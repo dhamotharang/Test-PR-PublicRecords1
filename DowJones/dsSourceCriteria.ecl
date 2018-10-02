@@ -1659,5 +1659,17 @@ EXPORT dsSourceCriteria := DATASET([
 {'National Stock Exchange (NSE) India Expelled Members','1645'},
 {'EC 2018/1204 ISIL (Da\'esh) and Al-Qaida List','1646'},
 {'Financial Markets Authority of New Zealand Warnings and Alerts','1647'},
-{'CME Group Disciplinary Notices List','1648'}
+{'CME Group Disciplinary Notices List','1648'},
+{'EC (CFSP) 2018/1237 Ukraine List','1649'},
+{'EC (CFSP) 2018/1238 Democratic People\'s Republic of Korea List','1650'},
+{'EC 2018/1230 Ukraine List','1651'},
+{'EC 2018/1231 Democratic People\'s Republic of Korea List','1652'},
+{'EC 2018/871 Banned Air Carriers List','1653'},
+{'EC (CFSP) 2018/1250 Libya List','1654'},
+{'EC (CFSP) 2018/1290 Libya List','1655'},
+{'EC 2018/1245 Libya List','1656'},
+{'EC 2018/1285 Libya List','1657'},
+{'Vessels - EC (CFSP) 2018/1289 Democratic People\'s Republic of Korea List Deflagged','1658'},
+{'Vessels - EC (CFSP) 2018/1289 Democratic People\'s Republic of Korea List Prohibited Entry into Ports','1659'},
+{'Vessels - EC 2018/1284 Democratic People\'s Republic of Korea List Prohibited Entry into Ports','1660'}
 ],r);

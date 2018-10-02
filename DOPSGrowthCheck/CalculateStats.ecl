@@ -27,49 +27,49 @@ DistFile:=distribute(BaseFile,hash(#expand(PersistentRecIDField)));
 #IF(hasDID)
 UniqueDID:=(string)count(table(DistFile,{did},did,merge));
 #ELSE
-UniqueDID:='n/a';
+UniqueDID:='';
 #END
 #IF(hasProxID)
 UniqueProxID:=(string)count(table(DistFile,{ProxID},ProxID,merge));
 #ELSE
-UniqueProxID:='n/a';
+UniqueProxID:='';
 #END
 #IF(hasSeleID)
 UniqueSeleID:=(string)count(table(DistFile,{SeleID},SeleID,merge));
 #ELSE
-UniqueSeleID:='n/a';
+UniqueSeleID:='';
 #END
 //Calculate Custom Field Stats
 #IF(PersistentRecIDField!='')
 UniquePersistentRecID:=(string)count(table(DistFile,{#expand(PersistentRecIDField)},#expand(PersistentRecIDField),merge));
 #ELSE
-UniquePersistentRecID:='n/a';
+UniquePersistentRecID:='';
 #END
 #IF(EmailField!='')
 UniqueEmail:=(string)count(table(DistFile,{#expand(EmailField)},#expand(EmailField),merge));
 #ELSE
-UniqueEmail:='n/a';
+UniqueEmail:='';
 #END
 #IF(PhoneField!='')
 UniquePhone:=(string)count(table(DistFile,{#expand(PhoneField)},#expand(PhoneField),merge));
 #ELSE
-UniquePhone:='n/a';
+UniquePhone:='';
 #END
 #IF(SSNField!='')
 UniqueSSN:=(string)count(table(DistFile,{#expand(SSNField)},#expand(SSNField),merge));
 #ELSE
-UniqueSSN:='n/a';
+UniqueSSN:='';
 #END
 #IF(FEINField!='')
 UniqueFein:=(string)count(table(DistFile,{#expand(FEINField)},#expand(FEINField),merge));
 #ELSE
-UniqueFein:='n/a';
+UniqueFein:='';
 #END
 #IF(indexfields!='')
 //Calculate Index Stats
 UniqueIndex:=(string)count(table(DistFile,{#expand(indexfields)},#expand(indexfields),merge));
 #ELSE
-UniqueIndex:='n/a';
+UniqueIndex:='';
 #END
 
 //Remove Date Fields
@@ -107,17 +107,17 @@ RemoveDates:=BaseFile;
 UniquePayload:=(string)count(dedup(sort(distribute(RemoveDates,hash(#expand(indexfields))),record,local),record,local));
 
 NewEntry:=dataset([
-{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','NumRecs',NumRecs,'B','N'},
-{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','UniqueDID',UniqueDID,'B','N'},
-{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','UniqueProxID',UniqueProxID,'B','N'},
-{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','UniqueSeleID',UniqueSeleID,'B','N'},
-{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','UniquePersistentRecID',UniquePersistentRecID,'B','N'},
-{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','UniqueEmail',UniqueEmail,'B','N'},
-{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','UniquePhone',UniquePhone,'B','N'},
-{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','UniqueSSN',UniqueSSN,'B','N'},
-{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','UniqueFEIN',UniqueFEIN,'B','N'},
-{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','UniqueIndex',UniqueIndex,'B','N'},
-{PackageName,in_base,InputKeyNickName,VersionBase,'n/a','UniquePayload',UniquePayload,'B','N'}
+{PackageName,in_base,InputKeyNickName,VersionBase,'','NumRecs',NumRecs,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionBase,'','UniqueDID',UniqueDID,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionBase,'','UniqueProxID',UniqueProxID,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionBase,'','UniqueSeleID',UniqueSeleID,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionBase,'','UniquePersistentRecID',UniquePersistentRecID,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionBase,'','UniqueEmail',UniqueEmail,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionBase,'','UniquePhone',UniquePhone,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionBase,'','UniqueSSN',UniqueSSN,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionBase,'','UniqueFEIN',UniqueFEIN,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionBase,'','UniqueIndex',UniqueIndex,'B','N'},
+{PackageName,in_base,InputKeyNickName,VersionBase,'','UniquePayload',UniquePayload,'B','N'}
 ],DOPSGrowthCheck.layouts.Stats_Layout);
 OldRecords:=dataset('~thor_data400::DeltaStats::IndividualFileStats::full',DOPSGrowthCheck.layouts.Stats_Layout,thor,__compressed__,opt);
 
@@ -130,7 +130,7 @@ DOPSGrowthCheck.layouts.Stats_Layout tCalculateDelTaStats(DOPSGrowthCheck.layout
                     Self.CurrVersion:=L.CurrVersion;
                     Self.PrevVersion:=R.CurrVersion;
                     Self.RecType:='D';
-                    Self.Passed:='n/a';
+                    Self.Passed:='';
                     Self:=L;
                 end;
 NewDeltaStat:=join(NewEntry,IdentifyProdRecord,Left.KeyNickName=Right.KeyNickName and Left.Stat_Name=Right.Stat_Name,tCalculateDelTaStats(left,right));

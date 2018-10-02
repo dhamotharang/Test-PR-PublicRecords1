@@ -86,10 +86,55 @@ EXPORT As_Business_Linking (
 		
 		from_base      := PROJECT(normPhones,trfMapBLInterface(LEFT));
 
-    from_persist   := dedup(sort(distribute(from_base,hash(vl_id,company_name)),record, local),record, local)
+    // Roll Up - to eliminate duplicates and keep the oldest (first) source_record_id
+	  from_base_Dist := DISTRIBUTE(from_base, HASH(vl_id));
+	  from_base_Sort := SORT(from_base_Dist 
+												,vl_id 											,source 										,company_phone    					
+												,phone_score 								,phone_type              		,company_name 							
+												,company_name_type_raw			,company_sic_code1       		,company_sic_code2					
+												,company_sic_code3          ,company_sic_code4       		,company_sic_code5          
+												,company_address_type_raw   ,company_address.prim_range ,company_address.predir     
+												,company_address.prim_name 	,company_address.postdir    ,company_address.sec_range	
+												,company_address.v_city_name,company_address.st         ,company_address.zip       
+												,company_address.zip4      	,company_url                ,company_ticker              
+												,company_ticker_exchange    ,company_inc_state  				,contact_job_title_raw        
+												,contact_name.title         ,contact_name.fname         ,contact_name.mname           
+												,contact_name.lname         ,contact_name.name_suffix   ,contact_email
+												,LOCAL );
+	
+	business_header.layout_business_linking.linking_interface RollupLinking(
+												 business_header.layout_business_linking.linking_interface L, 
+												 business_header.layout_business_linking.linking_interface R) := TRANSFORM
+	
+		Earliest_Date                 := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
+		SELF.source_record_id					:= IF(Earliest_Date = L.dt_vendor_first_reported, L.source_record_id, R.source_record_id);  
+
+		SELF.dt_first_seen 						:= ut.EarliestDate(ut.EarliestDate(L.dt_first_seen, R.dt_first_seen)
+																						        ,ut.EarliestDate(L.dt_last_seen,  R.dt_last_seen));
+		SELF.dt_last_seen 						:= max(L.dt_last_seen, R.dt_last_seen);
+		SELF.dt_vendor_last_reported 	:= max(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+		SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
+		SELF                          := L;
+	END;
+
+	from_base_Rollup := ROLLUP(from_base_Sort ,RollupLinking(LEFT, RIGHT)
+												,vl_id 											,source 										,company_phone    					
+												,phone_score 								,phone_type              		,company_name 							
+												,company_name_type_raw			,company_sic_code1       		,company_sic_code2					
+												,company_sic_code3          ,company_sic_code4       		,company_sic_code5          
+												,company_address_type_raw   ,company_address.prim_range ,company_address.predir     
+												,company_address.prim_name 	,company_address.postdir    ,company_address.sec_range	
+												,company_address.v_city_name,company_address.st         ,company_address.zip       
+												,company_address.zip4      	,company_url                ,company_ticker              
+												,company_ticker_exchange    ,company_inc_state  				,contact_job_title_raw        
+												,contact_name.title         ,contact_name.fname         ,contact_name.mname           
+												,contact_name.lname         ,contact_name.name_suffix   ,contact_email
+												,LOCAL );
+
+    from_persist   := dedup(sort(distribute(from_base_Rollup,hash(vl_id,company_name)),record, local),record, local)
 													 : persist(Infutor_NARB.persistnames().root + '::As_Business_Linking');											 
 		
-    from_nopersist := dedup(sort(distribute(from_base,hash(vl_id,company_name)),record, local),record, local);
+    from_nopersist := dedup(sort(distribute(from_base_Rollup,hash(vl_id,company_name)),record, local),record, local);
 													 													 													
     from_dedp      := if(IsPersist, from_persist, from_nopersist);
 

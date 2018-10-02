@@ -37,6 +37,7 @@
 	,yellowpages
 	,zoom
 	,cortera
+	,infutor_narb
 	;
 
 Business_Sources1 :=
@@ -80,6 +81,7 @@ Business_Sources1 :=
   + YellowPages.As_Business_Linking()
   // + Zoom.Zoom_As_Business_Linking          //on blacklist of ingest sources, filtered out completely
 	+ Cortera.Files.Bus_linking
+	+ Infutor_NARB.As_Business_Linking()
   ;
 
  // -- remove these re-corp states because we are not ready to ingest them yet.

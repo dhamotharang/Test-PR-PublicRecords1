@@ -4,7 +4,7 @@ export out_base_dev_stats_header_relatives(string filedate) := function
 
 ds_hdr_in    := header.File_Header_In().eq_uid_monthly;
 ds_hdr       := header.file_headers;
-ds_relatives := header.File_Relatives;
+ds_relatives := header.File_Relatives_v3;
 
 rPopulationStats_file_header_in
  :=

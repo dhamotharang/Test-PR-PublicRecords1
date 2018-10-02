@@ -1,7 +1,7 @@
-Credit_Unions.Spray(
+﻿Credit_Unions.Spray(
 
 	 pversion			:= ''
-	,pServerIP		:= _control.IPAddress.edata10
+	,pServerIP		:= _control.IPAddress.bctlpedata10
 	,pDirectory		:= '/data_build_5_2/credit_union/data/'
 	,pFilename		:= '*txt'
 	,pGroupName		:= Credit_Unions._Constants().groupname																		

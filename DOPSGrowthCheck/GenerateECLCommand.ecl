@@ -1,10 +1,11 @@
 ﻿import DOPSGrowthCheck;
-export GenerateECLCommand(Dataset(DOPSGrowthCheck.layouts.Build_Data_Layout) BuildList) := function
-    IdentifyAttributes:=project(BuildList,transform(DOPSGrowthCheck.layouts.Attribute_Layout_For_Command,
+export GenerateECLCommand:= function
+    // IdentifyAttributes:=project(BuildList,transform(DOPSGrowthCheck.layouts.Attribute_Layout_For_Command,
     //Self.hasProdRecord:=DOPSGrowthCheck.HasPrevious(Left.PackageName,Left.KeyFile,Left.ProdVersion);
     //Self.hasProdRecord:='true';
-    Self.indexfields:=DOPSGrowthCheck.DopsLayoutFunctions.fgetkeyedcolumns(Left.KeyFileNew);
-    Self:=Left;));
+    // Self.indexfields:=DOPSGrowthCheck.DopsLayoutFunctions.fgetkeyedcolumns(Left.KeyFileNew);
+    // Self:=Left;));
+		IdentifyAttributes:=DOPSGrowthCheck.IdentifyChangedDatasets;
 
     CommandLayout:=RECORD
         string command;
