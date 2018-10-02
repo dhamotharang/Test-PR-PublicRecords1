@@ -25,7 +25,7 @@ EXPORT proc_build_base(STRING version) := FUNCTION
 	//Send names to cleaner
 	NID.Mac_CleanParsedNames(PopCurrentRec, FileClnName, 
 													firstname:=FirstName, lastname:=LastName, middlename := clean_mname, namesuffix := clean_name_suffix
-													,includeInRepository:=false, normalizeDualNames:=false, useV2 := true);
+													,includeInRepository:=true, normalizeDualNames:=false, useV2 := true);
 	
 	//Name flags
 	person_flags := ['P', 'D'];
@@ -119,21 +119,10 @@ EXPORT proc_build_base(STRING version) := FUNCTION
     SELF:=L;
     SELF:=[];
   END;
-  new_acquireweb_data:=DISTRIBUTE(JOIN(ind_with_did_2,email_file_in,LEFT.awid=RIGHT.AWID_Email,jointhem(LEFT,RIGHT),INNER,LOCAL),HASH32(email));
+  new_acquireweb_data:=	JOIN(ind_with_did_2,email_file_in,LEFT.awid=RIGHT.AWID_Email,jointhem(LEFT,RIGHT),INNER,LOCAL);
 
-  // merge the new data with the existing basefile.  Then roll it up on the
-  // email and name fields, keeping the pertinent first and last date information
-	// prev_base := project(Acquireweb_Email.files.file_Acquireweb_Base, transform(layouts.layout_Acquireweb_Base, SELF.current_rec := false, SELF := LEFT));
-  // mergeddata:=SORT(new_acquireweb_data+prev_base,email,clean_fname,clean_mname,clean_lname);
-  // Acquireweb_Email.layouts.layout_Acquireweb_Base rollitup(Acquireweb_Email.layouts.layout_Acquireweb_Base L,Acquireweb_Email.layouts.layout_Acquireweb_Base R):=TRANSFORM
-    // SELF.date_first_seen:=IF(L.date_first_seen<R.date_first_seen,L.date_first_seen,R.date_first_seen);
-    // SELF.date_last_seen:=IF(L.date_last_seen>R.date_last_seen,L.date_last_seen,R.date_last_seen);
-    // SELF.date_vendor_first_reported:=IF(L.date_vendor_first_reported<R.date_vendor_first_reported,L.date_vendor_first_reported,R.date_vendor_first_reported);
-    // SELF.date_vendor_last_reported:=IF(L.date_vendor_last_reported>R.date_vendor_last_reported,L.date_vendor_last_reported,R.date_vendor_last_reported);
-    // SELF:=IF(L.date_vendor_last_reported>R.date_vendor_last_reported,L,R);
-  // END;
-  // BOOLEAN basefileexists:=nothor(fileservices.GetSuperFileSubCount('~thor_data200::base::acquireweb'))>0;
-  // newbasefile:=DISTRIBUTE(IF(basefileexists,ROLLUP(mergeddata,rollitup(LEFT,RIGHT),email,clean_fname,clean_mname,clean_lname,LOCAL),new_acquireweb_data),HASH32(awid));
+  // Final dedup
+  Deddata:=DEDUP(SORT(new_acquireweb_data,email,clean_fname,clean_mname,clean_lname,-date_vendor_last_reported),email,clean_fname,clean_mname,clean_lname);
 
-  RETURN new_acquireweb_data(trim(AWID,left,right)<>'AWID');
+  RETURN Deddata(trim(AWID,left,right)<>'AWID');
 END;

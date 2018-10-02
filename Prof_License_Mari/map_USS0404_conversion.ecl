@@ -225,7 +225,7 @@ maribase_plus_dbas 		xformToCommon(CleanRec pInput)
 		SELF.ACTIVE_FLAG			:= '';
 
 //Use address cleaner to clean address
-		CoPattern	:= '(^.* LLC$|^.* LLC\\.$|^.* INC$|^.* INC\\.$|^.* COMPANY$|^.* CORP$|^.* CORP\\.$|^.*APPRAISAL[S]?$|^.* MORTGAGE$|^FIRST BANK .*$|^BANK OF .*$|' +
+		CoPattern	:= '(^.* LLC$|^.* LLC\\.$|^.* INC$|^.* INC\\.$|^.* INC|^.* COMPANY$|^.* CORP$|^.* CORP\\.$|^.*APPRAISAL[S]?$|^.* MORTGAGE$|^FIRST BANK .*$|^BANK OF .*$|' +
 									'^.* APP[.]?$|^.* APPRAISAL SERVICE$|^.* APPRAISAL GROUP$|^.* APPRAISAL CO$|^.* FINANCIAL$|^.*HOMESERVICES|^FLAGSTAR BANK|^DMR MORTGAGE SERV ICES|' +
 									'^.* APPRAISAL SV[C|S]$|^.* SERVICE[S]?$|^.* & ASSOCIATES$|^.* ADVISORS$|^CO .*$|^C/O .*$|^ATTN.*$| ATTN.*$| \\-ATTN.*$| ATTN:.*$|^VALLEY BANK .*$|^.* MORTGAGE AND .*$|' +
 									'^.* REALTY$|^.* REAL ESTATE$|^.* REAL ESTATE CO$|^.* MANAGEMENT$|^.* MGMT$|^.* COMPANIES|^.* LIBERTY BUILDING$|^CHANCELLOR HOMESERVICES LENDIN$|' +
@@ -235,10 +235,10 @@ maribase_plus_dbas 		xformToCommon(CleanRec pInput)
 									'^.*MORTGAGE LOANS$|^NATIONAL LENDING NETWORK.*$|^INTERSTATE PACIFIC MORTGAGE CO.*$|^NATIONAL AFFORDABLE LENDING.*$|^.*MORTGAGE BANKING GROUP$|'+
 									'^WASHINGTON MUTUAL$|^HOMEFINDERSCENTER.COM$|^CAROL HENKEL$|^SUSAN AUSTIN$|PATRICIA NU$|SANDY DAVIS$|^1ST BANK DIVISION$|RETAIL CLIENT SERVICES GRP #16$|' +
 									'^FLEET MORTGAGE GROUP|^LEGACY FUNDING GROUP|PRINCIPAL LENDING GROUP|^RETAIL CLIENT SERVICES GRP.*$|^NATIONWIDE 1ST MORTGAGE.*$|^LA CROSSE - MADISON$|'+
-									'^.* MORTGAGE VENTURE.*$|^.* FCU$|^FLAGSTAR BANK.*$'+
+									'^.* MORTGAGE VENTURE.*$|^.* FCU$|^FLAGSTAR BANK.*$|UNION FEDERAL SAVINGS'+
                  ')';
 							  	
-	RemovePattern	  := '(^.* LLC[.]?$|^.* INC[.]?$|^.* COMPANY$|^.* CORP[.]?$|^.*APPRAISAL[S]?$|^.* MORTGAGE$|^HOMEFINDERSCENTER.COM$|^AGENT$|^BANK OF .*$|^CENTRAL REGION.*$|' +
+	RemovePattern	  := '(^.* LLC[.]?$|^.* INC[.]?$|^.* INC|^.* COMPANY$|^.* CORP[.]?$|^.*APPRAISAL[S]?$|^.* MORTGAGE$|^HOMEFINDERSCENTER.COM$|^AGENT$|^BANK OF .*$|^CENTRAL REGION.*$|' +
 											'^.* APPR\\.$|^.*APPRAISAL.*$|^APPRAISAL .*$|^.* FINANCIAL$|^.* SECTION$|^RLS ADMINISTRATION MP\\-5$|^FIRST BANK.*$|BOATMENS NATL BANK OF AUSTIN|' +
 											'^.* SERVICE[S]?$|^.* & ASSOCIATES$|^.* ADVISORS$|^CO .*$|^C/O.*$|^ATTN.*$|^.* ATTN$|^ATT:.*$|^ATT .*$| -ATTN.*$| ATTN .*$| ATTN:.*|' +
 											'^.* REALTY$|^.* REAL ESTATE.*$|^.* MANAGEMENT$|^.* MGMT$|^.* COMPANIES|^.*PROCESSING CENTER$|^.*PROCESSING CTR.*$|^.*PROCESSING|' +
@@ -260,7 +260,7 @@ maribase_plus_dbas 		xformToCommon(CleanRec pInput)
 											'^. OFFICE BLDG$|^.* BANK BLDG$|^MALL DRIVE OFFICE PARK|^NATIONWIDE 1ST MORTGAGE.*$|^.* BRANCH$|^LA CROSSE - MADISON$|'+
 											'^WHOLESALE DIVISION\\-$|^.* MORTGAGE VENTURE.*$|^.* FCU$|^FLAGSTAR BANK.*$|^MAIL STOP LIC$|'+
 											'^.* MORTGAGE CENTER$|^.* LENDING CENTER$|^.* FINANCIAL CENTER$|^.* BANKING CENTER$|^PEERLESS CENTER$|^.* EXECUTIVE CENTER$|'+
-											'^ALLIANCE CENTER$|^.* BANK BUILDING$|^.* FEDERAL BUILDING$'+
+											'^ALLIANCE CENTER$|^.* BANK BUILDING$|^.* FEDERAL BUILDING$|UNION FEDERAL SAVINGS'+
 											')';
 
 		TrimAddress1		:= ut.CleanSpacesAndUpper(pInput.corrected_address1);

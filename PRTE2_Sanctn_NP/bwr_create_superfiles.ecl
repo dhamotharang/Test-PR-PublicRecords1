@@ -1,10 +1,16 @@
 ﻿import promotesupers, roxiekeybuild, prte2_sanctn_np;
 
+promotesupers.mac_create_superfiles(prte2_sanctn_np.constants.in_prefix_name + 'incident');
+promotesupers.mac_create_superfiles(prte2_sanctn_np.constants.in_prefix_name + 'party');
+promotesupers.mac_create_superfiles(prte2_sanctn_np.constants.in_prefix_name + 'party_aka_dba');
+promotesupers.mac_create_superfiles(prte2_sanctn_np.constants.in_prefix_name + 'incidentcode');
+promotesupers.mac_create_superfiles(prte2_sanctn_np.constants.in_prefix_name + 'incidenttext');
+promotesupers.mac_create_superfiles(prte2_sanctn_np.constants.in_prefix_name + 'partytext');
+
+
 promotesupers.mac_create_superfiles(prte2_sanctn_np.constants.base_prefix_name + 'incident');
-promotesupers.mac_create_superfiles(prte2_sanctn_np.constants.base_prefix_name + 'license_nbr');
 promotesupers.mac_create_superfiles(prte2_sanctn_np.constants.base_prefix_name + 'party');
 promotesupers.mac_create_superfiles(prte2_sanctn_np.constants.base_prefix_name + 'party_aka_dba');
-promotesupers.mac_create_superfiles(prte2_sanctn_np.constants.base_prefix_name + 'incident_bip');
 promotesupers.mac_create_superfiles(prte2_sanctn_np.constants.base_prefix_name + 'incidentcode');
 promotesupers.mac_create_superfiles(prte2_sanctn_np.constants.base_prefix_name + 'incidenttext');
 promotesupers.mac_create_superfiles(prte2_sanctn_np.constants.base_prefix_name + 'partytext');
@@ -29,14 +35,14 @@ roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::sanctn::np', 's
 roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::sanctn::np', 'tin');
 
 //boolean keys
-roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::sanctn::np', 'dictindx3');
-roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::sanctn::np', 'docref.docref');
-roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::sanctn::np', 'dtldictx');
-roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::sanctn::np', 'exkeyi');
-roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::sanctn::np', 'exkeyo');
-roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::sanctn::np', 'nidx3');
-roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::sanctn::np', 'xdstat2');
-roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::sanctn::np', 'xseglist');
+// roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::sanctn::np', 'dictindx3');
+// roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::sanctn::np', 'docref.docref');
+// roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::sanctn::np', 'dtldictx');
+// roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::sanctn::np', 'exkeyi');
+// roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::sanctn::np', 'exkeyo');
+// roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::sanctn::np', 'nidx3');
+// roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::sanctn::np', 'xdstat2');
+// roxiekeybuild.mac_create_superkeyfiles_standard('~prte', '::key::sanctn::np', 'xseglist');
 
  
 //autokeys 
