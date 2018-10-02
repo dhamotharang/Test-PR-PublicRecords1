@@ -23,11 +23,11 @@ function
   odlv  := BIPV2_LGID3.Debug(BFile,s).RolledEntities(odl);
   odrv  := BIPV2_LGID3.Debug(BFile,s).RolledEntities(odr);
 
-  BIPV2_LGID3.match_candidates(BFile).layout_attribute_matches ainto(KFile.Attribute_Match le) := TRANSFORM
+  BIPV2_LGID3.match_candidates(BFile).layout_attribute_matches ainto(KFile.Attribute_Matches le) := TRANSFORM
     SELF := le;
   END;
 
-  am    := PROJECT(KFile.Attribute_Match(Lgid31=Lgid3one,Lgid32=Lgid3two)+KFile.Attribute_Match(Lgid31=Lgid3two,Lgid32=Lgid3one),ainto(LEFT));
+  am    := PROJECT(KFile.Attribute_Matches(Lgid31=Lgid3one,Lgid32=Lgid3two)+KFile.Attribute_Matches(Lgid31=Lgid3two,Lgid32=Lgid3one),ainto(LEFT));
   mtch  := BIPV2_LGID3.Debug(BFile,s).AnnotateMatchesFromData(odl+odr,DATASET([{0,0,0,0,Lgid3one,Lgid3two,0,0}],BIPV2_LGID3.match_candidates(BFile).layout_matches),am);
 
   // get layout with the scores only for easier reading
