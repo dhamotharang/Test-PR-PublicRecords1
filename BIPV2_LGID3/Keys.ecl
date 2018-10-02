@@ -5,7 +5,7 @@ EXPORT SpecificitiesDebugKeyName := '~'+'key::BIPV2_LGID3::LGID3::Debug::specifi
  
 EXPORT Specificities_Key := INDEX(s,{1},{s},SpecificitiesDebugKeyName);
 SHARED Build_Specificities_Key := BUILDINDEX(Specificities_Key, OVERWRITE, FEW);
-SHARED mtch := debug(ih,s[1]).AnnotateMatches(matches(ih).PossibleMatches);
+SHARED mtch := debug(ih,s[1]).AnnotateMatches(matches(ih).PossibleMatches,matches(ih).All_Attribute_Matches);
  
 EXPORT SampleKeyName := '~'+'key::BIPV2_LGID3::LGID3::Debug::match_sample_debug';
 ms_temp := SORT(mtch,Conf,LGID31,LGID32,SKEW(1.0)); // Some headers have very skewed IDs

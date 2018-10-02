@@ -228,7 +228,7 @@ r := RECORD
 END;
 export ConfidenceBreakdown := table(Matches,r,Conf,few);
 Full_Sample_Matches := MatchSample+BorderlineMatchSample+AlmostMatchSample;
-export MatchSampleRecords := Debug(ih,s,MatchThreshold).AnnotateMatches(Full_Sample_Matches);
+export MatchSampleRecords := Debug(ih,s,MatchThreshold).AnnotateMatches(Full_Sample_Matches,All_Attribute_Matches);
  
 //Now actually produce the new file
 SALT30.MAC_Reassign_UID(ih_thin,split_patch,LGID3,rcid,ih0); // Perform splits
