@@ -1,4 +1,4 @@
-import LiensV2, address;
+﻿import LiensV2, address;
 
 file_in := LiensV2.Mapping_Hogan;
 
@@ -15,6 +15,7 @@ self.vendor_id := L.record_code;
 self.orig_rmsid := L.orig_rmsid;
 self.bCBFlag	:= L.bCBFlag;
 self.eviction	:= L.eviction;
+SELF.dob	:= CHOOSE(cnt, L.DOB, '', '');
 self.orig_name := choose(Cnt, L.DEBTOR_NAME, L.creditor_name, L.ATTY_name);
 self.orig_address1 := choose(cnt, L.debtor_address1, L.creditor_address1, L.atty_address1);
 self.orig_address2 := '';

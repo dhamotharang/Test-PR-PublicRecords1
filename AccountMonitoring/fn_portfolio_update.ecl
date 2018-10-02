@@ -73,9 +73,9 @@ EXPORT fn_portfolio_update(UNSIGNED1 pseudo_environment,
 						SELF.unit_desig  := l.address_cln[47..56];
 						SELF.sec_range   := l.address_cln[57..64];
 						SELF.p_city_name := l.address_cln[65..89];
-						SELF.st          := l.address_cln[115..116];
-						SELF.z5          := l.address_cln[117..121];
-						SELF.zip4        := l.address_cln[122..125];
+						SELF.st          := IF(l.address_cln[115..116] !='' AND l.address_cln[1..10] !='' , l.address_cln[115..116],  l.state);
+						SELF.z5          := IF(l.address_cln[117..121] !='' AND l.address_cln[1..10] !='', l.address_cln[117..121], TRIM(l.zip)[1..5]);
+						SELF.zip4        := IF(l.address_cln[122..125] !='' AND l.address_cln[1..10] !='', l.address_cln[122..125], TRIM(REGEXREPLACE('[^0-9]',l.zip,''))[6..9]);
 						SELF.phone10     := l.phone;
 						SELF             := l;
 						SELF             := [];

@@ -1,5 +1,5 @@
-EXPORT Layout_Override_Liens_Main_In := record
-		string50 tmsid;
+﻿EXPORT Layout_Override_Liens_Main_In := record
+string50 tmsid;
 string50 rmsid;
 string8 process_date;
 string2 record_code;
@@ -42,8 +42,14 @@ string5 legal_block;
 string10 legal_borough;
 string certificate_number := '';
 BOOLEAN	bCBFlag	:=	FALSE;
-string20 flag_file_id;
+unsigned8 persistent_record_id := 0;
 string1 filing_status;
 string30 filing_status_desc;
-unsigned8 persistent_record_id := 0; 
+STRING2  Filing_Type_ID  := '';
+STRING8  Collection_Date := '';
+STRING45 CaseLinkID      := '';
+STRING50 TMSID_old       := '';
+STRING50 RMSID_old       := '';
+BOOLEAN  CaseLinkID_Prop_Flag := FALSE;
+string20 flag_file_id;
 end;

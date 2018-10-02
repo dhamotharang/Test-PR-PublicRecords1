@@ -37,6 +37,7 @@
 	,yellowpages
 	,zoom
 	,cortera
+	,infutor_narb
 	;
 
 Business_Sources1 :=
@@ -58,7 +59,7 @@ Business_Sources1 :=
   + Experian_FEIN.As_Business_Linking()
   + FAA.faa_aircraft_reg_as_business_linking
   + FBNV2.As_Business_Linking
-  // + Frandx.As_Business_Linking()
+  + Frandx.As_Business_Linking()
   + Govdata.CA_Sales_Tax_As_Business_Linking()
   + Govdata.FDIC_As_Business_Linking  //commented out in sprint43
   + Govdata.IRS_Non_Profit_As_Business_Linking
@@ -80,6 +81,7 @@ Business_Sources1 :=
   + YellowPages.As_Business_Linking()
   // + Zoom.Zoom_As_Business_Linking          //on blacklist of ingest sources, filtered out completely
 	+ Cortera.Files.Bus_linking
+	+ Infutor_NARB.As_Business_Linking
   ;
 
  // -- remove these re-corp states because we are not ready to ingest them yet.

@@ -1,4 +1,4 @@
-import autokeyb2;
+﻿import autokeyb2;
 
 export proc_autokeybuild(
 	string filedate, 

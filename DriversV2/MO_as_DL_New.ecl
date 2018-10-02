@@ -1,6 +1,8 @@
-import Drivers, ut, std;
+﻿import Drivers, ut, std;
 
-dl_file     :=  DriversV2.File_DL_MO_Update;
+EXPORT MO_as_DL_New(dataset(DriversV2.Layouts_DL_MO_New_In.Layout_MO_with_Clean_MedCert) pFile_MO_Input) := function
+
+dl_file     :=  pFile_MO_Input;
 
 string f2CharCodeAndComma(string pRestrictionCode) :=  // process each two-character restriction code
 					 if(trim(pRestrictionCode,right)<>'',
@@ -224,4 +226,8 @@ rolled_ds_joined := ROLLUP(srt_ds_joined,
 													 rollem(LEFT, RIGHT),
 													 LOCAL); 
 
-EXPORT MO_as_DL_New := rolled_ds_joined : PERSIST(DriversV2.Constants.Cluster + 'Persist::DL2::DrvLic_MO_as_DL_New');
+MO_as_DL_mapper := rolled_ds_joined;
+
+return MO_as_DL_mapper;
+
+end;

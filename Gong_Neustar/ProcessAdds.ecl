@@ -1,4 +1,4 @@
-IMPORT STD, Nid, Address, AID, DID_add, didville, Risk_Indicators, CellPhone, Gong, ut, _Validate;
+﻿IMPORT STD, Nid, Address, AID, DID_add, didville, Risk_Indicators, CellPhone, Gong, ut, _Validate;
 
 Layout_Captions := RECORD
 	 Layout_Neustar;
@@ -64,7 +64,7 @@ EXPORT ProcessAdds(dataset(layout_Neustar) adds,string rundate = ut.Now()) := fu
 				self.group_id				:= self.SeisintID;
 				self.listing_type_bus	:= IF(Left.RECORD_TYPE in ['B','b','P'],'B',' ');
 				self.listing_type_res := IF(Left.RECORD_TYPE in ['R','r'],'R',' ');
-				self.listing_type_gov := IF(Left.RECORD_TYPE = 'G','G',' ');
+				self.listing_type_gov := IF(Left.RECORD_TYPE in Gong_Neustar.Constants.govtRecordTypes,'G',' ');
 
 				self.prior_area_code:= '';
 				//self.company_name := Std.str.touppercase(left.Business_name);

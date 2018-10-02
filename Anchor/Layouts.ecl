@@ -1,5 +1,5 @@
 ﻿EXPORT Layouts := MODULE
-IMPORT Anchor, AID, address;
+IMPORT Anchor, AID, address, bipv2;
 
 	EXPORT Raw	:= RECORD
 		string  FirstName;
@@ -51,7 +51,14 @@ IMPORT Anchor, AID, address;
 		string8		date_last_seen;
 		string8		date_vendor_first_reported;
 		string8		date_vendor_last_reported;
-		string			clean_cname; //Not currently utilized but business names may be a future project
+		string		clean_cname;
+		boolean 	current_rec;
 		END;
+				
+		//Not currently utilized but BIP fields will be a future project
+	EXPORT Base_w_bip	:= RECORD
+		Base;
+		bipv2.IDlayouts.l_xlink_ids;
+	END;
 	
 END;

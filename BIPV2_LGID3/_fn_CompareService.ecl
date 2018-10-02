@@ -1,4 +1,4 @@
-import BIPV2_LGID3,tools;
+﻿import BIPV2_LGID3,tools;
 
 EXPORT _fn_CompareService(
 
@@ -23,14 +23,12 @@ function
   odlv  := BIPV2_LGID3.Debug(BFile,s).RolledEntities(odl);
   odrv  := BIPV2_LGID3.Debug(BFile,s).RolledEntities(odr);
 
-  mtch := BIPV2_LGID3.Debug(BFile,s).AnnotateMatchesFromData(odl+odr,DATASET([{0,0,0,0,LGID3one,LGID3two,0,0}],BIPV2_LGID3.match_candidates(BFile).layout_matches));
+  BIPV2_LGID3.match_candidates(BFile).layout_attribute_matches ainto(KFile.Attribute_Matches le) := TRANSFORM
+    SELF := le;
+  END;
 
-  // BIPV2_LGID3.match_candidates(BFile).layout_attribute_matches ainto(KFile.Attribute_Matches le) := TRANSFORM
-    // SELF := le;
-  // END;
-
-  // am    := PROJECT(KFile.Attribute_Matches(Lgid31=Lgid3one,Lgid32=Lgid3two)+KFile.Attribute_Matches(Lgid31=Lgid3two,Lgid32=Lgid3one),ainto(LEFT));
-  // mtch  := BIPV2_LGID3.Debug(BFile,s).AnnotateMatchesFromData(odl+odr,DATASET([{0,0,0,0,Lgid3one,Lgid3two,0,0}],BIPV2_LGID3.match_candidates(BFile).layout_matches),am);
+  am    := PROJECT(KFile.Attribute_Matches(Lgid31=Lgid3one,Lgid32=Lgid3two)+KFile.Attribute_Matches(Lgid31=Lgid3two,Lgid32=Lgid3one),ainto(LEFT));
+  mtch  := BIPV2_LGID3.Debug(BFile,s).AnnotateMatchesFromData(odl+odr,DATASET([{0,0,0,0,Lgid3one,Lgid3two,0,0}],BIPV2_LGID3.match_candidates(BFile).layout_matches),am);
 
   // get layout with the scores only for easier reading
   dnorm_specs_filt2 := BIPV2_LGID3._fn_normscores(mtch);

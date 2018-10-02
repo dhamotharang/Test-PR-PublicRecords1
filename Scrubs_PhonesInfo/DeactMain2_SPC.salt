@@ -3,8 +3,8 @@ MODULE:Scrubs_Phonesinfo
 FILENAME:Phonesinfo
 NAMESCOPE:DeactMain2
 
-FIELDTYPE:Invalid_Num:ALLOW(-0213456789)
-FIELDTYPE:Invalid_DeactCode:ENUM(DE|DE)
+FIELDTYPE:Invalid_Num:ALLOW(-0123456789 ) 
+FIELDTYPE:Invalid_DeactCode:ENUM(DE|SU|) 
 FIELDTYPE:Invalid_YN:ENUM(Y|N|P)
 FIELDTYPE:Invalid_Date:CUSTOM(Scrubs.fn_valid_date>0,'future')
 

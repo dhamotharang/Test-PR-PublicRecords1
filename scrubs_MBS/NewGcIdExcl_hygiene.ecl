@@ -1,38 +1,47 @@
-﻿IMPORT SALT37;
+﻿IMPORT SALT39,STD;
 EXPORT NewGcIdExcl_hygiene(dataset(NewGcIdExcl_layout_NewGcIdExcl) h) := MODULE
  
 //A simple summary record
-EXPORT Summary(SALT37.Str30Type txt) := FUNCTION
+EXPORT Summary(SALT39.Str30Type  txt) := FUNCTION
   SummaryLayout := RECORD
     txt;
     NumberOfRecords := COUNT(GROUP);
+    populated_fdn_file_gc_exclusion_id_cnt := COUNT(GROUP,h.fdn_file_gc_exclusion_id <> (TYPEOF(h.fdn_file_gc_exclusion_id))'');
     populated_fdn_file_gc_exclusion_id_pcnt := AVE(GROUP,IF(h.fdn_file_gc_exclusion_id = (TYPEOF(h.fdn_file_gc_exclusion_id))'',0,100));
-    maxlength_fdn_file_gc_exclusion_id := MAX(GROUP,LENGTH(TRIM((SALT37.StrType)h.fdn_file_gc_exclusion_id)));
-    avelength_fdn_file_gc_exclusion_id := AVE(GROUP,LENGTH(TRIM((SALT37.StrType)h.fdn_file_gc_exclusion_id)),h.fdn_file_gc_exclusion_id<>(typeof(h.fdn_file_gc_exclusion_id))'');
+    maxlength_fdn_file_gc_exclusion_id := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.fdn_file_gc_exclusion_id)));
+    avelength_fdn_file_gc_exclusion_id := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.fdn_file_gc_exclusion_id)),h.fdn_file_gc_exclusion_id<>(typeof(h.fdn_file_gc_exclusion_id))'');
+    populated_fdn_file_info_id_cnt := COUNT(GROUP,h.fdn_file_info_id <> (TYPEOF(h.fdn_file_info_id))'');
     populated_fdn_file_info_id_pcnt := AVE(GROUP,IF(h.fdn_file_info_id = (TYPEOF(h.fdn_file_info_id))'',0,100));
-    maxlength_fdn_file_info_id := MAX(GROUP,LENGTH(TRIM((SALT37.StrType)h.fdn_file_info_id)));
-    avelength_fdn_file_info_id := AVE(GROUP,LENGTH(TRIM((SALT37.StrType)h.fdn_file_info_id)),h.fdn_file_info_id<>(typeof(h.fdn_file_info_id))'');
+    maxlength_fdn_file_info_id := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.fdn_file_info_id)));
+    avelength_fdn_file_info_id := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.fdn_file_info_id)),h.fdn_file_info_id<>(typeof(h.fdn_file_info_id))'');
+    populated_exclusion_id_cnt := COUNT(GROUP,h.exclusion_id <> (TYPEOF(h.exclusion_id))'');
     populated_exclusion_id_pcnt := AVE(GROUP,IF(h.exclusion_id = (TYPEOF(h.exclusion_id))'',0,100));
-    maxlength_exclusion_id := MAX(GROUP,LENGTH(TRIM((SALT37.StrType)h.exclusion_id)));
-    avelength_exclusion_id := AVE(GROUP,LENGTH(TRIM((SALT37.StrType)h.exclusion_id)),h.exclusion_id<>(typeof(h.exclusion_id))'');
+    maxlength_exclusion_id := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.exclusion_id)));
+    avelength_exclusion_id := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.exclusion_id)),h.exclusion_id<>(typeof(h.exclusion_id))'');
+    populated_exclusion_id_type_cnt := COUNT(GROUP,h.exclusion_id_type <> (TYPEOF(h.exclusion_id_type))'');
     populated_exclusion_id_type_pcnt := AVE(GROUP,IF(h.exclusion_id_type = (TYPEOF(h.exclusion_id_type))'',0,100));
-    maxlength_exclusion_id_type := MAX(GROUP,LENGTH(TRIM((SALT37.StrType)h.exclusion_id_type)));
-    avelength_exclusion_id_type := AVE(GROUP,LENGTH(TRIM((SALT37.StrType)h.exclusion_id_type)),h.exclusion_id_type<>(typeof(h.exclusion_id_type))'');
+    maxlength_exclusion_id_type := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.exclusion_id_type)));
+    avelength_exclusion_id_type := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.exclusion_id_type)),h.exclusion_id_type<>(typeof(h.exclusion_id_type))'');
+    populated_status_cnt := COUNT(GROUP,h.status <> (TYPEOF(h.status))'');
     populated_status_pcnt := AVE(GROUP,IF(h.status = (TYPEOF(h.status))'',0,100));
-    maxlength_status := MAX(GROUP,LENGTH(TRIM((SALT37.StrType)h.status)));
-    avelength_status := AVE(GROUP,LENGTH(TRIM((SALT37.StrType)h.status)),h.status<>(typeof(h.status))'');
+    maxlength_status := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.status)));
+    avelength_status := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.status)),h.status<>(typeof(h.status))'');
+    populated_date_added_cnt := COUNT(GROUP,h.date_added <> (TYPEOF(h.date_added))'');
     populated_date_added_pcnt := AVE(GROUP,IF(h.date_added = (TYPEOF(h.date_added))'',0,100));
-    maxlength_date_added := MAX(GROUP,LENGTH(TRIM((SALT37.StrType)h.date_added)));
-    avelength_date_added := AVE(GROUP,LENGTH(TRIM((SALT37.StrType)h.date_added)),h.date_added<>(typeof(h.date_added))'');
+    maxlength_date_added := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.date_added)));
+    avelength_date_added := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.date_added)),h.date_added<>(typeof(h.date_added))'');
+    populated_user_added_cnt := COUNT(GROUP,h.user_added <> (TYPEOF(h.user_added))'');
     populated_user_added_pcnt := AVE(GROUP,IF(h.user_added = (TYPEOF(h.user_added))'',0,100));
-    maxlength_user_added := MAX(GROUP,LENGTH(TRIM((SALT37.StrType)h.user_added)));
-    avelength_user_added := AVE(GROUP,LENGTH(TRIM((SALT37.StrType)h.user_added)),h.user_added<>(typeof(h.user_added))'');
+    maxlength_user_added := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.user_added)));
+    avelength_user_added := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.user_added)),h.user_added<>(typeof(h.user_added))'');
+    populated_date_changed_cnt := COUNT(GROUP,h.date_changed <> (TYPEOF(h.date_changed))'');
     populated_date_changed_pcnt := AVE(GROUP,IF(h.date_changed = (TYPEOF(h.date_changed))'',0,100));
-    maxlength_date_changed := MAX(GROUP,LENGTH(TRIM((SALT37.StrType)h.date_changed)));
-    avelength_date_changed := AVE(GROUP,LENGTH(TRIM((SALT37.StrType)h.date_changed)),h.date_changed<>(typeof(h.date_changed))'');
+    maxlength_date_changed := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.date_changed)));
+    avelength_date_changed := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.date_changed)),h.date_changed<>(typeof(h.date_changed))'');
+    populated_user_changed_cnt := COUNT(GROUP,h.user_changed <> (TYPEOF(h.user_changed))'');
     populated_user_changed_pcnt := AVE(GROUP,IF(h.user_changed = (TYPEOF(h.user_changed))'',0,100));
-    maxlength_user_changed := MAX(GROUP,LENGTH(TRIM((SALT37.StrType)h.user_changed)));
-    avelength_user_changed := AVE(GROUP,LENGTH(TRIM((SALT37.StrType)h.user_changed)),h.user_changed<>(typeof(h.user_changed))'');
+    maxlength_user_changed := MAX(GROUP,LENGTH(TRIM((SALT39.StrType)h.user_changed)));
+    avelength_user_changed := AVE(GROUP,LENGTH(TRIM((SALT39.StrType)h.user_changed)),h.user_changed<>(typeof(h.user_changed))'');
   END;
     T := TABLE(h,SummaryLayout);
   R1 := RECORD
@@ -43,9 +52,9 @@ EXPORT Summary(SALT37.Str30Type txt) := FUNCTION
 END;
  
 summary0 := Summary('Summary');
-invRec := RECORD
+  invRec := RECORD
   UNSIGNED  FldNo;
-  SALT37.StrType FieldName;
+  SALT39.StrType FieldName;
   UNSIGNED NumberOfRecords;
   REAL8  populated_pcnt;
   UNSIGNED  maxlength;
@@ -62,17 +71,17 @@ END;
 EXPORT invSummary := NORMALIZE(summary0, 9, invert(LEFT,COUNTER));
 // The character counts
 // Move everything into 'inverted list' form so processing can be done 'in library'
-SALT37.MAC_Character_Counts.X_Data_Layout Into(h le,unsigned C) := TRANSFORM
-  SELF.Fld := TRIM(CHOOSE(C,IF (le.fdn_file_gc_exclusion_id <> 0,TRIM((SALT37.StrType)le.fdn_file_gc_exclusion_id), ''),IF (le.fdn_file_info_id <> 0,TRIM((SALT37.StrType)le.fdn_file_info_id), ''),IF (le.exclusion_id <> 0,TRIM((SALT37.StrType)le.exclusion_id), ''),TRIM((SALT37.StrType)le.exclusion_id_type),IF (le.status <> 0,TRIM((SALT37.StrType)le.status), ''),TRIM((SALT37.StrType)le.date_added),TRIM((SALT37.StrType)le.user_added),TRIM((SALT37.StrType)le.date_changed),TRIM((SALT37.StrType)le.user_changed)));
+SALT39.MAC_Character_Counts.X_Data_Layout Into(h le,unsigned C) := TRANSFORM
+  SELF.Fld := TRIM(CHOOSE(C,IF (le.fdn_file_gc_exclusion_id <> 0,TRIM((SALT39.StrType)le.fdn_file_gc_exclusion_id), ''),IF (le.fdn_file_info_id <> 0,TRIM((SALT39.StrType)le.fdn_file_info_id), ''),IF (le.exclusion_id <> 0,TRIM((SALT39.StrType)le.exclusion_id), ''),TRIM((SALT39.StrType)le.exclusion_id_type),IF (le.status <> 0,TRIM((SALT39.StrType)le.status), ''),TRIM((SALT39.StrType)le.date_added),TRIM((SALT39.StrType)le.user_added),TRIM((SALT39.StrType)le.date_changed),TRIM((SALT39.StrType)le.user_changed)));
   SELF.FldNo := C;
 END;
 SHARED FldInv0 := NORMALIZE(h,9,Into(LEFT,COUNTER));
 // Move everything into 'pairs' form so processing can be done 'in library'
-SALT37.MAC_Correlate.Data_Layout IntoP(h le,UNSIGNED C) := TRANSFORM
+SALT39.MAC_Correlate.Data_Layout IntoP(h le,UNSIGNED C) := TRANSFORM
   SELF.FldNo1 := 1 + (C / 9);
   SELF.FldNo2 := 1 + (C % 9);
-  SELF.Fld1 := TRIM(CHOOSE(SELF.FldNo1,IF (le.fdn_file_gc_exclusion_id <> 0,TRIM((SALT37.StrType)le.fdn_file_gc_exclusion_id), ''),IF (le.fdn_file_info_id <> 0,TRIM((SALT37.StrType)le.fdn_file_info_id), ''),IF (le.exclusion_id <> 0,TRIM((SALT37.StrType)le.exclusion_id), ''),TRIM((SALT37.StrType)le.exclusion_id_type),IF (le.status <> 0,TRIM((SALT37.StrType)le.status), ''),TRIM((SALT37.StrType)le.date_added),TRIM((SALT37.StrType)le.user_added),TRIM((SALT37.StrType)le.date_changed),TRIM((SALT37.StrType)le.user_changed)));
-  SELF.Fld2 := TRIM(CHOOSE(SELF.FldNo2,IF (le.fdn_file_gc_exclusion_id <> 0,TRIM((SALT37.StrType)le.fdn_file_gc_exclusion_id), ''),IF (le.fdn_file_info_id <> 0,TRIM((SALT37.StrType)le.fdn_file_info_id), ''),IF (le.exclusion_id <> 0,TRIM((SALT37.StrType)le.exclusion_id), ''),TRIM((SALT37.StrType)le.exclusion_id_type),IF (le.status <> 0,TRIM((SALT37.StrType)le.status), ''),TRIM((SALT37.StrType)le.date_added),TRIM((SALT37.StrType)le.user_added),TRIM((SALT37.StrType)le.date_changed),TRIM((SALT37.StrType)le.user_changed)));
+  SELF.Fld1 := TRIM(CHOOSE(SELF.FldNo1,IF (le.fdn_file_gc_exclusion_id <> 0,TRIM((SALT39.StrType)le.fdn_file_gc_exclusion_id), ''),IF (le.fdn_file_info_id <> 0,TRIM((SALT39.StrType)le.fdn_file_info_id), ''),IF (le.exclusion_id <> 0,TRIM((SALT39.StrType)le.exclusion_id), ''),TRIM((SALT39.StrType)le.exclusion_id_type),IF (le.status <> 0,TRIM((SALT39.StrType)le.status), ''),TRIM((SALT39.StrType)le.date_added),TRIM((SALT39.StrType)le.user_added),TRIM((SALT39.StrType)le.date_changed),TRIM((SALT39.StrType)le.user_changed)));
+  SELF.Fld2 := TRIM(CHOOSE(SELF.FldNo2,IF (le.fdn_file_gc_exclusion_id <> 0,TRIM((SALT39.StrType)le.fdn_file_gc_exclusion_id), ''),IF (le.fdn_file_info_id <> 0,TRIM((SALT39.StrType)le.fdn_file_info_id), ''),IF (le.exclusion_id <> 0,TRIM((SALT39.StrType)le.exclusion_id), ''),TRIM((SALT39.StrType)le.exclusion_id_type),IF (le.status <> 0,TRIM((SALT39.StrType)le.status), ''),TRIM((SALT39.StrType)le.date_added),TRIM((SALT39.StrType)le.user_added),TRIM((SALT39.StrType)le.date_changed),TRIM((SALT39.StrType)le.user_changed)));
   END;
 SHARED Pairs0 := NORMALIZE(ENTH(h,Config.CorrelateSampleSize),9*9,IntoP(LEFT,COUNTER))(FldNo1<FldNo2);
 SHARED FldIds := DATASET([{1,'fdn_file_gc_exclusion_id'}
@@ -83,12 +92,12 @@ SHARED FldIds := DATASET([{1,'fdn_file_gc_exclusion_id'}
       ,{6,'date_added'}
       ,{7,'user_added'}
       ,{8,'date_changed'}
-      ,{9,'user_changed'}],SALT37.MAC_Character_Counts.Field_Identification);
-EXPORT AllProfiles := SALT37.MAC_Character_Counts.FN_Profile(FldInv0,FldIds);
+      ,{9,'user_changed'}],SALT39.MAC_Character_Counts.Field_Identification);
+EXPORT AllProfiles := SALT39.MAC_Character_Counts.FN_Profile(FldInv0,FldIds);
  
-EXPORT SrcProfiles := SALT37.MAC_Character_Counts.Src_Profile(FldInv0,FldIds);
+EXPORT SrcProfiles := SALT39.MAC_Character_Counts.Src_Profile(FldInv0,FldIds);
  
-EXPORT Correlations := SALT37.MAC_Correlate.Fn_Profile(Pairs0,FldIds);
+EXPORT Correlations := SALT39.MAC_Correlate.Fn_Profile(Pairs0,FldIds);
  
 ErrorRecord := RECORD
   UNSIGNED1 FieldNum;
@@ -96,15 +105,15 @@ ErrorRecord := RECORD
 END;
 ErrorRecord NoteErrors(h le,UNSIGNED1 c) := TRANSFORM
   SELF.ErrorNum := CHOOSE(c,
-    NewGcIdExcl_Fields.InValid_fdn_file_gc_exclusion_id((SALT37.StrType)le.fdn_file_gc_exclusion_id),
-    NewGcIdExcl_Fields.InValid_fdn_file_info_id((SALT37.StrType)le.fdn_file_info_id),
-    NewGcIdExcl_Fields.InValid_exclusion_id((SALT37.StrType)le.exclusion_id),
-    NewGcIdExcl_Fields.InValid_exclusion_id_type((SALT37.StrType)le.exclusion_id_type),
-    NewGcIdExcl_Fields.InValid_status((SALT37.StrType)le.status),
-    NewGcIdExcl_Fields.InValid_date_added((SALT37.StrType)le.date_added),
-    NewGcIdExcl_Fields.InValid_user_added((SALT37.StrType)le.user_added),
-    NewGcIdExcl_Fields.InValid_date_changed((SALT37.StrType)le.date_changed),
-    NewGcIdExcl_Fields.InValid_user_changed((SALT37.StrType)le.user_changed),
+    NewGcIdExcl_Fields.InValid_fdn_file_gc_exclusion_id((SALT39.StrType)le.fdn_file_gc_exclusion_id),
+    NewGcIdExcl_Fields.InValid_fdn_file_info_id((SALT39.StrType)le.fdn_file_info_id),
+    NewGcIdExcl_Fields.InValid_exclusion_id((SALT39.StrType)le.exclusion_id),
+    NewGcIdExcl_Fields.InValid_exclusion_id_type((SALT39.StrType)le.exclusion_id_type),
+    NewGcIdExcl_Fields.InValid_status((SALT39.StrType)le.status),
+    NewGcIdExcl_Fields.InValid_date_added((SALT39.StrType)le.date_added),
+    NewGcIdExcl_Fields.InValid_user_added((SALT39.StrType)le.user_added),
+    NewGcIdExcl_Fields.InValid_date_changed((SALT39.StrType)le.date_changed),
+    NewGcIdExcl_Fields.InValid_user_changed((SALT39.StrType)le.user_changed),
     0);
   SELF.FieldNum := IF(SELF.ErrorNum=0,SKIP,c); // Bail early to avoid creating record
 END;
@@ -123,4 +132,16 @@ PrettyErrorTotals := RECORD
 END;
 ValErr := TABLE(TotalErrors,PrettyErrorTotals);
 EXPORT ValidityErrors := ValErr;
+EXPORT StandardStats(BOOLEAN doSummaryGlobal = TRUE, BOOLEAN doAllProfiles = TRUE) := FUNCTION
+  myTimeStamp := (UNSIGNED6)SALT39.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
+  fieldPopulationOverall := Summary('');
+ 
+  SALT39.mod_StandardStatsTransforms.mac_hygieneSummaryTransform(Scrubs_MBS, NewGcIdExcl_Fields, 'RECORDOF(fieldPopulationOverall)', FALSE);
+ 
+  fieldPopulationOverall_Standard := IF(doSummaryGlobal, NORMALIZE(fieldPopulationOverall, COUNT(FldIds) * 6, xSummary(LEFT, COUNTER, myTimeStamp, 'all', 'all')));
+  fieldPopulationOverall_TotalRecs_Standard := IF(doSummaryGlobal, SALT39.mod_StandardStatsTransforms.mac_hygieneTotalRecs(fieldPopulationOverall, myTimeStamp, 'all', FALSE, 'all'));
+  allProfiles_Standard := IF(doAllProfiles, SALT39.mod_StandardStatsTransforms.hygieneAllProfiles(AllProfiles, myTimeStamp, 10, 'all'));
+ 
+  RETURN fieldPopulationOverall_Standard & fieldPopulationOverall_TotalRecs_Standard & allProfiles_Standard;
+END;
 END;

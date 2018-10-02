@@ -1,4 +1,4 @@
-import data_services, header,RoxieKeyBuild,doxie,doxie_build,business_risk,Address,doxie_files,InsuranceHeader_xLink,_Control,std,Relationship;
+﻿import data_services, header,RoxieKeyBuild,doxie,doxie_build,business_risk,Address,doxie_files,InsuranceHeader_xLink,_Control,std,Relationship;
 export proc_build_keys(string filedate) := MODULE
 
     SHARED kpn:=  PRTE2_Header.constants.KEY_PREFIX;       // '~prte::key::header::'
@@ -69,11 +69,12 @@ export proc_build_keys(string filedate) := MODULE
     RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(doxie_files.key_minors               ,kpn+'minors'                                         ,kpn+filedate+'::minors'                                       ,k53);
     RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(doxie.key_Header_DA                  ,kpn+'da'                                             ,kpn+filedate+'::da'                                           ,k54);
     RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(doxie.Key_Header_DTS_FnameSmall      ,phd+'fname_small'                                    ,phd+filedate+'::fname_small'                                  ,k55);
-    RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(Relationship.key_relatives_v3        ,kpn+'relatives_v3'                                   ,kpn+filedate+'::relatives_v3'                                 ,k82);
+    RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(prte2_header.key_relatives_v3        ,kpn+'relatives_v3'                                   ,kpn+filedate+'::relatives_v3'                                 ,k82);
+				RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(prte2_header.key_insuranceheader_xlink_did     ,pih+'did'                                  ,pih+filedate+'::did'                                 									,k85);
 
     SHARED build_keys := parallel(    k02,k03,k04,k05,k06,k07,k08,k09,k10,k11,k12,k13,k14,k15,k16,k17,k18,k19,k20,
                                   k21,k22,k23,k24,k25,k26,k27,k28,k29,k30,k31,k32,k33,k34,k35,k36,k37,k38,k39,k40,
-                                  k41,k42,k43,k44,k45,k46,k47,k48,k49,k50,k51,k52,k53,k54,k55,k82,
+                                  k41,k42,k43,k44,k45,k46,k47,k48,k49,k50,k51,k52,k53,k54,k55,k82,k85,
                            
                                   k03f,k04f,k32f );
     
@@ -195,7 +196,8 @@ export proc_build_keys(string filedate) := MODULE
             RoxieKeyBuild.Mac_SK_Move_to_Built_v2(pll+'@version@'+'::determiner'                                    ,pll+filedate+'::determiner'                                    ,MB70);
             RoxieKeyBuild.Mac_SK_Move_to_Built_v2(kpn+'@version@'+'::addr_unique_expanded'                          ,kpn+filedate+'::addr_unique_expanded'                          ,MB83);
             RoxieKeyBuild.Mac_SK_Move_to_Built_v2(kpf+'@version@'+'::addr_unique_expanded'                          ,kpf+filedate+'::addr_unique_expanded'                          ,MB83f);
-
+												RoxieKeyBuild.Mac_SK_Move_to_Built_v2(pih+'@version@'+'::did'                         																	 ,pih+filedate+'::did'                          																	,MB85);
+						
                 
     SHARED move_PersonHeaderKeys_built := parallel( MB01,MB02,MB03,MB04,MB05,MB06,MB07,MB08,MB09,MB10,MB11,MB12,MB13,MB14,MB15,MB16,MB17,MB18,MB19,MB20,
                                              MB21,MB22,MB23,MB24,MB25,MB26,MB27,MB28,MB29,MB30,MB31,MB32,MB33,MB34,MB35,MB36,MB37,MB38,MB39,MB40,
@@ -205,7 +207,7 @@ export proc_build_keys(string filedate) := MODULE
                        
                                              MB03f,MB04f,MB32f,
                                              
-                                             MB56f,MB60f,MB61f,MB83f );
+                                             MB56f,MB60f,MB61f,MB83f, MB85 );
     
     
 
@@ -223,9 +225,9 @@ export proc_build_keys(string filedate) := MODULE
             RoxieKeyBuild.Mac_SK_Move_to_Built_v2(pih+'@version@::did::refs::zip_pr'     ,pih+filedate+'::did::refs::zip_pr'  ,MB80);
             RoxieKeyBuild.Mac_SK_Move_to_Built_v2(pih+'@version@::idl'                   ,pih+filedate+'::idl'                ,MB81);     
             RoxieKeyBuild.Mac_SK_Move_to_Built_v2(kpn+'@version@::relatives_v3'          ,kpn+filedate+'::relatives_v3'       ,MB82);
-            
+            RoxieKeyBuild.Mac_SK_Move_to_Built_v2(pih+'@version@::did::sup::rid'         ,pih+filedate+'::did::sup::rid'      ,MB84);
     
-    SHARED move_PersonLABKeys_built := parallel(MB69,MB70,MB71,MB72,MB73,MB74,MB75,MB77,MB78,MB79,MB80,MB81,MB82);
+    SHARED move_PersonLABKeys_built := parallel(MB69,MB70,MB71,MB72,MB73,MB74,MB75,MB77,MB78,MB79,MB80,MB81,MB82,MB84);
     
     
     // move keys to QA
@@ -308,6 +310,7 @@ export proc_build_keys(string filedate) := MODULE
         RoxieKeyBuild.Mac_SK_Move_V2(pll+'@version@'+'::determiner'                                     ,'Q',MQ70,2);
         RoxieKeyBuild.Mac_SK_Move_V2(kpn+'@version@'+'::addr_unique_expanded'                           ,'Q',MQ83,2);
         RoxieKeyBuild.Mac_SK_Move_V2(kpf+'@version@'+'::addr_unique_expanded'                           ,'Q',MQ83f,2);
+								RoxieKeyBuild.Mac_SK_Move_V2(pih+'@version@'+'::did'                           																	,'Q',MQ85,2);
         
         
         ;
@@ -320,7 +323,7 @@ export proc_build_keys(string filedate) := MODULE
                                                  
                                                  MQ03f,MQ04f,MQ32f,
                                              
-                                                 MQ56f,MQ60f,MQ61f,MQ83f);
+                                                 MQ56f,MQ60f,MQ61f,MQ83f,MQ85);
     
         RoxieKeyBuild.Mac_SK_Move_V2(pih+'@version@::did::refs::address'    ,'Q',MQ69,2);
         RoxieKeyBuild.Mac_SK_Move_V2(pih+'@version@::did::refs::dln'        ,'Q',MQ70,2);
@@ -336,10 +339,11 @@ export proc_build_keys(string filedate) := MODULE
         RoxieKeyBuild.Mac_SK_Move_V2(pih+'@version@::did::refs::zip_pr'     ,'Q',MQ80,2);
         RoxieKeyBuild.Mac_SK_Move_V2(pih+'@version@::idl'                   ,'Q',MQ81,2);
         RoxieKeyBuild.Mac_SK_Move_V2(kpn+'@version@::relatives_v3'          ,'Q',MQ82,2);
+								RoxieKeyBuild.Mac_SK_Move_V2(pih+'@version@::did::sup::rid'         ,'Q',MQ84,2);
             
             
     
-    SHARED move_PersonLABKeys_qa := parallel(MQ69,MQ70,MQ71,MQ72,MQ73,MQ74,MQ75,MQ77,MQ78,MQ79,MQ80,MQ81,MQ82);
+    SHARED move_PersonLABKeys_qa := parallel(MQ69,MQ70,MQ71,MQ72,MQ73,MQ74,MQ75,MQ77,MQ78,MQ79,MQ80,MQ81,MQ82,MQ84);
      
     EXPORT step1 := sequential(
                                     build_keys

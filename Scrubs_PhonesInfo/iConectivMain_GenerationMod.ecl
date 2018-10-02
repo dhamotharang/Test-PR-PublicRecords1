@@ -38,7 +38,7 @@ EXPORT iConectivMain_GenerationMod := MODULE(SALT39.iGenerationMod)
  
   // The entire spec file
   EXPORT spcString :=
-    'options:-gh \n'
+    'options:-gh\n'
     + 'MODULE:Scrubs_PhonesInfo\n'
     + 'FILENAME:PhonesInfo\n'
     + 'NAMESCOPE:iConectivMain\n'

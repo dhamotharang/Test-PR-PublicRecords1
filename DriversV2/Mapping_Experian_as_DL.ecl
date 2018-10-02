@@ -1,4 +1,4 @@
-import Ut, lib_stringlib, Drivers;
+﻿import Ut, lib_stringlib, Drivers;
 
 string1	fGenderCodeFromString(string pGenderIn)
  :=	case(pGenderIn,
@@ -222,7 +222,7 @@ DriversV2.Layout_DL_Extended	tExperianFixedToCommon(Drivers.Mapping_Experian_XML
 	self.zip 					  :=  pInput.CurrentAddress_zip;
 	self.country                  :=  ''; //pInput.CurrentAddress_country;     // added as a part of rewrite
 	self.postal_code              :=  ''; //pInput.CurrentAddress_foreign_zip; // added as a part of rewrite
-	self.ssn					  :=  lib_stringlib.StringLib.stringfilter(pInput.orig_ssn_first_5 + pInput.orig_ssn_last_4,'0123456789');
+	self.ssn_safe			  :=  lib_stringlib.StringLib.stringfilter(pInput.orig_ssn_first_5 + pInput.orig_ssn_last_4,'0123456789');
 	self.dob 					  :=  (unsigned4)fDateStringFromSlashedMDY(trim(pInput.dob_month,left,right) + '/' + trim(pInput.dob_day,left,right) + '/' + trim(pInput.dob_year,left,right));
 	self.sex_flag				  :=  fGenderCodeFromString(pInput.gender_description);
 	self.expiration_date	      :=  (unsigned4)fDateStringFromSlashedMDY(pInput.expiration_date);

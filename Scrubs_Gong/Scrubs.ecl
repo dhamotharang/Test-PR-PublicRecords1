@@ -1,6 +1,7 @@
-IMPORT ut,SALT33;
+﻿IMPORT ut,SALT33;
 IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Scrubs := MODULE
+
 // The module to handle the case where no scrubs exist
   EXPORT  Expanded_Layout := RECORD(Layout_File_Neustar)
     UNSIGNED1 ACTION_CODE_Invalid;

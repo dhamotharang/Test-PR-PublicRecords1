@@ -12,23 +12,24 @@ ut.MAC_Sequence_Records_NewRec(f,Layout_Searchfile,aircraft_id,outf);
 
 // persistent record id 
 
-outf_dedup:= dedup(sort(distribute(project(outf, transform(Layout_Searchfile, self.name:= trim(left.name,left,right), self:= left)), 
-														hash(n_number,serial_number, mfr_mdl_code, eng_mfr_mdl, year_mfr, type_registrant,name,
-																	street,street2,city,state,zip_code,region,orig_county,country,last_action_date,cert_issue_date,certification,
-																	type_aircraft,type_engine,status_code,mode_s_code,fract_owner,aircraft_mfr_name,model_name)),
-											n_number,serial_number, mfr_mdl_code, eng_mfr_mdl, year_mfr, type_registrant,name,
-												street,street2,city,state,zip_code,region,orig_county,country,last_action_date,cert_issue_date,certification,
-												type_aircraft,type_engine,status_code,mode_s_code,fract_owner,aircraft_mfr_name,model_name,- date_last_seen,local),
-												except aircraft_id, date_first_seen, date_last_seen,lot,local) ; 
-												
-												
   Layout_Searchfile_out := RECORD
   unsigned6 aircraft_id;
 	faa.layout_aircraft_registration_out_Persistent_ID;
 	BIPV2.IDlayouts.l_xlink_ids;
 	END;
-
-
+	
+outf_dedup:= dedup(sort(distribute(project(outf, transform(Layout_Searchfile_out, 
+self.name:= trim(left.name,left,right),self.persistent_record_id := 0,self:= left)), 
+						hash(n_number,serial_number, mfr_mdl_code, eng_mfr_mdl, year_mfr, type_registrant,name,
+								street,street2,city,state,zip_code,region,orig_county,country,last_action_date,cert_issue_date,certification,
+								type_aircraft,type_engine,status_code,mode_s_code,fract_owner,aircraft_mfr_name,model_name)),
+								n_number,serial_number, mfr_mdl_code, eng_mfr_mdl, year_mfr, type_registrant,name,
+								street,street2,city,state,zip_code,region,orig_county,country,last_action_date,cert_issue_date,certification,
+								type_aircraft,type_engine,status_code,mode_s_code,fract_owner,aircraft_mfr_name,model_name,
+								-date_last_seen,-UltWeight,-OrgWeight,-SELEWeight,-ProxWeight,-POWWeight,-EmpWeight,-DotWeight,local),
+								except aircraft_id, date_first_seen, date_last_seen,lot,current_flag,UltID,OrgID,SELEID,ProxID,POWID,EmpID,DotID,
+								UltWeight,OrgWeight,SELEWeight,ProxWeight,POWWeight,EmpWeight,DotWeight,UltScore,OrgScore,SELEScore,ProxScore,POWScore,EmpScore,DotScore,local); 
+																								
 out_pID := project( outf_dedup , transform(Layout_Searchfile_out, 
  self. persistent_record_id := hash64(trim(left.n_number,left,right)+
   trim(left.serial_number,left,right)+

@@ -96,9 +96,9 @@ EXPORT proc_build_base(String filedate) := FUNCTION
 		//project to final layout
 		df_phones_ported_metadata_final := PROJECT(df_phones_ported_metadata_combined, Layouts.layout_phones_ported_metadata_base_ext);
    
-  PromoteSupers.MAC_SF_BuildProcess(df_phones_ported_metadata_final, Constants.base_phones_ported_metadata, writefile_phones_ported_metadata,,,,filedate);
-	
-		//for carrier_reference file, just do a copy from prod
+  PromoteSupers.MAC_SF_BuildProcess(df_phones_ported_metadata_final, Constants.base_phones_ported_metadata, writefile_phones_ported_metadata,,,true,filedate);
+ 
+			//for carrier_reference file, just do a copy from prod
 		PromoteSupers.MAC_SF_BuildProcess(Files.carrier_reference_base_in, Constants.base_carrier_reference, writefile_carrier_reference,,,,filedate);
 	  
   RETURN  PARALLEL(writefile_phones_ported_metadata, writefile_carrier_reference);	

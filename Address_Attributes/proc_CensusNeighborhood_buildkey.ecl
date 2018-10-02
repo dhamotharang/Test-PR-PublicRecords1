@@ -215,5 +215,11 @@ full1 := 	sequential(parallel(a1,a2,a3,a4,a5a,a5,sequential(a7,b7,move7),sequent
 
      create_orbit_build:= Orbit3.proc_Orbit3_CreateBuild ('Neighborhood',filedate,'N');
 		 
-return sequential(full1,move_qa,UpdateRoxiePage,create_orbit_build);//,parallel(UpdateRoxiePage));
+build_all := sequential(full1,move_qa,UpdateRoxiePage,create_orbit_build) : //,parallel(UpdateRoxiePage));
+
+SUCCESS(FileServices.SendEmail('christopher.brodeur@lexisnexisrisk.com', 'Neighborhood Keybuild Complete', WORKUNIT)),
+Failure(FileServices.SendEmail('christopher.brodeur@lexisnexisrisk.com', 'Neighborhood Keybuild Failure',WORKUNIT + '\n' + FAILMESSAGE));
+
+		 
+return build_all;
 END;										

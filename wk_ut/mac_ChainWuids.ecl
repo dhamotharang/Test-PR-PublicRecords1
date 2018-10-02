@@ -15,21 +15,21 @@ also, in the email it would be nice for it to report the results set that you pa
 import tools,wk_ut,_control,ut;
 EXPORT mac_ChainWuids(
 
-	 pECL
-	,pIterationStartValue                                         // will replace any @iteration@ in the pECL with this value
-	,pNumIterations                                               // all subsequent iterations will increment the above this many times
-	,pversion           	= ''	                                  // will replace any @version@ in the pECL with this value. 
+   pECL
+  ,pIterationStartValue                                         // will replace any @iteration@ in the pECL with this value
+  ,pNumIterations                                               // all subsequent iterations will increment the above this many times
+  ,pversion             = ''                                    // will replace any @version@ in the pECL with this value. 
   ,pSetResults          = '[]'                                  // output these results after each iteration.  These are named results from the workunit kicked off.
   ,pcluster             = wk_ut._Constants.Groupname(,true)     // Thor cluster on which to run the iterations.
   ,pNotifyEmails        = 'wk_ut._Constants.EmailAddressNotify' // Email Addresses to send reports to.
-	,pESP							    = 'wk_ut._Constants.LocalEsp'	          // ESP server for your environment(for soapcalls).  Boca OSS dataland is '10.241.3.242'
-	,pOutputEcl					  = 'false'					                      // Should output the generated ecl as a string(for testing) or actually run the ecl
+  ,pESP                 = 'wk_ut._Constants.LocalEsp'           // ESP server for your environment(for soapcalls).  Boca OSS dataland is '10.241.3.242'
+  ,pOutputEcl           = 'false'                               // Should output the generated ecl as a string(for testing) or actually run the ecl
   ,pUniqueOutput        = '\'\''                                // Unique String to Identify these iterations from others in the same workunit.
   ,pOutputFilename      = '\'\''                                // filename template to output the workunits dataset to. Use @version@ and @iteration@ tokens within it to allow the name to be unique per iteration. 
   ,pOutputSuperfile     = '\'\''                                // superfile to add the above file to. 
   ,pSummaryFilename     = '\'\''                                // filename template to output the Summary report dataset to(which can be unique). Use @version@ and @iteration@ tokens within it to allow the name to be unique per iteration. 
   ,pSummarySuperfile    = '\'\''                                // superfile to add the above file to. 
-	,pForceRun					  = 'false'					                      // Should force running of all the iterations.  Don't skip if they've already been run. only for when using the pOutputFilename.
+  ,pForceRun            = 'false'                               // Should force running of all the iterations.  Don't skip if they've already been run. only for when using the pOutputFilename.
   ,pPollingFrequency    = '\'5\''                               // in minutes.  So 5 means poll every 5 minutes.
   ,pSetStopCondition    = '[]'                                  // if condition is true, don't kick off next iteration.  In effect, making pNumIterations a max # of iterations instead of total iterations
                                                                 // example: ['MatchesPerformed','< 1000000'].  This will pull the MatchesPerformed value from the finished iteration, and if it is less than 1 million
@@ -38,7 +38,7 @@ EXPORT mac_ChainWuids(
   ,pForceSkip           = false
 ) :=
 functionmacro
-	
+  
   import tools,wk_ut,_control,ut,std;
   
   #UNIQUENAME(PREECL          )
@@ -107,6 +107,10 @@ functionmacro
     #SET(ECLTEXT  ,regexreplace('@version@'   ,%'ECLTEXT'% ,pversion               ,nocase))
   #END
   
+  #UNIQUENAME(WAIT4MASTEREVENT_EVENT_NAME   )
+  #SET(WAIT4MASTEREVENT_EVENT_NAME  ,'__#__' + trim(pUniqueOutput,all) + '_' + trim(pversion) + '_' + trim((string)pIterationStartValue) + '_' + trim((string)pNumIterations) + '_' + length(trim(%'ECLTEXT'%)) + '_' + length(trim(regexreplace('[^;]',%'ECLTEXT'%,''),all)) + '_' + length(trim(regexreplace('[^[:alnum:]]',%'ECLTEXT'%,''),all)) + '__$__')
+  #UNIQUENAME(WAIT4MASTEREVENT   ,%'WAIT4MASTEREVENT_EVENT_NAME'%)
+
   #IF(regexfind('@version@'  ,pOutputFilename ,nocase))
     #SET(OUTPUTFILENAME  ,regexreplace('@version@'  , pOutputFilename ,pversion               ,nocase))
     #SET(REJECTCOND ,'cond := rejected(')
@@ -139,7 +143,7 @@ functionmacro
   #END
 
   #SET(SUMMARYREPORT,'')
-	#SET(STRINGFILLER, '                                                                           ')
+  #SET(STRINGFILLER, '                                                                           ')
   #SET(EXTRAPARENS,'')
   #SET(PREVCNTR,0)
   #SET(SETWUIDS ,'[')
@@ -181,8 +185,8 @@ functionmacro
       #APPEND(REJECTCONDS ,'cond' + %'CNTR'% + ' := STD.File.FileExists(\'' + %'LOOPFILENAME'% + '\');\n')
 /*      
   ,1 => sequential(cond1,cond2,cond3)
-	,2 => sequential(cond2,cond3)
-	,3 => sequential(cond3)
+  ,2 => sequential(cond2,cond3)
+  ,3 => sequential(cond3)
   );
  */
       #SET(MASTERCASE  ,regexreplace('[)]',%'MASTERCASE'%,',kick_iter'+ %'CNTR'% + ')',nocase))
@@ -229,8 +233,8 @@ cond3 := STD.File.FileExists('~temp::lbentley::20130719::it38');
         #APPEND(PREECL  ,%'SCALARFIELD'% + '_lay := ' + pSetResults[%RESULTCNTR% + 1] + ';\n')
       #END
 
-      #SET(LEN				,length(trim(%'SCALARFIELD'%,left,right)))
-      #SET(FILLER			,%'STRINGFILLER'%[1..(40 - (%LEN% - 1	))])
+      #SET(LEN        ,length(trim(%'SCALARFIELD'%,left,right)))
+      #SET(FILLER     ,%'STRINGFILLER'%[1..(40 - (%LEN% - 1 ))])
 
       #IF(trim(%'SCALARINDEXFIELD'%) = '')
         #APPEND(RESULTSTEMP ,%'SCALARRESULT'% + pversion + %'CNTR'% + '  := global(wk_ut.get_Scalar_Result(wuid' + %'CNTR'% + ',\'' + %'SCALARRESULT'% + '\',\'' + pESP + '\'),few);\n')
@@ -444,10 +448,10 @@ cond3 := STD.File.FileExists('~temp::lbentley::20130719::it38');
   #SET(ECL  ,%'PREECL'% + %'ECL'%)
   // #SET(ECL  ,%'PREECL'% + 'return ' + %'ECL'%)
 
-	#if(pOutputEcl = true)
-		return %'ECL'%;
-	#ELSE
-		%ECL%
-	#END
+  #if(pOutputEcl = true)
+    return %'ECL'%;
+  #ELSE
+    %ECL%
+  #END
 
 endmacro;

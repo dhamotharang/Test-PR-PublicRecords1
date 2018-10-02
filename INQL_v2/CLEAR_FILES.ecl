@@ -9,13 +9,13 @@
 	
 	export Current := sequential(
 					FS.StartSuperFileTransaction(),
-						nothor(apply(In_SF, FS.ClearSuperFile('~' + name, false))),//true))), temporary while testing 
+						nothor(apply(In_SF, FS.ClearSuperFile('~' + name, true))),
 					FS.FinishSuperFileTransaction()
 						);
 	
 	export In_Bldg := sequential(
 					FS.StartSuperFileTransaction(),
-						nothor(apply(In_Bldg_SF, FS.ClearSuperFile('~' + name,false))), //true))),
+						nothor(apply(In_Bldg_SF, FS.ClearSuperFile('~' + name, true))),
 					FS.FinishSuperFileTransaction()
 						);
 						

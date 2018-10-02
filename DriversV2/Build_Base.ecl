@@ -1,9 +1,9 @@
-import tools, _control;
+﻿import tools, _control;
 
 export Build_Base(
 
 	 string															pversion
-	,string															pDirectory			= '/data/dl_data/drvlic/bin/isBuildRunning.lck'
+	,string															pDirectory			= '/data/dl_data/drvlic/logs/isBuildRunning.lck'
 	,string															pServerIP				= _control.IPAddress.bctlpedata10
 ) :=
 function
@@ -12,6 +12,7 @@ function
 	sequential(DriversV2.Proc_Build_DL_Base(pversion)
 						 , DriversV2.Proc_DL2_QA_Samples
 						 , FileServices.DeleteExternalFile(pServerIP, pDirectory)
+						 , DriversV2.Promote_As_DL_Superfiles
 						);
 	
 	return

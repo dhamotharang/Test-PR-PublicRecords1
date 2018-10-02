@@ -1,4 +1,5 @@
-﻿IMPORT	tools, ut;
+﻿//	Needed in file_liens_fcra_main
+IMPORT	LiensV2_SrcInfoRpt, tools, ut;
 EXPORT Files(	STRING	pFilename	=	'',
 							BOOLEAN	pUseProd	=	FALSE) := MODULE
 							
@@ -11,7 +12,7 @@ EXPORT Files(	STRING	pFilename	=	'',
 																			);
 
 	EXPORT	SuppressedJurisdictions	:=	DATASET(
-																				IF(pFilename='',Filenames(pUseProd:=pUseProd).Base.SuppressedJurisdictions.QA,pFilename)
+																				IF(pFilename='',LiensV2_SrcInfoRpt.Filenames(pUseProd:=pUseProd).Base.SuppressedJurisdictions.QA,pFilename)
 																				,LiensV2_SrcInfoRpt.Layouts.rSuppressedJurisdictions,THOR,__compressed__
 																			);																
 END;

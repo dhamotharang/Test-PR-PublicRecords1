@@ -42,8 +42,10 @@ EXPORT cowatercraft 			:= 'COWATERCRAFT';
 EXPORT coaircraft 				:= 'COAIRCRAFT';
 EXPORT comarriagedivorce 	:= 'COMARRIAGEDIVORCE';
 EXPORT coucc 							:= 'COUCC';
+EXPORT coclue       := 'COCLUE';
+EXPORT cocc         := 'COCC';
 EXPORT setRels := [cohabit, coapt, copobox, cossn, copolicy, coclaim, coproperty, bcoproperty, coforeclosure, bcoforeclosure,
 									 colien, bcolien, cobankruptcy, bcobankruptcy, covehicle, coexperian, cotransunion, coenclarity, coecrash,
-									 bcoecrash, cowatercraft, coaircraft, comarriagedivorce, coucc];
+									 bcoecrash, cowatercraft, coaircraft, comarriagedivorce, coucc, coclue, cocc];
 
 END;

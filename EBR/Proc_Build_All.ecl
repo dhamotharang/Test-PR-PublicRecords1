@@ -1,4 +1,4 @@
-import RoxieKeybuild, _control,tools;
+﻿import RoxieKeybuild, _control,tools, Orbit3;
 // -- NOTE: EBR_Init_Flag determines if the base file is being included as input.
 // --	To include BASE FILE set to false
 // -- To include IN FILE set to true
@@ -13,7 +13,8 @@ accept_sk_to_qa		:= Proc_Accept_SK_to_QA;
 accept_sk_to_qa_LD:= Proc_Accept_SK_to_QA_LinkIDs;
 output_new_recs		:= Query_New_Records;
 send_email 				:= Send_Build_Completion_Email(filedate);
-updatedops    	  := RoxieKeyBuild.updateversion('EBRKeys',filedate,_Control.MyInfo.EmailAddressNotify,,'N|BN');
+updatedops    	  := RoxieKeyBuild.updateversion('EBRKeys',filedate,_Control.MyInfo.EmailAddressNotify,,'N');
+orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('EBR',(filedate),'N'); 
 
 
 
@@ -23,6 +24,7 @@ retval := sequential(
 	,build_keys
 	,build_autokeys
 	,updatedops
+ ,orbit_update
 	,run_stats
 	,superfiles_clear
 	,output_new_recs

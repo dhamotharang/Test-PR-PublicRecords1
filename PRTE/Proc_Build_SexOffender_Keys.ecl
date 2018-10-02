@@ -1,4 +1,4 @@
-import	_control, PRTE_CSV, hygenics_search;
+﻿import	_control, PRTE_CSV, hygenics_search;
 
 export	Proc_Build_SexOffender_Keys(string pIndexVersion)	:=
 function
@@ -261,4 +261,4 @@ function
 																				)
 											);
 
-end;
+end :DEPRECATED('Use PRTE2_SEXOFEENDER.PROC_BUILD_KEYS');

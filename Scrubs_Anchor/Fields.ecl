@@ -31,12 +31,12 @@ EXPORT InValidFT_invalid_date(SALT38.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH
 EXPORT InValidMessageFT_invalid_date(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInChars('0123456789'),SALT38.HygieneErrors.NotLength('0..8'),SALT38.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_name(SALT38.StrType s0) := FUNCTION
-  s1 := SALT38.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ\' -.()\'&_`\\/,'); // Only allow valid symbols
+  s1 := SALT38.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\' -.()\'&_`\\/,'); // Only allow valid symbols
   s2 := SALT38.stringcleanspaces( SALT38.stringsubstituteout(s1,' -.()\'&_`\\/,',' ') ); // Insert spaces but avoid doubles
   RETURN  s2;
 END;
-EXPORT InValidFT_invalid_name(SALT38.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT38.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ\' -.()\'&_`\\/,'))),~(LENGTH(TRIM(s)) >= 0));
-EXPORT InValidMessageFT_invalid_name(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ\' -.()\'&_`\\/,'),SALT38.HygieneErrors.NotLength('0..'),SALT38.HygieneErrors.Good);
+EXPORT InValidFT_invalid_name(SALT38.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT38.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\' -.()\'&_`\\/,'))),~(LENGTH(TRIM(s)) >= 0));
+EXPORT InValidMessageFT_invalid_name(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\' -.()\'&_`\\/,'),SALT38.HygieneErrors.NotLength('0..'),SALT38.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_address(SALT38.StrType s0) := FUNCTION
   s1 := SALT38.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\' -#.&:+\\/()_,'); // Only allow valid symbols
@@ -58,8 +58,8 @@ EXPORT MakeFT_invalid_zip(SALT38.StrType s0) := FUNCTION
   s1 := SALT38.stringfilter(s0,'0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_zip(SALT38.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT38.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) >= 0 AND LENGTH(TRIM(s)) <= 10));
-EXPORT InValidMessageFT_invalid_zip(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInChars('0123456789'),SALT38.HygieneErrors.NotLength('0..10'),SALT38.HygieneErrors.Good);
+EXPORT InValidFT_invalid_zip(SALT38.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT38.StringFilter(s,'0123456789'))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 5 OR LENGTH(TRIM(s)) = 9 OR LENGTH(TRIM(s)) = 10));
+EXPORT InValidMessageFT_invalid_zip(UNSIGNED1 wh) := CHOOSE(wh,SALT38.HygieneErrors.NotInChars('0123456789'),SALT38.HygieneErrors.NotLength('0,5,9,10'),SALT38.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_state(SALT38.StrType s0) := FUNCTION
   s1 := SALT38.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'); // Only allow valid symbols

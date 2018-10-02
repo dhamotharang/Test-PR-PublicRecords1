@@ -1,4 +1,4 @@
-﻿import _control,ut,RoxieKeyBuild,header,PromoteSupers;
+﻿import _control,ut,RoxieKeyBuild,header,PromoteSupers,Data_Services;
 export proc_quickHdr_build_all (string sourceIP) := function
    
 
@@ -13,8 +13,8 @@ export proc_quickHdr_build_all (string sourceIP) := function
         RETURN v_name;
 
     END;
-
-  xlink_superfile_ver := getVname('~thor_data400::key::insuranceheader_xlink::qa::did::refs::name')[1..8];
+  keyPrefix := Data_Services.Data_Location.Prefix('LAB_xLink'); // eg 	~thor400_44::
+  xlink_superfile_ver := getVname(keyPrefix+'key::insuranceheader_xlink::qa::did::refs::name')[1..8];
   header_raw_prod_ver := getVname('~thor_data400::base::header_raw_Prod','')[1..8];
   
   check_superfiles_are_in_sync := if ( xlink_superfile_ver <> header_raw_prod_ver

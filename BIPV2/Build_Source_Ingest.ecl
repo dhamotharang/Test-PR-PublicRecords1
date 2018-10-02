@@ -1,4 +1,5 @@
-import Business_Header, AID_Build, ut, mdr, tools,wk_ut,std,BIPV2_Build,BIPV2_Tools;
+﻿
+import Business_Header, AID_Build, ut, mdr, tools,wk_ut,std,BIPV2_Build,BIPV2_Tools, Scrubs, Scrubs_BIPV2;
 
 EXPORT Build_Source_Ingest(
 
@@ -37,6 +38,7 @@ function
 			,sequential(
          email_alert
 				,Build_Base_File
+				,Scrubs.ScrubsPlus('BIPV2','Scrubs_BIPV2','Scrubs_BIPV2_Ingest', 'Ingest', pversion, pEmailList, false)
 				,if(not pWriteFileOnly	,Promote(pversion,'source_ingest').buildfiles.New2Built	)
 				,if(not pWriteFileOnly	,Promote(pversion,'source_ingest').buildfiles.Built2Qa	)
         ,wk_ut.Strata_Orbit_Item_list(workunit,'BIPV2','Full_Build'  ,pversion ,pEmailNotifyList := BIPV2_Build.mod_email.emailList,pIsTesting := false)

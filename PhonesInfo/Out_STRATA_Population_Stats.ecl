@@ -1,6 +1,7 @@
 EXPORT Out_STRATA_Population_Stats (pTCPAPort    			// TCPA Daily Port File
 																			,piConectPort   // iConectiv Daily Port File
 																			,pLIDB					// LIDB File
+																			,pGHDisc 	//Gong History Disconnect Daily File
 																			,pDisc		// Disconnect Daily File
 																			,pPhonesMeta 		// PhonesMetadata File	
 																			,pCarrRef				// Carrier Reference File
@@ -25,6 +26,9 @@ import Strata, PhonesInfo, ut;
 	#uniquename(rPopulationStats_piDisconnect);
 	#uniquename(dPopulationStats_piDisconnect);
 	#uniquename(zRunDisconnectStats);
+	
+	#uniquename(dPopulationStats_pGHDisc);
+	#uniquename(zRunGHDisconnectStats);
 
 	#uniquename(rPopulationStats_pPhonesMeta);
 	#uniquename(dPopulationStats_pPhonesMeta);
@@ -135,6 +139,18 @@ import Strata, PhonesInfo, ut;
 
 	%dPopulationStats_piDisconnect% := table(pDisconnect, %rPopulationStats_piDisconnect%, carrier_name, few);
 	strata.createXMLStats(%dPopulationStats_piDisconnect%,'PhonesMetadata', 'Disconnect2Phones', pVersion, '', %zRunDisconnectStats%);	
+
+	//Gong History Disconnect File Population Stats	
+	%dPopulationStats_pGHDisc% := strata.macf_pops(pGHDisc,
+																																																		'is_deact',//group by
+																																																		,
+																																																		,
+																																																		,
+																																																		,
+																																																		TRUE,
+																																																		['groupid','phone_swap','carrier_name','swap_start_dt','swap_end_dt','is_deact','is_react','pk_carrier_name','days_apart']);	// remove these fields from population stats
+																												
+	strata.createXMLStats(%dPopulationStats_pGHDisc%, 'PhonesMetadata', 'GHDisconnect2Phones', pVersion, 'Population', %zRunGHDisconnectStats%);
 	
 	//PhonesMetadata File Population Stats
 		%rPopulationStats_pPhonesMeta% := record
@@ -285,6 +301,6 @@ import Strata, PhonesInfo, ut;
 	%dPopulationStats_pCarrRef% := table(pCarrRef, %rPopulationStats_pCarrRef%, serv, line, few);
 	strata.createXMLStats(%dPopulationStats_pCarrRef%, 'PhonesMetadata', 'CarrierReference2', pVersion, '', %zRunCarrRefStats%);
 	
-	zOut := parallel(%zRunTCPAPortStats%, %zRuniConectPortStats%, %zRunLIDBStats%, %zRunDisconnectStats%, %zRunPhoneMetadataStats%, %zRunCarrRefStats%);
+	zOut := parallel(%zRunTCPAPortStats%, %zRuniConectPortStats%, %zRunLIDBStats%, %zRunDisconnectStats%, %zRunGHDisconnectStats%, %zRunPhoneMetadataStats%, %zRunCarrRefStats%);
 
 ENDMACRO;

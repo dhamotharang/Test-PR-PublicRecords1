@@ -1,6 +1,8 @@
-import lib_stringlib, Drivers,idl_header,std;
+﻿import lib_stringlib, Drivers,idl_header,std;
 
-in_file  :=  DriversV2.File_DL_MA_Update_Clean;
+export MA_As_DL_New(dataset(DriversV2.Layout_DL_MA_In.Layout_MA_With_Clean) pFile_MA_Input) := function
+
+in_file  :=  pFile_MA_Input;
 
 /* Normalize Cleaned Vendor data on the two Addresses (Mailing & Residential) */
 layout_norm := record
@@ -70,6 +72,8 @@ DriversV2.Layout_DL_Extended  map_to_common(dNormalizeKeep l)   := transform
 	self                  				:= [];
 end;
 
-MA_Update := project(dNormalizeKeep, map_to_common(left));
+MA_As_DL_mapper := project(dNormalizeKeep, map_to_common(left));
 
-export MA_As_DL_New := MA_Update : persist(DriversV2.Constants.Cluster + 'Persist::DL2::DrvLic_MA_as_DL_New');
+return MA_As_DL_mapper;
+
+end;

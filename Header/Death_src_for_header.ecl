@@ -1,4 +1,4 @@
-IMPORT	MDR, Death_Master;
+﻿IMPORT	MDR, Death_Master;
 EXPORT	Death_src_for_header(string st,string src,string date)
 					:=
 					map(
@@ -22,4 +22,5 @@ EXPORT	Death_src_for_header(string st,string src,string date)
 													,'VA' =>	MDR.sourceTools.src_Death_VA
 													,'')
 							,src='SSA' and Death_Master.isDateSSARestricted(date)	=>	MDR.sourceTools.src_Death_Restricted
+						  ,src='OKC' =>	MDR.sourceTools.src_OKC_Probate
 							,'DE');

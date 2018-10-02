@@ -31,7 +31,7 @@ Inactive_Status 		:= '(^BAD | BAD |CANCEL|CEASE|CLOSE|CLOSING|DECEASED|DELETE|DO
 												 'RETURNED MAIL|TERMINAT|NO LONGER|VOID|MERGE|INVALID|^ONLY|^ACQUIRED)';
                                  
 
-agent_addr_ind := '( AGENT$|^AGENT[S]? |^AGENT-|^AGENTF|^AGT|^AKA|^ALSO |^AS AGENT|^AS RECEIVER|^D/B/A|^DBA| DBA |^FOR |^MTG |^OF |^&|^T/A|^PEOPLES|'+
+agent_addr_ind := '( AGENT$|^AGENT[S]? |^AGENT-|^AGENTF|^AGT|^AKA|^A/K/A|^ALSO |^AS AGENT|^AS RECEIVER|^D/B/A|^DBA| DBA |^FOR |^MTG |^OF |^&|^T/A|^PEOPLES|'+
 										'CREDIT UNION$|^PROVIDENT| AGENT-MELLON|^AGENG |^AGENR'+
 										')';
 
@@ -225,9 +225,9 @@ maribase_plus_dbas 		xformToCommon(CleanRec pInput)
 		SELF.ACTIVE_FLAG			:= '';
 
 //Use address cleaner to clean address
-		CoPattern	:= '(^.* LLC$|^.* LLC\\.$|^.* INC$|^.* INC\\.$|^.* COMPANY$|^.* CORP$|^.* CORP\\.$|^.*APPRAISAL[S]?$|^.* MORTGAGE$|^FIRST BANK .*$|^BANK OF .*$|' +
+		CoPattern	:= '(^.* LLC$|^.* LLC\\.$|^.* INC$|^.* INC\\.$|^.* INC|^.* COMPANY$|^.* CORP$|^.* CORP\\.$|^.*APPRAISAL[S]?$|^.* MORTGAGE$|^FIRST BANK .*$|^BANK OF .*$|' +
 									'^.* APP[.]?$|^.* APPRAISAL SERVICE$|^.* APPRAISAL GROUP$|^.* APPRAISAL CO$|^.* FINANCIAL$|^.*HOMESERVICES|^FLAGSTAR BANK|^DMR MORTGAGE SERV ICES|' +
-									'^.* APPRAISAL SV[C|S]$|^.* SERVICE[S]?$|^.* & ASSOCIATES$|^.* ADVISORS$|^CO .*$|^C/O .*$|^ATTN.*$| ATTN.*$| \\-ATTN.*$|^VALLEY BANK .*$|^.* MORTGAGE AND .*$|' +
+									'^.* APPRAISAL SV[C|S]$|^.* SERVICE[S]?$|^.* & ASSOCIATES$|^.* ADVISORS$|^CO .*$|^C/O .*$|^ATTN.*$| ATTN.*$| \\-ATTN.*$| ATTN:.*$|^VALLEY BANK .*$|^.* MORTGAGE AND .*$|' +
 									'^.* REALTY$|^.* REAL ESTATE$|^.* REAL ESTATE CO$|^.* MANAGEMENT$|^.* MGMT$|^.* COMPANIES|^.* LIBERTY BUILDING$|^CHANCELLOR HOMESERVICES LENDIN$|' +
 									'^.* MTG LEND[I]?$|^C-21 .*$|^PRUDENTIAL .*$|^.* REALTORS$|^.* PROPERTIES$|^ATT:.*$|^ATT .*$|^A\\.K\\.A\\.:.*$|^.* OFFICE$|BOATMENS NATL BANK OF AUSTIN|' +
 									'^CENTER STAT MORTGAGE |^.* SAVING BANK|^.*TEMPLE-INLAND MORTGAGE|^.* FUNDING$|^.*MORTGAGE AND LOAN|^.*MORTGAGE SERV|^.* MTG$|^BURNET HOME LOANS|'+
@@ -235,12 +235,12 @@ maribase_plus_dbas 		xformToCommon(CleanRec pInput)
 									'^.*MORTGAGE LOANS$|^NATIONAL LENDING NETWORK.*$|^INTERSTATE PACIFIC MORTGAGE CO.*$|^NATIONAL AFFORDABLE LENDING.*$|^.*MORTGAGE BANKING GROUP$|'+
 									'^WASHINGTON MUTUAL$|^HOMEFINDERSCENTER.COM$|^CAROL HENKEL$|^SUSAN AUSTIN$|PATRICIA NU$|SANDY DAVIS$|^1ST BANK DIVISION$|RETAIL CLIENT SERVICES GRP #16$|' +
 									'^FLEET MORTGAGE GROUP|^LEGACY FUNDING GROUP|PRINCIPAL LENDING GROUP|^RETAIL CLIENT SERVICES GRP.*$|^NATIONWIDE 1ST MORTGAGE.*$|^LA CROSSE - MADISON$|'+
-									'^.* MORTGAGE VENTURE.*$|^.* FCU$|^FLAGSTAR BANK.*$'+
+									'^.* MORTGAGE VENTURE.*$|^.* FCU$|^FLAGSTAR BANK.*$|UNION FEDERAL SAVINGS'+
                  ')';
 							  	
-	RemovePattern	  := '(^.* LLC[.]?$|^.* INC[.]?$|^.* COMPANY$|^.* CORP[.]?$|^.*APPRAISAL[S]?$|^.* MORTGAGE$|^HOMEFINDERSCENTER.COM$|^AGENT$|^BANK OF .*$|^CENTRAL REGION.*$|' +
+	RemovePattern	  := '(^.* LLC[.]?$|^.* INC[.]?$|^.* INC|^.* COMPANY$|^.* CORP[.]?$|^.*APPRAISAL[S]?$|^.* MORTGAGE$|^HOMEFINDERSCENTER.COM$|^AGENT$|^BANK OF .*$|^CENTRAL REGION.*$|' +
 											'^.* APPR\\.$|^.*APPRAISAL.*$|^APPRAISAL .*$|^.* FINANCIAL$|^.* SECTION$|^RLS ADMINISTRATION MP\\-5$|^FIRST BANK.*$|BOATMENS NATL BANK OF AUSTIN|' +
-											'^.* SERVICE[S]?$|^.* & ASSOCIATES$|^.* ADVISORS$|^CO .*$|^C/O.*$|^ATTN.*$|^.* ATTN$|^ATT:.*$|^ATT .*$| -ATTN.*$| ATTN .*$|' +
+											'^.* SERVICE[S]?$|^.* & ASSOCIATES$|^.* ADVISORS$|^CO .*$|^C/O.*$|^ATTN.*$|^.* ATTN$|^ATT:.*$|^ATT .*$| -ATTN.*$| ATTN .*$| ATTN:.*|' +
 											'^.* REALTY$|^.* REAL ESTATE.*$|^.* MANAGEMENT$|^.* MGMT$|^.* COMPANIES|^.*PROCESSING CENTER$|^.*PROCESSING CTR.*$|^.*PROCESSING|' +
 											'^C-21 .*$|^.* REALTORS$|^.* PROPERTIES$|^.* MANAGE$|^.*SUPPORT$|^VALLEY BANK .*$|^PRINCIPAL LENDING GROUP$|^PROPERTY MANAGEMENT SECTION.*$|' +
 											'^.* MANAGER$|^.* OPERATION[S]?$|^.* PROCESSING CENTER$|^MTGE LOAN PROCESSING.*$|^RETAIL CLIENT SERVICES GRP #16$|^REAL ESTATE SERVICE[S]? DIVISION[S]?$|' +
@@ -260,7 +260,7 @@ maribase_plus_dbas 		xformToCommon(CleanRec pInput)
 											'^. OFFICE BLDG$|^.* BANK BLDG$|^MALL DRIVE OFFICE PARK|^NATIONWIDE 1ST MORTGAGE.*$|^.* BRANCH$|^LA CROSSE - MADISON$|'+
 											'^WHOLESALE DIVISION\\-$|^.* MORTGAGE VENTURE.*$|^.* FCU$|^FLAGSTAR BANK.*$|^MAIL STOP LIC$|'+
 											'^.* MORTGAGE CENTER$|^.* LENDING CENTER$|^.* FINANCIAL CENTER$|^.* BANKING CENTER$|^PEERLESS CENTER$|^.* EXECUTIVE CENTER$|'+
-											'^ALLIANCE CENTER$|^.* BANK BUILDING$|^.* FEDERAL BUILDING$'+
+											'^ALLIANCE CENTER$|^.* BANK BUILDING$|^.* FEDERAL BUILDING$|UNION FEDERAL SAVINGS'+
 											')';
 
 		TrimAddress1		:= ut.CleanSpacesAndUpper(pInput.corrected_address1);
@@ -303,7 +303,7 @@ maribase_plus_dbas 		xformToCommon(CleanRec pInput)
 																				=> ConvertedName_Org +')',							
 								 				 													ConvertedName_Org);
 
-		DBA_Ind := '( D/B/A | DBA | AKA | DBA$| A/K/A$| D/B/A$| AKA$)';																							
+		DBA_Ind := '( D/B/A | DBA | AKA | DBA$| A/K/A$| D/B/A$| AKA$|A/K/A)';																							
 		std_org_name					:= IF(REGEXFIND(DBA_Ind,TRIM(prepNAME_ORG)),REGEXREPLACE(DBA_Ind,prepNAME_ORG,' / '),prepNAME_ORG);
 	
 		AgentPattern	:= '( AS RECEIVER .*$| AS AGENT .*$| AGENT\\/.*$| AGENT[S]? .*$| AGENT-.*$| AGENR .*$|AGENTFOR .*$| AGT .*$| AGEN .*$|\\,A DIV.*$|, A BRANCH .*$| A,STATE OF .*$|'+

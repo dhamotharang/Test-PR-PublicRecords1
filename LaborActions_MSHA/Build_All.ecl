@@ -1,6 +1,9 @@
-import LaborActions_MSHA, versioncontrol, _control, ut;
+﻿import LaborActions_MSHA, versioncontrol, _control, ut, Roxiekeybuild, Orbit3;
 
 export Build_All(string	pversion) := module
+
+		#workunit('name','Yogurt:LaborActions_MSHA Build - ' + pversion);
+		
 		//There are five base files: Mine, Operator, Events, Accident and Contractor. 
 		//Note:  Mine is the primary file.
 		export NewBase_Accident		:=	Update_Base_Accident( files().Mine_Input.using
@@ -51,7 +54,10 @@ export Build_All(string	pversion) := module
 																					
 		VersionControl.macBuildNewLogicalFile( Filenames('Base_Operator',pversion).base.new 
 																					,NewBase_Operator
-																					,Build_Base_File_Operator);																					
+																					,Build_Base_File_Operator);						
+																					
+		dops_update := Roxiekeybuild.updateversion('LaborActionsMSHAKeys',pversion,'Randy.Reyes@lexisnexisrisk.com;Manuel.Tarectecan@lexisnexisrisk.com',,'N'); 
+		orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('Labor Actions MSHA', pversion);
 		
 		full_build 	:= sequential( CreateSuperFileNames.fCreateInputBaseSuperfiles
 															,SprayFiles.fSprayFiles(pversion)
@@ -75,6 +81,8 @@ export Build_All(string	pversion) := module
 															,out_STRATA_population_stats_Events(pversion)
 															,out_STRATA_population_stats_Mine(pversion)
 															,out_STRATA_population_stats_Operator(pversion)
+															,dops_update
+															,orbit_update
 															) : success(Sequential(send_email(pversion).buildsuccess,send_email(pversion).roxie.qa))
 															  , failure(send_email(pversion).buildfailure);
    

@@ -1,4 +1,4 @@
-/*
+﻿/*
 Suppress.Key_New_Suppression is a replacement for doxie.Key_PullSSN
 Usage: InFile = input file to be checked
 			 outFile = output file
@@ -19,7 +19,7 @@ export MAC_Suppress (inFile, outFile, inApplicationType, inLinkType = '\'\'', in
 				#uniquename(validCriteria)
 				#uniquename(outfile1)
 				
-				%suppressFile% := suppress.Key_New_Suppression;
+				%suppressFile% := suppress.Key_New_Suppression();
 
 
 				#if(batch)

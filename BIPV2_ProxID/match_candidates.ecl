@@ -18,6 +18,7 @@ PrePropCounts := RECORD
   REAL8 ebr_file_number_pop := AVE(GROUP,IF((thin_table.ebr_file_number  IN SET(s.nulls_ebr_file_number,ebr_file_number) OR thin_table.ebr_file_number = (TYPEOF(thin_table.ebr_file_number))''),0,100));
   REAL8 company_fein_pop := AVE(GROUP,IF((thin_table.company_fein  IN SET(s.nulls_company_fein,company_fein) OR thin_table.company_fein = (TYPEOF(thin_table.company_fein))''),0,100));
   REAL8 cnp_name_pop := AVE(GROUP,IF((thin_table.cnp_name  IN SET(s.nulls_cnp_name,cnp_name) OR thin_table.cnp_name = (TYPEOF(thin_table.cnp_name))''),0,100));
+  REAL8 company_name_type_derived_pop := AVE(GROUP,IF((thin_table.company_name_type_derived  IN SET(s.nulls_company_name_type_derived,company_name_type_derived) OR thin_table.company_name_type_derived = (TYPEOF(thin_table.company_name_type_derived))''),0,100));
   REAL8 cnp_number_pop := AVE(GROUP,IF((thin_table.cnp_number  IN SET(s.nulls_cnp_number,cnp_number) OR thin_table.cnp_number = (TYPEOF(thin_table.cnp_number))''),0,100));
   REAL8 cnp_btype_pop := AVE(GROUP,IF((thin_table.cnp_btype  IN SET(s.nulls_cnp_btype,cnp_btype) OR thin_table.cnp_btype = (TYPEOF(thin_table.cnp_btype))''),0,100));
   REAL8 company_phone_pop := AVE(GROUP,IF((thin_table.company_phone  IN SET(s.nulls_company_phone,company_phone) OR thin_table.company_phone = (TYPEOF(thin_table.company_phone))''),0,100));
@@ -49,6 +50,7 @@ SHARED layout_withpropvars := RECORD
   UNSIGNED1 unk_corp_key_prop := 0;
   UNSIGNED1 ebr_file_number_prop := 0;
   UNSIGNED1 company_fein_prop := 0;
+  UNSIGNED1 company_name_type_derived_prop := 0;
   UNSIGNED1 cnp_number_prop := 0;
   UNSIGNED1 company_phone_prop := 0;
   UNSIGNED1 prim_name_derived_prop := 0;
@@ -182,13 +184,21 @@ SHARED ForeignCorpkey_prop5 := JOIN(ForeignCorpkey_prop4,cnp_name_props,left.Pro
 SHARED RAAddresses_prop5 := JOIN(RAAddresses_prop4,cnp_name_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
 SHARED FilterPrimNames_prop5 := JOIN(FilterPrimNames_prop4,cnp_name_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
  
+SALT37.mac_prop_field(with_props(company_name_type_derived NOT IN SET(s.nulls_company_name_type_derived,company_name_type_derived)),company_name_type_derived,Proxid,company_name_type_derived_props); // For every DID find the best FULL company_name_type_derived
+layout_withpropvars take_company_name_type_derived(with_props le,company_name_type_derived_props ri) := TRANSFORM
+  SELF.company_name_type_derived := IF ( le.company_name_type_derived IN SET(s.nulls_company_name_type_derived,company_name_type_derived) and ri.Proxid<>(TYPEOF(ri.Proxid))'', ri.company_name_type_derived, le.company_name_type_derived );
+  SELF.company_name_type_derived_prop := le.company_name_type_derived_prop + IF ( le.company_name_type_derived IN SET(s.nulls_company_name_type_derived,company_name_type_derived) and ri.company_name_type_derived NOT IN SET(s.nulls_company_name_type_derived,company_name_type_derived) and ri.Proxid<>(TYPEOF(ri.Proxid))'', 1, 0 ); // <>0 => propogation
+  SELF := le;
+  END;
+SHARED pj13 := JOIN(pj9,company_name_type_derived_props,left.Proxid=right.Proxid,take_company_name_type_derived(left,right),LEFT OUTER,HASH/*,HINT(parallel_match)*//*HACK to prevent memory limit exceeded error*/);
+ 
 SALT37.mac_prop_field(with_props(cnp_number NOT IN SET(s.nulls_cnp_number,cnp_number)),cnp_number,Proxid,cnp_number_props); // For every DID find the best FULL cnp_number
 layout_withpropvars take_cnp_number(with_props le,cnp_number_props ri) := TRANSFORM
   SELF.cnp_number := IF ( le.cnp_number IN SET(s.nulls_cnp_number,cnp_number) and ri.Proxid<>(TYPEOF(ri.Proxid))'', ri.cnp_number, le.cnp_number );
   SELF.cnp_number_prop := le.cnp_number_prop + IF ( le.cnp_number IN SET(s.nulls_cnp_number,cnp_number) and ri.cnp_number NOT IN SET(s.nulls_cnp_number,cnp_number) and ri.Proxid<>(TYPEOF(ri.Proxid))'', 1, 0 ); // <>0 => propogation
   SELF := le;
   END;
-SHARED pj15 := JOIN(pj9,cnp_number_props,left.Proxid=right.Proxid,take_cnp_number(left,right),LEFT OUTER,HASH/*,HINT(parallel_match)*//*HACK to prevent memory limit exceeded error*/);
+SHARED pj15 := JOIN(pj13,cnp_number_props,left.Proxid=right.Proxid,take_cnp_number(left,right),LEFT OUTER,HASH/*,HINT(parallel_match)*//*HACK to prevent memory limit exceeded error*/);
 SHARED SrcRidVlid_prop6 := JOIN(SrcRidVlid_prop5,cnp_number_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
 SHARED ForeignCorpkey_prop6 := JOIN(ForeignCorpkey_prop5,cnp_number_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
 SHARED RAAddresses_prop6 := JOIN(RAAddresses_prop5,cnp_number_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
@@ -259,6 +269,7 @@ PostPropCounts := RECORD
   REAL8 ebr_file_number_pop := AVE(GROUP,IF((propogated.ebr_file_number  IN SET(s.nulls_ebr_file_number,ebr_file_number) OR propogated.ebr_file_number = (TYPEOF(propogated.ebr_file_number))''),0,100));
   REAL8 company_fein_pop := AVE(GROUP,IF((propogated.company_fein  IN SET(s.nulls_company_fein,company_fein) OR propogated.company_fein = (TYPEOF(propogated.company_fein))''),0,100));
   REAL8 cnp_name_pop := AVE(GROUP,IF((propogated.cnp_name  IN SET(s.nulls_cnp_name,cnp_name) OR propogated.cnp_name = (TYPEOF(propogated.cnp_name))''),0,100));
+  REAL8 company_name_type_derived_pop := AVE(GROUP,IF((propogated.company_name_type_derived  IN SET(s.nulls_company_name_type_derived,company_name_type_derived) OR propogated.company_name_type_derived = (TYPEOF(propogated.company_name_type_derived))''),0,100));
   REAL8 cnp_number_pop := AVE(GROUP,IF((propogated.cnp_number  IN SET(s.nulls_cnp_number,cnp_number) OR propogated.cnp_number = (TYPEOF(propogated.cnp_number))''),0,100));
   REAL8 cnp_btype_pop := AVE(GROUP,IF((propogated.cnp_btype  IN SET(s.nulls_cnp_btype,cnp_btype) OR propogated.cnp_btype = (TYPEOF(propogated.cnp_btype))''),0,100));
   REAL8 company_phone_pop := AVE(GROUP,IF((propogated.company_phone  IN SET(s.nulls_company_phone,company_phone) OR propogated.company_phone = (TYPEOF(propogated.company_phone))''),0,100));
@@ -276,8 +287,8 @@ END;
 EXPORT PostPropogationStats := SALT37.MAC_Pivot(PoPS, poprec);
   Grpd := GROUP( SORT(
     DISTRIBUTE( TABLE( propogated, { propogated, UNSIGNED2 Buddies := 0 }),HASH(Proxid)),
-    Proxid, SALT_Partition/*Hack*/ ,active_duns_number,active_enterprise_number,active_domestic_corp_key,hist_enterprise_number,hist_duns_number,hist_domestic_corp_key,foreign_corp_key,unk_corp_key,ebr_file_number,company_fein,cnp_name,cnp_number,cnp_btype,company_phone,prim_name_derived,sec_range,v_city_name,st,zip,prim_range_derived,dt_first_seen,dt_last_seen, LOCAL),
-    Proxid, SALT_Partition/*Hack*/ ,active_duns_number,active_enterprise_number,active_domestic_corp_key,hist_enterprise_number,hist_duns_number,hist_domestic_corp_key,foreign_corp_key,unk_corp_key,ebr_file_number,company_fein,cnp_name,cnp_number,cnp_btype,company_phone,prim_name_derived,sec_range,v_city_name,st,zip,prim_range_derived,dt_first_seen,dt_last_seen, LOCAL);
+    Proxid, SALT_Partition/*Hack*/ ,active_duns_number,active_enterprise_number,active_domestic_corp_key,hist_enterprise_number,hist_duns_number,hist_domestic_corp_key,foreign_corp_key,unk_corp_key,ebr_file_number,company_fein,cnp_name,company_name_type_derived,cnp_number,cnp_btype,company_phone,prim_name_derived,sec_range,v_city_name,st,zip,prim_range_derived,dt_first_seen,dt_last_seen, LOCAL),
+    Proxid, SALT_Partition/*Hack*/ ,active_duns_number,active_enterprise_number,active_domestic_corp_key,hist_enterprise_number,hist_duns_number,hist_domestic_corp_key,foreign_corp_key,unk_corp_key,ebr_file_number,company_fein,cnp_name,company_name_type_derived,cnp_number,cnp_btype,company_phone,prim_name_derived,sec_range,v_city_name,st,zip,prim_range_derived,dt_first_seen,dt_last_seen, LOCAL);
   Grpd Tr(Grpd le, Grpd ri) := TRANSFORM
     SELF.Buddies := le.Buddies+1;
     SELF := le;
@@ -433,6 +444,8 @@ EXPORT Layout_Candidates := RECORD // A record to hold weights of each field val
   STRING500 cnp_name := h0.cnp_name; // Expanded wordbag field
   INTEGER2 cnp_name_weight100 := 0; // Contains 100x the specificity
   BOOLEAN cnp_name_isnull := (h0.cnp_name  IN SET(s.nulls_cnp_name,cnp_name) OR h0.cnp_name = (TYPEOF(h0.cnp_name))''); // Simplify later processing 
+  INTEGER2 company_name_type_derived_weight100 := 0; // Contains 100x the specificity
+  BOOLEAN company_name_type_derived_isnull := (h0.company_name_type_derived  IN SET(s.nulls_company_name_type_derived,company_name_type_derived) OR h0.company_name_type_derived = (TYPEOF(h0.company_name_type_derived))''); // Simplify later processing 
   INTEGER2 cnp_number_weight100 := 0; // Contains 100x the specificity
   BOOLEAN cnp_number_isnull := (h0.cnp_number  IN SET(s.nulls_cnp_number,cnp_number) OR h0.cnp_number = (TYPEOF(h0.cnp_number))''); // Simplify later processing 
   INTEGER2 cnp_btype_weight100 := 0; // Contains 100x the specificity
@@ -464,11 +477,16 @@ h1 := TABLE(h0,layout_candidates)(~prim_name_derived_isnull,~st_isnull,~(company
  
 //Would also create auto-id fields here
  
+layout_candidates add_company_name_type_derived(layout_candidates le,Specificities(ih).company_name_type_derived_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.company_name_type_derived_weight100 := MAP (le.company_name_type_derived_isnull => 0, patch_default and ri.field_specificity=0 => s.company_name_type_derived_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+j23 := JOIN(h1,PULL(Specificities(ih).company_name_type_derived_values_persisted),LEFT.company_name_type_derived=RIGHT.company_name_type_derived,add_company_name_type_derived(LEFT,RIGHT,TRUE),LOOKUP,FEW,LEFT OUTER);
 layout_candidates add_cnp_btype(layout_candidates le,Specificities(ih).cnp_btype_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.cnp_btype_weight100 := MAP (le.cnp_btype_isnull => 0, patch_default and ri.field_specificity=0 => s.cnp_btype_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-j22 := JOIN(h1,PULL(Specificities(ih).cnp_btype_values_persisted),LEFT.cnp_btype=RIGHT.cnp_btype,add_cnp_btype(LEFT,RIGHT,TRUE),LOOKUP,FEW,LEFT OUTER);
+j22 := JOIN(j23,PULL(Specificities(ih).cnp_btype_values_persisted),LEFT.cnp_btype=RIGHT.cnp_btype,add_cnp_btype(LEFT,RIGHT,TRUE),LOOKUP,FEW,LEFT OUTER);
 layout_candidates add_st(layout_candidates le,Specificities(ih).st_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.st_weight100 := MAP (le.st_isnull => 0, patch_default and ri.field_specificity=0 => s.st_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
@@ -794,7 +812,7 @@ END;
 jFilterPrimNames_21 := JOIN(jFilterPrimNames_18,PULL(Specificities(ih).st_values_persisted),LEFT.st=RIGHT.st,add_FilterPrimNames_st(LEFT,RIGHT,TRUE),LOOKUP,FEW,LEFT OUTER);
 EXPORT FilterPrimNames_candidates := jFilterPrimNames_21 : PERSIST('~temp::Proxid::BIPV2_ProxID::mc::FilterPrimNames',EXPIRE(BIPV2_ProxID.Config.PersistExpire));
 //Now see if these records are actually linkable
-TotalWeight := Annotated.active_duns_number_weight100 + Annotated.hist_duns_number_weight100 + Annotated.ebr_file_number_weight100 + Annotated.active_enterprise_number_weight100 + Annotated.active_domestic_corp_key_weight100 + Annotated.hist_enterprise_number_weight100 + Annotated.hist_domestic_corp_key_weight100 + Annotated.foreign_corp_key_weight100 + Annotated.unk_corp_key_weight100 + Annotated.company_fein_weight100 + Annotated.company_phone_weight100 + Annotated.company_address_weight100 + Annotated.cnp_name_weight100 + Annotated.cnp_number_weight100 + Annotated.cnp_btype_weight100;
+TotalWeight := Annotated.active_duns_number_weight100 + Annotated.hist_duns_number_weight100 + Annotated.ebr_file_number_weight100 + Annotated.active_enterprise_number_weight100 + Annotated.active_domestic_corp_key_weight100 + Annotated.hist_enterprise_number_weight100 + Annotated.hist_domestic_corp_key_weight100 + Annotated.foreign_corp_key_weight100 + Annotated.unk_corp_key_weight100 + Annotated.company_fein_weight100 + Annotated.company_phone_weight100 + Annotated.company_address_weight100 + Annotated.cnp_name_weight100 + Annotated.cnp_number_weight100 + Annotated.cnp_btype_weight100 + Annotated.company_name_type_derived_weight100;
 SHARED Linkable := TotalWeight >= Config.MatchThreshold;
 EXPORT BuddyCounts := TABLE(Annotated,{ buddies, Cnt := COUNT(GROUP) }, buddies, FEW);
 EXPORT HasBuddies := TABLE(Annotated(buddies>0), { rcid });

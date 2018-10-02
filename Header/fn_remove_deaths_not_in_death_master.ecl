@@ -1,4 +1,4 @@
-import mdr;
+import mdr,Death_Master;
 //SSA routinely provides updates whereby they remove SSN's from their list
 //of deceased people.  those updates are not being applied to the header.
 //since the SSN may have value for linking, for now just apply this to the keys
@@ -7,7 +7,21 @@ export fn_remove_deaths_not_in_death_master(dataset(recordof(header.layout_heade
 
 in_file_strings := project(in_file,header.layout_header_strings);
 
-d1 := header.file_state_death(length(trim(ssn))=9 and fname<>'' and lname<>'');
+ds:=header.file_state_death(length(trim(ssn))=9 and fname<>'' and lname<>'');
+dr:=Death_Master.Files.Resurrections(length(trim(ssn))=9 and fname<>'' and lname<>'');
+d1:=join( ds ,dr
+			,left.ssn=right.ssn
+			and (
+						(   left.fname=right.fname
+						and left.lname=right.lname)
+						or
+						(   left.fname=right.lname
+						and left.lname=right.fname)
+					)
+		,transform(left)
+		,left only
+		,lookup
+	  );
 d2 := header.file_did_death_masterv2(length(trim(ssn))=9 and fname<>'' and lname<>'');
 
 slim:={

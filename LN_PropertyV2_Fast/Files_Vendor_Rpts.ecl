@@ -1,4 +1,4 @@
-import std, Data_Services;
+﻿import std, Data_Services;
 EXPORT Files_Vendor_Rpts := module;
 
 //***************************Layouts*************************************
@@ -149,23 +149,42 @@ shared layout_bk_currencyreport	:=	RECORD
 	STRING filedate;
 END;
 
+shared layout_cl_currencyreport :=	RECORD
+	STRING	FIPS;
+	STRING	ST;
+  STRING	COUNTY;
+	STRING	RANK_NO;
+	STRING	DOC_TYPE;
+	STRING	KEYING_TIME_FRAME;
+	STRING	COUNTY_RECORDING_TIMEFRAME;
+	STRING	TOTAL_KEYING_TIMEFRAME;
+	STRING	COUNTY_MAX_REC_DATE;
+	STRING	DIABLO_MAX_REC_DATE;
+	STRING	COUNTY_ACQUISITION_FREQUENCY;	
+	STRING	__filename;
+	STRING filedate;
+end;	
+
 //BK Assessor Currency Report
 shared layout_bk_assessor_currencyreport	:=	RECORD
 	STRING   FIPS;
 	STRING   ST;
 	STRING   COUNTY;
 	//STRING   OPERATION; removed from new layout
-	STRING   ORDER_MTH;
-	STRING   CURRENT;
+	//STRING   ORDER_MTH;
+	//STRING   CURRENT;
 	STRING   LAST_AY;
+	STRING   LAST_ASSESMENT_MONTH_FROM_SOURCE;
+	STRING   LAST_ACQUISTION_YR;
 	STRING   LAST_RELEASED_DATE;
-	STRING   LAST_RE_RELEASED_DATE;
-	STRING   LAST_PROGRAM_TYPE;
-	STRING   LAST_WORKING_DAYS;
+//	STRING   LAST_RE_RELEASED_DATE;
+//	STRING   LAST_PROGRAM_TYPE;
+//	STRING   LAST_WORKING_DAYS;
 	STRING   NEXT_AY;
-	STRING   NEXT_PROGRAM_TYPE;
-	STRING   NEXT_WORKING_DAYS;
-	STRING   STATUS; //NEXT_STATUS; name changed on new layout
+	STRING   NEXT_ASSESMENT_MONTH_FROM_SOURCE;
+//	STRING   NEXT_WORKING_DAYS;
+  STRING    FILE_RECEIVED_DATE;
+	STRING   CURRENT; //NEXT_STATUS; name changed on new layout
 	STRING	__filename	{VIRTUAL(logicalfilename)};
 END;
 
@@ -184,6 +203,8 @@ export deedreport_bk_fname := '~thor_data::in::ln_propertyv2::raw::bk::deedrepor
 export taxreport_frs_reporting_fname  := '~thor_data400::in::property::raw::frs::taxreports::csv_reporting';
 export bk_curr_report_fname	:= '~Thor_data::in::ln_propertyv2::raw::bk::newcurrency_report';
 export bk_assessor_curr_report_fname	:= '~Thor_data::in::ln_propertyv2::raw::bk::assessor::newcurrency_report';
+//corelogic currency report VC 20180111
+export cl_curr_report_fname	:= '~thor_data::in::ln_propertyv2::raw::cl::newcurrency_report'; 
 
 shared taxreport_frs_d	:=	DATASET(Data_Services.Data_location.Prefix('NONAMEGIVEN')+ taxreport_frs_fname,layout_frs_taxreport, csv(separator(',')));
 export taxreport_frs := project(taxreport_frs_d (state <> 'State'), transform(layout_frs_taxreport_new, self.filedate := left.__filename[std.str.Find(left.__filename, ':',12)+1 ..std.str.Find(left.__filename, ':',12)+8], self := left)); 
@@ -236,5 +257,43 @@ export currencyreport_bk := when(currencyreport_bk_0,out_temp_file, BEFORE);
 
 assessorcurrencyreport_bk_d := dataset(/*Data_Services.Data_location.Prefix('NONAMEGIVEN')+*/ bk_assessor_curr_report_fname,layout_bk_assessor_currencyreport, csv(separator(','),quote('"')));
 export assessorcurrencyreport_bk := project(assessorcurrencyreport_bk_d(FIPS <> 'FIPS'), transform(layout_bk_assessor_currencyreport_new, self.filedate := regexfind('report::([0-9]{8})',left.__filename,1), self := left));
+
+/***************************************************************CL Prep*****************************************************************************/
+clcurr_report_temp	:= '~Thor_data::temp::in::ln_propertyv2::raw::cl::newcurrency_report';
+currencyreport_clx := dataset(cl_curr_report_fname,rec_temp, csv(separator('|'),quote('"')));
+
+currencyreport_clf := project(currencyreport_clx,
+                              transform(rec_temp_new,self.linein:=regexreplace('_x000D_',left.linein,''), 
+															                       self.filedate := regexfind('report::([0-9]{8})',left.__filename,1), 
+																										 self.__filename:=','+left.__filename+','));
+
+out_temp_clfile				:= output(currencyreport_clf,,clcurr_report_temp,csv(separator('|')),overwrite,expire(1));
+currencyreport_cld := dataset(clcurr_report_temp,layout_cl_currencyreport, csv(separator(','),quote('"')));
+currencyreport_cl0 := project(currencyreport_cld(FIPS <> 'FIPS'), transform(layout_bk_currencyreport, 
+																																						self.__FILENAME:= regexreplace('\\|',left.__FILENAME,''),
+																																						self.FILEDATE  := regexreplace('\\|',left.FILEDATE,''),
+																																						self.DATA_LAG  := left.COUNTY_RECORDING_TIMEFRAME,
+																																						self.KEYED_REC_THRU_DATE_IN_SITEX  := regexreplace('-',regexreplace('-([0-9]{2})$',left.COUNTY_MAX_REC_DATE,'-20\\1'),'/'),
+																																						self.FREQUENCY := (string)ROUND(7/(integer)regexreplace('([0-9]+) X WEEK',left.COUNTY_ACQUISITION_FREQUENCY,'$1')),
+																																						self.STATUS    := '',
+																																						self.ETA_KEYING:= '',
+																																						self.POPULATION:= '',
+																																						self := left));
+																																					
+currencyreport_cl := when(currencyreport_cl0,out_temp_clfile, BEFORE);
+
+currencyreport_cl rolluprecs(currencyreport_cl L, currencyreport_cl R) := transform
+ self.DATA_LAG                      := IF(L.doc_type ='DEED', L.DATA_LAG,R.DATA_LAG);
+ self.KEYED_REC_THRU_DATE_IN_SITEX  := IF(L.doc_type ='DEED', L.KEYED_REC_THRU_DATE_IN_SITEX, R.KEYED_REC_THRU_DATE_IN_SITEX);
+ self.FREQUENCY                     := IF(L.doc_type ='DEED', L.FREQUENCY, R.FREQUENCY);
+ self := L;
+end;
+
+s_currencyreport_cl  := sort(currencyreport_cl(doc_type in ['ABSTRACT','DEED','DEED/MORTGAGE','Deed/Mortgage/ADC','MORTGAGE']),FIPS,doc_type,-regexreplace('([0-9]+)[/]([0-9]+)[/]([0-9]+)',KEYED_REC_THRU_DATE_IN_SITEX,'$3$1$2'));
+
+ru_currencyreport_cl := rollup(s_currencyreport_cl,left.fips =right.fips ,
+                               rolluprecs(LEFT,RIGHT));
+																																				
+export currencyreport_clo := ru_currencyreport_cl;
 
 end;

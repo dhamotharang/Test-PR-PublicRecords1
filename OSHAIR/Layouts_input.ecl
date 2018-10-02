@@ -1,3 +1,4 @@
+﻿Import bipv2;
 EXPORT Layouts_input := module
 
 export Accident	:=	record
@@ -167,5 +168,20 @@ export GenDutyStd	:=	record
 	string6		line_nr;
 	string80	line_text;
 end;
+
+export cleaned_inspection := record
+  unsigned4 dt_first_seen						    := 0;
+	unsigned4 dt_last_seen						    := 0;
+	unsigned4 dt_vendor_first_reported    := 0;
+	unsigned4 dt_vendor_last_reported	    := 0;
+  bipv2.IDlayouts.l_xlink_ids           ;		  //Added for BIP project
+	unsigned8 source_rec_id 					    := 0; //Added for BIP project	
+	string2 source 										    := '';
+  OSHAIR.layout_OSHAIR_inspection_clean ;
+	unsigned8	raw_aid											:= 0; //Added for AID 
+	unsigned8	ace_aid										 	:= 0; //Added for AID 
+	string100	prep_addr_line1						 	:=''; //Added for AID 
+	string50	prep_addr_line_last				 	:=''; //Added for AID 
+end; 
 
 end;

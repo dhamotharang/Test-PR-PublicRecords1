@@ -89,6 +89,7 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
                      (UNSIGNED)le.date_vendor_last_reported < (UNSIGNED)ri.date_vendor_last_reported => ri.date_vendor_last_reported, // Want the highest value
                      le.date_vendor_last_reported);
     SELF.clean_cname := ri.clean_cname; // Derived(NEW)
+    SELF.current_rec := ri.current_rec; // Derived(NEW)
     __Tpe0 := MAP (
       le.__Tpe = 0 => ri.__Tpe,
       le.__Tpe = RecordType.Updated OR ri.__Tpe = 0 OR ri.__Tpe = le.__Tpe => le.__Tpe,

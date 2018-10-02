@@ -1,4 +1,4 @@
-IMPORT LiensV2_preprocess, LiensV2, ut, STD, Address, NID, VersionControl;
+﻿IMPORT LiensV2_preprocess, LiensV2, ut, STD, Address, NID, VersionControl;
 
 EXPORT ProcessHogan := FUNCTION
 
@@ -23,8 +23,8 @@ END;
 	//Clean/uppercase fields
 	LiensV2_preprocess.Layouts_Hogan.raw_in CleanFields(ds_in L) := TRANSFORM
 		self.ADDDELFLAG		:= ut.CleanSpacesAndUpper(L.ADDDELFLAG);
-		self.INDIVBUSUN		:= ut.CleanSpacesAndUpper(L.INDIVBUSUN);
-		self.AKA_YN				:= ut.CleanSpacesAndUpper(L.AKA_YN);
+		self.ENTITYTYPE		:= ut.CleanSpacesAndUpper(L.ENTITYTYPE);
+		// self.AKA_YN				:= ut.CleanSpacesAndUpper(L.AKA_YN);
 		self.ASSOCCODE		:= ut.CleanSpacesAndUpper(L.ASSOCCODE);
 		self.COURTID			:= ut.CleanSpacesAndUpper(L.COURTID);
 		self.FILETYPEID		:= ut.CleanSpacesAndUpper(L.FILETYPEID);
@@ -56,7 +56,7 @@ END;
 		self.ORIGBOOK			:= REGEXREPLACE('[^A-Z0-9 ]',RemoveLeadingZeros(ut.CleanSpacesAndUpper(L.ORIGBOOK)),'');
 		self.ORIGPAGE			:= REGEXREPLACE('[^A-Z0-9 ]',RemoveLeadingZeros(ut.CleanSpacesAndUpper(L.ORIGPAGE)),'');
 		self.ATYADDRESS		:= ut.CleanSpacesAndUpper(L.ATYADDRESS);
-		self.ATYCITY			:= ut.CleanSpacesAndUpper(L.ATYCITY);
+		// self.ATYCITY			:= ut.CleanSpacesAndUpper(L.ATYCITY);
 		self.ATYSTATE			:= ut.CleanSpacesAndUpper(L.ATYSTATE);
 		self.ATYZIP				:= ut.CleanSpacesAndUpper(L.ATYZIP);
 		self.AVAIL				:= ut.CleanSpacesAndUpper(L.AVAIL);
@@ -67,7 +67,13 @@ END;
 		self.VOL_INVOL		:= ut.CleanSpacesAndUpper(L.VOL_INVOL);
 		self.RMSID				:= ut.CleanSpacesAndUpper(L.RMSID);
 		self.EMPLOYER_NAME	:= ut.CleanSpacesAndUpper(L.EMPLOYER_NAME);
-		self.lf						:= L.lf;
+		// self.lf						:= L.lf;
+		vDOB	:=	STD.Date.IsValidDate((INTEGER)L.DOB);
+		SELF.DOB	:=	IF(vDOB,L.DOB,'');
+		vCollection_Date	:=	STD.Date.IsValidDate((INTEGER)L.Collection_Date);
+		SELF.Collection_Date	:=	IF(vCollection_Date,L.Collection_Date,'');
+		SELF.CaseLinkID		:= ut.CleanSpacesAndUpper(L.CaseLinkID);
+		SELF.Unused	:=	'';
 	END;
 	
 	CleanUpperDS	:= PROJECT(ds_in, CleanFields(left));
@@ -86,24 +92,35 @@ END;
 														trim(L.OTHERCASE) = '' AND trim(L.CASENUMBER) ='' AND trim(L.ORIGCASE) ='' => 4,
 														trim(L.OTHERCASE) != '' AND trim(L.CASENUMBER) !='' AND trim(L.ORIGCASE) ='' => 5,
 														trim(L.OTHERCASE) != '' AND trim(L.CASENUMBER) ='' AND trim(L.ORIGCASE) !='' => 6,7);
-		self.RMSID	:= IF(TempIdentifier in [0,1,3,6],'HGR'+trim(L.ORIGCASE,left,right)+trim(L.AMOUNT,left,right)+trim(L.COURTID,left,right)+trim(L.FILETYPEID,left,right),
+		STRING50	OldRMSID	:= IF(TempIdentifier in [0,1,3,6],'HGR'+trim(L.ORIGCASE,left,right)+trim(L.AMOUNT,left,right)+trim(L.COURTID,left,right)+trim(L.FILETYPEID,left,right),
 											IF(TempIdentifier in [2,5],'HGR'+trim(L.CASENUMBER,left,right)+trim(L.AMOUNT,left,right)+trim(L.COURTID,left,right)+trim(L.FILETYPEID,left,right),
 												IF(TempIdentifier = 4 AND trim(L.ORIGBOOK,left,right) != '' AND trim(L.ORIGPAGE,left,right) !=''
 														,'HGR'+HASH(L.DEFNAME,L.ACTIONDATE,L.AMOUNT,L.ORIGBOOK,L.ORIGPAGE,L.COURTID,L.FILETYPEID),
 														IF(TempIdentifier = 4 AND trim(L.ORIGBOOK,left,right) = '' AND trim(L.ORIGPAGE,left,right) =''
 															,'HGR'+HASH(L.DEFNAME,L.ACTIONDATE,L.AMOUNT,L.BOOK,L.PAGE,L.COURTID,L.FILETYPEID),''))));
-		self.TMSID	:= IF(TempIdentifier in [0,1,3,6],'HG'+trim(L.ORIGCASE,left,right)+trim(L.AMOUNT,left,right)+trim(L.COURTID,left,right),
+		STRING50	OldTMSID	:= IF(TempIdentifier in [0,1,3,6],'HG'+trim(L.ORIGCASE,left,right)+trim(L.AMOUNT,left,right)+trim(L.COURTID,left,right),
 											IF(TempIdentifier in [2,5],'HG'+trim(L.CASENUMBER,left,right)+trim(L.AMOUNT,left,right)+trim(L.COURTID,left,right),
 												IF(TempIdentifier = 4 AND trim(L.ORIGBOOK,left,right) != '' AND trim(L.ORIGPAGE,left,right) !=''
 														,'HG'+HASH(L.DEFNAME,L.ACTIONDATE,L.AMOUNT,L.ORIGBOOK,L.ORIGPAGE,L.COURTID),
 														IF(TempIdentifier = 4 AND trim(L.ORIGBOOK,left,right) = '' AND trim(L.ORIGPAGE,left,right) =''
 															,'HG'+HASH(L.DEFNAME,L.ACTIONDATE,L.AMOUNT,L.BOOK,L.PAGE,L.COURTID),''))));
+		STRING50	NewRMSID	:=	'HGR'+TRIM(L.CaseLinkID,LEFT,RIGHT)+TRIM(L.FILETYPEID,LEFT,RIGHT);
+		STRING50	NewTMSID	:=	'HG'+TRIM(L.CaseLinkID,LEFT,RIGHT);
+		//	We're not ready to use the new TMS/RMSID
+		// self.RMSID	:= IF(TRIM(L.CaseLinkID,LEFT,RIGHT)='',OldRMSID,NewRMSID); 
+		// self.TMSID	:= IF(TRIM(L.CaseLinkID,LEFT,RIGHT)='',OldTMSID,NewTMSID);
+		self.RMSID	:= IF(TRIM(L.CaseLinkID,LEFT,RIGHT)='',OldRMSID,OldRMSID);
+		self.TMSID	:= IF(TRIM(L.CaseLinkID,LEFT,RIGHT)='',OldTMSID,OldTMSID);
+		self.RMSID_old	:=	OldRMSID;
+		self.TMSID_old	:=	OldTMSID;		
 		self.PLAINTIFF						:= STD.Str.CleanSpaces(REGEXREPLACE('^,',REGEXREPLACE(remove_junk,L.PLAINTIFF,''),''));
-		self.DEFNAME							:= STD.Str.CleanSpaces(IF(L.INDIVBUSUN ='I' AND (L.AKA_YN = ' ' OR L.AKA_YN = 'I'),
+		SELF.INDIVBUSUN	:=	L.ENTITYTYPE[1];
+		SELF.AKA_YN	:=	L.ENTITYTYPE[2];
+		self.DEFNAME							:= STD.Str.CleanSpaces(IF(SELF.INDIVBUSUN ='I' AND (SELF.AKA_YN = ' ' OR SELF.AKA_YN = 'I'),
 																												REGEXREPLACE(remove_junk,L.DEFNAME,''), L.DEFNAME));
 		self.clean_defendent_addr	:= Address.CleanAddress182(TRIM(L.ADDRESS,left,right),TRIM(L.CITY,left,right) + ', '+
 																															 TRIM(L.STATE,left,right) +' '+ TRIM(L.ZIP,left,right));
-		self.clean_atty_addr			:= Address.CleanAddress182(TRIM(L.ATYADDRESS,left,right),TRIM(L.ATYCITY,left,right) + ', '+
+		self.clean_atty_addr			:= Address.CleanAddress182(TRIM(L.ATYADDRESS,left,right),//TRIM(L.ATYCITY,left,right) + ', '+
 																															 TRIM(L.ATYSTATE,left,right) +' '+ TRIM(L.ATYZIP,left,right));
 		self.GENERATION				:= LiensV2_preprocess.Code_lkps.HG_Gen(TRIM(L.generation,left,right));
 		self.court_desc				:= IF(L.COURTID = 'MSHINC3','MISSISSIPPI DEPT OF REVENUE', LiensV2_preprocess.Code_lkps.HG_Court(TRIM(L.COURTID,left,right))); //MSHINC3 is a new court/source

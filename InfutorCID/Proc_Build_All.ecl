@@ -1,4 +1,4 @@
-import _control, instantid_logs, PromoteSupers,Scrubs_InfutorCID, Scrubs;
+﻿import _control, instantid_logs, PromoteSupers,Scrubs_InfutorCID, Scrubs;
 
 /////************************************************************************/
 /////************************************************************************/
@@ -10,7 +10,7 @@ import _control, instantid_logs, PromoteSupers,Scrubs_InfutorCID, Scrubs;
 
 Export Proc_Build_All(string version) := function
 
-#workunit('name', 'InfutorCID/InstantID_Logs Build ' + version);
+#workunit('name', 'Yogurt: InfutorCID/InstantID_Logs Build ' + version);
 
 //////////////////////////////SCRUBS INFUTOR///////////////////////////////////
 F := Scrubs_InfutorCID.In_InfutorCidBase;

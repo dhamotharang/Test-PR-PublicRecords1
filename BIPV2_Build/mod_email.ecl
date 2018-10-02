@@ -13,7 +13,7 @@ export mod_email := module
                                                       // +   ',Todd.Leonard@LexisNexis.com'
                                                       +   ',Laverne.Bentley@LexisNexis.com'
                                                       +   ',Aleida.Lima@LexisNexis.com'
-//                                                      +   ',David.Wheelock@lexisnexis.com'
+                                                      +   ',Kevin.Wilmoth@lexisnexisrisk.com'
                                                       +   ',Janet.Anderson@lexisnexisrisk.com'
                                                       +   ',Paul.Wahbe@lexisnexis.com'
                                                       +   ',dustin.skaggs@lexisnexis.com'

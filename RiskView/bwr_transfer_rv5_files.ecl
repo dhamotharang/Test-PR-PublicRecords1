@@ -7,8 +7,37 @@
 // ***********************
 
 filestocopyds := dataset([
-// {'key::personcontext_deltakey::delta_key::lexid_qa','','',''}  // these 2 personcontext keys come from alpharetta, so the copy doesn't work the same for them
-// ,{'key::personcontext_deltakey::delta_key::recid_qa','','',''}
+{'thor_data400::key::override::fcra::advo::qa::ffid','','',''}
+,{'thor_data400::key::override::fcra::aircrafts::qa::ffid','','',''}
+,{'thor_data400::key::override::fcra::alloy::qa::ffid','','',''}
+,{'thor_data400::key::override::fcra::avm::qa::ffid','','',''}
+,{'thor_data400::key::override::fcra::bankrupt_filing::qa::ffid_v3','','',''}
+,{'thor_data400::key::override::fcra::bankrupt_search::qa::ffid_v3','','',''}
+,{'thor_data400::key::override::fcra::crim::qa::offenders','','',''}
+,{'thor_data400::key::override::fcra::email_data::qa::ffid','','',''}
+,{'thor_data400::key::override::fcra::flag::qa::did','','',''}
+,{'thor_data400::key::override::fcra::flag::qa::ssn','','',''}
+,{'thor_data400::key::override::fcra::gong::qa::ffid','','',''}
+,{'thor_data400::key::override::fcra::header::qa::did','','',''}
+,{'thor_data400::key::override::fcra::impulse::qa::ffid','','',''}
+,{'thor_data400::key::override::fcra::infutor::qa::ffid','','',''}
+,{'thor_data400::key::override::fcra::inquiries::qa::ffid','','',''}
+,{'thor_data400::key::override::fcra::liensv2_main::qa::ffid','','',''}
+,{'thor_data400::key::override::fcra::liensv2_party::qa::ffid','','',''}
+,{'thor_data400::key::override::fcra::paw::qa::ffid','','',''}
+,{'thor_data400::key::override::fcra::pcr::qa::did','','',''}
+,{'thor_data400::key::override::fcra::pcr::qa::ssn','','',''}
+,{'thor_data400::key::override::fcra::proflic::qa::ffid','','',''}
+,{'thor_data400::key::override::fcra::property_assessment::qa::ffid','','',''}
+,{'thor_data400::key::override::fcra::property_deed::qa::ffid','','',''}
+,{'thor_data400::key::override::fcra::property_ownership::qa::did','','',''}
+,{'thor_data400::key::override::fcra::property_search::qa::ffid','','',''}
+,{'thor_data400::key::override::fcra::ssn_table::qa::ffid','','',''}
+,{'thor_data400::key::override::fcra::so_main::qa::ffid','','',''}
+,{'thor_data400::key::override::fcra::student_new::qa::ffid','','',''}
+,{'thor_data400::key::override::fcra::watercraft::qa::watercraft_sid','','',''}
+,{'thor_data400::key::fcra::override::pii::qa::did','','',''}
+,{'thor_data400::key::fcra::override::pii::qa::ssn','','',''}
 ,{'thor_200::key::criminal_offenders::fcra::qa::did','','',''}
 ,{'thor_200::key::criminal_offenses::fcra::qa::offender_key','','',''}
 ,{'thor_200::key::email_data::fcra::qa::did','','',''}
@@ -45,8 +74,6 @@ filestocopyds := dataset([
 ,{'thor_data400::key::fcra::optout::address_qa','','',''}
 ,{'thor_data400::key::fcra::optout::did_qa','','',''}
 ,{'thor_data400::key::fcra::optout::ssn_qa','','',''}
-,{'thor_data400::key::fcra::override::pii::qa::did','','',''}
-,{'thor_data400::key::fcra::override::pii::qa::ssn','','',''}
 ,{'thor_data400::key::fcra::telcordia_tpm_slim_qa','','',''}
 ,{'thor_data400::key::fips2county_qa','','',''}
 ,{'thor_data400::key::gong_history::fcra::qa::address','','',''}
@@ -72,35 +99,6 @@ filestocopyds := dataset([
 ,{'thor_data400::key::ln_propertyv2::fcra::qa::search.did','','',''}
 ,{'thor_data400::key::ln_propertyv2::fcra::qa::search.fid','','',''}
 ,{'thor_data400::key::new_suppression::qa::link_type_link_id','','',''}
-,{'thor_data400::key::override::fcra::advo::qa::ffid','','',''}
-,{'thor_data400::key::override::fcra::aircrafts::qa::ffid','','',''}
-,{'thor_data400::key::override::fcra::alloy::qa::ffid','','',''}
-,{'thor_data400::key::override::fcra::avm::qa::ffid','','',''}
-,{'thor_data400::key::override::fcra::bankrupt_filing::qa::ffid_v3','','',''}
-,{'thor_data400::key::override::fcra::bankrupt_search::qa::ffid_v3','','',''}
-,{'thor_data400::key::override::fcra::crim::qa::offenders','','',''}
-,{'thor_data400::key::override::fcra::email_data::qa::ffid','','',''}
-,{'thor_data400::key::override::fcra::flag::qa::did','','',''}
-,{'thor_data400::key::override::fcra::flag::qa::ssn','','',''}
-,{'thor_data400::key::override::fcra::gong::qa::ffid','','',''}
-,{'thor_data400::key::override::fcra::header::qa::did','','',''}
-,{'thor_data400::key::override::fcra::impulse::qa::ffid','','',''}
-,{'thor_data400::key::override::fcra::infutor::qa::ffid','','',''}
-,{'thor_data400::key::override::fcra::inquiries::qa::ffid','','',''}
-,{'thor_data400::key::override::fcra::liensv2_main::qa::ffid','','',''}
-,{'thor_data400::key::override::fcra::liensv2_party::qa::ffid','','',''}
-,{'thor_data400::key::override::fcra::paw::qa::ffid','','',''}
-,{'thor_data400::key::override::fcra::pcr::qa::did','','',''}
-,{'thor_data400::key::override::fcra::pcr::qa::ssn','','',''}
-,{'thor_data400::key::override::fcra::proflic::qa::ffid','','',''}
-,{'thor_data400::key::override::fcra::property_assessment::qa::ffid','','',''}
-,{'thor_data400::key::override::fcra::property_deed::qa::ffid','','',''}
-,{'thor_data400::key::override::fcra::property_ownership::qa::did','','',''}
-,{'thor_data400::key::override::fcra::property_search::qa::ffid','','',''}
-,{'thor_data400::key::override::fcra::ssn_table::qa::ffid','','',''}
-,{'thor_data400::key::override::fcra::so_main::qa::ffid','','',''}
-,{'thor_data400::key::override::fcra::student_new::qa::ffid','','',''}
-,{'thor_data400::key::override::fcra::watercraft::qa::watercraft_sid','','',''}
 ,{'thor_data400::key::paw::qa::did_fcra','','',''}
 ,{'thor_data400::key::proflic_mari::fcra::qa::did','','',''}
 ,{'thor_data400::key::prolicv2::fcra::qa::professional_license_type_lookup','','',''}
@@ -118,35 +116,31 @@ filestocopyds := dataset([
 ,{'thor_data400::key::watercraft::fcra::did_qa','','',''}
 			]
 															,rampscopy.layouts.filestocopy);
-
-														
+															
 dops.xFerRoxieFiles(filestocopyds
-											,'prod_esp.br.seisint.com'  // prod thor ESP
-											,'prod_dali.br.seisint.com'  // prod dali
-											,'thor400_44'  // different cluster
-											,'8010' 
-											,'dev' // prod or dr or dev or some environment identity, this value will be used in dops.copyconstants.copyfile
-											,'david.schlangen@lexisnexisrisk.com'
-											,'riskviewkeys' // superfile name
-											,true  // moveToLive
-											,false  // spawnWU
-											,_Control.RoxieEnv.prod_batch_fcra //roxieip
-											, //srcthoresp
-											, //srcthordali
-											, //srcthorespport
-											,['thor400_44'
+											,'10.194.90.203'  									// vault ESP
+											,'10.194.90.202'  									// vault dali
+											,'analyt_thor400_90_a'  						// vault cluster
+											,'8010' 														// vault ESP port
+											,'dev' 															// prod or dr or dev or some environment identity, this value will be used in dops.copyconstants.copyfile
+											,'laura.weiner@lexisnexisrisk.com'
+											,'qa' 															// suffixSuperName
+											,true
+											,false
+											,_Control.RoxieEnv.prod_batch_fcra 	// FCRA prod roxie IP
+											, '10.173.84.202' 									// prod thor ESP
+											, '10.173.44.105' 									// prod thor dali
+											, '8010'														// prod thor ESP port
+											,['thor400_44'		
 											  ,'thor400_20'
-												 ,'thor400_60'
-												 ,'hthor__eclagent'
-													//,'thor400_31_store'
-												]
-											 , //roxieprodespport
-											 , '10.173.1.135' //roxieprodesp
-											 , 'roxie_208' //roxieprodtarget
-											 , //roxiecertespport
-											 , '10.173.235.22'
-											 , 'roxie_221'
-											// , //useRoxieToGetSubFilenames
-											).begincopy;									
-										
-																			
+												,'thor400_60'
+												,'hthor__eclagent'
+												]																	// prod clusters
+											 , '8010'														// FCRA prod roxie ESP port
+											 , '10.173.1.135' 									// FCRA prod roxie ESP
+											 , 'roxie_208' 											// FCRA prod roxie target
+											 , '8010'														// FCRA cert roxie ESP port
+											 , '10.173.235.22'									// FCRA cert roxie ESP
+											 , 'roxie_221'											// FCRA cert roxie target
+											 , true 														// useRoxieToGetSubFilenames
+											).begincopy;					

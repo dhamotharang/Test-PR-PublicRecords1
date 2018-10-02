@@ -2,39 +2,63 @@
 // Procedure that takes the two Acquireweb input files, joins them together and
 // determines the AID and DID information
 
-IMPORT ut,address,DID_Add,header_slimsort,AID,std;
+IMPORT Acquireweb_Email, ut, address, DID_Add, NID, AID, AID_Support,std, PromoteSupers;
+#WORKUNIT('name', 'Acquireweb Individual Email Build');
+// #CONSTANT(AID_Support.Constants.StoredWhichAIDCache, AID_Support.Constants.eCache.ForNonHeader);
+// #STORED('did_add_force','thor');
 
 EXPORT proc_build_base(STRING version) := FUNCTION
-  ind_file_in   :=  Acquireweb_Email.files.file_acquireweb_email_ind_dedup;
+  //ind_file_in   :=  Acquireweb_Email.files.file_acquireweb_email_ind_dedup;
+	dsBase				:= Acquireweb_Email.Files.file_Acquireweb_Base;
   email_file_in :=  DISTRIBUTE(Acquireweb_Email.files.file_Acquireweb_Email_Emails,HASH32(AWID_Email));
+	
+	IngestPrep	:= Acquireweb_Email.prep_ingest;
 
+	ingestMod		:= Acquireweb_Email.Ingest(,,dsBase,IngestPrep);
+	new_base		:= ingestMod.AllRecords;
+	
+	//Populate current_rec based on whether or not record is in the new input file as this is a full replace
+	//Unknown = 1 Ancient = 2 Old = 3 Unchanged = 4 Updated = 5 New = 6
+	PopCurrentRec	:= Project(new_base, TRANSFORM(layouts.layout_Acquireweb_Base,
+																							SELF.current_rec := IF(LEFT.__Tpe in [2,3],FALSE,TRUE); SELF := LEFT; SELF:= [];));
+																							
+	//Send names to cleaner
+	NID.Mac_CleanParsedNames(PopCurrentRec, FileClnName, 
+													firstname:=FirstName, lastname:=LastName, middlename := clean_mname, namesuffix := clean_name_suffix
+													,includeInRepository:=true, normalizeDualNames:=false, useV2 := true);
+	
+	//Name flags
+	person_flags := ['P', 'D'];
+	business_flags := ['B'];
+	InvName_flags	:= ['I']; //Invalid Name
+	
+	ClnName	:= Project(FileClnName, TRANSFORM(layouts.layout_Acquireweb_Base,
+																						BOOLEAN IsName	:=	LEFT.nametype IN person_flags OR
+																																(LEFT.nametype = 'U' AND trim(LEFT.cln_fname) != '' AND TRIM(LEFT.cln_lname) != '');
+																						SELF.clean_title				:=	IF(IsName, LEFT.cln_title, '');
+																						SELF.clean_fname				:=	IF(IsName, LEFT.cln_fname, LEFT.firstname);
+																						SELF.clean_mname				:=	IF(IsName, LEFT.cln_mname, '');
+																						SELF.clean_lname				:=	IF(IsName, LEFT.cln_lname, LEFT.lastname);
+																						SELF.clean_name_suffix	:=	IF(IsName, LEFT.cln_suffix, '');
+																						SELF := LEFT));
+																									
   // Take the individual file and add fields for the cleaned name and the fields
   // to pass into the AID macro
   layout_ind_clean:=RECORD
-    RECORDOF(ind_file_in);
-    STRING5 clean_title;
-    STRING20 clean_fname;
-    STRING20 clean_mname;
-    STRING20 clean_lname;
-    STRING5 clean_name_suffix;
-    STRING3 clean_name_score;
+    layouts.layout_Acquireweb_Base;
     STRING addr1;
     STRING addr2;
     UNSIGNED8 RawAID:=0;
   END;
 
-  layout_ind_clean t_clean(ind_file_in L):=TRANSFORM
-		SELF.clean_title:='';
-    SELF.clean_fname        := TRIM(L.FIRSTNAME,RIGHT,LEFT);
-    SELF.clean_mname        := '';
-    SELF.clean_lname        := TRIM(L.LASTNAME,RIGHT,LEFT);
-    SELF.clean_name_suffix  := '';
-    SELF.clean_name_score   := '097';
-    SELF.addr1:=StringLib.StringCleanSpaces(TRIM(TRIM(stringlib.stringtouppercase(L.address1),LEFT,RIGHT)+' '+TRIM(stringlib.stringtouppercase(L.address2),LEFT,RIGHT),LEFT,RIGHT));
-    SELF.addr2:=StringLib.StringCleanSpaces(Address.Addr2FromComponents(stringlib.stringtouppercase(L.city),stringlib.stringtouppercase(L.state),stringlib.stringtouppercase(L.zip[..5])));
-    SELF:=L;
-  end;
-  ind_name_clean:=PROJECT(ind_file_in,t_clean(LEFT));
+  layout_ind_clean t_clean(ClnName L):=TRANSFORM
+    SELF.clean_name_score := '097';
+    SELF.addr1 :=StringLib.StringCleanSpaces(TRIM(TRIM(stringlib.stringtouppercase(L.address1),LEFT,RIGHT)+' '+TRIM(stringlib.stringtouppercase(L.address2),LEFT,RIGHT),LEFT,RIGHT));
+    SELF.addr2 :=StringLib.StringCleanSpaces(Address.Addr2FromComponents(stringlib.stringtouppercase(L.city),stringlib.stringtouppercase(L.state),stringlib.stringtouppercase(L.zip[..5])));
+    SELF :=L;
+		SELF := [];
+  END;
+  ind_name_clean:=PROJECT(ClnName,t_clean(LEFT));
 
   // Call the AID macro to get the cleaned address information
   UNSIGNED4 lFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;
@@ -42,14 +66,8 @@ EXPORT proc_build_base(STRING version) := FUNCTION
 
   // Get standardized Name and Address fields
   Acquireweb_Email.layouts.layout_Acquireweb_Base tProjectClean(ind_aid L):=TRANSFORM
-    SELF.awid                       := L.awid_ind;
     SELF.DID                        := 0;
     SELF.DID_Score                  := 0;
-    SELF.date_vendor_first_reported := version;
-    SELF.date_vendor_last_reported  := version;
-    SELF.date_first_seen            := if(STD.Str.Contains(L.IndExportDate,'-',true),std.str.filter(L.IndExportDate,'0123456789'),ut.date_slashed_MMDDYYYY_to_YYYYMMDD(L.IndExportDate));
-    SELF.date_last_seen             := SELF.date_first_seen;
-		SELF.current_rec								:= true;
     SELF.clean_prim_range           := L.aidwork_acecache.prim_range;
     SELF.clean_predir               := L.aidwork_acecache.predir;
     SELF.clean_prim_name            := L.aidwork_acecache.prim_name;
@@ -101,21 +119,10 @@ EXPORT proc_build_base(STRING version) := FUNCTION
     SELF:=L;
     SELF:=[];
   END;
-  new_acquireweb_data:=DISTRIBUTE(JOIN(ind_with_did_2,email_file_in,LEFT.awid=RIGHT.AWID_Email,jointhem(LEFT,RIGHT),INNER,LOCAL),HASH32(email));
+  new_acquireweb_data:=	JOIN(ind_with_did_2,email_file_in,LEFT.awid=RIGHT.AWID_Email,jointhem(LEFT,RIGHT),INNER,LOCAL);
 
-  // merge the new data with the existing basefile.  Then roll it up on the
-  // email and name fields, keeping the pertinent first and last date information
-	prev_base := project(Acquireweb_Email.files.file_Acquireweb_Base, transform(layouts.layout_Acquireweb_Base, SELF.current_rec := false, SELF := LEFT));
-  mergeddata:=SORT(new_acquireweb_data+prev_base,email,clean_fname,clean_mname,clean_lname);
-  Acquireweb_Email.layouts.layout_Acquireweb_Base rollitup(Acquireweb_Email.layouts.layout_Acquireweb_Base L,Acquireweb_Email.layouts.layout_Acquireweb_Base R):=TRANSFORM
-    SELF.date_first_seen:=IF(L.date_first_seen<R.date_first_seen,L.date_first_seen,R.date_first_seen);
-    SELF.date_last_seen:=IF(L.date_last_seen>R.date_last_seen,L.date_last_seen,R.date_last_seen);
-    SELF.date_vendor_first_reported:=IF(L.date_vendor_first_reported<R.date_vendor_first_reported,L.date_vendor_first_reported,R.date_vendor_first_reported);
-    SELF.date_vendor_last_reported:=IF(L.date_vendor_last_reported>R.date_vendor_last_reported,L.date_vendor_last_reported,R.date_vendor_last_reported);
-    SELF:=IF(L.date_vendor_last_reported>R.date_vendor_last_reported,L,R);
-  END;
-  BOOLEAN basefileexists:=nothor(fileservices.GetSuperFileSubCount('~thor_data200::base::acquireweb'))>0;
-  newbasefile:=DISTRIBUTE(IF(basefileexists,ROLLUP(mergeddata,rollitup(LEFT,RIGHT),email,clean_fname,clean_mname,clean_lname,LOCAL),new_acquireweb_data),HASH32(awid));
+  // Final dedup
+  Deddata:=DEDUP(SORT(new_acquireweb_data,email,clean_fname,clean_mname,clean_lname,-date_vendor_last_reported),email,clean_fname,clean_mname,clean_lname);
 
-  RETURN newbasefile(trim(AWID,left,right)<>'AWID');
+  RETURN Deddata(trim(AWID,left,right)<>'AWID');
 END;

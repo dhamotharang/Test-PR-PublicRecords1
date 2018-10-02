@@ -1,6 +1,6 @@
-﻿IMPORT Data_Services, Doxie;
+﻿IMPORT Data_Services, Doxie, STD;
 
-ds_SupplementalBase := FLAccidents_Ecrash.Files.Base.Supplemental(TRIM(report_type_id,all) IN ['A','DE']);
+ds_SupplementalBase := FLAccidents_Ecrash.Files.Base.Supplemental(TRIM(report_type_id,all) IN ['A','DE'] OR STD.str.ToUpperCase(TRIM(vendor_code,LEFT,RIGHT)) = 'CMPD');
 ds_PhotoBase := FLAccidents_Ecrash.Files.Base.PhotoBase;
 
 ds_SuperReport := DEDUP(SORT(DISTRIBUTE(ds_SupplementalBase, HASH64(Super_report_id)), super_report_id,report_id, LOCAL), Super_report_id,report_id,LOCAL);

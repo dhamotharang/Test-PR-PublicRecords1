@@ -1,3 +1,11 @@
+﻿/* ********************************************************************************************
+PRTE2_Header_Ins.Files
+MUST SWITCH TO THE NEW BOCA BUSINESS CASE BUILD PROCESSES - FOR NOW MUST KEEP THE SAME FILE NAMES
+NOTE: We only need file info here for 
+a) Spray/DeSpray and the data preparation we used to do during the build before the append.
+b) Our Base file and 
+c) any research/maintenance
+************************************************************************************ */
 IMPORT ut, PRTE;
 IMPORT PRTE_CSV, PRTE2_Common;
 
@@ -37,15 +45,6 @@ EXPORT Files := MODULE
 		// During the build, the Boca code references PRTE2_
 		EXPORT HDR_BASE_ALPHA_RELATES_Name	:= Base_Prefix+'::qa::'+Relationship_Suffix;
 		EXPORT HDR_BASE_ALPHA_RELATES_DS		:= DATASET(HDR_BASE_ALPHA_RELATES_Name,Relative_Layout,THOR);
-
-		
-		// Obsolete mentioned in z attributes, but moved into PRTE2_X_Ins_PropertyScramble.
-		// EXPORT Orig_50k_name		:= 'Orig_50k_Base';
-		// EXPORT SPRAY_50_Name		:=  SPRAYED_PREFIX_NAME+Orig_50k_name+ '_' + ThorLib.Wuid();
-		// EXPORT SPRAY_50_DS			:=	DATASET(SPRAY_50_Name,layouts.Original_50k_Layout,
-	                                // CSV(HEADING(1), SEPARATOR(','), TERMINATOR(['\n','\r\n']), QUOTE('"')));	
-		// EXPORT BASE_50k_Name		:=  Base_Prefix+Orig_50k_name;
-		// EXPORT BASE_50k_DS			:=	DATASET(BASE_50k_Name,layouts.Original_50k_Layout,THOR);
 
 /*
 Boca header keys are prefixed as follows:

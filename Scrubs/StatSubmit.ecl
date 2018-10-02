@@ -1,11 +1,11 @@
-﻿import Salt35, Orbit3SOA, ut,_control,std, scrubs; 
+﻿import Salt311, Orbit3SOA, ut,_control,std, scrubs;
 EXPORT StatSubmit(Submission, CalculateWarnings, pProfileName, CustomTag, pProfileType, versionDate, FileType, wuid) := functionmacro 
 		
 		
 		submit_orbit := Orbit3SOA.SubmitStat(CalculateWarnings,pProfileName,pProfileType,versionDate,FileType);
 		
 		FullRules:=join(Submission,CalculateWarnings,trim(left.RuleDesc, left, right) = trim(right.RuleName, left, right),
-								transform(Salt35.ScrubsOrbitLayout,Self.rejectwarning:=Right.rejectwarning;Self.rulepcnt:=(decimal5_2)Left.rulepcnt;Self:=Left;),left outer);
+								transform(Salt311.ScrubsOrbitLayout,Self.rejectwarning:=Right.rejectwarning;Self:=Left;),left outer);
 		
 		log_File:='~thor_data400::'+pProfileName+'::OrbitReports::'+workunit;
 		

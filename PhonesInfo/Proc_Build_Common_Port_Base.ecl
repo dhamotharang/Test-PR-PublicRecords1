@@ -1,4 +1,4 @@
-import _control, Doxie, RoxieKeyBuild, std, Ut;
+﻿import _control, Doxie, RoxieKeyBuild, std, Ut;
 
 EXPORT Proc_Build_Common_Port_Base(string version, string version2, const varstring eclsourceip, string thor_name):= function
 	

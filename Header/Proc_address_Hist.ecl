@@ -27,7 +27,7 @@ end;
 
 
 join_all := JOIN(h(prim_name<>''),lab
-                ,LEFT.rid=RIGHT.rid
+                ,LEFT.rid=RIGHT.alpha_rid
                 ,TRANSFORM(r
 										,SELF := LEFT
 										,SELF := Right)

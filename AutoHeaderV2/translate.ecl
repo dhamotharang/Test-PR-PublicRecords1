@@ -1,4 +1,4 @@
-IMPORT AutoStandardI, address, doxie, ut, header, suppress, lib_stringlib, AutoheaderV2, lib_metaphone, lib_ziplib, _Validate;
+﻿IMPORT AutoStandardI, address, doxie, ut, header, suppress, lib_stringlib, AutoheaderV2, lib_metaphone, lib_ziplib, _Validate;
 
 isFCRAval := false;
 todays_date := (unsigned8)Stringlib.getDateYYYYMMDD();
@@ -22,7 +22,7 @@ EXPORT translate := MODULE
 		// note: app-type must be already pre-processed by a caller
 		Suppress.MAC_Suppress_Set (app_type, supp_set);
 
-		supp_key := suppress.Key_New_Suppression (
+		supp_key := suppress.Key_New_Suppression() (
 			keyed (product in supp_set),
 			keyed (linking_type=Suppress.Constants.LinkTypes.SSN),
 			keyed (Linking_ID=ssn_filtered_value));

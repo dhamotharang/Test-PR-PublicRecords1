@@ -27,6 +27,8 @@
 											 Constants.coaircraft 				=> le.coaircraft_score,
 											 Constants.comarriagedivorce 	=> le.comarriagedivorce_score,
 											 Constants.coucc 							=> le.coucc_score,
+											 Constants.coclue 							=> le.coclue_score,
+											 Constants.cocc 							=> le.cocc_score,
 											 ERROR('Missing relationship type')
 											);
 		return outScore;
@@ -59,6 +61,8 @@
 										 Constants.coaircraft 				=> le.coaircraft_cnt,
 										 Constants.comarriagedivorce 	=> le.comarriagedivorce_cnt,
 										 Constants.coucc 							=> le.coucc_cnt,
+										 Constants.coclue 							=> le.coclue_cnt,
+										 Constants.cocc 							=> le.cocc_cnt,
 										 ERROR('Missing relationship type')
 										);
 		return outCnt;
@@ -170,6 +174,12 @@
 																	couccRec := left.rels(rel_type = Constants.coucc)[1];
 																	self.coucc_score 							:= couccRec.score;
 																	self.coucc_cnt 								:= couccRec.cnt;
+																	coclueRec := left.rels(rel_type = Constants.coclue)[1];
+																	self.coclue_score := coclueRec.score;
+																	self.coclue_cnt   := coclueRec.cnt;
+																	coccRec := left.rels(rel_type = Constants.cocc)[1];
+																	self.cocc_score   := coccRec.score;
+																	self.cocc_cnt     := coccRec.cnt;
 																	self := left;
 																 ));
 		return relOut;
