@@ -23,7 +23,7 @@
 </message>
 */
 
-IMPORT BatchDatasets, BatchShare, Doxie, doxie_regression, Suppress, ut, AutoheaderV2;
+IMPORT BatchDatasets, BatchShare, Doxie, Suppress, ut, AutoheaderV2;
 
 EXPORT BatchService() := FUNCTION
   
