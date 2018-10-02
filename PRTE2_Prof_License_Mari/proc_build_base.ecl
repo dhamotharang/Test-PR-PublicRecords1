@@ -79,9 +79,9 @@ prepFile := project(dsLicenseState,xformOriginalBase(left));
 create_MariRid := Prof_License_Mari.fCreateMariRID(prepFile);
 
 //Reassign Temporary MARI RID to MARI RID
-reSetMariRid := project(create_MariRid, transform(Prof_License_Mari.layouts.final, self.mari_rid := left.tmp_mari_rid; self := left));
+reSetMariRid := project(create_MariRid, transform(layouts.search, self.mari_rid := left.tmp_mari_rid; self := left));
 
-reformatSearch:=project(create_MariRid,
+reformatSearch:=project(reSetMariRid,
 Transform(Layouts.search,
 Self:=Left;
 self := []; 

@@ -63,6 +63,7 @@
 	END;
 
 	EXPORT layout_Acquireweb_Base:=RECORD
+		UNSIGNED6 rcid; //Used for Ingest process
 	  // Information from the original files
     STRING awid;
     STRING firstname;

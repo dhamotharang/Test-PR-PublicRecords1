@@ -26,8 +26,8 @@ sequential(
 			,_control.fSubmitNewWorkunit('#workunit(\'name\',\'Scrubs_Transunion_Monthly\');\r\n'+
 																	'Scrubs_Transunion_Monthly.proc_generate_report();',std.system.job.target())
 			)
-			// : success(TransunionCred.Send_Email(Version).Build_Success)
-			// , failure(TransunionCred.Send_Email(Version).Build_Failure)
+			 :  success(TransunionCred.Send_Email(Version).Build_Success)
+			 ,  failure(TransunionCred.Send_Email(Version).Build_Failure)
 			;
 
  endmacro

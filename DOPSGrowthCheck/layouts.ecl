@@ -32,18 +32,20 @@
 			END;
 			export Configuration_Layout := RECORD
 				string PackageName;
-				string KeyAttribute;
 				string KeyNickName;
-				string KeyFilePre;
-				string KeyFilePost;
-				string PersistRecIDField;
-				string EmailField;
-				string PhoneField;
-				string SSNField;
-				string FeinField;
-				string FieldsOfInterest;
-				string IgnoreFields;
-				string Threshold;
+				decimal6_3 NumRecsThresholdMin; 
+				decimal6_3 NumRecsThresholdMax; 
+				decimal6_3 UniqueThresholdMin; 
+				decimal6_3 UniqueThresholdMax; 
+				decimal6_3 PIDThresholdMax;
+				decimal6_3 AddedThresholdMin; 
+				decimal6_3 AddedThresholdMax; 
+				decimal6_3 ModifiedThresholdMin; 
+				decimal6_3 ModifiedThresholdMax; 
+				decimal6_3 RemovedThresholdMin; 
+				decimal6_3 RemovedThresholdMax;
+				decimal6_3 PersistThresholdMax;
+				string emailList;
 			END;
 			export Date_Compare_Layout := RECORD
 				string PackageName;
@@ -135,4 +137,32 @@
 				string NumRecsChanged;
 				string passed;
 			end;
-end;
+			export CalculateStatAlerts	:=	record
+				string PackageName;
+				string KeyNickName;
+				string CurrVersion;
+				boolean	NumRecsAlerts;
+				boolean	UniqueDIDAlerts;
+				boolean	UniqueProxIDAlerts;
+				boolean	UniqueSeleIDAlerts;
+				boolean	UniquePersistentRecIDAlerts;
+				boolean	UniqueEmailAlerts;
+				boolean	UniquePhoneAlerts;
+				boolean	UniqueSSNAlerts;
+				boolean	UniqueFEINAlerts;
+			end;
+			export DeltaStatAlerts := record
+				string PackageName;
+				string KeyNickName;
+				string CurrVersion;
+				boolean AddedAlerts;
+				boolean ModifiedAlerts;
+				boolean RemovedAlerts;
+			end;
+			export PersistStatAlerts := record
+				string PackageName;
+				string KeyNickName;
+				string CurrVersion;
+				boolean PersistAlerts;
+			end;
+	end;  

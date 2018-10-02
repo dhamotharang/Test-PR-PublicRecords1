@@ -148,7 +148,22 @@ SALT30.mac_select_best_matches(last_mjs_t,rcid1,rcid2,o);
 RETURN  mjs0 +o;
 ENDMACRO;
 SHARED all_mjs := MAC_DoJoins(h,match_join);
-not_blocked := JOIN(all_mjs,LinkBlockers(ih).Block,left.LGID31=right.LGID31 and left.LGID32=right.LGID32,TRANSFORM(LEFT),LEFT ONLY, SMART); // Remove all blocked links
+//Now construct candidates based upon attribute & relationship files
+AllAttrMatches := SORT(Mod_Attr_UnderLinks(ih).Match,LGID31,LGID32,Rule,-(Conf+Conf_Prop),LOCAL);
+match_candidates(ih).Layout_Attribute_Matches CombineResults(match_candidates(ih).Layout_Attribute_Matches le,match_candidates(ih).Layout_Attribute_Matches ri) := TRANSFORM
+  SELF.Conf := le.Conf+ri.Conf;
+  SELF.Source_Id := le.Source_ID + '|' + ri.Source_ID;
+  SELF := le;
+END;
+EXPORT All_Attribute_Matches := ROLLUP(AllAttrMatches,LEFT.LGID31=RIGHT.LGID31 AND LEFT.LGID32=RIGHT.LGID32,CombineResults(LEFT,RIGHT),LOCAL);
+hd := DISTRIBUTE(h,HASH(LGID3));
+j1 := JOIN(DISTRIBUTE(All_Attribute_Matches,HASH(LGID32)),hd,LEFT.LGID32=RIGHT.LGID3,LOCAL); // Stock one half of full data
+match_candidates(ih).layout_candidates strim(j1 le) := TRANSFORM
+  SELF := le;
+END;
+attr_match := JOIN(DISTRIBUTE(j1,HASH(LGID31)),hd,LEFT.LGID31 = RIGHT.LGID3 AND ( LEFT.SALT_Partition = RIGHT.SALT_Partition OR LEFT.SALT_Partition='' OR RIGHT.SALT_Partition = '' ),match_join( RIGHT,PROJECT(LEFT,strim(LEFT)),LEFT.Rule, LEFT.Conf),LOCAL); // Will be distributed by DID1
+with_attr := attr_match + all_mjs;
+not_blocked := JOIN(with_attr,LinkBlockers(ih).Block,left.LGID31=right.LGID31 and left.LGID32=right.LGID32,TRANSFORM(LEFT),LEFT ONLY, SMART); // Remove all blocked links
 EXPORT All_Matches := not_blocked : PERSIST('~temp::LGID3::BIPV2_LGID3::all_m',EXPIRE(Config.PersistExpire)); // To by used by rcid and LGID3
 //  /* HACK - disable default salt mac_avoid_transitives*/
 import BIPV2_Tools; /*HACK - import for new transitives macro*/
@@ -213,7 +228,7 @@ r := RECORD
 END;
 export ConfidenceBreakdown := table(Matches,r,Conf,few);
 Full_Sample_Matches := MatchSample+BorderlineMatchSample+AlmostMatchSample;
-export MatchSampleRecords := Debug(ih,s,MatchThreshold).AnnotateMatches(Full_Sample_Matches);
+export MatchSampleRecords := Debug(ih,s,MatchThreshold).AnnotateMatches(Full_Sample_Matches,All_Attribute_Matches);
  
 //Now actually produce the new file
 SALT30.MAC_Reassign_UID(ih_thin,split_patch,LGID3,rcid,ih0); // Perform splits
