@@ -79,8 +79,8 @@ buildKey	:=	sequential(
 												 build_roxie_keys
 												,Move_keys
 												,to_qa
-												,build_autokeys
-												,PerformUpdateOrNot);
+												,build_autokeys);
+												//,PerformUpdateOrNot);
 												
 
 return	buildKey;
