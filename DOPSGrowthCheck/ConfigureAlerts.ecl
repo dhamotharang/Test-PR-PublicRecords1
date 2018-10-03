@@ -16,7 +16,7 @@
 	CreateNewfile:=output(FinalSet,,'~thor_data400::DeltaStats::AlertConfigurations::'+workunit,thor,compressed);
 
 	ClearFiles:=nothor(global(sequential(STD.File.StartSuperFileTransaction(),
-										STD.File.ClearSuperFile('~thor_data400::DeltaStats::AlertConfigurations',false),
+										STD.File.ClearSuperFile('~thor_data400::DeltaStats::AlertConfigurations',true),
 										STD.File.FinishSuperFileTransaction())));
 										
 	return sequential(

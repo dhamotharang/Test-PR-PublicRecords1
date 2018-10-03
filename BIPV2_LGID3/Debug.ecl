@@ -7,6 +7,8 @@ SHARED h := match_candidates(ih).candidates;
 SHARED LowerMatchThreshold := MatchThreshold-3; // Keep extra 'borderlines' for debug purposes
  
 EXPORT Layout_Sample_Matches := RECORD(match_candidates(ih).Layout_Matches)
+  INTEGER2 Attribute_Conf := 0; // Score provided by attribute files
+  SALT30.StrType   Matching_Attributes := ''; // Keys from attribute files which match
   typeof(h.sbfe_id) left_sbfe_id;
   INTEGER1 sbfe_id_match_code;
   INTEGER2 sbfe_id_score;
@@ -315,17 +317,25 @@ EXPORT layout_sample_matches sample_match_join(match_candidates(ih).layout_candi
     +MAX(le.cnp_number_prop,ri.cnp_number_prop)*SELF.cnp_number_score // Score if either field propogated
     +MAX(le.company_inc_state_prop,ri.company_inc_state_prop)*SELF.company_inc_state_score // Score if either field propogated
   ) / 100; // Score based on propogated fields
-  SELF.Conf := (SELF.sbfe_id_score + SELF.Lgid3IfHrchy_score + IF(SELF.duns_number_concept_score>0,MAX(SELF.duns_number_concept_score,SELF.active_duns_number_score + SELF.duns_number_score),SELF.active_duns_number_score + SELF.duns_number_score) + SELF.company_name_score + SELF.company_fein_score + SELF.company_charter_number_score + SELF.cnp_number_score + SELF.company_inc_state_score + SELF.cnp_btype_score) / 100 + outside;
+  SELF.Conf := (SELF.sbfe_id_score + SELF.Lgid3IfHrchy_score + IF(SELF.duns_number_concept_score>0,MAX(SELF.duns_number_concept_score,SELF.active_duns_number_score + SELF.duns_number_score),SELF.active_duns_number_score + SELF.duns_number_score) + SELF.company_name_score + SELF.company_fein_score + SELF.company_charter_number_score + SELF.cnp_number_score + SELF.company_inc_state_score + SELF.cnp_btype_score) / 100 + outside;END;
+SHARED AppendAttribs(DATASET(layout_sample_matches) am,DATASET(match_candidates(ih).layout_attribute_matches) ia) := FUNCTION
+  Layout_Sample_Matches add_attr(am le, ia ri) := TRANSFORM
+    SELF.Attribute_Conf := ri.Conf;
+    SELF.Matching_Attributes := ri.Source_Id;
+    SELF.Conf := le.Conf + ri.Conf;
+    SELF := le;
+  END;
+  RETURN JOIN(am,ia,LEFT.LGID31=RIGHT.LGID31 AND LEFT.LGID32=RIGHT.LGID32,add_attr(LEFT,RIGHT),LEFT OUTER,HASH);
 END;
  
-EXPORT AnnotateMatchesFromData(DATASET(match_candidates(ih).layout_candidates) in_data,DATASET(match_candidates(ih).layout_matches)  im) := FUNCTION
+EXPORT AnnotateMatchesFromData(DATASET(match_candidates(ih).layout_candidates) in_data,DATASET(match_candidates(ih).layout_matches)  im,dataset(Match_Candidates(ih).layout_attribute_matches) ia) := FUNCTION
   j1 := JOIN(in_data,im,LEFT.LGID3 = RIGHT.LGID31,HASH);
   match_candidates(ih).layout_candidates strim(j1 le) := TRANSFORM
     SELF := le;
   END;
   r := JOIN(j1,in_data,LEFT.LGID32 = RIGHT.LGID3,sample_match_join( PROJECT(LEFT,strim(LEFT)),RIGHT),HASH);
   d := DEDUP( SORT( r, LGID31, LGID32, -Conf, LOCAL ), LGID31, LGID32, LOCAL ); // LGID32 distributed by join
-  RETURN d;
+  RETURN AppendAttribs( d, ia );
 END;
  
 EXPORT AnnotateMatchesFromRecordData(DATASET(match_candidates(ih).layout_candidates) in_data,DATASET(match_candidates(ih).layout_matches)  im) := FUNCTION//Faster form when rcid known
@@ -344,8 +354,8 @@ EXPORT AnnotateClusterMatches(DATASET(match_candidates(ih).layout_candidates) in
   RETURN JOIN(in_data(rcid<>BaseRecord),j1,TRUE,sample_match_join( PROJECT(LEFT,strim(LEFT)),RIGHT),ALL);
 END;
  
-EXPORT AnnotateMatches(DATASET(match_candidates(ih).layout_matches)  im) := FUNCTION
-  RETURN AnnotateMatchesFromRecordData(h,im);
+EXPORT AnnotateMatches(DATASET(match_candidates(ih).layout_matches)  im,dataset(Match_Candidates(ih).layout_attribute_matches) ia) := FUNCTION
+  RETURN AppendAttribs( AnnotateMatchesFromRecordData(h,im), ia );
 END;
 EXPORT Layout_RolledEntity := RECORD,MAXLENGTH(63000)
   SALT30.UIDType LGID3;

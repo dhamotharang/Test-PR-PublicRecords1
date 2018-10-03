@@ -12,7 +12,7 @@ export Proc_Update_Dops() := function
 					        Orbit3.proc_Orbit3_CreateBuild ( 'Liens & Judgements',newfiledate,'N|B'),
 					fileservices.clearsuperfile('~thor::dops::liensv2',true),
 					fileservices.sendemail(
-												'BocaRoxiePackageTeam@lexisnexis.com',
+												'Sudhir.Kasavajjala@lexisnexisrisk.com; Michael.Gould@lexisnexisrisk.com',
 												'ALERT:LiensV2Keys:Completed',
 												'Liensv2 job finished, add to package for deployment'
 										)),

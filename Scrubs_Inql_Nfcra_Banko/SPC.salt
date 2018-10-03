@@ -1,0 +1,96 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_Inql_Nfcra_Banko
+FILENAME:File
+
+FIELDTYPE:DEFAULT:LEFTTRIM:NOQUOTES("')
+FIELDTYPE:ALPHA:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):
+FIELDTYPE:NAME:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-,'.):
+FIELDTYPE:NUMBER:ALLOW(0123456789):
+FIELDTYPE:WORDBAG:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789<>{}[]-^=!+&,./:|#_@$):SPACES( ):ONFAIL(CLEAN):
+
+
+FIELDTYPE:orig_transaction_id:SPACES( ):ALLOW(0123456789ABIRT):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_function_name:SPACES( ):ALLOW(34):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_company_id:SPACES( ):LIKE(NUMBER):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_login_id:SPACES( ):ALLOW(_abeknopsw):LEFTTRIM:LENGTHS(16):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_billing_code:SPACES( ):LIKE(WORDBAG):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_record_count:SPACES( ):LIKE(NUMBER):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_fcra_purpose:SPACES( ):ALLOW(N\):LEFTTRIM:LENGTHS(2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_glb_purpose:SPACES( ):ALLOW(01):LEFTTRIM:LENGTHS(1):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_dppa_purpose:SPACES( ):ALLOW(N\):LEFTTRIM:LENGTHS(2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_ip_address:SPACES( ):TYPE(NUMBERFIELD):LENGTHS(12,13,14,11,15):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_reference_code:SPACES( ):ALLOW( -0123456789BCDINPR\aeistu):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_login_history_id:SPACES( ):LIKE(NUMBER):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_date_added:SPACES( ):ALLOW( -0123456789:):LEFTTRIM:LENGTHS(19):WORDS(2):ONFAIL(CLEAN)
+FIELDTYPE:orig_price:SPACES( ):ALLOW(N\):LEFTTRIM:LENGTHS(2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_pricing_error_code:SPACES( ):ALLOW(0N\):LEFTTRIM:LENGTHS(1,2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_free:SPACES( ):ALLOW(3N\):LEFTTRIM:LENGTHS(2,1):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_business_name:SPACES( ):ALLOW(N\):LEFTTRIM:LENGTHS(2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_name_first:SPACES( ):LIKE(ALPHA):WORDS(1,2):ONFAIL(CLEAN)
+FIELDTYPE:orig_name_last:SPACES( ):LIKE(ALPHA):WORDS(1,2):ONFAIL(CLEAN)
+FIELDTYPE:orig_ssn:SPACES( ):LIKE(NUMBER):LEFTTRIM:LENGTHS(0..9):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_case_number:SPACES( ):ALLOW(N\):LEFTTRIM:LENGTHS(2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_address:SPACES( ):ALLOW(N\):LEFTTRIM:LENGTHS(2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_city:SPACES( ):ALLOW(N\):LEFTTRIM:LENGTHS(2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_state:SPACES( ):LIKE(ALPHA):LEFTTRIM:LENGTHS(2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_zip:SPACES( ):ALLOW(N\):LEFTTRIM:LENGTHS(2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_dob:SPACES( ):ALLOW(N\):LEFTTRIM:LENGTHS(2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_phone:SPACES( ):ALLOW(N\):LEFTTRIM:LENGTHS(2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_tmsid:SPACES( ):ALLOW(N\):LEFTTRIM:LENGTHS(2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_unique_id:SPACES( ):ALLOW(N\):LEFTTRIM:LENGTHS(2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_out_tmsid:SPACES( ):LIKE(WORDBAG):LEFTTRIM:LENGTHS(2,16):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_out_business_name:SPACES( ):ALLOW(N\):LEFTTRIM:LENGTHS(2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_out_first_name:SPACES( ):ALLOW(N\):LEFTTRIM:LENGTHS(2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_out_last_name:SPACES( ):ALLOW(N\):LEFTTRIM:LENGTHS(2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_out_ssn:SPACES( ):ALLOW(N\):LEFTTRIM:LENGTHS(2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_out_address:SPACES( ):ALLOW(N\):LEFTTRIM:LENGTHS(2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_out_city:SPACES( ):ALLOW(N\):LEFTTRIM:LENGTHS(2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_out_state:SPACES( ):ALLOW(N\):LEFTTRIM:LENGTHS(2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_out_zip:SPACES( ):ALLOW(N\):LEFTTRIM:LENGTHS(2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_out_case_number:SPACES( ):ALLOW(N\):LEFTTRIM:LENGTHS(2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:orig_transaction_type:SPACES( ):ALLOW():LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(CLEAN)
+
+FIELD:orig_transaction_id:LIKE(orig_transaction_id):TYPE(STRING):0,0
+FIELD:orig_function_name:LIKE(orig_function_name):TYPE(STRING):0,0
+FIELD:orig_company_id:LIKE(orig_company_id):TYPE(STRING):0,0
+FIELD:orig_login_id:LIKE(orig_login_id):TYPE(STRING):0,0
+FIELD:orig_billing_code:LIKE(orig_billing_code):TYPE(STRING):0,0
+FIELD:orig_record_count:LIKE(orig_record_count):TYPE(STRING):0,0
+FIELD:orig_fcra_purpose:LIKE(orig_fcra_purpose):TYPE(STRING):0,0
+FIELD:orig_glb_purpose:LIKE(orig_glb_purpose):TYPE(STRING):0,0
+FIELD:orig_dppa_purpose:LIKE(orig_dppa_purpose):TYPE(STRING):0,0
+FIELD:orig_ip_address:LIKE(orig_ip_address):TYPE(STRING):0,0
+FIELD:orig_reference_code:LIKE(orig_reference_code):TYPE(STRING):0,0
+FIELD:orig_login_history_id:LIKE(orig_login_history_id):TYPE(STRING):0,0
+FIELD:orig_date_added:LIKE(orig_date_added):TYPE(STRING):0,0
+FIELD:orig_price:LIKE(orig_price):TYPE(STRING):0,0
+FIELD:orig_pricing_error_code:LIKE(orig_pricing_error_code):TYPE(STRING):0,0
+FIELD:orig_free:LIKE(orig_free):TYPE(STRING):0,0
+FIELD:orig_business_name:LIKE(orig_business_name):TYPE(STRING):0,0
+FIELD:orig_name_first:LIKE(orig_name_first):TYPE(STRING):0,0
+FIELD:orig_name_last:LIKE(orig_name_last):TYPE(STRING):0,0
+FIELD:orig_ssn:LIKE(orig_ssn):TYPE(STRING):0,0
+FIELD:orig_case_number:LIKE(orig_case_number):TYPE(STRING):0,0
+FIELD:orig_address:LIKE(orig_address):TYPE(STRING):0,0
+FIELD:orig_city:LIKE(orig_city):TYPE(STRING):0,0
+FIELD:orig_state:LIKE(orig_state):TYPE(STRING):0,0
+FIELD:orig_zip:LIKE(orig_zip):TYPE(STRING):0,0
+FIELD:orig_dob:LIKE(orig_dob):TYPE(STRING):0,0
+FIELD:orig_phone:LIKE(orig_phone):TYPE(STRING):0,0
+FIELD:orig_tmsid:LIKE(orig_tmsid):TYPE(STRING):0,0
+FIELD:orig_unique_id:LIKE(orig_unique_id):TYPE(STRING):0,0
+FIELD:orig_out_tmsid:LIKE(orig_out_tmsid):TYPE(STRING):0,0
+FIELD:orig_out_business_name:LIKE(orig_out_business_name):TYPE(STRING):0,0
+FIELD:orig_out_first_name:LIKE(orig_out_first_name):TYPE(STRING):0,0
+FIELD:orig_out_last_name:LIKE(orig_out_last_name):TYPE(STRING):0,0
+FIELD:orig_out_ssn:LIKE(orig_out_ssn):TYPE(STRING):0,0
+FIELD:orig_out_address:LIKE(orig_out_address):TYPE(STRING):0,0
+FIELD:orig_out_city:LIKE(orig_out_city):TYPE(STRING):0,0
+FIELD:orig_out_state:LIKE(orig_out_state):TYPE(STRING):0,0
+FIELD:orig_out_zip:LIKE(orig_out_zip):TYPE(STRING):0,0
+FIELD:orig_out_case_number:LIKE(orig_out_case_number):TYPE(STRING):0,0
+FIELD:orig_transaction_type:LIKE(orig_transaction_type):TYPE(STRING):0,0
+// CONCEPT statements should be used to group together interellated fields; such as address
+// RELATIONSHIP is used to find non-obvious relationships between the clusters
+// SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+// LINKPATH is used to define access paths for external linking
