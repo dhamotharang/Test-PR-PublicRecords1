@@ -27,7 +27,8 @@ function
 		//for future use
 		// ,BIPStats(pversion) 
 		,Equifax_Business_Data.QA_Records()
-	) : success(Send_Emails(pversion,,not pIsTesting).Roxie), 
+	// ) : success(Send_Emails(pversion,,not pIsTesting).Roxie), 
+	) : success(Send_Emails(pversion,,not pIsTesting).buildsuccess), 
 	    failure(send_emails(pversion,,not pIsTesting).buildfailure);
 	
 	return

@@ -1,4 +1,4 @@
-import ut;
+﻿import ut;
 EXPORT UpdateWdogHdrFile(string watchdogtype ,boolean ishdrnew) := function
 
 string8 build_date := (string) Watchdog.proc_get_wdogdate(ishdrnew).fdate : independent;
@@ -30,14 +30,14 @@ end;
 
 ds1 := project(ds,updatefile(left));
 
-return Sequential( output(ds1,,set_wdog_tempfile+'_'+watchdogtype+'_'+build_date,overwrite),
-                
+return Sequential(/* output(ds1,,set_wdog_lfile+'_'+watchdogtype+'_'+build_date,overwrite),*/
                 FileServices.StartSuperfiletransaction(),
-								 FileServices.RemoveSuperfile(set_wdog_sfile,set_wdog_lfile),
+ 							  FileServices.RemoveSuperfile(set_wdog_sfile,set_wdog_lfile),
 								FileServices.FinishSuperfiletransaction(),
-
-                 FileServices.Renamelogicalfile(set_wdog_lfile,set_wdog_lfile+watchdogtype+'_old'+build_date),
-								FileServices.Renamelogicalfile(set_wdog_tempfile+'_'+watchdogtype+'_'+build_date,set_wdog_lfile),
+                output(ds1,,set_wdog_lfile+'_'+watchdogtype+'_'+build_date,overwrite),
+								output(ds1,,set_wdog_sfile+build_date,overwrite),
+//              FileServices.Renamelogicalfile(set_wdog_lfile,set_wdog_lfile+watchdogtype+'_old'+build_date),
+//							FileServices.Renamelogicalfile(set_wdog_tempfile+'_'+watchdogtype+'_'+build_date,set_wdog_lfile),
                 FileServices.StartSuperfiletransaction(),
 
 								 FileServices.AddSuperfile( set_wdog_sfile, set_wdog_lfile),
