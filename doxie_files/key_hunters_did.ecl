@@ -11,7 +11,6 @@ export key_hunters_did(boolean  IsFCRA = false) := function
 									 'thor_Data400::key::hunters_doxie_did_'
 									 );
 									 
-	  // return_file		:= index(emerges.file_hunters_keybuild((integer)did_out != 0),{UNSIGNED8 did := (UNSIGNED8) did_out}, {emerges.file_hunters_keybuild},
 	  return_file		:= index(dBase,{UNSIGNED8 did := (UNSIGNED8) did_out}, {dBase},
 														Data_Services.Data_location.Prefix('Emerges')+ key_name + doxie.Version_SuperKey);
 														
