@@ -80,6 +80,7 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
                                                                               SELF.address := address_in[1];
                                                                               SELF.phone := TRIM(LEFT.phone);
                                                                               SELF.ssn := TRIM(LEFT.ssn);
+                                                                              SELF.dob := TRIM(LEFT.dob);  
                                                                               SELF.accountNumber := TRIM(LEFT.acctNo);
                                                                               SELF.inputSeq := LEFT.seq;
                                                                               SELF := [];)]),
