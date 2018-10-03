@@ -77,14 +77,13 @@ EXPORT Base_Scrubs := MODULE
     UNSIGNED1 EFX_MRKT_TOTALIND_Invalid;
     UNSIGNED1 EFX_MRKT_TOTALSCORE_Invalid;
     UNSIGNED1 EFX_PUBLIC_Invalid;
-    UNSIGNED1 EFX_STATEC_Invalid;
     UNSIGNED1 EFX_STKEXC_Invalid;
     UNSIGNED1 EFX_PRIMSIC_Invalid;
     UNSIGNED1 EFX_SECSIC1_Invalid;
     UNSIGNED1 EFX_SECSIC2_Invalid;
     UNSIGNED1 EFX_SECSIC3_Invalid;
     UNSIGNED1 EFX_SECSIC4_Invalid;
-    UNSIGNED1 EFX_STATE_Invalid;
+    UNSIGNED1 norm_state_Invalid;
     UNSIGNED1 EFX_ID_Invalid;
     UNSIGNED1 EFX_NAME_Invalid;
     UNSIGNED1 EFX_LEGAL_NAME_Invalid;
@@ -95,8 +94,6 @@ EXPORT Base_Scrubs := MODULE
     UNSIGNED1 EFX_BIZ_Invalid;
     UNSIGNED1 EFX_RES_Invalid;
     UNSIGNED1 EFX_CMRA_Invalid;
-    UNSIGNED1 EFX_SECSTAT_Invalid;
-    UNSIGNED1 EFX_STATEC2_Invalid;
     UNSIGNED1 EFX_SECGEOPREC_Invalid;
     UNSIGNED1 EFX_SECCTRYISOCD_Invalid;
     UNSIGNED1 EFX_SECCTRYNUM_Invalid;
@@ -260,14 +257,13 @@ EXPORT FromNone(DATASET(Base_Layout_Equifax_Business_Data) h) := MODULE
     SELF.EFX_MRKT_TOTALIND_Invalid := Base_Fields.InValid_EFX_MRKT_TOTALIND((SALT37.StrType)le.EFX_MRKT_TOTALIND);
     SELF.EFX_MRKT_TOTALSCORE_Invalid := Base_Fields.InValid_EFX_MRKT_TOTALSCORE((SALT37.StrType)le.EFX_MRKT_TOTALSCORE);
     SELF.EFX_PUBLIC_Invalid := Base_Fields.InValid_EFX_PUBLIC((SALT37.StrType)le.EFX_PUBLIC);
-    SELF.EFX_STATEC_Invalid := Base_Fields.InValid_EFX_STATEC((SALT37.StrType)le.EFX_STATEC);
     SELF.EFX_STKEXC_Invalid := Base_Fields.InValid_EFX_STKEXC((SALT37.StrType)le.EFX_STKEXC);
     SELF.EFX_PRIMSIC_Invalid := Base_Fields.InValid_EFX_PRIMSIC((SALT37.StrType)le.EFX_PRIMSIC);
     SELF.EFX_SECSIC1_Invalid := Base_Fields.InValid_EFX_SECSIC1((SALT37.StrType)le.EFX_SECSIC1);
     SELF.EFX_SECSIC2_Invalid := Base_Fields.InValid_EFX_SECSIC2((SALT37.StrType)le.EFX_SECSIC2);
     SELF.EFX_SECSIC3_Invalid := Base_Fields.InValid_EFX_SECSIC3((SALT37.StrType)le.EFX_SECSIC3);
     SELF.EFX_SECSIC4_Invalid := Base_Fields.InValid_EFX_SECSIC4((SALT37.StrType)le.EFX_SECSIC4);
-    SELF.EFX_STATE_Invalid := Base_Fields.InValid_EFX_STATE((SALT37.StrType)le.EFX_STATE,(SALT37.StrType)le.EFX_CTRYNAME);
+    SELF.norm_state_Invalid := Base_Fields.InValid_norm_state((SALT37.StrType)le.norm_state,(SALT37.StrType)le.EFX_CTRYNAME);
     SELF.EFX_ID_Invalid := Base_Fields.InValid_EFX_ID((SALT37.StrType)le.EFX_ID);
     SELF.EFX_NAME_Invalid := Base_Fields.InValid_EFX_NAME((SALT37.StrType)le.EFX_NAME);
     SELF.EFX_LEGAL_NAME_Invalid := Base_Fields.InValid_EFX_LEGAL_NAME((SALT37.StrType)le.EFX_LEGAL_NAME);
@@ -278,8 +274,6 @@ EXPORT FromNone(DATASET(Base_Layout_Equifax_Business_Data) h) := MODULE
     SELF.EFX_BIZ_Invalid := Base_Fields.InValid_EFX_BIZ((SALT37.StrType)le.EFX_BIZ);
     SELF.EFX_RES_Invalid := Base_Fields.InValid_EFX_RES((SALT37.StrType)le.EFX_RES);
     SELF.EFX_CMRA_Invalid := Base_Fields.InValid_EFX_CMRA((SALT37.StrType)le.EFX_CMRA);
-    SELF.EFX_SECSTAT_Invalid := Base_Fields.InValid_EFX_SECSTAT((SALT37.StrType)le.EFX_SECSTAT,(SALT37.StrType)le.EFX_CTRYNAME);
-    SELF.EFX_STATEC2_Invalid := Base_Fields.InValid_EFX_STATEC2((SALT37.StrType)le.EFX_STATEC2);
     SELF.EFX_SECGEOPREC_Invalid := Base_Fields.InValid_EFX_SECGEOPREC((SALT37.StrType)le.EFX_SECGEOPREC);
     SELF.EFX_SECCTRYISOCD_Invalid := Base_Fields.InValid_EFX_SECCTRYISOCD((SALT37.StrType)le.EFX_SECCTRYISOCD);
     SELF.EFX_SECCTRYNUM_Invalid := Base_Fields.InValid_EFX_SECCTRYNUM((SALT37.StrType)le.EFX_SECCTRYNUM);
@@ -368,8 +362,8 @@ EXPORT FromNone(DATASET(Base_Layout_Equifax_Business_Data) h) := MODULE
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Base_Layout_Equifax_Business_Data);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
     SELF.ScrubsBits1 := ( le.dotid_Invalid << 0 ) + ( le.dotscore_Invalid << 1 ) + ( le.dotweight_Invalid << 2 ) + ( le.empid_Invalid << 3 ) + ( le.empscore_Invalid << 4 ) + ( le.empweight_Invalid << 5 ) + ( le.powid_Invalid << 6 ) + ( le.powscore_Invalid << 7 ) + ( le.powweight_Invalid << 8 ) + ( le.proxid_Invalid << 9 ) + ( le.proxscore_Invalid << 10 ) + ( le.proxweight_Invalid << 11 ) + ( le.seleid_Invalid << 12 ) + ( le.selescore_Invalid << 13 ) + ( le.seleweight_Invalid << 14 ) + ( le.orgid_Invalid << 15 ) + ( le.orgscore_Invalid << 16 ) + ( le.orgweight_Invalid << 17 ) + ( le.ultid_Invalid << 18 ) + ( le.ultscore_Invalid << 19 ) + ( le.ultweight_Invalid << 20 ) + ( le.dt_first_seen_Invalid << 21 ) + ( le.dt_last_seen_Invalid << 22 ) + ( le.dt_vendor_first_reported_Invalid << 23 ) + ( le.dt_vendor_last_reported_Invalid << 24 ) + ( le.process_date_Invalid << 25 ) + ( le.record_type_Invalid << 26 ) + ( le.normcompany_type_Invalid << 27 ) + ( le.normaddress_type_Invalid << 28 ) + ( le.clean_company_name_Invalid << 29 ) + ( le.clean_phone_Invalid << 30 ) + ( le.predir_Invalid << 31 ) + ( le.prim_name_Invalid << 32 ) + ( le.postdir_Invalid << 33 ) + ( le.p_city_name_Invalid << 34 ) + ( le.v_city_name_Invalid << 35 ) + ( le.st_Invalid << 36 ) + ( le.zip_Invalid << 37 ) + ( le.zip4_Invalid << 38 ) + ( le.cart_Invalid << 39 ) + ( le.cr_sort_sz_Invalid << 40 ) + ( le.lot_Invalid << 41 ) + ( le.lot_order_Invalid << 42 ) + ( le.dbpc_Invalid << 43 ) + ( le.chk_digit_Invalid << 44 ) + ( le.rec_type_Invalid << 45 ) + ( le.fips_state_Invalid << 46 ) + ( le.fips_county_Invalid << 47 ) + ( le.geo_lat_Invalid << 48 ) + ( le.geo_long_Invalid << 49 ) + ( le.msa_Invalid << 50 ) + ( le.geo_blk_Invalid << 51 ) + ( le.geo_match_Invalid << 52 ) + ( le.err_stat_Invalid << 53 ) + ( le.raw_aid_Invalid << 54 ) + ( le.ace_aid_Invalid << 55 ) + ( le.prep_addr_line1_Invalid << 56 ) + ( le.prep_addr_line_last_Invalid << 57 ) + ( le.EFX_BUSSTATCD_Invalid << 58 ) + ( le.EFX_CMSA_Invalid << 59 ) + ( le.EFX_CORPAMOUNTCD_Invalid << 60 ) + ( le.EFX_CORPAMOUNTPREC_Invalid << 61 ) + ( le.EFX_CORPAMOUNTTP_Invalid << 62 ) + ( le.EFX_CORPEMPCD_Invalid << 63 );
-    SELF.ScrubsBits2 := ( le.EFX_CTRYISOCD_Invalid << 0 ) + ( le.EFX_CTRYNUM_Invalid << 1 ) + ( le.EFX_CTRYTELCD_Invalid << 2 ) + ( le.EFX_GEOPREC_Invalid << 3 ) + ( le.EFX_MERCTYPE_Invalid << 4 ) + ( le.EFX_MRKT_TELESCORE_Invalid << 5 ) + ( le.EFX_MRKT_TOTALIND_Invalid << 6 ) + ( le.EFX_MRKT_TOTALSCORE_Invalid << 7 ) + ( le.EFX_PUBLIC_Invalid << 8 ) + ( le.EFX_STATEC_Invalid << 9 ) + ( le.EFX_STKEXC_Invalid << 10 ) + ( le.EFX_PRIMSIC_Invalid << 11 ) + ( le.EFX_SECSIC1_Invalid << 12 ) + ( le.EFX_SECSIC2_Invalid << 13 ) + ( le.EFX_SECSIC3_Invalid << 14 ) + ( le.EFX_SECSIC4_Invalid << 15 ) + ( le.EFX_STATE_Invalid << 16 ) + ( le.EFX_ID_Invalid << 17 ) + ( le.EFX_NAME_Invalid << 18 ) + ( le.EFX_LEGAL_NAME_Invalid << 19 ) + ( le.EFX_ADDRESS_Invalid << 20 ) + ( le.EFX_CITY_Invalid << 21 ) + ( le.EFX_CTRYNAME_Invalid << 22 ) + ( le.EFX_SOHO_Invalid << 23 ) + ( le.EFX_BIZ_Invalid << 24 ) + ( le.EFX_RES_Invalid << 25 ) + ( le.EFX_CMRA_Invalid << 26 ) + ( le.EFX_SECSTAT_Invalid << 27 ) + ( le.EFX_STATEC2_Invalid << 28 ) + ( le.EFX_SECGEOPREC_Invalid << 29 ) + ( le.EFX_SECCTRYISOCD_Invalid << 30 ) + ( le.EFX_SECCTRYNUM_Invalid << 31 ) + ( le.EFX_PHONE_Invalid << 32 ) + ( le.EFX_FAXPHONE_Invalid << 33 ) + ( le.EFX_YREST_Invalid << 34 ) + ( le.EFX_CORPEMPCNT_Invalid << 35 ) + ( le.EFX_LOCEMPCNT_Invalid << 36 ) + ( le.EFX_LOCEMPCD_Invalid << 37 ) + ( le.EFX_CORPAMOUNT_Invalid << 38 ) + ( le.EFX_LOCAMOUNT_Invalid << 39 ) + ( le.EFX_LOCAMOUNTCD_Invalid << 40 ) + ( le.EFX_LOCAMOUNTTP_Invalid << 41 ) + ( le.EFX_LOCAMOUNTPREC_Invalid << 42 ) + ( le.EFX_PRIMNAICSCODE_Invalid << 43 ) + ( le.EFX_SECNAICS1_Invalid << 44 ) + ( le.EFX_SECNAICS2_Invalid << 45 ) + ( le.EFX_SECNAICS3_Invalid << 46 ) + ( le.EFX_SECNAICS4_Invalid << 47 ) + ( le.EFX_DEAD_Invalid << 48 ) + ( le.EFX_DEADDT_Invalid << 49 ) + ( le.EFX_MRKT_TELEVER_Invalid << 50 ) + ( le.EFX_MRKT_VACANT_Invalid << 51 ) + ( le.EFX_MRKT_SEASONAL_Invalid << 52 ) + ( le.EFX_MBE_Invalid << 53 ) + ( le.EFX_WBE_Invalid << 54 ) + ( le.EFX_MWBE_Invalid << 55 ) + ( le.EFX_SDB_Invalid << 56 ) + ( le.EFX_HUBZONE_Invalid << 57 ) + ( le.EFX_DBE_Invalid << 58 ) + ( le.EFX_VET_Invalid << 59 ) + ( le.EFX_DVET_Invalid << 60 ) + ( le.EFX_8a_Invalid << 61 ) + ( le.EFX_8aEXPDT_Invalid << 62 ) + ( le.EFX_DIS_Invalid << 63 );
-    SELF.ScrubsBits3 := ( le.EFX_SBE_Invalid << 0 ) + ( le.EFX_BUSSIZE_Invalid << 1 ) + ( le.EFX_LBE_Invalid << 2 ) + ( le.EFX_GOV_Invalid << 3 ) + ( le.EFX_FGOV_Invalid << 4 ) + ( le.EFX_NONPROFIT_Invalid << 5 ) + ( le.EFX_HBCU_Invalid << 6 ) + ( le.EFX_GAYLESBIAN_Invalid << 7 ) + ( le.EFX_WSBE_Invalid << 8 ) + ( le.EFX_VSBE_Invalid << 9 ) + ( le.EFX_DVSBE_Invalid << 10 ) + ( le.EFX_MWBESTATUS_Invalid << 11 ) + ( le.EFX_NMSDC_Invalid << 12 ) + ( le.EFX_WBENC_Invalid << 13 ) + ( le.EFX_CA_PUC_Invalid << 14 ) + ( le.EFX_TX_HUB_Invalid << 15 ) + ( le.EFX_GSAX_Invalid << 16 ) + ( le.EFX_CALTRANS_Invalid << 17 ) + ( le.EFX_EDU_Invalid << 18 ) + ( le.EFX_MI_Invalid << 19 ) + ( le.EFX_ANC_Invalid << 20 ) + ( le.AT_CERTLEV1_Invalid << 21 ) + ( le.AT_CERTLEV2_Invalid << 22 ) + ( le.AT_CERTLEV3_Invalid << 23 ) + ( le.AT_CERTLEV4_Invalid << 24 ) + ( le.AT_CERTLEV5_Invalid << 25 ) + ( le.AT_CERTLEV6_Invalid << 26 ) + ( le.AT_CERTLEV7_Invalid << 27 ) + ( le.AT_CERTLEV8_Invalid << 28 ) + ( le.AT_CERTLEV9_Invalid << 29 ) + ( le.AT_CERTLEV10_Invalid << 30 ) + ( le.AT_CERTEXP1_Invalid << 31 ) + ( le.AT_CERTEXP2_Invalid << 32 ) + ( le.AT_CERTEXP3_Invalid << 33 ) + ( le.AT_CERTEXP4_Invalid << 34 ) + ( le.AT_CERTEXP5_Invalid << 35 ) + ( le.AT_CERTEXP6_Invalid << 36 ) + ( le.AT_CERTEXP7_Invalid << 37 ) + ( le.AT_CERTEXP8_Invalid << 38 ) + ( le.AT_CERTEXP9_Invalid << 39 ) + ( le.AT_CERTEXP10_Invalid << 40 ) + ( le.EFX_EXTRACT_DATE_Invalid << 41 ) + ( le.EFX_MERCHANT_ID_Invalid << 42 ) + ( le.EFX_PROJECT_ID_Invalid << 43 ) + ( le.EFX_FOREIGN_Invalid << 44 ) + ( le.Record_Update_Refresh_Date_Invalid << 45 ) + ( le.EFX_DATE_CREATED_Invalid << 46 );
+    SELF.ScrubsBits2 := ( le.EFX_CTRYISOCD_Invalid << 0 ) + ( le.EFX_CTRYNUM_Invalid << 1 ) + ( le.EFX_CTRYTELCD_Invalid << 2 ) + ( le.EFX_GEOPREC_Invalid << 3 ) + ( le.EFX_MERCTYPE_Invalid << 4 ) + ( le.EFX_MRKT_TELESCORE_Invalid << 5 ) + ( le.EFX_MRKT_TOTALIND_Invalid << 6 ) + ( le.EFX_MRKT_TOTALSCORE_Invalid << 7 ) + ( le.EFX_PUBLIC_Invalid << 8 ) + ( le.EFX_STKEXC_Invalid << 9 ) + ( le.EFX_PRIMSIC_Invalid << 10 ) + ( le.EFX_SECSIC1_Invalid << 11 ) + ( le.EFX_SECSIC2_Invalid << 12 ) + ( le.EFX_SECSIC3_Invalid << 13 ) + ( le.EFX_SECSIC4_Invalid << 14 ) + ( le.norm_state_Invalid << 15 ) + ( le.EFX_ID_Invalid << 16 ) + ( le.EFX_NAME_Invalid << 17 ) + ( le.EFX_LEGAL_NAME_Invalid << 18 ) + ( le.EFX_ADDRESS_Invalid << 19 ) + ( le.EFX_CITY_Invalid << 20 ) + ( le.EFX_CTRYNAME_Invalid << 21 ) + ( le.EFX_SOHO_Invalid << 22 ) + ( le.EFX_BIZ_Invalid << 23 ) + ( le.EFX_RES_Invalid << 24 ) + ( le.EFX_CMRA_Invalid << 25 ) + ( le.EFX_SECGEOPREC_Invalid << 26 ) + ( le.EFX_SECCTRYISOCD_Invalid << 27 ) + ( le.EFX_SECCTRYNUM_Invalid << 28 ) + ( le.EFX_PHONE_Invalid << 29 ) + ( le.EFX_FAXPHONE_Invalid << 30 ) + ( le.EFX_YREST_Invalid << 31 ) + ( le.EFX_CORPEMPCNT_Invalid << 32 ) + ( le.EFX_LOCEMPCNT_Invalid << 33 ) + ( le.EFX_LOCEMPCD_Invalid << 34 ) + ( le.EFX_CORPAMOUNT_Invalid << 35 ) + ( le.EFX_LOCAMOUNT_Invalid << 36 ) + ( le.EFX_LOCAMOUNTCD_Invalid << 37 ) + ( le.EFX_LOCAMOUNTTP_Invalid << 38 ) + ( le.EFX_LOCAMOUNTPREC_Invalid << 39 ) + ( le.EFX_PRIMNAICSCODE_Invalid << 40 ) + ( le.EFX_SECNAICS1_Invalid << 41 ) + ( le.EFX_SECNAICS2_Invalid << 42 ) + ( le.EFX_SECNAICS3_Invalid << 43 ) + ( le.EFX_SECNAICS4_Invalid << 44 ) + ( le.EFX_DEAD_Invalid << 45 ) + ( le.EFX_DEADDT_Invalid << 46 ) + ( le.EFX_MRKT_TELEVER_Invalid << 47 ) + ( le.EFX_MRKT_VACANT_Invalid << 48 ) + ( le.EFX_MRKT_SEASONAL_Invalid << 49 ) + ( le.EFX_MBE_Invalid << 50 ) + ( le.EFX_WBE_Invalid << 51 ) + ( le.EFX_MWBE_Invalid << 52 ) + ( le.EFX_SDB_Invalid << 53 ) + ( le.EFX_HUBZONE_Invalid << 54 ) + ( le.EFX_DBE_Invalid << 55 ) + ( le.EFX_VET_Invalid << 56 ) + ( le.EFX_DVET_Invalid << 57 ) + ( le.EFX_8a_Invalid << 58 ) + ( le.EFX_8aEXPDT_Invalid << 59 ) + ( le.EFX_DIS_Invalid << 60 ) + ( le.EFX_SBE_Invalid << 61 ) + ( le.EFX_BUSSIZE_Invalid << 62 ) + ( le.EFX_LBE_Invalid << 63 );
+    SELF.ScrubsBits3 := ( le.EFX_GOV_Invalid << 0 ) + ( le.EFX_FGOV_Invalid << 1 ) + ( le.EFX_NONPROFIT_Invalid << 2 ) + ( le.EFX_HBCU_Invalid << 3 ) + ( le.EFX_GAYLESBIAN_Invalid << 4 ) + ( le.EFX_WSBE_Invalid << 5 ) + ( le.EFX_VSBE_Invalid << 6 ) + ( le.EFX_DVSBE_Invalid << 7 ) + ( le.EFX_MWBESTATUS_Invalid << 8 ) + ( le.EFX_NMSDC_Invalid << 9 ) + ( le.EFX_WBENC_Invalid << 10 ) + ( le.EFX_CA_PUC_Invalid << 11 ) + ( le.EFX_TX_HUB_Invalid << 12 ) + ( le.EFX_GSAX_Invalid << 13 ) + ( le.EFX_CALTRANS_Invalid << 14 ) + ( le.EFX_EDU_Invalid << 15 ) + ( le.EFX_MI_Invalid << 16 ) + ( le.EFX_ANC_Invalid << 17 ) + ( le.AT_CERTLEV1_Invalid << 18 ) + ( le.AT_CERTLEV2_Invalid << 19 ) + ( le.AT_CERTLEV3_Invalid << 20 ) + ( le.AT_CERTLEV4_Invalid << 21 ) + ( le.AT_CERTLEV5_Invalid << 22 ) + ( le.AT_CERTLEV6_Invalid << 23 ) + ( le.AT_CERTLEV7_Invalid << 24 ) + ( le.AT_CERTLEV8_Invalid << 25 ) + ( le.AT_CERTLEV9_Invalid << 26 ) + ( le.AT_CERTLEV10_Invalid << 27 ) + ( le.AT_CERTEXP1_Invalid << 28 ) + ( le.AT_CERTEXP2_Invalid << 29 ) + ( le.AT_CERTEXP3_Invalid << 30 ) + ( le.AT_CERTEXP4_Invalid << 31 ) + ( le.AT_CERTEXP5_Invalid << 32 ) + ( le.AT_CERTEXP6_Invalid << 33 ) + ( le.AT_CERTEXP7_Invalid << 34 ) + ( le.AT_CERTEXP8_Invalid << 35 ) + ( le.AT_CERTEXP9_Invalid << 36 ) + ( le.AT_CERTEXP10_Invalid << 37 ) + ( le.EFX_EXTRACT_DATE_Invalid << 38 ) + ( le.EFX_MERCHANT_ID_Invalid << 39 ) + ( le.EFX_PROJECT_ID_Invalid << 40 ) + ( le.EFX_FOREIGN_Invalid << 41 ) + ( le.Record_Update_Refresh_Date_Invalid << 42 ) + ( le.EFX_DATE_CREATED_Invalid << 43 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -451,108 +445,105 @@ EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
     SELF.EFX_MRKT_TOTALIND_Invalid := (le.ScrubsBits2 >> 6) & 1;
     SELF.EFX_MRKT_TOTALSCORE_Invalid := (le.ScrubsBits2 >> 7) & 1;
     SELF.EFX_PUBLIC_Invalid := (le.ScrubsBits2 >> 8) & 1;
-    SELF.EFX_STATEC_Invalid := (le.ScrubsBits2 >> 9) & 1;
-    SELF.EFX_STKEXC_Invalid := (le.ScrubsBits2 >> 10) & 1;
-    SELF.EFX_PRIMSIC_Invalid := (le.ScrubsBits2 >> 11) & 1;
-    SELF.EFX_SECSIC1_Invalid := (le.ScrubsBits2 >> 12) & 1;
-    SELF.EFX_SECSIC2_Invalid := (le.ScrubsBits2 >> 13) & 1;
-    SELF.EFX_SECSIC3_Invalid := (le.ScrubsBits2 >> 14) & 1;
-    SELF.EFX_SECSIC4_Invalid := (le.ScrubsBits2 >> 15) & 1;
-    SELF.EFX_STATE_Invalid := (le.ScrubsBits2 >> 16) & 1;
-    SELF.EFX_ID_Invalid := (le.ScrubsBits2 >> 17) & 1;
-    SELF.EFX_NAME_Invalid := (le.ScrubsBits2 >> 18) & 1;
-    SELF.EFX_LEGAL_NAME_Invalid := (le.ScrubsBits2 >> 19) & 1;
-    SELF.EFX_ADDRESS_Invalid := (le.ScrubsBits2 >> 20) & 1;
-    SELF.EFX_CITY_Invalid := (le.ScrubsBits2 >> 21) & 1;
-    SELF.EFX_CTRYNAME_Invalid := (le.ScrubsBits2 >> 22) & 1;
-    SELF.EFX_SOHO_Invalid := (le.ScrubsBits2 >> 23) & 1;
-    SELF.EFX_BIZ_Invalid := (le.ScrubsBits2 >> 24) & 1;
-    SELF.EFX_RES_Invalid := (le.ScrubsBits2 >> 25) & 1;
-    SELF.EFX_CMRA_Invalid := (le.ScrubsBits2 >> 26) & 1;
-    SELF.EFX_SECSTAT_Invalid := (le.ScrubsBits2 >> 27) & 1;
-    SELF.EFX_STATEC2_Invalid := (le.ScrubsBits2 >> 28) & 1;
-    SELF.EFX_SECGEOPREC_Invalid := (le.ScrubsBits2 >> 29) & 1;
-    SELF.EFX_SECCTRYISOCD_Invalid := (le.ScrubsBits2 >> 30) & 1;
-    SELF.EFX_SECCTRYNUM_Invalid := (le.ScrubsBits2 >> 31) & 1;
-    SELF.EFX_PHONE_Invalid := (le.ScrubsBits2 >> 32) & 1;
-    SELF.EFX_FAXPHONE_Invalid := (le.ScrubsBits2 >> 33) & 1;
-    SELF.EFX_YREST_Invalid := (le.ScrubsBits2 >> 34) & 1;
-    SELF.EFX_CORPEMPCNT_Invalid := (le.ScrubsBits2 >> 35) & 1;
-    SELF.EFX_LOCEMPCNT_Invalid := (le.ScrubsBits2 >> 36) & 1;
-    SELF.EFX_LOCEMPCD_Invalid := (le.ScrubsBits2 >> 37) & 1;
-    SELF.EFX_CORPAMOUNT_Invalid := (le.ScrubsBits2 >> 38) & 1;
-    SELF.EFX_LOCAMOUNT_Invalid := (le.ScrubsBits2 >> 39) & 1;
-    SELF.EFX_LOCAMOUNTCD_Invalid := (le.ScrubsBits2 >> 40) & 1;
-    SELF.EFX_LOCAMOUNTTP_Invalid := (le.ScrubsBits2 >> 41) & 1;
-    SELF.EFX_LOCAMOUNTPREC_Invalid := (le.ScrubsBits2 >> 42) & 1;
-    SELF.EFX_PRIMNAICSCODE_Invalid := (le.ScrubsBits2 >> 43) & 1;
-    SELF.EFX_SECNAICS1_Invalid := (le.ScrubsBits2 >> 44) & 1;
-    SELF.EFX_SECNAICS2_Invalid := (le.ScrubsBits2 >> 45) & 1;
-    SELF.EFX_SECNAICS3_Invalid := (le.ScrubsBits2 >> 46) & 1;
-    SELF.EFX_SECNAICS4_Invalid := (le.ScrubsBits2 >> 47) & 1;
-    SELF.EFX_DEAD_Invalid := (le.ScrubsBits2 >> 48) & 1;
-    SELF.EFX_DEADDT_Invalid := (le.ScrubsBits2 >> 49) & 1;
-    SELF.EFX_MRKT_TELEVER_Invalid := (le.ScrubsBits2 >> 50) & 1;
-    SELF.EFX_MRKT_VACANT_Invalid := (le.ScrubsBits2 >> 51) & 1;
-    SELF.EFX_MRKT_SEASONAL_Invalid := (le.ScrubsBits2 >> 52) & 1;
-    SELF.EFX_MBE_Invalid := (le.ScrubsBits2 >> 53) & 1;
-    SELF.EFX_WBE_Invalid := (le.ScrubsBits2 >> 54) & 1;
-    SELF.EFX_MWBE_Invalid := (le.ScrubsBits2 >> 55) & 1;
-    SELF.EFX_SDB_Invalid := (le.ScrubsBits2 >> 56) & 1;
-    SELF.EFX_HUBZONE_Invalid := (le.ScrubsBits2 >> 57) & 1;
-    SELF.EFX_DBE_Invalid := (le.ScrubsBits2 >> 58) & 1;
-    SELF.EFX_VET_Invalid := (le.ScrubsBits2 >> 59) & 1;
-    SELF.EFX_DVET_Invalid := (le.ScrubsBits2 >> 60) & 1;
-    SELF.EFX_8a_Invalid := (le.ScrubsBits2 >> 61) & 1;
-    SELF.EFX_8aEXPDT_Invalid := (le.ScrubsBits2 >> 62) & 1;
-    SELF.EFX_DIS_Invalid := (le.ScrubsBits2 >> 63) & 1;
-    SELF.EFX_SBE_Invalid := (le.ScrubsBits3 >> 0) & 1;
-    SELF.EFX_BUSSIZE_Invalid := (le.ScrubsBits3 >> 1) & 1;
-    SELF.EFX_LBE_Invalid := (le.ScrubsBits3 >> 2) & 1;
-    SELF.EFX_GOV_Invalid := (le.ScrubsBits3 >> 3) & 1;
-    SELF.EFX_FGOV_Invalid := (le.ScrubsBits3 >> 4) & 1;
-    SELF.EFX_NONPROFIT_Invalid := (le.ScrubsBits3 >> 5) & 1;
-    SELF.EFX_HBCU_Invalid := (le.ScrubsBits3 >> 6) & 1;
-    SELF.EFX_GAYLESBIAN_Invalid := (le.ScrubsBits3 >> 7) & 1;
-    SELF.EFX_WSBE_Invalid := (le.ScrubsBits3 >> 8) & 1;
-    SELF.EFX_VSBE_Invalid := (le.ScrubsBits3 >> 9) & 1;
-    SELF.EFX_DVSBE_Invalid := (le.ScrubsBits3 >> 10) & 1;
-    SELF.EFX_MWBESTATUS_Invalid := (le.ScrubsBits3 >> 11) & 1;
-    SELF.EFX_NMSDC_Invalid := (le.ScrubsBits3 >> 12) & 1;
-    SELF.EFX_WBENC_Invalid := (le.ScrubsBits3 >> 13) & 1;
-    SELF.EFX_CA_PUC_Invalid := (le.ScrubsBits3 >> 14) & 1;
-    SELF.EFX_TX_HUB_Invalid := (le.ScrubsBits3 >> 15) & 1;
-    SELF.EFX_GSAX_Invalid := (le.ScrubsBits3 >> 16) & 1;
-    SELF.EFX_CALTRANS_Invalid := (le.ScrubsBits3 >> 17) & 1;
-    SELF.EFX_EDU_Invalid := (le.ScrubsBits3 >> 18) & 1;
-    SELF.EFX_MI_Invalid := (le.ScrubsBits3 >> 19) & 1;
-    SELF.EFX_ANC_Invalid := (le.ScrubsBits3 >> 20) & 1;
-    SELF.AT_CERTLEV1_Invalid := (le.ScrubsBits3 >> 21) & 1;
-    SELF.AT_CERTLEV2_Invalid := (le.ScrubsBits3 >> 22) & 1;
-    SELF.AT_CERTLEV3_Invalid := (le.ScrubsBits3 >> 23) & 1;
-    SELF.AT_CERTLEV4_Invalid := (le.ScrubsBits3 >> 24) & 1;
-    SELF.AT_CERTLEV5_Invalid := (le.ScrubsBits3 >> 25) & 1;
-    SELF.AT_CERTLEV6_Invalid := (le.ScrubsBits3 >> 26) & 1;
-    SELF.AT_CERTLEV7_Invalid := (le.ScrubsBits3 >> 27) & 1;
-    SELF.AT_CERTLEV8_Invalid := (le.ScrubsBits3 >> 28) & 1;
-    SELF.AT_CERTLEV9_Invalid := (le.ScrubsBits3 >> 29) & 1;
-    SELF.AT_CERTLEV10_Invalid := (le.ScrubsBits3 >> 30) & 1;
-    SELF.AT_CERTEXP1_Invalid := (le.ScrubsBits3 >> 31) & 1;
-    SELF.AT_CERTEXP2_Invalid := (le.ScrubsBits3 >> 32) & 1;
-    SELF.AT_CERTEXP3_Invalid := (le.ScrubsBits3 >> 33) & 1;
-    SELF.AT_CERTEXP4_Invalid := (le.ScrubsBits3 >> 34) & 1;
-    SELF.AT_CERTEXP5_Invalid := (le.ScrubsBits3 >> 35) & 1;
-    SELF.AT_CERTEXP6_Invalid := (le.ScrubsBits3 >> 36) & 1;
-    SELF.AT_CERTEXP7_Invalid := (le.ScrubsBits3 >> 37) & 1;
-    SELF.AT_CERTEXP8_Invalid := (le.ScrubsBits3 >> 38) & 1;
-    SELF.AT_CERTEXP9_Invalid := (le.ScrubsBits3 >> 39) & 1;
-    SELF.AT_CERTEXP10_Invalid := (le.ScrubsBits3 >> 40) & 1;
-    SELF.EFX_EXTRACT_DATE_Invalid := (le.ScrubsBits3 >> 41) & 1;
-    SELF.EFX_MERCHANT_ID_Invalid := (le.ScrubsBits3 >> 42) & 1;
-    SELF.EFX_PROJECT_ID_Invalid := (le.ScrubsBits3 >> 43) & 1;
-    SELF.EFX_FOREIGN_Invalid := (le.ScrubsBits3 >> 44) & 1;
-    SELF.Record_Update_Refresh_Date_Invalid := (le.ScrubsBits3 >> 45) & 1;
-    SELF.EFX_DATE_CREATED_Invalid := (le.ScrubsBits3 >> 46) & 1;
+    SELF.EFX_STKEXC_Invalid := (le.ScrubsBits2 >> 9) & 1;
+    SELF.EFX_PRIMSIC_Invalid := (le.ScrubsBits2 >> 10) & 1;
+    SELF.EFX_SECSIC1_Invalid := (le.ScrubsBits2 >> 11) & 1;
+    SELF.EFX_SECSIC2_Invalid := (le.ScrubsBits2 >> 12) & 1;
+    SELF.EFX_SECSIC3_Invalid := (le.ScrubsBits2 >> 13) & 1;
+    SELF.EFX_SECSIC4_Invalid := (le.ScrubsBits2 >> 14) & 1;
+    SELF.norm_state_Invalid := (le.ScrubsBits2 >> 15) & 1;
+    SELF.EFX_ID_Invalid := (le.ScrubsBits2 >> 16) & 1;
+    SELF.EFX_NAME_Invalid := (le.ScrubsBits2 >> 17) & 1;
+    SELF.EFX_LEGAL_NAME_Invalid := (le.ScrubsBits2 >> 18) & 1;
+    SELF.EFX_ADDRESS_Invalid := (le.ScrubsBits2 >> 19) & 1;
+    SELF.EFX_CITY_Invalid := (le.ScrubsBits2 >> 20) & 1;
+    SELF.EFX_CTRYNAME_Invalid := (le.ScrubsBits2 >> 21) & 1;
+    SELF.EFX_SOHO_Invalid := (le.ScrubsBits2 >> 22) & 1;
+    SELF.EFX_BIZ_Invalid := (le.ScrubsBits2 >> 23) & 1;
+    SELF.EFX_RES_Invalid := (le.ScrubsBits2 >> 24) & 1;
+    SELF.EFX_CMRA_Invalid := (le.ScrubsBits2 >> 25) & 1;
+    SELF.EFX_SECGEOPREC_Invalid := (le.ScrubsBits2 >> 26) & 1;
+    SELF.EFX_SECCTRYISOCD_Invalid := (le.ScrubsBits2 >> 27) & 1;
+    SELF.EFX_SECCTRYNUM_Invalid := (le.ScrubsBits2 >> 28) & 1;
+    SELF.EFX_PHONE_Invalid := (le.ScrubsBits2 >> 29) & 1;
+    SELF.EFX_FAXPHONE_Invalid := (le.ScrubsBits2 >> 30) & 1;
+    SELF.EFX_YREST_Invalid := (le.ScrubsBits2 >> 31) & 1;
+    SELF.EFX_CORPEMPCNT_Invalid := (le.ScrubsBits2 >> 32) & 1;
+    SELF.EFX_LOCEMPCNT_Invalid := (le.ScrubsBits2 >> 33) & 1;
+    SELF.EFX_LOCEMPCD_Invalid := (le.ScrubsBits2 >> 34) & 1;
+    SELF.EFX_CORPAMOUNT_Invalid := (le.ScrubsBits2 >> 35) & 1;
+    SELF.EFX_LOCAMOUNT_Invalid := (le.ScrubsBits2 >> 36) & 1;
+    SELF.EFX_LOCAMOUNTCD_Invalid := (le.ScrubsBits2 >> 37) & 1;
+    SELF.EFX_LOCAMOUNTTP_Invalid := (le.ScrubsBits2 >> 38) & 1;
+    SELF.EFX_LOCAMOUNTPREC_Invalid := (le.ScrubsBits2 >> 39) & 1;
+    SELF.EFX_PRIMNAICSCODE_Invalid := (le.ScrubsBits2 >> 40) & 1;
+    SELF.EFX_SECNAICS1_Invalid := (le.ScrubsBits2 >> 41) & 1;
+    SELF.EFX_SECNAICS2_Invalid := (le.ScrubsBits2 >> 42) & 1;
+    SELF.EFX_SECNAICS3_Invalid := (le.ScrubsBits2 >> 43) & 1;
+    SELF.EFX_SECNAICS4_Invalid := (le.ScrubsBits2 >> 44) & 1;
+    SELF.EFX_DEAD_Invalid := (le.ScrubsBits2 >> 45) & 1;
+    SELF.EFX_DEADDT_Invalid := (le.ScrubsBits2 >> 46) & 1;
+    SELF.EFX_MRKT_TELEVER_Invalid := (le.ScrubsBits2 >> 47) & 1;
+    SELF.EFX_MRKT_VACANT_Invalid := (le.ScrubsBits2 >> 48) & 1;
+    SELF.EFX_MRKT_SEASONAL_Invalid := (le.ScrubsBits2 >> 49) & 1;
+    SELF.EFX_MBE_Invalid := (le.ScrubsBits2 >> 50) & 1;
+    SELF.EFX_WBE_Invalid := (le.ScrubsBits2 >> 51) & 1;
+    SELF.EFX_MWBE_Invalid := (le.ScrubsBits2 >> 52) & 1;
+    SELF.EFX_SDB_Invalid := (le.ScrubsBits2 >> 53) & 1;
+    SELF.EFX_HUBZONE_Invalid := (le.ScrubsBits2 >> 54) & 1;
+    SELF.EFX_DBE_Invalid := (le.ScrubsBits2 >> 55) & 1;
+    SELF.EFX_VET_Invalid := (le.ScrubsBits2 >> 56) & 1;
+    SELF.EFX_DVET_Invalid := (le.ScrubsBits2 >> 57) & 1;
+    SELF.EFX_8a_Invalid := (le.ScrubsBits2 >> 58) & 1;
+    SELF.EFX_8aEXPDT_Invalid := (le.ScrubsBits2 >> 59) & 1;
+    SELF.EFX_DIS_Invalid := (le.ScrubsBits2 >> 60) & 1;
+    SELF.EFX_SBE_Invalid := (le.ScrubsBits2 >> 61) & 1;
+    SELF.EFX_BUSSIZE_Invalid := (le.ScrubsBits2 >> 62) & 1;
+    SELF.EFX_LBE_Invalid := (le.ScrubsBits2 >> 63) & 1;
+    SELF.EFX_GOV_Invalid := (le.ScrubsBits3 >> 0) & 1;
+    SELF.EFX_FGOV_Invalid := (le.ScrubsBits3 >> 1) & 1;
+    SELF.EFX_NONPROFIT_Invalid := (le.ScrubsBits3 >> 2) & 1;
+    SELF.EFX_HBCU_Invalid := (le.ScrubsBits3 >> 3) & 1;
+    SELF.EFX_GAYLESBIAN_Invalid := (le.ScrubsBits3 >> 4) & 1;
+    SELF.EFX_WSBE_Invalid := (le.ScrubsBits3 >> 5) & 1;
+    SELF.EFX_VSBE_Invalid := (le.ScrubsBits3 >> 6) & 1;
+    SELF.EFX_DVSBE_Invalid := (le.ScrubsBits3 >> 7) & 1;
+    SELF.EFX_MWBESTATUS_Invalid := (le.ScrubsBits3 >> 8) & 1;
+    SELF.EFX_NMSDC_Invalid := (le.ScrubsBits3 >> 9) & 1;
+    SELF.EFX_WBENC_Invalid := (le.ScrubsBits3 >> 10) & 1;
+    SELF.EFX_CA_PUC_Invalid := (le.ScrubsBits3 >> 11) & 1;
+    SELF.EFX_TX_HUB_Invalid := (le.ScrubsBits3 >> 12) & 1;
+    SELF.EFX_GSAX_Invalid := (le.ScrubsBits3 >> 13) & 1;
+    SELF.EFX_CALTRANS_Invalid := (le.ScrubsBits3 >> 14) & 1;
+    SELF.EFX_EDU_Invalid := (le.ScrubsBits3 >> 15) & 1;
+    SELF.EFX_MI_Invalid := (le.ScrubsBits3 >> 16) & 1;
+    SELF.EFX_ANC_Invalid := (le.ScrubsBits3 >> 17) & 1;
+    SELF.AT_CERTLEV1_Invalid := (le.ScrubsBits3 >> 18) & 1;
+    SELF.AT_CERTLEV2_Invalid := (le.ScrubsBits3 >> 19) & 1;
+    SELF.AT_CERTLEV3_Invalid := (le.ScrubsBits3 >> 20) & 1;
+    SELF.AT_CERTLEV4_Invalid := (le.ScrubsBits3 >> 21) & 1;
+    SELF.AT_CERTLEV5_Invalid := (le.ScrubsBits3 >> 22) & 1;
+    SELF.AT_CERTLEV6_Invalid := (le.ScrubsBits3 >> 23) & 1;
+    SELF.AT_CERTLEV7_Invalid := (le.ScrubsBits3 >> 24) & 1;
+    SELF.AT_CERTLEV8_Invalid := (le.ScrubsBits3 >> 25) & 1;
+    SELF.AT_CERTLEV9_Invalid := (le.ScrubsBits3 >> 26) & 1;
+    SELF.AT_CERTLEV10_Invalid := (le.ScrubsBits3 >> 27) & 1;
+    SELF.AT_CERTEXP1_Invalid := (le.ScrubsBits3 >> 28) & 1;
+    SELF.AT_CERTEXP2_Invalid := (le.ScrubsBits3 >> 29) & 1;
+    SELF.AT_CERTEXP3_Invalid := (le.ScrubsBits3 >> 30) & 1;
+    SELF.AT_CERTEXP4_Invalid := (le.ScrubsBits3 >> 31) & 1;
+    SELF.AT_CERTEXP5_Invalid := (le.ScrubsBits3 >> 32) & 1;
+    SELF.AT_CERTEXP6_Invalid := (le.ScrubsBits3 >> 33) & 1;
+    SELF.AT_CERTEXP7_Invalid := (le.ScrubsBits3 >> 34) & 1;
+    SELF.AT_CERTEXP8_Invalid := (le.ScrubsBits3 >> 35) & 1;
+    SELF.AT_CERTEXP9_Invalid := (le.ScrubsBits3 >> 36) & 1;
+    SELF.AT_CERTEXP10_Invalid := (le.ScrubsBits3 >> 37) & 1;
+    SELF.EFX_EXTRACT_DATE_Invalid := (le.ScrubsBits3 >> 38) & 1;
+    SELF.EFX_MERCHANT_ID_Invalid := (le.ScrubsBits3 >> 39) & 1;
+    SELF.EFX_PROJECT_ID_Invalid := (le.ScrubsBits3 >> 40) & 1;
+    SELF.EFX_FOREIGN_Invalid := (le.ScrubsBits3 >> 41) & 1;
+    SELF.Record_Update_Refresh_Date_Invalid := (le.ScrubsBits3 >> 42) & 1;
+    SELF.EFX_DATE_CREATED_Invalid := (le.ScrubsBits3 >> 43) & 1;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
@@ -634,14 +625,13 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     EFX_MRKT_TOTALIND_CUSTOM_ErrorCount := COUNT(GROUP,h.EFX_MRKT_TOTALIND_Invalid=1);
     EFX_MRKT_TOTALSCORE_CUSTOM_ErrorCount := COUNT(GROUP,h.EFX_MRKT_TOTALSCORE_Invalid=1);
     EFX_PUBLIC_CUSTOM_ErrorCount := COUNT(GROUP,h.EFX_PUBLIC_Invalid=1);
-    EFX_STATEC_CUSTOM_ErrorCount := COUNT(GROUP,h.EFX_STATEC_Invalid=1);
     EFX_STKEXC_CUSTOM_ErrorCount := COUNT(GROUP,h.EFX_STKEXC_Invalid=1);
     EFX_PRIMSIC_CUSTOM_ErrorCount := COUNT(GROUP,h.EFX_PRIMSIC_Invalid=1);
     EFX_SECSIC1_CUSTOM_ErrorCount := COUNT(GROUP,h.EFX_SECSIC1_Invalid=1);
     EFX_SECSIC2_CUSTOM_ErrorCount := COUNT(GROUP,h.EFX_SECSIC2_Invalid=1);
     EFX_SECSIC3_CUSTOM_ErrorCount := COUNT(GROUP,h.EFX_SECSIC3_Invalid=1);
     EFX_SECSIC4_CUSTOM_ErrorCount := COUNT(GROUP,h.EFX_SECSIC4_Invalid=1);
-    EFX_STATE_CUSTOM_ErrorCount := COUNT(GROUP,h.EFX_STATE_Invalid=1);
+    norm_state_CUSTOM_ErrorCount := COUNT(GROUP,h.norm_state_Invalid=1);
     EFX_ID_CUSTOM_ErrorCount := COUNT(GROUP,h.EFX_ID_Invalid=1);
     EFX_NAME_CUSTOM_ErrorCount := COUNT(GROUP,h.EFX_NAME_Invalid=1);
     EFX_LEGAL_NAME_CUSTOM_ErrorCount := COUNT(GROUP,h.EFX_LEGAL_NAME_Invalid=1);
@@ -652,8 +642,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     EFX_BIZ_ENUM_ErrorCount := COUNT(GROUP,h.EFX_BIZ_Invalid=1);
     EFX_RES_ENUM_ErrorCount := COUNT(GROUP,h.EFX_RES_Invalid=1);
     EFX_CMRA_ENUM_ErrorCount := COUNT(GROUP,h.EFX_CMRA_Invalid=1);
-    EFX_SECSTAT_CUSTOM_ErrorCount := COUNT(GROUP,h.EFX_SECSTAT_Invalid=1);
-    EFX_STATEC2_CUSTOM_ErrorCount := COUNT(GROUP,h.EFX_STATEC2_Invalid=1);
     EFX_SECGEOPREC_CUSTOM_ErrorCount := COUNT(GROUP,h.EFX_SECGEOPREC_Invalid=1);
     EFX_SECCTRYISOCD_CUSTOM_ErrorCount := COUNT(GROUP,h.EFX_SECCTRYISOCD_Invalid=1);
     EFX_SECCTRYNUM_CUSTOM_ErrorCount := COUNT(GROUP,h.EFX_SECCTRYNUM_Invalid=1);
@@ -748,8 +736,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
-    UNSIGNED1 ErrNum := CHOOSE(c,le.dotid_Invalid,le.dotscore_Invalid,le.dotweight_Invalid,le.empid_Invalid,le.empscore_Invalid,le.empweight_Invalid,le.powid_Invalid,le.powscore_Invalid,le.powweight_Invalid,le.proxid_Invalid,le.proxscore_Invalid,le.proxweight_Invalid,le.seleid_Invalid,le.selescore_Invalid,le.seleweight_Invalid,le.orgid_Invalid,le.orgscore_Invalid,le.orgweight_Invalid,le.ultid_Invalid,le.ultscore_Invalid,le.ultweight_Invalid,le.dt_first_seen_Invalid,le.dt_last_seen_Invalid,le.dt_vendor_first_reported_Invalid,le.dt_vendor_last_reported_Invalid,le.process_date_Invalid,le.record_type_Invalid,le.normcompany_type_Invalid,le.normaddress_type_Invalid,le.clean_company_name_Invalid,le.clean_phone_Invalid,le.predir_Invalid,le.prim_name_Invalid,le.postdir_Invalid,le.p_city_name_Invalid,le.v_city_name_Invalid,le.st_Invalid,le.zip_Invalid,le.zip4_Invalid,le.cart_Invalid,le.cr_sort_sz_Invalid,le.lot_Invalid,le.lot_order_Invalid,le.dbpc_Invalid,le.chk_digit_Invalid,le.rec_type_Invalid,le.fips_state_Invalid,le.fips_county_Invalid,le.geo_lat_Invalid,le.geo_long_Invalid,le.msa_Invalid,le.geo_blk_Invalid,le.geo_match_Invalid,le.err_stat_Invalid,le.raw_aid_Invalid,le.ace_aid_Invalid,le.prep_addr_line1_Invalid,le.prep_addr_line_last_Invalid,le.EFX_BUSSTATCD_Invalid,le.EFX_CMSA_Invalid,le.EFX_CORPAMOUNTCD_Invalid,le.EFX_CORPAMOUNTPREC_Invalid,le.EFX_CORPAMOUNTTP_Invalid,le.EFX_CORPEMPCD_Invalid,le.EFX_CTRYISOCD_Invalid,le.EFX_CTRYNUM_Invalid,le.EFX_CTRYTELCD_Invalid,le.EFX_GEOPREC_Invalid,le.EFX_MERCTYPE_Invalid,le.EFX_MRKT_TELESCORE_Invalid,le.EFX_MRKT_TOTALIND_Invalid,le.EFX_MRKT_TOTALSCORE_Invalid,le.EFX_PUBLIC_Invalid,le.EFX_STATEC_Invalid,le.EFX_STKEXC_Invalid,le.EFX_PRIMSIC_Invalid,le.EFX_SECSIC1_Invalid,le.EFX_SECSIC2_Invalid,le.EFX_SECSIC3_Invalid,le.EFX_SECSIC4_Invalid,le.EFX_STATE_Invalid,le.EFX_ID_Invalid,le.EFX_NAME_Invalid,le.EFX_LEGAL_NAME_Invalid,le.EFX_ADDRESS_Invalid,le.EFX_CITY_Invalid,le.EFX_CTRYNAME_Invalid,le.EFX_SOHO_Invalid,le.EFX_BIZ_Invalid,le.EFX_RES_Invalid,le.EFX_CMRA_Invalid,le.EFX_SECSTAT_Invalid,le.EFX_STATEC2_Invalid,le.EFX_SECGEOPREC_Invalid,le.EFX_SECCTRYISOCD_Invalid,le.EFX_SECCTRYNUM_Invalid,le.EFX_PHONE_Invalid,le.EFX_FAXPHONE_Invalid,le.EFX_YREST_Invalid,le.EFX_CORPEMPCNT_Invalid,le.EFX_LOCEMPCNT_Invalid,le.EFX_LOCEMPCD_Invalid,le.EFX_CORPAMOUNT_Invalid,le.EFX_LOCAMOUNT_Invalid,le.EFX_LOCAMOUNTCD_Invalid,le.EFX_LOCAMOUNTTP_Invalid,le.EFX_LOCAMOUNTPREC_Invalid,le.EFX_PRIMNAICSCODE_Invalid,le.EFX_SECNAICS1_Invalid,le.EFX_SECNAICS2_Invalid,le.EFX_SECNAICS3_Invalid,le.EFX_SECNAICS4_Invalid,le.EFX_DEAD_Invalid,le.EFX_DEADDT_Invalid,le.EFX_MRKT_TELEVER_Invalid,le.EFX_MRKT_VACANT_Invalid,le.EFX_MRKT_SEASONAL_Invalid,le.EFX_MBE_Invalid,le.EFX_WBE_Invalid,le.EFX_MWBE_Invalid,le.EFX_SDB_Invalid,le.EFX_HUBZONE_Invalid,le.EFX_DBE_Invalid,le.EFX_VET_Invalid,le.EFX_DVET_Invalid,le.EFX_8a_Invalid,le.EFX_8aEXPDT_Invalid,le.EFX_DIS_Invalid,le.EFX_SBE_Invalid,le.EFX_BUSSIZE_Invalid,le.EFX_LBE_Invalid,le.EFX_GOV_Invalid,le.EFX_FGOV_Invalid,le.EFX_NONPROFIT_Invalid,le.EFX_HBCU_Invalid,le.EFX_GAYLESBIAN_Invalid,le.EFX_WSBE_Invalid,le.EFX_VSBE_Invalid,le.EFX_DVSBE_Invalid,le.EFX_MWBESTATUS_Invalid,le.EFX_NMSDC_Invalid,le.EFX_WBENC_Invalid,le.EFX_CA_PUC_Invalid,le.EFX_TX_HUB_Invalid,le.EFX_GSAX_Invalid,le.EFX_CALTRANS_Invalid,le.EFX_EDU_Invalid,le.EFX_MI_Invalid,le.EFX_ANC_Invalid,le.AT_CERTLEV1_Invalid,le.AT_CERTLEV2_Invalid,le.AT_CERTLEV3_Invalid,le.AT_CERTLEV4_Invalid,le.AT_CERTLEV5_Invalid,le.AT_CERTLEV6_Invalid,le.AT_CERTLEV7_Invalid,le.AT_CERTLEV8_Invalid,le.AT_CERTLEV9_Invalid,le.AT_CERTLEV10_Invalid,le.AT_CERTEXP1_Invalid,le.AT_CERTEXP2_Invalid,le.AT_CERTEXP3_Invalid,le.AT_CERTEXP4_Invalid,le.AT_CERTEXP5_Invalid,le.AT_CERTEXP6_Invalid,le.AT_CERTEXP7_Invalid,le.AT_CERTEXP8_Invalid,le.AT_CERTEXP9_Invalid,le.AT_CERTEXP10_Invalid,le.EFX_EXTRACT_DATE_Invalid,le.EFX_MERCHANT_ID_Invalid,le.EFX_PROJECT_ID_Invalid,le.EFX_FOREIGN_Invalid,le.Record_Update_Refresh_Date_Invalid,le.EFX_DATE_CREATED_Invalid,100);
-    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Base_Fields.InvalidMessage_dotid(le.dotid_Invalid),Base_Fields.InvalidMessage_dotscore(le.dotscore_Invalid),Base_Fields.InvalidMessage_dotweight(le.dotweight_Invalid),Base_Fields.InvalidMessage_empid(le.empid_Invalid),Base_Fields.InvalidMessage_empscore(le.empscore_Invalid),Base_Fields.InvalidMessage_empweight(le.empweight_Invalid),Base_Fields.InvalidMessage_powid(le.powid_Invalid),Base_Fields.InvalidMessage_powscore(le.powscore_Invalid),Base_Fields.InvalidMessage_powweight(le.powweight_Invalid),Base_Fields.InvalidMessage_proxid(le.proxid_Invalid),Base_Fields.InvalidMessage_proxscore(le.proxscore_Invalid),Base_Fields.InvalidMessage_proxweight(le.proxweight_Invalid),Base_Fields.InvalidMessage_seleid(le.seleid_Invalid),Base_Fields.InvalidMessage_selescore(le.selescore_Invalid),Base_Fields.InvalidMessage_seleweight(le.seleweight_Invalid),Base_Fields.InvalidMessage_orgid(le.orgid_Invalid),Base_Fields.InvalidMessage_orgscore(le.orgscore_Invalid),Base_Fields.InvalidMessage_orgweight(le.orgweight_Invalid),Base_Fields.InvalidMessage_ultid(le.ultid_Invalid),Base_Fields.InvalidMessage_ultscore(le.ultscore_Invalid),Base_Fields.InvalidMessage_ultweight(le.ultweight_Invalid),Base_Fields.InvalidMessage_dt_first_seen(le.dt_first_seen_Invalid),Base_Fields.InvalidMessage_dt_last_seen(le.dt_last_seen_Invalid),Base_Fields.InvalidMessage_dt_vendor_first_reported(le.dt_vendor_first_reported_Invalid),Base_Fields.InvalidMessage_dt_vendor_last_reported(le.dt_vendor_last_reported_Invalid),Base_Fields.InvalidMessage_process_date(le.process_date_Invalid),Base_Fields.InvalidMessage_record_type(le.record_type_Invalid),Base_Fields.InvalidMessage_normcompany_type(le.normcompany_type_Invalid),Base_Fields.InvalidMessage_normaddress_type(le.normaddress_type_Invalid),Base_Fields.InvalidMessage_clean_company_name(le.clean_company_name_Invalid),Base_Fields.InvalidMessage_clean_phone(le.clean_phone_Invalid),Base_Fields.InvalidMessage_predir(le.predir_Invalid),Base_Fields.InvalidMessage_prim_name(le.prim_name_Invalid),Base_Fields.InvalidMessage_postdir(le.postdir_Invalid),Base_Fields.InvalidMessage_p_city_name(le.p_city_name_Invalid),Base_Fields.InvalidMessage_v_city_name(le.v_city_name_Invalid),Base_Fields.InvalidMessage_st(le.st_Invalid),Base_Fields.InvalidMessage_zip(le.zip_Invalid),Base_Fields.InvalidMessage_zip4(le.zip4_Invalid),Base_Fields.InvalidMessage_cart(le.cart_Invalid),Base_Fields.InvalidMessage_cr_sort_sz(le.cr_sort_sz_Invalid),Base_Fields.InvalidMessage_lot(le.lot_Invalid),Base_Fields.InvalidMessage_lot_order(le.lot_order_Invalid),Base_Fields.InvalidMessage_dbpc(le.dbpc_Invalid),Base_Fields.InvalidMessage_chk_digit(le.chk_digit_Invalid),Base_Fields.InvalidMessage_rec_type(le.rec_type_Invalid),Base_Fields.InvalidMessage_fips_state(le.fips_state_Invalid),Base_Fields.InvalidMessage_fips_county(le.fips_county_Invalid),Base_Fields.InvalidMessage_geo_lat(le.geo_lat_Invalid),Base_Fields.InvalidMessage_geo_long(le.geo_long_Invalid),Base_Fields.InvalidMessage_msa(le.msa_Invalid),Base_Fields.InvalidMessage_geo_blk(le.geo_blk_Invalid),Base_Fields.InvalidMessage_geo_match(le.geo_match_Invalid),Base_Fields.InvalidMessage_err_stat(le.err_stat_Invalid),Base_Fields.InvalidMessage_raw_aid(le.raw_aid_Invalid),Base_Fields.InvalidMessage_ace_aid(le.ace_aid_Invalid),Base_Fields.InvalidMessage_prep_addr_line1(le.prep_addr_line1_Invalid),Base_Fields.InvalidMessage_prep_addr_line_last(le.prep_addr_line_last_Invalid),Base_Fields.InvalidMessage_EFX_BUSSTATCD(le.EFX_BUSSTATCD_Invalid),Base_Fields.InvalidMessage_EFX_CMSA(le.EFX_CMSA_Invalid),Base_Fields.InvalidMessage_EFX_CORPAMOUNTCD(le.EFX_CORPAMOUNTCD_Invalid),Base_Fields.InvalidMessage_EFX_CORPAMOUNTPREC(le.EFX_CORPAMOUNTPREC_Invalid),Base_Fields.InvalidMessage_EFX_CORPAMOUNTTP(le.EFX_CORPAMOUNTTP_Invalid),Base_Fields.InvalidMessage_EFX_CORPEMPCD(le.EFX_CORPEMPCD_Invalid),Base_Fields.InvalidMessage_EFX_CTRYISOCD(le.EFX_CTRYISOCD_Invalid),Base_Fields.InvalidMessage_EFX_CTRYNUM(le.EFX_CTRYNUM_Invalid),Base_Fields.InvalidMessage_EFX_CTRYTELCD(le.EFX_CTRYTELCD_Invalid),Base_Fields.InvalidMessage_EFX_GEOPREC(le.EFX_GEOPREC_Invalid),Base_Fields.InvalidMessage_EFX_MERCTYPE(le.EFX_MERCTYPE_Invalid),Base_Fields.InvalidMessage_EFX_MRKT_TELESCORE(le.EFX_MRKT_TELESCORE_Invalid),Base_Fields.InvalidMessage_EFX_MRKT_TOTALIND(le.EFX_MRKT_TOTALIND_Invalid),Base_Fields.InvalidMessage_EFX_MRKT_TOTALSCORE(le.EFX_MRKT_TOTALSCORE_Invalid),Base_Fields.InvalidMessage_EFX_PUBLIC(le.EFX_PUBLIC_Invalid),Base_Fields.InvalidMessage_EFX_STATEC(le.EFX_STATEC_Invalid),Base_Fields.InvalidMessage_EFX_STKEXC(le.EFX_STKEXC_Invalid),Base_Fields.InvalidMessage_EFX_PRIMSIC(le.EFX_PRIMSIC_Invalid),Base_Fields.InvalidMessage_EFX_SECSIC1(le.EFX_SECSIC1_Invalid),Base_Fields.InvalidMessage_EFX_SECSIC2(le.EFX_SECSIC2_Invalid),Base_Fields.InvalidMessage_EFX_SECSIC3(le.EFX_SECSIC3_Invalid),Base_Fields.InvalidMessage_EFX_SECSIC4(le.EFX_SECSIC4_Invalid),Base_Fields.InvalidMessage_EFX_STATE(le.EFX_STATE_Invalid),Base_Fields.InvalidMessage_EFX_ID(le.EFX_ID_Invalid),Base_Fields.InvalidMessage_EFX_NAME(le.EFX_NAME_Invalid),Base_Fields.InvalidMessage_EFX_LEGAL_NAME(le.EFX_LEGAL_NAME_Invalid),Base_Fields.InvalidMessage_EFX_ADDRESS(le.EFX_ADDRESS_Invalid),Base_Fields.InvalidMessage_EFX_CITY(le.EFX_CITY_Invalid),Base_Fields.InvalidMessage_EFX_CTRYNAME(le.EFX_CTRYNAME_Invalid),Base_Fields.InvalidMessage_EFX_SOHO(le.EFX_SOHO_Invalid),Base_Fields.InvalidMessage_EFX_BIZ(le.EFX_BIZ_Invalid),Base_Fields.InvalidMessage_EFX_RES(le.EFX_RES_Invalid),Base_Fields.InvalidMessage_EFX_CMRA(le.EFX_CMRA_Invalid),Base_Fields.InvalidMessage_EFX_SECSTAT(le.EFX_SECSTAT_Invalid),Base_Fields.InvalidMessage_EFX_STATEC2(le.EFX_STATEC2_Invalid),Base_Fields.InvalidMessage_EFX_SECGEOPREC(le.EFX_SECGEOPREC_Invalid),Base_Fields.InvalidMessage_EFX_SECCTRYISOCD(le.EFX_SECCTRYISOCD_Invalid),Base_Fields.InvalidMessage_EFX_SECCTRYNUM(le.EFX_SECCTRYNUM_Invalid),Base_Fields.InvalidMessage_EFX_PHONE(le.EFX_PHONE_Invalid),Base_Fields.InvalidMessage_EFX_FAXPHONE(le.EFX_FAXPHONE_Invalid),Base_Fields.InvalidMessage_EFX_YREST(le.EFX_YREST_Invalid),Base_Fields.InvalidMessage_EFX_CORPEMPCNT(le.EFX_CORPEMPCNT_Invalid),Base_Fields.InvalidMessage_EFX_LOCEMPCNT(le.EFX_LOCEMPCNT_Invalid),Base_Fields.InvalidMessage_EFX_LOCEMPCD(le.EFX_LOCEMPCD_Invalid),Base_Fields.InvalidMessage_EFX_CORPAMOUNT(le.EFX_CORPAMOUNT_Invalid),Base_Fields.InvalidMessage_EFX_LOCAMOUNT(le.EFX_LOCAMOUNT_Invalid),Base_Fields.InvalidMessage_EFX_LOCAMOUNTCD(le.EFX_LOCAMOUNTCD_Invalid),Base_Fields.InvalidMessage_EFX_LOCAMOUNTTP(le.EFX_LOCAMOUNTTP_Invalid),Base_Fields.InvalidMessage_EFX_LOCAMOUNTPREC(le.EFX_LOCAMOUNTPREC_Invalid),Base_Fields.InvalidMessage_EFX_PRIMNAICSCODE(le.EFX_PRIMNAICSCODE_Invalid),Base_Fields.InvalidMessage_EFX_SECNAICS1(le.EFX_SECNAICS1_Invalid),Base_Fields.InvalidMessage_EFX_SECNAICS2(le.EFX_SECNAICS2_Invalid),Base_Fields.InvalidMessage_EFX_SECNAICS3(le.EFX_SECNAICS3_Invalid),Base_Fields.InvalidMessage_EFX_SECNAICS4(le.EFX_SECNAICS4_Invalid),Base_Fields.InvalidMessage_EFX_DEAD(le.EFX_DEAD_Invalid),Base_Fields.InvalidMessage_EFX_DEADDT(le.EFX_DEADDT_Invalid),Base_Fields.InvalidMessage_EFX_MRKT_TELEVER(le.EFX_MRKT_TELEVER_Invalid),Base_Fields.InvalidMessage_EFX_MRKT_VACANT(le.EFX_MRKT_VACANT_Invalid),Base_Fields.InvalidMessage_EFX_MRKT_SEASONAL(le.EFX_MRKT_SEASONAL_Invalid),Base_Fields.InvalidMessage_EFX_MBE(le.EFX_MBE_Invalid),Base_Fields.InvalidMessage_EFX_WBE(le.EFX_WBE_Invalid),Base_Fields.InvalidMessage_EFX_MWBE(le.EFX_MWBE_Invalid),Base_Fields.InvalidMessage_EFX_SDB(le.EFX_SDB_Invalid),Base_Fields.InvalidMessage_EFX_HUBZONE(le.EFX_HUBZONE_Invalid),Base_Fields.InvalidMessage_EFX_DBE(le.EFX_DBE_Invalid),Base_Fields.InvalidMessage_EFX_VET(le.EFX_VET_Invalid),Base_Fields.InvalidMessage_EFX_DVET(le.EFX_DVET_Invalid),Base_Fields.InvalidMessage_EFX_8a(le.EFX_8a_Invalid),Base_Fields.InvalidMessage_EFX_8aEXPDT(le.EFX_8aEXPDT_Invalid),Base_Fields.InvalidMessage_EFX_DIS(le.EFX_DIS_Invalid),Base_Fields.InvalidMessage_EFX_SBE(le.EFX_SBE_Invalid),Base_Fields.InvalidMessage_EFX_BUSSIZE(le.EFX_BUSSIZE_Invalid),Base_Fields.InvalidMessage_EFX_LBE(le.EFX_LBE_Invalid),Base_Fields.InvalidMessage_EFX_GOV(le.EFX_GOV_Invalid),Base_Fields.InvalidMessage_EFX_FGOV(le.EFX_FGOV_Invalid),Base_Fields.InvalidMessage_EFX_NONPROFIT(le.EFX_NONPROFIT_Invalid),Base_Fields.InvalidMessage_EFX_HBCU(le.EFX_HBCU_Invalid),Base_Fields.InvalidMessage_EFX_GAYLESBIAN(le.EFX_GAYLESBIAN_Invalid),Base_Fields.InvalidMessage_EFX_WSBE(le.EFX_WSBE_Invalid),Base_Fields.InvalidMessage_EFX_VSBE(le.EFX_VSBE_Invalid),Base_Fields.InvalidMessage_EFX_DVSBE(le.EFX_DVSBE_Invalid),Base_Fields.InvalidMessage_EFX_MWBESTATUS(le.EFX_MWBESTATUS_Invalid),Base_Fields.InvalidMessage_EFX_NMSDC(le.EFX_NMSDC_Invalid),Base_Fields.InvalidMessage_EFX_WBENC(le.EFX_WBENC_Invalid),Base_Fields.InvalidMessage_EFX_CA_PUC(le.EFX_CA_PUC_Invalid),Base_Fields.InvalidMessage_EFX_TX_HUB(le.EFX_TX_HUB_Invalid),Base_Fields.InvalidMessage_EFX_GSAX(le.EFX_GSAX_Invalid),Base_Fields.InvalidMessage_EFX_CALTRANS(le.EFX_CALTRANS_Invalid),Base_Fields.InvalidMessage_EFX_EDU(le.EFX_EDU_Invalid),Base_Fields.InvalidMessage_EFX_MI(le.EFX_MI_Invalid),Base_Fields.InvalidMessage_EFX_ANC(le.EFX_ANC_Invalid),Base_Fields.InvalidMessage_AT_CERTLEV1(le.AT_CERTLEV1_Invalid),Base_Fields.InvalidMessage_AT_CERTLEV2(le.AT_CERTLEV2_Invalid),Base_Fields.InvalidMessage_AT_CERTLEV3(le.AT_CERTLEV3_Invalid),Base_Fields.InvalidMessage_AT_CERTLEV4(le.AT_CERTLEV4_Invalid),Base_Fields.InvalidMessage_AT_CERTLEV5(le.AT_CERTLEV5_Invalid),Base_Fields.InvalidMessage_AT_CERTLEV6(le.AT_CERTLEV6_Invalid),Base_Fields.InvalidMessage_AT_CERTLEV7(le.AT_CERTLEV7_Invalid),Base_Fields.InvalidMessage_AT_CERTLEV8(le.AT_CERTLEV8_Invalid),Base_Fields.InvalidMessage_AT_CERTLEV9(le.AT_CERTLEV9_Invalid),Base_Fields.InvalidMessage_AT_CERTLEV10(le.AT_CERTLEV10_Invalid),Base_Fields.InvalidMessage_AT_CERTEXP1(le.AT_CERTEXP1_Invalid),Base_Fields.InvalidMessage_AT_CERTEXP2(le.AT_CERTEXP2_Invalid),Base_Fields.InvalidMessage_AT_CERTEXP3(le.AT_CERTEXP3_Invalid),Base_Fields.InvalidMessage_AT_CERTEXP4(le.AT_CERTEXP4_Invalid),Base_Fields.InvalidMessage_AT_CERTEXP5(le.AT_CERTEXP5_Invalid),Base_Fields.InvalidMessage_AT_CERTEXP6(le.AT_CERTEXP6_Invalid),Base_Fields.InvalidMessage_AT_CERTEXP7(le.AT_CERTEXP7_Invalid),Base_Fields.InvalidMessage_AT_CERTEXP8(le.AT_CERTEXP8_Invalid),Base_Fields.InvalidMessage_AT_CERTEXP9(le.AT_CERTEXP9_Invalid),Base_Fields.InvalidMessage_AT_CERTEXP10(le.AT_CERTEXP10_Invalid),Base_Fields.InvalidMessage_EFX_EXTRACT_DATE(le.EFX_EXTRACT_DATE_Invalid),Base_Fields.InvalidMessage_EFX_MERCHANT_ID(le.EFX_MERCHANT_ID_Invalid),Base_Fields.InvalidMessage_EFX_PROJECT_ID(le.EFX_PROJECT_ID_Invalid),Base_Fields.InvalidMessage_EFX_FOREIGN(le.EFX_FOREIGN_Invalid),Base_Fields.InvalidMessage_Record_Update_Refresh_Date(le.Record_Update_Refresh_Date_Invalid),Base_Fields.InvalidMessage_EFX_DATE_CREATED(le.EFX_DATE_CREATED_Invalid),'UNKNOWN'));
+    UNSIGNED1 ErrNum := CHOOSE(c,le.dotid_Invalid,le.dotscore_Invalid,le.dotweight_Invalid,le.empid_Invalid,le.empscore_Invalid,le.empweight_Invalid,le.powid_Invalid,le.powscore_Invalid,le.powweight_Invalid,le.proxid_Invalid,le.proxscore_Invalid,le.proxweight_Invalid,le.seleid_Invalid,le.selescore_Invalid,le.seleweight_Invalid,le.orgid_Invalid,le.orgscore_Invalid,le.orgweight_Invalid,le.ultid_Invalid,le.ultscore_Invalid,le.ultweight_Invalid,le.dt_first_seen_Invalid,le.dt_last_seen_Invalid,le.dt_vendor_first_reported_Invalid,le.dt_vendor_last_reported_Invalid,le.process_date_Invalid,le.record_type_Invalid,le.normcompany_type_Invalid,le.normaddress_type_Invalid,le.clean_company_name_Invalid,le.clean_phone_Invalid,le.predir_Invalid,le.prim_name_Invalid,le.postdir_Invalid,le.p_city_name_Invalid,le.v_city_name_Invalid,le.st_Invalid,le.zip_Invalid,le.zip4_Invalid,le.cart_Invalid,le.cr_sort_sz_Invalid,le.lot_Invalid,le.lot_order_Invalid,le.dbpc_Invalid,le.chk_digit_Invalid,le.rec_type_Invalid,le.fips_state_Invalid,le.fips_county_Invalid,le.geo_lat_Invalid,le.geo_long_Invalid,le.msa_Invalid,le.geo_blk_Invalid,le.geo_match_Invalid,le.err_stat_Invalid,le.raw_aid_Invalid,le.ace_aid_Invalid,le.prep_addr_line1_Invalid,le.prep_addr_line_last_Invalid,le.EFX_BUSSTATCD_Invalid,le.EFX_CMSA_Invalid,le.EFX_CORPAMOUNTCD_Invalid,le.EFX_CORPAMOUNTPREC_Invalid,le.EFX_CORPAMOUNTTP_Invalid,le.EFX_CORPEMPCD_Invalid,le.EFX_CTRYISOCD_Invalid,le.EFX_CTRYNUM_Invalid,le.EFX_CTRYTELCD_Invalid,le.EFX_GEOPREC_Invalid,le.EFX_MERCTYPE_Invalid,le.EFX_MRKT_TELESCORE_Invalid,le.EFX_MRKT_TOTALIND_Invalid,le.EFX_MRKT_TOTALSCORE_Invalid,le.EFX_PUBLIC_Invalid,le.EFX_STKEXC_Invalid,le.EFX_PRIMSIC_Invalid,le.EFX_SECSIC1_Invalid,le.EFX_SECSIC2_Invalid,le.EFX_SECSIC3_Invalid,le.EFX_SECSIC4_Invalid,le.norm_state_Invalid,le.EFX_ID_Invalid,le.EFX_NAME_Invalid,le.EFX_LEGAL_NAME_Invalid,le.EFX_ADDRESS_Invalid,le.EFX_CITY_Invalid,le.EFX_CTRYNAME_Invalid,le.EFX_SOHO_Invalid,le.EFX_BIZ_Invalid,le.EFX_RES_Invalid,le.EFX_CMRA_Invalid,le.EFX_SECGEOPREC_Invalid,le.EFX_SECCTRYISOCD_Invalid,le.EFX_SECCTRYNUM_Invalid,le.EFX_PHONE_Invalid,le.EFX_FAXPHONE_Invalid,le.EFX_YREST_Invalid,le.EFX_CORPEMPCNT_Invalid,le.EFX_LOCEMPCNT_Invalid,le.EFX_LOCEMPCD_Invalid,le.EFX_CORPAMOUNT_Invalid,le.EFX_LOCAMOUNT_Invalid,le.EFX_LOCAMOUNTCD_Invalid,le.EFX_LOCAMOUNTTP_Invalid,le.EFX_LOCAMOUNTPREC_Invalid,le.EFX_PRIMNAICSCODE_Invalid,le.EFX_SECNAICS1_Invalid,le.EFX_SECNAICS2_Invalid,le.EFX_SECNAICS3_Invalid,le.EFX_SECNAICS4_Invalid,le.EFX_DEAD_Invalid,le.EFX_DEADDT_Invalid,le.EFX_MRKT_TELEVER_Invalid,le.EFX_MRKT_VACANT_Invalid,le.EFX_MRKT_SEASONAL_Invalid,le.EFX_MBE_Invalid,le.EFX_WBE_Invalid,le.EFX_MWBE_Invalid,le.EFX_SDB_Invalid,le.EFX_HUBZONE_Invalid,le.EFX_DBE_Invalid,le.EFX_VET_Invalid,le.EFX_DVET_Invalid,le.EFX_8a_Invalid,le.EFX_8aEXPDT_Invalid,le.EFX_DIS_Invalid,le.EFX_SBE_Invalid,le.EFX_BUSSIZE_Invalid,le.EFX_LBE_Invalid,le.EFX_GOV_Invalid,le.EFX_FGOV_Invalid,le.EFX_NONPROFIT_Invalid,le.EFX_HBCU_Invalid,le.EFX_GAYLESBIAN_Invalid,le.EFX_WSBE_Invalid,le.EFX_VSBE_Invalid,le.EFX_DVSBE_Invalid,le.EFX_MWBESTATUS_Invalid,le.EFX_NMSDC_Invalid,le.EFX_WBENC_Invalid,le.EFX_CA_PUC_Invalid,le.EFX_TX_HUB_Invalid,le.EFX_GSAX_Invalid,le.EFX_CALTRANS_Invalid,le.EFX_EDU_Invalid,le.EFX_MI_Invalid,le.EFX_ANC_Invalid,le.AT_CERTLEV1_Invalid,le.AT_CERTLEV2_Invalid,le.AT_CERTLEV3_Invalid,le.AT_CERTLEV4_Invalid,le.AT_CERTLEV5_Invalid,le.AT_CERTLEV6_Invalid,le.AT_CERTLEV7_Invalid,le.AT_CERTLEV8_Invalid,le.AT_CERTLEV9_Invalid,le.AT_CERTLEV10_Invalid,le.AT_CERTEXP1_Invalid,le.AT_CERTEXP2_Invalid,le.AT_CERTEXP3_Invalid,le.AT_CERTEXP4_Invalid,le.AT_CERTEXP5_Invalid,le.AT_CERTEXP6_Invalid,le.AT_CERTEXP7_Invalid,le.AT_CERTEXP8_Invalid,le.AT_CERTEXP9_Invalid,le.AT_CERTEXP10_Invalid,le.EFX_EXTRACT_DATE_Invalid,le.EFX_MERCHANT_ID_Invalid,le.EFX_PROJECT_ID_Invalid,le.EFX_FOREIGN_Invalid,le.Record_Update_Refresh_Date_Invalid,le.EFX_DATE_CREATED_Invalid,100);
+    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Base_Fields.InvalidMessage_dotid(le.dotid_Invalid),Base_Fields.InvalidMessage_dotscore(le.dotscore_Invalid),Base_Fields.InvalidMessage_dotweight(le.dotweight_Invalid),Base_Fields.InvalidMessage_empid(le.empid_Invalid),Base_Fields.InvalidMessage_empscore(le.empscore_Invalid),Base_Fields.InvalidMessage_empweight(le.empweight_Invalid),Base_Fields.InvalidMessage_powid(le.powid_Invalid),Base_Fields.InvalidMessage_powscore(le.powscore_Invalid),Base_Fields.InvalidMessage_powweight(le.powweight_Invalid),Base_Fields.InvalidMessage_proxid(le.proxid_Invalid),Base_Fields.InvalidMessage_proxscore(le.proxscore_Invalid),Base_Fields.InvalidMessage_proxweight(le.proxweight_Invalid),Base_Fields.InvalidMessage_seleid(le.seleid_Invalid),Base_Fields.InvalidMessage_selescore(le.selescore_Invalid),Base_Fields.InvalidMessage_seleweight(le.seleweight_Invalid),Base_Fields.InvalidMessage_orgid(le.orgid_Invalid),Base_Fields.InvalidMessage_orgscore(le.orgscore_Invalid),Base_Fields.InvalidMessage_orgweight(le.orgweight_Invalid),Base_Fields.InvalidMessage_ultid(le.ultid_Invalid),Base_Fields.InvalidMessage_ultscore(le.ultscore_Invalid),Base_Fields.InvalidMessage_ultweight(le.ultweight_Invalid),Base_Fields.InvalidMessage_dt_first_seen(le.dt_first_seen_Invalid),Base_Fields.InvalidMessage_dt_last_seen(le.dt_last_seen_Invalid),Base_Fields.InvalidMessage_dt_vendor_first_reported(le.dt_vendor_first_reported_Invalid),Base_Fields.InvalidMessage_dt_vendor_last_reported(le.dt_vendor_last_reported_Invalid),Base_Fields.InvalidMessage_process_date(le.process_date_Invalid),Base_Fields.InvalidMessage_record_type(le.record_type_Invalid),Base_Fields.InvalidMessage_normcompany_type(le.normcompany_type_Invalid),Base_Fields.InvalidMessage_normaddress_type(le.normaddress_type_Invalid),Base_Fields.InvalidMessage_clean_company_name(le.clean_company_name_Invalid),Base_Fields.InvalidMessage_clean_phone(le.clean_phone_Invalid),Base_Fields.InvalidMessage_predir(le.predir_Invalid),Base_Fields.InvalidMessage_prim_name(le.prim_name_Invalid),Base_Fields.InvalidMessage_postdir(le.postdir_Invalid),Base_Fields.InvalidMessage_p_city_name(le.p_city_name_Invalid),Base_Fields.InvalidMessage_v_city_name(le.v_city_name_Invalid),Base_Fields.InvalidMessage_st(le.st_Invalid),Base_Fields.InvalidMessage_zip(le.zip_Invalid),Base_Fields.InvalidMessage_zip4(le.zip4_Invalid),Base_Fields.InvalidMessage_cart(le.cart_Invalid),Base_Fields.InvalidMessage_cr_sort_sz(le.cr_sort_sz_Invalid),Base_Fields.InvalidMessage_lot(le.lot_Invalid),Base_Fields.InvalidMessage_lot_order(le.lot_order_Invalid),Base_Fields.InvalidMessage_dbpc(le.dbpc_Invalid),Base_Fields.InvalidMessage_chk_digit(le.chk_digit_Invalid),Base_Fields.InvalidMessage_rec_type(le.rec_type_Invalid),Base_Fields.InvalidMessage_fips_state(le.fips_state_Invalid),Base_Fields.InvalidMessage_fips_county(le.fips_county_Invalid),Base_Fields.InvalidMessage_geo_lat(le.geo_lat_Invalid),Base_Fields.InvalidMessage_geo_long(le.geo_long_Invalid),Base_Fields.InvalidMessage_msa(le.msa_Invalid),Base_Fields.InvalidMessage_geo_blk(le.geo_blk_Invalid),Base_Fields.InvalidMessage_geo_match(le.geo_match_Invalid),Base_Fields.InvalidMessage_err_stat(le.err_stat_Invalid),Base_Fields.InvalidMessage_raw_aid(le.raw_aid_Invalid),Base_Fields.InvalidMessage_ace_aid(le.ace_aid_Invalid),Base_Fields.InvalidMessage_prep_addr_line1(le.prep_addr_line1_Invalid),Base_Fields.InvalidMessage_prep_addr_line_last(le.prep_addr_line_last_Invalid),Base_Fields.InvalidMessage_EFX_BUSSTATCD(le.EFX_BUSSTATCD_Invalid),Base_Fields.InvalidMessage_EFX_CMSA(le.EFX_CMSA_Invalid),Base_Fields.InvalidMessage_EFX_CORPAMOUNTCD(le.EFX_CORPAMOUNTCD_Invalid),Base_Fields.InvalidMessage_EFX_CORPAMOUNTPREC(le.EFX_CORPAMOUNTPREC_Invalid),Base_Fields.InvalidMessage_EFX_CORPAMOUNTTP(le.EFX_CORPAMOUNTTP_Invalid),Base_Fields.InvalidMessage_EFX_CORPEMPCD(le.EFX_CORPEMPCD_Invalid),Base_Fields.InvalidMessage_EFX_CTRYISOCD(le.EFX_CTRYISOCD_Invalid),Base_Fields.InvalidMessage_EFX_CTRYNUM(le.EFX_CTRYNUM_Invalid),Base_Fields.InvalidMessage_EFX_CTRYTELCD(le.EFX_CTRYTELCD_Invalid),Base_Fields.InvalidMessage_EFX_GEOPREC(le.EFX_GEOPREC_Invalid),Base_Fields.InvalidMessage_EFX_MERCTYPE(le.EFX_MERCTYPE_Invalid),Base_Fields.InvalidMessage_EFX_MRKT_TELESCORE(le.EFX_MRKT_TELESCORE_Invalid),Base_Fields.InvalidMessage_EFX_MRKT_TOTALIND(le.EFX_MRKT_TOTALIND_Invalid),Base_Fields.InvalidMessage_EFX_MRKT_TOTALSCORE(le.EFX_MRKT_TOTALSCORE_Invalid),Base_Fields.InvalidMessage_EFX_PUBLIC(le.EFX_PUBLIC_Invalid),Base_Fields.InvalidMessage_EFX_STKEXC(le.EFX_STKEXC_Invalid),Base_Fields.InvalidMessage_EFX_PRIMSIC(le.EFX_PRIMSIC_Invalid),Base_Fields.InvalidMessage_EFX_SECSIC1(le.EFX_SECSIC1_Invalid),Base_Fields.InvalidMessage_EFX_SECSIC2(le.EFX_SECSIC2_Invalid),Base_Fields.InvalidMessage_EFX_SECSIC3(le.EFX_SECSIC3_Invalid),Base_Fields.InvalidMessage_EFX_SECSIC4(le.EFX_SECSIC4_Invalid),Base_Fields.InvalidMessage_norm_state(le.norm_state_Invalid),Base_Fields.InvalidMessage_EFX_ID(le.EFX_ID_Invalid),Base_Fields.InvalidMessage_EFX_NAME(le.EFX_NAME_Invalid),Base_Fields.InvalidMessage_EFX_LEGAL_NAME(le.EFX_LEGAL_NAME_Invalid),Base_Fields.InvalidMessage_EFX_ADDRESS(le.EFX_ADDRESS_Invalid),Base_Fields.InvalidMessage_EFX_CITY(le.EFX_CITY_Invalid),Base_Fields.InvalidMessage_EFX_CTRYNAME(le.EFX_CTRYNAME_Invalid),Base_Fields.InvalidMessage_EFX_SOHO(le.EFX_SOHO_Invalid),Base_Fields.InvalidMessage_EFX_BIZ(le.EFX_BIZ_Invalid),Base_Fields.InvalidMessage_EFX_RES(le.EFX_RES_Invalid),Base_Fields.InvalidMessage_EFX_CMRA(le.EFX_CMRA_Invalid),Base_Fields.InvalidMessage_EFX_SECGEOPREC(le.EFX_SECGEOPREC_Invalid),Base_Fields.InvalidMessage_EFX_SECCTRYISOCD(le.EFX_SECCTRYISOCD_Invalid),Base_Fields.InvalidMessage_EFX_SECCTRYNUM(le.EFX_SECCTRYNUM_Invalid),Base_Fields.InvalidMessage_EFX_PHONE(le.EFX_PHONE_Invalid),Base_Fields.InvalidMessage_EFX_FAXPHONE(le.EFX_FAXPHONE_Invalid),Base_Fields.InvalidMessage_EFX_YREST(le.EFX_YREST_Invalid),Base_Fields.InvalidMessage_EFX_CORPEMPCNT(le.EFX_CORPEMPCNT_Invalid),Base_Fields.InvalidMessage_EFX_LOCEMPCNT(le.EFX_LOCEMPCNT_Invalid),Base_Fields.InvalidMessage_EFX_LOCEMPCD(le.EFX_LOCEMPCD_Invalid),Base_Fields.InvalidMessage_EFX_CORPAMOUNT(le.EFX_CORPAMOUNT_Invalid),Base_Fields.InvalidMessage_EFX_LOCAMOUNT(le.EFX_LOCAMOUNT_Invalid),Base_Fields.InvalidMessage_EFX_LOCAMOUNTCD(le.EFX_LOCAMOUNTCD_Invalid),Base_Fields.InvalidMessage_EFX_LOCAMOUNTTP(le.EFX_LOCAMOUNTTP_Invalid),Base_Fields.InvalidMessage_EFX_LOCAMOUNTPREC(le.EFX_LOCAMOUNTPREC_Invalid),Base_Fields.InvalidMessage_EFX_PRIMNAICSCODE(le.EFX_PRIMNAICSCODE_Invalid),Base_Fields.InvalidMessage_EFX_SECNAICS1(le.EFX_SECNAICS1_Invalid),Base_Fields.InvalidMessage_EFX_SECNAICS2(le.EFX_SECNAICS2_Invalid),Base_Fields.InvalidMessage_EFX_SECNAICS3(le.EFX_SECNAICS3_Invalid),Base_Fields.InvalidMessage_EFX_SECNAICS4(le.EFX_SECNAICS4_Invalid),Base_Fields.InvalidMessage_EFX_DEAD(le.EFX_DEAD_Invalid),Base_Fields.InvalidMessage_EFX_DEADDT(le.EFX_DEADDT_Invalid),Base_Fields.InvalidMessage_EFX_MRKT_TELEVER(le.EFX_MRKT_TELEVER_Invalid),Base_Fields.InvalidMessage_EFX_MRKT_VACANT(le.EFX_MRKT_VACANT_Invalid),Base_Fields.InvalidMessage_EFX_MRKT_SEASONAL(le.EFX_MRKT_SEASONAL_Invalid),Base_Fields.InvalidMessage_EFX_MBE(le.EFX_MBE_Invalid),Base_Fields.InvalidMessage_EFX_WBE(le.EFX_WBE_Invalid),Base_Fields.InvalidMessage_EFX_MWBE(le.EFX_MWBE_Invalid),Base_Fields.InvalidMessage_EFX_SDB(le.EFX_SDB_Invalid),Base_Fields.InvalidMessage_EFX_HUBZONE(le.EFX_HUBZONE_Invalid),Base_Fields.InvalidMessage_EFX_DBE(le.EFX_DBE_Invalid),Base_Fields.InvalidMessage_EFX_VET(le.EFX_VET_Invalid),Base_Fields.InvalidMessage_EFX_DVET(le.EFX_DVET_Invalid),Base_Fields.InvalidMessage_EFX_8a(le.EFX_8a_Invalid),Base_Fields.InvalidMessage_EFX_8aEXPDT(le.EFX_8aEXPDT_Invalid),Base_Fields.InvalidMessage_EFX_DIS(le.EFX_DIS_Invalid),Base_Fields.InvalidMessage_EFX_SBE(le.EFX_SBE_Invalid),Base_Fields.InvalidMessage_EFX_BUSSIZE(le.EFX_BUSSIZE_Invalid),Base_Fields.InvalidMessage_EFX_LBE(le.EFX_LBE_Invalid),Base_Fields.InvalidMessage_EFX_GOV(le.EFX_GOV_Invalid),Base_Fields.InvalidMessage_EFX_FGOV(le.EFX_FGOV_Invalid),Base_Fields.InvalidMessage_EFX_NONPROFIT(le.EFX_NONPROFIT_Invalid),Base_Fields.InvalidMessage_EFX_HBCU(le.EFX_HBCU_Invalid),Base_Fields.InvalidMessage_EFX_GAYLESBIAN(le.EFX_GAYLESBIAN_Invalid),Base_Fields.InvalidMessage_EFX_WSBE(le.EFX_WSBE_Invalid),Base_Fields.InvalidMessage_EFX_VSBE(le.EFX_VSBE_Invalid),Base_Fields.InvalidMessage_EFX_DVSBE(le.EFX_DVSBE_Invalid),Base_Fields.InvalidMessage_EFX_MWBESTATUS(le.EFX_MWBESTATUS_Invalid),Base_Fields.InvalidMessage_EFX_NMSDC(le.EFX_NMSDC_Invalid),Base_Fields.InvalidMessage_EFX_WBENC(le.EFX_WBENC_Invalid),Base_Fields.InvalidMessage_EFX_CA_PUC(le.EFX_CA_PUC_Invalid),Base_Fields.InvalidMessage_EFX_TX_HUB(le.EFX_TX_HUB_Invalid),Base_Fields.InvalidMessage_EFX_GSAX(le.EFX_GSAX_Invalid),Base_Fields.InvalidMessage_EFX_CALTRANS(le.EFX_CALTRANS_Invalid),Base_Fields.InvalidMessage_EFX_EDU(le.EFX_EDU_Invalid),Base_Fields.InvalidMessage_EFX_MI(le.EFX_MI_Invalid),Base_Fields.InvalidMessage_EFX_ANC(le.EFX_ANC_Invalid),Base_Fields.InvalidMessage_AT_CERTLEV1(le.AT_CERTLEV1_Invalid),Base_Fields.InvalidMessage_AT_CERTLEV2(le.AT_CERTLEV2_Invalid),Base_Fields.InvalidMessage_AT_CERTLEV3(le.AT_CERTLEV3_Invalid),Base_Fields.InvalidMessage_AT_CERTLEV4(le.AT_CERTLEV4_Invalid),Base_Fields.InvalidMessage_AT_CERTLEV5(le.AT_CERTLEV5_Invalid),Base_Fields.InvalidMessage_AT_CERTLEV6(le.AT_CERTLEV6_Invalid),Base_Fields.InvalidMessage_AT_CERTLEV7(le.AT_CERTLEV7_Invalid),Base_Fields.InvalidMessage_AT_CERTLEV8(le.AT_CERTLEV8_Invalid),Base_Fields.InvalidMessage_AT_CERTLEV9(le.AT_CERTLEV9_Invalid),Base_Fields.InvalidMessage_AT_CERTLEV10(le.AT_CERTLEV10_Invalid),Base_Fields.InvalidMessage_AT_CERTEXP1(le.AT_CERTEXP1_Invalid),Base_Fields.InvalidMessage_AT_CERTEXP2(le.AT_CERTEXP2_Invalid),Base_Fields.InvalidMessage_AT_CERTEXP3(le.AT_CERTEXP3_Invalid),Base_Fields.InvalidMessage_AT_CERTEXP4(le.AT_CERTEXP4_Invalid),Base_Fields.InvalidMessage_AT_CERTEXP5(le.AT_CERTEXP5_Invalid),Base_Fields.InvalidMessage_AT_CERTEXP6(le.AT_CERTEXP6_Invalid),Base_Fields.InvalidMessage_AT_CERTEXP7(le.AT_CERTEXP7_Invalid),Base_Fields.InvalidMessage_AT_CERTEXP8(le.AT_CERTEXP8_Invalid),Base_Fields.InvalidMessage_AT_CERTEXP9(le.AT_CERTEXP9_Invalid),Base_Fields.InvalidMessage_AT_CERTEXP10(le.AT_CERTEXP10_Invalid),Base_Fields.InvalidMessage_EFX_EXTRACT_DATE(le.EFX_EXTRACT_DATE_Invalid),Base_Fields.InvalidMessage_EFX_MERCHANT_ID(le.EFX_MERCHANT_ID_Invalid),Base_Fields.InvalidMessage_EFX_PROJECT_ID(le.EFX_PROJECT_ID_Invalid),Base_Fields.InvalidMessage_EFX_FOREIGN(le.EFX_FOREIGN_Invalid),Base_Fields.InvalidMessage_Record_Update_Refresh_Date(le.Record_Update_Refresh_Date_Invalid),Base_Fields.InvalidMessage_EFX_DATE_CREATED(le.EFX_DATE_CREATED_Invalid),'UNKNOWN'));
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
           ,CHOOSE(le.dotid_Invalid,'ENUM','UNKNOWN')
           ,CHOOSE(le.dotscore_Invalid,'ENUM','UNKNOWN')
@@ -824,14 +812,13 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.EFX_MRKT_TOTALIND_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.EFX_MRKT_TOTALSCORE_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.EFX_PUBLIC_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.EFX_STATEC_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.EFX_STKEXC_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.EFX_PRIMSIC_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.EFX_SECSIC1_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.EFX_SECSIC2_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.EFX_SECSIC3_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.EFX_SECSIC4_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.EFX_STATE_Invalid,'CUSTOM','UNKNOWN')
+          ,CHOOSE(le.norm_state_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.EFX_ID_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.EFX_NAME_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.EFX_LEGAL_NAME_Invalid,'CUSTOM','UNKNOWN')
@@ -842,8 +829,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.EFX_BIZ_Invalid,'ENUM','UNKNOWN')
           ,CHOOSE(le.EFX_RES_Invalid,'ENUM','UNKNOWN')
           ,CHOOSE(le.EFX_CMRA_Invalid,'ENUM','UNKNOWN')
-          ,CHOOSE(le.EFX_SECSTAT_Invalid,'CUSTOM','UNKNOWN')
-          ,CHOOSE(le.EFX_STATEC2_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.EFX_SECGEOPREC_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.EFX_SECCTRYISOCD_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.EFX_SECCTRYNUM_Invalid,'CUSTOM','UNKNOWN')
@@ -926,11 +911,11 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.EFX_FOREIGN_Invalid,'ENUM','UNKNOWN')
           ,CHOOSE(le.Record_Update_Refresh_Date_Invalid,'CUSTOM','UNKNOWN')
           ,CHOOSE(le.EFX_DATE_CREATED_Invalid,'CUSTOM','UNKNOWN'),'UNKNOWN'));
-    SELF.FieldName := CHOOSE(c,'dotid','dotscore','dotweight','empid','empscore','empweight','powid','powscore','powweight','proxid','proxscore','proxweight','seleid','selescore','seleweight','orgid','orgscore','orgweight','ultid','ultscore','ultweight','dt_first_seen','dt_last_seen','dt_vendor_first_reported','dt_vendor_last_reported','process_date','record_type','normcompany_type','normaddress_type','clean_company_name','clean_phone','predir','prim_name','postdir','p_city_name','v_city_name','st','zip','zip4','cart','cr_sort_sz','lot','lot_order','dbpc','chk_digit','rec_type','fips_state','fips_county','geo_lat','geo_long','msa','geo_blk','geo_match','err_stat','raw_aid','ace_aid','prep_addr_line1','prep_addr_line_last','EFX_BUSSTATCD','EFX_CMSA','EFX_CORPAMOUNTCD','EFX_CORPAMOUNTPREC','EFX_CORPAMOUNTTP','EFX_CORPEMPCD','EFX_CTRYISOCD','EFX_CTRYNUM','EFX_CTRYTELCD','EFX_GEOPREC','EFX_MERCTYPE','EFX_MRKT_TELESCORE','EFX_MRKT_TOTALIND','EFX_MRKT_TOTALSCORE','EFX_PUBLIC','EFX_STATEC','EFX_STKEXC','EFX_PRIMSIC','EFX_SECSIC1','EFX_SECSIC2','EFX_SECSIC3','EFX_SECSIC4','EFX_STATE','EFX_ID','EFX_NAME','EFX_LEGAL_NAME','EFX_ADDRESS','EFX_CITY','EFX_CTRYNAME','EFX_SOHO','EFX_BIZ','EFX_RES','EFX_CMRA','EFX_SECSTAT','EFX_STATEC2','EFX_SECGEOPREC','EFX_SECCTRYISOCD','EFX_SECCTRYNUM','EFX_PHONE','EFX_FAXPHONE','EFX_YREST','EFX_CORPEMPCNT','EFX_LOCEMPCNT','EFX_LOCEMPCD','EFX_CORPAMOUNT','EFX_LOCAMOUNT','EFX_LOCAMOUNTCD','EFX_LOCAMOUNTTP','EFX_LOCAMOUNTPREC','EFX_PRIMNAICSCODE','EFX_SECNAICS1','EFX_SECNAICS2','EFX_SECNAICS3','EFX_SECNAICS4','EFX_DEAD','EFX_DEADDT','EFX_MRKT_TELEVER','EFX_MRKT_VACANT','EFX_MRKT_SEASONAL','EFX_MBE','EFX_WBE','EFX_MWBE','EFX_SDB','EFX_HUBZONE','EFX_DBE','EFX_VET','EFX_DVET','EFX_8a','EFX_8aEXPDT','EFX_DIS','EFX_SBE','EFX_BUSSIZE','EFX_LBE','EFX_GOV','EFX_FGOV','EFX_NONPROFIT','EFX_HBCU','EFX_GAYLESBIAN','EFX_WSBE','EFX_VSBE','EFX_DVSBE','EFX_MWBESTATUS','EFX_NMSDC','EFX_WBENC','EFX_CA_PUC','EFX_TX_HUB','EFX_GSAX','EFX_CALTRANS','EFX_EDU','EFX_MI','EFX_ANC','AT_CERTLEV1','AT_CERTLEV2','AT_CERTLEV3','AT_CERTLEV4','AT_CERTLEV5','AT_CERTLEV6','AT_CERTLEV7','AT_CERTLEV8','AT_CERTLEV9','AT_CERTLEV10','AT_CERTEXP1','AT_CERTEXP2','AT_CERTEXP3','AT_CERTEXP4','AT_CERTEXP5','AT_CERTEXP6','AT_CERTEXP7','AT_CERTEXP8','AT_CERTEXP9','AT_CERTEXP10','EFX_EXTRACT_DATE','EFX_MERCHANT_ID','EFX_PROJECT_ID','EFX_FOREIGN','Record_Update_Refresh_Date','EFX_DATE_CREATED','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_numeric','invalid_percentage','invalid_numeric','invalid_numeric','invalid_percentage','invalid_numeric','invalid_numeric','invalid_percentage','invalid_numeric','invalid_numeric','invalid_percentage','invalid_numeric','invalid_numeric','invalid_percentage','invalid_numeric','invalid_reformated_date','invalid_reformated_date','invalid_reformated_date','invalid_reformated_date','invalid_reformated_date','invalid_record_type','invalid_norm_type','invalid_address_type_code','invalid_mandatory','invalid_phone','invalid_direction','invalid_mandatory','invalid_direction','invalid_mandatory','invalid_mandatory','invalid_st','invalid_zip5','invalid_zip4','invalid_cart','invalid_cr_sort_sz','invalid_lot','invalid_lot_order','invalid_dbpc','invalid_chk_digit','invalid_rec_type','invalid_fips_state','invalid_fips_county','invalid_geo','invalid_geo','invalid_msa','invalid_geo_blk','invalid_geo_match','invalid_err_stat','invalid_raw_aid','invalid_ace_aid','invalid_mandatory','invalid_mandatory','invalid_busstatcd','invalid_cmsa','invalid_corpamountcd','invalid_corpamountprec','invalid_corpamounttp','invalid_corpempcd','invalid_ctryisocd','invalid_ctrynum','invalid_ctrytelcd','invalid_geoprec','invalid_merctype','invalid_mrkt_telescore','invalid_mrkt_totalind','invalid_mrkt_totalscore','invalid_public','invalid_statec','invalid_stkexc','invalid_sic','invalid_sic','invalid_sic','invalid_sic','invalid_sic','invalid_st','invalid_numeric','invalid_name','invalid_legal_name','invalid_mandatory','invalid_mandatory','invalid_mandatory','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_st','invalid_statec','invalid_geoprec','invalid_ctryisocd','invalid_ctrynum','invalid_phone','invalid_phone','invalid_year_established','invalid_numeric_or_blank','invalid_numeric_or_blank','invalid_corpempcd','invalid_numeric_or_blank','invalid_numeric_or_blank','invalid_corpamountcd','invalid_corpamounttp','invalid_corpamountprec','invalid_naics','invalid_naics','invalid_naics','invalid_naics','invalid_naics','invalid_yes_blank','invalid_past_date','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_general_date','invalid_yes_blank','invalid_yes_blank','invalid_business_size','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_cert_or_class','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_cert_or_class','invalid_cert_or_class','invalid_cert_or_class','invalid_cert_or_class','invalid_cert_or_class','invalid_cert_or_class','invalid_cert_or_class','invalid_cert_or_class','invalid_cert_or_class','invalid_cert_or_class','invalid_general_date','invalid_general_date','invalid_general_date','invalid_general_date','invalid_general_date','invalid_general_date','invalid_general_date','invalid_general_date','invalid_general_date','invalid_general_date','invalid_past_date','invalid_numeric','invalid_numeric_or_blank','invalid_yes_blank','invalid_past_date','invalid_date_created','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT37.StrType)le.dotid,(SALT37.StrType)le.dotscore,(SALT37.StrType)le.dotweight,(SALT37.StrType)le.empid,(SALT37.StrType)le.empscore,(SALT37.StrType)le.empweight,(SALT37.StrType)le.powid,(SALT37.StrType)le.powscore,(SALT37.StrType)le.powweight,(SALT37.StrType)le.proxid,(SALT37.StrType)le.proxscore,(SALT37.StrType)le.proxweight,(SALT37.StrType)le.seleid,(SALT37.StrType)le.selescore,(SALT37.StrType)le.seleweight,(SALT37.StrType)le.orgid,(SALT37.StrType)le.orgscore,(SALT37.StrType)le.orgweight,(SALT37.StrType)le.ultid,(SALT37.StrType)le.ultscore,(SALT37.StrType)le.ultweight,(SALT37.StrType)le.dt_first_seen,(SALT37.StrType)le.dt_last_seen,(SALT37.StrType)le.dt_vendor_first_reported,(SALT37.StrType)le.dt_vendor_last_reported,(SALT37.StrType)le.process_date,(SALT37.StrType)le.record_type,(SALT37.StrType)le.normcompany_type,(SALT37.StrType)le.normaddress_type,(SALT37.StrType)le.clean_company_name,(SALT37.StrType)le.clean_phone,(SALT37.StrType)le.predir,(SALT37.StrType)le.prim_name,(SALT37.StrType)le.postdir,(SALT37.StrType)le.p_city_name,(SALT37.StrType)le.v_city_name,(SALT37.StrType)le.st,(SALT37.StrType)le.zip,(SALT37.StrType)le.zip4,(SALT37.StrType)le.cart,(SALT37.StrType)le.cr_sort_sz,(SALT37.StrType)le.lot,(SALT37.StrType)le.lot_order,(SALT37.StrType)le.dbpc,(SALT37.StrType)le.chk_digit,(SALT37.StrType)le.rec_type,(SALT37.StrType)le.fips_state,(SALT37.StrType)le.fips_county,(SALT37.StrType)le.geo_lat,(SALT37.StrType)le.geo_long,(SALT37.StrType)le.msa,(SALT37.StrType)le.geo_blk,(SALT37.StrType)le.geo_match,(SALT37.StrType)le.err_stat,(SALT37.StrType)le.raw_aid,(SALT37.StrType)le.ace_aid,(SALT37.StrType)le.prep_addr_line1,(SALT37.StrType)le.prep_addr_line_last,(SALT37.StrType)le.EFX_BUSSTATCD,(SALT37.StrType)le.EFX_CMSA,(SALT37.StrType)le.EFX_CORPAMOUNTCD,(SALT37.StrType)le.EFX_CORPAMOUNTPREC,(SALT37.StrType)le.EFX_CORPAMOUNTTP,(SALT37.StrType)le.EFX_CORPEMPCD,(SALT37.StrType)le.EFX_CTRYISOCD,(SALT37.StrType)le.EFX_CTRYNUM,(SALT37.StrType)le.EFX_CTRYTELCD,(SALT37.StrType)le.EFX_GEOPREC,(SALT37.StrType)le.EFX_MERCTYPE,(SALT37.StrType)le.EFX_MRKT_TELESCORE,(SALT37.StrType)le.EFX_MRKT_TOTALIND,(SALT37.StrType)le.EFX_MRKT_TOTALSCORE,(SALT37.StrType)le.EFX_PUBLIC,(SALT37.StrType)le.EFX_STATEC,(SALT37.StrType)le.EFX_STKEXC,(SALT37.StrType)le.EFX_PRIMSIC,(SALT37.StrType)le.EFX_SECSIC1,(SALT37.StrType)le.EFX_SECSIC2,(SALT37.StrType)le.EFX_SECSIC3,(SALT37.StrType)le.EFX_SECSIC4,(SALT37.StrType)le.EFX_STATE,(SALT37.StrType)le.EFX_ID,(SALT37.StrType)le.EFX_NAME,(SALT37.StrType)le.EFX_LEGAL_NAME,(SALT37.StrType)le.EFX_ADDRESS,(SALT37.StrType)le.EFX_CITY,(SALT37.StrType)le.EFX_CTRYNAME,(SALT37.StrType)le.EFX_SOHO,(SALT37.StrType)le.EFX_BIZ,(SALT37.StrType)le.EFX_RES,(SALT37.StrType)le.EFX_CMRA,(SALT37.StrType)le.EFX_SECSTAT,(SALT37.StrType)le.EFX_STATEC2,(SALT37.StrType)le.EFX_SECGEOPREC,(SALT37.StrType)le.EFX_SECCTRYISOCD,(SALT37.StrType)le.EFX_SECCTRYNUM,(SALT37.StrType)le.EFX_PHONE,(SALT37.StrType)le.EFX_FAXPHONE,(SALT37.StrType)le.EFX_YREST,(SALT37.StrType)le.EFX_CORPEMPCNT,(SALT37.StrType)le.EFX_LOCEMPCNT,(SALT37.StrType)le.EFX_LOCEMPCD,(SALT37.StrType)le.EFX_CORPAMOUNT,(SALT37.StrType)le.EFX_LOCAMOUNT,(SALT37.StrType)le.EFX_LOCAMOUNTCD,(SALT37.StrType)le.EFX_LOCAMOUNTTP,(SALT37.StrType)le.EFX_LOCAMOUNTPREC,(SALT37.StrType)le.EFX_PRIMNAICSCODE,(SALT37.StrType)le.EFX_SECNAICS1,(SALT37.StrType)le.EFX_SECNAICS2,(SALT37.StrType)le.EFX_SECNAICS3,(SALT37.StrType)le.EFX_SECNAICS4,(SALT37.StrType)le.EFX_DEAD,(SALT37.StrType)le.EFX_DEADDT,(SALT37.StrType)le.EFX_MRKT_TELEVER,(SALT37.StrType)le.EFX_MRKT_VACANT,(SALT37.StrType)le.EFX_MRKT_SEASONAL,(SALT37.StrType)le.EFX_MBE,(SALT37.StrType)le.EFX_WBE,(SALT37.StrType)le.EFX_MWBE,(SALT37.StrType)le.EFX_SDB,(SALT37.StrType)le.EFX_HUBZONE,(SALT37.StrType)le.EFX_DBE,(SALT37.StrType)le.EFX_VET,(SALT37.StrType)le.EFX_DVET,(SALT37.StrType)le.EFX_8a,(SALT37.StrType)le.EFX_8aEXPDT,(SALT37.StrType)le.EFX_DIS,(SALT37.StrType)le.EFX_SBE,(SALT37.StrType)le.EFX_BUSSIZE,(SALT37.StrType)le.EFX_LBE,(SALT37.StrType)le.EFX_GOV,(SALT37.StrType)le.EFX_FGOV,(SALT37.StrType)le.EFX_NONPROFIT,(SALT37.StrType)le.EFX_HBCU,(SALT37.StrType)le.EFX_GAYLESBIAN,(SALT37.StrType)le.EFX_WSBE,(SALT37.StrType)le.EFX_VSBE,(SALT37.StrType)le.EFX_DVSBE,(SALT37.StrType)le.EFX_MWBESTATUS,(SALT37.StrType)le.EFX_NMSDC,(SALT37.StrType)le.EFX_WBENC,(SALT37.StrType)le.EFX_CA_PUC,(SALT37.StrType)le.EFX_TX_HUB,(SALT37.StrType)le.EFX_GSAX,(SALT37.StrType)le.EFX_CALTRANS,(SALT37.StrType)le.EFX_EDU,(SALT37.StrType)le.EFX_MI,(SALT37.StrType)le.EFX_ANC,(SALT37.StrType)le.AT_CERTLEV1,(SALT37.StrType)le.AT_CERTLEV2,(SALT37.StrType)le.AT_CERTLEV3,(SALT37.StrType)le.AT_CERTLEV4,(SALT37.StrType)le.AT_CERTLEV5,(SALT37.StrType)le.AT_CERTLEV6,(SALT37.StrType)le.AT_CERTLEV7,(SALT37.StrType)le.AT_CERTLEV8,(SALT37.StrType)le.AT_CERTLEV9,(SALT37.StrType)le.AT_CERTLEV10,(SALT37.StrType)le.AT_CERTEXP1,(SALT37.StrType)le.AT_CERTEXP2,(SALT37.StrType)le.AT_CERTEXP3,(SALT37.StrType)le.AT_CERTEXP4,(SALT37.StrType)le.AT_CERTEXP5,(SALT37.StrType)le.AT_CERTEXP6,(SALT37.StrType)le.AT_CERTEXP7,(SALT37.StrType)le.AT_CERTEXP8,(SALT37.StrType)le.AT_CERTEXP9,(SALT37.StrType)le.AT_CERTEXP10,(SALT37.StrType)le.EFX_EXTRACT_DATE,(SALT37.StrType)le.EFX_MERCHANT_ID,(SALT37.StrType)le.EFX_PROJECT_ID,(SALT37.StrType)le.EFX_FOREIGN,(SALT37.StrType)le.Record_Update_Refresh_Date,(SALT37.StrType)le.EFX_DATE_CREATED,'***SALTBUG***');
+    SELF.FieldName := CHOOSE(c,'dotid','dotscore','dotweight','empid','empscore','empweight','powid','powscore','powweight','proxid','proxscore','proxweight','seleid','selescore','seleweight','orgid','orgscore','orgweight','ultid','ultscore','ultweight','dt_first_seen','dt_last_seen','dt_vendor_first_reported','dt_vendor_last_reported','process_date','record_type','normcompany_type','normaddress_type','clean_company_name','clean_phone','predir','prim_name','postdir','p_city_name','v_city_name','st','zip','zip4','cart','cr_sort_sz','lot','lot_order','dbpc','chk_digit','rec_type','fips_state','fips_county','geo_lat','geo_long','msa','geo_blk','geo_match','err_stat','raw_aid','ace_aid','prep_addr_line1','prep_addr_line_last','EFX_BUSSTATCD','EFX_CMSA','EFX_CORPAMOUNTCD','EFX_CORPAMOUNTPREC','EFX_CORPAMOUNTTP','EFX_CORPEMPCD','EFX_CTRYISOCD','EFX_CTRYNUM','EFX_CTRYTELCD','EFX_GEOPREC','EFX_MERCTYPE','EFX_MRKT_TELESCORE','EFX_MRKT_TOTALIND','EFX_MRKT_TOTALSCORE','EFX_PUBLIC','EFX_STKEXC','EFX_PRIMSIC','EFX_SECSIC1','EFX_SECSIC2','EFX_SECSIC3','EFX_SECSIC4','norm_state','EFX_ID','EFX_NAME','EFX_LEGAL_NAME','EFX_ADDRESS','EFX_CITY','EFX_CTRYNAME','EFX_SOHO','EFX_BIZ','EFX_RES','EFX_CMRA','EFX_SECGEOPREC','EFX_SECCTRYISOCD','EFX_SECCTRYNUM','EFX_PHONE','EFX_FAXPHONE','EFX_YREST','EFX_CORPEMPCNT','EFX_LOCEMPCNT','EFX_LOCEMPCD','EFX_CORPAMOUNT','EFX_LOCAMOUNT','EFX_LOCAMOUNTCD','EFX_LOCAMOUNTTP','EFX_LOCAMOUNTPREC','EFX_PRIMNAICSCODE','EFX_SECNAICS1','EFX_SECNAICS2','EFX_SECNAICS3','EFX_SECNAICS4','EFX_DEAD','EFX_DEADDT','EFX_MRKT_TELEVER','EFX_MRKT_VACANT','EFX_MRKT_SEASONAL','EFX_MBE','EFX_WBE','EFX_MWBE','EFX_SDB','EFX_HUBZONE','EFX_DBE','EFX_VET','EFX_DVET','EFX_8a','EFX_8aEXPDT','EFX_DIS','EFX_SBE','EFX_BUSSIZE','EFX_LBE','EFX_GOV','EFX_FGOV','EFX_NONPROFIT','EFX_HBCU','EFX_GAYLESBIAN','EFX_WSBE','EFX_VSBE','EFX_DVSBE','EFX_MWBESTATUS','EFX_NMSDC','EFX_WBENC','EFX_CA_PUC','EFX_TX_HUB','EFX_GSAX','EFX_CALTRANS','EFX_EDU','EFX_MI','EFX_ANC','AT_CERTLEV1','AT_CERTLEV2','AT_CERTLEV3','AT_CERTLEV4','AT_CERTLEV5','AT_CERTLEV6','AT_CERTLEV7','AT_CERTLEV8','AT_CERTLEV9','AT_CERTLEV10','AT_CERTEXP1','AT_CERTEXP2','AT_CERTEXP3','AT_CERTEXP4','AT_CERTEXP5','AT_CERTEXP6','AT_CERTEXP7','AT_CERTEXP8','AT_CERTEXP9','AT_CERTEXP10','EFX_EXTRACT_DATE','EFX_MERCHANT_ID','EFX_PROJECT_ID','EFX_FOREIGN','Record_Update_Refresh_Date','EFX_DATE_CREATED','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_numeric','invalid_percentage','invalid_numeric','invalid_numeric','invalid_percentage','invalid_numeric','invalid_numeric','invalid_percentage','invalid_numeric','invalid_numeric','invalid_percentage','invalid_numeric','invalid_numeric','invalid_percentage','invalid_numeric','invalid_reformated_date','invalid_reformated_date','invalid_reformated_date','invalid_reformated_date','invalid_reformated_date','invalid_record_type','invalid_norm_type','invalid_address_type_code','invalid_mandatory','invalid_phone','invalid_direction','invalid_mandatory','invalid_direction','invalid_mandatory','invalid_mandatory','invalid_st','invalid_zip5','invalid_zip4','invalid_cart','invalid_cr_sort_sz','invalid_lot','invalid_lot_order','invalid_dbpc','invalid_chk_digit','invalid_rec_type','invalid_fips_state','invalid_fips_county','invalid_geo','invalid_geo','invalid_msa','invalid_geo_blk','invalid_geo_match','invalid_err_stat','invalid_raw_aid','invalid_ace_aid','invalid_mandatory','invalid_mandatory','invalid_busstatcd','invalid_cmsa','invalid_corpamountcd','invalid_corpamountprec','invalid_corpamounttp','invalid_corpempcd','invalid_ctryisocd','invalid_ctrynum','invalid_ctrytelcd','invalid_geoprec','invalid_merctype','invalid_mrkt_telescore','invalid_mrkt_totalind','invalid_mrkt_totalscore','invalid_public','invalid_stkexc','invalid_sic','invalid_sic','invalid_sic','invalid_sic','invalid_sic','invalid_st','invalid_numeric','invalid_name','invalid_legal_name','invalid_mandatory','invalid_mandatory','invalid_mandatory','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_geoprec','invalid_ctryisocd','invalid_ctrynum','invalid_phone','invalid_phone','invalid_year_established','invalid_numeric_or_blank','invalid_numeric_or_blank','invalid_corpempcd','invalid_numeric_or_blank','invalid_numeric_or_blank','invalid_corpamountcd','invalid_corpamounttp','invalid_corpamountprec','invalid_naics','invalid_naics','invalid_naics','invalid_naics','invalid_naics','invalid_yes_blank','invalid_past_date','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_general_date','invalid_yes_blank','invalid_yes_blank','invalid_business_size','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_cert_or_class','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_yes_blank','invalid_cert_or_class','invalid_cert_or_class','invalid_cert_or_class','invalid_cert_or_class','invalid_cert_or_class','invalid_cert_or_class','invalid_cert_or_class','invalid_cert_or_class','invalid_cert_or_class','invalid_cert_or_class','invalid_general_date','invalid_general_date','invalid_general_date','invalid_general_date','invalid_general_date','invalid_general_date','invalid_general_date','invalid_general_date','invalid_general_date','invalid_general_date','invalid_past_date','invalid_numeric','invalid_numeric_or_blank','invalid_yes_blank','invalid_past_date','invalid_date_created','UNKNOWN');
+    SELF.FieldContents := CHOOSE(c,(SALT37.StrType)le.dotid,(SALT37.StrType)le.dotscore,(SALT37.StrType)le.dotweight,(SALT37.StrType)le.empid,(SALT37.StrType)le.empscore,(SALT37.StrType)le.empweight,(SALT37.StrType)le.powid,(SALT37.StrType)le.powscore,(SALT37.StrType)le.powweight,(SALT37.StrType)le.proxid,(SALT37.StrType)le.proxscore,(SALT37.StrType)le.proxweight,(SALT37.StrType)le.seleid,(SALT37.StrType)le.selescore,(SALT37.StrType)le.seleweight,(SALT37.StrType)le.orgid,(SALT37.StrType)le.orgscore,(SALT37.StrType)le.orgweight,(SALT37.StrType)le.ultid,(SALT37.StrType)le.ultscore,(SALT37.StrType)le.ultweight,(SALT37.StrType)le.dt_first_seen,(SALT37.StrType)le.dt_last_seen,(SALT37.StrType)le.dt_vendor_first_reported,(SALT37.StrType)le.dt_vendor_last_reported,(SALT37.StrType)le.process_date,(SALT37.StrType)le.record_type,(SALT37.StrType)le.normcompany_type,(SALT37.StrType)le.normaddress_type,(SALT37.StrType)le.clean_company_name,(SALT37.StrType)le.clean_phone,(SALT37.StrType)le.predir,(SALT37.StrType)le.prim_name,(SALT37.StrType)le.postdir,(SALT37.StrType)le.p_city_name,(SALT37.StrType)le.v_city_name,(SALT37.StrType)le.st,(SALT37.StrType)le.zip,(SALT37.StrType)le.zip4,(SALT37.StrType)le.cart,(SALT37.StrType)le.cr_sort_sz,(SALT37.StrType)le.lot,(SALT37.StrType)le.lot_order,(SALT37.StrType)le.dbpc,(SALT37.StrType)le.chk_digit,(SALT37.StrType)le.rec_type,(SALT37.StrType)le.fips_state,(SALT37.StrType)le.fips_county,(SALT37.StrType)le.geo_lat,(SALT37.StrType)le.geo_long,(SALT37.StrType)le.msa,(SALT37.StrType)le.geo_blk,(SALT37.StrType)le.geo_match,(SALT37.StrType)le.err_stat,(SALT37.StrType)le.raw_aid,(SALT37.StrType)le.ace_aid,(SALT37.StrType)le.prep_addr_line1,(SALT37.StrType)le.prep_addr_line_last,(SALT37.StrType)le.EFX_BUSSTATCD,(SALT37.StrType)le.EFX_CMSA,(SALT37.StrType)le.EFX_CORPAMOUNTCD,(SALT37.StrType)le.EFX_CORPAMOUNTPREC,(SALT37.StrType)le.EFX_CORPAMOUNTTP,(SALT37.StrType)le.EFX_CORPEMPCD,(SALT37.StrType)le.EFX_CTRYISOCD,(SALT37.StrType)le.EFX_CTRYNUM,(SALT37.StrType)le.EFX_CTRYTELCD,(SALT37.StrType)le.EFX_GEOPREC,(SALT37.StrType)le.EFX_MERCTYPE,(SALT37.StrType)le.EFX_MRKT_TELESCORE,(SALT37.StrType)le.EFX_MRKT_TOTALIND,(SALT37.StrType)le.EFX_MRKT_TOTALSCORE,(SALT37.StrType)le.EFX_PUBLIC,(SALT37.StrType)le.EFX_STKEXC,(SALT37.StrType)le.EFX_PRIMSIC,(SALT37.StrType)le.EFX_SECSIC1,(SALT37.StrType)le.EFX_SECSIC2,(SALT37.StrType)le.EFX_SECSIC3,(SALT37.StrType)le.EFX_SECSIC4,(SALT37.StrType)le.norm_state,(SALT37.StrType)le.EFX_ID,(SALT37.StrType)le.EFX_NAME,(SALT37.StrType)le.EFX_LEGAL_NAME,(SALT37.StrType)le.EFX_ADDRESS,(SALT37.StrType)le.EFX_CITY,(SALT37.StrType)le.EFX_CTRYNAME,(SALT37.StrType)le.EFX_SOHO,(SALT37.StrType)le.EFX_BIZ,(SALT37.StrType)le.EFX_RES,(SALT37.StrType)le.EFX_CMRA,(SALT37.StrType)le.EFX_SECGEOPREC,(SALT37.StrType)le.EFX_SECCTRYISOCD,(SALT37.StrType)le.EFX_SECCTRYNUM,(SALT37.StrType)le.EFX_PHONE,(SALT37.StrType)le.EFX_FAXPHONE,(SALT37.StrType)le.EFX_YREST,(SALT37.StrType)le.EFX_CORPEMPCNT,(SALT37.StrType)le.EFX_LOCEMPCNT,(SALT37.StrType)le.EFX_LOCEMPCD,(SALT37.StrType)le.EFX_CORPAMOUNT,(SALT37.StrType)le.EFX_LOCAMOUNT,(SALT37.StrType)le.EFX_LOCAMOUNTCD,(SALT37.StrType)le.EFX_LOCAMOUNTTP,(SALT37.StrType)le.EFX_LOCAMOUNTPREC,(SALT37.StrType)le.EFX_PRIMNAICSCODE,(SALT37.StrType)le.EFX_SECNAICS1,(SALT37.StrType)le.EFX_SECNAICS2,(SALT37.StrType)le.EFX_SECNAICS3,(SALT37.StrType)le.EFX_SECNAICS4,(SALT37.StrType)le.EFX_DEAD,(SALT37.StrType)le.EFX_DEADDT,(SALT37.StrType)le.EFX_MRKT_TELEVER,(SALT37.StrType)le.EFX_MRKT_VACANT,(SALT37.StrType)le.EFX_MRKT_SEASONAL,(SALT37.StrType)le.EFX_MBE,(SALT37.StrType)le.EFX_WBE,(SALT37.StrType)le.EFX_MWBE,(SALT37.StrType)le.EFX_SDB,(SALT37.StrType)le.EFX_HUBZONE,(SALT37.StrType)le.EFX_DBE,(SALT37.StrType)le.EFX_VET,(SALT37.StrType)le.EFX_DVET,(SALT37.StrType)le.EFX_8a,(SALT37.StrType)le.EFX_8aEXPDT,(SALT37.StrType)le.EFX_DIS,(SALT37.StrType)le.EFX_SBE,(SALT37.StrType)le.EFX_BUSSIZE,(SALT37.StrType)le.EFX_LBE,(SALT37.StrType)le.EFX_GOV,(SALT37.StrType)le.EFX_FGOV,(SALT37.StrType)le.EFX_NONPROFIT,(SALT37.StrType)le.EFX_HBCU,(SALT37.StrType)le.EFX_GAYLESBIAN,(SALT37.StrType)le.EFX_WSBE,(SALT37.StrType)le.EFX_VSBE,(SALT37.StrType)le.EFX_DVSBE,(SALT37.StrType)le.EFX_MWBESTATUS,(SALT37.StrType)le.EFX_NMSDC,(SALT37.StrType)le.EFX_WBENC,(SALT37.StrType)le.EFX_CA_PUC,(SALT37.StrType)le.EFX_TX_HUB,(SALT37.StrType)le.EFX_GSAX,(SALT37.StrType)le.EFX_CALTRANS,(SALT37.StrType)le.EFX_EDU,(SALT37.StrType)le.EFX_MI,(SALT37.StrType)le.EFX_ANC,(SALT37.StrType)le.AT_CERTLEV1,(SALT37.StrType)le.AT_CERTLEV2,(SALT37.StrType)le.AT_CERTLEV3,(SALT37.StrType)le.AT_CERTLEV4,(SALT37.StrType)le.AT_CERTLEV5,(SALT37.StrType)le.AT_CERTLEV6,(SALT37.StrType)le.AT_CERTLEV7,(SALT37.StrType)le.AT_CERTLEV8,(SALT37.StrType)le.AT_CERTLEV9,(SALT37.StrType)le.AT_CERTLEV10,(SALT37.StrType)le.AT_CERTEXP1,(SALT37.StrType)le.AT_CERTEXP2,(SALT37.StrType)le.AT_CERTEXP3,(SALT37.StrType)le.AT_CERTEXP4,(SALT37.StrType)le.AT_CERTEXP5,(SALT37.StrType)le.AT_CERTEXP6,(SALT37.StrType)le.AT_CERTEXP7,(SALT37.StrType)le.AT_CERTEXP8,(SALT37.StrType)le.AT_CERTEXP9,(SALT37.StrType)le.AT_CERTEXP10,(SALT37.StrType)le.EFX_EXTRACT_DATE,(SALT37.StrType)le.EFX_MERCHANT_ID,(SALT37.StrType)le.EFX_PROJECT_ID,(SALT37.StrType)le.EFX_FOREIGN,(SALT37.StrType)le.Record_Update_Refresh_Date,(SALT37.StrType)le.EFX_DATE_CREATED,'***SALTBUG***');
   END;
-  EXPORT AllErrors := NORMALIZE(h,175,Into(LEFT,COUNTER));
+  EXPORT AllErrors := NORMALIZE(h,172,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
@@ -1013,14 +998,13 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'EFX_MRKT_TOTALIND:invalid_mrkt_totalind:CUSTOM'
           ,'EFX_MRKT_TOTALSCORE:invalid_mrkt_totalscore:CUSTOM'
           ,'EFX_PUBLIC:invalid_public:CUSTOM'
-          ,'EFX_STATEC:invalid_statec:CUSTOM'
           ,'EFX_STKEXC:invalid_stkexc:CUSTOM'
           ,'EFX_PRIMSIC:invalid_sic:CUSTOM'
           ,'EFX_SECSIC1:invalid_sic:CUSTOM'
           ,'EFX_SECSIC2:invalid_sic:CUSTOM'
           ,'EFX_SECSIC3:invalid_sic:CUSTOM'
           ,'EFX_SECSIC4:invalid_sic:CUSTOM'
-          ,'EFX_STATE:invalid_st:CUSTOM'
+          ,'norm_state:invalid_st:CUSTOM'
           ,'EFX_ID:invalid_numeric:CUSTOM'
           ,'EFX_NAME:invalid_name:CUSTOM'
           ,'EFX_LEGAL_NAME:invalid_legal_name:CUSTOM'
@@ -1031,8 +1015,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'EFX_BIZ:invalid_yes_blank:ENUM'
           ,'EFX_RES:invalid_yes_blank:ENUM'
           ,'EFX_CMRA:invalid_yes_blank:ENUM'
-          ,'EFX_SECSTAT:invalid_st:CUSTOM'
-          ,'EFX_STATEC2:invalid_statec:CUSTOM'
           ,'EFX_SECGEOPREC:invalid_geoprec:CUSTOM'
           ,'EFX_SECCTRYISOCD:invalid_ctryisocd:CUSTOM'
           ,'EFX_SECCTRYNUM:invalid_ctrynum:CUSTOM'
@@ -1189,14 +1171,13 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,Base_Fields.InvalidMessage_EFX_MRKT_TOTALIND(1)
           ,Base_Fields.InvalidMessage_EFX_MRKT_TOTALSCORE(1)
           ,Base_Fields.InvalidMessage_EFX_PUBLIC(1)
-          ,Base_Fields.InvalidMessage_EFX_STATEC(1)
           ,Base_Fields.InvalidMessage_EFX_STKEXC(1)
           ,Base_Fields.InvalidMessage_EFX_PRIMSIC(1)
           ,Base_Fields.InvalidMessage_EFX_SECSIC1(1)
           ,Base_Fields.InvalidMessage_EFX_SECSIC2(1)
           ,Base_Fields.InvalidMessage_EFX_SECSIC3(1)
           ,Base_Fields.InvalidMessage_EFX_SECSIC4(1)
-          ,Base_Fields.InvalidMessage_EFX_STATE(1)
+          ,Base_Fields.InvalidMessage_norm_state(1)
           ,Base_Fields.InvalidMessage_EFX_ID(1)
           ,Base_Fields.InvalidMessage_EFX_NAME(1)
           ,Base_Fields.InvalidMessage_EFX_LEGAL_NAME(1)
@@ -1207,8 +1188,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,Base_Fields.InvalidMessage_EFX_BIZ(1)
           ,Base_Fields.InvalidMessage_EFX_RES(1)
           ,Base_Fields.InvalidMessage_EFX_CMRA(1)
-          ,Base_Fields.InvalidMessage_EFX_SECSTAT(1)
-          ,Base_Fields.InvalidMessage_EFX_STATEC2(1)
           ,Base_Fields.InvalidMessage_EFX_SECGEOPREC(1)
           ,Base_Fields.InvalidMessage_EFX_SECCTRYISOCD(1)
           ,Base_Fields.InvalidMessage_EFX_SECCTRYNUM(1)
@@ -1365,14 +1344,13 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.EFX_MRKT_TOTALIND_CUSTOM_ErrorCount
           ,le.EFX_MRKT_TOTALSCORE_CUSTOM_ErrorCount
           ,le.EFX_PUBLIC_CUSTOM_ErrorCount
-          ,le.EFX_STATEC_CUSTOM_ErrorCount
           ,le.EFX_STKEXC_CUSTOM_ErrorCount
           ,le.EFX_PRIMSIC_CUSTOM_ErrorCount
           ,le.EFX_SECSIC1_CUSTOM_ErrorCount
           ,le.EFX_SECSIC2_CUSTOM_ErrorCount
           ,le.EFX_SECSIC3_CUSTOM_ErrorCount
           ,le.EFX_SECSIC4_CUSTOM_ErrorCount
-          ,le.EFX_STATE_CUSTOM_ErrorCount
+          ,le.norm_state_CUSTOM_ErrorCount
           ,le.EFX_ID_CUSTOM_ErrorCount
           ,le.EFX_NAME_CUSTOM_ErrorCount
           ,le.EFX_LEGAL_NAME_CUSTOM_ErrorCount
@@ -1383,8 +1361,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.EFX_BIZ_ENUM_ErrorCount
           ,le.EFX_RES_ENUM_ErrorCount
           ,le.EFX_CMRA_ENUM_ErrorCount
-          ,le.EFX_SECSTAT_CUSTOM_ErrorCount
-          ,le.EFX_STATEC2_CUSTOM_ErrorCount
           ,le.EFX_SECGEOPREC_CUSTOM_ErrorCount
           ,le.EFX_SECCTRYISOCD_CUSTOM_ErrorCount
           ,le.EFX_SECCTRYNUM_CUSTOM_ErrorCount
@@ -1541,14 +1517,13 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.EFX_MRKT_TOTALIND_CUSTOM_ErrorCount
           ,le.EFX_MRKT_TOTALSCORE_CUSTOM_ErrorCount
           ,le.EFX_PUBLIC_CUSTOM_ErrorCount
-          ,le.EFX_STATEC_CUSTOM_ErrorCount
           ,le.EFX_STKEXC_CUSTOM_ErrorCount
           ,le.EFX_PRIMSIC_CUSTOM_ErrorCount
           ,le.EFX_SECSIC1_CUSTOM_ErrorCount
           ,le.EFX_SECSIC2_CUSTOM_ErrorCount
           ,le.EFX_SECSIC3_CUSTOM_ErrorCount
           ,le.EFX_SECSIC4_CUSTOM_ErrorCount
-          ,le.EFX_STATE_CUSTOM_ErrorCount
+          ,le.norm_state_CUSTOM_ErrorCount
           ,le.EFX_ID_CUSTOM_ErrorCount
           ,le.EFX_NAME_CUSTOM_ErrorCount
           ,le.EFX_LEGAL_NAME_CUSTOM_ErrorCount
@@ -1559,8 +1534,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.EFX_BIZ_ENUM_ErrorCount
           ,le.EFX_RES_ENUM_ErrorCount
           ,le.EFX_CMRA_ENUM_ErrorCount
-          ,le.EFX_SECSTAT_CUSTOM_ErrorCount
-          ,le.EFX_STATEC2_CUSTOM_ErrorCount
           ,le.EFX_SECGEOPREC_CUSTOM_ErrorCount
           ,le.EFX_SECCTRYISOCD_CUSTOM_ErrorCount
           ,le.EFX_SECCTRYNUM_CUSTOM_ErrorCount
@@ -1644,7 +1617,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.Record_Update_Refresh_Date_CUSTOM_ErrorCount
           ,le.EFX_DATE_CREATED_CUSTOM_ErrorCount,0) / le.TotalCnt + 0.5;
     END;
-    SummaryInfo := NORMALIZE(SummaryStats,175,Into(LEFT,COUNTER));
+    SummaryInfo := NORMALIZE(SummaryStats,172,Into(LEFT,COUNTER));
     orb_r := RECORD
       AllErrors.Src;
       STRING RuleDesc := TRIM(AllErrors.FieldName)+':'+TRIM(AllErrors.FieldType)+':'+AllErrors.ErrorType;

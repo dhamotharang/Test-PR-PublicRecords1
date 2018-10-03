@@ -1,5 +1,5 @@
 ﻿ 
-EXPORT MAC_PopulationStatistics(infile,Ref='',Input_dt_first_seen = '',Input_dt_last_seen = '',Input_dt_vendor_first_reported = '',Input_dt_vendor_last_reported = '',Input_process_date = '',Input_record_type = '',Input_normcompany_type = '',Input_normaddress_type = '',Input_EFX_BUSSTATCD = '',Input_EFX_CMSA = '',Input_EFX_CORPAMOUNTCD = '',Input_EFX_CORPAMOUNTPREC = '',Input_EFX_CORPAMOUNTTP = '',Input_EFX_CORPEMPCD = '',Input_EFX_WEB = '',Input_EFX_CTRYISOCD = '',Input_EFX_CTRYNUM = '',Input_EFX_CTRYTELCD = '',Input_EFX_GEOPREC = '',Input_EFX_MERCTYPE = '',Input_EFX_MRKT_TELESCORE = '',Input_EFX_MRKT_TOTALIND = '',Input_EFX_MRKT_TOTALSCORE = '',Input_EFX_PUBLIC = '',Input_EFX_STATEC = '',Input_EFX_STKEXC = '',Input_EFX_PRIMSIC = '',Input_EFX_SECSIC1 = '',Input_EFX_SECSIC2 = '',Input_EFX_SECSIC3 = '',Input_EFX_SECSIC4 = '',Input_EFX_STATE = '',Input_EFX_ID = '',Input_EFX_NAME = '',Input_EFX_LEGAL_NAME = '',Input_EFX_ADDRESS = '',Input_EFX_CITY = '',Input_EFX_REGION = '',Input_EFX_CTRYNAME = '',Input_EFX_COUNTYNM = '',Input_EFX_CMSADESC = '',Input_EFX_SOHO = '',Input_EFX_BIZ = '',Input_EFX_RES = '',Input_EFX_CMRA = '',Input_EFX_SECADR = '',Input_EFX_SECCTY = '',Input_EFX_SECSTAT = '',Input_EFX_STATEC2 = '',Input_EFX_SECGEOPREC = '',Input_EFX_SECREGION = '',Input_EFX_SECCTRYISOCD = '',Input_EFX_SECCTRYNUM = '',Input_EFX_SECCTRYNAME = '',Input_EFX_PHONE = '',Input_EFX_FAXPHONE = '',Input_EFX_BUSSTAT = '',Input_EFX_YREST = '',Input_EFX_CORPEMPCNT = '',Input_EFX_LOCEMPCNT = '',Input_EFX_LOCEMPCD = '',Input_EFX_CORPAMOUNT = '',Input_EFX_LOCAMOUNT = '',Input_EFX_LOCAMOUNTCD = '',Input_EFX_LOCAMOUNTTP = '',Input_EFX_LOCAMOUNTPREC = '',Input_EFX_TCKSYM = '',Input_EFX_PRIMSICDESC = '',Input_EFX_SECSICDESC1 = '',Input_EFX_SECSICDESC2 = '',Input_EFX_SECSICDESC3 = '',Input_EFX_SECSICDESC4 = '',Input_EFX_PRIMNAICSCODE = '',Input_EFX_SECNAICS1 = '',Input_EFX_SECNAICS2 = '',Input_EFX_SECNAICS3 = '',Input_EFX_SECNAICS4 = '',Input_EFX_PRIMNAICSDESC = '',Input_EFX_SECNAICSDESC1 = '',Input_EFX_SECNAICSDESC2 = '',Input_EFX_SECNAICSDESC3 = '',Input_EFX_SECNAICSDESC4 = '',Input_EFX_DEAD = '',Input_EFX_DEADDT = '',Input_EFX_MRKT_TELEVER = '',Input_EFX_MRKT_VACANT = '',Input_EFX_MRKT_SEASONAL = '',Input_EFX_MBE = '',Input_EFX_WBE = '',Input_EFX_MWBE = '',Input_EFX_SDB = '',Input_EFX_HUBZONE = '',Input_EFX_DBE = '',Input_EFX_VET = '',Input_EFX_DVET = '',Input_EFX_8a = '',Input_EFX_8aEXPDT = '',Input_EFX_DIS = '',Input_EFX_SBE = '',Input_EFX_BUSSIZE = '',Input_EFX_LBE = '',Input_EFX_GOV = '',Input_EFX_FGOV = '',Input_EFX_NONPROFIT = '',Input_EFX_HBCU = '',Input_EFX_GAYLESBIAN = '',Input_EFX_WSBE = '',Input_EFX_VSBE = '',Input_EFX_DVSBE = '',Input_EFX_MWBESTATUS = '',Input_EFX_NMSDC = '',Input_EFX_WBENC = '',Input_EFX_CA_PUC = '',Input_EFX_TX_HUB = '',Input_EFX_TX_HUBCERTNUM = '',Input_EFX_GSAX = '',Input_EFX_CALTRANS = '',Input_EFX_EDU = '',Input_EFX_MI = '',Input_EFX_ANC = '',Input_AT_CERT1 = '',Input_AT_CERT2 = '',Input_AT_CERT3 = '',Input_AT_CERT4 = '',Input_AT_CERT5 = '',Input_AT_CERT6 = '',Input_AT_CERT7 = '',Input_AT_CERT8 = '',Input_AT_CERT9 = '',Input_AT_CERT10 = '',Input_AT_CERTDESC1 = '',Input_AT_CERTDESC2 = '',Input_AT_CERTDESC3 = '',Input_AT_CERTDESC4 = '',Input_AT_CERTDESC5 = '',Input_AT_CERTDESC6 = '',Input_AT_CERTDESC7 = '',Input_AT_CERTDESC8 = '',Input_AT_CERTDESC9 = '',Input_AT_CERTDESC10 = '',Input_AT_CERTSRC1 = '',Input_AT_CERTSRC2 = '',Input_AT_CERTSRC3 = '',Input_AT_CERTSRC4 = '',Input_AT_CERTSRC5 = '',Input_AT_CERTSRC6 = '',Input_AT_CERTSRC7 = '',Input_AT_CERTSRC8 = '',Input_AT_CERTSRC9 = '',Input_AT_CERTSRC10 = '',Input_AT_CERTLEV1 = '',Input_AT_CERTLEV2 = '',Input_AT_CERTLEV3 = '',Input_AT_CERTLEV4 = '',Input_AT_CERTLEV5 = '',Input_AT_CERTLEV6 = '',Input_AT_CERTLEV7 = '',Input_AT_CERTLEV8 = '',Input_AT_CERTLEV9 = '',Input_AT_CERTLEV10 = '',Input_AT_CERTNUM1 = '',Input_AT_CERTNUM2 = '',Input_AT_CERTNUM3 = '',Input_AT_CERTNUM4 = '',Input_AT_CERTNUM5 = '',Input_AT_CERTNUM6 = '',Input_AT_CERTNUM7 = '',Input_AT_CERTNUM8 = '',Input_AT_CERTNUM9 = '',Input_AT_CERTNUM10 = '',Input_AT_CERTEXP1 = '',Input_AT_CERTEXP2 = '',Input_AT_CERTEXP3 = '',Input_AT_CERTEXP4 = '',Input_AT_CERTEXP5 = '',Input_AT_CERTEXP6 = '',Input_AT_CERTEXP7 = '',Input_AT_CERTEXP8 = '',Input_AT_CERTEXP9 = '',Input_AT_CERTEXP10 = '',Input_EFX_EXTRACT_DATE = '',Input_EFX_MERCHANT_ID = '',Input_EFX_PROJECT_ID = '',Input_EFX_FOREIGN = '',Input_Record_Update_Refresh_Date = '',Input_EFX_DATE_CREATED = '',OutFile) := MACRO
+EXPORT MAC_PopulationStatistics(infile,Ref='',Input_dt_first_seen = '',Input_dt_last_seen = '',Input_dt_vendor_first_reported = '',Input_dt_vendor_last_reported = '',Input_process_date = '',Input_record_type = '',Input_normcompany_type = '',Input_normaddress_type = '',Input_norm_state = '',Input_EFX_BUSSTATCD = '',Input_EFX_CMSA = '',Input_EFX_CORPAMOUNTCD = '',Input_EFX_CORPAMOUNTPREC = '',Input_EFX_CORPAMOUNTTP = '',Input_EFX_CORPEMPCD = '',Input_EFX_WEB = '',Input_EFX_CTRYISOCD = '',Input_EFX_CTRYNUM = '',Input_EFX_CTRYTELCD = '',Input_EFX_GEOPREC = '',Input_EFX_MERCTYPE = '',Input_EFX_MRKT_TELESCORE = '',Input_EFX_MRKT_TOTALIND = '',Input_EFX_MRKT_TOTALSCORE = '',Input_EFX_PUBLIC = '',Input_EFX_STKEXC = '',Input_EFX_PRIMSIC = '',Input_EFX_SECSIC1 = '',Input_EFX_SECSIC2 = '',Input_EFX_SECSIC3 = '',Input_EFX_SECSIC4 = '',Input_EFX_ID = '',Input_EFX_NAME = '',Input_EFX_LEGAL_NAME = '',Input_EFX_ADDRESS = '',Input_EFX_CITY = '',Input_EFX_REGION = '',Input_EFX_CTRYNAME = '',Input_EFX_COUNTYNM = '',Input_EFX_CMSADESC = '',Input_EFX_SOHO = '',Input_EFX_BIZ = '',Input_EFX_RES = '',Input_EFX_CMRA = '',Input_EFX_SECADR = '',Input_EFX_SECCTY = '',Input_EFX_SECGEOPREC = '',Input_EFX_SECREGION = '',Input_EFX_SECCTRYISOCD = '',Input_EFX_SECCTRYNUM = '',Input_EFX_SECCTRYNAME = '',Input_EFX_PHONE = '',Input_EFX_FAXPHONE = '',Input_EFX_BUSSTAT = '',Input_EFX_YREST = '',Input_EFX_CORPEMPCNT = '',Input_EFX_LOCEMPCNT = '',Input_EFX_LOCEMPCD = '',Input_EFX_CORPAMOUNT = '',Input_EFX_LOCAMOUNT = '',Input_EFX_LOCAMOUNTCD = '',Input_EFX_LOCAMOUNTTP = '',Input_EFX_LOCAMOUNTPREC = '',Input_EFX_TCKSYM = '',Input_EFX_PRIMSICDESC = '',Input_EFX_SECSICDESC1 = '',Input_EFX_SECSICDESC2 = '',Input_EFX_SECSICDESC3 = '',Input_EFX_SECSICDESC4 = '',Input_EFX_PRIMNAICSCODE = '',Input_EFX_SECNAICS1 = '',Input_EFX_SECNAICS2 = '',Input_EFX_SECNAICS3 = '',Input_EFX_SECNAICS4 = '',Input_EFX_PRIMNAICSDESC = '',Input_EFX_SECNAICSDESC1 = '',Input_EFX_SECNAICSDESC2 = '',Input_EFX_SECNAICSDESC3 = '',Input_EFX_SECNAICSDESC4 = '',Input_EFX_DEAD = '',Input_EFX_DEADDT = '',Input_EFX_MRKT_TELEVER = '',Input_EFX_MRKT_VACANT = '',Input_EFX_MRKT_SEASONAL = '',Input_EFX_MBE = '',Input_EFX_WBE = '',Input_EFX_MWBE = '',Input_EFX_SDB = '',Input_EFX_HUBZONE = '',Input_EFX_DBE = '',Input_EFX_VET = '',Input_EFX_DVET = '',Input_EFX_8a = '',Input_EFX_8aEXPDT = '',Input_EFX_DIS = '',Input_EFX_SBE = '',Input_EFX_BUSSIZE = '',Input_EFX_LBE = '',Input_EFX_GOV = '',Input_EFX_FGOV = '',Input_EFX_NONPROFIT = '',Input_EFX_HBCU = '',Input_EFX_GAYLESBIAN = '',Input_EFX_WSBE = '',Input_EFX_VSBE = '',Input_EFX_DVSBE = '',Input_EFX_MWBESTATUS = '',Input_EFX_NMSDC = '',Input_EFX_WBENC = '',Input_EFX_CA_PUC = '',Input_EFX_TX_HUB = '',Input_EFX_TX_HUBCERTNUM = '',Input_EFX_GSAX = '',Input_EFX_CALTRANS = '',Input_EFX_EDU = '',Input_EFX_MI = '',Input_EFX_ANC = '',Input_AT_CERT1 = '',Input_AT_CERT2 = '',Input_AT_CERT3 = '',Input_AT_CERT4 = '',Input_AT_CERT5 = '',Input_AT_CERT6 = '',Input_AT_CERT7 = '',Input_AT_CERT8 = '',Input_AT_CERT9 = '',Input_AT_CERT10 = '',Input_AT_CERTDESC1 = '',Input_AT_CERTDESC2 = '',Input_AT_CERTDESC3 = '',Input_AT_CERTDESC4 = '',Input_AT_CERTDESC5 = '',Input_AT_CERTDESC6 = '',Input_AT_CERTDESC7 = '',Input_AT_CERTDESC8 = '',Input_AT_CERTDESC9 = '',Input_AT_CERTDESC10 = '',Input_AT_CERTSRC1 = '',Input_AT_CERTSRC2 = '',Input_AT_CERTSRC3 = '',Input_AT_CERTSRC4 = '',Input_AT_CERTSRC5 = '',Input_AT_CERTSRC6 = '',Input_AT_CERTSRC7 = '',Input_AT_CERTSRC8 = '',Input_AT_CERTSRC9 = '',Input_AT_CERTSRC10 = '',Input_AT_CERTLEV1 = '',Input_AT_CERTLEV2 = '',Input_AT_CERTLEV3 = '',Input_AT_CERTLEV4 = '',Input_AT_CERTLEV5 = '',Input_AT_CERTLEV6 = '',Input_AT_CERTLEV7 = '',Input_AT_CERTLEV8 = '',Input_AT_CERTLEV9 = '',Input_AT_CERTLEV10 = '',Input_AT_CERTNUM1 = '',Input_AT_CERTNUM2 = '',Input_AT_CERTNUM3 = '',Input_AT_CERTNUM4 = '',Input_AT_CERTNUM5 = '',Input_AT_CERTNUM6 = '',Input_AT_CERTNUM7 = '',Input_AT_CERTNUM8 = '',Input_AT_CERTNUM9 = '',Input_AT_CERTNUM10 = '',Input_AT_CERTEXP1 = '',Input_AT_CERTEXP2 = '',Input_AT_CERTEXP3 = '',Input_AT_CERTEXP4 = '',Input_AT_CERTEXP5 = '',Input_AT_CERTEXP6 = '',Input_AT_CERTEXP7 = '',Input_AT_CERTEXP8 = '',Input_AT_CERTEXP9 = '',Input_AT_CERTEXP10 = '',Input_EFX_EXTRACT_DATE = '',Input_EFX_MERCHANT_ID = '',Input_EFX_PROJECT_ID = '',Input_EFX_FOREIGN = '',Input_Record_Update_Refresh_Date = '',Input_EFX_DATE_CREATED = '',OutFile) := MACRO
   IMPORT SALT37,Scrubs_Equifax_Business_Data;
   #uniquename(of)
   %of% := RECORD
@@ -54,6 +54,12 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_dt_first_seen = '',Input_dt_
       '' 
     #ELSE
         IF( le.Input_normaddress_type = (TYPEOF(le.Input_normaddress_type))'','',':normaddress_type')
+    #END
+ 
++    #IF( #TEXT(Input_norm_state)='' )
+      '' 
+    #ELSE
+        IF( le.Input_norm_state = (TYPEOF(le.Input_norm_state))'','',':norm_state')
     #END
  
 +    #IF( #TEXT(Input_EFX_BUSSTATCD)='' )
@@ -152,12 +158,6 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_dt_first_seen = '',Input_dt_
         IF( le.Input_EFX_PUBLIC = (TYPEOF(le.Input_EFX_PUBLIC))'','',':EFX_PUBLIC')
     #END
  
-+    #IF( #TEXT(Input_EFX_STATEC)='' )
-      '' 
-    #ELSE
-        IF( le.Input_EFX_STATEC = (TYPEOF(le.Input_EFX_STATEC))'','',':EFX_STATEC')
-    #END
- 
 +    #IF( #TEXT(Input_EFX_STKEXC)='' )
       '' 
     #ELSE
@@ -192,12 +192,6 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_dt_first_seen = '',Input_dt_
       '' 
     #ELSE
         IF( le.Input_EFX_SECSIC4 = (TYPEOF(le.Input_EFX_SECSIC4))'','',':EFX_SECSIC4')
-    #END
- 
-+    #IF( #TEXT(Input_EFX_STATE)='' )
-      '' 
-    #ELSE
-        IF( le.Input_EFX_STATE = (TYPEOF(le.Input_EFX_STATE))'','',':EFX_STATE')
     #END
  
 +    #IF( #TEXT(Input_EFX_ID)='' )
@@ -288,18 +282,6 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_dt_first_seen = '',Input_dt_
       '' 
     #ELSE
         IF( le.Input_EFX_SECCTY = (TYPEOF(le.Input_EFX_SECCTY))'','',':EFX_SECCTY')
-    #END
- 
-+    #IF( #TEXT(Input_EFX_SECSTAT)='' )
-      '' 
-    #ELSE
-        IF( le.Input_EFX_SECSTAT = (TYPEOF(le.Input_EFX_SECSTAT))'','',':EFX_SECSTAT')
-    #END
- 
-+    #IF( #TEXT(Input_EFX_STATEC2)='' )
-      '' 
-    #ELSE
-        IF( le.Input_EFX_STATEC2 = (TYPEOF(le.Input_EFX_STATEC2))'','',':EFX_STATEC2')
     #END
  
 +    #IF( #TEXT(Input_EFX_SECGEOPREC)='' )

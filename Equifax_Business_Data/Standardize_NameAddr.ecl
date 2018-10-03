@@ -36,10 +36,10 @@ EXPORT Standardize_NameAddr := MODULE
 			InvalidPart  := '%|UNKNOWN|UNKNOWN ADDRESS|PHYSICAL ADDRESS UNKNOWN|PYSICAL ADDRESS UNKNOWN|ADDRESS UNKNOWN|ADRESS UNKNOWN|UNKNOWN, UNKNOWN|ADDRESS UNKNOWN,|!|~';			
    				
 			cleanStreet  := REGEXREPLACE(InvalidPart,L.norm_Address,'');
-			
-			prepAddrLast 	  :=	L.norm_City + 
-														IF(L.norm_City <> '' and L.norm_State <> '', ', ', '') + L.norm_State + ' ' +
-														L.norm_Zip[1..5];
+					
+			prepAddrLast 	  :=	ut.CleanSpacesAndUpper(ut.CleanSpacesAndUpper(L.norm_city) + 
+														IF(L.norm_city <> '' and L.norm_State <> '', ', ', '') + L.norm_State + ' ' +
+													  IF(LENGTH(L.norm_Zip) >= 5, L.norm_Zip[1..5], ''));													
 			
 			clean_AddrPrep	:= IF(prepAddrLast <> '', Address.CleanAddress182(cleanStreet, prepAddrLast), '');	
 			Address.Layout_Clean182_fips	clean_AddrRec	:=	transfer(clean_AddrPrep, Address.Layout_Clean182_fips);
