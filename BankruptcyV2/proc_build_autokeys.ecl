@@ -3,13 +3,8 @@
 export proc_build_autokeys(string filedate, boolean isFCRA = false) := function
 
 todaysdate := ut.GetDate;
-
-// DF-22108 FCRA Consumer Data Deprecation for FCRA_BankruptcyKeys - thor_data400::key::bankruptcy::autokey::fcra::payload_qa
-b_fcra := BankruptcyV3.file_search_autokey;
-ut.MAC_CLEAR_FIELDS(b_fcra, b_fcra_cleared, BankruptcyV3.Constants().fields_to_clear.autokey_payload);
-
 b := if (isFCRA,
-			b_fcra_cleared,
+			BankruptcyV3.file_search_autokey,
 			BankruptcyV2.file_search_autokey(isFCRA)
 		 );
 
