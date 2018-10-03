@@ -1,4 +1,5 @@
-﻿OPTIONS:-gh -ga -p2 -gs2
+﻿//SALTVERSION:30
+OPTIONS:-gh -ga -p2 -gs2
 MODULE:BIPV2_LGID3 
 FILENAME:LGID3 
  
@@ -53,6 +54,7 @@ FIELD:company_fein:26,153
 FIELD:company_inc_state:PROP:FORCE(+,OR(active_duns_number),OR(duns_number),OR(duns_number_concept),OR(company_fein),OR(sbfe_id)):6,32
 FIELD:company_charter_number:PROP:CONTEXT(company_inc_state):26,97
 FIELD:cnp_btype:3,52
+
 // ----------------------------------------------------
 //  FYI -- no effect, but helpful during sample review
 // ----------------------------------------------------
@@ -93,3 +95,6 @@ FIELD:dt_first_seen:RECORDDATE(FIRST):0,0
 FIELD:dt_last_seen:RECORDDATE(LAST):0,0
 SOURCEFIELD:source:CONSISTENT(company_inc_state,company_charter_number,company_name,cnp_btype,company_fein):PARTITION(BIPV2.Mod_Sources.src2partition)
 BLOCKLINK:NAMED(OverLinks):BASIS(company_name)
+
+//Underlinks
+ATTRIBUTEFILE:UnderLinks:NAMED(file_underLink):VALUES(UnderLinkId):IDFIELD(LGID3):41,0

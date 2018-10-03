@@ -1,7 +1,7 @@
 ﻿import doxie_build,Criminal_Records,dops,DOPSGrowthCheck, corrections;
 export proc_build_DOC_keys(string filedate) := function
 
-GetDops:=dops.GetDeployedDatasets('P','B','F');
+GetDops:=dops.GetDeployedDatasets('P','B','N'); 
 OnlyCrim:=GetDops(datasetname='DOCKeys');
 father_filedate := OnlyCrim[1].buildversion;
 set of string	DistSet:=['offender_key'];
