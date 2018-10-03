@@ -87,9 +87,32 @@ Self:=Left;
 self := []; 
 ));
 
-PromoteSupers.Mac_SF_BuildProcess (Files.file_disciplinary,Constants.base_prefix_name+'disciplinary_actions',displinary_out,,,true);
-PromoteSupers.Mac_SF_BuildProcess (Files.file_individual,Constants.base_prefix_name+'individual_detail',detail_out,,,true);
-PromoteSupers.Mac_SF_BuildProcess (Files.file_regulatory,Constants.base_prefix_name+'regulatory_actions',regulatory_out,,,true);
+//
+
+cln_individual:=project(Files.file_individual,
+Transform(layouts.indv_detail,
+self.cln_start_dte:=if(left.start_dte !='',left.start_dte,'');
+self.cln_end_dte:=if(left.end_dte !='',left.end_dte,'');
+Self:=Left;
+));
+
+cln_disciplinary:=project(files.file_disciplinary,
+Transform(layouts.disp_action,
+self.cln_Action_dte:=if(left.Action_dte !='',Prof_License_Mari.DateCleaner.ToYYYYMMDD(Left.Action_dte),'');
+Self:=Left;
+));
+
+
+cln_regulatory :=project(Files.file_regulatory,
+Transform(Layouts.reg_action,
+self.cln_Action_dte:=if(left.Action_dte !='',Prof_License_Mari.DateCleaner.ToYYYYMMDD(Left.Action_dte),'');
+Self:=Left;
+));
+
+
+PromoteSupers.Mac_SF_BuildProcess (cln_disciplinary,Constants.base_prefix_name+'disciplinary_actions',displinary_out,,,true);
+PromoteSupers.Mac_SF_BuildProcess (cln_individual,Constants.base_prefix_name+'individual_detail',detail_out,,,true);
+PromoteSupers.Mac_SF_BuildProcess (cln_regulatory,Constants.base_prefix_name+'regulatory_actions',regulatory_out,,,true);
 PromoteSupers.Mac_SF_BuildProcess (reformatSearch,Constants.base_prefix_name+'search',base_out,,,true);
 
 export proc_build_base := sequential(displinary_out,detail_out,regulatory_out,base_out);			

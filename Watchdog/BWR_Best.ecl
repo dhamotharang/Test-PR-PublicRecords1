@@ -110,7 +110,7 @@ dout := if ( nothor( STD.File.fileexists( '~thor::wdog::wuinfo::'+var2 )),
                  ds + dataset( [ { var2,workunit}],stored_wu ),
 								  dataset( [ { var2,workunit}],stored_wu ) 
 								 );
-
+//modified code to fix using father
 dout_all :=  Sequential(output( dout ,,'~thor::wdog::wuinfo::'+var2+'::'+workunit[2..9] ,overwrite),									                                                   
 										   if (~(STD.File.Fileexists ( '~thor::wdog::wuinfo::'+var2)),STD.File.createsuperfile(  '~thor::wdog::wuinfo::'+var2)),
 										   if (~( STD.File.Fileexists ( '~thor::wdog::wuinfo::'+var2+'_father')),STD.File.createsuperfile(  '~thor::wdog::wuinfo::'+var2+'_father')),																				 
