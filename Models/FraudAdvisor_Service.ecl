@@ -1844,7 +1844,7 @@ Layout_AttributeGroup form_ParoAttributes(Models.Layout_FraudAttributes le) := T
 END;
 
 layout_FDAttributesOut formAttributeGroup(Models.Layout_FraudAttributes le) := transform
-	self.accountnumber := if(doAttributesVersion1 or doAttributesVersion2 OR doIDAttributes, account_value, '');
+	self.accountnumber := if(doAttributesVersion1 or doAttributesVersion2 OR doIDAttributes or doParoAttributes, account_value, '');
 	self.input.grade := Grade_Value;
 	self.input.Channel := Channel;
 	self.input.Income := Income;
