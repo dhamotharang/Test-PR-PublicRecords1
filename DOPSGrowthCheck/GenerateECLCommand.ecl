@@ -39,6 +39,6 @@ export GenerateECLCommand:= function
     END;
 
     dCombineCommands:=rollup(GenerateIndividualCommands,true,tCombineCommands(left,right));
-		finalcommand:='sequential('+dCombineCommands[1].FullCommand+');';
+		finalcommand:=dCombineCommands[1].FullCommand;
     return finalcommand;
 end;
