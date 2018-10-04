@@ -1,6 +1,6 @@
 ﻿import Address,Ut,_Validate, did_add, didville, did_add,watchdog, AID, AID_Support, STD, NID, Data_Services;
 
-// #CONSTANT(AID_Support.Constants.StoredWhichAIDCache, AID_Support.Constants.eCache.ForNonHeader);
+#CONSTANT(AID_Support.Constants.StoredWhichAIDCache, AID_Support.Constants.eCache.ForNonHeader);
 // #STORED('did_add_force','thor');
 
 rPreProcess	:=	RECORD,MAXLENGTH(Constants.InFileCSVMaxLength)
@@ -14,20 +14,20 @@ fPrepOrigNameField(string pNameInput)
 		string	lNameInputFiltered	:=	regexreplace('[^ a-z-]',trim(pNameInput,left,right),'',nocase);
 		string	lNameInputFix_1			:=	if(regexfind('-[a-z]-',lNameInputFiltered,nocase),regexreplace('-',lNameInputFiltered,''),lNameInputFiltered);
 		string	lNameInputFix_Final	:=	regexreplace('([-]{2,}|^-|-$)',lNameInputFix_1,'');
-		return	STD.Str.ToUpperCase(lNameInputFix_Final);
+		return	ut.CleanSpacesAndUpper(lNameInputFix_Final);
 	end
  ;
  
 fPreProcess(dataset(Layouts.In_Prepped) pRawFileInput) := FUNCTION
-
+		
 		rPreProcess tPreProcessPrep(pRawFileInput l) := TRANSFORM
 				self.orig_first_name	:=	fPrepOrigNameField(l.orig_first_name);
 				self.orig_last_name		:=	fPrepOrigNameField(l.orig_last_name);
-				self.orig_address			:=	STD.Str.ToUpperCase(trim(l.orig_address));
-				self.orig_city				:=	STD.Str.ToUpperCase(trim(l.orig_city));
-				self.orig_state				:=	STD.Str.ToUpperCase(trim(l.orig_state));
-				self.orig_email				:=	STD.Str.ToUpperCase(trim(l.orig_email));
-				self.orig_site				:=	STD.Str.ToUpperCase(trim(l.orig_site));
+				self.orig_address			:=	ut.CleanSpacesAndUpper(l.orig_address);
+				self.orig_city				:=	ut.CleanSpacesAndUpper(l.orig_city);
+				self.orig_state				:=	ut.CleanSpacesAndUpper(l.orig_state);
+				self.orig_email				:=	ut.CleanSpacesAndUpper(l.orig_email);
+				self.orig_site				:=	ut.CleanSpacesAndUpper(l.orig_site);
 				SELF.process_date			:= 	l.append_process_date;
 				SELF.date_vendor_first_reported	:=	l.Append_Process_Date;
 				SELF.date_vendor_last_reported	:=	l.Append_Process_Date;
@@ -43,10 +43,10 @@ fPreProcess(dataset(Layouts.In_Prepped) pRawFileInput) := FUNCTION
 		 ;
 		dPreProcessPrep	:=	PROJECT(pRawFileInput,tPreProcessPrep(left));
 		// tkirk:  Not so sure I get this filter.  So, if last name is profane, doesn't matter what email or first name are?  (Confirmed by JBello, 8/14/09)
-		dPreProcess			:=	dPreProcessPrep((~fn_profanity(orig_email) and ~fn_profanity(orig_first_name))
+		dPreProcessOut			:=	dPreProcessPrep((~fn_profanity(orig_email) and ~fn_profanity(orig_first_name))
 																		 or fn_profanity(orig_last_name)
 																			 );
-		RETURN dPreProcess;
+		RETURN dPreProcessOut;
 	END;
 	
 	dPreProcess			:=	fPreProcess(entiera.Files.In_Prepped());
@@ -76,9 +76,9 @@ fPreProcess(dataset(Layouts.In_Prepped) pRawFileInput) := FUNCTION
 
 	rPreProcess tProjectAIDClean_prep(rPreProcess pInput) := TRANSFORM
 		SELF.Append_Prep_Address1			:=	Address.fn_addr_clean_prep(pInput.orig_address, 'first');
-		SELF.Append_Prep_AddressLast	:=	Address.fn_addr_clean_prep(pInput.orig_city
-																							+	IF(pInput.orig_city <> '',', ','') + pInput.orig_state
-																							+	' ' + TRIM(pInput.orig_zip)+TRIM(pInput.orig_zip4), 'last');
+		SELF.Append_Prep_AddressLast	:=	Address.fn_addr_clean_prep( TRIM(pInput.orig_city)
+																							+	IF(pInput.orig_city <> '',', ','') + TRIM(pInput.orig_state)
+																							+	' ' + TRIM(pInput.orig_zip), 'last');
 		SELF := pInput;
 	END;
 
@@ -159,7 +159,8 @@ fPreProcess(dataset(Layouts.In_Prepped) pRawFileInput) := FUNCTION
 	rsCleanAIDGood	:=	rsCleanAIDGoodAddr + rsCleanAIDGoodNoAddr : persist('~thor::persist::entiera::cleaned_names_addresses');
 
 	//Set Base current_rec = false. Only records in recent file are current
-	ResetBase		:= PROJECT(Entiera.Files.Base, TRANSFORM(rPreProcess, SELF.unique_id := 0; SELF.current_rec := false; SELF := LEFT));
+	ResetBase		:= PROJECT(Entiera.Files.Base, TRANSFORM(rPreProcess, SELF.unique_id := 0; SELF.current_rec := FALSE; SELF := LEFT));
+
 	BasePlusIn	:=	rsCleanAIDGood + ResetBase;
 	
 	ut.MAC_Sequence_Records(BasePlusIn,unique_id,dSequenced);
@@ -177,54 +178,20 @@ fPreProcess(dataset(Layouts.In_Prepped) pRawFileInput) := FUNCTION
 																				-process_date,
 																				LOCAL
 															);
-	
-		// rPreFinal
-		 // :=
-		  // record,maxlength(Constants.PrepFileCSVMaxLength)
-				// rPreProcess;
-				// string8		date_first_seen;
- 		  	// string8		date_last_seen; - commented-snarra
-				// string8		date_vendor_first_reported;
-				// string8		date_vendor_last_reported;
-			// end
-		 // ;
-		
-		// rPreFinal	tPreFinal(dSorted pInput)
-		 // :=
-			// transform
-			// /*	self.date_first_seen						:=	fFixLoginDateForDateSeen(pInput.orig_login_date);
-				// self.date_last_seen							:=	fFixLoginDateForDateSeen(pInput.orig_login_date);
-				// commented-snarra
-			// */
-				// self.date_vendor_first_reported	:=	pInput.Append_Process_Date;
-				// self.date_vendor_last_reported	:=	pInput.Append_Process_Date;
-				// self														:=	pInput;
-			// end
-		 // ;
-		// dPreFinal	:=	project(dSorted,tPreFinal(left));
 
 		rPreProcess  tRollupDuplicates(dSorted pLeft, dSorted pRight)	:=	TRANSFORM
-		/*		self.date_first_seen 						:=	if(pLeft.date_first_seen <> '' and pLeft.date_first_seen < pRight.date_first_seen, 
-																							 pLeft.date_first_seen,
-																							 pRight.date_first_seen
-																							);
-				self.date_last_seen  						:=	if(pLeft.date_last_seen > pRight.date_last_seen,
-																							 pLeft.date_last_seen,
-																							 pRight.date_last_seen
-																							);
-																							commented-snarra
-																							
-		*/
+			//Fix missing process dates	
 				SELF.Process_Date    						:=	IF(pLeft.Process_Date > pRight.Process_Date, pLeft.Process_Date, pRight.Process_Date);
 				SELF.Date_Vendor_First_Reported :=	IF(pLeft.Date_Vendor_First_Reported > pRight.Date_Vendor_First_Reported, pRight.Date_Vendor_First_Reported, pLeft.Date_Vendor_First_Reported);
 				SELF.Date_Vendor_Last_Reported  :=	IF(pLeft.Date_Vendor_Last_Reported  < pRight.Date_Vendor_Last_Reported,  pRight.Date_Vendor_Last_Reported, pLeft.Date_Vendor_Last_Reported);
-				SELF.orig_login_date 						:=	IF(pLeft.orig_login_date <> '', 	pLeft.orig_login_date,		pRight.orig_login_date);	// Should we try to get earliest for actual "orig"?
-				SELF.orig_e360_id 							:=	IF(pLeft.orig_e360_id <> '',			pLeft.orig_e360_id, 			pRight.orig_e360_id);
-				SELF.orig_teramedia_id					:=	IF(pLeft.orig_teramedia_id <> '',	pLeft.orig_teramedia_id,	pRight.orig_teramedia_id);
+				SELF.orig_login_date 						:=	IF(pLeft.orig_login_date <> '', pLeft.orig_login_date, pRight.orig_login_date);	// Should we try to get earliest for actual "orig"?
+				SELF.ln_login_date 							:=	IF(pLeft.ln_login_date <> '', pLeft.ln_login_date, pRight.ln_login_date);
+				SELF.orig_e360_id 							:=	IF(pLeft.orig_e360_id <> '', pLeft.orig_e360_id, pRight.orig_e360_id);
+				SELF.orig_teramedia_id					:=	IF(pLeft.orig_teramedia_id <> '', pLeft.orig_teramedia_id, pRight.orig_teramedia_id);
 				
-				SELF.orig_ip 										:=	IF(pLeft.orig_ip <> '',	pLeft.orig_ip,	pRight.orig_ip);
-			  SELF.orig_pmghousehold_id  		  := 	IF(pLeft.orig_pmghousehold_id <> '',	pLeft.orig_pmghousehold_id,	pRight.orig_pmghousehold_id);
-        SELF.orig_site 									:=	IF(pLeft.orig_site <> '',	pLeft.orig_site,	pRight.orig_site);
+				SELF.orig_ip 										:=	IF(pLeft.orig_ip <> '',	pLeft.orig_ip, pRight.orig_ip);
+			  SELF.orig_pmghousehold_id  		  := 	IF(pLeft.orig_pmghousehold_id <> '', pLeft.orig_pmghousehold_id, pRight.orig_pmghousehold_id);
+        SELF.orig_site 									:=	IF(pLeft.orig_site <> '',	pLeft.orig_site, pRight.orig_site);
 				self.current_rec        				:=  IF(pLeft.Process_Date > pRight.Process_Date, pLeft.current_rec, pRight.current_rec);
 				SELF														:=	pLeft;
 		END;
@@ -324,19 +291,22 @@ fPreProcess(dataset(Layouts.In_Prepped) pRawFileInput) := FUNCTION
 																 left.unique_id = right.unique_id,
 																 tAppendDID_SSN_DOB(left,right),
 																 left outer
-																);
-																
-		//orig_login_date formatted to CCYYMMDD (Bug# 51741)											
-		Layouts.Base	tformatOrig_login_date(dAppendDID_SSN_DOB pInput):= TRANSFORM
-					self.ln_login_date		:=	MAP(
-																			REGEXFIND('(([0-1])?[0-9])/(([0-3])?[0-9])/((19|20)[0-9]{2})', TRIM(pInput.orig_login_date)) => REGEXFIND('(([0-1])?[0-9])/(([0-3])?[0-9])/((19|20)[0-9]{2})', TRIM(pInput.orig_login_date), 3)
-																								+(string2)INTFORMAT((unsigned1)REGEXFIND('(([0-1])?[0-9])/(([0-3])?[0-9])/((19|20)[0-9]{2})', TRIM(pInput.orig_login_date), 2), 2, 1)
-																								+(string2)INTFORMAT((unsigned1)REGEXFIND('(([0-1])?[0-9])/(([0-3])?[0-9])/((19|20)[0-9]{2})', TRIM(pInput.orig_login_date), 1), 2, 1),
-																			REGEXFIND('^(19|20)[0-9][0-9](0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])$', TRIM(pInput.orig_login_date)[1..8]) =>	TRIM(pInput.orig_login_date)[1..8],
-																		'');
-					self									:=	pInput;
+																);	// Already distributed from previous SSN append
+														
+		//orig_login_date formatted to CCYYMMDD (Bug# 51741)
+		fmtsin := [
+			'%m/%d/%Y',
+			'%Y-%m-%d',
+			'%Y%m%d'
+		];
+		fmtout := '%Y%m%d';
+		
+		Layouts.Base	tformatOrig_login_date(dAppendDID_SSN_DOB pInput) :=	TRANSFORM
+				self.ln_login_date    := 	STD.Date.ConvertDateFormatMultiple(pInput.orig_login_date,fmtsin,fmtout);
+				self									:=	pInput;
 		END;
 
-		dAppendDID_SSN_DOB_ln_login_date	:=	PROJECT(dAppendDID_SSN_DOB, tformatOrig_login_date(left));															
+		dAppendDID_SSN_DOB_ln_login_date	:=	PROJECT(dAppendDID_SSN_DOB, tformatOrig_login_date(left));
 
-EXPORT Standardized_Entiera_Data := dAppendDID_SSN_DOB_ln_login_date;//	:	persist('~thor::persist::entiera::standardized_entiera_data');
+
+EXPORT Standardized_Entiera_Data := dAppendDID_SSN_DOB_ln_login_date(trim(orig_first_name,left,right) <> '' and trim(orig_last_name,left,right) <> '');
