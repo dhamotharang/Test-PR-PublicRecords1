@@ -52,11 +52,7 @@ matchChars:=
 
 inf_dis:=distribute(infile
 		(
-		#if('S' in matchset or 'P' in matchset
-					and 'A' not in matchset
-					and 'C' not in matchset
-					and 'Z' not in matchset
-					and 'P' not in matchset)
+		#if('S' in matchset or 'P' in matchset)
 			(unsigned)ssn_field>0,
 		#end
 		#if('N' in matchset or 'V' in matchset)
@@ -66,27 +62,15 @@ inf_dis:=distribute(infile
 		#if('D' in matchset or 'B' in matchset)
 			(unsigned)dob_field>0,
 		#end		
-		#if('A' in matchset
-					and 'A' not in matchset
-					and 'C' not in matchset
-					and 'Z' not in matchset
-					and 'P' not in matchset)			
+		#if('A' in matchset)
 			prange_field<>'',
 			pname_field<>'',
 		#end
-		#if('C' in matchset
-					and 'A' not in matchset
-					and 'C' not in matchset
-					and 'Z' not in matchset
-					and 'P' not in matchset)			
+		#if('C' in matchset)
 			city_field<>'',
 			state_field<>'',
 		#end
-		#if('Z' in matchset
-					and 'A' not in matchset
-					and 'C' not in matchset
-					and 'Z' not in matchset
-					and 'P' not in matchset)			
+		#if('Z' in matchset)
 			zip_field<>'',
 		#end
 		lname_field<>''
@@ -100,45 +84,24 @@ inf_dis:=distribute(infile
 			lname_field,
 			fname_field[1],		
 		#end	
-		#if('S' in matchset
-					and 'A' not in matchset
-					and 'C' not in matchset
-					and 'Z' not in matchset
-					and 'P' not in matchset)		
+		#if('S' in matchset)
 			ssn_field,
 		#end
-		#if('P' in matchset
-					and 'A' not in matchset
-					and 'C' not in matchset
-					and 'Z' not in matchset
-					and 'S' not in matchset
-					and 'V' not in matchset)		
+		#if('P' in matchset)
 			ssn_field[6..9],
 		#end		
 		#if('D' in matchset or 'B' in matchset)
 			dob_field,
 		#end	
-		#if('A' in matchset
-					and 'S' not in matchset
-					and 'P' not in matchset
-					and 'B' not in matchset
-					and 'V' not in matchset)
+		#if('A' in matchset)
 			prange_field,
 			pname_field,
 		#end
-		#if('C' in matchset
-					and 'S' not in matchset
-					and 'P' not in matchset
-					and 'B' not in matchset
-					and 'V' not in matchset)
+		#if('C' in matchset)
 			city_field,
 			state_field,
 		#end
-		#if('Z' in matchset
-					and 'S' not in matchset
-					and 'P' not in matchset
-					and 'B' not in matchset
-					and 'V' not in matchset)		
+		#if('Z' in matchset)
 			zip_field,
 		#end
 		''
@@ -202,17 +165,17 @@ match:=join(inf_ddp,inf_ddp,
 		#end
 
 		#if('B' in matchset)
-			header.gens_ok(left.suffix_field,(unsigned)left.dob_field,right.suffix_field,(unsigned)right.dob_field) and
+			header.gens_ok(left.suffix_field,left.dob_field,right.suffix_field,right.dob_field) and
 			(unsigned)left.dob_field>0 and
 			(unsigned)right.dob_field>0 and
 			#if(dob_threshold = 3)
-				header.sig_near_dob((unsigned)left.dob_field,(unsigned)right.dob_field) and
+				header.sig_near_dob(left.dob_field,right.dob_field) and
 			#elseif(dob_threshold = 2)
-				header.date_value((unsigned)left.dob_field,(unsigned)right.dob_field) > 1 and
+				header.date_value(left.dob_field,right.dob_field) > 1 and
 			#elseif(dob_threshold = 1)
-				header.date_value((unsigned)left.dob_field,(unsigned)right.dob_field) > 0 and
+				header.date_value(left.dob_field,right.dob_field) > 0 and
 			#else
-				header.sig_near_dob((unsigned)left.dob_field,(unsigned)right.dob_field) and
+				header.sig_near_dob(left.dob_field,right.dob_field) and
 			#end
 		#end
 
@@ -221,7 +184,6 @@ match:=join(inf_ddp,inf_ddp,
 			right.pname_field<>'' and
 			left.pname_field=right.pname_field and
 			left.prange_field=right.prange_field and
-			left.ssn_field='' and
 		#end		
 
 		#if('C' in matchset)
@@ -231,18 +193,16 @@ match:=join(inf_ddp,inf_ddp,
 			right.state_field<>'' and
 			left.city_field=right.city_field and
 			left.state_field=right.state_field and
-			left.ssn_field='' and
 		#end
 
 		#if('Z' in matchset)
 			left.zip_field<>'' and
 			right.zip_field<>'' and
 			left.zip_field=right.zip_field and
-			left.ssn_field='' and
 		#end
 
 		true	//the one just keeps the "and" from messing it up
 		,tr(left,right)
 		,local);
-		outfile := dedup(sort(match,old_rid,new_rid), old_rid, local);
+		outfile := dedup(sort(match,old_rid,new_rid), old_rid);
 endmacro;

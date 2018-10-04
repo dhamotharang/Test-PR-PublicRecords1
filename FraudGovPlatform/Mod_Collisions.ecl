@@ -1,41 +1,9 @@
-﻿import FraudShared;
-EXPORT Mod_Collisions(DATASET(FraudShared.Layouts.Base.Main) FileBase) := Module
+﻿EXPORT Mod_Collisions(DATASET(DidSlim) SlimBase) := Module
 
 SHARED threashold:=enum(unsigned1,Low,Medium,High);
 SHARED ssn_threashold:=threashold;
 SHARED dob_threashold:=threashold;
 
-export DidSlim := 
-record
-	string20		fname;
-	string20		mname;
-	string20		lname;
-	string5			name_suffix;
-	string10		prim_range;
-	string28		prim_name;
-	string25		v_city_name;
-	string5			zip;
-	string2			st;
-	string9			ssn;
-	unsigned		dob;
-	unsigned6		did := 0;
-	unsigned1		did_score := 0;
-end;
-
-SHARED	SlimBase := project(FileBase, 
-												transform(DidSlim, 
-														SELF.fname:=LEFT.raw_first_name;
-														SELF.lname:=LEFT.raw_last_name;
-														SELF.name_suffix:= LEFT.raw_Orig_Suffix; 
-														SELF.ssn := LEFT.ssn; 
-														SELF.dob := (unsigned)LEFT.dob; 
-														SELF.prim_range := LEFT.clean_address.prim_range; 
-														SELF.prim_name := LEFT.clean_address.prim_name; 
-														SELF.v_city_name := LEFT.clean_address.v_city_name; 
-														SELF.st := LEFT.clean_address.st; 
-														SELF.zip := LEFT.zip; 
-														SELF := LEFT; 
-														SELF := []));
 //////////////////////////////////
 // 'NSD'=> 1             //LASTNAME & FIRSTNAME    & SSN      & DOB
 matchset:=['N','S','D'];
@@ -155,12 +123,6 @@ Mac_find_collisions(
 EXPORT N_D_A_Z_col:=dsOut;
 
 //////////////////////////////////
-// output(N_S_D_col, named('N_S_D_col'));
-// output(V_S_D_col, named('V_S_D_col'));
-// output(N_S_B_col, named('N_S_B_col'));
-// output(N_P_D_col, named('N_P_D_col'));
-// output(N_D_A_C_Z_col, named('N_D_A_C_Z_col'));
-// output(N_D_A_Z_col, named('N_D_A_Z_col'));
 
 concat_all := //sort(
 			N_S_D_col
@@ -178,16 +140,16 @@ concat_srt
 										,new_rid
 										,old_rid
 										)
-										// :persist('~otto::persist::concat_srt')
+										:persist('~otto::persist::concat_srt')
 										;
 concat_ddp
 					:=
 							dedup(concat_srt
 										,old_rid
 										)
-										// :persist('~otto::persist::concat_ddp')
+										:persist('~otto::persist::concat_ddp')
 										;
 
-EXPORT matches := sort(concat_ddp,new_rid, pri);
+EXPORT matches := sort(concat_ddp,-new_rid, -pri);
 
 END;
