@@ -9,6 +9,7 @@ EXPORT Boca_Shell_Bankrucpty_FCRAHist (	integer bsVersion, unsigned8 BSOptions=0
 	bans_search := BankruptcyV3.key_bankruptcyv3_search_full_bip(true);
 
 	insurance_fcra_filter :=  (BSOptions & Risk_Indicators.iid_constants.BSOptions.InsuranceFCRAMode) > 0;
+	insurance_bk_chapter_exception := (BSOptions & Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyException) > 0;
 
 	Risk_Indicators.Layouts_Derog_Info.layout_derog_process := RECORD
 			Risk_Indicators.layouts.layout_derogs_input;
@@ -118,7 +119,7 @@ EXPORT Boca_Shell_Bankrucpty_FCRAHist (	integer bsVersion, unsigned8 BSOptions=0
 							LEFT.bk_tmsid<>'' AND
 							keyed(LEFT.bk_tmsid = RIGHT.tmsid) AND
 							right.name_type='D' and
-							trim(right.chapter) in risk_indicators.iid_constants.set_permitted_bk_chapters(bsversion, insurance_fcra_filter) and
+							trim(right.chapter) in risk_indicators.iid_constants.set_permitted_bk_chapters(bsversion, insurance_bk_chapter_exception) and
 						 (unsigned)right.did=left.did and
 						 (unsigned)(RIGHT.date_filed[1..6]) < left.historydate and
 							if(insurance_fcra_filter and right.chapter in ['7','13'],
@@ -132,7 +133,7 @@ EXPORT Boca_Shell_Bankrucpty_FCRAHist (	integer bsVersion, unsigned8 BSOptions=0
 						 LEFT.bk_tmsid = RIGHT.tmsid AND
 						 (unsigned)right.did=left.did and
 						 (unsigned)(RIGHT.date_filed[1..6]) < left.historydate and
-             trim(right.chapter) in risk_indicators.iid_constants.set_permitted_bk_chapters(bsversion, insurance_fcra_filter) and
+             trim(right.chapter) in risk_indicators.iid_constants.set_permitted_bk_chapters(bsversion, insurance_bk_chapter_exception) and
 							if(insurance_fcra_filter and right.chapter in ['7','13'],
 								FCRA.bankrupt_is_ok(Risk_Indicators.iid_constants.myGetDate(left.historydate), right.date_filed, left.insurance_bk_filter, insurance_fcra_filter),
 								FCRA.bankrupt_is_ok(Risk_Indicators.iid_constants.myGetDate(left.historydate), right.date_filed, left.insurance_bk_filter)),
@@ -244,7 +245,7 @@ EXPORT Boca_Shell_Bankrucpty_FCRAHist (	integer bsVersion, unsigned8 BSOptions=0
 							keyed(LEFT.bk_tmsid = RIGHT.tmsid) AND
 							right.name_type='D' and
 						 (unsigned)right.did=left.did and
-						 trim(right.chapter) in risk_indicators.iid_constants.set_permitted_bk_chapters(bsversion, insurance_fcra_filter) and
+						 trim(right.chapter) in risk_indicators.iid_constants.set_permitted_bk_chapters(bsversion, insurance_bk_chapter_exception) and
 						 (unsigned)(RIGHT.date_filed[1..6]) < (left.historydate + 200) and
 							if(insurance_fcra_filter and right.chapter in ['7','13'],
 								FCRA.bankrupt_is_ok(iid_constants.myGetDate(left.historydate), right.date_filed, left.insurance_bk_filter, insurance_fcra_filter),
