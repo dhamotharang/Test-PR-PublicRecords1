@@ -181,10 +181,10 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 			// output(deltabase_recs,named('deltabase_recs'));
 			// output(delta_w_fdn_file_info,named('delta_w_fdn_file_info'));
 			// output(payload_mbs_filtered,named('payload_mbs_filtered'));
-			//output(payload_mbs_filtered,named('payload_mbs_filtered'));
+			// output(payload_mbs_filtered,named('payload_mbs_filtered'));
 			
 			// return payload_mbs_filtered;
-			return delta_w_fdn_file_info;
+			return payload_mbs_filtered;
 	END;
 
 	EXPORT getDeltabaseReportRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) in_recs) := FUNCTION
