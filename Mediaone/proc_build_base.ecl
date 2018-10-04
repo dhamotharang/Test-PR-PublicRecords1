@@ -26,10 +26,17 @@ EXPORT proc_build_base(STRING8 version) := FUNCTION
   END;
 	
 	//Send names to cleaner
+		fmtsin := [
+		'%m/%d/%Y',
+		'%Y-%m-%d',
+		'%Y%m%d'
+	];
+	fmtout := '%Y%m%d';
+	
 	layout_name_clean tPrep(dsCleanOut L):= TRANSFORM
     SELF.date_vendor_first_reported := version;
     SELF.date_vendor_last_reported  := version;
-    SELF.date_first_seen            := Mediaone.fn_format_date(L.date_time);
+    SELF.date_first_seen            := STD.Date.ConvertDateFormatMultiple(L.date_time,fmtsin,fmtout);
     SELF.date_last_seen             := SELF.date_first_seen;
     SELF	:= L;
 		SELF	:= [];
@@ -111,7 +118,6 @@ EXPORT proc_build_base(STRING8 version) := FUNCTION
     SELF.clean_geo_match     := L.aidwork_acecache.geo_match;
     SELF.clean_err_stat      := L.aidwork_acecache.err_stat;
     SELF.aid                 := L.aidwork_rawaid;
-		SELF.current_rec				 := TRUE;
     SELF                     := L;
     SELF                     := [];
   END;
@@ -146,7 +152,6 @@ EXPORT proc_build_base(STRING8 version) := FUNCTION
 		SELF.clean_geo_blk  		:=  cl_addr[171..177];
 		SELF.clean_geo_match  	:=  cl_addr[178];
 		SELF.clean_err_stat  		:=  cl_addr[179..182];
-		SELF.current_rec				:= TRUE;
 		SELF  									:= 	L;
 		SELF                    := [];
 	END;
@@ -167,10 +172,7 @@ EXPORT proc_build_base(STRING8 version) := FUNCTION
 
   // merge the new data with the existing basefile.  Then roll it up on the
   // email and name fields, keeping the pertinent first and last date information
-	//Set Base current_rec = false. Only records in recent file are current
-	ResetBase	:= PROJECT(Mediaone.file_base.file, TRANSFORM(Mediaone.file_base.layout, SELF.current_rec := false; SELF := LEFT));
-  mergeddata:= SORT(basefile + ResetBase, email, clean_fname, clean_mname, clean_lname, clean_p_city_name, clean_st, clean_zip, -Date_Vendor_Last_Reported);
-	
+  mergeddata:=SORT(basefile+Mediaone.file_base.file,email,clean_fname,clean_mname,clean_lname);
   Mediaone.file_base.layout rollitup(Mediaone.file_base.layout L,Mediaone.file_base.layout R):=TRANSFORM
     SELF.date_first_seen:=IF(L.date_first_seen<R.date_first_seen,L.date_first_seen,R.date_first_seen);
     SELF.date_last_seen:=IF(L.date_last_seen>R.date_last_seen,L.date_last_seen,R.date_last_seen);
@@ -178,8 +180,8 @@ EXPORT proc_build_base(STRING8 version) := FUNCTION
     SELF.date_vendor_last_reported:=IF(L.date_vendor_last_reported>R.date_vendor_last_reported,L.date_vendor_last_reported,R.date_vendor_last_reported);
     SELF:=IF(L.date_vendor_last_reported>R.date_vendor_last_reported,L,R);
   END;
-  //BOOLEAN basefileexists:= nothor(fileservices.GetSuperFileSubCount(Data_Services.foreign_prod+'thor::base::mediaone'))>0;
-  newbasefile := ROLLUP(mergeddata,rollitup(LEFT,RIGHT),email,clean_fname,clean_mname,clean_lname,clean_p_city_name,clean_st,clean_zip,LOCAL);
+  BOOLEAN basefileexists:= nothor(fileservices.GetSuperFileSubCount('~thor::base::mediaone'))>0;
+  newbasefile:=DISTRIBUTE(IF(basefileexists,ROLLUP(mergeddata,rollitup(LEFT,RIGHT),email,clean_fname,clean_mname,clean_lname,LOCAL),basefile),HASH32(email));
 
   RETURN newbasefile;
 END;
