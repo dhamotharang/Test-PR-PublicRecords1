@@ -492,7 +492,8 @@ export bureau_sources := ['EQ', 'EN', 'TN'];
 		Judgment = 1 										<< 26,
 		Eviction = 1										<< 27,
 		SSNLienFtlr = 1									<< 28,
-		BCBLienFtlr = 1									<< 29
+		BCBLienFtlr = 1									<< 29,
+		InsuranceFCRABankruptcyException = 1 << 30
 		);
 
 export CheckifFlagged(string inString, integer Position) :=  if(inString[Position] = '0', true, false);

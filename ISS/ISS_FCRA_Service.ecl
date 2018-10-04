@@ -278,7 +278,7 @@ export ISS_FCRA_Service := MACRO
 	boolean   doScore 						:= true;
 	unsigned1 AppendBest					:= 1;	// search best file
 	unsigned8 BSOptions						:= if(FilterLiens, risk_indicators.iid_constants.BSOptions.FilterLiens, 0 ) + //DRM to drive Liens/Judgments;
-                                    Risk_Indicators.iid_constants.BSOptions.InsuranceFCRAMode;
+													Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyException;
 	
 
 	clam := Risk_Indicators.Boca_Shell_Function_FCRA(	iid_prep, 
