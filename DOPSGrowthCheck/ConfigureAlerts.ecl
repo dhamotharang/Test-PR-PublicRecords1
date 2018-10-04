@@ -13,7 +13,7 @@
 		FinalSet:=loadfile;
 	#END
 	
-	CreateNewfile:=output(FinalSet,,'~thor_data400::DeltaStats::AlertConfigurations::'+workunit,thor,compressed);
+	CreateNewfile:=output(FinalSet,,'~thor_data400::DeltaStats::AlertConfigurations::'+workunit+KeyNickNameIn,thor,compressed);
 
 	ClearFiles:=nothor(global(sequential(STD.File.StartSuperFileTransaction(),
 										STD.File.ClearSuperFile('~thor_data400::DeltaStats::AlertConfigurations',true),
@@ -24,7 +24,7 @@
 										ClearFiles,
 										nothor(global(sequential(
 										STD.File.StartSuperFileTransaction(),
-										STD.File.AddSuperFile('~thor_data400::DeltaStats::AlertConfigurations','~thor_data400::DeltaStats::AlertConfigurations::'+workunit),
+										STD.File.AddSuperFile('~thor_data400::DeltaStats::AlertConfigurations','~thor_data400::DeltaStats::AlertConfigurations::'+workunit+KeyNickNameIn),
 										STD.File.FinishSuperFileTransaction()))));
 	
 endmacro;
