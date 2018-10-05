@@ -1,4 +1,4 @@
-dbasebuilt  := BIPV2_ProxID.files('20130925a_45',true).base.logical;  //this was 1 iteration run on top of a completely fixed input file(no foreign corpkey overlinks)
+﻿dbasebuilt  := BIPV2_ProxID.files('20130925a_45',true).base.logical;  //this was 1 iteration run on top of a completely fixed input file(no foreign corpkey overlinks)
 daggProxid        := tools.mac_AggregateFieldsPerID(dbasebuilt,proxid,['foreign_corp_key','cnp_name','company_name'],false);
 dagg_badProxid    := daggProxid(count(foreign_corp_keys) != count(table(foreign_corp_keys,{state := trim(foreign_corp_key,left,right)[1..2]},trim(foreign_corp_key,left,right)[1..2])));
 output(dbasebuilt     ,named('dbasebuilt'));
