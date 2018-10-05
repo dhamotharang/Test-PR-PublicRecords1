@@ -264,7 +264,7 @@ end;
 		
 export t_RiskView2Alert := record
 	string4 Code {xpath('Code')};
-	string150 Description {xpath('Description')};
+	string300 Description {xpath('Description')};
 end;
 		
 export t_RiskView2Report := record
