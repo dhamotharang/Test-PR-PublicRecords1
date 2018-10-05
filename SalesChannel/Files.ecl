@@ -2,7 +2,7 @@
 
 export Files(
 	 string		pversion							= ''
-	,boolean	pUseOtherEnvironment	= TRUE
+	,boolean	pUseOtherEnvironment	= FALSE
 ) :=
 module
 
