@@ -260,6 +260,7 @@ export mod_sources := module
     + MDR.sourceTools.set_Workers_Compensation 
     + MDR.sourceTools.set_Yellow_Pages         
     + MDR.sourceTools.set_Cortera         
+    + MDR.sourceTools.set_Infutor_NARB        
   ;
   
   // -- ingest_blacklist
@@ -311,6 +312,7 @@ export mod_sources := module
     + MDR.sourceTools.set_Workers_Compensation 
     + MDR.sourceTools.set_Yellow_Pages                  
     + MDR.sourceTools.set_Cortera                 
+    + MDR.sourceTools.set_Infutor_NARB                 
   ;
 
   export base_blacklist :=
@@ -390,6 +392,7 @@ export mod_sources := module
 		MDR.sourceTools.SourceIsCClue                 (src) => '37',
 		MDR.sourceTools.SourceIsBusiness_Credit       (src) => '38',
 		MDR.sourceTools.SourceIsCortera               (src) => '39',
+		MDR.sourceTools.SourceIsInfutor_NARB               (src) => '40',
 		nonCode
 	);
 	export boolean srcInBIPV2Header(string2 src) := src2numCode(src) <> nonCode;
@@ -420,6 +423,7 @@ export mod_sources := module
 		,MDR.sourceTools.set_Experian_CRDB	// S27
     ,MDR.sourceTools.set_Business_Credit// S31
     ,MDR.sourceTools.set_Cortera        // S61(BH-501)
+    ,MDR.sourceTools.set_Infutor_NARB        // S61(BH-528)
     ,MDR.sourceTools.set_Workers_Compensation // S62a(BH-502)
     ,MDR.sourceTools.set_CClue                // S62a
     ,MDR.sourceTools.set_BBB                  // S62a
@@ -508,6 +512,7 @@ export mod_sources := module
 		'36' => MDR.sourceTools.set_Experian_CRDB[1],
 		'37' => MDR.sourceTools.set_CClue[1],
 		'39' => MDR.sourceTools.set_Cortera[1],
+		'40' => MDR.sourceTools.set_Infutor_NARB[1],
 		nonCode
 	);
 	export TranslateCode(string2 code) := TranslateSource_aggregate(code2src1(code));
