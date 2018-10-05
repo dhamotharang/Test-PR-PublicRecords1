@@ -1,4 +1,4 @@
-import	Address, AID;
+﻿import	Address, AID;
 
 export Layouts
  :=
@@ -47,8 +47,8 @@ export Layouts
 				string			orig_address;
 				string			orig_city;
 				string			orig_state;
-				string			orig_zip;
-				string			orig_zip4;
+				string5			orig_zip;
+				string4			orig_zip4;
 				string			orig_email;
 				string			orig_ip;
 				string			orig_login_date;
@@ -71,6 +71,7 @@ export Layouts
 				string8			date_last_seen;
 				string8			date_vendor_first_reported;
 				string8			date_vendor_last_reported;
+				BOOLEAN 		current_rec;
 			end
 		 ;
 
