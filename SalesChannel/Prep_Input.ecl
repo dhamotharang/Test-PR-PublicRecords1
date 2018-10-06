@@ -11,7 +11,7 @@ function
 		//////////////////////////////////////////////////////////////////////////////////////
 		// -- Map Fields
 		//////////////////////////////////////////////////////////////////////////////////////
-	Layouts.Base tCleanFields(pInputFile L) := TRANSFORM
+	Layouts.Base_new tCleanFields(pInputFile L) := TRANSFORM
 		SELF.Date_First_Seen 						:= (unsigned4)pversion[1..8];			//no date field in record, so have to use version passed in, which 
 		SELF.Date_Last_Seen  						:= SELF.Date_First_Seen;//should be the receiving date
 		SELF.Date_Vendor_First_Reported	:= (unsigned4)pversion[1..8];
@@ -52,7 +52,7 @@ function
 	business_flags := ['B'];
 	InvName_flags	:= ['I'];
 	
-	Layouts.Base tStandardizeName(FileClnName L) := TRANSFORM
+	Layouts.Base_new tStandardizeName(FileClnName L) := TRANSFORM
 		BOOLEAN IsName							:=	L.nametype IN person_flags OR	(L.nametype = 'U' AND trim(L.cln_fname) != '' AND TRIM(L.cln_lname) != '');
 		SELF.clean_name.title				:= IF(IsName,L.cln_title, '');
 		SELF.clean_name.fname				:= IF(IsName,L.cln_fname, '');
