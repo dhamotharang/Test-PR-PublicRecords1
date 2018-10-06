@@ -1,9 +1,9 @@
-IMPORT BIPV2, ut, mdr, _Validate;
+﻿IMPORT BIPV2, ut, mdr, _Validate;
 
-Export As_Business_Linking_Contact (DATASET(saleschannel.layouts.base) pBase = saleschannel.Files().base.qa) := FUNCTION
+Export As_Business_Linking_Contact (DATASET(saleschannel.layouts.base_new) pBase = saleschannel.Files().base.qa) := FUNCTION
 
 	  //CONTACT MAPPING
-		BIPV2.Layout_Business_Linking_Full trfMAPBLInterface(saleschannel.layouts.base l) := TRANSFORM
+		BIPV2.Layout_Business_Linking_Full trfMAPBLInterface(saleschannel.layouts.base_new l) := TRANSFORM
         SELF.source                      	:= 	mdr.sourceTools.src_SalesChannel; 
 				SELF.dt_first_seen              	:= 	l.date_first_seen;
 				SELF.dt_last_seen               	:=  l.date_last_seen;
