@@ -22,7 +22,9 @@ EXPORT RiskViewReport_RptFunction(dataset (risk_indicators.Layout_Boca_Shell) bo
     ssn_flags := CHOOSEN (fcra.key_override_flag_ssn (l_ssn=bs.shell_Input.ssn, datalib.NameMatch (bs.shell_Input.fname, bs.shell_Input.mname, bs.shell_Input.lname, fname, mname, lname)<3), risk_indicators.iid_constants.MAX_OVERRIDE_LIMIT);
     did_flags := CHOOSEN (fcra.key_override_flag_did (keyed (l_did=(string)bs.did)), risk_indicators.iid_constants.MAX_OVERRIDE_LIMIT);
     flags := PROJECT (did_flags, fcra.Layout_override_flag) + PROJECT (ssn_flags, fcra.Layout_override_flag);
-		flagrecs := CHOOSEN (dedup (flags, ALL), risk_indicators.iid_constants.MAX_OVERRIDE_LIMIT);
+		flagrecs_original := CHOOSEN (dedup (flags, ALL), risk_indicators.iid_constants.MAX_OVERRIDE_LIMIT);	
+		personContext_flags := risk_indicators.AddConsumerStatementsToFlagFile(bocashell[1].ConsumerStatements);
+		flagrecs := flagrecs_original + personContext_flags;
 
 // Watercraft information...
 		watercrafts := RiskWiseFCRA._watercraft_data (dids_input, flagrecs, nss);
