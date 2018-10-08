@@ -54,6 +54,8 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 		self.Work_Phone_Cln := Models.Healthcare_SocioEconomic_Functions_RT_Service.PhoneCleaner(le.Work_Phone_in);
 		self.ADMIT_DATE_Cln := Models.Healthcare_SocioEconomic_Functions_RT_Service.DOBCleaner(le.ADMIT_DATE_in);
 		self.MemberGENDer_Cln := Models.Healthcare_SocioEconomic_Functions_RT_Service.GenderCleaner(le.MemberGENDer_in);
+		self.Name_First := Models.Healthcare_SocioEconomic_Functions_RT_Service.FirstAndLastNameValidator(le.Name_First);
+		self.Name_Last := Models.Healthcare_SocioEconomic_Functions_RT_Service.FirstAndLastNameValidator(le.Name_Last);
 		self := le;
 	END;
 
