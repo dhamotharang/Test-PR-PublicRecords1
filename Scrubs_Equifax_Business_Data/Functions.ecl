@@ -22,14 +22,6 @@ EXPORT Functions := MODULE
 	EXPORT fn_rcid(STRING s) := function    
 	  RETURN IF(LENGTH(s) in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] AND Stringlib.StringFilterOut(s, '0123456789') = '', 1, 0);
   END;
-	
-	//****************************************************************************
-  //fn_numeric: 	returns true if only populated with numbers
-  //****************************************************************************  
-	EXPORT fn_numeric(STRING nmbr, UNSIGNED1 size = 0) := FUNCTION
-    RETURN IF(IF(size = 0, LENGTH(TRIM(nmbr, ALL)) > 0, LENGTH(TRIM(nmbr, ALL)) = size) AND
-              Stringlib.StringFilterOut(nmbr, '0123456789') = '',1,0);
-  END;
 
   //****************************************************************************
   //fn_range_numeric: 	returns true if number in range
@@ -83,7 +75,15 @@ EXPORT Functions := MODULE
                         ''   => TRUE,
                         FALSE);
     RETURN IF(isValidCode,1,0);
-  END;	
+  END;		
+	
+	//****************************************************************************
+  //fn_numeric: 	returns true if only populated with numbers
+  //****************************************************************************  
+	EXPORT fn_numeric(STRING nmbr, UNSIGNED1 size = 0) := FUNCTION
+    RETURN IF(IF(size = 0, LENGTH(TRIM(nmbr, ALL)) > 0, LENGTH(TRIM(nmbr, ALL)) = size) AND
+              Stringlib.StringFilterOut(nmbr, '0123456789') = '',1,0);
+  END;
 		
   //****************************************************************************
 	 //fn_verify_zip4:  returns true or false based upon whether or not there is
@@ -172,17 +172,27 @@ EXPORT Functions := MODULE
   //****************************************************************************
   //fn_numeric_or_blank: 	returns true if only populated with numbers or blanks
   //****************************************************************************  
-	EXPORT fn_numeric_or_blank(STRING nmbr) := FUNCTION
-    // RETURN if(LENGTH(TRIM(nmbr, ALL)) < 10 and Stringlib.StringFilterOut(nmbr, '0123456789') = '' ,1 ,0);
+	EXPORT fn_numeric_or_blank(STRING nmbr, UNSIGNED1 size = 0) := FUNCTION
     RETURN if(LENGTH(TRIM(nmbr, ALL)) = 0 or Stringlib.StringFilterOut(nmbr, '0123456789') = '' ,1 ,0);
+  END;	
+	
+  //****************************************************************************
+  //fn_verify_zip5: 	returns true if only populated with numbers or blanks
+  //****************************************************************************  
+	EXPORT fn_verify_zip5(STRING nmbr) := FUNCTION
+    RETURN if((LENGTH(TRIM(nmbr, ALL)) = 0)
+		           or (LENGTH(TRIM(nmbr, ALL)) = 5 and Stringlib.StringFilterOut(nmbr, '0123456789') = '') 
+		           // or (countryName != 'USA') 
+							 ,1 ,0);
   END;
 	
    //****************************************************************************
 	 //fn_verify_state:  returns true or false based upon whether or not there is
    //                  a valid state abbreviation.
 	 //****************************************************************************
-	 EXPORT fn_verify_state(STRING code, STRING countryName) := function
-			RETURN IF(Equifax_Business_Data.EFX_STATE_TABLE.STATE(code) = 'INVALID'
+	 EXPORT fn_verify_state(STRING code) := function
+			RETURN IF((Equifax_Business_Data.EFX_STATE_TABLE.STATE(code) = 'INVALID' 
+								)
 			          //Military Bases
 			          AND code != 'AA'
 								AND code != 'AE'

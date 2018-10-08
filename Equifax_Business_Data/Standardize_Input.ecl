@@ -67,8 +67,8 @@ EXPORT fPreProcess(DATASET(Equifax_Business_Data.Layouts.Sprayed_Input) pRawInpu
 			                                and EFX_STATE_TABLE.STATE(tempState) != ' '
 			                                and EFX_STATE_TABLE.STATE(tempState) != 'INVALID', tempState,
 																			EFX_STATEC_TABLE.STATEC(SELF.norm_StateC2));
-																			
-			  correctedState := IF(tempCorrectedState != '' AND tempCorrectedState != 'INVALID', tempCorrectedState, tempState);																																				
+				
+				correctedState := IF(tempCorrectedState != '' AND tempCorrectedState != 'INVALID', tempCorrectedState, '');
 	  
         SELF.Norm_State := correctedState;
 				
