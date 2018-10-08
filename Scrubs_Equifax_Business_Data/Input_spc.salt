@@ -2,7 +2,6 @@
 MODULE:Scrubs_Equifax_Business_Data
 FILENAME:Equifax_Business_Data
 NAMESCOPE:Input
-//-------------------------
 //FIELDTYPE DEFINITIONS
 //-------------------------
 FIELDTYPE:invalid_name:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_invalid_name > 0)
@@ -30,9 +29,11 @@ FIELDTYPE:invalid_geo_match:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_num
 FIELDTYPE:invalid_err_stat:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_alphanum>0,4)
 FIELDTYPE:invalid_raw_aid:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_range_numeric>0,10000000000,999999999999)
 FIELDTYPE:invalid_ace_aid:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_numeric>0,12)
-FIELDTYPE:invalid_st:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_verify_state>0,EFX_CTRYNAME)
-FIELDTYPE:invalid_zip5:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_numeric>0,5)
-FIELDTYPE:invalid_zip4:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_verify_zip4>0)
+FIELDTYPE:invalid_st:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_verify_state>0)
+// FIELDTYPE:invalid_zip5:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_numeric>0,5)
+// FIELDTYPE:invalid_zip4:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_verify_zip4>0)
+FIELDTYPE:invalid_zip5:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_verify_zip5>0)
+FIELDTYPE:invalid_zip4:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_numeric_or_blank>0,4)
 FIELDTYPE:invalid_phone:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_verify_optional_phone>0)
 FIELDTYPE:invalid_rcid:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_rcid > 0)
 FIELDTYPE:invalid_sic:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_sic > 0)
@@ -80,7 +81,6 @@ FIELDTYPE:invalid_stkexc:CUSTOM(Scrubs_Equifax_Business_Data.Functions.fn_verify
 //--------------------------------------------------------------- 
 //FIELDS TO SCRUB -- Commented out fields are not being scrubbed
 //---------------------------------------------------------------
-//These could change once we get the fixed vendor data !!!!!!!!!!
 //Check logic on all date validations
 FIELD:dt_first_seen:TYPE(STRING8):LIKE(invalid_reformated_date):0,0
 FIELD:dt_last_seen:TYPE(STRING8):LIKE(invalid_reformated_date):0,0
@@ -92,6 +92,12 @@ FIELD:record_type:TYPE(STRING1):LIKE(invalid_record_type):0,0
 
 FIELD:normcompany_type:TYPE(STRING1):LIKE(invalid_norm_type):0,0
 FIELD:normaddress_type:TYPE(STRING1):LIKE(invalid_address_type_code):0,0
+FIELD:norm_state:TYPE(STRING2):LIKE(invalid_st):0,0
+FIELD:norm_zip:TYPE(STRING5):LIKE(invalid_zip5):0,0
+FIELD:norm_zip4:TYPE(STRING4):LIKE(invalid_zip4):0,0
+FIELD:EFX_NAME:TYPE(STRING75):LIKE(invalid_name):0,0
+FIELD:EFX_LEGAL_NAME:TYPE(STRING75):LIKE(invalid_legal_name):0,0
+FIELD:EFX_ADDRESS:TYPE(STRING75):LIKE(invalid_mandatory):0,0
 
 FIELD:EFX_BUSSTATCD:TYPE(STRING10):LIKE(invalid_busstatcd):0,0
 FIELD:EFX_CMSA:TYPE(STRING1):LIKE(invalid_cmsa):0,0
@@ -110,7 +116,7 @@ FIELD:EFX_MRKT_TELESCORE:TYPE(STRING10):LIKE(invalid_mrkt_telescore):0,0
 FIELD:EFX_MRKT_TOTALIND:TYPE(STRING2):LIKE(invalid_mrkt_totalind):0,0
 FIELD:EFX_MRKT_TOTALSCORE:TYPE(STRING0):LIKE(invalid_mrkt_totalscore):0,0
 FIELD:EFX_PUBLIC:TYPE(STRING1):LIKE(invalid_public):0,0
-FIELD:EFX_STATEC:TYPE(STRING2):LIKE(invalid_statec):0,0
+// FIELD:EFX_STATEC:TYPE(STRING2):LIKE(invalid_statec):0,0
 FIELD:EFX_STKEXC:TYPE(STRING1):LIKE(invalid_stkexc):0,0
 
 FIELD:EFX_PRIMSIC:TYPE(STRING4):LIKE(invalid_sic):0,0
@@ -118,12 +124,9 @@ FIELD:EFX_SECSIC1:TYPE(STRING4):LIKE(invalid_sic):0,0
 FIELD:EFX_SECSIC2:TYPE(STRING4):LIKE(invalid_sic):0,0
 FIELD:EFX_SECSIC3:TYPE(STRING4):LIKE(invalid_sic):0,0
 FIELD:EFX_SECSIC4:TYPE(STRING4):LIKE(invalid_sic):0,0
-FIELD:EFX_STATE:TYPE(STRING2):LIKE(invalid_st):0,0
+// FIELD:EFX_STATE:TYPE(STRING2):LIKE(invalid_st):0,0
 
 FIELD:EFX_ID:TYPE(STRING10):LIKE(invalid_numeric):0,0
-FIELD:EFX_NAME:TYPE(STRING75):LIKE(invalid_name):0,0
-FIELD:EFX_LEGAL_NAME:TYPE(STRING75):LIKE(invalid_legal_name):0,0
-FIELD:EFX_ADDRESS:TYPE(STRING75):LIKE(invalid_mandatory):0,0
 FIELD:EFX_CITY:TYPE(STRING75):LIKE(invalid_mandatory):0,0
 FIELD:EFX_REGION:0,0
 FIELD:EFX_CTRYNAME:TYPE(STRING100):LIKE(invalid_mandatory):0,0
@@ -135,8 +138,8 @@ FIELD:EFX_RES:TYPE(STRING1):LIKE(invalid_yes_blank):0,0
 FIELD:EFX_CMRA:TYPE(STRING1):LIKE(invalid_yes_blank):0,0
 FIELD:EFX_SECADR:0,0
 FIELD:EFX_SECCTY:0,0
-FIELD:EFX_SECSTAT:TYPE(STRING2):LIKE(invalid_st):0,0
-FIELD:EFX_STATEC2:TYPE(STRING2):LIKE(invalid_statec):0,0
+// FIELD:EFX_SECSTAT:TYPE(STRING2):LIKE(invalid_st):0,EFX_CTRYISOCD
+// FIELD:EFX_STATEC2:TYPE(STRING2):LIKE(invalid_statec):0,0
 FIELD:EFX_SECGEOPREC:TYPE(STRING3):LIKE(invalid_geoprec):0,0
 FIELD:EFX_SECREGION:0,0
 FIELD:EFX_SECCTRYISOCD:TYPE(STRING3):LIKE(invalid_ctryisocd):0,0
