@@ -155,8 +155,8 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                                 YRSinceLastReportedCredential := map(
                                                                      not(RIGHT.truedid)                       => NULL,
                                                                      last_seen_by_cred_source = NULL          => NULL,
-                                                                     (integer)num_of_cred_sources > 0         => round((sysdate - last_seen_by_cred_source) / 365.25),
-                                                                                                              -1);
+                                                                     (integer)num_of_cred_sources > 0         => truncate((sysdate - last_seen_by_cred_source) / 365.25),
+                                                                                                                 NULL);
                            //*** timeSinceLastReportedNonBureau *** ATTENTION - SHOULD the name of this indicator needs to be changed to TimeSinceLastReportedCredentialed
                                 SELF.timeSinceLastReportedNonBureau := IF(YRSinceLastReportedCredential = NULL, NEG1, YRSinceLastReportedCredential);            //***  
                          
@@ -269,9 +269,8 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                             address_first_seen_temp      := (unsigned)RIGHT.address_first_seen_date;
                             address_first_seen_SAS       := Models.common.sas_date((STRING)(address_first_seen_temp));
                             calcAgeAtThisTime_temp       := if(dob_temp = NULL or address_first_seen_SAS = NULL, NULL, 
-                                                               if ((address_first_seen_SAS - dob_temp) / 365.25 >= 0, 
-                                                                    roundup((address_first_seen_SAS - dob_temp) / 365.25), 
-                                                                    truncate((address_first_seen_SAS - dob_temp) / 365.25)));
+                                                                    truncate((address_first_seen_SAS - dob_temp) / 365.25)); 
+                                                                    
                             calcAgeAtThisTime            := if(calcAgeAtThisTime_temp > Citizenship.Constants.AGE_CAP, 
                                                                 Citizenship.Constants.AGE_CAP, 
                                                                 calcAgeAtThisTime_temp);
