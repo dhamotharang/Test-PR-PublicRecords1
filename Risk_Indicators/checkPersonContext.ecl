@@ -82,14 +82,15 @@ PersonContext_transformed := project(dsResponseRecords(searchStatus=personContex
 		securityfraudalert := statementtype = personContext.Constants.RecordTypes.fa;    
 		legal_hold_alert := statementtype in [personContext.Constants.RecordTypes.la, personContext.Constants.RecordTypes.lh];
     id_theft_flag := statementtype = personContext.Constants.RecordTypes.it;
-    
+    record_level_statement := statementtype = personContext.Constants.RecordTypes.rs;
+		
 		self.dispute_on_file := isDispute;
 		self.security_alert := securityfraudalert;
     self.legal_hold_alert := legal_hold_alert;
     self.id_theft_flag := id_theft_flag;
     
 // this list will grow as we add more types of alerts to person context that we need to suppress data for
-		alert_needs_suppression := isDispute or securityfraudalert or legal_hold_alert or (id_theft_flag and bsversion<50);
+		alert_needs_suppression := record_level_statement or isDispute or securityfraudalert or legal_hold_alert or (id_theft_flag and bsversion<50);
 
 		SELF.bankrupt_correct_cccn := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.BANKRUPTCY_MAIN, 
 																																		PersonContext.constants.datagroups.BANKRUPTCY_SEARCH ], 
