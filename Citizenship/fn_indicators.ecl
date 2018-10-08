@@ -3,12 +3,13 @@
 EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DATASET(Risk_Indicators.Layout_Boca_Shell) clam) := FUNCTION
 
   
-  NULL      := -999999999;
-  NEG1      := -1;
-  MAX_SCORE := 999;
-  COMMA     := '  ,';
-  MODIFIER  := 'ie';
-  isFCRA    := false;
+  NULL       := -999999999;
+  NEG1       := -1;
+  MAX_SCORE  := 999;
+  COMMA      := '  ,';
+  MODIFIER   := 'ie';
+  isFCRA     := false;
+  DAYSINYEAR := 365.25;
   
 //========================================================================================
 
@@ -39,16 +40,13 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                            //*** emergenceAgeHeader (capped at 110 years)***
                                 earliest_header_date_SAS := ver_sources_information[1..10];                                                           
                                 earliest_header_date     := (integer)earliest_header_date_SAS;  
-                                earliest_header_yrs      := if(min(sysdate, earliest_header_date) = NULL, NULL, 
-                                                              if((sysdate - earliest_header_date) / 365.25 >= 0, 
-                                                                 roundup((sysdate - earliest_header_date) / 365.25), 
-                                                                 truncate((sysdate - earliest_header_date) / 365.25)));
+                                earliest_header_yrs      := if(earliest_header_date = NULL or sysdate = NULL, NULL,  
+                                                                 truncate((sysdate - earliest_header_date) / DAYSINYEAR));
                                 in_dob                  := RIGHT.shell_input.dob;
                                 _in_dob                 := Models.common.sas_date((STRING)(in_dob));
                                 SELF.shell_dob_SAS      := _in_dob;                      //***save for the next step 
-                                calc_dob                := if(_in_dob = NULL or sysdate = NULL, NULL, if ((sysdate - _in_dob) / 365.25 >= 0, 
-                                                               roundup((sysdate - _in_dob) / 365.25), 
-                                                               truncate((sysdate - _in_dob) / 365.25)));
+                                calc_dob                := if(_in_dob = NULL or sysdate = NULL, NULL, 
+                                                               truncate((sysdate - _in_dob) / DAYSINYEAR));
                                 inferred_age            := RIGHT.inferred_age;
                                 iv_header_emergence_age_temp := map(
                                                                not(RIGHT.truedid)          => NULL,
@@ -67,10 +65,8 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                                 earliest_bureau_date_SAS   := ver_sources_information[12..21];
                                 earliest_bureau_date       := (integer)earliest_bureau_date_SAS;  
                                                                                                                                               
-                                earliest_bureau_yrs        := if(earliest_bureau_date = NULL or sysdate = NULL, NULL, 
-                                                                 if((sysdate - earliest_bureau_date) / 365.25 >= 0, 
-                                                                    roundup((sysdate - earliest_bureau_date) / 365.25), 
-                                                                    truncate((sysdate - earliest_bureau_date) / 365.25)));                                                        
+                                earliest_bureau_yrs        := if(earliest_bureau_date = NULL or sysdate = NULL, NULL,  
+                                                                    truncate((sysdate - earliest_bureau_date) / DAYSINYEAR));                                                        
                                 iv_bureau_emergence_age_temp    := map(
                                                                    not(RIGHT.truedid) or earliest_bureau_yrs = NULL => NULL,
                                                                    not(calc_dob = NULL)                             => calc_dob - earliest_bureau_yrs,
@@ -87,10 +83,8 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                                 ssnlength                  := RIGHT.input_validation.ssn_length;
                                 rc_ssnlowissue             := (unsigned)RIGHT.iid.socllowissue;
                                 _rc_ssnlowissue            := Models.common.sas_date((STRING)(rc_ssnlowissue));
-                                ssn_years                  := if(_rc_ssnlowissue = NULL or sysdate = NULL, NULL, 
-                                                                 if((sysdate - _rc_ssnlowissue) / 365.25 >= 0, 
-                                                                     roundup((sysdate - _rc_ssnlowissue) / 365.25), 
-                                                                     truncate((sysdate - _rc_ssnlowissue) / 365.25)));
+                                ssn_years                  := if(_rc_ssnlowissue = NULL or sysdate = NULL, NULL,  
+                                                                     truncate((sysdate - _rc_ssnlowissue) / DAYSINYEAR));
                                 nf_age_at_ssn_issuance_temp := map(
                                                                     not(RIGHT.truedid and (ssnlength in ['4', '9'])) or 
                                                                     sysdate = NULL or ssn_years = NULL                            => NULL,
@@ -155,7 +149,7 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                                 YRSinceLastReportedCredential := map(
                                                                      not(RIGHT.truedid)                       => NULL,
                                                                      last_seen_by_cred_source = NULL          => NULL,
-                                                                     (integer)num_of_cred_sources > 0         => truncate((sysdate - last_seen_by_cred_source) / 365.25),
+                                                                     (integer)num_of_cred_sources > 0         => truncate((sysdate - last_seen_by_cred_source) / DAYSINYEAR),
                                                                                                                  NULL);
                            //*** timeSinceLastReportedNonBureau *** ATTENTION - SHOULD the name of this indicator needs to be changed to TimeSinceLastReportedCredentialed
                                 SELF.timeSinceLastReportedNonBureau := IF(YRSinceLastReportedCredential = NULL, NEG1, YRSinceLastReportedCredential);            //***  
@@ -269,7 +263,7 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                             address_first_seen_temp      := (unsigned)RIGHT.address_first_seen_date;
                             address_first_seen_SAS       := Models.common.sas_date((STRING)(address_first_seen_temp));
                             calcAgeAtThisTime_temp       := if(dob_temp = NULL or address_first_seen_SAS = NULL, NULL, 
-                                                                    truncate((address_first_seen_SAS - dob_temp) / 365.25)); 
+                                                                    truncate((address_first_seen_SAS - dob_temp) / DAYSINYEAR)); 
                                                                     
                             calcAgeAtThisTime            := if(calcAgeAtThisTime_temp > Citizenship.Constants.AGE_CAP, 
                                                                 Citizenship.Constants.AGE_CAP, 
