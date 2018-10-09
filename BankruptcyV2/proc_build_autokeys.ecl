@@ -1,4 +1,4 @@
-import AutoKeyB2, fcra, BankruptcyV3, ut ,autokey,AutoKeyI; 
+﻿import AutoKeyB2, fcra, BankruptcyV3, ut ,autokey,AutoKeyI; 
 
 export proc_build_autokeys(string filedate, boolean isFCRA = false) := function
 

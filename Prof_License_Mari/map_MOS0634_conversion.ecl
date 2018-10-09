@@ -43,6 +43,7 @@ EXPORT map_MOS0634_conversion(STRING pVersion) := FUNCTION
 		STRING60 dba6;
 		STRING60 dba7;
 		STRING60 dba8;
+		STRING60 dba9;
 	END;
 
 	//MO Real Estate/Appraisers layout to Common
@@ -320,10 +321,12 @@ EXPORT map_MOS0634_conversion(STRING pVersion) := FUNCTION
 		prepDBA1							:= IF(REGEXFIND('[ ]*/[ ]*/[ ]*',prepDBA),REGEXREPLACE('[ ]*/[ ]*/[ ]*',prepDBA,' / '),prepDBA);
 		ClnSpaceDBA						:= StringLib.StringCleanSpaces(prepDBA1);
 		
-	//Parse DBA fields 
-    SELF.DBA1     := IF(SELF.RAW_LICENSE_TYPE != 'MORTGAGE LOAN ORIGINATOR',TrimDBA,'');	
+	//Parse DBA fields  
+    SELF.DBA1     := IF(SELF.RAW_LICENSE_TYPE != 'MORTGAGE LOAN ORIGINATOR',REGEXREPLACE('DBA ',REGEXFIND('(.*) DBA (.*)',TrimDBA,1),''),'');	
+ 	  
+ 	  SELF.DBA2     := IF(SELF.RAW_LICENSE_TYPE != 'MORTGAGE LOAN ORIGINATOR',REGEXFIND('(.*) DBA (.*)',TrimDBA,2),'');	
 	
-		SELF.DBA2			:=  MAP(StringLib.stringfind(ClnSpaceDBA,'/',1) > 0 AND StringLib.stringfind(ClnSpaceDBA,',',1) > 0 => REGEXFIND('^([\\/]?)([A-Za-z ][^\\/]+)',ClnSpaceDBA,2),
+		SELF.DBA3			:=  MAP(StringLib.stringfind(ClnSpaceDBA,'/',1) > 0 AND StringLib.stringfind(ClnSpaceDBA,',',1) > 0 => REGEXFIND('^([\\/]?)([A-Za-z ][^\\/]+)',ClnSpaceDBA,2),
 												  StringLib.stringfind(ClnSpaceDBA,'/',1) > 0 AND StringLib.stringfind(ClnSpaceDBA,';',1) > 0 =>
 												  REGEXFIND('^([0-9A-Za-z ][^\\;]+)[\\;][ ]([0-9A-Za-z ][^\\/]+)[\\/][ ]([0-9A-Za-z ][^\\;]+)[\\;][ ]([0-9A-Za-z  ][^\\/]+)',ClnSpaceDBA,1),
 												  StringLib.stringfind(ClnSpaceDBA,'/',2) > 0 AND StringLib.stringfind(ClnSpaceDBA,';',1) > 0 =>	  
@@ -331,7 +334,7 @@ EXPORT map_MOS0634_conversion(STRING pVersion) := FUNCTION
 												  StringLib.stringfind(ClnSpaceDBA,'/',1) > 0 => REGEXFIND('^([^\\/]+)[\\/][ ]([^\\/]+)',ClnSpaceDBA,1),
 												  StringLib.stringfind(ClnSpaceDBA,';',1) > 0 => REGEXFIND('^([A-Za-z ][^\\;]+)[\\;][ ]([A-Za-z ][^\\;]+)[ ]',ClnSpaceDBA,1),ClnSpaceDBA);
 				
-		SELF.dba3			:= MAP(StringLib.stringfind(ClnSpaceDBA,'/',1) > 0 AND StringLib.stringfind(ClnSpaceDBA,';',1) > 0 =>
+		SELF.dba4			:= MAP(StringLib.stringfind(ClnSpaceDBA,'/',1) > 0 AND StringLib.stringfind(ClnSpaceDBA,';',1) > 0 =>
 												 REGEXFIND('^([0-9A-Za-z ][^\\;]+)[\\;][ ]([0-9A-Za-z ][^\\/]+)[\\/][ ]([0-9A-Za-z ][^\\;]+)[\\;][ ]([0-9A-Za-z  ][^\\/]+)',ClnSpaceDBA,2),
 											   StringLib.stringfind(ClnSpaceDBA,'/',2) > 0 AND StringLib.stringfind(ClnSpaceDBA,';',1) > 0 =>	  
 											   REGEXFIND('^([0-9A-Za-z ][^\\;]+)[\\;][ ]([0-9A-Za-z ][^\\/]+)[\\/][ ]([0-9A-Za-z ][^\\/]+)[\\/][ ]([0-9A-Za-z  ][^\\/]+)',ClnSpaceDBA,2),
@@ -339,7 +342,7 @@ EXPORT map_MOS0634_conversion(STRING pVersion) := FUNCTION
 											   StringLib.stringfind(ClnSpaceDBA,';',1) > 0 => REGEXFIND('^([A-Za-z ][^\\;]+)[\\;][ ]([A-Za-z ][^\\;]+)[ ]',ClnSpaceDBA,2),
 																								 ' ');
 							
-		SELF.dba4 		:= MAP(StringLib.stringfind(ClnSpaceDBA,'/',1) > 0 AND StringLib.stringfind(ClnSpaceDBA,';',1) > 0 =>
+		SELF.dba5 		:= MAP(StringLib.stringfind(ClnSpaceDBA,'/',1) > 0 AND StringLib.stringfind(ClnSpaceDBA,';',1) > 0 =>
 											   REGEXFIND('^([0-9A-Za-z ][^\\;]+)[\\;][ ]([0-9A-Za-z ][^\\/]+)[\\/][ ]([0-9A-Za-z ][^\\;]+)[\\;][ ]([0-9A-Za-z  ][^\\/]+)',ClnSpaceDBA,3),
 											   StringLib.stringfind(ClnSpaceDBA,'/',2) > 0 AND StringLib.stringfind(ClnSpaceDBA,';',1) > 0 =>	  
 										 	   REGEXFIND('^([0-9A-Za-z ][^\\;]+)[\\;][ ]([0-9A-Za-z ][^\\/]+)[\\/][ ]([0-9A-Za-z ][^\\/]+)[\\/][ ]([0-9A-Za-z  ][^\\/]+)',ClnSpaceDBA,3),
@@ -347,7 +350,7 @@ EXPORT map_MOS0634_conversion(STRING pVersion) := FUNCTION
 											   REGEXFIND('^([^/]+)[/][ ]([^\\/]+)[\\/][ ]([^\\/]+)',ClnSpaceDBA,3),
 																									'');
 				
-		SELF.dba5 		:= MAP(StringLib.stringfind(ClnSpaceDBA,'/',1) > 0 AND StringLib.stringfind(ClnSpaceDBA,';',1) > 0 =>
+		SELF.dba6 		:= MAP(StringLib.stringfind(ClnSpaceDBA,'/',1) > 0 AND StringLib.stringfind(ClnSpaceDBA,';',1) > 0 =>
 												 REGEXFIND('^([0-9A-Za-z ][^\\;]+)[\\;][ ]([0-9A-Za-z ][^\\/]+)[\\/][ ]([0-9A-Za-z ][^\\;]+)[\\;][ ]([0-9A-Za-z  ][^\\/]+)',ClnSpaceDBA,4),
 											   StringLib.stringfind(ClnSpaceDBA,'/',2) > 0 AND StringLib.stringfind(ClnSpaceDBA,';',1) > 0 =>	  
 											   REGEXFIND('^([0-9A-Za-z ][^\\;]+)[\\;][ ]([0-9A-Za-z ][^\\/]+)[\\/][ ]([0-9A-Za-z ][^\\/]+)[\\/][ ]([0-9A-Za-z  ][^\\/]+)',ClnSpaceDBA,4),
@@ -355,12 +358,12 @@ EXPORT map_MOS0634_conversion(STRING pVersion) := FUNCTION
 											   REGEXFIND('([^/]+)[/][ ]([^\\/]+)[\\/][ ]([^\\/]+)[/][ ]([^\\/]+)',ClnSpaceDBA,4), 
 																									 '');
 				
-		SELF.dba6 			:= IF(StringLib.stringfind(ClnSpaceDBA,'/',4) > 0,
+		SELF.dba7 			:= IF(StringLib.stringfind(ClnSpaceDBA,'/',4) > 0,
 											    REGEXFIND('^([^/]+)[/][ ]([^\\/]+)[\\/][ ]([^\\/]+)[/][ ]([^\\/]+)[/][ ]([^\\/]+)',ClnSpaceDBA,5),'');
 
-		SELF.dba7 			:= IF(StringLib.stringfind(ClnSpaceDBA,'/',5) > 0,
+		SELF.dba8 			:= IF(StringLib.stringfind(ClnSpaceDBA,'/',5) > 0,
 													REGEXFIND('^([^/]+)[/][ ]([^\\/]+)[\\/][ ]([^\\/]+)[/][ ]([^\\/]+)[/][ ]([^\\/]+)[/][ ]([^\\/]+)',ClnSpaceDBA,6),'');
-		SELF.dba8 			:= IF(StringLib.stringfind(ClnSpaceDBA,'/',4) > 0,
+		SELF.dba9 			:= IF(StringLib.stringfind(ClnSpaceDBA,'/',4) > 0,
 													REGEXFIND('^([^/]+)[/][ ]([^\\/]+)[\\/][ ]([^\\/]+)[/][ ]([^\\/]+)[/][ ]([^\\/]+)[/][ ]([^\\/]+)[/][ ]([^\\/]+)',ClnSpaceDBA,7),'');
     SELF.NAME_DBA_ORIG := IF(SELF.RAW_LICENSE_TYPE != 'MORTGAGE LOAN ORIGINATOR',TrimDBA,'');		
 																
@@ -433,13 +436,13 @@ EXPORT map_MOS0634_conversion(STRING pVersion) := FUNCTION
 
 	maribase_dbas	NormIT(ds_map L, INTEGER C) := TRANSFORM
 		SELF := L;
-		SELF.TMP_DBA := CHOOSE(C, L.DBA1, L.DBA2, L.DBA3, L.DBA4, L.DBA5, L.DBA6, L.DBA7, L.DBA8);
+		SELF.TMP_DBA := CHOOSE(C, L.DBA1, L.DBA2, L.DBA3, L.DBA4, L.DBA5, L.DBA6, L.DBA7, L.DBA8, L.DBA9);
 	END;
 
 	NormDBAs 	:= DEDUP(NORMALIZE(ds_map,8,NormIT(LEFT,COUNTER)),ALL,RECORD);
 
 	NoDBARecs	:= NormDBAs(TMP_DBA = '' AND DBA1 = '' 
-					AND DBA2 = '' AND DBA3 = '' AND DBA4 = '' AND DBA5 = '' AND DBA6 = '' AND DBA7 = '' AND DBA8 ='');
+					AND DBA2 = '' AND DBA3 = '' AND DBA4 = '' AND DBA5 = '' AND DBA6 = '' AND DBA7 = '' AND DBA8 ='' AND DBA9 ='');
 	DBARecs 	:= NormDBAs(TMP_DBA != '');
 
 	FilteredRecs  := DBARecs + NoDBARecs;

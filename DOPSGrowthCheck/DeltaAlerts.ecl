@@ -1,5 +1,5 @@
 ﻿import std;
-EXPORT DeltaAlerts(string SpecPackageName, string SpecKeyNickname, string SpecVersion, decimal6_3 AddedThresholdMin, decimal6_3 AddedThresholdMax, decimal6_3 ModifiedThresholdMin, decimal6_3 ModifiedThresholdMax, decimal6_3 RemovedThresholdMin, decimal6_3 RemovedThresholdMax, string emailList, boolean publish=true):= function;
+EXPORT DeltaAlerts(string SpecPackageName, string SpecKeyNickname, string SpecVersion, decimal6_3 AddedThresholdMin, decimal6_3 AddedThresholdMax, decimal6_3 ModifiedThresholdMin, decimal6_3 ModifiedThresholdMax, decimal6_3 RemovedThresholdMin, decimal6_3 RemovedThresholdMax, boolean publish=true):= function;
 
 	oldrecsPlus:=dataset('~thor_data400::DeltaStats::FullDeltaStats::full',DOPSGrowthCheck.layouts.Full_Delta_Stat_Layout,thor,__compressed__,opt);
 

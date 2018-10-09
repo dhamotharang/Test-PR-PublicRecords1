@@ -99,7 +99,8 @@ module
 		export Crim					:= tools.mod_FilenamesBuild(Template('Crim'),pversion);
 		export Death				:= tools.mod_FilenamesBuild(Template('Death'),pversion);
 		export FraudPoint		:= tools.mod_FilenamesBuild(Template('FraudPoint'),pversion);
-
+		
+		
 		//Kel Files
 		export kel_customeraddress	:= tools.mod_FilenamesBuild(Template('kel::customeraddress'),pversion);
 		export kel_personstats			:= tools.mod_FilenamesBuild(Template('kel::personstats'),pversion);
@@ -112,8 +113,32 @@ module
 		export kel_entity_scorebreakdown				:= tools.mod_FilenamesBuild(Template('kel::entity_scorebreakdown'),pversion);
 		
 		export Main_Orig	:= tools.mod_FilenamesBuild(Template('Main_Orig'),pversion);
-		export Main_Anon	:= tools.mod_FilenamesBuild(Template('Main'),pversion);
+		export Main_Anon	:= tools.mod_FilenamesBuild(Template('Main_anon'),pversion);
 
+		//	soap appends original
+		
+		export CIID_Orig				:= tools.mod_FilenamesBuild(Template('CIID_Orig'),pversion);
+		export Crim_Orig				:= tools.mod_FilenamesBuild(Template('Crim_Orig'),pversion);
+		export Death_Orig				:= tools.mod_FilenamesBuild(Template('Death_Orig'),pversion);
+		export FraudPoint_Orig	:= tools.mod_FilenamesBuild(Template('FraudPoint_Orig'),pversion);
+		
+		// soap appends anonymized
+		export CIID_Anon				:= tools.mod_FilenamesBuild(Template('CIID_Anon'),pversion);
+		export Crim_Anon				:= tools.mod_FilenamesBuild(Template('Crim_Anon'),pversion);
+		export Death_Anon				:= tools.mod_FilenamesBuild(Template('Death_Anon'),pversion);
+		
+		// DemoData Files - SOAP Appends
+		export Pii_Demo					:= tools.mod_FilenamesBuild(Template('Pii_Demo'),pversion);
+		export CIID_Demo				:= tools.mod_FilenamesBuild(Template('CIID_Demo'),pversion);
+		export Crim_Demo				:= tools.mod_FilenamesBuild(Template('Crim_Demo'),pversion);
+		export Death_Demo				:= tools.mod_FilenamesBuild(Template('Death_Demo'),pversion);
+		export FraudPoint_Demo	:= tools.mod_FilenamesBuild(Template('FraudPoint_Demo'),pversion);
+			
+		// DemoData Anonymized Files - SOAP Appends
+		export CIID_Demo_Anon				:= tools.mod_FilenamesBuild(Template('CIID_Demo_Anon'),pversion);
+		export Crim_Demo_Anon				:= tools.mod_FilenamesBuild(Template('Crim_Demo_Anon'),pversion);
+		export Death_Demo_Anon			:= tools.mod_FilenamesBuild(Template('Death_Demo_Anon'),pversion);
+		
 		export dAll_filenames :=
 			IdentityData.dAll_filenames +
 			KnownFraud.dAll_filenames +
@@ -133,7 +158,19 @@ module
 			kel_person_associations_details.dAll_filenames +
 			kel_entity_scorebreakdown.dAll_filenames + 
  			Main_Orig.dAll_filenames + 
-			Main_Anon.dAll_filenames
+			Main_Anon.dAll_filenames + 
+			Pii_Demo.dAll_filenames + 
+			CIID_Demo.dAll_filenames + 
+			Crim_Demo.dAll_filenames + 
+			Death_Demo.dAll_filenames + 
+			FraudPoint_Demo.dAll_filenames + 
+			CIID_Demo_Anon.dAll_filenames + 
+			Crim_Demo_Anon.dAll_filenames + 
+			Death_Demo_Anon.dAll_filenames +
+			CIID_Orig.dAll_filenames +
+			Crim_Orig.dAll_filenames +
+			Death_Orig.dAll_filenames +
+			FraudPoint_Orig.dAll_filenames
 			; 
 	
 	end;
