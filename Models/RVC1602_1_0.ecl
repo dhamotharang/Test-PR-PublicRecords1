@@ -1,4 +1,4 @@
-IMPORT ut, Std, RiskWise, RiskWiseFCRA, Risk_Indicators, Riskview;
+﻿IMPORT ut, Std, RiskWise, RiskWiseFCRA, Risk_Indicators, Riskview;
 
 EXPORT RVC1602_1_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, 
 dataset(riskview.layouts.Layout_Custom_Inputs) custom_inputs) := FUNCTION
@@ -5512,7 +5512,8 @@ e_final_score_128 := map(
       e_final_score_120, e_final_score_121, e_final_score_122, e_final_score_123, e_final_score_124, 
       e_final_score_125, e_final_score_126, e_final_score_127, e_final_score_128); 
 
-exception_score := not(fnamepop and lnamepop and addrpop OR (Integer)ssnlength = 9);
+exception_score := not(fnamepop and lnamepop and addrpop OR (Integer)ssnlength = 9) or 
+  riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid);
 
 b_pbr := 0.1324;
 

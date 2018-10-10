@@ -1,4 +1,6 @@
-﻿EXPORT Constants :=
+﻿IMPORT AutoKeyI;
+
+EXPORT Constants :=
 MODULE
 
 	// below limits are defined here due to requirement of this FCRA service to return ALL payload records for subject
@@ -50,4 +52,12 @@ MODULE
     EXPORT UNSIGNED2 MaxWatercraftDetails := 200;  // ut.limits.MAX_DETAILS_PER_WATERCRAFT -- maxcnt=185 as of 11/9/2017, drops below 50 except 4 recs
   END;
  
+  EXPORT StatusCodes := MODULE
+    EXPORT  ResultsFound     := 0;      
+    EXPORT  NoResultsFound   := AutoKeyI.errorcodes._codes.NO_RECORDS;       
+	  EXPORT  SOAPError        := AutoKeyI.errorcodes._codes.SOAP_ERR;
+  END;    
+    
+  EXPORT GetStatusMessage(INTEGER __code) := AutoKeyI.errorcodes._msgs(__code);
+
 END;

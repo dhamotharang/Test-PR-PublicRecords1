@@ -1648,7 +1648,7 @@ with_bureau_phone_verification := join(with_insurance_phones, bureau_phones_roll
 shell50_branch1 := if(isFCRA, group(bsdata41, seq), group(with_bureau_phone_verification, seq));
 
 with_college_attendance := risk_indicators.boca_shell_college_attendance(shell50_branch1, isFCRA);		
-with_source_profile := risk_indicators.getSourceProfile(with_college_attendance);		
+with_source_profile := risk_indicators.getSourceProfile(with_college_attendance, isFCRA);		
 with_economic_trajectory := risk_indicators.getEconomicTrajectory(with_source_profile);		
 with_address_occupancy := Risk_Indicators.Boca_Shell_Address_Occupancy(with_economic_trajectory, isFCRA);		
 with_build_dates := risk_indicators.Boca_Shell_data_build_dates(with_address_occupancy, isFCRA);

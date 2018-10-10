@@ -1,5 +1,5 @@
-//DM Services 4359	- ADL FCRA 4.1 Modeling Shell 
-import risk_indicators, riskwise, riskwisefcra, ut, std;
+﻿//DM Services 4359	- ADL FCRA 4.1 Modeling Shell 
+import risk_indicators, riskwise, riskwisefcra, ut, std, riskview;
 
 export RVP1401_2_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam) := FUNCTION
 
@@ -413,17 +413,18 @@ export RVP1401_2_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam) := 
 	indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'BA', ',') or
 	bankrupt or filing_count > 0 or bk_recent_count > 0 or rc_decsflag = '1' or
 	indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'DS', ',') or
-	truedid) and not(eq_only);
+	truedid) and not(eq_only)
+	and truedid;
 
 	base := 680;
 
 	pts := 40;
 
 	odds := (1 - .3539) / .3539;
-
+		
 	rvp1401_2_0 := map(
 			ssn_deceased             => 200,
-			not(rv_prescreen_content) => 222,
+			riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid) => 222,
 																	min(if(max(round(pts * (ln(rsk_probscore / (1 - rsk_probscore)) - ln(odds)) / ln(2) + base), 501) = NULL, -NULL, max(round(pts * (ln(rsk_probscore / (1 - rsk_probscore)) - ln(odds)) / ln(2) + base), 501)), 900));
 
 

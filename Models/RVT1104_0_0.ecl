@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwisefcra, riskwise, std;
+﻿import risk_indicators, ut, riskwisefcra, riskwise, std, riskview;
 
 ds_layout := {STRING rc, REAL value};
 
@@ -1032,7 +1032,7 @@ dataset(ds_layout) rcs_override;
 
 		segment40 := map(
 			(integer)ssn_deceased > 0                                                      => 'X 200  ',
-			nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 3 and not(no222score) => 'X 222  ',
+			riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid) => 'X 222  ',
 			bs_attr_derog_flag2 = 1                                                        => '0 Derog',
 			age_estimate <= 22                                                             => '1 Young',
 			property_owner = 1                                                             => '2 Owner',

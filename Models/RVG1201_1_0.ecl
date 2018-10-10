@@ -1,4 +1,4 @@
-import ut, riskwise, risk_indicators, riskwisefcra, std;
+﻿import ut, riskwise, risk_indicators, riskwisefcra, std, riskview;
 
 export RVG1201_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boolean isCalifornia, boolean PreScreenOptOut ) := FUNCTION
 
@@ -628,7 +628,7 @@ export RVG1201_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boo
 
 		v4_custom_score := map(
 				ssn_deceased                                                                      => 200,
-				nas_summary_1 <= 4 and nap_summary <= 4 and add1_naprop <= 2 and not(scored_222s) => 222,
+				riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid) => 222,
 																																														 round(point * (ln(v4_probscore / (1 - v4_probscore)) - ln(odds)) / ln(2) + base));
 
 		rvg1201_1_0 := if(v4_custom_score > 222, max(501, min(900, if(v4_custom_score = NULL, -NULL, v4_custom_score))), v4_custom_score);

@@ -93,9 +93,18 @@ export BankruptcySearchServiceFCRA(
     string attorney_name := Std.Str.ToUpperCase(attorney_name_pre);
     string court_code_pre := '' : stored('CourtCode');
     string court_code := Std.Str.ToUpperCase(court_code_pre);
-    string state_value_ucase := Std.Str.ToUpperCase(state_val); 
-    string CaseNumber_value_ucase := Std.Str.ToUpperCase(if(Enable_CaseNumFilterSrch,
-                                                            STD.Str.FindReplace(CaseNumber_value,'-',''),
+    string state_value_ucase := Std.Str.ToUpperCase(state_val);
+    EnableCaseNumFilter := CaseNumber_value != '' and Enable_CaseNumFilterSrch;
+    
+    cleanCaseNumber(string str) := function
+        arrayOfWords :=  STD.Str.SplitWords(str,'-');
+        cleanStr := arrayOfWords[1] + arrayOfWords[2];
+    return(cleanStr);  
+    end;
+
+
+    string CaseNumber_value_ucase := Std.Str.ToUpperCase(if(EnableCaseNumFilter and attorney_name <> '',
+                                                            cleanCaseNumber(CaseNumber_value),
                                                             CaseNumber_value));
 
     
@@ -118,7 +127,7 @@ export BankruptcySearchServiceFCRA(
     //if more than one DID is found this call will fail the service with desired error message
     unsigned6 input_did := (unsigned6) did_value;
 
-    EnableCaseNumFilter := CaseNumber_value_ucase != '' and Enable_CaseNumFilterSrch;
+    
     // gateways := Gateway.Constants.void_gateway : stored ('gateways', few);
     gateways := Gateway.Configuration.Get();
     picklist_res := FCRA.PickListSoapcall.non_esdl(gateways, true, ~EnableCaseNumFilter and returnByDidOnly and (input_did = 0)); 

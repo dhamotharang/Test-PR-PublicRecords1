@@ -303,7 +303,8 @@ EXPORT Functions := MODULE
 	END;
 
 	EXPORT getMatchedEntityTypes(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_batch_in,
-															 DATASET(FraudShared_Services.Layouts.Raw_payload_rec) ds_payload) := FUNCTION	
+															 DATASET(FraudShared_Services.Layouts.Raw_payload_rec) ds_payload,
+															 Boolean skip_autokey_element_matching = FALSE) := FUNCTION	
 
 		FraudShared_Services.Layouts.layout_velocity_matches xform_velocity_matches(FraudShared_Services.Layouts.BatchInExtended_rec l,
 																																								FraudShared_Services.Layouts.Raw_Payload_rec r) := TRANSFORM	
@@ -318,8 +319,9 @@ EXPORT Functions := MODULE
 												
 			name :=  IF(l.name_last <> '' AND 
 									l.name_first <> '' AND
-									stringlib.StringToUpperCase(l.name_first) = stringlib.StringToUpperCase(r.cleaned_name.fname) AND
-									stringlib.StringToUpperCase(l.name_last) = stringlib.StringToUpperCase(r.cleaned_name.lname), 
+									(skip_autokey_element_matching OR 
+									(stringlib.StringToUpperCase(l.name_first) = stringlib.StringToUpperCase(r.cleaned_name.fname) AND
+									stringlib.StringToUpperCase(l.name_last) = stringlib.StringToUpperCase(r.cleaned_name.lname))), 
 									DATASET([{FraudGovPlatform_Services.Constants.Fragment_Types.NAME_FRAGMENT}], 
 											{STRING fragmentType}));
 												
@@ -334,11 +336,11 @@ EXPORT Functions := MODULE
 																		((l.mailing_p_city_name<>'' AND l.mailing_st<>'') OR l.mailing_z5<>'');
 										
 			physicalAddress :=  IF( isPhysicalAddress AND 
-															l.prim_range = r.clean_address.prim_range AND
+															(skip_autokey_element_matching  OR (l.prim_range = r.clean_address.prim_range AND
 															l.prim_name = r.clean_address.prim_name AND
 															l.sec_range = r.clean_address.sec_range AND
 															// l.unit_desig = r.clean_address.unit_desig AND
-															((l.p_city_name = r.clean_address.p_city_name AND l.st = r.clean_address.st ) OR l.z5 = r.clean_address.zip),
+															((l.p_city_name = r.clean_address.p_city_name AND l.st = r.clean_address.st ) OR l.z5 = r.clean_address.zip))),
 															DATASET([{FraudGovPlatform_Services.Constants.Fragment_Types.PHYSICAL_ADDRESS_FRAGMENT}],
 																	{STRING fragmentType}));
 
@@ -364,8 +366,8 @@ EXPORT Functions := MODULE
 													{STRING fragmentType}));
 													
 			phone :=  IF(l.phoneno <> '' AND 
-									 ((l.phoneno = r.clean_phones.phone_number) OR 
-										(l.phoneno = r.clean_phones.cell_phone)), 
+									 (skip_autokey_element_matching OR 
+									 (l.phoneno = r.clean_phones.phone_number OR l.phoneno = r.clean_phones.cell_phone)),  
 										DATASET([{FraudGovPlatform_Services.Constants.Fragment_Types.PHONE_FRAGMENT}], 
 												{STRING fragmentType}));
 						
@@ -438,10 +440,10 @@ EXPORT Functions := MODULE
 			customerProgram := IF(batch_params.IndustryType = r.classification_permissible_use_access.ind_type,
 													DATASET([{FraudGovPlatform_Services.Constants.Contribution_Types.CUSTOMER_PROGRAM}], {STRING contributionType}));
 			
-			agencyState := IF(batch_params.AgencyState = r.classification_source.customer_state,
+			agencyState := IF(STD.Str.ToUpperCase(batch_params.AgencyState) = STD.Str.ToUpperCase(r.classification_source.customer_state),
 											DATASET([{FraudGovPlatform_Services.Constants.Contribution_Types.AGENCY_STATE}], {STRING contributionType}));
 													
-			customerVertical := IF(batch_params.AgencyVerticalType = r.classification_source.customer_vertical,
+			customerVertical := IF(STD.Str.ToUpperCase(batch_params.AgencyVerticalType) = STD.Str.ToUpperCase(r.classification_source.customer_vertical),
 														DATASET([{FraudGovPlatform_Services.Constants.Contribution_Types.CUSTOMER_VERTICAL}], {STRING contributionType}));													
 
 			SELF.contributionType_matches := customer + customerProgram + agencyState + customerVertical;

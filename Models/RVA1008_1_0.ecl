@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwisefcra, riskwise, std;
+﻿import risk_indicators, ut, riskwisefcra, riskwise, std, riskview;
 
 export RVA1008_1_0( grouped dataset(risk_indicators.layout_boca_shell) clam,
 	boolean inCalif, real in_employment_years, real in_employment_months, real total_income
@@ -565,7 +565,7 @@ RVA_DEBUG := false;
 
 		scored_222s := if(max(property_owned_total, property_sold_total) = NULL, NULL, sum(if(property_owned_total = NULL, 0, property_owned_total), if(property_sold_total = NULL, 0, property_sold_total))) > 0 OR (90 <= combo_dobscore AND combo_dobscore <= 100 or input_dob_match_level >= (string)7 or (integer)lien_flag > 0 or criminal_count > 0 or (integer)bk_flag > 0 or ssn_deceased or truedid);
 
-		rva1008 := if(nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 2 and not((boolean)scored_222s), 222, rva1008_1);
+		rva1008 := if(riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid) , 222, rva1008_1);
 
 
 		#if(RVA_DEBUG)
@@ -720,7 +720,7 @@ RVA_DEBUG := false;
 		);
 
 		// per darrin udean:
-		// "For this model, I’d like to move the U1 threshold to 3000 and keep the U2 at 12 months. -darrin"
+		// "For this model, I'd like to move the U1 threshold to 3000 and keep the U2 at 12 months. -darrin"
 		inc_threshold := 3000;
 		emp_threshold := 12;
 

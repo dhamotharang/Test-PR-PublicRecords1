@@ -2,8 +2,10 @@
 EXPORT Constants := module
 
 // new NoScore logic to apply across all models and riskview attributes for Riskview Dempsey core project
-export noScore(integer nas, integer nap, integer naprop, boolean truedid) := (nas <= 4 and nap <= 4 and naprop <= 3) or truedid=false;
+export noScore(integer nas, integer nap, integer naprop, boolean truedid) := truedid=false;
+// export noScore(integer nas, integer nap, integer naprop, boolean truedid) := (nas <= 4 and nap <= 4 and naprop <= 3) or truedid=false;
 export noScoreAlert := '222A';  
+
 
 export batch := 'batch';
 export online := 'online';

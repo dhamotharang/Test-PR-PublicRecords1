@@ -1,4 +1,4 @@
-import iesp, risk_indicators, fcra, doxie, ut, riskview, RiskWiseFCRA;
+﻿import iesp, risk_indicators, fcra, doxie, ut, riskview, RiskWiseFCRA;
 
 // for now this only supports a single input record -- that's what the fcradataservice restricts too...
 
@@ -22,7 +22,9 @@ EXPORT RiskViewReport_RptFunction(dataset (risk_indicators.Layout_Boca_Shell) bo
     ssn_flags := CHOOSEN (fcra.key_override_flag_ssn (l_ssn=bs.shell_Input.ssn, datalib.NameMatch (bs.shell_Input.fname, bs.shell_Input.mname, bs.shell_Input.lname, fname, mname, lname)<3), risk_indicators.iid_constants.MAX_OVERRIDE_LIMIT);
     did_flags := CHOOSEN (fcra.key_override_flag_did (keyed (l_did=(string)bs.did)), risk_indicators.iid_constants.MAX_OVERRIDE_LIMIT);
     flags := PROJECT (did_flags, fcra.Layout_override_flag) + PROJECT (ssn_flags, fcra.Layout_override_flag);
-		flagrecs := CHOOSEN (dedup (flags, ALL), risk_indicators.iid_constants.MAX_OVERRIDE_LIMIT);
+		flagrecs_original := CHOOSEN (dedup (flags, ALL), risk_indicators.iid_constants.MAX_OVERRIDE_LIMIT);	
+		personContext_flags := risk_indicators.AddConsumerStatementsToFlagFile(bocashell[1].ConsumerStatements);
+		flagrecs := flagrecs_original + personContext_flags;
 
 // Watercraft information...
 		watercrafts := RiskWiseFCRA._watercraft_data (dids_input, flagrecs, nss);
@@ -67,7 +69,9 @@ EXPORT RiskViewReport_RptFunction(dataset (risk_indicators.Layout_Boca_Shell) bo
 		END;
 // Bankruptcies................		
 		RiskWiseFCRA._Bankruptcy_data(dids_input, flagrecs, bankruptcy_search, bankruptcy_, bk_courts_, history_date, bk_withdraws_);
-    bankruptcies := join(bankruptcy_search, bankruptcy_, (integer)left.did = dids_input[1].did and left.tmsid = right.tmsid);		
+    insurancemode := false;
+    bankruptcies := join(bankruptcy_search(trim(chapter) in risk_indicators.iid_constants.set_permitted_bk_chapters(BocaShellVersion, insurancemode) ), 
+												bankruptcy_, (integer)left.did = dids_input[1].did and left.tmsid = right.tmsid);		
 		
 		iesp.riskviewreport.t_RvReportBankruptcyRecord formatbankruptcies(bankruptcies l, integer c) := TRANSFORM
 			self.Seq := (string)c;

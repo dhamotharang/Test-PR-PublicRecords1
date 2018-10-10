@@ -5,9 +5,6 @@ EXPORT GetZumigoIdentity_Records(DATASET(PhoneFinder_Services.Layouts.PhoneFinde
                                  DATASET(Gateway.Layouts.Config) dGateways) := 
 
 MODULE
-  SHARED UNSIGNED1 consent_level       := inMod.LineIdentityConsentLevel;
-  SHARED BOOLEAN full_consent := consent_level = PhoneFinder_Services.Constants.ConsentLevels.FullConsumer;
-  SHARED BOOLEAN single_consent := consent_level = PhoneFinder_Services.Constants.ConsentLevels.SingleConsumer;
    
    Ph_wireless := dPhoneRecs(phone <> '' AND typeflag != Phones.Constants.TypeFlag.DataSource_PV AND COC_description = PhoneFinder_Services.Constants.PhoneType.Wireless);
 
@@ -19,14 +16,14 @@ MODULE
   // for pii search, sending in one primary wireless phone , if available, else one other phone per acct
   // sorting other phones(non primary) by score and dates 
     
-   PII_wireless_pre := DEDUP(SORT(Ph_wireless(batch_in.homephone = ''), acctno, if(isprimaryphone, 0, 1), -phone_score, -dt_last_seen, dt_first_seen), acctno);
+   PII_wireless_pre := DEDUP(SORT(Ph_wireless(batch_in.homephone = ''), acctno, IF(isprimaryphone, 0, 1), -phone_score, -dt_last_seen, dt_first_seen), acctno);
      
      // sending in best identities name/addr to first wireless phone 
    PhoneFinder_Services.Layouts.PhoneFinder.Final in_addr(PhoneFinder_Services.Layouts.PhoneFinder.Final l,
                                                            PhoneFinder_Services.Layouts.BatchInAppendDID r)
    := TRANSFORM
         
-            SELF.phone :=  l.phone;
+        SELF.phone :=  l.phone;
         SELF.fname :=  r.name_first;
         SELF.mname :=  r.name_middle;
         SELF.lname := r.name_last;
@@ -45,46 +42,11 @@ MODULE
                                                                                                                                                                                                                             
       END;
    
-   PII_wireless := JOIN(PII_wireless_pre, dInBestInfo, LEFT.acctno = RIGHT.acctno, in_addr(left,right),limit(0), keep(1));
+   PII_wireless := JOIN(PII_wireless_pre, dInBestInfo, LEFT.acctno = RIGHT.acctno, in_addr(LEFT,RIGHT),LIMIT(0), KEEP(1));
 
    Phones_wireless := PII_wireless + PhoneSrch_wireless;
 
-    Zum_inMod := MODULE(Phones.IParam.inZumigoParams)
-/*      use_case := MAP(inMod.Usecase[1] = '1' => 'OTPCFD',
-                       inMod.Usecase[2] = '1' => 'FCIP',
-                       inMod.Usecase[3] = '1' => 'TCPA',
-                       inMod.Usecase[4] = '1' => 'Geo Location',
-                      '');
-*/ 
-     EXPORT STRING20 Usecase              := PhoneFinder_Services.Constants.ZumigoConstants.Usecase;
-     EXPORT STRING3   productCode          := PhoneFinder_Services.Constants.ZumigoConstants.productCode;
-     EXPORT STRING8 billingId             := inMod.billingId;
-     EXPORT STRING20 productName          := PhoneFinder_Services.Constants.ZumigoConstants.productName;
-     
-     EXPORT BOOLEAN NameAddressValidation := full_consent and 
-                                             inMod.TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate; // Only nameaddrvalidation for ultimate transactions
-     EXPORT BOOLEAN NameAddressInfo       := FALSE;
-     EXPORT BOOLEAN AccountInfo           := FALSE;
-     EXPORT BOOLEAN CarrierInfo           := FALSE;
-     EXPORT BOOLEAN CallHandlingInfo      := full_consent;
-     EXPORT BOOLEAN DeviceInfo            := FALSE;
-     BOOLEAN hasActiveDeviceRules      := EXISTS(inMod.RiskIndicators((RiskId = PhoneFinder_Services.Constants.RiskRules.SimCardInfo or 
-                                                                         RiskId = PhoneFinder_Services.Constants.RiskRules.DeviceInfo) and active));
-     SHARED BOOLEAN includeDeviceDetails  := (full_consent or single_consent) and 
-                          inMod.TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate and hasActiveDeviceRules;
-     EXPORT BOOLEAN   DeviceHistory        := includeDeviceDetails;
-     EXPORT BOOLEAN   DeviceChangeOption   := includeDeviceDetails;
-     EXPORT STRING10 optInType            := PhoneFinder_Services.Constants.ZumigoConstants.optInType;
-     EXPORT STRING5   optInMethod          := IF(full_consent or single_consent, PhoneFinder_Services.Constants.ZumigoConstants.optInMethod, '');
-     EXPORT STRING3   optinDuration        := IF(full_consent or single_consent, PhoneFinder_Services.Constants.ZumigoConstants.optinDuration, '');
-     EXPORT STRING  optinId               := IF(Phones.Constants.Debug.Testing, '1', inMod.billingId);
-     EXPORT STRING  optInVersionId        := '';
-     EXPORT STRING15 optInTimestamp       := (STRING)STD.Date.CurrentDate(TRUE)+' '+(STRING)INTFORMAT(STD.Date.CurrentTime(TRUE),6,1);  
-  
-     EXPORT DATASET(Gateway.Layouts.Config) gateways := dGateways(Gateway.Configuration.IsZumigoIdentity(servicename));
-   END; 
-    
-   Phones.Layouts.ZumigoIdentity.subjectVerificationRequest toZin(PhoneFinder_Services.Layouts.PhoneFinder.Final l) := transform
+   Phones.Layouts.ZumigoIdentity.subjectVerificationRequest toZin(PhoneFinder_Services.Layouts.PhoneFinder.Final l) := TRANSFORM
 
      SELF.acctno := l.acctno;
      SELF.sequence_number    := l.seq;
@@ -110,7 +72,31 @@ MODULE
 
    END;
 
-   Zum_inrecs := PROJECT(Phones_wireless, toZin(LEFT));
+   SHARED Zum_inrecs := PROJECT(Phones_wireless, toZin(LEFT));
+    
+   SHARED Zum_inMod := MODULE(Phones.IParam.inZumigoParams)
+     EXPORT STRING20  Usecase             := PhoneFinder_Services.Constants.ZumigoConstants.Usecase;
+     EXPORT STRING3   productCode         := PhoneFinder_Services.Constants.ZumigoConstants.productCode;
+     EXPORT STRING8   billingId           := inMod.billingId;
+     EXPORT STRING20 productName          := PhoneFinder_Services.Constants.ZumigoConstants.productName;
+     
+     EXPORT BOOLEAN NameAddressValidation := inMod.IncludeNameAddressValidation;
+     EXPORT BOOLEAN NameAddressInfo       := FALSE;
+     EXPORT BOOLEAN AccountInfo           := FALSE;
+     EXPORT BOOLEAN CallHandlingInfo      := inMod.IncludeCallHandlingInfo;
+     EXPORT BOOLEAN DeviceInfo            := inMod.IncludeDeviceInfo;  
+     EXPORT BOOLEAN DeviceHistory         := inMod.IncludeDeviceHistory;
+     EXPORT BOOLEAN DeviceChangeOption    := inMod.IncludeDeviceChangeInfo;
+     EXPORT STRING10 optInType            := PhoneFinder_Services.Constants.ZumigoConstants.optInType;
+     EXPORT STRING5  optInMethod         := PhoneFinder_Services.Constants.ZumigoConstants.optInMethod;
+     EXPORT STRING3  optinDuration       := PhoneFinder_Services.Constants.ZumigoConstants.optinDuration;
+     EXPORT STRING   optinId               := IF(Phones.Constants.Debug.Testing, '1', inMod.billingId);
+     EXPORT STRING   optInVersionId        := '';
+     EXPORT STRING15 optInTimestamp       := (STRING)STD.Date.CurrentDate(TRUE)+' '+(STRING)INTFORMAT(STD.Date.CurrentTime(TRUE),6,1);  
+  
+     EXPORT DATASET(Gateway.Layouts.Config) gateways := dGateways(Gateway.Configuration.IsZumigoIdentity(servicename));
+   END; 
+    
 
    EXPORT Zumigo_Hist := Phones.GetZumigoIdentity(Zum_inrecs, Zum_inMod, inMod.GLBPurpose, inMod.DPPAPurpose);
 
@@ -121,7 +107,7 @@ MODULE
                                      (r.addr_score  BETWEEN Phones.Constants.Zumigo_NameAddr_Validation_Threshold_MIN AND Phones.Constants.Zumigo_NameAddr_Validation_Threshold_MAX);
                                
      Validhit                       := r.source = Phones.Constants.GatewayValues.ZumigoIdentity AND R.device_mgmt_status = '';
-     SELF.CallForwardingIndicator   := IF(Validhit and full_consent, PhoneFinder_Services.Functions.CallForwardingDesc(r.call_forwarding),'');
+     SELF.CallForwardingIndicator   := IF(Validhit AND Zum_inMod.CallHandlingInfo, PhoneFinder_Services.Functions.CallForwardingDesc(r.call_forwarding),'');
      SELF.rec_source := r.source; // for royalty count
    SELF.imsi_changedate := r.imsi_changedate;
    SELF.imsi_ActivationDate := r.imsi_ActivationDate;
@@ -138,10 +124,10 @@ MODULE
    END;
 
    EXPORT Zumigo_GLI := JOIN(dPhoneRecs, Zumigo_Hist,
-                       left.acctno = right.acctno AND
-                       left.seq    = right.sequence_number AND
-                       left.phone  = right.submitted_phonenumber,
-                       toZumValidated(left, right),
+                       LEFT.acctno = RIGHT.acctno AND
+                       LEFT.seq    = RIGHT.sequence_number AND
+                       LEFT.phone  = RIGHT.submitted_phonenumber,
+                       toZumValidated(LEFT, RIGHT),
                        LEFT OUTER, KEEP(1),
                        LIMIT(0));
 

@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwisefcra, riskwise, std;
+﻿import risk_indicators, ut, riskwisefcra, riskwise, std, riskview;
 
 export RVR711_0_0(
 	grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam,
@@ -608,7 +608,7 @@ end;
 		corrections := (rc_hrisksic=2225);
 
 		rvr711_override := map(
-			nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 2  => 222,
+			riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid)  => 222,
 			RVR711_0_0_b > 680 and (ssndead or ssnprior_x or criminal_flag or corrections ) => 680,
 			rvr711_0_0_b
 		);

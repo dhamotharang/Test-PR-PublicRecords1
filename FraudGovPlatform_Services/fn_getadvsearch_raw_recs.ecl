@@ -1,4 +1,4 @@
-﻿IMPORT FraudShared_Services, iesp, STD, ut, FraudShared;
+﻿IMPORT FraudShared_Services, iesp, STD;
 
 EXPORT fn_getadvsearch_raw_recs (
 	DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_batch_in,
@@ -128,7 +128,7 @@ EXPORT fn_getadvsearch_raw_recs (
 	END;
 
 	ds_recs := if(IsOnline, 
-								dataset([	{count(ds_auto_name), 'autoname', ds_auto_name},
+								dataset([ {count(ds_auto_name), 'autoname', ds_auto_name},
 													{count(ds_auto_address), 'autoaddress', ds_auto_address},
 													{count(ds_auto_ssn), 'autossn', ds_auto_ssn},
 													{count(ds_auto_phone), 'autophone', ds_auto_phone},
@@ -166,21 +166,10 @@ EXPORT fn_getadvsearch_raw_recs (
 	
 	//Applying the all AND filters based on all the Search Fields.
 	ds_recs_filtered := ds_payload_recs(if(in_rec.did <> 0, did = in_rec.did, true) AND
-																			if(in_rec.name_first <> '', cleaned_name.fname = in_rec.name_first, true) AND
-																			if(in_rec.name_middle <> '', cleaned_name.mname = in_rec.name_middle, true) AND
-																			if(in_rec.name_last <> '', cleaned_name.lname = in_rec.name_last, true) AND
-																			if(in_rec.addr <> '' , address_1 = in_rec.addr, true) AND
-																			if(in_rec.prim_name <> '', 
-																				(clean_address.prim_range = in_rec.prim_range AND
-																				clean_address.prim_name = in_rec.prim_name AND
-																				clean_address.sec_range = in_rec.sec_range AND
-																				((clean_address.p_city_name  = in_rec.p_city_name AND clean_address.st  = in_rec.st) OR clean_address.zip = in_rec.z5)),true) AND
 																			if(in_rec.p_city_name <> '' AND in_rec.st <> '', 
 																					clean_address.p_city_name  = in_rec.p_city_name AND clean_address.st  = in_rec.st,
 																					true) AND
 																			if(in_rec.z5 <> '', clean_address.zip = in_rec.z5, true) AND
-																			if(in_rec.ssn <> '', ssn = in_rec.ssn, true) AND
-																			if(in_rec.phoneno <> '', in_rec.phoneno IN [clean_phones.phone_number, clean_phones.cell_phone, clean_phones.work_phone], true) AND
 																			if(in_rec.HouseholdId <> '', household_id = in_rec.HouseholdId, true) AND
 																			if(in_rec.CustomerPersonId <> '', customer_person_id = in_rec.CustomerPersonId, true) AND
 																			if(in_rec.transactionstartdate <> '' AND in_rec.transactionenddate <> '', 
@@ -214,18 +203,46 @@ EXPORT fn_getadvsearch_raw_recs (
 																		 );
 																		 
 	//AND filter with BankName , explicit join because we do not have BankName field in the payload. 
-	ds_recs_filtered_bankname := IF(EXISTS(ds_BankNameIds),
+	ds_recs_filtered_bankname := IF(in_rec.BankName <> '',
 																	JOIN(ds_recs_filtered, ds_BankNameIds,
 																		LEFT.record_id = RIGHT.record_id,
 																		TRANSFORM(LEFT)),
 																	ds_recs_filtered);
 																
 	//AND filter with County , explicit join because we wanted to use recordid filtering... 
-	ds_recs_filtered_final := IF(EXISTS(ds_CountyIds),
+	ds_recs_filtered_county := IF(in_rec.county_name <> '',
 																JOIN(ds_recs_filtered_bankname, ds_CountyIds,
 																	LEFT.record_id = RIGHT.record_id,
 																	TRANSFORM(LEFT)),
-																ds_recs_filtered_bankname);																
+																ds_recs_filtered_bankname);
+																
+	//AND Filter with Name Autokey,
+	ds_recs_filtered_name := IF(in_rec.name_last <> '' AND in_rec.name_first <> '',
+																JOIN(ds_recs_filtered_county, ds_auto_name,
+																	LEFT.record_id = RIGHT.record_id,
+																	TRANSFORM(LEFT)),
+																ds_recs_filtered_county);	
+
+	//AND Filter with Address Autokey,
+	ds_recs_filtered_address := IF(in_rec.prim_name <> '' AND ((in_rec.p_city_name <> '' AND in_rec.st <> '') OR in_rec.z5 <> ''),
+																JOIN(ds_recs_filtered_name, ds_auto_address,
+																	LEFT.record_id = RIGHT.record_id,
+																	TRANSFORM(LEFT)),
+																ds_recs_filtered_name);	
+
+	//AND Filter with Name Autokey,
+	ds_recs_filtered_phone := IF(in_rec.phoneno <> '',
+																JOIN(ds_recs_filtered_address, ds_auto_phone,
+																	LEFT.record_id = RIGHT.record_id,
+																	TRANSFORM(LEFT)),
+																ds_recs_filtered_address);	
+
+	//AND Filter with ssn Autokey,
+	ds_recs_filtered_final := IF(in_rec.ssn <> '',
+																JOIN(ds_recs_filtered_phone, ds_auto_ssn,
+																	LEFT.record_id = RIGHT.record_id,
+																	TRANSFORM(LEFT)),
+																ds_recs_filtered_phone);	
 																		 
   // *** No filtering in FraudGov
   ds_recs_pulled := FraudShared_Services.Common_Suppress(ds_recs_filtered_final);
@@ -234,9 +251,16 @@ EXPORT fn_getadvsearch_raw_recs (
 
   ds_allPayloadRecs := ds_FilterThruMBS;
 	
+	// output(ds_batch_in, named('ds_batch_in'));
+	// output(ds_auto_name, named('ds_auto_name'));
+	// output(ds_auto_address, named('ds_auto_address'));
+	// output(ds_auto_ssn, named('ds_auto_ssn'));
 	// output(ds_auto_phone, named('ds_auto_phone'));
 	// output(ds_recs, named('ds_recs'));
 	// output(ds_recs_filtered, named('ds_recs_filtered'));
+	// output(ds_recs_filtered_name, named('ds_recs_filtered_name'));
+	// output(ds_recs_filtered_address, named('ds_recs_filtered_address'));
+	// output(ds_recs_filtered_phone, named('ds_recs_filtered_phone'));
 	// output(ds_recs_filtered_final, named('ds_recs_filtered_final'));
 	// output(ds_recs_pulled, named('ds_recs_pulled'));
 	// output(ds_FilterThruMBS, named('ds_FilterThruMBS'));

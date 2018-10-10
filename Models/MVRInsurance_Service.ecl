@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="MVRInsurance_Service">
 	<!-- XML INPUT -->
 	<part name="FcraInsuranceModelRequest" type="tns:XmlDataSet" cols="80" rows="30" />
@@ -255,6 +255,8 @@ EXPORT MVRInsurance_Service := MACRO
 	INTEGER1  bsVersion            := IF(EXISTS(modelNames (model = 'MPX1211.0.0')),4,3);  // just in case there are more than 1 models requested
   BOOLEAN   nugen                := TRUE;
 	BOOLEAN   ADL_Based_Shell      := FALSE;
+	unsigned8 BSOptions							:= Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyException;
+																		
 
 	clam := Risk_Indicators.Boca_Shell_Function_FCRA(
 		bsprep, gateways, dppa, glba, isUtility, isLN,
@@ -262,7 +264,7 @@ EXPORT MVRInsurance_Service := MACRO
 		suppressNearDups, fromBIID, excludeWatchlists, fromIT1O,
 		ofacVersion, includeOfac, includeAddWatchlists, watchlistThreshold,
 		bsVersion, isPreScreen, doScore, nugen, ADL_Based_Shell, datarestriction:=datarestriction,
-		datapermission:=datapermission
+		datapermission:=datapermission,BSOptions:=BSOptions
 	);
 	
 	emptyclam := group(project(bsPrep, transform(risk_indicators.Layout_Boca_Shell, 

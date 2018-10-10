@@ -1,4 +1,4 @@
-import riskwise, risk_indicators, ut, riskwisefcra, std;
+﻿import riskwise, risk_indicators, ut, riskwisefcra, std, riskview;
 
 export RVT711_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, 
 				  boolean isCalifornia = false) :=
@@ -587,7 +587,7 @@ FUNCTION
 		
 
 		RVT711_0_0 := Map( (( RVT711_0_0_tmp>680 ) and (ssndead_x or ssnprior_x or criminal_flag or corrections )) => 680,
-						   (( nas_summary <= 4 ) and ( nap_summary <= 4 ) and ( add1_naprop <= 2 )) => 222,
+						   riskview.constants.noscore(nas_summary,nap_summary, add1_naprop, le.truedid)										 => 222,
 						   RVT711_0_0_tmp);						   
 					   
 		// reason codes

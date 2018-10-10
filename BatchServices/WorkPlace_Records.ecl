@@ -266,7 +266,7 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
   // 11.4.1 Match all complete recs for a did to the most current one for a did to keep 
 	//        any recs for a did that have the same bdid/company name & phone1 as the 
 	//        most current one and are within 14 days of the most current dt_last_seen.
-  ds_best_recs_for_did := join(ds_most_complete_srtd,ds_most_current1,
+  ds_best_recs_for_did := join(ds_most_complete_srtd(~from_PAW),ds_most_current1,
 	                             left.did = right.did                            and 
 	                             // check for bdids the same in case company names are slightly different
 	                             ((left.bdid !=0 and left.bdid = right.bdid) or
@@ -324,7 +324,7 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
   // 11.6.2 Next sort/dedup the filtered recs to only keep the recs with a  
 	//        unique company_name for each did
   ds_most_complete_unique := dedup(sort(ds_most_complete_fltrd,
-		                                    did, company_name, -dt_last_seen, source_order, record),
+		                                    did, company_name, from_PAW, -dt_last_seen, source_order, record),
 	                                 did, company_name);
 
   // 11.6.3 Next do a left only join to remove the best rec for each did  
@@ -342,7 +342,7 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
   // 11.6.4 Next sort/dedup the remaining recs to keep the 4 next most current recs 
 	//        for each did.
   ds_addl_4recs := dedup(sort(ds_most_complete_addl,
-		                          did, -dt_last_seen, source_order, record),
+		                          did, -dt_last_seen, source_order, from_PAW, record),
 	                       did, dt_last_seen, source_order,
 	                       KEEP(WorkPlace_Constants.Limits.KEEP_HIST));
 
@@ -423,7 +423,7 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
 	end;
 	
   ds_addl_combined := rollup(group(sort(ds_addl_4recs_wcorpstat,
-	                                      did,-dt_last_seen, source_order, record),
+	                                      did, from_PAW, -dt_last_seen, source_order, record),
 																	 did),
 														 group,
 														 xform_roll_addl(left,rows(left)));

@@ -1,4 +1,4 @@
-import risk_indicators, riskwise, riskwisefcra, ut, std;
+﻿import risk_indicators, riskwise, riskwisefcra, ut, std, riskview;
 
 export RVP1208_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam ) := FUNCTION
 
@@ -374,7 +374,8 @@ export RVP1208_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam ) :=
 		indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'DS', ',') or 
 		truedid)
 		
-		and not uv_eq_only;
+		and not uv_eq_only
+		and truedid;;
 
 	base := 700;
 
@@ -384,7 +385,7 @@ export RVP1208_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam ) :=
 
 	rvp1208_1_0 := map(
 			ssn_deceased           => 200,
-			not uv_rvp1003_content     => 222,
+			riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid)     => 222,
 																min(if(max(round(point * (ln(probscore / (1 - probscore)) - ln(odds)) / ln(2) + base), 501) = NULL, -NULL, max(round(point * (ln(probscore / (1 - probscore)) - ln(odds)) / ln(2) + base), 501)), 900));
 
 	#if(RVP_DEBUG)

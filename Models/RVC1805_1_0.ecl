@@ -16,7 +16,7 @@
  * ECL Developer: Jack Francis Jr                                        08/15/2018 *
  ************************************************************************************/
 
-IMPORT ut, Std, RiskWise, RiskWiseFCRA, Risk_Indicators;
+IMPORT ut, Std, RiskWise, RiskWiseFCRA, Risk_Indicators, riskview;
 
 EXPORT rvc1805_1_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, Boolean isCalifornia = False) := FUNCTION
 
@@ -778,7 +778,7 @@ rc1_1 := if(not((rc1_2 in ['9Q', '9P'])) and not((rc2_2 in ['9Q', '9P'])) and no
 
 iv_rv5_deceased := rc_decsflag = '1' or (integer)indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'DS', ',') > 0 or (integer)indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'DE', ',') > 0;
 
-iv_rv5_unscorable := if(NAS_Summary <= 4 and NAP_Summary <= 4 and add1_naprop <= 3 or ~TrueDID, 1, 0);
+iv_rv5_unscorable := if(riskview.constants.noscore(NAS_Summary,NAP_Summary, add1_naprop, TrueDID), 1, 0);
 
 base := 700;
 

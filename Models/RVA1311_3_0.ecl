@@ -1,6 +1,6 @@
-// RVA1311_3 RVA1311_3 – SAFCO – Southern Auto Finance Company project 4489 - 4.1. shell - FCRA
+﻿// RVA1311_3 RVA1311_3 â€“ SAFCO â€“ Southern Auto Finance Company project 4489 - 4.1. shell - FCRA
 
-import risk_indicators, riskwise, RiskWiseFCRA, ut, std;
+import risk_indicators, riskwise, RiskWiseFCRA, ut, std, riskview;
 
 export RVA1311_3_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, BOOLEAN isCalifornia = FALSE) := FUNCTION
 
@@ -576,23 +576,7 @@ export RVA1311_3_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, BOO
 
 	ssn_deceased := rc_decsflag = '1' or indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'DS', ',') ;
 
-	iv_riskview_222s := nas_summary <= 4 and 
-		nap_summary <= 4 and 
-		add1_naprop <= 3 and 
-		not(if(max(property_owned_total, property_sold_total) = NULL, NULL, sum(if(property_owned_total = NULL, 0, property_owned_total), if(property_sold_total = NULL, 0, property_sold_total))) > 0 or 90 <= combo_dobscore AND 
-		combo_dobscore <= 100 or indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'L2', ',') or
-		indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'LI', ',') or 
-		liens_recent_unreleased_count > 0 or 
-		liens_historical_unreleased_ct > 0 or 
-		criminal_count > 0 or 
-		(rc_bansflag in ['1', '2']) or 
-		indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'BA', ',') or 
-		bankrupt or 
-		filing_count > 0 or 
-		bk_recent_count > 0 or
-		rc_decsflag = '1' or 
-		indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'DS', ',') or 
-		truedid);
+	iv_riskview_222s := riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid);
 
 	rva1311_3_0 := map(
 			ssn_deceased     => 200,

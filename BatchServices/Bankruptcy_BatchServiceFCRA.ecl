@@ -110,14 +110,8 @@ export Bankruptcy_BatchServiceFCRA(useCannedRecs = 'false') := MACRO
   //The used to be taken from STORED, but using getBatchParams for picklist caused a duplicated STORED error.
   in_ssn_mask := batch_params.ssn_mask;
 
-  //Attempt to append DIDs to ones that are missing using picklist.
-  ds_batch_in_appended_plist := BankruptcyV3_Services.fn_append_picklist(ds_batch_in, batch_params, isFCRA);
-
-  //Call person context to retrieve consumer data and alert flags.
-  dids := PROJECT(DEDUP(SORT(ds_batch_in_appended_plist, did, acctno), did, acctno), FFD.Layouts.DidBatch);
-  pc_recs := FFD.FetchPersonContext(dids((unsigned6)did > 0), batch_params.gateways, FFD.Constants.DataGroupSet.Bankruptcy, inFFDOptionsMask);
-  // Search for Bk records by party, not including searched without lexID, or suppressed from consumer level alerts.
-  ds_batch := BatchServices.Bankruptcy_BatchService_Records.search(ds_batch_in_appended_plist,
+ // Search for Bk records by party. Leave input as is to maintain expected results.
+  ds_batch := BatchServices.Bankruptcy_BatchService_Records.search(ds_batch_in,
     party_types,
     isFCRA,
     isDeepDive,
@@ -126,6 +120,13 @@ export Bankruptcy_BatchServiceFCRA(useCannedRecs = 'false') := MACRO
     BIPFetchLevel,
     BIPSkipMatch,
     suppress_withdrawn_bankruptcy);
+
+  //Attempt to append missing DIDs to input.
+  ds_batch_in_appended_plist := BankruptcyV3_Services.fn_append_picklist(ds_batch_in, batch_params, isFCRA);
+
+  //Call person context to retrieve consumer data and alert flags.
+  dids := PROJECT(DEDUP(SORT(ds_batch_in_appended_plist, did, acctno), did, acctno), FFD.Layouts.DidBatch);
+  pc_recs := FFD.FetchPersonContext(dids((unsigned6)did > 0), batch_params.gateways, FFD.Constants.DataGroupSet.Bankruptcy, inFFDOptionsMask);
 
   //Do a join against input lexIDs, only keep those with matching debtor_did.
   //This is not done after inquiryLexId batch because a filter after that loses mismatched records

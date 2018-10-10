@@ -9,7 +9,7 @@
 export Comprehensive_Report_Service := MACRO
 
 IMPORT  AutoStandardI, CriminalRecords_Services, doxie, doxie_crs, 
-        EquifaxDecisioning, FFD, FCRA, Gateway, iesp, Royalty, suppress, WSInput;
+        EquifaxDecisioning, FFD, FCRA, Gateway, Royalty, suppress, WSInput;
 
 WSInput.MAC_FCRA_Comprehensive_Report_Service();
 
@@ -43,8 +43,9 @@ integer8 inFFDMask := FFD.FFDMask.Get(inApplicationType:=application_type_value)
 boolean ShowConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDMask);
 
 // get person context
+datagroups_set := IF(Include_Them_All, FFD.Constants.DataGroupset.CompReport, doxie_crs.datagroups_select());
 in_pc := dataset([{FFD.Constants.SingleSearchAcctno, (unsigned)did_fcra}], FFD.Layouts.DidBatch);
-pc_recs := FFD.FetchPersonContext(in_pc, gateways,, inFFDMask);
+pc_recs := FFD.FetchPersonContext(in_pc, gateways, datagroups_set, inFFDMask);
 slim_pc_recs := FFD.SlimPersonContext(pc_recs);
 
 alert_indicators := FFD.ConsumerFlag.getAlertIndicators(pc_recs, inFCRAPurpose, inFFDMask)[1];

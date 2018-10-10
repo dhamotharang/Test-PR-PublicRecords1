@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwisefcra, riskwise, std;
+﻿import risk_indicators, ut, riskwisefcra, riskwise, std, riskview;
 
 export RVA1003_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boolean isCalifornia, boolean PreScreenOptOut=false ) := FUNCTION
 
@@ -2616,7 +2616,8 @@ export RVA1003_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boo
 									 ssn_deceased or
 									 truedid
 									 );
-		rva1003_0_0_3 := if( ( nas_summary <= 4 ) and ( nap_summary <= 4 ) and ( add1_naprop <= 2 ) AND not scored_222s, 222, rva1003_0_0_2 );
+
+		rva1003_0_0_3 := if( riskview.constants.noscore(nas_summary,nap_summary, add1_naprop, le.truedid), 222, rva1003_0_0_2 );
 
 
 		#if(RVA_DEBUG)

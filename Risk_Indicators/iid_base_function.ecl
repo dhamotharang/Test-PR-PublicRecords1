@@ -32,13 +32,10 @@ export iid_base_function(DATASET(risk_indicators.layout_input) indata, dataset(G
 													) := FUNCTION
 
 // step 1.  Get the DID and prep the layout_output dataset
-with_DID_Thor := risk_indicators.iid_getDID_prepOutput_THOR(indata, dppa, glb, isFCRA, BSversion, DataRestriction, append_best, gateways, BSOptions); 
-with_DID_Roxie := risk_indicators.iid_getDID_prepOutput(indata, dppa, glb, isFCRA, BSversion, DataRestriction, append_best, gateways, BSOptions);
-
 #IF(onThor)
-	with_DID := with_DID_thor;
+	with_DID := risk_indicators.iid_getDID_prepOutput_THOR(indata, dppa, glb, isFCRA, BSversion, DataRestriction, append_best, gateways, BSOptions);
 #ELSE
-	with_DID := with_DID_roxie;
+	with_DID := risk_indicators.iid_getDID_prepOutput(indata, dppa, glb, isFCRA, BSversion, DataRestriction, append_best, gateways, BSOptions);
 #END
 
 // do corrections here

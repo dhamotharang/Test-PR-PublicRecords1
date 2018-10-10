@@ -1,4 +1,4 @@
-/*2008-10-08T23:18:50Z (Todd Steil)
+﻿/*2008-10-08T23:18:50Z (Todd Steil)
 remove references to riskview fields in boca shell which are not actually calculated at run time per bug 33800
 */
  /*  Modelers Notes
@@ -9,7 +9,7 @@ remove references to riskview fields in boca shell which are not actually calcul
  *******************************************************************************************************
 */
 
-import riskwise, risk_indicators, ut, riskwisefcra, std;
+import riskwise, risk_indicators, ut, riskwisefcra, std, riskview;
 
 export RVT803_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, 
 				  boolean isCalifornia = false) :=
@@ -90,7 +90,7 @@ FUNCTION
 
 //*** dobver ***;
 
-    scr222 := ( nas_summary <= 4 ) and ( nap_summary <= 4 ) and ( add1_naprop <= 2 );
+    scr222 := riskview.constants.noscore(nas_summary,nap_summary, add1_naprop, le.truedid);
 
     dobver := if( ~scr222 AND combo_dobscore >= 90 AND combo_dobscore <= 100, 1, 0);
  
