@@ -223,7 +223,7 @@ macro
 	                     ,'ME_MEDCERT'     => DriversV2.Scrub_DL(filedate).ME_MEDCERT
 	                     ,'MI'             => DriversV2.Scrub_DL(filedate).MI
 	                     // ,'MO'             => DriversV2.Scrub_DL(filedate).MO
-	                     // ,'MO_MEDCERT'     => DriversV2.Scrub_DL(filedate).MO_MEDCERT
+	                     ,'MO_MEDCERT'     => DriversV2.Scrub_DL(filedate).MO_MEDCERT
 	                     ,'NE'             => DriversV2.Scrub_DL(filedate).NE
 	                     ,'NC'             => DriversV2.Scrub_DL(filedate).NC
 	                     ,'NV'             => DriversV2.Scrub_DL(filedate).NV											 
