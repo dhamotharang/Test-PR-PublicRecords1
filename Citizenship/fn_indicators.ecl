@@ -10,6 +10,7 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
   MODIFIER   := 'ie';
   isFCRA     := false;
   DAYSINYEAR := 365.25;
+  MOSINYEAR  := 12;  
   
 //========================================================================================
 
@@ -134,10 +135,10 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                                 SELF.firstSeenAddr10       := IF(rv_c14_addrs_10yr = NULL, NEG1, rv_c14_addrs_10yr);
                            
                            //*** reportedCurAddressYears
-                                add_curr_lres              := RIGHT.lres2;
-                                rv_c13_curr_addr_lres      := if(not(RIGHT.truedid and add_curr_pop), NULL, 
-                                                               min(if(add_curr_lres = NULL, -NULL, add_curr_lres), 999));
-                                SELF.reportedCurAddressYears := IF(rv_c13_curr_addr_lres = NULL, NEG1, rv_c13_curr_addr_lres);
+                                add_curr_lres                := TRUNCATE(RIGHT.lres2/ MOSINYEAR);               //***start with the number of months listed on the boca shell convert to years
+                                yr_c13_curr_addr_lres        := if(not(RIGHT.truedid and add_curr_pop), NULL, 
+                                                                   min(if(add_curr_lres = NULL, -NULL, add_curr_lres), 999));
+                                SELF.reportedCurAddressYears := IF(yr_c13_curr_addr_lres = NULL, NEG1, yr_c13_curr_addr_lres);
                            
                            //*** addressFirstReportedAge   - calculated after picking more information from the address hierarchy key   
                                 SELF.addressFirstReportedAge := -1;                   //*** 
