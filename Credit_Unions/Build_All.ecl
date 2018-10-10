@@ -26,7 +26,7 @@ function
 		,Promote().Inputfiles.using2used
 		,Promote().Buildfiles.Built2QA
 		,QA_Records()
-		,BIPStats(pversion,'Credit_Unions')
+		//,BIPStats(pversion,'Credit_Unions')
 
 	) : success(Send_Emails(pversion,,not pIsTesting).Roxie), failure(send_emails(pversion,,not pIsTesting).buildfailure);
 	

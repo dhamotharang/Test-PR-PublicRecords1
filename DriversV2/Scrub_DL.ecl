@@ -1,9 +1,8 @@
 ﻿IMPORT _Control, DriversV2, Scrubs, Scrubs_DL_CT, Scrubs_DL_FL, Scrubs_DL_MA, Scrubs_DL_ME_MEDCERT, Scrubs_DL_MI, 
-        Scrubs_DL_NE, Scrubs_DL_NC, Scrubs_DL_NV, Scrubs_DL_OH, Scrubs_DL_TN, Scrubs_DL_TN_CONV, 
+        Scrubs_DL_MO_MEDCERT, Scrubs_DL_NE, Scrubs_DL_NC, Scrubs_DL_NV, Scrubs_DL_OH, Scrubs_DL_TN, Scrubs_DL_TN_CONV, 
 				Scrubs_DL_TN_WDL, Scrubs_DL_TX, Scrubs_DL_WI, Scrubs_DL_WY_MEDCERT; 
        //,Scrubs_DL_NC_CHG
        // ,Scrubs_DL_MO
-			 // ,Scrubs_DL_MO_MEDCERT
 			 
 EXPORT Scrub_DL(STRING pversion) := MODULE
 
@@ -11,12 +10,13 @@ EXPORT Scrub_DL(STRING pversion) := MODULE
 		folder						:=	#EXPAND(myFolder);
 		inFile						:=	folder.#EXPAND(myFile)(BuildDate);
 		scrubs_name				:=	'Scrubs';
-
-		myEmail		:=	_Control.MyInfo.EmailAddressNotify;
+		myEmail						:=	_Control.MyInfo.EmailAddressNotify;
+		
 		F	:=	inFile;																				//	Records to scrub
 		S	:=	folder.#EXPAND(scrubs_name);									//	My scrubs module
 		N	:=	S.FromNone(F);																//	Generate the error flags
 		U :=	S.FromExpanded(N.ExpandedInFile);							//	Pass the expanded error flags into the Expanded module
+		
 		ErrorSummary			:=	OUTPUT(U.SummaryStats, NAMED('ErrorSummary'+datasetName));										//	Show errors by field and type
 		EyeballSomeErrors	:=	OUTPUT(CHOOSEN(U.AllErrors, 1000), NAMED('EyeballSomeErrors'+datasetName));		//	Just eyeball some errors
 		SomeErrorValues		:=	OUTPUT(CHOOSEN(U.BadValues, 1000), NAMED('SomeErrorValues'+datasetName));			//	See my error field values
@@ -72,8 +72,8 @@ EXPORT Scrub_DL(STRING pversion) := MODULE
   EXPORT ME_MEDCERT  := MAC_Scrubs_Report(pversion, 'Scrubs_DL_ME_MEDCERT', 'In_ME_MEDCERT', 'DL_ME_MEDCERT');
   EXPORT MI          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_MI',         'In_MI',         'DL_MI');
   EXPORT MO          := Temp_NoReport();
-  EXPORT MO_MEDCERT  := Temp_NoReport();
-  EXPORT NE          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_NE',         'In_NE',         'DL_NE');
+  EXPORT MO_MEDCERT  := MAC_Scrubs_Report(pversion, 'Scrubs_DL_MO_MEDCERT', 'In_MO_MEDCERT', 'DL_MO_MEDCERT');
+	EXPORT NE          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_NE',         'In_NE',         'DL_NE');
   EXPORT NC          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_NC',         'In_NC',         'DL_NC');
   EXPORT NV          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_NV',         'In_NV',         'DL_NV');
   EXPORT OH          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_OH',         'In_OH',         'DL_OH');
@@ -84,7 +84,6 @@ EXPORT Scrub_DL(STRING pversion) := MODULE
 
   // EXPORT LA          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_LA',         'In_LA',         'DL_LA');  
   // EXPORT MO          := MAC_Scrubs_Report(pversion, 'Scrubs_DL_MO',         'In_MO',         'DL_MO');
-  // EXPORT MO_MEDCERT  := MAC_Scrubs_Report(pversion, 'Scrubs_DL_MO_MEDCERT', 'In_MO_MEDCERT', 'DL_MO_MEDCERT');
 
   //***************Convictions**************
   // EXPORT OH_CONV     := MAC_Scrubs_Report(pversion, 'Scrubs_DL_OH_CONV',    'In_OH_CONV',    'DL_OH_CONV');

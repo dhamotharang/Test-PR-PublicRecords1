@@ -1,4 +1,4 @@
-import versioncontrol, _control, ut,Roxiekeybuild, orbit3;
+﻿import versioncontrol, _control, ut,Roxiekeybuild, orbit3;
 
 export Build_all(string	pVersion,string filedate) := function 
 							 
@@ -22,7 +22,7 @@ export Build_all(string	pVersion,string filedate) := function
 							
 		 dops_update := Roxiekeybuild.updateversion('ECRulingKeys',pVersion,'saritha.myana@lexisnexis.com, charlene.ros@lexisnexis.com',,'N'); 
 
-		 orbitUpdate := Orbit3.proc_Orbit3_CreateBuild('ECRulings',pversion,'N');
+		 orbitUpdate := Orbit3.proc_Orbit3_CreateBuild_AddItem('ECRulings',pversion,'N');
 																	
 		 full_build :=sequential (nothor(apply(filenames().Base.dAll_filenames, apply(dSuperfiles, versioncontrol.mUtilities.createsuper(name))))
 														 ,nothor(apply(Keynames(pversion).dall_filenames, apply(dSuperfiles,VersionControl.mUtilities.createsupers(Keynames(pversion).dall_filenames))))

@@ -10,7 +10,7 @@ export proc_Build_All(
 	,boolean										pIsTesting		= false
 	,boolean										pOverwrite		= false																															
 	,dataset(Layouts.Input		)	pSprayedFile	= Files().Input.using
-	,dataset(Layouts.Base			)	pBaseFile			= Files().base.qa										
+	,dataset(Layouts.Base_new	)	pBaseFile			= Files().base.qa										
 
 ) :=
 function
