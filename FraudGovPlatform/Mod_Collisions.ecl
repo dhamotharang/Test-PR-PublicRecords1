@@ -1,9 +1,42 @@
-﻿EXPORT Mod_Collisions(DATASET(DidSlim) SlimBase) := Module
+﻿import FraudShared;
+EXPORT Mod_Collisions(DATASET(FraudShared.Layouts.Base.Main) FileBase) := Module
 
 SHARED threashold:=enum(unsigned1,Low,Medium,High);
 SHARED ssn_threashold:=threashold;
 SHARED dob_threashold:=threashold;
 
+export DidSlim := 
+record
+	string20		fname;
+	string20		mname;
+	string20		lname;
+	string5			name_suffix;
+	string10		prim_range;
+	string28		prim_name;
+	string25		v_city_name;
+	string5			zip;
+	string2			st;
+	string9			ssn;
+	unsigned		dob;
+	unsigned6		record_id;	
+	unsigned6		did := 0;
+	unsigned1		did_score := 0;
+end;
+
+SHARED	SlimBase := project(FileBase, 
+												transform(DidSlim, 
+														SELF.fname:=LEFT.raw_first_name;
+														SELF.lname:=LEFT.raw_last_name;
+														SELF.name_suffix:= LEFT.raw_Orig_Suffix; 
+														SELF.ssn := LEFT.ssn; 
+														SELF.dob := (unsigned)LEFT.dob; 
+														SELF.prim_range := LEFT.clean_address.prim_range; 
+														SELF.prim_name := LEFT.clean_address.prim_name; 
+														SELF.v_city_name := LEFT.clean_address.v_city_name; 
+														SELF.st := LEFT.clean_address.st; 
+														SELF.zip := LEFT.zip; 
+														SELF := LEFT; 
+														SELF := []));
 //////////////////////////////////
 // 'NSD'=> 1             //LASTNAME & FIRSTNAME    & SSN      & DOB
 matchset:=['N','S','D'];
@@ -136,19 +169,15 @@ concat_all := //sort(
 concat_srt
 					:=
 							sort(concat_all
+										,old_rid
 										,pri
 										,new_rid
-										,old_rid
-										)
-										:persist('~otto::persist::concat_srt')
-										;
+										);
 concat_ddp
 					:=
 							dedup(concat_srt
 										,old_rid
-										)
-										:persist('~otto::persist::concat_ddp')
-										;
+										);
 
 EXPORT matches := sort(concat_ddp,-new_rid, -pri);
 

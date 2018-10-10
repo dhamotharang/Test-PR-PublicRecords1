@@ -128,14 +128,13 @@ end;
 
 match:=join(inf_ddp,inf_ddp,
 		left.did>right.did and
-
+		left.lname_field=right.lname_field and
+		
 		#if('N' in matchset)
-			left.fname_field=right.fname_field and
-			left.lname_field=right.lname_field and
+			left.fname_field=right.fname_field and			
 		#end
 
 		#if('V' in matchset)
-			left.lname_field=right.lname_field and
 			left.fname_field<>right.fname_field and
 			left.fname_field[1]=right.fname_field[1] and
 			ut.nneq(left.suffix_field,right.suffix_field)		and
@@ -161,7 +160,6 @@ match:=join(inf_ddp,inf_ddp,
 			(unsigned)left.ssn_field>0 and
 			(unsigned)right.ssn_field>0 and
 			left.ssn_field[6..9]=right.ssn_field[6..9] and
-			left.ssn_field[1..8]<>right.ssn_field[1..8] and
 		#end
 
 		#if('B' in matchset)
@@ -204,5 +202,5 @@ match:=join(inf_ddp,inf_ddp,
 		true	//the one just keeps the "and" from messing it up
 		,tr(left,right)
 		,local);
-		outfile := dedup(sort(match,old_rid,new_rid), old_rid);
+		outfile := match;
 endmacro;
