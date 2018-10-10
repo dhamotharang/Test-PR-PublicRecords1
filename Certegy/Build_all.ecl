@@ -1,4 +1,4 @@
-import PromoteSupers,UtilFile,Orbit3;
+﻿import PromoteSupers,UtilFile,Orbit3;
 export Build_all(string filedate) := function
 
 PromoteSupers.MAC_SF_BuildProcess(Build_base(filedate),'~thor_data400::base::certegy',certegybase,2,,true);
@@ -13,7 +13,7 @@ built := sequential(
 					,Build_keys(filedate)
 					,zDoPopulationStats
 					,zDoPopulationStats_newgrp
-					,Orbit3.proc_Orbit3_CreateBuild('Driver\'s License - Certegy',filedate)
+					,Orbit3.proc_Orbit3_CreateBuild_AddItem	('Driver\'s License - Certegy',filedate)
 					,UtilFile.pro_monitor().certegy_despray);
 
 return built;
