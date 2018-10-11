@@ -30,12 +30,18 @@ EXPORT Constants :=
         EXPORT DATASET(LNSmallBusiness.Layouts.ModelNameRec) BLENDED        := DATASET([BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED], LNSmallBusiness.Layouts.ModelNameRec); 
         EXPORT DATASET(LNSmallBusiness.Layouts.ModelNameRec) CREDIT         := DATASET([BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT], LNSmallBusiness.Layouts.ModelNameRec); 
         EXPORT DATASET(LNSmallBusiness.Layouts.ModelNameRec) CREDIT_BLENDED := DATASET([BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_BLENDED], LNSmallBusiness.Layouts.ModelNameRec); 
-	       EXPORT DATASET(LNSmallBusiness.Layouts.ModelNameRec) BLENDED_SLBB        := DATASET([BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_SLBB], LNSmallBusiness.Layouts.ModelNameRec); 
+        
+        EXPORT DATASET(LNSmallBusiness.Layouts.ModelNameRec) BLENDED_SLBB        := DATASET([BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_SLBB], LNSmallBusiness.Layouts.ModelNameRec); 
         EXPORT DATASET(LNSmallBusiness.Layouts.ModelNameRec) CREDIT_SLBO         := DATASET([BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_SLBO], LNSmallBusiness.Layouts.ModelNameRec); 
         EXPORT DATASET(LNSmallBusiness.Layouts.ModelNameRec) CREDIT_BLENDED_SLBB_SLBO := DATASET([BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_BLENDED_SLBB_SLBO], LNSmallBusiness.Layouts.ModelNameRec); 
+
+        EXPORT DATASET(LNSmallBusiness.Layouts.ModelNameRec) BLENDED_SLBBNFEL                 := DATASET([BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_SCORE_SLBBNFEL], LNSmallBusiness.Layouts.ModelNameRec); 
+        EXPORT DATASET(LNSmallBusiness.Layouts.ModelNameRec) CREDIT_SLBONFEL                  := DATASET([BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_SCORE_SLBONFEL], LNSmallBusiness.Layouts.ModelNameRec); 
+        EXPORT DATASET(LNSmallBusiness.Layouts.ModelNameRec) CREDIT_BLENDED_SLBBNFEL_SLBONFEL := DATASET([BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_BLENDED_SLBBNFEL_SLBONFEL], LNSmallBusiness.Layouts.ModelNameRec); 
+        
         EXPORT DATASET(LNSmallBusiness.Layouts.ModelNameRec) CREDIT_BLENDED_ALL := DATASET([BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_BLENDED_ALL], LNSmallBusiness.Layouts.ModelNameRec); 
         EXPORT DATASET(LNSmallBusiness.Layouts.ModelNameRec) BLENDED_ALL              := DATASET([BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_ALL], LNSmallBusiness.Layouts.ModelNameRec); 
-								EXPORT DATASET(LNSmallBusiness.Layouts.ModelNameRec) NONE           := DATASET([BusinessCredit_Services.Constants.MODEL_NAME_SETS.NONE], LNSmallBusiness.Layouts.ModelNameRec); 
+        EXPORT DATASET(LNSmallBusiness.Layouts.ModelNameRec) NONE           := DATASET([BusinessCredit_Services.Constants.MODEL_NAME_SETS.NONE], LNSmallBusiness.Layouts.ModelNameRec); 
       END;
 		
 		EXPORT BIPID_WEIGHT_THRESHOLD := 
