@@ -338,6 +338,17 @@ EXPORT Layouts := MODULE
 			unsigned6			fdn_file_info_id;
 		END;
 		
+		EXPORT ConfigRiskLevel	:= RECORD
+		  STRING entitytype;
+			STRING field;
+			STRING value;
+			STRING low;
+			STRING high;
+			STRING risklevel;
+			STRING weight;
+			STRING uidescription;
+		END;
+		
 	END;
 
 

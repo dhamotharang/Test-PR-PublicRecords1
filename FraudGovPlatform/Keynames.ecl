@@ -14,11 +14,13 @@ module
 		export ClusterDetails								:= tools.mod_FilenamesBuild(lTemplate('ClusterDetails'),pversion);
 		export ElementPivot									:= tools.mod_FilenamesBuild(lTemplate('ElementPivot'),pversion);
 		export ScoreBreakdown								:= tools.mod_FilenamesBuild(lTemplate('ScoreBreakdown'),pversion);
+		export WeightingChart								:= tools.mod_FilenamesBuild(lTemplate('WeightingChart'),pversion);
 			
 		export dAll_filenames :=
 		    ClusterDetails.dAll_filenames +
 			 	ElementPivot.dAll_filenames +
-				ScoreBreakdown.dAll_filenames ;
+				ScoreBreakdown.dAll_filenames +
+				WeightingChart.dAll_filenames ;
 	end;
 	
 export dAll_filenames :=
