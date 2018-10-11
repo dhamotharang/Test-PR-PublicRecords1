@@ -78,7 +78,7 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                                                                      Citizenship.Constants.AGE_CAP, 
                                                                      iv_bureau_emergence_age_temp);
                                                                      
-                               SELF.emergenceAgeBureau    := IF(iv_bureau_emergence_age = NULL, NEG1, iv_bureau_emergence_age);    
+                               SELF.emergenceAgeBureau    := IF(iv_bureau_emergence_age = NULL or iv_bureau_emergence_age < 0, NEG1, iv_bureau_emergence_age);  
                            
                            //*** ssnIssuanceAge (capped at 110 years)
                                 ssnlength                  := RIGHT.input_validation.ssn_length;
@@ -97,14 +97,14 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                                                                      Citizenship.Constants.AGE_CAP, 
                                                                      nf_age_at_ssn_issuance_temp);
                                                                      
-                               SELF.ssnIssuanceAge        := IF(nf_age_at_ssn_issuance = NULL, NEG1, nf_age_at_ssn_issuance);
+                                SELF.ssnIssuanceAge        := IF(nf_age_at_ssn_issuance = NULL or nf_age_at_ssn_issuance < 0,  NEG1, nf_age_at_ssn_issuance);
                           
                           //*** ssnIssuanceYears (capped at 110 years)
                                 ssn_years_capped          := IF(ssn_years > Citizenship.Constants.AGE_CAP,
                                                                  Citizenship.Constants.AGE_CAP,
                                                                  ssn_years);  
                                 
-                                SELF.ssnIssuanceYears      := IF(ssn_years_capped = NULL, NEG1, ssn_years_capped);
+                                SELF.ssnIssuanceYears      := IF(ssn_years_capped = NULL or ssn_years_capped < 0, NEG1, ssn_years_capped);
                            
                            //*** relativeCount
                                 SELF.relativeCount         := IF(NOT RIGHT.truedid, NEG1, MIN(RIGHT.relatives.relative_count, MAX_SCORE));
@@ -270,7 +270,7 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                                                                 Citizenship.Constants.AGE_CAP, 
                                                                 calcAgeAtThisTime_temp);
                        //*** addressFirstReportedAge (capped at 110 years)  
-                            SELF.addressFirstReportedAge := IF(calcAgeAtThisTime = NULL, NEG1, calcAgeAtThisTime);           //***this is the final answer
+                            SELF.addressFirstReportedAge := IF(calcAgeAtThisTime = NULL or calcAgeAtThisTime < 0, NEG1, calcAgeAtThisTime);           //***this is the final answer
                             SELF                         := LEFT;),
                             //***write the left even if there was a no match on the right.
                          LEFT OUTER);
