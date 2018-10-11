@@ -60,7 +60,7 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                                                                      Citizenship.Constants.AGE_CAP, 
                                                                      iv_header_emergence_age_temp);
                                                                      
-                                SELF.emergenceAgeHeader    := IF(iv_header_emergence_age = NULL, NEG1, iv_header_emergence_age);     
+                                SELF.emergenceAgeHeader    := IF(iv_header_emergence_age = NULL or iv_header_emergence_age < 0, NEG1, iv_header_emergence_age);     
                                 
                            //*** emergenceAgeBureau   (capped at 110 years)
                                 earliest_bureau_date_SAS   := ver_sources_information[12..21];
