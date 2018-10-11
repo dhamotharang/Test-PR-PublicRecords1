@@ -989,7 +989,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
           InstantID_records_srtd,
           TRANSFORM( BusinessInstantID20_Services.Layouts.ConsumerInstantIDLayout, 
             SELF.seq := LEFT.OrigSeq,
-            SELF.Rep_WhichOne := LEFT.seq % 10;
+            SELF.Rep_WhichOne := (STRING)(LEFT.seq % 10);
 						SELF := LEFT,
           )
         );
