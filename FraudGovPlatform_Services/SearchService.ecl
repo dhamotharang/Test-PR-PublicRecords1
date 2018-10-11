@@ -130,11 +130,11 @@ EXPORT SearchService() := MACRO
 
 	//Adding Options.IsTestRequest. When Options.IsTestRequest = TRUE, the service returns mockedup data in the
 	//... roxie response, to help ESP and Web to continue with the development until we find a real way to return the data.
-	tmp := FraudGovPlatform_Services.SearchRecords(search_mod, batch_params, Options.IsTestRequest);
+	ds_searchrecords := FraudGovPlatform_Services.SearchRecords(search_mod, batch_params, Options.IsTestRequest);
 	
-	search_records := tmp.ds_results;
-	adlDIDFound := tmp.adlDIDFound;
-	ds_adl_in := tmp.ds_adl_in;
+	search_records := ds_searchrecords.ds_results;
+	adlDIDFound := ds_searchrecords.adlDIDFound;
+	ds_adl_in := ds_searchrecords.ds_adl_in;
 	
 	//Per GRP-2060, we save RINID (stored in the lexid field), when the user entered full DOB, SSN and full name
 	// as search criteria and we couldn't resolve to a lexid from publicrecords
