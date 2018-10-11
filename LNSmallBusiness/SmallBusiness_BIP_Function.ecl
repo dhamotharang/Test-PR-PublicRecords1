@@ -32,7 +32,7 @@ EXPORT SmallBusiness_BIP_Function (
 
 	// Use the SBFE restriction to return Scores or not.
 	allow_SBFE_scores := DataPermissionMask[12] NOT IN RESTRICTED_SET;
-  BusShellv22_scores_requested := EXISTS(ModelsRequested(ModelName IN BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_BLENDED_SLBB_SLBO));
+  BusShellv22_scores_requested := EXISTS(ModelsRequested(ModelName IN BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_BLENDED_SLBB_SLBO+ BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_BLENDED_SLBBNFEL_SLBONFEL));
   
 /* ************************************************************************
 	 *                    Set common Business Shell Options                 *
@@ -563,7 +563,7 @@ unsigned8 BSOptions :=
 	// Attach the PhoneSources child dataset to the intermediateLayout for royalty purposes,
 	// and calculate BillingHit.
 	getBillingHitFromScores( DATASET(iesp.smallbusinessanalytics.t_SBAModelHRI) ModelResults ) := FUNCTION
-		BlendedScore := ModelResults(Name in [BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB])[1].Scores[1].Value;
+		BlendedScore := ModelResults(Name in [BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB,BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL])[1].Scores[1].Value;
 		CreditScore  := ModelResults(Name in [BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL, BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO])[1].Scores[1].Value;
 		isBillingHit := BlendedScore NOT IN [0,222] OR CreditScore NOT IN [0,222];
 		RETURN isBillingHit;
