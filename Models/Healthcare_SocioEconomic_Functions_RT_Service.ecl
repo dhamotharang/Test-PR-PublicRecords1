@@ -4,7 +4,7 @@ Import iesp;
 EXPORT Healthcare_SocioEconomic_Functions_RT_Service := Module
 
 EXPORT _blank := '';
-//TODO: Since product spec gives freedom to customer to omit name and address fields if ssn is populated, it is mandatory to have a length of 9 in that case.
+//Since product spec gives freedom to customer to omit name and address fields if ssn is populated, it is mandatory to have a length of 9 in that case.
 //Tested socio query to retrieve results on 7 or 8 digit padded SSN's, it does not return results. Hence 9 is needed.
 EXPORT SSNCleaner(string SSN) := FUNCTION
 string cleanSSN := STD.STR.filter(SSN,'0123456789');
@@ -19,7 +19,7 @@ END;
 //Code can be used for DOB and ADMIT_DATE
 EXPORT DOBCleaner(string8 InDate) := FUNCTION
 string cleanDOB := STD.STR.filter(InDate,'0123456789');
-LEN_DATE :=	LENGTH(TRIM(cleanDOB,LEFT,RIGHT)); //TODO: No need to trim here due to filter
+LEN_DATE :=	LENGTH(cleanDOB); //No need to trim here due to filter
 is_Valid_DOB := IF(STD.Date.IsValidDate((integer)cleanDOB) 
 					AND (integer) cleanDOB <= (integer) STD.Date.CurrentDate()
 					AND (integer) cleanDOB[1..4] >= 1900 , TRUE, FALSE);
@@ -116,45 +116,15 @@ EXPORT getCatThresholdValueForKeyFromIESP(dataset(iesp.healthcare_account_info.t
 	RETURN iff(tagExists and getVal <> _blank, getVal, _blank);
 END;
 
-// EXPORT checkForRejects(dataset(Models.Layouts_Healthcare_RT_Service.Layout_SocioEconomic_Data_Cln) Cleaned_Member_Input) := FUNCTION
-// 	Cleaned_Input := Cleaned_Member_Input[1];
-// 	Name_First := Cleaned_Input.Name_First;
-// 	Name_Last := Cleaned_Input.Name_Last;
-// 	street_addr := Cleaned_Input.street_addr;
-// 	p_City_name := Cleaned_Input.p_City_name;
-// 	ST_Cln := Cleaned_Input.ST_Cln;
-// 	Z5_Cln := Cleaned_Input.Z5_Cln;
-// 	DOB_Cln := Cleaned_Input.DOB_Cln;
-// 	MemberGender_Cln := Cleaned_Input.MemberGender_Cln;
-// 	SSN_Cln := Cleaned_Input.SSN_Cln;
-// 	ADMIT_DATE_Cln := Cleaned_Input.ADMIT_DATE_Cln;
-// 	isMinor:= IF(Cleaned_Input.Age<18,TRUE,FALSE);
-
-// 	Met_MinInput_Condition_1 := IF(SSN_Cln <>'' AND MemberGender_Cln <>'' AND DOB_Cln <>''AND ST_Cln<>'',TRUE, FALSE);
-// 	//Met_MinInput_Condition_1;
-// 	Met_MinInput_Condition_2 := IF(Name_First <>'' AND Name_Last<>'' AND street_addr <>'' AND p_City_name<>'' AND Z5_Cln<>'' AND MemberGender_Cln <>'' AND DOB_Cln <>''AND ST_Cln<>'',TRUE, FALSE);
-// 	//Met_MinInput_Condition_2;
-
-// 	Reject_Code_Reason_Prefix := 'Reject Code - Reject Reason Description: ';
-// 	Name_First_Rej_Message := IF(Name_First<>'','','8-INVALID OR BLANK FIRST NAME;');
-// 	Name_Last_Rej_Message := IF(Name_Last<>'','','4-INVALID OR BLANK LAST NAME;');
-// 	street_addr_Rej_Message := IF(street_addr<>'','','512-INVALID OR BLANK STREET ADDRESS;');
-// 	p_City_name_Rej_Message := IF(p_City_name<>'','','1024-IINVALID OR BLANK CITY;');
-// 	ST_name_Rej_Message := IF(ST_Cln<>'','','2048-INVALID OR BLANK STATE;');
-// 	Z5_Rej_Message := IF(Z5_Cln<>'','','4096-INVALID OR BLANK ZIP CODE;');
-// 	DOB_Rej_Message := IF(DOB_Cln<>'','','256-INVALID OR BLANK DATE OF BIRTH;');
-// 	MemberGender_Rej_Message := IF(MemberGender_Cln<>'','','16777216-INVALID OR BLANK GENDER;');
-// 	SSN_Rej_Message := IF(SSN_Cln<>'','','128-INVALID OR BLANK SSN;');
-
-// 	Condition_1_Reject_Message := Reject_Code_Reason_Prefix + SSN_Rej_Message + MemberGender_Rej_Message + DOB_Rej_Message + ST_name_Rej_Message;
-// 	// Condition_1_Reject_Message;
-// 	Condition_2_Reject_Message := Reject_Code_Reason_Prefix + Name_First_Rej_Message + Name_Last_Rej_Message + street_addr_Rej_Message + p_City_name_Rej_Message + Z5_Rej_Message + MemberGender_Rej_Message + DOB_Rej_Message + ST_name_Rej_Message;
-// 	// Condition_2_Reject_Message;
-// 	Condition_1_2_Reject_Message := IF(Met_MinInput_Condition_1 = TRUE or Met_MinInput_Condition_2 = TRUE,'',IF(Met_MinInput_Condition_2 = FALSE, Condition_2_Reject_Message,IF(Met_MinInput_Condition_2 = TRUE AND Met_MinInput_Condition_1 = FALSE,'',Condition_1_Reject_Message)));
-// 	//Condition_1_2_Reject_Message;
-// 	IF(Condition_1_2_Reject_Message<>'',FAIL(Condition_1_2_Reject_Message));
-// 	IF(Condition_1_2_Reject_Message<>'' AND isMinor,FAIL('Reject Code - Reject Reason Description: 666666-INPUT RECORD IS A MINOR;'));
-// 	return true;
-// END;
+EXPORT FirstAndLastNameValidator (string inName) := FUNCTION
+	uName := trim(STD.Str.ToUpperCase(inName),left,right);
+	//Check if we have at least one letter
+	OnlyAlphaCharacters := STD.STR.filter(uName , 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+	//If we have atleast one letter in the input, then verify that it contains only alpha characters, spaces, periods, apostrophes, and/or dashes. 
+	//regexfind('^([A-Z \'.-]+)$', name, 1);
+	ValidatedName := regexfind('^([A-Z \'.-]+)$', uName, 1);
+	outName := IF(OnlyAlphaCharacters <> _blank AND ValidatedName <> _blank, inName, _blank);
+	RETURN outName;
+END;
 
 END;

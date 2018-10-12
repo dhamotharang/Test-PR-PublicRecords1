@@ -203,21 +203,21 @@ export Healthcare_SocioEconomic_Core(isCoreRequestValid ,batch_in, DPPAPurpose_i
 //****************************************************SE RS*********************************************************************************************//
 
 	SeRs_PreProc_Patterns_Applied := Models.Healthcare_SocioEconomic_Transforms_Core.SeRs_Preprocessing_and_Patterns_M0_M1(Combined_LI_PB_Prep_Pre_Proc,Models.Layouts_Healthcare_Core.layout_SocioEconomic_LI_PB_flat_typed);
-		   
-	SeRs_PreProc_Patterns_Filtered := SeRs_PreProc_Patterns_Applied(isSeRsExcludedDiag =0 and isSeRsMinor =0 and ADMIT_DATE <>'');
+	SeRs_PreProc_Patterns_Validated := join(SeRs_PreProc_Patterns_Applied,icdkey.key().ref_icd10_diag_key.qa,
+											keyed(STD.Str.ToUpperCase(std.Str.FilterOut(left.admit_diagnosis_code, '.')) = right.diag_cd),
+											Transform(Models.Layouts_Healthcare_Core.layout_SocioEconomic_LI_PB_flat_typed,
+											self.isSeRsInvalidDiag := if(right.desc_short<>'',0,1);
+											self := left;
+											), left outer, atmost(1));
+
+	SeRs_PreProc_Patterns_Filtered := SeRs_PreProc_Patterns_Validated(isSeRsExcludedDiag =0 and isSeRsMinor =0 
+																	and Models.Healthcare_SocioEconomic_Functions_Core.DOBCleaner(ADMIT_DATE)<>'');
 		
-	SeRs_PreProc_Patterns_Excluded := SeRs_PreProc_Patterns_Applied(isSeRsExcludedDiag =1 or isSeRsMinor =1 or ADMIT_DATE ='');
-	
- SeRs_PreProc_Patterns_Filtered_Validated := join(SeRs_PreProc_Patterns_Filtered,icdkey.key().ref_icd10_diag_key.qa,
-																																																	keyed(STD.Str.ToUpperCase(std.Str.FilterOut(left.admit_diagnosis_code, '.')) = right.diag_cd),
-																																																	Transform(Models.Layouts_Healthcare_Core.layout_SocioEconomic_LI_PB_flat_typed,
-																																																	self.isSeRsInvalidDiag := if(right.desc_short<>'',0,1);
-																																																	self := left;
-																																																	), left outer, atmost(1));
+	SeRs_PreProc_Patterns_Excluded := SeRs_PreProc_Patterns_Validated(isSeRsExcludedDiag =1 or isSeRsMinor =1 or Models.Healthcare_SocioEconomic_Functions_Core.DOBCleaner(ADMIT_DATE) ='');
 	
 	M0_SeRs_PreProc_Patterns_Filtered_Validated_Mapped := Models.Healthcare_SocioEconomic_Transforms_Core.SeRs_M0_doMapping(SeRs_PreProc_Patterns_Filtered(isSeRsM1ModelUsed < 1));
  
- M1_Xwalked := Models.Healthcare_SocioEconomic_Transforms_Core.SeRs_M1_Xwalk(SeRs_PreProc_Patterns_Filtered_Validated(isSeRsM1ModelUsed = 1), Models.Layouts_Healthcare_Core.layout_SocioEconomic_LI_PB_flat_typed);
+ M1_Xwalked := Models.Healthcare_SocioEconomic_Transforms_Core.SeRs_M1_Xwalk(SeRs_PreProc_Patterns_Filtered(isSeRsM1ModelUsed = 1), Models.Layouts_Healthcare_Core.layout_SocioEconomic_LI_PB_flat_typed);
  
  M1_SeRs_PreProc_Patterns_Filtered_Validated_Mapped := Models.Healthcare_SocioEconomic_Transforms_Core.SeRs_M1_doMapping(M1_Xwalked, Models.Layouts_Healthcare_Core.layout_SocioEconomic_LI_PB_flat_typed_mapped);
 	
