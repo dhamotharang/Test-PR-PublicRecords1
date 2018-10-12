@@ -532,6 +532,20 @@ EXPORT Layouts := MODULE
     STRING2 registrationState;
   END;
   
+  EXPORT AircraftDataLayout := RECORD
+    BOOLEAN inquiredOwned;
+    BOOLEAN spouseOwned;
+    DATASET(DIDAndName) aircraftOwners;
+    
+    STRING8 tailNumber;
+    STRING4 year;
+    STRING30 make;
+    STRING30 model;
+    STRING30 vin;
+    STRING8 registrationDate;
+    STRING12 manufactureModelCode;		//used to get number of engines
+  END;
+  
   EXPORT VehicleDataLayout := RECORD
     BOOLEAN inquiredOwned;
     BOOLEAN spouseOwned;
@@ -573,9 +587,10 @@ EXPORT Layouts := MODULE
 	EXPORT BusReportDetails := RECORD
     DATASET(BusPropertyDataLayout) busProperties {MAXCOUNT(DueDiligence.Constants.MAX_PROPERTIES)};
     DATASET(WatercraftDataLayout) busWatercraft {MAXCOUNT(DueDiligence.Constants.MAX_WATERCRAFT)};
+    DATASET(AircraftDataLayout) busAircraft {MAXCOUNT(DueDiligence.Constants.MAX_AIRCRAFT)};
     DATASET(CommonGeographicLayout) operatingLocations {MAXCOUNT(DueDiligence.Constants.MAX_OPERATING_LOCATIONS)};
     BOOLEAN FEINSourceContainsE5;
-    STRING9  FEIN_Masked_For_Report;
+    STRING9 FEIN_Masked_For_Report;
     UNSIGNED3 FEINSourcesCnt;   
     DATASET(FEINLayoutSources) FEINSources;
     UNSIGNED3 YellowPageCnt;          //***among all of the Shell Shelf Sources - Yellow pages is 1 of them
@@ -590,7 +605,7 @@ EXPORT Layouts := MODULE
     DATASET(LayoutAgent) namesAssocWithFein {MAXCOUNT(DueDiligence.Constants.MAX_ASSOCIATED_FEIN_NAMES)};
     DATASET(DD_CompanyNames) companyDBA {MAXCOUNT(DueDiligence.Constants.MAX_DBA_NAMES)};
     STRING parentCompanyName;
-    UNSIGNED2   DIDlessBEOCount; 
+    UNSIGNED2 DIDlessBEOCount; 
     DATASET(RelatedParty) DIDlessExecs {MAXCOUNT(DueDiligence.Constants.MAX_EXECS)};
 	END;
   
@@ -603,7 +618,8 @@ EXPORT Layouts := MODULE
 		Address bestAddress;
     DATASET(IndPropertyDataLayout) perProperties {MAXCOUNT(DueDiligence.Constants.MAX_PROPERTIES)};
     DATASET(WatercraftDataLayout) perWatercraft {MAXCOUNT(DueDiligence.Constants.MAX_WATERCRAFT)};
-    DATASET(VehicleDataLayout)    perVehicle   {MAXCOUNT(DueDiligence.Constants.MAX_VEHICLE)};  
+    DATASET(VehicleDataLayout) perVehicle {MAXCOUNT(DueDiligence.Constants.MAX_VEHICLE)};  
+    DATASET(AircraftDataLayout) perAircraft {MAXCOUNT(DueDiligence.Constants.MAX_AIRCRAFT)};  
   END;
 	
 	

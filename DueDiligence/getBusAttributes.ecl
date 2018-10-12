@@ -1,7 +1,5 @@
 ﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence;
 
- //*** Under the 3 service framework - the Attributes Only Service will always pass a report flag of FALSE.  
-	//*** The Business Report Service will pass a report flag of TRUE. 
 	
 EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 																								Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
@@ -50,7 +48,7 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 
 	busWatercraft  := DueDiligence.getBusWatercraft(busProperty, options, linkingOptions);
 
-	busAircraft := DueDiligence.getBusAircraft(busWatercraft, options, includeReport);
+	busAircraft := DueDiligence.getBusAircraft(busWatercraft, options);
 	
 	busVehicle := DueDiligence.getBusVehicle(busAircraft, options, linkingOptions, includeReport);
 
