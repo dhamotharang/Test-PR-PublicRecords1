@@ -19,7 +19,7 @@ EXPORT IDataAccess := INTERFACE
   EXPORT boolean show_minors := FALSE;  //a.k.a. OKtoShowMinors
 
   //masking
-  EXPORT string ssn_mask := 'ALL'; // FIRST5, LAST4, NONE (string6?)
+  EXPORT string ssn_mask := suppress.constants.ssn_mask_type.ALL; // FIRST5, LAST4, NONE (string6?)
   EXPORT unsigned1 dl_mask := 1; // means, do mask
   EXPORT unsigned1 dob_mask := suppress.constants.dateMask.ALL;
   

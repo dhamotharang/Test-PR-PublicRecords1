@@ -8,7 +8,7 @@ EXPORT fn_relativeMatch(ERO_Services.Layouts.layout_extra_penalty   input_rec, u
     EXPORT unsigned1 dppa := 0; // not from the input?
     EXPORT boolean ln_branded := FALSE;
     EXPORT boolean probation_override := TRUE; // most likely, a typo
-    EXPORT string5 industry_class := 'UTILI'; 
+    EXPORT string5 industry_class := 'UTILI'; //different from how it is done in fn_add2Addrs. Probably, a typo. 
     EXPORT boolean no_scrub := FALSE;
     EXPORT unsigned3 date_threshold := 0;
   END;

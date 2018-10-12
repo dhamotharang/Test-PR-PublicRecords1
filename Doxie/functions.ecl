@@ -1,5 +1,4 @@
-﻿IMPORT $;
-IMPORT AutoStandardI, mdr, codes;
+﻿IMPORT AutoStandardI, mdr, codes;
 
 EXPORT functions := MODULE
  
@@ -53,16 +52,14 @@ EXPORT functions := MODULE
 
   // TODO: functions for checking access; they should be defined in a separate attribute
   //       (I probably want to replace existing permission Tools)
+  shared tools := AutoStandardI.PermissionI_Tools;
 
   shared minVal := 1;
   shared maxVal := 7;
   shared allow  := 255;
 
-	shared RNA_GLB_Set := [0, 1, 3, 12];  
-	shared RNA_DPPA_Set := [0, 2, 3, 5, 7];
-
-  // EXPORT boolean glb_ok  (unsigned1 purpose, boolean RNA=false) := (purpose >= minVal and purpose <= maxVal) or purpose in [11, 12, allow];
-  // EXPORT boolean dppa_ok (unsigned1 purpose, boolean RNA=false) := (purpose >= minVal and purpose <= maxVal) or purpose in [allow];
+	shared RNA_GLB_Set := tools.RNA_GLB_Set; //[0, 1, 3, 12];  
+	shared RNA_DPPA_Set := tools.RNA_DPPA_Set;//[0, 2, 3, 5, 7];
 
   EXPORT boolean glb_ok  (unsigned1 purpose, boolean RNA=false) := 
            ((purpose >= minVal and purpose <= maxVal) or purpose in [11, 12, allow]) AND // glb is fine

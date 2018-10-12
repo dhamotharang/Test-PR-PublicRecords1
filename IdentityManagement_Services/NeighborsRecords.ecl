@@ -53,7 +53,7 @@ iesp.identitymanagementreport.t_IdmIdentity GetDead (iesp.identitymanagementrepo
 END;
 
 rna_glb_ok := mod_access.isValidGLB(header.constants.checkRNA);
-death_params := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
+death_params := DeathV2_Services.IParam.GetDeathRestrictions(gmod);
 
 nbrs_correct_age := JOIN (fill_identities, doxie.key_death_masterV2_ssa_DID, 
 											KEYED ((INTEGER)LEFT.UniqueId = RIGHT.l_did)

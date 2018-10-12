@@ -29,7 +29,7 @@ EXPORT IdentityFraudReport (
   shared mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule (IsFCRA)))
     EXPORT unsigned1 glb := param.glbpurpose;
     EXPORT unsigned1 dppa := param.dppapurpose;
-    EXPORT string DataPermissionMask := param.DataPermissionMask; 
+    EXPORT string DataPermissionMask := DataPermission; 
     EXPORT string DataRestrictionMask := param.DataRestrictionMask;
     EXPORT boolean ln_branded := FALSE;       //hardcoded for mod_header_records call
     EXPORT boolean probation_override := param.probation_override;
@@ -38,6 +38,8 @@ EXPORT IdentityFraudReport (
     EXPORT boolean no_scrub := FALSE;         //hardcoded for mod_header_records call
     EXPORT unsigned3 date_threshold := 0;            //hardcoded for mod_header_records call
     EXPORT string ssn_mask := param.ssn_mask;
+    EXPORT unsigned1 dl_mask := IF (param.mask_dl, 1, 0);
+    export unsigned1 dob_mask := param.dob_mask;
   END;
 
 
@@ -634,7 +636,7 @@ EXPORT IdentityFraudReport (
 
   // masking: ssn, dl, dob
   boolean do_mask := (mod_access.ssn_mask != '' and mod_access.ssn_mask != 'NONE') or (mod_access.dl_mask = 1) or
-                     (param.dob_mask != suppress.Constants.DateMask.NONE);
+                     (mod_access.dob_mask != suppress.Constants.DateMask.NONE);
   individual := if (do_mask, Functions.MaskReport (report_patched, param), report_patched);
 	
   export	results				:=	individual;

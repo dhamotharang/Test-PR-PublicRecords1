@@ -26,8 +26,8 @@ export comp_subject(dataset(doxie.layout_references) dids,
 MODULE
 
 shared mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule(true));
-shared glb_ok := mod_access.isValidGLB();
-shared dppa_ok := mod_access.isValidDPPA();
+shared glb_ok := mod_access.isValidGLB(); //to use in a header cleaing macro
+shared dppa_ok := mod_access.isValidDPPA(); // ...
 
 
 head_all := riskwisefcra._header_data (dids, flagfile);

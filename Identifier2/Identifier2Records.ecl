@@ -1,6 +1,5 @@
 ﻿import iesp,identifier2,address,ut,AutoStandardI, seed_files, risk_indicators,doxie, PersonReports, IntlIID, header, mdr, drivers, std;
 	
-//	inputParams := project(AutoStandardI.GlobalModule(),input.params,opt);
 	mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
 	finderParams := project (AutoStandardI.GlobalModule(), PersonReports.input._finderreport, opt);
 

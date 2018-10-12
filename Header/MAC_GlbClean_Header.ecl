@@ -45,7 +45,7 @@ END;
 #uniquename(into)
 %oformat% %into% (%dl_rec% le, codes.Key_Codes_V3 R) := TRANSFORM
   _dppa_ok := #if (batch) le. #end dppa_ok;
-  _dppa    := #if (batch) le.dppa_purpose #else modAccess.dppa; #end;
+  _dppa    := #if (batch) le.dppa_purpose #else modAccess.dppa #end;
   //? TODO: interestingly enough, also skip for batch
   SELF.dppa := IF (le.dl_src = 0, FALSE, IF (_dppa_ok AND (R.file_name = ''), TRUE, SKIP));
 

@@ -1,4 +1,4 @@
-﻿import $, ut, suppress, SSNBest_Services, Header;
+import $, ut, suppress, SSNBest_Services, Header;
 import AutoStandardI;
 
 export best_records(DATASET(doxie.layout_references) di,

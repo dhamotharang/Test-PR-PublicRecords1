@@ -1,9 +1,9 @@
-IMPORT VotersV2_Services,doxie,UCCv2_Services,doxie
-,prof_LicenseV2_Services,VehicleV2_Services
-,bankruptcyv2_Services,LiensV2_Services,marriage_divorce_v2_Services
-,DeathV2_Services,FAB_StateWide,LN_PropertyV2_Services,doxie_raw,Statewide_Services
-,Business_Header,Driversv2_Services, Targus,AutoStandardI,WatercraftV2_services
-,Address,suppress,CriminalRecords_Services,header,FCRA;
+IMPORT VotersV2_Services, doxie, UCCv2_Services,
+  prof_LicenseV2_Services, VehicleV2_Services,
+  bankruptcyv2_Services, LiensV2_Services, marriage_divorce_v2_Services,
+  DeathV2_Services, FAB_StateWide, LN_PropertyV2_Services, Statewide_Services,
+  Business_Header, Driversv2_Services, Targus, AutoStandardI, WatercraftV2_services,
+  Address, suppress, CriminalRecords_Services, header;
 
 //***** SET of FUNCTIONS
 
@@ -18,8 +18,8 @@ EXPORT FAP_raw := MODULE
 			RETURN FullName;
 	END;
 	
-	shared unsigned4 max_limit := 2000;
-	shared out_layout  := FAB_StateWide.layout_FAB_Statewide_out;	
+	unsigned4 max_limit := 2000;
+	out_layout  := FAB_StateWide.layout_FAB_Statewide_out;	
   Business_Header.doxie_MAC_Field_Declare()
   mod_access := doxie.functions.GetGlobalDataAccessModule ();
 
