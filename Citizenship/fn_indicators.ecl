@@ -3,12 +3,14 @@
 EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DATASET(Risk_Indicators.Layout_Boca_Shell) clam) := FUNCTION
 
   
-  NULL      := -999999999;
-  NEG1      := -1;
-  MAX_SCORE := 999;
-  COMMA     := '  ,';
-  MODIFIER  := 'ie';
-  isFCRA    := false;
+  NULL       := -999999999;
+  NEG1       := -1;
+  MAX_SCORE  := 999;
+  COMMA      := '  ,';
+  MODIFIER   := 'ie';
+  isFCRA     := false;
+  DAYSINYEAR := 365.25;
+  MOSINYEAR  := 12;  
   
 //========================================================================================
 
@@ -21,72 +23,88 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                                 SELF.lexID    := RIGHT.did;
                                 sysdate       := Models.common.sas_date(if(RIGHT.historydate=999999, (STRING)std.date.today(), (STRING6)RIGHT.historydate+'01'));
                            
-                           //*** identityAge ***
-                                SELF.identityAge := MAP(NOT RIGHT.truedid               => NEG1,
-                                                        RIGHT.name_verification.age = 0 => 0,
-                                                                                           RIGHT.name_verification.age);                       
+                           //*** identityAge (capped at 110 years)***
+                                verificationAge_temp := MAP(NOT RIGHT.truedid               => NEG1,
+                                                            RIGHT.name_verification.age = 0 => 0,
+                                                                                               RIGHT.name_verification.age); 
+                                identityAge_temp := if(verificationAge_temp > Citizenship.Constants.AGE_CAP, 
+                                                       Citizenship.Constants.AGE_CAP, 
+                                                       verificationAge_temp);
+                                                       
+                                SELF.identityAge :=  identityAge_temp;                                                          
                           
                           //*** extract the dates needed from the Ver Source Sections of Boca Shell
                                 ver_sources_information   := Citizenship.Ver_source_Function(RIGHT.seq,
                                                                                            RIGHT.header_summary.ver_sources, 
                                                                                            RIGHT.header_summary.ver_sources_first_seen_date,
                                                                                            RIGHT.header_summary.ver_sources_last_seen_date);
-                           //*** emergenceAgeHeader ***
+                           //*** emergenceAgeHeader (capped at 110 years)***
                                 earliest_header_date_SAS := ver_sources_information[1..10];                                                           
                                 earliest_header_date     := (integer)earliest_header_date_SAS;  
-                                earliest_header_yrs      := if(min(sysdate, earliest_header_date) = NULL, NULL, 
-                                                              if((sysdate - earliest_header_date) / 365.25 >= 0, 
-                                                                 roundup((sysdate - earliest_header_date) / 365.25), 
-                                                                 truncate((sysdate - earliest_header_date) / 365.25)));
+                                earliest_header_yrs      := if(earliest_header_date = NULL or sysdate = NULL, NULL,  
+                                                                 truncate((sysdate - earliest_header_date) / DAYSINYEAR));
                                 in_dob                  := RIGHT.shell_input.dob;
                                 _in_dob                 := Models.common.sas_date((STRING)(in_dob));
                                 SELF.shell_dob_SAS      := _in_dob;                      //***save for the next step 
-                                calc_dob                := if(_in_dob = NULL or sysdate = NULL, NULL, if ((sysdate - _in_dob) / 365.25 >= 0, 
-                                                               roundup((sysdate - _in_dob) / 365.25), 
-                                                               truncate((sysdate - _in_dob) / 365.25)));
+                                calc_dob                := if(_in_dob = NULL or sysdate = NULL, NULL, 
+                                                               truncate((sysdate - _in_dob) / DAYSINYEAR));
                                 inferred_age            := RIGHT.inferred_age;
-                                iv_header_emergence_age := map(
-                                                               not(RIGHT.truedid)          => NEG1,
-                                                               earliest_header_yrs = NULL  => NEG1,    
+                                iv_header_emergence_age_temp := map(
+                                                               not(RIGHT.truedid)          => NULL,
+                                                               earliest_header_yrs = NULL  => NULL,    
                                                                not(_in_dob = NULL)         => calc_dob - earliest_header_yrs,
-                                                               inferred_age = 0            => NEG1,
+                                                               inferred_age = 0            => NULL,
                                                                                               inferred_age - earliest_header_yrs);
-                                SELF.emergenceAgeHeader    := iv_header_emergence_age;     
+                                                                                              
+                                iv_header_emergence_age     := if(iv_header_emergence_age_temp > Citizenship.Constants.AGE_CAP, 
+                                                                     Citizenship.Constants.AGE_CAP, 
+                                                                     iv_header_emergence_age_temp);
+                                                                     
+                                SELF.emergenceAgeHeader    := IF(iv_header_emergence_age = NULL or iv_header_emergence_age < 0, NEG1, iv_header_emergence_age);     
                                 
-                           //*** emergenceAgeBureau 
+                           //*** emergenceAgeBureau   (capped at 110 years)
                                 earliest_bureau_date_SAS   := ver_sources_information[12..21];
                                 earliest_bureau_date       := (integer)earliest_bureau_date_SAS;  
                                                                                                                                               
-                                earliest_bureau_yrs        := if(earliest_bureau_date = NULL or sysdate = NULL, NULL, 
-                                                                 if((sysdate - earliest_bureau_date) / 365.25 >= 0, 
-                                                                    roundup((sysdate - earliest_bureau_date) / 365.25), 
-                                                                    truncate((sysdate - earliest_bureau_date) / 365.25)));                                                        
-                                iv_bureau_emergence_age    := map(
-                                                                not(RIGHT.truedid) or earliest_bureau_yrs = NULL => NEG1,
-                                                                not(calc_dob = NULL)                             => calc_dob - earliest_bureau_yrs,
-                                                                inferred_age = 0                                 => NEG1,
-                                                                                                                    inferred_age - earliest_bureau_yrs);
-                                SELF.emergenceAgeBureau    :=  iv_bureau_emergence_age;    
+                                earliest_bureau_yrs        := if(earliest_bureau_date = NULL or sysdate = NULL, NULL,  
+                                                                    truncate((sysdate - earliest_bureau_date) / DAYSINYEAR));                                                        
+                                iv_bureau_emergence_age_temp    := map(
+                                                                   not(RIGHT.truedid) or earliest_bureau_yrs = NULL => NULL,
+                                                                   not(calc_dob = NULL)                             => calc_dob - earliest_bureau_yrs,
+                                                                   inferred_age = 0                                 => NULL,
+                                                                                                                       inferred_age - earliest_bureau_yrs);
+                               
+                               iv_bureau_emergence_age    := if(iv_bureau_emergence_age_temp > Citizenship.Constants.AGE_CAP, 
+                                                                     Citizenship.Constants.AGE_CAP, 
+                                                                     iv_bureau_emergence_age_temp);
+                                                                     
+                               SELF.emergenceAgeBureau    := IF(iv_bureau_emergence_age = NULL or iv_bureau_emergence_age < 0, NEG1, iv_bureau_emergence_age);  
                            
-                           //*** ssnIssuanceAge
+                           //*** ssnIssuanceAge (capped at 110 years)
                                 ssnlength                  := RIGHT.input_validation.ssn_length;
                                 rc_ssnlowissue             := (unsigned)RIGHT.iid.socllowissue;
                                 _rc_ssnlowissue            := Models.common.sas_date((STRING)(rc_ssnlowissue));
-                                ssn_years                  := if(_rc_ssnlowissue = NULL or sysdate = NULL, NULL, 
-                                                                 if((sysdate - _rc_ssnlowissue) / 365.25 >= 0, 
-                                                                     roundup((sysdate - _rc_ssnlowissue) / 365.25), 
-                                                                     truncate((sysdate - _rc_ssnlowissue) / 365.25)));
-                                nf_age_at_ssn_issuance     := map(
-                                                              not(RIGHT.truedid and (ssnlength in ['4', '9'])) or 
-                                                              sysdate = NULL or ssn_years = NULL                            => NULL,
-                                                              rc_ssnlowissue = Citizenship.Constants.RANDOMIZATION_STARTED  => NULL,
-                                                              not(calc_dob = NULL)                                          => calc_dob - ssn_years,
-                                                              inferred_age = 0                                              => NULL,
-                                                                                                                               inferred_age - ssn_years);
-                                SELF.ssnIssuanceAge        := IF(nf_age_at_ssn_issuance = NULL, NEG1, nf_age_at_ssn_issuance);
+                                ssn_years                  := if(_rc_ssnlowissue = NULL or sysdate = NULL, NULL,  
+                                                                     truncate((sysdate - _rc_ssnlowissue) / DAYSINYEAR));
+                                nf_age_at_ssn_issuance_temp := map(
+                                                                    not(RIGHT.truedid and (ssnlength in ['4', '9'])) or 
+                                                                    sysdate = NULL or ssn_years = NULL                            => NULL,
+                                                                    rc_ssnlowissue = Citizenship.Constants.RANDOMIZATION_STARTED  => NULL,
+                                                                    not(calc_dob = NULL)                                          => calc_dob - ssn_years,
+                                                                    inferred_age = 0                                              => NULL,
+                                                                                                                                     inferred_age - ssn_years);
+                               nf_age_at_ssn_issuance     := if(nf_age_at_ssn_issuance_temp > Citizenship.Constants.AGE_CAP, 
+                                                                     Citizenship.Constants.AGE_CAP, 
+                                                                     nf_age_at_ssn_issuance_temp);
+                                                                     
+                                SELF.ssnIssuanceAge        := IF(nf_age_at_ssn_issuance = NULL or nf_age_at_ssn_issuance < 0,  NEG1, nf_age_at_ssn_issuance);
                           
-                          //*** ssnIssuanceYears
-                                SELF.ssnIssuanceYears      := IF(ssn_years = NULL, NEG1, ssn_years);
+                          //*** ssnIssuanceYears (capped at 110 years)
+                                ssn_years_capped          := IF(ssn_years > Citizenship.Constants.AGE_CAP,
+                                                                 Citizenship.Constants.AGE_CAP,
+                                                                 ssn_years);  
+                                
+                                SELF.ssnIssuanceYears      := IF(ssn_years_capped = NULL or ssn_years_capped < 0, NEG1, ssn_years_capped);
                            
                            //*** relativeCount
                                 SELF.relativeCount         := IF(NOT RIGHT.truedid, NEG1, MIN(RIGHT.relatives.relative_count, MAX_SCORE));
@@ -117,10 +135,10 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                                 SELF.firstSeenAddr10       := IF(rv_c14_addrs_10yr = NULL, NEG1, rv_c14_addrs_10yr);
                            
                            //*** reportedCurAddressYears
-                                add_curr_lres              := RIGHT.lres2;
-                                rv_c13_curr_addr_lres      := if(not(RIGHT.truedid and add_curr_pop), NULL, 
-                                                               min(if(add_curr_lres = NULL, -NULL, add_curr_lres), 999));
-                                SELF.reportedCurAddressYears := IF(rv_c13_curr_addr_lres = NULL, NEG1, rv_c13_curr_addr_lres);
+                                add_curr_lres                := TRUNCATE(RIGHT.lres2/ MOSINYEAR);               //***start with the number of months listed on the boca shell convert to years
+                                yr_c13_curr_addr_lres        := if(not(RIGHT.truedid and add_curr_pop), NULL, 
+                                                                   min(if(add_curr_lres = NULL, -NULL, add_curr_lres), 999));
+                                SELF.reportedCurAddressYears := IF(yr_c13_curr_addr_lres = NULL, NEG1, yr_c13_curr_addr_lres);
                            
                            //*** addressFirstReportedAge   - calculated after picking more information from the address hierarchy key   
                                 SELF.addressFirstReportedAge := -1;                   //*** 
@@ -132,8 +150,8 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                                 YRSinceLastReportedCredential := map(
                                                                      not(RIGHT.truedid)                       => NULL,
                                                                      last_seen_by_cred_source = NULL          => NULL,
-                                                                     (integer)num_of_cred_sources > 0         => round((sysdate - last_seen_by_cred_source) / 365.25),
-                                                                                                              -1);
+                                                                     (integer)num_of_cred_sources > 0         => truncate((sysdate - last_seen_by_cred_source) / DAYSINYEAR),
+                                                                                                                 NULL);
                            //*** timeSinceLastReportedNonBureau *** ATTENTION - SHOULD the name of this indicator needs to be changed to TimeSinceLastReportedCredentialed
                                 SELF.timeSinceLastReportedNonBureau := IF(YRSinceLastReportedCredential = NULL, NEG1, YRSinceLastReportedCredential);            //***  
                          
@@ -245,13 +263,15 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                             
                             address_first_seen_temp      := (unsigned)RIGHT.address_first_seen_date;
                             address_first_seen_SAS       := Models.common.sas_date((STRING)(address_first_seen_temp));
-                            calcAgeAtThisTime            := if(dob_temp = NULL or address_first_seen_SAS = NULL, NULL, 
-                                                               if ((address_first_seen_SAS - dob_temp) / 365.25 >= 0, 
-                                                                    roundup((address_first_seen_SAS - dob_temp) / 365.25), 
-                                                                    truncate((address_first_seen_SAS - dob_temp) / 365.25)));
-                            
-                            SELF.addressFirstReportedAge := IF(calcAgeAtThisTime = NULL, NEG1, calcAgeAtThisTime);           //***this is the final answer
-                            SELF                          := LEFT;),
+                            calcAgeAtThisTime_temp       := if(dob_temp = NULL or address_first_seen_SAS = NULL, NULL, 
+                                                                    truncate((address_first_seen_SAS - dob_temp) / DAYSINYEAR)); 
+                                                                    
+                            calcAgeAtThisTime            := if(calcAgeAtThisTime_temp > Citizenship.Constants.AGE_CAP, 
+                                                                Citizenship.Constants.AGE_CAP, 
+                                                                calcAgeAtThisTime_temp);
+                       //*** addressFirstReportedAge (capped at 110 years)  
+                            SELF.addressFirstReportedAge := IF(calcAgeAtThisTime = NULL or calcAgeAtThisTime < 0, NEG1, calcAgeAtThisTime);           //***this is the final answer
+                            SELF                         := LEFT;),
                             //***write the left even if there was a no match on the right.
                          LEFT OUTER);
                             
