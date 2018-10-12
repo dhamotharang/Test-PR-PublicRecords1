@@ -1,6 +1,19 @@
 ﻿IMPORT DidVille,BatchServices,Gateway,MDR,Phones,PhoneOwnership, Risk_Indicators,Royalty, STD, Suppress, ut;
 EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 							PhoneOwnership.IParams.BatchParams inMod) := FUNCTION
+
+	// 1. Resolved DIDs
+	// 2. GetBestInfo and keep input name if best lastname differs
+	// 3. Get Relatives Employers, Associates, and Business (REAB)
+	// 4. Get Phone Metadata - port, deact, react, carrier info, line type...
+	// 5. Identify and segment Invalid phone number and disconnected landlines
+	// 6. Call Zumigo to verify REAB identities and phone status for valid and active phones
+	// 7. Get CallerID from Accudata CNAM for phones not verified by Zumigo
+	// 8. Check in-house data Gong, PhonesPlus, Bip for active phones without identities
+	// 9. Join results (steps 5-8) and return 1 record per acctno 
+	//10. Flag whether person is associated with any debt litigation
+	//11. Compute Royalties 
+
 	Functions := PhoneOwnership.Functions;
 	Constants := PhoneOwnership.Constants;
 	today := Functions.TODAY; 
@@ -31,6 +44,7 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 												SELF :=[]),
 							LEFT OUTER, LIMIT(0),KEEP(1));
 	Suppress.MAC_Suppress(dsBatchwInput,dsBatchUnrestricted,inMod.ApplicationType,Suppress.Constants.LinkTypes.DID,DID);
+	dsBatchwBestInfo := Functions.GetBestInfo(dsBatchUnrestricted);//Get bestinfo for name variations.
 
 	//*******************Get Phone Metadata - ATT LIDB(Carrier data) and porting info - reuse PhoneAttributes code***************************
 	tempMod := MODULE(PROJECT(inMod,Phones.IParam.PhoneAttributes.BatchParams,OPT))
@@ -88,11 +102,15 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 											LEFT.acctno=RIGHT.acctno AND
 											LEFT.phone=RIGHT.phoneno,
 											appendLIDB(LEFT,RIGHT),LEFT OUTER, KEEP(1));
+	
+	// Identify known invalid or disconnected landlines
+	dsInvalidnDeactPhones := dsPhonesMetadataByEffectiveDate(LexisNexisMatchCode = Constants.LNMatch.INVALID OR 
+															(AppendedPhoneLineType=Phones.Constants.PhoneServiceType.Landline[1] AND 
+															disconnect_status = Constants.DisconnectStatus.DISCONNECTED));											
 
 	//***************Get REAB identities for Zumigo and to compare with callerNames from AccuData **************************************************
-	dsBatchwBestInfo := Functions.GetBestInfo(dsBatchUnrestricted);//Get bestinfo for name variations.
-	dsBatchwREAB := PhoneOwnership.GetREAB(dsBatchwBestInfo,inMod);//use dsBatchwBestInfo with alternate name and REAB in sequencing	
-
+	dsBatchwREAB := PhoneOwnership.GetREAB(dsBatchwBestInfo,inMod);//use dsBatchwBestInfo with alternate name and REAB in sequencing
+	
 	PhoneOwnership.Layouts.BatchOut appendReabMetadata(PhoneOwnership.Layouts.BatchOut l, PhoneOwnership.Layouts.Phone_Relationship r) := TRANSFORM
 		SELF.acctno := l.acctno;
 		SELF.phone := l.phone;
@@ -159,7 +177,10 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 		SELF := l;
 		SELF := [];
 	END;
-	dsREABwMetadata := JOIN(dsPhonesMetadataByEffectiveDate,dsBatchwREAB,
+
+	// Filter known Invalid Phones and disconnected Landlines - At this point, we are confident about them being invalid/inactive.
+	// We will avoid appending identities or making subsequent gateway calls. Records are reappended at the end before returning results.
+	dsREABwMetadata := JOIN((dsPhonesMetadataByEffectiveDate - dsInvalidnDeactPhones),dsBatchwREAB,
 							LEFT.acctno = RIGHT.acctno,
 							appendReabMetadata(LEFT,RIGHT),
 							LEFT OUTER, LIMIT(Constants.MAX_RECORDS,SKIP));	
@@ -182,17 +203,17 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 	dsAccudataValidatedResults := DEDUP(SORT(dsPhoneswCallerName(validatedRecord),acctno,-ownership_index,seq),acctno);
 
 	// *************************Get in-house phone records***********************//	
-	// Only passing acctno not validated for LNPhones search. Need to add ***ATT*** phones that did not go through Accudata here
+	// Only passing acctno not validated for LNPhones search.
 	// Need more info from Product about ATT phones.
 	dsLNData := PhoneOwnership.AppendLNPhonesData(dsPhoneswCallerName(acctno NOT IN SET(dsAccudataValidatedResults,acctno)),inMod);									
 	
-	//compiling all processed phones including invalid responses
-	dsAllPhones := dsPhonesMetadataByEffectiveDate(LexisNexisMatchCode = Constants.LNMatch.INVALID) + 
-					IF(inMod.useZumigo,zFinal.Results(validatedRecord)) + 
-					IF(inMod.useAccudataCNAM,dsAccudataValidatedResults) + 
-					dsLNData;
+	//**************************Compiling all processed phones including invalid responses****************************
+	dsAllPhones := dsInvalidnDeactPhones + // Append invalid phones and disconnected landlines
+					IF(inMod.useZumigo,zFinal.Results(validatedRecord)) + // records validated by Zumigo.
+					IF(inMod.useAccudataCNAM,dsAccudataValidatedResults) + // Caller Names from Accudata
+					dsLNData; // In-house identities - Gong, PP, and Bip
 
-	//result record count will always be one per acctno for this release.
+	//Resulting record count will always be one per acctno for this release. MaxIdentityCount hard-coded to 1.
 	dsPhoneResults := UNGROUP(TOPN(GROUP(SORT(dsAllPhones,acctno),acctno),inMod.MaxIdentityCount,acctno,-validatedRecord,ownership_index=Constants.Ownership.enumIndex.UNDETERMINED,-ownership_index,-TotalZumigoScore,reason_codes='',reason_codes,seq)); 
 	
 	PhoneOwnership.Layouts.BatchOut UpdateUnknownRelationships (PhoneOwnership.Layouts.BatchOut l):= TRANSFORM
@@ -306,6 +327,7 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 		OUTPUT(dsBatchUnrestricted,NAMED('dsBatchUnrestricted'));
 		OUTPUT(dsBatchwBestInfo,NAMED('dsBatchwBestInfo'));
 		OUTPUT(dsPhoneswMetadata,NAMED('dsPhoneswMetadata'));
+		OUTPUT(dsInvalidnDeactPhones,NAMED('dsInvalidnDeactPhones'));
 		OUTPUT(dsPhonesMetadataByEffectiveDate,NAMED('dsPhonesMetadataByEffectiveDate'));
 		OUTPUT(dsBatchwREAB,NAMED('dsBatchwREAB'));
 		OUTPUT(dsREABwMetadata,NAMED('dsREABwMetadata'));
