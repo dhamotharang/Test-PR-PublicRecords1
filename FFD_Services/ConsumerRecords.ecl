@@ -4,7 +4,7 @@ EXPORT ConsumerRecords(iesp.fcraConsumer.t_SearchRequest srchReq) := FUNCTION
 
 	ds_picklist_req := PROJECT(DATASET([srchReq],iesp.fcraConsumer.t_SearchRequest),
 		TRANSFORM(iesp.person_picklist.t_PersonPickListRequest,SELF:=LEFT,SELF:=[]));
-	FCRA.MAC_GetPickListRecords(ds_picklist_req,ds_picklist_resp,TRUE);
+	ds_picklist_resp:=FCRA.getDidVilleRecords(ds_picklist_req[1]);
 	Status := ds_picklist_resp[1]._Header.Status;
 	UniqueId := IF(Status!=0,0,(UNSIGNED6)ds_picklist_resp[1].Records[1].UniqueId);
 	DataGroup := IF(srchReq.options.IncludePersonContext,
