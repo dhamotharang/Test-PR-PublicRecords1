@@ -1,10 +1,11 @@
-IMPORT DeltabaseGateway;
+﻿IMPORT dx_PhoneFinderReportDelta;
 
 EXPORT Map_OtherPhones(string8 version) := FUNCTION
 
-	inFile 			:= distribute(PhoneFinderReportDelta.File_PhoneFinder.OtherPhones_Raw);
+	inFile 			:= distribute(PhoneFinderReportDelta.File_PhoneFinder_In.OtherPhones_Raw);
 	
-	Layout_PhoneFinder.OtherPhones_Main trOPh(inFile l):= transform
+	//DF-23251: Add 'dx_' Prefix to Index Definitions
+	dx_PhoneFinderReportDelta.Layout_PhoneFinder.OtherPhones_Main trOPh(inFile l):= transform
 		self.date_file_loaded := version;
 		self.risk_indicator		:= PhoneFinderReportDelta._Functions.rmNull(l.risk_indicator);
 		self.phone_type				:= PhoneFinderReportDelta._Functions.rmNull(l.phone_type);
@@ -18,7 +19,7 @@ EXPORT Map_OtherPhones(string8 version) := FUNCTION
 	end;
 	
 	mapOPhMain 	:= project(inFile, trOPh(left));
-	concatFile	:= mapOPhMain + PhoneFinderReportDelta.File_PhoneFinder.OtherPhones_Main;	
+	concatFile	:= mapOPhMain + dx_PhoneFinderReportDelta.File_PhoneFinder.OtherPhones_Main;	
 	ddConcat 		:= dedup(sort(distribute(concatFile, hash(transaction_id)), transaction_id, sequence_number, -(date_added+time_added), local), transaction_id, sequence_number, local);
 	
 	return ddConcat; 

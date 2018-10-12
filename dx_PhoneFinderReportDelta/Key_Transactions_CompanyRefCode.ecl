@@ -1,8 +1,9 @@
-﻿IMPORT Data_Services, Doxie;
+﻿IMPORT Data_Services, Doxie, PhoneFinderReportDelta;
 
 //PHPR-173: New Indices for Phone Finder Reporting Query
+//DF-23251: Add 'dx_' Prefix to Index Definitions
 
-ds := PhoneFinderReportDelta.File_PhoneFinder.Transactions_Main;
+ds := dx_PhoneFinderReportDelta.File_PhoneFinder.Transactions_Main;
 
 	refLayout := record
 		string16 company_id;
@@ -16,4 +17,4 @@ ds := PhoneFinderReportDelta.File_PhoneFinder.Transactions_Main;
 EXPORT Key_Transactions_CompanyRefCode := index(inFile
 																								,{company_id, reference_code, transaction_date}
 																								,{inFile}
-																								,'~thor_data400::key::phonefinderreportdelta::transactions_companyrefcode_'+doxie.Version_SuperKey);
+																								,data_services.Data_location.Prefix ('PhoneFinderReportDelta') + 'thor_data400::key::phonefinderreportdelta::transactions_companyrefcode_'+doxie.Version_SuperKey);
