@@ -136,6 +136,7 @@ EXPORT fn_getBusiness_CreditScore (BusinessCredit_Services.Iparam.reportrecords 
 																 BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL => BusinessCredit_Services.Constants.SCORE_TYPE.BLENDED,
 																 BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB  => BusinessCredit_Services.Constants.SCORE_TYPE.BLENDED,
 																 BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL  => BusinessCredit_Services.Constants.SCORE_TYPE.BLENDED,
+																 BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL  => BusinessCredit_Services.Constants.SCORE_TYPE.CREDIT,
 																''
 																);
 		SELF.MinScoreRange 	:=	(integer)L.MinRange;
