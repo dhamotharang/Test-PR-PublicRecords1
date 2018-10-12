@@ -1,18 +1,23 @@
-import versioncontrol;
-EXPORT Spray(string version) := module
+IMPORT STD, versioncontrol;
 
-export Input := DATASET([
- 	{'edata12-bld.br.seisint.com'										
- 	,'/hds_180/experian_fein/data/' + version                      
- 	,'*.TXT'                           
- 	,'291'                                                             
- 	,'~thor_data400::in::experian_fein::@version@'    
- 	,[{'~thor_data400::in::experian_fein::sprayed::data'}]
- 	,'thor400_20'
-	,version
-                      
- 	}
+EXPORT Spray(
+	STRING  hostname,
+	STRING  absolutePath,
+	STRING  glob,
+	INTEGER recordsize,
+	STRING  version,
+	STRING  cluster = 'Thor400_44'
+) := MODULE
 
-], VersionControl.Layout_Sprays.Info);
+	EXPORT Input := DATASET([{
+		hostname,
+		IF(STD.Str.EndsWith('absolutePath','/'), absolutePath + '/', absolutePath),
+		glob,
+		recordsize,
+		'~thor_data400::in::experian_fein::@version@',
+		[{'~thor_data400::in::experian_fein::sprayed::data'}],
+		cluster,
+		version
+	}], VersionControl.Layout_Sprays.Info);
 
-end;
+END;
