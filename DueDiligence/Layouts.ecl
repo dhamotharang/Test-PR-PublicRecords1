@@ -102,6 +102,7 @@ EXPORT Layouts := MODULE
     UNSIGNED4 inputSeq;
 		UNSIGNED4 historyDateYYYYMMDD;
 		STRING10 requestedVersion;
+    STRING25 productRequested;
     Citizenship.Layouts.Input;
 		Busn_Input business;
 		Indv_Input individual;

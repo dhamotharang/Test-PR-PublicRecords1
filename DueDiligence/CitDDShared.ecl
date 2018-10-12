@@ -5,6 +5,15 @@ EXPORT CitDDShared := MODULE
   //constants shared between Citizenship and Due Diligence
   EXPORT VALIDATION_INVALID_GLB := 'Not an allowable GLB permissible purpose';
   EXPORT VALIDATION_INVALID_DPPA := 'Not an allowable DPPA permissible purpose';
+  EXPORT VALIDATION_INVALID_DD_ATTRIBUTE_REQUEST_WITH_CITIZENSHIP := 'Business attributes are not valid with a citizenship request';
+  EXPORT VALIDATION_INVALID_PRODUCT_REQUEST_TYPE := 'Product Request Type is required or invalid. Product Request Type = AttributesOnly, CitizenshipOnly or AttributesAndCitizenship';
+  EXPORT VALIDATION_MINIMUM_INPUT_COMBO := 'Minimum input information not met. Minimum input information is: \n ' +
+                                              '(1)  First Name, Last Name, SSN  OR \n ' +
+                                              '(2)  First Name, Last Name, Street Address, City and State  OR \n ' +
+                                              '(3)  First Name, Last Name, Street Address, Zip  OR \n ' +
+                                              '(4)  LexID, First Name, Last Name, SSN  OR \n ' +
+                                              '(5)  LexID First Name, Last Name, Street Address, City and State  OR \n ' +
+                                              '(6)  LexID First Name, Last Name, Street Address, Zip';
   
   //we want to use the standard BS Options used in the Boca Shell.  
   EXPORT INTEGER DEFAULT_BS_VERSION := 52;
@@ -16,6 +25,8 @@ EXPORT CitDDShared := MODULE
   
   EXPORT DUEDILIGENCE_PRODUCTS := [PRODUCT_REQUESTED_ENUM.ATTRIBUTES_ONLY, PRODUCT_REQUESTED_ENUM.BOTH];
   EXPORT CITIZENSHIP_PRODUCTS := [PRODUCT_REQUESTED_ENUM.CITIZENSHIP_ONLY, PRODUCT_REQUESTED_ENUM.BOTH];
+  
+  EXPORT VALID_REQUESTED_PRODUCTS := ['attributesonly', 'citizenshiponly', 'attributesandcitizenship'];
   
 
 

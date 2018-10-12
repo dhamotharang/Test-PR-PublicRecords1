@@ -42,6 +42,7 @@
       STRING14 phone2;
       STRING20 dlNumber;
       STRING2 dlState;
+      STRING120 email;
     END;
     
     //Citizenship Model Layout

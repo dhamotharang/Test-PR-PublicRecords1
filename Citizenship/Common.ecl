@@ -1,6 +1,6 @@
-﻿IMPORT Address, Business_Header, DueDiligence, STD;
+﻿IMPORT Address, Business_Header, DueDiligence, iesp, STD;
 
-EXPORT Validation := MODULE
+EXPORT Common := MODULE
 
   EXPORT ValidateInput(DATASET(DueDiligence.Layouts.Input) input, UNSIGNED1 glbPurpose, UNSIGNED1 dppaPurpose, STRING15 modelName):= FUNCTION
   
@@ -71,5 +71,16 @@ EXPORT Validation := MODULE
       
       RETURN cleanData;
   END;
+  
+  
+  EXPORT createNVPair(STRING name, INTEGER val) := FUNCTION
+			
+			iesp.share.t_NameValuePair createPair(STRING n, INTEGER v) := TRANSFORM
+				SELF.Name := n;
+				SELF.Value := (STRING)v;
+			END;
+			
+			RETURN ROW(createPair(name, val));			
+	END;
 
 END;
