@@ -1,0 +1,6 @@
+testcompositionrun_info
+Monitoring WU W20170110-101812(HIPIE_BCTLWXCARMIGJX_AppendCriminalFlag_testcmp_CarmigJX) to completion.
+ 
+testcompositionrun_err
+Plugin AppendCriminalFlag passed compliance check
+

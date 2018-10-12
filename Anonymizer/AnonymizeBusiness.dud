@@ -1,0 +1,40 @@
+﻿ID "ed984cd6-82e1-4c31-9fa3-ce054e5c1cde";
+NAME AnonymizeBusiness;
+LABEL "Anonymize Business";
+VERSION "1.0.0";
+AUTHOR "CarmigJX";
+CATEGORY CLEAN;
+DESCRIPTION "Anonymize business information.";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	DATASET dsInput
+    FIELD CompanyName: LABEL("Company Name"),DESCRIPTION("Field containing the business name");
+    FIELD FEIN: LABEL("FEIN"),DESCRIPTION("Field containing the business FEIN"),OPTIONAL,NULL("");
+  END
+  ENUM("FALSE","TRUE") Anonymize: LABEL("Anonymize"),DEFAULT("^GLOBAL|Anonymize");
+END
+
+OUTPUTS
+	DATASET dsOutput(dsInput);
+END
+
+GENERATES INLINE
+	IMPORT Anonymizer;
+  IMPORT Std;
+  doAnonymize     := STD.Str.ToUpperCase(%^qAnonymize%)='TRUE';
+  %^edsOutput% := IF(doAnonymize, Anonymizer.macAnonymizeBusiness(%dsInput%, %CompanyName%, %FEIN%), %dsInput%);
+ENDGENERATES
+
+
+RESOURCES
+	FILE readme: FILENAME("AnonymizeBusiness_README.txt"),LABEL("Plugin Readme File");
+	FILE AnonymizeBusiness_testcmp: FILENAME("AnonymizeBusiness_testcmp.txt"),LABEL("Plugin Test Composition");
+	FILE AnonymizeBusiness_BuildTestDataset: FILENAME("AnonymizeBusiness_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+	ECL Address:FILENAME("Address"), URL("http:// 10.241.100.153:8010");   
+	ECL Anonymizer:FILENAME("Anonymizer"), URL("http:// 10.241.100.153:8010");   
+END

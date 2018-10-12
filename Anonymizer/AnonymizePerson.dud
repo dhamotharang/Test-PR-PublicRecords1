@@ -1,0 +1,39 @@
+NAME AnonymizePerson;
+LABEL "Anonymize Person";
+VERSION "1.0.0";
+DESCRIPTION "Anonymize person information to drop PII.";
+AUTHOR "prichajx";
+CATEGORY CLEAN;
+
+PERMISSIONS
+ EDIT:PRIVATE;
+ VIEW:PUBLIC;
+ RUN:PUBLIC;
+END
+    
+INPUTS
+    DATASET dsInput
+        FIELD FirstName:LABEL("Firstname"),DESCRIPTION("Field containing the person Firstname");
+        FIELD Lastname:LABEL("Lastname"),DESCRIPTION("Field containing the person Lastname");
+        FIELD Gender:LABEL("Gender"),DESCRIPTION("Field containing the person gender"),OPTIONAL,NULL("");
+        FIELD SSN:LABEL("SSN"),DESCRIPTION("Field containing the person SSN"),OPTIONAL,NULL("");
+        FIELD DateOfBirth:LABEL("DateOfBirth"),DESCRIPTION("Field containing the date of birth"),OPTIONAL,NULL("");
+    END    
+END
+
+OUTPUTS
+    DATASET dsOutput(dsInput);
+END
+
+GENERATES INLINE
+IMPORT Anonymizer;
+IMPORT Std;
+
+%^edsOutput% := Anonymizer.mac_AnonymizePerson(%dsInput%, %FirstName%, %Lastname%, %Gender%, %SSN%, %DateOfBirth%);
+
+ENDGENERATES
+RESOURCES
+LOGICALFILE testinput:FILENAME("~qa::anonymizer::anonymizeperson::input"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+FILE readme: FILENAME("AnonymizePerson_ReadMe.txt"),LABEL("Plugin Readme File");
+
+END

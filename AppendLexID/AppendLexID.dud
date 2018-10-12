@@ -1,0 +1,122 @@
+﻿NAME AppendLexID;
+VERSION "1.0.0";
+LABEL "LexisNexis LexID Append";
+DESCRIPTION "Append LexID to cleaned data (first and lastname are required, the rest is optional)";
+CATEGORY APPEND;
+AUTHOR "prichajx";
+
+PERMISSIONS
+ EDIT:PRIVATE;
+ VIEW:PUBLIC;
+ RUN:PUBLIC;
+END
+   
+INPUTS
+    STRING Prefix:LABEL("Append Column Prefix"),DEFAULT("Person");
+    INT Weight : LABEL("Weight"),DEFAULT(30),DESCRIPTION("Match weight threshold, points for data point matches.");
+    INT Distance : LABEL("Distance"),DEFAULT(3),DESCRIPTION("Distance between top candidate and next.");
+    DATASET dsInput:MAPBYNAME
+        FIELD Ssn:LABEL("SSN"),OPTIONAL,NULL("");
+        FIELD Dob:LABEL("Date of Birth"),OPTIONAL,NULL("");
+        FIELD FirstName:LABEL("First Name");
+        FIELD MiddleName:LABEL("Middle Name"),OPTIONAL,NULL("");
+        FIELD LastName:LABEL("Last Name");
+        FIELD Gender:LABEL("Gender"),OPTIONAL,NULL("");
+        FIELD NameSuffix:LABEL("Name Suffix"),OPTIONAL,NULL("");
+        FIELD PrimaryRange:LABEL("Primary Range"),OPTIONAL,NULL("");
+        FIELD PrimaryName:LABEL("Primary Name"),OPTIONAL,NULL("");
+        FIELD SecondaryRange:LABEL("Secondary Range"),OPTIONAL,NULL("");
+        FIELD City:LABEL("City"),OPTIONAL,NULL("");
+        FIELD Zip:LABEL("Zipcode"),OPTIONAL,NULL("");
+        FIELD State:LABEL("State"),OPTIONAL,NULL("");
+        FIELD Phone:LABEL("Phone"),OPTIONAL,NULL("");
+    END
+END
+
+OUTPUTS
+    DATASET dsOutput(dsInput):PREFIX(INPUTS.Prefix),APPEND
+      UNSIGNED6 LexID;
+      UNSIGNED2 _xadl2_weight;
+      UNSIGNED2 _xadl2_score;
+      UNSIGNED4 _xadl2_keys_used;
+      UNSIGNED2 _xadl2_distance;
+      STRING20 _xadl2_matches;
+      STRING _xadl2_keys_desc;
+      STRING _xadl2_matches_desc;
+      INTEGER2 _xlink_weight;
+      UNSIGNED2 _xlink_score;
+      INTEGER1 _xlink_distance;
+      UNSIGNED4 _xlink_keys;
+      STRING _xlink_keys_desc;
+      STRING60 _xlink_matches;
+      STRING _xlink_matches_desc;
+    END
+    DATASET HitStats:PREFIX(INPUTS.Prefix), WUID, SIDE
+        INTEGER Hit: FEW;
+        STRING State: FEW;
+        INTEGER2 _xlink_weight : FEW;
+        INTEGER1 _xlink_distance : FEW;
+        INTEGER Cnt;
+    END    
+    DATASET PickHitStats:PREFIX(INPUTS.Prefix), WUID, SIDE 
+        INTEGER Hit : FEW;
+        STRING Description : FEW;
+    END 
+END
+
+VISUALIZE LexIDAppendStats : LABEL("LexID Append Stats")
+    PIE BasicHitStats(HitStats{Hit, SUM(Cnt)}) : LABEL(Hit),WEIGHT(SUM(Cnt)),SELECTS(Hit->TopStateCounts,ScoreDensity,HitWeightDistribution,WeightDistanceDistribution);
+    BAR HitWeightDistribution(HitStats{Hit, _xlink_weight, SUM(Cnt)}) : FILTER(Hit),LABEL(_xlink_weight),WEIGHT(SUM(Cnt)),SORT(-_xlink_weight),SELECTS(_xlink_weight->WeightDistanceDistribution);
+    BAR WeightDistanceDistribution(HitStats{Hit, _xlink_weight, _xlink_distance, SUM(Cnt)}) : FILTER(Hit, _xlink_weight),LABEL(_xlink_distance),WEIGHT(SUM(Cnt)),SORT(-_xlink_distance);
+    CHORO ScoreDensity(HitStats{Hit, State, SUM(Cnt)}) : FILTER(Hit),STATE(State),WEIGHT(SUM(Cnt)),COLOR("Red_Yellow_Blue");
+    TABLE TopStateCounts(HitStats{Hit, State, SUM(Cnt)}) : FILTER(Hit),LABEL("State","Count"),VALUE(State, SUM(Cnt));
+END
+
+GENERATES INLINE
+IMPORT ut;
+IMPORT IDLExternalLinking;
+IMPORT InsuranceHeader_xLink;
+IMPORT RAMPS;
+IMPORT hipie_ecl;
+
+UNSIGNED weight := %Weight%;
+UNSIGNED distance := %Distance%;
+BOOLEAN segmentation := TRUE;
+
+
+   LexIDResults := RAMPS.macxLinkingWithDescriptions(%dsInput%, , %FirstName%, %MiddleName%, %LastName%, %Gender%,/*derived gender*/, 
+                %PrimaryName%, %PrimaryRange%, %SecondaryRange%, %City%, %State%, %Zip%, 
+                %Ssn%, %Dob%, %Phone% , /*DL_State*/, /*DL_NBR*/, weight, distance, 
+               segmentation, TRUE, '%Prefix%');
+   
+   %^edsOutput% := LexIDResults %^p%; 
+   %^ePickHitStats% := DATASET([{1, 'Hits'}, {0, 'No Hits'}], {INTEGER %Prefix%Hit, string %Prefix%Description});
+   %^eHitStats% := TABLE(%dsOutput%, {INTEGER %Prefix%Hit := MAP(%Prefix%LexID > 0 => 1, 0), %Prefix%State := %State%, %Prefix%_xlink_weight, %Prefix%_xlink_distance, %Prefix%Cnt := COUNT(GROUP)}, MAP(%Prefix%LexID > 0 => 1, 0), %State%, %Prefix%_xlink_weight, %Prefix%_xlink_distance, FEW);
+ENDGENERATES
+
+RESOURCES
+
+
+    LOGICALFILE testinput:FILENAME("~qa::appendlexid::appendlexid::input"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+
+    INDEX key_insuranceheader_zip_pr:FILENAME("~thor_data400::key::insuranceheader_xlink::qa::did::refs::zip_pr"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX key_insuranceheader_ssn4:FILENAME("~thor_data400::key::insuranceheader_xlink::qa::did::refs::ssn4"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX key_insuranceheader_ssn:FILENAME("~thor_data400::key::insuranceheader_xlink::qa::did::refs::ssn"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX key_insuranceheader_ph:FILENAME("~thor_data400::key::insuranceheader_xlink::qa::did::refs::ph"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX key_insuranceheader_name:FILENAME("~thor_data400::key::insuranceheader_xlink::qa::did::refs::name"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX key_insuranceheader_lfz:FILENAME("~thor_data400::key::insuranceheader_xlink::qa::did::refs::lfz"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX key_insuranceheader_dob:FILENAME("~thor_data400::key::insuranceheader_xlink::qa::did::refs::dob"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX key_insuranceheader_dln:FILENAME("~thor_data400::key::insuranceheader_xlink::qa::did::refs::dln"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX key_insuranceheader_address:FILENAME("~thor_data400::key::insuranceheader_xlink::qa::did::refs::address"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX key_insuranceheader_did_ind:FILENAME("~thor400::key::insuranceheader_segmentation::did_ind_qa"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+
+    ECL ut:FILENAME("ut"), URL("http:// 10.241.100.153:8010");
+    ECL IDLExternalLinking:FILENAME("IDLExternalLinking"), URL("http:// 10.241.100.153:8010");
+    ECL InsuranceHeader_xLink:FILENAME("InsuranceHeader_xLink"), URL("http:// 10.241.100.153:8010");
+    ECL RAMPS:FILENAME("RAMPS"), URL("http:// 10.241.100.153:8010");
+    ECL hipie_ecl:FILENAME("hipie_ecl"), URL("http:// 10.241.100.153:8010");
+    FILE readme: FILENAME("AppendLexID_ReadMe.txt"),LABEL("Plugin Readme File");
+	FILE AppendLexID_BuildTestDataset: FILENAME("AppendLexID_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+	FILE AppendLexID_testcmp: FILENAME("AppendLexID_testcmp.txt"),LABEL("Plugin Test Composition");
+
+END

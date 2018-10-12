@@ -1,0 +1,22 @@
+Info Log -
+
+Monitoring WU W20180209-151337(HIPIE_ALAPERIASSX-W7D_HIPIE_Plugins.CleanClaimData.CleanClaimData_testcmp_sasisa01) to completion.
+Plugin CleanClaimData's test composition CleanClaimData_testcmp ran on cluster http://10.241.100.159:8010/ and created workunit W20180209-151337 with status completed
+Plugin CleanClaimData's test composition CleanClaimData_testcmp ran and completed with state "completed"
+Control workunit W20180209-151102 and this test workunit W20180209-151337 had the same number of results
+Control workunit W20180209-151102has no outputs that are missing from test workunit W20180209-151337
+No results were found in test workunit W20180209-151337 that weren't in the control workunit W20180209-151102
+All workunit results had the same number of records in the control workunit W20180209-151102 and this test workunit W20180209-151337
+The content of all workunit results was the same in the control workunit W20180209-151102 and the current test workunit W20180209-151337
+Plugin CleanClaimData passed compliance check
+
+Err Log - 
+
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/C:/Program%20Files%20(x86)/HPCCSystems/6.4.8/HIPIE/HIPIE.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/C:/Program%20Files%20(x86)/HPCCSystems/6.4.8/KEL/hipie.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
+Plugin CleanClaimData passed compliance check
+
+

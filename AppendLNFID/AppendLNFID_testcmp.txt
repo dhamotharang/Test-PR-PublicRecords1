@@ -1,0 +1,341 @@
+ID "HIPIE_Plugins.AppendLNFID.AppendLNFID_testcmp";
+NAME AppendLNFID_testcmp;
+LABEL "Facility ID Append";
+CATEGORY APPEND;
+VERSION "1.0.0";
+AUTHOR "periassx";
+DESCRIPTION "Append Facility ID using cleaned data as input";
+
+PERMISSIONS
+ VIEW:PUBLIC;
+ EDIT:PUBLIC;
+ RUN:PUBLIC;
+END
+
+INPUTS
+        STRING CompareWUID:DEFAULT("W20180730-111327");
+END
+
+INSTANCE UseDataset.UseDataset(Ins001): LABEL("Use Dataset"),VERSION("1.1.0")
+	LogicalFilename ="~qa::appendlnfid::appendlnfid::input"
+	Method="THOR"
+	Structure="RECORD
+  string50 provider_key;
+  string10 provider_npi;
+  string12 provider_dea;
+  string10 provider_taxonomy;
+  string10 provider_tax_id;
+  string5 provider_tax_id_suffix;
+  string12 provider_num;
+  string5 provider_num_suffix;
+  string2 provider_num_qualifier;
+  string2 provider_security_code;
+  string3 network_code;
+  string50 provider_facility_name;
+  string12 provider_facility_num;
+  string30 provider_first_name;
+  string36 provider_last_name;
+  string36 provider_address_1;
+  string36 provider_address_2;
+  string24 provider_city;
+  string2 provider_state;
+  string9 provider_zip_cd;
+  string30 provider_county;
+  string2 provider_country;
+  string4 provider_region;
+  string9 prov_specialty_cd_1;
+  string9 prov_specialty_cd_2;
+  string2 provider_type;
+  string1 watch_cd;
+  string8 provider_latest_update_date;
+  string50 prov_user_def_01;
+  string50 prov_user_def_02;
+  string50 prov_user_def_03;
+  string50 prov_user_def_04;
+  string50 prov_user_def_05;
+  string50 prov_user_def_06;
+  string50 prov_user_def_07;
+  string50 prov_user_def_08;
+  string50 prov_user_def_09;
+  string50 prov_user_def_10;
+  string8 providerdob;
+  string9 providerssn;
+  string50 cleanproviderproviderkey;
+  string20 cleanproviderfirstname;
+  string20 cleanprovidermiddlename;
+  string20 cleanproviderlastname;
+  string5 cleanprovidernamesuffix;
+  string10 cleanproviderprimaryrange;
+  string2 cleanproviderpredirectional;
+  string28 cleanproviderprimaryname;
+  string4 cleanprovideraddresssuffix;
+  string2 cleanproviderpostdirectional;
+  string10 cleanproviderunitdesignation;
+  string8 cleanprovidersecondaryrange;
+  string25 cleanproviderpostalcity;
+  string25 cleanprovidervanitycity;
+  string2 cleanproviderstate;
+  string5 cleanproviderzip5;
+  string4 cleanproviderzip4;
+  string2 cleanproviderdbpc;
+  string1 cleanprovidercheckdigit;
+  string2 cleanproviderrecordtype;
+  string2 cleanproviderfipsstate;
+  string3 cleanprovidercounty;
+  string10 cleanproviderlatitude;
+  string11 cleanproviderlongitude;
+  string4 cleanprovidermsa;
+  string7 cleanprovidergeoblock;
+  string1 cleanprovidergeomatchcode;
+  string4 cleanprovidererrorstatus;
+  string25 cleanprovideraddresskey;
+  string8 cleanproviderproviderdob;
+  string9 cleanproviderproviderssn;
+  string1 advohitflag;
+  string1 advovacancyindicator;
+  string1 advothrowbackindicator;
+  string1 advoseasonaldeliveryindicator;
+  string5 advoseasonalsuppressionstartdate;
+  string5 advoseasonalsuppressionenddate;
+  string1 advodonotdeliverindicator;
+  string1 advocollegeindicator;
+  string10 advocollegesuppressionstartdate;
+  string10 advocollegesuppressionenddate;
+  string1 advoaddressstyle;
+  string5 advosimplifyaddresscount;
+  string1 advodropindicator;
+  string1 advoresidentialorbusinessindicator;
+  string1 advoonlywaytogetmailindicator;
+  string1 advorecordtypecode;
+  string1 advoaddresstype;
+  string1 advoaddressusagetype;
+  string8 advofirstseendate;
+  string8 advolastseendate;
+  string8 advovendorfirstreporteddate;
+  string8 advovendorlastreporteddate;
+  string8 advovacationbegindate;
+  string8 advovacationenddate;
+  string8 advonumberofcurrentvacationmonths;
+  string8 advomaxvacationmonths;
+  string8 advovacationperiodscount;
+  string1 acahitfound;
+  string200 acainstitution;
+  string2 acainstitutiontype;
+  string10 acainstitutiontypeexp;
+  string1 acaaddresstype;
+  unsigned8 inplnpid;
+  unsigned2 inppidweight;
+  unsigned2 inppiddistance;
+  unsigned8 providerattrlexid;
+  string1 providerattrentitytype;
+  string20 providerattrfname;
+  string20 providerattrmname;
+  string28 providerattrlname;
+  string5 providerattrsname;
+  string9 providerattrssn;
+  string9 providerattrconsumerssn;
+  unsigned4 providerattrdateofbirth;
+  unsigned4 providerattrconsumerdateofbirth;
+  string25 providerattrlicensenumber;
+  string25 providerattrcleanedlicensenumber;
+  string2 providerattrlicensestate;
+  string60 providerattrlicensetype;
+  string60 providerattrlicensestatus;
+  unsigned4 providerattrdatelicenseexpired;
+  unsigned4 providerattrlicensecount;
+  unsigned4 providerattrlicensestatecount;
+  unsigned4 providerattractivelicensecount;
+  unsigned4 providerattrinactivelicensecount;
+  unsigned4 providerattrrevokedlicensecount;
+  string2 providerattrinactivelicensestate;
+  string1 providerattrinactivelicenseflag;
+  string1 providerattrrevokedlicenseflag;
+  string1 providerattrexpiredlicenseflag;
+  string1 providerattrdeathindicator;
+  unsigned4 providerattrdateofdeath;
+  unsigned4 providerattrbillingtaxid;
+  string10 providerattrphone;
+  string10 providerattrfax;
+  string6 providerattrupin;
+  string10 providerattrnpinumber;
+  string8 providerattrnpienumerationdate;
+  string8 providerattrnpideactivationdate;
+  string8 providerattrnpireactivationdate;
+  string1 providerattrnpiflag;
+  unsigned4 providerattrdeactivednpicount;
+  string1 providerattrdeabusinessactivityindicator;
+  string10 providerattrdeanumber;
+  unsigned4 providerattrdatedeaexpired;
+  unsigned4 providerattrdeacount;
+  unsigned4 providerattractivedeacount;
+  unsigned4 providerattrexpireddeacount;
+  string1 providerattrdeaexpiredflag;
+  string1 providerattrisstatesanction;
+  string1 providerattrisoigsanction;
+  string1 providerattrisopmsanction;
+  string10 providerattrtaxonomy;
+  string50 providerattrtaxonomydescription;
+  string3 providerattrspecialitycode;
+  string1 providerattrproviderstatus;
+  string40 providerattrgroupkey;
+  string1 providerattrhasactivelicenserevocation;
+  string2 providerattractivelicenserevocationstate;
+  string8 providerattractivelicenserevocationdate;
+  string1 providerattrhasactivestateexclusion;
+  string2 providerattractivelicenseexclusionstate;
+  string8 providerattractivestateexclusiondate;
+  string1 providerattrhasactiveoigexclusion;
+  string8 providerattractiveoigexclusiondate;
+  string1 providerattrhasactiveopmexclusion;
+  string8 providerattractiveopmexclusiondate;
+  string8 providerattractivestatesanctionexclusiondate;
+  string8 providerattractiveoigsanctionexclusiondate;
+  string8 providerattractiveopmsanctionexclusiondate;
+  string1 providerattrhaslicenserevocationreinstated;
+  string2 providerattrlicenserevocationreinstatedstate;
+  string8 providerattrlicenserevocationreinstateddate;
+  string1 providerattrhasstateexclusioinreinstated;
+  string2 providerattrstateexclusionreinstatedstate;
+  string8 providerattrstateexclusionreinstateddate;
+  string1 providerattrhasoigexclusioinreinstated;
+  string8 providerattroigexclusionreinstateddate;
+  string1 providerattrhasopmexclusioinreinstated;
+  string8 providerattropmexclusionreinstateddate;
+  string10 providerattrresidentialprimaryrange;
+  string2 providerattrresidentialpredirectional;
+  string28 providerattrresidentialprimaryname;
+  string4 providerattrresidentialaddresssuffix;
+  string2 providerattrresidentialpostdirectional;
+  string8 providerattrresidentialsecondaryrange;
+  string25 providerattrresidentialcityname;
+  string2 providerattrresidentialstate;
+  string5 providerattrresidentialzip5;
+  unsigned3 providerattrresidentialaddresslastseen;
+  string1 providerattrproviderwithsingleaddress;
+  unsigned3 providerattrsingleaddressprovidercount;
+  string10 providerattrpractiseprimaryrange;
+  string2 providerattrpractisepredirectional;
+  string28 providerattrpractiseprimaryname;
+  string4 providerattrpractiseaddresssuffix;
+  string2 providerattrpractisepostdirectional;
+  string8 providerattrpractisesecondaryrange;
+  string25 providerattrpractisecityname;
+  string2 providerattrpractisestate;
+  string5 providerattrpractisezip5;
+  string1 providerattrhasbankruptcy;
+  string8 providerattrbankruptcylastseen;
+  string1 providerattrhascriminalhistory;
+  string8 providerattrlastarresteddate;
+  string1 providerattrhasrelativeconvictions;
+  string1 providerattrhasrelativebankruptcy;
+  string3 providerattrrelativecount;
+  string3 providerattrrelativebankruptcycount;
+  string3 providerattrrelativefelonycount;
+  string1 providerattrhasassocactivestateexclusion;
+  string1 providerattrhasassocactivelicenserevocation;
+  string1 providerattrhasassocstateexclusionreinstated;
+  string1 providerattrhasassoclicenserevocationreinstated;
+  string1 providerattrhasassocbankruptcy;
+  string1 providerattrhasassoccriminalhistory;
+  string1 providerattrhasdeceased;
+  string8 providerattrdeceaseddate;
+  string1 consumerattrhasbankruptcy;
+  string1 consumerattrhasconvictions;
+  string1 consumerattrhasdeceased;
+  string8 consumerattrdateofdeaceased;
+  string1 consumerattrhasrelativebankruptcy;
+  string1 consumerattrhasrelativeconvictions;
+  string8 consumerattrbankruptcydate;
+  string8 consumerattrconvictiondate;
+  string3 consumerattrrelativecount;
+  string3 consumerattrrelativesbankruptcycount;
+  string3 consumerattrrelativesfelonycount;
+  string50 clientspecialtydescription;
+  string1 clientnpientitytypecode;
+ END;
+"
+END
+
+INSTANCE CleanFacilityName.CleanFacilityName(Ins002)
+	Prefix="clean"
+	dsInput=^Ins001|dsOutput
+	FacilityName=provider_facility_name
+END
+
+INSTANCE AppendLNFID.AppendLNFID(Ins003)
+	Prefix="fac"
+	dsInput=^Ins002|dsOutput
+	FacilityName=cleanFacilityName
+	PrimaryRange=cleanproviderprimaryrange 
+	PrimaryName=cleanproviderprimaryname 
+	SecondaryRange=cleanprovidersecondaryrange 
+	CityName_Vanity=cleanprovidervanitycity 
+	State=cleanproviderstate 
+	Zip5=cleanproviderzip5 
+	// Phone='' 
+	// Fax=''
+	// LicenseNumber=''
+	// LicenseState=''
+	// CLIANumber=''
+	NPINumber=provider_npi
+	DEANumber=provider_dea 
+	TaxID=provider_tax_id
+	// FEIN=''
+	// MedicareNumber=''
+	// MedicaidNumber='' 
+	// NCPDPNumber=''
+	Taxonomy=provider_taxonomy
+	// DataSource=''
+	// DataSourceRecordID=''
+	// LexisNexisBusinessID=''
+	// VendorID=''
+END
+
+INSTANCE OutDataset.OutDataset(Ins004)
+	name="~qa::appendlnfid::appendlnfid::output"
+	dsInput=^Ins003|dsOutput
+	Method=THOR
+END
+
+
+INSTANCE CleanFacilityName.CleanFacilityName(Ins005)
+	Prefix="clean1"
+	dsInput=^Ins001|dsOutput
+	FacilityName=provider_facility_name
+END
+
+INSTANCE AppendLNFID.AppendLNFID(Ins006)
+	Prefix="fac2"
+	dsInput=^Ins005|dsOutput
+	FacilityName=clean1FacilityName
+	PrimaryRange=cleanproviderprimaryrange 
+	PrimaryName=cleanproviderprimaryname 
+	SecondaryRange=cleanprovidersecondaryrange 
+	CityName_Vanity=cleanprovidervanitycity 
+	State=cleanproviderstate 
+	Zip5=cleanproviderzip5 
+	// Phone='' 
+	// Fax=''
+	// LicenseNumber=''
+	// LicenseState=''
+	// CLIANumber=''
+	NPINumber=provider_npi
+	DEANumber=provider_dea 
+	TaxID=provider_tax_id
+	// FEIN=''
+	// MedicareNumber=''
+	// MedicaidNumber='' 
+	// NCPDPNumber=''
+	Taxonomy=provider_taxonomy
+	// DataSource=''
+	// DataSourceRecordID=''
+	// LexisNexisBusinessID=''
+	// VendorID=''
+END
+
+INSTANCE OutDataset.OutDataset(Ins007)
+	name="~qa::appendlnfid::appendlnfid::output2"
+	dsInput=^Ins006|dsOutput
+	Method=THOR
+END
+

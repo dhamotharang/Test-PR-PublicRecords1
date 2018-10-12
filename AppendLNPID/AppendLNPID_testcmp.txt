@@ -1,0 +1,89 @@
+ID "HIPIE_Plugins.AppendLNPID.AppendLNPID_testcmp";
+NAME AppendLNPID_testcmp;
+LABEL "Append LNPID Attributes";
+DESCRIPTION "Append LNPID attributes";
+VERSION "1.0.0";
+AUTHOR "periassx";
+
+PERMISSIONS
+   VIEW:PUBLIC;
+   EDIT:PUBLIC;
+   RUN:PUBLIC;
+END
+
+INPUTS
+    STRING CompareWUID : DEFAULT("W20180208-134350");
+END
+
+INSTANCE UseDataset.UseDataset(Ins001)
+	LogicalFilename ="~qa::appendlnpid::appendlnpid::input"
+	Method=THOR
+	Structure=STRING|FirstName,STRING|MiddleName,STRING|LastName,STRING|NameSuffix,STRING|Gender,STRING|SSN,STRING|DateOFBirth,STRING|PrimaryRange,STRING|PrimaryName,STRING|SecondaryRange,STRING|CityName_Vanity,STRING|State,STRING|Zip5,STRING|Phone,STRING|Fax,STRING|LicenseNumber,STRING|LicenseState,STRING|UPIN,STRING|NPINumber,STRING|DEANumber,STRING|Taxonomy,STRING|VendorID
+END
+
+INSTANCE AppendLNPID.AppendLNPID(Ins002)
+	Prefix="idv"
+	dsInput=^Ins001|dsOutput
+	FirstName=FirstName
+	MiddleName=MiddleName
+	LastName=LastName
+	NameSuffix=NameSuffix
+	Gender=Gender
+	SSN=SSN
+	DateOfBirth=DateOfBirth
+	PrimaryRange=PrimaryRange
+	PrimaryName=PrimaryName
+	SecondaryRange=SecondaryRange
+	CityName_Vanity=CityName_Vanity
+	State=State
+	Zip5=ZIp5
+	Phone=Phone
+	Fax=Fax
+	LicenseNumber=LicenseNumber
+	LicenseState=LicenseState
+	UPIN=UPIN
+	NPINumber=NPINumber
+	DEANumber=DEANumber
+	Taxonomy=Taxonomy
+	VendorID=VendorID
+END
+
+INSTANCE AppendLNPID.AppendLNPID(Ins004)
+	Prefix="idv"
+	dsInput=^Ins001|dsOutput
+	FirstName=FirstName
+	MiddleName=MiddleName
+	LastName=LastName
+	NameSuffix=NameSuffix
+	Gender=Gender
+	SSN=SSN
+	DateOfBirth=DateOfBirth
+	PrimaryRange=PrimaryRange
+	PrimaryName=PrimaryName
+	SecondaryRange=SecondaryRange
+	CityName_Vanity=CityName_Vanity
+	State=State
+	Zip5=ZIp5
+	Phone=Phone
+	Fax=Fax
+	LicenseNumber=LicenseNumber
+	LicenseState=LicenseState
+	UPIN=UPIN
+	NPINumber=NPINumber
+	DEANumber=DEANumber
+	Taxonomy=Taxonomy
+	VendorID=VendorID
+END
+
+INSTANCE OutDataset.OutDataset(Ins003)
+	dsInput=^Ins002|dsOutput
+	name="~qa::appendlnpid::appendlnpid::output"
+	Method="THOR"
+END
+
+INSTANCE OutDataset.OutDataset(Ins005)
+	dsInput=^Ins004|dsOutput
+	name="~qa::appendlnpid::appendlnpid::output2"
+	Method="THOR"
+END
+

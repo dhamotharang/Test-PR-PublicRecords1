@@ -1,0 +1,18 @@
+Info Log -
+
+Monitoring WU W20180213-125541(HIPIE_ALAPERIASSX-W7D_HIPIE_Plugins.CleanPatientData.CleanPatientData_testcmp_periassx) to completion.
+Plugin CleanPatientData's test composition CleanPatientData_testcmp ran on cluster http://10.241.100.159:8010/ and created workunit W20180213-125541 with status completed
+Plugin CleanPatientData's test composition CleanPatientData_testcmp ran and completed with state "completed"
+Control workunit W20180213-124900 and this test workunit W20180213-125541 had the same number of results
+Control workunit W20180213-124900has no outputs that are missing from test workunit W20180213-125541
+No results were found in test workunit W20180213-125541 that weren't in the control workunit W20180213-124900
+All workunit results had the same number of records in the control workunit W20180213-124900 and this test workunit W20180213-125541
+The content of all workunit results was the same in the control workunit W20180213-124900 and the current test workunit W20180213-125541
+Plugin CleanPatientData passed compliance check
+
+
+
+Err Log - 
+
+Plugin CleanPatientData passed compliance check
+

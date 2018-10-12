@@ -1,0 +1,27 @@
+testcompositionrun_err.log
+C:\Users\carmigjx\git\HIPIE_Plugins\Business\ComputeBusinessAttributes_testcmp.txt(0,0):error H502:No Workunits were run for test composition ComputeBusinessAttributes_testcmp with ID HIPIE_Plugins.Business.ComputeBusinessAttributes_cmp
+C:\Users\carmigjx\git\HIPIE_Plugins\Business\ComputeBusinessAttributes_testcmp.txt(0,0):error H1602:ComputeBusinessAttributes_testcmp: the following outputs are in control workunit W20160628-133329 but not in test workunit W20160628-150029:Result 6
+C:\Users\carmigjx\git\HIPIE_Plugins\Business\ComputeBusinessAttributes_testcmp.txt(0,0):error H1602:ComputeBusinessAttributes_testcmp: the following outputs are in test workunit W20160628-150029 but not in control workunit W20160628-133329:Result 6
+C:\Users\carmigjx\git\HIPIE_Plugins\Business\ComputeBusinessAttributes_testcmp.txt(0,0):error H1602:ComputeBusinessAttributes_testcmp: output Result 6 had different values. Control workunit W20160628-133329:
+[100 rows], test workunit W20160628-150029:
+null
+C:\Users\carmigjx\git\HIPIE_Plugins\Business\ComputeBusinessAttributes_testcmp.txt(0,0):error H1602:ComputeBusinessAttributes_testcmp: output Result 6 had different filenames. Control workunit W20160628-133329:qa::business::computebusinessattributes::output, test workunit W20160628-150029:null
+C:\Users\carmigjx\git\HIPIE_Plugins\Business\ComputeBusinessAttributes_testcmp.txt(0,0):error H1602:ComputeBusinessAttributes_testcmp: output hipie_hash had different values. Control workunit W20160628-133329:
+e315d23569ae9fd3d0de3ecb1cf4a6a1, test workunit W20160628-150029:
+83760fa0db8b5432b00ecce5119f4b97
+
+
+
+testcompositionrun_info.log
+C:\Users\carmigjx\git\HIPIE_Plugins\AppendACA\AppendACA.dud(59,129):error H101:no viable alternative at input 'TABLEHitRate(acaHitStats{WasFound,Cnt}):TITLE("Hit Rate"),LABEL("Status","Count"),VALUE(WasFound,Cnt),_pagination='
+C:\Users\carmigjx\git\HIPIE_Plugins\AppendACA\AppendACA.dud(0,0):error H101:Invalid contract HIPIE_Plugins.AppendACA.AppendACA, discarding
+
+C:\Users\carmigjx\git\HIPIE_Plugins\Business\appendbusinesscontacts_testcmp.cmp(37,0):error H501:No contract found HIPIE_Plugins.Business.AppendBusinessContacts with version 1.0.0
+C:\Users\carmigjx\git\HIPIE_Plugins\Business\appendbusinesscontacts_testcmp.cmp(45,0):error H501:No contract found HIPIE_Plugins.Business.AppendBusinessContacts with version 1.0.0
+
+C:\Users\carmigjx\git\HIPIE_Plugins\Business\appendconsolidatedbipids_testcmp.cmp(29,0):error H501:No contract found HIPIE_Plugins.Business.AppendConsolidatedBipIds with version 1.0.0
+C:\Users\carmigjx\git\HIPIE_Plugins\Business\appendconsolidatedbipids_testcmp.cmp(44,0):error H501:No contract found HIPIE_Plugins.Business.AppendConsolidatedBipIds with version 1.0.0
+
+C:\Users\carmigjx\git\HIPIE_Plugins\CleanStringColumn\cleanstringcolumn_testcmp.cmp(23,0):error H501:No contract found HIPIE_Plugins.CleanStringColumn.CleanStringColumn with version 1.0.0
+
+Monitoring WU W20160628-150029(HIPIE_BCTLW7CARMIGJX_ComputeBusinessAttributes_testcmp_CarmigJX) to completion.

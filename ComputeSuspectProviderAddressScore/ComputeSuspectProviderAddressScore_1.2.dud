@@ -1,0 +1,597 @@
+NAME ComputeSuspectProviderAddressScore;
+LABEL "Compute Suspect Provider Address Score";
+CATEGORY COMPUTE;
+VERSION "1.2.0";
+AUTHOR "gaoyon01";
+DESCRIPTION "Compute Suspect Address Score";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+STRING Prefix: LABEL("Append Column Prefix"),DEFAULT("Scoring");
+DATASET dsInput: MAPBYNAME
+FIELD LNPID: LABEL("LNPID"),DESCRIPTION("Lexis Nexis Professional ID");
+FIELD PrimaryRange: LABEL("Primary Range"),DESCRIPTION("Primary Range, Street Number"),OPTIONAL,NULL(""),DEFAULT("provprimaryrange");
+FIELD PreDirectional: LABEL("Pre-Direction"),DESCRIPTION("Pre-Directional"),OPTIONAL,NULL(""),DEFAULT("provpredirectional");
+FIELD PrimaryName: LABEL("Primary Name"),DESCRIPTION("Primary Name, Street Name"),OPTIONAL,NULL("");
+FIELD AddressSuffix: LABEL("Address Suffix"),DESCRIPTION("Address Suffix"),OPTIONAL,NULL("");
+FIELD PostDirectional: LABEL("Post-Direction"),DESCRIPTION("Post-Directional"),OPTIONAL,NULL("");
+FIELD SecondaryRange: LABEL("Secondary Range"),DESCRIPTION("Secondary Range, Apt or Suite"),OPTIONAL,NULL("");
+FIELD CityName_Vanity: LABEL("City"),DESCRIPTION("City"),OPTIONAL,NULL("");
+FIELD State: LABEL("State"),DESCRIPTION("Two-letter state abbreviation"),OPTIONAL,NULL("");
+FIELD Zip5: LABEL("Zip Code"),DESCRIPTION("5-Digit Zip Code"),OPTIONAL,NULL("");
+FIELD AddressPaidAmount: LABEL("Address Paid Amount"),DESCRIPTION("Address Paid Amount"),OPTIONAL,NULL("");
+FIELD AddressExclusionFlag: LABEL("Address Exclusion Flag"),DESCRIPTION("Exclude Address from Scoring"),OPTIONAL,NULL("");
+
+FIELD SharedAddressIndicator: LABEL("Shared Address Indicator"),DESCRIPTION("Shared Address Indicator"),OPTIONAL,NULL("");
+FIELD SharedAddressPatientCount: LABEL("Shared Address Patient Count"),DESCRIPTION("Shared Address Patient Count"),OPTIONAL,NULL("0");
+
+FIELD DMEIndicator: LABEL("DME-Indicator"),DESCRIPTION("Durable Medical Equipment Indicator"),OPTIONAL,NULL("");
+FIELD DMEOutlierRank: LABEL("DME-Outlier Rank"),TYPE(INTEGER),DESCRIPTION("DME Claims Outlier Rank"),OPTIONAL,NULL("0");
+FIELD LABIndicator: LABEL("LAB-Indicator"),DESCRIPTION("Labarotary Indicator"),OPTIONAL,NULL("");
+FIELD LABOutlierRank: LABEL("LAB-Outlier Rank"),TYPE(INTEGER),DESCRIPTION("Labarotary Claims Outlier Rank"),OPTIONAL,NULL("0");
+
+FIELD SingleAddressIndicator: LABEL("Single Address Indicator"),DESCRIPTION("Single Address Indicator"),OPTIONAL,NULL("");
+FIELD SingleAddressProviderCount: LABEL("Single Address Provider Count"),DESCRIPTION("Single Address Provider Count"),OPTIONAL,NULL("0");
+
+FIELD TotalNPICount: LABEL("Total NPI Count"),TYPE(INTEGER),DESCRIPTION("Total NPI at Address"),OPTIONAL,NULL("0");
+FIELD RecentNPICount: LABEL("Recent NPI Count"),TYPE(INTEGER),DESCRIPTION("Recent NPI Count at Address"),OPTIONAL,NULL("0");
+FIELD StudentNPICount: LABEL("Student NPI Count"),TYPE(INTEGER),DESCRIPTION("Student NPI Count at Address"),OPTIONAL,NULL("0");
+FIELD DNDIndicator: LABEL("DND Indicator"),DESCRIPTION("Do Not Deliver at Address Indicator"),OPTIONAL,NULL("");
+FIELD TotalChargeAmount: LABEL("Total Charge Amount"),TYPE(NUMERIC),DESCRIPTION("Total Charge Amount"),OPTIONAL,NULL("0");
+FIELD TotalLNPIDChargeAmount: LABEL("Total LNPID Charge Amount"),TYPE(NUMERIC),DESCRIPTION("Total LNPID Charge Amount"),OPTIONAL,NULL("0");
+FIELD TotalPaidAmount: LABEL("Total Paid Amount"),TYPE(NUMERIC),DESCRIPTION("Total Paid Amount"),OPTIONAL,NULL("0");
+FIELD TotalClaimCount: LABEL("Total Claim Count"),TYPE(INTEGER),DESCRIPTION("Total Claim Count"),OPTIONAL,NULL("0");
+FIELD VacantAddressActivityIndicator: LABEL("Vacant Address Activity Indicator"),DESCRIPTION("Vacant Address Activity Indicator"),OPTIONAL,NULL("");
+FIELD MailDropIndicator: LABEL("Mail Drop Indicator"),DESCRIPTION("Mail Drop Address Indicator"),OPTIONAL,NULL("");
+FIELD AddressType: LABEL("Address Type"),DESCRIPTION("Address Type"),OPTIONAL,NULL("");
+FIELD UsageType: LABEL("Usage Type"),DESCRIPTION("Address Usage Type"),OPTIONAL,NULL("");
+FIELD PrisonIndicator: LABEL("Prison Indicator"),DESCRIPTION("Prison Address Indicator"),OPTIONAL,NULL("");
+FIELD ResidentialAddressIndicator: LABEL("Residential Address Indicator"),DESCRIPTION("Residential Address Indicator"),OPTIONAL,NULL("");
+FIELD ActiveStateExclusion: LABEL("Active State-Exclusion"),DESCRIPTION("Active State Exclusion Indicator"),OPTIONAL,NULL("");
+FIELD ActiveOIGExclusion: LABEL("Active OIG-Exclusion"),DESCRIPTION("Active OIG Exclusion Indicator"),OPTIONAL,NULL("");
+FIELD ActiveOPMExclusion: LABEL("Active OPM-Exclusion"),DESCRIPTION("Active OPM Exclusion Indicator"),OPTIONAL,NULL("");
+FIELD ActiveLicenseRevocation: LABEL("Active License Revocation"),DESCRIPTION("Active License Revocation Indicator"),OPTIONAL,NULL("");
+FIELD PastStateExclusion: LABEL("Past State-Exclusion"),DESCRIPTION("State-Exclusion in Past 5 Years Indicator"),OPTIONAL,NULL("");
+FIELD PastOIGExclusion: LABEL("Past OIG-Exclusion"),DESCRIPTION("OIG-Exclusion in Past 5 Years Indicator"),OPTIONAL,NULL("");
+FIELD PastOPMExclusion: LABEL("Past OPM-Exclusion"),DESCRIPTION("OPM-Exclusion in Past 5 Years Indicator"),OPTIONAL,NULL("");
+FIELD PastLicenseRevocation: LABEL("Past License Revocation"),DESCRIPTION("License Revocation in Past 5 Years Indicator"),OPTIONAL,NULL("");
+FIELD LicenseExpiredFlag: LABEL("License Expired Flag"),DESCRIPTION("License Expired Flag"),OPTIONAL,NULL("");
+FIELD DEAExpiredFlag: LABEL("DEA Expired Flag"),DESCRIPTION("DEA Expired Flag"),OPTIONAL,NULL("");
+FIELD DeceasedFlag: LABEL("Deceased Flag"),DESCRIPTION("Deceased Provider Flag"),OPTIONAL,NULL("");
+FIELD DateofDeath: LABEL("Date of Death"),DESCRIPTION("Deceased Provider Date of Death"),OPTIONAL,NULL("");
+FIELD BankruptcyFlag: LABEL("Bankruptcy Flag"),DESCRIPTION("Bankrupt Provider Flag"),OPTIONAL,NULL("");
+FIELD CriminalHistoryFlag: LABEL("Criminal History Flag"),DESCRIPTION("Criminal History Flag"),OPTIONAL,NULL("");
+FIELD DeceasedPatientsFlag: LABEL("Deceased Patients Flag"),DESCRIPTION("Deceased Patients Flag"),OPTIONAL,NULL("");
+FIELD LargePatientGroupFlag: LABEL("Large Patient Group Flag"),DESCRIPTION("Large Patient Group Flag"),OPTIONAL,NULL("");
+FIELD LicenseInactiveFlag: LABEL("License Inactive Flag"),DESCRIPTION("Inactive License Flag"),OPTIONAL,NULL("");
+FIELD NPIDeactivatedFlag: LABEL("NPI Deactivated Flag"),DESCRIPTION("NPI Deactivated Flag"),OPTIONAL,NULL("");
+FIELD LongPatientDrivingDistanceIndicator: LABEL("Long Patient Driving Distance Indicator"),DESCRIPTION("Patient Driving Long Distance Indicator"),OPTIONAL,NULL("");
+FIELD LongPatientDrivingDistanceOutlierRank: LABEL("LongPatientDrivingDistanceOutlierRank"),TYPE(INTEGER),DESCRIPTION("Patient Driving Long Distance Outlier Rank"),OPTIONAL,NULL("0");
+FIELD HighPaidDollarsPerPatientIndicator: LABEL("High Paid Dollars Per Patient Indicator"),DESCRIPTION("High Paid Dollars Per Patient Indicator"),OPTIONAL,NULL("");
+FIELD HighPaidDollarsPerPatientOutlierRank: LABEL("High Paid Dollars Per Patient Outlier Rank"),TYPE(INTEGER),DESCRIPTION("High Paid Dollars Per Patient Outlier Rank"),OPTIONAL,NULL("0");
+FIELD HighPaidDollarsPerClaimIndicator: LABEL("High Paid Dollars Per Claim Indicator"),DESCRIPTION("High Paid Dollars Per Claim Indicator"),OPTIONAL,NULL("");
+FIELD HighPaidDollarsPerClaimOutlierRank: LABEL("High Paid Dollars Per Claim Outlier Rank"),TYPE(INTEGER),DESCRIPTION("High Paid Dollars Per Claim Outlier Rank"),OPTIONAL,NULL("0");
+FIELD HighNumberOfPatientsIndicator: LABEL("High Number Of Patients Indicator"),DESCRIPTION("High Number Of Patients Indicator"),OPTIONAL,NULL("");
+FIELD HighNumberOfPatientsOutlierRank: LABEL("High Number Of Patients Outlier Rank"),TYPE(INTEGER),DESCRIPTION("High Number Of Patients Outlier Rank"),OPTIONAL,NULL("0");
+FIELD HighNumberOfClaimsIndicator: LABEL("High Number Of Claims Indicator"),DESCRIPTION("High Number Of Claims Indicator"),OPTIONAL,NULL("");
+FIELD HighNumberOfClaimsOutlierRank: LABEL("High Number Of Claims Outlier Rank"),TYPE(INTEGER),DESCRIPTION("High Number Of Claims Outlier Rank"),OPTIONAL,NULL("0");
+FIELD HighPaidDollarsIndicator: LABEL("High Paid Dollars Indicator"),DESCRIPTION("High Paid Dollars Indicator"),OPTIONAL,NULL("");
+FIELD HighPaidDollarsOutlierRank: LABEL("High Paid Dollars Outlier Rank"),TYPE(INTEGER),DESCRIPTION("High Paid Dollars Outlier Rank"),OPTIONAL,NULL("0");
+FIELD InNetworkCurrentExclusionFlag: LABEL("In-Network Current Exclusion Flag"),DESCRIPTION("In-Network Current Exclusion Flag"),OPTIONAL,NULL("");
+FIELD InNetworkCurrentRevocationFlag: LABEL("In-Network Current Revocation Flag"),DESCRIPTION("In-Network Current Revocation Flag"),OPTIONAL,NULL("");
+FIELD InNetworkPastExclusionFlag: LABEL("In-Network Past Exclusion Flag"),DESCRIPTION("In-Network Past Exclusion Flag"),OPTIONAL,NULL("");
+FIELD InNetworkPastRevocationFlag: LABEL("In-Network Past Revocation Flag"),DESCRIPTION("In-Network Past Revocation Flag"),OPTIONAL,NULL("");
+FIELD InNetworkhasBankruptcy: LABEL("In-Network has Bankruptcy"),DESCRIPTION("In-Network Bankruptcy Indicator"),OPTIONAL,NULL("");
+FIELD InNetworkhasCriminalHistory: LABEL("In-Network has Criminal History"),DESCRIPTION("In-Network Criminal History Indicator"),OPTIONAL,NULL("");
+FIELD OutNetworkCurrentExclusionFlag: LABEL("Out-Network Current Exclusion Flag"),DESCRIPTION("Out-Network Current Exclusion Flag"),OPTIONAL,NULL("");
+FIELD OutNetworkCurrentRevocationFlag: LABEL("Out-Network Current Revocation Flag"),DESCRIPTION("Out-Network Current Revocation Flag"),OPTIONAL,NULL("");
+FIELD OutNetworkPastExclusionFlag: LABEL("Out-Network Past Exclusion Flag"),DESCRIPTION("Out-Network Past Exclusion Flag"),OPTIONAL,NULL("");
+FIELD OutNetworkPastRevocationFlag: LABEL("Out-Network Past Revocation Flag"),DESCRIPTION("Out-Network Past Revocation Flag"),OPTIONAL,NULL("");
+FIELD OutNetworkhasBankruptcy: LABEL("Out-Network has Bankruptcy"),DESCRIPTION("Out-Network Bankruptcy Indicator"),OPTIONAL,NULL("");
+FIELD OutNetworkhasCriminalHistory: LABEL("Out-Network has Criminal History"),DESCRIPTION("Out-Network Criminal History Indicator"),OPTIONAL,NULL("");
+FIELD RelativeCriminalFlag: LABEL("Relative Criminal Flag"),DESCRIPTION("Relative Criminal Indicator"),OPTIONAL,NULL("");
+FIELD RelativeBankruptcyFlag: LABEL("Relative Bankruptcy Flag"),DESCRIPTION("Relative Bankrupt Indicator"),OPTIONAL,NULL("");
+FIELD AssociateCriminalFlag: LABEL("Associate Criminal Flag"),DESCRIPTION("Associate Criminal Indicator"),OPTIONAL,NULL("");
+FIELD AssociateBankruptcyFlag: LABEL("Associate Bankruptcy Flag"),DESCRIPTION("Associate Bankrupt Indicator"),OPTIONAL,NULL("");
+FIELD NoOfProviderAtAddress: LABEL("No Of Provider At Address"),TYPE(INTEGER),DESCRIPTION("No Of Provider At Address"),OPTIONAL,NULL("0");
+FIELD NoOfPatientAtAddress: LABEL("No Of Patient At Address"),TYPE(INTEGER),DESCRIPTION("No Of Patient At Address"),OPTIONAL,NULL("0");
+FIELD HighPaidAmountPerPatient: LABEL("High Paid Amount Per Patient"),TYPE(NUMERIC),DESCRIPTION("High Paid Amount Per Patient"),OPTIONAL,NULL("0");
+FIELD HighPaidAmountPerClaim: LABEL("High Paid Amount Per Claim"),TYPE(NUMERIC),DESCRIPTION("High Paid Amount Per Claim"),OPTIONAL,NULL("0");
+FIELD ClaimMedian: LABEL("Claim Median"),TYPE(INTEGER),DESCRIPTION("Claim Median"),OPTIONAL,NULL("0");
+FIELD PatientMedian: LABEL("Patient Median"),TYPE(INTEGER),DESCRIPTION("Patient Median"),OPTIONAL,NULL("0");
+FIELD HighPaidAmountMedian: LABEL("High Paid Amount Median"),TYPE(NUMERIC),DESCRIPTION("High Paid Amount Median"),OPTIONAL,NULL("0");
+FIELD HighPaidAmountPerClaimMedian: LABEL("High Paid Amount Per Claim Median"),TYPE(NUMERIC),DESCRIPTION("High Paid Amount Per Claim Median"),OPTIONAL,NULL("0");
+FIELD HighPaidAmountPerPatientMedian: LABEL("High Paid Amount Per Patient Median"),TYPE(INTEGER),DESCRIPTION("High Paid Amount Per Patient Median"),OPTIONAL,NULL("0");
+FIELD DMEPatientMedian: LABEL("DME Patient Median"),TYPE(INTEGER),DESCRIPTION("DME Patient Median"),OPTIONAL,NULL("0");
+FIELD DMEClaimMedian: LABEL("DME Claim Median"),TYPE(INTEGER),DESCRIPTION("DME Claim Median"),OPTIONAL,NULL("0");
+FIELD LABPatientMedian: LABEL("LAB Patient Median"),TYPE(INTEGER),DESCRIPTION("LAB Patient Median"),OPTIONAL,NULL("0");
+FIELD LABClaimMedian: LABEL("LAB Claim Median"),TYPE(INTEGER),DESCRIPTION("LAB Claim Median"),OPTIONAL,NULL("0");
+FIELD ActiveLicenseRevocationState: LABEL("Active License Revocation State"),DESCRIPTION("Active License Revocation State"),OPTIONAL,NULL("");
+FIELD ActiveLicenseRevocationDate: LABEL("Active License Revocation Date"),DESCRIPTION("Active License Revocation Date"),OPTIONAL,NULL("");
+FIELD ActiveLicenseExclusionState: LABEL("Active License Exclusion State"),DESCRIPTION("Active License Exclusion State"),OPTIONAL,NULL("");
+FIELD ActiveLicenseExclusionDate: LABEL("Active License Exclusion Date"),DESCRIPTION("Active License Exclusion Date"),OPTIONAL,NULL("");
+FIELD ActiveOIGExclusionDate: LABEL("Active OIG Exclusion Date"),DESCRIPTION("Active OIG Exclusion Date"),OPTIONAL,NULL("");
+FIELD ActiveOPMExclusionDate: LABEL("Active OPM Exclusion Date"),DESCRIPTION("Active OPM Exclusion Date"),OPTIONAL,NULL("");
+FIELD ActiveStateSanctionExclusionDate: LABEL("Active State Sanction Exclusion Date"),DESCRIPTION("Active State Sanction Exclusion Date"),OPTIONAL,NULL("");
+FIELD ActiveOIGSanctionExclusionDate: LABEL("Active OIG Sanction Exclusion Date"),DESCRIPTION("Active OIG Sanction Exclusion Date"),OPTIONAL,NULL("");
+FIELD ActiveOPMSanctionExclusionDate: LABEL("Active OPM Sanction Exclusion Date"),DESCRIPTION("Active OPM Sanction Exclusion Date"),OPTIONAL,NULL("");
+FIELD LicenseRevocationReinstatedState: LABEL("License Revocation Reinstated State"),DESCRIPTION("License Revocation Reinstated State"),OPTIONAL,NULL("");
+FIELD LicenseRevocationReinstatedDate: LABEL("License Revocation Reinstated Date"),DESCRIPTION("License Revocation Reinstated Date"),OPTIONAL,NULL("");
+FIELD StateExclusionReinstatedState: LABEL("State Exclusion Reinstated State"),DESCRIPTION("State Exclusion Reinstated State"),OPTIONAL,NULL("");
+FIELD StateExclusionReinstatedDate: LABEL("State Exclusion Reinstated Date"),DESCRIPTION("State Exclusion Reinstated Date"),OPTIONAL,NULL("");
+FIELD OIGExclusionReinstatedDate: LABEL("OIG Exclusion Reinstated Date"),DESCRIPTION("OIG Exclusion Reinstated Date"),OPTIONAL,NULL("");
+FIELD OPMExclusionReinstatedDate: LABEL("OPM Exclusion Reinstated Date"),DESCRIPTION("OPM Exclusion Reinstated Date"),OPTIONAL,NULL("");
+FIELD ExpiredDEANumber: LABEL("Expired DEA Number"),DESCRIPTION("Expired DEA Number"),OPTIONAL,NULL("");
+FIELD ExpiredDEADate: LABEL("Expired DEA Date"),DESCRIPTION("Expired DEA Date"),OPTIONAL,NULL("");
+FIELD ExpiredLicenseNumber: LABEL("Expired License Number"),DESCRIPTION("Expired License Number"),OPTIONAL,NULL("");
+FIELD ExpiredLicenseState: LABEL("Expired License State"),DESCRIPTION("Expired License State"),OPTIONAL,NULL("");
+FIELD ExpiredLicenseNumberDate: LABEL("Expired License Number Date"),DESCRIPTION("Expired License Number Date"),OPTIONAL,NULL("");
+FIELD BankruptcyFiledDate: LABEL("Bankruptcy Filed Date"),DESCRIPTION("Bankruptcy Filed Date"),OPTIONAL,NULL("");
+FIELD ConvictionDate: LABEL("Conviction Date"),DESCRIPTION("Conviction Date"),OPTIONAL,NULL("");
+FIELD DeceasedPatientCount: LABEL("Deceased Patient Count"),TYPE(INTEGER),DESCRIPTION("Deceased Patient Count"),OPTIONAL,NULL("0");
+FIELD PatientCount: LABEL("Patient Count"),TYPE(INTEGER),DESCRIPTION("Patient Count"),OPTIONAL,NULL("0");
+FIELD PatientDOD: LABEL("Patient DOD"),TYPE(INTEGER),DESCRIPTION("Patient Date Of Death"),OPTIONAL,NULL("0");
+FIELD NPIDeactivatedDate: LABEL("NPI Deactivated Date"),DESCRIPTION("NPI Deactivated Date"),OPTIONAL,NULL("");
+FIELD ProviderPatientAddress: LABEL("Provider Patient Address"),DESCRIPTION("Provider Patient Address"),OPTIONAL,NULL("");
+FIELD LargePatientCount: LABEL("Large Patient Count"),DESCRIPTION("Large Patient Count"),OPTIONAL,NULL("");
+FIELD LargePatientAddress: LABEL("Large Patient Address"),DESCRIPTION("Large Patient Address"),OPTIONAL,NULL("");
+FIELD InactiveLicenseState: LABEL("Inactive License State"),DESCRIPTION("Inactive License State"),OPTIONAL,NULL("");
+FIELD NoOfPatientsDrivingLongDistance: LABEL("No Of Patients Driving Long Distance"),TYPE(INTEGER),DESCRIPTION("No Of Patients Driving Long Distance"),OPTIONAL,NULL("0");
+FIELD AveDistance: LABEL("AveDistance"),TYPE(NUMERIC),DESCRIPTION("Average Distance"),OPTIONAL,NULL("0");
+FIELD PractisePrimaryrange: LABEL("Practise Primary range"),DESCRIPTION("Practise Address Primary Range"),OPTIONAL,NULL("");
+FIELD PractisePredirectional: LABEL("Practise Predirectional"),DESCRIPTION("Practise Address Predirectional"),OPTIONAL,NULL("");
+FIELD PractisePrimaryname: LABEL("Practise Primary Name"),DESCRIPTION("Practise Address Primary Name"),OPTIONAL,NULL("");
+FIELD PractiseAddresssuffix: LABEL("Practise Address Suffix"),DESCRIPTION("Practise Address Suffix"),OPTIONAL,NULL("");
+FIELD PractisePostdirectional: LABEL("Practise Post Directional"),DESCRIPTION("Practise Address Post Directional"),OPTIONAL,NULL("");
+FIELD PractiseSecondaryrange: LABEL("Practise Secondary Range"),DESCRIPTION("Practise Address Secondary Range"),OPTIONAL,NULL("");
+FIELD PractiseCityname: LABEL("Practise City Name"),DESCRIPTION("Practise Address City Name"),OPTIONAL,NULL("");
+FIELD PractiseState: LABEL("Practise State"),DESCRIPTION("Practise Address State"),OPTIONAL,NULL("");
+FIELD PractiseZip5: LABEL("Practise Zip5"),DESCRIPTION("Practise Address Zip5"),OPTIONAL,NULL("");
+FIELD ActiveStateExclusionImpactAmount: LABEL("Active State Exclusion Impact Amount"),DESCRIPTION("Active State Exclusion Impact Amount"),OPTIONAL,NULL("");
+FIELD ActiveOIGExclusionImpactAmount: LABEL("Active OIG Exclusion Impact Amount"),DESCRIPTION("Active OIG Exclusion Impact Amount"),OPTIONAL,NULL("");
+FIELD ActiveOPMExclusionImpactAmount: LABEL("Active OPM Exclusion Impact Amount"),DESCRIPTION("Active OPM Exclusion Impact Amount"),OPTIONAL,NULL("");
+FIELD PastStateExclusionImpactAmount: LABEL("Past State Exclusion Impact Amount"),DESCRIPTION("Past State Exclusion Impact Amount"),OPTIONAL,NULL("");
+FIELD PastOIGExclusionImpactAmount: LABEL("Past OIG Exclusion Impact Amount"),DESCRIPTION("Past OIG Exclusion Impact Amount"),OPTIONAL,NULL("");
+FIELD PastOPMExclusionImpactAmount: LABEL("Past OPM Exclusion Impact Amount"),DESCRIPTION("Past OPM Exclusion Impact Amount"),OPTIONAL,NULL("");
+FIELD CurrentLicenseRevokedImpactAmount: LABEL("Current License Revoked Impact Amount"),DESCRIPTION("Current License Revoked Impact Amount"),OPTIONAL,NULL("");
+FIELD PastLicenseRevokedImpactAmount: LABEL("Past License Revoked Impact Amount"),DESCRIPTION("Past License Revoked Impact Amount"),OPTIONAL,NULL("");
+FIELD LicenseExpiredImpactAmount: LABEL("License Expired Impact Amount"),DESCRIPTION("License Expired Impact Amount"),OPTIONAL,NULL("");
+FIELD NPIDeactiveImpactAmount: LABEL("NPI Deactive Impact Amount"),DESCRIPTION("NPI Deactive Impact Amount"),OPTIONAL,NULL("");
+FIELD PatientDeceasedImpactAmount: LABEL("Patient Deceased Impact Amount"),DESCRIPTION("Patient Deceased Impact Amount"),OPTIONAL,NULL("");
+FIELD ProviderDeceasedImpactAmount: LABEL("Provider Deceased Impact Amount"),DESCRIPTION("Provider Deceased Impact Amount"),OPTIONAL,NULL("");
+FIELD BankruptcyImpactAmount: LABEL("Bankruptcy Impact Amount"),DESCRIPTION("Bankruptcy Impact Amount"),OPTIONAL,NULL("");
+FIELD ConvictionImpactAmount: LABEL("Conviction Impact Amount"),DESCRIPTION("Conviction Impact Amount"),OPTIONAL,NULL("");
+END
+
+
+STRING SHAREDADDRESSSWITCH: LABEL("Shared Address Switch"),DEFAULT("^GLOBAL|SHAREDADDRESSSWITCH");
+STRING DMESWITCH: LABEL("DME Switch"),DEFAULT("^GLOBAL|DMESWITCH");
+STRING LABSWITCH: LABEL("LAB Switch"),DEFAULT("^GLOBAL|LABSWITCH");
+STRING SINGLEADDRESSSWITCH: LABEL("Single Address Switch"),DEFAULT("^GLOBAL|SINGLEADDRESSSWITCH");
+STRING RECENTNPISWITCH: LABEL("Recent NPI Switch"),DEFAULT("^GLOBAL|RECENTNPISWITCH");
+STRING STUDENTNPISWITCH: LABEL("Student NPI Switch"),DEFAULT("^GLOBAL|STUDENTNPISWITCH");
+STRING DNDSWITCH: LABEL("DND Switch"),DEFAULT("^GLOBAL|DNDSWITCH");
+STRING VACANTSWITCH: LABEL("Vacant Switch"),DEFAULT("^GLOBAL|VACANTSWITCH");
+STRING MAILDROPSWITCH: LABEL("Mail Drop Switch"),DEFAULT("^GLOBAL|MAILDROPSWITCH");
+STRING POBOXSWITCH: LABEL("PO Box Switch"),DEFAULT("^GLOBAL|POBOXSWITCH");
+STRING PRISONSWITCH: LABEL("Prison Switch"),DEFAULT("^GLOBAL|PRISONSWITCH");
+STRING RESIDENTIALSWITCH: LABEL("Residential Switch"),DEFAULT("^GLOBAL|RESIDENTIALSWITCH");
+STRING ACTIVESTATEEXCLUSIONSWITCH: LABEL("Active State Exclusion Switch"),DEFAULT("^GLOBAL|ACTIVESTATEEXCLUSIONSWITCH");
+STRING ACTIVEOIGEXCLUSIONSWITCH: LABEL("Active OIG Exclusion Switch"),DEFAULT("^GLOBAL|ACTIVEOIGEXCLUSIONSWITCH");
+STRING ACTIVEOPMEXCLUSIONSWITCH: LABEL("Active OPM Exclusion Switch"),DEFAULT("^GLOBAL|ACTIVEOPMEXCLUSIONSWITCH");
+STRING ACTIVELICENSEREVOCATIONSWITCH: LABEL("Active License Revocation Switch"),DEFAULT("^GLOBAL|ACTIVELICENSEREVOCATIONSWITCH");
+STRING PASTSTATEEXCLUSIONSWITCH: LABEL("Past State Exclusion Switch"),DEFAULT("^GLOBAL|PASTSTATEEXCLUSIONSWITCH");
+STRING PASTOIGEXCLUSIONSWITCH: LABEL("Past OIG Exclusion Switch"),DEFAULT("^GLOBAL|PASTOIGEXCLUSIONSWITCH");
+STRING PASTOPMEXCLUSIONSWITCH: LABEL("Past OPM Exclusion Switch"),DEFAULT("^GLOBAL|PASTOPMEXCLUSIONSWITCH");
+STRING PASTLICENSEREVOCATIONSWITCH: LABEL("Past License Revocation Switch"),DEFAULT("^GLOBAL|PASTLICENSEREVOCATIONSWITCH");
+STRING LICENSEEXPIREDSWITCH: LABEL("License Expired Switch"),DEFAULT("^GLOBAL|LICENSEEXPIREDSWITCH");
+STRING DEAEXPIREDSWITCH: LABEL("DEA Expired Switch"),DEFAULT("^GLOBAL|DEAEXPIREDSWITCH");
+STRING DECEASEDSWITCH: LABEL("Deceased Switch"),DEFAULT("^GLOBAL|DECEASEDSWITCH");
+STRING BANKRUPTCYSWITCH: LABEL("Bankruptcy Switch"),DEFAULT("^GLOBAL|BANKRUPTCYSWITCH");
+STRING CRIMINALHISTORYSWITCH: LABEL("Criminal History Switch"),DEFAULT("^GLOBAL|CRIMINALHISTORYSWITCH");
+STRING DECEASEDPATIENTSSWITCH: LABEL("Deceased Patients Switch"),DEFAULT("^GLOBAL|DECEASEDPATIENTSSWITCH");
+STRING LARGEPATIENTGROUPSWITCH: LABEL("Large Patient Group Switch"),DEFAULT("^GLOBAL|LARGEPATIENTGROUPSWITCH");
+STRING LICENSEINACTIVESWITCH: LABEL("License Inactive Switch"),DEFAULT("^GLOBAL|LICENSEINACTIVESWITCH");
+STRING NPIDEACTIVATEDSWITCH: LABEL("NPI Deactivated Switch"),DEFAULT("^GLOBAL|NPIDEACTIVATEDSWITCH");
+STRING LONGPATIENTDRIVINGDISTANCESWITCH: LABEL("Long Patient Driving Distance Switch"),DEFAULT("^GLOBAL|LONGPATIENTDRIVINGDISTANCESWITCH");
+STRING HIGHPAIDDOLLARSPERPATIENTSWITCH: LABEL("High Paid Dollars Per Patient Switch"),DEFAULT("^GLOBAL|HIGHPAIDDOLLARSPERPATIENTSWITCH");
+STRING HIGHPAIDDOLLARSPERCLAIMSWITCH: LABEL("High Paid Dollars Per Claim Switch"),DEFAULT("^GLOBAL|HIGHPAIDDOLLARSPERCLAIMSWITCH");
+STRING HIGHNUMBEROFPATIENTSSWITCH: LABEL("High Number Of Patients Switch"),DEFAULT("^GLOBAL|HIGHNUMBEROFPATIENTSSWITCH");
+STRING HIGHNUMBEROFCLAIMSSWITCH: LABEL("High Number Of Claims Switch"),DEFAULT("^GLOBAL|HIGHNUMBEROFCLAIMSSWITCH");
+STRING HIGHPAIDDOLLARSSWITCH: LABEL("High Paid Dollars Switch"),DEFAULT("^GLOBAL|HIGHPAIDDOLLARSSWITCH");
+STRING INNETWORKCURRENTEXCLUSIONSWITCH: LABEL("InNetwork Current Exclusion Switch"),DEFAULT("^GLOBAL|INNETWORKCURRENTEXCLUSIONSWITCH");
+STRING INNETWORKCURRENTREVOCATIONSWITCH: LABEL("InNetwork Current Revocation Switch"),DEFAULT("^GLOBAL|INNETWORKCURRENTREVOCATIONSWITCH");
+STRING INNETWORKPASTEXCLUSIONSWITCH: LABEL("InNetwork Past Exclusion Switch"),DEFAULT("^GLOBAL|INNETWORKPASTEXCLUSIONSWITCH");
+STRING INNETWORKPASTREVOCATIONSWITCH: LABEL("InNetwork Past Revocation Switch"),DEFAULT("^GLOBAL|INNETWORKPASTREVOCATIONSWITCH");
+STRING INNETWORKHASBANKRUPTCYSWITCH: LABEL("InNetwork has Bankruptcy Switch"),DEFAULT("^GLOBAL|INNETWORKHASBANKRUPTCYSWITCH");
+STRING INNETWORKHASCRIMINALHISTORYSWITCH: LABEL("InNetwork has Criminal History Switch"),DEFAULT("^GLOBAL|INNETWORKHASCRIMINALHISTORYSWITCH");
+STRING OUTNETWORKCURRENTEXCLUSIONSWITCH: LABEL("OutNetwork Current Exclusion Switch"),DEFAULT("^GLOBAL|OUTNETWORKCURRENTEXCLUSIONSWITCH");
+STRING OUTNETWORKCURRENTREVOCATIONSWITCH: LABEL("OutNetwork Current Revocation Switch"),DEFAULT("^GLOBAL|OUTNETWORKCURRENTREVOCATIONSWITCH");
+STRING OUTNETWORKPASTEXCLUSIONSWITCH: LABEL("OutNetwork Past Exclusion Switch"),DEFAULT("^GLOBAL|OUTNETWORKPASTEXCLUSIONSWITCH");
+STRING OUTNETWORKPASTREVOCATIONSWITCH: LABEL("OutNetwork Past Revocation Switch"),DEFAULT("^GLOBAL|OUTNETWORKPASTREVOCATIONSWITCH");
+STRING OUTNETWORKHASBANKRUPTCYSWITCH: LABEL("OutNetwork has Bankruptcy Switch"),DEFAULT("^GLOBAL|OUTNETWORKHASBANKRUPTCYSWITCH");
+STRING OUTNETWORKHASCRIMINALHISTORYSWITCH: LABEL("OutNetwork has Criminal History Switch"),DEFAULT("^GLOBAL|OUTNETWORKHASCRIMINALHISTORYSWITCH");
+STRING RELATIVEASSOCCRIMINALSWITCH: LABEL("Relative Associate Criminal Switch"),DEFAULT("^GLOBAL|RELATIVEASSOCCRIMINALSWITCH");
+STRING RELATIVEASSOCBANKRUPTCYSWITCH: LABEL("Relative Associate Bankruptcy Switch"),DEFAULT("^GLOBAL|RELATIVEASSOCBANKRUPTCYSWITCH");
+INT SHAREDADDRESSSCORE: LABEL("Shared AddressScore"),DEFAULT("^GLOBAL|SHAREDADDRESSSCORE");
+INT DMESCORE: LABEL("DME Score"),DEFAULT("^GLOBAL|DMESCORE");
+INT LABSCORE: LABEL("LAB Score"),DEFAULT("^GLOBAL|LABSCORE");
+INT SINGLEADDRESSSCORE: LABEL("Single Address Score"),DEFAULT("^GLOBAL|SINGLEADDRESSSCORE");
+INT RECENTNPISCORE: LABEL("Recent NPI Score"),DEFAULT("^GLOBAL|RECENTNPISCORE");
+INT STUDENTNPISCORE: LABEL("Student NPI Score"),DEFAULT("^GLOBAL|STUDENTNPISCORE");
+INT DNDSCORE: LABEL("DND Score"),DEFAULT("^GLOBAL|DNDSCORE");
+INT VACANTSCORE: LABEL("Vacant Score"),DEFAULT("^GLOBAL|VACANTSCORE");
+INT MAILDROPSCORE: LABEL("Mail Drop Score"),DEFAULT("^GLOBAL|MAILDROPSCORE");
+INT POBOXSCORE: LABEL("PO Box Score"),DEFAULT("^GLOBAL|POBOXSCORE");
+INT PRISONSCORE: LABEL("Prison Score"),DEFAULT("^GLOBAL|PRISONSCORE");
+INT RESIDENTIALSCORE: LABEL("Residential Score"),DEFAULT("^GLOBAL|RESIDENTIALSCORE");
+INT ACTIVESTATEEXCLUSIONSCORE: LABEL("Active State Exclusion Score"),DEFAULT("^GLOBAL|ACTIVESTATEEXCLUSIONSCORE");
+INT ACTIVEOIGEXCLUSIONSCORE: LABEL("Active OIG Exclusion Score"),DEFAULT("^GLOBAL|ACTIVEOIGEXCLUSIONSCORE");
+INT ACTIVEOPMEXCLUSIONSCORE: LABEL("Active OPM Exclusion Score"),DEFAULT("^GLOBAL|ACTIVEOPMEXCLUSIONSCORE");
+INT ACTIVELICENSEREVOCATIONSCORE: LABEL("Active License Revocation Score"),DEFAULT("^GLOBAL|ACTIVELICENSEREVOCATIONSCORE");
+INT PASTSTATEEXCLUSIONSCORE: LABEL("Past State Exclusion Score"),DEFAULT("^GLOBAL|PASTSTATEEXCLUSIONSCORE");
+INT PASTOIGEXCLUSIONSCORE: LABEL("Past OIG Exclusion Score"),DEFAULT("^GLOBAL|PASTOIGEXCLUSIONSCORE");
+INT PASTOPMEXCLUSIONSCORE: LABEL("Past OPM Exclusion Score"),DEFAULT("^GLOBAL|PASTOPMEXCLUSIONSCORE");
+INT PASTLICENSEREVOCATIONSCORE: LABEL("Past License Revocation Score"),DEFAULT("^GLOBAL|PASTLICENSEREVOCATIONSCORE");
+INT EXPIREDLICENSESCORE: LABEL("Expired License Score"),DEFAULT("^GLOBAL|EXPIREDLICENSESCORE");
+INT DEAEXPIREDSCORE: LABEL("DEA Expired Score"),DEFAULT("^GLOBAL|DEAEXPIREDSCORE");
+INT DECEASEDSCORE: LABEL("Deceased Score"),DEFAULT("^GLOBAL|DECEASEDSCORE");
+INT BANKRUPTCYSCORE: LABEL("Bankruptcy Score"),DEFAULT("^GLOBAL|BANKRUPTCYSCORE");
+INT CRIMINALHISTORYSCORE: LABEL("Criminal History Score"),DEFAULT("^GLOBAL|CRIMINALHISTORYSCORE");
+INT DECEASEDPATIENTSSCORE: LABEL("Deceased Patients Score"),DEFAULT("^GLOBAL|DECEASEDPATIENTSSCORE");
+INT LARGEPATIENTGROUPSCORE: LABEL("Large Patient Group Score"),DEFAULT("^GLOBAL|LARGEPATIENTGROUPSCORE");
+INT LICENSEINACTIVESCORE: LABEL("License Inactive Score"),DEFAULT("^GLOBAL|LICENSEINACTIVESCORE");
+INT NPIDEACTIVATEDSCORE: LABEL("NPI Deactivated Score"),DEFAULT("^GLOBAL|NPIDEACTIVATEDSCORE");
+INT LONGPATIENTDRIVINGDISTANCESCORE: LABEL("Long Patient Driving Distance Score"),DEFAULT("^GLOBAL|LONGPATIENTDRIVINGDISTANCESCORE");
+INT HIGHPAIDDOLLARSPERPATIENTSCORE: LABEL("High Paid Dollars Per Patient Score"),DEFAULT("^GLOBAL|HIGHPAIDDOLLARSPERPATIENTSCORE");
+INT HIGHPAIDDOLLARSPERCLAIMSCORE: LABEL("High Paid Dollars Per Claim Score"),DEFAULT("^GLOBAL|HIGHPAIDDOLLARSPERCLAIMSCORE");
+INT HIGHNUMBEROFPATIENTSSCORE: LABEL("High Number Of Patients Score"),DEFAULT("^GLOBAL|HIGHNUMBEROFPATIENTSSCORE");
+INT HIGHNUMBEROFCLAIMSSCORE: LABEL("High Number Of Claims Score"),DEFAULT("^GLOBAL|HIGHNUMBEROFCLAIMSSCORE");
+INT HIGHPAIDDOLLARSSCORE: LABEL("High Paid Dollars Score"),DEFAULT("^GLOBAL|HIGHPAIDDOLLARSSCORE");
+INT INNETWORKCURRENTEXCLUSIONSCORE: LABEL("In Network Current Exclusion Score"),DEFAULT("^GLOBAL|INNETWORKCURRENTEXCLUSIONSCORE");
+INT INNETWORKCURRENTREVOCATIONSCORE: LABEL("In Network Current Revocation Score"),DEFAULT("^GLOBAL|INNETWORKCURRENTREVOCATIONSCORE");
+INT INNETWORKPASTEXCLUSIONSCORE: LABEL("In Network Past Exclusion Score"),DEFAULT("^GLOBAL|INNETWORKPASTEXCLUSIONSCORE");
+INT INNETWORKPASTREVOCATIONSCORE: LABEL("In Network Past Revocation Score"),DEFAULT("^GLOBAL|INNETWORKPASTREVOCATIONSCORE");
+INT INNETWORKHASBANKRUPTCYSCORE: LABEL("In Network has Bankruptcy Score"),DEFAULT("^GLOBAL|INNETWORKHASBANKRUPTCYSCORE");
+INT INNETWORKHASCRIMINALHISTORYSCORE: LABEL("In Network has Criminal History Score"),DEFAULT("^GLOBAL|INNETWORKHASCRIMINALHISTORYSCORE");
+INT OUTNETWORKCURRENTEXCLUSIONSCORE: LABEL("Out Network Current Exclusion Score"),DEFAULT("^GLOBAL|OUTNETWORKCURRENTEXCLUSIONSCORE");
+INT OUTNETWORKCURRENTREVOCATIONSCORE: LABEL("Out Network Current Revocation Score"),DEFAULT("^GLOBAL|OUTNETWORKCURRENTREVOCATIONSCORE");
+INT OUTNETWORKPASTEXCLUSIONSCORE: LABEL("Out Network Past Exclusion Score"),DEFAULT("^GLOBAL|OUTNETWORKPASTEXCLUSIONSCORE");
+INT OUTNETWORKPASTREVOCATIONSCORE: LABEL("Out Network Past Revocation Score"),DEFAULT("^GLOBAL|OUTNETWORKPASTREVOCATIONSCORE");
+INT OUTNETWORKHASBANKRUPTCYSCORE: LABEL("Out Network has Bankruptcy Score"),DEFAULT("^GLOBAL|OUTNETWORKHASBANKRUPTCYSCORE");
+INT OUTNETWORKHASCRIMINALHISTORYSCORE: LABEL("Out Network has Criminal History Score"),DEFAULT("^GLOBAL|OUTNETWORKHASCRIMINALHISTORYSCORE");
+INT RELATIVEASSOCCRIMINALSCORE: LABEL("Relative Associate Criminal Score"),DEFAULT("^GLOBAL|RELATIVEASSOCCRIMINALSCORE");
+INT RELATIVEASSOCBANKRUPTCYSCORE: LABEL("Relative Associate Bankruptcy Score"),DEFAULT("^GLOBAL|RELATIVEASSOCBANKRUPTCYSCORE");
+END
+
+OUTPUTS
+DATASET dsOutput(dsInput): PREFIX(INPUTS.Prefix),APPEND
+UNSIGNED1 SharedAddressScore;
+UNSIGNED1 DMEScore;
+UNSIGNED1 LabScore;
+UNSIGNED1 SingleAddressScore;
+UNSIGNED1 RecentNPIScore;
+UNSIGNED1 StudentNPIScore;
+UNSIGNED1 DNDScore;
+UNSIGNED1 VacantScore;
+UNSIGNED1 MailDropScore;
+UNSIGNED1 POBoxScore;
+UNSIGNED1 PrisonScore;
+UNSIGNED1 ResidentialScore;
+UNSIGNED1 CurrentExclusionScore;
+UNSIGNED1 CurrentLicenseRevocationScore;
+UNSIGNED1 PastExclusionScore;
+UNSIGNED1 PastRevocationScore;
+UNSIGNED1 LicenseExpiredScore;
+UNSIGNED1 DEAExpiredScore;
+UNSIGNED1 DeceasedScore;
+UNSIGNED1 BankruptcyScore;
+UNSIGNED1 CriminalHistoryScore;
+UNSIGNED1 DeceasedPatientsScore;
+UNSIGNED1 LargePatientGroupScore;
+UNSIGNED1 LicenseInactiveScore;
+UNSIGNED1 NPIDeactivatedScore;
+UNSIGNED1 LongPatientDrivingDistanceScore;
+UNSIGNED1 HighPaidDollarsPerPatientScore;
+UNSIGNED1 HighPaidDollarsPerClaimScore;
+UNSIGNED1 HighNumberOfPatientsScore;
+UNSIGNED1 HighNumberOfClaimsScore;
+UNSIGNED1 HighPaidDollarsScore;
+UNSIGNED1 InNetworkAssocCurrentExclusionScore;
+UNSIGNED1 InNetworkAssocCurrentRevocationScore;
+UNSIGNED1 InNetworkAssocPastExclusionScore;
+UNSIGNED1 InNetworkAssocPastRevocationScore;
+UNSIGNED1 InNetworkAssocBankruptcyScore;
+UNSIGNED1 InNetworkAssocCriminalHistoryScore;
+UNSIGNED1 OutNetworkAssocCurrentExclusionScore;
+UNSIGNED1 OutNetworkAssocCurrentRevocationScore;
+UNSIGNED1 OutNetworkAssocPastExclusionScore;
+UNSIGNED1 OutNetworkAssocPastRevocationScore;
+UNSIGNED1 OutNetworkAssocBankruptcyScore;
+UNSIGNED1 OutNetworkAssocCriminalHistoryScore;
+UNSIGNED1 RelativeAssocCriminalScore;
+UNSIGNED1 RelativeAssocBankruptcyScore;
+UNSIGNED4 AddressScore;
+UNSIGNED4 ProfessionalScore;
+UNSIGNED4 MedianAddressScore;
+UNSIGNED4 MedianProfessionalScore;
+UNSIGNED4 MaxProfScoreAtAddressScore;
+UNSIGNED4 SuspectProviderAtLocationCount;
+UNSIGNED4 IncrementPaidAmountCount;
+UNSIGNED4 FinalAddressScore;
+UNSIGNED4 FinalProfessionalScore;
+DATASET reasons
+STRING4 reason;
+STRING description;
+STRING value;
+END
+END
+END
+
+GENERATES INLINE
+IMPORT ComputeSuspectProviderAddressScore, ML;
+
+ScoreResults := ComputeSuspectProviderAddressScore.macComputeSuspectProviderAddressScoreV2 (%dsInput%,
+%LNPID%,
+%PrimaryRange%,
+%PreDirectional%,
+%PrimaryName%,
+%AddressSuffix%,
+%PostDirectional%,
+%SecondaryRange%,
+%CityName_Vanity%,
+%State%,
+%Zip5%,
+%AddressPaidAmount%,
+%AddressExclusionFlag%,
+%SharedAddressIndicator%,
+%SharedAddressPatientCount%,
+%DMEIndicator%,
+%DMEOutlierRank%,
+%LABIndicator%,
+%LABOutlierRank%,
+%SingleAddressIndicator%,
+%SingleAddressProviderCount%,
+%TotalNPICount%,
+%RecentNPICount%,
+%StudentNPICount%,
+%DNDIndicator%,
+%TotalChargeAmount%,
+%TotalLNPIDChargeAmount%,
+%TotalPaidAmount%,
+%TotalClaimCount%,
+%VacantAddressActivityIndicator%,
+%MailDropIndicator%,
+%AddressType%,
+%UsageType%,
+%PrisonIndicator%,
+%ResidentialAddressIndicator%,
+%ActiveStateExclusion%,
+%ActiveOIGExclusion%,
+%ActiveOPMExclusion%,
+%ActiveLicenseRevocation%,
+%PastStateExclusion%,
+%PastOIGExclusion%,
+%PastOPMExclusion%,
+%PastLicenseRevocation%,
+%LicenseExpiredFlag%,
+%DEAExpiredFlag%,
+%DeceasedFlag%,
+%DateofDeath%,
+%BankruptcyFlag%,
+%CriminalHistoryFlag%,
+%DeceasedPatientsFlag%,
+%LargePatientGroupFlag%,
+%LicenseInactiveFlag%,
+%NPIDeactivatedFlag%,
+%LongPatientDrivingDistanceIndicator%,
+%LongPatientDrivingDistanceOutlierRank%,
+%HighPaidDollarsPerPatientIndicator%,
+%HighPaidDollarsPerPatientOutlierRank%,
+%HighPaidDollarsPerClaimIndicator%,
+%HighPaidDollarsPerClaimOutlierRank%,
+%HighNumberOfPatientsIndicator%,
+%HighNumberOfPatientsOutlierRank%,
+%HighNumberOfClaimsIndicator%,
+%HighNumberOfClaimsOutlierRank%,
+%HighPaidDollarsIndicator%,
+%HighPaidDollarsOutlierRank%,
+%InNetworkCurrentExclusionFlag%,
+%InNetworkCurrentRevocationFlag%,
+%InNetworkPastExclusionFlag%,
+%InNetworkPastRevocationFlag%,
+%InNetworkhasBankruptcy%,
+%InNetworkhasCriminalHistory%,
+%OutNetworkCurrentExclusionFlag%,
+%OutNetworkCurrentRevocationFlag%,
+%OutNetworkPastExclusionFlag%,
+%OutNetworkPastRevocationFlag%,
+%OutNetworkhasBankruptcy%,
+%OutNetworkhasCriminalHistory%,
+%RelativeCriminalFlag%,
+%RelativeBankruptcyFlag%,
+%AssociateCriminalFlag%,
+%AssociateBankruptcyFlag%,
+%NoOfProviderAtAddress%,
+%NoOfPatientAtAddress%,
+%HighPaidAmountPerPatient%,
+%HighPaidAmountPerClaim%,
+%ClaimMedian%,
+%PatientMedian%,
+%HighPaidAmountMedian%,
+%HighPaidAmountPerClaimMedian%,
+%HighPaidAmountPerPatientMedian%,
+%DMEPatientMedian%,
+%DMEClaimMedian%,
+%LABPatientMedian%,
+%LABClaimMedian%,
+%ActiveLicenseRevocationState%,
+%ActiveLicenseRevocationDate%,
+%ActiveLicenseExclusionState%,
+%ActiveLicenseExclusionDate%,
+%ActiveOIGExclusionDate%,
+%ActiveOPMExclusionDate%,
+%ActiveStateSanctionExclusionDate%,
+%ActiveOIGSanctionExclusionDate%,
+%ActiveOPMSanctionExclusionDate%,
+%LicenseRevocationReinstatedState%,
+%LicenseRevocationReinstatedDate%,
+%StateExclusionReinstatedState%,
+%StateExclusionReinstatedDate%,
+%OIGExclusionReinstatedDate%,
+%OPMExclusionReinstatedDate%,
+%ExpiredDEANumber%,
+%ExpiredDEADate%,
+%ExpiredLicenseNumber%,
+%ExpiredLicenseState%,
+%ExpiredLicenseNumberDate%,
+%BankruptcyFiledDate%,
+%ConvictionDate%,
+%DeceasedPatientCount%,
+%PatientCount%,
+%PatientDOD%,
+%NPIDeactivatedDate%,
+%ProviderPatientAddress%,
+%LargePatientCount%,
+%LargePatientAddress%,
+%InactiveLicenseState%,
+%NoOfPatientsDrivingLongDistance%,
+%AveDistance%,
+%PractisePrimaryrange%,
+%PractisePredirectional%,
+%PractisePrimaryname%,
+%PractiseAddresssuffix%,
+%PractisePostdirectional%,
+%PractiseSecondaryrange%,
+%PractiseCityname%,
+%PractiseState%,
+%PractiseZip5%,
+%ActiveStateExclusionImpactAmount%,
+%ActiveOIGExclusionImpactAmount%,
+%ActiveOPMExclusionImpactAmount%,
+%PastStateExclusionImpactAmount%,
+%PastOIGExclusionImpactAmount%,
+%PastOPMExclusionImpactAmount%,
+%CurrentLicenseRevokedImpactAmount%,
+%PastLicenseRevokedImpactAmount%,
+%LicenseExpiredImpactAmount%,
+%NPIDeactiveImpactAmount%,
+%PatientDeceasedImpactAmount%,
+%ProviderDeceasedImpactAmount%,
+%BankruptcyImpactAmount%,
+%ConvictionImpactAmount%,
+%GLOBAL.SHAREDADDRESSSWITCH%,
+%GLOBAL.DMESWITCH%,
+%GLOBAL.LABSWITCH%,
+%GLOBAL.SINGLEADDRESSSWITCH%,
+%GLOBAL.RECENTNPISWITCH%,
+%GLOBAL.STUDENTNPISWITCH%,
+%GLOBAL.DNDSWITCH%,
+%GLOBAL.VACANTSWITCH%,
+%GLOBAL.MAILDROPSWITCH%,
+%GLOBAL.POBOXSWITCH%,
+%GLOBAL.PRISONSWITCH%,
+%GLOBAL.RESIDENTIALSWITCH%,
+%GLOBAL.ACTIVESTATEEXCLUSIONSWITCH%,
+%GLOBAL.ACTIVEOIGEXCLUSIONSWITCH%,
+%GLOBAL.ACTIVEOPMEXCLUSIONSWITCH%,
+%GLOBAL.ACTIVELICENSEREVOCATIONSWITCH%,
+%GLOBAL.PASTSTATEEXCLUSIONSWITCH%,
+%GLOBAL.PASTOIGEXCLUSIONSWITCH%,
+%GLOBAL.PASTOPMEXCLUSIONSWITCH%,
+%GLOBAL.PASTLICENSEREVOCATIONSWITCH%,
+%GLOBAL.LICENSEEXPIREDSWITCH%,
+%GLOBAL.DEAEXPIREDSWITCH%,
+%GLOBAL.DECEASEDSWITCH%,
+%GLOBAL.BANKRUPTCYSWITCH%,
+%GLOBAL.CRIMINALHISTORYSWITCH%,
+%GLOBAL.DECEASEDPATIENTSSWITCH%,
+%GLOBAL.LARGEPATIENTGROUPSWITCH%,
+%GLOBAL.LICENSEINACTIVESWITCH%,
+%GLOBAL.NPIDEACTIVATEDSWITCH%,
+%GLOBAL.LONGPATIENTDRIVINGDISTANCESWITCH%,
+%GLOBAL.HIGHPAIDDOLLARSPERPATIENTSWITCH%,
+%GLOBAL.HIGHPAIDDOLLARSPERCLAIMSWITCH%,
+%GLOBAL.HIGHNUMBEROFPATIENTSSWITCH%,
+%GLOBAL.HIGHNUMBEROFCLAIMSSWITCH%,
+%GLOBAL.HIGHPAIDDOLLARSSWITCH%,
+%GLOBAL.INNETWORKCURRENTEXCLUSIONSWITCH%,
+%GLOBAL.INNETWORKCURRENTREVOCATIONSWITCH%,
+%GLOBAL.INNETWORKPASTEXCLUSIONSWITCH%,
+%GLOBAL.INNETWORKPASTREVOCATIONSWITCH%,
+%GLOBAL.INNETWORKHASBANKRUPTCYSWITCH%,
+%GLOBAL.INNETWORKHASCRIMINALHISTORYSWITCH%,
+%GLOBAL.OUTNETWORKCURRENTEXCLUSIONSWITCH%,
+%GLOBAL.OUTNETWORKCURRENTREVOCATIONSWITCH%,
+%GLOBAL.OUTNETWORKPASTEXCLUSIONSWITCH%,
+%GLOBAL.OUTNETWORKPASTREVOCATIONSWITCH%,
+%GLOBAL.OUTNETWORKHASBANKRUPTCYSWITCH%,
+%GLOBAL.OUTNETWORKHASCRIMINALHISTORYSWITCH%,
+%GLOBAL.RELATIVEASSOCCRIMINALSWITCH%,
+%GLOBAL.RELATIVEASSOCBANKRUPTCYSWITCH%,
+%GLOBAL.SHAREDADDRESSSCORE%,
+%GLOBAL.DMESCORE%,
+%GLOBAL.LABSCORE%,
+%GLOBAL.SINGLEADDRESSSCORE%,
+%GLOBAL.RECENTNPISCORE%,
+%GLOBAL.STUDENTNPISCORE%,
+%GLOBAL.DNDSCORE%,
+%GLOBAL.VACANTSCORE%,
+%GLOBAL.MAILDROPSCORE%,
+%GLOBAL.POBOXSCORE%,
+%GLOBAL.PRISONSCORE%,
+%GLOBAL.RESIDENTIALSCORE%,
+%GLOBAL.ACTIVESTATEEXCLUSIONSCORE%,
+%GLOBAL.ACTIVEOIGEXCLUSIONSCORE%,
+%GLOBAL.ACTIVEOPMEXCLUSIONSCORE%,
+%GLOBAL.ACTIVELICENSEREVOCATIONSCORE%,
+%GLOBAL.PASTSTATEEXCLUSIONSCORE%,
+%GLOBAL.PASTOIGEXCLUSIONSCORE%,
+%GLOBAL.PASTOPMEXCLUSIONSCORE%,
+%GLOBAL.PASTLICENSEREVOCATIONSCORE%,
+%GLOBAL.EXPIREDLICENSESCORE%,
+%GLOBAL.DEAEXPIREDSCORE%,
+%GLOBAL.DECEASEDSCORE%,
+%GLOBAL.BANKRUPTCYSCORE%,
+%GLOBAL.CRIMINALHISTORYSCORE%,
+%GLOBAL.DECEASEDPATIENTSSCORE%,
+%GLOBAL.LARGEPATIENTGROUPSCORE%,
+%GLOBAL.LICENSEINACTIVESCORE%,
+%GLOBAL.NPIDEACTIVATEDSCORE%,
+%GLOBAL.LONGPATIENTDRIVINGDISTANCESCORE%,
+%GLOBAL.HIGHPAIDDOLLARSPERPATIENTSCORE%,
+%GLOBAL.HIGHPAIDDOLLARSPERCLAIMSCORE%,
+%GLOBAL.HIGHNUMBEROFPATIENTSSCORE%,
+%GLOBAL.HIGHNUMBEROFCLAIMSSCORE%,
+%GLOBAL.HIGHPAIDDOLLARSSCORE%,
+%GLOBAL.INNETWORKCURRENTEXCLUSIONSCORE%,
+%GLOBAL.INNETWORKCURRENTREVOCATIONSCORE%,
+%GLOBAL.INNETWORKPASTEXCLUSIONSCORE%,
+%GLOBAL.INNETWORKPASTREVOCATIONSCORE%,
+%GLOBAL.INNETWORKHASBANKRUPTCYSCORE%,
+%GLOBAL.INNETWORKHASCRIMINALHISTORYSCORE%,
+%GLOBAL.OUTNETWORKCURRENTEXCLUSIONSCORE%,
+%GLOBAL.OUTNETWORKCURRENTREVOCATIONSCORE%,
+%GLOBAL.OUTNETWORKPASTEXCLUSIONSCORE%,
+%GLOBAL.OUTNETWORKPASTREVOCATIONSCORE%,
+%GLOBAL.OUTNETWORKHASBANKRUPTCYSCORE%,
+%GLOBAL.OUTNETWORKHASCRIMINALHISTORYSCORE%,
+%GLOBAL.RELATIVEASSOCCRIMINALSCORE%,
+%GLOBAL.RELATIVEASSOCBANKRUPTCYSCORE%,
+'%Prefix%');
+
+%^edsOutput% := ScoreResults %^p%;
+ENDGENERATES
+
+
+RESOURCES
+ECL ComputeSuspectProviderAddressScore: FILENAME("ComputeSuspectProviderAddressScore"),URL("http://10.241.100.153:8010");
+FILE ReadMe: FILENAME("ComputeSuspectAddressScore_1.2_ReadMe.txt"),LABEL("Plugin Readme File");
+FILE ComputeSuspectAddressScore_1.2_testcmp: FILENAME("ComputeSuspectAddressScore_1.2_testcmp.txt"),LABEL("Plugin Test Composition");
+FILE ComputeSuspectAddressScore_1.2_BuildTestDataset: FILENAME("ComputeSuspectAddressScore_BuildTestDataset_1.2.ecl"),LABEL("BWR to create data for test composition");
+FILE ComputeSuspectAddressScore_1.2_Checklist: FILENAME("ComputeSuspectAddressScore_1.2_Checklist.xlsx"),LABEL("Checklist");
+END

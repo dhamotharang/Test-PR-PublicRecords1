@@ -1,0 +1,6 @@
+testcompositionrun_err
+Plugin AppendPersonBestInfo passed compliance check
+
+testcompositionrun_info
+Monitoring WU W20170208-085342(HIPIE_BCTLWXCARMIGJX_AppendPersonBestInfo_testcmp_CarmigJX) to completion.
+

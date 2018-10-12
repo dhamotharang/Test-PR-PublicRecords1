@@ -1,0 +1,31 @@
+ID "HIPIE_Plugins.AppendProviderData.AppendProviderData_cmp";
+NAME AppendProviderData_testcmp;
+LABEL "Test composition for Provider ID Best Data Append";
+DESCRIPTION "Auto-generated test composition for plugin AppendProviderData";
+VERSION "1.0.0";
+AUTHOR "periassx";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING CompareWUID: DEFAULT("W123456789-000000");
+END
+INSTANCE OutDataset.OutDataset(Ins004): LABEL("Output Dataset"),VERSION("1.0.0")
+	dsInput="^Ins003|dsOutput"
+	name="~qa::appendproviderdata::appendproviderdata::output"
+	Method="THOR"
+END
+INSTANCE AppendProviderData.AppendProviderData(Ins003): LABEL("Provider ID Best Data Append"),VERSION("1.0.0")
+	dsInput="^Ins002|dsOutput"
+END
+INSTANCE AppendProviderData.AppendProviderData(Ins002): LABEL("Provider ID Best Data Append"),VERSION("1.0.0")
+END
+INSTANCE UseDataset.UseDataset(Ins001): LABEL("Use Dataset"),VERSION("1.1")
+	LogicalFilename="~qa::appendproviderdata::appendproviderdata::input"
+	Structure="RECORD
+STRING unknown
+END;"
+END
