@@ -1,7 +1,7 @@
 ﻿IMPORT DueDiligence, STD, ut;
 
 
-EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTION
+EXPORT getIndKRI(DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTION
 	//individual not found
 	STRING10 INVALID_INDIVIDUAL_FLAGS := 'FFFFFFFFFF';
 	STRING2 INVALID_INDIVIDUAL_SCORE := '-1';
@@ -55,8 +55,8 @@ EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTIO
                                                       PerMatchLevel_Flag2,
                                                       PerMatchLevel_Flag1);
                                       
-    self.PerMatchLevel_Flag   :=  PerMatchLevel_Flag_final;                                            
-		self.PerMatchLevel         := (STRING)(10 - STD.Str.Find(PerMatchLevel_Flag_final, DueDiligence.Constants.T_INDICATOR, 1));       
+    SELF.PerMatchLevel_Flag := PerMatchLevel_Flag_final;                                            
+		SELF.PerMatchLevel := (STRING)(10 - STD.Str.Find(PerMatchLevel_Flag_final, DueDiligence.Constants.T_INDICATOR, 1));       
     
     /* PERSON ASSET OWNED PROPERTY */
     perAssetOwnProperty_Flag9 := IF(le.ownedPropCount >= 15, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
@@ -79,8 +79,8 @@ EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTIO
                                                           perAssetOwnProperty_Flag2,
                                                           perAssetOwnProperty_Flag1); 
     
-    self.PerAssetOwnProperty_Flag :=  perAssetOwnProperty_Flag_final;                                           
-		self.PerAssetOwnProperty := (STRING)(10 - STD.Str.Find(perAssetOwnProperty_Flag_final, DueDiligence.Constants.T_INDICATOR, 1));
+    SELF.PerAssetOwnProperty_Flag := perAssetOwnProperty_Flag_final;                                           
+		SELF.PerAssetOwnProperty := (STRING)(10 - STD.Str.Find(perAssetOwnProperty_Flag_final, DueDiligence.Constants.T_INDICATOR, 1));
     
     
     /* PERSON ASSET OWNED WATERCRAFT */
@@ -104,8 +104,33 @@ EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTIO
                                                           perAssetOwnWatercraft_Flag2,
                                                           perAssetOwnWatercraft_Flag1); 
     
-    self.PerAssetOwnWatercraft_Flag :=  perAssetOwnWatercraft_Flag_final;                                           
-		self.PerAssetOwnWatercraft := (STRING)(10 - STD.Str.Find(perAssetOwnWatercraft_Flag_final, DueDiligence.Constants.T_INDICATOR, 1));
+    SELF.PerAssetOwnWatercraft_Flag := perAssetOwnWatercraft_Flag_final;                                           
+		SELF.PerAssetOwnWatercraft := (STRING)(10 - STD.Str.Find(perAssetOwnWatercraft_Flag_final, DueDiligence.Constants.T_INDICATOR, 1));
+    
+    
+    /* PERSON ASSET OWNED AIRCRAFT */
+    perAssetOwnAircraft_Flag9 := IF(le.aircraftCount >= 8, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perAssetOwnAircraft_Flag8 := IF(le.aircraftCount = 7, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perAssetOwnAircraft_Flag7 := IF(le.aircraftCount = 6, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perAssetOwnAircraft_Flag6 := IF(le.aircraftCount = 5, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perAssetOwnAircraft_Flag5 := IF(le.aircraftCount = 4, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perAssetOwnAircraft_Flag4 := IF(le.aircraftCount = 3, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perAssetOwnAircraft_Flag3 := IF(le.aircraftCount = 2, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perAssetOwnAircraft_Flag2 := IF(le.aircraftCount = 1, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    perAssetOwnAircraft_Flag1 := IF(le.aircraftCount = 0, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+    
+    perAssetOwnAircraft_Flag_final := calcFinalFlagField(perAssetOwnAircraft_Flag9,
+                                                          perAssetOwnAircraft_Flag8,
+                                                          perAssetOwnAircraft_Flag7,
+                                                          perAssetOwnAircraft_Flag6,
+                                                          perAssetOwnAircraft_Flag5,
+                                                          perAssetOwnAircraft_Flag4,
+                                                          perAssetOwnAircraft_Flag3,
+                                                          perAssetOwnAircraft_Flag2,
+                                                          perAssetOwnAircraft_Flag1); 
+                                                          
+    SELF.PerAssetOwnAircraft_Flag := perAssetOwnAircraft_Flag_final;
+    SELF.PerAssetOwnAircraft := (STRING)(10 - STD.Str.Find(perAssetOwnAircraft_Flag_final, DueDiligence.Constants.T_INDICATOR, 1));
     
     
     /* PERSON ACCESS TO FUNDS PROPERTY */
@@ -207,8 +232,8 @@ EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTIO
                                                   perGeoRisk_Flag2, 
                                                   perGeoRisk_Flag1); 
 		
-		self.perGeographic_Flag := perGeoRisk_Flag_final;                                             
-		self.perGeographic := (STRING)(10-STD.Str.Find(perGeoRisk_Flag_final, DueDiligence.Constants.T_INDICATOR, 1));          
+		SELF.perGeographic_Flag := perGeoRisk_Flag_final;                                             
+		SELF.perGeographic := (STRING)(10-STD.Str.Find(perGeoRisk_Flag_final, DueDiligence.Constants.T_INDICATOR, 1));          
 			
 
     
@@ -286,8 +311,8 @@ EXPORT getIndKRI (DATASET(DueDiligence.Layouts.Indv_Internal) indivs) := FUNCTIO
 	kriUnknownIndv := PROJECT(noDIDs, TRANSFORM(DueDiligence.Layouts.Indv_Internal,
 																							SELF.PerAssetOwnProperty := INVALID_INDIVIDUAL_SCORE;
 																							SELF.PerAssetOwnProperty_Flag := INVALID_INDIVIDUAL_FLAGS;
-																							// SELF.PerAssetOwnAircraft := INVALID_INDIVIDUAL_SCORE;
-																							// SELF.PerAssetOwnAircraft_Flag := INVALID_INDIVIDUAL_FLAGS;
+																							SELF.PerAssetOwnAircraft := INVALID_INDIVIDUAL_SCORE;
+																							SELF.PerAssetOwnAircraft_Flag := INVALID_INDIVIDUAL_FLAGS;
 																							SELF.PerAssetOwnWatercraft := INVALID_INDIVIDUAL_SCORE;
 																							SELF.PerAssetOwnWatercraft_Flag := INVALID_INDIVIDUAL_FLAGS;
 																							SELF.PerAssetOwnVehicle := INVALID_INDIVIDUAL_SCORE;

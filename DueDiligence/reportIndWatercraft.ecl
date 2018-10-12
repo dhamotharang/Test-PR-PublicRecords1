@@ -18,7 +18,7 @@ EXPORT reportIndWatercraft(DATASET(DueDiligence.Layouts.Indv_Internal) inData) :
                                                                                                     SELF.OwnershipType.SpouseOwned := LEFT.spouseOwned;
                                                                                                     SELF.OwnershipType.Owners := PROJECT(LEFT.owners, TRANSFORM(iesp.duediligenceshared.t_DDRPersonNameWithLexID,
                                                                                                                                                                 SELF.lexID := (STRING)LEFT.did;
-                                                                                                                                                                SELF.Name := iesp.ECL2ESP.SetName(LEFT.firstName, LEFT.middleName, LEFT.lastName, LEFT.suffix, DueDiligence.Constants.EMPTY))); //to add when added to iesp
+                                                                                                                                                                SELF.Name := iesp.ECL2ESP.SetName(LEFT.firstName, LEFT.middleName, LEFT.lastName, LEFT.suffix, DueDiligence.Constants.EMPTY))); 
                                                                                                     SELF := LEFT;)]);
                                                             SELF := LEFT;));
                                                                                                     
