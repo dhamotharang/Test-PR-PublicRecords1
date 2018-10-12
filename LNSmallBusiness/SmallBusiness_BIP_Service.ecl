@@ -585,7 +585,7 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 	#if(Models.LIB_BusinessRisk_Models().TurnOnValidation) // If TRUE, output the model results directly
 		
 	RETURN OUTPUT(SBA_Results_Temp, NAMED('Results'));
-	// RETURN OUTPUT(SBA_Results_Temp_with_PhoneSources, NAMED('Results')); used for model validation 
+	// RETURN OUTPUT(SBA_Results_Temp_with_PhoneSources, NAMED('Results')); //used for model validation 
 		
 	 #else	
 	 SBA_Results := IF(TestDataEnabled = FALSE, SBA_Results_Temp,
@@ -610,6 +610,15 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 		SELF.Name := LNSmallBusiness.Constants.SMALL_BIZ_ATTR_V1_NAME;
 		SELF.Attributes := NameValuePairsVersion1;
 	END;
+
+// Create Version 101 Name/Value Pair Attributes no felonies
+	NameValuePairsVersion101 := NORMALIZE(SBA_Results, 197, LNSmallBusiness.SmallBusiness_BIP_Transforms.intoVersion101(LEFT, COUNTER));
+	
+	iesp.smallbusinessanalytics.t_SBAAttributesGroup Version101(LNSmallBusiness.BIP_Layouts.IntermediateLayout le) := TRANSFORM
+		SELF.Name := LNSmallBusiness.Constants.SMALL_BIZ_ATTR_NOFEL;
+		SELF.Attributes := NameValuePairsVersion101;
+	END;
+
 
 	// Create Version 2 Name/Value Pair Attributes
 	NameValuePairsVersion2 := NORMALIZE(SBA_Results, 316, LNSmallBusiness.SmallBusiness_BIP_Transforms.intoVersion2(LEFT, COUNTER));
@@ -639,6 +648,7 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 		SELF.Result.BusinessID.UltID := le.UltID;
 		SELF.Result.Models := le.ModelResults;
 		SELF.Result.AttributeGroups := IF((UNSIGNED)AttributesRequested(AttributeGroup[1..18] = LNSmallBusiness.Constants.SMALL_BIZ_ATTR)[1].AttributeGroup[19..] = 1, PROJECT(le, Version1(LEFT))) + 
+																	 IF((UNSIGNED)AttributesRequested(AttributeGroup[1..18] = LNSmallBusiness.Constants.SMALL_BIZ_ATTR)[1].AttributeGroup[19..] = 101, PROJECT(le, Version101(LEFT))) +
 																	 IF((UNSIGNED)AttributesRequested(AttributeGroup[1..18] = LNSmallBusiness.Constants.SMALL_BIZ_ATTR)[1].AttributeGroup[19..] = 2, PROJECT(le, Version2(LEFT))) +
 																	 IF((UNSIGNED)AttributesRequested(AttributeGroup[1..9] = LNSmallBusiness.Constants.SMALL_BIZ_SBFE_ATTR)[1].AttributeGroup[10..] = 1, PROJECT(le, SBFEVersion1(LEFT))) +
 																	 DATASET([], iesp.smallbusinessanalytics.t_SBAAttributesGroup);

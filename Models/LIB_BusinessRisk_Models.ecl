@@ -26,7 +26,8 @@ EXPORT LIB_BusinessRisk_Models(
 	EXPORT TurnOnValidation := FALSE; // When TRUE allows for Layout_Debug to be OUTPUT from SmallBusiness_BIP_Service
 	// EXPORT TurnOnValidation := TRUE; // When TRUE allows for Layout_Debug to be OUTPUT from SmallBusiness_BIP_Service
 
-	EXPORT ValidatingModel := Models.SLBB1809_0_0(busShell, bocaShell); // Change this to the model you are trying to validate	
+	
+	EXPORT ValidatingModel := Models.SLBO1809_0_0(busShell); // Change this to the model you are trying to validate	
 	// EXPORT ValidatingModel := Models.SLBB1702_0_2(busShell, bocaShell); // Change this to the model you are trying to validate	
 
 	// The calcIndex function returns the 'billing_index' given the report_option
@@ -55,6 +56,7 @@ EXPORT LIB_BusinessRisk_Models(
 									{'SLBB1702_0_2', 'SLBB1702_0_2', 5, '0-999'}, //blended
 									{'SLBB1809_0_0', 'SLBB1809_0_0', 7, '0-999'}, //blended
 									{'SLBO1702_0_2', 'SLBO1702_0_2', 6, '0-999'}, //not blended
+									{'SLBO1809_0_0', 'SLBO1809_0_0', 8, '0-999'}, //not blended
 								// ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
 									{'SBBM9999_9'  , 'SBBM9999_9'  , 0             , '0-999'},
 									{'SBOM9999_9'  , 'SBOM9999_9'  , 0             , '0-999'}
@@ -72,6 +74,7 @@ EXPORT LIB_BusinessRisk_Models(
 											'SLBB1702_0_2' => UNGROUP(Models.SLBB1702_0_2(busShell, bocaShell)),
 											'SLBB1809_0_0' => UNGROUP(Models.SLBB1809_0_0(busShell, bocaShell)),
 											'SLBO1702_0_2' => UNGROUP(Models.SLBO1702_0_2(busShell)),
+											'SLBO1809_0_0' => UNGROUP(Models.SLBO1809_0_0(busShell)),
 											// ----------------------------------------------------------------------------------
 											// --------------------------------- CUSTOM MODELS ----------------------------------
 
