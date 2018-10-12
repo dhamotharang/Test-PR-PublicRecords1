@@ -25,8 +25,6 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
 	
 	boolean IncludeSpouseAlways := false : STORED('IncludeSpouseAlways');
 	boolean IncludeSpouseOnly   := false : STORED('IncludeSpouseOnlyIfNoDebtor');
-	boolean IncludeEmail        := false : STORED('IncludeEmailInfo');
-	boolean IncludeAddl         := false : STORED('IncludeAdditionalInfo');
 	boolean IncludeCorp         := false : STORED('IncludeCorpInfo');
 	boolean IncludeSelfRepCompanyName := false : STORED('IncludeSelfRepCompanyName');
 
@@ -316,10 +314,7 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
 	//
   // 11.6.1 If optional include additional (history) was set on, filter out:
 	//        1. recs for any royalty sources because they are not to be included.
-	ds_most_complete_fltrd := if(IncludeAddl,
-	                             ds_most_complete_srtd(source not in WorkPlace_Constants.WP_ROYALTY_SOURCE_SET),
-															 // else output an empty ds											 
-                               dataset([], WorkPlace_Layouts.poe_didkey_slimmed));
+	ds_most_complete_fltrd := ds_most_complete_srtd(source not in WorkPlace_Constants.WP_ROYALTY_SOURCE_SET);
 
   // 11.6.2 Next sort/dedup the filtered recs to only keep the recs with a  
 	//        unique company_name for each did
@@ -430,7 +425,7 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
 
   // 12. Get the detailed POE indivdual source data for each 1 best for did record.	
 	// Get the detailed data from all the sources and email addresses.	
-	ds_detail_w_email:= IF(includeEmail, WorkPlace_Services.Functions.getDetailedWithEmail(ds_best1_for_did_wcs), ds_best1_for_did_wcs);
+	ds_detail_w_email:= WorkPlace_Services.Functions.getDetailedWithEmail(ds_best1_for_did_wcs);
 	
 
   // 13. Get parent company info.
@@ -461,8 +456,7 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
   // 			RR-12635 WPL redesign return upto 4 additional records.
 	//      recs to the detail subject recs on did.
 	//      Only subject recs will have additional info, not spouse recs.
-	ds_detail_subj_waddl := if(IncludeAddl, 
-															join(ds_detail_subject,ds_addl_combined,
+	ds_detail_subj_waddl := join(ds_detail_subject,ds_addl_combined,
 														        left.did = (string) right.did,
 																	transform(WorkPlace_Layouts.final,
 																		// assign hist fields from right
@@ -507,8 +501,7 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
 																		self := left),
 																	left outer, // keep all recs from left whether they have hist or not
 																	limit(WorkPlace_Constants.Limits.JOIN_LIMIT)
-																	),
-															ds_detail_subject); // else just use det subject ds as it is.
+																	); 
 
  	// 17.3 Join all the detail recs with parent co info, prof lic & email info added to 
 	//      the spouse dids to create spouse only records.
@@ -552,8 +545,7 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
                             inner, // keep only recs that exist on both left & right
 											      limit(WorkPlace_Constants.Limits.JOIN_LIMIT));
  
-	ds_detail_spouse_waddl := if(IncludeAddl, 
-																join(ds_detail_spouse,ds_addl_combined,
+	ds_detail_spouse_waddl := join(ds_detail_spouse,ds_addl_combined,
 														        left.spouse_did = (string) right.did,
 																	transform(WorkPlace_Layouts.final,
 																		// assign hist fields from right
@@ -598,8 +590,7 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
 																	 	// assign rest of fields from left
 																		self := left),
 																	left outer, // keep all recs from left whether they have hist or not
-																	limit(WorkPlace_Constants.Limits.JOIN_LIMIT)),
-																ds_detail_spouse);  // else just use det spouse ds as it is.
+																	limit(WorkPlace_Constants.Limits.JOIN_LIMIT)); 
 																
   // 18.1 Now join the detail subject recs back to the ds of all acctnos with one did to
 	//      re-attach the acctnos to the dids and so that the same output results are returned
@@ -773,8 +764,6 @@ EXPORT WorkPlace_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
   // Uncomment lines below as needed for debugging
 	//OUTPUT(IncludeSpouseAlways,      NAMED('ds_batch_ISA'));
 	//OUTPUT(IncludeSpouseonly,        NAMED('ds_batch_ISO'));
-	//OUTPUT(IncludeEmail,             NAMED('ds_batch_IE'));
-	//OUTPUT(IncludeAddl,              NAMED('ds_batch_IA'));
 	//OUTPUT(IncludeCorp,              NAMED('ds_batch_IC'));
  	//OUTPUT(in_excluded_sources,      NAMED('in_excluded_sources'));
  	//OUTPUT(in_excluded_sources_edited, NAMED('in_excluded_sources_edited'));
