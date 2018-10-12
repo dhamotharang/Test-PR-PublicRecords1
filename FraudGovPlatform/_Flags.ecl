@@ -7,6 +7,8 @@ module
 	
 	export UseStandardizePersists := not IsTesting;	
 	
+	export	UseDemoData	:= true;
+	
 	export FileExists := module
 	
 		export Input := module

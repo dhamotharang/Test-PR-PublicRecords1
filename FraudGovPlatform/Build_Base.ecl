@@ -41,12 +41,11 @@ module
 			 )			 
 			 , if(PSkipAddressCacheBase , output('AddressCache base skipped'),Build_Base_AddressCache(pversion).All)
 			 , Promote(pversion).buildfiles.New2Built
-			 , if(PSkipMainBase, output('Main base skipped')
-				, Build_Base_Main(
-				 pversion
-				).All)			 
-			 , Promote(pversion).buildfiles.Built2QA			 
-		 )
+			 , if(PSkipMainBase, output('Main base skipped'), MapToCommon(pversion).Build_Base_Main.All)
+			 , Build_Base_Anonymized(pversion).All
+			 , Append_DemoData(pversion)
+			 , Promote(pversion).buildfiles.Built2QA
+		) 
 		,output('No Valid version parameter passed, skipping FraudGovPlatform.Build_Base atribute')
 	 );
 		
