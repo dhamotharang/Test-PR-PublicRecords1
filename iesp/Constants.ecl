@@ -458,7 +458,10 @@ EXPORT Constants := MODULE
 		export unsigned2 MaxIndvAssociations   			:= 500;
 		export unsigned2 MaxBusAssociations   			:= 500;
 	end;
-
+	
+	//Digital Mortgage Application Prefill (DMAP)
+	EXPORT UNSIGNED2 DMAP_MAX_COUNT_OWNED_PROPERTIES	:= 50;
+	
   //Dun and Bradstreet (DNB)
  	export unsigned2 DNB_MAX_COUNT_SEARCH_RECORDS := 500;	
 
