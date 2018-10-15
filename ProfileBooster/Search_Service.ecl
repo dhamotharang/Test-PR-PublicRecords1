@@ -620,10 +620,8 @@ iesp.share.t_NameValuePair createrec(searchResults le, integer C) := TRANSFORM
 																									 self.i_state := search.address.State,
 																									 self.i_zip := search.address.Zip5,
                                                    self.i_home_phone := search.phone,
-																									 // ProfileBooster does not have any models at the moment.
-																									 // This will have to be updated if that happens.
-																									 // self.i_model_name_1 := in_modelname,
-																									 self.o_score_1    := (Integer)left.Models[1].Scores[1].Value,
+																									 self.i_model_name_1 := custommodel_in,
+																									 self.o_score_1    := left.Models[1].Scores[1].Value,
 																									 self.o_reason_1_1 := left.Models[1].Scores[1].ScoreReasons[1].ReasonCode,
 																									 self.o_reason_1_2 := left.Models[1].Scores[1].ScoreReasons[2].ReasonCode,
 																									 self.o_reason_1_3 := left.Models[1].Scores[1].ScoreReasons[3].ReasonCode,
