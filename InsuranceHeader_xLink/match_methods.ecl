@@ -72,6 +72,11 @@ EXPORT match_ST(TYPEOF(h.ST) L, TYPEOF(h.ST) R, BOOLEAN RequiredField = FALSE) :
     SALT37.MatchCode.NoMatch),
         MAP(L = R => SALT37.MatchCode.ExactMatch, SALT37.MatchCode.NoMatch)
 );
+EXPORT match_ZIP_el(TYPEOF(h.ZIP) L, DATASET(InsuranceHeader_xLink.process_xIDL_layouts().layout_ZIP_cases) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
+   MAP(EXISTS(R(L=ZIP)) => SALT37.MatchCode.ExactMatch,
+    SALT37.MatchCode.NoMatch),
+        MAP(EXISTS(R(L=ZIP)) => SALT37.MatchCode.ExactMatch, SALT37.MatchCode.NoMatch)
+);
 EXPORT match_ZIP(TYPEOF(h.ZIP) L, TYPEOF(h.ZIP) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
    MAP(L = R => SALT37.MatchCode.ExactMatch,
     SALT37.MatchCode.NoMatch),
