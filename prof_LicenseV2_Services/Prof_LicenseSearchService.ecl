@@ -41,7 +41,7 @@
 import prof_licensev2_services;
 
 Export Prof_LicenseSearchService := MACRO
- #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+ #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	#constant('SearchIgnoresAddressOnly',true);
 	#constant('getBdidsbyExecutive',FALSE);
 	#Constant('SetRepAddr',TRUE);

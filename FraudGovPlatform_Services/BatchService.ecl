@@ -33,8 +33,8 @@
 IMPORT BatchShare, FraudGovPlatform_Services, FraudShared_Services, Royalty, WSInput;
 
 EXPORT BatchService(useCannedRecs = FALSE) := MACRO
-	#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
-	
+  #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+
 	//The following macro defines the field sequence on WsECL page of query. 
 	WSInput.MAC_FraudGovPlatform_Services_BatchService();
 

@@ -30,7 +30,7 @@
 /*--INFO-- This service searches all Txbus datafiles.*/
 
 export TxbusSearchService := macro
- #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+ #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	#constant('getBdidsbyExecutive',FALSE)
 	#constant('SearchIgnoresAddressOnly',true)
 
