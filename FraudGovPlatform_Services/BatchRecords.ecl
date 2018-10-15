@@ -6,7 +6,7 @@ EXPORT BatchRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_i
 		//**
 		//** Collect external batch services data if IsOnline is FALSE
 		//**
-		SHARED ds_reportFromBatchServices := IF(~batch_params.IsOnline,
+		EXPORT ds_reportFromBatchServices := IF(~batch_params.IsOnline OR batch_params.UseAllSearchFields,
 																						FraudGovPlatform_Services.Functions.getExternalServicesRecs(ds_batch_in, batch_params),
 																						PROJECT(ds_batch_in,TRANSFORM(FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw,
 																																				SELF.batchin_rec := LEFT,
@@ -87,4 +87,5 @@ EXPORT BatchRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_i
 																);
 		
 		EXPORT ds_results := ds_results_w_scores;
+		
 END;
