@@ -149,6 +149,8 @@ import address, iesp, identifier2, ut, risk_indicators, Risk_Reporting;
 
 export FlexID_Service := MACRO
 
+#stored('_espclientinterfaceversion', '');
+
 	ds_in    := dataset([], iesp.flexid.t_FlexIdRequest)  	: stored('FlexIDRequest', few);
 	first_row := ds_in[1] : independent;
 	
