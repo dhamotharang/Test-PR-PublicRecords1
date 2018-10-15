@@ -6,6 +6,8 @@ EXPORT IParam := MODULE
 		EXPORT boolean   AppendBest := true;
 		EXPORT boolean   TestVelocityRules := false;
 		EXPORT boolean   IsOnline := false;
+		EXPORT boolean 	 UseAllSearchFields;
+		EXPORT string60  ReportEntityType;
 		EXPORT UNSIGNED3 DIDScoreThreshold;
 		EXPORT unsigned6 GlobalCompanyId;	// company (agency)
 		EXPORT unsigned2 IndustryType;	// company (agency) program code i.e. 1292, 1321 etc..
@@ -67,6 +69,8 @@ EXPORT IParam := MODULE
 			EXPORT boolean   TestVelocityRules	:= false: STORED('TestVelocityRules'); // this option is internal to roxie. added to toggle between test/actual velocity rules. 
 			EXPORT boolean   AppendBest 				:= true	: STORED('AppendBest');
 			EXPORT boolean   IsOnline 					:= false: STORED('IsOnline');
+			EXPORT boolean   UseAllSearchFields := false: STORED('UseAllSearchFields');
+			EXPORT string60  ReportEntityType 	:= ''		: STORED('ReportEntityType');
 			EXPORT unsigned3 DIDScoreThreshold  := 80		: STORED('DIDScoreThreshold');
 			EXPORT unsigned6 GlobalCompanyId    := 0		: STORED('GlobalCompanyId');
 			EXPORT unsigned2 IndustryType       := IndustryTypeCode;

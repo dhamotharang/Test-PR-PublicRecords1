@@ -20,6 +20,8 @@ export t_FraudGovReportOption := record (iesp.share.t_BaseReportOption)
 	boolean AppendBest {xpath('AppendBest')};//hidden[internal]
 	unsigned3 DIDScoreThreshold {xpath('DIDScoreThreshold')};//hidden[internal]
 	boolean IsOnline {xpath('IsOnline')};//hidden[internal]
+	boolean UseAllSearchFields {xpath('UseAllSearchFields')};//hidden[internal]
+	string60 ReportEntityType {xpath('ReportEntityType')};//hidden[internal]
 	boolean IsIdentityTestRequest {xpath('IsIdentityTestRequest')};//hidden[internal]
 	boolean IsElementTestRequest {xpath('IsElementTestRequest')};//hidden[internal]
 	boolean ReturnSlimDetails {xpath('ReturnSlimDetails')};//hidden[internal]
