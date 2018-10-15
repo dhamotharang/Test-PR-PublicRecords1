@@ -83,12 +83,12 @@ EXPORT Proc_Build_PhoneFinderReportDelta(string version, const varstring eclsour
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 		//Identities
-		ctDltIdentRaw				:= count(PhoneFinderReportDelta.File_PhoneFinder_In.Identities_Raw);
+		ctDltIdentRaw				:= count(PhoneFinderReportDelta.File_PhoneFinder.Identities_Raw);
 	
 		//DltIdent - If daily file available, continue processing else use previous day's base file.
 		pickDltIdentH				:= if(ctDltIdentRaw>0,
-															PhoneFinderReportDelta.File_PhoneFinder_In.Identities_Raw + PhoneFinderReportDelta.File_PhoneFinder_In.Identities_History,
-															PhoneFinderReportDelta.File_PhoneFinder_In.Identities_History);
+															PhoneFinderReportDelta.File_PhoneFinder.Identities_Raw + PhoneFinderReportDelta.File_PhoneFinder.Identities_History,
+															PhoneFinderReportDelta.File_PhoneFinder.Identities_History);
 													
 		catDltIdentH				:= output(dedup(sort(distribute(pickDltIdentH, hash(transaction_id)), record, local), record, local),,'~thor_data400::in::phonefinderreportdelta::identities_history_'+version,__compressed__);
 		
@@ -99,12 +99,12 @@ EXPORT Proc_Build_PhoneFinderReportDelta(string version, const varstring eclsour
 																													'~thor_data400::in::phonefinderreportdelta::identities_history_delete'], '~thor_data400::in::phonefinderreportdelta::identities_history_'+version, true);	
 		
 		//OtherPhones
-		ctDltOPhRaw					:= count(PhoneFinderReportDelta.File_PhoneFinder_In.OtherPhones_Raw);
+		ctDltOPhRaw					:= count(PhoneFinderReportDelta.File_PhoneFinder.OtherPhones_Raw);
 	
 		//DltOPh - If daily file available, continue processing else use previous day's base file.
 		pickDltOPhH					:= if(ctDltOphRaw>0,
-															PhoneFinderReportDelta.File_PhoneFinder_In.OtherPhones_Raw + PhoneFinderReportDelta.File_PhoneFinder_In.OtherPhones_History,
-															PhoneFinderReportDelta.File_PhoneFinder_In.OtherPhones_History);
+															PhoneFinderReportDelta.File_PhoneFinder.OtherPhones_Raw + PhoneFinderReportDelta.File_PhoneFinder.OtherPhones_History,
+															PhoneFinderReportDelta.File_PhoneFinder.OtherPhones_History);
 													
 		catDltOPhH					:= output(dedup(sort(distribute(pickDltOPhH, hash(transaction_id)), record, local), record, local),,'~thor_data400::in::phonefinderreportdelta::otherphones_history_'+version,__compressed__);
 		
@@ -115,12 +115,12 @@ EXPORT Proc_Build_PhoneFinderReportDelta(string version, const varstring eclsour
 																													'~thor_data400::in::phonefinderreportdelta::otherphones_history_delete'], '~thor_data400::in::phonefinderreportdelta::otherphones_history_'+version, true);	
 	
 		//RiskIndicators
-		ctDltRIndRaw				:= count(PhoneFinderReportDelta.File_PhoneFinder_In.RiskIndicators_Raw);
+		ctDltRIndRaw				:= count(PhoneFinderReportDelta.File_PhoneFinder.RiskIndicators_Raw);
 	
 		//DltOPh - If daily file available, continue processing else use previous day's base file.
 		pickDltRIndH				:= if(ctDltRIndRaw>0,
-															PhoneFinderReportDelta.File_PhoneFinder_In.RiskIndicators_Raw + PhoneFinderReportDelta.File_PhoneFinder_In.RiskIndicators_History,
-															PhoneFinderReportDelta.File_PhoneFinder_In.RiskIndicators_History);
+															PhoneFinderReportDelta.File_PhoneFinder.RiskIndicators_Raw + PhoneFinderReportDelta.File_PhoneFinder.RiskIndicators_History,
+															PhoneFinderReportDelta.File_PhoneFinder.RiskIndicators_History);
 													
 		catDltRIndH					:= output(dedup(sort(distribute(pickDltRIndH, hash(transaction_id)), record, local), record, local),,'~thor_data400::in::phonefinderreportdelta::riskindicators_history_'+version,__compressed__);
 		
@@ -131,12 +131,12 @@ EXPORT Proc_Build_PhoneFinderReportDelta(string version, const varstring eclsour
 																													'~thor_data400::in::phonefinderreportdelta::riskindicators_history_delete'], '~thor_data400::in::phonefinderreportdelta::riskindicators_history_'+version, true);	
 																																																		
 	//Transactions
-		ctDltTransRaw				:= count(PhoneFinderReportDelta.File_PhoneFinder_In.Transactions_Raw);
+		ctDltTransRaw				:= count(PhoneFinderReportDelta.File_PhoneFinder.Transactions_Raw);
 	
 		//DltTrans - If daily file available, continue processing else use previous day's base file.
 		pickDltTransH				:= if(ctDltTransRaw>0,
-															PhoneFinderReportDelta.File_PhoneFinder_In.Transactions_Raw + PhoneFinderReportDelta.File_PhoneFinder_In.Transactions_History,
-															PhoneFinderReportDelta.File_PhoneFinder_In.Transactions_History);
+															PhoneFinderReportDelta.File_PhoneFinder.Transactions_Raw + PhoneFinderReportDelta.File_PhoneFinder.Transactions_History,
+															PhoneFinderReportDelta.File_PhoneFinder.Transactions_History);
 													
 		catDltTransH				:= output(dedup(sort(distribute(pickDltTransH, hash(transaction_id)), record, local), record, local),,'~thor_data400::in::phonefinderreportdelta::transactions_history_'+version,__compressed__);
 		
@@ -151,68 +151,80 @@ EXPORT Proc_Build_PhoneFinderReportDelta(string version, const varstring eclsour
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 		//DF-23251: Add 'dx_' Prefix to Index Definitions
-		RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(dx_PhoneFinderReportDelta.Key_Identities
-																								,'~thor_data400::key::phonefinderreportdelta::identities'
-																								,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::identities'
+		//DF-23286: Update Keys
+		RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_PhoneFinderReportDelta.Key_Identities																//index
+																								,PhoneFinderReportDelta.File_PhoneFinder.Identities_Main							//dataset	
+																								,'~thor_data400::key::phonefinderreportdelta::identities'							//key superfile
+																								,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::identities'//key logical file
 																								,bkDltIdent
 																								);
-
-		RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(dx_PhoneFinderReportDelta.Key_OtherPhones
+																																													
+		RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_PhoneFinderReportDelta.Key_OtherPhones
+																								,PhoneFinderReportDelta.File_PhoneFinder.OtherPhones_Main
 																								,'~thor_data400::key::phonefinderreportdelta::otherphones'
 																								,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::otherphones'
 																								,bkDltOPhones
 																								);
 
-		RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(dx_PhoneFinderReportDelta.Key_RiskIndicators
+		RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_PhoneFinderReportDelta.Key_RiskIndicators
+																								,PhoneFinderReportDelta.File_PhoneFinder.RiskIndicators_Main
 																								,'~thor_data400::key::phonefinderreportdelta::riskindicators'
 																								,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::riskindicators'
 																								,bkDltRInd
 																								);
 																																													
-		RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(dx_PhoneFinderReportDelta.Key_Transactions
+		RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_PhoneFinderReportDelta.Key_Transactions
+																								,PhoneFinderReportDelta.File_PhoneFinder.Transactions_Main
 																								,'~thor_data400::key::phonefinderreportdelta::transactions'
 																								,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::transactions'
 																								,bkDltTrans
 																								);
 		
 		//PHPR-173
-		RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(dx_PhoneFinderReportDelta.Key_Transactions_UserId
+		RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_PhoneFinderReportDelta.Key_Transactions_UserId
+																								,PhoneFinderReportDelta.File_PhoneFinder.Transactions_Main
 																								,'~thor_data400::key::phonefinderreportdelta::transactions_userid'
 																								,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::transactions_userid'
 																								,bkDltTransUserID
 																								);
 																								
-		RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(dx_PhoneFinderReportDelta.Key_Transactions_CompanyId
+		RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_PhoneFinderReportDelta.Key_Transactions_CompanyId
+																								,PhoneFinderReportDelta.File_PhoneFinder.Transactions_Main
 																								,'~thor_data400::key::phonefinderreportdelta::transactions_companyid'
 																								,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::transactions_companyid'
 																								,bkDltTransCompanyID
 																								);
 		
-		RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(dx_PhoneFinderReportDelta.Key_Transactions_RefCode
+		RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_PhoneFinderReportDelta.Key_Transactions_RefCode
+																								,PhoneFinderReportDelta.File_PhoneFinder.Transactions_Main
 																								,'~thor_data400::key::phonefinderreportdelta::transactions_refcode'
 																								,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::transactions_refcode'
 																								,bkDltTransRefCode
 																								);
 		
-		RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(dx_PhoneFinderReportDelta.Key_Transactions_CompanyRefCode
+		RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_PhoneFinderReportDelta.Key_Transactions_CompanyRefCode
+																								,PhoneFinderReportDelta.File_PhoneFinder.Transactions_Main
 																								,'~thor_data400::key::phonefinderreportdelta::transactions_companyrefcode'
 																								,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::transactions_companyrefcode'
 																								,bkDltTransCompanyRefCode
 																								);
 		
-		RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(dx_PhoneFinderReportDelta.Key_Transactions_Date
+		RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_PhoneFinderReportDelta.Key_Transactions_Date
+																								,PhoneFinderReportDelta.File_PhoneFinder.Transactions_Main
 																								,'~thor_data400::key::phonefinderreportdelta::transactions_date'
 																								,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::transactions_date'
 																								,bkDltTransDate
 																								);
 		
-		RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(dx_PhoneFinderReportDelta.Key_Transactions_Phone
+		RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_PhoneFinderReportDelta.Key_Transactions_Phone
+																								,PhoneFinderReportDelta.File_PhoneFinder.Transactions_Main
 																								,'~thor_data400::key::phonefinderreportdelta::transactions_phone'
 																								,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::transactions_phone'
 																								,bkDltTransPhone
 																								);
 		
-		RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(dx_PhoneFinderReportDelta.Key_Identities_LexId
+		RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_PhoneFinderReportDelta.Key_Identities_LexId
+																								,PhoneFinderReportDelta.File_PhoneFinder.Identities_Main
 																								,'~thor_data400::key::phonefinderreportdelta::identities_lexid'
 																								,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::identities_lexid'
 																								,bkDltIdentLexID
@@ -321,10 +333,10 @@ EXPORT Proc_Build_PhoneFinderReportDelta(string version, const varstring eclsour
 	//Build Strata Reports for Build/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-		PhoneFinderReportDelta.Out_Strata_Population_Stats(dx_PhoneFinderReportDelta.File_PhoneFinder.Identities_Main
-																												,dx_PhoneFinderReportDelta.File_PhoneFinder.OtherPhones_Main
-																												,dx_PhoneFinderReportDelta.File_PhoneFinder.RiskIndicators_Main
-																												,dx_PhoneFinderReportDelta.File_PhoneFinder.Transactions_Main
+		PhoneFinderReportDelta.Out_Strata_Population_Stats(PhoneFinderReportDelta.File_PhoneFinder.Identities_Main
+																												,PhoneFinderReportDelta.File_PhoneFinder.OtherPhones_Main
+																												,PhoneFinderReportDelta.File_PhoneFinder.RiskIndicators_Main
+																												,PhoneFinderReportDelta.File_PhoneFinder.Transactions_Main
 																												,version
 																												,buildStrata);
 	
