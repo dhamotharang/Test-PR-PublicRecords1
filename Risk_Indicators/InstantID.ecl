@@ -37,6 +37,7 @@
 	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
 	<part name="HistoryDateTimeStamp" type="xsd:string"/>
 	<part name="PoBoxCompliance" type="xsd:boolean"/>
+  <part name="_espclientinterfaceversion'" type="xsd:string"/>
 	<part name="OfacOnly" type="xsd:boolean"/>
 	<part name="ExcludeWatchLists" type="xsd:boolean"/>
 	<part name="OFACversion" type="xsd:unsignedInt"/>
@@ -107,6 +108,8 @@ import ut, codes, address, models, riskwise, suppress, seed_files, Royalty;
 
 export InstantID := MACRO
 
+#stored('_espclientinterfaceversion', '');
+
 #WEBSERVICE(FIELDS(
 		'_LoginID',
 		'_CompanyID',
@@ -146,6 +149,7 @@ export InstantID := MACRO
 		'HistoryDateYYYYMM',
 		'HistoryDateTimeStamp',
 		'PoBoxCompliance',
+    '_espclientinterfaceversion',
 		'OfacOnly',
 		'ExcludeWatchLists',
 		'OFACversion',
