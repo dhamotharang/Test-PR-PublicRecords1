@@ -2341,7 +2341,7 @@ EXPORT Layouts := MODULE
 	
 	EXPORT ConsumerInstantIDLayout := RECORD 
 		risk_indicators.Layout_InstantID_NuGenPlus AND NOT [acctno];
-    UNSIGNED1 Rep_WhichOne;
+    STRING1 Rep_WhichOne;
 	END;
 	
 	// The following layout provides the basis for transforming into either Online/XML or Batch layouts later.

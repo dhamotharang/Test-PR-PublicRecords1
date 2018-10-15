@@ -53,6 +53,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 		TRANSFORM
 			// i.e. risk_indicators.Layout_InstantID_NuGenPlus AND NOT [acctno,seq];
       SELF.did              := fn_CreateFakeDID( key1.rep1_firstname, key1.rep1_lastname );
+      SELF.rep_whichone     := IF(key1.rep1_firstname <> '' AND key1.rep1_lastname <> '','1','');
       SELF.title            := key1.rep1_titlename;
       SELF.fname            := key1.rep1_firstname;
       SELF.mname            := key1.rep1_middlename;
@@ -198,6 +199,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 		TRANSFORM
 			// i.e. risk_indicators.Layout_InstantID_NuGenPlus AND NOT [acctno,seq];
       SELF.did              := fn_CreateFakeDID( key1.rep2_firstname, key1.rep2_lastname );
+      SELF.rep_whichone     := IF(key1.rep2_firstname <> '' AND key1.rep2_lastname <> '','2','');
       SELF.title            := key1.rep2_titlename;
       SELF.fname            := key1.rep2_firstname;
       SELF.mname            := key1.rep2_middlename;
@@ -341,6 +343,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 		TRANSFORM
 			// i.e. risk_indicators.Layout_InstantID_NuGenPlus AND NOT [acctno,seq];
       SELF.did              := fn_CreateFakeDID( key1.rep3_firstname, key1.rep3_lastname );
+      SELF.rep_whichone     := IF(key1.rep3_firstname <> '' AND key1.rep3_lastname <> '','3','');
       SELF.title            := key1.rep3_titlename;
       SELF.fname            := key1.rep3_firstname;
       SELF.mname            := key1.rep3_middlename;
@@ -484,6 +487,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 		TRANSFORM
 			// i.e. risk_indicators.Layout_InstantID_NuGenPlus AND NOT [acctno,seq];
       SELF.did              := fn_CreateFakeDID( key1.rep4_firstname, key1.rep4_lastname );
+      SELF.rep_whichone     := IF(key1.rep4_firstname <> '' AND key1.rep4_lastname <> '','4','');
       SELF.title            := key1.rep4_titlename;
       SELF.fname            := key1.rep4_firstname;
       SELF.mname            := key1.rep4_middlename;
@@ -628,6 +632,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 	TRANSFORM
 			// i.e. risk_indicators.Layout_InstantID_NuGenPlus AND NOT [acctno,seq];
       SELF.did              := fn_CreateFakeDID( key1.rep5_firstname, key1.rep5_lastname );
+      SELF.rep_whichone     := IF(key1.rep5_firstname <> '' AND key1.rep5_lastname <> '','5','');
       SELF.title            := key1.rep5_titlename;
       SELF.fname            := key1.rep5_firstname;
       SELF.mname            := key1.rep5_middlename;
