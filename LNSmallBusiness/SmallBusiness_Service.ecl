@@ -247,7 +247,7 @@ export SmallBusiness_Service := macro
 																							 self.i_bus_zip := search.Business.address.Zip5,
                                                self.i_bus_phone := search.Business.Phone10,
 																							 self.i_model_name_1 := IF(ds_in[1].servicelocations[1].parameters[1].value = '', 'RVS811_0', ds_in[1].servicelocations[1].parameters[1].value),
-																							 self.o_score_1    := left.Result.Models[1].Scores[1].value,
+																							 self.o_score_1    := (String)left.Result.Models[1].Scores[1].value,
 																							 self.o_reason_1_1 := left.Result.Models[1].Scores[1].BusinessHighRiskIndicators[1].Riskcode,
 																							 self.o_reason_1_2 := left.Result.Models[1].Scores[1].BusinessHighRiskIndicators[2].Riskcode,
 																							 self.o_reason_1_3 := left.Result.Models[1].Scores[1].BusinessHighRiskIndicators[3].Riskcode,
