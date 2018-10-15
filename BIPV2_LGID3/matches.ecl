@@ -1,9 +1,11 @@
-// Begin code to perform the matching itself
+﻿// Begin code to perform the matching itself
  
 IMPORT SALT30,ut,std;
 EXPORT matches(DATASET(layout_LGID3) ih,UNSIGNED MatchThreshold = Config.MatchThreshold) := MODULE
 SHARED ih_thin := TABLE(ih,{ultid,orgid,seleid,lgid3,proxid,dotid,rcid}); // HACK - slim layout for ut.MAC_Patch_Id, etc later on.
+
 SHARED LowerMatchThreshold := MatchThreshold-3; // Keep extra 'borderlines' for debug purposes
+SHARED split_patch := LinkBlockers(ih).Patches;
 SHARED h := match_candidates(ih).candidates;
 SHARED s := Specificities(ih).Specificities[1];
  
@@ -14,7 +16,7 @@ SHARED match_candidates(ih).layout_matches match_join(match_candidates(ih).layou
   SELF.rcid1 := le.rcid;
   SELF.rcid2 := ri.rcid;
   SELF.DateOverlap := SALT30.fn_ComputeDateOverlap(((UNSIGNED)le.dt_first_seen),((UNSIGNED)le.dt_last_seen),((UNSIGNED)ri.dt_first_seen),((UNSIGNED)ri.dt_last_seen));
-  INTEGER2 sbfe_id_score_temp := MAP(
+  INTEGER2 sbfe_id_score := MAP(
                         le.sbfe_id_isnull OR ri.sbfe_id_isnull => 0,
                         le.sbfe_id = ri.sbfe_id  => le.sbfe_id_weight100,
                         SALT30.Fn_Fail_Scale(le.sbfe_id_weight100,s.sbfe_id_switch));
@@ -22,14 +24,14 @@ SHARED match_candidates(ih).layout_matches match_join(match_candidates(ih).layou
                         le.Lgid3IfHrchy_isnull OR ri.Lgid3IfHrchy_isnull => 0,
                         le.Lgid3IfHrchy = ri.Lgid3IfHrchy  => le.Lgid3IfHrchy_weight100,
                         SALT30.Fn_Fail_Scale(le.Lgid3IfHrchy_weight100,s.Lgid3IfHrchy_switch));
-  INTEGER2 company_name_score := MAP(
-                        le.company_name_isnull OR ri.company_name_isnull => 0,
-                        le.company_name = ri.company_name  => le.company_name_weight100,
-                        SALT30.MatchBagOfWords(le.company_name,ri.company_name,2128912,1));
   REAL duns_number_concept_score_scale := ( le.duns_number_concept_weight100 + ri.duns_number_concept_weight100 ) / (le.active_duns_number_weight100 + ri.active_duns_number_weight100 + le.duns_number_weight100 + ri.duns_number_weight100); // Scaling factor for this concept
   INTEGER2 duns_number_concept_score_pre := MAP( (le.duns_number_concept_isnull OR le.active_duns_number_isnull AND le.duns_number_isnull) OR (ri.duns_number_concept_isnull OR ri.active_duns_number_isnull AND ri.duns_number_isnull) => 0,
                         le.duns_number_concept = ri.duns_number_concept  => le.duns_number_concept_weight100,
                         0);
+  INTEGER2 company_name_score := MAP(
+                        le.company_name_isnull OR ri.company_name_isnull => 0,
+                        le.company_name = ri.company_name  => le.company_name_weight100,
+                        SALT30.MatchBagOfWords(le.company_name,ri.company_name,2128912,1));
   INTEGER2 company_fein_score := MAP(
                         le.company_fein_isnull OR ri.company_fein_isnull => 0,
                         le.company_fein = ri.company_fein  => le.company_fein_weight100,
@@ -51,7 +53,6 @@ SHARED match_candidates(ih).layout_matches match_join(match_candidates(ih).layou
                         le.cnp_btype_isnull OR ri.cnp_btype_isnull => 0,
                         le.cnp_btype = ri.cnp_btype  => le.cnp_btype_weight100,
                         SALT30.Fn_Fail_Scale(le.cnp_btype_weight100,s.cnp_btype_switch));
-  INTEGER2 sbfe_id_score := sbfe_id_score_temp*2.00; 
   INTEGER2 Lgid3IfHrchy_score := IF ( Lgid3IfHrchy_score_temp >= Config.Lgid3IfHrchy_Force * 100, Lgid3IfHrchy_score_temp, SKIP ); // Enforce FORCE parameter
   INTEGER2 active_duns_number_score := MAP(
                         le.active_duns_number_isnull OR ri.active_duns_number_isnull => 0,
@@ -72,14 +73,14 @@ SHARED match_candidates(ih).layout_matches match_join(match_candidates(ih).layou
   SELF.Conf_Prop := (0
     +MAX(le.Lgid3IfHrchy_prop,ri.Lgid3IfHrchy_prop)*Lgid3IfHrchy_score // Score if either field propogated
     +MAX(le.active_duns_number_prop,ri.active_duns_number_prop)*active_duns_number_score // Score if either field propogated
-    +MAX(le.company_name_prop,ri.company_name_prop)*company_name_score // Score if either field propogated
     +MAX(le.duns_number_prop,ri.duns_number_prop)*duns_number_score // Score if either field propogated
     +if(le.duns_number_concept_prop+ri.duns_number_concept_prop>0,duns_number_concept_score*(0+if(le.active_duns_number_prop+ri.active_duns_number_prop>0,1,0)+if(le.duns_number_prop+ri.duns_number_prop>0,1,0))/2,0)
+    +MAX(le.company_name_prop,ri.company_name_prop)*company_name_score // Score if either field propogated
     +MAX(le.company_charter_number_prop,ri.company_charter_number_prop)*company_charter_number_score // Score if either field propogated
     +MAX(le.cnp_number_prop,ri.cnp_number_prop)*cnp_number_score // Score if either field propogated
     +MAX(le.company_inc_state_prop,ri.company_inc_state_prop)*company_inc_state_score // Score if either field propogated
   ) / 100; // Score based on propogated fields
-  iComp := (sbfe_id_score + Lgid3IfHrchy_score + company_name_score + IF(duns_number_concept_score>0,MAX(duns_number_concept_score,active_duns_number_score + duns_number_score),active_duns_number_score + duns_number_score) + company_fein_score + company_charter_number_score + cnp_number_score + company_inc_state_score + cnp_btype_score) / 100 + outside;
+  iComp := (sbfe_id_score + Lgid3IfHrchy_score + IF(duns_number_concept_score>0,MAX(duns_number_concept_score,active_duns_number_score + duns_number_score),active_duns_number_score + duns_number_score) + company_name_score + company_fein_score + company_charter_number_score + cnp_number_score + company_inc_state_score + cnp_btype_score) / 100 + outside;
   SELF.Conf := IF( iComp>=LowerMatchThreshold OR iComp-self.Conf_Prop >= LowerMatchThreshold,iComp,SKIP ); // Remove failing records asap
 END;
 //Allow rule numbers to be converted to readable text.
@@ -87,13 +88,14 @@ EXPORT RuleText(UNSIGNED n) :=  MAP (
   n = 0 => ':sbfe_id',
   n = 1 => ':Lgid3IfHrchy',
   n = 2 => ':active_duns_number',
-  n = 3 => ':company_name',
-  n = 4 => ':duns_number',
+  n = 3 => ':duns_number',
+  n = 4 => ':company_name',
   n = 5 => ':company_fein',
   n = 6 => ':company_charter_number'
 ,n = 100 => ':duns_number'
 ,n = 101 => ':company_fein'
 ,'AttributeFile:'+(STRING)(n-10000));
+
 //Now execute each of the 7 join conditions of which 0 have been optimized into preceding conditions
 EXPORT MAC_DoJoins(hfile,trans) := FUNCTIONMACRO
  
@@ -115,17 +117,17 @@ dn2 := hfile(~active_duns_number_isnull);
 dn2_deduped := dn2(active_duns_number_weight100>=500); // Use specificity to flag high-dup counts
 mj2 := JOIN( dn2_deduped, dn2_deduped, LEFT.LGID3 > RIGHT.LGID3 AND ( LEFT.SALT_Partition = RIGHT.SALT_Partition OR LEFT.SALT_Partition='' OR RIGHT.SALT_Partition = '' ) AND LEFT.active_duns_number = RIGHT.active_duns_number AND ( left.Lgid3IfHrchy = right.Lgid3IfHrchy OR left.Lgid3IfHrchy_isnull OR right.Lgid3IfHrchy_isnull ) AND ( left.cnp_number = right.cnp_number OR left.cnp_number_isnull OR right.cnp_number_isnull ) AND (( ~left.company_inc_state_isnull AND ~right.company_inc_state_isnull ) OR ( ~left.active_duns_number_isnull AND ~right.active_duns_number_isnull ) OR ( ~left.duns_number_isnull AND ~right.duns_number_isnull ) OR ( ~left.duns_number_concept_isnull AND ~right.duns_number_concept_isnull ) OR ( ~left.company_fein_isnull AND ~right.company_fein_isnull ) OR ( ~left.sbfe_id_isnull AND ~right.sbfe_id_isnull )),trans(LEFT,RIGHT,2),HINT(unsorted_output),ATMOST(LEFT.active_duns_number = RIGHT.active_duns_number,10000),HASH);
  
+//Fixed fields ->:duns_number(27)
+ 
+dn3 := hfile(~duns_number_isnull);
+dn3_deduped := dn3(duns_number_weight100>=500); // Use specificity to flag high-dup counts
+mj3 := JOIN( dn3_deduped, dn3_deduped, LEFT.LGID3 > RIGHT.LGID3 AND ( LEFT.SALT_Partition = RIGHT.SALT_Partition OR LEFT.SALT_Partition='' OR RIGHT.SALT_Partition = '' ) AND LEFT.duns_number = RIGHT.duns_number AND ( left.Lgid3IfHrchy = right.Lgid3IfHrchy OR left.Lgid3IfHrchy_isnull OR right.Lgid3IfHrchy_isnull ) AND ( left.cnp_number = right.cnp_number OR left.cnp_number_isnull OR right.cnp_number_isnull ) AND (( ~left.company_inc_state_isnull AND ~right.company_inc_state_isnull ) OR ( ~left.active_duns_number_isnull AND ~right.active_duns_number_isnull ) OR ( ~left.duns_number_isnull AND ~right.duns_number_isnull ) OR ( ~left.duns_number_concept_isnull AND ~right.duns_number_concept_isnull ) OR ( ~left.company_fein_isnull AND ~right.company_fein_isnull ) OR ( ~left.sbfe_id_isnull AND ~right.sbfe_id_isnull )),trans(LEFT,RIGHT,3),HINT(unsorted_output),ATMOST(LEFT.duns_number = RIGHT.duns_number,10000),HASH);
+ 
 //Fixed fields ->:company_name(26)
  
-dn3 := hfile(~company_name_isnull);
-dn3_deduped := dn3(company_name_weight100>=500); // Use specificity to flag high-dup counts
-mj3 := JOIN( dn3_deduped, dn3_deduped, LEFT.LGID3 > RIGHT.LGID3 AND ( LEFT.SALT_Partition = RIGHT.SALT_Partition OR LEFT.SALT_Partition='' OR RIGHT.SALT_Partition = '' ) AND LEFT.company_name = RIGHT.company_name AND ( left.Lgid3IfHrchy = right.Lgid3IfHrchy OR left.Lgid3IfHrchy_isnull OR right.Lgid3IfHrchy_isnull ) AND ( left.cnp_number = right.cnp_number OR left.cnp_number_isnull OR right.cnp_number_isnull ) AND (( ~left.company_inc_state_isnull AND ~right.company_inc_state_isnull ) OR ( ~left.active_duns_number_isnull AND ~right.active_duns_number_isnull ) OR ( ~left.duns_number_isnull AND ~right.duns_number_isnull ) OR ( ~left.duns_number_concept_isnull AND ~right.duns_number_concept_isnull ) OR ( ~left.company_fein_isnull AND ~right.company_fein_isnull ) OR ( ~left.sbfe_id_isnull AND ~right.sbfe_id_isnull )),trans(LEFT,RIGHT,3),HINT(unsorted_output),ATMOST(LEFT.company_name = RIGHT.company_name,10000),HASH);
- 
-//Fixed fields ->:duns_number(26)
- 
-dn4 := hfile(~duns_number_isnull);
-dn4_deduped := dn4(duns_number_weight100>=500); // Use specificity to flag high-dup counts
-mj4 := JOIN( dn4_deduped, dn4_deduped, LEFT.LGID3 > RIGHT.LGID3 AND ( LEFT.SALT_Partition = RIGHT.SALT_Partition OR LEFT.SALT_Partition='' OR RIGHT.SALT_Partition = '' ) AND LEFT.duns_number = RIGHT.duns_number AND ( left.Lgid3IfHrchy = right.Lgid3IfHrchy OR left.Lgid3IfHrchy_isnull OR right.Lgid3IfHrchy_isnull ) AND ( left.cnp_number = right.cnp_number OR left.cnp_number_isnull OR right.cnp_number_isnull ) AND (( ~left.company_inc_state_isnull AND ~right.company_inc_state_isnull ) OR ( ~left.active_duns_number_isnull AND ~right.active_duns_number_isnull ) OR ( ~left.duns_number_isnull AND ~right.duns_number_isnull ) OR ( ~left.duns_number_concept_isnull AND ~right.duns_number_concept_isnull ) OR ( ~left.company_fein_isnull AND ~right.company_fein_isnull ) OR ( ~left.sbfe_id_isnull AND ~right.sbfe_id_isnull )),trans(LEFT,RIGHT,4),HINT(unsorted_output),ATMOST(LEFT.duns_number = RIGHT.duns_number,10000),HASH);
+dn4 := hfile(~company_name_isnull);
+dn4_deduped := dn4(company_name_weight100>=500); // Use specificity to flag high-dup counts
+mj4 := JOIN( dn4_deduped, dn4_deduped, LEFT.LGID3 > RIGHT.LGID3 AND ( LEFT.SALT_Partition = RIGHT.SALT_Partition OR LEFT.SALT_Partition='' OR RIGHT.SALT_Partition = '' ) AND LEFT.company_name = RIGHT.company_name AND ( left.Lgid3IfHrchy = right.Lgid3IfHrchy OR left.Lgid3IfHrchy_isnull OR right.Lgid3IfHrchy_isnull ) AND ( left.cnp_number = right.cnp_number OR left.cnp_number_isnull OR right.cnp_number_isnull ) AND (( ~left.company_inc_state_isnull AND ~right.company_inc_state_isnull ) OR ( ~left.active_duns_number_isnull AND ~right.active_duns_number_isnull ) OR ( ~left.duns_number_isnull AND ~right.duns_number_isnull ) OR ( ~left.duns_number_concept_isnull AND ~right.duns_number_concept_isnull ) OR ( ~left.company_fein_isnull AND ~right.company_fein_isnull ) OR ( ~left.sbfe_id_isnull AND ~right.sbfe_id_isnull )),trans(LEFT,RIGHT,4),HINT(unsorted_output),ATMOST(LEFT.company_name = RIGHT.company_name,10000),HASH);
 mjs0_t := mj0+mj1+mj2+mj3+mj4;
 SALT30.mac_select_best_matches(mjs0_t,rcid1,rcid2,o0);
 mjs0 := o0 : PERSIST('~temp::LGID3::BIPV2_LGID3::mj::0',EXPIRE(Config.PersistExpire));
@@ -146,10 +148,27 @@ SALT30.mac_select_best_matches(last_mjs_t,rcid1,rcid2,o);
 RETURN  mjs0 +o;
 ENDMACRO;
 SHARED all_mjs := MAC_DoJoins(h,match_join);
-EXPORT All_Matches := all_mjs : PERSIST('~temp::LGID3::BIPV2_LGID3::all_m',EXPIRE(Config.PersistExpire)); // To by used by rcid and LGID3
+//Now construct candidates based upon attribute & relationship files
+AllAttrMatches := SORT(Mod_Attr_UnderLinks(ih).Match,LGID31,LGID32,Rule,-(Conf+Conf_Prop),LOCAL);
+match_candidates(ih).Layout_Attribute_Matches CombineResults(match_candidates(ih).Layout_Attribute_Matches le,match_candidates(ih).Layout_Attribute_Matches ri) := TRANSFORM
+  SELF.Conf := le.Conf+ri.Conf;
+  SELF.Source_Id := le.Source_ID + '|' + ri.Source_ID;
+  SELF := le;
+END;
+EXPORT All_Attribute_Matches := ROLLUP(AllAttrMatches,LEFT.LGID31=RIGHT.LGID31 AND LEFT.LGID32=RIGHT.LGID32,CombineResults(LEFT,RIGHT),LOCAL);
+hd := DISTRIBUTE(h,HASH(LGID3));
+j1 := JOIN(DISTRIBUTE(All_Attribute_Matches,HASH(LGID32)),hd,LEFT.LGID32=RIGHT.LGID3,LOCAL); // Stock one half of full data
+match_candidates(ih).layout_candidates strim(j1 le) := TRANSFORM
+  SELF := le;
+END;
+attr_match := JOIN(DISTRIBUTE(j1,HASH(LGID31)),hd,LEFT.LGID31 = RIGHT.LGID3 AND ( LEFT.SALT_Partition = RIGHT.SALT_Partition OR LEFT.SALT_Partition='' OR RIGHT.SALT_Partition = '' ),match_join( RIGHT,PROJECT(LEFT,strim(LEFT)),LEFT.Rule, LEFT.Conf),LOCAL); // Will be distributed by DID1
+with_attr := attr_match + all_mjs;
+not_blocked := JOIN(with_attr,LinkBlockers(ih).Block,left.LGID31=right.LGID31 and left.LGID32=right.LGID32,TRANSFORM(LEFT),LEFT ONLY, SMART); // Remove all blocked links
+EXPORT All_Matches := not_blocked : PERSIST('~temp::LGID3::BIPV2_LGID3::all_m',EXPIRE(Config.PersistExpire)); // To by used by rcid and LGID3
 //  /* HACK - disable default salt mac_avoid_transitives*/
 import BIPV2_Tools; /*HACK - import for new transitives macro*/
 BIPV2_Tools.mac_avoid_transitives(All_Matches,LGID31,LGID32,Conf,DateOverlap,Rule,o); // HACK - Use new transitives macro*/
+
 EXPORT PossibleMatches := o : PERSIST('~temp::LGID3::BIPV2_LGID3::mt',EXPIRE(Config.PersistExpire));
 SALT30.mac_get_BestPerRecord( All_Matches,rcid1,LGID31,rcid2,LGID32,o );
 EXPORT BestPerRecord := o : PERSIST('~temp::LGID3::BIPV2_LGID3::mr',EXPIRE(Config.PersistExpire));
@@ -209,10 +228,11 @@ r := RECORD
 END;
 export ConfidenceBreakdown := table(Matches,r,Conf,few);
 Full_Sample_Matches := MatchSample+BorderlineMatchSample+AlmostMatchSample;
-export MatchSampleRecords := Debug(ih,s,MatchThreshold).AnnotateMatches(Full_Sample_Matches);
+export MatchSampleRecords := Debug(ih,s,MatchThreshold).AnnotateMatches(Full_Sample_Matches,All_Attribute_Matches);
  
 //Now actually produce the new file
-ut.MAC_Patch_Id(ih_thin,LGID3,BasicMatch(ih).patch_file,LGID31,LGID32,ihbp); // Perform basic matches
+SALT30.MAC_Reassign_UID(ih_thin,split_patch,LGID3,rcid,ih0); // Perform splits
+ut.MAC_Patch_Id(ih0,LGID3,BasicMatch(ih).patch_file,LGID31,LGID32,ihbp); // Perform basic matches
 SALT30.MAC_SliceOut_ByRID(ihbp,rcid,LGID3,ToSlice,rcid,sliced0); // Execute Sliceouts
   sliced := IF( Config.DoSliceouts, sliced0, ihbp); // Compile time ability to remove sliceout cost
 ut.MAC_Patch_Id(sliced,LGID3,Matches,LGID31,LGID32,o); // Join Clusters
@@ -223,6 +243,7 @@ ut.MAC_Patch_Id(sliced,LGID3,Matches,LGID31,LGID32,o); // Join Clusters
   Patchdotid := BIPV2_Tools.MAC_ChildId_Patch(Patchproxid,proxid,dotid,rcid); // Explode any dotid that need to because of splits in proxid
 SHARED Patched_Infile_thin := PatchDotID : INDEPENDENT; // HACK
 EXPORT Patched_Infile := JOIN(ih, Patched_Infile_thin, LEFT.rcid=RIGHT.rcid, TRANSFORM(RECORDOF(ih),SELF:=RIGHT,SELF:=LEFT), KEEP(1), HASH); // HACK
+
  
 //Produced a patched version of match_candidates to get External ADL2 for free.
 ut.MAC_Patch_Id(h,LGID3,Matches,LGID31,LGID32,o1);
@@ -257,10 +278,11 @@ EXPORT IdChanges := JOIN(ih_thin/*HACK*/,patched_infile_thin/*HACK*/,LEFT.rcid =
 //Now perform the safety checks
 EXPORT MatchesPerformed := COUNT( Matches );
 EXPORT SlicesPerformed := COUNT( ToSlice );
+EXPORT LinkBlocksPerformed := COUNT(LinkBlockers(ih).New); // Count dids created
 EXPORT MatchesPropAssisted := COUNT( Matches(Conf_Prop>0) );
 EXPORT MatchesPropRequired := COUNT( Matches(Conf-Conf_Prop<MatchThreshold) );
 EXPORT PreIDs := BIPV2_LGID3.Fields.UIDConsistency(ih_thin/*HACK*/); // Export whole consistency module
 EXPORT PostIDs := BIPV2_LGID3.Fields.UIDConsistency(Patched_Infile_thin); // Export whole consistency module
-EXPORT PatchingError0 := PreIDs.IdCounts[1].LGID3_count - PostIDs.IdCounts[1].LGID3_count - MatchesPerformed - COUNT(BasicMatch(ih).patch_file) + SlicesPerformed; // Should be zero
+EXPORT PatchingError0 := PreIDs.IdCounts[1].LGID3_count - PostIDs.IdCounts[1].LGID3_count - MatchesPerformed - COUNT(BasicMatch(ih).patch_file) + SlicesPerformed + LinkBlocksPerformed; // Should be zero
 EXPORT DuplicateRids0 := COUNT(Patched_Infile_thin) - PostIDs.IdCounts[1].rcid_Count; // Should be zero
 END;
