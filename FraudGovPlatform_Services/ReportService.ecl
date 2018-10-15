@@ -1,4 +1,4 @@
-﻿﻿/*--SOAP--
+/*--SOAP--
 <message name="ReportService">
     <part name="FraudGovReportRequest" type="tns:XmlDataSet" cols="80" rows="30"/>
 </message>
