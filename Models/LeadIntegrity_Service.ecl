@@ -2520,7 +2520,7 @@ end;
                                                      self.i_work_phone := WorkPhone,
 																										 self.i_attributes_name := option.AttributesVersionRequest,
 																										 self.i_model_name_1 := left.Result.Models[1].Name,
-																										 self.o_score_1 := left.Result.Models[1].Scores[1].Value,
+																										 self.o_score_1 := (String)left.Result.Models[1].Scores[1].Value,
 																										 self.o_reason_1_1 := left.Result.Models[1].Scores[1].WarningCodeIndicators[1].WarningCode,
 																										 self.o_reason_1_2 := left.Result.Models[1].Scores[1].WarningCodeIndicators[2].WarningCode,
 																										 self.o_reason_1_3 := left.Result.Models[1].Scores[1].WarningCodeIndicators[3].WarningCode,
