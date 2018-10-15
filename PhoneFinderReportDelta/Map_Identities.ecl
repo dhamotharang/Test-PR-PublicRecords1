@@ -2,9 +2,10 @@
 
 EXPORT Map_Identities(string8 version) := FUNCTION
 
-	inFile 			:= distribute(PhoneFinderReportDelta.File_PhoneFinder_In.Identities_Raw);
+	inFile 			:= distribute(PhoneFinderReportDelta.File_PhoneFinder.Identities_Raw);
 	
 	//DF-23251: Add 'dx_' Prefix to Index Definitions & Add Additional Filters to Identities File
+	//DF-23286: Update Keys
 	dx_PhoneFinderReportDelta.Layout_PhoneFinder.Identities_Main trId(inFile l):= transform
 		self.date_file_loaded := version;
 		self.full_name				:= Std.Str.FindReplace(PhoneFinderReportDelta._Functions.rmNull(l.full_name), '\\', '');//DF-23251
@@ -18,7 +19,7 @@ EXPORT Map_Identities(string8 version) := FUNCTION
 	end;
 	
 	mapIdMain 	:= project(inFile, trId(left));
-	concatFile	:= mapIdMain + dx_PhoneFinderReportDelta.File_PhoneFinder.Identities_Main;	
+	concatFile	:= mapIdMain + PhoneFinderReportDelta.File_PhoneFinder.Identities_Main;//DF-23286
 	ddConcat 		:= dedup(sort(distribute(concatFile, hash(transaction_id)), transaction_id, sequence_number, -(date_added+time_added), local), transaction_id, sequence_number, local);
 	
 	return ddConcat; 
