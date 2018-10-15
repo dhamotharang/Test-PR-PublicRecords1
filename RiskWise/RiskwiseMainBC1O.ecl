@@ -258,8 +258,8 @@ IF(~DisableOutcomeTracking and Log_trib and ~runSeed_value, OUTPUT(intermediateL
 																									 self.i_bus_state := cmpystate_value,
 																									 self.i_bus_zip := cmpyzip_value,
                                                    self.i_bus_phone := cmpyphone_value,
-																									 self.o_score_1 := (Integer)left.ecovariables,
-																									 self.o_score_2 := if(tribcode = 'cbbl', (Integer)left.cmpyaddrscore, 0),
+																									 self.o_score_1 := left.ecovariables,
+																									 self.o_score_2 := if(tribcode = 'cbbl', left.cmpyaddrscore, ''),
 																									 self.o_bdid    := left.riskwiseid, //bdid
 																									 self.o_lexid   := left.RepDid,     //repdid
 																									 self := left,

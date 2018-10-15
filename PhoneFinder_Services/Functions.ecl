@@ -1064,7 +1064,7 @@ MODULE
 																																														vCityStZip);
 				SELF.primary_identity.PrimaryAddressType								:= ri.PrimaryAddressType;																																										
 				SELF.primary_identity.RecordType												:= ri.RecordType;																																										
-				SELF.primary_identity.Deceased                          := IF((Integer)le.dod != 0),'Y','N');
+				SELF.primary_identity.Deceased                          := IF((Integer)le.dod != 0,'Y','N');
 				SELF.primary_identity.FirstSeenWithPrimaryPhone         := ri.FirstSeenWithPrimaryPhone;
 				SELF.primary_identity.LastSeenWithPrimaryPhone          := ri.LastSeenWithPrimaryPhone;
 				SELF.primary_identity.TimeWithPrimaryPhone              := ri.TimeWithPrimaryPhone;

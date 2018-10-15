@@ -24,7 +24,7 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 
 		bill_to_ship_to_models := ['fp1409_2']; // Populate with real model ids when the time comes.
   
-		bsVersion := MAP( model_name IN ['fp1508_1','msn1803_1','rsn804_1','msnrsn_1'] => 53, // bs 53
+		bsVersion := MAP( doParo or model_name IN ['fp1508_1', Models.FraudAdvisor_Constants.Paro_models] => 53, // bs 53
                       model_name IN ['fp3fdn1505_0', 'fp31505_0', 'fp3fdn1505_9', 
                                      'fp31505_9','fp1702_2','fp1702_1'] => 51, //run 51 shell for both FP3 models
 											model_name IN ['fp1210_1', 'fp1307_2', 'fp1409_2'] => 41, 
