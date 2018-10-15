@@ -6,6 +6,7 @@ EXPORT Build_All(
 	STRING  pAbsolutePath,
 	STRING  pGlob,
 	STRING  pAddresses,
+	STRING  pCluster = 'Thor400_44',
 	INTEGER pRecordsize = 291,
 	BOOLEAN	pIsTesting = false,
 	BOOLEAN	pOverwrite = false,
@@ -21,7 +22,8 @@ EXPORT Build_All(
 				pAbsolutePath,
 				pGlob,
 				pRecordsize,
-				pVersion	
+				pVersion,
+				pCluster	
 			).Input
 		),
 		Build_Base(pVersion,pIsTesting,pSprayedFile,pBaseFile),
