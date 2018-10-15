@@ -1,7 +1,8 @@
-EXPORT MAC_HeaderFileSearchService := MACRO
+﻿EXPORT MAC_HeaderFileSearchService := MACRO
 	#WEBSERVICE(FIELDS(	'ApplicationType',
 											'DataPermissionMask',
 											'DataRestrictionMask',
+											'DeathMasterPurpose',
 											'DLMask',
 											'dobMask',
 											'DPPAPurpose',

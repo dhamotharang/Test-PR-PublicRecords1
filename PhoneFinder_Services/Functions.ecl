@@ -825,7 +825,7 @@ MODULE
    																																				le.st,le.z5,le.zip4,'','',vStreetAddress[1..60],vStreetAddress[61..],vCityStZip);
    			SELF.PrimaryAddressType								 := ri.PrimaryAddressType;																																	
    			SELF.RecordType												 := ri.RecordType;																																	
-   			SELF.Deceased                          := IF(le.dod != '','Y','N');
+   			SELF.Deceased                          := IF((Integer)le.dod != 0,'Y','N'); 
    			SELF.FirstSeenWithPrimaryPhone         := ri.FirstSeenWithPrimaryPhone;
    			SELF.LastSeenWithPrimaryPhone          := ri.LastSeenWithPrimaryPhone;
    			SELF.TimeWithPrimaryPhone              := ri.TimeWithPrimaryPhone;
@@ -1064,7 +1064,7 @@ MODULE
 																																														vCityStZip);
 				SELF.primary_identity.PrimaryAddressType								:= ri.PrimaryAddressType;																																										
 				SELF.primary_identity.RecordType												:= ri.RecordType;																																										
-				SELF.primary_identity.Deceased                          := IF(le.dod != '','Y','N');
+				SELF.primary_identity.Deceased                          := IF((Integer)le.dod != 0),'Y','N');
 				SELF.primary_identity.FirstSeenWithPrimaryPhone         := ri.FirstSeenWithPrimaryPhone;
 				SELF.primary_identity.LastSeenWithPrimaryPhone          := ri.LastSeenWithPrimaryPhone;
 				SELF.primary_identity.TimeWithPrimaryPhone              := ri.TimeWithPrimaryPhone;
