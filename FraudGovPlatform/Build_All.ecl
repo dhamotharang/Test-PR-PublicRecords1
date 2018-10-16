@@ -8,21 +8,25 @@ export Build_All(
 	,string																pMBSServerIP 						= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10)
 	,string																pMBSFDNServerIP 					= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10)
 	,string																pMBSFraudGovDirectory			= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', '/data/super_credit/fraudgov/in/mbs/dev', '/data/super_credit/fraudgov/in/mbs/prod')
-	,string																pMBSFDNDirectory					= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', '/data/super_credit/fdn/in/mbs/dev', '/data/super_credit/fdn/in/mbs/prod')
+	,string																pMBSFDNDirectory					= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', '/data/super_credit/fdn/in/mbs/prod', '/data/super_credit/fdn/in/mbs/prod')
 	// All sources are not updated each build if no updates to particular source skip that source base 
 	,boolean															PSkipIdentityDataBase			= false 
 	,boolean															PSkipKnownFraudBase				= false 
+	,boolean															PSkipDeltabaseBase					= false 
 	,boolean															PSkipAddressCache					= false 
 	,boolean															PSkipMainBase           		= false 
  	,dataset(FraudShared.Layouts.Base.Main)			pBaseMainFile						= IF(_Flags.Update.Main, FraudShared.Files().Base.Main.QA, DATASET([], FraudShared.Layouts.Base.Main))
 	,dataset(Layouts.Base.IdentityData)				pBaseIdentityDataFile			= IF(_Flags.Update.IdentityData, Files().Base.IdentityData.QA, DATASET([], Layouts.Base.IdentityData))
 	,dataset(Layouts.Base.KnownFraud)					pBaseKnownFraudFile				= IF(_Flags.Update.KnownFraud, Files().Base.KnownFraud.QA, DATASET([], Layouts.Base.KnownFraud))
+	,dataset(Layouts.Base.Deltabase)					pBaseDeltabaseFile				= IF(_Flags.Update.Deltabase, Files().Base.Deltabase.QA, DATASET([], Layouts.Base.Deltabase))	
 	,dataset(Layouts.Input.IdentityData)				pUpdateIdentityDataFile		= Files().Input.IdentityData.Sprayed
 	,dataset(Layouts.Input.KnownFraud)					pUpdateKnownFraudFile			= Files().Input.KnownFraud.Sprayed
+	,dataset(Layouts.Input.Deltabase)					pUpdateDeltabaseFile			= Files().Input.Deltabase.Sprayed
 	,dataset(FraudShared.Layouts.Base.Main)			pBaseMainBuilt						= File_keybuild(FraudShared.Files(pversion).Base.Main.Built)
 	// This below flag is to run full file or update append if pUpdateIdentityDataflag = false full file run and true runs update append of the base file
 	,boolean                                    	pUpdateIdentityDataFlag		= _Flags.Update.IdentityData
 	,boolean                                     pUpdateKnownFraudFlag			= _Flags.Update.KnownFraud
+	,boolean                                     pUpdateDeltabaseFlag			= _Flags.Update.Deltabase
 	,boolean                                     PSkipKeysPortion					= false
 ) :=
 module
@@ -41,6 +45,7 @@ module
 				 pversion
 				,PSkipIdentityDataBase
 				,PSkipKnownFraudBase
+				,PSkipDeltabaseBase
 			 ).All
 			,HeaderInfo.Post
 			,AddressesInfo(pversion).Post				 
@@ -52,6 +57,7 @@ module
 				 pversion
 				,PSkipIdentityDataBase
 				,PSkipKnownFraudBase
+				,PSkipDeltabaseBase
 				,PSkipAddressCache
 				,PSkipMainBase
 				//Base
@@ -64,6 +70,10 @@ module
 				,pBaseKnownFraudFile				
 				,pUpdateKnownFraudFile	
 				,pUpdateKnownFraudFlag
+				//Deltabase
+				,pBaseDeltabaseFile				
+				,pUpdateDeltabaseFile	
+				,pUpdateDeltabaseFlag				
 			).All
 			,FraudgovInfo(pversion,'Base_Completed').postNewStatus
 			,notify('Base_Completed','*')
