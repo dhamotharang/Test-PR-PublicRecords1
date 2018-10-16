@@ -89,7 +89,7 @@ inf_dis:=distribute(infile
 		#if('P' in matchset)
 			ssn_field[6..9],
 		#end		
-		#if('D' in matchset)
+		#if('D' in matchset or 'B' in matchset)
 			dob_field,
 		#end	
 		#if('A' in matchset)
