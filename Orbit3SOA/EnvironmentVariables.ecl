@@ -19,7 +19,7 @@ export EnvironmentVariables := module
 		);
 	export statLandingZoneServer := 
 		if (_control.ThisEnvironment.Name = 'Prod_Thor', 
-			'10.195.88.85',// - Alpha //'10.237.6.40', - Boca
+			'prod_dali.br.seisint.com',// - Alpha //'10.237.6.40', - Boca
 			'10.121.145.163'
 		);
 
