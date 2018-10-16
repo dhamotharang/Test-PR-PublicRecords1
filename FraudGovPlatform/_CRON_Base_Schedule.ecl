@@ -1,21 +1,21 @@
-﻿import _Control;
-
-EVERY_DAY_AT_6AM := '0 6 * * *';
+﻿import _Control,FraudGovPlatform_Validation;
+EVERY_DAY_AT_5PM := '30 17 * * *';
 IP:=IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
-RootDir := Constants.DeltaLandingZonePathBase;
-
-ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev','thor400_30');
 
 lECL1 :=
  'import ut;\n'
 +'#CONSTANT	(\'Platform\',\'FraudGov\');\n'
-+'wuname := \'FraudGov Deltabase Input Prep\';\n'
++'#STORED(\'_Validate_Year_Range_Low\',1900);\n'
++'#STORED(\'_Validate_Year_Range_High\',2018);\n'
++'#OPTION(\'multiplePersistInstances\',FALSE);\n'
++'version:=ut.GetDate : independent;\n'
++'wuname := \'FraudGov Build Base \' + version;\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
 +'email(string msg):=fileservices.sendemail(\n'
 +'   \'oscar.barrientos@lexisnexis.com\'\n'
-+' 	 ,\'FraudGov Deltabase Input Prep\'\n'
++' 	 ,\'FraudGov Build Base Schedule\'\n'
 +' 	 ,msg\n'
 +' 	 +\'Build wuid \'+workunit\n'
 +' 	 );\n\n'
@@ -23,21 +23,18 @@ lECL1 :=
 +'d := sort(nothor(WorkunitServices.WorkunitList(\'\',,,wuname,\'\'))(wuid <> thorlib.wuid() and job = wuname and state in valid_state), -wuid);\n'
 +'d_wu := d[1].wuid;\n'
 +'active_workunit :=  exists(d);\n'
-+'version:=ut.GetDate : independent;\n'
 +'if(active_workunit\n'
 +'		,email(\'**** WARNING - Workunit \'+d_wu+\' in Wait, Queued, or Running *******\')\n'
-+'		,sequential(FraudGovPlatform_Validation.SprayAndQualifyDeltabase(version,\''+IP+'\',\''+RootDir+'\',\''+ThorName+'\'))\n'
++'		,FraudGovPlatform.Build_All(version).Build_Base_Files\n'
 +'	);\n'
 ;
 
 #WORKUNIT('protect',true);
-#WORKUNIT('name', 'FraudGov Deltabase Input Prep Schedule');
+#WORKUNIT('name', 'FraudGov Build Base Schedule');
 
-d:=FileServices.RemoteDirectory(IP, RootDir+'ready/', '*.dat');
-// if(exists(d),_Control.fSubmitNewWorkunit(lECL1, ThorName ),'NO FILES TO SPRAY' )
-if(exists(d), output(lECL1) ,output('NO FILES TO SPRAY'))
-			: WHEN(CRON(EVERY_DAY_AT_6AM))
+output(lECL1)
+			: WHEN(CRON(EVERY_DAY_AT_5PM))
 			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
-																			,'FraudGov Deltabase Input Prep SCHEDULE failure'
-																			,Constants.NOC_MSG
+																			,'FraudGov Build Base Schedule failure'
+																			,FraudGovPlatform_Validation.Constants.NOC_MSG
 																			));
