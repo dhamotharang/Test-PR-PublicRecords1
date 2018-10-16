@@ -53,7 +53,7 @@ ECL:='FraudGovPlatform_Validation._CRON_NACInputPrepSchedule;';
 Go:=sequential(wk_ut.CreateWuid(ECL,THOR,ESP),email(wuname));
 EXPORT CRON_NACInputPrepSchedule:=if(d=0,Go,noGo);
 
-//5PM
+//5:30PM
 wuname:='FraudGov Prep Base Scheduler';
 d:=count(WorkunitServices.WorkunitList('',jobname:=wuname)(state in valid_state));
 ECL:='FraudGovPlatform._CRON_Base_Schedule;';

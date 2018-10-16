@@ -1,6 +1,6 @@
 ﻿import _Control,FraudGovPlatform_Validation;
 
-EVERY_DAY_AT_5PM := '0 17 * * *';
+EVERY_DAY_AT_5PM := '30 17 * * *';
 IP:=IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
 
 lECL1 :=
