@@ -2,7 +2,7 @@
 
 EXPORT _CRON_Master_Controller := MODULE
 
-SHARED THOR:='hthor_dev';
+SHARED THOR:=if(_Control.ThisEnvironment.Name<> 'Prod_Thor','hthor_dev_eclcc','hthor');
 SHARED valid_state := ['blocked','compiled','submitted','running','wait'];
 
 dummy:='';
