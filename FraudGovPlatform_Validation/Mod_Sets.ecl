@@ -10,7 +10,7 @@ EXPORT validTerminatorsDeltabase := '|\n';
 
 EXPORT IdentityData_numberOfColumns := 58;
 EXPORT KnownFraud_numberOfColumns	:= 117;
-EXPORT Deltabase_numberOfColumns	:=50;
+EXPORT Deltabase_numberOfColumns	:=56;
 EXPORT VelocityRules_numberOfColumns	:=15;
 
 EXPORT CriticalFieldError_IdentityData	:= [
