@@ -1,6 +1,6 @@
 ﻿import _Control,STD;
 
-every_10_min := '*/10 0-23 * * *';
+every_10_min := '*/10 8-17 * * *';
 IP:= FraudGovPlatform_Validation.Constants.LandingZoneServer;
 RootDir := FraudGovPlatform_Validation.Constants.LandingZonePathBase;
 LzFilePath :=FraudGovPlatform_Validation.Constants.LandingZoneFilePathRgx;

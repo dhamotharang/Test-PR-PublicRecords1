@@ -1,21 +1,17 @@
-﻿import _Control;
+﻿import _Control,FraudGovPlatform_Validation;
 
-EVERY_DAY_AT_6AM := '0 6 * * *';
 IP:=IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
-RootDir := Constants.DeltaLandingZonePathBase;
-
-ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev','thor400_30');
 
 lECL1 :=
  'import ut;\n'
 +'#CONSTANT	(\'Platform\',\'FraudGov\');\n'
-+'wuname := \'FraudGov Deltabase Input Prep\';\n'
++'wuname := \'FraudGov Build Keys Controller\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
 +'email(string msg):=fileservices.sendemail(\n'
 +'   \'oscar.barrientos@lexisnexis.com\'\n'
-+' 	 ,\'FraudGov Deltabase Input Prep\'\n'
++' 	 ,\'FraudGov Build Keys Controller\'\n'
 +' 	 ,msg\n'
 +' 	 +\'Build wuid \'+workunit\n'
 +' 	 );\n\n'
@@ -26,18 +22,16 @@ lECL1 :=
 +'version:=ut.GetDate : independent;\n'
 +'if(active_workunit\n'
 +'		,email(\'**** WARNING - Workunit \'+d_wu+\' in Wait, Queued, or Running *******\')\n'
-+'		,sequential(FraudGovPlatform_Validation.SprayAndQualifyDeltabase(version,\''+IP+'\',\''+RootDir+'\',\''+ThorName+'\'))\n'
++'		,sequential(FraudGovPlatform.Build_All(version).Build_Key_Files\n'
 +'	);\n'
 ;
 
 #WORKUNIT('protect',true);
-#WORKUNIT('name', 'FraudGov Deltabase Input Prep Schedule');
+#WORKUNIT('name', 'FraudGov Build Keys Controller');
 
-d:=FileServices.RemoteDirectory(IP, RootDir+'ready/', '*.dat');
-// if(exists(d),_Control.fSubmitNewWorkunit(lECL1, ThorName ),'NO FILES TO SPRAY' )
-if(exists(d), output(lECL1) ,output('NO FILES TO SPRAY'))
-			: WHEN(CRON(EVERY_DAY_AT_6AM))
+output(lECL1)
+			: WHEN('Base_Completed')
 			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
-																			,'FraudGov Deltabase Input Prep SCHEDULE failure'
-																			,Constants.NOC_MSG
+																			,'FraudGov Build Keys Controller failure'
+																			,FraudGovPlatform_Validation.Constants.NOC_MSG
 																			));
