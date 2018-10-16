@@ -114,7 +114,7 @@ module
 	
 	export Build_Base_Files :=
 	if(tools.fun_IsValidVersion(pversion)
-		,base_portion
+		,sequential(input_portion, base_portion)
 		,output('No Valid version parameter passed, skipping FraudGovPlatform.Build_All')
 	);
 

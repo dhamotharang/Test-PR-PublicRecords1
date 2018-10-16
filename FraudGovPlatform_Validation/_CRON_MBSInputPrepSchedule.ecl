@@ -1,6 +1,6 @@
 ﻿import _Control;
 
-every_10_min := '*/10 0-23 * * *';
+EVERY_DAY_AT_5AM := '0 5 * * *';
 IP:=Constants.LandingZoneServer;
 RootDir := Constants.MBSLandingZonePathBase;
 ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev','thor400_30');
@@ -33,7 +33,7 @@ lECL1 :=
 
 d:=FileServices.RemoteDirectory(IP, RootDir+'ready/', '*.dat');
 if(exists(d), output(lECL1) ,output('NO FILES TO SPRAY'))
-			: WHEN(CRON(every_10_min))
+			: WHEN(CRON(EVERY_DAY_AT_5AM))
 			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
 																			,'FraudGov Input Prep SCHEDULE failure'
 																			,Constants.NOC_MSG

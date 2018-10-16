@@ -1,6 +1,6 @@
 ﻿import _Control, NAC;
 
-every_day := '0 5 * * *';
+EVERY_DAY_AT_6AM := '0 6 * * *';
 IP			:= NAC.Constants.LandingZoneServer;
 RootDir	:= NAC.Constants.LandingZonePathBase + '/msh/done/';
 
@@ -35,7 +35,7 @@ lECL1 :=
 d:=FileServices.RemoteDirectory(IP, RootDir+'ready/', '*.dat');
 
 if(exists(d),_Control.fSubmitNewWorkunit(lECL1, ThorName ),'NO FILES TO SPRAY' )
-			: WHEN(CRON(every_day))
+			: WHEN(CRON(EVERY_DAY_AT_6AM))
 			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
 																			,'FraudGov NAC Input Prep SCHEDULE failure'
 																			,FraudGovPlatform_Validation.Constants.NOC_MSG
