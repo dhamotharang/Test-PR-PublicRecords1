@@ -8,6 +8,7 @@
 IMPORT iesp, WSInput, DMAP_Services;
 
 EXPORT ReportService:= MACRO
+	#CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	#ONWARNING(4207, IGNORE);
 	WSInput.MAC_DMAP_Services_ReportService();
 	
