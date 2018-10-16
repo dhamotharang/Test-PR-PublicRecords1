@@ -2,9 +2,10 @@
 
 EXPORT Map_RiskIndicators(string8 version) := FUNCTION
 
-	inFile 					:= distribute(PhoneFinderReportDelta.File_PhoneFinder_In.RiskIndicators_Raw);
+	inFile 					:= distribute(PhoneFinderReportDelta.File_PhoneFinder.RiskIndicators_Raw);
 	
 	//DF-23251: Add 'dx_' Prefix to Index Definitions
+	//DF-23286: Update Keys
 	dx_PhoneFinderReportDelta.Layout_PhoneFinder.RiskIndicators_Main trRInd(inFile l):= transform
 		self.date_file_loaded 				:= version;
 		self.date_added								:= PhoneFinderReportDelta._Functions.keepNum(l.date_added)[1..8];
@@ -16,7 +17,7 @@ EXPORT Map_RiskIndicators(string8 version) := FUNCTION
 	end;
 	
 	mapRiskIndMain 	:= project(inFile, trRInd(left));
-	concatFile			:= mapRiskIndMain + dx_PhoneFinderReportDelta.File_PhoneFinder.RiskIndicators_Main;	
+	concatFile			:= mapRiskIndMain + PhoneFinderReportDelta.File_PhoneFinder.RiskIndicators_Main;//DF-23286
 	ddConcat 				:= dedup(sort(distribute(concatFile, hash(transaction_id)), transaction_id, sequence_number, phone_id, -(date_added+time_added), local), transaction_id, sequence_number, phone_id, local);
 
 	return ddConcat;  

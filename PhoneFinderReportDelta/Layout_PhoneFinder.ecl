@@ -1,16 +1,14 @@
 ﻿EXPORT Layout_PhoneFinder := MODULE
 
 	//DF-23251: Add 'dx_' Prefix to Index Definitions
+	//DF-23286: Update Keys
 	
 	///////////////////////////////////
 	//Transactions/////////////////////
 	///////////////////////////////////
-	
-	export Transactions_Main := record
-			string8		date_file_loaded;
+	export Transactions_In := record
 			string16	transaction_id;	
-			string8 	transaction_date;
-			string6 	transaction_time;
+			string20 	transaction_date;
 			string60	user_id;
 			string8 	product_code;
 			string16 	company_id;
@@ -34,29 +32,29 @@
 			string32 	phone_type;
 			string32 	phone_status;
 			integer5 	ported_count;
-			string8 	last_ported_date;
-			string6 	last_ported_time;
+			string20 	last_ported_date;
 			integer5 	otp_count;
-			string8 	last_otp_date;
-			string6 	last_otp_time;
+			string20 	last_otp_date;
 			integer5 	spoof_count;
-			string8 	last_spoof_date;
-			string6 	last_spoof_time;
+			string20 	last_spoof_date;
 			string32 	phone_forwarded;
-			string8		date_added;
-			string6		time_added;
+			string20 	date_added;
+	end;
+
+	export Transactions_Raw := record
+			Transactions_In;
+			string255 filename{virtual (logicalfilename)};
 	end;
 	
-	export Transactions_Index := record
-			Transactions_Main-date_file_loaded;
+	export Transactions_History := record
+			Transactions_In;
+			string255 filename;
 	end;
 	
 	///////////////////////////////////
 	//Other Phones/////////////////////
 	///////////////////////////////////
-	
-	export OtherPhones_Main := record
-			string8		date_file_loaded;
+	export OtherPhones_In := record
 			string16	transaction_id;
 			integer5	sequence_number;
 			integer5	phone_id;
@@ -68,20 +66,23 @@
 			string16 	porting_code;
 			string32 	phone_forwarded;
 			integer1 	verified_carrier;
-			string8		date_added;
-			string6		time_added;
+			string20 	date_added;
 	end;
 	
-	export OtherPhones_Index := record
-			OtherPhones_Main-date_file_loaded;
+	export OtherPhones_Raw := record
+			OtherPhones_In;
+			string255 filename{virtual (logicalfilename)};
+	end;
+	
+	export OtherPhones_History := record
+			OtherPhones_In;
+			string255 filename;
 	end;
 	
 	///////////////////////////////////
 	//Identities///////////////////////
 	///////////////////////////////////
-	
-	export Identities_Main := record
-			string8		date_file_loaded;
+	export Identities_In := record
 			string16	transaction_id;
 			integer5	sequence_number;
 			string32	lexid;
@@ -91,67 +92,41 @@
 			string16	state;
 			string10	zip;
 			integer1	verified_carrier;
-			string8		date_added;
-			string6		time_added;
+			string20 	date_added;
 	end;
 	
-	export Identities_Index := record
-			Identities_Main-date_file_loaded;
+	export Identities_Raw := record
+			Identities_In;
+			string255 filename{virtual (logicalfilename)};
+	end;
+	
+	export Identities_History := record
+			Identities_In;
+			string255 filename;
 	end;
 	
 	///////////////////////////////////
 	//Risk Indicators//////////////////
 	///////////////////////////////////
-	
-	export RiskIndicators_Main := record
-			string8		date_file_loaded;
+	export RiskIndicators_In := record
 			string16	transaction_id;
 			integer5	phone_id;
 			integer5	sequence_number;
+			string20 	date_added;
 			integer5	risk_indicator_id;
 			string16	risk_indicator_level;
 			string256	risk_indicator_text;
 			string32	risk_indicator_category;
-			string8		date_added;
-			string6		time_added;
 	end;
 	
-	export RiskIndicators_Index := record
-			RiskIndicators_Main-date_file_loaded;
+	export RiskIndicators_Raw := record
+			RiskIndicators_In;	
+			string255 filename{virtual (logicalfilename)};
 	end;
 	
-	////////////////////////////////////
-	//Additional Transactions Indexes///
-	////////////////////////////////////
-	
-	export Transactions_CompanyId := record
-			string16 	company_id;
-			string8 	transaction_date;
-			string16	transaction_id;	
-	end;
-
-	export Transactions_CompanyRefCode := record
-			string16 	company_id;
-			string60	reference_code;
-			string8 	transaction_date;
-			string16	transaction_id;	
-	end;
-	
-	export Transactions_Date := record
-			string8 	transaction_date;
-			string16	transaction_id;	
-	end;
-	
-	export Transactions_RefCode := record
-			string60	reference_code;
-			string8 	transaction_date;
-			string16	transaction_id;	
-	end;
-	
-	export Transactions_UserID := record
-			string60	user_id;
-			string8 	transaction_date;
-			string16	transaction_id;	
+	export RiskIndicators_History := record
+			RiskIndicators_In;
+			string255 filename;
 	end;
 	
 END;
