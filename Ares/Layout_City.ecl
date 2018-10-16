@@ -3,11 +3,6 @@
 	string value {xpath('value')};
 end;
 
-date := record
-	string dateBegan  {xpath('dateBegan')};
-	string dateCeased {xpath('dateCeased')};
-end;
-
 identifier := record
   string transferable{xpath('identifier/@transferable')};
   string type {xpath('type')};
@@ -22,8 +17,9 @@ metric := record
 	string date {xpath('date')};
 end;
 
-additionalInfo := record
-  string additionalInfo {xpath('additionalInfo')};
+region := record
+	string type {xpath('type')};
+	string value {xpath('value')};
 end;
 
 layout_place := record
@@ -31,25 +27,31 @@ layout_place := record
   string link_rel{xpath('link/@rel')};
 end;
 
-layout_redirectTo := record
+layout_within := record
 	dataset(layout_place) place{xpath('place')};
 end;
 
-layout_summary := record
-	string type{xpath('type')};
-	dataset(name) names{xpath('names/name')};
-	string citySortKey{xpath('names/citySortKey')};
-	string status {xpath('status')};
-	dataset(date) dates{xpath('dates/date')};
-	dataset (layout_redirectTo) rediretTo{xpath('redirectTo')};
-	dataset(identifier) identifiers{xpath('identifiers/identifier')};
-	dataset(metric) demographics{xpath('demographics/metric')};
-  dataset(additionalInfo) additionalInfos{xpath('additionalInfos/additionalInfo')};
-	string useInAddress{xpath('useInAddress')};
+layout_name := record
+	dataset(name) names{xpath('name')};
+	string citySortKey{xpath('citySortKey')};
 end;
 
+layout_summary := record
+	layout_name names{xpath('names')};
+	string status {xpath('status')};
+	dataset(identifier) identifiers{xpath('identifiers/identifier')};
+	dataset(metric) demographics{xpath('demographics/metric')};
+  string useInAddress{xpath('useInAddress')};
+end;
 
+layout_alternativeRegions := record
+ dataset(region) alternativeRegions{xpath('region')};
+end;
 export layout_city := record
- 
+    string id {xpath('@id')};
+		string fid {xpath('@fid')};
+    string tfpid {xpath('@tfpid')};
 		layout_summary summary{xpath('summary')};
+		layout_within within{xpath('within')};
+		layout_alternativeRegions alternativeRegions{xpath('alternativeRegions')};
 end;
