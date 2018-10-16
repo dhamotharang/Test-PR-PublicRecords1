@@ -96,7 +96,7 @@ EXPORT getCitizenship(DATASET(DueDiligence.Layouts.Input) validInput,
             
     // IF(debug, output(iid, NAMED('iid')));
     // IF(debug, output(bocaShell, NAMED('bocaShell')));
-    // IF(modelValidation, output(Citizenship.fn_modelValidation(indicators, modelResults), NAMED('modelValidationResults')));
+    IF(modelValidation, output(Citizenship.fn_modelValidation(indicators, modelResults), NAMED('modelValidationResults')));
     
     
             
