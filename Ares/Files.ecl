@@ -2,6 +2,7 @@
 EXPORT Files := Module
 
 Export ds_area := dataset(Constants.filename_Area, layout_area, XML('area',NOROOT));
+Export ds_city := dataset(Constants.filename_City, Layout_City, XML('city',NOROOT));
 
 shared area := DATASET(Constants.filename_Area, {STRING area {XPATH('<>')}},XML('area', NOROOT));
 shared city := DATASET(Constants.filename_City,{STRING city {XPATH('<>')}},XML('city', NOROOT));
