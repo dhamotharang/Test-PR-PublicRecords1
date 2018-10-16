@@ -394,6 +394,7 @@ TRANSFORM
   SELF.cflags.negative_alert := (ri.negative_alert='1');
   SELF.cflags.id_theft_flag := (ri.id_theft_flag='1');
   SELF := le;
+	self := [];
 END;
 bshell_w_flags := JOIN (bshellID, fcra.Key_Override_PCR_UID, 
                         keyed(LEFT.CID=RIGHT.UID),

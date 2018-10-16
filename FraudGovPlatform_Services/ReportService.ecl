@@ -1,4 +1,4 @@
-﻿﻿/*--SOAP--
+/*--SOAP--
 <message name="ReportService">
     <part name="FraudGovReportRequest" type="tns:XmlDataSet" cols="80" rows="30"/>
 </message>
@@ -7,7 +7,7 @@
 IMPORT BatchShare,doxie, FraudShared_Services, iesp, WSInput;
 
 EXPORT ReportService() := MACRO
-  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+  #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 
 	//The following macro defines the field sequence on WsECL page of query.
 	WSInput.MAC_FraudGovPlatform_Services_ReportService();
