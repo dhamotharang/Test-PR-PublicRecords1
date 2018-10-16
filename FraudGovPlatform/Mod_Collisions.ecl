@@ -18,7 +18,6 @@ record
 	string2			st;
 	string9			ssn;
 	unsigned		dob;
-	unsigned6		record_id;	
 	unsigned6		did := 0;
 	unsigned1		did_score := 0;
 end;
@@ -169,16 +168,17 @@ concat_all := //sort(
 concat_srt
 					:=
 							sort(concat_all
-										,old_rid
+										,did
 										,pri
-										,new_rid
-										);
+										)
+							:persist(Filenames().OutputF.mod_collisions_concat_srt);
 concat_ddp
 					:=
 							dedup(concat_srt
-										,old_rid
-										);
+										,did
+										)
+							:persist(Filenames().OutputF.mod_collisions_concat_ddp);
 
-EXPORT matches := sort(concat_ddp,-new_rid, -pri);
+EXPORT matches := concat_ddp;
 
 END;

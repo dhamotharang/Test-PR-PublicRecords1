@@ -77,7 +77,6 @@ inf_dis:=distribute(infile
 		)
 		,hash(
 		#if('N' in matchset)
-			lname_field,
 			fname_field,		
 		#end	
 		#if('V' in matchset)
@@ -90,7 +89,7 @@ inf_dis:=distribute(infile
 		#if('P' in matchset)
 			ssn_field[6..9],
 		#end		
-		#if('D' in matchset or 'B' in matchset)
+		#if('D' in matchset)
 			dob_field,
 		#end	
 		#if('A' in matchset)
@@ -104,7 +103,7 @@ inf_dis:=distribute(infile
 		#if('Z' in matchset)
 			zip_field,
 		#end
-		''
+		lname_field
 		));
 
 inf_ddp:=dedup(inf_dis,		record,		all,		local);
@@ -182,6 +181,7 @@ match:=join(inf_ddp,inf_ddp,
 			right.pname_field<>'' and
 			left.pname_field=right.pname_field and
 			left.prange_field=right.prange_field and
+			((left.ssn_field = '' and	right.ssn_field='' and left.ssn_field = right.ssn_field) or	 left.ssn_field <> right.ssn_field) and
 		#end		
 
 		#if('C' in matchset)
@@ -191,12 +191,14 @@ match:=join(inf_ddp,inf_ddp,
 			right.state_field<>'' and
 			left.city_field=right.city_field and
 			left.state_field=right.state_field and
+			((left.ssn_field = '' and	right.ssn_field='' and left.ssn_field = right.ssn_field) or	 left.ssn_field <> right.ssn_field) and
 		#end
 
 		#if('Z' in matchset)
 			left.zip_field<>'' and
 			right.zip_field<>'' and
 			left.zip_field=right.zip_field and
+			((left.ssn_field = '' and	right.ssn_field='' and left.ssn_field = right.ssn_field) or	 left.ssn_field <> right.ssn_field) and
 		#end
 
 		true	//the one just keeps the "and" from messing it up
