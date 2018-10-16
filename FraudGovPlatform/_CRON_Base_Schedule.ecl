@@ -9,7 +9,7 @@ lECL1 :=
 +'#STORED(\'_Validate_Year_Range_High\',2018);\n'
 +'#OPTION(\'multiplePersistInstances\',FALSE);\n'
 +'version:=ut.GetDate : independent;\n'
-+'wuname := \'FraudGov Build Base\' + version;\n'
++'wuname := \'FraudGov Build Base \' + version;\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
