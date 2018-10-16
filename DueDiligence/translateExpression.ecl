@@ -170,13 +170,10 @@ EXPORT translateExpression := MODULE
         
         expressionDetails := expressionDCT[enumReference];
         
-        expressionResults := MAP(trimTextToSearch = DueDiligence.Constants.EMPTY => ExpressionEnum.NO_OFFENSE_PROVIDED,
-                                 STD.str.ToUpperCase(trimTextToSearch) = 'NOT SPECIFIED' => ExpressionEnum.NO_OFFENSE_PROVIDED,
-                                 expressionDetails.expressionToUse = DueDiligence.Constants.EMPTY => ExpressionEnum.UNCATEGORIZED,
-                                 IF(REGEXFIND(expressionDetails.expressionToUse, textToSearch, NOCASE), expressionDetails.expressionWeight, ExpressionEnum.UNCATEGORIZED));
+        expressionResults := IF(REGEXFIND(expressionDetails.expressionToUse, textToSearch, NOCASE), expressionDetails.expressionWeight, ExpressionEnum.UNCATEGORIZED);
                                  
                                  
-        expressionFound := expressionResults NOT IN [ExpressionEnum.NO_OFFENSE_PROVIDED, ExpressionEnum.UNCATEGORIZED];
+        expressionFound := expressionResults NOT IN [ExpressionEnum.UNCATEGORIZED];
                                
                                
         //if the enum passed in is in the following group, there are additional checks to make prior to just using the expression itself
@@ -184,7 +181,12 @@ EXPORT translateExpression := MODULE
                                 additionalChecksToExpression(enumReference, offenseScore, offenseCategory, trafficFlag, expressionFound),
                                 expressionResults);
                                 
-        RETURN additionalChecks;
+        levelMatch := MAP(expressionDetails.expressionCategory = LEVEL_2 AND trimTextToSearch = DueDiligence.Constants.EMPTY => ExpressionEnum.NO_OFFENSE_PROVIDED,
+                          expressionDetails.expressionCategory = LEVEL_2 AND STD.str.ToUpperCase(trimTextToSearch) = 'NOT SPECIFIED' => ExpressionEnum.NO_OFFENSE_PROVIDED,
+                          expressionDetails.expressionCategory = LEVEL_2 AND expressionDetails.expressionToUse = DueDiligence.Constants.EMPTY => ExpressionEnum.UNCATEGORIZED,
+                          additionalChecks);
+                                
+        RETURN levelMatch;
 		END;
     
     
