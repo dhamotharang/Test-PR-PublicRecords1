@@ -9,8 +9,7 @@ dummy:='';
 SHARED noGo:=sequential(dummy);
 
 SHARED ENV:='PROD';
-// SHARED ESP:=_Control.IPAddress.prod_thor_esp;
-SHARED ESP:=_Control.IPAddress.dataland_esp;
+SHARED ESP:=_Control.IPAddress.prod_thor_esp;
 SHARED RESTART_MSG(string pMSG):='Restated '+pMSG+' in '+ENV;
 SHARED EMAIL(string pMSG) :=
 						fileservices.sendemail(
