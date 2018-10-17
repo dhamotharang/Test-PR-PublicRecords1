@@ -2,7 +2,7 @@
 
 EXPORT _CRON_Master_Controller := MODULE
 
-SHARED THOR:='hthor_dev';
+SHARED THOR:=if(_Control.ThisEnvironment.Name<> 'Prod_Thor','hthor_dev_eclcc','hthor');
 SHARED valid_state := ['blocked','compiled','submitted','running','wait'];
 
 dummy:='';
@@ -53,7 +53,7 @@ ECL:='FraudGovPlatform_Validation._CRON_NACInputPrepSchedule;';
 Go:=sequential(wk_ut.CreateWuid(ECL,THOR,ESP),email(wuname));
 EXPORT CRON_NACInputPrepSchedule:=if(d=0,Go,noGo);
 
-//5PM
+//5:30PM
 wuname:='FraudGov Prep Base Scheduler';
 d:=count(WorkunitServices.WorkunitList('',jobname:=wuname)(state in valid_state));
 ECL:='FraudGovPlatform._CRON_Base_Schedule;';
@@ -85,8 +85,9 @@ Go:=sequential(
 EXPORT Schedules := Go;
 
 Go:=sequential(
-						 CRON_Keys_Controller
-						,CRON_SoapAppends_Controller
+//						 CRON_Keys_Controller
+//						,CRON_SoapAppends_Controller
+						true
 						);
 EXPORT Controllers := Go;
 
