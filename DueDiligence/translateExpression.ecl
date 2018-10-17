@@ -155,10 +155,10 @@ EXPORT translateExpression := MODULE
                                   
                                   ExpressionEnum.INFRACTIONS_AND_ORDINANCES => IF(offenseScore = DueDiligence.Constants.INFRACTION or foundUsingExpression, enumReference, ExpressionEnum.UNCATEGORIZED),
                                   
-                                  ExpressionEnum.UNCATEGORIZED);
-                                         
+                                  ExpressionEnum.UNCATEGORIZED);            
 
-        RETURN expressionDCT[additionalChecks].expressionWeight;
+
+        RETURN additionalChecks;
     END;
     
     
@@ -180,12 +180,15 @@ EXPORT translateExpression := MODULE
         additionalChecks := IF(enumReference IN [ExpressionEnum.ALCOHOL_RELATED, ExpressionEnum.TRAFFIC_OFFENSES, ExpressionEnum.THEFT, ExpressionEnum.TRAFFICKING_SMUGGLING, ExpressionEnum.INFRACTIONS_AND_ORDINANCES],
                                 additionalChecksToExpression(enumReference, offenseScore, offenseCategory, trafficFlag, expressionFound),
                                 expressionResults);
-                                
-        levelMatch := MAP(expressionDetails.expressionCategory = LEVEL_2 AND trimTextToSearch = DueDiligence.Constants.EMPTY => ExpressionEnum.NO_OFFENSE_PROVIDED,
-                          expressionDetails.expressionCategory = LEVEL_2 AND STD.str.ToUpperCase(trimTextToSearch) = 'NOT SPECIFIED' => ExpressionEnum.NO_OFFENSE_PROVIDED,
-                          expressionDetails.expressionCategory = LEVEL_2 AND expressionDetails.expressionToUse = DueDiligence.Constants.EMPTY => ExpressionEnum.UNCATEGORIZED,
+        
+        //If we haven't categorized the offense, and in level 2 accounting for empty and 'Not Specified' offenses so they don't falsely hit in other levels (level 2 is lowest)
+        levelMatch := IF(additionalChecks = ExpressionEnum.UNCATEGORIZED,
+                          MAP(expressionDetails.expressionCategory = LEVEL_2 AND trimTextToSearch = DueDiligence.Constants.EMPTY => ExpressionEnum.NO_OFFENSE_PROVIDED,
+                              expressionDetails.expressionCategory = LEVEL_2 AND STD.str.ToUpperCase(trimTextToSearch) = 'NOT SPECIFIED' => ExpressionEnum.NO_OFFENSE_PROVIDED,
+                              expressionDetails.expressionCategory = LEVEL_2 AND expressionDetails.expressionToUse = DueDiligence.Constants.EMPTY => ExpressionEnum.UNCATEGORIZED,
+                              additionalChecks),
                           additionalChecks);
-                                
+        
         RETURN levelMatch;
 		END;
     
@@ -213,7 +216,6 @@ EXPORT translateExpression := MODULE
         
         getMaxLevelByLevel := DEDUP(SORT(determineMaxLevel, -levelResult, -expressionWeight), expressionCategory);
 
-      
         RETURN getMaxLevelByLevel[1].levelResult;
     END;
 END;
