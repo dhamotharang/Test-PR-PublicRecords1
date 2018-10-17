@@ -4,7 +4,7 @@ ThorName	:= if(_Control.ThisEnvironment.Name='Dataland','thor400_dev','thor400_4
 
 lECL1 :=
  'import ut;\n'
-+'wuname := \'FraudGov PII SOAP Appends\';\n'
++'wuname := \'FraudGov PII SOAP Appends Controller\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#Constant(\'Platform\',\'FraudGov\');\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
@@ -28,7 +28,7 @@ lECL1 :=
 ;
 
 #WORKUNIT('protect',true);
-#WORKUNIT('name', 'FraudGov PII SOAP Appends Schedule');
+#WORKUNIT('name', 'FraudGov PII SOAP Appends Controller');
 
 _Control.fSubmitNewWorkunit(lECL1, ThorName )	: WHEN('Build_FraudGov_PII_SOAP_Appends')
 																								,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
