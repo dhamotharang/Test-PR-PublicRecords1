@@ -4,7 +4,7 @@ every_10_min := '*/10 8-17 * * *';
 IP:= FraudGovPlatform_Validation.Constants.LandingZoneServer;
 RootDir := FraudGovPlatform_Validation.Constants.LandingZonePathBase;
 LzFilePath :=FraudGovPlatform_Validation.Constants.LandingZoneFilePathRgx;
-ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev','thor400_30');
+ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev','thor400_44');
 
 dsFileList:=nothor(FileServices.RemoteDirectory(ip, RootDir,'*.dat',true))(regexfind(LzFilePath,name,nocase)):global(few);
 dsFileListSorted := sort(dsFileList,modified);

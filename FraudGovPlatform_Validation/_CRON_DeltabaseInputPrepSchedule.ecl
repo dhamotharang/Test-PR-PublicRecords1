@@ -4,7 +4,7 @@ EVERY_DAY_AT_6AM := '0 6 * * *';
 IP:=IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
 RootDir := Constants.DeltaLandingZonePathBase;
 
-ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev','thor400_30');
+ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev','thor400_44');
 
 lECL1 :=
  'import ut;\n'
