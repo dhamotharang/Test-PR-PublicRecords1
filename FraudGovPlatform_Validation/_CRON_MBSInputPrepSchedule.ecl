@@ -3,7 +3,7 @@
 EVERY_DAY_AT_5AM := '0 5 * * *';
 IP:=Constants.LandingZoneServer;
 RootDir := Constants.MBSLandingZonePathBase;
-ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev','thor400_30');
+ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev','thor400_44');
 
 lECL1 :=
  'import ut;\n'
