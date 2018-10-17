@@ -265,7 +265,7 @@ export getBestCleaned(dataset(doxie.layout_references) deduped_dids,string50 Dat
 	best_data_roxie := join(deduped_dids, best_recs, left.did != 0 and left.did = right.did, 
 		get_best_layout(left, right), left outer, keep(1));
 
-	best_data_thor := join(distribute(deduped_dids, hash64(did)), best_recs, left.did != 0 and left.did = right.did, 
+	best_data_thor := join(distribute(deduped_dids, hash64(did)), distributed(best_recs, hash64(did)), left.did != 0 and left.did = right.did, 
 		get_best_layout(left, right), left outer, keep(1), LOCAL);
 										
   #IF(onThor)
