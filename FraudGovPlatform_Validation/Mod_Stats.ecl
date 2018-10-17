@@ -360,19 +360,23 @@ END;
 		
 		infile_r := record
 			infile;
-			unsigned3		file_type;
 			unsigned6		ind_type;			
 		end;
 		
-		p1 := project(infile, transform(infile_r, self.file_type := 3; self.ind_type := FraudGovPlatform.Functions.ind_type_fn(left.customer_program); self := left;));
+		p1 := project(infile, transform(infile_r, self.ind_type := FraudGovPlatform.Functions.ind_type_fn(left.customer_program); self := left;));
+
+		MBS_Layout := Record
+			FraudShared.Layouts.Input.MBS;
+			unsigned1 Deltabase := 0;
+		end;
+		MBS	:= project(FraudShared.Files().Input.MBS.sprayed(status = 1), transform(MBS_Layout, self.Deltabase := If(regexfind('DELTA', left.fdn_file_code, nocase),1,0); self := left));
 		
-		shared InqMbs := join(p1,FraudShared.Files().Input.MBS.sprayed(status = 1)
+		shared DeltabaseMbs := join(p1,MBS(Deltabase = 1)
 										,left.Customer_Account_Number =(string)right.gc_id
 										and left.ind_type = right.ind_type
-										and left.file_type = right.file_type
-										,transform({string20 Customer_Account_Number,string1		Customer_Program,string2		customer_state,string		customer_agency_vertical_type, string3 Customer_County,unsigned4 seq}
+										,transform({string20 Customer_Account_Number,string1		ind_type, unsigned4 seq}
 										,self.Customer_Account_Number:=left.Customer_Account_Number,
-										,self.Customer_Program:=left.customer_program
+										,self.ind_type:=(string)left.ind_type
 										,self.seq := counter
 										,self:=left),left only);
 	
@@ -389,11 +393,11 @@ END;
 			string255 field;
 			string255 value;
 			string50 	err;
-			InqMbs;
+			DeltabaseMbs;
 		end;
 
 
-		seqd:=project(InqMbs
+		seqd:=project(DeltabaseMbs
 						,transform(r
 							,self.seq:=counter
 							,self:=left
@@ -408,8 +412,8 @@ END;
 			self.RecordsTotal :=count(infile);
 			self.ErrorCount		:=mx;
 			self.RecordsRejected :=mx;
-			self.field 			:='Customer_Account_Number,customer_program,Customer_Agency_Vertical_Type';
-			self.value 			:=trim(l.Customer_Account_Number,left,right)+','+l.Customer_program+','+l.Customer_Agency_Vertical_Type;
+			self.field 			:='Customer_Account_Number,ind_type';
+			self.value 			:=trim(l.Customer_Account_Number,left,right)+','+l.ind_type;
 			self:=l;
 		end;
 
@@ -421,7 +425,7 @@ END;
 								,min_seq:=min(group,seq)
 								,err_cnt:=count(group)
 								,withRC
-      					},filedate,filetime,field,Customer_Account_Number,customer_program,Customer_Agency_Vertical_Type,few),filedate,filetime,-err_cnt);
+      					},filedate,filetime,field,Customer_Account_Number,ind_type,few),filedate,filetime,-err_cnt);
 
 						;
 

@@ -3,8 +3,13 @@
 EXPORT Append_RinID(DATASET(FraudShared.Layouts.Base.Main) FileBase) := FUNCTION
 	
 	// 2.Take new records w/o a lexid and join them to previous main file (AKA rinid, flexid, no match id)
-	previous_base 	:= distribute(FraudShared.Files().Base.Main.built, hash32(record_id));
-	building_base := distribute(FileBase, hash32(record_id));
+	Demo_Data	:= Files().Input.DemoData.Sprayed;
+	Previous_Build := FraudShared.Files().Base.Main.built;
+	
+	Previous_Build_And_Demo := if(_Flags.UseDemoData, Previous_Build + Demo_Data, Previous_Build);
+	
+	previous_base 	:= distribute(pull(Previous_Build_And_Demo), hash32(record_id)) ;
+	building_base := distribute(pull(FileBase), hash32(record_id));
 	
 	// 3.Where there is a match in #2 transfer the previous RinID over to the record w/o a lexid
 	
@@ -31,11 +36,13 @@ EXPORT Append_RinID(DATASET(FraudShared.Layouts.Base.Main) FileBase) := FUNCTION
 	
 	MAC_Sequence_Records(	building_base_without_rinids, did,	building_base_with_new_rinids, seed);
 	
-	building_base_all_rinids := 	building_base_with_previous_rinids(DID >= FirstRinID)
-												+	project(building_base_with_new_rinids,FraudShared.Layouts.Base.Main) ;
+	building_base_all_rinids := 	building_base_with_previous_rinids(DID >= FirstRinID)												
+												+	project(building_base_with_new_rinids,FraudShared.Layouts.Base.Main);
 
+	building_base_all_rinids_and_demo := building_base_all_rinids + if(_Flags.UseDemoData, Demo_Data(DID >= FirstRinID), dataset([], FraudShared.Layouts.Base.Main));
+	
 	//5.send all records with a RinID to be matched and collapsed
-	mtchs:= Mod_Collisions( building_base_all_rinids ).matches;
+	mtchs:= Mod_Collisions( building_base_all_rinids_and_demo ).matches;
   	//output(breakdown matchset)
 	pairs:=table(mtchs,{new_rid,old_rid});
 	Header.MAC_ApplyDid1( building_base_all_rinids  ,DID, pairs, outfile);
