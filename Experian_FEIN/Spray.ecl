@@ -11,7 +11,7 @@ EXPORT Spray(
 
 	EXPORT Input := DATASET([{
 		hostname,
-		IF(STD.Str.EndsWith('absolutePath','/'), absolutePath + '/', absolutePath),
+		IF(STD.Str.EndsWith('absolutePath','/'), absolutePath, absolutePath + '/'),
 		glob,
 		recordsize,
 		'~thor_data400::in::experian_fein::@version@',
