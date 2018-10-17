@@ -145,8 +145,14 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	// getting the records from deltabase database.
 	ds_delta_recentTransactions := mod_Deltabase_Functions(batch_params).getDeltabaseSearchRecords();
 	
+	//Getting the public records best to fill identity Detail card.
+	ds_GovBest := FraudGovPlatform_Services.Functions.getGovernmentBest(ds_dids_to_use, batch_params);
+	
+	//Getting the Contributory best to fill identity Detail card.
+	ds_contributoryBest := FraudGovPlatform_Services.Functions.getContributedBest(ds_dids_to_use, FraudGovPlatform_Services.Constants.FRAUD_PLATFORM);
+
 	//realtime record:
-	BOOLEAN isRealtimeRecord := adlDIDFound AND COUNT(ds_contributory_in) = 0;
+	BOOLEAN isRealtimeRecord := adlDIDFound AND COUNT(ds_contributoryBest) = 0;
 	
 	ds_batch_in_orig := PROJECT(ds_input_with_adl_did, FraudShared_Services.Layouts.BatchIn_rec);
 	ds_ExternalServices_recs := IF(isRealtimeRecord, 
@@ -154,14 +160,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 																	DATASET([], FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw));
 																		
 	ds_realtimescoring_rec := FraudGovPlatform_Services.mod_RealTimeScoring(ds_ExternalServices_recs, batch_params).ds_w_realTimeScore;
-	
-	
-	//Getting the public records best to fill identity Detail card.
-	ds_GovBest := FraudGovPlatform_Services.Functions.getGovernmentBest(ds_dids_to_use, batch_params);
-	
-	//Getting the Contributory best to fill identity Detail card.
-	ds_contributoryBest := FraudGovPlatform_Services.Functions.getContributedBest(ds_dids_to_use, FraudGovPlatform_Services.Constants.FRAUD_PLATFORM);
-																		
+
 	//Assembling all the pieces together to form search response.	
 	iesp.fraudgovsearch.t_FraudGovSearchRecord ElementsNIdentities_trans (FraudGovPlatform_Services.Layouts.elementNidentity_score_recs L, ds_fragment_tab_Recs R)  := TRANSFORM
 		boolean populateBest := L.fragment = Fragment_Types_const.PERSON_FRAGMENT;
@@ -243,7 +242,6 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 														SELF.NoOfRecentTransactions := COUNT(ds_delta_recentTransactions(UniqueId = (string)LEFT.LexID)),
 														SELF := []));														
 
-	// output(ds_delta_recentTransactions,named('ds_delta_recentTransactions'));	
 	// output(ds_allPayloadRecs, named('ds_allPayloadRecs'));
 	// output(ds_input_with_adl_did, named('ds_input_with_adl_did'));
 	// output(adlDIDFound, named('adlDIDFound'));
@@ -251,8 +249,6 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	// output(ds_contributory_in, named('ds_contributory_in'));
 	// output(ds_contributory_in_dedup, named('ds_contributory_in_dedup'));
 	// output(ds_dids_to_use, named('ds_dids_to_use'));
-	// output(ds_GovBest, named('ds_GovBest'));
-	// output(ds_contributoryBest, named('ds_contributoryBest'));
 	// output(ds_elements_dids, named('ds_elements_dids'));
 	// output(ds_combinedfreg_recs, named('ds_combinedfreg_recs'));
 	// output(ds_fragment_recs_w_value, named('ds_fragment_recs_w_value'));
@@ -260,7 +256,13 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	// output(ds_fragment_recs_sorted, named('ds_fragment_recs_sorted'));
 	// output(ds_fragment_recs_rolled, named('ds_fragment_recs_rolled'));
 	// output(ds_raw_cluster_recs, named('ds_raw_cluster_recs'));
-	// output(ds_cluster_recs_scores, named('ds_cluster_recs_scores'));
+	// output(ds_clusters, named('ds_clusters'));
+	// output(ds_delta_recentTransactions,named('ds_delta_recentTransactions'));
+	// output(ds_GovBest, named('ds_GovBest'));
+	// output(ds_contributoryBest, named('ds_contributoryBest'));
+	// output(isRealtimeRecord, named('isRealtimeRecord'));
+	// output(ds_realtimescoring_rec, named('ds_realtimescoring_rec'));
+	// output(ds_realtimerecord, named('ds_realtimerecord'));
 	// output(ds_fragment_recs_tab, named('ds_fragment_recs_tab'));
 	// output(ds_fragment_recs_w_scores, named('ds_fragment_recs_w_scores'));	
 	// output(ds_ExternalServices_recs, named('ds_ExternalServices_recs'));	
