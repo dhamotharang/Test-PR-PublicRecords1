@@ -1,4 +1,4 @@
-/*
+﻿/*
 Hacks:
   BIPV2_ProxID.matches: hack default force for cnp_number,cnp_name & prim_range(make sure they equal each other) in matchjoin attribute
                         add logic so that one side of cnp_name match(when SUPPORTED) is a DBA
