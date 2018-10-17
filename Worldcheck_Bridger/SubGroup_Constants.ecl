@@ -1083,6 +1083,8 @@
 		export string KEYWORD_FRCNIL								:= '771';
 		export string KEYWORD_PECG									:= '772';
 		export string KEYWORD_INFIU									:= '773';		
+		export string KEYWORD_GHBOG									:= '774';		
+		export string KEYWORD_EUEIB									:= '775';		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
 	

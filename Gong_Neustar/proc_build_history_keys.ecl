@@ -1,5 +1,5 @@
 ﻿import roxiekeybuild,relocations,ut,risk_indicators, doxie;
-import ut,promotesupers,RoxieKeyBuild,DayBatchEda, risk_indicators, doxie_cbrs, watchdog;
+import ut,promotesupers,RoxieKeyBuild,DayBatchEda, risk_indicators, doxie_cbrs, watchdog, strata;
 
 //g_did := Watchdog.DID_Gong;
 //ut.mac_SF_Move('~thor_data400::base::gong_did','P',mv_gong2prod);
@@ -134,6 +134,17 @@ RoxieKeyBuild.MAC_SK_Move_v2('~thor_data400::key::gong_history::fcra::@version@:
 RoxieKeyBuild.MAC_SK_Move_v2('~thor_data400::key::gong_history::fcra::@version@::wdtg','Q',mk_fcra_wdtg);					 
 */
 
+//DF-22158 - Verify deprecated fields are blank or zero
+cnt_fcra_address := OUTPUT(strata.macf_pops(Key_FCRA_History_Address,,,,,,FALSE,
+																													['caption_text','county_code','designation','disc_cnt18','disc_cnt6','prior_area_code',
+																													 'see_also_text']));
+cnt_fcra_did 			:= OUTPUT(strata.macf_pops(Key_FCRA_History_Did,,,,,,FALSE,
+																													['caption_text','county_code','designation','disc_cnt18','disc_cnt6','prior_area_code',
+																													 'see_also_text']));
+cnt_fcra_phone		 := OUTPUT(strata.macf_pops(Key_FCRA_History_Phone,,,,,,FALSE,
+																													['caption_text','county_code','designation','disc_cnt18','disc_cnt6','prior_area_code',
+																													 'see_also_text']));
+
 								 
 bk := parallel(bk_addr,bk_phone,bk_did,bk_hhid,bk_bdid,bk_name,bk_clnname,bk_zip_name,bk_npa_nxx_line,bk_surname,bk_wdtg,bk_cmp_name, bk_csn, bk_wnzip, bk_did_curr, bk_hhid_curr, Buildkey6, bk_cn, bk_cn_to_company, bk_LinkIDs/*, BuildFCRAkey5*/
 			,Build2ndFCRAkey5
@@ -153,12 +164,16 @@ mk := parallel(mk_addr,mk_phone,mk_did,mk_hhid,mk_bdid,mk_name,mk_clnname,mk_zip
 			//,mk_fcra_hhid,mk_fcra_bdid,mk_fcra_name,mk_fcra_companyname,mk_fcra_zip_name,mk_fcra_npa_nxx_line,mk_fcra_surname,mk_fcra_wdtg
 			);
 
+//DF-22158 - Verify deprecated fields are blank or zero
+fcra_deprecate_stats := parallel(cnt_fcra_address, cnt_fcra_did, cnt_fcra_phone);
+
 //build_keys := sequential(g_did, mv_gong2prod, bk, mv1, mk);
 build_keys := sequential(g_did, 
 		mv_gong2prod,
 		bk, 
 		mv1, 
-		mk
+		mk,
+		fcra_deprecate_stats
 //		RoxieKeybuild.updateversion('GongKeys',rundate,'cbrodeur@seisint.com, cguyton@seisint.com,charles.salvo@lexisnexis.com')
 );
 		//RoxieKeyBuild.updateversion('GongKeys',rundate,'cbrodeur@seisint.com',,'N',,,'A'),

@@ -22,6 +22,35 @@ shared death_base 			:= Files().base.death.qa;
 
 shared fraudpoint_base	:= Files().base.fraudpoint.qa;
 
+//original soap output files
+
+shared ciid_orig				:= Files().base.ciid_orig.built;
+
+shared crim_orig				:= Files().base.crim_orig.built;
+
+shared death_orig 			:= Files().base.death_orig.built;
+
+shared fraudpoint_orig 			:= Files().base.fraudpoint_orig.built;
+
+//original soap output files
+
+shared ciid_anon				:= Files().base.ciid_anon.built;
+
+shared crim_anon				:= Files().base.crim_anon.built;
+
+shared death_anon 			:= Files().base.death_anon.built;
+
+//Demo soap files anonymized
+
+shared ciid_demo_anon				:= Files().base.ciid_demo_anon.qa;
+
+shared crim_demo_anon				:= Files().base.crim_demo_anon.qa;
+
+shared death_demo_anon 			:= Files().base.death_demo_anon.qa;
+
+shared fraudpoint_demo 			:= Files().base.fraudpoint_demo.qa;
+
+//Pii
 Export Pii := Module
 
 		pbase:=Project(base,transform(Layouts.Pii
@@ -195,10 +224,15 @@ soap_results := soapcall(	soap_in,
 						// (errorcode='')
 						;
 
-p	:=	dedup(project(soap_results,Layouts.CIID),record,all);
+shared p	:=	dedup(project(soap_results,Layouts.CIID),record,all);
 
-ciid_combine	:= dedup((p + ciid_base),record,all);
-Export All		:= if(updatepii, ciid_combine,p); 
+shared ciid_prep	:= Anonymize.ciid(p).all;
+
+Export orig	:= if(updatepii,dedup((p + ciid_orig),all),p);
+
+Export	anon	:= if(updatepii,dedup((ciid_prep + ciid_anon),all),ciid_prep);
+
+Export all				:= dedup(anon + ciid_demo_anon,all);
 
 END;
 
@@ -271,8 +305,12 @@ soap_results := soapcall( soap_input,
 						;
 p:=dedup(project(soap_results,Layouts.Crim),record,all);
 
-crim_combine	:= dedup((p + crim_base),record,all);
-Export All		:= if(updatepii, crim_combine,p);
+crim_combine	:= dedup((p + crim_orig),record,all);
+
+Export orig		:= if(updatepii, crim_combine,p);
+
+Export all			:= dedup(orig + crim_demo_anon,all);
+
 									
 END;
 
@@ -335,10 +373,15 @@ soapResponse := soapcall( soap_input,
 						)
 						(matchcode<>'')
 						;
-p := dedup(Project(soapResponse,Layouts.Death),record,all);
+shared p := dedup(Project(soapResponse,Layouts.Death),record,all);
 
-Death_combine	:= dedup((p + death_base),record,all);
-Export All		:= if(updatepii, Death_combine,p);		
+shared Death_prep	:= Anonymize.Death(p).all;
+
+Export orig	:= if(updatepii,dedup((p + Death_orig),all),p);
+
+Export anon	:= if(updatepii,dedup((Death_prep + Death_anon),all),Death_prep);
+
+Export all		:= dedup(anon + Death_demo_anon,all);
 				
 END;
 
@@ -435,8 +478,11 @@ fp	:= dedup(project(soap_results	,Transform(Layouts.FraudPoint
 																	,self.did	:=(unsigned)left.acctno
 																	,self:=left)),record,all);
 
-Fp_combine	:= dedup((fp + fraudpoint_base),record,all);
-Export All		:= if(updatepii, Fp_combine,fp);	
+Fp_combine	:= dedup((fp + fraudpoint_orig),record,all);
+
+Export orig		:= if(updatepii, Fp_combine,fp);	
+
+Export all		:= dedup(orig + FraudPoint_Demo,all);
 
 END;
 

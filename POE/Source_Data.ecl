@@ -1,4 +1,4 @@
-import corp2,jigsaw,spoke,zoom,one_click_data,teletrack,garnishments,POEsFromEmails,POEsFromUtilities,SalesChannel, thrive;
+﻿import corp2,jigsaw,spoke,zoom,one_click_data,teletrack,garnishments,POEsFromEmails,POEsFromUtilities,SalesChannel, thrive;
 
 export Source_Data(
 	 boolean																					pUseOtherEnvironment	= false
@@ -13,7 +13,7 @@ export Source_Data(
 	,dataset(garnishments.Layouts.Base							)	pGarnishmentsBase			= garnishments.files			(psourceversion	,pUseOtherEnvironment).base.new
 	,dataset(POEsFromEmails.Layouts.Base						)	pPOEsFromEmailsBase		= POEsFromEmails.files		(psourceversion	,pUseOtherEnvironment).base.new
 	,dataset(POEsFromUtilities.layouts.base					) pPOEUtilityBase				= POEsFromUtilities.Files	(psourceversion	,pUseOtherEnvironment).base.new
-	,dataset(SalesChannel.layouts.Base							) pSalesChannelBase			= SalesChannel.Files			(psourceversion	,pUseOtherEnvironment).base.new
+	,dataset(SalesChannel.layouts.Base_new					) pSalesChannelBase			= SalesChannel.Files			(psourceversion	,pUseOtherEnvironment).base.new
   ,dataset(thrive.layouts.base							      ) pThrive			          = Thrive.Files						(psourceversion ,pUseOtherEnvironment).base.new
 
 ) :=

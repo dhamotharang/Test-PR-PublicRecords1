@@ -1,4 +1,4 @@
-import SexOffender, lib_stringlib;
+﻿import SexOffender, lib_stringlib;
 
 In_Base_file := Hygenics_SOff.File_OKC_Sex_Offender_DID(name_type = '0');
 
@@ -206,4 +206,4 @@ output(ds_AccurintMoxieFile,,'~thor_200::base::hd::OKC_Sex_Offender_File_Accurin
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-export Mapping_OKC_Cleaned_As_Accurint_In := output(sort_clean_ds,,'~thor_200::base::hd::OKC_Sex_Offender_File_Accurint_In',overwrite);
+export Mapping_OKC_Cleaned_As_Accurint_In := output(sort_clean_ds,,'~thor_200::base::hd::OKC_Sex_Offender_File_Accurint_In',overwrite,__compressed__);

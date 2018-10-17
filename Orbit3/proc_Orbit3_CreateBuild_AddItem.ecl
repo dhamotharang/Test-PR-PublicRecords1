@@ -65,7 +65,7 @@ export proc_Orbit3_CreateBuild_AddItem(string buildname,string Buildvs,string En
 												 keyword = 'NO_ITEMS_FOUND' and status = 'FAIL' => 'No Build Components found to Add in Orbit',
 												 'N/A'
 												 );
-	   return	 fileservices.sendemail(
+	   	 emailtoall :=  fileservices.sendemail(
 												_Control.MyInfo.EmailAddressNotify +'; sudhir.kasavajjala@lexisnexis.com',
 												' Orbit for Build : '+buildname+',version: '+Buildvs+',Env : '+Orbit3.Constants(Envmt).which_env,
 												'BuildName:'+buildname+'\n'+
@@ -79,6 +79,13 @@ export proc_Orbit3_CreateBuild_AddItem(string buildname,string Buildvs,string En
 												'Error Description:'+error_description+'\n'+
 												'---------------------'+'\n'+
 												'Workunit:'+workunit);
+												
+		verifystatus := if ( status <> 'FAIL' , emailtoall , Sequential ( emailtoall,
+									                                                                             FAIL( 'Orbit Build Instance Update Aborted .Build Name :'+buildname+ ' Build Version: '+Buildvs+' Reason:'+error_description )
+																					          )
+							);
+							
+		return verifystatus;
 	   end;
 												
 			
@@ -86,7 +93,7 @@ export proc_Orbit3_CreateBuild_AddItem(string buildname,string Buildvs,string En
 	
 	run_additem :=  sequential( 
 												       output(choosen(get_new_build_candidates,all) , named('List_of_Build_Items_to_add_'+buildname),EXTEND),
-															 if ( count( get_new_build_candidates) > 0 ,Sequential(add_components,sendemail('ADD_ITEMS','SUCCESS')),sendemail('NO_ITEMS_FOUND','FAIL'))
+															 if ( count( get_new_build_candidates) > 0 ,Sequential(add_components,sendemail('ADD_ITEMS','SUCCESS')),sendemail('NO_ITEMS_FOUND'))
 										 
 									      );
 												

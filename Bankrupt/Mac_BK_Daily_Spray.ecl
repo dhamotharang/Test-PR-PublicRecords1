@@ -1,4 +1,4 @@
-export Mac_BK_Daily_Spray(Mainfile,Searchfile,filedate,group_name ='\'thor_dell400\'',email_target='\' \'') := 
+﻿export Mac_BK_Daily_Spray(Mainfile,Searchfile,filedate,group_name ='\'thor_dell400\'',email_target='\' \'') := 
 macro
 import Bankruptcyv2,_Control;
 #uniquename(spray_main)
@@ -67,6 +67,7 @@ sequential(/*parallel(%spray_main%,%spray_search%),parallel(%super_main%,%super_
 		//parallel(%build_bk_keys%,Bankruptcyv2.Proc_Build_FCRA_Keys(filedate)),
 		Bankruptcyv2.Proc_Build_FCRA_Keys(filedate),
 		bankruptcyv2.Proc_Accept_FCRA_SK_To_QA,
+		BankruptcyV3.Proc_FCRA_Field_Deprecation_Stats,			//DF-21108 show the non-blank or non-zero count of deprecated fields
 		//Roxiekeybuild.updateversion('BankruptcyKeys',filedate,'avenkatachalam@seisint.com,cbrodeur@seisint.com'),
 
 	
