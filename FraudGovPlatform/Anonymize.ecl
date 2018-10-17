@@ -5,35 +5,9 @@ EXPORT Anonymize  := Module
 
 	Shared Sources_To_Anonymize := FraudGovPlatform.Files().Input.SourcesToAnonymize.Sprayed;
 	
-	Shared Base_Orig	:= FraudGovPlatform.Files().base.main_orig.qa;
-	
 	Export Ciid(dataset(Layouts.ciid) pCiidFile)		:= Module
 		
-		//get file_info_id for a ciid pii from the main base
-		
-		shared ciid_source		:= Join(Base_Orig	,	pCiidfile	,
-																	left.did											=	(unsigned6)right.did
-															and left.cleaned_name.fname				=	right.fname
-															and left.cleaned_name.mname 			=	right.mname									
-															and left.cleaned_name.lname				=	right.lname									
-															and left.cleaned_name.name_suffix =	right.suffix
-															and left.clean_address.prim_name	=	right.prim_name							
-															and left.clean_address.prim_range	= right.prim_range	
-															and left.clean_address.sec_range	= right.sec_range
-															and left.clean_address.st					= right.st
-															and left.clean_address.zip				=	right.z5
-															and left.ssn											=	right.ssn									
-															and left.dob											=	right.dob
-															and left.drivers_license					=	right.dl_number
-															and left.drivers_license_state		=	right.dl_state
-															and left.clean_phones.phone_number=	right.phone10
-															and left.clean_phones.work_phone	=	right.wphone10
-															and left.ip_address								= right.ip_address	
-														,Transform({Layouts.Ciid,unsigned6	fdn_file_info_id }
-														,self.fdn_file_info_id	:= left.classification_Permissible_use_access.fdn_file_info_id
-														,self	:=right));
-		
-		shared anonymizeSources := join ( ciid_source,
+	shared anonymizeSources := join ( pCiidFile,
 													Sources_To_Anonymize,
 													left.fdn_file_info_id = right.fdn_file_info_id,
 													transform(recordof(left), self := left;),
@@ -72,7 +46,7 @@ EXPORT Anonymize  := Module
 																																										 
 		shared ciid_anonymized	:= Project(anonymizeAddress3,TrAddress(left));
 		
-		shared Ciid_orig 			:= join(ciid_source,
+		shared Ciid_orig 			:= join(pCiidFile,
 																	anonymizeSources,
 																	left =right
 																	,transform(Layouts.ciid, self := left),
@@ -83,27 +57,8 @@ EXPORT Anonymize  := Module
 	End;
 	
 	Export Death	(dataset(Layouts.death) pDeathFile)	:= Module
-		
-	//get file_info_id for a ciid pii from the base
-		
-		death_source		:= Join(Base_Orig,	pDeathFile,
-													left.did											=(unsigned6)right.did
-											and left.cleaned_name.fname				=	right.fname
-											// and left.cleaned_name.mname 			=	right.mname									
-											and left.cleaned_name.lname				=	right.lname									
-											// and left.cleaned_name.name_suffix =	right.name_suffix
-											// and left.clean_address.prim_name	=	right.prim_name							
-											// and left.clean_address.prim_range	= right.prim_range	
-											// and left.clean_address.sec_range	= right.sec_range
-											// and left.clean_address.st					= right.st
-											// and left.clean_address.zip				=	right.zip
-											and left.ssn											= right.ssn
-											and left.dob											=	right.dob8
-											,Transform({FraudGovPlatform.Layouts.death,unsigned6	fdn_file_info_id }
-												,self.fdn_file_info_id	:=left.classification_Permissible_use_access.fdn_file_info_id
-												,self	:=right));
-		
-		anonymizeSources := join ( death_source,
+
+		anonymizeSources := join ( pDeathFile,
 													Sources_To_Anonymize,
 													left.fdn_file_info_id = right.fdn_file_info_id,
 													transform(recordof(left), self := left;),
@@ -123,7 +78,7 @@ EXPORT Anonymize  := Module
 												,self.dod8 := if(left.dod8<>'00000000' and left.dod8<>'' and left.dod8<left.dob8 ,left.dob8,left.dod8)
 												,self:=left));
 												
-		death_orig 			:= join(death_source,
+		death_orig 			:= join(pDeathFile,
 											anonymizeSources,
 											left =right
 											,transform(Layouts.death, self := left),
