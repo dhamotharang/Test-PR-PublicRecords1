@@ -2,7 +2,7 @@
 EVERY_DAY_AT_530PM := '30 17 * * *';
 IP:=IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
 
-ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev','thor400_44');
+ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev_eclcc','thor400_44_eclcc');
 
 lECL1 :=
  'import ut;\n'
