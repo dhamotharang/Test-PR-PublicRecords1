@@ -10,7 +10,9 @@ EXPORT Functions := MODULE
   END;
 
   EXPORT IsValidationOk(INTEGER code) := FUNCTION
-    RETURN code = FCRAGateway_Services.Constants.ValidationCode.DID_MATCH;
+    RETURN code IN
+      [FCRAGateway_Services.Constants.ValidationCode.DID_MATCH,
+      FCRAGateway_Services.Constants.ValidationCode.REMOTE_LINKING_MATCH];
   END;
 
   //TuFraudAlert specific functions
@@ -24,7 +26,7 @@ EXPORT Functions := MODULE
 
         rl_result := Gateway.SoapCall_RemoteLinking_Batch(rl_request, gateways);
 
-        RETURN rl_result[1].match;
+        RETURN rl_result[1];
     END;
 
   END;
