@@ -9,11 +9,6 @@ Export ds_currency := dataset(Constants.filename_Currency, layout_currency, XML(
 
 Export ds_department := dataset(Constants.filename_Department, layout_department, XML('department',NOROOT));
 
-Export ds_office := dataset(Constants.filename_Office, layout_office, XML('office', NOROOT));
-
-Export ds_legal_entity := dataset(Constants.filename_LegalEntity, Layout_LegalEntity, XML('legalEntity', NOROOT));
-
-
 shared area := DATASET(Constants.filename_Area, {STRING area {XPATH('<>')}},XML('area', NOROOT));
 shared city := DATASET(Constants.filename_City,{STRING city {XPATH('<>')}},XML('city', NOROOT));
 shared country := DATASET(Constants.filename_Country,{STRING country {XPATH('<>')}},XML('country', NOROOT));
@@ -36,14 +31,14 @@ Export ds_country_raw := project(country, {string country});
 Export ds_currency_raw := project(currency, {string currency});
 Export ds_department_raw := project(department, {string department});
 Export ds_financialstatement_raw := project(financialstatement, {string financialstatement});
-Export ds_legalentity_raw := project(legalentity, {string legalentity});
-Export ds_lookup_raw := project(lookup, {string lookup});
-Export ds_office_raw := project(office, {string office});
-Export ds_person_raw := project(person, {string person});
-Export ds_product_raw := project(product, {string product});
-Export ds_relationship_raw := project(relationship, {string relationship});
-Export ds_routingcode_raw := project(routingcode, {string routingcode});
-Export ds_ssi_raw := project(ssi, {string ssi});
-Export ds_ssiset_raw := project(ssiset, {string ssiset});
+Export ds_legalentity := project(legalentity, {string legalentity});
+Export ds_lookup := project(lookup, {string lookup});
+Export ds_office := project(office, {string office});
+Export ds_person := project(person, {string person});
+Export ds_product := project(product, {string product});
+Export ds_relationship := project(relationship, {string relationship});
+Export ds_routingcode := project(routingcode, {string routingcode});
+Export ds_ssi := project(ssi, {string ssi});
+Export ds_ssiset := project(ssiset, {string ssiset});
 
 end;
