@@ -9,8 +9,6 @@ export Header_Raw_batch(
 FUNCTION
 
 mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
-glb_ok := mod_access.isValidGLB ();
-dppa_ok := mod_access.isValidDPPA ();
 
 is_knowx := mod_access.isConsumer ();
 
@@ -34,8 +32,8 @@ Fetch1_MACRO(key,fetch_out) := MACRO
 #uniquename(getHeader)
 midrec %getHeader%(inputs l, key fileR) := TRANSFORM
   self := fileR;
-	self.glb_ok := ut.glb_ok(l.input.glb_purpose);
-	self.dppa_ok := ut.dppa_ok(l.input.dppa_purpose);
+	self.glb_ok := doxie.functions.glb_ok(l.input.glb_purpose);
+	self.dppa_ok := doxie.functions.dppa_ok(l.input.dppa_purpose);
 	self.input := l.input;
 	self := l.input;
 	self := [];

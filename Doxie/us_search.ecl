@@ -60,7 +60,7 @@ ENDMACRO;
 
 usHeaderPretty_MACRO(Infutor.Key_Header_Infutor_Knowx,infr_out1)
 usHeaderPretty_MACRO(doxie.key_header,hdr_out1)
-us_headerPretty := if(mod_access.industry_class ='CNSMR',infr_out1,hdr_out1);
+us_headerPretty := if(mod_access.isConsumer(),infr_out1,hdr_out1);
 
 header.MAC_GlbClean_Header(us_headerPretty,headerCleaned, , , mod_access);
 
@@ -87,7 +87,7 @@ TRANSFORM
 	                 le.src);
 	SELF.first_seen := le.dt_first_seen;
 	// for efficiency, we know only non_glb
-	SELF.last_seen := IF(industry_class_value ='CNSMR', le.dt_last_seen, le.dt_nonglb_last_seen);
+	SELF.last_seen := IF(mod_access.isConsumer(), le.dt_last_seen, le.dt_nonglb_last_seen);
 	SELF.name_suffix := IF( le.name_suffix[1]='U','',le.name_suffix );
 	SELF.age := ut.age(le.dob);
 	SELF := le;
