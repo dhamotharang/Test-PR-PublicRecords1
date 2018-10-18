@@ -64,6 +64,8 @@ module
 		export DemoData											:= tools.mod_FilenamesInput(Template('DemoData'),pversion);
 		export SourcesToAnonymize							:= tools.mod_FilenamesInput(Template('SourcesToAnonymize'),pversion);
 		
+		export ConfigRiskLevel							:= tools.mod_FilenamesInput(Template('ConfigRiskLevel'),pversion);
+		
 		
 		export dAll_filenames :=
 			IdentityData.dAll_filenames +
