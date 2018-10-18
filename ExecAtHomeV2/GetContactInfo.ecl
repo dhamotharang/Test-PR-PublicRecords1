@@ -1,4 +1,4 @@
-﻿IMPORT DCA,DMA,Doxie,ExecAtHomeV2,Gong,ProfileBooster,Watchdog;
+﻿IMPORT DCA,DMA,Doxie,ExecAtHomeV2,Gong,ProfileBooster,dx_BestRecords;
 
 EXPORT GetContactInfo(DATASET(ExecAtHomeV2.Layouts.expandedLayout) ds_Contacts,
                       STRING DataRestrictionMask,
@@ -8,8 +8,8 @@ FUNCTION
   // This function joins to various keys as well as calls the Profile Booster
   // to get as much additional identifying info for each executive as possible
   ds_PII := 
-  JOIN(ds_Contacts,Watchdog.Key_watchdog_marketing_V2,
-       KEYED(LEFT.DID = RIGHT.DID),
+  JOIN(ds_Contacts, dx_BestRecords.fn_get_best_records(ds_Contacts, DID, dx_BestRecords.Constants.perm_type.marketing_preglb),
+       LEFT.DID = RIGHT.DID,
        ExecAtHomeV2.Transforms.xfmAddWatchdogFields(LEFT, RIGHT),
        KEEP(1),
        LIMIT(0),
