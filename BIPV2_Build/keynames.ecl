@@ -50,6 +50,7 @@ module
     + bipv2_lgid3.keynames            (pversion,pUseOtherEnvironment).match_candidates_debug.dall_filenames
     + bipv2_lgid3.keynames            (pversion,pUseOtherEnvironment).specificities_debug   .dall_filenames
     + bipv2_lgid3.keynames            (pversion,pUseOtherEnvironment).match_sample_debug    .dall_filenames
+    + bipv2_lgid3.keynames            (pversion,pUseOtherEnvironment).attribute_matches     .dall_filenames
     + BizLinkFull.keynames            (pversion,pUseOtherEnvironment).dall_filenames
     + BIPV2_Best.Keynames             (pversion,pUseOtherEnvironment).dall_filenames
     // + BIPV2_Relative.keynames         (pversion,pUseOtherEnvironment).dall_filenames
