@@ -1,11 +1,11 @@
 ﻿
 type_summary := record
-	string type {xpath('type')};
+	string type_ {xpath('type')};
 	string type_abbreviation {xpath('type/@abbreviation')};
 end;
 
 name := record
-	string type {xpath('type')};
+	string type_ {xpath('type')};
 	string value {xpath('value')};
 end;
 
@@ -45,7 +45,7 @@ end;
 layout_address := record
 	string link_href  {xpath('link/@href')}; 
 	string link_rel   {xpath('link/@rel')};
-	string type       {xpath('type')};
+	string type_       {xpath('type')};
 	string addr_function   {xpath('function')};
 	street_addr_layout streetAddress {xpath('streetAddress')};
 	layout_link_place city           {xpath('city')};
@@ -58,7 +58,7 @@ end;
 telecom := record
 	string link_href 		 {xpath('link/@href')};
 	string link_rel          {xpath('link/@rel')};
-	string type              {xpath('type')};
+	string type_              {xpath('type')};
 	string phoneCountryCode  {xpath('phoneCountryCode')};
 	string phoneAreaCode     {xpath('phoneAreaCode')};
 	string phoneNumber       {xpath('phoneNumber')};
@@ -75,7 +75,7 @@ end;
 export layout_department := record
 	string deleted {xpath('@deleted')};
 	string fid {xpath('@fid')};
-	string id {xpath('@id')};
+	string id_ {xpath('@id')};
 	string resource {xpath('@resource')};
 	string source {xpath('@source')};
 	string tfpid {xpath('@tfpid')};
