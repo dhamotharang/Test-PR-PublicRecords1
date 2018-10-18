@@ -1,21 +1,25 @@
-import BIPV2, AutoStandardI,BizLinkFull,BIPV2_Build,BIPv2_HRCHY,tools,BIPV2_Suppression;
+﻿import BIPV2, AutoStandardI,BizLinkFull,BIPV2_Build,BIPv2_HRCHY,tools,BIPV2_Suppression;
 
 EXPORT Key_BH_Linking_Ids := MODULE
 
 	// DEFINE THE INDEX
-	superfile_name := BIPV2_Build.keynames(, pUseOtherEnvironment:= tools._Constants.IsDataland).linkids.qa;
+	//logical_name := '~thor_data400::key::BIPV2::Business_Header::20120828::linkIds';
+	shared superfile_name := BIPV2_Build.keynames(, pUseOtherEnvironment:= tools._Constants.IsDataland).linkids.qa;
+	shared superfile_name_hidden := BIPV2_Build.keynames(, pUseOtherEnvironment:= tools._Constants.IsDataland).linkids_hidden.qa;
 	
-	infile := BIPV2.CommonBase.DS_CLEAN;
-
+	shared infile := BIPV2.CommonBase.DS_CLEAN;
+  shared Infile_hidden:=join(BIPV2.CommonBase.DS_BUILT,infile, left.rcid=right.rcid, 
+					transform({BIPV2. CommonBase.DS_BASE},
+					           self:=left), left only,hash); //Add hash because RHS skewed, based on distribution of LHS partition points
 	
-	infile_rec := record
+	shared infile_rec := record
 		BIPV2.Files.business_header;
 //		BIPV2.IDlayouts.l_xlink_ids.SELEID;
 		BIPV2.IDlayouts.l_xlink_ids.SELEscore;
 		BIPV2.IDlayouts.l_xlink_ids.SELEweight;
 	end;	
 	
-	layout_key := record
+	shared layout_key := record
 		infile_rec;
 		BIPV2.IDlayouts.l_xlink_ids.DotScore;
 		BIPV2.IDlayouts.l_xlink_ids.DotWeight;
@@ -31,7 +35,7 @@ EXPORT Key_BH_Linking_Ids := MODULE
 		BIPV2.IDlayouts.l_xlink_ids.UltWeight;
 	end;
 
-	infile_key := project(infile, transform(layout_key,  
+	shared infile_key := project(infile, transform(layout_key,  
 																											self.DotScore   := 100,
 																											self.DotWeight  := 100,
 																											self.EmpScore   := 100,
@@ -49,9 +53,28 @@ EXPORT Key_BH_Linking_Ids := MODULE
                                                       self 						:= left,
 																											));
 
+	shared infile_hidden_key := project(infile_hidden, transform(layout_key,  
+                                                self.DotScore   := 100,
+                                                self.DotWeight  := 100,
+                                                self.EmpScore   := 100,
+                                                self.EmpWeight  := 100,
+                                                self.POWScore   := 100,
+                                                self.POWWeight  := 100,
+                                                self.ProxScore  := 100,
+                                                self.ProxWeight := 100,
+                                                self.OrgScore   := 100,
+                                                self.OrgWeight  := 100,
+                                                self.UltScore   := 100,
+                                                self.UltWeight  := 100,
+                                                self.SELEscore  := 100,
+                                                self.SELEweight := 100,
+                                                self            := left,
+                                                ));
+BIPV2.IDmacros.mac_IndexWithXLinkIDs(infile_hidden_key, k1, superfile_name_hidden);																					
+Export Key_hidden:=k1;
 
-	BIPV2.IDmacros.mac_IndexWithXLinkIDs(infile_key, k, superfile_name)
-	export Key := k;																									//withOUT ParentAbovSeleField (see comment below)
+	BIPV2.IDmacros.mac_IndexWithXLinkIDs(infile_key, k, superfile_name);	
+	export Key := k;//withOUT ParentAbovSeleField (see comment below)
 	export KeyPlus := BIPV2.IDmacros.mac_AddParentAbovSeleField(Key); //with ParentAbovSeleField
 
 

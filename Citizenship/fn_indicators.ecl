@@ -31,7 +31,7 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                                                        Citizenship.Constants.AGE_CAP, 
                                                        verificationAge_temp);
                                                        
-                                SELF.identityAge :=  identityAge_temp;                                                          
+                                SELF.identityAge :=  IF(identityAge_temp <= 0, NEG1, identityAge_temp);                                                          
                           
                           //*** extract the dates needed from the Ver Source Sections of Boca Shell
                                 ver_sources_information   := Citizenship.Ver_source_Function(RIGHT.seq,
@@ -63,7 +63,7 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                                 SELF.emergenceAgeHeader    := IF(iv_header_emergence_age = NULL or iv_header_emergence_age < 0, NEG1, iv_header_emergence_age);     
                                 
                            //*** emergenceAgeBureau   (capped at 110 years)
-                                earliest_bureau_date_SAS   := ver_sources_information[12..21];
+                                earliest_bureau_date_SAS   := ver_sources_information[12..21];     //***-99999999 will be returned if there no bureau sources
                                 earliest_bureau_date       := (integer)earliest_bureau_date_SAS;  
                                                                                                                                               
                                 earliest_bureau_yrs        := if(earliest_bureau_date = NULL or sysdate = NULL, NULL,  

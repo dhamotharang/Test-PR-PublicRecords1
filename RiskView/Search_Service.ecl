@@ -1131,10 +1131,10 @@ Deltabase_Logging_prep := project(riskview_xml, transform(Risk_Reporting.Layouts
                                                          self.i_work_phone := WorkPhone,
 																												 model_count := count(option.IncludeModels.Names);
 																												 self.i_model_name_1 := option.IncludeModels.Names[1].value,
-																												 //Check to see if there was more than one model requested
+																												 //Check to see if there were models requested
 																												 extra_score := model_count > 1;
 																												 self.i_model_name_2 := IF(extra_score, option.IncludeModels.Names[2].value, ''),
-																												 self.o_score_1    := (String)left.Result.Models[1].Scores[1].Value,
+																												 self.o_score_1    := IF(model_count != 0, (String)left.Result.Models[1].Scores[1].Value, ''),
 																												 self.o_reason_1_1 := left.Result.Models[1].Scores[1].ScoreReasons[1].ReasonCode,
 																												 self.o_reason_1_2 := left.Result.Models[1].Scores[1].ScoreReasons[2].ReasonCode,
 																												 self.o_reason_1_3 := left.Result.Models[1].Scores[1].ScoreReasons[3].ReasonCode,

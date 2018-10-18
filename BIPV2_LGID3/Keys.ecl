@@ -1,4 +1,4 @@
-﻿EXPORT Keys(DATASET(layout_LGID3) ih) := MODULE
+﻿EXPORT Keys(DATASET(layout_LGID3) ih) := INLINE MODULE
 SHARED s := Specificities(ih).Specificities;
  
 EXPORT SpecificitiesDebugKeyName := '~'+'key::BIPV2_LGID3::LGID3::Debug::specificities_debug';

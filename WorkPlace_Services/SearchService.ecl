@@ -39,7 +39,10 @@ import iesp, Royalty;
 
 export SearchService := macro
 #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+#ONWARNING(4207, IGNORE);
 #CONSTANT('useOnlyBestDID', TRUE);
+
+
 #stored('AllowNickNames',true); // used to find the best subject for the input data
 #stored('PhoneticMatch',true);  // used to find the best subject for the input data
 
