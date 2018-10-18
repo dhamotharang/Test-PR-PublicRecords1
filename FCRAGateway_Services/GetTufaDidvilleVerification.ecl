@@ -12,10 +12,10 @@ EXPORT GetTufaDidvilleVerification(DATASET(iesp.tu_fraud_alert.t_TuFraudAlertRes
 
     tufa_dville_resp := FCRA.getDidVilleRecords(tufa_plist_req[1]);
 
-    //Picklist with noFail will return a header message if there are errors.
+    //didville will return a header message if there are errors.
     is_dville_ok := tufa_dville_resp[1]._header.message = '';
 
-    //If we have a soapcall or picklist error make the lexID zero.
+    //If we have a soapcall or didville error make the lexID zero.
     dville_lexID := IF(is_soap_call_ok AND is_dville_ok, (unsigned6)tufa_dville_resp[1].Records[1].UniqueId, 0);
 
     ds_tufa_with_didville_response := PROJECT(ds_tufa_soap_response, TRANSFORM(FCRAGateway_Services.Layouts.tu_fraud_alert.gateway_out,
