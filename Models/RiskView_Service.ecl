@@ -181,7 +181,7 @@ export RiskView_Service := MACRO
 																					 // Check to see if there was a model requested
 																					 extra_score := model_count > 1;
 																					 self.i_model_name_2 := model_url.parameters[2].value,
-																					 self.o_score_1    := left.Models[1].Scores[1].i,
+																					 self.o_score_1    := IF(model_count != 0, left.Models[1].Scores[1].i, ''),
 																					 self.o_reason_1_1 := left.Models[1].Scores[1].reason_codes[1].reason_code,
 																					 self.o_reason_1_2 := left.Models[1].Scores[1].reason_codes[2].reason_code,
 																					 self.o_reason_1_3 := left.Models[1].Scores[1].reason_codes[3].reason_code,
