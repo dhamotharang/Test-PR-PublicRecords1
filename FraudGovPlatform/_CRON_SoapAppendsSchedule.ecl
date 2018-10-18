@@ -4,14 +4,14 @@ ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev_eclcc','tho
 
 lECL1 :=
  'import ut;\n'
-+'wuname := \'FraudGov PII SOAP Appends Controller\';\n'
++'wuname := \'FraudGov PII SOAP Appends\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#Constant(\'Platform\',\'FraudGov\');\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
 +'email(string msg):=fileservices.sendemail(\n'
 +'   \'sesha.nookala@lexisnexis.com\'\n'
-+' 	 ,\'FraudGov PII SOAP Appends Controller\'\n'
++' 	 ,\'FraudGov PII SOAP Appends\'\n'
 +' 	 ,msg\n'
 +' 	 +\'Build wuid \'+workunit\n'
 +' 	 );\n\n'
