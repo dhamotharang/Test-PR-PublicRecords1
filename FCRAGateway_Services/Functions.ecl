@@ -18,12 +18,11 @@ EXPORT Functions := MODULE
   //TuFraudAlert specific functions
   EXPORT TuFraudAlert := MODULE
 
-  //Calls remote linking via SOAPCALL and returns true if remote linking considers it a match.
+  //Calls remote linking via SOAPCAL and returns single result.
     EXPORT Get_RL_Match(iesp.tu_fraud_alert.t_TuFraudAlertRequest request,
       iesp.tu_fraud_alert.t_TuFraudAlertResponse response, DATASET(Gateway.layouts.config) gateways) := FUNCTION
 
         rl_request := DATASET([FCRAGateway_Services.TuFraudAlert_Transforms.input_output_to_remote_linking(request, response)]);
-
         rl_result := Gateway.SoapCall_RemoteLinking_Batch(rl_request, gateways);
 
         RETURN rl_result[1];
