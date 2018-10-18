@@ -22,7 +22,7 @@ EXPORT GetTufaDidvilleVerification(DATASET(iesp.tu_fraud_alert.t_TuFraudAlertRes
       SELF.lexID := dville_lexID,
       SELF.response := LEFT.response));
 
-    #IF(FCRAGateway_Services.Constants.Debug.TuPicklistVerification)
+    #IF(FCRAGateway_Services.Constants.Debug.TuDidvilleVerification)
       output(tufa_plist_req, NAMED('tufa_plist_req'));
       output(tufa_dville_resp, NAMED('tufa_dville_resp'));
       output(ds_tufa_with_didville_response, NAMED('ds_tufa_with_didville_response'));

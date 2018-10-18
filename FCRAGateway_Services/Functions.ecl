@@ -23,8 +23,8 @@ EXPORT Functions := MODULE
       iesp.tu_fraud_alert.t_TuFraudAlertResponse response, DATASET(Gateway.layouts.config) gateways) := FUNCTION
 
         rl_request := DATASET([FCRAGateway_Services.TuFraudAlert_Transforms.input_output_to_remote_linking(request, response)]);
-        rl_result := Gateway.SoapCall_RemoteLinking_Batch(rl_request, gateways);
 
+        //Remote linking is only available as a batch service. We are only interested in a single request/result.
         RETURN rl_result[1];
     END;
 

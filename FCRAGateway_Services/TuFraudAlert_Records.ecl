@@ -29,7 +29,7 @@ EXPORT TuFraudAlert_Records(dataset(iesp.tu_fraud_alert.t_TuFraudAlertRequest) i
   input_lexID := IF(err_code = 0, (UNSIGNED6)dville_resp[1].Records[1].UniqueId, 0);
 
   //Check if they match, if they do not we send it to remote linking.
-  is_lexID_match := output_lexID = input_lexID;
+  is_lexID_match := output_lexID <> 0 AND output_lexID = input_lexID;
   remote_linking_result := IF(~is_lexID_match,
     FCRAGateway_Services.Functions.TuFraudAlert.Get_RL_Match(in_req[1], ds_tufa_soap_response[1].response, in_mod.gateways));
 
@@ -79,9 +79,18 @@ EXPORT TuFraudAlert_Records(dataset(iesp.tu_fraud_alert.t_TuFraudAlertRequest) i
   ds_tufa_recs := DATASET([xtOut()]);
 
   #IF(constants.Debug.TuFraudAlertRecords)
-    OUTPUT(ds_compliance_data, NAMED('ds_compliance_data'));
     OUTPUT(ds_tufa_soap_response, NAMED('ds_tufa_soap_response'));
-    OUTPUT(ds_tufa_recs, NAMED('ds_tufa_recs'));
+    OUTPUT(ds_tufa_with_didville_recs, NAMED('ds_tufa_with_didville_recs'));
+    OUTPUT(ds_plist_req, NAMED('ds_plist_req'));
+    OUTPUT(dville_resp, NAMED('dville_resp'));
+    OUTPUT(output_lexID, NAMED('output_lexID'));
+    OUTPUT(input_lexID, NAMED('input_lexID'));
+    OUTPUT(is_lexID_match, NAMED('is_lexID_match'));
+    OUTPUT(remote_linking_result, NAMED('remote_linking_result'));
+    OUTPUT(inquiry_log_lexID, NAMED('inquiry_log_lexID'));
+    OUTPUT(consumer, NAMED('consumer'));
+    OUTPUT(cia_data, NAMED('cia_data'));
+    OUTPUT(return_results, NAMED('return_results'));
   #END
 
   RETURN ds_tufa_recs;

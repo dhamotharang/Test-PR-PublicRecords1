@@ -38,7 +38,7 @@ EXPORT Constants := MODULE
     EXPORT EquifaxEmsGateway := FALSE;
     EXPORT EquifaxEmsRecords := FALSE;
     EXPORT TuFraudAlertSoapCall := FALSE;
-    EXPORT TuPicklistVerification := FALSE;
+    EXPORT TuDidvilleVerification := FALSE;
     EXPORT TuFraudAlertRecords := FALSE;
   END;
 

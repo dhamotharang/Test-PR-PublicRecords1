@@ -117,7 +117,7 @@ EXPORT TuFraudAlert_Transforms := MODULE
       SELF := L;
   END;
 
-      //Transform input and output into an RL request. SSNs must be padded with 0s if not 9 digits.
+  //Transform input and output into an RL request. SSNs must be padded with 0s if not 9 digits.
   EXPORT InsuranceHeader_RemoteLinking.Layouts.ServiceInputLayout_Batch input_output_to_remote_linking(
     iesp.tu_fraud_alert.t_TuFraudAlertRequest L, iesp.tu_fraud_alert.t_TuFraudAlertResponse R) := TRANSFORM
 
@@ -126,6 +126,11 @@ EXPORT TuFraudAlert_Transforms := MODULE
       inquiry_subject := L.SearchBy.ReqSubject;
       results_name := R.RespSubjects[1].RespNames[1];
       results_address := R.RespSubjects[1].RespAddresses[1];
+
+      //There is only a batch version of remote linking service.
+      //In TuFraudAlert it's a single request however.
+      //Remote linking will fail if reference ID = 0, so set it to 1.
+      SELF.referenceid := 1;
 
       //Input Data
       SELF.SSN_Inq := INTFORMAT((INTEGER)inquiry_subject.PersonalInfo.SocialSecurityNumber, 9, 1);
