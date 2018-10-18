@@ -1,4 +1,4 @@
-﻿
+
 ds_area := Ares.Files.ds_area;
 ds_area;
 
@@ -17,4 +17,5 @@ Ares.Files.ds_routingcode;
 Ares.Files.ds_ssi;
 Ares.Files.ds_ssiset;
 
+>>>>>>> Stashed changes
 
