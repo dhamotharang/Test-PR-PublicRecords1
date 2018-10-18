@@ -24,7 +24,7 @@ shared person := DATASET(Constants.filename_Person,{STRING person {XPATH('<>')}}
 shared product := DATASET(Constants.filename_Product,{STRING product {XPATH('<>')}},XML('product', NOROOT));
 shared relationship := DATASET(Constants.filename_Relationship,{STRING relationship {XPATH('<>')}},XML('relationship', NOROOT));
 shared routingcode := DATASET(Constants.filename_RoutingCode,{STRING routingcode {XPATH('<>')}},XML('routingCode', NOROOT));
-shared ssi := DATASET(Constants.filename_SSI,{STRING ssi {XPATH('<>')}},XML('ssi', NOROOT));
+shared ssi := DATASET(Constants.filename_SSI,{STRING ssi {XPATH('<>')}},XML('SSI', NOROOT));
 shared ssiset := DATASET(Constants.filename_SSISet,{STRING ssiset {XPATH('<>')}},XML('ssiSet', NOROOT));
 
 Export ds_area_raw := project(area, {string area});
