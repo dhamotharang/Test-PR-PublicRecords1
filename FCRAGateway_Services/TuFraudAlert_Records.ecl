@@ -14,7 +14,7 @@ EXPORT TuFraudAlert_Records(dataset(iesp.tu_fraud_alert.t_TuFraudAlertRequest) i
   ds_tufa_soap_response := Gateway.SoapCall_TuFraudAlert(in_req, in_mod.gateways, true);
 
   //Verify response resolves to lexID with picklist.
-  ds_tufa_with_didville_recs := FCRAGateway_Services.GetTufaDidvilleVerification(ds_tufa_soap_response, user);
+  ds_tufa_with_didville_recs := FCRAGateway_Services.GetTufaLexIDVerification(ds_tufa_soap_response, user);
 
   //Get royalties from ds_tufa_with_didville_recs.This occurs before lexID validation since the vendor charges us regardless.
   ds_royalties := Royalty.RoyaltyTuFraudAlert.GetRoyalties(ds_tufa_with_didville_recs);

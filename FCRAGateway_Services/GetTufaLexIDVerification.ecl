@@ -1,6 +1,6 @@
 IMPORT iesp, FCRA, FCRAGateway_Services;
 
-EXPORT GetTufaDidvilleVerification(DATASET(iesp.tu_fraud_alert.t_TuFraudAlertResponseEx) ds_tufa_soap_response,
+EXPORT GetTufaLexIDVerification(DATASET(iesp.tu_fraud_alert.t_TuFraudAlertResponseEx) ds_tufa_soap_response,
   iesp.share.t_User user) := FUNCTION
 
     soap_response := ds_tufa_soap_response[1].response;
