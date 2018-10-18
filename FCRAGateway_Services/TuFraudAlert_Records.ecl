@@ -39,7 +39,15 @@ EXPORT TuFraudAlert_Records(dataset(iesp.tu_fraud_alert.t_TuFraudAlertRequest) i
   inquiry_log_lexID := IF(is_lexID_match OR ~remote_linking_result.match, input_lexID, remote_linking_result.best_lexID);
 
   //Prepare inquiry log, even if lexID is 0 we must log the inquiry. Use input data sent to didville.
-  consumer:= FFD.MAC.PrepareConsumerRecord((STRING)inquiry_log_lexID, TRUE, ds_plist_req[1].searchby);
+  //Can't use FFD.Mac.PrepareConsumerRecord because it doesn't allow lexIDs of 0 to be logged.
+  iesp.share_fcra.t_FcraConsumer SetConsumerRecord() := TRANSFORM
+    SELF.Lexid := (STRING)inquiry_log_lexID;
+    searchDOB := iesp.ECL2ESP.t_DateToString8(ds_plist_req[1].searchby.DOB);
+    SELF.Inquiry.DOB := IF((UNSIGNED)searchDOB > 0, searchDOB, '');
+    SELF.Inquiry := ds_plist_req[1].searchby;
+  END;
+
+  consumer := ROW(SetConsumerRecord());
 
   //Set validation code and message.
   validation_code := MAP(remote_linking_result.match => constants.ValidationCode.REMOTE_LINKING_MATCH,
