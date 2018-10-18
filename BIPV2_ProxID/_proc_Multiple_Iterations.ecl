@@ -12,7 +12,7 @@ EXPORT _proc_Multiple_Iterations(
 ) :=
 functionmacro
   
-  import wk_ut,tools,bipv2,mdr,BIPV2_ProxID,SALTTOOLS22,BIPV2_Files;
+  import wk_ut,tools,bipv2,mdr,BIPV2_ProxID,SALTTOOLS22,BIPV2_Files,BIPV2_Build;
   
   lstartiter        := pstartiter                       ;
   lnumiters         := pnumiters                        ;

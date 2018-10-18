@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="ProxidCompareService">
 <part name="ProxidOne" type="xsd:string"/>
 <part name="ProxidTwo" type="xsd:string"/>

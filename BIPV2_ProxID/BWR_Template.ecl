@@ -1,4 +1,4 @@
-/*
+﻿/*
 //do tonight -- try to kick off iteration that doesnt have contact fields in it.  see how much faster it is
 //remove contact fields from spc
 //do cnp name stuff

@@ -46,14 +46,14 @@ tools.mac_WriteFile(Filenames(pversion).Base.Death_Anon.New,Death_Anon,Build_dea
 Export All := 	Sequential
 											(Build_pii_Base
 											,Promote(pversion).buildfiles.New2Built
-											,Build_ciid_Orig
-											,Build_crim_Orig
-											,Build_death_Orig
-											,Build_fraudpoint_Orig
-											,Build_ciid_Anon
-											// ,Build_crim_Anon
-											,Build_death_Anon
-											,Promote(pversion).buildfiles.New2Built
+ 											,Build_ciid_Orig
+   											,Build_crim_Orig
+   											,Build_death_Orig
+   											,Build_fraudpoint_Orig
+   											,Build_ciid_Anon
+   											// ,Build_crim_Anon
+   											,Build_death_Anon
+   											,Promote(pversion).buildfiles.New2Built
 											,Build_ciid_Base
 											,Build_crim_Base
 											,Build_death_Base

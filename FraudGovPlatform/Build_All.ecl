@@ -35,7 +35,9 @@ module
 					FraudShared.Promote().Inputfiles.Sprayed2Using,
 					FraudShared.Promote().Inputfiles.Using2Used,
 					FraudShared.SprayMBSFiles(pversion := pVersion[1..8], pServerIP := pMBSServerIP,pDirectory := pMBSFraudGovDirectory),
-					FraudGovPlatform_Validation.SprayMBSFiles(pversion := pVersion[1..8], pServerIP := pMBSFDNServerIP, pDirectory := pMBSFDNDirectory)
+					FraudGovPlatform_Validation.SprayMBSFiles(pversion := pVersion[1..8], pServerIP := pMBSFDNServerIP, pDirectory := pMBSFDNDirectory),
+					If(_Flags.UseDemoData,FraudGovPlatform.Append_MBSDemoData(pversion).MbsIncl)
+					
 	);
 
 //	export dops_update := RoxieKeyBuild.updateversion('IdentityDataKeys', pversion, _Control.MyInfo.EmailAddressNotify,,'N'); 															
@@ -114,7 +116,7 @@ module
 	
 	export Build_Base_Files :=
 	if(tools.fun_IsValidVersion(pversion)
-		,base_portion
+		,sequential(input_portion, base_portion)
 		,output('No Valid version parameter passed, skipping FraudGovPlatform.Build_All')
 	);
 

@@ -86,5 +86,16 @@
 		string populationtype;
 		integer8 value;
 	END;
+	
+	EXPORT WeightingChart	:= RECORD
+		string200 field;
+		integer8 entitytype;
+		string value;
+		decimal64_32 low;
+		decimal64_32 high;
+		integer8 risklevel;
+		integer8 weight;
+		string uidescription;
+	END;
 
 END;
