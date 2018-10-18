@@ -62,7 +62,10 @@ module
 		export AddressCache_Deltabase							:= tools.mod_FilenamesInput(Template('AddressCache_Deltabase'),pversion);
 		
 		export DemoData											:= tools.mod_FilenamesInput(Template('DemoData'),pversion);
-		export SourcesToAnonymize							:= tools.mod_FilenamesInput(Template('SourcesToAnonymize'),pversion);
+		export SourcesToAnonymize						:= tools.mod_FilenamesInput(Template('SourcesToAnonymize'),pversion);
+		export MBSInclusionDemoData					:= tools.mod_FilenamesInput(Template('MBSInclusionDemoData'),pversion);
+		
+		export ConfigRiskLevel							:= tools.mod_FilenamesInput(Template('ConfigRiskLevel'),pversion);
 		
 		export ConfigRiskLevel							:= tools.mod_FilenamesInput(Template('ConfigRiskLevel'),pversion);
 		
