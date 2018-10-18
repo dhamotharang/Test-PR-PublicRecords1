@@ -187,6 +187,12 @@ EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmal
 							BusinessCredit_Services.Constants.MODEL_NAME_SETS.NONE) +
 						if(EXISTS(ds_CombinedModelsRequested(ModelName = BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO)),
 							BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_SLBO, 
+							BusinessCredit_Services.Constants.MODEL_NAME_SETS.NONE) + 
+            	if(EXISTS(ds_CombinedModelsRequested(ModelName = BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL)),
+							BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_SCORE_SLBONFEL, 
+							BusinessCredit_Services.Constants.MODEL_NAME_SETS.NONE)+
+              	if(EXISTS(ds_CombinedModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL)),
+							BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_SCORE_SLBBNFEL, 
 							BusinessCredit_Services.Constants.MODEL_NAME_SETS.NONE);  
 	
     ds_Final_SmallBizAnaResults := 
@@ -304,6 +310,8 @@ ds_newModels;
                                      BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL => BusinessCredit_Services.Constants.SCORE_TYPE.BLENDED,
                                      BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO	 => BusinessCredit_Services.Constants.SCORE_TYPE.CREDIT,  
                                      BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB => BusinessCredit_Services.Constants.SCORE_TYPE.BLENDED, 
+                                     BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL => BusinessCredit_Services.Constants.SCORE_TYPE.BLENDED, 
+                                     BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL => BusinessCredit_Services.Constants.SCORE_TYPE.CREDIT, 
  ''
                                     );
         SELF.MinScoreRange 	:=	(UNSIGNED2)BusinessCredit_Services.Constants.MIN_SCORE_RANGE;
@@ -335,6 +343,8 @@ ds_newModels;
                                      BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL => BusinessCredit_Services.Constants.SCORE_TYPE.BLENDED,
                                      BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO	 => BusinessCredit_Services.Constants.SCORE_TYPE.CREDIT,  
                                      BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB => BusinessCredit_Services.Constants.SCORE_TYPE.BLENDED,  
+                                     BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL => BusinessCredit_Services.Constants.SCORE_TYPE.BLENDED,  
+                                     BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL => BusinessCredit_Services.Constants.SCORE_TYPE.CREDIT,  
 	''
                                     );
         SELF.MinScoreRange 	:=	(UNSIGNED2)BusinessCredit_Services.Constants.MIN_SCORE_RANGE;
