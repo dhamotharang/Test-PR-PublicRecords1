@@ -12,7 +12,6 @@ typeof(infile) %add_dl%(infile L, dx_BestRecords.layout_best R) := TRANSFORM
   SELF := L;
 END;
 
-#uniquename(outfile)
 outfile := JOIN (infile, dx_BestRecords.fn_get_best_records(infile, append_did, dx_BestRecords.Constants.perm_type.nonglb),
                     	(Left.append_did != 0 AND Left.orig_dob = '') AND
                     	(Left.append_did = Right.did),
