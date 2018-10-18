@@ -8,13 +8,13 @@ ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev_eclcc','tho
 
 lECL1 :=
  'import ut;\n'
-+'wuname := \'FraudGov NAC Input Prep Schedule\';\n'
++'wuname := \'FraudGov NAC Input Prep\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
 +'email(string msg):=fileservices.sendemail(\n'
 +'   \'oscar.barrientos@lexisnexis.com\'\n'
-+' 	 ,\'FraudGov NAC Input Prep Schedule\'\n'
++' 	 ,\'FraudGov NAC Input Prep\'\n'
 +' 	 ,msg\n'
 +' 	 +\'Build wuid \'+workunit\n'
 +' 	 );\n\n'
