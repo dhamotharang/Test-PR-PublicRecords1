@@ -33,8 +33,10 @@ EXPORT TuFraudAlert_Records(dataset(iesp.tu_fraud_alert.t_TuFraudAlertRequest) i
   remote_linking_result := IF(~is_lexID_match,
     FCRAGateway_Services.Functions.TuFraudAlert.Get_RL_Match(in_req[1], ds_tufa_soap_response[1].response, in_mod.gateways));
 
-  //Set the inquiry log lexID to input, or remote linking's best_lexID if remote linking was called.
-  inquiry_log_lexID := IF(is_lexID_match, input_lexID, remote_linking_result.best_lexID);
+  //Set the inquiry log lexID to input if we have a match or remote linking didn't match.
+  //This is because if we identify a person on input we need inquiry log and FFD data.
+  //regardless of the vendor gateway response.
+  inquiry_log_lexID := IF(is_lexID_match OR ~remote_linking_result.match, input_lexID, remote_linking_result.best_lexID);
 
   //Prepare inquiry log, even if lexID is 0 we must log the inquiry. Use input data sent to didville.
   consumer:= FFD.MAC.PrepareConsumerRecord((STRING)inquiry_log_lexID, TRUE, ds_plist_req[1].searchby);
@@ -54,9 +56,6 @@ EXPORT TuFraudAlert_Records(dataset(iesp.tu_fraud_alert.t_TuFraudAlertRequest) i
   //Return results if there's no suppression and lexID validation passed, or if we bypass validation.
   return_results := ~return_matched_lexIDs_only OR (validation_ok AND ~cia_data.suppress_records);
 
-  //Only return consumer data if it causes suppression, or if we can return vendor response.
-  return_consumer_data := return_results OR cia_data.suppress_records;
-
   //Creates a final output and populates the credit information based on suppression.
   FCRAGateway_Services.Layouts.tu_fraud_alert.records_out xtOut() := TRANSFORM
     //Always return the header, royalties, gateway status, errors, and DID validation.
@@ -66,10 +65,11 @@ EXPORT TuFraudAlert_Records(dataset(iesp.tu_fraud_alert.t_TuFraudAlertRequest) i
     SELF.response.ErrorTexts := ds_tufa_soap_response[1].response.ErrorTexts;
     SELF.Royalties := ds_royalties;
 
-    //Return consumer data if we don't call gateway or if we do and get a matching lexID.
-    SELF.response.Consumer :=  IF(return_consumer_data, consumer);
-    SELF.response.ConsumerStatements := IF(return_consumer_data, cia_data.ConsumerStatements);
-    SELF.response.ConsumerAlerts := IF(return_consumer_data, cia_data.ConsumerAlerts);
+    //If we were able to retreive consumer data it means we were able to resolve a lexID.
+    //Return what we have regardless of the vendor response.
+    SELF.response.Consumer :=  consumer;
+    SELF.response.ConsumerStatements := cia_data.ConsumerStatements;
+    SELF.response.ConsumerAlerts := cia_data.ConsumerAlerts;
 
     //Only return the rest of the data if we have lexID validation and we are not suppressed by PersonContext.
     SELF := IF(return_results, ds_tufa_with_didville_recs[1]);
