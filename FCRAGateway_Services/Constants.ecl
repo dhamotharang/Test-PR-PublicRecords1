@@ -25,7 +25,7 @@ EXPORT Constants := MODULE
     {ValidationCode.DID_MISMATCH, 'Failed to validate consumer LexID.'},
     {ValidationCode.NO_CALL, 'Gateway was not called.'},
     {ValidationCode.INVALID_RESPONSE, 'Gateway had invalid response.'},
-    {ValidationCode.REMOTE_LINKING_MATCH, 'Remote Linking matched input and output without LexID.'}
+    {ValidationCode.REMOTE_LINKING_MATCH, 'Remote Linking was a match.'}
     ], {INTEGER code, STRING description});
 
   DictValidationCodesDesc := DICTIONARY (ValidationCodes, {code => description});
