@@ -1,6 +1,8 @@
 ﻿import _Control,FraudGovPlatform_Validation;
-EVERY_DAY_AT_5PM := '30 17 * * *';
+EVERY_DAY_AT_530PM := '30 17 * * *';
 IP:=IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
+
+ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev','thor400_44');
 
 lECL1 :=
  'import ut;\n'
@@ -9,7 +11,7 @@ lECL1 :=
 +'#STORED(\'_Validate_Year_Range_High\',2018);\n'
 +'#OPTION(\'multiplePersistInstances\',FALSE);\n'
 +'version:=ut.GetDate : independent;\n'
-+'wuname := \'FraudGov Build Base \' + version;\n'
++'wuname := \'FraudGov Build Base Schedule\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
@@ -32,8 +34,8 @@ lECL1 :=
 #WORKUNIT('protect',true);
 #WORKUNIT('name', 'FraudGov Build Base Schedule');
 
-output(lECL1)
-			: WHEN(CRON(EVERY_DAY_AT_5PM))
+_Control.fSubmitNewWorkunit(lECL1,ThorName)
+			: WHEN(CRON(EVERY_DAY_AT_530PM))
 			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
 																			,'FraudGov Build Base Schedule failure'
 																			,FraudGovPlatform_Validation.Constants.NOC_MSG

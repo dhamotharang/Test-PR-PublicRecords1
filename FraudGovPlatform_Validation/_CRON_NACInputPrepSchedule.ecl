@@ -8,7 +8,7 @@ ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev','thor400_4
 
 lECL1 :=
  'import ut;\n'
-+'wuname := \'FraudGov NAC Input Prep\';\n'
++'wuname := \'FraudGov NAC Input Prep Schedule\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
@@ -37,6 +37,6 @@ d:=FileServices.RemoteDirectory(IP, RootDir+'ready/', '*.dat');
 if(exists(d),_Control.fSubmitNewWorkunit(lECL1, ThorName ),'NO FILES TO SPRAY' )
 			: WHEN(CRON(EVERY_DAY_AT_6AM))
 			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
-																			,'FraudGov NAC Input Prep SCHEDULE failure'
+																			,'FraudGov NAC Input Prep Schedule failure'
 																			,FraudGovPlatform_Validation.Constants.NOC_MSG
 																			));
