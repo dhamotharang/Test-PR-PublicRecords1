@@ -443,7 +443,7 @@ EXPORT BCD_SmallBizCombinedReport :=
 																										 //Check to see if there was more than one model requested
 																										 extra_score := model_count > 1;
 																										 SELF.i_model_name_2 := IF(extra_score, Models_Requested[2].ModelName, ''),
-																										 SELF.o_score_1    := (String)LEFT.SmallBusinessAnalyticsResults.Models[1].Scores[1].Value,
+																										 SELF.o_score_1    := IF(model_count != 0, (String)LEFT.SmallBusinessAnalyticsResults.Models[1].Scores[1].Value, ''),
 																										 SELF.o_reason_1_1 := LEFT.SmallBusinessAnalyticsResults.Models[1].Scores[1].ScoreReasons[1].ReasonCode,
 																										 SELF.o_reason_1_2 := LEFT.SmallBusinessAnalyticsResults.Models[1].Scores[1].ScoreReasons[2].ReasonCode,
 																										 SELF.o_reason_1_3 := LEFT.SmallBusinessAnalyticsResults.Models[1].Scores[1].ScoreReasons[3].ReasonCode,
