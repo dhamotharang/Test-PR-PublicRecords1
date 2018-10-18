@@ -11,7 +11,7 @@ lECL1 :=
 +'#WORKUNIT(\'priority\',11);\n'
 +'email(string msg):=fileservices.sendemail(\n'
 +'   \'sesha.nookala@lexisnexis.com\'\n'
-+' 	 ,\'FraudGov PII SOAP Appends\'\n'
++' 	 ,\'FraudGov PII SOAP Appends Controller\'\n'
 +' 	 ,msg\n'
 +' 	 +\'Build wuid \'+workunit\n'
 +' 	 );\n\n'
@@ -32,7 +32,7 @@ lECL1 :=
 
 _Control.fSubmitNewWorkunit(lECL1, ThorName )	: WHEN('Build_FraudGov_PII_SOAP_Appends')
 																								,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
-																								,'FraudGov Input Prep SCHEDULE failure'
+																								,'FraudGov PII SOAP Appends Controller failure'
 																								,FraudGovPlatform_Validation.Constants.NOC_MSG
 																								));
 																			

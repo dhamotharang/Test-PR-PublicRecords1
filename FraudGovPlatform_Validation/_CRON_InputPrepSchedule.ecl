@@ -13,13 +13,13 @@ FileDir:=RootDir + pfile[1] +'/';
 
 ECL :=
  'import ut;\n'
-+'wuname := \'FraudGov Contributory Input Prep\';\n'
++'wuname := \'FraudGov Input Prep Schedule\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
 +'email(string msg):=fileservices.sendemail(\n'
 +'   \'sesha.nookala@lexisnexis.com\'\n'
-+' 	 ,\'FraudGov Input Prep\'\n'
++' 	 ,\'FraudGov Input Prep Schedule\'\n'
 +' 	 ,msg\n'
 +' 	 +\'Build wuid \'+workunit\n'
 +' 	 );\n\n'
@@ -39,6 +39,6 @@ ECL :=
 
 if(count(nothor(FileServices.RemoteDirectory(ip, RootDir,'*.dat',true))(regexfind(LzFilePath,name,nocase)))>0,_Control.fSubmitNewWorkunit(ECL,ThorName),'NO FILES TO SPRAY') :WHEN(CRON(every_10_min))
 			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
-																			,'FraudGov Input Prep SCHEDULE failure'
+																			,'FraudGov Input Prep Schedule failure'
 																			,FraudGovPlatform_Validation.Constants.NOC_MSG
 																			));
