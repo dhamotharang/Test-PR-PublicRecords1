@@ -2,6 +2,8 @@
 
 IP:=IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
 
+ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev_eclcc','thor400_44_eclcc');
+
 lECL1 :=
  'import ut;\n'
 +'#CONSTANT	(\'Platform\',\'FraudGov\');\n'
@@ -29,7 +31,7 @@ lECL1 :=
 #WORKUNIT('protect',true);
 #WORKUNIT('name', 'FraudGov Build Keys Controller');
 
-output(lECL1)
+_Control.fSubmitNewWorkunit(lECL1,ThorName)
 			: WHEN('Base_Completed')
 			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
 																			,'FraudGov Build Keys Controller failure'
