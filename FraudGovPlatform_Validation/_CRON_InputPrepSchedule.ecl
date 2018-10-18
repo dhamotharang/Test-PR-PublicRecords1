@@ -1,6 +1,6 @@
 ﻿import _Control,STD;
 
-every_10_min := '0 8-17 * * *';
+every_hour_8to5pm := '0 8-17 * * *';
 IP:= FraudGovPlatform_Validation.Constants.LandingZoneServer;
 RootDir := FraudGovPlatform_Validation.Constants.LandingZonePathBase;
 LzFilePath :=FraudGovPlatform_Validation.Constants.LandingZoneFilePathRgx;
@@ -39,7 +39,7 @@ ECL :=
 if(count(nothor(FileServices.RemoteDirectory(ip, RootDir,'*.dat',true))(regexfind(LzFilePath,name,nocase)))>0,
 	_Control.fSubmitNewWorkunit(ECL,ThorName),
 	'NO FILES TO SPRAY') 
-:WHEN(CRON(every_10_min))
+:WHEN(CRON(every_hour_8to5pm))
 			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
 			,'FraudGov Input Prep Schedule failure'
 			,FraudGovPlatform_Validation.Constants.NOC_MSG
