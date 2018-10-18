@@ -9,6 +9,8 @@ Export ds_currency := dataset(Constants.filename_Currency, layout_currency, XML(
 
 Export ds_department := dataset(Constants.filename_Department, layout_department, XML('department',NOROOT));
 
+Export ds_office := dataset(Constants.filename_Office, layout_office, XML('office', NOROOT));
+
 shared area := DATASET(Constants.filename_Area, {STRING area {XPATH('<>')}},XML('area', NOROOT));
 shared city := DATASET(Constants.filename_City,{STRING city {XPATH('<>')}},XML('city', NOROOT));
 shared country := DATASET(Constants.filename_Country,{STRING country {XPATH('<>')}},XML('country', NOROOT));
@@ -33,7 +35,7 @@ Export ds_department_raw := project(department, {string department});
 Export ds_financialstatement_raw := project(financialstatement, {string financialstatement});
 Export ds_legalentity := project(legalentity, {string legalentity});
 Export ds_lookup := project(lookup, {string lookup});
-Export ds_office := project(office, {string office});
+// Export ds_office := project(office, {string office});
 Export ds_person := project(person, {string person});
 Export ds_product := project(product, {string product});
 Export ds_relationship := project(relationship, {string relationship});
