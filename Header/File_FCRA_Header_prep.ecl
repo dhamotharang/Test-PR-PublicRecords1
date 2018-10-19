@@ -1,18 +1,18 @@
  import mdr,FCRA_ExperianCred,PRTE2_Header,Header_Incremental,SALT37,std,ut,PromoteSupers;
 
 #IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
-export File_FCRA_Header_prep :=header.file_headers(src<>'EN',src in mdr.sourceTools.set_scoring_FCRA,pflag3<>'I',pflag3<>'V',did>0);
+export File_FCRA_Header_prep(string filedate) :=header.file_headers(src<>'EN',src in mdr.sourceTools.set_scoring_FCRA,pflag3<>'I',pflag3<>'V',did>0);
 #ELSE 
+
+export File_FCRA_Header_prep(string filedate) := FUNCTION
 
 hr0 := header.file_headers(src<>'EN',src in mdr.sourceTools.set_scoring_FCRA,pflag3<>'I',pflag3<>'V'):independent;
 
-versionBuild:=header.version_build;
-
 basename:='~thor_data400::base::header::FCRA_ExperianCred_prep';
 new_en_as_header:= FCRA_ExperianCred.as_header(,true)(did>0);
-old_en_fcra_prep:= dataset(basename,{header.Layout_Header},thor);
+old_en_fcra_prep:= dataset(basename,{header.Layout_Header},thor,opt);
 
-max_en_rid:=max( old_en_fcra_prep,rid):independent;
+max_en_rid:=max(header.constants.EN_start_rid,max( old_en_fcra_prep,rid)):independent;
 
 header.Layout_New_Records add_rid_all(old_en_fcra_prep l, new_en_as_header r) := transform
  self.rid            := l.rid;
@@ -45,16 +45,15 @@ join_old_new_en_0 :=  join( distribute(old_en_fcra_prep,hash(prim_name,zip,lname
                 ,add_rid_all(left,right)
 				,right outer
 				,local
-				): persist(                     '~thor_data400::persist::hbm::fcra_en::'+ versionBuild ,expire(60),REFRESH(TRUE));
+				): persist(                     '~thor_data400::persist::hbm::fcra_en::'+ filedate ,expire(60),REFRESH(TRUE));
 
-join_old_new_en:= if(nothor(std.file.fileexists(  '~thor_data400::persist::hbm::fcra_en::'+ versionBuild )) 
-            ,dataset(      '~thor_data400::persist::hbm::fcra_en::'+ versionBuild ,header.Layout_New_Records,thor)
+join_old_new_en:= if(nothor(std.file.fileexists(  '~thor_data400::persist::hbm::fcra_en::'+ filedate )) 
+            ,dataset(      '~thor_data400::persist::hbm::fcra_en::'+ filedate ,header.Layout_New_Records,thor)
             ,join_old_new_en_0);
 
-all_en := dedup(join_old_new_en_0,record,all,local);
 
-with_no_rid_no_uid := all_en(rid=0):independent;
-with_old_rid_w_uid := all_en(rid>0):independent;
+with_no_rid_no_uid := join_old_new_en(rid=0):independent;
+with_old_rid_w_uid := join_old_new_en(rid>0):independent;
 
 // re-sequence to minimize new rid range
 ut.MAC_Sequence_Records(with_no_rid_no_uid,uid,with_no_rid_new_uid);
@@ -67,7 +66,28 @@ duplicate_rid_count:=count(table_duplicates);
 duplicate_rid_sample:=(with_old_rid+with_new_rid)(rid in set(choosen(table_duplicates,100),rid));
 
 new_file_FCRA_Header_prep:= (hr0 + with_old_rid + with_new_rid);
-PromoteSupers.MAC_SF_BuildProcess(new_file_FCRA_Header_prep,basename,bld_new_en_as_header,2,,true,versionBuild);
+
+all_en := sort( with_old_rid + with_new_rid,
+
+		fname,			mname,	lname,	name_suffix,	
+		phone,			ssn,	dob,
+		prim_range,		predir,		prim_name,	suffix,	postdir,
+		unit_desig,		sec_range,	city_name,	st,		zip,		zip4,
+
+		rid,local);
+
+all_en_unique_join := dedup (all_en,
+
+		fname,			mname,	lname,	name_suffix,	
+		phone,			ssn,	dob,
+		prim_range,		predir,		prim_name,	suffix,	postdir,
+		unit_desig,		sec_range,	city_name,	st,		zip,		zip4,
+
+		// we take the lowest rid. We rollup by dates anyway and want to preseve the rid over time
+
+		local);
+
+PromoteSupers.MAC_SF_BuildProcess(all_en_unique_join,basename,bld_new_en_as_header,2,,true,filedate);
 
 update_and_reports:=sequential(
 
@@ -84,6 +104,7 @@ update_and_reports:=sequential(
 
 pre_fcra := when(new_file_FCRA_Header_prep,update_and_reports,before);
 
-EXPORT File_FCRA_Header_prep := Header_Incremental.File_headers_inc_FCRA(pre_fcra);
-  
+return Header_Incremental.File_headers_inc_FCRA(pre_fcra);
+end;
+
 #END;
