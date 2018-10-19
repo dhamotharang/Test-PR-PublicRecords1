@@ -4,7 +4,7 @@ EXPORT GetTufaLexIDVerification(DATASET(iesp.tu_fraud_alert.t_TuFraudAlertRespon
   iesp.share.t_User user) := FUNCTION
 
     soap_response := ds_tufa_soap_response[1].response;
-    is_soap_call_ok := ~EXISTS(soap_response._header.Exceptions);
+    is_soap_call_ok := soap_response._header.status = FCRAGateway_Services.Constants.GatewayStatus.SUCCESS;
 
     //If we have a valid gateway response call picklist to retrieve a DID.
     tufa_plist_req := IF(is_soap_call_ok, PROJECT(DATASET(soap_response),
@@ -12,8 +12,8 @@ EXPORT GetTufaLexIDVerification(DATASET(iesp.tu_fraud_alert.t_TuFraudAlertRespon
 
     tufa_dville_resp := FCRA.getDidVilleRecords(tufa_plist_req[1]);
 
-    //didville will return a header message if there are errors.
-    is_dville_ok := tufa_dville_resp[1]._header.message = '';
+    //didville will return a header status of 0 on success
+    is_dville_ok := tufa_dville_resp[1]._header.status = 0;
 
     //If we have a soapcall or didville error make the lexID zero.
     dville_lexID := IF(is_soap_call_ok AND is_dville_ok, (unsigned6)tufa_dville_resp[1].Records[1].UniqueId, 0);

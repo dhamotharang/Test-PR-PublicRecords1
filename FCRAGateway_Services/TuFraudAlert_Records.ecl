@@ -12,6 +12,7 @@ EXPORT TuFraudAlert_Records(dataset(iesp.tu_fraud_alert.t_TuFraudAlertRequest) i
   //Used to only call when we could resolve a lexID. Now with remote linking we always call.
   //This is because we can identify a match without lexIDs using remote linking.
   ds_tufa_soap_response := Gateway.SoapCall_TuFraudAlert(in_req, in_mod.gateways, true);
+  is_soap_response_success := ds_tufa_soap_response[1].response._header.status = FCRAGateway_Services.Constants.GatewayStatus.SUCCESS;
 
   //Verify response resolves to lexID with picklist.
   ds_tufa_with_didville_recs := FCRAGateway_Services.GetTufaLexIDVerification(ds_tufa_soap_response, user);
@@ -30,13 +31,14 @@ EXPORT TuFraudAlert_Records(dataset(iesp.tu_fraud_alert.t_TuFraudAlertRequest) i
 
   //Check if they match, if they do not we send it to remote linking.
   is_lexID_match := output_lexID <> 0 AND output_lexID = input_lexID;
-  remote_linking_result := IF(~is_lexID_match,
+  remote_linking_result := IF(~is_lexID_match AND is_soap_response_success,
     FCRAGateway_Services.Functions.TuFraudAlert.Get_RL_Match(in_req[1], ds_tufa_soap_response[1].response, in_mod.gateways));
 
   //Set the inquiry log lexID to input if we have a match or remote linking didn't match.
   //This is because if we identify a person on input we need inquiry log and FFD data.
   //regardless of the vendor gateway response.
-  inquiry_log_lexID := IF(is_lexID_match OR ~remote_linking_result.match, input_lexID, remote_linking_result.best_lexID);
+  inquiry_log_lexID := IF(is_lexID_match OR ~remote_linking_result.match OR ~remote_linking_result.best_lexID = 0,
+    input_lexID, remote_linking_result.best_lexID);
 
   //Prepare inquiry log, even if lexID is 0 we must log the inquiry. Use input data sent to didville.
   //Can't use FFD.Mac.PrepareConsumerRecord because it doesn't allow lexIDs of 0 to be logged.
@@ -62,7 +64,7 @@ EXPORT TuFraudAlert_Records(dataset(iesp.tu_fraud_alert.t_TuFraudAlertRequest) i
     in_mod.FCRAPurpose, in_mod.gateways, FFD.Constants.DataGroupSet.Person, is_reseller))[1];
 
   //Return results if there's no suppression and lexID validation passed, or if we bypass validation.
-  return_results := ~return_matched_lexIDs_only OR (validation_ok AND ~cia_data.suppress_records);
+  return_results := (~return_matched_lexIDs_only OR validation_ok) AND ~cia_data.suppress_records;
 
   //Creates a final output and populates the credit information based on suppression.
   FCRAGateway_Services.Layouts.tu_fraud_alert.records_out xtOut() := TRANSFORM
