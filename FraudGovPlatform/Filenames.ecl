@@ -67,8 +67,6 @@ module
 		
 		export ConfigRiskLevel							:= tools.mod_FilenamesInput(Template('ConfigRiskLevel'),pversion);
 		
-		export ConfigRiskLevel							:= tools.mod_FilenamesInput(Template('ConfigRiskLevel'),pversion);
-		
 		
 		export dAll_filenames :=
 			IdentityData.dAll_filenames +
