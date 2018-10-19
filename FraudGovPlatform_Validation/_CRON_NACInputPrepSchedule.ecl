@@ -4,17 +4,17 @@ EVERY_DAY_AT_6AM := '0 6 * * *';
 IP			:= NAC.Constants.LandingZoneServer;
 RootDir	:= NAC.Constants.LandingZonePathBase + '/msh/done/';
 
-ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev','thor400_44');
+ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev_eclcc','thor400_44_eclcc');
 
 lECL1 :=
  'import ut;\n'
-+'wuname := \'FraudGov NAC Input Prep Schedule\';\n'
++'wuname := \'FraudGov NAC Input Prep\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
 +'email(string msg):=fileservices.sendemail(\n'
 +'   \'oscar.barrientos@lexisnexis.com\'\n'
-+' 	 ,\'FraudGov NAC Input Prep Schedule\'\n'
++' 	 ,\'FraudGov NAC Input Prep\'\n'
 +' 	 ,msg\n'
 +' 	 +\'Build wuid \'+workunit\n'
 +' 	 );\n\n'

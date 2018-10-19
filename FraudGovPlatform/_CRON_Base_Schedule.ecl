@@ -2,7 +2,7 @@
 EVERY_DAY_AT_530PM := '30 17 * * *';
 IP:=IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
 
-ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev','thor400_44');
+ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev_eclcc','thor400_44_eclcc');
 
 lECL1 :=
  'import ut;\n'
@@ -11,13 +11,13 @@ lECL1 :=
 +'#STORED(\'_Validate_Year_Range_High\',2018);\n'
 +'#OPTION(\'multiplePersistInstances\',FALSE);\n'
 +'version:=ut.GetDate : independent;\n'
-+'wuname := \'FraudGov Build Base Schedule\';\n'
++'wuname := \'FraudGov Build Base\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
 +'email(string msg):=fileservices.sendemail(\n'
 +'   \'oscar.barrientos@lexisnexis.com\'\n'
-+' 	 ,\'FraudGov Build Base Schedule\'\n'
++' 	 ,\'FraudGov Build Base\'\n'
 +' 	 ,msg\n'
 +' 	 +\'Build wuid \'+workunit\n'
 +' 	 );\n\n'

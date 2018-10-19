@@ -368,6 +368,17 @@ EXPORT Layouts := MODULE
 			unsigned6			fdn_file_info_id;
 		END;
 		
+		EXPORT ConfigRiskLevel	:= RECORD
+		  STRING entitytype;
+			STRING field;
+			STRING value;
+			STRING low;
+			STRING high;
+			STRING risklevel;
+			STRING weight;
+			STRING uidescription;
+		END;
+		
 	END;
 
 
@@ -549,6 +560,8 @@ Export PII	:=RECORD
   string10 home_phone;
   string10 work_phone_;
   string25 ip_address;
+	unsigned8 Record_ID;
+	unsigned6 fdn_file_info_id;
 
 END;
 
@@ -730,17 +743,23 @@ Export CIID := RECORD
 	boolean addresscmra;
 	string3 cvicustomscore;
 	string1 instantidversion;
-	STRING errorcode
+	STRING errorcode;
+	unsigned8 Record_ID;
+	unsigned6 fdn_file_info_id;
  END;
  
  Export Crim	:= RECORD
  CriminalRecords_BatchService.Layouts.batch_out;
  string errorcode;
+ unsigned8 Record_ID;
+ unsigned6 fdn_file_info_id;
  END;
  
  Export Death	:= RECORD
  DeathV2_Services.Layouts.BatchOut;
  string errorcode;
+ unsigned8 Record_ID;
+ unsigned6 fdn_file_info_id;
  END;
  
  Export FraudPoint	:= RECORD
@@ -757,6 +776,8 @@ Export CIID := RECORD
 	string2 v2_InputAddrDwellType;
 	string3 v2_divssnidentitycountnew;
   string errorcode;
+	unsigned8 Record_ID;
+	unsigned6 fdn_file_info_id;
  END;
  
 END;
