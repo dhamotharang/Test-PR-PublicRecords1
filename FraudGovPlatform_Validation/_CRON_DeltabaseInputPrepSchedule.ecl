@@ -4,7 +4,7 @@ EVERY_DAY_AT_6AM := '0 6 * * *';
 IP:=IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
 RootDir := Constants.DeltaLandingZonePathBase;
 
-ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev','thor400_44');
+ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev_eclcc','thor400_44_eclcc');
 
 lECL1 :=
  'import ut;\n'
@@ -34,10 +34,9 @@ lECL1 :=
 #WORKUNIT('name', 'FraudGov Deltabase Input Prep Schedule');
 
 d:=FileServices.RemoteDirectory(IP, RootDir+'ready/', '*.dat');
-// if(exists(d),_Control.fSubmitNewWorkunit(lECL1, ThorName ),'NO FILES TO SPRAY' )
-if(exists(d), output(lECL1) ,output('NO FILES TO SPRAY'))
+if(exists(d),_Control.fSubmitNewWorkunit(lECL1, ThorName ),'NO FILES TO SPRAY' )
 			: WHEN(CRON(EVERY_DAY_AT_6AM))
 			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
-																			,'FraudGov Deltabase Input Prep SCHEDULE failure'
+																			,'FraudGov Deltabase Input Prep Schedule failure'
 																			,Constants.NOC_MSG
 																			));

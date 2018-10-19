@@ -2,7 +2,7 @@
 
 EVERY_DAY_AT_6AM := '0 6 * * *';
 
-ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev','thor400_44');
+ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev_eclcc','thor400_44_eclcc');
 lECL1 :=
  'import ut;\n'
 +'wuname := \'FraudGov InquiryLogs Input Prep\';\n'
@@ -27,6 +27,6 @@ lECL1 :=
 ;
 
 #WORKUNIT('protect',true);
-#WORKUNIT('name', 'FraudGov InqLog Input Prep Schedule');
+#WORKUNIT('name', 'FraudGov InquiryLogs Input Prep Schedule');
 
 _Control.fSubmitNewWorkunit(lECL1, ThorName ) : WHEN(CRON(EVERY_DAY_AT_6AM));
