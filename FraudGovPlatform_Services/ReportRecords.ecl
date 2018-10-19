@@ -266,7 +266,8 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 																DATASET([],iesp.fraudgovreport.t_FraudGovScoreBreakdown));
 
 			SELF.AssociatedIdentities := IF(batch_params.IsOnline,
-																			CHOOSEN(SORT(ds_contributoryBest_w_scores, -ScoreDetails.Score), iesp.constants.FraudGov.MAX_COUNT_ASSOCIATED_IDENTITY),
+																			CHOOSEN(SORT(ds_contributoryBest_w_scores, -ScoreDetails.Score, ScoreDetails.ElementValue, 
+																									 RECORD), iesp.constants.FraudGov.MAX_COUNT_ASSOCIATED_IDENTITY),
 																			DATASET([],iesp.fraudgovreport.t_FraudGovIdentityCardDetails));
 			
 			SELF.AssociatedAddresses := IF(batch_params.IsOnline,
@@ -274,7 +275,8 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 																			DATASET([],iesp.fraudgovreport.t_FraudGovAssociatedAddress));
 
 			SELF.RelatedClusters := IF(batch_params.IsOnline, 
-																	CHOOSEN(SORT(ds_related_clusters, -ScoreDetails.Score), iesp.constants.FraudGov.MAX_COUNT_CLUSTER),
+																	CHOOSEN(SORT(ds_related_clusters, -ScoreDetails.Score, ScoreDetails.ElementValue, 
+																							-NoOfIdentities, RECORD), iesp.constants.FraudGov.MAX_COUNT_CLUSTER),
 																	DATASET([],iesp.fraudgovreport.t_FraudGovClusterCardDetails));
 																
 			SELF.TimeLineDetails := IF(batch_params.IsOnline, 
