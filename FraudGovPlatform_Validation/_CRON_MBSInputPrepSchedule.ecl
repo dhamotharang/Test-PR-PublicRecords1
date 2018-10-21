@@ -3,17 +3,17 @@
 EVERY_DAY_AT_5AM := '0 5 * * *';
 IP:=Constants.LandingZoneServer;
 RootDir := Constants.MBSLandingZonePathBase;
-ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev','thor400_44');
+ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev_eclcc','thor400_44_eclcc');
 
 lECL1 :=
  'import ut;\n'
-+'wuname := \'FraudGov MBS Input Prep Schedule\';\n'
++'wuname := \'FraudGov MBS Input Prep\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
 +'email(string msg):=fileservices.sendemail(\n'
 +'   \'oscar.barrientos@lexisnexis.com\'\n'
-+' 	 ,\'FraudGov MBS Input Prep Schedule\'\n'
++' 	 ,\'FraudGov MBS Input Prep\'\n'
 +' 	 ,msg\n'
 +' 	 +\'Build wuid \'+workunit\n'
 +' 	 );\n\n'

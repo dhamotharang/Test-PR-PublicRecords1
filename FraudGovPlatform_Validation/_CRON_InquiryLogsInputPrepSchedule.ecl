@@ -2,16 +2,16 @@
 
 EVERY_DAY_AT_6AM := '0 6 * * *';
 
-ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev','thor400_44');
+ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev_eclcc','thor400_44_eclcc');
 lECL1 :=
  'import ut;\n'
-+'wuname := \'FraudGov InquiryLogs Input Prep Schedule\';\n'
++'wuname := \'FraudGov InquiryLogs Input Prep\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
 +'email(string msg):=fileservices.sendemail(\n'
 +'   \'oscar.barrientos@lexisnexis.com\'\n'
-+' 	 ,\'FraudGov InquiryLogs Input Prep Schedule\'\n'
++' 	 ,\'FraudGov InquiryLogs Input Prep\'\n'
 +' 	 ,msg\n'
 +' 	 +\'Build wuid \'+workunit\n'
 +' 	 );\n\n'
