@@ -497,6 +497,49 @@ module
   unsigned2 ultscore;
   unsigned2 ultweight;
   end;
+
+	export ErieWatchList := RECORD
+		string	watchlistid;
+		string	entityid;
+		string	firstname;
+		string	lastname;
+		string	nameonly;
+		string	businessname;
+		string	businessnameonly;
+		string	tin;
+		string	ssn;
+		string	dln;
+		string	dlstate;
+		string	dob;
+		string	comment_ds;
+		string	policy;
+		string	addressline1;
+		string	addressline2;
+		string	city;
+		string	state;
+		string	phone1;
+		string	phone2;
+		string	zip;
+		string	country;
+		string	alertnumber;
+		string	actioncodes;
+		string	vin;
+		string	plate;
+		string	platestate;
+		string	checkhist;
+		string	requester;
+		string	userid;
+		string	createuserid;
+		string	createdate;
+		string	ffid;
+		string	validstart;
+		string	validend;
+		string	clientid;
+		string	category;
+		string	alias;
+		string	email;
+		string	search_data;
+  end;
 end;
 
 export Base         := 
@@ -808,6 +851,41 @@ End;
 	unsigned1        bdid_score;
  end;
  
+ export ErieWatchList := record
+  input.ErieWatchList - [businessname, ffid];
+	string8            validstartDate;
+	string8            ValidendDate;
+	string20           ValidStartTS;
+	string12           phone;
+	unsigned8          ffid;
+	string20           middlename;       
+  string5            suffixname;
+	unsigned8          source_rec_id;
+	string100	       source; 
+	unsigned4         process_date ; 
+  unsigned4         dt_first_seen;
+	unsigned4         dt_last_seen;
+	unsigned4         dt_vendor_last_reported;
+	unsigned4         dt_vendor_first_reported;
+	string            current ; 
+	unsigned8         Unique_Id ;
+	string9 		       fein;
+  string100       	business_name;	
+  string100       	clean_business_name; 
+	Address.Layout_Clean_Name					cleaned_name;  
+	Address.Layout_Clean182_fips				clean_address; 
+	Layout_clean_phones               clean_phones ;
+	string100         address_1 ;
+	string50          address_2 ;
+	unsigned8       	NID:=0;       // name cleaner ID
+	unsigned2       	name_ind:=0;  // name indicator bitmap
+	string10          entity;
+	unsigned6         bdid;
+	unsigned1         bdid_score;
+	BIPV2.IDlayouts.l_xlink_ids; 
+	unsigned6         did;
+	unsigned1         did_score;
+	end; 
  
 	
   export hdr_build_version := record

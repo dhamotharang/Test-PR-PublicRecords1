@@ -1,4 +1,4 @@
-﻿IMPORT std, tools, DID_Add, RoxieKeyBuild;
+﻿IMPORT std, ut, tools, DID_Add, RoxieKeyBuild;
 
 EXPORT fn_FDNBaseFiles_LexID(STRING pversion = (STRING8)Std.Date.Today()) := FUNCTION
 
@@ -11,6 +11,7 @@ FraudDefenseNetwork.Mac_LexidAppend(cfna_base, cfna_base_idl);
 
 dist_cfna                        := DISTRIBUTE(cfna_base_idl, hash(Application_ID));
 
+
 //#########################################################################################################################################
 //------------------------------------------------------- ERIE -------------------------------------------------------------------------
 //#########################################################################################################################################
@@ -19,6 +20,15 @@ erie_base                        := files().base.erie.qa;
 FraudDefenseNetwork.Mac_LexidAppend(erie_base, erie_base_idl);
 
 dist_erie                        := DISTRIBUTE(erie_base_idl, hash(claimnumber,cleaned_name.fname,cleaned_name.lname,typeofloss, dateofloss, dateio, findings, responsibleparty, policynumber, cleaned_name_cp.fname, cleaned_name_cp.lname));
+
+//#########################################################################################################################################
+//------------------------------------------------------- ERIE WatchList -------------------------------------------------------------------------
+//#########################################################################################################################################
+erieWL_base                        := files().base.ErieWatchList.qa;
+
+FraudDefenseNetwork.Mac_LexidAppend(erieWL_base, erieWL_base_idl);
+
+dist_erieWL                        := DISTRIBUTE(erieWL_base_idl, hash(alertnumber, firstname, lastname, business_name, ssn,  dob, validstartDate, entity ));
 
 //#########################################################################################################################################
 //------------------------------------------------------- GLB5 -------------------------------------------------------------------------
@@ -62,9 +72,11 @@ RoxieKeyBuild.Mac_SF_BuildProcess_V2(dist_glb5, FileNames().Fdn_Prefix, 'GLB5', 
 RoxieKeyBuild.Mac_SF_BuildProcess_V2(dist_oig,  FileNames().Fdn_Prefix, 'OIG', pversion, oig_base_out, 3, false, true);
 RoxieKeyBuild.Mac_SF_BuildProcess_V2(dist_TextMinedCrim, FileNames().Fdn_Prefix, 'TEXTMINEDCRIM', pversion, TextMinedCrim_base_out, 3, false, true);
 RoxieKeyBuild.Mac_SF_BuildProcess_V2(dist_tiger, FileNames().Fdn_Prefix, 'TIGER', pversion, tiger_base_out, 3, false, true);
+RoxieKeyBuild.Mac_SF_BuildProcess_V2(dist_erieWL, FileNames().Fdn_Prefix, 'ERIEWATCHLIST', pversion, erieWL_base_out, 3, false, true);
 
-FDN_Lexid   :=  parallel(cfna_base_out, erie_base_out, glb5_base_out, oig_base_out, TextMinedCrim_base_out, Tiger_base_out) ;
 
+FDN_Lexid   :=  Sequential(parallel(cfna_base_out, erie_base_out, glb5_base_out, oig_base_out, TextMinedCrim_base_out, Tiger_base_out, erieWL_base_out)
+                           ,Promote(pversion).buildfiles.New2Built);
 return FDN_Lexid;
 
 end;

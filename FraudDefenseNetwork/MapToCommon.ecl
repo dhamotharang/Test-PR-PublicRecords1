@@ -1,5 +1,5 @@
 ﻿import tools, HealthCareFacility,FraudShared, NID, ut; 
-EXPORT MapToCommon  (
+export MapToCommon  (
 		string pversion
 	 ,dataset(Layouts.Base.SuspectIP)    inBaseSuspectIP     = Files().Base.SuspectIP.Built
 	 ,dataset(Layouts.Base.GLB5)         inBaseGLB5          = Files().Base.GLB5.Built
@@ -9,12 +9,12 @@ EXPORT MapToCommon  (
 	 ,dataset(Layouts.Base.OIG)          inBaseOIG           = Files().Base.OIG.Built
 	 ,dataset(Layouts.Base.AInspection)  inBaseAInspection   = Files().Base.AInspection.Built
 	 ,dataset(Layouts.Base.Erie)         inBaseErie          = Files().Base.Erie.Built
+	 ,dataset(Layouts.Base.ErieWatchList)inBaseErieWatchList = Files().Base.ErieWatchList.Built
 ) :=
 module  
  
- // SuspectIP 
- 
- Export		SuspectIP                    := project (inBaseSuspectIP, transform(FraudShared.Layouts.Base.Main , 
+ // SuspectIP  
+ export		SuspectIP                    := project (inBaseSuspectIP, transform(FraudShared.Layouts.Base.Main , 
 
       self.Record_ID                      := 0 ;
       self.Reported_Date                  := left.Reported_Date;
@@ -325,9 +325,8 @@ Export		Tiger                   := project (inBaseTiger , transform(FraudShared.
 		  self                                                                    := left; 
   	  self                                                                    := [];
 	
-	)); 
-
-
+	));
+	
  Export		TextMinedCrim                            := project(inBaseTextMinedCrim, transform(FraudShared.Layouts.Base.Main , 
 
       self.Record_ID                      := 0 ;
@@ -631,18 +630,126 @@ Export		Tiger                   := project (inBaseTiger , transform(FraudShared.
 		  self.did                                                                := left.did;  
 			self                                                                    := left;
   	  self                                                                    := [];
+	));  
+	
+//ErieWatchList
+ Export		ErieWatchList                      := project(inBaseErieWatchList(source ='ERIE_WATCHLIST'), transform(FraudShared.Layouts.Base.Main, 
+			self.Record_ID                          := 0 ;
+			self.Reason_Description                 := '';
+			self.reported_date                      := left.validStartDate;	
+			self.reported_time                      := left.ValidStartTS;
+			self.customer_fraud_code_1              := '';
+			self.raw_first_name                     := left.firstname;																				
+			self.raw_last_name                      := left.lastname;
+			self.raw_full_name                      := trim(trim(left.firstname,left,right)  + ' ' + trim(left.lastname,left,right),left, right);
+			self.ssn                                := left.ssn; 
+			self.dob                                := left.dob; 
+			self.drivers_license                    := left.dln; 
+			self.drivers_license_state              := left.dlstate; 
+			self.street_1                           := left.addressline1; 
+			self.street_2                           := left.addressline2; 
+			self.city                               := left.city; 
+			self.state                              := left.state; 
+			self.zip                                := left.zip;
+			self.source                            := left.source;																									 
+			self.business_name                     := left.business_name;                                                                              
+			self.clean_business_name               := left.clean_business_name;
+			self.tin                               := left.tin;    
+			self.phone_number                      := left.phone;    
+			self.vin                               := left.vin;   
+			self.alias                             := '';        
+			self.Transaction_ID                    := left.policy;    
+			self.Transaction_Type                  := if(left.policy <> '', 'POLICY', '');
+     self.classification_source.source_type  := Mod_MbsContext.ErieWatchListFileType;
+			self.classification_source.Primary_source_Entity := Mod_MbsContext.ErieWatchListPrimarySrcEntity;
+			self.classification_source.Expectation_of_Victim_Entities := Mod_MbsContext.ErieWatchListExpOfVicEntities; 
+			self.classification_source.Industry_segment := '';
+			self.classification_Activity.Suspected_Discrepancy := Mod_MbsContext.ErieWatchListSuspDiscrepancy; 			
+			self.classification_Activity.Confidence_that_activity_was_deceitful := Mod_MbsContext.ErieWatchListConfActivityDeceitful;
+			self.classification_Activity.workflow_stage_committed := Mod_MbsContext.ErieWatchListWrkFlowStgComtd;
+			self.classification_Activity.workflow_stage_detected  := Mod_MbsContext.ErieWatchListWrkFlowStgDetected;
+			self.classification_Activity.Channels := Mod_MbsContext.ErieWatchListChannels;
+			self.classification_Activity.category_or_fraudtype := 'GENERAL';
+			self.classification_Activity.description := '';
+			self.classification_Activity.Threat := Mod_MbsContext.ErieWatchListThreat;
+			self.classification_Activity.Exposure := '';
+			self.classification_Activity.write_off_loss := '';
+			self.classification_Activity.Mitigated := '';
+			self.classification_Activity.Alert_level := Mod_MbsContext.ErieWatchListAlertLevel;
+			self.classification_Entity.Entity_type	:= 	left.entity	;																					 
+     self.classification_Entity.Entity_type_id := Functions.ErieWL_EntityType_id(left.entity);
+			self.classification_Entity.Entity_sub_type := Mod_MbsContext.ErieWatchListEntitySubType;
+			self.classification_Entity.role := Mod_MbsContext.ErieWatchListRole;
+			self.classification_Entity.Evidence := Mod_MbsContext.ErieWatchListEvidence;
+		  self.did := left.did;  
+			self := left;
+  	  self := [];
+	));  
+	
+//ErieNICBWatchList
+ Export  ErieNICBWatchList                   := project(inBaseErieWatchList(source ='ERIE_NICB_WATCHLIST'), transform(FraudShared.Layouts.Base.Main, 
+      self.Record_ID                         := 0 ;
+			self.Reason_Description                 := '';
+			self.reported_date                      := left.validStartDate;	
+			self.reported_time                      := left.ValidStartTS;
+			self.customer_fraud_code_1              := left.alertnumber;
+			self.raw_first_name                     := left.firstname;																				
+			self.raw_last_name                      := left.lastname;
+			self.raw_full_name                      := trim(trim(left.firstname,left,right)  + ' ' + trim(left.lastname,left,right),left, right);
+			self.ssn                                := left.ssn; 
+			self.dob                                := left.dob; 
+			self.drivers_license                    := left.dln; 
+			self.drivers_license_state              := left.dlstate; 
+			self.street_1                           := left.addressline1; 
+			self.street_2                           := left.addressline2; 
+			self.city                               := left.city; 
+			self.state                              := left.state; 
+			self.zip                                := left.zip;
+			self.source                            := left.source;
+			self.business_name                     := left.business_name;                                                                              
+			self.clean_business_name               := left.clean_business_name;
+			self.tin                               := left.tin;    
+			self.phone_number                      := left.phone;    
+			self.vin                               := left.vin;   
+			self.alias                             := '';      
+			self.Transaction_ID                    := left.policy;    
+			self.Transaction_Type                  := if(left.policy <> '', 'POLICY', ''); 
+     self.classification_source.source_type  := Mod_MbsContext.ErieNICBWatchListFileType;
+			self.classification_source.Primary_source_Entity := Mod_MbsContext.ErieNICBWatchListPrimarySrcEntity;
+			self.classification_source.Expectation_of_Victim_Entities := Mod_MbsContext.ErieNICBWatchListExpOfVicEntities;
+			self.classification_source.Industry_segment := '';
+			self.classification_Activity.Suspected_Discrepancy := Mod_MbsContext.ErieNICBWatchListSuspDiscrepancy;
+			self.classification_Activity.Confidence_that_activity_was_deceitful := Mod_MbsContext.ErieNICBWatchListConfActivityDeceitful;
+			self.classification_Activity.workflow_stage_committed := Mod_MbsContext.ErieNICBWatchListWrkFlowStgComtd;
+			self.classification_Activity.workflow_stage_detected  := Mod_MbsContext.ErieNICBWatchListWrkFlowStgDetected;
+			self.classification_Activity.Channels := Mod_MbsContext.ErieNICBWatchListChannels;
+			self.classification_Activity.category_or_fraudtype := 'GENERAL';
+			self.classification_Activity.description := '';
+			self.classification_Activity.Threat := Mod_MbsContext.ErieNICBWatchListThreat;
+			self.classification_Activity.Exposure := '';
+			self.classification_Activity.write_off_loss := '';
+			self.classification_Activity.Mitigated := '';
+			self.classification_Activity.Alert_level := Mod_MbsContext.ErieNICBWatchListAlertLevel;
+			self.classification_Entity.Entity_type	:= 	left.entity	;																					 
+     self.classification_Entity.Entity_type_id := Functions.ErieNICBWL_EntityType_id(left.entity);
+			self.classification_Entity.Entity_sub_type := Mod_MbsContext.ErieNICBWatchListEntitySubType;
+			self.classification_Entity.role := Mod_MbsContext.ErieNICBWatchListRole;
+			self.classification_Entity.Evidence :=  Mod_MbsContext.ErieNICBWatchListEvidence;
+		  self.did := left.did;  
+			self := left;
+  	  self := [];
 	));
 	
  
 // Append MBS classification attributes 
 
-  CombinedClassification := Functions.Classification(SuspectIP + GLB5 + Tiger + CFNA + TextMinedCrim + OIG + AInspection + Erie) ; 
+  CombinedClassification := Functions.Classification(SuspectIP + GLB5 + Tiger + CFNA + TextMinedCrim + OIG + AInspection + Erie + ErieWatchList + ErieNICBWatchList) ; 
 	
 	// append rid 
 	
 	typeof(CombinedClassification)  to_form(CombinedClassification l) := transform
 	
-	 prefix                      := MAP( l.source= 'GLB5'             =>  1000000000000,
+	 prefix                      := map( l.source= 'GLB5'             =>  1000000000000,
 								                       l.source= 'TIGER'            =>  2000000000000,
 																			 l.source= 'CFNA'             =>  3000000000000,
 																			 l.source= 'TEXTMINEDCRIM'    =>  400000000000,
@@ -651,14 +758,16 @@ Export		Tiger                   := project (inBaseTiger , transform(FraudShared.
 																			 l.source= 'SUSPECTIPADDRESS' =>  7000000000000, 
 																			 l.source= 'OIG_INDIVIDUAL'   =>  8000000000000, 
 																			 l.source= 'OIG_BUSINESS'     =>  9000000000000, 
+																			 l.source= 'ERIE_WATCHLIST'   =>  11000000000000, 
+																			 l.source= 'ERIE_NICB_WATCHLIST' => 12000000000000, 
 								                      0);
-	SELF.Record_ID               := prefix +  L.source_rec_id;  
+	self.Record_ID               := prefix +  L.source_rec_id;  
 	self := l;
   end;
 
  combined       := project(CombinedClassification,to_form(left));
  // Filter header records
 NewBaseRid := combined (Customer_event_id not in ['CUST_ID_NUM','CUSTOMERID']);
-EXPORT Build_Base_Shared_Main := FraudShared.Build_Base_Main(pversion,NewBaseRid);
+export Build_Base_Shared_Main := FraudShared.Build_Base_Main(pversion,NewBaseRid);
 
-END;
+end;
