@@ -3,10 +3,9 @@
 //PHPR-154: Add Indexed Fields
 //DF-23251: Add 'dx_' Prefix to Index Definitions
 
-inFile := project(dx_PhoneFinderReportDelta.File_PhoneFinder.RiskIndicators_Main, dx_PhoneFinderReportDelta.Layout_PhoneFinder.RiskIndicators_Main-date_file_loaded);
+inFile := dx_PhoneFinderReportDelta.Layout_PhoneFinder.RiskIndicators_Index;
 
-EXPORT Key_RiskIndicators	:= index(inFile
-																		,{transaction_id}
-																		,{inFile}
+EXPORT Key_RiskIndicators	:= index({inFile.transaction_id}
+																		,inFile
 																		,data_services.Data_location.Prefix ('PhoneFinderReportDelta') + 'thor_data400::key::phonefinderreportdelta::riskindicators_'+doxie.Version_SuperKey);
 																																	

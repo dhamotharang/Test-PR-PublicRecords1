@@ -11,11 +11,13 @@ export Build_Keys(
 	tools.mac_WriteIndex('TheKeys.Main.ClusterDetails.New'								  	,BuildClusterDetailsKey			);
 	tools.mac_WriteIndex('TheKeys.Main.ElementPivot.New'											,BuildElementPivotKey				);
 	tools.mac_WriteIndex('TheKeys.Main.ScoreBreakdown.New'										,BuildScoreBreakdownKey			);
+	tools.mac_WriteIndex('TheKeys.Main.WeightingChart.New'										,BuildWeightingChartKey			);
 													  
 	export full_build :=
 	sequential(
 		 parallel(
-			 BuildClusterDetailsKey	
+			 BuildWeightingChartKey
+			,BuildClusterDetailsKey	
 			,BuildElementPivotKey
 			,BuildScoreBreakdownKey	
 		 )

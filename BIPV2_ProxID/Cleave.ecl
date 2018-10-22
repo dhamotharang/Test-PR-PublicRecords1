@@ -1,9 +1,9 @@
 ﻿// Begin code to generate cleave points
-IMPORT SALT37,std;
+IMPORT SALT311,std;
 EXPORT Cleave(DATASET(layout_DOT_Base) ih,layout_specificities.R s = Specificities(ih).specificities[1],BOOLEAN RoxieService=FALSE) := MODULE
   h00 := BIPV2_ProxID.BasicMatch(ih).input_file;
 SHARED h0 := IF(RoxieService,Specificities(ih).input_file_np,h00);
-SHARED h := PROJECT(h0,TRANSFORM({h0,SALT37.UIDType copy_Proxid},SELF.copy_Proxid:=LEFT.Proxid, SELF:=LEFT));
+SHARED h := PROJECT(h0,TRANSFORM({h0,SALT311.UIDType copy_Proxid},SELF.copy_Proxid:=LEFT.Proxid, SELF:=LEFT));
  
 // Cleave points for active_domestic_corp_key
   bse := DISTRIBUTE(TABLE(h,{Proxid,active_domestic_corp_key}),HASH(Proxid));
@@ -23,7 +23,7 @@ EXPORT FullTallied_active_domestic_corp_key := Tallied_active_domestic_corp_key(
     UNSIGNED2 left_pos;
     UNSIGNED2 right_pos;
     UNSIGNED Cnt;
-    SALT37.UIDType Proxid;
+    SALT311.UIDType Proxid;
   END;
   cleavecandidate make_cand(enumerated le,enumerated ri) := TRANSFORM
     SELF.left_active_domestic_corp_key := le.active_domestic_corp_key;
@@ -53,7 +53,7 @@ EXPORT CleaveBy_active_domestic_corp_key(DATASET(RECORDOF(h)) inp) := FUNCTION
   K := IF(RoxieService, Candidates_active_domestic_corp_key_ni, Candidates_active_domestic_corp_key);
   R := RECORD
     inp;
-    SALT37.UIDType __Shadow; // Track old during processing
+    SALT311.UIDType __Shadow; // Track old during processing
     INTEGER1 __Cluster := -1; // -1<no-cleave>, 0 <none>, 1<left>, 2<right>
   END;
   R TakeCleave(inp le,k ri) := TRANSFORM
@@ -95,7 +95,7 @@ EXPORT FullTallied_cnp_number := Tallied_cnp_number((cnp_number NOT IN SET(s.nul
     UNSIGNED2 left_pos;
     UNSIGNED2 right_pos;
     UNSIGNED Cnt;
-    SALT37.UIDType Proxid;
+    SALT311.UIDType Proxid;
   END;
   cleavecandidate make_cand(enumerated le,enumerated ri) := TRANSFORM
     SELF.left_cnp_number := le.cnp_number;
@@ -125,7 +125,7 @@ EXPORT CleaveBy_cnp_number(DATASET(RECORDOF(h)) inp) := FUNCTION
   K := IF(RoxieService, Candidates_cnp_number_ni, Candidates_cnp_number);
   R := RECORD
     inp;
-    SALT37.UIDType __Shadow; // Track old during processing
+    SALT311.UIDType __Shadow; // Track old during processing
     INTEGER1 __Cluster := -1; // -1<no-cleave>, 0 <none>, 1<left>, 2<right>
   END;
   R TakeCleave(inp le,k ri) := TRANSFORM

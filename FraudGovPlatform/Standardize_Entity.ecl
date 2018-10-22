@@ -3,7 +3,7 @@ MODULE
 
 EXPORT Clean_Address(pInputFile, pAddressCache ) := 
 FUNCTIONMACRO		
-		InputFile := distribute(pInputFile, hash(address_id));
+		InputFile := distribute(pInputFile, hash32(address_id));
 		AddressCache := distribute(pAddressCache, hash32(address_id));
 		
 		pInputFile addCleanAddress(pInputFile L, pAddressCache R) := TRANSFORM
@@ -77,7 +77,7 @@ FUNCTIONMACRO
 			END;
 			
 			Cleaned_Address_2 := join(
-										Cleaned_Address_1(mailing_address_2 <> ''),
+										distribute(Cleaned_Address_1(mailing_address_2 <> ''),hash32(mailing_address_id)),
 										AddressCache,
 										left.mailing_address_id = RIGHT.address_id,
 										addCleanAAddress(LEFT,RIGHT),
@@ -116,8 +116,9 @@ FUNCTIONMACRO
 					SELF := L;
 			END;
 																		 
-			Cleaned_Addresses:=	 JOIN (	Cleaned_Address_1,
-										Cleaned_Address_2,
+			Cleaned_Addresses:=	 JOIN (	
+										distribute(Cleaned_Address_1,hash32(unique_id)),
+										distribute(Cleaned_Address_2,hash32(unique_id)),
 										left.unique_id = RIGHT.unique_id,
 										appendCleanMailingAddress(left, RIGHT),
 										left outer,

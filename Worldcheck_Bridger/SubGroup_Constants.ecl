@@ -1085,6 +1085,7 @@
 		export string KEYWORD_INFIU									:= '773';		
 		export string KEYWORD_GHBOG									:= '774';		
 		export string KEYWORD_EUEIB									:= '775';		
+		export string KEYWORD_CNCBRC								:= '776';		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
 	

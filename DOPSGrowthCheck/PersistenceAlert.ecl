@@ -14,7 +14,12 @@ EXPORT PersistenceAlert(string SpecPackageName, string SpecKeyNickname, string S
 	
 	AddPersistAlerts:=if(PersistAlerts,'Percent not persistent: '+ ((((real)SpecificInstances(diff='persistent_record_id')[1].NumRecsChanged)/((real)SpecificInstances(diff='')[1].NumRecsChanged+(real)SpecificInstances(diff='persistent_record_id')[1].NumRecsChanged))*100) + 'Max Threshold: ' + PersistThresholdMax + '\n','');
 	
-	NewHistoryRec:=dataset([{SpecPackageName,SpecKeyNickname,SpecVersion,PersistAlerts}],DOPSGrowthCheck.layouts.PersistStatAlerts);
+	NewHistoryRec:=dataset([{SpecPackageName,
+													 SpecKeyNickname,
+													 SpecVersion,
+													 PersistAlerts,(string)(((real)SpecificInstances(diff='persistent_record_id')[1].NumRecsChanged)/((real)SpecificInstances(diff='')[1].NumRecsChanged+(real)SpecificInstances(diff='persistent_record_id')[1].NumRecsChanged)),
+													 PersistThresholdMax
+													 }],DOPSGrowthCheck.layouts.PersistStatAlerts);
 	
 	ToPublish:=output(NewHistoryRec,,'~thor_data400::DeltaStats::PersistenceStatsAlerts::using::'+workunit+SpecKeyNickname,thor,compressed,overwrite);
 	AddFile:=sequential(STD.FILE.StartSuperFileTransaction(),
