@@ -1,4 +1,4 @@
-import _control, tools, FraudShared;
+﻿import _control, tools, FraudShared;
 
 export _Flags :=
 module
@@ -16,6 +16,7 @@ module
 			export CFNA                 := count(nothor(FileServices.SuperFileContents(Filenames().Input.CFNA        	.Sprayed))) > 0;
 			export AInspection          := count(nothor(FileServices.SuperFileContents(Filenames().Input.AInspection  .Sprayed))) > 0;
 			export Erie                 := count(nothor(FileServices.SuperFileContents(Filenames().Input.Erie         .Sprayed))) > 0;
+			export ErieWatchList        := count(nothor(FileServices.SuperFileContents(Filenames().Input.ErieWatchList .Sprayed))) > 0;
 		end;
 					
 		export Base := module
@@ -28,6 +29,7 @@ module
 		  export TextMinedCrim        := count(nothor(FileServices.SuperFileContents(Filenames().Base.TextMinedCrim        .QA))) > 0;
 			export OIG                  := count(nothor(FileServices.SuperFileContents(Filenames().Base.OIG                  .QA))) > 0;
 			export Erie                 := count(nothor(FileServices.SuperFileContents(Filenames().Base.Erie                 .QA))) > 0;
+			export ErieWatchList        := count(nothor(FileServices.SuperFileContents(Filenames().Base.ErieWatchList        .QA))) > 0;
 
 			end;
 	end;
@@ -45,6 +47,7 @@ module
 		export TextMinedCrim := FileExists.Base.TextMinedCrim;  // inputs are picked direclty from Boca thor and gets updated twice week
 		export OIG           := FileExists.Base.OIG;  // inputs are picked direclty from Boca thor and gets updated once a month
 		export Erie          := FileExists.Input.Erie and FileExists.Base.Erie;  
+		export ErieWatchList := FileExists.Input.ErieWatchList and FileExists.Base.ErieWatchList;  
    
 		end;
    export Skipped := module
@@ -57,6 +60,7 @@ module
 	  export TextMinedCrim := FileExists.Base.TextMinedCrim;  // inputs are picked direclty from Boca thor and gets updated twice week
 		export OIG           := FileExists.Base.OIG;  // inputs are picked direclty from Boca thor and gets updated once a month
 		export Erie          := ~FileExists.Input.Erie;
+		export ErieWatchList := ~FileExists.Input.ErieWatchList;
    
 		end;
 		
