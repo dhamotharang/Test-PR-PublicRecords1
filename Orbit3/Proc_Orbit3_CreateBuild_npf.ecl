@@ -1,5 +1,5 @@
 ﻿import ut,Orbit3,_Control;
-export Proc_Orbit3_CreateBuild_npf(string buildname,string Buildvs,string BuildStatus = 'BUILD_AVAILABLE_FOR_USE', boolean skipcreatebuild = false,boolean skipupdatebuild = false,  boolean runcreatebuild = true, boolean runaddcomponentsonly = false) := function
+export Proc_Orbit3_CreateBuild_npf(string buildname,string Buildvs,string BuildStatus = 'BUILD_AVAILABLE_FOR_USE', boolean skipcreatebuild = false,boolean skipupdatebuild = false,  boolean skipaddcomponents = false, boolean runcreatebuild = true, boolean runaddcomponentsonly = false) := function
 
 	tokenval := orbit3.GetToken();
 
@@ -84,7 +84,6 @@ get_build_candidates := 	Orbit3.GetBuildCandidates(buildname,
 
 	return sequential
 							(
-									if(_Control.ThisEnvironment.Name <> 'Prod', 
 									if( runcreatebuild,
 									  	if ( runaddcomponentsonly, 
 								                     if ( get_buildinst.Status = 'Success',
@@ -108,16 +107,21 @@ get_build_candidates := 	Orbit3.GetBuildCandidates(buildname,
 													                                                                                                      sendemail('UPDATE','SUCCESS'),
 																					                                                            sendemail('UPDATE','FAIL')
 																                           )
-														                 )
+														                 ),
+												                 if ( skipaddcomponents,	
+										                        Sequential( Output('Skipping_Add_Components'),output(choosen(get_new_build_candidates,all) , named('List_of_Build_Items_to_add_'+buildname),EXTEND),sendemail('SKIP_ADD_ITEMS','SUCCESS')),
+														     
+										                                   run_additem
+																																
+															)
+						                                         )
+											 ),										 
 									
 									
-											                      )
-											),							
+								
 									Output('Dont run build')
-									),
-									output('Not a prod environment')
-									),
-				
+									)
+					
 								);
 
 end;
