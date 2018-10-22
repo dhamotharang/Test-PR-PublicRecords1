@@ -1,4 +1,4 @@
-import RoxieKeyBuild, tools, _control, Orbit3, FraudShared;
+﻿import RoxieKeyBuild, tools, _control, Orbit3, FraudShared;
 
 export Build_All(
 
@@ -12,6 +12,7 @@ export Build_All(
   ,boolean                                      pskipOIGBase                    = false 
 	,boolean                                      pSkipAInspection                = false       
 	,boolean                                      pSkipErieBase                   = false       
+	,boolean                                      pSkipErieWatchListBase          = false       
 	,string																				pDirectory											= '/data/super_credit/fdn/in'
 	,string																				pServerIP												= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10)
 	,boolean																			pIsTesting											= false
@@ -20,7 +21,8 @@ export Build_All(
 	,string		                                    pFilenameSuspectIP              = '*suspicious_ip*'
 	,string		                                    pFilenameTiger                  = '*Tiger*txt'
 	,string		                                    pFilenameCFNA                   = '*CFNA*txt'
-	,string		                                    pFilenameErie                   = '*ERIE*txt'
+	,string		                                    pFilenameErie                   = 'FDN_ERIE_CF*txt' //FDN_ERIE_CF_YYYYMMDD.txt
+	,string		                                    pFilenameErieWatchList          = 'FDN_ERIE_WL*txt' //FDN_ERIE_WL_YYYYMMDD.txt 
 	,string																				pGroupName											= _dataset().groupname																		
 	,dataset(FraudShared.Layouts.Base.Main)				pBaseMainFile										=	IF(_Flags.Update.Main, FraudShared.Files().Base.Main.QA, DATASET([], FraudShared.Layouts.Base.Main))
 	,dataset(Layouts.Base.SuspectIP)			        pBaseSuspectIPFile					    =	IF(_Flags.Update.SuspectIP, Files().Base.SuspectIP.QA, DATASET([], Layouts.Base.SuspectIP))
@@ -31,12 +33,14 @@ export Build_All(
 	,dataset(Layouts.Base.OIG)                    pBaseOIGFile							      =	IF(_Flags.Update.OIG, Files().Base.OIG.QA, DATASET([], Layouts.Base.OIG))
 	,dataset(Layouts.Base.Ainspection)						pBaseAinspectionFile						=	IF(_Flags.Update.Ainspection, Files().Base.Ainspection.QA, DATASET([], Layouts.Base.Ainspection))
 	,dataset(Layouts.Base.Erie)						        pBaseErieFile						       =	IF(_Flags.Update.Erie, Files().Base.Erie.QA, DATASET([], Layouts.Base.Erie))
+	,dataset(Layouts.Base.ErieWatchList)						pBaseErieWatchListFile	       =	IF(_Flags.Update.ErieWatchList, Files().Base.ErieWatchList.QA, DATASET([], Layouts.Base.ErieWatchList))
 	,dataset(Layouts.Input.SuspectIP)	            pUpdateSuspectIPFile	          =	Files().Input.SuspectIP.Sprayed
 	,dataset(Layouts.Input.GLB5)	                pUpdateGLB5File	                =	Files().Input.GLB5.Sprayed
 	,dataset(Layouts.Input.Tiger)	                pUpdateTigerFile	              =	Files().Input.Tiger.Sprayed
 	,dataset(Layouts.Input.CFNA)	                pUpdateCFNAFile	                =	Files().Input.CFNA.Sprayed
 	,dataset(Layouts.Input.Ainspection)	          pUpdateAinspectionFile	        =	Files().Input.Ainspection.Sprayed
 	,dataset(Layouts.Input.Erie)	                pUpdateErieFile	                =	Files().Input.Erie.Sprayed
+	,dataset(Layouts.Input.ErieWatchList)         pUpdateErieWatchListFile	      = Files().Input.ErieWatchList.Sprayed
 	,dataset(FraudShared.Layouts.Base.Main)				pBaseMainBuilt									= File_keybuild(FraudShared.Files(pversion).Base.Main.Built)
 	// This below flag is to run full file or update append if pUpdateGLB5flag = false full file run and true runs update append of the base file
 	,boolean                                      pUpdateSuspectIPflag            = FraudDefenseNetwork._Flags.Update.SuspectIP
@@ -47,6 +51,7 @@ export Build_All(
 	,boolean                                      pUpdateOIGflag                  = FraudDefenseNetwork._Flags.Update.OIG
 	,boolean                                      pUpdateAInspectionflag          = FraudDefenseNetwork._Flags.Update.AInspection
 	,boolean                                      pUpdateErieflag                 = FraudDefenseNetwork._Flags.Update.Erie
+	,boolean                                      pUpdateErieWatchListflag        = FraudDefenseNetwork._Flags.Update.ErieWatchList
          
 ) :=
 module
@@ -58,6 +63,7 @@ module
 		,pFilenameTiger
 		,pFilenameCFNA
 		,pFilenameErie
+		,pFilenameErieWatchList
 		,pversion
 		,pGroupName
 		,pIsTesting
@@ -90,6 +96,7 @@ module
 			,pSkipOIGBase
 			,pSkipAInspection
 			,pSkipErieBase
+			,pSkipErieWatchListBase
 			,pBaseMainFile	
 			,pBaseSuspectIPFile
 			,pUpdateSuspectIPFile	
@@ -113,6 +120,9 @@ module
 			,pBaseErieFile
 			,pUpdateErieFile	
 			,pUpdateErieflag
+			,pBaseErieWatchListFile
+			,pUpdateErieWatchListFile	
+			,pUpdateErieWatchListflag
 		
 		).All
 			,notify('FDN BASE FILES COMPLETE','*');
@@ -165,6 +175,7 @@ export	create_build := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'FDN',pversion);
 			,pSkipOIGBase
 			,pSkipAInspection
 			,pSkipErieBase
+			,pSkipErieWatchListBase
 			,pBaseMainFile	
 			,pBaseSuspectIPFile
 			,pUpdateSuspectIPFile	
@@ -188,6 +199,9 @@ export	create_build := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'FDN',pversion);
 			,pBaseErieFile
 			,pUpdateErieFile	
 			,pUpdateErieflag
+			,pBaseErieWatchListFile
+			,pUpdateErieWatchListFile	
+			,pUpdateErieWatchListflag
 		
 		).All
 		  ,FraudShared.Build_Keys(
