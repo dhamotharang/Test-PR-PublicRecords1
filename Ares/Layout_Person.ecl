@@ -6,19 +6,14 @@
 end;
 
 layout_summary := record 
-	string personSortKey {xpath('personSortKey')};
+	string personSortKey {xpath('names/personSortKey')};
 	dataset(name) names{xpath('names/name')};
 end;
-
 
 layout_link := Record
 	string href{xpath('link/@href')};
 	string rel{xpath('link/@rel')};
 End;
-
-// layout_relation := record
-	// dataset(layout_link) relation_link{xpath('relation')};
-// end;
 
 layout_relatedEntities := record
 	dataset(layout_link) relation_link{xpath('relation')};
@@ -31,7 +26,5 @@ EXPORT Layout_Person := record
 	string resource {xpath('@resource')};
 	string source {xpath('@source')};
 	layout_summary summary{xpath('summary')};
-	//layout_relatedEntities relatedEntities{xpath('relatedEntities/relation')};
 	layout_relatedEntities relatedEntities{xpath('relatedEntities')};
-	//dataset(layout_link) relation_link{xpath('relatedEntities')};
 end;
