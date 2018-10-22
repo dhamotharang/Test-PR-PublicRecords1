@@ -10,14 +10,19 @@ layout_summary := record
 	dataset(name) names{xpath('names/name')};
 end;
 
-layout_relatedEntities := record
-	dataset(Layouts.layout_link) relation_link{xpath('relation')};
-end;
 
 layout_link := Record
-	string href{xpath('@href')};
-	string rel{xpath('@rel')};
+	string href{xpath('link/@href')};
+	string rel{xpath('link/@rel')};
 End;
+
+// layout_relation := record
+	// dataset(layout_link) relation_link{xpath('relation')};
+// end;
+
+layout_relatedEntities := record
+	dataset(layout_link) relation_link{xpath('relation')};
+end;
 
 EXPORT Layout_Person := record
 	string deleted {xpath('@deleted')};
@@ -27,6 +32,6 @@ EXPORT Layout_Person := record
 	string source {xpath('@source')};
 	layout_summary summary{xpath('summary')};
 	//layout_relatedEntities relatedEntities{xpath('relatedEntities/relation')};
-	//layout_relatedEntities relatedEntities{xpath('relatedEntities/relation')};
-	dataset(layout_link) relation_link{xpath('relatedEntities/relation')};
+	layout_relatedEntities relatedEntities{xpath('relatedEntities')};
+	//dataset(layout_link) relation_link{xpath('relatedEntities')};
 end;
