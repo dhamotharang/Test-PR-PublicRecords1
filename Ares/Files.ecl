@@ -16,6 +16,12 @@ Export ds_department := dataset(Constants.filename_Department, layout_department
 
 Export ds_office := dataset(Constants.filename_Office, layout_office, XML('office', NOROOT));
 
+Export ds_financialstatement := dataset(Constants.filename_FinancialStatement, layout_financialstatement, XML('financialStatement',NOROOT));
+
+Export ds_ssi := dataset(Constants.filename_SSI, layout_ssi, XML('SSI',NOROOT));
+
+Export ds_ssiset := dataset(Constants.filename_SSISet, layout_ssiset, XML('SSISET',NOROOT));
+
 shared area := DATASET(Constants.filename_Area, {STRING area {XPATH('<>')}},XML('area', NOROOT));
 shared city := DATASET(Constants.filename_City,{STRING city {XPATH('<>')}},XML('city', NOROOT));
 shared country := DATASET(Constants.filename_Country,{STRING country {XPATH('<>')}},XML('country', NOROOT));
@@ -30,7 +36,7 @@ shared product := DATASET(Constants.filename_Product,{STRING product {XPATH('<>'
 shared relationship := DATASET(Constants.filename_Relationship,{STRING relationship {XPATH('<>')}},XML('relationship', NOROOT));
 shared routingcode := DATASET(Constants.filename_RoutingCode,{STRING routingcode {XPATH('<>')}},XML('routingCode', NOROOT));
 shared ssi := DATASET(Constants.filename_SSI,{STRING ssi {XPATH('<>')}},XML('SSI', NOROOT));
-shared ssiset := DATASET(Constants.filename_SSISet,{STRING ssiset {XPATH('<>')}},XML('ssiSet', NOROOT));
+shared ssiset := DATASET(Constants.filename_SSISet,{STRING ssiset {XPATH('<>')}},XML('SSISET', NOROOT));
 
 Export ds_area_raw := project(area, {string area});
 Export ds_city_raw := project(city, {string city});
@@ -39,13 +45,13 @@ Export ds_currency_raw := project(currency, {string currency});
 Export ds_department_raw := project(department, {string department});
 Export ds_financialstatement_raw := project(financialstatement, {string financialstatement});
 Export ds_legalentity := project(legalentity, {string legalentity});
-Export ds_lookup := project(lookup, {string lookup});
+Export ds_lookup_raw := project(lookup, {string lookup});
 // Export ds_office := project(office, {string office});
 Export ds_person_raw := project(person, {string person});
 Export ds_product := project(product, {string product});
 Export ds_relationship := project(relationship, {string relationship});
 Export ds_routingcode := project(routingcode, {string routingcode});
-Export ds_ssi := project(ssi, {string ssi});
-Export ds_ssiset := project(ssiset, {string ssiset});
+Export ds_ssi_raw := project(ssi, {string ssi});
+Export ds_ssiset_raw := project(ssiset, {string ssiset});
 
 end;
