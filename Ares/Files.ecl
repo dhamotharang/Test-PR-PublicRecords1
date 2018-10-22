@@ -5,8 +5,8 @@ Export ds_area := dataset(Constants.filename_Area, layout_area, XML('area',NOROO
 Export ds_city := dataset(Constants.filename_City, Layout_City, XML('city',NOROOT));
 Export ds_legal_entity := dataset(Constants.filename_LegalEntity, Layout_LegalEntity, XML('legalEntity',NOROOT));
 Export ds_lookup := dataset(Constants.filename_Lookup, Layout_Lookup, XML('lookup',NOROOT));
-
 Export ds_person := dataset(Constants.filename_Person, Layout_Person, XML('person',NOROOT));
+Export ds_relationship := dataset(Constants.filename_Relationship, Layout_Relationship, XML('relationship',NOROOT));
 
 Export ds_country := dataset(Constants.filename_Country, layout_country, XML('country',NOROOT));
 
@@ -43,7 +43,7 @@ Export ds_lookup := project(lookup, {string lookup});
 // Export ds_office := project(office, {string office});
 Export ds_person_raw := project(person, {string person});
 Export ds_product := project(product, {string product});
-Export ds_relationship := project(relationship, {string relationship});
+Export ds_relationship_raw := project(relationship, {string relationship});
 Export ds_routingcode := project(routingcode, {string routingcode});
 Export ds_ssi := project(ssi, {string ssi});
 Export ds_ssiset := project(ssiset, {string ssiset});
