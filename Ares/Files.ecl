@@ -3,7 +3,8 @@ EXPORT Files := Module
 
 Export ds_area := dataset(Constants.filename_Area, layout_area, XML('area',NOROOT));
 Export ds_city := dataset(Constants.filename_City, Layout_City, XML('city',NOROOT));
-Export ds_legalEntity := dataset(Constants.filename_LegalEntity, Layout_LegalEntity, XML('city',NOROOT));
+Export ds_legal_entity := dataset(Constants.filename_LegalEntity, Layout_LegalEntity, XML('legalEntity',NOROOT));
+Export ds_lookup := dataset(Constants.filename_Lookup, Layout_Lookup, XML('lookup',NOROOT));
 
 Export ds_person := dataset(Constants.filename_Person, Layout_Person, XML('person',NOROOT));
 
