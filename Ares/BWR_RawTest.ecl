@@ -1,6 +1,6 @@
-﻿
-// ds_area := Ares.Files.ds_area;
-// ds_area;
+
+ds_area := Ares.Files.ds_area;
+ds_area;
 
 // Ares.Files.ds_area_raw;
 // Ares.Files.ds_city_raw;
@@ -18,3 +18,4 @@ count(Ares.Files.ds_ssi);
 // Ares.Files.ds_ssiset;
 Ares.Files.ds_office;
 
+>>>>>>> Stashed changes
