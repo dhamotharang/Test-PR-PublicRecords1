@@ -7,11 +7,12 @@ layout_names := record
 	dataset(layout_name) names{xpath('name')};
 End;
 layout_type := Record
-	string type {xpath('type')};
+	string type {xpath('./')};
 End;
 layout_link := Record
 	string href{xpath('@href')};
   string rel{xpath('@rel')};
+	string sourceHref {xpath('sourceHref')};
 End;
 
 layout_place := record

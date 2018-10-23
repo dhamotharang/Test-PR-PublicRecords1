@@ -323,8 +323,15 @@ function
 		ds_company_norm2	:= normalize(distribute(ds_company_norm), choosePhone(left.corp_phone_number, left.corp_fax_nbr), Translate_To_Company_BHL2(left,counter),local);		
 		
 		ds_company_norm_dist  := distribute(ds_company_norm2, hash(record_id, clean_company));
-		ds_company_sort				:= sort(ds_company_norm_dist, record_id, clean_company, company_address.zip, company_address.prim_name, company_address.prim_range, company_address.v_city_name ,company_address.st, local);
+		ds_company_sort		  := sort(ds_company_norm_dist, record_id, clean_company, company_address.zip 
+                                  ,company_address.prim_name, company_address.prim_range
+                                  ,company_address.v_city_name ,company_address.st 
+                                  ,-company_address.sec_range, -company_phone, -company_fein
+                                  ,source_record_id, company_address_type_raw, dt_first_seen 
+						                   ,dt_last_seen, dt_vendor_first_reported, dt_vendor_last_reported
+						                   ,company_rawaid, local); 
 
+  
 		bh_layout_company Rollup_Corp_Norm(bh_layout_company l, bh_layout_company r) := transform
 				self              := l;
 		end;
@@ -346,7 +353,7 @@ function
 																			right.company_address.st			 		= ''
 																			))
 																		,Rollup_Corp_Norm(left,right)
-																		,local);
+																		,local); 
 																		
 		// count(ds_company_rollup);																	
 																
@@ -450,10 +457,10 @@ function
 													,dt_vendor_last_reported
 													,dt_vendor_first_reported
 													,dt_last_seen
-													,local);
+													,source_record_id
+													,local);  
 				
-		ds_company := rollup(corp_clean_sort
-															 ,
+		ds_company := rollup(corp_clean_sort,
                                 left.vl_id                      = right.vl_id and
                                 left.company_address.zip 				= right.company_address.zip and
 																left.company_address.prim_name 	= right.company_address.prim_name and
@@ -745,7 +752,7 @@ function
 	
 		concat2				:=	norm_DBAFile + NonDBAFile;
 	
-		concatDist				:= 	sort(distribute(concat2, hash(vl_id)),record, except contact_name.name_score,company_rawaid,local);
+		concatDist			:= 	sort(distribute(concat2, hash(vl_id)),record, except contact_name.name_score,company_rawaid,local); 
 		concat_dupd 			:= 	dedup(project(concatDist,Business_Header.Layout_Business_Linking.Linking_Interface),except contact_name.name_score,company_rawaid,local)(company_name !='');
 
     // -- if we have no events or filing or status dates, we can use forgn_date or inc date if we have it.  used as a last resort for new companies if all else fails....we do know this about the company
@@ -818,7 +825,7 @@ function
       ,output(concat_dupd          ((count(lcorpkey) > 0 and trim(vl_id           ) in lcorpkey )                            or (count(pTestSourceRids) > 0 and source_record_id in pTestSourceRids ))  ,named('concat_dupd'         ),all)
       ,output(ds_result            ((count(lcorpkey) > 0 and trim(vl_id           ) in lcorpkey )                            or (count(pTestSourceRids) > 0 and source_record_id in pTestSourceRids ))  ,named('ds_result'           ),all)
     );                              
-		
+
 	return when(ds_result ,if(count(pTestCorpkeys) != 0 or count(pTestSourceRids) != 0 ,outputdebug));
 			
 end;				
