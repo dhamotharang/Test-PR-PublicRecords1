@@ -33,6 +33,7 @@ MODULE
 	EXPORT  BIP_Header_Package_Env_Var     := 'bip_build_version';
 	EXPORT  Email_List                     := 'Sudhir.Kasavajjala@lexisnexisrisk.com, ravi.gadi@lexisnexisrisk.com,kapildev.kanyagundla@lexisnexisrisk.com';
   EXPORT  ErieAddrPhClnPersist           := '~thor_data400::base::fdn::erie::AddrPhCln::persist';
+  EXPORT  ErieWLClnLinkedPersist         := '~thor_data400::base::fdn::eriewatchlist::ClnLinked::persist';
   EXPORT  OigAddrClnPersist              := '~thor_data400::base::fdn::oig::AddrCln::persist';
 
 
