@@ -40,8 +40,9 @@ EXPORT TuFraudAlert_Records(dataset(iesp.tu_fraud_alert.t_TuFraudAlertRequest) i
   inquiry_log_lexID := IF(is_lexID_match OR ~remote_linking_result.match OR remote_linking_result.best_lexID = 0,
     input_lexID, remote_linking_result.best_lexID);
 
-  //Prepare inquiry log, even if lexID is 0 we must log the inquiry. Use input data sent to didville.
-  consumer := FFD.Mac.PrepareConsumerRecord((STRING)inquiry_log_lexID, TRUE, ds_plist_req[1].searchby, '', TRUE);
+  //Prepare inquiry log. If it is a 0, set to a blank string per ESP team request.
+  consumer := FFD.Mac.PrepareConsumerRecord(IF(inquiry_log_lexID = 0, '', (STRING)inquiry_log_lexID),
+    TRUE, ds_plist_req[1].searchby, '', TRUE);
 
   //Set validation code and message.
   //Previously NOCALL would be set if we didn't have a lexID, or if we had FFD suppression.

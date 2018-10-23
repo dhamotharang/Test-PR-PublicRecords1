@@ -35,7 +35,7 @@
     END;
     __outrec := ROW(SetConsumerRecord());
     // return result only if there is resolved LexId, or if it's explcitly allowed.
-    RETURN 	IF(__allow_zero_lexid OR (UNSIGNED) __lexId > 0, __outrec);
+    RETURN  IF(__allow_zero_lexid OR (UNSIGNED) __lexId > 0, __outrec);
   ENDMACRO;
 
   EXPORT PrepareResultRecord(__results, __outrec, __statements, __alerts, __lout) := MACRO
