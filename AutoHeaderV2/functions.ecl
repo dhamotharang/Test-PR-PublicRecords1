@@ -77,8 +77,12 @@ EXPORT functions := MODULE
       AutoheaderV2.layouts.search_out.index_hit;
     end;
 
-    srec tra(AutoheaderV2.layouts.search_out l, dx_BestRecords.layout_best r) := transform
+		best_recs := dx_BestRecords.fn_get_best_records(adv_references, did, dx_BestRecords.Constants.perm_type.glb);
+
+    srec tra(recordof(best_recs) r) := transform
+
       //change: take ssn-valid indicator from best, not from header
+			AutoheaderV2.layouts.search_out l := r._bestrec_input;
       boolean is_good_ssn := length(trim(temp_ssn_value)) = 9 and r.ssn = temp_ssn_value and r.valid_ssn = 'G';
       ss := 
         if(temp_ssn_value = '', 
@@ -118,10 +122,7 @@ EXPORT functions := MODULE
       self.index_hit := l.index_hit;
     end;
 
-    j := join(adv_references, 
-							dx_BestRecords.fn_get_best_records(adv_references, did, dx_BestRecords.Constants.perm_type.glb),
-              left.did = right.did, 
-              tra(left, right), KEEP (1), limit (0));
+		j := project(best_recs, tra(left));
 
     b := TOPN (j, 1, -score, did);
     bslim := project(b, AutoheaderV2.layouts.search_out);
