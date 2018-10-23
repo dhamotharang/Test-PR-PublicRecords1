@@ -1,4 +1,4 @@
-IMPORT FraudShared;
+﻿IMPORT FraudShared;
 EXPORT Functions := 
 	module 
 	
@@ -55,8 +55,9 @@ function
 												self.classification_Activity.Channels_id                                               := right.Channels;
 												self.classification_Activity.Threat_id                                                 := right.Threat;
 												self.classification_Activity.Alert_level_id                                            := right.Alert_level;
-												self.classification_Entity.Entity_type_id                                              := if(left.source = 'ERIE', left.classification_Entity.Entity_type_id, 
-												                                                                                                                   right.Entity_type); 
+												self.classification_Entity.Entity_type_id                                              := if(left.source in ['ERIE', 'ERIE_NICB_WATCHLIST', 'ERIE_WATCHLIST'],
+												                                                                                             left.classification_Entity.Entity_type_id, 
+                                                                                                                   right.Entity_type); 
 												self.classification_Entity.Entity_sub_type_id                                          := if(left.source = 'ERIE', left.classification_Entity.Entity_sub_type_id,
 												                                                                                                                   right.Entity_sub_type);
 												self.classification_Entity.role_id                                                     := if(left.source = 'ERIE', left.classification_Entity.role_id, 
@@ -268,6 +269,18 @@ end;
 																			map(entity      = 'PERSON'        => Mod_MbsContext.ErieEntityType_person_id,//'PERSON',
 																					entity      = 'BUSINESS'      => Mod_MbsContext.ErieEntityType_business_id,//'BUSINESS',
 																					Mod_MbsContext.ErieEntityType_unknown_id //UNKNOWN
+																					);
+
+ 	export ErieWL_EntityType_id(string entity)  :=
+																			map(entity      = 'PERSON'        => Mod_MbsContext.ErieWatchListEntityType_person_id,
+																					entity      = 'BUSINESS'      => Mod_MbsContext.ErieWatchListEntityType_business_id,
+																					Mod_MbsContext.ErieWatchListEntityType_unknown_id 
+																					);
+
+ 	export ErieNICBWL_EntityType_id(string entity)  :=
+																			map(entity      = 'PERSON'        => Mod_MbsContext.ErieNICBWatchListEntityType_person_id,
+																					entity      = 'BUSINESS'      => Mod_MbsContext.ErieNICBWatchListEntityType_business_id,
+																					Mod_MbsContext.ErieNICBWatchListEntityType_unknown_id
 																					);
 																		 
 end; 

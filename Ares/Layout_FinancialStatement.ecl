@@ -80,7 +80,6 @@ export layout_financialstatement := record
 	string source {xpath('@source')};
 	string owner_link_href {xpath('owner/link/@href')};
 	string owner_link_rel {xpath('owner/link/@rel')};
-	
 	string tfpid {xpath('@tfpid')};
 	layout_summary summary {xpath('summary')};	
 	dataset(layout_location) locations {xpath('locations/location')};	
