@@ -1,26 +1,26 @@
-export fn_get_best_records(did_ds, did_field, permission_type) := functionmacro
+export fn_get_best_records(did_ds, did_field, permission_type, use_distributed = 'false') := functionmacro
 
 	import ut, watchdog, Infutor, doxie, dx_BestRecords;
 
 	// ennumerate all of the possible join options
 	// -------------------------------------------------------------
-	local out_glb := dx_BestRecords.fn_join_watchdog(did_ds, did_field, watchdog.Key_watchdog_glb);
-	local out_glb_nonutil := dx_BestRecords.fn_join_watchdog(did_ds, did_field, watchdog.Key_watchdog_glb_nonutil);
-	local out_glb_nonutil_nonblank := dx_BestRecords.fn_join_watchdog(did_ds, did_field, watchdog.Key_watchdog_glb_nonutil_nonblank);
-	local out_glb_nonexp := dx_BestRecords.fn_join_watchdog(did_ds, did_field, watchdog.Key_Watchdog_GLB_nonExperian);
-	local out_glb_noneq := dx_BestRecords.fn_join_watchdog(did_ds, did_field, watchdog.Key_Watchdog_GLB_nonEquifax);
-	local out_glb_nonexp_noneq := dx_BestRecords.fn_join_watchdog(did_ds, did_field, watchdog.Key_Watchdog_GLB_nonExperian_nonEquifax);
-	local out_glb_nonblank := dx_BestRecords.fn_join_watchdog(did_ds, did_field, watchdog.key_watchdog_glb_nonblank);
-	local out_glb_nonexp_nonblank := dx_BestRecords.fn_join_watchdog(did_ds, did_field, watchdog.Key_Watchdog_GLB_nonExperian_nonblank);
-	local out_glb_noneq_nonblank := dx_BestRecords.fn_join_watchdog(did_ds, did_field, watchdog.Key_Watchdog_GLB_nonEquifax_nonblank);
-	local out_glb_nonexp_noneq_nonblank := dx_BestRecords.fn_join_watchdog(did_ds, did_field, watchdog.Key_Watchdog_GLB_nonExperian_nonEquifax_nonblank);
-	local out_nonglb := dx_BestRecords.fn_join_watchdog(did_ds, did_field, watchdog.Key_Watchdog_nonglb);
-	local out_nonglb_preglb := dx_BestRecords.fn_join_watchdog(did_ds, did_field, Watchdog.Key_Watchdog_nonglb_V2);
-	local out_nonglb_nonblank := dx_BestRecords.fn_join_watchdog(did_ds, did_field, watchdog.key_watchdog_nonglb_nonblank);
-	local out_nonglb_nonblank_preglb := dx_BestRecords.fn_join_watchdog(did_ds, did_field, Watchdog.key_watchdog_nonglb_nonblank_V2);
-	local out_marketing := dx_BestRecords.fn_join_watchdog(did_ds, did_field, watchdog.Key_watchdog_marketing);
-	local out_marketing_preglb := dx_BestRecords.fn_join_watchdog(did_ds, did_field, Watchdog.Key_Watchdog_marketing_V2);
-	local out_cnsmr := dx_BestRecords.fn_join_watchdog(did_ds, did_field, Infutor.key_infutor_best_did);
+	local out_glb := dx_BestRecords.fn_join_watchdog(did_ds, did_field, watchdog.Key_watchdog_glb, use_distributed);
+	local out_glb_nonutil := dx_BestRecords.fn_join_watchdog(did_ds, did_field, watchdog.Key_watchdog_glb_nonutil, use_distributed);
+	local out_glb_nonutil_nonblank := dx_BestRecords.fn_join_watchdog(did_ds, did_field, watchdog.Key_watchdog_glb_nonutil_nonblank, use_distributed);
+	local out_glb_nonexp := dx_BestRecords.fn_join_watchdog(did_ds, did_field, watchdog.Key_Watchdog_GLB_nonExperian, use_distributed);
+	local out_glb_noneq := dx_BestRecords.fn_join_watchdog(did_ds, did_field, watchdog.Key_Watchdog_GLB_nonEquifax, use_distributed);
+	local out_glb_nonexp_noneq := dx_BestRecords.fn_join_watchdog(did_ds, did_field, watchdog.Key_Watchdog_GLB_nonExperian_nonEquifax, use_distributed);
+	local out_glb_nonblank := dx_BestRecords.fn_join_watchdog(did_ds, did_field, watchdog.key_watchdog_glb_nonblank, use_distributed);
+	local out_glb_nonexp_nonblank := dx_BestRecords.fn_join_watchdog(did_ds, did_field, watchdog.Key_Watchdog_GLB_nonExperian_nonblank, use_distributed);
+	local out_glb_noneq_nonblank := dx_BestRecords.fn_join_watchdog(did_ds, did_field, watchdog.Key_Watchdog_GLB_nonEquifax_nonblank, use_distributed);
+	local out_glb_nonexp_noneq_nonblank := dx_BestRecords.fn_join_watchdog(did_ds, did_field, watchdog.Key_Watchdog_GLB_nonExperian_nonEquifax_nonblank, use_distributed);
+	local out_nonglb := dx_BestRecords.fn_join_watchdog(did_ds, did_field, watchdog.Key_Watchdog_nonglb, use_distributed);
+	local out_nonglb_preglb := dx_BestRecords.fn_join_watchdog(did_ds, did_field, Watchdog.Key_Watchdog_nonglb_V2, use_distributed);
+	local out_nonglb_nonblank := dx_BestRecords.fn_join_watchdog(did_ds, did_field, watchdog.key_watchdog_nonglb_nonblank, use_distributed);
+	local out_nonglb_nonblank_preglb := dx_BestRecords.fn_join_watchdog(did_ds, did_field, Watchdog.key_watchdog_nonglb_nonblank_V2, use_distributed);
+	local out_marketing := dx_BestRecords.fn_join_watchdog(did_ds, did_field, watchdog.Key_watchdog_marketing, use_distributed);
+	local out_marketing_preglb := dx_BestRecords.fn_join_watchdog(did_ds, did_field, Watchdog.Key_Watchdog_marketing_V2, use_distributed);
+	local out_cnsmr := dx_BestRecords.fn_join_watchdog(did_ds, did_field, Infutor.key_infutor_best_did, use_distributed);
 
 	// select correct join based on the input flag
 	// NOTE: we expect a valid value of type dx_BestRecords.Constants.perm_type
