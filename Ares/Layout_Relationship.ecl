@@ -51,9 +51,7 @@ positions_ := record
 end;
 
 telecoms_ := record
-//TODO revisit this linkshref/rel.
-	string link_href{xpath('link/@href')};
-  string link_rel{xpath('link/@rel')};	
+	layouts.layout_link entityReference {xpath('link')};
 	string telecom_fid {xpath('@fid')} :='';
 	string type {xpath('type')} :='';
 	string phoneCountryCode {xpath('phoneCountryCode')} :='';
@@ -89,10 +87,7 @@ layout_details := record
 end;
 
 layout_provider := record
-	//TODO: use Ares.Layouts.layout_link here
-	//Ares.Layouts.layout_link entityReference {xpath('provider/link')};
-	string link_href{xpath('link/@href')};
-  string link_rel{xpath('link/@rel')};
+	layouts.layout_link entityReference {xpath('link')};
 	string legalName{xpath('legalName')};
 end;
 
