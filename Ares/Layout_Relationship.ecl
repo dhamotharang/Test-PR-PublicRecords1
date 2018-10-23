@@ -1,16 +1,98 @@
-﻿import Layouts;
-membershipType := record
+﻿membership_ := record
 	string membership {xpath('membershipType')};
 end;
 
+ownership_ := record 
+	string ownerType{xpath('ownerType')} :='';
+	string percentage{xpath('percentage')} :='';
+end;
+
+regulator_ := record 
+	string regulatorType {xpath('regulatorType')} :='';
+end;
+
+auditor_ := record 
+	string auditorType{xpath('auditorType')} :='';
+end;
+
+stockExchange_ := record 
+	string primary{xpath('primary')} :='';
+	string tickerSymbol{xpath('tickerSymbol')} :='';
+end;
+
+roles_ :=record
+	string role{xpath('./')} :='';
+end;
+
+types_ := record
+	string department_types_type{xpath('./')} :='';
+end;
+
+department_types := record
+	dataset (types_) types {xpath('type')};
+end;
+
+department_name := record
+	string department_name_type{xpath('type')} :='';
+	string department_name_value{xpath('value')} :='';
+end;
+
+department_ := record
+		department_name name {xpath('name')};
+		department_types types {xpath('types')};
+end;
+
+positions_ := record
+	string positionCategory {xpath('positionCategory')} :='';
+	dataset (Ares.Layouts.layout_link) office {xpath('office/link')};
+	department_ department {xpath('department')};
+	string jobTitle {xpath('jobTitle')} :='';
+	string jobTitleType {xpath('jobTitleType')} :='';
+end;
+
+telecoms_ := record
+//TODO revisit this linkshref/rel.
+	string link_href{xpath('link/@href')};
+  string link_rel{xpath('link/@rel')};	
+	string telecom_fid {xpath('@fid')} :='';
+	string type {xpath('type')} :='';
+	string phoneCountryCode {xpath('phoneCountryCode')} :='';
+	string phoneAreaCode {xpath('phoneAreaCode')} :='';
+	string phoneNumber {xpath('phoneNumber')} :='';
+	string phoneNumberRangeLimit {xpath('phoneNumberRangeLimit')} :='';
+	string phoneExtension {xpath('phoneExtension')} :='';
+	string value {xpath('value')} :='';
+end;
+
+employment_ :=record
+	dataset (roles_) roles {xpath('roles/role')};
+	dataset (positions_) positions {xpath('positions/position')};
+	dataset (telecoms_) telecoms {xpath('telecoms/telecom')};
+end;
+
+contact_ := record
+	string contactType {xpath('contactType')} :='';
+	string username {xpath('username')} :='';
+	dataset (positions_) positions {xpath('positions/position')};
+	dataset(layouts.address) address {xpath('addresses/address')};
+	dataset (telecoms_) telecoms {xpath('telecoms/telecom')};
+end;
+
 layout_details := record
-	dataset (membershipType) membership {xpath('membership')};
+	dataset (ownership_) ownership {xpath('ownership')};
+	regulator_ regulator {xpath('regulator')};
+	auditor_ auditor {xpath('auditor')};
+	membership_ membership {xpath('membership')};
+	stockExchange_ stockExchange {xpath('stockExchange')};
+	employment_ employment {xpath('employment')};
+	contact_ contact {xpath('contact')};
 end;
 
 layout_provider := record
-	// string link_href{xpath('link/@href')};
-  // string link_rel{xpath('link/@rel')};
-	Ares.Layouts.layout_link entityReference {xpath('provider/link')};
+	//TODO: use Ares.Layouts.layout_link here
+	//Ares.Layouts.layout_link entityReference {xpath('provider/link')};
+	string link_href{xpath('link/@href')};
+  string link_rel{xpath('link/@rel')};
 	string legalName{xpath('legalName')};
 end;
 
@@ -18,6 +100,7 @@ party := record
 	string partyType {xpath('partyType')};
 	string entityType {xpath('entityType')};
 	dataset (Ares.Layouts.layout_link) entityReference {xpath('entityReference/link')};
+	string description {xpath('description')};
 end;
 
 layout_parties := record
@@ -36,9 +119,7 @@ EXPORT Layout_Relationship := record
 	string dateEnded {xpath('dateEnded')};
 	string validationDate {xpath('validationDate')};
 	layout_provider provider {xpath('provider')};
-	layout_details details {xpath('details')};
-	layout_parties parties {xpath('parties')};
 	string extendedSource {xpath('extendedSource')};
-	
-
+	layout_parties parties {xpath('parties')};
+	layout_details details {xpath('details')};
 end;
