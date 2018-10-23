@@ -1,8 +1,8 @@
 ﻿IMPORT SALT37,std;
-EXPORT Key_InsuranceHeader_SSN4(BOOLEAN incremental=FALSE, UNSIGNED2  aBlockLimit=Config.SSN4_MAXBLOCKLIMIT) := MODULE/*HACK*/
+EXPORT Key_InsuranceHeader_SSN4(BOOLEAN incremental=FALSE, UNSIGNED2  aBlockLimit= Config.SSN4_MAXBLOCKLIMIT) := MODULE/*HACK25*/
  
 //SSN4:FNAME:LNAME(NOFUZZY):+:DOB:SSN5:DERIVED_GENDER:SNAME
-EXPORT KeyName := KeyNames().SSN4_super; /*HACK*/
+EXPORT KeyName := KeyNames().SSN4_super; /*HACK10*/
  
 EXPORT KeyName_sf := '~'+KeyPrefix+'::'+'key::InsuranceHeader_xLink'+'::'+KeySuperfile+'::DID::Refs::SSN4';
  
@@ -85,7 +85,7 @@ EXPORT MergeKeyFiles(STRING superFileIn, STRING outfileName, UNSIGNED4 minDate =
   fieldListPayload := 'IsIncremental';
   RETURN Process_xIDL_Layouts().MAC_GenerateMergedKey(superFileIn, outfileName, minDate, replaceExisting, fieldListIndex, fieldListPayload, 'Key');
 END;
-EXPORT MAX_BLOCKLIMIT := IF (aBlockLimit=0,  Config.SSN4_MAXBLOCKLIMIT, aBlockLimit);
+EXPORT MAX_BLOCKLIMIT := IF (aBlockLimit=0,  Config.SSN4_MAXBLOCKLIMIT, aBlockLimit);/*HACK24a*/
 EXPORT CanSearch(Process_xIDL_Layouts().InputLayout le) := le.SSN4 <> (TYPEOF(le.SSN4))'' AND Fields.InValid_SSN4((SALT37.StrType)le.SSN4)=0 AND le.FNAME <> (TYPEOF(le.FNAME))'' AND Fields.InValid_FNAME((SALT37.StrType)le.FNAME)=0 AND le.LNAME <> (TYPEOF(le.LNAME))'';
 KeyRec := RECORDOF(Key);
  
@@ -93,7 +93,7 @@ EXPORT RawFetch(TYPEOF(h.SSN4) param_SSN4 = (TYPEOF(h.SSN4))'',TYPEOF(h.SSN4_len
     STEPPED( LIMIT( Key(
           KEYED(( SSN4 = param_SSN4 AND param_SSN4 <> (TYPEOF(SSN4))''))
       AND KEYED(( FNAME = param_FNAME AND param_FNAME <> (TYPEOF(FNAME))''))
-      AND KEYED(( LNAME = param_LNAME AND param_LNAME <> (TYPEOF(LNAME))''))),MAX_BLOCKLIMIT /*HACK*/,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED),DID);
+      AND KEYED(( LNAME = param_LNAME AND param_LNAME <> (TYPEOF(LNAME))''))),MAX_BLOCKLIMIT/*HACK24b*/,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED),DID);
  
  
 EXPORT ScoredDIDFetch(TYPEOF(h.SSN4) param_SSN4 = (TYPEOF(h.SSN4))'',TYPEOF(h.SSN4_len) param_SSN4_len = (TYPEOF(h.SSN4_len))'',TYPEOF(h.FNAME) param_FNAME = (TYPEOF(h.FNAME))'',TYPEOF(h.FNAME_len) param_FNAME_len = (TYPEOF(h.FNAME_len))'',TYPEOF(h.LNAME) param_LNAME = (TYPEOF(h.LNAME))'',TYPEOF(h.LNAME_len) param_LNAME_len = (TYPEOF(h.LNAME_len))'',UNSIGNED4 param_DOB,TYPEOF(h.SSN5) param_SSN5 = (TYPEOF(h.SSN5))'',TYPEOF(h.SSN5_len) param_SSN5_len = (TYPEOF(h.SSN5_len))'',TYPEOF(h.DERIVED_GENDER) param_DERIVED_GENDER = (TYPEOF(h.DERIVED_GENDER))'',TYPEOF(h.SNAME) param_SNAME = (TYPEOF(h.SNAME))'',BOOLEAN param_disableForce = FALSE) := FUNCTION

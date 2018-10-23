@@ -17,73 +17,84 @@ EXPORT getIndRelatives(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
 			
 			RETURN filtRelatives;
 		END;
+    
+    getListOfRelations(relationData, filterRelativesBy) := FUNCTIONMACRO
+      
+      filteredRelations := relationData(indvType = filterRelativesBy);
+      
+      //make sure we only have 1 relationship with a given DID
+      uniqueDIDs := DEDUP(SORT(filteredRelations, seq, inquiredDID, individual.did), seq, inquiredDID, individual.did);
+      
+      reformatRelations := PROJECT(uniqueDIDs, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, DATASET(DueDiligence.Layouts.SlimIndividual) relations},
+                                                          SELF.seq := LEFT.seq;
+                                                          SELF.did := LEFT.inquiredDID;
+                                                          SELF.relations := DATASET([TRANSFORM(DueDiligence.Layouts.SlimIndividual, SELF := LEFT.individual;)]);
+                                                          SELF := [];));
+                                                          
+      sortReformatted := SORT(reformatRelations, seq, did);
+      rollReformatted := ROLLUP(sortReformatted,
+                                LEFT.seq = RIGHT.seq AND
+                                LEFT.did = RIGHT.did,
+                                TRANSFORM(RECORDOF(LEFT),
+                                          SELF.relations := LEFT.relations + RIGHT.relations;
+                                          SELF := LEFT;));
+                                          
+      RETURN rollReformatted;
+    ENDMACRO;
 		
-		
+	
+	
+  
+  
+  
+  
+  
+  
 		justDIDs := PROJECT(inData, TRANSFORM(Relationship.Layout_GetRelationship.DIDs_layout, SELF.DID := LEFT.inquiredDID;));									 
 
 		firstDegreeRelationships := getRelations(justDIDs);
 		
 		spouse := firstDegreeRelationships(title IN Header.relative_titles.set_Spouse);
 		parents := firstDegreeRelationships(title IN Header.relative_titles.set_Parent);
-		
-		//temp code
-		cntSpouse := PROJECT(spouse, TRANSFORM({UNSIGNED4 spouseCnt, RECORDOF(LEFT)}, SELF.spouseCnt := 1; SELF := LEFT;));
-		
-		rollSpouseCnt := ROLLUP(SORT(cntSpouse, did1),
-																											LEFT.did1 = RIGHT.did1,
-																											TRANSFORM(RECORDOF(LEFT),
-																																						SELF.spouseCnt := LEFT.spouseCnt + RIGHT.spouseCnt;
-																																						SELF := LEFT;));
-																																						
-																																						
-			addSpouseCnt := JOIN(inData, rollSpouseCnt,
-																				LEFT.inquiredDID = RIGHT.did1,
-																				TRANSFORM(DueDiligence.Layouts.Indv_Internal,
-																														SELF.numberOfSpouses := RIGHT.spouseCnt;
-																														SELF := LEFT;),
-																				LEFT OUTER);																																			
-																																						
-		//end temp code																																				
-		
-		//only want 1 spouse
-		topSpouse := DEDUP(SORT(spouse, did1, did2), did1); 
-		
-		spouseAndParents := parents + topSpouse;
-		
-		relatives := JOIN(inData, spouseAndParents,
-																				LEFT.inquiredDID = RIGHT.did1,
-																				TRANSFORM(DueDiligence.Layouts.Indv_Internal,
-																														SELF.seq := LEFT.seq;
-																														SELF.inquiredDID := LEFT.inquiredDID;
-																														SELF.individual.did := RIGHT.did2;
-																														SELF.indvType := IF(RIGHT.title IN Header.relative_titles.set_Spouse, DueDiligence.Constants.INQUIRED_INDIVIDUAL_SPOUSE, DueDiligence.Constants.INQUIRED_INDIVIDUAL_PARENT);
-																														SELF := [];));
-		
-		relativeData := DueDiligence.getIndBestData(relatives, dppa, glba, FALSE);
-		
-		slimRelative := PROJECT(relativeData, TRANSFORM({UNSIGNED4 seq, UNSIGNED6 inquiredExecDID, STRING2 indvType, DueDiligence.Layouts.SlimIndividual individual},
-																																																				SELF.inquiredExecDID := LEFT.inquiredDID;
-																																																				SELF.seq := LEFT.seq;
-																																																				SELF.individual := LEFT.individual;
-																																																				SELF := LEFT;
-																																																				SELF := [];));
-		
-		addSpouse := JOIN(addSpouseCnt, slimRelative(indvType = DueDiligence.Constants.INQUIRED_INDIVIDUAL_SPOUSE),
-																				LEFT.seq = RIGHT.seq AND
-																				LEFT.inquiredDID = RIGHT.inquiredExecDID,
-																				TRANSFORM(DueDiligence.Layouts.Indv_Internal,
-																														SELF.spouse := RIGHT.individual;
-																														SELF := LEFT;),
-																				LEFT OUTER);
-																				
-		addParents := DENORMALIZE(addSpouse, slimRelative(indvType = DueDiligence.Constants.INQUIRED_INDIVIDUAL_PARENT),
-																												LEFT.seq = RIGHT.seq AND
-																												LEFT.inquiredDID = RIGHT.inquiredExecDID,
-																												TRANSFORM(DueDiligence.Layouts.Indv_Internal,
-																																	SELF.parents := LEFT.parents + RIGHT.individual;
-																																	SELF.hasParent := LEFT.hasParent OR RIGHT.individual.did <> 0;
-																																	SELF := LEFT;),
-																												LEFT OUTER);
+
+    spouseAndParents := parents + spouse;
+    
+    relatives := JOIN(inData, spouseAndParents,
+                      LEFT.inquiredDID = RIGHT.did1,
+                      TRANSFORM(DueDiligence.Layouts.Indv_Internal,
+                                SELF.seq := LEFT.seq;
+                                SELF.inquiredDID := LEFT.inquiredDID;
+                                SELF.individual.did := RIGHT.did2;
+                                SELF.indvType := IF(RIGHT.title IN Header.relative_titles.set_Spouse, DueDiligence.Constants.INQUIRED_INDIVIDUAL_SPOUSE, DueDiligence.Constants.INQUIRED_INDIVIDUAL_PARENT);
+                                SELF := [];));
+    
+    bestRelativeData := DueDiligence.getIndBestData(relatives, dppa, glba, FALSE);
+    
+  
+    slimmedRolledSpouseData := getListOfRelations(bestRelativeData, DueDiligence.Constants.INQUIRED_INDIVIDUAL_SPOUSE);
+    slimmedRolledParentData := getListOfRelations(bestRelativeData, DueDiligence.Constants.INQUIRED_INDIVIDUAL_PARENT);
+    
+    addSpouse := JOIN(inData, slimmedRolledSpouseData,
+                       LEFT.seq = RIGHT.seq AND
+                       LEFT.inquiredDID = RIGHT.did,
+                       TRANSFORM(DueDiligence.Layouts.Indv_Internal,
+                                 SELF.spouses := RIGHT.relations;
+                                 SELF.numberOfSpouses := COUNT(RIGHT.relations);
+                                 SELF := LEFT;),
+                       LEFT OUTER,
+                       ATMOST(1));
+      																				
+    addParents := JOIN(addSpouse, slimmedRolledParentData,
+                        LEFT.seq = RIGHT.seq AND
+                        LEFT.inquiredDID = RIGHT.did,
+                        TRANSFORM(DueDiligence.Layouts.Indv_Internal,
+                                  SELF.parents := RIGHT.relations;
+                                  SELF.hasParent := COUNT(RIGHT.relations) > 0;
+                                  SELF := LEFT;),
+                        LEFT OUTER,
+                        ATMOST(1));
+
+
 		
 			
 				
@@ -92,16 +103,14 @@ EXPORT getIndRelatives(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
 		// OUTPUT(firstDegreeRelationships, NAMED('firstDegreeRelationships'));
 		// OUTPUT(spouse, NAMED('spouse'));
 		// OUTPUT(parents, NAMED('parents'));
-		// OUTPUT(topSpouse, NAMED('topSpouse'));
 		// OUTPUT(spouseAndParents, NAMED('spouseAndParents'));
 		// OUTPUT(relatives, NAMED('relatives'));
-		// OUTPUT(relativeData, NAMED('relativeData'));
-		// OUTPUT(slimRelative, NAMED('slimRelative'));
+		// OUTPUT(bestRelativeData, NAMED('bestRelativeData'));
+		// OUTPUT(slimmedRolledSpouseData, NAMED('slimmedRolledSpouseData'));
+		// OUTPUT(slimmedRolledParentData, NAMED('slimmedRolledParentData'));
 		// OUTPUT(addSpouse, NAMED('addSpouse'));
 		// OUTPUT(addParents, NAMED('addParents'));
 		
-		
-		// OUTPUT(rollSpouseCnt, NAMED('rollSpouseCnt'));
 	
 	
 		RETURN addParents;

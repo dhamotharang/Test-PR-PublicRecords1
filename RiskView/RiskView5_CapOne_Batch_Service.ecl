@@ -208,6 +208,11 @@ export RiskView5_CapOne_Batch_Service := MACRO
 
 		riskview.layouts.layout_RV5capOneBatch_searchResults-AcctNo apply_score_alert_filters(RV5attrs_W_bankcardResults le, clam rt) := transform
 				SELF.LexID := IF(rt.DID = 0, '', (STRING)rt.DID); //FCRA_listGen - This should never be zero in Riskview.LITE
+        
+				// if the transaction can't get a score, don't return the DID for logging the inquiry
+        self.inquiry_lexid := if(riskview.constants.noscore(rt.iid.nas_summary,rt.iid.nap_summary, rt.address_verification.input_address_information.naprop, rt.truedid), 
+        '', 
+        (string12)rt.did);
 
 				// ====================================================
 				// 							Alerts

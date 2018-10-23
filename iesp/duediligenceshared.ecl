@@ -71,22 +71,64 @@ export t_DDRTaxAssessmentValues := record
 	integer8 TaxPrice {xpath('TaxPrice')};
 end;
 		
-export t_DDRTenant := record
-	string LexID {xpath('LexID')};
-	iesp.share.t_Name Name {xpath('Name')};
-	iesp.share.t_Date DateOfBirth {xpath('DateOfBirth')};
+export t_DDRLegalSourceInfo := record
+	string OffenseCharge {xpath('OffenseCharge')};
+	string7 OffenseConviction {xpath('OffenseConviction')};
+	string OffenseChargeLevelReported {xpath('OffenseChargeLevelReported')};
+	string Source {xpath('Source')};
+	string CourtDisposition1 {xpath('CourtDisposition1')};
+	string CourtDisposition2 {xpath('CourtDisposition2')};
+	iesp.share.t_Date OffenseReportedDate {xpath('OffenseReportedDate')};
+	iesp.share.t_Date OffenseArrestDate {xpath('OffenseArrestDate')};
+	iesp.share.t_Date OffenseCourtDispDate {xpath('OffenseCourtDispDate')};
+	iesp.share.t_Date OffenseAppealDate {xpath('OffenseAppealDate')};
+	iesp.share.t_Date OffenseSentenceDate {xpath('OffenseSentenceDate')};
+	iesp.share.t_Date OffenseSentenceStartDate {xpath('OffenseSentenceStartDate')};
+	iesp.share.t_Date DOCConvictionOverrideDate {xpath('DOCConvictionOverrideDate')};
+	iesp.share.t_Date DOCScheduledReleaseDate {xpath('DOCScheduledReleaseDate')};
+	iesp.share.t_Date DOCActualReleaseDate {xpath('DOCActualReleaseDate')};
+	string DOCInmateStatus {xpath('DOCInmateStatus')};
+	string DOCParoleStatus {xpath('DOCParoleStatus')};
+	string OffenseMaxTerm {xpath('OffenseMaxTerm')};
+	dataset(iesp.share.t_StringArrayItem) PartyNames {xpath('PartyNames/PartyName'), MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxLegalPartyNames)};
+end;
+		
+export t_DDRLegalStateCriminal := record
+	string50 State {xpath('State')};
+	string25 Source {xpath('Source')};
+	string CaseNumber {xpath('CaseNumber')};
+	string OffenseStatute {xpath('OffenseStatute')};
+	iesp.share.t_Date OffenseDDFirstReported {xpath('OffenseDDFirstReported')};
+	iesp.share.t_Date OffenseDDLastReportedActivity {xpath('OffenseDDLastReportedActivity')};
+	iesp.share.t_Date OffenseDDMostRecentCourtDispDate {xpath('OffenseDDMostRecentCourtDispDate')};
+	string OffenseDDLegalEventTypeMapped {xpath('OffenseDDLegalEventTypeMapped')};
+	string OffenseCharge {xpath('OffenseCharge')};
+	string OffenseDDChargeLevelCalculated {xpath('OffenseDDChargeLevelCalculated')};
+	string OffenseChargeLevelReported {xpath('OffenseChargeLevelReported')};
+	string7 OffenseConviction {xpath('OffenseConviction')};
+	string15 OffenseIncarcerationProbationParole {xpath('OffenseIncarcerationProbationParole')};
+	string7 OffenseTrafficRelated {xpath('OffenseTrafficRelated')};
+	string30 County {xpath('County')};
+	string40 CountyCourt {xpath('CountyCourt')};
+	string40 City {xpath('City')};
+	string50 Agency {xpath('Agency')};
+	string30 Race {xpath('Race')};
+	string7 Sex {xpath('Sex')};
+	string15 HairColor {xpath('HairColor')};
+	string15 EyeColor {xpath('EyeColor')};
+	string3 Height {xpath('Height')};
+	string3 Weight {xpath('Weight')};
+	dataset(t_DDRLegalSourceInfo) Sources {xpath('Sources/Source'), MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxLegalSources)};
 end;
 		
 export t_DDRProperty := record
 	iesp.share.t_Address Address {xpath('Address')};
-	string45 BusinessAddressType {xpath('BusinessAddressType')};
-	iesp.share.t_Name OwnerName {xpath('OwnerName')};
+	string45 AddressType {xpath('AddressType')};
 	string1 OwnerOccupied {xpath('OwnerOccupied')};
 	t_DDROwnershipDetails Ownership {xpath('Ownership')};
 	t_DDRTaxAssessmentValues Assessment {xpath('Assessment')};
 	t_DDRAreaRisk AreaRisk {xpath('AreaRisk')};
 	t_DDRCountyCityRisk CountyCityRisk {xpath('CountyCityRisk')};
-	dataset(t_DDRTenant) ResidentTenants {xpath('ResidentTenants/ResidentTenant'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxTenants)};
 end;
 		
 export t_DDRAircraft := record
@@ -115,60 +157,6 @@ export t_DDRLegalEventIndividual := record
 	string SSN {xpath('SSN')};
 	iesp.share.t_Date DOB {xpath('DOB')};
 	string LexID {xpath('LexID')};
-end;
-		
-export t_DDRLegalEventCriminal := record
-	string LegalEventType {xpath('LegalEventType')};
-	string1 Conviction {xpath('Conviction')};
-	string1 TrafficRelated {xpath('TrafficRelated')};
-	string CaseNumber {xpath('CaseNumber')};
-	string CourtType {xpath('CourtType')};
-	string CaseTypeDescription {xpath('CaseTypeDescription')};
-	string1 OffenseScore {xpath('OffenseScore')};
-	string OffenseScoreDescription {xpath('OffenseScoreDescription')};
-	string OffenseLevel {xpath('OffenseLevel')};
-	string OffenseLevelDescription {xpath('OffenseLevelDescription')};
-	string ArrestLevelDescription {xpath('ArrestLevelDescription')};
-	string CourtStatute {xpath('CourtStatute')};
-	string CourtStatuteDescription {xpath('CourtStatuteDescription')};
-	string Charge {xpath('Charge')};
-	string3 NumberOfCounts {xpath('NumberOfCounts')};
-	string DispositionDescription1 {xpath('DispositionDescription1')};
-	string DispositionDescription2 {xpath('DispositionDescription2')};
-	string ProbationSentence {xpath('ProbationSentence')};
-	boolean Incarceration {xpath('Incarceration')};
-	boolean CurrentIncarceration {xpath('CurrentIncarceration')};
-	boolean CurrentParole {xpath('CurrentParole')};
-	boolean CurrentProbation {xpath('CurrentProbation')};
-	iesp.share.t_Date EarliestOffenseDate {xpath('EarliestOffenseDate')};
-	iesp.share.t_Date OffenseDate {xpath('OffenseDate')};
-	iesp.share.t_Date ArrestDate {xpath('ArrestDate')};
-	iesp.share.t_Date CourtDispositionDate {xpath('CourtDispositionDate')};
-	iesp.share.t_Date SentenceDate {xpath('SentenceDate')};
-	iesp.share.t_Date AppealDate {xpath('AppealDate')};
-	iesp.share.t_Date IncarcerationDate {xpath('IncarcerationDate')};
-	iesp.share.t_Date IncarcerationReleaseDate {xpath('IncarcerationReleaseDate')};
-	string50 AgencyDescription {xpath('AgencyDescription')};
-	string2 StateOrigin {xpath('StateOrigin')};
-	string30 CountyOfOrigin {xpath('CountyOfOrigin')};
-	string40 CourtCounty {xpath('CourtCounty')};
-	string40 OffenseTown {xpath('OffenseTown')};
-	string2 Citizenship {xpath('Citizenship')};
-	string30 RaceDescription {xpath('RaceDescription')};
-	string7 Sex {xpath('Sex')};
-	string15 HairColor {xpath('HairColor')};
-	string15 EyeColor {xpath('EyeColor')};
-	string3 Height {xpath('Height')};
-	string3 Weight {xpath('Weight')};
-	string10 FederalOrState {xpath('FederalOrState')};
-	string CaseType {xpath('CaseType')};
-	string ArrestLevel {xpath('ArrestLevel')};
-	string Agency {xpath('Agency')};
-	string30 Race {xpath('Race')};
-	string50 OffenseState {xpath('OffenseState')};
-	string30 OffenseCounty {xpath('OffenseCounty')};
-	string40 OffenseCity {xpath('OffenseCity')};
-	boolean TrafficRelatedOffense {xpath('TrafficRelatedOffense')};
 end;
 		
 export t_DDRLegalSummary := record
@@ -249,11 +237,18 @@ export t_DDRAttributesBusiness := record (t_DDRAttributesBase)
 end;
 		
 export t_DDRAttributesOptions := record (iesp.share.t_BaseOption)
-	string32 AttributesVersionRequest {xpath('AttributesVersionRequest')};
+	string32 DDAttributesVersionRequest {xpath('DDAttributesVersionRequest')};
 	iesp.share.t_Date HistoryDate {xpath('HistoryDate')};
-	boolean IncludeNews {xpath('IncludeNews')};
 	boolean DisplayText {xpath('DisplayText')};
 	string IncludeSpecialAttributes {xpath('IncludeSpecialAttributes')}; //values['None','Online','Batch','']//hidden[internal]
+	integer1 FBOPDateTolerance {xpath('FBOPDateTolerance')};
+	integer1 FBOPDateToleranceYearsPrior {xpath('FBOPDateToleranceYearsPrior')};
+	integer1 FBOPNameOrderSearched {xpath('FBOPNameOrderSearched')};
+	integer1 FBOPDOBNumberOfYearsRadius {xpath('FBOPDOBNumberOfYearsRadius')};
+	boolean FBOPIncludeExactInputLastName {xpath('FBOPIncludeExactInputLastName')};
+	boolean FBOPIncludeNicknames {xpath('FBOPIncludeNicknames')};
+	boolean FBOPIncludeLexIDPrimaryDOBYear {xpath('FBOPIncludeLexIDPrimaryDOBYear')};
+	boolean FBOPIncludeDOBYearRadius {xpath('FBOPIncludeDOBYearRadius')};
 end;
 		
 export t_DDRAttributeGroup := record

@@ -139,6 +139,22 @@ export Layout_CDM_Batch_Out := record
 	string4   IDVerFirstNameGovernmentMonthsSeen;
 	string3 	IDVerFirstNameBehavioralCount;
 	string4		IDVerFirstNameBehavioralMonthsSeen;
+  
+ // lastname
+	string2		IDVerLastNameCreditBureauCount;
+	string4   IDVerLastNameCreditBureauMonthsSeen;
+	string3		IDVerLastNameGovernmentCount;
+	string4   IDVerLastNameGovernmentMonthsSeen;
+	string3 	IDVerLastNameBehavioralCount;
+	string4		IDVerLastNameBehavioralMonthsSeen;
+  
+ // deceased
+	string2		IDVerDeceasedCreditBureauCount;
+	string4   IDVerDeceasedCreditBureauMonthsSeen;
+	string3		IDVerDeceasedGovernmentCount;
+	string4   IDVerDeceasedGovernmentMonthsSeen;
+	string3 	IDVerDeceasedBehavioralCount;
+	string4		IDVerDeceasedBehavioralMonthsSeen;
 	
 end;
 

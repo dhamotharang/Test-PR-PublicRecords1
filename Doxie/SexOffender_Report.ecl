@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SexOffender_Report" wuTimeout="240000">
   <part name="DID" type="xsd:string" required="1"/>
   <part name="SeisintPrimaryKey" type="xsd:string"/>
@@ -16,7 +16,7 @@
 import WSInput, doxie;
 
 export sexoffender_report := macro
-
+#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 #stored('IncludeNonRegisteredAltAddresses',true);
 
 WSInput.MAC_SexOffender_Report()

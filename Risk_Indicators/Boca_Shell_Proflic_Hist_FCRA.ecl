@@ -1,4 +1,5 @@
-﻿import prof_licenseV2, riskwise, ut, RiskView;
+﻿import _Control, prof_licenseV2, riskwise, ut, RiskView;
+onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Proflic_Hist_FCRA(GROUPED DATASET(Layout_Boca_Shell_ids) ids_only, integer bsversion, 
 			boolean isPrescreen, boolean isDirectToConsumerPurpose = false) := FUNCTION
@@ -58,13 +59,28 @@ PL_Plus_temp PL_FCRA(ids_only le, key_did rt) := transform
 	self := le;
 	self := [];  // sanctions are not pop in FCRA
 end;
-license_recs_original := join(ids_only, key_did,
+license_recs_original_roxie := join(ids_only, key_did,
 											left.did!=0 and keyed(right.did = left.did) and
 											(unsigned)(right.date_last_seen[1..6]) < left.historydate AND
 											(isDirectToConsumerPurpose = false or (
 											 isDirectToConsumerPurpose = true and StringLib.StringToUpperCase(trim(right.vendor)) != trim(RiskView.Constants.directToConsumerPL_sources))),
 											PL_FCRA(left,right), left outer, atmost(right.did = left.did, riskwise.max_atmost));
 
+license_recs_original_thor_did := join(distribute(ids_only(did!=0), hash64(did)), 
+											distribute(pull(key_did), hash64(did)),
+											(right.did = left.did) and
+											(unsigned)(right.date_last_seen[1..6]) < left.historydate AND
+											(isDirectToConsumerPurpose = false or (
+											 isDirectToConsumerPurpose = true and StringLib.StringToUpperCase(trim(right.vendor)) != trim(RiskView.Constants.directToConsumerPL_sources))),
+											PL_FCRA(left,right), left outer, atmost(right.did = left.did, riskwise.max_atmost), LOCAL);
+											
+license_recs_original_thor := GROUP(SORT(DISTRIBUTE(license_recs_original_thor_did + PROJECT(ids_only(did=0), TRANSFORM(PL_Plus_temp, SELF := LEFT, SELF := [])), HASH64(seq)), seq, LOCAL), seq, LOCAL);
+
+#IF(onThor)
+	license_recs_original := license_recs_original_thor;
+#ELSE
+	license_recs_original := license_recs_original_roxie;
+#END
 
 isFCRA := true;
 
@@ -152,14 +168,32 @@ Sorted_licenses := sort(license_recs_dates, seq, did, -license_number_cleaned, s
 		-tmp_MostRecent, -proflic_count);
 rolled_licenses_pre := rollup(group(Sorted_licenses, seq, did, license_number_cleaned, source_st), true, roll_licenses(left,right));	
 
-with_category_v5 := join(rolled_licenses_pre, Prof_LicenseV2.Key_LicenseType_lookup(true), 
+LicenseType_Key := Prof_LicenseV2.Key_LicenseType_lookup(true);
+
+PL_Plus_temp getv5category(rolled_licenses_pre le, LicenseType_Key ri) := transform
+	self.jobCategory := ri.occupation;  
+			self.PLcategory := if(trim(ri.category) != '', ri.category, '0');
+	self := le;
+END;
+
+with_category_v5_roxie := join(rolled_licenses_pre, LicenseType_Key, 
 		left.license_type<>'' and
 		keyed(left.license_type=right.license_type), 	
-			transform(PL_Plus_temp, 
-			self.jobCategory := right.occupation; 
-			self.PLcategory := if(trim(right.category) != '', right.category, '0');
-			self := left), left outer, atmost(100), keep(1));
-			
+			getv5category(LEFT,RIGHT), 
+		left outer, atmost(100), keep(1));
+		
+with_category_v5_thor := join(rolled_licenses_pre, pull(LicenseType_Key), 
+		left.license_type<>'' and
+		(left.license_type=right.license_type), 	
+			getv5category(LEFT,RIGHT), 
+		left outer, atmost(100), keep(1), MANY LOOKUP);
+		
+#IF(onThor)
+	with_category_v5 := with_category_v5_thor;
+#ELSE
+	with_category_v5 := with_category_v5_roxie;
+#END
+
 rolled_licenses := if(bsversion >= 4, with_category_v5, rolled_licenses_pre);
 			
 PL_Plus_temp roll_licenses2(PL_Plus_temp le, PL_Plus_temp rt) := transform

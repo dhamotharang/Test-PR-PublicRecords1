@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="QueryExpansionService">
   <part name="SSN" type="xsd:string"/>
 	<part name="UnParsedFullName" type="xsd:string"/>
@@ -39,7 +39,7 @@
            The individuals are delineated using the DID field*/
 
 export Query_Expand_Service := macro
-
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 doxie.MAC_Header_Field_Declare()
 
 d := didville.Expanded_Query;

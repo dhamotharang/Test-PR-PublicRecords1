@@ -49,6 +49,10 @@ EXPORT Layouts :=
         INTEGER2  Biz_RegisteredAgentsCount;
         INTEGER2  Biz_UCCFilingsCount;
         INTEGER2  Biz_WatercraftsCount;
+        INTEGER2  Biz_ProfLicMariCount;
+        INTEGER2  Biz_PublicSanctnCount;
+        INTEGER2  Biz_NonpublicSanctnCount;
+        INTEGER2  Biz_FreddieMacSanctnCount;
       END;
       
     EXPORT combinedTemp_rec :=
@@ -103,6 +107,10 @@ EXPORT Layouts :=
         INTEGER2 Per_SSNsCount;
         INTEGER2 Per_ThirdDegreeRelativesCount;
         INTEGER2 Per_WatercraftsCount;
+        INTEGER2 Per_ProfLicMariCount;
+        INTEGER2 Per_PublicSanctnCount;
+        INTEGER2 Per_NonpublicSanctnCount;
+        INTEGER2 Per_FreddieMacSanctnCount;
      END;
 
     EXPORT finalPlusSorting_rec :=
@@ -125,152 +133,4 @@ EXPORT Layouts :=
         business_linkid_rec;
       END;
 
-EXPORT People_Layout := RECORD
-  boolean isfcra;
-  integer8 first_degree_relatives_cnt;
-  integer8 second_degree_relatives_cnt;
-  integer8 Third_Degree_Relatives_cnt;
-  integer8 associates_cnt;
-  integer8 neighbors_cnt;
-  integer8 akas_cnt;
-  integer8 bankruptcy_cnt;
-  integer8 corporate_affiliation_cnt;
-  integer8 criminal_cnt;
-  integer8 criminal_doc_cnt;
-  boolean in_deceased;
-  integer8 directory_assistance_gong_cnt;
-  integer8 dl_cnt;
-  integer8 email_cnt;
-  integer8 faa_aircraft_cnt;
-  integer8 foreclosure_cnt;
-  integer8 gwl_cnt;
-  boolean in_gwl_ofac_only;
-  boolean in_address_hri;
-  boolean in_ssn_hri;
-  integer8 liens_cnt;
-  integer8 judgements_cnt;
-  integer8 evictions_cnt;
-  integer8 marriage_and_divorce_cnt;
-  integer8 mvr_cnt;
-  integer8 notice_of_default_cnt;
-  integer8 people_at_work_cnt;
-  boolean in_person_header;
-  integer8 phonesplus_cnt;
-  integer8 professional_license_cnt;
-  integer8 property_cnt;
-  integer8 registered_agent_cnt;
-  integer8 sex_offender_cnt;
-  integer8 watercraft_cnt;
-  integer8 addresses_cnt;
-  integer8 ssn_cnt;
-  integer8 owned_business_bdid_cnt;
-  integer8 owned_business_linkid_cnt;
-  unsigned6 did;
-  DATASET(business_bdid_rec) owned_businesses_bdid{maxcount(25)} := DATASET([],business_bdid_rec);
-  DATASET(business_linkid_rec) owned_businesses_linkid{maxcount(25)} := DATASET([],business_linkid_rec);
-  unsigned8 __internal_fpos__ :=0;
- END;
- EXPORT Business_Bdid_Layout := RECORD
-  boolean isfcra;
-  integer8 addresses_cnt;
-  integer8 bankruptcy_cnt;
-  boolean in_business_header;
-  integer8 business_associates_cnt;
-  integer8 business_industry_naics_cnt;
-  integer8 business_name_variations_cnt;
-  integer8 business_registrations_cnt;
-  integer8 corporations_sos_cnt;
-  integer8 directory_assistance_gong_cnt;
-  integer8 executives_cnt;
-  integer8 faa_aircraft_cnt;
-  integer8 fictitious_businesses_cnt;
-  integer8 foreclosure_cnt;
-  integer8 gwl_cnt;
-  boolean in_gwl_ofac_only;
-  integer8 internet_domain_cnt;
-  integer8 liens_cnt;
-  integer8 judgements_cnt;
-  integer8 evictions_cnt;
-  integer8 mvr_cnt;
-  integer8 property_cnt;
-  integer8 registered_agent_cnt;
-  integer8 ucc_cnt;
-  integer8 watercraft_cnt;
-  unsigned6 bdid;
-	integer8 fp := 0;
- END;
- 
- EXPORT Business_Linkids_Layout := RECORD
-  integer8 addresses_cnt;
-  integer8 bankruptcy_cnt;
-  boolean in_business_header;
-  integer8 business_associates_cnt;
-  integer8 business_industry_naics_cnt;
-  integer8 business_name_variations_cnt;
-  integer8 business_registrations_cnt;
-  integer8 corporations_sos_cnt;
-  integer8 directory_assistance_gong_cnt;
-  integer8 executives_cnt;
-  integer8 faa_aircraft_cnt;
-  integer8 fictitious_businesses_cnt;
-  integer8 foreclosure_cnt;
-  integer8 gwl_cnt;
-  boolean in_gwl_ofac_only;
-  integer8 internet_domain_cnt;
-  integer8 liens_cnt;
-  integer8 judgements_cnt;
-  integer8 evictions_cnt;
-  integer8 mvr_cnt;
-  integer8 property_cnt;
-  integer8 registered_agent_cnt;
-  integer8 ucc_cnt;
-  integer8 watercraft_cnt;
-  unsigned6 ultid;
-  unsigned6 orgid;
-  unsigned6 seleid;
-	unsigned8 __internal_fpos__ := 0;
- END;
- 
- slim_child_bdid_address := RECORD
-   unsigned6 bdid;
-   qstring120 company_name;
-   string2 predir;
-   qstring4 addr_suffix;
-   string2 postdir;
-   qstring5 unit_desig;
-   qstring25 city;
-   string2 state;
-   string4 zip4;
-   unsigned6 phone;
-   unsigned4 fein;
-  END;
-
-slim_child_seleid_address := RECORD
-   unsigned6 ultid;
-   unsigned6 orgid;
-   unsigned6 seleid;
-   unsigned6 bdid;
-   qstring120 company_name;
-   string2 predir;
-   qstring4 addr_suffix;
-   string2 postdir;
-   qstring5 unit_desig;
-   qstring25 city;
-   string2 state;
-   string4 zip4;
-   unsigned6 phone;
-   unsigned4 fein;
-  END;
-
-EXPORT Business_Address_Layout := RECORD
-  integer8 bdid_cnt;
-  integer8 seleid_cnt;
-  qstring10 prim_range;
-  qstring28 prim_name;
-  qstring8 sec_range;
-  string5 zip;
-  DATASET(slim_child_bdid_address) businesses_bdid{choosen(50)} :=  DATASET([],slim_child_bdid_address);
-  DATASET(slim_child_seleid_address) businesses_seleid{choosen(50)} := DATASET([], slim_child_seleid_address) ;
-	unsigned8 __internal_fpos__ := 0;
- END;
  END;

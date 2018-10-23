@@ -1,4 +1,4 @@
-IMPORT AutoStandardI, iesp, ut;
+﻿IMPORT AutoStandardI, iesp, ut;
 
 EXPORT LicenseReport_Records (MIDEX_Services.IParam.reportrecords in_mod) := 
   FUNCTION
@@ -48,10 +48,15 @@ EXPORT LicenseReport_Records (MIDEX_Services.IParam.reportrecords in_mod) :=
     sanctPub_report := MIDEX_Services.Raw_Public.License.Report_View.by_midex_rpt_num(ds_Sanctreport_ids,in_mod.AlertVersion,in_mod.SearchType,in_mod.ssnmask,in_mod.applicationType);
 		
 		// Get Profesional License Mari report(s)
-		profLic_report := MIDEX_Services.Raw_ProfessionalLicenses.License.Report_View.by_mari_num(ds_Profreport_ids, in_mod.AlertVersion, in_mod.ssnmask, in_mod.applicationType, in_mod.searchType);
-
-		nohash_results_raw := 
-      CHOOSEN(DEDUP(sanctNP_report+sanctPub_report+profLic_report,ALL),iesp.Constants.MIDEX.MAX_COUNT_REPORT_LICENSES);
+		profLic_report := MIDEX_Services.Raw_ProfessionalLicenses.License.Report_View.by_mari_num(ds_Profreport_ids, 
+                                                                                              in_mod.AlertVersion, 
+                                                                                              in_mod.ssnmask, 
+                                                                                              in_mod.applicationType, 
+                                                                                              IF(in_mod.isLicenseOnlyReport,MIDEX_Services.Constants.ALL_LICENSES_SEARCH,in_mod.searchType));
+																																															
+          // removed (Dedup, DS, all ) so as not to resort the data set that is returned from the 3 DS's being added together.
+		nohash_results_raw :=       
+		CHOOSEN(sanctNP_report+sanctPub_report+profLic_report,iesp.Constants.MIDEX.MAX_COUNT_REPORT_LICENSES);	
 
     ds_nohash_withLicNMLSid :=
       PROJECT(nohash_results_raw,
@@ -60,11 +65,12 @@ EXPORT LicenseReport_Records (MIDEX_Services.IParam.reportrecords in_mod) :=
                         SELF            := LEFT));
 
     ds_nohash_withLicNMLSid_nonblank := ds_nohash_withLicNMLSid(LicNMLS_id != 0);
+		
     ds_nohash_withBlank_LicNMLSid    := 
       PROJECT(ds_nohash_withLicNMLSid(LicNMLS_id  = 0), MIDEX_Services.Layouts.LicenseReport_Layout);
-
+			
     nohash_resultsLicsRolled :=
-      ROLLUP(ds_nohash_withLicNMLSid_nonblank,
+			  ROLLUP(ds_nohash_withLicNMLSid_nonblank,
              LEFT.LicNMLS_id = RIGHT.LicNMLS_id, // rollup all licenses associated with nmls id into one report
              TRANSFORM(MIDEX_Services.Layouts.LicenseReport_RollupTempLayout,
                        SELF.Licenses            := LEFT.Licenses + RIGHT.Licenses,
@@ -176,13 +182,14 @@ EXPORT LicenseReport_Records (MIDEX_Services.IParam.reportrecords in_mod) :=
     END;
     
 		deleted_results := DATASET([xfm_make_delete_record()]);
-		
+	
+	 
 		// If an alert report request and the document/report isn't found anymore, then return a record
 		// with the record deleted flag set to true.
 		rec_results := IF(in_mod.EnableAlert,
                       IF(EXISTS(hash_results),hash_results,deleted_results),
                       nohash_results);
-
+           
 		RETURN(rec_results);
 	END;
 	

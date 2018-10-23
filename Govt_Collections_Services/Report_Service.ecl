@@ -6,7 +6,7 @@
 IMPORT Address, AutoStandardI, Gateway, iesp, govt_collections_services, ut, Doxie, Suppress, STD, WSInput;
 
 EXPORT Report_Service() := MACRO
-
+    #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
     // Setup the field that shall be displayed on the WsECL page.
     WSInput.MAC_Govt_Collections_Report_Service();
     

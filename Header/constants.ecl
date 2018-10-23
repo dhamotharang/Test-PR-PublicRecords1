@@ -1,4 +1,4 @@
-export constants := module
+﻿export constants := module
 
 export ssn_indicators := module
 
@@ -77,5 +77,7 @@ export checkRNA := true; // there are additional glb and dppa restrictions for R
     export string NO_SSN   := 'NO_SSN';
     export string CORE     := 'CORE';
   END;
+	
+	export UNSIGNED ReturnLimit := 20000; //for use in doxie.header_records_byDID as the ReturnLimit value
 
 end;

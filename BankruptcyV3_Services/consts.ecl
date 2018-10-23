@@ -1,4 +1,4 @@
-export consts := MODULE
+﻿export consts := MODULE
 	// LAYOUT ROLLUP CONSTANTS
 	export NAMES_PER_PARTY := 5;
 	export ADDRESSES_PER_PARTY := 5;
@@ -12,6 +12,7 @@ export consts := MODULE
 	export MAX_SSN4 := 3000;
   export MAX_PER_COURT_CASE_LOOKUP := 1;  // There should only be 1 record per court ID / case number lookup
   export KEEP_LIMIT := 1000;
+  export string2 CASETYPE_BANKRUPTCY := 'BK';
   
   /*  From Data Fab: T - represents Trustee A1 - attorney1, 
       A2 - attorney2, T1 - trustee1, D - Debtor.  

@@ -164,7 +164,7 @@
 		UNSIGNED1	_DPPA_Purpose        := IF(TRIM(users.DLPurpose) != ''     , (INTEGER)users.DLPurpose , DPPAPurpose_stored);
 		UNSIGNED1	_GLBA_Purpose        := IF(TRIM(users.GLBPurpose) != ''    , (INTEGER)users.GLBPurpose, GLBPurpose_stored);
 		STRING    _DataRestrictionMask := IF( users.DataRestrictionMask != '', users.DataRestrictionMask, DataRestrictionMask_stored );
-		STRING    _DataPermissionMask  := IF( users.DataPermissionMask != '' , users.DataPermissionMask , DataPermissionMask_stored );
+		STRING    __DataPermissionMask := IF( users.DataPermissionMask != '' , users.DataPermissionMask , DataPermissionMask_stored );
 		STRING5	  _IndustryClass       := MAP( users.IndustryClass != '' => users.IndustryClass, option.IndustryClass != '' => option.IndustryClass, Business_Risk_BIP.Constants.Default_IndustryClass );
 		BOOLEAN   _TestData_Enabled    := users.TestDataEnabled OR option.TestDataEnabled;
 		STRING    _TestData_TableName  := IF( users.TestDataTableName != '', users.TestDataTableName, option.TestDataTableName );
@@ -174,17 +174,19 @@
 		UNSIGNED1	_LinkSearchLevel                 := IF( option.LinkSearchLevel = 0         , Business_Risk_BIP.Constants.LinkSearch.Default         , option.LinkSearchLevel );
 		UNSIGNED1	_MarketingMode                   := IF( option.MarketingMode = 0           , Business_Risk_BIP.Constants.Default_MarketingMode      , option.MarketingMode );
 		UNSIGNED1	_BusShellVersion                 := IF( option.BusShellVersion = 0         , Business_Risk_BIP.Constants.BusShellVersion_v22        , option.BusShellVersion );
-		STRING50	_AllowedSources                   := IF( option.AllowedSources = ''         , Business_Risk_BIP.Constants.Default_AllowedSources     , option.AllowedSources );
-		UNSIGNED1 _OFAC_Version                    := IF( option.OFACVersion = 0             , 2, option.OFACVersion );
+		STRING50	_AllowedSources                  := IF( option.AllowedSources = ''         , Business_Risk_BIP.Constants.Default_AllowedSources     , option.AllowedSources );
+		UNSIGNED1 _OFAC_Version                    := IF( option.OFACVersion = 0             , BusinessInstantID20_Services.Constants.DEFAULT_OFAC_VERSION, option.OFACVersion );
 		REAL      _Global_Watchlist_Threshold      := IF( option.GlobalWatchlistThreshold = 0, Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold, option.GlobalWatchlistThreshold );
 		UNSIGNED6	_HistoryDate                     := IF( option.HistoryDate = 0             , 999999, option.HistoryDate );
 		UNSIGNED  _BIID20ProductType               := IF( option.BIID20ProductType = 0       , BIID20ProductType_stored, option.BIID20ProductType );
 		UNSIGNED1 _BIPBestAppend                   := option.BIPBestAppend;
 		BOOLEAN   _DisableIntermediateShellLogging := option.OutcomeTrackingOptOut;
-		BOOLEAN   _include_ofac                    := TRUE;
-		BOOLEAN   _include_additional_watchlists   := option.IncludeAdditionalWatchLists;
+		BOOLEAN   _include_ofac                    := TRUE; // Always run OFAC
+		BOOLEAN   _include_additional_watchlists   := _BIID20ProductType IN [BusinessInstantID20_Services.Types.productTypeEnum.COMPLIANCE, BusinessInstantID20_Services.Types.productTypeEnum.COMPLIANCE_PLUS_SBFE]; 
 		DATASET(iesp.share.t_StringArrayItem) _Watchlists_Requested := option.WatchlistsRequested;
 		DATASET(iesp.businessinstantid20.t_BIID20Gateway) _Gateways  := option.Gateways;
+    
+    STRING    _DataPermissionMask := BusinessInstantID20_Services.fn_setSBFEBitInDataPermissionMask(__DataPermissionMask, _BIID20ProductType); 
 				
 		// Per Product Mgmt guidance:
 		//   o  turn off Gateway calls to Targus
@@ -193,9 +195,9 @@
 		BOOLEAN   _RunTargusGateway     := FALSE;
 		BOOLEAN   _OverRideExperianRestriction := option.OverRideExperianRestriction;
 		
-  _CompanyID := IF( users.CompanyID != ''     , users.CompanyID     , option.CompanyID );
-  _Login_ID  := IF( users.LoginHistoryId != '', users.LoginHistoryId, option.LoginID );
-  _DOBMask   := IF( users.DOBMask != ''       , users.DOBMask       , option.DOBMask );
+		_CompanyID := IF( users.CompanyID != ''     , users.CompanyID     , option.CompanyID );
+		_Login_ID  := IF( users.LoginHistoryId != '', users.LoginHistoryId, option.LoginID );
+		_DOBMask   := IF( users.DOBMask != ''       , users.DOBMask       , option.DOBMask );
 		_SSNMask   := IF( users.SSNMask != ''       , users.SSNMask       , option.SSNMask );
     
 		// The following #STORED( ) attributes will be read directly within 
@@ -248,7 +250,7 @@
 		#STORED('DPPAPurpose'        ,Business_Risk_BIP.Constants.Default_DPPA);
 		#STORED('GLBPurpose'         ,Business_Risk_BIP.Constants.Default_GLBA);
 		#STORED('IndustryClass'      ,Business_Risk_BIP.Constants.Default_IndustryClass);
-		#STORED('OFAC_Version'       ,Business_Risk_BIP.Constants.Default_OFAC_Version);
+		#STORED('OFAC_Version'       ,BusinessInstantID20_Services.Constants.DEFAULT_OFAC_VERSION);
 		#STORED('Global_Watchlist_Threshold',Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold);
 
 		UNSIGNED1 DPPAPurpose_stored      := Business_Risk_BIP.Constants.Default_DPPA                : STORED('DPPAPurpose');
@@ -261,10 +263,11 @@
 
 		_Gateways := Gateway.Configuration.Get();	// Gateways Coded in this Product: Targus
 
+		BusinessInstantID20_Services.Types.productTypeEnum  _BIID20ProductType := BusinessInstantID20_Services.Types.productTypeEnum.BASE : STORED('BIID20ProductType');
 		UNSIGNED1	_DPPA_Purpose        := DPPAPurpose_stored;
 		UNSIGNED1	_GLBA_Purpose        := GLBPurpose_stored;
 		STRING  	_DataRestrictionMask := DataRestrictionMask_stored;
-		STRING  	_DataPermissionMask  := DataPermissionMask_stored;
+		STRING  	_DataPermissionMask  := BusinessInstantID20_Services.fn_setSBFEBitInDataPermissionMask(DataPermissionMask_stored, _BIID20ProductType);
 		STRING5	  _IndustryClass       := STD.Str.ToUpperCase(TRIM( IndustryClass_stored, LEFT, RIGHT ));
 		UNSIGNED6	_HistoryDate         := 999999 : STORED('HistoryDate');
 		UNSIGNED1	_LinkSearchLevel     := Business_Risk_BIP.Constants.LinkSearch.Default : STORED('LinkSearchLevel');
@@ -278,10 +281,9 @@
 		BOOLEAN   _RunTargusGateway              := FALSE : STORED('RunTargusGatewayAnywayForTesting');
 		BOOLEAN   _OverRideExperianRestriction   := FALSE : STORED('OverRideExperianRestriction');
 		REAL      _Global_Watchlist_Threshold    := Global_Watchlist_Threshold_stored;
-		BOOLEAN		_include_ofac                  := TRUE;
-		BOOLEAN   _include_additional_watchlists := FALSE : STORED('IncludeAdditionalWatchLists');
+		BOOLEAN		_include_ofac                  := TRUE; // Always run OFAC
 		BOOLEAN   _DisableIntermediateShellLogging := TRUE;
-		BusinessInstantID20_Services.Types.productTypeEnum  _BIID20ProductType := BusinessInstantID20_Services.Types.productTypeEnum.BASE : STORED('BIID20ProductType');
+		BOOLEAN   _include_additional_watchlists := _BIID20ProductType IN [BusinessInstantID20_Services.Types.productTypeEnum.COMPLIANCE, BusinessInstantID20_Services.Types.productTypeEnum.COMPLIANCE_PLUS_SBFE];
 		BOOLEAN   _ReturnDetailedRoyalties := FALSE : STORED('ReturnDetailedRoyalties');
 		
 		// The following attributes are included in the service interface by requirement, but aren't used yet.

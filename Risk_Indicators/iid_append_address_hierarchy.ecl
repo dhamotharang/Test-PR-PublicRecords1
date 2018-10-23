@@ -1,6 +1,7 @@
-import header, riskwise, address, ut, mdr;
+﻿import _Control, header, riskwise, address, ut, mdr;
+onThor := _Control.Environment.OnThor;
 
-EXPORT iid_append_address_hierarchy(GROUPED DATASET(risk_indicators.iid_constants.layout_outx) allheader , boolean isFCRA, integer bsversion, boolean OnThor=false) := FUNCTION
+EXPORT iid_append_address_hierarchy(GROUPED DATASET(risk_indicators.iid_constants.layout_outx) allheader , boolean isFCRA, integer bsversion) := FUNCTION
 
 hierarchy_key := header.key_addr_hist(isFCRA); 
 
@@ -8,7 +9,11 @@ just_dids_roxie := table(allheader(did<>0), {did}, did);
 
 just_dids_thor := table(distribute(allheader(did<>0), hash64(did)), {did}, did, LOCAL);
 
-just_dids := IF(onThor, just_dids_thor, just_dids_roxie);
+#IF(onThor)
+	just_dids := just_dids_thor;
+#ELSE
+	just_dids := just_dids_roxie;
+#END
 
 addr_history_data_roxie := join(just_dids, hierarchy_key, 
 	keyed(left.did=right.s_did), 
@@ -18,9 +23,13 @@ addr_history_data_thor := join(distribute(just_dids, hash64(did)),
 	distribute(pull(hierarchy_key), hash64(s_did)), 
 	(left.did=right.s_did), 
 	transform(recordof(hierarchy_key), self := right), atmost(riskwise.max_atmost), LOCAL);
-	
-addr_history_data := if(OnThor, addr_history_data_thor, addr_history_data_roxie);
-	
+
+#IF(onThor)
+	addr_history_data := addr_history_data_thor;
+#ELSE
+	addr_history_data := addr_history_data_roxie;
+#END
+
 layout_temp := record
 	unsigned record_seq;  // for deduping after join to key_addr_hist, fix issue with ut.nneq join
 	risk_indicators.iid_constants.layout_outx;
@@ -93,16 +102,24 @@ header_with_addr_heirarchy_nneq_thor := join(distribute(allheader_temp, hash64(d
 	keep(2),
 	LOCAL);  // keep 2 just in case there are records on addr_hist for same street, 1 with the sec_range populated and 1 without
 	
-header_with_addr_heirarchy_nneq := if(onThor, header_with_addr_heirarchy_nneq_thor, header_with_addr_heirarchy_nneq_roxie);
-	
+#IF(onThor)
+	header_with_addr_heirarchy_nneq := header_with_addr_heirarchy_nneq_thor;
+#ELSE
+	header_with_addr_heirarchy_nneq := header_with_addr_heirarchy_nneq_roxie;
+#END
+
 // get back to just 1 record per record_seq
 header_with_addr_heirarchy_roxie := dedup(sort(header_with_addr_heirarchy_nneq, seq, did, record_seq, if(address_history_seq=0, 255, address_history_seq) ),
 	seq, did, record_seq);
 header_with_addr_heirarchy_thor := dedup(sort(distribute(header_with_addr_heirarchy_nneq, hash64(seq, did)), seq, did, record_seq, if(address_history_seq=0, 255, address_history_seq), LOCAL),
 	seq, did, record_seq, LOCAL);
 
-header_with_addr_heirarchy := IF(onThor, header_with_addr_heirarchy_thor, header_with_addr_heirarchy_roxie);	
-	
+#IF(onThor)
+	header_with_addr_heirarchy := header_with_addr_heirarchy_thor;
+#ELSE
+	header_with_addr_heirarchy := header_with_addr_heirarchy_roxie;
+#END
+
 // now that we've appended the address history_seq, use that thing for the sort instead of just dt_last_seen, dt_first_seen dates
 new_sortedBest_roxie := sort(header_with_addr_heirarchy, seq, did, if(address_history_seq=0, 255, address_history_seq), 
 		-dt_last_seen, -chronodate_first, chronolast, chronofirst, 
@@ -116,13 +133,21 @@ new_sortedBest_thor := sort(header_with_addr_heirarchy, seq, did, if(address_his
 		-socsvalid, -chronozip, -chronoprim_name, -chronoprim_range, -chronopredir, -chronosuffix, -chronopostdir, 
 		-chronosec_range, -chronounit_desig, -chronogeo_blk, -chronozip4, -chronocity, -chronostate, LOCAL);
 	
-new_sortedBest := IF(onThor, new_sortedBest_thor, new_sortedBest_roxie);
-	
+#IF(onThor)
+	new_sortedBest := new_sortedBest_thor;
+#ELSE
+	new_sortedBest := new_sortedBest_roxie;
+#END
+
 best_address_roxie := dedup(new_sortedBest, seq, did);  // get the best address per sequence
 
 best_address_thor := dedup(new_sortedBest, seq, did, LOCAL);
 
-best_address := if(onThor, best_address_thor, best_address_roxie);
+#IF(onThor)
+	best_address := best_address_thor;
+#ELSE
+	best_address := best_address_roxie;
+#END
 
 // join back to new_sortedBest to append that best to layout_output
 
@@ -150,12 +175,20 @@ with_best_address_thor := join(new_sortedBest, best_address, left.seq=right.seq 
 	getBestAddress(LEFT,RIGHT),
 	left outer, keep(1), LOCAL);
 		
-with_best_address := IF(onThor, with_best_address_thor, with_best_address_roxie);
+#IF(onThor)
+	with_best_address := with_best_address_thor;
+#ELSE
+	with_best_address := with_best_address_roxie;
+#END
 
 with_best_address_grouped_roxie := group(sort(with_best_address, seq,did), seq, did);
 with_best_address_grouped_thor := group(sort(with_best_address, seq,did, LOCAL), seq, did, LOCAL);
 
-with_best_address_grouped := IF(onThor, with_best_address_grouped_thor, with_best_address_grouped_roxie);
+#IF(onThor)
+	with_best_address_grouped := with_best_address_grouped_thor;
+#ELSE
+	with_best_address_grouped := with_best_address_grouped_roxie;
+#END
 
 // ################### comment out this section when done troubleshooting  ##################
 			// get every unique DID in the input dataset to use for searching the hierarchy table

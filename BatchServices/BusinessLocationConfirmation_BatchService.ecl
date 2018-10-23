@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BusinessLocationConfirmation_BatchService">
 
 	<part name="GLBPurpose"             type="xsd:byte"/>
@@ -12,7 +12,7 @@
 */
 
 EXPORT BusinessLocationConfirmation_BatchService := MACRO
-
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	// Layout of input data
 	in_layout := BatchServices.BusinessLocationConfirmation_BatchService_Layouts.Input;
 	

@@ -23,9 +23,6 @@ EXPORT GetEquifaxPicklistVerification(DATASET(iesp.equifax_ems.t_EquifaxEmsRespo
 
 	ds_ems_with_picklist_response := PROJECT(ds_ems_soap_response, TRANSFORM(FCRAGateway_Services.Layouts.equifax_ems.gateway_out,
 		SELF.lexID := plist_lexID;
-		SELF.status := IF(~is_soap_call_ok OR ~is_plist_ok,
-			FCRAGateway_Services.Constants.GatewayStatus.ERROR,
-			FCRAGateway_Services.Constants.GatewayStatus.SUCCESS);
 		SELF.response := LEFT.response;
 		));
 

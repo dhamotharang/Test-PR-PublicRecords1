@@ -12,12 +12,12 @@ export BatchRecords (CriminalRecords_BatchService.IParam.batch_params configData
   unsigned8 bitmap_all_includes := CriminalRecords_BatchService.Functions.Bitmap_all_includes(configData);
 	
 	// flagfiles for FCRA
-	ds_best  := project(ds_batch_in(did <> 0),transform(doxie.layout_best,self.did:=left.did, self:=[])); //using input to create dataset for getting the flag file (overrides). For FCRA we only use DID to get overrides.
+	ds_best  := project(ds_batch_in(did > 0),transform(doxie.layout_best,self.did:=left.did, self:=[])); //using input to create dataset for getting the flag file (overrides). For FCRA we only use DID to get overrides.
 	
 	// FCRA FFD  	
 	boolean do_skipPersonContextCall :=  ~isFCRA or SkipPersonContextCall;
 	
-	dids := project(ds_batch_in(did <> 0),FFD.Layouts.DidBatch); 	
+	dids := project(ds_batch_in(did > 0),FFD.Layouts.DidBatch); 	
 				
 	pc_recs :=  if(do_skipPersonContextCall, in_pc_recs(datagroup in FFD.Constants.DataGroupSet.Criminal), 
 	                       FFD.FetchPersonContext(dids, configData.gateways, FFD.Constants.DataGroupSet.Criminal, configData.FFDOptionsMask));
@@ -118,9 +118,12 @@ export BatchRecords (CriminalRecords_BatchService.IParam.batch_params configData
 	results_all := UNGROUP(TOPN(GROUP(SORT(results_out_fltr, acctno, pty_typ), acctno), configData.MaxResults, acctno, -process_date));
 
   //FFD   - records maybe suppressed due to alerts
-  results_out_raw := IF(isFCRA, FFD.Mac.ApplyConsumerAlertsBatch(results_all, alert_flags, StatementsAndDisputes, CriminalRecords_BatchService.Layouts.batch_out_pre),
-	                       results_all);
+  ds_flat_with_alerts := FFD.Mac.ApplyConsumerAlertsBatch(results_all, alert_flags, StatementsAndDisputes, CriminalRecords_BatchService.Layouts.batch_out_pre, configData.FFDOptionsMask);
 	
+	// add resolved LexId to the results for inquiry history logging support                    
+  ds_flat_with_inquiry := FFD.Mac.InquiryLexidBatch(ds_batch_in, ds_flat_with_alerts, CriminalRecords_BatchService.Layouts.batch_out_pre, 0);
+
+  results_out_raw := if(isFCRA, ds_flat_with_inquiry, results_all);
 	
 	consumer_statements := NORMALIZE(results_out_raw, LEFT.StatementsAndDisputes, 
 		TRANSFORM (FFD.Layouts.ConsumerStatementBatch, 
@@ -130,7 +133,7 @@ export BatchRecords (CriminalRecords_BatchService.IParam.batch_params configData
 
 	// append the actual contents of each consumer statement
 	consumer_statements_prep := IF(isFCRA, FFD.prepareConsumerStatementsBatch(consumer_statements, pc_recs, configData.FFDOptionsMask));
- consumer_alerts  := IF(isFCRA, FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs));                                               
+ consumer_alerts  := IF(isFCRA, FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs, alert_flags, configData.FFDOptionsMask));                                               
  consumer_statements_alerts := consumer_statements_prep + consumer_alerts;
 	
 	results_out := PROJECT(results_out_raw, CriminalRecords_BatchService.Layouts.batch_out);

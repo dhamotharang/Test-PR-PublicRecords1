@@ -1,4 +1,4 @@
-/*2012-05-23T13:19:13Z (aleida lima)
+﻿/*2012-05-23T13:19:13Z (aleida lima)
 review only
 */
 /*--SOAP--
@@ -62,6 +62,7 @@ boolean %trackSplit% := false : stored('TrackSplit');
 	string10	prim_range := '';
 	string8		sec_range := '';
 	string5		z5 := '';
+	string4  zip4 := '';
 	didville.Layout_Best_Append;
 end;
 #uniquename(p1)

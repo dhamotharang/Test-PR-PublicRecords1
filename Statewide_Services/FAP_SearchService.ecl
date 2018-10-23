@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="FAP_StateWide_SearchService" wuTimeout="300000">
 	<part name="GLBPurpose"      type="xsd:byte" />
 	<part name="DPPAPurpose"     type="xsd:byte" />
@@ -104,6 +104,7 @@ Returns Results from all the available Jurisdiction.
 import AutoStandardI, FAP_StateWide, Doxie;
 
 EXPORT FAP_SearchService := MACRO
+#CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 #onwarning(4207, ignore);
 
 #OPTION ('optimizeProjects', FALSE);

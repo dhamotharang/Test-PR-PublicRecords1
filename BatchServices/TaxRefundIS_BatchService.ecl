@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="TaxRefundIS_BatchService">
 	<part name="DPPAPurpose"          type="xsd:byte"/>
 	<part name="GLBPurpose"           type="xsd:byte"/> 
@@ -56,6 +56,7 @@
 import BatchServices;
 	
 export TaxRefundIS_BatchService := MACRO
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);	
 	in_layout := BatchServices.Layouts.TaxRefundIS.batch_in;
 	
 	

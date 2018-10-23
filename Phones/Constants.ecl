@@ -127,6 +127,13 @@ MODULE
 		EXPORT Other    := 'UNKNOWN';
 	END;
 
+	EXPORT PhoneStatus :=
+	MODULE
+		EXPORT ACTIVE 		:= 'active';
+		EXPORT CANCELLED 	:= 'cancelled';
+		EXPORT SUSPENDED    := 'suspended';
+	END;	
+
 	EXPORT GatewayValues :=
 	MODULE
 		 EXPORT STRING AccuDataLNP  := 'LNP'; // local number poratability data - AccuData gateway transaction type
@@ -140,6 +147,7 @@ MODULE
 		EXPORT STRING 	 ZumigoIdentity				 := 'Zumigo_GLI';
 		EXPORT STRING 	 ClientIDPrefix				 := 'LEXISNEXIS_';
 		EXPORT UNSIGNED1 MaxZumigoRequest			 := 15;
+		EXPORT STRING 	 TimeoutMessage 			 := 'timeout expired';
 	END;
 	// Zumigo Input Values
 	EXPORT ZumigoInputOptions :=
@@ -185,10 +193,10 @@ MODULE
 		EXPORT set_ATT_LIDB			:= [ATT_LIDB_SRC,ATT_LIDB_RealTime];
 		EXPORT ICONECTIV_SRC		:= MDR.sourceTools.src_PhonesPorted_iConectiv;
 		EXPORT DISCONNECT_SRC		:= MDR.sourceTools.src_Phones_Disconnect;
+		EXPORT GONG_DISCONNECT_SRC	:= MDR.sourceTools.src_Phones_Gong_History_Disconnect;
 		EXPORT SUSPENDED_CODE		:= 'SU';
 		EXPORT DISCONNECTED_CODE:= 'DE';
 
 	END;
-
-
+ 	
 END;

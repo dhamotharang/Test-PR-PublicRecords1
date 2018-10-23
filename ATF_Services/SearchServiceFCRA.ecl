@@ -53,7 +53,7 @@ EXPORT SearchServiceFCRA := MACRO
 		
 		atf_recs := ATF_Services.SearchService_Records.search(tempmod, true);
 
-		input_consumer := FFD.MAC.PrepareConsumerRecord(rdid, false, search_by);
+		input_consumer := FFD.MAC.PrepareConsumerRecord(rdid, true, search_by);
 		
 		iesp.ECL2ESP.Marshall.MAC_Marshall_Results(atf_recs.Records, results, iesp.firearm_fcra.t_FcraFirearmSearchResponse);
 																

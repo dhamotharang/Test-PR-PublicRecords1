@@ -41,6 +41,7 @@
 		LNBranded. Switch for specific behavior for dayton apps
 */
 export HeaderFileNeighborSearchService := MACRO
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
   // v-- Added for RQ-13563 to purposely force off the use of FDN keys
   #CONSTANT('IncludeFraudDefenseNetwork',FALSE);
 

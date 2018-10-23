@@ -1,4 +1,5 @@
-﻿import doxie, did_add, ut, riskwise, address, gateway, watchdog;
+﻿import _Control, doxie, did_add, ut, riskwise, address, gateway, watchdog;
+onThor := _Control.Environment.OnThor;
 
 // this function will first append the BEST fname, lname, phone and ssn
 // then perform the necessary searching and counting logic to calculate velocity counters for each of those elements
@@ -26,13 +27,38 @@ withBest_nonfcra := join(bsData, outfile,
 		transform(risk_indicators.Layout_Boca_Shell,
 		self.best_flags := right; self := left), left outer, atmost(riskwise.max_atmost), keep(1));
 
-withBest_FCRA_noEQ := join(bsData, Watchdog.Key_Watchdog_FCRA_nonEQ, keyed(left.did=right.did),
+withBest_FCRA_noEQ_roxie := join(bsData, Watchdog.Key_Watchdog_FCRA_nonEQ, keyed(left.did=right.did),
+	transform(risk_indicators.Layout_Boca_Shell,
+		self.best_flags := right; self := left), left outer, atmost(riskwise.max_atmost), keep(1));
+
+withBest_FCRA_noEQ_thor := join(distribute(bsData, hash64(did)), 
+	distribute(pull(Watchdog.Key_Watchdog_FCRA_nonEQ), hash64(did)), 
+	(left.did=right.did),
+	transform(risk_indicators.Layout_Boca_Shell,
+		self.best_flags := right; self := left), left outer, atmost(riskwise.max_atmost), keep(1), LOCAL);
+
+#IF(onThor)
+	withBest_FCRA_noEQ := GROUP(SORT(withBest_FCRA_noEQ_thor, seq, LOCAL), seq, LOCAL);
+#ELSE
+	withBest_FCRA_noEQ := withBest_FCRA_noEQ_roxie;
+#END
+
+withBest_FCRA_noEN_roxie := join(bsData, Watchdog.Key_Watchdog_FCRA_nonEN, keyed(left.did=right.did),
 	transform(risk_indicators.Layout_Boca_Shell,
 		self.best_flags := right; self := left), left outer, atmost(riskwise.max_atmost), keep(1));
 		
-withBest_FCRA_noEN := join(bsData, Watchdog.Key_Watchdog_FCRA_nonEN, keyed(left.did=right.did),
+withBest_FCRA_noEN_thor := join(distribute(bsData, hash64(did)), 
+	distribute(pull(Watchdog.Key_Watchdog_FCRA_nonEN), hash64(did)), 
+	(left.did=right.did),
 	transform(risk_indicators.Layout_Boca_Shell,
-		self.best_flags := right; self := left), left outer, atmost(riskwise.max_atmost), keep(1));
+		self.best_flags := right; self := left), left outer, atmost(riskwise.max_atmost), keep(1), LOCAL);
+
+#IF(onThor)
+	withBest_FCRA_noEN := GROUP(SORT(withBest_FCRA_noEN_thor, seq, LOCAL), seq, LOCAL);
+#ELSE
+	withBest_FCRA_noEN := withBest_FCRA_noEN_roxie;
+#END
+
 // based upon the datarestrictionmask, either use the copy without equifax data or the copy without experian data		
 withBest_FCRA := if(datarestrictionmask[risk_indicators.iid_constants.posEquifaxRestriction]='1', withBest_FCRA_noEQ, withBest_FCRA_noEN);
 		

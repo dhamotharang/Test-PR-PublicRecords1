@@ -102,7 +102,7 @@ EXPORT ReportServiceFCRA := MACRO
 		results := project(rec_out,  transform(iesp.fcraconsumerprofilereport.t_ConsumerProfileReportResponse,
 																				self._Header := iesp.ECL2ESP.GetHeaderRow(),
 																				self.ConsumerStatements := left.ConsumerStatements;
-																				self.Consumer := FFD.Constants.BlankConsumerRec;  // for inquiry logging
+																				self.Consumer := left.ConsumerInquiry;  // for inquiry logging
 																				self.Result  := left.Result));
 		
 		royalty := rec_out[1].royalty;

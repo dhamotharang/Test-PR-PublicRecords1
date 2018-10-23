@@ -181,8 +181,13 @@ EXPORT Get_Experian_Data := MODULE
 
 		VehicleV2_Services.assorted_layouts.Layout_lienholder xformLienholder(vinaLayout L,INTEGER C) := TRANSFORM
 			SELF.orig_name := IF(TRIM(L.RegisteredOwners[C].nameRole)='LIENHOLDER',L.RegisteredOwners[C].orgName,SKIP);
+			SELF.fname := L.RegisteredOwners[C].firstName;
+			SELF.mname := L.RegisteredOwners[C].middleName;
+			SELF.lname := L.RegisteredOwners[C].lastName;
+			SELF.name_suffix := L.RegisteredOwners[C].nameSuffix;
 			SELF.append_clean_cname := L.RegisteredOwners[C].orgName;
 			SELF.matchFlags.surnameFlag := IF(L.RegisteredOwners[C].surnameFlag='',' ',L.RegisteredOwners[C].surnameFlag);
+			SELF.matchFlags.fullNameFlag := IF(L.RegisteredOwners[C].fullNameFlag='',' ',L.RegisteredOwners[C].fullNameFlag);
 			SELF.name_source_cd := L.RegisteredOwners[C].nameSourceCd;
 			SELF.name_source := Exp_Code_Translations.name_source_cd_description(L.RegisteredOwners[C].nameSourceCd);
 			SELF:=[];
@@ -190,8 +195,13 @@ EXPORT Get_Experian_Data := MODULE
 
 		VehicleV2_Services.assorted_layouts.layout_lessee_or_lessor xformLessor(vinaLayout L,INTEGER C) := TRANSFORM
 			SELF.orig_name := IF(TRIM(L.RegisteredOwners[C].nameRole)='LESSOR',L.RegisteredOwners[C].orgName,SKIP);
+			SELF.fname := L.RegisteredOwners[C].firstName;
+			SELF.mname := L.RegisteredOwners[C].middleName;
+			SELF.lname := L.RegisteredOwners[C].lastName;
+			SELF.name_suffix := L.RegisteredOwners[C].nameSuffix;
 			SELF.append_clean_cname := L.RegisteredOwners[C].orgName;
 			SELF.matchFlags.surnameFlag := IF(L.RegisteredOwners[C].surnameFlag='',' ',L.RegisteredOwners[C].surnameFlag);
+			SELF.matchFlags.fullNameFlag := IF(L.RegisteredOwners[C].fullNameFlag='',' ',L.RegisteredOwners[C].fullNameFlag);
 			SELF.name_source_cd := L.RegisteredOwners[C].nameSourceCd;
 			SELF.name_source := Exp_Code_Translations.name_source_cd_description(L.RegisteredOwners[C].nameSourceCd);
 			SELF:=[];

@@ -1,4 +1,4 @@
-export Layout_CapOne_RiskView_Batch_Out := RECORD
+﻿export Layout_CapOne_RiskView_Batch_Out := RECORD
 	string20 acctno;
 	
 	string1 index11;
@@ -354,45 +354,6 @@ export Layout_CapOne_RiskView_Batch_Out := RECORD
 	string1 idTheftFlag;
 	string1 PrescreenOptOut;
 	
-	// Scores & Reason Codes
-	// string3 index6;
-	// string20 modelname1;
-	// string3 score1;
-	// string15 scorename1;
-	// string3 reason1;
-	// string3 reason2;
-	// string3 reason3;
-	// string3 reason4;
-	// string3 index7;
-	// string20 modelname2;
-	// string3 score2;
-	// string15 scorename2;
-	// string3 reason5;
-	// string3 reason6;
-	// string3 reason7;
-	// string3 reason8;
-	// string3 index8;
-	// string20 modelname3;
-	// string3 score3;
-	// string15 scorename3;
-	// string3 reason9;
-	// string3 reason10;
-	// string3 reason11;
-	// string3 reason12;
-	// string3 index9;
-	// string20 modelname4;
-	// string3 score4;
-	// string15 scorename4;
-	// string3 reason13;
-	// string3 reason14;
-	// string3 reason15;
-	// string3 reason16;
-	// string3 index10;
-	// string20 modelname5;
-	// string3 score5;
-	// string15 scorename5;
-	// string3 reason17;
-	// string3 reason18;
-	// string3 reason19;
-	// string3 reason20;
+  string12 inquiry_lexid;
+
 END;

@@ -1,11 +1,12 @@
-﻿import doxie_files, FCRA, ut, BankruptcyV3, riskwise, Risk_Indicators, STD;
-
+﻿import _Control, doxie_files, FCRA, ut, BankruptcyV3, riskwise, Risk_Indicators, STD;
+onThor := _Control.Environment.OnThor;
 
 EXPORT Boca_Shell_Bankruptcy_FCRA(integer bsVersion, unsigned8 BSOptions=0, 
-				GROUPED DATASET(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus) w_corrections, boolean onThor=false) := function
+				GROUPED DATASET(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus) w_corrections) := function
 
   todaysdate := (string) risk_indicators.iid_constants.todaydate;
 	insurance_fcra_filter :=  (BSOptions & Risk_Indicators.iid_constants.BSOptions.InsuranceFCRAMode) > 0;
+	Insurance_bk_chapter_exception := (BSOptions & Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyException) > 0;
 
 	bans_did := BankruptcyV3.key_bankruptcyV3_did(true);
 	bans_Withdrawn_Status := BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus(,,TRUE);	
@@ -32,8 +33,12 @@ EXPORT Boca_Shell_Bankruptcy_FCRA(integer bsVersion, unsigned8 BSOptions=0,
 		atmost(riskwise.max_atmost), left OUTER, KEEP(10), LOCAL);
 	bankrupt_added_thor := group(sort(w_corrections(did=0) + bankrupt_added_thor_did, did, LOCAL), did, LOCAL);
 
-	bankrupt_added := IF(onThor, bankrupt_added_thor, bankrupt_added_roxie);
-
+	#IF(onThor)
+		bankrupt_added := bankrupt_added_thor;
+	#ELSE
+		bankrupt_added := bankrupt_added_roxie;
+	#END
+  
 	Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus getWithdrawnCheck(bankrupt_added le, bans_Withdrawn_Status ri) := TRANSFORM
 		// blank out the TMSID if found on withdrawn key so the next join doesn't hit the search file
 		// per the requirements document, we only want to remove the withdrawn bankruptcy on version 3.0 and higher
@@ -56,8 +61,12 @@ EXPORT Boca_Shell_Bankruptcy_FCRA(integer bsVersion, unsigned8 BSOptions=0,
 							left outer, atmost(riskwise.max_atmost), keep(1), LOCAL) +
 							bankrupt_added(bk_tmsid='');
 							
-	bankrupt_added_after_withdrawn_check := if(onThor, group(sort(bankrupt_added_after_withdrawn_check_thor, seq),seq), bankrupt_added_after_withdrawn_check_roxie);						
-							
+	#IF(onThor)
+		bankrupt_added_after_withdrawn_check := group(sort(bankrupt_added_after_withdrawn_check_thor, seq),seq);
+	#ELSE
+		bankrupt_added_after_withdrawn_check := bankrupt_added_after_withdrawn_check_roxie;
+	#END
+  
 	Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus get_bankrupt_FCRA (Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus le, 
 		bans_search ri) := TRANSFORM
 		myGetDate := iid_constants.myGetDate(le.historydate);
@@ -90,6 +99,7 @@ EXPORT Boca_Shell_Bankruptcy_FCRA(integer bsVersion, unsigned8 BSOptions=0,
 		SELF.BJL.bk_count36 := (integer)Risk_Indicators.iid_constants.checkingDays(myGetDate,(STRING8)SELF.BJL.date_last_seen,ut.DaysInNYears(3));
 		SELF.BJL.bk_count60 := (integer)Risk_Indicators.iid_constants.checkingDays(myGetDate,(STRING8)SELF.BJL.date_last_seen,ut.DaysInNYears(5));
 		SELF.BJL.bk_chapter := ri.chapter;
+		SELF.bk_chapters := dataset([{ri.chapter}], risk_indicators.Layouts_Derog_Info.layout_bk_chapter);
 		SELF.bk_disp_date := MAX((INTEGER)ri.date_filed, 
 				if((INTEGER)ri.discharged[1..6] < le.historydate, (INTEGER)ri.discharged, 0));
 		SELF := le;
@@ -99,6 +109,7 @@ EXPORT Boca_Shell_Bankruptcy_FCRA(integer bsVersion, unsigned8 BSOptions=0,
 							LEFT.bk_tmsid<>'' AND
 							keyed(LEFT.bk_tmsid = RIGHT.tmsid) AND
 							right.name_type='D' and
+							trim(right.chapter) in risk_indicators.iid_constants.set_permitted_bk_chapters(bsversion, Insurance_bk_chapter_exception) and
 						 (unsigned)right.did=left.did and
 						 (unsigned)(RIGHT.date_filed[1..6]) < left.historydate and
 							if(insurance_fcra_filter and right.chapter in ['7','13'],
@@ -110,6 +121,7 @@ EXPORT Boca_Shell_Bankruptcy_FCRA(integer bsVersion, unsigned8 BSOptions=0,
 	bankrupt_full_thor_tmsid := JOIN (distribute(bankrupt_added_after_withdrawn_check(bk_tmsid <> ''), hash64(bk_tmsid)), 
 							distribute(pull(bans_search(name_type='D')), hash64(tmsid)),
 						 LEFT.bk_tmsid = RIGHT.tmsid AND
+						 trim(right.chapter) in risk_indicators.iid_constants.set_permitted_bk_chapters(bsversion, Insurance_bk_chapter_exception) and
 						 (unsigned)right.did=left.did and
 						 (unsigned)(RIGHT.date_filed[1..6]) < left.historydate and
 							if(insurance_fcra_filter and right.chapter in ['7','13'],
@@ -119,8 +131,12 @@ EXPORT Boca_Shell_Bankruptcy_FCRA(integer bsVersion, unsigned8 BSOptions=0,
 							LEFT OUTER, keep(100), LOCAL);
 	bankrupt_full_thor := group(sort(bankrupt_added_after_withdrawn_check(bk_tmsid = '') + bankrupt_full_thor_tmsid, seq), seq);
 
-	bankrupt_full := if(onThor, bankrupt_full_thor, bankrupt_full_roxie);
-
+	#IF(onThor)
+		bankrupt_full := bankrupt_full_thor;
+	#ELSE
+		bankrupt_full := bankrupt_full_roxie;
+	#END
+  
 	Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus roll_bankrupt(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus le, 
 		Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus ri) := TRANSFORM
 		sameBankruptcy := le.case_num=ri.case_num AND le.court_code=ri.court_code;
@@ -132,6 +148,7 @@ EXPORT Boca_Shell_Bankruptcy_FCRA(integer bsVersion, unsigned8 BSOptions=0,
 		SELF.bjl.filing_type := IF (takeLeft, le.bjl.filing_type, ri.bjl.filing_type);
 		SELF.bjl.disposition := IF (takeLeft, le.bjl.disposition, ri.bjl.disposition);
 		SELF.BJL.bk_chapter :=  IF (takeLeft, le.BJL.bk_chapter, ri.bjl.bk_chapter);
+		SELF.bk_chapters :=  IF(sameBankruptcy, le.bk_chapters, le.bk_chapters + ri.bk_chapters);  
 
 		SELF.BJL.filing_count := le.BJL.filing_count + IF(sameBankruptcy,0,ri.BJL.filing_count);
 		SELF.BJL.filing_count120 := le.BJL.filing_count120 + IF(sameBankruptcy, 0, ri.BJL.filing_count120);
@@ -177,6 +194,7 @@ EXPORT Boca_Shell_Bankruptcy_FCRA(integer bsVersion, unsigned8 BSOptions=0,
 			SELF.case_num := RIGHT.case_num;
 			SELF.court_code := RIGHT.court_code;
 			SELF.BJL.bk_chapter := RIGHT.BJL.bk_chapter;
+      self.bk_chapters := dedup(sort(left.bk_chapters, chapter));
 			SELF := LEFT),
 		LEFT OUTER);
 	w_bk := if(bsVersion < 50, w_bk_tmp, group(w_bk_rolled_disp, seq));
@@ -214,7 +232,7 @@ EXPORT Boca_Shell_Bankruptcy_FCRA(integer bsVersion, unsigned8 BSOptions=0,
 			self := le;
 		END;
 		w_bk_correct := PROJECT(w_bk, correct_bk(LEFT));
-		
+		    
 		RETURN w_bk_correct;
 END;
 		

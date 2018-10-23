@@ -30,7 +30,7 @@ export OrderScore_Service := MACRO
 			'gateways'));
 
 
-	BOOLEAN DEBUG := FALSE;                                    //Set to TRUE for Round 1 and Round 2 validation and to FALSE when you are creating TEST SEEDS
+	BOOLEAN DEBUG := False;                                    //Set to TRUE for Round 1 and Round 2 validation and to FALSE when you are creating TEST SEEDS
 	
 	BOOLEAN   ipid_only  := FALSE  : stored('ipid_only');
 
@@ -193,6 +193,16 @@ export OrderScore_Service := MACRO
 	//reserved for future use of the model options - similar to code below...I think
 	// cmGrade           := StringLib.StringToLowerCase(TRIM(option.IncludeModels.ModelOptions[1].OptionName)) = 'grade';
 	// cmGradeValue      := StringLib.StringToUpperCase(TRIM(option.IncludeModels.ModelOptions[1].OptionValue));
+  // cmDeliverable           := StringLib.StringToLowerCase(TRIM(option.IncludeModels.ModelOptions[1].OptionName)) = 'delivery';
+  // cmDeliverableValue      := StringLib.StringToUpperCase(TRIM(option.IncludeModels.ModelOptions[1].OptionValue));
+  // cmTotal           := StringLib.StringToLowerCase(TRIM(option.IncludeModels.ModelOptions[1].OptionName)) = 'total_amount';
+  // cmTotalValue      := StringLib.StringToUpperCase(TRIM(option.IncludeModels.ModelOptions[1].OptionValue));
+  
+  
+  cmDeliverableOption           := option.IncludeModels.ModelOptions(StringLib.StringToLowerCase(TRIM(OptionName)) = 'delivery');
+  cmDeliverableValue      := StringLib.StringToUpperCase(TRIM(cmDeliverableOption[1].OptionValue));
+  cmTotalAmountOption           := option.IncludeModels.ModelOptions(StringLib.StringToLowerCase(TRIM(OptionName)) = 'total_amount' );
+  cmTotalValue      := StringLib.StringToUpperCase(TRIM(cmTotalAmountOption[1].OptionValue));
 
   /* ***************************************
 	 *           Set Users Values:           *
@@ -207,12 +217,14 @@ export OrderScore_Service := MACRO
 		//notice this code is NOT the same as CBD!!!
 		//adding real time Inquiry searching
 		self.servicename := IF(genericModelName IN ['osn1504_0', 
-		                                            'osn1608_1'], 
+		                                            'osn1608_1', 
+		                                            'osn1803_1'], 
 																								le.servicename, '');
 																								
 		netCheck := if(StringLib.StringToLowerCase(le.servicename) = 'targus' OR 
 																		genericModelName NOT IN ['osn1504_0', 
-																		                         'osn1608_1'], 
+																		                         'osn1608_1', 
+																		                         'osn1803_1'], 
 																														 false, true);
 																		
 		self.url := if(netCheck or (stringlib.StringToLowerCase(trim(le.servicename)) in
@@ -268,7 +280,7 @@ export OrderScore_Service := MACRO
 	END;
 	settings := project( attributesIn, checkSettings(left, counter) );
 	
-	modelBSVersion := 51;
+	modelBSVersion := if (genericModelName in ['osn1803_1'],53 ,51);
 											
 	includeVehicles  := FALSE;
 	
@@ -544,7 +556,8 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 
 /*  Models will be validated and called in this OrderScore_GetScore */   
 	#If(DEBUG)
-	    getScore :=  Models.OrderScore_GetScore (clam, ungroup(cd2i_in), ipid_only, genericModelName);
+	    //getScore :=  Models.OrderScore_GetScore (clam, ungroup(cd2i_in), ipid_only, genericModelName);
+	    getScore :=  Models.OrderScore_GetScore (clam, ungroup(cd2i_in), ipid_only, genericModelName, cmDeliverableValue , (Integer) cmTotalValue);
 			getScoreWAcct := record
 		    recordof(getScore);
 		    string30 account2 := '';
@@ -554,7 +567,8 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 		             left.seq = right.seq * 2,                                           //this needs to be the seq # of the bill to
 		             transform(getScoreWAcct, self.Account2 := right.Account, self := left));
 	#ELSE
-	    getScore :=  Models.OrderScore_GetScore (clam, ungroup(cd2i_in), ipid_only, genericModelName);  
+	    //getScore :=  Models.OrderScore_GetScore (clam, ungroup(cd2i_in), ipid_only, genericModelName );  
+	    getScore :=  Models.OrderScore_GetScore (clam, ungroup(cd2i_in), ipid_only, genericModelName, cmDeliverableValue , (Integer) cmTotalValue );  
 	
 	
 // ****Add the Models to the output 
@@ -590,6 +604,7 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 			self._type := map(
 				genericModelName = 'osn1504_0' => 'OSN1504_0',  // Flagship model
 				genericModelName = 'osn1608_1' => 'OSN1608_1',  // Vivid Seats custom model
+				genericModelName = 'osn1803_1' => 'OSN1803_1',  // Wallmart custom model
 				                                  '');
 			self.Value := (integer) le.score;
 			
@@ -606,6 +621,7 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 	iesp.instantid.t_ModelSequencedRISets form_model(getScore le, string account_value) := TRANSFORM
 			self.Name := map(
 				genericModelName = 'osn1608_1' => 'OrderScoreOSN1608_1',
+				genericModelName = 'osn1803_1' => 'OrderScoreOSN1803_1',
 				'OrderScore');
 			self.scores := PROJECT(le, form_cscore(LEFT));
 	END;
@@ -755,14 +771,14 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 																								 self.i_name_last_2 := last2_value,
 																								 self.i_model_name_1 := genericModelName,
 																								 self.i_model_name_2 := '',
-																								 self.o_score_1    := (Integer)left.Result.Models[1].Scores[1].Value,
+																								 self.o_score_1    := IF(genericModelName != '', (String)left.Result.Models[1].Scores[1].Value, ''),
 																								 self.o_reason_1_1 := left.Result.Models[1].Scores[1].RiskIndicatorSets[1].RiskIndicators[1].RiskCode,
 																								 self.o_reason_1_2 := left.Result.Models[1].Scores[1].RiskIndicatorSets[1].RiskIndicators[2].RiskCode,
 																								 self.o_reason_1_3 := left.Result.Models[1].Scores[1].RiskIndicatorSets[1].RiskIndicators[3].RiskCode,
 																								 self.o_reason_1_4 := left.Result.Models[1].Scores[1].RiskIndicatorSets[1].RiskIndicators[4].RiskCode,
 																								 self.o_reason_1_5 := left.Result.Models[1].Scores[1].RiskIndicatorSets[1].RiskIndicators[5].RiskCode,
 																								 self.o_reason_1_6 := left.Result.Models[1].Scores[1].RiskIndicatorSets[1].RiskIndicators[6].RiskCode,
-																								 self.o_score_2    := 0,
+																								 self.o_score_2    := '',
 																								 self.o_reason_2_1 := left.Result.Models[1].Scores[1].RiskIndicatorSets[2].RiskIndicators[1].RiskCode,
 																								 self.o_reason_2_2 := left.Result.Models[1].Scores[1].RiskIndicatorSets[2].RiskIndicators[2].RiskCode,
 																								 self.o_reason_2_3 := left.Result.Models[1].Scores[1].RiskIndicatorSets[2].RiskIndicators[3].RiskCode,

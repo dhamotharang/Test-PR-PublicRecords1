@@ -1,9 +1,22 @@
 ﻿IMPORT DidVille,BatchServices,Gateway,MDR,Phones,PhoneOwnership, Risk_Indicators,Royalty, STD, Suppress, ut;
 EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 							PhoneOwnership.IParams.BatchParams inMod) := FUNCTION
+
+	// 1. Resolved DIDs
+	// 2. GetBestInfo and keep input name if best lastname differs
+	// 3. Get Relatives Employers, Associates, and Business (REAB)
+	// 4. Get Phone Metadata - port, deact, react, carrier info, line type...
+	// 5. Identify and segment Invalid phone number and disconnected landlines
+	// 6. Call Zumigo to verify REAB identities and phone status for valid and active phones
+	// 7. Get CallerID from Accudata CNAM for phones not verified by Zumigo
+	// 8. Check in-house data Gong, PhonesPlus, Bip for active phones without identities
+	// 9. Join results (steps 5-8) and return 1 record per acctno 
+	//10. Flag whether person is associated with any debt litigation
+	//11. Compute Royalties 
+
 	Functions := PhoneOwnership.Functions;
 	Constants := PhoneOwnership.Constants;
-	today := STD.Date.Today();
+	today := Functions.TODAY; 
 	//*******************Get unknown DIDs - using best DID********************************
 	dsBatch := PROJECT(ds_batch_in(did=0),TRANSFORM(DidVille.Layout_Did_OutBatch,
 													SELF.fname:=LEFT.name_first,
@@ -31,6 +44,7 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 												SELF :=[]),
 							LEFT OUTER, LIMIT(0),KEEP(1));
 	Suppress.MAC_Suppress(dsBatchwInput,dsBatchUnrestricted,inMod.ApplicationType,Suppress.Constants.LinkTypes.DID,DID);
+	dsBatchwBestInfo := Functions.GetBestInfo(dsBatchUnrestricted);//Get bestinfo for name variations.
 
 	//*******************Get Phone Metadata - ATT LIDB(Carrier data) and porting info - reuse PhoneAttributes code***************************
 	tempMod := MODULE(PROJECT(inMod,Phones.IParam.PhoneAttributes.BatchParams,OPT))
@@ -49,6 +63,7 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 		disconnectDate := IF(nullEffectiveDay OR r.disconnect_date>=l.batch_in.effective_date,r.disconnect_date,0);
 		portedDate := IF(nullEffectiveDay OR r.ported_date>=l.batch_in.effective_date,r.ported_date,0);
 		swapDate := IF(nullEffectiveDay OR r.swapped_phone_number_date>=l.batch_in.effective_date,r.swapped_phone_number_date,0);
+		reactDate := IF(nullEffectiveDay OR r.reactivated_date>=l.batch_in.effective_date,r.reactivated_date,0);
 		SELF.acctno := l.acctno;
 		SELF.phone := l.phone;
 		SELF.dob := (STRING)l.dob;
@@ -56,7 +71,8 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 		SELF.AppendedCarrierName := r.carrier_name;
 		SELF.PrepaidPhoneFlag := (BOOLEAN)r.prepaid; //newly added to PhoneAttribute layout
 		status := MAP(  disconnectDate > 0 AND portedDate > 0 AND  ut.DaysApart((STRING)disconnectDate, (STRING)portedDate)<=7 => Constants.DisconnectStatus.UNDETERMINED,
-						disconnectDate > 0 AND (portedDate = 0 OR (portedDate > 0 AND ut.DaysApart((STRING)disconnectDate, (STRING)portedDate)>7)) => Constants.DisconnectStatus.DISCONNECTED,
+						disconnectDate > 0 AND (portedDate > disconnectDate OR reactDate > disconnectDate) => Constants.DisconnectStatus.HISTORIC_DISCONNECT,
+						disconnectDate > 0 AND (portedDate = 0 OR (disconnectDate > portedDate AND disconnectDate > reactDate)) => Constants.DisconnectStatus.DISCONNECTED,
 						Constants.DisconnectStatus.UNKNOWN);
 		SELF.disconnect_status := status;
 		SELF.ph_poss_disconnect_date := disconnectDate;
@@ -76,8 +92,8 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 		SELF.ownership_likelihood := IF(badNumber,Constants.Ownership.INVALID,'');
 		SELF.reason_codes := IF(badNumber,Constants.Reason_Codes.INVALID_NUMBER,'');
 		SELF.source_category := Constants.LIDB;
-		SELF.Source := r.source; // preserves PJ,PK,PB,PG source labels to identify gateway records
-		SELF.error_desc:=r.error_desc + IF(r.error_desc<>'',PhoneOwnership.Constants.DELIMITER,'');		//newly added to PhoneAttribute layout
+		SELF.Source := r.source; // preserves PG,PJ,PK,PB,PR source labels
+		SELF.error_desc:=r.error_desc;
 		SELF:=l.batch_in;		
 		SELF:=l;		
 		SELF:=[];
@@ -86,11 +102,15 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 											LEFT.acctno=RIGHT.acctno AND
 											LEFT.phone=RIGHT.phoneno,
 											appendLIDB(LEFT,RIGHT),LEFT OUTER, KEEP(1));
+	
+	// Identify known invalid or disconnected landlines
+	dsInvalidnDeactPhones := dsPhonesMetadataByEffectiveDate(LexisNexisMatchCode = Constants.LNMatch.INVALID OR 
+															(AppendedPhoneLineType=Phones.Constants.PhoneServiceType.Landline[1] AND 
+															disconnect_status = Constants.DisconnectStatus.DISCONNECTED));											
 
 	//***************Get REAB identities for Zumigo and to compare with callerNames from AccuData **************************************************
-	dsBatchwBestInfo := Functions.GetBestInfo(dsBatchUnrestricted);//Get bestinfo for name variations.
-	dsBatchwREAB := PhoneOwnership.GetREAB(dsBatchwBestInfo,inMod);//use dsBatchwBestInfo with alternate name and REAB in sequencing	
-
+	dsBatchwREAB := PhoneOwnership.GetREAB(dsBatchwBestInfo,inMod);//use dsBatchwBestInfo with alternate name and REAB in sequencing
+	
 	PhoneOwnership.Layouts.BatchOut appendReabMetadata(PhoneOwnership.Layouts.BatchOut l, PhoneOwnership.Layouts.Phone_Relationship r) := TRANSFORM
 		SELF.acctno := l.acctno;
 		SELF.phone := l.phone;
@@ -100,6 +120,7 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 		SELF.AppendedFirstName := r.fname;
 		SELF.AppendedMiddleName := r.mname;
 		SELF.AppendedSurname := r.lname;
+		SELF.AppendedEmailAddress := r.EmailAddress;
 		SELF.AppendedCompanyName := r.companyname;
 		SELF.AppendedStreetNumber := r.prim_range;
 		SELF.AppendedPreDirectional := r.predir;
@@ -152,12 +173,14 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 						NOT fullNameMatch => Constants.Ownership.enumIndex.LOW,
 						l.ownership_index);
 		SELF.ownership_index := ownership;
-		SELF.ownership_likelihood := Functions.getOwnershipValue(ownership);
-		SELF.reason_codes := IF(fullNameMatch,Constants.Reason_Codes.MATCH,l.reason_codes);		
+		SELF.ownership_likelihood := Functions.getOwnershipValue(ownership);		
 		SELF := l;
 		SELF := [];
 	END;
-	dsREABwMetadata := JOIN(dsPhonesMetadataByEffectiveDate,dsBatchwREAB,
+
+	// Filter known Invalid Phones and disconnected Landlines - At this point, we are confident about them being invalid/inactive.
+	// We will avoid appending identities or making subsequent gateway calls. Records are reappended at the end before returning results.
+	dsREABwMetadata := JOIN((dsPhonesMetadataByEffectiveDate - dsInvalidnDeactPhones),dsBatchwREAB,
 							LEFT.acctno = RIGHT.acctno,
 							appendReabMetadata(LEFT,RIGHT),
 							LEFT OUTER, LIMIT(Constants.MAX_RECORDS,SKIP));	
@@ -167,7 +190,7 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 	dsZumigoValidatedPhones := DEDUP(SORT(zFinal.Results(validatedRecord),acctno),acctno);  
 
 	//******************Get CallerID for PREMIUM and unresolved Ultimate********************************
-	dsCallerIDRequest := IF(inMod.useZumigo, dsREABwMetadata(acctno NOT IN SET(dsZumigoValidatedPhones,acctno)),
+	dsCallerIDRequest := IF(inMod.useZumigo, zFinal.Results(acctno NOT IN SET(dsZumigoValidatedPhones,acctno)),
 											dsREABwMetadata); //If not useZumigo, account for all input phone #s	
 	//Send unique phones avoid sending identified invalid numbers											
 	dsAccudataRequest := DEDUP(SORT(dsCallerIDRequest(LexisNexisMatchCode != Constants.LNMatch.INVALID),phone),phone);
@@ -180,18 +203,18 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 	dsAccudataValidatedResults := DEDUP(SORT(dsPhoneswCallerName(validatedRecord),acctno,-ownership_index,seq),acctno);
 
 	// *************************Get in-house phone records***********************//	
-	// Only passing acctno not validated for LNPhones search. Need to add ***ATT*** phones that did not go through Accudata here
+	// Only passing acctno not validated for LNPhones search.
 	// Need more info from Product about ATT phones.
 	dsLNData := PhoneOwnership.AppendLNPhonesData(dsPhoneswCallerName(acctno NOT IN SET(dsAccudataValidatedResults,acctno)),inMod);									
 	
-	//compiling all processed phones including invalid responses
-	dsAllPhones := dsPhonesMetadataByEffectiveDate(LexisNexisMatchCode = Constants.LNMatch.INVALID) + 
-					IF(inMod.useZumigo,zFinal.Results(validatedRecord)) + 
-					IF(inMod.useAccudataCNAM,dsAccudataValidatedResults) + 
-					dsLNData;
+	//**************************Compiling all processed phones including invalid responses****************************
+	dsAllPhones := dsInvalidnDeactPhones + // Append invalid phones and disconnected landlines
+					IF(inMod.useZumigo,zFinal.Results(validatedRecord)) + // records validated by Zumigo.
+					IF(inMod.useAccudataCNAM,dsAccudataValidatedResults) + // Caller Names from Accudata
+					dsLNData; // In-house identities - Gong, PP, and Bip
 
-	//result record count will always be one per acctno for this release.
-	dsPhoneResults := UNGROUP(TOPN(GROUP(SORT(dsAllPhones,acctno),acctno),inMod.MaxIdentityCount,acctno,-validatedRecord,ownership_index=Constants.Ownership.enumIndex.UNDETERMINED,-ownership_index,reason_codes='',reason_codes,seq)); 
+	//Resulting record count will always be one per acctno for this release. MaxIdentityCount hard-coded to 1.
+	dsPhoneResults := UNGROUP(TOPN(GROUP(SORT(dsAllPhones,acctno),acctno),inMod.MaxIdentityCount,acctno,-validatedRecord,ownership_index=Constants.Ownership.enumIndex.UNDETERMINED,-ownership_index,-TotalZumigoScore,reason_codes='',reason_codes,seq)); 
 	
 	PhoneOwnership.Layouts.BatchOut UpdateUnknownRelationships (PhoneOwnership.Layouts.BatchOut l):= TRANSFORM
 		availableListingName := l.AppendedListingName <>'';
@@ -217,31 +240,46 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 		SELF.AppendedStateCode := IF(ownershipPossible,l.AppendedStateCode,'');
 		SELF.AppendedZipCode := IF(ownershipPossible,l.AppendedZipCode,'');		
 		SELF.AppendedZipCodeExtension := IF(ownershipPossible,l.AppendedZipCodeExtension,'');		
+		SELF.AppendedEmailAddress := IF(ownershipPossible,l.AppendedEmailAddress,'');	
+		isInvalid := l.LexisNexisMatchCode = Constants.LNMatch.INVALID;
 		SELF.LexisNexisMatchCode := MAP(l.validatedRecord AND l.LexisNexisMatchCode<>''  => TRIM(l.LexisNexisMatchCode,ALL),
-										l.LexisNexisMatchCode = Constants.LNMatch.INVALID => Constants.LNMatch.INVALID,
+										isInvalid => Constants.LNMatch.INVALID,
 										l.AppendedPhoneLineType = Phones.Constants.PhoneServiceType.Wireless[1] => Constants.LNMatch.CELL,
 										l.AppendedRecordType = Constants.LNMatch.BUSINESS => Constants.LNMatch.BUSINESS,
 										l.AppendedRecordType <> Constants.LNMatch.BUSINESS => Constants.LNMatch.NON_CELL_CONSUMER,
-										'');	
-		noRelationship := l.subj2own_relationship = Constants.Relationship.NONE; 
-		finalOwnershipIndex := IF(noRelationship,Functions.checkOwnership(l.name_first,l.name_last,l.AppendedFirstName,l.AppendedSurname,'',Constants.Relationship.NONE),Constants.Ownership.enumIndex.UNDETERMINED);
-		ownership := MAP(NOT l.validatedRecord => Constants.Ownership.enumIndex.UNDETERMINED,
-									FullNameMatch => Constants.Ownership.enumIndex.HIGH, //will update Zumigo index
-									noRelationship => finalOwnershipIndex,
-									ownershipPossible OR l.ownership_index = Constants.Ownership.enumIndex.INVALID =>  l.ownership_index, 
-									Constants.Ownership.enumIndex.LOW);	
+										'');
 		isDisconnected := l.disconnect_status = Constants.DisconnectStatus.DISCONNECTED;
-		gatewayResponse := STD.Str.Contains(l.source_category,Constants.CARRIER,FALSE) OR STD.Str.Contains(l.source_category,Constants.CNAM,FALSE);	
+		isSuspended	   := l.disconnect_status = Constants.DisconnectStatus.CONFIRMED_SUSPENDED;
+		noOwner := NOT l.validatedRecord OR (l.AppendedFirstName='' AND l.AppendedSurname='' AND l.AppendedCompanyName='' AND l.AppendedEmailAddress='');
+		confirmedDisconnected := noOwner AND isDisconnected;
+		noRelationship := NOT confirmedDisconnected AND l.subj2own_relationship = Constants.Relationship.NONE; 
+		finalOwnershipIndex := IF(noRelationship,Functions.checkOwnership(l.name_first,l.name_last,l.AppendedFirstName,l.AppendedSurname,'',Constants.Relationship.NONE),Constants.Ownership.enumIndex.UNDETERMINED);
+		ownership := MAP(confirmedDisconnected OR isInvalid => Constants.Ownership.enumIndex.INVALID,//both invalid and confirmedDisconnected have an ownership index of zero
+							NOT l.validatedRecord => Constants.Ownership.enumIndex.UNDETERMINED,
+							FullNameMatch => Constants.Ownership.enumIndex.HIGH, //will update Zumigo index
+							noRelationship => finalOwnershipIndex,
+							ownershipPossible =>  l.ownership_index, 
+							Constants.Ownership.enumIndex.LOW);	
+		
+		zumigoSource := STD.Str.Contains(l.source_category,Constants.CARRIER,FALSE);
+		gatewayResponse := zumigoSource OR STD.Str.Contains(l.source_category,Constants.CNAM,FALSE);	
 		ownershipStatus := IF(NOT gatewayResponse AND isDisconnected AND ownership > 2,ownership - 1, ownership);
 		SELF.ownership_index := ownershipStatus;
-		SELF.ownership_likelihood := IF(STD.Str.Contains(l.source_category,Constants.CARRIER,FALSE),l.ownership_likelihood,Functions.getOwnershipValue(ownershipStatus));			
-		SELF.subj2own_relationship := MAP(NOT l.validatedRecord => Constants.Relationship.NO_IDENTITY,
+		SELF.ownership_likelihood := MAP(confirmedDisconnected => Constants.Ownership.NONE,
+										zumigoSource =>l.ownership_likelihood,
+										isInvalid => Constants.Ownership.INVALID,	
+										Functions.getOwnershipValue(ownershipStatus));			
+		SELF.subj2own_relationship := MAP(	confirmedDisconnected => Constants.Relationship.NO_OWNER,
+											isInvalid => Constants.Relationship.INVALID,
+											NOT l.validatedRecord => Constants.Relationship.NO_IDENTITY,
 											FullNameMatch => Constants.Relationship.SUBJECT,
 											noRelationship => Functions.getRelationship(finalOwnershipIndex),
-											ownershipPossible OR l.subj2own_relationship = Constants.Relationship.INVALID => l.subj2own_relationship,
+											ownershipPossible => l.subj2own_relationship,
 											Constants.Relationship.NONE);	
-		SELF.reason_codes := IF(l.LexisNexisMatchCode=Constants.LNMatch.INVALID,Constants.LNMatch.INVALID,
-										Functions.getReasonCodes(SELF.ownership_index = Constants.Ownership.enumIndex.HIGH,SELF.ownership_index = Constants.Ownership.enumIndex.UNDETERMINED,l.ph_poss_disconnect_date > 0));
+		SELF.reason_codes := MAP(isInvalid => Constants.Reason_Codes.INVALID_NUMBER,
+									confirmedDisconnected => Constants.Reason_Codes.CONFIRMED_DISCONNECTED,
+									zumigoSource => l.reason_codes,
+									Functions.getReasonCodes(SELF.ownership_index = Constants.Ownership.enumIndex.HIGH,SELF.ownership_index = Constants.Ownership.enumIndex.UNDETERMINED,l.ph_poss_disconnect_date > 0,isSuspended));
 		SELF:=l;
 	END;
 	dsPhonesFinal := PROJECT(dsPhoneResults,UpdateUnknownRelationships(LEFT));
@@ -280,7 +318,7 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 	END;
 
 	dsFinal := DATASET([ResultswRoyalties()])[1];	
-
+	
 	#IF(PhoneOwnership.Constants.Debug.Main)
 		OUTPUT(ds_batch_in,NAMED('ds_batch_in'));
 		OUTPUT(dsBatch,NAMED('dsBatch'));
@@ -289,6 +327,7 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 		OUTPUT(dsBatchUnrestricted,NAMED('dsBatchUnrestricted'));
 		OUTPUT(dsBatchwBestInfo,NAMED('dsBatchwBestInfo'));
 		OUTPUT(dsPhoneswMetadata,NAMED('dsPhoneswMetadata'));
+		OUTPUT(dsInvalidnDeactPhones,NAMED('dsInvalidnDeactPhones'));
 		OUTPUT(dsPhonesMetadataByEffectiveDate,NAMED('dsPhonesMetadataByEffectiveDate'));
 		OUTPUT(dsBatchwREAB,NAMED('dsBatchwREAB'));
 		OUTPUT(dsREABwMetadata,NAMED('dsREABwMetadata'));

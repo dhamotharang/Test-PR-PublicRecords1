@@ -1,4 +1,4 @@
-// ************
+﻿// ************
 // NOTE if timeouts reoccur place to look for improved join limits may be within 
 // BIPV2.mac_AddStatus
 // ******************
@@ -73,7 +73,7 @@ export ConnectedBusinessSection := module
 	ds_best2_rawProxidZeroBest := if(in_options.restrictexperian,ds_bestInfo,ds_bip_best);
 																							
 	ds_best2_rawProxidZero := project( choosen(ds_best2_rawProxidZeroBest,MaxRelatives),
-	                               transform( {string30 companyName; 															
+	                               transform( {string120 companyName; 															
 																iesp.share.t_address companyAddress; 
 																iesp.share.t_businessIdentity businessIds; 
 																string12 businessId;string9 tin; string2 TinSource},																         																				

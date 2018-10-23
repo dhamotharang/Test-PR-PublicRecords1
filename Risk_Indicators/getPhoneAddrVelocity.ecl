@@ -1,15 +1,15 @@
-// *******************************************************************************************************************************************************
+﻿// *******************************************************************************************************************************************************
 // ********  IF YOU CHANGE LOGIC IN THIS FUNCTION, ALSO MODIFY THE CORRESPONDING CODE WITHIN Risk_Indicators.get_IID_Best_Flags ATTRIBUTE ****************
 // *******************************************************************************************************************************************************
 
-import risk_indicators, gong, riskwise, ut, header, doxie, mdr, drivers, FCRA;
+import _Control, risk_indicators, gong, riskwise, ut, header, doxie, mdr, drivers, FCRA;
+onThor := _Control.Environment.OnThor;
 
 export getPhoneADDRVelocity (GROUPED DATASET(risk_indicators.iid_constants.layout_outx) iid, boolean isUtility=false, unsigned1 dppa,
 															boolean isFCRA=false,
 															string50 DataRestriction=iid_constants.default_DataRestriction, 
 															integer bsversion,
-															unsigned8 BSOptions,
-															boolean onThor=FALSE) := FUNCTION
+															unsigned8 BSOptions) := FUNCTION
 
 dk := choosen(if(isFCRA, doxie.Key_FCRA_max_dt_last_seen, doxie.key_max_dt_last_seen), 1);
 
@@ -48,7 +48,11 @@ gong_by_did_thor_did := join(distribute(dedup_by_did(did!=0), hash64(did)),
 											
 gong_by_did_thor := sort(gong_by_did_thor_did + dedup_by_did(did=0), seq, did);											
 											
-gong_by_did := if(onThor, gong_by_did_thor, gong_by_did_roxie);
+#IF(onThor)
+	gong_by_did := gong_by_did_thor;
+#ELSE
+	gong_by_did := gong_by_did_roxie;
+#END
 
 risk_indicators.iid_constants.layout_outx count_phones_per_did(risk_indicators.iid_constants.layout_outx le, risk_indicators.iid_constants.layout_outx rt) := transform
 	self.phones_per_adl := le.phones_per_adl+IF(le.phone_from_did=rt.phone_from_did ,0, rt.phones_per_adl);
@@ -151,8 +155,11 @@ header_by_address_pre50_thor_addr := join(distribute(dedup_by_did(prim_name!='' 
 
 header_by_address_pre50_thor := header_by_address_pre50_thor_addr + project(dedup_by_did(prim_name='' or z5=''), TRANSFORM(slim_addr_rec, self := left));
 
-header_by_address_pre50 := IF(onThor, header_by_address_pre50_thor, header_by_address_pre50_roxie);																		
-																		
+#IF(onThor)
+	header_by_address_pre50 := header_by_address_pre50_thor;
+#ELSE
+	header_by_address_pre50 := header_by_address_pre50_roxie;
+#END
 																		
 header_by_address_50_roxie := join(dedup_by_did, header_address_key,	
 															left.prim_name!='' and left.z5!='' and
@@ -209,7 +216,12 @@ header_by_address_50_thor_addr := join(distribute(dedup_by_did(prim_name!='' and
 
 header_by_address_50_thor := header_by_address_50_thor_addr + project(dedup_by_did(prim_name='' or z5=''), TRANSFORM(slim_addr_rec, self := left));
 
-header_by_address_50 := if(OnThor, header_by_address_50_thor, header_by_address_50_roxie);
+#IF(onThor)
+	header_by_address_50 := header_by_address_50_thor;
+#ELSE
+	header_by_address_50 := header_by_address_50_roxie;
+#END
+
 // temporary, leave the header_by_address alone for versions prior to 50.  
 // per bug 164071, Difference in the 2 joins is the atmost condition and the keep() 									
 header_by_address := if(bsversion >=50, header_by_address_50, header_by_address_pre50);
@@ -226,7 +238,11 @@ counts_per_ssn_thor := table(distribute(header_by_address, hash64(seq,did)), {se
 															_ssns_per_addr_created_6months := count(group, ssns_per_addr_created_6months>0)
 															}, seq, did, ssn_from_addr, local);		
 
-counts_per_ssn := if(onThor, counts_per_ssn_thor, counts_per_ssn_roxie);
+#IF(onThor)
+	counts_per_ssn := counts_per_ssn_thor;
+#ELSE
+	counts_per_ssn := counts_per_ssn_roxie;
+#END
 
 ssns_per_addr_counts := table(counts_per_ssn, {seq, did, 
 															ssns_per_addr := count(group, _ssns_per_addr>0),
@@ -253,7 +269,11 @@ counts_per_adl_thor := table(distribute(header_by_address, hash64(seq, did)), {s
 															SuspciousADLsperAddr := 0  // initialize this variable to 0
 															}, seq, did, DID_from_srch, historydate, local);				
 															
-counts_per_adl := if(onThor, counts_per_adl_thor, counts_per_adl_roxie);
+#IF(onThor)
+	counts_per_adl := counts_per_adl_thor;
+#ELSE
+	counts_per_adl := counts_per_adl_roxie;
+#END
 
 adls_from_address := project(counts_per_adl(DID_from_srch<>0), 
 	transform(risk_indicators.Boca_Shell_Fraud.layout_identities_input, self.did := left.DID_from_srch;
@@ -302,7 +322,11 @@ adls_per_addr_counts_thor := table(distribute(address_velocity_raw, hash64(seq,d
 															adls_per_addr_created_6months := count(group, _adls_per_addr_created_6months>0)}, 
 															seq, did, local);
 
-adls_per_addr_counts := if(onThor, adls_per_addr_counts_thor, adls_per_addr_counts_roxie);
+#IF(onThor)
+	adls_per_addr_counts := adls_per_addr_counts_thor;
+#ELSE
+	adls_per_addr_counts := adls_per_addr_counts_roxie;
+#END
 
 // rolled_adl_counts := project(ssn_counts_by_seq_did, transform(iid_constants.layout_outx, self := left, self := []));
 
@@ -323,8 +347,11 @@ with_phone_counts_thor := join(distribute(iid, hash64(seq, did)),
 															 getPhoneCounts(LEFT, RIGHT), left outer,
 															 local);
 															 
-with_phone_counts := if(onThor, with_phone_counts_thor, with_phone_counts_roxie);
-
+#IF(onThor)
+	with_phone_counts := with_phone_counts_thor;
+#ELSE
+	with_phone_counts := with_phone_counts_roxie;
+#END
 
 risk_indicators.iid_constants.layout_outx getSSNPerAddrCounts(with_phone_counts le, ssns_per_addr_counts ri)  := TRANSFORM
 		self.ssns_per_addr := iid_constants.capVelocity(ri.ssns_per_addr); 
@@ -340,7 +367,11 @@ with_ssn_per_addr_counts_roxie := join(with_phone_counts, ssns_per_addr_counts, 
 with_ssn_per_addr_counts_thor := join(with_phone_counts, distribute(ssns_per_addr_counts, hash64(seq,did)), left.seq=right.seq and left.did=right.did, 
 	getSSNPerAddrCounts(LEFT, RIGHT), left outer, local);	
 		
-with_ssn_per_addr_counts := if(onThor, with_ssn_per_addr_counts_thor, with_ssn_per_addr_counts_roxie);		
+#IF(onThor)
+	with_ssn_per_addr_counts := with_ssn_per_addr_counts_thor;
+#ELSE
+	with_ssn_per_addr_counts := with_ssn_per_addr_counts_roxie;
+#END
 
 risk_indicators.iid_constants.layout_outx getADLsPerAddrCounts(with_ssn_per_addr_counts le, adls_per_addr_counts ri) := TRANSFORM
 		self.suspicious_adls_per_addr_created_6months := iid_constants.capVelocity(ri.suspicious_adls_per_addr_created_6months);
@@ -357,13 +388,20 @@ with_adls_per_addr_counts_roxie := join(with_ssn_per_addr_counts, adls_per_addr_
 with_adls_per_addr_counts_thor := join(with_ssn_per_addr_counts, distribute(adls_per_addr_counts, hash64(seq, did)), left.seq=right.seq and left.did=right.did, 
 	getADLsPerAddrCounts(LEFT, RIGHT), left outer, local);
 
-
-with_adls_per_addr_counts := if(onThor, with_adls_per_addr_counts_thor, with_adls_per_addr_counts_roxie);
+#IF(onThor)
+	with_adls_per_addr_counts := with_adls_per_addr_counts_thor;
+#ELSE
+	with_adls_per_addr_counts := with_adls_per_addr_counts_roxie;
+#END
 
 with_adls_per_addr_counts_grouped_roxie := group(sort(with_adls_per_addr_counts, seq, did), seq, did);
 with_adls_per_addr_counts_grouped_thor := group(sort(with_adls_per_addr_counts, seq, did, local), seq, did, local);
 
-with_adls_per_addr_counts_grouped := if(onThor, with_adls_per_addr_counts_grouped_thor, with_adls_per_addr_counts_grouped_roxie);
+#IF(onThor)
+	with_adls_per_addr_counts_grouped := with_adls_per_addr_counts_grouped_thor;
+#ELSE
+	with_adls_per_addr_counts_grouped := with_adls_per_addr_counts_grouped_roxie;
+#END
 
 RETURN with_adls_per_addr_counts_grouped;
 END;

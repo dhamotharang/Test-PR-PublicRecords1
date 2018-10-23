@@ -4,11 +4,11 @@ EXPORT reportIndCriminal(DATASET(DueDiligence.layouts.Indv_Internal) inData,
                          STRING6 ssnMask) := FUNCTION
 
 
-  listOfInquiredOffenses := NORMALIZE(inData, LEFT.individual.partyOffenses, TRANSFORM(DueDiligence.LayoutsInternalReport.FlatListOfIndividualsWithCriminalLayout,																												
+  listOfInquiredOffenses := NORMALIZE(inData, LEFT.individual.indOffenses, TRANSFORM(DueDiligence.LayoutsInternalReport.FlatListOfIndividualsWithCriminalLayout,																												
                                                                                         SELF.seq := LEFT.seq;  
-                                                                                        SELF.did := LEFT.inquiredDID;   
-                                                                                        SELF := LEFT.individual;  
-                                                                                        SELF := RIGHT;
+                                                                                        SELF.did := LEFT.inquiredDID; 
+                                                                                        SELF := LEFT.individual; 
+                                                                                        SELF.crimData := RIGHT;
                                                                                         SELF := [];)); 
 
 
@@ -18,7 +18,7 @@ EXPORT reportIndCriminal(DATASET(DueDiligence.layouts.Indv_Internal) inData,
                                                                           SELF.seq := LEFT.seq;
                                                                           SELF.did := LEFT.did;
                                                                           SELF.crimEvents.PersonInfo := LEFT;
-                                                                          SELF.crimEvents.CriminalEvents := LEFT.criminalChildDS;
+                                                                          SELF.crimEvents.Criminals := LEFT.criminalChildDS;
                                                                           SELF := [];));
 
 

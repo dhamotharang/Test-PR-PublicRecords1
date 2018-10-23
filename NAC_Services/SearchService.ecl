@@ -1,10 +1,11 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="NAC SearchService" wuTimeout="300000">
 	<part  name="NACSearchRequest" type="tns:XmlDataSet" cols="80" rows="30"/>
 </message>
 */
-IMPORT NAC_Services,NAC_V2_Services,iesp;
+IMPORT NAC_Services,NAC_V2_Services,iesp,AutoheaderV2;
 EXPORT SearchService() := FUNCTION
+#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 //1. Get input params and store iesp standards for penalty calculations
 	ds_in     := DATASET([], iesp.nac_search.t_NACSearchRequest) : STORED('NACSearchRequest',FEW);
 	first_row := ds_in[1] : INDEPENDENT;

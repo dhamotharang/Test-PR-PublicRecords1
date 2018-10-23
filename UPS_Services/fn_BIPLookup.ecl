@@ -3,20 +3,11 @@ EXPORT fn_BIPLookup( dataset(BIPV2.IDfunctions.rec_SearchInput) ds_Format2Search
 												AutoStandardI.DataRestrictionI.params in_mod2   
 											) := FUNCTION
 	
+
 	ds_Format2SearchInput_Hsort := project(ds_Format2SearchInput,
-																								transform(BIPV2.IDfunctions.rec_SearchInput,
-	self.company_name := STD.Str.ToUpperCase(left.company_name);
-  self.prim_name := STD.Str.ToUpperCase(left.prim_name);
-  self.sec_range := STD.Str.ToUpperCase(left.sec_range);
-  self.city := STD.Str.ToUpperCase(left.city);
-  self.state := STD.Str.ToUpperCase(left.state);
-  self.URL := STD.Str.ToUpperCase(left.URL);
-  self.Email := STD.Str.ToUpperCase(left.Email);
-  self.Contact_fname := STD.Str.ToUpperCase(left.Contact_fname);
-  self.Contact_mname := STD.Str.ToUpperCase(left.Contact_mname);
-  self.Contact_lname := STD.Str.ToUpperCase(left.Contact_lname);
-  self.hsort := true,
-	self := left )) ;
+																		 transform(BIPV2.IDfunctions.rec_SearchInput,
+                                   self.hsort := true,
+	                                 self := left )) ;
 	
 	ds_InfoProxIdNonRestrictedWithD := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(ds_Format2SearchInput_Hsort).data2_;
 	ds_InfoProxIdNonRestricted := ds_InfoProxIdNonRestrictedWithD(source <> MDR.SourceTools.src_Dunn_Bradstreet);
@@ -31,11 +22,31 @@ EXPORT fn_BIPLookup( dataset(BIPV2.IDfunctions.rec_SearchInput) ds_Format2Search
 																 dt_first_seen // this is field name only no value
 															 );
 		 																							   
-	topResults := dedup(sort(ds_ProxIdRestricted,ultid, orgid, seleid, proxid,powid,
-      			                         -proxweight,-record_score, -dt_last_seen,record),ultid, orgid, seleid, proxid,powid);
-										 
+	topResults := dedup(sort(ds_ProxIdRestricted,ultid, orgid, seleid, proxid,powid,-proxweight,-record_score,-dt_last_seen,record),
+															ultid, orgid, seleid, proxid,powid);
+ 
+		
+  status_coded := bipv2.key_bh_linking_ids.kFetch2(project(topResults,transform(BIPV2.IDlayouts.l_xlink_ids2,self := left)),
+																												BIPV2.IDconstants.Fetch_Level_PowID, //The lowest level you'd like to pay attention to.
+																												0, //ScoreThreshold
+																												PROJECT(AutoStandardI.GlobalModule(),BIPV2.mod_sources.iParams,opt),
+																												5, //JoinLimit
+																												true, //dnbFullRemove
+																												); 						 
+	
+  topResults_with_status := 
+														join(topResults,status_coded, 
+															 left.ultid = right.ultid and 
+															 left.orgid = right.orgid and  
+															 left.seleid = right.seleid and  
+															 left.proxid = right.proxid and 
+															 left.powid = right.powid,
+															 transform(UPS_Services.layouts.RecBipRecordOut2, 
+																					self := left , self := right),
+															 left outer, keep(1),limit(0));
+	
   //sort by -proxweight to bubble top score within a proxid group to the top again.
-  tmpTopResultsScored := sort(topResults,-proxweight,-record_score, -dt_last_seen);  
-  					 
-	return(tmpTopResultsScored);
+  tmpTopResultsScored := project(sort(topResults_with_status,-proxweight,-record_score, -dt_last_seen), UPS_Services.layouts.RecBipRecordOut2); 
+	
+	return tmpTopResultsScored;
 	end;

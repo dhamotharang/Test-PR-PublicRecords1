@@ -48,7 +48,7 @@ EXPORT SearchServiceFCRA := MACRO
 	
 	ccwresults := CCW_services.SearchService_Records.search(tempmod, true);		
 
-	input_consumer := FFD.MAC.PrepareConsumerRecord(rdid, false, search_by);
+	input_consumer := FFD.MAC.PrepareConsumerRecord(rdid, true, search_by);
 	
 	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(ccwresults.Records, results, iesp.concealedweapon_fcra.t_FcraWeaponSearchResponse);	
 	

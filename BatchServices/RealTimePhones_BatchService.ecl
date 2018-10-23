@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="RealTimePhones_BatchService">
   <part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>  
   <part name="DPPAPurpose" type="xsd:byte"/>
@@ -38,7 +38,8 @@ acctno is required and must be unique for each row
 
 import Gateway,   AutoStandardI,  BatchServices, address, Royalty, Phones;
 export RealTimePhones_BatchService := macro
-  max_results := BatchServices.Constants.RealTime.REALTIME_PHONE_LIMIT : stored('max_results_per_acct');
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);  
+	max_results := BatchServices.Constants.RealTime.REALTIME_PHONE_LIMIT : stored('max_results_per_acct');
 	store_max := if (max_results > BatchServices.Constants.RealTime.REALTIME_PHONE_LIMIT or max_results = 0,BatchServices.Constants.RealTime.REALTIME_PHONE_LIMIT,max_results);
 	#stored('MaxResults', store_max);
   in_gateways := Gateway.Configuration.get();

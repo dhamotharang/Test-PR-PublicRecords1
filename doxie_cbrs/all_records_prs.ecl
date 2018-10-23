@@ -1,9 +1,11 @@
-import doxie_crs,doxie,LN_PropertyV2_Services;
+﻿import doxie_crs,doxie,LN_PropertyV2_Services;
 
-export all_records_prs(dataset(doxie_cbrs.layout_references) bdids) := FUNCTION
+export all_records_prs(dataset(doxie_cbrs.layout_references) bdids, unsigned1 ofac_version = 1,
+                                                             boolean include_ofac = false, real global_watchlist_threshold = 0.8
+) := FUNCTION
 
 //***** MY RECORDSETS
-cntr := doxie_cbrs.count_records_prs(bdids);
+cntr := doxie_cbrs.count_records_prs(bdids, ofac_version, include_ofac, global_watchlist_threshold);
 tarr := doxie_cbrs.best_records_prs_target(bdids);
 hirr := doxie_cbrs.hierarchy_records;
 idnr := doxie_cbrs.ID_Number_records(bdids);
@@ -27,7 +29,7 @@ idor := doxie_cbrs.Internet_Domains_records_max(bdids);
 dnbr := doxie_cbrs.DNB_records_max(bdids);
 rvlr := doxie_cbrs.reverse_lookup_records_prs_max(bdids);
 ypar := doxie_cbrs.YellowPages_records_prs_max(bdids);
-patr := doxie_cbrs.Patriot_records_max;
+patr := doxie_cbrs.Patriot_records_max(ofac_version, include_ofac, global_watchlist_threshold);
 plir := doxie_cbrs.proflic_records_prs_max(bdids);
 bbbr := doxie_cbrs.BBB_records_prs_max(bdids);
 bnmr := doxie_cbrs.BBB_NM_records_prs_max(bdids);

@@ -1,4 +1,5 @@
-﻿import inquiry_acclogs, ut, did_add, riskwise, fcra, riskwisefcra, gateway;
+﻿import _Control, inquiry_acclogs, ut, did_add, riskwise, fcra, riskwisefcra, gateway;
+onThor := _Control.Environment.OnThor;
 
 isFCRA := True;
 
@@ -6,8 +7,7 @@ export Boca_Shell_Inquiries_FCRA(
 	GROUPED DATASET(Risk_Indicators.layout_bocashell_neutral) clam_pre_Inquiries, 
 	unsigned8 BSOptions,
 	integer bsVersion,
-	dataset(Gateway.Layouts.Config) gateways,
-	boolean onThor=false) := FUNCTION
+	dataset(Gateway.Layouts.Config) gateways) := FUNCTION
 
 // when running in FCRA historical mode, this function will call over to neutral roxie
 // to count up collection transactions that happened prior to project july moving
@@ -654,7 +654,11 @@ j_raw_fcra_thor := join(distribute(clam_pre_Inquiries, hash64(shell_input.did)),
 						add_inquiry_raw_fcra(left, right),
 						left outer, atmost(left.shell_input.did=right.appended_adl, 5000), LOCAL);		
 
-j_raw_fcra := if(onThor, j_raw_fcra_thor, ungroup(j_raw_fcra_roxie));
+#IF(onThor)
+	j_raw_fcra := j_raw_fcra_thor;
+#ELSE
+	j_raw_fcra := ungroup(j_raw_fcra_roxie);
+#END
 
 j_fcra_corrections_roxie := join(clam_pre_Inquiries, fcra.Key_Override_Inquiries_ffid, 
 						keyed(right.flag_file_id in left.inquiries_correct_ffid) and
@@ -668,7 +672,11 @@ j_fcra_corrections_thor := join(clam_pre_Inquiries, pull(fcra.Key_Override_Inqui
 						add_inquiry_corrections_fcra(left, right),
 						left outer, LOCAL, ALL);	
 
-j_fcra_corrections := if(onThor, j_fcra_corrections_thor, j_fcra_corrections_roxie);
+#IF(onThor)
+	j_fcra_corrections := j_fcra_corrections_thor;
+#ELSE
+	j_fcra_corrections := j_fcra_corrections_roxie;
+#END
 
 j_fcra := j_raw_fcra + j_fcra_corrections; // add the raw + corrections together	
 
@@ -797,14 +805,17 @@ j_raw_fcra_offset_roxie := join(clam_pre_Inquiries, Inquiry_AccLogs.Key_FCRA_DID
 j_raw_fcra_offset_thor := join(distribute(clam_pre_Inquiries, hash64(shell_input.did)), 
 						distribute(pull(Inquiry_AccLogs.Key_FCRA_DID), hash64(appended_adl)), 
 						left.shell_input.did<>0 and (left.shell_input.did=right.appended_adl) and
-						Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate + 200, bsversion) and
+						Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, '', /*left.historydateTimeStamp*/ left.historydate + 200, bsversion) and
 						trim(right.permissions.fcra_purpose) in Inquiry_AccLogs.shell_constants.set_fcra_shell_permissible_purposes and
 						trim(right.search_info.transaction_id) not in left.inquiries_correct_record_id,  // don't include any records from raw data that have been corrected
 						add_inquiry_raw_fcra_offset(left, right),
 						left outer, atmost(left.shell_input.did=right.appended_adl, 5000), LOCAL);		
 
-j_raw_fcra_offset := if(onThor, j_raw_fcra_offset_thor, ungroup(j_raw_fcra_offset_roxie));
-
+#IF(onThor)
+	j_raw_fcra_offset := j_raw_fcra_offset_thor;
+#ELSE
+	j_raw_fcra_offset := ungroup(j_raw_fcra_offset_roxie);
+#END
 
 j_fcra_corrections_offset_roxie := join(clam_pre_Inquiries, fcra.Key_Override_Inquiries_ffid, 
 						keyed(right.flag_file_id in left.inquiries_correct_ffid) and
@@ -814,11 +825,15 @@ j_fcra_corrections_offset_roxie := join(clam_pre_Inquiries, fcra.Key_Override_In
 
 j_fcra_corrections_offset_thor := join(clam_pre_Inquiries, pull(fcra.Key_Override_Inquiries_ffid), 
 						right.flag_file_id in left.inquiries_correct_ffid and
-						Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, left.historydateTimeStamp, left.historydate + 200, bsversion),	
+						Inquiry_AccLogs.shell_constants.hist_is_ok(right.search_info.datetime, '', /*left.historydateTimeStamp,*/ left.historydate + 200, bsversion),	
 						add_inquiry_corrections_fcra_offset(left, right),
 						left outer, LOCAL, ALL);	
 
-j_fcra_corrections_offset := if(onThor, j_fcra_corrections_offset_thor, j_fcra_corrections_offset_roxie);
+#IF(onThor)
+	j_fcra_corrections_offset := j_fcra_corrections_offset_thor;
+#ELSE
+	j_fcra_corrections_offset := j_fcra_corrections_offset_roxie;
+#END
 
 j_fcra_offset := j_raw_fcra_offset + j_fcra_corrections_offset; // add the raw + corrections together	
 
@@ -1791,7 +1806,11 @@ ssn_raw_base_fcra_thor := join(distribute(with_all_per_adl(shell_input.ssn<>''),
 								add_ssn_raw_fcra(left, right), left outer, atmost(left.shell_input.ssn=right.ssn,riskwise.max_atmost), LOCAL) 
 								+ with_all_per_adl(shell_input.ssn='');	//MS-104 and MS-105
 
-ssn_raw_base_fcra := if(onThor, ssn_raw_base_fcra_thor, ssn_raw_base_fcra_roxie);
+#IF(onThor)
+	ssn_raw_base_fcra := ssn_raw_base_fcra_thor;
+#ELSE
+	ssn_raw_base_fcra := ssn_raw_base_fcra_roxie;
+#END
 
 // only append the ssn_raw_updates for non-fcra
 ssn_raw := ssn_raw_base_fcra;
@@ -2003,8 +2022,12 @@ Addr_raw_base_fcra_thor := join(distribute(with_ssn_velocity(shell_input.prim_na
 										left.shell_input.sec_range=right.sec_range, riskwise.max_atmost), LOCAL) 
 								+ with_ssn_velocity(shell_input.prim_name='' or shell_input.z5='');
 								
-Addr_raw_base_fcra := if(onThor, Addr_raw_base_fcra_thor, Addr_raw_base_fcra_roxie);
-								
+#IF(onThor)
+	Addr_raw_base_fcra := Addr_raw_base_fcra_thor;
+#ELSE
+	Addr_raw_base_fcra := Addr_raw_base_fcra_roxie;
+#END
+
 addr_raw := addr_raw_base_fcra;								
 
 grouped_addr_raw := group(sort(addr_raw, seq, -inquiryADLsFromAddr), seq);
@@ -2167,7 +2190,11 @@ Phone_raw_base_fcra_thor := join(distribute(with_address_velocities(shell_input.
 								atmost(left.shell_input.phone10=right.phone10, riskwise.max_atmost), LOCAL) 
 								+ with_address_velocities(shell_input.phone10='');				
 								
-Phone_raw_base_fcra := if(onThor, Phone_raw_base_fcra_thor, Phone_raw_base_fcra_roxie);
+#IF(onThor)
+	Phone_raw_base_fcra := Phone_raw_base_fcra_thor;
+#ELSE
+	Phone_raw_base_fcra := Phone_raw_base_fcra_roxie;
+#END
 
 phone_raw := Phone_raw_base_fcra;								
 
@@ -2250,7 +2277,11 @@ with_billgroups_thor := join(distribute(with_inquiries, hash64(did)),
 	getBillGroups(LEFT,RIGHT), 
 		left outer, atmost(riskwise.max_atmost), keep(1), LOCAL);
 
-with_billgroups := if(onThor, with_billgroups_thor, ungroup(with_billgroups_roxie));
+#IF(onThor)
+	with_billgroups := with_billgroups_thor;
+#ELSE
+	with_billgroups := ungroup(with_billgroups_roxie);
+#END
 
 // skip the billgroups search if bsversion is prior to 50
 inquiry_summary := if(bsversion>=50, group(with_billgroups, seq), group(with_inquiries, seq) );

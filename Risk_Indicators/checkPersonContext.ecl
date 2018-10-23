@@ -1,11 +1,12 @@
-﻿import Gateway, PersonContext, risk_indicators, iesp, ut;
+﻿import _Control, Gateway, PersonContext, risk_indicators, iesp, ut, FFD;
+onThor := _Control.Environment.OnThor;
 
 // this function will be used by every FCRA transaction coming in from a scoring product.  
 // Search PersonContext.GetPersonContext by LexID to find out if the consumer has any disputes on file.  
 // Eventually PersonContext will also contain information about security freeze, fraud alert, id theft flag as well
 
 EXPORT checkPersonContext(grouped DATASET(risk_indicators.layout_output) input_with_DID, 
-		DATASET (Gateway.Layouts.Config) gateways, BOOLEAN onThor=FALSE, integer BSversion=1) := function
+		DATASET (Gateway.Layouts.Config) gateways, integer BSversion=1) := function
 
 URL := gateways(stringlib.StringToLowerCase(trim(servicename))=gateway.constants.ServiceName.delta_personcontext)[1].url;
 
@@ -33,12 +34,20 @@ dsResponseRecords_roxie := dedup(
 // When running on thor, GetPersonContext takes in multiple rows of data and returns multiple rows of data, instead of using child datasets like the roxie version in order to avoid errors 
 dsResponseRecords_thor := DEDUP(SORT(PersonContext.GetPersonContext_thor(PCKeys), LexID, -(integer) stringLib.StringFilter(dateadded[1..10], '0123456789'), statementID), LexID, keep(iesp.Constants.MAX_CONSUMER_STATEMENTS)) ;
 
-dsResponseRecords := if(onThor, dsResponseRecords_thor, dsResponseRecords_roxie);
+#IF(onThor)
+	dsResponseRecords := dsResponseRecords_thor;
+#ELSE
+	dsResponseRecords := dsResponseRecords_roxie;
+#END
 
 temp_statements := record
 	unsigned LexID;
 	boolean ConsumerStatement;
 	boolean dispute_on_file;
+	boolean security_alert;
+	boolean id_theft_flag;
+  boolean legal_hold_alert;
+  
 	Risk_Indicators.Layout_Overrides;
 	dataset(Risk_Indicators.Layouts.tmp_Consumer_Statements) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MAX_CONSUMER_STATEMENTS)};
 end;
@@ -50,9 +59,15 @@ PersonContext_transformed := project(dsResponseRecords(searchStatus=personContex
 		lexid := left.lexid;
 		statementid := left.statementid;
 		statementtype := left.recordtype;
-		content := left.content;
 		datagroup := left.datagroup;
-		
+		// content := left.content;
+    Content := CASE(left.RecordType, 
+                    FFD.Constants.RecordType.IT => FFD.Constants.AlertMessage.IDTheftMessage,
+                    FFD.Constants.RecordType.LH => FFD.Constants.AlertMessage.LegalHoldMessage,
+                    FFD.Constants.RecordType.SF => FFD.Constants.AlertMessage.FreezeMessage,
+                    FFD.Constants.RecordType.FA => FFD.Constants.AlertMessage.FraudMessage,
+                    left.Content);
+                            
 // 2016-06-01 19:27:32   
 		ts_year := trim(left.dateadded[1..4]);
 		ts_month := trim(left.dateadded[6..7]);
@@ -64,14 +79,25 @@ PersonContext_transformed := project(dsResponseRecords(searchStatus=personContex
 		self.ConsumerStatement := statementtype in [personContext.Constants.RecordTypes.cs, personcontext.Constants.RecordTypes.rs];
 	
 		isDispute := statementtype = personContext.Constants.RecordTypes.dr;
+		securityfraudalert := statementtype = personContext.Constants.RecordTypes.fa;    
+		legal_hold_alert := statementtype in [personContext.Constants.RecordTypes.la, personContext.Constants.RecordTypes.lh];
+    id_theft_flag := statementtype = personContext.Constants.RecordTypes.it;
+    record_level_statement := statementtype = personContext.Constants.RecordTypes.rs;
+		
 		self.dispute_on_file := isDispute;
+		self.security_alert := securityfraudalert;
+    self.legal_hold_alert := legal_hold_alert;
+    self.id_theft_flag := id_theft_flag;
+    
+// this list will grow as we add more types of alerts to person context that we need to suppress data for
+		alert_needs_suppression := record_level_statement or isDispute or securityfraudalert or legal_hold_alert or (id_theft_flag and bsversion<50);
 
-		SELF.bankrupt_correct_cccn := if(isDispute and left.dataGroup in [	PersonContext.constants.datagroups.BANKRUPTCY_MAIN, 
+		SELF.bankrupt_correct_cccn := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.BANKRUPTCY_MAIN, 
 																																		PersonContext.constants.datagroups.BANKRUPTCY_SEARCH ], 
 																[TRIM(left.RecID1, left, right)], 
 																[]);    
 		RecIdForStId := TRIM(left.RecID1, left, right);       
-		SELF.lien_correct_tmsid_rmsid := if(isDispute and left.dataGroup in [	PersonContext.constants.datagroups.LIEN_MAIN, 
+		SELF.lien_correct_tmsid_rmsid := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.LIEN_MAIN, 
 											PersonContext.constants.datagroups.LIEN_PARTY ], 
 											[TRIM(left.RecID1, left, right)], 
 											[]);
@@ -93,66 +119,62 @@ PersonContext_transformed := project(dsResponseRecords(searchStatus=personContex
 																									self := []));		
 		self.consumerStatements := sort(ConsumerStatements1, statementID);  // in case of multiple statements, always sort by StatementID to get them in same order each transaction
     
-		SELF.crim_correct_ofk := if(isDispute and left.dataGroup in [	PersonContext.constants.datagroups.OFFENDERS, 
+		SELF.crim_correct_ofk := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.OFFENDERS, 
 																															PersonContext.constants.datagroups.OFFENDERS_PLUS,
 																															PersonContext.constants.datagroups.OFFENSES	], 
 													[TRIM(left.RecID1, left, right)], 
 													[]);    
-		SELF.prop_correct_lnfare := if(isDispute and left.dataGroup in [	PersonContext.constants.datagroups.ASSESSMENT, 
+		SELF.prop_correct_lnfare := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.ASSESSMENT, 
 																																			PersonContext.constants.datagroups.DEED,
 																																			PersonContext.constants.datagroups.PROPERTY_SEARCH,
 																																			PersonContext.constants.datagroups.PROPERTY	], 
 												[TRIM(left.RecID1, left, right)], 
 												[]); 
-		SELF.water_correct_RECORD_ID := if(isDispute and left.dataGroup in [	PersonContext.constants.datagroups.WATERCRAFT, 
+		SELF.water_correct_RECORD_ID := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.WATERCRAFT, 
 																																					PersonContext.constants.datagroups.WATERCRAFT_DETAILS ], 
 													[TRIM(left.RecID1, left, right)], 
 													[]);
-		SELF.proflic_correct_RECORD_ID := if(isDispute and left.dataGroup in [	PersonContext.constants.datagroups.PROFLIC, 
+		SELF.proflic_correct_RECORD_ID := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.PROFLIC, 
 																																						PersonContext.constants.datagroups.MARI	], 
 													[TRIM(left.RecID1, left, right)], 
 													[]);
-		SELF.student_correct_RECORD_ID := if(isDispute and left.dataGroup in [	PersonContext.constants.datagroups.STUDENT, 
+		SELF.student_correct_RECORD_ID := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.STUDENT, 
 																															PersonContext.constants.datagroups.STUDENT_ALLOY	], 
 													[TRIM(left.RecID1, left, right)], 
 													[]);
-		SELF.air_correct_RECORD_ID  := if(isDispute and left.dataGroup in [	PersonContext.constants.datagroups.AIRCRAFT ], 
+		SELF.air_correct_RECORD_ID  := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.AIRCRAFT ], 
 													[TRIM(left.RecID1, left, right)], 
 													[]);
-		SELF.avm_correct_RECORD_ID := if(isDispute and left.dataGroup in [	PersonContext.constants.datagroups.AVM ], 
+		SELF.avm_correct_RECORD_ID := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.AVM ], 
 													[TRIM(left.RecID1, left, right)], 
 													[]);
-		SELF.infutor_correct_record_id := if(isDispute and left.dataGroup in [	PersonContext.constants.datagroups.INFUTOR, 
+		SELF.infutor_correct_record_id := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.INFUTOR, 
 																															PersonContext.constants.datagroups.INFUTORCID	], 
 													[TRIM(left.RecID1, left, right)], 
 													[]);
-		SELF.impulse_correct_record_id  := if(isDispute and left.dataGroup in [	PersonContext.constants.datagroups.IMPULSE, 
+		SELF.impulse_correct_record_id  := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.IMPULSE, 
 																															PersonContext.constants.datagroups.THRIVE	], 
 													[TRIM(left.RecID1, left, right)], 
 													[]);
-		SELF.gong_correct_record_id := if(isDispute and left.dataGroup in [	PersonContext.constants.datagroups.GONG ], 
+		SELF.gong_correct_record_id := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.GONG ], 
 													[TRIM(left.RecID1, left, right)], 
 													[]);
-		SELF.advo_correct_record_id := if(isDispute and left.dataGroup in [	PersonContext.constants.datagroups.ADVO ], 
+		SELF.advo_correct_record_id := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.ADVO ], 
 													[TRIM(left.RecID1, left, right)], 
 													[]);
-		SELF.paw_correct_record_id := if(isDispute and left.dataGroup in [	PersonContext.constants.datagroups.PAW ], 
+		SELF.paw_correct_record_id := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.PAW ], 
 													[TRIM(left.RecID1, left, right)], 
 													[]);
-		SELF.email_data_correct_record_id := if(isDispute and left.dataGroup in [	PersonContext.constants.datagroups.EMAIL_DATA ], 
+		SELF.email_data_correct_record_id := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.EMAIL_DATA ], 
 													[TRIM(left.RecID1, left, right)], 
 													[]);
-		SELF.inquiries_correct_record_id  := if(isDispute and left.dataGroup in [	PersonContext.constants.datagroups.INQUIRIES ], 
+		SELF.inquiries_correct_record_id  := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.INQUIRIES ], 
 													[TRIM(left.RecID1, left, right)], 
 													[]);
-		SELF.ssn_correct_record_id := if(isDispute and left.dataGroup in [	PersonContext.constants.datagroups.SSN ], 
+		SELF.ssn_correct_record_id := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.SSN ], 
 													[TRIM(left.RecID1, left, right)], 
 													[]);
-		SELF.header_correct_record_id := if(isDispute and left.dataGroup in [	PersonContext.constants.datagroups.HDR ], 
-													[TRIM(left.RecID1, left, right)], 
-													[]);
-		SELF.ibehavior_correct_record_id := if(isDispute and left.dataGroup in [	PersonContext.constants.datagroups.IBEHAVIOR_CONSUMER, 
-																															PersonContext.constants.datagroups.IBEHAVIOR_PURCHASE	], 
+		SELF.header_correct_record_id := if(alert_needs_suppression and left.dataGroup in [	PersonContext.constants.datagroups.HDR ], 
 													[TRIM(left.RecID1, left, right)], 
 													[]);
 	
@@ -167,9 +189,10 @@ rolled_personContext := rollup(PersonContext_sorted, left.lexid=right.lexid,
 		// set the flags to true if any of the records in the rollup show as true
 		self.ConsumerStatement := left.consumerstatement or right.consumerstatement;
 		self.dispute_on_file := left.dispute_on_file or right.dispute_on_file;
-		// self.security_freeze := left.security_freeze or right.security_freeze;
-		
-
+		self.security_alert := left.security_alert or right.security_alert;
+		self.id_theft_flag := left.id_theft_flag or right.id_theft_flag;
+		self.legal_hold_alert := left.legal_hold_alert or right.legal_hold_alert;
+		  
 		SELF.bankrupt_correct_cccn          := left.bankrupt_correct_cccn  +  right.bankrupt_correct_cccn ;   
 		SELF.lien_correct_tmsid_rmsid 			:= left.lien_correct_tmsid_rmsid + right.lien_correct_tmsid_rmsid; 
 		SELF.crim_correct_ofk               := left.crim_correct_ofk  +  right.crim_correct_ofk ;
@@ -196,13 +219,17 @@ rolled_personContext := rollup(PersonContext_sorted, left.lexid=right.lexid,
 with_personContext := join(input_with_DID, rolled_personContext, left.did=right.lexid,
 	transform(risk_indicators.layout_output,
 
+		consumer_statement_flag := right.consumerstatement;
+
 		self.consumerStatements := right.consumerStatements;
 		// then set the flags within the shell that we can now get from the PersonContext gateway
 		SELF.ConsumerFlags.corrected_flag := if(left.consumerFlags.corrected_flag or right.lexid<>0, true, false);
-		SELF.ConsumerFlags.consumer_statement_flag := right.consumerstatement;
+		SELF.ConsumerFlags.consumer_statement_flag := consumer_statement_flag;
 		SELF.ConsumerFlags.dispute_flag := right.dispute_on_file;
-
-
+		self.ConsumerFlags.security_alert := right.security_alert;
+    self.ConsumerFlags.legal_hold_alert := right.legal_hold_alert;  // 100H
+    self.ConsumerFlags.id_theft_flag := right.id_theft_flag; // 100G
+        
 // for any of these data groups, add the record IDs from the flag file search together with the RecID1 values from PersonContext dispute records
 // this way, anything that is found to be under Dispute in person context is treated as a suppression record and doesn't get used in the shell
 
@@ -237,9 +264,11 @@ with_personContext := join(input_with_DID, rolled_personContext, left.did=right.
 // output(dsResponseRecords, named('dsResponseRecords'));		
 // output(PersonContext_transformed, named('PersonContext_transformed'));	
 // output(rolled_personContext, named('rolled_personContext'));			
-// output(with_personContext, named('with_personContext'));			
+// output(with_personContext, named('with_personcontext'));			
 
 return group(with_personContext,seq);
 
 
 end;
+
+

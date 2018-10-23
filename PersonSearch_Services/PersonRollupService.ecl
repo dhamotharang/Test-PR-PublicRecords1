@@ -71,7 +71,7 @@
 /*--USES-- ut.input_xslt */
 IMPORT iesp,AutoStandardI;
 EXPORT PersonRollupService () := MACRO
-
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	//The following macro defines the field sequence on WsECL page of query. 
 	WSInput.MAC_PersonSearch_Services_PersonRollupService();
 

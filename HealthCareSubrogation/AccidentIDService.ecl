@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="CarrierSearchService" wuTimeout="300000">
   <part name="DPPAPurpose"         type="xsd:byte"/>
   <part name="GLBPurpose"          type="xsd:byte"/> 
@@ -9,6 +9,7 @@
 import AutoStandardI,iesp,ut, Address, CarrierID_Services, STD;
 // export AccidentIDService () :=  FUNCTION
 export AccidentIDService :=  MACRO
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 		#stored('PhoneticMatch','true');
 
     //get xml input 

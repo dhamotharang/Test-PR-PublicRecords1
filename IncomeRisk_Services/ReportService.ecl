@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="IncomeRiskAssessment_ReportService" wuTimeout="300000">
 
 	<part name="GLBPurpose"          type="xsd:byte"/>
@@ -83,7 +83,7 @@
 		*/		
 import iesp, risk_indicators, business_risk, IncomeRisk_Services, ut, patriot;
 export ReportService := MACRO
-
+		#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
     // ds_in2 := DATASET ([], rec_in) : STORED ('ERISalaryReportRequest', FEW);
 		// first_row2 := ds_in[1] : independent;
 		

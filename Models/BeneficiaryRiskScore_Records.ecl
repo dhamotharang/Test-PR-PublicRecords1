@@ -1,11 +1,14 @@
-
+﻿
 IMPORT Address, Gateway, Risk_Indicators, RiskProcessing, RiskWise, ut, doxie, gateway;
                                      
 EXPORT BeneficiaryRiskScore_Records( DATASET(Models.BeneficiaryRiskScore_Layouts.SearchSubject) ds_input,
 																		 DATASET(Gateway.Layouts.Config) gateways,
 																		 Models.BeneficiaryRiskScore_Interfaces.IInputOptions_BocaShell bsSvcOptions,
 																		 Models.BeneficiaryRiskScore_Interfaces.IInputOptions_PostBeneficiaryFraud pbfSvcOptions,
-																		 Models.BeneficiaryRiskScore_Interfaces.IRestrictionParams restrictions ) := 
+																		 Models.BeneficiaryRiskScore_Interfaces.IRestrictionParams restrictions, 
+                                     unsigned1 ofac_version_ = 1,
+                                     boolean include_ofac_ = false,
+                                     real global_watchlist_threshold_ = 0.84) := 
 	MODULE		
 		// Add seq and cleaned fields to input.
 		SHARED ds_input_plus :=
@@ -24,7 +27,7 @@ EXPORT BeneficiaryRiskScore_Records( DATASET(Models.BeneficiaryRiskScore_Layouts
 		// Define configuration necessary to run boca shell. These are hard-coded values e.g. see
 		// Risk_Indicators.Boca_Shell and Models.PostBeneficiaryFraud_Batch_Service.
 		SHARED iidConfig := 
-				Models.BeneficiaryRiskScore_Interfaces.modInstantIDConfigDefault(restrictions);
+				Models.BeneficiaryRiskScore_Interfaces.modInstantIDConfigDefault(restrictions, ofac_version_, include_ofac_, global_watchlist_threshold_);
 		
 		// NOTE: the following code is copied from Risk_Indicators.Boca_Shell and modified slightly.
 		SHARED prep := risk_indicators.InstantID_Function(iid_prep, 

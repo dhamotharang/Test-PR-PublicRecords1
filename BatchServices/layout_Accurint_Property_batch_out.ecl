@@ -50,6 +50,12 @@ EXPORT layout_Accurint_Property_batch_out :=
 		STRING250 legal_description  := '';
 		
 		FFD.Layouts.ConsumerFlags;
+
+		STRING12 owner_1_did;
+		STRING12 owner_2_did;
+		STRING12 seller_did;
+    
+    STRING12 inquiry_lexid := '';
 	END;
 	
 /*

@@ -1,4 +1,4 @@
-﻿IMPORT AutokeyB2_batch, BatchServices, FFD, FCRA, LN_PropertyV2_Services, LN_PropertyV2, BatchShare, Autokey_batch, Gateway, Suppress, ut, STD;
+﻿IMPORT AutokeyB2_batch, BatchServices, FFD, FCRA, LN_PropertyV2_Services, LN_PropertyV2, BatchShare, Gateway, Suppress, ut, STD;
 
 EXPORT Accurint_Property_BatchCommon(boolean isFCRA, unsigned1 nss, boolean useCannedRecs) := FUNCTION
     /* ******************************************* SET-UP ****************************************** */
@@ -60,10 +60,9 @@ EXPORT Accurint_Property_BatchCommon(boolean isFCRA, unsigned1 nss, boolean useC
     // FFD 
     integer8 inFFDOptionsMask := FFD.FFDMask.Get();
     integer inFCRAPurpose := FCRA.FCRAPurpose.Get();
-    boolean showConsumerStatements := isFCRA and FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask);
 
     // a) we are using the subject DID rather than the Best DID 
-    ds_dids := project(ds_ready, FFD.Layouts.DidBatch);
+    ds_dids := project(ds_ready(did>0), FFD.Layouts.DidBatch);
       
     // b) Call the person context    
     pc_recs := if(isFCRA, FFD.FetchPersonContext(ds_dids, gw_config, FFD.Constants.DataGroupSet.Property, inFFDOptionsMask));
@@ -226,13 +225,15 @@ EXPORT Accurint_Property_BatchCommon(boolean isFCRA, unsigned1 nss, boolean useC
     
     // Flatten the property records. Pre Dedup Sort
     ds_flat_final_recs := PROJECT(UNGROUP(ds_top_property_recs), 
-                            BatchServices.xfm_Accurint_Property_make_flat(LEFT, formatted_values, ShowConsumerStatements, counter));
+                            BatchServices.xfm_Accurint_Property_make_flat(LEFT, formatted_values, counter));
     
-
     // data maybe suppressed due to alerts
-    ds_flat_out := IF(isFCRA, FFD.Mac.ApplyConsumerAlertsBatch(ds_flat_final_recs, alert_flags, StatementsAndDisputes, BatchServices.layout_Accurint_Property_batch_out_pre),
-		                    ds_flat_final_recs);
+    ds_flat_with_alerts := FFD.Mac.ApplyConsumerAlertsBatch(ds_flat_final_recs, alert_flags, StatementsAndDisputes, BatchServices.layout_Accurint_Property_batch_out_pre,inFFDOptionsMask);
+		// add resolved LexId to the results for inquiry history logging support                    
+    ds_flat_with_inquiry := FFD.Mac.InquiryLexidBatch(ds_ready, ds_flat_with_alerts, BatchServices.layout_Accurint_Property_batch_out_pre, 0);
 
+    ds_flat_out := IF(isFCRA, ds_flat_with_inquiry, ds_flat_final_recs);
+ 
     ds_all_sort := sort(ds_flat_out,record_type,LN_PropertyV2.fn_strip_pnum(parcel_number),-sortby_date,fares_source_id,acctno);
     
     final_sort := sort(dedup(ds_all_sort,record_type,LN_PropertyV2.fn_strip_pnum(parcel_number),sortby_date,acctno),acctno);  
@@ -245,7 +246,7 @@ EXPORT Accurint_Property_BatchCommon(boolean isFCRA, unsigned1 nss, boolean useC
     
     // consumer statements dataset contains information about disputed records as well as Statements.
     consumer_statements_prep := IF(isFCRA, FFD.prepareConsumerStatementsBatch(consumer_statements, pc_recs, inFFDOptionsMask));
-    consumer_alerts  := IF(isFCRA, FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs));                                               
+    consumer_alerts  := IF(isFCRA, FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs, alert_flags, inFFDOptionsMask));                                               
     consumer_statements_alerts := consumer_statements_prep + consumer_alerts;
 		
     BatchShare.MAC_RestoreAcctno(ds_batch_in, consumer_statements_alerts, consumer_statements_acctno, false, false);

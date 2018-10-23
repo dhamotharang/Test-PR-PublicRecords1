@@ -1,16 +1,23 @@
-IMPORT ut;
-EXPORT KeyNames(string buildType='') := MODULE
+﻿IMPORT ut;
+
+EXPORT KeyNames(string buildType='', String aBuildDate='') := MODULE
+
 	SHARED BOOLEAN isCustTestEnv           := FALSE:STORED('CustomerTestEnv');
 	// Common key name components
 	SHARED prefix    := KeyPrefix + 'key::InsuranceHeader_xLink';
 	specPrefixBase := '~thor_data400::key::InsuranceHeader_xLink';
 	SHARED spec_prefix := IF(isCustTestEnv, specPrefixBase + '_prte', specPrefixBase);
 	// SHARED prefix    := KeyPrefix + 'key::CustomerTest_xLink_IKB';
-	SHARED buildDate := keyInfix;
-	EXPORT keyFather := 'father';
+	SHARED buildDate := IF(aBuildDate<>'', aBuildDate, keyInfix);
+	EXPORT keyFather := TRIM(MAP(buildType=''=>'father',
+													buildType='FULL' => 'full_father',  // used for build only
+													buildType='INC' => 'inc_father', 
+													buildType='INC_BOCA' => 'inc_boca_father', 'father'));// used for build only
+	
 	SHARED spFileInfix := TRIM(MAP(buildType='' => keySuperFile,  // default superfile for batch and online searches
 														buildType='FULL' => 'full',  // used for build only
-														buildType='INC' => 'inc', '')); // used for build only
+														buildType='INC' => 'inc', 
+														buildType='INC_BOCA' => 'inc_boca', keySuperFile));// used for build only
 	// SHARED spFileInfix := 'full';
 	// Specific key names superfile
 	EXPORT header_super		:= prefix + '::' + spFileInfix + '::' + 'header';
@@ -22,10 +29,10 @@ EXPORT KeyNames(string buildType='') := MODULE
 	EXPORT ssn_super			:= prefix + '::' + spFileInfix + '::' + 'DID::Refs::SSN';
 	EXPORT ssn4_super			:= prefix + '::' + spFileInfix + '::' + 'DID::Refs::SSN4';
 	EXPORT dob_super			:= prefix + '::' + spFileInfix + '::' + 'DID::Refs::DOB';
+	EXPORT dobf_super			:= prefix + '::' + spFileInfix + '::' + 'DID::Refs::DOBF';	
 	EXPORT zip_pr_super		:= prefix + '::' + spFileInfix + '::' + 'DID::Refs::ZIP_PR';
 	EXPORT src_rid_super	:= prefix + '::' + spFileInfix + '::' + 'DID::Refs::SRC_RID';
-	EXPORT dln_super			:= prefix + '::' + spFileInfix + '::' + 'DID::Refs::DLN';
-	// EXPORT rid_super			:= prefix + '::' + spFileInfix + '::' + 'DID::Refs::RID';
+	EXPORT dln_super			:= prefix + '::' + spFileInfix  + '::' + 'DID::Refs::DLN';
 	EXPORT ph_super				:= prefix + '::' + spFileInfix + '::' + 'DID::Refs::PH';
 	EXPORT lfz_super			:= prefix + '::' + spFileInfix + '::' + 'DID::Refs::LFZ';
 	EXPORT relative_super := prefix + '::' + spFileInfix + '::' + 'DID::Refs::RELATIVE';
@@ -41,10 +48,10 @@ EXPORT KeyNames(string buildType='') := MODULE
 	EXPORT ssn_father			:= prefix + '::' + keyFather + '::' + 'DID::Refs::SSN';
 	EXPORT ssn4_father		:= prefix + '::' + keyFather + '::' + 'DID::Refs::SSN4';
 	EXPORT dob_father			:= prefix + '::' + keyFather + '::' + 'DID::Refs::DOB';
+	EXPORT dobf_father			:= prefix + '::' + keyFather + '::' + 'DID::Refs::DOBF';
 	EXPORT zip_pr_father	:= prefix + '::' + keyFather + '::' + 'DID::Refs::ZIP_PR';
 	EXPORT src_rid_father	:= prefix + '::' + keyFather + '::' + 'DID::Refs::SRC_RID';
 	EXPORT dln_father			:= prefix + '::' + keyFather + '::' + 'DID::Refs::DLN';
-	// EXPORT rid_father			:= prefix + '::' + keyFather + '::' + 'DID::Refs::RID';
 	EXPORT ph_father			:= prefix + '::' + keyFather + '::' + 'DID::Refs::PH';
 	EXPORT lfz_father			:= prefix + '::' + keyFather + '::' + 'DID::Refs::LFZ';
 	EXPORT relative_father:= prefix + '::' + Keyfather + '::' + 'DID::Refs::RELATIVE';
@@ -60,10 +67,10 @@ EXPORT KeyNames(string buildType='') := MODULE
 	EXPORT ssn_logical			:= prefix + '::' + buildDate + '::' + 'DID::Refs::SSN';
 	EXPORT ssn4_logical			:= prefix + '::' + buildDate + '::' + 'DID::Refs::SSN4';
 	EXPORT dob_logical			:= prefix + '::' + buildDate + '::' + 'DID::Refs::DOB';
+	EXPORT dobf_logical			:= prefix + '::' + buildDate + '::' + 'DID::Refs::DOBF';
 	EXPORT zip_pr_logical		:= prefix + '::' + buildDate + '::' + 'DID::Refs::ZIP_PR';
 	EXPORT src_rid_logical	:= prefix + '::' + buildDate + '::' + 'DID::Refs::SRC_RID';
 	EXPORT dln_logical			:= prefix + '::' + buildDate + '::' + 'DID::Refs::DLN';
-	// EXPORT rid_logical			:= prefix + '::' + buildDate + '::' + 'DID::Refs::RID';
 	EXPORT ph_logical				:= prefix + '::' + buildDate + '::' + 'DID::Refs::PH';
 	EXPORT lfz_logical			:= prefix + '::' + buildDate + '::' + 'DID::Refs::LFZ';
 	EXPORT relative_logical	:= prefix + '::' + buildDate + '::' + 'DID::Refs::RELATIVE';
@@ -91,7 +98,6 @@ EXPORT KeyNames(string buildType='') := MODULE
 	EXPORT dl_nbr_spc_super 					:= spec_prefix + '::' + KeySuperfile + '::' + 'DID::Word::DL_NBR';
 	EXPORT src_spc_super 							:= spec_prefix + '::' + KeySuperfile + '::' + 'DID::Word::SRC';
 	EXPORT source_rid_spc_super 			:= spec_prefix + '::' + KeySuperfile + '::' + 'DID::Word::SOURCE_RID';
-	// EXPORT rid_spc_super 							:= spec_prefix + '::' + KeySuperfile + '::' + 'DID::Word::RID';
 	EXPORT mainname_spc_super 				:= spec_prefix + '::' + KeySuperfile + '::' + 'DID::Word::MAINNAME';
 	EXPORT fullname_spc_super 				:= spec_prefix + '::' + KeySuperfile + '::' + 'DID::Word::FULLNAME';
 	EXPORT addr1_spc_super 						:= spec_prefix + '::' + KeySuperfile + '::' + 'DID::Word::ADDR1';
@@ -127,7 +133,6 @@ EXPORT KeyNames(string buildType='') := MODULE
 	EXPORT dl_nbr_spc_father 					:= spec_prefix + '::' + keyFather + '::' + 'DID::Word::DL_NBR';
 	EXPORT src_spc_father 						:= spec_prefix + '::' + keyFather + '::' + 'DID::Word::SRC';
 	EXPORT source_rid_spc_father 			:= spec_prefix + '::' + keyFather + '::' + 'DID::Word::SOURCE_RID';
-	// EXPORT rid_spc_father 						:= spec_prefix + '::' + keyFather + '::' + 'DID::Word::RID';
 	EXPORT mainname_spc_father 				:= spec_prefix + '::' + keyFather + '::' + 'DID::Word::MAINNAME';
 	EXPORT fullname_spc_father 				:= spec_prefix + '::' + keyFather + '::' + 'DID::Word::FULLNAME';
 	EXPORT addr1_spc_father 					:= spec_prefix + '::' + keyFather + '::' + 'DID::Word::ADDR1';
@@ -163,7 +168,6 @@ EXPORT KeyNames(string buildType='') := MODULE
 	EXPORT dl_nbr_spc_logical 					:= spec_prefix + '::' + buildDate + '::' + 'DID::Word::DL_NBR';
 	EXPORT src_spc_logical 							:= spec_prefix + '::' + buildDate + '::' + 'DID::Word::SRC';
 	EXPORT source_rid_spc_logical 			:= spec_prefix + '::' + buildDate + '::' + 'DID::Word::SOURCE_RID';
-	// EXPORT rid_spc_logical 							:= spec_prefix + '::' + buildDate + '::' + 'DID::Word::RID';
 	EXPORT mainname_spc_logical 				:= spec_prefix + '::' + buildDate + '::' + 'DID::Word::MAINNAME';
 	EXPORT fullname_spc_logical 				:= spec_prefix + '::' + buildDate + '::' + 'DID::Word::FULLNAME';
 	EXPORT addr1_spc_logical 						:= spec_prefix + '::' + buildDate + '::' + 'DID::Word::ADDR1';

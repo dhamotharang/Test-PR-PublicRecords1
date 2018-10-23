@@ -68,7 +68,8 @@ RiskWise.Layout_BC1I addseq(batchin l, integer C) := transform
 end;
 f := project(batchin, addseq(LEFT,COUNTER));
 
-ret := if(tribCode in ['bnk4','cbbl'], RiskWise.BC1O_Function(f, gateways, GLB_Purpose, DPPA_Purpose, false, false, tribCode, DataRestriction, DataPermission), 
+ret := if(tribCode in ['bnk4','cbbl'], project(RiskWise.BC1O_Function(f, gateways, GLB_Purpose, DPPA_Purpose, false, false, tribCode, DataRestriction, DataPermission),
+                                               TRANSFORM(riskwise.Layout_BC1O, SELF := LEFT)), 
 													  dataset([], riskwise.Layout_BC1O));
 
 output(ret, named('Results'));

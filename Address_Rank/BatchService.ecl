@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="AddressRank_BatchService">
   <part name="batch_in" 							type="tns:XmlDataSet" cols="70" rows="25"/>  
   <part name="DPPAPurpose" 						type="xsd:unsignedInt"/>
@@ -58,7 +58,8 @@
 
 IMPORT Address_Rank, AutoKeyI, doxie;
 EXPORT BatchService(useCannedRecs = false) := MACRO
-
+ 
+ #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	ds_xml_in 	:= DATASET([],Address_Rank.Layouts.Batch_in) : STORED('batch_in',FEW);
 	batch_params		:= Address_Rank.IParams.getBatchParams();							
 	processed_input := Address_Rank.fn_processInput(ds_xml_in, useCannedRecs);

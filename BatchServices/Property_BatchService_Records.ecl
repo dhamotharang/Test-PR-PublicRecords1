@@ -1,5 +1,5 @@
 ﻿IMPORT AutokeyB2, Autokey_batch, Doxie, LN_PropertyV2, LN_PropertyV2_Services, Suppress, 
-			BIPV2, BatchServices, FCRA, FFD, Gateway;
+			BIPV2, BatchServices, FCRA, FFD, Gateway, D2C;
 
 /* 
 * The following module is really basic in that it just retrieves Property records, given an input batch
@@ -39,7 +39,8 @@ EXPORT Property_BatchService_Records(DATASET(LN_PropertyV2_Services.layouts.batc
 																							STRING BIPFetchLevel = 'S',
 																							dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
 																							integer8 inFFDOptionsMask = 0,
-																							dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile) := 
+																							dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile,
+																							Boolean isCNSMR = false) := 
 	MODULE
 
 		// Below Exports used by BatchServices.Property_BatchCommon
@@ -138,12 +139,14 @@ EXPORT Property_BatchService_Records(DATASET(LN_PropertyV2_Services.layouts.batc
 		// Now, filter based on FIPS code match.
 		ds_deeds_filt_by_fips := JOIN(ds_all_fares_ids_plus_input_fips(ln_fares_id[2] in ['M','D']),LN_PropertyV2.key_deed_fid(isFCRA),
 																				 KEYED(RIGHT.ln_fares_id = LEFT.ln_fares_id) AND
-																				 (LEFT.fips_code = '' OR RIGHT.fips_code = LEFT.fips_code),
+																				 (LEFT.fips_code = '' OR RIGHT.fips_code = LEFT.fips_code) AND
+																				 (~isCNSMR or right.vendor_source_flag not in D2C.Constants.LNPropertyV2RestrictedSources ),
 																				 TRANSFORM(LEFT),
 																				 LIMIT(BatchServices.Constants.PROPERTY_MAX_FIPS_LIMIT,SKIP));
     ds_assessors_filt_by_fips := JOIN(ds_all_fares_ids_plus_input_fips(ln_fares_id[2] in ['A']),LN_PropertyV2.key_assessor_fid(isFCRA),
 																				 KEYED(RIGHT.ln_fares_id = LEFT.ln_fares_id) AND
-																				 (LEFT.fips_code = '' OR RIGHT.fips_code = LEFT.fips_code),
+																				 (LEFT.fips_code = '' OR RIGHT.fips_code = LEFT.fips_code) AND
+																				 (~isCNSMR or right.vendor_source_flag not in D2C.Constants.LNPropertyV2RestrictedSources ),
 																				 TRANSFORM(LEFT),
 																				 LIMIT(BatchServices.Constants.PROPERTY_MAX_FIPS_LIMIT,SKIP));
 																				 
@@ -160,8 +163,11 @@ EXPORT Property_BatchService_Records(DATASET(LN_PropertyV2_Services.layouts.batc
 			// 6. Obtain matching domain-specific records via a ready-made function. Note: this returns a very fat layout.
 		ds_prep_fids_for_raw := DEDUP(SORT(PROJECT(ds_outpl_slim_filtered, LN_PropertyV2_Services.layouts.fid),ln_fares_id,search_did),ln_fares_id,search_did);
 		
-		 
-		_ds_property_output := LN_PropertyV2_Services.resultFmt.widest_view.get_by_fid(ds_prep_fids_for_raw,,,nonss,isFCRA,slim_pc_recs,inFFDOptionsMask,ds_flags)(fid_type != '');
+		//at this step we need for FCRA to get all statemetIds disregarding input inFFDOptionsMask 1st bit 
+		// filtering of Dempsey hits if needed is addressed later in the code
+		FFDOptionsMask_adj := if(isFCRA,inFFDOptionsMask | FFD.Constants.ConsumerOptions.SHOW_CONSUMER_STATEMENTS, inFFDOptionsMask);
+		_ds_property_output := LN_PropertyV2_Services.resultFmt.widest_view.get_by_fid(ds_prep_fids_for_raw,,,nonss,isFCRA,slim_pc_recs,FFDOptionsMask_adj,ds_flags)(fid_type != '');
+
 		//Apply Party Type filter (return only parties requested by subscriber) and 
 		//tax data filter (return only records where assessment.standardized_land_use_code[1] is not misc. category of 0.
 		PT := LN_PropertyV2.Constants.PARTY_TYPE;
@@ -239,6 +245,6 @@ EXPORT Property_BatchService_Records(DATASET(LN_PropertyV2_Services.layouts.batc
 		// Apply yet another sort-dedup, since it's happened that, in an input batch, the customer will
 		// provide many identical records, save for the acctno. Since ds_propoerty_recs doesn't contain
 		// an acctno, its only unique identifier is ln_fares_id.
-						
+			
 		EXPORT ds_property_recs := DEDUP(SORT(ds_property_recs_pnlt, ln_fares_id, search_did), ln_fares_id, search_did);
 	END;

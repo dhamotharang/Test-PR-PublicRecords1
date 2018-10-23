@@ -121,6 +121,8 @@ export FCRAConsumerAttributes_Service := MACRO
 	optionsIn 	:= ds_in[1].options;
 	userIn 			:= ds_in[1].user;
 	
+  BOOLEAN OutputConsumerStatements := optionsIn.FFDOptionsMask[1] = '1';
+  
 	INTEGER3 history_date 						:= if(optionsIn.historyDateYYYYMM=0, 999999, optionsIn.historyDateYYYYMM);
 	STRING50 outOfBandDataRestriction := '' : STORED('DataRestrictionMask');
 	DataRestriction 	:= MAP(TRIM(userIn.DataRestrictionMask) <> ''       => userIn.DataRestrictionMask,
@@ -295,9 +297,10 @@ export FCRAConsumerAttributes_Service := MACRO
 	boolean   nugen               := true;
 	boolean   doScore 						:= true;
 	boolean   isPreScreen     := StringLib.StringToUpperCase(optionsIn.IntendedPurpose) = 'PRESCREENING';
-
-	unsigned8 BSOptions 					:= risk_indicators.iid_constants.BSOptions.DIDRIDSearchOnly +
-			if(FilterLiens, risk_indicators.iid_constants.BSOptions.FilterLiens, 0 );//DRM to drive Liens/Judgments
+      
+  unsigned8 BSOptions 					:= risk_indicators.iid_constants.BSOptions.DIDRIDSearchOnly +
+			if(FilterLiens, risk_indicators.iid_constants.BSOptions.FilterLiens, 0 ) + //DRM to drive Liens/Judgments
+    	Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyException;
 										
 	clam(unsigned1 bsVersion) := Risk_Indicators.Boca_Shell_Function_FCRA(
 		iid_prep, gateways, dppa, glba, isUtility, isLN,
@@ -358,19 +361,16 @@ export FCRAConsumerAttributes_Service := MACRO
 	
 	iesp.consumerattributesreport.t_NameValuePairLong convertNVP( AllModelScores le, integer c) := TRANSFORM
 	
-			iesp.consumerattributesreport.t_NameValuePairLong createrec(string name, string value) := TRANSFORM
-					self.Name:= name;
-					self.Value:= value;
-			end;
+		self.name := case(le.model,
+			'MNC21106.0.0' => 'MNC21106', 
+			'MPX1211.0.0' => 'MPX1211', 
+			'MV361006.0.0' => 'MV361006', 
+			'MX361006.0.0' => 'MX361006', 
+			'RVR611.0.0' => 'RVR611', 
+			'WOMV002.0.0' => 'WOMV002', 
+			'Invalid');
 
-				self := case(le.model,
-			 'MNC21106.0.0' => ROW(createrec('MNC21106', (string)le.score)),
-			 'MPX1211.0.0' => ROW(createrec('MPX1211', (string)le.score)),
-			 'MV361006.0.0' => ROW(createrec('MV361006', (string)le.score)),
-			 'MX361006.0.0' => ROW(createrec('MX361006', (string)le.score)),
-			 'RVR611.0.0' => ROW(createrec('RVR611', (string)le.score)),
-			 'WOMV002.0.0' => ROW(createrec('WOMV002', (string)le.score)),
-			  ROW(createrec('Invalid','Invalid')));
+		self.value := (string)le.score;		
 			 
 	END;
 	
@@ -393,27 +393,24 @@ export FCRAConsumerAttributes_Service := MACRO
 
 	attributes := project(attributesIn, process_groups(LEFT));
 
-	did_statement := choosen(Consumerstatement.key.fcra.lexid(keyed(lexid=clamAndSeed[1].did)), 1);
-	ssn_statement := choosen(Consumerstatement.key.fcra.ssn(keyed(ssn=clamAndSeed[1].shell_input.ssn) and 
-													datalib.NameMatch (clamAndSeed[1].shell_Input.fname,  '',  clamAndSeed[1].shell_Input.lname, fname, '', lname) < 3),  // make sure the name on statement also matches the input name
-													1);
-	statementText := if(did_statement[1].cs_text<>'', did_statement[1].cs_text, ssn_statement[1].cs_text); 											
-
-	boolean hasConsumerStatement := clamAndSeed[1].consumerFlags.consumer_statement_flag;
-	ConsumerStatementText := if(hasConsumerStatement, statementText, ''); 
-
-	
- iesp.fcraconsumerattributesreport.t_FCRAConsumerAttributesReportResponse build_result(DATASET(iesp.FCRAconsumerattributesreport.t_FCRAConsumerAttributesReportGroup) le, string ri) := TRANSFORM
+	consumer_statements := project(clamandseed[1].ConsumerStatements, transform(iesp.share_fcra.t_ConsumerStatement, self.dataGroup := '', self := left));
+        
+ iesp.fcraconsumerattributesreport.t_FCRAConsumerAttributesReportResponse build_result( DATASET(iesp.FCRAconsumerattributesreport.t_FCRAConsumerAttributesReportGroup) le,
+                                                                                        DATASET(iesp.share_fcra.t_ConsumerStatement) rt
+ ) := TRANSFORM
 		self._Header := [];
 		self.Result.InputEcho := ds_in[1].searchby;
 		self.Result.AttributeGroups := le;
-		self.Result.ConsumerStatement := ri;
 		
-		
+    self.Result.ConsumerStatements := rt;	
+    // for inquiry logging, populate the Consumer.LexID.  if the person is a noScore, don't log the LexID
+    self.Result.Consumer.LexID := if(riskview.constants.noscore(clamandseed[1].iid.nas_summary,clamandseed[1].iid.nap_summary, clamandseed[1].address_verification.input_address_information.naprop, clamandseed[1].truedid), 
+        '', 
+        (string12)clamandseed[1].did); 
 		self.Result := [];
  end;
  
-	res := ROW(build_result( attributes, ConsumerStatementText));
+	res := ROW(build_result( attributes, consumer_statements ));
 	
 	output(res, named('Results'));
 ENDMACRO;

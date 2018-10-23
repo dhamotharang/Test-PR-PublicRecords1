@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="CapitalGains_BatchService">
 	<part name="DPPAPurpose"               type="xsd:byte"/>
 	<part name="GLBPurpose" 					     type="xsd:byte" />
@@ -22,7 +22,7 @@
 IMPORT BatchServices;
 
 EXPORT CapitalGains_BatchService(useCannedRecs = 'false') := MACRO
-		
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);		
 	batch_in_layout := BatchServices.CapitalGains_BatchService_Layouts.batch_in;
 	ds_batch_in_stored := DATASET([], batch_in_layout) : STORED('batch_in', FEW);
 	ds_batch_in := IF( NOT useCannedRecs, 

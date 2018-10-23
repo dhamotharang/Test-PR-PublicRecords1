@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SexOffender_Search_Events" wuTimeout="240000">
  <part name="SSN" type="xsd:string"/>
   <part name="FirstName" type="xsd:string"/>
@@ -41,6 +41,7 @@
 /*--INFO-- This service pulls from the Sex Offenders Offenses file.*/
 
 export SexOffender_Search_Events := macro
+#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 #STORED('LookupType','SEX');
 
 WSInput.MAC_SexOffender_Search_Events();

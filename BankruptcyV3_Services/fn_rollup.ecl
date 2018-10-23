@@ -1,4 +1,4 @@
-import AutoStandardI, bankruptcyv3, bankruptcyv3_services, codes, 
+﻿import AutoStandardI, bankruptcyv3, bankruptcyv3_services, codes, 
        doxie, doxie_cbrs, banko, suppress;
 
 export fn_rollup(
@@ -16,7 +16,9 @@ export fn_rollup(
 	boolean include_dockets = false,
 	string8 lower_entered_date = '',
 	string8 upper_entered_date = '',
-	string32 appType
+	string32 appType,
+  boolean isCaseNumberSearch = false,
+  boolean isAttorneySearch = false
 	) :=
 		function 
 			doxie.MAC_Header_Field_Declare(isFCRA)
@@ -25,7 +27,7 @@ export fn_rollup(
 			                                        //force FCRA only when using SSNLast4 until it is needed and KEY is built.
 			 in_tmsids1 := if (in_SSNLast4 <> '' and isFCRA, 
 			                    bankruptcy_ids_ssn4(in_limit,in_SSNLast4, in_filing_jurisdiction,in_party_type,lname_value,fname_value,isFCRA),
-                    		    bankruptcy_ids(in_dids,in_bdids,in_tmsids0,in_limit,in_party_type, isFCRA)
+                    		    bankruptcy_ids(in_dids,in_bdids,in_tmsids0,in_limit,in_party_type, isFCRA,isCaseNumberSearch,isAttorneySearch)
 			                    );
   
 			temp_records_search0 :=
@@ -42,7 +44,7 @@ export fn_rollup(
 			
 			temp_debtor_dids := project(dedup(sort(temp_records_search0((unsigned)did != 0 and name_type[1] = BankruptcyV3_Services.consts.NAME_TYPES.DEBTOR),did),did),transform(doxie.layout_references,self.did := (unsigned)left.did));
 			temp_debtor_bdids := project(dedup(sort(temp_records_search0((unsigned)bdid != 0 and name_type[1] = BankruptcyV3_Services.consts.NAME_TYPES.DEBTOR),bdid),bdid),transform(doxie_cbrs.layout_references,self.bdid := (unsigned)left.bdid));
-			temp_addl_tmsids := bankruptcyv3_services.bankruptcy_ids(temp_debtor_dids,temp_debtor_bdids,in_tmsids0(false),if(in_limit = 0,0,in_limit - count(in_tmsids1)),in_party_type, isFCRA);
+			temp_addl_tmsids := bankruptcyv3_services.bankruptcy_ids(temp_debtor_dids,temp_debtor_bdids,in_tmsids0(false),if(in_limit = 0,0,in_limit - count(in_tmsids1)),in_party_type, isFCRA,isCaseNumberSearch,isAttorneySearch);
 			in_tmsids := in_tmsids1 + if(in_all_bks_for_all_debtors and (in_limit = 0 or count(in_tmsids1) < in_limit),temp_addl_tmsids);
       
 			temp_records_search1 :=
@@ -179,11 +181,16 @@ export fn_rollup(
 						self := left,
 						self := []));
 			temp_pen_dedup :=
+      if(isFCRA and isCaseNumberSearch and isAttorneySearch, // We are delibrately keeping multiple attorney records. 
+         dedup(
+           sort(temp_pen_slim(matched_party.party_type = 'A'),tmsid,
+                 matched_party.did,matched_party.parsed_party.cname,penalt),
+                 tmsid,matched_party.did,matched_party.parsed_party.cname),
 				dedup(
 					sort(
 						temp_pen_slim,
 						tmsid,penalt,record),
-					tmsid);
+					tmsid));
 			temp_top_join :=
 				join(
 					temp_top_dedup,
@@ -305,19 +312,18 @@ export fn_rollup(
 							self := left),
 						left outer));
 
-       // output(in_tmsids1 , named('in_tmsids1'));				
-			 // output(temp_records_search0, named('temp_records_search0'));
-       // output(temp_records_search, named('temp_records_search'));		
-			 // output(temp_records_searchA, named('temp_records_searchA'));
-			 // output(temp_records_searchD, named('temp_records_searchD'));
-			 // output(temp_records_search_pulled, named('temp_records_search_pulled'));
-			 // output(tmsids_pulled, named('tmsids_pulled_v3'));
-			 // output(temp_records_main, named('temp_records_mainv3'));
-			 // output(trusteesPulled, named('trusteesPulledv3'));	 
-			 // output(temp_records_main_jur, named('temp_records_main_jur'),overwrite);
-			 // output(temp_top_slim, named('temp_top_slimv3'), overwrite);
-			  // output(temp_top_join, named('tmp_top_joinv3'));
-			  // output(temp_top_add_debtors, named('temp_top_add_debtors'));
+// output(in_tmsids1 , named('in_tmsids1'));				
+// output(temp_records_search0, named('temp_records_search0'));
+// output(temp_records_search, named('temp_records_search'));		
+// output(temp_records_searchA, named('temp_records_searchA'));
+// output(temp_records_searchD, named('temp_records_searchD'));
+// output(temp_records_search_pulled, named('temp_records_search_pulled'));
+// output(tmsids_pulled, named('tmsids_pulled_v3'));
+// output(temp_records_main, named('temp_records_mainv3'));
+// output(trusteesPulled, named('trusteesPulledv3'));	 
+// output(temp_records_main_jur, named('temp_records_main_jur'),overwrite);
+// output(temp_top_slim, named('temp_top_slimv3'), overwrite);
+ 
 				return  sort(temp_top_add_dockets,-orig_filing_date,-date_filed,record);
 			
 		end;

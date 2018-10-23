@@ -21,7 +21,7 @@ EXPORT getIndHeader(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
 		dppa_ok := Risk_Indicators.iid_constants.dppa_ok(dppa, isFCRA);
 		
 		
-		parents := DueDiligence.CommonIndividual.getParents(inData);																																																							
+		parents := DueDiligence.CommonIndividual.getRelationship(inData, parents, DueDiligence.Constants.INQUIRED_INDIVIDUAL_PARENT);																																																							
 		allInd := parents + inData;
 		
 		getHeaderData(key, didField, atmostValue, keepValue) := FUNCTIONMACRO

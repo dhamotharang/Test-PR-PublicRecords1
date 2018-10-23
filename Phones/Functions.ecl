@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2_Company_Names,DidVille,Drivers,MDR,Phones,Phonesplus_v2,STD,ut;
+﻿IMPORT BIPV2_Company_Names,DidVille,Drivers,MDR,Phones,Phonesplus_v2,STD,ut, D2C;
 
 EXPORT Functions :=
 MODULE
@@ -20,10 +20,11 @@ MODULE
 																	 STRING data_restriction_mask
 																	) :=
 	FUNCTION
-
+				
  		// Set some easier to understand booleans
     GLB_OK  := ut.glb_ok(glb_purpose, checkRNA);
     DPPA_OK := ut.dppa_ok(dppa_purpose, checkRNA);
+				is_CNSMR  := ut.IndustryClass.is_Knowx;
 
     // Check if specific Insurance bit is set
     ins_bit := Phonesplus_v2.Translation_Codes.rules_bitmap_code (Phones.Constants.InsVeriBelow);
@@ -67,10 +68,11 @@ MODULE
 			 // just used a subset of the coding here.
        OR (src = MDR.sourceTools.src_LnPropV2_Fares_Asrs    and data_restriction_mask[1] != '0')
        OR (src = MDR.sourceTools.src_Experian_Credit_Header and data_restriction_mask[6] != '0')
-		   OR (src = MDR.sourceTools.src_Certegy         and data_restriction_mask[7] not in ['0',''])
-	     OR (src = MDR.sourceTools.src_Equifax         and data_restriction_mask[8] not in ['0',''])
-		   OR (src = MDR.sourceTools.src_TU_CreditHeader and data_restriction_mask[10] not in ['0',''])
- 		   OR (src = MDR.sourceTools.src_InquiryAcclogs  and data_restriction_mask[16] not in ['0','']);
+		     OR (src = MDR.sourceTools.src_Certegy         and data_restriction_mask[7] not in ['0',''])
+	      OR (src = MDR.sourceTools.src_Equifax         and data_restriction_mask[8] not in ['0',''])
+		     OR (src = MDR.sourceTools.src_TU_CreditHeader and data_restriction_mask[10] not in ['0',''])
+ 		    OR (src = MDR.sourceTools.src_InquiryAcclogs  and data_restriction_mask[16] not in ['0',''])
+			    OR(src in D2C.Constants.PhonesPlusV2RestrictedSources and is_CNSMR);
       //end of filters
 
 		// remove restricted sources from the dataset of all sources
@@ -84,7 +86,7 @@ MODULE
     //output(src_all,                NAMED('src_all'),EXTEND);
     //output(src_all_decoded,        NAMED('src_all_decoded'),EXTEND);
     //output(ds_src_all,             NAMED('ds_src_all'),EXTEND);
-    //output(ds_srcs_not_restricted, NAMED('ds_srcs_not_restricted'),EXTEND);
+    // output(ds_srcs_not_restricted, NAMED('ds_srcs_not_restricted'),EXTEND);
 
 	  // "TRUE"(restricted) is returned if either the input rec is restricted by Insurance verified/GLB
 	  // OR the dataset of sources that are not-restricted is empty
@@ -418,10 +420,10 @@ MODULE
 		stdName := STD.Str.Filter(STD.Str.ToUpperCase(XMLDECODE(trim(name, left, right))), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 		return stdName;
 	END;
-	EXPORT BOOLEAN isPassZumigo(UNSIGNED zumigoScore):= FUNCTION
+	EXPORT BOOLEAN isPassZumigo(INTEGER zumigoScore):= FUNCTION
 		RETURN	zumigoScore BETWEEN Phones.Constants.Zumigo_NameAddr_Validation_Threshold_MIN AND Phones.Constants.Zumigo_NameAddr_Validation_Threshold_MAX;
 	END;
-	EXPORT BOOLEAN isValidZumigo(UNSIGNED zumigoScore):= FUNCTION
+	EXPORT BOOLEAN isValidZumigo(INTEGER zumigoScore):= FUNCTION
 		RETURN	zumigoScore BETWEEN 0 AND Phones.Constants.Zumigo_NameAddr_Validation_Threshold_MAX;
 	END;	
 	EXPORT GetCleanCompanyName(STRING inputCompanyName) := FUNCTION

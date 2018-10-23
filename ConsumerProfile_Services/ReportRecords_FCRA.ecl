@@ -139,8 +139,8 @@ EXPORT ReportRecords_FCRA(iesp.fcraconsumerprofilereport.t_ConsumerProfileReport
 														transform(right),
 														atmost(riskwise.max_atmost)); //Potentially we could have more than 1 consumer statement per DID, but currently we are only returning the most recent one
 	//Alerts
- pc_alert_ind := FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_param.FCRAPurpose, in_param.FFDOptionsMask)[1];
- pc_alerts := ConsumerProfile_Services.Functions.checkForAlertsFromPC(pc_recs, pc_alert_ind.suppress_records);  // alerts coming from Person Context
+  pc_alert_ind := FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_param.FCRAPurpose, in_param.FFDOptionsMask)[1];
+  pc_alerts := ConsumerProfile_Services.Functions.checkForAlertsFromPC(pc_recs, pc_alert_ind, in_param.FFDOptionsMask);  // alerts coming from Person Context
 	clam_alerts := ConsumerProfile_Services.Functions.checkForAlertsFromClam(clam[1], in_param);  // alerts coming from indices
 	cs_alert := ConsumerProfile_Services.Functions.getAlertDataset(FCRA.Constants.ALERT_CODE.CONSUMER_STATEMENT);
 	boolean has_consumer_statement := exists(consumer_statement) or pc_alert_ind.has_consumer_statement or (pc_alert_ind.has_record_statement and ~pc_alert_ind.suppress_records);
@@ -249,10 +249,14 @@ EXPORT ReportRecords_FCRA(iesp.fcraconsumerprofilereport.t_ConsumerProfileReport
 	
 	royalty_rec := Royalty.RoyaltyExperianHeader.GetFCRARoyaltySet(fcra_header_final);
 	
+  rdid := if(count(dids(did <> dids[1].did))>0, '', (string) dids[1].did); // resolved LexId should be single value - to be used for logging
+	input_consumer := FFD.MAC.PrepareConsumerRecord(rdid, true, in_rec);
+	
 	ConsumerProfile_Services.Layouts.cp_out_layout xformOut() := transform
 		self.Result	 := row(xformResultsOut());
 		self.Royalty := if(not in_param.isECHRestricted, royalty_rec);
 		self.ConsumerStatements := choosen(statement_output_fcra, iesp.Constants.MaxConsumerStatements);
+		self.ConsumerInquiry := input_consumer;
 	end;
 	final_rec := dataset([xformOut()]);
 	
@@ -261,6 +265,7 @@ EXPORT ReportRecords_FCRA(iesp.fcraconsumerprofilereport.t_ConsumerProfileReport
 		self.Result.Alerts 		:= choosen(alerts/*(alertCode in null_alerts_set)*/, iesp.Constants.ConsumerProfile.MAX_COUNT_ALERTS);
 		self.Result.ConsumerStatement := if(has_consumer_statement, sort(consumer_statement, -dateCreated)[1].cs_text, '');
 		self.ConsumerStatements := choosen(statement_output_fcra(StatementType IN FFD.Constants.RecordType.StatementConsumerLevel), iesp.Constants.MaxConsumerStatements); // consumer level statements are always returned even if blank result
+		self.ConsumerInquiry := input_consumer;
 		self := [];
 	end;
 	null_final_rec := dataset([xformNull()]);

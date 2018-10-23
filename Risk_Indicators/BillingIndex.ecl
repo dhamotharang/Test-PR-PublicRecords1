@@ -1,8 +1,6 @@
-﻿
-// Billing index rule of thumb:
+﻿﻿﻿// Billing index rule of thumb:
 // ECL index % 100 + 30 == ESP index
 // e.g., sub-prime auto is 108; 108%100+30 = 38
-
 
 
 
@@ -119,7 +117,10 @@ export BillingIndex := MODULE
 		export RVT1605_2			:= '203'; // Verizon - Wireless 
 		export RVC1703_1			:= '204'; // Rossman & Co //batch only
 		export RVC1801_1			:= '205'; // TSI //batch only
+		export RVT1705_1      := '206'; // Huntington	
 		
+    export RVC1805_1			:= '207'; // Phillips & Cohen //batch only (207 % 100 + 30 = 137)             
+    export RVC1805_2			:= '208'; // Phillips & Cohen //batch only (208 % 100 + 30 = 138)
 	
 		// Chargeback Defender Version 1
 		export CBD_v1 						:= '10';	// CDN712_0
@@ -180,13 +181,20 @@ export BillingIndex := MODULE
 		export FP1611_1			:= '162'; //FP1611_1 - Fraudpoint 3.0 Custom Model for Axcess Financial (162 % 100 + 30 = 92)
 		export FP1606_1			:= '163'; //FP1606_1 - Fraudpoint 3.0 Custom Model for CashCall & LoanMe (163 % 100 + 30 = 93)
 		export FP1610_2			:= '164'; //FP1610_2 - Fraudpoint 3.0 Custom Model for Axcess Financial (164 % 100 + 30 = 94)
-  export FP1702_1			:= '165'; //FP1702_1 - Fraudpoint 3.0 Custom Model for Kohls online (165 % 100 + 30 = 95)
-		export FP1706_1		 := '166'; //FP1706_1 - Fraudpoint 3.0 Custom Model for MetaBank (166 % 100 + 30 = 96)
+    export FP1702_1			:= '165'; //FP1702_1 - Fraudpoint 3.0 Custom Model for Kohls online (165 % 100 + 30 = 95)
+		export FP1706_1		  := '166'; //FP1706_1 - Fraudpoint 3.0 Custom Model for MetaBank (166 % 100 + 30 = 96)
 		export FP1702_2			:= '167'; //FP1702_2 - Fraudpoint 3.0 Custom Model for Kohls POS (167 % 100 + 30 = 97)	
 		export FP1609_2			:= '168'; //FP1609_2 - Fraudpoint 3.0 Custom Model for Discovery (168 % 100 + 30 = 98)	
 		export FP1607_1			:= '169'; //FP1607_1 - Fraudpoint 3.0 Custom Model for TracPhone (169 % 100 + 30 = 99)	
 		export FP1712_0			:= '170'; //FP1712_0 - Fraudpoint/Shell Custom Model for Bureau Fraud (170 % 100 + 30 = 100)	
-		export FP1508_1			:= '171'; //FP1508_1 - Fraudpoint 3.0 Custom Model for Discovery = 100)	
-	
+		export FP1508_1			:= '171'; //FP1508_1 - Fraudpoint 3.0 Custom Model for Discovery = 100) (171 % 100 + 30 = 101)             
+	  export FP1705_1     := '172'; //FP1705_1 - Fraudpoint 3.0 Custom Model for Huntington = 102 (172 % 100 + 30 = 102)             
+    export FP1802_1     := '173'; //FP1508_1 - Fraudpoint 3.0 Custom Model for Direct financial  (173 % 100 + 30 = 103)             
+    export FP1801_1     := '174'; //FP1801_1 - Fraudpoint 3.0 Custom Model for Digital (174 % 100 + 30 = 104)             
+    export FP1710_1     := '175'; //FP1710_1 - Fraudpoint 3.0 Custom Model for Borrow Works (175 % 100 + 30 = 105)
+    export FP1806_1     := '176'; //FP1806_1 - Fraudpoint 3.0 Custom Model for Discover (176 % 100 + 30 = 106)             
+    export FP1803_1     := '177'; //FP1803_1 - Fraudpoint 3.0 Custom Model for Upgrade inc (177 % 100 + 30 = 107)             
+    export MSN1803_1    := '178';//MSN1803_1 - Custom Model for Paro (178 % 100 + 30 = 108)             
+    export RSN804_1     := '179'; //RSN804_1 - Custom Model for Paro (179 % 100 + 30 = 109)             
+    export MSNRSN_1     := '180'; //MSNRSN_1 - Custom Model Combo for Paro (180 % 100 + 30 = 110)             
 END;
-

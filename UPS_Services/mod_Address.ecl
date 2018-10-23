@@ -1,4 +1,4 @@
-import iesp, Address;
+﻿import iesp, Address;
 
 // NOTE - 
 // When streetIsPrimRange do not set the StreetAddress1 and StreetAddress2 values in response
@@ -17,7 +17,17 @@ export mod_Address(iesp.share.t_Address inAddr, boolean isCanada = false) := MOD
     (if (isCanada, inp.PostalCode, inp.Zip5) <> '')	OR
     (inp.City <> '' AND inp.State <> '' );
 
-	shared inStreetAddr := TRIM(TRIM(inAddr.StreetAddress1) + ' ' + TRIM(inAddr.StreetAddress2));
+	inStreetAddrType1 := TRIM(TRIM(inAddr.StreetAddress1) + ' ' + TRIM(inAddr.StreetAddress2));
+	inStreetAddrType2 := TRIM(TRIM(inAddr.StreetNumber) + ' ' + 
+	                          TRIM(inAddr.StreetPreDirection) + ' ' + 
+														   TRIM(inAddr.StreetName) + ' ' +  
+                            TRIM(inAddr.StreetSuffix) + ' ' +  
+                            TRIM(inAddr.StreetPostDirection) + ' ' +  
+                            TRIM(inAddr.UnitDesignation) + ' ' +  
+                            TRIM(inAddr.UnitNumber) 
+													    );
+														
+	shared inStreetAddr := if(TRIM(inStreetAddrType1) <> '',inStreetAddrType1,inStreetAddrType2);
 	
 	inZip5 := TRIM(inAddr.Zip5, LEFT, RIGHT);
 	shared useZip5 := MAP(LENGTH(inZip5) = 5 => inZip5,

@@ -1,4 +1,5 @@
-﻿import AID, gateway, risk_indicators, address, riskwise, ut, Risk_Reporting, Consumerstatement, Models, iesp, RiskWiseFCRA;
+﻿import _Control, AID, gateway, risk_indicators, address, riskwise, ut, Risk_Reporting, Consumerstatement, Models, iesp, RiskWiseFCRA, personcontext;
+onThor := _Control.Environment.OnThor;
 
 EXPORT Search_Function(
 	dataset(RiskView.Layouts.layout_riskview_input) riskview_input, 
@@ -33,9 +34,7 @@ EXPORT Search_Function(
 	integer2 ReportingPeriod, 
 	boolean IncludeLnJ,
 	boolean RetainInputDID,
-	boolean exception_score_reason = FALSE,
-	boolean onThor = FALSE
-) := function
+	boolean exception_score_reason = FALSE) := function
 
 
 boolean   isPreScreenPurpose := StringLib.StringToUpperCase(intended_purpose) = 'PRESCREENING';
@@ -86,24 +85,45 @@ Risk_Indicators.Layout_Input cleanup(riskview_input le) := TRANSFORM
 	SELF.in_zipCode := le.Z5;
 	self.in_country := '';
 	//If running on Thor, we will call the AID address cache macro to populate these fields in the next transform to save processing time.
-	self.prim_range 	:= IF(onThor, '', address.cleanFields(clean_addr).prim_range);
-	self.predir 			:= IF(onThor, '', address.cleanFields(clean_addr).predir);
-	self.prim_name 		:= IF(onThor, '', address.cleanFields(clean_addr).prim_name);
-	self.addr_suffix 	:= IF(onThor, '', address.cleanFields(clean_addr).addr_suffix);
-	self.postdir 			:= IF(onThor, '', address.cleanFields(clean_addr).postdir);
-	self.unit_desig 	:= IF(onThor, '', address.cleanFields(clean_addr).unit_desig);
-	self.sec_range 		:= IF(onThor, '', address.cleanFields(clean_addr).sec_range);
-	self.p_city_name 	:= IF(onThor, '', address.cleanFields(clean_addr).v_city_name);  // use v_city_name 90..114 to match all other scoring products
-	self.st 					:= IF(onThor, '', address.cleanFields(clean_addr).st);
-	self.z5 					:= IF(onThor, '', address.cleanFields(clean_addr).zip);
-	self.zip4 				:= IF(onThor, '', address.cleanFields(clean_addr).zip4);
-	self.lat 					:= IF(onThor, '', address.cleanFields(clean_addr).geo_lat);
-	self.long 				:= IF(onThor, '', address.cleanFields(clean_addr).geo_long);
-	self.addr_type 		:= IF(onThor, '', address.cleanFields(clean_addr).rec_type);
-	self.addr_status 	:= IF(onThor, '', address.cleanFields(clean_addr).err_stat);
-	self.county 			:= IF(onThor, '', clean_addr[143..145]);  // address.cleanFields(clean_addr).county returns the full 5 character fips, we only want the county fips
-	self.geo_blk 			:= IF(onThor, '', address.cleanFields(clean_addr).geo_blk);
+  #IF(onThor)
+    self.prim_range 	:= '';
+    self.predir 			:= '';
+    self.prim_name 		:= '';
+    self.addr_suffix 	:= '';
+    self.postdir 			:= '';
+    self.unit_desig 	:= '';
+    self.sec_range 		:= '';
+    self.p_city_name 	:= '';
+    self.st 					:= '';
+    self.z5 					:= '';
+    self.zip4 				:= '';
+    self.lat 					:= '';
+    self.long 				:= '';
+    self.addr_type 		:= '';
+    self.addr_status 	:= '';
+    self.county 			:= '';
+    self.geo_blk 			:= '';
 	self.country 			:= '';
+	#ELSE
+    self.prim_range   := address.cleanFields(clean_addr).prim_range;
+    self.predir 			:= address.cleanFields(clean_addr).predir;
+    self.prim_name 		:= address.cleanFields(clean_addr).prim_name;
+    self.addr_suffix 	:= address.cleanFields(clean_addr).addr_suffix;
+    self.postdir 			:= address.cleanFields(clean_addr).postdir;
+    self.unit_desig 	:= address.cleanFields(clean_addr).unit_desig;
+    self.sec_range 		:= address.cleanFields(clean_addr).sec_range;
+    self.p_city_name 	:= address.cleanFields(clean_addr).v_city_name;  // use v_city_name 90..114 to match all other scoring products
+    self.st 					:= address.cleanFields(clean_addr).st;
+    self.z5 					:= address.cleanFields(clean_addr).zip;
+    self.zip4 				:= address.cleanFields(clean_addr).zip4;
+    self.lat 					:= address.cleanFields(clean_addr).geo_lat;
+    self.long 				:= address.cleanFields(clean_addr).geo_long;
+    self.addr_type 		:= address.cleanFields(clean_addr).rec_type;
+    self.addr_status 	:= address.cleanFields(clean_addr).err_stat;
+    self.county 			:= clean_addr[143..145];  // address.cleanFields(clean_addr).county returns the full 5 character fips, we only want the county fips
+    self.geo_blk 			:= address.cleanFields(clean_addr).geo_blk;
+    self.country 			:= '';
+  #END
 	
 	self.dl_number 		:= stringlib.stringtouppercase(dl_num_clean);
 	self.dl_state 		:= stringlib.stringtouppercase(le.dl_state);
@@ -164,7 +184,11 @@ END;
 
 bsprep_thor := PROJECT(my_dataset_with_address_cache, getCleanAddr_thor(LEFT)): PERSIST('~BOCASHELLFCRA::cleaned_inputs');
 
-bsprep := IF(onThor, bsprep_thor, bsprep_roxie);
+#IF(onThor)
+	bsprep := bsprep_thor;
+#ELSE
+	bsprep := bsprep_roxie;
+#END
 
 RiskView.Layouts.Layout_Custom_Inputs getCustomInputs(RiskView.Layouts.layout_riskview_input le) := TRANSFORM
 	SELF.Seq := le.Seq; // This should match the Seq number of BSPrep/Model Results
@@ -238,7 +262,7 @@ bsversion := IF(Crossindustry_model in [ 'RVS1706_0'] or
 		ofacVersion, includeOfac, includeAddWatchlists, watchlistThreshold,
 		bsVersion, isPreScreenPurpose, doScore, ADL_Based_Shell:=ADL_Based_Shell, datarestriction:=datarestriction, BSOptions:=BSOptions,
 		datapermission:=datapermission, IN_isDirectToConsumer:=isDirectToConsumerPurpose,
-		IncludeLnJ :=IncludeLnJ, onThor := onThor,
+		IncludeLnJ :=IncludeLnJ,
     ReportingPeriod := ReportingPeriod 
 	);
 	
@@ -581,7 +605,7 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 	boolean hasSecurityFreeze := rt.consumerFlags.security_freeze;
 	
 	//security fraud alert, return alert code 100B
-	boolean hasSecurityFraudAlert := rt.consumerFlags.security_alert or rt.consumerFlags.id_theft_flag ;
+	boolean hasSecurityFraudAlert := rt.consumerFlags.security_alert;
 
 	//consumer statement alert, return alert code 100C
 	boolean hasConsumerStatement := rt.consumerFlags.consumer_statement_flag;
@@ -605,7 +629,10 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 	
 	// Regulatory Condition 100F, on the FCRA Prescreen OptOut File
 	boolean PrescreenOptOut :=  isPreScreenPurpose and risk_indicators.iid_constants.CheckFlag( risk_indicators.iid_constants.IIDFlag.IsPreScreen, rt.iid.iid_flags );
-	
+  
+	boolean hasLegalHold :=  rt.consumerflags.legal_hold_alert;  
+	boolean hasIdentityFraudAlert := rt.consumerflags.id_theft_flag  ;
+	  
 	hasScore (STRING score) := le.Auto_score = score OR le.Bankcard_score = score OR le.Short_term_lending_Score = score OR le.Telecommunications_score = score OR le.Crossindustry_score = score OR le.Custom_score = score;
 	
 	// instead of just using the le.SubjectDeceased, also calculate it here because sometimes attributes are not requested, and then the alert doesn't get triggered.
@@ -614,22 +641,21 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 	boolean has200Score := hasScore('200') or Alerts200 ;
 	boolean has222Score := hasScore('222');
 	
-	boolean chapter7bankruptcy := trim(rt.bjl.bk_chapter)='7' AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);	
-	boolean chapter9bankruptcy := trim(rt.bjl.bk_chapter)='9' AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);
-	boolean chapter11bankruptcy := trim(rt.bjl.bk_chapter)='11' AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);
-	boolean chapter12bankruptcy := trim(rt.bjl.bk_chapter)='12' AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);	
-	boolean chapter13bankruptcy := trim(rt.bjl.bk_chapter)='13' AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);
-	boolean chapter15bankruptcy := trim(rt.bjl.bk_chapter) in ['15', '304'] AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);
+  boolean chapter7bankruptcy := '7' in set(rt.bk_chapters, chapter) AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);	
+	boolean chapter9bankruptcy := '9' in set(rt.bk_chapters, chapter) AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);
+	boolean chapter11bankruptcy := '11' in set(rt.bk_chapters, chapter) AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);
+	boolean chapter12bankruptcy := '12' in set(rt.bk_chapters, chapter) AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);	
+	boolean chapter13bankruptcy := '13' in set(rt.bk_chapters, chapter) AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);
+	boolean chapter15bankruptcy := (  '15' in set(rt.bk_chapters, chapter) or 
+                                   '304' in set(rt.bk_chapters, chapter)  ) AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);
 	
-	
-
 	hasBankruptcyAlert := chapter7bankruptcy or chapter9bankruptcy or chapter11bankruptcy or chapter12bankruptcy or chapter13bankruptcy or chapter15bankruptcy;
 		
-	// currently there are only 6 conditions to trigger an alert, but leaving room in the batch layout for up to 10 alerts to be returned.
 	ds_alerts_temp1 := dataset([
 		{if(hasSecurityFreeze and isCollectionsPurpose, '100A', '')},  // only include securityFreeze alert in this dataset if the purpose is collections
-		{if(hasSecurityFraudAlert, '100B', '')},
+    {if(hasSecurityFraudAlert, '100B', '')},
 		{if(hasConsumerStatement, '100C', '')},
+		{if(hasIdentityFraudAlert, '100G', '')},
 		{if(has200Score, '200A', '')},
 		{if(chapter7bankruptcy, '300A', '')},
 		{if(chapter9bankruptcy, '300B', '')},
@@ -642,20 +668,25 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 	// when confirmationSubjectFound = 0, the only alert to come back should be the 222A.  all other alert conditions are ignored
 	// when state exeption, just return a 100D and no other alerts
 	ds_alert_subject_not_found := dataset([{'222A'}],{string4 alert_code});
+  ds_alert_SecurityFreeze := dataset([{'100A'}],{string4 alert_code});  // comes back by itself if purpose is not collections
+  ds_alert_Security_Fraud := dataset([{'100B'}],{string4 alert_code});  
+	ds_alert_consumer_statement := dataset([{'100C'}],{string4 alert_code});
 	ds_alert_state_exception := dataset([{'100D'}],{string4 alert_code});
 	ds_alert_tooYoungForPrescreen := dataset([{'100E'}],{string4 alert_code});
 	ds_alert_PrescreenOptOut := dataset([{'100F'}],{string4 alert_code});
-	ds_alert_SecurityFreeze := dataset([{'100A'}],{string4 alert_code});  // comes back by itself if purpose is not collections
-					
+  ds_alert_Legal_Hold := dataset([{'100H'}],{string4 alert_code}); 
+ 			
 	ds_alerts_temp := map(isStateException 																=> ds_alert_state_exception,  // because the state exceptions are also coming through as 222, Brad wants to put this first in map so allert of 100D
-												le.ConfirmationSubjectFound='0' or has222score 	=> ds_alert_subject_not_found,
-												TooYoungForPrescreen														=> ds_alert_tooYoungForPrescreen,
-												PrescreenOptOut																	=> ds_alert_PrescreenOptOut,
-												hasSecurityFreeze and ~isCollectionsPurpose			=> ds_alert_SecurityFreeze,
+                        TooYoungForPrescreen														=> ds_alert_tooYoungForPrescreen,
+                        PrescreenOptOut																	=> ds_alert_PrescreenOptOut,
+                        hasLegalHold 	                                  => ds_alert_legal_hold, 
+                        hasSecurityFreeze and ~isCollectionsPurpose			=> ds_alert_SecurityFreeze,
+                        hasSecurityFraudAlert                           => ds_alert_security_fraud,
+                        le.ConfirmationSubjectFound='0' or has222score 	=> ds_alert_subject_not_found,
 																																					 ds_alerts_temp1);
 	
 	// Only 100B, 100C, 200A, 222A alert codes allow for valid RiskView Scores to return, if it's the others override the score to a 100.  100A allows for a score to return if this is a collections purpose.
-	score_override_alert_returned := UT.Exists2(ds_alerts_temp (alert_code IN ['100D', '100E', '100F'])) OR (UT.Exists2(ds_alerts_temp (alert_code = '100A')) AND ~isCollectionsPurpose);
+	score_override_alert_returned := UT.Exists2(ds_alerts_temp (alert_code IN ['100D', '100E', '100F', '100H'])) OR (UT.Exists2(ds_alerts_temp (alert_code = '100A')) AND ~isCollectionsPurpose);
 	
 	// If the score is being overridden to a 100, don't return a 200 or 222 score alert code.
 	ds_alerts := IF(score_override_alert_returned, ds_alerts_temp (alert_code NOT IN ['200A', '222A']), ds_alerts_temp);
@@ -879,21 +910,20 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 	SELF.Custom5_reason5 := IF(prescreen_score_scenario_custom5 OR score_override_alert_returned, '', le.Custom5_reason5);
   
 	AlertRegulatoryCondition := map(
-		le.confirmationsubjectfound='0' => '0',  // if the subject is not found on file, also return a 0 for the AlertRegulatoryCondition	
 		(hasSecurityFreeze and ~isCollectionsPurpose) or isStateException or tooYoungForPrescreen or PrescreenOptOut OR 
-						prescreen_score_scenario_auto OR prescreen_score_scenario_bankcard OR prescreen_score_scenario_stl OR prescreen_score_scenario_teleco OR prescreen_score_scenario_Crossindustry OR prescreen_score_scenario_custom => '3',// Subject has an alert on their file restricting the return of their information and therefore all attributes values have been suppressed 
+						prescreen_score_scenario_auto OR prescreen_score_scenario_bankcard OR prescreen_score_scenario_stl OR 
+            prescreen_score_scenario_teleco OR prescreen_score_scenario_Crossindustry OR prescreen_score_scenario_custom OR
+            hasLegalHold            => '3',// Subject has an alert on their file restricting the return of their information and therefore all attributes values have been suppressed 
 		hasSecurityFreeze and isCollectionsPurpose => '2',  // security freeze isn't a regulatory condition to blank everything out if the purpose is collections	
-		hasConsumerStatement or hasSecurityFraudAlert or hasBankruptcyAlert=> '2',  // Subject has an alert on their file that does not impact the return of their information
+		hasConsumerStatement or hasSecurityFraudAlert or hasBankruptcyAlert or hasIdentityFraudAlert=> '2',  // Subject has an alert on their file that does not impact the return of their information
+    le.confirmationsubjectfound='0' => '0',  // if the subject is not found on file, also return a 0 for the AlertRegulatoryCondition	
 		'1');
 	
 	self.AlertRegulatoryCondition := if(valid_attributes_requested, AlertRegulatoryCondition, '');
 	
-	// TODO:  eventually when PersonContext is turned on across the boardh, we can remove these 2 searches and use PersonContext dataset instead
-	did_statement := choosen(Consumerstatement.key.fcra.lexid(keyed(lexid=rt.did)), 1);
-	ssn_statement := choosen(Consumerstatement.key.fcra.ssn(keyed(ssn=rt.shell_input.ssn) and 
-													datalib.NameMatch (rt.shell_Input.fname,  '',  rt.shell_Input.lname, fname, '', lname) < 3),  // make sure the name on statement also matches the input name
-													1);
-	statementText := if(did_statement[1].cs_text<>'', did_statement[1].cs_text, ssn_statement[1].cs_text); 
+  cs_statements := rt.consumerstatements(StatementType in [personcontext.constants.RecordTypes.CS, personcontext.constants.RecordTypes.RS]);
+  
+	statementText := trim(cs_statements[1].content); 
 	// don't even search the statements for scenarios of 222A, 100D, 100E, 100A
 	self.ConsumerStatementText := if(hasConsumerStatement, statementText, ''); 
 	

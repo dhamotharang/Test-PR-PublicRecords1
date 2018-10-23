@@ -1,4 +1,4 @@
-﻿IMPORT ut, RiskWise, RiskWiseFCRA, Risk_Indicators, std;
+﻿IMPORT ut, RiskWise, RiskWiseFCRA, Risk_Indicators, std, riskview;
 
 EXPORT RVR1008_1_0(GROUPED DATASET(risk_indicators.layout_boca_shell) clam, BOOLEAN inCalif=FALSE, BOOLEAN PreScreenOptOut=FALSE) := FUNCTION
 
@@ -1950,7 +1950,7 @@ _rvr1008 := min(900, if(max(501, score) = NULL, -NULL, max(501, score)));
 
 scored_222s := if(max(property_owned_total, property_sold_total) = NULL, NULL, sum(if(property_owned_total = NULL, 0, property_owned_total), if(property_sold_total = NULL, 0, property_sold_total))) > 0 OR (90 <= combo_dobscore AND combo_dobscore <= 100 or input_dob_match_level >= (string)7 or (integer)lien_flag > 0 or criminal_count > 0 or (integer)bk_flag > 0 or ssn_deceased or truedid);
 
-rvr1008 := if(nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 2 AND not(scored_222s), 222, _rvr1008);
+rvr1008 := if(riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid), 222, _rvr1008);
 
 riTemp := RiskWiseFCRA.corrReasonCodes(le.consumerflags, 4);
 

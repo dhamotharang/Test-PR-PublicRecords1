@@ -1,10 +1,11 @@
-﻿IMPORT Address,autoHeaderV2,AutoStandardI,doxie,EquifaxDecisioning,
+﻿IMPORT autoHeaderV2,AutoStandardI,doxie,EquifaxDecisioning,
        Gateway,iesp,riskwisefcra; 
 
 EXPORT getAttributes (DATASET(doxie.layout_best) infile, 
                       DATASET(Gateway.Layouts.Config) gateways,
                       BOOLEAN gw_Requested,
-                      STRING  in_DataPermissionMask
+                      STRING  in_DataPermissionMask,
+                      BOOLEAN suppress_due_alerts = FALSE
                      ) := 
       FUNCTION
         dataPermissionTempMod := MODULE( AutoStandardI.DataPermissionI.params )
@@ -127,7 +128,7 @@ EXPORT getAttributes (DATASET(doxie.layout_best) infile,
         ds_GatewayResultsToReturn := 
           MAP(~gw_Requested =>
                     DATASET([{EquifaxDecisioning.Constants.EQUIFAX_GATEWAY_USAGE.GATEWAY_NOT_REQUESTED}],EquifaxDecisioning.Layouts.Eq_DecisioningAttr),
-              ~pMakeGatewayCall OR ~hasEquifaxAccess => 
+              ~pMakeGatewayCall OR ~hasEquifaxAccess OR suppress_due_alerts => 
                     DATASET([{EquifaxDecisioning.Constants.EQUIFAX_GATEWAY_USAGE.GATEWAY_NOT_CALLED}],EquifaxDecisioning.Layouts.Eq_DecisioningAttr),
               ~EXISTS(_rowGw.Attributes) => 
                     DATASET([{EquifaxDecisioning.Constants.EQUIFAX_GATEWAY_USAGE.NO_GATEWAY_ATTRIUBTES_RETURNED}],EquifaxDecisioning.Layouts.Eq_DecisioningAttr),

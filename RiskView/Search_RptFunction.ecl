@@ -29,11 +29,14 @@ EXPORT Search_RptFunction(dataset(Risk_Indicators.Layout_Input) raw_input,
 		boolean inquiryRestrict := DataRestrictionMask[Risk_Indicators.iid_constants.posInquiriesRestriction] = '1'; 
 		boolean FilterLiens := DataRestrictionMask[risk_indicators.iid_constants.posLiensJudgRestriction]='1' ;
 		
-    ssn_flags := CHOOSEN (fcra.key_override_flag_ssn (l_ssn=bs.shell_Input.ssn, datalib.NameMatch (bs.shell_Input.fname, bs.shell_Input.mname, bs.shell_Input.lname, fname, mname, lname)<3), risk_indicators.iid_constants.MAX_OVERRIDE_LIMIT);
-    did_flags := CHOOSEN (fcra.key_override_flag_did (keyed (l_did=(string)bs.did)), risk_indicators.iid_constants.MAX_OVERRIDE_LIMIT);
-    flags := PROJECT (did_flags, fcra.Layout_override_flag) + PROJECT (ssn_flags, fcra.Layout_override_flag);
-		flagrecs := CHOOSEN (dedup (flags, ALL), risk_indicators.iid_constants.MAX_OVERRIDE_LIMIT);	
-		
+  ssn_flags := CHOOSEN (fcra.key_override_flag_ssn (l_ssn=bs.shell_Input.ssn, datalib.NameMatch (bs.shell_Input.fname, bs.shell_Input.mname, bs.shell_Input.lname, fname, mname, lname)<3), risk_indicators.iid_constants.MAX_OVERRIDE_LIMIT);
+  did_flags := CHOOSEN (fcra.key_override_flag_did (keyed (l_did=(string)bs.did)), risk_indicators.iid_constants.MAX_OVERRIDE_LIMIT);
+  flags := PROJECT (did_flags, fcra.Layout_override_flag) + PROJECT (ssn_flags, fcra.Layout_override_flag);
+	flagrecs_original := CHOOSEN (dedup (flags, ALL), risk_indicators.iid_constants.MAX_OVERRIDE_LIMIT);	
+	personContext_flags := risk_indicators.AddConsumerStatementsToFlagFile(bocashell[1].ConsumerStatements);
+	flagrecs := flagrecs_original + personContext_flags;
+
+
 // Watercraft information...
 		watercrafts := RiskWiseFCRA._watercraft_data (dids_input, flagrecs, nss);
 		watercraftreport := dedup(sort(watercrafts.details, state_origin, watercraft_key[1..10], -sequence_key),
@@ -77,13 +80,10 @@ EXPORT Search_RptFunction(dataset(Risk_Indicators.Layout_Input) raw_input,
 						l.postdir, l.unit_desig, l.sec_range, '','', l.v_city_name, l.st, l.zip, l.z4, '','','');	
 				self := [];
 		END;
-// Filing Records -- liens
-		RiskWiseFCRA._Lien_data(dids_input, flagrecs, liens_main_, liens_party_, nss, history_date, true, true);
-		both_joined  := join(liens_main_, liens_party_, Left.tmsid = Right.tmsid and Left.rmsid = Right.rmsid);
-		final_sorted := sort(both_joined, tmsid, rmsid, filing_number, filing_type_desc, amount, persistent_record_id, -date_last_seen, date_First_Seen);
-		liensdata := dedup(final_sorted, tmsid, rmsid, filing_number, filing_type_desc, amount, persistent_record_id);
-		// liensdata := liensdata1(filing_type_desc != '' or eviction = 'Y');
-		
+// Filing Records -- liens -- this calls _Lien_RV_data rather than _Lien_data 
+//as _Lien_data can't have just the RV logic
+		RiskWiseFCRA._Lien_RV_data(dids_input, flagrecs, liensdata, history_date, bs);
+	
 		iesp.riskview2.t_Rv2ReportFilingRecord formatliens(liensdata l, integer c) := TRANSFORM
 			self.Seq := c;
 		ftd := trim(stringlib.stringtouppercase(l.filing_type_desc));
@@ -93,12 +93,12 @@ EXPORT Search_RptFunction(dataset(Risk_Indicators.Layout_Input) raw_input,
 		judgment := 'JUDGMENT';
 		self.RecordType := MAP(
 				l.eviction ='Y' OR ((ftd in risk_indicators.iid_constants.setLandlordTenant) and ftd_suit) => evict,			
-				(ftd in risk_indicators.iid_constants.setCivilJudgment) and ftd_noSuitEviction => judgment,
+				(ftd in risk_indicators.iid_constants.setCivilJudgment_50) and ftd_noSuitEviction => judgment,
 				(((ftd in risk_indicators.iid_constants.setFederalTax) and ftd_noSuitEviction)) OR
 					 (((ftd in risk_indicators.iid_constants.setOtherTax) and ftd_noSuitEviction)) =>	'LIEN',
-				 (ftd in risk_indicators.iid_constants.setForeclosure) and ftd_noSuitEviction => judgment,
-				 (ftd in risk_indicators.iid_constants.setSmallClaims) and ftd_noSuitEviction => judgment,
-				 (ftd not in risk_indicators.iid_constants.setOtherLJ) and ftd_noSuitEviction => 'OTHER',
+				 (ftd in risk_indicators.iid_constants.setForeclosure_50) and ftd_noSuitEviction => judgment,
+				 (ftd in risk_indicators.iid_constants.setSmallClaims_50) and ftd_noSuitEviction => judgment,
+				 (ftd not in risk_indicators.iid_constants.setPROther) and ftd_noSuitEviction => 'OTHER',
 				'');	
 			self.Description := if(TRIM(l.eviction)='Y', evict, l.filing_type_desc);
 			self.CourtName :=l.agency;
@@ -107,13 +107,17 @@ EXPORT Search_RptFunction(dataset(Risk_Indicators.Layout_Input) raw_input,
 			self.Amount := l.amount;
 			self.Status := if(TRIM(l.release_date)<>'', 'RELEASED', '');
 			self.FilingDate := iesp.ECL2ESP.toDate((integer)l.orig_filing_date);
-			laDate := if( (integer)l.date_last_seen > (integer)l.release_date, (integer)l.date_last_seen, (integer)l.release_date);
-			self.LastActionDate := iesp.ECL2ESP.toDate(laDate); 
+			laDate := if( (integer)l.pdate_last_seen > (integer)l.release_date, (integer)l.pdate_last_seen, (integer)l.release_date);
+			self.LastActionDate := iesp.ECL2ESP.toDate(laDate);
+   self.DateLastSeen := iesp.ECL2ESP.toDate((integer)l.VendorDateLastSeen);
+			//self.ConsumerStatementId := l.ConsumerStatementId;
 			self := [];
 		END;
 // Bankruptcies................	
 		RiskWiseFCRA._Bankruptcy_data(dids_input, flagrecs, bankruptcy_search, bankruptcy_, bk_courts_, history_date, bk_withdraws_);
-		bankruptcies_info := join(bankruptcy_search, bankruptcy_, (integer)left.did = dids_input[1].did and left.tmsid = right.tmsid);
+    insurancemode := false;
+		bankruptcies_info := join(bankruptcy_search(trim(chapter) in risk_indicators.iid_constants.set_permitted_bk_chapters(BocaShellVersion, insurancemode) ),
+															bankruptcy_, (integer)left.did = dids_input[1].did and left.tmsid = right.tmsid);
 		bk_layout := recordOf(bankruptcies_info);
 	  bankruptcies := if(bs.bjl.bankrupt, bankruptcies_info, dataset([], bk_layout)); 
  
@@ -331,7 +335,8 @@ EXPORT Search_RptFunction(dataset(Risk_Indicators.Layout_Input) raw_input,
 // Build final report record							
 		returnLayout makereport(risk_indicators.Layout_Boca_Shell l) := TRANSFORM
 			self.seq := l.seq;
-			add_hist := ungroup(addr_History_all);
+			
+   add_hist := ungroup(addr_History_all);
 			self.Summary := RiskView.Search_RptData.summary(add_hist, l, inquiryRestrict, raw_input, 
 				LexIDOnlyOnInput, SSNMask, dob_mask_value);
 			self.AddressHistories := ungroup(final_addr_History2);;
@@ -339,10 +344,14 @@ EXPORT Search_RptFunction(dataset(Risk_Indicators.Layout_Input) raw_input,
 			ac := project(aircraftreport, formataircraft(left, counter));
 			self.RealProperties := ungroup(final_propertyrecs);
 			self.PersonalProperties := project(sort(wc + ac, -iesp.ECL2ESP.DateToString(RegistrationDate)), TRANSFORM(iesp.riskview2.t_Rv2ReportPersonalPropertyRecord, self.seq:=counter, self := left));
-			self.FilingRecords := if(FilterLiens,  project(risk_indicators.iid_constants.ds_Record,
-				transform(iesp.riskview2.t_Rv2ReportFilingRecord, self := [])),
-				project(sort(liensdata, -date_last_seen), formatliens(left, counter))); 
-			self.Bankruptcies := project(sort(bankruptcies, -date_last_seen), formatbankruptcies(left, counter)); 
+		
+    self.FilingRecords := if(FilterLiens,  
+      project(risk_indicators.iid_constants.ds_Record,
+            transform(iesp.riskview2.t_Rv2ReportFilingRecord, self := [])),
+      project(sort(liensdata, -(integer) VendorDateLastSeen, -(integer) orig_filing_date,
+      -(integer) Release_Date ), formatliens(left, counter))); 
+		
+   self.Bankruptcies := project(sort(bankruptcies, -date_last_seen), formatbankruptcies(left, counter)); 
 			self.Criminal.CriminalRecords := project(sort(criminalrecs, -offender.fcra_date), formatcriminal(left, counter));
 			self.Criminal.OffenderRegistryRecords := project(sorecs, formatSO(left, counter));
 			s1 := project(amstudentrecs, formatamstudent(left, counter));
@@ -358,8 +367,7 @@ EXPORT Search_RptFunction(dataset(Risk_Indicators.Layout_Input) raw_input,
 			
 			self.ConsumerStatement := ConsumerStatements[1].cs_text;  // after all products are turned on to use personContext, this will be changing
 			// self.ConsumerStatement := bocashell_in[1].ConsumerStatements(trim(StatementType)=PersonContext.Constants.RecordTypes.CS)[1].Content;  // after all products are turned on to use personContext function, this will also need to be updated and get rid of old search
-			self.ConfirmationSubjectFound := if(l.iid.nas_summary <= 4 and l.iid.nap_summary <= 4 and 
-				l.infutor_phone.infutor_nap <= 4 and l.address_verification.input_address_information.naprop <= 3 and l.truedid=false, 
+			self.ConfirmationSubjectFound := if(riskview.constants.noscore(l.iid.nas_summary,l.iid.nap_summary, l.address_verification.input_address_information.naprop, l.truedid),
 				'0',  // subject not found
 				'1');  // subject found
 			self := [];
@@ -373,7 +381,7 @@ EXPORT Search_RptFunction(dataset(Risk_Indicators.Layout_Input) raw_input,
 		// OUTPUT (aircrafts.pilot_registrations, NAMED ('pilot_registration'));
 		// OUTPUT (aircrafts.pilot_certificates, NAMED ('pilot_certificate'));
 //		 output(aircraftreport, named('aircrafts'));
-//		 output(liensdata, named('liensdata'));
+//		 output(liensdata, named('liensdata')); 
 //		 output(bankruptcies, named('bankruptcies'));
 //		 OUTPUT (criminalrecs,      NAMED ('offenders'));
 //		 output(amstudentrecs, named('americanstuden'));
@@ -393,7 +401,11 @@ EXPORT Search_RptFunction(dataset(Risk_Indicators.Layout_Input) raw_input,
 		// output(outfile, named('outfile'));
 		// output(best_data4did, named('best_data4did'));
 		// output(prop_recs, named('prop_recs'));
+  // output(history_date, named('history_date'));
 		final_report := project(choosen(bocashell,1), makereport(left));
-
+	// OUTPUT(	flagrecs, NAMED('Iflagrecs'));
+  // OUTPUT(flags, NAMED('flags'));
+  // OUTPUT(did_flags, NAMED('did_flags'));
+  // output(bs, named('bs'));
 		return final_report;
 END;

@@ -26,10 +26,11 @@ EXPORT WatercraftSearch(WatercraftV2_services.Interfaces.Search_Params in_params
 																												in_params.include_non_regulated_sources,
 																												slim_pc_recs, in_params.FFDOptionsMask).search();
 																												
- suppress_results_due_alerts := isFCRA and FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_params.FCRAPurpose, in_params.FFDOptionsMask)[1].suppress_records;
+  alert_indicators := FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_params.FCRAPurpose, in_params.FFDOptionsMask)[1];
+  suppress_results_due_alerts := isFCRA and alert_indicators.suppress_records;
 
 	consumer_statements := if(IsFCRA and ShowConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements); 
- consumer_alerts := if(isFCRA, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, suppress_results_due_alerts), FFD.Constants.BlankConsumerAlerts);
+  consumer_alerts := if(isFCRA, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, alert_indicators, in_params.FFDOptionsMask), FFD.Constants.BlankConsumerAlerts);
 									
 	//Handle non-subject found records
 	WatercraftV2_Services.Layouts.search_out xformNonSubject(WatercraftV2_Services.Layouts.search_out L) := transform

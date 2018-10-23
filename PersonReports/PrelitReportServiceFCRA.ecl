@@ -139,7 +139,7 @@ EXPORT PrelitReportServiceFCRA () := MACRO
   recs := project(recs_combined.Records, transform(iesp.prelitigationreport_fcra.t_FcraPreLitigationReportIndividual,
        Self := Left));  // it is single record coming as dataset
   
- input_consumer := FFD.MAC.PrepareConsumerRecord(search_mod.did);  // we only have UniqueId coming from input
+ input_consumer := FFD.MAC.PrepareConsumerRecord(search_mod.did, true, , UniqueId);  // we only have UniqueId coming from input
 
   // wrap it into output structure
    iesp.prelitigationreport_fcra.t_FcraPreLitigationReportResponse SetResponse () := transform

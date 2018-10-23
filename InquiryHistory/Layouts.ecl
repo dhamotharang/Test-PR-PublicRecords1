@@ -8,7 +8,7 @@ EXPORT Layouts := MODULE
   EXPORT InquiryHistoryDeltabaseResponseEx := RECORD(iesp.fcrainquiryhistory.t_FCRAInquiryHistoryDeltabaseResponseEx) 
   END;
   
-  EXPORT inquiry_history_per_transaction := RECORD(iesp.fcrainquiryhistory.t_FCRAInquiryHistoryPRRec) 
+  EXPORT inquiry_history_per_transaction := RECORD(iesp.fcrainquiryhistory.t_FCRAInquiryHistoryRecord) 
   END;
   
 
@@ -20,8 +20,9 @@ EXPORT Layouts := MODULE
   
   EXPORT inquiry_history_out := RECORD
     UNSIGNED6 UniqueId;
-    UNSIGNED SearchStatus;
+    UNSIGNED  SearchStatus;
     STRING256 Message;
+    DATASET(iesp.share.t_WsException)        SearchExceptions;
     DATASET(inquiry_history_per_transaction) IndividualResults;    
   END;
 END;

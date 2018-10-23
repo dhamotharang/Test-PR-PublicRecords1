@@ -224,29 +224,43 @@ export comp_nap(boolean firstmatch, boolean lastmatch, boolean addrmatch, boolea
 												~firstmatch and lastmatch and addrmatch and phonematch => 11,
 												firstmatch and lastmatch and addrmatch and phonematch => 12,
 												0);
-																
-export setCivilJudgment := ['CIVIL JUDGMENT','CIVIL NEW FILING','CIVIL SPECIAL JUDGMENT','CIVIL SUIT','CIVIL SUMMONS','COURT ORDER','COURT ORDER NO CHANGE',
-														'FEDERAL COURT CHANGE OF VENUE','FEDERAL COURT JUDGMENT','FEDERAL COURT NEW FILING','JUDGEMENT LIEN','JUDGMENT',
+															
+export setCivilJudgment_standard := ['CIVIL JUDGMENT','CIVIL NEW FILING','CIVIL SPECIAL JUDGMENT','CIVIL SUIT','CIVIL SUMMONS','COURT ORDER','COURT ORDER NO CHANGE',
+														'FEDERAL COURT CHANGE OF VENUE','FEDERAL COURT JUDGMENT','FEDERAL COURT NEW FILING','JUDGMENT',
 														'JUDGMENT - CHAPTER 7','JUDGMENTS','JUDGMENTS DOCKET','SATISFACTION OF JUDGMENT','SUBSEQUENT JUDGMENT',
-														'CIVIL DISMISSAL','CIVIL JUDGMENT RELEASE','CIVIL SPECIAL JUDGMENT RELEASE','FEDERAL COURT DISMISSAL','JUDGMENT LIEN RELEASE','SATISFIED JUDGMENT'];
+														'CIVIL DISMISSAL','CIVIL JUDGMENT RELEASE','CIVIL SPECIAL JUDGMENT RELEASE','FEDERAL COURT DISMISSAL','SATISFIED JUDGMENT'];
+//we are not sure if we should remove these 2 from RV - as Report is impacted if we don't use the setCivilJudgment bucket
+//JUDGMENT LIEN was not listed in the original setCivilJudgment_standard bucket so that is why it's not listed in setCivilJudgment
+export setCivilJudgment := setCivilJudgment_standard + ['JUDGEMENT LIEN','JUDGMENT LIEN RELEASE'];
+//we are not sure if we should remove these 2 from RV - as Report is impacted if we don't use the setCivilJudgment bucket
+export setCivilJudgment_50 := setCivilJudgment_standard + ['RENEW/REOPEN CIVIL JUDGMENT', 'RENEWED CIVIL JUDGMENT'];
 export setFederalTax := ['CORRECTED FEDERAL TAX LIEN','FEDERAL TAX LIEN','FEDERAL TAX LIEN RELEASE','FEDERAL TAX RELEASE'];
 export setForeclosure := ['FORECLOSURE (JUDGMENT)','FORECLOSURE NEW FILING','FORECLOSURE DISMISSED','FORECLOSURE SATISFIED','VACATED FORECLOSURE'];
+//not sure if this is for RV
+export setForeclosure_50 := setForeclosure + ['FORECLOSURE', 'FORECLOSURE PAID'];
 export setLandlordTenant := ['FORCIBLE ENTRY/DETAINER','LANDLORD TENANT JUDGMENT','LANDLORD TENANT SUIT','FORCIBLE ENTRY/DETAINER RELEAS'];
+//not sure if we want this added for RV
+export setLandlordTenant_50 := setLandlordTenant + ['FORCIBLE ENTRY/DETAINER RELEASE'];
 export setLisPendens := ['LIS PENDENS','LIS PENDENS NOTICE','LIS PENDENS RELEASE','LIS PENDENS WITHDRAWAL'];
 export setOtherTax := [	'CITY TAX LIEN','COUNTY TAX LIEN','ILLINOIS TAX LIEN','JUDGMENT OR STATE TAX LIEN','PROPERTY TAX LIEN','STATE TAX LIEN','STATE TAX LIEN RENEWAL',
 												'STATE TAX WARRANT','STATE TAX WARRANT RENEWED','CITY TAX LIEN RELEASE','COUNTY TAX LIEN RELEASE','ILLINOIS TAX RELEASE',
 												'PROPERTY TAX RELEASE','STATE TAX LIEN RELEASE','STATE TAX RELEASE','STATE TAX WARRANT RELEASE'];
 export setSmallClaims := ['RENEW/REOPEN SMALL CLAIM JUDGM','SMALL CLAIMS JUDGMENT','SMALL CLAIMS JUDGMENT RELEASE'];
+//not sure if we want this added to RV
+export setSmallClaims_50 := setSmallClaims + ['RENEWED SMALL CLAIM JUDGMENT'];
 export setMechanicsLiens := ['MECHANICS LIEN','MECHANICS LIEN RELEASE','MECHANICS LIEN WITHDRAWAL'];
-export setOtherLJ := setCivilJudgment + setFederalTax + setLandlordTenant + setOtherTax + setSmallClaims + setForeclosure;
+export setOtherLJ := setCivilJudgment + setFederalTax + setLandlordTenant + setOtherTax + setSmallClaims + setForeclosure + setLisPendens;
+export setOtherLJ_50 := setCivilJudgment_50 + setFederalTax + setLandlordTenant_50 + setOtherTax + setSmallClaims_50 + setForeclosure_50;
+
 export setStateTax := ['JUDGMENT OR STATE TAX LIEN','STATE TAX LIEN','STATE TAX LIEN RENEWAL', 'STATE TAX WARRANT',
 											'STATE TAX WARRANT RENEWED', 'STATE TAX LIEN RELEASE', 'STATE TAX RELEASE', 'STATE TAX WARRANT RELEASE'];
 export setAllTax := setFederalTax + setOtherTax;
-export setLJLisPendens := ['LIS PENDENS','LIS PENDENS RELEASE'];
+// export setLJLisPendens := ['LIS PENDENS','LIS PENDENS RELEASE'];
 
-// new for shell 5.0
-export setSuits := ['CIVIL NEW FILING','CIVIL SUIT','FEDERAL COURT NEW FILING','LIS PENDENS NOTICE','LANDLORD TENANT SUIT','CIVIL SUMMONS'];
-export setSuitsFCRA_exceptions := ['COURT ORDER', 'FORECLOSURE NEW FILING', 'JUDGMENT- CHAPTER 7'];
+// new for shell 5.0 - Juli and RV use these
+export setSuits := ['CIVIL NEW FILING','CIVIL SUIT','FEDERAL COURT NEW FILING','LIS PENDENS NOTICE','LANDLORD TENANT SUIT',
+	'CIVIL SUMMONS'];
+export setSuitsFCRA_exceptions := ['COURT ORDER', 'FORECLOSURE NEW FILING', 'JUDGMENT- CHAPTER 7','LIS PENDENS','LIS PENDENS RELEASE'];
 export setSuitsFCRA := setSuits + setSuitsFCRA_exceptions;
 
 export set_Invalid_Liens_50 := ['CITY TAX LIEN FILED IN ERROR','CIVIL DISMISSAL','COURT ORDER NO CHANGE','DISMISSED JUDGMENT','FEDERAL COURT CHANGE OF VENUE','ERRONEOUS TERMINATION',
@@ -255,12 +269,12 @@ export set_Invalid_Liens_50 := ['CITY TAX LIEN FILED IN ERROR','CIVIL DISMISSAL'
 
 //new for Juli: Liens and Judgments for Public Records 
 export setValidEviction := ['Y'];
-export setPRJudgment := setCivilJudgment + setForeclosure + setSmallClaims + setLisPendens;
-export setPREviction := setLandlordTenant + setValidEviction;
+export setPRJudgment := setCivilJudgment_50 + setForeclosure_50 + setSmallClaims_50;// + setLisPendens;
+export setPREviction := setLandlordTenant_50 + setValidEviction;
 export setOtherLien := ['BUILDING LIEN', 'BUILDING RELEASE', 'BUILDING WITHDRAWAL',
  'CHILD SUPPORT LIEN', 'SIDEWALK LIEN', 'SIDEWALK RELEASE', 'SIDEWALK WITHDRAWAL']; 
-export setPRLien := setFederalTax + setOtherTax + setOtherLien;
-export setPROther := setOtherLJ + setValidEviction + setMechanicsLiens; //we say is NOT in this category
+export setPRLien := setFederalTax + setOtherTax + setOtherLien + ['JUDGEMENT LIEN','JUDGMENT LIEN RELEASE', 'WELFARE LIEN', 'JUDGMENT LIEN'];
+export setPROther := setOtherLJ_50 + setValidEviction + setMechanicsLiens; //we say is NOT in this category
 
 export JudgmentText := 'Judgment';
 export EvictionText := 'Eviction';
@@ -269,7 +283,6 @@ export OtherText:= 'Other';
 
 export LienBucket := [LienText];
 export JudgmentBucket := [JudgmentText,	EvictionText, OtherText];
-
 
 export CityLienFltrs := ['CITY TAX LIEN', 'CITY TAX LIEN RELEASE'];
 export CountyLienFltrs := ['COUNTY TAX LIEN','COUNTY TAX LIEN RELEASE'];
@@ -280,14 +293,14 @@ export OtherLienFltrs := ['BUILDING LIEN','BUILDING RELEASE','CHILD SUPPORT LIEN
 									'HOSPITAL LIEN','HOSPITAL RELEASE',
 									/*'MECHANICS LIEN','MECHANICS LIEN RELEASE',*/'SIDEWALK LIEN',
 									'SIDEWALK RELEASE', 
+									'JUDGMENT LIEN', 'JUDGEMENT LIEN', 'JUDGMENT LIEN RELEASE',
 									//'LIS PENDENS','LIS PENDENS RELEASE'
 									'WELFARE LIEN'];
 export JudgmentFltrs := ['CIVIL JUDGMENT','CIVIL JUDGMENT RELEASE',
 									'CIVIL SPECIAL JUDGMENT', 'CIVIL SPECIAL JUDGMENT RELEASE', 
-									'JUDGMENT LIEN', 'JUDGEMENT LIEN', 'JUDGMENT LIEN RELEASE', 
 									'SMALL CLAIMS JUDGMENT', 'SMALL CLAIMS JUDGMENT RELEASE',
 									'FEDERAL COURT JUDGMENT','FEDERAL COURT NEW FILING',
-									'CIVIL NEW FILING','CIVIL SUIT','LIS PENDENS','LIS PENDENS RELEASE',
+									'CIVIL NEW FILING','CIVIL SUIT',
 									'CHILD SUPPORT PAYMENT','CHILD SUPPORT PAYMENT RELEASE',
 									'ABSTRACT OF JUDGMENT','GARNISHMENT',
 									'GARNISHMENT COLLECT','RENEW/REOPEN CIVIL JUDGMENT',
@@ -300,7 +313,7 @@ export EvictionFltrs := ['FORCIBLE ENTRY/DETAINER', 'FORCIBLE ENTRY/DETAINER REL
 									'FORECLOSURE SATISFIED','DISMISSED FORECLOSURE','FORECLOSURE',
 									'FORCIBLE ENTRY/DETAINER RELEAS','FORECLOSURE PAID'];
 
-export LnJDefault := '11111111';
+export LnJDefault := '11111111';		
 
 export CreateFullName(string title, string fname, string mname, string lname, string name_suffix) := function
  return (if(trim(title) != '', trim(title) + ' ','') +
@@ -479,7 +492,8 @@ export bureau_sources := ['EQ', 'EN', 'TN'];
 		Judgment = 1 										<< 26,
 		Eviction = 1										<< 27,
 		SSNLienFtlr = 1									<< 28,
-		BCBLienFtlr = 1									<< 29
+		BCBLienFtlr = 1									<< 29,
+		InsuranceFCRABankruptcyException = 1 << 30
 		);
 
 export CheckifFlagged(string inString, integer Position) :=  if(inString[Position] = '0', true, false);
@@ -959,11 +973,14 @@ export Set_Equifax_Active_Duty_Alert_Codes := ['W','Q','N'];
 export Set_Equifax_Fraud_Alert_Codes := ['W','Q','X','V'];
 
 export OFAC4_NoGateway := 'watchlist server error';
-export FABatch_WatchlistModels := ['fp1109_0', 'fp31105_1_0', 'fp3710_0_0']; 
-export FAXML_WatchlistModels := ['fp1109_0', 'fp31105_1_0', 'fp3710_0_0', 'fp3904_1_0'];
-export RecoverScoreBatchWatchlistModels :=  ['rsn807_0'];   
+export FABatch_WatchlistModels := ['fp1109_0', 'fp31105_1', 'fp3710_0']; 
+export FAXML_WatchlistModels := ['fp1109_0', 'fp31105_1', 'fp3710_0', 'fp3904_1'];
+export RecoverScoreBatchWatchlistModels :=  ['RSN807_0_0'];   
 
 export fn_CreateFakeDID( STRING fname, STRING lname ) := 
     (UNSIGNED6)(STD.Str.Filter( (STRING)(HASH(fname,lname)), '0123456789' )[1..12]);
+
+// for dempsey riskview project, change the bankruptcy filter to only include these specific chapters
+export set_permitted_bk_chapters(integer bsversion, boolean insurancemode) := if(bsversion < 50 and ~insurancemode, ['7'], ['7', '9', '11', '12', '13', '15', '304']);
 
 end;

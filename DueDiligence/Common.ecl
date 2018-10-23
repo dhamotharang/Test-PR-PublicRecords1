@@ -3,6 +3,15 @@
 
 EXPORT Common := MODULE
 
+  EXPORT firstPopulatedString(field) := FUNCTIONMACRO
+    RETURN IF(LEFT.field = DueDiligence.Constants.EMPTY, RIGHT.field, LEFT.field);
+  ENDMACRO;
+  
+  EXPORT firstNonZeroNumber(field) := FUNCTIONMACRO
+    //so negative numbers would also be returned (ie -1)
+    RETURN IF(LEFT.field = DueDiligence.Constants.NUMERIC_ZERO, RIGHT.field, LEFT.field);
+  ENDMACRO;
+
 	EXPORT createNVPair(STRING name, STRING val) := FUNCTION
 			
 			iesp.share.t_NameValuePair createPair(STRING n, STRING v) := TRANSFORM
@@ -215,63 +224,10 @@ EXPORT Common := MODULE
 		RETURN updatedDS;
 	ENDMACRO;
 		
-	
-	EXPORT ValidateRequest(DATASET(DueDiligence.Layouts.Input) input, UNSIGNED1 glbPurpose, UNSIGNED1 dppaPurpose):= FUNCTION
-
-		validatedRequests := PROJECT(input, TRANSFORM(DueDiligence.Layouts.Input,
-																									//Validate the request
-																									BOOLEAN IndFNamePopulated		  := LEFT.individual.name.firstName <> DueDiligence.Constants.EMPTY OR LEFT.individual.name.fullName <> DueDiligence.Constants.EMPTY;
-																									BOOLEAN IndLNamePopulated	  	:= LEFT.individual.name.lastName <> DueDiligence.Constants.EMPTY OR LEFT.individual.name.fullName <> DueDiligence.Constants.EMPTY;
-																									BOOLEAN IndAddrPopulated		  := LEFT.Individual.address.streetaddress1 <> DueDiligence.Constants.EMPTY OR (LEFT.Individual.address.prim_range <> DueDiligence.Constants.EMPTY AND LEFT.Individual.address.prim_name <> DueDiligence.Constants.EMPTY);
-																									BOOLEAN IndCityStatePopulated := LEFT.individual.address.city <> DueDiligence.Constants.EMPTY AND LEFT.individual.address.state <> DueDiligence.Constants.EMPTY;
-																									BOOLEAN IndZipPopulated		    := LEFT.individual.address.zip5 <> DueDiligence.Constants.EMPTY;
-																									BOOLEAN IndSSNPopulated		    := LEFT.individual.ssn <> DueDiligence.Constants.EMPTY;
-
-																									BOOLEAN BusNamePopulated		  := LEFT.business.companyName <> DueDiligence.Constants.EMPTY OR LEFT.business.altCompanyName <> DueDiligence.Constants.EMPTY;
-																									BOOLEAN BusAddrPopulated		  := LEFT.business.address.streetaddress1 <> DueDiligence.Constants.EMPTY OR (LEFT.business.address.prim_range <> DueDiligence.Constants.EMPTY AND LEFT.Business.address.prim_name <> DueDiligence.Constants.EMPTY);
-																									BOOLEAN BusCityStatePopulated := LEFT.business.address.city <> DueDiligence.Constants.EMPTY AND LEFT.business.address.state <> DueDiligence.Constants.EMPTY;
-																									BOOLEAN BusZipPopulated		    := LEFT.business.address.zip5 <> DueDiligence.Constants.EMPTY;
-																									BOOLEAN BusTaxIDPopulated		  := LEFT.business.fein <> DueDiligence.Constants.EMPTY;
-																									
-																									BOOLEAN LexIDPopulated		  	:= LEFT.individual.lexID <> DueDiligence.Constants.EMPTY;
-																									BOOLEAN SeleIDPopulated	  	  := LEFT.business.lexID <> DueDiligence.Constants.EMPTY;
-																									BOOLEAN ValidGLB		  				:= Risk_Indicators.iid_constants.glb_ok((UNSIGNED)glbPurpose, FALSE );
-																									BOOLEAN ValidDPPA	  					:= Risk_Indicators.iid_constants.dppa_ok((UNSIGNED)dppaPurpose, FALSE);
-																									
-																									BOOLEAN ValidIndividual := (IndFNamePopulated AND IndLNamePopulated AND
-																																									(IndSSNPopulated OR 
-																																									(IndAddrPopulated AND (IndCityStatePopulated OR IndZipPopulated)))) 
-																																							OR LexIDPopulated;
-																									
-																									BOOLEAN ValidBusiness := (BusNamePopulated AND
-																																								(BusTaxIDPopulated OR
-																																								(BusAddrPopulated AND (BusCityStatePopulated OR BusZipPopulated)))) 
-																																						OR SeleIDPopulated;
-																																						
-																									BOOLEAN ValidIndVersion := LEFT.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS;
-																									BOOLEAN ValidBusVersion := LEFT.requestedVersion IN DueDiligence.Constants.VALID_BUS_ATTRIBUTE_VERSIONS;
-																									
-																									STRING OhNoMessage := MAP(ValidIndVersion = FALSE AND ValidBusVersion = FALSE => DueDiligence.Constants.VALIDATION_INVALID_VERSION,
-																																						ValidIndVersion AND ValidIndividual = FALSE => DueDiligence.Constants.VALIDATION_INVALID_INDIVIDUAL,
-																																						ValidBusVersion AND ValidBusiness = FALSE => DueDiligence.Constants.VALIDATION_INVALID_BUSINESS,
-																																						ValidGLB = FALSE => DueDiligence.Constants.VALIDATION_INVALID_GLB,
-																																						ValidDPPA = FALSE => DueDiligence.Constants.VALIDATION_INVALID_DPPA,
-																																						DueDiligence.Constants.EMPTY);
-
-																									
-																									SELF.validRequest := IF(OhNoMessage = DueDiligence.Constants.EMPTY, TRUE, FALSE);
-																									SELF.errorMessage := OhNoMessage;
-																									SELF := LEFT;));
-
-		RETURN validatedRequests;
-	END;
-
-
-
-	
+		
 	EXPORT fn_filterOnArchiveDate(INTEGER fieldDate, INTEGER archiveDate) := FUNCTION
 		
-		isEarlierThanArchiveDate := fieldDate < archiveDate AND fieldDate > 0;
+		isEarlierThanArchiveDate := fieldDate <= archiveDate AND fieldDate > 0;
 
 		RETURN isEarlierThanArchiveDate;
 	END;
@@ -398,155 +354,80 @@ EXPORT Common := MODULE
 	
 	END;
 	
-	
-	EXPORT GetCleanData(DATASET(DueDiligence.Layouts.Input) input) := FUNCTION
-	
-		DueDiligence.Layouts.CleanedData cleanIt(DueDiligence.Layouts.Input le) := TRANSFORM
-		
-			//Clean Address
-			addressToClean := IF(le.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, le.individual.address, le.business.address);
-			
+  // ------                                                                                -----
+  // ------   THIS FUNCTION IS EXPECTED TO PRODUCE the GEOBLK information                  -----
+	// ------   NEEDED FOR CALCULATING GEOGRAPHIC RISK                                       -----
+	// ------                                                                                -----
 
-			addr := Risk_Indicators.MOD_AddressClean.street_address(addressToClean.streetAddress1 + ' ' + addressToClean.streetAddress2, addressToClean.prim_range, 
-																																				addressToClean.predir, addressToClean.prim_name, addressToClean.addr_suffix, 
-																																				addressToClean.postdir, addressToClean.unit_desig, addressToClean.sec_range);
+  EXPORT getCleanAddress(DATASET(DueDiligence.LayoutsInternal.GeographicLayout) input)          := FUNCTION
+	
+	 DueDiligence.LayoutsInternal.GeographicLayout cleanIt(DueDiligence.LayoutsInternal.GeographicLayout le) := TRANSFORM
+			            /* Start with the uncleaned address  */  
+			            addressToClean :=  le;
+			            addr           := Risk_Indicators.MOD_AddressClean.street_address(addressToClean.streetAddress1 
+                                                                                    + ' ' 
+                                                                                    + addressToClean.streetAddress2, 
+                                                                                      addressToClean.prim_range, 
+																																				              addressToClean.predir, 
+                                                                                      addressToClean.prim_name,  
+                                                                                      addressToClean.addr_suffix, 
+																																				              addressToClean.postdir, 
+                                                                                      addressToClean.unit_desig, 
+                                                                                      addressToClean.sec_range);
 																																				
-			cleanAddr := Risk_Indicators.MOD_AddressClean.clean_addr(addr, addressToClean.city, addressToClean.state, addressToClean.zip5);											
+			            cleanAddr      := Risk_Indicators.MOD_AddressClean.clean_addr(addr, addressToClean.city, addressToClean.state, addressToClean.zip5);											
+			            cleanedAddress := Address.CleanFields(cleanAddr);
+			            street1        := Risk_Indicators.MOD_AddressClean.street_address(DueDiligence.Constants.EMPTY, 
+                                                                                    cleanedAddress.Prim_Range, 
+                                                                                    cleanedAddress.Predir, 
+                                                                                    cleanedAddress.Prim_Name, 
+																												                            cleanedAddress.Addr_Suffix, 
+                                                                                    cleanedAddress.Postdir, 
+                                                                                    cleanedAddress.Unit_Desig, 
+                                                                                    cleanedAddress.Sec_Range);
+								 SELF.streetAddress1    := street1;
+								 SELF.streetAddress2    := TRIM(STD.Str.ToUpperCase(addressToClean.StreetAddress2));
+								 SELF.prim_range        := cleanedAddress.prim_range;
+								 SELF.predir            := cleanedAddress.predir;
+								 SELF.prim_name         := cleanedAddress.prim_name;
+								 SELF.addr_suffix       := cleanedAddress.addr_suffix;
+								 SELF.postdir           := cleanedAddress.postdir;
+								 SELF.unit_desig        := cleanedAddress.unit_desig;
+								 SELF.sec_range         := cleanedAddress.sec_range;
+						     SELF.city              := cleanedAddress.v_city_name;
+								 SELF.state             := cleanedAddress.st;
+								 SELF.zip5              := cleanedAddress.zip;
+								 SELF.zip4              := cleanedAddress.zip4;
+								 SELF.cart              := cleanedAddress.cart;
+								 SELF.cr_sort_sz        := cleanedAddress.cr_sort_sz;
+								 SELF.lot               := cleanedAddress.lot;
+								 SELF.lot_order         := cleanedAddress.lot_order;
+								 SELF.dbpc              := cleanedAddress.dbpc;
+								 SElF.chk_digit         := cleanedAddress.chk_digit;
+								 SELF.rec_type          := cleanedAddress.rec_type;
+								 /* Due Diligence logic is expecting only the last 3 digits of the full 5 digit FIPS Code        */   
+								 /*               When it needs the full 5 digits of the FIPS Code it will generate the 5 digits */
+								 /*               by converting the 2 character state code into the 2 digit numerice code and    */
+								 /*               concatenate the 2 digit state code with 3 digit county code to generate the    */
+								 /*               full 5 digits again.   This is consistent with other Risk Products             */  
+								 SELF.county            := cleanedAddress.county[DueDiligence.Constants.FIRST_POS..DueDiligence.Constants.LAST_POS];
+								 SELF.geo_lat           := cleanedAddress.geo_lat;
+								 SELF.geo_long          := cleanedAddress.geo_long;
+								 SELF.msa               := cleanedAddress.msa;
+								 SELF.geo_blk           := cleanedAddress.geo_blk;
+								 SELF.geo_match         := cleanedAddress.geo_match;
+								 SELF.err_stat          := cleanedAddress.err_stat;												                      
+                 SELF                   := le;   //*** all other fields from the input will be passed along via this statement  
+			        
+		    END;     //*** END OF TRANSFORM
 		
-			cleanedAddress := Address.CleanFields(cleanAddr);
-			
-			street1 := Risk_Indicators.MOD_AddressClean.street_address(DueDiligence.Constants.EMPTY, cleanedAddress.Prim_Range, cleanedAddress.Predir, cleanedAddress.Prim_Name, 
-																												cleanedAddress.Addr_Suffix, cleanedAddress.Postdir, cleanedAddress.Unit_Desig, cleanedAddress.Sec_Range);
-			
-			addressClean := DATASET([TRANSFORM(DueDiligence.Layouts.Address,
-																					SELF.streetAddress1 := street1;
-																					SELF.streetAddress2 := TRIM(STD.Str.ToUpperCase(addressToClean.StreetAddress2));
-																					SELF.prim_range := cleanedAddress.prim_range;
-																					SELF.predir := cleanedAddress.predir;
-																					SELF.prim_name := cleanedAddress.prim_name;
-																					SELF.addr_suffix := cleanedAddress.addr_suffix;
-																					SELF.postdir := cleanedAddress.postdir;
-																					SELF.unit_desig := cleanedAddress.unit_desig;
-																					SELF.sec_range := cleanedAddress.sec_range;
-																					SELF.city := cleanedAddress.v_city_name;
-																					SELF.state := cleanedAddress.st;
-																					SELF.zip5 := cleanedAddress.zip;
-																					SELF.zip4 := cleanedAddress.zip4;
-																					SELF.cart := cleanedAddress.cart;
-																					SELF.cr_sort_sz := cleanedAddress.cr_sort_sz;
-																					SELF.lot := cleanedAddress.lot;
-																					SELF.lot_order := cleanedAddress.lot_order;
-																					SELF.dbpc := cleanedAddress.dbpc;
-																					SElF.chk_digit := cleanedAddress.chk_digit;
-																					SELF.rec_type := cleanedAddress.rec_type;
-																					/* Due Diligence logic is expecting only the last 3 digits of the full 5 digit FIPS Code        */   
-																					/*               When it needs the full 5 digits of the FIPS Code it will generate the 5 digits */
-																					/*               by converting the 2 character state code into the 2 digit numerice code and    */
-																					/*               concatenate the 2 digit state code with 3 digit county code to generate the    */
-																					/*               full 5 digits again.   This is consistent with other Risk Products             */  
-																					SELF.county := cleanedAddress.county[DueDiligence.Constants.FIRST_POS..DueDiligence.Constants.LAST_POS];
-																					SELF.geo_lat := cleanedAddress.geo_lat;
-																					SELF.geo_long := cleanedAddress.geo_long;
-																					SELF.msa := cleanedAddress.msa;
-																					SELF.geo_blk := cleanedAddress.geo_blk;
-																					SELF.geo_match := cleanedAddress.geo_match;
-																					SELF.err_stat := cleanedAddress.err_stat;
-																					SELF := [];)])[1];
-			
-			addrProvided := addressToClean.streetAddress1 <> DueDiligence.Constants.EMPTY OR addressToClean.streetAddress2 <> DueDiligence.Constants.EMPTY OR addressToClean.prim_range <> DueDiligence.Constants.EMPTY OR addressToClean.predir <> DueDiligence.Constants.EMPTY OR 
-											addressToClean.prim_name <> DueDiligence.Constants.EMPTY OR addressToClean.addr_suffix <> DueDiligence.Constants.EMPTY OR addressToClean.postdir <> DueDiligence.Constants.EMPTY OR addressToClean.unit_desig <> DueDiligence.Constants.EMPTY OR 
-											addressToClean.sec_range <> DueDiligence.Constants.EMPTY OR addressToClean.city <> DueDiligence.Constants.EMPTY OR addressToClean.state <> DueDiligence.Constants.EMPTY OR addressToClean.zip5 <> DueDiligence.Constants.EMPTY;	
-											
-			fullAddrProvided := (addressClean.streetAddress1 <> DueDiligence.Constants.EMPTY OR addressClean.prim_name <> DueDiligence.Constants.EMPTY) AND addressClean.city <> DueDiligence.Constants.EMPTY AND addressClean.state <> DueDiligence.Constants.EMPTY AND addressClean.zip5 <> DueDiligence.Constants.EMPTY;
-			
-			//Clean Company Name
-			busName := le.business.companyName;
-			altBusName := le.business.altCompanyName;
-			
-
-			companyName := IF(busName = DueDiligence.Constants.EMPTY, ut.CleanCompany(altBusName), ut.CleanCompany(busName)); // If the customer didn't pass in a company but passed in an alt company name use the alt as the company name
-			altCompanyName := IF(busName = DueDiligence.Constants.EMPTY, DueDiligence.Constants.EMPTY, ut.CleanCompany(altBusName)); // Blank out the cleaned AltCompanyName if CompanyName wasn't populated, as we copied Alt into the Main CompanyName field on the previous line
-			
-			//Clean Phone Number
-			phoneNumber := IF(le.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, le.individual.phone, le.business.phone);
-			phoneToClean := STD.Str.Filter(phoneNumber, DueDiligence.Constants.NUMERIC_VALUES);
-			validPhone := IF(Business_Risk_BIP.Common.validPhone(phoneToClean), phoneToClean, DueDiligence.Constants.EMPTY); //If we do not have a valid phone, blank it out
-			
-			//Remove any non-numeric fiends from taxID and lexID fields
-			taxID := IF(le.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, le.individual.ssn, le.business.fein);
-			taxIDToClean := STD.Str.Filter(taxID, DueDiligence.Constants.NUMERIC_VALUES);
-			validTaxID := IF(le.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, IF(Business_Header.IsValidSsn((UNSIGNED)taxIDToClean), taxIDToClean, DueDiligence.Constants.EMPTY), 
-																																																	 IF(Business_Header.ValidFEIN((UNSIGNED)taxIDToClean), taxIDToClean, DueDiligence.Constants.EMPTY ));
-			
-			lexID := IF(le.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, le.individual.lexID, le.business.lexID);
-			validLexID := STD.Str.Filter(lexID, DueDiligence.Constants.NUMERIC_VALUES);
-			
-			//Valid history date passed - if invalid should return 99999999 for current mode
-			validDate := checkInvalidDate((STRING)le.historyDateYYYYMMDD, (STRING)DueDiligence.Constants.date8Nines);
-			
-			//Populate appropriate cleaned data	
-			busClean := IF(le.requestedVersion IN DueDiligence.Constants.VALID_BUS_ATTRIBUTE_VERSIONS, 
-												DATASET([TRANSFORM(DueDiligence.Layouts.Busn_Input,
-																						SELF.lexID := validLexID;
-																						SELF.companyName := companyName;
-																						SELF.altCompanyName := altCompanyName;
-																						SELF.address := addressClean;
-																						SELF.phone := validPhone;
-																						SELF.fein := validTaxID;
-																						SELF := le.business;
-																						SELF := [];)]),
-												DATASET([], DueDiligence.Layouts.Busn_Input));
-		
-			indClean := IF(le.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS,
-												DATASET([TRANSFORM(DueDiligence.Layouts.Indv_Input,
-																						SELF.lexID := validLexID;
-																						SELF.name := DATASET([TRANSFORM(DueDiligence.Layouts.Name,
-																																						unparsedName := STD.Str.ToUpperCase(le.individual.name.fullName);
-																																						fName := STD.Str.ToUpperCase(le.individual.name.firstName);
-																																						mName := STD.Str.ToUpperCase(le.individual.name.middleName);
-																																						lName := STD.Str.ToUpperCase(le.individual.name.lastName);
-																																						sName := STD.Str.ToUpperCase(le.individual.name.suffix);
-																																						
-																																						
-																																						cleanedName := MAP(STD.Str.ToUpperCase(le.individual.nameInputOrder) = 'FML' => Address.CleanPersonFML73(unparsedName),
-																																															 STD.Str.ToUpperCase(le.individual.nameInputOrder) = 'LFM' => Address.CleanPersonLFM73(unparsedName),
-																																															 Address.CleanPerson73(unparsedName));	
-			
-																																						cleanedFirst := IF(unparsedName <> DueDiligence.Constants.EMPTY, STD.Str.ToUpperCase(cleanedName[6..25]), DueDiligence.Constants.EMPTY);
-																																						cleanedMiddle := IF(unparsedName <> DueDiligence.Constants.EMPTY, STD.Str.ToUpperCase(cleanedName[26..45]), DueDiligence.Constants.EMPTY);
-																																						cleanedLast := IF(unparsedName <> DueDiligence.Constants.EMPTY, STD.Str.ToUpperCase(cleanedName[46..65]), DueDiligence.Constants.EMPTY);
-																																						cleanedSuffix := IF(unparsedName <> DueDiligence.Constants.EMPTY, STD.Str.ToUpperCase(cleanedName[66..70]), DueDiligence.Constants.EMPTY);
-																														
-																																						SELF.fullName := unparsedName;
-																																						SELF.firstName := IF(fName = DueDiligence.Constants.EMPTY, cleanedFirst, fName);
-																																						SELF.middleName := IF(mName = DueDiligence.Constants.EMPTY, cleanedMiddle, mName);
-																																						SELF.lastName := IF(lName = DueDiligence.Constants.EMPTY, cleanedLast, lName);
-																																						SELF.suffix := IF(sName = DueDiligence.Constants.EMPTY, cleanedSuffix, sName);																															
-																																						SELF := [];)])[1];
-																						SELF.address := addressClean;
-																						SELF.phone := validPhone;
-																						SELF.ssn := validTaxID;
-																						SELF := le.individual;
-																						SELF := [];)]),
-												DATASET([], DueDiligence.Layouts.Indv_Input));
-
-			inputClean := DATASET([TRANSFORM(DueDiligence.Layouts.Input,
-																				SELF.business := busClean[1];
-																				SELF.individual := indClean[1];
-																				SELF.historyDateYYYYMMDD := (UNSIGNED)validDate;
-																				SELF.addressProvided := addrProvided;
-																				SELF.fullAddressProvided := fullAddrProvided;
-																				SELF := le;
-																				SELF := [];)])[1];
-			
-			
-			SELF.cleanedInput := inputClean;
-			SELF.inputEcho := le;
-			SELF := [];
-		END;
-		
-		RETURN PROJECT(input, cleanIt(LEFT));
-	END;
+    cleanedAddress :=  PROJECT(input, cleanIt(LEFT));
+    
+		RETURN cleanedAddress;
+    
+	END;     //***END OF FUNCTION
+  
+  
 	
 	EXPORT DaysApartWithZeroEmptyDate(STRING date, STRING date2) := FUNCTION
 		
@@ -649,36 +530,49 @@ EXPORT Common := MODULE
 
 	
 	
-  EXPORT LookAtOther(STRING5 courtOffenseLevel, STRING75 charge, string40 courtDispDesc1, string40 courtDispDesc2, string35 arr_off_lev_mapped, 	string35 court_off_lev_mapped) := FUNCTION
+  EXPORT LookAtOther(STRING5 courtOffenseLevel, STRING75 charge, STRING40 courtDispDesc1, STRING40 courtDispDesc2, STRING35 offenseChargeLevelReported, STRING1 trafficFlag) := FUNCTION
 		
-		//***Does the field "courtOffenseLevel" map to any of the listed FELONY or MISDEMEANOR codes***// 
-		boolean MapsToFelony         := STD.Str.ToUpperCase(TRIM(courtOffenseLevel, LEFT, RIGHT)) IN DueDiligence.Constants.setFELONY; 
-		boolean MapsToMisdemeanor    := STD.Str.ToUpperCase(TRIM(courtOffenseLevel, LEFT, RIGHT)) IN DueDiligence.Constants.setMISDEMEANOR;
+		//Does the field "courtOffenseLevel" map to any of the listed FELONY, MISDEMEANOR, TRAFFIC, or INFRACCTION codes 
+		BOOLEAN MapsToFelony := STD.Str.ToUpperCase(TRIM(courtOffenseLevel, LEFT, RIGHT)) IN DueDiligence.Constants.setFELONY; 
+		BOOLEAN MapsToMisdemeanor := STD.Str.ToUpperCase(TRIM(courtOffenseLevel, LEFT, RIGHT)) IN DueDiligence.Constants.setMISDEMEANOR;
+		BOOLEAN MapsToTraffic := STD.Str.ToUpperCase(TRIM(courtOffenseLevel, LEFT, RIGHT)) IN DueDiligence.Constants.setTRAFFIC;
+		BOOLEAN MapsToInfraction := STD.Str.ToUpperCase(TRIM(courtOffenseLevel, LEFT, RIGHT)) IN DueDiligence.Constants.setINFRACTION;
 		
-		//***Can we find the keyword 'FELONY' in the field "charge" ***// 
-		STRING  TextStringConcatenated   := charge + courtDispDesc1 + courtDispDesc2 + arr_off_lev_mapped + court_off_lev_mapped;   
-		boolean foundTheWordFelony       := (boolean)STD.Str.Find(STD.Str.ToUpperCase(TextStringConcatenated), DueDiligence.Constants.KEYWORD_FELONY, 1);
-		boolean foundTheWordReduced      := (boolean)STD.Str.Find(STD.Str.ToUpperCase(TextStringConcatenated), DueDiligence.Constants.KEYWORD_REDUCED, 1);
+		//check to see if we can find key words
+		STRING  TextStringConcatenated := charge + courtDispDesc1 + courtDispDesc2 + offenseChargeLevelReported;  
+    
+		BOOLEAN foundFelonyKeyWord := IF(REGEXFIND(DueDiligence.RegularExpressions.FELONY_NOT_REDUCED, TextStringConcatenated, NOCASE), TRUE, FALSE);
+    BOOLEAN foundMisdemeanorKeyWord := IF(REGEXFIND(DueDiligence.RegularExpressions.SPECIFIC_KEYWORD_MISDEMEANOR, TextStringConcatenated, NOCASE), TRUE, FALSE);
+    BOOLEAN foundTrafficKeyWord := IF(REGEXFIND(DueDiligence.RegularExpressions.SPECIFIC_KEYWORD_TRAFFIC, TextStringConcatenated, NOCASE), TRUE, FALSE);
+    BOOLEAN foundInfractionKeyWord := IF(REGEXFIND(DueDiligence.RegularExpressions.SPECIFIC_KEYWORD_INFRACTION, TextStringConcatenated, NOCASE), TRUE, FALSE);
+    
 		
-		ReturnValue      := MAP(
-		                        MapsToFelony => DueDiligence.Constants.FELONY,
-														MapsToMisdemeanor => DueDiligence.Constants.MISDEMEANOR,    
-														foundTheWordFelony AND ~foundTheWordReduced  => DueDiligence.Constants.FELONY,             
-		                        DueDiligence.Constants.UNKNOWN);
+    
+		returnValue := MAP(MapsToFelony => DueDiligence.Constants.FELONY,
+                        foundFelonyKeyWord => DueDiligence.Constants.FELONY,
+                        MapsToMisdemeanor => DueDiligence.Constants.MISDEMEANOR,    
+                        MapsToTraffic => DueDiligence.Constants.TRAFFIC,
+                        MapsToInfraction => DueDiligence.Constants.INFRACTION,
+                        trafficFlag = DueDiligence.Constants.YES => DueDiligence.Constants.TRAFFIC,
+                        foundMisdemeanorKeyWord => DueDiligence.Constants.MISDEMEANOR,
+                        foundTrafficKeyWord => DueDiligence.Constants.TRAFFIC,
+                        foundInfractionKeyWord => DueDiligence.Constants.INFRACTION,
+                        DueDiligence.Constants.UNKNOWN);
 		
-		RETURN ReturnValue;
+		RETURN returnValue;
 	END;	
 	
 
-  // ------                                                                                -----
-  // ------   THIS FUNCTION IS EXPECTING THE 3 DIGIT FIPS CODE TO BE POPULATED             -----
-	// ------   IT NEEDS BOTH THE 3 DIGIT FIPS AND THE 5 DIGIT FIPS CODE                     -----
-	// ------   The FIPS county code is a five-digit Federal Information Processing          -----
-	// ------   Standards (FIPS) code (FIPS 6-4) which uniquely identifies counties and      -----
-	// ------   county equivalents in the United States,                                     -----
 
-	EXPORT getGeographicRisk(DATASET(DueDiligence.layoutsInternal.GeographicLayout) AddressList) := FUNCTION
 											      
+	EXPORT getGeographicRisk(DATASET(DueDiligence.layoutsInternal.GeographicLayout) AddressList,
+                                   BOOLEAN TheseAddressesNeedToBeCleaned = FALSE) := FUNCTION
+  
+  //
+   PickUpGeoRiskForThisList := IF(TheseAddressesNeedToBeCleaned,
+                                   getCleanAddress(AddressList),
+                              /*ELSE*/
+                                   AddressList);  
   // ------                                                                                     ------
 	// ------ Pick up the EasiTotCrime this state and county and geo blk                          ------  
 	// ------ from the Census Keys.  The address cleaner picked up the county put into the        ------
@@ -692,7 +586,7 @@ EXPORT Common := MODULE
 	// ------        per our requirements the "not found" condition will produce the same result  ------
 	// ------        a low to average crime index                                                 ------
 	
- withGeographicRisk := join(AddressList, Easi.Key_Easi_Census,
+ withGeographicRisk := join(PickUpGeoRiskForThisList, Easi.Key_Easi_Census,
 		keyed(right.geolink = left.state + left.county + left.geo_blk),
 		transform(DueDiligence.layoutsInternal.GeographicLayout, 
 		        /*  Set all of the County/State area risk indicators   */
@@ -714,7 +608,9 @@ EXPORT Common := MODULE
 				    self.CityFerryCrossing         := tempCityState in DueDiligence.Constants.CityFerryCrossing; 
 				    self.CityRailStation           := tempCityState in DueDiligence.Constants.CityRailStation; 
 					   /* populate the remaining business internal record with data from the left  */ 
-						self                          := left;), left outer,
+						self                          := left;),
+    /* keep all the records from the LEFT even when there is no CENSUS information   */  
+    left outer,  
 		ATMOST
 		    (keyed(right.geolink = left.state + left.county + left.geo_blk), 
 				 DueDiligence.Constants.MAX_ATMOST), KEEP(1));
@@ -735,7 +631,7 @@ EXPORT Common := MODULE
 	
 	EXPORT getRelatedPartyOffenses(DATASET(DueDiligence.LayoutsInternal.RelatedParty) relatedParty) := FUNCTION
 		
-		execOffenses := NORMALIZE(relatedParty, LEFT.party.partyOffenses, TRANSFORM(DueDiligence.LayoutsInternal.CriminalOffenses,
+		execOffenses := NORMALIZE(relatedParty, LEFT.party.indOffenses, TRANSFORM(DueDiligence.LayoutsInternal.CriminalOffenses,
 																																								SELF.ultID := LEFT.UltID;
 																																								SELF.orgID := LEFT.OrgID;
 																																								SELF.seleID := LEFT.SeleID;
@@ -786,4 +682,7 @@ EXPORT Common := MODULE
     RETURN UNGROUP(maxedRecords);
   ENDMACRO;
   
-END;
+  
+ 
+  
+END;   //***END OF MODULE

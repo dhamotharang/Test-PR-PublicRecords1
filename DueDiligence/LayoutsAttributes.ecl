@@ -7,12 +7,12 @@
 		UNSIGNED2 	CurrPropOwnedCount;                                 //populated in DueDiligence.getBusProperty
 		UNSIGNED2 	CountSoldProp;                                      //populated in DueDiligence.getBusProperty
     /* BusAssetOwnWatercraft */ 
-		UNSIGNED2 	WatercraftCount;                                    //populated in DueDiligence.getBusWatercraft 
-		UNSIGNED2  	Watercraftlength;                                   //populated in DueDiligence.getBusWatercraft 
+		UNSIGNED2 	WatercraftCount;                                    //populated in DueDiligence.getSharedWatercraft 
+		UNSIGNED2  	Watercraftlength;                                   //populated in DueDiligence.getSharedWatercraft 
     /* BusAssetOwnAircraft */
 		UNSIGNED2 	AircraftCount;                                      //populated in DueDiligence.getBusAircraft
     /* BusAssetOwnVehicle */
-		UNSIGNED2 	VehicleCount;                                       //populated in DueDiligence.getBusVehicle
+		UNSIGNED3 	VehicleCount;                                       //populated in DueDiligence.getBusVehicle
 		UNSIGNED6  	VehicleBaseValue;
     /*BusSOSAgeRange*/  
 		UNSIGNED4  	sosIncorporationDate;										            //populated in DueDiligence.getBusSOSDetail
@@ -81,41 +81,35 @@
 		BOOLEAN			atleastOneBEOInCategory2;                           //populated in DueDiligence.getBusLegalEvents
 		BOOLEAN			BEOsHaveNoConvictionsOrCategoryHits;                //populated in DueDiligence.getBusLegalEvents
     /*BusUSResidency*/
-		BOOLEAN		atleastOneBEOInvalidSSN;
-		BOOLEAN		atleastOneBEOAssocITINOrImmigrantSSN;
-		BOOLEAN		atleastOneBEODOBPriorToParentSSN;
-		BOOLEAN   atleastOneBEOParentWithITINOrImmigrantSSN;
-		BOOLEAN		atleastOneBEONoParentsOrNeitherHaveSSNITIN;
-		BOOLEAN		atleastOneBEOPublicRecordsLess3YrsWithNoVote;
-		BOOLEAN		atleastOneBEOPublicRecordsBetween3And10YrsWithNoVote;
-		BOOLEAN		atleastOneBEOPublicRecordsMoreThan10YrsWithNoVote;
-		BOOLEAN		atleastOneBEOOrParentRegisteredVoter;
+		BOOLEAN		  atleastOneBEOInvalidSSN;
+		BOOLEAN		  atleastOneBEOAssocITINOrImmigrantSSN;
+		BOOLEAN		  atleastOneBEODOBPriorToParentSSN;
+		BOOLEAN     atleastOneBEOParentWithITINOrImmigrantSSN;
+		BOOLEAN		  atleastOneBEONoParentsOrNeitherHaveSSNITIN;
+		BOOLEAN		  atleastOneBEOPublicRecordsLess3YrsWithNoVote;
+		BOOLEAN		  atleastOneBEOPublicRecordsBetween3And10YrsWithNoVote;
+		BOOLEAN		  atleastOneBEOPublicRecordsMoreThan10YrsWithNoVote;
+		BOOLEAN		  atleastOneBEOOrParentRegisteredVoter;
     /* Criminal Evidence flags*/                                    
-		BOOLEAN     BEOevidenceOfCurrentIncarceration;                // Level 9
-		BOOLEAN     BEOevidenceOfCurrentParole;                       // Level 9
-		BOOLEAN     BEOevidenceOfFelonyConvictionInLastNYR;           // Level 8 - at least one 4F - in last 3 years
-		BOOLEAN     BEOevidenceOfFelonyConvictionOlderNYR;            // Level 7 - at least one 4F - older than 3 years
+		BOOLEAN     BEOevidenceOfCurrentIncarcerationOrParole;        // Level 9
+		BOOLEAN     BEOevidenceOfFelonyConvictionInLastNYR;           // Level 8 
+		BOOLEAN     BEOevidenceOfFelonyConvictionOlderNYR;            // Level 7
 		BOOLEAN     BEOevidenceOfPreviousIncarceration;               // Level 6
-		BOOLEAN     BEOevidenceOfUncatagorizedConvictionInLastNYR;    // Level 5 - at least one 4U - in the last 3 years
-		BOOLEAN     BEOevidenceOfMisdeameanorConvictionInLastNYR;     // Level 4 - at least one 4M - in the last 3 years
-		BOOLEAN     BEOevidenceOfUncatagorizedConvictionOlderNYR;     // Level 3 - at least one 4U - older than 3 years
-		BOOLEAN     BEOevidenceOfMisdeameanorConvictionOlderNYR;      // Level 2 - at lease one 4M - older than 3 years
+		BOOLEAN     BEOevidenceOfUncatagorizedConvictionInLastNYR;    // Level 5
+		BOOLEAN     BEOevidenceOfMisdeameanorConvictionInLastNYR;     // Level 4
+		BOOLEAN     BEOevidenceOfUncatagorizedConvictionOlderNYR;     // Level 3
+		BOOLEAN     BEOevidenceOfMisdeameanorConvictionOlderNYR;      // Level 2
     BOOLEAN     BEONoEvidenceOfStateCriminal;
-    /* Traffic & Infraction Evidence flags*/                                    
-		BOOLEAN     BEOevidenceOf3TrafficNYR;                         // Level 9 - 3 or more traffic     in last 3 years
-		BOOLEAN     BEOevidenceOf2TrafficNYR;                         // Level 8 - 1 or 2    traffic     in last 3 years
-		BOOLEAN     BEOevidenceOf3InfractionsNYR;                     // Level 7 - 3 or more infractions in last 3 years
-		BOOLEAN     BEOevidenceOf2InfractionsNYR;                     // Level 6 - 1 or 2    infractions in last 3 years
-		BOOLEAN     BEOevidenceOf3TrafficOlderNYR;                    // Level 5 - 3 or more traffic     older than 3 years
-		BOOLEAN     BEOevidenceOf2TrafficOlderNYR;                    // Level 4 - 1 or 2    traffic     older than 3 years
-		BOOLEAN     BEOevidenceOf3InfractionsOlderNYR;                // Level 3 - 3 or more infractions older than 3 years
-		BOOLEAN     BEOevidenceOf2InfractionsOlderNYR;                // Level 2 - 1 or 2    infractions older than 3 years
-    BOOLEAN     BEONoEvidenceOfTrafficOrInfraction;
   END;
   
   
   //These are used stricly to calculate the attribute values in getIndKRI
   EXPORT PersonAttributeValues := RECORD
+    /*PerAssetOwnWatercraft*/ 
+		UNSIGNED2 	watercraftCount;                                  //populated in DueDiligence.getSharedWatercraft 
+		UNSIGNED2  	watercraftLength;                                 //populated in DueDiligence.getSharedWatercraft 
+    /*PerAssetOwnAircraft*/
+    UNSIGNED2   aircraftCount;
     /*PerUSResidency*/
 		UNSIGNED4 	firstReportedDate;															  //populated in DueDiligence.getIndHeader
 		BOOLEAN		  registeredVoter;															    //populated in DueDiligence.getIndHeader
@@ -139,16 +133,7 @@
 		BOOLEAN			atleastOneCategory4;
 		BOOLEAN			atleastOneCategory3;
 		BOOLEAN			atleastOneCategory2;
-    /*PerLegalTrafficInfractions*/
-    BOOLEAN     threePlusTrafConvictPast3Yrs;
-    BOOLEAN     twoOrLessTrafConvictPast3Yrs;
-    BOOLEAN     threePlusInfractConvictPast3Yrs;
-    BOOLEAN     twoOrLessInfractConvictPast3Yrs;
-    BOOLEAN     threePlusTrafConvictOver3Yrs;
-    BOOLEAN     twoOrLessTrafConvictOver3Yrs;
-    BOOLEAN     threePlusInfractConvictOver3Yrs;
-    BOOLEAN     twoOrLessInfractConvictOver3Yrs;
-    /*PerLegalCivil*/
+    /*PerCivilLegalEvent*/
     BOOLEAN     tenPlusLiensJudgementsEvictionsPast3Yrs;
     BOOLEAN     five2NineLiensJudgementsEvictionsPast3Yrs;
     BOOLEAN     three2FourLiensJudgementsEvictionsPast3Yrs;
@@ -157,7 +142,7 @@
     BOOLEAN     five2NineLiensJudgementsEvictionsOver3Yrs;
     BOOLEAN     three2FourLiensJudgementsEvictionsOver3Yrs;
     BOOLEAN     one2TwoLiensJudgementsEvictionsOver3Yrs;
-    /*PerLegalStateCriminal*/
+    /*PerStateLegalEvent*/
     BOOLEAN     currentIncarcerationOrParole;
     BOOLEAN     felonyPast3Yrs;
     BOOLEAN     felonyOver3Yrs;
@@ -166,6 +151,27 @@
     BOOLEAN     misdemeanorConvictionPast3Yrs;
     BOOLEAN     uncategorizedConvictionOver3Yrs;
     BOOLEAN     misdemeanorConvictionOver3Years;
+    /*PerAssetOwnProperty*/
+    UNSIGNED2   ownedPropCount;                                 //populated in DueDiligence.getIndProperty
+    /*PerAccessToFundsProperty*/
+    UNSIGNED6   totalAssesedValue;                              //populated in DueDiligence.getIndProperty
+    UNSIGNED2   previouslyOwnedPropCount;                       //populated in DueDiligence.getIndProperty
+    /*PerProfessional License*/
+    BOOLEAN			atleastOneActiveLawAcct;					            	//populated in DueDiligence.getIndProfessionalData
+		BOOLEAN			atleastOneActiveFinRealEstate;		            	//populated in DueDiligence.getIndProfessionalData
+		BOOLEAN			atleastOneActiveMedical;						            //populated in DueDiligence.getIndProfessionalData
+		BOOLEAN			atleastOneActiveBlastPilot;					            //populated in DueDiligence.getIndProfessionalData
+		BOOLEAN			atleastOneInactiveLawAcct;					            //populated in DueDiligence.getIndProfessionalData
+		BOOLEAN			atleastOneInactiveFinRealEstate;		            //populated in DueDiligence.getIndProfessionalData
+		BOOLEAN			atleastOneInactiveMedical;					            //populated in DueDiligence.getIndProfessionalData
+		BOOLEAN			atleastOneInactiveBlastPilot;				            //populated in DueDiligence.getIndProfessionalData
+    /*PerAccessToFundsIncome*/
+    UNSIGNED3   estimatedIncome;                                //populated in DueDiligence.getIndEstimatedIncome
+    /*PerAssetOwnVehicle*/
+		UNSIGNED2 	VehicleCount;                                   //populated in DueDiligence.getIndVehicle
+		UNSIGNED6  	VehicleBaseValue;
+    /*PerAgeRange*/
+    INTEGER1   estimatedAge;
   END;
 
 END;

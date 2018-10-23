@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="InViewReportService" wuTimeout="300000">
   <part name="CompanyName" type="xsd:string"/>
   <part name="Addr" type="xsd:string"/>
@@ -75,6 +75,7 @@
 /*--INFO-- InView Business Report */	
 	
 export InViewReportService := MACRO
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 #onwarning(4207, ignore);
 
 #option ('globalAutoHoist', false);

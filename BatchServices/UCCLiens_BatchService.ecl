@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="UCCLiens_BatchService">
 	<part name="DPPAPurpose"          type="xsd:byte"/>
 	<part name="GLBPurpose"           type="xsd:byte"/> 
@@ -39,7 +39,7 @@ EXPORT UCCLiens_BatchService(useCannedRecs = 'false') :=
 	MACRO
 	
 	 
-	
+	 #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 		#OPTION('optimizeProjects', TRUE);
 		
 		#CONSTANT('getBdidsbyExecutive',FALSE);

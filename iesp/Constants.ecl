@@ -44,7 +44,7 @@ EXPORT Constants := MODULE
 	export unsigned2 MaxCountIncomeRiskHRI := 25; // ~18 from biid + 5 new ones from includes both : 
 	                                              // business risk HRI codes and 
 	                                              // 5 new ones in income risk
-  export unsigned1 MaxResponseExceptions := 4;
+  export unsigned1 MaxResponseExceptions := 20;
 	export unsigned2 MaxCountHealthCareConsolidatedSearch := 1000;
   
 	export unsigned2 MAX_REPORT_SOURCES := 1;
@@ -255,6 +255,11 @@ EXPORT Constants := MODULE
 	export ChildIdentityFraud := module
 		export MaxPersonRecords := 3;
 	end;
+  
+  //Citizenship
+  export Citizenship := MODULE
+    export MaxAttributes := 27;
+  end;
 
   // Contact Plus
 	export Contact_Plus := module
@@ -421,11 +426,11 @@ EXPORT Constants := MODULE
 		
 	//Due Diligence
 	export DDRAttributesConst := MODULE
-		export unsigned2 MaxAttributes      				:= 23;		
-    export unsigned2 MaxMatchSummaries     		 	:= 20;
-    export unsigned2 MaxNewsProfiles       		 	:= 20;
+		export unsigned2 MaxAttributes      				:= 21;		
+    // export unsigned2 MaxMatchSummaries     		 	:= 20;
+    // export unsigned2 MaxNewsProfiles       		 	:= 20;
     export unsigned2 MaxProperties         			:= 500;
-    export unsigned2 MaxTenants	         				:= 500;
+    export unsigned2 MaxPropertyOwners   				:= 500;
     export unsigned2 MaxAircraft         				:= 500;
     export unsigned2 MaxWatercraft         			:= 500;
     export unsigned2 MaxVehicles         				:= 500;
@@ -438,12 +443,14 @@ EXPORT Constants := MODULE
 		export unsigned2 MaxDescriptions    				:= 210;
 		export unsigned2 MaxBusinesses      				:= 500;
 		export unsigned2 MaxSSNAssociations     		:= 500;
-		export unsigned2 MaxPersonNames      				:= 500;
-		export unsigned2 MaxAgents      						:= 500;
+		// export unsigned2 MaxPersonNames      				:= 500;
+		// export unsigned2 MaxAgents      						:= 500;
 		export unsigned2 MaxCreditors   						:= 500;
 		export unsigned2 MaxDebtors   							:= 500;
 		export unsigned2 MaxLienJudgementsEvictions	:= 500;
 		export unsigned2 MaxLegalEvents   					:= 500;
+		export unsigned2 MaxLegalPartyNames					:= 500;
+		export unsigned2 MaxLegalSources  					:= 500;
 		export unsigned2 MaxTitles   								:= 500;
 		export unsigned2 MaxLicenses   							:= 500;
 		export unsigned2 MaxBusinessExecs   				:= 500;
@@ -451,7 +458,10 @@ EXPORT Constants := MODULE
 		export unsigned2 MaxIndvAssociations   			:= 500;
 		export unsigned2 MaxBusAssociations   			:= 500;
 	end;
-
+	
+	//Digital Mortgage Application Prefill (DMAP)
+	EXPORT UNSIGNED2 DMAP_MAX_COUNT_OWNED_PROPERTIES	:= 50;
+	
   //Dun and Bradstreet (DNB)
  	export unsigned2 DNB_MAX_COUNT_SEARCH_RECORDS := 500;	
 
@@ -1261,6 +1271,7 @@ EXPORT Constants := MODULE
 	EXPORT Order__Score := MODULE
 	  EXPORT UNSIGNED2 MaxAttributeVersionCount := 3;
 		EXPORT UNSIGNED2 MaxAttributes := 131;
+    EXPORT UNSIGNED2 MaxModelOptionsCount :=2;
 	END;
 
    // Oregon Workers Compensation (ORWORK)
@@ -1318,11 +1329,11 @@ EXPORT Constants := MODULE
 		export unsigned1 MaxPorts := 100;
 		export unsigned1 MaxSpoofs := 100;
 		export unsigned1 MaxOTPs := 100;
+		export unsigned1 MaxInquiries := 100;
 		export unsigned1 MaxPRIRules := 20;
 		export unsigned1 MaxAlerts := 20;
 		export unsigned1 MaxAlertMessages := 20;
 	end;
-	
   // Phone History Report
 	export unsigned2 PhoneHistoryMaxRecords :=500;
   export unsigned2 PhoneInfoMessages := 1;
@@ -1630,6 +1641,12 @@ EXPORT Constants := MODULE
 		export MaxBusinessReturn		:= 8000;
 		export MaxSIC_CODES := 12;
 	end;
+
+	//Socio Constants
+	export Socio := module
+		export Max_Scores := 10;
+		export Max_Invalids := 10;
+	end;
 	
 	// Taxpayer info, AKA Txbus?
 	export TAXPAYER := module
@@ -1929,6 +1946,8 @@ EXPORT Constants := MODULE
 	export unsigned2 WP_MAX_COUNT_SEARCH_RESPONSE_RECORDS        := 100;
 	export unsigned2 WP_PLUS_MAX_COUNT_SEARCH_RESPONSE_RECORDS   := 2000;
 	export unsigned2 WP_MAX_COUNT_SEARCH_RESPONSE_SINGLE_RECORD  := 1;
+	export unsigned2 WP_MAX_COUNT_ADDL_COMP  := 4;
+	export unsigned2 WP_MAX_COUNT_EMAIL_ADDR := 3;
 
 
   // *** Modules that refer to other modules above.
@@ -2006,6 +2025,7 @@ EXPORT Constants := MODULE
     export unsigned1 MaxCompanyInput := 5;
     export unsigned1 MaxCompanyResult := 5;
     export unsigned1 MaxDBAandOfficersResult := 10;
+    export unsigned1 MaxUtilAddresses := 2;
   end;
 
  	// NOTE: Various Max*** attributes in the AR module refer to the BR & DL modules, 
@@ -2082,5 +2102,9 @@ EXPORT Constants := MODULE
   export DEMO_SEARCH_TOOL := MODULE
     export unsigned2 MAX_COUNT_SEARCH_RESPONSE_RECORDS := 100;
   end;
+
+	 export PhoneMetadata := module
+		export UNSIGNED2 MaxPhoneMetadataRecords := 1000;
+	end;
 	
 END;

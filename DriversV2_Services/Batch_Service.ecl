@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Batch_Service">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="DPPAPurpose" type="xsd:byte"/>
@@ -12,10 +12,11 @@
 </message>
 */
 
-IMPORT Autokey_batch, DriversV2, DriversV2_Services, UT, WSInput;
+IMPORT Autokey_batch, DriversV2, DriversV2_Services, UT, WSInput,AutoheaderV2;
 
 EXPORT Batch_Service() := FUNCTION
 
+ #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	//The following macro defines the field sequence on WsECL page of query. 
 	WSInput.MAC_DriversV2_Services_Batch_Service();
 	

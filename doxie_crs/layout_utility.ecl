@@ -1,4 +1,6 @@
-﻿// RR-11535 - Adding Utility Data to Comprehensive Report. 
+﻿// RR-11535 - Adding Utility Data to Comprehensive Report.
+IMPORT iesp;
+
 EXPORT layout_utility := MODULE
 
   EXPORT address_layout := RECORD 
@@ -40,7 +42,7 @@ EXPORT layout_utility := MODULE
     string10        phone;
     string1         addr_dual;
 
-    DATASET(address_layout) address_recs {MAXCOUNT(2)};
+    DATASET(address_layout) address_recs {MAXCOUNT(iesp.Constants.BR.MaxUtilAddresses)};
 
   END;
 
@@ -52,34 +54,6 @@ EXPORT layout_utility := MODULE
     boolean         is_billing_addr_set;
 
     record_layout_slim;
-
-    string1         service_addr_type;
-    string10        service_prim_range;
-    string2         service_predir;
-    string28        service_prim_name;
-    string4         service_addr_suffix;
-    string2         service_postdir;
-    string10        service_unit_desig;
-    string8         service_sec_range;
-    string25        service_city;
-    string2         service_state;
-    string10        service_zip;
-    string10        service_zip4;
-    string18        service_county_name;    
-
-    string1         billing_addr_type;
-    string10        billing_prim_range;
-    string2         billing_predir;
-    string28        billing_prim_name;
-    string4         billing_addr_suffix;
-    string2         billing_postdir;
-    string10        billing_unit_desig;
-    string8         billing_sec_range;
-    string25        billing_city;
-    string2         billing_state;
-    string10        billing_zip;
-    string10        billing_zip4;
-    string18        billing_county_name;    
 
     string50        debug;
 

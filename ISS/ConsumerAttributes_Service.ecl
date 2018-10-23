@@ -109,7 +109,7 @@ ConsumerAttributesReportRequest XML:
 */
 
 
-import risk_indicators, ut, iesp, address, riskwise, seed_files, gateway;
+import risk_indicators, ut, iesp, address, riskwise, seed_files, gateway, OFAC_XG5;
 
 export ConsumerAttributes_Service := MACRO
 
@@ -301,6 +301,9 @@ export ConsumerAttributes_Service := MACRO
 	unsigned4 EverOccupant_StartDate  := 99999999;
 	unsigned1 AppendBest 					:= 1;	// search the best file
 	unsigned8 BSOptions 					:= risk_indicators.iid_constants.BSOptions.DIDRIDSearchOnly;
+
+IF( OFACVersion != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, value),
+   FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 
 ////////////////////////////////////////////////////////////			
 	iid(unsigned1 bsversion) := risk_indicators.InstantID_Function(iid_prep, 

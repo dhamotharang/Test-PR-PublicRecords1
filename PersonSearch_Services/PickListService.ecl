@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="headerFileRollupRequest">
   <part name="DID" type="xsd:string"/>
   <part name="RID" type="xsd:string"/>
@@ -125,12 +125,13 @@
 */
 /*--USES-- ut.input_xslt */
 
-IMPORT iesp, doxie, AutoStandardI, AutoHeaderI, PersonReports, standard, suppress, header;
+IMPORT iesp, doxie, AutoStandardI, AutoHeaderI, PersonReports, standard, suppress, header, BankruptcyV3, FCRA, STD;
 
 export PickListService := MACRO
 	
 	//The following macro defines the field sequence on WsECL page of query. 
 	WSInput.MAC_PersonSearch_Services_PickListService();
+	 #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
   #CONSTANT ('UsingKeepSSNs',true);
   #CONSTANT ('GONG_SEARCHTYPE','PERSON');
   #CONSTANT ('IncludePhonesFeedback','false');
@@ -166,6 +167,7 @@ export PickListService := MACRO
 
 	all_dids         := AI.all_dids.val (project (gm,AI.all_dids.params));  // return all DID records for every match
 	return_just_dids := AI.did_only.val (project (gm, AI.did_only.params)); // suppress everything except DID
+	SortByBankruptcy := first_row.Options.SortByBankruptcy ; // put bankruptcy on the top 
 
   // execute search
 /*    
@@ -215,8 +217,6 @@ export PickListService := MACRO
     recordof (doxie.key_header) and not [persistent_record_id];
   end;
   header_raw := project (head_ssn_masked, rec_header);
-
-
 
   // ----------------- ROLLUP (will be moved to .functions) -----------------
   // rollup presentation
@@ -299,23 +299,24 @@ export PickListService := MACRO
 
   // check RI restriction
   header_rolled_clean := header_rolled (~check_ri OR ri_input_complete OR (info_code & ri_info_code != ri_info_code));
+	
+ // Full-scale ESDL presentation //
+  iesp.person_picklist.t_PersonPickListRecord FormatToESDL (rec_rolled L ) := transform
+	  
+			Self.UniqueId := intformat (L.did, 12, 1);
+			Self._Penalty := L.penalt;
+			Self.Names := project (L.names, transform (iesp.share.t_Name, 
+																								 Self := iesp.ECL2ESP.SetName (Left.fname, '', Left.lname, '' , '', '')));
+			Self.Addresses := project (L.addresses, transform (iesp.share.t_Address, 
+																								 Self := iesp.ECL2ESP.SetAddress ('', '', '', '', '', '', '', 
+																																									Left.city_name, Left.st, '' , '', '')));
+			Self.SSNs := project (L.ssns, transform (iesp.share.t_StringArrayItem, Self.value := Left.ssn));
 
-  // Full-scale ESDL presentation
-  iesp.person_picklist.t_PersonPickListRecord FormatToESDL (rec_rolled L) := transform
-    Self.UniqueId := intformat (L.did, 12, 1);
-    Self._Penalty := L.penalt;
-    Self.Names := project (L.names, transform (iesp.share.t_Name, 
-                                               Self := iesp.ECL2ESP.SetName (Left.fname, '', Left.lname, '' , '', '')));
-    Self.Addresses := project (L.addresses, transform (iesp.share.t_Address, 
-                                               Self := iesp.ECL2ESP.SetAddress ('', '', '', '', '', '', '', 
-                                                                                Left.city_name, Left.st, '' , '', '')));
-    Self.SSNs := project (L.ssns, transform (iesp.share.t_StringArrayItem, Self.value := Left.ssn));
-
-    Self.DOBs := project (L.dobs, transform (iesp.share.t_MaskableDate, 
-                                             Self := iesp.ECL2ESP.toMaskableDatestring8 (Left.dob)));
+			Self.DOBs := project (L.dobs, transform (iesp.share.t_MaskableDate, 
+																							 Self := iesp.ECL2ESP.toMaskableDatestring8 (Left.dob)));															 
   end;
+	
   esdl_header := project (header_rolled_clean, FormatToESDL (Left));
-
 
   // if just DIDs were requested and there's no need to check Rhode Island (and potentially others) restriction,
   // then we can take it directly from search results; otherwise -- from rolled up presentation
@@ -325,9 +326,15 @@ export PickListService := MACRO
                                                     Self.UniqueId := Left.UniqueId, Self := [])),
                    project (dids_clean, transform (iesp.person_picklist.t_PersonPickListRecord,
                                                    Self.UniqueId := intformat (Left.did, 12, 1), Self := [])));
+	
+  records_pre := if (return_just_dids, sort (esdl_dids, UniqueId), sort (esdl_header, _Penalty, UniqueId));
 
-  records_esdl := if (return_just_dids, sort (esdl_dids, UniqueId), sort (esdl_header, _Penalty, UniqueId));
+  records_bk := PersonSearch_Services.Functions.GetBankruptcyFlag(records_pre);														
 
+  records_esdl := if(SortByBankruptcy,
+                      project(sort(records_bk, if(_HasBankruptcy, 0, 1), _Penalty, UniqueId), iesp.person_picklist.t_PersonPickListRecord),
+                      records_pre);
+  
   // set up non-fatal messages
   ds_message := if (check_ri and ~ri_input_complete and exists (header_rolled (info_code & ri_info_code = ri_info_code)),
 // TODO:  I wouldn't want to reuse an error code, but it's not clear if the separate set of codes is feasible to have  
@@ -338,7 +345,7 @@ export PickListService := MACRO
   iesp.ECL2ESP.Marshall.Mac_Set (first_row.Options);
 	iesp.ECL2ESP.Marshall.MAC_Marshall_Results (records_esdl, res_esdl, iesp.person_picklist.t_PersonPickListResponse, 
                                               , , SubjectTotalCount, Messages, ds_message);
-
+  
   // output (dids, named('dids'));
   // output (all_header_recs, named('header'));
   // output (header_rolled, named ('header_rolled'));

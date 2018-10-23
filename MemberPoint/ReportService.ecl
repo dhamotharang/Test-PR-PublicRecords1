@@ -9,6 +9,7 @@
 import iesp, AutoStandardI,Royalty;
 
 EXPORT ReportService := MACRO
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
  #onwarning(4207, warning);
 	//b. Receive input 
 	rec_in := iesp.memberpointreport.t_MemberPointReportRequest;

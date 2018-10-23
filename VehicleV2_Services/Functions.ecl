@@ -1,4 +1,4 @@
-import doxie, ut, codes, iesp;
+﻿import doxie, ut, codes, iesp;
 import AutoStandardI, VehicleV2_Services, Autokey_batch, CriminalRecords_Services;
 import VehicleV2, VehicleCodes, suppress, Census_Data, doxie_raw, MDR,Driversv2;
 
@@ -735,20 +735,24 @@ export 	lic_plate_filter_New(dataset(Layouts.lic_plate_key_payload_fields_New) p
 
   EXPORT GetVehicleReport (IParam.reportParams aInputData, GROUPED dataset(Layout_Vehicle_Key) in_veh_keys,
                      STRING in_ssn_mask_type = '') := FUNCTION
+										 
+		boolean isCNSMR := aInputData.IndustryClass = 'CNSMR';
     dppa_purpose_x := aInputData.dppapurpose;  // from business_header/doxie_MAC_Field_Declare()
 		boolean include_non_regulated_data := aInputData.IncludeNonRegulatedSources and ~doxie.DataRestriction.InfutorMV;
 		
-	  pre_veh_recs0 := join(in_veh_keys, VehicleV2.Key_Vehicle_Main_Key,
+	  pre_veh_recs0_info := join(in_veh_keys, VehicleV2.Key_Vehicle_Main_Key,
                           keyed(left.Vehicle_Key = right.Vehicle_Key) and
                           keyed((left.Iteration_Key = '') OR left.Iteration_Key = right.Iteration_Key) and
 													(include_non_regulated_data or right.source_code not in MDR.sourceTools.set_infutor_all_veh),
                           makeVehReport(left, right),
                           limit(Constant.VEHICLE_PER_KEY,skip));
 
+			pre_veh_recs0 := if(~isCNSMR, pre_veh_recs0_info);
+
     _pre_veh_recs1 := pre_veh_recs0(ut.PermissionTools.dppa.state_ok(state_origin,dppa_purpose_x,,source_code) or
 																	  (source_code in MDR.sourceTools.set_infutor_all_veh and ut.PermissionTools.dppa.ok(dppa_purpose_x)));
 
-    r_j := JOIN(in_veh_keys, keyVParty,
+    r_j_vehicleparty := JOIN(in_veh_keys, keyVParty,
                 KEYED(LEFT.Vehicle_key = RIGHT.Vehicle_key) AND
                 KEYED(LEFT.Iteration_key = RIGHT.Iteration_key) AND
                 KEYED(LEFT.Sequence_key = RIGHT.Sequence_key) and
@@ -756,29 +760,36 @@ export 	lic_plate_filter_New(dataset(Layouts.lic_plate_key_payload_fields_New) p
                 get_parties_report (RIGHT),
                 KEEP(Constant.PARTIES_PER_VEHICLE),
 								LIMIT(0));
-
+													
+  
+ 	r_j := if(~isCNSMR, r_j_vehicleparty);
     pre_party_recs0 := UNGROUP(r_j);		
 		MAC_JoinLatestDLAndPrePartyRecs(pre_party_recs0, outputPrePartyRecs);
+		
     return GetRolledView (_pre_veh_recs1, outputPrePartyRecs, aInputData, true);
   END;
 
   EXPORT Get_VehicleSearch (IParam.searchParams aInputData, GROUPED dataset(Layout_VKeysWithInput) in_veh_keys,                      
                       STRING in_ssn_mask_type = '', BOOLEAN penalize_by_party = FALSE) := FUNCTION
+											
+		boolean isCNSMR := aInputData.IndustryClass = 'CNSMR';									
     dppa_purpose_x := aInputData.dppapurpose;  // from business_header/doxie_MAC_Field_Declare()
     unsigned2 penalty_threshold := aInputData.penalty_threshold;    
 		boolean include_non_regulated_data := aInputData.IncludeNonRegulatedSources and ~doxie.DataRestriction.InfutorMV;
 		
-    pre_veh_recs0 := join(in_veh_keys, VehicleV2.Key_Vehicle_Main_Key,
+    pre_veh_recs0_info := join(in_veh_keys, VehicleV2.Key_Vehicle_Main_Key,
                           keyed(left.Vehicle_Key = right.Vehicle_Key) and
                           keyed(left.Iteration_Key = right.Iteration_Key) and
 													(include_non_regulated_data or right.source_code not in MDR.sourceTools.set_infutor_all_veh),
                           makeVehSearch(left, right, aInputData),
                           limit(Constant.VEHICLE_PER_KEY,skip));
+														
+			pre_veh_recs0 := if(~isCNSMR, pre_veh_recs0_info);
 
     pre_veh_recs1 := pre_veh_recs0(ut.PermissionTools.dppa.state_ok(state_origin,dppa_purpose_x,,source_code) or
 																	 (source_code in MDR.sourceTools.set_infutor_all_veh and ut.PermissionTools.dppa.ok(dppa_purpose_x)));
 		
-    r_j := JOIN(in_veh_keys, keyVParty,
+    r_j_vehicleparty := JOIN(in_veh_keys, keyVParty,
                 KEYED(LEFT.Vehicle_key = RIGHT.Vehicle_key) AND
                 KEYED(LEFT.Iteration_key = RIGHT.Iteration_key) AND
                 KEYED(LEFT.Sequence_key = RIGHT.Sequence_key) and
@@ -786,6 +797,9 @@ export 	lic_plate_filter_New(dataset(Layouts.lic_plate_key_payload_fields_New) p
                 get_parties_search (LEFT, RIGHT, aInputData, penalize_by_party),
                 KEEP(Constant.PARTIES_PER_VEHICLE),
 								LIMIT(0));
+    					
+  
+ 	 r_j := if(~isCNSMR, r_j_vehicleparty);
 
     pre_party_recs := UNGROUP(r_j(party_penalty <= penalty_threshold));
 

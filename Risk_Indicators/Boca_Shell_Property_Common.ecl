@@ -1,4 +1,5 @@
-﻿IMPORT Data_services, Doxie, LN_PropertyV2, LN_PropertyV2_Services, RiskWise, Suppress, profilebooster;
+﻿IMPORT _Control, Data_services, Doxie, LN_PropertyV2, LN_PropertyV2_Services, RiskWise, Suppress, profilebooster;
+onThor := _Control.Environment.OnThor;
 
 EXPORT Boca_Shell_Property_Common(GROUPED DATASET(Layout_PropertyRecord) p_address,
                                   GROUPED DATASET(Layout_Boca_Shell_ids) ids_only, 
@@ -7,8 +8,7 @@ EXPORT Boca_Shell_Property_Common(GROUPED DATASET(Layout_PropertyRecord) p_addre
 																  BOOLEAN is_FCRA = FALSE,
 																	LN_PropertyV2_Services.interfaces.Iinput_report input_mod,
 																  BOOLEAN ViewDebugs = FALSE,
-																	BOOLEAN is_from_PB = FALSE,
-																	boolean onThor = false) := FUNCTION
+																	BOOLEAN is_from_PB = FALSE) := FUNCTION
 
 	// --------------------[ CONSTANTS ]-------------------
 
@@ -372,8 +372,12 @@ end;
 			local
 		);
 
-																		// add group by seq to make both branches have same grouping
-ids_plus_fares_by_did := if(onThor, group(ids_plus_fares_by_did_thor, seq), ids_plus_fares_by_did_roxie);
+#IF(onThor)
+	ids_plus_fares_by_did := group(ids_plus_fares_by_did_thor, seq); // add group by seq to make both branches have same grouping
+#ELSE
+	ids_plus_fares_by_did := ids_plus_fares_by_did_roxie;
+#END
+
 	// 1.b. Now get ln_fares_ids by Address. Note that if the applicant lived in an apartment,
 	// this join won't return any records for it, unless it was a condo.
 	p_addr_roxie := 
@@ -395,8 +399,11 @@ ids_plus_fares_by_did := if(onThor, group(ids_plus_fares_by_did_thor, seq), ids_
 			did, prim_range, prim_name, sec_range, city_name, st, zip5, local
 		);
 		
-	p_addr := if(onThor, group(p_addr_thor, seq), p_addr_roxie);
-	
+	#IF(onThor)
+		p_addr := group(p_addr_thor, seq);
+	#ELSE
+		p_addr := p_addr_roxie;
+	#END
 
 kaf := LN_PropertyV2.key_addr_fid(is_FCRA);
 
@@ -449,8 +456,12 @@ end;
 			local
 		);
 		
-		ids_plus_fares_by_address := if(onThor, group(ids_plus_fares_by_address_thor, seq), ids_plus_fares_by_address_roxie);
-		
+	#IF(onThor)
+		ids_plus_fares_by_address := group(ids_plus_fares_by_address_thor, seq);
+	#ELSE
+		ids_plus_fares_by_address := ids_plus_fares_by_address_roxie;
+	#END
+  
 	ids_plus_fares_temp := ungroup(ids_plus_fares_by_did + ids_plus_fares_by_address);
 	
 	ids_plus_fares_roxie := 
@@ -481,8 +492,11 @@ end;
 				inp_did, ln_fares_id, -(UNSIGNED)(dataSrce = SEARCHED_BY_LEXID), local),
 				inp_did, ln_fares_id, local);
 	
-	ids_plus_fares := if(onThor, ids_plus_fares_thor,  ids_plus_fares_roxie);  // don't perform the persist if this code is being run on roxie
-	
+	#IF(onThor)
+		ids_plus_fares := ids_plus_fares_thor;
+	#ELSE
+		ids_plus_fares := ids_plus_fares_roxie;
+	#END
 
 	// output(ids_plus_fares_by_address,all, named('ids_plus_fares_by_address'));
 	// output(ids_plus_fares_by_did_ddpd,all, named('ids_plus_fares_by_did_ddpd'));
@@ -513,8 +527,7 @@ end;
 			inTrimBySortBy    := FALSE,
 			nonSS             := suppress.constants.NonSubjectSuppression.doNothing,
 			isFCRA            := is_FCRA,
-			in_mod            := input_mod,
-			onthor						:= onThor);
+			in_mod            := input_mod);
 
 	// 2.b. Convert single-record child datasets into datarows for rolling up later.
 	// (You can't rollup a child dataset within a dataset.)
@@ -608,8 +621,12 @@ end;
 			seq, inp_did, ln_fares_id, -(UNSIGNED)(dataSrce = SEARCHED_BY_LEXID)) 
 			;
 	
-	ds_property_recs_filt_a := if(onThor, ds_property_recs_filt_a_local, ds_property_recs_filt_a_roxie);
-		
+	#IF(onThor)
+		ds_property_recs_filt_a := ds_property_recs_filt_a_local;
+	#ELSE
+		ds_property_recs_filt_a := ds_property_recs_filt_a_roxie;
+	#END
+  
 	// 4.b. Filter out FARES records if indicated.
 	ds_property_recs_filt_b := ds_property_recs_filt_a(vendor_source_flag = FIDELITY OR NOT filter_out_fares);
 	
@@ -671,8 +688,12 @@ end;
 			seq, inp_did, unique_prop_id, local
 		);
 	
-	tbl_naprop_values_local := if(onThor, tbl_naprop_values_local_thor, tbl_naprop_values_local_roxie);
-	
+	#IF(onThor)
+		tbl_naprop_values_local := tbl_naprop_values_local_thor;
+	#ELSE
+		tbl_naprop_values_local := tbl_naprop_values_local_roxie;
+	#END
+  
 	tbl_naprop_values := 
 		TABLE( 
 			tbl_naprop_values_local, 

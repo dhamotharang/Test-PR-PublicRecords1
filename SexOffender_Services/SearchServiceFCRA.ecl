@@ -131,7 +131,7 @@ export SearchServiceFCRA := macro
   end;
   tempresults := SexOffender_Services.Search_Records.fcra_val(tempmod);
 
-	input_consumer := FFD.MAC.PrepareConsumerRecord(rdid, false, search_by);
+	input_consumer := FFD.MAC.PrepareConsumerRecord(rdid, true, search_by);
 
   // Determine center point of a radius search (when applicable)
   lv := AutoStandardI.InterfaceTranslator.location_value.val(project(tempmod,AutoStandardI.InterfaceTranslator.location_value.params));

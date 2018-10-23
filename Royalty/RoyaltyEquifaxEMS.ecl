@@ -1,6 +1,6 @@
 //Returns a dataset of royalties for the Equifax EMS gateway.
 
-IMPORT IESP, FCRAGateway_Services, STD, MDR;
+IMPORT FCRAGateway_Services;
 EXPORT RoyaltyEquifaxEMS := MODULE
 	EXPORT GetRoyalties(DATASET(FCRAGateway_Services.Layouts.equifax_ems.gateway_out) ds_gw_response) := FUNCTION
 		//Any response that is not an HTTP error status will be charged, even if there is no match found.

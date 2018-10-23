@@ -1,4 +1,4 @@
-/*2016-02-17T22:44:43Z (brandon helm)
+﻿/*2016-02-17T22:44:43Z (brandon helm)
 Modified to accept AJ's input.
 */
 IMPORT ut, RiskWise, RiskWiseFCRA, Risk_Indicators, RiskView;
@@ -1867,7 +1867,7 @@ export RVG1601_1_0 (grouped dataset(risk_indicators.Layout_Boca_Shell) clam,
 	
 	iv_rv5_deceased := (integer)rc_decsflag = 1 or (integer)rc_ssndod != 0 or (integer)indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'DS', ',') > 0 or (integer)indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'DE', ',') > 0;
 	// cast all instances above as integers
-	iv_rv5_unscorable := if(NAS_Summary <= 4 and NAP_Summary <= 4 and Infutor_NAP <= 4 and Add_Input_NAProp <= 3 and (integer)TrueDID = 0, '1', '0');
+	iv_rv5_unscorable := if(riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid), '1', '0');
 	// cast TRUEDID as integer
 	base := 700;
 	

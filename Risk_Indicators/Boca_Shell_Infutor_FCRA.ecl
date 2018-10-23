@@ -1,6 +1,7 @@
-import InfutorCID, ut, riskwise, FCRA;
+﻿import _Control, InfutorCID, ut, riskwise, FCRA;
+onThor := _Control.Environment.OnThor;
 
-export Boca_Shell_Infutor_FCRA(GROUPED DATASET(layout_bocashell_neutral) ids_wide, boolean onThor=false) := FUNCTION
+export Boca_Shell_Infutor_FCRA(GROUPED DATASET(layout_bocashell_neutral) ids_wide) := FUNCTION
 
 Layout_Infutor := RECORD
 	unsigned4 seq;
@@ -38,7 +39,11 @@ infutor_correct_thor := join(ids_wide, pull(FCRA.Key_Override_Infutor_FFID),
 												(right.flag_file_id in left.infutor_correct_ffid),
 												infutor_corr(left, right),left outer, local, all);
 
-infutor_correct := if(onThor, group(infutor_correct_thor, seq), infutor_correct_roxie);
+#IF(onThor)
+	infutor_correct := group(infutor_correct_thor, seq);
+#ELSE
+	infutor_correct := infutor_correct_roxie;
+#END
 
 Layout_Infutor getInfutor(ids_wide le, InfutorCID.Key_Infutor_DID_FCRA ri) := transform	
 	firstscore := FnameScore(le.shell_input.fname, ri.fname);
@@ -76,7 +81,11 @@ wInfutor_thor := join(distribute(ids_wide, hash64(did)),
 									trim(right.persistent_record_id) not in	left.infutor_correct_record_id,  // new way, using persistent_record_id
 									getInfutor(left,right), left outer, atmost(left.did=right.did, riskwise.max_atmost), KEEP(100), LOCAL);
 
-wInfutor := if(onThor, wInfutor_thor, ungroup(wInfutor_roxie));
+#IF(onThor)
+	wInfutor := wInfutor_thor;
+#ELSE
+	wInfutor := ungroup(wInfutor_roxie);
+#END
 
 combined := ungroup(infutor_correct + wInfutor);
 combo := group( sort ( combined, seq), seq);									

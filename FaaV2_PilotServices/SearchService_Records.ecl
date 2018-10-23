@@ -40,7 +40,8 @@ export SearchService_Records := module
 
     ds_flags := if(isFCRA, FFD.GetFlagFile (ds_best, pc_recs));
     
-    suppress_results_due_alerts := isFCRA and FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_mod.FCRAPurpose, in_mod.FFDOptionsMask)[1].suppress_records;
+    alert_indicators := FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_mod.FCRAPurpose, in_mod.FFDOptionsMask)[1];
+    suppress_results_due_alerts := isFCRA and alert_indicators.suppress_records;
     
     Suppress.MAC_Suppress(ids,ids_tmp,in_mod.applicationtype,Suppress.Constants.LinkTypes.DID,did);
     
@@ -49,7 +50,7 @@ export SearchService_Records := module
     recs := faav2_pilotservices.raw.joinByAirmenId(ids_tmp,in_mod.applicationtype,isFCRA, ds_flags, slim_pc_recs, in_mod.FFDOptionsMask);
     
     statement_output := if(IsFCRA and ShowConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
-    consumer_alerts := if(isFCRA, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, suppress_results_due_alerts), FFD.Constants.BlankConsumerAlerts);
+    consumer_alerts := if(isFCRA, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, alert_indicators, in_mod.FFDOptionsMask), FFD.Constants.BlankConsumerAlerts);
     
     // Calculate the penalty on the records
     recs_plus_pen := project(recs,transform(FaaV2_PilotServices.Layouts.Pilotrawrec,

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="DLSearchRequest">
   <part name="DriversLicense" type="xsd:string"/>
   <part name="SSN" type="xsd:string"/>
@@ -45,6 +45,7 @@
 /*--INFO-- This service pulls from the DL file.*/
   
 export dl_search := MACRO
+#CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 #STORED('ScoreThreshold',10);
 
 boolean random_value := false : STORED('Randomize');

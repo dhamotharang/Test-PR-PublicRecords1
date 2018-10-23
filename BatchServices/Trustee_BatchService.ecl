@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Trustee_BatchService">
 	<part name="batch_in"             type="tns:XmlDataSet" cols="70" rows="25"/>		
 	<part name="Chapter_Includes"	  type="xsd:string"/>
@@ -11,6 +11,7 @@ IMPORT BatchServices;
 
 export Trustee_BatchService() := 
 	MACRO
+	 #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 		#OPTION('optimizeProjects', TRUE);
 		#constant('isFCRA', false);
 

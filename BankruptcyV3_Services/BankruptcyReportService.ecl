@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BankruptcyReportService">
   <part name="DID" 					type="xsd:string"/>
   <part name="BDID" 				type="xsd:string"/>
@@ -17,7 +17,7 @@ import doxie, WSInput;
 export BankruptcyReportService(
 	) :=
 		macro
-		
+		#CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 		//The following macro defines the field sequence on WsECL page of query.
 		WSInput.MAC_BankruptcyV3_Services_BankruptcyReportService();  
 		

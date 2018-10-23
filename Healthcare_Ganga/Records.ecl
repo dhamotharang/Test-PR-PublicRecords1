@@ -25,13 +25,13 @@ EXPORT Records := Module
 																					self.st := left.State;
 																					self.z5 := left.Zip5;
 																					self.zip4 := left.Zip4;
-																					self.comp_name:= STD.Str.ToUpperCase(left.BusinessName);
+																					self.comp_name:= map(left.LegalName <> '' => STD.Str.ToUpperCase(left.LegalName),
+																															STD.Str.ToUpperCase(left.BusinessName));
 																					self.TaxID := left.taxid;
 																					self.IsIndividualSearch := left.EntityType in [Healthcare_Ganga.Constants.HCP,
 																																																	Healthcare_Ganga.Constants.Principles];
 																					self.IsBusinessSearch := left.EntityType in [Healthcare_Ganga.Constants.HCO,
 																																																Healthcare_Ganga.Constants.Orgs];
-
 																					self := left;
 																					self := [];
 																					));
@@ -41,18 +41,24 @@ EXPORT Records := Module
 	//Record with 'P' entity type
 	byPrinciples (DATASET(Healthcare_Ganga.Layouts.IdentityInput) inRecs, dataset(Healthcare_Header_Services.Layouts.common_runtime_config) cfg) := FUNCTION
 		refmt := reformatInput(inRecs);
-		getRaw := Healthcare_Header_Services.Datasource_Boca_Header.get_boca_header_entity(refmt);
+		getBocaHeader := Healthcare_Header_Services.Datasource_Boca_Header.get_boca_header_entity(refmt);
+		getRaw := join(refmt, getBocaHeader, left.acctno=right.acctno, transform(recordof(getBocaHeader), 
+																																							self.acctno := left.acctno; 
+																																							self:=right; self:=left;), left outer);
 		getRawAppend := Healthcare_Header_Services.Records.getRecordsAppend(refmt,getRaw,cfg);
-		final := Join(getRawAppend,inrecs,left.acctno=right.acctno,Healthcare_Ganga.Transforms.xformCommon(left,right),full outer);
+		final := Join(dedup(sort(getRawAppend, acctno, record_penalty, -lnpid), acctno),inrecs,left.acctno=right.acctno,Healthcare_Ganga.Transforms.xformCommon(left,right));				
 		return final;
 	END;
 	
 	//Record with 'I' entity type
 	byHCP (DATASET(Healthcare_Ganga.Layouts.IdentityInput) inRecs, dataset(Healthcare_Header_Services.Layouts.common_runtime_config) cfg) := FUNCTION
 		refmt := reformatInput(inRecs);
-		getRaw := Healthcare_Header_Services.Records.getRecordsIndividual(refmt,cfg);
+		getRecordsIndividual := Healthcare_Header_Services.Records.getRecordsIndividual(refmt,cfg);
+		getRaw := join(refmt, getRecordsIndividual, left.acctno=right.acctno, transform(recordof(getRecordsIndividual), 
+																																							self.acctno := left.acctno; 
+																																							self:=right; self:=left;), left outer);
 		getRawAppend := Healthcare_Header_Services.Records.getRecordsAppend(refmt,getRaw,cfg);
-		final := Join(getRawAppend,inrecs,left.acctno=right.acctno,Healthcare_Ganga.Transforms.xformCommon(left,right),full outer);
+		final := Join(dedup(sort(getRawAppend, acctno, record_penalty, -lnpid), acctno),inrecs,left.acctno=right.acctno,Healthcare_Ganga.Transforms.xformCommon(left,right));		
 		return final;
 	END;
 	
@@ -134,16 +140,22 @@ EXPORT Records := Module
 	//Records with 'O' entity type
 	byHCO (DATASET(Healthcare_Ganga.Layouts.IdentityInput) inRecs, dataset(Healthcare_Header_Services.Layouts.common_runtime_config) cfg) := FUNCTION
 		refmt := reformatInput(inRecs);
-		getRaw := Healthcare_Header_Services.Records.getRecordsBusiness(refmt,cfg);
+		getRecordsBusiness := Healthcare_Header_Services.Records.getRecordsBusiness(refmt,cfg);
+		getRaw := join(refmt, getRecordsBusiness, left.acctno=right.acctno, transform(recordof(getRecordsBusiness), 
+																																									self.acctno := left.acctno; 
+																																									self:=right; self:=left;), left outer);
 		getRawAppend := Project(getRaw,transform(Healthcare_Header_Services.Layouts.CombinedHeaderResultsDoxieLayout, self:=left));
-		final := Join(getRawAppend,inrecs,left.acctno=right.acctno,Healthcare_Ganga.Transforms.xformCommon(left,right),full outer);
+		final := Join(dedup(sort(getRawAppend, acctno, record_penalty, -lnpid), acctno),inrecs,left.acctno=right.acctno,Healthcare_Ganga.Transforms.xformCommon(left,right));	
 		return final;
 	END;
 	
 	//Records with 'M' entity type
 	byOrgs (DATASET(Healthcare_Ganga.Layouts.IdentityInput) inRecs,dataset(Healthcare_Header_Services.Layouts.common_runtime_config) cfg) := FUNCTION
 		refmt := reformatInput(inRecs);
-		getRaw := Healthcare_Header_Services.Datasource_Boca_Bus_Header.get_boca_bus_header_entity(refmt);
+		getBocaHeader := Healthcare_Header_Services.Datasource_Boca_Bus_Header.get_boca_bus_header_entity(refmt);
+		getRaw := join(refmt, getBocaHeader, left.acctno=right.acctno, transform(recordof(getBocaHeader), 
+																																							self.acctno := left.acctno; 
+																																							self:=right; self:=left;), left outer);
 		getRawPenalty := sort(Project(getRaw,transform(recordof(getRaw),
 																											np:=min(left.names,namepenalty);
 																											ap:=min(left.addresses,addrpenalty);
@@ -165,10 +177,8 @@ EXPORT Records := Module
 																					self.SicDesc := '';
 																					self.lnpid := left.lnpid;
 																					self := []));
-		
 		filldata := fillGap(gapdata);
-																												
-		joinData := dedup(sort(join(getRawPenalty,filldata, left.acctno = right.acctno and left.lnpid = right.lnpid, 
+		joinData := dedup(sort(join(dedup(sort(getRawPenalty, acctno,record_penalty,-lnpid),acctno),filldata, left.acctno = right.acctno and left.lnpid = right.lnpid, 
 										transform(Healthcare_Ganga.Layouts.IdentityOutput,
 																names:= sort(left.Names,namepenalty,-nameSeq);
 																addr := sort(left.Addresses,addrpenalty, -last_seen);
@@ -203,11 +213,11 @@ EXPORT Records := Module
 																self.DoingBusinessAs	:= if(left.NPIRaw[1].EntityInformation.CompanyNameAKA <> '',left.NPIRaw[1].EntityInformation.CompanyNameAKA,lbn);
 																self.FaxNumber := addr(FaxNumber<>'')[1].FaxNumber;
 																self:=right;),left outer,keep(Healthcare_Header_Services.Constants.BUS_NAME_BIPMATCH_THRESHOLD), limit(0)),record),record);
-		final := sort(dedup(sort(join(joinData, inrecs, left.acctno = right.acctno, 
+		final := sort(dedup(sort(join(joinData, inrecs, left.acctno = right.acctno,
 										transform(Healthcare_Ganga.Layouts.IdentityOutput,
 															self.EntityType := right.EntityType;
 															self.RecordIdentifier := right.RecordIdentifier;
-															self := left;),keep(Healthcare_Header_Services.Constants.BUS_NAME_BIPMATCH_THRESHOLD), limit(0)),record),record),acctno,-lnpid);
+															self := left;), keep(Healthcare_Header_Services.Constants.BUS_NAME_BIPMATCH_THRESHOLD), limit(0)),record),record),acctno,-lnpid);		
 		return final;
 	END;
 	Export getAllRecords (DATASET(Healthcare_Ganga.Layouts.IdentityInput) inRecs, dataset(Healthcare_Header_Services.Layouts.common_runtime_config) cfg) := FUNCTION
@@ -229,20 +239,29 @@ EXPORT Records := Module
 		ProcessOrgs := byOrgs(doOrgs,cfg);
 		
 		GoodRecords := ProcessPrinciple+ProcessHCP+ProcessHCO+ProcessOrgs;
-		
 		//Process input warnings
 		getInputWarnings := Healthcare_Ganga.Functions.getInputWarnings(doPrinciple+doHCP+doHCO+doOrgs);
 		getInvalidInputWarnings := Healthcare_Ganga.Functions.getInputWarnings(missingPrinciple+missingHCP+missingHCO+missingOrgs+missingType);
 		//Process output warnings
 		getOutputWarnings := Healthcare_Ganga.Functions.getOutputWarnings(GoodRecords);
+		
 		GoodResults := join(getInputWarnings,getOutputWarnings,left.acctno=right.acctno,
 																								transform(Healthcare_Ganga.Layouts.IdentityOutput,
 																									self.acctno := left.acctno;
-																									self.Warnings := dedup(sort(left.Warnings+right.Warnings,record),record);
+																									self.Warnings := dedup(sort(left.Warnings + if(exists(right.Warnings) OR 
+																																																	right.EntityType in [Healthcare_Ganga.Constants.Principles,Healthcare_Ganga.Constants.HCP,Healthcare_Ganga.Constants.Orgs,Healthcare_Ganga.Constants.HCO], 
+																																																	right.Warnings, dataset([{Healthcare_Ganga.Constants.Warnings.NoHit,Healthcare_Ganga.Constants.LexisNexis}], Healthcare_Ganga.Layouts.WarningsOutput)),record),record);
 																									self.ResponseDateTime := left.ResponseDateTime;
+																									self.EntityType := left.EntityType;
+																									self.RecordIdentifier := left.RecordIdentifier;
 																									self := right;),left outer,keep(Healthcare_Header_Services.Constants.MAX_SEARCH_RECS),limit(0));
-		
-		Results := sort(GoodResults+getInvalidInputWarnings, acctno);
+		FinalGoodResults := sort(GoodResults+getInvalidInputWarnings, acctno);
+		CatchNoHits := join(inRecs, FinalGoodResults, left.acctno = right.acctno, transform(left), left only);
+		FormatNoHits := project(CatchNoHits, transform(Healthcare_Ganga.Layouts.IdentityOutput,
+																										self.acctno := left.acctno;
+																										self.Warnings := dataset([{Healthcare_Ganga.Constants.Warnings.NoHit,Healthcare_Ganga.Constants.LexisNexis}], Healthcare_Ganga.Layouts.WarningsOutput);
+																										self := left));
+		Results := sort(FinalGoodResults + FormatNoHits, acctno);
 		return Results;
 	END;
 END;

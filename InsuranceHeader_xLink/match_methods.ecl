@@ -1,4 +1,4 @@
-IMPORT SALT37,std;
+﻿IMPORT SALT37,std;
 EXPORT match_methods(DATASET(layout_InsuranceHeader) ih) := MODULE
  
 SHARED h := match_candidates(ih).candidates;
@@ -10,8 +10,8 @@ EXPORT match_SNAME(TYPEOF(h.SNAME) L, TYPEOF(h.SNAME) R, BOOLEAN RequiredField =
 EXPORT match_FNAME(TYPEOF(h.FNAME) L, TYPEOF(h.FNAME) R, UNSIGNED1 LL = 0, UNSIGNED1 RL = 0, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
    MAP(L = R => SALT37.MatchCode.ExactMatch,
 	LENGTH(TRIM(L))>0 and L = R[1..LENGTH(TRIM(L))] => SALT37.MatchCode.InitialMatch,
-	LENGTH(TRIM(R))>0 and R = L[1..LENGTH(TRIM(R))] => SALT37.MatchCode.InitialMatch, 
-		Config.WithinEditN(L,LL,R,RL,Config.FNAME_LENGTH_EDIT2, 0) => SALT37.MatchCode.EditDistanceMatch, /*HACK*/
+	LENGTH(TRIM(R))>0 and R = L[1..LENGTH(TRIM(R))] => SALT37.MatchCode.InitialMatch,
+	Config.WithinEditN(L,LL,R,RL,1,Config.FNAME_LENGTH_EDIT2, 0) => SALT37.MatchCode.EditDistanceMatch, /*HACK17b*/
 	metaphonelib.dmetaphone1(L) = metaphonelib.dmetaphone1(R) => SALT37.MatchCode.PhoneticMatch,
 	Config.WildMatch(L,R,false) => SALT37.MatchCode.WildMatch,
     fn_PreferredName(L) =  fn_PreferredName(R) => SALT37.MatchCode.CustomFuzzyMatch, // Compare fn_PreferredName values
@@ -28,9 +28,9 @@ EXPORT match_MNAME(TYPEOF(h.MNAME) L, TYPEOF(h.MNAME) R, UNSIGNED1 LL = 0, UNSIG
 );
 EXPORT match_LNAME(TYPEOF(h.LNAME) L, TYPEOF(h.LNAME) R, UNSIGNED1 LL = 0, UNSIGNED1 RL = 0, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
    MAP(L = R => SALT37.MatchCode.ExactMatch,
-    SALT37.HyphenMatch(L,R,1)<=2 =>SALT37.MatchCode.HyphenMatch,
-		Config.WithinEditN(L,LL,R,RL,Config.LNAME_LENGTH_EDIT2,0) => SALT37.MatchCode.EditDistanceMatch, /*HACK*/
-	metaphonelib.dmetaphone1(L) = metaphonelib.dmetaphone1(R) => SALT37.MatchCode.PhoneticMatch,
+     metaphonelib.dmetaphone1(L) = metaphonelib.dmetaphone1(R) => SALT37.MatchCode.PhoneticMatch,
+   Config.WithinEditN(L,LL,R,RL,1, Config.LNAME_LENGTH_EDIT2) => SALT37.MatchCode.EditDistanceMatch, /*HACK17a*/
+  SALT37.HyphenMatch(L,R,1)<=2 =>SALT37.MatchCode.HyphenMatch,
 	Config.WildMatch(L,R,false) => SALT37.MatchCode.WildMatch,
     SALT37.MatchCode.NoMatch),
         MAP(L = R => SALT37.MatchCode.ExactMatch, SALT37.MatchCode.NoMatch)
@@ -71,6 +71,11 @@ EXPORT match_ST(TYPEOF(h.ST) L, TYPEOF(h.ST) R, BOOLEAN RequiredField = FALSE) :
    MAP(L = R => SALT37.MatchCode.ExactMatch,
     SALT37.MatchCode.NoMatch),
         MAP(L = R => SALT37.MatchCode.ExactMatch, SALT37.MatchCode.NoMatch)
+);
+EXPORT match_ZIP_el(TYPEOF(h.ZIP) L, DATASET(InsuranceHeader_xLink.process_xIDL_layouts().layout_ZIP_cases) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
+   MAP(EXISTS(R(L=ZIP)) => SALT37.MatchCode.ExactMatch,
+    SALT37.MatchCode.NoMatch),
+        MAP(EXISTS(R(L=ZIP)) => SALT37.MatchCode.ExactMatch, SALT37.MatchCode.NoMatch)
 );
 EXPORT match_ZIP(TYPEOF(h.ZIP) L, TYPEOF(h.ZIP) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
    MAP(L = R => SALT37.MatchCode.ExactMatch,
@@ -119,8 +124,9 @@ EXPORT match_DL_STATE(TYPEOF(h.DL_STATE) L, TYPEOF(h.DL_STATE) R, BOOLEAN Requir
     SALT37.MatchCode.NoMatch),
         MAP(L = R => SALT37.MatchCode.ExactMatch, SALT37.MatchCode.NoMatch)
 );
-EXPORT match_DL_NBR(TYPEOF(h.DL_NBR) L, TYPEOF(h.DL_NBR) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
+EXPORT match_DL_NBR(TYPEOF(h.DL_NBR) L, TYPEOF(h.DL_NBR) R, UNSIGNED1 LL = 0, UNSIGNED1 RL = 0, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
    MAP(L = R => SALT37.MatchCode.ExactMatch,
+	Config.WithinEditN(L,LL,R,RL,1, 0) => SALT37.MatchCode.EditDistanceMatch,
     SALT37.MatchCode.NoMatch),
         MAP(L = R => SALT37.MatchCode.ExactMatch, SALT37.MatchCode.NoMatch)
 );

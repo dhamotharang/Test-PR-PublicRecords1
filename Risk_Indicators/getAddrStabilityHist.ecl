@@ -1,14 +1,16 @@
-/* 
+﻿/* 
  * Calculates the Address Stability 
  * A majority of this code has been adapted from Risk_Indicators.ADL_Risk_Table
  */
 
-IMPORT Risk_Indicators, ut, STD;
+IMPORT _Control, Risk_Indicators, ut, STD;
+onThor := _Control.Environment.OnThor;
 
-EXPORT getAddrStabilityHist(DATASET(risk_indicators.layouts.layout_header_plus_hist_date) input, boolean onThor=false) := FUNCTION
+EXPORT getAddrStabilityHist(DATASET(risk_indicators.layouts.layout_header_plus_hist_date) input) := FUNCTION
 	
 	mobi := RECORD
 		integer2 currentYear;
+    input.seq;
 		input.did;
 		input.dt_first_seen;
 		input.dt_last_seen;
@@ -31,7 +33,7 @@ EXPORT getAddrStabilityHist(DATASET(risk_indicators.layouts.layout_header_plus_h
 
 	hdrFiltered := stab_hdr (dt_first_seen != 0, dt_last_seen != 0, prim_name[1..6] != 'PO BOX');
 	
-  hdr_sorted := SORT(hdrFiltered, did, prim_range, prim_name, zip);
+  hdr_sorted := SORT(hdrFiltered, seq, did, prim_range, prim_name, zip);
 	
   mobi currRoll(mobi le, mobi ri) := TRANSFORM
     first_seen := MIN(le.dt_first_seen, ri.dt_first_seen);
@@ -43,7 +45,7 @@ EXPORT getAddrStabilityHist(DATASET(risk_indicators.layouts.layout_header_plus_h
     SELF := le;
   END;
 
-  hdr_currRolled := ROLLUP(hdr_sorted, currRoll(LEFT,RIGHT), did, prim_range, prim_name, zip);
+  hdr_currRolled := ROLLUP(hdr_sorted, currRoll(LEFT,RIGHT), seq, did, prim_range, prim_name, zip);
 
   // Handle records that aren't duplicates (didn't go through the rollup)
   mobi currProject(mobi le) := TRANSFORM
@@ -56,10 +58,15 @@ EXPORT getAddrStabilityHist(DATASET(risk_indicators.layouts.layout_header_plus_h
   hdr_current := hdr_currRolled(curr_years != -1) + hdr_currProjected;
 
 	// Rollup into records for a particular DID
-  hdr_currSorted_roxie := SORT(hdr_current, did, -dt_first_seen, -dt_last_seen);
-	hdr_currSorted_thor := SORT(distribute(hdr_current, hash64(did)), did, -dt_first_seen, -dt_last_seen, LOCAL);
-	hdr_currSorted := if(onThor, hdr_currSorted_thor, hdr_currSorted_roxie);
-	
+  hdr_currSorted_roxie := SORT(hdr_current, seq, did, -dt_first_seen, -dt_last_seen);
+	hdr_currSorted_thor := SORT(distribute(hdr_current, hash64(seq, did)), seq, did, -dt_first_seen, -dt_last_seen, LOCAL);
+
+	#IF(onThor)
+		hdr_currSorted := hdr_currSorted_thor;
+	#ELSE
+		hdr_currSorted := hdr_currSorted_roxie;
+	#END
+  
   mobi everRoll(mobi le, mobi ri) := TRANSFORM		
     first_iteration := le.tot_stay_last2 = -1;
 
@@ -83,7 +90,7 @@ EXPORT getAddrStabilityHist(DATASET(risk_indicators.layouts.layout_header_plus_h
     SELF := le;
   END;
 		
-  hdr_everRolled := ROLLUP(hdr_currSorted, everRoll(LEFT,RIGHT), did);
+  hdr_everRolled := ROLLUP(hdr_currSorted, everRoll(LEFT,RIGHT), seq, did);
 
   // Handle records that aren't duplicates (Didn't go through the rollup)
   mobi everProject(mobi le) := TRANSFORM
@@ -102,6 +109,7 @@ EXPORT getAddrStabilityHist(DATASET(risk_indicators.layouts.layout_header_plus_h
 
   // Main code
   resultrec := RECORD
+    UNSIGNED4 seq;
     UNSIGNED6 did;
     INTEGER stability;
   END;
@@ -142,7 +150,7 @@ EXPORT getAddrStabilityHist(DATASET(risk_indicators.layouts.layout_header_plus_h
 
   hdr_recent := hdr_ever((currentYear - ((INTEGER)last_ever/100) <= 1 ));
 
-  stability_flags := DEDUP(SORT(PROJECT(hdr_recent, calcStability(LEFT)), DID, stability), DID, stability);
+  stability_flags := DEDUP(SORT(PROJECT(hdr_recent, calcStability(LEFT)), seq, DID, stability), seq, DID, stability);
 
   RETURN(stability_flags);
 

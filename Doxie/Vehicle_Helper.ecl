@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="VehicleHelperRequest">
  <part name="SSN" type="xsd:string"/>
   <part name="FirstName" type="xsd:string"/>
@@ -43,7 +43,7 @@
 /*--INFO-- This service searches the vehicle file.*/
 
 export Vehicle_Helper := MACRO
-
+#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 doxie.MAC_Header_Field_Declare()
 qstring25 vid_value := '' : STORED('VID');
 

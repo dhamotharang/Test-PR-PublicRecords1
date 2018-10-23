@@ -195,7 +195,8 @@ export Search_Service := MACRO
 	BOOLEAN TestDataEnabled := users.TestDataEnabled;
 	STRING32 TestDataTableName := StringLib.StringToUpperCase(TRIM(users.TestDataTableName, LEFT, RIGHT));
 	
-  STRING20 EndUserCompanyName 		:= users.EndUser.CompanyName;
+  //Used only by MLA
+  STRING20 EndUserCompanyName 		:= context.MLAGatewayInfo.EndUserCompanyName;
   STRING20 CustomerNumber					:= context.MLAGatewayInfo.CustomerNumber ;
   STRING20 SecurityCode 					:= context.MLAGatewayInfo.SecurityCode  ;
 	
@@ -1036,6 +1037,15 @@ input_ok := map(((
 				self.Result.LiensJudgmentsReports.Judgments := LnJ_jdgmts;
 				self.Result.LiensJudgmentsReports.LnJAttributes := LnJReport; 
 
+        
+        // for inquiry logging, populate the consumer section with the DID and input fields
+        // don't log the lexid if the person got a noscore
+        self.Result.Consumer.LexID := if(riskview.constants.noScoreAlert in [left.Alert1,left.Alert2,left.Alert3,left.Alert4,left.Alert5,left.Alert6,left.Alert7,left.Alert8,left.Alert9,left.Alert10], '', left.LexID);
+        searchDOB := iesp.ECL2ESP.t_DateToString8(search.DOB);
+		    SELF.Result.Consumer.Inquiry.DOB := IF((UNSIGNED)searchDOB > 0, searchDOB, '');
+        self.Result.Consumer.Inquiry.Phone10 := search.HomePhone;
+        self.Result.Consumer.Inquiry := search;      
+
 				//For MLA, we need to populate the exception area of the result if there was an error flagged in the MLA process.  The
 				//Exception_code field will contain the error code...use it to look up the description and format the exception record.
 				ds_excep_blank := DATASET([], iesp.share.t_WsException); 
@@ -1121,17 +1131,17 @@ Deltabase_Logging_prep := project(riskview_xml, transform(Risk_Reporting.Layouts
                                                          self.i_work_phone := WorkPhone,
 																												 model_count := count(option.IncludeModels.Names);
 																												 self.i_model_name_1 := option.IncludeModels.Names[1].value,
-																												 //Check to see if there was more than one model requested
+																												 //Check to see if there were models requested
 																												 extra_score := model_count > 1;
 																												 self.i_model_name_2 := IF(extra_score, option.IncludeModels.Names[2].value, ''),
-																												 self.o_score_1    := (Integer)left.Result.Models[1].Scores[1].Value,
+																												 self.o_score_1    := IF(model_count != 0, (String)left.Result.Models[1].Scores[1].Value, ''),
 																												 self.o_reason_1_1 := left.Result.Models[1].Scores[1].ScoreReasons[1].ReasonCode,
 																												 self.o_reason_1_2 := left.Result.Models[1].Scores[1].ScoreReasons[2].ReasonCode,
 																												 self.o_reason_1_3 := left.Result.Models[1].Scores[1].ScoreReasons[3].ReasonCode,
 																												 self.o_reason_1_4 := left.Result.Models[1].Scores[1].ScoreReasons[4].ReasonCode,
 																												 self.o_reason_1_5 := left.Result.Models[1].Scores[1].ScoreReasons[5].ReasonCode,
 																												 self.o_reason_1_6 := left.Result.Models[1].Scores[1].ScoreReasons[6].ReasonCode,
-																												 self.o_score_2    := IF(extra_score, (Integer)left.Result.Models[2].Scores[1].Value, 0),
+																												 self.o_score_2    := IF(extra_score, (String)left.Result.Models[2].Scores[1].Value, ''),
 																												 self.o_reason_2_1 := IF(extra_score, left.Result.Models[2].Scores[1].ScoreReasons[1].ReasonCode, ''),
 																												 self.o_reason_2_2 := IF(extra_score, left.Result.Models[2].Scores[1].ScoreReasons[2].ReasonCode, ''),
 																												 self.o_reason_2_3 := IF(extra_score, left.Result.Models[2].Scores[1].ScoreReasons[3].ReasonCode, ''),

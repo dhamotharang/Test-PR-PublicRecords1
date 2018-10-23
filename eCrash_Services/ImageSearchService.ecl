@@ -32,7 +32,7 @@ EXPORT ImageSearchService() := FUNCTION
   END;
 	
 	DeltaBaseService := eCrash_Services.DeltaBaseSoapCall(InModuleDeltaBase);
-	DeltaBaseSql := RawDeltaBaseSQL(InModuleDeltaBase);
+	DeltaBaseSql := eCrash_Services.RawDeltaBaseSQL(InModuleDeltaBase);
 	
 	Gateway.Layouts.Config ImageSoapCallGatewaysStructure := TRANSFORM
 		SELF.ServiceName := Gateway.Constants.ServiceName.EcrashImageRetrieval;
@@ -49,7 +49,8 @@ EXPORT ImageSearchService() := FUNCTION
 	RequestVendorCode := Request[1].ReportBy.Vendor;
 	RequestAgencyOri := Request[1].ReportBy.AgencyORI;
 	RequestDateOfCrash := Request[1].ReportBy.DateOfCrash;
-		RequestColoredImage := Request[1].Options.ColoredImage;
+    RequestColoredImage := Request[1].Options.ColoredImage;
+	RequestRedact       := Request[1].Options.Redact;
 
 	RequestReportIdRaw := Request[1].ReportBy.ReportID;
 	//blanking out RequestReportId for KYCrashLogic since we need to get an image for it straigt away without search performed. 
@@ -75,10 +76,10 @@ EXPORT ImageSearchService() := FUNCTION
 	
 	ReportsDeltabaseResult := IF(
 		ReportHashKeysFromKey[1].Vendor_Code IN eCrash_Services.Constants.VENDOR_CODES_BYPASS_DELTABASE, 
-		Functions.getSupplementalsBypassDeltabase(
+		eCrash_Services.Functions.getSupplementalsBypassDeltabase(
 			ReportHashKeysFromKey
 		),
-		Functions.getSupplementalsDeltabase(
+		eCrash_Services.Functions.getSupplementalsDeltabase(
 			RequestReportId,
 			ReportHashKeysFromKey,
 			InModuleDeltaBase
@@ -141,7 +142,8 @@ EXPORT ImageSearchService() := FUNCTION
 		RequestVendorCode,
 		RequestDateOfCrash,
 		isOnlyTm,
-		RequestColoredImage
+		RequestColoredImage,
+		RequestRedact
 	);
 
 	//We don't know which report_id was used to retreive image for TM that's why we are searching by all the possible report ids. ESP inserts report_id from the request.

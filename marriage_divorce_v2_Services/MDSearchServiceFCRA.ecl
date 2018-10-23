@@ -103,7 +103,7 @@ export MDSearchServiceFCRA() := macro
 	raw := tmp.records;
 	statements  := tmp.statements;
 	consumer_alerts  := tmp.ConsumerAlerts;
-  input_consumer := FFD.Constants.BlankConsumerRec;
+  input_consumer := FFD.MAC.PrepareConsumerRecord(rdid, false);
 	
   Text_Search.MAC_Append_ExternalKey(raw, raw2, INTFORMAT(l.record_id,15,1));
 	// And chop it up as necessary

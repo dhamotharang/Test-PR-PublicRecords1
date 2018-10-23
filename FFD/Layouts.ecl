@@ -48,6 +48,11 @@ EXPORT Layouts := MODULE
     PersonContext.Layouts.Layout_PCResponseRec;
   END;
 	
+  EXPORT PersonContextBatchResponse := RECORD
+    iesp.share.t_ResponseHeader _Header;
+    DATASET(PersonContextBatch) Records;
+  END;
+
 	// These are the FFD fields that will be used to determine statements & disputes associated to the raw record.
 	EXPORT CommonRawRecordElements:= RECORD
 		DATASET(StatementIdRec) StatementIds {xpath('StatementIdRecs/StatementIdRec')} := DATASET([], StatementIdRec);
@@ -80,8 +85,13 @@ EXPORT Layouts := MODULE
   END;
   
   EXPORT ConsumerLogInquiry := RECORD (iesp.share_fcra.t_FcraConsumer)
-	  STRING CaseNumber := '';   // log for bankruptcy search by case number
   END;
 		
+  EXPORT CIA_data := RECORD
+    BOOLEAN  suppress_records := FALSE; 
+    DATASET(iesp.share_fcra.t_ConsumerAlert) ConsumerAlerts;
+    DATASET(iesp.share_fcra.t_ConsumerStatement) ConsumerStatements;
+    DATASET(PersonContextBatch) PersonContext;
+  END;
 
 END;

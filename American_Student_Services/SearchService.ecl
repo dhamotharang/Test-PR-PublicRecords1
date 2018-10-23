@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SearchService">
 	
 	<!-- COMPLIANCE SETTINGS -->
@@ -77,7 +77,8 @@ import iesp, AutoStandardI, American_Student_Services;
 
 export SearchService := MACRO
 
-//The following macro defines the field sequence on WsECL page of query.
+ #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+
   WSInput.MAC_American_Student_SearchService();
 	
 	ds_in := DATASET ([], iesp.student.t_StudentSearchRequest) : STORED('StudentSearchRequest', FEW);

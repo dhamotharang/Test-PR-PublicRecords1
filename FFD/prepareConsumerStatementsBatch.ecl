@@ -5,8 +5,7 @@ EXPORT  prepareConsumerStatementsBatch (DATASET (FFD.layouts.ConsumerStatementBa
 																				INTEGER8 inFFDOptionsMask = 0
                                         )  := FUNCTION
 
-  BOOLEAN showConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask);
-	BOOLEAN showDisputedRecords := FFD.FFDMask.isShowDisputed(inFFDOptionsMask) OR FFD.FFDMask.isShowDisputedBankruptcies(inFFDOptionsMask);
+  BOOLEAN ReturnBlank := ~FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask);
 	
 	//TODO: if we preserve statement IDs from disputed records in the results,
   //      this code can be significantly simplified 
@@ -57,9 +56,18 @@ EXPORT  prepareConsumerStatementsBatch (DATASET (FFD.layouts.ConsumerStatementBa
   // TODO: find out if there are possible duplicates here;
   //       consider using KEEP (1) in joins above, if feasible
 	
-  StatementsAndDisputes := MAP(showConsumerStatements => Rstatements + Disputes + CSstatements,
-																showDisputedRecords => Disputes,
-																DATASET([],FFD.layouts.ConsumerStatementBatchFull));  																						 
+  Combined_statements := Rstatements + Disputes + CSstatements;
+	
+  // in case of Legal hold alert no consumer statements are to be returned
+  LegalHoldFlags := ds_pc(RecordType = FFD.Constants.RecordType.LH);
+  
+  // suppress statements if account has legal hold alert
+  filtered_statements := JOIN(Combined_statements, LegalHoldFlags, LEFT.acctno = RIGHT.acctno, TRANSFORM(LEFT), LEFT ONLY);
+  
+  all_statements := IF(EXISTS(LegalHoldFlags), filtered_statements, Combined_statements);
+  
+  StatementsAndDisputes := IF(ReturnBlank, DATASET([],FFD.layouts.ConsumerStatementBatchFull),
+	                            all_statements);  																						 
 
   RETURN StatementsAndDisputes;
 END;

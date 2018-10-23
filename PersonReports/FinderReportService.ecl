@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="FinderReportService">
   <part name="FirstName" type="xsd:string"/>
   <part name="MiddleName" type="xsd:string"/>
@@ -53,6 +53,7 @@
 IMPORT iesp, doxie, AutoHeaderI, AutoStandardI, Relationship;
 
 EXPORT FinderReportService () := MACRO
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 #onwarning(4207, ignore);
 
 //The following macro defines the field sequence on WsECL page of query. 

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BeneficiaryRiskScore_Service">
 	<!-- Record-level or SearchBy fields --> 
 	<part name="UniqueClientID"            type="xsd:string" comment="i.e. acctno"/> <!-- required -->
@@ -75,6 +75,7 @@
 	<part name="IndustryClass"          type="xsd:string"/>
 
 	<!-- =====[ Query behavior ]===== -->
+	<part name="OFACversion" type="xsd:unsignedInt"/>
 	<part name="BSVersion"              type='xsd:integer'/>
 	<part name="RelativeDepthLevel"     type="xsd:byte"/>    <!-- e.g. 1,2,3 -->
 
@@ -85,20 +86,28 @@
 </message>
 */
 
-IMPORT Address, Gateway, Risk_Indicators, RiskWise, ut, doxie, gateway;
+IMPORT Address, Gateway, Risk_Indicators, RiskWise, ut, doxie, gateway,AutoheaderV2;
+
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 
 EXPORT BeneficiaryRiskScore_Service() := FUNCTION
-
   UCase := StringLib.StringToUpperCase;
 	
 	// Define query restrictions and search options.
 	restrictions  := Models.BeneficiaryRiskScore_Functions.get_restriction_params();
 	bsSvcOptions  := Models.BeneficiaryRiskScore_Functions.get_InputSearchOptions_BocaShell();
 	pbfSvcOptions := Models.BeneficiaryRiskScore_Functions.get_InputSearchOptions_PostBeneficiaryFraud();
+  
+  // Defining variables for OFAC 
+ unsigned1 ofac_version_      := 1        : stored('OFACVersion');
+           include_ofac_ := if(ofac_version_ = 1, false, true);
+           global_watchlist_threshold_ := if(ofac_version_ in [1, 2, 3], 0.84, 0.85);
 	
 	// Define the search subject and the gateways for MVR.
 	search_subject := Models.BeneficiaryRiskScore_Functions.get_search_subject_params();
-	gateways       := Models.BeneficiaryRiskScore_Functions.get_gateways(bsSvcOptions);
+	gateways      := Models.BeneficiaryRiskScore_Functions.get_gateways(bsSvcOptions, ofac_version_);
+  
+  if( ofac_version_ = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 	// Redefine the search_subject module as a 1-record dataset.
 	ds_searchsubject :=
@@ -106,7 +115,7 @@ EXPORT BeneficiaryRiskScore_Service() := FUNCTION
 			
 	// Instantiate _Records module...
 	records := 
-			Models.BeneficiaryRiskScore_Records(ds_searchsubject, gateways, bsSvcOptions, pbfSvcOptions, restrictions);
+			Models.BeneficiaryRiskScore_Records(ds_searchsubject, gateways, bsSvcOptions, pbfSvcOptions, restrictions, ofac_version_, include_ofac_, global_watchlist_threshold_);
 	
 	// ...and assign result datasets.
 	bocashell_results := records.bocashell_Edina_v50_results;

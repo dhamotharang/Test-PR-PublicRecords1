@@ -1,4 +1,4 @@
-import doxie_ln, fcra, suppress, ffd, LN_PropertyV2, ut;
+﻿import doxie_ln, fcra, suppress, ffd, LN_PropertyV2, ut, D2C;
 
 export deed_records (
     DATASET (doxie_ln.layout_property_ids) ids,
@@ -11,10 +11,10 @@ export deed_records (
     dataset(FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = ffd.Constants.BlankPersonContextBatchSlim,
     integer8 inFFDOptionsMask = 0
 ) := FUNCTION
-
+  isCNSMR := ut.IndustryClass.is_Knowx;
   kdf := ln_propertyv2.key_deed_fid(isFCRA);
   kdaddlfares := LN_PropertyV2.key_addl_fares_deed_fid;
-
+  
   boolean showDisputedRecords := FFD.FFDMask.isShowDisputed(inFFDOptionsMask);
 	boolean ShowConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask);
 
@@ -139,7 +139,8 @@ export deed_records (
 
   outf_reg_base := JOIN (final_ids, kdf,
                          left.fid <> '' and keyed (left.fid=right.ln_fares_id)
-                         and ~((string)right.ln_fares_id in set( flags((unsigned6)did=left.did ),record_id) and isFCRA),
+                         and ~((string)right.ln_fares_id in set( flags((unsigned6)did=left.did ),record_id) and isFCRA)
+												             and (~isCNSMR or right.vendor_source_flag not in D2C.Constants.LNPropertyV2RestrictedSources ),
                          take_right2 (left, right), keep (1), limit (0)); //should be atmost one record at right anyway
 
   // adding join to addl_fares key to populate fares fields for non-fcra comp report        
@@ -158,8 +159,8 @@ export deed_records (
                                    take_right2 (left, right),keep(1),limit(0));
 
   rec add_statement_ids ( rec l, FFD.Layouts.PersonContextBatchSlim r ) := transform,
-  skip(~showDisputedRecords and r.isdisputed) 
-    self.statementids := if(ShowConsumerStatements,r.StatementIDs,FFD.Constants.BlankStatements);
+  skip((~showDisputedRecords and r.isdisputed) or (~ShowConsumerStatements and exists(R.StatementIDs))) 
+    self.statementids := r.StatementIDs;
     self.isdisputed :=  r.isdisputed;
     self := L;
   end;
@@ -177,7 +178,6 @@ export deed_records (
     SELF := ri;
   END;
   out := UNGROUP (ITERATE(group(SORT(outf, did, bdid, address_seq_no),did,bdid), iter(LEFT,RIGHT)));
-
   RETURN out((source_code <> 'B' or ln_branded_value) AND
              (dateVal = 0 OR (unsigned3)(contract_date[1..6]) <= dateVal));
 

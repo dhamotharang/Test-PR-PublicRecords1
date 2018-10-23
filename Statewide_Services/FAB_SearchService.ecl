@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="FAB_SearchService" wuTimeout="300000">
 	<part name="GLBPurpose"      type="xsd:byte" />
 	<part name="DPPAPurpose"     type="xsd:byte" />
@@ -86,7 +86,7 @@ FAB StateWide Service. If the Jurisdiction is not specified, this service return
 IMPORT doxie, FAB_Statewide, FAP_Statewide;
 
 EXPORT FAB_SearchService() := MACRO
-
+ #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	#OPTION ('optimizeProjects', FALSE);
 	
 	#STORED('PenaltThreshold', 10);

@@ -1,4 +1,5 @@
 ﻿import FCRA, Riskwise, _control, Gateway;
+onThor := _Control.Environment.OnThor;
 
 USE_BOCA_SHELL_LIBRARY := not _Control.LibraryUse.ForceOff_Risk_Indicators__LIB_Boca_Shell_Function;
 
@@ -35,7 +36,6 @@ export Boca_Shell_Function_FCRA (	DATASET (risk_indicators.Layout_input) pre_iid
 																	string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
 																	BOOLEAN	IN_isDirectToConsumer = false,
 																	BOOLEAN IncludeLnJ = false,
-																	BOOLEAN onThor = false,
                  integer2 ReportingPeriod = 84 
                  ) := FUNCTION
 
@@ -117,12 +117,16 @@ seq_map := join( pre_iid1, pre_iid,
 									 isUtility, isLN, includeRelativeInfo, require2Ele,
 									 IN_OFAC_Only, IN_SuppressNearDups, IN_From_BIID, IN_ExcludeWatchLists, IN_From_IT1O,
 									 IN_OFAC_Version, IN_Include_OFAC, IN_Include_additional_watchlists, IN_Global_watchlist_threshold,
-									 IN_BSversion, nugen, ADL_Based_Shell, DataRestriction, append_best, BSOptions, DataPermission, onThor := onThor
+									 IN_BSversion, nugen, ADL_Based_Shell, DataRestriction, append_best, BSOptions, DataPermission
 									 );
 		ids_wide_roxie := group(sort(ids_result, seq), seq);
 		ids_wide_thor := group(sort(distribute(ids_result, hash64(seq)), seq, LOCAL), seq, LOCAL);
-		ids_wide := if(onThor, ids_wide_thor, ids_wide_roxie);
-		
+    #IF(onThor)
+      ids_wide := ids_wide_thor;
+    #ELSE
+      ids_wide := ids_wide_roxie;
+    #END
+  
   p := dedup(group(sort(project(ids_wide(~isrelat), transform (Risk_Indicators.Layout_Boca_Shell, self := LEFT)), seq), seq), seq);
 
   Risk_Indicators.layout_output into_iid(p le) := transform
@@ -146,8 +150,7 @@ seq_map := join( pre_iid1, pre_iid,
 							true,  // filter out fares always true in FCRA
 							DataRestriction,
 							BSOptions, glb, gateways, DataPermission, IN_isDirectToConsumer, 
-							IncludeLnJ, onThor := onThor, 
-       ReportingPeriod := ReportingPeriod 
+							IncludeLnJ, ReportingPeriod := ReportingPeriod 
        );
 
 

@@ -203,6 +203,7 @@ EXPORT Layouts := MODULE
     Batchshare.layouts.ShareErrors;
     unsigned SequenceNumber := 0;
 		FFD.Layouts.ConsumerFlags;
+    string12 inquiry_lexid := '';
   END;    
   
   EXPORT batch_out_pre := RECORD(batch_out)

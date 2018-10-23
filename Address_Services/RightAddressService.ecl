@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="RightAddress">
   <part name="RightAddressSearchRequest" type="tns:XmlDataSet" cols="80" rows="30" />
 </message>
@@ -7,6 +7,7 @@
 
 export RightAddressService := MACRO
 	
+	#CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	#stored ('ScoreThreshold', UPS_Services.Constants.SCORE_THRESHOLD);
 	#constant('AllowWildcard',true);
 	#constant('isCP_V2',true);

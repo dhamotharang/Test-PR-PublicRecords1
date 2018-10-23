@@ -1,4 +1,4 @@
-import emerges, ccw_services, FCRA, ut, FFD;
+﻿import emerges, ccw_services, FCRA, ut, FFD;
 
 export Raw := MODULE;
 		
@@ -53,8 +53,8 @@ export Raw := MODULE;
 			
 			// Supress disputed records and fill the statement_ids 				
 			ccw_services.Layouts.rawrec xformStatements( recs_fcra l, FFD.Layouts.PersonContextBatchSlim r ) := transform,
-			skip( ~showDisputedRecords and r.isDisputed )						
-					self.StatementIDs := if(ShowConsumerStatements,r.StatementIDs,FFD.Constants.BlankStatements);
+			skip(( ~showDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs)))						
+					self.StatementIDs := r.StatementIDs;
 					self.iSDisputed := r.isDisputed;
 					self := l;
 			end;

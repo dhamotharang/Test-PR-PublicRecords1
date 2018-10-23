@@ -1,6 +1,7 @@
-import watercraft, fcra, riskwise, ut;
+﻿import _Control, watercraft, fcra, riskwise, ut;
+onThor := _Control.Environment.OnThor;
 
-export Boca_Shell_Watercraft_FCRA(GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell_ids) ids_only, boolean isPreScreen, integer bsVersion, boolean onThor=false) := FUNCTION
+export Boca_Shell_Watercraft_FCRA(GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell_ids) ids_only, boolean isPreScreen, integer bsVersion) := FUNCTION
 
 
 restrictedStates := fcra.compliance.watercrafts.restricted_states;	// need consumer permission
@@ -37,7 +38,11 @@ water_correct_thor := join(ids_only, pull(FCRA.Key_Override_Watercraft.sid),
 											((isPreScreen and right.state_origin not in restrictedStates) or ~isPreScreen),	// filter by state if prescreen
 											watercraft_correct(left, right),left outer, LOCAL, ALL);		
 											
-water_correct := if(onThor, water_correct_thor, water_correct_roxie);
+#IF(onThor)
+	water_correct := water_correct_thor;
+#ELSE
+	water_correct := water_correct_roxie;
+#END
 
 key_did := watercraft.key_watercraft_did (true); //fcra-version 
 riskwise.layouts.Layout_Watercraft_Plus watercraft_FCRA(water_correct le, key_did ri) := transform
@@ -74,7 +79,11 @@ watercraft_recs_thor_did := join(distribute(water_correct(did!=0), hash64(did)),
 
 watercraft_recs_thor := group(sort(watercraft_recs_thor_did + water_correct(did=0), seq), seq);
 
-watercraft_recs := if(onThor, watercraft_recs_thor, watercraft_recs_roxie);
+#IF(onThor)
+	watercraft_recs := watercraft_recs_thor;
+#ELSE
+	watercraft_recs := watercraft_recs_roxie;
+#END
 
 combined := ungroup(water_correct + watercraft_Recs);
 

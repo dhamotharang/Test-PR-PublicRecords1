@@ -1,4 +1,5 @@
-import risk_indicators, gong, riskwise, ut, header, doxie, mdr, drivers, FCRA, gateway;
+﻿import _Control, risk_indicators, gong, riskwise, ut, header, doxie, mdr, drivers, FCRA, gateway;
+onThor := _Control.Environment.OnThor;
 
 export get_IID_Best_Flags (GROUPED DATASET(risk_indicators.layout_output) iid_input,  
 															unsigned1 glb, 
@@ -20,7 +21,7 @@ runSSNCodes := false;
 exactmatchlevel := risk_indicators.iid_constants.default_ExactMatchLevel;
 lastseenthreshold := risk_indicators.iid_constants.oneyear;
 
-dppa_ok := iid_constants.dppa_ok(dppa, isFCRA);
+dppa_ok := risk_indicators.iid_constants.dppa_ok(dppa, isFCRA);
 
 //// Address //////////////
 // slim down the layout for computing the address velocity.  
@@ -56,9 +57,10 @@ slim_addr_rec add_header_by_address(risk_indicators.layout_output le, Doxie.Key_
 	self := le;
 end;	
 		
-		
+Header_Address_Key := if(isFCRA, Doxie.Key_FCRA_Header_Address, Doxie.Key_Header_Address);
+
 // Risk_Indicators.getPhoneAddrVelocity has branch of code to handle prior to 50, but this function will only be called for shell 52 and higher, so we have removed that branch here
-header_by_address := join(iid_input, if(isFCRA, Doxie.Key_FCRA_Header_Address, Doxie.Key_Header_Address),	
+header_by_address_roxie := join(iid_input, Header_Address_Key,	
 															left.prim_name!='' and left.z5!='' and
 															keyed(left.prim_name=right.prim_name)/* and keyed(left.st=right.st)*/ and
 															keyed(left.z5=right.zip) and keyed(right.prim_range=left.prim_range) and
@@ -84,35 +86,113 @@ header_by_address := join(iid_input, if(isFCRA, Doxie.Key_FCRA_Header_Address, D
 																		and right.prim_range=left.prim_range 
 																		and left.sec_range=right.sec_range, 2001), 
 																		keep(2000));
-						
+
+header_by_address_thor_addr := join(distribute(iid_input(prim_name!='' and z5!=''), hash64(prim_name,z5,prim_range,sec_range)), 
+															distribute(pull(Header_Address_Key), hash64(prim_name,zip,prim_range,sec_range)),	
+															(left.prim_name=right.prim_name)/* and (left.st=right.st)*/ and
+															(left.z5=right.zip) and (right.prim_range=left.prim_range) and
+															(left.sec_range=right.sec_range) and
+															left.predir=right.predir and left.postdir=right.postdir and			
+															RIGHT.dt_first_seen < left.historydate and  // check date,
+															// check permissions
+															right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND
+															(~mdr.Source_is_Utility(RIGHT.src) OR ~isUtility)	AND
+															(~mdr.Source_is_DPPA(RIGHT.src) OR
+																(dppa_ok AND drivers.state_dppa_ok(header.translateSource(RIGHT.src),dppa,RIGHT.src))) AND
+															~risk_indicators.iid_constants.filtered_source(right.src, right.st) and
+															(~IsFCRA OR ~FCRA.Restricted_Header_Src (RIGHT.src, '')) and
+															(~isFCRA or 
+																((right.src='BA' and FCRA.bankrupt_is_ok(iid_constants.myGetDate(left.historydate),(string)right.dt_first_seen))
+																OR (right.src='L2' and FCRA.lien_is_ok(iid_constants.myGetDate(left.historydate),(string)right.dt_first_seen))
+																OR right.src not in ['BA','L2'])
+															),
+														add_header_by_address(left,right), left outer, 
+														atmost(left.prim_name=right.prim_name 
+																		and left.z5=right.zip
+																		and right.prim_range=left.prim_range 
+																		and left.sec_range=right.sec_range, 2001), 
+																		keep(2000), LOCAL);
+header_by_address_thor := header_by_address_thor_addr + PROJECT(iid_input(prim_name='' or z5=''), TRANSFORM(slim_addr_rec, SELF := LEFT, SELF := []));
+
+#IF(onThor)
+	header_by_address := header_by_address_thor;
+#ELSE
+	header_by_address := header_by_address_roxie;
+#END
+
 // SSN per Address counts
-counts_per_ssn := table(header_by_address, {seq, did, ssn_from_addr,
+counts_per_ssn_roxie := table(header_by_address, {seq, did, ssn_from_addr,
 															_ssns_per_addr := count(group, ssns_per_addr>0),
 															_ssns_per_addr_current := count(group, ssns_per_addr_current>0),
 															_ssns_per_addr_created_6months := count(group, ssns_per_addr_created_6months>0)
 															}, seq, did, ssn_from_addr, few);									
 
-ssns_per_addr_counts := table(counts_per_ssn, {seq, did, 
+counts_per_ssn_thor := table(distribute(header_by_address, hash64(seq,did)), {seq, did, ssn_from_addr,
+															_ssns_per_addr := count(group, ssns_per_addr>0),
+															_ssns_per_addr_current := count(group, ssns_per_addr_current>0),
+															_ssns_per_addr_created_6months := count(group, ssns_per_addr_created_6months>0)
+															}, seq, did, ssn_from_addr, local);	
+
+#IF(onThor)
+	counts_per_ssn := counts_per_ssn_thor;
+#ELSE
+	counts_per_ssn := counts_per_ssn_roxie;
+#END
+
+ssns_per_addr_counts_roxie := table(counts_per_ssn, {seq, did, 
 															ssns_per_addr := count(group, _ssns_per_addr>0),
 															ssns_per_addr_current := count(group, _ssns_per_addr_current>0),
 															ssns_per_addr_created_6months := count(group, _ssns_per_addr_created_6months>0)}, 
 															seq, did, few);
+															
+ssns_per_addr_counts_thor := table(distribute(counts_per_ssn, hash64(seq,did)), {seq, did, 
+															ssns_per_addr := count(group, _ssns_per_addr>0),
+															ssns_per_addr_current := count(group, _ssns_per_addr_current>0),
+															ssns_per_addr_created_6months := count(group, _ssns_per_addr_created_6months>0)}, 
+															seq, did, local);
 									
+#IF(onThor)
+	ssns_per_addr_counts := ssns_per_addr_counts_thor;
+#ELSE
+	ssns_per_addr_counts := ssns_per_addr_counts_roxie;
+#END
 
 // ADL per address counts
-counts_per_adl := table(header_by_address, {seq, did, DID_from_srch, historydate,
+counts_per_adl_roxie := table(header_by_address, {seq, did, DID_from_srch, historydate,
 															_adls_per_addr := count(group, adls_per_addr>0),
 															_adls_per_addr_current := count(group, adls_per_addr_current>0),
 															_adls_per_addr_created_6months := count(group, adls_per_addr_created_6months>0),
 															}, seq, did, DID_from_srch, historydate, few);									
-	
-adls_per_addr_counts := table(counts_per_adl, {seq, did, 
+
+counts_per_adl_thor := table(distribute(header_by_address, hash64(seq, did)), {seq, did, DID_from_srch, historydate,
+															_adls_per_addr := count(group, adls_per_addr>0),
+															_adls_per_addr_current := count(group, adls_per_addr_current>0),
+															_adls_per_addr_created_6months := count(group, adls_per_addr_created_6months>0),
+															}, seq, did, DID_from_srch, historydate, local);	
+                              
+#IF(onThor)
+	counts_per_adl := counts_per_adl_thor;
+#ELSE
+	counts_per_adl := counts_per_adl_roxie;
+#END
+
+adls_per_addr_counts_roxie := table(counts_per_adl, {seq, did, 
 															adls_per_addr := count(group, _adls_per_addr>0),
 															adls_per_addr_current := count(group, _adls_per_addr_current>0),
 															adls_per_addr_created_6months := count(group, _adls_per_addr_created_6months>0)}, 
 															seq, did, few);
+															
+adls_per_addr_counts_thor := table(distribute(counts_per_adl, hash64(seq,did)), {seq, did, 
+															adls_per_addr := count(group, _adls_per_addr>0),
+															adls_per_addr_current := count(group, _adls_per_addr_current>0),
+															adls_per_addr_created_6months := count(group, _adls_per_addr_created_6months>0)}, 
+															seq, did, local);
 
-									
+#IF(onThor)
+	adls_per_addr_counts := adls_per_addr_counts_thor;
+#ELSE
+	adls_per_addr_counts := adls_per_addr_counts_roxie;
+#END
 
 with_ssn_per_addr_counts := join(iid_input, ssns_per_addr_counts, left.seq=right.seq and left.did=right.did, 
 		transform(risk_indicators.layout_output, 
@@ -231,7 +311,7 @@ layout_output_tmp bestaddr_highrisk_transform(risk_indicators.layout_output l,ri
 	self := l;
 END;
 
-with_bestaddr_hriskaddrflag_tmp := if (isFCRA,
+with_bestaddr_hriskaddrflag_tmp_roxie := if (isFCRA,
 			join(bestaddr_zipclass,risk_indicators.key_HRI_Address_To_SIC_filtered_FCRA,
 				left.z5!='' and left.prim_name != '' and
 				keyed(left.z5=right.z5) and keyed(left.prim_name=right.prim_name) and keyed(left.addr_suffix=right.suffix) and 
@@ -252,6 +332,34 @@ with_bestaddr_hriskaddrflag_tmp := if (isFCRA,
 				ATMOST(keyed(left.z5=right.z5) and keyed(left.prim_name=right.prim_name) and keyed(left.addr_suffix=right.suffix) and
 					  keyed(left.predir=right.predir) and keyed(left.postdir=right.postdir) and keyed(left.prim_range=right.prim_range) and
 						keyed(ut.NNEQ(left.sec_range, right.sec_range)), RiskWise.max_atmost), keep(100)));
+
+with_bestaddr_hriskaddrflag_tmp_thor := if (isFCRA,
+			join(distribute(bestaddr_zipclass, hash64(z5, prim_name, addr_suffix, predir, postdir, prim_range)),
+				distribute(pull(risk_indicators.key_HRI_Address_To_SIC_filtered_FCRA), hash64(z5, prim_name, suffix, predir, postdir, prim_range)),
+				left.z5!='' and left.prim_name != '' and
+				(left.z5=right.z5) and (left.prim_name=right.prim_name) and (left.addr_suffix=right.suffix) and 
+				(left.predir=right.predir) and (left.postdir=right.postdir) and (left.prim_range=right.prim_range) and 
+				(ut.NNEQ(left.sec_range, right.sec_range)) AND 
+				// check date
+				right.dt_first_seen < left.historydate,bestaddr_highrisk_transform(left,right),left outer,
+				ATMOST(left.z5=right.z5 and left.prim_name=right.prim_name and left.addr_suffix=right.suffix and
+					  left.predir=right.predir and left.postdir=right.postdir and left.prim_range=right.prim_range, RiskWise.max_atmost), keep(100), LOCAL),
+			join(distribute(bestaddr_zipclass, hash64(z5, prim_name, addr_suffix, predir, postdir, prim_range)),
+				distribute(pull(risk_indicators.key_HRI_Address_To_SIC), hash64(z5, prim_name, suffix, predir, postdir, prim_range)),
+				left.z5!='' and left.prim_name != '' and
+				(left.z5=right.z5) and (left.prim_name=right.prim_name) and (left.addr_suffix=right.suffix) and 
+				(left.predir=right.predir) and (left.postdir=right.postdir) and (left.prim_range=right.prim_range) and 
+				(ut.NNEQ(left.sec_range, right.sec_range)) AND 
+				// check date
+				right.dt_first_seen < left.historydate,bestaddr_highrisk_transform(left,right),left outer,
+				ATMOST(left.z5=right.z5 and left.prim_name=right.prim_name and left.addr_suffix=right.suffix and
+					  left.predir=right.predir and left.postdir=right.postdir and left.prim_range=right.prim_range, RiskWise.max_atmost), keep(100), LOCAL));
+
+#IF(onThor)
+	with_bestaddr_hriskaddrflag_tmp := group(sort(with_bestaddr_hriskaddrflag_tmp_thor, seq, LOCAL), seq, LOCAL);
+#ELSE
+	with_bestaddr_hriskaddrflag_tmp := with_bestaddr_hriskaddrflag_tmp_roxie;
+#END
 
 with_bestaddr_hriskaddrflag_tmp_sorted := sort(with_bestaddr_hriskaddrflag_tmp, seq, -hriskaddrflag);						
 with_bestaddr_hriskaddrflag_rolled := rollup(with_bestaddr_hriskaddrflag_tmp_sorted, left.seq = right.seq, flagroll(left,right));

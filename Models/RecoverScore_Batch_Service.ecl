@@ -120,13 +120,13 @@ gateways_in := Gateway.Configuration.Get();
 model_name := if(model in valid_models, model, ERROR(301,'Missing or Invalid Model Name') );
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform  
-	self.servicename := if(le.servicename = 'bridgerwlc' and ofac_version = 4 and model_name not in Risk_Indicators.iid_constants.RecoverScoreBatchWatchlistModels, '', le.servicename);
-	self.url := if(le.servicename = 'bridgerwlc' and ofac_version = 4 and model_name not in Risk_Indicators.iid_constants.RecoverScoreBatchWatchlistModels, '', le.url);
+	self.servicename := if(le.servicename = 'bridgerwlc' and ofac_version = 4 and StringLib.StringToUpperCase(model_name) not in Risk_Indicators.iid_constants.RecoverScoreBatchWatchlistModels, '', le.servicename);
+	self.url := if(le.servicename = 'bridgerwlc' and ofac_version = 4 and StringLib.StringToUpperCase(model_name) not in Risk_Indicators.iid_constants.RecoverScoreBatchWatchlistModels, '', le.url);
   self := le;																																								
 end;
 gateways := project(gateways_in, gw_switch(left));
 
-if(ofac_version = 4 and model_name in Risk_Indicators.iid_constants.RecoverScoreBatchWatchlistModels and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
+if(ofac_version = 4 and StringLib.StringToUpperCase(model_name) in Risk_Indicators.iid_constants.RecoverScoreBatchWatchlistModels and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 // add sequence to matchup later to add acctno to output
 Models.Layout_RecoverScore_Batch_Input into_seq(batchin le, integer C) := TRANSFORM

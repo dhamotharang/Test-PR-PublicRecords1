@@ -74,6 +74,7 @@ IMPORT progressive_phone, addrbest,iesp,PhonesFeedback_Services,ut,
 				doxie,PersonSearch_Services, AutoStandardi,EmailService,Suppress, Royalty;
 
 EXPORT ContactPlusSearchService := MACRO
+  #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
     #constant('IncludeFraudDefenseNetwork',false)
 		rec_in := iesp.contactplus.t_ContactPlusSearchRequest;
     ds_in := DATASET ([], rec_in) : STORED ('ContactPlusSearchRequest', FEW);

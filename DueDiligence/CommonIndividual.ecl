@@ -1,42 +1,22 @@
 ﻿IMPORT DueDiligence, iesp, STD, ut;
 
 EXPORT CommonIndividual := MODULE
+
 	
-
-	// EXPORT IndividualJoin(joinTo, didFieldName, keyName, whereClause, joinType, maxRecords = 5) := FUNCTIONMACRO
-
-		// LOCAL atmostMax := IF(maxRecords > 0, 'ATMOST(' + maxRecords + ')', DueDiligence.Constants.EMPTY);
-		// LOCAL addJoinType := IF(joinType = DueDiligence.Constants.EMPTY, joinType, joinType + ',');
-		// LOCAL didField := 'LEFT.' + didFieldName;
-		
-		// LOCAL joinResult := JOIN(joinTo, #EXPAND(keyName), 
-																											// #EXPAND(whereClause), 
-																											// TRANSFORM({UNSIGNED4 seq, UNSIGNED6 inDid, UNSIGNED4 historyDate, RECORDOF(RIGHT)},
-																																// SELF.seq := LEFT.seq;
-																																// SELF.inDid := #EXPAND(didField);
-																																// SELF.historyDate := LEFT.historyDate;
-																																// SELF := RIGHT), 
-																											// #EXPAND(addJoinType)					
-																											// #EXPAND(atmostMax)); 
-												
-		// RETURN joinResult;
-
-	// ENDMACRO;
-	
-	EXPORT getParents(DATASET(DueDiligence.Layouts.Indv_Internal) inquiredInd) := FUNCTION
-		
-		parents := NORMALIZE(inquiredInd, LEFT.parents, TRANSFORM(DueDiligence.Layouts.Indv_Internal,
-																																																												SELF.seq := LEFT.seq;
-																																																												SELF.inquiredDID := LEFT.individual.did;
-																																																												SELF.historyDate := LEFT.historyDate;
-																																																												SELF.individual := RIGHT;
-																																																												SELF.indvType := DueDiligence.Constants.INQUIRED_INDIVIDUAL_PARENT;
-																																																												SELF := [];));
-		
-		RETURN parents;
-	END;
+	EXPORT getRelationship(inquiredInd, dsNameFromInquiredInd, relationToInquired) := FUNCTIONMACRO
   
-  
+    relationship := NORMALIZE(inquiredInd, LEFT.dsNameFromInquiredInd, TRANSFORM(DueDiligence.Layouts.Indv_Internal,
+                                                                            SELF.seq := LEFT.seq;
+                                                                            SELF.inquiredDID := LEFT.individual.did;
+                                                                            SELF.historyDate := LEFT.historyDate;
+                                                                            SELF.historyDateRaw := LEFT.historyDateRaw;
+                                                                            SELF.individual := RIGHT;
+                                                                            SELF.indvType := relationToInquired;
+                                                                            SELF := [];));
+		
+		RETURN relationship;
+	ENDMACRO;
+    
   
   EXPORT calcCrimData(dataRow, offenderLevelIn, offenseScoreIn, daysLookupSymbol) := FUNCTIONMACRO
   
@@ -56,5 +36,19 @@ EXPORT CommonIndividual := MODULE
     RETURN val;
   ENDMACRO;
 
+  EXPORT CreateRelatedPartyDataset(DATASET(DueDiligence.Layouts.Indv_Internal) inData) := FUNCTION
+  //Need to convert the inquuired individual into a dataset in order to re-use modules created for indivuals and Business executives
+    indivRelatedParty := PROJECT(inData, TRANSFORM({DATASET(DueDiligence.LayoutsInternal.RelatedParty) inquiredDS},
+                                                    SELF.inquiredDS := PROJECT(LEFT, TRANSFORM(DueDiligence.LayoutsInternal.RelatedParty, 
+                                                                                             SELF.seq := LEFT.seq;
+                                                                                             SELF.did := LEFT.inquiredDID;
+                                                                                             SELF.party := LEFT.individual;
+                                                                                             SELF := LEFT;
+                                                                                             SELF := [];));
+                                                    SELF := [];));
 
-END;
+  RETURN indivRelatedParty.inquiredDS;
+
+  END;  //END OF FUNCTION
+
+END;  //END OF MODULE

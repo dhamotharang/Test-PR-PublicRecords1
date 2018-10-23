@@ -1,7 +1,5 @@
-﻿/*2017-08-23T18:15:39Z (Laura Weiner)
-RR-11601: RiskView 5.0 on thor
-*/
-import risk_indicators, doxie, header, mdr, did_add, ut, drivers, FCRA, header_quick, riskwise, NID, address;
+﻿import _Control, risk_indicators, doxie, header, mdr, did_add, ut, drivers, FCRA, header_quick, riskwise, NID, address;
+onThor := _Control.Environment.OnThor;
 
 export iid_getHeader(grouped DATASET(risk_indicators.Layout_output) inrec, unsigned1 dppa, unsigned1 glb, 
 							boolean isFCRA=false, boolean ln_branded, 
@@ -12,8 +10,7 @@ export iid_getHeader(grouped DATASET(risk_indicators.Layout_output) inrec, unsig
 							unsigned2 EverOccupant_PastMonths=0,
 							unsigned4 EverOccupant_StartDate = iid_constants.default_history_date,
 							unsigned3 LastSeenThreshold = iid_constants.oneyear,
-							unsigned8 BSOptions=0,
-							boolean onThor = false
+							unsigned8 BSOptions=0
 	) := function
 	
 
@@ -148,7 +145,11 @@ header_corr_thor := if(isFCRA,group( JOIN(distribute(g_inrec(did<>0), hash64(did
 																atmost(left.did=right.did,ut.limits.HEADER_PER_DID),LOCAL),seq),
 													group(dataset([], layout_headerOverridePlusSeq),seq));													
 
-header_corr := if(OnThor, header_corr_thor, header_corr_roxie);
+#IF(onThor)
+	header_corr := header_corr_thor;
+#ELSE
+	header_corr := header_corr_roxie;
+#END
 																		
 // get full header	
 header_key := if(isFCRA, doxie.key_fcra_header, doxie.key_header);
@@ -226,7 +227,12 @@ j_pre_thor := join (distribute(g_inrec(did<>0), hash64(did)),
 													 LEFT OUTER, atmost(left.did=right.s_did, ut.limits.HEADER_PER_DID), LOCAL);
 
 j_pre_thor_nodid := project(g_inrec(did=0), transform(Layout_Header_Data, self := left, self := []));
-j_pre := IF(OnThor, j_pre_thor+j_pre_thor_nodid, j_pre_roxie);
+
+#IF(onThor)
+	j_pre := j_pre_thor+j_pre_thor_nodid;
+#ELSE
+	j_pre := j_pre_roxie;
+#END
 
 // get quick header
 header_quick_key := if(isFCRA, header_quick.key_did_fcra, header_quick.key_DID);
@@ -302,9 +308,12 @@ j_quickpre_thor := join (distribute(g_inrec(did<>0), hash64(did)),
 													 get_j_quickpre(LEFT,RIGHT), 
 													 atmost(LEFT.did = RIGHT.did, ut.limits.HEADER_PER_DID), LOCAL);
 													 
-j_quickpre := IF(onThor, j_quickpre_thor, j_quickpre_roxie);
+#IF(onThor)
+	j_quickpre := j_quickpre_thor;
+#ELSE
+	j_quickpre := j_quickpre_roxie;
+#END
 			   
-							 
 real_header_all_roxie := group( sort( ungroup(j_pre + j_quickpre), seq ,did), seq, did);	 
 real_header_all_thor := group( sort( distribute( ungroup(j_pre + j_quickpre), hash64(seq)), seq ,did, LOCAL), seq, did, LOCAL);
 real_header_all := if(onThor, real_header_all_thor, real_header_all_roxie);
@@ -928,8 +937,18 @@ iid_constants.layout_outx getHeader(Layout_working le) := TRANSFORM
 	dobmatch := iid_constants.g(dobmatch_score) and if(ExactDOBRequired, le.dob[1..8]=le_head_dob[1..8], true);
 	
 	
-	SELF.trueDID := le.h.did<>0;
-	
+	trueDID_original := le.h.did<>0;
+	    
+  // if the consumer has a statement on file, security alert, legal hold, we need to set the noScore trigger so all attributes and scores get suppressed.
+  // for id_theft_flag, don't set the truedid=false because we'll return a real score for that person, just return the alert code of 100G
+	self.truedid := if(
+  (le.ConsumerFlags.consumer_statement_flag  and bsversion < 50) or  
+  le.ConsumerFlags.security_alert or  
+  le.ConsumerFlags.legal_hold_alert or  
+  (le.ConsumerFlags.id_theft_flag and bsversion < 50) ,
+    false, trueDID_original);
+    
+    
 	// FYI, if we add any new sources to this list or modify this mapping, let Jesse Shaw know about it so that he can update KEL attribute IdentityReport.graph
 	converted_src := map(
 				 utilityRecord => 'U',  // new for shell 5.0.  UtilityRecord will only be set to true in shell versions 50 and higher
@@ -1341,8 +1360,11 @@ prison1_thor_withAddr := join(distribute(tranHeader(trim(chronozip)!='' and trim
 
 prison1_thor := prison1_thor_withAddr + tranHeader(trim(chronozip)='' or trim(chronoprim_name)='');
 
-prison1 := group(if(OnThor, sort(distribute(prison1_thor, hash64(seq)), seq, did, local),
-														sort(prison1_roxie, seq,did)), seq, did);
+#IF(onThor)
+	prison1 := group(sort(distribute(prison1_thor, hash64(seq)), seq, did, local), seq, did);
+#ELSE
+	prison1 := group(sort(prison1_roxie, seq,did), seq, did);
+#END
 
 prison := if(BSversion>2, prison1, tranHeader);
 
@@ -1370,7 +1392,11 @@ corr_by_did_thor := group(sort(JOIN (distribute(g_inrec(did!=0), hash64(did)),
 													distribute(pull(FCRA.Key_FCRA_Override_pii_DID(s_did!=0)), hash64(s_did)),
                      (Left.did = Right.s_did), get_corr_by_did(LEFT,RIGHT), atmost(riskwise.max_atmost), LOCAL), seq, did), seq, did);
 
-corr_by_did := IF(OnThor, corr_by_did_thor, corr_by_did_roxie);
+#IF(onThor)
+	corr_by_did := corr_by_did_thor;
+#ELSE
+	corr_by_did := corr_by_did_roxie;
+#END
 
 layout_corr get_corr_by_ssn(g_inrec le, FCRA.Key_FCRA_Override_pii_SSN ri) := TRANSFORM
 	SELF.did := INTFORMAT(le.did,12,0); // Set DID to LEFT record so that we will pick these up later
@@ -1393,7 +1419,11 @@ corr_by_ssn_thor := group(sort(JOIN (distribute(g_inrec(ssn!=''), hash64(ssn)),
                                         Right.fname, Right.mname, Right.lname) < 3,
                     get_corr_by_ssn(LEFT,RIGHT), atmost(left.ssn=right.ssn, riskwise.max_atmost), LOCAL), seq, did), seq, did);
 
-corr_by_ssn := IF(OnThor, corr_by_ssn_thor, corr_by_ssn_roxie);
+#IF(onThor)
+	corr_by_ssn := corr_by_ssn_thor;
+#ELSE
+	corr_by_ssn := corr_by_ssn_roxie;
+#END
 
 all_corrections1 := DEDUP (corr_by_did + corr_by_ssn, ALL);
 
@@ -1519,8 +1549,15 @@ iid_constants.layout_outx GetFakeHeaderRecords (Risk_Indicators.layout_output le
 
 	dobmatch := iid_constants.g(dobmatch_score) and if(ExactDOBRequired, le.dob[1..8]=ri_dob[1..8], true);
 		
-	
-	SELF.trueDID := ri.did<>0;
+  trueDID_original := ri.did<>0;
+	    
+  // if the consumer has a statement on file, security alert, legal hold, we need to set the noScore trigger so all attributes and scores get suppressed.
+  // for id_theft_flag, don't set the truedid=false because we'll return a real score for that person, just return the alert code of 100G
+	self.truedid := if(le.ConsumerFlags.consumer_statement_flag or  
+  le.ConsumerFlags.security_alert or  
+  le.ConsumerFlags.legal_hold_alert or  
+  (le.ConsumerFlags.id_theft_flag and bsversion < 50) ,
+    false, trueDID_original);
 	
 	// if input social is 4 bytes then use full social from header if last4 match
 	ssnLength := length(trim(le.ssn));
@@ -1632,7 +1669,11 @@ j_combined_roxie := GROUP (SORT (UNGROUP(prison + j_corrections), seq, did), seq
 
 j_combined_thor := GROUP (SORT( DISTRIBUTE(UNGROUP(prison + j_corrections), HASH64(seq, did)), seq, did, LOCAL), seq, did, LOCAL);
 
-j_combined := if(onThor, j_combined_thor, j_combined_roxie);
+#IF(onThor)
+	j_combined := j_combined_thor;
+#ELSE
+	j_combined := j_combined_roxie;
+#END
 
 j_header := IF (isFCRA, j_combined, prison);	
 

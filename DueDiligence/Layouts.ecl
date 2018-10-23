@@ -1,4 +1,4 @@
-﻿IMPORT iesp, SALT28;
+﻿IMPORT Citizenship, iesp, SALT28;
 
 EXPORT Layouts := MODULE
 
@@ -16,7 +16,7 @@ EXPORT Layouts := MODULE
 	
 /* Output of DueDiligence.getBusBIPId */  
 	EXPORT LinkID_Results := RECORD
-		UNSIGNED4 Seq       := 0;
+		UNSIGNED6 Seq       := 0;
 		BOOLEAN BIPIDSourceInput;                       // Indicates if the BIP IDs were returned from the append process or input
 		LinkIDs PowID;
 		LinkIDs ProxID;
@@ -24,11 +24,9 @@ EXPORT Layouts := MODULE
 		LinkIDs OrgID;
 		LinkIDs UltID;
 	END;
-
-	EXPORT Address := RECORD
-		STRING   streetAddress1;
-		STRING   streetAddress2;
-		STRING10 prim_range;
+  
+  EXPORT AddressSlimDetail := RECORD
+    STRING10 prim_range;
 		STRING2  predir;
 		STRING28 prim_name;
 		STRING4  addr_suffix;
@@ -39,6 +37,14 @@ EXPORT Layouts := MODULE
 		STRING2  state;
 		STRING5  zip5;
 		STRING4  zip4;
+    STRING3  county;                               //Due Diligence is capturing the last 3 digits of the full 5 digit FIPS code. It uses the 3 digit code to access the Census Keys and the will build the 5 digit FIPS to determine HIFCA and HIDTA  
+    STRING7  geo_blk;
+  END;
+
+	EXPORT Address := RECORD
+		STRING120   streetAddress1;
+		STRING120   streetAddress2;
+		AddressSlimDetail;
 		STRING4  cart;	
 		STRING1  cr_sort_sz;
 		STRING4  lot;	
@@ -46,11 +52,9 @@ EXPORT Layouts := MODULE
 		STRING2  dbpc; 	
 		STRING1  chk_digit; 
 		STRING2  rec_type;
-		STRING3  county;                               //Due Diligence is capturing the last 3 digits of the full 5 digit FIPS code. It uses the 3 digit code to access the Census Keys and the will build the 5 digit FIPS to determine HIFCA and HIDTA  
 		STRING10 geo_lat;
 		STRING11 geo_long;
-		STRING4  msa; 	
-		string7  geo_blk;
+		STRING4  msa; 
 		STRING1  geo_match;
 		STRING4  err_stat;	
 		UNSIGNED4 dateLastSeen;
@@ -63,38 +67,43 @@ EXPORT Layouts := MODULE
 		STRING20 lastName;
 		STRING5 suffix;	
 	END;
+  
+  EXPORT Shared_Input := RECORD
+    STRING15 lexID;
+		STRING30 accountNumber;
+    Address address;
+    STRING14 phone;  //to account if input comes in (xxx) xxx-xxxx
+    UNSIGNED6 inputSeq;
+  END;
 
 	EXPORT Busn_Input := RECORD
 		LinkID_Results BIP_IDs;
-		STRING lexID;
-		STRING30 accountNumber;
-		STRING companyName;
-		STRING altCompanyName;
-		Address address;
-		STRING phone;
-		STRING fein;
+		Shared_Input;
+		STRING120 companyName;
+		STRING120 altCompanyName;
+		STRING11 fein;
 	END;
 
 	EXPORT Indv_Input := RECORD
-		STRING lexID;
-		STRING30 accountNumber;
+		Shared_Input;
 		STRING3 nameInputOrder;
-		Name name;
-		Address address;
-		STRING phone;
-		STRING ssn;
+		Name name;		
+		STRING11 ssn; //to account if input comes in xxx-xx-xxxx
 		STRING8 dob;
 	END;
 
 
 	EXPORT Input := RECORD
 		BOOLEAN validRequest;
-		STRING errorMessage;
+		STRING200 errorMessage;
 		BOOLEAN addressProvided;
 		BOOLEAN fullAddressProvided;
 		UNSIGNED4 seq;
+    UNSIGNED4 inputSeq;
 		UNSIGNED4 historyDateYYYYMMDD;
 		STRING10 requestedVersion;
+    STRING25 productRequested;
+    Citizenship.Layouts.Input;
 		Busn_Input business;
 		Indv_Input individual;
 	END;
@@ -104,8 +113,9 @@ EXPORT Layouts := MODULE
 		Input cleanedInput;
 	END;
 
+  //ALSO USED BY BATCH - changing name will impact batch
 	EXPORT PerAttributes := RECORD
-		UNSIGNED6 PerLexID;
+		STRING15 PerLexID;
 		STRING2 PerAssetOwnProperty;
 		STRING10 PerAssetOwnProperty_Flag;
 		STRING2 PerAssetOwnAircraft;
@@ -114,24 +124,24 @@ EXPORT Layouts := MODULE
 		STRING10 PerAssetOwnWatercraft_Flag;
 		STRING2 PerAssetOwnVehicle;
 		STRING10 PerAssetOwnVehicle_Flag;
-		STRING2 PerAccessToFundsProperty;
-		STRING10 PerAccessToFundsProperty_Flag;
-		STRING2 PerAccessToFundsIncome;
+    STRING2 PerAccessToFundsIncome;
 		STRING10 PerAccessToFundsIncome_Flag;
+		STRING2 PerAccessToFundsProperty;
+		STRING10 PerAccessToFundsProperty_Flag;		
 		STRING2 PerGeographic;
 		STRING10 PerGeographic_Flag;
 		STRING2 PerMobility;
 		STRING10 PerMobility_Flag;
-		STRING2 PerLegalStateCriminal;
-		STRING10 PerLegalStateCriminal_Flag;
-    STRING2 PerLegalFedCriminal;
-		STRING10 PerLegalFedCriminal_Flag;
-		STRING2 PerLegalCivil;
-		STRING10 PerLegalCivil_Flag;
-		STRING2 PerLegalTraffInfr;
-		STRING10 PerLegalTraffInfr_Flag;
-		STRING2 PerLegalTypes;
-		STRING10 PerLegalTypes_Flag;
+		STRING2 PerStateLegalEvent;
+		STRING10 PerStateLegalEvent_Flag;
+    STRING2 PerFederalLegalEvent;
+		STRING10 PerFederalLegalEvent_Flag;
+    STRING2 PerFederalLegalMatchLevel;
+    STRING10 PerFederalLegalMatchLevel_Flag;
+		STRING2 PerCivilLegalEvent;
+		STRING10 PerCivilLegalEvent_Flag;
+		STRING2 PerOffenseType;
+		STRING10 PerOffenseType_Flag;
 		STRING2 PerAgeRange;
 		STRING10 PerAgeRange_Flag;
 		STRING2 PerIdentityRisk;
@@ -140,15 +150,17 @@ EXPORT Layouts := MODULE
 		STRING10 PerUSResidency_Flag;
 		STRING2 PerMatchLevel;
 		STRING10 PerMatchLevel_Flag;
-		STRING2 PerAssociatesIndex;
-		STRING10 PerAssociatesIndex_Flag;
+		STRING2 PerAssociates;
+		STRING10 PerAssociates_Flag;
 		STRING2 PerProfLicense;
 		STRING10 PerProfLicense_Flag;
+    STRING2 PerBusAssociations;
+    STRING10 PerBusAssociations_Flag;
 	END;
 
-	//------These are the customer facing attributes for this product ------
+  //ALSO USED BY BATCH - changing name will impact batch
 	EXPORT BusAttributes := RECORD
-		UNSIGNED6 BusLexID;
+		STRING15 BusLexID;
 		STRING2 BusAssetOwnProperty;
 		STRING10 BusAssetOwnProperty_Flag;
 		STRING2 BusAssetOwnAircraft;
@@ -177,20 +189,16 @@ EXPORT Layouts := MODULE
 		STRING10 BusShellShelf_Flag;
 		STRING2 BusMatchLevel;
 		STRING10 BusMatchLevel_Flag;
-		STRING2 BusLegalStateCriminal;
-		STRING10 BusLegalStateCriminal_Flag;
-    STRING2 BusLegalFederalCriminal;
-    STRING10 BusLegalFederalCriminal_Flag;
-		STRING2 BusLegalCivil;
-		STRING10 BusLegalCivil_Flag;
-		STRING2 BusLegalTraffInfr;
-		STRING10 BusLegalTraffInfr_Flag;
-		STRING2 BusLegalTypes;
-		STRING10 BusLegalTypes_Flag;
-		STRING2 BusLinkedBusFootprint;
-		STRING10 BusLinkedBusFootprint_Flag;
-		STRING2 BusLinkedBusIndex;
-		STRING10 BusLinkedBusIndex_Flag;
+		STRING2 BusStateLegalEvent;
+		STRING10 BusStateLegalEvent_Flag;
+    STRING2 BusFederalLegalEvent;
+    STRING10 BusFederalLegalEvent_Flag;
+    STRING2 BusFederalLegalMatchLevel;
+    STRING10 BusFederalLegalMatchLevel_Flag;
+		STRING2 BusCivilLegalEvent;
+		STRING10 BusCivilLegalEvent_Flag;
+		STRING2 BusOffenseType;
+		STRING10 BusOffenseType_Flag;
 		STRING2 BusBEOProfLicense;
 		STRING10 BusBEOProfLicense_Flag;
 		STRING2 BusBEOUSResidency;
@@ -198,19 +206,17 @@ EXPORT Layouts := MODULE
 	END;
 
 	EXPORT BatchInLayout  := RECORD
-		unsigned4 seq;
-		string30  acctNo;
-		string15  custType;
+		UNSIGNED4 seq;
+		STRING30  acctNo;
+		STRING15  custType;
 		STRING15 	lexID;
-		string120 companyName;
-		string120 altCompanyName;
-		string11  taxID;
+    
+		STRING120 companyName;
+		STRING120 altCompanyName;
+		STRING11  taxID;
+    
 		STRING3		nameInputOrder;	// sequence of name (FML = First/Middle/Last, LFM = Last/First/Middle) if not specified, uses default name parser
-		STRING120 fullName;
-		STRING20 	firstName;
-		STRING20 	middleName;
-		STRING20 	lastName;
-		STRING5 	suffix;
+		Name;
 		STRING9   ssn;
 		STRING8   dob;
 		
@@ -229,90 +235,25 @@ EXPORT Layouts := MODULE
 		STRING4  		zip4;
 
 		STRING10  phone;
-		unsigned4	HistoryDateYYYYMMDD;
+		STRING10  phone2;
+		
+    STRING25 dlNumber;
+    STRING2 dlState;
+    
+    STRING100 emailAddress;
+    UNSIGNED4	HistoryDateYYYYMMDD;
 	END;
 
-//***Coordinate these changes witht the batch team ***//
+  //***Coordinate these changes witht the batch team ***//
 	EXPORT BatchOut := RECORD
-		STRING30 AcctNo;
-		STRING15 IndLexID;
-		STRING2 IndAssetOwnProperty;
-		STRING10 IndAssetOwnProperty_Flags;
-		STRING2 IndAssetOwnAircraft;
-		STRING10 IndAssetOwnAircraft_Flags;
-		STRING2 IndAssetOwnWatercraft;
-		STRING10 IndAssetOwnWatercraft_Flags;
-		STRING2 IndAssetOwnVehicle;
-		STRING10 IndAssetOwnVehicle_Flags;
-		STRING2 IndAccessToFundsIncome;
-		STRING10 IndAccessToFundsIncome_Flags;
-		STRING2 IndAccessToFundsProperty;
-		STRING10 IndAccessToFundsProperty_Flags;
-		STRING2 IndGeographicRisk;
-		STRING10 IndGeographicRisk_Flags;
-		STRING2 IndMobility;
-		STRING10 IndMobility_Flags;
-		STRING2 IndLegalEvents;
-		STRING10 IndLegalEvents_Flags;
-		STRING2 IndLegalEventsFelonyType;
-		STRING10 IndLegalEventsFelonyType_Flags;
-		STRING2 IndHighRiskNewsProfiles;
-		STRING10 IndHighRiskNewsProfiles_Flags;
-		STRING2 IndAgeRange;
-		STRING10 IndAgeRange_Flags;
-		STRING2 IndIdentityRisk;
-		STRING10 IndIdentityRisk_Flags;
-		STRING2 IndResidencyRisk;
-		STRING10 IndResidencyRisk_Flags;
-		STRING2 IndMatchLevel;
-		STRING10 IndMatchLevel_Flags;
-		STRING2 IndAssociatesRisk;
-		STRING10 IndAssociatesRisk_Flags;
-		STRING2 IndProfessionalRisk;
-		STRING10 IndProfessionalRisk_Flags;
-		 
-		STRING15 BusLexID;
-		STRING2 BusAssetOwnProperty;
-		STRING10 BusAssetOwnProperty_Flags;
-		STRING2 BusAssetOwnAircraft;
-		STRING10 BusAssetOwnAircraft_Flags;
-		STRING2 BusAssetOwnWatercraft;
-		STRING10 BusAssetOwnWatercraft_Flags;
-		STRING2 BusAssetOwnVehicle;
-		STRING10 BusAssetOwnVehicle_Flags;
-		STRING2 BusAccessToFundsProperty;
-		STRING10 BusAccessToFundsProperty_Flags;
-		STRING2 BusGeographicRisk;
-		STRING10 BusGeographicRisk_Flags;
-		STRING2 BusValidityRisk;
-		STRING10 BusValidityRisk_Flags;
-		STRING2 BusStabilityRisk;
-		STRING10 BusStabilityRisk_Flags;
-		STRING2 BusIndustryRisk;
-		STRING10 BusIndustryRisk_Flags;
-		STRING2 BusStructureType;
-		STRING10 BusStructureType_Flags;
-		STRING2 BusSOSAgeRange;
-		STRING10 BusSOSAgeRange_Flags;
-		STRING2 BusPublicRecordAgeRange;
-		STRING10 BusPublicRecordAgeRange_Flags;
-		STRING2 BusShellShelfRisk;
-		STRING10 BusShellShelfRisk_Flags;
-		STRING2 BusMatchLevel;
-		STRING10 BusMatchLevel_Flags;
-		STRING2 BusLegalEvents;
-		STRING10 BusLegalEvents_Flags;
-		STRING2 BusLegalEventsFelonyType;
-		STRING10 BusLegalEventsFelonyType_Flags;
-		STRING2 BusHighRiskNewsProfiles;  //TO BE REMOVED WITH BATCH CHANGES
-		STRING10 BusHighRiskNewsProfiles_Flags;  //TO BE REMOVED WITH BATCH CHANGES
-		STRING2 BusLinkedBusRisk;
-		STRING10 BusLinkedBusRisk_Flags;
-		STRING2 BusExecOfficersRisk;
-		STRING10 BusExecOfficersRisk_Flags;
-		STRING2 BusExecOfficersResidencyRisk;
-		STRING10 BusExecOfficersResidencyRisk_Flags;
+		UNSIGNED4 seq;
+    STRING30 acctNo;
+    BOOLEAN lexIDChanged;
+		PerAttributes;
+		BusAttributes;
+    Citizenship.Layouts.LayoutScoreAndIndicators;
 	END;
+  
 	
 	EXPORT LayoutSICNAIC := RECORD
 		UNSIGNED4 DateFirstSeen;
@@ -338,200 +279,40 @@ EXPORT Layouts := MODULE
 		BOOLEAN otherHighRiskIndustExists;
 		BOOLEAN moderateRiskIndustExists;
 		BOOLEAN lowRiskIndustExists;
-		STRING sicCodes;
-		STRING naicCodes;
+		STRING800 sicCodes;
+		STRING800 naicCodes;
 	END;
 
-
- //---                                                                          ---
- //--- This is all of the criminal data we have for each DID and each offense   ---
- //--- So there are multiple rows for each DID.                                 ---
- //--- data collected came from key-offenders, key-offenses, offenders-risk-key ---
- //--- and key-punishments                                                      ---
- //---                                                                          ---
-	EXPORT CriminalOffenseLayout_by_DIDOffense  := RECORD
-		unsigned4	seq := 0;
-		UNSIGNED6 DID;
-		string60 	offender_key;      // offenders key
-		unsigned4 historydate;
-		unsigned4 ToDaysDate;   
-		UNSIGNED4 DateToUse; 
-		UNSIGNED3 NumOfDaysAgo;  
-    
-    //case details
-    string35 	caseNum;                     // Key_Offenders_Risk.case_num
-    string50  courtType;                   // Key_Offenders.datasource
-    string3   num_of_counts;               // Key_Offenses.num_of_counts
-    string75  charge;                      // Key_Offenders_Risk.offense.court_off_desc_1
-    string40  courtDispDesc1;              // Key_Offenders_Risk.offense.court_disp_desc_1
-		string40  courtDispDesc2;              // Key_Offenders_Risk.offense.court_disp_desc_2
-    
-    //offense details
-    STRING35  caseType;                    // Key_Offenders.case_type_desc
-    STRING35  arrestLevel;                 // Key_Court_Offenses.arr_off_lev_mapped 
-    string1   untouchedOffenseScore;
-    string1   offenseScore;                // values are 'U' or null = UNKOWN, 'M'= Misdemeanor, 'F'= Felony, 'T' = TRAFFIC, 'I'=Infraction.
-    string5   courtOffenseLevel;           // values are documented in a spreadsheet. 
-    
-    //offense locations
-    STRING25  offenseState;                // Key_Offenders_Risk.orig_state
-    STRING30  offenseCounty;               // Key_Offenders_Risk.county_of_origin
-    STRING    courtCounty;                 // Key_Offenses.court_county
-    STRING50  offenseCity;                 // Key_Offenses.offenseTown
-    STRING    agency;                      // Key_Court_Offenses.le_agency_desc
-           
-    //offense dates
-    string8   offenseDate;                 // Key_Offenders_Risk.offense.off_date
-		string8   arrestDate;                  // Key_Offenders_Risk.offense.arr_date
-    string8   courtDispDate;               // Key_Offenders_Risk.offense.court_disp_date
-    string8   sentenceDate;                // Key_Offenders_Risk.offense.sent_date
-		string8   appealDate;                  // Key_Offenders_Risk.offense.appeal_date
-    STRING8   incarcerationDate;
-    STRING8   incarcerationReleaseDate;
-    
-    //additional offense details
-    /*  To determine whether any of these 3 conditions were EVER TRUE - follow the code in getIndCriminal */
-		string1   Ever_incarc_offenders;       // pulled from key_ offenders
-		string1   Ever_incarc_offenses;        // pulled from key_ offenses
-		string1   Ever_incarc_punishments;     // pulled from key_ punishment
-    /*  To determine whether any of these 3 condition are CURRENTLY TRUE - Use logic similar to the VOO function */
-		string1   Curr_incarc_offenders;        // Key_Offenses.curr_incar_flag
-		string1   Curr_incarc_offenses;         // Key_Offenses.stc_desc_2
-		string1   Curr_incarc_punishments;      // Key_Punishment.latest_adm_dt
-    STRING1   currentProbation;             // Key_Offenders.curr_prob_flag
-    STRING    probationSentence;            // Key_Court_Offenses.sent_probation
-    
-    //offender description/info
-    string30  race;                        // Key_Offenders_Risk.race_desc
-    string1   sex;                         // Key_Offenders_Risk.sex
-    string50  hairColor;                   // Key_Offenders_Risk.hair_color_desc
-    string15  eyeColor;                    // Key_Offenders_Risk.eye_color_desc
-    string3   height;                      // Key_Offenders_Risk.height
-    string3   weight;                      // Key_Offenders_Risk.weight
-    string2   citizenship;                 // Key_Offenders_Risk.citizenship
-    
-    //other details
-    UNSIGNED4 legalEventTypeCode;       // Code/Weight from RegularExpressions
-    STRING1   stateFederalData;            //Constant of S = State  or F = Federal
-    string8   earliestOffenseDate;         // in order to calculate how old this date is I need to send we clean it before using it.
-		string8   untouchedearliestOffenseDate;  // if we need to show this in the report it should be the uncleaned date.
-    string20  courtStatute;                // Key_Offenders_Risk.offense.court_statute
-		string70  courtStatuteDesc;            // Key_Offenders_Risk.offense.court_statute_desc
-    
-    string1 	curr_parole_flag;            // pulled from the offenders key
-    string1 	curr_parole_punishments;     // pulled from the key_ punishment
-    
-		
-    
-
-
-
-		string1   convictionFlag; 
-		string1   trafficFlag;
-		string1   criminalOffenderLevel;       // values are 4 = NON-TRAFFIC/CONVICTED, 3 = NON-TRAFFIC/NOT-CONVICTED, 2 = TRAFFIC/CONVICTED, 1 = TRAFFIC/NOT-CONVICTED
-		
-		string20  caseTypeDesc;                // ***???
-
-		string30  stc_desc_2;                  // offenses key  --- pulled but not used, except for verification
-		string35  court_off_lev_mapped;        // Court_Offenses key
-	 
-	END;
-	
- //---                                                                          ---
- //--- These counts are all of the data we have for each offense but it is      ---
- //--- rolled up to a single DID                                                ---
- //---                                                                          ---
-	EXPORT TrafficOffensesCounts := RECORD                            
-	 /* CONVICTED TRAFFIC VIOLATIONS */ 
-		unsigned2   ConvictedTraffic2T_OVNYR;                           //*** Convicted Traffic Violations over 3 years
-		unsigned2   ConvictedTraffic2T_NYR;                             //*** Convicted Traffic Violations in the past 3 years
-		unsigned2   ConvictedTraffic2T_Ever;                            //*** Convicted Traffic Violations EVER
-    /*  CONVICTED INFRACTIONS VIOLATIONS */    
-		unsigned2   ConvictedInfractions2I_OVNYR;                       //*** Convicted Infractions over 3 years
-		unsigned2   ConvictedInfractions2I_NYR;                         //*** Convicted Infractions in the past 3 years
-		unsigned2   ConvictedInfractions2I_Ever;                        //*** Convicted Infractions EVER
-    //Non Convicted traffic and infractions ever
-    UNSIGNED2   NonConvictedTraffic1T_Ever;
-    UNSIGNED2   NonConvictedInfraction1I_Ever;    
-  END;  
-	
-	EXPORT CivilOffensesCounts := RECORD                               
-	/* LIENS and JUDGMENTS and EVICTIONS */  
-		unsigned2   liensUnreleasedCntOVNYR;                            //*** liens unreleased over 3 years
-		unsigned2   liensUnreleasedCntInThePastNYR;                     //*** liens unreleased in the past 3 years
-		unsigned2   liensUnreleasedCnt;                                 //*** liens unreleased EVER
-    
-    unsigned2   liensReleasedCnt;                                   //*** liens released EVER
-		
-		unsigned2   evictionsCntOVNYR;                                  //*** evictions over 3 years ago
-		unsigned2   evictionsCntInThePastNYR;                           //*** evcitions in the past 3 years
-		unsigned2   evictionsCnt;                                       //*** evictions EVER
-	END;  
-	
-	EXPORT CriminalOffensesCounts := RECORD                            
-	/* CONVICTED NON-TRAFFIC VIOLATIONS */  
-		unsigned2   ConvictedFelonyCount4F_OVNYR;                          //*** Convicted Felony counts over 3 years ago 
-		unsigned2   ConvictedFelonyCount4F_NYR;                          //*** Convicted Felony counts in past 3 years
-		unsigned2   ConvictedFelonyCount4F_Ever;                         //*** Convicted Felony counts EVER
-		
-		unsigned2   ConvictedUnknownCount4U_OVNYR;                         //*** Convicted Unknown counts over 3 years ago
-		unsigned2   ConvictedUnknownCount4U_NYR;                         //*** Convicted Unknown counts in past 3 years
-		unsigned2   ConvictedUnknownCount4U_Ever;                        //*** Convicted Unknown counts EVER
-		
-		unsigned2   ConvictedMisdemeanorCount4M_OVNYR;                     //*** Convicted Misdemeanor counts over 3 years ago 
-		unsigned2   ConvictedMisdemeanorCount4M_NYR;                     //*** Convicted Misdemeanor counts in past 3 years
-		unsigned2   ConvictedMisdemeanorCount4M_Ever;                    //*** Convicted Misdemeanor counts EVER
-		
-		/* NON-CONVICTED NON-TRAFFIC VIOLATIONS */ 
-		unsigned2   NonConvictedFelonyCount3F_OVNYR;                       //*** Non-Convicted Felony counts over 3 years ago
-		unsigned2   NonConvictedFelonyCount3F_NYR;                       //*** Non-Convicted Felony counts in past 3 years
-		unsigned2   NonConvictedFelonyCount3F_EVER;                        //*** Non-Convicted Felony count EVER
-		
-		unsigned2   NonConvictedUnknownCount3U_OVNYR;                      //*** Non-Convicted Unknown counts over 3 years ago
-		unsigned2   NonConvictedUnknownCount3U_NYR;                      //*** Non-Convicted Unknown counts in past N# of years
-		unsigned2   NonConvictedUnknownCount3U_EVER;                     //*** Non-Convicted Unknown counts EVER
-		
-		unsigned2   NonConvictedMisdemeanorCount3M_OVNYR;                  //*** Non-Convicted Misdemeanor counts over 3 years ago
-		unsigned2   NonConvictedMisdemeanorCount3M_NYR;                  //*** Non-Convicted Misdemeanor counts in past N# of years
-		unsigned2   NonConvictedMisdemeanorCount3M_EVER;                   //*** Non-Convicted Misdemeanor count EVER
-	END;   
-	
-	EXPORT IncarcaratedParoleFlags := RECORD                           
-    /* Incarcarated and Parole Evidence of */    
-		BOOLEAN     EverIncarcer;                                       //*** Ever incarcerated
-		BOOLEAN     CurrIncarcer;                                       //*** Currently incarcerated  
-		BOOLEAN     CurrParole;                                         //*** Currently on Parole	
-	END;
   
 	
-	EXPORT DerogatoryEvents := RECORD 
-	  /* Incarcarated and Parole counts */    
-		 IncarcaratedParoleFlags;  
-		 CriminalOffensesCounts;
-		 TrafficOffensesCounts;  
-     BOOLEAN noEvidenceOfConvictedStateCrim;
-     BOOLEAN noEvidenceOfTrafficOrInfraction;
-		/* TOTAL OF ALL OFFENSES  */  
-		unsigned2   ALLOffensesForThisDID;                            //*** All Criminal Offenses EVER.
-	END;
+	EXPORT CivilOffensesCounts := RECORD                               
+	  /* LIENS and JUDGMENTS and EVICTIONS */  
+		UNSIGNED2   liensUnreleasedCntOVNYR;                            //*** liens unreleased over 3 years
+		UNSIGNED2   liensUnreleasedCntInThePastNYR;                     //*** liens unreleased in the past 3 years
+		UNSIGNED2   liensUnreleasedCnt;                                 //*** liens unreleased EVER
+    
+    UNSIGNED2   liensReleasedCnt;                                   //*** liens released EVER
+		
+		UNSIGNED2   evictionsCntOVNYR;                                  //*** evictions over 3 years ago
+		UNSIGNED2   evictionsCntInThePastNYR;                           //*** evcitions in the past 3 years
+		UNSIGNED2   evictionsCnt;                                       //*** evictions EVER
+	END;  
+		
 	
 	EXPORT GeographicRiskLayout := RECORD 
 		STRING12    buildgeolink;
 		STRING3	    EasiTotCrime;
-		STRING      CityState;
+		STRING28    CityState;
     STRING5     FipsCode;  
-    STRING50    CountyName;                             //populated in DueDiligence.Common.getGeographicRisk       
-		string1   	AddressVacancyInd;                      //is not being populated?????
-		boolean     CountyHasHighCrimeIndex;                //populated in DueDiligence.Common.getGeographicRisk
-		boolean     CountyBordersForgeinJur;                //populated in DueDiligence.Common.getGeographicRisk
-		boolean     CountyBorderOceanForgJur;               //populated in DueDiligence.Common.getGeographicRisk
-		boolean     CityBorderStation;                      //populated in DueDiligence.Common.getGeographicRisk
-		boolean     CityFerryCrossing;                      //populated in DueDiligence.Common.getGeographicRisk
-		boolean     CityRailStation;                        //populated in DueDiligence.Common.getGeographicRisk
-		boolean     HIDTA;                                  //populated in DueDiligence.Common.getGeographicRisk
-		boolean     HIFCA;                                  //populated in DueDiligence.Common.getGeographicRisk
-		boolean     HighFelonNeighborhood;                  //populated in ???
-		boolean     HRBusPct;                               //populated in ???
+    STRING50    CountyName;                             //populated in DueDiligence.Common.getGeographicRisk 
+		BOOLEAN     CountyHasHighCrimeIndex;                //populated in DueDiligence.Common.getGeographicRisk
+		BOOLEAN     CountyBordersForgeinJur;                //populated in DueDiligence.Common.getGeographicRisk
+		BOOLEAN     CountyBorderOceanForgJur;               //populated in DueDiligence.Common.getGeographicRisk
+		BOOLEAN     CityBorderStation;                      //populated in DueDiligence.Common.getGeographicRisk
+		BOOLEAN     CityFerryCrossing;                      //populated in DueDiligence.Common.getGeographicRisk
+		BOOLEAN     CityRailStation;                        //populated in DueDiligence.Common.getGeographicRisk
+		BOOLEAN     HIDTA;                                  //populated in DueDiligence.Common.getGeographicRisk
+		BOOLEAN     HIFCA;                                  //populated in DueDiligence.Common.getGeographicRisk
 	END;  	
 	
  
@@ -544,27 +325,14 @@ EXPORT Layouts := MODULE
 		UNSIGNED4 firstReported;
 		UNSIGNED4 lastReported;
 	END;
-	
-	EXPORT BusOperLocationLayout := RECORD
+  
+  EXPORT CommonGeographicLayout := RECORD
 	 Address;
 	 GeographicRiskLayout;  
 	 BOOLEAN cmra;
 	 BOOLEAN vacant;
    STRING1 addressType;
 	END;	
-  
-  EXPORT BusinessLegalSummary := RECORD 
-    UNSIGNED3   BusFelonyConviction_4F;
-    UNSIGNED3   BusFelonyNonConviction_3F;
-    UNSIGNED3   BusMisdemeanorConviction_4M;
-    UNSIGNED3   BusMisdemeanorNonConviction_3M;
-    UNSIGNED3   BusUnknownConviction_4U;
-    UNSIGNED3   BusUnknownNonConviction_3U;
-    UNSIGNED3   BusTrafficConviction_2T;
-    UNSIGNED3   BusTrafficNonConviction_1T; 
-    UNSIGNED3   BusInfractionConviction_2I;
-    UNSIGNED3   BusInfractionNonConviction_1I;
-  END;
 	
 	
 	EXPORT LayoutAgent := RECORD
@@ -584,29 +352,8 @@ EXPORT Layouts := MODULE
 		INTEGER  source_record_id;
     STRING  vl_id;     
 	END;
-	
-	EXPORT BusReportDetails        := RECORD
-    DATASET(BusOperLocationLayout) operatingLocations {MAXCOUNT(DueDiligence.Constants.MAX_OPERATING_LOCATIONS)};
-    BOOLEAN FEINSourceContainsE5;
-    STRING  FEIN_Masked_For_Report;
-    UNSIGNED3 FEINSourcesCnt;   
-    DATASET(FEINLayoutSources) FEINSources;
-    UNSIGNED3 YellowPageCnt;          //***among all of the Shell Shelf Sources - Yellow pages is 1 of them
-    UNSIGNED3 BetterBusCnt;           //***among all of the Shell Shelf Sources - Better Business Bureau is 1 of them
-    UNSIGNED3 UtilityCnt;             //***among all of the Shell Shelf Sources - Utilities is 1 of them
-    UNSIGNED3 GongGovernmentCnt;      //***among all of the Shell Shelf Sources - Gong Government is 1 of them
-    UNSIGNED3 GongBusinessCnt;        //***among all of the Shell Shelf Sources - Gong Business is 1 of them  
-    STRING2 CompanyIncorpState;
-    DATASET(BusSourceLayout)       sourcesReporting {MAXCOUNT(DueDiligence.Constants.MAX_BUREAUS)};
-    DATASET(BusSourceLayout)       bureauReporting {MAXCOUNT(DueDiligence.Constants.MAX_BUREAUS)};
-    UNSIGNED4 dateVendorFirstReported;
-    BusinessLegalSummary;
-    DATASET(LayoutAgent) namesAssocWithFein {MAXCOUNT(DueDiligence.Constants.MAX_ASSOCIATED_FEIN_NAMES)};
-    DATASET(DD_CompanyNames) companyDBA {MAXCOUNT(DueDiligence.Constants.MAX_DBA_NAMES)};
-    STRING parentCompanyName;
-	END;
-	
-	EXPORT Positions := RECORD
+  
+  EXPORT Positions := RECORD
 		UNSIGNED4 firstSeen;
 		UNSIGNED4 lastSeen;
 		STRING title;
@@ -628,64 +375,283 @@ EXPORT Layouts := MODULE
 		BOOLEAN blastPilot;
 		BOOLEAN other;
 	END;
-
-	
-	EXPORT SlimIndividual := RECORD
-		UNSIGNED6 did;
+    
+  EXPORT DIDAndName := RECORD
+    UNSIGNED6 did;
+    Name;
+  END;
+  
+  EXPORT SlimIndividual := RECORD
+		DIDAndName;
 		UNSIGNED2 score;		//did score
 		STRING9 ssn;
 		UNSIGNED4 dob;
-		STRING phone;
-		Name;
+		STRING10 phone;
 		Address;
 	END;
-	
-	
-	EXPORT RelatedParty := RECORD
+  
+  EXPORT CriminalSources := RECORD
+    STRING75 offenseCharge;
+    STRING1 offenseConviction;
+    STRING1 offenseChargeLevelCalculated;
+    STRING35 offenseChargeLevelReported;
+    STRING25 source;
+    STRING50 courtDisposition1;
+    STRING50 courtDisposition2;
+    UNSIGNED4 offenseReportedDate;
+    UNSIGNED4 offenseArrestDate;
+    UNSIGNED4 offenseCourtDispDate;
+    UNSIGNED4 offenseAppealDate;
+    UNSIGNED4 offenseSentenceDate;
+    UNSIGNED4 offenseSentenceStartDate;
+    UNSIGNED4 DOCConvictionOverrideDate;
+    UNSIGNED4 DOCScheduledReleaseDate;
+    UNSIGNED4 DOCActualReleaseDate;
+    STRING50 DOCInmateStatus;
+    STRING50 DOCParoleStatus;
+    STRING30 offenseMaxTerm;
+    DATASET({STRING120 name}) partyNames;
+    
+    //used for file validation
+    STRING1 validate_trafficRelated;
+    UNSIGNED8 validate_category;
+    STRING100 validate_eventType;
+  END;
+  
+  EXPORT CriminalOffenses := RECORD
+    //fields used for attribute calculation - calc based on roll of sources
+    BOOLEAN attr_currentlyIncarceratedOrParoled;
+    BOOLEAN attr_felonyPast3Yrs;
+    BOOLEAN attr_felonyOver3Yrs;
+    BOOLEAN attr_previouslyIncarcerated;
+    BOOLEAN attr_uncategorizedConvictionPast3Yrs;
+    BOOLEAN attr_uncategorizedConvictionOver3Yrs;
+    BOOLEAN attr_misdemeanorConvictionPast3Yrs;
+    BOOLEAN attr_misdemeanorConvictionOver3Yrs;
+    
+    BOOLEAN attr_legalEventCat9;
+    BOOLEAN attr_legalEventCat8;
+    BOOLEAN attr_legalEventCat7;
+    BOOLEAN attr_legalEventCat6;
+    BOOLEAN attr_legalEventCat5;
+    BOOLEAN attr_legalEventCat4;
+    BOOLEAN attr_legalEventCat3;
+    BOOLEAN attr_legalEventCat2;
+    
+    //Top Level Data
+    STRING2 state;
+    STRING25 source;
+    STRING35 caseNumber;
+    STRING35 offenseStatute;
+    STRING8 offenseDDFirstReportedActivity;
+    UNSIGNED4 offenseDDLastReportedActivity;
+    UNSIGNED4 offenseDDLastCourtDispDate;
+    UNSIGNED1 offenseDDLegalEventTypeCode;
+    STRING75 offenseCharge;
+    STRING1 offenseDDChargeLevelCalculated;
+    STRING35 offenseChargeLevelReported; 
+    STRING1 offenseConviction;
+    STRING13 offenseIncarcerationProbationParole;
+    STRING1 offenseTrafficRelated;
+    
+    //Additional details
+    STRING county;
+    STRING50 countyCourt;
+    STRING25 city;
+    STRING50 agency;
+    STRING30 race;
+    STRING1 sex;
+    STRING15 hairColor;
+    STRING5 eyeColor;
+    STRING3 height;
+    STRING3 weight;
+    
+    //Source info
+    DATASET(CriminalSources) sources;
+  END;
+  
+  EXPORT RelatedParty := RECORD
 		SlimIndividual;
 		STRING2 usResidencyScore;
 		STRING10 usResidencyFlags;
 		STRING2 legalEventTypeScore;
 		STRING10 legalEventTypeFlags;
-    STRING2 trafficInfractionScore;
-    STRING10 trafficInfractionFlags;
     STRING2 stateCriminalLegalEventsScore;
     STRING10 stateCriminalLegalEventsFlags;
     STRING2 civilLegalEventsScore;
     STRING10 civilLegalEventsFlags;
-    DerogatoryEvents;                           //***these are rolled upto the DID 
 		UNSIGNED3 numOfPositions;
 		DATASET(Positions) positions; //{MAXCOUNT(DueDiligence.Constants.MAX_POSITIONS)};
 		UNSIGNED3 numOfLicenses;
 		DATASET(Licenses) licenses; //{MAXCOUNT(DueDiligence.Constants.MAX_LICENSES)};
-		DATASET(CriminalOffenseLayout_by_DIDOffense) partyOffenses;    //***these are listed at the offense level for each DID
+    DATASET(CriminalOffenses) indOffenses;   //{MAXCOUNT(DueDiligence.Constants.MAX_OFFENSES)};
 	END;
-
+  
+  EXPORT PropertyDataLayout := RECORD
+    Address;
+    STRING50 addressType;
+    STRING8   purchaseDate; 
+    INTEGER8  purchasePrice;
+    INTEGER2  lengthOfOwnership;
+    STRING4 assessedYear;
+    INTEGER8 assessedValue;
+  END;
+  
+  EXPORT BusPropertyDataLayout := RECORD
+    PropertyDataLayout;
+    STRING120 ownerName;
+  END;
+  
+  EXPORT IndPropertyDataLayout := RECORD
+    PropertyDataLayout;
+    BOOLEAN inquiredOwned;
+    BOOLEAN spouseOwned;
+    STRING1 ownerOccupied;
+    DATASET(DIDAndName) propertyOwners;
+  END;
+  
+  EXPORT WatercraftDataLayout := RECORD
+    BOOLEAN inquiredOwned;
+    BOOLEAN spouseOwned;
+    DATASET(DIDAndName) watercraftOwners;
+    UNSIGNED8 purchasePrice;
+    STRING4 year;
+		STRING30 make;
+		STRING30 model;
+    STRING vesselType;
+    STRING propulsion;
+    STRING hullTypeDescription;
+    STRING2 titleState;   //TO REMOVE AFTER WEB
+    UNSIGNED2 vesselLengthFeet;
+    UNSIGNED2 vesselLengthInches;
+    UNSIGNED2 vesselTotalLength;	 
+    UNSIGNED4 oldestTitleDate;
+    UNSIGNED4 newestTitleDate;
+    STRING registrationNumber;
+    UNSIGNED4 oldestRegistrationDate;
+    UNSIGNED4 newestRegistrationDate;
+    STRING2 registrationState;
+  END;
+  
+  EXPORT AircraftDataLayout := RECORD
+    BOOLEAN inquiredOwned;
+    BOOLEAN spouseOwned;
+    DATASET(DIDAndName) aircraftOwners;
+    
+    STRING8 tailNumber;
+    STRING4 year;
+    STRING30 make;
+    STRING30 model;
+    STRING30 vin;
+    STRING8 registrationDate;
+    STRING12 manufactureModelCode;		//used to get number of engines
+  END;
+  
+  EXPORT VehicleDataLayout := RECORD
+    BOOLEAN inquiredOwned;
+    BOOLEAN spouseOwned;
+    DATASET(DIDAndName) vehicleOwners;
+      
+    STRING30 licensePlateType;
+    STRING50 classType;
+    STRING4 year;
+    STRING36 make;
+    STRING30 model;
+    UNSIGNED6 basePrice;
+    STRING25 vin;
+    
+    STRING2 titleState;
+    STRING8 titleDate;
+    STRING2 registeredState;
+    STRING8 registeredDate;
+    
+    /* data that describes the vehicle */
+    string25		Orig_VIN;                        
+		string4			Orig_Year;
+    string36		Orig_Make_Desc; 
+    string30		Orig_Model_Desc;
+    string30    license_Plate_Type; 
+    string50    Class_Type;
+    unsigned6   Vina_Price; 
+    /* title  */  
+    string2     Title_State;                   
+	  integer2    Title_Year;                      
+		integer2    Title_Month;                     
+		integer2    Title_Day;                    
+    /* registration */  
+    string2     Registered_State;                    
+	  integer2    Registered_Year;                    
+		integer2    Registered_Month;                  
+		integer2    Registered_Day; 
+	END;
+  
+	EXPORT BusReportDetails := RECORD
+    DATASET(BusPropertyDataLayout) busProperties {MAXCOUNT(DueDiligence.Constants.MAX_PROPERTIES)};
+    DATASET(WatercraftDataLayout) busWatercraft {MAXCOUNT(DueDiligence.Constants.MAX_WATERCRAFT)};
+    DATASET(AircraftDataLayout) busAircraft {MAXCOUNT(DueDiligence.Constants.MAX_AIRCRAFT)};
+    DATASET(CommonGeographicLayout) operatingLocations {MAXCOUNT(DueDiligence.Constants.MAX_OPERATING_LOCATIONS)};
+    BOOLEAN FEINSourceContainsE5;
+    STRING9 FEIN_Masked_For_Report;
+    UNSIGNED3 FEINSourcesCnt;   
+    DATASET(FEINLayoutSources) FEINSources;
+    UNSIGNED3 YellowPageCnt;          //***among all of the Shell Shelf Sources - Yellow pages is 1 of them
+    UNSIGNED3 BetterBusCnt;           //***among all of the Shell Shelf Sources - Better Business Bureau is 1 of them
+    UNSIGNED3 UtilityCnt;             //***among all of the Shell Shelf Sources - Utilities is 1 of them
+    UNSIGNED3 GongGovernmentCnt;      //***among all of the Shell Shelf Sources - Gong Government is 1 of them
+    UNSIGNED3 GongBusinessCnt;        //***among all of the Shell Shelf Sources - Gong Business is 1 of them  
+    STRING2 CompanyIncorpState;
+    DATASET(BusSourceLayout) sourcesReporting {MAXCOUNT(DueDiligence.Constants.MAX_BUREAUS)};
+    DATASET(BusSourceLayout) bureauReporting {MAXCOUNT(DueDiligence.Constants.MAX_BUREAUS)};
+    UNSIGNED4 dateVendorFirstReported;
+    DATASET(LayoutAgent) namesAssocWithFein {MAXCOUNT(DueDiligence.Constants.MAX_ASSOCIATED_FEIN_NAMES)};
+    DATASET(DD_CompanyNames) companyDBA {MAXCOUNT(DueDiligence.Constants.MAX_DBA_NAMES)};
+    STRING parentCompanyName;
+    UNSIGNED2 DIDlessBEOCount; 
+    DATASET(RelatedParty) DIDlessExecs {MAXCOUNT(DueDiligence.Constants.MAX_EXECS)};
+	END;
+  
+  EXPORT IndReportDetails := RECORD
+    STRING9 inputSSN;
+    STRING9 bestSSN;
+    STRING10 bestPhone;
+    UNSIGNED4 bestDOB;
+    Name bestName;
+		Address bestAddress;
+    DATASET(IndPropertyDataLayout) perProperties {MAXCOUNT(DueDiligence.Constants.MAX_PROPERTIES)};
+    DATASET(WatercraftDataLayout) perWatercraft {MAXCOUNT(DueDiligence.Constants.MAX_WATERCRAFT)};
+    DATASET(VehicleDataLayout) perVehicle {MAXCOUNT(DueDiligence.Constants.MAX_VEHICLE)};  
+    DATASET(AircraftDataLayout) perAircraft {MAXCOUNT(DueDiligence.Constants.MAX_AIRCRAFT)};  
+  END;
+	
+	
+  
 	
 	EXPORT Indv_Internal := Record
-		UNSIGNED4	 seq := 0;
-		UNSIGNED4	 historyDate;													//If all 9s will be todays date, otherwise cleaned input date (actual date value)
-		UNSIGNED4		historyDateRaw;										//cleaned date used to calc history date
-		BOOLEAN 			inputAddressProvided;
-		BOOLEAN				fullInputAddressProvided;
-		UNSIGNED6		inquiredDID;
-		RelatedParty 		individual;																								//populated in DueDiligence.getIndDID, DueDiligence.getIndBestData
-		UNSIGNED4 	numberOfSpouses;																							
-		SlimIndividual spouse;																												//populated in DueDiligence.getIndRelatives
-		DATASET(SlimIndividual) parents {MAXCOUNT(DueDiligence.Constants.MAX_PARENTS)}; 			//populated in DueDiligence.getIndRelatives
-		Indv_Input indvRawInput;
-		Indv_Input	indvCleanInput;
-		STRING2				indvType;                         					    //II = Inquired Individual, IS = Inquired Individual Spouse,  IP = Inquired Individual Parent, 
+		UNSIGNED6 seq := 0;
+		UNSIGNED4 historyDate;													//If all 9s will be todays date, otherwise cleaned input date (actual date value)
+		UNSIGNED4 historyDateRaw;										    //cleaned date used to calc history date
+		BOOLEAN inputAddressProvided;
+		BOOLEAN fullInputAddressProvided;
+    Indv_Input indvRawInput;
+		Indv_Input indvCleanInput;
+    GeographicRiskLayout; 
+		UNSIGNED6 inquiredDID;
+		RelatedParty individual;											  //populated in DueDiligence.getIndDID, DueDiligence.getIndBestData
+		UNSIGNED4 numberOfSpouses;																							
+		DATASET(SlimIndividual) spouses;																												//populated in DueDiligence.getIndRelatives
+		DATASET(SlimIndividual) parents {MAXCOUNT(DueDiligence.Constants.MAX_PARENTS)}; 			  //populated in DueDiligence.getIndRelatives
+		STRING2 indvType;                         		  //II = Inquired Individual, IS = Inquired Individual Spouse,  IP = Inquired Individual Parent, 
 		
     DueDiligence.LayoutsAttributes.PersonAttributeValues;         //used in calc'ing attribute values in getIndKRI
 
+    IndReportDetails;                               //Used to hold report data when we have access instead of multiple key calls
 		PerAttributes;
     iesp.duediligencepersonreport.t_DDRPersonReport personReport;
 	END;
 
 
 	EXPORT Busn_Internal := Record
-		UNSIGNED4	  seq := 0;
+		UNSIGNED6	  seq := 0;
 		UNSIGNED4	  historydate;
 		BOOLEAN 		inputAddressProvided;
 		BOOLEAN			fullInputAddressProvided;
@@ -700,7 +666,6 @@ EXPORT Layouts := MODULE
     
     DueDiligence.LayoutsAttributes.BusinessAttributeValues;         //used in calc'ing attribute values in getBusKRI
 
-		unsigned2 	CountOwnProp;                                       //populated in DueDiligence.getBusProperty - 
 		UNSIGNED4		filingDate;	
 		BOOLEAN			sosFilingExists;												            //populated in DueDiligence.getBusSOSDetail
 		STRING2			residentialAddr;												            //populated in DueDiligence.getBusAsInd
@@ -710,28 +675,20 @@ EXPORT Layouts := MODULE
 		SicNaicRiskLayout sicNaicRisk;											            //populated in DueDiligence.getBusSicNaic -- ATTRIBUTE AND OTHER LAYOUTS??
 		UNSIGNED3		numOfSicNaic;
 		DATASET(LayoutSICNAIC) sicNaicSources {MAXCOUNT(DueDiligence.Constants.MAX_SIC_NAIC)};		//populated in DueDiligence.getBusSicNaic, DueDiligence.getBusHeader, DueDiligence.getBusRegistration, DueDiligence.getBusSOSDetail
-		UNSIGNED3		numOfRegAgents;
+		
+    UNSIGNED3		numOfRegAgents;
 		DATASET(LayoutAgent) registeredAgents {MAXCOUNT(DueDiligence.Constants.MAX_REGISTERED_AGENTS)};		//populated in DueDiligence.getBusRegistration, DueDiligence.getBusSOSDetail
 		
 		/* BusMatchLevel  */ 
 		INTEGER2		weight;                                             //populated in -------------------------- 
 		
-		unsigned4   SOSLastReported;																								
-		unsigned2 	CorpStateCount;													
-		unsigned4	  BusnHdrDtLastSeen;										        	    //populated in DueDiligence.getBusHeader		
-		STRING1     dwelltype := '';
-		STRING1     hriskaddrflag := '';
-		string5     FIPsCode;
-		string2	    src := '';
-		
+											
+		UNSIGNED4	  BusnHdrDtLastSeen;										        	    //populated in DueDiligence.getBusHeader		
+		STRING5     FIPsCode;
+
 		/*BusGeographicRisk*/
 		GeographicRiskLayout;   
-		
-		string30  	ShellBusnIndvalues;
-		unsigned1   ShellIndCount;
-		boolean     ShelfBusn;
-		BOOLEAN		  PotentialNIS;
-		boolean     ExecSNNMatch;
+
 	  /* Civil Offenses   */   
 		CivilOffensesCounts  Business;
 
@@ -739,5 +696,6 @@ EXPORT Layouts := MODULE
 		BusReportDetails;
     iesp.duediligencebusinessreport.t_DDRBusinessReport BusinessReport;
 	END;
+
 
 END;

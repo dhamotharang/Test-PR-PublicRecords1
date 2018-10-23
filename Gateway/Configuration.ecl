@@ -92,6 +92,7 @@ export Configuration := module
 	export IsEquifaxEVS(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.EquifaxEVS;
 	export IsAccuDataCNAM(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.IsAccuDataCNAM;
 	export IsEquifaxEmsReport(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.IsEquifaxEmsReport;
+	export IsTuFraudAlert(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.IsTuFraudAlert;
 	// internal
 	export IsNeutralRoxie(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.NeutralRoxie;
 	export IsFCRARoxie(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.FCRARoxie;

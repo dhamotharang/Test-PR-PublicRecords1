@@ -1,4 +1,4 @@
-IMPORT AutoKeyI, AutoStandardI, iesp, BIPV2;
+﻿IMPORT AutoKeyI, AutoStandardI, iesp, BIPV2;
 
 EXPORT IParam := MODULE
 	
@@ -118,6 +118,9 @@ EXPORT IParam := MODULE
     EXPORT STRING8  StartLoadDate := '';
 		EXPORT DATASET 	LinkIds								:= DATASET([], BIPV2.IDlayouts.l_xlink_ids);
 		EXPORT STRING1  BusinessIDFetchLevel 	:= BIPV2.IDconstants.Fetch_Level_SELEID;
+    EXPORT BOOLEAN  isLicenseOnlyReport := FALSE; // defaulting to false so other services (Midex Comp Report & 
+                                                  // Relationship Identifier Report) calling the 
+                                                  // MIDEX_Services.LicenseReport_Records attribute are not impacted
   END;
 
   

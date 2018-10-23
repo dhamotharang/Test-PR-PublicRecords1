@@ -2,10 +2,9 @@
 
 export Boca_Shell_Derogs_FCRA (GROUPED DATASET(layouts.layout_derogs_input) ids, 
 	integer bsVersion, unsigned8 BSOptions=0, 
-	boolean IncludeLnJ = false, boolean onThor=false,
+	boolean IncludeLnJ = false,
 	GROUPED DATASET (risk_indicators.Layout_output) iid_withPersonContext,
- integer2 ReportingPeriod = 84
-   ) := function
+	integer2 ReportingPeriod = 84) := function
 
   todaysdate := (string) risk_indicators.iid_constants.todaydate;
 
@@ -114,13 +113,15 @@ export Boca_Shell_Derogs_FCRA (GROUPED DATASET(layouts.layout_derogs_input) ids,
 	w_corrections := nofold(PROJECT (ids, fetch_corrections(LEFT)));
 
 //new
-	Bankruptcy := Risk_Indicators.Boca_Shell_Bankruptcy_FCRA(bsVersion, BSOptions, w_corrections, onThor); 
-	BankLiens := Risk_Indicators.Boca_Shell_Liens_FCRA(bsVersion, BSOptions, Bankruptcy, onThor); 
-  BankLiensCrim := Risk_Indicators.Boca_Shell_Crim_FCRA(bsVersion, BSOptions, BankLiens, onThor); 
-	BankLiensCrimSO := Risk_Indicators.Boca_Shell_SO_FCRA(bsVersion, BSOptions, BankLiensCrim, onThor); 
+	Bankruptcy := Risk_Indicators.Boca_Shell_Bankruptcy_FCRA(bsVersion, BSOptions, w_corrections); 
+	BankLiens := if(bsVersion >= 3, 
+		Risk_Indicators.Boca_Shell_Liens_FCRA_tmsid(bsVersion, BSOptions, Bankruptcy), 
+		Risk_Indicators.Boca_Shell_Liens_FCRA(bsVersion, BSOptions, Bankruptcy)); 
+ BankLiensCrim := Risk_Indicators.Boca_Shell_Crim_FCRA(bsVersion, BSOptions, BankLiens); 
+	BankLiensCrimSO := Risk_Indicators.Boca_Shell_SO_FCRA(bsVersion, BSOptions, BankLiensCrim); 
 
 	BankLiensCrimSO_LNJ :=	Risk_Indicators.Boca_Shell_Liens_LnJ_FCRA(bsVersion, BSOptions, w_corrections, 
-		IncludeLnJ, onThor, iid_withPersonContext, ReportingPeriod); 							
+		IncludeLnJ, iid_withPersonContext, ReportingPeriod);								
 	DerogsLNJ := JOIN(BankLiensCrimSO, BankLiensCrimSO_LNJ,
 					LEFT.Did = Right.Did,
 					RiskView.Transforms.GetLnJInfo(LEFT, RIGHT),

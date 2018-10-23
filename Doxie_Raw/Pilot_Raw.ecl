@@ -1,4 +1,4 @@
-//============================================================================
+﻿//============================================================================
 // Attribute: Pilot_Raw.  Used by view source service and comp-report.
 // Function to get pilot records by did.
 // Return value: Dataset of layout doxie_crs/layout_pilot_records.
@@ -48,8 +48,8 @@ pilot_override_st := project (pilot_override, transform (doxie_crs.layout_pilot_
 pilot_fcra := raw + pilot_override_st;
 
 doxie_crs.layout_pilot_records addStatementIDs(doxie_crs.layout_pilot_records L, FFD.Layouts.PersonContextBatchSlim R) := transform,
-	skip(~showDisputedRecords and r.isDisputed) 
-		self.StatementIDs := if(ShowConsumerStatements,r.StatementIDs,FFD.Constants.BlankStatements);
+	skip((~showDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs))) 
+		self.StatementIDs := r.StatementIDs;
 		self.isDisputed :=	r.isDisputed;
 		self := L;
 	end;

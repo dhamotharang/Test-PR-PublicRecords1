@@ -1,7 +1,7 @@
-﻿IMPORT BIPV2, Business_Risk_BIP;
+﻿IMPORT BIPV2, Business_Risk_BIP, iesp, Patriot;
 
 EXPORT mod_BusinessShell(DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo) ds_input,
-                           Business_Risk_BIP.LIB_Business_Shell_LIBIN Options) := 
+                           BusinessInstantID20_Services.iOptions Options) := 
 	MODULE
 
 			SHARED Business_Risk_BIP.Layouts.Input convertToBusinessShellInput(RECORDOF(ds_input) le) := TRANSFORM
@@ -114,6 +114,20 @@ EXPORT mod_BusinessShell(DATASET(BusinessInstantID20_Services.layouts.InputCompa
 			END;
 			
 			SHARED Shell_Input := PROJECT(ds_input, convertToBusinessShellInput(LEFT));
+      
+      // Per requirements concerning the Business only: assign Boolean TRUE/FALSE to 
+      // include_additional_watchlists based solely on BIID product type.  
+      //   o  Business InstantID 2.0 - search OFAC only (always search OFAC an any case)
+      //   o  Business InstantID 2.0 Compliance & Business InstantID 2.0 Compliance with SBFE -- 
+      //      search the global watch list        
+      SHARED includeAddlWatchlists := 
+        Options.BIID20_productType IN [ BusinessInstantID20_Services.Types.productTypeEnum.COMPLIANCE, BusinessInstantID20_Services.Types.productTypeEnum.COMPLIANCE_PLUS_SBFE ];
+
+      SHARED ds_derived_watchlists := 
+				DATASET([{patriot.constants.wlOFAC}], iesp.share.t_StringArrayItem) + // always run OFAC for the Business
+				IF(includeAddlWatchlists, DATASET([{patriot.constants.wlALL}], iesp.share.t_StringArrayItem));
+
+      SHARED ds_WatchlistsRequested := Options.Watchlists_Requested + ds_derived_watchlists;
 			 
 			// Grab Business Shell results. Layout is Business_Risk_BIP.Layouts.Shell .
 			SHARED Shell_Results := Business_Risk_BIP.LIB_Business_Shell_Function(Shell_Input,
@@ -129,14 +143,14 @@ EXPORT mod_BusinessShell(DATASET(BusinessInstantID20_Services.layouts.InputCompa
 																																		 Options.BIPBestAppend,
 																																		 Options.OFAC_Version,
 																																		 Options.Global_Watchlist_Threshold,
-																																		 Options.Watchlists_Requested,
+																																		 ds_WatchlistsRequested,
 																																		 Options.KeepLargeBusinesses, 
 																																		 Options.IncludeTargusGateway,
 																																		 Options.Gateways,
-																																		 Options.RunTargusGatewayAnywayForTesting, /* for testing purposes only */
+																																		 Options.RunTargusGatewayAnywayForTesting, // for testing purposes only
 																																		 Options.OverRideExperianRestriction, 
-                                   BusinessInstantID20_Services.Constants.INCLUDE_AUTHREP_IN_BIP_APPEND,
-																	 BusinessInstantID20_Services.Constants.IS_BIID_20);						
+																																		 BusinessInstantID20_Services.Constants.INCLUDE_AUTHREP_IN_BIP_APPEND,
+																																		 BusinessInstantID20_Services.Constants.IS_BIID_20);						
 
 			SHARED BIPV2.IDlayouts.l_xlink_ids2 grabLinkIDs(Business_Risk_BIP.Layouts.Shell le) := 
 				TRANSFORM
@@ -152,4 +166,5 @@ EXPORT mod_BusinessShell(DATASET(BusinessInstantID20_Services.layouts.InputCompa
 			EXPORT BIPIDs := PROJECT(Shell_Results, grabLinkIDs(LEFT));
 			
 			EXPORT Records := Shell_Results; 
+
 	END;

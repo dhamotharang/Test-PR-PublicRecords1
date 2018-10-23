@@ -1,15 +1,11 @@
 ﻿IMPORT Advo,DID_Add, Gateway, Inquiry_AccLogs,MDR,PhoneFinder_Services,PhoneFraud,PhonesInfo,Phones,Risk_Indicators, std, ut;
-	EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final) dInRecs, 
+
+EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final) dInRecs, 
 													 PhoneFinder_Services.iParam.ReportParams inMod, 
 													 DATASET(Gateway.Layouts.Config) dGateways, 
 													 DATASET(PhoneFinder_Services.Layouts.BatchInAppendDID) dInBestInfo,
 													 DATASET(PhoneFinder_Services.Layouts.SubjectPhone) subjectInfo) :=
 	FUNCTION
-
-  
-  displayAll := inMod.TransactionType in [PhoneFinder_Services.Constants.TransType.PREMIUM,
-																						PhoneFinder_Services.Constants.TransType.ULTIMATE,
-																						PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT];	
 	
 	// ---------------------------------------------------------------------------------------------------------
 	// ****************************************Process Location*************************************************
@@ -161,10 +157,12 @@
 												 
 	dPhoneInquiryRecs       := If(inMod.UseDeltabase, dDeltabaseInquiredRecs, dSearchRecswInquiryDaily);
 	
-	dPhoneInquiryRecs_final := PROJECT(dPhoneInquiryRecs, PhoneFinder_Services.Layouts.PhoneFinder.Final); 
+	// we use Inquiry Recs only when RI = 30(30	Phone # has had “Input A” search requests within the past “Input B” days	) is active
+	dPhoneInquiryRecs_final := IF(EXISTS(inMod.RiskIndicators(Active AND RiskId = 30)), 
+	                           PROJECT(dPhoneInquiryRecs, PhoneFinder_Services.Layouts.PhoneFinder.Final),
+	                           PROJECT(dSearchRecswAddrType, PhoneFinder_Services.Layouts.PhoneFinder.Final)); 
 	
 	// Adding Ported data
-	
 		PhoneFinder_Services.Layouts.PhoneFinder.Final UpdatePhonePortedInfo(PhoneFinder_Services.Layouts.PhoneFinder.Final l,PhoneFinder_Services.Layouts.PhoneFinder.Final r) := TRANSFORM 
 		
 			SELF.PortingCode        := r.PortingCode;
@@ -190,7 +188,9 @@
 															LEFT OUTER, KEEP(1),
 															LIMIT(0));
 	
-	dPortedRecs := IF(inMod.TransactionType=PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT, dPhoneInfoWPorting, dPhoneInquiryRecs_final);
+	dPortedRecs := IF(inMod.TransactionType=PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT, 
+	                  dPhoneInfoWPorting, 
+										          dPhoneInquiryRecs_final);
 	
 	// ---------------------------------------------------------------------------------------------------------
 	// ****************************************Process SPOOFs***************************************************
@@ -285,13 +285,14 @@
 															mergeSpoof(LEFT,RIGHT),
 															LEFT OUTER, KEEP(1),
 															LIMIT(0));
-	dPhoneInfoUpdate := IF(EXISTS(spoofInfo) AND inMod.TransactionType IN [PhoneFinder_Services.Constants.TransType.ULTIMATE,
-																																					 PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT],
+		
+		// original approach : display Spoofing when IncludePhoneMetadata and transaction type = ultimate and phoneriskassesment
+	 //Re-design approach: display Spoofing info when IncludeSpoofing = true												
+	 dPhoneInfoUpdate_Spoofing := IF(inMod.ReturnSpoofingInfo AND EXISTS(spoofInfo),
 																																										dPhoneInfoWSpoofing,dPortedRecs);															
 	// ---------------------------------------------------------------------------------------------------------
 	// ****************************************Process OTPs****************************************************
 	// ---------------------------------------------------------------------------------------------------------	
-	
 	//Get OTP records													
 	dOTP	:= JOIN(subjectInfo, PhoneFraud.Key_OTP,
 									KEYED(LEFT.phone = RIGHT.otp_phone) AND
@@ -345,30 +346,34 @@
 																																												
 	//Append OTP results
 	PhoneFinder_Services.Layouts.PhoneFinder.Final mergeOTP(PhoneFinder_Services.Layouts.PhoneFinder.Final l,dvalidOTPwHistory r) := TRANSFORM
-			SELF.OTP 						:= IF(displayAll,r.OTP,false);
-			SELF.OTPCount 			:= IF(displayAll,r.OTPCount,0);
-			SELF.FirstOTPDate 	:= IF(displayAll,r.FirstOTPDate,0);
-			SELF.LastOTPDate	 	:= IF(displayAll,r.LastOTPDate,0);
-			SELF.LastOTPStatus 	:= IF(displayAll,r.LastOTPStatus,false);
-			SELF.OTPHistory		 	:= IF(displayAll,CHOOSEN(SORT(r.OTPHistory,-EventDate),PhoneFinder_Services.Constants.MaxOTPMatches),
+			SELF.OTP 						     := IF(inMod.ReturnOTPInfo,r.OTP,false);
+			SELF.OTPCount 			   := IF(inMod.ReturnOTPInfo,r.OTPCount,0);
+			SELF.FirstOTPDate 	 := IF(inMod.ReturnOTPInfo,r.FirstOTPDate,0);
+			SELF.LastOTPDate	 	 := IF(inMod.ReturnOTPInfo,r.LastOTPDate,0);
+			SELF.LastOTPStatus 	:= IF(inMod.ReturnOTPInfo,r.LastOTPStatus,false);
+			SELF.OTPHistory		  	:= IF(inMod.ReturnOTPInfo,CHOOSEN(SORT(r.OTPHistory,-EventDate),PhoneFinder_Services.Constants.MaxOTPMatches),
 																					DATASET([],PhoneFinder_Services.Layouts.PhoneFinder.OTPs));
 			SELF := l;
 			SELF := [];
 	END;
 		
-	dPhoneInfowOTP		:= JOIN(dPhoneInfoUpdate,dvalidOTPwHistory,
+	dPhoneInfowOTP		:= JOIN(dPhoneInfoUpdate_Spoofing,dvalidOTPwHistory,
 															LEFT.acctno	= RIGHT.acctno AND
 															LEFT.did		= RIGHT.did AND
 															LEFT.phone 	= RIGHT.phone,
 															mergeOTP(LEFT,RIGHT),
 															LEFT OUTER, KEEP(1),
 															LIMIT(0));	
-													
+	 // original approach : display OTP when IncludePhoneMetadata
+	 //Re-design approach: display OTP info when IncludeOTP = true
+	dPhoneInfoUpdate_OTP := IF(inMod.ReturnOTPInfo AND EXISTS(dvalidOTP), dPhoneInfowOTP, dPhoneInfoUpdate_Spoofing);
 	// ---------------------------------------------------------------------------------------------------------
 	// ****************************************Process PRIs****************************************************
 	// ---------------------------------------------------------------------------------------------------------																
-	primaryPhoneSource := [PhoneFinder_Services.Constants.PhoneSource.Waterfall,PhoneFinder_Services.Constants.PhoneSource.QSentGateway];															
-	displayPRI := displayAll AND EXISTS(inMod.RiskIndicators(Active));
+	primaryPhoneSource := [PhoneFinder_Services.Constants.PhoneSource.Waterfall,PhoneFinder_Services.Constants.PhoneSource.QSentGateway];				
+	 // original approach : display RI's when IncludePhoneMetadata and transaction type = premium,ultimate and phoneriskassesment
+	 //Re-design approach: display RI's info when IncludeRiskIndicators = true
+	displayPRI := inMod.IncludeRiskIndicators AND EXISTS(inMod.RiskIndicators(Active));
 	call_fowarded := PhoneFinder_Services.Functions.CallForwardingDesc(1);	// FORWARDED
 	PhoneFinder_Services.Layouts.PhoneFinder.Final rollMetadata(PhoneFinder_Services.Layouts.PhoneFinder.Final l,
 																																PhoneFinder_Services.Layouts.PhoneFinder.Final r) := TRANSFORM
@@ -376,7 +381,7 @@
 			SELF.dt_last_seen					:= (STRING)MAX((INTEGER)l.dt_last_seen,(INTEGER)r.dt_last_seen);
 			SELF.listing_type_bus			:= IF(l.listing_type_bus='',r.listing_type_bus,l.listing_type_bus);
 			SELF.coc_description			:= IF(l.coc_description='',r.coc_description,l.coc_description);
-			SELF.realtimephone_ext.statuscode	:= IF(l.realtimephone_ext.statuscode='',r.realtimephone_ext.statuscode,l.realtimephone_ext.statuscode);
+			SELF.phonestatus	:= IF(l.phonestatus = PhoneFinder_Services.Constants.PhoneStatus.NotAvailable,r.phonestatus,l.phonestatus);
 			// preserve address type since recs with zero DIDs are blank
 			SELF.primary_address_type := IF(l.primary_address_type='',r.primary_address_type,l.primary_address_type); 
 			SELF.typeflag							:= IF(r.typeflag = 'P',l.typeflag,r.typeflag);										
@@ -384,9 +389,22 @@
 			SELF.phone_source					:= IF(l.phone_source IN primaryPhoneSource,l.phone_source,r.phone_source); //more efficiently account for the subject
 			SELF.PhoneOwnershipIndicator := l.PhoneOwnershipIndicator or r.PhoneOwnershipIndicator; // retaining values for a phone
 			SELF.CallForwardingIndicator := IF(l.CallForwardingIndicator = call_fowarded, l.CallForwardingIndicator , r.CallForwardingIndicator);
+			
+			SELF.imsi_changedate := IF(l.imsi_changedate = '', r.imsi_changedate, l.imsi_changedate);
+	        SELF.imsi_ActivationDate := IF(l.imsi_ActivationDate ='', r.imsi_ActivationDate, l.imsi_ActivationDate);
+	        SELF.iccid_seensince := IF(l.iccid_seensince='', r.iccid_seensince, l.iccid_seensince);
+	        SELF.imsi_seensince := IF(l.imsi_seensince='', r.imsi_seensince, l.imsi_seensince);
+	        SELF.imei_seensince := IF(l.imei_seensince='', r.imei_seensince, l.imei_seensince);
+	        SELF.imei_changedate := IF(l.imei_changedate='', r.imei_changedate, l.imei_changedate);
+			SELF.loststolen_date := IF(l.loststolen_date='', r.loststolen_date, l.loststolen_date);
+	        SELF.loststolen := IF(l.loststolen = 0, r.loststolen, l.loststolen);
+			SELF.iccid_changedthis_time := IF(l.iccid_changedthis_time = 0, r.iccid_changedthis_time, l.iccid_changedthis_time);
+			SELF.imsi_changedthis_time :=  IF(l.imsi_changedthis_time = 0, r.imsi_changedthis_time, l.imsi_changedthis_time);
+			SELF.imei_changedthis_time :=  IF(l.imei_changedthis_time = 0, r.imei_changedthis_time, l.imei_changedthis_time);
+			
 			SELF               				:= l;
 	END;
-	dRolledMetadataRecs:= ROLLUP(SORT(dPhoneInfowOTP,acctno,did,phone,typeflag=Phones.Constants.TypeFlag.DataSource_PV,-dt_last_seen,dt_first_seen,phone_source),
+	dRolledMetadataRecs:= ROLLUP(SORT(dPhoneInfoUpdate_OTP,acctno,did,phone,typeflag=Phones.Constants.TypeFlag.DataSource_PV,-dt_last_seen,dt_first_seen,phone_source),
 														LEFT.acctno=RIGHT.acctno AND
 														LEFT.did=RIGHT.did AND
 														LEFT.phone=RIGHT.phone,
@@ -421,6 +439,9 @@
 			SELF.confidencescore := 2;
 			SELF := otherPhonePRI;
 	END;
+	
+	 // original approach : display otherphones RI's when IncludePhoneMetadata and IncludeOtherPhoneRiskIndicators
+	 //Re-design approach: display otherphones RI's when IncludeRiskIndicators = true
 	dOtherPhones_wRiskValues := IF(inMod.IncludeOtherPhoneRiskIndicators AND EXISTS(dOtherPhones), //check if PRI for other phones are required
 																								PROJECT(dOtherPhones,getOtherPRI(LEFT)));
 		
@@ -438,12 +459,12 @@
 			SELF.Alerts							:= r.Alerts;
 			SELF:=l;
 	END;			
-	dPhoneInfowPRI:= 	JOIN(dPhoneInfowOTP,PhoneAlerts,
+	dPhoneInfowPRI:= 	JOIN(dPhoneInfoUpdate_OTP,PhoneAlerts,
 														LEFT.acctno	= RIGHT.acctno AND
 														LEFT.phone 	= RIGHT.phone,
 														mergePRI(LEFT,RIGHT), LEFT OUTER, ALL);
 														
-	MetadataResults:= IF(displayPRI,dPhoneInfowPRI,dPhoneInfowOTP);
+	MetadataResults:= IF(displayPRI,dPhoneInfowPRI,dPhoneInfoUpdate_OTP);
 		
 	
   #IF(PhoneFinder_Services.Constants.Debug.PhoneMetadata)		
@@ -467,14 +488,13 @@
 		// OUTPUT(transformSpoof,NAMED('transformSpoof'));		
 		// OUTPUT(spoofInfo,NAMED('spoofInfo'));		
 		// OUTPUT(spoofInfowHistory,NAMED('spoofInfowHistory'));	
-	  OUTPUT(dPhoneInfoUpdate,NAMED('dPhoneInfoUpdate'));	
+	  OUTPUT(dPhoneInfoUpdate_Spoofing,NAMED('dPhoneInfoUpdate_Spoofing'));	
 		// OUTPUT(dOTP,NAMED('dOTPIndex'));		
 		// OUTPUT(dDeltaOTPwSubject,NAMED('dDeltaOTPwSubject'));		
 		// OUTPUT(dOTPPhones,NAMED('dOTPPhones'));		
 		// OUTPUT(dedupOTPs,NAMED('dedupOTPs'));		
 		// OUTPUT(dvalidOTP,NAMED('dvalidOTP'));		
-		// OUTPUT(dvalidOTPwHistory,NAMED('dvalidOTPwHistory'));		
-		// OUTPUT(dPhoneInfoUpdate,NAMED('dPhoneInfoUpdate'));		
+		// OUTPUT(dvalidOTPwHistory,NAMED('dvalidOTPwHistory'));			
 		OUTPUT(dPhoneInfowOTP,NAMED('dPhoneInfowOTP'));				
 		OUTPUT(drolledMetadataRecs,NAMED('rolledMetadataRecs'));	
 		OUTPUT(dSortedPhoneRecs,NAMED('SortedPhoneRecs'));	
@@ -490,7 +510,7 @@
 		OUTPUT(dPhoneInfowPRI,NAMED('dPhoneInfowPRI'));		
 		OUTPUT(MetadataResults,NAMED('MetadataResults'));		
 	#END;
-	
+
 	RETURN SORT(MetadataResults,acctno,seq);	
 		
-	END;	
+	END;

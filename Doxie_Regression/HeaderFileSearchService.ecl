@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="headerFileSearchRequest">
   <part name="recid" type="xsd:unsignedInt"/>
   <part name="SSN" type="xsd:string"/>
@@ -43,7 +43,7 @@
 /*--INFO-- This service searches the header file.*/
 import doxie,ut,suppress;
 export HeaderFileSearchService := MACRO
-
+#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 #option('workflow', 0);
 unsigned4 StartTick := doxie_regression.TimeService.Ticks() : stored('StartTick');
 doxie.MAC_Header_Field_Declare()

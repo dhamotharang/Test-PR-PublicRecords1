@@ -1,6 +1,7 @@
-﻿IMPORT Watercraft, RiskWise, ut, std, risk_indicators;
+﻿IMPORT _Control, Watercraft, RiskWise, ut, std, risk_indicators;
+onThor := _Control.Environment.OnThor;
 
-EXPORT getWatercraft(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim, boolean onThor) := FUNCTION
+EXPORT getWatercraft(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim) := FUNCTION
 
 WCidKey := Watercraft.key_watercraft_did(false); 
  
@@ -30,8 +31,12 @@ WatercraftKeys_thor :=  join(distribute(PBslim, did2),
 												 atmost(right.l_did=left.did2, riskwise.max_atmost), 
 												 local);
 												 
-WatercraftKeys := if(onThor, watercraftkeys_thor, watercraftkeys_roxie);											 
-											
+#IF(onThor)
+	WatercraftKeys := WatercraftKeys_thor;
+#ELSE
+	WatercraftKeys := WatercraftKeys_roxie;
+#END
+
 WCDetailskey := watercraft.key_watercraft_sid(false);
 											
 ProfileBooster.Layouts.Layout_PB_Slim_watercraft  getWCDetails(WatercraftKeys le, WCDetailskey ri) := TRANSFORM
@@ -62,8 +67,12 @@ WatercraftDetails_thor :=  join(WatercraftKeys, WCDetailskey,
 												 getWCDetails(left,right), 
 												 atmost(right.watercraft_key = left.watercraft_key and right.state_origin = left.state_origin, riskwise.max_atmost));
 												 
-WatercraftDetails :=  if(onThor, watercraftdetails_thor, watercraftdetails_roxie);									 
-												 				 
+#IF(onThor)
+	WatercraftDetails := WatercraftDetails_thor;
+#ELSE
+	WatercraftDetails := WatercraftDetails_roxie;
+#END
+
 SortWCdetails :=  dedup(sort(WatercraftDetails, seq, did2, watercraft_key[1..10], -sequence_key),
 																								seq, did2, watercraft_key[1..10]);
 

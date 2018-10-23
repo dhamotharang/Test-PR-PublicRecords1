@@ -3,46 +3,56 @@ import iesp, Royalty;
 
 EXPORT Layouts := MODULE
 
-	//this shoudl be code map
-	EXPORT error_code := RECORD
-		INTEGER code;
-		STRING message;
+	EXPORT fault_rec := RECORD
+		STRING  Source   := XMLTEXT('faultactor');
+		INTEGER Code     := (INTEGER) XMLTEXT('faultcode');
+		STRING  Location := XMLTEXT('Location');
+		STRING  Message  := XMLTEXT('faultstring');
 	END;
 
-	EXPORT gateway_common := RECORD
-		unsigned6 lexID;
-		integer status;
+	EXPORT consumer_data := RECORD
+			DATASET(iesp.share_fcra.t_ConsumerAlert) ConsumerAlerts;
+			DATASET(iesp.share_fcra.t_ConsumerStatement) ConsumerStatements;
+		  iesp.share_fcra.t_FcraConsumer Consumer;
+	END;
+
+	//These get added to FCRA Gateway responses for compliance with Dempsey.
+	EXPORT dempsey_compliance := RECORD
+		consumer_data;
+		iesp.share.t_CodeMap unique_validation;
 	END;
 
 	EXPORT compliance_out := RECORD
 		boolean is_suppressed_by_alert;
-		DATASET(iesp.share_fcra.t_ConsumerAlert) ConsumerAlerts;
-		DATASET(iesp.share_fcra.t_ConsumerStatement) ConsumerStatements;
-		unsigned6 lexID;
+		consumer_data;
 	END;
 
 	EXPORT equifax_ems := MODULE
 
-		EXPORT fault_rec := RECORD
-			STRING  Source   := XMLTEXT('faultactor');
-			INTEGER Code     := (INTEGER) XMLTEXT('faultcode');
-			STRING  Location := XMLTEXT('Location');
-			STRING  Message  := XMLTEXT('faultstring');
-		END;
-
-		EXPORT gateway_out := RECORD(gateway_common)
+		EXPORT gateway_out := RECORD
+			unsigned6 lexID;
 			iesp.equifax_ems.t_EquifaxEmsResponse response;
 		END;
 
-		//This is the gateway response with royalties and consumer statements/alerts from personcontext
-		EXPORT service_out := RECORD(gateway_out)
-			DATASET(iesp.share_fcra.t_ConsumerAlert) ConsumerAlerts,
-			DATASET(iesp.share_fcra.t_ConsumerStatement) ConsumerStatements,
-			iesp.share.t_CodeMap unique_validation;
-		END;
-
-		EXPORT records_out := RECORD(service_out)
+		//This is the gateway response with royalties, alerts from personContext, and uniqueValidation
+		EXPORT records_out := RECORD(gateway_out)
+			dempsey_compliance;
 			DATASET(Royalty.Layouts.Royalty) royalties;
 		END;
+
 	END;
+
+	EXPORT tu_fraud_alert := MODULE
+
+		EXPORT gateway_out := RECORD
+			unsigned6 lexID;
+			iesp.tu_fraud_alert.t_TuFraudAlertResponse response;
+		END;
+
+		EXPORT records_out := RECORD(gateway_out)
+			DATASET(Royalty.Layouts.Royalty) royalties;
+		END;
+
+	END;
+
 END;

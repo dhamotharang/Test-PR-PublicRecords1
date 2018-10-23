@@ -9,6 +9,8 @@
 import iesp, AutoStandardI;
 
 EXPORT ReportService := MACRO
+ 
+	#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	#onwarning(4207, ignore);
 	//b. Receive input 
 	rec_in := iesp.childidentityfraudreport.t_ChildIdentityFraudReportRequest;

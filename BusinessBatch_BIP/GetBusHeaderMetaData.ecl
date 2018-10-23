@@ -369,18 +369,18 @@ EXPORT GetBusHeaderMetaData := MODULE
                                   BIPV2.IDmacros.mac_JoinTop3Linkids(),
                                   TRANSFORM(rec_SicCodeLayoutWAcctnoSlim,
                                             SELF.acctno := LEFT.acctno,
-																						SELF := LEFT,
+								 SELF := LEFT,
                                             SELF := RIGHT,
-                                            SELF := []), LEFT OUTER);
+                                            SELF := []), LEFT OUTER, limit(0), keep(inMod.MaxResultsPerAcct));
 																		
     // the join to add in the naics code to the previous DS																		
     ds_AllCodesRecsWAcctno := JOIN(ds_SicCodeRecsWAcctno,  ds_IndustryRecsDenormNAICSCode,
 	                                BIPV2.IDmacros.mac_JoinTop3Linkids(),
-																	TRANSFORM(rec_CodesLayout,
+							TRANSFORM(rec_CodesLayout,
                                             SELF.acctno := LEFT.acctno,
                                             SELF := LEFT,
                                             SELF := RIGHT,
-                                            SELF := []), LEFT OUTER);
+                                            SELF := []), LEFT OUTER,  limit(0), keep(inMod.MaxResultsPerAcct));
    																		
     ds_allMetadata := JOIN(ds_AllCodesRecsWAcctno,  ds_BHRecsDenorm,
                             BIPV2.IDmacros.mac_JoinTop3Linkids(),
@@ -388,7 +388,7 @@ EXPORT GetBusHeaderMetaData := MODULE
                                       SELF.acctno := LEFT.acctno;
                                       SELF := LEFT,
                                       SELF := RIGHT,
-                                      SELF := []), LEFT OUTER);  			
+                                      SELF := []),  LEFT OUTER, limit(0), keep(inMod.MaxResultsPerAcct));  			
     
     // set all the fields in here
     // join back to the acctno at the end.
@@ -402,8 +402,8 @@ EXPORT GetBusHeaderMetaData := MODULE
                                                 SELF.Best_Naics_description := RIGHT.BestNaicsDescription,
                                                 SELF := LEFT,
                                                 SELF := RIGHT,
-                                                SELF := []),
-                                      LEFT OUTER),                                
+                                                SELF := []),         
+                                      LEFT OUTER,  limit(0), keep(inMod.MaxResultsPerAcct)),                      
                             BusinessBatch_BIP.Layouts.BusHeaderMetaDataFinal);	  	
 										 
 		// output(BatchInputIn, named('BatchInputIn'));

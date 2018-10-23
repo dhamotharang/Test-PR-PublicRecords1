@@ -128,6 +128,8 @@ export ctg_TrespassofRealProperty          := 'TRESPASS_OF_REALPROPERTY';
 export ctg_PeepingTom                      := 'PEEPING_TOM'; 
 export ctg_Other                           := 'OTHER'; 
 export ctg_Unclassified                    := 'CANNOT_CLASSIFY'; 
+export ctg_Warrant_Fugitive                := 'WARRANT_FUGITIVE';
+export ctg_Obstruct_Resist                 := 'OBSTRUCT_RESIST';
 // export ctg_Embezzlement                 := 'EMBEZZLEMENT';        //Currently Not used
 // export ctg_Extortion_Blackmail          := 'EXTORTION_BLACKMAIL'; //Currently Not used 
 
@@ -177,6 +179,8 @@ export category_to_bitmap  (string category = '')  := map(
 													category = ctg_PeepingTom                     	=> ut.bit_set(0,39),      
 													category = ctg_Other                            => ut.bit_set(0,40),      
 													category = ctg_Unclassified                     => ut.bit_set(0,41),      
+													category = ctg_Warrant_Fugitive                 => ut.bit_set(0,42),
+													category = ctg_Obstruct_Resist                  => ut.bit_set(0,43),
 													0); //Max 64 sources
  
 
@@ -226,7 +230,8 @@ export	string	Get_category_from_bitmap(unsigned bitmap_category) := function
 																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_PeepingTom                      )),' ' + ctg_PeepingTom                     ,'')	
 																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Other                           )),' ' + ctg_Other                          ,'')	
 																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Unclassified                    )),' ' + ctg_Unclassified                   ,'')	
-																																								
+																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Warrant_Fugitive                )),' ' + ctg_Warrant_Fugitive               ,'')
+																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Obstruct_Resist                 )),' ' + ctg_Obstruct_Resist                ,'')
 												 );                                                                                                      	
 		
 		return		stringlib.stringfindreplace(trim(stringlib.stringcleanspaces(translate_bitmap),left,right),'  ',' ');

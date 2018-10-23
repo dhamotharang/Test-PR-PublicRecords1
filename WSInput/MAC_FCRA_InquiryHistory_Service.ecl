@@ -5,7 +5,7 @@ EXPORT MAC_FCRA_InquiryHistory_Service() := MACRO
   #WEBSERVICE(FIELDS(	
 										/*---- Compliance Fields ----*/										
 										/*---- Search Fields ----*/
-										'FCRAInquiryHistoryPRRequest',
+										'FCRAInquiryHistoryRequest',
 										'gateways'
 									));
 									

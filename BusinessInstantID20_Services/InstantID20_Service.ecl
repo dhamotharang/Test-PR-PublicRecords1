@@ -10,7 +10,7 @@
 */
 /*--INFO-- This Service is the interface into the Business InstantID ECL service, version 2.0. */
 
-IMPORT BIPV2, Business_Risk_BIP, Gateway, iesp, MDR, Risk_Indicators, Risk_Reporting, Royalty, STD, Inquiry_AccLogs;
+IMPORT BIPV2, Business_Risk_BIP, Gateway, iesp, MDR, OFAC_XG5, Risk_Indicators, Risk_Reporting, Royalty, STD, Inquiry_AccLogs;
 
 EXPORT InstantID20_Service() := MACRO
 
@@ -98,6 +98,9 @@ EXPORT InstantID20_Service() := MACRO
 			EXPORT BOOLEAN    useSBFE := DataPermissionMask[12] NOT IN BusinessInstantID20_Services.Constants.RESTRICTED_SET;
 		END;
 
+  IF( Options.OFAC_Version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(Options.Watchlists_Requested, value),
+      FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
+
 		// Generate the linking parameters to be used in BIP's kFetch (Key Fetch) - These parameters should be global so figure them out here and pass around appropriately
 		linkingOptions := MODULE(BIPV2.mod_sources.iParams)
 			EXPORT STRING DataRestrictionMask		:= Options.DataRestrictionMask; // Note: Must unfortunately leave as undefined STRING length to match the module definition
@@ -121,9 +124,9 @@ EXPORT InstantID20_Service() := MACRO
 		IF( NOT MinimumInputMet,
 			FAIL('Error - Minimum input fields required: please refer to your product manual for guidance.'));
 
-    IF( Options.OFAC_Version = 4 AND NOT EXISTS(Options.Gateways(servicename = 'bridgerwlc')), 
-      FAIL(Risk_Indicators.iid_constants.OFAC4_NoGateway));
-			
+		IF( Options.OFAC_Version = 4 AND NOT EXISTS(Options.Gateways(servicename = 'bridgerwlc')), 
+			FAIL(Risk_Indicators.iid_constants.OFAC4_NoGateway));
+
 		// 4. Pass input to BIID 2.0 logic.
 		ds_BIID_results := BusinessInstantID20_Services.InstantID20_Records(ds_Input, Options, linkingOptions);
 
@@ -193,7 +196,7 @@ EXPORT InstantID20_Service() := MACRO
                                                      self.glb := _GLBA_Purpose,
                                                      self.dppa := _DPPA_Purpose,
 																										 self.data_restriction_mask := _DataRestrictionMask,
-																										 self.data_permission_mask := _DataPermissionMask,
+																										 self.data_permission_mask := __DataPermissionMask,
 																										 self.industry := Industry_Search[1].Industry,
 																										 // self.i_attributes_name := Attributes_Requested[1].AttributeGroup,
 																										 self.i_ssn := search.AuthorizedRep1.SSN,
@@ -236,14 +239,14 @@ EXPORT InstantID20_Service() := MACRO
                                                      self.i_bus_phone := search.Company.Phone,
 																										 self.i_model_name_1 := 'BVI',
 																										 self.i_model_name_2 := 'CVI',
-																										 self.o_score_1    := (Integer)left.Result.CompanyResults.BusinessVerification.Index,
+																										 self.o_score_1    := (String)left.Result.CompanyResults.BusinessVerification.Index,
 																										 self.o_reason_1_1 := left.Result.CompanyResults.RiskIndicators[1].RiskCode,
 																										 self.o_reason_1_2 := left.Result.CompanyResults.RiskIndicators[2].RiskCode,
 																										 self.o_reason_1_3 := left.Result.CompanyResults.RiskIndicators[3].RiskCode,
 																										 self.o_reason_1_4 := left.Result.CompanyResults.RiskIndicators[4].RiskCode,
 																										 self.o_reason_1_5 := left.Result.CompanyResults.RiskIndicators[5].RiskCode,
 																										 self.o_reason_1_6 := left.Result.CompanyResults.RiskIndicators[6].RiskCode,
-																										 self.o_score_2    := (Integer)left.Result.AuthorizedRepresentativeResults[1].ComprehensiveVerificationIndex,
+																										 self.o_score_2    := (String)left.Result.AuthorizedRepresentativeResults[1].ComprehensiveVerificationIndex,
 																										 self.o_reason_2_1 := left.Result.AuthorizedRepresentativeResults[1].RiskIndicators[1].RiskCode,
 																										 self.o_reason_2_2 := left.Result.AuthorizedRepresentativeResults[1].RiskIndicators[2].RiskCode,
 																										 self.o_reason_2_3 := left.Result.AuthorizedRepresentativeResults[1].RiskIndicators[3].RiskCode,

@@ -245,7 +245,7 @@ export ChargebackDefender_Service := MACRO
 	
 	ExcludeWatchLists := true;	// trying this out to save some time, doesn't seem to need it ever at this point.  will turn off ofac searching
 	
-	cbdParams := model_url(name='Models.ChargebackDefender_Service')[1].parameters;
+	cbdParams := model_url(StringLib.StringToLowerCase(name)='models.chargebackdefender_service')[1].parameters;
 	cbdParamsCap := PROJECT(cbdParams, TRANSFORM(RECORDOF(cbdParams), SELF.Name := StringLib.StringToUpperCase(LEFT.Name); SELF.Value := LEFT.Value; SELF := LEFT));
 	genericModelName := trim(StringLib.StringToLowerCase(cbdParamsCap(name='VERSION')[1].value));
 	
@@ -818,14 +818,14 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 																								 self.i_name_last_2 := last2_value,
 																								 self.i_model_name_1 := genericModelName,
 																								 self.i_model_name_2 := '',
-																								 self.o_score_1    := (Integer)left.Models[1].Scores[1].i,
+																								 self.o_score_1    := IF(genericModelName != '', left.Models[1].Scores[1].i, ''),
 																								 self.o_reason_1_1 := left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[1].Reason_Code,
 																								 self.o_reason_1_2 := left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[2].Reason_Code,
 																								 self.o_reason_1_3 := left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[3].Reason_Code,
 																								 self.o_reason_1_4 := left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[4].Reason_Code,
 																								 self.o_reason_1_5 := left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[5].Reason_Code,
 																								 self.o_reason_1_6 := left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[6].Reason_Code,
-																								 self.o_score_2    := 0,
+																								 // self.o_score_2    := '',
 																								 self.o_reason_2_1 := left.Models[1].Scores[1].RiskIndicatorSets[2].Reason_Codes[1].Reason_Code,
 																								 self.o_reason_2_2 := left.Models[1].Scores[1].RiskIndicatorSets[2].Reason_Codes[2].Reason_Code,
 																								 self.o_reason_2_3 := left.Models[1].Scores[1].RiskIndicatorSets[2].Reason_Codes[3].Reason_Code,

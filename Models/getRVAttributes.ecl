@@ -1,4 +1,4 @@
-import address, fcra_opt_out, Models, Risk_Indicators, ut;
+﻿import address, fcra_opt_out, Models, Risk_Indicators, ut, riskview;
 
 export getRVAttributes(grouped DATASET(risk_indicators.Layout_Boca_Shell) clam, string30 account_value, boolean isPreScreen = false, boolean opt_out_hit = false, 
 	string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction, UNSIGNED8 BSOptions = 0) := FUNCTION
@@ -157,7 +157,8 @@ Models.Layout_RVAttributes.Layout_rvAttrSeqWithAddrAppend intoAttributes(clam le
 	self.version2.isAddrInvalid := le.iid.addrvalflag='N' and ((le.shell_input.in_StreetAddress<>'' and le.shell_input.in_City<>'' and 
 																 le.shell_input.in_State<>'') or (le.shell_input.in_StreetAddress<>'' and le.shell_input.in_Zipcode<>''));
 	self.version2.isDLInvalid := le.iid.drlcvalflag in ['1','3'];
-	self.version2.isNoVer := le.iid.nas_summary <= 4 and le.iid.nap_summary <= 4 and le.address_verification.input_address_information.naprop <= 2;
+	self.version2.isNoVer := riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid);
+
 	
 	
 	// SSN Attributes
@@ -715,8 +716,8 @@ Models.Layout_RVAttributes.Layout_rvAttrSeqWithAddrAppend intoAttributes(clam le
 	dlNotInput := le.shell_input.dl_Number='' or le.shell_input.dl_state=''; 
 	self.version3.InvalidDL := if(dlNotInput, '', checkBoolean(le.iid.drlcvalflag in ['1','3']));
 	
-	self.version3.isNoVer := le.iid.nas_summary <= 4 and le.iid.nap_summary <= 4 and le.address_verification.input_address_information.naprop <= 2 ;
-	
+	self.version3.isNoVer := riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid);
+
 	// SSN Attributes
 	self.version3.SSNDeceased := if(ssnNotInput, '', checkBoolean(le.iid.decsflag='1'));
 	self.version3.DeceasedDate := if(le.ssn_verification.Validation.deceasedDate=0 or le.ssn_verification.Validation.deceasedDate>fullDate, '', (string)le.ssn_verification.Validation.deceasedDate);	
@@ -1414,7 +1415,7 @@ Models.Layout_RVAttributes.Layout_rvAttrSeqWithAddrAppend intoAttributes(clam le
 	self.v4_RecentUpdate                                    := attr.RecentUpdate_buildDate;
 	self.v4_SrcsConfirmIDAddrCount                          := attr.SrcsConfirmIDAddrCount;
 	self.v4_InvalidDL                                       := attr.InvalidDL;
-	self.v4_VerificationFailure                             := attr.VerificationFailure;
+	self.v4_VerificationFailure                             := attr.FCRAVerificationFailure;
 	self.v4_SSNNotFound                                     := attr.SSNNotFound;
 	self.v4_VerifiedName                                    := attr.VerifiedName;
 	self.v4_VerifiedSSN                                     := attr.VerifiedSSN;

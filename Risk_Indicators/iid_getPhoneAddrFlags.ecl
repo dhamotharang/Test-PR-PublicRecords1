@@ -1,15 +1,15 @@
-
-import address, riskwise, risk_indicators, gong;
+﻿
+import _Control, address, riskwise, risk_indicators, gong;
+onThor := _Control.Environment.OnThor;
 
 export iid_getPhoneAddrFlags(grouped dataset(risk_indicators.Layout_Output) with_did, 
-								boolean isFCRA, boolean runAreaCodeSplitSearch = true, unsigned1 BSversion = 1,
-								boolean onThor = false) := function
+								boolean isFCRA, boolean runAreaCodeSplitSearch = true, unsigned1 BSversion = 1) := function
 
 
 // with_zip_flags := iid_getZipFlags(with_DID);	// moved to iid combine verification
 
 // one of the optimization options in IID v2 is to allow this search to be skipped when not needed.
-with_ac_split := risk_indicators.iid_getACsplit(with_did, isFCRA, onThor);
+with_ac_split := risk_indicators.iid_getACsplit(with_did, isFCRA);
 ac_split := if(runAreaCodeSplitSearch, with_ac_split, with_did);
 
 
@@ -44,8 +44,12 @@ connected_h_phones_thor := JOIN (distribute(ac_split((integer)phone10 !=0), hash
 																RiskWise.max_atmost),
 															keep(100), LOCAL);							
 														
-connected_h_phones := if(onThor, connected_h_phones_thor, connected_h_phones_roxie);
-														
+#IF(onThor)
+	connected_h_phones := connected_h_phones_thor;
+#ELSE
+	connected_h_phones := connected_h_phones_roxie;
+#END
+
 connected_w_phones_roxie := JOIN (ac_split, gong_key,
 															(integer) Left.wphone10 != 0
 															AND keyed (Left.wphone10[4..10] = Right.p7 AND Left.wphone10[1..3] = Right.p3)
@@ -68,8 +72,12 @@ connected_w_phones_thor := JOIN (distribute(ac_split((integer)wphone10!=0), hash
 																		RiskWise.max_atmost),
 																	keep(100), LOCAL);
 																	
-connected_w_phones := if(onThor, connected_w_phones_thor, connected_w_phones_roxie);
-																	
+#IF(onThor)
+	connected_w_phones := connected_w_phones_thor;
+#ELSE
+	connected_w_phones := connected_w_phones_roxie;
+#END
+
 //consider all phones as "disconnected" by default:
 risk_indicators.layout_output setDisconnectedTrue (risk_indicators.layout_output L) := TRANSFORM
   SELF.phonedissflag := TRUE;
@@ -215,7 +223,11 @@ jphonerecs_thor_nophone := PROJECT(with_phone_disconnect_hist(phone10 = ''), TRA
 																		
 jphonerecs_thor := jphonerecs_thor_pre + jphonerecs_thor_nophone;
 
-jphonerecs := if(onThor, group(sort(distribute(jphonerecs_thor, hash64(seq)), seq, did, LOCAL), seq, did, LOCAL), jphonerecs_roxie);
+#IF(onThor)
+	jphonerecs := group(sort(distribute(jphonerecs_thor, hash64(seq)), seq, did, LOCAL), seq, did, LOCAL);
+#ELSE
+	jphonerecs := jphonerecs_roxie;
+#END
 
 // rollup here before searching with the workphone
 // add a rollup to calculate my flags
@@ -282,8 +294,12 @@ jphonerecs2_thor_nowphone := PROJECT(jphonerecsrolled(wphone10 = ''), TRANSFORM(
 					
 jphonerecs2_thor := jphonerecs2_thor_pre + jphonerecs2_thor_nowphone;
 
-jphonerecs2 := if(onThor, group(sort(distribute(jphonerecs2_thor, hash64(seq)), seq, did, LOCAL), seq, did, LOCAL), jphonerecs2_roxie);
-					
+#IF(onThor)
+	jphonerecs2 := group(sort(distribute(jphonerecs2_thor, hash64(seq)), seq, did, LOCAL), seq, did, LOCAL);
+#ELSE
+	jphonerecs2 := jphonerecs2_roxie;
+#END
+
 // rollup again here before searching telcordia
 jphonerecs2rolled := rollup(jphonerecs2,true,flagroll(LEFT,RIGHT));
 
@@ -347,7 +363,11 @@ telphonerecs0_thor_phone := join(distribute(jphonerecs2rolled(phone10!=''), hash
 
 telphonerecs0_thor := group(sort(distribute(telphonerecs0_thor_phone + jphonerecs2rolled(phone10=''), hash64(seq)),seq, LOCAL), seq,LOCAL);
 
-telphonerecs0 := if(onThor, telphonerecs0_thor, telphonerecs0_roxie);
+#IF(onThor)
+	telphonerecs0 := telphonerecs0_thor;
+#ELSE
+	telphonerecs0 := telphonerecs0_roxie;
+#END
 
 telphonerecs := rollup(telphonerecs0,true,flagroll(LEFT,RIGHT));
 
@@ -369,7 +389,11 @@ telphonerecs2_pre_thor_wphone := join(distribute(telphonerecs(wphone10!=''), has
 												
 telphonerecs2_pre_thor := group(sort(distribute(telphonerecs2_pre_thor_wphone + telphonerecs(wphone10=''), hash64(seq)), seq, LOCAL), seq, LOCAL);
 
-telphonerecs2_pre := if(onThor, telphonerecs2_pre_thor, telphonerecs2_pre_roxie);
+#IF(onThor)
+	telphonerecs2_pre := telphonerecs2_pre_thor;
+#ELSE
+	telphonerecs2_pre := telphonerecs2_pre_roxie;
+#END
 
 telphonerecs2 := rollup(telphonerecs2_pre,true,flagroll(LEFT,RIGHT));
 // OUTPUT(with_did, NAMED('with_did'));

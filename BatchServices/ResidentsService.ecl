@@ -1,4 +1,4 @@
-
+﻿
 /*--SOAP--
 <message name="ResidentsService">
 	<part name="DPPAPurpose"          type="xsd:byte"/>
@@ -57,6 +57,7 @@ MaxRecordsToReturn can also be used to set the maximum number of current residen
 
 import address,advo;
 export ResidentsService := Macro	
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 		boolean ExcludeDropIndCheck := false :stored('ExcludeDropIndCheck');
     rec_batch_in := BatchServices.Layouts.Resident.batch_in;
 		rec_cln_batch_in := BatchServices.Layouts.Resident.cln_batch_in;

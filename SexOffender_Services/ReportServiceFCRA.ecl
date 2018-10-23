@@ -64,7 +64,7 @@ export ReportServiceFCRA := macro
 
 	temp := SexOffender_Services.ReportRecords.fcra_val(tempmod);
  
-  input_consumer := FFD.MAC.PrepareConsumerRecord(tempmod.did);
+  input_consumer := FFD.MAC.PrepareConsumerRecord(tempmod.did, true, , report_by.UniqueId); 
 	
  	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(temp.Records, results, 
                   iesp.sexualoffender_fcra.t_FcraSexOffenderReportResponse, SexualOffenses, true);

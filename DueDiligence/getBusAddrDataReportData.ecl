@@ -49,8 +49,8 @@ EXPORT getBusAddrDataReportData := MODULE
     
     addOpLocVancancy := JOIN(initialOpLocations, operatingLocationData,
                           #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()),
-                          TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, DATASET(DueDiligence.Layouts.BusOperLocationLayout) opLocations},
-                                    SELF.opLocations := DATASET([TRANSFORM(DueDiligence.Layouts.BusOperLocationLayout,
+                          TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, DATASET(DueDiligence.Layouts.CommonGeographicLayout) opLocations},
+                                    SELF.opLocations := DATASET([TRANSFORM(DueDiligence.Layouts.CommonGeographicLayout,
                                                                             SELF.vacant := RIGHT.vacant;
                                                                             SELF := LEFT;)]);
                                     SELF := LEFT;),
@@ -76,8 +76,10 @@ EXPORT getBusAddrDataReportData := MODULE
                           LEFT.predir = RIGHT.predir AND
                           LEFT.postdir = RIGHT.postdir AND
                           LEFT.sec_range = RIGHT.sec_range,
-                          TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, DATASET(DueDiligence.Layouts.BusOperLocationLayout) opLocations},
-                                    SELF.opLocations := DATASET([TRANSFORM(DueDiligence.Layouts.BusOperLocationLayout,
+                          //TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, DATASET(DueDiligence.Layouts.BusOperLocationLayout) opLocations},
+                          TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, DATASET(DueDiligence.Layouts.CommonGeographicLayout) opLocations},
+                                    //SELF.opLocations := DATASET([TRANSFORM(DueDiligence.Layouts.BusOperLocationLayout,
+                                    SELF.opLocations := DATASET([TRANSFORM(DueDiligence.Layouts.CommonGeographicLayout,
                                                                             SELF.cmra := RIGHT.cmrasiccode;
                                                                             SELF := LEFT;)]);
                                     SELF := LEFT;),

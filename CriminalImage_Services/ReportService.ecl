@@ -1,4 +1,4 @@
-import iesp;
+﻿import iesp;
 /*--SOAP--
 <message name="CriminalRecords::CrimImageSeachService">
 	<!-- Keyed Fields -->
@@ -11,6 +11,7 @@ import iesp;
 import iesp,doxie;
 
 EXPORT ReportService := MACRO
+ #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	#onwarning(4207, ignore);
 	
 	rec_in		:= iesp.criminalimagereport.t_CriminalImageReportRequest;

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BatchService">
 	<part name="DPPAPurpose"             type="xsd:byte"/>
 	<part name="GLBPurpose"              type="xsd:byte"/> 
@@ -17,7 +17,7 @@
 IMPORT AutoStandardI, BatchShare, Residency_Services, Suppress;	
 
 EXPORT BatchService() := MACRO
-		
+		 #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
     // *************************************************************************
    // *                      Force the order on the WsECL page                *
    // *************************************************************************

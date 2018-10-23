@@ -36,6 +36,7 @@
 	<part name="DataPermissionMask" type="xsd:string"/>
 	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
 	<part name="PoBoxCompliance" type="xsd:boolean"/>		
+  <part name="_espclientinterfaceversion'" type="xsd:string"/>		
 	<part name="OfacOnly" type="xsd:boolean"/>
 	<part name="ExcludeWatchLists" type="xsd:boolean"/>
 	<part name="OFACversion" type="xsd:unsignedInt"/>
@@ -66,6 +67,8 @@ import address, doxie, risk_indicators, models, riskwise, Risk_Reporting, suppre
        Inquiry_AccLogs, Risk_Reporting;
 
 export InstantID_Service() := macro
+
+#stored('_espclientinterfaceversion', '');
 
 // Can't have duplicate definitions of Stored with different default values, 
 // so add the default to #stored to eliminate the assignment of a default value.
@@ -110,6 +113,7 @@ export InstantID_Service() := macro
 	'DataPermissionMask',
 	'HistoryDateYYYYMM',
 	'PoBoxCompliance',	
+	'_espclientinterfaceversion',
 	'OfacOnly',
 	'ExcludeWatchLists',
 	'OFACversion',
@@ -188,10 +192,11 @@ unsigned3 history_date := 999999 : stored('HistoryDateYYYYMM');
 boolean IsPOBoxCompliant := false : STORED('PoBoxCompliance');
 boolean ofac_only := true : stored('OfacOnly');
 boolean	ExcludeWatchLists  := false   : stored('ExcludeWatchLists');
-unsigned1 OFAC_version_temp := 1 			: stored('OFACversion');
+String OFAC_version_Null := '' 			: stored('OFACversion');
+unsigned1 OFAC_version_temp := if(OFAC_version_Null = '', 1, (unsigned1) OFAC_version_Null);
 	OFAC_version := if(trim(stringlib.stringtolowercase(_LoginID)) in ['keyxml','keydevxml'], 4, OFAC_version_temp);	// temporary code for Key Bank
-boolean Include_Additional_watchlists_temp := FALSE: stored('IncludeAdditionalWatchlists');
-boolean Include_Ofac_temp := FALSE: stored('IncludeOfac');
+boolean Include_Additional_watchlists := FALSE: stored('IncludeAdditionalWatchlists');
+boolean Include_Ofac := FALSE: stored('IncludeOfac');
 real global_watchlist_threshold_temp := 0 			: stored('GlobalWatchlistThreshold');
 	global_watchlist_threshold := Map( trim(stringlib.stringtolowercase(_LoginID)) in ['keyxml','keydevxml'] and global_watchlist_threshold_temp=0  => OFAC_XG5.Constants.DEF_THRESHOLD_KeyBank_REAL ,
 																		OFAC_version >= 4	and global_watchlist_threshold_temp = 0																											=> OFAC_XG5.Constants.DEF_THRESHOLD_KeyBank_REAL,
@@ -222,24 +227,9 @@ end;
 
 watchlist_options := dataset([],temp) :stored('WatchList', few);
 watchlists_request := watchlist_options[1].WatchList;
-
-// If OFACVersion is set to 2 or 3, check whether include_ofac = false and include_additional_watchlists 
-// = false and watchlists_requested is empty. If they are, set include_ofac = true and include_
-// additional_watchlists = true so that this service will imitate the system behavior when OFACVersion
-// is 1 (returns everything). This will fix a problem for customers who were converted from
-// OFACVersion 1 to 2 and suddenly had no Watchlist records from the system. Applicable only to 
-// Patriot Search, IID, and BIID.
-
-noWatchlistsSelectedAtAll := 
-  NOT Include_Additional_watchlists_temp AND NOT Include_Ofac_temp AND COUNT(watchlists_request) = 0;
-  
-Include_Additional_watchlists := IF( OFAC_version IN [2,3] AND noWatchlistsSelectedAtAll, TRUE, Include_Additional_watchlists_temp );
-Include_Ofac                  := IF( OFAC_version IN [2,3] AND noWatchlistsSelectedAtAll, TRUE, Include_Ofac_temp );
-
 boolean IncludeMSoverride := false : stored('IncludeMSoverride');
 boolean IncludeDLverification := false : stored('IncludeDLverification');
 unsigned1 AppendBest := 1;	// search best file
-
 
 in_city_name := stringlib.stringtouppercase(city);
 in_st		 := stringlib.stringtouppercase(state);
@@ -258,7 +248,57 @@ Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 end;
 gateways := project(gateways_in, gw_switch(left));
 
-if( OFAC_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
+String10 ESP_version_temp := '1.000000' : STORED('_espclientinterfaceversion');
+Real ESP_version := (REAL)ESP_version_temp;
+
+
+OFAC_version_from_ESP :=
+  MAP(
+    ESP_version < 1.039 => 1, 
+    ESP_version >= 1.039 and ESP_version < 1.49 => 2, 
+    ESP_version >= 1.49 and OFAC_version_Null = '' => 2,
+    ESP_version >= 1.49 and OFAC_version < 2 => 2,
+    OFAC_version
+  );
+  
+Include_Ofac_from_ESP :=
+  MAP(
+    ESP_version >= 1.49 => False, // Customers only pick watchlists from the warchlist dataset in these versions of the ESP 
+    Include_Ofac
+  );
+  
+Include_Additional_watchlists_from_ESP :=
+  MAP(
+    ESP_version < 1.039 => FALSE, 
+    ESP_version >= 1.49 => False, // Customers only pick watchlists from the warchlist dataset in these versions of the ESP
+    Include_Additional_watchlists
+  );
+
+ofac_only_from_ESP := 
+  MAP(
+    ESP_version < 1.039 => TRUE,
+    ESP_version >= 1.039 and ESP_version < 1.49 and Include_ofac_from_ESP = True and Include_Additional_watchlists_from_ESP = True => FALSE,
+    ESP_version >= 1.039 and ESP_version < 1.49 and Include_ofac_from_ESP = True and Include_Additional_watchlists_from_ESP = False => TRUE,
+    ESP_version >= 1.49 => False,
+    ofac_only
+  );
+  
+  ExcludeWatchLists_from_ESP :=
+  MAP(
+  ESP_version >= 1.039 and ESP_version < 1.49 and Include_ofac_from_ESP = False and Include_Additional_watchlists_from_ESP = False => TRUE,
+  ExcludeWatchLists
+  );
+  
+/*
+  This logic needs to be added when all queries are moved to OFAC version 4. According to notes this logic is to be added only when ESP Version is less than 1.039.
+  ESP_Version < 1.039 and ofac_only_from_ESP = TRUE, Include_Ofac_from_ESP = True and Include_Additional_watchlists_from_ESP = False);
+  ESP_Version < 1.039 and ofac_only_from_ESP = FALSE, Include_Ofac_from_ESP = True and Include_Additional_watchlists_from_ESP = True);
+*/
+
+if( OFAC_version_from_ESP = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
+
+IF( OFAC_version_from_ESP != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, value),
+		FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 
 foorec := record
 	unsigned4	seq := 0;
@@ -348,7 +388,7 @@ bsVersion := MAP(
 								);
 
 outf := business_risk.InstantID_Function(df2, gateways, if (bdid = '', false, true),dppa,glb,false,false, '',
-							ExcludeWatchLists,ofac_only,ofac_version,include_ofac,include_additional_watchlists,Global_WatchList_Threshold,
+							ExcludeWatchLists_from_ESP,ofac_only_from_ESP,OFAC_version_from_ESP,Include_Ofac_from_ESP,Include_Additional_watchlists_from_ESP,Global_WatchList_Threshold,
 							dob_radius_use,IsPOBoxCompliant,bsVersion,exactMatchLevel, DataRestriction, 
 							IncludeMSoverride, IncludeDLverification, watchlists_request, AppendBest, IncludeRepAttributes, IncludeAllRC,
 							DataPermission);
@@ -568,11 +608,11 @@ business_risk.Layout_Business_Advisor_In scoredata(df le) := TRANSFORM
 	SELF.DPPAPurpose         := dppa;
 	SELF.GLBPurpose          := glb;
 	SELF.HistoryDateYYYYMM   := history_date;
-	SELF.OfacOnly            := ofac_only;
-	SELF.ExcludeWatchLists   := ExcludeWatchLists;
-	SELF.OfacVersion         := OFAC_Version;
-	SELF.IncludeAdditionalWatchlists := Include_Additional_watchlists;
-	SELF.IncludeOFAC         := Include_Ofac;
+	SELF.OfacOnly            := ofac_only_from_ESP;
+	SELF.ExcludeWatchLists   := ExcludeWatchLists_from_ESP;
+	SELF.OfacVersion         := OFAC_version_from_ESP;
+	SELF.IncludeAdditionalWatchlists := Include_Additional_watchlists_from_ESP;
+	SELF.IncludeOFAC         := Include_Ofac_from_ESP;
 	SELF.GlobalWatchListThreshold := Global_WatchList_Threshold;
 	SELF.UseDOBFilter         := use_dob_filter;
 	SELF.DOBRadius            := dob_radius;
@@ -582,11 +622,14 @@ business_risk.Layout_Business_Advisor_In scoredata(df le) := TRANSFORM
 
 	self.DataRestrictionMask := DataRestriction;
 	self.ExactMatchLevel := ExactMatchLevel;
+  self.gateways := PROJECT(gateways_in, Risk_Indicators.Layout_Gateways_In);
 	SELF := [];
 END;
 
 // Pass the input dataset to the Score Controller (if necessary)
-scores := IF(EXISTS(model_url),Business_Risk.Score_Controller(model_url,PROJECT(df,scoredata(LEFT))));
+soapcall_request_date := PROJECT(df,scoredata(LEFT));
+
+scores := IF(EXISTS(model_url),Business_Risk.Score_Controller(model_url,soapcall_request_date));
 
 r combo(r le, scores ri) := TRANSFORM
 	SELF.models := ri.models;
@@ -675,8 +718,8 @@ rep_input_bido := IF( tribcode = '2x42', rep_input, DATASET( [], risk_indicators
 gateways_bido  := IF( tribcode = '2x42', gateways, DATASET( [], Gateway.Layouts.Config ) );
 
 bido := business_risk.BIDO_Function(tribcode, test_data_enabled, addr_bido, city_bido, state_bido, zip_bido,
-									outf_bido, rep_input_bido, gateways_bido, dppa, glb, ofac_only,
-									ExcludeWatchlists, ofac_version, include_ofac, include_additional_watchlists,
+									outf_bido, rep_input_bido, gateways_bido, dppa, glb, ofac_only_from_ESP,
+									ExcludeWatchLists_from_ESP, OFAC_version_from_ESP, Include_Ofac_from_ESP, Include_Additional_watchlists_from_ESP,
 									global_watchlist_threshold, dob_radius_use,bsVersion,
 									exactMatchLevel:=exactMatchLevel, 
 									DataRestriction:=DataRestriction,
@@ -748,14 +791,14 @@ Deltabase_Logging_prep := project(final, transform(Risk_Reporting.Layouts.LOG_De
                                                   self.i_bus_phone := busphone,
                                                   self.i_model_name_1 := 'BVI',
                                                   self.i_model_name_2 := 'CVI',
-                                                  self.o_score_1    := (Integer)left.BVI, //bvi
+                                                  self.o_score_1    := left.BVI, //bvi
                                                   self.o_reason_1_1 := left.PRI_1,
                                                   self.o_reason_1_2 := left.PRI_2,
                                                   self.o_reason_1_3 := left.PRI_3,
                                                   self.o_reason_1_4 := left.PRI_4,
                                                   self.o_reason_1_5 := left.PRI_5,
                                                   self.o_reason_1_6 := left.PRI_6,
-                                                  self.o_score_2    := (Integer)left.RepCVI, //rep cvi
+                                                  self.o_score_2    := left.RepCVI, //rep cvi
                                                   self.o_reason_2_1 := left.Rep_PRI_1,
                                                   self.o_reason_2_2 := left.Rep_PRI_2,
                                                   self.o_reason_2_3 := left.Rep_PRI_3,

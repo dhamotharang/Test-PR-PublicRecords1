@@ -1,8 +1,13 @@
 ﻿IMPORT MDR, risk_indicators;
 
+
 EXPORT Constants := MODULE
 
+EXPORT VERSION_0 := 0;
 EXPORT VERSION_3 := 3;
+
+EXPORT REQUESTED_SOURCE_ENUM := ENUM(UNSIGNED1, EMPTY=0, NONE=1, ONLINE=2, BATCH=3);
+
 
 EXPORT IND_REQ_ATTRIBUTE_V3 := 'DDAPERV3';
 EXPORT BUS_REQ_ATTRIBUTE_V3 := 'DDABUSV3';
@@ -20,18 +25,15 @@ EXPORT INVALID := 'INVALID';
 EXPORT VALIDATION_INVALID_INDIVIDUAL := 'Minimum input information not met. Minimum input information is: \n (1)  First Name, Last Name, Street Address, City and State or Zip  OR \n (2)  First Name, Last Name, SSN  OR \n (3)  LexID';
 EXPORT VALIDATION_INVALID_BUSINESS := 'Minimum input information not met. Minimum input information is: \n (1)  Business Name, Street Address, City and State or Zip  OR \n (2)  Business Name, Tax ID OR \n (3)  LexID';
 EXPORT VALIDATION_INVALID_VERSION := 'Please enter a valid attributes version';
-EXPORT VALIDATION_INVALID_GLB := 'Not an allowable GLB permissible purpose';
-EXPORT VALIDATION_INVALID_DPPA := 'Not an allowable DPPA permissible purpose';
+
 
 EXPORT DEFAULT_DPPA := 3;
 EXPORT DEFAULT_GLBA := 5;
 
-EXPORT DEFAULT_BS_VERSION := 50;
-EXPORT DEFAULT_BS_OPTIONS := 0;
 EXPORT DEFAULT_IS_FCRA := FALSE;
 
-EXPORT NUMBER_OF_INDIVIDUAL_ATTRIBUTES := 19;
-EXPORT NUMBER_OF_BUSINESS_ATTRIBUTES := 23;
+EXPORT NUMBER_OF_INDIVIDUAL_ATTRIBUTES := 20;
+EXPORT NUMBER_OF_BUSINESS_ATTRIBUTES := 21;
 
 EXPORT STRING_TRUE := 'TRUE';
 EXPORT STRING_FALSE := 'FALSE';
@@ -71,6 +73,10 @@ EXPORT MAX_BUREAUS := 200;
 //EXPORT MAX_DEBTORS_CREDITORS := 10;
 EXPORT MAX_ASSOCIATED_FEIN_NAMES := 500;
 EXPORT MAX_DBA_NAMES := 500;
+EXPORT MAX_PROPERTIES := 500;
+EXPORT MAX_WATERCRAFT := 500;
+EXPORT MAX_VEHICLE := 500;
+EXPORT MAX_AIRCRAFT := 500;
 
 
 EXPORT EMPTY := '';
@@ -81,31 +87,17 @@ EXPORT YES := 'Y';
 EXPORT NO := 'N'; 
 EXPORT UNKNOWN := 'U';  
 
-
-
-
-
-// ---- 
-// ---- constants used for Offense Score  
-// ----
-
-EXPORT KEYWORD_FELONY           := 'FELONY';  
-EXPORT KEYWORD_REDUCED          := 'REDUCED';  
-EXPORT KEYWORD_THEFT            := 'THEFT';  
 EXPORT FELONY                   := 'F';
 EXPORT MISDEMEANOR              := 'M';
 EXPORT INFRACTION               := 'I';
 EXPORT TRAFFIC                  := 'T';
-EXPORT UNKNOWN_OFFENSES         := [ UNKNOWN, '' ];   
- 
+EXPORT UNKNOWN_OFFENSES         := [UNKNOWN, EMPTY];   
 
-// ---- 
-// ---- constants used for Offender Level
-// ----
-EXPORT NONTRAFFIC_CONVICTED     := '4'; 
-EXPORT NONTRAFFIC_NOT_CONVICTED := '3';
-EXPORT TRAFFIC_CONVICTED        := '2';
-EXPORT TRAFFIC_NOT_CONVICTED    := '1';
+
+EXPORT INCARCERATION_TEXT := 'Incarceration';
+EXPORT PAROLE_TEXT := 'Parole';
+EXPORT PROBATION_TEXT := 'Probation'; 
+
 
 
 // ---- 
@@ -157,9 +149,6 @@ EXPORT SET OF STRING filing_status_dismissed :=
 			'DISPOSED - PENDING', 'EXPUNGED', 'JUDGMENT VACATED'
 		];
  
-
-EXPORT NOT_PO_ADDRESS_EXPRESSION := '^((?!((P[\\s\\.]*O[\\.\\s]*)|(POST[\\s]*OFFICE[\\s]*))+BOX).)*$';  //finds reference to anything other than po box or post office box
-
 
 //****SECTION FOR MACROS *****
 // NOTE: when calling these macros (mac_ListTop*), you will need to add a "#expand(...)" before the actual
@@ -219,6 +208,28 @@ ENDMACRO;
 EXPORT mac_calculate_liensNYR := MACRO
      'SUM(GROUP, (integer)(eviction != DueDiligence.Constants.YES   AND  NumOfDaysAgo <= ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK)))'
 ENDMACRO; 
+
+
+EXPORT mac_TRANSFORMFetch2Linkids  := MACRO
+     'SELF.UniqueID		:= LEFT.Busn_Info.BIP_IDs.seq;'           +
+		 'SELF.PowID			:= LEFT.Busn_info.BIP_IDs.PowID.LinkID;'  +
+		 'SELF.PowScore		:= LEFT.Busn_info.BIP_IDs.PowID.Score; '  + 
+		 'SELF.PowWeight	:= LEFT.Busn_info.BIP_IDs.PowID.Weight; ' +
+		 'SELF.ProxID			:= LEFT.Busn_info.BIP_IDs.ProxID.LinkID;' +
+		 'SELF.ProxScore	:= LEFT.Busn_info.BIP_IDs.ProxID.Score; ' + 
+		 'SELF.ProxWeight	:= LEFT.Busn_info.BIP_IDs.ProxID.Weight;' +
+		 'SELF.SeleID			:= LEFT.Busn_info.BIP_IDs.SeleID.LinkID;' +
+		 'SELF.SeleScore	:= LEFT.Busn_info.BIP_IDs.SeleID.Score; ' + 
+		 'SELF.SeleWeight	:= LEFT.Busn_info.BIP_IDs.SeleID.Weight;' +
+		 'SELF.OrgID			:= LEFT.Busn_info.BIP_IDs.OrgID.LinkID; ' +
+		 'SELF.OrgScore		:= LEFT.Busn_info.BIP_IDs.OrgID.Score;  ' +
+		 'SELF.OrgWeight	:= LEFT.Busn_info.BIP_IDs.OrgID.Weight; ' +
+		 'SELF.UltID			:= LEFT.Busn_info.BIP_IDs.UltID.LinkID; ' + 
+		 'SELF.UltScore		:= LEFT.Busn_info.BIP_IDs.UltID.Score;  ' + 
+		 'SELF.UltWeight	:= LEFT.Busn_info.BIP_IDs.UltID.Weight; ' +
+		 'SELF            := [];                                  '
+  ENDMACRO;   
+		
 									                                                                
 
 
@@ -1037,228 +1048,43 @@ EXPORT StatesBorderDiffCountry := ['WA', 'VT', 'TX', 'OH', 'ND', 'NY', 'NM', 'MT
                                 'MI', 'ME', 'FL', 'ID', 'CA', 'AZ', 'AK'];
 						
 								
-EXPORT AMLNewsCategory := ['ADVERSE MEDIA-AIRCRAFT HIJACKING',
-				'ADVERSE MEDIA-ANTITRUST VIOLATIONS',
-				'ADVERSE MEDIA-ARMS TRAFFICKING',
-				'ADVERSE MEDIA-BANK FRAUD',
-				'ADVERSE MEDIA-BRIBERY',
-				'ADVERSE MEDIA-BURGLARY',
-				'ADVERSE MEDIA-CONSPIRACY',
-				'ADVERSE MEDIA-CORRUPTION',
-				'ADVERSE MEDIA-COUNTERFEITING',
-				'ADVERSE MEDIA-CRIME AGNST HUMANITY',
-				'ADVERSE MEDIA-DRUG TRAFFICKING',
-				'ADVERSE MEDIA-EMBEZZLEMENT',
-				'ADVERSE MEDIA-ESPIONAGE',
-				'ADVERSE MEDIA-EXPLOSIVES',
-				'ADVERSE MEDIA-EXTORT-RACK-THREATS',
-				'ADVERSE MEDIA-FINANCIAL CRIMES',
-				'ADVERSE MEDIA-FORGERY',
-				'ADVERSE MEDIA-FRAUD',
-				'ADVERSE MEDIA-FUGITIVE',
-				'ADVERSE MEDIA-GAMBLING OPERATIONS',
-				'ADVERSE MEDIA-GOVT BRANCH MEMBER',
-				'ADVERSE MEDIA-HEALTHCARE FRAUD',
-				'ADVERSE MEDIA-HUMAN RIGHTS ABUSE',
-				'ADVERSE MEDIA-HUMAN TRAFFICKING',
-				'ADVERSE MEDIA-INSIDER TRADING',
-				'ADVERSE MEDIA-INTERSTATE COMMERCE',
-				'ADVERSE MEDIA-KIDNAPPING',
-				'ADVERSE MEDIA-MONEY LAUNDERING',
-				'ADVERSE MEDIA-MORTGAGE FRAUD',
-				'ADVERSE MEDIA-MURDER',
-				'ADVERSE MEDIA-ORGANIZED CRIME',
-				'ADVERSE MEDIA-PEONAGE',
-				'ADVERSE MEDIA-PHARMA TRAFFICKING',
-				'ADVERSE MEDIA-PIRACY',
-				'ADVERSE MEDIA-PORNOGRAPHY',
-				'ADVERSE MEDIA-PRICE MANIPULATION',
-				'ADVERSE MEDIA-RICO',
-				'ADVERSE MEDIA-SECURITIES FRAUD',
-				'ADVERSE MEDIA-SMUGGLING',
-				'ADVERSE MEDIA-STOLEN PROPERTY',
-				'ADVERSE MEDIA-TAX EVASION',
-				'ADVERSE MEDIA-TERRORISM',
-				'ADVERSE MEDIA-WAR CRIMES',
-				'ADVERSE MEDIA-WMD',
-				'ASSOCIATED ENTITY-ARMS TRAFFICKING',
-				'ASSOCIATED ENTITY-BRIBERY',
-				'ASSOCIATED ENTITY-DRUG TRAFFICKING',
-				'ASSOCIATED ENTITY-EMBEZZLEMENT',
-				'ASSOCIATED ENTITY-ESPIONAGE',
-				'ASSOCIATED ENTITY-FRAUD',
-				'ASSOCIATED ENTITY-HUMAN TRAFFICKING',
-				'ASSOCIATED ENTITY-INTERSTATE COMMERCE',
-				'ASSOCIATED ENTITY-MONEY LAUNDERING',
-				'ASSOCIATED ENTITY-MURDER',
-				'ASSOCIATED ENTITY-ORGANIZED CRIME',
-				'ASSOCIATED ENTITY-SECURITIES FRAUD',
-				'ASSOCIATED ENTITY-TERRORISM',
-				'COMPANY OF INTEREST-DRUG TRAFFICKING',
-				'COMPANY OF INTEREST-TERRORISM',
-				'END-USE CONTROLS-DRUG TRAFFICKING',
-				'ENFORCEMENT-AIRCRAFT HIJACKING',
-				'ENFORCEMENT-ANTITRUST VIOLATIONS',
-				'ENFORCEMENT-ARMS TRAFFICKING',
-				'ENFORCEMENT-BANK FRAUD',
-				'ENFORCEMENT-BRIBERY',
-				'ENFORCEMENT-BURGLARY',
-				'ENFORCEMENT-CONSPIRACY',
-				'ENFORCEMENT-CORRUPTION',
-				'ENFORCEMENT-COUNTERFEITING',
-				'ENFORCEMENT-CRIME AGNST HUMANITY',
-				'ENFORCEMENT-DRUG TRAFFICKING',
-				'ENFORCEMENT-EMBEZZLEMENT',
-				'ENFORCEMENT-ENVIRONMENTAL CRIMES',
-				'ENFORCEMENT-ESPIONAGE',
-				'ENFORCEMENT-EXPLOSIVES',
-				'ENFORCEMENT-EXTORT-RACK-THREATS',
-				'ENFORCEMENT-FINANCIAL CRIMES',
-				'ENFORCEMENT-FORGERY',
-				'ENFORCEMENT-FRAUD',
-				'ENFORCEMENT-FUGITIVE',
-				'ENFORCEMENT-GAMBLING OPERATIONS',
-				'ENFORCEMENT-HEALTHCARE FRAUD',
-				'ENFORCEMENT-HUMAN RIGHTS ABUSE',
-				'ENFORCEMENT-HUMAN TRAFFICKING',
-				'ENFORCEMENT-INSIDER TRADING',
-				'ENFORCEMENT-INTERSTATE COMMERCE',
-				'ENFORCEMENT-KIDNAPPING',
-				'ENFORCEMENT-MONEY LAUNDERING',
-				'ENFORCEMENT-MORTGAGE FRAUD',
-				'ENFORCEMENT-MURDER',
-				'ENFORCEMENT-ORGANIZED CRIME',
-				'ENFORCEMENT-PEONAGE',
-				'ENFORCEMENT-PHARMA TRAFFICKING',
-				'ENFORCEMENT-PIRACY',
-				'ENFORCEMENT-PORNOGRAPHY',
-				'ENFORCEMENT-PRICE MANIPULATION',
-				'ENFORCEMENT-RICO',
-				'ENFORCEMENT-SECURITIES FRAUD',
-				'ENFORCEMENT-SMUGGLING',
-				'ENFORCEMENT-STOLEN PROPERTY',
-				'ENFORCEMENT-TAX EVASION',
-				'ENFORCEMENT-TERRORISM',
-				'ENFORCEMENT-WAR CRIMES',
-				'ENFORCEMENT-WMD',
-				'EXCLUDED PARTY-ARMS TRAFFICKING',
-				'EXCLUDED PARTY-BANK FRAUD',
-				'EXCLUDED PARTY-BRIBERY',
-				'EXCLUDED PARTY-BURGLARY',
-				'EXCLUDED PARTY-CONSPIRACY',
-				'EXCLUDED PARTY-CORRUPTION',
-				'EXCLUDED PARTY-DRUG TRAFFICKING',
-				'EXCLUDED PARTY-EMBEZZLEMENT',
-				'EXCLUDED PARTY-EXTORT-RACK-THREATS',
-				'EXCLUDED PARTY-FRAUD',
-				'EXCLUDED PARTY-HEALTHCARE FRAUD',
-				'EXCLUDED PARTY-HUMAN TRAFFICKING',
-				'EXCLUDED PARTY-MONEY LAUNDERING',
-				'EXCLUDED PARTY-MORTGAGE FRAUD',
-				'EXCLUDED PARTY-MURDER',
-				'EXCLUDED PARTY-ORGANIZED CRIME',
-				'EXCLUDED PARTY-RICO',
-				'EXCLUDED PARTY-SECURITIES FRAUD',
-				'EXCLUDED PARTY-SMUGGLING',
-				'EXCLUDED PARTY-STOLEN PROPERTY',
-				'EXCLUDED PARTY-TAX EVASION',
-				'EXCLUDED PARTY-TERRORISM',
-				'EXCLUDED PARTY-WMD',
-				'GOVERNMENT CORP-FRAUD',
-				'GOVERNMENT CORP-GAMBLING OPERATIONS',
-				'GOVERNMENT CORP-INSIDER TRADING',
-				'GOVERNMENT CORP-MONEY LAUNDERING',
-				'GOVERNMENT CORP-WMD',
-				'INFLUENTIAL PERSON-ARMS TRAFFICKING',
-				'INFLUENTIAL PERSON-DRUG TRAFFICKING',
-				'INFLUENTIAL PERSON-EMBEZZLEMENT',
-				'INFLUENTIAL PERSON-EXTORT-RACK-THREATS',
-				'INFLUENTIAL PERSON-FRAUD',
-				'INFLUENTIAL PERSON-INSIDER TRADING',
-				'INFLUENTIAL PERSON-MONEY LAUNDERING',
-				'INFLUENTIAL PERSON-MURDER',
-				'INVESTIGATION-ARMS TRAFFICKING',
-				'INVESTIGATION-BANK FRAUD',
-				'INVESTIGATION-BRIBERY',
-				'INVESTIGATION-BURGLARY',
-				'INVESTIGATION-CONSPIRACY',
-				'INVESTIGATION-CORRUPTION',
-				'INVESTIGATION-DRUG TRAFFICKING',
-				'INVESTIGATION-EMBEZZLEMENT',
-				'INVESTIGATION-ESPIONAGE',
-				'INVESTIGATION-EXPLOSIVES',
-				'INVESTIGATION-EXTORT-RACK-THREATS',
-				'INVESTIGATION-FINANCIAL CRIMES',
-				'INVESTIGATION-FRAUD',
-				'INVESTIGATION-GAMBLING OPERATIONS',
-				'INVESTIGATION-HEALTHCARE FRAUD',
-				'INVESTIGATION-HUMAN TRAFFICKING',
-				'INVESTIGATION-INSIDER TRADING',
-				'INVESTIGATION-KIDNAPPING',
-				'INVESTIGATION-MONEY LAUNDERING',
-				'INVESTIGATION-MURDER',
-				'INVESTIGATION-ORGANIZED CRIME',
-				'INVESTIGATION-PIRACY',
-				'INVESTIGATION-PORNOGRAPHY',
-				'INVESTIGATION-PRICE MANIPULATION',
-				'INVESTIGATION-RICO',
-				'INVESTIGATION-SECURITIES FRAUD',
-				'INVESTIGATION-SMUGGLING',
-				'INVESTIGATION-STOLEN PROPERTY',
-				'INVESTIGATION-TAX EVASION',
-				'INVESTIGATION-TERRORISM',
-				'INVESTIGATION-WAR CRIMES',
-				'PEP-ARMS TRAFFICKING',
-				'PEP-BRIBERY',
-				'PEP-BURGLARY',
-				'PEP-CONSPIRACY',
-				'PEP-CORRUPTION',
-				'PEP-COUNTERFEITING',
-				'PEP-DRUG TRAFFICKING',
-				'PEP-EMBEZZLEMENT',
-				'PEP-ESPIONAGE',
-				'PEP-EXPLOSIVES',
-				'PEP-EXTORT-RACK-THREATS',
-				'PEP-FINANCIAL CRIMES',
-				'PEP-FORGERY',
-				'PEP-FRAUD',
-				'PEP-FUGITIVE',
-				'PEP-GAMBLING OPERATIONS',
-				'PEP-HEALTHCARE FRAUD',
-				'PEP-INSIDER TRADING',
-				'PEP-INTERSTATE COMMERCE',
-				'PEP-KIDNAPPING',
-				'PEP-MONEY LAUNDERING',
-				'PEP-MURDER',
-				'PEP-ORGANIZED CRIME',
-				'PEP-PEONAGE',
-				'PEP-PHARMA TRAFFICKING',
-				'PEP-PORNOGRAPHY',
-				'PEP-RICO',
-				'PEP-TERRORISM',
-				'PEP-WAR CRIMES',
-				'SANCTION LIST-N/A'];
 
  //*** These are the 5 digit court offense levels that can be mapped to a FELONY
 EXPORT setFELONY := ['CA', '*F', '1F', '2F', '3F', '4 F', '4F', ';F2', 'AF', 'AF1', 
-											'AF2', 'AF3', 'AF4', 'AGGF1', 'AGGF2', 'AGGF3', 'CAPIA', 'CCA', 
-											'CF', 'CL', 'DF', 'F', 'F 3', 'F*', 'F*;F*', 'F*;F1', 'F*;F2', 
-											'F*;F3', 'F*;FS', 'F*;FX', 'F*;M*', 'F*;MA', 'F*;MB', 'F*;MC', 
-											'F*;MT', 'F*\\M*', 'F-1', 'F-1)', 'F-2', 'F-2)', 'F-3', 'F-3)', 
-											'F-4', 'F-4)', 'F-4PR', 'F-5', 'F-5)', 'F/GM', 'F/M', 'F0', 'F1', 
-											'F10', 'F1;F*', 'F1;F1', 'F1;F2', 'F1;F3', 'F1;FS', 'F1;MA', 'F1D', 
-											'F2', 'F2;F*', 'F2;F1', 'F2;F2', 'F2;F3', 'F2;FS', 'F2;MA', 'F2D', 
-											'F3', 'F3;F*', 'F3;F1', 'F3;F2', 'F3;F3', 'F3;FS', 'F3;MA', 'F3;MB', 
-											'F3D', 'F4', 'F4D', 'F5', 'F5D', 'F6', 'F6TH', 'F7', 'F8', 'F9', 
-											'FA', 'FAD', 'FB', 'FBC', 'FC', 'FCA', 'FCAP', 'FD', 'FDM', 'FE', 
-											'FEM', 'FF', 'FG', 'FH', 'FI', 'FL', 'FL1', 'FLOWE', 'FM', 'FN', 
-											'FNC', 'FNG', 'FO', 'FOG', 'FP', 'FQ', 'FS', 'FS;E', 'FS;E;', 
-											'FS;F*', 'FS;F1', 'FS;F2', 'FS;F3', 'FS;FS', 'FS;MA', 'FS;MB', 
-											'FSJ', 'FT', 'FU', 'FUPPE', 'FV', 'FW', 'FX', 'FX;F1', 'FX;FX', 
-											'FY-1', 'FY-3', 'FZ', 'LIFE', 'MA;FS', 'MB;F3', 'MB;FS', 'SF', 
-											'SJF', 'SPF', 'UF'];
+                     'AF2', 'AF3', 'AF4', 'AGGF1', 'AGGF2', 'AGGF3', 'CAPIA', 'CCA', 
+                     'CF', 'CL', 'DF', 'F', 'F 3', 'F*', 'F*;F*', 'F*;F1', 'F*;F2', 
+                     'F*;F3', 'F*;FS', 'F*;FX', 'F*;M*', 'F*;MA', 'F*;MB', 'F*;MC', 
+                     'F*;MT', 'F*\\M*', 'F-1', 'F-1)', 'F-2', 'F-2)', 'F-3', 'F-3)', 
+                     'F-4', 'F-4)', 'F-4PR', 'F-5', 'F-5)', 'F/GM', 'F/M', 'F0', 'F1', 
+                     'F10', 'F1;F*', 'F1;F1', 'F1;F2', 'F1;F3', 'F1;FS', 'F1;MA', 'F1D', 
+                     'F2', 'F2;F*', 'F2;F1', 'F2;F2', 'F2;F3', 'F2;FS', 'F2;MA', 'F2D', 
+                     'F3', 'F3;F*', 'F3;F1', 'F3;F2', 'F3;F3', 'F3;FS', 'F3;MA', 'F3;MB', 
+                     'F3D', 'F4', 'F4D', 'F5', 'F5D', 'F6', 'F6TH', 'F7', 'F8', 'F9', 
+                     'FA', 'FAD', 'FB', 'FBC', 'FC', 'FCA', 'FCAP', 'FD', 'FDM', 'FE', 
+                     'FEM', 'FF', 'FG', 'FH', 'FI', 'FL', 'FL1', 'FLOWE', 'FM', 'FN', 
+                     'FNC', 'FNG', 'FO', 'FOG', 'FP', 'FQ', 'FS', 'FS;E', 'FS;E;', 
+                     'FS;F*', 'FS;F1', 'FS;F2', 'FS;F3', 'FS;FS', 'FS;MA', 'FS;MB', 
+                     'FSJ', 'FT', 'FU', 'FUPPE', 'FV', 'FW', 'FX', 'FX;F1', 'FX;FX', 
+                     'FY-1', 'FY-3', 'FZ', 'LIFE', 'MA;FS', 'MB;F3', 'MB;FS', 'SF', 
+                     'SJF', 'SPF', 'UF', 'MO', 'MT;F2', 'MT;FS', 'P', 'WF'];
 
 //*** These are the 5 digit court offense levels that can be mapped to a MISDEMEANOR
-EXPORT setMISDEMEANOR := ['AM', 'BM', 'GM', 'GMT', 'GM2', 'GM3'];
+EXPORT setMISDEMEANOR := ['AM', 'BM', 'GM', 'GMT', 'GM2', 'GM3', 'M', '*M', 'CM', 'CTM1', 
+                          'CTM2', 'CV', 'M 0', 'M*', 'M-1', 'M-1S)', 'M-2', 'M0', 'M1', 
+                          'M2', 'M2N', 'M3', 'M3R', 'M4', 'M5', 'M6', 'M7', 'M8', 'M9', 
+                          'MA', 'MAD', 'MAM', 'MAMUN', 'MAP', 'MB', 'MB)', 'MBD', 'MC', 
+                          'MCA', 'MCLAS', 'MCT', 'MD', 'ME', 'MF', 'MG', 'MH', 'MI', 
+                          'MIS', 'MK', 'ML', 'MM', 'MN', 'MO', 'MP', 'MQ', 'MR', 'MS', 
+                          'MSE', 'MT', 'MU', 'MUM', 'MUMUN', 'MUNCL', 'MUNK', 'MV', 'MW', 
+                          'MX', 'MY', 'MZ', 'P M', 'PM', 'PMT', 'PVM2', 'SPM', 'T', 'TM', 
+                          'TVM1', 'TVM2'];
+
+//*** These are the 5 digit court offense levels that can be mapped to a TRAFFIC
+EXPORT setTRAFFIC := ['T', 'C', 'CT', 'FFT', 'JTOT', 'MTV', 'T/MI', 'T2', 'T4', 'TA', 'TB', 
+                      'TC', 'TH', 'TI', 'TL', 'TM', 'TO', 'TP', 'TR', 'TT', 'TU', 'TV', 'UC', 'UO', 'CVI'];
+
+//*** These are the 5 digit court offense levels that can be mapped to a INFRACTION
+EXPORT setINFRACTION := ['CI', 'CTI', 'I', 'I1', 'I2', 'IN', 'MO', 'MO1', 'MO2', 'MOR', 'MU', 'MU1', 
+                         'MU2', 'MU3', 'OCO', 'OMU', 'ORD', 'OV', 'PVI', 'TVI', 'CO', 'COR', 'ICA'];
 
 END;

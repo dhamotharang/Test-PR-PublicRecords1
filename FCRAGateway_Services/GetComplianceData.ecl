@@ -1,37 +1,31 @@
-IMPORT iesp, FFD, FCRA, FCRAGateway_Services;
+﻿IMPORT iesp, FFD, FCRA, FCRAGateway_Services;
 
-//Follows Dempsey compliance for FCRA reports. Resolve a DID from PII, if none found stop.
-//If a did is found retrieve consumer statements and credit alerts as well as the DID.
+//Follows Dempsey compliance for FCRA reports. Resolve a LexID from PII, if none found stop.
+//If a lexid is found retrieve consumer statements and alerts from Person Context repository.
 EXPORT GetComplianceData(DATASET(iesp.person_picklist.t_PersonPickListRequest) plist_req,
-	FCRAGateway_Services.IParam.common_params params) := FUNCTION
+  FCRAGateway_Services.IParam.common_params params) := FUNCTION
 
-	//Use picklist to find a did. If we don't receive one we stop the report.
-	FCRA.MAC_GetPickListRecords(plist_req, plist_resp, true);
-	err_code := plist_resp[1]._Header.Status;
-	plist_did := IF(err_code = 0, (unsigned6)plist_resp[1].Records[1].UniqueId, 0);
+  //Use picklist to find a did. If we don't receive one we stop the report.
+  FCRA.MAC_GetPickListRecords(plist_req, plist_resp, true);
+  err_code := plist_resp[1]._Header.Status;
+  plist_did := IF(err_code = 0, (unsigned6)plist_resp[1].Records[1].UniqueId, 0);
 
-	//Get PersonContext records which contain all credit alerts and consumer statements if we have a valid did.
-	//Suppression is handled by FFDOptionsMask.
-	ds_dids := dataset([{FFD.Constants.SingleSearchAcctno, plist_did}], FFD.Layouts.DidBatch);
-	ds_person_context := IF(plist_did > 0,
-		FFD.FetchPersonContext(ds_dids, gateways, FFD.Constants.DataGroupSet.Person, params.FFDOptionsMask));
-	ds_consumer_statements := FFD.prepareConsumerStatements(ds_person_context);
+  consumer:= FFD.MAC.PrepareConsumerRecord((string)plist_did, TRUE, plist_req[1].searchby);
+  isReseller := TRUE;
+  CIA_data := FFD.ConsumerInitiatedActivities.Get(plist_did, params.FFDOptionsMask, params.FCRAPurpose, params.gateways, 
+                                                  FFD.Constants.DataGroupSet.Person, isReseller);
+  
+  //Bundle the results so we can return them in a dataset.
+  ds_compliance_out := PROJECT(CIA_data,TRANSFORM(FCRAGateway_Services.Layouts.compliance_out,
+                               SELF.is_suppressed_by_alert := LEFT.suppress_records,
+                               SELF.Consumer := consumer,
+                               SELF := LEFT));
+                               
+  #IF(FCRAGateway_Services.Constants.Debug.ComplianceData)
+    OUTPUT(plist_req,NAMED('compliance_plist_req'));
+    OUTPUT(plist_resp,NAMED('compliance_plist_resp'));
+    OUTPUT(ds_compliance_out,NAMED('ds_compliance_out'));
+  #END
 
-	//Check if we need to suppress the report due to credit alerts.
-	is_suppressed_by_alert := FFD.ConsumerFlag.getAlertIndicators(ds_person_context, params.FCRAPurpose, params.FFDOptionsMask)[1].suppress_records;
-	ds_consumer_alerts := FFD.ConsumerFlag.prepareAlertMessages(ds_person_context, is_suppressed_by_alert);
-
-	//Bundle the results so we can return them in a dataset.
-	ds_compliance_out := DATASET([{is_suppressed_by_alert, ds_consumer_alerts, ds_consumer_statements, plist_did}],
-		FCRAGateway_Services.Layouts.compliance_out);
-
-	#IF(FCRAGateway_Services.Constants.Debug.ComplianceData)
-		OUTPUT(plist_resp,NAMED('compliance_plist_resp'));
-		OUTPUT(ds_person_context,NAMED('ds_person_context'));
-		OUTPUT(ds_consumer_statements,NAMED('ds_consumer_statements'));
-		OUTPUT(ds_consumer_alerts,NAMED('ds_consumer_alerts'));
-		OUTPUT(ds_compliance_out,NAMED('ds_compliance_out'));
-	#END
-
-	RETURN ds_compliance_out;
+  RETURN ds_compliance_out;
 END;

@@ -19,7 +19,7 @@ export dataset(l_out) fn_get_report(
 	dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile
 	) := function
 																							
-
+ isCNSMR := ut.IndustryClass.is_Knowx;
 	doxie.MAC_Header_Field_Declare(isFCRA);
 	// Apply FaresID-based restrictions
 	fids1 := in_fids(ln_fares_id[1] not in LN_PropertyV2_Services.input.srcRestrict);	// blacklist FARES, Fidelity, or LnBranded as needed
@@ -31,8 +31,8 @@ export dataset(l_out) fn_get_report(
 		string8 sortby_date;
 	end;
 	
-	deeds_raw_early		:= project(LN_PropertyV2_Services.fn_get_deeds_raw(fids2a,isFCRA,ds_flags,slim_pc_recs,inFFDOptionsMask),early_fid_rec);
-	assess_raw_early	:= project(LN_PropertyV2_Services.fn_get_assessments_raw(fids2a,isFCRA,ds_flags,slim_pc_recs,inFFDOptionsMask),early_fid_rec);
+	deeds_raw_early		:= project(LN_PropertyV2_Services.fn_get_deeds_raw(fids2a,isFCRA,ds_flags,slim_pc_recs,inFFDOptionsMask,isCNSMR),early_fid_rec);
+	assess_raw_early	:= project(LN_PropertyV2_Services.fn_get_assessments_raw(fids2a,isFCRA,ds_flags,slim_pc_recs,inFFDOptionsMask,isCNSMR),early_fid_rec);
 	
 	fids2 := if(inTrimBySortBy,project(topn(
 		dedup(sort(deeds_raw_early + assess_raw_early,ln_fares_id,search_did,-sortby_date),ln_fares_id,search_did),
@@ -40,7 +40,7 @@ export dataset(l_out) fn_get_report(
 		-sortby_date,ln_fares_id),recordof(fids2a)),fids2a);
 	
 	// Get raw parties based on fid suppression so far
-	parties_extraRaw := LN_PropertyV2_Services.fn_get_parties_raw(fids2,nonSS,isFCRA,ds_flags,,slim_pc_recs,inFFDOptionsMask);
+	parties_extraRaw := LN_PropertyV2_Services.fn_get_parties_raw(fids2,nonSS,isFCRA,ds_flags,slim_pc_recs,inFFDOptionsMask,isCNSMR);
 	
 	// Pull records (fids) and parties based on DID/SSN
 	Suppress.MAC_Suppress_Child.keyLinked(fids2,parties_extraRaw,fids2RemoveDID, application_type_value,
@@ -50,8 +50,8 @@ export dataset(l_out) fn_get_report(
 											Suppress.Constants.LinkTypes.SSN,app_ssn,ln_fares_id,'',false);
 
 	// retrieve raw results with minimal processing (just the JOINs)
-	deeds_raw		:= LN_PropertyV2_Services.fn_get_deeds_raw(fids3,isFCRA,ds_flags,slim_pc_recs,inFFDOptionsMask);
-	assess_raw	:= LN_PropertyV2_Services.fn_get_assessments_raw(fids3,isFCRA,ds_flags,slim_pc_recs,inFFDOptionsMask);
+	deeds_raw		:= LN_PropertyV2_Services.fn_get_deeds_raw(fids3,isFCRA,ds_flags,slim_pc_recs,inFFDOptionsMask,isCNSMR);
+	assess_raw	:= LN_PropertyV2_Services.fn_get_assessments_raw(fids3,isFCRA,ds_flags,slim_pc_recs,inFFDOptionsMask,isCNSMR);
 	
 	aNames_raw	:= join(
 		fids3, keys.addl_names(isFCRA),
@@ -88,6 +88,7 @@ export dataset(l_out) fn_get_report(
 	
 	// We need to process parties early (to get their penalty)
   parties := LN_PropertyV2_Services.fn_get_parties(parties_extraRaw,isFCRA);
+	
 
 	// If we're marshalling early, pare down raw deeds & assessments to the page we care about
 	// NOTE: When input.currentVend is true, we delay marshalling both because code below
@@ -334,7 +335,6 @@ assess	:= fn_get_assessments(assess_paged);
 	     
 			 
 				// output(recs_limited, 		named('recs_limited'));  // Has source_code in output- 
-	     // output(results_final, 		named('results_final'));  // Has source_code in output- 
 	     
 			
 	                                                  // output for QA

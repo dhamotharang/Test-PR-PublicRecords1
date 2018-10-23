@@ -858,7 +858,7 @@ iesp.businessinstantid20.t_BIID20AuthorizedRepresentativeResults xfm_AddAuthRepR
 		SELF.UniqueId := (STRING)le.did;
 		
 		// Input Echo
-		SELF.InputEcho.Sequence                  		  := ''; // (STRING)le.seq; ***** NOTE: Remove this from layout *****
+		SELF.InputEcho.Sequence                  		  := (STRING)le.Rep_WhichOne;
 		SELF.InputEcho.Name.Full                 		  := '';
 		SELF.InputEcho.Name.First                		  := le.fname;
 		SELF.InputEcho.Name.Middle                		:= le.mname;

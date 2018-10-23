@@ -201,7 +201,7 @@ export liens_raw := module
 								transform(with_did,self.acctno := left.acctno,self := right),
 								keep(1000)); // actual number might be higher than that...
 
-		res_fcra_checked := join(res_fcra, liensv2.key_liens_party_ID,
+		res_fcra_checked := join(res_fcra, liensv2.key_liens_party_id_FCRA,
 														keyed(left.tmsid = right.tmsid) and 
 														left.did = (unsigned)right.did and 
 														right.name_type[1] = STD.Str.ToUpperCase(in_party_type)[1],

@@ -10,7 +10,7 @@ EXPORT getBusProfLic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	execs := DueDiligence.CommonBusiness.getExecs(indata);
 	
 	//call individual routine to get prof licenses for the exec individuals
-	profLic := DueDiligence.getIndProfLic(execs, includeReportData);
+	profLic := DueDiligence.getIndProfLic(execs);
 	
 	//join execs with licene data to update licenses for the execs
 	joinExecLic := JOIN(execs, profLic,

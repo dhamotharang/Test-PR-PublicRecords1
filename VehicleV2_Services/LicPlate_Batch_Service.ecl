@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="LicPlate_Batch_Service">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="DPPAPurpose" type="xsd:byte"/>
@@ -16,7 +16,7 @@
 IMPORT VehicleV2_Services;
 
 EXPORT LicPlate_Batch_Service() := MACRO
-
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	data_in := DATASET([], VehicleV2_Services.Batch_Layout.LicPlate_InLayout) : STORED('batch_in', FEW);
 	
 	mod := module(VehicleV2_Services.IParam.RTBatch_V2_params)

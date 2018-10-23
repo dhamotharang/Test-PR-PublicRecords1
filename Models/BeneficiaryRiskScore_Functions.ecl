@@ -1,4 +1,4 @@
-
+﻿
 IMPORT Address, AutoStandardI, BatchShare, Doxie, Gateway, Models, Risk_Indicators, Riskwise, ut, VehicleV2, 
 VehicleV2_Services, std;
 
@@ -238,12 +238,20 @@ EXPORT BeneficiaryRiskScore_Functions := MODULE
 			RETURN modInputOptions_PostBeneficiaryFraud; 
 		END;
 	
-	EXPORT get_gateways(Models.BeneficiaryRiskScore_Interfaces.IInputOptions_BocaShell bocashell_options) :=
+	EXPORT get_gateways(Models.BeneficiaryRiskScore_Interfaces.IInputOptions_BocaShell bocashell_options, unsigned ofac_version_ = 1) :=
 		FUNCTION
 			gateways_in   := Gateway.Configuration.Get();
-			
-			Gateway.Layouts.Config gw_switch(Gateway.Layouts.Config le) := TRANSFORM
-				SELF.servicename := le.servicename;
+      
+      			Gateway.Layouts.Config gw_switch_watchlist(Gateway.Layouts.Config le) := TRANSFORM
+				SELF.servicename := if(ofac_version_ = 4 and le.servicename = 'bridgerwlc', le.servicename, '');
+				SELF.url := if(ofac_version_ = 4 and le.servicename = 'bridgerwlc', le.url, '');
+				SELF := le;
+			END;
+
+			gateways_watchlist := PROJECT(gateways_in, gw_switch_watchlist(LEFT));
+      
+      			Gateway.Layouts.Config gw_switch(Gateway.Layouts.Config le) := TRANSFORM
+				SELF.servicename := if(le.servicename = 'bridgerwlc', '', le.servicename);
 				SELF.url := // insurance phones gateway allowed if shell version 50 or higher
 					IF(
 						bocashell_options.bsversion >= 50 AND 
@@ -253,8 +261,10 @@ EXPORT BeneficiaryRiskScore_Functions := MODULE
 					); 
 				SELF := le;
 			END;
-
-			gateways := PROJECT(gateways_in, gw_switch(LEFT));
+      
+      gateways_boca_shell := PROJECT(gateways_in, gw_switch(LEFT));
+      
+      gateways := gateways_watchlist + gateways_boca_shell;
 			
 			RETURN gateways;
 		END;

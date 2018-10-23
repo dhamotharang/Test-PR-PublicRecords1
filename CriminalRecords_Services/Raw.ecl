@@ -1,4 +1,4 @@
-import STD, doxie, doxie_files, hygenics_crim, ut, FCRA, FFD, D2C;
+﻿import STD, doxie, doxie_files, hygenics_crim, ut, FCRA, FFD, D2C;
 
 MAX_OVERRIDE_LIMIT := FCRA.compliance.MAX_OVERRIDE_LIMIT;
 
@@ -105,8 +105,8 @@ export Raw := module
 		
 		CriminalRecords_Services.layouts.l_raw xformStatements( CriminalRecords_Services.layouts.l_raw l , 
 																														FFD.Layouts.PersonContextBatchSlim r ) := transform,
-		skip(~ShowDisputedRecords and r.isDisputed )
-			self.StatementIDs := if(ShowConsumerStatements,r.StatementIds,FFD.Constants.BlankStatements); 
+		skip((~ShowDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs)))
+			self.StatementIDs := r.StatementIds; 
 			self.IsDisputed   := r.IsDisputed; 
 			self := l;
 		end;

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="VehicleSearchRequest" wuTimeout="500000">
  <part name="SSN" type="xsd:string"/>
 	<part name="UnParsedFullName" type="xsd:string"/>
@@ -50,6 +50,7 @@
 /*--INFO-- This service searches the vehicle file.*/
 
 export Vehicle_Search := MACRO
+#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 #STORED('ScoreThreshold',10);
 
 doxie.MAC_Header_Field_Declare()

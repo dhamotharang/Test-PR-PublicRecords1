@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="ContactCard.ReportService">
 
 	<part name="PhonesPerPerson" type="xsd:byte"/> 
@@ -52,6 +52,7 @@
 
 
 export ReportService := MACRO
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 #constant('IsCRS', true);
 
 con := ContactCard.constants;

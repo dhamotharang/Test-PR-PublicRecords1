@@ -26,7 +26,7 @@
       boolean hasAppendedproviderid := hasNum(L.appendedproviderid);
       boolean hasTin := hasTxt(L.tin);
       boolean hasGeo := hasTxt(L.geo_lat) AND hasTxt(L.geo_long);
-      boolean hasBankAccount := hasTxt(L.bank_routing_number) AND hasTxt(L.bank_account_number);
+      boolean hasBankAccount := hasTxt(L.bank_account_number);
       boolean hasDL := hasTxt(L.dl_state) AND hasTxt(L.dl_number);
 
       SELF.hasFullName           := hasFullName;

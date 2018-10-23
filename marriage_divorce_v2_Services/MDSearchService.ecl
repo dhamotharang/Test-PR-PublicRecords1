@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="MDSearchService">
 
 	<!-- MD Keys -->
@@ -65,7 +65,9 @@
 /*--INFO-- Search for Marriage & Divorce Records via simple keys or autokeys. */
 import text_search, doxie;  
 export MDSearchService() := macro
-  
+
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+ 
 	// Generate the full report
 	pre_raw := marriage_divorce_v2_Services.MDSearchService_Records();
 	raw := pre_raw.Records;

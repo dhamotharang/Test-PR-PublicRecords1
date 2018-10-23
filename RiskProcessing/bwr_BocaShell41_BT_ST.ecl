@@ -1,4 +1,4 @@
-#workunit('name','NonFCRA BT-ST Bocashell 4.1 Process');
+﻿#workunit('name','NonFCRA BT-ST Bocashell 4.1 Process');
 
 /* *** Note that Netacuity is turned ON *** needs to use Cert gateway  */
 
@@ -134,7 +134,7 @@ l t_f(ds_input le, INTEGER c) := TRANSFORM
 	self.historydateyyyymm := (unsigned)le.historydateyyyymm;
 	self.dppapurpose := dppa;
 	self.glbpurpose := glba;
-	self.gateways := riskwise.shortcuts.gw_netacuity;
+	self.gateways := riskwise.shortcuts.gw_netacuityv4;
 	SELF.datarestrictionmask := datarestrictionmask;
 	self.bsversion := 41;		
 	SELF := le;

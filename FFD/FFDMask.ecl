@@ -16,8 +16,8 @@ EXPORT FFDMask := MODULE
 	
 	//1st position in FFDOptionsMask string
 	EXPORT BOOLEAN isShowConsumerStatements(INTEGER8 inFFDMask) := (inFFDMask & $.Constants.ConsumerOptions.SHOW_CONSUMER_STATEMENTS) = $.Constants.ConsumerOptions.SHOW_CONSUMER_STATEMENTS;
-	//2nd position in FFDOptionsMask string
-	EXPORT BOOLEAN isShowDisputedBankruptcies(INTEGER8 inFFDMask) := (inFFDMask & $.Constants.ConsumerOptions.SHOW_DISPUTED_BANKRUPTCY) = $.Constants.ConsumerOptions.SHOW_DISPUTED_BANKRUPTCY;
+	//2nd position in FFDOptionsMask string (plus 1st position should be set to be enforced)
+	EXPORT BOOLEAN isShowDisputedBankruptcies(INTEGER8 inFFDMask) := isShowConsumerStatements(inFFDMask) AND (inFFDMask & $.Constants.ConsumerOptions.SHOW_DISPUTED_BANKRUPTCY) = $.Constants.ConsumerOptions.SHOW_DISPUTED_BANKRUPTCY;
 	//3rd position in FFDOptionsMask string
 	EXPORT BOOLEAN isSuppressRecordsWhenITAlert(INTEGER8 inFFDMask) := (inFFDMask & $.Constants.ConsumerOptions.SUPPRESS_RECORDS_WHEN_IT_ALERT) = $.Constants.ConsumerOptions.SUPPRESS_RECORDS_WHEN_IT_ALERT;
 	//4th position in FFDOptionsMask string

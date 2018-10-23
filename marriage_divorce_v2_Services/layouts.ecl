@@ -278,6 +278,7 @@ export layouts := module
     BatchShare.layouts.ShareErrors;
 		batch_out_search.SequenceNumber;
 		FFD.Layouts.ConsumerFlags;
+    string12 inquiry_lexid := '';
 	END;
 	
 	export batch_out_pre := record(batch_out)

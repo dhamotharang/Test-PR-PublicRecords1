@@ -1,7 +1,6 @@
 ﻿export layout_Common := RECORD
 	UNSIGNED6 rollup_key;
 	STRING7   rollup_key_type;  // a Constants.TAG_ROLLUP_KEY* value
-
 	UNSIGNED4 dt_first_seen;
 	UNSIGNED4 dt_last_seen;
 	STRING10  phone;
@@ -22,12 +21,13 @@
 	STRING5   zip;
 	string6   postalcode;
 	STRING4   zip4;
-
 	UNSIGNED2 score_name;
 	UNSIGNED2 score_addr;
 	// UNSIGNED2 score_addrStreet;
 	// UNSIGNED2 score_addrCityStZip;
 	UNSIGNED2 score_phone;
 	STRING1   listing_type;
-	string1	  history_flag;
+	string1	 history_flag;
+	STRING1	 AddressType := '';
+	STRING1	 Current := 'U'; 
 END;

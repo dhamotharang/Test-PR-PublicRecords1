@@ -45,11 +45,27 @@ export t_FraudGovSearchOption := record (iesp.share.t_BaseOption)
 	string Platform {xpath('Platform')};
 end;
 		
+export t_FraudGovSearchElementInformation := record
+	string12 UniqueId {xpath('UniqueId')};
+	iesp.share.t_Name Name {xpath('Name')};
+	iesp.share.t_Address Address {xpath('Address')};
+	iesp.share.t_GeoLocation GeoLocation {xpath('GeoLocation')};
+	string11 SSN {xpath('SSN')};
+	string15 Phone10 {xpath('Phone10')};
+	string25 IpAddress {xpath('IpAddress')};
+	iesp.fraudgovplatform.t_FraudGovBankInformation BankInformation {xpath('BankInformation')};
+	iesp.fraudgovplatform.t_FraudGovDriversLicense DriversLicense {xpath('DriversLicense')};
+	string50 DeviceId {xpath('DeviceId')};
+	iesp.share.t_Address MailingAddress {xpath('MailingAddress')};
+end;
+		
 export t_FraudGovSearchRecord := record
 	string70 AnalyticsRecordId {xpath('AnalyticsRecordId')};
 	string10 RecordType {xpath('RecordType')};
+	string30 RecordSource {xpath('RecordSource')};
 	string60 ElementType {xpath('ElementType')};
 	string100 ElementValue {xpath('ElementValue')};
+	t_FraudGovSearchElementInformation ElementInformation {xpath('ElementInformation')};
 	integer Score {xpath('Score')};
 	integer NoOfIdentities {xpath('NoOfIdentities')};
 	iesp.fraudgovplatform.t_FraudGovBestInfo GovernmentBest {xpath('GovernmentBest')};

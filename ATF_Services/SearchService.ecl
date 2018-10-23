@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SearchService">
   <part name="SSN" type="xsd:string"/>
   <part name="FirstName" type="xsd:string"/>
@@ -32,8 +32,10 @@
 */
 /*--INFO-- This service Returns ATF Firearms and Explosives Search records.*/
 
-import ATF_services, iesp, AutoStandardI,WSInput;
+import ATF_services, iesp, AutoStandardI, WSInput;
 export SearchService := MACRO
+
+ #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 
     //The following macro defines the field sequence on WsECL page of query.
 		WSInput.MAC_ATF_Services_SearchService();  

@@ -6,20 +6,23 @@ EXPORT Collect_EntitiesIDs(
 ) := FUNCTION
 
   ds_valid_in := FraudShared_Services.ValidateInput.BuildValidityRecs(ds_batch_in);
+	_GetEntitiesIds := FraudShared_Services.EntitiesIds(ds_valid_in, fraud_platform, filterBy_entity_type);
 
-  ds_did                  := FraudShared_Services.EntitiesIds(ds_valid_in, fraud_platform, filterBy_entity_type).GetLexID();
-  ds_ip                   := FraudShared_Services.EntitiesIds(ds_valid_in, fraud_platform, filterBy_entity_type).GetIp();
-  ds_linkId               := FraudShared_Services.EntitiesIds(ds_valid_in, fraud_platform, filterBy_entity_type).GetLinkIds();
-  ds_device_id            := FraudShared_Services.EntitiesIds(ds_valid_in, fraud_platform, filterBy_entity_type).GetDeviceID();
-  ds_professional_id      := FraudShared_Services.EntitiesIds(ds_valid_in, fraud_platform, filterBy_entity_type).GetProfessionalID();
-  ds_tin                  := FraudShared_Services.EntitiesIds(ds_valid_in, fraud_platform, filterBy_entity_type).GetTIN();
-  ds_email                := FraudShared_Services.EntitiesIds(ds_valid_in, fraud_platform, filterBy_entity_type).GetEmail();
-  ds_appended_provider_id := FraudShared_Services.EntitiesIds(ds_valid_in, fraud_platform, filterBy_entity_type).GetAppendedProviderID();
-  ds_provider_npi         := FraudShared_Services.EntitiesIds(ds_valid_in, fraud_platform, filterBy_entity_type).GetNPI();
-  ds_provider_lnpid       := FraudShared_Services.EntitiesIds(ds_valid_in, fraud_platform, filterBy_entity_type).GetLNPID();
+  ds_did                  := _GetEntitiesIds.GetLexID();
+  ds_ip                   := _GetEntitiesIds.GetIp();
+  ds_linkId               := _GetEntitiesIds.GetLinkIds();
+  ds_device_id            := _GetEntitiesIds.GetDeviceID();
+  ds_professional_id      := _GetEntitiesIds.GetProfessionalID();
+  ds_tin                  := _GetEntitiesIds.GetTIN();
+  ds_email                := _GetEntitiesIds.GetEmail();
+  ds_bankaccountnumber    := _GetEntitiesIds.GetBankAccountNumber();
+  ds_dlnumber					    := _GetEntitiesIds.GetDriverLicenses();
+  ds_appended_provider_id := _GetEntitiesIds.GetAppendedProviderID();
+  ds_provider_npi         := _GetEntitiesIds.GetNPI();
+  ds_provider_lnpid       := _GetEntitiesIds.GetLNPID();
   ds_provider             := ds_provider_npi + ds_provider_lnpid + ds_appended_provider_id; 
 
-  ds_ids := ds_did + ds_ip + ds_linkId + ds_device_id + ds_professional_id + ds_tin + ds_provider + ds_email;
+  ds_ids := ds_did + ds_ip + ds_linkId + ds_device_id + ds_professional_id + ds_tin + ds_provider + ds_email + ds_bankaccountnumber + ds_dlnumber;
 
   RETURN ds_ids;
 END;

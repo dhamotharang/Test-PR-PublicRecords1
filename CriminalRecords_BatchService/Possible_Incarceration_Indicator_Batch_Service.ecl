@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Possible_Incarceration_Indicator_Batch_Service" wuTimeout="300000">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="Match_Name" type="xsd:boolean"/>
@@ -24,7 +24,7 @@
 IMPORT AutoStandardI, BatchShare, CriminalRecords_BatchService,ut;
 
 EXPORT Possible_Incarceration_Indicator_Batch_Service() := MACRO
-	
+	#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	gm := AutoStandardI.GlobalModule();
 	BOOLEAN match_name     			:= FALSE : STORED('Match_Name');
 	BOOLEAN match_addr  				:= FALSE : STORED('Match_Street_Address');     

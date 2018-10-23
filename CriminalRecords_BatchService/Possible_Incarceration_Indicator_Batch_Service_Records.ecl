@@ -117,6 +117,7 @@ EXPORT Possible_Incarceration_Indicator_Batch_Service_Records(CriminalRecords_Ba
 		SELF.INCR_doc_num := r.doc_num;
 		SELF.INCR_state_origin := r.orig_state;
 		SELF.INCR_dob := r.dob;
+		SELF.INCR_did := r.did;
 		SELF.INCR_ssn := if(is_Return_SSN,if(r.ssn = '', r.ssn_appended, r.ssn),'');
 		SELF.INCR_fname := if(is_Return_DOC_Name,r.fname,'');
 		SELF.INCR_lname := if(is_Return_DOC_Name,r.lname,'');
@@ -144,6 +145,7 @@ EXPORT Possible_Incarceration_Indicator_Batch_Service_Records(CriminalRecords_Ba
 	Layout_PII_OffenderPNameSSN rollOutputOffenderPNameSSN(Layout_PII_OffenderPNameSSN L, Layout_PII_OffenderPNameSSN R) := TRANSFORM
 		SELF.ssn := if(L.ssn = '',R.ssn,L.ssn);
 		SELF.ssn_appended := if(L.ssn_appended = '',R.ssn_appended,L.ssn_appended);
+		SELF.did := if(L.did = '',R.did,L.did);
 		use_L := L.ssn <> '' OR L.ssn_appended <> '';
 		SELF.isDisputed := R.isDisputed OR (use_L  and L.isDisputed);
 		SELF.StatementIds := R.StatementIds + if(use_L,L.StatementIds);
@@ -170,8 +172,8 @@ EXPORT Possible_Incarceration_Indicator_Batch_Service_Records(CriminalRecords_Ba
 	// Change for RR-12139
 	
 	rslt_tmp := if(is_Return_DOC_Name or is_Return_SSN,
-								JOIN(punishments_inc, OffenderPNameSSN, LEFT.offender_key = RIGHT.ofk, makeOutputOffender(LEFT, RIGHT), KEEP(KeepN)),
-								JOIN(punishments_inc, OffenderPNameSSN_Temp, LEFT.offender_key = RIGHT.ofk, makeOutputOffender(LEFT, RIGHT), KEEP(1)));
+								JOIN(punishments_inc, OffenderPNameSSN, LEFT.offender_key = RIGHT.ofk, makeOutputOffender(LEFT, RIGHT), KEEP(KeepN), LIMIT(0)),
+								JOIN(punishments_inc, OffenderPNameSSN_Temp, LEFT.offender_key = RIGHT.ofk, makeOutputOffender(LEFT, RIGHT), KEEP(1), LIMIT(0)));
 								
 	rslt_grp := group(sort(rslt_tmp,except match_type),except match_type);
 	rslt_ungrp := ungroup(dedup(rslt_grp, 
@@ -180,8 +182,12 @@ EXPORT Possible_Incarceration_Indicator_Batch_Service_Records(CriminalRecords_Ba
 	rslt_srt := sort(rslt_ungrp,acctno,Incarceration_Flag,INCR_state_origin,INCR_doc_num,INCR_dob,event_dt,punishment_type,sent_length,sent_length_desc,cur_stat_inm,cur_stat_inm_desc,cur_loc_inm,cur_sec_class_dt,cur_loc_sec,gain_time,gain_time_eff_dt,latest_adm_dt,sch_rel_dt,act_rel_dt,ctl_rel_dt,presump_par_rel_dt,match_type,-INCR_ssn,INCR_fname,INCR_lname);
 															
   //FFD 
-  rslt := IF(isFCRA, FFD.Mac.ApplyConsumerAlertsBatch(rslt_srt, alert_flags, StatementsAndDisputes, CriminalRecords_BatchService.Layouts.batch_pii_out_pre),
-	            rslt_srt);
+  ds_flat_with_alerts := FFD.Mac.ApplyConsumerAlertsBatch(rslt_srt, alert_flags, StatementsAndDisputes, CriminalRecords_BatchService.Layouts.batch_pii_out_pre, configData.FFDOptionsMask);
+	            
+	// add resolved LexId to the results for inquiry history logging support                    
+  ds_flat_with_inquiry := FFD.Mac.InquiryLexidBatch(ds_batch_in, ds_flat_with_alerts, CriminalRecords_BatchService.Layouts.batch_pii_out_pre, 0);
+
+  rslt := if(isFCRA, ds_flat_with_inquiry, rslt_srt);
 
 	sequenced_out := PROJECT(rslt, TRANSFORM(CriminalRecords_BatchService.Layouts.batch_pii_out_pre, SELF.SequenceNumber := COUNTER, SELF := LEFT));
 	out := project(sequenced_out,CriminalRecords_BatchService.Layouts.batch_pii_out);
@@ -193,7 +199,7 @@ EXPORT Possible_Incarceration_Indicator_Batch_Service_Records(CriminalRecords_Ba
 			SELF := RIGHT));
 													 
 	consumer_statements_prep := IF(isFCRA, FFD.prepareConsumerStatementsBatch(consumer_statements, pc_recs, configData.FFDOptionsMask));	
- consumer_alerts  := IF(isFCRA, FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs));                                               
+ consumer_alerts  := IF(isFCRA, FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs, alert_flags, configData.FFDOptionsMask));                                               
  consumer_statements_alerts := consumer_statements_prep + consumer_alerts;
 
 	FFD.MAC.PrepareResultRecordBatch(out, record_out, consumer_statements_alerts, CriminalRecords_BatchService.Layouts.batch_pii_out);	

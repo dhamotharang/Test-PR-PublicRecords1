@@ -1,4 +1,4 @@
-
+﻿
 IMPORT AutoKeyI, AutoStandardI, census_data, iesp, lib_stringlib, SANCTN, Suppress, ut,BIPV2,MIDEX_Services;
 
 // ==============================================================================================================	
@@ -237,7 +237,7 @@ EXPORT Raw_Public :=
 									
 									sanct_recsHash := PROJECT(sanct_recs_wNmlsID_rolled,MIDEX_Services.alert_calcs.calcLicenseSrchHashes(LEFT));
 									
-									RETURN(IF(alertVersion != Midex_Services.Constants.AlertVersion.None,sanct_recsHash,sanct_recs_wlicInfo_Dedup));
+									RETURN(IF(alertVersion != Midex_Services.Constants.AlertVersion.None,sanct_recsHash,sanct_recs_wNmlsID_rolled));
 							END; // end function
 				END;  // Midex License module     
 			END;     // License module

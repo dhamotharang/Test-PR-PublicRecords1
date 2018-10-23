@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Crim_Offender_Events_SearchRequest">
   <part name="SSN" type="xsd:string"/>
   <part name="FirstName" type="xsd:string"/>
@@ -45,6 +45,7 @@
 /*--INFO-- This service pulls from the Criminal Offenses and Events files.*/
 
 export DOC_Search_Events := macro
+#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 #STORED('LookupType','CRIM');
 #stored('SelectIndividually',true);
 #stored('IncludeCriminalRecords',true);

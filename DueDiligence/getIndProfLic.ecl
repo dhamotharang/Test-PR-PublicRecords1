@@ -1,13 +1,14 @@
 ﻿IMPORT BIPv2, prof_licenseV2, risk_indicators, Prof_License_Mari, STD;
 
 /*
+  This module is used by both Business and Person products.
+
 	Following Keys being used:
 			Prof_licenseV2.Key_Proflic_Did
 			Prof_License_Mari.key_did
 */
 
-EXPORT getIndProfLic(DATASET(DueDiligence.LayoutsInternal.RelatedParty) indiv,
-											BOOLEAN includeReportData) := FUNCTION
+EXPORT getIndProfLic(DATASET(DueDiligence.LayoutsInternal.RelatedParty) indiv) := FUNCTION
 
 
 	licenseRaw := JOIN(indiv, prof_licenseV2.Key_Proflic_Did(),

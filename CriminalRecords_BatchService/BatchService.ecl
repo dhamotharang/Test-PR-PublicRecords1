@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BatchService">
   <part name="batch_in"    type="tns:XmlDataSet" cols="70" rows="25"/>
 	<!-- part name="NoDeepDive"  type="xsd:boolean"/ -->
@@ -51,11 +51,14 @@
   <part name="IncludeWeaponLaw"                   type="xsd:boolean"/>
   <part name="IncludeOther"                       type="xsd:boolean"/>
 	<part name="IncludeCannotClassify"              type="xsd:boolean"/>
+	<part name="IncludeWarrantFugitive"             type="xsd:boolean"/>
+	<part name="IncludeObstructResist"              type="xsd:boolean"/>
 
 </message>
 */
 
 EXPORT BatchService() := MACRO
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
  #WEBSERVICE(DESCRIPTION('This service pulls from the Criminal Offenders & 2 Offenses files.'));
 
 	ds_xml_in		    := DATASET([], CriminalRecords_BatchService.Layouts.batch_in) : STORED('batch_in');

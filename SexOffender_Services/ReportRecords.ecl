@@ -39,11 +39,12 @@ export ReportRecords := module
                 
     recs_pre := IF(isFCRA, did_recs, recs1); 
     
-    suppress_results_due_alerts := isFCRA and FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_mod.FCRAPurpose, in_mod.FFDOptionsMask)[1].suppress_records;
+    alert_indicators := FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_mod.FCRAPurpose, in_mod.FFDOptionsMask)[1];
+    suppress_results_due_alerts := isFCRA and alert_indicators.suppress_records;
     recs := if(suppress_results_due_alerts, dataset([], iesp.sexualoffender_fcra.t_FcraSexOffReportRecord), recs_pre);
 
     consumer_statements := if(isFCRA and showConsumerStatements,FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
-    consumer_alerts := if(isFCRA, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, suppress_results_due_alerts), FFD.Constants.BlankConsumerAlerts);
+    consumer_alerts := if(isFCRA, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, alert_indicators, in_mod.FFDOptionsMask), FFD.Constants.BlankConsumerAlerts);
          
     FFD.MAC.PrepareResultRecord(recs, final_results, consumer_statements, consumer_alerts, iesp.sexualoffender_fcra.t_FcraSexOffReportRecord); 
     

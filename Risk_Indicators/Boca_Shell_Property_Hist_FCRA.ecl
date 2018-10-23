@@ -1,4 +1,5 @@
-﻿IMPORT ut, RiskWise, LN_PropertyV2;
+﻿IMPORT _Control, ut, RiskWise, LN_PropertyV2;
+onThor := _Control.Environment.OnThor;
 
 EXPORT Boca_Shell_Property_Hist_FCRA (GROUPED DATASET(Layout_PropertyRecord) p_address,
                                       GROUPED DATASET(Layout_Boca_Shell_ids) ids, 
@@ -24,7 +25,7 @@ layout_PropertyRecordPlus get_property_by_addr (layout_propertyRecord le, record
 	SELF := [];
 END;
 
-property_by_address := JOIN (p_address, LN_PropertyV2.Key_Addr_Fid(isFCRA),
+property_by_address_roxie := JOIN (p_address, LN_PropertyV2.Key_Addr_Fid(isFCRA),
                              LEFT.prim_name<>'' AND
                              keyed(LEFT.prim_name=RIGHT.prim_name) AND
                              keyed(LEFT.prim_range=RIGHT.prim_range) AND
@@ -47,13 +48,45 @@ property_by_address := JOIN (p_address, LN_PropertyV2.Key_Addr_Fid(isFCRA),
 				     RiskWise.max_atmost
 			     ));
 
+property_by_address_thor := JOIN (distribute(p_address(prim_name<>''), hash64(prim_name, prim_range, zip5, predir, postdir, addr_suffix, sec_range)), 
+                             distribute(pull(LN_PropertyV2.Key_Addr_Fid(isFCRA)(source_code_2='P')), hash64(prim_name, prim_range, zip, predir, postdir, suffix, sec_range)),
+                             // LEFT.prim_name<>'' AND
+                             (LEFT.prim_name=RIGHT.prim_name) AND
+                             (LEFT.prim_range=RIGHT.prim_range) AND
+                             (LEFT.zip5=RIGHT.zip) AND
+                             (LEFT.predir=RIGHT.predir) AND
+                             (LEFT.postdir=RIGHT.postdir) AND
+                             (LEFT.addr_suffix=RIGHT.suffix) AND
+                             (LEFT.sec_range=RIGHT.sec_range),
+                             get_property_by_addr(LEFT,RIGHT), KEEP(100), LEFT OUTER,
+			     ATMOST(
+				     (LEFT.prim_name=RIGHT.prim_name) AND
+				     (LEFT.prim_range=RIGHT.prim_range) AND
+				     (LEFT.zip5=RIGHT.zip) AND
+				     (LEFT.predir=RIGHT.predir) AND
+				     (LEFT.postdir=RIGHT.postdir) AND
+				     (LEFT.addr_suffix=RIGHT.suffix) AND
+				     (LEFT.sec_range=RIGHT.sec_range),
+				     RiskWise.max_atmost
+			     ), LOCAL) +
+           PROJECT(p_address(prim_name=''), TRANSFORM(layout_PropertyRecordPlus,
+             SELF.dataSrce := '0',
+             SELF := LEFT,
+             SELF := []));
+           
+#IF(onThor)
+	property_by_address := property_by_address_thor;
+#ELSE
+	property_by_address := UNGROUP(property_by_address_roxie);
+#END
+
 layout_PropertyRecordPlus get_property_by_did(Layout_Boca_Shell_ids le, recordof(LN_PropertyV2.key_property_did(isFCRA)) ri) := TRANSFORM
 	SELF.own_fares_id := ri.ln_fares_id;
 	SELF := le;
 	SELF.dataSrce := '9';
 	SELF := [];
 END;
-property_by_did := JOIN (ids, LN_PropertyV2.key_property_did(isFCRA),
+property_by_did_roxie := JOIN (ids, LN_PropertyV2.key_property_did(isFCRA),
                          LEFT.did<>0 AND 
                          (includeRelatives or ~left.isrelat) and
                          keyed(LEFT.did=RIGHT.s_did) and
@@ -61,6 +94,20 @@ property_by_did := JOIN (ids, LN_PropertyV2.key_property_did(isFCRA),
                          get_property_by_did(LEFT,RIGHT), 
 			 KEEP(100), ATMOST(keyed(LEFT.did=RIGHT.s_did) and keyed(right.source_code_2 = 'P'),
 				 RiskWise.max_atmost));
+
+property_by_did_thor := JOIN (distribute(ids(did<>0), hash64(did)), 
+                         distribute(pull(LN_PropertyV2.key_property_did(isFCRA)(source_code_2='P')), hash64(s_did)),
+                         (includeRelatives or ~left.isrelat) and
+                         (LEFT.did=RIGHT.s_did),
+                         get_property_by_did(LEFT,RIGHT), 
+			 KEEP(100), ATMOST((LEFT.did=RIGHT.s_did),
+				 RiskWise.max_atmost), LOCAL);
+
+#IF(onThor)
+	property_by_did := property_by_did_thor;
+#ELSE
+	property_by_did := UNGROUP(property_by_did_roxie);
+#END
 
 layout_PropertyRecordPlus roll_property_fid(layout_PropertyRecordPlus le, layout_PropertyRecordPlus ri) := TRANSFORM
 	SELF.isrelat := le.isrelat OR ri.isrelat;
@@ -73,7 +120,7 @@ layout_PropertyRecordPlus roll_property_fid(layout_PropertyRecordPlus le, layout
 	SELF := le;
 END;
 
-pre_property_fid := UNGROUP (property_by_address) + UNGROUP (property_by_did);
+pre_property_fid := property_by_address + property_by_did;
 
 property_fid := ROLLUP(SORT(pre_property_fid(own_fares_id != ''),
 					   seq, own_fares_id, dataSrce, prim_name, prim_range),
@@ -117,7 +164,7 @@ END;
 
 // filter out those fares records that came from DID lookup, 
 // and have no property address even after the join tries to add one 
-property_searched := group(sort(JOIN (property_fid, LN_PropertyV2.key_search_fid(isFCRA),
+property_searched_roxie := group(sort(JOIN (property_fid, LN_PropertyV2.key_search_fid(isFCRA),
                                       keyed(LEFT.own_fares_id=RIGHT.ln_fares_id) AND
                                       wild (RIGHT.which_orig) AND
                                       keyed(RIGHT.source_code_2='P') AND
@@ -135,6 +182,28 @@ property_searched := group(sort(JOIN (property_fid, LN_PropertyV2.key_search_fid
 					      RiskWise.max_atmost
 				     ))(prim_name<>'' AND zip5<>''),
                                 seq),seq);
+
+property_searched_thor := group(sort(JOIN (distribute(property_fid, hash64(own_fares_id)), 
+                                           distribute(pull(LN_PropertyV2.key_search_fid(isFCRA)(source_code_2='P')), hash64(ln_fares_id)),
+                                      (LEFT.own_fares_id=RIGHT.ln_fares_id) AND
+                                      (LEFT.prim_name='' OR LEFT.prim_name=RIGHT.prim_name) AND
+                                      (Left.prim_range='' OR LEFT.prim_range=RIGHT.prim_range) AND
+				      (LEFT.zip5='' OR LEFT.zip5=RIGHT.zip) AND
+				      (unsigned)(RIGHT.process_date[1..6]) < left.historydate,
+				      getSearch_FCRA(LEFT,RIGHT),
+
+				      LEFT OUTER, keep(100),
+				      ATMOST(
+					      (LEFT.own_fares_id=RIGHT.ln_fares_id),
+					      RiskWise.max_atmost
+				     ), LOCAL)(prim_name<>'' AND zip5<>''),
+                                seq),seq);
+
+#IF(onThor)
+	property_searched := property_searched_thor;
+#ELSE
+	property_searched := property_searched_roxie;
+#END
 
 layout_PropertyRecordPlus roll_prop_searched(layout_PropertyRecordPlus le, layout_PropertyRecordPlus ri) := TRANSFORM
 	SELF.NAPROP := MAX(le.naprop,ri.naprop);
@@ -341,7 +410,7 @@ layout_PropertyRecordPlus add_assess_FCRA(layout_PropertyRecordPlus le, recordof
 	SELF := le;
 END;
 
-pre_Assessments_added := JOIN (property_searched, LN_PropertyV2.key_assessor_fid(isFCRA),
+pre_Assessments_added_roxie := JOIN (property_searched, LN_PropertyV2.key_assessor_fid(isFCRA),
                               keyed(LEFT.own_fares_id=RIGHT.ln_fares_id) and
 															((unsigned)right.tax_year <= (unsigned)(((string)left.historydate)[1..4])
 																AND (unsigned)right.assessed_value_year <= (unsigned)(((string)left.historydate)[1..4])
@@ -351,6 +420,24 @@ pre_Assessments_added := JOIN (property_searched, LN_PropertyV2.key_assessor_fid
 															) and	// see that all of these dates are less than history date
                               LEFT.own_fares_id[2]='A', 
                               add_assess_FCRA(LEFT,RIGHT), LEFT OUTER, keep(100), ATMOST( keyed(LEFT.own_fares_id=RIGHT.ln_fares_id), RiskWise.max_atmost));
+
+pre_Assessments_added_thor := JOIN (distribute(property_searched, hash64(own_fares_id)), 
+                              distribute(pull(LN_PropertyV2.key_assessor_fid(isFCRA)), hash64(ln_fares_id)),
+                              (LEFT.own_fares_id=RIGHT.ln_fares_id) and
+															((unsigned)right.tax_year <= (unsigned)(((string)left.historydate)[1..4])
+																AND (unsigned)right.assessed_value_year <= (unsigned)(((string)left.historydate)[1..4])
+																AND (unsigned)right.market_value_year <= (unsigned)(((string)left.historydate)[1..4])
+																AND (unsigned)right.sale_date[1..6] <= (unsigned)left.historydate
+																AND (unsigned)right.recording_date[1..6] <= (unsigned)left.historydate
+															) and	// see that all of these dates are less than history date
+                              LEFT.own_fares_id[2]='A', 
+                              add_assess_FCRA(LEFT,RIGHT), LEFT OUTER, keep(100), ATMOST((LEFT.own_fares_id=RIGHT.ln_fares_id), RiskWise.max_atmost), LOCAL);
+
+#IF(onThor)
+	pre_Assessments_added := group(sort(pre_Assessments_added_thor, seq),seq);
+#ELSE
+	pre_Assessments_added := pre_Assessments_added_roxie;
+#END
 
 assessments_added := rollup(sort(pre_assessments_added, own_fares_id, prim_name, prim_range, zip5, sec_range, dataSrce), roll_prop_searched(LEFT,RIGHT), own_fares_id, prim_name, prim_range, zip5, sec_range);
 
@@ -450,7 +537,7 @@ layout_PropertyRecordPlus add_deeds_FCRA(layout_PropertyRecordPlus le, recordof(
 	SELF := le;
 END;
 
-pre_Deeds_added := JOIN (assessments_added, LN_PropertyV2.key_deed_fid(isFCRA),
+pre_Deeds_added_roxie := JOIN (assessments_added, LN_PropertyV2.key_deed_fid(isFCRA),
 								RIGHT.proc_date<>0 AND // make sure we have a proc_date and the recording date is not in the future of todays date
 								keyed(LEFT.own_fares_id=RIGHT.ln_fares_id) AND
 								keyed(RIGHT.proc_date < left.historydate) AND
@@ -460,7 +547,22 @@ pre_Deeds_added := JOIN (assessments_added, LN_PropertyV2.key_deed_fid(isFCRA),
 								ATMOST( keyed(LEFT.own_fares_id=RIGHT.ln_fares_id) AND 
 								keyed(RIGHT.proc_date < left.historydate), RiskWise.max_atmost));
 
-deeds_added := rollup(sort(pre_deeds_added,prim_name,prim_range,zip5,sec_range, dataSrce),roll_prop_searched(LEFT,RIGHT),prim_name,prim_range,zip5,sec_range);
+pre_Deeds_added_thor := JOIN (distribute(assessments_added, hash64(own_fares_id)), 
+                distribute(pull(LN_PropertyV2.key_deed_fid(isFCRA)(proc_date<>0)), hash64(ln_fares_id)),// make sure we have a proc_date and the recording date is not in the future of todays date
+								(LEFT.own_fares_id=RIGHT.ln_fares_id) AND
+								(RIGHT.proc_date < left.historydate) AND
+								LEFT.own_fares_id[2] IN ['D','M'], 
+							add_deeds_FCRA(LEFT,RIGHT), 
+								LEFT OUTER, keep(100), 
+								ATMOST( (LEFT.own_fares_id=RIGHT.ln_fares_id), RiskWise.max_atmost), LOCAL);
+
+#IF(onThor)
+	pre_Deeds_added := group(sort(pre_Deeds_added_thor,seq),seq);
+#ELSE
+	pre_Deeds_added := pre_Deeds_added_roxie;
+#END
+
+deeds_added := rollup(sort(pre_deeds_added,prim_name,prim_range,zip5,sec_range, dataSrce,own_fares_id),roll_prop_searched(LEFT,RIGHT),prim_name,prim_range,zip5,sec_range);
 
 
 // distressed sale sorting and picking 2 most recent
@@ -488,7 +590,7 @@ itera into2sales(itera le, itera ri) := transform
 															
 	self := le;
 end;
-distressed := rollup(itera(iter_seq<3), left.did=right.did and left.seq=right.seq, into2sales(left,right));		// already have 2 records per did and applicant sold recs
+distressed := rollup(itera(iter_seq<3), left.seq=right.seq and left.did=right.did, into2sales(left,right));		// already have 2 records per did and applicant sold recs
 
 //join test to deeds_added so we have 3 records with all info
 
@@ -505,7 +607,7 @@ layout_PropertyRecordPlus fillall(deeds_added le, distressed ri) := transform
 	
 	self := le;
 end;
-wDistressed := join(deeds_added, distressed, left.did=right.did, fillall(left,right), left outer);
+wDistressed := join(deeds_added, distressed, left.seq = right.seq and left.did=right.did, fillall(left,right), left outer);
 
 
 

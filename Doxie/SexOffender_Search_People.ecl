@@ -1,4 +1,4 @@
-/*--SOAP-- 
+﻿/*--SOAP-- 
 <message name="SexOffender_Search_People" wuTimeout="240000">
  <part name="SSN" type="xsd:string"/>
   <part name="FirstName" type="xsd:string"/>
@@ -41,6 +41,7 @@
 /*--INFO-- This service pulls from the Sex Offenders file.*/
 
 export sexoffender_search_people := macro
+#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 #STORED('LookupType','SEX');
 
 WSInput.MAC_SexOffender_Search_People()

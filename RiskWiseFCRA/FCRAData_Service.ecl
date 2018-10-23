@@ -25,6 +25,7 @@
   <separator />
 	
 	<part name="instant_ip" type="xsd:string" default="http://roxiestaging.br.seisint.com:9876" description=" gateway to VRU Identity service and neutral did service"/>
+	<part name="SkipRiskviewFilters" type="xsd:boolean" default="false" description="turns off certain riskview business logic filtering of the data so that DOST can get full picture if they want">
 	<part name='NonSubjectSuppression' type = 'xsd:unsignedInt' default="2"/> <!-- [1,2,3] -->
 </message>
 */
@@ -60,7 +61,8 @@ export FCRAData_service := MACRO
 	'zip',
 	'dob',
 	'instant_ip',
-	'NonSubjectSuppression'));
+	'NonSubjectSuppression',
+	'SkipRiskviewFilters'));
 
 
 boolean alpha_numeric := false : stored ('AlphaNumericInput');
@@ -87,6 +89,7 @@ string9  zip9_val    := '' : stored ('zip');
 string8  dob_val     := '' : stored ('dob');
 
 string neutral_ip := '' : stored ('instant_ip');
+boolean SkipRiskviewFilters := false : stored ('SkipRiskviewFilters');
 IF ((neutral_ip = '') and (did_value = 0), FAIL (301, TRIM (doxie.ErrorCodes (301)) + ': instant_ip is required'));
 
 //non-subject suppression
@@ -391,6 +394,7 @@ TRANSFORM
   SELF.cflags.negative_alert := (ri.negative_alert='1');
   SELF.cflags.id_theft_flag := (ri.id_theft_flag='1');
   SELF := le;
+	self := [];
 END;
 bshell_w_flags := JOIN (bshellID, fcra.Key_Override_PCR_UID, 
                         keyed(LEFT.CID=RIGHT.UID),
@@ -1193,7 +1197,7 @@ RiskWiseFCRA._Lien_data(dids, ds_flagfile, liens_main_f, liens_party_f, nss, his
 IF (VRU_ok, OUTPUT (liens_main_f,   NAMED ('liens_main')));
 IF (VRU_ok, OUTPUT (liens_party_f,  NAMED ('liens_party')));
 
-crim_recs := RiskWiseFCRA._crim_data (dids, ds_flagfile);
+crim_recs := RiskWiseFCRA._crim_data (dids, ds_flagfile, SkipRiskviewFilters);
 IF (VRU_ok, OUTPUT (crim_recs.offenders,      NAMED ('offenders')));
 IF (VRU_ok, OUTPUT (crim_recs.offenses,       NAMED ('offenses')));
 IF (VRU_ok, OUTPUT (crim_recs.punishments,    NAMED ('punishment')));

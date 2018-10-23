@@ -1,4 +1,4 @@
-import risk_indicators, ut, models;
+﻿import risk_indicators, ut, models;
 
 // *******************************************************************************************************************************************
 // the main code for this logic exists in Riskview.Search_Function
@@ -118,6 +118,7 @@ risk_indicators.Layout_Boca_Shell add_alerts(risk_indicators.Layout_Boca_Shell l
 	self.rv_scores.bankcardv5 := if(le.rv_scores.bankcardv5<>'' and score_override_alert_returned, '100', le.rv_scores.bankcardv5);
 	self.rv_scores.msbv5 := if(le.rv_scores.msbv5<>'' and score_override_alert_returned, '100', le.rv_scores.msbv5);
 	self.rv_scores.telecomv5 := if(le.rv_scores.telecomv5<>'' and score_override_alert_returned, '100', le.rv_scores.telecomv5);					 
+	self.rv_scores.crossindv5 := if(le.rv_scores.crossindv5<>'' and score_override_alert_returned, '100', le.rv_scores.crossindv5);					 
 														 
 	self := le;
 end;

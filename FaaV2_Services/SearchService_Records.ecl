@@ -32,7 +32,7 @@ export SearchService_Records := module
     gateways := Gateway.Configuration.Get();
     boolean ShowConsumerStatements := FFD.FFDMask.isShowConsumerStatements(in_mod.FFDOptionsMask);
     
-    // 1) Select the DID ( We are using the subject DID rather than the Best DID.) 
+    //  Select the DID ( We are using the subject DID rather than the Best DID.) 
     ds_dids := dataset([{FFD.Constants.SingleSearchAcctno,
                          (unsigned)in_mod.DID}],FFD.Layouts.DidBatch);
                          
@@ -44,11 +44,12 @@ export SearchService_Records := module
     
     recs := FaaV2_Services.Raw.getByAircraftId(search_ids, in_mod.applicationType, isFCRA, ds_flags, slim_pc_recs, in_mod.FFDOptionsMask);
 
-    suppress_results_due_alerts := isFCRA and FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_mod.FCRAPurpose, in_mod.FFDOptionsMask)[1].suppress_records;
+    alert_indicators := FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_mod.FCRAPurpose, in_mod.FFDOptionsMask)[1];
+    suppress_results_due_alerts := isFCRA and alert_indicators.suppress_records;
    
-     //4) Make Statements
+     // Make Statements
     statement_output := if(isFCRA and ShowConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
-    consumer_alerts := if(isFCRA, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, suppress_results_due_alerts), FFD.Constants.BlankConsumerAlerts);
+    consumer_alerts := if(isFCRA, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, alert_indicators, in_mod.FFDOptionsMask), FFD.Constants.BlankConsumerAlerts);
                                        
    recs_alpha_sort := sort(recs, lname, fname, mname, state, city, aircraft_id);                        
     // Calculate the penalty on the records

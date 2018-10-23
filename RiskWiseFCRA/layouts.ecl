@@ -1,4 +1,4 @@
-IMPORT risk_indicators, riskwise, iesp;
+﻿IMPORT risk_indicators, riskwise, iesp, liensv2;
 
 EXPORT layouts := MODULE
 
@@ -141,6 +141,46 @@ export PersonContext_layout := record
 	dataset(iesp.share_fcra.t_ConsumerStatement) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MAX_CONSUMER_STATEMENTS)};
 	risk_indicators.Layout_Boca_Shell;
 end;
-
+export layoutLiens := record
+		string50 ptmsid;
+		string50 prmsid;
+		string porig_name;
+		string8  pdate_first_seen := '';
+		string8  pdate_last_seen := '';
+		unsigned pdid;
+		string pname_type; 
+  string Party_PersistId;
+  integer ConsumerStatementId;
+	end;
+	export layoutParty := record	
+		recordOf(liensv2.layout_liens_party);
+		layoutLiens;
+	end;
+	export layoutMain := record
+			layoutLiens;
+			recordof(liensv2.Layout_liens_main_module.layout_liens_main);
+			STRING DF;
+			STRING DF2;
+			STRING DF3;
+			STRING DF4;
+			string mOrigFilingNumber;
+			string mcertificateNumber;
+			string mirsSerialNumber;
+			string mCaseNumberL;
+			string msort2Date;
+			string mProcessDate;
+			string8 mDateFiled ; 
+			string8 mReleaseDate    ;  
+			string20 mFilingNumber       ;    
+			string10 mFilingBook         ;    
+			string10 mFilingPage         ;    
+			string35 mAgencyCounty       ;    
+			string2 mAgencyState         ; 
+			string mAmount;
+			string mFtdDec;
+			boolean misSuits;
+   string8 VendorDateLastSeen;
+   string PersistId;
+	end;
 
 END;

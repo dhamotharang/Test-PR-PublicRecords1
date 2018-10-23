@@ -50,11 +50,13 @@ export mod_Rollup(SearchParams inputs) := MODULE
 		// removes records without a first seen/last seen date.  If there is only
 		// one address in the input, pass it back REGARDLESS of whether it has a
 		// date or not.  (Bugzilla 42359).
-		filteredAddrs := addrs(DateLastSeen.year > 0 OR DateFirstSeen.year > 0 OR 
-															ut.Age(iesp.ECL2ESP.DateToInteger(DateLastSeen)) <= 10 ); // Remove records older than 10 years if newer are available. 
+		filteredAddrs := addrs(
+															(DateLastSeen.year > 0 OR DateFirstSeen.year > 0 ) AND 
+															 ut.Age(iesp.ECL2ESP.DateToInteger(DateLastSeen)) <= 10 
+														 ); // Keep records newer than or equal to 10 years. 
 		return IF(COUNT(filteredAddrs) > 0 , 
 							 CHOOSEN(filteredAddrs, maxRecs),
-							 addrs);//i am not sure whether this is deterministic
+							 CHOOSEN(addrs, maxRecs));//i am not sure whether this is deterministic
 	END;
 
 	// after names are rolled up, decide which ones are passed to output
@@ -247,8 +249,8 @@ export mod_Rollup(SearchParams inputs) := MODULE
 		END;
 
 		resp := PROJECT(scoredResp, toResponseLayout(LEFT));
-
-		#IF(debug.debug_flag)
+	 
+	 #IF(debug.debug_flag)
 		output(names, named('inputNames'));
 		output(srtNames, named('srtNames'));
 		output(uniqueNames, named('uniqueNames'));
@@ -334,8 +336,8 @@ export mod_Rollup(SearchParams inputs) := MODULE
 			// context later.
 			SELF.best_score_phone := L.score_phone;
 			SELF.listing_type := L.listing_type; 
-			SELF.Current := [];
-			SELF.AddressType := [];
+			SELF.Current := L.Current;
+			SELF.AddressType := L.AddressType;
 		END;	// AddrTransform
 
 		addrs := PROJECT(recs, InputToAddrTransform(LEFT));
@@ -388,8 +390,8 @@ export mod_Rollup(SearchParams inputs) := MODULE
 			SELF.StateCityZip := '';
 			SELF.listing_type := '';
 			//SELF.HistoryFlag := '';
-			SELF.Current := [];
-			SELF.AddressType := [];	
+			SELF.Current := if(pa.Current <> '', pa.Current, oa.Current);
+			SELF.AddressType := if(pa.AddressType <> '', pa.AddressType, oa.AddressType);
 		END;  // AddressRollup
 
 		BOOLEAN fuzzyMatch(STRING s1, STRING s2) := (s1 = s2 OR fn_NormalizedEditDistance(s1, s2) > 80);
@@ -587,11 +589,11 @@ export mod_Rollup(SearchParams inputs) := MODULE
 			
 			SELF.UniqueID := (STRING) L.rollup_key;
 			SELF.EntityType := map( 
-			                      L.rollup_key_type = Constants.TAG_ROLLUP_KEY_LINKID => Constants.TAG_ENTITY_BIZ,
+			                      L.rollup_key_type = Constants.TAG_ROLLUP_KEY_LINKID => UPS_Services.Constants.TAG_ENTITY_BIZ,
 														  L.rollup_key_type = Constants.TAG_ROLLUP_KEY_DID =>  Constants.TAG_ENTITY_IND,								
-															L.rollup_key_type = Constants.TAG_ROLLUP_KEY_FDID  and L.Listing_Type ='B'=> Constants.TAG_ENTITY_BIZ,
-															L.rollup_key_type = Constants.TAG_ROLLUP_KEY_FDID  and L.Listing_Type ='R'=> Constants.TAG_ENTITY_IND,
-															L.rollup_key_type = Constants.TAG_ROLLUP_KEY_FAKEID  and L.Listing_Type ='B'=> Constants.TAG_ENTITY_BIZ,
+															L.rollup_key_type = Constants.TAG_ROLLUP_KEY_FDID  and L.Listing_Type ='B'=> UPS_Services.Constants.TAG_ENTITY_BIZ,
+															L.rollup_key_type = Constants.TAG_ROLLUP_KEY_FDID  and L.Listing_Type ='R'=> UPS_Services.Constants.TAG_ENTITY_IND,
+															L.rollup_key_type = Constants.TAG_ROLLUP_KEY_FAKEID  and L.Listing_Type ='B'=> UPS_Services.Constants.TAG_ENTITY_BIZ,
 															Constants.TAG_ENTITY_UNK
 														 );
 
@@ -629,7 +631,7 @@ export mod_Rollup(SearchParams inputs) := MODULE
 
 			SELF.Score := if(wt_total = 0, Constants.DEFAULT_RANGE,
 																		 (pointsBestName + pointsBestAddr + pointsBestPhone) / wt_total);
-			SELF.listing_type := L.listing_type;
+			SELF.listing_type := L.listing_type;	
 		END;
 
 		filledRecs := PROJECT(emptyRecs, PopulateEntities(LEFT));

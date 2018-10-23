@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="ReversePhoneTeaserService">	
   <part name="Phone" type="xsd:string"/>
   	<!-- COMPLIANCE SETTINGS -->
@@ -22,7 +22,7 @@
 IMPORT iesp, AutoStandardI, TeaserSearchServices, std;
 
 EXPORT ReversePhoneTeaserService := MACRO
-	
+	#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	rec_in := iesp.thinreversephoneteaser.t_ThinReversePhoneTeaserRequest;
 	ds_in := DATASET ([], rec_in) : STORED ('ThinReversePhoneTeaserRequest', FEW);
   first_row := ds_in[1] : INDEPENDENT;

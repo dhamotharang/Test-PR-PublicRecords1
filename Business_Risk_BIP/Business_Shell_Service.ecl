@@ -259,7 +259,7 @@
 /*--INFO-- Business Shell Service - This is the XML Service utilizing BIP linking. */
 
 #option('expandSelectCreateRow', true);
-IMPORT Business_Risk_BIP, Cortera, Gateway, iesp, UT, Risk_Indicators;
+IMPORT Business_Risk_BIP, Cortera, Gateway, iesp, UT, Risk_Indicators, OFAC_XG5;
 
 EXPORT Business_Shell_Service() := FUNCTION
 	/* ************************************************************************
@@ -1009,6 +1009,9 @@ EXPORT Business_Shell_Service() := FUNCTION
 	Input := DATASET([grabInput()]);
   
   if( ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
+  
+  IF( OFAC_version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(Watchlists_Requested, value),
+    FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 	
 	/* ************************************************************************
 	 *                   Get the Business Shell Results                       *

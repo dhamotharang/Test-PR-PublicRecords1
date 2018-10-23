@@ -98,6 +98,10 @@ EXPORT RiskView.Layouts.layout_riskview5_batch_response FormatBatch(RiskView.Lay
 		//integer l, integer j
 		) := transform
 		self.acctno := le.acctno;
+    
+    // don't log the lexid if the person got a noscore
+    self.inquiry_lexid := if(riskview.constants.noScoreAlert in [ri.Alert1,ri.Alert2,ri.Alert3,ri.Alert4,ri.Alert5,ri.Alert6,ri.Alert7,ri.Alert8,ri.Alert9,ri.Alert10], '', ri.LexID);
+    
 		self.Liens1_Seq          := ri.LnJliens[1].Seq;
 		self.Liens1_DateFiled    := ri.LnJliens[1].DateFiled;
   self.Liens1_LienTypeID   := ri.LnJliens[1].LienTypeID;

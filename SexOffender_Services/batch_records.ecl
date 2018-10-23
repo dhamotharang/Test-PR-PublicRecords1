@@ -55,8 +55,12 @@ EXPORT batch_records(SexOffender_Services.IParam.Batch_Params configData,
 	
 	  SHARED alert_flags := IF(isFCRA, FFD.ConsumerFlag.getAlertIndicators(pc_recs, configData.FCRAPurpose, configData.FFDOptionsMask));
 	
+	  // we need to override 1st bit here to make sure records with statements are flagged correctly
+	  // Dempsey Hits filtering is done separately (if needed)
+    SHARED FFDOptionsMask_adj := configData.FFDOptionsMask | FFD.Constants.ConsumerOptions.SHOW_CONSUMER_STATEMENTS; 
+		
 		// 3. Get raw offenders records
-		ds_offenders_raw := SexOffender_Services.Raw.batch_view.GetOffendersRecs(acctNos_final, isFCRA, ds_flags, slim_pc_recs, configData.FFDOptionsMask);
+		ds_offenders_raw := SexOffender_Services.Raw.batch_view.GetOffendersRecs(acctNos_final, isFCRA, ds_flags, slim_pc_recs, FFDOptionsMask_adj);
 		
 		// 4. Remove restricted records via DID & SSN pulling and suppression.
 		appType := configData.applicationType;	  
@@ -75,7 +79,7 @@ EXPORT batch_records(SexOffender_Services.IParam.Batch_Params configData,
 																 TRANSFORM(LEFT),
 																 LEFT ONLY);
 																					 
-    SHARED ds_offenders := IF(IsFCRA, FFD.Mac.ApplyConsumerAlertsBatch(ds_offenders_pre, alert_flags, StatementIds, SexOffender_Services.Layouts.rec_offender_plus_acctno),
+    SHARED ds_offenders := IF(IsFCRA, FFD.Mac.ApplyConsumerAlertsBatch(ds_offenders_pre, alert_flags, StatementIds, SexOffender_Services.Layouts.rec_offender_plus_acctno, configData.FFDOptionsMask),
 	                            ds_offenders_pre);
 		// 5. Penalize offenders.	
 		ds_batch_in_undrscr := PROJECT(ds_batch_in, BatchServices.transforms.SexOffenderCPS.xfm_prepend_underscore(LEFT));	
@@ -90,7 +94,7 @@ EXPORT batch_records(SexOffender_Services.IParam.Batch_Params configData,
 		// 6. Get Offenses/Convictions using found offenders seising_primary key.
 		ds_acctnos_sspks := PROJECT(ds_offenders, SexOffender_Services.Layouts.lookup_id_rec);
 		ds_acctnos_sspks_deduped := DEDUP(SORT(ds_acctnos_sspks, acctno, seisint_primary_key), acctno, seisint_primary_key); //TODO: check if this is needed...	
-	  ds_offenses := SexOffender_Services.Raw.batch_view.GetOffensesRecs(ds_acctnos_sspks_deduped, isFCRA, ds_flags, slim_pc_recs, configData.FFDOptionsMask);
+	  ds_offenses := SexOffender_Services.Raw.batch_view.GetOffensesRecs(ds_acctnos_sspks_deduped, isFCRA, ds_flags, slim_pc_recs, FFDOptionsMask_adj);
 		
 		// 7. Expose exportable attributes.
 	
@@ -105,11 +109,15 @@ EXPORT batch_records(SexOffender_Services.IParam.Batch_Params configData,
 																	 LEFT.seisint_primary_key = RIGHT.seisint_primary_key,
 																	 SexOffender_Services.batch_make_flat(LEFT, RIGHT, COUNTER) );	
  
-    ds_records_with_alerts := IF(IsFCRA, FFD.Mac.ApplyConsumerAlertsBatch(ds_records, alert_flags, Statements, SexOffender_Services.Layouts.batch_out_pre),
-	                            ds_records);
+    ds_records_with_alerts := FFD.Mac.ApplyConsumerAlertsBatch(ds_records, alert_flags, Statements, SexOffender_Services.Layouts.batch_out_pre, configData.FFDOptionsMask);
+	                            
+	  // add resolved LexId to the results for inquiry history logging support                    
+    ds_out_fcra := FFD.Mac.InquiryLexidBatch(ds_batch_in, ds_records_with_alerts, SexOffender_Services.Layouts.batch_out_pre, 0);
+  
+    ds_records_out := IF(IsFCRA, ds_out_fcra, ds_records);
+    
 		//	sequence the records								 
-		
-		SHARED sequenced_out := PROJECT(ds_records_with_alerts, TRANSFORM(SexOffender_Services.Layouts.batch_out_pre, SELF.SequenceNumber := COUNTER, SELF := LEFT));
+		SHARED sequenced_out := PROJECT(ds_records_out, TRANSFORM(SexOffender_Services.Layouts.batch_out_pre, SELF.SequenceNumber := COUNTER, SELF := LEFT));
 		EXPORT records := 	PROJECT(sequenced_out, SexOffender_Services.Layouts.batch_out);			// projecting to batch layout
 		
 		// get statements 
@@ -119,7 +127,7 @@ EXPORT batch_records(SexOffender_Services.IParam.Batch_Params configData,
 																								 SELF := RIGHT));
 																								 
 		consumer_statements  := IF(isFCRA, FFD.prepareConsumerStatementsBatch(sd_out, pc_recs, configData.FFDOptionsMask));  // FCRA FFD statements
-    consumer_alerts  := IF(IsFCRA, FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs));                                               
+    consumer_alerts  := IF(IsFCRA, FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs, alert_flags, configData.FFDOptionsMask));                                               
     consumer_statements_alerts := consumer_statements + consumer_alerts;
 
 		EXPORT FFD_Statements := consumer_statements_alerts;  // FCRA FFD statements

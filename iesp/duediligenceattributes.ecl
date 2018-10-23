@@ -6,16 +6,29 @@ import iesp;
 
 export duediligenceattributes := MODULE
 			
+export t_DDRCitizenship := record (iesp.citizenshipscore.t_CITRequest)
+end;
+		
+export t_DDRCitizenshipResults := record (iesp.citizenshipscore.t_CITResponse)
+end;
+		
+export t_DDRPersonAttributesReportBy := record (iesp.duediligenceshared.t_DDRAttributesPerson)
+	t_DDRCitizenship Citizenship {xpath('Citizenship')};
+end;
+		
 export t_DDRAttributesReportBy := record
-	iesp.duediligenceshared.t_DDRAttributesPerson Person {xpath('Person')};
+	string ProductRequestType {xpath('ProductRequestType')}; //values['AttributesOnly','CitizenshipOnly','AttributesAndCitizenship','']
+	t_DDRPersonAttributesReportBy Person {xpath('Person')};
 	iesp.duediligenceshared.t_DDRAttributesBusiness Business {xpath('Business')};
 end;
 		
 export t_DDRAttributesResult := record
 	string12 UniqueId {xpath('UniqueId')};
 	string12 BusinessId {xpath('BusinessId')};
+	boolean LexIDChanged {xpath('LexIDChanged')};
 	t_DDRAttributesReportBy InputEcho {xpath('InputEcho')};
 	iesp.duediligenceshared.t_DDRAttributeGroup AttributeGroup {xpath('AttributeGroup')};
+	t_DDRCitizenshipResults CitizenshipResults {xpath('CitizenshipResults')};
 end;
 		
 export t_DueDiligenceAttributesResponse := record

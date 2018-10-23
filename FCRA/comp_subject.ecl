@@ -1,4 +1,4 @@
-import fcra, doxie, riskwisefcra, doxie_crs, suppress, Gong, risk_Indicators, ut, NID, header, FFD;
+﻿import fcra, doxie, riskwisefcra, doxie_crs, suppress, Gong, risk_Indicators, ut, NID, header, FFD;
 
 doxie.MAC_Header_Field_Declare (true); // is FCRA
 // reads: dppa_ok, glb_ok, probation_override_value, no_scrub, IsFCRA, ssn_mask_value, dl_mask_value
@@ -636,12 +636,12 @@ EXPORT ssn_lookups := project(result, mask_ssn5(left));
 gong_data := RiskWiseFCRA._Gong_data (dids, flagfile) (current_flag, publish_code != 'N' and omit_phone != 'Y');
 
 doxie_crs.layout_phone_records xformGong( RECORDOF(gong_data) l, FFD.Layouts.PersonContextBatchSlim r ) := 
-		TRANSFORM, SKIP(~showDisputedRecords AND r.isDisputed)																				 
+		TRANSFORM, SKIP((~showDisputedRecords AND r.isDisputed) OR (~ShowConsumerStatements AND EXISTS(r.StatementIDs)))																				 
 			SELF.zip := l.z5,
 			SELF.listing_name := l.listed_name,
 			SELF.phone := l.phone10,
 			SELF.timezone := '',			
-			SELF.StatementIDs := IF(ShowConsumerStatements,r.StatementIds,FFD.Constants.BlankStatements),
+			SELF.StatementIDs := r.StatementIds,
 			SELF.IsDisputed   := r.IsDisputed,
 			SELF.hri_Phone := []; // Risk_Indicators.Layout_Desc
 			SELF.Feedback := []; //PhonesFeedback_Services.Layouts.feedback_report

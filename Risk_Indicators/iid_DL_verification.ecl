@@ -1,10 +1,11 @@
-import DriversV2, Certegy, RiskWise, Risk_Indicators, InsuranceHeader_BestOfBest, Business_Risk_BIP, Drivers;
+﻿import _Control, DriversV2, Certegy, RiskWise, Risk_Indicators, InsuranceHeader_BestOfBest, Business_Risk_BIP, Drivers;
+onThor := _Control.Environment.OnThor;
 
 // this function accepts layout_output instead of just a slim layout_input so that we can check if the drlc is valid before searching anyting
 export iid_DL_verification(grouped DATASET(Risk_Indicators.Layout_Output) indata, integer dppa, boolean isFCRA=false,
 													 string10 ExactMatchLevel=risk_indicators.iid_constants.default_ExactMatchLevel, unsigned8 BSOptions,
 													 string50 DataPermission=risk_indicators.iid_constants.default_DataPermission, 
-													 unsigned1 BSversion, boolean onThor=false) := function
+													 unsigned1 BSversion) := function
 	
 	// check that user has permissible purpose to see DL data
 	dppa_ok := Risk_Indicators.iid_constants.dppa_ok(dppa, isFCRA);
@@ -67,8 +68,12 @@ with_dl_did_thor_pre := join(distribute(indata(did<>0 and dl_number<>'' and dl_s
 
 with_dl_did_thor := group(with_dl_did_thor_pre + project(indata(did=0 or dl_number='' or dl_state=''), transform(dl_temp, self := left, self := [])), seq);
 
-with_dl_did := if(onThor, with_dl_did_thor, with_dl_did_roxie);
-					
+#IF(onThor)
+	with_dl_did := with_dl_did_thor;
+#ELSE
+	with_dl_did := with_dl_did_roxie;
+#END
+
 dl_temp roll_dl(dl_temp le, dl_temp rt) := transform
 	self.dl_searched := le.dl_searched or rt.dl_searched;
 	self.any_DL_found := le.any_dl_found or rt.any_dl_found;
@@ -104,7 +109,7 @@ Slimmed_dl_did := project(rolled_dl_did, into_insurance_input(left));
 //=== for attribute version 201 customers - no DL # or DL state is required on input === 
 //=== (these customers are identified by using return_sources)                         ===
 //======================================================================================
-insurance_dl_did := InsuranceHeader_BestOfBest.search_Insurance_DL_by_Did(Slimmed_dl_did,dppa,isFCRA,DataPermission, onThor);
+insurance_dl_did := InsuranceHeader_BestOfBest.search_Insurance_DL_by_Did(Slimmed_dl_did,dppa,isFCRA,DataPermission);
 
 dl_temp get_insurance_dl_did(rolled_dl_did le, insurance_dl_did ri) := TRANSFORM
 	self.dl_searched := le.dl_searched or (le.did<>0 and le.dl_number<>'' and le.dl_state<>'' and le.verified_dl='');
@@ -134,8 +139,12 @@ with_insurance_dl_did_thor_pre := join(distribute(rolled_dl_did(did<>0 and ((dl_
 
 with_insurance_dl_did_thor := with_insurance_dl_did_thor_pre + rolled_dl_did(did=0 or ((dl_number='' or dl_state='') and not (return_sources)));
 
-with_insurance_dl_did := if(onThor, with_insurance_dl_did_thor, with_insurance_dl_did_roxie);
-					
+#IF(onThor)
+	with_insurance_dl_did := with_insurance_dl_did_thor;
+#ELSE
+	with_insurance_dl_did := with_insurance_dl_did_roxie;
+#END
+
 rolled_insurance_did := rollup(group(sort(with_insurance_dl_did, seq, -verified_dl), seq), true, roll_dl(left,right));
 
 //Search Certegy keys by DID
@@ -173,8 +182,12 @@ with_certegy_thor_pre := join(distribute(dl_did_rolled(did<>0 and dl_number<>'' 
 
 with_certegy_thor := group(with_certegy_thor_pre + dl_did_rolled(did=0 or dl_number='' or dl_state=''), seq);
 
-with_certegy := if(onThor, with_certegy_thor, with_certegy_roxie);
-					
+#IF(onThor)
+	with_certegy := with_certegy_thor;
+#ELSE
+	with_certegy := with_certegy_roxie;
+#END
+
 rolled_certegy := rollup(group(sort(with_certegy, seq, -verified_dl), seq), true, roll_dl(left,right));
 
 //Search State keys by DL
@@ -211,14 +224,18 @@ with_dl_thor_pre := join(distribute(rolled_certegy(dl_number<>'' and  dl_state<>
 
 with_dl_thor := group(with_dl_thor_pre + rolled_certegy(dl_number='' or  dl_state=''), seq);
 
-with_dl := if(onThor, with_dl_thor, with_dl_roxie);
+#IF(onThor)
+	with_dl := with_dl_thor;
+#ELSE
+	with_dl := with_dl_roxie;
+#END
 
 rolled_dl := rollup(group(sort(with_dl, seq, -verified_dl), seq), true, roll_dl(left,right));
 
 Slimmed_state := project(rolled_dl, into_insurance_input(left));
 
 //Search the Insurance DL keys by DL
-insurance_dl_dl := InsuranceHeader_BestOfBest.search_Insurance_DL_by_DL(Slimmed_state,dppa,isFCRA,DataPermission, onThor);
+insurance_dl_dl := InsuranceHeader_BestOfBest.search_Insurance_DL_by_DL(Slimmed_state,dppa,isFCRA,DataPermission);
 
 dl_temp get_insurance_dl_dl(rolled_dl le, insurance_dl_dl ri) := TRANSFORM
 	self.dl_searched := le.dl_searched or (le.dl_number<>'' and le.dl_state<>'' and le.fname<>'' and le.lname<>'' and le.verified_dl='');
@@ -251,7 +268,11 @@ with_insurance_dl_dl_thor_pre := join(distribute(rolled_dl(dl_number<>'' and  dl
 
 with_insurance_dl_dl_thor := with_insurance_dl_dl_thor_pre + rolled_dl(dl_number='' or  dl_state='');
 
-with_insurance_dl_dl := if(onThor, with_insurance_dl_dl_thor, with_insurance_dl_dl_roxie);
+#IF(onThor)
+	with_insurance_dl_dl := with_insurance_dl_dl_thor;
+#ELSE
+	with_insurance_dl_dl := with_insurance_dl_dl_roxie;
+#END
 
 //We should have the highest verified record at this point.
 rolled_insurance_dl := rollup(group(sort(with_insurance_dl_dl, seq, -verified_dl), seq), true, roll_dl(left,right));

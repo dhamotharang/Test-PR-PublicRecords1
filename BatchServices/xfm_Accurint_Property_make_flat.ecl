@@ -1,8 +1,8 @@
-
+﻿
 IMPORT BatchServices, LN_PropertyV2_Services, FFD;
 
 EXPORT layout_Accurint_Property_batch_out_pre xfm_Accurint_Property_make_flat(BatchServices.Layouts.LN_Property.rec_widest_plus_acctnos_plus_matchcodes l, 
-																																							BOOLEAN return_formatted_values, boolean ShowConsumerStatements,
+																																							BOOLEAN return_formatted_values, 
 																																							integer c = 0) := 
 	TRANSFORM
 	
@@ -59,6 +59,12 @@ EXPORT layout_Accurint_Property_batch_out_pre xfm_Accurint_Property_make_flat(Ba
 																name_owner_1 = 4 => TRIM(first_borrower.cname),
 																DISPLAY_NOTHING
 															 );
+		// populate LexId only if corresponding name is populated
+		SELF.owner_1_did       := MAP(
+																name_owner_1 IN [1, 2] => TRIM(first_owner.did),
+																name_owner_1 IN [3, 4] => TRIM(first_borrower.did),
+																DISPLAY_NOTHING
+															 );
 		
 
 		
@@ -77,6 +83,13 @@ EXPORT layout_Accurint_Property_batch_out_pre xfm_Accurint_Property_make_flat(Ba
 																DISPLAY_NOTHING
 															 );
 
+		// populate LexId only if corresponding name is populated
+		SELF.owner_2_did       := MAP(
+																name_owner_2 IN [1, 2] => TRIM(second_owner.did),
+																name_owner_2 IN [3, 4] => TRIM(second_borrower.did),
+																DISPLAY_NOTHING
+															 );
+		
 		SELF.prop_prim_range    := property.prim_range;
 		SELF.prop_predir        := property.predir;
 		SELF.prop_prim_name     := property.prim_name;
@@ -100,6 +113,11 @@ EXPORT layout_Accurint_Property_batch_out_pre xfm_Accurint_Property_make_flat(Ba
 		
 		SELF.name_seller        := IF( TRIM(seller.lname) != '',
 		                               TRIM(seller.lname) + ', ' + TRIM(seller.fname) + ' ' + TRIM(seller.mname),
+																	 DISPLAY_NOTHING
+																	);
+		
+		// populate LexId only if corresponding name is populated
+		SELF.seller_did        := IF( TRIM(seller.lname) != '', TRIM(seller.did),
 																	 DISPLAY_NOTHING
 																	);
 		
@@ -161,22 +179,22 @@ EXPORT layout_Accurint_Property_batch_out_pre xfm_Accurint_Property_make_flat(Ba
 		
 		
 		owner1 := map(
-					name_owner_1 in [1,2 ] => owner_1_Disputes_o + if(ShowConsumerStatements,owner_1_Statements_o,dataset([],FFD.Layouts.ConsumerStatementBatch)),
-					name_owner_1 in [3,4 ] => owner_1_Disputes_b + if(ShowConsumerStatements,owner_1_Statements_b,dataset([],FFD.Layouts.ConsumerStatementBatch)),
+					name_owner_1 in [1,2 ] => owner_1_Disputes_o + owner_1_Statements_o,
+					name_owner_1 in [3,4 ] => owner_1_Disputes_b + owner_1_Statements_b,
 					dataset([],FFD.Layouts.ConsumerStatementBatch));	
 
 
 
 		owner2 := map(
-					name_owner_2 in [1,2 ] => owner_2_Disputes_o + if(ShowConsumerStatements,owner_2_Statements_o,dataset([],FFD.Layouts.ConsumerStatementBatch)),
-					name_owner_2 in [3,4 ] => owner_2_Disputes_b + if(ShowConsumerStatements,owner_2_Statements_b,dataset([],FFD.Layouts.ConsumerStatementBatch)),
+					name_owner_2 in [1,2 ] => owner_2_Disputes_o + owner_2_Statements_o,
+					name_owner_2 in [3,4 ] => owner_2_Disputes_b + owner_2_Statements_b,
 					dataset([],FFD.Layouts.ConsumerStatementBatch)
 				);
 
 		StatementsAndDisputes := assessDisputes + 
 														 DeedDisputes + 
 														 seller_Disputes + 
-														 if(ShowConsumerStatements,assessStatements + DeedStatements + seller_Statements, dataset([],FFD.Layouts.ConsumerStatementBatch)) +
+														 assessStatements + DeedStatements + seller_Statements +
 														 owner1 +
 														 owner2;
 														 
@@ -186,14 +204,14 @@ EXPORT layout_Accurint_Property_batch_out_pre xfm_Accurint_Property_make_flat(Ba
 	END;
 	
 	/* Available "value" fields:
-		Â•	assessments[1].fares_calculated_land_value 
-		Â•	assessments[1].fares_calculated_improvement_value
-		Â•	assessments[1].fares_calculated_total_value
-		Â•	assessments[1].assessed_total_value 
-		Â•	assessments[1].assessed_improvement_value 
-		Â•	assessments[1].market_land_value
-		Â•	assessments[1].market_improvement_value 
-		Â•	assessments[1].market_total_value 
-		Â•	assessments[1].market_value_year;
-		Â•	assessments[1].assessed_land_value		
+			assessments[1].fares_calculated_land_value 
+			assessments[1].fares_calculated_improvement_value
+			assessments[1].fares_calculated_total_value
+			assessments[1].assessed_total_value 
+			assessments[1].assessed_improvement_value 
+			assessments[1].market_land_value
+			assessments[1].market_improvement_value 
+			assessments[1].market_total_value 
+			assessments[1].market_value_year;
+			assessments[1].assessed_land_value		
 	*/

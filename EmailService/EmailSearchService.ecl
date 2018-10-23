@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="EmailSearchService">
 	<!-- COMPLIANCE SETTINGS -->
 	<part name="GLBPurpose"         type="xsd:byte"/>
@@ -45,6 +45,8 @@
 import AutoStandardI, doxie, codes, Royalty;
 
 export EmailSearchService() := MACRO
+
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 
 	boolean allow_mult_results := false : stored('AllowMultipleResults');
 

@@ -941,5 +941,5 @@ RECORD
 	//these are child sets...LEAVE as last item in Boca Shell - nothing after them:)
 	Risk_Indicators.Layouts_Derog_Info.LJ_DataSets LnJ_datasets;
 	dataset(Risk_Indicators.Layouts.tmp_Consumer_Statements) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MAX_CONSUMER_STATEMENTS)};
-
+  DATASET(Risk_Indicators.Layouts_Derog_Info.layout_bk_chapter) bk_chapters {MAXCOUNT(10)};
 END;

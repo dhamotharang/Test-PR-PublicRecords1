@@ -1,10 +1,10 @@
-import paw, riskwise, ut, mdr, fcra;
+﻿import _Control, paw, riskwise, ut, mdr, fcra;
+onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Employment(GROUPED DATASET(layout_bocashell_neutral) clam_pre_employment, 
 															boolean isFCRA, 
 															boolean isPreScreen, 
-															integer bsVersion,
-															boolean onThor=false) := FUNCTION
+															integer bsVersion) := FUNCTION
 
 patw := record
 	clam_pre_employment.seq;
@@ -48,7 +48,11 @@ with_paw_did_thor := join(distribute(clam_pre_employment, hash64(did)),
 						getPawDid(LEFT,RIGHT),
 						left outer, atmost(riskwise.max_atmost), keep(1000), LOCAL);
 						
-with_paw_did := if(onThor, group(sort(with_paw_did_thor, seq), seq), with_paw_did_roxie);
+#IF(onThor)
+	with_paw_did := group(sort(with_paw_did_thor, seq), seq);
+#ELSE
+	with_paw_did := with_paw_did_roxie;
+#END
 
 patw getPawFull(with_paw_did le, paw.Key_contactID ri) := TRANSFORM
 	self.seq := le.seq;
@@ -89,7 +93,11 @@ pawfile_full_nonfcra_thor := join(distribute(with_paw_did, hash64(contact_id)),
 						left outer,
 						atmost(riskwise.max_atmost), keep(1000), LOCAL);
 
-pawfile_full_nonfcra := if(onThor, group(sort(pawfile_full_nonfcra_thor,seq),seq), pawfile_full_nonfcra_roxie);
+#IF(onThor)
+	pawfile_full_nonfcra := group(sort(pawfile_full_nonfcra_thor,seq),seq);
+#ELSE
+	pawfile_full_nonfcra := pawfile_full_nonfcra_roxie;
+#END
 
 // can not use these sources if running in prescreen mode
 restricted_prescreen_sources := [mdr.sourcetools.src_IL_Corporations,
@@ -147,7 +155,11 @@ pawfile_raw_FCRA_thor := join(distribute(clam_pre_employment, hash64(did)),
 						left outer,
 						atmost(left.did=right.did, riskwise.max_atmost), keep(1000), LOCAL);
 
-pawfile_raw_FCRA := if(onThor, group(sort(pawfile_raw_FCRA_thor,seq),seq), pawfile_raw_FCRA_roxie);
+#IF(onThor)
+	pawfile_raw_FCRA := group(sort(pawfile_raw_FCRA_thor,seq),seq);
+#ELSE
+	pawfile_raw_FCRA := pawfile_raw_FCRA_roxie;
+#END
 
 patw getPAWCorrections(clam_pre_employment le, fcra.Key_Override_PAW_ffid ri) := TRANSFORM
 	self.seq := le.seq;
@@ -188,8 +200,12 @@ paw_corrections_FCRA_thor := join(clam_pre_employment, pull(fcra.Key_Override_PA
 						~(isPreScreen and right.source in restricted_prescreen_sources),
 						getPAWCorrections(LEFT, RIGHT), keep(1000), LOCAL, ALL);			
 						
-paw_corrections_FCRA := if(onThor, paw_corrections_FCRA_thor, paw_corrections_FCRA_roxie);
-						
+#IF(onThor)
+	paw_corrections_FCRA := paw_corrections_FCRA_thor;
+#ELSE
+	paw_corrections_FCRA := paw_corrections_FCRA_roxie;
+#END
+
 pawfile_full_FCRA := pawfile_raw_FCRA + paw_corrections_FCRA;
 						
 pawfile_full := ungroup(if(isFCRA, pawfile_full_FCRA, pawfile_full_nonfcra));

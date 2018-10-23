@@ -7,7 +7,10 @@ EXPORT AppendLNPhonesData(DATASET(PhoneOwnership.Layouts.BatchOut) ds_batch_in,
 								    PhoneOwnership.IParams.BatchParams inMod) := FUNCTION
 	Constants := PhoneOwnership.Constants;	
 	Functions := PhoneOwnership.Functions;						
-	dsLNPhonesRequest := PROJECT(DEDUP(SORT(ds_batch_in,acctno,phone),acctno),TRANSFORM(Phones.Layouts.PhoneIdentity,SELF:=LEFT,SELF:=[]));
+	dsLNPhonesRequest := PROJECT(DEDUP(SORT(ds_batch_in,acctno,phone),acctno),TRANSFORM(Phones.Layouts.PhoneIdentity,
+																						//preserve identified landline phone type
+																							SELF.append_phone_type:= IF(LEFT.AppendedPhoneLineType=Phones.Constants.PhoneServiceType.Landline[1],LEFT.AppendedPhoneLineType,LEFT.AppendedPhoneServiceType),
+																							SELF:=LEFT,SELF:=[]));
 	
 	//passing through phones to get latest LN phone associates. Trying to match with relatives identified or append known phone record.
 	dsLNIdentities := SORT(Phones.GetLNIdentity_byPhone(dsLNPhonesRequest,inMod.GLBPurpose,inMod.DPPAPurpose,inMod.DataRestrictionMask,inMod.Industryclass),acctno,phone,lname='',fname='',-dt_last_seen,dt_first_seen);
@@ -70,7 +73,7 @@ EXPORT AppendLNPhonesData(DATASET(PhoneOwnership.Layouts.BatchOut) ds_batch_in,
 		phoneMatch := IF(includeEntity,Constants.LNMatch.PHONE,'');
 		businessMatch := IF(r.ActiveFlag='A' AND (r.companyname<>'' OR r.seleid > 0 OR r.bdid > 0),Constants.LNMatch.BUSINESS,'');
 		noEntityMatch := MAP(NOT includeEntity AND l.AppendedPhoneLineType = Phones.Constants.PhoneServiceType.Wireless[1] => Constants.LNMatch.CELL,
-							NOT includeEntity AND (l.AppendedPhoneLineType <> Phones.Constants.PhoneServiceType.Wireless[1] AND businessMatch <> '') => Constants.LNMatch.BUSINESS,
+							(businessMatch <> '' AND nameMatch = '' AND relationalMatch = '') AND (addressMatch<>'' OR l.AppendedPhoneLineType <> Phones.Constants.PhoneServiceType.Wireless[1]) => Constants.LNMatch.BUSINESS,
 							NOT includeEntity AND (l.AppendedPhoneLineType <> Phones.Constants.PhoneServiceType.Wireless[1] AND businessMatch = '') => Constants.LNMatch.NON_CELL_CONSUMER,
 							'');
 		// subjectMatch := match AND((l.did > 0 AND l.did IN [(UNSIGNED)l.AppendedDID,r.did]) OR (l.name_first IN [r.fname,l.AppendedFirstName] AND l.name_last IN [r.lname,l.AppendedSurname])) AND
@@ -78,7 +81,7 @@ EXPORT AppendLNPhonesData(DATASET(PhoneOwnership.Layouts.BatchOut) ds_batch_in,
 		badNumber := l.LexisNexisMatchCode=Constants.LNMatch.INVALID;
 		SELF.LexisNexisMatchCode := MAP(badNumber => Constants.LNMatch.INVALID,
 										noOwner => Constants.LNMatch.NONE,
-										nameMatch + relationalMatch + addressMatch + phoneMatch + businessMatch + noEntityMatch);
+										nameMatch + relationalMatch + addressMatch + phoneMatch + noEntityMatch);
 		//********************determine phone Ownership*******************************************
 		SELF.subj2own_relationship := MAP(inputNameMatch AND recordNameMatch  => Constants.Relationship.SUBJECT,
 											badNumber => Constants.Relationship.INVALID, 
@@ -87,10 +90,11 @@ EXPORT AppendLNPhonesData(DATASET(PhoneOwnership.Layouts.BatchOut) ds_batch_in,
 											noOwner OR blankName => Constants.Relationship.NONE,
 											l.subj2own_relationship);
 		isDisconnected := l.disconnect_status = Constants.DisconnectStatus.DISCONNECTED;
+		isSuspended	   := l.disconnect_status = Constants.DisconnectStatus.CONFIRMED_SUSPENDED;
 		isCloseRelative := recordNameMatch AND l.subj2own_relationship NOT IN ['',Constants.Relationship.INVALID,Constants.Relationship.RELATIVE,Constants.Relationship.SUBJECT,Constants.Relationship.NONE];
 		SELF.reason_codes := MAP(badNumber => Constants.Reason_Codes.INVALID_NUMBER,
-								isDisconnected AND l.reason_codes<>'' => l.reason_codes + Constants.Reason_Codes.DISCONNECTED,
-								Functions.GetReasonCodes(nameMatch<>'' OR sameDID,noOwner,l.disconnect_status = Constants.DisconnectStatus.DISCONNECTED) );	
+								 isDisconnected AND l.reason_codes<>'' => l.reason_codes + Constants.Reason_Codes.DISCONNECTED,
+								Functions.GetReasonCodes(nameMatch<>'' OR sameDID,noOwner,isDisconnected,isSuspended));	
 		ownership := MAP(inputNameMatch AND recordNameMatch => Constants.Ownership.enumIndex.HIGH,
 						(recordNameMatch OR inputNameMatch) AND l.subj2own_relationship=Constants.Relationship.SUBJECT => Constants.Ownership.enumIndex.HIGH,
 						(recordNameMatch OR inputNameMatch) AND isCloseRelative => Constants.Ownership.enumIndex.MEDIUM_HIGH,
@@ -113,7 +117,7 @@ EXPORT AppendLNPhonesData(DATASET(PhoneOwnership.Layouts.BatchOut) ds_batch_in,
 						(LEFT.AppendedListingName <> '' AND Functions.fuzzyString(LEFT.AppendedListingName) = Functions.fuzzyString(RIGHT.companyname))),
 						appendLNData(LEFT,RIGHT),
 						LEFT OUTER, LIMIT(Constants.MAX_RECORDS,SKIP));	
-	// If there is no match with input or associated REAB, then output gets pouplated with inhouse phone identities.
+	// If there is no match with input or associated REAB, then output gets populated with inhouse phone identities.
 	noRelation := 	DEDUP(SORT(dsPhoneswLNData,acctno,-validatedRecord,appendeddid,appendedfirstname,appendedsurname,appendedlistingname,record),acctno);												
 	dsDefaultLNData := JOIN(noRelation(NOT validatedRecord),dsLNIdentities,
 					LEFT.phone=RIGHT.phone AND

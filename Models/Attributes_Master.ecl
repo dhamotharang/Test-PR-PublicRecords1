@@ -1,4 +1,4 @@
-﻿import risk_indicators, ut, mdr, easi, riskwise, aml, riskview, std;
+﻿import risk_indicators, ut, mdr, easi, riskwise, aml, riskview, std; 
 
 blankEasi := row( [], EASI.Layout_Easi_Census );
 blankBTST := row( [], Risk_Indicators.Layout_BocaShell_BtSt_Out );
@@ -212,8 +212,13 @@ export	string2	InvalidDL	:= map(clam.shell_input.dl_Number='' or clam.shell_inpu
 																 clam.iid.drlcvalflag in ['1','3'] => '1',
 																 '0');
 																 
-export	string1	VerificationFailure	:= if(clam.iid.nas_summary <= 4 and clam.iid.nap_summary <= 4 and clam.address_verification.input_address_information.naprop <= 2, '1','0');
-		 
+export	string1	VerificationFailure	:= 
+  if(clam.iid.nas_summary <= 4 and clam.iid.nap_summary <= 4 and clam.address_verification.input_address_information.naprop <= 2, '1','0');
+
+export	string1	FCRAVerificationFailure	:= 
+if(riskview.constants.noscore(clam.iid.nas_summary,clam.iid.nap_summary, clam.address_verification.input_address_information.naprop, clam.truedid), '1', '0');
+	
+  
 export	string2	SSNNotFound	:= map(noSSNinput => '-1',
 																	clam.iid.ssnexists => '0',
 																	'1');	
@@ -2602,7 +2607,13 @@ export string2 InquiryCollections12Month	:= if(not clam.truedid, '-1', checkbool
 
 export string3 SSNSubjectCount := if(not clam.truedid or InputProvidedSSN='0', '-1', capS( (string)clam.velocity_counters.adls_per_ssn_seen_18months, capZero, cap255) );
 export string2	SSNDeceased	:= map(not clam.truedid or InputProvidedSSN='0' => '-1', clam.iid.decsflag='1' => '1', '0');
-export string8 SSNDateLowIssued := if(not clam.truedid or InputProvidedSSN='0' or trim(clam.iid.socllowissue)='' or clam.iid.socllowissue = '20110625'  , '-1', clam.iid.socllowissue);
+
+export string8 SSNDateLowIssued := if(not clam.truedid 
+                                        or InputProvidedSSN='0' 
+                                        or trim(clam.iid.socllowissue)='' or trim(clam.iid.socllowissue)='0'
+                                        or clam.iid.socllowissue = '20110625'  , '-1', clam.iid.socllowissue);
+// export string8 SSNDateLowIssued := if(TRIM(SSNDateLowIssued1)='' OR SSNDateLowIssued1 = '0' ,'-1', SSNDateLowIssued1);
+                                     
 export string2	SSNProblems_v5	:= map(not clam.truedid or InputProvidedSSN='0' 								=> '-1',  // not input
 								clam.iid.decsflag='1' 		=> '5',   // deceased SSN
 								clam.iid.socsdobflag='1'	=> '4',  	// issued prior to DOB
@@ -2849,9 +2860,9 @@ export string3 PhoneInputSubjectCount := if(noPhoneinput, '-1', capS((string)cla
 
 
 export string1 ConfirmationSubjectFound := 
-	if(clam.iid.nas_summary <= 4 and clam.iid.nap_summary <= 4 and clam.infutor_phone.infutor_nap <= 4 and clam.address_verification.input_address_information.naprop <= 3 and clam.truedid=false, 
-	'0',  // subject not found
-	'1');  // subject found
+  if(riskview.constants.noscore(clam.iid.nas_summary,clam.iid.nap_summary, clam.address_verification.input_address_information.naprop, clam.truedid), 
+  '0',  // subject not found
+  '1');  // subject found
 
 export	string7	AssetPropCurrentTaxTotal	:= if(not clam.truedid or clam.address_verification.owned.property_total < 1, '-1', 
 	capS((string)clam.address_verification.owned.property_owned_assessed_total, capZero, cap7Byte) );

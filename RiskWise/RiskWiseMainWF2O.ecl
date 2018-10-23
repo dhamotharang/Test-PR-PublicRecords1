@@ -475,6 +475,7 @@ withModel := join(final, getAir, left.seq=right.seq, addModel(left,right), left 
 
 riskwise.Layout_WF2O createEmpty(withModel le) := TRANSFORM
 	self.seq := le.seq;
+  self.riskwiseid := le.riskwiseid;
 	self.account := account_value;
 	self.airwavesscore := if(le.inputPresent, le.airwavesscore, '');
 	self.tciaddrflag := le.tciaddrflag;
@@ -550,12 +551,12 @@ Deltabase_Logging_prep := project(finalOutput, transform(Risk_Reporting.Layouts.
                                                  self.i_home_phone := hphone_value,
                                                  self.i_work_phone := wphone_value,
 																								 self.i_bus_name := cmpy_value,
-																								 self.o_score_1    := (Integer)left.airwavesscore,
+																								 self.o_score_1    := left.airwavesscore,
 																								 self.o_reason_1_1 := left.reason1,
 																								 self.o_reason_1_2 := left.reason2,
 																								 self.o_reason_1_3 := left.reason3,
 																								 self.o_reason_1_4 := left.reason4,
-																								 self.o_score_2    := if(left.score2 <> '', (Integer)left.score2, 0);
+																								 self.o_score_2    := left.score2;
 																								 self.o_lexid := (Integer)left.riskwiseid,  //did
 																								 self := left,
 																								 self := [] ));

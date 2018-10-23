@@ -1,4 +1,4 @@
-import doxie_ln, fcra, suppress, ffd, LN_PropertyV2, ut, codes;
+﻿import doxie_ln, fcra, suppress, ffd, LN_PropertyV2, ut, codes, D2C;
 
 export asses_records(
     DATASET (doxie_ln.layout_property_ids) ids,
@@ -11,7 +11,7 @@ export asses_records(
     dataset(FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,
     integer8 inFFDOptionsMask = 0
 ) := FUNCTION
-
+  isCNSMR := ut.IndustryClass.is_Knowx;
   kaf := LN_PropertyV2.key_assessor_fid(isFCRA);
 
   kdaddlfares := LN_PropertyV2.key_addl_fares_tax_fid;
@@ -115,7 +115,8 @@ export asses_records(
 
   outf_reg_base := JOIN (final_ids, kaf,
                          left.fid <> '' and keyed (left.fid=right.ln_fares_id)
-                         and ~((string)right.ln_fares_id in set(flags((unsigned6)did=left.did ),record_id) and isFCRA),
+                         and ~((string)right.ln_fares_id in set(flags((unsigned6)did=left.did ),record_id) and isFCRA)
+												             and (~isCNSMR or right.vendor_source_flag not in D2C.Constants.LNPropertyV2RestrictedSources ),
                          take_right (left, right), KEEP (1), LIMIT (0)); 
 
   outf_reg := JOIN (outf_reg_base, kdaddlfares,
@@ -131,8 +132,8 @@ export asses_records(
 
 
   rec add_statement_ids ( rec l, FFD.Layouts.PersonContextBatchSlim r ) := transform,
-    skip(~showDisputedRecords and r.isdisputed) 
-      self.statementids := if(ShowConsumerStatements,r.StatementIDs,FFD.Constants.BlankStatements);
+    skip((~showDisputedRecords and r.isdisputed) or (~ShowConsumerStatements and exists(R.StatementIDs))) 
+      self.statementids := r.StatementIDs;
       self.isdisputed :=  r.isdisputed;
       self := L;
   end;
@@ -151,7 +152,6 @@ export asses_records(
   END;
 
   outfile := group(ITERATE(group(SORT(outf,did,bdid,address_seq_no),did,bdid),iter(LEFT,RIGHT)));
-
   RETURN outfile(dateVal = 0 OR (unsigned3)(sale_date[1..6]) <= dateVal);
 
 END;

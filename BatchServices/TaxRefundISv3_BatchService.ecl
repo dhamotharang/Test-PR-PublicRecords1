@@ -83,7 +83,7 @@ IMPORT BatchServices, BatchShare, Royalty, ut, WSInput;
 
   
 EXPORT TaxRefundISv3_BatchService := MACRO
-
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	//The following macro defines the field sequence on WsECL page of query. 
 	WSInput.MAC_TaxRefundISv3_BatchService();
 	

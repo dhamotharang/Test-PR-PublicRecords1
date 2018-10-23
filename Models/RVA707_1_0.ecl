@@ -1,4 +1,4 @@
-import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, std;
+﻿import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, std, riskview;
 
 export RVA707_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean isCalifornia) := FUNCTION
 
@@ -319,7 +319,7 @@ export RVA707_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boole
 		(
 			ssndead     and rva707_1_0c > 560 => 560,
 			corrections and rva707_1_0c > 560 => 560,
-			nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 2 and rva707_1_0c > 620 => 620, // 222 override is replaced with a 620 cap
+			riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid) and rva707_1_0c > 620 => 620, // 222 override is replaced with a 620 cap
 			ssnprior    and rva707_1_0c > 620 => 620,
 			criminal_count > 0 and rva707_1_0c > 610 => 610,
 			rva707_1_0c

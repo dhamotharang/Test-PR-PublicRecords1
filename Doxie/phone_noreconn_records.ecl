@@ -64,7 +64,7 @@ h_targus := if(~call_PVS,doxie.MAC_Get_GLB_DPPA_Targus(phoneOnlySearch,
 doxie.MAC_Get_GLB_DPPA_Qsent(dids, h_qsent, true,,
                              inMod.GLBPurpose, inMod.DPPAPurpose, inMod.IndustryClass, inMod.CompanyName);
 
-h_Last_Resort := PhonesPlus_Services.AppendLR_bydid(dids);
+h_Last_Resort := PhonesPlus_Services.AppendLR_bydid(dids,doxie.DataRestriction.fixed_DRM);
 
 UseAllDids := lengthSSN > 0 or fullNameAddressSearch; // if there is a ssn then use all dids
 gong_dids := if (UseAllDids, dids, dataset([{(unsigned6)inMod.DID}],doxie.layout_references));

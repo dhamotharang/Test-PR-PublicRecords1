@@ -1,4 +1,4 @@
-
+﻿
 /*--SOAP--
 <message name="AKA_BatchService">
 	<part name="DPPAPurpose"          type="xsd:byte"/>
@@ -18,6 +18,7 @@ IMPORT BatchServices;
 EXPORT AKA_BatchService(useCannedRecs = 'false') := 
 	MACRO
 
+    #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
     UNSIGNED1 did_limit := 1 : STORED('DidLimit');
 		
 		// 1a. Grab the input XML and throw into a dataset.	

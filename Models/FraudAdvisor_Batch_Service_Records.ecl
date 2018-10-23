@@ -1,4 +1,4 @@
-﻿import  address, risk_indicators, models, riskwise, ut, Gateway, Royalty;
+﻿import  address, risk_indicators, models, riskwise, ut, Gateway, Royalty, Easi;
 
 
 
@@ -7,9 +7,12 @@ EXPORT FraudAdvisor_Batch_Service_Records ( Models.FraudAdvisor_Batch_Service_In
 																					  dataset(Gateway.Layouts.Config) gateways,
 																						dataset(riskwise.Layout_IP2O) inIPdata = dataset([], riskwise.Layout_IP2O)) :=  function
 
+Boolean VALIDATION := false; //True when validating model, false for production mode.
+
 //These 2 value types are being used multiple times.
-		boolean   doVersion1 					:= args.doVersion1;
-		boolean   doVersion2 					:= args.doVersion2;
+    boolean  doVersion1 := args.doVersion1;
+    boolean  doVersion2 := args.doVersion2;
+    boolean  doParo     := args.doParo_attrs;
 		
 		string	model_name 	:= StringLib.StringToLowerCase(args.ModelName_in);
 		boolean	isUtility 	:= StringLib.StringToUpperCase(args.industry_class_val) = 'UTILI';
@@ -19,13 +22,11 @@ EXPORT FraudAdvisor_Batch_Service_Records ( Models.FraudAdvisor_Batch_Service_In
 		FP3_models_requiring_GLB	:= ['fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9']; //these models require valid GLB, else fail
 		fraudpoint3_custom_models := ['fp1702_2','fp1702_1','fp1508_1'];
 
-
 		bill_to_ship_to_models := ['fp1409_2']; // Populate with real model ids when the time comes.
   
-		bsVersion := MAP( 
-    model_name IN ['fp1508_1'] => 53, // bs 53
-    model_name IN ['fp3fdn1505_0', 'fp31505_0', 'fp3fdn1505_9', 
-		                                 'fp31505_9','fp1702_2','fp1702_1'] => 51, //run 51 shell for both FP3 models
+		bsVersion := MAP( doParo or model_name IN ['fp1508_1', Models.FraudAdvisor_Constants.Paro_models] => 53, // bs 53
+                      model_name IN ['fp3fdn1505_0', 'fp31505_0', 'fp3fdn1505_9', 
+                                     'fp31505_9','fp1702_2','fp1702_1'] => 51, //run 51 shell for both FP3 models
 											model_name IN ['fp1210_1', 'fp1307_2', 'fp1409_2'] => 41, 
 											doVersion2 or model_name in fraudpoint2_models	=> 4,
 											model_name IN ['fp31105_1'] => 3,
@@ -57,8 +58,12 @@ EXPORT FraudAdvisor_Batch_Service_Records ( Models.FraudAdvisor_Batch_Service_In
 			self.seq := C;
 			self := le;
 		END;
+    
+#IF(VALIDATION)
+    batchinseq := batchin;	//To retain sequence number during validation...this is for validation only...do not implement!!!
+#ELSE
 		batchinseq := project(batchin, into_seq(left,counter));  
-		// batchinseq := batchin;				//To retain sequence number during validation...this is for validation only...do not implement!!!
+#END		
 
 
 		risk_indicators.Layout_Input into_in(batchinseq le) := TRANSFORM
@@ -154,7 +159,7 @@ EXPORT FraudAdvisor_Batch_Service_Records ( Models.FraudAdvisor_Batch_Service_In
 		boolean   suppressNearDups := false;
 		boolean   fromBIID := false;
 		boolean   isFCRA := false;
-		boolean   fromIT1O := false;
+		boolean   fromIT1O := IF(doParo or model_name IN ['msn1803_1','rsn804_1','msnrsn_1'], true, false);
 		integer2  dobradius := if(args.usedobFilter, args.dobradius, -1);
 		boolean   doScore := false;
 		boolean   nugen := true;		
@@ -188,6 +193,21 @@ EXPORT FraudAdvisor_Batch_Service_Records ( Models.FraudAdvisor_Batch_Service_In
 		ip_prep := project( batchinseq( ip_addr!='' ), transform( riskwise.Layout_IPAI, self.ipaddr := left.ip_addr, self.seq := left.seq ) );
 		ipdata_gw := risk_indicators.getNetAcuity( ip_prep, gateways, args.dppa, args.glb);
     ipdata := IF(exists(inIPdata), inIPdata_seq, ipdata_gw);
+    
+    //Added for Paro 9-2018
+    skiptrace_Prep := project(ungroup(iid), transform(risk_indicators.Layout_input, self := left));
+    skiptrace_call := riskwise.skip_trace(skiptrace_Prep, args.DPPA, args.GLB, args.DataRestriction, '', args.DataPermission);
+    								
+    easi_census := join(ungroup(iid), Easi.Key_Easi_Census,
+                        keyed(left.st+left.county+left.geo_blk=right.geolink) and model_name IN Models.FraudAdvisor_Constants.Paro_models,
+                        transform(easi.layout_census, 
+                              self.state:= left.st,
+                              self.county:=left.county,
+                              self.tract:=left.geo_blk[1..6],
+                              self.blkgrp:=left.geo_blk[7],
+                              self.geo_blk:=left.geo_blk,
+                              self := right));
+    //End for Paro
 		
 		combined_layouts := record
 			unsigned seq;
@@ -197,9 +217,10 @@ EXPORT FraudAdvisor_Batch_Service_Records ( Models.FraudAdvisor_Batch_Service_In
 
 		red_flags_ret := if(args.RedFlag_version<>0, risk_indicators.Red_Flags_Function(iid), dataset([], combined_layouts));
 
+    model_indicator := IF(doParo, Models.FraudAdvisor_Constants.attrvparo, model_name);
 
-		attr := if(doVersion1 or doVersion2,
-			Models.getFDAttributes(clam, iid, ''/*account_value*/, ipdata),
+		attr := if(doVersion1 or doVersion2 or doParo,
+			Models.getFDAttributes(clam, iid, ''/*account_value*/, ipdata, model_indicator),
 			project(group(clam), transform(Models.Layout_FraudAttributes, self.input.seq:=left.seq, self := []) )
 		);
 
@@ -625,6 +646,42 @@ EXPORT FraudAdvisor_Batch_Service_Records ( Models.FraudAdvisor_Batch_Service_In
 			self.v2_PrevAddrCarTheftIndex	:= if(doVersion2, le.version2.PrevAddrCarTheftIndex, '');
 			self.v2_PrevAddrBurglaryIndex	:= if(doVersion2, le.version2.PrevAddrBurglaryIndex, '');
 			self.v2_PrevAddrCrimeIndex	:= if(doVersion2, le.version2.PrevAddrCrimeIndex, '');
+      
+      self.paro_bansmatchflag     := IF(doParo, le.ParoAttributes.paro_bansmatchflag, '');
+      self.paro_banscasenum       := IF(doParo, le.ParoAttributes.paro_banscasenum, '');
+      self.paro_bansprcode        := IF(doParo, le.ParoAttributes.paro_bansprcode, '');
+      self.paro_bansdispcode      := IF(doParo, le.ParoAttributes.paro_bansdispcode, '');
+      self.paro_bansdatefiled     := IF(doParo, le.ParoAttributes.paro_bansdatefiled, '');
+      self.paro_bansfirst         := IF(doParo, le.ParoAttributes.paro_bansfirst, '');
+      self.paro_bansmiddle        := IF(doParo, le.ParoAttributes.paro_bansmiddle, '');
+      self.paro_banslast          := IF(doParo, le.ParoAttributes.paro_banslast, '');
+      self.paro_banscnty          := IF(doParo, le.ParoAttributes.paro_banscnty, '');
+      self.paro_bansecoaflag      := IF(doParo, le.ParoAttributes.paro_bansecoaflag, '');
+      self.paro_decsflag          := IF(doParo, le.ParoAttributes.paro_decsflag, '');
+      self.paro_decsdob           := IF(doParo, le.ParoAttributes.paro_decsdob, '');
+      self.paro_decszip           := IF(doParo, le.ParoAttributes.paro_decszip, '');
+      self.paro_decszip2          := IF(doParo, le.ParoAttributes.paro_decszip2, '');
+      self.paro_decslast          := IF(doParo, le.ParoAttributes.paro_decslast, '');
+      self.paro_decsfirst         := IF(doParo, le.ParoAttributes.paro_decsfirst, '');
+      self.paro_decsdod           := IF(doParo, le.ParoAttributes.paro_decsdod, '');
+      self.paro_inputaddrcharflag := IF(doParo, le.ParoAttributes.paro_inputaddrcharflag, '');
+      self.paro_inputsocscharflag := IF(doParo, le.ParoAttributes.paro_inputsocscharflag, '');
+      self.paro_correctsocs       := IF(doParo, le.ParoAttributes.paro_correctsocs, '');
+      self.paro_phonestatusflag   := IF(doParo, le.ParoAttributes.paro_phonestatusflag, '');
+      self.paro_phone             := IF(doParo, le.ParoAttributes.paro_phone, '');
+      self.paro_altareacode       := IF(doParo, le.ParoAttributes.paro_altareacode, '');
+      self.paro_splitdate         := IF(doParo, le.ParoAttributes.paro_splitdate, '');
+      self.paro_addrstatusflag    := IF(doParo, le.ParoAttributes.paro_addrstatusflag, '');
+      self.paro_addrcharflag      := IF(doParo, le.ParoAttributes.paro_addrcharflag, '');
+      self.paro_first             := IF(doParo, le.ParoAttributes.paro_first, '');
+      self.paro_last              := IF(doParo, le.ParoAttributes.paro_last, '');
+      self.paro_addr              := IF(doParo, le.ParoAttributes.paro_addr, '');
+      self.paro_city              := IF(doParo, le.ParoAttributes.paro_city, '');
+      self.paro_state             := IF(doParo, le.ParoAttributes.paro_state, '');
+      self.paro_zip               := IF(doParo, le.ParoAttributes.paro_zip, '');
+      self.paro_hownstatusflag    := IF(doParo, le.ParoAttributes.paro_hownstatusflag, '');
+      self.paro_estincome         := IF(doParo, le.ParoAttributes.paro_estincome, '');
+      self.paro_median_hh_size    := IF(doParo, le.ParoAttributes.paro_median_hh_size, ''); // takes the place of score2
 
 			self := rt;  // map the red flags fields
 			self := [];
@@ -666,22 +723,18 @@ EXPORT FraudAdvisor_Batch_Service_Records ( Models.FraudAdvisor_Batch_Service_In
 		);
 		
 		
-
-	// model_temp := Models.FP1508_1_0(ungroup (clam ),6); 	// For validation only...hard code 
-
-
-// RETURN MODEL_temp ;	
-
-
-
-	//the model here and comment out rest of code
-	//	output(model_temp);
+#IF(VALIDATION)
+	wmodel := Models.MSN1803_1_0(ungroup(clam )); 	// For validation only 
+  // RETURN wmodel ;	
+#ELSE
 
 		model_temp := map(
 			model_name = 'fp3710_0' 	=> Models.FP3710_0_0( clam_ip ),
 			model_name = 'fp31105_1' 	=> Models.FP31105_1_0( clam_ip ), // Key Bank - Custom FraudPoint Model
 			model_name = 'fp1210_1' 	=> ungroup(Models.FP1210_1_0( clam )), 	// TRIS - Custom FraudPoint Model
 		  model_name = 'fp1409_2' 	=> Models.FP1409_2_0( ungroup(clam_BtSt)), //Synchrony - Custom BTST model
+      model_name IN ['msn1803_1', 'msnrsn_1']  => Models.MSN1803_1_0( ungroup(clam) ),
+      model_name = 'rsn804_1'  => Models.RSN804_1_0( clam, skiptrace_call, easi_census ),
 			model_name = '' or model_name in fraudpoint2_models + fraudpoint3_models => dataset( [], Models.Layout_ModelOut ),
 			fail(Models.Layout_ModelOut, 'Invalid fraud version/model input combination')
 		);
@@ -720,19 +773,26 @@ EXPORT FraudAdvisor_Batch_Service_Records ( Models.FraudAdvisor_Batch_Service_In
 			'fp1508_1'	=> Models.fp1508_1_0( ungroup(clam), 6),
 												 dataset( [], Models.Layouts.layout_fp1109 )
 		);
+    
+    Second_model_score := CASE(model_name,
+                               'msnrsn_1' => Models.RSN804_1_0( clam, skiptrace_call, easi_census ),
+                                             dataset( [], Models.Layout_ModelOut )
+                              );
 		
 		//fp1307_2 uses everything from 1109_0 execpt the indices
 		model := map(model_name in fraudpoint2_models		=> model_fraudpoint2,
 								 model_name in fraudpoint3_models		=> model_fraudpoint3,
 								 model_name in fraudpoint3_custom_models => model_fraudpoint3,
 																											 original_models);
-
+                                                       
 		Layout_FD_Batch_Out_Ext := record
 			models.Layout_FD_Batch_Out;
 			Royalty.RoyaltyNetAcuity.IPData.Royalty_NAG;
 		end;
-		wmodel := join(wAcctNo, model, left.seq=right.seq,
-			transform(Layout_FD_Batch_Out_Ext,
+    
+		wmodel_1 := join(wAcctNo, model, left.seq=right.seq,
+			transform({unsigned seq, Layout_FD_Batch_Out_Ext},
+        self.seq := left.seq,
 				self.score1 := right.score,
 				self.index2 := map(
 					model_name='fp3710_0' => Risk_Indicators.BillingIndex.FP3710_0,
@@ -749,6 +809,9 @@ EXPORT FraudAdvisor_Batch_Service_Records ( Models.FraudAdvisor_Batch_Service_In
 					model_name='fp1702_2' => Risk_Indicators.BillingIndex.fp1702_2,
 					model_name='fp1702_1' => Risk_Indicators.BillingIndex.fp1702_1,
 					model_name='fp1508_1' => Risk_Indicators.BillingIndex.fp1508_1,
+					model_name='msn1803_1' => Risk_Indicators.BillingIndex.MSN1803_1,
+					model_name='rsn804_1' => Risk_Indicators.BillingIndex.RSN804_1,
+					model_name='msnrsn_1' => Risk_Indicators.BillingIndex.MSNRSN_1,
 					''
 				),
 				
@@ -762,13 +825,16 @@ EXPORT FraudAdvisor_Batch_Service_Records ( Models.FraudAdvisor_Batch_Service_In
 					model_name IN ['fp1702_2'] 																													    => 'FraudPointfp1702_2',
 					model_name IN ['fp1702_1'] 																													    => 'FraudPointfp1702_1',
 					model_name IN ['fp1508_1'] 																													    => 'FraudPointfp1508_1',
+					model_name IN ['msn1803_1', 'msnrsn_1'] 																								=> 'FraudPointMSN1803_1',
+					model_name IN ['rsn804_1'] 																													    => 'FraudPointRSN804_1',
 					''
 				),
 				
 				self.scorename1 := map(
 					model_name IN ['fp3710_0', 'fp31105_1', 'fp1109_0', 'fp1109_9', 'fp1210_1', 'fp1307_2', 
 												 'fp1409_2', 'fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9',
-												 'fp1702_2','fp1702_1','fp1508_1'] 		=> '0 to 999',
+												 'fp1702_2','fp1702_1','fp1508_1', 'msn1803_1', 'msnrsn_1'] 		=> '0 to 999',
+          model_name IN ['rsn804_1'] => '250 to 999',
 					''
 				),
 				self.reason1 := right.ri[1].hri,  
@@ -791,6 +857,19 @@ EXPORT FraudAdvisor_Batch_Service_Records ( Models.FraudAdvisor_Batch_Service_In
 			),
 			left outer
 		);
+    
+    Layout_FD_Batch_Out_Ext add_model_2(Recordof(wmodel_1) le, Models.Layout_ModelOut rt) := TRANSFORM
+      self.score2 := rt.score;
+      self.modelname2 := map(model_name IN ['msnrsn_1'] => 'FraudPointRSN804_1',
+                                                           '');
+      self.scorename2 := map(model_name IN ['msnrsn_1'] => '250 to 999',
+                                                          '');
+      self := le
+    END;
+    
+    wmodel := join(wmodel_1, Second_model_score,left.seq=right.seq,
+                   add_model_2(left,right), left outer, Atmost(riskwise.max_atmost));
+    
 	
 	// DEBUGs:
 	// OUTPUT( model_name, NAMED('model_name') );
@@ -799,7 +878,9 @@ EXPORT FraudAdvisor_Batch_Service_Records ( Models.FraudAdvisor_Batch_Service_In
 	// OUTPUT( model, NAMED('model') );
 	// OUTPUT( wmodel, NAMED('wmodel') );
 	// OUTPUT( wAcctNo, NAMED('wAcctNo') );
-	
+	// OUTPUT( attr, NAMED('attr') );
+#END	
+
 	return wmodel;
 
 end;

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BLJSearchService">
   <part name="IncludeBankruptcies"  type="xsd:boolean"/>
   <part name="IncludeLiensJudgments" type="xsd:boolean"/>
@@ -54,6 +54,10 @@
 	<part name="EmpID" type="xsd:string"/>
 	<part name="DotID" type="xsd:string"/>
   <part name="BusinessIDFetchLevel" type="xsd:string"/>
+  <!-- Business Bankrupcty Only -->
+  <part name="ChapterChoice" type="xsd:unsignedInt"/>
+  <part name="BusinessOnly" 		type="xsd:boolean"/> 
+
 </message>
 */
 /*--INFO-- This service searches the Bankruptcyv2 and Lienv2 files.*/
@@ -61,6 +65,7 @@
 import doxie, liensv2_services, Text_Search, bankruptcyv2_Services;
 
 export BLJSearchService() := macro
+ #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
     doxie.MAC_Header_Field_Declare(false);
 	#constant('getBdidsbyExecutive',FALSE);
 	#constant('SearchGoodSSNOnly',true);
@@ -74,6 +79,9 @@ export BLJSearchService() := macro
   boolean Include_LiensJudgments := false : stored('IncludeLiensJudgments');
   boolean Include_CriminalIndicators := false : stored('IncludeCriminalIndicators');
   boolean Include_AttorneyTrustee := false : stored('IncludeAttorneyTrustee');
+	unsigned ChapterChoice := 0 : stored('ChapterChoice');
+	boolean BusinessOnly := false : stored('BusinessOnly');
+	
 
 	  //get lien records
 	  boolean evictions_only := false : stored('EvictionsOnly');
@@ -101,6 +109,7 @@ export BLJSearchService() := macro
       export unsigned6 EmpID := 0;
       export unsigned6 DotID := 0;
 		END;
+		
 		lienrecs := LiensV2_Services.LiensSearchService_records(liens_params).records;
 
       lienorec := record 
@@ -130,15 +139,37 @@ export BLJSearchService() := macro
                                                                    in_bids := in_bids,
                                                                    bid_fetch_level := bid_params.BusinessIDFetchLevel);
 	
+  // If needed filter out chapters
+ 	 bankrecs_chp :=  map( 
+                        ChapterChoice = 1  => bankrecs(Chapter = '11'),
+													 ChapterChoice = 2 => bankrecs(Chapter = '7'),
+													 ChapterChoice = 3 => bankrecs(Chapter in ['11','7']),
+													 ChapterChoice not in [1,2,3] and   BusinessOnly  => bankrecs(Chapter in ['11','7']),
+														                     bankrecs);
+																						
+	 // Classify the Bankruptcy record
+	 bankrecs_classified :=  BLJ_V2_Services.fnSupressPeople(bankrecs_chp);			 
+	 bankrecs_unclassified := project(bankrecs_chp,
+	                           transform(recordof(bankrecs_classified), 
+														     self.BKRecordType := 3, // no classification
+																  self := left));
+																	
+	 bankrecs_final := if(BusinessOnly,bankrecs_classified(BKRecordType <> 0),bankrecs_unclassified);
+	 
 	  bankorec := record 
         bankruptcyv2_services.layouts.layout_rollup;
         Text_Search.Layout_ExternalKey;
+				 boolean DebtorsSuppressed;
       END;
-      bankorec addExt ( bankrecs l) := transform
-        self := l;
-        self.ExternalKey := l.TMSID;
+			
+      bankorec addExt ( bankrecs_final l) := transform
+				self.ExternalKey := l.TMSID;        
+				Self.DebtorsSuppressed := l.BKRecordType = 2;
+				self := l;
+				
       end;
-      bankorecs := project(bankrecs, addext(left));
+			 
+   bankorecs :=  project(bankrecs_final, addext(left));
     
 	
 	//combined records 
@@ -178,7 +209,8 @@ export BLJSearchService() := macro
                          MRecs); //if both or neither are specified
 
 	doxie.MAC_Marshall_Results(finalOutputRecs, outputBLJ);
-	OUTPUT(outputBLJ,NAMED('Results'));
+	
+	OUTPUT(outputBLJ,NAMED('Results'));	
 endmacro;
 //BLJSearchService();
 	

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Crim_Offender_SearchRequest">
   <part name="FirstName" type="xsd:string"/>
   <part name="LastName" type="xsd:string"/>
@@ -23,6 +23,7 @@
 import Corrections,doxie,ut,WSInput;
 
 export DOC_Report := macro
+#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 #STORED('LookupType','CRIM');
 #stored('ReportReq',true);
 #stored('ReturnOffenses',true);

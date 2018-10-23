@@ -1,4 +1,4 @@
-IMPORT ut, Std, RiskWise, RiskWiseFCRA, Risk_Indicators;
+﻿IMPORT ut, Std, RiskWise, RiskWiseFCRA, Risk_Indicators, riskview;
 
 EXPORT RVA1601_1_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam) := FUNCTION
 
@@ -341,7 +341,7 @@ other_seg := rv50_seg_hd_subprime = '4 OTHER';
 
 sysdate := common.sas_date(if(le.historydate=999999, (string8)Std.Date.Today(), (string6)le.historydate+'01'));
 
-iv_rv5_unscorable := if(NAS_Summary <= 4 and NAP_Summary <= 4 and Infutor_NAP <= 4 and Add_Input_NAProp <= 3 and not(truedid), '1', '0');
+iv_rv5_unscorable := if(riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid), '1', '0');
 
 rv_f03_input_add_not_most_rec := if(not(truedid and add_input_pop), ' ', (string)(integer)rc_input_addr_not_most_recent);
 

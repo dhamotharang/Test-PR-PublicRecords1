@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Batch_Service">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="DPPAPurpose" type="xsd:byte"/>
@@ -16,7 +16,7 @@
 IMPORT Autokey_batch, BatchServices, BatchShare, BIPV2;
 
 EXPORT Batch_Service(useCannedRecs = false) := MACRO
-
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	// Alias
 	AutoKeyBatchInput := WatercraftV2_Services.Layouts.batch_in;
 	

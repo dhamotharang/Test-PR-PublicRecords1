@@ -1,9 +1,6 @@
-/*2012-11-29T16:21:23Z (Michele Walklin)
-Inital check-in
-*/
-import riskwise, ut, header, doxie, Risk_indicators, MDR;
+﻿import riskwise, ut, header, doxie, Risk_indicators, MDR;
 
-export getAgeHist(GROUPED DATASET(Risk_Indicators.iid_constants.layout_outx) iid2, boolean onThor = false) := FUNCTION
+export getAgeHist(GROUPED DATASET(Risk_Indicators.iid_constants.layout_outx) iid2) := FUNCTION
 
 default_first_seen := 999999;
 
@@ -131,10 +128,8 @@ p1 := project(iid2,
 				self.dt_last_seen   := left.h.dt_last_seen;
 				self := []));
 				
-p1_dds_roxie := dedup(sort(p1, seq, did, -complete_dob, source_rank, -dt_last_seen, -dob, src), seq, did);
-p1_dds_thor := dedup(sort(p1, seq, did, -complete_dob, source_rank, -dt_last_seen, -dob, src, if(dt_first_seen=0, 99999999, dt_first_seen)), seq, did);
-p1_dds := if(onThor, p1_dds_thor, p1_dds_roxie);
-
+p1_dds := dedup(sort(p1, seq, did, -complete_dob, source_rank, -dt_last_seen, -dob, src), seq, did);
+// p1_dds_thor := dedup(sort(p1, seq, did, -complete_dob, source_rank, -dt_last_seen, -dob, src, if(dt_first_seen=0, 99999999, dt_first_seen)), seq, did);
 
 	layout_age_out := RECORD
 		UNSIGNED4 seq;

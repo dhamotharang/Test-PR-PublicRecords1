@@ -1,4 +1,5 @@
-import watercraft, riskwise, ut, fcra;
+﻿import _Control, watercraft, riskwise, ut, fcra;
+onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Watercraft_Hist_FCRA(GROUPED DATASET(Layout_Boca_Shell_ids) ids_only, boolean isPreScreen, integer bsVersion) := FUNCTION
 
@@ -26,12 +27,26 @@ riskwise.layouts.Layout_Watercraft_Plus watercraft_FCRA(ids_only le, key_did ri)
 	self := le;
 	self := [];
 end;
-watercraft_recs := join(ids_only, key_did, 
+watercraft_recs_roxie := join(ids_only, key_did, 
 												 left.did!=0 and keyed(right.l_did = left.did) and 
 												 (unsigned3)(right.sequence_key[1..6]) < left.historydate AND	// was told sequence key is best to use
 												 ((isPreScreen and right.state_origin not in restrictedStates) or ~isPreScreen),	// filter by state if prescreen
 												 watercraft_FCRA(left,right), left outer, atmost(right.l_did=left.did, riskwise.max_atmost));
 
+watercraft_recs_thor_did := join(distribute(ids_only(did!=0), hash64(did)), 
+												 distribute(pull(key_did), hash64(l_did)), 
+												 right.l_did = left.did and 
+												 (unsigned3)(right.sequence_key[1..6]) < left.historydate AND	// was told sequence key is best to use
+												 ((isPreScreen and right.state_origin not in restrictedStates) or ~isPreScreen),	// filter by state if prescreen
+												 watercraft_FCRA(left,right), left outer, atmost(right.l_did=left.did, riskwise.max_atmost), LOCAL);
+watercraft_recs_thor := GROUP(SORT(distribute(watercraft_recs_thor_did + project(ids_only(did=0), transform(riskwise.layouts.Layout_Watercraft_Plus,
+												self.watercraft_build_date := watercraft_build_date, self := LEFT, self := [])), hash64(seq)), seq, LOCAL), seq, LOCAL);
+
+#IF(onThor)
+	watercraft_recs := watercraft_recs_thor;
+#ELSE
+	watercraft_recs := watercraft_recs_roxie;
+#END
 
 riskwise.layouts.Layout_Watercraft_Plus roll_watercraft(riskwise.layouts.Layout_Watercraft_Plus le, riskwise.layouts.Layout_Watercraft_Plus ri) := transform
 	self.watercraft_count := le.watercraft_count+IF(le.watercraft_key=ri.watercraft_key,0,ri.watercraft_count);  // don't increment if the key is a duplicate

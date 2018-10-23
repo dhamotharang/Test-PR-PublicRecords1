@@ -1,4 +1,4 @@
-import Models, Seed_Files;
+﻿import Models, Seed_Files;
 
 export RV_TestSeed_Function(dataset(Layout_Input) inData, string30 account_value, string20 TestDataTableName, string svcname, string modelname ) := FUNCTION
 
@@ -107,6 +107,7 @@ export RV_TestSeed_Function(dataset(Layout_Input) inData, string30 account_value
 			modelname = 'fxd1607_0' => Risk_Indicators.BillingIndex.FXD1607_0,
 			modelname = 'rvt1605_1' => Risk_Indicators.BillingIndex.RVT1605_1,
 			modelname = 'rvt1605_2' => Risk_Indicators.BillingIndex.RVT1605_2,
+			modelname = 'rvt1705_1' => Risk_Indicators.BillingIndex.RVT1705_1,
 			''		
 			);
 	
@@ -199,6 +200,7 @@ export RV_TestSeed_Function(dataset(Layout_Input) inData, string30 account_value
 		modelname = 'fxd1607_0' => 'FICOScoreXDFXD16070',
 		modelname = 'rvt1605_1' => 'TelecomRVT16051',
 		modelname = 'rvt1605_2' => 'TelecomRVT16052',
+		modelname = 'rvt1705_1' => 'TelecomRVT17051',
 		''
 	);
 	

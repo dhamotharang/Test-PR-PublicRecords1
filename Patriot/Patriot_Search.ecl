@@ -23,6 +23,8 @@
  </message>
 */
 
+import OFAC_XG5;
+
 export Patriot_Search := MACRO
 
 // new temporary input field for KeyBank so that we can change the OFAC version to 3 for them, currently it is defaulted to 2.
@@ -33,7 +35,8 @@ unsigned8 MaxResults_val := 2000 : stored('MaxResults');
 unsigned8 MaxResultsThisTime_val := 2000 : stored('MaxResultsThisTime');
 unsigned8 SkipRecords_val := 0 : stored('SkipRecords');
 
-unsigned1 OFAC_version_temp := 1 			: stored('OFACversion');
+String OFAC_version_Null := '' 			: stored('OFACversion');
+unsigned1 OFAC_version_temp := if(OFAC_version_Null = '', 1, (unsigned1) OFAC_version_Null);
 	OFAC_version := if(trim(stringlib.stringtolowercase(_LoginID)) in ['keyxml','keydevxml'], 4, OFAC_version_temp);	// temporary code for Key Bank
 	
 real global_watchlist_threshold_temp := 0 			: stored('Threshold');
@@ -53,16 +56,14 @@ STRING1 searchtype_value := 'B' : STORED('SearchType');
 boolean ofaconly_value := false : STORED('OfacOnly');
 
 STRING20 country_value := '' : STORED('Country');
-boolean Include_Additional_watchlists_temp := FALSE: stored('IncludeAdditionalWatchlists');
-boolean Include_Ofac_temp := FALSE: stored('IncludeOfac');
+boolean Include_Additional_watchlists := FALSE: stored('IncludeAdditionalWatchlists');
+boolean Include_Ofac := FALSE: stored('IncludeOfac');
 
 
 boolean use_dob_Filter := FALSE :stored('UseDobFilter');
 integer2 dob_radius := -1 :stored('DobRadius');
 
 	gateways				:= Gateway.Configuration.Get();
-	
-if( OFAC_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 dob_radius_use := if(use_dob_Filter,dob_radius,-1);
 
@@ -73,19 +74,6 @@ end;
 watchlist_options := dataset([],temp) :stored('WatchList', few);
 watchlists_request := watchlist_options[1].WatchList;
 
-// If OFACVersion is set to 2 or 3, check whether include_ofac = false and include_additional_watchlists 
-// = false and watchlists_requested is empty. If they are, set include_ofac = true and include_
-// additional_watchlists = true so that this service will imitate the system behavior when OFACVersion
-// is 1 (returns everything). This will fix a problem for customers who were converted from
-// OFACVersion 1 to 2 and suddenly had no Watchlist records from the system. Applicable only to 
-// Patriot Search, IID, and BIID.
-
-noWatchlistsSelectedAtAll := 
-  NOT Include_Additional_watchlists_temp AND NOT Include_Ofac_temp AND COUNT(watchlists_request) = 0;
-  
-Include_Additional_watchlists := IF( OFAC_version IN [2,3] AND noWatchlistsSelectedAtAll, TRUE, Include_Additional_watchlists_temp );
-Include_Ofac                  := IF( OFAC_version IN [2,3] AND noWatchlistsSelectedAtAll, TRUE, Include_Ofac_temp );
-
 in_data := GROUP(SORTED(DATASET([{'1',1,Stringlib.StringToUpperCase(firstname_value),
 																				Stringlib.StringToUpperCase(middlename_value),
 																				Stringlib.StringToUpperCase(lastname_value),
@@ -93,8 +81,37 @@ in_data := GROUP(SORTED(DATASET([{'1',1,Stringlib.StringToUpperCase(firstname_va
 																				Stringlib.StringToUpperCase(searchtype_value), 
 																				Stringlib.StringToUpperCase(country_value),
 																				dob_value}],patriot.Layout_batch_in),acctno),acctno);
+                                        
+REAL ESP_version := 1.000000 : STORED('_espclientinterfaceversion');
 
-a := SORT(patriot.Search_Function(in_data,ofaconly_value,global_watchlist_threshold,ofac_version,include_ofac,include_additional_watchlists,dob_radius_use,watchlists_request),-score,pty_key);
+ofac_version_from_ESP := 
+  MAP(
+    OFAC_version_Null = '' => 2,
+    ESP_version >= 1.49 and ofac_version < 2 => 2,
+    ofac_version
+  );
+  
+Include_Ofac_from_ESP :=
+  MAP(
+    ESP_version < 1.49 and ofac_version_from_ESP > 1 => True,
+    ESP_version >= 1.49 => False, // Customers only pick watchlists from the watchlist dataset in these versions of the ESP
+    Include_Ofac
+  );
+  
+Include_Additional_watchlists_from_ESP :=
+  MAP(
+    ESP_version < 1.49 and ofac_version_from_ESP > 1 and ofaconly_value = true => False,
+    ESP_version < 1.49 and ofac_version_from_ESP > 1 and ofaconly_value = false => True,
+    ESP_version >= 1.49 => False, // Customers only pick watchlists from the warchlist dataset in these versions of the ESP
+    Include_Additional_watchlists
+  );
+  
+if( ofac_version_from_ESP = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
+
+IF( ofac_version_from_ESP != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, value),
+   FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
+
+a := SORT(patriot.Search_Function(in_data,ofaconly_value,global_watchlist_threshold,ofac_version_from_ESP,Include_Ofac_from_ESP,Include_Additional_watchlists_from_ESP,dob_radius_use,watchlists_request),-score,pty_key);
 // output(a, named('Results'));
 
 

@@ -1,4 +1,4 @@
-import AutoStandardI, doxie, FLAccidents_eCrash, doxie_crs, codes, Census_Data, suppress, ut, Accident_services, lib_stringlib;
+﻿import AutoStandardI, doxie, FLAccidents_eCrash, doxie_crs, codes, Census_Data, suppress, ut, Accident_services, STD;
 
 export Raw := MODULE
 
@@ -85,7 +85,7 @@ export Raw := MODULE
 
 		// filter by accident state requested
 		accRecsFilterState := IF((in_mod.EnableNationalAccidents OR in_mod.EnableExtraAccidents) AND in_mod.Accident_State!='',
-			accidentRecs(vehicle_incident_st=stringlib.StringToUpperCase(in_mod.Accident_State)),
+			accidentRecs(vehicle_incident_st=STD.Str.ToUpperCase(in_mod.Accident_State)),
 			accidentRecs);
 
 		// Filter records where states require a DPPA permissible purpose
@@ -161,6 +161,8 @@ export Raw := MODULE
 	END;
 
 	EXPORT CrsAccidentRpt(DATASET(Doxie.layout_references) dids, Accident_services.IParam.searchRecords in_mod) := FUNCTION
+  
+  Boolean isCNSMR := in_mod.IndustryClass= 'CNSMR';
 
 		layout_report := doxie_crs.layout_FLCrash_Search_Records;
 		layout_time_location := doxie_crs.layout_FSR_time_location;
@@ -249,8 +251,8 @@ export Raw := MODULE
 			SELF.Vehicle_Fault_Code_Name := codes.FLCRASH2_VEHICLE.VEHICLE_FAULT_CODE(L.VEHICLE_FAULT_CODE);
 			SELF.vehicle_fr_code_name := codes.FLCRASH2_VEHICLE.VEHICLE_FR_CODE(L.VEHICLE_FR_CODE);
 			SELF.vehicle_insur_code_name := MAP(
-				stringlib.StringToUpperCase(L.vehicle_insur_code) = 'U' => 'Vehicle Un-Insured',
-				stringlib.StringToUpperCase(L.vehicle_insur_code) = 'I' => 'Vehicle Insured',
+				STD.Str.ToUpperCase(L.vehicle_insur_code) = 'U' => 'Vehicle Un-Insured',
+				STD.Str.ToUpperCase(L.vehicle_insur_code) = 'I' => 'Vehicle Insured',
 				'');
 			SELF.vehicle_driver_action_name := codes.FLCRASH2_VEHICLE.VEHICLE_DRIVER_ACTION(L.VEHICLE_DRIVER_ACTION);
 			SELF.vehicle_owner_driver_code_name := codes.FLCRASH2_VEHICLE.VEHICLE_OWNER_DRIVER_CODE(L.VEHICLE_OWNER_DRIVER_CODE);
@@ -389,16 +391,17 @@ export Raw := MODULE
 				SELF:=LEFT),
 			LEFT OUTER,KEEP(1),LIMIT(ut.limits.ACCIDENTS_PER_DID,SKIP)); 
 
+
 		// filter by accident state requested
 		accNbrs2 := IF(in_mod.EnableNationalAccidents AND in_mod.accident_State!='',
-			accNbrs1(vehicle_incident_st=stringlib.StringToUpperCase(in_mod.accident_State)),
+			accNbrs1(vehicle_incident_st=STD.Str.ToUpperCase(in_mod.accident_State)),
 			accNbrs1);
 
 		// Filter records where states require a DPPA permissible purpose
 		accNbrs3 := IF((in_mod.EnableNationalAccidents OR in_mod.EnableExtraAccidents) AND ~Accident_services.Functions.allowDPPA(),
 			accNbrs2(vehicle_incident_st NOT IN Accident_services.Constants.DPPA_States),accNbrs2);
 
-		ApplicationType := stringlib.StringToUpperCase(in_mod.applicationType);
+		ApplicationType := STD.Str.ToUpperCase(in_mod.applicationType);
 		allowableStates := SET(Accident_Services.StateRestrictionsFunctions.getRestrictions(ApplicationType),accidentState);
 
 		nationalAccidents := IF(in_mod.EnableNationalAccidents AND in_mod.ApplicationType!='',accNbrs3(report_code IN Accident_services.Constants.NtlAccident_source AND vehicle_incident_st IN allowableStates));
@@ -407,9 +410,12 @@ export Raw := MODULE
 
 		accRpt0 := PROJECT(accNbrs4,initReport(left));
 
-		accRpt1 := PROJECT(accRpt0, addChildDatasets(LEFT))
+		accRpt1_add_childds := PROJECT(accRpt0, addChildDatasets(LEFT))
 						(in_mod.dateVal=0 OR (UNSIGNED3)MIN(flcrash_time_location,accident_date[1..6]) <= in_mod.dateVal);
-
+						
+	 //Blanking out to be compliant with D2C; Key data should not go through 
+	 accRpt1 := IF(~isCNSMR, accRpt1_add_childds);
+	 
 		accRpt2 := PROJECT(accRpt1,suppressDL(LEFT,in_mod.mask_dl));
 
 		accRpt3 := PROJECT(accRpt2,sortChildren(LEFT));

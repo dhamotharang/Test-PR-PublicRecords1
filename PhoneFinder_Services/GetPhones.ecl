@@ -11,7 +11,7 @@ EXPORT GetPhones( DATASET(lBatchIn)                        dIn,
 									DATASET(Gateway.Layouts.Config)          dGateways = DATASET([],Gateway.Layouts.Config)) :=
 FUNCTION
 	targusGateway := dGateways(inMod.useTargus and Gateway.Configuration.isTargus(servicename))[1];
-	qSentGateway  := dGateways(inMod.useQSent and Gateway.Configuration.isQSentV2(servicename))[1];
+	qSentPVSGateway  := dGateways(inMod.UseTransUnionPVS and Gateway.Configuration.isQSentV2(servicename))[1];
 	
 	// Create module with autokey paramaters to pass to the batch function
 	akMod := MODULE(PROJECT(inMod,PhoneFinder_Services.iParam.AKParams,OPT))
@@ -21,7 +21,7 @@ FUNCTION
 	END;
 	
 	// Phonesplus data
-	dPhonesPlus_ := Phones.Functions.GetPhonesPlusData(dIn,akMod,MDR.SourceTools.src_Phones_Plus,FALSE,TRUE,inMod.IsPhone7Search);
+	dPhonesPlus_ := IF(inMod.UseInhousePhones, Phones.Functions.GetPhonesPlusData(dIn,akMod,MDR.SourceTools.src_Phones_Plus,FALSE,TRUE,inMod.IsPhone7Search));
 	dPhonesPlus  := PROJECT(dPhonesPlus_,
 													TRANSFORM(lCommon,
 																		SELF.phone_source := PhoneFinder_Services.Constants.PhoneSource.PhonesPlus,
@@ -44,7 +44,7 @@ FUNCTION
 																			SELF := LEFT));
 	
 	// Gong data
-	dGong := PhoneFinder_Services.GetGongPhones(dIn,inMod);
+	dGong := IF(inMod.UseInhousePhones, PhoneFinder_Services.GetGongPhones(dIn,inMod));
 	
 	// Targus gateway data
 	dTargus := IF(inMod.useTargus and targusGateway.url != '',
@@ -96,7 +96,7 @@ FUNCTION
 	dReformat2Common := PROJECT(dPhoneCarrierInfo,tReformat2Common(LEFT));
 	
 	// QSent gateway data
-	dQSentPVS := qSentPhones.GetQSentPVSData(dIn,inMod,homephone,acctno,,qSentGateway);
+	dQSentPVS := IF(inMod.UseTransUnionPVS, qSentPhones.GetQSentPVSData(dIn,inMod,homephone,acctno,,qSentPVSGateway));
 	
 	// No need to send to gateway again if we didn't get a hit for PVS since TU does hit the SS gateway if no hits found in their database	
 	// If data source returned from QSent is 'PV' (typeFlag = 'P'), no need to hit the gateway again for phone details
@@ -107,26 +107,30 @@ FUNCTION
 	dQSentAppendPrimaryPhoneDetails := IF(EXISTS(dQSentPrimaryPhoneNoDetails),
 																				qSentPhones.GetQSentPVSData(dQSentPrimaryPhoneNoDetails,
 																																		inMod,batch_in.homephone,batch_in.acctno,
-																																		TRUE,qSentGateway));
+																																		TRUE,qSentPVSGateway));
 	
 	dQSentCombined := dQSentPrimaryPhoneDetails + dQSentPrimaryPhoneNoDetails + dQSentAppendPrimaryPhoneDetails;
 	
 	// Get QSent gateway records only for ultimate transaction type
-	dQSentRecs := IF(inMod.useQSent and qSentGateway.url != '',dQSentCombined);
+	dQSentRecs := IF(inMod.UseTransUnionPVS and qSentPVSGateway.url != '',dQSentCombined);
 	
 	dInhousePhoneDetail	:= PhoneFinder_Services.GetPhoneDetails(PROJECT(dIn,TRANSFORM(Phones.Layouts.PhoneAttributes.BatchIn,
 																																											SELF.acctno:=LEFT.acctno,SELF.phoneno:=LEFT.homephone,SELF:=[])), dGateways, inMod);
 																																																																																				
 	dPhoneDetailWBatchIn := JOIN(dInhousePhoneDetail, dIn,
 																																					LEFT.acctno = RIGHT.acctno,
-																			 TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.Final,
-																			 SELF.isPrimaryPhone := TRUE, SELF.batch_in := RIGHT, SELF := LEFT));
+																			                TRANSFORM(lFinal,
+																			                SELF.isPrimaryPhone := TRUE, SELF.batch_in := RIGHT, SELF := LEFT));
 																																																																						
  //use inhouse metada (metadata index, att libd, carrier reference index)
 	dPhoneDetail := IF(inMod.UseInHousePhoneMetadata, dPhoneDetailWBatchIn, dQSentRecs);
 
 	// Combine all the sources
 	dPhonesCombined := dReformat2Common + dPhoneDetail;
+	
+	dPhoneRecs := PROJECT(dPhonesCombined, TRANSFORM(lFinal,
+																					                       SELF.phonestatus :=  PhoneFinder_Services.Functions.PhoneStatusDesc((INTEGER)LEFT.realtimephone_ext.statuscode), 
+																																             SELF := LEFT));
 		
 	// Debug
 	#IF(PhoneFinder_Services.Constants.Debug.PhoneNoSearch)
@@ -150,5 +154,5 @@ FUNCTION
 		#END
 	#END
 	
-	RETURN dPhonesCombined;
+	RETURN dPhoneRecs;
 END;

@@ -120,7 +120,7 @@ export t_User := record
 	string6 DOBMask {xpath('DOBMask')};//hidden[internal]
 	boolean ExcludeDMVPII {xpath('ExcludeDMVPII')};//hidden[internal]
 	boolean DLMask {xpath('DLMask')};//hidden[internal]
-	string50 DataRestrictionMask {xpath('DataRestrictionMask')};//hidden[internal]
+	string DataRestrictionMask {xpath('DataRestrictionMask')};//hidden[internal]
 	string50 DataPermissionMask {xpath('DataPermissionMask')};//hidden[internal]
 	string SourceCode {xpath('SourceCode')};//hidden[internal]
 	string32 ApplicationType {xpath('ApplicationType')};//hidden[internal]
@@ -136,6 +136,7 @@ export t_User := record
 	boolean OutcomeTrackingOptOut {xpath('OutcomeTrackingOptOut')};//hidden[internal]
 	integer NonSubjectSuppression {xpath('NonSubjectSuppression')};//hidden[ecl_only]
 	string ProductCode {xpath('ProductCode')};//hidden[internal]
+	string10 DeathMasterPurpose {xpath('DeathMasterPurpose')};//hidden[internal]
 end;
 		
 export t_LoginInfo := record

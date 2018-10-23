@@ -1,6 +1,7 @@
-import risk_indicators, riskwise, ut, std;
+﻿import _Control, risk_indicators, riskwise, ut, std;
+onThor := _Control.Environment.OnThor;
 
-export identify_opt_outs(dataset(risk_indicators.layout_input) indata, boolean onThor=false) := function
+export identify_opt_outs(dataset(risk_indicators.layout_input) indata) := function
 
 flagrec := record
 	boolean opt_out_hit := false;
@@ -35,7 +36,11 @@ didkey_thor := join(distribute(indata, hash64(did)),
 				  getDidKey(LEFT,RIGHT),
 					left outer, atmost(left.did = right.l_DID, riskwise.max_atmost), keep(1), LOCAL);
 
-didkey := if(onThor, didkey_thor, didkey_roxie);
+#IF(onThor)
+  didkey := didkey_thor;
+#ELSE
+ didkey := didkey_roxie;
+#END
 
 flagrec getSSNKey(didkey le, fcra_opt_out.key_ssn ri) := TRANSFORM
 	namematch := risk_indicators.iid_constants.g(risk_indicators.FnameScore(le.fname, ri.inname_first)) and 
@@ -58,7 +63,11 @@ ssnkey_thor := join(distribute(didkey, hash64(ssn)),
 				  getSSNKey(LEFT,RIGHT),
 					left outer, atmost((unsigned)left.ssn = right.l_ssn, riskwise.max_atmost), keep(10), LOCAL);
 
-ssnkey := if(onThor, ssnkey_thor, ssnkey_roxie);
+#IF(onThor)
+  ssnkey := ssnkey_thor;
+#ELSE
+ ssnkey := ssnkey_roxie;
+#END
 
 // search by address, and if a match found, check the names to make sure it's a match
 
@@ -88,7 +97,11 @@ addrkey_thor := join(distribute(ssnkey, hash64(z5, prim_range, prim_name, sec_ra
 				  getAddrKey(LEFT,RIGHT),
 					left outer, atmost(riskwise.max_atmost), keep(1000), LOCAL);					
 
-addrkey := if(onThor, addrkey_thor, addrkey_roxie);
+#IF(onThor)
+  addrkey := addrkey_thor;
+#ELSE
+  addrkey := addrkey_roxie;
+#END
 
 // if any of the searches returns more than 1 record, keep the one that matched the opt_out file by sorting descending
 opt_out_results := dedup(sort(addrkey, seq, -opt_out_hit), seq);

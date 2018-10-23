@@ -1,4 +1,4 @@
-﻿IMPORT Address, BIPV2, Business_Risk_BIP, LN_PropertyV2, MDR, DueDiligence, SALT28, iesp, VehicleV2, VehicleV2_Services, TopBusiness_Services, STD;
+﻿IMPORT Address, BIPV2, Business_Risk_BIP, MDR, DueDiligence, SALT28, iesp, VehicleV2, VehicleV2_Services, TopBusiness_Services, STD;
 
 
 EXPORT getBusVehicle(DATASET(DueDiligence.layouts.Busn_Internal) BusnData, 

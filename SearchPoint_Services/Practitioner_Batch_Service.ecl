@@ -1,4 +1,4 @@
-	/*--SOAP--
+﻿	/*--SOAP--
 <message name="Practitioner_Batch_Service">
 	<part name="DPPAPurpose"          type="xsd:byte"/>
 	<part name="GLBPurpose"           type="xsd:byte"/> 
@@ -10,7 +10,8 @@
 */
 
 EXPORT Practitioner_Batch_Service(useCannedRecs = 'false') := 
-	MACRO	 	 				 
+	MACRO	 	 
+	 #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 		results := SearchPoint_Services.Practitioner_Batch_Service_Records(useCannedRecs);		
     OUTPUT( results, NAMED('Results'));				
 	ENDMACRO;	

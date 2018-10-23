@@ -52,8 +52,9 @@
 import iesp, AutoStandardI, std;
 
 export SearchService := MACRO
-
-
+ 
+ #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+ #ONWARNING (4207, ignore);
 	rec_in		:= iesp.criminal.t_CrimSearchRequest;
 	ds_in			:= dataset([], rec_in) : STORED('CrimSearchRequest', few);
 	first_row	:= ds_in[1] : INDEPENDENT;

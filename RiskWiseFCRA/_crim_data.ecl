@@ -1,4 +1,4 @@
-import CriminalRecords_Services, CrimSrch, corrections, doxie, doxie_files, fcra, riskwise, ut, iesp, risk_indicators;
+﻿import CriminalRecords_Services, CrimSrch, corrections, doxie, doxie_files, fcra, riskwise, ut, iesp, risk_indicators;
 
 boolean IsFCRA := true;
 MAX_OVERRIDE_LIMIT := FCRA.compliance.MAX_OVERRIDE_LIMIT;
@@ -22,8 +22,9 @@ layout_courtOffense := corrections.layout_CourtOffenses and not offense_category
 layout_activity     := corrections.layout_activity;
 
 EXPORT _crim_data (dataset (doxie.layout_references) dids, 
-                   dataset (fcra.Layout_override_flag) flag_file
-                   // integer nss = nss_const.doNothing
+                   dataset (fcra.Layout_override_flag) flag_file,
+                   // integer nss = nss_const.doNothing,
+									 boolean SkipRiskviewFilters = false
                    ) := MODULE
 	boolean isFCRA := true;
 
@@ -40,7 +41,7 @@ EXPORT _crim_data (dataset (doxie.layout_references) dids,
                      keyed (Left.did = Right.sdid) AND
                      ((string)Right.offender_key NOT IN crim_correct_ofk) AND
                      (unsigned3)(Right.fcra_date[1..6]) < history_date AND
-										 RIGHT.offense_score in risk_indicators.iid_constants.set_valid_offense_scores, 
+										 (RIGHT.offense_score in risk_indicators.iid_constants.set_valid_offense_scores or SkipRiskviewFilters), 
                      TRANSFORM (layout_offenders, SELF := Right),
                      atmost(riskwise.max_atmost));
 
@@ -60,7 +61,7 @@ EXPORT _crim_data (dataset (doxie.layout_references) dids,
   offenses := JOIN (dedup (pre_offenders, offender_key, all), doxie_files.Key_Offenses(isFCRA), 
                     Left.offender_key<>'' AND keyed (Left.offender_key = Right.ok) AND
                     ((string)Right.offense_persistent_id NOT IN offenses_puid) AND
-										RIGHT.offense_score in risk_indicators.iid_constants.set_valid_offense_scores,
+										(RIGHT.offense_score in risk_indicators.iid_constants.set_valid_offense_scores or SkipRiskviewFilters),
                     TRANSFORM (layout_offenses, SELF := Right),
                     LEFT OUTER, atmost(riskwise.max_atmost));
 
@@ -76,7 +77,7 @@ EXPORT _crim_data (dataset (doxie.layout_references) dids,
 
   // check which offenses were "dismissed"
   dismissed_offenses := pre_offenses(stringlib.stringfind(ct_disp_desc_1, 'DISMISSED', 1) > 0 or stringlib.stringfind(ct_disp_desc_2, 'DISMISSED', 1) > 0 );
-  shared set_ofks_dissmissed := set(dismissed_offenses, offender_key);
+  shared set_ofks_dissmissed := if(SkipRiskviewFilters, [], set(dismissed_offenses, offender_key));
 
   // now: remove dissmissed offenders and offenses
   ungr_offenders := sort(pre_offenders (offender_key not in set_ofks_dissmissed), process_date);

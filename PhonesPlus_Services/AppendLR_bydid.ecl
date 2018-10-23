@@ -1,7 +1,8 @@
-import phonesPlus_v2,doxie,ut;
+﻿import phonesPlus_v2,doxie,ut,Phones;
 LR_index_did := Phonesplus_v2.Key_Royalty_Did;
 
-export AppendLR_bydid(dataset(doxie.layout_references) in_dids) := function
+export AppendLR_bydid(dataset(doxie.layout_references) in_dids,
+          string data_restriction_mask = '') := function
 doxie.MAC_Header_Field_Declare();	
 	
 doxie.layout_pp_raw_common LR_trans(recordof(LR_index_did) l) := transform
@@ -35,7 +36,17 @@ doxie.layout_pp_raw_common LR_trans(recordof(LR_index_did) l) := transform
 end;
 
  	LR_results := join(in_dids,LR_index_did,
-                         keyed(left.did = right.l_did) and right.confidencescore >= 11 , 
+                         keyed(left.did = right.l_did) and right.confidencescore >= 11
+																									and (~Phones.Functions.isPhoneRestricted(right.origstate, 
+																															 glb_purpose,
+																															 dppa_purpose,
+																															 industry_class_value,
+																															 , //checkRNA
+																															 right.datefirstseen,
+																															 right.dt_nonglb_last_seen,
+																															 right.rules,
+																															 right.src_all,
+																															 data_restriction_mask)), 
     	                 LR_trans(right), limit(ut.limits.PHONE_PER_PERSON, skip));
 											 
 	final_results:= LR_results(penalt<score_threshold_value);

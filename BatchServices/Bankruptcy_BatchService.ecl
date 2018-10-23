@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Bankruptcy_BatchService">
 	<part name="DPPAPurpose"          type="xsd:byte"/>
 	<part name="GLBPurpose"           type="xsd:byte"/> 
@@ -48,7 +48,7 @@ IMPORT BatchServices, Autokey_Batch, doxie;
 
 export Bankruptcy_BatchService(useCannedRecs = 'false') := 
 	MACRO
-	
+	 #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 		#OPTION('optimizeProjects', TRUE);
 		
 		// Imitate in part the constants and stored variables found in the bankruptcy search service.

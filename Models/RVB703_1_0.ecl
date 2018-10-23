@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwise, riskwisefcra;
+﻿import risk_indicators, ut, riskwise, riskwisefcra, riskview;
 
 export RVB703_1_0( grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean OFAC, boolean isCalifornia ) := FUNCTION
 
@@ -253,7 +253,7 @@ export RVB703_1_0( grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, bool
 			rvb703_1_0a
 		);
 
-		rvb703_1_0c := if( nas_summary<=4 and nap_summary <= 4 and add1_naprop<=2, 222, rvb703_1_0b ); // no scores
+		rvb703_1_0c := if( riskview.constants.noscore(nas_summary,nap_summary, add1_naprop, le.truedid), 222, rvb703_1_0b ); // no scores
 
 
 		ssnprior2 := (rc_ssndobflag = 1);

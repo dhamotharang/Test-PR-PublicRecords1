@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="VehicleRegSearchService" 		wuTimeout="300000">
 	<part name = 'BDID'						type = 'xsd:string'/>
 	<part name = 'DID'						type = 'xsd:string'/>
@@ -60,6 +60,7 @@ all Vehicle datafiles including files used in MVR wildcard search to return resu
 IMPORT iesp, Royalty;
 
 EXPORT VehicleRegSearchService() := MACRO
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	#constant('SearchIgnoresAddressOnly',true);
 	#constant('getBdidsbyExecutive',FALSE);
 	#constant('DisplayMatchedParty',true);

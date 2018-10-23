@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BatchService">
 	<part name="ApplicationType"     	type="xsd:string"/>
 	<part name="DPPAPurpose"          type="xsd:byte"/>
@@ -37,6 +37,7 @@ IMPORT AutoStandardI, BatchShare, Suppress;
 
 EXPORT BatchService(useCannedRecs = false) := 
 	MACRO
+	#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 		/* Some of the older batch services that we are calling read, stored 
 			 values including of PenaltThreshold in the records attribute.
 			 In absence of a defined stored, they have a default value. 

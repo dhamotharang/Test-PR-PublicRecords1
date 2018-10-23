@@ -40,10 +40,11 @@
   //=================================================================
   //  Delta base read & SOAPCALL related limits
   //=================================================================
-  EXPORT limiter      := ' LIMIT 50 ; ';
+  EXPORT limiter      := ' LIMIT 1000; ';
   EXPORT read_retry   := 2;  
   EXPORT read_timeout := 75; 
   EXPORT maxRecs      := 100;
+	EXPORT FRAUDGOV_BUILD_ENV_VARIABLE := 'fraudgov_build_version';
   
   EXPORT Fragment_Types := MODULE
 			EXPORT BANK_ACCOUNT_NUMBER_FRAGMENT := 'BANK_ACCOUNT';
@@ -79,8 +80,10 @@
 			EXPORT CUSTOMER_VERTICAL := 'CUSTOMER_VERTICAL';
 	END;
 
-  //Mapping the FDN file type field above to our usage of the field for FraudGov
-  EXPORT PayloadFileTypeEnum := ENUM(unsigned1,KnownFraud=1,IdentityActivity=3);
+  // Mapping the FDN file type field above to our usage of the field for FraudGov
+	// file_type 2 is reserved for Applicable Public Records, not used for FraudGov.
+	// file_type 4 is reserved for Relationship Analytics, not used for FraudGov.
+  EXPORT PayloadFileTypeEnum := ENUM(unsigned1,KnownFraud=1,IdentityActivity=3,StatusUpdate=5);
   
 	EXPORT Red_Flag_Alerts := MODULE
 		EXPORT Codes := MODULE
@@ -194,11 +197,17 @@
 	END;
 	
 	SHARED ClassificationActivity_Enum := ENUM(UNSIGNED2,
-			POTENTIAL = 1,
-			PROBABLE = 2,
+			PROBABLE = 1,
+			POTENTIAL = 2,
+			KNOWNGOOD = 3,
+			NEUTRAL = 4,
 			PROVEN = 5);
 			
-	EXPORT ClassificationActivitySet := [ClassificationActivity_Enum.POTENTIAL, ClassificationActivity_Enum.PROBABLE, ClassificationActivity_Enum.PROVEN];
+	EXPORT ClassificationActivitySet := [ClassificationActivity_Enum.PROBABLE, 
+																			 ClassificationActivity_Enum.POTENTIAL, 
+																			 ClassificationActivity_Enum.KNOWNGOOD, 
+																			 ClassificationActivity_Enum.NEUTRAL, 
+																			 ClassificationActivity_Enum.PROVEN];
 
 	EXPORT ServiceType := MODULE
 		EXPORT REPORT := 'FraudGovReport';
@@ -206,6 +215,8 @@
 	END;
 
 	EXPORT INQUIRY_SOURCE := 'RIN';
+	
+	EXPORT DELTABASE_ESP_GATEWAY_NAME := 'delta_db';
 
 	EXPORT CIID_DESC := MODULE
 			EXPORT NAS_0 := 'This identity could not be located in public records';
@@ -227,4 +238,31 @@
 	EXPORT append_l  := 'BEST_ALL,VERIFY_ALL'; //Append_1 allows all Best Info to return
 	EXPORT verify_l  := 'BEST_ALL,VERIFY_ALL';
 	
+	EXPORT RecordType := MODULE
+		EXPORT ELEMENT := 'ELEMENT';
+		EXPORT IDENTITY := 'IDENTITY';
+		EXPORT CLUSTER := 'CLUSTER';
+	END;
+	
+	EXPORT KEL_ENTITY_TYPE := MODULE
+		EXPORT ENTITY_TYPE_LEXID := 1;
+		EXPORT ENTITY_TYPE_PHYSICAL_ADDRESS := 9;
+		EXPORT ENTITY_TYPE_SSN := 15;
+		EXPORT ENTITY_TYPE_PHONENO := 16;
+		EXPORT ENTITY_TYPE_IPADDRESS := 18;
+	END;
+	
+	EXPORT PHONE_TYPE := MODULE
+		EXPORT PHONE_TYPE_HOME := 'HOME';
+		EXPORT PHONE_TYPE_CELL := 'CELL';
+		EXPORT PHONE_TYPE_WORK := 'WORK';
+	END;	
+	
+	EXPORT KelEntityIdentifier := MODULE
+		EXPORT STRING _LEXID := '_01';
+		EXPORT STRING _PHYSICAL_ADDRESS := '_09';
+		EXPORT STRING _SSN := '_15';
+		EXPORT STRING _PHONENO := '_16';
+		EXPORT STRING _IPADDRESS := '_18';
+	END;	
 END;

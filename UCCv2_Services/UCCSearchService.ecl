@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="UCCSearchService">
   
 	<!-- Indexed Directly -->
@@ -62,6 +62,7 @@
 export UCCSearchService() := macro
 import Text_Search,doxie;
 
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	#constant('getBdidsbyExecutive',FALSE);
 	#constant('SearchGoodSSNOnly',true);
 	#constant('SearchIgnoresAddressOnly',true);

@@ -1,7 +1,7 @@
 ﻿IMPORT DueDiligence;
 
-EXPORT getIndLegalEvents(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
-                         BOOLEAN includeReport) := FUNCTION
+
+EXPORT getIndLegalEvents(DATASET(DueDiligence.Layouts.Indv_Internal) inData) := FUNCTION
     
     
     //Need to convert the inquuired individual into a dataset
@@ -15,8 +15,7 @@ EXPORT getIndLegalEvents(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
                                                     SELF := [];));
     
     //get the criminal data
-    crimData := DueDiligence.getIndCriminal(indivRelatedParty.inquired, includeReport);
-    
+    crimData := DueDiligence.getIndCriminal(indivRelatedParty.inquired);                       
     
     //put the inquired individual back on the internal layout to be passed on for more information
     addInquiredCriminalData := JOIN(inData, crimData,
@@ -36,6 +35,7 @@ EXPORT getIndLegalEvents(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
     // OUTPUT(inData, NAMED('inData'));
     // OUTPUT(indivRelatedParty, NAMED('indivRelatedParty'));
     // OUTPUT(crimData, NAMED('crimData'));
+    // OUTPUT(updateIndLegalEventType, NAMED('updateIndLegalEventType'));
     // OUTPUT(addInquiredCriminalData, NAMED('addInquiredCriminalData'));
     
     

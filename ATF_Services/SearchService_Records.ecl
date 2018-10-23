@@ -71,7 +71,8 @@ export SearchService_Records := module
 
 		ds_flags := if(isFCRA, FFD.GetFlagFile(ds_best, pc_recs), FCRA.compliance.blank_flagfile);
     
-  suppress_results_due_alerts := isFCRA and FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_mod.FCRAPurpose, in_mod.FFDOptionsMask)[1].suppress_records;
+    alert_indicators := FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_mod.FCRAPurpose, in_mod.FFDOptionsMask)[1];
+    suppress_results_due_alerts := isFCRA and alert_indicators.suppress_records;
 
 		final_records := if(~suppress_results_due_alerts, raw_records(ids, in_mod, isFCRA, ds_flags, FALSE, slim_pc_recs),
                       dataset([], iesp.firearm_fcra.t_FcraFirearmRecord));
@@ -81,8 +82,8 @@ export SearchService_Records := module
 				we are showing that record or not. */
 		boolean showConsumerStatements := FFD.FFDMask.isShowConsumerStatements(in_mod.FFDOptionsMask);
     
-  consumer_statements := if(isFCRA and showConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
-  consumer_alerts := if(isFCRA, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, suppress_results_due_alerts), FFD.Constants.BlankConsumerAlerts);
+    consumer_statements := if(isFCRA and showConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
+    consumer_alerts := if(isFCRA, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, alert_indicators, in_mod.FFDOptionsMask), FFD.Constants.BlankConsumerAlerts);
 		FFD.MAC.PrepareResultRecord(final_records, rec_out, consumer_statements, consumer_alerts, iesp.firearm_fcra.t_FcraFirearmRecord);
     
 		return rec_out;

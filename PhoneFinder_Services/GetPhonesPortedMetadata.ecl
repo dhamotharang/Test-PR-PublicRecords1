@@ -1,14 +1,12 @@
-﻿IMPORT PhoneFinder_Services,ut, PhonesInfo, MDR, Gateway;
+﻿IMPORT  Gateway, MDR, PhoneFinder_Services, PhonesInfo, STD, ut;
 EXPORT GetPhonesPortedMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final) dSearchRecs0, 
 													     PhoneFinder_Services.iParam.ReportParams inMod, 
 													     DATASET(Gateway.Layouts.Config) dGateways, 
 													     DATASET(	PhoneFinder_Services.Layouts.SubjectPhone) subjectInfo,
 													     DATASET(PhoneFinder_Services.Layouts.PortedMetadata) accu_rpt = DATASET([],PhoneFinder_Services.Layouts.PortedMetadata)) :=
 	FUNCTION
-
-  displayAll := inMod.TransactionType in [PhoneFinder_Services.Constants.TransType.PREMIUM,
-																						PhoneFinder_Services.Constants.TransType.ULTIMATE,
-																						PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT];	
+   
+	 currentDate := (STRING)STD.Date.Today();		
 														
 		//Based on subject info get ALL ports and CURRENT deact records
 	dPorted	:= JOIN(subjectInfo, PhonesInfo.Key_Phones.Ported_Metadata,
@@ -120,17 +118,17 @@ EXPORT GetPhonesPortedMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.
 			SELF.PortingCode    := MAP(hasPort => 'Ported', 
 																 (NOT inMod.SubjectMetadataOnly OR l.isprimaryphone OR l.batch_in.homephone<>'')=> 'Not Ported',
 																 '');
-			SELF.PortingCount    := IF(displayAll,r.PortingCount,l.PortingCount);
-			SELF.PortingHistory  := IF(displayAll,CHOOSEN(SORT(r.PortingHistory,-PortEndDate),PhoneFinder_Services.Constants.MaxPortedMatches),l.PortingHistory);	
-			SELF.FirstPortedDate := IF(displayAll,r.FirstPortedDate,l.FirstPortedDate);		
-			SELF.LastPortedDate  := IF(displayAll,r.LastPortedDate,l.LastPortedDate);
-			SELF.NoContractCarrier  := IF(displayAll,r.NoContractCarrier,l.NoContractCarrier);
-			SELF.Prepaid				 := IF(displayAll,r.Prepaid,l.Prepaid);
-			Phone_Status_Qsent   := PhoneFinder_Services.Functions.PhoneStatusDesc((INTEGER)l.RealTimePhone_Ext.StatusCode);
-			Phone_Status_Inhouse := MAP(r.is_deact AND ~r.is_react => PhoneFinder_Services.Constants.PhoneStatus.Inactive,
+			SELF.PortingCount    := IF(inMod.ReturnPortingInfo,r.PortingCount,l.PortingCount);
+			SELF.PortingHistory  := IF(inMod.ReturnPortingInfo,CHOOSEN(SORT(r.PortingHistory,-PortEndDate),PhoneFinder_Services.Constants.MaxPortedMatches),l.PortingHistory);	
+			SELF.FirstPortedDate := IF(inMod.ReturnPortingInfo,r.FirstPortedDate,l.FirstPortedDate);		
+			SELF.LastPortedDate  := IF(inMod.ReturnPortingInfo,r.LastPortedDate,l.LastPortedDate);
+			SELF.NoContractCarrier  := IF(inMod.ReturnPortingInfo,r.NoContractCarrier,l.NoContractCarrier);
+			SELF.Prepaid				 := IF(inMod.ReturnPortingInfo,r.Prepaid,l.Prepaid);
+			deact_thresholdcheck := Std.Date.IsValidDate(r.DisconnectDate) AND (ut.DaysApart((STRING)r.DisconnectDate, currentDate) <= PhoneFinder_Services.Constants.PortingStatus.DisconnectedPhoneThreshold);
+			Phone_Status_Inhouse := MAP(r.is_deact AND ~r.is_react AND deact_thresholdcheck => PhoneFinder_Services.Constants.PhoneStatus.Inactive,
 		                             ~r.is_deact AND r.is_react => PhoneFinder_Services.Constants.PhoneStatus.Active,
 			                            PhoneFinder_Services.Constants.PhoneStatus.NotAvailable);
-			Phone_Status         := IF(inMod.UseInHousePhoneMetadata, Phone_Status_Inhouse, Phone_Status_Qsent); // flag to use inhouse phone metatdata instead of Qsent PVS
+			Phone_Status         := IF(inMod.UseInHousePhoneMetadata, Phone_Status_Inhouse, l.PhoneStatus); // flag to use inhouse phone metatdata instead of Qsent PVS
 			SELF.PhoneStatus     :=  Phone_Status;
 			SELF.ActivationDate  := IF(Phone_Status = PhoneFinder_Services.Constants.PhoneStatus.Active, r.ActivationDate, 0);
 			SELF.DisconnectDate  := IF(Phone_Status = PhoneFinder_Services.Constants.PhoneStatus.INACTIVE, r.DisconnectDate, 0);

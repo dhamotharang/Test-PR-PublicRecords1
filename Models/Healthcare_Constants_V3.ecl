@@ -7,6 +7,5 @@
 	export default_BocaShell_Version := 41;
 	export default_ProfileBooster_Version := 1; //or v1/V1
 	export default_ProfileBooster_AttributesVersionRequest := 'PBATTRV1';
-	export default_onThor := false;
 	export integer4 default_adl_score_filter_val := 80;
 END;

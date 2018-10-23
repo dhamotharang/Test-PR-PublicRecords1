@@ -1,4 +1,4 @@
-IMPORT ut,SALT30;
+﻿IMPORT ut,SALT30;
 IMPORT BIPV2;
 EXPORT specificities(DATASET(layout_LGID3) h) := MODULE
  
@@ -340,11 +340,38 @@ EXPORT cnp_btype_max := MAX(cnp_btype_values_persisted,field_specificity);
 SALT30.MAC_Field_Specificity(cnp_btype_values_persisted,cnp_btype,cnp_btype_nulls,ol) // Compute column level specificity
 EXPORT cnp_btype_specificity := ol;
  
+  infile := file_underLink;
+  r := RECORD
+    SALT30.AttrValueType Basis := TRIM((SALT30.StrType)infile.UnderLinkId);
+    infile.UnderLinkId; // Easy way to get component values
+    INTEGER2 UnderLinkId_weight100 := 0; // Easy place to store weight
+    SALT30.UIDType LGID3 := infile.LGID3;
+    UNSIGNED Basis_cnt := 0;
+    INTEGER2 Basis_weight100 := 0;
+  END;
+  t := TABLE(infile,r);
+SHARED UnderLinks_attributes := DEDUP( SORT( DISTRIBUTE( t, LGID3 ), LGID3, Basis, LOCAL), LGID3, Basis, LOCAL) : PERSIST('~temp::LGID3::BIPV2_LGID3::values::UnderLinks',EXPIRE(Config.PersistExpire));
+  SALT30.Mac_Specificity_Local(UnderLinks_attributes,Basis,LGID3,UnderLinks_nulls,Layout_Specificities.UnderLinks_ChildRec,UnderLinks_specificity,UnderLinks_switch,UnderLinks_values);
+EXPORT UnderLinks_max := MAX(UnderLinks_values,field_specificity);
+ 
+EXPORT UnderLinksValuesIndexKeyName := '~'+'key::BIPV2_LGID3::LGID3::Word::UnderLinks';
+  TYPEOF(UnderLinks_attributes) take(UnderLinks_attributes le,UnderLinks_values ri,BOOLEAN patch_default) := TRANSFORM
+    SELF.Basis_cnt := ri.cnt;
+    SELF.Basis_weight100 := ri.field_specificity*100;
+    SELF.UnderLinkId_weight100 := SELF.Basis_weight100 / 1;
+    SELF := le;
+  END;
+  non_null_atts := UnderLinks_attributes(Basis NOT IN SET(UnderLinks_nulls,Basis));
+SALT30.MAC_Choose_JoinType(non_null_atts,UnderLinks_nulls,UnderLinks_values,Basis,Basis_weight100,take,UnderLinks_v);
+ 
+EXPORT UnderLinks_values_index := INDEX(UnderLinks_v,{Basis},{UnderLinks_v},UnderLinksValuesIndexKeyName);
+EXPORT UnderLinks_values_persisted := UnderLinks_values_index;
+ 
 EXPORT SpecIndexKeyName := '~'+'key::BIPV2_LGID3::LGID3::Specificities';
-iSpecificities := DATASET([{0,sbfe_id_specificity,sbfe_id_switch,sbfe_id_max,sbfe_id_nulls,Lgid3IfHrchy_specificity,Lgid3IfHrchy_switch,Lgid3IfHrchy_max,Lgid3IfHrchy_nulls,company_name_specificity,company_name_switch,company_name_max,company_name_nulls,cnp_number_specificity,cnp_number_switch,cnp_number_max,cnp_number_nulls,active_duns_number_specificity,active_duns_number_switch,active_duns_number_max,active_duns_number_nulls,duns_number_specificity,duns_number_switch,duns_number_max,duns_number_nulls,duns_number_concept_specificity,duns_number_concept_switch,duns_number_concept_max,duns_number_concept_nulls,company_fein_specificity,company_fein_switch,company_fein_max,company_fein_nulls,company_inc_state_specificity,company_inc_state_switch,company_inc_state_max,company_inc_state_nulls,company_charter_number_specificity,company_charter_number_switch,company_charter_number_max,company_charter_number_nulls,cnp_btype_specificity,cnp_btype_switch,cnp_btype_max,cnp_btype_nulls}],Layout_Specificities.R);
+iSpecificities := DATASET([{0,sbfe_id_specificity,sbfe_id_switch,sbfe_id_max,sbfe_id_nulls,Lgid3IfHrchy_specificity,Lgid3IfHrchy_switch,Lgid3IfHrchy_max,Lgid3IfHrchy_nulls,company_name_specificity,company_name_switch,company_name_max,company_name_nulls,cnp_number_specificity,cnp_number_switch,cnp_number_max,cnp_number_nulls,active_duns_number_specificity,active_duns_number_switch,active_duns_number_max,active_duns_number_nulls,duns_number_specificity,duns_number_switch,duns_number_max,duns_number_nulls,duns_number_concept_specificity,duns_number_concept_switch,duns_number_concept_max,duns_number_concept_nulls,company_fein_specificity,company_fein_switch,company_fein_max,company_fein_nulls,company_inc_state_specificity,company_inc_state_switch,company_inc_state_max,company_inc_state_nulls,company_charter_number_specificity,company_charter_number_switch,company_charter_number_max,company_charter_number_nulls,cnp_btype_specificity,cnp_btype_switch,cnp_btype_max,cnp_btype_nulls,UnderLinks_specificity,UnderLinks_switch,UnderLinks_max,UnderLinks_nulls}],Layout_Specificities.R);
  
 EXPORT Specificities_Index := INDEX(iSpecificities,{1},{iSpecificities},SpecIndexKeyName);
-EXPORT Build := SEQUENTIAL ( PARALLEL(BUILDINDEX(sbfe_id_values_index, OVERWRITE),BUILDINDEX(Lgid3IfHrchy_values_index, OVERWRITE),BUILDINDEX(company_name_values_index, OVERWRITE),BUILDINDEX(cnp_number_values_index, OVERWRITE),BUILDINDEX(active_duns_number_values_index, OVERWRITE),BUILDINDEX(duns_number_values_index, OVERWRITE),BUILDINDEX(duns_number_concept_values_index, OVERWRITE),BUILDINDEX(company_fein_values_index, OVERWRITE),BUILDINDEX(company_inc_state_values_index, OVERWRITE),BUILDINDEX(company_charter_number_values_index, OVERWRITE),BUILDINDEX(cnp_btype_values_index, OVERWRITE)), BUILDINDEX(Specificities_Index, OVERWRITE, FEW) );
+EXPORT Build := SEQUENTIAL ( PARALLEL(BUILDINDEX(sbfe_id_values_index, OVERWRITE),BUILDINDEX(Lgid3IfHrchy_values_index, OVERWRITE),BUILDINDEX(company_name_values_index, OVERWRITE),BUILDINDEX(cnp_number_values_index, OVERWRITE),BUILDINDEX(active_duns_number_values_index, OVERWRITE),BUILDINDEX(duns_number_values_index, OVERWRITE),BUILDINDEX(duns_number_concept_values_index, OVERWRITE),BUILDINDEX(company_fein_values_index, OVERWRITE),BUILDINDEX(company_inc_state_values_index, OVERWRITE),BUILDINDEX(company_charter_number_values_index, OVERWRITE),BUILDINDEX(cnp_btype_values_index, OVERWRITE),BUILDINDEX(UnderLinks_values_index, OVERWRITE)), BUILDINDEX(Specificities_Index, OVERWRITE, FEW) );
 Layout_Specificities.R Into(Specificities_Index i) := TRANSFORM
   SELF := i;
 END;
@@ -356,23 +383,25 @@ SpcShiftR := RECORD
   integer1 Lgid3IfHrchy_shift0 := ROUND(Specificities[1].Lgid3IfHrchy_specificity - 27);
   integer2 Lgid3IfHrchy_switch_shift0 := ROUND(1000*Specificities[1].Lgid3IfHrchy_switch - 0);
   integer1 company_name_shift0 := ROUND(Specificities[1].company_name_specificity - 26);
-  integer2 company_name_switch_shift0 := ROUND(1000*Specificities[1].company_name_switch - 333);
+  integer2 company_name_switch_shift0 := ROUND(1000*Specificities[1].company_name_switch - 328);
   integer1 cnp_number_shift0 := ROUND(Specificities[1].cnp_number_specificity - 13);
   integer2 cnp_number_switch_shift0 := ROUND(1000*Specificities[1].cnp_number_switch - 1);
   integer1 active_duns_number_shift0 := ROUND(Specificities[1].active_duns_number_specificity - 27);
-  integer2 active_duns_number_switch_shift0 := ROUND(1000*Specificities[1].active_duns_number_switch - 44);
-  integer1 duns_number_shift0 := ROUND(Specificities[1].duns_number_specificity - 26);
-  integer2 duns_number_switch_shift0 := ROUND(1000*Specificities[1].duns_number_switch - 114);
-  integer1 duns_number_concept_shift0 := ROUND(Specificities[1].duns_number_concept_specificity - 26);
-  integer2 duns_number_concept_switch_shift0 := ROUND(1000*Specificities[1].duns_number_concept_switch - 172);
+  integer2 active_duns_number_switch_shift0 := ROUND(1000*Specificities[1].active_duns_number_switch - 55);
+  integer1 duns_number_shift0 := ROUND(Specificities[1].duns_number_specificity - 27);
+  integer2 duns_number_switch_shift0 := ROUND(1000*Specificities[1].duns_number_switch - 66);
+  integer1 duns_number_concept_shift0 := ROUND(Specificities[1].duns_number_concept_specificity - 27);
+  integer2 duns_number_concept_switch_shift0 := ROUND(1000*Specificities[1].duns_number_concept_switch - 110);
   integer1 company_fein_shift0 := ROUND(Specificities[1].company_fein_specificity - 26);
-  integer2 company_fein_switch_shift0 := ROUND(1000*Specificities[1].company_fein_switch - 178);
+  integer2 company_fein_switch_shift0 := ROUND(1000*Specificities[1].company_fein_switch - 184);
   integer1 company_inc_state_shift0 := ROUND(Specificities[1].company_inc_state_specificity - 6);
-  integer2 company_inc_state_switch_shift0 := ROUND(1000*Specificities[1].company_inc_state_switch - 29);
+  integer2 company_inc_state_switch_shift0 := ROUND(1000*Specificities[1].company_inc_state_switch - 32);
   integer1 company_charter_number_shift0 := ROUND(Specificities[1].company_charter_number_specificity - 26);
-  integer2 company_charter_number_switch_shift0 := ROUND(1000*Specificities[1].company_charter_number_switch - 95);
+  integer2 company_charter_number_switch_shift0 := ROUND(1000*Specificities[1].company_charter_number_switch - 106);
   integer1 cnp_btype_shift0 := ROUND(Specificities[1].cnp_btype_specificity - 3);
-  integer2 cnp_btype_switch_shift0 := ROUND(1000*Specificities[1].cnp_btype_switch - 51);
+  integer2 cnp_btype_switch_shift0 := ROUND(1000*Specificities[1].cnp_btype_switch - 54);
+  INTEGER1 UnderLinks_shift0 := ROUND(Specificities[1].UnderLinks_specificity - 41);
+  INTEGER2 UnderLinks_switch_shift0 := ROUND(1000*Specificities[1].UnderLinks_switch - 0);
   END;
  
 EXPORT SpcShift := TABLE(Specificities,SpcShiftR);
@@ -390,4 +419,3 @@ EXPORT SpcShift := TABLE(Specificities,SpcShiftR);
 EXPORT AllProfiles := sbfe_id_specificity_profile + Lgid3IfHrchy_specificity_profile + company_name_specificity_profile + cnp_number_specificity_profile + active_duns_number_specificity_profile + duns_number_specificity_profile + company_fein_specificity_profile + company_inc_state_specificity_profile + company_charter_number_specificity_profile + cnp_btype_specificity_profile;
 END;
  
-

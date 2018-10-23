@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="HeaderFileThinTeaserService">
   <part name="IndustryCLASS" type="xsd:string"/>
   <part name="SSN" type="xsd:string"/>
@@ -89,7 +89,7 @@
 IMPORT ut, watchdog, NID, suppress, standard, doxie;
 			 
 EXPORT HeaderFileThinTeaserService := MACRO
-
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 #Constant('applicationType',suppress.Constants.ApplicationTypes.Consumer);
 
 	boolean  includeRelatives := false : stored('IncludeRelativeNames');

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Deathv2SearchService">
   
   <part name="DID" 								type="xsd:string"/>
@@ -40,6 +40,7 @@
 
 
 export SearchService() := macro
+ #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	#constant('SearchGoodSSNOnly',true);
 	#constant('SearchIgnoresAddressOnly',true);
 	#stored('ScoreThreshold',10);

@@ -1,4 +1,4 @@
-import Suppress, ut, AutoHeaderV2;
+﻿import Suppress, ut, AutoHeaderV2;
 
 EXPORT get_dids (dataset(AutoHeaderV2.layouts.unprocessed_input) ds_search_in, integer s_code=0,
 								 boolean forceLocal = true, boolean ShowMessages = false) := function
@@ -15,8 +15,11 @@ EXPORT get_dids (dataset(AutoHeaderV2.layouts.unprocessed_input) ds_search_in, i
     Self.ssn := AutoHeaderV2.translate.GetCleanedSSN (L.ssn, L.ApplicationType);
     Self := L;
   end;
-	ds_search := project(ds_search_in, Preprocess (Left)); 
-	lib_local := LIBCALL_header (ds_search, search_code);
+	ds_search := project(ds_search_in, Preprocess (Left));
+
+	// read here from stored
+	integer libVersion := AutoHeaderV2.Constants.LibVersion.LEGACY : STORED('SearchLibraryVersion');
+	lib_local := LIBCALL_header (ds_search, search_code, libVersion);
 
 	// remote search (note: no checking for temp_adl_service_ip='')
   lib_remote := AutoHeaderV2.functions.GetDIDsRemote (ds_search, search_code, _row.seisintadlservice);

@@ -1,4 +1,4 @@
-﻿IMPORT iesp, Risk_indicators, Riskwise, address, AutoStandardI;
+﻿IMPORT iesp, Risk_indicators, Riskwise, address, AutoStandardI,std;
 
 EXPORT Batch_Service() := FUNCTION
 
@@ -11,9 +11,11 @@ EXPORT Batch_Service() := FUNCTION
 	string9   AttributesVersionRequest	:= ''  : stored('AttributesVersionRequest'); 
 	string50 	Custom_Model 						  := ''  : stored('Custom_Model');
 
+  BOOLEAN DEBUG := False;
 	
 	PB_wseq := project( batch_in, transform( ProfileBooster.Layouts.Layout_PB_In, 
 																	self.seq := counter; 
+                                  
 																	cleaned_name := address.CleanPerson73(left.Name_Full);
 																	boolean valid_cleaned := left.Name_Full <> '';
 																	
@@ -22,19 +24,24 @@ EXPORT Batch_Service() := FUNCTION
 																	self.Name_Middle := stringlib.stringtouppercase(if(left.Name_Middle='' AND valid_cleaned, cleaned_name[26..45], left.Name_Middle));
 																	self.Name_Suffix := stringlib.stringtouppercase(if(left.Name_Suffix ='' AND valid_cleaned, cleaned_name[66..70], left.Name_Suffix));	
 																	self.Name_Title  := stringlib.stringtouppercase(if(valid_cleaned, cleaned_name[1..5],''));
-
+                              
 																	street_address := risk_indicators.MOD_AddressClean.street_address(left.street_addr, left.streetnumber, left.streetpredirection, left.streetname, left.streetsuffix, left.streetpostdirection, left.unitdesignation, left.unitnumber);
 																	self.street_addr := street_address;
+                                 
 																	self := left ) );
   
-  setvalidmodels :=['PBM1803_0'];
-  domodel := TRIM(TRIM(stringlib.stringtouppercase(Custom_Model),LEFT),RIGHT) IN setvalidmodels;
+  setvalidmodels :=['PBM1803_0','PB1708_1'];
+  custommodel_in := TRIM(std.str.touppercase(Custom_Model),ALL);
+  domodel := custommodel_in IN setvalidmodels;
   
   
-  attributes := ProfileBooster.Search_Function(PB_wseq, DataRestriction, DataPermission, AttributesVersionRequest, false, domodel);  
+  attributes := ProfileBooster.Search_Function(PB_wseq, DataRestriction, DataPermission, AttributesVersionRequest,domodel,custommodel_in);  
 
+#IF(DEBUG)
 
-
+  final := attributes;
+  
+#ELSE
 	ProfileBooster.Layouts.Layout_PB_BatchOutFlat addAcct(attributes le, PB_wSeq ri) := transform
 		self.AcctNo 																	:= ri.AcctNo;
 		self.seq																			:= le.seq;
@@ -217,28 +224,29 @@ EXPORT Batch_Service() := FUNCTION
 		self.v1_RaAOccBusinessAssocMmbrCnt						:= le.attributes.version1.RaAOccBusinessAssocMmbrCnt;
 		self.v1_RaAInterestSportPersonMmbrCnt					:= le.attributes.version1.RaAInterestSportPersonMmbrCnt;
 		
-		self.v1_PPCurrOwnedAutoVIN				:= le.attributes.version1.PPCurrOwnedAutoVIN;
-		self.v1_PPCurrOwnedAutoYear			:= le.attributes.version1.PPCurrOwnedAutoYear;
-		self.v1_PPCurrOwnedAutoMake				:= le.attributes.version1.PPCurrOwnedAutoMake;
-		self.v1_PPCurrOwnedAutoModel				:= le.attributes.version1.PPCurrOwnedAutoModel;
-		self.v1_PPCurrOwnedAutoSeries				:= le.attributes.version1.PPCurrOwnedAutoSeries;
-		self.v1_PPCurrOwnedAutoType				:= le.attributes.version1.PPCurrOwnedAutoType;
+		self.v1_PPCurrOwnedAutoVIN			             	:= le.attributes.version1.PPCurrOwnedAutoVIN;
+		self.v1_PPCurrOwnedAutoYear			              := le.attributes.version1.PPCurrOwnedAutoYear;
+		self.v1_PPCurrOwnedAutoMake			            	:= le.attributes.version1.PPCurrOwnedAutoMake;
+		self.v1_PPCurrOwnedAutoModel				          := le.attributes.version1.PPCurrOwnedAutoModel;
+		self.v1_PPCurrOwnedAutoSeries				          := le.attributes.version1.PPCurrOwnedAutoSeries;
+		self.v1_PPCurrOwnedAutoType				            := le.attributes.version1.PPCurrOwnedAutoType;
 		self.score1                                   := le.attributes.version1.score1;
+    self.scorename1                               := custommodel_in;
 		self := le;
 	end;	
 	
 	final := join(attributes, PB_wSeq, 
 								left.seq = right.seq,
 								addAcct(left, right), left outer); 
-
+#END
 /* ********************
  *  Debugging Section *
  **********************/
 
 // OUTPUT(glba, NAMED('glba'));																					 
 // OUTPUT(batch_in, NAMED('batch_in'));																					 
-// OUTPUT(PB_wseq, NAMED('PB_wseq'));																					 
-// OUTPUT(attributes, NAMED('attributes'));
+ //OUTPUT(PB_wseq, NAMED('PB_wseq'));																					 
+ //OUTPUT(attributes, NAMED('attributes1'));
 																					 
 RETURN OUTPUT(final, NAMED('Results'));																					 
 

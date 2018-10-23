@@ -1,10 +1,12 @@
-/*2014-11-16T00:19:09Z (Nathan Koubsky)
+﻿/*2014-11-16T00:19:09Z (Nathan Koubsky)
 Added core roxie ip
 */
 import risk_indicators, Phone_Shell, Data_Services;
 
 // placeholder for all of the roxie VIPs to use when processing files using soapcall
 export shortcuts := module
+
+ export prod_batch_analytics_roxie := 'http://10.176.71.36:9856';  // use this VIP starting week of 2018-02-12
 
 	export prod_batch_neutral := 'http://roxiebatch.br.seisint.com:9856';
 	export prod_batch_fcra := 'http://fcrabatch.sc.seisint.com:9876';
@@ -18,13 +20,20 @@ export shortcuts := module
 
 	export QA_neutral_roxieIP := 'http://roxieqavip.br.seisint.com:9876'; 
 
-  export core_roxieIP := 'http://10.176.68.187:9876/';
+  export core_96_roxieIP := 'http://10.176.68.187:9876/';
+  export core_97_roxieIP := 'http://10.176.68.184:9876/';
 
 	export dev190 := 'http://roxiedevvip.sc.seisint.com:9876'; // stu's roxie, 190
 	export Dev192 := 'http://roxiedevvip2.sc.seisint.com:9876';  // dev roxie 192
 	export Dev194 := 'http://roxiedevvip3.sc.seisint.com:9876';  // dev roxie 194
 	export Dev196 := 'http://roxiedataqa.sc.seisint.com:9876';  // dev roxie 196
 	
+  export dev154 := 'http://dev154vip.hpcc.risk.regn.net:9876'; // dev roxie 154
+	export Dev155 := 'http://dev155vip.hpcc.risk.regn.net:9876';  // dev roxie 155
+	export Dev156 := 'http://dev156vip.hpcc.risk.regn.net:9876';  // dev roxie 156
+	export Dev157 := 'http://dev157vip.hpcc.risk.regn.net:9876';  // dev roxie 157
+	export Dev158 := 'http://dev158vip.hpcc.risk.regn.net:9876';  // dev roxie 158
+    
 	// keep these 4 around just in case there are any scripts using them
 	export Dev64RoxieIP := dev190;
 	export Dev64 := dev190; 
@@ -65,9 +74,10 @@ export shortcuts := module
 	export gw_targus    := dataset( [{'targus','http://rw_data_dev:Password01@rwgatewaycert.br.seisint.com:8090/wsGateway'}], risk_indicators.layout_gateways_in );
 	export gw_targus_sco:= dataset( [{'targus','http://rw_score_dev:Password01@rwgatewaycert.br.seisint.com:8090/wsGateway'}], risk_indicators.layout_gateways_in );
 	export gw_attus     := dataset( [{'attus','http://rw_score_dev:Password01@rwgatewaycert.br.seisint.com:8090/wsGateway'}], risk_indicators.layout_gateways_in );
-	export gw_netacuity := dataset( [{'netacuity','http://rw_score_dev:Password01@rwgatewaycert.sc.seisint.com:7726/WsGateway'}], risk_indicators.layout_gateways_in );
-	export gw_netacuityv4 := dataset( [{'netacuity','http://rw_score_dev:Password01@rwgatewaycert.sc.seisint.com:7726/WsGateway/?ver_=1.93'}], risk_indicators.layout_gateways_in );
-	export gw_FCRA      := dataset( [{'FCRA','http://roxieqavip.br.seisint.com:9876'}], risk_indicators.layout_gateways_in );
+	export gw_netacuityv4_cert := dataset( [{'netacuity','http://rw_score_dev:Password01@rwgatewaycert.sc.seisint.com:7726/WsGateway/?ver_=1.93'}], risk_indicators.layout_gateways_in );
+  export gw_netacuityv4 := dataset( [{'netacuity','https://rox_netacuitygw:g3t3m2018@gatewayprodesp.sc.seisint.com:8726/WsGateway/?ver_=1.93'}], risk_indicators.layout_gateways_in );
+	
+  export gw_FCRA      := dataset( [{'FCRA','http://roxieqavip.br.seisint.com:9876'}], risk_indicators.layout_gateways_in );
 	export gw_personContext	:= dataset( [{'delta_personcontext','http://ln_api_dempsey_dev:g0n0l3s!@10.176.68.172:7534/WsSupport/?ver_=2'}], risk_indicators.layout_gateways_in );
 	//deltabase gateways for Inquiries
 	export gw_delta_dev := dataset( [{'delta_inquiry','http://rw_score_dev:Password01@10.176.68.151:7909/WsDeltaBase/preparedsql'}], risk_indicators.layout_gateways_in );
@@ -202,17 +212,43 @@ export shortcuts := module
 	EXPORT ox50_in := RECORD
 		unsigned8 time_ms{xpath('_call_latency_ms')} := 0;  // picks up timing
 		INTEGER version := 0;
-		risk_indicators.Layout_Boca_Shell -LnJ_datasets -consumerstatements;	
+		risk_indicators.Layout_Boca_Shell -LnJ_datasets -consumerstatements - bk_chapters;	
 		string200 errorcode;
 	end;
+  
+	EXPORT ox53 := RECORD
+		Risk_Indicators.layout_bocashell_53temp;
+	END;
+
+	EXPORT ox54 := RECORD
+		Risk_Indicators.layout_bocashell_54temp;
+	END;
+
+  EXPORT ox41ADL := RECORD
+    Risk_Indicators.layout_bocashell_41ADLtemp;
+  END;
 	
 // keeping a copy of these shells on dataland thor50_dev cluster and prod pound_option_thor cluster
-	export validation_fcra_shell108k_41    := dataset( '~thor50_dev::out::fcrashell41_validation_108k__w20150506-141026',  ox50, csv(quote('"'), maxlength(15000)) );
-	export validation_nonfcra_shell108k_41 := dataset( '~thor50_dev::out::nonfcrashell41_validation_108k__w20150506-125953',  ox50, csv(quote('"'), maxlength(15000)) );
-	
-	export validation_fcra_shell108k_50    := dataset( '~thor50_dev::out::fcrashell50_validation_108k__w20150506-140238',  ox50, csv(quote('"'), maxlength(15000)) );
-	export validation_nonfcra_shell108k_50 := dataset( '~thor50_dev::out::nonfcrashell50_validation_108k__w20150506-125241-1',  ox50, csv(quote('"'), maxlength(15000)) );
-	
+	export validation_fcra_shell108k_41    := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::fcrashell41_validation_108k__w20180510-094626',  ox54, csv(quote('"'), maxlength(15000)) );
+	export validation_nonfcra_shell108k_41 := dataset( Data_services.foreign_dataland + 'thor50_dev::out::nonfcrashell41_validation_108k__w20150506-125953',  ox50, csv(quote('"'), maxlength(15000)) );
+  export validation_fcraADL_shell108k_41 := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::fcrashell41_adl_validation_108k__w20180328-104402',  ox41ADL, csv(quote('"'), maxlength(15000)) );
+
+	export validation_fcra_shell108k_50    := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::fcrashell50_validation_108k__w20180214-115527',  ox50, csv(quote('"'), maxlength(15000)) );
+	export validation_nonfcra_shell108k_50 := dataset( Data_services.foreign_dataland + 'thor50_dev::out::nonfcrashell50_validation_108k__w20171003-125613_layout_50temp',  ox50, csv(quote('"'), maxlength(15000)) );
+
+// since the 52 shell files weren't created until after 53 was already in, both sets of files are in the same layout, which is why they can all use the 'ox53' layout above.
+	export validation_fcra_shell108k_52    := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::fcrashell52_validation_108k__w20171212-093750',  ox53, csv(quote('"'), maxlength(15000)) );
+	export validation_nonfcra_shell108k_52 := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::nonfcrashell52_validation_108k__w20171212-095636',  ox53, csv(quote('"'), maxlength(15000)) );
+	export validation_fcraADL_shell108k_52 := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::fcrashell52_adl_validation_108k__w20180410-162819',  ox54, csv(quote('"'), maxlength(15000)) );
+
+	export validation_fcra_shell108k_53    := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::fcrashell53_validation_108k__w20171212-091317',  ox53, csv(quote('"'), maxlength(15000)) );
+	export validation_nonfcra_shell108k_53 := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::nonfcrashell53_validation_108k__W20171212-101115',  ox53, csv(quote('"'), maxlength(15000)) );
+	export validation_fcraADL_shell108k_53 := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::fcrashell53_adl_validation_108k__w20171212-102405',  ox53, csv(quote('"'), maxlength(15000)) );
+
+	export validation_fcra_shell108k_54    := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::fcrashell54_validation_108k__w20180426-163345',  ox54, csv(quote('"'), maxlength(15000)) );
+	export validation_nonfcra_shell108k_54 := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::nonfcrashell54_validation_108k__w20180426-161125',  ox54, csv(quote('"'), maxlength(15000)) );
+	export validation_fcraADL_shell108k_54 := dataset( Data_services.foreign_dataland + 'thor50_dev02::out::fcrashell54_adl_validation_108k__w20180426-164321',  ox54, csv(quote('"'), maxlength(15000)) );
+
 //commented out since the layout has changed too much. If need, recreate	
 	// export	ox50btst := record
 		// unsigned8 time_ms := 0;
@@ -234,9 +270,13 @@ export shortcuts := module
 	// The following are used for Phone Shell model validation - Boca Shell Version 41.  Join by Account Number AND Gathered Phone to get a unique record for validation. 95,000 inputs = 987,090 phones
 	// Unique Join for full layout: Input_Echo.AcctNo AND Gathered_Phone
 //file is too old so need to recreate if need it
-	// export validation_phone_shell95k_41 := dataset('~bpahl::validation::phone_shell_w20131217-152013.csv', Phone_Shell.Layout_Phone_Shell_Temp.Phone_Shell_Layout, CSV(HEADING(single), QUOTE('"')));
+//	// export validation_phone_shell95k_41 := dataset('~bpahl::validation::phone_shell_w20131217-152013.csv', Phone_Shell.Layout_Phone_Shell_Temp.Phone_Shell_Layout, CSV(HEADING(single), QUOTE('"')));
+export validation_phone_shell95k_41_gatewaysoff := dataset('~njj::out::phone_shell_sample_mar18_1p-equifax_off_tmppsw20180522-155400.csv', Phone_Shell.Layout_Phone_Shell_Temp.Phone_Shell_Layout, CSV(HEADING(single), QUOTE('"')));
+export validation_phone_shell95k_41_gatewayson := dataset('~njj::out::phone_shell_sample_mar18_1p-equifax_on_tmppsw20180522-155230.csv', Phone_Shell.Layout_Phone_Shell_Temp.Phone_Shell_Layout, CSV(HEADING(single), QUOTE('"')));
 	// Unique Join for modeling layout: AcctNo AND Gathered_Ph
-	export validation_phone_shell95k_modelinglayout_41 := dataset('~bpahl::validation::phone_shell_modelinglayout_w20131217-152013.csv', Phone_Shell.Layout_Modeling_Shell, CSV(HEADING(single), QUOTE('"')));
+	// // export validation_phone_shell95k_modelinglayout_41 := dataset('~bpahl::validation::phone_shell_modelinglayout_w20131217-152013.csv', Phone_Shell.Layout_Modeling_Shell, CSV(HEADING(single), QUOTE('"')));
+export validation_phone_shell95k_modelinglayout_41_gatewaysoff := dataset('~njj::out::phone_shell_sample_mar18_1p-equifax_off_modelinglayout_w20180522-155400.csv', Phone_Shell.Layout_Modeling_Shell, CSV(HEADING(single), QUOTE('"')));
+export validation_phone_shell95k_modelinglayout_41_gatewayson := dataset('~njj::out::phone_shell_sample_mar18_1p-equifax_on_modelinglayout_w20180522-155230.csv', Phone_Shell.Layout_Modeling_Shell, CSV(HEADING(single), QUOTE('"')));
 
 	// for converting PRII files from Nick's team to layout_batch_in:
 	export PRII2Batch( dataset(prii_layout) prii_in ) := FUNCTION

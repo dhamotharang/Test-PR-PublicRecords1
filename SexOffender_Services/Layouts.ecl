@@ -211,6 +211,8 @@ export Layouts := MODULE
 		Batchshare.layouts.ShareErrors;
 		unsigned SequenceNumber :=0;  // FCRA FFD
 		FFD.Layouts.ConsumerFlags;
+		SexOffender.Layout_Out_Main.did;
+    string12 inquiry_lexid := '';
 	END;
   EXPORT batch_out_pre := RECORD(batch_out)            //FCRA FFD
 	  DATASET (FFD.Layouts.ConsumerStatementBatch) statements;

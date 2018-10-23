@@ -1,4 +1,4 @@
-import doxie, FaaV2_PilotServices, faa, iesp, suppress, ut,fcra, FFD;
+﻿import doxie, FaaV2_PilotServices, faa, iesp, suppress, ut,fcra, FFD;
 
 rec_slim := faav2_PilotServices.Layouts.pilotUniqueIDPlus;
 rec_pilot := faav2_pilotServices.layouts.pilotRawRec;
@@ -62,8 +62,8 @@ export Raw := module
     //---------------------------------------FCRA FFD----------------------------------------------------------------	
 	
     rec_pilot xformPILOT ( rec_pilot L , FFD.Layouts.PersonContextBatchSlim R ) := transform,
-		skip(~ShowDisputedRecords and r.isDisputed) 
-			self.StatementIDs := if(showConsumerStatements, r.StatementIDs, FFD.Constants.BlankStatements);
+		skip((~ShowDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs))) 
+			self.StatementIDs := r.StatementIDs;
 			self.isDisputed :=	r.isDisputed;
 			self := L;
 	  end;
@@ -124,8 +124,8 @@ export Raw := module
 			//---------------------------------------FCRA FFD----------------------------------------------------------------	
 			
 			rec_cert xformCERT ( rec_cert L , FFD.Layouts.PersonContextBatchSlim R ) := transform,
-			skip(~ShowDisputedRecords and r.isDisputed) 
-			self.StatementIDs := if(showConsumerStatements, r.StatementIDs, FFD.Constants.BlankStatements);
+			skip((~ShowDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs))) 
+			self.StatementIDs := r.StatementIDs;
 			self.isDisputed :=	r.isDisputed;
 			self := L;
 			end;

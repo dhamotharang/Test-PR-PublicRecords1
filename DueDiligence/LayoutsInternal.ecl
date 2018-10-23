@@ -3,7 +3,7 @@
 EXPORT LayoutsInternal := MODULE
 
  EXPORT InternalSeqAndIdentifiersLayout := RECORD
-		UNSIGNED4 seq;
+		UNSIGNED6 seq;
 		UNSIGNED6 ultID;
 		UNSIGNED6 orgID;
 		UNSIGNED6 seleID;
@@ -12,16 +12,13 @@ EXPORT LayoutsInternal := MODULE
     UNSIGNED6 did;
 	END; 
 	
-	EXPORT CommonGeographicLayout   := RECORD
-		DueDiligence.Layouts.BusOperLocationLayout;
-	END;
 	
+  
 	
 //*** This is my simple/flat dataset - use this layout to call the getGeographic Risk ***
 	EXPORT GeographicLayout   := RECORD
 	 InternalSeqAndIdentifiersLayout;
-	 unsigned4  GeoSequence;
-	 CommonGeographicLayout;
+	 DueDiligence.Layouts.CommonGeographicLayout;
 	END;
  
  
@@ -29,7 +26,7 @@ EXPORT LayoutsInternal := MODULE
 	EXPORT OperatingLocationLayout := RECORD
 		InternalSeqAndIdentifiersLayout;                                 
 		UNSIGNED3 addrCount;
-		DATASET(CommonGeographicLayout) locAddrs;
+		DATASET(DueDiligence.Layouts.CommonGeographicLayout) locAddrs;
 	END;
 	
 	
@@ -101,79 +98,103 @@ EXPORT LayoutsInternal := MODULE
   END;
 
 
-//------                                      ------
-//------  BusPropertyOwnedWithDetails         ------
-//------  Populated with data for the report  ------
-//------                                      ------
-  EXPORT PropertySlimLayout := RECORD
-   InternalSeqAndIdentifiersLayout  PropertyReportData;
-	  unsigned4 propertySeq;   
-		 STRING12  LNFaresId;
-		 STRING80  AssesseeName;
-		 STRING45  BusinessType;
-		 STRING8   SaleDate; 
-		 INTEGER2  LengthOfOwnership;
-		 INTEGER8  PurchasePrice;
-		 STRING1   OwnerOccupied;
-	  INTEGER8  TaxAssdValue;   
-   INTEGER8  TaxAmount;
-	  STRING4   TaxYear;
-	  UNSIGNED4 HistoryDate;
-		 string80  cname;
-		 string10  prim_range;
-   string2   predir;
-   string28  prim_name;
-   string4   suffix;
-   string2   postdir;
-   string10  unit_desig;
-   string8   sec_range;
-   string25 p_city_name;
-   string25 v_city_name;
-   string2   st;
-   string5   zip;
-   string4   zip4;
-	  STRING5   County;
-		 //STRING20  countyName;
-		 string7   geo_blk;
-		 DueDiligence.Layouts.GeographicRiskLayout;
-  END;					
-	
-	
 
-//------                                      ------
-//------                                      ------
-//------  Populated with data for the report  ------
-//------                                      ------
- EXPORT VehicleSlimLayout := RECORD
-  InternalSeqAndIdentifiersLayout  VehicleReportData;
-  string30		Vehicle_Key;
-		string15		Iteration_Key;
-		string2			Source_Code;
-		string1     Orig_name_type;
-		string25		Orig_VIN;                       //*** VIN
-		string4			Orig_Year;                      //*** Year
-		string5			Orig_Make_Code;                 //???
-		string36		Orig_Make_Desc;                 //*** Make
-		string3			Orig_Series_Code;
-		string25		Orig_Series_Desc;               //*** class type?
-		string3			Orig_Model_Code;                //???
-		string30		Orig_Model_Desc;                //*** Model
-		unsigned6   Vina_Price;                     //*** base price
-		UNSIGNED4   historyDateYYYYMMDD;
-		unsigned4   sl_vehicleCount  := 0;
-		string30    license_Plate_Type;            //*** reg license plate type desc
-		string50    Class_Type;
-		/*  Registration */
-		string2     Registered_State;                     //*** Title State
-	 integer2    Registered_Year;                      //*** Title Year
-		integer2    Registered_Month;                     //*** Title Month
-		integer2    Registered_Day; 
-		/*  Title        */  
-		string2     Title_State;                     //*** Title State
-	 integer2    Title_Year;                      //*** Title Year
-		integer2    Title_Month;                     //*** Title Month
-		integer2    Title_Day;                       //*** Title Day  
- END;		
+  EXPORT PropertySlimLayout := RECORD
+   InternalSeqAndIdentifiersLayout; 
+   STRING12  LNFaresId;
+   STRING2   sourceCode;
+
+   //person related
+   BOOLEAN inquiredOwned;
+   BOOLEAN spouseOwned;
+   DATASET(DueDiligence.Layouts.DIDAndName) ownerNames;
+   STRING1 vacancyIndicator;
+
+   //business related
+   UNSIGNED4 dateFirstSeen;
+   UNSIGNED4 dateLastSeen;
+   STRING120 ownerName;
+ 
+   //used for report by both person/business
+   UNSIGNED4 historyDate;
+   STRING50  addressType;
+   STRING1   ownerOccupied;
+   
+   STRING8   recordingDate;
+   STRING8   purchaseDate; 
+   INTEGER8  purchasePrice;
+   INTEGER2  lengthOfOwnership;
+
+   STRING4 assessedYear;
+   INTEGER8 assessedTotalValue;
+
+   DueDiligence.Layouts.AddressSlimDetail;
+  END;					
+  
+	
+  
+  EXPORT WatercraftSlimLayout := RECORD
+   InternalSeqAndIdentifiersLayout; 
+   STRING30 watercraftKey;		//used to get watercraft details
+	 STRING30 sequenceKey;			//used to get watercraft details
+	 STRING2 stateOrigin;			//used to get watercraft details
+  
+   UNSIGNED4 historyDate;
+   DueDiligence.Layouts.WatercraftDataLayout;
+  END;	
+  
+  EXPORT SharedWatercraftSlim := RECORD
+    InternalSeqAndIdentifiersLayout;
+    UNSIGNED4 totalWatercraft;
+    UNSIGNED2 maxWatercraftLength;
+    DATASET(DueDiligence.Layouts.WatercraftDataLayout) allWatercraft;
+  END;
+  
+  EXPORT AircraftSlimLayout := RECORD
+    InternalSeqAndIdentifiersLayout;
+    
+    UNSIGNED4 historyDate;
+    UNSIGNED6 id;
+    UNSIGNED4 dateFirstSeen;
+    UNSIGNED4 dateLastSeen;
+    STRING1 statusFlag;
+    
+    DueDiligence.Layouts.AircraftDataLayout;
+  END;
+
+
+  EXPORT VehicleSlimLayout := RECORD
+    InternalSeqAndIdentifiersLayout;
+    STRING30 Vehicle_Key;
+    STRING15 Iteration_Key;
+    STRING15 Sequence_Key;
+    UNSIGNED4 historyDate, 
+    UNSIGNED4 dateFirstSeen;
+    STRING1 historyFlag;
+    STRING1 nameType;
+    DueDiligence.Layouts.VehicleDataLayout;
+    //DPPA verification fields
+    STRING2 stateOrigin;
+    STRING2 sourceCode;
+    
+    //TO BE REMOVED AFTER DUEDIL-424
+    InternalSeqAndIdentifiersLayout  VehicleReportData;
+    string2			Source_Code;
+    string1     Orig_name_type;
+    string5			Orig_Make_Code;                 
+    string3			Orig_Series_Code;
+    string25		Orig_Series_Desc;               
+    string3			Orig_Model_Code;                
+    UNSIGNED4   historyDateYYYYMMDD;
+    unsigned4   sl_vehicleCount  := 0;
+  END;		
+ 
+ EXPORT SharedVehicleSlim := RECORD
+    InternalSeqAndIdentifiersLayout;
+    UNSIGNED4 totalvehicleCount;  //TO BE REMOVED AFTER DUEDIL-424 
+    UNSIGNED6 maxBasePrice;
+    DATASET(DueDiligence.Layouts.VehicleDataLayout) allVehicles;
+  END;
 
 
 //------                                      ------
@@ -246,19 +267,9 @@ END;
 	
 	
 //------                                     ------
-//------   Criminal Offense details          ------
-//------                                     ------
-//------                                     ------
-	EXPORT CriminalDATASETLayout := RECORD
-  unsigned4		seq := 0;
-		unsigned6 	did;
-		string60 	offender_key; 
-		DATASET(DueDiligence.Layouts.CriminalOffenseLayout_by_DIDOffense) DIDOffenses;
-	END;
-	
 	EXPORT CriminalOffenses := RECORD
 		InternalSeqAndIdentifiersLayout;
-		DueDiligence.Layouts.CriminalOffenseLayout_by_DIDOffense offense;
+		DueDiligence.Layouts.CriminalOffenses offense;
 	END;
 	
 
@@ -286,8 +297,91 @@ END;
     DATASET(DueDiligence.Layouts.FEINLayoutSources) Sources;    
 	END;
   
+  
 
+  EXPORT IndCrimLayoutFinal := RECORD
+    InternalSeqAndIdentifiersLayout;
+    STRING sort_key;
+    STRING sort_eventTypeCodeFull;
+    UNSIGNED1 temp_chargeLevelCalcWeight;
+    DueDiligence.Layouts.CriminalOffenses
+  END;
 
+  EXPORT IndCrimLayoutFlat := RECORD
+    InternalSeqAndIdentifiersLayout;
+    UNSIGNED4 historyDate;
+    
+    //misc additional fields
+    STRING offenderKey;
+    STRING sort_key;
+    STRING sort_eventTypeCodeFull;
+    STRING8 temp_date;
+    UNSIGNED temp_category;
+    UNSIGNED4 temp_calcdFirstSeenDate;
+    STRING8 temp_firstReportedActivity; 
+    BOOLEAN temp_previouslyIncarcerated;
+    STRING1 temp_offenseScore;
+    STRING5 temp_courtOffLevel;
+    
+    //event type category hits
+    BOOLEAN attr_legalEventCat9;
+    BOOLEAN attr_legalEventCat8;
+    BOOLEAN attr_legalEventCat7;
+    BOOLEAN attr_legalEventCat6;
+    BOOLEAN attr_legalEventCat5;
+    BOOLEAN attr_legalEventCat4;
+    BOOLEAN attr_legalEventCat3;
+    BOOLEAN attr_legalEventCat2;
+    
+    //Top Level Data
+    STRING50 state;
+    STRING25 source; //also used in source info
+    STRING caseNumber;
+    STRING offenseStatute;
+    STRING8 offenseDDFirstReportedActivity;
+    UNSIGNED4 offenseDDLastReportedActivity;
+    UNSIGNED4 offenseDDLastCourtDispDate;
+    UNSIGNED offenseDDLegalEventTypeCode;
+    STRING offenseDDLegalEventTypeMapped;
+    STRING offenseCharge; //also used in source info
+    STRING1 offenseDDChargeLevelCalculated;
+    STRING offenseChargeLevelReported; //also used in source info
+    STRING7 offenseConviction; //also used in source info
+    STRING15 offenseIncarcerationProbationParole;
+    STRING7 offenseTrafficRelated;
+    
+    //Additional details
+    STRING30 county;
+    STRING40 countyCourt;
+    STRING40 city;
+    STRING50 agency;
+    STRING30 race;
+    STRING7 sex;
+    STRING15 hairColor;
+    STRING15 eyeColor;
+    STRING3 height;
+    STRING3 weight;
+    
+    //Source info
+    STRING1 offenseChargeLevelCalculated;
+    STRING courtDisposition1;
+    STRING courtDisposition2;
+    UNSIGNED4 offenseReportedDate;
+    UNSIGNED4 offenseArrestDate;
+    UNSIGNED4 offenseCourtDispDate;
+    UNSIGNED4 offenseAppealDate;
+    UNSIGNED4 offenseSentenceDate;
+    UNSIGNED4 offenseSentenceStartDate;
+    UNSIGNED4 DOCConvictionOverrideDate;
+    UNSIGNED4 DOCScheduledReleaseDate;
+    UNSIGNED4 DOCActualReleaseDate;
+    STRING DOCInmateStatus;
+    STRING DOCParoleStatus;
+    STRING offenseMaxTerm;
+    
+    //Party Names
+    STRING120 partyName;
+  END;
 
 
 END;

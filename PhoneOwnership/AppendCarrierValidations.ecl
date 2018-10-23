@@ -11,6 +11,7 @@ EXPORT AppendCarrierValidations(DATASET(PhoneOwnership.Layouts.BatchOut) ds_batc
 	// Only processing wireless phones and only the first identity for AT&T phones
 	Constants := PhoneOwnership.Constants;
 	dsPhoneIdentityValidationRequest := ds_batch_in(LexisNexisMatchCode != Constants.LNMatch.INVALID AND 
+													((AppendedFirstName<>'' AND AppendedSurname<>'') OR  AppendedCompanyName<>'') AND
 													(AppendedPhoneServiceType=Phones.Constants.PhoneServiceType.Wireless[1] OR 
 													AppendedPhoneLineType=Phones.Constants.PhoneServiceType.Wireless[1]) AND
 													(AppendedCarrierName!=Constants.ATTPhone OR (AppendedCarrierName=Constants.ATTPhone AND seq = 1)));
@@ -24,6 +25,8 @@ EXPORT AppendCarrierValidations(DATASET(PhoneOwnership.Layouts.BatchOut) ds_batc
 																SELF.middle_name:= LEFT.AppendedMiddleName,
 																SELF.last_name:= LEFT.AppendedSurname,
 																SELF.nameType:= LEFT.subj2own_relationship,
+																SELF.emailType:= IF(LEFT.AppendedEmailAddress<>'',LEFT.subj2own_relationship,''),
+																SELF.email_address:= LEFT.AppendedEmailAddress,
 																SELF.busult_id:=LEFT.ultid,
 																SELF.busorg_id:=LEFT.orgid,
 																SELF.bussele_id:=LEFT.seleid,
@@ -43,9 +46,9 @@ EXPORT AppendCarrierValidations(DATASET(PhoneOwnership.Layouts.BatchOut) ds_batc
 																SELF.st := LEFT.AppendedStateCode,
 																SELF.z5 := LEFT.AppendedZipCode,
 																SELF.zip4 := LEFT.AppendedZipCodeExtension,
+																SELF.county_name := '',
 																SELF.addressType:=LEFT.subj2own_relationship,
-																SELF:=LEFT, 
-																SELF:=[])),
+																SELF:=LEFT)),
 											DATASET([],Phones.Layouts.ZumigoIdentity.subjectVerificationRequest));
 	zMod := MODULE(Phones.IParam.inZumigoParams)
 		EXPORT STRING20 useCase := inMod.useCase;
@@ -53,6 +56,7 @@ EXPORT AppendCarrierValidations(DATASET(PhoneOwnership.Layouts.BatchOut) ds_batc
 		EXPORT STRING8	billingId := inMod.billingId;
 		EXPORT STRING20 productName := inMod.productName;
 		EXPORT BOOLEAN 	NameAddressValidation := inMod.NameAddressValidation;
+		EXPORT BOOLEAN 	AccountStatusInfo := inMod.AccountStatusInfo;
 		EXPORT STRING10 optInType := inMod.optInType;
 		EXPORT STRING5 	optInMethod := inMod.optInMethod;
 		EXPORT STRING3 	optinDuration := inMod.optinDuration;
@@ -72,7 +76,17 @@ EXPORT AppendCarrierValidations(DATASET(PhoneOwnership.Layouts.BatchOut) ds_batc
 		FirstNameMatch := Phones.Functions.isPassZumigo(r.first_name_score);
 		LastNameMatch  := Phones.Functions.isPassZumigo(r.last_name_score);
 		AddressMatch   := Phones.Functions.isPassZumigo(r.addr_score);
-		ZumigoMatch := FirstNameMatch OR LastNameMatch OR AddressMatch;
+		// business_name_score is only populated for AT&T and TMobile
+		BusinessNameMatch   := Phones.Functions.isPassZumigo(r.business_name_score);
+		EmailMatch   := Phones.Functions.isPassZumigo(r.email_address_score);
+		validPass := FirstNameMatch OR LastNameMatch OR AddressMatch OR BusinessNameMatch OR EmailMatch;
+		// Zumigo is currently returning -1 for score fields based on data submitted. 
+		// Hence identity fields should be populated with blanks below as expected. 
+		// Therefore no need for the additional isCancelled check.
+		isCancelled := r.account_status = Phones.Constants.PhoneStatus.CANCELLED;
+		isSuspended := r.account_status = Phones.Constants.PhoneStatus.SUSPENDED;
+		isActive := r.account_status = Phones.Constants.PhoneStatus.ACTIVE;
+		ZumigoMatch := validPass OR isCancelled;
 		FullNameMatch := FirstNameMatch AND LastNameMatch; 
 		SELF.acctno := l.acctno;
 		SELF.phone := l.phone;
@@ -80,7 +94,8 @@ EXPORT AppendCarrierValidations(DATASET(PhoneOwnership.Layouts.BatchOut) ds_batc
 		SELF.AppendedFirstName := IF(NOT ZumigoMatch OR FirstNameMatch,l.AppendedFirstName,'');
 		SELF.AppendedMiddleName := IF(NOT ZumigoMatch OR FullNameMatch,l.AppendedMiddleName,'');
 		SELF.AppendedSurname := IF(NOT ZumigoMatch OR LastNameMatch,l.AppendedSurname,'');
-		SELF.AppendedCompanyName := IF(NOT ZumigoMatch OR FullNameMatch,l.AppendedCompanyName,'');
+		SELF.AppendedCompanyName := IF(NOT ZumigoMatch OR BusinessNameMatch,l.AppendedCompanyName,'');
+		SELF.AppendedEmailAddress := IF(NOT ZumigoMatch OR EmailMatch,l.AppendedEmailAddress,'');
 		SELF.validatedRecord := ZumigoMatch;
 		SELF.AppendedStreetNumber := IF(NOT ZumigoMatch OR AddressMatch,l.AppendedStreetNumber,'');
 		SELF.AppendedPreDirectional := IF(NOT ZumigoMatch OR AddressMatch,l.AppendedPreDirectional,'');
@@ -94,12 +109,16 @@ EXPORT AppendCarrierValidations(DATASET(PhoneOwnership.Layouts.BatchOut) ds_batc
 		SELF.AppendedZipCode := IF(NOT ZumigoMatch OR AddressMatch,l.AppendedZipCode,'');
 		SELF.AppendedZipCodeExtension := IF(NOT ZumigoMatch OR AddressMatch,l.AppendedZipCodeExtension,'');
 		SELF.AppendedListingName := '';
-		SELF.AppendedLastDate := IF(ZumigoMatch,STD.Date.Today(),l.AppendedLastDate);			
-		SELF.source_category := l.source_category + IF(ZumigoMatch,PhoneOwnership.Constants.CARRIER,'');
+		SELF.AppendedLastDate := IF(ZumigoMatch OR isSuspended OR isActive,PhoneOwnership.Functions.TODAY,l.AppendedLastDate);	
+		SELF.disconnect_status := MAP(isCancelled => Constants.DisconnectStatus.CONFIRMED_DISCONNECTED,
+										isSuspended => Constants.DisconnectStatus.CONFIRMED_SUSPENDED,
+										(validPass OR isActive) AND l.disconnect_status<>'' => Constants.DisconnectStatus.HISTORIC_DISCONNECT,
+										l.disconnect_status);			
+		SELF.source_category := l.source_category + IF(ZumigoMatch OR isSuspended OR isActive,PhoneOwnership.Constants.CARRIER,'');
 		SELF.error_desc := l.error_desc + r.device_mgmt_status + IF(r.device_mgmt_status<>'',PhoneOwnership.Constants.DELIMITER,'');
 		inFNameMatch := PhoneOwnership.Functions.fuzzyString(l.name_first) = PhoneOwnership.Functions.fuzzyString(l.AppendedFirstName);
 		inLNameMatch := PhoneOwnership.Functions.fuzzyString(l.name_last) = PhoneOwnership.Functions.fuzzyString(l.AppendedSurname);
-		businessMatch := IF(l.subj2own_relationship IN Constants.BUSINESS_RELATIONS,Phones.Constants.ListingType.Business,''); 
+		businessMatch := IF(BusinessNameMatch OR l.subj2own_relationship IN Constants.BUSINESS_RELATIONS,Phones.Constants.ListingType.Business,''); 
 		inputAddressMatch := Risk_Indicators.iid_constants.ga(Risk_Indicators.AddrScore.AddressScore(
 																						l.appendedstreetnumber,l.appendedstreetname,l.appendedunitnumber,
 																						l.prim_range,l.prim_name,l.sec_range,
@@ -109,16 +128,29 @@ EXPORT AppendCarrierValidations(DATASET(PhoneOwnership.Layouts.BatchOut) ds_batc
 										inLNameMatch AND LastNameMatch AND inputAddressMatch AND AddressMatch AND NOT FirstNameMatch => Constants.LNMatch.NAME + Constants.LNMatch.RELATIVE + Constants.LNMatch.ADDRESS + Constants.LNMatch.PHONE,
 										inFNameMatch AND FirstNameMatch AND NOT AddressMatch => Constants.LNMatch.NAME + Constants.LNMatch.PHONE,
 										inLNameMatch AND LastNameMatch AND NOT FirstNameMatch AND NOT AddressMatch => Constants.LNMatch.NAME + Constants.LNMatch.RELATIVE + Constants.LNMatch.PHONE,
-										inputAddressMatch AND businessMatch='' AND AddressMatch => Constants.LNMatch.RELATIVE + Constants.LNMatch.ADDRESS + Constants.LNMatch.PHONE,
+										LastNameMatch AND inputAddressMatch AND businessMatch='' AND AddressMatch => Constants.LNMatch.RELATIVE + Constants.LNMatch.ADDRESS + Constants.LNMatch.PHONE,
 										inputAddressMatch AND AddressMatch => Constants.LNMatch.ADDRESS + Constants.LNMatch.PHONE,
-										businessMatch='' AND LastNameMatch => Constants.LNMatch.RELATIVE + Constants.LNMatch.PHONE,
+										businessMatch='' AND (LastNameMatch OR AddressMatch OR EmailMatch) => Constants.LNMatch.RELATIVE + Constants.LNMatch.PHONE,
+										isCancelled => Constants.LNMatch.CELL,
 										l.LexisNexisMatchCode) + businessMatch;
-		SELF.reason_codes := IF(fullNameMatch, Constants.Reason_Codes.MATCH,l.reason_codes);
-		SELF.ownership_index := IF(FirstNameMatch OR Phones.Functions.isValidZumigo(r.first_name_score),r.first_name_score,0) + 
+		SELF.reason_codes := MAP(fullNameMatch => Constants.Reason_Codes.MATCH,
+									isCancelled => Constants.Reason_Codes.CONFIRMED_DISCONNECTED,
+									ZumigoMatch AND NOT (FirstNameMatch OR LastNameMatch) => Constants.Reason_Codes.NO_IDENTITY, 
+									l.reason_codes) + IF(isSuspended, Constants.Reason_Codes.CONFIRMED_SUSPENDED,'');
+		SELF.TotalZumigoScore := IF(FirstNameMatch OR Phones.Functions.isValidZumigo(r.first_name_score),r.first_name_score,0) + 
 								IF(LastNameMatch OR Phones.Functions.isValidZumigo(r.last_name_score),r.last_name_score,0) +
-								IF(AddressMatch OR Phones.Functions.isValidZumigo(r.addr_score),r.addr_score,0); //preserved to sort by highest valued owner based on summed scores.
+								IF(AddressMatch OR Phones.Functions.isValidZumigo(r.addr_score),r.addr_score,0) +
+								IF(BusinessNameMatch OR Phones.Functions.isValidZumigo(r.business_name_score),r.business_name_score,0) +
+								IF(EmailMatch OR Phones.Functions.isValidZumigo(r.email_address_score),r.email_address_score,0); //preserved to sort by highest valued owner based on summed scores.
+								// ownership_index for Zumigo will be used to sort passing records.
+		SELF.ownership_index := MAP(isCancelled => Constants.Ownership.enumIndex.INVALID,
+									FirstNameMatch => Constants.Ownership.enumIndex.HIGH,
+									LastNameMatch => Constants.Ownership.enumIndex.MEDIUM_HIGH,
+									AddressMatch OR BusinessNameMatch OR EmailMatch => Constants.Ownership.enumIndex.MEDIUM,
+									Constants.Ownership.enumIndex.UNDETERMINED);
 								
-		SELF.ownership_likelihood := MAP((l.subj2own_relationship = Constants.Relationship.SUBJECT AND FirstNameMatch) OR (inFNameMatch AND inLNameMatch) => Constants.Ownership.HIGH,
+		SELF.ownership_likelihood := MAP(isCancelled => Constants.Ownership.NONE,
+											(l.subj2own_relationship = Constants.Relationship.SUBJECT AND FirstNameMatch) OR (FirstNameMatch AND inFNameMatch AND inLNameMatch) => Constants.Ownership.HIGH,
 										 	inLNameMatch AND NOT inFNameMatch => Constants.Ownership.MEDIUM_HIGH,
 											AddressMatch AND NOT FirstNameMatch AND NOT LastNameMatch => Constants.Ownership.MEDIUM,
 											NOT ZumigoMatch AND l.AppendedCarrierName=Constants.ATTPhone => Constants.Ownership.UNDETERMINED,
@@ -128,6 +160,7 @@ EXPORT AppendCarrierValidations(DATASET(PhoneOwnership.Layouts.BatchOut) ds_batc
 		SELF.subj2own_relationship := MAP(AddressMatch AND businessMatch='' AND NOT FirstNameMatch AND NOT LastNameMatch=> Constants.Relationship.ROOMMATE,
 										AddressMatch AND businessMatch<>'' => Constants.Relationship.BUSINESS,
 										LastNameMatch AND NOT FirstNameMatch AND businessMatch='' => Constants.Relationship.RELATIVE,
+										isCancelled => Constants.Relationship.NO_OWNER, // No valid owner
 										l.subj2own_relationship);								
 		SELF := l;
 	END;

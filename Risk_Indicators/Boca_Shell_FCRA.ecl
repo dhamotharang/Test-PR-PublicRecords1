@@ -278,7 +278,7 @@ ret := risk_indicators.Boca_Shell_Function_FCRA
     false, require2Ele, includeRelativeInfo, true, false, true, TRUE, FALSE, FALSE, 
     FALSE, FALSE, 1, FALSE, FALSE, 0.84, version, isPreScreen, doScore, nugen, 
 		ADL_Based_Shell,dataRestriction, AppendBest, BSOptions,
-		DataPermission, false, IncludeLnJ, false, ReportingPeriod);
+		DataPermission, false, IncludeLnJ, ReportingPeriod);
 
 output (ret, NAMED('Results'))
 

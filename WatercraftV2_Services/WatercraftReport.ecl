@@ -24,10 +24,11 @@ export WatercraftReport(WatercraftV2_services.Interfaces.report_Params in_params
 																																								in_params.include_non_regulated_sources,slim_pc_recs,
 																																								in_params.FFDOptionsMask);
 
- suppress_results_due_alerts := isFCRA and FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_params.FCRAPurpose, in_params.FFDOptionsMask)[1].suppress_records;
+  alert_indicators := FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_params.FCRAPurpose, in_params.FFDOptionsMask)[1];
+  suppress_results_due_alerts := isFCRA and alert_indicators.suppress_records;
 		
 	consumer_statements := if(IsFCRA and ShowConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements); 
- consumer_alerts := if(isFCRA, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, suppress_results_due_alerts), FFD.Constants.BlankConsumerAlerts);
+  consumer_alerts := if(isFCRA, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, alert_indicators, in_params.FFDOptionsMask), FFD.Constants.BlankConsumerAlerts);
 
 	//use sort from prepr to determine the desired record to output
 	summarized_prepr := dedup(prepr, watercraft_key);

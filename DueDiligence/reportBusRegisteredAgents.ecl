@@ -1,4 +1,4 @@
-﻿IMPORT BIPv2, Business_Risk_BIP, DueDiligence, Gateway, iesp;
+﻿IMPORT BIPv2, Business_Risk_BIP, DueDiligence, iesp;
 
 EXPORT reportBusRegisteredAgents(DATASET(DueDiligence.layouts.Busn_Internal) inData,
                                   Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
@@ -44,7 +44,7 @@ EXPORT reportBusRegisteredAgents(DATASET(DueDiligence.layouts.Busn_Internal) inD
     sortGroupAgents := GROUP(SORT(agents, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), -agent.dateLastSeen), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
   
     //limit the number of associated names for a given fein
-    DueDiligence.LayoutsInternal.Agent getMaxAgents(sortGroupAgents sgan, INTEGER agentCount) := TRANSFORM, SKIP(agentCount > iesp.constants.DDRAttributesConst.MaxAgents) 
+    DueDiligence.LayoutsInternal.Agent getMaxAgents(sortGroupAgents sgan, INTEGER agentCount) := TRANSFORM, SKIP(agentCount > iesp.constants.DDRAttributesConst.MaxRegisteredAgents) 
       SELF := sgan;
       SELF := [];
     END;
@@ -63,7 +63,7 @@ EXPORT reportBusRegisteredAgents(DATASET(DueDiligence.layouts.Busn_Internal) inD
     //get LexIDs
     busLexIDs := DueDiligence.getBusBIPId(cleanBusAgent.clean, options, linkingOptions, FALSE);
     indLexIDs := DueDiligence.getIndDID(cleanIndAgent.clean, options.DataRestrictionMask, options.DPPA_Purpose, options.GLBA_Purpose,
-                                        DueDiligence.Constants.DEFAULT_BS_VERSION, DueDiligence.Constants.DEFAULT_BS_OPTIONS, DATASET([], Gateway.Layouts.Config));
+                                        DueDiligence.CitDDShared.DEFAULT_BS_VERSION, DueDiligence.CitDDShared.DEFAULT_BS_OPTIONS);
    
 
                                                   

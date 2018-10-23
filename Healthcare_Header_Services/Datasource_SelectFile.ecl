@@ -337,7 +337,7 @@ Import Enclarity,ut,doxie_files,codes,Ingenix_NatlProf,Enclarity_Facility_Sancti
 																															 right.LegacyType);
 																		self.FullDesc := if(trim(left.sanc1_desc,right)<>'',left.sanc1_desc,right.desc);//Support new granular field data
 																		self.SancLevel := if(RIGHT.level='STATE','',RIGHT.level);
-																		self.StateOrFederal := if(RIGHT.level='STATE','STATE','FEDERAL');
+																		self.StateOrFederal := if(left.level='STATE','STATE','FEDERAL');
 																		self.SancLossOfLic := if((integer)left.ln_derived_rein_date>0,'FALSE',right.LossOfLicense);
 																		self:=left;
 																		self:=[]),
@@ -355,15 +355,6 @@ Import Enclarity,ut,doxie_files,codes,Ingenix_NatlProf,Enclarity_Facility_Sancti
 	Shared appendSanctionLookup(dataset(Healthcare_Header_Services.layouts.layout_sanctions) input):= function
 			Step1:=appendSanctionLookupStep1(input);
 			final:=appendSanctionGroup(Step1);
-			// output(input);
-			// output(rawdatalookup1);
-			// output(rawdatalookup2);
-			// output(rawdatalookup3);
-			// output(rawdatalookup4);
-			// output(grpDate);
-			// output(sanctions_final);
-			// output(finalSort);
-			// output(setGrpSortOrder);
 			return final;
 	end;
 	Export appendSanction(dataset(Healthcare_Header_Services.layouts.CombinedHeaderResults) input, dataset(Healthcare_Header_Services.layouts.GroupKey) searchby):= function
@@ -407,12 +398,12 @@ Import Enclarity,ut,doxie_files,codes,Ingenix_NatlProf,Enclarity_Facility_Sancti
 																								self.hasOIG := exists(SancRecs(stateorfederal='FEDERAL' and SancLevel = 'OIG'));
 																								self.hasOPM := exists(SancRecs(stateorfederal='FEDERAL' and SancLevel = 'OPM'));
 																								self := left),left outer);
-			// output(rawdata);
+			 //output(rawdata,named('encsancrawdata'),extend);
 			// output(UpdateLicenseStatus);
 			// output(appendLookups);
 			// output(grpSanc);
 			// output(sanctions_rollup);
-			// output(results);
+			// output(results,named('encsancresults'),extend);
 			return results;
 	end;
 
@@ -502,10 +493,10 @@ Import Enclarity,ut,doxie_files,codes,Ingenix_NatlProf,Enclarity_Facility_Sancti
 			// updateFEIN := join(baseRecs(min(names,namepenalty) < Healthcare_Header_Services.Constants.BUS_NAME_MATCH_THRESHOLD),fein_rolled,left.acctno=right.acctno,transform(Layouts.CombinedHeaderResults, self.feins:=dedup(sort(left.feins+right.childinfo,record),record);self:=left;self:=[];),left outer,keep(Constants.MAX_RECS_ON_JOIN), limit(0));
 			updateFEIN := join(mergedRecs,fein_rolled,left.acctno=right.acctno and left.lnpid=right.providerid,transform(Healthcare_Header_Services.layouts.CombinedHeaderResults, self.feins:=dedup(sort(left.feins+right.childinfo,record),record);self:=left;self:=[];),left outer,keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0));
 			updateSanctions := project(updateFEIN+getSanctionRecords,transform(Healthcare_Header_Services.layouts.CombinedHeaderResults,
-																										sanctionLookup := appendSanctionLookupStep1(left.Sanctions);
-																										FinalSanctions := appendSanctionGroup(sanctionLookup);
-																										self.Sanctions := FinalSanctions;
-																										self.LegacySanctions := Functions.buildLegacySanctionRecord(left,FinalSanctions);
+																		               // sanctionLookup := appendSanctionLookup(left.Sanctions);
+																										//FinalSanctions := appendSanctionGroup(sanctionLookup);
+																										//self.Sanctions := left.Sanctions;
+																										self.LegacySanctions := Functions.buildLegacySanctionRecord(left,left.sanctions);
 																										self := Left));
 			getInput:= project(input,transform(Healthcare_Header_Services.layouts.autokeyInput,self.license_state:=left.UserLicenseState;self.license_number:=left.UserLicenseNumber;
 																															self.TaxID:=left.userTaxID; self.UPIN:=left.userUPIN;self.NPI:=left.userNPI;
@@ -515,7 +506,7 @@ Import Enclarity,ut,doxie_files,codes,Ingenix_NatlProf,Enclarity_Facility_Sancti
 			facilities_final_sorted := sort(filterRec, acctno, SrcId, Src,vendorid);
 			facilities_final_grouped := group(facilities_final_sorted, acctno, SrcId, Src,vendorid);
 			facilities_rolled := rollup(facilities_final_grouped, group, Transforms.doSelectFileFacilitiesBaseRecordSrcIdRollup(left,rows(left)));			
-     return facilities_rolled;
+      return facilities_rolled;
 	end;
 
 	Export get_selectfile_entity (dataset(Healthcare_Header_Services.layouts.searchKeyResults_plus_input) input,dataset(Healthcare_Header_Services.layouts.common_runtime_config) cfg):= function

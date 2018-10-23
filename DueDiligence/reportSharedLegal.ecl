@@ -1,12 +1,13 @@
 ﻿IMPORT BIPv2, DueDiligence, iesp, Suppress;
 
+
 EXPORT reportSharedLegal := MODULE
 
   EXPORT getDDRLegalEventCriminalWithMasking(DATASET(DueDiligence.LayoutsInternalReport.FlatListOfIndividualsWithCriminalLayout) listOfIndAndOffenses, STRING6 ssnMasking) := FUNCTION
      
       Suppress.MAC_Mask(listOfIndAndOffenses, maskSSNInListOfIndividuals, ssn, '', TRUE, FALSE,,,,ssnMasking);
      
-      sortMaskedList := SORT(maskSSNInListOfIndividuals, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did, -earliestOffenseDate, offensescore);
+      sortMaskedList := SORT(maskSSNInListOfIndividuals, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did, -crimData.source, -crimData.offenseDDFirstReportedActivity, crimData.caseNumber);
       groupMaskedList := GROUP(sortMaskedList, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did);
       
       
@@ -42,74 +43,68 @@ EXPORT reportSharedLegal := MODULE
           SELF.ExecTitle               := le.mostRecentTitle;
           SELF.SSN                     := le.ssn;
           SELF.DOB                     := iesp.ECL2ESP.toDate(le.DOB);
-          SELF.criminalChildDS   := PROJECT(le, TRANSFORM(iesp.duediligenceshared.t_DDRLegalEventCriminal,
-                                                           //offense details
-                                                           SELF.CaseNumber               := LEFT.caseNum; 
-                                                           SELF.CourtType                := LEFT.courtType;
-                                                           SELF.CaseTypeDescription      := LEFT.caseTypeDesc;  //to be removed at later date replaced with CaseType
-                                                           SELF.CaseType                 := LEFT.caseTypeDesc; 
-                                                           SELF.ArrestLevelDescription   := LEFT.arrestLevel;  //to be removed at later date replaced with ArrestLevel
-                                                           SELF.ArrestLevel              := LEFT.arrestLevel;
-                                                           SELF.OffenseScore             := LEFT.offenseScore;  //??? Is this or OffenseScoreDescription displayed on web and are both needed??
-                                                           SELF.OffenseScoreDescription  := DueDiligence.translateCodeToText.OffenseScoreText(LEFT.offenseScore);  //??? Is this or OffenseScore displayed on web and are both needed??
-                                                           SELF.OffenseLevel             := LEFT.criminalOffenderLevel; //??? Is this or OffenseLevelDescription displayed on web and are both needed??
-                                                           SELF.OffenseLevelDescription  := DueDiligence.translateCodeToText.OffenseLevelText(LEFT.criminalOffenderLevel); //??? Is this or OffenseLevel displayed on web and are both needed??
-                                                           SELF.NumberOfCounts           := LEFT.num_of_counts;
-                                                           SELF.Conviction               := LEFT.convictionFlag;
-                                                           SELF.Charge                   := LEFT.Charge;
-                                                           SELF.DispositionDescription1  := LEFT.courtDispDesc1;
-                                                           SELF.DispositionDescription2  := LEFT.courtDispDesc2;
-                                                           SELF.FederalOrState           := DueDiligence.translateCodeToText.LegalStateFederalText(LEFT.stateFederalData);
-                                                           SELF.TrafficRelated           := LEFT.trafficFlag;   //to be removed at later date 
-                                                           SELF.TrafficRelatedOffense    := LEFT.trafficFlag = DueDiligence.Constants.YES;
-                                                           SELF.CourtStatute             := LEFT.courtStatute;
-                                                           SELF.CourtStatuteDescription  := LEFT.courtStatuteDesc; 
-                                                           
-                                                           //offense dates
-                                                           SELF.EarliestOffenseDate  := iesp.ECL2ESP.toDatestring8(LEFT.earliestOffenseDate);
-                                                           SELF.OffenseDate          := iesp.ECL2ESP.toDatestring8(LEFT.offenseDate);
-                                                           SELF.ArrestDate           := iesp.ECL2ESP.toDatestring8(LEFT.arrestDate);
-                                                           SELF.CourtDispositionDate := iesp.ECL2ESP.toDatestring8(LEFT.courtDispDate);
-                                                           SELF.SentenceDate         := iesp.ECL2ESP.toDatestring8(LEFT.sentenceDate);
-                                                           SELF.AppealDate           := iesp.ECL2ESP.toDatestring8(LEFT.appealDate);
-                                                           SELF.IncarcerationDate    := iesp.ECL2ESP.toDatestring8(LEFT.incarcerationDate);
-                                                           SELF.IncarcerationReleaseDate := iesp.ECL2ESP.toDatestring8(LEFT.incarcerationReleaseDate);
-                                                           
-                                                           //offense locations
-                                                           SELF.OffenseState := LEFT.offenseState;
-                                                           SELF.OffenseCounty := LEFT.offenseCounty;
-                                                           SELF.CourtCounty := LEFT.courtCounty;
-                                                           SELF.OffenseCity := LEFT.offenseCity;
+          SELF.criminalChildDS := PROJECT(le.crimData, TRANSFORM(iesp.duediligenceshared.t_DDRLegalStateCriminal,
+          
+                                                           //top level data
+                                                           SELF.State := LEFT.state;
+                                                           SELF.Source := LEFT.source;
+                                                           SELF.CaseNumber := LEFT.caseNumber;
+                                                           SELF.OffenseStatute := LEFT.offenseStatute;
+                                                           SELF.OffenseDDFirstReported := iesp.ECL2ESP.toDatestring8(LEFT.offenseDDFirstReportedActivity);
+                                                           SELF.OffenseDDLastReportedActivity := iesp.ECL2ESP.toDate(LEFT.offenseDDLastReportedActivity);
+                                                           SELF.OffenseDDMostRecentCourtDispDate := iesp.ECL2ESP.toDate(LEFT.offenseDDLastCourtDispDate);
+                                                           SELF.OffenseDDLegalEventTypeMapped := DueDiligence.translateExpression.expressionTextByEnum(LEFT.offenseDDLegalEventTypeCode);
+                                                           SELF.OffenseCharge := LEFT.offenseCharge;
+                                                           SELF.OffenseDDChargeLevelCalculated := DueDiligence.translateCodeToText.OffenseLevelText(LEFT.offenseDDChargeLevelCalculated);
+                                                           SELF.OffenseChargeLevelReported := LEFT.offenseChargeLevelReported;
+                                                           SELF.OffenseConviction := DueDiligence.translateCodeToText.YesNoUnknownText(LEFT.offenseConviction);
+                                                           SELF.OffenseIncarcerationProbationParole := LEFT.offenseIncarcerationProbationParole;
+                                                           SELF.OffenseTrafficRelated := DueDiligence.translateCodeToText.YesNoUnknownText(LEFT.offenseTrafficRelated);
+              
+                                                           // additional details
+                                                           SELF.County := LEFT.county;
+                                                           SELF.CountyCourt := LEFT.countyCourt;
+                                                           SELF.City := LEFT.city;
                                                            SELF.Agency := LEFT.agency;
-                                                           
-                                                           //person details
                                                            SELF.Race := LEFT.race;
                                                            SELF.Sex := DueDiligence.translateCodeToText.GenderText(LEFT.sex);
                                                            SELF.HairColor := LEFT.hairColor;
                                                            SELF.EyeColor := LEFT.eyeColor;
                                                            SELF.Height := LEFT.height;
                                                            SELF.Weight := LEFT.weight;
-                                                           SELF.Citizenship := LEFT.citizenship;
                                                            
-                                                           //other details
-                                                           SELF.Incarceration :=  LEFT.Ever_incarc_offenders = DueDiligence.Constants.YES OR 
-                                                                                  LEFT.Ever_incarc_offenses  = DueDiligence.Constants.YES OR
-                                                                                  LEFT.Ever_incarc_punishments = DueDiligence.Constants.YES;   
-                                                                                      
-                                                           SELF.CurrentIncarceration := LEFT.Curr_incarc_offenders = DueDiligence.Constants.YES OR
-                                                                                        LEFT.Curr_incarc_offenses  = DueDiligence.Constants.YES OR
-                                                                                        LEFT.Curr_incarc_punishments = DueDiligence.Constants.YES; 
-                                                                                                                                     
-                                                           SELF.CurrentParole            := LEFT.Curr_parole_flag = DueDiligence.Constants.YES;  
-                                                           SELF.CurrentProbation         := LEFT.currentProbation = DueDiligence.Constants.YES; 
-                                                           SELF.ProbationSentence        := LEFT.probationSentence; 
-
-                                                           SELF                          := [];));
+                                                           //sort the sources as if there is more than our dataset can handle, we value certain data more so than others
+                                                           sortedSources := SORT(LEFT.sources, -source);
+                                                           
+                                                           // sources
+                                                           SELF.Sources := PROJECT(sortedSources[1..iesp.Constants.DDRAttributesConst.MaxLegalSources], 
+                                                                                   TRANSFORM(iesp.duediligenceshared.t_DDRLegalSourceInfo,
+                                                                                              SELF.OffenseCharge := LEFT.offenseCharge;
+                                                                                              SELF.OffenseConviction := DueDiligence.translateCodeToText.YesNoUnknownText(LEFT.offenseConviction);
+                                                                                              SELF.OffenseChargeLevelReported := LEFT.offenseChargeLevelReported;
+                                                                                              SELF.Source := LEFT.source;
+                                                                                              SELF.CourtDisposition1 := LEFT.courtDisposition1;
+                                                                                              SELF.CourtDisposition2 := LEFT.courtDisposition2;
+                                                                                              SELF.OffenseReportedDate := iesp.ECL2ESP.toDate(LEFT.offenseReportedDate);
+                                                                                              SELF.OffenseArrestDate := iesp.ECL2ESP.toDate(LEFT.offenseArrestDate);
+                                                                                              SELF.OffenseCourtDispDate := iesp.ECL2ESP.toDate(LEFT.offenseCourtDispDate);
+                                                                                              SELF.OffenseAppealDate := iesp.ECL2ESP.toDate(LEFT.offenseAppealDate);
+                                                                                              SELF.OffenseSentenceDate := iesp.ECL2ESP.toDate(LEFT.offenseSentenceDate);
+                                                                                              SELF.OffenseSentenceStartDate := iesp.ECL2ESP.toDate(LEFT.offenseSentenceStartDate);
+                                                                                              SELF.DOCConvictionOverrideDate := iesp.ECL2ESP.toDate(LEFT.DOCConvictionOverrideDate);
+                                                                                              SELF.DOCScheduledReleaseDate := iesp.ECL2ESP.toDate(LEFT.DOCScheduledReleaseDate);
+                                                                                              SELF.DOCActualReleaseDate := iesp.ECL2ESP.toDate(LEFT.DOCActualReleaseDate);
+                                                                                              SELF.DOCInmateStatus := LEFT.DOCInmateStatus;
+                                                                                              SELF.DOCParoleStatus := LEFT.DOCParoleStatus;
+                                                                                              SELF.OffenseMaxTerm := LEFT.offenseMaxTerm;
+                                                                                              SELF.PartyNames := PROJECT(LEFT.partyNames[1..iesp.Constants.DDRAttributesConst.MaxLegalPartyNames], 
+                                                                                                                         TRANSFORM(iesp.share.t_StringArrayItem,
+                                                                                                                                   SELF.value := LEFT.name;));));));
           SELF := [];      
       END;
      
      
-      limitedReportRecords := PROJECT(groupMaskedList, limitOffenses(LEFT, COUNTER));
+      limitedReportRecords := UNGROUP(PROJECT(groupMaskedList, limitOffenses(LEFT, COUNTER)));
      
           
       //perform the ROLLUP by LINKID And DID
@@ -120,6 +115,16 @@ EXPORT reportSharedLegal := MODULE
                                        TRANSFORM(RECORDOF(LEFT),
                                                  SELF.criminalChildDS := LEFT.criminalChildDS + RIGHT.criminalChildDS,
                                                  SELF := LEFT));
+
+
+
+
+
+
+
+      // OUTPUT(sortMaskedList, NAMED('sortMaskedList'));
+      // OUTPUT(limitedReportRecords, NAMED('limitedReportRecords'));
+      // OUTPUT(rollupCriminalOffense, NAMED('rollupCriminalOffense'));
 
 
       RETURN rollupCriminalOffense;                                         

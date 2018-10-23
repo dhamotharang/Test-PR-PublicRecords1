@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="FBNSearchService">
   <part name="IndustryClass" 							type="xsd:string"/>
   <part name="TMSID" 							type="xsd:string"/>
@@ -58,6 +58,7 @@
 
 
 export FBNSearchService() := macro
+ #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	#constant('getBdidsbyExecutive',FALSE);
 
 	// output(FBNV2_Services.FBNV2_records, named('Results'));

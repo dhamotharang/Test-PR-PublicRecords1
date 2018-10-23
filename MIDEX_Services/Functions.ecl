@@ -832,7 +832,15 @@ EXPORT Functions :=
         ds_nonpubSanNMLS := 
           JOIN(in_mod.MidexReportNumbers, SANCTN_Mari.key_nmls_midex,
                KEYED(LEFT.midex_rpt_nbr = RIGHT.midex_rpt_nbr) AND
-               (UNSIGNED)RIGHT.nmls_id != 0,
+               (UNSIGNED)RIGHT.nmls_id != 0 AND
+               IF(in_mod.searchType = MIDEX_Services.Constants.COMP_SEARCH, 
+                  RIGHT.license_type = MIDEX_Services.Constants.NMLS_COMP OR
+                  RIGHT.license_type = MIDEX_Services.Constants.NMLS_BR OR
+                  RIGHT.license_type = MIDEX_Services.Constants.NMLS,
+                  IF(in_mod.searchType = MIDEX_Services.Constants.INDIV_SEARCH, 
+                     RIGHT.license_type = MIDEX_Services.Constants.NMLS_INDIV OR
+                     RIGHT.license_type = MIDEX_Services.Constants.NMLS,                     
+                  FALSE)),
                TRANSFORM(MIDEX_Services.Layouts.rec_NMLSIds, 
                          SELF.NMLSId := (UNSIGNED6)RIGHT.nmls_id), 
                LIMIT(MIDEX_Services.Constants.JOIN_LIMIT, SKIP));
@@ -840,7 +848,15 @@ EXPORT Functions :=
         ds_pubSanNMLS := 
           JOIN(in_mod.MidexReportNumbers, SANCTN.key_nmls_midex,
                KEYED(LEFT.midex_rpt_nbr = RIGHT.midex_rpt_nbr) AND
-               (UNSIGNED)RIGHT.nmls_id != 0,
+               (UNSIGNED)RIGHT.nmls_id != 0 AND
+               IF(in_mod.searchType = MIDEX_Services.Constants.COMP_SEARCH, 
+                  RIGHT.license_type = MIDEX_Services.Constants.NMLS_COMP OR
+                  RIGHT.license_type = MIDEX_Services.Constants.NMLS_BR OR
+                  RIGHT.license_type = MIDEX_Services.Constants.NMLS,
+                  IF(in_mod.searchType = MIDEX_Services.Constants.INDIV_SEARCH, 
+                     RIGHT.license_type = MIDEX_Services.Constants.NMLS_INDIV OR
+                     RIGHT.license_type = MIDEX_Services.Constants.NMLS,
+                  FALSE)),   
                TRANSFORM(MIDEX_Services.Layouts.rec_NMLSIds, 
                          SELF.NMLSId := (UNSIGNED6)RIGHT.nmls_id), 
                LIMIT(MIDEX_Services.Constants.JOIN_LIMIT, SKIP));

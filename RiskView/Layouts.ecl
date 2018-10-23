@@ -490,6 +490,7 @@ export layout_riskview5LITE_search_results := record
 	string3   Custom100_score;
 	layout_riskview_attributes_5_slimList;
   layout_riskview5_alerts;
+	dataset(iesp.share_fcra.t_ConsumerStatement) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MAX_CONSUMER_STATEMENTS)};
 end;
 
 export Layout_Riskview_Batch_In := RECORD
@@ -961,7 +962,7 @@ export layout_riskview5_batch_response := record
   string5  Exception_code := '';
 	string3	 Billing_Index2 := '';
 	layout_riskview_lnj_batch;
-	
+	STRING12 inquiry_lexid := '';
 end;
 
 export attributes_internal_layout := record
@@ -1072,6 +1073,7 @@ export layout_RV5capOneBatch_searchResults := record
 	layout_RV5capOneBatch_modelResults-seq;  //Seq was used in the service to join the model results back to attribute results.
 	layout_riskview_attributes_5 -Risk_Indicators.Layouts_Derog_Info.LNR_AttrIbutes; //CapOne is not running Juli so remove from output
   layout_riskview5_alerts-ConsumerStatementText;
+  STRING12 inquiry_lexid := '';
 end;
 
 end;

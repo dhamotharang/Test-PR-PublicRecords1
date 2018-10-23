@@ -144,8 +144,24 @@
         IF( LEFT.Per_SSNsCount  = 0,
             LEFT.Per_SSNsCount  = RIGHT.SSN_Cnt,
             LEFT.Per_SSNsCount <= RIGHT.SSN_Cnt ) 
+        AND
+        IF( LEFT.Per_ProfLicMariCount  = 0,
+            LEFT.Per_ProfLicMariCount  = RIGHT.Mari_License_Cnt,
+            LEFT.Per_ProfLicMariCount <= RIGHT.Mari_License_Cnt ) 
+        AND
+        IF( LEFT.Per_PublicSanctnCount  = 0,
+            LEFT.Per_PublicSanctnCount  = RIGHT.public_sanctn_cnt,
+            LEFT.Per_PublicSanctnCount <= RIGHT.public_sanctn_cnt ) 
+        AND
+        IF( LEFT.Per_NonPublicSanctnCount  = 0,
+            LEFT.Per_NonPublicSanctnCount  = RIGHT.nonpublic_sanctn_cnt,
+            LEFT.Per_NonPublicSanctnCount <= RIGHT.nonpublic_sanctn_cnt ) 
+        AND
+        IF( LEFT.Per_FreddieMacSanctnCount  = 0,
+            LEFT.Per_FreddieMacSanctnCount  = RIGHT.freddiemac_sanctn_cnt,
+            LEFT.Per_FreddieMacSanctnCount <= RIGHT.freddiemac_sanctn_cnt ) 
       ENDMACRO;
-    
+
     EXPORT mac_JoinBizKeys() :=
       MACRO
         IF( LEFT.Biz_AddressesCount = 0,
@@ -239,6 +255,22 @@
         IF( LEFT.Biz_WatercraftsCount = 0,
             LEFT.Biz_WatercraftsCount  = RIGHT.Watercraft_cnt,
             LEFT.Biz_WatercraftsCount <= RIGHT.Watercraft_cnt )
+        AND
+        IF( LEFT.Biz_ProfLicMariCount  = 0,
+            LEFT.Biz_ProfLicMariCount  = RIGHT.Mari_License_Cnt,
+            LEFT.Biz_ProfLicMariCount <= RIGHT.Mari_License_Cnt ) 
+        AND
+        IF( LEFT.Biz_PublicSanctnCount  = 0,
+            LEFT.Biz_PublicSanctnCount  = RIGHT.public_sanctn_cnt,
+            LEFT.Biz_PublicSanctnCount <= RIGHT.public_sanctn_cnt ) 
+        AND
+        IF( LEFT.Biz_NonPublicSanctnCount  = 0,
+            LEFT.Biz_NonPublicSanctnCount  = RIGHT.nonpublic_sanctn_cnt,
+            LEFT.Biz_NonPublicSanctnCount <= RIGHT.nonpublic_sanctn_cnt ) 
+        AND
+        IF( LEFT.Biz_FreddieMacSanctnCount  = 0,
+            LEFT.Biz_FreddieMacSanctnCount  = RIGHT.freddiemac_sanctn_cnt,
+            LEFT.Biz_FreddieMacSanctnCount <= RIGHT.freddiemac_sanctn_cnt ) 
       ENDMACRO;
 
     EXPORT mac_xfmCombinedPersonKeyFields (rw_in) := 

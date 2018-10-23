@@ -177,5 +177,39 @@ EXPORT EntitiesIds(
     // OUTPUT(results, 'EntityIds_GetEmail');
     RETURN results;
   END;
+	
+  EXPORT GetBankAccountNumber() := FUNCTION
+    results := JOIN(
+      ds_valid_in(hasBankAccount), FraudShared.Key_BankAccount(fraud_platform),
+      KEYED(LEFT.bank_account_number = RIGHT.bank_account_number),
+      TRANSFORM(FraudShared_Services.Layouts.Recid_rec,
+        SELF.acctno := IF(filterBy_entity_type AND RIGHT.Entity_type_id <> FraudShared_Services.Constants.EntityTypes_Enum.PERSON, 
+          SKIP, 
+          LEFT.acctno),
+        SELF := RIGHT,
+        SELF := LEFT,
+        SELF := []),
+      LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
+
+    // OUTPUT(results, 'EntityIds_BankAccountNumber');
+    RETURN results;
+  END;
+	
+	EXPORT GetDriverLicenses() := FUNCTION
+		results := JOIN(
+			ds_valid_in(hasDL), FraudShared.Key_DriversLicense(fraud_platform),
+			KEYED(LEFT.dl_number = RIGHT.drivers_license AND LEFT.dl_state = RIGHT.drivers_license_state),
+			 TRANSFORM(FraudShared_Services.Layouts.Recid_rec,
+				SELF.acctno := IF(filterBy_entity_type AND RIGHT.Entity_type_id <> FraudShared_Services.Constants.EntityTypes_Enum.PERSON, 
+					SKIP, 
+					LEFT.acctno),
+				SELF := RIGHT,
+				SELF := LEFT,
+				SELF := []), 
+			LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
+		
+		// OUTPUT(results, named('results'));
+		RETURN results;
+	END;	
   
 END;

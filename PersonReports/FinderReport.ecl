@@ -1,4 +1,4 @@
-IMPORT doxie, iesp;
+﻿IMPORT doxie, iesp, D2C;
 
 out_rec := iesp.peoplereport.t_PeopleReportIndividual;
 
@@ -10,7 +10,7 @@ EXPORT out_rec FinderReport (
 
   // DID should be atmost one (do we keep layout_references for legacyt reasons?)
   did := dids[1].did;
-
+  isCNSMR := param.IndustryClass = D2C.Constants.CNSMR;
   // person records 
   pers := Person_records (dids, module (project (param, input.personal, opt)) end, IsFCRA);
 
@@ -28,8 +28,8 @@ EXPORT out_rec FinderReport (
   p_hist_2     := choosen (old_phones.oldphones_2, iesp.constants.BR.MaxPhonesHistorical);
 
   // "single source" person's data
-  vehs := vehicle_records (dids, module (project (param, input.vehicles)) end, IsFCRA);
-  p_vehicles   := choosen (vehs.vehicles, iesp.Constants.BR.MaxVehicles);
+  vehs := if(~isCNSMR, vehicle_records (dids, module (project (param, input.vehicles)) end, IsFCRA).vehicles);
+  p_vehicles   := choosen (vehs, iesp.Constants.BR.MaxVehicles);
   proflic := proflic_records (dids, module (project (param, input.proflic, opt)) end, IsFCRA);
   p_proflic    := choosen (proflic.proflicenses_v2, iesp.constants.BR.MaxProfLicenses);
   bankrpt := bankruptcy_records (dids, module (project (param, input.bankruptcy, opt)) end, IsFCRA);

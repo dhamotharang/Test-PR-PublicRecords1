@@ -46,7 +46,7 @@ EXPORT batch_records (FaaV2_Services.IParam.BatchParams params,
 									
  
 	// FFD				  
-	dids := PROJECT(clean_in, FFD.Layouts.DidBatch); 
+	dids := PROJECT(clean_in(did>0), FFD.Layouts.DidBatch); 
 
 	pc_recs := IF(isFCRA, FFD.FetchPersonContext(dids, params.gateways, FFD.Constants.DataGroupSet.Aircraft, params.FFDOptionsMask));
 
@@ -56,8 +56,12 @@ EXPORT batch_records (FaaV2_Services.IParam.BatchParams params,
 	ds_best  := project (clean_in, transform (doxie.layout_best, self.did:=left.did, self:=[])); //using input to create dataset for getting the flag file (overrides). For FCRA we only use DID to get overrides.
 	ds_flags := if(isFCRA, FFD.GetFlagFile (ds_best, pc_recs)); //this is for more than one person 
  
- slim_pc_recs := FFD.SlimPersonContext(pc_recs);
+	slim_pc_recs := FFD.SlimPersonContext(pc_recs);
 	
+	//at RAW we need for FCRA to get all statemetIds disregarding input FFDOptionsMask 1st bit 
+	// filtering of Dempsey hits if needed is addressed later in the code
+	FFDOptionsMask_adj := if(isFCRA,params.FFDOptionsMask | FFD.Constants.ConsumerOptions.SHOW_CONSUMER_STATEMENTS, params.FFDOptionsMask);
+
   //**** RAW FUNCTION
   // We might not have the problem with concurrent corrections as with, for example, watercrafts,
   // since aircrafts corections are fetched by 'aircraft_id', which is not shared among different DIDs
@@ -65,7 +69,7 @@ EXPORT batch_records (FaaV2_Services.IParam.BatchParams params,
                faa_dids, faa_bdids,
                0, params.DPPAPurpose, params.GLBPurpose, params.ssn_mask, params.ApplicationType, //0 == dateval
                IsFCRA, ds_flags,
-							 faa_linkids,params.BIPFetchLevel, slim_pc_recs, params.FFDOptionsMask);
+							 faa_linkids,params.BIPFetchLevel, slim_pc_recs, FFDOptionsMask_adj);
 
   //**** BATCH FUNCTION
   batch_res := FaaV2_Services.Transforms.Batch_View.out_Layout(faa_res, params.BIPFetchLevel);
@@ -99,8 +103,12 @@ EXPORT batch_records (FaaV2_Services.IParam.BatchParams params,
 	out_all := SORT(out + out_link,acctno);
 	
 	ds_out_all := PROJECT(out_all, FaaV2_Services.Layouts.batch_out_pre);
+  
 	// data maybe suppressed due to alerts
-	out_fcra_with_alerts := IF(isFCRA, FFD.Mac.ApplyConsumerAlertsBatch(out_fcra, alert_flags, Statements, FaaV2_Services.Layouts.batch_out_pre));
+	out_fcra_with_alerts := IF(isFCRA, FFD.Mac.ApplyConsumerAlertsBatch(out_fcra, alert_flags, Statements, FaaV2_Services.Layouts.batch_out_pre, params.FFDOptionsMask));
+
+	// add resolved LexId to the results for inquiry history logging support                    
+  ds_out_fcra := FFD.Mac.InquiryLexidBatch(clean_in, out_fcra_with_alerts, FaaV2_Services.Layouts.batch_out_pre, 0);
 
 	//Sequencing the Records
 	FaaV2_Services.Layouts.batch_out_pre sequenceIt(FaaV2_Services.Layouts.batch_out_pre L , INTEGER C):=  TRANSFORM
@@ -108,7 +116,7 @@ EXPORT batch_records (FaaV2_Services.IParam.BatchParams params,
 			SELF :=  L;
 	END; 
 	
-	sequenced_out_fcra := PROJECT(out_fcra_with_alerts, sequenceIt(LEFT,COUNTER)); // FCRA
+	sequenced_out_fcra := PROJECT(ds_out_fcra, sequenceIt(LEFT,COUNTER)); // FCRA
 	sequenced_out := PROJECT(ds_out_all, sequenceIt(LEFT,COUNTER)); //NON-FCRA
 	
 	consumer_statements := NORMALIZE(sequenced_out_fcra, LEFT.Statements, 
@@ -118,7 +126,7 @@ EXPORT batch_records (FaaV2_Services.IParam.BatchParams params,
 							 self := right));	
 	
 	consumer_statements_prep := IF(isFCRA, FFD.prepareConsumerStatementsBatch(consumer_statements, pc_recs, params.FFDOptionsMask));
- consumer_alerts  := IF(isFCRA, FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs));                                               
+ consumer_alerts  := IF(isFCRA, FFD.ConsumerFlag.prepareAlertMessagesBatch(pc_recs, alert_flags, params.FFDOptionsMask));                                               
  consumer_statements_alerts := consumer_statements_prep + consumer_alerts;
 	
 	final_recs := if (IsFCRA, sequenced_out_fcra, sequenced_out);

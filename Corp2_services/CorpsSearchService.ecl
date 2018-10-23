@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="CorpSearch" wuTimeout="300000">
 	<part name="BDID"                    type="xsd:string"/>
 	<part name="DID"                     type="xsd:string"/>
@@ -61,6 +61,7 @@
 
 export CorpsSearchService := macro
 
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	#constant('SearchGoodSSNOnly',true);
 	#constant('SearchIgnoresAddressOnly',true);
 	#constant('getBdidsbyExecutive',FALSE);

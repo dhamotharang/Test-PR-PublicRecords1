@@ -1,4 +1,4 @@
-import address, doxie, risk_indicators, models, business_risk, Business_Header,Gateway;
+﻿import address, doxie, risk_indicators, models, business_risk, Business_Header,Gateway;
 
 Business_Header.doxie_MAC_Field_Declare()
 
@@ -55,8 +55,10 @@ in_z5 := zip;
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := map(IncludeTargus3220 and le.servicename = 'targus' => 'targuse3220',	// if E3220 requested, change servicename for later use
+                                                le.servicename = 'bridgerwlc' and OFAC_version <> 4 => '',
 													le.servicename);
 	self.url := map(IncludeTargus3220 and le.servicename = 'targus' => le.url + '?ver_=1.39',	// need version 1.39 for E3220,
+                                        le.servicename = 'bridgerwlc' and OFAC_version <> 4 => '',
 									le.url); 
 	self := le;								
 end;

@@ -731,6 +731,7 @@ export layout_HRI_Businesses := record
 end;
 
 export layout_header_plus_hist_date := record
+  unsigned4 seq;
 	header.layout_header;
 	unsigned3 historydate;
 end;

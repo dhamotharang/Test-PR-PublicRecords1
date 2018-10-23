@@ -175,7 +175,9 @@ export FcraInsurView_Service := MACRO
 	unsigned8 BSOptions := if( IsPreScreen, risk_indicators.iid_constants.BSOptions.IncludePreScreen, 0 ) + 
 												 IF(DoAddressAppend, Risk_Indicators.iid_constants.BSOptions.IncludeAddressAppend, 0) +
 												 if(FilterLiens, risk_indicators.iid_constants.BSOptions.FilterLiens, 0 ) +//DRM to drive Liens/Judgments											  
-													Risk_Indicators.iid_constants.BSOptions.InsuranceFCRAMode;
+													Risk_Indicators.iid_constants.BSOptions.InsuranceFCRAMode +
+													Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyException;
+													
 	ExperianTransaction := DataRestriction[risk_indicators.iid_constants.posExperianFCRARestriction]='0';	
 /*****************Put in input layout*************************************************************/
 	Risk_Indicators.Layout_Input intoInput(emptyRecord l, integer c) := TRANSFORM
@@ -338,6 +340,16 @@ export FcraInsurView_Service := MACRO
 		
 		self.Result.ConsumerStatements := project(rt.ConsumerStatements,
 			transform(iesp.share_fcra.t_ConsumerStatement, self.dataGroup := '', self := left));
+          
+    // for inquiry logging, populate the consumer section with the DID and input fields
+    // if the person is a noScore, don't log the DID
+    self.Result.Consumer.LexID := if(riskview.constants.noscore(rt.iid.nas_summary,rt.iid.nap_summary, rt.address_verification.input_address_information.naprop, rt.truedid), 
+        '', 
+        (string12)rt.did);      
+    searchDOB := iesp.ECL2ESP.t_DateToString8(search.DOB);
+    SELF.Result.Consumer.Inquiry.DOB := IF((UNSIGNED)searchDOB > 0, searchDOB, '');
+    self.Result.Consumer.Inquiry.Phone10 := search.HomePhone;
+    self.Result.Consumer.Inquiry := search;   
 	END;
 			
 	//final_wEcho := PROJECT(attributesWithFlags, addEcho(LEFT));	

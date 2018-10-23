@@ -1,4 +1,5 @@
-﻿IMPORT Address, AutoStandardI, BatchShare, CriminalRecords_BatchService, didville, FraudGovPlatform_Services, FraudShared_Services, FraudShared, iesp, Patriot, Risk_Indicators, STD, ut;
+﻿IMPORT Address, AutoStandardI, BatchShare, CriminalRecords_BatchService, didville, FraudGovPlatform, FraudGovPlatform_Services, 
+				FraudShared_Services, FraudShared, iesp, Patriot, Risk_Indicators, STD, Suppress, ut;
 
 EXPORT Functions := MODULE
 	
@@ -13,7 +14,7 @@ EXPORT Functions := MODULE
 		
 		ds_instantIDRaw := raw_.getInstantIDRaw(ds_batch_in);
 		
-		recs_RedFlag := raw_.GetRedFlags(ds_batch_in, ds_instantIDRaw);
+		recs_RedFlag := raw_.GetRedFlags(ds_batch_in, ds_instantIDRaw); 
 		recs_CIID := raw_.GetCIID(ds_batch_in, ds_instantIDRaw);
 		
 		FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw xfm_Compilation(FraudShared_Services.Layouts.BatchIn_rec L) := TRANSFORM
@@ -337,15 +338,12 @@ EXPORT Functions := MODULE
 		
 		FraudGovPlatform_Services.Layouts.BatchOut_rec xfm_pre_batchout(FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw L) := TRANSFORM
 			SELF.Seq := L.batchin_rec.Seq;
-			SELF.LexID := L.batchin_rec.did;
-			SELF.identity_resolved := IF(L.batchin_rec.did <> 0 , 'Y', 'N');
-			
 			unsigned4 VEL_CNT := COUNT(L.childRecs_Velocities);
 			SELF.velocity_exceeded_cnt := VEL_CNT;
 			SELF.velocity_exceeded_reason1 := IF(VEL_CNT >= 1, STD.Str.CleanSpaces(L.childRecs_Velocities[1].description), '');
 			SELF.velocity_exceeded_reason2 := IF(VEL_CNT >= 2, STD.Str.CleanSpaces(L.childRecs_Velocities[2].description), '');
 			SELF.velocity_exceeded_reason3 := IF(VEL_CNT >= 3, STD.Str.CleanSpaces(L.childRecs_Velocities[3].description), '');
-
+			
 			SELF := L;
 			SELF := [];
 		END;
@@ -381,6 +379,9 @@ EXPORT Functions := MODULE
 		END;
 		
 		GLB := AutoStandardI.PermissionI_Tools.val(p).glb.ok(batch_params.GLBPurpose);
+		
+		//Mask DOB when requested.
+		unsigned1 dob_mask_value := Suppress.date_mask_math.MaskIndicator(batch_params.DOBMask);		
 
 		ds_best := DidVille.did_service_common_function(ds_best_in,
 																										appends_value			:= FraudGovPlatform_Services.Constants.append_l,
@@ -393,7 +394,10 @@ EXPORT Functions := MODULE
 																										DRM_val						:= batch_params.DataRestrictionMask,
 																										GetSSNBest				:= TRUE);
 		
-		iesp.fraudgovplatform.t_FraudGovBestInfo best_trans(RECORDOF(ds_best) L) := TRANSFORM																									
+		iesp.fraudgovplatform.t_FraudGovBestInfo best_trans(RECORDOF(ds_best) L) := TRANSFORM	
+			dob_ := iesp.ECL2ESP.toDate((integer) L.best_dob);
+			masked_dob := iesp.ECL2ESP.ApplyDateMask(dob_, dob_mask_value);
+			
 			SELF.UniqueId := (string) L.did;  
 			SELF.Name.Prefix := L.best_title; 
 			SELF.Name.First := L.best_fname; 
@@ -401,7 +405,7 @@ EXPORT Functions := MODULE
 			SELF.Name.Last := L.best_lname; 
 			SELF.Name.Suffix := L.best_name_suffix;
 			SELF.SSN := (string) L.best_ssn;
-			SELF.DOB := iesp.ECL2ESP.toDate((integer)L.best_dob);
+			SELF.DOB := masked_dob;
 			SELF.Address := iesp.ECL2ESP.SetAddress('',
 																							'', 
 																							'', 
@@ -431,15 +435,14 @@ EXPORT Functions := MODULE
 		ds_rids:=	JOIN(ds_best_in, FraudShared.Key_Did(fraud_platform),
 										KEYED(LEFT.did = RIGHT.did),
 										TRANSFORM(FraudShared_Services.Layouts.Recid_rec,
-											SELF.AcctNo := (string) Left.Seq, //Assigning the seq number as acctno so I can use the acctno for rollup, that's it. 
-											SELF := RIGHT,
 											SELF := LEFT,
+											SELF := RIGHT,
 											SELF := []),
 									LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
 
 		ds_payload_recs := FraudShared_Services.GetPayloadRecords(ds_rids, fraud_platform);
 
-		ds_payload_recs_sorted := SORT(ds_payload_recs, acctno, -event_date, record);
+		ds_payload_recs_sorted := SORT(ds_payload_recs, did, -event_date, record);
 
 		FraudShared_Services.Layouts.Raw_Payload_rec xformRollup(FraudShared_Services.Layouts.Raw_Payload_rec L, FraudShared_Services.Layouts.Raw_Payload_rec R) := transform
 				//We wanted to keep the record which has good address, instead of first non blank address...
@@ -456,7 +459,7 @@ EXPORT Functions := MODULE
 				SELF.cleaned_name.name_suffix :=  IF(L.cleaned_name.name_suffix <> '' , L.cleaned_name.name_suffix , R.cleaned_name.name_suffix);
 				SELF.ssn :=  IF(L.ssn <> '' , L.ssn , R.ssn);
 				SELF.dob :=  IF(L.dob <> '' , L.dob , R.dob);
-				SELF.phone_number :=  IF(L.phone_number <> '' , L.phone_number , R.phone_number);
+				SELF.phone_number :=  IF(L.clean_phones.phone_number <> '' , L.clean_phones.phone_number , R.clean_phones.phone_number);
 				SELF.email_address :=  IF(L.email_address <> '' , L.email_address , R.email_address);
 				SELF.clean_address.prim_range := IF(isPhysicalAddress, L.clean_address.prim_range, R.clean_address.prim_range);
 				SELF.clean_address.predir := IF(isPhysicalAddress, L.clean_address.predir, R.clean_address.predir);
@@ -473,7 +476,7 @@ EXPORT Functions := MODULE
 				SELF := [];
 		END;
 
-		ds_payload_recs_rolled := ROLLUP(	ds_payload_recs_sorted, left.acctno = right.acctno, xformRollup(left, right));
+		ds_payload_recs_rolled := ROLLUP(	ds_payload_recs_sorted, left.did = right.did, xformRollup(left, right));
 
 		iesp.fraudgovreport.t_FraudGovIdentityCardDetails best_trans(FraudShared_Services.Layouts.Raw_Payload_rec L) := TRANSFORM
 			SELF.ContributedBest.UniqueId := (string) L.DID;
@@ -496,7 +499,7 @@ EXPORT Functions := MODULE
 																															L.clean_address.zip,
 																															L.clean_address.zip4,
 																															'');
-			SELF.ContributedBest.Phone10 :=  L.phone_number;
+			SELF.ContributedBest.Phone10 :=  L.clean_phones.phone_number;
 			SELF.EmailAddress := L.email_address;
 			SELF := [];
 		END;
@@ -508,6 +511,7 @@ EXPORT Functions := MODULE
 		
 		RETURN ds_Contrib_Best;
 	END;
+	
 	EXPORT GetDeltabaseLogDataSet(ds_in,InquiryReason) := FUNCTIONMACRO
 		
 		commonRecord := RECORD
@@ -541,14 +545,23 @@ EXPORT Functions := MODULE
 		
 		common_ds := PROJECT(ds_in, createCommonDs(LEFT));
 		
+		today := STD.Date.CurrentDate(True);
+		time := STD.Date.CurrentTime(True);
+		today_str :=  intformat(STD.Date.Year(today),4,1)  + '-' + intformat(STD.Date.Month(today),2,1) + '-' + 
+									intformat(STD.Date.Day(today),2,1)   + ' ' + intformat(STD.Date.Hour(time),2,1)   + ':' + 
+									intformat(STD.Date.Minute(time),2,1) + ':' + intformat(STD.Date.Second(time),2,1);
+		
 		FraudGovPlatform_Services.Layouts.LOG_Deltabase_Layout_Record xform_deltabase_log(commonRecord L):= TRANSFORM
 			SELF.gc_id := (STRING)L.FraudGovUser.GlobalCompanyId;
 			SELF.program_name := L.FraudGovUser.IndustryTypeName;
 			SELF.inquiry_reason := InquiryReason;
 			SELF.inquiry_source := FraudGovPlatform_Services.Constants.INQUIRY_SOURCE;
+			SELF.file_type := FraudGovPlatform_Services.Constants.PayloadFileTypeEnum.IdentityActivity;
 			
 			#IF(InquiryReason=FraudGovPlatform_Services.Constants.ServiceType.REPORT)
-				SELF.customer_county_code := L.options.AgencyCounty;
+				//SELF.customer_county_code := L.options.AgencyCounty;
+				SELF.customer_county_code :=  Address.County_Names(state_alpha=L.options.AgencyState,
+																														county_name=L.options.AgencyCounty)[1].county_code;
 				SELF.customer_state := L.options.AgencyState;
 				SELF.customer_vertical_code := L.options.AgencyVerticalType;
 				SELF.client_uid := '';
@@ -571,31 +584,26 @@ EXPORT Functions := MODULE
 			SELF.name_last := L.reportBy.Name.last;
 			SELF.name_suffix := L.reportBy.Name.suffix;
 			// If StreetAddress is empty, then use the parsed address fields
-			SELF.full_address := IF(L.reportBy.Address.StreetAddress1 = '',
-									Address.Addr1FromComponents(L.reportBy.Address.StreetNumber, 
-											L.reportBy.Address.StreetPreDirection,
-											L.reportBy.Address.StreetName, L.reportBy.Address.StreetSuffix,
-											L.reportBy.Address.StreetPostDirection,L.reportBy.Address.UnitDesignation,
-											L.reportBy.Address.UnitNumber),
-									L.reportBy.Address.StreetAddress1 + ' ' + L.reportBy.Address.StreetAddress2);
-			SELF.physical_address := IF(L.reportBy.Address.StreetAddress1 = '',
-									Address.Addr1FromComponents(L.reportBy.Address.StreetNumber, 
-											L.reportBy.Address.StreetPreDirection,
-											L.reportBy.Address.StreetName, L.reportBy.Address.StreetSuffix,
-											L.reportBy.Address.StreetPostDirection,L.reportBy.Address.UnitDesignation,
-											L.reportBy.Address.UnitNumber),
-									L.reportBy.Address.StreetAddress1 + ' ' + L.reportBy.Address.StreetAddress2);
+			Physical_address:= 	IF(L.reportBy.Address.StreetAddress1 = '',
+															Address.Addr1FromComponents(L.reportBy.Address.StreetNumber, 
+																													L.reportBy.Address.StreetPreDirection,
+																													L.reportBy.Address.StreetName, L.reportBy.Address.StreetSuffix,
+																													L.reportBy.Address.StreetPostDirection,L.reportBy.Address.UnitDesignation,
+																													L.reportBy.Address.UnitNumber),
+															STD.Str.CleanSpaces(L.reportBy.Address.StreetAddress1) + ' ' + STD.Str.CleanSpaces(L.reportBy.Address.StreetAddress2));			
+			SELF.full_address := Physical_address;
+			SELF.physical_address := Physical_address;
 			SELF.physical_city := L.reportBy.Address.City;
 			SELF.physical_state := L.reportBy.Address.State;
 			SELF.physical_zip := L.reportBy.Address.Zip5;
 			SELF.physical_county := L.reportBy.Address.County;
 			SELF.mailing_address := IF(L.reportBy.MailingAddress.StreetAddress1 = '',
-									Address.Addr1FromComponents(L.reportBy.MailingAddress.StreetNumber, 
-											L.reportBy.MailingAddress.StreetPreDirection,
-											L.reportBy.MailingAddress.StreetName, L.reportBy.MailingAddress.StreetSuffix,
-											L.reportBy.MailingAddress.StreetPostDirection,L.reportBy.MailingAddress.UnitDesignation,
-											L.reportBy.MailingAddress.UnitNumber),
-									L.reportBy.MailingAddress.StreetAddress1 + ' ' + L.reportBy.MailingAddress.StreetAddress2);
+																	Address.Addr1FromComponents(L.reportBy.MailingAddress.StreetNumber, 
+																															L.reportBy.MailingAddress.StreetPreDirection,
+																															L.reportBy.MailingAddress.StreetName, L.reportBy.MailingAddress.StreetSuffix,
+																															L.reportBy.MailingAddress.StreetPostDirection,L.reportBy.MailingAddress.UnitDesignation,
+																															L.reportBy.MailingAddress.UnitNumber),
+																	STD.Str.CleanSpaces(L.reportBy.MailingAddress.StreetAddress1) + ' ' + STD.Str.CleanSpaces(L.reportBy.MailingAddress.StreetAddress2));
 			SELF.mailing_city := L.reportBy.MailingAddress.City;
 			SELF.mailing_state := L.reportBy.MailingAddress.State;
 			SELF.mailing_zip := L.reportBy.MailingAddress.Zip5;
@@ -618,7 +626,7 @@ EXPORT Functions := MODULE
 			SELF.dl_number := L.reportBy.DriversLicense.DriversLicenseNumber;
 			SELF.geo_lat := L.reportBy.GeoLocation.Latitude;
 			SELF.geo_long := L.reportBy.GeoLocation.Longitude;
-			SELF.date_added := STD.Date.CurrentDate(True);
+			SELF.date_added := today_str;
 			SELF := L;
 			SELF := [];
 		END;
@@ -635,6 +643,220 @@ EXPORT Functions := MODULE
 		return deltabase_inquiry_log;
 		
 	ENDMACRO;
+	
+	EXPORT GetFragmentRecs (DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_freg_recs_in,
+													DATASET(FraudShared_Services.Layouts.Raw_payload_rec) ds_payload,
+													FraudGovPlatform_Services.IParam.BatchParams batch_params,
+													Boolean skip_autokey_ds_matching = FALSE) := FUNCTION
 
+		Fragment_Types_const := FraudGovPlatform_Services.Constants.Fragment_Types;
+		File_Type_Const := FraudGovPlatform_Services.Constants.PayloadFileTypeEnum;													
+	
+		ds_fragment_recs := FraudShared_Services.Functions.getMatchedEntityTypes(ds_freg_recs_in, ds_payload, skip_autokey_ds_matching);
+
+		FraudGovPlatform_Services.Layouts.fragment_w_value_recs  ds_fragment_recs_w_trans(FraudShared_Services.layouts.layout_velocity_in L, 
+																																											FraudShared_Services.Layouts.Raw_Payload_rec R)  := TRANSFORM
+			
+			bank_account_number := IF(R.bank_account_number_1 <> '', R.bank_account_number_1 , R.bank_account_number_2);
+			SELF.fragment_value := CASE(L.fragment,
+																	Fragment_Types_const.BANK_ACCOUNT_NUMBER_FRAGMENT => bank_account_number,
+																	Fragment_Types_const.DEVICE_ID_FRAGMENT => R.device_id,
+																	Fragment_Types_const.DRIVERS_LICENSE_NUMBER_FRAGMENT => R.drivers_license,
+																	// Fragment_Types_const.GEOLOCATION_FRAGMENT => R.clean_address.geo_lat + ' ' + R.clean_address.R.geo_long,
+																	Fragment_Types_const.IP_ADDRESS_FRAGMENT => R.ip_address	,
+																	Fragment_Types_const.MAILING_ADDRESS_FRAGMENT => (STD.Str.CleanSpaces(R.additional_address.address_1) + ' ' + STD.Str.CleanSpaces(R.additional_address.address_2)),
+																	Fragment_Types_const.NAME_FRAGMENT => (R.cleaned_name.fname + ' ' + R.cleaned_name.lname),
+																	Fragment_Types_const.PERSON_FRAGMENT => (string) R.did,
+																	Fragment_Types_const.PHONE_FRAGMENT => R.clean_phones.phone_number,
+																	Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT => STD.Str.CleanSpaces(R.address_1) + '@@@' + STD.Str.CleanSpaces(R.address_2),
+																	Fragment_Types_const.SSN_FRAGMENT => R.ssn,
+																	'');
+			SELF.file_type := R.classification_Permissible_use_access.file_type;
+			SELF := L;
+		END;
+
+		ds_fragment_recs_w_value := JOIN(ds_fragment_recs, ds_payload,
+																	LEFT.record_id = RIGHT.record_id,
+																	ds_fragment_recs_w_trans(LEFT, RIGHT),
+																	LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
+
+		RETURN ds_fragment_recs_w_value;
+	END;
+	
+	EXPORT getClusterDetails (ds_entityNameUID, batch_params, useRelatedCluster) := FUNCTIONMACRO
+		
+		IMPORT FraudGovPlatform;
+
+		unsigned6 GC_ID := batch_params.GlobalCompanyId;
+		unsigned2 IndustryType := batch_params.IndustryType;
+		
+		temp_rec := RECORD
+			STRING20 acctno;
+			STRING60 entity_name;
+			STRING100 entity_value;
+			RECORDOF(FraudGovPlatform.Key_ClusterDetails);
+		END;											 		
+		
+		
+		// In the Following join, when useRelatedCluster = TRUE, Joining with same tree_uid to entity_context_uid_ & tree_uid_ from Key. 
+		// This is done so I can find the center cluster record for the related entity cluster. 
+		// By definition, center cluster record for an entity has entity_context_uid_ = tree_uid_. (only 1 such row per entity in key).
+		ds_clusterdetails:= JOIN(ds_entityNameUID , FraudGovPlatform.Key_ClusterDetails(),
+													KEYED(RIGHT.customer_id_ = GC_ID AND
+																RIGHT.industry_type_ = IndustryType AND
+																#IF(useRelatedCluster)
+																	LEFT.tree_uid = RIGHT.entity_context_uid_ AND
+																	LEFT.tree_uid = RIGHT.tree_uid_),
+																#ELSE
+																	LEFT.entity_context_uid = RIGHT.entity_context_uid_),
+																#END
+													TRANSFORM(temp_rec,
+														SELF.acctno := LEFT.acctno,
+														SELF.entity_name := LEFT.entity_name,
+														SELF.entity_value := LEFT.entity_value,
+														SELF := RIGHT),
+													LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
+
+		//this is a temporary fix and will be resolved when analytics data sharing is corrected in KEL BUILD.
+		//Leaving the SORT dedup after the fix will not effect the results since the fix will result in NO duplicates in KEL Index.
+		ds_clusterdetails_dedup := DEDUP(SORT(ds_clusterdetails, entity_context_uid_, tree_uid_, -__recordcount),
+																 entity_context_uid_, tree_uid_);		
+
+		// output(ds_entityNameUID, named('ds_entityNameUID____getClusterDetails')); 
+		// output(ds_clusterdetails, named('ds_clusterdetails____getClusterDetails'));
+		// output(ds_clusterdetails_dedup, named('ds_clusterdetails_dedup____getClusterDetails'));
+		RETURN ds_clusterdetails_dedup;											 
+	ENDMACRO;	
+	
+	EXPORT getAssociatedAddresses (DATASET(FraudShared_Services.Layouts.Raw_Payload_rec) ds_payload) := FUNCTION
+		
+		ds_physicaladdress := PROJECT(ds_payload,TRANSFORM(iesp.fraudgovreport.t_FraudGovAssociatedAddress,
+																								SELF.AddressType := LEFT.address_type,
+																								SELF.Address := iesp.ECL2ESP.SetAddress(LEFT.clean_address.prim_name, 
+																																												LEFT.clean_address.prim_range, 
+																																												LEFT.clean_address.predir, 
+																																												LEFT.clean_address.postdir, 
+																																												LEFT.clean_address.addr_suffix, 
+																																												LEFT.clean_address.unit_desig, 
+																																												LEFT.clean_address.sec_range, 
+																																												LEFT.clean_address.p_city_name, 
+																																												LEFT.clean_address.st, 
+																																												LEFT.clean_address.zip, 
+																																												LEFT.clean_address.zip4, 
+																																												'', 
+																																												'', 
+																																												LEFT.address_1, 
+																																												LEFT.address_2,
+																																												''),
+																								SELF.RoofTopLatLong.Latitude := LEFT.clean_address.geo_lat,
+																								SELF.RoofTopLatLong.Longitude := LEFT.clean_address.geo_long));
+		
+		ds_Mailingaddress := PROJECT(ds_payload,TRANSFORM(iesp.fraudgovreport.t_FraudGovAssociatedAddress,
+																							SELF.AddressType := LEFT.additional_address.address_type,
+																							SELF.Address := iesp.ECL2ESP.SetAddress(LEFT.additional_address.clean_address.prim_name, 
+																																											LEFT.additional_address.clean_address.prim_range, 
+																																											LEFT.additional_address.clean_address.predir, 
+																																											LEFT.additional_address.clean_address.postdir, 
+																																											LEFT.additional_address.clean_address.addr_suffix, 
+																																											LEFT.additional_address.clean_address.unit_desig, 
+																																											LEFT.additional_address.clean_address.sec_range, 
+																																											LEFT.additional_address.clean_address.p_city_name, 
+																																											LEFT.additional_address.clean_address.st, 
+																																											LEFT.additional_address.clean_address.zip, 
+																																											LEFT.additional_address.clean_address.zip4, 
+																																											'', 
+																																											'', 
+																																											LEFT.additional_address.street_1, 
+																																											LEFT.additional_address.street_2,
+																																											''),
+																							SELF.RoofTopLatLong.Latitude := LEFT.additional_address.clean_address.geo_lat,
+																							SELF.RoofTopLatLong.Longitude := LEFT.additional_address.clean_address.geo_long));
+		
+		//Discarding the addresses which doesn't have RoofTopLatLong information in the data.
+		ds_address_w_geoloc := (ds_physicaladdress + ds_Mailingaddress)(RoofTopLatLong.Latitude <> '' OR RoofTopLatLong.Longitude <> '');
+		
+		ds_address := DEDUP(SORT(ds_address_w_geoloc, 
+															RoofTopLatLong.Latitude, RoofTopLatLong.Longitude), 
+												RoofTopLatLong.Latitude, RoofTopLatLong.Longitude);
+
+		RETURN ds_address;											 
+	END;	
+
+	EXPORT GetIndicatorAttributes(DATASET(FraudGovPlatform_Services.Layouts.elementNidentity_uid_recs) ds_in, FraudGovPlatform_Services.IParam.BatchParams batch_params) := FUNCTION
+			
+
+		FraudGovPlatform_Services.Layouts.kel_filter_rec xform_getFilter(FraudGovPlatform_Services.Layouts.elementNidentity_uid_recs L) := TRANSFORM
+			SELF.gc_id := batch_params.GlobalCompanyId;
+			SELF.ind_type := batch_params.IndustryType;
+			SELF.element := L;
+		END;
+
+		ds_kel_filter := PROJECT(ds_in,xform_getFilter(LEFT));
+
+		iesp.fraudgovreport.t_FraudGovIndicatorAttribute xform_getIndicatorAttribute(FraudGovPlatform_Services.Layouts.kel_filter_rec L, FraudGovPlatform.Key_ElementPivot R):= TRANSFORM
+			SELF.IndicatorTypeCode := R.indicatortype;
+			SELF.IndicatorTypeDescription := R.indicatordescription;
+			SELF.DataType := R.fieldtype;
+			SELF.RiskLevel := (STRING)R.risklevel;
+			SELF.DescriptionCode := R.field;
+			SELF.Description := R.label; 
+			SELF.DescriptionValue := R.value;
+			SELF := [];
+		END;
+
+		ds_indicator_attributes := JOIN(ds_kel_filter, FraudGovPlatform.Key_ElementPivot(),
+										KEYED(LEFT.gc_id = RIGHT.customer_id_ AND
+											LEFT.ind_type = RIGHT.industry_type_ AND
+											LEFT.element.entity_context_uid = RIGHT.entity_context_uid_),
+										xform_getIndicatorAttribute(LEFT,RIGHT), LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT,SKIP));
+
+		ds_indicator_attributes_dedup := DEDUP(SORT(ds_indicator_attributes,DescriptionCode,-DescriptionValue),DescriptionCode);
+
+		return ds_indicator_attributes_dedup;
+	END;
+
+	EXPORT GetScoreBreakDown(DATASET(FraudGovPlatform_Services.Layouts.elementNidentity_uid_recs) ds_in, FraudGovPlatform_Services.IParam.BatchParams batch_params) := FUNCTION
+
+		gc_id := batch_params.GlobalCompanyId;
+		ind_type := batch_params.IndustryType;
+
+		FraudGovPlatform_Services.Layouts.kel_filter_rec xform_getFilter(FraudGovPlatform_Services.Layouts.elementNidentity_uid_recs L) := TRANSFORM
+			SELF.gc_id := gc_id;
+			SELF.ind_type := ind_type;
+			SELF.element := L;
+		END;
+
+		ds_kel_filter := PROJECT(ds_in,xform_getFilter(LEFT));
+
+	
+		iesp.fraudgovreport.t_FraudGovScoreBreakdown generateScoreBreakdown(FraudGovPlatform_Services.Layouts.kel_filter_rec L,
+																			FraudGovPlatform.Key_ScoreBreakdown R):= TRANSFORM
+			SELF.IndicatorTypeCode := R.indicatortype;
+			SELF.IndicatorTypeDescription := R.IndicatorDescription;
+			SELF.RiskLevel := (STRING)R.risklevel;
+			SELF.PopulationType := R.populationtype;
+			SELF.Value := R.value;
+		END;
+
+		ds_scoreBreakdowns := JOIN(ds_kel_filter,FraudGovPlatform.Key_ScoreBreakdown(), 
+									KEYED(LEFT.gc_id = RIGHT.customer_id_ AND
+												LEFT.ind_type = RIGHT.industry_type_ AND
+												LEFT.element.entity_context_uid = RIGHT.entity_context_uid_),
+									generateScoreBreakdown(LEFT,RIGHT), LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
+
+		ds_scoreBreakdowns_dedup := DEDUP(SORT(ds_scoreBreakdowns,IndicatorTypeCode,PopulationType,-Value),IndicatorTypeCode,PopulationType);
+
+		return ds_scoreBreakdowns_dedup;
+	END;
+	
+	EXPORT IsValidInputDate(iesp.share.t_Date date) := FUNCTION
+		date_int := iesp.ECL2ESP.DateToInteger(date);
+		
+		return STD.Date.IsValidDate(date_int) OR date_int = 0;
+	END;
+	
+	EXPORT GetCleanAddressFragmentValue(string address) := FUNCTION
+		return REGEXREPLACE('@@@',address,', ');
+	END;
 
 END;

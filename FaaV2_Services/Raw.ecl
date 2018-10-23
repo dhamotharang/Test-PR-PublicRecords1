@@ -63,15 +63,15 @@ export Raw := module
 																
   		Suppress.MAC_Suppress(recs_raw,recs_1,applicationType,Suppress.Constants.LinkTypes.DID,did_out);
 																
-			recs_over := project( FCRA.key_override_faa.aircraft (keyed(flag_file_id in aircraft_correct_ffid) and isFCRA),
+			recs_over := project( choosen(FCRA.key_override_faa.aircraft (keyed(flag_file_id in aircraft_correct_ffid) and isFCRA),FCRA.compliance.MAX_OVERRIDE_LIMIT),
 											transform(FaaV2_Services.Layouts.Rawrec,self:=left,self:=[]));
 			recs_over1 :=	recs_1 + recs_over ;
 			
 			//---------------------------------------FCRA FFD----------------------------------------------------------------	
 	
 			FaaV2_Services.Layouts.Rawrec xformAircraft ( FaaV2_Services.Layouts.Rawrec L , FFD.Layouts.PersonContextBatchSlim R ) := transform,
-			skip(~ShowDisputedRecords and r.isDisputed) 
-			self.StatementIDs := if(ShowConsumerStatements,r.StatementIDs,FFD.Constants.BlankStatements);
+			skip((~ShowDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs))) 
+			self.StatementIDs := r.StatementIDs;
 			self.isDisputed :=	r.isDisputed;
 			self := L;
 			end;
@@ -118,7 +118,7 @@ export Raw := module
 											// transform(faa.layout_aircraft_info,self.aircraft_mfr_model_code := left.mfr_mdl_code,self:=RIGHT),
 											LEFT OUTER, KEEP(1), LIMIT(0));
 											
-			info_overrecs := FCRA.key_override_faa.aircraft_details(keyed(flag_file_id in info_correct_ffid));
+			info_overrecs := choosen(FCRA.key_override_faa.aircraft_details(keyed(flag_file_id in info_correct_ffid)), FCRA.compliance.MAX_OVERRIDE_LIMIT);
 															
 			aircraft_infoover_added := join(in_air(isFCRA AND aircraft.mfr_mdl_code IN info_correct_rec_id),info_overrecs, 
 											(left.aircraft.mfr_mdl_code = right.aircraft_mfr_model_code),
@@ -132,7 +132,7 @@ export Raw := module
 			FaaV2_Services.Layouts.aircraft_full xformAircraftDetail ( FaaV2_Services.Layouts.aircraft_full L , FFD.Layouts.PersonContextBatchSlim R ) := transform
 			self.detail.StatementIDs := if(ShowConsumerStatements,r.StatementIDs,FFD.Constants.BlankStatements);
 			self.detail.isDisputed := ShowDisputedRecords and r.isDisputed;
-			self.detail := if(ShowDisputedRecords or ~r.isDisputed,L.detail);
+			self.detail := if((ShowDisputedRecords or ~r.isDisputed) and (ShowConsumerStatements or ~exists(r.StatementIDs)),L.detail);
 			self := L;
 			end;
 											
@@ -171,7 +171,7 @@ export Raw := module
 									transform(FaaV2_Services.Layouts.aircraft_full,self.engine:=RIGHT,self:=left),
 									LEFT OUTER, KEEP(1), LIMIT(0));
 
-			engine_overrecs := FCRA.key_override_faa.aircraft_engine(keyed(flag_file_id in engine_correct_ffid));	
+			engine_overrecs := choosen(FCRA.key_override_faa.aircraft_engine(keyed(flag_file_id in engine_correct_ffid)),FCRA.compliance.MAX_OVERRIDE_LIMIT);	
 			
 			aircraft_engineover_info_added := join(in_air(isFCRA AND aircraft.eng_mfr_mdl IN engine_correct_rec_id), engine_overrecs,
 											(left.aircraft.eng_mfr_mdl = right.engine_mfr_model_code),							
@@ -183,7 +183,7 @@ export Raw := module
 			FaaV2_Services.Layouts.aircraft_full xformAircraft ( FaaV2_Services.Layouts.aircraft_full L , FFD.Layouts.PersonContextBatchSlim R ) := transform
 			    self.engine.StatementIDs := if(ShowConsumerStatements,r.StatementIDs,FFD.Constants.BlankStatements),
 					self.engine.isDisputed := ShowDisputedRecords and r.isDisputed;
-					self.engine := if(ShowDisputedRecords or ~r.isDisputed,L.engine);
+					self.engine := if((ShowDisputedRecords or ~r.isDisputed) and (ShowConsumerStatements or ~exists(r.StatementIDs)),L.engine);
 					self := L;
 			end;
 	

@@ -1,7 +1,4 @@
-﻿/*2016-05-21T00:39:26Z (Kevin Huls)
-Automated reinstate from 2016-05-19T17:50:17Z
-*/
-/*--SOAP--
+﻿/*--SOAP--
 <message name="InstantIdBatch">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="DPPAPurpose" type="xsd:byte"/>
@@ -132,7 +129,7 @@ Automated reinstate from 2016-05-19T17:50:17Z
 </pre>
 */
 
-import ut, address, codes, models, riskwise, iesp, patriot, intliid, address, royalty, AutoStandardI;
+import ut, address, codes, models, riskwise, iesp, patriot, intliid, address, royalty, AutoStandardI, OFAC_XG5;
 
 export InstantID_Batch := macro
 
@@ -209,6 +206,7 @@ boolean	fdReasonsWith38 := false;
 boolean OFAC := true;  // this was previously hardcoded when calling the cviScore, so will do that up here now
 
 boolean Include_ALL_Watchlist:= false : stored('Include_ALL_Watchlist');
+boolean Include_ALLV4_Watchlist:= false : stored('Include_ALLV4_Watchlist');
 boolean Include_BES_Watchlist:= false : stored('Include_BES_Watchlist');
 boolean Include_CFTC_Watchlist:= false : stored('Include_CFTC_Watchlist');
 boolean Include_DTC_Watchlist:= false : stored('Include_DTC_Watchlist');
@@ -241,6 +239,7 @@ boolean Include_PMLJ_Watchlist:= false : stored('Include_PMLJ_Watchlist');
 
 dWL := dataset([], iesp.share.t_StringArrayItem) +
 if(Include_ALL_Watchlist, dataset([{patriot.constants.wlALL}], iesp.share.t_StringArrayItem)) +
+if(Include_ALLV4_Watchlist, dataset([{patriot.constants.wlALLV4}], iesp.share.t_StringArrayItem)) +
 if(Include_BES_Watchlist, dataset([{patriot.constants.wlBES}], iesp.share.t_StringArrayItem)) +
 if(Include_CFTC_Watchlist, dataset([{patriot.constants.wlCFTC}], iesp.share.t_StringArrayItem)) +
 if(Include_DTC_Watchlist, dataset([{patriot.constants.wlDTC}], iesp.share.t_StringArrayItem)) +
@@ -271,6 +270,9 @@ if(Include_PMLC_Watchlist, dataset([{patriot.constants.wlPMLC}], iesp.share.t_St
 if(Include_PMLJ_Watchlist, dataset([{patriot.constants.wlPMLJ}], iesp.share.t_StringArrayItem));
 
 watchlists_request := dWL(value<>'');
+
+IF( OFAC_version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlists_request, value),
+   FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 
 boolean IncludeDLverification := false : stored('IncludeDLverification');
 boolean IncludeMSoverride := false : stored('IncludeMSoverride');

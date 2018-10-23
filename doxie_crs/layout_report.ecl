@@ -1,4 +1,4 @@
-//**** Full record def for the Comp Reports
+﻿//**** Full record def for the Comp Reports
 import doxie,images,vehicleV2_services,DriversV2_Services,iesp;
 
 recvehi := recordof(doxie.vehicle_search_records_crs); 
@@ -22,5 +22,6 @@ export layout_report := record, maxlength(doxie_crs.maxlength_report)
 	dataset(recimar) images_children;
 	dataset(recdocr2) DOC2_children{xpath('CriminalRecords/Criminal'), MAXCOUNT(iesp.constants.CRIM.MaxReportRecords)};
 	transhist TransactionHistory {xpath('TransactionHistory')};
+	DATASET(iesp.ContactPlus.t_ContactPlusProgPhoneRecord) progressive_phones {MAXCOUNT(doxie.rollup_limits.progressivePhone)};
 end;
 

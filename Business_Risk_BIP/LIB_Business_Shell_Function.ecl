@@ -50,7 +50,7 @@ options := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
 	EXPORT UNSIGNED1	BIPBestAppend				:= IF(BIPBestAppend_In BETWEEN Business_Risk_BIP.Constants.BIPBestAppend.Default AND Business_Risk_BIP.Constants.BIPBestAppend.OverwriteWithBest,
 																							BIPBestAppend_In,
 																							Business_Risk_BIP.Constants.BIPBestAppend.Default);
-	EXPORT UNSIGNED1	OFAC_Version				:= MAX(MIN(OFAC_Version_In, 3), 0);
+	EXPORT UNSIGNED1	OFAC_Version				:= MAX(MIN(OFAC_Version_In, Business_Risk_BIP.Constants.MAX_OFAC_VERSION), 0);
 	EXPORT REAL				Global_Watchlist_Threshold	:= MAX(MIN(Global_Watchlist_Threshold_In, 1), 0);
 	EXPORT UNSIGNED1	KeepLargeBusinesses	:= MAX(MIN(KeepLargeBusinesses_In, 1), 0);
 	EXPORT BOOLEAN    IncludeTargusGateway := IncludeTargusGateway_In;

@@ -1,6 +1,7 @@
-﻿IMPORT Doxie, eMerges, RiskWise, Risk_Indicators, ut;
+﻿IMPORT _Control, Doxie, eMerges, RiskWise, Risk_Indicators, ut;
+onThor := _Control.Environment.OnThor;
 
-EXPORT getSports(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim1, boolean onThor) := FUNCTION
+EXPORT getSports(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim1) := FUNCTION
 
 PBSlim := PBslim1(did2<>0);
 
@@ -26,8 +27,12 @@ sportsDIDs_thor := join(
 							atmost(riskwise.max_atmost), 
 	local);
 
-sportsDIDs := if(onThor, sportsDIDS_thor, sportsDIDs_roxie);							
-							
+#IF(onThor)
+	sportsDIDs := sportsDIDs_thor;
+#ELSE
+	sportsDIDs := sportsDIDs_roxie;
+#END
+
 sportsRIDkey := eMerges.Key_HuntFish_Rid(false);
 
 ProfileBooster.Layouts.Layout_PB_Slim_sports	addSportsDetails(sportsDIDs le, sportsRIDkey ri) := transform
@@ -53,8 +58,12 @@ sportsDetails_thor := join(
 							atmost(riskwise.max_atmost),
 	local);
 
-sportsDetails := if(onThor, sportsDetails_thor, sportsDetails_roxie);
-							
+#IF(onThor)
+	sportsDetails := sportsDetails_thor;
+#ELSE
+	sportsDetails := sportsDetails_roxie;
+#END
+
 //conceal and carry
 ccwDIDkey := eMerges.key_ccw_did(false);
 
@@ -77,8 +86,12 @@ ccwDIDs_thor := join(
 							atmost(riskwise.max_atmost),
 	local);
 							
-ccwDIDs := if(onThor, ccwDIDs_thor, ccwDIDs_roxie);
-							
+#IF(onThor)
+	ccwDIDs := ccwDIDs_thor;
+#ELSE
+	ccwDIDs := ccwDIDs_roxie;
+#END
+
 ccwRIDkey := eMerges.key_ccw_rid(false);
 
 ProfileBooster.Layouts.Layout_PB_Slim_sports	addCCWDetails(ccwDIDs le, ccwRIDkey ri) := transform
@@ -101,8 +114,12 @@ ccwDetails_thor := join(
 							atmost(riskwise.max_atmost),
 	local);
 							
-ccwDetails := if(onThor, ccwDetails_thor, ccwDetails_roxie);
-							
+#IF(onThor)
+	ccwDetails := ccwDetails_thor;
+#ELSE
+	ccwDetails := ccwDetails_roxie;
+#END
+
 sortSportsdetails := sort(sportsDetails + ccwDetails, seq, did2, RID);
 
 ProfileBooster.Layouts.Layout_PB_Slim_sports rollSports(sportsDetails le, sportsDetails ri) := TRANSFORM

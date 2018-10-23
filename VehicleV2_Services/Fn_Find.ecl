@@ -1,4 +1,4 @@
-import mdr, VehicleV2, driversv2, doxie, ut, suppress, Census_Data, VehicleV2_services, codes,
+﻿import mdr, VehicleV2, driversv2, doxie, ut, suppress, Census_Data, VehicleV2_services, codes,
        doxie_Raw, doxie_build, CriminalRecords_Services, Address;
 
   doxie.MAC_Header_Field_Declare ();
@@ -17,6 +17,7 @@ export Fn_Find(
 							boolean include_non_regulated_data = false) 
 							:= module 
 	
+	isCNSMR := ut.IndustryClass.is_Knowx;
 	includeNonRegulatedData := include_non_regulated_data and ~doxie.DataRestriction.InfutorMV;
 
   layout_w_keys makeVehReport(in_veh_keys l, VehicleV2.Key_Vehicle_Main_Key r) := transform
@@ -89,7 +90,7 @@ export Fn_Find(
   // Probably this code do not always work as it was intended: 
   // there are more than 1,000 records matching by vehicle-key,
   // and ~200 by vehicle- and iteration-key.
-	veh_recs0 := join(in_veh_keys,
+	veh_recs0_mainkeyinfo := join(in_veh_keys,
 								VehicleV2.Key_Vehicle_Main_Key,
 								keyed(left.Vehicle_Key = right.Vehicle_Key[1..length(trim(left.vehicle_key))]) and
                 // it =looks= like left.iteration_key cannot be blank here.
@@ -97,6 +98,9 @@ export Fn_Find(
                 (includeNonRegulatedData or right.source_code not in MDR.sourceTools.set_infutor_all_veh), 
 								makeVehReport(left, right),
 								keep (VehicleV2_services.Constant.VEHICLE_PER_KEY), limit (10000));
+															
+								
+ veh_recs0 := if(~isCNSMR, veh_recs0_mainkeyinfo);
 	
 	// for moxie queries this filtering is now done in runall
 	veh_recs := if(alternate_route,
@@ -105,7 +109,7 @@ export Fn_Find(
 														(source_code in MDR.sourceTools.set_infutor_all_veh and ut.PermissionTools.dppa.ok(dppa_purpose))));
 	
 	// Similar issue: 3,000,000 by vehicle-key, ~4,500 by vehicle-, iteration-, sequence-key.
-	owner_recs0 :=join(in_veh_keys, vehiclev2.Key_Vehicle_Party_Key,
+	owner_recs0_info :=join(in_veh_keys, vehiclev2.Key_Vehicle_Party_Key,
 									keyed(left.vehicle_key=right.vehicle_key[1..length(trim(left.vehicle_key))]) and
 									keyed(left.iteration_key='' or left.Iteration_key = right.Iteration_key) and// and
 									keyed(left.sequence_key=''  or left.sequence_key= right.sequence_key) and
@@ -113,6 +117,9 @@ export Fn_Find(
 									TRANSFORM (vehiclev2.Layout_Base_Party, SELF := RIGHT),
                   // TODO: should rather be PARTIES_PER_VEHICLE
 									keep(VehicleV2_services.Constant.VEHICLE_PER_KEY), limit (10000));
+	
+									
+	owner_recs0 := if(~isCNSMR, owner_recs0_info);
 									
 	vehiclev2.Layout_Base_Party get_dob_sex(owner_recs0 l, driversv2.Key_DL_DID r) := transform
 		self.orig_dob := if(((unsigned) l.orig_dob) <> 0,l.orig_dob,(string8) r.dob);

@@ -529,6 +529,8 @@ EXPORT Functions := MODULE
 															getPenalty := getAddrPenalty(input.prim_range,input.prim_name,input.p_city_name,input.st,input.z5,
 																								STD.Str.ToUpperCase(left.prim_range),STD.Str.ToUpperCase(left.prim_name),STD.Str.ToUpperCase(left.p_city_name),STD.Str.ToUpperCase(left.st),left.z5,zipradius);
 															self.addrPenalty:=getPenalty;self:=left));
+
+
 			return min(bestValues,addrpenalty);
 	end;
 	export getNamePenalty (string inFirst, string inMiddle, string inLast, string inCompany, string rawFirst ,string rawMiddle, string rawLast, string rawCompany):=function
@@ -551,6 +553,7 @@ EXPORT Functions := MODULE
 			busPenalty := map(foundCompany => if(Confidence>=Constants.BUS_NAME_BIPMATCH_THRESHOLD,(100-Confidence)/10,(100-Confidence)/5),
 												// inCompany <> '' => 10,
 												0);
+
 			return namePenalty+busPenalty;
 	end;
 	Export getBestNamePenalty (dataset(layouts.layout_nameinfo) inNames, layouts.autokeyInput input) := function
@@ -558,6 +561,7 @@ EXPORT Functions := MODULE
 															getPenalty := getNamePenalty(input.name_first,input.name_middle,input.name_last,input.comp_name,
 																							 STD.Str.ToUpperCase(left.FirstName),STD.Str.ToUpperCase(left.MiddleName),STD.Str.ToUpperCase(left.LastName),STD.Str.ToUpperCase(left.CompanyName));
 															self.namePenalty:=getPenalty;self:=left));
+
 			return min(bestValues,namePenalty);
 	end;
 	Export doPenalty (dataset(layouts.CombinedHeaderResults) inRecs, dataset(layouts.autokeyInput) input, integer maxPenalty, integer zipradius = Constants.ZIP_RADIUS) := function
@@ -638,19 +642,19 @@ EXPORT Functions := MODULE
 		finalRecs := recsNotDerivedInput+recsDerivedInput+inRecs(penalty_applied=true);
 		sortRecs := sort(finalRecs,acctno,srcid,src,record_penalty);
 		dedupRecs := sort(dedup(sortRecs, acctno,srcid,src),record_penalty);
-		// output(inRecs,named('doPenalty_inrecsfordopentaly'),extend);
-		// output(inRecs.names,named('doPenalty_recsName'),extend);
-		// output(recsWithPenalty,named('doPenalty_recsWithPenalty'),extend);
-		// output(removeOverPenalty,named('doPenalty_removeOverPenalty'),extend);
-		// output(recsNotDerivedInput,named('doPenalty_recsNotDerivedInput'),extend);
-		// output(recsDerivedInput,named('doPenalty_recsDerivedInput'),extend);
-		// output(inrecsPenaltyTrue,named('doPenalty_inrecsPenaltyTrue'),extend);
-		// output(maxpenalty,named('doPenalty_maxpenalty'),overwrite);
-		// output(zipradius,named('doPenalty_zipradius'),overwrite);
-		// output(finalRecs,named('doPenalty_finalRecs'),extend);
-		// output(sortRecs,named('doPenalty_sortRecs'),extend);
-		// output(dedupRecs,named('doPenalty_dedupRecs'),extend);
-		return dedupRecs;
+
+
+
+
+
+
+
+
+
+
+
+
+				return dedupRecs;
 	end;
 	//AMS Specific Functions
 	export getAmsGroupAffiliations(dataset(Layouts.searchKeyResults_plus_input) provs) := function
@@ -906,6 +910,7 @@ EXPORT Functions := MODULE
 																								sancType = 'OTHER' => 23,
 																								sancType = 'NONE GIVEN' => 25,
 																								sancType = '' => 25,99);
+																								self.SANC_FINES:=left.specialnotes;
 											self := left;
 											self := [];//All other fields are no longer valid via Enclarity conversion from Ingenix
 											));
@@ -1037,6 +1042,7 @@ EXPORT Functions := MODULE
 										self.acctno:=if(keepRecord,left.acctno,skip); self.providerid :=left.providerid;self.death_ind:=true;self.dod:=right.dod8),
 									keep(1), limit(0));
 			death_final := sort(death_BestHit+death_BestFreq,acctno,ProviderID);
+
 			// output(input);
 			// output(death_final);
 		return death_final;
@@ -1052,6 +1058,11 @@ EXPORT Functions := MODULE
 																							self.DeathLookup := right.death_ind;
 																							self.DateofDeath := right.dod;
 																							self := left),left outer);
+
+
+
+
+
 		// output(inputSlim);
 		// output(inputRecs);
 		// output(updateSSN);

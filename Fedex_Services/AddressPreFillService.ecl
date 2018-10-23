@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="AddressPreFillServiceRequest" fast_display = "true">
   <part name="LastName" type="xsd:string"/>
   <part name="Addr" type="xsd:string"/>
@@ -21,6 +21,7 @@
 */
 
 export AddressPreFillService := macro
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 #constant('AllowLeadingLname',true);
 #constant('IncludeZeroDIDRefs',true);
 #stored('ScoreThreshold',fedex_services.Contants.ScoreThreshold);

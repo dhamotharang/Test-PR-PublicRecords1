@@ -6,12 +6,12 @@ EXPORT getIndDID(DATASET(DueDiligence.Layouts.CleanedData) cleanedData,
 																	UNSIGNED1 glba,
 																	INTEGER bsVersion,
 																	UNSIGNED8 bsOptions,
-																	DATASET(Gateway.Layouts.Config) gateways,
 																	BOOLEAN includeReport = FALSE,
 																	BOOLEAN isFCRA = FALSE) := FUNCTION
 	
 	
 		UNSIGNED1 appendBest := 0;	// search the best file 
+    gateways := DATASET([], Gateway.Layouts.Config);
 	
 																										
 		uniqueDIDs := DEDUP(SORT(PROJECT(cleanedData((UNSIGNED)cleanedInput.individual.lexID <> 0), TRANSFORM(doxie.layout_references, SELF.did := (UNSIGNED)LEFT.cleanedInput.individual.lexID )), did), did);
@@ -87,7 +87,6 @@ EXPORT getIndDID(DATASET(DueDiligence.Layouts.CleanedData) cleanedData,
 																																	SELF.historyDateRaw := LEFT.cleanedinput.historyDateYYYYMMDD;
 																																	SELF.historyDate := IF(LEFT.cleanedinput.historyDateYYYYMMDD = DueDiligence.Constants.date8Nines, STD.Date.Today(), LEFT.cleanedinput.historyDateYYYYMMDD);
 																																	SELF.indvType := DueDiligence.Constants.INQUIRED_INDIVIDUAL;
-																																	SELF.perLexID := RIGHT.did;
 																																	
 																																	cleaned := LEFT.cleanedInput;
 																																	indv := cleaned.individual;

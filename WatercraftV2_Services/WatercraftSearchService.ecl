@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="WatercraftSearch" wuTimeout="300000">
 	<part name="BDID" type="xsd:string"/>
 	<part name="DID" type="xsd:string"/>
@@ -45,7 +45,7 @@
 IMPORT Text_Search, doxie, AutostandardI;
 
 EXPORT WatercraftSearchService := MACRO
-
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	#WEBSERVICE(FIELDS(	'DID',
 											'BDID',
 											'WatercraftKey',

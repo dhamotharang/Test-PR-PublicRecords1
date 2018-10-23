@@ -1,4 +1,5 @@
-import doxie, risk_indicators, riskwisefcra, gateway;
+﻿import _Control, doxie, risk_indicators, riskwisefcra, gateway;
+onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_FCRA_Neutral_DID_Soapcall(DATASET(risk_indicators.layout_input) iid,
 								DATASET(Gateway.Layouts.Config) gateways,
@@ -23,8 +24,7 @@ export Boca_Shell_FCRA_Neutral_DID_Soapcall(DATASET(risk_indicators.layout_input
 								string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
 								unsigned1 append_best=0, 
 								unsigned8 BSOptions=0,
-								string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
-								boolean onThor=false) :=
+								string50 DataPermission=risk_indicators.iid_constants.default_DataPermission) :=
 FUNCTION
 
 ret := risk_indicators.InstantID_Function(iid,
@@ -50,9 +50,7 @@ ret := risk_indicators.InstantID_Function(iid,
 										in_runDLverification := FALSE,
 										in_append_best := append_best,
 										in_BSOptions := BSOptions,
-										in_DataPermission := DataPermission,
-										onThor := onThor
-	);
+										in_DataPermission := DataPermission);
 	
 	iid_results_with_flags := risk_indicators.ADL_Based_Modeling_IID_Function(iid,
 																																				gateways, 
@@ -81,7 +79,7 @@ ret := risk_indicators.InstantID_Function(iid,
 	
 	iid_results := if(ADL_Based_Shell, just_iid_results, ret);
 	
-	outf_n := ungroup( risk_indicators.Boca_Shell_FCRA_Neutral_Function (iid_results, IN_DPPAPurpose, IN_GLBPurpose, isUtil, IN_LNBranded, includerel, TRUE, IN_BSversion, nugen := nugen, bsOptions := bsOptions, onThor := onThor) );
+	outf_n := ungroup( risk_indicators.Boca_Shell_FCRA_Neutral_Function (iid_results, IN_DPPAPurpose, IN_GLBPurpose, isUtil, IN_LNBranded, includerel, TRUE, IN_BSversion, nugen := nugen, bsOptions := bsOptions) );
 	
 	with_adl_based_flags := join(outf_n, iid_results_with_flags, left.seq = right.seq, transform(risk_indicators.Layout_BocaShell_Neutral, 
 													self.adl_shell_flags.in_addrpop	 := right.in_addrpop	 ;
@@ -126,6 +124,7 @@ transform(layout_pcr,
 	SELF.ConsumerFlags.security_alert := (right.dbrecords[1].security_fraud_alert=1);
 	SELF.ConsumerFlags.negative_alert := (right.dbrecords[1].negative_alert=1);
 	SELF.ConsumerFlags.id_theft_flag := (right.dbrecords[1].id_theft_flag=1);
+	self.ConsumerFlags.legal_hold_alert := false ; // PCR keys don't have legal hold
 	SELF.date_created := (unsigned)(stringlib.stringfilterout((right.dbrecords[1].date_added[1..10]), '-')) ) );
 
 
@@ -138,6 +137,7 @@ layout_pcr add_flags_by_did(risk_indicators.Layout_BocaShell_Neutral le, fcra.Ke
 	SELF.ConsumerFlags.security_alert := (ri.security_alert='1');
 	SELF.ConsumerFlags.negative_alert := (ri.negative_alert='1');
 	SELF.ConsumerFlags.id_theft_flag := (ri.id_theft_flag='1');
+	self.ConsumerFlags.legal_hold_alert := false ; // PCR keys don't have legal hold
 	SELF.date_created := (unsigned)ri.date_created;
 	SELF := le;
 END;
@@ -152,7 +152,11 @@ j1_thor := JOIN (distribute(outf, hash64(did)),
             add_flags_by_did(LEFT,RIGHT),
             LIMIT(10,SKIP), KEEP(1), LOCAL);
 
-j1 := if(onThor, j1_thor, j1_roxie);
+#IF(onThor)
+  j1 := j1_thor;
+#ELSE
+  j1 := j1_roxie;
+#END
 
 layout_pcr add_flags_by_ssn(risk_indicators.Layout_BocaShell_Neutral le, fcra.Key_Override_PCR_SSN ri) := TRANSFORM
 	SELF.ConsumerFlags.corrected_flag := true;
@@ -162,6 +166,7 @@ layout_pcr add_flags_by_ssn(risk_indicators.Layout_BocaShell_Neutral le, fcra.Ke
 	SELF.ConsumerFlags.security_alert := (ri.security_alert='1');
 	SELF.ConsumerFlags.negative_alert := (ri.negative_alert='1');
 	SELF.ConsumerFlags.id_theft_flag := (ri.id_theft_flag='1');
+	self.ConsumerFlags.legal_hold_alert := false ; // PCR keys don't have legal hold
 	SELF.date_created := (unsigned)ri.date_created;
 	SELF := le;
 END;
@@ -181,8 +186,12 @@ j2_thor := JOIN (distribute(outf, hash64(Shell_Input.ssn)),
             add_flags_by_ssn(LEFT,RIGHT),
             LIMIT(10,SKIP), KEEP(1), LOCAL);
 						
-j2 := if(onThor, j2_thor, j2_roxie);						
-						
+#IF(onThor)
+  j2 := j2_thor;
+#ELSE
+  j2 := j2_roxie;
+#END
+
 pcr_on_roxie := DEDUP(SORT(GROUP(j1)+GROUP(j2),seq,-(unsigned)date_created),seq);
 
 
@@ -200,6 +209,8 @@ risk_indicators.Layout_BocaShell_Neutral add_flags(risk_indicators.Layout_BocaSh
 	SELF.ConsumerFlags.security_alert := le.ConsumerFlags.security_alert or ri.ConsumerFlags.security_alert;
 	SELF.ConsumerFlags.negative_alert := le.ConsumerFlags.negative_alert or ri.ConsumerFlags.negative_alert;
 	SELF.ConsumerFlags.id_theft_flag := le.ConsumerFlags.id_theft_flag or ri.ConsumerFlags.id_theft_flag;
+	SELF.ConsumerFlags.legal_hold_alert := le.ConsumerFlags.legal_hold_alert or ri.ConsumerFlags.legal_hold_alert;
+
 	SELF.ConsumerStatements := le.ConsumerStatements;  // these always come from PersonContext, searched earlier within Risk_Indicators.checkPersonContext
 	
 	self.seq := le.seq;
@@ -224,7 +235,11 @@ END;
 with_flags_thor := JOIN(distribute(outf, hash64(seq, did)), pcr_final, LEFT.seq=RIGHT.seq, add_flags(LEFT,RIGHT), LOOKUP, LEFT OUTER) : PERSIST('~BOCASHELLFCRA::iid_results');
 with_flags_roxie := JOIN(outf, pcr_final, LEFT.seq=RIGHT.seq, add_flags(LEFT,RIGHT), LOOKUP, LEFT OUTER);
 
-with_flags := if(onThor, with_flags_thor, with_flags_roxie);
+#IF(onThor)
+  with_flags := with_flags_thor;
+#ELSE
+  with_flags := with_flags_roxie;
+#END
 
 // output(esp_input, named('esp_input'));
 // output(esp_response, named('esp_response'));

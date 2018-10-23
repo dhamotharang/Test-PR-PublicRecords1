@@ -14,10 +14,12 @@ EXPORT Records (DATASET(ConsumerCreditReport_Services.Layouts.inputRec) ds_input
 
 	ds_with_dids := ConsumerCreditReport_Services.Functions.append_Dids(ds_work_temp,in_mod);
   
- ds_dids:=PROJECT(ds_with_dids(did!=0),TRANSFORM(FFD.Layouts.DidBatch,SELF:=LEFT));
+ ds_dids:=PROJECT(ds_with_dids(did!=0),TRANSFORM(FFD.Layouts.DidBatch,
+                                                 SELF.acctno := FFD.Constants.SingleSearchAcctno,
+																								 SELF.did:=LEFT.did));
  
  DataGroupSet:=IF(in_mod.FetchLiensJudgments,FFD.Constants.DataGroupSet.Liens,FFD.Constants.DataGroupSet.Person);
- pc_recs :=IF(isFCRA, FFD.FetchPersonContext(ds_dids,in_mod.gateways,DataGroupSet),DATASET([],FFD.Layouts.PersonContextBatch));
+ pc_recs :=IF(isFCRA, FFD.FetchPersonContext(ds_dids,in_mod.gateways,DataGroupSet,in_mod.FFDOptionsMask),DATASET([],FFD.Layouts.PersonContextBatch));
  
 	ds_work_recs := IF(isFCRA, ConsumerCreditReport_Services.Functions.append_PersonContext(ds_with_dids,in_mod, pc_recs), ds_with_dids);
 
@@ -28,7 +30,7 @@ EXPORT Records (DATASET(ConsumerCreditReport_Services.Layouts.inputRec) ds_input
  ds_flags := IF(isFCRA, FFD.GetFlagFile(ds_best, pc_recs));
  
 	ds_ccr_LiensJudgments := IF(in_mod.FetchLiensJudgments AND isFCRA,
-		ConsumerCreditReport_Services.Functions.append_LiensJudgments(ds_ccr_UniqueId, in_mod, ds_flags),
+		ConsumerCreditReport_Services.Functions.append_LiensJudgments(ds_ccr_UniqueId, in_mod, ds_flags, pc_recs),
 		ds_ccr_UniqueId);
 
 	ds_rejects := ConsumerCreditReport_Services.Functions.format_Rejects(ds_work_recs(error_code>0));

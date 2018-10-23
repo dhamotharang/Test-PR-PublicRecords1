@@ -1,27 +1,17 @@
-﻿IMPORT _control;
+﻿IMPORT AutoKeyI;
 
 EXPORT Constants := MODULE
 
     EXPORT MaxIHperLexId := 10000;  // used to pull data from index
-
+    
     EXPORT StatusCodes := MODULE
-        EXPORT  NoSearchRecords     := 401;       //  no valid lexids in the request
-        EXPORT  ResultsFound        := 501;       //  found records for at least 1 lexid in the request
-        EXPORT  NoResultsFound      := 503;       //  no records found for valid lexid(s)
+        EXPORT  ResultsFound        := 0;       //  found records for at least 1 lexid in the request
+        EXPORT  NoResultsFound      := AutoKeyI.errorcodes._codes.NO_RECORDS;       //  no records found for valid lexid(s)
+	      EXPORT  SOAPError           := AutoKeyI.errorcodes._codes.SOAP_ERR;
     END;    //  StatusCodes MODULE
 
-    EXPORT Messages := MODULE
-        EXPORT  NoSearchRecordsMsg  := 'NO VALID INPUT SEARCH KEYS PROVIDED';   // for 401
-        EXPORT  ResultsFoundMsg     := 'RESULTS FOUND';                         // for 501
-        EXPORT  NoResultsFoundMsg   := 'NO RESULTS FOUND';                      // for 503
-
-    END;    //  Messages MODULE
     
-    EXPORT GetStatusMesage(INTEGER __code) := CASE(__code, 
-                                                  StatusCodes.NoSearchRecords => Messages.NoSearchRecordsMsg, 
-                                                  StatusCodes.ResultsFound => Messages.ResultsFoundMsg, 
-                                                  StatusCodes.NoResultsFound => Messages.NoResultsFoundMsg, 
-                                                  '');
+    EXPORT GetStatusMessage(INTEGER __code) := AutoKeyI.errorcodes._msgs(__code);
     
     EXPORT  ESP_Method          := 'FCRAInquiryHistoryDeltabase';
     EXPORT  ResultStructure     := 'FCRAInquiryHistoryDeltabaseResponseEx';

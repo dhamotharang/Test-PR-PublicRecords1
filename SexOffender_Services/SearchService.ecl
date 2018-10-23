@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SearchService">
 
 	<!-- COMPLIANCE SETTINGS -->
@@ -72,7 +72,7 @@
 import Alerts, AutoStandardI, iesp, ut;
 
 export SearchService := macro
-	
+	 #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
   // Get XML input 
   rec_in := iesp.sexualoffender.t_OffenderSearchRequest;
   ds_in := DATASET ([], rec_in) : STORED ('OffenderSearchRequest', FEW);

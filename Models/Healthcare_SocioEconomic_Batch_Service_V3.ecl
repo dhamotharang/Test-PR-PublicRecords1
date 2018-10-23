@@ -8,7 +8,7 @@ IMPORT HCSE_LT_18_LUCI_MODEL;
 export Healthcare_SocioEconomic_Batch_Service_V3 := MACRO
 
 	batchin := dataset([],Models.Layouts_Healthcare_V3.Layout_SocioEconomic_Batch_In) : stored('batch_in',few);
-	gateways := Gateway.Constants.void_gateway;
+	gateways_in := Gateway.Configuration.Get();
 
 	unsigned1 prep_dppa := 1 : stored('DPPAPurpose');
 	unsigned1 glb := 0 : stored('GLBPurpose');
@@ -18,9 +18,12 @@ export Healthcare_SocioEconomic_Batch_Service_V3 := MACRO
 	string5   industry_class_val := '';
 	boolean   isUtility := false;
 	boolean   ofac_Only := false;
+  unsigned1 ofac_version_      := 1        : stored('OFACVersion');
 
 	string DataRestriction := '' : stored('DataRestrictionMask');
 	string50 DataPermission := '' : stored('DataPermissionMask');
+	IF(DataRestriction='', FAIL('A blank DataRestrictionMask value is supplied.'));
+	IF(DataPermission='', FAIL('A blank DataPermissionMask value is supplied.'));
 
 	unsigned3 history_date := 999999; //Default if input is 0
 
@@ -32,6 +35,13 @@ export Healthcare_SocioEconomic_Batch_Service_V3 := MACRO
 	cleanIn := project(batchinseq(goodInput), Models.Healthcare_SocioEconomic_Transforms_V3.CleanBatch(left,history_date));
 	cleanInHist12 := project(cleanIn, Models.Healthcare_SocioEconomic_Transforms_V3.AddHistDate(left,12));
 	cleanInHist24 := project(cleanIn, Models.Healthcare_SocioEconomic_Transforms_V3.AddHistDate(left,24));
+  
+    Gateway.Layouts.Config gw_switch(gateways_in le) := transform
+	self.servicename := if(ofac_version_ = 4 and LeadIntegrityVersion >= 4 and le.servicename = 'bridgerwlc', le.servicename, '');
+	self.url := if(ofac_version_ = 4 and LeadIntegrityVersion >= 4 and le.servicename = 'bridgerwlc', le.url, ''); 		
+	self := le;
+end;
+gateways := project(gateways_in, gw_switch(left));
 
 	// set variables for passing to bocashell function
 	BOOLEAN includeDLverification := IF(LeadIntegrityVersion >= 4, TRUE, FALSE);
@@ -47,9 +57,12 @@ export Healthcare_SocioEconomic_Batch_Service_V3 := MACRO
 	boolean   fromIT1O := false;
 	boolean   doScore := false;
 	boolean   nugen := true;	
-	BOOLEAN   ofacSearching := IF(LeadIntegrityVersion >= 4, TRUE, FALSE);
-	UNSIGNED1 ofacVersion := IF(LeadIntegrityVersion >= 4, 2, 1);
+	BOOLEAN   include_ofac := IF(LeadIntegrityVersion >= 4, TRUE, FALSE);
+	UNSIGNED1 ofacVersion := map(LeadIntegrityVersion >= 4 and ofac_version_ = 4 => 4,
+                               LeadIntegrityVersion >= 4 => 2, 
+                                                            1);
 	BOOLEAN   includeAdditionalWatchlists := IF(LeadIntegrityVersion >= 4, TRUE, FALSE);
+  REAL    global_watchlist_threshold := if(ofacVersion in [1, 2, 3], 0.84, 0.85);
 	BOOLEAN   excludeWatchlists := IF(LeadIntegrityVersion >= 4, FALSE, TRUE); // Attributes 4.1 return a watchlist hit, so don't exclude watchlists
 	// For ITA we can't use FARES Data
 	BOOLEAN filterOutFares := TRUE;
@@ -58,18 +71,20 @@ export Healthcare_SocioEconomic_Batch_Service_V3 := MACRO
 	unsigned8 BSOptions := IF(LeadIntegrityVersion >= 4, risk_indicators.iid_constants.BSOptions.IncludeDoNotMail + 
 																											risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity,
 																											risk_indicators.iid_constants.BSOptions.IncludeDoNotMail);
+                                                      
+if(ofacVersion = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 /* ***************************************
 	 *     Gather Boca Shell Results:      *
    *************************************** */
 	iid := Risk_Indicators.InstantID_Function(cleanIn, gateways, DPPA, GLB, isUtility, isLn, ofac_Only, 
-																						suppressNearDups, require2Ele, fromBIID, isFCRA, excludeWatchlists, fromIT1O, ofacVersion, ofacSearching, includeAdditionalWatchlists,
+																						suppressNearDups, require2Ele, fromBIID, isFCRA, excludeWatchlists, fromIT1O, ofacVersion, include_ofac, includeAdditionalWatchlists, global_watchlist_threshold,
 																						in_BSversion := bsVersion, in_runDLverification:=IncludeDLverification, in_DataRestriction := DataRestriction, in_append_best := append_best, in_BSOptions := BSOptions, in_DataPermission := DataPermission);
 	iidHist12 := Risk_Indicators.InstantID_Function(cleanInHist12, gateways, DPPA, GLB, isUtility, isLn, ofac_Only, 
-																						suppressNearDups, require2Ele, fromBIID, isFCRA, excludeWatchlists, fromIT1O, ofacVersion, ofacSearching, includeAdditionalWatchlists,
+																						suppressNearDups, require2Ele, fromBIID, isFCRA, excludeWatchlists, fromIT1O, ofacVersion, include_ofac, includeAdditionalWatchlists, global_watchlist_threshold,
 																						in_BSversion := bsVersion, in_runDLverification:=IncludeDLverification, in_DataRestriction := DataRestriction, in_append_best := append_best, in_BSOptions := BSOptions, in_DataPermission := DataPermission);
 	iidHist24 := Risk_Indicators.InstantID_Function(cleanInHist24, gateways, DPPA, GLB, isUtility, isLn, ofac_Only, 
-																						suppressNearDups, require2Ele, fromBIID, isFCRA, excludeWatchlists, fromIT1O, ofacVersion, ofacSearching, includeAdditionalWatchlists,
+																						suppressNearDups, require2Ele, fromBIID, isFCRA, excludeWatchlists, fromIT1O, ofacVersion, include_ofac, includeAdditionalWatchlists, global_watchlist_threshold,
 																						in_BSversion := bsVersion, in_runDLverification:=IncludeDLverification, in_DataRestriction := DataRestriction, in_append_best := append_best, in_BSOptions := BSOptions, in_DataPermission := DataPermission);
 
 	clam := Risk_Indicators.Boca_Shell_Function(iid, gateways, DPPA, GLB, isUtility, isLn, doRelatives, doDL, 
@@ -148,10 +163,9 @@ export Healthcare_SocioEconomic_Batch_Service_V3 := MACRO
 									SELF := LEFT)); 	
  	//Profile Booster Search Function Contants
 	Profilebooster_AttributesVersionRequest := Models.Healthcare_Constants_V3.default_Profilebooster_AttributesVersionRequest;
-	onThor := Models.Healthcare_Constants_V3.default_onThor;
 
 	//Calling Profile Booster Search Function and fetching the attributes
-	pb_attributes := ProfileBooster.Search_Function(Profilebooster_In_With_LexID, DataRestriction, DataPermission, Profilebooster_AttributesVersionRequest, onThor);  
+	pb_attributes := ProfileBooster.Search_Function(Profilebooster_In_With_LexID, DataRestriction, DataPermission, Profilebooster_AttributesVersionRequest);  
 	//Combining Lead Integrity and Profile Booster attributes
 	Combined_LI_PB_Attributes := 	Join(rawResults_final, pb_attributes, left.seq=(string)right.seq, transform(Models.Layouts_Healthcare_V3.layout_SocioEconomic_LI_PB_combined,
 					self.acctno := left.acctno;

@@ -55,7 +55,7 @@ export ReportServiceFCRA := macro
 	
   recs := FaaV2_Services.ReportService_Records.fcra_val(tempmod);
 	
-  input_consumer := FFD.MAC.PrepareConsumerRecord(tempmod.did);
+  input_consumer := FFD.MAC.PrepareConsumerRecord(tempmod.did, true, , report_by.uniqueid);
 
   iesp.ECL2ESP.Marshall.MAC_Marshall_Results(recs.records, results_pre, iesp.faaaircraft_fcra.t_FcraAircraftReportResponse, Aircrafts, true);
 	 

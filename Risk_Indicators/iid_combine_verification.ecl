@@ -1,11 +1,12 @@
-﻿import ut, did_add, address, risk_indicators, census_data, riskwise, USPIS_HotList, ADVO, DOXIE, MDR;
+﻿import _Control, ut, did_add, address, risk_indicators, census_data, riskwise, USPIS_HotList, ADVO, DOXIE, MDR;
+onThor := _Control.Environment.OnThor;
 
 export iid_combine_verification(grouped dataset(risk_indicators.Layout_Output) ssnrecs, 
 								grouped dataset(risk_indicators.Layout_Output) pphonerecs,
 								boolean from_IT1O=false, string10 ExactMatchLevel=iid_constants.default_ExactMatchLevel,
 								boolean isFCRA, unsigned8 BSOptions,
 								integer bsVersion, string50 DataPermission=iid_constants.default_DataPermission, 
-								string50 DataRestriction=iid_constants.default_DataRestriction, boolean onThor=false) := function	
+								string50 DataRestriction=iid_constants.default_DataRestriction) := function	
 								
 
 ExactAddrRequired := ExactMatchLevel[iid_constants.posExactAddrMatch]=iid_constants.sTrue;								
@@ -31,6 +32,7 @@ end;
 temp combo(temp le, temp ri) := TRANSFORM
 	// these couple fields always need to be set from the result of the ssnrecs
 	self.did := le.did;
+  self.truedid := le.truedid;
 	self.firstscore := le.firstscore;
 	self.lastscore := le.lastscore;
 	self.addrscore := le.addrscore;
@@ -503,7 +505,7 @@ temp combo(temp le, temp ri) := TRANSFORM
 	nonfalse(chrono_eqfsaddrcount3);
 	nonfalse(chrono_dladdrcount3);
 	nonfalse(chrono_emaddrcount3);
-	nonfalse(trueDID);
+
 	
 	nonblank(idtheftflag);
 	
@@ -928,11 +930,14 @@ with_county_name_thor := join(distribute(finalCombo, hash64(seq)), pull(Census_D
 							 transform(risk_indicators.Layout_Output, self.combo_county := right.county_name, self := left),
 							 LEFT OUTER, atmost(riskwise.max_atmost), keep(1), MANY LOOKUP);
 
-with_county_name := if(onThor, group(sort(with_county_name_thor, seq, LOCAL), seq, LOCAL), 
-															 with_county_name_roxie);
+#IF(onThor)
+	with_county_name := group(sort(with_county_name_thor, seq, LOCAL), seq, LOCAL);
+#ELSE
+	with_county_name := with_county_name_roxie;
+#END
 
 // moved from iid_getphoneaddrflags because we didnt have chronoaddrflags there
-with_zip_flags := risk_indicators.iid_getZipFlags(with_county_name, onThor);
+with_zip_flags := risk_indicators.iid_getZipFlags(with_county_name);
 							 
 layout_output_tmp := record
 	risk_indicators.layout_output;
@@ -1054,7 +1059,11 @@ biggerrec_thor := if (isFCRA,
 				// check date
 				right.dt_first_seen < left.historydate,hrtrans(left,right),left outer, keep(100), LOCAL));
 
-biggerrec := if(onThor, group(sort(biggerrec_thor, seq, LOCAL), seq, LOCAL), biggerrec_roxie);
+#IF(onThor)
+	biggerrec := group(sort(biggerrec_thor, seq, LOCAL), seq, LOCAL);
+#ELSE
+	biggerrec := biggerrec_roxie;
+#END
 
 flagrecs_tmp := rollup(biggerrec, left.seq = right.seq, flagroll(left,right));
 flagrecs := project(flagrecs_tmp, transform(risk_indicators.layout_output, self := left));
@@ -1095,8 +1104,12 @@ with_hotlist_thor :=
 			get_hotlist(LEFT,RIGHT),
 			left outer, atmost(riskwise.max_atmost),keep(10), LOCAL);
 
-with_hotlist := if(onThor, group(sort(with_hotlist_thor, seq), seq), with_hotlist_roxie);
-			
+#IF(onThor)
+	with_hotlist := group(sort(with_hotlist_thor, seq), seq);
+#ELSE
+	with_hotlist := with_hotlist_roxie;
+#END
+
 // Adapted from Risk_Indicators.Boca_Shell_Advo
 layout_output_tmp get_advo(with_hotlist le, Advo.Key_Addr1 ri) := TRANSFORM
 											self.ADVODoNotDeliver := TRIM(ri.dnd_indicator) = 'Y';
@@ -1134,8 +1147,12 @@ with_advo_temp_thor := join(distribute(with_hotlist, hash64(z5, prim_range, prim
 					get_Advo(LEFT,RIGHT), left outer,
 					atmost(riskwise.max_atmost), keep(10), LOCAL);
 
-with_advo_temp := if(onThor, group(sort(distribute(with_advo_temp_thor, hash64(seq)), seq, LOCAL), seq, LOCAL), with_advo_temp_roxie);
-					
+#IF(onThor)
+	with_advo_temp := group(sort(distribute(with_advo_temp_thor, hash64(seq)), seq, LOCAL), seq, LOCAL);
+#ELSE
+	with_advo_temp := with_advo_temp_roxie;
+#END
+
 Layout_Output_tmp rollWithAdvo(with_advo_temp l, with_advo_temp r) := TRANSFORM
 //	SELF := le;
 	self := if(trim(l.sec_range) != '' 
@@ -1170,8 +1187,12 @@ withDIDdeceased_nonfcra_thor := JOIN(distribute(with_advo, hash64(did)),
 												getDIDdeceased(LEFT, RIGHT),	
 												LEFT OUTER, ATMOST(LEFT.did=RIGHT.l_did, riskwise.max_atmost), KEEP(100), LOCAL);
 										
-withDIDdeceased_nonfcra := if(onThor, group(sort(distribute(withDIDdeceased_nonfcra_thor, hash64(seq)), seq, LOCAL), seq, LOCAL), withDIDdeceased_nonfcra_roxie);
-										
+#IF(onThor)
+	withDIDdeceased_nonfcra := group(sort(distribute(withDIDdeceased_nonfcra_thor, hash64(seq)), seq, LOCAL), seq, LOCAL);
+#ELSE
+	withDIDdeceased_nonfcra := withDIDdeceased_nonfcra_roxie;
+#END
+
 withDIDdeceased_FCRA_roxie := JOIN(with_advo, doxie.key_death_masterV2_ssa_DID_fcra, 
 												LEFT.did<>0 AND KEYED(LEFT.did=RIGHT.l_did) AND
 												(UNSIGNED)(RIGHT.dod8[1..6]) < LEFT.historydate AND
@@ -1187,8 +1208,12 @@ withDIDdeceased_FCRA_thor := JOIN(distribute(with_advo, hash64(did)),
 													getDIDdeceased(LEFT,RIGHT),												
 												LEFT OUTER, ATMOST(LEFT.did=RIGHT.l_did, riskwise.max_atmost), KEEP(100), LOCAL);
 
-withDIDdeceased_FCRA := if(onThor, group(sort(distribute(withDIDdeceased_FCRA_thor, hash64(seq)), seq, LOCAL), seq, LOCAL), withDIDdeceased_FCRA_roxie);
-												
+#IF(onThor)
+	withDIDdeceased_FCRA := group(sort(distribute(withDIDdeceased_FCRA_thor, hash64(seq)), seq, LOCAL), seq, LOCAL);
+#ELSE
+	withDIDdeceased_FCRA := withDIDdeceased_FCRA_roxie;
+#END
+
 withDIDdeceased := if(isfcra, withDIDdeceased_FCRA, withDIDdeceased_nonFCRA);												
 
 Risk_Indicators.Layout_Output rollDeceased(withDIDdeceased le, withDIDdeceased ri) := TRANSFORM

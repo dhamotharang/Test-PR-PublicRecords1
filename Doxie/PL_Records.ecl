@@ -1,4 +1,4 @@
-import doxie, ut, doxie_crs, Doxie_Raw, FCRA, FFD;
+﻿import doxie, ut, doxie_crs, Doxie_Raw, FCRA, FFD;
 
 outrec := doxie_Crs.layout_PL_Records;
 
@@ -20,8 +20,8 @@ export PL_Records (
                               dppa_purpose, glb_purpose, ssn_mask_value, IsFCRA, flagfile);
 
 	outrec xformAddStatementIDs(recordof(fetched) l, FFD.Layouts.PersonContextBatchSlim r) := transform,
-		skip(~ShowDisputedRecords and r.isDisputed)
-		self.StatementIDs := if(ShowConsumerStatements,r.StatementIDs,FFD.Constants.BlankStatements),
+		skip((~ShowDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs)))
+		self.StatementIDs := r.StatementIDs,
 		self.isDisputed := r.isDisputed,
 		self.penalt := 0,
 		self := l

@@ -1,4 +1,4 @@
-// Alpharetta has the Input_Phone at the end of argument list, Distance default is 6
+﻿// Alpharetta has the Input_Phone at the end of argument list, Distance default is 6
 // Change name to _Boca instead of new
 export mac_xLinking_on_thor_Boca (infile, IDL ='', Input_SNAME = '', Input_FNAME = '',Input_MNAME = '',Input_LNAME = '',Input_Gender = '', Input_Derived_Gender = '',
 														Input_PRIM_NAME = '',Input_PRIM_RANGE = '',Input_SEC_RANGE = '',Input_CITY = '',Input_ST = '',Input_ZIP = '',Input_SSN = '',
@@ -84,10 +84,10 @@ IMPORT InsuranceHeader_xLink, ut;
 			self.ST := (typeof(SELF.ST))'';
 		#END
 		#IF ( #TEXT(Input_ZIP) <> '' )
-			self.ZIP := (typeof(SELF.ZIP))le.Input_ZIP;
-		#ELSE
-			self.ZIP := (typeof(SELF.ZIP))'';
-		#END
+    SELF.ZIP_cases := DATASET([{le.Input_ZIP, 100}],InsuranceHeader_xLink.Process_xIDL_layouts().layout_ZIP_cases);
+  #ELSE
+     SELF.ZIP := DATASET([],InsuranceHeader_xLink.Process_xIDL_layouts().layout_ZIP_cases);
+  #END
 		#IF ( #TEXT(Input_SSN) <> '')
 			self.SSN5 := InsuranceHeader_xLink.mod_SSNParse(le.Input_SSN).ssn5;
 			self.SSN4 := InsuranceHeader_xLink.mod_SSNParse(le.Input_SSN).ssn4;
@@ -134,15 +134,10 @@ IMPORT InsuranceHeader_xLink, ut;
 		%pr% := project(%infile_seq_temp%,%into%(left)); // Into roxie input format
 	#uniquename(res_out)
 
-	// InsuranceHeader_xLink.MAC_MEOW_xIDL_Batch(%pr%, uniqueID, , input_sname, input_fname, input_mname, input_lname, Input_Gender, 
-																// input_prim_range, input_prim_name, input_SEC_RANGE, input_CITY, input_ST, input_ZIP,																
-																// SSN5, SSN4, input_DOB, Input_PHONE, input_DL_STATE, input_DL_NBR,
-																// , , Input_relFname, Input_RelLname, %res_out%, %asIndex%, , , disableForce);
-
 	InsuranceHeader_xLink.MAC_MEOW_xIDL_Batch(%pr%, UniqueId, ,SNAME, fname, mname, lname, derived_gender, 
-																prim_range, prim_name, SEC_RANGE, CITY, ST, ZIP,																
+																prim_range, prim_name, SEC_RANGE, CITY, ST, ZIP_cases,
 																SSN5, SSN4, DOB, PHONE, DL_STATE, DL_NBR,
-																SRC, SOURCE_RID, Input_relFname, Input_RelLname, %res_out%, %asIndex%, , , disableForce);																
+																SRC, SOURCE_RID, Input_relFname, Input_RelLname, %res_out%, %asIndex%, , , disableForce);
 
 	#UNIQUENAME(result_trim)
 	IDLExternalLinking.mac_trim_xidl_layout(%res_out%, %result_trim%, reference);

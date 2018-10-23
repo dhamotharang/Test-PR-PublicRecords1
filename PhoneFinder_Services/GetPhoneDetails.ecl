@@ -1,14 +1,14 @@
-﻿IMPORT doxie, Doxie_Raw, Gateway,Phones;
+﻿IMPORT doxie, Doxie_Raw, iesp, Gateway, MDR, Phones, STD;
 EXPORT GetPhoneDetails(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dInPhones,
 	                      DATASET(Gateway.Layouts.Config) dGateways     = DATASET([],Gateway.Layouts.Config),
                        PhoneFinder_Services.iParam.ReportParams inMod)
 											           := FUNCTION
 
-tempMod := MODULE(PROJECT(inMod,Phones.IParam.PhoneAttributes.BatchParams,OPT))
-		EXPORT UNSIGNED		max_lidb_age_days					:= PhoneFinder_Services.Constants.LIBD_LastActivityThreshold; 
-		EXPORT BOOLEAN		use_realtime_lidb				 	:= TRUE;
-		EXPORT DATASET (Gateway.Layouts.Config) gateways := dGateways; 
-	END;
+  tempMod := MODULE(PROJECT(inMod,Phones.IParam.PhoneAttributes.BatchParams,OPT))
+		   EXPORT UNSIGNED		max_lidb_age_days					:= PhoneFinder_Services.Constants.LIBD_LastActivityThreshold; 
+		   EXPORT BOOLEAN		use_realtime_lidb				 	:= TRUE;
+	   	EXPORT DATASET (Gateway.Layouts.Config) gateways := dGateways; 
+	 END;
 	
 	dsPhonesAttr_recs:= Phones.GetPhoneMetadata_wLIDB(dInPhones, tempMod);
 																														
@@ -72,6 +72,34 @@ tempMod := MODULE(PROJECT(inMod,Phones.IParam.PhoneAttributes.BatchParams,OPT))
     SELF                                                          := [];                                                      
   END;
   
-  dDetailedPhoneInfo  := ROLLUP(dsPhonesAttrRecsGrp, GROUP, appendDetails(LEFT, ROWS(LEFT)));
+  dDetailedCarrierInfo  := ROLLUP(dsPhonesAttrRecsGrp, GROUP, appendDetails(LEFT, ROWS(LEFT)));
+	
+	 // call accudata cname for callerid and listing name
+	dPrimaryPhones := DEDUP(SORT(PROJECT(dInPhones,TRANSFORM(Phones.Layouts.PhoneAcctno, SELF.phone := LEFT.phoneno, SELF.acctno := LEFT.acctno)),
+	                      phone, acctno),
+												      phone);		
+	gateway_cfg := dGateways(Gateway.Configuration.IsAccuDataCNAM(servicename))[1];
+ gateway_URL := gateway_cfg.url;	 
+	boolean makeGatewayCall := gateway_URL != '';
+	dAccuDataCNAM := Gateway.SoapCall_AccuData_CallerID(dPrimaryPhones,gateway_cfg,inMod.UseAccuData_CNAM AND makeGatewayCall);
+	
+	PhoneFinder_Services.Layouts.PhoneFinder.Final getaccu_data(PhoneFinder_Services.Layouts.PhoneFinder.Final l,
+	                                                            iesp.accudata_accuname.t_AccudataCnamResponseEx r) := TRANSFORM
+	
+	callerName	:= STD.Str.ToUpperCase(r.response.AccudataReport.Reply.CallingName);
+	errorMessage := IF(r.response._header.Message<>'',r.response._header.Message,r.response.AccudataReport.ErrorMessage);
+ SELF.RealTimePhone_Ext.GenericName := callerName;
+ SELF.RealTimePhone_Ext.ListingName := callerName;
+	SELF.subj_phone_type_new := IF(errorMessage='',MDR.sourceTools.src_Phones_Accudata_CNAM_CNM2,''); // royalty count
+	SELF := l;
+	
+	END; 
+ dDetailedPhoneInfo	  := IF (EXISTS(dAccuDataCNAM), 
+                         JOIN(dDetailedCarrierInfo, dAccuDataCNAM,
+                         LEFT.phone    = RIGHT.response.AccudataReport.Phone,
+												             getaccu_data(LEFT,RIGHT), LEFT OUTER, LIMIT(0), KEEP(1)),
+                         dDetailedCarrierInfo);
+                                     
+
 	RETURN dDetailedPhoneInfo;
 	END;

@@ -46,6 +46,7 @@ export t_DDRBusinessAttributeDescription := record
 end;
 		
 export t_DDRBusinessProperty := record (iesp.duediligenceshared.t_DDRProperty)
+	iesp.share.t_Name OwnerName {xpath('OwnerName')};
 end;
 		
 export t_DDRBusinessPropertyOwnership := record
@@ -141,6 +142,7 @@ export t_DDRBusinessOperatingInformation := record
 	dataset(t_DDRComponentsOfBusiness) BusinessNameVariations {xpath('BusinessNameVariations/Variation'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxBusinesses)};
 	string FEIN {xpath('FEIN')};
 	boolean FEINIsSSN {xpath('FEINIsSSN')};
+	dataset(iesp.duediligenceshared.t_DDRPersonNameWithLexID) SSNAssociatedWithFEIN {xpath('SSNAssociatedWithFEIN/Item'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxSSNAssociations)};
 	dataset(iesp.share.t_Name) SSNAssociatedWith {xpath('SSNAssociatedWith/Name'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxSSNAssociations)};
 	boolean OperatesOutOfAHomeOffice {xpath('OperatesOutOfAHomeOffice')};
 	string Filing {xpath('Filing')};
@@ -152,22 +154,8 @@ export t_DDRBusinessOperatingInformation := record
 	iesp.share.t_Date SOSLastReported {xpath('SOSLastReported')};
 	iesp.share.t_Date BureauFirstReported {xpath('BureauFirstReported')};
 	iesp.share.t_Date BureauLastReported {xpath('BureauLastReported')};
-end;
-		
-export t_DDRLinkedBusinessInformation := record
-	string RelatedDegree {xpath('RelatedDegree')};
-	t_DDRBusinessOperatingInformation BusinessOperatingInformation {xpath('BusinessOperatingInformation')};
-	t_DDRBusinessAddressRisk BusinessAddressRisk {xpath('BusinessAddressRisk')};
-	string RelatedThrough {xpath('RelatedThrough')};
-	string ParentCompanyName {xpath('ParentCompanyName')};
-	iesp.duediligenceshared.t_DDRAttributeGroup AttributeGroup {xpath('AttributeGroup')};
-	string2 LinkedBusFootprintScore {xpath('LinkedBusFootprintScore')};
-	string2 LinkedBusIndex {xpath('LinkedBusIndex')};
-end;
-		
-export t_DDRLinkedBusinessSections := record
-	integer2 NumberOfLinkedBusinesses {xpath('NumberOfLinkedBusinesses')};
-	dataset(t_DDRLinkedBusinessInformation) LinkedBusinesses {xpath('LinkedBusinesses/LinkedBusiness'), MAXCOUNT(1)};
+	integer8 AnnualSales {xpath('AnnualSales')};
+	string4 AnnualSalesYearReported {xpath('AnnualSalesYearReported')};
 end;
 		
 export t_DDRRegisteredAgent := record
@@ -215,7 +203,7 @@ end;
 export t_DDRBusinessExecutiveCriminalEvents := record
 	iesp.duediligenceshared.t_DDRLegalEventIndividual ExecutiveOfficer {xpath('ExecutiveOfficer')};
 	string ExecTitle {xpath('ExecTitle')};
-	dataset(iesp.duediligenceshared.t_DDRLegalEventCriminal) CriminalEvents {xpath('CriminalEvents/CriminalEvent'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxLegalEvents)};
+	dataset(iesp.duediligenceshared.t_DDRLegalStateCriminal) Criminals {xpath('Criminals/Criminal'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxLegalEvents)};
 end;
 		
 export t_DDRBusinessLegalAttributeDetails := record
@@ -257,35 +245,6 @@ export t_DDRBusinessNetworkDetails := record
 	dataset(t_DDRRegisteredAgents) RegisteredAgents {xpath('RegisteredAgents/RegisteredAgent'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxRegisteredAgents)};
 end;
 		
-export t_DDRMatchSummary := record
-	integer2 Sequence {xpath('Sequence')};
-	iesp.share.t_Name Name {xpath('Name')};
-	string LexID {xpath('LexID')};
-	iesp.share.t_Date SourceDate {xpath('SourceDate')};
-	string EntityType {xpath('EntityType')};
-	iesp.share.t_Date EntityDate {xpath('EntityDate')};
-	integer2 Number {xpath('Number')};
-	string ReasonListed {xpath('ReasonListed')};
-	string ProprietaryUID {xpath('ProprietaryUID')};
-	iesp.share.t_Address Address {xpath('Address')};
-	string AdditionalInformation {xpath('AdditionalInformation')};
-end;
-		
-export t_DDRHighRiskNewsProfiles := record
-	integer2 Sequence {xpath('Sequence')};
-	integer2 Score {xpath('Score')};
-	iesp.share.t_Name IndividualName {xpath('IndividualName')};
-	string Category {xpath('Category')};
-	iesp.share.t_Date Date {xpath('Date')};
-	dataset(t_DDRMatchSummary) MatchSummaries {xpath('MatchSummaries/MatchSummary'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxMatchSummaries)};
-end;
-		
-export t_DDRAdverseMediaDataDetails := record
-	integer2 NumberOfBusinesses {xpath('NumberOfBusinesses')};
-	integer2 NumberOfBusinessExecutiveOfficers {xpath('NumberOfBusinessExecutiveOfficers')};
-	dataset(t_DDRHighRiskNewsProfiles) HighRiskNewsProfiles {xpath('HighRiskNewsProfiles/HighRiskNewsProfile'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxNewsProfiles)};
-end;
-		
 export t_DDRBusinessAttributeDetails := record
 	t_DDRBusinessEconomicAttributeDetails Economic {xpath('Economic')};
 	t_DDRBusinessOperatingAttributeDetails Operating {xpath('Operating')};
@@ -297,7 +256,6 @@ export t_DDRBusinessReport := record
 	t_DDRBusinessInformation BusinessInformation {xpath('BusinessInformation')};
 	t_DDRBusinessAttributeDescription BusinessAttributeDescription {xpath('BusinessAttributeDescription')};
 	t_DDRBusinessAttributeDetails BusinessAttributeDetails {xpath('BusinessAttributeDetails')};
-	t_DDRLinkedBusinessSections LinkedBusinesses {xpath('LinkedBusinesses')};
 end;
 		
 export t_DDRBusinessReportBy := record

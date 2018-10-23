@@ -6,7 +6,7 @@
 IMPORT IESP,AutoStandardI,Healthcare_Shared,Healthcare_Header_Services,Healthcare_Ganga, ut;
 
 EXPORT SearchService := MACRO
-	ds_in := DATASET ([], iesp.healthcare_identity.t_HealthCareIdentityScreeningRequest): STORED('IdentityScreeningRequest', FEW);
+	ds_in := DATASET ([], iesp.healthcare_identity.t_HealthCareIdentityScreeningRequest): STORED('HealthCareIdentityScreeningRequest', FEW);
 	first_row := ds_in[1] : INDEPENDENT;
 	
 	SearchCriteria := first_row.SearchBy;

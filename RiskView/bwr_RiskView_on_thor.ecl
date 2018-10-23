@@ -4,25 +4,20 @@
 // 1.  FROM THE THORPROD BRANCH, COPY ALL PUBLIC RECORD KEYS THAT RiskView 5.0 USES TO THE analyt_thor400_90_a CLUSTER 
 //   -  RiskView.bwr_transfer_rv5_files
 //	 -	RiskView.bwr_transfer_rv5_files_from_alpha
-// 2. ONCE FILES ARE SUCCESSFULLY COPIED, SWITCH TO THE ROXIEDEV BRANCH.
-// 3.  MAKE SURE _Control.LibraryUse IS SANDBOXED with the following 
-//   - export ForceOff_AllLibraries := TRUE;
-// 4. MAKE SURE Risk_Indicators.iid_base_function IS SANDBOXED with the following:
-//		- with_DID := with_DID_Thor;
-// 5.  Update your input test file logical name:  test_file_name on line 35
-// 6.  RUN a 100 record sample through the roxie version to make sure all keys are working
+// 2. ONCE FILES ARE SUCCESSFULLY COPIED, SWITCH TO THE SCORINGQA BRANCH.
+// 3.  Update your input test file logical name:  test_file_name on line 33
+// 4.  RUN a 100 record sample through the roxie version (onThor := FALSE) to make sure all keys are working
 //   - To run the roxie version, sandbox these changes:
 //       Line 38 of Risk_Indicators.iid_base_function:
 //          with_DID := with_DID_Thor ;
-// 7.  remove the 100 record limit on line 29, change the flag for onThor on line 21 to true and RUN the entire job  
+// 5.  remove the 100 record limit on line 28, change the flag for onThor on line 20 to true and RUN the entire job  
 //	 - (wait couple days for it to finish)
 // *****************************************************************************************************************
 
 
 IMPORT FFD, Gateway, iesp, Risk_Indicators, RiskView, Ut;
 
-// onThor := TRUE;	//Use thor logic (distributed data)
-onThor := FALSE;  //Use roxie logic (Keyed JOINS): Use this for testing small batches to make sure everything is working.
+onThor := _Control.Environment.OnThor; // If onThor needs to be toggled, change it in _Control.Environment.OnThor 
 
 #WORKUNIT('name', 'RiskView 5.0 ' + 	if(onThor, 'thor ', 'roxie ') );
 #STORED('did_add_force', if(onThor, 'thor', 'roxi') );  // stored parameter used inside the DID append macro to determine which version of the macro to use
@@ -275,8 +270,7 @@ Search_Results := riskview.Search_Function(valid_inputs,
  ReportingPeriod, // xNJJx
 	IncludeLnJ,
 	RetainInputDID,
-  exception_score_reason,
-	onThor
+  exception_score_reason
 	);
 
 Results := JOIN(batchin_with_seq, search_results, LEFT.seq=RIGHT.seq,

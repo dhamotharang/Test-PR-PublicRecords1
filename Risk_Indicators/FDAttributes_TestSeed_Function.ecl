@@ -8,12 +8,15 @@ FUNCTION
 	
 	
 	Models.Layout_FraudAttributes create_output(inData le, Seed_Files.Key_FDAttributes ri) := TRANSFORM
+    //RQ-14267: append a fake DID to testseed records. Make sure we hit the testseed key by checking fname for non blank.
+    self.input.DID := if(ri.fname <> '', Risk_Indicators.iid_constants.fn_CreateFakeDID((string)le.fname, (string)le.lname), 0);
 		self.input := le;
 		self.accountnumber := account_value;
 		self.version1 := ri.version1;
 		self.version2 := ri.version2;
 		self.version201 := ri.version201;
 		self.IDAttributes := ri.IDAttributes;
+    self.ParoAttributes := [];
     self.compromisedDL_hash := '';  // we don't need to log this for testseed transactions
 	END;
 	FDtest := join(inData, Seed_Files.Key_FDAttributes,keyed(right.dataset_name=Test_Data_Table_Name) and 

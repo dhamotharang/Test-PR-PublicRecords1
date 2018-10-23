@@ -67,10 +67,11 @@ if the permission is set. Try Qsent data if nothing found above.
 <message name="phone_noreconn_search" wuTimeout="300000">
 */
 
-IMPORT AutoStandardI, BatchServices, DeathV2_Services, DidVille, Doxie_Raw, iesp, MDR, PhonesFeedback_Services, PhonesInfo, Royalty, STD, Suppress, ut, WSInput;
+IMPORT AutoStandardI, BatchServices, DeathV2_Services, DidVille, Doxie_Raw, iesp, MDR, PhonesFeedback_Services, PhonesInfo, Royalty, STD, Suppress, ut, WSInput, D2C;
 
 EXPORT phone_noreconn_search := MACRO 
-	
+	#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+
 	//The following macro defines the field sequence on WsECL page of query. 
 	WSInput.MAC_phone_noreconn_search();
 
@@ -84,6 +85,7 @@ EXPORT phone_noreconn_search := MACRO
 
 	doxie.MAC_Header_Field_Declare();
 	globalmod := AutoStandardI.GlobalModule();
+	IsCNSMR := ut.IndustryClass.is_Knowx;
 	srchMod := MODULE(PROJECT(globalmod,doxie.phone_noreconn_param.searchParams,OPT))
 			EXPORT UNSIGNED1 DPPAPurpose := DPPA_Purpose;
 			EXPORT UNSIGNED1 GLBPurpose := GLB_Purpose;
@@ -335,10 +337,13 @@ EXPORT phone_noreconn_search := MACRO
 	// Then do a a one-time join to the "phones_ported_metadata" key (NOTE:key name is miss-leading
 	//    since it contains more than just "ported" phones) 
 	// and keep the matching key records to be used for mutiple places below.
+	
+
 	ds_ppmd_key_recs := join(ds_cmp_res_out_dd, PhonesInfo.Key_Phones.Ported_Metadata,
-															keyed(left.phone = right.phone),
+															keyed(left.phone = right.phone)
+															and (~IsCNSMR or right.source not in D2C.Constants.PhonemetadataRestrictedSources),
 													 transform(right),
-													 inner, limit(doxie.phone_noreconn_constants.MaxPortedMatches,skip));
+													 inner, limit(doxie.phone_noreconn_constants.MaxPortedMatches,skip));							 
 
 	// Join a second time, the orig cmp_res_out to the ds_ppmd_key_recs comparing the 
 	// left date_first/last_seen (+/-5 days) vs right port_start/end dates to save the port dates.

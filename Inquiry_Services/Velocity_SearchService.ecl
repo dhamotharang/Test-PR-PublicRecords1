@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SearchAlertRequest" wuTimeout="300000">
   <part name="UniqueID"						type="xsd:string"/>
 	<part name="Industry"						type="xsd:string"/>
@@ -17,6 +17,7 @@ import	Address,AutoStandardI,Doxie,iesp,ut;
 
 export	Velocity_SearchService	:=
 macro
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	#constant('useonlybestdid',true);
 	
   rec_in     := iesp.SearchAlert.t_SearchAlertRequest;

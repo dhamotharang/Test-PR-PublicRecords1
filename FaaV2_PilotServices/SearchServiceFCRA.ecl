@@ -56,7 +56,7 @@ export SearchServiceFCRA := macro
     export integer FCRAPurpose := FCRA.FCRAPurpose.Get(first_row.options.FCRAPurpose);
   end;
   
-	input_consumer := FFD.MAC.PrepareConsumerRecord(rdid, false, search_by);
+	input_consumer := FFD.MAC.PrepareConsumerRecord(rdid, true, search_by);
 
   pilot_res := FaaV2_PilotServices.SearchService_Records.fcra_val(tempmod); 
    

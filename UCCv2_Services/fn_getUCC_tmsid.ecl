@@ -1,4 +1,4 @@
-// Get UCC data for a set of tmsid records
+﻿// Get UCC data for a set of tmsid records
 
 // code modeled after LiensV2_Services/fn_get_liens_tmsid
 
@@ -56,8 +56,8 @@ export fn_getUCC_tmsid(
   party_fcra := ds_party_data + project (party_override_st, xf_party_copy (Left));// uccv2_services.layout_ucc_party_raw;
 
 	uccv2_services.layout_ucc_party_raw addPartyStatementIDs(uccv2_services.layout_ucc_party_raw l, FFD.Layouts.PersonContextBatchSlim r) := transform,
-		skip(~ShowDisputedRecords and r.isDisputed)
-		self.statementids := if(ShowConsumerStatements,r.StatementIDs,FFD.Constants.BlankStatements),
+		skip((~ShowDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs)))
+		self.statementids := r.StatementIDs,
 		self.isdisputed := r.isdisputed,
 		self := l
 	end;
@@ -99,8 +99,8 @@ export fn_getUCC_tmsid(
   main_fcra := (main_data + main_override_st)(fcra.compliance.ucc.is_ok ((string) STD.Date.Today(), orig_filing_date));
 
 	l_k_main addMainStatementIDs(l_k_main l, FFD.Layouts.PersonContextBatchSlim r) := transform,
-		skip(~ShowDisputedRecords and r.isDisputed)
-		self.statementids := if(ShowConsumerStatements,r.StatementIDs,FFD.Constants.BlankStatements),
+		skip((~ShowDisputedRecords and r.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs)))
+		self.statementids := r.StatementIDs,
 		self.isdisputed := r.isdisputed,
 		self := l
 	end;

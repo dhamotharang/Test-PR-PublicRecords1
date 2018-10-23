@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SearchService">
 	<!-- COMPLIANCE SETTINGS -->
 	<part name="GLBPurpose"          type="xsd:byte"/>
@@ -55,6 +55,8 @@
 
 export SearchService := macro
 import FaaV2_PilotServices, iesp, AutoStandardI;
+
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
     
 		rec_in := iesp.faapilot.t_PilotSearchRequest;
 		// "FEW" keyword set to make data read more efficient

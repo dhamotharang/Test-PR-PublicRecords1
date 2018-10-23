@@ -1,4 +1,4 @@
-IMPORT iesp;
+﻿IMPORT iesp;
 
 export fn_GetTestRecords := MODULE
 
@@ -40,11 +40,11 @@ export fn_GetTestRecords := MODULE
     END;
 
     export GetTestIndicatorAttributes() := FUNCTION
-        indicatorAttributes := DATASET([{'C1001','SSN Validation','','MediumRisk','D2015','The input SSN is associated with a different name and address',2017,5,1},
-                                        {'C1002','Known Risk','','LowRisk','D2263','Potential address discrepancy - the Input address may be previous address',2018,3,25},
-                                        {'C1003','Velocity','','HighRisk','D2452','SSN used for Check Cashing Fraud',2018,1,22},
-                                        {'C1004','Top Flagged','','HighRisk','D2444','SSN used for Applied Benefits',2017,12,14},
-                                        {'C1005','Cluster','','MediumRisk','D2452','This identity has no record of being in the input state.',2018,3,31}],iesp.fraudgovreport.t_FraudGovIndicatorAttribute);
+        indicatorAttributes := DATASET([{'C1001','SSN Validation','','MediumRisk','D2015','','The input SSN is associated with a different name and address',2017,5,1},
+                                        {'C1002','Known Risk','','LowRisk','D2263','','Potential address discrepancy - the Input address may be previous address',2018,3,25},
+                                        {'C1003','Velocity','','HighRisk','D2452','','SSN used for Check Cashing Fraud',2018,1,22},
+                                       //{'C1004','Top Flagged','','HighRisk','D2444','','SSN used for Applied Benefits',2017,12,14},
+                                        {'C1005','Cluster','','MediumRisk','D2452','','This identity has no record of being in the input state.',2018,3,31}],iesp.fraudgovreport.t_FraudGovIndicatorAttribute);
         
         return indicatorAttributes;
     END;
@@ -69,18 +69,40 @@ export fn_GetTestRecords := MODULE
 
     export GetTestTimelineDetails() := FUNCTION
         timelineDetails := DATASET([
-            {False,3,87621,'441246700122','','','',2018,4,3,8,10,0,'',2018,4,3,2018,4,3,'','','','','SNAP','SSN used for Applied Benefits',
+            {False,3,87621,'441246700122','','','',2,2018,4,3,8,10,0,'',2018,4,3,2018,4,3,'','','','','SNAP','SSN used for Applied Benefits',
                 2018,4,3,2018,4,3,'',testName1,'859038536',1963,12,1,'Home',testAddr4,testAddr2,'',testPhones1,'','FL','',
                 '','','','','Other','','','','192.10.0.1','','','','C1001','','','','','','','','','','',''},
-            {False,2,87621,'441246700125','','','',2018,1,23,9,50,0,'',2018,1,23,2018,1,24,'','','','','SNAP','SSN used for Check Cashing Fraud',
+            {False,2,87621,'441246700125','','','',2,2018,1,23,9,50,0,'',2018,1,23,2018,1,24,'','','','','SNAP','SSN used for Check Cashing Fraud',
                 2018,4,3,2018,4,3,'',testName2,'158013524',1982,1,18,'Home',testAddr3,testAddr1,'',testPhones2,'','FL','',
                 '','','','','Other','','','','10.0.1.14','','','','C1003','','','','','','','','','','',''},
-            {True,3,87621,'441246700124','','','',2018,1,23,11,31,0,'',2018,1,23,2018,1,24,'','','','','SNAP','SSN used for Benefit Renewal',
+            {True,3,87621,'441246700124','','','',2,2018,1,23,11,31,0,'',2018,1,23,2018,1,24,'','','','','SNAP','SSN used for Benefit Renewal',
                 2018,4,3,2018,4,3,'',testName2,'158013525',1982,1,18,'Home',testAddr3,testAddr1,'',testPhones3,'','FL','',
                 '','','','','Other','','','','97.101.11.231','','','','C1005','','','','','','','','','','',''}
         ],iesp.fraudgovreport.t_FraudGovTimeLineDetails);
 
         return timelineDetails;
     END;
+		
+    export GetDummyGovBestInfo(dataset(iesp.fraudgovreport.t_FraudGovIdentityCardDetails) ds_in) := FUNCTION
+				
+				ds_dummybestinfo := PROJECT(ds_in, TRANSFORM(iesp.fraudgovplatform.t_FraudGovBestInfo,
+																							SELF.UniqueId := LEFT.ContributedBest.UniqueId,
+																							SELF.Name := LEFT.ContributedBest.Name,
+																							SELF.SSN := '222334444',
+																							SELF.DOB := iesp.ECL2ESP.toDatestring8('19700101'),
+																							SELF.Address := iesp.ECL2ESP.SetAddress('Main St',
+																																											'1212',
+																																											'' , '', '', '', '',
+																																											'New York',
+																																											'NY',
+																																											'12345',
+																																											'', '', '', 
+																																											'1212 Main St'),
+																																											
+																							SELF.Phone10 := '9541231234',
+																							SELF := [],
+																		));
+				return ds_dummybestinfo;
+    END;		
 
 END;

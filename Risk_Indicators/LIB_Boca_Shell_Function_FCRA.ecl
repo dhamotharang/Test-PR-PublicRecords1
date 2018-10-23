@@ -83,7 +83,7 @@ EXPORT LIB_Boca_Shell_Function_FCRA (
 							true,  // filter out fares always true in FCRA
 							DataRestriction,
 							BSOptions, glb, gateways, DataPermission, 
-							IN_isDirectToConsumerPurpose, IncludeLnJ, false, in_ReportingPeriod);
+							IN_isDirectToConsumerPurpose, IncludeLnJ, in_ReportingPeriod);
 
 	export results := per_prop;
 END;

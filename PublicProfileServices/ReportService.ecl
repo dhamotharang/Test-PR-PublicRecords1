@@ -63,6 +63,7 @@
 IMPORT iesp,address,PersonReports,AutoStandardI, std;
 
 EXPORT ReportService := MACRO
+ #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	#onwarning(4207, ignore);
 	
 	#CONSTANT('IncludeMinors',TRUE);

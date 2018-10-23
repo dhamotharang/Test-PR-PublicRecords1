@@ -1,25 +1,28 @@
-
+﻿
 import   Risk_Indicators, RiskWise;
 
 EXPORT OrderScore_GetScore (GROUPED DATASET(Risk_Indicators.Layout_BocaShell_BtSt_Out) clam,  
 																						DATASET(RiskWise.Layout_CD2I) cd2i_in,
 																						boolean ipid_only = FALSE,
-																						string9 genericModelName
-										                                                  ) := FUNCTION
+																						string9 genericModelName,
+                                            String Delivery,
+										                        Integer Total_amount  ) := FUNCTION
 																						
-DEBUG_MODE  := FALSE;	                       //Set to TRUE during round 1 and round 2 validation
+DEBUG_MODE  := false;	                       //Set to TRUE during round 1 and round 2 validation
 isFCRA      := FALSE;
 IBICID      := TRUE;
 WantstoSeeBillToShipToDifferenceFlag  := TRUE;
 WantstoSeeEA                          := TRUE;    
-
-   																					
+																				
 
 #If(DEBUG_MODE)   /*   call the model being validate using DEBUG_MODE = TRUE   */   
-	getScore := models.OSN1608_1_0( clam, IBICID, 
+	getScore := models.OSN1803_1_0( clam, IBICID, 
 		                              WantstoSeeBillToShipToDifferenceFlag,
 																	isFCRA,
-																	WantsToSeeEA); 	
+																	WantsToSeeEA,
+                                  Delivery,
+                                  Total_Amount
+                                  ); 	
 		
 #ELSE
   /* Determine the model being requested and call it - It must be one of these valid models */   
@@ -30,7 +33,13 @@ WantstoSeeEA                          := TRUE;
 		                                                                WantstoSeeBillToShipToDifferenceFlag,
 																																		isFCRA,
 																																		WantsToSeeEA),
-		genericModelName <> ''             => fail(Models.Layout_ModelOut, 'Invalid service/model input combination'),
+		genericModelName = 'osn1803_1'     => models.OSN1803_1_0( clam, IBICID, 
+		                                                                WantstoSeeBillToShipToDifferenceFlag,
+																																		isFCRA,
+																																		WantsToSeeEA,
+                                                                    Delivery, 
+                                                                    Total_amount),
+    genericModelName <> ''             => fail(Models.Layout_ModelOut, 'Invalid service/model input combination'),
 		                                      dataset( [], models.Layout_ModelOut )                                     // for transactions with an invalid modelname specified
 	                                        );																																										
 #END

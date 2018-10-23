@@ -6,8 +6,13 @@ import iesp;
 
 export fcrainquiryhistory := MODULE
 			
-export t_FCRAInquiryHistorySearchBy := record
-	dataset(iesp.share.t_StringArrayItem) LexIDs {xpath('LexIDs/LexID'), MAXCOUNT(iesp.Constants.FCRAInqHist.MAX_LEXIDS)};
+export t_FCRAInquiryHistoryOption := record (iesp.share_fcra.t_FcraReportOption)
+	boolean ReturnSuppressedRecords {xpath('ReturnSuppressedRecords')};
+	boolean ReturnDisputedRecords {xpath('ReturnDisputedRecords')};
+end;
+		
+export t_FCRAInquiryHistoryReportBy := record
+	string30 LexId {xpath('LexId')};
 end;
 		
 export t_FCRAInquiryHistoryRec := record
@@ -57,53 +62,37 @@ export t_FCRAInquiryHistoryRec := record
 	string20 GCId {xpath('GCId')};
 end;
 		
-export t_FCRAInquiryHistoryRecord := record (t_FCRAInquiryHistoryRec)
-	string3 Status {xpath('Status')};
-	string256 Message {xpath('Message')};
-end;
-		
-export t_FCRAInquiryHistoryResponse := record
-	iesp.share.t_ResponseHeader _Header {xpath('Header')};
-	dataset(t_FCRAInquiryHistoryRecord) Records {xpath('Records/Record'), MAXCOUNT(iesp.Constants.FCRAInqHist.MAX_RECORDS)};
-end;
-		
-export t_FCRAInquiryHistoryDeltabaseResponse := record (t_FCRAInquiryHistoryResponse)
-end;
-		
-export t_FCRAInquiryHistoryOption := record (iesp.share_fcra.t_FcraReportOption)
-	boolean ReturnSuppressedRecords {xpath('ReturnSuppressedRecords')};
-	boolean ReturnDisputedRecords {xpath('ReturnDisputedRecords')};
-end;
-		
 export t_FCRAInquiryHistoryComplianceFlags := record
 	boolean IsSuppressed {xpath('IsSuppressed')};
 	boolean IsDisputed {xpath('IsDisputed')};
 end;
 		
-export t_FCRAInquiryHistoryReportBy := record
-	string30 LexId {xpath('LexId')};
-end;
-		
-export t_FCRAInquiryHistoryPRRec := record (t_FCRAInquiryHistoryRec)
+export t_FCRAInquiryHistoryRecord := record (t_FCRAInquiryHistoryRec)
 	t_FCRAInquiryHistoryComplianceFlags Metadata {xpath('Metadata')};
 end;
 		
-export t_FCRAInquiryHistoryPRResponse := record
+export t_FCRAInquiryHistoryResponse := record
 	iesp.share.t_ResponseHeader _Header {xpath('Header')};
-	dataset(t_FCRAInquiryHistoryPRRec) Records {xpath('Records/Record'), MAXCOUNT(iesp.Constants.FCRAInqHist.MAX_RECORDS)};
+	string RoxieCluster {xpath('RoxieCluster')};
+	dataset(t_FCRAInquiryHistoryRecord) Records {xpath('Records/Record'), MAXCOUNT(iesp.Constants.FCRAInqHist.MAX_RECORDS)};
+end;
+		
+export t_FCRAInquiryHistorySearchBy := record
+	dataset(iesp.share.t_StringArrayItem) LexIDs {xpath('LexIDs/LexID'), MAXCOUNT(iesp.Constants.FCRAInqHist.MAX_LEXIDS)};
+end;
+		
+export t_FCRAInquiryHistoryDeltabaseResponse := record
+	iesp.share.t_ResponseHeader _Header {xpath('Header')};
+	dataset(t_FCRAInquiryHistoryRec) Records {xpath('Records/Record'), MAXCOUNT(iesp.Constants.FCRAInqHist.MAX_RECORDS)};
 end;
 		
 export t_FCRAInquiryHistoryRequest := record (iesp.share.t_BaseRequest)
-	t_FCRAInquiryHistorySearchBy SearchBy {xpath('SearchBy')};
+	t_FCRAInquiryHistoryReportBy ReportBy {xpath('ReportBy')};
+	t_FCRAInquiryHistoryOption Options {xpath('Options')};
 end;
 		
 export t_FCRAInquiryHistoryDeltabaseRequest := record (iesp.share.t_BaseRequest)
 	t_FCRAInquiryHistorySearchBy SearchBy {xpath('SearchBy')};
-end;
-		
-export t_FCRAInquiryHistoryPRRequest := record (iesp.share.t_BaseRequest)
-	t_FCRAInquiryHistoryReportBy ReportBy {xpath('ReportBy')};
-	t_FCRAInquiryHistoryOption Options {xpath('Options')};
 end;
 		
 export t_FCRAInquiryHistoryResponseEx := record
@@ -112,10 +101,6 @@ end;
 		
 export t_FCRAInquiryHistoryDeltabaseResponseEx := record
 	t_FCRAInquiryHistoryDeltabaseResponse response {xpath('response')};
-end;
-		
-export t_FCRAInquiryHistoryPRResponseEx := record
-	t_FCRAInquiryHistoryPRResponse response {xpath('response')};
 end;
 		
 

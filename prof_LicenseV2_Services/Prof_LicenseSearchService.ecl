@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="profLicSearch" wuTimeout="300000">
   <part name="IndustryClass" type="xsd:string"/>
   <part name="CompanyName" type="xsd:string"/>
@@ -41,7 +41,7 @@
 import prof_licensev2_services;
 
 Export Prof_LicenseSearchService := MACRO
-
+ #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	#constant('SearchIgnoresAddressOnly',true);
 	#constant('getBdidsbyExecutive',FALSE);
 	#Constant('SetRepAddr',TRUE);

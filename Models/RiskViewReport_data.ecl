@@ -1,4 +1,4 @@
-import doxie, RiskWiseFCRA, Watercraft, FCRA, LiensV2, riskwise, ut, Risk_Indicators, BankruptcyV2, BankruptcyV3,
+﻿import doxie, RiskWiseFCRA, Watercraft, FCRA, LiensV2, riskwise, ut, Risk_Indicators, BankruptcyV2, BankruptcyV3,
 				american_student_list, AlloyMedia_student_list, Prof_LicenseV2, paw, impulse_email, ln_propertyv2, 
 				header, Inquiry_AccLogs, Gong, advo, Codes, iesp, address, corrections, Consumerstatement, RiskView;
 
@@ -656,9 +656,7 @@ EXPORT RiskViewReport_data := MODULE
 	export addrHistory(dataset (risk_indicators.Layout_Boca_Shell) dids, dataset (fcra.Layout_override_flag) flagrecs, integer bsVersion_in, string50 DataRestrictionMask) := FUNCTION
 
 			unsigned2 MAX_PROP_KEEP  := 100;
-			unsigned4 MAX_PROP_MATCH := 5000;
-			set_fcra_permissible_purposes := ['0','100','101','164'];  // if the inquiry wasn't run with one of these 4 permissible purposes, throw it out
-			
+			unsigned4 MAX_PROP_MATCH := 5000;	
 			
 			risk_indicators.Layout_Output toLO(risk_indicators.Layout_Boca_Shell l) := TRANSFORM
 				

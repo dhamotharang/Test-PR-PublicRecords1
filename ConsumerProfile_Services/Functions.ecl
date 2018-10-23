@@ -186,9 +186,10 @@ EXPORT Functions := MODULE
 	end;
 	
 	//Extract Alerts from PersonContext
-  export checkForAlertsFromPC(dataset(FFD.Layouts.PersonContextBatch) pc_recs, boolean isSuppressedResult = false) := function
+  export checkForAlertsFromPC(dataset(FFD.Layouts.PersonContextBatch) pc_recs, FFD.layouts.ConsumerFlagsBatch pc_consumer_flags,
+                              integer8 inFFDOptionsMask = 0) := function
   
-    pc_alerts := FFD.ConsumerFlag.prepareAlertMessages(pc_recs, isSuppressedResult);
+    pc_alerts := FFD.ConsumerFlag.prepareAlertMessages(pc_recs, pc_consumer_flags, inFFDOptionsMask);
     return project(pc_alerts, transform(iesp.fcraconsumerprofilereport.t_ConsumerProfileAlert, 
                     self.Code := left.Code,
                     self.Message := left.Message,

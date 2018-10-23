@@ -177,9 +177,11 @@ end;
 
 
 
-import ut, codes, address, models, riskwise, suppress, seed_files, iesp, AutoStandardI,Risk_Indicators;
+import ut, codes, address, models, riskwise, suppress, seed_files, iesp, AutoStandardI, OFAC_XG5, Risk_Indicators;
 
 export Identifier2_Service := MACRO
+ 
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
   ds_in := DATASET ([], iesp.mod_identifier2.t_Identifier2Request) : STORED ('Identifier2Request', FEW);
   first_row := ds_in[1] : independent;
   
@@ -383,6 +385,8 @@ export Identifier2_Service := MACRO
 	#stored ('Gender', search_by.Gender);
 	#stored ('UniqueId', search_by.UniqueId);
 	
+  IF( options.OFACVersion != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(watchlist_temp[1].WatchList, value),
+      FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 
 	// With Emerging Identities changes, bump from BS version 3 to 51
 	#stored( 'BSVersion', 51 )

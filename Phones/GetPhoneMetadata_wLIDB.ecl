@@ -119,43 +119,43 @@ EXPORT GetPhoneMetadata_wLIDB(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dB
     SELF.delivery_point_code     := IF(is_carrier_info, ri.dpbc, le.delivery_point_code);
     SELF.affiliated_to           := IF(is_carrier_info, ri.affiliated_to, le.affiliated_to);
     SELF.contact_name            := IF(is_carrier_info, ri.contact_name, le.contact_name);
-		  SELF.contact_address1        := IF(is_carrier_info, ri.carrier_address1, le.contact_address1);
-		 	SELF.contact_address2        := IF(is_carrier_info, ri.carrier_address2, le.contact_address2);
-			 SELF.contact_city            := IF(is_carrier_info, ri.carrier_city, le.carrier_city);
-			 SELF.contact_state           := IF(is_carrier_info, ri.carrier_state, le.carrier_state);
-		 	SELF.contact_zip             := IF(is_carrier_info, ri.carrier_zip, le.contact_zip);
+	SELF.contact_address1        := IF(is_carrier_info, ri.carrier_address1, le.contact_address1);
+	SELF.contact_address2        := IF(is_carrier_info, ri.carrier_address2, le.contact_address2);
+	SELF.contact_city            := IF(is_carrier_info, ri.carrier_city, le.carrier_city);
+	SELF.contact_state           := IF(is_carrier_info, ri.carrier_state, le.carrier_state);
+	SELF.contact_zip             := IF(is_carrier_info, ri.carrier_zip, le.contact_zip);
     SELF.contact_phone           := IF(is_carrier_info, ri.carrier_phone, le.contact_phone);
     SELF.contact_fax             := IF(is_carrier_info, ri.contact_fax, le.contact_fax);
     SELF.contact_email           := IF(is_carrier_info, ri.contact_email, le.contact_email);
 			
-			SET OF STRING2 sourcesMissingInfo := [Consts.ATT_LIDB_Delta, Consts.ATT_LIDB_RealTime];
-			recNeedsLineServ := le.source IN sourcesMissingInfo AND le.error_desc = '';
+	SET OF STRING2 sourcesMissingInfo := [Consts.ATT_LIDB_Delta, Consts.ATT_LIDB_RealTime];
+	recNeedsLineServ := le.source IN sourcesMissingInfo AND le.error_desc = '';
 
-			//Add the remaining information only to deltabase and realtime records.
-			SELF.line:=IF(recNeedsLineServ, ri.line, le.line);
-			SELF.serv:=IF(recNeedsLineServ, ri.serv, le.serv);
-			SELF.spid:=IF(recNeedsLineServ, ri.spid, le.spid);
-			SELF.prepaid:=IF(recNeedsLineServ, ri.prepaid, le.prepaid);
-			SELF.operator_fullname:=IF(recNeedsLineServ, ri.operator_full_name, le.operator_fullname);
+	//Add the remaining information only to deltabase and realtime records.
+	SELF.line:=IF(recNeedsLineServ, ri.line, le.line);
+	SELF.serv:=IF(recNeedsLineServ, ri.serv, le.serv);
+	SELF.spid:=IF(recNeedsLineServ, ri.spid, le.spid);
+	SELF.prepaid:=IF(recNeedsLineServ, ri.prepaid, le.prepaid);
+	SELF.operator_fullname:=IF(recNeedsLineServ, ri.operator_full_name, le.operator_fullname);
 
-			//Remove temporary PD source.
-			SELF.source := IF(le.source=Consts.ATT_LIDB_Delta,Consts.ATT_LIDB_SRC,le.source);
-			SELF := le;
+	//Remove temporary PD source.
+	SELF.source := IF(le.source=Consts.ATT_LIDB_Delta,Consts.ATT_LIDB_SRC,le.source);
+	SELF := le;
    
   END;
   
 	//denormalize to join index records for contact function = '' and overall ocn <> '' -  limit to 100
   dPortedPhonesFinal := DENORMALIZE(dPortedPhones, PhonesInfo.Key_Source_Reference.ocn_name,
-    KEYED(LEFT.account_owner = RIGHT.ocn) AND
-    Phones.Functions.StandardName(LEFT.carrier_name) = RIGHT.name AND
-    RIGHT.is_current,
-    tAppendCarrierRefInfo1(LEFT, RIGHT),
-		    LEFT OUTER, LIMIT(100, SKIP));
+									KEYED(LEFT.account_owner = RIGHT.ocn) AND
+									Phones.Functions.StandardName(LEFT.carrier_name) = RIGHT.name AND
+									RIGHT.is_current,
+									tAppendCarrierRefInfo1(LEFT, RIGHT),
+									LEFT OUTER, LIMIT(100, SKIP));
 				
 				
-			//prioritize Realtime LIDB
+	//prioritize Realtime LIDB
 	dPortedPhonesSorted := SORT(dPortedPhonesFinal, acctno,phone, -dt_last_reported, -dt_first_reported,
-		source <> Consts.ATT_LIDB_RealTime, record);
+										source <> Consts.ATT_LIDB_RealTime, record);
 		
 	Layout_BatchRaw  ProcessRecs(Layout_BatchRaw L) := TRANSFORM
 		SELF.acctno := L.acctno;
@@ -171,17 +171,18 @@ EXPORT GetPhoneMetadata_wLIDB(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dB
 		boolean ported_line := ported_phone or  L.source IN Consts.set_ATT_LIDB;
 
 		//identifies both historic and current disconnect records
+		//is_deact can also be P - Ported - we want to ignore P records because they don't represent true disconnects.
 		boolean disconnected := L.deact_code = Consts.DISCONNECTED_CODE and (L.is_deact = 'Y' OR L.is_deact = 'N');
 		boolean number_swapped := L.phone_swap <> '';
 		boolean suspended := L.deact_code = Consts.SUSPENDED_CODE and in_mod.include_temp_susp_reactivate;
-		boolean reactivated := L.deact_code = Consts.SUSPENDED_CODE and L.is_react = 'Y';
+		boolean reactivated := L.is_react = 'Y'; //remove L.deact_code=Consts.SUSPENDED_CODE to include PX(suspension reacts) and PG(Gong additions)
 		boolean lidb_verfication := L.source IN Consts.set_ATT_LIDB;
 		event_type := if(ported_phone, Consts.PORTED_PHONE, '') +
-			if(disconnected and not ported_phone, Consts.DISCONNECTED, '') +
-			if(reactivated, Consts.REACTIVATED, '') +
-			if(number_swapped, Consts.NUMBER_SWAPPED, '') +
-			if(suspended, Consts.SUSPENDED, '') +
-			if(lidb_verfication, Consts.LIDB_VERFICATION, '');
+						if(disconnected and not ported_phone, Consts.DISCONNECTED, '') +
+						if(reactivated, Consts.REACTIVATED, '') +
+						if(number_swapped, Consts.NUMBER_SWAPPED, '') +
+						if(suspended, Consts.SUSPENDED, '') +
+						if(lidb_verfication, Consts.LIDB_VERFICATION, '');
 
 		event_date := if(lidb_verfication,L.dt_last_reported,MAX(L.port_start_dt, L.swap_start_dt, L.deact_start_dt, L.react_start_dt));
 		SELF.event_type := event_type;
@@ -189,7 +190,8 @@ EXPORT GetPhoneMetadata_wLIDB(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dB
 
 		// populate disconnect date based on record's event type to report most recent event date
 		SELF.disconnect_date := MAP(disconnected => L.deact_start_dt,
-			number_swapped => L.swap_start_dt, 0);
+									number_swapped => L.swap_start_dt, 
+									0);
 
 		SELF.ported_date := if(ported_phone, L.port_start_dt, 0);
 		SELF.carrier_id	:= L.account_owner;
@@ -198,11 +200,12 @@ EXPORT GetPhoneMetadata_wLIDB(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dB
 		SELF.operator_id := L.spid;
 		SELF.operator_name := if(L.operator_fullname <> '', L.operator_fullname, L.carrier_name);
 		SELF.line_type_last_seen := CASE(L.source,
-			Consts.ATT_LIDB_SRC => L.dt_last_reported,
-			Consts.ATT_LIDB_RealTime => L.dt_last_reported,
-			Consts.ICONECTIV_SRC => L.port_start_dt, 0);
-
-		SELF.phone_serv_type := if(ported_line, L.serv, '');
+										Consts.ATT_LIDB_SRC => L.dt_last_reported,
+										Consts.ATT_LIDB_RealTime => L.dt_last_reported,
+										Consts.ICONECTIV_SRC => L.port_start_dt, //probably should include port_end_dt
+										Consts.GONG_DISCONNECT_SRC => MAX(L.deact_start_dt,L.deact_end_dt,L.react_start_dt,L.react_end_dt),
+										0);
+		SELF.phone_serv_type := if(ported_line, L.serv, ''); // PG are not always shown as landlines even though they came from gong ???
 		SELF.phone_line_type := if(ported_line, L.line, '');
 		SELF.swapped_phone_number_date := if(number_swapped, L.swap_start_dt, 0);
 		SELF.new_phone_number_from_swap	:= L.phone_swap;
@@ -227,7 +230,7 @@ EXPORT GetPhoneMetadata_wLIDB(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dB
 	END;
 	dPhones_w_Metadata := PROJECT(dPortedPhonesSorted, ProcessRecs(LEFT));
 	
- #IF(Phones.Constants.Debug.PhoneMetadata_wLIDB)
+ 	#IF(Phones.Constants.Debug.PhoneMetadata_wLIDB)
         OUTPUT(dBatchPhonesIn,NAMED('dBatchPhonesIn'), EXTEND);
         OUTPUT(dPortedMetadataPhones,NAMED('dPortedMetadataPhones'), EXTEND);
         OUTPUT(numbersForDelta,NAMED('numbersForDelta'), EXTEND);
@@ -238,14 +241,14 @@ EXPORT GetPhoneMetadata_wLIDB(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dB
         OUTPUT(latestPhoneRecs,NAMED('latestPhoneRecs'), EXTEND);
         OUTPUT(oldOrIncompleteRecs,NAMED('oldOrIncompleteRecs'), EXTEND); 
         OUTPUT(numbersWithNoData,NAMED('numbersWithNoData'), EXTEND);
-	      	OUTPUT(numbersForRealtime,NAMED('numbersForRealtime'), EXTEND);
-		      OUTPUT(realtimeATTPhones,NAMED('realtimeATTPhones'), EXTEND);
-		      OUTPUT(filteredAttPhones,NAMED('filteredAttPhones'), EXTEND);
-		      OUTPUT(dPortedRealtime,NAMED('dPortedRealtime'), EXTEND);
-		      OUTPUT(dPortedPhones,NAMED('dPortedPhones'), EXTEND);
-		      OUTPUT(dPortedPhonesFinal,NAMED('dPortedPhonesFinal'), EXTEND);
-	      	OUTPUT(dPortedPhonesSorted,NAMED('dPortedPhonesSorted'), EXTEND);
-	       OUTPUT(dPhones_w_Metadata,NAMED('dPhones_w_Metadata'), EXTEND);
+	    OUTPUT(numbersForRealtime,NAMED('numbersForRealtime'), EXTEND);
+		OUTPUT(realtimeATTPhones,NAMED('realtimeATTPhones'), EXTEND);
+		OUTPUT(filteredAttPhones,NAMED('filteredAttPhones'), EXTEND);
+		OUTPUT(dPortedRealtime,NAMED('dPortedRealtime'), EXTEND);
+		OUTPUT(dPortedPhones,NAMED('dPortedPhones'), EXTEND);
+		OUTPUT(dPortedPhonesFinal,NAMED('dPortedPhonesFinal'), EXTEND);
+	    OUTPUT(dPortedPhonesSorted,NAMED('dPortedPhonesSorted'), EXTEND);
+	    OUTPUT(dPhones_w_Metadata,NAMED('dPhones_w_Metadata'), EXTEND);
 	#END
 RETURN dPhones_w_Metadata;
 END;

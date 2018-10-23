@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SmallBusiness_BIP_Batch_Service" wuTimeout="300000">
   <part name="Batch_In" type="tns:XmlDataSet" cols="100" rows="100"/>
   <part name="GLBPurpose" type="xsd:integer"/>
@@ -119,7 +119,7 @@
 */
 
 #option('expandSelectCreateRow', true);
-IMPORT Business_Risk_BIP, Gateway, IESP, MDR, Phones, Risk_Indicators, RiskWise, Royalty, Suspicious_Fraud_LN, UT, Royalty;
+IMPORT Business_Risk_BIP, Gateway, IESP, MDR, OFAC_XG5, Phones, Risk_Indicators, RiskWise, Royalty, Suspicious_Fraud_LN, UT, Royalty;
 
 EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 	/* ************************************************************************
@@ -177,6 +177,9 @@ EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 	UNSIGNED1 OFAC_Version		     := Business_Risk_BIP.Constants.Default_OFAC_Version : STORED('OFAC_Version');
 	REAL Global_Watchlist_Threshold	:= Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold : STORED('Global_Watchlist_Threshold');
 	DATASET(iesp.Share.t_StringArrayItem) Watchlists_Requested := Business_Risk_BIP.Constants.Default_Watchlists_Requested : STORED('Watchlists_Requested');
+
+	IF( OFAC_version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(Watchlists_Requested, value),
+		FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
 
 	Gateways 										:= Gateway.Configuration.Get();	// Gateways Coded in this Product: Targus
 	BOOLEAN  ReturnDetailedRoyalties := FALSE : STORED('ReturnDetailedRoyalties');
@@ -258,8 +261,9 @@ EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 	 *   Restrict/allow LN Small Business Attributes and/or SBFE Attributes.  *
 	 ************************************************************************ */
 
-	allow_SBA_attrs  := EXISTS(AttrsRequested(AttributeGroup = StringLib.StringToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_ATTR_V1_NAME)));   // i.e. "LN" Small Business Attributes
-	allow_SBFE_attrs := EXISTS(AttrsRequested(AttributeGroup IN [StringLib.StringToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_SBFE_ATTR_NAME),StringLib.StringToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_SBFE_V1_ATTR)])); // i.e. "SBFE" Small Business Attributes
+	allow_SBA_attrs     := EXISTS(AttrsRequested(AttributeGroup = StringLib.StringToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_ATTR_V1_NAME)));   // i.e. "LN" Small Business Attributes
+	allow_SBA_attrs101  := EXISTS(AttrsRequested(AttributeGroup = StringLib.StringToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_ATTR_NOFEL)));   // i.e. "LN" Small Business Attributes no felloniew
+	allow_SBFE_attrs    := EXISTS(AttrsRequested(AttributeGroup IN [StringLib.StringToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_SBFE_ATTR_NAME),StringLib.StringToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_SBFE_V1_ATTR)])); // i.e. "SBFE" Small Business Attributes
 		
 	LNSmallBusiness.BIP_Layouts.BatchOutput xfm_allow_SBA_only( LNSmallBusiness.BIP_Layouts.BatchOutput le ) :=
 		TRANSFORM
@@ -284,12 +288,33 @@ EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 			SELF := [];
 		END;
 		
+    LNSmallBusiness.BIP_Layouts.BatchOutput xfm_allow_SBA101_only( LNSmallBusiness.BIP_Layouts.BatchOutput le ) :=
+		TRANSFORM
+			LNSmallBusiness.Macros.mac_base_attrs()
+			LNSmallBusiness.Macros.mac_SBA_attrs101()
+			LNSmallBusiness.Macros.mac_scoring_attrs()
+			SELF := [];
+		END;
+    
+     LNSmallBusiness.BIP_Layouts.BatchOutput xfm_allow_SBA101SBFE_only( LNSmallBusiness.BIP_Layouts.BatchOutput le ) :=
+		TRANSFORM
+			LNSmallBusiness.Macros.mac_base_attrs()
+			LNSmallBusiness.Macros.mac_SBA_attrs101()
+			LNSmallBusiness.Macros.mac_SBFE_attrs()
+			LNSmallBusiness.Macros.mac_scoring_attrs()
+			SELF := [];
+		END;
+    
+    
+    
 	Final_Results :=
 			MAP(
-				NOT allow_SBA_attrs AND NOT allow_SBFE_attrs => PROJECT( Final_Results_pre, xfm_allow_none(LEFT)),
-				allow_SBA_attrs AND NOT allow_SBFE_attrs     => PROJECT( Final_Results_pre, xfm_allow_SBA_only(LEFT)),
-				NOT allow_SBA_attrs AND allow_SBFE_attrs     => PROJECT( Final_Results_pre, xfm_allow_SBFE_only(LEFT)),
-				/* default (allow both attribute groups): */    Final_Results_pre
+				NOT allow_SBA_attrs AND NOT allow_SBFE_attrs AND NOT allow_SBA_attrs101  => PROJECT( Final_Results_pre, xfm_allow_none(LEFT)),
+				allow_SBA_attrs AND NOT allow_SBFE_attrs AND NOT allow_SBA_attrs101      => PROJECT( Final_Results_pre, xfm_allow_SBA_only(LEFT)),
+				NOT allow_SBA_attrs AND allow_SBFE_attrs AND NOT allow_SBA_attrs101      => PROJECT( Final_Results_pre, xfm_allow_SBFE_only(LEFT)),
+				allow_SBA_attrs101 AND not allow_SBFE_attrs AND NOT allow_SBA_attrs      => PROJECT( Final_Results_pre, xfm_allow_SBA101_only(LEFT)),
+				allow_SBA_attrs101 AND  allow_SBFE_attrs AND NOT allow_SBA_attrs      => PROJECT( Final_Results_pre, xfm_allow_SBA101SBFE_only(LEFT)),
+        /* default (allow both attribute groups): */    Final_Results_pre
 			);
 	
 	/* ************************************************************************

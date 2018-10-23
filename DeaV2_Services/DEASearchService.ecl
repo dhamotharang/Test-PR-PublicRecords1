@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="DEASearchService" wuTimeout="300000">
   <part name="DID"	type="xsd:string"/>
   <part name="BDID"	type="xsd:string"/>
@@ -34,7 +34,7 @@
 
 EXPORT DEASearchService := MACRO
 
-
+#CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 #constant('SearchGoodSSNOnly',true);
 #constant('SearchIgnoresAddressOnly',true);
 #constant('getBdidsbyExecutive',FALSE);

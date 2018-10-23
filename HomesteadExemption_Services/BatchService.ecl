@@ -1,4 +1,4 @@
-
+﻿
 /*--SOAP--
 <message name="HomesteadExemption_BatchService">
 	<part name="DPPAPurpose"         type="xsd:byte"/>
@@ -19,6 +19,7 @@
 IMPORT Address, BatchShare, Doxie, doxie_regression, STD, Suppress, ut;
 
 EXPORT BatchService() := MACRO
+    #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
     //required for property search.
     #STORED('Return_Property',TRUE);
     #STORED('Return_Assessments',TRUE);

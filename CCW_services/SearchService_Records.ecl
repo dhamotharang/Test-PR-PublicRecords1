@@ -98,7 +98,8 @@ export SearchService_Records := module
 		ds_flags := if(isFCRA, FFD.GetFlagFile (ds_best, pc_recs));
     
 		slim_pc_recs := FFD.SlimPersonContext(pc_recs);
-		suppress_results_due_alerts := isFCRA and FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_mod.FCRAPurpose, in_mod.FFDOptionsMask)[1].suppress_records;
+		alert_indicators := FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_mod.FCRAPurpose, in_mod.FFDOptionsMask)[1];
+    suppress_results_due_alerts := isFCRA and alert_indicators.suppress_records;
 		
 		// Send the DID and show disputed inside 
 		boolean isCNSMR := in_mod.IndustryClass = ut.IndustryClass.Knowx_IC; // D2C - consumer restriction
@@ -111,7 +112,7 @@ export SearchService_Records := module
   consumer_statements := if(isFCRA and showConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
 
   // process alerts coming from PersonContext
-		consumer_alerts := if(isFCRA, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, suppress_results_due_alerts), FFD.Constants.BlankConsumerAlerts);
+		consumer_alerts := if(isFCRA, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, alert_indicators, in_mod.FFDOptionsMask), FFD.Constants.BlankConsumerAlerts);
 		
 		FFD.MAC.PrepareResultRecord(final_recs, rec_out, consumer_statements, consumer_alerts, iesp.concealedweapon_fcra.t_FcraWeaponRecord);
 		 

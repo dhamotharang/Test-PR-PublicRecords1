@@ -16,6 +16,8 @@
 										'ProductCode',
 										/*---- Other Fields .----*/
 										/*---- ESDL Request Field ----*/
-										'FraudGovSearchRequest'
+										'FraudGovSearchRequest',
+										/*----Gateway-----*/
+										'Gateways'
 							));	
 ENDMACRO;

@@ -1,4 +1,4 @@
-IMPORT AddrBest, Autokey_batch, Batchshare, BatchServices, Doxie, Header;
+﻿IMPORT AddrBest, Autokey_batch, Batchshare, BatchServices, Doxie, Header;
 
 EXPORT Layouts := MODULE	
 	EXPORT Batch_in := RECORD
@@ -115,9 +115,11 @@ EXPORT Layouts := MODULE
 		AddrBest.Layout_BestAddr.batch_out_final;
   END;
 	
-	EXPORT bestrec_ext := RECORD
+	EXPORT bestrec_into_interface := RECORD
 	  bestrec;
-	  Header.Layout_addr_ind.best_addr_rank;
+		string2   addr_ind := '';
+    unsigned3 dt_first_seen;
+    unsigned3 dt_last_seen;
   END;
 
 END;

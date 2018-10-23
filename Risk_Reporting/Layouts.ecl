@@ -2020,8 +2020,8 @@ EXPORT LOG_Deltabase_Layout_Record := Record
   String30 industry;
   // PII Request data
   String9  i_ssn;
-  String8  i_dob;       //new
-  String120 i_name_full; //new
+  String8  i_dob;
+  String120 i_name_full;
   String30 i_name_first;
   String30 i_name_last;
   Integer8 i_lexid;
@@ -2031,8 +2031,8 @@ EXPORT LOG_Deltabase_Layout_Record := Record
   String9  i_zip;
   String30 i_dl;
   String2  i_dl_state;
-  String10 i_home_phone; //new
-  String10 i_work_phone; //new
+  String10 i_home_phone;
+  String10 i_work_phone;
   String9  i_tin;
   String30 i_name_first_2;
   String30 i_name_last_2;
@@ -2049,24 +2049,24 @@ EXPORT LOG_Deltabase_Layout_Record := Record
   String30 i_name_first_8;
   String30 i_name_last_8;
   String50 i_bus_name;
-  String50 i_alt_bus_name; //new
+  String50 i_alt_bus_name;
   String60 i_bus_address;
   String50 i_bus_city;
   String2  i_bus_state;
   String9  i_bus_zip;
-  String10 i_bus_phone;    //new
+  String10 i_bus_phone;
   String20 i_model_name_1;
   String20 i_model_name_2;
   String60 i_attributes_name;
   // Response data
-  Integer2 o_score_1;
+  String5 o_score_1;
   String4 o_reason_1_1;
   String4 o_reason_1_2;
   String4 o_reason_1_3;
   String4 o_reason_1_4;
   String4 o_reason_1_5;
   String4 o_reason_1_6;
-  Integer2 o_score_2;
+  String5 o_score_2;
   String4 o_reason_2_1;
   String4 o_reason_2_2;
   String4 o_reason_2_3;
@@ -2074,8 +2074,8 @@ EXPORT LOG_Deltabase_Layout_Record := Record
   String4 o_reason_2_5;
   String4 o_reason_2_6;
   Integer8 o_lexid;
-  String14 o_bdid;          //new
-  unsigned6 o_seleid;       //new
+  String14 o_bdid;
+  unsigned6 o_seleid;
 END;
 
 EXPORT LOG_Deltabase_Layout := RECORD

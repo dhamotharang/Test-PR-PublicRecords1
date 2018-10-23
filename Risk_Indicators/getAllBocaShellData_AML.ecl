@@ -360,11 +360,10 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
 
 
   // =============== Derogs ===============
- onThor := false;
  IncludeLnJ := false;
   derogs := IF (IsFCRA,
                 Risk_Indicators.Boca_Shell_Derogs_FCRA (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion, 
-									BSOptions, IncludeLnJ, onThor, iid),
+									BSOptions, IncludeLnJ, iid),
                 Risk_Indicators.Boca_Shell_Derogs      (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), BSversion));
   derogs_hist := IF (IsFCRA,
                      Risk_Indicators.Boca_Shell_Derogs_Hist_FCRA (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion),

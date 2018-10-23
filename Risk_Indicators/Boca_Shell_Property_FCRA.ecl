@@ -1,4 +1,5 @@
-﻿IMPORT FCRA, ut, RiskWise, ln_propertyv2;
+﻿IMPORT _Control, FCRA, ut, RiskWise, ln_propertyv2;
+onThor := _Control.Environment.OnThor;
 
 EXPORT Boca_Shell_Property_FCRA (GROUPED DATASET(layout_PropertyRecord) addresses,
                                  GROUPED DATASET(Layout_Boca_Shell_ids) ids) := FUNCTION
@@ -94,7 +95,7 @@ layout_PropertyRecordPlus join_address(layout_PropertyRecordPlus L, ln_propertyv
 	self := L;
 end;
 
-by_addr := join(p_address(prim_name != '', zip5 != ''), ln_propertyv2.key_prop_address_FCRA_V4,
+by_addr_roxie := join(p_address(prim_name != '', zip5 != ''), ln_propertyv2.key_prop_address_FCRA_V4,
 				keyed(left.prim_range = right.prim_range) and
 				keyed(left.prim_name = right.prim_name) and
 				keyed(left.sec_range = right.sec_range) and
@@ -115,9 +116,38 @@ by_addr := join(p_address(prim_name != '', zip5 != ''), ln_propertyv2.key_prop_a
 				keyed(left.postdir = right.postdir),
 				100
 			      )
-	       ) + p_address(prim_name = '' or zip5 = '');
+	       );
 
-
+by_addr_thor := join(distribute(p_address(prim_name != '', zip5 != ''), hash64(prim_range, prim_name, sec_range, zip5, addr_suffix, predir, postdir)), 
+        distribute(pull(ln_propertyv2.key_prop_address_FCRA_V4), hash64(prim_range, prim_name, sec_range, zip, suffix, predir, postdir)),
+				(left.prim_range = right.prim_range) and
+				(left.prim_name = right.prim_name) and
+				(left.sec_range = right.sec_range) and
+				(left.zip5 = right.zip) and
+				(left.addr_suffix = right.suffix) and
+				(left.predir = right.predir) and
+				(left.postdir = right.postdir) AND
+        // don't get data from records whose ln_fares_id are among corrections' fares_id;
+        NOT EXISTS (Right.fares (ln_fare_id IN Left.prop_correct_lnfare)),
+			join_address(LEFT,RIGHT), left outer,
+			ATMOST(
+				(left.prim_range = right.prim_range) and
+				(left.prim_name = right.prim_name) and
+				(left.sec_range = right.sec_range) and
+				(left.zip5 = right.zip) and
+				(left.addr_suffix = right.suffix) and
+				(left.predir = right.predir) and
+				(left.postdir = right.postdir),
+				100
+			      ), LOCAL
+	       );
+         
+#IF(onThor)
+	by_addr := by_addr_thor + p_address(prim_name = '' or zip5 = '');
+#ELSE
+	by_addr := by_addr_roxie + p_address(prim_name = '' or zip5 = '');
+#END
+  
 layout_PropertyRecordPlus join_did(ids L, ln_propertyv2.key_prop_ownership_FCRA_V4 R) := transform
 	self.own_fares_id := '';
 	self.occupant_owned := R.occupant_owned;
@@ -166,12 +196,25 @@ layout_PropertyRecordPlus join_did(ids L, ln_propertyv2.key_prop_ownership_FCRA_
 	self := [];
 end;
 
-by_did := JOIN (ids, ln_propertyv2.key_prop_ownership_FCRA_V4,
+by_did_roxie := UNGROUP(JOIN (ids, ln_propertyv2.key_prop_ownership_FCRA_V4,
                 left.did != 0 and
                 keyed (left.did = right.did) AND
                 // don't get data from records whose ln_fares_id are among corrections' fares_id
                 NOT EXISTS (Right.fares (ln_fare_id IN Left.prop_correct_lnfare)),
-                join_did (LEFT,RIGHT), KEEP(500), ATMOST(keyed (left.did = right.did), RiskWise.max_atmost));
+                join_did (LEFT,RIGHT), KEEP(500), ATMOST(keyed (left.did = right.did), RiskWise.max_atmost)));
+
+by_did_thor := JOIN (distribute(ids(did!=0), hash64(did)), 
+                distribute(pull(ln_propertyv2.key_prop_ownership_FCRA_V4), hash64(did)),
+                (left.did = right.did) AND
+                // don't get data from records whose ln_fares_id are among corrections' fares_id
+                NOT EXISTS (Right.fares (ln_fare_id IN Left.prop_correct_lnfare)),
+                join_did (LEFT,RIGHT), KEEP(500), ATMOST((left.did = right.did), RiskWise.max_atmost), LOCAL);
+
+#IF(onThor)
+	by_did := by_did_thor;
+#ELSE
+	by_did := by_did_roxie;
+#END
 
 all_props := UNGROUP (by_addr + by_did);
 
@@ -234,10 +277,20 @@ layout_PropertyRecordPlus GetCorrected (Layout_Boca_Shell_ids L,
 	self := L; //actually, overrides only, can be made blank (or ignored) here.
 END;
 
-new_props := JOIN (ids, FCRA.key_override_property.ownership,	
+new_props_roxie := JOIN (ids, FCRA.key_override_property.ownership,	
                    Left.did != 0 AND keyed (Left.did = Right.did),
                    GetCorrected (Left, Right), ATMOST(keyed (Left.did = Right.did), RiskWise.max_atmost));
 
+new_props_thor := GROUP(SORT(JOIN (distribute(ids(did!=0), hash64(did)), 
+                   distribute(pull(FCRA.key_override_property.ownership), hash64(did)),	
+                   (Left.did = Right.did),
+                   GetCorrected (Left, Right), ATMOST((Left.did = Right.did), RiskWise.max_atmost), LOCAL), seq),seq);
+
+#IF(onThor)
+	new_props := new_props_thor;
+#ELSE
+	new_props := new_props_roxie;
+#END
 
 all_corrected :=  new_props + all_props;
 

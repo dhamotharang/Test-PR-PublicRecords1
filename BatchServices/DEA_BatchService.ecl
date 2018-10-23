@@ -1,4 +1,4 @@
-	/*--SOAP--
+﻿	/*--SOAP--
 <message name="DEA_BatchService">
 	<part name="DPPAPurpose"          type="xsd:byte"/>
 	<part name="GLBPurpose"           type="xsd:byte"/> 
@@ -14,7 +14,7 @@ IMPORT BatchServices;
 
 EXPORT DEA_BatchService(useCannedRecs = 'false') := 
 	MACRO
-	 	 				 
+	 #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);	 				 
 		results := BatchServices.DEA_BatchService_Records(useCannedRecs);		
 		ut.mac_TrimFields(results, 'results', result);
 		OUTPUT(result, NAMED('Results'));

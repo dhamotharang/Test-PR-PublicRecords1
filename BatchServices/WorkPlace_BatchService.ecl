@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="WorkPlace_BatchService">
 	<part name="DPPAPurpose"         type="xsd:byte"/>
 	<part name="GLBPurpose"          type="xsd:byte"/>
@@ -9,8 +9,6 @@
 	<!-- USER OPTIONS -->
 	<part name="IncludeSpouseAlways"             type="xsd:boolean"/>
 	<part name="IncludeSpouseOnlyIfNoDebtor"     type="xsd:boolean"/>
-	<part name="IncludeEmailInfo"                type="xsd:boolean"/>
-	<part name="IncludeAdditionalInfo"           type="xsd:boolean"/>
 	<part name="IncludeCorpInfo"	               type="xsd:boolean"/>
   <part name="IncludeSelfRepCompanyName"			 type="xsd:boolean"/>
 
@@ -25,6 +23,7 @@
 import Royalty;
 
 EXPORT WorkPlace_BatchService(useCannedRecs = 'false') := MACRO
+#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 #stored('useOnlyBestDID',true); // used to determine the 1 "best" did for the input criteria
 
   Pre_result := BatchServices.WorkPlace_Records(useCannedRecs);

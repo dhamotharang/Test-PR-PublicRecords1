@@ -1,4 +1,5 @@
-EXPORT MAC_MEOW_xIDL_Batch(infile,Ref = '',Input_DID = '',Input_SNAME = '',Input_FNAME = '',Input_MNAME = '',Input_LNAME = '',Input_DERIVED_GENDER = '',Input_PRIM_RANGE = '',Input_PRIM_NAME = '',Input_SEC_RANGE = '',Input_CITY = '',Input_ST = '',Input_ZIP = '',Input_SSN5 = '',Input_SSN4 = '',Input_DOB = '',Input_PHONE = '',Input_DL_STATE = '',Input_DL_NBR = '',Input_SRC = '',Input_SOURCE_RID = '',/*HACK*/ Input_fname2 = '',Input_lname2 = '',OutFile,AsIndex='true',UpdateIDs='false',Stats='', In_disableForce = 'InsuranceHeader_xLink.Config.DOB_NotUseForce') := MACRO
+﻿ 
+EXPORT MAC_MEOW_xIDL_Batch(infile,Ref = '',Input_DID = '',Input_SNAME = '',Input_FNAME = '',Input_MNAME = '',Input_LNAME = '',Input_DERIVED_GENDER = '',Input_PRIM_RANGE = '',Input_PRIM_NAME = '',Input_SEC_RANGE = '',Input_CITY = '',Input_ST = '',Input_ZIP = '',Input_SSN5 = '',Input_SSN4 = '',Input_DOB = '',Input_PHONE = '',Input_DL_STATE = '',Input_DL_NBR = '',Input_SRC = '',Input_SOURCE_RID = '',/*MMXBHACK01*/Input_fname2 = '',Input_lname2 = '',OutFile,AsIndex='true',/*MMXBHACK03*/ input_UpdateIDs='false',Stats='', In_disableForce = 'InsuranceHeader_xLink.Config.DOB_NotUseForce' /*HACK18*/) := MACRO
   #uniquename(ToProcess)
   IMPORT SALT37,InsuranceHeader_xLink;
   #uniquename(TPRec)
@@ -7,7 +8,7 @@ EXPORT MAC_MEOW_xIDL_Batch(infile,Ref = '',Input_DID = '',Input_SNAME = '',Input
   #uniquename(InputT)
    %TPRec% %InputT%(InFile le) := TRANSFORM
     SELF.UniqueId := le.ref;
-  #IF ( #TEXT(Input_DID) <> '' AND UpdateIDs=true)
+  #IF ( #TEXT(Input_DID) <> '' AND /*MMXBHACK03*/ input_UpdateIDs=true)
     SELF.Entered_DID := (TYPEOF(SELF.Entered_DID))le.Input_DID;
   #ELSE
     SELF.Entered_DID := (TYPEOF(SELF.Entered_DID))'';
@@ -63,9 +64,9 @@ EXPORT MAC_MEOW_xIDL_Batch(infile,Ref = '',Input_DID = '',Input_SNAME = '',Input
     SELF.ST := (TYPEOF(SELF.ST))'';
   #END
   #IF ( #TEXT(Input_ZIP) <> '' )
-    SELF.ZIP := (TYPEOF(SELF.ZIP))le.Input_ZIP;
+    SELF.ZIP_cases := le.Input_ZIP;
   #ELSE
-    SELF.ZIP := (TYPEOF(SELF.ZIP))'';
+    SELF.ZIP_cases := DATASET([],InsuranceHeader_xLink.Process_xIDL_layouts().layout_ZIP_cases);
   #END
   #IF ( #TEXT(Input_SSN5) <> '' )
     SELF.SSN5 := (TYPEOF(SELF.SSN5))le.Input_SSN5;
@@ -87,7 +88,7 @@ EXPORT MAC_MEOW_xIDL_Batch(infile,Ref = '',Input_DID = '',Input_SNAME = '',Input
   #ELSE
     SELF.PHONE := (TYPEOF(SELF.PHONE))'';
   #END
-  #IF ( #TEXT(Input_DL_STATE) <> '' )
+  #IF ( #TEXT(Input_DL_STATE) <> '' and #TEXT(Input_DL_NBR) <> '' ) /*MMXBHACK05*/
     SELF.DL_STATE := (TYPEOF(SELF.DL_STATE))le.Input_DL_STATE;
   #ELSE
     SELF.DL_STATE := (TYPEOF(SELF.DL_STATE))'';
@@ -107,15 +108,15 @@ EXPORT MAC_MEOW_xIDL_Batch(infile,Ref = '',Input_DID = '',Input_SNAME = '',Input
   #ELSE
     SELF.SOURCE_RID := (TYPEOF(SELF.SOURCE_RID))'';
   #END
-  SELF.DT_FIRST_SEEN := (TYPEOF(SELF.DT_FIRST_SEEN))'';
-  SELF.DT_LAST_SEEN := (TYPEOF(SELF.DT_LAST_SEEN))'';
-  SELF.DT_EFFECTIVE_FIRST := (TYPEOF(SELF.DT_EFFECTIVE_FIRST))'';
-  SELF.DT_EFFECTIVE_LAST := (TYPEOF(SELF.DT_EFFECTIVE_LAST))'';  
-  SELF.MAINNAME :=   '';
-	SELF.FULLNAME :=   '';
-	SELF.ADDR1 :=   '';
-	SELF.LOCALE :=   ''; 
-	SELF.ADDRESS :=   '';/*HACK*/ 
+  SELF.DT_FIRST_SEEN := (TYPEOF(SELF.DT_FIRST_SEEN))''; /*MMXBHACK04a*/
+  SELF.DT_LAST_SEEN := (TYPEOF(SELF.DT_LAST_SEEN))''; /*MMXBHACK04b*/
+  SELF.DT_EFFECTIVE_FIRST := (TYPEOF(SELF.DT_EFFECTIVE_FIRST))''; /*MMXBHACK04c*/
+  SELF.DT_EFFECTIVE_LAST := (TYPEOF(SELF.DT_EFFECTIVE_LAST))''; /*MMXBHACK04d*/
+  SELF.MAINNAME :=   '';/*MMXBHACK02a*/
+  SELF.FULLNAME :=   '';/*MMXBHACK02b*/
+  SELF.ADDR1 :=   '';/*MMXBHACK02c*/
+  SELF.LOCALE :=   '';/*MMXBHACK02d*/
+  SELF.ADDRESS :=   '';/*MMXBHACK02e*/
   #IF ( #TEXT(Input_fname2) <> '' )
     SELF.fname2 := (TYPEOF(SELF.fname2))le.Input_fname2;
   #ELSE
@@ -142,7 +143,7 @@ EXPORT MAC_MEOW_xIDL_Batch(infile,Ref = '',Input_DID = '',Input_SNAME = '',Input
     SELF.SEC_RANGE := (TYPEOF(SELF.SEC_RANGE))InsuranceHeader_xLink.Fields.Make_SEC_RANGE((SALT37.StrType)le.SEC_RANGE);
     SELF.CITY := (TYPEOF(SELF.CITY))InsuranceHeader_xLink.Fields.Make_CITY((SALT37.StrType)le.CITY);
     SELF.ST := (TYPEOF(SELF.ST))InsuranceHeader_xLink.Fields.Make_ST((SALT37.StrType)le.ST);
-    SELF.ZIP := (TYPEOF(SELF.ZIP))le.ZIP;
+    SELF.ZIP_cases := le.ZIP_cases;
     SELF.SSN5 := (TYPEOF(SELF.SSN5))InsuranceHeader_xLink.Fields.Make_SSN5((SALT37.StrType)le.SSN5);
     SELF.SSN4 := (TYPEOF(SELF.SSN4))InsuranceHeader_xLink.Fields.Make_SSN4((SALT37.StrType)le.SSN4);
     SELF.DOB := (TYPEOF(SELF.DOB))InsuranceHeader_xLink.Fields.Make_DOB((SALT37.StrType)le.DOB);
@@ -191,7 +192,7 @@ EXPORT MAC_MEOW_xIDL_Batch(infile,Ref = '',Input_DID = '',Input_SNAME = '',Input
 #IF(#TEXT(Input_PRIM_RANGE)<>'' AND #TEXT(Input_PRIM_NAME)<>'' AND #TEXT(Input_ZIP)<>'')
   #uniquename(HoldADDRESS)
   %HoldADDRESS% := %ToProcess%;
-  InsuranceHeader_xLink.Key_InsuranceHeader_ADDRESS().MAC_ScoredFetch_Batch(%HoldADDRESS%,UniqueId,PRIM_RANGE,PRIM_NAME,ZIP,SEC_RANGE,FNAME,MNAME,LNAME,CITY,ST,DERIVED_GENDER,SNAME,DOB,%OutputADDRESS%,AsIndex,In_disableForce)
+  InsuranceHeader_xLink.Key_InsuranceHeader_ADDRESS().MAC_ScoredFetch_Batch(%HoldADDRESS%,UniqueId,PRIM_RANGE,PRIM_NAME,ZIP_cases,SEC_RANGE,FNAME,MNAME,LNAME,CITY,ST,DERIVED_GENDER,SNAME,DOB,%OutputADDRESS%,AsIndex,In_disableForce)
 #ELSE
   %OutputADDRESS% := DATASET([],InsuranceHeader_xLink.Process_xIDL_Layouts().LayoutScoredFetch);
 #END
@@ -215,15 +216,23 @@ EXPORT MAC_MEOW_xIDL_Batch(infile,Ref = '',Input_DID = '',Input_SNAME = '',Input
 #IF(#TEXT(Input_DOB)<>'' AND #TEXT(Input_LNAME)<>'')
   #uniquename(HoldDOB)
   %HoldDOB% := %ToProcess%;
-  InsuranceHeader_xLink.Key_InsuranceHeader_DOB().MAC_ScoredFetch_Batch(%HoldDOB%,UniqueId,DOB,LNAME,FNAME,MNAME,ST,CITY,SSN5,SSN4,DERIVED_GENDER,SNAME,%OutputDOB%,AsIndex,In_disableForce)
+  InsuranceHeader_xLink.Key_InsuranceHeader_DOB().MAC_ScoredFetch_Batch(%HoldDOB%,UniqueId,DOB,LNAME,FNAME,MNAME,ST,CITY,SSN5,SSN4,DERIVED_GENDER,DL_NBR,DL_STATE,SNAME,%OutputDOB%,AsIndex,In_disableForce)
 #ELSE
   %OutputDOB% := DATASET([],InsuranceHeader_xLink.Process_xIDL_Layouts().LayoutScoredFetch);
+#END
+  #uniquename(OutputDOBF)
+#IF(#TEXT(Input_DOB)<>'' AND #TEXT(Input_FNAME)<>'')
+  #uniquename(HoldDOBF)
+  %HoldDOBF% := %ToProcess%;
+  InsuranceHeader_xLink.Key_InsuranceHeader_DOBF().MAC_ScoredFetch_Batch(%HoldDOBF%,UniqueId,DOB,FNAME,LNAME,MNAME,ST,CITY,SSN5,SSN4,DERIVED_GENDER,DL_NBR,DL_STATE,SNAME,%OutputDOBF%,AsIndex,In_disableForce)
+#ELSE
+  %OutputDOBF% := DATASET([],InsuranceHeader_xLink.Process_xIDL_Layouts().LayoutScoredFetch);
 #END
   #uniquename(OutputZIP_PR)
 #IF(#TEXT(Input_ZIP)<>'' AND #TEXT(Input_PRIM_RANGE)<>'')
   #uniquename(HoldZIP_PR)
   %HoldZIP_PR% := %ToProcess%;
-  InsuranceHeader_xLink.Key_InsuranceHeader_ZIP_PR().MAC_ScoredFetch_Batch(%HoldZIP_PR%,UniqueId,ZIP,PRIM_RANGE,FNAME,LNAME,PRIM_NAME,SEC_RANGE,CITY,ST,DERIVED_GENDER,SNAME,DOB,%OutputZIP_PR%,AsIndex,In_disableForce)
+  InsuranceHeader_xLink.Key_InsuranceHeader_ZIP_PR().MAC_ScoredFetch_Batch(%HoldZIP_PR%,UniqueId,ZIP_cases,PRIM_RANGE,FNAME,LNAME,PRIM_NAME,SEC_RANGE,CITY,ST,DERIVED_GENDER,SNAME,DOB,%OutputZIP_PR%,AsIndex,In_disableForce)
 #ELSE
   %OutputZIP_PR% := DATASET([],InsuranceHeader_xLink.Process_xIDL_Layouts().LayoutScoredFetch);
 #END
@@ -255,7 +264,7 @@ EXPORT MAC_MEOW_xIDL_Batch(infile,Ref = '',Input_DID = '',Input_SNAME = '',Input
 #IF(#TEXT(Input_LNAME)<>'' AND #TEXT(Input_FNAME)<>'' AND #TEXT(Input_ZIP)<>'')
   #uniquename(HoldLFZ)
   %HoldLFZ% := %ToProcess%;
-  InsuranceHeader_xLink.Key_InsuranceHeader_LFZ().MAC_ScoredFetch_Batch(%HoldLFZ%,UniqueId,LNAME,FNAME,ZIP,CITY,PRIM_RANGE,PRIM_NAME,SSN5,SSN4,MNAME,SEC_RANGE,SNAME,DOB,ST,%OutputLFZ%,AsIndex,In_disableForce)
+  InsuranceHeader_xLink.Key_InsuranceHeader_LFZ().MAC_ScoredFetch_Batch(%HoldLFZ%,UniqueId,LNAME,FNAME,ZIP_cases,CITY,PRIM_RANGE,PRIM_NAME,SSN5,SSN4,MNAME,SEC_RANGE,SNAME,DOB,ST,%OutputLFZ%,AsIndex,In_disableForce)
 #ELSE
   %OutputLFZ% := DATASET([],InsuranceHeader_xLink.Process_xIDL_Layouts().LayoutScoredFetch);
 #END
@@ -268,7 +277,7 @@ EXPORT MAC_MEOW_xIDL_Batch(infile,Ref = '',Input_DID = '',Input_SNAME = '',Input
   %OutputRELATIVE% := DATASET([],InsuranceHeader_xLink.Process_xIDL_Layouts().LayoutScoredFetch);
 #END
   #uniquename(AllRes)
-  %AllRes% := %OutputNAME%+%OutputADDRESS%+%OutputSSN%+%OutputSSN4%+%OutputDOB%+%OutputZIP_PR%+%OutputSRC_RID%+%OutputDLN%+%OutputPH%+%OutputLFZ%+%OutputRELATIVE%+%OutputNewIDs%;
+  %AllRes% := %OutputNAME%+%OutputADDRESS%+%OutputSSN%+%OutputSSN4%+%OutputDOB%+%OutputDOBF%+%OutputZIP_PR%+%OutputSRC_RID%+%OutputDLN%+%OutputPH%+%OutputLFZ%+%OutputRELATIVE%+%OutputNewIDs%;
   #uniquename(All)
   %All% := InsuranceHeader_xLink.Process_xIDL_Layouts().CombineAllScores(%AllRes%, In_disableForce);
   #uniquename(OutFile0)

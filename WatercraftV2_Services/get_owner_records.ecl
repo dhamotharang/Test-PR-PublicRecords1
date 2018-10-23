@@ -15,28 +15,43 @@ EXPORT get_owner_records(
 	boolean showDisputedRecords := FFD.FFDMask.isShowDisputed(inFFDOptionsMask);
 	boolean ShowConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask);
 
-	getOwnerRecs(inRecs, inKeyFile) := FUNCTIONMACRO
-	  CNSMR_flag := ut.IndustryClass.is_Knowx;
-			orecs := JOIN(inRecs,inKeyFile,
-					KEYED(LEFT.state_origin = RIGHT.state_origin or LEFT.state_origin ='') 
-						and KEYED(LEFT.watercraft_key = RIGHT.watercraft_key) 
-						and KEYED(LEFT.sequence_key = RIGHT.sequence_key or LEFT.sequence_key='')
-						and (include_non_regulated_data or RIGHT.source_code != MDR.sourceTools.src_Infutor_Watercraft)
-						and (~CNSMR_flag or right.source_code not in D2C.Constants.WatercraftRestrictedSources),
-					TRANSFORM (owner_rec,
-						SELF.isDeepDive := LEFT.isDeepDive,
-						SELF.NonDMVSource := RIGHT.source_code in MDR.sourcetools.set_Infutor_Watercraft,
-						SELF.subject_did := LEFT.subject_did,
-						SELF := RIGHT,
-						SELF := []),
-					LIMIT(0), KEEP(ut.limits.OWNERS_PER_WATERCRAFT));
-					
-			RETURN(orecs);
+	CNSMR_flag := ut.IndustryClass.is_Knowx;
+	
+	mac_sid_join_criteria := MACRO
+					KEYED(LEFT.watercraft_key = RIGHT.watercraft_key) 
+					and KEYED(LEFT.sequence_key='' OR LEFT.sequence_key = RIGHT.sequence_key)
+					and KEYED(LEFT.state_origin ='' OR LEFT.state_origin = RIGHT.state_origin) 
+					and (include_non_regulated_data or RIGHT.source_code != MDR.sourceTools.src_Infutor_Watercraft)
+					and (~CNSMR_flag or right.source_code not in D2C.Constants.WatercraftRestrictedSources)
 	ENDMACRO;
-		
-	// Fcra sid linkid key doesn't exist, use non sid_linkid for FCRA search
-	recs_orig := IF(~isFCRA,getOwnerRecs(in_watercraftkeys,watercraft.key_watercraft_sid_linkids(isFCRA)),
-													getOwnerRecs(in_watercraftkeys,watercraft.key_watercraft_sid(isFCRA)));
+	
+	// Get owner records from sid key
+	recs_owner := JOIN(in_watercraftkeys,watercraft.key_watercraft_sid(isFCRA),
+	                   mac_sid_join_criteria(),
+										 TRANSFORM(owner_rec,
+												SELF.isDeepDive := LEFT.isDeepDive,
+												SELF.NonDMVSource := RIGHT.source_code in MDR.sourcetools.set_Infutor_Watercraft,
+												SELF.subject_did := LEFT.subject_did,
+												SELF := RIGHT,
+												SELF := []),
+										 LIMIT(0), KEEP(ut.limits.OWNERS_PER_WATERCRAFT));
+	
+	// For non fcra, append the linkids from sid_linkid keys
+	recs_owner_wLinkids := JOIN(recs_owner,watercraft.key_watercraft_sid_linkids(isFCRA),
+																mac_sid_join_criteria(),
+																TRANSFORM(owner_rec,
+																		SELF.dotid := RIGHT.dotid,
+																		SELF.empid := RIGHT.empid,
+																		SELF.powid := RIGHT.powid,
+																		SELF.proxid := RIGHT.proxid,
+																		SELF.seleid := RIGHT.seleid,
+																		SELF.orgid := RIGHT.orgid,
+																		SELF.ultid := RIGHT.ultid,
+																		SELF := LEFT),
+																LIMIT(0), KEEP(ut.limits.OWNERS_PER_WATERCRAFT),
+																LEFT OUTER);
+										
+	recs_orig := IF(~isFCRA,recs_owner_wLinkids,recs_owner);
 	
 	// overrides (FCRA only)
 	flagfileMods := flagfile(file_id = FCRA.FILE_ID.WATERCRAFT);
@@ -79,9 +94,9 @@ EXPORT get_owner_records(
 	// FCRA FFD ----------------------------------------------------------------------------------------------------------------
 	// Remove or mark Disputed rows & add StatementIDs
 	owner_rec xformDs (owner_rec L, FFD.Layouts.PersonContextBatchSlim R) := TRANSFORM,
-		skip(~ShowDisputedRecords and R.isDisputed) 
+		skip((~ShowDisputedRecords and R.isDisputed) or (~ShowConsumerStatements and exists(r.StatementIDs))) 
 		SELF.isDisputed :=  r.isDisputed ;
-		SELF.StatementIDs := if(ShowConsumerStatements,r.StatementIDs,FFD.Constants.BlankStatements);
+		SELF.StatementIDs := r.StatementIDs;
 		SELF := L;
 	END;
 
@@ -103,7 +118,7 @@ EXPORT get_owner_records(
 	// if(isFCRA, OUTPUT(recs_FCRA, NAMED(Prefix + '__recs_FCRA')));
 	// if(isFCRA, OUTPUT(recs_disp, NAMED(Prefix + '__recs_disp')));
 	// OUTPUT(records, NAMED(Prefix + '__records'));
-
+	
 	RETURN records;
 
 END;

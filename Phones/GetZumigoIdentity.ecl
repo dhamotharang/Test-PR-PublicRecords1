@@ -1,6 +1,6 @@
 ﻿/*
 This function prepare phones request to call Zumigo.
-As of 04/2018 Zumigo is configured to call 7 functions.
+As of 07/2018 Zumigo is configured to call 9 functions.
 When available lineType and carrier name are returned for all requests.
 NameAddressValidation: scores up to 15 submitted firstname/lastname/address 
 						- a value of 80-100 inclusively determines a passing score
@@ -15,10 +15,12 @@ DeviceInfo: returning device information - model and make.
 			 - The IDs above are hashed before outputting. 
 DeviceHistory: history of device with phone# - must be requested with DeviceInfo function
 			 - returns imsi or imei SeenSince/ChangedThisTime/ChangedCount/TrackedSince
+DeviceChangeOption - 			 
+AccountStatusInfo: Returns ServiceStatus - active/cancelled/suspended 
 
 After obtaining Zumigo, we process results to populate what we are legally allowed to store.
 */
-IMPORT Address, Doxie,DidVille,Email_Data, Gateway, iesp, Phones,Risk_Indicators,STD, ut;
+IMPORT Address,Codes, Doxie,DidVille,Email_Data, Gateway, iesp, Phones,Risk_Indicators,STD, ut;
 EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificationRequest) inRecs,
 						Phones.IParam.inZumigoParams inMod,
 						UNSIGNED1 GLBPurpose = 0,
@@ -45,11 +47,15 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 		SELF.Name.NameType := acctSeqPrefix + l.NameType;
 		SELF.Name.FirstName := l.first_name;
 		SELF.Name.LastName := l.last_name;
+		//According to email from Zumigo, BusinessName is only supported for ATT and TMO
+		SELF.Name.BusinessName := l.business_name; 
 		SELF.Address.AddressType := acctSeqPrefix + l.AddressType;
 		SELF.Address.AddressLine1 := Address.Addr1FromComponents(l.prim_range, l.predir, l.prim_name, l.addr_suffix, l.postdir, '', l.sec_range);
 		SELF.Address.City := l.p_city_name;
 		SELF.Address.state := l.st;
 		SELF.Address.PostalCode := l.z5;
+		SELF.Email.EmailType := acctSeqPrefix + l.EmailType;
+		SELF.Email.EmailAddress := l.email_address;		
 		SELF:=[];
 	END;
 	zumNameAddrRequest := PROJECT(dsNameAddrRequest,prepZumigoInput(LEFT));
@@ -57,20 +63,23 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 
 	iesp.zumigo_identity.t_ZIdIdentitySearch rollInput (Phones.Layouts.ZumigoIdentity.zIn l, DATASET(Phones.Layouts.ZumigoIdentity.zIn) r):= TRANSFORM
 		SELF.MobileDeviceNumber := l.MobileDeviceNumber;
-		SELF.NameAddrValidation.NameList := IF(inMod.NameAddressValidation, PROJECT(r,TRANSFORM(iesp.zumigo_identity.t_ZIdNameToVerify,SELF:=LEFT.Name)));
-		SELF.NameAddrValidation.AddressList := IF(inMod.NameAddressValidation, PROJECT(r,TRANSFORM(iesp.zumigo_identity.t_ZIdSubjectAddress,SELF:=LEFT.Address)));
+		SELF.NameAddrValidation.NameList := PROJECT(r,TRANSFORM(iesp.zumigo_identity.t_ZIdNameToVerify,SELF:=LEFT.Name));
+		SELF.NameAddrValidation.AddressList := PROJECT(r,TRANSFORM(iesp.zumigo_identity.t_ZIdSubjectAddress,SELF:=LEFT.Address));
+		SELF.NameAddrValidation.EmailList := PROJECT(r,TRANSFORM(iesp.zumigo_identity.t_ZIdEmailToVerify,SELF:=LEFT.Email));
 		SELF:=[];
 	END;
 	zumValidationRequest := ROLLUP(validNameAddrRequests,GROUP, rollInput(LEFT,ROWS(LEFT))); // a single call for each phone across all accounts		
-	zumNonValidationRequest := PROJECT(dsZumigoRequest,TRANSFORM(iesp.zumigo_identity.t_ZIdIdentitySearch,SELF.MobileDeviceNumber:=LEFT.phone,SELF:=[]));
+	zumNonValidationRequest := PROJECT(DEDUP(SORT(dsZumigoRequest, phone), phone), TRANSFORM(iesp.zumigo_identity.t_ZIdIdentitySearch,SELF.MobileDeviceNumber:=LEFT.phone,SELF:=[]));
 	zumIn := IF(nameAddrRequested,zumValidationRequest,zumNonValidationRequest);									
 	//Call to Zumigo gateway
 	zumOut:=Gateway.Soapcall_ZumigoIdentity(zumIn,inMod,doxie.DataPermission.use_ZumigoIdentity);
 	
 	//***Preserve populated emails with Email_rec_key - using TransactionID to establish link since the actual email address will not be saved
+	setRoyaltyEmailSources := SET(codes.Key_Codes_V3(file_name	=	'EMAIL_SOURCES',field_name	=	'ROYALTY'),code);
 	zEmails := zumOut(response.LineIdentityResponse.Subscriber.FirstName<>'' AND response.LineIdentityResponse.Subscriber.LastName<>'' AND response.LineIdentityResponse.Subscriber.Email<>'');
 	zEmailMatch := JOIN(zEmails, Email_Data.Key_Email_Address,
 						KEYED(LEFT.response.LineIdentityResponse.Subscriber.Email = RIGHT.Clean_email) AND
+						RIGHT.email_src NOT in	setRoyaltyEmailSources AND
 						ut.NameMatch(LEFT.response.LineIdentityResponse.Subscriber.FirstName,'',
 									 LEFT.response.LineIdentityResponse.Subscriber.LastName,RIGHT.orig_first_name,'',RIGHT.orig_last_name)<=Phones.Constants.STRING_MATCH_THRESHOLD,
 						TRANSFORM(Phones.Layouts.ZumigoIdentity.zOutEmail,
@@ -93,8 +102,9 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 
 	//***flatten by creating a record for each name/address validation pair	
 	iesp.zumigo_identity.t_ZumigoIdentityResponseEx normZumigo (iesp.zumigo_identity.t_ZumigoIdentityResponseEx l,  INTEGER c) := TRANSFORM
-		SELF.response.LineIdentityResponse.NameAddrValidation.NameList := l.response.LineIdentityResponse.NameAddrValidation.Namelist[c];
-		SELF.response.LineIdentityResponse.NameAddrValidation.AddressList := l.response.LineIdentityResponse.NameAddrValidation.Addresslist[c];
+		SELF.response.LineIdentityResponse.NameAddrValidation.NameList := l.response.LineIdentityResponse.NameAddrValidation.NameList[c];
+		SELF.response.LineIdentityResponse.NameAddrValidation.AddressList := l.response.LineIdentityResponse.NameAddrValidation.AddressList[c];
+		SELF.response.LineIdentityResponse.NameAddrValidation.EmailList := l.response.LineIdentityResponse.NameAddrValidation.EmailList[c];
 		SELF := l;
 	END;
 	normZResults := NORMALIZE(zumOut, LEFT.response.LineIdentityResponse.NameAddrValidation.Namelist,normZumigo(LEFT,COUNTER)); 
@@ -153,12 +163,17 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 		// SELF.zip4;
 		// SELF.county;
 		SELF.country := l.response.LineIdentityResponse.Account.BillingAddress.Country;
+		string8 t_Date2ToString (iesp.share.t_Date2 Date) := Date.Year + Date.Month + Date.Day;
 		SELF.imsi	:= IF(l.response.LineIdentityResponse.Subscriber.IntlMobileSubscriberId='','',(STRING)HASH64(l.response.LineIdentityResponse.Subscriber.IntlMobileSubscriberId));
-		SELF.imsi_seensince := l.response.LineIdentityResponse.Subscriber.SeenSince;
-		SELF.imsi_changedthis_time := (INTEGER)l.response.LineIdentityResponse.Subscriber.ChangedThisTime;
-		SELF.imsi_change_count := l.response.LineIdentityResponse.Subscriber.ChangeCount;
-		SELF.imsi_trackedsince := l.response.LineIdentityResponse.Subscriber.TrackedSince;
+		SELF.imsi_seensince := l.response.LineIdentityResponse.Subscriber.Identifier.Imsi.SeenSince;
+		SELF.imsi_changedthis_time := (INTEGER)l.response.LineIdentityResponse.Subscriber.Identifier.Imsi.ChangedThisTime;
+		SELF.imsi_changedate := t_Date2ToString(l.response.LineIdentityResponse.Subscriber.Identifier.Imsi.ChangeDate);
+		SELF.imsi_ActivationDate := t_Date2ToString(l.response.LineIdentityResponse.Subscriber.Identifier.Imsi.ActivationDate);
+		SELF.imsi_change_count := l.response.LineIdentityResponse.Subscriber.Identifier.Imsi.ChangeCount;
+		SELF.imsi_trackedsince := t_Date2ToString(l.response.LineIdentityResponse.Subscriber.Identifier.Imsi.TrackedSince);
 		SELF.iccid	:= IF(l.response.LineIdentityResponse.Subscriber.IntegratedCircuitCardId='','',(STRING)HASH64(l.response.LineIdentityResponse.Subscriber.IntegratedCircuitCardId));
+		SELF.iccid_changedthis_time := (INTEGER)l.response.LineIdentityResponse.Subscriber.Identifier.Iccid.ChangedThisTime;
+		SELF.iccid_seensince := l.response.LineIdentityResponse.Subscriber.Identifier.Iccid.SeenSince;
 		SELF.subscriber_id	:= IF(l.response.LineIdentityResponse.Subscriber.SubscriberId='','',(STRING)HASH64(l.response.LineIdentityResponse.Subscriber.SubscriberId));
 		SELF.call_forwarding := (INTEGER)l.response.LineIdentityResponse.Subscriber.CallHandlingInfo.CallForwarding;
 		SELF.call_forwarding_linked_toSubject := l.response.LineIdentityResponse.Subscriber.CallHandlingInfo.CallForwardedNumber; //Call Forwarded Number held temporarily
@@ -177,14 +192,21 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 		// SELF.device_type;
 		// SELF.deviceOS;
 		SELF.imei	:= IF(l.response.LineIdentityResponse.Device.IntlMobileEquipmentId='','',(STRING)HASH64(l.response.LineIdentityResponse.Device.IntlMobileEquipmentId));
+		SELF.loststolen := (INTEGER)l.response.LineIdentityResponse.Device.LostStolen;
+		SELF.loststolen_date := t_Date2ToString(l.response.LineIdentityResponse.Device.LostStolenDate);
 		// SELF.imei_type;
-		SELF.imei_seensince := l.response.LineIdentityResponse.Device.SeenSince;
-		SELF.imei_changed_this_time := (INTEGER)l.response.LineIdentityResponse.Device.ChangedThisTime;
-		SELF.imei_change_count := l.response.LineIdentityResponse.Device.ChangeCount;
-		SELF.imei_tracked_since := l.response.LineIdentityResponse.Device.TrackedSince;
+		SELF.imei_seensince := l.response.LineIdentityResponse.Device.Identifier.Imei.SeenSince;
+		SELF.imei_changed_this_time := (INTEGER)l.response.LineIdentityResponse.Device.Identifier.Imei.ChangedThisTime;
+		SELF.imei_changedate := t_Date2ToString(l.response.LineIdentityResponse.Device.Identifier.Imei.ChangeDate);
+		SELF.imei_change_count := l.response.LineIdentityResponse.Device.Identifier.Imei.ChangeCount;
+		SELF.imei_tracked_since := t_Date2ToString(l.response.LineIdentityResponse.Device.Identifier.Imei.TrackedSince);
 		SELF.first_name_score := l.response.LineIdentityResponse.NameAddrValidation.NameList[1].FirstNameScore;
 		SELF.last_name_score := l.response.LineIdentityResponse.NameAddrValidation.NameList[1].LastNameScore;
 		SELF.addr_score := l.response.LineIdentityResponse.NameAddrValidation.AddressList[1].AddressScore;
+		SELF.billing_first_name_score := l.response.LineIdentityResponse.NameAddrValidation.NameList[1].BillingFirstNameScore;
+		SELF.billing_last_name_score := l.response.LineIdentityResponse.NameAddrValidation.NameList[1].BillingLastNameScore;
+		SELF.business_name_score := l.response.LineIdentityResponse.NameAddrValidation.NameList[1].BusinessNameScore;		
+		SELF.email_address_score := l.response.LineIdentityResponse.NameAddrValidation.EmailList[1].EmailScore;		
 		// SELF.cnm_availability_indicator;
 		// SELF.cnm_presentation_indicator;
 		// SELF.port_date;
@@ -192,7 +214,7 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 		// SELF.reply_code;
 		// SELF.point_code;
 		// SELF.prepaid;
-		// SELF.account_status;
+		SELF.account_status := l.response.LineIdentityResponse.Account.ServiceStatus;
 		// SELF.language;
 		// SELF.tele_type;
 		// SELF.bill_block;
@@ -213,6 +235,7 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 		SELF.sub_name_type := l.response.LineIdentityResponse.NameAddrValidation.NameList[1].NameType;
 		SELF.sub_first_name := l.response.LineIdentityResponse.NameAddrValidation.NameList[1].FirstName;
 		SELF.sub_last_name := l.response.LineIdentityResponse.NameAddrValidation.NameList[1].LastName;
+		SELF.sub_business_name := l.response.LineIdentityResponse.NameAddrValidation.NameList[1].BusinessName;
 		SELF.sub_addr_type := l.response.LineIdentityResponse.NameAddrValidation.AddressList[1].AddressType;
 		SELF.sub_addr1 := l.response.LineIdentityResponse.NameAddrValidation.AddressList[1].AddressLine1;
 		SELF.sub_addr2 := l.response.LineIdentityResponse.NameAddrValidation.AddressList[1].AddressLine2;
@@ -220,6 +243,7 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 		SELF.sub_state := l.response.LineIdentityResponse.NameAddrValidation.AddressList[1].State;
 		SELF.sub_postal_code := l.response.LineIdentityResponse.NameAddrValidation.AddressList[1].PostalCode;
 		SELF.sub_country := l.response.LineIdentityResponse.NameAddrValidation.AddressList[1].Country;
+		SELF.sub_email_address := l.response.LineIdentityResponse.NameAddrValidation.EmailList[1].EmailAddress;
 		// SELF.customer_bill_acct_type;
 		// SELF.customer_bill_acct;
 		SELF.device_mgmt_status := MAP(l.response.LineIdentityResponse.Error.ErrorCode <> '' => l.response.LineIdentityResponse.Error.ErrorInfo,
@@ -235,11 +259,11 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 	//***repopulate acctno and seq in correct fields for nameAddressValidation records.
 	Phones.Layouts.ZumigoIdentity.zOut extractAcctnoNSeq(Phones.Layouts.gatewayHistory l) := TRANSFORM
 		setStr:=STD.Str.SplitWords(l.sub_name_type,'|'); // defined on lines 22 and 26. Index 1 is the acctno, 2 is the seq#
-		addressType:=STD.Str.SplitWords(l.sub_addr_type,'|')[3]; // and 3 is the name/address type. 
-		SELF.acctno := setStr[1];
-		SELF.sequence_number := (UNSIGNED)setStr[2];
+		addressType:=STD.Str.SplitWords(l.sub_addr_type,'|'); // and 3 is the name/address/email type. 
+		SELF.acctno := IF(l.sub_name_type<>'',setStr[1],addressType[1]);
+		SELF.sequence_number := (UNSIGNED)IF(l.sub_name_type<>'',setStr[2],addressType[2]);
 		SELF.sub_name_type := setStr[3];
-		SELF.sub_addr_type := addressType;
+		SELF.sub_addr_type := addressType[3];
 		SELF := l;
 		SELF :=[];
 	END;
@@ -268,6 +292,9 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 		SELF.sub_postal_code := l.z5;																									 
 		//source and optin fields will be blank for any record that was not sent to Zumigo. //eg. blank phones - can be filtered out later
 		SELF.transaction_id := r.transaction_id;
+		// ESP passes a LF in error message for timeouts that breaks batch results. Replacing message with abbreviated text.
+		SELF.device_mgmt_status := IF(STD.Str.StartsWith(STD.Str.ToLowerCase(r.device_mgmt_status),Phones.Constants.GatewayValues.TimeoutMessage),
+																Phones.Constants.GatewayValues.TimeoutMessage, r.device_mgmt_status);
 		SELF:= r;
 		SELF:=[]
 	END;
@@ -413,24 +440,24 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 													
 													
 	#IF(Phones.Constants.Debug.Zumigo)		
-		OUTPUT(zumIn,NAMED('zumIn'));
+		//OUTPUT(zumIn,NAMED('zumIn'));
 		OUTPUT(zumOut,NAMED('zumOut'));
 		OUTPUT(zEmailMatch,NAMED('zEmailMatch'));
-		OUTPUT(zForwardedPhones,NAMED('zForwardedPhones'));
-		OUTPUT(normzResults,NAMED('normzResults'));
-		OUTPUT(dsZResults_wErrors,NAMED('dsZResults_wErrors'));
-		OUTPUT(dsRepopulateAcctnoNSeq,NAMED('dsRepopulateAcctnoNSeq'));
-		OUTPUT(zProcessedOutput,NAMED('zProcessedOutput'));	
-		OUTPUT(zHistoryRecs,NAMED('zHistoryRecs'));
-		OUTPUT(zPhoneOwners,NAMED('zPhoneOwners'));
-		OUTPUT(zPhoneOwners_wDIDs,NAMED('zPhoneOwners_wDIDs'));
-		OUTPUT(zHistoryRecs_wDIDs,NAMED('zHistoryRecs_wDIDs'));
-		OUTPUT(LNPhoneOwnership,NAMED('LNPhoneOwnership'));
-		OUTPUT(zHistoryRecs_wInputMatch,NAMED('zHistoryRecs_wInputMatch'));
-		OUTPUT(zHistoryRecs_wLNIdentityMatch,NAMED('zHistoryRecs_wLNIdentityMatch'));
-		OUTPUT(zHistoryRecs_wMatchedSubscriber,NAMED('zHistoryRecs_wMatchedSubscriber'));
-		OUTPUT(zHistoryRecs_wEmailMatched,NAMED('zHistoryRecs_wEmailMatched'));
-		OUTPUT(zHistoryRecs_wForwardMatched,NAMED('zHistoryRecs_wForwardMatched'));
+		//OUTPUT(zForwardedPhones,NAMED('zForwardedPhones'));
+		//OUTPUT(normzResults,NAMED('normzResults'));
+		//OUTPUT(dsZResults_wErrors,NAMED('dsZResults_wErrors'));
+		//OUTPUT(dsRepopulateAcctnoNSeq,NAMED('dsRepopulateAcctnoNSeq'));
+		//OUTPUT(zProcessedOutput,NAMED('zProcessedOutput'));	
+		//OUTPUT(zHistoryRecs,NAMED('zHistoryRecs'));
+		//OUTPUT(zPhoneOwners,NAMED('zPhoneOwners'));
+		//OUTPUT(zPhoneOwners_wDIDs,NAMED('zPhoneOwners_wDIDs'));
+		//OUTPUT(zHistoryRecs_wDIDs,NAMED('zHistoryRecs_wDIDs'));
+		//OUTPUT(LNPhoneOwnership,NAMED('LNPhoneOwnership'));
+		//OUTPUT(zHistoryRecs_wInputMatch,NAMED('zHistoryRecs_wInputMatch'));
+		//OUTPUT(zHistoryRecs_wLNIdentityMatch,NAMED('zHistoryRecs_wLNIdentityMatch'));
+		//OUTPUT(zHistoryRecs_wMatchedSubscriber,NAMED('zHistoryRecs_wMatchedSubscriber'));
+		//OUTPUT(zHistoryRecs_wEmailMatched,NAMED('zHistoryRecs_wEmailMatched'));
+		//OUTPUT(zHistoryRecs_wForwardMatched,NAMED('zHistoryRecs_wForwardMatched'));
 		// OUTPUT(dsZumigoHistory,NAMED('dsZumigoHistory'));
 	#END;
 	RETURN dsZumigoHistory;

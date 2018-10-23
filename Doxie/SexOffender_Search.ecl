@@ -52,6 +52,7 @@
 import SexOffender, Alerts;
 
 export SexOffender_Search := macro
+#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 #STORED('LookupType','SEX');
 #STORED('ScoreThreshold',20);
 

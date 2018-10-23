@@ -1,4 +1,4 @@
-
+﻿
 /*--SOAP--
 <message name="BeneficiaryRiskScore_Batch_Service">
 
@@ -81,7 +81,7 @@
 IMPORT address, risk_indicators, models, riskwise, ut, gateway;
 
 EXPORT BeneficiaryRiskScore_Batch_Service() := MACRO
-
+ #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	// For the PostBeneficiaryFraud attributes, we want all of them to run; and only the
 	// Real-Time Vehicles if chosen explicitly by the customer.
 	#STORED('IncludeAllAttributeCategories', TRUE);

@@ -50,6 +50,10 @@
 	<part name="PhoneFinderSearchRequest" type="tns:XmlDataSet" cols="80" rows="30" />
 	<part name="RiskIndicators" type="tns:XmlDataSet" cols="80" rows="20" />
   <part name="IncludeOtherPhoneRiskIndicators" type="xsd:boolean" default="false"/>
+  <part name="UseInHousePhoneMetadata" type="xsd:boolean" default="false"/>
+  <part name="IncludePorting" type="xsd:boolean" default="false"/>
+  <part name="IncludeSpoofing" type="xsd:boolean" default="false"/>
+  <part name="IncludeOTP" type="xsd:boolean" default="false"/>
   <part name="usewaterfallv6" type="xsd:boolean" default="false"/>
 </message>
 */
@@ -57,7 +61,7 @@ IMPORT Address,AutoStandardI,Gateway,iesp,PhoneFinder_Services,ut;
 
 EXPORT PhoneFinderReportService() :=
 MACRO	
-
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 	// parse ESDL input
   dIn       := DATASET([], iesp.phonefinder.t_PhoneFinderSearchRequest) : STORED('PhoneFinderSearchRequest',FEW);
   pfRequest := dIn[1] : INDEPENDENT;
@@ -151,81 +155,11 @@ MACRO
 	cleanpSearchBy := PROJECT(dReqBatch, CleanupSearch(LEFT));
 	
 	formattedSearchBy := cleanpSearchBy[1];
-	
-	// Transaction type
-	STRING vTransactionType := pfOptions._Type : STORED('TransactionType');
-
-	// Report module
-	reportMod := MODULE(PhoneFinder_Services.iParam.ReportParams)
-	 EXPORT UNSIGNED1 TransactionType     := PhoneFinder_Services.Constants.MapTransType2Code(vTransactionType);
-		EXPORT BOOLEAN   StrictMatch        		:= AutoStandardI.InterfaceTranslator.StrictMatch_value.val(searchMod);
-		EXPORT BOOLEAN   PhoneticMatch      		:= AutoStandardI.InterfaceTranslator.phonetics.val(searchMod);
-		EXPORT STRING32  ApplicationType   		  := AutoStandardI.InterfaceTranslator.application_type_val.val(searchMod);
-		EXPORT STRING5   IndustryClass      		:= AutoStandardI.InterfaceTranslator.industry_class_val.val(PROJECT(globalMod,AutoStandardI.InterfaceTranslator.industry_class_val.params));
-		EXPORT UNSIGNED1 GLBPurpose         		:= AutoStandardI.InterfaceTranslator.glb_purpose.val(searchMod);
-		EXPORT UNSIGNED1 DPPAPurpose        		:= AutoStandardI.InterfaceTranslator.dppa_purpose.val(searchMod);
-		EXPORT UNSIGNED  ScoreThreshold     		:= AutoStandardI.InterfaceTranslator.score_threshold_value.val(searchMod);
-		EXPORT UNSIGNED  PenaltyThreshold    		:= AutoStandardI.InterfaceTranslator.penalt_threshold_value.val(PROJECT(globalMod,AutoStandardI.InterfaceTranslator.penalt_threshold_value.params));
-		EXPORT STRING    DataRestrictionMask		:= globalMod.DataRestrictionMask;
-		EXPORT STRING    DataPermissionMask 		:= globalMod.DataPermissionMask;
-		EXPORT STRING6   DOBMask             		:= AutoStandardI.InterfaceTranslator.dob_mask_val.val(PROJECT(globalMod,AutoStandardI.InterfaceTranslator.dob_mask_val.params));
-		EXPORT STRING6   SSNMask            		:= AutoStandardI.InterfaceTranslator.ssn_mask_val.val(PROJECT(globalMod,AutoStandardI.InterfaceTranslator.ssn_mask_val.params));
-		EXPORT BOOLEAN   UseLastResort      		:= doxie.DataPermission.use_LastResort and TransactionType <> PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT;
-		EXPORT BOOLEAN   UseInHouseQSent    		:= doxie.DataPermission.use_QSent and TransactionType <> PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT;
-		EXPORT BOOLEAN   UseQSent           		:= ~doxie.DataRestriction.QSent and TransactionType in [PhoneFinder_Services.Constants.TransType.Premium,PhoneFinder_Services.Constants.TransType.Ultimate];
-		EXPORT BOOLEAN   UseAccuData_OCN        := pfOptions.IncludePhoneMetadata and TransactionType in [PhoneFinder_Services.Constants.TransType.Premium,
-		                                                                                                  PhoneFinder_Services.Constants.TransType.Ultimate,
-		                                                                                                  PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT];
-		EXPORT BOOLEAN   UseTargus          		:= ~doxie.DataRestriction.PhoneFinderTargus and TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate;
-		EXPORT BOOLEAN   UseEquifax         		:= ~doxie.DataRestriction.EquifaxPhoneMart and TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate;
-		EXPORT BOOLEAN   useWaterfallv6					:= FALSE : STORED('useWaterfallv6');	// internal
-		EXPORT BOOLEAN   IncludePhoneMetadata		:= pfOptions.IncludePhoneMetadata : STORED('IncludePhoneMetadata');				 				 
-		BOOLEAN          RealTimedata 			 		:= pfOptions.UseDeltabase : STORED('UseDeltabase');						 
-		EXPORT BOOLEAN   UseDeltabase 					:= IF(IncludePhoneMetadata,RealTimedata,FALSE);																						 
-		BOOLEAN          SubjectMetadata 		 		:= pfOptions.SubjectMetadataOnly : STORED('SubjectMetadataOnly');
-		EXPORT BOOLEAN   SubjectMetadataOnly  	:= IF(IncludePhoneMetadata,SubjectMetadata,FALSE);
-		
-		// Options for phone verification	  
-		EXPORT BOOLEAN   VerifyPhoneName				:= pfOptions.VerificationOptions.VerifyPhoneName 				: STORED('VerifyPhoneName');
-		EXPORT BOOLEAN   VerifyPhoneNameAddress := pfOptions.VerificationOptions.VerifyPhoneNameAddress : STORED('VerifyPhoneNameAddress');
-		EXPORT BOOLEAN   VerifyPhoneIsActive    := pfOptions.VerificationOptions.VerifyPhoneIsActive    : STORED('VerifyPhoneIsActive');
-        EXPORT INTEGER   DateFirstSeenThreshold := pfOptions.VerificationOptions.DateFirstSeenThreshold	: STORED('DateFirstSeenThreshold');
-        EXPORT INTEGER   DateLastSeenThreshold  := pfOptions.VerificationOptions.DateLastSeenThreshold 	: STORED('DateLastSeenThreshold');
-        EXPORT INTEGER   LengthOfTimeThreshold  := pfOptions.VerificationOptions.LengthOfTimeThreshold 	: STORED('LengthOfTimeThreshold');
-		EXPORT BOOLEAN   UseDateFirstSeenVerify := pfOptions.VerificationOptions.UseDateFirstSeenVerify	: STORED('UseDateFirstSeenVerify');
-		EXPORT BOOLEAN   UseDateLastSeenVerify  := pfOptions.VerificationOptions.UseDateLastSeenVerify  : STORED('UseDateLastSeenVerify');
-		EXPORT BOOLEAN   UseLengthOfTimeVerify  := pfOptions.VerificationOptions.UseLengthOfTimeVerify  : STORED('UseLengthOfTimeVerify');
-									   UserRules							:= pfOptions.RiskIndicators : STORED('RiskIndicators');	
-										 allRules := IF(EXISTS(UserRules)and IncludePhoneMetadata, PhoneFinder_Services.Constants.defaultRules + UserRules,
-										                                                           DATASET([],iesp.phonefinder.t_PhoneFinderRiskIndicator));
-		EXPORT DATASET(iesp.phonefinder.t_PhoneFinderRiskIndicator) RiskIndicators	:= IF(TransactionType = PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT, 
-		                                                                                  UserRules,
-																																		                  allRules);
-		EXPORT BOOLEAN   IncludeOtherPhoneRiskIndicators				:= pfOptions.IncludeOtherPhoneRiskIndicators : STORED('IncludeOtherPhoneRiskIndicators');	
-		EXPORT UNSIGNED1 LineIdentityConsentLevel           := pfOptions.LineIdentityConsentLevel : STORED('LineIdentityConsentLevel');                                                     
-		EXPORT STRING20  Usecase                            := pfOptions.LineIdentityUseCase: STORED('LineIdentityUseCase');
-		EXPORT STRING3 	 ProductCode                        := pfUser.ProductCode: STORED('ProductCode');
-		EXPORT STRING8	 BillingId                          	:= pfUser.BillingId: STORED('BillingId');
-			
-		EXPORT STRING16 CompanyId     := pfUser.CompanyId;
-		EXPORT STRING60 ReferenceCode := pfUser.ReferenceCode;
-		EXPORT STRING8  SourceCode    := pfUser.SourceCode;
-		EXPORT STRING60 BillingCode   := pfUser.BillingCode;
-		EXPORT STRING   TransactionId := '': STORED('_TransactionId');
-		 		
-		
-		EXPORT BOOLEAN   UseZumigoIdentity	 := doxie.DataPermission.use_ZumigoIdentity and TransactionType IN [PhoneFinder_Services.Constants.TransType.Ultimate,
-		                                                                                                        PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT] and BillingId <>'';
-		       INTEGER   input_MaxOtherPhones	 := pfOptions.MaxOtherPhones : STORED('MaxOtherPhones'); // TO RESTRICT OTHER PHONES
-		EXPORT INTEGER   MaxOtherPhones	 := IF(input_MaxOtherPhones <> 0, input_MaxOtherPhones, PhoneFinder_Services.Constants.MaxOtherPhones);
-		                 UseInHousePhoneMetadata_internal	 := pfOptions.UseInHousePhoneMetadata: STORED('UseInHousePhoneMetadata');
-		EXPORT BOOLEAN   UseInHousePhoneMetadata	 := UseQSent and UseInHousePhoneMetadata_internal;
-	END;
-
+	reportMod := PhoneFinder_Services.iParam.GetSearchParams(pfOptions,pfUser);
 	modRecords := PhoneFinder_Services.PhoneFinder_Records(dReqBatch, reportMod, IF(reportMod.TransactionType = PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT,
 															dGateways(servicename IN PhoneFinder_Services.Constants.PhoneRiskAssessmentGateways),dGateways),
  															formattedSearchBy, pfSearchBy);
- iesp.phonefinder.t_PhoneFinderSearchResponse tFormat2IespResponse() :=
+iesp.phonefinder.t_PhoneFinderSearchResponse tFormat2IespResponse() :=
       		TRANSFORM
       			SELF._Header   := iesp.ECL2ESP.GetHeaderRow();
       			SELF.Records   := modRecords.dFormat2IESP;

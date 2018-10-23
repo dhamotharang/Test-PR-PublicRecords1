@@ -51,6 +51,7 @@ export Constants := module
 		export String40 SearchAlertID := 'SP_SEARCHALERTID'; // referenced in Inquiry_Services
 		export String40 SearchIdentityVelocityId := 'SP_SEARCHIDENTITYVELOCITYID'; // referenced in Inquiry_Services
 		export String40 FDNDeltabase		:= 'delta_fdn';				//FDN Search
+		export String40 FraudGovDeltabase := 'delta_esp';
 		export String40 PhonesMetaData		:= 'delta_phonefinder';				//Phone Finder service metadata - porting/spoof/otp
 		// FCRA Full File Disclosure person context deltabase
 		export String40 delta_personcontext	:= 'delta_personcontext';				//FCRA Full File Disclosure
@@ -65,6 +66,7 @@ export Constants := module
 		export String40 EquifaxEVS := 'equifaxevs';			// Equifax Employment Verification Service
 		export String40 IsAccuDataCNAM := 'accudata_cnam';			//CallerID - Retrieve Calling Name for phone number
 		export String40 IsEquifaxEmsReport := 'equifax_ems';			//Equifax Tri-Merge report.
+		export String40 IsTuFraudAlert := 'tu_fraud_alert';			//Transunion Fraud Alert
 	end;
 
 	export ConfigProperties := module
