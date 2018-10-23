@@ -41,7 +41,7 @@
 /*--INFO-- This service pulls from the Sex Offenders file.*/
 
 export sexoffender_search_people := macro
-#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 #STORED('LookupType','SEX');
 
 WSInput.MAC_SexOffender_Search_People()
