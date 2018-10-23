@@ -37,13 +37,16 @@ EXPORT TuFraudAlert_Records(dataset(iesp.tu_fraud_alert.t_TuFraudAlertRequest) i
   //Set the inquiry log lexID to input if we have a match or remote linking didn't match.
   //This is because if we identify a person on input we need inquiry log and FFD data.
   //regardless of the vendor gateway response.
-  inquiry_log_lexID := IF(is_lexID_match OR ~remote_linking_result.match OR ~remote_linking_result.best_lexID = 0,
+  inquiry_log_lexID := IF(is_lexID_match OR ~remote_linking_result.match OR remote_linking_result.best_lexID = 0,
     input_lexID, remote_linking_result.best_lexID);
 
   //Prepare inquiry log, even if lexID is 0 we must log the inquiry. Use input data sent to didville.
   consumer := FFD.Mac.PrepareConsumerRecord((STRING)inquiry_log_lexID, TRUE, ds_plist_req[1].searchby, '', TRUE);
 
   //Set validation code and message.
+  //Previously NOCALL would be set if we didn't have a lexID, or if we had FFD suppression.
+  //Due to remote linking we call FFD after results, and always call gateway regardless of lexID resolution.
+  //NOCALL is no longer relevant to this service.
   validation_code := MAP(remote_linking_result.match => constants.ValidationCode.REMOTE_LINKING_MATCH,
     ds_tufa_soap_response[1].response._header.status = constants.GatewayStatus.ERROR => constants.ValidationCode.INVALID_RESPONSE,
     FCRAGateway_Services.Functions.GetValidationCode(input_lexID, output_lexID));
