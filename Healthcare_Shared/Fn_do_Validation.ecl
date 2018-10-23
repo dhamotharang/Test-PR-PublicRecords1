@@ -147,14 +147,14 @@ export Fn_do_Validation := Module
 			// output(checkDidFromSSN,named('checkDidFromSSN'));
 			//Check the SSN against the watchdog file to get the full name and see if it is close to what the user supplied if so get the watch dog name and compare it to the real names collected
 			bestRecs := dx_BestRecords.fn_get_best_records(checkDidFromSSN, did, dx_BestRecords.Constants.perm_type.glb);
-			bestInfo:=join(checkDidFromSSN, bestRecs,
-																	(right.did=left.did) and 
-																	((right.fname[1..2]=STD.Str.ToUpperCase(left.name_first[1..2]) and right.lname = STD.Str.ToUpperCase(left.name_last)) or 
-																	 (right.fname[1..2]=STD.Str.ToUpperCase(left.name_last[1..2]) and right.lname = STD.Str.ToUpperCase(left.name_first))),
+			bestInfo:=project(bestRecs((fname[1..2]=STD.Str.ToUpperCase(_bestrec_input.name_first[1..2]) and lname = STD.Str.ToUpperCase(_bestrec_input.name_last)) or 
+																	(fname[1..2]=STD.Str.ToUpperCase(_bestrec_input.name_last[1..2]) and lname = STD.Str.ToUpperCase(_bestrec_input.name_first))),
 																	Transform(Healthcare_Shared.Layouts.layout_lookup_DID, 
-																			self.acctno := left.acctno; self.lnpid := left.lnpid; self.did:= (integer)right.ssn;
-																			self.name_first := right.fname, self.name_last := right.lname;),
-																	keep(50), limit(0));
+																			self.acctno := left._bestrec_input.acctno; 
+																			self.lnpid := left._bestrec_input.lnpid; 
+																			self.did:= (integer)left.ssn;
+																			self.name_first := left.fname, 
+																			self.name_last := left.lname));
 			// output(bestInfo,named('bestInfo'));
 			//Compare the best Info to the Names we are about to return to see if it matches any of the variations
 			bestInfo_match := Join(BestInfo,nameRecs, left.acctno=right.acctno and left.lnpid=right.lnpid and left.did=(integer)right.ssn,

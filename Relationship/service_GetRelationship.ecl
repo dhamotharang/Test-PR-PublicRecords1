@@ -67,14 +67,13 @@ nrec := record
 	result;
 end;
 segrecs    := dx_BestRecords.fn_get_best_records(result, did2, dx_BestRecords.Constants.perm_type.glb);
-NamesAdded := join(result,segrecs,
-                   left.did2 = right.did,
+NamesAdded := project(segrecs,
 									 transform(nrec,
-									           self.fname := right.fname,
-														 self.mname := right.mname,
-														 self.lname := right.lname,
-														 self.title_str := Header.relative_titles.fn_get_str_title(left.title);
-														 self := left));
+									           self.fname := left.fname,
+														 self.mname := left.mname,
+														 self.lname := left.lname,
+														 self.title_str := Header.relative_titles.fn_get_str_title(left._bestrec_input.title);
+														 self := left._bestrec_input));
 
 IF(Add_Names,output(NamesAdded,named('Names_and_Title_String_added_for_display_purposes_only')));
 IF(NOT Add_Names,output(result,named('Interface_results')));
