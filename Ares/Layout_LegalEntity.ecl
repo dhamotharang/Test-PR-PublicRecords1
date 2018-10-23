@@ -72,8 +72,8 @@ layout_link := record
 end;
 
 layout_type := record
-	string type_source{xpath('type/@source')}:='';
-  string type_value {xpath('type')}:='';
+	string type_source{xpath('./@source')}:='';
+  string type_value {xpath('./')}:='';
 end;
 
 employees := record
