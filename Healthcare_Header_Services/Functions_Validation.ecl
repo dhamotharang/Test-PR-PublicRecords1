@@ -62,8 +62,8 @@ export Functions_Validation := Module
 			didbasedssn := dedup(sort(project(getdidfromssn(ut.NameMatch100(pfname,'','',stringlib.StringToUpperCase(src.name_first),'','')>80),layouts.layout_did),record),record);
 			bestRecs := dx_BestRecords.fn_get_best_records(dataset([{didbasedssn[1].did}], doxie.layout_references), 
 				did, dx_BestRecords.Constants.perm_type.glb);
-			bestInfo:=Choosen(bestRecs(((fname[1..2]=stringlib.StringToUpperCase(src.name_first[1..2]) and lname = stringlib.StringToUpperCase(src.name_last)) or 
-																	(fname[1..2]=stringlib.StringToUpperCase(src.name_last[1..2]) and lname = stringlib.StringToUpperCase(src.name_first)))),50);
+			bestInfo:=bestRecs(((fname[1..2]=stringlib.StringToUpperCase(src.name_first[1..2]) and lname = stringlib.StringToUpperCase(src.name_last)) or 
+													(fname[1..2]=stringlib.StringToUpperCase(src.name_last[1..2]) and lname = stringlib.StringToUpperCase(src.name_first))));
 			bestInfo_match := join(bestInfo,nameRecs,left.ssn=right.ssn,transform(recordof(bestInfo),
 														self.ssn := if(ut.NameMatch100(left.fname[1..2],'',left.lname,right.FName,'',right.LName)>80 or
 																					 ut.NameMatch100(left.fname[1..2],'',left.lname,right.FName,'',right.LName)>80 or
