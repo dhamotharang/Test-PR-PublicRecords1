@@ -108,6 +108,8 @@
     /*PerAssetOwnWatercraft*/ 
 		UNSIGNED2 	watercraftCount;                                  //populated in DueDiligence.getSharedWatercraft 
 		UNSIGNED2  	watercraftLength;                                 //populated in DueDiligence.getSharedWatercraft 
+    /*PerAssetOwnAircraft*/
+    UNSIGNED2   aircraftCount;
     /*PerUSResidency*/
 		UNSIGNED4 	firstReportedDate;															  //populated in DueDiligence.getIndHeader
 		BOOLEAN		  registeredVoter;															    //populated in DueDiligence.getIndHeader

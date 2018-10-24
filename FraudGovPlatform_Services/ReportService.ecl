@@ -1,4 +1,4 @@
-﻿/*--SOAP--
+/*--SOAP--
 <message name="ReportService">
     <part name="FraudGovReportRequest" type="tns:XmlDataSet" cols="80" rows="30"/>
 </message>
@@ -7,7 +7,7 @@
 IMPORT BatchShare,doxie, FraudShared_Services, iesp, WSInput;
 
 EXPORT ReportService() := MACRO
-  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+  #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 
 	//The following macro defines the field sequence on WsECL page of query.
 	WSInput.MAC_FraudGovPlatform_Services_ReportService();
@@ -45,6 +45,7 @@ EXPORT ReportService() := MACRO
 	#STORED('AgencyState',  Options.AgencyState);
 	#STORED('FraudPlatform',	Options.Platform);
 	#STORED('IsOnline',	Options.IsOnline);
+	#STORED('useAllSearchFields',	Options.useAllSearchFields);
 	#STORED('MaxVelocities', MaxVelocities);
 	#STORED('MaxKnownFrauds', MaxKnownFrauds);
 
@@ -131,7 +132,7 @@ EXPORT ReportService() := MACRO
 	
 	//When Options.IsOnline is FALSE, we don't use the validation logic, because the API clients use the ReportService
 	//for searches, not just card details.
-	isValidInput := (inputCount = 1 OR ~Options.IsOnline) AND isValidDate;
+	isValidInput := (inputCount = 1 OR ~Options.IsOnline OR Options.UseAllSearchFields) AND isValidDate;
 
 	// **************************************************************************************
 	// Append DID for Input PII

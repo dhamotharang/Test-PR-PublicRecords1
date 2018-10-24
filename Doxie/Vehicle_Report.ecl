@@ -19,7 +19,7 @@
 import codes;
 
 export Vehicle_Report := MACRO
-#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 doxie.MAC_Header_Field_Declare()
 qstring25 vid_value := '' : STORED('VID');
 string2 st_code_value := '' : STORED('StateCode');

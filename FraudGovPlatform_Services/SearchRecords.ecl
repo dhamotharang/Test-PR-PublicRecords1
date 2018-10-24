@@ -11,11 +11,11 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	// **************************************************************************************
 	// Getting the payload records from FraudGov Payload key.
 	// **************************************************************************************
-	SHARED ds_allPayloadRecs := FraudGovPlatform_Services.fn_getadvsearch_raw_recs(ds_batch_in,
-																																					batch_params.GlobalCompanyId,
-																																					batch_params.IndustryType,
-																																					batch_params.ProductCode,
-																																					IsOnline := batch_params.IsOnline);
+	SHARED ds_allPayloadRecs := FraudGovPlatform_Services.fn_getadvsearch_raw_recs( ds_batch_in,
+																																									batch_params.GlobalCompanyId,
+																																									batch_params.IndustryType,
+																																									batch_params.ProductCode,
+																																									IsOnline := batch_params.IsOnline);
 
 	// **************************************************************************************
 	// Append DID for Input PII
@@ -30,7 +30,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 													SELF.mname	:= LEFT.name_middle,
 													SELF.lname	:= LEFT.name_last,
 													SELF.suffix	:= LEFT.name_suffix,
-													SELF.phone10	:= LEFT.phoneno,
+													SELF.phone10:= LEFT.phoneno,
 													SELF	:= LEFT,
 													SELF	:= []));
 	
@@ -40,7 +40,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 														SELF.did := LEFT.did,
 														SELF := []));
 
-	SHARED ds_contributory_in_dedup := DEDUP(SORT(ds_contributory_in(did > 0), did), did);
+	ds_contributory_in_dedup := DEDUP(SORT(ds_contributory_in(did > 0), did), did);
 	
 	/* This is best on three step process defined in GRP-724 */
 		/* 
@@ -55,13 +55,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 		3.Bring back ELEMENT cards (ONLY MVP SUPPORTED ELEMENTs),  for each ELEMENT in the Search Criteria,   
 			when ALL ELEMENTS in the Search Criteria is found to match a single contributed row.
 		*/
-	SHARED ds_dids_to_use := IF(adlDIDFound , ds_adl_in , ds_contributory_in_dedup);
-	
-	//Getting the public records best to fill identity Detail card.
-	ds_GovBest := FraudGovPlatform_Services.Functions.getGovernmentBest(ds_dids_to_use, batch_params);
-	
-	//Getting the Contributory best to fill identity Detail card.
-	ds_contributoryBest := FraudGovPlatform_Services.Functions.getContributedBest(ds_dids_to_use, FraudGovPlatform_Services.Constants.FRAUD_PLATFORM);
+	ds_dids_to_use := IF(adlDIDFound , ds_adl_in , ds_contributory_in_dedup);
 	
 	//adding additional elements lexid's to ds_batch_in , so velocities can be calculated.
 	ds_elements_dids := PROJECT(ds_contributory_in_dedup, 
@@ -148,9 +142,25 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 																	LEFT OUTER,
 																	LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
 	
+	// getting the records from deltabase database.
+	ds_delta_recentTransactions := mod_Deltabase_Functions(batch_params).getDeltabaseSearchRecords();
+	
+	//Getting the public records best to fill identity Detail card.
+	ds_GovBest := FraudGovPlatform_Services.Functions.getGovernmentBest(ds_dids_to_use, batch_params);
+	
+	//Getting the Contributory best to fill identity Detail card.
+	ds_contributoryBest := FraudGovPlatform_Services.Functions.getContributedBest(ds_dids_to_use, FraudGovPlatform_Services.Constants.FRAUD_PLATFORM);
 
-	ds_delta_recentTransactions := mod_Deltabase_Functions(batch_params).getDeltabaseSearchRecords();											
+	//realtime record:
+	BOOLEAN isRealtimeRecord := adlDIDFound AND COUNT(ds_contributoryBest) = 0;
+	
+	ds_batch_in_orig := PROJECT(ds_input_with_adl_did, FraudShared_Services.Layouts.BatchIn_rec);
+	ds_ExternalServices_recs := IF(isRealtimeRecord, 
+																	FraudGovPlatform_Services.Functions.getExternalServicesRecs(ds_batch_in_orig, batch_params),
+																	DATASET([], FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw));
 																		
+	ds_realtimescoring_rec := FraudGovPlatform_Services.mod_RealTimeScoring(ds_ExternalServices_recs, batch_params).ds_w_realTimeScore;
+
 	//Assembling all the pieces together to form search response.	
 	iesp.fraudgovsearch.t_FraudGovSearchRecord ElementsNIdentities_trans (FraudGovPlatform_Services.Layouts.elementNidentity_score_recs L, ds_fragment_tab_Recs R)  := TRANSFORM
 		boolean populateBest := L.fragment = Fragment_Types_const.PERSON_FRAGMENT;
@@ -219,8 +229,19 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 															LEFT.fragment = RIGHT.fragment,
 															ElementsNIdentities_trans(LEFT, RIGHT),
 														LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
+														
+	ds_realtimerecord := 	PROJECT(ds_realtimescoring_rec, 
+													TRANSFORM(iesp.fraudgovsearch.t_FraudGovSearchRecord,
+														SELF.AnalyticsRecordId := FraudGovPlatform_Services.Constants.KelEntityIdentifier._LEXID + (string)LEFT.LexID,
+														SELF.RecordType := FraudGovPlatform_Services.Constants.RecordType.IDENTITY,
+														SELF.RecordSource := 'REALTIME',
+														SELF.ElementType := Fragment_Types_const.PERSON_FRAGMENT,
+														SELF.ElementValue := (string)LEFT.LexID,
+														SELF.Score := LEFT.risk_score,
+														SELF.GovernmentBest := ds_GovBest[1],
+														SELF.NoOfRecentTransactions := COUNT(ds_delta_recentTransactions(UniqueId = (string)LEFT.LexID)),
+														SELF := []));														
 
-	// output(ds_delta_recentTransactions,named('ds_delta_recentTransactions'));	
 	// output(ds_allPayloadRecs, named('ds_allPayloadRecs'));
 	// output(ds_input_with_adl_did, named('ds_input_with_adl_did'));
 	// output(adlDIDFound, named('adlDIDFound'));
@@ -228,8 +249,6 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	// output(ds_contributory_in, named('ds_contributory_in'));
 	// output(ds_contributory_in_dedup, named('ds_contributory_in_dedup'));
 	// output(ds_dids_to_use, named('ds_dids_to_use'));
-	// output(ds_GovBest, named('ds_GovBest'));
-	// output(ds_contributoryBest, named('ds_contributoryBest'));
 	// output(ds_elements_dids, named('ds_elements_dids'));
 	// output(ds_combinedfreg_recs, named('ds_combinedfreg_recs'));
 	// output(ds_fragment_recs_w_value, named('ds_fragment_recs_w_value'));
@@ -237,9 +256,17 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	// output(ds_fragment_recs_sorted, named('ds_fragment_recs_sorted'));
 	// output(ds_fragment_recs_rolled, named('ds_fragment_recs_rolled'));
 	// output(ds_raw_cluster_recs, named('ds_raw_cluster_recs'));
-	// output(ds_cluster_recs_scores, named('ds_cluster_recs_scores'));
+	// output(ds_clusters, named('ds_clusters'));
+	// output(ds_delta_recentTransactions,named('ds_delta_recentTransactions'));
+	// output(ds_GovBest, named('ds_GovBest'));
+	// output(ds_contributoryBest, named('ds_contributoryBest'));
+	// output(isRealtimeRecord, named('isRealtimeRecord'));
+	// output(ds_realtimescoring_rec, named('ds_realtimescoring_rec'));
+	// output(ds_realtimerecord, named('ds_realtimerecord'));
 	// output(ds_fragment_recs_tab, named('ds_fragment_recs_tab'));
 	// output(ds_fragment_recs_w_scores, named('ds_fragment_recs_w_scores'));	
+	// output(ds_ExternalServices_recs, named('ds_ExternalServices_recs'));	
+	// output(ds_realtimescoring_rec, named('ds_realtimescoring_rec'));	
 	
-	EXPORT ds_results := SORT(ds_ElementsNIdentities + ds_clusters, ElementType, ElementValue);
-END;
+	EXPORT ds_results := SORT(IF(~isRealtimeRecord, (ds_ElementsNIdentities + ds_clusters), ds_realtimerecord), ElementType, ElementValue);
+END; 

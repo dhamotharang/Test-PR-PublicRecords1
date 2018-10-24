@@ -1,4 +1,4 @@
-import LN_PropertyV2, LN_PropertyV2_Services, doxie, risk_indicators, address, identifier2, codes;
+﻿import LN_PropertyV2, LN_PropertyV2_Services, doxie, risk_indicators, address, identifier2, codes;
 					  
 export transform_property := MODULE	
 
@@ -162,9 +162,47 @@ export transform_property := MODULE
 			self.deed.sellers := [];
 			self.deed.owners  := [];
 			self.deed.srt_date               := sale_date;
-			isOwner := l.fares_did != 0 and l.fares_did in [l.did,l.did2,l.did3];
+      
+      //*** Check if the input name matches the name on the deed record - either name1 or name2 *** 
+      //first try a straight string find of the first and last name in either of the name fields on the deed record
+      stringFoundName1  := Stringlib.StringFind(R.name1, trim(L.fname), 1) > 0 and Stringlib.StringFind(R.name1, trim(L.lname), 1) > 0;
+      stringFoundName2  := Stringlib.StringFind(R.name2, trim(L.fname), 1) > 0 and Stringlib.StringFind(R.name2, trim(L.lname), 1) > 0;
+ 
+      //next try parsing the name1 field from the deed record and then scoring the first and last name to the parsed names
+      cleaned_name1 := Stringlib.StringToUppercase(Address.CleanPersonLFM73(R.name1));
+      string30 fname1_clean := cleaned_name1[6..25];
+      string30 lname1_clean := cleaned_name1[46..65];
+      firstmatch1_score := Risk_Indicators.FnameScore(L.fname,fname1_clean);
+      lastmatch1_score  := Risk_Indicators.LnameScore(L.lname,lname1_clean);
+      fuzzyMatchName1   := risk_indicators.iid_constants.g(firstmatch1_score) and risk_indicators.iid_constants.g(lastmatch1_score);
+
+      //finally try parsing the name2 field from the deed record and then scoring the first and last name to the parsed names
+      cleaned_name2 := Stringlib.StringToUppercase(Address.CleanPersonLFM73(R.name2));
+      string30 fname2_clean := cleaned_name2[6..25];
+      string30 lname2_clean := cleaned_name2[46..65];
+      firstmatch2_score := Risk_Indicators.FnameScore(L.fname,fname2_clean);
+      lastmatch2_score  := Risk_Indicators.LnameScore(L.lname,lname2_clean);
+      fuzzyMatchName2   := risk_indicators.iid_constants.g(firstmatch2_score) and risk_indicators.iid_constants.g(lastmatch2_score);
+
+			nameMatch   := L.fname <> '' and L.lname <> '' and (stringFoundName1 or stringFoundName2 or fuzzyMatchName1 or fuzzyMatchName2);
+
+			DIDMatch    := l.fares_did != 0 and l.fares_did in [l.did,l.did2,l.did3];
+			isOwner     := DIDMatch or nameMatch;
 			self.deed.IsSubjectOwned         := isOwner;
-		
+
+      //move owner names from the deed record to the Owners2 section of the layout so we can compare the deed owner names to the assessment owner names later when they are joined together
+      deedName1 := project(Risk_Indicators.iid_constants.ds_Record, 
+                                 transform(iesp.property.t_Property2Name, 
+                                           self.First  := fname1_clean,
+                                           self.Last   := lname1_clean,
+                                           self        := []));
+      deedName2 := project(Risk_Indicators.iid_constants.ds_Record, 
+                                 transform(iesp.property.t_Property2Name, 
+                                           self.First  := fname2_clean,
+                                           self.Last   := lname2_clean,
+                                           self        := []));
+      self.deed.Owners2.Names   := deedName1 + deedName2;
+      
 			self := L;
 		END;
 
@@ -214,12 +252,49 @@ export transform_property := MODULE
 
 			clean( R.property_full_street_address, R.property_unit_number, R.property_city_state_zip, self.assess.PropertyAddress );
 
-			// see whether it is currently owned property (for sorting purposes, if requested only)
-			isOwner := L.fares_did != 0 and L.fares_did in [l.did,l.did2,l.did3];
+			self.assess.Owner1Name             := R.assessee_name;
+			self.assess.Owner2Name             := R.second_assessee_name;
+
+      //*** Check if the input name matches the name on the assessor record - either name1 or name2 *** 
+      //first try a straight string find of the first and last name in either of the name fields on the assessor record
+      stringFoundName1  := Stringlib.StringFind(R.assessee_name, trim(L.fname), 1) > 0 and Stringlib.StringFind(R.assessee_name, trim(L.lname), 1) > 0;
+      stringFoundName2  := Stringlib.StringFind(R.second_assessee_name, trim(L.fname), 1) > 0 and Stringlib.StringFind(R.second_assessee_name, trim(L.lname), 1) > 0;
+ 
+      //next try parsing the name1 field from the assessor record and then scoring the first and last name to the parsed names
+      cleaned_name1 := Stringlib.StringToUppercase(Address.CleanPersonLFM73(R.assessee_name));
+      string30 fname1_clean := cleaned_name1[6..25];
+      string30 lname1_clean := cleaned_name1[46..65];
+      firstmatch1_score := Risk_Indicators.FnameScore(L.fname,fname1_clean);
+      lastmatch1_score  := Risk_Indicators.LnameScore(L.lname,lname1_clean);
+      fuzzyMatchName1   := risk_indicators.iid_constants.g(firstmatch1_score) and risk_indicators.iid_constants.g(lastmatch1_score);
+
+      //finally try parsing the name2 field from the assessor record and then scoring the first and last name to the parsed names
+      cleaned_name2 := Stringlib.StringToUppercase(Address.CleanPersonLFM73(R.second_assessee_name));
+      string30 fname2_clean := cleaned_name2[6..25];
+      string30 lname2_clean := cleaned_name2[46..65];
+      firstmatch2_score := Risk_Indicators.FnameScore(L.fname,fname2_clean);
+      lastmatch2_score  := Risk_Indicators.LnameScore(L.lname,lname2_clean);
+      fuzzyMatchName2   := risk_indicators.iid_constants.g(firstmatch2_score) and risk_indicators.iid_constants.g(lastmatch2_score);
+
+			nameMatch   := L.fname <> '' and L.lname <> '' and (stringFoundName1 or stringFoundName2 or fuzzyMatchName1 or fuzzyMatchName2);  //if the name was found using any of the searches above
+      
+			DIDmatch    := L.fares_did != 0 and L.fares_did in [l.did,l.did2,l.did3];
+			isOwner     := DIDMatch or nameMatch;
 			self.assess.IsSubjectOwned          := IsOwner;
 			self.assess.srt_date                := (unsigned4) if (R.sale_date != '', R.sale_date, R.recording_date);
 
-			// self.assess.Foundation              := R.foundation_code; // was: foundation_desc;
+      //move owner names from the assess record to the Owners2 section of the layout so we can compare the assessment owner names to the deed owner names later when they are joined together
+      assessName1 := project(Risk_Indicators.iid_constants.ds_Record, 
+                                 transform(iesp.property.t_Property2Name, 
+                                           self.First  := fname1_clean,
+                                           self.Last   := lname1_clean,
+                                           self        := []));
+      assessName2 := project(Risk_Indicators.iid_constants.ds_Record, 
+                                 transform(iesp.property.t_Property2Name, 
+                                           self.First  := fname2_clean,
+                                           self.Last   := lname2_clean,
+                                           self        := []));
+      self.assess.Owners2.Names   := assessName1 + assessName2;
 			
 			// codes
 			self.assess.mortgage_loan_type_code      := R.mortgage_loan_type_code; // was: mortgage_loan_type_desc;

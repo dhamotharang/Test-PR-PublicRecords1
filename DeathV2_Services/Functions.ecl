@@ -4,8 +4,8 @@ export Functions := module
 
 	EXPORT boolean Restricted(string2 src, string1 glb_flag, boolean glb_ok, DeathV2_Services.IParam.DeathRestrictions in_mod) := function
 		return AutoStandardI.DataRestrictionI.val(in_mod).isHeaderSourceRestricted(src, in_mod.DataRestrictionMask)
-						or (glb_ok = false and glb_flag = 'Y')
-						or (in_mod.UseDeathMasterSSAUpdates = false and src = MDR.sourceTools.src_Death_Restricted)					
+						or (~glb_ok and glb_flag = 'Y')
+						or ((~in_mod.UseDeathMasterSSAUpdates or (in_mod.DeathMasterPurpose = DeathV2_Services.Constants.DeathMasterPurpose.NoPermissibleUse))and src = MDR.sourceTools.src_Death_Restricted)					
 						or (in_mod.IsConsumer and src in D2C.Constants.DeathRestrictedSources)										
 						or (in_mod.SuppressNonMarketingDeathSources and src in [DeathV2_Services.Constants.src_Death_NonMarketing_Sources]);			
 	END;			 		

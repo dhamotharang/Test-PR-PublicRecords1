@@ -459,14 +459,14 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
 																										 //Check to see if there was more than one model requested
 																										 extra_score := model_count > 1;
 																										 self.i_model_name_2 := IF(extra_score, Models_Requested[2].ModelName, ''),
-																										 self.o_score_1    := (Integer)left.SmallBusinessAnalyticsResults.Models[1].Scores[1].Value,
+																										 self.o_score_1    := IF(model_count != 0, (String)left.SmallBusinessAnalyticsResults.Models[1].Scores[1].Value, ''),
 																										 self.o_reason_1_1 := left.SmallBusinessAnalyticsResults.Models[1].Scores[1].ScoreReasons[1].ReasonCode,
 																										 self.o_reason_1_2 := left.SmallBusinessAnalyticsResults.Models[1].Scores[1].ScoreReasons[2].ReasonCode,
 																										 self.o_reason_1_3 := left.SmallBusinessAnalyticsResults.Models[1].Scores[1].ScoreReasons[3].ReasonCode,
 																										 self.o_reason_1_4 := left.SmallBusinessAnalyticsResults.Models[1].Scores[1].ScoreReasons[4].ReasonCode,
 																										 self.o_reason_1_5 := left.SmallBusinessAnalyticsResults.Models[1].Scores[1].ScoreReasons[5].ReasonCode,
 																										 self.o_reason_1_6 := left.SmallBusinessAnalyticsResults.Models[1].Scores[1].ScoreReasons[6].ReasonCode,
-																										 self.o_score_2    := IF(extra_score, (Integer)left.SmallBusinessAnalyticsResults.Models[2].Scores[1].Value, 0),
+																										 self.o_score_2    := IF(extra_score, (String)left.SmallBusinessAnalyticsResults.Models[2].Scores[1].Value, ''),
 																										 self.o_reason_2_1 := IF(extra_score, left.SmallBusinessAnalyticsResults.Models[2].Scores[1].ScoreReasons[1].ReasonCode, ''),
 																										 self.o_reason_2_2 := IF(extra_score, left.SmallBusinessAnalyticsResults.Models[2].Scores[1].ScoreReasons[2].ReasonCode, ''),
 																										 self.o_reason_2_3 := IF(extra_score, left.SmallBusinessAnalyticsResults.Models[2].Scores[1].ScoreReasons[3].ReasonCode, ''),

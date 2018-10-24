@@ -127,7 +127,7 @@ EXPORT fn_SmallBusiness_getScores( DATASET(Business_Risk_BIP.Layouts.Input) Shel
 		Blank_Boca_Shell := GROUP(DATASET([], Risk_Indicators.Layout_Boca_Shell), Seq);
 		
 		Boca_Shell_Grouped := IF(BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL IN set_model_names or
-		BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB IN set_model_names, Clam, Blank_Boca_Shell); //don't call the boca shell if a model doesn't need it
+		BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB IN set_model_names or BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL IN set_model_names, Clam, Blank_Boca_Shell); //don't call the boca shell if a model doesn't need it
 				
 		// 3. Run Business Shell results through models; include Boca_Shell_Grouped in the call to the SBBM model.
 		Layout_ModelOut_pre := RECORD
@@ -177,11 +177,18 @@ EXPORT fn_SmallBusiness_getScores( DATASET(Business_Risk_BIP.Layouts.Input) Shel
 			IF( BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB IN set_model_names, // blended model
 					setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB, Boca_Shell_Grouped)) ) + 
 
+			IF( BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL IN set_model_names, // blended model no felonies
+					setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL, Boca_Shell_Grouped)) ) + 
+            IF( BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL IN set_model_names, // non-blended or Business Only model
+					setModelName(BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL)) ) + 	
+       
 			DATASET([], Layout_ModelOut_pre);
 
 		Model_Results := IF( allow_scores or 
 						(BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB IN set_model_names OR
-						BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO IN set_model_names),
+						BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO IN set_model_names or
+						BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL IN set_model_names OR
+						BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL IN set_model_names),
 						Model_Results_pre, 
 						DATASET([], Layout_ModelOut_pre) );
 

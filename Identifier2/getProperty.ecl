@@ -29,7 +29,9 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 			and keyed(left.prim_name = right.prim_name)
 			and keyed(right.sec_range in ['',left.sec_range])
 			and keyed(left.z5 = right.zip)
-			and keyed(left.addr_suffix = right.suffix),
+			and keyed(left.addr_suffix = right.suffix) 
+			and keyed(left.predir = right.predir or left.predir = '' or right.predir = '')       //September, 2018 - tighten up the match logic by address 
+			and keyed(left.postdir = right.postdir or left.postdir = '' or right.postdir = ''), 
 		append_fid_by_addr(LEFT,RIGHT), ATMOST(100)
 	);
 	fids_byAddr_nofares := join(indata, ln_propertyv2.key_prop_address_v4_no_fares,
@@ -39,7 +41,9 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 			and keyed(left.prim_name = right.prim_name)
 			and keyed(right.sec_range in ['',left.sec_range])
 			and keyed(left.z5 = right.zip)
-			and keyed(left.addr_suffix = right.suffix),
+			and keyed(left.addr_suffix = right.suffix)
+			and keyed(left.predir = right.predir or left.predir = '' or right.predir = '')     //September, 2018 - tighten up the match logic by address 
+      and keyed(left.postdir = right.postdir or left.postdir = '' or right.postdir = ''),
 		append_fid_by_addr(LEFT,RIGHT), ATMOST(100)
 	);
 	fids_byAddr := if( 'R' in LN_PropertyV2_Services.input.srcRestrict, fids_byAddr_nofares, fids_byAddr_fares );
@@ -52,7 +56,7 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 	
 	
 	fids_byDid := join( indata, key_did,
-		keyed(right.s_did in ID2Common.didset(left))
+		keyed(right.s_did in Identifier2.ID2Common.didset(left))
 			and LN_PropertyV2_Services.input.lookupVal in ['',LN_PropertyV2.fn_fid_type(right.ln_fares_id)]
 			and LN_PropertyV2_Services.input.partyType in ['',right.source_code[1]]
 			and right.ln_fares_id[1] not in LN_PropertyV2_Services.input.srcRestrict, // fares restriction
@@ -72,7 +76,11 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 		
 		self.dt_last_seen := ri.dt_last_seen;
 		self.dt_vendor_last_reported := ri.dt_vendor_last_reported;
-		
+
+    sec_rangescore := map(le.sec_range = '' and ri.sec_range <> ''              => 15,  // we have a sec range on database, but not provided on input, default to low score
+                          le.sec_range <> '' and ri.sec_range = ''              => 70,  // we have a sec range on input but not on the database, consider this as a match
+                          (100 - (10 * (ut.StringSimilar(le.sec_range, ri.sec_range)))));
+
 		self.isAddressMatch :=
 			le.prim_range=ri.prim_range
 			and le.prim_name=ri.prim_name
@@ -81,10 +89,11 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
    				or (le.in_city=ri.p_city_name and le.in_state=ri.st)
 				or (le.p_city_name=ri.p_city_name and le.st=ri.st)
 				)
-			and ut.NNEQ(le.sec_range,ri.sec_range)
+			// and ut.NNEQ(le.sec_range,ri.sec_range)
+			and sec_rangescore > 69
 		;
 
-		fmatch( string onfile ) := id2common.isfirstmatch( le.fname, onfile );
+		fmatch( string onfile ) := Identifier2.id2common.isfirstmatch( le.fname, onfile );
 		lmatch( string onfile ) := le.lname=onfile;
 
 		isDIDMatch := ri.did!=0 and ri.did in [le.did,le.did2,le.did3];
@@ -100,7 +109,7 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 				    (fmatch(ri.fname) or fmatch(ri.mname) or fmatch(ri.lname))
 				and (lmatch(ri.fname) or lmatch(ri.mname) or lmatch(ri.lname))
 			)
-			or ID2Common.EstateMatch( le.fname, le.lname, ri.cname )
+			or Identifier2.ID2Common.EstateMatch( le.fname, le.lname, ri.cname )
 		;
 
 		// self.fares_did := if(self.isowner, ri.did, skip);
@@ -124,8 +133,8 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 
 	iesp.transform_property.working_layout populateDeeds( iesp.transform_property.working_layout le ) := TRANSFORM
 		isLeCurrentOwner := le.isAddressMatch and le.isOwner;
-		ownedAny       := le.isDIDMatch;
-		everOwned      := le.isAddressMatch and le.isOwner
+		ownedAny       := le.isDIDMatch or le.deed.IsSubjectOwned;
+		everOwned      := le.isAddressMatch and (le.isOwner or le.deed.IsSubjectOwned)
 			and (
 				Ever_Owned_Input_Property_InPastNumberOfYears = 0
 				or ut.Age( MAP(
@@ -138,7 +147,7 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 
 		self.EverOwnedInputProperty.deed    := if( ever_owned_input_property and everOwned, le.deed );
 		self.CurrentlyOwnInputProperty.deed := if( currently_own_input_property and le.isAddressMatch, le.deed ); // keep all deeds regardless of who is the owner, but they must be for the input property
-		self.isCurrentDeedOwner             := currently_own_input_property and le.isOwner and le.isAddressMatch;
+		self.isCurrentDeedOwner             := currently_own_input_property and (le.isOwner or le.deed.IsSubjectOwned) and le.isAddressMatch;
 
 		self.OwnedAnyProperty.UniqueDeedsCount := if( owned_any_property and ownedAny, 1, 0 );
 		self.OwnedAnyProperty.deed             := if( owned_any_property and ownedAny, le.deed );
@@ -190,8 +199,8 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
       iesp.transform_property.deed_assess.format_assess_all(left,right), atmost(riskwise.max_atmost) );
 
 	iesp.transform_property.working_layout populateAssessors( iesp.transform_property.working_layout le ) := TRANSFORM
-		ownedAny       := owned_any_property and le.isDIDMatch; // only poulate the OwnedAnyProperty if it's requested
-		everOwned      := le.isAddressMatch and le.isOwner
+		ownedAny       := owned_any_property and (le.isDIDMatch or le.assess.IsSubjectOwned); // only poulate the OwnedAnyProperty if it's requested
+		everOwned      := le.isAddressMatch and (le.isOwner or le.assess.IsSubjectOwned)
 			and (
 				Ever_Owned_Input_Property_InPastNumberOfYears = 0
 				or ut.Age( MAP(
@@ -204,7 +213,7 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 		
 		self.EverOwnedInputProperty.Assessment        := if( ever_owned_input_property and everOwned, le.assess );
 		self.CurrentlyOwnInputProperty.Assessment     := if( currently_own_input_property and le.isAddressMatch, le.assess ); // copy all assessments forward, but they must be the input property
-		self.isCurrentAssessorOwner                   := currently_own_input_property and le.isOwner and le.isAddressMatch;
+		self.isCurrentAssessorOwner                   := currently_own_input_property and (le.isOwner or le.assess.IsSubjectOwned) and le.isAddressMatch;
 		
 		self.OwnedAnyProperty.UniquePropertiesCount   := if( owned_any_property and ownedAny, 1, 0 );
 		self.OwnedAnyProperty.Assessment              := if( owned_any_property and ownedAny, le.assess );
@@ -266,14 +275,40 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 
 		currentDeed       := le.isCurrentDeedOwner;
 		currentAssessor   := ri.isCurrentAssessorOwner;
-		deedDate     := le.dt_last_seen;
-		assessorDate := ri.dt_last_seen;
+		deedDate          := le.dt_last_seen;
+		assessorDate      := ri.dt_last_seen;
+
+    //The code below was added to recognize when there are co-owners of a property but both owners are not listed on both the current deed and the current assessment.  In these cases we still 
+    //want to treat as the input person currently owns the property - even though they are not listed on one of the docs.  Example...
+    //  Bill Jones and Sara Jones are co-owners of a property at 123 Main St
+    //  The input PII to Identifier2 is Sara Jones at 123 Main St
+    //  The current deed has both Bill and Sara as owners
+    //  The current assessment has only Bill as the owner and has a more recent date.  Prior to this logic, the property would be returned as not currently owned by Sara because the current 
+    //  assessment has a different owner and is more recent than the deed.
+    //  This new logic will check if the other owner on the deed (Bill in this case) is an owner on the assessment.  If so, return the property as currently owned by Sara since they are co-owners.
+ 
+    //compare deed name1 to assessment name1
+    deed1_assess1_fname_score := Risk_Indicators.FnameScore(le.deed.Owners2.Names[1].first,ri.assess.Owners2.Names[1].first);
+    deed1_assess1_lname_score := Risk_Indicators.LnameScore(le.deed.Owners2.Names[1].last,ri.assess.Owners2.Names[1].last);
+    deed1_assess1_match       := risk_indicators.iid_constants.g(deed1_assess1_fname_score) and risk_indicators.iid_constants.g(deed1_assess1_lname_score);
+    //compare deed name1 to assessment name2
+    deed1_assess2_fname_score := Risk_Indicators.FnameScore(le.deed.Owners2.Names[1].first,ri.assess.Owners2.Names[2].first);
+    deed1_assess2_lname_score := Risk_Indicators.LnameScore(le.deed.Owners2.Names[1].last,ri.assess.Owners2.Names[2].last);
+    deed1_assess2_match       := risk_indicators.iid_constants.g(deed1_assess2_fname_score) and risk_indicators.iid_constants.g(deed1_assess2_lname_score);
+    //compare deed name2 to assessment name1
+    deed2_assess1_fname_score := Risk_Indicators.FnameScore(le.deed.Owners2.Names[2].first,ri.assess.Owners2.Names[1].first);
+    deed2_assess1_lname_score := Risk_Indicators.LnameScore(le.deed.Owners2.Names[2].last,ri.assess.Owners2.Names[1].last);
+    deed2_assess1_match       := risk_indicators.iid_constants.g(deed2_assess1_fname_score) and risk_indicators.iid_constants.g(deed2_assess1_lname_score);
+    //compare deed name2 to assessment name2
+    deed2_assess2_fname_score := Risk_Indicators.FnameScore(le.deed.Owners2.Names[2].first,ri.assess.Owners2.Names[2].first);
+    deed2_assess2_lname_score := Risk_Indicators.LnameScore(le.deed.Owners2.Names[2].last,ri.assess.Owners2.Names[2].last);
+    deed2_assess2_match       := risk_indicators.iid_constants.g(deed2_assess2_fname_score) and risk_indicators.iid_constants.g(deed2_assess2_lname_score);
 
 		self.CurrentlyOwnInputProperty.deed             := if( IncludePropDetails, le.CurrentlyOwnInputProperty.deed );
 		self.CurrentlyOwnInputProperty.assessment       := if( IncludePropDetails, ri.CurrentlyOwnInputProperty.assessment );
 		curr_IsPropertyOwner  := currentDeed and currentAssessor                         // set as current owner if the individual is on the most recent deed and assessor record
-			or (currentDeed     and (deedDate     >= assessorDate or ~ri.isAddressMatch))  // or is on the most recent deed and it is more recent than the assessor or there is no assessor for the prop 
-			or (currentAssessor and (assessorDate >= deedDate or ~le.isAddressMatch))      // or is on the most recent assessor and it is more recent than the deed or there is no deed for the prop
+			or (currentDeed     and (deedDate     >= assessorDate or ~ri.isAddressMatch or deed1_assess1_match or deed1_assess2_match or deed2_assess1_match or deed2_assess2_match))  // or is on the most recent deed and it is more recent than the assessor or there is no assessor for the prop 
+			or (currentAssessor and (assessorDate >= deedDate     or ~le.isAddressMatch or deed1_assess1_match or deed1_assess2_match or deed2_assess1_match or deed2_assess2_match))  // or is on the most recent assessor and it is more recent than the deed or there is no deed for the prop
 		;
 		self.CurrentlyOwnInputProperty.IsPropertyOwner  := curr_IsPropertyOwner;
 		self.CurrentlyOwnInputProperty.RiskIndicators   := if( currently_own_input_property and not curr_IsPropertyOwner, mkRI('CN'), blankRI );

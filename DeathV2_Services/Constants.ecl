@@ -21,5 +21,11 @@ EXPORT Constants := MODULE
 																																											MDR.sourceTools.src_Death_MI, 
 																																											MDR.sourceTools.src_Death_Restricted,
 																																											MDR.sourceTools.src_TUCS_Ptrack];
+																																											
+	  EXPORT DeathMasterPurpose := MODULE
+    export Integer NoPermissibleUse := 0;
+    export Integer LegitimateFraudPrevention := 1;
+    export Integer LegitimateBusinessPurpose := 2;
+  END;	
 	
 END;

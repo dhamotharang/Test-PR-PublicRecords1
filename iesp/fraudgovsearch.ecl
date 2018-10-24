@@ -62,6 +62,7 @@ end;
 export t_FraudGovSearchRecord := record
 	string70 AnalyticsRecordId {xpath('AnalyticsRecordId')};
 	string10 RecordType {xpath('RecordType')};
+	string30 RecordSource {xpath('RecordSource')};
 	string60 ElementType {xpath('ElementType')};
 	string100 ElementValue {xpath('ElementValue')};
 	t_FraudGovSearchElementInformation ElementInformation {xpath('ElementInformation')};

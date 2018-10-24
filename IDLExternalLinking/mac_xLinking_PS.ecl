@@ -62,9 +62,9 @@ EXPORT mac_xLinking_PS (infile, uID ='', Input_SNAME = '', Input_FNAME = '',Inpu
     SELF.ST := (TYPEOF(SELF.ST))'';
   #END
   #IF ( #TEXT(Input_ZIP) <> '' )
-    SELF.ZIP := (TYPEOF(SELF.ZIP))le.Input_ZIP;
+    SELF.ZIP_cases := le.Input_ZIP;
   #ELSE
-    SELF.ZIP := (TYPEOF(SELF.ZIP))'';
+    SELF.ZIP_cases := DATASET([],InsuranceHeader_xLink.Process_xIDL_layouts().layout_ZIP_cases);
   #END
   #IF ( #TEXT(Input_SSN) <> '' )
     SELF.SSN5 := InsuranceHeader_xLink.mod_SSNParse(le.Input_SSN).ssn5;

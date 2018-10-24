@@ -1,4 +1,4 @@
-// Various routines to assist in debugging
+﻿// Various routines to assist in debugging
  
 IMPORT SALT30,ut,std;
 EXPORT Debug(DATASET(layout_LGID3) ih, Layout_Specificities.R s, MatchThreshold = Config.MatchThreshold) := MODULE
@@ -7,6 +7,8 @@ SHARED h := match_candidates(ih).candidates;
 SHARED LowerMatchThreshold := MatchThreshold-3; // Keep extra 'borderlines' for debug purposes
  
 EXPORT Layout_Sample_Matches := RECORD(match_candidates(ih).Layout_Matches)
+  INTEGER2 Attribute_Conf := 0; // Score provided by attribute files
+  SALT30.StrType   Matching_Attributes := ''; // Keys from attribute files which match
   typeof(h.sbfe_id) left_sbfe_id;
   INTEGER1 sbfe_id_match_code;
   INTEGER2 sbfe_id_score;
@@ -20,10 +22,6 @@ EXPORT Layout_Sample_Matches := RECORD(match_candidates(ih).Layout_Matches)
   INTEGER1 active_duns_number_match_code;
   INTEGER2 active_duns_number_score;
   typeof(h.active_duns_number) right_active_duns_number;
-  typeof(h.company_name) left_company_name;
-  INTEGER1 company_name_match_code;
-  INTEGER2 company_name_score;
-  typeof(h.company_name) right_company_name;
   typeof(h.duns_number) left_duns_number;
   INTEGER1 duns_number_match_code;
   INTEGER2 duns_number_score;
@@ -32,6 +30,10 @@ EXPORT Layout_Sample_Matches := RECORD(match_candidates(ih).Layout_Matches)
   INTEGER1 duns_number_concept_match_code;
   INTEGER2 duns_number_concept_score;
   typeof(h.duns_number_concept) right_duns_number_concept;
+  typeof(h.company_name) left_company_name;
+  INTEGER1 company_name_match_code;
+  INTEGER2 company_name_score;
+  typeof(h.company_name) right_company_name;
   typeof(h.company_fein) left_company_fein;
   INTEGER1 company_fein_match_code;
   INTEGER2 company_fein_score;
@@ -131,7 +133,7 @@ EXPORT layout_sample_matches sample_match_join(match_candidates(ih).layout_candi
   SELF.sbfe_id_match_code := MAP(
 		le.sbfe_id_isnull OR ri.sbfe_id_isnull => SALT30.MatchCode.OneSideNull,
 		match_methods(ih).match_sbfe_id(le.sbfe_id,ri.sbfe_id));
-  INTEGER2 sbfe_id_score_temp := MAP(
+  SELF.sbfe_id_score := MAP(
                         le.sbfe_id_isnull OR ri.sbfe_id_isnull => 0,
                         le.sbfe_id = ri.sbfe_id  => le.sbfe_id_weight100,
                         SALT30.Fn_Fail_Scale(le.sbfe_id_weight100,s.sbfe_id_switch));
@@ -144,15 +146,6 @@ EXPORT layout_sample_matches sample_match_join(match_candidates(ih).layout_candi
                         le.Lgid3IfHrchy_isnull OR ri.Lgid3IfHrchy_isnull => 0,
                         le.Lgid3IfHrchy = ri.Lgid3IfHrchy  => le.Lgid3IfHrchy_weight100,
                         SALT30.Fn_Fail_Scale(le.Lgid3IfHrchy_weight100,s.Lgid3IfHrchy_switch));
-  SELF.left_company_name := le.company_name;
-  SELF.right_company_name := ri.company_name;
-  SELF.company_name_match_code := MAP(
-		le.company_name_isnull OR ri.company_name_isnull => SALT30.MatchCode.OneSideNull,
-		match_methods(ih).match_company_name(le.company_name,ri.company_name));
-  SELF.company_name_score := MAP(
-                        le.company_name_isnull OR ri.company_name_isnull => 0,
-                        le.company_name = ri.company_name  => le.company_name_weight100,
-                        SALT30.MatchBagOfWords(le.company_name,ri.company_name,2128912,1));
   SELF.duns_number_concept_match_code := MAP(
 		(le.duns_number_concept_isnull OR le.active_duns_number_isnull AND le.duns_number_isnull) OR (ri.duns_number_concept_isnull OR ri.active_duns_number_isnull AND ri.duns_number_isnull) => SALT30.MatchCode.OneSideNull,
 		match_methods(ih).match_duns_number_concept(le.duns_number_concept,ri.duns_number_concept));
@@ -162,6 +155,15 @@ EXPORT layout_sample_matches sample_match_join(match_candidates(ih).layout_candi
                         0);
   SELF.left_duns_number_concept := le.duns_number_concept;
   SELF.right_duns_number_concept := ri.duns_number_concept;
+  SELF.left_company_name := le.company_name;
+  SELF.right_company_name := ri.company_name;
+  SELF.company_name_match_code := MAP(
+		le.company_name_isnull OR ri.company_name_isnull => SALT30.MatchCode.OneSideNull,
+		match_methods(ih).match_company_name(le.company_name,ri.company_name));
+  SELF.company_name_score := MAP(
+                        le.company_name_isnull OR ri.company_name_isnull => 0,
+                        le.company_name = ri.company_name  => le.company_name_weight100,
+                        SALT30.MatchBagOfWords(le.company_name,ri.company_name,2128912,1));
   SELF.left_company_fein := le.company_fein;
   SELF.right_company_fein := ri.company_fein;
   SELF.company_fein_match_code := MAP(
@@ -273,7 +275,6 @@ EXPORT layout_sample_matches sample_match_join(match_candidates(ih).layout_candi
   SELF.right_dt_first_seen := ri.dt_first_seen;
   SELF.left_dt_last_seen := le.dt_last_seen;
   SELF.right_dt_last_seen := ri.dt_last_seen;
-  SELF.sbfe_id_score := sbfe_id_score_temp*2.00; 
   SELF.Lgid3IfHrchy_score := IF ( Lgid3IfHrchy_score_temp >= Config.Lgid3IfHrchy_Force * 100, Lgid3IfHrchy_score_temp, -9999 ); // Enforce FORCE parameter
   SELF.Lgid3IfHrchy_skipped := SELF.Lgid3IfHrchy_score < -5000;// Enforce FORCE parameter
   SELF.left_active_duns_number := le.active_duns_number;
@@ -309,24 +310,32 @@ EXPORT layout_sample_matches sample_match_join(match_candidates(ih).layout_candi
   SELF.Conf_Prop := (0
     +MAX(le.Lgid3IfHrchy_prop,ri.Lgid3IfHrchy_prop)*SELF.Lgid3IfHrchy_score // Score if either field propogated
     +MAX(le.active_duns_number_prop,ri.active_duns_number_prop)*SELF.active_duns_number_score // Score if either field propogated
-    +MAX(le.company_name_prop,ri.company_name_prop)*SELF.company_name_score // Score if either field propogated
     +MAX(le.duns_number_prop,ri.duns_number_prop)*SELF.duns_number_score // Score if either field propogated
     +if(le.duns_number_concept_prop+ri.duns_number_concept_prop>0,self.duns_number_concept_score*(0+if(le.active_duns_number_prop+ri.active_duns_number_prop>0,1,0)+if(le.duns_number_prop+ri.duns_number_prop>0,1,0))/2,0)
+    +MAX(le.company_name_prop,ri.company_name_prop)*SELF.company_name_score // Score if either field propogated
     +MAX(le.company_charter_number_prop,ri.company_charter_number_prop)*SELF.company_charter_number_score // Score if either field propogated
     +MAX(le.cnp_number_prop,ri.cnp_number_prop)*SELF.cnp_number_score // Score if either field propogated
     +MAX(le.company_inc_state_prop,ri.company_inc_state_prop)*SELF.company_inc_state_score // Score if either field propogated
   ) / 100; // Score based on propogated fields
-  SELF.Conf := (SELF.sbfe_id_score + SELF.Lgid3IfHrchy_score + SELF.company_name_score + IF(SELF.duns_number_concept_score>0,MAX(SELF.duns_number_concept_score,SELF.active_duns_number_score + SELF.duns_number_score),SELF.active_duns_number_score + SELF.duns_number_score) + SELF.company_fein_score + SELF.company_charter_number_score + SELF.cnp_number_score + SELF.company_inc_state_score + SELF.cnp_btype_score) / 100 + outside;
+  SELF.Conf := (SELF.sbfe_id_score + SELF.Lgid3IfHrchy_score + IF(SELF.duns_number_concept_score>0,MAX(SELF.duns_number_concept_score,SELF.active_duns_number_score + SELF.duns_number_score),SELF.active_duns_number_score + SELF.duns_number_score) + SELF.company_name_score + SELF.company_fein_score + SELF.company_charter_number_score + SELF.cnp_number_score + SELF.company_inc_state_score + SELF.cnp_btype_score) / 100 + outside;END;
+SHARED AppendAttribs(DATASET(layout_sample_matches) am,DATASET(match_candidates(ih).layout_attribute_matches) ia) := FUNCTION
+  Layout_Sample_Matches add_attr(am le, ia ri) := TRANSFORM
+    SELF.Attribute_Conf := ri.Conf;
+    SELF.Matching_Attributes := ri.Source_Id;
+    SELF.Conf := le.Conf + ri.Conf;
+    SELF := le;
+  END;
+  RETURN JOIN(am,ia,LEFT.LGID31=RIGHT.LGID31 AND LEFT.LGID32=RIGHT.LGID32,add_attr(LEFT,RIGHT),LEFT OUTER,HASH);
 END;
  
-EXPORT AnnotateMatchesFromData(DATASET(match_candidates(ih).layout_candidates) in_data,DATASET(match_candidates(ih).layout_matches)  im) := FUNCTION
+EXPORT AnnotateMatchesFromData(DATASET(match_candidates(ih).layout_candidates) in_data,DATASET(match_candidates(ih).layout_matches)  im,dataset(Match_Candidates(ih).layout_attribute_matches) ia) := FUNCTION
   j1 := JOIN(in_data,im,LEFT.LGID3 = RIGHT.LGID31,HASH);
   match_candidates(ih).layout_candidates strim(j1 le) := TRANSFORM
     SELF := le;
   END;
   r := JOIN(j1,in_data,LEFT.LGID32 = RIGHT.LGID3,sample_match_join( PROJECT(LEFT,strim(LEFT)),RIGHT),HASH);
   d := DEDUP( SORT( r, LGID31, LGID32, -Conf, LOCAL ), LGID31, LGID32, LOCAL ); // LGID32 distributed by join
-  RETURN d;
+  RETURN AppendAttribs( d, ia );
 END;
  
 EXPORT AnnotateMatchesFromRecordData(DATASET(match_candidates(ih).layout_candidates) in_data,DATASET(match_candidates(ih).layout_matches)  im) := FUNCTION//Faster form when rcid known
@@ -345,15 +354,15 @@ EXPORT AnnotateClusterMatches(DATASET(match_candidates(ih).layout_candidates) in
   RETURN JOIN(in_data(rcid<>BaseRecord),j1,TRUE,sample_match_join( PROJECT(LEFT,strim(LEFT)),RIGHT),ALL);
 END;
  
-EXPORT AnnotateMatches(DATASET(match_candidates(ih).layout_matches)  im) := FUNCTION
-  RETURN AnnotateMatchesFromRecordData(h,im);
+EXPORT AnnotateMatches(DATASET(match_candidates(ih).layout_matches)  im,dataset(Match_Candidates(ih).layout_attribute_matches) ia) := FUNCTION
+  RETURN AppendAttribs( AnnotateMatchesFromRecordData(h,im), ia );
 END;
 EXPORT Layout_RolledEntity := RECORD,MAXLENGTH(63000)
   SALT30.UIDType LGID3;
   DATASET(SALT30.Layout_FieldValueList) sbfe_id_Values := DATASET([],SALT30.Layout_FieldValueList);
   DATASET(SALT30.Layout_FieldValueList) Lgid3IfHrchy_Values := DATASET([],SALT30.Layout_FieldValueList);
-  DATASET(SALT30.Layout_FieldValueList) company_name_Values := DATASET([],SALT30.Layout_FieldValueList);
   DATASET(SALT30.Layout_FieldValueList) duns_number_concept_Values := DATASET([],SALT30.Layout_FieldValueList);
+  DATASET(SALT30.Layout_FieldValueList) company_name_Values := DATASET([],SALT30.Layout_FieldValueList);
   DATASET(SALT30.Layout_FieldValueList) company_fein_Values := DATASET([],SALT30.Layout_FieldValueList);
   DATASET(SALT30.Layout_FieldValueList) company_charter_number_Values := DATASET([],SALT30.Layout_FieldValueList);
   DATASET(SALT30.Layout_FieldValueList) cnp_number_Values := DATASET([],SALT30.Layout_FieldValueList);
@@ -398,8 +407,8 @@ Layout_RolledEntity RollValues(Layout_RolledEntity le,Layout_RolledEntity ri) :=
   SELF.LGID3 := le.LGID3;
   SELF.sbfe_id_values := SALT30.fn_combine_fieldvaluelist(le.sbfe_id_values,ri.sbfe_id_values);
   SELF.Lgid3IfHrchy_values := SALT30.fn_combine_fieldvaluelist(le.Lgid3IfHrchy_values,ri.Lgid3IfHrchy_values);
-  SELF.company_name_values := SALT30.fn_combine_fieldvaluelist(le.company_name_values,ri.company_name_values);
   SELF.duns_number_concept_values := SALT30.fn_combine_fieldvaluelist(le.duns_number_concept_values,ri.duns_number_concept_values);
+  SELF.company_name_values := SALT30.fn_combine_fieldvaluelist(le.company_name_values,ri.company_name_values);
   SELF.company_fein_values := SALT30.fn_combine_fieldvaluelist(le.company_fein_values,ri.company_fein_values);
   SELF.company_charter_number_values := SALT30.fn_combine_fieldvaluelist(le.company_charter_number_values,ri.company_charter_number_values);
   SELF.cnp_number_values := SALT30.fn_combine_fieldvaluelist(le.cnp_number_values,ri.cnp_number_values);
@@ -447,8 +456,8 @@ Layout_RolledEntity into(in_data le) := TRANSFORM
   SELF.LGID3 := le.LGID3;
   SELF.sbfe_id_Values := IF ( le.sbfe_id  IN SET(s.nulls_sbfe_id,sbfe_id),DATASET([],SALT30.Layout_FieldValueList),DATASET([{TRIM((SALT30.StrType)le.sbfe_id)}],SALT30.Layout_FieldValueList));
   SELF.Lgid3IfHrchy_Values := IF ( le.Lgid3IfHrchy  IN SET(s.nulls_Lgid3IfHrchy,Lgid3IfHrchy),DATASET([],SALT30.Layout_FieldValueList),DATASET([{TRIM((SALT30.StrType)le.Lgid3IfHrchy)}],SALT30.Layout_FieldValueList));
-  SELF.company_name_Values := IF ( le.company_name  IN SET(s.nulls_company_name,company_name),DATASET([],SALT30.Layout_FieldValueList),DATASET([{TRIM((SALT30.StrType)le.company_name)}],SALT30.Layout_FieldValueList));
   self.duns_number_concept_Values := IF ( le.active_duns_number  IN SET(s.nulls_active_duns_number,active_duns_number) AND le.duns_number  IN SET(s.nulls_duns_number,duns_number),dataset([],SALT30.Layout_FieldValueList),dataset([{TRIM((SALT30.StrType)le.active_duns_number) + ' ' + TRIM((SALT30.StrType)le.duns_number)}],SALT30.Layout_FieldValueList));
+  SELF.company_name_Values := IF ( le.company_name  IN SET(s.nulls_company_name,company_name),DATASET([],SALT30.Layout_FieldValueList),DATASET([{TRIM((SALT30.StrType)le.company_name)}],SALT30.Layout_FieldValueList));
   SELF.company_fein_Values := IF ( le.company_fein  IN SET(s.nulls_company_fein,company_fein),DATASET([],SALT30.Layout_FieldValueList),DATASET([{TRIM((SALT30.StrType)le.company_fein)}],SALT30.Layout_FieldValueList));
   SELF.company_charter_number_Values := IF ( le.company_charter_number  IN SET(s.nulls_company_charter_number,company_charter_number),DATASET([],SALT30.Layout_FieldValueList),DATASET([{TRIM((SALT30.StrType)le.company_charter_number)}],SALT30.Layout_FieldValueList));
   SELF.cnp_number_Values := IF ( le.cnp_number  IN SET(s.nulls_cnp_number,cnp_number),DATASET([],SALT30.Layout_FieldValueList),DATASET([{TRIM((SALT30.StrType)le.cnp_number)}],SALT30.Layout_FieldValueList));
@@ -495,8 +504,8 @@ Layout_RolledEntity into(ih le) := TRANSFORM
   SELF.LGID3 := le.LGID3;
   SELF.sbfe_id_Values := IF ( le.sbfe_id  IN SET(s.nulls_sbfe_id,sbfe_id),DATASET([],SALT30.Layout_FieldValueList),DATASET([{TRIM((SALT30.StrType)le.sbfe_id)}],SALT30.Layout_FieldValueList));
   SELF.Lgid3IfHrchy_Values := IF ( le.Lgid3IfHrchy  IN SET(s.nulls_Lgid3IfHrchy,Lgid3IfHrchy),DATASET([],SALT30.Layout_FieldValueList),DATASET([{TRIM((SALT30.StrType)le.Lgid3IfHrchy)}],SALT30.Layout_FieldValueList));
-  SELF.company_name_Values := IF ( le.company_name  IN SET(s.nulls_company_name,company_name),DATASET([],SALT30.Layout_FieldValueList),DATASET([{TRIM((SALT30.StrType)le.company_name)}],SALT30.Layout_FieldValueList));
   self.duns_number_concept_Values := IF ( le.active_duns_number  IN SET(s.nulls_active_duns_number,active_duns_number) AND le.duns_number  IN SET(s.nulls_duns_number,duns_number),dataset([],SALT30.Layout_FieldValueList),dataset([{TRIM((SALT30.StrType)le.active_duns_number) + ' ' + TRIM((SALT30.StrType)le.duns_number)}],SALT30.Layout_FieldValueList));
+  SELF.company_name_Values := IF ( le.company_name  IN SET(s.nulls_company_name,company_name),DATASET([],SALT30.Layout_FieldValueList),DATASET([{TRIM((SALT30.StrType)le.company_name)}],SALT30.Layout_FieldValueList));
   SELF.company_fein_Values := IF ( le.company_fein  IN SET(s.nulls_company_fein,company_fein),DATASET([],SALT30.Layout_FieldValueList),DATASET([{TRIM((SALT30.StrType)le.company_fein)}],SALT30.Layout_FieldValueList));
   SELF.company_charter_number_Values := IF ( le.company_charter_number  IN SET(s.nulls_company_charter_number,company_charter_number),DATASET([],SALT30.Layout_FieldValueList),DATASET([{TRIM((SALT30.StrType)le.company_charter_number)}],SALT30.Layout_FieldValueList));
   SELF.cnp_number_Values := IF ( le.cnp_number  IN SET(s.nulls_cnp_number,cnp_number),DATASET([],SALT30.Layout_FieldValueList),DATASET([{TRIM((SALT30.StrType)le.cnp_number)}],SALT30.Layout_FieldValueList));
@@ -546,15 +555,15 @@ EXPORT RemoveProps(DATASET(match_candidates(ih).layout_candidates) im) := FUNCTI
     self.active_duns_number := if ( le.active_duns_number_prop>0, (TYPEOF(le.active_duns_number))'', le.active_duns_number ); // Blank if propogated
     self.active_duns_number_isnull := le.active_duns_number_prop>0 OR le.active_duns_number_isnull;
     self.active_duns_number_prop := 0; // Avoid reducing score later
-    self.company_name := if ( le.company_name_prop>0, (TYPEOF(le.company_name))'', le.company_name ); // Blank if propogated
-    self.company_name_isnull := le.company_name_prop>0 OR le.company_name_isnull;
-    self.company_name_prop := 0; // Avoid reducing score later
     self.duns_number := if ( le.duns_number_prop>0, (TYPEOF(le.duns_number))'', le.duns_number ); // Blank if propogated
     self.duns_number_isnull := le.duns_number_prop>0 OR le.duns_number_isnull;
     self.duns_number_prop := 0; // Avoid reducing score later
     self.duns_number_concept := if ( le.duns_number_concept_prop>0, 0, le.duns_number_concept ); // Blank if propogated
     self.duns_number_concept_isnull := true; // Flag as null to scoring
     self.duns_number_concept_prop := 0; // Avoid reducing score later
+    self.company_name := if ( le.company_name_prop>0, (TYPEOF(le.company_name))'', le.company_name ); // Blank if propogated
+    self.company_name_isnull := le.company_name_prop>0 OR le.company_name_isnull;
+    self.company_name_prop := 0; // Avoid reducing score later
     self.company_charter_number := if ( le.company_charter_number_prop>0, (TYPEOF(le.company_charter_number))'', le.company_charter_number ); // Blank if propogated
     self.company_charter_number_isnull := le.company_charter_number_prop>0 OR le.company_charter_number_isnull;
     self.company_charter_number_prop := 0; // Avoid reducing score later
@@ -576,8 +585,8 @@ Layout_Chubbies0 := RECORD,MAXLENGTH(63000)
   AllRolled;
   UNSIGNED1 sbfe_id_size := 0;
   UNSIGNED1 Lgid3IfHrchy_size := 0;
-  UNSIGNED1 company_name_size := 0;
   UNSIGNED1 duns_number_concept_size := 0;
+  UNSIGNED1 company_name_size := 0;
   UNSIGNED1 company_fein_size := 0;
   UNSIGNED1 company_charter_number_size := 0;
   UNSIGNED1 cnp_number_size := 0;
@@ -588,8 +597,8 @@ t0 := TABLE(AllRolled,Layout_Chubbies0);
 Layout_Chubbies0 NoteSize(Layout_Chubbies0 le) := TRANSFORM
   SELF.sbfe_id_size := SALT30.Fn_SwitchSpec(s.sbfe_id_switch,count(le.sbfe_id_values));
   SELF.Lgid3IfHrchy_size := SALT30.Fn_SwitchSpec(s.Lgid3IfHrchy_switch,count(le.Lgid3IfHrchy_values));
-  SELF.company_name_size := SALT30.Fn_SwitchSpec(s.company_name_switch,count(le.company_name_values));
   SELF.duns_number_concept_size := SALT30.Fn_SwitchSpec(s.duns_number_concept_switch,count(le.duns_number_concept_values));
+  SELF.company_name_size := SALT30.Fn_SwitchSpec(s.company_name_switch,count(le.company_name_values));
   SELF.company_fein_size := SALT30.Fn_SwitchSpec(s.company_fein_switch,count(le.company_fein_values));
   SELF.company_charter_number_size := SALT30.Fn_SwitchSpec(s.company_charter_number_switch,count(le.company_charter_number_values));
   SELF.cnp_number_size := SALT30.Fn_SwitchSpec(s.cnp_number_switch,count(le.cnp_number_values));
@@ -599,7 +608,8 @@ Layout_Chubbies0 NoteSize(Layout_Chubbies0 le) := TRANSFORM
 END;  t := PROJECT(t0,NoteSize(LEFT));
 Layout_Chubbies := RECORD,MAXLENGTH(63000)
   t;
-  UNSIGNED2 Size := t.sbfe_id_size+t.Lgid3IfHrchy_size+t.company_name_size+t.duns_number_concept_size+t.company_fein_size+t.company_charter_number_size+t.cnp_number_size+t.company_inc_state_size+t.cnp_btype_size;
+  UNSIGNED2 Size := t.sbfe_id_size+t.Lgid3IfHrchy_size+t.duns_number_concept_size+t.company_name_size+t.company_fein_size+t.company_charter_number_size+t.cnp_number_size+t.company_inc_state_size+t.cnp_btype_size;
 END;
 EXPORT Chubbies := TABLE(t,Layout_Chubbies);
 END;
+

@@ -287,11 +287,11 @@ EXPORT ECL2ESP := MODULE
     #stored('SSNMask', SSNMask);
     unsigned1 DLMask := (unsigned1) global(xml_in).DLMask; // def=0
     #stored('DLMask', DLMask);
-		STRING DOBMask := global(xml_in).DOBMask; // def=NONE
+		  STRING DOBMask := global(xml_in).DOBMask; // def=NONE
     #stored('DOBMask', DOBMask);
     string5 IndustryClass := global(xml_in).IndustryClass; // def=''
     #stored('IndustryClass', IndustryClass);
-		string32 ApplicationType := global(xml_in).ApplicationType; // def=''
+		  string32 ApplicationType := global(xml_in).ApplicationType; // def=''
     #stored('ApplicationType', ApplicationType);
 		
     string50 DataRestrictionMask := global(xml_in).DataRestrictionMask; // must be provided: '1'
@@ -302,9 +302,12 @@ EXPORT ECL2ESP := MODULE
     string50 QueryId := global(xml_in).QueryId; 
     #stored('_QueryId', QueryId);
 		
-		boolean suppressDMVInfo := global(xml_in).ExcludeDMVPII;
-		#stored('ExcludeDMVPII', suppressDMVInfo);
+		  boolean suppressDMVInfo := global(xml_in).ExcludeDMVPII;
+		  #stored('ExcludeDMVPII', suppressDMVInfo);
 		
+		  string10 DeathMasterPurpose := global(xml_in).DeathMasterPurpose;
+		  #stored('DeathMasterPurpose', DeathMasterPurpose);	
+			
     // test data
     #stored ('TestDataEnabled', xml_in.TestDataEnabled);
     #stored ('TestDataTableName', xml_in.TestDataTableName);

@@ -49,7 +49,10 @@ each product. Entering company data will likely yield no results. */
 import iesp, Royalty;
 
 export Plus_SearchService() := macro
- #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+  #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+  #ONWARNING(4207, IGNORE);
+  #CONSTANT('useOnlyBestDID', TRUE);
+
 	INTEGER Max_Results := iesp.constants.WP_PLUS_MAX_COUNT_SEARCH_RESPONSE_RECORDS;
 	
 	#STORED('ReturnCount',Max_Results); // For iesp.ECL2ESP.Marshall
