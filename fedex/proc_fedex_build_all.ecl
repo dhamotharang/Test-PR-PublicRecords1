@@ -37,6 +37,7 @@ export	proc_fedex_build_all(string	version_date) := function
 													,_Control.IPAddress.bctlpedata10
 												  , '/data/hds_4/FedEx/out/fedex_new_records.csv',,,,true)
 													,send_email
+													//changed to have strat submitted as a separate workunit
 													,output(_control.fSubmitNewWorkunit('#workunit(\'name\',\'FedEx Strata - '+filedate+'\');\r\n'+
                           'fedex.FedEx_Stats(\''+version_date+'\');\r\n'
                           ,std.system.job.target()))

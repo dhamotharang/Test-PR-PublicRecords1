@@ -142,6 +142,7 @@ macro
 	
 	#uniquename(util_daily_stats)
     // %util_daily_stats% := UtilFile.Out_Base_Dev_Stats(filedate);
+		// modified so that the last thing this build does is submit strata so that the build can finish correctly if strata fails
 		   %util_daily_stats% := output(_control.fSubmitNewWorkunit('#workunit(\'name\',\'Utility Strata - '+filedate+'\');\r\n'+
        'UtilFile.Out_Base_Dev_Stats(\''+filedate+'\');\r\n'
        ,std.system.job.target())); 

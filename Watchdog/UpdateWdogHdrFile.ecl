@@ -29,7 +29,7 @@ self := l;
 end;
 
 ds1 := project(ds,updatefile(left));
-
+// changed - went back to the original setup.
 return Sequential(output(ds1,,set_wdog_lfile+'_'+watchdogtype+'_'+build_date,overwrite),
                FileServices.StartSuperfiletransaction(),
 							  FileServices.RemoveSuperfile(set_wdog_sfile,set_wdog_lfile),
@@ -37,10 +37,10 @@ return Sequential(output(ds1,,set_wdog_lfile+'_'+watchdogtype+'_'+build_date,ove
 								
                 output(ds1,,set_wdog_lfile+'_'+watchdogtype+'_'+build_date,overwrite),
 								output(ds1,,set_wdog_tempfile+'_'+build_date,overwrite),
-               FileServices.Renamelogicalfile(set_wdog_lfile,set_wdog_lfile+watchdogtype+'_old'+build_date),
-//   							FileServices.Renamelogicalfile(set_wdog_tempfile+'_'+watchdogtype+'_'+build_date,set_wdog_lfile),
+                FileServices.Renamelogicalfile(set_wdog_lfile,set_wdog_lfile+watchdogtype+'_old'+build_date),
+//   					  FileServices.Renamelogicalfile(set_wdog_tempfile+'_'+watchdogtype+'_'+build_date,set_wdog_lfile),
 							  FileServices.Renamelogicalfile(set_wdog_tempfile+'_'+build_date,set_wdog_lfile),
-               FileServices.StartSuperfiletransaction(),
+                FileServices.StartSuperfiletransaction(),
 								FileServices.AddSuperfile( set_wdog_sfile, set_wdog_lfile),
 								FileServices.Renamelogicalfile(set_wdog_lfile,set_wdog_lfile+watchdogtype+'_old'),
 								FileServices.FinishSuperfiletransaction()
