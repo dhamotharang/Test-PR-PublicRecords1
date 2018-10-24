@@ -1675,5 +1675,8 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2018/1494 ISIL (Da\'esh) and Al-Qaida List','1661'},
 {'EC (CFSP) 2018/1540 ISIL (Da\'esh) and Al-Qaida List','1662'},
 {'EC 2018/1539 ISIL (Da\'esh) and Al-Qaida List','1663'},
-{'PBC Administrative Money Laundering Penalties','1664'}
+{'PBC Administrative Money Laundering Penalties','1664'},
+{'African Development Bank Group (AFDB) List of Debarred Entities','1665'},
+{'EC 2018/1562 ISIL (Da\'esh) and Al-Qaida List','1666'},
+{'SECO (Switzerland) Myanmar List','1667'}
 ],r);
