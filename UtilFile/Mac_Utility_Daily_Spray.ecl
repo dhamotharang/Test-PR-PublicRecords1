@@ -141,7 +141,12 @@ macro
 ///////////SCRUBS REPORTS//////////////
 	
 	#uniquename(util_daily_stats)
-     %util_daily_stats% := UtilFile.Out_Base_Dev_Stats(filedate);
+    // %util_daily_stats% := UtilFile.Out_Base_Dev_Stats(filedate);
+		// modified so that the last thing this build does is submit strata so that the build can finish correctly if strata fails
+		   %util_daily_stats% := output(_control.fSubmitNewWorkunit('#workunit(\'name\',\'Utility Strata - '+filedate+'\');\r\n'+
+       'UtilFile.Out_Base_Dev_Stats(\''+filedate+'\');\r\n'
+       ,std.system.job.target())); 
+
             #uniquename(out_daily_samples_util_type_1)
 					  #uniquename(out_daily_samples_util_type_2)
 						#uniquename(out_daily_samples_util_type_3)
@@ -167,8 +172,8 @@ macro
 					%out_daily_samples_util_type_1%,%out_daily_samples_util_type_2%,%out_daily_samples_util_type_3%,
 					%add_daily%, %clear_daily%, %run_redid%, %run_daily_redid%, %util_headerVer_update%,%build_phonetype%,
           %build_util_keys%, %build_util_bus_base%, %build_util_bus_keys%, %accept_keys%, %keys_relationship%,
-		  %despraydaily%, %do_build_hval%, %do_build_datecorrect%, %util_daily_stats%, %updatedops%, %updatefcradops%,
-			%orbit_non_fcra%, %orbit_fcra%)
+		  %despraydaily%, %do_build_hval%, %do_build_datecorrect%,%updatedops%, %updatefcradops%,
+			%orbit_non_fcra%, %orbit_fcra%,%util_daily_stats%)
 	 : success(%send_succ_msg%),
 		 failure(%send_fail_msg%); 
 
