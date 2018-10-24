@@ -127,6 +127,7 @@
 'CZ', // FLORIDA_CITRUS_COUNTY_ARRESTS                                                                       
 'DA', // ALABAMA_DEPARTMENT_OF_CORRECTIONS                                                                   
 'DB', // ARKANSAS_DEPARTMENT_OF_CORRECTIONS                                                                  
+'DD', // ARIZONA_DEPARTMENT_OF_CORRECTIONS                                                                   
 'DJ', // GEORGIA_DEPARTMENT_OF_CORRECTIONS                                                                   
 'DL', // HAWAII_DEPARTMENT_OF_CORRECTIONS                                                                    
 'DO', // IOWA_DEPARTMENT_OF_CORRECTIONS                                                                      
@@ -467,8 +468,10 @@
 'W0044', // CALIFORNIA_CALAVERAS_COUNTY_BOOKINGS_CW                                                             
 'W0045', // CALIFORNIA_NEVADA_COUNTY_BOOKINGS_CW                                                                
 'W0048', // NORTH_CAROLINA_CHATHAM_COUNTY_SHERIFF_CW                                                            
+'W0050', // FLORIDA_MARION_COUNTY_SHERIFFS_OFFICE_CW                                                            
 'W0053', // TEXAS_BROWN_COUNTY_ARRESTS_CW                                                                       
 'W0058', // TENNESSEE_ROANE_COUNTY_ARRESTS_CW                                                                   
+'W0061', // NORTH_CAROLINA_PENDER_COUNTY_CURRENT_INMATES_LIST_CW                                                
 'W0066', // CALIFORNIA_NEVADA_COUNTY_SHERIFFS_OFFICE_CW                                                         
 'W0079', // FLORIDA_COLUMBIA_COUNTY_SHERIFFS_OFFICE_CW                                                          
 'W0082', // FLORIDA_JACKSON_COUNTY_SHERIFFS_OFFICE_CW                                                           
