@@ -259,14 +259,11 @@ export getBestCleaned(dataset(doxie.layout_references) deduped_dids,string50 Dat
 		filter_exp_flag := ~experian_permitted, 
 		pre_glb_flag := (DataRestriction[23] = '1'));
 
-	// fn_get_best_records will return a distrubuted result on Thor builds
-	best_recs := dx_BestRecords.fn_get_best_records(deduped_dids, did, wdog_perm);
+	best_recs_roxie := dx_BestRecords.append(deduped_dids, did, wdog_perm, on_thor := false);
+	best_recs_thor := dx_BestRecords.append(deduped_dids, did, wdog_perm, on_thor := true);
 
-	best_data_roxie := join(deduped_dids, best_recs, left.did != 0 and left.did = right.did, 
-		get_best_layout(left, right), left outer, keep(1));
-
-	best_data_thor := join(distribute(deduped_dids, hash64(did)), distributed(best_recs, hash64(did)), left.did != 0 and left.did = right.did, 
-		get_best_layout(left, right), left outer, keep(1), LOCAL);
+	best_data_roxie := project(best_recs_roxie, get_best_layout(left, left._best));
+	best_data_thor := project(best_recs_thor, get_best_layout(left, left._best), local);
 										
   #IF(onThor)
 		best_data := best_data_thor;

@@ -628,12 +628,13 @@ EXPORT Provider_Records_Functions := MODULE
 		ssn_mask_val := AutoStandardI.InterfaceTranslator.ssn_mask_val.val(project(gm,AutoStandardI.InterfaceTranslator.ssn_mask_val.params)); 
 		byDids := dedup(normalize(input,left.dids,transform(Layouts.layout_sanc_DID,self.acctno := left.acctno;self.ProviderID:=left.ProviderID;self.did:=right.did;self.freq:=right.freq;self:=[])),all);
 		mylayouts.layout_ssns_freq get_provider_ssns(mylayouts.layout_sanc_DID l, dx_BestRecords.layout_best r) := transform
-			self.ssn := r.ssn;
+			self.ssn := if (r._valid and (r.valid_ssn = 'G' or r.valid_ssn = ' ' or r.valid_ssn = ''), r.ssn, l.ssn);
 			self := l;
 		end;
 
-		f_ssns := join(byDids, dx_BestRecords.fn_get_best_records(byDids, did, dx_BestRecords.Constants.perm_type.glb), 
-										(left.did=right.did) AND (RIGHT.Valid_SSN = 'G' or RIGHT.Valid_SSN = ' ' or RIGHT.Valid_SSN = ''),get_provider_ssns(left, right),keep(myConst.MAX_RECS_ON_JOIN),limit(0),left outer)(ssn<>'');
+		best_recs := dx_BestRecords.append(byDids, did, dx_BestRecords.Constants.perm_type.glb);
+		f_ssns := project(best_recs, get_provider_ssns(left, left._best))(ssn <> '');
+
 		//Check to see if we have a match to user criteria
 		f_ssns_best := join(input,f_ssns,left.acctno=right.acctno and left.ProviderID= right.ProviderID,
 																			transform(mylayouts.layout_ssns_bestHit,self.besthit:=if(trim(left.UserSSN,all)=trim(right.ssn,all) and left.UserSSN<>'',true,false);self:=left;self:=right),keep(myConst.MAX_RECS_ON_JOIN),limit(0));
