@@ -1,0 +1,1346 @@
+ID "fb05fe29-71fa-4215-953f-3dd26d3179cc";
+NAME ComputeSuspectProviderAddressScore_2.0_testcmp;
+LABEL ComputeSuspectProviderAddressScore2.0_testcmp;
+DESCRIPTION "Batch Composition with global variables needed by batch";
+VERSION "2.0.0";
+AUTHOR periassx;
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+	INPUTS
+	BOOL KeepECL: DEFAULT("true");
+	STRING GCID: DEFAULT("192082831");
+	STRING JOBID: DEFAULT("0");
+	STRING FCRA: DEFAULT("UNDEFINED");
+	STRING DPPAPURPOSE: DEFAULT("00000000000000");
+	STRING GLBPURPOSE: DEFAULT("0011000000000000");
+	STRING DATAPERMISSIONMASK: DEFAULT("000000000100000000000000000000");
+	STRING DATARESTRICTIONMASK: DEFAULT("000000000000000000000000000000");
+	STRING SSNMASK: DEFAULT("ALL");
+	STRING INDUSTRYCLASS: DEFAULT("OTHER");
+	STRING DLMASK: DEFAULT("ALL");
+	STRING DOBMASK: DEFAULT("ALL");
+	STRING InputLogicalFilename: DEFAULT("~temp::in");
+	STRING OutputLogicalFilename: DEFAULT("~temp::out");
+	STRING ReferenceId: DEFAULT("192082831");
+	STRING InputLogicalFileDs: DEFAULT("~qa::computesuspectprovideraddressscore::computesuspectprovideraddressscore20::input");
+	STRING SHAREDADDRESSSWITCH: DEFAULT("Y");
+	STRING DMESWITCH: DEFAULT("Y");
+	STRING LABSWITCH: DEFAULT("Y");
+	STRING SINGLEADDRESSSWITCH: DEFAULT("Y");
+	STRING RECENTNPISWITCH: DEFAULT("Y");
+	STRING STUDENTNPISWITCH: DEFAULT("Y");
+	STRING DNDSWITCH: DEFAULT("N");
+	STRING VACANTSWITCH: DEFAULT("N");
+	STRING MAILDROPSWITCH: DEFAULT("N");
+	STRING POBOXSWITCH: DEFAULT("N");
+	STRING PRISONSWITCH: DEFAULT("N");
+	STRING RESIDENTIALSWITCH: DEFAULT("N");
+	STRING ACTIVESTATEEXCLUSIONSWITCH: DEFAULT("Y");
+	STRING ACTIVEOIGEXCLUSIONSWITCH: DEFAULT("Y");
+	STRING ACTIVEOPMEXCLUSIONSWITCH: DEFAULT("Y");
+	STRING ACTIVELICENSEREVOCATIONSWITCH: DEFAULT("Y");
+	STRING PASTSTATEEXCLUSIONSWITCH: DEFAULT("Y");
+	STRING PASTOIGEXCLUSIONSWITCH: DEFAULT("Y");
+	STRING PASTOPMEXCLUSIONSWITCH: DEFAULT("Y");
+	STRING PASTLICENSEREVOCATIONSWITCH: DEFAULT("Y");
+	STRING LICENSEEXPIREDSWITCH: DEFAULT("Y");
+	STRING DEAEXPIREDSWITCH: DEFAULT("Y");
+	STRING DECEASEDSWITCH: DEFAULT("Y");
+	STRING BANKRUPTCYSWITCH: DEFAULT("Y");
+	STRING CRIMINALHISTORYSWITCH: DEFAULT("Y");
+	STRING DECEASEDPATIENTSSWITCH: DEFAULT("Y");
+	STRING LARGEPATIENTGROUPSWITCH: DEFAULT("Y");
+	STRING LICENSEINACTIVESWITCH: DEFAULT("Y");
+	STRING NPIDEACTIVATEDSWITCH: DEFAULT("Y");
+	STRING LONGPATIENTDRIVINGDISTANCESWITCH: DEFAULT("Y");
+	STRING HIGHPAIDDOLLARSPERPATIENTSWITCH: DEFAULT("Y");
+	STRING HIGHPAIDDOLLARSPERCLAIMSWITCH: DEFAULT("Y");
+	STRING HIGHNUMBEROFPATIENTSSWITCH: DEFAULT("Y");
+	STRING HIGHNUMBEROFCLAIMSSWITCH: DEFAULT("Y");
+	STRING HIGHPAIDDOLLARSSWITCH: DEFAULT("Y");
+	STRING INNETWORKCURRENTEXCLUSIONSWITCH: DEFAULT("Y");
+	STRING INNETWORKCURRENTREVOCATIONSWITCH: DEFAULT("Y");
+	STRING INNETWORKPASTEXCLUSIONSWITCH: DEFAULT("Y");
+	STRING INNETWORKPASTREVOCATIONSWITCH: DEFAULT("Y");
+	STRING INNETWORKHASBANKRUPTCYSWITCH: DEFAULT("Y");
+	STRING INNETWORKHASCRIMINALHISTORYSWITCH: DEFAULT("Y");
+	STRING OUTNETWORKCURRENTEXCLUSIONSWITCH: DEFAULT("Y");
+	STRING OUTNETWORKCURRENTREVOCATIONSWITCH: DEFAULT("Y");
+	STRING OUTNETWORKPASTEXCLUSIONSWITCH: DEFAULT("Y");
+	STRING OUTNETWORKPASTREVOCATIONSWITCH: DEFAULT("Y");
+	STRING OUTNETWORKHASBANKRUPTCYSWITCH: DEFAULT("Y");
+	STRING OUTNETWORKHASCRIMINALHISTORYSWITCH: DEFAULT("Y");
+	STRING RELATIVEASSOCCRIMINALSWITCH: DEFAULT("Y");
+	STRING RELATIVEASSOCBANKRUPTCYSWITCH: DEFAULT("Y");
+	INT STUDENTNPISCORE: DEFAULT("10");
+	INT DNDSCORE: DEFAULT("5");
+	INT VACANTSCORE: DEFAULT("5");
+	INT MAILDROPSCORE: DEFAULT("5");
+	INT POBOXSCORE: DEFAULT("5");
+	INT PRISONSCORE: DEFAULT("5");
+	INT RESIDENTIALSCORE: DEFAULT("5");
+	INT ACTIVESTATEEXCLUSIONSCORE: DEFAULT("25");
+	INT ACTIVEOIGEXCLUSIONSCORE: DEFAULT("25");
+	INT ACTIVEOPMEXCLUSIONSCORE: DEFAULT("25");
+	INT ACTIVELICENSEREVOCATIONSCORE: DEFAULT("25");
+	INT PASTSTATEEXCLUSIONSCORE: DEFAULT("20");
+	INT PASTOIGEXCLUSIONSCORE: DEFAULT("20");
+	INT PASTOPMEXCLUSIONSCORE: DEFAULT("20");
+	INT PASTLICENSEREVOCATIONSCORE: DEFAULT("20");
+	INT EXPIREDLICENSESCORE: DEFAULT("20");
+	INT DEAEXPIREDSCORE: DEFAULT("15");
+	INT DECEASEDSCORE: DEFAULT("15");
+	INT BANKRUPTCYSCORE: DEFAULT("15");
+	INT CRIMINALHISTORYSCORE: DEFAULT("15");
+	INT DECEASEDPATIENTSSCORE: DEFAULT("15");
+	INT LARGEPATIENTGROUPSCORE: DEFAULT("10");
+	INT LICENSEINACTIVESCORE: DEFAULT("10");
+	INT NPIDEACTIVATEDSCORE: DEFAULT("10");
+	INT LONGPATIENTDRIVINGDISTANCESCORE: DEFAULT("15");
+	INT HIGHPAIDDOLLARSPERPATIENTSCORE: DEFAULT("10");
+	INT HIGHPAIDDOLLARSPERCLAIMSCORE: DEFAULT("10");
+	INT HIGHNUMBEROFPATIENTSSCORE: DEFAULT("5");
+	INT HIGHNUMBEROFCLAIMSSCORE: DEFAULT("5");
+	INT HIGHPAIDDOLLARSSCORE: DEFAULT("5");
+	INT INNETWORKCURRENTEXCLUSIONSCORE: DEFAULT("10");
+	INT INNETWORKCURRENTREVOCATIONSCORE: DEFAULT("10");
+	INT INNETWORKPASTEXCLUSIONSCORE: DEFAULT("10");
+	INT INNETWORKPASTREVOCATIONSCORE: DEFAULT("10");
+	INT INNETWORKHASCRIMINALHISTORYSCORE: DEFAULT("10");
+	INT OUTNETWORKCURRENTEXCLUSIONSCORE: DEFAULT("10");
+	INT OUTNETWORKCURRENTREVOCATIONSCORE: DEFAULT("10");
+	INT OUTNETWORKPASTEXCLUSIONSCORE: DEFAULT("10");
+	INT OUTNETWORKPASTREVOCATIONSCORE: DEFAULT("10");
+	INT OUTNETWORKHASBANKRUPTCYSCORE: DEFAULT("10");
+	INT OUTNETWORKHASCRIMINALHISTORYSCORE: DEFAULT("10");
+	INT RELATIVEASSOCCRIMINALSCORE: DEFAULT("10");
+	INT RELATIVEASSOCBANKRUPTCYSCORE: DEFAULT("10");
+	INT SHAREDADDRESSSCORE: DEFAULT("15");
+	INT DMESCORE: DEFAULT("15");
+	INT LABSCORE: DEFAULT("15");
+	INT SINGLEADDRESSSCORE: DEFAULT("15");
+	INT RECENTNPISCORE: DEFAULT("10");
+	INT INNETWORKHASBANKRUPTCYSCORE: DEFAULT("10");
+	INT OUTLIERPERCENTILE: DEFAULT(95);
+	STRING OutputLogicalDs: DEFAULT("~qa::computesuspectprovideraddressscore::computesuspectprovideraddressscore_2.0::output");
+	STRING VIZSERVICEVERSION: DEFAULT("JOBID${ROOTJOBID}");
+	STRING CompareWUID: DEFAULT("W20180904-123314");	
+END
+
+INSTANCE ComputeSuspectProviderAddressScore.ComputeSuspectProviderAddressScore(Ins276860): LABEL("Compute Suspect Provider Address Score"),VERSION("2.0")
+	dsInput="^Ins001|dsOutput"
+	LongPatientDrivingDistanceOutlierRank="claimoutlierlongdistancerank"
+	DateofDeath_childds_recnum="1"
+	ExpiredDEANumber_childds_recnum="1"
+	PastOPMExclusion_childds_recnum="1"
+	BANKRUPTCYSCORE="^GLOBAL|BANKRUPTCYSCORE"
+	LicenseExpiredFlag_childds_recnum="1"
+	PractiseState_childds_recnum="1"
+	InNetworkCurrentRevocationFlag_childds_recnum="1"
+	PASTSTATEEXCLUSIONSWITCH="^GLOBAL|PASTSTATEEXCLUSIONSWITCH"
+	TotalPaidAmount="claimoutlierproviderhighpaidamount"
+	Zip5_childds_recnum="1"
+	ActiveStateSanctionExclusionDate_childds_recnum="1"
+	StudentNPICount="claimoutlierstudentnpicount"
+	MAILDROPSCORE="^GLOBAL|MAILDROPSCORE"
+	ACTIVEOIGEXCLUSIONSCORE="^GLOBAL|ACTIVEOIGEXCLUSIONSCORE"
+	PractisePostdirectional_childds_recnum="1"
+	ACTIVESTATEEXCLUSIONSWITCH="^GLOBAL|ACTIVESTATEEXCLUSIONSWITCH"
+	PreDirectional_childds_recnum="1"
+	NoOfPatientAtAddress_childds_recnum="1"
+	PASTOIGEXCLUSIONSCORE="^GLOBAL|PASTOIGEXCLUSIONSCORE"
+	DECEASEDSWITCH="^GLOBAL|DECEASEDSWITCH"
+	OUTNETWORKPASTREVOCATIONSCORE="^GLOBAL|OUTNETWORKPASTREVOCATIONSCORE"
+	RESIDENTIALSWITCH="^GLOBAL|RESIDENTIALSWITCH"
+	INNETWORKPASTREVOCATIONSWITCH="^GLOBAL|INNETWORKPASTREVOCATIONSWITCH"
+	DeceasedFlag_childds_recnum="1"
+	INNETWORKCURRENTREVOCATIONSWITCH="^GLOBAL|INNETWORKCURRENTREVOCATIONSWITCH"
+	PastStateExclusion_childds_recnum="1"
+	BankruptcyFlag_childds_recnum="1"
+	SecondaryRange_childds_recnum="1"
+	HIGHNUMBEROFPATIENTSSWITCH="^GLOBAL|HIGHNUMBEROFPATIENTSSWITCH"
+	RecentNPICount="claimoutlierrecentnpicount"
+	PastOIGExclusion_childds_recnum="1"
+	PractiseAddresssuffix_childds_recnum="1"
+	HighPaidDollarsOutlierRank_childds_recnum="1"
+	HighNumberOfClaimsIndicator_childds_recnum="1"
+	ACTIVELICENSEREVOCATIONSCORE="^GLOBAL|ACTIVELICENSEREVOCATIONSCORE"
+	PractiseSecondaryrange_childds_recnum="1"
+	HIGHPAIDDOLLARSSWITCH="^GLOBAL|HIGHPAIDDOLLARSSWITCH"
+	Prefix="Scoring"
+	DMEPatientMedian="claimoutlierdmepatientmedian"
+	INNETWORKHASCRIMINALHISTORYSWITCH="^GLOBAL|INNETWORKHASCRIMINALHISTORYSWITCH"
+	HIGHNUMBEROFCLAIMSSCORE="^GLOBAL|HIGHNUMBEROFCLAIMSSCORE"
+	HighNumberOfPatientsOutlierRank_childds_recnum="1"
+	NPIDEACTIVATEDSCORE="^GLOBAL|NPIDEACTIVATEDSCORE"
+	ACTIVELICENSEREVOCATIONSWITCH="^GLOBAL|ACTIVELICENSEREVOCATIONSWITCH"
+	InNetworkhasBankruptcy_childds_recnum="1"
+	ClaimMedian_childds_recnum="1"
+	OUTNETWORKPASTEXCLUSIONSCORE="^GLOBAL|OUTNETWORKPASTEXCLUSIONSCORE"
+	ActiveLicenseRevocationDate_childds_recnum="1"
+	RELATIVEASSOCCRIMINALSWITCH="^GLOBAL|RELATIVEASSOCCRIMINALSWITCH"
+	HighNumberOfPatientsOutlierRank="claimoutlierpatientcountrank"
+	OutNetworkPastExclusionFlag_childds_recnum="1"
+	PASTOIGEXCLUSIONSWITCH="^GLOBAL|PASTOIGEXCLUSIONSWITCH"
+	INNETWORKCURRENTEXCLUSIONSWITCH="^GLOBAL|INNETWORKCURRENTEXCLUSIONSWITCH"
+	LARGEPATIENTGROUPSCORE="^GLOBAL|LARGEPATIENTGROUPSCORE"
+	LICENSEINACTIVESWITCH="^GLOBAL|LICENSEINACTIVESWITCH"
+	DMESCORE="^GLOBAL|DMESCORE"
+	HighPaidAmountPerClaim_childds_recnum="1"
+	ACTIVEOIGEXCLUSIONSWITCH="^GLOBAL|ACTIVEOIGEXCLUSIONSWITCH"
+	OUTNETWORKHASBANKRUPTCYSCORE="^GLOBAL|OUTNETWORKHASBANKRUPTCYSCORE"
+	AveDistance_childds_recnum="1"
+	PrimaryName_childds_recnum="1"
+	PractisePrimaryrange_childds_recnum="1"
+	NoOfPatientsDrivingLongDistance="claimoutliernoofpatientdrivinglongdistance"
+	PatientMedian="claimoutlierpatientcountmedian"
+	POBOXSWITCH="^GLOBAL|POBOXSWITCH"
+	TotalClaimCount="claimoutlierproviderclaimcount"
+	OutNetworkCurrentExclusionFlag_childds_recnum="1"
+	RelativeBankruptcyFlag_childds_recnum="1"
+	CRIMINALHISTORYSWITCH="^GLOBAL|CRIMINALHISTORYSWITCH"
+	PASTLICENSEREVOCATIONSWITCH="^GLOBAL|PASTLICENSEREVOCATIONSWITCH"
+	ActiveOPMExclusion_childds_recnum="1"
+	AddressSuffix_childds_recnum="1"
+	PatientDOD_childds_recnum="1"
+	LABSWITCH="^GLOBAL|LABSWITCH"
+	INNETWORKHASCRIMINALHISTORYSCORE="^GLOBAL|INNETWORKHASCRIMINALHISTORYSCORE"
+	HighNumberOfClaimsOutlierRank="claimoutlierclaimcountrank"
+	TotalChargeAmount="claimoutlierproviderhighchargeamount"
+	TotalLNPIDChargeAmount="claimoutlierlnpidhighchargeamount"
+	AddressType_childds_recnum="1"
+	LABClaimMedian="claimoutlierlabclaimmedian"
+	ActiveLicenseExclusionDate_childds_recnum="1"
+	INNETWORKPASTEXCLUSIONSWITCH="^GLOBAL|INNETWORKPASTEXCLUSIONSWITCH"
+	ActiveOIGExclusion_childds_recnum="1"
+	OUTNETWORKPASTREVOCATIONSWITCH="^GLOBAL|OUTNETWORKPASTREVOCATIONSWITCH"
+	LABIndicator_childds_recnum="1"
+	LONGPATIENTDRIVINGDISTANCESWITCH="^GLOBAL|LONGPATIENTDRIVINGDISTANCESWITCH"
+	DMESWITCH="^GLOBAL|DMESWITCH"
+	DMEClaimMedian_childds_recnum="1"
+	AddressPaidAmount_childds_recnum="1"
+	HighPaidAmountPerPatientMedian="claimoutlierhighpaidamountperpatientmedian"
+	ACTIVEOPMEXCLUSIONSCORE="^GLOBAL|ACTIVEOPMEXCLUSIONSCORE"
+	PRISONSCORE="^GLOBAL|PRISONSCORE"
+	POBOXSCORE="^GLOBAL|POBOXSCORE"
+	ActiveLicenseExclusionState_childds_recnum="1"
+	DECEASEDPATIENTSSCORE="^GLOBAL|DECEASEDPATIENTSSCORE"
+	OutNetworkCurrentRevocationFlag_childds_recnum="1"
+	LongPatientDrivingDistanceOutlierRank_childds_recnum="1"
+	BankruptcyFiledDate_childds_recnum="1"
+	OUTNETWORKCURRENTEXCLUSIONSCORE="^GLOBAL|OUTNETWORKCURRENTEXCLUSIONSCORE"
+	AddressExclusionFlag_childds_recnum="1"
+	DeceasedPatientCount_childds_recnum="1"
+	NoOfProviderAtAddress="claimoutlieraddressprovidercount"
+	DECEASEDPATIENTSSWITCH="^GLOBAL|DECEASEDPATIENTSSWITCH"
+	LicenseInactiveFlag_childds_recnum="1"
+	ActiveLicenseRevocationState_childds_recnum="1"
+	HighPaidDollarsPerClaimIndicator_childds_recnum="1"
+	STUDENTNPISCORE="^GLOBAL|STUDENTNPISCORE"
+	ActiveLicenseRevocation_childds_recnum="1"
+	HighPaidDollarsPerClaimOutlierRank="claimoutlierhighpaidamountperclaimrank"
+	OPMExclusionReinstatedDate_childds_recnum="1"
+	DEAEXPIREDSWITCH="^GLOBAL|DEAEXPIREDSWITCH"
+	NPIDEACTIVATEDSWITCH="^GLOBAL|NPIDEACTIVATEDSWITCH"
+	UsageType_childds_recnum="1"
+	VACANTSWITCH="^GLOBAL|VACANTSWITCH"
+	VacantAddressActivityIndicator_childds_recnum="1"
+	PractiseCityname_childds_recnum="1"
+	DNDSWITCH="^GLOBAL|DNDSWITCH"
+	STUDENTNPISWITCH="^GLOBAL|STUDENTNPISWITCH"
+	PatientMedian_childds_recnum="1"
+	INNETWORKHASBANKRUPTCYSWITCH="^GLOBAL|INNETWORKHASBANKRUPTCYSWITCH"
+	RELATIVEASSOCBANKRUPTCYSWITCH="^GLOBAL|RELATIVEASSOCBANKRUPTCYSWITCH"
+	RESIDENTIALSCORE="^GLOBAL|RESIDENTIALSCORE"
+	StateExclusionReinstatedDate_childds_recnum="1"
+	ACTIVEOPMEXCLUSIONSWITCH="^GLOBAL|ACTIVEOPMEXCLUSIONSWITCH"
+	NoOfPatientsDrivingLongDistance_childds_recnum="1"
+	SingleAddressIndicator_childds_recnum="1"
+	BANKRUPTCYSWITCH="^GLOBAL|BANKRUPTCYSWITCH"
+	HIGHPAIDDOLLARSPERCLAIMSCORE="^GLOBAL|HIGHPAIDDOLLARSPERCLAIMSCORE"
+	AssociateBankruptcyFlag_childds_recnum="1"
+	NPIDeactivatedDate_childds_recnum="1"
+	OUTNETWORKCURRENTEXCLUSIONSWITCH="^GLOBAL|OUTNETWORKCURRENTEXCLUSIONSWITCH"
+	INNETWORKPASTEXCLUSIONSCORE="^GLOBAL|INNETWORKPASTEXCLUSIONSCORE"
+	HighPaidAmountPerClaim="claimoutlierproviderhighpaidamountperclaim"
+	DeceasedPatientsFlag_childds_recnum="1"
+	CRIMINALHISTORYSCORE="^GLOBAL|CRIMINALHISTORYSCORE"
+	HIGHPAIDDOLLARSSCORE="^GLOBAL|HIGHPAIDDOLLARSSCORE"
+	LICENSEEXPIREDSWITCH="^GLOBAL|LICENSEEXPIREDSWITCH"
+	OUTNETWORKPASTEXCLUSIONSWITCH="^GLOBAL|OUTNETWORKPASTEXCLUSIONSWITCH"
+	DeceasedPatientCount="claimoutlierpatientdeceasedcount"
+	INNETWORKCURRENTEXCLUSIONSCORE="^GLOBAL|INNETWORKCURRENTEXCLUSIONSCORE"
+	LNPID="inplnpid"
+	DECEASEDSCORE="^GLOBAL|DECEASEDSCORE"
+	OUTNETWORKHASCRIMINALHISTORYSCORE="^GLOBAL|OUTNETWORKHASCRIMINALHISTORYSCORE"
+	ActiveOPMExclusionDate_childds_recnum="1"
+	StudentNPICount_childds_recnum="1"
+	ExpiredLicenseState_childds_recnum="1"
+	NPIDeactivatedFlag_childds_recnum="1"
+	DNDSCORE="^GLOBAL|DNDSCORE"
+	ClaimMedian="claimoutlierclaimcountmedian"
+	PrimaryRange_childds_recnum="1"
+	HighPaidDollarsPerPatientOutlierRank="claimoutlierhighpaidamountperpatientrank"
+	ActiveStateExclusion_childds_recnum="1"
+	PastLicenseRevocation_childds_recnum="1"
+	SharedAddressIndicator_childds_recnum="1"
+	InNetworkPastRevocationFlag_childds_recnum="1"
+	State_childds_recnum="1"
+	MailDropIndicator_childds_recnum="1"
+	PractiseZip5_childds_recnum="1"
+	HIGHPAIDDOLLARSPERPATIENTSWITCH="^GLOBAL|HIGHPAIDDOLLARSPERPATIENTSWITCH"
+	CityName_Vanity_childds_recnum="1"
+	HighPaidDollarsPerPatientIndicator_childds_recnum="1"
+	PatientCount_childds_recnum="1"
+	MAILDROPSWITCH="^GLOBAL|MAILDROPSWITCH"
+	CriminalHistoryFlag_childds_recnum="1"
+	PostDirectional_childds_recnum="1"
+	LongPatientDrivingDistanceIndicator_childds_recnum="1"
+	ExpiredLicenseNumber_childds_recnum="1"
+	PASTOPMEXCLUSIONSWITCH="^GLOBAL|PASTOPMEXCLUSIONSWITCH"
+	OutNetworkhasCriminalHistory_childds_recnum="1"
+	AveDistance="claimoutlieravedistancetravelled"
+	PatientCount="claimoutlierproviderpatientcount"
+	OUTNETWORKCURRENTREVOCATIONSWITCH="^GLOBAL|OUTNETWORKCURRENTREVOCATIONSWITCH"
+	StateExclusionReinstatedState_childds_recnum="1"
+	HighPaidDollarsPerPatientOutlierRank_childds_recnum="1"
+	OUTNETWORKHASBANKRUPTCYSWITCH="^GLOBAL|OUTNETWORKHASBANKRUPTCYSWITCH"
+	SINGLEADDRESSSCORE="^GLOBAL|SINGLEADDRESSSCORE"
+	RECENTNPISCORE="^GLOBAL|RECENTNPISCORE"
+	HIGHPAIDDOLLARSPERPATIENTSCORE="^GLOBAL|HIGHPAIDDOLLARSPERPATIENTSCORE"
+	TotalNPICount_childds_recnum="1"
+	ACTIVESTATEEXCLUSIONSCORE="^GLOBAL|ACTIVESTATEEXCLUSIONSCORE"
+	ProviderPatientAddress_childds_recnum="1"
+	LICENSEINACTIVESCORE="^GLOBAL|LICENSEINACTIVESCORE"
+	SHAREDADDRESSSWITCH="^GLOBAL|SHAREDADDRESSSWITCH"
+	HighPaidAmountPerClaimMedian="claimoutlierhighpaidamountperclaimmedian"
+	TotalClaimCount_childds_recnum="1"
+	PrisonIndicator_childds_recnum="1"
+	LargePatientAddress_childds_recnum="1"
+	LABPatientMedian_childds_recnum="1"
+	DEAEXPIREDSCORE="^GLOBAL|DEAEXPIREDSCORE"
+	LARGEPATIENTGROUPSWITCH="^GLOBAL|LARGEPATIENTGROUPSWITCH"
+	InNetworkhasCriminalHistory_childds_recnum="1"
+	DEAExpiredFlag_childds_recnum="1"
+	LargePatientGroupFlag_childds_recnum="1"
+	ExpiredLicenseNumberDate_childds_recnum="1"
+	PRISONSWITCH="^GLOBAL|PRISONSWITCH"
+	LABPatientMedian="claimoutlierlabpatientmedian"
+	ActiveOIGSanctionExclusionDate_childds_recnum="1"
+	DNDIndicator_childds_recnum="1"
+	HighPaidDollarsOutlierRank="claimoutlierhighpaidamountrank"
+	LABClaimMedian_childds_recnum="1"
+	PractisePredirectional_childds_recnum="1"
+	HighPaidDollarsPerClaimOutlierRank_childds_recnum="1"
+	OIGExclusionReinstatedDate_childds_recnum="1"
+	HIGHPAIDDOLLARSPERCLAIMSWITCH="^GLOBAL|HIGHPAIDDOLLARSPERCLAIMSWITCH"
+	DMEOutlierRank="claimoutlierdmerank"
+	OutNetworkPastRevocationFlag_childds_recnum="1"
+	HIGHNUMBEROFPATIENTSSCORE="^GLOBAL|HIGHNUMBEROFPATIENTSSCORE"
+	OutNetworkhasBankruptcy_childds_recnum="1"
+	OUTNETWORKHASCRIMINALHISTORYSWITCH="^GLOBAL|OUTNETWORKHASCRIMINALHISTORYSWITCH"
+	ExpiredDEADate_childds_recnum="1"
+	LABOutlierRank="claimoutlierlabrank"
+	HighNumberOfClaimsOutlierRank_childds_recnum="1"
+	DMEClaimMedian="claimoutlierdmeclaimmedian"
+	ConvictionDate_childds_recnum="1"
+	SINGLEADDRESSSWITCH="^GLOBAL|SINGLEADDRESSSWITCH"
+	HighPaidAmountMedian="claimoutlierhighpaidamountmedian"
+	EXPIREDLICENSESCORE="^GLOBAL|EXPIREDLICENSESCORE"
+	LicenseRevocationReinstatedState_childds_recnum="1"
+	NoOfProviderAtAddress_childds_recnum="1"
+	HighPaidAmountPerPatient="claimoutlierproviderhighpaidamountperpatient"
+	TotalChargeAmount_childds_recnum="1"
+	LNPID_childds_recnum="1"
+	PASTLICENSEREVOCATIONSCORE="^GLOBAL|PASTLICENSEREVOCATIONSCORE"
+	DMEPatientMedian_childds_recnum="1"
+	RECENTNPISWITCH="^GLOBAL|RECENTNPISWITCH"
+	PractisePrimaryname_childds_recnum="1"
+	DMEIndicator_childds_recnum="1"
+	HIGHNUMBEROFCLAIMSSWITCH="^GLOBAL|HIGHNUMBEROFCLAIMSSWITCH"
+	LABSCORE="^GLOBAL|LABSCORE"
+	TotalPaidAmount_childds_recnum="1"
+	VACANTSCORE="^GLOBAL|VACANTSCORE"
+	INNETWORKCURRENTREVOCATIONSCORE="^GLOBAL|INNETWORKCURRENTREVOCATIONSCORE"
+	INNETWORKHASBANKRUPTCYSCORE="^GLOBAL|INNETWORKHASBANKRUPTCYSCORE"
+	NoOfPatientAtAddress="claimoutlieraddresspatientcount"
+	AssociateCriminalFlag_childds_recnum="1"
+	OUTNETWORKCURRENTREVOCATIONSCORE="^GLOBAL|OUTNETWORKCURRENTREVOCATIONSCORE"
+	HighNumberOfPatientsIndicator_childds_recnum="1"
+	RelativeCriminalFlag_childds_recnum="1"
+	HighPaidAmountMedian_childds_recnum="1"
+	PASTSTATEEXCLUSIONSCORE="^GLOBAL|PASTSTATEEXCLUSIONSCORE"
+	LONGPATIENTDRIVINGDISTANCESCORE="^GLOBAL|LONGPATIENTDRIVINGDISTANCESCORE"
+	HighPaidDollarsIndicator_childds_recnum="1"
+	ActiveOIGExclusionDate_childds_recnum="1"
+	PatientDOD="claimoutlierpatientdod"
+	InNetworkPastExclusionFlag_childds_recnum="1"
+	RELATIVEASSOCBANKRUPTCYSCORE="^GLOBAL|RELATIVEASSOCBANKRUPTCYSCORE"
+	LABOutlierRank_childds_recnum="1"
+	HighPaidAmountPerClaimMedian_childds_recnum="1"
+	SHAREDADDRESSSCORE="^GLOBAL|SHAREDADDRESSSCORE"
+	RecentNPICount_childds_recnum="1"
+	PASTOPMEXCLUSIONSCORE="^GLOBAL|PASTOPMEXCLUSIONSCORE"
+	INNETWORKPASTREVOCATIONSCORE="^GLOBAL|INNETWORKPASTREVOCATIONSCORE"
+	TotalNPICount="claimoutliertotalnpicount"
+	InNetworkCurrentExclusionFlag_childds_recnum="1"
+	DMEOutlierRank_childds_recnum="1"
+	ResidentialAddressIndicator_childds_recnum="1"
+	ActiveOPMSanctionExclusionDate_childds_recnum="1"
+	HighPaidAmountPerPatientMedian_childds_recnum="1"
+	InactiveLicenseState_childds_recnum="1"
+	HighPaidAmountPerPatient_childds_recnum="1"
+	RELATIVEASSOCCRIMINALSCORE="^GLOBAL|RELATIVEASSOCCRIMINALSCORE"
+	PractiseState="providerattrpractisestate"
+	OIGExclusionReinstatedDate="providerattroigexclusionreinstateddate"
+	DEAExpiredFlag="claimoutlierproviderdeadeactivatedflag"
+	RelativeCriminalFlag="hasrelativecriminaldescription"
+	ConvictionDate="consumerattrconvictiondate"
+	LargePatientAddress="claimoutlierlargepatientgroupaddress"
+	LargePatientCount="claimoutlierlargepatientgroupcount"
+	NPIDeactivatedFlag="claimoutlierprovidernpideactivatedflag"
+	PastStateExclusion="providerattrhasstateexclusioinreinstated"
+	AddressPaidAmount="claimoutlieraddresshighpaidamount"
+	StateExclusionReinstatedState="providerattrstateexclusionreinstatedstate"
+	AssociateCriminalFlag="hasassociatecriminaldescription"
+	PractisePostdirectional="providerattrpractisepostdirectional"
+	ActiveOIGExclusionDate="providerattractiveoigexclusiondate"
+	PostDirectional="cleanproviderpostdirectional"
+	ActiveLicenseRevocationState="providerattractivelicenserevocationstate"
+	PrimaryName="cleanproviderprimaryname"
+	HighNumberOfClaimsIndicator="claimoutlierclaimcountflag"
+	LicenseExpiredFlag="claimoutlierproviderlicenseexpiredflag"
+	InNetworkhasBankruptcy="innetworkbankruptcyflagdescription"
+	PractisePrimaryname="providerattrpractiseprimaryname"
+	DMEIndicator="claimoutlierdmeflag"
+	ActiveLicenseExclusionDate="providerattractivestateexclusiondate"
+	NPIDeactivatedDate="providerattrnpideactivationdate"
+	PractisePrimaryrange="providerattrpractiseprimaryrange"
+	InNetworkCurrentExclusionFlag="innetworkactiveexclusionflagdescription"
+	RelativeBankruptcyFlag="hasrelativebankruptcydescription"
+	DateofDeath="consumerattrdateofdeaceased"
+	AddressType="advoaddresstype"
+	ActiveStateSanctionExclusionDate="providerattractivestatesanctionexclusiondate"
+	HighNumberOfPatientsIndicator="claimoutlierpatientcountflag"
+	CityName_Vanity="cleanprovidervanitycity"
+	HighPaidDollarsIndicator="claimoutlierhighpaidamountflag"
+	HighPaidDollarsPerPatientIndicator="claimoutlierhighpaidamountperpatientflag"
+	OutNetworkCurrentExclusionFlag="outnetworkactiveexclusionflagdescription"
+	ActiveLicenseRevocation="providerattrhasactivelicenserevocation"
+	PractiseCityname="providerattrpractisecityname"
+	OutNetworkCurrentRevocationFlag="outnetworkactiverevocationflagdescription"
+	ExpiredLicenseNumber="providerattrlicensenumber"
+	DeceasedPatientsFlag="claimoutlierpatientdeceasedflag"
+	InNetworkCurrentRevocationFlag="innetworkactiverevocationflagdescription"
+	HighPaidDollarsPerClaimIndicator="claimoutlierhighpaidamountperclaimflag"
+	LargePatientGroupFlag="claimoutlierlargepatientgroupflag"
+	State="cleanproviderstate"
+	ActiveLicenseRevocationDate="providerattractivelicenserevocationdate"
+	PastOPMExclusion="providerattrhasopmexclusioinreinstated"
+	OutNetworkPastExclusionFlag="outnetworkreinstatedrevocationflagdescription"
+	PastOIGExclusion="providerattrhasoigexclusioinreinstated"
+	PrimaryRange="cleanproviderprimaryrange"
+	ActiveOIGSanctionExclusionDate="providerattractiveoigsanctionexclusiondate"
+	ExpiredDEADate="providerattrdatedeaexpired"
+	PractiseSecondaryrange="providerattrpractisesecondaryrange"
+	BankruptcyFiledDate="consumerattrbankruptcydate"
+
+	SharedAddressIndicator="claimoutlierproviderpatientaddressflag"
+	SharedAddressPatientCount="claimoutlierproviderpatientaddresscount"
+
+	CriminalHistoryFlag="consumerattrhasconvictions"
+	ActiveLicenseExclusionState="providerattractivelicenseexclusionstate"
+	PractiseZip5="providerattrpractisezip5"
+	OPMExclusionReinstatedDate="providerattropmexclusionreinstateddate"
+	ProviderPatientAddress="claimoutlierproviderpatientsharedaddress"
+	InNetworkhasCriminalHistory="innetworkcriminalflagdescription"
+
+	SingleAddressIndicator="providerattrproviderwithsingleaddress"
+	SingleAddressProviderCount="providerattrsingleaddressprovidercount"
+
+	DNDIndicator="advodonotdeliverindicator"
+	LongPatientDrivingDistanceIndicator="claimoutlierlongdistanceflag"
+	InNetworkPastExclusionFlag="innetworkreinstatedexclusionflagdescription"
+	PractiseAddresssuffix="providerattrpractiseaddresssuffix"
+	MailDropIndicator="advodropindicator"
+	InactiveLicenseState="providerattrinactivelicensestate"
+	ExpiredLicenseState="providerattrlicensestate"
+	StateExclusionReinstatedDate="providerattrstateexclusionreinstateddate"
+	Zip5="cleanproviderzip5"
+	PreDirectional="cleanproviderpredirectional"
+	SecondaryRange="cleanprovidersecondaryrange"
+	VacantAddressActivityIndicator="claimoutliervacantaddressactivityflag"
+	AddressExclusionFlag="claimoutlierexcludeaddressflag"
+	LABIndicator="claimoutlierlabflag"
+	DeceasedFlag="claimoutlierproviderdeceasedflag"
+	OutNetworkPastRevocationFlag="outnetworkreinstatedrevocationflagdescription"
+	ExpiredLicenseNumberDate="providerattrdatelicenseexpired"
+	ActiveStateExclusion="providerattrhasactivestateexclusion"
+	AssociateBankruptcyFlag="hasassociatebankruptcydescription"
+	InNetworkPastRevocationFlag="innetworkreinstatedrevocationflagdescription"
+	ActiveOPMExclusionDate="providerattractiveopmexclusiondate"
+	OutNetworkhasCriminalHistory="outnetworkcriminalflagdescription"
+	LicenseInactiveFlag="providerattrinactivelicenseflag"
+	LicenseRevocationReinstatedState="providerattrlicenserevocationreinstatedstate"
+	LicenseRevocationReinstatedDate="providerattrlicenserevocationreinstateddate"
+	AddressSuffix="cleanprovideraddresssuffix"
+	UsageType="advoaddressusagetype"
+	ActiveOPMExclusion="providerattrhasactiveopmexclusion"
+	OutNetworkhasBankruptcy="outnetworkbankruptcyflagdescription"
+	ActiveOPMSanctionExclusionDate="providerattractiveopmsanctionexclusiondate"
+	ResidentialAddressIndicator="advoresidentialorbusinessindicator"
+	PractisePredirectional="providerattrpractisepredirectional"
+	ActiveOIGExclusion="providerattrhasactiveoigexclusion"
+	ExpiredDEANumber="providerattrdeanumber"
+	BankruptcyFlag="consumerattrhasbankruptcy"
+	PastLicenseRevocation="providerattrhaslicenserevocationreinstated"
+	PrisonIndicator="acahitfound"
+	ActiveStateExclusionImpactAmount="claimoutlieractivestateexclusionimpactamount"
+	ActiveOIGExclusionImpactAmount="claimoutlieractiveoigexclusionimpactamount"
+	ActiveOPMExclusionImpactAmount="claimoutlieractiveopmexclusionimpactamount"
+	PastStateExclusionImpactAmount="claimoutlierpaststateexclusionimpactamount"
+	PastOIGExclusionImpactAmount="claimoutlierpastoigexclusionimpactamount"
+	PastOPMExclusionImpactAmount="claimoutlierpastopmexclusionimpactamount"
+	CurrentLicenseRevokedImpactAmount="claimoutliercurrentlicenserevokedimpactamount"
+	PastLicenseRevokedImpactAmount="claimoutlierpastlicenserevokedimpactamount"
+	LicenseExpiredImpactAmount="claimoutlierlicenseexpiredimpactamount"
+	NPIDeactiveImpactAmount="claimoutliernpideactiveimpactamount"
+	PatientDeceasedImpactAmount="claimoutlierpatientdeceasedimpactamount"
+	ProviderDeceasedImpactAmount="claimoutlierproviderdeceasedimpactamount"
+	BankruptcyImpactAmount="claimoutlierbankruptcyimpactamount"
+	ConvictionImpactAmount="claimoutlierconvictionimpactamount"
+	ProviderImpactAmount="claimoutlierproviderimpactamount"
+	AddressImpactAmount="claimoutlieraddressimpactamount"
+	ImpactScoreRange="claimoutlierproviderimpactrange"
+END
+
+
+INSTANCE ComputeSuspectProviderAddressScore.ComputeSuspectProviderAddressScore(Ins276862): LABEL("Compute Suspect Provider Address Score"),VERSION("2.0")
+	dsInput="^Ins001|dsOutput"
+	LongPatientDrivingDistanceOutlierRank="claimoutlierlongdistancerank"
+	DateofDeath_childds_recnum="1"
+	ExpiredDEANumber_childds_recnum="1"
+	PastOPMExclusion_childds_recnum="1"
+	BANKRUPTCYSCORE="^GLOBAL|BANKRUPTCYSCORE"
+	LicenseExpiredFlag_childds_recnum="1"
+	PractiseState_childds_recnum="1"
+	InNetworkCurrentRevocationFlag_childds_recnum="1"
+	PASTSTATEEXCLUSIONSWITCH="^GLOBAL|PASTSTATEEXCLUSIONSWITCH"
+	TotalPaidAmount="claimoutlierproviderhighpaidamount"
+	Zip5_childds_recnum="1"
+	ActiveStateSanctionExclusionDate_childds_recnum="1"
+	StudentNPICount="claimoutlierstudentnpicount"
+	MAILDROPSCORE="^GLOBAL|MAILDROPSCORE"
+	ACTIVEOIGEXCLUSIONSCORE="^GLOBAL|ACTIVEOIGEXCLUSIONSCORE"
+	PractisePostdirectional_childds_recnum="1"
+	ACTIVESTATEEXCLUSIONSWITCH="^GLOBAL|ACTIVESTATEEXCLUSIONSWITCH"
+	PreDirectional_childds_recnum="1"
+	NoOfPatientAtAddress_childds_recnum="1"
+	PASTOIGEXCLUSIONSCORE="^GLOBAL|PASTOIGEXCLUSIONSCORE"
+	DECEASEDSWITCH="^GLOBAL|DECEASEDSWITCH"
+	OUTNETWORKPASTREVOCATIONSCORE="^GLOBAL|OUTNETWORKPASTREVOCATIONSCORE"
+	RESIDENTIALSWITCH="^GLOBAL|RESIDENTIALSWITCH"
+	INNETWORKPASTREVOCATIONSWITCH="^GLOBAL|INNETWORKPASTREVOCATIONSWITCH"
+	DeceasedFlag_childds_recnum="1"
+	INNETWORKCURRENTREVOCATIONSWITCH="^GLOBAL|INNETWORKCURRENTREVOCATIONSWITCH"
+	PastStateExclusion_childds_recnum="1"
+	BankruptcyFlag_childds_recnum="1"
+	SecondaryRange_childds_recnum="1"
+	HIGHNUMBEROFPATIENTSSWITCH="^GLOBAL|HIGHNUMBEROFPATIENTSSWITCH"
+	RecentNPICount="claimoutlierrecentnpicount"
+	PastOIGExclusion_childds_recnum="1"
+	PractiseAddresssuffix_childds_recnum="1"
+	HighPaidDollarsOutlierRank_childds_recnum="1"
+	HighNumberOfClaimsIndicator_childds_recnum="1"
+	ACTIVELICENSEREVOCATIONSCORE="^GLOBAL|ACTIVELICENSEREVOCATIONSCORE"
+	PractiseSecondaryrange_childds_recnum="1"
+	HIGHPAIDDOLLARSSWITCH="^GLOBAL|HIGHPAIDDOLLARSSWITCH"
+	Prefix="Scoring2"
+	DMEPatientMedian="claimoutlierdmepatientmedian"
+	INNETWORKHASCRIMINALHISTORYSWITCH="^GLOBAL|INNETWORKHASCRIMINALHISTORYSWITCH"
+	HIGHNUMBEROFCLAIMSSCORE="^GLOBAL|HIGHNUMBEROFCLAIMSSCORE"
+	HighNumberOfPatientsOutlierRank_childds_recnum="1"
+	NPIDEACTIVATEDSCORE="^GLOBAL|NPIDEACTIVATEDSCORE"
+	ACTIVELICENSEREVOCATIONSWITCH="^GLOBAL|ACTIVELICENSEREVOCATIONSWITCH"
+	InNetworkhasBankruptcy_childds_recnum="1"
+	ClaimMedian_childds_recnum="1"
+	OUTNETWORKPASTEXCLUSIONSCORE="^GLOBAL|OUTNETWORKPASTEXCLUSIONSCORE"
+	ActiveLicenseRevocationDate_childds_recnum="1"
+	RELATIVEASSOCCRIMINALSWITCH="^GLOBAL|RELATIVEASSOCCRIMINALSWITCH"
+	HighNumberOfPatientsOutlierRank="claimoutlierpatientcountrank"
+	OutNetworkPastExclusionFlag_childds_recnum="1"
+	PASTOIGEXCLUSIONSWITCH="^GLOBAL|PASTOIGEXCLUSIONSWITCH"
+	INNETWORKCURRENTEXCLUSIONSWITCH="^GLOBAL|INNETWORKCURRENTEXCLUSIONSWITCH"
+	LARGEPATIENTGROUPSCORE="^GLOBAL|LARGEPATIENTGROUPSCORE"
+	LICENSEINACTIVESWITCH="^GLOBAL|LICENSEINACTIVESWITCH"
+	DMESCORE="^GLOBAL|DMESCORE"
+	HighPaidAmountPerClaim_childds_recnum="1"
+	ACTIVEOIGEXCLUSIONSWITCH="^GLOBAL|ACTIVEOIGEXCLUSIONSWITCH"
+	OUTNETWORKHASBANKRUPTCYSCORE="^GLOBAL|OUTNETWORKHASBANKRUPTCYSCORE"
+	AveDistance_childds_recnum="1"
+	PrimaryName_childds_recnum="1"
+	PractisePrimaryrange_childds_recnum="1"
+	NoOfPatientsDrivingLongDistance="claimoutliernoofpatientdrivinglongdistance"
+	PatientMedian="claimoutlierpatientcountmedian"
+	POBOXSWITCH="^GLOBAL|POBOXSWITCH"
+	TotalClaimCount="claimoutlierproviderclaimcount"
+	OutNetworkCurrentExclusionFlag_childds_recnum="1"
+	RelativeBankruptcyFlag_childds_recnum="1"
+	CRIMINALHISTORYSWITCH="^GLOBAL|CRIMINALHISTORYSWITCH"
+	PASTLICENSEREVOCATIONSWITCH="^GLOBAL|PASTLICENSEREVOCATIONSWITCH"
+	ActiveOPMExclusion_childds_recnum="1"
+	AddressSuffix_childds_recnum="1"
+	PatientDOD_childds_recnum="1"
+	LABSWITCH="^GLOBAL|LABSWITCH"
+	INNETWORKHASCRIMINALHISTORYSCORE="^GLOBAL|INNETWORKHASCRIMINALHISTORYSCORE"
+	HighNumberOfClaimsOutlierRank="claimoutlierclaimcountrank"
+	TotalChargeAmount="claimoutlierproviderhighchargeamount"
+	TotalLNPIDChargeAmount="claimoutlierlnpidhighchargeamount"
+	AddressType_childds_recnum="1"
+	LABClaimMedian="claimoutlierlabclaimmedian"
+	ActiveLicenseExclusionDate_childds_recnum="1"
+	INNETWORKPASTEXCLUSIONSWITCH="^GLOBAL|INNETWORKPASTEXCLUSIONSWITCH"
+	ActiveOIGExclusion_childds_recnum="1"
+	OUTNETWORKPASTREVOCATIONSWITCH="^GLOBAL|OUTNETWORKPASTREVOCATIONSWITCH"
+	LABIndicator_childds_recnum="1"
+	LONGPATIENTDRIVINGDISTANCESWITCH="^GLOBAL|LONGPATIENTDRIVINGDISTANCESWITCH"
+	DMESWITCH="^GLOBAL|DMESWITCH"
+	DMEClaimMedian_childds_recnum="1"
+	AddressPaidAmount_childds_recnum="1"
+	HighPaidAmountPerPatientMedian="claimoutlierhighpaidamountperpatientmedian"
+	ACTIVEOPMEXCLUSIONSCORE="^GLOBAL|ACTIVEOPMEXCLUSIONSCORE"
+	PRISONSCORE="^GLOBAL|PRISONSCORE"
+	POBOXSCORE="^GLOBAL|POBOXSCORE"
+	ActiveLicenseExclusionState_childds_recnum="1"
+	DECEASEDPATIENTSSCORE="^GLOBAL|DECEASEDPATIENTSSCORE"
+	OutNetworkCurrentRevocationFlag_childds_recnum="1"
+	LongPatientDrivingDistanceOutlierRank_childds_recnum="1"
+	BankruptcyFiledDate_childds_recnum="1"
+	OUTNETWORKCURRENTEXCLUSIONSCORE="^GLOBAL|OUTNETWORKCURRENTEXCLUSIONSCORE"
+	AddressExclusionFlag_childds_recnum="1"
+	DeceasedPatientCount_childds_recnum="1"
+	NoOfProviderAtAddress="claimoutlieraddressprovidercount"
+	DECEASEDPATIENTSSWITCH="^GLOBAL|DECEASEDPATIENTSSWITCH"
+	LicenseInactiveFlag_childds_recnum="1"
+	ActiveLicenseRevocationState_childds_recnum="1"
+	HighPaidDollarsPerClaimIndicator_childds_recnum="1"
+	STUDENTNPISCORE="^GLOBAL|STUDENTNPISCORE"
+	ActiveLicenseRevocation_childds_recnum="1"
+	HighPaidDollarsPerClaimOutlierRank="claimoutlierhighpaidamountperclaimrank"
+	OPMExclusionReinstatedDate_childds_recnum="1"
+	DEAEXPIREDSWITCH="^GLOBAL|DEAEXPIREDSWITCH"
+	NPIDEACTIVATEDSWITCH="^GLOBAL|NPIDEACTIVATEDSWITCH"
+	UsageType_childds_recnum="1"
+	VACANTSWITCH="^GLOBAL|VACANTSWITCH"
+	VacantAddressActivityIndicator_childds_recnum="1"
+	PractiseCityname_childds_recnum="1"
+	DNDSWITCH="^GLOBAL|DNDSWITCH"
+	STUDENTNPISWITCH="^GLOBAL|STUDENTNPISWITCH"
+	PatientMedian_childds_recnum="1"
+	INNETWORKHASBANKRUPTCYSWITCH="^GLOBAL|INNETWORKHASBANKRUPTCYSWITCH"
+	RELATIVEASSOCBANKRUPTCYSWITCH="^GLOBAL|RELATIVEASSOCBANKRUPTCYSWITCH"
+	RESIDENTIALSCORE="^GLOBAL|RESIDENTIALSCORE"
+	StateExclusionReinstatedDate_childds_recnum="1"
+	ACTIVEOPMEXCLUSIONSWITCH="^GLOBAL|ACTIVEOPMEXCLUSIONSWITCH"
+	NoOfPatientsDrivingLongDistance_childds_recnum="1"
+	SingleAddressIndicator_childds_recnum="1"
+	BANKRUPTCYSWITCH="^GLOBAL|BANKRUPTCYSWITCH"
+	HIGHPAIDDOLLARSPERCLAIMSCORE="^GLOBAL|HIGHPAIDDOLLARSPERCLAIMSCORE"
+	AssociateBankruptcyFlag_childds_recnum="1"
+	NPIDeactivatedDate_childds_recnum="1"
+	OUTNETWORKCURRENTEXCLUSIONSWITCH="^GLOBAL|OUTNETWORKCURRENTEXCLUSIONSWITCH"
+	INNETWORKPASTEXCLUSIONSCORE="^GLOBAL|INNETWORKPASTEXCLUSIONSCORE"
+	HighPaidAmountPerClaim="claimoutlierproviderhighpaidamountperclaim"
+	DeceasedPatientsFlag_childds_recnum="1"
+	CRIMINALHISTORYSCORE="^GLOBAL|CRIMINALHISTORYSCORE"
+	HIGHPAIDDOLLARSSCORE="^GLOBAL|HIGHPAIDDOLLARSSCORE"
+	LICENSEEXPIREDSWITCH="^GLOBAL|LICENSEEXPIREDSWITCH"
+	OUTNETWORKPASTEXCLUSIONSWITCH="^GLOBAL|OUTNETWORKPASTEXCLUSIONSWITCH"
+	DeceasedPatientCount="claimoutlierpatientdeceasedcount"
+	INNETWORKCURRENTEXCLUSIONSCORE="^GLOBAL|INNETWORKCURRENTEXCLUSIONSCORE"
+	LNPID="inplnpid"
+	DECEASEDSCORE="^GLOBAL|DECEASEDSCORE"
+	OUTNETWORKHASCRIMINALHISTORYSCORE="^GLOBAL|OUTNETWORKHASCRIMINALHISTORYSCORE"
+	ActiveOPMExclusionDate_childds_recnum="1"
+	StudentNPICount_childds_recnum="1"
+	ExpiredLicenseState_childds_recnum="1"
+	NPIDeactivatedFlag_childds_recnum="1"
+	DNDSCORE="^GLOBAL|DNDSCORE"
+	ClaimMedian="claimoutlierclaimcountmedian"
+	PrimaryRange_childds_recnum="1"
+	HighPaidDollarsPerPatientOutlierRank="claimoutlierhighpaidamountperpatientrank"
+	ActiveStateExclusion_childds_recnum="1"
+	PastLicenseRevocation_childds_recnum="1"
+	SharedAddressIndicator_childds_recnum="1"
+	InNetworkPastRevocationFlag_childds_recnum="1"
+	State_childds_recnum="1"
+	MailDropIndicator_childds_recnum="1"
+	PractiseZip5_childds_recnum="1"
+	HIGHPAIDDOLLARSPERPATIENTSWITCH="^GLOBAL|HIGHPAIDDOLLARSPERPATIENTSWITCH"
+	CityName_Vanity_childds_recnum="1"
+	HighPaidDollarsPerPatientIndicator_childds_recnum="1"
+	PatientCount_childds_recnum="1"
+	MAILDROPSWITCH="^GLOBAL|MAILDROPSWITCH"
+	CriminalHistoryFlag_childds_recnum="1"
+	PostDirectional_childds_recnum="1"
+	LongPatientDrivingDistanceIndicator_childds_recnum="1"
+	ExpiredLicenseNumber_childds_recnum="1"
+	PASTOPMEXCLUSIONSWITCH="^GLOBAL|PASTOPMEXCLUSIONSWITCH"
+	OutNetworkhasCriminalHistory_childds_recnum="1"
+	AveDistance="claimoutlieravedistancetravelled"
+	PatientCount="claimoutlierproviderpatientcount"
+	OUTNETWORKCURRENTREVOCATIONSWITCH="^GLOBAL|OUTNETWORKCURRENTREVOCATIONSWITCH"
+	StateExclusionReinstatedState_childds_recnum="1"
+	HighPaidDollarsPerPatientOutlierRank_childds_recnum="1"
+	OUTNETWORKHASBANKRUPTCYSWITCH="^GLOBAL|OUTNETWORKHASBANKRUPTCYSWITCH"
+	SINGLEADDRESSSCORE="^GLOBAL|SINGLEADDRESSSCORE"
+	RECENTNPISCORE="^GLOBAL|RECENTNPISCORE"
+	HIGHPAIDDOLLARSPERPATIENTSCORE="^GLOBAL|HIGHPAIDDOLLARSPERPATIENTSCORE"
+	TotalNPICount_childds_recnum="1"
+	ACTIVESTATEEXCLUSIONSCORE="^GLOBAL|ACTIVESTATEEXCLUSIONSCORE"
+	ProviderPatientAddress_childds_recnum="1"
+	LICENSEINACTIVESCORE="^GLOBAL|LICENSEINACTIVESCORE"
+	SHAREDADDRESSSWITCH="^GLOBAL|SHAREDADDRESSSWITCH"
+	HighPaidAmountPerClaimMedian="claimoutlierhighpaidamountperclaimmedian"
+	TotalClaimCount_childds_recnum="1"
+	PrisonIndicator_childds_recnum="1"
+	LargePatientAddress_childds_recnum="1"
+	LABPatientMedian_childds_recnum="1"
+	DEAEXPIREDSCORE="^GLOBAL|DEAEXPIREDSCORE"
+	LARGEPATIENTGROUPSWITCH="^GLOBAL|LARGEPATIENTGROUPSWITCH"
+	InNetworkhasCriminalHistory_childds_recnum="1"
+	DEAExpiredFlag_childds_recnum="1"
+	LargePatientGroupFlag_childds_recnum="1"
+	ExpiredLicenseNumberDate_childds_recnum="1"
+	PRISONSWITCH="^GLOBAL|PRISONSWITCH"
+	LABPatientMedian="claimoutlierlabpatientmedian"
+	ActiveOIGSanctionExclusionDate_childds_recnum="1"
+	DNDIndicator_childds_recnum="1"
+	HighPaidDollarsOutlierRank="claimoutlierhighpaidamountrank"
+	LABClaimMedian_childds_recnum="1"
+	PractisePredirectional_childds_recnum="1"
+	HighPaidDollarsPerClaimOutlierRank_childds_recnum="1"
+	OIGExclusionReinstatedDate_childds_recnum="1"
+	HIGHPAIDDOLLARSPERCLAIMSWITCH="^GLOBAL|HIGHPAIDDOLLARSPERCLAIMSWITCH"
+	DMEOutlierRank="claimoutlierdmerank"
+	OutNetworkPastRevocationFlag_childds_recnum="1"
+	HIGHNUMBEROFPATIENTSSCORE="^GLOBAL|HIGHNUMBEROFPATIENTSSCORE"
+	OutNetworkhasBankruptcy_childds_recnum="1"
+	OUTNETWORKHASCRIMINALHISTORYSWITCH="^GLOBAL|OUTNETWORKHASCRIMINALHISTORYSWITCH"
+	ExpiredDEADate_childds_recnum="1"
+	LABOutlierRank="claimoutlierlabrank"
+	HighNumberOfClaimsOutlierRank_childds_recnum="1"
+	DMEClaimMedian="claimoutlierdmeclaimmedian"
+	ConvictionDate_childds_recnum="1"
+	SINGLEADDRESSSWITCH="^GLOBAL|SINGLEADDRESSSWITCH"
+	HighPaidAmountMedian="claimoutlierhighpaidamountmedian"
+	EXPIREDLICENSESCORE="^GLOBAL|EXPIREDLICENSESCORE"
+	LicenseRevocationReinstatedState_childds_recnum="1"
+	NoOfProviderAtAddress_childds_recnum="1"
+	HighPaidAmountPerPatient="claimoutlierproviderhighpaidamountperpatient"
+	TotalChargeAmount_childds_recnum="1"
+	LNPID_childds_recnum="1"
+	PASTLICENSEREVOCATIONSCORE="^GLOBAL|PASTLICENSEREVOCATIONSCORE"
+	DMEPatientMedian_childds_recnum="1"
+	RECENTNPISWITCH="^GLOBAL|RECENTNPISWITCH"
+	PractisePrimaryname_childds_recnum="1"
+	DMEIndicator_childds_recnum="1"
+	HIGHNUMBEROFCLAIMSSWITCH="^GLOBAL|HIGHNUMBEROFCLAIMSSWITCH"
+	LABSCORE="^GLOBAL|LABSCORE"
+	TotalPaidAmount_childds_recnum="1"
+	VACANTSCORE="^GLOBAL|VACANTSCORE"
+	INNETWORKCURRENTREVOCATIONSCORE="^GLOBAL|INNETWORKCURRENTREVOCATIONSCORE"
+	INNETWORKHASBANKRUPTCYSCORE="^GLOBAL|INNETWORKHASBANKRUPTCYSCORE"
+	NoOfPatientAtAddress="claimoutlieraddresspatientcount"
+	AssociateCriminalFlag_childds_recnum="1"
+	OUTNETWORKCURRENTREVOCATIONSCORE="^GLOBAL|OUTNETWORKCURRENTREVOCATIONSCORE"
+	HighNumberOfPatientsIndicator_childds_recnum="1"
+	RelativeCriminalFlag_childds_recnum="1"
+	HighPaidAmountMedian_childds_recnum="1"
+	PASTSTATEEXCLUSIONSCORE="^GLOBAL|PASTSTATEEXCLUSIONSCORE"
+	LONGPATIENTDRIVINGDISTANCESCORE="^GLOBAL|LONGPATIENTDRIVINGDISTANCESCORE"
+	HighPaidDollarsIndicator_childds_recnum="1"
+	ActiveOIGExclusionDate_childds_recnum="1"
+	PatientDOD="claimoutlierpatientdod"
+	InNetworkPastExclusionFlag_childds_recnum="1"
+	RELATIVEASSOCBANKRUPTCYSCORE="^GLOBAL|RELATIVEASSOCBANKRUPTCYSCORE"
+	LABOutlierRank_childds_recnum="1"
+	HighPaidAmountPerClaimMedian_childds_recnum="1"
+	SHAREDADDRESSSCORE="^GLOBAL|SHAREDADDRESSSCORE"
+	RecentNPICount_childds_recnum="1"
+	PASTOPMEXCLUSIONSCORE="^GLOBAL|PASTOPMEXCLUSIONSCORE"
+	INNETWORKPASTREVOCATIONSCORE="^GLOBAL|INNETWORKPASTREVOCATIONSCORE"
+	TotalNPICount="claimoutliertotalnpicount"
+	InNetworkCurrentExclusionFlag_childds_recnum="1"
+	DMEOutlierRank_childds_recnum="1"
+	ResidentialAddressIndicator_childds_recnum="1"
+	ActiveOPMSanctionExclusionDate_childds_recnum="1"
+	HighPaidAmountPerPatientMedian_childds_recnum="1"
+	InactiveLicenseState_childds_recnum="1"
+	HighPaidAmountPerPatient_childds_recnum="1"
+	RELATIVEASSOCCRIMINALSCORE="^GLOBAL|RELATIVEASSOCCRIMINALSCORE"
+	PractiseState="providerattrpractisestate"
+	OIGExclusionReinstatedDate="providerattroigexclusionreinstateddate"
+	DEAExpiredFlag="claimoutlierproviderdeadeactivatedflag"
+	RelativeCriminalFlag="hasrelativecriminaldescription"
+	ConvictionDate="consumerattrconvictiondate"
+	LargePatientAddress="claimoutlierlargepatientgroupaddress"
+	LargePatientCount="claimoutlierlargepatientgroupcount"
+	NPIDeactivatedFlag="claimoutlierprovidernpideactivatedflag"
+	PastStateExclusion="providerattrhasstateexclusioinreinstated"
+	AddressPaidAmount="claimoutlieraddresshighpaidamount"
+	StateExclusionReinstatedState="providerattrstateexclusionreinstatedstate"
+	AssociateCriminalFlag="hasassociatecriminaldescription"
+	PractisePostdirectional="providerattrpractisepostdirectional"
+	ActiveOIGExclusionDate="providerattractiveoigexclusiondate"
+	PostDirectional="cleanproviderpostdirectional"
+	ActiveLicenseRevocationState="providerattractivelicenserevocationstate"
+	PrimaryName="cleanproviderprimaryname"
+	HighNumberOfClaimsIndicator="claimoutlierclaimcountflag"
+	LicenseExpiredFlag="claimoutlierproviderlicenseexpiredflag"
+	InNetworkhasBankruptcy="innetworkbankruptcyflagdescription"
+	PractisePrimaryname="providerattrpractiseprimaryname"
+	DMEIndicator="claimoutlierdmeflag"
+	ActiveLicenseExclusionDate="providerattractivestateexclusiondate"
+	NPIDeactivatedDate="providerattrnpideactivationdate"
+	PractisePrimaryrange="providerattrpractiseprimaryrange"
+	InNetworkCurrentExclusionFlag="innetworkactiveexclusionflagdescription"
+	RelativeBankruptcyFlag="hasrelativebankruptcydescription"
+	DateofDeath="consumerattrdateofdeaceased"
+	AddressType="advoaddresstype"
+	ActiveStateSanctionExclusionDate="providerattractivestatesanctionexclusiondate"
+	HighNumberOfPatientsIndicator="claimoutlierpatientcountflag"
+	CityName_Vanity="cleanprovidervanitycity"
+	HighPaidDollarsIndicator="claimoutlierhighpaidamountflag"
+	HighPaidDollarsPerPatientIndicator="claimoutlierhighpaidamountperpatientflag"
+	OutNetworkCurrentExclusionFlag="outnetworkactiveexclusionflagdescription"
+	ActiveLicenseRevocation="providerattrhasactivelicenserevocation"
+	PractiseCityname="providerattrpractisecityname"
+	OutNetworkCurrentRevocationFlag="outnetworkactiverevocationflagdescription"
+	ExpiredLicenseNumber="providerattrlicensenumber"
+	DeceasedPatientsFlag="claimoutlierpatientdeceasedflag"
+	InNetworkCurrentRevocationFlag="innetworkactiverevocationflagdescription"
+	HighPaidDollarsPerClaimIndicator="claimoutlierhighpaidamountperclaimflag"
+	LargePatientGroupFlag="claimoutlierlargepatientgroupflag"
+	State="cleanproviderstate"
+	ActiveLicenseRevocationDate="providerattractivelicenserevocationdate"
+	PastOPMExclusion="providerattrhasopmexclusioinreinstated"
+	OutNetworkPastExclusionFlag="outnetworkreinstatedrevocationflagdescription"
+	PastOIGExclusion="providerattrhasoigexclusioinreinstated"
+	PrimaryRange="cleanproviderprimaryrange"
+	ActiveOIGSanctionExclusionDate="providerattractiveoigsanctionexclusiondate"
+	ExpiredDEADate="providerattrdatedeaexpired"
+	PractiseSecondaryrange="providerattrpractisesecondaryrange"
+	BankruptcyFiledDate="consumerattrbankruptcydate"
+
+	SharedAddressIndicator="claimoutlierproviderpatientaddressflag"
+	SharedAddressPatientCount="claimoutlierproviderpatientaddresscount"
+
+	CriminalHistoryFlag="consumerattrhasconvictions"
+	ActiveLicenseExclusionState="providerattractivelicenseexclusionstate"
+	PractiseZip5="providerattrpractisezip5"
+	OPMExclusionReinstatedDate="providerattropmexclusionreinstateddate"
+	ProviderPatientAddress="claimoutlierproviderpatientsharedaddress"
+	InNetworkhasCriminalHistory="innetworkcriminalflagdescription"
+
+	SingleAddressIndicator="providerattrproviderwithsingleaddress"
+	SingleAddressProviderCount="providerattrsingleaddressprovidercount"
+
+	DNDIndicator="advodonotdeliverindicator"
+	LongPatientDrivingDistanceIndicator="claimoutlierlongdistanceflag"
+	InNetworkPastExclusionFlag="innetworkreinstatedexclusionflagdescription"
+	PractiseAddresssuffix="providerattrpractiseaddresssuffix"
+	MailDropIndicator="advodropindicator"
+	InactiveLicenseState="providerattrinactivelicensestate"
+	ExpiredLicenseState="providerattrlicensestate"
+	StateExclusionReinstatedDate="providerattrstateexclusionreinstateddate"
+	Zip5="cleanproviderzip5"
+	PreDirectional="cleanproviderpredirectional"
+	SecondaryRange="cleanprovidersecondaryrange"
+	VacantAddressActivityIndicator="claimoutliervacantaddressactivityflag"
+	AddressExclusionFlag="claimoutlierexcludeaddressflag"
+	LABIndicator="claimoutlierlabflag"
+	DeceasedFlag="claimoutlierproviderdeceasedflag"
+	OutNetworkPastRevocationFlag="outnetworkreinstatedrevocationflagdescription"
+	ExpiredLicenseNumberDate="providerattrdatelicenseexpired"
+	ActiveStateExclusion="providerattrhasactivestateexclusion"
+	AssociateBankruptcyFlag="hasassociatebankruptcydescription"
+	InNetworkPastRevocationFlag="innetworkreinstatedrevocationflagdescription"
+	ActiveOPMExclusionDate="providerattractiveopmexclusiondate"
+	OutNetworkhasCriminalHistory="outnetworkcriminalflagdescription"
+	LicenseInactiveFlag="providerattrinactivelicenseflag"
+	LicenseRevocationReinstatedState="providerattrlicenserevocationreinstatedstate"
+	LicenseRevocationReinstatedDate="providerattrlicenserevocationreinstateddate"
+	AddressSuffix="cleanprovideraddresssuffix"
+	UsageType="advoaddressusagetype"
+	ActiveOPMExclusion="providerattrhasactiveopmexclusion"
+	OutNetworkhasBankruptcy="outnetworkbankruptcyflagdescription"
+	ActiveOPMSanctionExclusionDate="providerattractiveopmsanctionexclusiondate"
+	ResidentialAddressIndicator="advoresidentialorbusinessindicator"
+	PractisePredirectional="providerattrpractisepredirectional"
+	ActiveOIGExclusion="providerattrhasactiveoigexclusion"
+	ExpiredDEANumber="providerattrdeanumber"
+	BankruptcyFlag="consumerattrhasbankruptcy"
+	PastLicenseRevocation="providerattrhaslicenserevocationreinstated"
+	PrisonIndicator="acahitfound"
+	ActiveStateExclusionImpactAmount="claimoutlieractivestateexclusionimpactamount"
+	ActiveOIGExclusionImpactAmount="claimoutlieractiveoigexclusionimpactamount"
+	ActiveOPMExclusionImpactAmount="claimoutlieractiveopmexclusionimpactamount"
+	PastStateExclusionImpactAmount="claimoutlierpaststateexclusionimpactamount"
+	PastOIGExclusionImpactAmount="claimoutlierpastoigexclusionimpactamount"
+	PastOPMExclusionImpactAmount="claimoutlierpastopmexclusionimpactamount"
+	CurrentLicenseRevokedImpactAmount="claimoutliercurrentlicenserevokedimpactamount"
+	PastLicenseRevokedImpactAmount="claimoutlierpastlicenserevokedimpactamount"
+	LicenseExpiredImpactAmount="claimoutlierlicenseexpiredimpactamount"
+	NPIDeactiveImpactAmount="claimoutliernpideactiveimpactamount"
+	PatientDeceasedImpactAmount="claimoutlierpatientdeceasedimpactamount"
+	ProviderDeceasedImpactAmount="claimoutlierproviderdeceasedimpactamount"
+	BankruptcyImpactAmount="claimoutlierbankruptcyimpactamount"
+	ConvictionImpactAmount="claimoutlierconvictionimpactamount"
+	ProviderImpactAmount="claimoutlierproviderimpactamount"
+	AddressImpactAmount="claimoutlieraddressimpactamount"
+	ImpactScoreRange="claimoutlierproviderimpactrange"
+END
+
+
+INSTANCE OutDataset.OutDataset(Ins104837): LABEL("Output Dataset"),VERSION("2.0")
+	name="^GLOBAL|OutputLogicalDs"
+	dsInput="^Ins276860|dsOutput"
+	UniqueIdentifier="1"
+	Method="THOR"
+END
+
+INSTANCE OutDataset.OutDataset(Ins104838): LABEL("Output Dataset"),VERSION("2.0")
+	name="^GLOBAL|OutputLogicalDs"
+	dsInput="^Ins276862|dsOutput"
+	UniqueIdentifier="2"
+	Method="THOR"
+END
+
+INSTANCE UseDataset.UseDataset(Ins001): LABEL("Use Dataset"),VERSION("1.1")
+	LogicalFilename="^GLOBAL|InputLogicalFileDs"
+	Method="THOR"
+	Structure="RECORD
+  string50 provider_key;
+  string10 provider_npi;
+  string12 provider_dea;
+  string10 provider_taxonomy;
+  string10 provider_tax_id;
+  string5 provider_tax_id_suffix;
+  string12 provider_num;
+  string5 provider_num_suffix;
+  string2 provider_num_qualifier;
+  string2 provider_security_code;
+  string3 network_code;
+  string50 provider_facility_name;
+  string12 provider_facility_num;
+  string30 provider_first_name;
+  string36 provider_last_name;
+  string36 provider_address_1;
+  string36 provider_address_2;
+  string24 provider_city;
+  string2 provider_state;
+  string9 provider_zip_cd;
+  string30 provider_county;
+  string2 provider_country;
+  string4 provider_region;
+  string9 prov_specialty_cd_1;
+  string9 prov_specialty_cd_2;
+  string2 provider_type;
+  string1 watch_cd;
+  string8 provider_latest_update_date;
+  string50 prov_user_def_01;
+  string50 prov_user_def_02;
+  string50 prov_user_def_03;
+  string50 prov_user_def_04;
+  string50 prov_user_def_05;
+  string50 prov_user_def_06;
+  string50 prov_user_def_07;
+  string50 prov_user_def_08;
+  string50 prov_user_def_09;
+  string50 prov_user_def_10;
+  string8 providerdob;
+  string9 providerssn;
+  string50 cleanproviderproviderkey;
+  string20 cleanproviderfirstname;
+  string20 cleanprovidermiddlename;
+  string20 cleanproviderlastname;
+  string5 cleanprovidernamesuffix;
+  string10 cleanproviderprimaryrange;
+  string2 cleanproviderpredirectional;
+  string28 cleanproviderprimaryname;
+  string4 cleanprovideraddresssuffix;
+  string2 cleanproviderpostdirectional;
+  string10 cleanproviderunitdesignation;
+  string8 cleanprovidersecondaryrange;
+  string25 cleanproviderpostalcity;
+  string25 cleanprovidervanitycity;
+  string2 cleanproviderstate;
+  string5 cleanproviderzip5;
+  string4 cleanproviderzip4;
+  string2 cleanproviderdbpc;
+  string1 cleanprovidercheckdigit;
+  string2 cleanproviderrecordtype;
+  string2 cleanproviderfipsstate;
+  string3 cleanprovidercounty;
+  string10 cleanproviderlatitude;
+  string11 cleanproviderlongitude;
+  string4 cleanprovidermsa;
+  string7 cleanprovidergeoblock;
+  string1 cleanprovidergeomatchcode;
+  string4 cleanprovidererrorstatus;
+  string25 cleanprovideraddresskey;
+  string8 cleanproviderproviderdob;
+  string9 cleanproviderproviderssn;
+  string1 advohitflag;
+  string1 advovacancyindicator;
+  string1 advothrowbackindicator;
+  string1 advoseasonaldeliveryindicator;
+  string5 advoseasonalsuppressionstartdate;
+  string5 advoseasonalsuppressionenddate;
+  string1 advodonotdeliverindicator;
+  string1 advocollegeindicator;
+  string10 advocollegesuppressionstartdate;
+  string10 advocollegesuppressionenddate;
+  string1 advoaddressstyle;
+  string5 advosimplifyaddresscount;
+  string1 advodropindicator;
+  string1 advoresidentialorbusinessindicator;
+  string1 advoonlywaytogetmailindicator;
+  string1 advorecordtypecode;
+  string1 advoaddresstype;
+  string1 advoaddressusagetype;
+  string8 advofirstseendate;
+  string8 advolastseendate;
+  string8 advovendorfirstreporteddate;
+  string8 advovendorlastreporteddate;
+  string8 advovacationbegindate;
+  string8 advovacationenddate;
+  string8 advonumberofcurrentvacationmonths;
+  string8 advomaxvacationmonths;
+  string8 advovacationperiodscount;
+  string1 acahitfound;
+  string200 acainstitution;
+  string2 acainstitutiontype;
+  string10 acainstitutiontypeexp;
+  string1 acaaddresstype;
+  unsigned8 inplnpid;
+  unsigned2 inppidweight;
+  unsigned2 inppiddistance;
+  unsigned8 providerattrlexid;
+  string1 providerattrentitytype;
+  string20 providerattrfname;
+  string20 providerattrmname;
+  string28 providerattrlname;
+  string5 providerattrsname;
+  string9 providerattrssn;
+  string9 providerattrconsumerssn;
+  unsigned4 providerattrdateofbirth;
+  unsigned4 providerattrconsumerdateofbirth;
+  string25 providerattrlicensenumber;
+  string25 providerattrcleanedlicensenumber;
+  string2 providerattrlicensestate;
+  string60 providerattrlicensetype;
+  string60 providerattrlicensestatus;
+  unsigned4 providerattrdatelicenseexpired;
+  unsigned4 providerattrlicensecount;
+  unsigned4 providerattrlicensestatecount;
+  unsigned4 providerattractivelicensecount;
+  unsigned4 providerattrinactivelicensecount;
+  unsigned4 providerattrrevokedlicensecount;
+  string2 providerattrinactivelicensestate;
+  string2 providerattrrevokedlicensestate;
+  string1 providerattrinactivelicenseflag;
+  string1 providerattrrevokedlicenseflag;
+  string1 providerattrexpiredlicenseflag;
+  string1 providerattrdeathindicator;
+  unsigned4 providerattrdateofdeath;
+  unsigned4 providerattrbillingtaxid;
+  string10 providerattrphone;
+  string10 providerattrfax;
+  string6 providerattrupin;
+  string10 providerattrnpinumber;
+  string8 providerattrnpienumerationdate;
+  string8 providerattrnpideactivationdate;
+  string8 providerattrnpireactivationdate;
+  string1 providerattrnpiflag;
+  unsigned4 providerattrdeactivednpicount;
+  string1 providerattrdeabusinessactivityindicator;
+  string10 providerattrdeanumber;
+  unsigned4 providerattrdatedeaexpired;
+  unsigned4 providerattrdeacount;
+  unsigned4 providerattractivedeacount;
+  unsigned4 providerattrexpireddeacount;
+  string1 providerattrdeaexpiredflag;
+  string1 providerattrisstatesanction;
+  string1 providerattrisoigsanction;
+  string1 providerattrisopmsanction;
+  string10 providerattrtaxonomy;
+  string50 providerattrtaxonomydescription;
+  string3 providerattrspecialitycode;
+  string1 providerattrproviderstatus;
+  string40 providerattrgroupkey;
+  string1 providerattrhasactivelicenserevocation;
+  string2 providerattractivelicenserevocationstate;
+  string8 providerattractivelicenserevocationdate;
+  string1 providerattrhasactivestateexclusion;
+  string2 providerattractivelicenseexclusionstate;
+  string8 providerattractivestateexclusiondate;
+  string1 providerattrhasactiveoigexclusion;
+  string8 providerattractiveoigexclusiondate;
+  string1 providerattrhasactiveopmexclusion;
+  string8 providerattractiveopmexclusiondate;
+  string8 providerattractivestatesanctionexclusiondate;
+  string8 providerattractiveoigsanctionexclusiondate;
+  string8 providerattractiveopmsanctionexclusiondate;
+  string1 providerattrhaslicenserevocationreinstated;
+  string2 providerattrlicenserevocationreinstatedstate;
+  string8 providerattrlicenserevocationreinstateddate;
+  string1 providerattrhasstateexclusioinreinstated;
+  string2 providerattrstateexclusionreinstatedstate;
+  string8 providerattrstateexclusionreinstateddate;
+  string1 providerattrhasoigexclusioinreinstated;
+  string8 providerattroigexclusionreinstateddate;
+  string1 providerattrhasopmexclusioinreinstated;
+  string8 providerattropmexclusionreinstateddate;
+  string10 providerattrresidentialprimaryrange;
+  string2 providerattrresidentialpredirectional;
+  string28 providerattrresidentialprimaryname;
+  string4 providerattrresidentialaddresssuffix;
+  string2 providerattrresidentialpostdirectional;
+  string8 providerattrresidentialsecondaryrange;
+  string25 providerattrresidentialcityname;
+  string2 providerattrresidentialstate;
+  string5 providerattrresidentialzip5;
+  unsigned3 providerattrresidentialaddresslastseen;
+  string1 providerattrproviderwithsingleaddress;
+  unsigned3 providerattrsingleaddressprovidercount;
+  string10 providerattrpractiseprimaryrange;
+  string2 providerattrpractisepredirectional;
+  string28 providerattrpractiseprimaryname;
+  string4 providerattrpractiseaddresssuffix;
+  string2 providerattrpractisepostdirectional;
+  string8 providerattrpractisesecondaryrange;
+  string25 providerattrpractisecityname;
+  string2 providerattrpractisestate;
+  string5 providerattrpractisezip5;
+  string1 providerattrhasbankruptcy;
+  string8 providerattrbankruptcylastseen;
+  string1 providerattrhascriminalhistory;
+  string8 providerattrlastarresteddate;
+  string1 providerattrhasrelativeconvictions;
+  string1 providerattrhasrelativebankruptcy;
+  string3 providerattrrelativecount;
+  string3 providerattrrelativebankruptcycount;
+  string3 providerattrrelativefelonycount;
+  string1 providerattrhasassocactivestateexclusion;
+  string1 providerattrhasassocactivelicenserevocation;
+  string1 providerattrhasassocstateexclusionreinstated;
+  string1 providerattrhasassoclicenserevocationreinstated;
+  string1 providerattrhasassocbankruptcy;
+  string1 providerattrhasassoccriminalhistory;
+  string1 providerattrhasdeceased;
+  string8 providerattrdeceaseddate;
+  string1 providerattrclientstateexclusionind;
+  string8 providerattrclientstateexclusiondate;
+  string1 providerattrclientstatelicenserevokedind;
+  string8 providerattrclientstatelicenserevokeddate;
+  string1 providerattrclientstatelicenseexpiredind;
+  string8 providerattrclientstatelicenseexpireddate;
+  string1 consumerattrhasbankruptcy;
+  string1 consumerattrhasconvictions;
+  string1 consumerattrhasdeceased;
+  string8 consumerattrdateofdeaceased;
+  string1 consumerattrhasrelativebankruptcy;
+  string1 consumerattrhasrelativeconvictions;
+  string8 consumerattrbankruptcydate;
+  string8 consumerattrconvictiondate;
+  string3 consumerattrrelativecount;
+  string3 consumerattrrelativesbankruptcycount;
+  string3 consumerattrrelativesfelonycount;
+  string100 clientspeciality_desc;
+  string1 cliententitytypecode;
+  string cleanfacilityname;
+  unsigned8 faclnfid;
+  unsigned2 facfidweight;
+  unsigned2 facfiddistance;
+  string1 facilityattrentitytype;
+  string120 facilityattrcname;
+  string10 facilityattrnpinumber;
+  string8 facilityattrnpienumerationdate;
+  string8 facilityattrnpideactivationdate;
+  string8 facilityattrnpireactivationdate;
+  string1 facilityattrnpiflag;
+  string10 facilityattrdeanumber;
+  string1 facilityattrisstatesanction;
+  string1 facilityattrisoigsanction;
+  string1 facilityattrisopmsanction;
+  string10 facilityattrtaxonomy;
+  string50 facilityattrtaxonomydescription;
+  string3 facilityattrspecialitycode;
+  string40 facilityattrgroupkey;
+  string10 facilityattrclia;
+  string7 facilityattrncpdp;
+  integer8 claimoutlierproviderclaimcount;
+  integer8 claimoutlierlnpidclaimcount;
+  integer8 claimoutlierproviderpatientcount;
+  integer8 claimoutlierpatientdeceasedcount;
+  real8 claimoutlierproviderhighchargeamount;
+  real8 claimoutlierlnpidhighchargeamount;
+  real8 claimoutlierproviderhighpaidamount;
+  real8 claimoutlierlnpidhighpaidamount;
+  real8 claimoutlierproviderhighpaidamountperclaim;
+  real8 claimoutlierproviderhighpaidamountperpatient;
+  string8 claimoutlierproviderservicedatemin;
+  string8 claimoutlierproviderservicedatemax;
+  string1 claimoutlierexcludeaddressflag;
+  string1 claimoutlierpatientdeceasedflag;
+  string1 claimoutlierprovidernpideactivatedflag;
+  string1 claimoutlierproviderdeadeactivatedflag;
+  integer8 claimoutlierproviderpatientaddresscount;
+  string1 claimoutlierproviderpatientaddressflag;
+  integer8 claimoutlieraddressprovidercount;
+  integer8 claimoutlieraddresspatientcount;
+  integer8 claimoutlieraddressclaimcount;
+  real8 claimoutlieraddresshighchargeamount;
+  real8 claimoutlieraddresshighpaidamount;
+  string8 claimoutlieraddressservicedatemin;
+  string8 claimoutlieraddressservicedatemax;
+  integer8 claimoutliertotalnpicount;
+  integer8 claimoutlierrecentnpicount;
+  integer8 claimoutlierstudentnpicount;
+  string1 claimoutlierrecentnpiflag;
+  string1 claimoutlierstudentnpiflag;
+  integer8 claimoutlierlargepatientgroupcount;
+  string1 claimoutlierlargepatientgroupflag;
+  string1 claimoutliervacantaddressactivityflag;
+  unsigned4 claimoutliernoofaddress;
+  real8 claimoutlierdistance;
+  string1 claimoutlierclaimcountflag;
+  string1 claimoutlierpatientcountflag;
+  string1 claimoutlierhighpaidamountflag;
+  string1 claimoutlierhighpaidamountperclaimflag;
+  string1 claimoutlierhighpaidamountperpatientflag;
+  string1 claimoutlierlongdistanceflag;
+  string1 claimoutlierdmeflag;
+  string1 claimoutlierlabflag;
+  unsigned2 claimoutlierclaimcountrank;
+  unsigned2 claimoutlierpatientcountrank;
+  unsigned2 claimoutlierhighpaidamountrank;
+  unsigned2 claimoutlierhighpaidamountperclaimrank;
+  unsigned2 claimoutlierhighpaidamountperpatientrank;
+  unsigned2 claimoutlierlongdistancerank;
+  unsigned2 claimoutlierdmerank;
+  unsigned2 claimoutlierlabrank;
+  unsigned8 claimoutlierclaimcountmedian;
+  unsigned8 claimoutlierpatientcountmedian;
+  unsigned8 claimoutlierhighpaidamountmedian;
+  unsigned8 claimoutlierhighpaidamountperclaimmedian;
+  unsigned8 claimoutlierhighpaidamountperpatientmedian;
+  unsigned8 claimoutlierlongdistancemedian;
+  unsigned8 claimoutlierdmemedian;
+  unsigned8 claimoutlierlabmedian;
+  unsigned8 claimoutlierdmepatientmedian;
+  unsigned8 claimoutlierlabpatientmedian;
+  unsigned8 claimoutlierdmeclaimmedian;
+  unsigned8 claimoutlierlabclaimmedian;
+  string2 claimoutlierclaimcountoutliertype;
+  string2 claimoutlierpatientcountoutliertype;
+  string2 claimoutlierhighpaidamountoutliertype;
+  string2 claimoutlierhighpaidamountperclaimoutliertype;
+  string2 claimoutlierhighpaidamountperpatientoutliertype;
+  string2 claimoutlierlongdistanceoutliertype;
+  string2 claimoutlierdmeoutliertype;
+  string2 claimoutlierlaboutliertype;
+  real4 claimoutlierclaimcountoutlierdiff;
+  real4 claimoutlierpatientcountoutlierdiff;
+  real4 claimoutlierhighpaidamountoutlierdiff;
+  real4 claimoutlierhighpaidamountperclaimoutlierdiff;
+  real4 claimoutlierhighpaidamountperpatientoutlierdiff;
+  real4 claimoutlierlongdistanceoutlierdiff;
+  real4 claimoutlierdmeoutlierdiff;
+  real4 claimoutlierlaboutlierdiff;
+  integer8 claimoutliernoofpatientdrivinglongdistance;
+  real4 claimoutlieravedistancetravelled;
+  integer8 claimoutlierpatientdod;
+  string50 claimoutlierproviderpatientsharedaddress;
+  string50 claimoutlierlargepatientgroupaddress;
+  string1 claimoutlierproviderdeceasedflag;
+  string1 claimoutlierproviderlicenseexpiredflag;
+  integer8 claimoutlieractivestateexclusionimpactamount;
+  integer8 claimoutlieractiveoigexclusionimpactamount;
+  integer8 claimoutlieractiveopmexclusionimpactamount;
+  integer8 claimoutlierpaststateexclusionimpactamount;
+  integer8 claimoutlierpastoigexclusionimpactamount;
+  integer8 claimoutlierpastopmexclusionimpactamount;
+  integer8 claimoutliercurrentlicenserevokedimpactamount;
+  integer8 claimoutlierpastlicenserevokedimpactamount;
+  integer8 claimoutlierlicenseexpiredimpactamount;
+  integer8 claimoutliernpideactiveimpactamount;
+  integer8 claimoutlierpatientdeceasedimpactamount;
+  integer8 claimoutlierproviderdeceasedimpactamount;
+  integer8 claimoutlierbankruptcyimpactamount;
+  integer8 claimoutlierconvictionimpactamount;
+  integer8 claimoutlieractivestateexclusionclaimcount;
+  integer8 claimoutlieractiveoigexclusionclaimcount;
+  integer8 claimoutlieractiveopmexclusionclaimcount;
+  integer8 claimoutlierpaststateexclusionclaimcount;
+  integer8 claimoutlierpastoigexclusionclaimcount;
+  integer8 claimoutlierpastopmexclusionclaimcount;
+  integer8 claimoutliercurrentlicenserevokedclaimcount;
+  integer8 claimoutlierpastlicenserevokedclaimcount;
+  integer8 claimoutlierlicenseexpiredclaimcount;
+  integer8 claimoutliernpideactiveclaimcount;
+  integer8 claimoutlierpatientdeceasedclaimcount;
+  integer8 claimoutlierproviderdeceasedclaimcount;
+  integer8 claimoutlierbankruptcyclaimcount;
+  integer8 claimoutlierconvictionclaimcount;
+  integer8 claimoutlierproviderimpactamount;
+  integer8 claimoutlierproviderimpactclaimcount;
+  integer8 claimoutlieraddressimpactamount;
+  integer8 claimoutlieraddressimpactclaimcount;
+  integer8 claimoutlierlnpidimpactamount;
+  integer8 claimoutlierlnpidimpactclaimcount;
+  integer8 claimoutlierproviderimpactrange;
+  integer8 claimoutlierproviderimpactpercent;
+  integer4 claimoutlierclientsingleaddresscount;
+  string1 claimoutlierclientsingleaddressflag;
+  integer8 innetworkactiveexclusionflag;
+  integer8 innetworkactiverevocationflag;
+  integer8 innetworkreinstatedexclusionflag;
+  integer8 innetworkreinstatedrevocationflag;
+  integer8 innetworkbankruptcyflag;
+  integer8 innetworkcriminalflag;
+  integer8 outnetworkactiveexclusionflag;
+  integer8 outnetworkactiverevocationflag;
+  integer8 outnetworkreinstatedexclusionflag;
+  integer8 outnetworkreinstatedrevocationflag;
+  integer8 outnetworkbankruptcyflag;
+  integer8 outnetworkcriminalflag;
+  integer8 hasassociatebankruptcy;
+  integer8 hasassociatecriminal;
+  integer8 hasrelativebankruptcy;
+  integer8 hasrelativecriminal;
+  string innetworkactiveexclusionflagdescription;
+  string innetworkactiverevocationflagdescription;
+  string innetworkreinstatedexclusionflagdescription;
+  string innetworkreinstatedrevocationflagdescription;
+  string innetworkbankruptcyflagdescription;
+  string innetworkcriminalflagdescription;
+  string outnetworkactiveexclusionflagdescription;
+  string outnetworkactiverevocationflagdescription;
+  string outnetworkreinstatedexclusionflagdescription;
+  string outnetworkreinstatedrevocationflagdescription;
+  string outnetworkbankruptcyflagdescription;
+  string outnetworkcriminalflagdescription;
+  string hasassociatebankruptcydescription;
+  string hasassociatecriminaldescription;
+  string hasrelativebankruptcydescription;
+  string hasrelativecriminaldescription;
+ END;
+"
+END

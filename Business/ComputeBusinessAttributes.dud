@@ -1,0 +1,86 @@
+﻿ID "5d6dc6c3-803b-47df-9118-995cc25b3773";
+NAME ComputeBusinessAttributes;
+LABEL "Compute Business Attributes";
+VERSION "1.1.0";
+AUTHOR "CarmigJX";
+CATEGORY COMPUTE;
+DESCRIPTION "Computes additional attributes and flags to support dashboarding of the business data";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING Prefix: LABEL("Append Column Prefix"),DESCRIPTION("Prefix to be appended to the new fields");
+	DATASET dsInput: MAPBYNAME
+		FIELD UltID: LABEL("UltID"),DESCRIPTION("UltID");
+		FIELD SeleID: LABEL("SeleID"),DESCRIPTION("SeleID");
+		FIELD ProxID: LABEL("ProxID"),DESCRIPTION("ProxID");
+    FIELD DateFirstSeen: LABEL("Date First Seen"),DESCRIPTION("Business date first seen in YYYYMMDD format");
+    FIELD DateLastSeen: LABEL("Date Last Seen"),DESCRIPTION("Business date last seen in YYYYMMDD format");
+  END
+	INT NewBusinessThreshold: LABEL("New Business Threshold"),DESCRIPTION("Used to determine if a business is new. Default is 180 days"),DEFAULT("180");
+	INT InactiveThreshold: LABEL("Inactive Threshold"),DESCRIPTION("Used to determine if a business is inactive. Default is 18 months"),DEFAULT("18");
+END
+
+OUTPUTS
+	DATASET dsOutput(dsInput): PREFIX(INPUTS.Prefix),APPEND
+		INTEGER IsNew;
+    INTEGER Inactive;
+    INTEGER HierarchySize;
+  END
+  
+  DATASET newBusinessStats : SIDE, WUID, SMALL
+    BOOLEAN  NewBusinesses : FEW;
+    INTEGER Cnt;
+  END
+
+  DATASET inactiveBusinessStats : SIDE, WUID, SMALL
+    BOOLEAN  InactiveBusinesses : FEW;
+    INTEGER Cnt;
+  END
+END
+
+VISUALIZE BankruptcyAppendStats : LABEL("Bankruptcy Indicators Stats")
+    PIE     NewBusinessesCount(newBusinessStats{NewBusinesses, Cnt}) : TITLE("New Businesses Count"), LABEL(NewBusinesses), WEIGHT(Cnt);
+    PIE     InactiveBusinessesCount(inactiveBusinessStats{InactiveBusinesses, Cnt}) : TITLE("Inactive Businesses Count"), LABEL(InactiveBusinesses), WEIGHT(Cnt);
+END
+
+GENERATES INLINE
+	IMPORT ut;
+  
+  LOCAL rFinalOutput := RECORD
+    RECORDOF(%dsInput%);
+    INTEGER %Prefix%IsNew;
+    INTEGER %Prefix%Inactive;
+    INTEGER %Prefix%HierarchySize;
+  END;
+  
+  LOCAL dDistributed  := DISTRIBUTE(%dsInput%((INTEGER)%UltID%<>0), HASH32(%UltID%, %SeleID%));
+  LOCAL dDup          := DEDUP(SORT(dDistributed, %UltID%, %SeleID%, %ProxID%, LOCAL), %UltID%, %SeleID%, %ProxID%, LOCAL);
+  LOCAL dUltIdCounts  := TABLE(dDup, {%UltID%, HierarchySize := COUNT(GROUP)}, %UltID%, MERGE);
+  
+  LOCAL dIntOutput := JOIN(%dsInput%((INTEGER)%UltID%<>0), dUltIdCounts, 
+    LEFT.UltID=RIGHT.UltID, LEFT OUTER, HASH);
+  
+  LOCAL dFinalOutput := PROJECT(dIntOutput + PROJECT(%dsInput%((INTEGER)%UltID%=0), {RECORDOF(LEFT), INTEGER HierarchySize := 0}),
+    TRANSFORM(rFinalOutput,
+    SELF.%Prefix%HierarchySize := LEFT.HierarchySize;
+    SELF.%Prefix%IsNew    := (INTEGER)(ut.DaysApart(ut.GetDate,(STRING8)LEFT.%DateFirstSeen%) <= %NewBusinessThreshold%);
+    SELF.%Prefix%Inactive := (INTEGER)(ut.monthsApart_YYYYMMDD(ut.GetDate,(STRING8)LEFT.%DateLastSeen%) >= %InactiveThreshold%);
+    SELF  := LEFT));
+
+  %^edsOutput% 	:= dFinalOutput %^p%;
+  %^enewBusinessStats% := TABLE(%dsOutput%,{BOOLEAN NewBusinesses := %Prefix%IsNew, INTEGER Cnt := COUNT(GROUP)}, %Prefix%IsNew, MERGE);
+  %^einactiveBusinessStats% := TABLE(%dsOutput%,{BOOLEAN InactiveBusinesses := %Prefix%Inactive, INTEGER Cnt := COUNT(GROUP)}, %Prefix%Inactive, MERGE);
+ENDGENERATES
+
+
+RESOURCES
+	FILE readme: FILENAME("ComputeBusinessAttributes_ReadMe.txt"),LABEL("Plugin Readme File");
+	FILE computebusinessattributes_testcmp: FILENAME("computebusinessattributes_testcmp.txt"),LABEL("Plugin Test Composition");
+	FILE ComputeBusinessAttributes_BuildTestDataset: FILENAME("ComputeBusinessAttributes_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+  ECL  ut:FILENAME("ut"), URL("<http://10.241.100.153:8010>"); 
+	LOGICALFILE test: FILENAME("~qa::business::computebusinessattributes::input"),URL("http://10.241.100.159:8010"),DALIIP("10.241.100.159"),CLUSTER("thor100_100cert");
+END

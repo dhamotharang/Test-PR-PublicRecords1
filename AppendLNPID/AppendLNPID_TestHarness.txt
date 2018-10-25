@@ -1,0 +1,14 @@
+Plugin AppendLNPID's test composition AppendLNPID_testcmp ran and completed with
+ state "completed"
+Control workunit W20180208-134350 and this test workunit W20180208-135024 had th
+e same number of results
+Control workunit W20180208-134350has no outputs that are missing from test worku
+nit W20180208-135024
+No results were found in test workunit W20180208-135024 that weren't in the cont
+rol workunit W20180208-134350
+All workunit results had the same number of records in the control workunit W201
+80208-134350 and this test workunit W20180208-135024
+The content of all workunit results was the same in the control workunit W201802
+08-134350 and the current test workunit W20180208-135024
+Plugin AppendLNPID passed compliance check
+Plugin AppendLNPID passed compliance check

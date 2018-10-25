@@ -1,0 +1,86 @@
+﻿ID "e523f7cd-c232-4f40-2772-29cf2222272e";
+NAME AppendFacilityAttributes;
+LABEL "Facility Shell Attribute Append";
+CATEGORY APPEND;
+VERSION "1.0.0";
+AUTHOR "periassx";
+DESCRIPTION "Append Facility Shell Attributes using LNFID";
+
+PERMISSIONS
+ VIEW:PUBLIC;
+ EDIT:PRIVATE;
+ RUN:PUBLIC;
+END
+ 
+INPUTS
+    STRING Prefix:LABEL("Append Column Prefix"),DEFAULT("FacilityAttr");
+    DATASET dsInput:MAPBYNAME
+		FIELD LNFID:LABEL("Facility ID"),DESCRIPTION("Lexis Nexis Facility ID"); 
+    END
+    STRING GCID:LABEL("GLOBAL COMPANY ID"),DEFAULT("^GLOBAL|GCID");
+    STRING JOBID:LABEL("Job ID"),DEFAULT("^GLOBAL|JOBID");
+    STRING FCRA:LABEL("FCRA"),DEFAULT("^GLOBAL|FCRA");
+    STRING DPPAPURPOSE:LABEL("DPPA Purpose"),DEFAULT("^GLOBAL|DPPAPURPOSE");
+    STRING GLBPURPOSE:LABEL("GLB Purpose"),DEFAULT("^GLOBAL|GLBPURPOSE");
+    STRING DATAPERMISSIONMASK:LABEL("Data Permission Mask"),DEFAULT("^GLOBAL|DATAPERMISSIONMASK");
+    STRING DATARESTRICTIONMASK:LABEL("Data Restriction Mask"),DEFAULT("^GLOBAL|DATARESTRICTIONMASK");
+    STRING SSNMASK:LABEL("SSN Mask"),DEFAULT("^GLOBAL|SSNMASK");
+    STRING INDUSTRYCLASS:LABEL("Industry Class"),DEFAULT("^GLOBAL|INDUSTRYCLASS");
+    STRING DLMASK:LABEL("Driver's License Mask"),DEFAULT("^GLOBAL|DLMASK");
+    STRING DOBMASK:LABEL("Date of Birth Mask"),DEFAULT("^GLOBAL|DOBMASK");
+END
+
+OUTPUTS
+    DATASET dsOutput(dsInput):PREFIX(INPUTS.Prefix), APPEND
+			STRING1	  EntityType;
+			STRING120 CNAME;
+			STRING10  NPINUMBER;
+			STRING8   NPIEnumerationDate;
+			STRING8   NPIDeactivationDate;
+			STRING8   NPIReactivationDate;
+			STRING1	  NPIFlag;
+			STRING10  DEANumber;
+			STRING1	  isStateSanction;
+			STRING1	  isOIGSanction;
+			STRING1	  isOPMSanction;
+			STRING10  Taxonomy;
+			STRING50  TaxonomyDescription;		
+			STRING3	  SpecialityCode;	
+			STRING40  GroupKey;
+			STRING10  Clia;
+			STRING7   NCPDP;
+	END
+
+    DATASET PerStats:PREFIX(INPUTS.Prefix),SIDE,SMALL, WUID
+        STRING  FieldName;
+        INTEGER FieldPercent;
+    END
+END
+
+VISUALIZE AppendProviderDataStats:LABEL("Append Provider Data Stats")
+	TABLE FieldPopulationPercentage(PerStats{FieldName, FieldPercent}) : VALUE (FieldName, FieldPercent) , LABEL ("FieldName", "FieldPercentage");	
+END
+
+GENERATES INLINE 
+ IMPORT AppendFacilityAttributes;
+ 
+ LNFIDResults := AppendFacilityAttributes.macAppendFacilityAttributes (%dsInput%, %LNFID%, ,'%Prefix%');
+
+ %^edsOutput% := LNFIDResults %^p%; 
+
+ IMPORT HealthCare;
+ PercentageResults := HealthCare.Mac_Field_Percentage (%dsOutput%, '%Prefix%');
+ %^ePerStats% := TABLE (PercentageResults,{%Prefix%FieldName, %Prefix%FieldPercent}); 
+ENDGENERATES
+
+RESOURCES
+    INDEX Key_Facility_Attributes:FILENAME("~thor::key::healthcarefacility::qa::shell"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    LOGICALFILE testinput:FILENAME("~qa::appendfacilityattributes::appendfacilityattributes::input"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    ECL AppendFacilityAttributes:FILENAME("AppendFacilityAttributes"), URL("http://10.241.100.153:8010");
+    ECL HealthCare:FILENAME("HealthCare"), URL("http://10.241.100.153:8010");
+    FILE ReadMe: FILENAME("AppendFacilityAttributes_ReadMe.txt"),LABEL("Plugin Readme File");
+    FILE AppendFacilityAttributes_testcmp: FILENAME("AppendFacilityAttributes_testcmp.txt"),LABEL("Plugin Test Composition");
+    FILE AppendFacilityAttributes_BuildTestDataset: FILENAME("AppendFacilityAttributes_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+    FILE AppendFacilityAttributesChecklist: FILENAME("AppendFacilityAttributesChecklist.xlsx"),LABEL("Checklist");
+    FILE AppendFacilityAttributes_TestHarness: FILENAME("AppendFacilityAttributes_TestHarness.txt"),LABEL("Test Harness");
+END

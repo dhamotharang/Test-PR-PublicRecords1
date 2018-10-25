@@ -1,0 +1,41 @@
+ID "HIPIE_Plugins.AppendBankruptcyFlag.AppendBankruptcyFlag_cmp";
+NAME appendbankruptcyflag_testcmp;
+LABEL "Test composition for Append Bankruptcy Flag";
+DESCRIPTION "Auto-generated test composition for plugin AppendBankruptcyFlag";
+VERSION "1.0.0";
+AUTHOR "CarmigJX";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING CompareWUID: DEFAULT("W20171215-161914");
+END
+
+INSTANCE OutDataset.OutDataset(Ins004): LABEL("Output Dataset"),VERSION("2.0")
+	dsInput="^Ins003|dsOutput"
+	name="~qa::appendbankruptcyflag::appendbankruptcyflag::output"
+	Method="THOR"
+END
+
+INSTANCE AppendBankruptcyFlag.AppendBankruptcyFlag(Ins003): LABEL("Append Bankruptcy Flag"),VERSION("1.0.0")
+	dsInput="^Ins002|dsOutput"
+  Prefix="TestPrefix"
+  LexID="did"
+END
+
+INSTANCE AppendBankruptcyFlag.AppendBankruptcyFlag(Ins002): LABEL("Append Bankruptcy Flag"),VERSION("1.0.0")
+  dsInput="^Ins001|dsOutput"
+  Prefix="Provider"
+  LexID="did"
+END 
+
+INSTANCE UseDataset.UseDataset(Ins001): LABEL("Use Dataset"),VERSION("1.1")
+	LogicalFilename="~qa::appendbankruptcyflag::appendbankruptcyflag::input"
+	Structure="RECORD
+    UNSIGNED8 did;
+  END;"
+  Method=THOR
+END

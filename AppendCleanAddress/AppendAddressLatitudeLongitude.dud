@@ -1,0 +1,80 @@
+﻿ID "33893ba0-edf1-417d-b619-0be5b498b93a";
+NAME AppendAddressLatitudeLongitude;
+LABEL "Append Address Latitude Longitude";
+VERSION "1.0.0";
+AUTHOR "CarmigJX";
+CATEGORY APPEND;
+DESCRIPTION "Appends latitude and longitude from an address";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+
+INPUTS
+	STRING Prefix: LABEL("Append Column Prefix"),DESCRIPTION("Prefix will be appended to the new latitude and longitude columns");
+	DATASET dsInput: MAPBYNAME
+		FIELD PrimaryRange: LABEL("Primary Range"),DESCRIPTION("Primary Range, street number");
+		FIELD PreDirectional: LABEL("Pre Directional"),DESCRIPTION("Pre Directional");
+		FIELD PrimaryName: LABEL("Primary Name"),DESCRIPTION("Primary Name, street name");
+		FIELD AddressSuffix: LABEL("Address Suffix"),DESCRIPTION("Address Suffix");
+		FIELD PostDirectional: LABEL("Post Directional"),DESCRIPTION("Post Directional");
+		FIELD UnitDesignation: LABEL("UnitDesignation"),DESCRIPTION("UnitDesignation");
+		FIELD SecondaryRange: LABEL("Secondary Range"),DESCRIPTION("Secondary Range, Apt or Suite");
+		FIELD City: LABEL("City"),DESCRIPTION("City");
+		FIELD State: LABEL("State"),DESCRIPTION("Two-letter state abbreviation");
+		FIELD Zip: LABEL("5-Digit Zip Code"),DESCRIPTION("Zip Code 5");
+	END
+	ENUM("0", "1", "4", "5")GeoMatchCodeThreshold:LABEL("GeoMatchCode Threshold"), DESCRIPTION("GeoMatchCode threshold for appending latitude and longitude"), OPTIONAL, DEFAULT("0");
+END
+
+OUTPUTS
+	DATASET dsOutput(dsInput): PREFIX(INPUTS.Prefix),APPEND
+		REAL Latitude;
+		REAL Longitude;
+		STRING GeoMatchCode;
+	END
+	DATASET GeoMatchStats: WUID,SIDE
+		STRING GeoMatchCode: FEW;
+		INTEGER Cnt;
+	END
+	DATASET HitStats: WUID,SIDE
+		INTEGER LatitudeHitCnt;
+		INTEGER LatitudeNoHitCnt;
+		INTEGER LongitudeHitCnt;
+		INTEGER LongitudeNoHitCnt;
+	END
+END
+
+VISUALIZE ErrorsAndGeo: LABEL("Address Clean")
+	TABLE HitCounts(HitStats): TITLE("Latitude and Longitude Hit Counts"),LABEL("Latitude Hit","Latitude No Hit","Longitude Hit","Longitude No Hit"),VALUE(LatitudeHitCnt,LatitudeNoHitCnt,LongitudeHitCnt,LongitudeNoHitCnt);
+	BAR GeoLevelStats(GeoMatchStats{GeoMatchCode,SUM(Cnt)}): LABEL(GeoMatchCode),WEIGHT(SUM(Cnt));
+END
+
+GENERATES INLINE
+	IMPORT AppendCleanAddress, Address;
+
+	rFinalOutput := RECORD
+	 RECORDOF(%dsInput%);
+	 REAL %Prefix%Latitude;
+	 REAL %Prefix%Longitude;
+	 STRING %Prefix%GeoMatchCode;
+	END;
+
+	FinalOutput := AppendCleanAddress.macAppendAddressLatitudeLongitude(%dsInput%,%PrimaryRange%,%PreDirectional%,%PrimaryName%,%AddressSuffix%,%PostDirectional%,
+		%UnitDesignation%,%SecondaryRange%,%City%,%State%,%Zip%,%Prefix%Latitude,%Prefix%Longitude, %Prefix%GeoMatchCode, %GeoMatchCodeThreshold%);  
+		
+	%^edsOutput% := FinalOutput %^p%;
+	%^eGeoMatchStats% := TABLE(%dsOutput%, {STRING GeoMatchCode:=(STRING)%Prefix%GeoMatchCode, Cnt := COUNT(GROUP)}, %Prefix%GeoMatchCode, MERGE);
+	%^eHitStats% := TABLE(%dsOutput%, {LatitudeHitCnt := COUNT(GROUP, %Prefix%Latitude<>0), LatitudeNoHitCnt := COUNT(GROUP, %Prefix%Latitude=0), LongitudeHitCnt := COUNT(GROUP, %Prefix%Longitude<>0), LongitudeNoHitCnt := COUNT(GROUP, %Prefix%Longitude=0)}, MERGE);
+ENDGENERATES
+
+
+RESOURCES
+	FILE readme: FILENAME("AppendAddressLatitudeLongitude_README.txt"),LABEL("Plugin Readme File");
+	FILE AppendAddressLatitudeLongitude_testcmp: FILENAME("AppendAddressLatitudeLongitude_testcmp.txt"),LABEL("Plugin Test Composition");
+	FILE AppendAddressLatitudeLongitude_BuildTestDataset: FILENAME("AppendAddressLatitudeLongitude_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+	ECL AppendCleanAddress:FILENAME("AppendCleanAddress"), URL("http:// 10.241.100.153:8010");
+	ECL Address:FILENAME("Address"), URL("http:// 10.241.100.153:8010");    
+END

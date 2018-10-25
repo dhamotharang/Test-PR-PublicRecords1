@@ -1,0 +1,140 @@
+NAME AppendACA;
+ID "AppendACA.AppendACA_cmp";
+LABEL "Append Prison Attributes";
+CATEGORY APPEND;
+VERSION "1.0.0";
+AUTHOR "campda01";
+DESCRIPTION "Append prison attributes (Institution name, type, and address type).  Matching requires cleaned address attributes.";
+
+PERMISSIONS
+    VIEW:PUBLIC;
+    EDIT:PRIVATE;
+    RUN:PUBLIC;
+END
+
+INPUTS
+	STRING Prefix:LABEL("Append Column Prefix"),DEFAULT("ACA");
+    DATASET dsInput : MAPBYNAME
+        FIELD PrimaryRange : LABEL("Primary Range"), DESCRIPTION("Primary Range, street number");
+        FIELD PrimaryName : LABEL("Primary Name"), DESCRIPTION("Primary Name, street name");
+        FIELD AddressSuffix : LABEL("Address Suffix"), DESCRIPTION("Address Suffix");
+        FIELD PreDirectional : LABEL("Pre-Direction"), DESCRIPTION("Pre-Directional");
+        FIELD PostDirectional : LABEL("Post-Direction"), DESCRIPTION("Post-Directional");
+        FIELD SecondaryRange : LABEL("Secondary Range"), DESCRIPTION("Secondary Range, Apt or Suite");
+        FIELD City : LABEL("City"), DESCRIPTION("City");
+        FIELD State : LABEL("State"), DESCRIPTION("Two-letter state abbreviation");
+        FIELD Zip5 : LABEL("5-Digit Zip Code"), DESCRIPTION("Zip Code");
+    END
+END
+
+OUTPUTS
+    DATASET dsOutput(dsInput) : PREFIX(INPUTS.Prefix), APPEND
+        STRING1     HitFound;
+        STRING200   Institution;
+        STRING2     InstitutionType;
+        STRING10    InstitutionTypeExp;
+        STRING1     AddressType;
+    END
+
+    DATASET dsAppendACATempDS : SIDE, LARGE
+        STRING1     HitFound;
+        STRING      WasFound;
+        STRING10    InstitutionTypeExp;
+        STRING2     State;
+    END
+
+    DATASET acaHitStats : SIDE, WUID, SMALL
+        STRING      WasFound : FEW;
+        INTEGER     Cnt;
+    END
+
+    DATASET acaAppendStats : SIDE, WUID, SMALL
+        STRING10    InstitutionTypeExp : FEW;
+        STRING2     State : FEW;
+        INTEGER     Cnt;
+    END
+END
+
+VISUALIZE ACAAppendStats : LABEL("Append Prison Attributes Stats")
+    TABLE   HitRate(acaHitStats{WasFound, Cnt}) : TITLE("Hit Rate"), LABEL("Status", "Count"), VALUE(WasFound, Cnt);
+    PIE     InstitutionTypeExp(acaAppendStats{InstitutionTypeExp, SUM(Cnt)}) : TITLE("Institution Type"), LABEL(InstitutionTypeExp), WEIGHT(SUM(Cnt)), SELECTS(InstitutionTypeExp->StatesFound);
+    CHORO   StatesFound(acaAppendStats{InstitutionTypeExp, State, SUM(Cnt)}) : FILTER(InstitutionTypeExp), TITLE("Where Found"), STATE(State), WEIGHT(SUM(Cnt)), COLOR(Red_Yellow_Blue);
+END
+
+GENERATES INLINE
+    IMPORT AppendACA;
+
+    functionResult := AppendACA.FN_AppendACA
+        (
+            %dsInput%,
+            %PrimaryRange%,
+            %PrimaryName%,
+            %AddressSuffix%,
+            %PreDirectional%,
+            %PostDirectional%,
+            %SecondaryRange%,
+            %City%,
+            %State%,
+            %Zip5%,
+            %^qPrefix%
+        );
+
+    %^edsOutput% := functionResult %^p%;
+
+	AppendStatsInfoLayout := RECORD
+        STRING1     HitFound;
+        STRING      WasFound;
+        STRING10    InstitutionTypeExp;
+        STRING2     State;
+	END;
+	
+    // Build append stats side dataset without the prefix
+    %^edsAppendACATempDS% := PROJECT
+        (
+            %dsOutput%,
+            TRANSFORM
+                (
+                    AppendStatsInfoLayout,
+                    SELF.HitFound := LEFT.%Prefix%HitFound,
+                    SELF.WasFound := IF(SELF.HitFound = 'Y', 'Matched', 'Unmatched'),
+                    SELF.InstitutionTypeExp := IF
+                        (
+                            LEFT.%Prefix%InstitutionTypeExp != '',
+                            LEFT.%Prefix%InstitutionTypeExp,
+                            'UNKNOWN'
+                        ),
+                    SELF.State := LEFT.%State%
+                )
+        );
+
+    %^eacaHitStats% := TABLE
+        (
+            %dsAppendACATempDS%,
+            {
+                WasFound,
+                INTEGER Cnt := COUNT(GROUP)
+            },
+            WasFound,
+            MERGE
+        );
+
+    %^eacaAppendStats% := TABLE
+        (
+            %dsAppendACATempDS%(HitFound = 'Y'),
+            {
+                InstitutionTypeExp,
+                State,
+                INTEGER Cnt := COUNT(GROUP)
+            },
+            InstitutionTypeExp, State,
+            MERGE
+        );
+ENDGENERATES
+
+RESOURCES
+    INDEX Key_ACA_Addr:FILENAME("~thor_data400::key::aca_institutions_addr_qa"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100dev");
+    FILE readme:FILENAME("AppendACA_README.txt"),DESCRIPTION("README for this plugin"),LABEL("README");
+    FILE localfile:FILENAME("AppendACA_testcmp.txt"),DESCRIPTION("Test composition for running this plugin"),LABEL("Test composition");
+	FILE AppendACA_BuildTestDataset: FILENAME("AppendACA_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+    LOGICALFILE test:FILENAME("~qa::appendaca::appendaca::input"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+END

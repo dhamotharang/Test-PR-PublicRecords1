@@ -1,0 +1,5 @@
+testcompositionrun_info
+Monitoring WU W20170321-170635(HIPIE_BCTLWXCARMIGJX_ComputeBizUnknownBusinessAttributestestcmp_CarmigJX) to completion.
+
+testcompositionrun_err
+Plugin ComputeBizUnknownBusinessAttributes passed compliance check

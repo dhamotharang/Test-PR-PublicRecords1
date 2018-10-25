@@ -1,0 +1,47 @@
+﻿ID "395608ff-bc65-4be6-9a0a-8844697331b1";
+NAME CleanFacilityName;
+LABEL "Clean Facility Name";
+VERSION "1.0.0";
+AUTHOR "CarmigJX";
+CATEGORY CLEAN;
+DESCRIPTION "Clean facility name";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING Prefix: LABEL("Append Column Prefix"),DESCRIPTION("This prefix will be appended to all fields added by this plugin."),DEFAULT("Clean");
+	DATASET dsInput: MAPBYNAME
+    FIELD FacilityName: LABEL("Facility Name"),DESCRIPTION("Facility name to clean");
+  END
+END
+
+OUTPUTS
+	DATASET dsOutput(dsInput): PREFIX(INPUTS.Prefix),APPEND
+		STRING FacilityName;
+END
+END
+
+GENERATES INLINE
+  IMPORT HealthCareFacility;
+	rOut := RECORD
+    RECORDOF(%dsInput%);
+    STRING %Prefix%FacilityName;
+  END;
+  
+  %^edsOutput% := PROJECT(%dsInput%, TRANSFORM(rOut,
+    SELF.%Prefix%FacilityName := IF((STRING)LEFT.%FacilityName% <> '', HealthCareFacility.clean_facility_name ((STRING)LEFT.%FacilityName%), '');
+    SELF := LEFT));
+ENDGENERATES
+
+
+RESOURCES
+	FILE readme: FILENAME("CleanFacilityName_ReadMe.txt"),LABEL("Plugin Readme File");
+	FILE cleanfacilityname_testcmp: FILENAME("cleanfacilityname_testcmp.txt"),LABEL("Plugin Test Composition");
+	FILE CleanFacilityName_BuildTestDataset: FILENAME("CleanFacilityName_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+	ECL HealthCareFacility: FILENAME("HealthCareFacility"),URL("http://10.241.100.153:8010");
+	FILE checklist: FILENAME("CleanFacilityNameChecklist.xlsx"),LABEL("Plugin Checklist");
+  LOGICALFILE test: FILENAME("~qa::cleanfacilityname::cleanfacilityname::input"),URL("http://10.241.100.159:8010"),DALIIP("10.241.100.159"),CLUSTER("thor100_100dev");
+END

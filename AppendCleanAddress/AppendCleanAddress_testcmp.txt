@@ -1,0 +1,40 @@
+ID "AppendCleanAddress.AppendCleanAddress_cmp";
+NAME AppendCleanAddress; 
+LABEL "Append Clean Address Test";
+DESCRIPTION "Append the cleaned address."; 
+VERSION "1.0.0";
+AUTHOR prichajx;
+PERMISSIONS
+VIEW:PRIVATE; 
+EDIT:PRIVATE;
+RUN:PRIVATE;
+END
+
+INPUTS
+    STRING CompareWUID : DEFAULT("W20151104-124354");
+END
+
+INSTANCE UseDataset.UseDataset(Ins001)
+	LogicalFilename="~qa::appendcleanaddress::appendcleanaddress::input"
+	Method=THOR
+	Structure="{string addr1,string addr2,string city,string st,string zip};"
+END    
+
+INSTANCE AppendCleanAddress.AppendCleanAddress(Ins002)
+	dsInput=^Ins001|dsOutput
+	AddressLine1=addr1
+	AddressLine2=addr2
+	City=city  
+	State=st
+	Zip=zip 
+	Prefix="Address"
+END  
+ 
+INSTANCE OutDataset.OutDataset(Ins003)
+	name="~qa::appendcleanaddress::appendcleanaddress::output"
+	Method=THOR
+	dsInput=^Ins002|dsOutput
+END   
+
+ 
+

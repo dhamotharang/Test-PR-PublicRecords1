@@ -1,0 +1,5 @@
+testcompositionrun_info
+Monitoring WU W20170209-171517(HIPIE_BCTLWXCARMIGJX_CleanFacilityName_testcmp_CarmigJX) to completion.
+
+testcompositionrun_err
+Plugin CleanFacilityName passed compliance check

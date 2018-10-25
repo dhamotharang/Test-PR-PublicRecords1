@@ -1,0 +1,213 @@
+ID "HIPIE_Plugins.JoinDataset.JoinDataset_cmp";
+NAME joindataset_testcmp;
+LABEL "Test composition for Join Dataset";
+DESCRIPTION "Auto-generated test composition for plugin JoinDataset";
+VERSION "1.1.0";
+AUTHOR "CarmigJX";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING CompareWUID: DEFAULT("W20180809-134037");
+END
+
+
+INSTANCE JoinDataset.JoinDataset(Ins003): LABEL("Join Dataset"),VERSION("1.1.0")
+  dsInput1="^Ins005|dsOutput"
+  dsInput2="^Ins002|dsOutput"
+  JoinFields1="customer_account"
+  JoinFields2="customer_account"
+  AppendFields="executivelexid","executivetitle","executivefirstname","executivemiddlename","executivelastname","executivesuffix","executivejobtitle","executivecontacttype","executiveisexecutive","executiveexecutiveorder","executivedatefirstseen","executivedatelastseen","executiveiscurrent","executivecontactappended","executivecontactidentified"
+  JoinType="Full Outer"
+END 
+
+INSTANCE JoinDataset.JoinDataset(Ins005): LABEL("Join Dataset"),VERSION("1.1.0")
+  dsInput1="^Ins001|dsOutput"
+  dsInput2="^Ins002|dsOutput"
+  JoinFields1="customer_account"
+  JoinFields2="customer_account"
+  AppendFields="executivelexid","executivetitle","executivefirstname","executivemiddlename","executivelastname","executivesuffix","executivejobtitle","executivecontacttype","executiveisexecutive","executiveexecutiveorder","executivedatefirstseen","executivedatelastseen","executiveiscurrent","executivecontactappended","executivecontactidentified"
+  JoinType="Full Outer"
+	Prefix="test2_"
+END 
+
+INSTANCE OutDataset.OutDataset(Ins004): LABEL("Output Dataset"),VERSION("2.0")
+	dsInput="^Ins003|dsOutput"
+	name="~qa::joindataset::joindataset::output"
+	Method="THOR"
+END
+
+INSTANCE OutDataset.OutDataset(Ins006): LABEL("Output Dataset"),VERSION("2.0")
+	dsInput="^Ins005|dsOutput"
+	name="~qa::joindataset::joindataset::test2::output"
+	Method="THOR"
+END
+ 
+INSTANCE UseDataset.UseDataset(Ins001): LABEL("Use Dataset"),VERSION("1.1")
+	LogicalFilename="~qa::joindataset::joindataset::input"
+	Structure="RECORD
+    string customer_account;
+    unsigned8 ultid;
+    unsigned8 orgid;
+    unsigned8 seleid;
+    unsigned8 proxid;
+    unsigned8 powid;
+    unsigned8 empid;
+    unsigned8 dotid;
+    string ro_name_1;
+    string ro_ssn_1;
+    string ro_name_2;
+    string ro_ssn_2;
+    string ro_name_3;
+    string ro_ssn_3;
+    string lexid_ro_1;
+    string lexid_score_ro_1;
+    string verify_best_ssn_score_ro_1;
+    string verify_best_name_score_ro_1;
+    string best_ssn_ro_1;
+    string best_dob_ro_1;
+    string best_dod_ro_1;
+    string best_fname_ro_1;
+    string best_mname_ro_1;
+    string best_lname_ro_1;
+    string best_name_suffix_ro_1;
+    string best_address_ro_1;
+    string best_city_ro_1;
+    string best_state_ro_1;
+    string best_zip_ro_1;
+    string best_zip4_ro_1;
+    string best_addr_date_ro_1;
+    string lexid_ro_2;
+    string lexid_score_ro_2;
+    string verify_best_ssn_score_ro_2;
+    string verify_best_name_score_ro_2;
+    string best_ssn_ro_2;
+    string best_dob_ro_2;
+    string best_dod_ro_2;
+    string best_fname_ro_2;
+    string best_mname_ro_2;
+    string best_lname_ro_2;
+    string best_name_suffix_ro_2;
+    string best_address_ro_2;
+    string best_city_ro_2;
+    string best_state_ro_2;
+    string best_zip_ro_2;
+    string best_zip4_ro_2;
+    string best_addr_date_ro_2;
+    string lexid_ro_3;
+    string lexid_score_ro_3;
+    string verify_best_ssn_score_ro_3;
+    string verify_best_name_score_ro_3;
+    string best_ssn_ro_3;
+    string best_dob_ro_3;
+    string best_dod_ro_3;
+    string best_fname_ro_3;
+    string best_mname_ro_3;
+    string best_lname_ro_3;
+    string best_name_suffix_ro_3;
+    string best_address_ro_3;
+    string best_city_ro_3;
+    string best_state_ro_3;
+    string best_zip_ro_3;
+    string best_zip4_ro_3;
+    string best_addr_date_ro_3;
+    string normalizedrawname;
+    string normalizedrawssn;
+    string normalizedlexid;
+    string normalizedfirstname;
+    string normalizedmiddlename;
+    string normalizedlastname;
+    string normalizednamesuffix;
+    string normalizedssn;
+    string normalizeddob;
+    string normalizeddod;
+    string normalizedaddress;
+    string normalizedcity;
+    string normalizedstate;
+    string normalizedzip;
+    string normalizedzip4;
+    string normalizedaddressdate;
+    string normalizedlexidscore;
+    string normalizedssnscore;
+    string normalizednamescore;
+  END;"
+	Method="THOR" 
+END
+
+INSTANCE HIPIE_Plugins.UseDataset.UseDataset(Ins002): LABEL("Use Dataset"),VERSION("1.1")
+	LogicalFilename="~qa::joindataset::joindataset::input2"
+	Structure="RECORD
+    string customer_account;
+    string fein;
+    string ssn;
+    string suffix;
+    string legal_name;
+    string dba_name;
+    string bus_contact_name;
+    string bus_addr;
+    string bus_secondary_addr;
+    string bus_city;
+    string bus_state;
+    string bus_zip;
+    string busi_mailing_addr;
+    string bus_secondary_mailing_addr;
+    string bus_mailing_city;
+    string bus_mailing_state;
+    string bus_mailing_zip;
+    string ro_name_1;
+    string ro_ssn_1;
+    string ro_name_2;
+    string ro_ssn_2;
+    string ro_name_3;
+    string ro_ssn_3;
+    string10 physicaladdressprimaryrange;
+    string2 physicaladdresspredirectional;
+    string28 physicaladdressprimaryname;
+    string4 physicaladdressaddresssuffix;
+    string2 physicaladdresspostdirectional;
+    string10 physicaladdressunitdesignation;
+    string8 physicaladdresssecondaryrange;
+    string25 physicaladdresspostalcity;
+    string25 physicaladdressvanitycity;
+    string2 physicaladdressstate;
+    string5 physicaladdresszip;
+    string4 physicaladdresszip4;
+    string2 physicaladdressdbpc;
+    string1 physicaladdresscheckdigit;
+    string2 physicaladdressrecordtype;
+    string5 physicaladdresscounty;
+    string10 physicaladdresslatitude;
+    string11 physicaladdresslongitude;
+    string4 physicaladdressmsa;
+    string7 physicaladdressgeoblock;
+    string1 physicaladdressgeomatchcode;
+    string4 physicaladdresserrorstatus;
+    boolean physicaladdresscachehit;
+    boolean physicaladdresscleanerhit;
+    string physicaladdresscleanedaddress;
+    string physicaladdressinputaddress;
+    boolean physicaladdressnoaddressinput;
+    boolean physicaladdressnoaddresscleanererror;
+    string physicaladdresserrorcodedescription;
+    unsigned6 bizrecid;
+    unsigned6 executivelexid;
+    string executivetitle;
+    string executivefirstname;
+    string executivemiddlename;
+    string executivelastname;
+    string executivesuffix;
+    string executivejobtitle;
+    string executivecontacttype;
+    boolean executiveisexecutive;
+    integer8 executiveexecutiveorder;
+    unsigned8 executivedatefirstseen;
+    unsigned8 executivedatelastseen;
+    boolean executiveiscurrent;
+    boolean executivecontactappended;
+    boolean executivecontactidentified;
+  END;"
+	Method="THOR" 
+END

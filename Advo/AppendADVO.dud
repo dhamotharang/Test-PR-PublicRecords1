@@ -1,0 +1,121 @@
+﻿NAME AppendADVO;
+LABEL "ADVO";
+VERSION "1.0.0";
+DESCRIPTION "Append ADVO details for an address";
+AUTHOR "prichajx";
+CATEGORY APPEND;
+
+PERMISSIONS
+ EDIT:PRIVATE;
+ VIEW:PUBLIC;
+ RUN:PUBLIC;
+END
+    
+INPUTS
+    STRING Prefix:LABEL("Append Column Prefix"),DEFAULT("Advo");
+    DATASET dsInput:MAPBYNAME
+        FIELD PrimaryRange:LABEL("Primary Range"), DESCRIPTION("Primary Range, street number");
+        FIELD PrimaryName:LABEL("Primary Name"), DESCRIPTION("Primary Name, street name");
+        FIELD AddressSuffix:LABEL("Address Suffix"), DESCRIPTION("Address Suffix");
+        FIELD PreDirectional:LABEL("Pre-Direction"), DESCRIPTION("Pre-Directional");
+        FIELD PostDirectional:LABEL("Post-Direction"), DESCRIPTION("Post-Directional");
+        FIELD SecondaryRange:LABEL("Secondary Range"), DESCRIPTION("Secondary Range, Apt or Suite");
+        FIELD Zip5:LABEL("Zip Code"), DESCRIPTION("Zip Code");     
+        FIELD County:LABEL("County"), DESCRIPTION("County");
+    END
+END
+
+OUTPUTS
+  DATASET dsOutput(dsInput):PREFIX(INPUTS.Prefix),APPEND
+    STRING1 HitFlag;
+    STRING1 VacancyIndicator;
+    STRING1 ThrowBackIndicator;
+    STRING1 SeasonalDeliveryIndicator;
+    STRING5 SeasonalSuppressionStartDate;
+    STRING5 SeasonalSuppressionEndDate;
+    STRING1 DoNotDeliverIndicator;
+    STRING1 CollegeIndicator;
+    STRING10 CollegeSuppressionStartDate;
+    STRING10 CollegeSuppressionEndDate;
+    STRING1 AddressStyle;
+    STRING5 SimplifyAddressCount;
+    STRING1 DropIndicator;
+    STRING1 ResidentialOrBusinessIndicator;
+    STRING1 OnlyWayToGetMailIndicator;
+    STRING1 RecordTypeCode;
+    STRING1 AddressType;
+    STRING1 AddressUsageType;
+    STRING8 FirstSeenDate;
+    STRING8 LastSeenDate;
+    STRING8 VendorFirstReportedDate;
+    STRING8 VendorLastReportedDate;
+    STRING8 VacationBeginDate;
+    STRING8 VacationEndDate;
+    STRING8 NumberOfCurrentVacationMonths;
+    STRING8 MaxVacationMonths;
+    STRING8 VacationPeriodsCount;  
+  END   
+    
+  DATASET AdvoStats : PREFIX(INPUTS.Prefix), SIDE, SMALL, WUID
+    STRING1 HitFlag;
+    STRING1 VacancyIndicator;
+    STRING1 ThrowBackIndicator;
+    STRING1 SeasonalDeliveryIndicator;
+    STRING1 DoNotDeliverIndicator;
+    STRING1 CollegeIndicator;
+    STRING1 AddressStyle;
+    STRING1 DropIndicator;
+    STRING1 ResidentialOrBusinessIndicator;
+    STRING1 OnlyWayToGetMailIndicator;
+    STRING1 RecordTypeCode;
+    STRING1 AddressType;
+    STRING1 AddressUsageType;
+    INTEGER Cnt;
+  END 
+
+END
+
+VISUALIZE AdvoStatsDashboard  : LABEL("Advo Stats")
+    PIE HitStats(AdvoStats{HitFlag, SUM(Cnt)}) : LABEL(HitFlag),WEIGHT(SUM(Cnt));
+    PIE VacancyIndicatorStats(AdvoStats{VacancyIndicator, SUM(Cnt)}) : LABEL(VacancyIndicator),WEIGHT(SUM(Cnt)); 
+    PIE DropIndicatorStats(AdvoStats{DropIndicator, SUM(Cnt)}) : LABEL(DropIndicator),WEIGHT(SUM(Cnt));
+    PIE AddressUsageTypeStats(AdvoStats{AddressUsageType, SUM(Cnt)}) : LABEL(AddressUsageType),WEIGHT(SUM(Cnt));
+    PIE ResidentialOrBusinessIndicatorStats(AdvoStats{ResidentialOrBusinessIndicator, SUM(Cnt)}) : LABEL(ResidentialOrBusinessIndicator),WEIGHT(SUM(Cnt));
+    PIE AddressTypeStats(AdvoStats{AddressType, SUM(Cnt)}) : LABEL(AddressType),WEIGHT(SUM(Cnt)),SELECTS(AddressType->AddressTypeVacancyStats,AddressTypeDropIndicatorStats,AddressTypeAddressUsageStats); 
+    PIE AddressTypeVacancyStats(AdvoStats{AddressType, VacancyIndicator, SUM(Cnt)}) : FILTER(AddressType), LABEL(VacancyIndicator),WEIGHT(SUM(Cnt)); 
+    PIE AddressTypeDropIndicatorStats(AdvoStats{AddressType, DropIndicator, SUM(Cnt)}) : FILTER(AddressType), LABEL(DropIndicator),WEIGHT(SUM(Cnt));
+    PIE AddressTypeAddressUsageStats(AdvoStats{AddressType, AddressUsageType, SUM(Cnt)}) : FILTER(AddressType), LABEL(AddressUsageType),WEIGHT(SUM(Cnt));
+END
+
+GENERATES INLINE
+
+   IMPORT ADVO, hipie_ECL;
+   
+   ADVOAddresses := ADVO.mac_AppendADVO(%dsInput%, , %PrimaryRange%, %PrimaryName%, %AddressSuffix%, %PreDirectional%, %PostDirectional%, %SecondaryRange%, %Zip5%, '%Prefix%'); 
+
+   %^edsOutput% := ADVOAddresses %^p%;
+   
+   %^eAdvoStats% := TABLE(%dsOutput%, 
+                {%Prefix%HitFlag, %Prefix%VacancyIndicator,%Prefix%ThrowBackIndicator,
+                %Prefix%SeasonalDeliveryIndicator,%Prefix%DoNotDeliverIndicator,
+                %Prefix%CollegeIndicator, %Prefix%AddressStyle, %Prefix%DropIndicator,
+                %Prefix%ResidentialOrBusinessIndicator, %Prefix%OnlyWayToGetMailIndicator,
+                %Prefix%RecordTypeCode, %Prefix%AddressType, %Prefix%AddressUsageType,
+                %Prefix%Cnt := COUNT(GROUP)
+                }, %Prefix%HitFlag, %Prefix%VacancyIndicator,%Prefix%ThrowBackIndicator,
+                %Prefix%SeasonalDeliveryIndicator,%Prefix%DoNotDeliverIndicator,
+                %Prefix%CollegeIndicator, %Prefix%AddressStyle, %Prefix%DropIndicator,
+                %Prefix%ResidentialOrBusinessIndicator, %Prefix%OnlyWayToGetMailIndicator,
+                %Prefix%RecordTypeCode, %Prefix%AddressType, %Prefix%AddressUsageType, MERGE);
+                
+ENDGENERATES
+RESOURCES
+    INDEX Key_Addr1:FILENAME("~thor_data400::key::advo::qa::addr_search1"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100dev");    
+    LOGICALFILE testinput:FILENAME("~qa::appendcleanaddress::appendcleanaddress::input"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    ECL hipie_ecl:FILENAME("hipie_ecl"), URL("http://10.241.100.153:8010");    
+    ECL ADVO:FILENAME("ADVO"), URL("http://10.241.100.153:8010");
+    FILE readme: FILENAME("AppendADVO_README.txt"),LABEL("Plugin Readme File");  
+    FILE AppendADVO_BuildTestDataset: FILENAME("AppendADVO_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+    FILE appendadvo_testcmp: FILENAME("appendadvo_testcmp.txt"),LABEL("Plugin Test Composition");
+END
+

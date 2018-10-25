@@ -1,0 +1,43 @@
+﻿ID "7e91a492-7635-47b9-b4d5-079b7edb0678";
+NAME AppendSequenceId;
+LABEL "Append Sequence Id";
+VERSION "1.0.0";
+AUTHOR "CarmigJX";
+CATEGORY APPEND;
+DESCRIPTION "Sequence records of the input dataset.";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING Prefix: LABEL("Append Column Prefix"),DESCRIPTION("This prefix will be appended to new field added by this plugin");
+	DATASET dsInput: MAPBYNAME;
+  ENUM("True","False") StriclySequential: LABEL("Stricly Sequential IDs"),DESCRIPTION("Append IDs in numerically increasing order"),OPTIONAL,DEFAULT("True");
+  STRING StartingID:LABEL("Starting ID"),OPTIONAL,DEFAULT("1"),DESCRIPTION("The minimum record identifier to assign. Defaults to 1.");
+
+END
+
+OUTPUTS
+	DATASET dsOutput(dsInput): PREFIX(INPUTS.Prefix),APPEND
+		INTEGER RecId;
+END
+END
+
+GENERATES INLINE
+  IMPORT hipie_ecl;
+  
+  %^edsOutput% := hipie_ecl.FN_AppendUniqueID(%dsInput%, %StartingID%, %StriclySequential%,'%Prefix%');  
+  
+ENDGENERATES
+
+
+RESOURCES
+	ECL hipie_ecl: FILENAME("hipie_ecl"),URL("http:// 10.241.100.153:8010");
+	FILE readme: FILENAME("AppendSequenceId_ReadMe.txt"),LABEL("Plugin Readme File");
+	FILE appendsequenceid_testcmp: FILENAME("appendsequenceid_testcmp.txt"),LABEL("Plugin Test Composition");
+	FILE AppendSequenceIdChecklist: FILENAME("AppendSequenceIdChecklist.xlsx"),LABEL("Checklist");
+	FILE AppendSequenceId_BuildTestDataset: FILENAME("AppendSequenceId_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+	LOGICALFILE test: FILENAME("~qa::appendsequenceid::appendsequenceid::input"),URL("http://10.241.100.159:8010"),DALIIP("10.241.100.159"),CLUSTER("thor100_100dev");
+END
