@@ -38,8 +38,8 @@ EXPORT Layouts := MODULE
 	
 	EXPORT borrower_layout:= RECORD
 		UNSIGNED6 Did;
-		STRING11   SSN;
-		UNSIGNED4 DOB;
+		STRING11  SSN;
+		STRING8 DOB;
 		iesp.share.t_Name Name;
 		address_info;
 	END;
