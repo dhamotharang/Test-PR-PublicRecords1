@@ -1,4 +1,4 @@
-﻿import doxie, tools,FraudShared,ut,std,Bank_Routing,IP_Metadata;
+﻿import doxie, tools,FraudShared,ut,std,Bank_Routing,IP_Metadata,FraudGovPlatform;
 
 export Keys(
 	 string pversion = ''
@@ -108,8 +108,17 @@ export Keys(
 // Ip Range End
 
 //Mbs DeltaBase
+
+	shared Mbs_demo	:= FraudGovPlatform.Files().Input.MbsDemoData.Sprayed(status=1,regexfind('DELTA',fdn_file_code,nocase));
+
+	shared Mbs_orig	:= FraudShared.files().input.Mbs.Sprayed(status=1,regexfind('DELTA',fdn_file_code,nocase));
+
+	shared MbsSrt			:= Sort((Mbs_orig + Mbs_demo), fdn_file_info_id,fdn_file_code,gc_id,file_type,ind_type);
+
+	shared MbsRoll			:= Rollup(MbsSrt, Transform(recordof(left),self:=left), fdn_file_info_id,fdn_file_code,gc_id,file_type,ind_type);
 	
-	shared Base_MbsDeltaBase							:= Join(Files().Input.Mbs.Sprayed(status=1,regexfind('DELTA',fdn_file_code,nocase)),Files().Input.MbsFdnIndType.Sprayed(status=1)
+	shared Base_MbsDeltaBase							:= Join(if(FraudGovPlatform._Flags.UseDemoData,MbsRoll,Mbs_orig)
+																							,Files().Input.MbsFdnIndType.Sprayed(status=1)
 																							,left.ind_type=right.ind_type
 																							,Transform(Layouts_Key.Classification.Permissible_use_access,
 																										self.Ind_type_description:=ut.CleanSpacesAndUpper(right.description)
