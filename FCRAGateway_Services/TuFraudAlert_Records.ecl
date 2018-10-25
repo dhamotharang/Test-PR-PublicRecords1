@@ -48,7 +48,7 @@ EXPORT TuFraudAlert_Records(dataset(iesp.tu_fraud_alert.t_TuFraudAlertRequest) i
   //Previously NOCALL would be set if we didn't have a lexID, or if we had FFD suppression.
   //Due to remote linking we call FFD after results, and always call gateway regardless of lexID resolution.
   //NOCALL is no longer relevant to this service.
-  validation_code := MAP(remote_linking_result.match => constants.ValidationCode.REMOTE_LINKING_MATCH,
+  validation_code := MAP(remote_linking_result.match => constants.ValidationCode.DID_MATCH,
     ds_tufa_soap_response[1].response._header.status = constants.GatewayStatus.ERROR => constants.ValidationCode.INVALID_RESPONSE,
     FCRAGateway_Services.Functions.GetValidationCode(input_lexID, output_lexID));
 

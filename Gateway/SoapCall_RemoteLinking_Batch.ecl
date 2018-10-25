@@ -5,8 +5,9 @@ IMPORT Gateway, InsuranceHeader_RemoteLinking;
 EXPORT SoapCall_RemoteLinking_Batch(
   DATASET(InsuranceHeader_RemoteLinking.Layouts.ServiceInputLayout_Batch) request,
   DATASET(Gateway.layouts.config) gateways,
-  INTEGER waittime=10,
-  INTEGER retries=Gateway.Constants.Defaults.RETRIES
+  //Below values mimic picklist.
+  INTEGER waittime=3,
+  INTEGER retries=0
 ) := FUNCTION
 
   //Grab the remote linking URL. Remote linking uses neutral roxie.

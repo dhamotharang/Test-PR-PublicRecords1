@@ -14,7 +14,6 @@ EXPORT Constants := MODULE
     EXPORT INTEGER DID_MISMATCH := 112; // input/out did mismatch
     EXPORT INTEGER NO_CALL := 113; // gateway was never called
     EXPORT INTEGER INVALID_RESPONSE := 114; // gateway had an invalid response
-    EXPORT INTEGER REMOTE_LINKING_MATCH := 115; // remote linking found a match
   END;
 
   ValidationCodes := DATASET ([
@@ -24,8 +23,7 @@ EXPORT Constants := MODULE
     {ValidationCode.OUTPUT_DID_NOTFOUND, 'Output does not resolve to LexID.'},
     {ValidationCode.DID_MISMATCH, 'Failed to validate consumer LexID.'},
     {ValidationCode.NO_CALL, 'Gateway was not called.'},
-    {ValidationCode.INVALID_RESPONSE, 'Gateway had invalid response.'},
-    {ValidationCode.REMOTE_LINKING_MATCH, 'Remote Linking was a match.'}
+    {ValidationCode.INVALID_RESPONSE, 'Gateway had invalid response.'}
     ], {INTEGER code, STRING description});
 
   DictValidationCodesDesc := DICTIONARY (ValidationCodes, {code => description});
