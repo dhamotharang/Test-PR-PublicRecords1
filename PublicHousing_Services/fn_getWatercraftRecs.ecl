@@ -1,5 +1,5 @@
 
-IMPORT BatchDatasets, Doxie_Regression, Std, WatercraftV2_Services;
+IMPORT BatchDatasets, WatercraftV2_Services;
 
 EXPORT fn_getWatercraftRecs(DATASET(Layouts.batch_in) ds_batch_in, IParams.BatchParams in_mod) :=
 	FUNCTION

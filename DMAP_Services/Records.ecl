@@ -1,28 +1,15 @@
 ﻿IMPORT $, iesp, Doxie, AutostandardI, STD, ut, LN_PropertyV2_Services;
 
-EXPORT Records($.Layouts.Input_Layout input):= FUNCTION
-	
-	gm:= AutostandardI.GlobalModule();
-	INTEGER GLBA:= AutoStandardI.InterfaceTranslator.GLB_Purpose.val(PROJECT(gm,AutoStandardI.InterfaceTranslator.GLB_Purpose.params));	
-	INTEGER DPPA:= AutoStandardI.InterfaceTranslator.DPPA_Purpose.val(PROJECT(gm,AutoStandardI.InterfaceTranslator.DPPA_Purpose.params));
-	BOOLEAN probation_override_value:= AutoStandardI.InterfaceTranslator.probation_override_value.val(PROJECT(gm,AutoStandardI.InterfaceTranslator.probation_override_value.params));
-	BOOLEAN IncludeModel:= TRUE; 	// Defaulted to TRUE to get Verification of Occupancy Score
-	BOOLEAN IncludeReport:= TRUE;	// Defaulted to TRUE to get Verification of Occupancy Score
-	drm:= gm.DataRestrictionMask;
-	dpm:= gm.DataPermissionMask;
-	STRING5 industryclass:= AutoStandardI.InterfaceTranslator.industry_class_val.val(PROJECT(gm,AutoStandardI.InterfaceTranslator.industry_class_val.params));
-	BOOLEAN isUtility:=  ut.IndustryClass.Is_Utility;	
-	BOOLEAN glb_ok:= ut.glb_ok(GLBA);
-	BOOLEAN dppa_ok:= ut.dppa_ok(DPPA);
+EXPORT Records($.Layouts.Input_Layout input, $.IParams.ReportParams input_params):= FUNCTION
 	
 	//	Create a dataset of dids to get Best and All addresses from header records
 	ds_dids:= DATASET([input.did], doxie.layout_references);
 	
 	//	Get best record using did (current address)
-	best_recs:= $.Functions.fn_best_records(ds_dids, GLBA, DPPA, dppa_ok, glb_ok, drm);
+	best_recs:= $.Functions.fn_best_records(ds_dids, input_params);
 	
 	//	Get all addresses associated with did from Header Records (for prior addresses)
-	addr_recs:= $.Functions.fn_comp_addr(ds_dids, GLBA, DPPA, probation_override_value, industryclass);
+	addr_recs:= $.Functions.fn_comp_addr(ds_dids, input_params);
 	
 	//	Join Best address and All addresses from Header to get DateFirstSeen for best address.
 	$.Layouts.borrower_layout xform_addr($.Layouts.borrower_layout L, $.Layouts.borrower_layout R, INTEGER C):= TRANSFORM
@@ -42,8 +29,8 @@ EXPORT Records($.Layouts.Input_Layout input):= FUNCTION
 											 xform_addr(LEFT, RIGHT, COUNTER), LEFT OUTER);
 
 	//	Get Verification of Occupancy Score for all the records
-	voo_recs:= $.Functions.fn_VOOScore(addr_with_dates, drm, GLBA, DPPA, isUtility, IncludeModel, dpm,IncludeReport);
-	
+	voo_recs:= $.Functions.fn_VOOScore(addr_with_dates, input_params);
+		
 	// Separating the best records and sorting them on descending DateLastSeen.
 	sorted_best_recs:= SORT(voo_recs(is_best_address), -DateLastSeen);
 	
@@ -58,12 +45,12 @@ EXPORT Records($.Layouts.Input_Layout input):= FUNCTION
 	//	Subject info with current Address
 	subject_with_currentAddr:= sorted_best_recs[1];
 	
+	// Subject data masking
+	subject_data_masked:= $.Functions.fn_data_masking(subject_with_currentAddr, input_params);
+		
 	//	Subject info with previous Address
 	subject_with_priorAddr:= sorted_prior_recs[1];
-	
-	//Subject previous address
-	prior_address:= PROJECT(subject_with_priorAddr.Address, $.Transforms.xform_t_address(LEFT));
-		
+			
 	//	Get phones for the borrower
 	phones:= $.Functions.fn_get_phones(best_recs[1]);
 	
@@ -88,48 +75,20 @@ EXPORT Records($.Layouts.Input_Layout input):= FUNCTION
 												
 	input_prop_fids:= fids(is_input_property);											
 	
-	//	Get assessinfo for the input property address using fids
+	//	Assessment info for the input property address using fids
 	input_prop_assess_info:= $.Functions.fn_get_assessments(input_prop_fids);
 	
-	//	Get deedinfo for the input property address
+	//	Deedinfo for the input property address
 	input_prop_deed_info:= deed_info(is_input_property)[1];
 			
-	iesp.dmap.t_DMAPReportResult info():= TRANSFORM
-		SELF.Borrower.UniqueId:=(STRING)subject_with_currentAddr.did,
-		SELF.Borrower.Name:= subject_with_currentAddr.Name;
-		SELF.Borrower.DOB:= iesp.ECL2ESP.toDatestring8((STRING8)subject_with_currentAddr.DOB);
-		SELF.Borrower.SSN:= subject_with_currentAddr.SSN;
-		SELF.Borrower.Phone1:= phones[1].phone;
-		SELF.Borrower.Phone2:= phones[2].phone;
-		SELF.Borrower.CurrentAddress:= PROJECT(subject_with_currentAddr.Address, $.Transforms.xform_t_address(LEFT));
-		Years_at_Address_current:= STD.Date.YearsBetween(subject_with_currentAddr.datefirstseen, subject_with_currentAddr.datelastseen);
-		SELF.Borrower.CurrentAddress.YearsAtAddress:= (STRING)Years_at_Address_current;
-		SELF.Borrower.CurrentAddress.VerificationOfOccupancyScore:= (STRING)subject_with_currentAddr.VerificationOfOccupancyScore;
-		SELF.Borrower.CurrentAddress.InferredOwnershipTypeIndex:= (STRING)subject_with_currentAddr.InferredOwnershipTypeIndex;
-		SELF.Borrower.CurrentAddress.OwnOrRent:= subject_with_currentAddr.OwnOrRent;
-		SELF.Borrower.CurrentAddress.VerificationOfOccupancyAsOfDate:= iesp.ECL2ESP.toDatestring8(subject_with_currentAddr.AsOfDate);
-		SELF.Borrower.PriorAddress:= If(Years_at_Address_current< $.Constants.YEARS_AT_CURRENT_ADDRESS_THRESHOLD, prior_address, ROW([],iesp.share.t_Address));
-		SELF.Borrower.PriorAddress.VerificationOfOccupancyScore:= If(Years_at_Address_current< $.Constants.YEARS_AT_CURRENT_ADDRESS_THRESHOLD, (STRING)subject_with_priorAddr.VerificationOfOccupancyScore, '');
-		SELF.Borrower.PriorAddress.InferredOwnershipTypeIndex:= If(Years_at_Address_current< $.Constants.YEARS_AT_CURRENT_ADDRESS_THRESHOLD, (STRING)subject_with_priorAddr.InferredOwnershipTypeIndex, '');
-		SELF.Borrower.PriorAddress.OwnOrRent:= If(Years_at_Address_current< $.Constants.YEARS_AT_CURRENT_ADDRESS_THRESHOLD, subject_with_priorAddr.OwnOrRent, '');	
-		Years_at_Address_prior:= STD.Date.YearsBetween(subject_with_priorAddr.datefirstseen, subject_with_priorAddr.datelastseen);
-		SELF.Borrower.PriorAddress.VerificationOfOccupancyAsOfDate:= If(Years_at_Address_current< $.Constants.YEARS_AT_CURRENT_ADDRESS_THRESHOLD, iesp.ECL2ESP.toDatestring8(subject_with_priorAddr.AsOfDate), ROW([], iesp.share.t_Date));
-		SELF.Borrower.PriorAddress.YearsAtAddress:= If(Years_at_Address_current< $.Constants.YEARS_AT_CURRENT_ADDRESS_THRESHOLD, (STRING)Years_at_Address_prior, '');
-		SELF.OwnedProperties:= owned_prop_addr;
-		SELF.SubjectProperty.Address:= ROW($.Transforms.xform_t_address(input_prop_addr[1]));
-		SELF.SubjectProperty.NoOfUnits:= input_prop_assess_info.NoOfUnits;
-		SELF.SubjectProperty.PropertyType:= input_prop_assess_info.SubjectPropertyType;
-		SELF.SubjectProperty.LegalDescription:= input_prop_assess_info.LegalDescription;
-		SELF.SubjectProperty.YearBuilt:= input_prop_assess_info.YearBuilt;
-		SELF.SubjectProperty.RealEstateTaxesCurrentProperty:= input_prop_assess_info.RealEstateTaxesCurrentProperty;		
-		SELF.SubjectProperty.BorrowerVestingDescription:= input_prop_deed_info.BorrowerVestingDesc;
-		SELF.SubjectProperty.BuyerVestingDescription:= input_prop_deed_info.BuyerVestingDesc;
-		SELF.SubjectProperty.YearLotAcquired:= input_prop_deed_info.YearLotAcquired;
-		SELF.SubjectProperty.OriginalCost:= input_prop_deed_info.OriginalCost;		
-		SELF:= [];
-	END;
-	
-	final_recs:= ROW(info());
+	final_recs:= ROW($.Transforms.xform_finalLayout(subject_data_masked,
+																									subject_with_priorAddr,
+																									phones[1].phone,
+																									phones[2].phone,
+																									input_prop_addr,
+																									input_prop_deed_info,
+																									input_prop_assess_info,
+																									owned_prop_addr));
 	
 	// OUTPUT(in, NAMED('in'));
 	// OUTPUT(best_recs, NAMED('best_recs'));

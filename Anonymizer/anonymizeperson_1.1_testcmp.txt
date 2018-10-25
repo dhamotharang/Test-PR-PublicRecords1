@@ -1,0 +1,43 @@
+﻿ID "HIPIE_Plugins.Anonymizer.AnonymizePerson_cmp";
+NAME "AnonymizePerson_1.1_testcmp";
+LABEL "Test composition for Anonymize Person";
+DESCRIPTION "Auto-generated test composition for plugin AnonymizePerson";
+VERSION "1.1.0";
+AUTHOR "CarmigJX";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING CompareWUID: DEFAULT("W20171214-102122");
+  STRING Anonymize:LABEL("Anonymize"),DEFAULT("TRUE"); 
+END
+INSTANCE OutDataset.OutDataset(Ins003): LABEL("Output Dataset"),VERSION("1.0.0")
+	dsInput="^Ins002|dsOutput"
+	name="~qa::anonymizer::anonymizeperson::output"
+	Method="THOR"
+END
+INSTANCE Anonymizer.AnonymizePerson(Ins002): LABEL("Anonymize Person"),VERSION("1.1.0")
+	dsInput="^Ins001|dsOutput"
+	DateOfBirth="dob"
+	FirstName="fname"
+	Lastname="lname"
+	Gender="gender"
+	SSN="ssn"
+	FullName="fullname"
+  Anonymize=^GLOBAL|Anonymize 
+END
+INSTANCE UseDataset.UseDataset(Ins001): LABEL("Use Dataset"),VERSION("1.1")
+	LogicalFilename="~qa::anonymizer::anonymizeperson::input"
+	Structure="RECORD
+		string fname; 
+		string lname;
+		string gender; 
+		string ssn;
+		INTEGER dob;
+		string fullname;
+	END;"
+	Method="THOR"
+END

@@ -74,5 +74,12 @@ EXPORT Constants :=
       'B2BPaid12M',
       'B2BBalanceAvg03M'
     ];
-    
+  
+  Export OutputType := module
+      EXPORT string1 PDF_ONLY := 'P';    //Means ‘PDF Only’
+      EXPORT string1 PDF_AND_XML := 'B'; //Means ‘PDF and XML’
+      EXPORT string1 XML_ONLY := 'X';    //Means ‘XML Only’
+      EXPORT string1 BLANK := '';        // Empty/Nothing/NotPresent 
+  end;
+
   END;

@@ -30,25 +30,18 @@ EXPORT Functions:= MODULE
 	
 	//	Function to get best record for the did 	
 	EXPORT fn_best_records(DATASET(Doxie.layout_references) dids_in,
-												 INTEGER GLB_Purpose,
-												 INTEGER DPPA_Purpose,
-												 BOOLEAN dppa_ok,
-												 BOOLEAN glb_ok,
-												 STRING  drm):= FUNCTION
-
-		Doxie.mac_best_records(dids_in, did, bestout, dppa_ok, glb_ok, , drm);		
+												 $.IParams.ReportParams input_params):= FUNCTION
+	
+		Doxie.mac_best_records(dids_in, did, bestout, input_params.dppa_ok, input_params.glb_ok, , input_params.drm);
 		recs:= PROJECT(bestout, $.Transforms.xform_bestDmap(LEFT));
 	RETURN recs;
 	END;
 	
 	//	Function to get all addresses for the did	
 	EXPORT fn_comp_addr(DATASET(Doxie.layout_references) dids_in,
-											INTEGER GLB_Purpose,
-											INTEGER DPPA_Purpose,
-											BOOLEAN Probation_Override_Value,
-											STRING5 Industry_Class):= FUNCTION
+											$.IParams.ReportParams input_params):= FUNCTION
  
-		addr:= Doxie.Comp_Subject_Addresses(dids_in, , DPPA_Purpose, GLB_Purpose, , , Probation_Override_Value, Industry_Class).Addresses;
+		addr:= Doxie.Comp_Subject_Addresses(dids_in, , input_params.DPPA, input_params.GLBA, , , input_params.Probation_Override_Value, input_params.Industry_Class).Addresses;
 		address_recs:= PROJECT(addr, $.Transforms.xform_compAddr(LEFT));
 	RETURN address_recs;
 	END;
@@ -61,13 +54,7 @@ EXPORT Functions:= MODULE
 	
 	// Function to calculate Verification Of Occupancy score for the subject and all the addresses. 
  	EXPORT fn_VOOScore(DATASET($.Layouts.borrower_layout) Input,
-										 STRING		drm, 
-										 INTEGER  glba,  
-										 INTEGER  dppa,
-										 BOOLEAN  isUtility,
-										 BOOLEAN  IncludeModel,
-										 STRING	 	dpm,
-										 BOOLEAN	IncludeReport):= FUNCTION							 
+										$.IParams.ReportParams input_params):= FUNCTION							 
 		
 		VerificationOfOccupancy.Layouts.Layout_VOOIn xform_vooIn($.Layouts.borrower_layout L) := TRANSFORM
 			SELF.LexID 								:= L.did;	
@@ -76,7 +63,7 @@ EXPORT Functions:= MODULE
 			asOfDate:= fn_AsOfDate(L.dateFirstSeen, L.dateLastSeen);	
 			SELF.AsOf 								:= IF(std.Date.IsValidDate((INTEGER)asOfDate), asOfDate, $.Constants.DEFAULT_ASOFDATE);
 			SELF.ssn 									:= L.ssn;
-			SELF.dob 									:= (STRING8)L.dob;
+			SELF.dob 									:= L.dob;
 			SELF.Name_Full 						:= L.Name.full;
 			SELF.Name_First  					:= L.Name.First;
 			SELF.Name_Middle 					:= L.Name.middle;
@@ -96,7 +83,7 @@ EXPORT Functions:= MODULE
 			SELF											:= [];
 		END;
 		voo_in := PROJECT(Input, xform_vooIn(LEFT));		
-		voo_out:= VerificationOfOccupancy.Search_Function(voo_in, drm, glba, dppa, isUtility, $.Constants.ATTRIBUTES_VERSION, IncludeModel, dpm, IncludeReport).VOOReport;
+		voo_out:= VerificationOfOccupancy.Search_Function(voo_in, input_params.drm, input_params.glba, input_params.dppa, input_params.isUtility, $.Constants.ATTRIBUTES_VERSION, input_params.IncludeModel, input_params.dpm, input_params.IncludeReport).VOOReport;
 		
 		$.Layouts.dmap_Layout xform_vooOut(VerificationOfOccupancy.Layouts.Layout_VOOBatchOutReport L, $.Layouts.borrower_layout R) := TRANSFORM
 			InferredOwnershipTypeIndex								:= (INTEGER)L.attributes.version1.InferredOwnershipTypeIndex;
@@ -127,6 +114,14 @@ EXPORT Functions:= MODULE
 		deduped_phones:= DEDUP(SORT(phone_recs, Phone), Phone);
 		
 	RETURN deduped_phones;
+	END;
+	
+	// Function to mask DOB and SSN info as per input options	
+	EXPORT fn_data_masking($.Layouts.dmap_Layout subject_current_info, $.IParams.ReportParams input_params):= FUNCTION
+	
+		subject_with_maskedInfo:= ROW($.Transforms.xform_dataMask(subject_current_info, input_params));
+	
+	RETURN subject_with_maskedInfo;
 	END;
 	
 	// Function to get fids for the Input Property Address & Owned Property Address

@@ -35,6 +35,7 @@ export Constants := module
 		export unsigned2 TEASER					:= 240;
 		export unsigned2 FDN_DL_DATA		:= 250;
 		export unsigned2 SBFE					  := 260;
+		export unsigned2 SBFE_PDF		  := 261;
 		export unsigned2 EMAIL					:= 300;
 		export unsigned2 EMAIL_AW				:= 301;
 		export unsigned2 EMAIL_M1				:= 302;
@@ -83,6 +84,7 @@ export Constants := module
 		export unsigned2 CORTERA_FILE := 701;
 		export unsigned2 ACCUDATA_CNAM_CNM2   := 711;
 		export unsigned2 ACCUDATA_OCN_LNP   := 712;
+    
 	end;
 
 	export RoyaltyType := module
@@ -101,6 +103,7 @@ export Constants := module
 		export EN_HEADER_FCRA	:= _TYPE(RoyaltyCode.EN_HEADER_FCRA);
 		export FDN_DL_DATA  	:= _TYPE(RoyaltyCode.FDN_DL_DATA);
 		export SBFE           := _TYPE(RoyaltyCode.SBFE);
+		export SBFE_PDF       := _TYPE(RoyaltyCode.SBFE_PDF);
 		export INVIEW_DEFAULT	:= _TYPE(RoyaltyCode.INVIEW_DEFAULT);
 		export INVIEW_REPORT	:= _TYPE(RoyaltyCode.INVIEW_REPORT);
 		export INVIEW_BCRCI_BFRL := _TYPE(RoyaltyCode.INVIEW_BCRCI_BFRL);

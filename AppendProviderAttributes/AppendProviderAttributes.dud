@@ -1,0 +1,187 @@
+﻿ID "d423f4cd-c432-4f40-2442-29cf2224442e";
+NAME AppendProviderAttributes;
+LABEL "Provider Shell Attribute Append";
+CATEGORY APPEND;
+VERSION "1.1.0";
+AUTHOR "periassx";
+DESCRIPTION "Append Provider Shell Attributes using LNPID";
+
+PERMISSIONS
+ VIEW:PUBLIC;
+ EDIT:PRIVATE;
+ RUN:PUBLIC;
+END
+ 
+INPUTS
+    STRING Prefix:LABEL("Append Column Prefix"),DEFAULT("ProviderAttr");
+    DATASET dsInput:MAPBYNAME
+		FIELD LNPID:LABEL("Provider ID"),DESCRIPTION("Lexis Nexis Professional ID");
+	END
+    STRING GCID:LABEL("GLOBAL COMPANY ID"),DEFAULT("^GLOBAL|GCID");
+    STRING JOBID:LABEL("Job ID"),DEFAULT("^GLOBAL|JOBID");
+    STRING FCRA:LABEL("FCRA"),DEFAULT("^GLOBAL|FCRA");
+    STRING DPPAPURPOSE:LABEL("DPPA Purpose"),DEFAULT("^GLOBAL|DPPAPURPOSE");
+    STRING GLBPURPOSE:LABEL("GLB Purpose"),DEFAULT("^GLOBAL|GLBPURPOSE");
+    STRING DATAPERMISSIONMASK:LABEL("Data Permission Mask"),DEFAULT("^GLOBAL|DATAPERMISSIONMASK");
+    STRING DATARESTRICTIONMASK:LABEL("Data Restriction Mask"),DEFAULT("^GLOBAL|DATARESTRICTIONMASK");
+    STRING SSNMASK:LABEL("SSN Mask"),DEFAULT("^GLOBAL|SSNMASK");
+    STRING INDUSTRYCLASS:LABEL("Industry Class"),DEFAULT("^GLOBAL|INDUSTRYCLASS");
+    STRING DLMASK:LABEL("Driver's License Mask"),DEFAULT("^GLOBAL|DLMASK");
+    STRING DOBMASK:LABEL("Date of Birth Mask"),DEFAULT("^GLOBAL|DOBMASK");
+END
+
+OUTPUTS
+    DATASET dsOutput(dsInput):PREFIX(INPUTS.Prefix), APPEND
+			UNSIGNED8 LexID;
+			STRING1	  EntityType;
+			STRING20  FNAME;
+			STRING20  MNAME;
+			STRING28  LNAME; 
+			STRING5	  SNAME;
+			STRING9	  SSN;
+			STRING9	  ConsumerSSN;
+			UNSIGNED4 DateOfBirth;
+			UNSIGNED4 ConsumerDateOfBirth;
+			STRING25  LicenseNumber;
+			STRING25  CleanedLicenseNumber;
+			STRING2	  LicenseState;
+			STRING60  LicenseType;
+			STRING60  LicenseStatus;
+			UNSIGNED4 DateLicenseExpired; 
+			UNSIGNED4 LicenseCount;
+			UNSIGNED4 LicenseStateCount;
+			UNSIGNED4 ActiveLicenseCount;
+			UNSIGNED4 InactiveLicenseCount;
+			UNSIGNED4 RevokedLicenseCount;
+			STRING2	  InactiveLicenseState;	
+			STRING1	  InactiveLicenseFlag;	
+			STRING1	  RevokedLicenseFlag;	
+			STRING1	  ExpiredLicenseFlag;	
+			STRING1	  DeathIndicator;
+			UNSIGNED4 DateOfDeath;
+			UNSIGNED4 BillingTaxID;
+			STRING10  Phone;
+			STRING10  Fax;
+			STRING6	  UPIN;
+			STRING10  NPINUMBER;
+			STRING8   NPIEnumerationDate;
+			STRING8   NPIDeactivationDate;
+			STRING8   NPIReactivationDate;
+			STRING1	  NPIFlag;
+			UNSIGNED4 DeactivedNPICount;		
+			STRING1	  DEABusinessActivityIndicator;		
+			STRING10  DEANumber;
+			UNSIGNED4 DateDEAExpired;
+			UNSIGNED4 DEACount;
+			UNSIGNED4 ActiveDEACount;
+			UNSIGNED4 ExpiredDEACount;
+			STRING1	  DEAExpiredFlag;
+			STRING1	  isStateSanction;
+			STRING1	  isOIGSanction;
+			STRING1	  isOPMSanction;
+			STRING10  Taxonomy;
+			STRING50  TaxonomyDescription;		
+			STRING3	  SpecialityCode;	
+			STRING1	  ProviderStatus;
+			STRING40  GroupKey;
+			STRING1	  hasActiveLicenseRevocation;
+			STRING2	  ActiveLicenseRevocationState;			
+			STRING8	  ActiveLicenseRevocationDate;			
+			STRING1	  hasActiveStateExclusion;
+			STRING2	  ActiveLicenseExclusionState;
+			STRING8	  ActiveStateExclusionDate;			
+			STRING1	  hasActiveOIGExclusion;	
+			STRING8	  ActiveOIGExclusionDate;
+			STRING1	  hasActiveOPMExclusion;
+			STRING8	  ActiveOPMExclusionDate;
+			STRING8	  ActiveStateSanctionExclusionDate;
+			STRING8	  ActiveOIGSanctionExclusionDate;
+			STRING8	  ActiveOPMSanctionExclusionDate;
+			STRING1	  hasLicenseRevocationReinstated;
+			STRING2	  LicenseRevocationReinstatedState;
+			STRING8	  LicenseRevocationReinstatedDate;
+			STRING1	  hasStateExclusioinReinstated;
+			STRING2	  StateExclusionReinstatedState;
+			STRING8	  StateExclusionReinstatedDate;
+			STRING1	  hasOIGExclusioinReinstated;
+			STRING2	  OIGExclusionReinstatedState;
+			STRING8	  OIGExclusionReinstatedDate;			
+			STRING1	  hasOPMExclusioinReinstated;
+			STRING2	  OPMExclusionReinstatedState;
+			STRING8	  OPMExclusionReinstatedDate;			
+			STRING10  ResidentialPrimaryRange;
+			STRING2   ResidentialPreDirectional;
+			STRING28  ResidentialPrimaryName;
+			STRING4   ResidentialAddressSuffix;
+			STRING2   ResidentialPostDirectional;
+			STRING8   ResidentialSecondaryRange;
+			STRING25  ResidentialCityName;
+			STRING2   ResidentialState;
+			STRING5   ResidentialZip5;
+			UNSIGNED3 ResidentialAddressLastSeen;
+			STRING1	  ProviderWithSingleAddress;
+			STRING1	  hasBankruptcy;
+			STRING1	  hasCriminalHistory;			
+			STRING1	  hasRelativeBankruptcy;
+			STRING1	  hasRelativeCriminalHistory;			
+			STRING1	  hasAssocActiveStateExclusion;
+			STRING1	  hasAssocActiveLicenseRevocation;		
+			STRING1	  hasAssocStateExclusionReinstated;
+			STRING1	  hasAssocLicenseRevocationReinstated;
+			STRING1	  hasAssocBankruptcy;
+			STRING1	  hasAssocCriminalHistory;
+	END
+
+    DATASET LexIDStats:PREFIX(INPUTS.Prefix),SIDE,SMALL, WUID
+		INTEGER1 Hit;
+        INTEGER4  Cnt;
+    END    
+
+    DATASET ProvTypeStats:PREFIX(INPUTS.Prefix),SIDE,SMALL, WUID
+        STRING	  ProviderType;
+        INTEGER4  Cnt;
+    END    
+
+    DATASET ProvStatusStats:PREFIX(INPUTS.Prefix),SIDE,SMALL, WUID
+        STRING	  ProviderDesc;
+        INTEGER4  Cnt;
+    END    
+
+    DATASET PerStats:PREFIX(INPUTS.Prefix),SIDE,SMALL, WUID
+        STRING  FieldName;
+        INTEGER FieldPercent;
+    END
+END
+
+VISUALIZE AppendProviderDataStats:LABEL("Append Provider Data Stats")
+	PIE LexIDHitCounts(LexIDStats{Hit, Cnt}) : TITLE("LexIDStats") , LABEL(Hit), WEIGHT (Cnt) , COLOR ("Red_Yellow_Blue"); 
+	PIE ProviderStatusCounts(ProvStatusStats{ProviderDesc, Cnt}) : TITLE("ProviderDesc") , LABEL(ProviderDesc), WEIGHT (Cnt) , COLOR ("Red_Yellow_Blue"); 
+	TABLE ProvidersTypeStats(ProvTypeStats{ProviderType, Cnt}) : VALUE (ProviderType, Cnt) , LABEL ("ProviderType", "Count");	
+	TABLE FieldPopulationPercentage(PerStats{FieldName, FieldPercent}) : VALUE (FieldName, FieldPercent) , LABEL ("FieldName", "FieldPercentage");	
+END
+
+GENERATES INLINE 
+ IMPORT AppendProviderAttributes;
+ 
+ LNPIDResults := AppendProviderAttributes.macAppendProviderAttributes (%dsInput%, %LNPID%, ,'%Prefix%');
+
+ %^edsOutput% := LNPIDResults %^p%; 
+ %^eLexIDStats% := TABLE(%dsOutput%, {INTEGER %Prefix%Hit := MAP(%Prefix%LexID > 0 => 1, 0), %Prefix%Cnt := COUNT(GROUP)}, MAP(%Prefix%LexID > 0 => 1, 0), FEW); 
+ %^eProvTypeStats% := TABLE(%dsOutput% (%Prefix%TaxonomyDescription <> ''), {%Prefix%ProviderType := %Prefix%TaxonomyDescription, %Prefix%Cnt := COUNT(GROUP)}, %Prefix%TaxonomyDescription, FEW);
+ %^eProvStatusStats% := TABLE(%dsOutput%, {%Prefix%ProviderDesc := MAP (%Prefix%ProviderStatus IN ['N',''] => 'Active', %Prefix%ProviderStatus IN ['U','D'] => 'Deceased', %Prefix%ProviderStatus IN ['R'] => 'Retired','Other'), %Prefix%Cnt := COUNT(GROUP)}, MAP (%Prefix%ProviderStatus IN ['N',''] => 'Active', %Prefix%ProviderStatus IN ['U','D'] => 'Deacesed', %Prefix%ProviderStatus IN ['R'] => 'Retired','Other'), FEW);
+
+ IMPORT HealthCare;
+ PercentageResults := HealthCare.Mac_Field_Percentage (%dsOutput%, '%Prefix%');
+ %^ePerStats% := TABLE (PercentageResults,{%Prefix%FieldName, %Prefix%FieldPercent}); 
+ENDGENERATES
+
+RESOURCES
+    INDEX Key_Provider_Attributes:FILENAME("~thor::key::healthcareprovider::qa::shell"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    LOGICALFILE testinput:FILENAME("~qa::appendproviderattributes::appendproviderattributes::input"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    ECL AppendProviderAttributes:FILENAME("AppendProviderAttributes"), URL("http://10.241.100.153:8010");
+    FILE ReadMe: FILENAME("AppendProviderAttributes_ReadMe.txt"),LABEL("Plugin Readme File");
+    FILE AppendProviderAttributes_testcmp: FILENAME("AppendProviderAttributes_testcmp.txt"),LABEL("Plugin Test Composition");
+    FILE AppendProviderAttributes_BuildTestDataset: FILENAME("AppendProviderAttributes_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+    FILE AppendProviderAttributesChecklist: FILENAME("AppendProviderAttributesChecklist.xlsx"),LABEL("Checklist");
+    FILE AppendProviderAttributes_TestHarness: FILENAME("AppendProviderAttributes_TestHarness.txt"),LABEL("Test Harness");
+END

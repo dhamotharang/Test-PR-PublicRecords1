@@ -1,0 +1,38 @@
+﻿ID "HIPIE_Plugins.Anonymizer.AnonymizeBusiness_cmp";
+NAME AnonymizeBusiness_testcmp;
+LABEL "Test composition for Anonymize Business";
+DESCRIPTION "Auto-generated test composition for plugin AnonymizeBusiness";
+VERSION "1.0.0";
+AUTHOR "CarmigJX";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING CompareWUID: DEFAULT("W20171214-101711");
+  STRING Anonymize:LABEL("Anonymize"),DEFAULT("TRUE");
+END
+
+INSTANCE OutDataset.OutDataset(Ins003): LABEL("Output Dataset"),VERSION("1.0.0")
+	dsInput="^Ins002|dsOutput"
+	name="~qa::anonymizer::anonymizebusiness::output"
+	Method="THOR"
+END
+
+INSTANCE Anonymizer.AnonymizeBusiness(Ins002): LABEL("Anonymize Business"),VERSION("1.0.0")
+	CompanyName="company_name"
+	FEIN="fein"
+	dsInput="^Ins001|dsOutput"
+  Anonymize=^GLOBAL|Anonymize
+END
+
+INSTANCE UseDataset.UseDataset(Ins001): LABEL("Use Dataset"),VERSION("1.1")
+	LogicalFilename="~qa::anonymizer::anonymizebusiness::input"
+	Structure="RECORD
+    string company_name;
+    string fein;
+  END;" 
+  Method="THOR"
+END

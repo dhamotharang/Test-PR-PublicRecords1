@@ -1,5 +1,5 @@
 
-IMPORT BatchDatasets, Doxie, Doxie_Regression, NID, SexOffender_Services;
+IMPORT BatchDatasets, Doxie, NID, SexOffender_Services;
 
 EXPORT fn_getSexOffenderRecs(DATASET(Layouts.batch_in) ds_batch_in, IParams.BatchParams in_mod) := 
 	FUNCTION													

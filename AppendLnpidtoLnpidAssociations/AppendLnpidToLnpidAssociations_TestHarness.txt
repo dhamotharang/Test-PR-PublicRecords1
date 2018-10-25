@@ -1,0 +1,5 @@
+testcompositionrun_info
+Monitoring WU W20170110-164449(HIPIE_BCTLWXCARMIGJX_AppendLnpidToLnpidAssociations_testcmp_CarmigJX) to completion.
+
+testcompositionrun_err
+Plugin AppendLnpidToLnpidAssociations passed compliance check

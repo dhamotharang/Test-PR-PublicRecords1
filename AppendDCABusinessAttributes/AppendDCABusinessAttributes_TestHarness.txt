@@ -1,0 +1,5 @@
+testcompositionrun_info
+Monitoring WU W20170427-121733-4(HIPIE_BCTLWXCARMIGJX_AppendDCABusinessAttributes_testcmp_CarmigJX) to completion.
+
+testcompositionrun_err
+Plugin AppendDCABusinessAttributes passed compliance check

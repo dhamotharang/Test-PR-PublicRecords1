@@ -1,0 +1,31 @@
+ID "HIPIE_Plugins.CleanDate.CleanDate_cmp";
+NAME CleanDate_testcmp;
+LABEL "Test composition for Clean Date";
+DESCRIPTION "Auto-generated test composition for plugin CleanDate";
+VERSION "1.0.0";
+AUTHOR "campda01";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING CompareWUID: DEFAULT("W123456789-000000");
+END
+INSTANCE HIPIE_Plugins.OutDataset.OutDataset(Ins004): LABEL("Output Dataset"),VERSION("1.0.0")
+	dsInput="^Ins003|dsOutput"
+	name="~qa::cleandate::cleandate::output"
+	Method="THOR"
+END
+INSTANCE HIPIE_Plugins.CleanDate.CleanDate(Ins003): LABEL("Clean Date"),VERSION("1.0.0")
+	dsInput="^Ins002|dsOutput"
+END
+INSTANCE HIPIE_Plugins.CleanDate.CleanDate(Ins002): LABEL("Clean Date"),VERSION("1.0.0")
+END
+INSTANCE HIPIE_Plugins.UseDataset.UseDataset(Ins001): LABEL("Use Dataset"),VERSION("1.1")
+	LogicalFilename="~qa::cleandate::cleandate::input"
+	Structure="RECORD
+STRING unknown
+END;"
+END

@@ -1,0 +1,66 @@
+﻿ID "HIPIE_Plugins.AppendCleanAddress.AppendAddressLatitudeLongitude_cmp";
+NAME AppendAddressLatitudeLongitude_testcmp;
+LABEL "Test composition for Append Address Latitude Longitude";
+DESCRIPTION "Auto-generated test composition for plugin AppendAddressLatitudeLongitude";
+VERSION "1.0.0";
+AUTHOR "CarmigJX";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING CompareWUID: DEFAULT("W20171214-100431");
+END
+INSTANCE OutDataset.OutDataset(Ins004): LABEL("Output Dataset"),VERSION("1.0.0")
+	dsInput="^Ins003|dsOutput"
+	name="~qa::appendcleanaddress::appendaddresslatitudelongitude::output"
+	Method="THOR"
+END
+INSTANCE AppendCleanAddress.AppendAddressLatitudeLongitude(Ins003): LABEL("Append Address Latitude Longitude"),VERSION("1.0.0")
+	Prefix="test"
+	dsInput="^Ins002|dsOutput"
+	PrimaryRange="addressprimaryrange"
+	PreDirectional="addresspredirectional"
+	PrimaryName="addressprimaryname"
+	AddressSuffix="addressaddresssuffix"
+	PostDirectional="addresspostdirectional"
+	UnitDesignation="addressunitdesignation"
+	SecondaryRange="addresssecondaryrange"
+	City="addressvanitycity"
+	State="addressstate"
+	Zip="addresszip"
+END 
+INSTANCE AppendCleanAddress.AppendAddressLatitudeLongitude(Ins002): LABEL("Append Address Latitude Longitude"),VERSION("1.0.0")
+	Prefix="address"
+	dsInput="^Ins001|dsOutput"
+	PrimaryRange="addressprimaryrange"
+	PreDirectional="addresspredirectional"
+	PrimaryName="addressprimaryname"
+	AddressSuffix="addressaddresssuffix"
+	PostDirectional="addresspostdirectional"
+	UnitDesignation="addressunitdesignation"
+	SecondaryRange="addresssecondaryrange"
+	City="addressvanitycity"
+	State="addressstate"
+	Zip="addresszip"
+END
+INSTANCE UseDataset.UseDataset(Ins001): LABEL("Use Dataset"),VERSION("1.1")
+	LogicalFilename="~qa::appendcleanaddress::appendaddresslatitudelongitude::input"
+	Structure="record
+		string10 addressprimaryrange;
+		string2 addresspredirectional;
+		string28 addressprimaryname;
+		string4 addressaddresssuffix;
+		string2 addresspostdirectional;
+		string10 addressunitdesignation;
+		string8 addresssecondaryrange;
+		string25 addresspostalcity;
+		string25 addressvanitycity;
+		string2 addressstate;
+		string5 addresszip;
+		string4 addresszip4;
+	end;"
+	Method="THOR"
+END
