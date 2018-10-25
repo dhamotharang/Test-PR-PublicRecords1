@@ -99,18 +99,20 @@ export Bankruptcy_BatchServiceFCRA(useCannedRecs = 'false') := MACRO
 
   ds_batch_in := IF( NOT useCannedRecs,
     BatchServices.file_Bankruptcy_Batch_in(forceSeq := FALSE),
-    PROJECT(BatchServices._Sample_inBatchMaster('BANKRUPTCY'), BatchServices.layout_BankruptcyV3_Batch_in)
-    );
+    PROJECT(BatchServices._Sample_inBatchMaster('BANKRUPTCY'), BatchServices.layout_BankruptcyV3_Batch_in));
 
   //Need these values to utilize picklist to try and find missing DIDs from PII.
-  batch_params := module(BatchShare.IParam.getBatchParams())
-    export dataset (Gateway.layouts.config) gateways := Gateway.Configuration.Get();
+  batch_params := MODULE(BatchShare.IParam.getBatchParams())
+    EXPORT DATASET (Gateway.layouts.config) gateways := Gateway.Configuration.Get();
   END;
 
   //The used to be taken from STORED, but using getBatchParams for picklist caused a duplicated STORED error.
   in_ssn_mask := batch_params.ssn_mask;
 
- // Search for Bk records by party. Leave input as is to maintain expected results.
+ //Search for Bk records by party. Leave input as is to maintain expected results.
+ //Picklist used to be utlized here, however it was determined that it's redundant and not needed.
+ //This is due to the batch services running ADL Best on the input PRIOR to sending the query to this service.
+ //Since picklist is changing to DidVille it would run the same lexID resolution logic twice if done within roxie.
   ds_batch := BatchServices.Bankruptcy_BatchService_Records.search(ds_batch_in,
     party_types,
     isFCRA,
@@ -121,46 +123,51 @@ export Bankruptcy_BatchServiceFCRA(useCannedRecs = 'false') := MACRO
     BIPSkipMatch,
     suppress_withdrawn_bankruptcy);
 
-  //Attempt to append missing DIDs to input.
-  ds_batch_in_appended_plist := BankruptcyV3_Services.fn_append_picklist(ds_batch_in, batch_params, isFCRA);
-
-  //Call person context to retrieve consumer data and alert flags.
-  dids := PROJECT(DEDUP(SORT(ds_batch_in_appended_plist, did, acctno), did, acctno), FFD.Layouts.DidBatch);
-  pc_recs := FFD.FetchPersonContext(dids((unsigned6)did > 0), batch_params.gateways, FFD.Constants.DataGroupSet.Bankruptcy, inFFDOptionsMask);
-
-  //Do a join against input lexIDs, only keep those with matching debtor_did.
-  //This is not done after inquiryLexId batch because a filter after that loses mismatched records
-  //which are to be kept for logging purposes.
-  ds_batch_validated_lexID := JOIN(ds_batch, ds_batch_in_appended_plist((unsigned6)did > 0),
-    LEFT.acctno = RIGHT.acctno AND (unsigned6)LEFT.debtor_did = (unsigned6)RIGHT.did,
-    TRANSFORM(BatchServices.layout_BankruptcyV3_Batch_out, SELF := LEFT),
+  //Get results with matching inquiry and result dids (exluding 0), and populate the inquiry_lexID.
+  ds_batch_validated_lexID := JOIN(ds_batch, ds_batch_in,
+    RIGHT.did > 0 AND LEFT.acctno = RIGHT.acctno AND (UNSIGNED6)LEFT.debtor_did = RIGHT.did,
+    TRANSFORM(BatchServices.layout_BankruptcyV3_Batch_out, SELF.inquiry_lexID := (STRING)RIGHT.did, SELF := LEFT),
     KEEP(1), LIMIT(0));
 
-  //Apply FCRA FFD suppression and format the data to return user friendly statements.
-  //This will also create blank records with flags for records which were suppressed due to FFD alerts.
-  //The blank records retain the debtor_did value however.
-  ds_batch_ffd := BankruptcyV3_Services.fn_fcra_ffd_batch(ds_batch_validated_lexID, pc_recs, inFFDOptionsMask, inFCRAPurpose);
+  //Any inquiry without a single match is sent to remote linking.
+  ds_batch_for_remote_linking := JOIN(ds_batch, ds_batch_validated_lexID,
+    LEFT.acctno = RIGHT.acctno, LEFT ONLY);
 
-  //Add inquiry lexIDs to the results. This also adds any suppressed records as blanks for inquiry logging purposes.
-  ds_batch_inquiry_lexID := FFD.Mac.InquiryLexidBatch(ds_batch_in_appended_plist, ds_batch_ffd.records, BatchServices.layout_BankruptcyV3_Batch_out, 0);
+  //Get remote linking matches and concat them to the lexID validated results.
+  ds_remote_linking_matches := BankruptcyV3_Services.fn_get_remote_linking_matches(ds_batch_in, ds_batch_for_remote_linking, batch_params.gateways);
+  ds_batch_all_validated := ds_batch_validated_lexID + ds_remote_linking_matches;
 
-  results_pre := sort(ds_batch_inquiry_lexID, acctno); // records in batch out layout
-  consumer_statements := sort(ds_batch_ffd.statements, acctno); // statements
+  //Add back records with no results for inquiry logging, and person context retrieval.
+  //Set AddlOptions to 1 so we don't overwrite inquiry_lexID values set by remote linking or input DID.
+  ds_batch_inquiry_lexID := FFD.Mac.InquiryLexidBatch(ds_batch_in, ds_batch_all_validated, BatchServices.layout_BankruptcyV3_Batch_out, 1);
+
+  //Extract all inquiry_lexID values per acctno and use this data to call person context.
+  //This is either set by input DID when matching, or remote linking's best_lexID.
+  dids := PROJECT(ds_batch_inquiry_lexID, TRANSFORM(FFD.Layouts.DidBatch,
+    SELF.did := (UNSIGNED6)LEFT.inquiry_lexID, SELF.acctno := LEFT.acctno));
+
+  deduped_dids := DEDUP(SORT(dids(did>0), acctno, did), acctno, did);
+  pc_recs := FFD.FetchPersonContext(deduped_dids, batch_params.gateways, FFD.Constants.DataGroupSet.Bankruptcy, inFFDOptionsMask);
+
+  //Apply FCRA FFD suppression.
+  ds_batch_ffd := BankruptcyV3_Services.fn_fcra_ffd_batch(ds_batch_inquiry_lexID, pc_recs, inFFDOptionsMask, inFCRAPurpose);
+
+  results_pre := SORT(ds_batch_ffd.records, acctno); // records in batch out layout
+  consumer_statements := SORT(ds_batch_ffd.statements, acctno); // statements
   ut.mac_TrimFields(results_pre, 'results_pre', results);
 
 //DEBUG--------------------------------------------
-  // OUTPUT(batch_params.gateways, NAMED('gateways'));
-  // OUTPUT(ds_batch_in_picklist, NAMED('ds_batch_in_picklist'));
-  // OUTPUT(ds_batch_in_appended_plist, NAMED('ds_batch_in_appended_plist'));
-  // OUTPUT(pc_recs_pre, NAMED('pc_recs_pre'));
+  // OUTPUT(ds_batch, NAMED('ds_batch'));
+  // OUTPUT(ds_batch_for_remote_linking, NAMED('ds_batch_for_remote_linking'));
+  // OUTPUT(ds_remote_linking_matches, NAMED('ds_remote_linking_matches'));
+  // OUTPUT(dids, NAMED('dids'));
+  // OUTPUT(deduped_dids, NAMED('deduped_dids'));
   // OUTPUT(pc_recs, NAMED('pc_recs'));
-  // OUTPUT(ds_batch_inquiry_lexID, NAMED('ds_batch_inquiry_lexID'));
   // OUTPUT(ds_batch_ffd, NAMED('ds_batch_ffd'));
 //END DEBUG-----------------------------------------
 
   OUTPUT(results, NAMED('Results'));
   OUTPUT(consumer_statements, NAMED('CSDResults'));
-
 
   ENDMACRO;
 // BatchServices.Bankruptcy_BatchServiceFCRA();
