@@ -10,9 +10,7 @@ EXPORT Functions := MODULE
   END;
 
   EXPORT IsValidationOk(INTEGER code) := FUNCTION
-    RETURN code IN
-      [FCRAGateway_Services.Constants.ValidationCode.DID_MATCH,
-      FCRAGateway_Services.Constants.ValidationCode.REMOTE_LINKING_MATCH];
+    RETURN code =FCRAGateway_Services.Constants.ValidationCode.DID_MATCH;
   END;
 
   //TuFraudAlert specific functions
