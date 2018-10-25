@@ -36,7 +36,7 @@ export mac_join (ds, d_field, key, use_dist, do_append) := functionmacro
 					self.age := if (right.dob = 0, 0, ut.age(right.dob)), 
 					self := right),
 			#end
-			keep(1), limit(0), local)
+			keep(1), limit(0))
 	);
 
 	return ds_res;
