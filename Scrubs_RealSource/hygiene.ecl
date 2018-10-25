@@ -162,7 +162,7 @@ END;
 TotalErrors := TABLE(Errors,ErrorRecordsTotals,FieldNum,ErrorNum,FEW);
 PrettyErrorTotals := RECORD
   FieldNme := Fields.FieldName(TotalErrors.FieldNum);
-  FieldType := CHOOSE(TotalErrors.FieldNum,'invalid_name','invalid_name','invalid_name','invalid_suffix','invalid_alnum','invalid_alpha','invalid_state','invalid_zip','invalid_zip','invalid_phone','invalid_date','Unknown','Unknown','invalid_date','Unknown');
+  FieldType := CHOOSE(TotalErrors.FieldNum,'invalid_name','invalid_name','invalid_name','invalid_suffix','invalid_alnum','invalid_alpha','invalid_state','invalid_zip5','invalid_zip4','invalid_phone','invalid_date','Unknown','Unknown','invalid_date','Unknown');
   ErrorMessage := CHOOSE(TotalErrors.FieldNum,Fields.InValidMessage_firstname(TotalErrors.ErrorNum),Fields.InValidMessage_middleinit(TotalErrors.ErrorNum),Fields.InValidMessage_lastname(TotalErrors.ErrorNum),Fields.InValidMessage_suffix(TotalErrors.ErrorNum),Fields.InValidMessage_address(TotalErrors.ErrorNum),Fields.InValidMessage_city(TotalErrors.ErrorNum),Fields.InValidMessage_state(TotalErrors.ErrorNum),Fields.InValidMessage_zipcode(TotalErrors.ErrorNum),Fields.InValidMessage_zipplus4(TotalErrors.ErrorNum),Fields.InValidMessage_phone(TotalErrors.ErrorNum),Fields.InValidMessage_dob(TotalErrors.ErrorNum),Fields.InValidMessage_email(TotalErrors.ErrorNum),Fields.InValidMessage_ipaddr(TotalErrors.ErrorNum),Fields.InValidMessage_datestamp(TotalErrors.ErrorNum),Fields.InValidMessage_url(TotalErrors.ErrorNum));
   TotalErrors.Cnt;
 END;

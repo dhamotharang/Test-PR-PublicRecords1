@@ -18,7 +18,7 @@ dENasSource	:=	as_source(pFile,pForHeaderBuild,pFastHeader);
 // 01=previous address1
 // ...
 // 24=previous address24
-		self.rid											:= 900000000000 + l.uid;
+		self.rid					  :=0;//						:= 900000000000 + l.uid;
 		SELF.title                    :=if(l.title not in ['MR','MS'],'',l.title);
 
 		dt_first_seen                 := if(l.dt_first_seen <>0,l.dt_first_seen, l.dt_last_seen);
@@ -27,10 +27,10 @@ dENasSource	:=	as_source(pFile,pForHeaderBuild,pFastHeader);
 		dt_first_seen1                := if(dt_last_seen > dt_first_seen, dt_first_seen, dt_last_seen);
 		dt_last_seen1                 := if(dt_last_seen < dt_first_seen, dt_first_seen, dt_last_seen);
 
-		self.dt_first_seen            := (unsigned)dt_first_seen1[1..6];
-		self.dt_last_seen             := (unsigned)dt_last_seen1[1..6]; 
-		self.dt_vendor_first_reported := (unsigned)l.dt_vendor_first_reported[1..6];
-		self.dt_vendor_last_reported  := (unsigned)l.dt_vendor_last_reported[1..6];
+		self.dt_first_seen            := (unsigned)((string)dt_first_seen1)[1..6];
+		self.dt_last_seen             := (unsigned)((string)dt_last_seen1)[1..6]; 
+		self.dt_vendor_first_reported := (unsigned)((string)l.dt_vendor_first_reported)[1..6];
+		self.dt_vendor_last_reported  := (unsigned)((string)l.dt_vendor_last_reported)[1..6];
 		self.dt_nonglb_last_seen      := 0;
 		self.rec_type                 := if(l.IsCurrent,'1','2'); 
 		self.vendor_id                := l.EXPERIAN_ENCRYPTED_PIN;

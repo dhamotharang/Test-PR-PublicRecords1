@@ -1,7 +1,7 @@
 ﻿import Address, Ut, lib_stringlib, _Control, business_header,_Validate, mdr,
 Header, Header_Slimsort, didville, DID_Add,Business_Header_SS, NID, AID, watchdog,
 VersionControl,lib_fileservices,Health_Provider_Services,Health_Facility_Services,
-BIPV2_Company_Names, HealthCareFacility;
+BIPV2_Company_Names, HealthCareFacility, Std;
 
 EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 
@@ -126,8 +126,8 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 										
 		Enclarity.Layouts.facility_base t_rollup (new_base_s L, new_base_s R) := TRANSFORM
 			SELF.dt_vendor_first_reported 	:= ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
-			SELF.dt_vendor_last_reported  	:= ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
-			SELF.clean_last_verify_date   := ut.LatestDate	(L.clean_last_verify_date, R.clean_last_verify_date);
+			SELF.dt_vendor_last_reported  	:= max	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+			SELF.clean_last_verify_date   := max	(L.clean_last_verify_date, R.clean_last_verify_date);
 			SELF						 							:= IF(L.record_type = 'C', L, R);
 		END;
 
@@ -172,8 +172,8 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 										,t_rollup(LEFT,RIGHT),LOCAL);	
 										
 		Enclarity.Layouts.facility_base GetSourceRID(base_f L)	:= TRANSFORM
-			SELF.record_type 					:= if((unsigned)l.dea_num_exp >0 and l.dea_num_exp  < ut.GetDate
-																			and (unsigned)l.lic_end_date>0 and l.lic_end_date < ut.GetDate
+			SELF.record_type 					:= if((unsigned)l.dea_num_exp >0 and l.dea_num_exp  < (string8)Std.Date.Today()
+																			and (unsigned)l.lic_end_date>0 and l.lic_end_date < (string8)Std.Date.Today()
 																				,'H'
 																				,l.record_type);
 			SELF.source_rid 					:= HASH64(hashmd5(
@@ -429,8 +429,8 @@ fn_rollup(dataset(track_ancillaries) d):=function
 
 		track_ancillaries t_rollup(new_base_s L, new_base_s R) := TRANSFORM
 			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
-			SELF.dt_vendor_last_reported  := ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
-			SELF.clean_last_verify_date		:= ut.LatestDate(L.clean_last_verify_date, R.clean_last_verify_date);
+			SELF.dt_vendor_last_reported  := max	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+			SELF.clean_last_verify_date		:= max	(L.clean_last_verify_date, R.clean_last_verify_date);
 			sum_L := L.addr + L.dob + L.ssn + L.lic + L.dea + L.npi + L.sanc;
 			sum_R := R.addr + R.dob + R.ssn + R.lic + R.dea + R.npi + R.sanc;
 			SELF						 							:= map(
@@ -506,6 +506,8 @@ end;
 		h_base_d	:= sort(distribute(new_base_d(record_type = 'H' and addr_key <> ''), hash(group_key, addr_key)), group_key, addr_key, local);
 		
 		add_file	:= sort(distribute(enclarity.Files().address_base.built, hash(group_key)), group_key, local);
+		add_file_dedup := dedup(sort(distribute(enclarity.Files().address_base.built, hash(group_key, addr_key)), group_key, addr_key, record_type, local),group_key, addr_key, record_type, local); 
+
 		c_base_a	:= JOIN(c_base_d, add_file
 										,LEFT.group_key = RIGHT.group_key
 										,TRANSFORM(track_ancillaries
@@ -581,7 +583,7 @@ end;
 										,LOCAL);		
 										
 		h_base_a	:= JOIN(h_base_d,
-											sort(distribute(add_file, hash(group_key, addr_key)), group_key, addr_key, local)
+											add_file_dedup
 										,LEFT.group_key = RIGHT.group_key and
 										 LEFT.addr_key  = RIGHT.addr_key
 										,TRANSFORM(track_ancillaries
@@ -620,7 +622,7 @@ end;
 		c_sort_ssn	:= sort_ssn(record_type <> 'H' or (record_type = 'H' and lic_num = ''));
 		h_sort_ssn	:= sort_ssn(record_type = 'H' and lic_num <> '');
 		
-		lic_file	:= sort(distribute(enclarity.Files().license_base.built, hash(group_key)), group_key, local);
+		lic_file	:= sort(distribute(enclarity.Files().license_base.built(record_type = 'C' or (record_type = 'H' and lic_state <> 'MO')), hash(group_key)), group_key, local);
 		c_base_l	:= JOIN(sort(distribute(c_sort_ssn, hash(group_key)), group_key, local), lic_file
 										,   LEFT.group_key = RIGHT.group_key
 										,TRANSFORM({sort_ssn}
@@ -1025,8 +1027,25 @@ end;
 		// all_lnpid	:= has_lnpid + rejoin_lnpid;
 		all_lnpid	:= rejoin_lnpid;
 		sort_lnpid	:= fn_rollup(all_lnpid);
+		
+		pre_final_base	:= project(sort_lnpid, enclarity.Layouts.individual_base);		
+		get_historical_mo_provs	:= pre_final_base(lic_state = 'MO' and record_type = 'H');
+		non_historical_provs		:= pre_final_base(record_type = 'C');
+		non_mo_historical				:= pre_final_base(lic_state <> 'MO' and record_type = 'H');
+		
+		get_mo_apn		:= get_historical_mo_provs(taxonomy[1..4] = '363L' or taxonomy[1..4] = '364S' or taxonomy[1..3] = '367');
+		
+		non_mo_apn		:= get_historical_mo_provs(taxonomy[1..4] <> '363L' and taxonomy[1..4] <> '364S' and taxonomy[1..3] <> '367');
+		
+		clear_exp_stat	:= project(get_mo_apn, 
+																transform(enclarity.Layouts.individual_base,
+																	self.lic_end_date	:= '00000000',
+																	self.lic_status		:= '',
+																	self							:= left));
+																	
+		recombined_provs	:= non_historical_provs + non_mo_historical + non_mo_apn + clear_exp_stat;
 
-		RETURN project(sort_lnpid, enclarity.Layouts.individual_base);
+		RETURN recombined_provs;
 	END;
 			
 	EXPORT Associate_Base := FUNCTION
@@ -1067,7 +1086,7 @@ fn_rollup(dataset(enclarity.layouts.associate_base) d) := function
 									
 		Enclarity.Layouts.associate_base t_rollup(new_base_s L, new_base_s R) := TRANSFORM
 			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
-			SELF.dt_vendor_last_reported  := ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+			SELF.dt_vendor_last_reported  := max	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 			SELF						 							:= IF(L.record_type = 'C', L, R);
 		END;
 
@@ -1146,46 +1165,23 @@ end;
 										
 		all_ssn := c_base_s + h_base_s;
 		sort_ssn	:= fn_rollup(all_ssn);
-		c_all_ssn	:= sort_ssn(record_type <> 'H' or (record_type = 'H' and sloc_type = ''));
-		h_all_ssn	:= sort_ssn(record_type = 'H' and sloc_type <> '');
-
-		fac_file	:= sort(distribute(Enclarity.Files().facility_base.built, hash(group_key)), group_key, local);
-		c_base_f	:= JOIN(sort(distribute(c_all_ssn, hash(sloc_group_key)), sloc_group_key, local), fac_file
-										,LEFT.sloc_group_key = RIGHT.group_key
-										,TRANSFORM({all_ssn}
-											,SELF.record_type	:= if(right.record_type='H',right.record_type,left.record_type)
-											,SELF.sloc_type	:= RIGHT.type1
-											,SELF:=LEFT)
-										,LEFT OUTER
-										,LOCAL
-										);
-										
-		h_base_f	:= JOIN(sort(distribute(h_all_ssn, hash(sloc_group_key)), sloc_group_key, local), fac_file
-										,LEFT.sloc_group_key = RIGHT.group_key
-										,TRANSFORM({all_ssn}
-											,SELF.record_type	:= if(right.record_type='H',right.record_type,left.record_type)
-											,SELF.sloc_type	:= RIGHT.type1
-											,SELF:=LEFT)
-										,LEFT OUTER
-										,LOCAL
-										);
-
-		all_sloc := c_base_f + h_base_f;
-		sort_sloc	:= fn_rollup(all_sloc);
-		c_all_sloc	:= sort_sloc(record_type <> 'H' or (record_type = 'H' and billing_type = ''));
-		h_all_sloc	:= sort_sloc(record_type = 'H' and billing_type <> '');
 	
-		c_base_f1	:= JOIN(sort(distribute(c_all_sloc, hash(billing_group_key)), billing_group_key, local), fac_file
-										,LEFT.billing_group_key = RIGHT.group_key
-										,TRANSFORM({sort_sloc}
-											,SELF.record_type	:= if(right.record_type='H',right.record_type,left.record_type)
-											,SELF.billing_type	:= RIGHT.type1
-											,SELF:=LEFT)
+		fac_file	:= distribute(Enclarity.Files().facility_base.built, hash(group_key));
+    fac_file_dedup	:= dedup(sort(fac_file, group_key,record_type,type1, local),group_key,record_type,type1, local);
+
+    base_f	:= JOIN(sort(distribute(sort_ssn, hash(sloc_group_key)), sloc_group_key, local), fac_file_dedup
+										,LEFT.sloc_group_key = RIGHT.group_key
+										,TRANSFORM({sort_ssn}
+										,SELF.record_type	:= if(right.record_type='H',right.record_type,left.record_type)
+										,SELF.sloc_type	:= RIGHT.type1
+										,SELF:=LEFT)
 										,LEFT OUTER
 										,LOCAL
 										);
 		
-		h_base_f1	:= JOIN(sort(distribute(h_all_sloc, hash(billing_group_key)), billing_group_key, local), fac_file
+		sort_sloc	:= fn_rollup(base_f);
+	
+		base_f1	:= JOIN(sort(distribute(sort_sloc, hash(billing_group_key)), billing_group_key, local), fac_file_dedup
 										,LEFT.billing_group_key = RIGHT.group_key
 										,TRANSFORM({sort_sloc}
 											,SELF.record_type	:= if(right.record_type='H',right.record_type,left.record_type)
@@ -1195,8 +1191,7 @@ end;
 										,LOCAL
 										);
 								
-		all_bill	:= c_base_f1 + h_base_f1;
-		sort_bill	:= fn_rollup(all_bill);
+		sort_bill	:= fn_rollup(base_f1);
 		dist_bill	:= distribute(sort_bill, hash(group_key, prepped_name, addr_key, prepped_addr1, prepped_addr2, normed_name_rec_type, addr_phone, sloc_phone, sloc_group_key, billing_group_key));		
 		
 		Enclarity.Layouts.associate_base GetSourceRID(dist_bill L)	:= TRANSFORM
@@ -1497,7 +1492,7 @@ end;
    										
    		Enclarity.Layouts.address_base t_rollup (new_base_s L, new_base_s R) := TRANSFORM
    			SELF.dt_vendor_first_reported 	:= ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
-   			SELF.dt_vendor_last_reported  	:= ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+   			SELF.dt_vendor_last_reported  	:= max	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 			SELF						 									:= IF(L.record_type = 'C', L, R);
    		END;
    
@@ -1639,7 +1634,7 @@ end;
 										
 		Enclarity.Layouts.dea_base t_rollup (new_base_s L, new_base_s R) := TRANSFORM
 			SELF.dt_vendor_first_reported	:= ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
-			SELF.dt_vendor_last_reported  := ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+			SELF.dt_vendor_last_reported  := max	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 			SELF						 							:= IF(L.record_type = 'C', L, R);
 		END;
 
@@ -1659,7 +1654,7 @@ end;
 
 		base_p:=PROJECT(base_i
 									,transform({base_i}
-										,SELF.record_type:= if((unsigned)left.dea_num_exp > 0 and left.dea_num_exp < ut.GetDate,'H',left.record_type)
+										,SELF.record_type:= if((unsigned)left.dea_num_exp > 0 and left.dea_num_exp < (string8)Std.Date.Today(),'H',left.record_type)
 										,SELF:=LEFT
 										));
 
@@ -1687,7 +1682,7 @@ end;
 		base_d	:= JOIN(new_base_d, dob_file
 										,LEFT.group_key = RIGHT.group_key
 										,TRANSFORM({new_base_d}
-											,SELF.record_type	:= if(right.record_type='H',right.record_type,left.record_type)
+											,SELF.record_type	:= left.record_type//if(right.record_type='H',right.record_type,left.record_type)
 											,SELF.clean_dob	:= RIGHT.clean_date_of_birth;
 											,SELF:=LEFT)
 										,LEFT OUTER
@@ -1698,7 +1693,7 @@ end;
 		base_s	:= JOIN(base_d, ssn_file
 										,LEFT.group_key = RIGHT.group_key
 										,TRANSFORM({new_base_d}
-											,SELF.record_type	:= if(right.record_type='H',right.record_type,left.record_type)
+											,SELF.record_type	:= left.record_type//if(right.record_type='H',right.record_type,left.record_type)
 											,SELF.clean_ssn	:= RIGHT.clean_ssn
 											,SELF:=LEFT)
 										,LEFT OUTER
@@ -1730,7 +1725,7 @@ end;
 		
 		Enclarity.Layouts.license_base t_rollup(new_base_s L, new_base_s R) := TRANSFORM
 			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
-			SELF.dt_vendor_last_reported  := ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+			SELF.dt_vendor_last_reported  := max	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 			SELF						 							:= IF(L.record_type = 'C', L, R);
 		END;
 
@@ -1758,7 +1753,7 @@ end;
 										,t_rollup(LEFT,RIGHT),LOCAL);																																			
 										
 		Enclarity.Layouts.license_base GetSourceRID(base_i L)	:= TRANSFORM
-			SELF.record_type 					:= if((unsigned)l.lic_end_date>0 and l.lic_end_date < ut.GetDate,'H',l.record_type);
+			SELF.record_type 					:= l.record_type;//if((unsigned)l.lic_end_date>0 and l.lic_end_date < ut.GetDate,'H',l.record_type);
 			SELF.source_rid 					:= HASH64(hashmd5(
 																	trim(l.orig_fullname)
 																	,trim(l.prefix_name)
@@ -1876,6 +1871,73 @@ end;
 		RETURN result;
 	END;
 	
+	EXPORT Modified_License_Base	:= FUNCTION
+		orig_lic_base		:= Enclarity.Files(filedate,pUseProd).license_base.built;
+		mo_only					:= orig_lic_base(lic_state = 'MO');
+		no_mo_lic				:= orig_lic_base(lic_state <> 'MO');
+		npi_base				:= Enclarity.Files(filedate,pUseProd).npi_base.built;
+		
+		lic_base_w_tax	:= record
+			Enclarity.Layouts.license_base;
+			Enclarity.Layouts.npi_base.npi_num;
+			Enclarity.Layouts.npi_base.taxonomy;
+		end;
+		
+		joined_npi	:= join(sort(distribute(mo_only, hash(group_key)), group_key, local),
+												sort(distribute(npi_base, hash(group_key)), group_key, local),
+													left.group_key = right.group_key,
+													transform({lic_base_w_tax},
+														self.npi_num	:= right.npi_num,
+														self.taxonomy	:= trim(right.taxonomy,all),
+														self					:= left),
+													left outer, local);
+	
+		mo_apn			:= joined_npi(taxonomy[1..4] = '363L' or taxonomy[1..4] = '364S' or taxonomy[1..3] = '367')
+										:persist('~thor_data400::base::enclarity::modified_license_w_taxonomy');
+		
+		non_mo_apn	:= joined_npi(taxonomy[1..4] <> '363L' and taxonomy[1..4] <> '364S' and taxonomy[1..3] <> '367')
+										:persist('~thor_data400::base::enclarity::modified_license_w_taxonomy_non_apn');;
+		
+		clear_exp_stat	:= project(mo_apn, 
+																transform(enclarity.Layouts.license_base,
+																	old_rec									:= if(left.dt_vendor_last_reported < (unsigned4)filedate, true, false);
+																	self.lic_end_date				:= if(old_rec,'00000000',left.lic_end_date),
+																	self.lic_status					:= if(old_rec,'',left.lic_status),
+																	self.clean_lic_end_date	:= if(old_rec,'00000000',left.clean_lic_end_date),
+																	self										:= left));
+																	
+		sort_clear_exp_stat	:= sort(distribute(clear_exp_stat, hash(group_key, lic_state, lic_num, lic_begin_date)),
+															group_key, lic_state, lic_num, lic_begin_date, local);
+
+		Enclarity.Layouts.license_base t_rollup(sort_clear_exp_stat L, sort_clear_exp_stat R) := TRANSFORM
+			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
+			SELF.dt_vendor_last_reported  := max	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+			SELF						 							:= IF(L.lic_end_date = '00000000', L, R);
+		END;
+
+		roll_mo_lic := ROLLUP(sort_clear_exp_stat,					
+										LEFT.group_key 			= RIGHT.group_key 			AND 
+										LEFT.lic_state 			= RIGHT.lic_state				AND				
+										LEFT.lic_num				= RIGHT.lic_num					AND						
+										// LEFT.lic_end_date		= RIGHT.lic_end_date	 	AND	 // don't match end date
+										// LEFT.lic_status			= RIGHT.lic_status		  AND
+										LEFT.lic_begin_date = RIGHT.lic_begin_date	AND
+										LEFT.record_type		= RIGHT.record_type,
+										t_rollup(LEFT,RIGHT),LOCAL);
+									
+		recombined_provs	:= no_mo_lic + project(non_mo_apn, enclarity.Layouts.license_base) + roll_mo_lic;
+		
+		dedup_recombined_provs	:= dedup(sort(distribute(recombined_provs, hash(group_key, lic_state, lic_num, lic_end_date, lic_status)),
+																	group_key, lic_state, lic_num, lic_end_date, lic_status, local), record, local):
+										persist('~thor_data400::base::enclarity::modified_license_persist_for_keys::' + filedate);
+										
+		// RETURN non_mo_apn;
+		// RETURN roll_mo_lic;
+		// RETURN mo_apn;
+		// RETURN sort_clear_exp_stat;
+		RETURN dedup_recombined_provs;
+	END;
+	
 	EXPORT Taxonomy_Base := FUNCTION
 		hist_base	:= Mark_history(Enclarity.Files(filedate,pUseProd).taxonomy_base.built, Enclarity.layouts.taxonomy_base);
 		
@@ -1908,7 +1970,7 @@ end;
 										
 		Enclarity.Layouts.taxonomy_base t_rollup(new_base_s L, new_base_s R) := TRANSFORM
 			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
-			SELF.dt_vendor_last_reported  := ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+			SELF.dt_vendor_last_reported  := max	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 			SELF						 							:= IF(L.record_type = 'C', L, R);
 		END;
 
@@ -1992,7 +2054,7 @@ end;
 						
 		Enclarity.Layouts.npi_base t_rollup(new_base_s L, new_base_s R) := TRANSFORM
 			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
-			SELF.dt_vendor_last_reported  := ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+			SELF.dt_vendor_last_reported  := max	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 			SELF						 							:= IF(L.record_type = 'C', L, R);
 		END;
 
@@ -2167,7 +2229,7 @@ end;
 										
 		Enclarity.Layouts.medschool_base t_rollup(new_base_s L, new_base_s R) := TRANSFORM
 			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
-			SELF.dt_vendor_last_reported  := ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+			SELF.dt_vendor_last_reported  := max	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 			SELF						 							:= IF(L.record_type = 'C', L, R);
 		END;
 
@@ -2205,7 +2267,7 @@ end;
 										
 		Enclarity.Layouts.tax_codes_base t_rollup(new_base_s L, new_base_s R) := TRANSFORM
 			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
-			SELF.dt_vendor_last_reported  := ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+			SELF.dt_vendor_last_reported  := max	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 			SELF						 							:= IF(L.record_type = 'C', L, R);
 		END;
 
@@ -2243,7 +2305,7 @@ end;
 										
 		Enclarity.Layouts.prov_ssn_base t_rollup(new_base_s L, new_base_s R) := TRANSFORM
 			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
-			SELF.dt_vendor_last_reported  := ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+			SELF.dt_vendor_last_reported  := max	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 			SELF						 							:= IF(L.record_type = 'C', L, R);
 		END;
 
@@ -2275,7 +2337,7 @@ end;
 						
 		Enclarity.Layouts.specialty_base t_rollup(new_base_s L, new_base_s R) := TRANSFORM
 			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
-			SELF.dt_vendor_last_reported  := ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+			SELF.dt_vendor_last_reported  := max	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 			SELF						 							:= IF(L.record_type = 'C', L, R);
 		END;
 
@@ -2319,7 +2381,7 @@ end;
 			
 		Enclarity.Layouts.prov_birthdate_base t_rollup(new_base_s L, new_base_s R) := TRANSFORM
 			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
-			SELF.dt_vendor_last_reported  := ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+			SELF.dt_vendor_last_reported  := max	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 			SELF						 							:= IF(L.record_type = 'C', L, R);
 		END;
 
@@ -2391,7 +2453,7 @@ end;
 
 		base_u3 t_rollup(base_u3  L, base_u3 R) := TRANSFORM
 			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
-			SELF.dt_vendor_last_reported  := ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+			SELF.dt_vendor_last_reported  := max	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 			SELF						 							:= IF(L.record_type = 'C', L, R);
 		END;
 		
@@ -2538,7 +2600,7 @@ end;
 
 		flags_sort last_rollup(flags_sort  L, flags_sort R) := TRANSFORM
 			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
-			SELF.dt_vendor_last_reported  := ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+			SELF.dt_vendor_last_reported  := max	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 			SELF						 							:= IF(L.record_type = 'C', L, R);
 		END;
 		

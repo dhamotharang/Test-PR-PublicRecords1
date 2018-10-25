@@ -250,7 +250,21 @@ dSuppressRecs				:=
 	//	LNK-444	DQ: DECEASED INDICATOR; 81272
     {'008274817909', 100, '20180305', ' ', ' ', '         ', 'WAYMAN              ', '    ', 'CHRIS          ', 'M              ', ' ', '        ', '19831106', '06', '94704', '     ', 'CA', '001', '  ', 'N', 'TUN', /*'008274817909WTUN'*/'', 'TN', 'Y'}, 
 	//	LNK-502	Consumer incorrectly marked as deceased	
-    {'057182621232', 100, '20180305', ' ', ' ', '         ', 'PASCHANG            ', '    ', 'ANDREA         ', '               ', ' ', '        ', '19890712', '20', '66210', '     ', 'KS', '091', '  ', 'N', 'TUN', /*'057182621232PTUN'*/'', 'TN', 'Y'}
+    {'057182621232', 100, '20180305', ' ', ' ', '         ', 'PASCHANG            ', '    ', 'ANDREA         ', '               ', ' ', '        ', '19890712', '20', '66210', '     ', 'KS', '091', '  ', 'N', 'TUN', /*'057182621232PTUN'*/'', 'TN', 'Y'},
+	// LNK-1716	Deceased research question
+    {'001080819561', 100, '20180531', ' ', ' ', '         ', 'HAUGHTON            ', '    ', 'DOUGLAS        ', 'K              ', ' ', '20180329', '19401206', '53', '     ', '     ', 'WA', '   ', '  ', 'N', 'OBD', /*'OB00000040307222'*/'', 'OB', 'N'},
+	// LNK-1494	Non-FCRA - Alive Consumer marked as deceased
+				{/*'000000000000'*/'', 0, '20130524', ' ', ' ', /*'563392477'*/'', 'KHOURI              ', '    ', 'NABIL          ', 'ADIB           ', ' ', '20040116', '        ', '06', '     ', '     ', 'CA', '   ', '  ', 'Y', 'CAL', 'CA00000002765897', 'D0', 'N'},
+	//	LNK-1285	Ohio National Life - 1765801 Miguel Nunez Jr.
+    {'001691940595', 100, '20180619', ' ', ' ', '266712661', 'NUNEZ               ', '    ', 'MIGUEL         ', 'ANGEL          ', ' ', '20120903', '        ', '12', '33133', '     ', 'FL', '086', '  ', 'N', 'ENC', /*'001691940595NENC'*/'', '64', 'N'},
+	// LNK-1816 Consumer being reported with two DODs.
+		{/*'001856332815'*/'', 100, '20180621', ' ', ' ', '         ', 'NOTTINGHAM          ', '    ', 'RICHARD        ', 'E              ', ' ', '20180531', '19470210', '40', '     ', '     ', 'OK', '   ', '  ', 'N', 'OBD', 'OB00000040823558', 'OB', 'N'},
+	// LNK-1854	Overlinking of Death record to LexID 153361926277 Bennie
+		{/*'153361926277'*/'', 97, '20180629', 'A', 'A', '567180654', 'BENNIE              ', '    ', 'ANDREW         ', 'ADAIR          ', ' ', '19441219', '00000000', '  ', '     ', '     ', '  ', '   ', '  ', 'N', 'SSA', /*'567180654B441219'*/'', 'DE', 'N'},
+	// LNK-987 FW: Deceased data
+    {'000602512896', 100, '20180806', ' ', ' ', '         ', 'DE JORIA            ', 'II  ', 'JOHN           ', 'PAUL           ', ' ', '        ', '19650731', '41', '97132', '     ', 'OR', '071', '  ', 'N', 'TUN', /*'000602512896DTUN'*/'', 'TN', 'Y'},
+	//	LNK-579 Health Equity - Yolanda White - Showing DECEASED and is NOT
+    {'001122861464', 85, '20180806', ' ', ' ', '         ', 'YOLANDA             ', '    ', 'POPE           ', '               ', ' ', '        ', '        ', '53', '98178', '     ', 'WA', '033', '  ', 'N', 'TUN', /*'001122861464YTUN'*/'', 'TN', 'Y'}
 	], Header.Layout_Did_Death_MasterV3);
 
 EXPORT	File_Death_Master_Suppression	:=	dSuppressRecs;

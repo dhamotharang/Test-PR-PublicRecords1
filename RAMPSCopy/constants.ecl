@@ -1,4 +1,4 @@
-import _Control,lib_stringlib;
+﻿import _Control,lib_stringlib;
 // destenv = '' for prod copy; = 'dr' for dr copy
 EXPORT constants(string destenv) := module
 	export dslistfile := 'ramps::in::indexes::list'; // file is created manually from rampscopy.updaterampsdsfile
@@ -24,10 +24,10 @@ EXPORT constants(string destenv) := module
 																											,'thor400_44'];
 		export port := '8010';
 		export nonfcra := module
-			export roxieprodesp := '10.173.1.131';
-			export roxieprodtarget := 'roxie_134';
-			export roxiecertesp := '10.173.1.136';
-			export roxiecerttarget := 'roxie_128';
+			export roxieprodesp := '10.173.109.101';
+			export roxieprodtarget := 'roxie_109';
+			export roxiecertesp := '10.173.101.101';
+			export roxiecerttarget := 'roxie_cert_pull';
 		end;
 	end;
 
@@ -42,7 +42,7 @@ EXPORT constants(string destenv) := module
 															stringlib.StringToUpperCase(destenv) = 'DR' => '10.194.100.151',
 															stringlib.StringToUpperCase(destenv) = 'QA' => '10.241.100.157',
 															stringlib.StringToUpperCase(destenv) = 'DEV' => '10.241.100.159',
-															'10.241.100.151'
+															'10.173.10.151'
 														);
 		export dstcluster := map
 															(

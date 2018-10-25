@@ -861,4 +861,14 @@
 
 	//BuyCrash Project KY Integration
 	STRING3 Contrib_source; 
+	
+	//BuyCrash Release 6
+  STRING10 Date_Report_Submitted;
+	
+	//CrashLogic Release 4
+	STRING1 Releasable;
+	
+	//Nucleus 
+	STRING50 Platform;
+	STRING40 Agency_Report_Number;
 END;

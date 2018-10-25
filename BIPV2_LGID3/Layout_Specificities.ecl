@@ -1,4 +1,4 @@
-IMPORT SALT30;
+﻿IMPORT SALT30;
 EXPORT Layout_Specificities := MODULE
 SHARED L := Layout_LGID3;
 export sbfe_id_ChildRec := record
@@ -56,6 +56,11 @@ export cnp_btype_ChildRec := record
   unsigned8 cnt;
   unsigned4 id;
 end;
+EXPORT UnderLinks_ChildRec := RECORD
+  SALT30.StrType Basis;
+  UNSIGNED8 cnt;
+  UNSIGNED4 id;
+END;
 EXPORT R := RECORD,MAXLENGTH(32000)
  UNSIGNED1 dummy;
   real4 sbfe_id_specificity;
@@ -102,5 +107,9 @@ EXPORT R := RECORD,MAXLENGTH(32000)
   real4 cnp_btype_switch;
   real4 cnp_btype_max;
   dataset(cnp_btype_ChildRec) nulls_cnp_btype {MAXCOUNT(100)};
+  REAL4 UnderLinks_specificity;
+  REAL4 UnderLinks_switch;
+  REAL4 UnderLinks_max;
+  DATASET(UnderLinks_ChildRec) nulls_UnderLinks {MAXCOUNT(100)};
 END;
 END;

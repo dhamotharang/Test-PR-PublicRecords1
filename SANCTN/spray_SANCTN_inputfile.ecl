@@ -1,4 +1,4 @@
-import SANCTN,_Control;
+﻿import SANCTN,_Control;
 
 export spray_SANCTN_inputfile(string filedate) := function
 
@@ -11,11 +11,11 @@ export spray_SANCTN_inputfile(string filedate) := function
 
 // %groupname% := 'thor200_144';
 //%groupname% := 'thor20_241_10';
-%groupname% := 'thor400_30';
+%groupname% := 'thor400_44';
 %cluster_name% := SANCTN.cluster_name;
 
-%spray_data% := fileservices.SprayVariable(_Control.IPAddress.edata12
-                                        ,'/thor_back5/sanctn/public/data/'+filedate+'/'+filedate+'_combined.dat'
+%spray_data% := fileservices.SprayVariable(_Control.IPAddress.bctlpedata12
+                                        ,'/data/thor_back5/sanctn/public/data/'+filedate+'/'+filedate+'_combined.dat'
 										,
 										,''
 										,'\n'
@@ -34,7 +34,8 @@ export spray_SANCTN_inputfile(string filedate) := function
 		
 // Do superfile transactions
 %super_input% := sequential(FileServices.StartSuperFileTransaction()
-                             ,FileServices.ClearSuperFile(SANCTN.cluster + 'in::SANCTN::payload')
+         ,FileServices.PromoteSuperFileList([SANCTN.cluster + 'in::SANCTN::payload',SANCTN.cluster + 'in::SANCTN::payload_father']) 
+                           //  ,FileServices.ClearSuperFile(SANCTN.cluster + 'in::SANCTN::payload')
 							 ,FileServices.AddSuperFile(SANCTN.cluster + 'in::SANCTN::payload'
 							                           ,SANCTN.cluster + 'in::sanctn::'+filedate+'::payload')
 			                 ,FileServices.FinishSuperFileTransaction());

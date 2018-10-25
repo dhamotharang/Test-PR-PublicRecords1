@@ -1,10 +1,10 @@
-﻿/**
+/**
 Most common US surnames from 2000 census
 **/
 import	Data_Services, _Control;
 dataland := '~thor400_88::';	//		'~thor40_241::;	//'~thor200_144::';
 cluster :=  map(Thorlib.Daliservers() in LogsThor => Data_Services.foreign_prod + 'thor_data400::',
-									     //_Control.ThisEnvironment.name='Dataland' => dataland,
+									     _Control.ThisEnvironment.name='Dataland' => dataland,
 											 '~thor_data400::');
 											 
 bname := 'base::nid::censussurnames';

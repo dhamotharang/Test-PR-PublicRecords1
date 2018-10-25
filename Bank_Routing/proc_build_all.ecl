@@ -45,10 +45,11 @@ EXPORT proc_build_all(STRING filedate, STRING filename) := FUNCTION
    Build_Keys,
    bank_routing.Out_Base_Stats_Population(filedate),
    //bank_routing.Proc_Build_Autokeys(filedate)),
-  bank_routing.fn_Key_Compare(filedate),
+  
   Scrubs_bank_routing.PostBuildScrubs(filedate)
-	// if(bank_routing.fn_CheckBeforeDops(filedate),UpdateRoxiePage)
-	)): 
+	
+	),UpdateRoxiePage
+	): 
   SUCCESS(e_mail_success), 
   FAILURE(e_mail_fail);
 

@@ -25,7 +25,13 @@ OverrideData := DATASET([
 	{'P','','CRYSTAL','','BALL','','MS','CRYSTAL','','BALL'},
 	{'B','VIRGINIA EASLEY JOHNSON PA','','','','','','','',''},
 	// from death master
-   {'P','SU IN LEI', 'SU', 'IN', 'LEI', '', '', 'SU', 'IN', 'LEI'}
+   {'P','SU IN LEI', 'SU', 'IN', 'LEI', '', '', 'SU', 'IN', 'LEI'},
+	 //
+   {'B','Terra Firma'},
+   {'B','TERRA FIRMA'},
+   {'P','CEDILLOS, JOSE FELIX DEL CID', '', '', '', '', 'MR', 'JOSE', 'FELIX DEL CID', 'CEDILLOS'},
+   {'P','ALEXANDER WILDERNESS, SR','', '', '', '', 'MR', 'ALEXANDER', '', 'WILDERNESS', 'SR'},
+   {'P','ALEXANDER WILDERNESS','', '', '', '', 'MR', 'ALEXANDER', '', 'WILDERNESS', ''}
 	], layout_Override);
 
 EXPORT Overrides(boolean fullname=true) := DISTRIBUTE(PROJECT(OverrideData, TRANSFORM(Layout_Repository,

@@ -37,8 +37,10 @@ first_spray_new_files := sequential(
                                     doSprayFile('prte__personrecs__captone_*.txt'),
                                     doSprayFile('prte__personrecs__axcessfin_*.txt'),
                                     doSprayFile('prte__personrecs__amex_*.txt'),
-                                    doSprayFile('prte__personrecs__ecr_*.txt')
-);
+                                    doSprayFile('prte__personrecs__ecr_*.txt'),
+																		doSprayFile('prte__personrecs__transunion_*.txt'),
+																		doSprayFile('prte__personrecs__scientificgaming_*.txt')
+	);
 
 then_move_previous_to_father_before_adding_the_new_sprayed_files := sequential(
             

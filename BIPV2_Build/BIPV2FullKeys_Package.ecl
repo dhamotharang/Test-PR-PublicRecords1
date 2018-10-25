@@ -40,6 +40,7 @@ module
   export proxid_atts                    := tools.macf_FilesIndex('BIPV2_ProxID.Keys().Attribute_Matches          ' ,proxknames.Attribute_Matches      );
   export lgid3_mtch_cand                := BIPV2_LGID3.Keys2(,pversion,puseotherenvironment).MatchCandidates;
   export lgid3_specs                    := BIPV2_LGID3.Keys2(,pversion,puseotherenvironment).Specificity    ;
+  export lgid3_atts                     := BIPV2_LGID3.Keys2(,pversion,puseotherenvironment).Attribute_Match;
   export best_linkids                   := tools.macf_FilesIndex('BIPV2_Best.Key_LinkIds.key                     ' ,bestknames.LinkIds                );
   // export relative_assoc                 := tools.macf_FilesIndex('BIPv2_Relative.keys(relbase).ASSOC             ' ,relknames.assoc                   );
   export Seleid_relative_assoc          := tools.macf_FilesIndex('BIPV2_Seleid_Relative.keys(Seleidrelbase).ASSOC' ,Seleidrelknames.assoc             );
@@ -100,7 +101,8 @@ module
     ,if(pKey in [0 ,10] ,sequential(output(10 ,named('KeyNumber'),overwrite) ,output(choosen(proxid_atts                  .logical ,100),named('proxid_atts'                   ))))
     ,if(pKey in [0 ,11] ,sequential(output(11 ,named('KeyNumber'),overwrite) ,output(choosen(lgid3_mtch_cand              .logical ,100),named('lgid3_mtch_cand'               ))))
     ,if(pKey in [0 ,12] ,sequential(output(12 ,named('KeyNumber'),overwrite) ,output(choosen(lgid3_specs                  .logical ,100),named('lgid3_specs'                   ))))
-    ,if(pKey in [0 ,13] ,sequential(output(13 ,named('KeyNumber'),overwrite) ,output(choosen(best_linkids                 .logical ,100),named('best_linkids'                  ))))
+    ,if(pKey in [0 ,13] ,sequential(output(13 ,named('KeyNumber'),overwrite) ,output(choosen(lgid3_atts                   .logical ,100),named('lgid3_atts'                    ))))
+    ,if(pKey in [0 ,14] ,sequential(output(14 ,named('KeyNumber'),overwrite) ,output(choosen(best_linkids                 .logical ,100),named('best_linkids'                  ))))
     // ,if(pKey in [0 ,14] ,sequential(output(14 ,named('KeyNumber'),overwrite) ,output(choosen(relative_assoc               .logical ,100),named('relative_assoc'                ))))
     ,if(pKey in [0 ,15] ,sequential(output(15 ,named('KeyNumber'),overwrite) ,output(choosen(Seleid_relative_assoc        .logical ,100),named('Seleid_relative_assoc'         ))))
     ,if(pKey in [0 ,16] ,sequential(output(16 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkmeow                    .logical ,100),named('Xlinkmeow'                     ))))

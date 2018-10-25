@@ -1,4 +1,4 @@
-lproxid := 206036;
+﻿lproxid := 206036;
 pDataset := BIPV2_ProxID.Files().base.qa;
 ddotsinproxid := pdataset(proxid = lproxid);
 dAggOverall_raw := BIPV2_ProxID.AggregateDOTidElements(ddotsinproxid,false);

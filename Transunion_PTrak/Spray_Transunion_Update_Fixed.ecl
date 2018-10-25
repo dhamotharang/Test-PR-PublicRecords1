@@ -1,18 +1,18 @@
-//----------------------------------------------------------------------
+﻿//----------------------------------------------------------------------
 //VENDOR FILE: data updates will be from the vendor only in a fixed length file
 //----------------------------------------------------------------------
-IMPORT lib_stringlib, lib_fileservices, _control;
+IMPORT lib_stringlib, lib_fileservices, _control, lib_thorlib;
 
 EXPORT  Spray_Transunion_Update_Fixed (STRING full_filedate = '', STRING Update_filedate = '') := FUNCTION
 f_Date := if(full_filedate <> '', full_filedate, Update_filedate);
 //srcIP := 'edata11-bld.br.seisint.com';
 srcIP := _Control.IPAddress.bctlpedata11;
-targetGrp := 'thor400_44';
+targetGrp := thorlib.group();
 superfile := Transunion_Ptrak.SuperFileList.SourceFileUpdateIn;
 superfileDel := '~thor_data400::in::transunionptrak_delete';
 filenames := superfile + '_' + f_Date;
 filenameDel := superfileDel+ '_' + f_Date;
-RemoteLoc := '/data/data_lib_2_hus2/TUCS/vendor/' + f_Date + '/' ;
+RemoteLoc := '/data/data_lib_2_hus2/TUCS/data/' + f_Date + '/' ;
 RemoteFile:= 'vendor.d00' ;
 RemoteFileDel := 'delete.del00';
 

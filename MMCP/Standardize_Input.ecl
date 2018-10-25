@@ -1,4 +1,4 @@
-IMPORT _Validate, ut;
+﻿IMPORT _Validate, ut;
 
 EXPORT Standardize_Input(DATASET(Layouts.Base)             pInputMI,
                          DATASET(Layouts.Input.IL_License) pInputIL,
@@ -111,7 +111,7 @@ EXPORT Standardize_Input(DATASET(Layouts.Base)             pInputMI,
 	END;
 
 	MI := PROJECT(pInputMI, clean_input(LEFT));
-	IL := PROJECT(pInputIL(license_number[1..3] IN _Constants().valid_license_numbers), clean_il_input(LEFT));
+	IL := PROJECT(pInputIL, clean_il_input(LEFT));
 
   EXPORT All := MI + IL;
 

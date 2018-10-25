@@ -1,6 +1,6 @@
 ﻿IMPORT	ut, AID, AID_Support, DID_Add, Business_Header_SS, address, NID, STD, PromoteSupers,
 							PRTE2, Anchor; //using a cleaning functions in these repositories;
-#workunit('name', 'RealSource Email Build');
+#workunit('name', 'Yogurt: RealSource Email Build');
 // #constant(AID_Support.Constants.StoredWhichAIDCache, AID_Support.Constants.eCache.ForNonHeader);
 // #STORED('did_add_force','thor');
 				
@@ -58,9 +58,10 @@ EXPORT proc_build_base(STRING8 version) := FUNCTION
 
 	rsAIDCleanName	:= PROJECT(InputFileClnName ,tProjectAIDClean_prep(LEFT))(TRIM(EMAIL) <> ''); //removes invalid records
 	
-	rsAID_NoAddr		:=	rsAIDCleanName(TRIM(Append_Prep_Address_Situs) = '' OR TRIM(Append_Prep_Address_Last_Situs) = '' OR
-																																	STD.Str.Find(Append_Prep_Address_Situs, '@', 1) > 0);
-	rsAID_Addr			:=	rsAIDCleanName(TRIM(Append_Prep_Address_Situs) != '' AND TRIM(Append_Prep_Address_Last_Situs) != '');
+	rsAID_NoAddr		:=	rsAIDCleanName(TRIM(Append_Prep_Address_Situs) = '' OR TRIM(Append_Prep_Address_Last_Situs) = '' 
+																			OR STD.Str.Find(Append_Prep_Address_Situs, '@', 1) > 0 OR LENGTH(ZipCode)<5 OR TRIM(state) = '');
+	rsAID_Addr			:=	rsAIDCleanName(TRIM(Append_Prep_Address_Situs) != '' AND TRIM(Append_Prep_Address_Last_Situs) != ''
+																			AND STD.Str.Find(Append_Prep_Address_Situs, '@', 1) = 0 AND LENGTH(ZipCode)=5 AND TRIM(state) != '');
 	
 	AID.MacAppendFromRaw_2Line(rsAID_Addr,Append_Prep_Address_Situs, Append_Prep_Address_Last_Situs, RawAID,
 																											rsCleanAID, lAIDFlags);	
@@ -187,8 +188,8 @@ EXPORT proc_build_base(STRING8 version) := FUNCTION
 																			,																			// mname
 																			,																			// lname
 																			,																			// contact ssn
-																			,MDR.sourceTools.src_RealSource				// Source  MDR.sourceTools
-																			,persistent_record_id									// Source_Record_Id
+																			,'RS'																	// Source  MDR.sourceTools
+																			,rcid																	// Source_Record_Id
 																			,																			// Src_Matching_is_priorty
 																			);
 */												

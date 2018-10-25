@@ -338,7 +338,7 @@ export Main         :=
 	string75  				Event_Type_2;
 	string75  				Event_Type_3;
 //ENTITY CHARACTERISTICS
-	unsigned8 				Household_ID;
+	string20 					Household_ID;
 	string250    			Reason_Description;
 	string25					Investigation_Referral_Case_ID;
 	string8						Investigation_Referral_Date_Opened;
@@ -354,7 +354,7 @@ export Main         :=
 	string5						Fraud_Point_Score;
 // Entity 
 // Person 
-	unsigned6					  Customer_Person_ID;
+	string20					  Customer_Person_ID;
 	string50						raw_title;
 	string100						raw_First_Name;
 	string60						raw_Middle_Name;
@@ -404,7 +404,7 @@ export Main         :=
 	string50					Email_Address ;
 	string10					Email_Address_Type ;
 	string8						Email_Date ;
-	string15					Host ;
+	string						Host ;
 	string25					Alias ;
 	string25					Location ;
 // IP ADDRESS
@@ -419,12 +419,12 @@ export Main         :=
 	string50					Device_ID;
 	string8 					Device_Date;
 	string20					Unique_number;// (IMEI, MEID, ESN, IMSI)   
-	string10					MAC_Address;
+	string25					MAC_Address;
 	string20					Serial_Number;
 	string25					Device_Type ; 
 	string25          Device_identification_Provider; 
 // TRANSACTION (case, claim, policy,...)
-	string20					Transaction_ID;
+	string					  Transaction_ID;
 	string10					Transaction_Type;
 	string12					Amount_of_Loss;
 // LICENSED PROFESSIONAL (LP)
@@ -432,6 +432,8 @@ export Main         :=
 	string50					Profession_Type;
 	string12					Corresponding_Professional_IDs;
 	string2						Licensed_PR_State;
+//Vehicle
+  string25        VIN := ''; 
 	// Classification // per source mapped at record level
   Classification.source                  classification_source; 
 	Classification.Activity                classification_Activity;
@@ -469,6 +471,10 @@ export Main         :=
 	string20					relationship_indicator := '';
 	string3						county := ''; //   County/Parish ???
 	address_cleaner		additional_address;	
+	string10					clean_SSN :='';
+	string10					clean_Zip :='';
+	string25					clean_IP_Address :='';
+	string10					clean_dob :='';
 
 // FraudGovPlatform	IdentityData
 	string1						Race := '';
@@ -495,6 +501,7 @@ export Main         :=
 	string60					business_risk_code := '';
 	string60					mailing_address_risk_code := '';
 	string60	 				device_risk_code := '';
+	string60					identity_risk_code := '';
 	string10					tax_preparer_id := '';
 	string8						start_date := '';
 	string8						end_date := '';
@@ -533,7 +540,7 @@ export keybuild
 	string75  				Event_Type_2;
 	string75  				Event_Type_3;
 //ENTITY CHARACTERISTICS
-	unsigned8 				Household_ID;
+	string20 					Household_ID;
 	string250    			Reason_Description;
 	string25					Investigation_Referral_Case_ID;
 	string8						Investigation_Referral_Date_Opened;
@@ -549,7 +556,7 @@ export keybuild
 	string5						Fraud_Point_Score;
 // Entity 
 // Person 
-	unsigned6					  Customer_Person_ID;
+	string20					  Customer_Person_ID;
 	string50						raw_title;
 	string100						raw_First_Name;
 	string60						raw_Middle_Name;
@@ -599,7 +606,7 @@ export keybuild
 	string50					Email_Address ;
 	string10					Email_Address_Type ;
 	string8						Email_Date ;
-	string15					Host ;
+	string						Host ;
 	string25					Alias ;
 	string25					Location ;
 // IP ADDRESS
@@ -614,12 +621,12 @@ export keybuild
 	string50					Device_ID;
 	string8 					Device_Date;
 	string20					Unique_number;// (IMEI, MEID, ESN, IMSI)   
-	string10					MAC_Address;
+	string25					MAC_Address;
 	string20					Serial_Number;
 	string25					Device_Type ; 
 	string25          Device_identification_Provider; 
 // TRANSACTION (case, claim, policy,...)
-	string20					Transaction_ID;
+	string					  Transaction_ID;
 	string10					Transaction_Type;
 	string12					Amount_of_Loss;
 // LICENSED PROFESSIONAL (LP)
@@ -627,6 +634,8 @@ export keybuild
 	string50					Profession_Type;
 	string12					Corresponding_Professional_IDs;
 	string2						Licensed_PR_State;
+//Vehicle
+  string25        VIN := ''; 
 	// Classification // per source mapped at record level
   Classification.source                  classification_source; 
 	Classification.Activity                classification_Activity;
@@ -664,6 +673,10 @@ export keybuild
 	string20					relationship_indicator := '';
 	string3						county := ''; //   County/Parish ???
 	address_cleaner		additional_address;	
+	string10					clean_SSN :='';
+	string10					clean_Zip :='';
+	string25					clean_IP_Address :='';
+	string10					clean_dob :='';
 
 // FraudGovPlatform	IdentityData
 	string1						Race := '';
@@ -690,6 +703,7 @@ export keybuild
 	string60					business_risk_code := '';
 	string60					mailing_address_risk_code := '';
 	string60	 				device_risk_code := '';	
+	string60					identity_risk_code := '';
 	string10					tax_preparer_id := '';
 	string8						start_date := '';
 	string8						end_date := '';

@@ -1,6 +1,7 @@
-/* Converting Asc National Registry Real Estate Appraisers Professional License File to MARI common layout
+﻿/* Converting Asc National Registry Real Estate Appraisers Professional License File to MARI common layout
 // Following allowable Real Estate License Type: APR, RLE, MTG, LND*/
 //Input file location: \\Tapeload02b\k\professional_licenses\mari\national\real_estate_appraisers_(en)
+#workunit('name','Yogurt: map_USS0814_conversion'); 
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib, STD;
 
 EXPORT map_USS0814_conversion(STRING pVersion) := FUNCTION

@@ -25,16 +25,14 @@ TRANSFORM
 	clean_POD_address_2						:=	Address.fn_addr_clean_prep(IF(TRIM(clean_POD_City,ALL)<>'',clean_POD_City+', CA','CA'),'last');
 
 	// Convert the DOB and DOD to a common format and calculate AGE
-	fmtsin := [
-		'%m/%d/%Y',
-		'%m/%d/%y'
-	];
-	fmtout:='%Y%m%d';
-	STRING8 	clean_dob 		:=	Std.date.ConvertDateFormatMultiple(pInput.dob,fmtsin,fmtout);
+	fmtsin_dob := '%m/%d/%Y'; // Ex. 6/7/2018
+	fmtsin_dod := '%m/%d/%y'; // Ex. 6/7/18
+	fmtout					:=	'%Y%m%d';
+	STRING8 	clean_dob 		:=	Std.date.ConvertDateFormat(pInput.dob,fmtsin_dob,fmtout);
 	//	California may send in two digit year (1/1/15) so we add 20 to the beginning
-	STRING8 	clean_dod 		:= 	IF((UNSIGNED)Std.date.ConvertDateFormatMultiple(pInput.dod,fmtsin,fmtout)<999999,
-															'20'+Std.date.ConvertDateFormatMultiple(pInput.dod,fmtsin,fmtout),
-															Std.date.ConvertDateFormatMultiple(pInput.dod,fmtsin,fmtout));
+	STRING8 	clean_dod 		:= 	IF((UNSIGNED)Std.date.ConvertDateFormat(pInput.dod,fmtsin_dod,fmtout)<999999,
+															'20'+Std.date.ConvertDateFormat(pInput.dod,fmtsin_dod,fmtout),
+															Std.date.ConvertDateFormat(pInput.dod,fmtsin_dod,fmtout));
 	UNSIGNED1	clean_age 		:=	ut.Age((INTEGER) clean_dob,(INTEGER) clean_dod);		
 	
 	SELF.source_state  			:=	'CA';

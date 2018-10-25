@@ -1,7 +1,7 @@
-//******************************************************************************************************************************************
+﻿//******************************************************************************************************************************************
 // Purpose :  To synchronise with Miami dade county's database
-// Description : 1) The recording extract will no longer contain deleted (Â‘DÂ’) records. 
-//                  You will need to use the CFN Year + CFN Sequence in order to synchronize your database with the CountyÂ’s database. 
+// Description : 1) The recording extract will no longer contain deleted (D) records. 
+//                  You will need to use the CFN Year + CFN Sequence in order to synchronize your database with the Countys database. 
 //                   The CFN Year and Sequence is a unique key combination you can use to do a full refresh of the document in your database. 
 //*******************************************************************************************************************************************
 import lib_fileservices,lib_stringlib,ut,std;

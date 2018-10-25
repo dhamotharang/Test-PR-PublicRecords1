@@ -14,15 +14,15 @@ EXPORT Mac_spray_accuity_bank_routing(source_IP,source_path,filedate,file_name,g
 #workunit('name','Bank Routing Spray');
 
 %sourceCsvSeparater% := '\\,';
-%sourceCsvTeminater% := '\\n\\r';
-%recSize% := 650;
+%sourceCsvTeminater% := '\\r\\r\\n';
+%recSize% := 653;
 
 %spray_main% := FileServices.SprayVariable(Source_IP,source_path + file_name,%recSize%,%sourceCsvSeparater%,%sourceCsvTeminater%,,group_name,bank_routing.thor_cluster + 'in::accuity::rtbaset::'+ filedate,-1,,,true,true,true);
 
 %Create_Superfiles% := sequential(FileServices.CreateSuperFile(bank_routing.thor_cluster + 'in::Accuity::rtbaset::Superfile',false),
  FileServices.CreateSuperFile(bank_routing.thor_cluster + 'in::Accuity::rtbaset::archive',false));
  
-%CreateSuperFiles% := if (NOT(~FileServices.SuperFileExists(bank_routing.thor_cluster + 'in::Accuity::rtbaset::Superfile')),%Create_Superfiles%);
+%CreateSuperFiles% := if (NOT(FileServices.SuperFileExists(bank_routing.thor_cluster + 'in::Accuity::rtbaset::Superfile')),%Create_Superfiles%);
 
 %super_main% := sequential(FileServices.StartSuperFileTransaction(),
  FileServices.AddSuperFile(bank_routing.thor_cluster + 'in::Accuity::rtbaset::archive', 

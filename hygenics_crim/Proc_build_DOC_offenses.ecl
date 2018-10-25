@@ -1,4 +1,4 @@
-import crim_common;
+﻿import crim_common;
  
 def 	:= distribute(hygenics_crim.file_in_defendant_doc(),hash(recordid,statecode));
 cha 	:= distribute(hygenics_crim.file_in_charge_doc(),hash(recordid,statecode));
@@ -926,26 +926,56 @@ result_common 	:= project(j_final, to_court_offenses(left))(trim(vendor, left, r
 	
 /////////////////////////////////////////////////////////////////////////////////////////////
 
+// result_sort 	:= sort(distribute(result_common,HASH(offender_key,vendor,source_file)),
+                                     // process_date, offender_key, vendor, source_file, off_date, arr_date, case_num, 
+                                     // off_code, chg, chg_typ_flg, off_desc_1, off_desc_2, add_off_cd, add_off_desc, off_typ, off_lev,
+                                     // arr_disp_date, arr_disp_cd, arr_disp_desc_1, arr_disp_desc_2, arr_disp_desc_3, court_cd, court_desc,
+                                     // ct_dist, ct_fnl_plea_cd, ct_fnl_plea, ct_off_code, ct_chg, ct_chg_typ_flg, ct_off_desc_1, ct_off_desc_2,
+                                     // ct_addl_desc_cd, ct_off_lev, ct_disp_dt, ct_disp_cd, ct_disp_desc_1, ct_disp_desc_2, cty_conv_cd,
+                                     // cty_conv, adj_wthd, stc_dt, stc_cd, stc_comp, stc_desc_1, stc_desc_2, stc_desc_3, stc_desc_4,
+                                     // stc_lgth, stc_lgth_desc, inc_adm_dt, min_term, min_term_desc, max_term, max_term_desc,
+																		 // parole,probation,offensetown,convict_dt,
+																		 // -num_of_counts,-offense_key,local);
+																		 
 result_sort 	:= sort(distribute(result_common,HASH(offender_key,vendor,source_file)),
                                      process_date, offender_key, vendor, source_file, off_date, arr_date, case_num, 
-                                     off_code, chg, chg_typ_flg, off_desc_1, off_desc_2, add_off_cd, add_off_desc, off_typ, off_lev,
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(off_code),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+																		 chg, chg_typ_flg, 
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(off_desc_1+off_desc_2),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+																		 add_off_cd, add_off_desc, off_typ, off_lev,
                                      arr_disp_date, arr_disp_cd, arr_disp_desc_1, arr_disp_desc_2, arr_disp_desc_3, court_cd, court_desc,
                                      ct_dist, ct_fnl_plea_cd, ct_fnl_plea, ct_off_code, ct_chg, ct_chg_typ_flg, ct_off_desc_1, ct_off_desc_2,
                                      ct_addl_desc_cd, ct_off_lev, ct_disp_dt, ct_disp_cd, ct_disp_desc_1, ct_disp_desc_2, cty_conv_cd,
-                                     cty_conv, adj_wthd, stc_dt, stc_cd, stc_comp, stc_desc_1, stc_desc_2, stc_desc_3, stc_desc_4,
-                                     stc_lgth, stc_lgth_desc, inc_adm_dt, min_term, min_term_desc, max_term, max_term_desc,
-																		 parole,probation,offensetown,convict_dt,
-																		 -num_of_counts,-offense_key,local);
+                                     cty_conv, adj_wthd, trim(stc_dt), stc_comp, stc_desc_1, stc_desc_2, stc_desc_3, stc_desc_4,
+                                     stc_lgth, stc_lgth_desc, inc_adm_dt, min_term, min_term_desc, max_term, 
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(max_term_desc),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+																		 parole,
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(probation),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+																		 offensetown,convict_dt,-num_of_counts,-offense_key,
+																		 local); 																		 
 
-result_dedup 	:= dedup(result_sort, process_date, offender_key, vendor, source_file, off_date, arr_date, case_num, 
-                                     off_code, chg, chg_typ_flg, off_desc_1, off_desc_2, add_off_cd, add_off_desc, off_typ, off_lev,
+// result_dedup 	:= dedup(result_sort, process_date, offender_key, vendor, source_file, off_date, arr_date, case_num, 
+                                     // off_code, chg, chg_typ_flg, off_desc_1, off_desc_2, add_off_cd, add_off_desc, off_typ, off_lev,
+                                     // arr_disp_date, arr_disp_cd, arr_disp_desc_1, arr_disp_desc_2, arr_disp_desc_3, court_cd, court_desc,
+                                     // ct_dist, ct_fnl_plea_cd, ct_fnl_plea, ct_off_code, ct_chg, ct_chg_typ_flg, ct_off_desc_1, ct_off_desc_2,
+                                     // ct_addl_desc_cd, ct_off_lev, ct_disp_dt, ct_disp_cd, ct_disp_desc_1, ct_disp_desc_2, cty_conv_cd,
+                                     // cty_conv, adj_wthd, stc_dt, stc_cd, stc_comp, stc_desc_1, stc_desc_2, stc_desc_3, stc_desc_4,
+                                     // stc_lgth, stc_lgth_desc, inc_adm_dt, min_term, min_term_desc, max_term, max_term_desc,
+																		 // parole,probation,offensetown,convict_dt,local)  : persist ('persist::out::crim::HD::DOC::offenses');
+ 
+result_dedup 	:= dedup(result_sort,  process_date,offender_key,vendor, source_file, off_date, arr_date, case_num, 
+ 																		 StringLib.StringFilter(StringLib.StringToUpperCase(off_code),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+																		 chg, chg_typ_flg, 
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(off_desc_1+off_desc_2),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+																		 add_off_cd, add_off_desc, off_typ, off_lev,
                                      arr_disp_date, arr_disp_cd, arr_disp_desc_1, arr_disp_desc_2, arr_disp_desc_3, court_cd, court_desc,
                                      ct_dist, ct_fnl_plea_cd, ct_fnl_plea, ct_off_code, ct_chg, ct_chg_typ_flg, ct_off_desc_1, ct_off_desc_2,
                                      ct_addl_desc_cd, ct_off_lev, ct_disp_dt, ct_disp_cd, ct_disp_desc_1, ct_disp_desc_2, cty_conv_cd,
-                                     cty_conv, adj_wthd, stc_dt, stc_cd, stc_comp, stc_desc_1, stc_desc_2, stc_desc_3, stc_desc_4,
-                                     stc_lgth, stc_lgth_desc, inc_adm_dt, min_term, min_term_desc, max_term, max_term_desc,
-																		 parole,probation,offensetown,convict_dt,local)  : persist ('persist::out::crim::HD::DOC::offenses');
+                                     cty_conv, adj_wthd,trim(stc_dt),stc_comp,stc_desc_1, stc_desc_2, stc_desc_3, stc_desc_4,
+                                     stc_lgth, stc_lgth_desc, inc_adm_dt, min_term, min_term_desc, max_term, 
+                                     StringLib.StringFilter(StringLib.StringToUpperCase(max_term_desc),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+																		 parole,
+																		 StringLib.StringFilter(StringLib.StringToUpperCase(probation),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),																		 
+																		 offensetown,convict_dt,local) : persist ('persist::out::crim::HD::DOC::offenses');
 //remove records with blank charges for UT DOC 
-
-
 export Proc_build_DOC_offenses := result_dedup(vendor = 'EM' and case_num+off_code+off_desc_1+stc_dt+ct_disp_desc_1 <>'')+result_dedup(vendor <> 'EM');

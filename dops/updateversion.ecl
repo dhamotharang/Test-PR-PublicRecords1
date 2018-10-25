@@ -1,4 +1,4 @@
-// Function to update data operations database with a new build version for a specific
+﻿// Function to update data operations database with a new build version for a specific
 // dataset
 
 // Parameters
@@ -23,6 +23,7 @@
 //							Note: Use Delta Replace when you are replacing a delta version with another delta.
 // tagdelta = allows users to pass "previous/already existing" delta version to tag to the new 
 //						"full" version that is pass in uversion parameter
+// overrideupdateflag = false; if the version already exists do not override the flag field, if set to true override
 //	Example: DOPS.updateversion('ABCKeys','20170516','abc@lexisnexis.com',,'N',,,,,,'F','20170514')
 
 import STD,dops;
@@ -31,7 +32,10 @@ string l_auto_pkg = 'N',string l_inenvment = '',string l_isboolready = 'Y',
 string l_isprodready = 'N',string l_inloc = dops.constants.location,string l_indaliip = '',string l_includeboolean = 'Y', 
 string l_updateflag = 'F',
 string l_tagdelta = '',
-string l_dopsenv = dops.constants.dopsenvironment) := function
+string l_dopsenv = dops.constants.dopsenvironment,
+boolean l_overrideupdateflag = false,
+string l_esp = dops.constants.esp(dops.constants.dopsenvironment),
+string l_espport = '8010') := function
 
 	// trim all string variables when a value is passed from a deprecated function/macro
 	// the values are being padded with space
@@ -66,6 +70,7 @@ string l_dopsenv = dops.constants.dopsenvironment) := function
 												subjectprefixstring + datasetname + ' DOPS UPDATE ' + newcversion, 
 												'Dataset: ' + datasetname + '\n' +
 												'Version: ' + uversion + '\n' +
+												'Workunit: ' + WORKUNIT + '\n' +
 												'HPCC Build Owner/User: ' + dops.constants.jobowner + '\n\n' +
 												'DOPS ENVIRONMENT: ' + dopsenv + if (dopsenv = 'dev', '. Updating DOPS DEV DB because the ECL code is running on dev, dops.constants.daliip is pointing to dev dali.', '') + '\n\n' +
 												newemailmessage
@@ -96,6 +101,7 @@ string l_dopsenv = dops.constants.dopsenvironment) := function
 		string inprod{xpath('inprod')} := isprodready;
 		string updateflag{xpath('updateflag')} := updateflag;
 		string tagdelta{xpath('tagdelta')} := tagdelta;
+		boolean overrideupdateflag{xpath('overrideupdateflag')} := l_overrideupdateflag;
 	end;
 	
 
@@ -105,7 +111,7 @@ string l_dopsenv = dops.constants.dopsenvironment) := function
 	end;
 	
 	soapresults := SOAPCALL(
-				dops.constants.prboca.serviceurl(dopsenv,if (regexfind('H',inenvment),'H','')),
+				dops.constants.prboca.serviceurl(dopsenv,if (regexfind('H',inenvment),'H',''),l_inloc),
 				'iUpdateVersion',
 				InputRec,
 				outrec,
@@ -121,11 +127,29 @@ string l_dopsenv = dops.constants.dopsenvironment) := function
 	missingkeys := emailme_function(email_t,datasetname,'FAILURE:'+(string8)STD.Date.Today(),uversion,'Missing Keys:' + builtkeys);
 
 	invaliddaliip := emailme_function(email_t,datasetname,'FAILURE:'+(string8)STD.Date.Today(),uversion,'Dali IP Mismatch: lib_thorlib.thorlib.daliServers() = ' + dops.constants.daliip + ' does not match with ' + dops.constants.devdaliip + ' or ' + dops.constants.proddaliip);
-								
+	
+	clustertorun := if (regexfind('eclcc',STD.System.Job.Target()),
+													map( l_dopsenv = 'prod' => 'hthor_eclcc'
+															,l_dopsenv = 'dev' => 'hthor_dev_eclcc'
+															,'na'
+													)
+													,'hthor');
+	
+	/*spawnWUtoUpdateKeyInfo := output(dops.WorkUnitModule(l_esp,l_espport).fSubmitNewWorkunit
+																	(
+																		'#workunit(\'name\',\'KEY INFO UPDATE DOPS DB:'+ datasetname+':'+uversion+':'+inenvment+'\');\r\n'+
+																		'dops.UpdateDOPSForPkgValidation(\''+datasetname+'\',\''+uversion+'\',l_environmentflag:=\''+if(l_isprodready = 'Y','P','Q')+'\',l_clusterflag:=\''+inenvment+'\',l_locationflag:=\''+l_inloc+'\',l_dopsenv:=\''+l_dopsenv+'\',l_daliip := \''+l_indaliip+'\',l_email:=\''+l_email_t+'\').RunUpdate();'
+																		,dops.constants.hthorcluster(l_dopsenv))
+																	);*/
+
+	updatekeyinfo := dops.UpdateDOPSForPkgValidation(datasetname,uversion,l_environmentflag:=if(l_isprodready = 'Y','P','Q'),l_clusterflag:=inenvment,l_locationflag:=l_inloc,l_dopsenv:=l_dopsenv,l_daliip := l_indaliip,l_email:=l_email_t).RunUpdate();
+	
 	return if(dops.constants.dopsenvironment <> 'na'
 							,if (builtkeys <> ''
 									,missingkeys
-									,if(uversion[1..8] <= (string8)STD.Date.Today(),codeval,invalid_date))
+									,if(uversion[1..8] <= (string8)STD.Date.Today()
+													,sequential(output(updatekeyinfo),codeval)
+													,invalid_date))
 							,invaliddaliip);
 
 	

@@ -1,4 +1,4 @@
-﻿import tools, _control, _validate;
+﻿import tools, _control, _validate, Orbit3;
 
 export Build_All(
 
@@ -15,14 +15,16 @@ function
 	full_build :=
 	sequential(
 		 Create_Supers
+		,Output(pversion,NAMED('Version_date'))
 		,RemoteCopyInfile	(pFilename,pGroupName,pRemoteIp)
 		,Build_Base				(pversion,pIsTesting,pSprayedFile	)
 		,Build_Keys				(pversion															).all
 		,Build_Strata			(pversion	,pOverwrite,,,	pIsTesting	)
 		,Promote().Inputfiles.using2used
 		,Promote().Buildfiles.Built2QA
-	): success(Send_Emails(pversion,,not pIsTesting).Roxie), failure(send_emails(pversion,,not pIsTesting).buildfailure);
-	//): success(Send_Emails(pversion,,not pIsTesting).BuildSuccess), failure(send_emails(pversion,,not pIsTesting).buildfailure);
+	  ,Orbit3.proc_Orbit3_CreateBuild_npf('CCLUE',pversion)
+   ): success(Send_Emails(pversion,,not pIsTesting).BuildSuccess), failure(send_emails(pversion,,not pIsTesting).buildfailure);	
+	
 		
 	return
 		if(_validate.date.fIsValid(pversion[1..8]) and _validate.date.fIsValid(pversion[1..8],_validate.date.rules.DateInPast)

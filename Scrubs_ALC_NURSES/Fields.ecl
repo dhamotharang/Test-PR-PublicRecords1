@@ -76,11 +76,11 @@ EXPORT InValidFT_invalid_gender(SALT37.StrType s) := WHICH(((SALT37.StrType) s) 
 EXPORT InValidMessageFT_invalid_gender(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('M|F|B|I|U| '),SALT37.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_addr_type(SALT37.StrType s0) := FUNCTION
-  s1 := SALT37.stringfilter(s0,'#BCHLPUXY'); // Only allow valid symbols
+  s1 := SALT37.stringfilter(s0,'#BCDHLPUXY'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_addr_type(SALT37.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT37.StringFilter(s,'#BCHLPUXY'))));
-EXPORT InValidMessageFT_invalid_addr_type(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInChars('#BCHLPUXY'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_addr_type(SALT37.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT37.StringFilter(s,'#BCDHLPUXY'))));
+EXPORT InValidMessageFT_invalid_addr_type(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInChars('#BCDHLPUXY'),SALT37.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_license_number(SALT37.StrType s0) := FUNCTION
   s1 := SALT37.stringfilter(s0,' .-#*\\ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'); // Only allow valid symbols

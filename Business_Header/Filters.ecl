@@ -37,7 +37,11 @@ module
 	// -- JIRA - LNK-788 - Overlinking of Mary J Conley - LexID 496119776 in PAW Record
 	// -- JIRA - DF-20087 - Consumer Disputing PAW record - from zoom
 	// -- JIRA - DF-21021 - Wrongly Linked Zoom Record-LexID 257274842 Consumer Advocacy
-	// -- JIRA - DF-21627 - Incorrect Linking PAW - LexID 9785873368 
+	// -- JIRA - DF-21627 - Incorrect Linking PAW - LexID 9785873368
+	// -- JIRA - DF-21478 - Consumer Adv - Overlinked PAW/Business Contacts - LexID 1120761903
+	// -- JIRA - DF-22103 - Cons. Adv. - PAW Overlinking LexID 975637332 Gowda
+	// -- JIRA - DF-22156 - Cons. Adv. - PAW Overlinking - LexID 175941365 - Bell
+	// -- JIRA - DF-23058 - Paw and Bus Header Records to be removed
 	shared Bad_zoom_vend_ids := [	'1901732652   C23201883',
 																'1793702174   C355227920',
 																'1793716775   C355227920',
@@ -53,7 +57,11 @@ module
 																'2083107149    C232603813',		// JIRA - LNK-788
 																'2061716462    C344399990',
 																'3941486       C275579153',
-																'1343528727   C354557740'			// JIRA - DF-21627
+																'1343528727   C354557740',		// JIRA - DF-21627
+																'1292818441   C344452260',		// JIRA - DF-21478
+																'1615571128   C368649983',		// JIRA - DF-22103
+																'1921742036    C71944602',		// JIRA - DF-23058
+																'1217197599C70371215'					// JIRA - DF-22156
 															 ];
 	
 	export Input :=
@@ -416,6 +424,23 @@ module
 				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.fname) = 'MICHAEL' and trim(pInput.lname) = 'COUTR' and trim(pInput.prim_name) = 'MAIN' and pInput.zip = 7503 and regexfind('ST. JOSEPH HEALTH SYSTEM', pInput.company_name, nocase))
 				// -- JIRA - DF-20795 - Consumer disputing association with a company
 				or  (mdr.sourceTools.sourceIsEq_Employer(pInput.source) and pInput.company_phone = 3192333309)
+				// -- JIRA - DF-21961 - Consumer Adv. - PAW/Bus. Contacts Overlinking LexID 184656279
+				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) = '2108024717    C90883103' and trim(pInput.prim_name) = 'PO BOX 6')
+				// -- JIRA - DF-21988 - Consumer Advocacy - Linking Dispute LexID 1533124325 - Mary Lloyd
+				or  ((mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) or mdr.sourceTools.sourceIsFBNV2_Hist_Choicepoint(pInput.source)) and trim(pInput.vendor_id) in ['CP3345616258597945683', '76327426'] and trim(pInput.fname) = 'MARY' and trim(pInput.lname) = 'LLOYD')
+				// -- JIRA - DF-22790 - Consumer Dispute - PAW record to be removed
+				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.vl_id) in ['17794919'] and trim(pInput.fname) = 'TINA' and trim(pInput.lname) = 'TOPE')
+				// -- JIRA - DF-22882 - consumer has opted out but these records are still in PAW 
+				or  ((mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) or mdr.sourceTools.sourceIsIL_Corporations(pInput.source)) and trim(pInput.vendor_id) in ['17-LLC-03428427','22388016','24834066'] and trim(pInput.lname) in ['RICCARDO','BRADLEY'])
+				// -- JIRA - DF-23058 - Consumer Dispute - Paw and Bus Header Records to be removed
+				or  (trim(pInput.fname) = 'BROCK' and trim(pInput.lname) = 'KORSAN' and trim(pInput.company_source_group) = 'L14000179431JAMES ROBERTS PAINTING')
+				// -- JIRA - DF-22874 - Consumer Dispute Paw records and old business header contact records to be removed
+				or  ((trim(pInput.company_source_group) in ['25817K-3 INC','42981866JD PROPERTIES'] or pInput.company_phone = 9492510650) and trim(pInput.fname) = 'YANA' and trim(pInput.lname) in ['ROSTOMYAN','ROSTOMIAN'])
+				// -- JIRA - DF-22999 - Consumer Dispute has a Paw record to be removed
+				or  (trim(pInput.vendor_id) = 'SKAV4337795' and pInput.company_phone = 6196591085 and trim(pInput.lname) = 'SPINO')
+				// -- JIRA - DF-23136 - FCRA PAW Linking - LexID 1386265060 Kiefer
+				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.company_source_group) = '84399STENSENG CONSULTING' and trim(pInput.lname) = 'KIEFER' and trim(pInput.fname) = 'MAX')
+				
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -622,6 +647,9 @@ module
 				//or	(MDR.sourceTools.SourceIsVickers(pInput.source))
 				// -- Jira DF-18364 - Business Header - Flush-n-fill Gong Neustar business records due to bad Source_group
 				//or	(MDR.sourceTools.sourceIsGong_Business(pInput.source) and pInput.source_group[1..4] = 'NEU-')
+				// -- JIRA# DF-22524 - Business Header/PAW - Bad PA Corps addresses 
+				// -- JIRA# DF-22502 - PA Corps contact addresses are skewed
+				or (MDR.sourceTools.sourceIsPA_Corporations(pInput.source) and pInput.dt_last_seen = 20180521)
 				;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -952,6 +980,29 @@ module
 				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.fname) = 'MICHAEL' and trim(pInput.lname) = 'COUTR' and trim(pInput.prim_name) = 'MAIN' and pInput.zip = 7503 and regexfind('ST. JOSEPH HEALTH SYSTEM', pInput.company_name, nocase))
 				// -- JIRA - DF-20795 - Consumer disputing association with a company
 				or  (mdr.sourceTools.sourceIsEq_Employer(pInput.source) and pInput.company_phone = 3192333309)
+				// -- JIRA - DF-21961 - Consumer Adv. - PAW/Bus. Contacts Overlinking LexID 184656279
+				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) = '2108024717    C90883103' and trim(pInput.prim_name) = 'PO BOX 6')
+				// -- JIRA - DF-21988 - Consumer Advocacy - Linking Dispute LexID 1533124325 - Mary Lloyd
+				or  ((mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) or mdr.sourceTools.sourceIsFBNV2_Hist_Choicepoint(pInput.source)) and trim(pInput.vendor_id) in ['CP3345616258597945683', '76327426'] and trim(pInput.fname) = 'MARY' and trim(pInput.lname) = 'LLOYD')
+				// -- JIRA# DF-22524 - Business Header/PAW - Bad PA Corps addresses 
+				// -- JIRA# DF-22502 - PA Corps contact addresses are skewed
+				or 	(MDR.sourceTools.sourceIsPA_Corporations(pInput.source) and pInput.bdid = 4548595047 and trim(pInput.lname) = '')
+				// -- JIRA - DF-22852 - Consumer Dispute - Paw record to be removed
+				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and pInput.bdid = 984406 and pInput.did = 402682961)
+				// -- JIRA - DF-22841 - Overlinking in PAW LexID 1224547541
+				or  (mdr.sourceTools.sourceIsUT_Corporations(pInput.source) and trim(pInput.vendor_id) = '49-2039256')
+				// -- JIRA - DF-22790 - Consumer Dispute - PAW record to be removed
+				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.vl_id) in ['17794919'] and trim(pInput.fname) = 'TINA' and trim(pInput.lname) = 'TOPE')
+				// -- JIRA - DF-22882 - consumer has opted out but these records are still in PAW 
+				or  ((mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) or mdr.sourceTools.sourceIsIL_Corporations(pInput.source)) and trim(pInput.vendor_id) in ['17-LLC-03428427','22388016','24834066'] and trim(pInput.lname) in ['RICCARDO','BRADLEY'])
+				// -- JIRA - DF-23058 - Consumer Dispute - Paw and Bus Header Records to be removed
+				or  (trim(pInput.fname) = 'BROCK' and trim(pInput.lname) = 'KORSAN' and trim(pInput.company_source_group) = 'L14000179431JAMES ROBERTS PAINTING')
+				// -- JIRA - DF-22874 - Consumer Dispute Paw records and old business header contact records to be removed
+				or  ((trim(pInput.company_source_group) in ['25817K-3 INC','42981866JD PROPERTIES'] or pInput.company_phone = 9492510650) and trim(pInput.fname) = 'YANA' and trim(pInput.lname) in ['ROSTOMYAN','ROSTOMIAN'])
+				// -- JIRA - DF-22999 - Consumer Dispute has a Paw record to be removed
+				or  (trim(pInput.vendor_id) = 'SKAV4337795' and pInput.company_phone = 6196591085 and trim(pInput.lname) = 'SPINO')
+				// -- JIRA - DF-23136 - FCRA PAW Linking - LexID 1386265060 Kiefer
+				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and trim(pInput.company_source_group) = '84399STENSENG CONSULTING' and trim(pInput.lname) = 'KIEFER' and trim(pInput.fname) = 'MAX')
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -1009,7 +1060,7 @@ module
 												;
 				
 				// JIRA: LNK-563 - Consumer Advocacy - PAW Linking Questioned
-				filterbugLNK563 := trimids(l.vl_id) in ['12-552868'] 
+				filterbugLNK563 := trimids(l.vendor_id) in ['12-552868'] 
 												and mdr.sourcetools.SourceIsFL_Corporations(l.source)
 												and trim(l.fname) = 'SHEILA' and trim(l.lname) = 'BORLAND'
 												and l.did = 2323167047
@@ -1206,6 +1257,12 @@ module
 				or	(pInput.did = 1510111650)
 				// -- JIRA: DF-18970 Remove all PAW/Business Contacts for LexID 724864388 at Las Vegas Address
 				or	(pInput.did = 724864388)
+				// -- JIRA: DF-20795 - Consumer disputing association with a company
+				or  (mdr.sourceTools.SourceIsEq_Employer(pInput.source) and pInput.company_phone = 3192333309)
+				// -- JIRA: DF-22583 - Consumer Dispute - PAW record to be removed
+				or  (mdr.sourceTools.SourceIsZoom(pInput.source) and pInput.did = 1743066322 and pInput.bdid = 975644 and trim(pInput.fname) = 'KARLA' and trim(pInput.lname) = 'MITCHELL' and trim(pInput.mname) = '')
+				// -- JIRA - DF-22852 - Consumer Dispute - Paw record to be removed
+				or  (mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and pInput.bdid = 984406 and pInput.did = 402682961)
 			
 				;
 
@@ -1231,7 +1288,7 @@ module
 												and l.state = 'TX'
 												;
 				// JIRA: LNK-563 - Consumer Advocacy - PAW Linking Questioned
-				filterbugLNK563 := trimids(l.vl_id) in ['12-552868'] 
+				filterbugLNK563 := trimids(l.vendor_id) in ['12-552868'] 
 												and mdr.sourcetools.SourceIsFL_Corporations(l.source)
 												and trim(l.fname) = 'SHEILA' and trim(l.lname) = 'BORLAND'
 												and l.did = 2323167047
@@ -1551,6 +1608,16 @@ module
 			  ( mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.fname) = 'MICHAEL' and trim(pInput.lname) = 'COUTR' and trim(pInput.prim_name) = 'MAIN' and pInput.zip = 7503 and regexfind('ST. JOSEPH HEALTH SYSTEM', pInput.company_name, nocase))
 			or // -- JIRA - DF-20795 - Consumer disputing association with a company
 				( mdr.sourceTools.sourceIsEq_Employer(pInput.source) and (integer)pInput.company_phone = 3192333309)
+			or // -- JIRA - DF-21961 - Consumer Adv. - PAW/Bus. Contacts Overlinking LexID 184656279
+			  ( mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) = '2108024717    C90883103' and trim(pInput.prim_name) = 'PO BOX 6')
+			or // -- JIRA - DF-21988 - Consumer Advocacy - Linking Dispute LexID 1533124325 - Mary Lloyd
+				((mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) or mdr.sourceTools.sourceIsFBNV2_Hist_Choicepoint(pInput.source)) and trim(pInput.vendor_id) in ['CP3345616258597945683', '76327426'] and trim(pInput.fname) = 'MARY' and trim(pInput.lname) = 'LLOYD')
+			or // -- JIRA - DF-22502/DF22524 - PA Corps contact addresses are skewed/Business Header/PAW - Bad PA Corps addresses
+				( MDR.sourceTools.sourceIsPA_Corporations(pInput.source) and pInput.bdid = 4548595047 and trim(pInput.lname) = '')
+			or // -- JIRA - DF-22852 - Consumer Dispute - Paw record to be removed
+				( mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and pInput.bdid = 984406 and pInput.did = 402682961)
+			or // -- JIRA - DF-22841 - Overlinking in PAW LexID 1224547541
+				( mdr.sourceTools.sourceIsUT_Corporations(pInput.source) and trim(pInput.vendor_id) = '49-2039256')
 				;
 
 			boolean lFullFilter 	:= not(lAdditionalFilter);	//negate it 
@@ -1562,7 +1629,13 @@ module
 				// JIRA - DF-21083 PAW Error for LexID 947738531, Heagerty - Consumer Advocacy 
 				filter_DF21083 						:=	(l.company_phone	= 7707819312 or l.phone = 7707819312)
 																			and regexfind('CONSUMER SOLUTIONS', l.company_name, nocase)
-																			;	
+																			;
+				// JIRA: LNK-563 - Consumer Advocacy - PAW Linking Questioned
+				filterbugLNK563 					:= trimids(l.vendor_id) in ['12-552868'] 
+																			and mdr.sourcetools.SourceIsFL_Corporations(l.source)
+																			and trim(l.fname) = 'SHEILA' and trim(l.lname) = 'BORLAND'
+																			and l.did = 2323167047
+																			;
 				self.prim_range						:= 	if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,''	,l.prim_range						);
 				self.predir								:= 	if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,''	,l.predir								);
 				self.prim_name						:= 	if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,''	,l.prim_name						);
@@ -1589,7 +1662,9 @@ module
 				self.company_phone				:= 	if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source) or filter_DF21083	,0	,l.company_phone				);
 				self.rawaid								:= 	if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,0	,l.rawaid								);
 				self.company_rawaid				:= 	if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,0	,l.company_rawaid				);
-				self.company_fein					:= 	if(filterbug30999,0	,l.company_fein						);
+				self.company_fein					:=	if(filterbug30999,0	,l.company_fein						);
+				self.did									:=	if(filterbugLNK563, 0, l.did);
+				self.ssn									:=	if(filterbugLNK563, 0, l.ssn);
 				self 											:= 	l;                     
 			end;
 		
@@ -2062,6 +2137,16 @@ module
 			  ( mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.fname) = 'MICHAEL' and trim(pInput.lname) = 'COUTR' and trim(pInput.prim_name) = 'MAIN' and pInput.zip = '07503' and regexfind('ST. JOSEPH HEALTH SYSTEM', pInput.company_name, nocase))
 			or // -- JIRA - DF-20795 - Consumer disputing association with a company
 				( mdr.sourceTools.sourceIsEq_Employer(pInput.source) and (integer)pInput.company_phone = 3192333309)
+			or // -- JIRA - DF-21961 - Consumer Adv. - PAW/Bus. Contacts Overlinking LexID 184656279
+			  ( mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) = '2108024717    C90883103' and trim(pInput.prim_name) = 'PO BOX 6')
+			or // -- JIRA - DF-21988 - Consumer Advocacy - Linking Dispute LexID 1533124325 - Mary Lloyd
+				((mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) or mdr.sourceTools.sourceIsFBNV2_Hist_Choicepoint(pInput.source)) and trim(pInput.vendor_id) in ['CP3345616258597945683', '76327426'] and trim(pInput.fname) = 'MARY' and trim(pInput.lname) = 'LLOYD')
+			or // -- JIRA - DF-22502/DF22524 - PA Corps contact addresses are skewed/Business Header/PAW - Bad PA Corps addresses
+				( MDR.sourceTools.sourceIsPA_Corporations(pInput.source) and pInput.bdid = 4548595047 and trim(pInput.lname) = '')
+			or // -- JIRA - DF-22852 - Consumer Dispute - Paw record to be removed
+				( mdr.sourceTools.sourceIsBusiness_Registration(pInput.source) and pInput.bdid = 984406 and pInput.did = 402682961)
+			or // -- JIRA - DF-22841 - Overlinking in PAW LexID 1224547541
+				( mdr.sourceTools.sourceIsUT_Corporations(pInput.source) and trim(pInput.vendor_id) = '49-2039256')
 				;
 
 			boolean lFullFilter 	:= not(lAdditionalFilter);	//negate it 
@@ -2071,7 +2156,13 @@ module
 				// JIRA - DF-21083 PAW Error for LexID 947738531, Heagerty - Consumer Advocacy 
 				filter_DF21083 						:= ((unsigned)l.company_phone	= 7707819312 or (unsigned)l.phone = 7707819312)
 																			and regexfind('CONSUMER SOLUTIONS', l.company_name, nocase)
-																			;	
+																			;
+				// JIRA: LNK-563 - Consumer Advocacy - PAW Linking Questioned
+				filterbugLNK563 					:= trimids(l.vendor_id) in ['12-552868'] 
+																			and mdr.sourcetools.SourceIsFL_Corporations(l.source)
+																			and trim(l.fname) = 'SHEILA' and trim(l.lname) = 'BORLAND'
+																			and l.did = 2323167047
+																			;
 				self.prim_range						:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,''	,l.prim_range						);
 				self.predir								:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,''	,l.predir								);
 				self.prim_name						:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,''	,l.prim_name						);
@@ -2098,6 +2189,8 @@ module
 				self.company_rawaid				:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,0	,l.company_rawaid				);
 				self.phone								:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	or filter_DF21083,''	,l.phone								);
 				self.company_phone				:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	or filter_DF21083,''	,l.company_phone				);
+				self.did									:= if(filterbugLNK563, 0, l.did);
+				self.ssn									:= if(filterbugLNK563, '', l.ssn);
 				self 											:= l;                                              
 			end;
 			
@@ -2159,6 +2252,14 @@ module
 			and prim_range	= '1330'
 			and city				= 'WASHINGTON'
 			and state				= 'DC'
+			)
+			//for jira# DF DF-22823 - HRI SIC code issue for one of address record that came from BusReg.
+			or
+			(
+					prim_name 	= 'WINTER SONG'
+			and prim_range	= '2805'
+			and city				= 'RALEIGH'
+			and state				= 'NC'
 			)
 		);
 

@@ -73,7 +73,7 @@ ExcessiveInvalidRecordsFound:=dAllRecords[1].errorcount/rCount>treshld_;
 		FooterLine2
 										:=
 											'TOTAL RECORDS:  '+ rCount  +'\n'
-										+	'RECORDS INVALID:   '+ dAllRecords[1].errorcount +'\n'
+										+	'TOTAL WARNINGS:   '+ dAllRecords[1].errorcount +'\n'
 										+ '\n'										
 										+ 'FILE CONTENT IS ACCEPTABLE.   ****   FILE WILL BE PROCESSED   ********\n'
 										+ 'FILE CONTENT IS ACCEPTABLE.   ****   FILE WILL BE PROCESSED   ********\n'

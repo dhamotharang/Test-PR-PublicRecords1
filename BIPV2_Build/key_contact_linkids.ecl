@@ -365,6 +365,8 @@ dAssignBdids_commonbase := project(j_add_exec_ind_commonbase  ,transform(layoutO
   export keyfather      := keyvs().father     ;
   export keygrandfather := keyvs().grandfather;
   
+	 export kfetch_layout :={Key};
+	
   //DEFINE THE INDEX ACCESS
   export kFetch(
                   dataset(BIPV2.IDlayouts.l_xlink_ids) inputs 
@@ -380,6 +382,22 @@ dAssignBdids_commonbase := project(j_add_exec_ind_commonbase  ,transform(layoutO
 									BIPV2_Suppression.mac_contacts(ds_restricted, ds_suppressed_clean, ds_suppressed_dirty)
                   return ds_suppressed_clean;
 									
+  end;
+	
+	//DEFINE THE INDEX ACCESS
+  export kFetchMarketing(
+                  dataset(BIPV2.IDlayouts.l_xlink_ids) inputs 
+                  ,string1 Level = BIPV2.IDconstants.Fetch_Level_DotID
+                  ,unsigned2 ScoreThreshold = 0
+                  ,BIPV2.mod_sources.iParams in_mod=PROJECT(AutoStandardI.GlobalModule(),BIPV2.mod_sources.iParams,opt)
+                  ,JoinLimit=25000
+                  ,boolean includeDMI=false
+                  ) :=
+  function   
+    kFetched := kfetch(inputs, Level, ScoreThreshold, in_mod, JoinLimit, includeDMI);
+		  allowCodeBmap := BIPV2.mod_Sources.code2bmap(BIPV2.mod_Sources.code.MARKETING_UNRESTRICTED);
+			 marketingSuppressed := kFetched(BIPV2.mod_sources.src2bmap(source) & allowCodeBmap <> 0);    
+    return marketingSuppressed;						
   end;
   
 end;

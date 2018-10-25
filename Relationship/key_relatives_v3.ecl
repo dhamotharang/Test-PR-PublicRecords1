@@ -1,5 +1,5 @@
 ﻿import doxie,ut,data_services;
-res := File_Relative(not(confidence IN ['NOISE','LOW']));
+res := relationship.File_Relative(not(confidence IN ['NOISE','LOW']));
 
 resNeutral := functions_output.convertTitledToKey(res);
 

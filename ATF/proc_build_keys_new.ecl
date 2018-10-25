@@ -1,4 +1,4 @@
-import AutoKeyB2, RoxieKeyBuild,PromoteSupers,standard,_Control;
+﻿import AutoKeyB2, RoxieKeyBuild,PromoteSupers,standard,_Control,dops,DOPSGrowthCheck;
 
 export proc_build_keys_new(string filedate, boolean isFCRA = false) := function
 
@@ -112,6 +112,19 @@ AutoKeyB2.MAC_Build (File_ATF_Autokey,license1_fname,license1_mname,license1_lna
 
 AutoKeyB2.MAC_AcceptSK_to_QA(ak_keyname, MAK,, ak_skipSet);
 
+GetDops := dops.GetDeployedDatasets('P', 'B', 'F');
+OnlyATF:=GetDops(datasetname='FCRA_ATFKeys');
+father_filedate := OnlyATF[1].buildversion;																	
+set of string InputSet_ATF := ['atf_id','source','seq','rec_code','bdid','bdid_score','d_score','best_ssn','did_out','date_first_seen','date_last_seen','expiration_flag','record_type','license_number','lic_regn','orig_lic_dist','lic_dist','lic_cnty','lic_type','lic_xprdte','lic_seqn','license_name','business_name','premise_street','premise_city','premise_state','premise_orig_zip','mail_street','mail_city','mail_state','mail_zip_code','voice_phone','irs_region','license1_title','license1_fname','license1_mname','license1_lname','license1_name_suffix','license1_score','license1_cname','license2_title','license2_fname','license2_mname','license2_lname','license2_name_suffix','license2_score','license2_cname','business_cname','premise_prim_range','premise_predir','premise_prim_name','premise_suffix','premise_postdir','premise_unit_desig','premise_sec_range','premise_p_city_name','premise_v_city_name','premise_st','premise_zip','premise_zip4','premise_cart','premise_cr_sort_sz','premise_lot','premise_lot_order','premise_dpbc','premise_chk_digit','premise_rec_type','premise_fips_st','premise_fips_county','premise_fips_county_name','premise_geo_lat','premise_geo_long','premise_msa','premise_geo_blk','premise_geo_match','premise_err_stat','mail_prim_range','mail_predir','mail_prim_name','mail_suffix','mail_postdir','mail_unit_desig','mail_sec_range','mail_p_city_name','mail_v_city_name','mail_st','mail_zip','mail_zip4','mail_cart','mail_cr_sort_sz','mail_lot','mail_lot_order','mail_dpbc','mail_chk_digit','mail_rec_type','mail_fips_st','mail_fips_county','mail_geo_lat','mail_geo_long','mail_msa','mail_geo_blk','mail_geo_match','mail_err_stat','did'];
+set of string Persistent_ID_ATF := ['rec_code','license_number','Lic_Regn','Lic_Dist','Lic_Cnty','Lic_Type','Lic_Xprdte','License_Name','Business_Name','Premise_Street','Premise_City','Premise_State','Premise_orig_Zip','Mail_Street','Mail_City','Mail_State','Mail_Zip_Code','Voice_Phone','license1_fname','license1_mname','license1_lname','license1_name_suffix','license1_cname','license2_fname','license2_mname','license2_lname','license2_name_suffix','license2_cname','business_cname'];	
+DeltaCommands:=sequential(
+DOPSGrowthCheck.CalculateStats('FCRA_ATFKeys','atf.key_ATF_id(true)', 'key_ATFID_FCRA','~thor_data400::key::atf::firearms::fcra::'+filedate+'::atfid','atf_id','atf_id','','voice_phone','best_ssn','',filedate,father_filedate, false, true),
+DOPSGrowthCheck.DeltaCommand('~thor_data400::key::atf::firearms::fcra::'+filedate+'::atfid', '~thor_data400::key::atf::firearms::fcra::'+father_filedate+'::atfid', 'FCRA_ATFKeys', 'key_ATFID_FCRA', 'atf.key_ATF_id(true)', 'atf_id', filedate, father_filedate, InputSet_ATF, false, true),
+DOPSGrowthCheck.ChangesByField('~thor_data400::key::atf::firearms::fcra::'+filedate+'::atfid', '~thor_data400::key::atf::firearms::fcra::'+father_filedate+'::atfid','FCRA_ATFKeys','key_ATFID_FCRA','atf.key_ATF_id(true)','atf_id','',filedate,father_filedate, false, true),
+DOPSGrowthCheck.PersistenceCheck('~thor_data400::key::atf::firearms::fcra::'+filedate+'::atfid', '~thor_data400::key::atf::firearms::fcra::'+father_filedate+'::atfid',  'FCRA_ATFKeys',  'key_ATFID_FCRA',  'atf.key_ATF_id(true)',  'atf_id',  Persistent_ID_ATF,  Persistent_ID_ATF,  filedate,  father_filedate, false ,  true)
+);
+
+
 return sequential(
 									pre
 									,pre1
@@ -122,6 +135,7 @@ return sequential(
 									,BAK
 									,MAK
 									,post
+									,DeltaCommands
 									);
 
 end;
