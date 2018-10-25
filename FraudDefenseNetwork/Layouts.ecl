@@ -1,5 +1,5 @@
-import Address , bipv2, Inquiry_Acclogs, corrections;
-EXPORT Layouts := 
+﻿import Address , bipv2, Inquiry_Acclogs, corrections;
+export Layouts := 
 module
 
 	export Input := 
@@ -115,7 +115,7 @@ module
   string orig_transaction_code;
   string orig_source_code;
   string3 fraudpoint_score;
- END;
+  end;
  
 	export erie := RECORD
 	 string claimnumber;
@@ -184,19 +184,18 @@ module
 	 string loss_state;
 	 string loss_desc;
 	 string loss_location;
- end;
+  end;
 
- 
- export SuspectIP  := record
+  export SuspectIP  := record
   string  orig_date;
   string  orig_ip;
   string  orig_country;
   string  orig_state;
   string  orig_city;
   string  orig_isp;
- end;
+  end;
  
-  Export Glb5  := 
+  export Glb5  := 
 	record, maxlength(250000)
   string source_file;
   string source_input;
@@ -307,11 +306,11 @@ module
   string orig_transaction_code;
   string orig_source_code;
   string3 fraudpoint_score;
-end;	
-// Tiger 
-	Export Tiger := 
-	  record
+  end;	
 
+// Tiger 
+	export Tiger := 
+	  record
 		string App_Number;
 		string Loan_Number;
 		string Primary_Fraud_Code;
@@ -338,10 +337,10 @@ end;
 		string NET_INCOME;
 		string FP1_Score;
 		string FP2_Score;
-
 	end;
+	
 // CFNA
- Export CFNA := 
+  export CFNA := 
    record
 		string customer_ID;
 		string vendor_ID;
@@ -386,10 +385,9 @@ end;
 		string LN_Sub_Product_ID;
 		string Industry;
 		string Fraud_Index_Type;
-end;
+  end;
 
-Export  AInspection     := 
-
+ export  AInspection     := 
 	RECORD,maxlength(8192)
   string8 dt_first_reported;
   string8 dt_last_reported;
@@ -427,9 +425,9 @@ Export  AInspection     :=
   string4 err_stat;
   unsigned8 raw_aid;
   unsigned8 ace_aid;
- END; 
+ end; 
  
-Export TextMinedCrim := RECORD
+  export TextMinedCrim := RECORD
 	corrections.layout_offender;
   string150 off_desc;
   string75 off_desc_1;
@@ -445,7 +443,7 @@ Export TextMinedCrim := RECORD
   string50 fraud_type;
 	END;
 
-Export OIG := record
+ export OIG := record
   string20 lastname;
   string15 firstname;
   string15 midname;
@@ -498,16 +496,56 @@ Export OIG := record
   unsigned6 ultid;
   unsigned2 ultscore;
   unsigned2 ultweight;
-End;
+  end;
 
-End;
+	export ErieWatchList := RECORD
+		string	watchlistid;
+		string	entityid;
+		string	firstname;
+		string	lastname;
+		string	nameonly;
+		string	businessname;
+		string	businessnameonly;
+		string	tin;
+		string	ssn;
+		string	dln;
+		string	dlstate;
+		string	dob;
+		string	comment_ds;
+		string	policy;
+		string	addressline1;
+		string	addressline2;
+		string	city;
+		string	state;
+		string	phone1;
+		string	phone2;
+		string	zip;
+		string	country;
+		string	alertnumber;
+		string	actioncodes;
+		string	vin;
+		string	plate;
+		string	platestate;
+		string	checkhist;
+		string	requester;
+		string	userid;
+		string	createuserid;
+		string	createdate;
+		string	ffid;
+		string	validstart;
+		string	validend;
+		string	clientid;
+		string	category;
+		string	alias;
+		string	email;
+		string	search_data;
+  end;
+end;
 
 export Base         := 
     module 
-
 export AFI          := 
-      record 
-
+  record 
 	input.AFI ; 
 	unsigned8         source_rec_id;
 	string4	          Source; 
@@ -532,12 +570,18 @@ export Layout_Clean_Name_Erie := record
 	string64 lname					;
 	string5  name_suffix		;
 	string3  name_score			;
-
 end;
 
- export erie       := record     
+export Layout_clean_phones :=
+	record
+	string10            phone_number ; 
+	string10            cell_phone   ; 
+	string10            Work_phone   ; 
+end;
+
+export erie       := record     
   string12          claimnumber;       
-  string40          insuredlastname; 
+  string100         insuredlastname; 
   string20          insuredfirstname; 
 	string20          insuredmiddlename;       
   string5           insuredsuffixname;       
@@ -607,22 +651,33 @@ end;
   string1020        Loss_location;     
 	//Internal build fields
 	unsigned8         source_rec_id;
-	string20		      Source; 
+	string20		       source; 
 	unsigned4         process_date ; 
   unsigned4         dt_first_seen;
 	unsigned4         dt_last_seen;
 	unsigned4         dt_vendor_last_reported;
 	unsigned4         dt_vendor_first_reported;
 	string            current ; 
-	unsigned8         Unique_Id ;  
+	unsigned8         Unique_Id ;
+	string9 		       fein;
+  string100       	business_name;	
   string100       	clean_business_name;	
   string100       	clean_business_name_cp;	
-	Layout_Clean_Name_Erie    cleaned_name;	     
-	Layout_Clean_Name_Erie    cleaned_name_cp;	     
+	Layout_Clean_Name_Erie            cleaned_name;	     
+	Layout_Clean_Name_Erie            cleaned_name_cp; 
+	Address.Layout_Clean182_fips				clean_address;
+	Layout_clean_phones               clean_phones ;
+	string100         address_1 ;
+	string50          address_2 ;
 	unsigned8       	NID:=0;       // name cleaner ID
 	unsigned2       	name_ind:=0;  // name indicator bitmap
 	string10          entity;
 	string25          TypeOfMapping;
+	unsigned6         bdid;
+	unsigned1         bdid_score;
+	BIPV2.IDlayouts.l_xlink_ids; 
+	unsigned6         did;
+	unsigned1         did_score;
 end;
  
  export SuspectIP  := record 
@@ -630,7 +685,7 @@ end;
   string8           reported_date;  
   string10          reported_time;
 	unsigned8         source_rec_id;
-	string20		      Source; 
+	string20		       source; 
 	unsigned4         process_date ; 
   unsigned4         dt_first_seen;
 	unsigned4         dt_last_seen;
@@ -647,10 +702,9 @@ end;
 
 export Glb5          := 
   record 
-
 	input.Glb5 ;
 	string            Sybase_company_id;
-	string 	          Sybase_app_type;
+	string 	         Sybase_app_type;
 	string            Sybase_market;
 	string            Sybase_sub_market;
 	string            Sybase_vertical ;
@@ -658,7 +712,7 @@ export Glb5          :=
 	string            Sybase_bill_country_code;
 	string            Industry_segment ;
 	unsigned8         source_rec_id;
-	string4	          Source; 
+	string4	         source; 
 	unsigned4         process_date ; 
   unsigned4         dt_first_seen;
 	unsigned4         dt_last_seen;
@@ -666,14 +720,20 @@ export Glb5          :=
 	unsigned4         dt_vendor_first_reported;
 	string            current ; 
 	unsigned8         Unique_Id ; 
-	Address.Layout_Clean_Name						cleaned_name;         
+	Address.Layout_Clean_Name					 cleaned_name; 
+	Address.Layout_Clean182_fips				 clean_address;
+	Layout_clean_phones                clean_phones ;
+	string100         address_1 ;
+	string50          address_2 ;        
+	string12          phone_number;        
 	unsigned8       	NID:=0;       // name cleaner ID
 	unsigned2       	name_ind:=0;  // name indicator bitmap
+	unsigned6         did;
+	unsigned1         did_score;
 end; 
 
 export Tiger          := 
   record 
-
 	input.Tiger ;
 	string5           namesuffix; // needed for the macro. 
 	unsigned8         source_rec_id;
@@ -685,12 +745,17 @@ export Tiger          :=
 	unsigned4         dt_vendor_first_reported;
 	string            current ; 
 	unsigned8         Unique_Id ; 
-	Address.Layout_Clean_Name						cleaned_name;         
+	Address.Layout_Clean_Name					cleaned_name;   
+	Address.Layout_Clean182_fips				clean_address;	    
+	Layout_clean_phones               clean_phones ; 
 	unsigned8       	NID:=0;       // name cleaner ID
 	unsigned2       	name_ind:=0;  // name indicator bitmap
 	string100         address_1 ;   
-	string50          address_2 ;   
+	string50          address_2 ; 
+  unsigned6         did;
+  unsigned1         did_score;
 	end; 
+	
 export CFNA          := 
   record 
 	Input.CFNA ;
@@ -703,12 +768,17 @@ export CFNA          :=
 	unsigned4         dt_vendor_first_reported;
 	string            current ; 
 	unsigned8         Unique_Id ; 
-	Address.Layout_Clean_Name						cleaned_name;         
+	Address.Layout_Clean_Name           cleaned_name;  
+	Address.Layout_Clean182_fips        clean_address;
+	Layout_clean_phones                 clean_phones;
 	unsigned8       	NID:=0;       // name cleaner ID
 	unsigned2       	name_ind:=0;  // name indicator bitmap
 	string100         address_1 ;   
-	string50          address_2 ;   
+	string50          address_2 ; 
+	unsigned6 				  did ;   
+	unsigned1 				  did_score ; 
 	end; 
+	
 export AInspection          := 
   record 
 	Input.AInspection ;
@@ -721,7 +791,8 @@ export AInspection          :=
 	unsigned4         dt_vendor_first_reported;
 	string            current ; 
 	unsigned8         Unique_Id ; 
-	Address.Layout_Clean_Name						cleaned_name;         
+	Address.Layout_Clean_Name					cleaned_name;  
+	Address.Layout_Clean182_fips				clean_address; 
 	unsigned8       	NID:=0;       // name cleaner ID
 	unsigned2       	name_ind:=0;  // name indicator bitmap
 	string100         address_1 ;   
@@ -730,7 +801,7 @@ export AInspection          :=
 
 Export TextMinedCrim := 
   record 
-	Input.TextMinedCrim -[ process_date , NID ];
+	Input.TextMinedCrim -[ process_date , NID, DID ];
 	unsigned8         source_rec_id;
 	string4		        Source; 
 	unsigned4         process_date ; 
@@ -740,15 +811,19 @@ Export TextMinedCrim :=
 	unsigned4         dt_vendor_first_reported;
 	string            current ; 
 	unsigned8         Unique_Id ; 
-	Address.Layout_Clean_Name						cleaned_name;         
+	Address.Layout_Clean_Name						cleaned_name;   
+	Address.Layout_Clean182_fips				  clean_address;   
+	Layout_clean_phones                 clean_phones ;   
 	unsigned8       	NID:=0;       // name cleaner ID
 	unsigned2       	name_ind:=0;  // name indicator bitmap
 	string100         address_1 ;   
-	string50          address_2 ;   
+	string50          address_2 ; 
+  unsigned6         did;
+	unsigned1         did_score;  
 End;
  
  export OIG  := record 
-  input.OIG  - [dt_first_seen, dt_last_seen, dt_vendor_last_reported, dt_vendor_first_reported];
+  input.OIG  - [bdid, did, dt_first_seen, dt_last_seen, dt_vendor_last_reported, dt_vendor_first_reported];
   unsigned8         lnpid; 
 	string5           suffix_name;
 	unsigned8         source_rec_id;
@@ -760,33 +835,104 @@ End;
 	unsigned4         dt_vendor_first_reported;
 	string            current ; 
 	unsigned8         Unique_Id ;  
+	string9 		        fein;
+  string100       	 business_name;	
   string100       	clean_business_name;	
-	Address.Layout_Clean_Name           cleaned_name;	     
+	Address.Layout_Clean_Name         cleaned_name; 
+	Address.Layout_Clean182_fips				clean_address; 
+	Layout_clean_phones               clean_phones;
+	string100         address_1 ;   
+	string50          address_2 ;       
 	unsigned8       	NID:=0;       // name cleaner ID
 	unsigned2       	name_ind:=0;  // name indicator bitmap
-	string100         address_1 ;   
-	string50          address_2 ;  
-	unsigned8         RawAID := 0;     //address id 
- end;	
+  unsigned6        did;
+	unsigned1        did_score;
+  unsigned6        bdid;
+	unsigned1        bdid_score;
+ end;
+ 
+ export ErieWatchList := record
+  input.ErieWatchList - [businessname, ffid];
+	string8            validstartDate;
+	string8            ValidendDate;
+	string20           ValidStartTS;
+	string12           phone;
+	unsigned8          ffid;
+	string20           middlename;       
+  string5            suffixname;
+	unsigned8          source_rec_id;
+	string100	       source; 
+	unsigned4         process_date ; 
+  unsigned4         dt_first_seen;
+	unsigned4         dt_last_seen;
+	unsigned4         dt_vendor_last_reported;
+	unsigned4         dt_vendor_first_reported;
+	string            current ; 
+	unsigned8         Unique_Id ;
+	string9 		       fein;
+  string100       	business_name;	
+  string100       	clean_business_name; 
+	Address.Layout_Clean_Name					cleaned_name;  
+	Address.Layout_Clean182_fips				clean_address; 
+	Layout_clean_phones               clean_phones ;
+	string100         address_1 ;
+	string50          address_2 ;
+	unsigned8       	NID:=0;       // name cleaner ID
+	unsigned2       	name_ind:=0;  // name indicator bitmap
+	string10          entity;
+	unsigned6         bdid;
+	unsigned1         bdid_score;
+	BIPV2.IDlayouts.l_xlink_ids; 
+	unsigned6         did;
+	unsigned1         did_score;
+	end; 
+ 
+	
+  export hdr_build_version := record
+    string   build_version;
+  end;
 		
 end; 
 
-export temp := module 
+export temp := module  	 
+	 export DidSlim := 
+	  record
+			unsigned8		unique_id;
+			string20 		fname;
+			string20 		mname	;
+			string20 		lname;
+			string5  		name_suffix;
+			string10    	prim_range;
+			string28		  prim_name;
+			string8			sec_range;
+			string5			zip5;
+			string2			state;
+			string10		  phone;
+			string9 		  ssn;
+			string8   	  dob;
+			unsigned6		did        := 0;
+			unsigned1		did_score	:= 0;
+	  end;
 
-		export oig := record
-			string20 fname			;
-	    string20 mname			;
-	    string20 lname			;
-	    string5 name_suffix;
-	    string10 prim_range	;
-	    string28 prim_name	;
-	    string8 sec_range	;
-	    string25 v_city_name	;
-	    string2 state		  ;
-	    string5 zip5		 		;
-			Base.oig			;
-
-		end; 
+	  export BdidSlim := 
+	  record
+			unsigned8	unique_id;
+			string100 	business_name;
+			string10  	prim_range;
+			string28		prim_name;
+			string5		zip5;
+			string8		sec_range;
+			string25 	p_City_name;
+			string2		state;
+			string10		phone;
+			string20 	fname;
+			string20 	mname;
+			string20 	lname;
+			string9 		fein;
+			unsigned6	bdid  := 0;
+			unsigned1	bdid_score  := 0;
+			BIPV2.IDlayouts.l_xlink_ids		;
+	  end;
  end; 
 
 end;

@@ -1,9 +1,9 @@
 ﻿import _Control;
 
-every_10_min := '*/10 0-23 * * *';
+EVERY_DAY_AT_5AM := '0 5 * * *';
 IP:=Constants.LandingZoneServer;
 RootDir := Constants.MBSLandingZonePathBase;
-ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor50_dev02','thor400_30');
+ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev_eclcc','thor400_44_eclcc');
 
 lECL1 :=
  'import ut;\n'
@@ -13,7 +13,7 @@ lECL1 :=
 +'#WORKUNIT(\'priority\',11);\n'
 +'email(string msg):=fileservices.sendemail(\n'
 +'   \'oscar.barrientos@lexisnexis.com\'\n'
-+' 	 ,\'FraudGov Input Prep\'\n'
++' 	 ,\'FraudGov MBS Input Prep\'\n'
 +' 	 ,msg\n'
 +' 	 +\'Build wuid \'+workunit\n'
 +' 	 );\n\n'
@@ -29,13 +29,13 @@ lECL1 :=
 ;
 
 #WORKUNIT('protect',true);
-#WORKUNIT('name', 'FraudGov Input Prep Schedule');
+#WORKUNIT('name', 'FraudGov MBS Input Prep Schedule');
 
 d:=FileServices.RemoteDirectory(IP, RootDir+'ready/', '*.dat');
-if(exists(d), output(lECL1) ,output('NO FILES TO SPRAY'))
-			: WHEN(CRON(every_10_min))
+if(exists(d),_Control.fSubmitNewWorkunit(lECL1, ThorName ),'NO FILES TO SPRAY' )
+			: WHEN(CRON(EVERY_DAY_AT_5AM))
 			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
-																			,'FraudGov Input Prep SCHEDULE failure'
+																			,'FraudGov MBS Input Prep Schedule failure'
 																			,Constants.NOC_MSG
 																			));
 																			
