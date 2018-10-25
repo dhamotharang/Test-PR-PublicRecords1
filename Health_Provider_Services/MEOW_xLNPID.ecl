@@ -1,4 +1,4 @@
-IMPORT ut,SALT29;
+﻿IMPORT ut,SALT29;
 // @param MultiRec - if set to true then multiple records may have the same Reference and a consolidated result will be produced
 // @param ButNot - set of IDs that will NOT be considered as part of the result
 EXPORT MEOW_xLNPID(DATASET(Process_xLNPID_Layouts.InputLayout) in, BOOLEAN MultiRec = FALSE,SET OF SALT29.UIDType ButNot=[]) := MODULE
@@ -81,7 +81,7 @@ EXPORT Raw_Results := IF(EXISTS(RR0),RR4);
       SELF := ri;
       SELF := le;
     END;
-    RETURN JOIN( d,k,(LEFT.LNPID = RIGHT.LNPID),tr(LEFT,RIGHT), LEFT OUTER, KEEP(10000)); // Ignore excess records without erroring
+    	RETURN JOIN( d,k,(LEFT.LNPID = RIGHT.LNPID),tr(LEFT,RIGHT), LEFT OUTER, LIMIT(0), KEEP(1)); // Ignore excess records without erroring
     END;
   EXPORT Raw_Data := Fetch_Stream(Uid_Results);
   // This macro can be used to score any data with field names matching the header standard to the input criteria
