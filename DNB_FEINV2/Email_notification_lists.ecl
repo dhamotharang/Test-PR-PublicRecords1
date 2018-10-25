@@ -1,13 +1,14 @@
-﻿import _control,RoxieKeyBuild; 
+﻿IMPORT STD, _control, RoxieKeyBuild;
 
-export Email_Notification_Lists(boolean	pIsTesting = _Constants().IsTesting ) := module
+EXPORT Email_Notification_Lists(STRING pAddresses, BOOLEAN pIsTesting = _Constants().IsTesting) := MODULE
+	SHARED addresses    := STD.Str.SplitWords(pAddresses, ',');
 	
-	export myInfo       := _Control.MyInfo.EmailAddressNotify;
-	export all_hands    := myInfo + ';Harry.Gist@lexisnexisrisk.com;';
+	SHARED myInfo       := IF( _Control.MyInfo.EmailAddressNotify = addresses[1], addresses[1],  _Control.MyInfo.EmailAddressNotify + ';' + addresses[1]);
+	SHARED all_hands    := myInfo + ';' + addresses[2] + ';'+ addresses[3];
 	
-	export BuildSuccess := if(pIsTesting, myInfo, all_hands + ';qualityassurance@seisint.com');
-	export BuildFailure := if(pIsTesting, myInfo, all_hands + ';akayttala@seisint.com');
-	export Roxie        := if(pIsTesting, myInfo, all_hands + RoxieKeyBuild.Email_Notification_List);
-	export ScrubsPlus   := if(pIsTesting, myInfo, all_hands + ';Rosemary.Murphy@lexisnexisrisk.com;Kent.Wolf@lexisnexisrisk.com');
+	EXPORT BuildSuccess := IF(pIsTesting, myInfo, all_hands);
+	EXPORT BuildFailure := BuildSuccess; 
+	EXPORT Roxie        := BuildSuccess;
+	EXPORT ScrubsPlus   := BuildSuccess;
 
-end; 
+END; 
