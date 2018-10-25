@@ -34,11 +34,10 @@ EXPORT TuFraudAlert_Records(dataset(iesp.tu_fraud_alert.t_TuFraudAlertRequest) i
   remote_linking_result := IF(~is_lexID_match AND is_soap_response_success,
     FCRAGateway_Services.Functions.TuFraudAlert.Get_RL_Match(in_req[1], ds_tufa_soap_response[1].response, in_mod.gateways));
 
-  //Set the inquiry log lexID to input if we have a match or remote linking didn't match.
-  //This is because if we identify a person on input we need inquiry log and FFD data.
-  //regardless of the vendor gateway response.
-  inquiry_log_lexID := IF(is_lexID_match OR ~remote_linking_result.match OR remote_linking_result.best_lexID = 0,
-    input_lexID, remote_linking_result.best_lexID);
+  //Set the inquiry log lexID to remote linking best_lexID if it's valid.
+  //Otherwise use what we have from input.
+  inquiry_log_lexID := IF(remote_linking_result.match AND remote_linking_result.best_lexID > 0,
+    remote_linking_result.best_lexID, input_lexID);
 
   //Prepare inquiry log. If it is a 0, set to a blank string per ESP team request.
   consumer := FFD.Mac.PrepareConsumerRecord(IF(inquiry_log_lexID = 0, '', (STRING)inquiry_log_lexID),

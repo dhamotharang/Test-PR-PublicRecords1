@@ -7,10 +7,10 @@ EXPORT GetTufaLexIDVerification(DATASET(iesp.tu_fraud_alert.t_TuFraudAlertRespon
     is_soap_call_ok := soap_response._header.status = FCRAGateway_Services.Constants.GatewayStatus.SUCCESS;
 
     //If we have a valid gateway response call picklist to retrieve a DID.
-    tufa_plist_req := IF(is_soap_call_ok, PROJECT(DATASET(soap_response),
-      FCRAGateway_Services.TuFraudAlert_Transforms.output_to_picklist(LEFT, user)));
+    tufa_dville_req := IF(is_soap_call_ok, PROJECT(DATASET(soap_response),
+      FCRAGateway_Services.TuFraudAlert_Transforms.output_to_lexId_resolution(LEFT, user)));
 
-    tufa_dville_resp := FCRA.getDidVilleRecords(tufa_plist_req[1]);
+    tufa_dville_resp := FCRA.getDidVilleRecords(tufa_dville_req[1]);
 
     //didville will return a header status of 0 on success
     is_dville_ok := tufa_dville_resp[1]._header.status = 0;
@@ -23,7 +23,7 @@ EXPORT GetTufaLexIDVerification(DATASET(iesp.tu_fraud_alert.t_TuFraudAlertRespon
       SELF.response := LEFT.response));
 
     #IF(FCRAGateway_Services.Constants.Debug.TuDidvilleVerification)
-      output(tufa_plist_req, NAMED('tufa_plist_req'));
+      output(tufa_dville_req, NAMED('tufa_dville_req'));
       output(tufa_dville_resp, NAMED('tufa_dville_resp'));
       output(ds_tufa_with_didville_response, NAMED('ds_tufa_with_didville_response'));
     #END

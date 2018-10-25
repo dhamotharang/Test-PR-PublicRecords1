@@ -76,8 +76,9 @@ EXPORT TuFraudAlert_Transforms := MODULE
       SELF := [];
   END;
 
-  //Transforms gateway response to picklist request.
-  EXPORT iesp.person_picklist.t_PersonPickListRequest output_to_picklist(
+  //Transforms gateway response to picklist for lexID resolution.
+  //Used to just be picklist, now it's didville, but it utilizes the picklist layout.
+  EXPORT iesp.person_picklist.t_PersonPickListRequest output_to_lexId_resolution(
     iesp.tu_fraud_alert.t_TuFraudAlertResponse in_req, iesp.share.t_User user) := TRANSFORM
       name := in_req.RespSubjects[1].RespNames[1];
       address := in_req.RespSubjects[1].RespAddresses[1];
