@@ -83,6 +83,8 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
     option    := GLOBAL(firstRow.Options);
     users     := GLOBAL(firstRow.User); 
     
+    OutputType := firstRow.User.OutputType;
+    
     // Some of the top business code is using the global mod instead 
     // of using the interface module
     iesp.ECL2ESP.SetInputBaseRequest (firstRow);
@@ -376,7 +378,8 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
                           ds_Results_withSmBizSBFEroyalty[1].SmallBiz_SBFE_Royalty, 1, 0);
                           
     ds_SBFE_CountRoyalLayout := DATASET([{SBFE_RoyalCount}], {INTEGER SBFEAccountCount});                                           
-    ds_combinedSBFE_royalties := IF( TestData_Enabled, Royalty.RoyaltySBFE.GetNoRoyalties(), Royalty.RoyaltySBFE.GetOnlineRoyalties(ds_SBFE_CountRoyalLayout) );
+    ds_combinedSBFE_royalties := IF( TestData_Enabled, Royalty.RoyaltySBFE.GetNoRoyalties(OutputType), 
+                                     Royalty.RoyaltySBFE.GetOnlineRoyalties(ds_SBFE_CountRoyalLayout,OutputType) );
 
    /* ************************************************************************
     *                    Targus Royalties                                    *
