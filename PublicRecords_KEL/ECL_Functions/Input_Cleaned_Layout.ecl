@@ -1,44 +1,42 @@
-﻿//Taken from PublicRecords.risk_indicators.layout_input
-EXPORT Input_Cleaned_Layout := RECORD
-	UNSIGNED4 seq;
-  
-	STRING in_streetAddress;
-	STRING in_city;
-	STRING in_state;
-	STRING in_zipCode;
-	STRING in_country;
+﻿IMPORT PublicRecords_KEL;
 
-	STRING prim_range;
-	STRING predir;
-	STRING prim_name;
-	STRING addr_suffix;
-	STRING postdir;
-	STRING unit_desig;
-	STRING sec_range;
-	STRING p_city_name;
-	STRING st;
-	STRING z5;
-	STRING zip4;
-	STRING lat := '';
-	STRING long := '';
-	STRING county := '';
-	STRING geo_blk := '';
-	STRING addr_type;
-	STRING addr_status;
-	STRING country;
-	STRING dl_number := '';
-	STRING dl_state := '';
-	STRING email_address := '';
-  
-  	//FOR TESTING to get lexid
-	string tweaked_zip;
-	STRING20 fname;
-	STRING20 mname;
-	STRING20 lname;	
-	STRING9  ssn;
-	STRING8  dob;
-  UNSIGNED6 Lexid;
-  string suffix;
-  string phone10;
-  integer score;
+EXPORT Input_Cleaned_Layout := RECORD
+	INTEGER InputID; 
+	INTEGER7 AppendedLexID; 
+	INTEGER2 AppendedLexIDScore;  
+
+	STRING5  InputCleanPrefix;
+	STRING20 InputCleanFirstName;
+	STRING20 InputCleanMiddleName;
+	STRING20 InputCleanLastName;
+	STRING5  InputCleanSuffix;
+
+	STRING10 InputCleanPrimaryRange;
+	STRING3 InputCleanPreDirection;
+	STRING28 InputCleanPrimaryName;
+	STRING4 InputCleanAddressSuffix;
+	STRING3 InputCleanPostDirection;
+	STRING10 InputCleanUnitDesig;
+	STRING8 InputCleanSecondaryRange;
+	STRING25 InputCleanCityName; 
+	STRING3 InputCleanState;
+	STRING5 InputCleanZip5; 
+	STRING4 InputCleanZip4;
+	STRING10 InputCleanLatitude;
+	STRING11 InputCleanLongitude;
+	STRING3 InputCleanCounty;
+	STRING7 InputCleanGeoblock;
+	STRING3 InputCleanAddressType;
+	STRING4 InputCleanAddressStatus;
+	STRING25 InputCleanCountry;
+	STRING50 InputCleanEMail;
+	STRING10 InputCleanHomePhone;
+	STRING10 InputCleanWorkPhone;
+	STRING20 InputCleanDLNumber;
+	STRING3 InputCleanDLState;
+	STRING8 InputCleanDOB;
+	STRING9 InputCleanSSN;
+	STRING20 ArchiveDate;
+
+	PublicRecords_KEL.ECL_Functions.Cleaned_Date_Layout;  
 END;
