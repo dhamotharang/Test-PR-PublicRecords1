@@ -8,6 +8,7 @@ EXPORT GetCCRGateway (DATASET(ConsumerCreditReport_Services.Layouts.workRec) ds_
 		SELF.User.BillingCode:=in_mod.BillingCode;
 		// QueryId is assigned as acctno as the ONLY input field returned in gateway response
 		SELF.User.QueryId:=(STRING)L.acctno;
+		SELF.User.CompanyId:=in_mod.CompanyId;
 		SELF.User.EndUser.CompanyName:=in_mod.EndUserCompanyName;
 		SELF.Options.PermissiblePurpose:=in_mod.PermissiblePurpose; 
 		SELF.SearchBy.Subject.SSN:=L.ssn;

@@ -54,13 +54,14 @@ EXPORT Functions := MODULE
   EXPORT append_Dids (DATASET(ConsumerCreditReport_Services.Layouts.workRec) ds_work_in,
                       ConsumerCreditReport_Services.IParams.Params in_mod) := FUNCTION
 
-    BatchShare.MAC_AppendPicklistDID(ds_work_in(error_code=0),ds_work_out,in_mod,TRUE);
+    BatchShare.MAC_AppendDidVilleDID(ds_work_in(error_code=0),ds_work_out,in_mod);
 
     ConsumerCreditReport_Services.Layouts.workRec appendDids(ds_work_in L, ds_work_out R) := TRANSFORM
+      noRecordsFound:=R.err_search=Standard.Errors.SEARCH.DID_NOT_FOUND;
       hasTooManySubjects:=R.err_search=Standard.Errors.SEARCH.DID_MULTIPLE;
-      SELF.did:=IF(NOT hasTooManySubjects,R.did,L.did);
+      SELF.did:=IF(noRecordsFound OR hasTooManySubjects,L.did,R.did);
       SELF.err_search:=R.err_search;
-      SELF.error_code:=IF(hasTooManySubjects,ConsumerCreditReport_Services.Constants.TOO_MANY_SUBJECTS_CODE,L.error_code);
+      SELF.error_code:=R.error_code;
       SELF:=L;
     END;
 
@@ -138,7 +139,7 @@ EXPORT Functions := MODULE
   EXPORT append_UniqueId (DATASET(ConsumerCreditReport_Services.Layouts.ccrResp) ds_ccr_resp,
                           ConsumerCreditReport_Services.IParams.Params in_mod) := FUNCTION
 
-    ConsumerCreditReport_Services.Layouts.workRec picklistReq(ds_ccr_resp L):= TRANSFORM
+    ConsumerCreditReport_Services.Layouts.workRec didvilleReq(ds_ccr_resp L):= TRANSFORM
       SELF.acctno := L.AccountNumber,
       Subj := L.ConsumerCreditReports[1].ReportHeader.Subject;
       SELF.name_first  := Subj.Name.First;
@@ -164,8 +165,8 @@ EXPORT Functions := MODULE
       SELF:=[];
     END;
 
-    ds_picklist_in:=PROJECT(ds_ccr_resp,picklistReq(LEFT));
-    BatchShare.MAC_AppendPicklistDID(ds_picklist_in,ds_picklist_out,in_mod,TRUE);
+    ds_didville_in:=PROJECT(ds_ccr_resp,didvilleReq(LEFT));
+    BatchShare.MAC_AppendDidVilleDID(ds_didville_in,ds_didville_out,in_mod);
 
     iesp.consumercreditreport_fcra.t_FcraCCReport applyMasking(iesp.consumercreditreport_fcra.t_FcraCCReport L) := TRANSFORM
       SELF.ReportHeader.Subject.SSN:=Suppress.ssn_mask(L.ReportHeader.Subject.SSN,in_mod.SSN_Mask);
@@ -177,13 +178,15 @@ EXPORT Functions := MODULE
       SELF:=L;
     END;
 
-    ConsumerCreditReport_Services.Layouts.ccrResp appendUniqueid(ds_ccr_resp L, ds_picklist_out R) := TRANSFORM
+    ConsumerCreditReport_Services.Layouts.ccrResp appendUniqueid(ds_ccr_resp L, ds_didville_out R) := TRANSFORM
+      noRecordsFound:=R.err_search=Standard.Errors.SEARCH.DID_NOT_FOUND;
       hasTooManySubjects:=R.err_search=Standard.Errors.SEARCH.DID_MULTIPLE;
-      UniqueId2:=IF(NOT hasTooManySubjects,(STRING)R.did,'');
+      UniqueId2:=IF(noRecordsFound OR hasTooManySubjects,'',(STRING)R.did);
       hasMatchingIds:=(UNSIGNED)L.UniqueId1=(UNSIGNED)UniqueId2;
       SELF.UniqueId2:=UniqueId2;
       SELF._Header.QueryId:=L.AccountNumber;
       SELF._Header.Exceptions:=MAP(
+        noRecordsFound => L._Header.Exceptions+ConsumerCreditReport_Services.Constants.NO_LEXID_FOUND_G,
         hasTooManySubjects => L._Header.Exceptions+ConsumerCreditReport_Services.Constants.TOO_MANY_SUBJECTS_G,
         NOT hasMatchingIds => L._Header.Exceptions+ConsumerCreditReport_Services.Constants.NON_MATCHING_LEXID,
         L._Header.Exceptions);
@@ -195,7 +198,7 @@ EXPORT Functions := MODULE
       SELF:=L;
     END;
 
-    RETURN JOIN(ds_ccr_resp,ds_picklist_out(did!=0),
+    RETURN JOIN(ds_ccr_resp,ds_didville_out,
       LEFT.AccountNumber=RIGHT.acctno,
       appendUniqueid(LEFT,RIGHT),
       LEFT OUTER,KEEP(1),LIMIT(0));
@@ -343,7 +346,7 @@ EXPORT Functions := MODULE
       SELF._Header.QueryId:=L.acctno;
       SELF._Header.Exceptions:=CASE(L.error_code,
         ConsumerCreditReport_Services.Constants.NO_LEXID_FOUND_CODE => ConsumerCreditReport_Services.Constants.NO_LEXID_FOUND,
-        ConsumerCreditReport_Services.Constants.TOO_MANY_SUBJECTS_CODE => ConsumerCreditReport_Services.Constants.TOO_MANY_SUBJECTS_I,
+        ConsumerCreditReport_Services.Constants.TOO_MANY_SUBJECTS_CODE => ConsumerCreditReport_Services.Constants.TOO_MANY_SUBJECTS,
         ConsumerCreditReport_Services.Constants.INSUFFICIENT_INPUT_CODE => ConsumerCreditReport_Services.Constants.INSUFFICIENT_INPUT, 
         DATASET([],iesp.share.t_WsException));
    // no Exceptions generated in case of CONSUMER_ALERT_CODE, results will be suppressed and consumer statements and alerts returned
