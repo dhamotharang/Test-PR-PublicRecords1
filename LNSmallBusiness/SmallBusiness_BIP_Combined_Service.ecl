@@ -378,8 +378,10 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
                           ds_Results_withSmBizSBFEroyalty[1].SmallBiz_SBFE_Royalty, 1, 0);
                           
     ds_SBFE_CountRoyalLayout := DATASET([{SBFE_RoyalCount}], {INTEGER SBFEAccountCount});                                           
-    ds_combinedSBFE_royalties := IF( TestData_Enabled, Royalty.RoyaltySBFE.GetNoRoyalties(OutputType), 
-                                     Royalty.RoyaltySBFE.GetOnlineRoyalties(ds_SBFE_CountRoyalLayout,OutputType) );
+
+    ds_combinedSBFE_royalties := IF( TestData_Enabled, Royalty.RoyaltySBFE.GetNoRoyaltiesPlus(OutputType), 
+                                     Royalty.RoyaltySBFE.GetOnlineRoyaltiesPlus(ds_SBFE_CountRoyalLayout,OutputType) );
+
 
    /* ************************************************************************
     *                    Targus Royalties                                    *
