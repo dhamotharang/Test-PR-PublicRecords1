@@ -56,8 +56,8 @@ export fetch_SSN (dataset (AutoheaderV2.layouts.search) ds_search) := function
 	p := p0+ IF((~temp_fuzzy_ssn OR temp_isCRS )	AND NOT EXISTS(p0) AND useSSnPartialFetch
 					,SSNPartial_Fetch);
 					
-	best_recs := dx_BestRecords.append(p, did, dx_BestRecords.Constants.perm_type.glb);
-	GoodSSNOnly := project(best_recs(_best._valid and _best.valid_ssn = 'G' and _best.ssn = temp_ssn_value), 
+	best_recs := dx_BestRecords.append(p, did, dx_BestRecords.Constants.perm_type.glb, left_outer := false);
+	GoodSSNOnly := project(best_recs(_best.valid_ssn = 'G' and _best.ssn = temp_ssn_value), 
 		transform(recordof(p), self := left));
 
 	ssn_res := if(temp_SearchGoodSSNOnly_value, GoodSSNOnly, p);

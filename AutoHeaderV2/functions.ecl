@@ -118,8 +118,8 @@ EXPORT functions := MODULE
       self.index_hit := l.index_hit;
     end;
 
-		best_recs := dx_BestRecords.append(adv_references, did, dx_BestRecords.Constants.perm_type.glb);
-		j := project(best_recs(_best._valid), tra(left, left._best));
+		best_recs := dx_BestRecords.append(adv_references, did, dx_BestRecords.Constants.perm_type.glb, left_outer := false);
+		j := project(best_recs, tra(left, left._best));
 
     b := TOPN (j, 1, -score, did);
     bslim := project(b, AutoheaderV2.layouts.search_out);

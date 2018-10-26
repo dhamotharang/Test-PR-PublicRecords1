@@ -146,9 +146,8 @@ export Fn_do_Validation := Module
 																	keep(50), limit(0)),record),record);
 			// output(checkDidFromSSN,named('checkDidFromSSN'));
 			//Check the SSN against the watchdog file to get the full name and see if it is close to what the user supplied if so get the watch dog name and compare it to the real names collected
-			bestRecs := dx_BestRecords.append(checkDidFromSSN, did, dx_BestRecords.Constants.perm_type.glb);
-			bestInfo:=project(bestRecs(_best._valid and 
-																	((_best.fname[1..2]=STD.Str.ToUpperCase(name_first[1..2]) and _best.lname = STD.Str.ToUpperCase(name_last)) or 
+			bestRecs := dx_BestRecords.append(checkDidFromSSN, did, dx_BestRecords.Constants.perm_type.glb, left_outer := false);
+			bestInfo:=project(bestRecs(((_best.fname[1..2]=STD.Str.ToUpperCase(name_first[1..2]) and _best.lname = STD.Str.ToUpperCase(name_last)) or 
 																	(_best.fname[1..2]=STD.Str.ToUpperCase(name_last[1..2]) and _best.lname = STD.Str.ToUpperCase(name_first)))),
 																	Transform(Healthcare_Shared.Layouts.layout_lookup_DID, 
 																			self.acctno := left.acctno; 
