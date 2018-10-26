@@ -76,7 +76,10 @@ PersonContext_transformed := project(dsResponseRecords(searchStatus=personContex
 		ts_minute := trim(left.dateadded[15..16]);
 		ts_second := trim(left.dateadded[18..19]);
 		
-		self.ConsumerStatement := statementtype in [personContext.Constants.RecordTypes.cs, personcontext.Constants.RecordTypes.rs];
+    // requirement 3.4 of riskview dempsey requirements
+    //b.	Record Level statements shall NOT be returned in the XML response for legacy riskview (riskview versions older than 50)
+    valid_statements := if(bsversion < 50, [personContext.Constants.RecordTypes.cs], [personContext.Constants.RecordTypes.cs, personcontext.Constants.RecordTypes.rs] );
+		self.ConsumerStatement := statementtype in valid_statements;
 	
 		isDispute := statementtype = personContext.Constants.RecordTypes.dr;
 		securityfraudalert := statementtype = personContext.Constants.RecordTypes.fa;    
