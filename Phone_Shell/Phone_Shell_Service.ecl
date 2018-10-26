@@ -51,7 +51,7 @@
 	<part name="Strict_APSX_Match" type="xsd:boolean"/>
 	<part name="Score_Threshold" type="xsd:integer"/>
 
-	<part name="BocaShell_Version" type="xsd:integer"/>
+	<part name="PhoneShell_Version" type="xsd:integer"/>
 	<part name="BocaShell_IncludeRelatives" type="xsd:boolean"/>
 	<part name="BocaShell_IncludeDL" type="xsd:boolean"/>
 	<part name="BocaShell_IncludeVehicle" type="xsd:boolean"/>
@@ -189,7 +189,7 @@ EXPORT Phone_Shell_Service() := FUNCTION
                 'SX_Match_Restriction_Limit',
                 'Strict_APSX_Match',
                 'Score_Threshold',
-                'BocaShell_Version',
+                'PhoneShell_Version',
                 'BocaShell_IncludeRelatives',
                 'BocaShell_IncludeDL',
                 'BocaShell_IncludeVehicle',
@@ -272,8 +272,8 @@ EXPORT Phone_Shell_Service() := FUNCTION
 	SX_Match_Restriction_Limit := IF(SX_Match_Restriction_Limit_Temp > 0, SX_Match_Restriction_Limit_Temp, 10);
 	BOOLEAN Strict_APSX															:= FALSE : STORED('Strict_APSX_Match');
 	Unsigned2 Score_Threshold												:= Phone_Shell.constants.Default_PhoneScore : STORED('Score_Threshold');
-	// Boca Shell Options
-	UNSIGNED1 BocaShell_Version 										:= 41 : STORED('BocaShell_Version');
+	// Boca Shell Options, Phone Shell version uses 2-digit notation so 10 value = phone shell 1.0
+	UNSIGNED1 PhoneShell_Version 										:= 10 : STORED('PhoneShell_Version');
 	BOOLEAN BocaShell_IncludeRelatives 							:= TRUE : STORED('BocaShell_IncludeRelatives');
 	BOOLEAN BocaShell_IncludeDL 										:= FALSE : STORED('BocaShell_IncludeDL');
 	BOOLEAN BocaShell_IncludeVehicle 								:= FALSE : STORED('BocaShell_IncludeVehicle');
@@ -366,7 +366,7 @@ EXPORT Phone_Shell_Service() := FUNCTION
 	 *  Get the Phone Shell Results                                           *
 	 ************************************************************************ */
 	results := Phone_Shell.Phone_Shell_Function(input, Gateways, GLBPurpose, DPPAPurpose, DataRestrictionMask, DataPermissionMask, PhoneRestrictionMask, 
-																							MaxPhones, InsuranceVerificationAgeLimit, BocaShell_Version, SPIIAccessLevel, VerticalMarket, IndustryClass,
+																							MaxPhones, InsuranceVerificationAgeLimit, PhoneShell_Version, SPIIAccessLevel, VerticalMarket, IndustryClass,
 																							RelocationsMaxDaysBefore, RelocationsMaxDaysAfter, RelocationsTargetRadius, IncludeLastResort, IncludePhonesFeedback, 
 																							BocaShell_IncludeRelatives, BocaShell_IncludeDL, BocaShell_IncludeVehicle, BocaShell_IncludeDerog,
 																							BocaShell_OFAC_Only, BocaShell_ExcludeWatchlists, BocaShell_Include_OFAC, BocaShell_Include_AdditionalWatchlists,

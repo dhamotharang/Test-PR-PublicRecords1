@@ -9,7 +9,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout Phone_Shell_Function (D
 																																						 	UNSIGNED1 PhoneRestrictionMaskTemp = Phone_Shell.Constants.PRM.AllPhones,
 																																						 	UNSIGNED3 MaxPhones = Phone_Shell.Constants.Default_MaxPhones,
 																																						 	UNSIGNED3 InsuranceVerificationAgeLimit = Phone_Shell.Constants.Default_InsuranceVerificationAgeLimit,
-																																							 UNSIGNED2 BocaShellVersion = 41,
+																																							 UNSIGNED2 PhoneShellVersion = 10, // use 2-digit notation (10 = phone shell version 1.0)
 																																						 	STRING2 SPIIAccessLevel = Phone_Shell.Constants.Default_SPIIAccessLevel, // 5A or 5B - used in TransUnion Gateway
 																																						 	STRING30 VerticalMarket = '', // Example: 'Receivables Management' restricts certain Gateways
 																																						 	STRING30 IndustryClass = '', // Example: 'UTILI' restricts the Utility Data Search
@@ -193,6 +193,11 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout Phone_Shell_Function (D
 	// We don't want to call Targus twice...
 	BocaShellGateways		:= if(exists(Gateways(servicename = 'bridgerwlc')), Gateways, Gateway.Constants.void_gateway);
 	
+ // Choose BocaShellVersion based on what PhoneShellVersion was passed in
+ BocaShellVersion := if(PhoneShellVersion >= 20, // PhoneShell V2 (2.0, 2.1, etc)
+                        54, // If PhoneShell V2 then Boca Shell 5.4
+                        41); // Else use Boca Shell 4.1
+  
 	/* ************************************************************************
 	 *  Get IID and Boca Shell Data - This will also perform our DID append   *
 	 ************************************************************************ */
