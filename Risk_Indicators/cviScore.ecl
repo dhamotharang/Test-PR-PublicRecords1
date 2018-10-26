@@ -1,11 +1,11 @@
-export cviScore(INTEGER1 p, INTEGER1 s, Layout_Output l, STRING9 corrected_ssn, STRING50 corrected_address, STRING10 corrected_phone, STRING5 inTweak, STRING50 veraddr, STRING20 verlast, 
+﻿export cviScore(INTEGER1 p, INTEGER1 s, Layout_Output l, STRING9 corrected_ssn, STRING50 corrected_address, STRING10 corrected_phone, STRING5 inTweak, STRING50 veraddr, STRING20 verlast, 
 								BOOLEAN OFAC=TRUE) := 
 FUNCTION
 
 BOOLEAN isPOTS := l.isPOTS;
 tweak := trim(inTweak);
 
-cvi := CASE(p,
+cvi := __COMMON__(CASE(p,
 		0 => MAP(s IN [0,1] => '00',
 			    s IN [2,3,4] => '10',
 			    s IN [5,6,7,8,9,10] => '20',
@@ -62,22 +62,22 @@ cvi := CASE(p,
 				s IN [0,2,3,4,5,6] => '30',
 				s IN [7,8,10,11] => '40',  							// 11 will now be a 40
 				'50'),																	// 9 will now be 50
-				'00');
+				'00'));
 				
 	
 	// determine if we need to override to 10
-	override1 := ((	rcSet.isCode02(l.decsflag) OR 
+	override1 := __COMMON__(((	rcSet.isCode02(l.decsflag) OR 
 									rcSet.isCode03(l.socsdobflag) OR 
 									((rcSet.isCode06(l.socsvalflag, l.ssn) OR rcSet.isCodeIS(l.ssn, l.socsvalflag, l.socllowissue, l.socsRCISflag)) AND ~rcSet.isCode29(l.socsmiskeyflag)) OR 
 									(rcSet.isCode08(l.phonetype,l.phone10) AND rcSet.isCode11(l.addrvalflag, l.in_streetAddress, l.in_city, l.in_state, l.in_zipCode) AND ~rcSet.isCode30(l.addrmiskeyflag) AND ~rcSet.isCode31(l.hphonemiskeyflag))) AND
 								cvi>'10') OR 
-								(OFAC and rcSet.isCode32(l.watchlist_table, l.watchlist_record_number ));
+								(OFAC and rcSet.isCode32(l.watchlist_table, l.watchlist_record_number )));
 	
 				
-	cviAdj2 := IF(override1,'10',cvi);
+	cviAdj2 := __COMMON__(IF(override1,'10',cvi));
 			   
 	// special logic for ecvi and ddvi and svi
-	cviAdj3 := MAP(tweak = 'ecvi' =>
+	cviAdj3 := __COMMON__(MAP(tweak = 'ecvi' =>
 					MAP(cviAdj2 <= '20' => 
 							MAP(l.socsverlevel IN [4,7,9] and l.dobcount>0 and l.hriskphoneflag<>'5' and (l.addrvalflag<>'N' OR veraddr<>'') => '30',
 							    l.socsverlevel IN [4,7,9] and ga(l.combo_addrscore) and l.combo_prim_range=l.prim_range and (l.addrvalflag<>'N' OR veraddr<>'') => '30',
@@ -104,24 +104,24 @@ cvi := CASE(p,
 							    cviAdj2),
 					    cviAdj2 = '30' => IF(l.decsflag='1' or l.socsdobflag='1' or l.socsvalflag='1' or ((INTEGER)(l.socllowissue)>=1999),'20',cviAdj2),
 					    cviAdj2),
-			     cviAdj2);
+			     cviAdj2));
 				
-	cviAdj4 := IF(tweak='svi',IF((rcSet.isCode02(l.decsflag) OR rcSet.isCode03(l.socsdobflag) OR ((rcSet.isCode06(l.socsvalflag, l.ssn) OR rcSet.isCodeIS(l.ssn, l.socsvalflag, l.socllowissue, l.socsRCISflag)) AND ~rcSet.isCode29(l.socsmiskeyflag)) OR 
+	cviAdj4 := __COMMON__(IF(tweak='svi',IF((rcSet.isCode02(l.decsflag) OR rcSet.isCode03(l.socsdobflag) OR ((rcSet.isCode06(l.socsvalflag, l.ssn) OR rcSet.isCodeIS(l.ssn, l.socsvalflag, l.socllowissue, l.socsRCISflag)) AND ~rcSet.isCode29(l.socsmiskeyflag)) OR 
 	              (rcSet.isCode08(l.phonetype,l.phone10) AND rcSet.isCode11(l.addrvalflag, l.in_streetAddress, l.in_city, l.in_state, l.in_zipCode) AND ~rcSet.isCode30(l.addrmiskeyflag) AND ~rcSet.isCode31(l.hphonemiskeyflag)) AND
-			     cvi>'10'),'10',cviAdj3),cviAdj3);
+			     cvi>'10'),'10',cviAdj3),cviAdj3));
 					 
-	override2 := cviAdj4 > '20' and l.ssnexists and l.socscount = 0 and ~l.lastssnmatch2 and LENGTH(Stringlib.StringFilter(l.ssn,'0123456789'))=9;	// ssn does not belong to this last and it belongs to someone else
-	override3 := cviAdj4 > '20' and l.socsvalflag != '1' and ~l.ssnexists and l.socscount = 0 and l.versocs <> '' and LENGTH(Stringlib.StringFilter(l.ssn,'0123456789'))=9;	// ssn does not belong to anybody, but there is a social for this person				 
+	override2 := __COMMON__(cviAdj4 > '20' and l.ssnexists and l.socscount = 0 and ~l.lastssnmatch2 and LENGTH(Stringlib.StringFilter(l.ssn,'0123456789'))=9);	// ssn does not belong to this last and it belongs to someone else
+	override3 := __COMMON__(cviAdj4 > '20' and l.socsvalflag != '1' and ~l.ssnexists and l.socscount = 0 and l.versocs <> '' and LENGTH(Stringlib.StringFilter(l.ssn,'0123456789'))=9);	// ssn does not belong to anybody, but there is a social for this person				 
 
-	cviAdj5 := IF(override2, '20', cviAdj4);	
-	cviAdj6 := IF(override3, '20', cviAdj5);	
+	cviAdj5 := __COMMON__(IF(override2, '20', cviAdj4));	
+	cviAdj6 := __COMMON__(IF(override3, '20', cviAdj5));	
 	
 	// for american express add custom cvi override logic
-	cviAdj7 := IF(tweak='amxvi' and cviAdj6 > '30',
+	cviAdj7 := __COMMON__(IF(tweak='amxvi' and cviAdj6 > '30',
 															MAP(rcSet.isCode11(l.addrvalflag, l.in_streetAddress, l.in_city, l.in_state, l.in_zipCode) and rcSet.isCode30(l.addrmiskeyflag) => '25',
 																	rcSet.isCodeCL(l.ssn, l.bestssn, l.socsverlevel, l.combo_ssn) and ~rcSet.isCode29(l.socsmiskeyflag) => '15',
 																	cviAdj6),
-															cviAdj6);
+															cviAdj6));
 															
 
 RETURN (cviAdj7);

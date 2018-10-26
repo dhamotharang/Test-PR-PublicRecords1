@@ -1,11 +1,11 @@
-export cviScoreV1(INTEGER1 p, INTEGER1 s, Layout_Output l, STRING9 corrected_ssn, STRING50 corrected_address, STRING10 corrected_phone, STRING5 inTweak, STRING50 veraddr, STRING20 verlast, 
+﻿export cviScoreV1(INTEGER1 p, INTEGER1 s, Layout_Output l, STRING9 corrected_ssn, STRING50 corrected_address, STRING10 corrected_phone, STRING5 inTweak, STRING50 veraddr, STRING20 verlast, 
 								BOOLEAN OFAC=TRUE, BOOLEAN IncludeDOBinCVI=FALSE, BOOLEAN IncludeDLinCVI=FALSE, STRING128 CustomCVIModelName='') := 
 FUNCTION
 
 BOOLEAN isPOTS := l.isPOTS;
 tweak := trim(inTweak);
 
-cvi := CASE(p,
+cvi := __COMMON__(CASE(p,
 		0 => MAP(s IN [0,1] => '00',
 			    s IN [2,3,4] => '10',
 			    s IN [5,6,7,8,9,10] => '20',
@@ -74,22 +74,22 @@ cvi := CASE(p,
 				s IN [0,2,3,4,5,6] => '30',
 				s IN [7,8,10,11] => '40',  							// 11 will now be a 40
 				'50'),																	// 9 will now be 50
-				'00');
+				'00'));
 				
 	
 	// determine if we need to override to 10
-	override1 := ((	rcSet.isCode02(l.decsflag) OR 
+	override1 := __COMMON__(((	rcSet.isCode02(l.decsflag) OR 
 									rcSet.isCodeDI(l.DIDdeceased) OR
 									rcSet.isCode03(l.socsdobflag) OR 
 									((rcSet.isCode06(l.socsvalflag, l.ssn) OR rcSet.isCodeIS(l.ssn, l.socsvalflag, l.socllowissue, l.socsRCISflag)) AND ~rcSet.isCode29(l.socsmiskeyflag)) OR 
 									(rcSet.isCode08(l.phonetype,l.phone10) AND rcSet.isCode11(l.addrvalflag, l.in_streetAddress, l.in_city, l.in_state, l.in_zipCode) AND ~rcSet.isCode30(l.addrmiskeyflag) AND ~rcSet.isCode31(l.hphonemiskeyflag)))) OR
-								(OFAC and rcSet.isCode32(l.watchlist_table, l.watchlist_record_number ));
+								(OFAC and rcSet.isCode32(l.watchlist_table, l.watchlist_record_number )));
 	
 				
-	cviAdj2 := IF(override1 and cvi>'10','10',cvi);
+	cviAdj2 := __COMMON__(IF(override1 and cvi>'10','10',cvi));
 			   
 	// special logic for ecvi and ddvi and svi
-	cviAdj3 := MAP(tweak = 'ecvi' =>
+	cviAdj3 := __COMMON__(MAP(tweak = 'ecvi' =>
 					MAP(cviAdj2 <= '20' => 
 							MAP(l.socsverlevel IN [4,7,9] and l.dobcount>0 and l.hriskphoneflag<>'5' and (l.addrvalflag<>'N' OR veraddr<>'') => '30',
 							    l.socsverlevel IN [4,7,9] and ga(l.combo_addrscore) and l.combo_prim_range=l.prim_range and (l.addrvalflag<>'N' OR veraddr<>'') => '30',
@@ -116,38 +116,40 @@ cvi := CASE(p,
 							    cviAdj2),
 					    cviAdj2 = '30' => IF(l.decsflag='1' or l.socsdobflag='1' or l.socsvalflag='1' or ((INTEGER)(l.socllowissue)>=1999),'20',cviAdj2),
 					    cviAdj2),
-			     cviAdj2);
+			     cviAdj2));
 				
-	cviAdj4 := IF(tweak='svi',IF((rcSet.isCode02(l.decsflag) OR rcSet.isCode03(l.socsdobflag) OR ((rcSet.isCode06(l.socsvalflag, l.ssn) OR rcSet.isCodeIS(l.ssn, l.socsvalflag, l.socllowissue, l.socsRCISflag)) AND ~rcSet.isCode29(l.socsmiskeyflag)) OR 
+	cviAdj4 := __COMMON__(IF(tweak='svi',IF((rcSet.isCode02(l.decsflag) OR rcSet.isCode03(l.socsdobflag) OR ((rcSet.isCode06(l.socsvalflag, l.ssn) OR rcSet.isCodeIS(l.ssn, l.socsvalflag, l.socllowissue, l.socsRCISflag)) AND ~rcSet.isCode29(l.socsmiskeyflag)) OR 
 	              (rcSet.isCode08(l.phonetype,l.phone10) AND rcSet.isCode11(l.addrvalflag, l.in_streetAddress, l.in_city, l.in_state, l.in_zipCode) AND ~rcSet.isCode30(l.addrmiskeyflag) AND ~rcSet.isCode31(l.hphonemiskeyflag)) AND
-			     cvi>'10'),'10',cviAdj3),cviAdj3);
+			     cvi>'10'),'10',cviAdj3),cviAdj3));
 					 
-	override2 := l.ssnexists and l.socscount = 0 and ~l.lastssnmatch2 and LENGTH(Stringlib.StringFilter(l.ssn,'0123456789'))=9;	// ssn does not belong to this last and it belongs to someone else
-	override3 := l.socsvalflag != '1' and ~l.ssnexists and l.socscount = 0 and l.versocs <> '' and LENGTH(Stringlib.StringFilter(l.ssn,'0123456789'))=9;	// ssn does not belong to anybody, but there is a social for this person				 
+	override2 := __COMMON__(l.ssnexists and l.socscount = 0 and ~l.lastssnmatch2 and LENGTH(Stringlib.StringFilter(l.ssn,'0123456789'))=9);	// ssn does not belong to this last and it belongs to someone else
+	override3 := __COMMON__(l.socsvalflag != '1' and ~l.ssnexists and l.socscount = 0 and l.versocs <> '' and LENGTH(Stringlib.StringFilter(l.ssn,'0123456789'))=9);	// ssn does not belong to anybody, but there is a social for this person				 
 
-	cviAdj5 := IF(override2 AND cviAdj4 > '20' , '20', cviAdj4);	
-	cviAdj6 := IF(override3 AND cviAdj4 > '20' , '20', cviAdj5);	
+	cviAdj5 := __COMMON__(IF(override2 AND cviAdj4 > '20' , '20', cviAdj4));	
+	cviAdj6 := __COMMON__(IF(override3 AND cviAdj4 > '20' , '20', cviAdj5));	
 	
 	// for american express add custom cvi override logic
-	cviAdj7 := IF(tweak='amxvi' and cviAdj6 > '30',
+	cviAdj7 := __COMMON__(IF(tweak='amxvi' and cviAdj6 > '30',
 															MAP(rcSet.isCode11(l.addrvalflag, l.in_streetAddress, l.in_city, l.in_state, l.in_zipCode) and rcSet.isCode30(l.addrmiskeyflag) => '25',
 																	rcSet.isCodeCL(l.ssn, l.bestssn, l.socsverlevel, l.combo_ssn) and ~rcSet.isCode29(l.socsmiskeyflag) => '15',
 																	cviAdj6),
-															cviAdj6);
+															cviAdj6));
 															
 	// new adjustments for CIID project
 	// DOB and DL adjustments
 	// For both DOB and DL, add 10 to the cvi (not to exceed 40 and not to add more than 10 combined).  Do so if requested.
 	// Do not add 10 if the 10 or 20 override logic was set
-	DOBverified := l.combo_dobscore BETWEEN 80 AND 100;
-	DLverified := TRIM(l.verified_dl)<>'';
+	DOBverified := __COMMON__(l.combo_dobscore BETWEEN 80 AND 100);
+	DLverified := __COMMON__(TRIM(l.verified_dl)<>'');
 	
-	cviAdj8 := MAP(	IncludeDOBinCVI AND DOBverified AND cviAdj7<'40' AND ~override1 AND ~override2 AND ~override3 => (STRING)((UNSIGNED)(cviAdj7)+10),	// add 10 to the score if DOB is verified
+	cviAdj8 := __COMMON__(MAP(	IncludeDOBinCVI AND DOBverified AND cviAdj7<'40' AND ~override1 AND ~override2 AND ~override3 => (STRING)((UNSIGNED)(cviAdj7)+10),	// add 10 to the score if DOB is verified
 									IncludeDLinCVI AND DLverified AND cviAdj7<'40' AND ~override1 AND ~override2 AND ~override3 => (STRING)((UNSIGNED)(cviAdj7)+10),	// add 10 to the score if DL is verified
-									cviAdj7);
+									cviAdj7));
 	
 	//Adjustment for Targets fp1403_2 model
-	target_Adj := if(CustomCVIModelName = 'CCVI1501_1', if((s=7 and p=7) OR (s=9 and p=9), '20', cviAdj8), cviAdj8);
+	target_Adj := __COMMON__(if(CustomCVIModelName = 'CCVI1501_1', if((s=7 and p=7) OR (s=9 and p=9), '20', cviAdj8), cviAdj8));
+
+//CustomCVIModelName = 'CCVI1810_1' special logic for chase.  Depends on if verfirst,last and addr is blanked out in iid records transform, also chaning nas and nap. applied to normal and custom cvi.
 
 RETURN (target_Adj);
 
