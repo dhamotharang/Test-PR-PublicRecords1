@@ -772,6 +772,16 @@ MODULE
 		STRING10     phone;
 	  UNSIGNED RecordsReturned;
 	END;
+
+	EXPORT PFResSnapShotSearch := RECORD
+      STRING8 StartDate;
+      STRING8 EndDate;
+      STRING60 UserId;
+      STRING16 CompanyId;
+      STRING15 PhoneNumber; 		
+      STRING60 ReferenceCode;
+      UNSIGNED8 UniqueId;
+	END;
 	
 	//	DeltaPhones
 	EXPORT delta_phones_rpt_transaction := record
