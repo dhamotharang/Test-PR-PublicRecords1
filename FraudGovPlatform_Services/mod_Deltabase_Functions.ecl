@@ -48,12 +48,12 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 				SELF.EventDate.Year := (INTEGER)(L.Event_Date[1..4]);
 				SELF.EventDate.Month := (INTEGER)(L.Event_Date[5..6]);
 				SELF.EventDate.Day := (INTEGER)(L.Event_Date[7..8]);
-				SELF.ReportedDateTime.Year := (INTEGER)(L.Event_Date[1..4]);
-				SELF.ReportedDateTime.Month := (INTEGER)(L.Event_Date[5..6]);
-				SELF.ReportedDateTime.Day := (INTEGER)(L.Event_Date[7..8]);
-				SELF.ReportedDateTime.Hour24 := (INTEGER)(L.Event_Date[9..10]);
-				SELF.ReportedDateTime.Minute := (INTEGER)(L.Event_Date[11..12]);
-				SELF.ReportedDateTime.Second := (INTEGER)(L.Event_Date[13..14]);
+				SELF.ReportedDateTime.Year := (INTEGER)(L.Reported_Date[1..4]);
+				SELF.ReportedDateTime.Month := (INTEGER)(L.Reported_Date[5..6]);
+				SELF.ReportedDateTime.Day := (INTEGER)(L.Reported_Date[7..8]);
+				SELF.ReportedDateTime.Hour24 := (INTEGER)(L.Reported_Time[1..2]);
+				SELF.ReportedDateTime.Minute := (INTEGER)(L.Reported_Time[3..4]);
+				SELF.ReportedDateTime.Second := (INTEGER)(L.Reported_Time[5..6]);
 				SELF.IndustryTypeDescription := L.classification_source.Industry_segment;
 				SELF.ReportedBy := L.classification_Permissible_use_access.user_added;
 				SELF.ActivityReason := L.Referral_reason;
@@ -111,6 +111,8 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 				SELF.transaction_id := L.cust_transaction_id;
 				SELF.Customer_ID := L.gc_id;
 				SELF.Event_Date := L.date_added[1..4] + L.date_added[6..7] + L.date_added[9..10];
+				SELF.Reported_Date := L.date_added[1..4] + L.date_added[6..7] + L.date_added[9..10];
+				SELF.Reported_Time := L.date_added[12..13] + L.date_added[15..16] + L.date_added[18..19];
 				SELF.Investigation_Referral_Case_ID := L.case_id;
 				// SELF.Customer_Person_ID := L.client_uid;
 				SELF.uid := (INTEGER)L.client_uid;
