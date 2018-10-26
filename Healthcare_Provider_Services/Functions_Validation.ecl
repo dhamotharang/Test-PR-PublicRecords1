@@ -66,7 +66,7 @@ export Functions_Validation := Module
 			didbasedssn := dedup(sort(project(getdidfromssn,myLayouts.layout_did),record),record);
 			bestRaw := dx_BestRecords.get(dataset([{didbasedssn[1].did}], doxie.layout_references), 
 				did, dx_BestRecords.Constants.perm_type.glb);
-			bestRecs := project(bestRaw, transform(dx_BestRecords, self := left._best));
+			bestRecs := project(bestRaw, transform(dx_BestRecords.layout_best, self := left._best));
 			bestInfo:=bestRecs(((fname[1]=src.name_first[1] and lname = src.name_last) or 
 													(fname[1]=src.name_last[1] and lname = src.name_first)));
 			bestInfo_match := join(bestInfo,nameRecs,left.ssn=right.ssn,transform(recordof(bestInfo),
