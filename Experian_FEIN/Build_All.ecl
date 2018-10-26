@@ -1,32 +1,60 @@
-﻿import ut, VersionControl, dops, tools, _control, Scrubs, std, Scrubs_Experian_FEIN;
+﻿IMPORT ut, VersionControl, dops, tools, _control, Scrubs, STD, Scrubs_Experian_FEIN;
 
-export Build_All(
-   string													pversion
-	,boolean												pIsTesting	 = false
-	,boolean												pOverwrite	 = false																															
-	,dataset(Layouts.Input.sprayed)	pSprayedFile = Files().Input.using
-	,dataset(Layouts.Base					)	pBaseFile		 = Files().base.qa	
-) := function
+EXPORT Build_All(
+	STRING  pVersion,
+	STRING  pHostname,
+	STRING  pAbsolutePath,
+	STRING  pGlob,
+	STRING  pAddresses,
+	STRING  pCluster = 'Thor400_44',
+	INTEGER pRecordsize = 291,
+	BOOLEAN	pIsTesting = false,
+	BOOLEAN	pOverwrite = false,
+	DATASET(Layouts.Input.sprayed) pSprayedFile = Files().Input.using,
+	DATASET(Layouts.Base) pBaseFile = Files().base.qa
+) := FUNCTION
 
-	full_build :=	sequential(
-		Create_Supers
-		,VersionControl.fSprayInputFiles(Spray(pversion).Input)
-		,Build_Base		(pversion,pIsTesting,pSprayedFile,pBaseFile)
-		,Scrubs.ScrubsPlus('Experian_FEIN','Scrubs_Experian_FEIN','Scrubs_Experian_FEIN_Base', 'Base', pVersion,Experian_FEIN.Email_Notification_Lists().Stats,false)
-		,Build_Keys		(pversion).all
-		,dops.updateversion('ExperianFEINKeys',pversion,_control.MyInfo.EmailAddressNotify,,'N')
-		,Build_Strata	(pversion,pOverwrite,,,pIsTesting)
-		,Promote().Inputfiles.using2used
-		,Promote().Buildfiles.Built2QA
-		,QA_Records()
-		
-	) : success(Send_Emails(pversion).BuildSuccess), 
-	    failure(send_emails(pversion).BuildFailure);
+	full_build := SEQUENTIAL(
+		Create_Supers,
+		VersionControl.fSprayInputFiles(
+			Spray(
+				pHostname,
+				pAbsolutePath,
+				pGlob,
+				pRecordsize,
+				pVersion,
+				pCluster	
+			).Input
+		),
+		Build_Base(pVersion,pIsTesting,pSprayedFile,pBaseFile),
+		Scrubs.ScrubsPlus(
+			'Experian_FEIN',
+			'Scrubs_Experian_FEIN',
+			'Scrubs_Experian_FEIN_Base',
+			'Base',
+			pVersion,
+			Send_Emails(pAddresses, pVersion).Call_Email_Notification.Stats,		
+			false
+		),
+		Build_Keys(pVersion).all,
+		dops.updateversion(
+			'ExperianFEINKeys',
+			pVersion,
+			Send_Emails(pAddresses, pVersion).Get_Primary_Addresses,,
+			'N'
+		),
+		Build_Strata(pVersion,pOverwrite,,,pIsTesting),
+		Promote().Inputfiles.using2used,
+		Promote().Buildfiles.Built2QA,
+		QA_Records()
+	): SUCCESS(Send_Emails(pAddresses, pVersion).BuildSuccess), FAILURE(Send_Emails(pAddresses, pVersion).BuildFailure);
 	
-	return
-		if(tools.fun_IsValidVersion(pversion)
-			,full_build
-			,output('No Valid version parameter passed, skipping Experian_FEIN.Build_All')
-		);
+	RETURN
 
-end;
+	IF(
+		tools.fun_IsValidVersion(pVersion),
+		full_build,
+		OUTPUT('No Valid version parameter passed, skipping Experian_FEIN.Build_All')
+	);
+
+END;
