@@ -45,7 +45,7 @@ IMPORT ut, dx_BestRecords, doxie_files, DeathV2_Services, AutoStandardI;
 
 #uniquename(outf)
 %outf% := project(dx_BestRecords.get(did_stream, did_field, %perm_flag%), 
-	transform(bestlayout, self := left));
+	transform(bestlayout, self := left._best));
 	
 #uniquename(outfile_nominors)
 %outfile_nominors% := join(%outf%, doxie_files.key_minors_hash,

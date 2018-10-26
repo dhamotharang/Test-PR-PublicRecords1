@@ -1,44 +1,34 @@
-export mac_join (ds, d_field, key, use_dist, do_append) := functionmacro
+EXPORT mac_join (ds, d_field, key, use_dist, left_outer) := FUNCTIONMACRO
 
-	local out_rec := record(recordof(ds))
+	LOCAL out_rec := RECORD(recordof(ds))
 		dx_BestRecords.layout_best _best;
-	end;
+	END;
 
-	local ds_res := if (use_dist, 
-		join (distribute (ds, hash64(d_field)), distribute(pull(key), hash64(did)),
-			(left.d_field = right.did),
-			#if (do_append)            
-				transform (out_rec,
-					self._best._valid := true, 
-					self._best.age := if (right.dob = 0, 0, ut.age(right.dob)),
-					self._best := right,
-					self := left),
-				left outer,            
-			#else
-				transform (dx_BestRecords.layout_best, 
-					self._valid := true, 
-					self.age := if (right.dob = 0, 0, ut.age(right.dob)), 
-					self := right),
+	LOCAL ds_res := if (use_dist, 
+		JOIN (DISTRIBUTE (ds, hash64(d_field)), DISTRIBUTE(PULL(key), hash64(did)),
+			(LEFT.d_field = RIGHT.did),           
+			TRANSFORM (out_rec,
+				SELF._best._valid := TRUE, 
+				SELF._best.age := if (RIGHT.dob = 0, 0, ut.age(RIGHT.dob)),
+				SELF._best := RIGHT,
+				SELF := LEFT),
+			#IF (left_outer) 
+				LEFT OUTER,            
+			#END
+			KEEP(1), LIMIT(0), LOCAL),
+		JOIN (ds, key,
+			KEYED(LEFT.d_field = RIGHT.did),
+			TRANSFORM (out_rec,
+				SELF._best._valid := TRUE, 
+				SELF._best.age := if (RIGHT.dob = 0, 0, ut.age(RIGHT.dob)),
+				SELF._best := RIGHT,
+				SELF := LEFT),
+			#if (left_outer) 
+				LEFT OUTER,            
 			#end
-			keep(1), limit(0), local),
-		join (ds, key,
-			keyed(left.d_field = right.did),
-			#if (do_append)            
-				transform (out_rec,
-					self._best._valid := true, 
-					self._best.age := if (right.dob = 0, 0, ut.age(right.dob)),
-					self._best := right,
-					self := left),
-				left outer,            
-			#else
-				transform (dx_BestRecords.layout_best, 
-					self._valid := true, 
-					self.age := if (right.dob = 0, 0, ut.age(right.dob)), 
-					self := right),
-			#end
-			keep(1), limit(0))
+			KEEP(1), LIMIT(0))
 	);
 
-	return ds_res;
+	RETURN ds_res;
 
-endmacro;
+ENDMACRO;
