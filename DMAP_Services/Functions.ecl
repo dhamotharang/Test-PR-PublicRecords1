@@ -40,8 +40,20 @@ EXPORT Functions:= MODULE
 	//	Function to get all addresses for the did	
 	EXPORT fn_comp_addr(DATASET(Doxie.layout_references) dids_in,
 											$.IParams.ReportParams input_params):= FUNCTION
- 
-		addr:= Doxie.Comp_Subject_Addresses(dids_in, , input_params.DPPA, input_params.GLBA, , , input_params.Probation_Override_Value, input_params.Industry_Class).Addresses;
+
+    mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
+      EXPORT unsigned1 glb := input_params.GLBA;
+      EXPORT unsigned1 dppa := input_params.DPPA;
+      EXPORT string DataPermissionMask := input_params.dpm;
+      EXPORT string DataRestrictionMask := input_params.drm;
+      EXPORT boolean ln_branded := FALSE;
+      EXPORT boolean probation_override := input_params.Probation_Override_Value;
+      EXPORT string5 industry_class := input_params.Industry_Class;
+      EXPORT string ssn_mask := 'NONE';
+      EXPORT unsigned1 dob_mask := input_params.dob_mask_val;
+    END;
+		addr:= Doxie.Comp_Subject_Addresses(dids_in, , , , mod_access).Addresses;
+
 		address_recs:= PROJECT(addr, $.Transforms.xform_compAddr(LEFT));
 	RETURN address_recs;
 	END;
