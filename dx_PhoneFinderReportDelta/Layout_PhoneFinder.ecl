@@ -20,7 +20,7 @@
 			integer5 	response_time;
 			string60 	reference_code;
 			string32 	phonefinder_type;
-			string32 	submitted_lexid;
+			unsigned8 submitted_lexid;
 			string15 	submitted_phonenumber;
 			string20 	submitted_firstname;
 			string20 	submitted_lastname;
@@ -29,6 +29,7 @@
 			string64 	submitted_city;
 			string16 	submitted_state;
 			string10 	submitted_zip;
+			string15  orig_phonenumber;
 			string15 	phonenumber;
 			string16 	risk_indicator;
 			string32 	phone_type;
@@ -48,7 +49,7 @@
 	end;
 	
 	export Transactions_Index := record
-			Transactions_Main-date_file_loaded;
+			Transactions_Main-[date_file_loaded, orig_phonenumber];
 	end;
 	
 	///////////////////////////////////
@@ -60,6 +61,7 @@
 			string16	transaction_id;
 			integer5	sequence_number;
 			integer5	phone_id;
+			string15  orig_phonenumber;
 			string15	phonenumber;
 			string16 	risk_indicator;
 			string32 	phone_type;
@@ -73,7 +75,7 @@
 	end;
 	
 	export OtherPhones_Index := record
-			OtherPhones_Main-date_file_loaded;
+			OtherPhones_Main-[date_file_loaded, orig_phonenumber];
 	end;
 	
 	///////////////////////////////////
@@ -84,7 +86,7 @@
 			string8		date_file_loaded;
 			string16	transaction_id;
 			integer5	sequence_number;
-			string32	lexid;
+			unsigned8	lexid;
 			string128	full_name;
 			string128	full_address;
 			string64	city;
