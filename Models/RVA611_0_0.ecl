@@ -1,4 +1,4 @@
-import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, std;
+﻿import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, std, riskview;
 
 export RVA611_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean isCalifornia) := FUNCTION
 
@@ -534,7 +534,7 @@ export RVA611_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boole
 			RVA611b
 		);
 
-		RVA611 := if( le.iid.nas_summary <= 4 and le.iid.nap_summary <= 4 and add1_naprop <= 2, 222, RVA611c);
+		RVA611 := if( riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid), 222, RVA611c);
 
 
 		inCalif := isCalifornia and ((integer)(boolean)le.iid.combo_firstcount+(integer)(boolean)le.iid.combo_lastcount+

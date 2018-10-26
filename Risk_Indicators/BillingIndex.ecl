@@ -193,6 +193,7 @@ export BillingIndex := MODULE
     export FP1801_1     := '174'; //FP1801_1 - Fraudpoint 3.0 Custom Model for Digital (174 % 100 + 30 = 104)             
     export FP1710_1     := '175'; //FP1710_1 - Fraudpoint 3.0 Custom Model for Borrow Works (175 % 100 + 30 = 105)
     export FP1806_1     := '176'; //FP1806_1 - Fraudpoint 3.0 Custom Model for Discover (176 % 100 + 30 = 106)             
+    export FP1803_1     := '177'; //FP1803_1 - Fraudpoint 3.0 Custom Model for Upgrade inc (177 % 100 + 30 = 107)             
     export MSN1803_1    := '178';//MSN1803_1 - Custom Model for Paro (178 % 100 + 30 = 108)             
     export RSN804_1     := '179'; //RSN804_1 - Custom Model for Paro (179 % 100 + 30 = 109)             
     export MSNRSN_1     := '180'; //MSNRSN_1 - Custom Model Combo for Paro (180 % 100 + 30 = 110)             

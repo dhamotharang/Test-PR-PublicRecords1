@@ -15,7 +15,7 @@ Process_xIDL_Layouts().OutputLayout GetResults(Process_xIDL_Layouts().InputLayou
   UNSIGNED1 DL_NBR_len := LENGTH(TRIM(le.DL_NBR));
   In_disableForce := le.disableForce;
   SELF.keys_tried := IF (Key_InsuranceHeader_NAME().CanSearch(le),1 << 1,0) + IF (Key_InsuranceHeader_ADDRESS().CanSearch(le),1 << 2,0) + IF (Key_InsuranceHeader_SSN().CanSearch(le),1 << 3,0) + IF (Key_InsuranceHeader_SSN4().CanSearch(le),1 << 4,0) + IF (Key_InsuranceHeader_DOB().CanSearch(le),1 << 5,0) + IF (Key_InsuranceHeader_DOBF().CanSearch(le),1 << 6,0) + IF (Key_InsuranceHeader_ZIP_PR().CanSearch(le),1 << 7,0) + IF (Key_InsuranceHeader_SRC_RID().CanSearch(le),1 << 8,0) + IF (Key_InsuranceHeader_DLN().CanSearch(le),1 << 9,0) + IF (Key_InsuranceHeader_PH().CanSearch(le),1 << 10,0) + IF (Key_InsuranceHeader_LFZ().CanSearch(le),1 << 11,0) + IF (Key_InsuranceHeader_RELATIVE().CanSearch(le),1 << 12,0);
-  fetchResults := TOPN(ROLLUP(
+  fetchResults1 := TOPN(ROLLUP(
     MERGE(
     SORTED(Key_InsuranceHeader_NAME(,aBlockLimit/*MEOWHACK05*/).ScoredDIDFetch(param_FNAME := le.FNAME,param_FNAME_len := FNAME_len,param_LNAME := le.LNAME,param_LNAME_len := LNAME_len,param_ST := le.ST,param_DERIVED_GENDER := le.DERIVED_GENDER,param_SNAME := le.SNAME,param_MNAME := le.MNAME,param_MNAME_len := MNAME_len,param_SSN5 := le.SSN5,param_SSN5_len := SSN5_len,param_SSN4 := le.SSN4,param_SSN4_len := SSN4_len,param_PRIM_RANGE := le.PRIM_RANGE,param_PRIM_RANGE_len := PRIM_RANGE_len,param_PRIM_NAME := le.PRIM_NAME,param_PRIM_NAME_len := PRIM_NAME_len,param_SEC_RANGE := le.SEC_RANGE,param_CITY := le.CITY,param_DOB := (UNSIGNED4)le.DOB,param_disableForce := In_disableForce),DID)
     ,SORTED(Key_InsuranceHeader_ADDRESS(,aBlockLimit/*MEOWHACK05*/).ScoredDIDFetch(param_PRIM_RANGE := le.PRIM_RANGE,param_PRIM_RANGE_len := PRIM_RANGE_len,param_PRIM_NAME := le.PRIM_NAME,param_PRIM_NAME_len := PRIM_NAME_len,param_ZIP := le.ZIP_cases,param_SEC_RANGE := le.SEC_RANGE,param_FNAME := le.FNAME,param_FNAME_len := FNAME_len,param_MNAME := le.MNAME,param_MNAME_len := MNAME_len,param_LNAME := le.LNAME,param_LNAME_len := LNAME_len,param_CITY := le.CITY,param_ST := le.ST,param_DERIVED_GENDER := le.DERIVED_GENDER,param_SNAME := le.SNAME,param_DOB := (UNSIGNED4)le.DOB,param_disableForce := In_disableForce),DID)
@@ -32,8 +32,10 @@ Process_xIDL_Layouts().OutputLayout GetResults(Process_xIDL_Layouts().InputLayou
     ,SORTED(Key_InsuranceHeader_LFZ(,aBlockLimit/*MEOWHACK05*/).ScoredDIDFetch(param_LNAME := le.LNAME,param_LNAME_len := LNAME_len,param_FNAME := le.FNAME,param_FNAME_len := FNAME_len,param_ZIP := le.ZIP_cases,param_CITY := le.CITY,param_PRIM_RANGE := le.PRIM_RANGE,param_PRIM_RANGE_len := PRIM_RANGE_len,param_PRIM_NAME := le.PRIM_NAME,param_PRIM_NAME_len := PRIM_NAME_len,param_SSN5 := le.SSN5,param_SSN5_len := SSN5_len,param_SSN4 := le.SSN4,param_SSN4_len := SSN4_len,param_MNAME := le.MNAME,param_MNAME_len := MNAME_len,param_SEC_RANGE := le.SEC_RANGE,param_SNAME := le.SNAME,param_DOB := (UNSIGNED4)le.DOB,param_ST := le.ST,param_disableForce := In_disableForce),DID)
     ,SORTED(Key_InsuranceHeader_RELATIVE(,aBlockLimit/*MEOWHACK05*/).ScoredDIDFetch(param_fname2 := le.fname2,param_lname2 := le.lname2,param_FNAME := le.FNAME,param_FNAME_len := FNAME_len,param_LNAME := le.LNAME,param_LNAME_len := LNAME_len,param_disableForce := In_disableForce),DID),SORTED(DID)) /* Merged */
     , RIGHT.DID > 0 AND LEFT.DID = RIGHT.DID, Process_xIDL_Layouts().Combine_Scores(LEFT,RIGHT, In_disableForce))(DID NOT IN ButNot),le.MaxIDs + 1,-Weight)(SALT37.DebugMode OR ~ForceFailed OR ButNot<>[]); // Warning - is a fetch to keys etc
+		// another project with sort dedup		
+		fetchResults := Process_xIDL_Layouts().combine_Zip(fetchResults1);
   SELF.Results := CHOOSEN(fetchResults, le.MaxIDs);
-  SELF.IsTruncated := COUNT(fetchResults) > le.MaxIDs;
+  SELF.IsTruncated := COUNT(fetchResults1) > le.MaxIDs;
   Process_xIDL_Layouts().MAC_Add_ResolutionFlags()
   SELF := le;
 END;

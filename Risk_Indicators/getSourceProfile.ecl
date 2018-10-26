@@ -1,7 +1,7 @@
-import Models, Risk_Indicators, ut, std;
+﻿import Models, Risk_Indicators, ut, std, riskview;
 
 
-EXPORT getSourceProfile (GROUPED DATASET (Layout_Boca_Shell) clam) := FUNCTION;
+EXPORT getSourceProfile (GROUPED DATASET (Layout_Boca_Shell) clam, boolean isFCRA) := FUNCTION;
 
 layout_debug := record
 	decimal6_1 hdr_source_profile; 
@@ -283,6 +283,7 @@ source_profile := (decimal4_1)source_profile1;
 
 source_profile_index := map(
     not(truedid)                                                                         => -1,
+    isFCRA and riskview.Constants.NoScore(NAS_Summary,NAP_Summary, Add_Input_NAProp, le.truedid) => 0,
     NAS_Summary <= 4 AND NAP_Summary <= 4 AND Infutor_NAP <= 4 AND Add_Input_NAProp <= 3 => 0,
     source_profile <= 9                                                                  => 1,
     source_profile <= 36                                                                 => 2,

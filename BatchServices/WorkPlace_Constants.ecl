@@ -102,7 +102,25 @@ export WorkPlace_Constants := module
 																				{'BELLSOUTH.NET'},
 																				{'PRODIGY.NET'},
 																				{'PEOPLEPC.COM'},
-																				{'MINDSPRING.COM'}], {STRING domain});
+																				{'MINDSPRING.COM'},
+																				{'CS.COM'},
+																				{'EXCITE.COM'},
+																				{'NETSCAPE.COM'},
+																				{'NETSCAPE.NET'},
+																				{'FASTMAIL.COM'},
+																				{'GMX.NET'},
+																				{'EMAIL.COM'},
+																				{'MSN.COM'},
+																				{'MAIL.COM'},
+																				{'YGM.COM'},
+																				{'WOW.COM'},
+																				{'POBOX.COM'},
+																				{'YANDEX.COM'},
+																				{'HUSHMAIL.COM'},
+																				{'OUTLOOK.COM'},
+																				{'LAPOSTE.NET'},
+																				{'NETZERO.NET'},
+																				{'FREEMAIL.COM'}], {STRING domain});
 
 	EXPORT PERSONAL_EMAIL_DOMAIN_DCT  := DICTIONARY(PERSONAL_EMAIL_DOMAIN_SET,{domain});
 	

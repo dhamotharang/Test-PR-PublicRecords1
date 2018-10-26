@@ -1,0 +1,822 @@
+ID "52b3897f-f03a-4749-9dda-8b6831ba96af";
+NAME AppendClaimOutlier_2.0_testcmp;
+LABEL AppendClaimOutlier_2.0_testcmp;
+DESCRIPTION "Batch Composition with global variables needed by batch";
+VERSION "2.0.0";
+AUTHOR periassx;
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PUBLIC;
+RUN:PUBLIC;
+END
+
+INPUTS
+	BOOL KeepECL: DEFAULT("true");
+	STRING GCID: DEFAULT("0");
+	STRING JOBID: DEFAULT("0");
+	STRING FCRA: DEFAULT("UNDEFINED");
+	STRING DPPAPURPOSE: DEFAULT("00000000000000");
+	STRING GLBPURPOSE: DEFAULT("0011000000000000");
+	STRING DATAPERMISSIONMASK: DEFAULT("000000000100000000000000000000");
+	STRING DATARESTRICTIONMASK: DEFAULT("000000000000000000000000000000");
+	STRING SSNMASK: DEFAULT("ALL");
+	STRING INDUSTRYCLASS: DEFAULT("OTHER");
+	STRING DLMASK: DEFAULT("ALL");
+	STRING DOBMASK: DEFAULT("ALL");
+	STRING InputLogicalFilename: DEFAULT("~temp::in");
+	STRING OutputLogicalFilename: DEFAULT("~temp::out");
+	STRING ReferenceId: DEFAULT("192082831");
+	STRING InputProviderDs: DEFAULT("~qa::appendclaimoutlier::appendclaimoutlier20::provider::input");
+	STRING InputPatientDs: DEFAULT("~qa::appendclaimoutlier::appendclaimoutlier20::patient::input");
+	STRING InputMedicalClaimDs: DEFAULT("~qa::appendclaimoutlier::appendclaimoutlier20::medicalclaim::input");
+	STRING InputAddressExclusionDs: DEFAULT("~batchr3::192082831::suspectaddress::hnow-8291831-mrshnow4940::input::exclusionlist");
+	INT OUTLIERPERCENTILE:LABEL("Outlier Percentile"),DEFAULT(95);	 				
+	// STRING HOMESTATE: DEFAULT("^(WI)");
+	// STRING NEIGHBORINGSTATES: DEFAULT("^(MN|MI|IL)");
+	// STRING DRIVINGDISTANCEMIN: DEFAULT("75");
+	// STRING DRIVINGDISTANCEMAX: DEFAULT("400");
+	// STRING DMECODE:LABEL("DME CODE"),DEFAULT("^(25080|25250|25251|53540|53542|53543)");	 
+	// STRING LABCODE:LABEL("LAB CODE"),DEFAULT("^(28280|28283)");	 			
+// HPHC Config 	
+	STRING HOMESTATE: DEFAULT("^(MA)");
+	STRING NEIGHBORINGSTATES: DEFAULT("^(CT|ME|NH)");
+	INT DRIVINGDISTANCEMIN: DEFAULT(100);
+	INT DRIVINGDISTANCEMAX: DEFAULT(500);
+	STRING DMECODE:LABEL("DME CODE"),DEFAULT("^(85)");	 
+	STRING LABCODE:LABEL("LAB CODE"),DEFAULT("^(122)");	 			
+  // HNOW Config
+	 // STRING HOMESTATE:LABEL("Home State"),DEFAULT("^(NY)");
+   // STRING NEIGHBORINGSTATES:LABEL("Neighboring States"),DEFAULT("^(PA|MA|NJ|CV|CT)");
+   // STRING DRIVINGDISTANCEMIN:LABEL("Driving Distance Min"),DEFAULT("50");
+   // STRING DRIVINGDISTANCEMAX:LABEL("Driving Distance Max"),DEFAULT("300");	 
+   // STRING DMECODE:LABEL("DME CODE"),DEFAULT("^(DMER|DME)");	 
+   // STRING LABCODE:LABEL("LAB CODE"),DEFAULT("^(LAB1|LAB|LABX|LABC)");	 			
+	STRING OutputLogicalDs: DEFAULT("~qa::appendclaimoutlier::appendclaimoutlier20::output");
+	STRING CompareWUID: DEFAULT("W20180904-111349");	
+	STRING VIZSERVICEVERSION: DEFAULT("JOBID${ROOTJOBID}");
+END
+
+INSTANCE OutDataset.OutDataset(Ins268453): LABEL("Output Dataset"),VERSION("2.0")
+	name="^GLOBAL|OutputLogicalDs"
+	dsInput="^Ins268440|dsOutput"
+	UniqueIdentifier=""
+	Method="THOR"
+END
+
+INSTANCE AppendClaimOutlier.AppendClaimOutlier(Ins268440): LABEL("Append Claim Outlier"),VERSION("2.0")
+	dsExclusionList="^Ins207915|dsOutput"
+	dsPatient="^Ins207914|dsOutput"
+	dsClaim="^Ins207913|dsOutput"
+	dsProvider="^Ins001|dsOutput"
+	ProviderDEAExpiredDate_childds_recnum="1"
+	ProviderSpecialityCode_childds_recnum="1"
+	ProviderDateofDeath_childds_recnum="1"
+	PatientPrimaryName_childds_recnum="1"
+	ClaimBeginningDateOfService_childds_recnum="1"
+	ProviderLEXID_childds_recnum="1"
+	ProviderSecondaryRange_childds_recnum="1"
+	ExclusionCity_childds_recnum="1"
+	PatientNumber_childds_recnum="1"
+	ProviderFirstName_childds_recnum="1"
+	PatientLongitude_childds_recnum="1"
+	ClaimEndingDateOfService_childds_recnum="1"
+	ClaimNumber_childds_recnum="1"
+	DRIVINGDISTANCEMIN="^GLOBAL|DRIVINGDISTANCEMIN"
+	ProviderDEANumber_childds_recnum="1"
+	ExclusionPreDirectional_childds_recnum="1"
+	DRIVINGDISTANCEMAX="^GLOBAL|DRIVINGDISTANCEMAX"
+	ExclusionAddressSuffix_childds_recnum="1"
+	ExclusionZip5_childds_recnum="1"
+	PatientPrimaryRange_childds_recnum="1"
+	PatientCounty_childds_recnum="1"
+	PatientZip5_childds_recnum="1"
+	PatientGender_childds_recnum="1"
+	ProviderVacationBeginDate_childds_recnum="1"
+	ClaimPaidAmount_childds_recnum="1"
+	ProviderCountry_childds_recnum="1"
+	PatientCity_childds_recnum="1"
+	ExclusionPostDirectional_childds_recnum="1"
+	Prefix="ClaimOutlier"
+	ClaimServiceDate_childds_recnum="1"
+	ExclusionFacilityName_childds_recnum="1"
+	PatientMiddleName_childds_recnum="1"
+	ProviderType_childds_recnum="1"
+	ClaimTransactionKey_childds_recnum="1"
+	PatientCountry_childds_recnum="1"
+	PatientNameSuffix_childds_recnum="1"
+	ProviderLastName_childds_recnum="1"
+	PatientDateOfBirth_childds_recnum="1"
+	ProviderAddressSuffix_childds_recnum="1"
+	ProviderLNPID_childds_recnum="1"
+	ProviderNPINumber_childds_recnum="1"
+	ProviderNPIFlag_childds_recnum="1"
+	ClaimRenderingProviderKey_childds_recnum="1"
+	ClaimChargeAmount_childds_recnum="1"
+	PatientDeceasedFlag_childds_recnum="1"
+	PatientKey_childds_recnum="1"
+	ProviderTaxonomy_childds_recnum="1"
+	ProviderPreDirectional_childds_recnum="1"
+	ProviderState_childds_recnum="1"
+	ProviderFacilityName_childds_recnum="1"
+	HOMESTATE="^GLOBAL|HOMESTATE"
+	ProviderLatitude_childds_recnum="1"
+	ProviderEntityType_childds_recnum="1"
+	ProviderLongitude_childds_recnum="1"
+	PatientLexID_childds_recnum="1"
+	ClaimLineNumber_childds_recnum="1"
+	ProviderVacationEndDate_childds_recnum="1"
+	ExclusionState_childds_recnum="1"
+	ProviderCity_childds_recnum="1"
+	PatientFirstName_childds_recnum="1"
+	PatientSequenceNumber_childds_recnum="1"
+	ClaimPatientKey_childds_recnum="1"
+	ProviderNameSuffix_childds_recnum="1"
+	PatientClientDateOfDeath_childds_recnum="1"
+	ProviderCounty_childds_recnum="1"
+	ProviderPrimaryName_childds_recnum="1"
+	ProviderZip5_childds_recnum="1"
+	ProviderMiddleName_childds_recnum="1"
+	PatientLatitude_childds_recnum="1"
+	PatientPreDirectional_childds_recnum="1"
+	ProviderKey_childds_recnum="1"
+	NEIGHBORINGSTATES="^GLOBAL|NEIGHBORINGSTATES"
+	PatientSSN_childds_recnum="1"
+	PatientLastName_childds_recnum="1"
+	ProviderNPIDeactivationDate_childds_recnum="1"
+	ProviderLicenseExpiredDate_childds_recnum="1"
+	ClientNPINumber_childds_recnum="1"
+	ProviderPostDirectional_childds_recnum="1"
+	PatientDateOfDeath_childds_recnum="1"
+	ProviderPrimaryRange_childds_recnum="1"
+	PatientState_childds_recnum="1"
+	PatientPostDirectional_childds_recnum="1"
+	PatientSecondaryRange_childds_recnum="1"
+	ProviderKey="provider_key"
+	ProviderClientSpecialityCode_childds_recnum="1"
+	ExclusionSecondaryRange_childds_recnum="1"
+	ExclusionPrimaryName_childds_recnum="1"
+	ExclusionPrimaryRange_childds_recnum="1"
+	ProviderNPIEnumerationDate_childds_recnum="1"
+	PatientAddressSuffix_childds_recnum="1"
+	PatientFirstName="cleanpatientfirstname"
+	ProviderNPIDeactivationDate="providerattrnpideactivationdate"
+	PatientGender="patient_gender"
+	ProviderPrimaryRange="cleanproviderprimaryrange"
+	PatientCountry="patient_country"
+	PatientLexID="personlexid"
+	ProviderMiddleName="cleanprovidermiddlename"
+	ProviderLatitude="cleanproviderlatitude"
+	ClaimRenderingProviderKey="cleanclaimproviderkey"
+	PatientSSN="patient_ssn"
+	ProviderVacationEndDate="advovacationenddate"
+	ProviderLastName="cleanproviderlastname"
+	ProviderLEXID="providerattrlexid"
+	PatientNameSuffix="cleanpatientnamesuffix"
+	ProviderVacationBeginDate="advovacationbegindate"
+	PatientCounty="cleanpatientcounty"
+	ProviderTaxonomy="providerattrtaxonomy"
+	ProviderZip5="cleanproviderzip5"
+	ProviderNPIFlag="providerattrnpiflag"
+	ProviderLicenseExpiredDate="providerattrdatelicenseexpired"
+	PatientLastName="cleanpatientlastname"
+	ProviderType="provider_type"
+	ProviderFacilityName="provider_facility_name"
+	ProviderState="cleanproviderstate"
+	ProviderCounty="cleanprovidercounty"
+	PatientAddressSuffix="cleanpatientaddresssuffix"
+	PatientCity="cleanpatientvanitycity"
+	ProviderSecondaryRange="cleanprovidersecondaryrange"
+	ProviderPreDirectional="cleanproviderpredirectional"
+	ClaimChargeAmount="cleanclaimchargeamount"
+	ExclusionPostDirectional="postdir"
+	ExclusionCity="v_city_name"
+	PatientPostDirectional="cleanpatientpostdirectional"
+	ProviderSpecialityCode="providerattrspecialitycode"
+	ProviderNameSuffix="cleanprovidernamesuffix"
+	ProviderAddressSuffix="cleanprovideraddresssuffix"
+	ProviderDateofDeath="consumerattrdateofdeaceased"
+	PatientNumber="patient_num"
+	ProviderCountry="provider_country"
+	ClaimNumber="cleanclaimclaimnumber"
+	PatientSecondaryRange="cleanpatientsecondaryrange"
+	ExclusionPreDirectional="predir"
+	PatientLongitude="cleanpatientlongitude"
+	PatientSequenceNumber="patient_seq_nbr"
+	PatientZip5="cleanpatientzip5"
+	ClaimPatientKey="cleanclaimpatientkey"
+	ExclusionZip5="zip"
+	ProviderLongitude="cleanproviderlongitude"
+	ProviderDEAExpiredDate="providerattrdatedeaexpired"
+	ExclusionPrimaryName="prim_name"
+	ClaimLineNumber="cleanclaimclaimlinenumber"
+	PatientPrimaryName="cleanpatientprimaryname"
+	ExclusionFacilityName="cnp_name"
+	PatientClientDateOfDeath="patient_dod"
+	ProviderFirstName="cleanproviderfirstname"
+	ClaimTransactionKey="transaction_id"
+	ClientNPINumber="provider_npi"
+	PatientDeceasedFlag="consumerattrhasdeceased"
+	PatientPreDirectional="cleanpatientpredirectional"
+	ExclusionAddressSuffix="addr_suffix"
+	ClaimPaidAmount="cleanclaimpaidamount"
+	PatientState="cleanpatientstate"
+	ExclusionSecondaryRange="sec_range"
+	ProviderEntityType="providerattrentitytype"
+	PatientDateOfBirth="patient_birth_dt"
+	ProviderClientSpecialityCode="prov_specialty_cd_1"
+	PatientKey="cleanpatientpatientkey"
+	PatientPrimaryRange="cleanpatientprimaryrange"
+	ProviderDEANumber="provider_dea"
+	ClaimEndingDateOfService="cleanclaimendingdateofservice"
+	ProviderPostDirectional="cleanproviderpostdirectional"
+	ProviderCity="cleanprovidervanitycity"
+	ProviderNPIEnumerationDate="providerattrnpienumerationdate"
+	PatientLatitude="cleanpatientlatitude"
+	ExclusionState="st"
+	ClaimServiceDate="cleanclaimservicedate"
+	PatientDateOfDeath="consumerattrdateofdeaceased"
+	ProviderPrimaryName="cleanproviderprimaryname"
+	ProviderNPINumber="providerattrnpinumber"
+	ExclusionPrimaryRange="prim_range"
+	ProviderLNPID="inplnpid"
+	PatientMiddleName="cleanpatientmiddlename"
+	ClaimBeginningDateOfService="cleanclaimbeginningdateofservice"
+	ProviderCurrentStateExclusionDate="providerattractivestateexclusiondate"
+	ProviderCurrentOIGExclusionDate="providerattractiveoigexclusiondate"
+	ProviderCurrentOPMExclusionDate="providerattractiveopmexclusiondate"
+	ProviderPastStateExclusionDate="providerattrstateexclusionreinstateddate"
+	ProviderPastOIGExclusionDate="providerattroigexclusionreinstateddate"
+	ProviderPastOPMExclusionDate="providerattropmexclusionreinstateddate"
+	ProviderCurrentRevokedLicenseDate="providerattractivelicenserevocationdate"
+	ProviderPastRevokedLicenseDate="providerattrlicenserevocationreinstateddate"
+	ProviderBankruptcyDate="consumerattrbankruptcydate"
+	ProviderConvictionDate="consumerattrconvictiondate"
+	ProviderActiveStateExclusionFlag="providerattrhasactivestateexclusion"
+	ProviderActiveOIGExclusionFlag="providerattrhasactiveoigexclusion"
+	ProviderActiveOPMExclusionFlag="providerattrhasactiveopmexclusion"
+	ProviderPastStateExclusionFlag="providerattrhasstateexclusioinreinstated"
+	ProviderPastOIGExclusionFlag="providerattrhasoigexclusioinreinstated"
+	ProviderPastOPMExclusionFlag="providerattrhasopmexclusioinreinstated"
+	ProviderActiveLicenseRevokedFlag="providerattrhasactivelicenserevocation"
+	ProviderPastLicenseRevokedFlag="providerattrhaslicenserevocationreinstated"
+	ProviderCurrentExclusionState="providerattrhaslicenserevocationreinstated"
+	ProviderCurrentRevokedState="providerattractivelicenserevocationstate"
+	ProviderPastExclusionState="providerattrstateexclusionreinstatedstate"
+	ProviderPastRevokedState="providerattrlicenserevocationreinstatedstate"
+	ProviderLicenseExpiredState="providerattrlicensestate"
+	ProviderLicenseExpiredFlag="providerattrexpiredlicenseflag"
+	ProviderLicenseInactiveState="providerattrinactivelicensestate"
+	ProviderLicenseRevokedState="providerattrrevokedlicensestate"
+	ProviderSingleAddressFlag="providerattrproviderwithsingleaddress"
+	ProviderPractisePrimaryRange="providerattrpractiseprimaryrange"
+	ProviderPractisePreDirectional="providerattrpractisepredirectional"
+	ProviderPractisePrimaryName="providerattrpractiseprimaryname"
+	ProviderPractisePostDirectional="providerattrpractisepostdirectional"
+	ProviderPractiseAddressSuffix="providerattrpractiseaddresssuffix"
+	ProviderPractiseSecondaryRange="providerattrpractisesecondaryrange"
+	ProviderPractiseCity="providerattrpractisecityname"
+	ProviderPractiseState="providerattrpractisestate"
+	ProviderPractiseZip5="providerattrpractisezip5"
+END
+INSTANCE UseDataset.UseDataset(Ins207915): LABEL("Use Dataset"),VERSION("1.1.0")
+	Structure="RECORD
+  string120 cnp_name;
+  string10 prim_range;
+  string2 predir;
+  string28 prim_name;
+  string4 addr_suffix;
+  string2 postdir;
+  string8 sec_range;
+  string25 v_city_name;
+  string2 st;
+  string5 zip;
+ END;
+"
+	LogicalFilename="^GLOBAL|InputAddressExclusionDs"
+	Method="THOR"
+END
+INSTANCE UseDataset.UseDataset(Ins207914): LABEL("Use Dataset"),VERSION("1.1.0")
+	Structure="RECORD
+  string50 patient_key;
+  string12 patient_num;
+  string2 patient_seq_nbr;
+  string2 patient_security_code;
+  string2 patient_relation;
+  string9 patient_ssn;
+  string30 patient_first_name;
+  string1 patient_mid_init;
+  string36 patient_last_name;
+  string36 patient_address_1;
+  string36 patient_address_2;
+  string24 patient_city_name;
+  string2 patient_state_name;
+  string9 patient_zip_cd;
+  string30 patient_county;
+  string2 patient_country;
+  string8 patient_birth_dt;
+  string1 patient_gender;
+  string8 patient_dod;
+  string8 insured_elig_eff_dt;
+  string8 insured_elig_exp_dt;
+  string6 insured_elig_cov_type;
+  string4 insured_elig_status;
+  string50 primary_member_key;
+  string9 primary_ins_ssn;
+  string12 primary_ins_num;
+  string12 primary_ins_policy_number;
+  string15 primary_ins_group_num;
+  string11 primary_ins_division_num;
+  string8 patient_latest_update_date;
+  string50 pat_user_def_01;
+  string50 pat_user_def_02;
+  string50 pat_user_def_03;
+  string50 pat_user_def_04;
+  string50 pat_user_def_05;
+  string50 pat_user_def_06;
+  string50 pat_user_def_07;
+  string50 pat_user_def_08;
+  string50 pat_user_def_09;
+  string50 pat_user_def_10;
+  string50 pat_user_def_18;
+  string50 cleanpatientpatientkey;
+  string20 cleanpatientfirstname;
+  string20 cleanpatientmiddlename;
+  string20 cleanpatientlastname;
+  string5 cleanpatientnamesuffix;
+  string10 cleanpatientprimaryrange;
+  string2 cleanpatientpredirectional;
+  string28 cleanpatientprimaryname;
+  string4 cleanpatientaddresssuffix;
+  string2 cleanpatientpostdirectional;
+  string10 cleanpatientunitdesignation;
+  string8 cleanpatientsecondaryrange;
+  string25 cleanpatientpostalcity;
+  string25 cleanpatientvanitycity;
+  string2 cleanpatientstate;
+  string5 cleanpatientzip5;
+  string4 cleanpatientzip4;
+  string2 cleanpatientdbpc;
+  string1 cleanpatientcheckdigit;
+  string2 cleanpatientrecordtype;
+  string2 cleanpatientfipsstate;
+  string3 cleanpatientcounty;
+  string10 cleanpatientlatitude;
+  string11 cleanpatientlongitude;
+  string4 cleanpatientmsa;
+  string7 cleanpatientgeoblock;
+  string1 cleanpatientgeomatchcode;
+  string4 cleanpatienterrorstatus;
+  unsigned6 personlexid;
+  unsigned2 person_xadl2_weight;
+  unsigned2 person_xadl2_score;
+  unsigned4 person_xadl2_keys_used;
+  unsigned2 person_xadl2_distance;
+  string20 person_xadl2_matches;
+  string person_xadl2_keys_desc;
+  string person_xadl2_matches_desc;
+  integer2 person_xlink_weight;
+  unsigned2 person_xlink_score;
+  integer1 person_xlink_distance;
+  unsigned4 person_xlink_keys;
+  string person_xlink_keys_desc;
+  string60 person_xlink_matches;
+  string person_xlink_matches_desc;
+  string1 consumerattrhasbankruptcy;
+  string1 consumerattrhasconvictions;
+  string1 consumerattrhasdeceased;
+  string8 consumerattrdateofdeaceased;
+  string1 consumerattrhasrelativebankruptcy;
+  string1 consumerattrhasrelativeconvictions;
+  string8 consumerattrbankruptcydate;
+  string8 consumerattrconvictiondate;
+  string3 consumerattrrelativecount;
+  string3 consumerattrrelativesbankruptcycount;
+  string3 consumerattrrelativesfelonycount;
+END;
+"
+	LogicalFilename="^GLOBAL|InputPatientDs"
+	Method="THOR"
+END
+INSTANCE UseDataset.UseDataset(Ins207913): LABEL("Use Dataset"),VERSION("1.1.0")
+	Structure="RECORD
+  string50 transaction_id;
+  string50 rendering_provider_key;
+  string50 patient_key;
+  string50 med_rec_num;
+  string38 patient_acct_num;
+  string50 pcp_provider_key;
+  string50 billing_provider_key;
+  string50 referring_provider_key;
+  string50 primary_insured_key;
+  string10 facility_npi;
+  string9 company_id;
+  string2 medical_security_code;
+  string55 claim_num;
+  string10 claim_line_num;
+  string1 patient_status;
+  string2 claim_status;
+  string4 claim_type;
+  string1 transaction_type;
+  string5 adjustment_cd;
+  string2 adjustment_num;
+  string5 rej_reason_1;
+  string5 rej_reason_2;
+  string5 rej_reason_3;
+  string5 rej_reason_4;
+  string5 rej_reason_5;
+  string5 rej_reason_6;
+  string9 auth_code;
+  string20 agreement_id;
+  string12 line_of_business;
+  string20 type_of_plan;
+  string20 benefit_plan;
+  string4 type_of_bill;
+  string50 check_num;
+  string8 check_dt;
+  string8 processed_dt;
+  string22 dt_tm_stamp;
+  string8 service_from_dt;
+  string8 service_to_dt;
+  string8 service_dt;
+  string8 admit_dt;
+  string8 disch_dt;
+  string8 received_dt;
+  string8 accident_dt;
+  string10 accident_type;
+  string2 place_of_service;
+  string10 type_of_service;
+  string15 unit_of_serv_type;
+  string5 units_of_service;
+  string5 units_of_service_allowed;
+  string12 cpt_hcpcs_proc_cd;
+  string2 cpt_hcpcs_proc_cd_modifier_1;
+  string2 cpt_hcpcs_proc_cd_modifier_2;
+  string2 cpt_hcpcs_proc_cd_modifier_3;
+  string2 cpt_hcpcs_proc_cd_modifier_4;
+  string10 payment_type;
+  string4 drg_source;
+  string4 drg_version;
+  string10 diag_rel_group;
+  string10 diag_rel_group_2;
+  string18 drg_pricing;
+  string2 outlier_cd;
+  string2 icd_version;
+  string10 prn_diag_cd;
+  string10 adm_diag_cd;
+  string10 visit_reasn_diag_cd;
+  string10 diag_cd_1;
+  string10 diag_cd_2;
+  string10 diag_cd_3;
+  string10 diag_cd_4;
+  string10 diag_cd_5;
+  string10 diag_cd_6;
+  string10 diag_cd_7;
+  string10 diag_cd_8;
+  string10 diag_cd_9;
+  string10 diag_cd_10;
+  string10 diag_cd_11;
+  string10 diag_cd_12;
+  string12 prn_icd_cd;
+  string12 icd_proc_cd_1;
+  string12 icd_proc_cd_2;
+  string12 icd_proc_cd_3;
+  string12 icd_proc_cd_4;
+  string12 icd_proc_cd_5;
+  string11 ndc_cd_1;
+  string6 ndc_cd_1_qty;
+  string2 ndc_cd_1_uom;
+  string11 ndc_cd_2;
+  string6 ndc_cd_2_qty;
+  string2 ndc_cd_2_uom;
+  string11 ndc_cd_3;
+  string6 ndc_cd_3_qty;
+  string2 ndc_cd_3_uom;
+  string11 ndc_cd_4;
+  string6 ndc_cd_4_qty;
+  string2 ndc_cd_4_uom;
+  string11 ndc_cd_5;
+  string6 ndc_cd_5_qty;
+  string2 ndc_cd_5_uom;
+  string11 ndc_cd_6;
+  string6 ndc_cd_6_qty;
+  string2 ndc_cd_6_uom;
+  string11 ndc_cd_7;
+  string6 ndc_cd_7_qty;
+  string2 ndc_cd_7_uom;
+  string11 ndc_cd_8;
+  string6 ndc_cd_8_qty;
+  string2 ndc_cd_8_uom;
+  string11 ndc_cd_9;
+  string6 ndc_cd_9_qty;
+  string2 ndc_cd_9_uom;
+  string11 ndc_cd_10;
+  string6 ndc_cd_10_qty;
+  string2 ndc_cd_10_uom;
+  string10 revenue_cd;
+  string50 payee_code;
+  string1 network_ind;
+  string1 prov_medicare_par_ind;
+  string1 max_pocket_out_met_indv;
+  string1 max_pocket_out_met_family;
+  string1 deductible_met_indv;
+  string1 deductible_met_family;
+  string1 price_ind;
+  string18 charge_amt;
+  string18 rc_amt;
+  string18 deduct_amt;
+  string18 paid_amt;
+  string18 copay_amt;
+  string18 cob_amt;
+  string18 co_ins_amt;
+  string50 med_user_def_01;
+  string50 med_user_def_02;
+  string50 med_user_def_03;
+  string50 med_user_def_04;
+  string50 med_user_def_05;
+  string50 med_user_def_06;
+  string50 med_user_def_07;
+  string50 med_user_def_08;
+  string50 med_user_def_09;
+  string50 med_user_def_10;
+  string18 post_hospitalization_expenses_c30;
+  string50 cleanclaimproviderkey;
+  string50 cleanclaimpatientkey;
+  string55 cleanclaimclaimnumber;
+  string10 cleanclaimclaimlinenumber;
+  string8 cleanclaimbeginningdateofservice;
+  string8 cleanclaimendingdateofservice;
+  string8 cleanclaimservicedate;
+  string18 cleanclaimchargeamount;
+  string18 cleanclaimpaidamount;
+ END;
+"
+	LogicalFilename="^GLOBAL|InputMedicalClaimDs"
+	Method="THOR"
+END
+INSTANCE UseDataset.UseDataset(Ins001): LABEL("Use Dataset"),VERSION("1.1.0")
+	LogicalFilename="^GLOBAL|InputProviderDs"
+	Method="THOR"
+	Structure="RECORD
+  string50 provider_key;
+  string10 provider_npi;
+  string12 provider_dea;
+  string10 provider_taxonomy;
+  string10 provider_tax_id;
+  string5 provider_tax_id_suffix;
+  string12 provider_num;
+  string5 provider_num_suffix;
+  string2 provider_num_qualifier;
+  string2 provider_security_code;
+  string3 network_code;
+  string50 provider_facility_name;
+  string12 provider_facility_num;
+  string30 provider_first_name;
+  string36 provider_last_name;
+  string36 provider_address_1;
+  string36 provider_address_2;
+  string24 provider_city;
+  string2 provider_state;
+  string9 provider_zip_cd;
+  string30 provider_county;
+  string2 provider_country;
+  string4 provider_region;
+  string9 prov_specialty_cd_1;
+  string9 prov_specialty_cd_2;
+  string2 provider_type;
+  string1 watch_cd;
+  string8 provider_latest_update_date;
+  string50 prov_user_def_01;
+  string50 prov_user_def_02;
+  string50 prov_user_def_03;
+  string50 prov_user_def_04;
+  string50 prov_user_def_05;
+  string50 prov_user_def_06;
+  string50 prov_user_def_07;
+  string50 prov_user_def_08;
+  string50 prov_user_def_09;
+  string50 prov_user_def_10;
+  string8 providerdob;
+  string9 providerssn;
+  string50 cleanproviderproviderkey;
+  string20 cleanproviderfirstname;
+  string20 cleanprovidermiddlename;
+  string20 cleanproviderlastname;
+  string5 cleanprovidernamesuffix;
+  string10 cleanproviderprimaryrange;
+  string2 cleanproviderpredirectional;
+  string28 cleanproviderprimaryname;
+  string4 cleanprovideraddresssuffix;
+  string2 cleanproviderpostdirectional;
+  string10 cleanproviderunitdesignation;
+  string8 cleanprovidersecondaryrange;
+  string25 cleanproviderpostalcity;
+  string25 cleanprovidervanitycity;
+  string2 cleanproviderstate;
+  string5 cleanproviderzip5;
+  string4 cleanproviderzip4;
+  string2 cleanproviderdbpc;
+  string1 cleanprovidercheckdigit;
+  string2 cleanproviderrecordtype;
+  string2 cleanproviderfipsstate;
+  string3 cleanprovidercounty;
+  string10 cleanproviderlatitude;
+  string11 cleanproviderlongitude;
+  string4 cleanprovidermsa;
+  string7 cleanprovidergeoblock;
+  string1 cleanprovidergeomatchcode;
+  string4 cleanprovidererrorstatus;
+  string25 cleanprovideraddresskey;
+  string8 cleanproviderproviderdob;
+  string9 cleanproviderproviderssn;
+  string1 advohitflag;
+  string1 advovacancyindicator;
+  string1 advothrowbackindicator;
+  string1 advoseasonaldeliveryindicator;
+  string5 advoseasonalsuppressionstartdate;
+  string5 advoseasonalsuppressionenddate;
+  string1 advodonotdeliverindicator;
+  string1 advocollegeindicator;
+  string10 advocollegesuppressionstartdate;
+  string10 advocollegesuppressionenddate;
+  string1 advoaddressstyle;
+  string5 advosimplifyaddresscount;
+  string1 advodropindicator;
+  string1 advoresidentialorbusinessindicator;
+  string1 advoonlywaytogetmailindicator;
+  string1 advorecordtypecode;
+  string1 advoaddresstype;
+  string1 advoaddressusagetype;
+  string8 advofirstseendate;
+  string8 advolastseendate;
+  string8 advovendorfirstreporteddate;
+  string8 advovendorlastreporteddate;
+  string8 advovacationbegindate;
+  string8 advovacationenddate;
+  string8 advonumberofcurrentvacationmonths;
+  string8 advomaxvacationmonths;
+  string8 advovacationperiodscount;
+  string1 acahitfound;
+  string200 acainstitution;
+  string2 acainstitutiontype;
+  string10 acainstitutiontypeexp;
+  string1 acaaddresstype;
+  unsigned8 inplnpid;
+  unsigned2 inppidweight;
+  unsigned2 inppiddistance;
+  unsigned8 providerattrlexid;
+  string1 providerattrentitytype;
+  string20 providerattrfname;
+  string20 providerattrmname;
+  string28 providerattrlname;
+  string5 providerattrsname;
+  string9 providerattrssn;
+  string9 providerattrconsumerssn;
+  unsigned4 providerattrdateofbirth;
+  unsigned4 providerattrconsumerdateofbirth;
+  string25 providerattrlicensenumber;
+  string25 providerattrcleanedlicensenumber;
+  string2 providerattrlicensestate;
+  string60 providerattrlicensetype;
+  string60 providerattrlicensestatus;
+  unsigned4 providerattrdatelicenseexpired;
+  unsigned4 providerattrlicensecount;
+  unsigned4 providerattrlicensestatecount;
+  unsigned4 providerattractivelicensecount;
+  unsigned4 providerattrinactivelicensecount;
+  unsigned4 providerattrrevokedlicensecount;
+  string2 providerattrinactivelicensestate;
+  string2 providerattrrevokedlicensestate;
+  string1 providerattrinactivelicenseflag;
+  string1 providerattrrevokedlicenseflag;
+  string1 providerattrexpiredlicenseflag;
+  string1 providerattrdeathindicator;
+  unsigned4 providerattrdateofdeath;
+  unsigned4 providerattrbillingtaxid;
+  string10 providerattrphone;
+  string10 providerattrfax;
+  string6 providerattrupin;
+  string10 providerattrnpinumber;
+  string8 providerattrnpienumerationdate;
+  string8 providerattrnpideactivationdate;
+  string8 providerattrnpireactivationdate;
+  string1 providerattrnpiflag;
+  unsigned4 providerattrdeactivednpicount;
+  string1 providerattrdeabusinessactivityindicator;
+  string10 providerattrdeanumber;
+  unsigned4 providerattrdatedeaexpired;
+  unsigned4 providerattrdeacount;
+  unsigned4 providerattractivedeacount;
+  unsigned4 providerattrexpireddeacount;
+  string1 providerattrdeaexpiredflag;
+  string1 providerattrisstatesanction;
+  string1 providerattrisoigsanction;
+  string1 providerattrisopmsanction;
+  string10 providerattrtaxonomy;
+  string50 providerattrtaxonomydescription;
+  string3 providerattrspecialitycode;
+  string1 providerattrproviderstatus;
+  string40 providerattrgroupkey;
+  string1 providerattrhasactivelicenserevocation;
+  string2 providerattractivelicenserevocationstate;
+  string8 providerattractivelicenserevocationdate;
+  string1 providerattrhasactivestateexclusion;
+  string2 providerattractivelicenseexclusionstate;
+  string8 providerattractivestateexclusiondate;
+  string1 providerattrhasactiveoigexclusion;
+  string8 providerattractiveoigexclusiondate;
+  string1 providerattrhasactiveopmexclusion;
+  string8 providerattractiveopmexclusiondate;
+  string8 providerattractivestatesanctionexclusiondate;
+  string8 providerattractiveoigsanctionexclusiondate;
+  string8 providerattractiveopmsanctionexclusiondate;
+  string1 providerattrhaslicenserevocationreinstated;
+  string2 providerattrlicenserevocationreinstatedstate;
+  string8 providerattrlicenserevocationreinstateddate;
+  string1 providerattrhasstateexclusioinreinstated;
+  string2 providerattrstateexclusionreinstatedstate;
+  string8 providerattrstateexclusionreinstateddate;
+  string1 providerattrhasoigexclusioinreinstated;
+  string8 providerattroigexclusionreinstateddate;
+  string1 providerattrhasopmexclusioinreinstated;
+  string8 providerattropmexclusionreinstateddate;
+  string10 providerattrresidentialprimaryrange;
+  string2 providerattrresidentialpredirectional;
+  string28 providerattrresidentialprimaryname;
+  string4 providerattrresidentialaddresssuffix;
+  string2 providerattrresidentialpostdirectional;
+  string8 providerattrresidentialsecondaryrange;
+  string25 providerattrresidentialcityname;
+  string2 providerattrresidentialstate;
+  string5 providerattrresidentialzip5;
+  unsigned3 providerattrresidentialaddresslastseen;
+  string1 providerattrproviderwithsingleaddress;
+  unsigned3 providerattrsingleaddressprovidercount;
+  string10 providerattrpractiseprimaryrange;
+  string2 providerattrpractisepredirectional;
+  string28 providerattrpractiseprimaryname;
+  string4 providerattrpractiseaddresssuffix;
+  string2 providerattrpractisepostdirectional;
+  string8 providerattrpractisesecondaryrange;
+  string25 providerattrpractisecityname;
+  string2 providerattrpractisestate;
+  string5 providerattrpractisezip5;
+  string1 providerattrhasbankruptcy;
+  string8 providerattrbankruptcylastseen;
+  string1 providerattrhascriminalhistory;
+  string8 providerattrlastarresteddate;
+  string1 providerattrhasrelativeconvictions;
+  string1 providerattrhasrelativebankruptcy;
+  string3 providerattrrelativecount;
+  string3 providerattrrelativebankruptcycount;
+  string3 providerattrrelativefelonycount;
+  string1 providerattrhasassocactivestateexclusion;
+  string1 providerattrhasassocactivelicenserevocation;
+  string1 providerattrhasassocstateexclusionreinstated;
+  string1 providerattrhasassoclicenserevocationreinstated;
+  string1 providerattrhasassocbankruptcy;
+  string1 providerattrhasassoccriminalhistory;
+  string1 providerattrhasdeceased;
+  string8 providerattrdeceaseddate;
+  string1 providerattrclientstateexclusionind;
+  string8 providerattrclientstateexclusiondate;
+  string1 providerattrclientstatelicenserevokedind;
+  string8 providerattrclientstatelicenserevokeddate;
+  string1 providerattrclientstatelicenseexpiredind;
+  string8 providerattrclientstatelicenseexpireddate;
+  string1 consumerattrhasbankruptcy;
+  string1 consumerattrhasconvictions;
+  string1 consumerattrhasdeceased;
+  string8 consumerattrdateofdeaceased;
+  string1 consumerattrhasrelativebankruptcy;
+  string1 consumerattrhasrelativeconvictions;
+  string8 consumerattrbankruptcydate;
+  string8 consumerattrconvictiondate;
+  string3 consumerattrrelativecount;
+  string3 consumerattrrelativesbankruptcycount;
+  string3 consumerattrrelativesfelonycount;
+  string100 clientspeciality_desc;
+  string1 cliententitytypecode;
+  string cleanfacilityname;
+  unsigned8 faclnfid;
+  unsigned2 facfidweight;
+  unsigned2 facfiddistance;
+  string1 facilityattrentitytype;
+  string120 facilityattrcname;
+  string10 facilityattrnpinumber;
+  string8 facilityattrnpienumerationdate;
+  string8 facilityattrnpideactivationdate;
+  string8 facilityattrnpireactivationdate;
+  string1 facilityattrnpiflag;
+  string10 facilityattrdeanumber;
+  string1 facilityattrisstatesanction;
+  string1 facilityattrisoigsanction;
+  string1 facilityattrisopmsanction;
+  string10 facilityattrtaxonomy;
+  string50 facilityattrtaxonomydescription;
+  string3 facilityattrspecialitycode;
+  string40 facilityattrgroupkey;
+  string10 facilityattrclia;
+  string7 facilityattrncpdp;
+ END;
+"
+END

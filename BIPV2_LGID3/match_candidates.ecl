@@ -1,4 +1,4 @@
-// Begin code to produce match candidates
+﻿// Begin code to produce match candidates
 IMPORT SALT30,ut;
 EXPORT match_candidates(DATASET(layout_LGID3) ih) := MODULE
 SHARED s := Specificities(ih).Specificities[1];
@@ -32,6 +32,10 @@ SHARED layout_withpropvars := RECORD
   UNSIGNED1 company_charter_number_prop := 0;
 END;
 SHARED with_props := TABLE(thin_table,layout_withpropvars);
+SHARED UnderLinks_prop0 := DISTRIBUTE( specificities(ih).UnderLinks_values_persisted(Basis_cnt<10000), HASH(LGID3)); // Not guaranteed distributed by LGID3 :(
+ 
+SALT30.mac_prop_field(with_props(sbfe_id NOT IN SET(s.nulls_sbfe_id,sbfe_id)),sbfe_id,LGID3,sbfe_id_props); // For every DID find the best FULL sbfe_id
+SHARED UnderLinks_prop1 := JOIN(UnderLinks_prop0,sbfe_id_props,left.LGID3=right.LGID3,LEFT OUTER,LOCAL);
  
 SALT30.mac_prop_field(with_props(Lgid3IfHrchy NOT IN SET(s.nulls_Lgid3IfHrchy,Lgid3IfHrchy)),Lgid3IfHrchy,LGID3,Lgid3IfHrchy_props); // For every DID find the best FULL Lgid3IfHrchy
 layout_withpropvars take_Lgid3IfHrchy(with_props le,Lgid3IfHrchy_props ri) := TRANSFORM
@@ -39,7 +43,8 @@ layout_withpropvars take_Lgid3IfHrchy(with_props le,Lgid3IfHrchy_props ri) := TR
   SELF.Lgid3IfHrchy_prop := le.Lgid3IfHrchy_prop + IF ( le.Lgid3IfHrchy IN SET(s.nulls_Lgid3IfHrchy,Lgid3IfHrchy) and ri.Lgid3IfHrchy NOT IN SET(s.nulls_Lgid3IfHrchy,Lgid3IfHrchy) and ri.LGID3<>(TYPEOF(ri.LGID3))'', 1, 0 ); // <>0 => propogation
   SELF := le;
   END;
-SHARED pj2 := JOIN(with_props,Lgid3IfHrchy_props,left.LGID3=right.LGID3,take_Lgid3IfHrchy(left,right),LEFT OUTER,HASH/*,HINT(parallel_match)*//*HACK to prevent memory limit exceeded error*/);
+SHARED pj2 := JOIN(with_props,Lgid3IfHrchy_props,left.LGID3=right.LGID3,take_Lgid3IfHrchy(left,right),LEFT OUTER,HASH/*,HINT(parallel_match)*//*HACKMatchCand to prevent memory limit exceeded error*/);
+SHARED UnderLinks_prop2 := JOIN(UnderLinks_prop1,Lgid3IfHrchy_props,left.LGID3=right.LGID3,LEFT OUTER,LOCAL);
  
 SALT30.mac_prop_field(with_props(company_name NOT IN SET(s.nulls_company_name,company_name)),company_name,LGID3,company_name_props); // For every DID find the best FULL company_name
 layout_withpropvars take_company_name(with_props le,company_name_props ri) := TRANSFORM
@@ -47,7 +52,7 @@ layout_withpropvars take_company_name(with_props le,company_name_props ri) := TR
   SELF.company_name_prop := le.company_name_prop + IF ( le.company_name IN SET(s.nulls_company_name,company_name) and ri.company_name NOT IN SET(s.nulls_company_name,company_name) and ri.LGID3<>(TYPEOF(ri.LGID3))'', 1, 0 ); // <>0 => propogation
   SELF := le;
   END;
-SHARED pj5 := JOIN(pj2,company_name_props,left.LGID3=right.LGID3,take_company_name(left,right),LEFT OUTER,HASH/*,HINT(parallel_match)*//*HACK to prevent memory limit exceeded error*/);
+SHARED pj5 := JOIN(pj2,company_name_props,left.LGID3=right.LGID3,take_company_name(left,right),LEFT OUTER,HASH/*,HINT(parallel_match)*//*HACKMatchCand to prevent memory limit exceeded error*/);
  
 SALT30.mac_prop_field(with_props(cnp_number NOT IN SET(s.nulls_cnp_number,cnp_number)),cnp_number,LGID3,cnp_number_props); // For every DID find the best FULL cnp_number
 layout_withpropvars take_cnp_number(with_props le,cnp_number_props ri) := TRANSFORM
@@ -55,7 +60,8 @@ layout_withpropvars take_cnp_number(with_props le,cnp_number_props ri) := TRANSF
   SELF.cnp_number_prop := le.cnp_number_prop + IF ( le.cnp_number IN SET(s.nulls_cnp_number,cnp_number) and ri.cnp_number NOT IN SET(s.nulls_cnp_number,cnp_number) and ri.LGID3<>(TYPEOF(ri.LGID3))'', 1, 0 ); // <>0 => propogation
   SELF := le;
   END;
-SHARED pj6 := JOIN(pj5,cnp_number_props,left.LGID3=right.LGID3,take_cnp_number(left,right),LEFT OUTER,HASH/*,HINT(parallel_match)*//*HACK to prevent memory limit exceeded error*/);
+SHARED pj6 := JOIN(pj5,cnp_number_props,left.LGID3=right.LGID3,take_cnp_number(left,right),LEFT OUTER,HASH/*,HINT(parallel_match)*//*HACKMatchCand to prevent memory limit exceeded error*/);
+SHARED UnderLinks_prop3 := JOIN(UnderLinks_prop2,cnp_number_props,left.LGID3=right.LGID3,LEFT OUTER,LOCAL);
  
 SALT30.mac_prop_field(with_props(active_duns_number NOT IN SET(s.nulls_active_duns_number,active_duns_number)),active_duns_number,LGID3,active_duns_number_props); // For every DID find the best FULL active_duns_number
 layout_withpropvars take_active_duns_number(with_props le,active_duns_number_props ri) := TRANSFORM
@@ -63,7 +69,8 @@ layout_withpropvars take_active_duns_number(with_props le,active_duns_number_pro
   SELF.active_duns_number_prop := le.active_duns_number_prop + IF ( le.active_duns_number IN SET(s.nulls_active_duns_number,active_duns_number) and ri.active_duns_number NOT IN SET(s.nulls_active_duns_number,active_duns_number) and ri.LGID3<>(TYPEOF(ri.LGID3))'', 1, 0 ); // <>0 => propogation
   SELF := le;
   END;
-SHARED pj7 := JOIN(pj6,active_duns_number_props,left.LGID3=right.LGID3,take_active_duns_number(left,right),LEFT OUTER,HASH/*,HINT(parallel_match)*//*HACK to prevent memory limit exceeded error*/);
+SHARED pj7 := JOIN(pj6,active_duns_number_props,left.LGID3=right.LGID3,take_active_duns_number(left,right),LEFT OUTER,HASH/*,HINT(parallel_match)*//*HACKMatchCand to prevent memory limit exceeded error*/);
+SHARED UnderLinks_prop4 := JOIN(UnderLinks_prop3,active_duns_number_props,left.LGID3=right.LGID3,LEFT OUTER,LOCAL);
  
 SALT30.mac_prop_field(with_props(duns_number NOT IN SET(s.nulls_duns_number,duns_number)),duns_number,LGID3,duns_number_props); // For every DID find the best FULL duns_number
 layout_withpropvars take_duns_number(with_props le,duns_number_props ri) := TRANSFORM
@@ -71,7 +78,11 @@ layout_withpropvars take_duns_number(with_props le,duns_number_props ri) := TRAN
   SELF.duns_number_prop := le.duns_number_prop + IF ( le.duns_number IN SET(s.nulls_duns_number,duns_number) and ri.duns_number NOT IN SET(s.nulls_duns_number,duns_number) and ri.LGID3<>(TYPEOF(ri.LGID3))'', 1, 0 ); // <>0 => propogation
   SELF := le;
   END;
-SHARED pj8 := JOIN(pj7,duns_number_props,left.LGID3=right.LGID3,take_duns_number(left,right),LEFT OUTER,HASH/*,HINT(parallel_match)*//*HACK to prevent memory limit exceeded error*/);
+SHARED pj8 := JOIN(pj7,duns_number_props,left.LGID3=right.LGID3,take_duns_number(left,right),LEFT OUTER,HASH/*,HINT(parallel_match)*//*HACKMatchCand to prevent memory limit exceeded error*/);
+SHARED UnderLinks_prop5 := JOIN(UnderLinks_prop4,duns_number_props,left.LGID3=right.LGID3,LEFT OUTER,LOCAL);
+ 
+SALT30.mac_prop_field(with_props(company_fein NOT IN SET(s.nulls_company_fein,company_fein)),company_fein,LGID3,company_fein_props); // For every DID find the best FULL company_fein
+SHARED UnderLinks_prop6 := JOIN(UnderLinks_prop5,company_fein_props,left.LGID3=right.LGID3,LEFT OUTER,LOCAL);
  
 SALT30.mac_prop_field(with_props(company_inc_state NOT IN SET(s.nulls_company_inc_state,company_inc_state)),company_inc_state,LGID3,company_inc_state_props); // For every DID find the best FULL company_inc_state
 layout_withpropvars take_company_inc_state(with_props le,company_inc_state_props ri) := TRANSFORM
@@ -79,7 +90,8 @@ layout_withpropvars take_company_inc_state(with_props le,company_inc_state_props
   SELF.company_inc_state_prop := le.company_inc_state_prop + IF ( le.company_inc_state IN SET(s.nulls_company_inc_state,company_inc_state) and ri.company_inc_state NOT IN SET(s.nulls_company_inc_state,company_inc_state) and ri.LGID3<>(TYPEOF(ri.LGID3))'', 1, 0 ); // <>0 => propogation
   SELF := le;
   END;
-SHARED pj11 := JOIN(pj8,company_inc_state_props,left.LGID3=right.LGID3,take_company_inc_state(left,right),LEFT OUTER,HASH/*,HINT(parallel_match)*//*HACK to prevent memory limit exceeded error*/);
+SHARED pj11 := JOIN(pj8,company_inc_state_props,left.LGID3=right.LGID3,take_company_inc_state(left,right),LEFT OUTER,HASH/*,HINT(parallel_match)*//*HACKMatchCand to prevent memory limit exceeded error*/);
+/*HACKmatch_candidates01*/ SHARED UnderLinks_prop7 := JOIN(UnderLinks_prop6,company_inc_state_props,left.LGID3=right.LGID3,LEFT OUTER, LOCAL);
  
 SALT30.mac_prop_field(with_props(company_charter_number NOT IN SET(s.nulls_company_charter_number,company_charter_number)),company_charter_number,LGID3,company_charter_number_props); // For every DID find the best FULL company_charter_number
 layout_withpropvars take_company_charter_number(with_props le,company_charter_number_props ri) := TRANSFORM
@@ -87,7 +99,8 @@ layout_withpropvars take_company_charter_number(with_props le,company_charter_nu
   SELF.company_charter_number_prop := le.company_charter_number_prop + IF ( le.company_charter_number IN SET(s.nulls_company_charter_number,company_charter_number) and ri.company_charter_number NOT IN SET(s.nulls_company_charter_number,company_charter_number) and ri.LGID3<>(TYPEOF(ri.LGID3))'', 1, 0 ); // <>0 => propogation
   SELF := le;
   END;
-SHARED pj12 := JOIN(pj11,company_charter_number_props,left.LGID3=right.LGID3,take_company_charter_number(left,right),LEFT OUTER,HASH/*,HINT(parallel_match)*//*HACK to prevent memory limit exceeded error*/);
+SHARED pj12 := JOIN(pj11,company_charter_number_props,left.LGID3=right.LGID3,take_company_charter_number(left,right),LEFT OUTER,HASH/*,HINT(parallel_match)*//*HACKMatchCand to prevent memory limit exceeded error*/);
+SHARED UnderLinks_prp := UnderLinks_prop7;
  
 pj12 do_computes(pj12 le) := TRANSFORM
   SELF.duns_number_concept := IF (Fields.InValid_duns_number_concept((SALT30.StrType)le.active_duns_number,(SALT30.StrType)le.duns_number),0,HASH32((SALT30.StrType)le.active_duns_number,(SALT30.StrType)le.duns_number)); // Combine child fields into 1 for specificity counting
@@ -121,6 +134,27 @@ EXPORT Layout_Matches := RECORD//in this module for because of ,foward bug
   SALT30.UIDType rcid1 := 0;
   SALT30.UIDType rcid2 := 0;
 END;
+EXPORT Layout_Attribute_Matches := RECORD(layout_matches),MAXLENGTH(32000)
+  SALT30.StrType source_id;
+END;
+EXPORT Layout_UnderLinks_Candidates := RECORD
+  {UnderLinks_prp};
+  INTEGER2 sbfe_id_weight100 := 0; // Contains 100x the specificity
+  BOOLEAN sbfe_id_isnull := UnderLinks_prp.sbfe_id  IN SET(s.nulls_sbfe_id,sbfe_id); // Simplify later processing 
+  INTEGER2 Lgid3IfHrchy_weight100 := 0; // Contains 100x the specificity
+  BOOLEAN Lgid3IfHrchy_isnull := UnderLinks_prp.Lgid3IfHrchy  IN SET(s.nulls_Lgid3IfHrchy,Lgid3IfHrchy); // Simplify later processing 
+  INTEGER2 cnp_number_weight100 := 0; // Contains 100x the specificity
+  BOOLEAN cnp_number_isnull := UnderLinks_prp.cnp_number  IN SET(s.nulls_cnp_number,cnp_number); // Simplify later processing 
+  INTEGER2 active_duns_number_weight100 := 0; // Contains 100x the specificity
+  BOOLEAN active_duns_number_isnull := UnderLinks_prp.active_duns_number  IN SET(s.nulls_active_duns_number,active_duns_number); // Simplify later processing 
+  INTEGER2 duns_number_weight100 := 0; // Contains 100x the specificity
+  BOOLEAN duns_number_isnull := UnderLinks_prp.duns_number  IN SET(s.nulls_duns_number,duns_number); // Simplify later processing 
+  INTEGER2 company_fein_weight100 := 0; // Contains 100x the specificity
+  BOOLEAN company_fein_isnull := UnderLinks_prp.company_fein  IN SET(s.nulls_company_fein,company_fein); // Simplify later processing 
+  INTEGER2 company_inc_state_weight100 := 0; // Contains 100x the specificity
+  BOOLEAN company_inc_state_isnull := UnderLinks_prp.company_inc_state  IN SET(s.nulls_company_inc_state,company_inc_state); // Simplify later processing 
+END;
+SHARED UnderLinks_pp := TABLE(UnderLinks_prp,Layout_UnderLinks_Candidates);
 EXPORT Layout_Candidates := RECORD // A record to hold weights of each field value
   {h0} AND NOT [company_name]; // remove wordbag fields which need to be expanded
   INTEGER2 sbfe_id_weight100 := 0; // Contains 100x the specificity
@@ -177,22 +211,22 @@ layout_candidates add_company_fein(layout_candidates le,Specificities(ih).compan
   SELF := le;
 END;
 SALT30.MAC_Choose_JoinType(j7,s.nulls_company_fein,Specificities(ih).company_fein_values_persisted,company_fein,company_fein_weight100,add_company_fein,j6);
-layout_candidates add_duns_number_concept(layout_candidates le,Specificities(ih).duns_number_concept_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
-  SELF.duns_number_concept_weight100 := MAP (le.duns_number_concept_isnull => 0, patch_default and ri.field_specificity=0 => s.duns_number_concept_max, ri.field_specificity) * 100; // If never seen before - must be rare
-  SELF := le;
-END;
-SALT30.MAC_Choose_JoinType(j6,s.nulls_duns_number_concept,Specificities(ih).duns_number_concept_values_persisted,duns_number_concept,duns_number_concept_weight100,add_duns_number_concept,j5);
-layout_candidates add_duns_number(layout_candidates le,Specificities(ih).duns_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
-  SELF.duns_number_weight100 := MAP (le.duns_number_isnull => 0, patch_default and ri.field_specificity=0 => s.duns_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
-  SELF := le;
-END;
-SALT30.MAC_Choose_JoinType(j5,s.nulls_duns_number,Specificities(ih).duns_number_values_persisted,duns_number,duns_number_weight100,add_duns_number,j4);
 layout_candidates add_company_name(layout_candidates le,Specificities(ih).company_name_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.company_name_weight100 := MAP (le.company_name_isnull => 0, patch_default and ri.field_specificity=0 => s.company_name_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF.company_name := IF( ri.field_specificity<>0 or ri.word<>'',SELF.company_name_weight100+' '+ri.word,SALT30.Fn_WordBag_AppendSpecs_Fake(le.company_name, s.company_name_specificity) );// Copy in annotated wordstring
   SELF := le;
 END;
-SALT30.MAC_Choose_JoinType(j4,s.nulls_company_name,Specificities(ih).company_name_values_persisted,company_name,company_name_weight100,add_company_name,j3);
+SALT30.MAC_Choose_JoinType(j6,s.nulls_company_name,Specificities(ih).company_name_values_persisted,company_name,company_name_weight100,add_company_name,j5);
+layout_candidates add_duns_number_concept(layout_candidates le,Specificities(ih).duns_number_concept_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.duns_number_concept_weight100 := MAP (le.duns_number_concept_isnull => 0, patch_default and ri.field_specificity=0 => s.duns_number_concept_max, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT30.MAC_Choose_JoinType(j5,s.nulls_duns_number_concept,Specificities(ih).duns_number_concept_values_persisted,duns_number_concept,duns_number_concept_weight100,add_duns_number_concept,j4);
+layout_candidates add_duns_number(layout_candidates le,Specificities(ih).duns_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.duns_number_weight100 := MAP (le.duns_number_isnull => 0, patch_default and ri.field_specificity=0 => s.duns_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT30.MAC_Choose_JoinType(j4,s.nulls_duns_number,Specificities(ih).duns_number_values_persisted,duns_number,duns_number_weight100,add_duns_number,j3);
 layout_candidates add_active_duns_number(layout_candidates le,Specificities(ih).active_duns_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.active_duns_number_weight100 := MAP (le.active_duns_number_isnull => 0, patch_default and ri.field_specificity=0 => s.active_duns_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
@@ -210,9 +244,48 @@ END;
 SALT30.MAC_Choose_JoinType(j1,s.nulls_sbfe_id,Specificities(ih).sbfe_id_values_persisted,sbfe_id,sbfe_id_weight100,add_sbfe_id,j0);
 //Using HASH(did) to get smoother distribution
 SHARED Annotated := DISTRIBUTE(j0,hash(LGID3)) : PERSIST('~temp::LGID3::BIPV2_LGID3::mc',EXPIRE(Config.PersistExpire)); // Distributed for keybuild case
+ 
+//Now prepare candidate file for UnderLinks attribute file
+layout_UnderLinks_candidates add_UnderLinks_Lgid3IfHrchy(layout_UnderLinks_candidates le,Specificities(ih).Lgid3IfHrchy_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.Lgid3IfHrchy_weight100 := MAP (le.Lgid3IfHrchy_isnull => 0, patch_default and ri.field_specificity=0 => s.Lgid3IfHrchy_max, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT30.MAC_Choose_JoinType(UnderLinks_pp,s.nulls_Lgid3IfHrchy,Specificities(ih).Lgid3IfHrchy_values_persisted,Lgid3IfHrchy,Lgid3IfHrchy_weight100,add_UnderLinks_Lgid3IfHrchy,jUnderLinks_0);
+layout_UnderLinks_candidates add_UnderLinks_active_duns_number(layout_UnderLinks_candidates le,Specificities(ih).active_duns_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.active_duns_number_weight100 := MAP (le.active_duns_number_isnull => 0, patch_default and ri.field_specificity=0 => s.active_duns_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT30.MAC_Choose_JoinType(jUnderLinks_0,s.nulls_active_duns_number,Specificities(ih).active_duns_number_values_persisted,active_duns_number,active_duns_number_weight100,add_UnderLinks_active_duns_number,jUnderLinks_1);
+layout_UnderLinks_candidates add_UnderLinks_duns_number(layout_UnderLinks_candidates le,Specificities(ih).duns_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.duns_number_weight100 := MAP (le.duns_number_isnull => 0, patch_default and ri.field_specificity=0 => s.duns_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT30.MAC_Choose_JoinType(jUnderLinks_1,s.nulls_duns_number,Specificities(ih).duns_number_values_persisted,duns_number,duns_number_weight100,add_UnderLinks_duns_number,jUnderLinks_2);
+layout_UnderLinks_candidates add_UnderLinks_sbfe_id(layout_UnderLinks_candidates le,Specificities(ih).sbfe_id_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.sbfe_id_weight100 := MAP (le.sbfe_id_isnull => 0, patch_default and ri.field_specificity=0 => s.sbfe_id_max, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT30.MAC_Choose_JoinType(jUnderLinks_2,s.nulls_sbfe_id,Specificities(ih).sbfe_id_values_persisted,sbfe_id,sbfe_id_weight100,add_UnderLinks_sbfe_id,jUnderLinks_4);
+layout_UnderLinks_candidates add_UnderLinks_company_fein(layout_UnderLinks_candidates le,Specificities(ih).company_fein_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.company_fein_weight100 := MAP (le.company_fein_isnull => 0, patch_default and ri.field_specificity=0 => s.company_fein_max, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT30.MAC_Choose_JoinType(jUnderLinks_4,s.nulls_company_fein,Specificities(ih).company_fein_values_persisted,company_fein,company_fein_weight100,add_UnderLinks_company_fein,jUnderLinks_6);
+layout_UnderLinks_candidates add_UnderLinks_cnp_number(layout_UnderLinks_candidates le,Specificities(ih).cnp_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.cnp_number_weight100 := MAP (le.cnp_number_isnull => 0, patch_default and ri.field_specificity=0 => s.cnp_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT30.MAC_Choose_JoinType(jUnderLinks_6,s.nulls_cnp_number,Specificities(ih).cnp_number_values_persisted,cnp_number,cnp_number_weight100,add_UnderLinks_cnp_number,jUnderLinks_8);
+layout_UnderLinks_candidates add_UnderLinks_company_inc_state(layout_UnderLinks_candidates le,Specificities(ih).company_inc_state_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.company_inc_state_weight100 := MAP (le.company_inc_state_isnull => 0, patch_default and ri.field_specificity=0 => s.company_inc_state_max, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+jUnderLinks_9 := JOIN(jUnderLinks_8,PULL(Specificities(ih).company_inc_state_values_persisted),LEFT.company_inc_state=RIGHT.company_inc_state,add_UnderLinks_company_inc_state(LEFT,RIGHT,TRUE),LOOKUP,LEFT OUTER);
+EXPORT UnderLinks_candidates := jUnderLinks_9 : PERSIST('~temp::LGID3::BIPV2_LGID3::mc::UnderLinks',EXPIRE(Config.PersistExpire));
 //Now see if these records are actually linkable
-TotalWeight := Annotated.sbfe_id_weight100 + Annotated.Lgid3IfHrchy_weight100 + Annotated.company_name_weight100 + Annotated.duns_number_concept_weight100 + Annotated.company_fein_weight100 + Annotated.company_charter_number_weight100 + Annotated.cnp_number_weight100 + Annotated.company_inc_state_weight100 + Annotated.cnp_btype_weight100;
+TotalWeight := Annotated.sbfe_id_weight100 + Annotated.Lgid3IfHrchy_weight100 + Annotated.duns_number_concept_weight100 + Annotated.company_name_weight100 + Annotated.company_fein_weight100 + Annotated.company_charter_number_weight100 + Annotated.cnp_number_weight100 + Annotated.company_inc_state_weight100 + Annotated.cnp_btype_weight100;
+
 SHARED Linkable := TotalWeight >= Config.MatchThreshold;
 EXPORT Unlinkables := Annotated(~Linkable); // Insufficient data to ever get a match
-EXPORT Candidates := Annotated(Linkable); //No point in trying to link records with too little data
+EXPORT Candidates := Annotated(); //Attribute Files might bring total score up to threshold
 END;

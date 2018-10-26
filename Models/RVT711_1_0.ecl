@@ -1,4 +1,4 @@
-import riskwise, risk_indicators, ut, riskwisefcra, std;
+﻿import riskwise, risk_indicators, ut, riskwisefcra, std, riskview;
 
 export RVT711_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, 
 				  boolean isCalifornia = false) :=
@@ -632,7 +632,7 @@ FUNCTION
 		
 		
 		// Per DU; Move 222 override to last as it is highest priority.
-		RVT711_1_0 := if( (( nas_summary <= 4 ) and ( nap_summary <= 4 ) and ( add1_naprop <= 2 )), 222,	RVT711_1_0_tmp3);	
+		RVT711_1_0 := if( riskview.constants.noscore(nas_summary,nap_summary, add1_naprop, le.truedid), 222,	RVT711_1_0_tmp3);	
 														
 											
 

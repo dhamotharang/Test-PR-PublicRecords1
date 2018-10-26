@@ -20,6 +20,8 @@ export t_FraudGovReportOption := record (iesp.share.t_BaseReportOption)
 	boolean AppendBest {xpath('AppendBest')};//hidden[internal]
 	unsigned3 DIDScoreThreshold {xpath('DIDScoreThreshold')};//hidden[internal]
 	boolean IsOnline {xpath('IsOnline')};//hidden[internal]
+	boolean UseAllSearchFields {xpath('UseAllSearchFields')};//hidden[internal]
+	string60 ReportEntityType {xpath('ReportEntityType')};//hidden[internal]
 	boolean IsIdentityTestRequest {xpath('IsIdentityTestRequest')};//hidden[internal]
 	boolean IsElementTestRequest {xpath('IsElementTestRequest')};//hidden[internal]
 	boolean ReturnSlimDetails {xpath('ReturnSlimDetails')};//hidden[internal]
@@ -66,6 +68,8 @@ export t_FraudGovReportBy := record
 	iesp.share.t_GeoLocation GeoLocation {xpath('GeoLocation')};
 	dataset(iesp.share.t_BusinessIdentity) BusinessLinkIds {xpath('BusinessLinkIds/BusinessLinkId'), MAXCOUNT(iesp.Constants.FraudGov.MAX_COUNT_BUSINESS_LINKIDS)};
 	iesp.share.t_Address MailingAddress {xpath('MailingAddress')};
+	boolean UseAllSearchFields {xpath('UseAllSearchFields')};//hidden[internal]
+	string60 ReportEntityType {xpath('ReportEntityType')};//hidden[internal]
 end;
 		
 export t_FraudGovScoreDetails := record
@@ -142,6 +146,7 @@ export t_FraudGovTimelineDetails := record
 	string20 HouseholdId {xpath('HouseholdId')};
 	string20 CustomerPersonId {xpath('CustomerPersonId')};
 	string20 CustomerEventId {xpath('CustomerEventId')};
+	integer2 DeceitfulConfidenceId {xpath('DeceitfulConfidenceId')};
 	iesp.share.t_TimeStamp ReportedDateTime {xpath('ReportedDateTime')};
 	string30 ReportedBy {xpath('ReportedBy')};
 	iesp.share.t_Date EventDate {xpath('EventDate')};

@@ -16,7 +16,7 @@
   UNSIGNED1 FBOP_DOBNumberOfYearsRadius := DueDiligence.Constants.NUMERIC_ZERO : STORED('FBOP_DOBNumberOfYearsRadius');
   
   //validate the requests
-	validatedRequests := DueDiligence.CommonQuery.ValidateRequest(input, inGLBA, inDPPA);
+	validatedRequests := DueDiligence.CommonQuery.ValidateRequest(input, inGLBA, inDPPA, DueDiligence.Constants.ATTRIBUTES);
   
   //clean data
   cleanData := DueDiligence.CommonQuery.GetCleanData(validatedRequests(validRequest));

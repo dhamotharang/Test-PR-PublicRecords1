@@ -261,8 +261,9 @@ EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 	 *   Restrict/allow LN Small Business Attributes and/or SBFE Attributes.  *
 	 ************************************************************************ */
 
-	allow_SBA_attrs  := EXISTS(AttrsRequested(AttributeGroup = StringLib.StringToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_ATTR_V1_NAME)));   // i.e. "LN" Small Business Attributes
-	allow_SBFE_attrs := EXISTS(AttrsRequested(AttributeGroup IN [StringLib.StringToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_SBFE_ATTR_NAME),StringLib.StringToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_SBFE_V1_ATTR)])); // i.e. "SBFE" Small Business Attributes
+	allow_SBA_attrs     := EXISTS(AttrsRequested(AttributeGroup = StringLib.StringToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_ATTR_V1_NAME)));   // i.e. "LN" Small Business Attributes
+	allow_SBA_attrs101  := EXISTS(AttrsRequested(AttributeGroup = StringLib.StringToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_ATTR_NOFEL)));   // i.e. "LN" Small Business Attributes no felloniew
+	allow_SBFE_attrs    := EXISTS(AttrsRequested(AttributeGroup IN [StringLib.StringToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_SBFE_ATTR_NAME),StringLib.StringToUpperCase(LNSmallBusiness.Constants.SMALL_BIZ_SBFE_V1_ATTR)])); // i.e. "SBFE" Small Business Attributes
 		
 	LNSmallBusiness.BIP_Layouts.BatchOutput xfm_allow_SBA_only( LNSmallBusiness.BIP_Layouts.BatchOutput le ) :=
 		TRANSFORM
@@ -287,12 +288,33 @@ EXPORT SmallBusiness_BIP_Batch_Service() := FUNCTION
 			SELF := [];
 		END;
 		
+    LNSmallBusiness.BIP_Layouts.BatchOutput xfm_allow_SBA101_only( LNSmallBusiness.BIP_Layouts.BatchOutput le ) :=
+		TRANSFORM
+			LNSmallBusiness.Macros.mac_base_attrs()
+			LNSmallBusiness.Macros.mac_SBA_attrs101()
+			LNSmallBusiness.Macros.mac_scoring_attrs()
+			SELF := [];
+		END;
+    
+     LNSmallBusiness.BIP_Layouts.BatchOutput xfm_allow_SBA101SBFE_only( LNSmallBusiness.BIP_Layouts.BatchOutput le ) :=
+		TRANSFORM
+			LNSmallBusiness.Macros.mac_base_attrs()
+			LNSmallBusiness.Macros.mac_SBA_attrs101()
+			LNSmallBusiness.Macros.mac_SBFE_attrs()
+			LNSmallBusiness.Macros.mac_scoring_attrs()
+			SELF := [];
+		END;
+    
+    
+    
 	Final_Results :=
 			MAP(
-				NOT allow_SBA_attrs AND NOT allow_SBFE_attrs => PROJECT( Final_Results_pre, xfm_allow_none(LEFT)),
-				allow_SBA_attrs AND NOT allow_SBFE_attrs     => PROJECT( Final_Results_pre, xfm_allow_SBA_only(LEFT)),
-				NOT allow_SBA_attrs AND allow_SBFE_attrs     => PROJECT( Final_Results_pre, xfm_allow_SBFE_only(LEFT)),
-				/* default (allow both attribute groups): */    Final_Results_pre
+				NOT allow_SBA_attrs AND NOT allow_SBFE_attrs AND NOT allow_SBA_attrs101  => PROJECT( Final_Results_pre, xfm_allow_none(LEFT)),
+				allow_SBA_attrs AND NOT allow_SBFE_attrs AND NOT allow_SBA_attrs101      => PROJECT( Final_Results_pre, xfm_allow_SBA_only(LEFT)),
+				NOT allow_SBA_attrs AND allow_SBFE_attrs AND NOT allow_SBA_attrs101      => PROJECT( Final_Results_pre, xfm_allow_SBFE_only(LEFT)),
+				allow_SBA_attrs101 AND not allow_SBFE_attrs AND NOT allow_SBA_attrs      => PROJECT( Final_Results_pre, xfm_allow_SBA101_only(LEFT)),
+				allow_SBA_attrs101 AND  allow_SBFE_attrs AND NOT allow_SBA_attrs      => PROJECT( Final_Results_pre, xfm_allow_SBA101SBFE_only(LEFT)),
+        /* default (allow both attribute groups): */    Final_Results_pre
 			);
 	
 	/* ************************************************************************

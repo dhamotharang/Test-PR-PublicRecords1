@@ -38,10 +38,13 @@ EXPORT SearchService() := MACRO
 														searchBy.BankInformation.BankAccountNumber <> '' OR searchBy.ISPName <> '' OR searchBy.MACAddress <> '' OR searchBy.DeviceId <> '' OR searchBy.IPAddress <> '' OR
 														(iesp.ECL2ESP.t_DateToString8(searchBy.TransactionStartDate)  <> '' AND iesp.ECL2ESP.t_DateToString8(searchBy.TransactionEndDate) <> '') OR
 														searchBy.Address.StreetAddress1 <> '' OR (searchBy.Address.StreetName <> '' AND ((searchBy.Address.City <> '' AND searchBy.Address.State <> '') OR searchBy.Address.Zip5 <> ''));
+														
+	BOOLEAN isMinimumForRINID := searchBy.Name.Last <> '' AND searchBy.Name.First <> '' AND searchBy.SSN <> '' AND
+															 searchBy.DOB.Year <> 0 AND searchBy.DOB.Month <> 0 AND searchBy.DOB.Day <> 0;
 
 	BOOLEAN isValidDate := FraudGovPlatform_Services.Functions.IsValidInputDate(searchby.DOB) AND
-						   FraudGovPlatform_Services.Functions.IsValidInputDate(searchby.TransactionStartDate) AND
-						   FraudGovPlatform_Services.Functions.IsValidInputDate(searchby.TransactionEndDate);
+												 FraudGovPlatform_Services.Functions.IsValidInputDate(searchby.TransactionStartDate) AND
+												 FraudGovPlatform_Services.Functions.IsValidInputDate(searchby.TransactionEndDate);
 
 	//Checking that gc_id, industry type, and product code have some values - they are required.
 	IF(FraudGovUser.GlobalCompanyId = 0, FraudShared_Services.Utilities.FailMeWithCode(ut.constants_MessageCodes.FRAUDGOV_GC_ID));
@@ -127,10 +130,17 @@ EXPORT SearchService() := MACRO
 
 	//Adding Options.IsTestRequest. When Options.IsTestRequest = TRUE, the service returns mockedup data in the
 	//... roxie response, to help ESP and Web to continue with the development until we find a real way to return the data.
-	tmp := FraudGovPlatform_Services.SearchRecords(search_mod, batch_params, Options.IsTestRequest);
-	search_records := tmp.ds_results;
-	adlDIDFound := tmp.adlDIDFound;
-	ds_adl_in := tmp.ds_adl_in;
+	ds_searchrecords := FraudGovPlatform_Services.SearchRecords(search_mod, batch_params, Options.IsTestRequest);
+	
+	search_records := ds_searchrecords.ds_results;
+	adlDIDFound := ds_searchrecords.adlDIDFound;
+	ds_adl_in := ds_searchrecords.ds_adl_in;
+	
+	//Per GRP-2060, we save RINID (stored in the lexid field), when the user entered full DOB, SSN and full name
+	// as search criteria and we couldn't resolve to a lexid from publicrecords
+	// but we found a SINGLE identity record in the contributory data
+	useRINID := COUNT(search_records(RecordType=FraudGovPlatform_Services.Constants.RecordType.IDENTITY)) = 1 AND 
+							isMinimumForRINID AND ~adlDIDFound;
 
 	iesp.fraudgovsearch.t_FraudGovSearchResponse final_transform_t_FraudGovSearchResponse() := TRANSFORM
 			SELF._Header	:= iesp.ECL2ESP.GetHeaderRow(),
@@ -141,12 +151,15 @@ EXPORT SearchService() := MACRO
 
 	results := DATASET([final_transform_t_FraudGovSearchResponse()]);
 	
-	delta_log_input := PROJECT(first_row,TRANSFORM(iesp.fraudgovsearch.t_FraudGovSearchRequest,
-																				SELF.SearchBy.UniqueId := IF(LEFT.SearchBy.UniqueId = '' AND adlDIDFound = TRUE,
-																																		(STRING)ds_adl_in[1].did,
-																																		LEFT.SearchBy.UniqueId),
-																				SELF := LEFT
-																			));
+	delta_log_input := PROJECT(first_row,
+														TRANSFORM(iesp.fraudgovsearch.t_FraudGovSearchRequest,
+																SELF.SearchBy.UniqueId := MAP(
+																		LEFT.SearchBy.UniqueId = '' AND ~useRINID => (STRING)ds_adl_in[1].did,
+																		LEFT.SearchBy.UniqueId = '' AND useRINID => 
+																				search_records(RecordType=FraudGovPlatform_Services.Constants.RecordType.IDENTITY)[1].ElementValue,
+																		LEFT.SearchBy.UniqueId),
+																SELF := LEFT
+																));
 
 	deltabase_inquiry_log := FraudGovPlatform_Services.Functions.GetDeltabaseLogDataSet(
 														delta_log_input,
@@ -156,9 +169,9 @@ EXPORT SearchService() := MACRO
 	IF(~isValidDate, FAIL(303,doxie.ErrorCodes(303)));
 
 	IF (isMinimumInput, 
-				OUTPUT(results, named('Results')),
+				PARALLEL( OUTPUT(results, named('Results')), 
+									OUTPUT(deltabase_inquiry_log, NAMED('log_delta__fraudgov_delta__identity'))),
 				FAIL(301,doxie.ErrorCodes(301))
 			);
-	IF(isMinimumInput,output(deltabase_inquiry_log, NAMED('log_delta__fraudgov_delta__identity')));
 		
 ENDMACRO;

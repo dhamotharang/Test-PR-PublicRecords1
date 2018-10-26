@@ -1,0 +1,41 @@
+ID "HIPIE_Plugins.AppendLnpidToLnpidAssociations.AppendLnpidToLnpidAssociations_cmp";
+NAME appendlnpidtolnpidassociations_testcmp;
+LABEL "Test composition for Append LNPID to LNPID Assocations";
+DESCRIPTION "Auto-generated test composition for plugin AppendLnpidToLnpidAssociations";
+VERSION "1.0.0";
+AUTHOR "CarmigJX";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING CompareWUID: DEFAULT("W20171214-105735");
+END
+
+INSTANCE OutDataset.OutDataset(Ins004): LABEL("Output Dataset"),VERSION("2.0")
+	dsInput="^Ins003|dsOutput"
+	name="~qa::appendlnpidtolnpidassociations::appendlnpidtolnpidassociations::output"
+	Method="THOR"
+END
+
+INSTANCE AppendLnpidToLnpidAssociations.AppendLnpidToLnpidAssociations(Ins003): LABEL("Append LNPID to LNPID Assocations"),VERSION("1.0.0")
+	dsInput="^Ins002|dsOutput"
+  LNPID="providerlnpid"
+  Prefix="TestPrefix"
+END
+
+INSTANCE AppendLnpidToLnpidAssociations.AppendLnpidToLnpidAssociations(Ins002): LABEL("Append LNPID to LNPID Assocations"),VERSION("1.0.0")
+  dsInput="^Ins001|dsOutput"
+  LNPID="providerlnpid"
+  Prefix="Provider"
+END
+
+INSTANCE UseDataset.UseDataset(Ins001): LABEL("Use Dataset"),VERSION("1.1")
+	LogicalFilename="~qa::appendlnpidtolnpidassociations::appendlnpidtolnpidassociations::input"
+	Method="THOR"
+	Structure="RECORD
+    unsigned8 providerlnpid;
+  END;"
+END

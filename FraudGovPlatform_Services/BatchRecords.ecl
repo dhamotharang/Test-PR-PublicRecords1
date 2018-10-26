@@ -6,7 +6,7 @@ EXPORT BatchRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_i
 		//**
 		//** Collect external batch services data if IsOnline is FALSE
 		//**
-		SHARED ds_reportFromBatchServices := IF(~batch_params.IsOnline,
+		EXPORT ds_reportFromBatchServices := IF(~batch_params.IsOnline OR batch_params.UseAllSearchFields,
 																						FraudGovPlatform_Services.Functions.getExternalServicesRecs(ds_batch_in, batch_params),
 																						PROJECT(ds_batch_in,TRANSFORM(FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw,
 																																				SELF.batchin_rec := LEFT,
@@ -21,14 +21,14 @@ EXPORT BatchRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_i
 		//**
 		//** Known Frauds
 		//**
-		SHARED ds_payload_KNFD := ds_payload(classification_Permissible_use_access.file_type = FraudGovPlatform_Services.Constants.PayloadFileTypeEnum.KnownFraud); 
-		SHARED ds_reportKnownFrauds := FraudGovPlatform_Services.Functions.getKnownFraudRecs(ds_batch_in, batch_params, ds_payload_KNFD);
+		ds_payload_KNFD := ds_payload(classification_Permissible_use_access.file_type = FraudGovPlatform_Services.Constants.PayloadFileTypeEnum.KnownFraud); 
+		ds_reportKnownFrauds := FraudGovPlatform_Services.Functions.getKnownFraudRecs(ds_batch_in, batch_params, ds_payload_KNFD);
 
 		//**
 		//** Velocities goes here
 		//**
-		SHARED ds_payload_IDDT := ds_payload(classification_Permissible_use_access.file_type = FraudGovPlatform_Services.Constants.PayloadFileTypeEnum.IdentityActivity);
-		SHARED ds_Velocities := FraudGovPlatform_Services.Functions.getVelocityRecs(ds_batch_in, batch_params, ds_payload_IDDT);
+		ds_payload_IDDT := ds_payload(classification_Permissible_use_access.file_type = FraudGovPlatform_Services.Constants.PayloadFileTypeEnum.IdentityActivity);
+		ds_Velocities := FraudGovPlatform_Services.Functions.getVelocityRecs(ds_batch_in, batch_params, ds_payload_IDDT);
 
 		//**
 		//** Assemble the pieces
@@ -87,4 +87,5 @@ EXPORT BatchRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_i
 																);
 		
 		EXPORT ds_results := ds_results_w_scores;
+		
 END;

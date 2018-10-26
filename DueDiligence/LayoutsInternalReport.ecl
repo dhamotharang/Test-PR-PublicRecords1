@@ -2,29 +2,12 @@
 
 EXPORT LayoutsInternalReport := MODULE
 
-	EXPORT VinTitleAndRegistration := RECORD
-		STRING30		vin;
-		STRING2   	titleState;
-		STRING8   	titleDate;
-		STRING2   	registrationState;
-    STRING8   	registrationDate;
-	END;
-	
-	EXPORT YearMakeModel := RECORD
-		STRING4   	year;
-		STRING30  	make;
-		STRING30  	model;
-	END;
-
-  EXPORT BusAircraftSlimLayout := RECORD
-    DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
-		YearMakeModel;
-		STRING1   detailType; 
-		UNSIGNED1	numberOfEngines;
-		STRING10		tailNumber;
-		VinTitleAndRegistration;
-		STRING12	manufactureModelCode;		//used to get number of engines
-  END;								
+  EXPORT OwnershipType := RECORD
+    BOOLEAN inquiredOwned;
+    BOOLEAN spouseOwned;
+    DATASET(DueDiligence.Layouts.DIDAndName) owners;
+  END;
+								
 
   
   EXPORT SharedPropertyLayout := RECORD
@@ -36,18 +19,21 @@ EXPORT LayoutsInternalReport := MODULE
   
   EXPORT SharedWatercraftLayout := RECORD
     DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
-    BOOLEAN inquiredOwned;
-    BOOLEAN spouseOwned;
-    DATASET(DueDiligence.Layouts.DIDAndName) owners;
+    OwnershipType;
     iesp.duediligenceshared.t_DDRWatercraft;
   END;
  
- EXPORT SharedVehicleLayout := RECORD
+  EXPORT SharedVehicleLayout := RECORD
     DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
-    BOOLEAN inquiredOwned;
-    BOOLEAN spouseOwned;
-    DATASET(DueDiligence.Layouts.DIDAndName) owners;
+    OwnershipType;
     iesp.duediligenceshared.t_DDRMotorVehicle;
+  END;
+  
+  EXPORT SharedAircraftLayout := RECORD
+    DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
+    STRING12 manufactureModelCode;
+		OwnershipType;
+		iesp.duediligenceshared.t_DDRAircraft;
   END;
 	
 	

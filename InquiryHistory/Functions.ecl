@@ -1,4 +1,4 @@
-﻿IMPORT doxie, dx_InquiryHistory, Gateway, iesp, Data_Services, STD;
+﻿IMPORT doxie, dx_InquiryHistory, Gateway, iesp, Data_Services, STD, InquiryHistory;
 
 EXPORT Functions := MODULE
 
@@ -19,28 +19,36 @@ EXPORT Functions := MODULE
     //  in the case that we do want to use it for some purpose in the future. Keep in mind, even though the deltabase may
     //  not be available the keys still contain data that Inquiry History can return regardless.
 
-    InquiryHistory.Layouts.InquiryHistoryDeltabaseResponseEx failx(InquiryHistory.Layouts.InquiryHistoryDeltabaseRequest L) := TRANSFORM
-      SELF.response._Header.Status  := FAILCODE;
-      SELF.response._Header.Message := FAILMESSAGE('soapresponse');
-      SELF := L;
+    InquiryHistory.Layouts.InquiryHistoryDeltabaseResponseEx failx() := TRANSFORM
+      SELF.response._Header.Exceptions := IF(FAILMESSAGE <> '', DATASET([{'Roxie', FAILCODE,InquiryHistory.Constants.ESP_Method,FAILMESSAGE}],iesp.share.t_WsException));
+      SELF.response._Header.Status  := InquiryHistory.Constants.StatusCodes.SOAPError;
+      SELF.response._Header.Message := InquiryHistory.Constants.GetStatusMessage(InquiryHistory.Constants.StatusCodes.SOAPError);
       SELF := [];
     END;
 
     URL := in_gateways(Gateway.Configuration.IsDeltaInquiryHistory(servicename))[1].URL;
 
-    dsSoapOut := SOAPCALL(dsIHReq,
+    dsSoapRes := SOAPCALL(dsIHReq,
                           URL,
                           InquiryHistory.Constants.ESP_Method,
                           InquiryHistory.Layouts.InquiryHistoryDeltabaseRequest,
                           TRANSFORM(InquiryHistory.Layouts.InquiryHistoryDeltabaseRequest, SELF := LEFT),
                           DATASET(InquiryHistory.Layouts.InquiryHistoryDeltabaseResponseEx),
                           XPATH(InquiryHistory.Constants.ResultStructure),
-                          ONFAIL(failx(left)),
                           RETRY(InquiryHistory.Constants.SOAPCallRetry),
                           TIMEOUT(InquiryHistory.Constants.SOAPWaitTime),
                           TRIM);
 
-    dsIHDB := dsSoapOut[1];
+    dsSoapOut := PROJECT(dsSoapRes, TRANSFORM(InquiryHistory.Layouts.InquiryHistoryDeltabaseResponseEx,
+                              _error_code := LEFT.response._Header.Status;
+                              _error_msg  := LEFT.response._Header.Message;
+                              SELF.response._Header.Status := IF(_error_code <> 0, ERROR(_error_code, _error_msg), 0);
+                              SELF.response._Header.Message := IF(_error_code <> 0, _error_msg, '');
+                              SELF := LEFT));
+
+     dsIHDBOut := CATCH(dsSoapOut, ONFAIL(failx()));
+
+     dsIHDB := IF(EXISTS(in_dids(did>0)), dsIHDBOut[1]);
 
      RETURN dsIHDB;
 

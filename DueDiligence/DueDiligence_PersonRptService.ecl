@@ -13,9 +13,9 @@ EXPORT DueDiligence_PersonRptService := MACRO
 	
 			DueDiligence.CommonQuery.mac_CreateInputFromXML(requestLayout, requestName, TRUE, DueDiligence.Constants.INDIVIDUAL);
 			
-			validatedRequest := DueDiligence.CommonQuery.ValidateRequest(input, glba, dppa);
+			validatedRequest := DueDiligence.CommonQuery.ValidateRequest(input, glba, dppa, DueDiligence.Constants.INDIVIDUAL);
 			
-			DueDiligence.CommonQuery.mac_FailOnError(validatedRequest(validRequest = FALSE), DueDiligence.Constants.INDIVIDUAL);
+			DueDiligence.CommonQuery.mac_FailOnError(validatedRequest(validRequest = FALSE));
 			
 			cleanData := DueDiligence.CommonQuery.GetCleanData(validatedRequest(validRequest));
 			

@@ -1,0 +1,120 @@
+ID "e2740a60-dfaa-438b-82e4-1cb7a0e2c91c"; 
+NAME CleanProviderData_testcmp;
+LABEL "Clean Provider Data";
+DESCRIPTION "Clean Provider Data";
+VERSION "1.0.0";
+AUTHOR "periassx";
+
+PERMISSIONS
+   VIEW:PUBLIC;
+   EDIT:PRIVATE;
+   RUN:PUBLIC;
+END
+
+INPUTS
+    STRING CompareWUID : DEFAULT("W20180214-085619");
+END
+
+INSTANCE UseDataset.UseDataset(Ins001)
+	LogicalFilename ="~qa::cleanproviderdata::cleanproviderdata::input1"
+	Method=THOR
+	Structure=STRING50|ProviderKey,STRING10|NPINumber,STRING12|DEANumber,STRING10|Taxonomy,STRING10|ProviderTaxID,STRING5|ProviderTaxIDSuffix,STRING12|ProviderNumber,STRING5|ProviderNumberSuffix,STRING2|ProviderNumberQualifier,STRING2|SecurityAuthorizationCode,STRING3|NetworkCode,STRING50|FacilityName,STRING12|FacilityNumber,STRING30|FirstName,STRING36|LastName,STRING36|AddressLine1,STRING36|AddressLine2,STRING24|City,STRING2|State,STRING9|Zip5,STRING30|County,STRING2|Country,STRING4|Regions,STRING9|SpecialityCode1,STRING9|SpecialityCode2,STRING2|ProviderType,STRING1|WatchCode,STRING8|LastUpdateDate,STRING50|UserDefinedField01,STRING50|UserDefinedField02,STRING50|UserDefinedField03,STRING50|UserDefinedField04,STRING50|UserDefinedField05,STRING50|UserDefinedField06,STRING50|UserDefinedField07,STRING50|UserDefinedField08,STRING50|UserDefinedField09,STRING50|UserDefinedField10
+END
+
+INSTANCE CleanProviderData.CleanProviderData(Ins002)
+	Prefix="clean"
+	dsInput=^Ins001|dsOutput
+	ProviderKey=ProviderKey
+	NPINumber=NPINumber
+	DEANumber=DEANumber
+	Taxonomy=Taxonomy
+	ProviderTaxID=ProviderTaxID
+	ProviderTaxIDSuffix=ProviderTaxIDSuffix
+	ProviderNumber=ProviderNumber
+	ProviderNumberSuffix=ProviderNumberSuffix
+	ProviderNumberQualifier=ProviderNumberQualifier
+	SecurityAuthorizationCode=SecurityAuthorizationCode
+	NetworkCode=NetworkCode
+	FacilityName=FacilityName
+	FacilityNumber=FacilityNumber
+	FirstName=FirstName
+	LastName=LastName
+	AddressLine1=AddressLine1
+	AddressLine2=AddressLine2
+	City=City
+	State=State
+	Zip5=Zip5
+	County=County
+	Country=Country
+	Regions=Regions
+	SpecialityCode1=SpecialityCode1
+	SpecialityCode2=SpecialityCode2
+	ProviderType=ProviderType
+	WatchCode=WatchCode
+	LastUpdateDate=LastUpdateDate
+	UserDefinedField01=UserDefinedField01
+	UserDefinedField02=UserDefinedField02
+	UserDefinedField03=UserDefinedField03
+	UserDefinedField04=UserDefinedField04
+	UserDefinedField05=UserDefinedField05
+	UserDefinedField06=UserDefinedField06
+	UserDefinedField07=UserDefinedField07
+	UserDefinedField08=UserDefinedField08
+	UserDefinedField09=UserDefinedField09
+	UserDefinedField10=UserDefinedField10
+END
+
+INSTANCE CleanProviderData.CleanProviderData(Ins004)
+	Prefix="clean2"
+	dsInput=^Ins001|dsOutput
+	ProviderKey=ProviderKey
+	NPINumber=NPINumber
+	DEANumber=DEANumber
+	Taxonomy=Taxonomy
+	ProviderTaxID=ProviderTaxID
+	ProviderTaxIDSuffix=ProviderTaxIDSuffix
+	ProviderNumber=ProviderNumber
+	ProviderNumberSuffix=ProviderNumberSuffix
+	ProviderNumberQualifier=ProviderNumberQualifier
+	SecurityAuthorizationCode=SecurityAuthorizationCode
+	NetworkCode=NetworkCode
+	FacilityName=FacilityName
+	FacilityNumber=FacilityNumber
+	FirstName=FirstName
+	LastName=LastName
+	AddressLine1=AddressLine1
+	AddressLine2=AddressLine2
+	City=City
+	State=State
+	Zip5=Zip5
+	County=County
+	Country=Country
+	Regions=Regions
+	SpecialityCode1=SpecialityCode1
+	SpecialityCode2=SpecialityCode2
+	ProviderType=ProviderType
+	WatchCode=WatchCode
+	LastUpdateDate=LastUpdateDate
+	UserDefinedField01=UserDefinedField01
+	UserDefinedField02=UserDefinedField02
+	UserDefinedField03=UserDefinedField03
+	UserDefinedField04=UserDefinedField04
+	UserDefinedField05=UserDefinedField05
+	UserDefinedField06=UserDefinedField06
+	UserDefinedField07=UserDefinedField07
+	UserDefinedField08=UserDefinedField08
+	UserDefinedField09=UserDefinedField09
+	UserDefinedField10=UserDefinedField10
+END
+
+INSTANCE OutDataset.OutDataset(Ins003)
+	dsInput=^Ins002|dsOutput
+	name="~qa::cleanproviderdata::cleanproviderdadtame::output"
+	Method=THOR
+END
+
+INSTANCE OutDataset.OutDataset(Ins005)
+	dsInput=^Ins004|dsOutput
+	name="~qa::cleanproviderdata::cleanproviderdadtame::output2"
+	Method=THOR
+END

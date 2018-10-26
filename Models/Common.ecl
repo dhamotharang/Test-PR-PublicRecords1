@@ -1,4 +1,4 @@
-import ut, risk_indicators,Std;
+﻿import ut, risk_indicators,Std, riskview;
 
 export Common := MODULE
 	EXPORT NULL := -999999999;
@@ -293,54 +293,9 @@ END;
 		return normalize( blank, wordcount, norm(left,counter) );
 	END;
 
-	export boolean isRV3Unscorable( risk_indicators.Layout_Boca_Shell clam ) := FUNCTION
-		BOOLEAN indexw(string source, string target, string delim) :=
-			(source = target)
-			OR (StringLib.StringFind(source, delim + target + delim, 1) > 0)
-			OR (source[1..length(target)+1] = target + delim)
-			OR (StringLib.StringReverse(source)[1..length(target)+1] = StringLib.StringReverse(target) + delim);
+	export boolean isRV3Unscorable( risk_indicators.Layout_Boca_Shell le ) := FUNCTION
 
-
-		property_owned_total             := clam.address_verification.owned.property_total;
-		property_sold_total              := clam.address_verification.sold.property_total;
-		combo_dobscore                   := clam.iid.combo_dobscore;
-		input_dob_match_level            := clam.dobmatchlevel;
-		rc_sources                       := clam.iid.sources;
-		source_tot_L2                    := ((integer)indexw(StringLib.StringToUpperCase(trim(rc_sources, ALL)), 'L2', ',') > 0);
-		source_tot_LI                    := ((integer)indexw(StringLib.StringToUpperCase(trim(rc_sources, ALL)), 'LI', ',') > 0);
-		liens_recent_unreleased_count    := clam.bjl.liens_recent_unreleased_count;
-		liens_historical_unreleased_ct   := clam.bjl.liens_historical_unreleased_count;
-		lien_rec_unrel_flag              := (liens_recent_unreleased_count > 0);
-		lien_hist_unrel_flag             := (liens_historical_unreleased_ct > 0);
-
-		lien_flag                        := (((integer)source_tot_L2 = 1) or (((integer)source_tot_LI = 1) or (lien_rec_unrel_flag or lien_hist_unrel_flag)));
-
-		criminal_count                   := clam.bjl.criminal_count;
-		rc_bansflag                      := clam.iid.bansflag;
-		findw(rc_sources, 'BA', ' ,', 'I', source_tot_BA, 'bool');
-		bankrupt                         := clam.bjl.bankrupt;
-		filing_count                     := clam.bjl.filing_count;
-		bk_recent_count                  := clam.bjl.bk_recent_count;
-		bk_flag                          := ((rc_bansflag in ['1', '2']) or (((integer)source_tot_BA = 1) or (((integer)bankrupt = 1) or ((filing_count > 0) or (bk_recent_count > 0)))));
-
-		rc_decsflag                      := clam.iid.decsflag;
-		source_tot_DS                    := ((integer)indexw(StringLib.StringToUpperCase(trim(rc_sources, ALL)), 'DS', ',') > 0);
-		ssn_deceased                     := (((integer)rc_decsflag = 1) or ((integer)source_tot_DS = 1));
-		truedid                          := clam.truedid;
-		nas_summary                      := clam.iid.nas_summary;
-		nap_summary                      := clam.iid.nap_summary;
-		add1_naprop                      := clam.address_verification.input_address_information.naprop;
-
-		scored_222s := ( sum(property_owned_total,property_sold_total)>0 OR
-						 combo_dobscore between 90 and 100 or
-						 (integer)input_dob_match_level >= 7 or
-						 lien_flag or
-						 criminal_count > 0 or
-						 bk_flag or
-						 ssn_deceased or
-						 truedid
-				   );
-		unscorable := ( nas_summary <= 4 ) and ( nap_summary <= 4 ) and ( add1_naprop <= 2 ) AND not scored_222s;
+    unscorable := riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid);
 		return unscorable;
 	END;
 	

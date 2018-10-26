@@ -1,5 +1,5 @@
 ﻿
-IMPORT ut, Std, RiskWise,Risk_Indicators;
+IMPORT ut, Std, RiskWise,Risk_Indicators, riskview;
 
 EXPORT RVS1706_0_0(GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam) := FUNCTION
 
@@ -1597,7 +1597,7 @@ ver_dob_src_tu := ver_dob_src_tu_pos > 0;
 
 iv_add_apt := if(StringLib.StringToUpperCase(trim(rc_dwelltype, LEFT, RIGHT)) = 'A' or StringLib.StringToUpperCase(trim(out_addr_type, LEFT, RIGHT)) = 'H' or not(out_unit_desig = '') or not(out_sec_range = ''), 1, 0);
 
-iv_rv5_unscorable := if(NAS_Summary <= 4 and NAP_Summary <= 4 and Infutor_NAP <= 4 and Add_Input_NAProp <= 3 and not(TrueDID),'1', '0');
+iv_rv5_unscorable := if(riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid),'1', '0');
 
 rv_d30_derog_count := if(not(truedid), NULL, min(if(attr_total_number_derogs = NULL, -NULL, attr_total_number_derogs), 999));
 

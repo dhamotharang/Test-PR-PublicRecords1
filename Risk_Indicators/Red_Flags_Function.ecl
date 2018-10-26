@@ -1,4 +1,4 @@
-import riskwise, fcra;
+﻿import riskwise, fcra;
 
 export Red_Flags_Function(GROUPED DATASET (Layout_output) iid, DATASET(riskwise.layouts.reasoncode_settings) rc_settings=DATASET([],riskwise.layouts.reasoncode_settings)) := function
 
@@ -154,6 +154,7 @@ end;
 															SELF.security_alert := (right.security_alert='1');
 															SELF.negative_alert := (right.negative_alert='1');
 															SELF.id_theft_flag := (right.id_theft_flag='1');
+                              SELF.legal_hold_alert := false;  // new field that doesn't get used in NonFCRA
 															SELF.seq := left.seq;
 															SELF.date_created := (unsigned)right.date_created), atmost(100), keep(1) );
 															
@@ -169,6 +170,7 @@ end;
 															SELF.security_alert := (right.security_alert='1');
 															SELF.negative_alert := (right.negative_alert='1');
 															SELF.id_theft_flag := (right.id_theft_flag='1');
+                              SELF.legal_hold_alert := false;  // new field that doesn't get used in NonFCRA
 															SELF.seq := left.seq;
 															SELF.date_created := (unsigned)right.date_created), atmost(100), keep(1) );
 															

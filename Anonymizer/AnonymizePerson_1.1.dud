@@ -1,0 +1,47 @@
+﻿NAME AnonymizePerson;
+LABEL "Anonymize Person";
+VERSION "1.1.0";
+DESCRIPTION "Anonymize person information to drop PII.";
+AUTHOR "CarmigJX";
+CATEGORY CLEAN;
+
+PERMISSIONS
+ EDIT:PRIVATE;
+ VIEW:PUBLIC;
+ RUN:PUBLIC;
+END
+    
+INPUTS
+	DATASET dsInput
+			FIELD FirstName:LABEL("Firstname"),DESCRIPTION("Field containing the person Firstname"),OPTIONAL,NULL("");
+			FIELD Lastname:LABEL("Lastname"),DESCRIPTION("Field containing the person Lastname"),OPTIONAL,NULL("");
+			FIELD Gender:LABEL("Gender"),DESCRIPTION("Field containing the person gender"),OPTIONAL,NULL("");
+			FIELD SSN:LABEL("SSN"),DESCRIPTION("Field containing the person SSN"),OPTIONAL,NULL("");
+			FIELD DateOfBirth:LABEL("DateOfBirth"),DESCRIPTION("Field containing the date of birth"),OPTIONAL,NULL("");
+			FIELD FullName:LABEL("FullName"),DESCRIPTION("Field containing the full name"),OPTIONAL,NULL("");
+	END   
+  ENUM("FALSE","TRUE") Anonymize: LABEL("Anonymize"),DEFAULT("^GLOBAL|Anonymize");
+END
+
+OUTPUTS
+	DATASET dsOutput(dsInput);
+END
+
+GENERATES INLINE
+	IMPORT Anonymizer;
+	IMPORT Std;
+	IMPORT Address;
+  
+  doAnonymize     := STD.Str.ToUpperCase(%^qAnonymize%)='TRUE';
+	%^edsOutput% := IF(doAnonymize, Anonymizer.mac_AnonymizePerson(%dsInput%, %FirstName%, %Lastname%, %Gender%, %SSN%, %DateOfBirth%, %FullName%), %dsInput%);
+
+ENDGENERATES
+
+RESOURCES
+	LOGICALFILE testinput:FILENAME("~qa::anonymizer::anonymizeperson::input"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+	ECL Address:FILENAME("Address"), URL("http:// 10.241.100.153:8010");   
+	ECL Anonymizer:FILENAME("Anonymizer"), URL("http:// 10.241.100.153:8010");   
+	FILE readme: FILENAME("AnonymizePerson_1.1_README.txt"),LABEL("Plugin Readme File");
+	FILE AnonymizePerson_testcmp: FILENAME("AnonymizePerson_1.1_testcmp.txt"),LABEL("Plugin Test Composition");
+	FILE AnonymizePerson_BuildTestDataset: FILENAME("AnonymizePerson_1.1_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+END

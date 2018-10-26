@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Prod Data FCRA - Raw">
 	<part name="did" type="xsd:integer"/>
 	<part name="addr" type="xsd:string"/>
@@ -29,6 +29,8 @@
 	<part name="IncludeThrive" type="xsd:boolean"/>
 	<part name="IncludeWatercraft" type="xsd:boolean"/>
 	<part name="IncludeOverrides" type="xsd:boolean"/>
+	<part name="IncludePersonContext" type="xsd:boolean"/>
+	<part name="delta_PersonContext_gateway" type="xsd:string"/>
   <part name="DisplayDeployedEnvironment" type="xsd:boolean"/>
   <part name="DataRestrictionMask" type="xsd:string"/>
  </message>
@@ -48,29 +50,31 @@ export ProdData_FCRA := MACRO
 	'state',
 	'zip',
 	'socs',
-	'IncludeAllFiles',
-	'IncludeHeader',
-	'IncludeSSNTable',
-	'IncludeDeathMaster',
-	'IncludeAircraft',
-	'IncludeStudent',
+	'IncludeAllFiles',	
 	'IncludeADVO',
+  'IncludeAircraft',
 	'IncludeAVM',
 	'IncludeBankruptcy',
 	'IncludeCriminal',
+  'IncludeDeathMaster',
 	'IncludeEmailData',
 	'IncludeGong',
+  'IncludeHeader',
 	'IncludeImpulse',
 	'IncludeInfutor',
 	'IncludeInquiries',
 	'IncludeLiens',
 	'IncludeMari',
+  'IncludeOverrides',
 	'IncludePAW',
+  'IncludePersonContext',
+  'delta_PersonContext_gateway',
 	'IncludeProfessionalLicense',
 	'IncludeProperty',
+  'IncludeSSNTable',
+  'IncludeStudent',
 	'IncludeThrive',
-	'IncludeWatercraft',
-	'IncludeOverrides',
+	'IncludeWatercraft',	
 	'DisplayDeployedEnvironment',
 	'DataRestrictionMask'
 	));
@@ -111,6 +115,8 @@ unsigned1 DPPA := RiskWise.permittedUse.fraudDPPA : stored('DPPAPurpose');
 unsigned1 GLB := RiskWise.permittedUse.fraudGLBA  : stored('GLBPurpose');
 BOOLEAN DisplayDeployedEnvironment := FALSE : STORED('DisplayDeployedEnvironment');
 string DataRestrictionMask := '' : STORED('DataRestrictionMask');
+string delta_PersonContext_gateway := '' : STORED('delta_PersonContext_gateway');
+boolean Include_PersonContext := false : STORED('IncludePersonContext');
 
 max_recs := 100;
 
@@ -433,6 +439,16 @@ if(Include_All_Files,
 
 	// For Score and Outcome Tracking we need to be able to determine if we are deployed to Cert or Prod - using this as a test.
 	IF(DisplayDeployedEnvironment, OUTPUT(_Control.ThisEnvironment.RoxieEnv, NAMED('Current_Environment')));
+
+input_with_did := project(clean_a2, transform(risk_indicators.layout_output, self := left; self := []));  
+// gw_personcontext := dataset( [{'delta_personcontext','http://ln_api_dempsey_dev:g0n0l3s!@10.176.68.172:7534/WsSupport/?ver_=2'}], risk_indicators.layout_gateways_in );
+gw_personcontext := dataset( [{'delta_personcontext',delta_PersonContext_gateway}], risk_indicators.layout_gateways_in );
+gateways := project(gw_personContext, transform(gateway.layouts.config, self := left, self := []) );
+
+bsversion := 50;
+    
+pc := Risk_Indicators.checkPersonContext(group(input_with_did, seq), gateways, bsversion);
+if(include_personContext or delta_personcontext_gateway <> '', output(pc, named('person_context')) );
 
 //
 ENDMACRO;

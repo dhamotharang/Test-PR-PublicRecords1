@@ -9,6 +9,7 @@ EXPORT CommonIndividual := MODULE
                                                                             SELF.seq := LEFT.seq;
                                                                             SELF.inquiredDID := LEFT.individual.did;
                                                                             SELF.historyDate := LEFT.historyDate;
+                                                                            SELF.historyDateRaw := LEFT.historyDateRaw;
                                                                             SELF.individual := RIGHT;
                                                                             SELF.indvType := relationToInquired;
                                                                             SELF := [];));

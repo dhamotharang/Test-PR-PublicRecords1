@@ -1,4 +1,4 @@
-IMPORT ut, RiskWise, RiskView, RiskWiseFCRA, Risk_Indicators;
+﻿IMPORT ut, RiskWise, RiskView, RiskWiseFCRA, Risk_Indicators, riskview;
 
 export RVG1605_1_0 (grouped dataset(risk_indicators.Layout_Boca_Shell) clam) := FUNCTION
 										
@@ -659,7 +659,7 @@ export RVG1605_1_0 (grouped dataset(risk_indicators.Layout_Boca_Shell) clam) := 
 	
 	iv_rv5_deceased := rc_decsflag = '1' or rc_ssndod != 0 or indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'DS', ',') or indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'DE', ',');
 	
-	iv_rv5_unscorable := if(NAS_Summary <= 4 and NAP_Summary <= 4 and Infutor_NAP <= 4 and Add_Input_NAProp <= 3 and not(TrueDID), true, false);
+	iv_rv5_unscorable := if(riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid), true, false);
 	
 	rvg1605_1_0_score := map(
 	    iv_rv5_deceased   => 200,

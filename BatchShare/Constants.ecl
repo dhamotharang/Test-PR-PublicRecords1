@@ -12,6 +12,7 @@ export Constants := module
     export string DataRestrictionMask := '1    0'; // same (wrong) way as defined in AutoStandardI/GlobalModule;
     export string DataPermissionMask  := AutoStandardI.Constants.DataPermissionMask_default;
     export string6 SSNMask := 'NONE';
+    export unsigned didScoreThreshold := 80;
 	end;
 
 	export Limits := module

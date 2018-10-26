@@ -4,7 +4,7 @@
 EXPORT Common := MODULE
 
   EXPORT firstPopulatedString(field) := FUNCTIONMACRO
-    RETURN IF(LEFT.field = '', RIGHT.field, LEFT.field);
+    RETURN IF(LEFT.field = DueDiligence.Constants.EMPTY, RIGHT.field, LEFT.field);
   ENDMACRO;
   
   EXPORT firstNonZeroNumber(field) := FUNCTIONMACRO

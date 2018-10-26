@@ -1,4 +1,4 @@
-import riskwise, risk_indicators, ut, riskwisefcra, std;
+﻿import riskwise, risk_indicators, ut, riskwisefcra, std, riskview;
 
 export RVT809_1_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, 
 				boolean isCalifornia = false,
@@ -381,7 +381,7 @@ end;
 			truedid
 		;
 
-		rvt809_1_0b := if(nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 2 AND NOT scored_222s, 222, rvt809_1_0a);
+		rvt809_1_0b := if(riskview.constants.noscore(nas_summary,nap_summary, add1_naprop, le.truedid), 222, rvt809_1_0a);
 
 		ssndead     := ((integer)ssnlength>0 and rc_decsflag='1');
 		ssnprior    := (rc_ssndobflag='1' or rc_pwssndobflag='1');

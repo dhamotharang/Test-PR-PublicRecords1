@@ -3,6 +3,7 @@
 EXPORT SLBB1702_0_2 (GROUPED DATASET(Business_Risk_BIP.Layouts.Shell) busShell, GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam ) := FUNCTION
 
 	MODEL_DEBUG := false;
+	// MODEL_DEBUG := true;
 
 	#if(MODEL_DEBUG)
 		Layout_Debug := RECORD
@@ -1347,20 +1348,7 @@ EXPORT SLBB1702_0_2 (GROUPED DATASET(Business_Risk_BIP.Layouts.Shell) busShell, 
 	 *             Model Input Variable Assignments              *
 	 ************************************************************* */
 			MaxSASLength := 1000; // Max length for the list fields to be imported into SAS (Technically SAS can handle up to 32,767 - but modeling only wants 1,000 to help with speed of imports)
-		// The following function takes a comma-delimited string of any length, and a numeric
-		// length to truncate the string to. Since the resulting string will often have an 
-		// incomplete value at the end, the function trims it off, leaving complete values only.
-		truncate_list(STRING str, UNSIGNED len) :=
-			FUNCTION
-				delimiter := ',';		
-				rec_word  := {STRING word};
-				string_as_dataset := DATASET( [{str}], {STRING text} );
-				norm_lettrs    := NORMALIZE( string_as_dataset, len + 1, TRANSFORM( rec_word, SELF.word := LEFT.text[COUNTER] ) );		
-				words_rolled   := ROLLUP( norm_lettrs, RIGHT.word != delimiter, TRANSFORM( rec_word, SELF.word := LEFT.word + RIGHT.word ) );
-				no_partials    := CHOOSEN( words_rolled, COUNT(words_rolled)-1 );
-				str_trunc_list := ROLLUP( no_partials, TRUE, TRANSFORM( rec_word, SELF.word := LEFT.word + RIGHT.word ) )[1].word;
-				RETURN IF( LENGTH(TRIM(str)) < len, str, str_trunc_list );
-			END;
+		
 			
 truedid                          := ri.truedid;
 nas_summary                      := ri.iid.nas_summary;
@@ -1469,12 +1457,12 @@ ver_src_id_mth_since_fs          := le.Business_Activity.SourceBusinessRecordTim
 ver_src_id_count                 := le.Verification.SourceCountID;
 ver_src_bureau_mth_since_fs      := le.Tradeline.TradeTimeOldest;
 ver_src_id_activity12            := le.Business_Activity.BusinessActivity12MonthID;
-ver_src_id_list                  := truncate_list(le.Verification.sourcelistID, MaxSASLength);
-ver_src_id_firstseen_list        := truncate_list(le.Verification.sourcedatefirstseenlistID, MaxSASLength);
-ver_src_id_lastseen_list         := truncate_list(le.Verification.sourcedatelastseenlistID, MaxSASLength);
-ver_src_list                     := truncate_list(le.Verification.sourcelist, MaxSASLength);
-ver_addr_src_firstseen_list      := truncate_list(le.Verification.AddrVerificationDateFirstSeenList, MaxSASLength);
-ver_addr_src_lastseen_list       := truncate_list(le.Verification.AddrVerificationDateLastSeenList, MaxSASLength);
+ver_src_id_list                  := Business_Risk_BIP.Common.truncate_list(le.Verification.sourcelistID, MaxSASLength);
+ver_src_id_firstseen_list        := Business_Risk_BIP.Common.truncate_list(le.Verification.sourcedatefirstseenlistID, MaxSASLength);
+ver_src_id_lastseen_list         := Business_Risk_BIP.Common.truncate_list(le.Verification.sourcedatelastseenlistID, MaxSASLength);
+ver_src_list                     := Business_Risk_BIP.Common.truncate_list(le.Verification.sourcelist, MaxSASLength);
+ver_addr_src_firstseen_list      := Business_Risk_BIP.Common.truncate_list(le.Verification.AddrVerificationDateFirstSeenList, MaxSASLength);
+ver_addr_src_lastseen_list       := Business_Risk_BIP.Common.truncate_list(le.Verification.AddrVerificationDateLastSeenList, MaxSASLength);
 addr_input_lres                  := le.Verification.InputAddrLengthOfResidence;
 addr_input_assessed_value        := le.Input_Characteristics.InputAddrAssessedTotal;
 assoc_count                      := le.Associates.AssociateCount;
@@ -3686,12 +3674,26 @@ num_pos_sources := __common__( if(max((integer)source_ar, (integer)source_bm, (i
 
 num_neg_sources := __common__( if(max((integer)source_ba, (integer)source_l2, (integer)source_ut) = NULL, NULL, sum((integer)source_ba, (integer)source_l2, (integer)source_ut)) ) ;
 
+
+// old 
+// bv_ver_src_derog_ratio := __common__( map(
+    // not(truebiz_ln)                                                                                                                                                 => NULL,
+    // ver_src_list = ''                                                                                                                                             => -1,
+    // if(max(num_pos_sources, num_neg_sources) = NULL, NULL, sum(if(num_pos_sources = NULL, 0, num_pos_sources), if(num_neg_sources = NULL, 0, num_neg_sources))) = 0 => -2,
+    // num_neg_sources > 0                                                                                                                                             => round(num_neg_sources / if(max(num_pos_sources, num_neg_sources) = NULL, NULL, sum(if(num_pos_sources = NULL, 0, num_pos_sources), if(num_neg_sources = NULL, 0, num_neg_sources)))/.1)*.1,
+  //                                                                                                                                                                    100 + num_pos_sources) ) ;
+
 bv_ver_src_derog_ratio := __common__( map(
     not(truebiz_ln)                                                                                                                                                 => NULL,
     ver_src_list = ''                                                                                                                                             => -1,
-    if(max(num_pos_sources, num_neg_sources) = NULL, NULL, sum(if(num_pos_sources = NULL, 0, num_pos_sources), if(num_neg_sources = NULL, 0, num_neg_sources))) = 0 => -2,
-    num_neg_sources > 0                                                                                                                                             => round(num_neg_sources / if(max(num_pos_sources, num_neg_sources) = NULL, NULL, sum(if(num_pos_sources = NULL, 0, num_pos_sources), if(num_neg_sources = NULL, 0, num_neg_sources)))/.1)*.1,
-                                                                                                                                                                       100 + num_pos_sources) ) ;
+    if(max(num_pos_sources, num_neg_sources) = NULL, NULL, 
+        sum(if(num_pos_sources = NULL, 0, num_pos_sources), 
+            if(num_neg_sources = NULL, 0, num_neg_sources))) = 0 => -2,
+    num_neg_sources > 0  => round(((num_neg_sources / 
+                                  if(max(num_pos_sources, num_neg_sources) = NULL, NULL, 
+                                  sum(if(num_pos_sources = NULL, 0, num_pos_sources), 
+                                      if(num_neg_sources = NULL, 0, num_neg_sources)))/.1)*.1),1),
+    100 + num_pos_sources) ) ;
 
 bv_mth_ver_src_p_ls_1 := __common__( if(not(truebiz_ln), NULL, NULL) ) ;
 
@@ -4419,13 +4421,25 @@ s0_v27_w := __common__( map(
     bv_mth_bureau_fs <= 124.5 => -0.0765046550085903,
                                  -0.127560665099968) ) ;
 
-s0_aa_code_27 := __common__( map(
+// s0_aa_code_27 := __common__( map(
+    // s0_v27_w = -0.127560665099968 => '     ',
+    // bv_mth_bureau_fs = NULL       => 'P535',
+    // bv_mth_bureau_fs = -1         => 'P523',
+    // bv_mth_bureau_fs <= 70.5      => 'P523',
+    // bv_mth_bureau_fs <= 124.5     => 'P523',
+                                     // 'P523') ) ;
+ s0_aa_code_27 := __common__( map(
     s0_v27_w = -0.127560665099968 => '     ',
     bv_mth_bureau_fs = NULL       => 'P535',
-    bv_mth_bureau_fs = -1         => 'P523',
-    bv_mth_bureau_fs <= 70.5      => 'P523',
-    bv_mth_bureau_fs <= 124.5     => 'P523',
-                                     'P523') ) ;
+    bv_mth_bureau_fs = -1         => 'B034',
+    bv_mth_bureau_fs <= 70.5      => 'B034',
+    bv_mth_bureau_fs <= 124.5     => 'B034',
+                                     'B034') ) ;                                    
+                                     
+
+
+
+
 
 s0_aa_dist_27 := __common__( 0 - s0_v27_w ) ;
 

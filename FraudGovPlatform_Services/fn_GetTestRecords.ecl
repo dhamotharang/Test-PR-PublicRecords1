@@ -69,13 +69,13 @@ export fn_GetTestRecords := MODULE
 
     export GetTestTimelineDetails() := FUNCTION
         timelineDetails := DATASET([
-            {False,3,87621,'441246700122','','','',2018,4,3,8,10,0,'',2018,4,3,2018,4,3,'','','','','SNAP','SSN used for Applied Benefits',
+            {False,3,87621,'441246700122','','','',2,2018,4,3,8,10,0,'',2018,4,3,2018,4,3,'','','','','SNAP','SSN used for Applied Benefits',
                 2018,4,3,2018,4,3,'',testName1,'859038536',1963,12,1,'Home',testAddr4,testAddr2,'',testPhones1,'','FL','',
                 '','','','','Other','','','','192.10.0.1','','','','C1001','','','','','','','','','','',''},
-            {False,2,87621,'441246700125','','','',2018,1,23,9,50,0,'',2018,1,23,2018,1,24,'','','','','SNAP','SSN used for Check Cashing Fraud',
+            {False,2,87621,'441246700125','','','',2,2018,1,23,9,50,0,'',2018,1,23,2018,1,24,'','','','','SNAP','SSN used for Check Cashing Fraud',
                 2018,4,3,2018,4,3,'',testName2,'158013524',1982,1,18,'Home',testAddr3,testAddr1,'',testPhones2,'','FL','',
                 '','','','','Other','','','','10.0.1.14','','','','C1003','','','','','','','','','','',''},
-            {True,3,87621,'441246700124','','','',2018,1,23,11,31,0,'',2018,1,23,2018,1,24,'','','','','SNAP','SSN used for Benefit Renewal',
+            {True,3,87621,'441246700124','','','',2,2018,1,23,11,31,0,'',2018,1,23,2018,1,24,'','','','','SNAP','SSN used for Benefit Renewal',
                 2018,4,3,2018,4,3,'',testName2,'158013525',1982,1,18,'Home',testAddr3,testAddr1,'',testPhones3,'','FL','',
                 '','','','','Other','','','','97.101.11.231','','','','C1005','','','','','','','','','','',''}
         ],iesp.fraudgovreport.t_FraudGovTimeLineDetails);

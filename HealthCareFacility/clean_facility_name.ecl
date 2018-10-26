@@ -1,4 +1,4 @@
-IMPORT BIPV2_COMPANY_NAMES, lib_StringLib,UT, STD;
+IMPORT BIPV2_COMPANY_NAMES, lib_StringLib,UT, STD, HealthCareFacility;
 EXPORT clean_facility_name (STRING120 FNAME_RAW)  := FUNCTION
 
 	FNAME := lib_StringLib.StringLib.StringFilterOut(FNAME_RAW,'&'); 

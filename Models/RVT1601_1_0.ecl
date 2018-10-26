@@ -1,5 +1,5 @@
-/* !! Second Build !! */
-IMPORT ut, RiskWise, RiskWiseFCRA, Risk_Indicators, STD;
+﻿/* !! Second Build !! */
+IMPORT ut, RiskWise, RiskWiseFCRA, Risk_Indicators, STD, riskview;
 
 
 EXPORT RVT1601_1_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, BOOLEAN lexIDOnlyOnInput = FALSE) := FUNCTION
@@ -592,9 +592,7 @@ iv_rv5_deceased := rc_decsflag = '1'
 								or (integer)indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'DS', ',') > 0 
 								or (integer)indexw(StringLib.StringToUpperCase(trim(ver_sources, ALL)), 'DE', ',') > 0;
 
-iv_rv5_unscorable := if(NAS_Summary <= 4 and NAP_Summary <= 4 
-                         and Infutor_NAP <= 4 and Add_Input_NAProp <= 3 and not(TrueDID), 
-												'1', '0');
+iv_rv5_unscorable := if(riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid), '1', '0');
 
 ov_rc19 := combo_lnamecount = 0 and combo_addrcount = 0 and combo_hphonecount = 0 and combo_ssncount = 0;
 

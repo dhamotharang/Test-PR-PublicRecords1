@@ -1,4 +1,4 @@
-import risk_indicators, riskwise, riskwisefcra, ut, std;
+﻿import risk_indicators, riskwise, riskwisefcra, ut, std, riskview;
 
 // this model needs to use the original V1 reason code set like 2x69 does, defaulting useRCSetV2 to false
 export RVT1006_1_0(grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boolean isCalifornia=false, boolean useRcSetV2 = false ) := FUNCTION
@@ -988,7 +988,7 @@ export RVT1006_1_0(grouped dataset(risk_indicators.Layout_Boca_Shell) clam, bool
 
 		VRZN_CUSTOM_SCORE := max(501, min(900, if(VRZN_LOG = NULL, -NULL, VRZN_LOG)));
 
-		rvt1006_1_0 :=  if(((nas_summary <= 4) and ((nap_summary <= 4) and (add1_naprop <= 2))) and not(scored_222s), 222, VRZN_CUSTOM_SCORE);
+		rvt1006_1_0 :=  if(riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid), 222, VRZN_CUSTOM_SCORE);
 
 
 		self.seq := le.seq;

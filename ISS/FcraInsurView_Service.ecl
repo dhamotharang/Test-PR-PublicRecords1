@@ -175,7 +175,9 @@ export FcraInsurView_Service := MACRO
 	unsigned8 BSOptions := if( IsPreScreen, risk_indicators.iid_constants.BSOptions.IncludePreScreen, 0 ) + 
 												 IF(DoAddressAppend, Risk_Indicators.iid_constants.BSOptions.IncludeAddressAppend, 0) +
 												 if(FilterLiens, risk_indicators.iid_constants.BSOptions.FilterLiens, 0 ) +//DRM to drive Liens/Judgments											  
-													Risk_Indicators.iid_constants.BSOptions.InsuranceFCRAMode;
+													Risk_Indicators.iid_constants.BSOptions.InsuranceFCRAMode +
+													Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyException;
+													
 	ExperianTransaction := DataRestriction[risk_indicators.iid_constants.posExperianFCRARestriction]='0';	
 /*****************Put in input layout*************************************************************/
 	Risk_Indicators.Layout_Input intoInput(emptyRecord l, integer c) := TRANSFORM

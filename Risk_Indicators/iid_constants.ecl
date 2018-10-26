@@ -492,7 +492,8 @@ export bureau_sources := ['EQ', 'EN', 'TN'];
 		Judgment = 1 										<< 26,
 		Eviction = 1										<< 27,
 		SSNLienFtlr = 1									<< 28,
-		BCBLienFtlr = 1									<< 29
+		BCBLienFtlr = 1									<< 29,
+		InsuranceFCRABankruptcyException = 1 << 30
 		);
 
 export CheckifFlagged(string inString, integer Position) :=  if(inString[Position] = '0', true, false);
@@ -978,5 +979,8 @@ export RecoverScoreBatchWatchlistModels :=  ['RSN807_0_0'];
 
 export fn_CreateFakeDID( STRING fname, STRING lname ) := 
     (UNSIGNED6)(STD.Str.Filter( (STRING)(HASH(fname,lname)), '0123456789' )[1..12]);
+
+// for dempsey riskview project, change the bankruptcy filter to only include these specific chapters
+export set_permitted_bk_chapters(integer bsversion, boolean insurancemode) := if(bsversion < 50 and ~insurancemode, ['7'], ['7', '9', '11', '12', '13', '15', '304']);
 
 end;

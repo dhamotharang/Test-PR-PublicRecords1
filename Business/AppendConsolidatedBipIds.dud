@@ -1,0 +1,115 @@
+﻿ID "7fdba8ec-336f-4856-a0d3-a1850fed7f21";
+NAME AppendConsolidatedBipIds;
+LABEL "Append Consolidated BipIds";
+VERSION "1.0.0";
+AUTHOR "CarmigJX";
+CATEGORY APPEND;
+DESCRIPTION "Consolidate multiple sets of BIP Ids into a single set of correct Ids";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING Prefix: LABEL("Append Column Prefix"),DESCRIPTION("Prefix to be appended to the new fields"),OPTIONAL,DEFAULT(""),NULL("");
+	DATASET dsInput: MAPBYNAME
+    FIELD UltID1: LABEL("UltID 1"),DESCRIPTION("UltID from the first set of BIP Ids");
+    FIELD SeleID1: LABEL("SeleID 1"),DESCRIPTION("SeleID from the first set of BIP Ids");
+    FIELD ProxID1: LABEL("ProxID 1"),DESCRIPTION("ProxID from the first set of BIP Ids");
+    FIELD OrgID1: LABEL("OrgID 1"),DESCRIPTION("OrgID from the first set of BIP Ids");
+    FIELD PowID1: LABEL("PowID 1"),DESCRIPTION("PowID from the first set of BIP Ids");
+    FIELD EmpID1: LABEL("EmpID 1"),DESCRIPTION("EmpID from the first set of BIP Ids"), OPTIONAL, NULL("");
+    FIELD DotID1: LABEL("DotID 1"),DESCRIPTION("DotID from the first set of BIP Ids"), OPTIONAL, NULL("");
+    FIELD Score1: LABEL("Score 1"),DESCRIPTION("First set of BIP Ids score");
+    FIELD Weight1: LABEL("Weight 1"),DESCRIPTION("First set of BIP Ids weight");
+    FIELD UltID2: LABEL("UltID 2"),DESCRIPTION("UltID from the second set of BIP Ids");
+    FIELD SeleID2: LABEL("SeleID 2"),DESCRIPTION("SeleID from the second set of BIP Ids");
+    FIELD ProxID2: LABEL("ProxID 2"),DESCRIPTION("ProxID from the second set of BIP Ids");
+    FIELD OrgID2: LABEL("OrgID 2"),DESCRIPTION("OrgID from the second set of BIP Ids");
+    FIELD PowID2: LABEL("PowID 2"),DESCRIPTION("PowID from the second set of BIP Ids");
+    FIELD EmpID2: LABEL("EmpID 2"),DESCRIPTION("EmpID from the second set of BIP Ids"), OPTIONAL, NULL("");
+    FIELD DotID2: LABEL("DotID 2"),DESCRIPTION("DotID from the second set of BIP Ids"), OPTIONAL, NULL("");
+    FIELD Score2: LABEL("Score 2"),DESCRIPTION("Second set of BIP Ids score");
+    FIELD Weight2: LABEL("Weight 2"),DESCRIPTION("Second set of BIP Ids weight");
+    FIELD UltID3: LABEL("UltID 3"),DESCRIPTION("UltID from the third set of BIP Ids"), OPTIONAL, NULL("");
+    FIELD SeleID3: LABEL("SeleID 3"),DESCRIPTION("SeleID from the third set of BIP Ids"), OPTIONAL, NULL("");
+    FIELD ProxID3: LABEL("ProxID 3"),DESCRIPTION("ProxID from the third set of BIP Ids"), OPTIONAL, NULL("");
+    FIELD OrgID3: LABEL("OrgID 3"),DESCRIPTION("OrgID from the third set of BIP Ids"), OPTIONAL, NULL("");
+    FIELD PowID3: LABEL("PowID 3"),DESCRIPTION("PowID from the third set of BIP Ids"), OPTIONAL, NULL("");
+    FIELD EmpID3: LABEL("EmpID 3"),DESCRIPTION("EmpID from the third set of BIP Ids"), OPTIONAL, NULL("");
+    FIELD DotID3: LABEL("DotID 3"),DESCRIPTION("DotID from the third set of BIP Ids"), OPTIONAL, NULL("");
+    FIELD Score3: LABEL("Score 3"),DESCRIPTION("Third set of BIP Ids score"), OPTIONAL, NULL("");
+    FIELD Weight3: LABEL("Weight 3"),DESCRIPTION("Third set of BIP Ids weight"), OPTIONAL, NULL("");
+    FIELD UltID4: LABEL("UltID 4"),DESCRIPTION("UltID from the fourth set of BIP Ids"), OPTIONAL, NULL("");
+    FIELD SeleID4: LABEL("SeleID 4"),DESCRIPTION("SeleID from the fourth set of BIP Ids"), OPTIONAL, NULL("");
+    FIELD ProxID4: LABEL("ProxID 4"),DESCRIPTION("ProxID from the fourth set of BIP Ids"), OPTIONAL, NULL("");
+    FIELD OrgID4: LABEL("OrgID 4"),DESCRIPTION("OrgID from the fourth set of BIP Ids"), OPTIONAL, NULL("");
+    FIELD PowID4: LABEL("PowID 4"),DESCRIPTION("PowID from the fourth set of BIP Ids"), OPTIONAL, NULL("");
+    FIELD EmpID4: LABEL("EmpID 4"),DESCRIPTION("EmpID from the fourth set of BIP Ids"), OPTIONAL, NULL("");
+    FIELD DotID4: LABEL("DotID 4"),DESCRIPTION("DotID from the fourth set of BIP Ids"), OPTIONAL, NULL("");
+    FIELD Score4: LABEL("Score 4"),DESCRIPTION("Fourth set of BIP Ids score"), OPTIONAL, NULL("");
+    FIELD Weight4: LABEL("Weight 4"),DESCRIPTION("Fourth set of BIP Ids weight"), OPTIONAL, NULL("");
+  END
+END
+
+OUTPUTS 
+  DATASET dsOutput(dsInput): PREFIX(INPUTS.Prefix),APPEND	
+	UNSIGNED6 UltID;
+    	UNSIGNED6 OrgID;
+    	UNSIGNED6 SELEID;
+    	UNSIGNED6 ProxID;
+    	UNSIGNED6 POWID;
+    	UNSIGNED6 EmpID;
+    	UNSIGNED6 DotID;
+	UNSIGNED Score;
+	UNSIGNED Weight;
+  END
+  DATASET ConsolidatedStats: SIDE, WUID
+		INTEGER UltIDPercentHit: FEW;
+		INTEGER OrgIDPercentHit: FEW;
+		INTEGER SeleIDPercentHit: FEW;
+		INTEGER ProxIDPercentHit: FEW;
+		INTEGER PowIDPercentHit: FEW;
+		INTEGER EmpIDPercentHit: FEW;
+		INTEGER DotIDPercentHit: FEW;
+	END
+END
+
+VISUALIZE AppendConsolidatedBipIdsStats: LABEL("Append BIP Best Stats")
+	  TABLE ConsolidatedBipIdsStats(ConsolidatedStats): 
+      TITLE("Consolidated BIP Ids Hit Rate"),
+      LABEL("UltID Percent Hit","OrgID Percent Hit","SeleID Percent Hit","ProxID Percent Hit","PowID Percent Hit","EmpID Percent Hit","DotID Percent Hit"),
+      VALUE(UltIDPercentHit,OrgIDPercentHit,SeleIDPercentHit,ProxIDPercentHit,PowIDPercentHit,EmpIDPercentHit,DotIDPercentHit);
+END
+
+GENERATES INLINE
+	IMPORT Business;
+  dFinalOutput := Business.macAppendConsolidatedBipIds(%dsInput%, 
+    %UltID1%, %OrgID1%, %SeleID1%, %ProxID1%, %PowID1%, %EmpID1%, %DotID1%, %Score1%, %Weight1%,
+    %UltID2%, %OrgID2%, %SeleID2%, %ProxID2%, %PowID2%, %EmpID2%, %DotID2%, %Score2%, %Weight2%,
+    %UltID3%, %OrgID3%, %SeleID3%, %ProxID3%, %PowID3%, %EmpID3%, %DotID3%, %Score3%, %Weight3%,
+    %UltID4%, %OrgID4%, %SeleID4%, %ProxID4%, %PowID4%, %EmpID4%, %DotID4%, %Score4%, %Weight4%,
+    %^qPrefix%);	
+														 
+	%^edsOutput% 	:= dFinalOutput %^p%;
+  INTEGER TotalNumberOfRecords := COUNT(%dsOutput%);
+  %^eConsolidatedStats%  := TABLE(%dsOutput%, {UltIDPercentHit:=(COUNT(GROUP, %Prefix%UltID <> 0)*100)/TotalNumberOfRecords
+    ,OrgIDPercentHit:=(COUNT(GROUP, %Prefix%OrgID <> 0)*100)/TotalNumberOfRecords
+    ,SeleIDPercentHit:=(COUNT(GROUP, %Prefix%SeleID <> 0)*100)/TotalNumberOfRecords
+    ,ProxIDPercentHit:=(COUNT(GROUP, %Prefix%ProxID <> 0)*100)/TotalNumberOfRecords
+    ,PowIDPercentHit:=(COUNT(GROUP, %Prefix%PowID <> 0)*100)/TotalNumberOfRecords
+    ,EmpIDPercentHit:=(COUNT(GROUP, %Prefix%EmpID <> 0)*100)/TotalNumberOfRecords
+    ,DotIDPercentHit:=(COUNT(GROUP, %Prefix%DotID <> 0)*100)/TotalNumberOfRecords
+    });
+ENDGENERATES
+
+RESOURCES
+	FILE readme: FILENAME("AppendConsolidatedBipIds_README.txt"),LABEL("Plugin Readme File");
+	FILE AppendConsolidatedBipIds_testcmp: FILENAME("AppendConsolidatedBipIds_testcmp.txt"),LABEL("Plugin Test Composition");
+	FILE AppendConsolidatedBipIds_BuildTestDataset: FILENAME("AppendConsolidatedBipIds_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+	FILE AppendConsolidatedBipIdsChecklist: FILENAME("AppendConsolidatedBipIdsCheckList.xlsx"),LABEL("Checklist");
+	FILE AppendConsolidatedBipIds_TestHarness: FILENAME("AppendConsolidatedBipIds_TestHarness.txt"),LABEL("Test Harness");
+	ECL  Business:FILENAME("Business"), URL("<http://10.241.100.153:8010>"); 
+	LOGICALFILE AppendConsolidatedBipIds_BuildTestDataset:FILENAME("~qa::business::appendconsolidatedbipids::input"), URL("http://10.241.100.159:8010"), DALIIP("10.241.100.159"), CLUSTER("thor100_100dev");  
+END

@@ -1,0 +1,15 @@
+Info Log -
+Monitoring WU W20180209-141732(HIPIE_ALAPERIASSX-W7D_HIPIE_Plugins.AppendProviderAttributes.AppendProviderAttributes_testcmp_periassx) to completion.
+Plugin AppendProviderAttributes's test composition AppendProviderAttributes_testcmp ran on cluster http://10.241.100.159:8010/ and created workunit W20180209-141732 with status completed
+Plugin AppendProviderAttributes's test composition AppendProviderAttributes_testcmp ran and completed with state "completed"
+Plugin AppendProviderAttributes's passed compliance check
+
+Err Log -
+
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/C:/Program%20Files%20(x86)/HPCCSystems/6.4.8/HIPIE/HIPIE.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/C:/Program%20Files%20(x86)/HPCCSystems/6.4.8/KEL/hipie.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
+Plugin AppendProviderAttributes passed compliance check
+

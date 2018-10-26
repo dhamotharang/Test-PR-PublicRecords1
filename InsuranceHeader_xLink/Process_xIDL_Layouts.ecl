@@ -379,6 +379,13 @@ EXPORT isLeftWinner(INTEGER2 l_weight,INTEGER2 r_weight, INTEGER1 l_mc=SALT37.Ma
  
 EXPORT isWeightForcedDown(INTEGER2 l_weight,INTEGER2 r_weight, INTEGER1 l_mc=SALT37.MatchCode.NoMatch, INTEGER1 r_mc=SALT37.MatchCode.NoMatch) :=
   IF((isLeftWinner(l_weight,r_weight,l_mc,r_mc) AND (l_weight < r_weight)) OR  (NOT isLeftWinner(l_weight,r_weight,l_mc,r_mc) AND (l_weight > r_weight)),true,false);
+
+EXPORT LayoutScoredFetch combine_Zip(DATASET(LayoutScoredFetch) le) := FUNCTION
+ fetchResults := project(le, transform(LayoutScoredFetch,
+					 SELF.ZIP_cases := DEDUP(SORT(left.ZIP_cases, ZIP,-weight ),ZIP);
+						SELF := LEFT));
+		RETURN fetchResults;
+END;
  
 EXPORT LayoutScoredFetch combine_scores(LayoutScoredFetch le,LayoutScoredFetch ri, BOOLEAN In_disableForce = FALSE) := TRANSFORM
   BOOLEAN SNAMEWeightForcedDown := IF ( isWeightForcedDown(le.SNAMEWeight,ri.SNAMEWeight,le.SNAME_match_code,ri.SNAME_match_code),TRUE,FALSE );
@@ -421,7 +428,7 @@ EXPORT LayoutScoredFetch combine_scores(LayoutScoredFetch le,LayoutScoredFetch r
   SELF.STWeight := IF ( isLeftWinner(le.STWeight,ri.STWeight,le.ST_match_code,ri.ST_match_code ), le.STWeight, ri.STWeight );
   SELF.ST := IF ( isLeftWinner(le.STWeight,ri.STWeight,le.ST_match_code,ri.ST_match_code ), le.ST, ri.ST );
   SELF.ST_match_code := IF ( isLeftWinner(le.STWeight,ri.STWeight,le.ST_match_code,ri.ST_match_code ), le.ST_match_code, ri.ST_match_code );
-  SELF.ZIP_cases := DEDUP(SORT(le.ZIP_cases & ri.ZIP_cases, ZIP,-weight ),ZIP);
+  SELF.ZIP_cases := le.ZIP_cases + ri.ZIP_cases; //le.ZIP_cases; // DEDUP(SORT(le.ZIP_cases + ri.ZIP_cases, ZIP,-weight ),ZIP);
   SELF.ZIPWeight := MAX(SELF.ZIP_cases,weight); // KEEP(1) means you can take the maximum value
   SELF.ZIP_match_code := IF ( isLeftWinner(le.ZIPWeight,ri.ZIPWeight,le.ZIP_match_code,ri.ZIP_match_code ), le.ZIP_match_code, ri.ZIP_match_code );
   BOOLEAN SSN5WeightForcedDown := IF ( isWeightForcedDown(le.SSN5Weight,ri.SSN5Weight,le.SSN5_match_code,ri.SSN5_match_code),TRUE,FALSE );

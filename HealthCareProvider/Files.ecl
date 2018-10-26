@@ -1,4 +1,4 @@
-import ut, IDL_Header;
+﻿import ut, IDL_Header;
 EXPORT Files := MODULE
 	EXPORT INGENIX_DID_DS := DATASET ('~foreign::10.241.20.205::thor_data400::base::ingenix_providers_did',Layouts.INGENIX_DID,thor);	
 	EXPORT DEA_DS 				:= DATASET ('~foreign::10.241.20.205::thor_data400::base::ingenix_dea',Layouts.INGENIX_DEA,thor);
@@ -13,7 +13,8 @@ EXPORT Files := MODULE
 	EXPORT PROF_LIC_DS		:= DATASET ('~foreign::10.241.20.205::thor_data400::base::prolicv2::proflic_base::built',Layouts.PROF_LIC,thor);	
 	EXPORT ABMS_DS				:= DATASET ('~foreign::10.241.20.205::thor_data400::base::abms::qa::main',Layouts.ABMS,thor);
 	EXPORT Name_Count_DS	:= DATASET ('~foreign::10.194.12.1::thor::base::insuranceheader::name_count',IDL_Header.layout_name_count,thor);
-
+	EXPORT Taxonomy_Code_DS		:= DATASET ('~thor::taxonomy::code::table',{string4 taxonomy_code, string40 classification},thor);
+	
 	EXPORT HealthCare_Prefix				:=	'~thor::base::healthcareprovider';
 	
 	EXPORT person_in_Suffix					:=	'person::salt::input';

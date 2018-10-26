@@ -5,20 +5,7 @@ EXPORT to_OutputLayout_SAS_v2( DATASET(Business_Risk_BIP.Layouts.OutputLayout) f
 	FUNCTION
 
 		MaxSASLength := 1000; // Max length for the list fields to be imported into SAS (Technically SAS can handle up to 32,767 - but modeling only wants 1,000 to help with speed of imports)
-		// The following function takes a comma-delimited string of any length, and a numeric
-		// length to truncate the string to. Since the resulting string will often have an 
-		// incomplete value at the end, the function trims it off, leaving complete values only.
-		truncate_list(STRING str, UNSIGNED len) :=
-			FUNCTION
-				delimiter := ',';		
-				rec_word  := {STRING word};
-				string_as_dataset := DATASET( [{str}], {STRING text} );
-				norm_lettrs    := NORMALIZE( string_as_dataset, len + 1, TRANSFORM( rec_word, SELF.word := LEFT.text[COUNTER] ) );		
-				words_rolled   := ROLLUP( norm_lettrs, RIGHT.word != delimiter, TRANSFORM( rec_word, SELF.word := LEFT.word + RIGHT.word ) );
-				no_partials    := CHOOSEN( words_rolled, COUNT(words_rolled)-1 );
-				str_trunc_list := ROLLUP( no_partials, TRUE, TRANSFORM( rec_word, SELF.word := LEFT.word + RIGHT.word ) )[1].word;
-				RETURN IF( LENGTH(TRIM(str)) < len, str, str_trunc_list );
-			END;
+		
 		
 		Business_Risk_BIP.Layouts_SAS.OutputLayout_SAS_v2 xfm_toOutputLayoutSAS(Business_Risk_BIP.Layouts.OutputLayout le)  :=
 			TRANSFORM
@@ -270,9 +257,9 @@ EXPORT to_OutputLayout_SAS_v2( DATASET(Business_Risk_BIP.Layouts.OutputLayout) f
 				SELF.ver_src_id_activity03 := le.Business_Activity.BusinessActivity03MonthID;
 				SELF.ver_src_id_activity06 := le.Business_Activity.BusinessActivity06MonthID;
 				SELF.ver_src_id_activity12 := le.Business_Activity.BusinessActivity12MonthID;
-				SELF.ver_src_id_list := truncate_list(le.Verification.sourcelistID, MaxSASLength);
-				SELF.ver_src_id_firstseen_list := truncate_list(le.Verification.sourcedatefirstseenlistID, MaxSASLength);
-				SELF.ver_src_id_lastseen_list := truncate_list(le.Verification.sourcedatelastseenlistID, MaxSASLength);
+				SELF.ver_src_id_list := Business_Risk_BIP.Common.truncate_list(le.Verification.sourcelistID, MaxSASLength);
+				SELF.ver_src_id_firstseen_list := Business_Risk_BIP.Common.truncate_list(le.Verification.sourcedatefirstseenlistID, MaxSASLength);
+				SELF.ver_src_id_lastseen_list := Business_Risk_BIP.Common.truncate_list(le.Verification.sourcedatelastseenlistID, MaxSASLength);
 				SELF.ver_src_NonDerog_Count := le.Verification.SourceNonDerogCount;
 				SELF.ver_src_NonDerog_Count3 := le.Verification.SourceNonDerogCount03;
 				SELF.ver_src_NonDerog_Count6 := le.Verification.SourceNonDerogCount06;
@@ -283,25 +270,25 @@ EXPORT to_OutputLayout_SAS_v2( DATASET(Business_Risk_BIP.Layouts.OutputLayout) f
 				SELF.ver_src_activity03 := le.Business_Activity.BusinessActivity03Month;
 				SELF.ver_src_activity06 := le.Business_Activity.BusinessActivity06Month;
 				SELF.ver_src_activity12 := le.Business_Activity.BusinessActivity12Month;
-				SELF.ver_src_list := truncate_list(le.Verification.sourcelist, MaxSASLength);
-				SELF.ver_src_firstseen_list := truncate_list(le.Verification.sourcedatefirstseenlist, MaxSASLength);
-				SELF.ver_src_lastseen_list := truncate_list(le.Verification.sourcedatelastseenlist, MaxSASLength);
+				SELF.ver_src_list := Business_Risk_BIP.Common.truncate_list(le.Verification.sourcelist, MaxSASLength);
+				SELF.ver_src_firstseen_list := Business_Risk_BIP.Common.truncate_list(le.Verification.sourcedatefirstseenlist, MaxSASLength);
+				SELF.ver_src_lastseen_list := Business_Risk_BIP.Common.truncate_list(le.Verification.sourcedatelastseenlist, MaxSASLength);
 				SELF.ver_addr_src_count := le.Verification.AddrVerificationSourceCount;
-				SELF.ver_addr_src_list := truncate_list(le.Verification.addrverificationsourcelist, MaxSASLength);
-				SELF.ver_addr_src_firstseen_list := truncate_list(le.Verification.AddrVerificationDateFirstSeenList, MaxSASLength);
-				SELF.ver_addr_src_lastseen_list := truncate_list(le.Verification.AddrVerificationDateLastSeenList, MaxSASLength);
+				SELF.ver_addr_src_list := Business_Risk_BIP.Common.truncate_list(le.Verification.addrverificationsourcelist, MaxSASLength);
+				SELF.ver_addr_src_firstseen_list := Business_Risk_BIP.Common.truncate_list(le.Verification.AddrVerificationDateFirstSeenList, MaxSASLength);
+				SELF.ver_addr_src_lastseen_list := Business_Risk_BIP.Common.truncate_list(le.Verification.AddrVerificationDateLastSeenList, MaxSASLength);
 				SELF.ver_fein_src_count := le.Verification.FEINMatchSourceCount;
-				SELF.ver_fein_src_list := truncate_list(le.Verification.feinmatchsourcelist, MaxSASLength);
-				SELF.ver_fein_src_firstseen_list := truncate_list(le.Verification.FEINMatchDateFirstSeenList, MaxSASLength);
-				SELF.ver_fein_src_lastseen_list := truncate_list(le.Verification.FEINMatchDateLastSeenList, MaxSASLength);
+				SELF.ver_fein_src_list := Business_Risk_BIP.Common.truncate_list(le.Verification.feinmatchsourcelist, MaxSASLength);
+				SELF.ver_fein_src_firstseen_list := Business_Risk_BIP.Common.truncate_list(le.Verification.FEINMatchDateFirstSeenList, MaxSASLength);
+				SELF.ver_fein_src_lastseen_list := Business_Risk_BIP.Common.truncate_list(le.Verification.FEINMatchDateLastSeenList, MaxSASLength);
 				SELF.ver_phn_src_id_count := le.Verification.PhoneMatchSourceCountID;
-				SELF.ver_phn_src_id_list := truncate_list(le.Verification.phonematchsourcelistID, MaxSASLength);
-				SELF.ver_phn_src_id_firstseen_list := truncate_list(le.Verification.PhoneDateFirstSeenListID, MaxSASLength);
-				SELF.ver_phn_src_id_lastseen_list := truncate_list(le.Verification.PhoneDateFirstSeenListID, MaxSASLength);				
+				SELF.ver_phn_src_id_list := Business_Risk_BIP.Common.truncate_list(le.Verification.phonematchsourcelistID, MaxSASLength);
+				SELF.ver_phn_src_id_firstseen_list := Business_Risk_BIP.Common.truncate_list(le.Verification.PhoneDateFirstSeenListID, MaxSASLength);
+				SELF.ver_phn_src_id_lastseen_list := Business_Risk_BIP.Common.truncate_list(le.Verification.PhoneDateFirstSeenListID, MaxSASLength);				
 				SELF.ver_phn_src_count := le.Verification.PhoneMatchSourceCount;
-				SELF.ver_phn_src_list := truncate_list(le.Verification.phonematchsourcelist, MaxSASLength);
-				SELF.ver_phn_src_firstseen_list := truncate_list(le.Verification.PhoneMatchDateFirstSeenList, MaxSASLength);
-				SELF.ver_phn_src_lastseen_list := truncate_list(le.Verification.PhoneMatchDateFirstSeenList, MaxSASLength);
+				SELF.ver_phn_src_list := Business_Risk_BIP.Common.truncate_list(le.Verification.phonematchsourcelist, MaxSASLength);
+				SELF.ver_phn_src_firstseen_list := Business_Risk_BIP.Common.truncate_list(le.Verification.PhoneMatchDateFirstSeenList, MaxSASLength);
+				SELF.ver_phn_src_lastseen_list := Business_Risk_BIP.Common.truncate_list(le.Verification.PhoneMatchDateFirstSeenList, MaxSASLength);
 				SELF.build_date_header := le.Data_Build_Dates.BusinessHeaderBuildDate;
 				SELF.build_date_bankruptcy := le.Data_Build_Dates.BankruptcyBuildDate;
 				SELF.build_date_inquiry := le.Data_Build_Dates.InquiriesBuildDate;
@@ -454,19 +441,19 @@ EXPORT to_OutputLayout_SAS_v2( DATASET(Business_Risk_BIP.Layouts.OutputLayout) f
 				SELF.sos_ever_defunct := le.SOS.soseverdefunct;
 				SELF.sos_agent_change_lastseen := le.SOS.SOSRegisterAgentChangeDateLastSeen;
 				SELF.sos_agent_change_mth_since_ls := le.SOS.SOSTimeAgentChange;
-				SELF.sos_inc_filing_date_list := truncate_list(le.SOS.sosdateofincorporationlist, MaxSASLength);
-				SELF.sos_inc_filing_state_list := truncate_list(le.SOS.sosstateofincorporationlist, MaxSASLength);
-				SELF.sos_foreign_state_list := truncate_list(le.SOS.sosforeignstatelist, MaxSASLength);
-				SELF.sos_agent_change_date_list := truncate_list(le.SOS.sosregisteragentchangedatelist, MaxSASLength);
-				SELF.sos_ownership_type_list := truncate_list(le.SOS.sosownershiptypelist, MaxSASLength);
-				SELF.sos_business_nature_list := truncate_list(le.SOS.sosnatureofbusinesslist, MaxSASLength);
-				SELF.sos_corp_structure_list := truncate_list(le.SOS.soscorporatestructurelist, MaxSASLength);
-				SELF.sos_location_desc_list := truncate_list(le.SOS.soslocationdescriptionlist, MaxSASLength);
-				SELF.sos_filing_date_list := truncate_list(le.SOS.sosdateoffilinglist, MaxSASLength);
-				SELF.sos_filing_code_list := truncate_list(le.SOS.sosfilingcodelist, MaxSASLength);
-				SELF.sos_filing_term_list := truncate_list(le.SOS.sostypeoffilingtermlist, MaxSASLength);
-				SELF.sos_filing_amend_count_list := truncate_list(le.SOS.soscountofamendmentslist, MaxSASLength);
-				SELF.sos_code_list := truncate_list(le.SOS.soscodelist, MaxSASLength);
+				SELF.sos_inc_filing_date_list := Business_Risk_BIP.Common.truncate_list(le.SOS.sosdateofincorporationlist, MaxSASLength);
+				SELF.sos_inc_filing_state_list := Business_Risk_BIP.Common.truncate_list(le.SOS.sosstateofincorporationlist, MaxSASLength);
+				SELF.sos_foreign_state_list := Business_Risk_BIP.Common.truncate_list(le.SOS.sosforeignstatelist, MaxSASLength);
+				SELF.sos_agent_change_date_list := Business_Risk_BIP.Common.truncate_list(le.SOS.sosregisteragentchangedatelist, MaxSASLength);
+				SELF.sos_ownership_type_list := Business_Risk_BIP.Common.truncate_list(le.SOS.sosownershiptypelist, MaxSASLength);
+				SELF.sos_business_nature_list := Business_Risk_BIP.Common.truncate_list(le.SOS.sosnatureofbusinesslist, MaxSASLength);
+				SELF.sos_corp_structure_list := Business_Risk_BIP.Common.truncate_list(le.SOS.soscorporatestructurelist, MaxSASLength);
+				SELF.sos_location_desc_list := Business_Risk_BIP.Common.truncate_list(le.SOS.soslocationdescriptionlist, MaxSASLength);
+				SELF.sos_filing_date_list := Business_Risk_BIP.Common.truncate_list(le.SOS.sosdateoffilinglist, MaxSASLength);
+				SELF.sos_filing_code_list := Business_Risk_BIP.Common.truncate_list(le.SOS.sosfilingcodelist, MaxSASLength);
+				SELF.sos_filing_term_list := Business_Risk_BIP.Common.truncate_list(le.SOS.sostypeoffilingtermlist, MaxSASLength);
+				SELF.sos_filing_amend_count_list := Business_Risk_BIP.Common.truncate_list(le.SOS.soscountofamendmentslist, MaxSASLength);
+				SELF.sos_code_list := Business_Risk_BIP.Common.truncate_list(le.SOS.soscodelist, MaxSASLength);
 				SELF.bankruptcy_count := le.Bankruptcy.BankruptcyCount;
 				SELF.bankruptcy_count12 := le.Bankruptcy.BankruptcyCount12Month;
 				SELF.bankruptcy_count24 := le.Bankruptcy.BankruptcyCount24Month;
@@ -544,12 +531,12 @@ EXPORT to_OutputLayout_SAS_v2( DATASET(Business_Risk_BIP.Layouts.OutputLayout) f
 				SELF.lien_Rel_O_FirstSeen := le.Lien_And_Judgment.LienReleasedODateFirstSeen;
 				SELF.lien_Rel_O_LastSeen := le.Lien_And_Judgment.LienReleasedODateLastSeen;
 				SELF.lien_Rel_O_Total_Amount := le.Lien_And_Judgment.LienReleasedOTotalAmount;
-				SELF.lien_filing_date_list := truncate_list(le.Lien_And_Judgment.lienfilingdatelist, MaxSASLength);
-				SELF.lien_released_date_list := truncate_list(le.Lien_And_Judgment.lienreleasedatelist, MaxSASLength);
-				SELF.lien_type_list := truncate_list(le.Lien_And_Judgment.lientypelist, MaxSASLength);
-				SELF.lien_state_list := truncate_list(le.Lien_And_Judgment.lienfilingstatelist, MaxSASLength);
-				SELF.lien_amount_list := truncate_list(le.Lien_And_Judgment.lienamountlist, MaxSASLength);
-				SELF.lien_status_list := truncate_list(le.Lien_And_Judgment.lienfilingstatuslist, MaxSASLength);
+				SELF.lien_filing_date_list := Business_Risk_BIP.Common.truncate_list(le.Lien_And_Judgment.lienfilingdatelist, MaxSASLength);
+				SELF.lien_released_date_list := Business_Risk_BIP.Common.truncate_list(le.Lien_And_Judgment.lienreleasedatelist, MaxSASLength);
+				SELF.lien_type_list := Business_Risk_BIP.Common.truncate_list(le.Lien_And_Judgment.lientypelist, MaxSASLength);
+				SELF.lien_state_list := Business_Risk_BIP.Common.truncate_list(le.Lien_And_Judgment.lienfilingstatelist, MaxSASLength);
+				SELF.lien_amount_list := Business_Risk_BIP.Common.truncate_list(le.Lien_And_Judgment.lienamountlist, MaxSASLength);
+				SELF.lien_status_list := Business_Risk_BIP.Common.truncate_list(le.Lien_And_Judgment.lienfilingstatuslist, MaxSASLength);
 				SELF.judg_filed_count := le.Lien_And_Judgment.JudgmentCount;
 				SELF.judg_released_count := le.Lien_And_Judgment.JudgmentReleasedCount;
 				SELF.judg_state_count := le.Lien_And_Judgment.JudgmentStateCount;
@@ -604,12 +591,12 @@ EXPORT to_OutputLayout_SAS_v2( DATASET(Business_Risk_BIP.Layouts.OutputLayout) f
 				SELF.judg_Rel_O_FirstSeen := le.Lien_And_Judgment.JudgmentReleasedODateFirstSeen;
 				SELF.judg_Rel_O_LastSeen := le.Lien_And_Judgment.JudgmentReleasedODateLastSeen;
 				SELF.judg_Rel_O_Total_Amount := le.Lien_And_Judgment.JudgmentReleasedOTotalAmount;
-				SELF.judg_filing_date_list := truncate_list(le.Lien_And_Judgment.JudgmentFilingDateList, MaxSASLength);
-				SELF.judg_released_date_list := truncate_list(le.Lien_And_Judgment.JudgmentReleasedDateList, MaxSASLength);
-				SELF.judg_type_list := truncate_list(le.Lien_And_Judgment.JudgmentTypeList, MaxSASLength);
+				SELF.judg_filing_date_list := Business_Risk_BIP.Common.truncate_list(le.Lien_And_Judgment.JudgmentFilingDateList, MaxSASLength);
+				SELF.judg_released_date_list := Business_Risk_BIP.Common.truncate_list(le.Lien_And_Judgment.JudgmentReleasedDateList, MaxSASLength);
+				SELF.judg_type_list := Business_Risk_BIP.Common.truncate_list(le.Lien_And_Judgment.JudgmentTypeList, MaxSASLength);
 				SELF.judg_state_list := le.Lien_And_Judgment.JudgmentFilingStateList;
-				SELF.judg_amount_list := truncate_list(le.Lien_And_Judgment.JudgmentAmountList, MaxSASLength);
-				SELF.judg_status_list := truncate_list(le.Lien_And_Judgment.JudgmentFilingStatusList, MaxSASLength);
+				SELF.judg_amount_list := Business_Risk_BIP.Common.truncate_list(le.Lien_And_Judgment.JudgmentAmountList, MaxSASLength);
+				SELF.judg_status_list := Business_Risk_BIP.Common.truncate_list(le.Lien_And_Judgment.JudgmentFilingStatusList, MaxSASLength);
 				SELF.ucc_count := le.Public_Record.ucccount;
 				SELF.ucc_firstseen := le.Public_Record.UCCInitialFilingDateFirstSeen;
 				SELF.ucc_lastseen := le.Public_Record.UCCInitialFilingDateLastSeen;
@@ -620,38 +607,38 @@ EXPORT to_OutputLayout_SAS_v2( DATASET(Business_Risk_BIP.Layouts.OutputLayout) f
 				SELF.ucc_active_count := le.Public_Record.UCCActiveCount;
 				SELF.ucc_terminated_count := le.Public_Record.UCCTerminatedCount;
 				SELF.ucc_other_count := le.Public_Record.UCCOtherCount;
-				SELF.ucc_date_list := truncate_list(le.Public_Record.uccdatelist, MaxSASLength);
-				SELF.ucc_type_list := truncate_list(le.Public_Record.ucctypeslist, MaxSASLength);
-				SELF.ucc_status_list := truncate_list(le.Public_Record.uccfilingstatuslist, MaxSASLength);
+				SELF.ucc_date_list := Business_Risk_BIP.Common.truncate_list(le.Public_Record.uccdatelist, MaxSASLength);
+				SELF.ucc_type_list := Business_Risk_BIP.Common.truncate_list(le.Public_Record.ucctypeslist, MaxSASLength);
+				SELF.ucc_status_list := Business_Risk_BIP.Common.truncate_list(le.Public_Record.uccfilingstatuslist, MaxSASLength);
 				SELF.gov_debarred := le.Public_Record.GovernmentDebarred;
 				SELF.prop_count := le.Asset_Information.AssetPropertyCount;
 				SELF.prop_state_count := le.Asset_Information.AssetPropertyStateCount;
 				SELF.prop_lot_size_total := le.Asset_Information.AssetPropertyLotSizeTotal;
 				SELF.prop_bldg_size_total := le.Asset_Information.AssetPropertySqFootageTotal;
 				SELF.prop_assessed_value_total := le.Asset_Information.AssetPropertyAssessedTotal;
-				SELF.prop_assessed_value_list := truncate_list(le.Asset_Information.PropertyAssessedValueList, MaxSASLength);
+				SELF.prop_assessed_value_list := Business_Risk_BIP.Common.truncate_list(le.Asset_Information.PropertyAssessedValueList, MaxSASLength);
 				SELF.asset_aircraft_count := le.Asset_Information.AssetAircraftCount;
 				SELF.asset_watercraft_count := le.Asset_Information.AssetWatercraftCount;
 				SELF.ind_naics_best := le.Firmographic.FirmNAICSCode;
 				SELF.ind_naics_recent := le.Firmographic.IndustryNAICRecent;
 				SELF.ind_sic_best := le.Firmographic.FirmSICCode;
 				SELF.ind_sic_recent := le.Firmographic.IndustrySICRecent;
-				SELF.ind_naics_src_best_list := truncate_list(le.Firmographic.industrysourcenaicbestlist, MaxSASLength);
-				SELF.ind_naics_src_best_code_list := truncate_list(le.Firmographic.industrynaicbestlist, MaxSASLength);
-				SELF.ind_naics_src_all_list := truncate_list(le.Firmographic.industrysourcenaiccompletelist, MaxSASLength);
-				SELF.ind_naics_src_all_code_list := truncate_list(le.Firmographic.industrynaiccompletelist, MaxSASLength);
-				SELF.ind_sic_src_best_list := truncate_list(le.Firmographic.industrysicsourcebestlist, MaxSASLength);
-				SELF.ind_sic_src_best_code_list := truncate_list(le.Firmographic.industrysicbestlist, MaxSASLength);
-				SELF.ind_sic_src_all_list := truncate_list(le.Firmographic.industrysourcesiccompletelist, MaxSASLength);
-				SELF.ind_sic_src_all_code_list := truncate_list(le.Firmographic.industrysiccompletelist, MaxSASLength);
+				SELF.ind_naics_src_best_list := Business_Risk_BIP.Common.truncate_list(le.Firmographic.industrysourcenaicbestlist, MaxSASLength);
+				SELF.ind_naics_src_best_code_list := Business_Risk_BIP.Common.truncate_list(le.Firmographic.industrynaicbestlist, MaxSASLength);
+				SELF.ind_naics_src_all_list := Business_Risk_BIP.Common.truncate_list(le.Firmographic.industrysourcenaiccompletelist, MaxSASLength);
+				SELF.ind_naics_src_all_code_list := Business_Risk_BIP.Common.truncate_list(le.Firmographic.industrynaiccompletelist, MaxSASLength);
+				SELF.ind_sic_src_best_list := Business_Risk_BIP.Common.truncate_list(le.Firmographic.industrysicsourcebestlist, MaxSASLength);
+				SELF.ind_sic_src_best_code_list := Business_Risk_BIP.Common.truncate_list(le.Firmographic.industrysicbestlist, MaxSASLength);
+				SELF.ind_sic_src_all_list := Business_Risk_BIP.Common.truncate_list(le.Firmographic.industrysourcesiccompletelist, MaxSASLength);
+				SELF.ind_sic_src_all_code_list := Business_Risk_BIP.Common.truncate_list(le.Firmographic.industrysiccompletelist, MaxSASLength);
 				SELF.empl_ct_best := le.Firmographic.FirmEmployeeCount;
 				SELF.empl_ct_recent := le.Firmographic.FirmEmployeeCountmostrecent;
 				SELF.empl_ct_min := le.Firmographic.FirmEmployeeCountsmallest;
 				SELF.empl_ct_max := le.Firmographic.FirmEmployeeCountlargest;
-				SELF.empl_ct_src_list := truncate_list(le.Firmographic.FirmEmployeeCountsourcelist, MaxSASLength);
-				SELF.empl_ct_src_firstseen_list := truncate_list(le.Firmographic.FirmEmployeeCountdatefirstseenlist, MaxSASLength);
-				SELF.empl_ct_src_lastseen_list := truncate_list(le.Firmographic.FirmEmployeeCountdatelastseenlist, MaxSASLength);
-				SELF.empl_ct_src_count_list := truncate_list(le.Firmographic.FirmEmployeeCountlist, MaxSASLength);
+				SELF.empl_ct_src_list := Business_Risk_BIP.Common.truncate_list(le.Firmographic.FirmEmployeeCountsourcelist, MaxSASLength);
+				SELF.empl_ct_src_firstseen_list := Business_Risk_BIP.Common.truncate_list(le.Firmographic.FirmEmployeeCountdatefirstseenlist, MaxSASLength);
+				SELF.empl_ct_src_lastseen_list := Business_Risk_BIP.Common.truncate_list(le.Firmographic.FirmEmployeeCountdatelastseenlist, MaxSASLength);
+				SELF.empl_ct_src_count_list := Business_Risk_BIP.Common.truncate_list(le.Firmographic.FirmEmployeeCountlist, MaxSASLength);
 				SELF.fin_reported_sales := le.Firmographic.FirmReportedSales;
 				SELF.fin_reported_earnings := le.Firmographic.FirmReportedEarnings;
 				SELF.fin_reported_networth := le.Firmographic.FinanceWorthOfBus;
@@ -720,8 +707,8 @@ EXPORT to_OutputLayout_SAS_v2( DATASET(Business_Risk_BIP.Layouts.OutputLayout) f
 				SELF.inq_consumer_addr := le.Inquiry.inquiryconsumeraddress;
 				SELF.inq_consumer_phone := le.Inquiry.inquiryconsumerphone;
 				SELF.inq_consumer_addr_fein := le.Inquiry.inquiryconsumeraddressssn;
-				SELF.inq_date_list := truncate_list(le.Inquiry.inquirydatelist, MaxSASLength);
-				SELF.inq_industry_list := truncate_list(le.Inquiry.inquiryindustrydescriptionlist, MaxSASLength);
+				SELF.inq_date_list := Business_Risk_BIP.Common.truncate_list(le.Inquiry.inquirydatelist, MaxSASLength);
+				SELF.inq_industry_list := Business_Risk_BIP.Common.truncate_list(le.Inquiry.inquiryindustrydescriptionlist, MaxSASLength);
 				
 				SELF.sbfe_source_index := le.SBFE.SBFESourceIndex;
 				SELF.sbfe_name_input_ver_index := le.SBFE.SBFEVerBusInputName;

@@ -585,13 +585,14 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 	#if(Models.LIB_BusinessRisk_Models().TurnOnValidation) // If TRUE, output the model results directly
 		
 	RETURN OUTPUT(SBA_Results_Temp, NAMED('Results'));
+	// RETURN OUTPUT(SBA_Results_Temp_with_PhoneSources, NAMED('Results')); //used for model validation 
 		
-	#else	
-	SBA_Results := IF(TestDataEnabled = FALSE, SBA_Results_Temp,
-																	/* else */ LNSmallBusiness.SmallBusiness_BIP_Testseed_Function(Input,
-																						 TestDataTableName,
-																						 DataPermissionMask,
-																						 ModelsRequested));
+	 #else	
+	 SBA_Results := IF(TestDataEnabled = FALSE, SBA_Results_Temp,
+																	 /* else */ LNSmallBusiness.SmallBusiness_BIP_Testseed_Function(Input,
+																						  TestDataTableName,
+																						  DataPermissionMask,
+																						  ModelsRequested));
 	
 	/* ************************************************************************
 	 * Transform the Small Business Attributes and Scores Results into IESP   *
@@ -609,6 +610,15 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 		SELF.Name := LNSmallBusiness.Constants.SMALL_BIZ_ATTR_V1_NAME;
 		SELF.Attributes := NameValuePairsVersion1;
 	END;
+
+// Create Version 101 Name/Value Pair Attributes no felonies
+	NameValuePairsVersion101 := NORMALIZE(SBA_Results, 197, LNSmallBusiness.SmallBusiness_BIP_Transforms.intoVersion101(LEFT, COUNTER));
+	
+	iesp.smallbusinessanalytics.t_SBAAttributesGroup Version101(LNSmallBusiness.BIP_Layouts.IntermediateLayout le) := TRANSFORM
+		SELF.Name := LNSmallBusiness.Constants.SMALL_BIZ_ATTR_NOFEL;
+		SELF.Attributes := NameValuePairsVersion101;
+	END;
+
 
 	// Create Version 2 Name/Value Pair Attributes
 	NameValuePairsVersion2 := NORMALIZE(SBA_Results, 316, LNSmallBusiness.SmallBusiness_BIP_Transforms.intoVersion2(LEFT, COUNTER));
@@ -638,6 +648,7 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 		SELF.Result.BusinessID.UltID := le.UltID;
 		SELF.Result.Models := le.ModelResults;
 		SELF.Result.AttributeGroups := IF((UNSIGNED)AttributesRequested(AttributeGroup[1..18] = LNSmallBusiness.Constants.SMALL_BIZ_ATTR)[1].AttributeGroup[19..] = 1, PROJECT(le, Version1(LEFT))) + 
+																	 IF((UNSIGNED)AttributesRequested(AttributeGroup[1..18] = LNSmallBusiness.Constants.SMALL_BIZ_ATTR)[1].AttributeGroup[19..] = 101, PROJECT(le, Version101(LEFT))) +
 																	 IF((UNSIGNED)AttributesRequested(AttributeGroup[1..18] = LNSmallBusiness.Constants.SMALL_BIZ_ATTR)[1].AttributeGroup[19..] = 2, PROJECT(le, Version2(LEFT))) +
 																	 IF((UNSIGNED)AttributesRequested(AttributeGroup[1..9] = LNSmallBusiness.Constants.SMALL_BIZ_SBFE_ATTR)[1].AttributeGroup[10..] = 1, PROJECT(le, SBFEVersion1(LEFT))) +
 																	 DATASET([], iesp.smallbusinessanalytics.t_SBAAttributesGroup);
@@ -743,14 +754,14 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
                                                self.i_bus_phone := search.Company.Phone,
 																							 self.i_model_name_1 := ModelsRequested[1].ModelName,
 																							 self.i_model_name_2 := ModelsRequested[2].ModelName,
-																							 self.o_score_1    := left.Result.Models[1].Scores[1].Value,
+																							 self.o_score_1    := IF(ModelsRequested[1].ModelName != '', (String)left.Result.Models[1].Scores[1].Value, ''),
 																							 self.o_reason_1_1 := left.Result.Models[1].Scores[1].ScoreReasons[1].ReasonCode,
 																							 self.o_reason_1_2 := left.Result.Models[1].Scores[1].ScoreReasons[2].ReasonCode,
 																							 self.o_reason_1_3 := left.Result.Models[1].Scores[1].ScoreReasons[3].ReasonCode,
 																							 self.o_reason_1_4 := left.Result.Models[1].Scores[1].ScoreReasons[4].ReasonCode,
 																							 self.o_reason_1_5 := left.Result.Models[1].Scores[1].ScoreReasons[5].ReasonCode,
 																							 self.o_reason_1_6 := left.Result.Models[1].Scores[1].ScoreReasons[6].ReasonCode,
-																							 self.o_score_2    := left.Result.Models[2].Scores[1].Value,
+																							 self.o_score_2    := IF(ModelsRequested[2].ModelName != '', (String)left.Result.Models[2].Scores[1].Value, '');
 																							 self.o_reason_2_1 := left.Result.Models[2].Scores[1].ScoreReasons[1].ReasonCode,
 																							 self.o_reason_2_2 := left.Result.Models[2].Scores[1].ScoreReasons[2].ReasonCode,
 																							 self.o_reason_2_3 := left.Result.Models[2].Scores[1].ScoreReasons[3].ReasonCode,

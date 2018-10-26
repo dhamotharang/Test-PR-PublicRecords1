@@ -45,7 +45,7 @@
 /*--INFO-- This service pulls from the DL file.*/
   
 export dl_search := MACRO
-#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+#CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 #STORED('ScoreThreshold',10);
 
 boolean random_value := false : STORED('Randomize');

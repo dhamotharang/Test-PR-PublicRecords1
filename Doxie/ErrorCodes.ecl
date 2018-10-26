@@ -2,6 +2,8 @@ export varstring ErrorCodes(integer c) :=
 	CASE(c,	
 	    10  => 'No records found',
 			11	=> 'Search is too broad',
+			20  => 'No records found - gateway',
+			21	=> 'Too many subjects found - gateway',
 			203	=> 'Too many subjects found',
 			301	=> 'Insufficient input',
 			302 => 'At least three leading characters required',

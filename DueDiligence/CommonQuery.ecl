@@ -44,6 +44,7 @@ EXPORT CommonQuery := MODULE
 																					SELF.phone := TRIM(personInfo.phone);
 																					SELF.ssn := TRIM(personInfo.ssn);
 																					SELF.accountNumber := TRIM(acctNo);
+                                          SELF.dob := (INTFORMAT(personInfo.dob.Year, 4, 1) + INTFORMAT(personInfo.dob.Month, 2, 1) + INTFORMAT(personInfo.dob.Day, 2, 1));
 																					SELF := [];)]);
 				#else
 						ind_in := DATASET([], DueDiligence.Layouts.Indv_Input);
@@ -92,8 +93,8 @@ EXPORT CommonQuery := MODULE
 				firstRow := requestIn[1] : INDEPENDENT; // Since this is realtime AND not batch, should only have one row on input.
 
 				optionsIn := GLOBAL(firstRow.options);
-				userIn    := GLOBAL(firstRow.user);  //see the t_user layout in PublicRecords.iesp.share for details
-				search    := GLOBAL(firstRow.reportBy);
+				userIn := GLOBAL(firstRow.user);  
+				search := GLOBAL(firstRow.reportBy);
 				
 				//get outer band data - to use if customer data is not populated
 				UNSIGNED1 outerBandDPPAPurpose := Business_Risk_BIP.Constants.Default_DPPA : STORED('DPPAPurpose');
@@ -111,7 +112,7 @@ EXPORT CommonQuery := MODULE
         STRING6 DD_SSNMask := IF(userIn.SSNMask != DueDiligence.Constants.EMPTY, TRIM(userIn.SSNMask), TRIM(outerBandSSNMASK));    //*** EXPECTING ALL/LAST4/FIRST5 from MBS   
 				
         //since the initial version can be defaulted, default options for person and business reports only; attributes need to be requested
-        defaultVersion := MAP(TRIM(STD.Str.ToUpperCase(optionsIn.AttributesVersionRequest)) <> DueDiligence.Constants.EMPTY => TRIM(STD.Str.ToUpperCase(optionsIn.AttributesVersionRequest)),
+        defaultVersion := MAP(TRIM(STD.Str.ToUpperCase(optionsIn.DDAttributesVersionRequest)) <> DueDiligence.Constants.EMPTY => TRIM(STD.Str.ToUpperCase(optionsIn.DDAttributesVersionRequest)),
                               serviceRequested = DueDiligence.Constants.BUSINESS => DueDiligence.Constants.BUS_REQ_ATTRIBUTE_V3,
                               serviceRequested = DueDiligence.Constants.INDIVIDUAL => DueDiligence.Constants.IND_REQ_ATTRIBUTE_V3,
                               DueDiligence.Constants.EMPTY);
@@ -147,11 +148,23 @@ EXPORT CommonQuery := MODULE
 																					SELF.business := populatedBus[1];
 																					SELF.historyDateYYYYMMDD := histDate;
 																					SELF.requestedVersion := version;
+                                          
+                                          //Citizenship fields
+                                          #IF(serviceRequested = DueDiligence.Constants.ATTRIBUTES)
+                                            SELF.modelName := reportBy.person.citizenship.citizenshipModelName;
+                                            SELF.phone2 := reportBy.person.citizenship.phone2;
+                                            SELF.dlNumber := reportBy.person.citizenship.dlNumber;
+                                            SELF.dlState := reportBy.person.citizenship.dlState;
+                                            SELF.email := reportBy.person.citizenship.email;
+                                            
+                                            SELF.productRequested := search.ProductRequestType;
+                                          #END
+                                          
 																					SELF := [];));
 		ENDMACRO;
 		
 		
-		EXPORT ValidateRequest(DATASET(DueDiligence.Layouts.Input) input, UNSIGNED1 glbPurpose, UNSIGNED1 dppaPurpose):= FUNCTION
+		EXPORT ValidateRequest(DATASET(DueDiligence.Layouts.Input) input, UNSIGNED1 glbPurpose, UNSIGNED1 dppaPurpose, STRING11 requestedService):= FUNCTION
         
         BOOLEAN ValidGLB := DueDiligence.CitDDShared.isValidGLBA(glbPurpose);
 				BOOLEAN ValidDPPA := DueDiligence.CitDDShared.isValidDPPA(dppaPurpose);
@@ -185,31 +198,27 @@ EXPORT CommonQuery := MODULE
                                                                                 ValidGLB = FALSE => DueDiligence.CitDDShared.VALIDATION_INVALID_GLB,
                                                                                 ValidDPPA = FALSE => DueDiligence.CitDDShared.VALIDATION_INVALID_DPPA,
                                                                                 DueDiligence.Constants.EMPTY);
+                                                                                
+                                                      validVersions := MAP(TRIM(requestedService) = DueDiligence.Constants.BUSINESS => DueDiligence.Constants.BUS_REQ_ATTRIBUTE_V3,
+                                                                           TRIM(requestedService) = DueDiligence.Constants.INDIVIDUAL => DueDiligence.Constants.IND_REQ_ATTRIBUTE_V3,
+                                                                           DueDiligence.Constants.IND_REQ_ATTRIBUTE_V3 + ' OR ' + DueDiligence.Constants.BUS_REQ_ATTRIBUTE_V3);
+                                                            
+                                                      versionReq := ': ' + validVersions;
+                                                      updatedOhNoMessage := IF(OhNoMessage = DueDiligence.Constants.VALIDATION_INVALID_VERSION, TRIM(OhNoMessage) + versionReq, OhNoMessage);
                                                       
-																											
+																											trimOhNo := TRIM(updatedOhNoMessage);
 
 																											
-																											SELF.validRequest := OhNoMessage = DueDiligence.Constants.EMPTY;
-																											SELF.errorMessage := OhNoMessage;
+																											SELF.validRequest := trimOhNo = DueDiligence.Constants.EMPTY;
+																											SELF.errorMessage := trimOhNo;
 																											SELF := LEFT;));
 
 				RETURN validatedRequests;
 		END;
 		
 		
-		EXPORT mac_FailOnError(invalidRequests, requestedService) := MACRO
-				//update the error message if the version was incorrect
-				updateVersionMessage := PROJECT(invalidRequests, TRANSFORM(DueDiligence.Layouts.Input,
-        
-                                                                    validVersions := MAP(requestedService = DueDiligence.Constants.BUSINESS => DueDiligence.Constants.BUS_REQ_ATTRIBUTE_V3,
-                                                                                         requestedService = DueDiligence.Constants.INDIVIDUAL => DueDiligence.Constants.IND_REQ_ATTRIBUTE_V3,
-                                                                                         DueDiligence.Constants.IND_REQ_ATTRIBUTE_V3 + ' OR ' + DueDiligence.Constants.BUS_REQ_ATTRIBUTE_V3);
-                                                            
-																																		versionReq := ': ' + validVersions;
-																																		SELF.errorMessage := IF(LEFT.errorMessage = DueDiligence.Constants.VALIDATION_INVALID_VERSION, TRIM(LEFT.errorMessage) + versionReq, LEFT.errorMessage);
-																																		SELF := LEFT;));
-
-				IF(COUNT(updateVersionMessage) > 0 AND updateVersionMessage[1].validRequest = FALSE, FAIL(updateVersionMessage[1].errorMessage));
+		EXPORT mac_FailOnError(invalidRequests) := MACRO
+				IF(COUNT(invalidRequests) > 0 AND invalidRequests[1].validRequest = FALSE, FAIL(invalidRequests[1].errorMessage));
 		ENDMACRO;
 			
 			
@@ -479,7 +488,7 @@ EXPORT CommonQuery := MODULE
 				
 				returnData := JOIN(inputWithSeq, results, 
 														LEFT.seq = RIGHT.seq,
-														TRANSFORM({UNSIGNED seq, iespLayout},			//TEMP ADDING SEQ
+														TRANSFORM(iespLayout,
 																			SELF.result.inputecho := LEFT.reportBy;	
 																			SELF.result.AttributeGroup.attributes :=  attrs;
 																			SELF.result.AttributeGroup.AttributeLevelHits := attrsFlags;

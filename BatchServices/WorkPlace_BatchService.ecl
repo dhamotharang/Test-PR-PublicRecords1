@@ -9,8 +9,6 @@
 	<!-- USER OPTIONS -->
 	<part name="IncludeSpouseAlways"             type="xsd:boolean"/>
 	<part name="IncludeSpouseOnlyIfNoDebtor"     type="xsd:boolean"/>
-	<part name="IncludeEmailInfo"                type="xsd:boolean"/>
-	<part name="IncludeAdditionalInfo"           type="xsd:boolean"/>
 	<part name="IncludeCorpInfo"	               type="xsd:boolean"/>
   <part name="IncludeSelfRepCompanyName"			 type="xsd:boolean"/>
 

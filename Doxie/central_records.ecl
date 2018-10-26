@@ -1,15 +1,15 @@
 ﻿IMPORT doxie, doxie_crs, doxie_ln, moxie_phonesplus_server,gateway, 
   LN_PropertyV2_Services, Business_Risk, iesp, CriminalRecords_Services,
   ATF_Services, American_Student_Services, AutoStandardI, suppress, fcra, doxie_raw, ut, EmailService,
-	FFD;
+  FFD;
 
 export central_records(boolean IsFCRA, string1 in_party_type,
                        dataset (doxie.layout_central_header) header_data,
-											 integer1 nonSS = suppress.constants.NonSubjectSuppression.doNothing,
-											 dataset(FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim, 											 
-											 integer8 inFFDMask = 0,
-											 dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile
-											 ) := 
+                       integer1 nonSS = suppress.constants.NonSubjectSuppression.doNothing,
+                       dataset(FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,                        
+                       integer8 inFFDMask = 0,
+                       dataset (FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile
+                       ) := 
 FUNCTION
 
 con := doxie_crs.constants;
@@ -18,7 +18,7 @@ doxie.MAC_Header_Field_Declare(IsFCRA);
 doxie.MAC_Selection_Declare();
 
 // header data (remote or local) we need for calculations of single-sources 
-besr      		:= normalize (choosen (header_data,1), left.best_information_children, transform(right));
+besr          := normalize (choosen (header_data,1), left.best_information_children, transform(right));
 csa_names     := normalize (choosen (header_data,1), left.subject_names, transform(right));
 csa_addresses := normalize (choosen (header_data,1), left.subject_addresses, transform(right));
 
@@ -60,16 +60,16 @@ prov := if(Include_Providers_val, doxie.Prov_records(dids));
 util := if(Include_Utility_val, doxie.Util_records(dids, ssn_mask_value, dl_mask_value, GLB_Purpose, industry_class_val));
 
 aMod := module(project (global_mod,ATF_Services.IParam.search_params,opt)) 
-	export string14 did := (string) dids[1].did;
-	export unsigned1 non_subject_suppression := nonSS;
-	export integer8 FFDOptionsMask := inFFDMask;
+  export string14 did := (string) dids[1].did;
+  export unsigned1 non_subject_suppression := nonSS;
+  export integer8 FFDOptionsMask := inFFDMask;
 end;
 atfr := if(Include_FirearmsAndExplosives_val, ATF_Services.SearchService_Records.report (aMod, isFCRA, ds_flags, slim_pc_recs));
 
-hunr := doxie.hunting_records(dids, isFCRA, ds_flags(file_id = FCRA.FILE_ID.HUNTING_FISHING), slim_pc_recs, inFFDMask);
+hunr := if(Include_HuntingFishingLicenses_val, doxie.hunting_records(dids, isFCRA, ds_flags(file_id = FCRA.FILE_ID.HUNTING_FISHING), slim_pc_recs, inFFDMask));
 
 pilr := if(Include_FAACertificates_val, doxie.pilot_records(dids, dateVal, ssn_mask_value, IsFCRA, 
-														ds_flags(file_id = FCRA.FILE_ID.PILOT_REGISTRATION), slim_pc_recs, inFFDMask));
+                            ds_flags(file_id = FCRA.FILE_ID.PILOT_REGISTRATION), slim_pc_recs, inFFDMask));
 
 cerr := if(Include_FAACertificates_val, Doxie_Raw.Pilot_cert_raw(dids, dateVal, IsFCRA, ds_flags, slim_pc_recs, inFFDMask));
 faar := if(Include_FAAAircrafts_val, doxie.Faa_Aircraft_records (dids, IsFCRA, ds_flags, slim_pc_recs, inFFDMask));
@@ -187,13 +187,13 @@ doxie.layout_central_records tra (layout_central_header l) := transform
   // NB: assumption: properties on FCRA side are necessarily owned (or used to be owned) by subject
   self.propertyV2__indicator              := IF (~IsFCRA, exists (preprop2(owned)), exists(prop));
   self.student_information                := IF (~IsFCRA, global(american_student)); 
-	self.studentV2_information              := IF (~IsFCRA, global(american_studentV2)); 
-	
-	self.hasCriminalConviction              := IF (~IsFCRA, crimIndicators[1].hasCriminalConviction,false);
-	self.isSexualOffender                   := IF (~IsFCRA, crimIndicators[1].isSexualOffender,false);
+  self.studentV2_information              := IF (~IsFCRA, global(american_studentV2)); 
+  
+  self.hasCriminalConviction              := IF (~IsFCRA, crimIndicators[1].hasCriminalConviction,false);
+  self.isSexualOffender                   := IF (~IsFCRA, crimIndicators[1].isSexualOffender,false);
     // subject's names, addresses, relatives, neighbors, etc. are all taken from header_data
   Self := l;
-	self := [];
+  self := [];
 end;
 
 return project (header_data, tra(left));

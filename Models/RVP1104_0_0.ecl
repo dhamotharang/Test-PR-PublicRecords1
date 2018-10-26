@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwisefcra, riskwise, std;
+﻿import risk_indicators, ut, riskwisefcra, riskwise, std, riskview;
 
 export RVP1104_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boolean isCalifornia, boolean xmlPreScreenOptOut ) := FUNCTION
 
@@ -5908,38 +5908,10 @@ export RVP1104_0_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, boo
 
 		uv_eq_only := (integer)ver_src_eq = 1 and ver_src_cnt = 1 and (integer)uv_gong_sourced = 0;
 
-		// uv_rvp1003_content := (uv_rv20_content or uv_gong_sourced or ver_src_em or ver_src_vo or ver_src_p or ver_src_v or add1_naprop > 2 or prof_license_flag or add1_avm_land_use != (string)NULL or trim(ams_file_type, LEFT, RIGHT) != '' or criminal_count > 0 or liens_historical_unreleased_ct > 0 or ver_src_l2 or bankrupt or ver_src_eb or ver_src_w or watercraft_count > 0 or if(max(property_owned_total, property_sold_total) = NULL, NULL, sum(if(property_owned_total = NULL, 0, property_owned_total), if(property_sold_total = NULL, 0, property_sold_total))) > 0 or 90 <= combo_dobscore AND combo_dobscore <= 100 or input_dob_match_level >= (string)7 or ver_src_l2 or ver_src_li or liens_recent_unreleased_count > 0 or liens_historical_unreleased_ct > 0 or criminal_count > 0 or (rc_bansflag in ['1', '2']) or (integer)ver_src_ba = 1 or filing_count > 0 or bk_recent_count > 0 or rc_decsflag = (string)1 or (integer)ver_src_ds = 1 or truedid) and (integer)uv_eq_only = 0;
-		uv_RVP1003_content := ( (uv_rv20_content
-			or uv_gong_sourced               
-			or ver_src_EM or ver_src_VO
-			or ver_src_P
-			or ver_src_V
-			or add1_naprop>2                 
-			or prof_license_flag
-			or trim(add1_avm_land_use) != ''           
-			or trim(ams_file_type) != ''     
-			or criminal_count>0
-			or liens_historical_unreleased_ct>0 
-			or ver_src_L2
-			or bankrupt
-			or ver_src_EB  or ver_src_w
-			or watercraft_count>0          
-			or sum(property_owned_total,property_sold_total)>0 
-			// or 90 <= combo_dobscore <= 100 
-			or combo_dobscore between 90 and 100 
-			or (integer1)input_dob_match_level >= 7 
-			or ver_src_L2 or ver_src_LI or liens_recent_unreleased_count>0 or liens_historical_unreleased_ct>0   
-			or criminal_count > 0 
-			or (integer1)rc_bansflag in [1,2]
-			or ver_src_BA
-			or filing_count > 0
-			or bk_recent_count > 0     
-			or rc_decsflag='1'  or  ver_src_ds   
-			or truedid   )
-			and not uv_EQ_only     );    
+		uv_RVP1003_content := riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid);    
 
 		rvp1104 := map(rc_decsflag='1'  or  ver_src_ds	=> 200,  //add 200 logic for deceased - 2012/11/12
-									(integer)uv_rvp1003_content = 0 	=> 222,
+									(integer)uv_rvp1003_content = 1 	=> 222,
 									 rvp1104_cap);
 
 

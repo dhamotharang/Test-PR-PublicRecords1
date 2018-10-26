@@ -37,6 +37,7 @@
 	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
 	<part name="HistoryDateTimeStamp" type="xsd:string"/>
 	<part name="PoBoxCompliance" type="xsd:boolean"/>
+  <part name="_espclientinterfaceversion'" type="xsd:string"/>
 	<part name="OfacOnly" type="xsd:boolean"/>
 	<part name="ExcludeWatchLists" type="xsd:boolean"/>
 	<part name="OFACversion" type="xsd:unsignedInt"/>
@@ -107,6 +108,8 @@ import ut, codes, address, models, riskwise, suppress, seed_files, Royalty;
 
 export InstantID := MACRO
 
+#stored('_espclientinterfaceversion', '');
+
 #WEBSERVICE(FIELDS(
 		'_LoginID',
 		'_CompanyID',
@@ -146,6 +149,7 @@ export InstantID := MACRO
 		'HistoryDateYYYYMM',
 		'HistoryDateTimeStamp',
 		'PoBoxCompliance',
+    '_espclientinterfaceversion',
 		'OfacOnly',
 		'ExcludeWatchLists',
 		'OFACversion',
@@ -339,7 +343,7 @@ Deltabase_Logging_prep := project(iid, transform(Risk_Reporting.Layouts.LOG_Delt
                                                 //Custom CVI takes presidence over normal CVI
                                                 self.i_model_name_1 := IF(LoggedCCVI != '', LoggedCCVI, 'CVI'),
                                                 self.i_model_name_2 := modelname,
-                                                self.o_score_1 := IF(LoggedCCVI != '', (Integer)left.cviCustomScore, (Integer)left.cvi),
+                                                self.o_score_1 := IF(LoggedCCVI != '', left.cviCustomScore, left.cvi),
                                                 self.o_reason_1_1 := IF(LoggedCCVI != '', left.cviCustomScore_ri[1].hri, left.ri[1].hri),
                                                 self.o_reason_1_2 := IF(LoggedCCVI != '', left.cviCustomScore_ri[2].hri, left.ri[2].hri),
                                                 self.o_reason_1_3 := IF(LoggedCCVI != '', left.cviCustomScore_ri[3].hri, left.ri[3].hri),
@@ -348,7 +352,8 @@ Deltabase_Logging_prep := project(iid, transform(Risk_Reporting.Layouts.LOG_Delt
                                                 self.o_reason_1_6 := IF(LoggedCCVI != '', left.cviCustomScore_ri[6].hri, left.ri[6].hri),
                                                 //Check to see if there was a model requested
                                                 extra_score := left.models[1].scores[1].i <> '';
-                                                self.o_score_2 := IF(extra_score, (Integer)left.models[1].scores[1].i, 0),
+                                                self.o_score_2 := left.models[1].scores[1].i,
+                                                // self.o_score_2 := IF(extra_score, left.models[1].scores[1].i, ''),
                                                 self.o_reason_2_1 := IF(extra_score, left.models[1].scores[1].reason_codes[1].reason_code, ''),
                                                 self.o_reason_2_2 := IF(extra_score, left.models[1].scores[1].reason_codes[2].reason_code, ''),
                                                 self.o_reason_2_3 := IF(extra_score, left.models[1].scores[1].reason_codes[3].reason_code, ''),

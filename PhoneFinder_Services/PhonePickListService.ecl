@@ -69,6 +69,8 @@ MACRO
 		EXPORT BOOLEAN   UseQSent            := FALSE;
 		EXPORT BOOLEAN   UseTargus           := FALSE;
 		EXPORT BOOLEAN   IsPhone7Search      := TRUE;
+		EXPORT BOOLEAN   UseInhousePhones    := TRUE;
+    
 	END;
 	
 	dPhonePickList := PhoneFinder_Services.PhonePickList_Records(dReqBatch,reportMod);

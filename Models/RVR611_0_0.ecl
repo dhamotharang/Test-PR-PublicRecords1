@@ -1,4 +1,4 @@
-import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, std;
+﻿import ut, Risk_Indicators, RiskWise, RiskWiseFCRA, std, riskview;
 
 export RVR611_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boolean isCalifornia) := FUNCTION
 
@@ -340,7 +340,7 @@ export RVR611_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boole
 		/* Overrides Caps and NoScores */
 		RiskView611c := if( ( RiskView611b > 680 ) and ( ssndead or ssnprior or criminal_flag or corrections ), 680, RiskView611b );
 
-		RVR611a := if( (nas_summary <= 4) and (nap_summary <= 4) and (add1_naprop <= 2), 222, RiskView611c );
+		RVR611a := if( riskview.constants.noscore(nas_summary,nap_summary, add1_naprop, le.truedid), 222, RiskView611c );
 
 		riTemp := RiskWiseFCRA.corrReasonCodes(le.consumerflags, 4);
 
@@ -350,7 +350,7 @@ export RVR611_0_0(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, boole
 			RVR611a
 		);
 
-		RVR611 := if( nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 2, 222, RVR611b);
+		RVR611 := if( riskview.constants.noscore(nas_summary,nap_summary, add1_naprop, le.truedid), 222, RVR611b);
 
 
 		inCalif := isCalifornia and ((integer)(boolean)le.iid.combo_firstcount+(integer)(boolean)le.iid.combo_lastcount+

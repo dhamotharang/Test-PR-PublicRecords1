@@ -237,10 +237,18 @@ export t_DDRAttributesBusiness := record (t_DDRAttributesBase)
 end;
 		
 export t_DDRAttributesOptions := record (iesp.share.t_BaseOption)
-	string32 AttributesVersionRequest {xpath('AttributesVersionRequest')};
+	string32 DDAttributesVersionRequest {xpath('DDAttributesVersionRequest')};
 	iesp.share.t_Date HistoryDate {xpath('HistoryDate')};
 	boolean DisplayText {xpath('DisplayText')};
 	string IncludeSpecialAttributes {xpath('IncludeSpecialAttributes')}; //values['None','Online','Batch','']//hidden[internal]
+	integer1 FBOPDateTolerance {xpath('FBOPDateTolerance')};
+	integer1 FBOPDateToleranceYearsPrior {xpath('FBOPDateToleranceYearsPrior')};
+	integer1 FBOPNameOrderSearched {xpath('FBOPNameOrderSearched')};
+	integer1 FBOPDOBNumberOfYearsRadius {xpath('FBOPDOBNumberOfYearsRadius')};
+	boolean FBOPIncludeExactInputLastName {xpath('FBOPIncludeExactInputLastName')};
+	boolean FBOPIncludeNicknames {xpath('FBOPIncludeNicknames')};
+	boolean FBOPIncludeLexIDPrimaryDOBYear {xpath('FBOPIncludeLexIDPrimaryDOBYear')};
+	boolean FBOPIncludeDOBYearRadius {xpath('FBOPIncludeDOBYearRadius')};
 end;
 		
 export t_DDRAttributeGroup := record

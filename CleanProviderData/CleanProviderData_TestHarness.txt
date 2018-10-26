@@ -1,0 +1,16 @@
+Info Log -
+
+Monitoring WU W20180214-085906(HIPIE_ALAPERIASSX-W7D_HIPIE_Plugins.CleanProviderData.CleanProviderData_testcmp_periassx) to completion.
+Plugin CleanProviderData's test composition CleanProviderData_testcmp ran on cluster http://10.241.100.159:8010/ and created workunit W20180214-085906 with status completed
+Plugin CleanProviderData's test composition CleanProviderData_testcmp ran and completed with state "completed"
+Control workunit W20180214-085619 and this test workunit W20180214-085906 had the same number of results
+Control workunit W20180214-085619has no outputs that are missing from test workunit W20180214-085906
+No results were found in test workunit W20180214-085906 that weren't in the control workunit W20180214-085619
+All workunit results had the same number of records in the control workunit W20180214-085619 and this test workunit W20180214-085906
+The content of all workunit results was the same in the control workunit W20180214-085619 and the current test workunit W20180214-085906
+Plugin CleanProviderData passed compliance check
+
+Err Log - 
+
+Plugin CleanProviderData passed compliance check
+

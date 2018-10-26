@@ -1,4 +1,4 @@
-import risk_indicators, ut, riskwisefcra, riskwise, std;
+﻿import risk_indicators, ut, riskwisefcra, riskwise, std, riskview;
 
 export RVB1104_1_0(  grouped dataset(risk_indicators.Layout_Boca_Shell) clamPre, BOOLEAN isCalifornia = FALSE, BOOLEAN isFCRA = TRUE) := FUNCTION
 
@@ -2966,7 +2966,7 @@ bs_attr_derog_flag2 := if(bs_attr_derog_flag > 0 or (integer)lien_flag > 0 or bs
 
 scored_222s_1 := if(max(property_owned_total, property_sold_total) = NULL, NULL, sum(if(property_owned_total = NULL, 0, property_owned_total), if(property_sold_total = NULL, 0, property_sold_total))) > 0 OR (90 <= combo_dobscore AND combo_dobscore <= 100 or (integer)input_dob_match_level >= 7 or (integer)lien_flag > 0 or criminal_count > 0 or (integer)bk_flag > 0 or ssn_deceased or truedid);
 
-pk_222_flag := if(nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 3 AND not(scored_222s_1), 1, 0);
+pk_222_flag := if(riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid), 1, 0);
 
 pk_segment_40 := map(
     (integer)ssn_deceased > 0        => 'X 200  ',
@@ -4698,7 +4698,7 @@ rvb1104c := if(rvb1104b > 680 and (ov_ssndead or ov_ssnprior or ov_criminal_flag
 
 scored_222s := if(max(property_owned_total, property_sold_total) = NULL, NULL, sum(if(property_owned_total = NULL, 0, property_owned_total), if(property_sold_total = NULL, 0, property_sold_total))) > 0 OR (90 <= combo_dobscore AND combo_dobscore <= 100 or (integer)input_dob_match_level >= 7 or (integer)lien_flag > 0 or criminal_count > 0 or (integer)bk_flag > 0 or ssn_deceased or truedid);
 
-rvb1104d := if(nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 3 AND not(scored_222s), 222, rvb1104c);
+rvb1104d := if(riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid), 222, rvb1104c);
 
 rvb1104e := if((integer)ssn_deceased > 0, 200, rvb1104d);
 

@@ -18,6 +18,10 @@ EXPORT getIndReport(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
   
   getVehicleData := DueDiligence.reportIndVehicle(getProfessionalLicenseData);  
   
+  getAircraftData := DueDiligence.reportIndAircraft(getVehicleData);
+  
+  
+  
   
   // OUTPUT(getInputBestInfo, NAMED('getInputBestInfo'));
   // OUTPUT(getPropertyReportData, NAMED('getPropertyReportData'));
@@ -27,5 +31,5 @@ EXPORT getIndReport(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
   //OUTPUT(getVehicleData, NAMED('getVehicleData'));
   
   
-  RETURN getVehicleData;     //****DON't FORGET TO CHANGE THIS!!!!!!!!
+  RETURN getAircraftData;     
 END;

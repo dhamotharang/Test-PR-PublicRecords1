@@ -1,8 +1,4 @@
-/*2016-04-05T22:15:33Z (laure fischer)
-fixed the reason code S69 to S65
-*/
-
-IMPORT Models, Risk_Indicators, RiskWise, RiskWiseFCRA, RiskView, UT, std;
+﻿IMPORT Models, Risk_Indicators, RiskWise, RiskWiseFCRA, RiskView, UT, std, riskview;
 
 EXPORT RVB1503_0_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, BOOLEAN lexIDOnlyOnInput = FALSE) := FUNCTION
 
@@ -755,7 +751,7 @@ Layout_Debug := RECORD
 //=             That go into the score for this model          =
 //==============================================================	 
 	
-	iv_rv5_unscorable := if(NAS_Summary <= 4 and NAP_Summary <= 4 and Infutor_NAP <= 4 and Add_Input_NAProp <= 3 and not(TrueDID), '1', '0');
+	iv_rv5_unscorable := if(riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid), '1', '0');
 	
 	rv_a44_prop_owner_inp_only := map(
 	    not(truedid)                                => '',

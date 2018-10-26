@@ -1,5 +1,5 @@
 
-IMPORT BatchDatasets, BatchServices, CriminalRecords_BatchService, Doxie, Doxie_Regression, NID;
+IMPORT BatchDatasets, CriminalRecords_BatchService, Doxie, NID;
 
 EXPORT fn_getDOCandCriminalRecs(DATASET(Layouts.batch_in) ds_batch_in, IParams.BatchParams in_mod) := 
 	FUNCTION

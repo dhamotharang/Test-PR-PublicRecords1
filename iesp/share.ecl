@@ -136,6 +136,8 @@ export t_User := record
 	boolean OutcomeTrackingOptOut {xpath('OutcomeTrackingOptOut')};//hidden[internal]
 	integer NonSubjectSuppression {xpath('NonSubjectSuppression')};//hidden[ecl_only]
 	string ProductCode {xpath('ProductCode')};//hidden[internal]
+  string OutputType {xpath('OutputType')};
+	string10 DeathMasterPurpose {xpath('DeathMasterPurpose')};//hidden[internal]
 end;
 		
 export t_LoginInfo := record

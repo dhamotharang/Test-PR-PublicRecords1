@@ -1,0 +1,69 @@
+﻿ID "77d6cb85-60a3-4818-8656-2e5cb220cd88";
+NAME JoinDataset;
+LABEL "Join Dataset";
+VERSION "1.1.0";
+AUTHOR "CarmigJX";
+CATEGORY JOIN;
+DESCRIPTION "Joins two datasets";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	DATASET dsInput1
+    FIELD JoinFields1: MANY,LABEL("Join Fields from dsInput1"),DESCRIPTION("Field to join on in dsInput1");
+  END
+	DATASET dsInput2
+    FIELD JoinFields2: MANY,LABEL("Join Fields from dsInput2"),DESCRIPTION("Fields to join on in dsInput2");
+    FIELD AppendFields: MANY,LABEL("Append Fields"),DESCRIPTION("Fields to append to the output layout from dsInput2"),OPTIONAL,NULL(""),DEFAULT("");
+  END
+	ENUM("Inner","Left Outer","Right Outer","Full Outer","Left Only","Right Only","Full Only") JoinType: LABEL("Join Type"),DESCRIPTION("Join type to use"), DEFAULT("Inner");
+  ENUM("True","False") KeepOption: LABEL("Keep?"),DEFAULT("False"),DESCRIPTION("Enables KEEP option in the JOIN. KEEP must only be used with Inner or Left Outer Join Types"),OPTIONAL;
+  STRING KeepValue:LABEL("Keep Value"),OPTIONAL,DEFAULT("1"),DESCRIPTION("The maximum number of matching records to generate into the result set"),ENABLE(KeepOption=True);
+  STRING Prefix:LABEL("Prefix"),OPTIONAL,DEFAULT(""),DESCRIPTION("Prefix prepended to append fields, to avoid column conflicts");
+END
+
+OUTPUTS
+	DATASET dsOutput(dsInput1):PREFIX(INPUTS.Prefix)
+		INPUTS.AppendFields;
+  END
+  DATASET JoinDatasetTableStats: SIDE,WUID
+		INTEGER InputDataset1Count: FEW;
+    INTEGER InputDataset2Count: FEW;
+    INTEGER OutputDatasetCount: FEW;
+	END
+END
+
+VISUALIZE JoinDatasetStats: LABEL("Join Dataset Stats")
+	  TABLE JoinStats(JoinDatasetTableStats): TITLE("Join Stats"),LABEL("Input Dataset 1 Count","Input Dataset 2 Count", "Output Dataset Count"),VALUE(InputDataset1Count,InputDataset2Count, OutputDatasetCount);
+END
+
+GENERATES INLINE
+	IMPORT JoinDataset;
+  
+  strJoinFields1        := '%#foreach(INPUTS.JoinFields1,",")% %INPUTS.JoinFields1% %#end%';
+  strJoinFields2        := '%#foreach(INPUTS.JoinFields2,",")% %INPUTS.JoinFields2% %#end%';
+  strJoinStatement      := JoinDataset.macComputeJoinStatement(strJoinFields1, strJoinFields2);
+  
+  strFields             := '%#foreach(INPUTS.AppendFields,",")% %INPUTS.AppendFields% %#end%';
+
+  dFinalOutput          := JoinDataset.macJoinDataset(%dsInput1%, %dsInput2%, strJoinStatement, %^qJoinType%, strFields, %KeepOption%, %KeepValue%, '%Prefix%');
+  %^edsOutput%          := dFinalOutput %^p%;
+  
+  %^eJoinDatasetTableStats%  := DATASET([{COUNT(%dsInput1%),COUNT(%dsInput2%),COUNT(%dsOutput%)}],{INTEGER InputDataset1Count, INTEGER InputDataset2Count, INTEGER OutputDatasetCount});
+
+ENDGENERATES
+
+
+RESOURCES
+	FILE JoinDataset_1.1_readme: FILENAME("JoinDataset_1.1_ReadMe.txt"),LABEL("Plugin Readme File");
+	FILE JoinDataset_1.1_testcmp: FILENAME("joindataset_1.1_testcmp.txt"),LABEL("Plugin Test Composition");
+	FILE JoinDataset_1.1_TestHarness: FILENAME("JoinDataset_1.1_TestHarness.txt"),LABEL("Plugin Test Harness");
+	FILE JoinDataset_1.1_BuildTestDataset: FILENAME("JoinDataset_1.1_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+	FILE JoinDataset_1.1_CheckList: FILENAME("JoinDataset_1.1_CheckList.xlsx"),LABEL("Plugin checklist");
+	ECL  JoinDataset:FILENAME("JoinDataset"), URL("<http://10.241.100.153:8010>"); 
+	LOGICALFILE test: FILENAME("~qa::joindataset::joindataset::input"),URL("http://10.241.100.159:8010"),DALIIP("10.241.100.159"),CLUSTER("thor100_100dev");
+	LOGICALFILE test2: FILENAME("~qa::joindataset::joindataset::input2"),URL("http://10.241.100.159:8010"),DALIIP("10.241.100.159"),CLUSTER("thor100_100dev");
+END

@@ -1,4 +1,4 @@
-import risk_indicators, riskwise, riskwisefcra, ut, std;
+﻿import risk_indicators, riskwise, riskwisefcra, ut, std, riskview;
 
 export RVC1208_1_0( grouped dataset(risk_indicators.Layout_Boca_Shell) clam, BOOLEAN isCalifornia = FALSE, BOOLEAN xmlPreScreenOptOut = FALSE ) := FUNCTION
 
@@ -489,7 +489,7 @@ scored_222s := sum(property_owned_total,property_sold_total)>0
 
 rvc1208_1_0 := map(
     ssn_deceased                                                                		=> 200,
-    nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 2 AND not(scored_222s) => 222,
+    riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid) => 222,
                                                                                        rvc1208_1_0_1);
 
 glrc97 := criminal_count > 0;

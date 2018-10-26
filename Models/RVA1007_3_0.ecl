@@ -1,4 +1,4 @@
-IMPORT ut, RiskWise, RiskWiseFCRA, Risk_Indicators, std;
+﻿IMPORT ut, RiskWise, RiskWiseFCRA, Risk_Indicators, std, riskview;
 
 EXPORT rva1007_3_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, BOOLEAN isCalifornia = FALSE) := FUNCTION
 
@@ -897,7 +897,7 @@ EXPORT rva1007_3_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, BOO
 	    pred_inc > 250000 => 250999,
 	                         round(pred_inc/1000)*1000);
 	
-	estimated_income1 := if(nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 2, 0, estimated_income1_1);
+	estimated_income1 := if(riskview.constants.noscore(nas_summary,nap_summary, add1_naprop, le.truedid), 0, estimated_income1_1);
 	
 	estimated_income1_cap := map(
 	    estimated_income1 = 0      => 26000,
@@ -1527,7 +1527,7 @@ EXPORT rva1007_3_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, BOO
 	mod1_renter := mod1_custom1;
 	
 	rva1007_3_0_float := map(
-	    nas_summary <= 4 and nap_summary <= 4 and add1_naprop <= 2 => 222,
+	    riskview.constants.noscore(le.iid.nas_summary,le.iid.nap_summary, le.address_verification.input_address_information.naprop, le.truedid) => 222,
 	    TRIM(pk_segment) = '1 Owner '                            => mod1_owner,
 	    TRIM(pk_segment) = '2 Renter'                            => mod1_renter,
 	    TRIM(pk_segment) = '3 Other '                            => mod1_other,

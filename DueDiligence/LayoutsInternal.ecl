@@ -149,37 +149,45 @@ EXPORT LayoutsInternal := MODULE
     UNSIGNED2 maxWatercraftLength;
     DATASET(DueDiligence.Layouts.WatercraftDataLayout) allWatercraft;
   END;
+  
+  EXPORT AircraftSlimLayout := RECORD
+    InternalSeqAndIdentifiersLayout;
+    
+    UNSIGNED4 historyDate;
+    UNSIGNED6 id;
+    UNSIGNED4 dateFirstSeen;
+    UNSIGNED4 dateLastSeen;
+    STRING1 statusFlag;
+    
+    DueDiligence.Layouts.AircraftDataLayout;
+  END;
 
-//------                                      ------
-//------                                      ------
-//------  Populated with data for the report  ------
-//------                                      ------
- EXPORT VehicleSlimLayout := RECORD
-  InternalSeqAndIdentifiersLayout;
-  STRING30 Vehicle_Key;
-  STRING15 Iteration_Key;
-  STRING15 Sequence_Key;
-  UNSIGNED4 historyDate, 
-  UNSIGNED4 dateFirstSeen;
-  STRING1 historyFlag;
-  STRING1 nameType;
-  DueDiligence.Layouts.VehicleDataLayout;
-  //DPPA verification fields
-  STRING2 stateOrigin;
-  STRING2 sourceCode;
-  
-  //TO BE REMOVED AFTER DUEDIL-424
-  InternalSeqAndIdentifiersLayout  VehicleReportData;
-  string2			Source_Code;
-  string1     Orig_name_type;
-  string5			Orig_Make_Code;                 
-  string3			Orig_Series_Code;
-  string25		Orig_Series_Desc;               
-  string3			Orig_Model_Code;                
-  UNSIGNED4   historyDateYYYYMMDD;
-  unsigned4   sl_vehicleCount  := 0;
-  
- END;		
+
+  EXPORT VehicleSlimLayout := RECORD
+    InternalSeqAndIdentifiersLayout;
+    STRING30 Vehicle_Key;
+    STRING15 Iteration_Key;
+    STRING15 Sequence_Key;
+    UNSIGNED4 historyDate, 
+    UNSIGNED4 dateFirstSeen;
+    STRING1 historyFlag;
+    STRING1 nameType;
+    DueDiligence.Layouts.VehicleDataLayout;
+    //DPPA verification fields
+    STRING2 stateOrigin;
+    STRING2 sourceCode;
+    
+    //TO BE REMOVED AFTER DUEDIL-424
+    InternalSeqAndIdentifiersLayout  VehicleReportData;
+    string2			Source_Code;
+    string1     Orig_name_type;
+    string5			Orig_Make_Code;                 
+    string3			Orig_Series_Code;
+    string25		Orig_Series_Desc;               
+    string3			Orig_Model_Code;                
+    UNSIGNED4   historyDateYYYYMMDD;
+    unsigned4   sl_vehicleCount  := 0;
+  END;		
  
  EXPORT SharedVehicleSlim := RECORD
     InternalSeqAndIdentifiersLayout;

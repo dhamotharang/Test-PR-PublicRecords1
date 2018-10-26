@@ -115,7 +115,7 @@ EXPORT MAC_MEOW_xIDL_Batch(infile,Ref = '',Input_DID = '',Input_SNAME = '',Input
   SELF.MAINNAME :=   '';/*MMXBHACK02a*/
   SELF.FULLNAME :=   '';/*MMXBHACK02b*/
   SELF.ADDR1 :=   '';/*MMXBHACK02c*/
-  SELF.LOCALE :=   '';/*MMXBHACK02d*/  
+  SELF.LOCALE :=   '';/*MMXBHACK02d*/
   SELF.ADDRESS :=   '';/*MMXBHACK02e*/
   #IF ( #TEXT(Input_fname2) <> '' )
     SELF.fname2 := (TYPEOF(SELF.fname2))le.Input_fname2;

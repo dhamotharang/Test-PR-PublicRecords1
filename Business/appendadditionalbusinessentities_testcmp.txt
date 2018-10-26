@@ -1,0 +1,162 @@
+﻿ID "HIPIE_Plugins.Business.AppendAdditionalBusinessEntities_cmp";
+NAME AppendAdditionalBusinessEntities_testcmp;
+LABEL "Test composition for Append Additional Business Entities";
+DESCRIPTION "Auto-generated test composition for plugin AppendAdditionalBusinessEntities";
+VERSION "1.0.0";
+AUTHOR "CarmigJX";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING CompareWUID: DEFAULT("W20171214-093536"); 
+  STRING JURISDICTIONSTATES: OPTIONAL, DEFAULT("AK,AL,AR,AZ,CA,CO,CT,DE,FL,GA,HI,IA,ID,IL,IN,KS,KY,LA,MA,MD,ME,MI,MN,MO,MS,MT,NC,ND,NE,NH,NJ,NM,NV,NY,OH,OK,OR,PA,RI,SC,SD,TN,TX,UT,VA,VT,WA,WI,WV,WY"); 
+END
+
+INSTANCE OutDataset.OutDataset(Ins004): LABEL("Output Dataset"),VERSION("1.0.0")
+	dsInput="^Ins003|dsOutput"
+	name="~qa::business::appendadditionalbusinessentities::output"
+	Method="THOR"
+END 
+INSTANCE Business.AppendAdditionalBusinessEntities(Ins003): LABEL("Append Additional Business Entities"),VERSION("1.0.0")
+	dsInput="^Ins002|dsOutput" 
+	UltID="ultid"
+	SeleID="seleid"
+	ProxID="proxid"
+	CompanyName="tradename"
+	PrimaryRange="locaddrscleanprimaryrange"
+	PreDirectional="locaddrscleanpredirectional"
+	PrimaryName="locaddrscleanprimaryname"
+	AddressSuffix="locaddrscleanaddresssuffix"
+	PostDirectional="locaddrscleanpostdirectional"
+	UnitDesignation="locaddrscleanunitdesignation"
+	SecondaryRange="locaddrscleansecondaryrange"
+	PostalCity="locaddrscleanpostalcity"
+	VanityCity="locaddrscleanvanitycity"
+	State="locaddrscleanstate"
+	Zip5="locaddrscleanzip"
+	Zip4="locaddrscleanzip4"
+	County="locaddrscleancounty"
+	Latitude="locaddrscleanlatitude"
+	Longitude="locaddrscleanlongitude"
+	JurisdictionStates=^GLOBAL|JURISDICTIONSTATES 
+  	Prefix="Test"
+  	DPPAPURPOSE="1"
+  	GLBPURPOSE="3"
+  	DATARESTRICTIONMASK="0000"
+END
+INSTANCE Business.AppendAdditionalBusinessEntities(Ins002): LABEL("Append Additional Business Entities"),VERSION("1.0.0")
+	dsInput="^Ins001|dsOutput" 
+	UltID="ultid"
+	SeleID="seleid"
+	ProxID="proxid"
+	CompanyName="tradename"
+	PrimaryRange="locaddrscleanprimaryrange"
+	PreDirectional="locaddrscleanpredirectional"
+	PrimaryName="locaddrscleanprimaryname"
+	AddressSuffix="locaddrscleanaddresssuffix"
+	PostDirectional="locaddrscleanpostdirectional"
+	UnitDesignation="locaddrscleanunitdesignation"
+	SecondaryRange="locaddrscleansecondaryrange"
+	PostalCity="locaddrscleanpostalcity"
+	VanityCity="locaddrscleanvanitycity"
+	State="locaddrscleanstate"
+	Zip5="locaddrscleanzip"
+	Zip4="locaddrscleanzip4"
+	County="locaddrscleancounty"
+	Latitude="locaddrscleanlatitude"
+	Longitude="locaddrscleanlongitude"
+	JurisdictionStates=^GLOBAL|JURISDICTIONSTATES 
+	// JurisdictionStates="IL","FL" 
+  	DPPAPURPOSE="1"
+  	GLBPURPOSE="3"
+  	DATARESTRICTIONMASK="0000"
+END
+INSTANCE UseDataset.UseDataset(Ins001): LABEL("Use Dataset"),VERSION("1.1")
+	LogicalFilename="~qa::business::appendadditionalbusinessentities::input"
+	Structure="RECORD
+		string idtype;
+		string suffix;
+		string bip;
+		integer ultid;
+		integer seleid;
+		integer proxid;
+		string recordid;
+		string accountno;
+		string taxtypecode;
+		string taxtypedescription;
+		string feinssn;
+		string permitactiveind;
+		string statusdate;
+		string permitnmbr;
+		string permitstartdate;
+		string legalname;
+		string tradename;
+		string locaddr1;
+		string locaddr2;
+		string loccity;
+		string locstate;
+		string loczip;
+		string mailaddr1;
+		string mailaddr2;
+		string mailcity;
+		string mailstate;
+		string mailzip;
+		string poaaddr1;
+		string poaaddr2;
+		string poacity;
+		string poastate;
+		string poazip;
+		string auditaddr1;
+		string auditaddr2;
+		string auditcity;
+		string auditstate;
+		string auditzip;
+		string refundaddr1;
+		string refundaddr2;
+		string refundcity;
+		string refundstate;
+		string refundzip;
+		string electcredaddr1;
+		string electcredaddr2;
+		string electcredcity;
+		string electcredstate;
+		string electcredzip;
+		string electdebitaddr1;
+		string electdebitaddr2;
+		string electdebitcity;
+		string electdebitstate;
+		string electdebitzip;
+		string phone1;
+		string phone2;
+		string entitytypecode;
+		string entitytypedesc;
+		string10 locaddrscleanprimaryrange;
+		string2 locaddrscleanpredirectional;
+		string28 locaddrscleanprimaryname;
+		string4 locaddrscleanaddresssuffix;
+		string2 locaddrscleanpostdirectional;
+		string10 locaddrscleanunitdesignation;
+		string8 locaddrscleansecondaryrange;
+		string25 locaddrscleanpostalcity;
+		string25 locaddrscleanvanitycity;
+		string2 locaddrscleanstate;
+		string5 locaddrscleanzip;
+		string4 locaddrscleanzip4;
+		string2 locaddrscleandbpc;
+		string1 locaddrscleancheckdigit;
+		string2 locaddrscleanrecordtype;
+		string5 locaddrscleancounty;
+		REAL locaddrscleanlatitude;
+		REAL locaddrscleanlongitude;
+		string4 locaddrscleanmsa;
+		string7 locaddrscleangeoblock;
+		string1 locaddrscleangeomatchcode;
+		string4 locaddrscleanerrorstatus;
+		boolean locaddrscleancachehit;
+		boolean locaddrscleancleanerhit;
+	 END;"
+	 Method="THOR" 
+END

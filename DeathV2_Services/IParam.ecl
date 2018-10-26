@@ -43,7 +43,7 @@ EXPORT IParam := MODULE
 	INTERFACE(AutoStandardI.DataPermissionI.params, AutoStandardI.DataRestrictionI.params, AutoStandardI.InterfaceTranslator.industry_class_val.params)	
 		EXPORT BOOLEAN UseDeathMasterSSAUpdates := FALSE;
 		EXPORT BOOLEAN IsConsumer := FALSE;
-		EXPORT BOOLEAN SuppressNonMarketingDeathSources := FALSE;		
+		EXPORT BOOLEAN SuppressNonMarketingDeathSources := FALSE;	
 	END;
 	
 	EXPORT GetDeathRestrictions(inmod) := 
@@ -55,7 +55,7 @@ EXPORT IParam := MODULE
 		death_mod := MODULE(dmod)	
 			EXPORT BOOLEAN UseDeathMasterSSAUpdates := AutoStandardI.DataPermissionI.val(dmod).use_DeathMasterSSAUpdates;
 			EXPORT BOOLEAN IsConsumer := AutoStandardI.InterfaceTranslator.industry_class_value.val(dmod) = ut.IndustryClass.Knowx_IC;
-			EXPORT BOOLEAN SuppressNonMarketingDeathSources := FALSE : stored('SuppressNonMarketingDeathSources');	
+			EXPORT BOOLEAN SuppressNonMarketingDeathSources := FALSE : stored('SuppressNonMarketingDeathSources');
 		END;		
 		
 	RETURN death_mod;

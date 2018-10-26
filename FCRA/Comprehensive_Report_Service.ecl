@@ -9,7 +9,7 @@
 export Comprehensive_Report_Service := MACRO
 
 IMPORT  AutoStandardI, CriminalRecords_Services, doxie, doxie_crs, 
-        EquifaxDecisioning, FFD, FCRA, Gateway, iesp, Royalty, suppress, WSInput;
+        EquifaxDecisioning, FFD, FCRA, Gateway, Royalty, suppress, WSInput;
 
 WSInput.MAC_FCRA_Comprehensive_Report_Service();
 
@@ -43,12 +43,15 @@ integer8 inFFDMask := FFD.FFDMask.Get(inApplicationType:=application_type_value)
 boolean ShowConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDMask);
 
 // get person context
+datagroups_set := IF(Include_Them_All, FFD.Constants.DataGroupset.CompReport, doxie_crs.datagroups_select());
 in_pc := dataset([{FFD.Constants.SingleSearchAcctno, (unsigned)did_fcra}], FFD.Layouts.DidBatch);
-pc_recs := FFD.FetchPersonContext(in_pc, gateways,, inFFDMask);
+pc_recs := FFD.FetchPersonContext(in_pc, gateways, datagroups_set, inFFDMask);
 slim_pc_recs := FFD.SlimPersonContext(pc_recs);
 
 alert_indicators := FFD.ConsumerFlag.getAlertIndicators(pc_recs, inFCRAPurpose, inFFDMask)[1];
 suppress_results_due_alerts := alert_indicators.suppress_records;
+
+suppress_reseller_data_due_alerts := FFD.ConsumerFlag.getAlertIndicators(pc_recs, inFCRAPurpose, inFFDMask, isReseller := TRUE)[1].suppress_records;
 
 // create pseudo-best record only to get flag records; more realistic best is calculated later
 ds_flags := FFD.GetFlagFile (PROJECT (dids, TRANSFORM (doxie.layout_best, SELF.did := LEFT.did, SELF := [])),
@@ -73,7 +76,8 @@ eq_act_dec_rec :=
   EquifaxDecisioning.getAttributes(besr, 
                                    gateways,
                                    EquifaxDecisioningRequested, 
-                                   input_params.DataPermissionMask
+                                   input_params.DataPermissionMask,
+                                   suppress_results_due_alerts OR suppress_reseller_data_due_alerts //if suppressed - no gateway call is made, only gateway usage code is repoted than
                                   );
 
 tempmod := module(project(AutoStandardI.GlobalModule(IsFCRA),CriminalRecords_Services.IParam.report,opt))
@@ -100,7 +104,14 @@ doxie_crs.layout_report_fcra patch(doxie.layout_central_records l) := transform
   self := []; //vehicles, images
 end;
 
-all_records := if(suppress_results_due_alerts, dataset([], doxie_crs.layout_report_fcra), 
+doxie_crs.layout_report_fcra xf_reseller_only() := transform
+  self.Eq_Decisioning_Attr   := eq_act_dec_rec[1];
+  self := [];
+end;
+
+all_records := if(suppress_results_due_alerts, 
+                  // suppression of Equifax gateway results due to alerts is taken care in EquifaxDecisioning.getAttributes; only gateway usage code is repoted than
+                  if(EquifaxDecisioningRequested, dataset([xf_reseller_only()]), dataset([], doxie_crs.layout_report_fcra)), 
                   project (cent, patch(left)));
 
 consumer_statements_all := if(ShowConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);

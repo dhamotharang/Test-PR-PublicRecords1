@@ -6,6 +6,7 @@ EXPORT Boca_Shell_Bankruptcy_FCRA(integer bsVersion, unsigned8 BSOptions=0,
 
   todaysdate := (string) risk_indicators.iid_constants.todaydate;
 	insurance_fcra_filter :=  (BSOptions & Risk_Indicators.iid_constants.BSOptions.InsuranceFCRAMode) > 0;
+	Insurance_bk_chapter_exception := (BSOptions & Risk_Indicators.iid_constants.BSOptions.InsuranceFCRABankruptcyException) > 0;
 
 	bans_did := BankruptcyV3.key_bankruptcyV3_did(true);
 	bans_Withdrawn_Status := BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus(,,TRUE);	
@@ -108,6 +109,7 @@ EXPORT Boca_Shell_Bankruptcy_FCRA(integer bsVersion, unsigned8 BSOptions=0,
 							LEFT.bk_tmsid<>'' AND
 							keyed(LEFT.bk_tmsid = RIGHT.tmsid) AND
 							right.name_type='D' and
+							trim(right.chapter) in risk_indicators.iid_constants.set_permitted_bk_chapters(bsversion, Insurance_bk_chapter_exception) and
 						 (unsigned)right.did=left.did and
 						 (unsigned)(RIGHT.date_filed[1..6]) < left.historydate and
 							if(insurance_fcra_filter and right.chapter in ['7','13'],
@@ -119,6 +121,7 @@ EXPORT Boca_Shell_Bankruptcy_FCRA(integer bsVersion, unsigned8 BSOptions=0,
 	bankrupt_full_thor_tmsid := JOIN (distribute(bankrupt_added_after_withdrawn_check(bk_tmsid <> ''), hash64(bk_tmsid)), 
 							distribute(pull(bans_search(name_type='D')), hash64(tmsid)),
 						 LEFT.bk_tmsid = RIGHT.tmsid AND
+						 trim(right.chapter) in risk_indicators.iid_constants.set_permitted_bk_chapters(bsversion, Insurance_bk_chapter_exception) and
 						 (unsigned)right.did=left.did and
 						 (unsigned)(RIGHT.date_filed[1..6]) < left.historydate and
 							if(insurance_fcra_filter and right.chapter in ['7','13'],
@@ -229,8 +232,7 @@ EXPORT Boca_Shell_Bankruptcy_FCRA(integer bsVersion, unsigned8 BSOptions=0,
 			self := le;
 		END;
 		w_bk_correct := PROJECT(w_bk, correct_bk(LEFT));
-		
-    
+		    
 		RETURN w_bk_correct;
 END;
 		
