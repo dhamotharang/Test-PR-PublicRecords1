@@ -86,9 +86,9 @@ prep := project(indata,into_bus_input(LEFT));
 
 boolean hasbdids := false;
 boolean ExcludeWatchLists := false;
-boolean OFAC := true;
+boolean OFAC := true; // ofac_only
 Real Global_WatchList_Threshold := if(OFACversion = 4, 0.85, 0.84);
-boolean include_ofac := if(OFACversion = 4, True, False);
+boolean include_ofac := if(OFACversion >= 2, True, False);
  
 biid_results := business_risk.InstantID_Function(prep,gateways,hasbdids,dppa,glb,isUtility,ln_branded,'pb01',ExcludeWatchLists,ofac, ofac_version := OFACversion, include_ofac := include_ofac, Global_WatchList_Threshold := Global_WatchList_Threshold, dataRestriction:=DataRestriction, dataPermission:=dataPermission);
 

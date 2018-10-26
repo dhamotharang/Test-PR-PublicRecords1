@@ -41,7 +41,7 @@ BridgerGateway := gateways_in(servicename='bridgerwlc')[1].url!='';
 OFACversion := map(BridgerGateway and tribcode in ['np21', 'np25', 'np27', 'np50', 'np60', 'np90', 'np91', 'np92'] and ofac_version = 4 => 4,
                    BridgerGateway and tribcode = 'np21' => 4, // this won't hit fail message on line 59 as it was determined that can't be done without changing current prod logic
 																			tribcode in ['np90','np91','np92'] and ofac_version != 4 => 3,
-																																						1);                                                                                                             
+																																						ofac_version);                                                                                                             
 
 targusGatewaySet := ['np21','np22','np24','np25','np27','np50','np60','np80','np81','np82','np90', 'np91', 'np92'];
 attusSet := ['np80','np81','np82'];
