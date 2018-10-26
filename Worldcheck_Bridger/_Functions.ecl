@@ -1185,6 +1185,9 @@
 				trim(kword, left, right) = 'FRCNIL' =>SubGroup_Constants.numKeywordsID.KEYWORD_FRCNIL,
 				trim(kword, left, right) = 'PECG' =>SubGroup_Constants.numKeywordsID.KEYWORD_PECG,
 				trim(kword, left, right) = 'INFIU' =>SubGroup_Constants.numKeywordsID.KEYWORD_INFIU,
+				trim(kword, left, right) = 'GHBOG' =>SubGroup_Constants.numKeywordsID.KEYWORD_GHBOG,
+				trim(kword, left, right) = 'EUEIB' =>SubGroup_Constants.numKeywordsID.KEYWORD_EUEIB,
+				trim(kword, left, right) = 'CNCBRC' =>SubGroup_Constants.numKeywordsID.KEYWORD_CNCBRC,
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);

@@ -41,7 +41,13 @@ EXPORT As_Business_Linking (
 				self.company_sic_code3           := l.sic3;
 				self.company_sic_code4           := l.sic4;
 				self.company_sic_code5           := l.sic5;
-				self.company_address_type_raw    := if(l.v_city_name<>'' Or l.st<>'' Or l.zip <>'' , 'BUSINESS','');
+				self.company_org_structure_raw   := map(l.government = 'Y' and l.small = 'Y' => 'GOVERNMENT-SMALL_BUSINESS',
+																							  l.government = 'Y'   								 => 'GOVERNMENT',
+																								l.small = 'Y' 											 => 'SMALL_BUSINESS',
+																								'');
+				self.company_address_type_raw    := map(l.home_office =  'Y' and (l.v_city_name<>'' or l.st<>'' or l.zip <>'') => 'HOME-OFFICE',
+																								l.home_office <> 'Y' and (l.v_city_name<>'' or l.st<>'' or l.zip <>'') => 'BUSINESS',
+																								'');
 				self.company_address.prim_range  := l.prim_range;
 				self.company_address.predir      := l.predir;
 				self.company_address.prim_name   := l.prim_name;

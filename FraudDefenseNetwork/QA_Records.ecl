@@ -13,7 +13,9 @@ function
 	SampleFileMain_TextMinedCrim        := topn(pBaseMain(source= 'TEXTMINEDCRIM' and DID<>0  and Event_Date between  ut.getDateOffset(-3650) and (STRING8)Std.Date.Today()),50,-process_date);
 	SampleFileMain_AInspection          := topn(pBaseMain(source= 'ADDRESSINSPECTION'   and Reported_Date between  ut.getDateOffset(-1095) and (STRING8)Std.Date.Today()),50,-process_date);
 	SampleFileMain_Erie                 := topn(pBaseMain(source= 'ERIE' and DID<>0  and classification_Entity.Entity_sub_type ='' and Event_Date between  ut.getDateOffset(-1825) and (STRING8)Std.Date.Today()),50,-process_date);
-	SampleFileMain                      := SampleFileMain_GLB5 + SampleFileMain_OIG_Individual + SampleFileMain_OIG_Business + SampleFileMain_TextMinedCrim + SampleFileMain_AInspection + SampleFileMain_Erie;
+	SampleFileMain_ErieWatchList        := topn(pBaseMain(source= 'ERIE_WATCHLIST' and DID<>0 and classification_Entity.Entity_type ='PERSON' ),50,-process_date);
+	SampleFileMain_ErieNICBWatchList    := topn(pBaseMain(source= 'ERIE_NICB_WATCHLIST' and DID<>0 and classification_Entity.Entity_type ='PERSON'),50,-process_date);
+	SampleFileMain                      := SampleFileMain_GLB5 + SampleFileMain_OIG_Individual + SampleFileMain_OIG_Business + SampleFileMain_TextMinedCrim + SampleFileMain_AInspection + SampleFileMain_Erie + SampleFileMain_ErieWatchList + SampleFileMain_ErieNICBWatchList;
 	
 	didrec := RECORD,maxlength(60000)
   unsigned6 did;

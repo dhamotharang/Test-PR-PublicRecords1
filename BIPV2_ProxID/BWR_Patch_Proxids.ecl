@@ -1,4 +1,4 @@
-import bipv2,bipv2_files,BIPV2_ProxID,ut,salt26,tools;
+﻿import bipv2,bipv2_files,BIPV2_ProxID,ut,salt26,tools;
 iter      := '29';
 pversion  := BIPV2.KeySuffix + 'a';
 pdataset  := BIPV2_Files.files_dotid.DS_DOTID_BASE;

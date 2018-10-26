@@ -1,4 +1,4 @@
-import corp2,paw;
+﻿import corp2,paw;
 EXPORT file_DEAD_SOS(
 	 dataset(Corp2.Layout_Corporate_Direct_Corp_Base	)	pCorpInactives  = PAW.fCorpInactives()
 	,string														                  pPersistname		= '~thor_data400::persist::BIPV2_ProxID::file_current_SOS'													

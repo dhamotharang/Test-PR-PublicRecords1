@@ -1,15 +1,14 @@
-import address,aid,tools;
+﻿import address,aid,tools;
 
 export Append_AID :=
 module
 
 	export fPreProcess(
 
-		dataset(Layouts.Base) pBase
+		dataset(Layouts.Base_new) pBase
 
 	) :=
 	function
-
 		dPrep_for_aid := project(
 			 pBase
 			,transform(
@@ -139,8 +138,11 @@ module
 		dStandardizeAddress	:= fStandardizeAddresses(dPreprocess) 
 			: persist(pPersistname);
 	                                                                                                                             
-		return PROJECT(dStandardizeAddress,TRANSFORM(Layouts.Base,					                                 
-			                                         self 						:= LEFT;));
+	//Populate current_rec based on whether or not record is in the new input file as this is a full replace
+	//Unknown = 1 Ancient = 2 Old = 3 Unchanged = 4 Updated = 5 New = 6	
+		return PROJECT(dStandardizeAddress,TRANSFORM(Layouts.Base_new,
+																							 SELF.current_rec := IF(LEFT.record_type in [2,3],FALSE,TRUE);
+			                                         SELF 						:= LEFT;));
 	
 	end;
 	

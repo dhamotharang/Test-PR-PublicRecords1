@@ -26,7 +26,7 @@ function
   odl   := PROJECT(CHOOSEN(KFile.Candidates(Proxid=Proxidone),100000),transform(BIPV2_ProxID.match_candidates(BFile).layout_candidates,self := left,self := []));
   odr   := PROJECT(CHOOSEN(KFile.Candidates(Proxid=ProxidTwo),100000),transform(BIPV2_ProxID.match_candidates(BFile).layout_candidates,self := left,self := []));
   k     := KFile.Specificities_Key;
-  s     := GLOBAL(PROJECT(k,transform(BIPV2_ProxID.Layout_Specificities.R,self := left,self.cnp_name_MAXIMUM := left.cnp_name_max,self := []))[1]);
+  s     := GLOBAL(PROJECT(k,BIPV2_ProxID.Layout_Specificities.R)[1]);
   odlv  := BIPV2_ProxID.Debug(BFile,s).RolledEntities(odl);
   odrv  := BIPV2_ProxID.Debug(BFile,s).RolledEntities(odr);
 
