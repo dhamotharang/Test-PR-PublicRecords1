@@ -51,6 +51,9 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 				SELF.ReportedDateTime.Year := (INTEGER)(L.Event_Date[1..4]);
 				SELF.ReportedDateTime.Month := (INTEGER)(L.Event_Date[5..6]);
 				SELF.ReportedDateTime.Day := (INTEGER)(L.Event_Date[7..8]);
+				SELF.ReportedDateTime.Hour24 := (INTEGER)(L.Event_Date[9..10]);
+				SELF.ReportedDateTime.Minute := (INTEGER)(L.Event_Date[11..12]);
+				SELF.ReportedDateTime.Second := (INTEGER)(L.Event_Date[13..14]);
 				SELF.IndustryTypeDescription := L.classification_source.Industry_segment;
 				SELF.ReportedBy := L.classification_Permissible_use_access.user_added;
 				SELF.ActivityReason := L.Referral_reason;

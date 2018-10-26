@@ -129,7 +129,10 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 																											SELF.Name := LEFT.indicator,
 																											SELF.Value := LEFT.value)),
 															SELF := []));
-
+		
+		ds_related_clusters_sorted := SORT(ds_related_clusters, -ScoreDetails.Score, ScoreDetails.ElementValue, 
+																							-NoOfIdentities, RECORD);
+		
 		/* Getting the related identities*/			
 		ds_associated_identities_raw := ds_center_clusterdetails(entity_type_ = FraudGovKelConst_.ENTITY_TYPE_LEXID);
 		
@@ -168,7 +171,10 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 																				SELF.ScoreDetails.Score := RIGHT.score_,
 																				SELF := LEFT),
 																			LEFT OUTER, LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
-																			
+		
+		ds_contributoryBest_w_scores_sorted := SORT(ds_contributoryBest_w_scores, -ScoreDetails.Score, ScoreDetails.ElementValue, 
+																									 RECORD);
+		
 		ds_realtime := PROJECT(ds_realtimeScore_raw,TRANSFORM(iesp.fraudgovreport.t_FraudGovIdentityCardDetails,
 																				SELF.ScoreDetails.RecordType := FraudGovConst_.RecordType.IDENTITY,
 																				SELF.ScoreDetails.ElementType := FraudGovFragConst_.PERSON_FRAGMENT, 
@@ -178,7 +184,9 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 		
 		/* Returning the Timeline Data */
 		ds_timeline := PROJECT(ds_payload, FraudGovPlatform_Services.Transforms.xform_timeline_details(LEFT)) + ds_delta_recentActivity;
-		ds_timeline_sorted := SORT(ds_timeline, IsRecentActivity, FileType , record);
+		ds_timeline_sorted := SORT(ds_timeline, -IsRecentActivity, FileType, -ReportedDateTime.Year,-ReportedDateTime.Month, 
+																-ReportedDateTime.Day,-ReportedDateTime.Hour24,-ReportedDateTime.Minute,-ReportedDateTime.Second, 
+																record);
 		
 		/* Returning the Associated Address Data  - This is based on the Timeline Records found above */
 		ds_associated_addresses := FraudGovPlatform_Services.Functions.getAssociatedAddresses(ds_payload);
@@ -242,7 +250,7 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 
 			SELF.IdentityCardDetails := MAP(batch_params.IsOnline AND batch_params.UseAllSearchFields => ds_realtime[1],
 																			batch_params.IsOnline AND ~batch_params.UseAllSearchFields => 
-																				ds_contributoryBest_w_scores(ContributedBest.UniqueId = (STRING)ds_in[1].did)[1],
+																				ds_contributoryBest_w_scores_sorted(ContributedBest.UniqueId = (STRING)ds_in[1].did)[1],
 																		ROW([], iesp.fraudgovreport.t_FraudGovIdentityCardDetails));
 			
 			SELF.GovernmentBest := IF(batch_params.IsOnline,
@@ -266,8 +274,7 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 																DATASET([],iesp.fraudgovreport.t_FraudGovScoreBreakdown));
 
 			SELF.AssociatedIdentities := IF(batch_params.IsOnline,
-																			CHOOSEN(SORT(ds_contributoryBest_w_scores, -ScoreDetails.Score, ScoreDetails.ElementValue, 
-																									 RECORD), iesp.constants.FraudGov.MAX_COUNT_ASSOCIATED_IDENTITY),
+																			CHOOSEN(ds_contributoryBest_w_scores_sorted, iesp.constants.FraudGov.MAX_COUNT_ASSOCIATED_IDENTITY),
 																			DATASET([],iesp.fraudgovreport.t_FraudGovIdentityCardDetails));
 			
 			SELF.AssociatedAddresses := IF(batch_params.IsOnline,
@@ -275,8 +282,7 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 																			DATASET([],iesp.fraudgovreport.t_FraudGovAssociatedAddress));
 
 			SELF.RelatedClusters := IF(batch_params.IsOnline, 
-																	CHOOSEN(SORT(ds_related_clusters, -ScoreDetails.Score, ScoreDetails.ElementValue, 
-																							-NoOfIdentities, RECORD), iesp.constants.FraudGov.MAX_COUNT_CLUSTER),
+																	CHOOSEN(ds_related_clusters_sorted, iesp.constants.FraudGov.MAX_COUNT_CLUSTER),
 																	DATASET([],iesp.fraudgovreport.t_FraudGovClusterCardDetails));
 																
 			SELF.TimeLineDetails := IF(batch_params.IsOnline, 
