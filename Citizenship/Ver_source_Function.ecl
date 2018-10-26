@@ -393,7 +393,7 @@ EXPORT Ver_source_Function(unsigned4 seq, STRING ver_sources, STRING ver_sources
    
       //***these dates are returned in the SAS format - the format needed to calcuate age or number days ****//      
       string10 char_SAS_earliest_header_date    := (string)earliest_header_date; 
-      string10 char_SAS_earliest_bureau_date    := IF(earliest_bureau_date = NULL, '', (string)earliest_bureau_date);
+      string10 char_SAS_earliest_bureau_date    := (string)earliest_bureau_date;
       string10 char_SAS_ldate_credentialed      := (string)ldate_credentialed;  
       string3  char_sum_of_credentialed_sources := (string)sum_of_credentialed_sources;   
       string3 char_sum_of_any_sources           := (string)sum_of_any_sources;   

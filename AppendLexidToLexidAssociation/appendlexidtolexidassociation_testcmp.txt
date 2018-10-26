@@ -1,0 +1,50 @@
+﻿ID "HIPIE_Plugins.AppendLexidToLexidAssociation.AppendLexidToLexidAssociation_cmp";
+NAME appendlexidtolexidassociation_testcmp;
+LABEL "Test composition for Lexid To Lexid Association";
+DESCRIPTION "Auto-generated test composition for plugin AppendLexidToLexidAssociation";
+VERSION "1.0.0";
+AUTHOR "prichajx";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+ 
+INPUTS
+	STRING CompareWUID: DEFAULT("W20171214-105529");
+END
+
+INSTANCE OutDataset.OutDataset(Ins004): LABEL("Output Dataset"),VERSION("1.0.0")
+	dsInput="^Ins003|dsOutput"
+	name="~qa::appendlexidtolexidassociation::appendlexidtolexidassociation::output"
+	Method="THOR"
+END
+INSTANCE AppendLexidToLexidAssociation.AppendLexidToLexidAssociation(Ins003): LABEL("Lexid To Lexid Association"),VERSION("1.0.0")
+	dsInput="^Ins002|dsOutput"
+	Prefix="Test"
+	DistanceThreshold=1.7
+	Lexid1="mailerpersonlexid"
+	Lexid2="addresseepersonlexid"
+END
+INSTANCE AppendLexidToLexidAssociation.AppendLexidToLexidAssociation(Ins002): LABEL("Lexid To Lexid Association"),VERSION("1.0.0")
+	dsInput="^Ins001|dsOutput"
+	Prefix="Association"
+	DistanceThreshold=1.7
+	Lexid1="mailerpersonlexid"
+	Lexid2="addresseepersonlexid"
+END
+
+INSTANCE UseDataset.UseDataset(Ins001): LABEL("Use Dataset"),VERSION("1.1")
+	LogicalFilename="~qa::appendlexidtolexidassociation::appendlexidtolexidassociation::input"
+	Method="THOR"
+	Structure="  record
+    STRING transactionid;
+    STRING fromfirstname;
+    STRING fromlastname;
+    STRING tofirstname;
+    STRING tolastname;
+    UNSIGNED6 addresseepersonlexid;
+    UNSIGNED6 mailerpersonlexid;
+  END;
+"
+END

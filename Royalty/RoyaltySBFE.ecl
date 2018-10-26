@@ -1,29 +1,60 @@
+﻿Import LNSmallBusiness;
 EXPORT RoyaltySBFE := module
 		
-	EXPORT GetOnlineRoyalties(dRecsOut) := 
+	EXPORT GetOnlineRoyalties(dRecsOut,OutputType) := 
 		FUNCTIONMACRO	
 		
-			dTGRoyalOut := 
-				DATASET([{
-									Royalty.Constants.RoyaltyCode.SBFE,
-									Royalty.Constants.RoyaltyType.SBFE,
-									(UNSIGNED)((INTEGER)dRecsOut[1].SBFEAccountCount > 0),
-									0
-								}],Royalty.Layouts.Royalty);			
+			dTGRoyalOut :=  if ( OutputType IN [ LNSmallBusiness.Constants.OutputType.PDF_AND_XML,
+                                          LNSmallBusiness.Constants.OutputType.PDF_ONLY],
+                          DATASET([{
+                              Royalty.Constants.RoyaltyCode.SBFE_PDF,
+                              Royalty.Constants.RoyaltyType.SBFE_PDF,
+                              (UNSIGNED)((INTEGER)dRecsOut[1].SBFEAccountCount > 0),
+                              0
+                            },
+                            {
+                              Royalty.Constants.RoyaltyCode.SBFE,
+                              Royalty.Constants.RoyaltyType.SBFE,
+                              (UNSIGNED)((INTEGER)dRecsOut[1].SBFEAccountCount > 0),
+                              0
+                            }],Royalty.Layouts.Royalty)
+                            ,
+                        DATASET([{
+                              Royalty.Constants.RoyaltyCode.SBFE,
+                              Royalty.Constants.RoyaltyType.SBFE,
+                              (UNSIGNED)((INTEGER)dRecsOut[1].SBFEAccountCount > 0),
+                              0
+                            }],Royalty.Layouts.Royalty)
+         );			
 			
 			RETURN dTGRoyalOut;
 	ENDMACRO;		
 
-	EXPORT GetNoRoyalties() := 
+	EXPORT GetNoRoyalties(OutputType) := 
 		FUNCTIONMACRO	
 		
-			dTGRoyalOut := 
-				DATASET([{
-									Royalty.Constants.RoyaltyCode.SBFE,
-									Royalty.Constants.RoyaltyType.SBFE,
-									0,
-									0
-								}],Royalty.Layouts.Royalty);			
+			dTGRoyalOut := if ( OutputType IN [ LNSmallBusiness.Constants.OutputType.PDF_AND_XML,
+                                          LNSmallBusiness.Constants.OutputType.PDF_ONLY],
+                      DATASET([{
+                                  Royalty.Constants.RoyaltyCode.SBFE,
+                                  Royalty.Constants.RoyaltyType.SBFE,
+                                  0,
+                                  0
+                                },
+                                {
+                                  Royalty.Constants.RoyaltyCode.SBFE_PDF,
+                                  Royalty.Constants.RoyaltyType.SBFE_PDF,
+                                  0,
+                                  0
+                                }
+                                ],Royalty.Layouts.Royalty)
+                                ,
+                        DATASET([{
+                                  Royalty.Constants.RoyaltyCode.SBFE,
+                                  Royalty.Constants.RoyaltyType.SBFE,
+                                  0,
+                                  0
+                                }],Royalty.Layouts.Royalty));			
 			
 			RETURN dTGRoyalOut;
 	ENDMACRO;	

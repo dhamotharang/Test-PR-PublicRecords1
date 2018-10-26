@@ -500,7 +500,7 @@ royalties4us := royalties4ustemp(royalty_type_code != 0);
    																												 self.o_reason_1_6 := IF(left.cviCustomScore != '', left.cviCustomScore_ri[6].hri, left.ri[6].hri),
    																												 //Check to see if there was a model requested
    																												 extra_score := left.models[1].scores[1].i <> '';
-   																												 self.o_score_2 := left.models[1].scores[1].i,
+   																												 self.o_score_2 := IF(extra_score, left.models[1].scores[1].i, ''),
    																												 self.o_reason_2_1 := IF(extra_score, left.models[1].scores[1].reason_codes[1].reason_code, ''),
    																												 self.o_reason_2_2 := IF(extra_score, left.models[1].scores[1].reason_codes[2].reason_code, ''),
    																												 self.o_reason_2_3 := IF(extra_score, left.models[1].scores[1].reason_codes[3].reason_code, ''),

@@ -1,5 +1,5 @@
 
-IMPORT BatchDatasets, Doxie, Doxie_Regression;
+IMPORT BatchDatasets, Doxie;
 
 EXPORT fn_getDriversLicenseRecs(DATASET(Layouts.batch_in) ds_batch_in, IParams.BatchParams in_mod) := 
 	FUNCTION

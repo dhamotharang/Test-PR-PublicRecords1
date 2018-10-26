@@ -1,0 +1,15 @@
+Info Log -
+Control workunit W20180730-130218has no outputs that are missing from test worku
+nit W20180730-132812
+No results were found in test workunit W20180730-132812 that weren't in the cont
+rol workunit W20180730-130218
+All workunit results had the same number of records in the control workunit W201
+80730-130218 and this test workunit W20180730-132812
+The content of all workunit results was the same in the control workunit W201807
+30-130218 and the current test workunit W20180730-132812
+Plugin AppendFacilityAttributes passed compliance check
+Plugin AppendFacilityAttributes passed compliance check
+
+Err Log -
+
+

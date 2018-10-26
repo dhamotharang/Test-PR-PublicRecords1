@@ -16,7 +16,7 @@
 </message>
 */
 
-IMPORT Address, BatchShare, Doxie, doxie_regression, STD, Suppress, ut;
+IMPORT BatchShare, Doxie, Suppress, ut;
 
 EXPORT BatchService() := MACRO
     #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);

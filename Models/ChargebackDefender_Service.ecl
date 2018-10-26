@@ -818,7 +818,7 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 																								 self.i_name_last_2 := last2_value,
 																								 self.i_model_name_1 := genericModelName,
 																								 self.i_model_name_2 := '',
-																								 self.o_score_1    := left.Models[1].Scores[1].i,
+																								 self.o_score_1    := IF(genericModelName != '', left.Models[1].Scores[1].i, ''),
 																								 self.o_reason_1_1 := left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[1].Reason_Code,
 																								 self.o_reason_1_2 := left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[2].Reason_Code,
 																								 self.o_reason_1_3 := left.Models[1].Scores[1].RiskIndicatorSets[1].Reason_Codes[3].Reason_Code,

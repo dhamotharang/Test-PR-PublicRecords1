@@ -1,0 +1,51 @@
+﻿ID "58aba0bb-a872-4518-a7cb-c76b78db595d";
+NAME AppendCriminalFlag;
+LABEL "Append Criminal Flag";
+VERSION "1.0.0";
+AUTHOR "CarmigJX";
+CATEGORY APPEND;
+DESCRIPTION "Append Bocashell criminal flag";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING Prefix: LABEL("Append Columns Prefix"),DESCRIPTION("A string to prefix to the new dataset columns appended by this plugin."),OPTIONAL,NULL("");
+	DATASET dsInput: MAPBYNAME
+	FIELD LexID: LABEL("LexID"),DESCRIPTION("Unique identifier for an individual");
+END
+END
+
+OUTPUTS
+	DATASET dsOutput(dsInput): PREFIX(INPUTS.Prefix),APPEND
+		INTEGER1 HasCriminal;
+END
+	DATASET criminalHitStats: SIDE,WUID,SMALL
+		BOOLEAN hasCriminal: FEW;
+    INTEGER Cnt;
+  END
+END
+
+VISUALIZE AppendCriminalFlagStats: LABEL("Append Criminal Flag Stats")
+	  PIE CriminalHitStats(criminalHitStats): TITLE("Criminal Hit Stats"),LABEL(hasCriminal),WEIGHT(Cnt);
+END
+
+GENERATES INLINE
+	IMPORT AppendCriminalFlag;
+  
+  %^edsOutput% := AppendCriminalFlag.macAppendCriminalFlag(%dsInput%, %LexID%, %^qPrefix%) %^p%;
+  %^ecriminalHitStats% := TABLE(%dsOutput%,{BOOLEAN hasCriminal := %Prefix%HasCriminal=1,INTEGER Cnt := COUNT(GROUP)},%Prefix%HasCriminal,MERGE);
+ENDGENERATES
+
+
+RESOURCES
+	FILE readme: FILENAME("AppendCriminalFlag_ReadMe.txt"),LABEL("Plugin Readme File");
+	FILE appendcriminalflag_testcmp: FILENAME("appendcriminalflag_testcmp.txt"),LABEL("Plugin Test Composition");
+	FILE AppendCriminalFlag_BuildTestDataset: FILENAME("AppendCriminalFlag_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+  FILE checklist: FILENAME("AppendCriminalFlagChecklist.xlsx"),LABEL("Plugin Checklist");
+ 	INDEX Keys.BocashellCriminalKey:FILENAME("~thor_data400::key::corrections_offenders_risk::bocashell_did_qa"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");  
+  LOGICALFILE test:FILENAME("~qa::appendCriminalflag::appendCriminalflag::input"), URL("http://10.241.100.159:8010"), DALIIP("10.241.100.159"), CLUSTER("thor100_100dev");
+ 	ECL  AppendCriminalFlag:FILENAME("AppendCriminalFlag"), URL("<http://10.241.100.153:8010>"); 
+END

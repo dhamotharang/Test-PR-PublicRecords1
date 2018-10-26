@@ -3,6 +3,7 @@
 EXPORT SLBB1702_0_2 (GROUPED DATASET(Business_Risk_BIP.Layouts.Shell) busShell, GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam ) := FUNCTION
 
 	MODEL_DEBUG := false;
+	// MODEL_DEBUG := true;
 
 	#if(MODEL_DEBUG)
 		Layout_Debug := RECORD
@@ -3673,12 +3674,26 @@ num_pos_sources := __common__( if(max((integer)source_ar, (integer)source_bm, (i
 
 num_neg_sources := __common__( if(max((integer)source_ba, (integer)source_l2, (integer)source_ut) = NULL, NULL, sum((integer)source_ba, (integer)source_l2, (integer)source_ut)) ) ;
 
+
+// old 
+// bv_ver_src_derog_ratio := __common__( map(
+    // not(truebiz_ln)                                                                                                                                                 => NULL,
+    // ver_src_list = ''                                                                                                                                             => -1,
+    // if(max(num_pos_sources, num_neg_sources) = NULL, NULL, sum(if(num_pos_sources = NULL, 0, num_pos_sources), if(num_neg_sources = NULL, 0, num_neg_sources))) = 0 => -2,
+    // num_neg_sources > 0                                                                                                                                             => round(num_neg_sources / if(max(num_pos_sources, num_neg_sources) = NULL, NULL, sum(if(num_pos_sources = NULL, 0, num_pos_sources), if(num_neg_sources = NULL, 0, num_neg_sources)))/.1)*.1,
+  //                                                                                                                                                                    100 + num_pos_sources) ) ;
+
 bv_ver_src_derog_ratio := __common__( map(
     not(truebiz_ln)                                                                                                                                                 => NULL,
     ver_src_list = ''                                                                                                                                             => -1,
-    if(max(num_pos_sources, num_neg_sources) = NULL, NULL, sum(if(num_pos_sources = NULL, 0, num_pos_sources), if(num_neg_sources = NULL, 0, num_neg_sources))) = 0 => -2,
-    num_neg_sources > 0                                                                                                                                             => round(num_neg_sources / if(max(num_pos_sources, num_neg_sources) = NULL, NULL, sum(if(num_pos_sources = NULL, 0, num_pos_sources), if(num_neg_sources = NULL, 0, num_neg_sources)))/.1)*.1,
-                                                                                                                                                                       100 + num_pos_sources) ) ;
+    if(max(num_pos_sources, num_neg_sources) = NULL, NULL, 
+        sum(if(num_pos_sources = NULL, 0, num_pos_sources), 
+            if(num_neg_sources = NULL, 0, num_neg_sources))) = 0 => -2,
+    num_neg_sources > 0  => round(((num_neg_sources / 
+                                  if(max(num_pos_sources, num_neg_sources) = NULL, NULL, 
+                                  sum(if(num_pos_sources = NULL, 0, num_pos_sources), 
+                                      if(num_neg_sources = NULL, 0, num_neg_sources)))/.1)*.1),1),
+    100 + num_pos_sources) ) ;
 
 bv_mth_ver_src_p_ls_1 := __common__( if(not(truebiz_ln), NULL, NULL) ) ;
 
@@ -4406,13 +4421,25 @@ s0_v27_w := __common__( map(
     bv_mth_bureau_fs <= 124.5 => -0.0765046550085903,
                                  -0.127560665099968) ) ;
 
-s0_aa_code_27 := __common__( map(
+// s0_aa_code_27 := __common__( map(
+    // s0_v27_w = -0.127560665099968 => '     ',
+    // bv_mth_bureau_fs = NULL       => 'P535',
+    // bv_mth_bureau_fs = -1         => 'P523',
+    // bv_mth_bureau_fs <= 70.5      => 'P523',
+    // bv_mth_bureau_fs <= 124.5     => 'P523',
+                                     // 'P523') ) ;
+ s0_aa_code_27 := __common__( map(
     s0_v27_w = -0.127560665099968 => '     ',
     bv_mth_bureau_fs = NULL       => 'P535',
-    bv_mth_bureau_fs = -1         => 'P523',
-    bv_mth_bureau_fs <= 70.5      => 'P523',
-    bv_mth_bureau_fs <= 124.5     => 'P523',
-                                     'P523') ) ;
+    bv_mth_bureau_fs = -1         => 'B034',
+    bv_mth_bureau_fs <= 70.5      => 'B034',
+    bv_mth_bureau_fs <= 124.5     => 'B034',
+                                     'B034') ) ;                                    
+                                     
+
+
+
+
 
 s0_aa_dist_27 := __common__( 0 - s0_v27_w ) ;
 

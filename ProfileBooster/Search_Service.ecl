@@ -621,7 +621,7 @@ iesp.share.t_NameValuePair createrec(searchResults le, integer C) := TRANSFORM
 																									 self.i_zip := search.address.Zip5,
                                                    self.i_home_phone := search.phone,
 																									 self.i_model_name_1 := custommodel_in,
-																									 self.o_score_1    := (String)left.Models[1].Scores[1].Value,
+																									 self.o_score_1    := IF(custommodel_in != '', (String)left.Models[1].Scores[1].Value, ''),
 																									 self.o_reason_1_1 := left.Models[1].Scores[1].ScoreReasons[1].ReasonCode,
 																									 self.o_reason_1_2 := left.Models[1].Scores[1].ScoreReasons[2].ReasonCode,
 																									 self.o_reason_1_3 := left.Models[1].Scores[1].ScoreReasons[3].ReasonCode,

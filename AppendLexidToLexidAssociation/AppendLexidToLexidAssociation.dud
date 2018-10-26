@@ -1,0 +1,141 @@
+﻿ID "fb9a8ddd-bfd4-4b13-95c3-88dc62309b68";
+NAME AppendLexidToLexidAssociation;
+LABEL "Lexid To Lexid Association";
+VERSION "1.0.0";
+AUTHOR "prichajx";
+CATEGORY COMPUTE;
+DESCRIPTION "Given two Lexids (Prescriber - Patient, Merchant - Cardholder) 
+append whether there is an association in the LexisNexis relatives file.";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS  
+  STRING Prefix: LABEL("Append Column Prefix"),DEFAULT("Association"),DESCRIPTION("This prefix will be appended to all fields added by this plugin. This allows the same plugin to be chained more than once in a composition without creating field conflicts.");
+  STRING DistanceThreshold: LABEL("Distance Threshold"),DEFAULT(1.8),DESCRIPTION("Distance threshold in relationship degrees.");
+  DATASET dsInput: MAPBYNAME
+      FIELD Lexid1: LABEL("From LexID"),DESCRIPTION("The From LexID for the association.");
+      FIELD Lexid2: LABEL("To LexID"),DESCRIPTION("The To LexID for the association."),OPTIONAL,NULL("");
+  END
+END
+
+OUTPUTS
+  DATASET dsOutput(dsInput): PREFIX(INPUTS.Prefix);
+  
+  DATASET RelativeAssociations(dsInput): PREFIX(INPUTS.Prefix)
+      UNSIGNED4 AssociatedLexid;
+      STRING15 Type;
+      STRING10 confidence;
+      INTEGER2 CohabitScore;
+      INTEGER2 CohabitCount;
+      INTEGER2 CoApartmentScore;
+      INTEGER2 CoApartmentCount;
+      INTEGER2 CoPoBoxScore;
+      INTEGER2 CoPoBoxCount;
+      INTEGER2 CoSsnScore;
+      INTEGER2 CoSsnCount;
+      UNSIGNED2 TotalCount;
+      INTEGER2 TotalScore;
+      STRING10 Cluster;
+      STRING2 Generation;
+      UNSIGNED4 RelationshipDateFirstSeen;
+      UNSIGNED4 RelationshipDateLastSeen;
+      UNSIGNED2 OverlapMonths;
+      UNSIGNED4 DateFirstSeen;
+      UNSIGNED4 DateLastSeen;
+      UNSIGNED2 AgeFirstSeen;
+      BOOLEAN Personal;
+      BOOLEAN Business;
+      BOOLEAN Other;
+      BOOLEAN IsRelative;
+      BOOLEAN IsAssociate;
+      BOOLEAN IsBusiness;
+      REAL Degree;
+      INTEGER1 Hit;
+      INTEGER1 RelationshipCode;
+      STRING Relationship;
+  END
+  DATASET AssociationCounts: SIDE,WUID
+      STRING CountDescription: FEW;
+      INTEGER RowCount: FEW;
+  END
+  DATASET TopAssociatedFromLexids: SIDE,WUID
+    UNSIGNED FromLexid: FEW;
+    UNSIGNED Total: FEW;
+    UNSIGNED TotalAssociated: FEW;
+  END
+  DATASET TopAssociatedToLexids: SIDE,WUID
+    UNSIGNED ToLexid: FEW;
+    UNSIGNED Total: FEW;
+    UNSIGNED TotalAssociated: FEW;
+  END
+  DATASET FromAssociationCountDistribution: SIDE,WUID
+    UNSIGNED TotalAssociated: FEW;
+    UNSIGNED TotalRows: FEW;
+  END
+  DATASET ToAssociationCountDistribution: SIDE,WUID
+    UNSIGNED TotalAssociated: FEW;
+    UNSIGNED TotalRows: FEW;
+  END
+END
+
+VISUALIZE LexidAssociationStats : LABEL("Lexid Associations Stats")
+    BAR FromLexidCounts(FromAssociationCountDistribution) : LABEL(TotalAssociated),WEIGHT(TotalRows), SORT(TotalAssociated);   
+    BAR ToLexidCounts(ToAssociationCountDistribution) : LABEL(TotalAssociated),WEIGHT(TotalRows), SORT(TotalAssociated);   
+    TABLE GeneralCounts(AssociationCounts) : VALUE(CountDescription, RowCount), LABEL("Description","Count");   
+    TABLE TopFromLexids(TopAssociatedFromLexids) : VALUE(FromLexid, Total, TotalAssociated), LABEL("From Lexid", "Total", "TotalAssociated"), SORT(-TotalAssociated);  
+    TABLE TopToLexids(TopAssociatedToLexids) : VALUE(ToLexid, Total, TotalAssociated), LABEL("To Lexid", "Total", "TotalAssociated"), SORT(-TotalAssociated);  
+END
+
+GENERATES INLINE
+  IMPORT AppendLexidToLexidAssociation;
+  IMPORT Relationship;
+  IMPORT Relavator;
+
+  %^edsOutput% := %dsInput%;
+
+  IMPORT AppendLexidToLexidAssociation;
+   
+  LexidAssociations := AppendLexidToLexidAssociation.MacAppendLexidToLexidAssociations(%dsOutput%, %Lexid1%, %Lexid2%, %^qPrefix%, %DistanceThreshold%, 2000000);
+  %^eRelativeAssociations% := LexidAssociations %^p%;
+
+  %^eAssociationCounts% := DATASET([
+    {'Total Rows', COUNT(%RelativeAssociations%)}, 
+    {'TotalHits', SUM(%RelativeAssociations%,%Prefix%Hit)},
+    {'TotalRelative', COUNT(%RelativeAssociations%(%Prefix%IsRelative))},
+    {'TotalAssociate', COUNT(%RelativeAssociations%(%Prefix%IsAssociate))},
+    {'TotalBusiness', COUNT(%RelativeAssociations%(%Prefix%IsBusiness))}
+    ], {STRING CountDescription, UNSIGNED RowCount});
+
+  %^sFromAssociationCounts% := TABLE(%RelativeAssociations%((INTEGER)%Lexid1%>0), {UNSIGNED FromLexid := (INTEGER)%Lexid1%,UNSIGNED Total := count(group), UNSIGNED TotalAssociated := SUM(group, %Prefix%Hit)},  %Lexid1%, MERGE);
+  %^eTopAssociatedFromLexids%  := TOPN(%FromAssociationCounts%, 100, -TotalAssociated);
+
+  %^sToAssociationCounts% := TABLE(%RelativeAssociations%((INTEGER)%Prefix%AssociatedLexid>0), {UNSIGNED ToLexid := (INTEGER)%Prefix%AssociatedLexid,UNSIGNED Total := count(group), UNSIGNED TotalAssociated := SUM(group, %Prefix%Hit)}, %Prefix%AssociatedLexid, MERGE);
+  %^eTopAssociatedToLexids%  := TOPN(%ToAssociationCounts%, 100, -TotalAssociated);
+
+
+  %^eFromAssociationCountDistribution% := TABLE(%FromAssociationCounts%, 
+                                   {
+                                     TotalAssociated, UNSIGNED TotalRows := COUNT(GROUP)}, TotalAssociated, FEW);
+
+  %^eToAssociationCountDistribution% := TABLE(%ToAssociationCounts%, 
+                                   {
+                                     TotalAssociated, UNSIGNED TotalRows := COUNT(GROUP)}, TotalAssociated, FEW);
+
+ENDGENERATES
+
+
+RESOURCES
+  FILE readme: FILENAME("AppendLexidToLexidAssociation_README.txt"),LABEL("Plugin Readme File");
+  INDEX key_relatives_v3:FILENAME("~thor_data400::key::relatives_v3_qa"), URL("http://10.241.12.201:8010"), DALIIP("10.241.12.201"), CLUSTER("thor400_dev"); 
+  INDEX Key_Person_Cluster_Degree:FILENAME("~thor_data400::key::sna::person_cluster_degree_qa"), URL("http://10.241.12.201:8010"), DALIIP("10.241.12.201"), CLUSTER("thor400_dev"); 
+  ECL AppendLexidToLexidAssociation:FILENAME("AppendLexidToLexidAssociation"), URL("http://10.241.100.153:8010");
+  ECL Relationship:FILENAME("Relationship"), URL("http://10.241.100.153:8010");
+  ECL Relavator:FILENAME("Relavator"), URL("http://10.241.100.153:8010");
+  ECL Header:FILENAME("Header"), URL("http://10.241.100.153:8010");
+  FILE AppendLexidToLexidAssociation_BuildTestDataset: FILENAME("AppendLexidToLexidAssociation_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+  FILE appendlexidtolexidassociation_testcmp: FILENAME("appendlexidtolexidassociation_testcmp.txt"),LABEL("Plugin Test Composition");
+  FILE LexidToLexidAssociationChecklist: FILENAME("LexidToLexidAssociationChecklist.xlsx"),LABEL("Plugin Checklist");
+END

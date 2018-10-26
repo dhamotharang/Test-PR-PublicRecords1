@@ -1,0 +1,50 @@
+﻿ID "e51d5f9e-72f3-4199-83b4-c7ed5697b43e";
+NAME AppendBankruptcyFlag;
+LABEL "Append Bankruptcy Flag";
+VERSION "1.0.0";
+AUTHOR "CarmigJX";
+CATEGORY APPEND;
+DESCRIPTION "Append Bocashell Bankruptcy flag";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING Prefix: LABEL("Append Columns Prefix"),DESCRIPTION("A string to prefix to the new dataset columns appended by this plugin."),OPTIONAL,NULL("");
+	DATASET dsInput: MAPBYNAME
+	FIELD LexID: LABEL("LexID"),DESCRIPTION("Unique identifier for an individual");
+END
+END
+
+OUTPUTS
+	DATASET dsOutput(dsInput): PREFIX(INPUTS.Prefix),APPEND
+		INTEGER1 HasBankruptcy;
+  END
+	DATASET bankruptcyHitStats: SIDE,WUID,SMALL
+		BOOLEAN hasBankruptcy: FEW;
+    INTEGER Cnt;
+  END
+END
+VISUALIZE AppendBankruptcyFlagStats: LABEL("Append Bankruptcy Flag Stats")
+	  PIE BankruptcyHitStats(bankruptcyHitStats): TITLE("Bankruptcy Hit Stats"),LABEL(hasBankruptcy),WEIGHT(Cnt);
+END
+
+GENERATES INLINE
+	IMPORT AppendBankruptcyFlag;
+  
+  %^edsOutput% := AppendBankruptcyFlag.macAppendBankruptcyFlag(%dsInput%, %LexID%, %^qPrefix%) %^p%;
+  %^ebankruptcyHitStats% := TABLE(%dsOutput%,{BOOLEAN hasBankruptcy := %Prefix%HasBankruptcy=1,INTEGER Cnt := COUNT(GROUP)},%Prefix%HasBankruptcy,MERGE);
+ENDGENERATES
+
+
+RESOURCES
+	FILE readme: FILENAME("AppendBankruptcyFlag_ReadMe.txt"),LABEL("Plugin ReadMe File");
+	FILE checklist: FILENAME("AppendBankruptcyFlagChecklist.xlsx"),LABEL("Plugin Checklist");
+	FILE appendbankruptcyflag_testcmp: FILENAME("appendbankruptcyflag_testcmp.txt"),LABEL("Plugin Test Composition");
+	FILE AppendBankruptcyFlag_BuildTestDataset: FILENAME("AppendBankruptcyFlag_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+	INDEX Keys.BocashellBankruptcyKey:FILENAME("~thor_data400::key::bankruptcyv3::bocashell_qa"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100dev");  
+  LOGICALFILE test:FILENAME("~qa::appendbankruptcyflag::appendbankruptcyflag::input"), URL("http://10.241.100.159:8010"), DALIIP("10.241.100.159"), CLUSTER("thor100_100dev");
+	ECL  AppendBankruptcyFlag:FILENAME("AppendBankruptcyFlag"), URL("<http://10.241.100.153:8010>"); 
+END

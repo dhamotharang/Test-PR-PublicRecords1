@@ -1,0 +1,72 @@
+﻿ID "6680b2a1-70c5-46fd-9c17-f3f2e79d3a22";
+NAME AppendPersonBestInfo;
+LABEL "Append Person Best Info";
+VERSION "1.0.0";
+AUTHOR "CarmigJX";
+CATEGORY APPEND;
+DESCRIPTION "Append person best info";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING Prefix: LABEL("Append Column Prefix"),DESCRIPTION("Prefix to be appended to the new fields"),OPTIONAL,DEFAULT("");
+	DATASET dsInput: MAPBYNAME
+    FIELD Lexid: LABEL("LexID"),DESCRIPTION("LexisNexis person identifier");
+  END
+	ENUM("True","False") UseNonBlank: LABEL("Use Non Blank Index"),DESCRIPTION("If true returns blank info when the best algorithm couldn't find best info. Otherwise randomly picks one"),OPTIONAL,DEFAULT("True");
+	STRING GLBPURPOSE: LABEL("GLB Purpose"),DEFAULT("^GLOBAL|GLBPURPOSE");
+	STRING DATARESTRICTIONMASK: LABEL("Data Restriction Mask"),DEFAULT("^GLOBAL|DATARESTRICTIONMASK");
+	ENUM("False","True") IncludeMarketing: LABEL("Include Marketing"),DESCRIPTION("Use marketing keys. Currently this option does not do anything. See ReadMe"),OPTIONAL,DEFAULT("False");
+	ENUM("False","True") IncludeDod: LABEL("Include DOD"),DESCRIPTION("Return Date Of Death. Currently this option does not do anything. See ReadMe"),OPTIONAL,DEFAULT("False");
+	ENUM("False","True") IncludeMinors: LABEL("Include Minors"),DESCRIPTION("Include minors. Currently this option does not do anything. See ReadMe"),OPTIONAL,DEFAULT("False");
+END
+
+OUTPUTS
+	DATASET dsOutput(dsInput): PREFIX(INPUTS.Prefix),APPEND
+		STRING Title;
+    STRING FirstName;
+    STRING MiddleName;
+    STRING LastName;
+    STRING NameSuffix;
+    STRING PrimaryRange;
+    STRING PreDirectional;
+    STRING PrimaryName;
+    STRING AddressSuffix;
+    STRING PostDirectional;
+    STRING UnitDesignation;
+    STRING SecondaryRange;
+    STRING City;
+    STRING State;
+    STRING Zip;
+    STRING Zip4;
+    STRING AddressFirstSeen;
+    STRING AddressLastSeen;
+  END
+END
+
+GENERATES INLINE
+	IMPORT AppendPersonBestInfo, doxie, hipie_ecl;
+  
+  %^edsOutput% := AppendPersonBestInfo.macAppendPersonBestInfo(%dsInput%, %Lexid%, %^qGLBPURPOSE%, %^qDATARESTRICTIONMASK%,
+    %^qUseNonBlank%, %^qIncludeMarketing%, %^qIncludeDod%, %^qIncludeMinors%, %^qPrefix%);
+ENDGENERATES
+
+
+RESOURCES
+	FILE readme: FILENAME("AppendPersonBestInfo_ReadMe.txt"),LABEL("Plugin Readme File");
+	FILE appendpersonbestinfo_testcmp: FILENAME("appendpersonbestinfo_testcmp.txt"),LABEL("Plugin Test Composition");
+	FILE AppendPersonBestInfo_BuildTestDataset: FILENAME("AppendPersonBestInfo_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+	FILE checklist: FILENAME("AppendPersonBestInfoChecklist.xlsx"),LABEL("Plugin Checklist");
+  ECL AppendPersonBestInfo: FILENAME("AppendPersonBestInfo"),URL("http://10.241.100.153:8010");
+	ECL doxie: FILENAME("doxie"),URL("http://10.241.100.153:8010");
+	ECL hipie_ecl: FILENAME("hipie_ecl"),URL("http://10.241.100.153:8010");
+  INDEX WatchdogNonGlbNonBlankV2Key: FILENAME("~thor_data400::key::watchdog_nonglb_noneq.did_nonblank_qa"),URL("http://10.241.100.159:8010"),DALIIP("10.241.100.159"),CLUSTER("thor100_100dev");
+  INDEX WatchdogNonGlbNonBlankKey: FILENAME("~thor_data400::key::watchdog_nonglb.did_nonblank_qa"),URL("http://10.241.100.159:8010"),DALIIP("10.241.100.159"),CLUSTER("thor100_100dev");
+  INDEX WatchdogNonGlbV2Key: FILENAME("~thor_data400::key::watchdog_nonglb_noneq.did_qa"),URL("http://10.241.100.159:8010"),DALIIP("10.241.100.159"),CLUSTER("thor100_100dev");
+  INDEX WatchdogNonGlbKey: FILENAME("~thor_data400::key::watchdog_nonglb.did_qa"),URL("http://10.241.100.159:8010"),DALIIP("10.241.100.159"),CLUSTER("thor100_100dev");
+  INDEX MinorsHashKey: FILENAME("~thor_data400::key::header.minors_hash_qa"),URL("http://10.241.100.159:8010"),DALIIP("10.241.100.159"),CLUSTER("thor100_100dev");
+  LOGICALFILE test: FILENAME("~qa::appendpersonbestinfo::appendpersonbestinfo::input"),URL("http://10.241.100.159:8010"),DALIIP("10.241.100.159"),CLUSTER("thor100_100dev");
+END

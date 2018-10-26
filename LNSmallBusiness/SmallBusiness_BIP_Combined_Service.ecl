@@ -83,6 +83,8 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
     option    := GLOBAL(firstRow.Options);
     users     := GLOBAL(firstRow.User); 
     
+    OutputType := firstRow.User.OutputType;
+    
     // Some of the top business code is using the global mod instead 
     // of using the interface module
     iesp.ECL2ESP.SetInputBaseRequest (firstRow);
@@ -376,7 +378,8 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
                           ds_Results_withSmBizSBFEroyalty[1].SmallBiz_SBFE_Royalty, 1, 0);
                           
     ds_SBFE_CountRoyalLayout := DATASET([{SBFE_RoyalCount}], {INTEGER SBFEAccountCount});                                           
-    ds_combinedSBFE_royalties := IF( TestData_Enabled, Royalty.RoyaltySBFE.GetNoRoyalties(), Royalty.RoyaltySBFE.GetOnlineRoyalties(ds_SBFE_CountRoyalLayout) );
+    ds_combinedSBFE_royalties := IF( TestData_Enabled, Royalty.RoyaltySBFE.GetNoRoyalties(OutputType), 
+                                     Royalty.RoyaltySBFE.GetOnlineRoyalties(ds_SBFE_CountRoyalLayout,OutputType) );
 
    /* ************************************************************************
     *                    Targus Royalties                                    *
@@ -459,7 +462,7 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
 																										 //Check to see if there was more than one model requested
 																										 extra_score := model_count > 1;
 																										 self.i_model_name_2 := IF(extra_score, Models_Requested[2].ModelName, ''),
-																										 self.o_score_1    := (String)left.SmallBusinessAnalyticsResults.Models[1].Scores[1].Value,
+																										 self.o_score_1    := IF(model_count != 0, (String)left.SmallBusinessAnalyticsResults.Models[1].Scores[1].Value, ''),
 																										 self.o_reason_1_1 := left.SmallBusinessAnalyticsResults.Models[1].Scores[1].ScoreReasons[1].ReasonCode,
 																										 self.o_reason_1_2 := left.SmallBusinessAnalyticsResults.Models[1].Scores[1].ScoreReasons[2].ReasonCode,
 																										 self.o_reason_1_3 := left.SmallBusinessAnalyticsResults.Models[1].Scores[1].ScoreReasons[3].ReasonCode,

@@ -50,6 +50,7 @@ import iesp, Royalty;
 
 export Plus_SearchService() := macro
   #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+  #ONWARNING(4207, IGNORE);
   #CONSTANT('useOnlyBestDID', TRUE);
 
 	INTEGER Max_Results := iesp.constants.WP_PLUS_MAX_COUNT_SEARCH_RESPONSE_RECORDS;
