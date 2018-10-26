@@ -2199,12 +2199,29 @@ Models.layouts.FP_Layout_Model form_Paro(Paro_ret le, Paro_ret2 ri) := TRANSFORM
 END;
 paro_model := join(Paro_ret,Paro_ret2,left.seq=right.seq, form_Paro(LEFT,RIGHT));
 
-// Paro will need test seeds, incorporate them here?
-// paro_test_seed := project(fp_test_seed, Transform(Models.layouts.FP_Layout_Model,
-                                                  // self.i := left.Score,
-                                                  // self.));
+Models.layouts.Layout_Score_FP paro_testseeds_trans(fp_test_seed le, integer c) := transform 
+                self.i := le.score;
+                SELF.description := MAP(model_name='msnrsn_1' and c = 1 => '0 to 999', 
+																				model_name='msnrsn_1' and c = 2 => '250 to 999',
+																				model_name='rsn804_1'  and c = 1 =>  '250 to 999',
+																				model_name='msn1803_1' and c = 1 => '0 to 999','');
+                self.index := Models.FraudAdvisor_Constants.getBilling_Index(model_name);
+                // self.reason_codes := left.ri;
+                self := [];
+								
+end;	
+	
+paro_seeds_projected := project(fp_test_seed, paro_testseeds_trans(left,counter)); 
 
-// Paro_final := IF(test_data_enabled, paro_test_seed, paro_model);
+paro_test_seed := project(ut.ds_oneRecord, transform(Models.layouts.FP_Layout_Model,
+                self.accountnumber := account_value;
+                self.description := 'FraudPoint' + Std.Str.ToUpperCase(model_name);
+                self.scores := paro_seeds_projected;
+                self := [];
+                ));
+								
+Paro_final := IF(test_data_enabled, paro_test_seed, paro_model);
+
 
 testrec form_model(ret le, ret2 ri) := 
 TRANSFORM
@@ -2330,7 +2347,7 @@ finalcustom := map( model_name in fraudpoint3_models => fraudpoint3_model,
                     model_name in Models.FraudAdvisor_Constants.fraudpoint3_custom_models => fraudpoint3_model,
                     model_name in fraudpoint2_models => fraudpoint2_model,
                     model_name = 'idn6051' => custom_idn6051,
-                    model_name in Models.FraudAdvisor_Constants.Paro_models => paro_model,
+                    model_name in Models.FraudAdvisor_Constants.Paro_models => Paro_final,
                     model_name in Models.FraudAdvisor_Constants.XML_custom_models OR model_name = 'ain801_1' => custom,
                     final_v1 ); 
 										
