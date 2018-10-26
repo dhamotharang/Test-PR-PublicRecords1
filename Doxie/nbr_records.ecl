@@ -30,7 +30,7 @@ export DATASET(doxie.layout_nbr_records) nbr_records(
 ) := FUNCTION
 
   //get missing access parameters from global
-  mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+  mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
     EXPORT unsigned1 glb := GLB_Purpose;
     EXPORT unsigned1 dppa := DPPA_Purpose;
     EXPORT boolean probation_override := probation_override_value;

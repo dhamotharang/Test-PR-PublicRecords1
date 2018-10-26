@@ -3,7 +3,7 @@ EXPORT fn_relativeMatch(ERO_Services.Layouts.layout_extra_penalty   input_rec, u
 	function
 
   // Note: currently,  is called with a lot of defaults
-  mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
+  mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
     EXPORT unsigned1 glb := 0; // not from the input?
     EXPORT unsigned1 dppa := 0; // not from the input?
     EXPORT boolean ln_branded := FALSE;

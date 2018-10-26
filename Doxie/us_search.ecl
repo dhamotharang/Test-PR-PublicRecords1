@@ -4,7 +4,7 @@ export us_search :=
 FUNCTION
 
 doxie.mac_header_field_declare();
-mod_access := doxie.functions.GetGlobalDataAccessModule ();
+mod_access := doxie.compliance.GetGlobalDataAccessModule ();
 
 d := IF(reduced_data_value,GROUP(header_references(false), did));
 

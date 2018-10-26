@@ -14,7 +14,7 @@ EXPORT Person_records (
 
 // Get values missing from the input from global.
 // Can't project from {input} because of different type of ssn_mask (string vs. string6);
-shared mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+shared mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
   EXPORT unsigned1 glb := in_params.GLBPurpose;
   EXPORT unsigned1 dppa := in_params.DPPAPurpose;
   EXPORT string DataPermissionMask := in_params.DataPermissionMask;

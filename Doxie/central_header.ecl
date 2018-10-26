@@ -14,7 +14,7 @@ boolean includeGeoLocation := false : stored('IncludeGeoLocation');
 boolean IncludePhoneMetadata := false : stored('IncludePhoneMetadata'); //For Accurint CompReport
 
 doxie.MAC_Header_Field_Declare(IsFCRA); //ssn_value, fname_value, lname_value, dial_contactprecision_value
-mod_access := doxie.functions.GetGlobalDataAccessModule ();
+mod_access := doxie.compliance.GetGlobalDataAccessModule ();
 
 doxie.MAC_Selection_Declare();
 

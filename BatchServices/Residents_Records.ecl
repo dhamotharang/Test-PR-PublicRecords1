@@ -4,7 +4,7 @@ rec_batch_in := BatchServices.Layouts.Resident.cln_batch_in;
 rec_batch_out := BatchServices.Layouts.Resident.batch_out;
 export Residents_Records(dataset(rec_batch_in) batch_in, BatchServices.Interfaces.res_config in_mod ) := FUNCTION
   glb_mod := AutoStandardI.GlobalModule();
-  mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (glb_mod);
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (glb_mod);
   glb_ok :=  mod_access.isValidGLB ();
   dppa_ok := mod_access.isValidDPPA ();
 

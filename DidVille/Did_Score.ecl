@@ -3,7 +3,7 @@
 export Did_Score() := FUNCTION
 
 	inputmod := AutoStandardI.GlobalModule();
-  mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (inputmod);
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (inputmod);
 	
 	zip_value := AutoStandardI.InterfaceTranslator.zip_value.val(project(inputmod,AutoStandardI.InterfaceTranslator.zip_value.params)); 
 

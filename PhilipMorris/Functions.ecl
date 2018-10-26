@@ -637,7 +637,7 @@ export Functions := MODULE
 															 boolean maskSSN = false) := FUNCTION												
 		
 		// Get missing permissions from global module
-		mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+		mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
 		  EXPORT unsigned1 glb := glb_purpose;
 			EXPORT unsigned1 dppa := dppa_purpose;
 			EXPORT boolean probation_override := probation_override_value;

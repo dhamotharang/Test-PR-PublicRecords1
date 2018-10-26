@@ -26,7 +26,7 @@ comm := project(if(Doxie.DataRestriction.WH, k(~mdr.sourceTools.sourceisWeeklyHe
 
 
 //***** CHECK PERMISSIONS
-mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
+mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
   EXPORT unsigned1 dppa := dppa_purpose;
   EXPORT unsigned1 glb := glb_purpose;
   EXPORT boolean probation_override := probation_override_value;

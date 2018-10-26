@@ -4,7 +4,7 @@ import person_models,moxie_phonesplus_server,doxie_raw,header,Relocations,doxie,
 deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
 
 doxie.MAC_Header_Field_Declare(); //isCRS, depth, glb_ok, dial_contactprecision_value, ...
-mod_access := doxie.functions.GetGlobalDataAccessModule ();
+mod_access := doxie.compliance.GetGlobalDataAccessModule ();
 doxie.MAC_Selection_Declare();
 
 con := ContactCard.constants;

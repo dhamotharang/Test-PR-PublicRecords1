@@ -20,7 +20,7 @@
 import doxie, autokey, ut, header, suppress;
 
 doxie.MAC_Header_Field_Declare();
-mod_access := doxie.functions.GetGlobalDataAccessModule ();
+mod_access := doxie.compliance.GetGlobalDataAccessModule ();
 
 Layout_Names := RECORD
 	STRING30  name_first;

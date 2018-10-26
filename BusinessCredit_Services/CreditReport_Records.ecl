@@ -2,7 +2,7 @@ IMPORT BIPV2, Business_Credit, BusinessCredit_Services, Codes, Doxie, iesp, Supp
 
 EXPORT CreditReport_Records(BusinessCredit_Services.Iparam.reportrecords inmod) := FUNCTION
 
-    mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
+    mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
       EXPORT unsigned1 glb := inmod.glbpurpose;
       EXPORT unsigned1 dppa := inmod.dppapurpose;
       EXPORT string DataPermissionMask := inmod.DataPermissionMask;

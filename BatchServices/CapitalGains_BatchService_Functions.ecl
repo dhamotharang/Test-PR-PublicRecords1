@@ -126,7 +126,7 @@ export CapitalGains_BatchService_Functions := module
 	
 	export appendBest(dataset(layout_flat) ds_recs, unsigned1 glbPurpose, unsigned1 dppaPurpose,boolean include_minors=false, boolean getSSNBest=true) := function		
 	
-    mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))		
+    mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))		
       EXPORT unsigned1 glb := glbPurpose;
       EXPORT unsigned1 dppa := dppaPurpose;
       EXPORT boolean show_minors := include_minors OR (glbPurpose = 2);

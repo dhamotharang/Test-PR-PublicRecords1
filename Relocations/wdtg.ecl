@@ -127,7 +127,7 @@ export wdtg := module
 		// get the header records for the target subject, and reduce to just zips
 		dids := dataset( [ targetDID ], doxie.layout_references );
 
-    mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ());
+    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ());
 		headerRecs := 
       doxie.Comp_Subject_Addresses(dids,mod_access := mod_access).addresses;
 		headerSort	:= sort(headerRecs,-dt_last_seen);

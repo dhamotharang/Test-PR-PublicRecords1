@@ -13,8 +13,8 @@ export HeaderShowSources(
 		boolean IncludeNonRegulatedWatercraftSources = false
 ) := FUNCTION
 
-// canot use doxie.functions.GetGlobalDataAccessModule (); -- because of name conflicts
-mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
+// canot use doxie.compliance.GetGlobalDataAccessModule (); -- because of name conflicts
+mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
   EXPORT unsigned1 glb := glb_purpose;
   EXPORT unsigned1 dppa := dppa_purpose;
   EXPORT string32 application_type := appType; //is it translated?

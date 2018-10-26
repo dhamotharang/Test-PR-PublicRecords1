@@ -7,7 +7,7 @@ export rollup_presentation(DATASET(layout_presentation) presRecs,
 													 boolean skipRelativePhoneAppend = false) := FUNCTION
 
 	doxie.MAC_Header_Field_Declare();
-	mod_access := doxie.functions.GetGlobalDataAccessModule ();
+	mod_access := doxie.compliance.GetGlobalDataAccessModule ();
 	
 	high_valid_ssn := 100; // default high value; lowest is best
 	high_tnt := 100; // default high value; lowest is best

@@ -31,13 +31,13 @@ EXPORT IDataAccess := INTERFACE
   //     the idea is to replace ut/* and AutostandardI/Permission_Tools
   // --------------------------------------------------------------------------------------------
    
-  EXPORT boolean isValidGLB (boolean RNA=false) := $.functions.glb_ok (glb, RNA); 
-  EXPORT boolean isValidDPPA (boolean RNA=false) := $.functions.dppa_ok (dppa, RNA);
+  EXPORT boolean isValidGLB (boolean RNA=false) := $.compliance.glb_ok (glb, RNA); 
+  EXPORT boolean isValidDPPA (boolean RNA=false) := $.compliance.dppa_ok (dppa, RNA);
 
   EXPORT boolean isValidDPPAState (string2 st, string2 header_source='', string2 source_code='') :=
-           $.functions.dppa_state_ok (st, dppa, header_source, source_code);
+           $.compliance.dppa_state_ok (st, dppa, header_source, source_code);
   EXPORT boolean isHeaderPreGLB (unsigned3 nonglb_last_seen, unsigned3 first_seen, string2 src) := 
-           $.functions.HeaderIsPreGLB (nonglb_last_seen, first_seen, src, DataRestrictionMask);
+           $.compliance.HeaderIsPreGLB (nonglb_last_seen, first_seen, src, DataRestrictionMask);
 
   EXPORT boolean isConsumer () := industry_class = 'CNSMR';
 END;

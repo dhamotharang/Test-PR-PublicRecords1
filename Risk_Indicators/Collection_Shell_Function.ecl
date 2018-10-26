@@ -2,7 +2,7 @@
 
 export Collection_Shell_Function( dataset(risk_indicators.Layout_Input) progressive_prep, Risk_Indicators.Scoring_Parameters parameters) := FUNCTION
 
-mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
   EXPORT unsigned1 glb := parameters.glb;
   EXPORT unsigned1 dppa := parameters.dppa;	
   EXPORT string DataPermissionMask := parameters.datapermission;

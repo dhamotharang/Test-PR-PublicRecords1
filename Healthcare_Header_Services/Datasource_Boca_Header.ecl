@@ -1,7 +1,7 @@
 import Doxie,didville, header;
 EXPORT Datasource_Boca_Header := Module
 	Export get_boca_header_entity (dataset(Layouts.autokeyInput) input):= function
-      mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
+      mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
       glb_ok := mod_access.isValidGLB();
       dppa_ok := mod_access.isValidDPPA();
 

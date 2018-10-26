@@ -8,7 +8,7 @@ ssn_rec := record
 end;
 
 // Interestingly, glb and dppa are hardcoded (along with other values) in doxie/mod_header_records call.
-gmod := doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
+gmod := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
 mod_access := MODULE (gmod)
   EXPORT unsigned1 glb := 0;
   EXPORT unsigned1 dppa := 0;

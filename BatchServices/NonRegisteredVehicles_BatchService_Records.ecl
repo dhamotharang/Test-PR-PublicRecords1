@@ -225,7 +225,7 @@ EXPORT NonRegisteredVehicles_BatchService_Records(boolean useCannedRecs=false,
 
 
   // 3. Check/clean the header records that were acquired.
-	mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ());
+	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ());
   glb_ok :=  mod_access.isValidGLB ();
   dppa_ok := mod_access.isValidDPPA ();
 	Header.MAC_GlbClean_Header(ds_hdr_recs_match_input,ds_hdr_recs_outglbclean, , , mod_access);

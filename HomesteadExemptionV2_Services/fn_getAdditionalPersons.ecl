@@ -3,7 +3,7 @@
 EXPORT fn_getAdditionalPersons(DATASET(HomesteadExemptionV2_Services.Layouts.propIdRec) ds_srch_recs,
 				HomesteadExemptionV2_Services.IParams.Params in_mod) := FUNCTION
 
-  mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+  mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
     EXPORT unsigned1 glb := in_mod.GLBPurpose;
     EXPORT unsigned1 dppa := in_mod.DPPAPurpose;
     EXPORT boolean ln_branded := in_mod.lnbranded;

@@ -22,7 +22,7 @@ export header_records_byDID(
 FUNCTION
 
 doxie.mac_header_field_declare()
-mod_access := $.functions.GetGlobalDataAccessModule ();
+mod_access := $.compliance.GetGlobalDataAccessModule ();
 
 include_fun(unsigned2 penalt, string1 TNT, unsigned3 dt) := 
 											// because we have different defaults today

@@ -2,7 +2,7 @@ import ut, header;
 
 export ssn_persons ( boolean checkRNA = false ) := function
 doxie.MAC_Header_Field_Declare();
-mod_access := doxie.functions.GetGlobalDataAccessModule ();
+mod_access := doxie.compliance.GetGlobalDataAccessModule ();
 
 keepOldSsns := doxie.keep_old_ssns_val;
 

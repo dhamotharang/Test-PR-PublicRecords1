@@ -48,7 +48,7 @@ export params := interface(AutoStandardI.InterfaceTranslator.application_type_va
 			
     	export  COA_services.Layouts.rawrec getMasterRec(Dataset (header.layout_header) in_recs, params in_mod, 
 																												Address.ICleanAddress clean_addr) := function
-				mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+				mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
 					EXPORT unsigned1 glb := in_mod.glbPurpose;
 					EXPORT unsigned1 dppa := in_mod.dppapurpose;
 					EXPORT string DataPermissionMask := in_mod.DataPermissionMask;
@@ -240,7 +240,7 @@ export params := interface(AutoStandardI.InterfaceTranslator.application_type_va
 				
 
         // NB: in_mod has mostly untranslated values (industryclass, for instance); this can cause complience issues
-				mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+				mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
 					EXPORT unsigned1 glb := in_mod.glbPurpose;
 					EXPORT unsigned1 dppa := in_mod.dppapurpose;
 					EXPORT string DataPermissionMask := in_mod.DataPermissionMask;

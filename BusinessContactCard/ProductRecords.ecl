@@ -71,7 +71,7 @@ EXPORT ProductRecords := MODULE
 	EXPORT contactsRecords(dataset(BusinessContactCard.Layouts.rec_contact) ds_contacts_in,
 												 BusinessContactCard.IParam.options in_mod) := function
 
-    mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
+    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
 		UNRANKED_TITLE_VALUE := 100;
 																				
 		ds_contacts_ranked := JOIN(ds_contacts_in, doxie_cbrs.executive_titles,

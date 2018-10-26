@@ -1,6 +1,6 @@
 ﻿IMPORT AutoStandardI, mdr, codes;
 
-EXPORT functions := MODULE
+EXPORT compliance := MODULE
  
   // from doxie.mac_header_field_declare() -- i.e. translated
   EXPORT GetGlobalDataAccessModule () := FUNCTIONMACRO
@@ -165,7 +165,7 @@ EXPORT functions := MODULE
 // input file based upon the contents of a specific field within the input file and 
 // based upon the passed-in Data Restriction Mask (DRM).
     EXPORT MAC_FilterSources (infile, src_field='src', drm) := FUNCTIONMACRO
-      RETURN infile (NOT doxie.functions.isHeaderSourceRestricted (src_field, drm));
+      RETURN infile (NOT doxie.compliance.isHeaderSourceRestricted (src_field, drm));
     ENDMACRO;  
 
 

@@ -26,7 +26,7 @@ EXPORT IdentityFraudReport (
 
   // Inherit missing values from the global module; it is safer in case new fields added to the IDataAccess interface.
   // Can't project from {input} because of different type of ssn_mask (string vs. string6);
-  shared mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule (IsFCRA)))
+  shared mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule (IsFCRA)))
     EXPORT unsigned1 glb := param.glbpurpose;
     EXPORT unsigned1 dppa := param.dppapurpose;
     EXPORT string DataPermissionMask := DataPermission; 

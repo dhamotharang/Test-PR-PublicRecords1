@@ -53,7 +53,7 @@ export STR_Functions := MODULE
 	EXPORT fn_get_best_recs(dataset(doxie.layout_references) dids, 
 	                        BatchServices.Interfaces.str_config in_mod) := FUNCTION
 
-    mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
+    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
     glb_ok :=  mod_access.isValidGLB ();
     dppa_ok := mod_access.isValidDPPA ();
 		

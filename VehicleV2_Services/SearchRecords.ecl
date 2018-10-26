@@ -192,7 +192,7 @@ export SearchRecords := MODULE
 	
 	SHARED  getCombinedRecords(IParam.searchParams aInputData) :=FUNCTION			
 
-    mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+    mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
       EXPORT unsigned1 glb := aInputData.glbpurpose;
 	    EXPORT unsigned1 dppa := aInputData.dppapurpose;	
       EXPORT string DataPermissionMask := aInputData.DataPermissionMask;

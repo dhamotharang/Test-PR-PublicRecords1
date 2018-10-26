@@ -10,7 +10,7 @@ export Property_History_Function(DATASET(Layout_PropHistory_In) inData,
 						   BOOLEAN lnBranded=false, BOOLEAN doAVM=false) := 
 FUNCTION
 
-  mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+  mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
 	  EXPORT unsigned1 glb := glba;
 	  EXPORT unsigned1 dppa := ^.dppa;
 		EXPORT boolean ln_branded := lnBranded;

@@ -11,7 +11,7 @@ EXPORT PhoneSearch( DATASET(lBatchIn)                        dIn,
 										DATASET(Gateway.Layouts.Config)          dGateways) :=
 FUNCTION
 
-  mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+  mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
     EXPORT unsigned1 glb := inMod.GLBPurpose;
     EXPORT unsigned1 dppa := inMod.DPPAPurpose;
     EXPORT string DataPermissionMask := inMod.DataPermissionMask;

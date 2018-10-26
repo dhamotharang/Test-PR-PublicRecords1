@@ -47,7 +47,7 @@ export HeaderFileSearchService () := MACRO
 #option('workflow', 0);
 unsigned4 StartTick := doxie_regression.TimeService.Ticks() : stored('StartTick');
 doxie.MAC_Header_Field_Declare() //MaxResults_val, SkipRecords_val, MaxResultsThisTime_val, did_only
-mod_access := doxie.functions.GetGlobalDataAccessModule ();
+mod_access := doxie.compliance.GetGlobalDataAccessModule ();
 
 unsigned4 rec_id := 0 : stored('recid');
 

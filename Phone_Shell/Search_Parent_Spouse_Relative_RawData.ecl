@@ -56,7 +56,7 @@ EXPORT Phone_Shell.Layouts.Layout_Parent_Spouse_Relative_RawData Search_Parent_S
 	  *************************************************************** */
   // why input GLB, DPPA are not used?
 		
-  mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
+  mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
     EXPORT string DataRestrictionMask := ^.DataRestrictionMask;
   END;
   glb_ok := mod_access.isValidGLB();

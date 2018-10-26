@@ -23,7 +23,7 @@ export property_ids (
 ) := FUNCTION
 
 // In the future {mod_access} should be provided in the input
-mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule (IsFCRA)))
+mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule (IsFCRA)))
   EXPORT unsigned1 glb := glb_purpose;
   EXPORT unsigned1 dppa := dppa_purpose;
   EXPORT boolean ln_branded := ln_branded_value;

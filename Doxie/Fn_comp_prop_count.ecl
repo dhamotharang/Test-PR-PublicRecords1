@@ -18,7 +18,7 @@ FUNCTION
 
 	dids := dataset([{did_value}],doxie.layout_references);
 
-  mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+  mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
     EXPORT unsigned1 glb := 1;
     EXPORT unsigned1 dppa := 1;
     EXPORT boolean ln_branded := TRUE;

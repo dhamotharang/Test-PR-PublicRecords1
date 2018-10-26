@@ -7,7 +7,7 @@ iir := project(iir_temp, risk_indicators.Layout_InstandID_NuGen);
 //***** Pull the DID off of the InstantID result and use it to get more addresses and names
 
 gmod := AutoStandardI.GlobalModule();
-mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (gmod);
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (gmod);
 dial_contactprecision_value := AutoStandardI.InterfaceTranslator.dial_contactprecision_value.val(project(gmod,AutoStandardI.InterfaceTranslator.dial_contactprecision_value.params)); 
 
 DIDs := project(iir(DID > 0), Doxie.layout_references);

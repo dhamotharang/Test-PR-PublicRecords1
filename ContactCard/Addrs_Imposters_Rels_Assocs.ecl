@@ -7,7 +7,7 @@ import ut, doxie, suppress, codes, driversv2_services, watchdog, risk_indicators
 t_yesNo	:= PersonReports.layouts.t_yesNo; // string3
 yesNo		:= PersonReports.layouts.yesNo;
 
-mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ());
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ());
 
 export Addrs_imposters_rels_assocs(dataset(doxie.layout_references) dids, boolean checkrna = header.constants.checkRNA) := MODULE
 

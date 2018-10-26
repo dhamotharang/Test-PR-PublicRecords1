@@ -11,7 +11,7 @@
 
 import doxie, header, suppress, ut;
 doxie.MAC_Header_Field_Declare();
-mod_access := doxie.functions.GetGlobalDataAccessModule ();
+mod_access := doxie.compliance.GetGlobalDataAccessModule ();
 
 boolean RandR := false : stored('RandR');
 // contents of doxie.Layout_AddressSearch

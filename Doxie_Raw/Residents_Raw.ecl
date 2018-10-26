@@ -11,7 +11,7 @@ export Residents_Raw(
 	unsigned3 MaxResidentsPerAddr = 10
 ) := FUNCTION
 
-mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
+mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
   EXPORT unsigned1 dppa := dppa_purpose;
   EXPORT unsigned1 glb := glb_purpose;
   EXPORT boolean ln_branded := ln_branded_value;

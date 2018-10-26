@@ -307,7 +307,7 @@ export mod_Searches := MODULE
 		export records(params in_mod) := FUNCTION
 
       // {in_mod} is basically GlobalModule, but it doesn't define all fields required for projection.
-      mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+      mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
         EXPORT unsigned1 glb := AIT.GLB_Purpose.val(project(in_mod,AIT.GLB_Purpose.params));
         EXPORT unsigned1 dppa := AIT.DPPA_Purpose.val(project(in_mod,AIT.DPPA_Purpose.params));
         EXPORT string DataPermissionMask := in_mod.DataPermissionMask;

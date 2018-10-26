@@ -1,6 +1,6 @@
 ﻿import iesp,identifier2,address,ut,AutoStandardI, seed_files, risk_indicators,doxie, PersonReports, IntlIID, header, mdr, drivers, std;
 	
-	mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
+	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
 	finderParams := project (AutoStandardI.GlobalModule(), PersonReports.input._finderreport, opt);
 
 	boolean Test_Data_Enabled := FALSE   	: stored('TestDataEnabled');

@@ -8,7 +8,7 @@ MODULE
 // Read and format some of the inputs
 export maxresults_val := AutoStandardI.InterfaceTranslator.maxresults_val.val(project(gmod,AutoStandardI.InterfaceTranslator.maxresults_val.params));	
 
-EXPORT mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (gmod);
+EXPORT mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (gmod);
 
 export string4   ssn4_value := '' : STORED('SSN4');
 export unsigned2 yob_value := 0  : STORED('Yob');

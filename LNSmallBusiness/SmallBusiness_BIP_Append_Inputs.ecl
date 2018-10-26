@@ -5,7 +5,7 @@ EXPORT SmallBusiness_BIP_Append_Inputs (DATASET(LNSmallBusiness.BIP_Layouts.Inpu
                         BIPV2.mod_sources.iParams linkingOptions) := FUNCTION
 
   // Get values missing from the input from global.
-    mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
+    mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
       EXPORT unsigned1 glb :=linkingOptions.glbpurpose;
       EXPORT unsigned1 dppa := linkingOptions.dppapurpose;
       EXPORT string DataRestrictionMask := linkingOptions.DataRestrictionMask;

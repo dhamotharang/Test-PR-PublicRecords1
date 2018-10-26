@@ -119,13 +119,13 @@ Suppress.MAC_Suppress(%Fetch3a%,%Fetch3b%,%appType%,Suppress.Constants.LinkTypes
 
 #uniquename(Fetch3c)
 #uniquename(Fetch3c_minors_cleaned)
-%Fetch3c_minors_cleaned% := doxie.functions.MAC_FilterOutMinors (%Fetch3b%,,dob, modAccess.show_minors);
+%Fetch3c_minors_cleaned% := doxie.compliance.MAC_FilterOutMinors (%Fetch3b%,,dob, modAccess.show_minors);
 %Fetch3c% := if (IsFCRA, %Fetch3b%, %Fetch3c_minors_cleaned%);
 
 // Filter out any specific source(s) based upon the DataRestrictionMask.
 // As of October 2009 only Experian Credit Header is possibly being filtered out.
 #uniquename(Fetch3d)
-%Fetch3d% := doxie.functions.MAC_FilterSources (%Fetch3c%, src, modAccess.DataRestrictionMask);
+%Fetch3d% := doxie.compliance.MAC_FilterSources (%Fetch3c%, src, modAccess.DataRestrictionMask);
 
 #uniquename(Fetch3e0)
 #uniquename(Fetch3e)

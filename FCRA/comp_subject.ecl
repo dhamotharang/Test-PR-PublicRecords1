@@ -25,7 +25,7 @@ export comp_subject(dataset(doxie.layout_references) dids,
 										integer8 inFFDOptionsMask = 0) :=
 MODULE
 
-shared mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule(true));
+shared mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule(true));
 shared glb_ok := mod_access.isValidGLB(); //to use in a header cleaing macro
 shared dppa_ok := mod_access.isValidDPPA(); // ...
 

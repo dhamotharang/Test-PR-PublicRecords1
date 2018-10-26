@@ -1,7 +1,7 @@
 import didville, doxie, header, header_quick, utilfile, STD;
 
   doxie.MAC_Header_Field_Declare(); //score_threshold_value, phonetics
-  mod_access := doxie.functions.GetGlobalDataAccessModule (); 
+  mod_access := doxie.compliance.GetGlobalDataAccessModule (); 
 
 	//basic id record
 	acc_did_rec := record

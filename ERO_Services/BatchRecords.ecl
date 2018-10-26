@@ -5,7 +5,7 @@ export BatchRecords(/*ERO_Services.IParam.batchParams configData,*/
 										UNSIGNED1 did_limit=ERO_Services.Constants.Limits.DID_LIMIT,
 										BOOLEAN GetSSNBest=true) := function
    gm := AutoStandardI.GlobalModule(); //TODO: now only for IncludeMinors
-	 mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (gm);
+	 mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (gm);
 
 	 searchMod:= MODULE(PROJECT(gm, ERO_Services.IParam.searchParams,opt))	end;	
 	   // Set an adjusted did_limit to 1 just in case it gets accidently input as 0

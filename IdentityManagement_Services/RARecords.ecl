@@ -11,7 +11,7 @@ export RARecords (IdentityManagement_Services.IParam._report in_params, dataset 
   // Get values missing from the input from global.
   // Can't project from {input} because of different type of ssn_mask (string vs. string6);
   gmod := AutoStandardI.GlobalModule ();
-  mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (gmod))
+  mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (gmod))
     EXPORT unsigned1 glb := in_params.glbpurpose;
     EXPORT unsigned1 dppa := in_params.dppapurpose;
     EXPORT string DataPermissionMask := in_params.DataPermissionMask;

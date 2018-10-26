@@ -216,7 +216,7 @@ EXPORT functions := MODULE
     // TODO: the order of passing parameters was wrong, it is not clear what it should be. Needs verification.
     // Easier to create a new module rather than read from global: too many defaults
     gmod := AutoStandardI.GlobalModule ();
-    mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (gmod);
+    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (gmod);
 
     glb_ok := mod_access.isValidGLB ();
     dppa_ok := mod_access.isValidDPPA ();

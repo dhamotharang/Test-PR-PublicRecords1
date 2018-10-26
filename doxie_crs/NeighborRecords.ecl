@@ -55,7 +55,7 @@
 		unsigned1 Neighbor_Recency := 3 : stored('NeighborRecency');								
 
     gmod := AutoStandardI.GlobalModule (isFCRA);
-    mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (gmod))
+    mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (gmod))
       EXPORT unsigned1 glb := inmodGLBPurpose;
       EXPORT unsigned1 dppa := inmodDPPAPurpose;
       EXPORT string DataRestrictionMask := InmodDRM;

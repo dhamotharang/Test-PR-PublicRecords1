@@ -7,7 +7,7 @@ export Comp_RealTime_Vehicles (dataset(doxie.layout_references) dids,
 shared  input_params := AutoStandardI.GlobalModule();
 
 //TODO: not likely needed, but have to reset few values to be on the safe side:
-mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (input_params))
+mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (input_params))
                 EXPORT unsigned3 date_threshold := 0;
                 EXPORT boolean ln_branded := FALSE;
                 EXPORT boolean probation_override := FALSE;

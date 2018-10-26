@@ -61,7 +61,7 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 	headerRecs 								:= project(recs, TRANSFORM(header.Layout_Header,self:=left,self:=[]));			 
 
   //Some values are not provided in the input module; until that, has to make this call:
-  mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+  mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
     EXPORT unsigned1 glb := param.glbPurpose;
     EXPORT unsigned1 dppa := param.dppapurpose;
     EXPORT string DataPermissionMask := param.DataPermissionMask;
@@ -86,7 +86,7 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 
 	Residents_all := doxie.best_records(dids, IsFCRA, , , true, , includeDOD:=true, modAccess := mod_access);
 
-  Residents_Filtered := doxie.functions.MAC_FilterOutMinors (Residents_all, , dob, mod_access.show_minors);
+  Residents_Filtered := doxie.compliance.MAC_FilterOutMinors (Residents_all, , dob, mod_access.show_minors);
 
 	Suppress.MAC_Suppress(Residents_Filtered,Residents_Filt_did,mod_access.application_type,Suppress.Constants.LinkTypes.DID,did);
 	Suppress.MAC_Suppress(Residents_Filt_did,Residents_Filt_did_ssn,mod_access.application_type,Suppress.Constants.LinkTypes.SSN,ssn);

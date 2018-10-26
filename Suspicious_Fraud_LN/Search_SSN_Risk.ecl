@@ -25,7 +25,7 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_SSN_Risk (DATASET(Su
 	threeMonths := ROUND(sixMonths / 2);
 	twoMonths := ROUND(sixMonths / 3);
 	
-  mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
+  mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
     EXPORT unsigned1 glb := GLBPurpose;
     EXPORT unsigned1 dppa := DPPAPurpose;	
     EXPORT string DataRestrictionMask := ^.DataRestrictionMask;

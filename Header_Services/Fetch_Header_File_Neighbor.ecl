@@ -2,7 +2,7 @@ import header, doxie, ut, AutoHeaderI, AutoStandardI, AutoheaderV2;
 doxie.MAC_Header_Field_Declare()
 doxie.MAC_Selection_Declare()
 
-mod_access := doxie.functions.GetGlobalDataAccessModule ();
+mod_access := doxie.compliance.GetGlobalDataAccessModule ();
 // search header by address
 tempmod := module(project(AutoStandardI.GlobalModule(),AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full,opt))
   // I can blank some specific fields here to ease up a cleaning a little, if needed.

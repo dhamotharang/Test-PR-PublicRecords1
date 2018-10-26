@@ -40,7 +40,7 @@ export Check_Records(DATASET(iesp.checkpersonsearch.t_CheckPersonSearchRequest) 
 	 lname_set_val := AutoStandardI.InterfaceTranslator.lname_set_value.val(project(gm,AutoStandardI.InterfaceTranslator.lname_set_value.params));
 	 cleaned_lname_val := AutoStandardI.InterfaceTranslator.cleaned_input_lname.val(project(gm,AutoStandardI.InterfaceTranslator.cleaned_input_lname.params));
 
- 	 mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (gm);
+ 	 mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (gm);
    glb_ok := mod_access.isValidGLB();  
 	 dob_mask_value := mod_access.dob_mask; 
 

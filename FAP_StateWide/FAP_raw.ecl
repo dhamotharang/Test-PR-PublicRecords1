@@ -21,7 +21,7 @@ EXPORT FAP_raw := MODULE
 	unsigned4 max_limit := 2000;
 	out_layout  := FAB_StateWide.layout_FAB_Statewide_out;	
   Business_Header.doxie_MAC_Field_Declare()
-  mod_access := doxie.functions.GetGlobalDataAccessModule ();
+  mod_access := doxie.compliance.GetGlobalDataAccessModule ();
 
 	       
   EXPORT search := MODULE

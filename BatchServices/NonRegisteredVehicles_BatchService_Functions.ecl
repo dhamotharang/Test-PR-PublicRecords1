@@ -32,7 +32,7 @@ EXPORT NonRegisteredVehicles_BatchService_Functions := MODULE
 																 limit(BatchServices.NonRegisteredVehicles_BatchService_Constants.JOIN_LIMIT_UNLMTD));
 
   // Check/clean the header records that were acquired.
-  mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
   glb_ok :=  mod_access.isValidGLB ();
   dppa_ok := mod_access.isValidDPPA ();
 	Header.MAC_GlbClean_Header(ds_hdr_recs_for_dids,ds_hdr_recs_outglbclean, , , mod_access);

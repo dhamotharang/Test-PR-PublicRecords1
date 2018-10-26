@@ -603,7 +603,7 @@ end;
 export fPossibleOwners(dataset(AddressReport_Services.Layouts.in_address) in_recs,
 											AddressReport_Services.input.params in_param) := function
 
-  mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
+  mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
     EXPORT unsigned1 glb := in_param.glbPurpose;
     EXPORT unsigned1 dppa := in_param.dppaPurpose;
     EXPORT string DataPermissionMask := in_param.DataPermissionMask;

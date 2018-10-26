@@ -44,7 +44,7 @@ EXPORT WeAlsoFoundService := MACRO
   IF (Err, FAIL (11, doxie.ErrorCodes (11)));
 
   doxie.MAC_Header_Field_Declare(); // read glb, dppa
-  mod_access := doxie.functions.GetGlobalDataAccessModule ();
+  mod_access := doxie.compliance.GetGlobalDataAccessModule ();
 
   // slim down to required fields
   slim_rec := RECORD

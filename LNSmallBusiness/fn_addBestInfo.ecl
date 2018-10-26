@@ -5,7 +5,7 @@ EXPORT fn_addBestInfo (LNSmallBusiness.IParam.LNSmallBiz_BIP_CombinedReport_IPar
                       )  := 
   FUNCTION
 
-    mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule ()))
+    mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule ()))
       EXPORT unsigned1 glb := SmallBizCombined_inmod.glbpurpose;
       EXPORT unsigned1 dppa := SmallBizCombined_inmod.dppapurpose;	
       EXPORT string DataPermissionMask := SmallBizCombined_inmod.datapermissionmask;

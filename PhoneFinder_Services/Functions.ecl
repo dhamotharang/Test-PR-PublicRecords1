@@ -72,7 +72,7 @@ MODULE
 	EXPORT GetBestInfo(DATASET(lBatchInDID) dIn) :=
 	FUNCTION
 
-	  mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ());
+	  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ());
 
 		dids := DEDUP(SORT(PROJECT(dIn,doxie.layout_references),did),did);
 		

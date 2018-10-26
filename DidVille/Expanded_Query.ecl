@@ -6,7 +6,7 @@ unsigned1 MaxAddr  := 10 : stored('MaxAddresses');
 unsigned1 MaxRecsPer  := 50 : stored('MaxRecordsPerCandidate');
 
 // doxie.MAC_Header_Field_Declare()
-mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
 glb_ok := mod_access.isValidGLB ();
 dppa_ok := mod_access.isValidDPPA ();
 

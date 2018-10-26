@@ -38,7 +38,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Extended_Sk
 	/* ***************************************************************
 		* 						        	Get Blue Records						      			*
 	  *************************************************************** */
-  mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
+  mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
     EXPORT string DataRestrictionMask := ^.DataRestrictionMask;
   END;
   glb_ok := mod_access.isValidGLB();

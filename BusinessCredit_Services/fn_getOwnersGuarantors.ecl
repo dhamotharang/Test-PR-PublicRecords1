@@ -5,7 +5,7 @@ EXPORT fn_getOwnersGuarantors (	BusinessCredit_Services.Iparam.reportrecords inm
 																boolean buzCreditAccess = FALSE
 																) := FUNCTION
 
-  mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
+  mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
     EXPORT unsigned1 glb := inmod.glbpurpose;
     EXPORT unsigned1 dppa := inmod.dppapurpose;
     EXPORT string DataPermissionMask := inmod.DataPermissionMask;

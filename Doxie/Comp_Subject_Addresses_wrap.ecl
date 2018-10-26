@@ -5,7 +5,7 @@ IMPORT $;
 $.MAC_Selection_Declare();
 $.MAC_Header_Field_Declare();
 
-mod_access := $.functions.GetGlobalDataAccessModule ();
+mod_access := $.compliance.GetGlobalDataAccessModule ();
  
 export Comp_Subject_Addresses_wrap :=
 MODULE

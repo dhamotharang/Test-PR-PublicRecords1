@@ -7,7 +7,7 @@ IMPORT BatchServices,BIPV2,BIPV2_Build,Codes,DeathV2_Services,Doxie,Doxie_Raw,Em
 
 EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwnership.IParams.BatchParams inMod) :=FUNCTION //
 
-  mod_access := MODULE (doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+  mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
       EXPORT unsigned1 glb := inMod.glbpurpose;
       EXPORT unsigned1 dppa := inMod.dppapurpose;
       EXPORT string DataPermissionMask := inMod.DataPermissionMask;

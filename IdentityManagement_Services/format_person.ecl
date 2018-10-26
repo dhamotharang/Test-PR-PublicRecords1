@@ -18,7 +18,7 @@ END;
 
 EXPORT out_rec format_person (dataset(doxie.layout_references) dids):= FUNCTION
 
-  mod_access := doxie.functions.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ());
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ());
 
 	// 157096:UNIMPLEMENTED Activity <parameter> Error workaround.
 	// Passed in only dids as input parameter and brought header_records_byDID here.
