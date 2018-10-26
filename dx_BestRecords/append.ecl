@@ -24,7 +24,7 @@ EXPORT append(did_ds, did_field, permission_type, left_outer = 'true', on_thor =
 
 	// select correct join based on the input flag
 	// NOTE: we expect a valid value of type dx_BestRecords.Constants.perm_type
-	LOCAL br_output := map(
+	LOCAL br_output := MAP(
 		permission_type = dx_BestRecords.Constants.perm_type.glb => out_glb, 
 		permission_type = dx_BestRecords.Constants.perm_type.glb_nonexperian => out_glb_nonexp, 
 		permission_type = dx_BestRecords.Constants.perm_type.glb_nonequifax => out_glb_noneq, 
