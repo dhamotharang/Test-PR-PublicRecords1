@@ -42,7 +42,7 @@
 */
 /*--INFO-- Contains RiskView Scores AirWaves, Auto, Bankcard, Retail and Money and Attributes */
 
-IMPORT Risk_Reporting;
+IMPORT Risk_Reporting, STD;
 
 export RiskView_Service := MACRO
 
@@ -136,7 +136,18 @@ export RiskView_Service := MACRO
 	gateways_in := Gateway.Configuration.Get();
 	model_url := if( exists(model_url1) or exists(attributesIn), model_url1, fail(Models.Layout_Score_Chooser, 'No scores or attributes requested'));
 
-	model_count := count(model_url);
+  layout_temp := record
+		dataset(models.layout_parameters) params;
+	end;
+
+  // Grab only the model names
+  model_params := project(model_url(STD.Str.ToLowerCase(name)in ['models.riskview_service','models.rvauto_service','models.rvbankcard_service',
+                                    'models.rvretail_service','models.rvtelecom_service','models.rvmoney_service','models.rvprescreen_service']),
+                          transform(layout_temp,
+                                    self.params := left.parameters(STD.Str.ToLowerCase(name)='custom'))
+                         );
+                           
+  model_count := count(model_params);
 
 	riskview_xml := Models.RiskView_Records;
 
@@ -177,10 +188,10 @@ export RiskView_Service := MACRO
 																					 self.i_dl_state := drlcstate_value,
                                            self.i_home_phone := hphone_value,
                                            self.i_work_phone := wphone_value,
-																					 self.i_model_name_1 := if(model_count >= 1, model_url.parameters[1].value, ''),
+																					 self.i_model_name_1 := if(model_count >= 1, model_params.params[1].value, ''),
 																					 // Check to see if there was a model requested
 																					 extra_score := model_count > 1;
-																					 self.i_model_name_2 := model_url.parameters[2].value,
+																					 self.i_model_name_2 := IF(extra_score, model_params.params[2].value, ''),
 																					 self.o_score_1    := IF(model_count != 0, left.Models[1].Scores[1].i, ''),
 																					 self.o_reason_1_1 := left.Models[1].Scores[1].reason_codes[1].reason_code,
 																					 self.o_reason_1_2 := left.Models[1].Scores[1].reason_codes[2].reason_code,
