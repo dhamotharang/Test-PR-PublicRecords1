@@ -1,8 +1,8 @@
-IMPORT Address, Business_Risk, Business_Risk_BIP, Census_data, DID_Add, Risk_Indicators, STD, ut;
+﻿IMPORT Address, Business_Risk, Business_Risk_BIP, Census_data, DID_Add, Risk_Indicators, STD, ut;
 
 	// The following function determines whether Business data passed in from the customer were actually found
 	// in various sources.
-	EXPORT fn_GetVerificationInfo( DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo) ds_OriginalInput,
+	EXPORT fn_GetVerificationInfo( DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfoClean) ds_CleanedInput,  
 	                               DATASET(BusinessInstantID20_Services.layouts.BusinessHeaderSlim) ds_BusinessHeader,
 																 DATASET(Business_Risk_BIP.Layouts.Shell) ds_Shell_Results,
 																 BusinessInstantID20_Services.iOptions Options) := 
@@ -52,13 +52,13 @@ IMPORT Address, Business_Risk, Business_Risk_BIP, Census_data, DID_Add, Risk_Ind
 
 				// Okay, let's do some matching. The Company and Address data in the layout below
 				// are from the matching key record. Seq is from the input record.				
-				layout_temp xfm_ScoreTheData( ds_OriginalInput le, ds_BusinessHeaderSlimDeduped ri ) :=
+				layout_temp xfm_ScoreTheData( ds_CleanedInput le, ds_BusinessHeaderSlimDeduped ri ) :=
 					TRANSFORM
 						// NOTE: except for the company name, we're making no effort at this point to improve
 						// efficiency by doing first character comparisons to short-circuit fuzzy matching, as 
-						// in Business_Risk_BIP.getBusinessHeader( ).
-						
-						inp_city  := UCase(TRIM(le.City));
+						// in Business_Risk_BIP.getBusinessHeader( ).	
+            
+						inp_city  := UCase(TRIM(le.p_city_name));
 						p_city    := UCase(TRIM(ri.p_city_name));
 						v_city    := UCase(TRIM(ri.v_city_name));
 	
@@ -87,7 +87,7 @@ IMPORT Address, Business_Risk, Business_Risk_BIP, Census_data, DID_Add, Risk_Ind
 						CityMatched := Risk_Indicators.iid_constants.ga( CityScore );
 						use_V_City  := V_CityScore > P_CityScore;
 								
-						StateScore := fn_StateScore( le.State, ri.st );
+						StateScore := fn_StateScore( le.St, ri.st );
 						StateMatched := StateScore = 100;
 						
 						CityStateScore := 
@@ -98,19 +98,17 @@ IMPORT Address, Business_Risk, Business_Risk_BIP, Census_data, DID_Add, Risk_Ind
 									0 
 								);
 						
-						Zip5Score := fn_Zip5Score( le.Zip, ri.Zip );
+						Zip5Score := fn_Zip5Score( le.Zip5, ri.Zip );
 						Zip5Matched := Zip5Score = 100;
 						
-						// Calculate Address score; a bit more work.
-						CleanAddr := Risk_Indicators.MOD_AddressClean.clean_addr(le.StreetAddress1, inp_city, le.State, le.Zip, le.StreetAddress2);											
-						cln := Address.CleanFields(CleanAddr);
 
+            // Calculate Address score; a bit more work.
 						AddressPopulated := (le.StreetAddress1 <> '' OR le.StreetAddress2 <> '') AND ri.prim_name <> '';
 						AddressScore := 
 								IF(
 										Zip5Score = Risk_Indicators.iid_constants.default_empty_score AND CityStateScore = Risk_Indicators.iid_constants.default_empty_score, 
 										Risk_Indicators.iid_constants.default_empty_score, 
-										Risk_Indicators.AddrScore.AddressScore(cln.Prim_Range, cln.Prim_Name, cln.Sec_Range, ri.prim_range, ri.prim_name, ri.sec_range, Zip5Score, CityStateScore)
+										Risk_Indicators.AddrScore.AddressScore(le.Prim_Range, le.Prim_Name, le.Sec_Range, ri.prim_range, ri.prim_name, ri.sec_range, Zip5Score, CityStateScore)
 									);
 						AddressMatched := AddressPopulated AND Risk_Indicators.iid_constants.ga( AddressScore );
 
@@ -155,7 +153,7 @@ IMPORT Address, Business_Risk, Business_Risk_BIP, Census_data, DID_Add, Risk_Ind
 					
 				ds_Matching :=
 					JOIN(
-						ds_OriginalInput, ds_BusinessHeaderSlimDeduped,
+						ds_CleanedInput, ds_BusinessHeaderSlimDeduped,
 						LEFT.Seq = RIGHT.uniqueid,
 						xfm_ScoreTheData(LEFT,RIGHT),
 						LEFT OUTER

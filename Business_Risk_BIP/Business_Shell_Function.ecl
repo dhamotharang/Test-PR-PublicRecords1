@@ -3911,11 +3911,9 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Verification.NameMatchSourceLSList := calculateValueFor._NameMatchSourceLSList(SeqNameSources);
 
 		SELF.Verification.NameMatchSourceCount := (STRING)Business_Risk_BIP.Common.capNum(COUNT(SeqNameSources), -1, 99);
-		cantVerifyAddress := IF(le.Input.InputCheckBusAddr = '0' OR // If any element of address wasn't populated we can't verify it
-														le.Input.InputCheckBusCity = '0' OR
-														le.Input.InputCheckBusState = '0' OR
-														le.Input.InputCheckBusZip = '0',
-													TRUE, FALSE);
+                          
+    cantVerifyAddress := FALSE;  // don't check the individual parts anymore, part of RQ-14786
+                          
 		SELF.Verification.AddrVerificationSourceList := IF(cantVerifyAddress, '', Business_Risk_BIP.Common.convertDelimited(SeqAddressVerSources, Source, Business_Risk_BIP.Constants.FieldDelimiter));
 		SELF.Verification.AddrVerificationSourceCount := IF(cantVerifyAddress, '-1', (STRING)Business_Risk_BIP.Common.capNum(COUNT(SeqAddressVerSources), -1, 99));
 		SELF.Verification.AddrVerificationDateFirstSeenList := IF(cantVerifyAddress, '', Business_Risk_BIP.Common.convertDelimited(SeqAddressVerSources, DateFirstSeen, Business_Risk_BIP.Constants.FieldDelimiter));
