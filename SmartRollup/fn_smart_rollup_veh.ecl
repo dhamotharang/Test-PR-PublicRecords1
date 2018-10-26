@@ -1,5 +1,6 @@
 ﻿import iesp,STD,VehicleV2,ut;
 export fn_smart_rollup_veh(dataset(iesp.motorvehicle.t_MotorVehicleReport2Record) inRecs,unsigned6 subjectDID) := function
+  todays_date := STD.Date.Today();
   outLayout := record
 		string1 current_prior;
  	  unsigned4 regist_date_9999;
@@ -38,8 +39,7 @@ export fn_smart_rollup_veh(dataset(iesp.motorvehicle.t_MotorVehicleReport2Record
   // The car will show in the prior vehicle section until the new vender record is in the data. 
 	// currOwners(append_did = subjectDID... allows for co-owners to show the veh as current
   dRecs fixCurrent(dRecs L) := transform
-	  todays_date := STD.Date.Today ();
-    owners := LIMIT(VehicleV2.Key_Vehicle_Party_Key(keyed(vehicle_key = L.vehicleInfo.vehicleRecordId)),1000,KEYED,SKIP);
+	  owners := LIMIT(VehicleV2.Key_Vehicle_Party_Key(keyed(vehicle_key = L.vehicleInfo.vehicleRecordId)),1000,KEYED,SKIP);
     sowners := sort(owners, -reg_latest_effective_date,-reg_latest_expiration_date,-date_vendor_last_reported);
     currOwners := sowners(reg_latest_effective_date = sowners[1].reg_latest_effective_date AND
                           reg_latest_expiration_date = sowners[1].reg_latest_expiration_date AND
