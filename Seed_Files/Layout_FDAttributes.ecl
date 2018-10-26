@@ -1,4 +1,6 @@
-﻿Layout_Version1 := RECORD
+﻿import riskwise;
+
+Layout_Version1 := RECORD
 	unsigned4 SSNFirstSeen;
 	unsigned4 DateLastSeen;
 	boolean   isRecentUpdate;
@@ -559,4 +561,5 @@ export Layout_FDAttributes := RECORD
 	Layout_Version2 version2;
 	Layout_IDAttributes IDAttributes;
 	Layout_Version201 version201;
+	riskwise.layouts.Paro_IT1O_layout ParoAttributes;
 END;
