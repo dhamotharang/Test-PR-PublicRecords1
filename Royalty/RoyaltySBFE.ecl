@@ -1,10 +1,38 @@
 ﻿Import LNSmallBusiness;
 EXPORT RoyaltySBFE := module
 		
-	EXPORT GetOnlineRoyalties(dRecsOut,OutputType) := 
+
+    EXPORT GetOnlineRoyalties(dRecsOut) := 
+
 		FUNCTIONMACRO	
 		
-			dTGRoyalOut :=  if ( OutputType IN [ LNSmallBusiness.Constants.OutputType.PDF_AND_XML,
+			dTGRoyalOut :=      DATASET([{
+                              Royalty.Constants.RoyaltyCode.SBFE,
+                              Royalty.Constants.RoyaltyType.SBFE,
+                              (UNSIGNED)((INTEGER)dRecsOut[1].SBFEAccountCount > 0),
+                              0
+                            }],Royalty.Layouts.Royalty);			
+			
+			RETURN dTGRoyalOut;
+	ENDMACRO;		
+
+	EXPORT GetNoRoyalties() := 
+		FUNCTIONMACRO	
+		
+			dTGRoyalOut :=    DATASET([{
+                                  Royalty.Constants.RoyaltyCode.SBFE,
+                                  Royalty.Constants.RoyaltyType.SBFE,
+                                  0,
+                                  0
+                                }],Royalty.Layouts.Royalty);			
+			
+			RETURN dTGRoyalOut;
+	ENDMACRO;
+	
+	EXPORT GetOnlineRoyaltiesPlus(dRecsOut,OutputType) := 
+		FUNCTIONMACRO	
+		
+			dTGRoyalPlusOut :=  if ( OutputType IN [ LNSmallBusiness.Constants.OutputType.PDF_AND_XML,
                                           LNSmallBusiness.Constants.OutputType.PDF_ONLY],
                           DATASET([{
                               Royalty.Constants.RoyaltyCode.SBFE_PDF,
@@ -27,13 +55,13 @@ EXPORT RoyaltySBFE := module
                             }],Royalty.Layouts.Royalty)
          );			
 			
-			RETURN dTGRoyalOut;
+			RETURN dTGRoyalPlusOut;
 	ENDMACRO;		
 
-	EXPORT GetNoRoyalties(OutputType) := 
+	EXPORT GetNoRoyaltiesPlus(OutputType) := 
 		FUNCTIONMACRO	
 		
-			dTGRoyalOut := if ( OutputType IN [ LNSmallBusiness.Constants.OutputType.PDF_AND_XML,
+			dTGRoyalPlusOut := if ( OutputType IN [ LNSmallBusiness.Constants.OutputType.PDF_AND_XML,
                                           LNSmallBusiness.Constants.OutputType.PDF_ONLY],
                       DATASET([{
                                   Royalty.Constants.RoyaltyCode.SBFE,
@@ -56,7 +84,7 @@ EXPORT RoyaltySBFE := module
                                   0
                                 }],Royalty.Layouts.Royalty));			
 			
-			RETURN dTGRoyalOut;
+			RETURN dTGRoyalPlusOut;
 	ENDMACRO;	
 	
 	EXPORT GetBatchRoyaltiesByAcctno(dInF, dRecsOut, fAcctno='acctno') := 
