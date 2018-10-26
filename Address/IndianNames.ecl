@@ -8,7 +8,7 @@ END;
 
 csvboys := DATASET('~thor200_144::csalvo::indiannames::boys',rNamaRupa,
 			CSV(SEPARATOR('\t'),QUOTE('"')));
-csvgirls := DATASET('~thor200_144::csalvo::indiannames::boys',rNamaRupa,
+csvgirls := DATASET('~thor200_144::csalvo::indiannames::girls',rNamaRupa,
 			CSV(SEPARATOR('\t'),QUOTE('"')));
 			
 rNamaRupa x(rNamaRupa s) := TRANSFORM
@@ -101,10 +101,12 @@ shared SET of STRING20 IndianBoys := [
 'AMISH',
 'AMITABH',
 'AMITESH',
+'AMLAN',
 'AMOGH',
 'AMRIT',
 'ANAGH',
 'ANANDMOORTI',
+'ANANTHA',
 'ANANTRAM',
 'ANGAK',
 'ANILKUMAR',
@@ -120,6 +122,8 @@ shared SET of STRING20 IndianBoys := [
 'APOORVA',
 'APURVA',
 'ARJUN',
+'ARJUNA',
+'ARJUNE',
 'ARUN',
 'ASEEM',
 'ASHOK',
@@ -244,6 +248,8 @@ shared SET of STRING20 IndianBoys := [
 'CHELIYAN',
 'CHELLAMUTHU',
 'CHEMMAL',
+'CHEMMANAPPILL',
+'CHEMPAKASSERIL',
 'CHETANA',
 'CHHAILBEHARI',
 'CHIDAMBAR',
@@ -288,6 +294,7 @@ shared SET of STRING20 IndianBoys := [
 'DAYASAGAR',
 'DAYASHANKAR',
 'DEBASHIS',
+'DEBENDRA',
 'DEENABANDHU',
 'DEENDAYAL',
 'DEEPAK',
@@ -495,6 +502,7 @@ shared SET of STRING20 IndianBoys := [
 'HASIT',
 'HASSAN',
 'HAVISH',
+'HEBA',
 'HEM',
 'HEMADRI',
 'HEMAN',
@@ -508,6 +516,7 @@ shared SET of STRING20 IndianBoys := [
 'HIMNISH',
 'HIRANYA',
 'HIRESH',
+'HITESH',
 'HRIDAY',
 'HRIDAYESH',
 'HRIDIK',
@@ -560,6 +569,7 @@ shared SET of STRING20 IndianBoys := [
 'JAGACHANDRA',
 'JAGADAYU',
 'JAGADEEP',
+'JAGADEESH',
 'JAGADEV',
 'JAGADIP',
 'JAGADISHWARA',
@@ -616,6 +626,7 @@ shared SET of STRING20 IndianBoys := [
 'JEETANDRA',
 'JEEVANPRAKASH',
 'JEHANGIR',
+'JEONA',
 'JHOOMER',
 'JIHAN',
 'JISHNU',
@@ -717,11 +728,24 @@ shared SET of STRING20 IndianBoys := [
 'KOVIDA',
 'KRIPAL',
 'KRIPASAGAR',
+'KRISHANT',
+'KRISHANTA',
+'KRISHANTHA',
+'KRISHANTHI',
+'KRISHANTI',
+'KRISHMATTI',
+'KRISHMATTIE',
 'KRISHNA',
 'KRISHNADEVA',
 'KRISHNAKUMAR',
+'KRISHNALAL',
+'KRISHNAMOORTH',
 'KRISHNAMOORTI',
 'KRISHNAMURTHY',
+'KRISHNAPRIYA',
+'KRISHNAT',
+'KRISHNAWAT',
+'KRISHNAWATTIE',
 'KRISHNENDU',
 'KSHIRAJ',
 'KSHITIJ',
@@ -899,6 +923,7 @@ shared SET of STRING20 IndianBoys := [
 'NANDAN',
 'NANDI',
 'NANDISH',
+'NARADA',
 'NARAHARI',
 'NARAYAN',
 'NARENDRA',
@@ -1135,9 +1160,12 @@ shared SET of STRING20 IndianBoys := [
 'RAKESH',
 'RAKSHAN',
 'RAM',
+'RAMACHANDRA',         
+'RAMACHANDER',       
 'RAMAKANTA',
 'RAMAN',
 'RAMANUJA',
+'RAMARATNAM',
 'RAMAVATAR',
 'RAMDAS',
 'RAMESHWAR',
@@ -1150,7 +1178,9 @@ shared SET of STRING20 IndianBoys := [
 'RANDHEER',
 'RANGA',
 'RANGANATH',
+'RANJ',
 'RANJAN',
+'RANJEET',
 'RANJIT',
 'RASARAJ',
 'RASESH',
@@ -1179,6 +1209,7 @@ shared SET of STRING20 IndianBoys := [
 'ROHIT',
 'ROHITASVA',
 'ROSHAN',
+'ROTISH',
 'RUDRA',
 'RUJUL',
 'RUPAK',
@@ -1230,6 +1261,7 @@ shared SET of STRING20 IndianBoys := [
 'SANDANANDA',
 'SANDEEPAN',
 'SANGUPT',
+'SANJAI',
 'SANJAY',
 'SANJITH',
 'SANJIVAN',
@@ -1378,7 +1410,10 @@ shared SET of STRING20 IndianBoys := [
 'SUDESHA',
 'SUDHAKAR',
 'SUDHAN',
+'SUDHEENDRA',
+'SUDHENDRA',
 'SUDHANSSU',
+'SUDHEER',
 'SUDHINDRA',
 'SUDHISH',
 'SUDIP',
@@ -1641,6 +1676,7 @@ shared SET of STRING20 IndianGirls := [
 'AKSHAYA',
 'AKSITHI',
 'AKUTI',
+'ALEYAMMA',                                
 'ALISHA',
 'ALKA',
 'ALOPA',
@@ -1697,7 +1733,7 @@ shared SET of STRING20 IndianGirls := [
 'APARNA',
 'APSARA',
 'ARADHANA',
-'ARATI, AAARTI',
+'ARATI,		// AAARTI',
 'ARCHA',
 'ARCHANA',
 'ARCHISHA',
@@ -1752,6 +1788,7 @@ shared SET of STRING20 IndianGirls := [
 'BARSHA',
 'BARUNA',
 'BASABI',
+'BEENA',                                   
 'BELA',
 'BENAZIR',
 'BHAGAVATHI',
@@ -1923,6 +1960,7 @@ shared SET of STRING20 IndianGirls := [
 'GAUHAR',
 'GAURI',
 'GAUTAMI',
+'GAUTAMY',
 'GAYANTHIKA',
 'GAZALA',
 'GEETA',
@@ -1975,11 +2013,13 @@ shared SET of STRING20 IndianGirls := [
 'HEERA',
 'HEMA',
 'HEMALATA',
+'HEMALATHA',                               
 'HEMANGINI',
 'HEMANTI',
 'HEMAPRABHA',
 'HEMAVATI',
 'HEMLATA',
+'HEMWATTIE',
 'HENNA',
 'HIMA',
 'HIMAJA',
@@ -2022,6 +2062,11 @@ shared SET of STRING20 IndianGirls := [
 'ISHYA',
 'IVY',
 'IYLA',
+'JANAKI',                                  
+'JAYANTHI',                                
+'JAYASHREE',                               
+'JAYSHREE',                                
+'JIAH',
 'KAANDHAL',
 'KADAMBARI',
 'KADHIROLI',
@@ -2050,6 +2095,7 @@ shared SET of STRING20 IndianGirls := [
 'KANAKABATI',
 'KANAKLATA',
 'KANAN',
+'KANCHANA',                                
 'KANCHANPRABHA',
 'KANDHARA',
 'KANIKA',
@@ -2065,6 +2111,7 @@ shared SET of STRING20 IndianGirls := [
 'KARUNA',
 'KARUNAMAYI',
 'KASHI',
+'KASHMIR',
 'KASNI',
 'KATYAYANI',
 'KAUSHALYA',
@@ -2263,6 +2310,7 @@ shared SET of STRING20 IndianGirls := [
 'NAGANALATHA',
 'NAGANIKA',
 'NAGINA',
+'NAHEED',                                  
 'NAIMA',
 'NAINI',
 'NAISHA',
@@ -2276,6 +2324,7 @@ shared SET of STRING20 IndianGirls := [
 'NAMYA',
 'NANDANA',
 'NANDIKA',
+'NANDINI',                                 
 'NANDITA',
 'NARAYANI',
 'NAROIS',
@@ -2295,6 +2344,7 @@ shared SET of STRING20 IndianGirls := [
 'NEETI',
 'NEHAL',
 'NETRAVATI',
+'NEWSHA',
 'NIDHIPA',
 'NIDHYATHI',
 'NIHARIKA',
@@ -2413,6 +2463,7 @@ shared SET of STRING20 IndianGirls := [
 'RAJASHRI',
 'RAJATA',
 'RAJESHWARI',
+'RAJESWARI',                               
 'RAJKUMARI',
 'RAJNANDINI',
 'RAKA',
@@ -2427,12 +2478,14 @@ shared SET of STRING20 IndianGirls := [
 'RASHMIKA',
 'RASNA',
 'RATI',
+'RATNA',                                   
 'RATNABALA',
 'RATNAJYOTI',
 'RATNALEKHA',
 'RATNAMALA',
 'RATNAPRABHA',
 'RATNAVALI',
+'REHAB',
 'REKHA',
 'RENUKA',
 'RESHMA',
@@ -2486,6 +2539,7 @@ shared SET of STRING20 IndianGirls := [
 'SANA',
 'SANATANI',
 'SANCHAYA',
+'SANCHITA',
 'SANDHAYA',
 'SANEMI',
 'SANIKA',
@@ -2502,6 +2556,7 @@ shared SET of STRING20 IndianGirls := [
 'SAPNA',
 'SARAKSHI',
 'SARAMA',
+'SARAMMA',
 'SARANYA',
 'SARASI',
 'SARASWATI',
@@ -2527,22 +2582,27 @@ shared SET of STRING20 IndianGirls := [
 'SESHA',
 'SEVITA',
 'SHABALINI',
+'SHABANA',                                 
 'SHABARI',
 'SHACHI',
 'SHAHEENA',
 'SHAILAJA',
+'SHAISTA',                                 
 'SHAKAMBARI',
 'SHAKEELA',
 'SHAKUNTALA',
 'SHALIKA',
 'SHALINI',
 'SHAMA',
+'SHAMALA',
 'SHAMBHAVI',
 'SHAMEENA',
 'SHAMITA',
 'SHANKARI',
 'SHANTA',
+'SHANTHI',                                 
 'SHANTI',
+'SHARADA',
 'SHARADINI',
 'SHARIBA',
 'SHARMILA',
@@ -2614,6 +2674,7 @@ shared SET of STRING20 IndianGirls := [
 'SONALI',
 'SONIA',
 'SOORAT',
+'SOSAMMA',                                 
 'SOUMYA',
 'SOWMYA',
 'SRAGVI',
@@ -2711,6 +2772,7 @@ shared SET of STRING20 IndianGirls := [
 'TARU',
 'TARUNI',
 'TARUNIMA',
+'TASNEEM',                                 
 'TEERTHA',
 'TEHZEEB',
 'TEJAL',
@@ -2763,6 +2825,7 @@ shared SET of STRING20 IndianGirls := [
 'UTPALA',
 'UTPATTI',
 'UTTARA',
+'VASANTHA',                                
 'WAFIYA',
 'WAJEEHA',
 'WAMIL',
@@ -2821,6 +2884,7 @@ shared SET of STRING20 IndianSurnames := [
 'BUJARBARUA',
 'PANDITBHUYAN',
 'BARBHUYAN',
+'BISHU',
 'BORO',
 'BORA',
 'BORAH',
@@ -2860,6 +2924,7 @@ shared SET of STRING20 IndianSurnames := [
 'SARMAH',
 'SHARMA',
 'SIDDHANT',
+'GUMMADI',
 'TERANG',
 'TERON',
 'THAKORE',
@@ -3072,6 +3137,7 @@ shared SET of STRING20 IndianSurnames := [
 'TOMAR',
 'TRIVEDI',
 'UPADHYAY',
+'LAJEVARDI',                          
 'VAJPAI',
 'VASUDEV',
 'VERMA',
@@ -3164,6 +3230,7 @@ shared SET of STRING20 IndianSurnames := [
 'KUMAR',
 'KYADA',
 'KHILOSIA',
+'LAJEVARDI',
 'LALBHAI',
 'LUNAGARIYAMACWAN',
 'MAKAVANA',
@@ -3445,6 +3512,7 @@ shared SET of STRING20 IndianSurnames := [
 'UPADHYAYA',
 'WALI',
 'WANI',
+'NAIPAUL',
 'ANCHAN',
 'HULLATHI',
 'MALGI',
@@ -5162,6 +5230,7 @@ shared SET of STRING20 IndianSurnames := [
 'GOVEKAR',
 'SALGAONKAR',
 'USGAONKAR',
+'PUISTOLAHTI',
 // from Bangladesh
 'ALAM',
 'BEGUM',
@@ -5169,8 +5238,6 @@ shared SET of STRING20 IndianSurnames := [
 'HOSSAIN',
 'MIAH',
 // Pakistan
-'KHOKAR',
-'ZUGAJ',
 'AFRIDI',
 'AGHA',
 'ALVI',
@@ -5185,6 +5252,7 @@ shared SET of STRING20 IndianSurnames := [
 'FAROOQI',
 'JAFFRI',
 'KALPAR',
+'KHOKAR',
 'MOOSVI',
 'KAZMI',
 'LAGHARI',
@@ -5208,6 +5276,7 @@ shared SET of STRING20 IndianSurnames := [
 'USMANI',
 'WASTI',
 'ZAIDI',
+'ZUGAJ',
 'ZUGI'
 ];
 /*
@@ -5219,19 +5288,28 @@ export boolean IsIndianGirlsName(string20 name) :=
 	name in IndianGirls;
 export boolean IsIndianSurName(string20 name) := name in IndianSurnames;
 */
-shared SET OF STRING32 boyTokens := Address.TokenManagement.SortAndTerminateSet(IndianBoys);	
-shared SET OF STRING32 girlTokens := Address.TokenManagement.SortAndTerminateSet(IndianGirls);	
-shared SET OF STRING32 surnameTokens := Address.TokenManagement.SortAndTerminateSet(IndianSurnames);
-	
-export boolean IsIndianBoysName(string20 name) :=
-	Address.TokenManagement.FindToken(boyTokens, name);
-export boolean IsIndianGirlsName(string20 name) :=
-	Address.TokenManagement.FindToken(girlTokens, name);
-export boolean IsIndianName(string20 name) :=
-	IsIndianBoysName(name) OR IsIndianGirlsName(name);
-export boolean IsIndianSurName(string20 name) := 
-	Address.TokenManagement.FindToken(surnameTokens, name);
-
+//shared SET OF STRING32 boyTokens := Address.TokenManagement.SortAndTerminateSet(IndianBoys);	
+//shared SET OF STRING32 girlTokens := Address.TokenManagement.SortAndTerminateSet(IndianGirls);	
+//shared SET OF STRING32 surnameTokens := Address.TokenManagement.SortAndTerminateSet(IndianSurnames);
 export dsIndianSurnames := DATASET(IndianSurnames, {string20 name});
+export dsIndianGivenNames := DATASET(IndianBoys+IndianGirls, {string20 name});
+export dsIndianBoysNames := DATASET(IndianBoys, {string20 name});
+export dsIndianGirlsNames := DATASET(IndianGirls, {string20 name});
+
+export dIndianSurnames := DICTIONARY(dsIndianSurnames, {name => true});
+export dIndianGivenNames := DICTIONARY(dsIndianGivennames, {name => true});
+export dIndianBoysNames := DICTIONARY(dsIndianBoysNames, {name => true});
+export dIndianGirlsNames := DICTIONARY(dsIndianGirlsNames, {name => true});
+
+	
+export boolean IsIndianBoysName(string20 name) := name in dIndianBoysNames;
+	//Address.TokenManagement.FindToken(boyTokens, name);
+export boolean IsIndianGirlsName(string20 name) := name in dIndianGirlsNames;
+	//Address.TokenManagement.FindToken(girlTokens, name);
+export boolean IsIndianName(string20 name) := name in dIndianGivennames;
+	//IsIndianBoysName(name) OR IsIndianGirlsName(name);
+export boolean IsIndianSurName(string20 name) := name in dIndianSurnames; 
+	//Address.TokenManagement.FindToken(surnameTokens, name);
+
 	
 END;

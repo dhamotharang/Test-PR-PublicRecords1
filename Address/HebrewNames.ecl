@@ -1,4 +1,4 @@
-export HebrewNames := MODULE
+﻿export HebrewNames := MODULE
 
 export SET of STRING20 HebrewBoys := [
 'ABDOWN',
@@ -237,6 +237,7 @@ export SET of STRING20 HebrewBoys := [
 'DELAYAH', //  (????????): Hebrew name meaning "God has drawn." In the bible, this is the name of several characters, including a descendant of Zerubbabel. 
 'DELAYAHU', //  (?????????): Variant form of Hebrew Delayah, meaning "God has drawn." 
 'DIBRIY', //  (????????): Hebrew name meaning "my word" or "eloquent." In the bible, this is the name of a man whose daughter married an Egyptian. Also spelled Divri. 
+'DIKLAH', 
 'DIQLAH', //  (????????): Hebrew name of foreign origin, meaning "palm grove." In the bible, this is the name of a son of Joktan. 
 'DIVRI', //  (????????): Variant spelling of Hebrew Dibriy, meaning "my word" or "eloquent." 
 'DIYSHAN', //  (????????): Hebrew name meaning "a species of gazelle" or "a thresher." In the bible, this is the name of the fifth son of Seir. 
@@ -614,6 +615,7 @@ export SET of STRING20 HebrewBoys := [
 'SHEM', //  (????): Hebrew name meaning "conspicuous position, name, renown, sigma." In the bible, this is the name of a son of Noah. 
 'SHEMAYAH', //  (??????????): Hebrew name meaning "whom Jehovah has answered" or "whom Jehovah has heard." In the bible, this is the name of many characters, including a prophet who lived in the time of Rehoboam. 
 'SHEMER', //  (??????): Hebrew name meaning "dregs (of wine)." In the bible, this is the name of several characters, including the owner of the hill where Samaria was built.  
+'SHEMUEL',
 'SHEMUWEL', //  (????????): Hebrew name meaning "heard of God," "his name is El," or "name of God." In the bible, this is the name of several characters, including a son of Elkanah by Hannah. 
 'SHEPHATYAH', //  (??????????): Hebrew name meaning "whom Jehovah defends." In the bible, this is the name of many characters, including a son of David.  
 'SHET', // : Variant spelling of Hebrew Sheth, meaning "buttocks." 
@@ -1019,7 +1021,9 @@ export SET of STRING20 HebrewGirls := [
 'DEGANYA', //  (?????????): Hebrew name meaning "grain." 
 'DELIYLAH', //  (?????????): Hebrew name derived from the root dal, meaning "delicate, weak." In the bible, this is the name of the mistress of Samson. 
 'DEVORA', // : Variant spelling of Hebrew Devorah, meaning "bee." 
-'DEVORAH', // : Variant spelling of Hebrew Debowrah, meaning "bee."  
+'DEVORAH', // : Variant spelling of Hebrew Debowrah, meaning "bee." 
+'DIKLA', 
+'DIKLAH', 
 'DIMONA', //  (?????????): Hebrew name meaning "south." 
 'DITA', //  (???????): Pet form of Hebrew Yehuwdiyth, meaning "Jewess" or "praised." Compare with another form of Dita. 
 'DIYNAH', //  (???????): Hebrew name meaning "judgment." In the bible, this is the name of a daughter of Jacob. 
@@ -1352,15 +1356,24 @@ export SET of STRING20 HebrewGirls := [
 'ZOHAR', // (?????): Hebrew unisex name meaning "brilliant."  
 'ZYLPHA'
 ];
-shared SET OF STRING32 boyTokens := Address.TokenManagement.SortAndTerminateSet(HebrewBoys);
-shared SET OF STRING32 girlTokens := Address.TokenManagement.SortAndTerminateSet(HebrewGirls);	
-shared SET OF STRING32 firstNames := Address.TokenManagement.SortAndTerminateSet(HebrewBoys+HebrewGirls);	
+//shared SET OF STRING32 boyTokens := Address.TokenManagement.SortAndTerminateSet(HebrewBoys);
+//shared SET OF STRING32 girlTokens := Address.TokenManagement.SortAndTerminateSet(HebrewGirls);	
+//shared SET OF STRING32 firstNames := Address.TokenManagement.SortAndTerminateSet(HebrewBoys+HebrewGirls);	
 
-export boolean IsHebrewBoysName(string20 name) :=
-	Address.TokenManagement.FindToken(boyTokens, name);
-export boolean IsHebrewGirlsName(string20 name) :=
-	Address.TokenManagement.FindToken(girlTokens, name);
-export boolean IsHebrewName(string20 name) :=
-	Address.TokenManagement.FindToken(firstNames, name);
+export dsHebrewGivenNames := DATASET(HebrewBoys+HebrewGirls, {string20 name});
+export dsHebrewBoysNames := DATASET(HebrewBoys, {string20 name});
+export dsHebrewGirlsNames := DATASET(HebrewGirls, {string20 name});
+
+export dHebrewGivenNames := DICTIONARY(dsHebrewGivenNames, {name => true});
+export dHebrewBoysNames := DICTIONARY(dsHebrewBoysNames, {name => true});
+export dHebrewGirlsNames := DICTIONARY(dsHebrewGirlsNames, {name => true});
+
+
+export boolean IsHebrewBoysName(string20 name) := name in dHebrewBoysNames;
+//	Address.TokenManagement.FindToken(boyTokens, name);
+export boolean IsHebrewGirlsName(string20 name) := name in dHebrewGirlsNames;
+//	Address.TokenManagement.FindToken(girlTokens, name);
+export boolean IsHebrewName(string20 name) := name in dHebrewGivenNames;
+//	Address.TokenManagement.FindToken(firstNames, name);
 
 END;

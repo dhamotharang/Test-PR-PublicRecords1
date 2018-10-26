@@ -6,10 +6,11 @@ EXPORT CleanDualName140 (const string dualname,
                          const string server = '', 
                          unsigned2 port = 0)	:= FUNCTION
 
-	
+	cleanserver := if (server = '',Address.Constants.CorrectServer,server);
+	cleanport := if (port = 0,Address.Constants.CorrectPort,port);
 	
   //clean := AddrCleanLib.CleanDualName140 (dualname, CorrectServer, CorrectPort);  
-	clean := BO_Address.CleanDualName140 (dualname,Address.Constants.CorrectServer,Address.Constants.CorrectPort);  
+	clean := BO_Address.CleanDualName140 (dualname,cleanserver,cleanport);  
   
   return clean; 
 END;
