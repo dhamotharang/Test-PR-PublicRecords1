@@ -58,7 +58,7 @@ export Did_Score() := FUNCTION
 
 	// Get uncleaned records so that dt_first_seen may be pulled off any records. Later get passed through MAC_GlbClean_Header
 		//have to reset mod_access to ensure same call as was here before:
-	mod_access_local := MODULE (PROJECT (mod_access, doxie.IDataAccess))
+	mod_access_local := MODULE (mod_access)
     EXPORT boolean ln_branded := FALSE;
     EXPORT boolean probation_override := FALSE;
     EXPORT boolean no_scrub := FALSE;

@@ -71,7 +71,7 @@
 		   dids_all := project(in_ids, doxie.layout_references);
 			 dids := dedup(sort(dids_all, did),did);
 			 //TODO: Why do we hardcode these values?
-       mod_access_local := MODULE (PROJECT (modAccess, doxie.IDataAccess))
+       mod_access_local := MODULE (modAccess)
          EXPORT boolean ln_branded := FALSE;
          EXPORT boolean probation_override := TRUE;
          EXPORT boolean no_scrub := FALSE;

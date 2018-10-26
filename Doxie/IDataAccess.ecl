@@ -10,7 +10,7 @@ EXPORT IDataAccess := INTERFACE
   EXPORT boolean probation_override := FALSE; //if TRUE, have to check whether src is in the probation list 
   EXPORT string5 industry_class := 'UTILI';
   EXPORT string32 application_type := ''; //?
-  EXPORT boolean no_scrub := FALSE; //?
+  EXPORT boolean no_scrub := FALSE; // If TRUE, records put on probation will be returned (same as input parameter "raw")
   EXPORT unsigned3 date_threshold := 0; // a.k.a. dateVal
   EXPORT boolean suppress_dmv := TRUE; // as simple as "SuppressDMVInfo := false : stored('ExcludeDMVPII');"
 

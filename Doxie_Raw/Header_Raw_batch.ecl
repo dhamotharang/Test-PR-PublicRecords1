@@ -48,7 +48,7 @@ Fetch1_MACRO(Infutor.Key_Header_Infutor_Knowx,infr_out)
 Fetch1_MACRO(doxie.Key_Header,hdr_out)
 fetch1 := if(is_knowx,infr_out,hdr_out);
 
-mod_access_local := MODULE (PROJECT (mod_access, doxie.IDataAccess))
+mod_access_local := MODULE (mod_access)
   EXPORT string5 industry_class := '';
   EXPORT boolean no_scrub := FALSE;
 END;  
