@@ -81,7 +81,7 @@
 IMPORT AutoStandardI, Royalty, WSInput;
 
 EXPORT Business_Report_Service() := MACRO
-  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+  #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 		#onwarning(4207, ignore);
 		//The following macro defines the field sequence on WsECL page of query. 
 		WSInput.MAC_Business_Report_Service();

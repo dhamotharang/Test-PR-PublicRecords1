@@ -18,7 +18,7 @@
 import Doxie_Raw, Header, doxie_cbrs;
 
 export Business_Report_Source_Service := macro
-#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 #CONSTANT('usePropMarshall',true);
 
 //string8 in_date := '' : stored('RecordByDate');

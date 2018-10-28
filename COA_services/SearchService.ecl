@@ -50,7 +50,7 @@
 
 import iesp, AutoStandardI;
 export SearchService := macro
-  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);  
+  #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);  
 		rec_in := iesp.ChangeOfAddress.t_ChangeOfAddressRequest;
 		
 		// "FEW" keyword set to make data read more efficient

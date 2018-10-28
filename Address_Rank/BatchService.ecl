@@ -59,7 +59,7 @@
 IMPORT Address_Rank, AutoKeyI, doxie;
 EXPORT BatchService(useCannedRecs = false) := MACRO
  
- #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+ #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	ds_xml_in 	:= DATASET([],Address_Rank.Layouts.Batch_in) : STORED('batch_in',FEW);
 	batch_params		:= Address_Rank.IParams.getBatchParams();							
 	processed_input := Address_Rank.fn_processInput(ds_xml_in, useCannedRecs);

@@ -60,7 +60,7 @@ all Vehicle datafiles including files used in MVR wildcard search to return resu
 IMPORT iesp, Royalty;
 
 EXPORT VehicleRegSearchService() := MACRO
- #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+  #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	#constant('SearchIgnoresAddressOnly',true);
 	#constant('getBdidsbyExecutive',FALSE);
 	#constant('DisplayMatchedParty',true);

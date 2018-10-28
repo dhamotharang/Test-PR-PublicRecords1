@@ -49,7 +49,7 @@
 import iesp,AutoStandardI,Accident_Services;
 
 export ReportService := macro
-  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+  #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 		#constant('StrictMatch', true);
 
     //get XML input 

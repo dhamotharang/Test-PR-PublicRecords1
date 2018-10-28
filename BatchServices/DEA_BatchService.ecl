@@ -14,7 +14,7 @@ IMPORT BatchServices;
 
 EXPORT DEA_BatchService(useCannedRecs = 'false') := 
 	MACRO
-	 #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);	 				 
+	 #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);	 				 
 		results := BatchServices.DEA_BatchService_Records(useCannedRecs);		
 		ut.mac_TrimFields(results, 'results', result);
 		OUTPUT(result, NAMED('Results'));
