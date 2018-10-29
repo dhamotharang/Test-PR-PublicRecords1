@@ -1,4 +1,4 @@
-﻿EXPORT JapaneseNames := MODULE
+EXPORT JapaneseNames := MODULE
 
 shared SET OF STRING20 JapaneseSurnames := [
 'ABE',                          
@@ -2046,37 +2046,29 @@ shared GivenNames := DATASET([
 {'YUZUKI','G'},                 
 {'YUZUNA','G'},                 
 {'YUZURU','M'}          
-],	{string20 name, string1 gender}); 
+],	{string20 name, string1 gender}) : GLOBAL(FEW); 
 
-/*
+
 shared SET of STRING20 JapaneseBoys := SET(GivenNames(gender in ['M','N']), name);
 shared SET of STRING20 JapaneseGirls := SET(GivenNames(gender in ['F','N']), name);
 shared SET of STRING20 JapaneseFirstnames := SET(GivenNames, name);
 
-shared SET OF STRING32 boyTokens := Address.TokenManagement.SortAndTerminateSet(JapaneseBoys);	// : GLOBAL(FEW);;
-shared SET OF STRING32 girlTokens := Address.TokenManagement.SortAndTerminateSet(JapaneseGirls);	// : GLOBAL(FEW);;	
-shared SET OF STRING32 FirstNames := Address.TokenManagement.SortAndTerminateSet(JapaneseFirstnames);	// : GLOBAL(FEW);;	
-shared SET OF STRING32 surnameTokens := Address.TokenManagement.SortAndTerminateSet(JapaneseSurnames);	// : GLOBAL(FEW);;	
-*/
-export dsJapaneseSurnames := DATASET(JapaneseSurnames, {string20 name});
-export dsJapaneseGivenNames := GivenNames;
-export dsJapaneseBoysNames := GivenNames(gender in ['M','N']);
-export dsJapaneseGirlsNames := GivenNames(gender in ['F','N']);
+shared SET OF STRING32 boyTokens := Address.TokenManagement.SortAndTerminateSet(JapaneseBoys);
+shared SET OF STRING32 girlTokens := Address.TokenManagement.SortAndTerminateSet(JapaneseGirls);	
+shared SET OF STRING32 FirstNames := Address.TokenManagement.SortAndTerminateSet(JapaneseFirstnames);	
+shared SET OF STRING32 surnameTokens := Address.TokenManagement.SortAndTerminateSet(JapaneseSurnames);	
 
-export dJapaneseSurnames := DICTIONARY(dsJapaneseSurnames, {name => true});
-export dJapaneseGivenNames := DICTIONARY(dsJapaneseGivennames, {name => gender});
-export dJapaneseBoysNames := DICTIONARY(dsJapaneseBoysNames, {name => gender});
-export dJapaneseGirlsNames := DICTIONARY(dsJapaneseGirlsNames, {name => gender});
+export boolean IsJapaneseBoysName(string20 name) :=
+	Address.TokenManagement.FindToken(boyTokens, name);
+export boolean IsJapaneseGirlsName(string20 name) :=
+	Address.TokenManagement.FindToken(girlTokens, name);
+export boolean IsJapaneseName(string20 name) :=
+	Address.TokenManagement.FindToken(FirstNames, name);
+export boolean IsJapaneseSurName(string20 name) :=
+	Address.TokenManagement.FindToken(surnameTokens, name);
 
-
-export boolean IsJapaneseBoysName(string20 name) := name in dJapaneseBoysNames;
-//	Address.TokenManagement.FindToken(boyTokens, name);
-export boolean IsJapaneseGirlsName(string20 name) := name in dJapaneseGirlsNames;
-//	Address.TokenManagement.FindToken(girlTokens, name);
-export boolean IsJapaneseName(string20 name) := name in dJapaneseGivenNames;
-//	Address.TokenManagement.FindToken(FirstNames, name);
-export boolean IsJapaneseSurname(string20 name) := name in dJapaneseSurnames;
-//	Address.TokenManagement.FindToken(surnameTokens, name);
+export dsJapaneseGivennames := SORT(PROJECT(GivenNames, {string20 name}),name);
+export dsJapaneseSurnames := SORT(DATASET(JapaneseSurnames, {string20 name}),name) : GLOBAL(FEW);
 
 
 END;

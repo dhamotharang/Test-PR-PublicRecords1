@@ -1,95 +1,64 @@
-﻿export OrientalNames := MODULE
+export OrientalNames := MODULE
 /*
 	includes Chinese Mandarin and Cantonese names
 	plus related languages including Korean and Vietnamese
 */
 
 shared ChineseNames := DATASET([
-{'ACHING','U'},
-{'AEILING','U'},
-{'AEIJING','U'},
-{'AEIKYING','U'},
-{'AEIYING','U'},
 {'AH-LAM','F'},
 {'AHLAM','F'},
-{'AIJING','U'},
-{'AILING','U'},
-{'AIMING','U'},
-{'AINING','U'},
-{'AIPING','U'},
-{'AIQING','U'},
-{'AITING','U'},
-{'AIXING','U'},
-{'AIYING','U'},
 {'AN','N'},
+{'AN-TOAN','M'},	// vietnamese
+{'ANTOAN','M'},	// vietnamese
 {'AHGUO','M'},
-{'ANJING','N'},
-{'ANLING','N'},
 {'ANMING','N'},
-{'ANPING','N'},
-{'ANNPING','N'},
-{'ANQING','N'},
-{'ANTING','N'},
-{'ANYING','N'},
 {'BAATARSAIKH','M'},
-{'BALING','N'},
-{'BAMING','N'},
-{'BAIJING','N'},
-{'BAILING','N'},
-{'BAIMING','N'},
-{'BAINING','N'},
-{'BAIPING','N'},
-{'BAIQING','N'},
-{'BAITING','N'},
-{'BAIXING','N'},
 {'BANG','M'},
 {'BAO','M'},
 {'BAO YU','F'},
 {'BAO-YU','F'},
 {'BAOYU','F'},
 {'BAOJIA','M'},
-{'BEIJING','N'},
-{'BEILING','N'},
-{'BEIMING','N'},
-{'BEIPING','N'},
+{'BICH','F'},	// vietnamese
 {'BIHAI','N'},
 {'BIK','F'},
 {'BIMING','N'},
+{'BINH','M'},	// vietnamese
 {'CAI','M'},
+{'CAM','N'},	// vietnamese
 {'CHAN-JUAN','F'},
 {'CHANG','N'},
-{'CHEN','U'},
+{'CHAU','F'},	// vietnamese
 {'CHEN-I','U'},                                   
 {'CHENG','M'},
 {'CHENG-I','U'},                                  
 {'CHENG-GONG','M'},
-{'CHENGGYU','U'},
+{'CHI','F'},	// vietnamese
 {'CHIA-I','U'},                                   
 {'CHIANG-I','U'},                                 
 {'CHIANN-I','U'},                                 
 {'CHIAO-I','U'},                                  
-{'CHIAYU','M'},
 {'CHIH-I','U'},                                   
 {'CHIN-I','U'},                                   
 {'CHING-I','U'},                                  
 {'CHING-LAN','F'},
 {'CHING LAN','F'},
-{'CHINGLAN','M'},
 {'CHIUNG-I','U'},                                 
 {'CHONGDE','N'},
 {'CHU-HUA','F'},
 {'CHUN','F'},
+{'CUC','F'},	// vietnamese
 {'DAO-MING','F'},
 {'DAOMING','F'},
 {'DAWEI','N'},
 {'DAZHONG','N'},
+{'DE','M'},	// vietnamese
 {'DEHUA','M'},
 {'DESHENG','M'},
 {'DESHI','M'},
 {'DEWU','M'},
 {'DIE','F'},
 {'DONG','M'},
-{'DUONG','U'},
 {'ENLAI','M'},
 {'FA','M'},
 {'FAI','M'},
@@ -104,24 +73,18 @@ shared ChineseNames := DATASET([
 {'FEN','F'},
 {'FENG','M'},
 {'FU','M'},
-{'GEESEOB','U'},
 {'GAO','M'},
-{'GUANGYU','U'},
-{'HAIBIN','U'},
-{'HAIMING','U'},
-{'HAIYAN','U'},
+{'HANG','F'},	// vietnamese
+{'HANH','N'},	// vietnamese
 {'HAO','M'},
-{'HAOMING','U'},
+{'HAU','N'},	// vietnamese
 {'HE','N'},
 {'HE-PING','M'},
 {'HEPING','M'},
 {'HO','N'},
-{'HOJONG','U'},
+{'HOA','F'},	// vietnamese
+{'HOA-MI','F'},	// vietnamese
 {'HONG','F'},
-{'HONGBO','U'},
-{'HONGMEI','U'},
-{'HONGWEI','U'},
-{'HOUYU','U'},
 {'HSIU MEI','F'},
 {'HSIU-MEI','F'},
 {'HSIUMEI','F'},
@@ -131,104 +94,79 @@ shared ChineseNames := DATASET([
 {'HUANG FU','M'},
 {'HUANG-FU','M'},
 {'HUANGFU','M'},
+{'HUE','F'},	// vietnamese
 {'HUI-FANG','F'},
 {'HUI-YING','F'},
 {'HUNG','M'},
-{'HUPMG','U'},
-{'HYONG','M'},
+{'HUONG','F'},	// vietnamese
+{'HUY','M'},	// vietnamese
+{'HUYNH','F'},	// vietnamese
 {'JI','M'},
 {'JIA','N'},
 {'JIA LI','F'},
 {'JIA-LI','F'},
-{'JIAN','M'},
-{'JIANHUA','U'},
-{'JIANLING','U'},
 {'JIAO','F'},
 {'JIAO-LONG','M'},
-{'JIAOLONG','M'},
-{'JIANHUG','U'},
-{'JIANJIAN','U'},
-{'JIANJUN','U'},
-{'JIANPING','U'},
 {'JIE','M'},
 {'JIN','N'},
 {'JING','N'},
-{'JINGJING','U'},
-{'JINGMING','N'},
 {'JING-SHENG','M'},
-{'JINGSHENG','M'},
-{'JINSONG','U'},
-{'JIUN','F'},
-{'JIUSHI','U'},
-{'JOOYEON','U'},
 {'JU-LONG','M'},
-{'JULONG','M'},
 {'JUN','N'},
 {'JUNG','N'},
-{'JUNHUA','U'},
 {'JUNREN','M'},
 {'KAILI','M'},
 {'KANG','M'},
 {'KEUNG','M'},
 {'KEW','F'},
 {'KIEW','F'},
+{'KIM','F'},	// vietnamese
+{'KIM-CUC','F'},	// vietnamese
 {'KONG','M'},
 {'KUN','M'},
 {'KUO','M'},
+{'KYM','F'},	// vietnamese
 {'LAN','F'},
 {'LEI','F'},
 {'LI','M'},
 {'LI-HUA','F'},
-{'LIHUA','F'},
 {'LI-LIANG','M'},
-{'LILIANG','M'},
 {'LIANG','F'},
 {'LIEN','F'},
 {'LIEN-HUA','F'},
-{'LIENHUA','F'},
-{'LIJUAN','U'},
-{'LIJUN','U'},
 {'LIMENG','U'},
-{'LIMIN','U'},
 {'LIN','F'},
 {'LIN LIN','F'},
 {'LIN-LIN','F'},
-{'LINLIN','F'},
 {'LING','F'},
-{'LIPING','U'},
-{'LIYING','U'},
-{'LUCHU','F'},
+{'LINH','F'},	// vietnamese
+{'LU CHU','F'},
 {'LU-CHU','F'},
+{'LY','F'},	// vietnamese
 {'LYMENG','U'},
 {'MAI','F'},
+{'MAI-LY','F'},	// vietnamese
 {'MEI','F'},
-{'MEI-LIEN','F'},
-{'MEILIEN','F'},
 {'MEI-HUA','F'},
-{'MEIHUA','F'},
+{'MEI-LIEN','F'},
+{'MEI-HUA','F'},
 {'MEI-TE','U'},
-{'MEITE','U'},
 {'MEI-XING','F'},
-{'MEIXING','F'},
 {'MEI-ZHEN','F'},
-{'MEIZHEN','F'},
 {'MEOW','U'},
 {'MI','F'},
-{'MIKYUNG','U'},
 {'MIN','F'},
 {'MING','F'},
-{'MINGYI','U'},
-{'MINLING','U'},
-{'MINPING','U'},
 {'MING-HOA','M'},
+{'MINH','N'},	// vietnamese
 {'MO LI','F'},
 {'MO-LI','F'},
 {'MU','N'},
+{'NGOC','F'},	// vietnamese
 {'NIU','F'},
 {'NHIN','U'},
 {'P\'ENG','N'},
 {'PANG','G'},
-{'PEILI','M'},
 {'PENG','M'},
 {'PHUONG','U'},
 {'PHUONGTHAO','U'},
@@ -247,7 +185,6 @@ shared ChineseNames := DATASET([
 {'QING','N'},
 {'QING-NIAN','M'},
 {'QUON','M'},
-{'RONGHUA','F'},
 {'RUI','N'},
 {'SHAO-QIANG','M'},
 {'SHAOQIANG','M'},
@@ -255,12 +192,17 @@ shared ChineseNames := DATASET([
 {'SHENG','M'},
 {'SHENG LI','M'},
 {'SHENG-LI','M'},
-{'SHIDONG','U'},
 {'SHING','M'},
 {'SHIUNG','M'},
 {'SI','M'},
 {'SONG','N'},
 {'TAI','F'},
+{'THANH','N'},	// vietnamese
+{'THI','F'},	// vietnamese
+{'THU','F'},	// vietnamese
+{'THUC','M'},	// vietnamese
+{'THUY','F'},	// vietnamese
+{'TIEN','F'},	// vietnamese
 {'THIEN','U'},	
 {'THIENCO','U'},	
 {'THIENHAO','U'},	
@@ -277,102 +219,47 @@ shared ChineseNames := DATASET([
 {'THIENRANG','U'},	
 {'THIENVO','U'},	
 {'THIENVU','U'},	
-{'TINSUE','U'},
 {'TSZ','M'},
 {'TU','N'},
+{'TUAN','M'},	// vietnamese
 {'TUN','U'},
 {'TUNG','M'},
 {'WANG','M'},
-{'WEIDONG','U'},
-{'WEIMING','U'},
-{'WEIPING','U'},
-{'WEIWEI','U'},
-{'WENJIE','U'},
-{'WENJUN','U'},
-{'WENSHENG','U'},
 {'XI-WANG','M'},
-{'XIWANG','M'},
-{'XIAOBING','U'},
-{'XIAOFENG','U'},            
 {'XIAO HONG','F'},
 {'XIAO-HONG','F'},
-{'XIAOHONG','F'},
-{'XIAOLING','U'},
 {'XIAO-NIAO','F'},
-{'XIAONIAO','F'},
-{'XIAO-MING','M'},
-{'XIAOMING','M'},
 {'XIAO-PING','M'},
-{'XIAOPING','M'},
-{'XIAOQIN','U'},
-{'XIAOWEI','U'},
 {'XIAO-XING','F'},
-{'XIAOXING','F'},
-{'XIAOYAN','U'},
-{'XIAOYONG','U'},
 {'XIN','N'},
 {'XING','M'},
 {'XING-FU','M'},
-{'XINSHENG','U'},
 {'XIU','F'},
 {'XIULAN','F'},
-{'XIUMING','U'},
-{'XIUYING','U'},
-{'XUELING','U'},
-{'XUEMEI','F'},
-{'XUMING','U'},
 {'XUE','M'},
-{'XUEJUN','U'},
 {'XUN','M'},
 {'YA','F'},
-{'YANG','U'},
-{'YANPING','U'},
 {'YAO NIANG','F'},
 {'YAO-NIANG','F'},
-{'YAONIANG','F'},
 {'YAT-SEN','M'},
-{'YERMING','M'},
+{'YEN','F'},	// vietnamese
 {'YI','F'},
-{'YIH','F'},
-{'YIH-CHEN','U'},
-{'YIHCHEN','U'},
-{'YIH-CHERN','U'},
-{'YIDONG','U'},
-{'YIFAN','U'},
-{'YIFEI','U'},
-{'YIJUN','U'},
-{'YILIN','U'},
-{'YIMING','U'},
-{'YITU','U'},
 {'YIN','F'},
 {'YING','N'},
-{'YINGBING','N'},
-{'YOUNGHEE','U'},
 {'YU','M'},
 {'YUAN','M'},
-{'YUCHEN','U'},
 {'YUE','F'},
-{'YUMING','M'},
 {'YUN','F'},
-{'YUNJI','U'},
 {'YUN-QI','M'},
-{'YUNQI','M'},
-{'YUQING','U'},
-{'YUSING','U'},
 {'ZAN','F'},
-{'ZESHAN','U'},
 {'ZHEN','U'},
-{'ZHENG','U'},
 {'ZHI','F'},
-{'ZHICHAO','U'},
 {'ZHIN','F'},
-{'ZHIYONG','U'},
 {'ZHON','M'},
 {'ZHONG','M'},
 {'ZHU','M'},
 {'ZHUANG','M'},
 {'ZHUO','F'},
-{'ZHUMING','U'},
 {'ZI','F'},
 {'ZIWANG','M'},
 {'ZUEFANG','M'},
@@ -385,126 +272,9 @@ shared ChineseNames := DATASET([
  'N'  // either
 ];*/
 
-shared VietnameseNames := DATASET([
-{'AN','N'},
-{'AN TOAN','M'},
-{'AN-TOAN','M'},	// vietnamese
-{'ANTOAN','M'},	// vietnamese
-{'BAO','N'},	// vietnamese
-{'BICH','F'},	// vietnamese
-{'BINH','M'},	// vietnamese
-{'CAM','N'},	// vietnamese
-{'CAMTHI','N'},	// vietnamese
-{'CHAU','F'},	// vietnamese
-{'CHI','F'},	// vietnamese
-{'CUC','F'},	// vietnamese
-{'DE','M'},	// vietnamese
-{'HANG','F'},	// vietnamese
-{'HANH','N'},	// vietnamese
-{'HAU','N'},	// vietnamese
-{'HOA','F'},	// vietnamese
-{'HOAI MI','F'},	// vietnamese
-{'HOAI-MI','F'},	// vietnamese
-{'HONG','F'},
-{'HUE','F'},	// vietnamese
-{'HUONG','F'},	// vietnamese
-{'HUY','M'},	// vietnamese
-{'HUYNH','F'},	// vietnamese
-{'KIM','N'},	// vietnamese
-{'KIM CUC','F'},	// vietnamese
-{'KIM-CUC','F'},	// vietnamese
-{'KYM','F'},	// vietnamese
-{'LIEN','F'},	// vietnamese
-{'LINH','F'},	// vietnamese
-{'LONG','N'},	// vietnamese
-{'LY','F'},	// vietnamese
-{'MAI','F'},	// vietnamese
-{'MAI LY','F'},	// vietnamese
-{'MAI-LY','F'},	// vietnamese
-{'MINH','N'},	// vietnamese
-{'NGOC','F'},	// vietnamese
-{'TAI','F'},	// vietnamese
-{'THANH','N'},	// vietnamese
-{'THI','F'},	// vietnamese
-{'THU','F'},	// vietnamese
-{'THUC','M'},	// vietnamese
-{'THUY','F'},	// vietnamese
-{'TIEN','F'},	// vietnamese
-{'TU','N'},	// vietnamese
-{'TUAN','M'},	// vietnamese
-{'VAN','M'},	// vietnamese
-{'YEN','F'}		// vietnamese
-],	{string20 name, string1 gender}) : GLOBAL(FEW);
-
-shared set of string20 VietnameseSurnames := [
-'AI-TAN-GIAC-LA',			//	Ái-tân-giác-la
-'A-SU-NA',						//	A-s?-na
-'BACH LY',						//	Bách Lý
-'BOT NHI CHI CAN',		//	B?t Nhi Ch? Cân
-'THUAN-VU',						//	Thu?n-vu
-'DE-NGU',							//	??-ng?
-'DONG-PHUONG',				//	?ông-ph??ng
-'DONG-CAC',						//	?ông-các
-'DONG-QUACH',					//	?ông-quách
-'DONG-MON',						//	?ông-môn
-'DOAN-MOC',						//	?oan-m?c
-'DOC-CO',							//	??c-cô
-'CONG-TON',						//	Công-tôn
-'CONG-DUONG',					//	Công-d??ng
-'CONG-DA',						//	Công-dã
-'CONG-TAY',						//	Công-tây
-'QUAN-KHAU',					//	Quán-khâu
-'COC-LUONG',					//	C?c-l??ng
-'HA-LAN',							//	H?-lan
-'HACH-LIEN',					//	Hách-liên
-'HACH-XA-LY',					//	Hách-xá-lý
-'HA-NHUOC',						//	H?-nh??c
-'HOANG-PHU',					//	Hoàng-ph?
-'HO-DIEN',						//	Hô-diên
-'LENH-HO',						//	L?nh-h?
-'LO-LY',							//	L?-lý
-'LU-KHAU',						//	L?-khâu
-'MAC-KY',							//	M?c-k?
-'MO-DUNG',						//	M?-dung
-'NAP-LAN',						//	N?p-lan
-'NAM-CUNG',						//	Nam-cung
-'AU-DUONG',						//	Âu-d??ng
-'SA-TRA',							//	Sa-tra
-'THUONG-QUAN',				//	Th??ng-quan
-'THAN-DO',						//	Thân-??
-'TU-MA',							//	T?-mã
-'TU-DO',							//	T?-??
-'TU-KHONG',						//	T?-không
-'TU-KHAU',						//	T?-kh?u
-'THAI-SU',						//	Thái-s?
-'DAM-THAI',						//	?àm-thái
-'THAC-BAT',						//	Thác-b?t
-'HOAN-NHAN',					//	Hoàn-nhan
-'VAN-NHAN',						//	V?n-nhân
-'NGO-MA',							//	Ng?-mã
-'HA-HAU',							//	H?-h?u
-'TIEN-VU',						//	Tiên-vu
-'TAY-MON',						//	Tây-môn
-'HIEN-VIEN',					//	Hiên-viên
-'DUONG-TU',						//	D??ng-t?
-'GIA-LUAT',						//	Gia-lu?t
-'NHAC-CHINH',					//	Nh?c-chính
-'UY-TRI',							//	Úy-trì
-'VU-VAN',							//	V?-v?n
-'TRUONG-TON',					//	Tr??ng-tôn
-'CHUNG-LY',						//	Chung-ly
-'CHU-CAT',						//	Ch?-cát (Gia-cát)
-'GIA-CAT',
-'CHUC-DUNG',					//	Chúc-dung
-'TU-CU',							//	T?-c?
-'TA-NHAN'							//	T?-nhân
-];
-
 shared ThaiNames := DATASET([
-{'ANING','F'},
 {'ARAN','M'},
 {'AROON','M'},
-{'CHAMRAS','M'},
 {'CHANARONG','M'},
 {'DAW','M'},
 {'ISRA','F'},
@@ -515,15 +285,13 @@ shared ThaiNames := DATASET([
 {'KIET','M'},
 {'KLAHAN','M'},
 {'KULAP','F'},
-{'LAWAN','F'},
+{'LAWAN','G'},
 {'MALI','F'},
-{'MEALEA','F'},
 {'MONGKUT','M'},
 {'NIRAN','M'},
 {'PAKPAO','F'},
 {'PHAILIN','F'},
 {'PHUENG','F'},
-{'PRANEE','F'},                                  
 {'RATANA','F'},
 {'SOM','M'},
 {'SOMCHAI','F'},
@@ -532,231 +300,15 @@ shared ThaiNames := DATASET([
 {'SUKHON','F'},
 {'SUMALEE','F'},
 {'SUNAN','M'},
-{'SUWANNEE','F'},
 {'TASANEE','F'},
 {'THURIAN','F'},
 {'TOLA','F'},
 {'WENJI','U'}
 // *****
-],	{string20 name, string1 gender});
-
-shared set of string20 ThaiSurnames := [
-'BOONLIANG',
-'CHAROENKUL',
-'DAHKLING',
-'GASON',
-'JAINUKUL',
-'KASEMSARN',
-'KWAIGNO',
-'MOOKJAI',
-'MONTRI',
-'NANTAKARN',
-'PRADCHAPHET',
-'PRAPHASIRIRAT',
-'RATTANAKOSIN',
-'SANTISAKUL',
-'SAOWALUK',
-'SHINAWATRA',
-'SINTAWICHAI',
-'SUPITAYAPORN',
-'SURAMONGKOL',
-'SUTTIKUL',
-'THANASUKOLWIT',
-'WATTANA',
-'WATTANAPANIT',
-'WICHASAK',
-'WILLAPANA',
-'WONGSAWAT'
-];
-
-shared KoreanNames := DATASET([
-{'AE CHA','F'},
-{'AE SOOK','F'},
-{'BAE','M'},
-{'BONG CHA','F'},
-{'CHIN HO','M'},
-{'CHO HEE','F'},
-{'CHUN HEI','F'},
-{'CHUNG AE','F'},
-{'CHUNG CHA','F'},
-{'CHUNG-HEE','M'},
-{'CHUNG-HO','M'},
-{'DAE-HO','M'},
-{'DAE-HYUN','M'},
-{'DAE-JUNG','M'},
-{'DONG-MIN','M'},
-{'DONG-SUN','M'},
-{'DU-HO','M'},
-{'DUCK-YOUNG','M'},
-{'EUN','F'},
-{'EUN AE','F'},
-{'EUN HEE','F'},
-{'EUN JUNG','F'},
-{'EUN KYUNG','F'},
-{'EUN MI','F'},
-{'EUN SUN','F'},
-{'HANA','F'},
-{'HEA JUNG','F'},
-{'HEA WOO','F'},
-{'HEA YOUNG','F'},
-{'HEI RYUNG','F'},
-{'HO SOOK','F'},
-{'HWA YOUNG','F'},
-{'HY','F'},
-{'HYE SU','F'},
-{'HYO','M'},
-{'HYUN AE','F'},
-{'HYUN JAE','F'},
-{'HYUN JUNG','F'},
-{'HYUN KI','M'},
-{'HYUN OK','F'},
-{'HYUN SU','M'},
-{'HYUN-SHIK','M'},
-{'IL SUNG','M'},
-{'IN HO','M'},
-{'IN-SU','M'},
-{'JAE','N'},
-{'JAE HWA','M'},
-{'JAE-HWA','M'},
-{'JAE-SUN','M'},
-{'JIN AE','F'},
-{'JIN KYONG','F'},
-{'JIN-SANG','M'},
-{'JUH','F'},
-{'JUNG','N'},
-{'JUNG HEE','M'},
-{'JUNG-HWA','M'},
-{'JUNG-SU','M'},
-{'KANG-DAE','M'},
-{'KWAN','M'},
-{'KWANG HO','M'},
-{'KWANG-SUN','M'},
-{'KYU BOK','M'},
-{'KYU BONG','M'},
-{'KYUNG','M'},
-{'KYUNG MI','F'},
-{'KYUNG SOON','F'},
-{'KYUNG-SAM','M'},
-{'MI CHA','F'},
-{'MI HI','F'},
-{'MI KYONG','F'},
-{'MI SUN','F'},
-{'MI YOUNG','F'},
-{'MIN HEE','F'},
-{'MIN HO','M'},
-{'MIN JEE','F'},
-{'MIN JUNG','F'},
-{'MIN KI','M'},
-{'MIN KYUNG','M'},
-{'MUN-HEE','M'},
-{'MYUNG HEE','F'},
-{'MYUNG-DAE','M'},
-{'MYUNG-KI','M'},
-{'NAM-KYU','M'},
-{'NAM-KYU','M'},
-{'SANG KI','M'},
-{'SANG KYU','M'},
-{'SANG MIN','M'},
-{'SHIN','M'},
-{'SHIN-IL','M'},
-{'SO YOUNG','F'},
-{'SOO JIN','F'},
-{'SOO MIN','F'},
-{'SOO YUN','F'},
-{'SOON BOK','F'},
-{'SUK-CHUL','M'},
-{'SUN','F'},
-{'SUN HEE','F'},
-{'SUN HI','F'},
-{'SUN JUNG','F'},
-{'TAE-HYUN','M'},
-{'YONG SOOK','M'},
-{'YONG SUN','M'},
-//{'YOUNG','M'},
-{'YOUNG HO','M'},
-{'YOUNG IL','N'},
-{'YOUNG JA','M'},
-{'YOUNG JAE','M'},
-{'YOUNG MI','F'},
-{'YOUNG MIN','M'},
-{'YOUNG SOO','M'},
-{'YOUNG SOON','F'},
-{'YOUNG-NAM','M'},
-{'YUN','F'},
-{'YUN HEE','F'}
-],	{string20 name, string1 gender});
-
-shared set of string20 KoreanSurnames := [
-'AESINGAKRA',
-'AKJEONG',
-'ASANA',
-'BAEKRI',
-'BAL\'AJIGEUN',
-'CHUK\'YUNG',
-'DAMDAE',
-'DONGBANG',
-'DONGGAK',
-'DONGGWAK',
-'DONGMUN',
-'DANMOK',
-'DOKGO',
-'GIM',
-'GONGSON',
-'GONG-YANG',
-'GONG-YA',
-'GONGSEO',
-'GUYANG',
-'GWANGU',
-'GOKRYANG',
-'HAHU',
-'HAYAK',
-'HARAN',
-'HEON\'WEON',
-'HYEOKRYEON',
-'HYEKSARI',
-'HWANG BO',
-'HOYEON',
-'JAGEO',
-'JE-O',
-'JANGSON',
-'JONGRI',
-'JEGAL',
-'JWAIN',
-'KIM',
-'LEE',
-'RYEONGHO',
-'ROKRI',
-'RYEOGU',
-'MANSA',
-'MOYONG',
-'MUN\'IN',
-'NAPRAN',
-'NAMGUNG',
-'PARK',
-'SATA',
-'SINDO',
-'SAMA',
-'SAGONG',
-'SAGOUNG',
-'SAKONG',
-'SAGU',
-'SAKOUNG',
-'SANGGWAN',
-'SEON\'U',
-'SEOMUN',
-'SUN\'U',
-'TAESA',
-'TAKBAL',
-'UMA',
-'ULJI',
-'UMUN',
-'WAN\'AN',
-'YANGJA',
-'YAYUL'
-];
+],	{string20 name, string1 gender}); 
 
 
-shared SET OF STRING20 ChineseSurnames := [
+shared SET OF STRING20 OrientalSurnames := [
 'ASHINS',
 'BAILI',
 'BORJIGIN',
@@ -779,7 +331,6 @@ shared SET OF STRING20 ChineseSurnames := [
 'HESHELI',
 'HERUO',
 'HUANGFU',
-'HUH',
 'HUYAN',
 'LINGHU',
 'LULI',
@@ -880,7 +431,7 @@ shared SET OF STRING20 ChineseSurnames := [
 'YONG',
 'LEONG',
 'HUAN',
-//'YOUNG',
+'YOUNG',
 'YO',
 'EAW',
 'YEO',
@@ -898,7 +449,7 @@ shared SET OF STRING20 ChineseSurnames := [
 'ZHAO',
 'ZHOU',
 'CHOU',
-//'JOE',
+'//JOE',
 'ZAU',
 'CHOW',
 'JAO',
@@ -1040,8 +591,8 @@ shared SET OF STRING20 ChineseSurnames := [
 'CHNG',		// common misspelling
 'TAY',
 'TEH',
-//'THE',
-//'THEY',
+'//THE',
+'//THEY',
 'TEAY',
 'CHHIN',
 'THIN',
@@ -1122,7 +673,7 @@ shared SET OF STRING20 ChineseSurnames := [
 'KHO',
 'KHO',
 'KHOR',
-//'CO',
+'//CO',
 'KHAW',
 'KHOUW',
 'HI',
@@ -1245,7 +796,7 @@ shared SET OF STRING20 ChineseSurnames := [
 'YAN',
 'JYU',
 'YUE',
-//'UI',
+'//U,I',
 'VU',
 'DONG',
 'TUNG',
@@ -1325,7 +876,7 @@ shared SET OF STRING20 ChineseSurnames := [
 'JEONG',
 'TEI',
 'SHEN',
-//'SAM',
+'//SAM',
 'SUM',
 'SHUM',
 'SIM',
@@ -1376,10 +927,10 @@ shared SET OF STRING20 ChineseSurnames := [
 'TUNG',
 'SHO',
 'LU',
-//'LOU',
+'//LOU',
 'LOH',
 'LOO',
-//'NO',
+'//NO',
 'RO',
 'RYO',
 'WANG',
@@ -1404,7 +955,7 @@ shared SET OF STRING20 ChineseSurnames := [
 'CEOI',
 'CHUI',
 'CHOI',
-//'SAM',
+'//SAM',
 'CHHOI',
 'THOI',
 'SAI',
@@ -1413,7 +964,7 @@ shared SET OF STRING20 ChineseSurnames := [
 'JAM',
 'YAM',
 'YUM',
-//'JIM',
+'//JIM',
 'NIM',
 'NHAM',
 'IM',
@@ -1427,7 +978,7 @@ shared SET OF STRING20 ChineseSurnames := [
 'RIKU',
 'LIAO',
 'LIU',
-//'LEW',
+'//LEW',
 'LIOW',
 'LIEU',
 'RYO',
@@ -1609,7 +1160,7 @@ shared SET OF STRING20 ChineseSurnames := [
 'THENG',
 'THON',
 'DOAN',
-//'DAN',
+'//DAN',
 'HAO',
 'KOK',
 'HOK',
@@ -1841,7 +1392,7 @@ shared SET OF STRING20 ChineseSurnames := [
 'XUANYUAN',
 'YANGZI',
 'YELU',
-'YUEZHENG',
+'YUEZHÈNG',
 'YUCHI',
 'YUWEN',
 'ZHANGSUN',
@@ -1852,54 +1403,25 @@ shared SET OF STRING20 ChineseSurnames := [
 'ZUOREN'
 ];
 
-shared SET OF STRING20 OrientalSurnames := ChineseSurnames + KoreanSurnames 
-														+ VietnameseSurnames + ThaiSurnames;
-
-
-shared OrientalNames := DEDUP(SORT(ChineseNames + ThaiNames + VietnameseNames + KoreanNames,name,gender),name,gender);
+shared OrientalNames := DEDUP(SORT(ChineseNames + ThaiNames,name,gender),name,gender);
 shared SET of STRING20 OrientalBoys := SET(OrientalNames(gender in ['M','N']), name);
 shared SET of STRING20 OrientalGirls := SET(OrientalNames(gender in ['F','N']), name);
 shared SET of STRING20 OrientalFirstnames := SET(OrientalNames, name);
-shared SET of STRING20 ChineseFirstnames := SET(SORT(ChineseNames,name,gender), name);
-shared SET of STRING20 ThaiFirstnames := SET(SORT(ThaiNames,name,gender), name);
-shared SET of STRING20 KoreanFirstnames := SET(SORT(KoreanNames,name,gender), name);
-shared SET of STRING20 VietnameseFirstnames := SET(SORT(VietnameseNames,name,gender), name);
-
-export dsAsianSurnames := SORT(DATASET(OrientalSurnames, {string20 name}),name);
-export dsAsianGivennames := SORT(PROJECT(OrientalNames, {string20 name}),name);
-export dsChineseGivenNames := SORT(PROJECT(ChineseNames, {string20 name}),name);
-export dsThaiGivennames := SORT(PROJECT(ThaiNames, {string20 name}),name);
-export dsKoreanGivennames := SORT(PROJECT(KoreanNames, {string20 name}),name);
-export dsVietnameseGivennames := SORT(PROJECT(VietnameseNames, {string20 name}),name);
-
-export dsChineseSurnames := DEDUP(SORT(DATASET(ChineseSurnames, {string20 name}),name),name);
-export dsKoreanSurnames := SORT(DATASET(KoreanSurnames, {string20 name}),name);
-export dsVietnameseSurnames := SORT(DATASET(VietnameseSurnames, {string20 name}),name);
-export dsThaiSurnames := SORT(DATASET(ThaiSurnames, {string20 name}),name);
-
-export dsOrientalSurnames := DATASET(OrientalSurnames,  {string20 name});
 
 
-export dOrientalBoysNames := DICTIONARY(OrientalNames(gender in ['M','N']), {name => gender});
-export dOrientalGirlsNames := DICTIONARY(OrientalNames(gender in ['F','N']), {name => gender});
-export dOrientalGivenNames := DICTIONARY(OrientalNames, {name => gender});
+shared SET OF STRING32 boyTokens := Address.TokenManagement.SortAndTerminateSet(OrientalBoys);
+shared SET OF STRING32 girlTokens := Address.TokenManagement.SortAndTerminateSet(OrientalGirls);	
+shared SET OF STRING32 FirstNames := Address.TokenManagement.SortAndTerminateSet(OrientalFirstnames);	
+shared SET OF STRING32 surnameTokens := Address.TokenManagement.SortAndTerminateSet(OrientalSurnames);	
 
-export dChineseSurnames := DICTIONARY(dsChineseSurnames, {name => true});
-export dChineseGivenNames := DICTIONARY(ChineseNames, {name => gender});
+export boolean IsOrientalBoysName(string20 name) :=
+	Address.TokenManagement.FindToken(boyTokens, name);
+export boolean IsOrientalGirlsName(string20 name) :=
+	Address.TokenManagement.FindToken(girlTokens, name);
+export boolean IsOrientalName(string20 name) :=
+	Address.TokenManagement.FindToken(FirstNames, name);
+export boolean IsOrientalSurName(string20 name) :=
+	Address.TokenManagement.FindToken(surnameTokens, name);
 
-export dOrientalSurnames := DICTIONARY(dsOrientalSurnames, {name => true}); 
-
-export boolean IsOrientalBoysName(string20 name) := name in dOrientalBoysNames;
-//	Address.TokenManagement.FindToken(boyTokens, name);
-export boolean IsOrientalGirlsName(string20 name) := name in dOrientalGirlsNames;
-//	Address.TokenManagement.FindToken(girlTokens, name);
-export boolean IsOrientalName(string20 name) := name in dOrientalGivenNames;
-//	Address.TokenManagement.FindToken(FirstNames, name);
-export boolean IsOrientalSurName(string20 name) := name in dOrientalSurnames;
-//	Address.TokenManagement.FindToken(surnameTokens, name);
-export boolean IsChineseSurName(string20 name) := name in dChineseSurnames;
-//	Address.TokenManagement.FindToken(ChineseSurnameTokens, name);
-export boolean IsChineseName(string20 name) := name in dChineseGivenNames;
-//	Address.TokenManagement.FindToken(ChineseNameTokens, name);
 
 END;

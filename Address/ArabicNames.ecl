@@ -107,10 +107,8 @@ shared SET of STRING20 ArabicBoys := [
 'ABDUL-WALIY',                  
 'ABDUL-WARITH',                 
 'ABDUL-ZAHIR',
-'ABDULLA',                        
 'ABDOUL',              
 'ABDUAL',              
-'ABDUALLAH',                                                      
 'ABDULALAH',           
 'ABDULAMIR',           
 'ABDULATEF',           
@@ -178,10 +176,9 @@ shared SET of STRING20 ArabicBoys := [
 'AL TUFAIL',                    
 'AL TUFAYL',                    
 'ALA\' AL DIN',                 
-'ALA\' AL-DIN',                 
+'ALA\' AL DIN',                 
 'ALA AL DIN',                   
-'ALA AL-DIN',                   
-'ALA\'-AL-DIN', 
+'ALA AL DIN',                   
 'ALA\'',                        
 'ALA',                          
 'ALADDIN',                      
@@ -209,8 +206,7 @@ shared SET of STRING20 ArabicBoys := [
 'AMJAD',                        
 'AMMAR',                        
 '\'AMMAR',                      
-'AMMAR',
-'AMRAM',                         
+'AMMAR',                        
 '\'AMRO',                       
 'AMRO',                         
 'ANAS',                         
@@ -375,8 +371,7 @@ shared SET of STRING20 ArabicBoys := [
 'GHAYTH',                       
 'GHAZI',                        
 'GHAZWAN',                      
-'GHIYATH',
-'GOLI',                      
+'GHIYATH',                      
 'HABBAB',                       
 'HABIB',                        
 'HADAD',                        
@@ -605,9 +600,7 @@ shared SET of STRING20 ArabicBoys := [
 'MAYMUN',                       
 'MAYSARAH',                     
 'MAZHAR',                       
-'MAZIN',  
-'MEHDI',
-'MEDHI',                      
+'MAZIN',                        
 'MIHRAN',                       
 'MIHYAR',                       
 'MIKA\'IL',                     
@@ -721,7 +714,6 @@ shared SET of STRING20 ArabicBoys := [
 'NADIR',                        
 'NAFI\'',                       
 'NAFI',                         
-'NAGEL',                         
 'NAHID',                        
 'NAIF',                         
 'NA\'IL',                       
@@ -795,7 +787,6 @@ shared SET of STRING20 ArabicBoys := [
 'QUTUZ',                        
 'RABAH',                        
 'RABI',                         
-'RABIH',                         
 'RADI',                         
 'RAFI',                         
 'RAFID',                        
@@ -871,8 +862,7 @@ shared SET of STRING20 ArabicBoys := [
 'SAFUH',                        
 'SAFWAH',                       
 'SAFWAN',                       
-'SAFWAT',
-'SAHEED',                       
+'SAFWAT',                       
 'SAHIB',                        
 'SAHIR',                        
 'SAHL',                         
@@ -885,8 +875,6 @@ shared SET of STRING20 ArabicBoys := [
 'SAJID',                        
 'SAJJAD',                       
 'SAKHR',                        
-'SALADIN',                 
-'SALAH-AL-DIN',                 
 'SALAH AL DIN',                 
 'SALAH',                        
 'SALAMAH',                      
@@ -928,8 +916,6 @@ shared SET of STRING20 ArabicBoys := [
 'SHARIF',                       
 'SHAWQI',
 'SHEHRYAR',                       
-'SHERIFF',
-'SHEZLON',                      
 'SHIHAB AL DIN',                
 'SHIHAB',                       
 'SHIHAD',                       
@@ -959,8 +945,7 @@ shared SET of STRING20 ArabicBoys := [
 'SUOUD',                        
 'SURAQAH',                      
 'SU\'UD',                       
-'SUUD',
-'SYED',                         
+'SUUD',                         
 'TAHIR',                        
 'TAHSIN',                       
 'TAIM ALLAH',                   
@@ -1346,7 +1331,6 @@ shared SET of STRING20 ArabicGirls := [
 'FARIHAH',                      
 'FARIZAH',                      
 'FATHIYAH',                     
-'FATEME',                       
 'FATIMA',                       
 'FATIMAH',                      
 'FATIN OR FATINAH',             
@@ -1693,7 +1677,7 @@ shared SET of STRING20 ArabicGirls := [
 'MAY',                          
 'MAYMUNAH',                     
 'MAYMUNAH',                     
-//'MAYS',                         
+'MAYS',                         
 'MAYSA\'',                      
 'MAYSA',                        
 'MAYSAA',                       
@@ -1757,7 +1741,6 @@ shared SET of STRING20 ArabicGirls := [
 'NADWAH',                       
 'NAEEMA',                       
 'NAFEESA',                      
-'NAFISA',                                  
 'NAFISAH',                      
 'NAFLAH',                       
 'NAHEEDA',                      
@@ -1783,7 +1766,6 @@ shared SET of STRING20 ArabicGirls := [
 'NAJWA',                        
 'NAJYA',                        
 'NAMAR',                        
-'NARGIS',                                  
 'NARJIS',                       
 'NASHIDA',                      
 'NASHITA',            
@@ -2006,9 +1988,7 @@ shared SET of STRING20 ArabicGirls := [
 'SAUDA',                        
 'SAWDAH',                       
 'SAWSAN',                       
-'SAYYIDAH',
-'SELAMAWIT',                   
-'SELEMAWIT',                   
+'SAYYIDAH',                     
 'SFIYAH',                       
 'SHADAN',                       
 'SHADHA',                       
@@ -2093,7 +2073,6 @@ shared SET of STRING20 ArabicGirls := [
 'TAQWA',                        
 'TAQWAA',                       
 'TARUB',                        
-'TASHFEEN',
 'TASNIM',                       
 'TAWBAH',                       
 'TAYMA\'',                      
@@ -2231,8 +2210,7 @@ export SET OF STRING20 ArabicSurnames := [
 'ABBOUD',                       
 'ABDEL',                        
 'ABDEL-DAYEM',                  
-'ABDELAZ',                 
-'ABDELLAH',
+'ABDELLAH',                     
 'ABDUL',                        
 'ABDULAH',                      
 'ABDULLAH',                     
@@ -2294,8 +2272,7 @@ export SET OF STRING20 ArabicSurnames := [
 'ALAM',                         
 'ALGOSAUBI',                    
 'ALI',                          
-'ALIAS',
-'ALKADY',                        
+'ALIAS',                        
 'ALKHAIWANI',                   
 'ALMASI',                       
 'ALZESHI',                      
@@ -2347,8 +2324,7 @@ export SET OF STRING20 ArabicSurnames := [
 'BOUTROS',                      
 'CHAM',                         
 'DAGHER',                       
-'DAHER',
-'DAHUKEY',                       
+'DAHER',                        
 'DEEB',                         
 'DEMIRKOL',                     
 'DERBALA',                      
@@ -2357,8 +2333,7 @@ export SET OF STRING20 ArabicSurnames := [
 'ELBADRY',                      
 'ELBASSIOUNY',                  
 'ELBENHAWY',                    
-'ELBORDINY',
-'ELDEEN',                    
+'ELBORDINY',                    
 'ELFAR',                        
 'ELGAMMAL',                     
 'ELHADIDI',                     
@@ -2384,8 +2359,7 @@ export SET OF STRING20 ArabicSurnames := [
 'EL-SHORBAGY',                   
 'ESSA',                         
 'FAKHOURY',                     
-'FARAJ',
-'FAROOK',                        
+'FARAJ',                        
 'FARRAKHAN',                    
 'GABER',                        
 'GANEM',                        
@@ -2425,9 +2399,7 @@ export SET OF STRING20 ArabicSurnames := [
 'ISMAIL',                       
 'ISSA',                         
 'JABER',                        
-'JABIR',
-'KAHLEEL',                     
-'KALALKECHE',                         
+'JABIR',                        
 'KALB',                         
 'KALEEL',                       
 'KALIL',                        
@@ -2519,8 +2491,7 @@ export SET OF STRING20 ArabicSurnames := [
 'SARRAF',                       
 'SAVAN',                        
 'SAYEGH',                       
-'SEIF',
-'SENAD',                     
+'SEIF',                         
 'SHADI',                        
 'SHADID',                       
 'SHAHEEN',                      
@@ -2547,7 +2518,6 @@ export SET OF STRING20 ArabicSurnames := [
 'SULIMANI',                     
 'SURUR',                        
 'TA\'ANARI',                     
-'TAHA',                        
 'TAHAN',                        
 'TANNOUS',                      
 'TASABAY',                      
@@ -2568,9 +2538,18 @@ export SET OF STRING20 ArabicSurnames := [
 'ZOGBY',                        
 'ZUABI',                        
 'ZUBROMAWI',
-'ZAWAHIRI'
-];
-/*
+'ZAWAHIRI',
+// Uncategorized surnames, maintained here for now
+'PRAICO',
+'BANCACO',
+'BRUTICO',
+'IUSICO',
+'DEFRANSISCO',
+'FADY',
+'TESFAZION',
+'LOOB',
+'BETANCORP'];
+
 shared SET OF STRING32 boyTokens := Address.TokenManagement.SortAndTerminateSet(ArabicBoys);
 shared SET OF STRING32 girlTokens := Address.TokenManagement.SortAndTerminateSet(ArabicGirls);	
 shared SET OF STRING32 arabicNames := Address.TokenManagement.SortAndTerminateSet(ArabicBoys+ArabicGirls);	
@@ -2584,22 +2563,5 @@ export boolean IsArabicName(string20 name) :=
 	Address.TokenManagement.FindToken(arabicNames, name);
 export boolean IsArabicSurName(string20 name) :=
 	Address.TokenManagement.FindToken(surnameTokens, name);
-*/
-
-export dsArabicSurnames := SORT(DATASET(ArabicSurnames, {string20 name}), name);
-export dsArabicGivennames := SORT(DATASET(ArabicBoys+ArabicGirls, {string20 name}), name);
-export dsArabicBoysNames := SORT(DATASET(ArabicBoys, {string20 name}), name);
-export dsArabicGirlsNames := SORT(DATASET(ArabicGirls, {string20 name}), name);
-
-export dArabicSurnames := DICTIONARY(dsArabicSurnames, {name => true});
-export dArabicGivennames := DICTIONARY(dsArabicGivennames, {name => true});
-export dArabicBoysNames := DICTIONARY(dsArabicBoysNames, {name => true});
-export dArabicGirlsNames := DICTIONARY(dsArabicGirlsNames, {name => true});
-
-export boolean IsArabicBoysName(string20 s) := s in dArabicBoysNames;
-export boolean IsArabicGirlsName(string20 s) := s in dArabicGirlsNames;
-export boolean IsArabicName(string20 s) := s in dArabicGivennames;
-export boolean IsArabicSurName(string20 s) := s in dArabicSurnames;
-
 
 END;

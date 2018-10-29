@@ -1,6 +1,6 @@
-﻿export Common := MODULE
+export Common := MODULE
 
-	import _Control, lib_stringlib, ut, Address, STD, Data_Services;
+	import _Control, lib_stringlib, ut, Address;
 
 	//**************************************************************************************
 		export		xNID					:=	unsigned8;	//string18;
@@ -12,7 +12,40 @@
 		export		xWUID					:=	string20;	// w20090102-123456-123 possible
 
 	//**************************************************************************************
+	//export	xNID	fGetNextNID()	:=	lib_FileServices.FileServices.getUniqueInteger(eUniqueIntegerDali);
 	export integer4 CurrentDate	:=	(integer4)stringlib.getDateYYYYMMDD() : global;	// just to prevent the transforms from calling the function for every record in any transforms below
+	
+	export string16 ToHexString(unsigned integer8 n) :=
+	BEGINC++
+	// RETURNS:
+	//	char *  __result
+	// PARMS:
+	//	unsigned __int64 n
+	#include <string.h>
+	#body
+	#option pure
+		char	str[18];
+		snprintf(str, 18, "%016llX", n);
+		memcpy(__result, str, 16);
+	ENDC++;
+	
+	export data8 ToHex(unsigned integer8 n) :=
+	BEGINC++
+	// RETURNS:
+	//	void *  __result
+	// PARMS:
+	//	unsigned __int64 n
+	#include <string.h>
+	#body
+	#option pure
+		//memcpy(__result, &n, 8);
+		char *s = (char *)&__result;
+		char *t = (char *)&n;
+		int i = 7;
+		do {
+			*s++ = t[i--];
+		} while (i >= 0);
+	ENDC++;
 	
 	export string CombineName(string fname, string mname, string lname, string suffix) := 
 		 TRIM( 
@@ -22,8 +55,12 @@
 					IF(suffix='','',' ' + TRIM(suffix))
 				, LEFT, RIGHT);	
 	
+	//export	xNID	fGetNID(string name)	:=	ToHexstring(HASH64(TRIM(name,LEFT,RIGHT))) + '00';
+	//export	xNid	fGetNIDParsed(string fname, string mname, string lname, string suffix='') :=
+	//				fGetNID(Address.Persons.ReconstructName(fname,mname,lname,suffix));
+	//export	xNid	BlankNid := fGetNid('') : stored('BlankNid');
 	export	xNID	fGetNID(string name, integer derivation=0)	:=
-						if(derivation=0,HASH64(TRIM(name[1..150],LEFT,RIGHT)),
+						if(derivation=0,HASH64(TRIM(name,LEFT,RIGHT)),
 										HASH64(TRIM(name,LEFT,RIGHT),derivation));
 	string TrimName(string name) := FUNCTION
 		t := TRIM(name);
@@ -32,46 +69,32 @@
 	export	xNid	fGetNIDParsed(string fname, string mname, string lname, string suffix='', integer derivation=0) :=
 						if(derivation=0,HASH64(TrimName(fname), TrimName(mname), TrimName(lname), TrimName(suffix)),
 									HASH64(TrimName(fname), TrimName(mname), TrimName(lname), TrimName(suffix),derivation));
-	export	xNid	BlankNid := fGetNID('') : global;	
+//					fGetNID(Address.Persons.ReconstructName(fname,mname,lname,suffix));
+	export	xNid	BlankNid := fGetNID('') : stored('BlankNid');
 
-/*
-IP Address for LogsThor mapping
 
-*/
-	shared set of string LogsThor := ['10.241.50.42:8010','10.173.231.12:7070', '10.173.11.12:7070',
-																	'10.241.21.34:7070','10.241.50.45:7070','10.173.52.3:7070', '10.173.52.1:7070'];
-    shared nidCluster1 :=  MAP(
-         Thorlib.Daliservers() in LogsThor => Data_Services.foreign_prod + 'thor::',
- 				_Control.ThisEnvironment.name='Dataland' => '~thor::',          //'~thor400_88::',
-        '~thor::'); 
-  shared nidCluster :=  MAP(
-         Thorlib.Daliservers() in LogsThor => Data_Services.foreign_prod + 'thor::',
- 				_Control.ThisEnvironment.name='Dataland' => '~thor::',          //'~thor400_88::',
-        '~thor::'); 
+	//shared nidCluster :=  IF(_Control.ThisEnvironment.name='Dataland', 
+	//						'~' + _Control.ThisCluster.GroupName + '::',	//'~thor400_88::',
+	//						'~thor_data400::')  : stored('nidCluster');
+	shared nidCluster :=  IF(_Control.ThisEnvironment.name='Dataland', 
+							'~thor40_241::',				//'~thor400_88::',
+							'~thor_data400::')  : stored('nidCluster');
 							
-	export filename_NameRepository	  := nidCluster + 'base::nid::repository::current';
-	export filename_NameRepository_Legacy	  := nidCluster1 + 'base::nid::repository::v1';
+	export filename_NameRepository	  := nidCluster + 'base::nid::repository::prod';
 	export filename_NameRepository_Base	  := nidCluster + 'base::nid::repository';
-	export filename_NameRepository_Cache  := '~thor::base::nid::repository::cache';
+	export filename_NameRepository_Cache  := filename_NameRepository_Base + '::cache';
 	export filename_NameRepository_Delete  := filename_NameRepository_Base + '::delete';
 	export filename_NameRepository_Version  := filename_NameRepository_Base + '::@version@';
-	export filename_NameRepository_Add	  := '~thor::nid::cache';
+	export filename_NameRepository_Add	  := nidCluster + 'base::nid';
 	export filename_NameRepository_Key	  := nidCluster + 'key::nid';
 	export filename_NameRepository_Name_Key := nidCluster + 'key::nid::fullname';
 	export filename_NameRepository_ParsedName_Key := nidCluster + 'key::nid::parsedname';
 	export filename_NameRepository_CleanName_Key := nidCluster + 'key::nid::cleanname';
-	export filename_NameRepository_BizName_Key := nidCluster + 'key::nid::bizname';
-	export filename_NameRepository_FirstName_Key := nidCluster + 'key::nid::firstname';
+	//export filename_NameRepository_FirstName_Key := nidCluster + 'key::nid::firstname';
 	
-	//export GetFilename := filename_NameRepository_Add + '::' + workunit + '::' + GetTime();
-	
-//	tiebreaker := '::' + (string)COUNT(NOTHOR(Std.System.Workunit.WorkunitFilesWritten(workunit))(Std.Str.FindCount(name,'::base::nid') > 0));
-	
-	
-	
-	export GetFilename2(string uniqueid) := filename_NameRepository_Add + '::' + workunit + '::' + uniqueid;	// + tiebreaker;
-	//export GetFilenameEx(string id) := filename_NameRepository_Add + '::' + workunit + '::' + ut.GetTime()
-	//							+ if(id='','','_'+id);
+	export GetFilename := filename_NameRepository_Add + '::' + workunit + '::' + ut.GetTime();
+	export GetFilenameEx(string id) := filename_NameRepository_Add + '::' + workunit + '::' + ut.GetTime()
+								+ if(id='','','_'+id);
 
 
 END;
