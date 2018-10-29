@@ -1,8 +1,7 @@
-//This is the code to execute in a builder window
+﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','BIPV2_ProxID.BWR_Iterate - Internal Linking - SALT V3.0 Gold');
-IMPORT BIPV2_ProxID,SALT30;
-IMPORT SALTTOOLS30;
+#workunit('name','BIPV2_ProxID.BWR_Iterate - Internal Linking - SALT V3.11.3');
+IMPORT BIPV2_ProxID,SALT311;
 //BIPV2_ProxID.Specificities(BIPV2_ProxID.In_DOT_Base).Build; // Used to create calibration keys
 // Proc_Iterate also supports a dataset parameter to allow an arbitrary file as starting point.
 // Proc_Iterate also supports a threshold parameter to override the default threshold.
@@ -17,18 +16,19 @@ P.DoAll; // Use this version to run an iteration
 // MAC_MatchSamplePatterns is a tool that generates match/mismatch patterns based on the content of the Keys.MatchSample file.
 // Patterns consist of field names, with or without minus sign, where the minus sign identifies mismatch fields.
 // NOTE: It must run after Proc_Iterate.DoAll completes, so use SEQUENTIAL or a separate workunit.
-SALT30.MAC_MatchSamplePatterns(BIPV2_ProxID.Keys(BIPV2_ProxID.In_DOT_Base).MatchSample,MatchPatterns,Proxid1,Proxid2,8,27-33);
-OutMatchPatterns := OUTPUT(MatchPatterns,named('match_patterns'));
+// SALT311.MAC_MatchSamplePatterns(BIPV2_ProxID.Keys(BIPV2_ProxID.In_DOT_Base).MatchSample,MatchPatterns,Proxid1,Proxid2,8,27-33);
+// OutMatchPatterns := OUTPUT(MatchPatterns,named('match_patterns'));
 // OutMatchPatterns;
  
 // MAC_GetSALTReviewSamples is a tool that generates Internal Linking review samples. To use this tool, please define
 // reviewers (as a set), the number of review samples to be allocated to every reviewer, and the threshold.
 // NOTE: It must run after Proc_Iterate.DoAll completes, so use SEQUENTIAL or a separate workunit.
-Reviewers:=['Reviewer1','Reviewer2']; // e.g. ['EM','DB']
-NumSamplesPerReviewer:=20;
-ConfThreshold:=30;
-ReviewSamples:=SALTTOOLS30.MAC_GetSALTReviewSamples(BIPV2_ProxID.Keys(BIPV2_ProxID.In_DOT_Base).MatchSample,BIPV2_ProxID.Keys(BIPV2_ProxID.In_DOT_Base).Candidates,BIPV2_ProxID.In_DOT_Base,Proxid,ConfThreshold,NumSamplesPerReviewer,Reviewers);
-//ReviewSamples;
+// IMPORT SALTTOOLS30;
+// Reviewers:=['Reviewer1','Reviewer2']; // e.g. ['EM','DB']
+// NumSamplesPerReviewer:=20;
+// ConfThreshold:=30;
+// ReviewSamples:=SALTTOOLS30.MAC_GetSALTReviewSamples(BIPV2_ProxID.Keys(BIPV2_ProxID.In_DOT_Base).MatchSample,BIPV2_ProxID.Keys(BIPV2_ProxID.In_DOT_Base).Candidates,BIPV2_ProxID.In_DOT_Base,Proxid,ConfThreshold,NumSamplesPerReviewer,Reviewers);
+// ReviewSamples;
  
 // Run all three in a single workunit - but don't forget to comment-out the individual actions above to avoid conflict
-// SEQUENTIAL(P.DoAll, OutMatchPatterns, ReviewSamples);
+// SEQUENTIAL(P.DoAllAgain, OutMatchPatterns, ReviewSamples);
