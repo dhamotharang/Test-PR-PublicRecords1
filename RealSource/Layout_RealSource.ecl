@@ -1,3 +1,3 @@
 ﻿IMPORT RealSource;
 
-EXPORT Layout_RealSource := RealSource.Layouts.Base;
+EXPORT Layout_RealSource := RealSource.Layouts.Base_w_bip;
