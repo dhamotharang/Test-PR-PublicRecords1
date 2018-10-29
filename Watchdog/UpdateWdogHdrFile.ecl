@@ -25,7 +25,7 @@ wdog_hr_rec updatefile( ds l) := transform
 
 self.issubmitted := if ( l.wtype = watchdogtype , 'Y','N');
 self.iscompleted := if ( l.wtype = watchdogtype , 'Y','N');
-self := l;
+self := l;L
 end;
 
 ds1 := project(ds,updatefile(left));
@@ -34,8 +34,6 @@ return Sequential(output(ds1,,set_wdog_lfile+'_'+watchdogtype+'_'+build_date,ove
                FileServices.StartSuperfiletransaction(),
 							  FileServices.RemoveSuperfile(set_wdog_sfile,set_wdog_lfile),
 								FileServices.FinishSuperfiletransaction(),
-								
-                output(ds1,,set_wdog_lfile+'_'+watchdogtype+'_'+build_date,overwrite),
 								output(ds1,,set_wdog_tempfile+'_'+build_date,overwrite),
                 FileServices.Renamelogicalfile(set_wdog_lfile,set_wdog_lfile+watchdogtype+'_old'+build_date),
 //   					  FileServices.Renamelogicalfile(set_wdog_tempfile+'_'+watchdogtype+'_'+build_date,set_wdog_lfile),
