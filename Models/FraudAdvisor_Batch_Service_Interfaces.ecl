@@ -1,7 +1,7 @@
 ﻿EXPORT FraudAdvisor_Batch_Service_Interfaces := MODULE 
 	
 	EXPORT Input := INTERFACE
-		export string 		ModelName_in ;
+		export string 	 ModelName_in ;
 		export boolean   doVersion1 ;
 		export boolean   doVersion2 ;
 		export unsigned1 dppa ;
@@ -20,6 +20,7 @@
 		export string    DataRestriction ;
 		export string    DataPermission ;
     export boolean   doParo_attrs ;
+    export string    requestedattributegroups;
 	END;
 	
 END;

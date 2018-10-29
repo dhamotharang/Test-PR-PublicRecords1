@@ -1,4 +1,4 @@
-Import risk_indicators;
+﻿Import risk_indicators;
 
 EXPORT FraudAdvisor_Batch_Service_Layouts := MODULE 
 
