@@ -18,7 +18,7 @@ suffix2 = 'cln_suffix2'		// cleaned suffix for name 2
 	NID.Layout_Repository %xform%(RECORDOF(inFile) L) := TRANSFORM
 		self.NID := NID.Common.fGetNIDParsed(L._firstname,L._middlename,L._lastname,L._namesuffix);
 
-		self.Name := Nid.ReconstructName(L._firstname,L._middlename,L._lastname,L._namesuffix);
+		self.Name := Address.Persons.ReconstructName(L._firstname,L._middlename,L._lastname,L._namesuffix);
 	
 		self.NameType := L.namtype;
 			
@@ -48,7 +48,6 @@ suffix2 = 'cln_suffix2'		// cleaned suffix for name 2
 						_firstname,_middlename,_lastname,_namesuffix,LOCAL),
 					%xform%(LEFT));
 	//%dsOut% := 	PROJECT(inFile, NID.Layouts.rNameCache);
-	/*
 #UNIQUENAME(dualxform)
 	NID.Layout_Repository %dualxform%(NID.Layout_Repository L, integer c) := TRANSFORM
 		SELF.NameType := IF(L.NameType='D','P',SKIP);
@@ -76,15 +75,19 @@ suffix2 = 'cln_suffix2'		// cleaned suffix for name 2
 	END;
 #UNIQUENAME(dual)
 	%dual% := Distribute(NORMALIZE(%dsOut%(NameType='D'), 2, %dualxform%(LEFT, COUNTER)),Nid);
-*/				
+				
 #UNIQUENAME(outfile)
-    %outfile% := %dsOut%;	// & %dual%;
+	//%outfile% := 	SORT(DISTRIBUTE(%dsOut% + %dual%,HASH64(NID)),NID,LOCAL)
+    %outfile% := %dsOut% + %dual%;
 					//		: INDEPENDENT;
 
 #UNIQUENAME(filename)
-#UNIQUENAME(fp, '#$');
-	%filename% := Nid.CreateRepositoryFilename(#TEXT(%fp%));
-		NID.AddToCache(%outfile%, %filename%);
+	%filename% := Nid.Common.Getfilename;
+
+  IF(Exists(%dsOut%),
+		NID.AddToRepository(%dsOut%, %filename%));
 		
+		//	NID.AddToRepository(%dsOut%, %filename%)),
+
 
 ENDMACRO;
