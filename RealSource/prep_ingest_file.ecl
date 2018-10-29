@@ -40,8 +40,10 @@ EXPORT prep_ingest_file := FUNCTION
 																							+TRIM(pInput.City)
 																							+TRIM(pInput.State)
 																							+TRIM(pInput.ZipCode)
+																							+TRIM(self.phone)
 																							+TRIM(pInput.DOB)
-																							+TRIM(pInput.Email));
+																							+TRIM(pInput.Email)
+																							+TRIM(pInput.URL));
 		self																			:=	pInput;
 		self																			:=	[];
 	END;
