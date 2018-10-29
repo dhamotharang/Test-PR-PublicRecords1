@@ -12,7 +12,7 @@
 */
 
 EXPORT BatchService() := MACRO
- #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+ #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	#constant('StrictMatch', true)
 	UNSIGNED2 MaxResultsPerAcct := 10 : STORED('MaxResultsPerAcct');
 	BOOLEAN   EnableExtraAccidents := false : STORED('EnableExtraAccidents');
