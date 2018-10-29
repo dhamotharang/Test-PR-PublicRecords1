@@ -8,7 +8,7 @@ EXPORT prep_ingest_file := FUNCTION
 	fmtout:= '%Y%m%d';
 	
 	//Populate added fields prior to cleaning
-	RealSource.Layouts.Base tAppendFields(RealSource.Layouts.Raw pInput) := TRANSFORM
+	RealSource.Layouts.Base_w_bip tAppendFields(RealSource.Layouts.Raw pInput) := TRANSFORM
 		self.FirstName			:= Anchor.fCleanAscii(pInput.FirstName);
 		//Clean known issues in LastName
 		ClnLastName					:= Anchor.fCleanAscii(pInput.LastName);
@@ -40,8 +40,10 @@ EXPORT prep_ingest_file := FUNCTION
 																							+TRIM(pInput.City)
 																							+TRIM(pInput.State)
 																							+TRIM(pInput.ZipCode)
+																							+TRIM(self.phone)
 																							+TRIM(pInput.DOB)
-																							+TRIM(pInput.Email));
+																							+TRIM(pInput.Email)
+																							+TRIM(pInput.URL));
 		self																			:=	pInput;
 		self																			:=	[];
 	END;
