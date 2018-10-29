@@ -1,3 +1,4 @@
+﻿/*HACKCompareService*/
 /*--SOAP--
 <message name="ProxidCompareService">
 <part name="ProxidOne" type="xsd:string"/>
@@ -13,3 +14,4 @@ combo := 'qa';
 
 BIPV2_ProxID._fun_CompareService((unsigned6)Proxidonestr,(unsigned6)Proxidtwostr,combo);
 ENDMACRO;
+
