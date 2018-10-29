@@ -83,7 +83,7 @@
 		*/		
 import iesp, risk_indicators, business_risk, IncomeRisk_Services, ut, patriot;
 export ReportService := MACRO
-		#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+		#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
     // ds_in2 := DATASET ([], rec_in) : STORED ('ERISalaryReportRequest', FEW);
 		// first_row2 := ds_in[1] : independent;
 		

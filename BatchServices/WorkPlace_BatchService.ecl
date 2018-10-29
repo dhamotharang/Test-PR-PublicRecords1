@@ -23,7 +23,7 @@
 import Royalty;
 
 EXPORT WorkPlace_BatchService(useCannedRecs = 'false') := MACRO
-#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 #stored('useOnlyBestDID',true); // used to determine the 1 "best" did for the input criteria
 
   Pre_result := BatchServices.WorkPlace_Records(useCannedRecs);

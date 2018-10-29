@@ -19,7 +19,7 @@
 IMPORT BatchShare, Doxie, Suppress, ut;
 
 EXPORT BatchService() := MACRO
-    #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+    #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
     //required for property search.
     #STORED('Return_Property',TRUE);
     #STORED('Return_Assessments',TRUE);

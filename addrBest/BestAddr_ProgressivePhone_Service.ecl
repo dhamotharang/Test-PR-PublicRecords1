@@ -175,7 +175,7 @@
 import AddrBest, progressive_phone, ut, WSInput;
 
 export BestAddr_ProgressivePhone_Service := macro
-#CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+#CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
  //The following macro defines the field sequence on WsECL page of query.
  WSInput.MAC_AddrBest_bestaddr_progressivephone_service();
 

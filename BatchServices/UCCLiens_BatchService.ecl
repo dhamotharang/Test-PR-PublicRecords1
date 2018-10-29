@@ -39,7 +39,7 @@ EXPORT UCCLiens_BatchService(useCannedRecs = 'false') :=
 	MACRO
 	
 	 
-	 #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+	 #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 		#OPTION('optimizeProjects', TRUE);
 		
 		#CONSTANT('getBdidsbyExecutive',FALSE);

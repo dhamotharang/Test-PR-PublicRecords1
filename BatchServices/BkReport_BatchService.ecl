@@ -26,7 +26,7 @@ IMPORT BatchServices, BankruptcyV3_Services, BankruptcyV3;
 
 export BkReport_BatchService(useCannedRecs = 'false') := 
 	MACRO
-	 #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+	 #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 		#OPTION('optimizeProjects', TRUE);
 		
 		#CONSTANT('isFCRA', FALSE)

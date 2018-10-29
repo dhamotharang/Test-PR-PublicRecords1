@@ -16,7 +16,7 @@
 IMPORT Autokey_batch, BatchServices, BatchShare, BIPV2;
 
 EXPORT Batch_Service(useCannedRecs = false) := MACRO
- #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+  #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	// Alias
 	AutoKeyBatchInput := WatercraftV2_Services.Layouts.batch_in;
 	
