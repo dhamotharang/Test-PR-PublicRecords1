@@ -15,6 +15,8 @@ FUNCTION
 		self.version1 := ri.version1;
 		self.version2 := ri.version2;
 		self.version201 := ri.version201;
+    self.version202 := ri.version202;
+    self.version203 := ri.version203;
 		self.IDAttributes := ri.IDAttributes;
     self.ParoAttributes := ri.ParoAttributes;
     self.compromisedDL_hash := '';  // we don't need to log this for testseed transactions
