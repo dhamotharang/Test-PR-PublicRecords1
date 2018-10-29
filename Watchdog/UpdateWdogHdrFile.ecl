@@ -25,7 +25,7 @@ wdog_hr_rec updatefile( ds l) := transform
 
 self.issubmitted := if ( l.wtype = watchdogtype , 'Y','N');
 self.iscompleted := if ( l.wtype = watchdogtype , 'Y','N');
-self := l;L
+self := l;
 end;
 
 ds1 := project(ds,updatefile(left));
