@@ -44,7 +44,7 @@ EXPORT IParam := MODULE
 		EXPORT BOOLEAN UseDeathMasterSSAUpdates := FALSE;
 		EXPORT BOOLEAN IsConsumer := FALSE;
 		EXPORT BOOLEAN SuppressNonMarketingDeathSources := FALSE;
-		EXPORT Integer DeathMasterPurpose := DeathV2_Services.Constants.DeathMasterPurpose.NoPermissibleUse;		
+		EXPORT Integer DeathMasterPurpose := DeathV2_Services.Constants.DeathMasterPurpose.NoValue;		
 	END;
 	
 	EXPORT GetDeathRestrictions(inmod) := 
