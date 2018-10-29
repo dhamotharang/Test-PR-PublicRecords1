@@ -2204,8 +2204,8 @@ layout_FDAttributesOut formAttributeGroup(Models.Layout_FraudAttributes le) := t
                             );
   self := [];
 END;
-// attributeOut := project(pick_attr, formAttributeGroup(left));
-attributeOut := join(pick_attr,clam,  left.input.seq=right.seq, formAttributeGroup(LEFT,RIGHT));
+attributeOut := project(pick_attr, formAttributeGroup(left));
+// attributeOut := join(pick_attr,clam,  left.input.seq=right.seq, formAttributeGroup(LEFT,RIGHT));
 
 
 // Get the models
