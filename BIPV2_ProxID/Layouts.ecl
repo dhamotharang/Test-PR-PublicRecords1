@@ -1,4 +1,4 @@
-import 
+﻿import 
 // Business_DOT_SALT_micro4,
 business_header,salt22,Business_DOT,BIPV2_Files,BIPV2;
 export Layouts :=
@@ -146,7 +146,53 @@ end;
 //	export orig_DOT_Base := Business_DOT.Files.l_dot;
 	export orig_DOT_Base := BIPV2.CommonBase.Layout;
   
-	export DOT_Base := BIPV2.CommonBase.Layout;
+	export DOT_Base := {
+ orig_DOT_Base.rcid
+,orig_DOT_Base.dotid
+,orig_DOT_Base.Proxid
+,orig_DOT_Base.lgid3
+,orig_DOT_Base.orgid
+,orig_DOT_Base.ultid
+,orig_DOT_Base.source
+,orig_DOT_Base.source_record_id
+,orig_DOT_Base.active_domestic_corp_key
+,orig_DOT_Base.active_duns_number
+,orig_DOT_Base.active_enterprise_number
+,orig_DOT_Base.cnp_btype
+,orig_DOT_Base.cnp_classid
+,orig_DOT_Base.cnp_hasnumber
+,orig_DOT_Base.cnp_lowv
+,orig_DOT_Base.cnp_name
+,orig_DOT_Base.cnp_number
+,orig_DOT_Base.cnp_translated
+,orig_DOT_Base.company_bdid
+,orig_DOT_Base.company_charter_number
+,orig_DOT_Base.company_fein
+,orig_DOT_Base.company_foreign_domestic
+,orig_DOT_Base.company_inc_state
+,orig_DOT_Base.company_name
+,orig_DOT_Base.company_name_type_derived
+,orig_DOT_Base.company_name_type_raw
+,orig_DOT_Base.company_phone
+,orig_DOT_Base.dt_first_seen
+,orig_DOT_Base.dt_last_seen
+,orig_DOT_Base.ebr_file_number
+,orig_DOT_Base.foreign_corp_key
+,orig_DOT_Base.hist_domestic_corp_key
+,orig_DOT_Base.hist_duns_number
+,orig_DOT_Base.hist_enterprise_number
+,orig_DOT_Base.prim_range
+,orig_DOT_Base.prim_range_derived
+,orig_DOT_Base.prim_name
+,orig_DOT_Base.prim_name_derived
+,orig_DOT_Base.sec_range
+,orig_DOT_Base.v_city_name
+,orig_DOT_Base.st
+,orig_DOT_Base.zip
+,orig_DOT_Base.unk_corp_key
+,orig_DOT_Base.vl_id  
+,orig_DOT_Base.deleted_key
+  };
 //	export attfile_duns_entum := {dot_base.proxid,dot_base.duns_number,dot_base.enterprise_number};
 	export attfile_contact 		:= {dot_base.proxid,string73 contact};
 

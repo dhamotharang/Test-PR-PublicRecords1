@@ -220,9 +220,9 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 		red_flags_ret := if(args.RedFlag_version<>0, risk_indicators.Red_Flags_Function(iid), dataset([], combined_layouts));
 
     model_indicator := map(doParo       => Models.FraudAdvisor_Constants.attrvparo,
-                           requestedattributegroups IN ['fraudpointattrv201'] => Models.FraudAdvisor_Constants.attrv201,
-                           requestedattributegroups IN ['fraudpointattrv202'] => Models.FraudAdvisor_Constants.attrv202,
-                           requestedattributegroups IN ['fraudpointattrv203'] => Models.FraudAdvisor_Constants.attrv203,
+                           requestedattributegroups IN ['fraudpointattrv201'] => 'fraudpointattrv201',
+                           requestedattributegroups IN ['fraudpointattrv202'] => 'fraudpointattrv202',
+                           requestedattributegroups IN ['fraudpointattrv203'] => 'fraudpointattrv203',
                                            model_name);
 
 		attr := if(doVersion1 or doVersion2 or requestedattributegroups IN ['fraudpointattrv201','fraudpointattrv202','fraudpointattrv203'] or doParo,

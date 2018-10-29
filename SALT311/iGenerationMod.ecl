@@ -1,0 +1,38 @@
+﻿// Declare machine-readable versions of the spec file and subsets thereof,
+// to be generated as GenerationMod in each module
+EXPORT iGenerationMod := INTERFACE
+ 
+	// SALT Version info
+	EXPORT STRING salt_VERSION := ''; // e.g. 'V3.9.0'
+	EXPORT STRING salt_MODULE := ''; // e.g. 'SALT39'
+	EXPORT STRING salt_TOOLSMODULE := '';	// e.g. 'SALTTOOLS30'
+	// Core module configuration values
+	EXPORT STRING spc_MODULE := ''; // e.g. 'SALT_Test'
+	EXPORT STRING spc_NAMESCOPE := '';
+	EXPORT STRING spc_PROCESS := ''; // e.g. 'XSAMPL'
+	EXPORT STRING spc_PROCLAYOUTS := ''; // e.g. 'Process_XSAMPL_Layouts[([args]*)]'
+	EXPORT STRING spc_IDNAME := ''; // e.g. 'BDID'
+	EXPORT STRING spc_IDFIELD := ''; // e.g. 'BDID'
+	EXPORT STRING spc_RIDFIELD := ''; // e.g. 'rcid'
+	EXPORT STRING spc_SOURCEFIELD := '';
+	EXPORT STRING spc_FILEPREFIX := ''; // e.g. 'In_', 'File_'
+	EXPORT STRING spc_FILENAME := ''; // e.g. 'Sample'
+	EXPORT STRING spc_INGESTSTATUS := '';
+	EXPORT STRING spc_EXTERNAL_MAPPING := '';
+	EXPORT STRING spc_EXTERNAL_BATCH_PARAM := '';
+	EXPORT STRING spc_CONFIG := '';
+	EXPORT BOOLEAN spc_CONFIGPARAM := FALSE;
+	EXPORT BOOLEAN spc_HAS_TWOSTEP := FALSE;
+	EXPORT BOOLEAN spc_HAS_PARTITION := FALSE;
+	EXPORT BOOLEAN spc_HAS_CONSISTENT := FALSE;
+	EXPORT BOOLEAN spc_HAS_FIELDTYPES := FALSE;
+	EXPORT BOOLEAN spc_HAS_INCREMENTAL := FALSE;
+	EXPORT BOOLEAN spc_HAS_ASOF := FALSE;
+	EXPORT BOOLEAN spc_HAS_NONCONTIGUOUS := FALSE;
+	EXPORT BOOLEAN spc_HAS_SUPERFILES := FALSE;
+	EXPORT BOOLEAN spc_HAS_EXTERNAL := FALSE;
+	EXPORT BOOLEAN spc_HAS_PARENTS := FALSE;
+	EXPORT BOOLEAN spc_HAS_FORCE := FALSE;
+	EXPORT BOOLEAN spc_HAS_BLOCKLINK := FALSE;
+	
+END;
