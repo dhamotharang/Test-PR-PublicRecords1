@@ -20,6 +20,7 @@ module
     tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.TextMinedCrim       ,Layouts.Input.TextMinedCrim      ,TextMinedCrim);
     tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.OIG                 ,Layouts.Input.OIG                ,OIG);
     tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.Erie                ,Layouts.Input.Erie               ,Erie, 'CSV','',['\n','\r\n','\n\r'],'|',,,);
+    tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ErieWatchList       ,Layouts.Input.ErieWatchList      ,ErieWatchList, 'CSV','',['\n','\r\n','\n\r'],'|',,,);
 
 		end;
 	
@@ -35,6 +36,7 @@ module
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.TextMinedCrim      ,Layouts.Base.TextMinedCrim          ,TextMinedCrim);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.OIG                ,Layouts.Base.OIG                    ,OIG);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Erie               ,Layouts.Base.Erie                   ,Erie,,,,,,true,);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.ErieWatchList      ,Layouts.Base.ErieWatchList          ,ErieWatchList,,,,,,true,);
 
 			end;
 //3 years of glb5 data

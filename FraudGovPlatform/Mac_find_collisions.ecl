@@ -3,12 +3,17 @@
 	infile
 	,matchset
 	,priority_
-	,fname_field = 'raw_First_Name'
-	,lname_field = 'raw_Last_Name'
-	,name_suffix_field = 'raw_Orig_Suffix'
-	,ssn_field = 'SSN'
-	,dob_field = 'DOB'
-	,DID_field	= 'DID'
+	,fname_field = 'fname'
+	,lname_field = 'lname'
+	,suffix_field = 'name_suffix'
+	,ssn_field = 'ssn'
+	,dob_field = 'dob'
+	,DID_field = 'did'
+	,prange_field = 'prim_range'
+	,pname_field = 'prim_name'
+	,city_field = 'v_city_name'
+	,state_field = 'st'
+	,zip_field	= 'zip'
 	,outrec
 	,outfile
 	,ssn_threshold
@@ -47,23 +52,57 @@ matchChars:=
 
 inf_dis:=distribute(infile
 		(
-		#if('S' in matchset)
+		#if('S' in matchset or 'P' in matchset)
 			(unsigned)ssn_field>0,
 		#end
-		#if('D' in matchset)
+		#if('N' in matchset or 'V' in matchset)
+			lname_field <> '',
+			fname_field <> '',
+		#end			
+		#if('D' in matchset or 'B' in matchset)
 			(unsigned)dob_field>0,
+		#end		
+		#if('A' in matchset)
+			prange_field<>'',
+			pname_field<>'',
 		#end
-		 fname_field<>'',
-		 lname_field<>''
+		#if('C' in matchset)
+			city_field<>'',
+			state_field<>'',
+		#end
+		#if('Z' in matchset)
+			zip_field<>'',
+		#end
+		lname_field<>''
 		)
 		,hash(
+		#if('N' in matchset)
+			fname_field,		
+		#end	
+		#if('V' in matchset)
+			lname_field,
+			fname_field[1],		
+		#end	
 		#if('S' in matchset)
 			ssn_field,
 		#end
-		#if('D' in matchset)
+		#if('P' in matchset)
+			ssn_field[6..9],
+		#end		
+		#if('D' in matchset or 'B' in matchset)
 			dob_field,
+		#end	
+		#if('A' in matchset)
+			prange_field,
+			pname_field,
 		#end
-		fname_field,
+		#if('C' in matchset)
+			city_field,
+			state_field,
+		#end
+		#if('Z' in matchset)
+			zip_field,
+		#end
 		lname_field
 		));
 
@@ -89,13 +128,31 @@ end;
 match:=join(inf_ddp,inf_ddp,
 		left.did>right.did and
 		left.lname_field=right.lname_field and
-
+		
 		#if('N' in matchset)
-			left.fname_field=right.fname_field and
+			left.fname_field=right.fname_field and			
+		#end
+
+		#if('V' in matchset)
+			left.fname_field<>right.fname_field and
+			left.fname_field[1]=right.fname_field[1] and
+			ut.nneq(left.suffix_field,right.suffix_field)		and
 		#end
 
 		#if('S' in matchset)
+			(unsigned)left.ssn_field>0 and
+			(unsigned)right.ssn_field>0 and		
 			left.ssn_field=right.ssn_field and
+		#end
+
+		#if('D' not in matchset)
+			ut.nneq(left.suffix_field,right.suffix_field)		and
+		#end
+
+		#if('D' in matchset)
+			(unsigned)left.dob_field>0 and
+			(unsigned)right.dob_field>0 and
+			left.dob_field=right.dob_field and
 		#end
 
 		#if('P' in matchset)
@@ -104,15 +161,48 @@ match:=join(inf_ddp,inf_ddp,
 			left.ssn_field[6..9]=right.ssn_field[6..9] and
 		#end
 
-		#if('D' in matchset)
-			left.dob_field=right.dob_field and
-			ut.nneq(left.name_suffix_field,right.name_suffix_field) and
+		#if('B' in matchset)
+			header.gens_ok(left.suffix_field,left.dob_field,right.suffix_field,right.dob_field) and
+			(unsigned)left.dob_field>0 and
+			(unsigned)right.dob_field>0 and
+			#if(dob_threshold = 3)
+				header.sig_near_dob(left.dob_field,right.dob_field) and
+			#elseif(dob_threshold = 2)
+				header.date_value(left.dob_field,right.dob_field) > 1 and
+			#elseif(dob_threshold = 1)
+				header.date_value(left.dob_field,right.dob_field) > 0 and
+			#else
+				header.sig_near_dob(left.dob_field,right.dob_field) and
+			#end
+		#end
+
+		#if('A' in matchset)
+			left.pname_field<>'' and
+			right.pname_field<>'' and
+			left.pname_field=right.pname_field and
+			left.prange_field=right.prange_field and
+			((left.ssn_field = '' and	right.ssn_field='' and left.ssn_field = right.ssn_field) or	 left.ssn_field <> right.ssn_field) and
+		#end		
+
+		#if('C' in matchset)
+			left.city_field<>'' and
+			right.city_field<>'' and
+			left.state_field<>'' and
+			right.state_field<>'' and
+			left.city_field=right.city_field and
+			left.state_field=right.state_field and
+			((left.ssn_field = '' and	right.ssn_field='' and left.ssn_field = right.ssn_field) or	 left.ssn_field <> right.ssn_field) and
+		#end
+
+		#if('Z' in matchset)
+			left.zip_field<>'' and
+			right.zip_field<>'' and
+			left.zip_field=right.zip_field and
+			((left.ssn_field = '' and	right.ssn_field='' and left.ssn_field = right.ssn_field) or	 left.ssn_field <> right.ssn_field) and
 		#end
 
 		true	//the one just keeps the "and" from messing it up
 		,tr(left,right)
 		,local);
-
-outfile := dedup(match);
-
+		outfile := match;
 endmacro;

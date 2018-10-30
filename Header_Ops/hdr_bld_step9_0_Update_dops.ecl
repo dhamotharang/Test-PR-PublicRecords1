@@ -9,29 +9,30 @@ elist:=         'gabriel.marcan@lexisnexisrisk.com'
 // // // // // // // // // FullHeader DOPS update
 
 // h_version := Header.version_build;
-h_version := '20180724';
+h_version := '20180926';
 
-dops.updateversion('SourceKeys'           ,h_version,elist,,'N'); // header // Show Sources <=== NOTE !! RELEASE THE DAY AFTER
-dops.updateversion('PersonHeaderKeys'     ,h_version,elist,,'N'); // header // Header
-dops.updateversion('PersonSlimsortKeys'   ,h_version,elist,,'N'); // header // Slimsorts
-dops.updateversion('PersonLabKeys'        ,h_version,elist,,'N'); // header // PersonXLAB
-dops.updateversion('RelativeV3Keys'       ,h_version,elist,,'N'); // header // RelativesV3
-dops.updateversion('PersonAncillaryKeys'  ,h_version,elist,,'N'); // header // PersonAncillaryKeys
-dops.updateversion('AddressRawAIDKeys'    ,h_version,elist,,'N'); // header // AddressRawAIDKeys
+dops.updateversion('SourceKeys'             ,h_version,elist,,'N'); // header // Show Sources <=== NOTE !! RELEASE THE DAY AFTER
+dops.updateversion('PersonHeaderKeys'       ,h_version,elist,,'N'); // header // Header
+dops.updateversion('PersonHeaderWeeklyKeys' ,h_version,elist,,'N'); // header // Header
+dops.updateversion('PersonSlimsortKeys'     ,h_version,elist,,'N'); // header // Slimsorts
+dops.updateversion('PersonLabKeys'          ,h_version,elist,,'N'); // header // PersonXLAB
+dops.updateversion('RelativeV3Keys'         ,h_version,elist,,'N'); // header // RelativesV3
+dops.updateversion('PersonAncillaryKeys'    ,h_version,elist,,'N'); // header // PersonAncillaryKeys
+dops.updateversion('AddressRawAIDKeys'      ,h_version,elist,,'N'); // header // AddressRawAIDKeys
 
-dops.updateversion('FCRA_PersonHeaderKeys',h_version,elist,,'F'); // header // FCRA_Header
-dops.updateversion('AddressRawAIDKeys'    ,h_version,elist,,'F'); // header // FCRA_Header
+dops.updateversion('FCRA_PersonHeaderKeys'  ,h_version,elist,,'F'); // header // FCRA_Header
+dops.updateversion('AddressRawAIDKeys'      ,h_version,elist,,'F'); // header // FCRA_Header
 
-dops.updateversion('PersonHeaderKeys'     ,h_version,elist,,'B'); // header // <=== NOTE !! RELEASE THE DAY AFTER
-dops.updateversion('PowerSearchKeys'      ,h_version,elist,,'B'); // header // <=== NOTE !! RELEASE THE DAY AFTER
+dops.updateversion('PersonHeaderKeys'       ,h_version,elist,,'B'); // header // <=== NOTE !! RELEASE THE DAY AFTER
+dops.updateversion('PowerSearchKeys'        ,h_version,elist,,'B'); // header // <=== NOTE !! RELEASE THE DAY AFTER
 
 // // // // // // // // // QuickHeader DOPS update
 
-qh_version := Header.Sourcedata_month.v_eq_as_of_date; // 'thor_data400::flag::version::equifax_weekly'
-// qh_version := '20180826';
+// qh_version := Header.Sourcedata_month.v_eq_as_of_date; // 'thor_data400::flag::version::equifax_weekly'
+qh_version := '20181028';
 
-rt_version := qh_version;//+'a';
-// rt_version := '20171119a';
+// rt_version := qh_version;//+'a';
+rt_version := '20181028';
 
 dops.updateversion('QuickHeaderKeys'     ,qh_version,elist,,'N'); // orbit: Quick Header
 dops.updateversion('QHsourceKeys'        ,qh_version,elist,,'N'); // orbit: QHsourceKeys

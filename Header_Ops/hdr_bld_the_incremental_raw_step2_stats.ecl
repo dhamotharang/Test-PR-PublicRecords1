@@ -29,7 +29,7 @@ return sequential(stats, if(~incremental,run_rel_avb));
 END;
 
 boolean incremental:=true;
-run_stats(Header.email_list.BocaDevelopers,incremental,'20180919');
+run_stats(Header.email_list.BocaDevelopers,incremental,'20181016');
 
 // run on p_svc_person_header: Header_AVB.Stat is sandboxed
 // run on thor (eg 44) 
@@ -46,6 +46,7 @@ run_stats(Header.email_list.BocaDevelopers,incremental,'20180919');
 
 Previous runs
 -------------
+20181002 W20181003-155000
 20180911 W20180912-233629
 20180904 W20180905-164827
 20180730 W20180801-092539

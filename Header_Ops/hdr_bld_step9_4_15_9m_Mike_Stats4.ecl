@@ -304,6 +304,7 @@ send_report(seg_m,emailList,mv,wu,'Marketing');
 //
 // Previous runs
 // -------------
+// 20180821 W20181003-145200
 // 20180724 W20180907-113130
 /*
 

@@ -61,7 +61,7 @@ output(Get_DFUInfo(   '~thor_data400::key::insuranceheader_segmentation::'+filed
 ,output(Get_DFUInfo('~thor_data400::key::fcra::header::'+filedate+'::addr_unique_expanded'),named('file_copy_log'),extend)
 );
 
-getInfo('20180821'); // run on hthor
+getInfo('20180926'); // run on hthor
 
 // W:\Projects\Header\15-05a_BuildAssistScripts\header_dfu_info_copy_from_alpha.ecl
 // run on hthor (svc_person_header is ok)

@@ -137,6 +137,7 @@ STD.System.Email.SendEmailAttachText(
 // Run on: hthor p_svc_person_header
 // Previous runs
 // -------------
+// 20180821 W20181003-151526
 // 20180724 W20180907-124234
 // 20180522 W20180629-135531
 // 20180423 W20180604-141816 

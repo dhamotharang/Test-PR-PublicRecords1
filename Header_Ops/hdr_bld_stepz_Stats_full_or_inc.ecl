@@ -232,7 +232,7 @@ end;
 // ***********************************************************************************************************************
 // RUN ON HTHOR !
 percent_nbm_change_threshold:=100;
-forceNewVersion:='20180919'; // eg 20170430 // instead of manually checking version on line ~48/49
+forceNewVersion:='20181023'; // eg 20170430 // instead of manually checking version on line ~48/49
 HeaderStatsReport(forceNewVersion,percent_nbm_change_threshold);
 
 // RUN THIS BWR BEFORE THE ACTUAL STAT REPORT FOR ALPHARETTA AND CHECK REPORT_FINAL
@@ -242,6 +242,8 @@ HeaderStatsReport(forceNewVersion,percent_nbm_change_threshold);
 // Previous runs
 // ----------------
 /*
+20181002 W20181003-091707
+20180926 W20180928-094220
 20180919 W20180921-231918
 20180911 W20180912-233418
 20180904 W20180905-135516

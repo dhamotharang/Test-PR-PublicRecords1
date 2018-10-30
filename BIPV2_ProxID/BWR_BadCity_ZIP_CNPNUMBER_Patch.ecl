@@ -1,4 +1,4 @@
-#workunit('name','BIPV2 Proxid Bad City, Bad Zip + cnp number Patch');
+﻿#workunit('name','BIPV2 Proxid Bad City, Bad Zip + cnp number Patch');
 dbase1 := BIPV2_ProxID.files('20130212a_1').base.logical : global;
 msd               := BIPV2_ProxID.Keys(BIPV2_ProxID.In_DOT_Base).MatchSample;
 gte21             := msd(conf >= 21);

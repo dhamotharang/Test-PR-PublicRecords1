@@ -1,6 +1,6 @@
 ﻿IMPORT tools,header;
 #workunit('name','Manual stale keys rename');
-filedate:='20180821';//header.version_build;
+filedate:='20180926';//header.version_build;
 all_packagekeys := DATASET([                                                                                                                                                                                                                              
 {'~thor_data400::key::header.rid_qa', '~thor_data400::key::header::'+filedate+'::rid'}  // put in the NEW version name                                                                                                                                                
 ], tools.Layout_SuperFilenames.inputlayout);                                                                                                                                                                                                                  

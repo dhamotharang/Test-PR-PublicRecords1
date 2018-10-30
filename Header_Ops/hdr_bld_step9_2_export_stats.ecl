@@ -9,8 +9,10 @@ EXPORT header_get_wuid_results(filedate,res_name,out_rec,step) := FUNCTIONMACRO
 				w_e		:='W'+ut.date_math(workunit[2..9], 1)+'-000000';
 
 				job_name := CASE(step,
-												'ingest' => 'Yogurt:'+filedate+' Header*Ingest*',
-												'sync'   => 'Yogurt:'+filedate+' Header Sync;Rollup & Stats',
+												// 'ingest' => 'Yogurt:'+filedate+' Header*Ingest*',
+												'ingest' => '*' + filedate+' Header*Ingest*',
+												// 'sync'   => 'Yogurt:'+filedate+' Header Sync;Rollup & Stats',
+												'sync'   => '*' + filedate+' Header Sync;Rollup & Stats',
 												'');
 				
                 // get wuid which should contain the results
@@ -138,14 +140,14 @@ end;
 // ****************************************************************************************** //
 // RUNS: (on p_svc_person_header or gmarcan_prod because header.stats is sandboxed)
 
-hVersion := '20180821' ;//regexfind('[1-2][0-9]{3}[0-1][0-9][0-3][0-9][a-z]?'
+hVersion := '20181023';//'20180926' ;//regexfind('[1-2][0-9]{3}[0-1][0-9][0-3][0-9][a-z]?'
                                     //,fileservices.SuperFileContents('~thor_data400::base::header')[1].name,0);
 
 // output(hVersion,named('hVersion'));
 // CHECK hVersion (above) < -- !!! *** READ THIS BEFORE RUNNING !!!
 // NB: DO NOT UPDATE STATS FILE IF PREVIOUS VERSION NOT FULLY UPDATED (IE ALL 3 RUNS DONE)
 
-// generateStats(hVersion).onbm; // NOTHOR (ingest)     // TEST add_ingest_stats
+generateStats(hVersion).onbm; // NOTHOR (ingest)     // TEST add_ingest_stats
 // generateStats(hVersion).onts; // NOTHOR (synced)     // TEST sync stats
 // generateStats(hVersion).otsg; // YES THOR (syned)    // TEST singeleton
 

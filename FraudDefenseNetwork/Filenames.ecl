@@ -23,6 +23,7 @@ module
 		export TextMinedCrim                 := tools.mod_FilenamesInput(Template('TextMinedCrim'                    ),pversion);
 		export OIG                           := tools.mod_FilenamesInput(Template('OIG'                              ),pversion);
 		export Erie                          := tools.mod_FilenamesInput(Template('Erie'                             ),pversion);
+		export ErieWatchList                 := tools.mod_FilenamesInput(Template('ErieWatchList'                    ),pversion);
 
 
 		export dAll_filenames :=
@@ -33,7 +34,8 @@ module
 			AInspection.dAll_filenames +
 			TextMinedCrim.dAll_filenames +
 			OIG.dAll_filenames + 
-			Erie.dAll_filenames;
+			Erie.dAll_filenames +
+			ErieWatchList.dAll_filenames;
 			
 			
 	end;
@@ -52,6 +54,7 @@ module
 	  export TextMinedCrim         := tools.mod_FilenamesBuild(Template('TextMinedCrim'       ),pversion);
 		export OIG                   := tools.mod_FilenamesBuild(Template('OIG'                 ),pversion);
 		export Erie                  := tools.mod_FilenamesBuild(Template('Erie'                ),pversion);
+		export ErieWatchList         := tools.mod_FilenamesBuild(Template('ErieWatchList'       ),pversion);
 
 		export dAll_filenames :=
 			SuspectIP.dAll_filenames  +
@@ -61,7 +64,8 @@ module
 			AInspection.dAll_filenames +
 			TextMinedCrim.dAll_filenames   +
 			OIG.dAll_filenames +
-			Erie.dAll_filenames ;
+			Erie.dAll_filenames +
+			ErieWatchList.dAll_filenames ;
 	
 	end;
 	

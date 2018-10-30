@@ -64,7 +64,7 @@ send_email:= fileservices.SendEmail(
 																			+'10.173.84.223 - PA_DISTRIX_LZ - /c$/distrix/\n'
 																		);
 
-send_bad_email := FileServices.sendemail('gabriel.marcan@lexisnexisrisk.com', 'Header hashes build failed', failmessage,'');
+send_bad_email := FileServices.sendemail('gabriel.marcan@lexisnexisrisk.com;debendra.kumar@lexisnexisrisk.com', 'Header hashes build failed', failmessage,'');
 
 export header_hash_split := sequential(
 																			build_base,header_split,

@@ -27,7 +27,7 @@ SHARED getFileVersion(string sf,boolean alp=false) := FUNCTION
         output(dataset([{frName,filedate}],{string lg_ck, string fldt}),named('checked_file'),extend);
         
         return filedate;
-        // return '20180402';
+        // return '20181005';
 
 END;
 
@@ -213,20 +213,26 @@ elist:= _control.MyInfo.EmailAddressNotify
 
 SHARED udops := sequential(
                 dops.updateversion(
-
                                      l_datasetname:='PersonLabKeys' // Name of the package to update
                                     ,l_uversion   :=filedate        // Version to update to
                                     ,l_email_t    :=elist           // Who to email
                                     ,l_inenvment  :='N'             // nFCRA
                                     ,l_updateflag :='DR'            // Delta Replace (must sepcify, because default is FULL)
                                     )
+                                    
+               ,dops.updateversion(
+                                     l_datasetname:='PersonHeaderWeeklyKeys'
+                                     ,l_uversion   :=filedate        // Version to update to
+                                    ,l_email_t    :=elist           // Who to email
+                                    ,l_inenvment  :='N'             // nFCRA
+                                   )
 
-                // ,dops.updateversion(
-                                     // l_datasetname:='FCRA_PersonHeaderKeys' // Name of the package to update
-                                    // ,l_uversion   :=filedate                // Version to update to
-                                    // ,l_email_t    :=elist                   // Who to email
-                                    // ,l_inenvment  :='F'                     // FCRA
-                                  // )
+               ,dops.updateversion(
+                                     l_datasetname:='FCRA_PersonHeaderKeys' // Name of the package to update
+                                    ,l_uversion   :=filedate                // Version to update to
+                                    ,l_email_t    :=elist                   // Who to email
+                                    ,l_inenvment  :='F'                     // FCRA
+                                  )
                 );
 
 SHARED orbit_update_entries(string createORupdate) := function
@@ -265,12 +271,14 @@ SHARED orbit_update_entries(string createORupdate) := function
     
     RETURN if (createORupdate='create',
                         sequential(
-                                output(create_entry('PersonXLAB_Inc'            ,filedate)),
-                                output(create_entry('FCRA_Header'               ,filedate))
+                                output(create_entry('PersonXLAB_Inc'            ,filedate))
+                                ,output(create_entry('FCRA_Header'               ,filedate))
+                                ,output(create_entry('Header_IKB'               ,filedate))
                         ),
                         sequential(
-                                output(update_entry('PersonXLAB_Inc'            ,filedate,'N')),
-                                output(update_entry('FCRA_Header'               ,filedate,'N'))
+                                output(update_entry('PersonXLAB_Inc'            ,filedate,'N'))
+                                ,output(update_entry('FCRA_Header'               ,filedate,'N'))
+                                ,output(update_entry('Header_IKB'               ,filedate,'N'))
                         )
                );
  
@@ -302,13 +310,16 @@ EXPORT deploy(string emailList,string rpt_qa_email_list) := sequential(
                     +'\n\n'
                     +'PersonXLAB_Inc\n'
                     +'FCRA_Header\n'
+                    +'PersonHeaderWeeklyKeys\n'
                     +'\n'
                     +'Deployment version: '+filedate+'\n'
                     +'\n'
                     +'Corespondiong Orbit entries have been created and updated.\n'
                     +'\n'
                     +'If you have any question or concerns please contact:\n'
-                    +emailList
+                    // +emailList
+                    +'debendra.kumar@lexisnexisrisk.com\n'
+                    +'Gabriel.Marcan@lexisnexisrisk.com'
                     +'\nThank you,')
                 // copy_to_dataland;
 );

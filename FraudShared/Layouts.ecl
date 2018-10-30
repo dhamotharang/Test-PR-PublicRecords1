@@ -501,6 +501,7 @@ export Main         :=
 	string60					business_risk_code := '';
 	string60					mailing_address_risk_code := '';
 	string60	 				device_risk_code := '';
+	string60					identity_risk_code := '';
 	string10					tax_preparer_id := '';
 	string8						start_date := '';
 	string8						end_date := '';
@@ -702,6 +703,7 @@ export keybuild
 	string60					business_risk_code := '';
 	string60					mailing_address_risk_code := '';
 	string60	 				device_risk_code := '';	
+	string60					identity_risk_code := '';
 	string10					tax_preparer_id := '';
 	string8						start_date := '';
 	string8						end_date := '';

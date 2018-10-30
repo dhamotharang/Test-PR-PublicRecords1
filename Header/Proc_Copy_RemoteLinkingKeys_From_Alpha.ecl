@@ -50,7 +50,7 @@ EXPORT Proc_Copy_RemoteLinkingKeys_From_Alpha(string filedate) := FUNCTION
     
   moveKeys := sequential(    
         STD.File.StartSuperFileTransaction( )
-       ,nothor(apply(QAfiles, STD.File.PromoteSuperFileList(['~' + name, '~' + regexreplace('::qa', name, '::father')], '~' + regexreplace('qa::current', name, filedate))))
+       ,nothor(apply(QAfiles, STD.File.PromoteSuperFileList(['~' + name, '~' + regexreplace('::qa', name, '::father')], '~' + regexreplace('qa::current', name, filedate) + '::publish')))
        ,STD.File.FinishSuperFileTransaction( )
        );
   

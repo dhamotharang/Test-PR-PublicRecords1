@@ -70,6 +70,8 @@ CopyFiles1(data_services.foreign_prod + 'prte::key::fraudgov::' + prev_version +
 CopyFiles1(data_services.foreign_prod + 'prte::key::fraudgov::' + prev_version + '::user','~prte::key::fraudgov::' + current_version + '::user',dest_cluster);
 CopyFiles1(data_services.foreign_prod + 'prte::key::fraudgov::' + prev_version + '::zip','~prte::key::fraudgov::' + current_version + '::zip',dest_cluster);
 
+CopyFiles1(data_services.foreign_prod + 'prte::key::fraudgov::' + prev_version + '::kel::weightingchart','~prte::key::fraudgov::' + current_version + '::kel::weightingchart',dest_cluster); 
+
 RETURN 'Success';	
 	END;
 END;

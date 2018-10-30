@@ -28,6 +28,7 @@ MODULE
 	EXPORT 	special_characters    := '~|!|-|%|\\^|\\+|:|\\(|\\)|,|\\.|;|_|#|%|&|\\*|<|>|/|"|`|\\[|]|\\{|\\}|\\\\|\\\'';
   EXPORT  word_characters       := ' A | ABC | AN | AND | ANY | AS | AT | BUT | BY | ETC | FOR | FROM | IN | NA | OF | ON | OR | OTH | OTHER | PER | THAN | THE | THEN | TO | UP | WITH ';
 
+  	EXPORT DeceiptfulConfidence	:= dataset([{1,'Probable'},{2, 'Potential'},{3,'Probable'},{4, 'Potential'},{5, 'Proven'}],{unsigned2 Confidence_that_activity_was_deceitful_id, string10 Confidence_that_activity_was_deceitful});
 	EXPORT FirstRinID			:= 900000000000;
 	
 	EXPORT validDelimiter		:= '~|~';
