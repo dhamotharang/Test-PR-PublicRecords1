@@ -1,15 +1,21 @@
-/////////////////////////////////////////////////////////////////////////////////
+﻿/////////////////////////////////////////////////////////////////////////////////
 // -- Process to build the Txbus.
 /////////////////////////////////////////////////////////////////////////////////
-import Lib_FileServices, STRATA, Roxiekeybuild, _Control, PromoteSupers, Orbit3;
+import Lib_FileServices, STRATA, Roxiekeybuild, _Control, PromoteSupers, Orbit3, Scrubs, Scrubs_Txbus;
 
-export Proc_build_Txbus(string filedate) := function
+export Proc_build_Txbus(string filedate,boolean pIsTesting) := function
+
+/////////////////////////////////////////////////////////////////////////////////
+// -- Scrub Input File
+/////////////////////////////////////////////////////////////////////////////////
+
+Scrub_Raw_File := Scrubs.ScrubsPlus('Txbus','Scrubs_Txbus','Scrubs_Txbus', 'Raw', filedate,TXBUS.Email_Notification_Lists(pIsTesting).Stats,false);
 
 /////////////////////////////////////////////////////////////////////////////////
 // -- Build Base File
 /////////////////////////////////////////////////////////////////////////////////
 
-PromoteSupers.MAC_SF_BuildProcess(TXBUS.Cleaned_Txbus_DID,Txbus.Constants.Cluster+'base::Txbus::basefile',aTxbusMainBuild,3);
+PromoteSupers.MAC_SF_BuildProcess(TXBUS.Cleaned_Txbus_DID,Txbus.Constants.Cluster+'base::Txbus::basefile',aTxbusMainBuild,3,,true);
 
 /////////////////////////////////////////////////////////////////////////////////
 // -- Build Autokeys
@@ -75,7 +81,13 @@ orbitUpdate := Orbit3.proc_Orbit3_CreateBuild_AddItem('TXBUS',filedate,'N|B');
 // -- Actions
 /////////////////////////////////////////////////////////////////////////////////
 
-build_files := sequential(aTxbusMainBuild, parallel(build_autokeys, build_booleanKeys), UpdateRoxiePage, build_stats, orbitUpdate);
+build_files := sequential(Scrub_Raw_File,
+                          aTxbusMainBuild, 
+                          parallel(build_autokeys, build_booleanKeys), 
+													UpdateRoxiePage, 
+													build_stats,													
+													orbitUpdate
+													);
 
 return parallel(build_files, emailN);
 
