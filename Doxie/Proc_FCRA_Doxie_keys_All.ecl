@@ -10,12 +10,10 @@ fcra_add_super(string typ) := if(fileservices.getsuperfilesubcount('~thor_data40
              ,fileservices.addsuperfile('~thor_data400::Base::FCRA_HeaderKey_Building','~thor_data400::Base::FCRA_Header'+typ,,true));
 fcra_clr_super := fileservices.clearsuperfile('~thor_data400::Base::FCRA_HeaderKey_Building');
 fcra_chk_build(string typ) := output('Checking Base::FCRA_HeaderKey_Building...') : success(fcra_add_super(typ));
-
-export Proc_FCRA_Doxie_keys_All(boolean pFastHeader=false, boolean inc = false, string version = '') := function
+export Proc_FCRA_Doxie_keys_All(boolean pFastHeader=false, boolean inc = false, string filedate) := function
  
- string filedate := if(inc, version, header.version_build);
  fcra_fhb(boolean inc) := doxie_build.Proc_file_FCRA_header_building(filedate,inc);
- fcra_keys := doxie.proc_fcra_header_keys(filedate);
+fcra_keys := doxie.proc_fcra_header_keys(filedate);
  fcra_mv2QA := header.Proc_FCRAacceptSK_toQA(filedate);
 
  return sequential(

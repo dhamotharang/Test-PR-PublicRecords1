@@ -1,13 +1,13 @@
 import header, gong;
 
-export fn_with_TNT(boolean isEN=false) := function
+export fn_with_TNT(boolean isEN=false,string filedate) := function
 
 //workaround
-h_new_wo := sort(header.fn_Apt_Patch(isEN),did);
+h_new_wo := sort(header.fn_Apt_Patch(isEN,filedate),did);
 
 h_new := distribute(h_new_wo,hash(rid));
 
-tnt_f := header.TNT_Candidates(fn_Apt_Patch(isEN)) : persist(if(isEN,'EN_','')+'fcra_TNT_Candidates');
+tnt_f := header.TNT_Candidates(header.fn_Apt_Patch(isEN,filedate)) : persist(if(isEN,'EN_','')+'fcra_TNT_Candidates');
 
 //Add TNT flag
 header.Layout_Header add_flag(header.Layout_Header he, tnt_f i) := transform
@@ -18,20 +18,20 @@ header.Layout_Header add_flag(header.Layout_Header he, tnt_f i) := transform
 jnd_1 := join(h_new,distribute(tnt_f,hash(rid)),left.rid=right.rid,add_flag(left,right),left outer,local);
 
 //Add valid SSN flag
-header.Layout_Header add_sflag(header.Layout_Header le, {header.fn_ssn_validities(isEN)} ri) := transform
+header.Layout_Header add_sflag(header.Layout_Header le, {header.fn_ssn_validities(isEN,filedate)} ri) := transform
   self.valid_ssn := ri.val;
   self := le;
   end;
 
-jnd_2 := join(jnd_1,distribute(header.fn_ssn_validities(isEN),hash(rid)),left.rid=right.rid,add_sflag(left,right),left outer,local);
+jnd_2 := join(jnd_1,distribute(header.fn_ssn_validities(isEN,filedate),hash(rid)),left.rid=right.rid,add_sflag(left,right),left outer,local);
 
 //Add valid DOB flag
-header.Layout_Header add_jflag(header.Layout_Header le, {header.fn_DOB_Validities(isEN)} ri) := transform
+header.Layout_Header add_jflag(header.Layout_Header le, {header.fn_DOB_Validities(isEN,filedate)} ri) := transform
   self.jflag1 := ri.jflag1;
   self := le;
   end;
 
-jnd := join(jnd_2,distribute(header.fn_DOB_Validities(isEN),hash(rid)),left.rid=right.rid,add_jflag(left,right),left outer,local);
+jnd := join(jnd_2,distribute(header.fn_DOB_Validities(isEN,filedate),hash(rid)),left.rid=right.rid,add_jflag(left,right),left outer,local);
 
 
 // Now perform death append
@@ -52,7 +52,7 @@ put_out := iterate(s_did,propogate_death(left,right));
 napt := put_out(unit_desig='');
 apt := put_out(unit_desig<>'');
 
-apb := header.fn_ApartmentBuildings(isEN)(apt_cnt>5);
+apb := header.fn_ApartmentBuildings(isEN,filedate)(apt_cnt>5);
 
 header.Layout_Header cpy(header.Layout_Header le, apb ap) := transform
   self.unit_desig := if ( le.unit_desig = '' and ap.apt_cnt > 0, 'APT',le.unit_desig );
