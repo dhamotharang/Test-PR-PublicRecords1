@@ -49,7 +49,7 @@ build_iDid := sequential(
 
 build_fcra := sequential(
                 header.LogBuild.single('STARTED:iFCRA'),
-                Doxie.Proc_FCRA_Doxie_keys_All(,true),
+                Doxie.Proc_FCRA_Doxie_keys_All(,true,filedate),
                 header.LogBuild.single('end:iFCRA'),
                 ):failure(std.system.Email.SendEmail(emailList,'FAILED:iFCRA:'+workunit,wLink));
 

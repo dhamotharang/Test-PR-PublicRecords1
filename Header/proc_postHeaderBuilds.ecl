@@ -80,10 +80,9 @@ export proc_postHeaderBuilds := module
                                         ,checkLinkingVersion(header.version_build)
                                         ,bld_Transunion_LN
                                         ,bld_Transunion_Ptrak
-                                        // ,notify('Build_Relatives','*')
                                         ,build_slimsorts
                                         ,nothor(Header.Proc_Copy_From_Alpha.CopyOthers)
-                                        ,Header.Proc_Copy_RemoteLinkingKeys_From_Alpha(version)
+                                        ,Header.Proc_Copy_RemoteLinkingKeys_From_Alpha(header.version_build)
                                         ,header.LogBuild.single('Completed :'+step)
                                         )
                                         :success(header.msg(cmpltd,elist_owners).good)
@@ -121,8 +120,15 @@ export proc_postHeaderBuilds := module
                                             header.LogBuild.single('Started :'+step)
                                             ,if(Header.version_build<>fn[sub..],fail('Header base does not match version'))
                                             ,checkLinkingVersion(header.version_build)
+<<<<<<< Updated upstream
                                             ,parallel(make_hhid	,make_fcra_hhid)
                                             // ,notify('Build_Header_Keys','*')
+=======
+                                            ,bld_relatives
+                                            ,parallel(make_hhid, make_fcra_hhid)
+                                            // ,notify('Build_Header_Keys','*')
+                                            ,bld_relative_title
+>>>>>>> Stashed changes
                                             ,header.LogBuild.single('Completed :'+step)
                                             )
                                             :success(header.msg(cmpltd,elist_owners).good)

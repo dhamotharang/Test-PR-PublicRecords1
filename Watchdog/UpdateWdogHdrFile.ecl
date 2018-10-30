@@ -34,6 +34,11 @@ return Sequential(output(ds1,,set_wdog_lfile+'_'+watchdogtype+'_'+build_date,ove
                FileServices.StartSuperfiletransaction(),
 							  FileServices.RemoveSuperfile(set_wdog_sfile,set_wdog_lfile),
 								FileServices.FinishSuperfiletransaction(),
+<<<<<<< Updated upstream
+=======
+								
+                output(ds1,,set_wdog_lfile+'_'+watchdogtype+'_'+build_date,overwrite),
+>>>>>>> Stashed changes
 								output(ds1,,set_wdog_tempfile+'_'+build_date,overwrite),
                 FileServices.Renamelogicalfile(set_wdog_lfile,set_wdog_lfile+watchdogtype+'_old'+build_date),
 //   					  FileServices.Renamelogicalfile(set_wdog_tempfile+'_'+watchdogtype+'_'+build_date,set_wdog_lfile),

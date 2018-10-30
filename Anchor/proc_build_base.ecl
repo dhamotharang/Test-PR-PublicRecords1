@@ -1,7 +1,12 @@
 ﻿IMPORT	ut, AID, AID_Support, DID_Add, address, NID, STD, PromoteSupers, PRTE2; //using a cleaning function in this repository;
 #WORKUNIT('name', 'Yogurt: Anchor Email Build');
+<<<<<<< Updated upstream
 // #CONSTANT(AID_Support.Constants.StoredWhichAIDCache, AID_Support.Constants.eCache.ForNonHeader);
 // #STORED('did_add_force','thor');
+=======
+//#CONSTANT(AID_Support.Constants.StoredWhichAIDCache, AID_Support.Constants.eCache.ForNonHeader);
+//#STORED('did_add_force','thor');
+>>>>>>> Stashed changes
 				
 EXPORT proc_build_base(STRING version) := FUNCTION
 	

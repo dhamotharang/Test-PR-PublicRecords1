@@ -66,13 +66,7 @@ export checkRNA := true; // there are additional glb and dppa restrictions for R
  // is not know at the time of source build.
  export external_sources_end_rid := 800000000000;
  export EN_start_rid:=900000000000;
-
- export EN_start_rid := 900000000000;
-
- export EN_start_rid := 900000000000;
-
- export EN_start_rid := 900000000000;
-
+ 
   // LexID types
   EXPORT DidType := MODULE
     export string DEAD     := 'DEAD';

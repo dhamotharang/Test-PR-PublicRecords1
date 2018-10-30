@@ -20,7 +20,11 @@
 			integer5 	response_time;
 			string60 	reference_code;
 			string32 	phonefinder_type;
+<<<<<<< Updated upstream
 			unsigned8 submitted_lexid;
+=======
+			string32 	submitted_lexid;
+>>>>>>> Stashed changes
 			string15 	submitted_phonenumber;
 			string20 	submitted_firstname;
 			string20 	submitted_lastname;
@@ -29,7 +33,10 @@
 			string64 	submitted_city;
 			string16 	submitted_state;
 			string10 	submitted_zip;
+<<<<<<< Updated upstream
 			string15  orig_phonenumber;
+=======
+>>>>>>> Stashed changes
 			string15 	phonenumber;
 			string16 	risk_indicator;
 			string32 	phone_type;
@@ -49,7 +56,11 @@
 	end;
 	
 	export Transactions_Index := record
+<<<<<<< Updated upstream
 			Transactions_Main-[date_file_loaded, orig_phonenumber];
+=======
+			Transactions_Main-date_file_loaded;
+>>>>>>> Stashed changes
 	end;
 	
 	///////////////////////////////////
@@ -61,7 +72,10 @@
 			string16	transaction_id;
 			integer5	sequence_number;
 			integer5	phone_id;
+<<<<<<< Updated upstream
 			string15  orig_phonenumber;
+=======
+>>>>>>> Stashed changes
 			string15	phonenumber;
 			string16 	risk_indicator;
 			string32 	phone_type;
@@ -75,7 +89,11 @@
 	end;
 	
 	export OtherPhones_Index := record
+<<<<<<< Updated upstream
 			OtherPhones_Main-[date_file_loaded, orig_phonenumber];
+=======
+			OtherPhones_Main-date_file_loaded;
+>>>>>>> Stashed changes
 	end;
 	
 	///////////////////////////////////
@@ -86,7 +104,11 @@
 			string8		date_file_loaded;
 			string16	transaction_id;
 			integer5	sequence_number;
+<<<<<<< Updated upstream
 			unsigned8	lexid;
+=======
+			string32	lexid;
+>>>>>>> Stashed changes
 			string128	full_name;
 			string128	full_address;
 			string64	city;
