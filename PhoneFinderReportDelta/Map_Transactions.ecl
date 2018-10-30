@@ -1,4 +1,4 @@
-﻿IMPORT dx_PhoneFinderReportDelta;
+﻿IMPORT dx_PhoneFinderReportDelta, std;
 
 EXPORT Map_Transactions(string8 version) := FUNCTION
 	
@@ -8,7 +8,9 @@ EXPORT Map_Transactions(string8 version) := FUNCTION
 	//DF-23286: Update Keys
 	dx_PhoneFinderReportDelta.Layout_PhoneFinder.Transactions_Main trT(inFile l):= transform
 		self.date_file_loaded 				:= version;
-		self.transaction_date					:= PhoneFinderReportDelta._Functions.keepNum(l.transaction_date)[1..8];
+		self.transaction_date					:= if(Std.Date.IsValidDate((unsigned)(PhoneFinderReportDelta._Functions.keepNum(l.transaction_date)[1..8])),
+																				PhoneFinderReportDelta._Functions.keepNum(l.transaction_date)[1..8],
+																				'');
 		self.transaction_time					:= PhoneFinderReportDelta._Functions.keepNum(l.transaction_date)[9..];
 		self.user_id									:= PhoneFinderReportDelta._Functions.keepAlphNum(l.user_id);
 		self.product_code							:= PhoneFinderReportDelta._Functions.rmNull(l.product_code);
@@ -17,7 +19,7 @@ EXPORT Map_Transactions(string8 version) := FUNCTION
 		self.batch_job_id							:= PhoneFinderReportDelta._Functions.rmNull(l.batch_job_id);
 		self.reference_code						:= PhoneFinderReportDelta._Functions.rmNull(l.reference_code);
 		self.phonefinder_type					:= PhoneFinderReportDelta._Functions.rmNull(l.phonefinder_type);
-		self.submitted_lexid					:= PhoneFinderReportDelta._Functions.rmNull(l.submitted_lexid);
+		self.submitted_lexid					:= (unsigned)l.submitted_lexid;
 		self.submitted_phonenumber		:= PhoneFinderReportDelta._Functions.rmNull(l.submitted_phonenumber);
 		self.submitted_firstname			:= PhoneFinderReportDelta._Functions.rmNull(l.submitted_firstname);
 		self.submitted_lastname				:= PhoneFinderReportDelta._Functions.rmNull(l.submitted_lastname);
@@ -26,7 +28,8 @@ EXPORT Map_Transactions(string8 version) := FUNCTION
 		self.submitted_city						:= PhoneFinderReportDelta._Functions.rmNull(l.submitted_city);
 		self.submitted_state					:= PhoneFinderReportDelta._Functions.rmNull(l.submitted_state);
 		self.submitted_zip						:= PhoneFinderReportDelta._Functions.rmNull(l.submitted_zip);
-		self.phonenumber							:= PhoneFinderReportDelta._Functions.rmNull(l.phonenumber);
+		self.orig_phonenumber					:= PhoneFinderReportDelta._Functions.rmNull(l.phonenumber);	
+		self.phonenumber							:= PhoneFinderReportDelta._Functions.keepNum(l.phonenumber); //Filtered Phonenumber
 		self.risk_indicator						:= PhoneFinderReportDelta._Functions.rmNull(l.risk_indicator);
 		self.phone_type								:= PhoneFinderReportDelta._Functions.rmNull(l.phone_type);
 		self.phone_status							:= PhoneFinderReportDelta._Functions.rmNull(l.phone_status);		

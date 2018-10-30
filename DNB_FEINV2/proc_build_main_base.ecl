@@ -23,7 +23,7 @@ lookup_tmsid := join(baseds,inds,left.tmsid = right.tmsid,
 SampleRecords := output(choosen(lookup_tmsid,1000)) : success(output('Sample Of New Records for QA.'));
 
 PromoteSupers.MAC_SF_BuildProcess(DNB_FEINv2.DNB_FEIN_BDID(inds),
-                       '~thor_data400::base::main::dnb_fein', bld_dnbfein_main,3);
+                       '~thor_data400::base::main::dnb_fein', bld_dnbfein_main,3,,true);
                          
 retval := sequential(SampleRecords, bld_dnbfein_main);
 
