@@ -71,6 +71,8 @@ export checkRNA := true; // there are additional glb and dppa restrictions for R
 
  export EN_start_rid := 900000000000;
 
+ export EN_start_rid := 900000000000;
+
   // LexID types
   EXPORT DidType := MODULE
     export string DEAD     := 'DEAD';
