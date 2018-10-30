@@ -8,7 +8,7 @@ EXPORT prep_ingest_file := FUNCTION
 	fmtout:='%Y%m%d';
 	
 	//Populate added fields
-		Anchor.Layouts.Base tAppendFields(Anchor.Layouts.Raw pInput) := TRANSFORM
+		Anchor.Layouts.Base_w_bip tAppendFields(Anchor.Layouts.Raw pInput) := TRANSFORM
 			self.dob								:=	STD.Date.ConvertDateFormatMultiple(pInput.DOB,fmtsin,fmtout);
 			self.zip								:=	STD.Str.Filter(pInput.zipcode,'1234567890');
 			self.Address_1					:= STD.Str.CleanSpaces(MAP(STD.Str.Find(pInput.Address_1,'&APOS;',1) > 0 => STD.Str.FindReplace(pInput.Address_1,'&APOS;','\''),

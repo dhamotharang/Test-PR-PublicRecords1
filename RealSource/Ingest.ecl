@@ -1,4 +1,4 @@
-﻿IMPORT STD,SALT38,RealSource;
+﻿IMPORT STD,SALT311;
 EXPORT Ingest(BOOLEAN incremental=FALSE
 , DATASET(Layout_RealSource) Delta = DATASET([],Layout_RealSource)
 , DATASET(Layout_RealSource) dsBase = In_RealSource // Change IN_RealSource to change input to ingest process
@@ -86,6 +86,27 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
                      le.date_vendor_last_reported);
     SELF.clean_cname := ri.clean_cname; // Derived(NEW)
     SELF.current_rec := ri.current_rec; // Derived(NEW)
+    SELF.dotid := ri.dotid; // Derived(NEW)
+    SELF.dotscore := ri.dotscore; // Derived(NEW)
+    SELF.dotweight := ri.dotweight; // Derived(NEW)
+    SELF.empid := ri.empid; // Derived(NEW)
+    SELF.empscore := ri.empscore; // Derived(NEW)
+    SELF.empweight := ri.empweight; // Derived(NEW)
+    SELF.powid := ri.powid; // Derived(NEW)
+    SELF.powscore := ri.powscore; // Derived(NEW)
+    SELF.powweight := ri.powweight; // Derived(NEW)
+    SELF.proxid := ri.proxid; // Derived(NEW)
+    SELF.proxscore := ri.proxscore; // Derived(NEW)
+    SELF.proxweight := ri.proxweight; // Derived(NEW)
+    SELF.seleid := ri.seleid; // Derived(NEW)
+    SELF.selescore := ri.selescore; // Derived(NEW)
+    SELF.seleweight := ri.seleweight; // Derived(NEW)
+    SELF.orgid := ri.orgid; // Derived(NEW)
+    SELF.orgscore := ri.orgscore; // Derived(NEW)
+    SELF.orgweight := ri.orgweight; // Derived(NEW)
+    SELF.ultid := ri.ultid; // Derived(NEW)
+    SELF.ultscore := ri.ultscore; // Derived(NEW)
+    SELF.ultweight := ri.ultweight; // Derived(NEW)
     __Tpe0 := MAP (
       le.__Tpe = 0 => ri.__Tpe,
       le.__Tpe = RecordType.Updated OR ri.__Tpe = 0 OR ri.__Tpe = le.__Tpe => le.__Tpe,
@@ -113,7 +134,7 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
   SHARED AllRecs0 := UNGROUP(ROLLUP(Group0,TRUE,MergeData(LEFT,RIGHT)));
  
   //Now need to update 'rid' numbers on new records
-  //Base upon SALT38.utMac_Sequence_Records
+  //Base upon SALT311.utMac_Sequence_Records
   // Do not use PROJECT,COUNTER because it is very slow if any of the fields are not fixed length
   NR := AllRecs0(__Tpe=RecordType.New);
   ORe := AllRecs0(__Tpe<>RecordType.New);
@@ -124,7 +145,7 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
   END;
   NR1 := ITERATE(NR(RCID=0),AddNewRid(LEFT,RIGHT),LOCAL);
   SHARED AllRecs := ORe+NR1+NR(RCID<>0) : PERSIST('~temp::RealSource::Ingest_Cache',EXPIRE(RealSource.Config.PersistExpire));
-  SHARED UpdateStatsFull := SORT(TABLE(AllRecs, {__Tpe,SALT38.StrType INGESTSTATUS:=RTToText(AllRecs.__Tpe),UNSIGNED Cnt:=COUNT(GROUP)}, __Tpe, FEW),__Tpe, FEW);
+  SHARED UpdateStatsFull := SORT(TABLE(AllRecs, {__Tpe,SALT311.StrType INGESTSTATUS:=RTToText(AllRecs.__Tpe),UNSIGNED Cnt:=COUNT(GROUP)}, __Tpe, FEW),__Tpe, FEW);
   SHARED UpdateStatsInc := SORT(UpdateStatsFull(__Tpe = RecordType.New), __Tpe, INGESTSTATUS, FEW);
   EXPORT UpdateStats := IF(incremental, UpdateStatsInc, UpdateStatsFull);
   SHARED S0 := OUTPUT(UpdateStats, {{UpdateStats} AND NOT __Tpe}, ALL, NAMED('UpdateStats'));
@@ -140,6 +161,20 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
   EXPORT AllRecords := IF(incremental, NewRecords, PROJECT(AllRecs, NoFlagsRec));
   EXPORT AllRecords_NoTag := PROJECT(AllRecords,Layout_RealSource); // Records in 'pure' format
  
+f := TABLE(dsBase,{RCID}) : GLOBAL;
+rcid_clusters := SALT311.MOD_ClusterStats.Counts(f,RCID);
+DuplicateRids0 := COUNT(dsBase) - SUM(rcid_clusters,NumberOfClusters); // Should be zero
+d := DATASET([{DuplicateRids0}],{UNSIGNED2 DuplicateRids0});
+EXPORT ValidityStats := OUTPUT(d,NAMED('ValidityStatistics'));
   EXPORT DoStats := S0;
  
+  EXPORT StandardStats(BOOLEAN doInfileOverallCnt = TRUE, BOOLEAN doStatusOverallCnt = TRUE) := FUNCTION
+    myTimeStamp := (UNSIGNED6)SALT311.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
+    infileCntOverall := IF(doInfileOverallCnt, SALT311.mod_StandardStatsTransforms.MAC_ingestInfileOverallCount(COUNT(FilesToIngest), 'Infile', myTimeStamp));
+    basefileCntOverall := IF(doInfileOverallCnt, SALT311.mod_StandardStatsTransforms.MAC_ingestInfileOverallCount(COUNT(dsBase), 'Basefile', myTimeStamp));
+    deltaCntOverall := IF(doInfileOverallCnt, SALT311.mod_StandardStatsTransforms.MAC_ingestInfileOverallCount(COUNT(Delta), 'Deltafile', myTimeStamp));
+    ingestStatusOverall := IF(doStatusOverallCnt, SALT311.mod_StandardStatsTransforms.MAC_ingestStatus(UpdateStats,, myTimeStamp));
+    standardStats := infileCntOverall & basefileCntOverall & ingestStatusOverall;
+    RETURN standardStats;
+  END;
 END;
