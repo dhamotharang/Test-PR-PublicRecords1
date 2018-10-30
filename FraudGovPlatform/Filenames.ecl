@@ -65,7 +65,10 @@ module
 		export SourcesToAnonymize						:= tools.mod_FilenamesInput(Template('SourcesToAnonymize'),pversion);
 		export MBSInclusionDemoData					:= tools.mod_FilenamesInput(Template('MBSInclusionDemoData'),pversion);
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 		export MBSDemoData									:= tools.mod_FilenamesInput(Template('MBSDemoData'),pversion);
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 		

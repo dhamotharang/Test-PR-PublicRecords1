@@ -121,8 +121,15 @@ export proc_postHeaderBuilds := module
                                             ,if(Header.version_build<>fn[sub..],fail('Header base does not match version'))
                                             ,checkLinkingVersion(header.version_build)
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                                             ,parallel(make_hhid	,make_fcra_hhid)
                                             // ,notify('Build_Header_Keys','*')
+=======
+                                            ,bld_relatives
+                                            ,parallel(make_hhid, make_fcra_hhid)
+                                            // ,notify('Build_Header_Keys','*')
+                                            ,bld_relative_title
+>>>>>>> Stashed changes
 =======
                                             ,bld_relatives
                                             ,parallel(make_hhid, make_fcra_hhid)
