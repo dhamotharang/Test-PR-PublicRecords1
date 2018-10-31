@@ -985,7 +985,8 @@ export Set_Equifax_Fraud_Alert_Codes := ['W','Q','X','V'];
 export OFAC4_NoGateway := 'watchlist server error';
 export FABatch_WatchlistModels := ['fp1109_0', 'fp31105_1', 'fp3710_0']; 
 export FAXML_WatchlistModels := ['fp1109_0', 'fp31105_1', 'fp3710_0', 'fp3904_1'];
-export RecoverScoreBatchWatchlistModels :=  ['RSN807_0_0'];   
+export RecoverScoreBatchWatchlistModels :=  ['RSN807_0_0'];
+export set_validOFACVersions := [1,2,3,4];   
 
 export fn_CreateFakeDID( STRING fname, STRING lname ) := 
     (UNSIGNED6)(STD.Str.Filter( (STRING)(HASH(fname,lname)), '0123456789' )[1..12]);

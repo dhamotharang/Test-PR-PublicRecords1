@@ -35,8 +35,9 @@ unsigned8 MaxResults_val := 2000 : stored('MaxResults');
 unsigned8 MaxResultsThisTime_val := 2000 : stored('MaxResultsThisTime');
 unsigned8 SkipRecords_val := 0 : stored('SkipRecords');
 
-String OFAC_version_Null := '' 			: stored('OFACversion');
-unsigned1 OFAC_version_temp := if(OFAC_version_Null = '', 1, (unsigned1) OFAC_version_Null);
+set_validOFACVersions := Risk_Indicators.iid_constants.set_validOFACVersions;  
+unsigned OFAC_version_Null := 0 			: stored('OFACversion');
+unsigned1 OFAC_version_temp := if(OFAC_version_Null NOT IN set_validOFACVersions, 1, OFAC_version_Null);
 	OFAC_version := if(trim(stringlib.stringtolowercase(_LoginID)) in ['keyxml','keydevxml'], 4, OFAC_version_temp);	// temporary code for Key Bank
 	
 real global_watchlist_threshold_temp := 0 			: stored('Threshold');
@@ -86,7 +87,7 @@ REAL ESP_version := 1.000000 : STORED('_espclientinterfaceversion');
 
 ofac_version_from_ESP := 
   MAP(
-    OFAC_version_Null = '' => 2,
+    OFAC_version_Null = 0 => 2,
     ESP_version >= 1.49 and ofac_version < 2 => 2,
     ofac_version
   );
