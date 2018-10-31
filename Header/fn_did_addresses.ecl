@@ -1,8 +1,8 @@
-﻿import mdr,PRTE2_Header;
+import mdr,PRTE2_Header;
 
-export fn_did_addresses(boolean isEN=false) := function
+export fn_did_addresses(boolean isEN=false,string filedate) := function
 
-h := Header.File_FCRA_Header_prep()(if(isEN,src<>'EQ',src<>'EN'));
+h := Header.File_FCRA_Header_prep(filedate)(if(isEN,src<>'EQ',src<>'EN'));
 
 hslim := record
   h.prim_range;

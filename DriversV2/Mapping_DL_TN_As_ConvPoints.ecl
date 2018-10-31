@@ -1,4 +1,4 @@
-﻿IMPORT Drivers, DriversV2, lib_stringlib, _Validate, ut, VersionControl;
+﻿IMPORT _Validate, ut, VersionControl;
 
 EXPORT Mapping_DL_TN_As_ConvPoints( string  pversion) := MODULE
 
@@ -20,8 +20,8 @@ EXPORT Mapping_DL_TN_As_ConvPoints( string  pversion) := MODULE
 	                                   _Validate.Date.fIsValid(l.event_date,_Validate.Date.Rules.DateInPast),l.event_date,'');
      SELF.CONVICTION_DATE      := IF(_Validate.Date.fIsValid(l.post_date) AND
 	                                   _Validate.Date.fIsValid(l.post_date,_Validate.Date.Rules.DateInPast),l.post_date,'');
-     // SELF.ACD_OFFENSE_CD       := ut.fnTrim2Upper(l.action_code);
-     // SELF.ACD_OFFENSE_DESC     := ut.fnTrim2Upper(DriversV2.Tables_CP_TN.Conviction_Code(SELF.ACD_OFFENSE_CD));
+     SELF.ACD_OFFENSE_CD       := ut.CleanSpacesAndUpper(l.action_code);
+     SELF.ACD_OFFENSE_DESC     := ut.CleanSpacesAndUpper(DriversV2.Tables_CP_TN.Conviction_Code(SELF.ACD_OFFENSE_CD));
      SELF.STATE_OF_ORIGIN      := 'TN';    
 		 SELF.COUNTY               := ut.CleanSpacesAndUpper(DriversV2.Tables_CP_TN.County_Code(l.County_Code));
      SELF                      := l;
@@ -47,8 +47,8 @@ EXPORT Mapping_DL_TN_As_ConvPoints( string  pversion) := MODULE
      SELF.DLCP_KEY             := ut.CleanSpacesAndUpper(l.DL_NUMBER);
      SELF.ACTION_DATE          := IF(_Validate.Date.fIsValid(l.event_date) AND
 	                                   _Validate.Date.fIsValid(l.event_date,_Validate.Date.Rules.DateInPast),l.event_date,'');
-		 // SELF.ACD_OFFENSE_CD       := ut.fnTrim2Upper(l.action_code);
-     // SELF.ACD_OFFENSE_DESC     := ut.fnTrim2Upper(DriversV2.Tables_CP_TN.Withdrawal_Code(SELF.ACD_OFFENSE_CD));
+		 SELF.ACD_OFFENSE_CD       := ut.CleanSpacesAndUpper(l.action_code);
+     SELF.ACD_OFFENSE_DESC     := ut.CleanSpacesAndUpper(DriversV2.Tables_CP_TN.Withdrawal_Code(SELF.ACD_OFFENSE_CD));
 		 SELF                      := l;
      SELF                      := [];
   END;

@@ -1,15 +1,15 @@
 ﻿IMPORT header,std;
-#stored ('versionBuild', '20181023'   ); 
-run_date :=              '20181023'    ;
+#stored ('versionBuild', '20181031'   ); 
+run_date :=              '20181031'    ;
                     
 operatorEmailList    := Header.email_list.BocaDevelopersEx;
 extraNotifyEmailList := '';
 
 // /* STEP1 */ Header.BWR_IngestSetup(operatorEmailList,false /* skip action */); // ** run on hthor ** // RUN FALSE TO DO ACTIONS. DO NOT SKIP! RUN THE SUPERFILE UPDATE
-// /* STEP2 */ Header.Inputs_Set(); // NOT hthor NOT. Must use regular thor!!
+/* STEP2 */ Header.Inputs_Set(); // NOT hthor NOT. Must use regular thor!!
 // /* STEP2.5 */ header_ops.fn_SetIKBInput();
 // /* STEP3 */ Header.BWR_IngestSetup(operatorEmailList,true);  // ** run on hthor ** SKIP THE SETUP (JUST CONFIRMING THE CHANGES)
-/* STEP4 */  Header.BWR_Build_Incremental(operatorEmailList, extraNotifyEmailList, run_date); // (run on regular thor)
+// /* STEP4 */  Header.BWR_Build_Incremental(operatorEmailList, extraNotifyEmailList, run_date); // (run on regular thor)
 
 // -------------------------------------------------------------------------------
 /*

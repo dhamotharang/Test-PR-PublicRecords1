@@ -1,6 +1,6 @@
-Import ut,tools; 
+﻿import ut, tools, address, didville, DID_Add ;
 
-EXPORT Build_Base_CFNA ( 
+export Build_Base_CFNA ( 
    string pversion
 	,dataset(Layouts.Base.CFNA)  inBaseCFNA   = Files().Base.CFNA.QA
 	,dataset(Layouts.Input.CFNA) inCFNAUpdate = Files().Input.CFNA.Sprayed
@@ -10,95 +10,100 @@ module
 
 	unsigned	CFNAMaxRecordID	:=	if(UpdateCFNA, max(inBaseCFNA,source_rec_id), 0)	:	global; 
 	
-	FraudDefenseNetwork.Functions.CleanFields(inCFNAUpdate ,inCFNAUpdateUpper); 
+	Functions.CleanFields(inCFNAUpdate ,inCFNAUpdateUpper); 
 
-		FraudDefenseNetwork.Layouts.Base.CFNA	tPrep(Layouts.Input.CFNA	pInput,integer	cnt)	:=
-	transform
-				
-				    self.process_date                    := (unsigned) pversion, 
-						self.Unique_Id                       := 0; 
-						self.Source                          := 'CFNA'; 
-						self.date_application                := FraudDefenseNetwork.Functions.fSlashedMDYtoCYMD(pInput.date_application);
-            self.Date_Fraud_Detected             := FraudDefenseNetwork.Functions.fSlashedMDYtoCYMD(pInput.Date_Fraud_Detected);
-            self.Date_Fraud_Reported_LN          := FraudDefenseNetwork.Functions.fSlashedMDYtoCYMD(pInput.Date_Fraud_Reported_LN);
+	Layouts.Base.CFNA	tPrep(Layouts.Input.CFNA	pInput,integer	cnt)	:=
+	transform				
+           self.process_date                    := (unsigned) pversion, 
+           self.Unique_Id                       := 0; 
+           self.Source                          := 'CFNA'; 
+           self.date_application                := FraudDefenseNetwork.Functions.fSlashedMDYtoCYMD(pInput.date_application);
+           self.Date_Fraud_Detected             := FraudDefenseNetwork.Functions.fSlashedMDYtoCYMD(pInput.Date_Fraud_Detected);
+           self.Date_Fraud_Reported_LN          := FraudDefenseNetwork.Functions.fSlashedMDYtoCYMD(pInput.Date_Fraud_Reported_LN);
 						self.dt_first_seen                   := (unsigned)self.Date_Fraud_Detected [1..8]; 
 						self.dt_last_seen                    := (unsigned)self.Date_Fraud_Detected [1..8];
 						self.dt_vendor_last_reported         := (unsigned) pversion;
 						self.dt_vendor_first_reported        := (unsigned) pversion;
-					  self.source_rec_id							     :=	 CFNAMaxRecordID + cnt ;																			
+					  self.source_rec_id							       :=	CFNAMaxRecordID + cnt ;																			
 						// add  address and name prep 
-					  self.current                         := 'C' ; 
+					  self.current                         := 'C' ;   
+           self.address_1                       := Address.Addr1FromComponents(pInput.street_address, '','', '', '', '', '');
+           self.address_2                       := Address.Addr2FromComponents(pInput.city, pInput.state, pInput.zip_code); 
 						self                                 := pInput; 
 						self                                 := []; 
    end; 
 		
 	CFNAUpdate	:=	project(dedup(inCFNAUpdateUpper(first_name <> '' and last_name <>'')  ,all),tPrep(left,counter));
 		
-	// Standardize Name 
-	FraudDefenseNetwork.Standardize_Name(CFNAUpdate, first_name,middle_name,last_name, suffix, CFNAUpdatecleaned); 
+	Standardize_Name(CFNAUpdate, first_name,middle_name,last_name, suffix, CFNANameCleaned); 
+	
+	Standardize_Address(CFNANameCleaned, CFNAAddrCleaned); 
+	
+	Standardize_Phone(CFNAAddrCleaned, phone_number	,CFNAPhoneCleaned	,clean_phones.phone_number	,,true); 
+	
+	Mac_LexidAppend(CFNAPhoneCleaned, CFNAWithIDL);
 	
 		// Rollup Update and previous base 
-	Pcombined     := If(UpdateCFNA , inBaseCFNA + CFNAUpdatecleaned , CFNAUpdatecleaned); 	
+	Pcombined     := if(UpdateCFNA , inBaseCFNA + CFNAWithIDL , CFNAWithIDL); 	
 	pDataset_Dist := distribute(Pcombined, hash(Application_ID));	
 	pDataset_sort := sort(pDataset_Dist ,  
-	  customer_ID,
-		vendor_ID,
-		appended_LexID,
-		Date_Fraud_Reported_LN,
-		first_name,
-		middle_name,
-		Last_name,
-		suffix,
-		street_address,
-		city,
-		state,
-		zip_code,
-		Phone_Number,
-		SSN,
-		DOB,
-		Driver_License_Number,
-		Driver_License_State,
-	  IP_Address,
-		Email_Address,
-		Device_Identification,
-		Device_identification_Provider,
-		Origination_Channel,
-		Income,
-		Own_or_Rent,
-		Location_Identifier,
-		Other_Application_Identifier,
-		Other_Application_Identifier2,
-		Other_Application_Identifier3,
-		Date_Application,
-		Time_Application,
-		Application_ID ,
-		FraudPoint_Score,
-		Date_Fraud_Detected,
-		Financial_Loss,
-		Gross_Fraud_Dollar_Loss,
-		Application_Fraud,
-		Primary_Fraud_Code,
-		Secondary_Fraud_Code,
-		Source_Identifier,
-		LN_Product_ID,
-		LN_Sub_Product_ID,
-		Industry,
-		Fraud_Index_Type,-dt_last_seen,-process_date,local);
+													customer_ID,
+													vendor_ID,
+													appended_LexID,
+													Date_Fraud_Reported_LN,
+													first_name,
+													middle_name,
+													Last_name,
+													suffix,
+													street_address,
+													city,
+													state,
+													zip_code,
+													Phone_Number,
+													SSN,
+													DOB,
+													Driver_License_Number,
+													Driver_License_State,
+													IP_Address,
+													Email_Address,
+													Device_Identification,
+													Device_identification_Provider,
+													Origination_Channel,
+													Income,
+													Own_or_Rent,
+													Location_Identifier,
+													Other_Application_Identifier,
+													Other_Application_Identifier2,
+													Other_Application_Identifier3,
+													Date_Application,
+													Time_Application,
+													Application_ID ,
+													FraudPoint_Score,
+													Date_Fraud_Detected,
+													Financial_Loss,
+													Gross_Fraud_Dollar_Loss,
+													Application_Fraud,
+													Primary_Fraud_Code,
+													Secondary_Fraud_Code,
+													Source_Identifier,
+													LN_Product_ID,
+													LN_Sub_Product_ID,
+													Industry,
+		                    Fraud_Index_Type,-dt_last_seen,-process_date,local);
 			
 	FraudDefenseNetwork.Layouts.Base.CFNA RollupUpdate(FraudDefenseNetwork.Layouts.Base.CFNA l, FraudDefenseNetwork.Layouts.Base.CFNA r) := 
 	transform
-		self.dt_first_seen 													:= ut.EarliestDate(l.dt_first_seen	,r.dt_first_seen); 
-		self.dt_last_seen 					        	      := max(l.dt_last_seen,r.dt_last_seen);
-		SELF.dt_vendor_last_reported 								:= max(l.dt_vendor_last_reported, r.dt_vendor_last_reported);
-		SELF.dt_vendor_first_reported               := ut.EarliestDate(l.dt_vendor_first_reported, r.dt_vendor_first_reported);
-		SELF.source_rec_id						              := if(r.source_rec_id < l.source_rec_id,r.source_rec_id, l.source_rec_id); // leave always previous rid 
-		self.current							                  := if(l.current = 'C' or r.current = 'C', 'C', 'H');
-		self := l;
+		self.dt_first_seen                    := ut.EarliestDate(l.dt_first_seen	,r.dt_first_seen); 
+		self.dt_last_seen                     := max(l.dt_last_seen,r.dt_last_seen);
+		SELF.dt_vendor_last_reported          := max(l.dt_vendor_last_reported, r.dt_vendor_last_reported);
+		SELF.dt_vendor_first_reported         := ut.EarliestDate(l.dt_vendor_first_reported, r.dt_vendor_first_reported);
+		SELF.source_rec_id                    := if(r.source_rec_id < l.source_rec_id,r.source_rec_id, l.source_rec_id); // leave always previous rid 
+		self.current                          := if(l.current = 'C' or r.current = 'C', 'C', 'H');
+		self                                  := l;
 
 	end;
 
-	pDataset_rollup := rollup( pDataset_sort,
-	                         
+	pDataset_rollup := rollup( pDataset_sort,	                         
 		left.customer_ID                     =      right.customer_ID                           and
 		left.vendor_ID                       =      right.vendor_ID                             and
 		left.appended_LexID                  =      right.appended_LexID                        and
@@ -141,10 +146,8 @@ module
 		left.LN_Product_ID                   =      right.LN_Product_ID                         and
 		left.LN_Sub_Product_ID               =      right.LN_Sub_Product_ID                     and
 		left.Industry                        =      right.Industry                              and
-		left.Fraud_Index_Type                =      right.Fraud_Index_Type                      
-		
-		,RollupUpdate(left, right)	, local									
-    	);
+		left.Fraud_Index_Type                =      right.Fraud_Index_Type
+		,RollupUpdate(left, right)	, local);
 
 	tools.mac_WriteFile(Filenames(pversion).Base.CFNA.New,pDataset_rollup,Build_Base_File);
 

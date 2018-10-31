@@ -1,4 +1,4 @@
-﻿import header,address,lssi,doxie_build,RoxieKeyBuild,business_risk,doxie_files,AddrFraud,aid_build,PromoteSupers,InsuranceHeader_xLink;
+import header,address,lssi,doxie_build,RoxieKeyBuild,business_risk,doxie_files,AddrFraud,aid_build,PromoteSupers,InsuranceHeader_xLink;
 
 export Proc_Header_Keys(string filedate, boolean pFastHeader=false) := function
 

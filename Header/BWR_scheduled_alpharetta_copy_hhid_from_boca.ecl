@@ -5,7 +5,7 @@
 // SCHEDULE TO RUN IN ALPHARETTA !!!
 // SCHEDULE TO RUN IN ALPHARETTA !!!
 
-IMPORT ut;
+IMPORT ut,std;
 #workunit('name','Boca.PersonHeader - Monitor copy from Boca');
 
 emailListS			:=  'gabriel.marcan@lexisnexisrisk.com'
@@ -32,7 +32,7 @@ sequential(
 			fileservices.SendEmail(emailListS,'SUCCESS! PersonHeader '+pVersion+' HHID files copied from Boca to Alpharetta','See Alpha prod:'+WORKUNIT),
 			if(fileservices.FileExists(flagFileName)=true,fileservices.deleteLogicalFile  (flagFileName))
 );		
-dt:=ut.getTimeDate();
+dt:=Std.Date.SecondsToString(Std.Date.CurrentSeconds(TRUE), '%F%H%M%S%u');
 last_checked:= dt[1..10]+' '+dt[11..12]+':'+dt[13..14]+':'+dt[15..16];
 
 when(output(last_checked,named('last_checked')),

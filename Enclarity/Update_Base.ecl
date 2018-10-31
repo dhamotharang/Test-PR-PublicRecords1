@@ -1027,8 +1027,25 @@ end;
 		// all_lnpid	:= has_lnpid + rejoin_lnpid;
 		all_lnpid	:= rejoin_lnpid;
 		sort_lnpid	:= fn_rollup(all_lnpid);
+		
+		pre_final_base	:= project(sort_lnpid, enclarity.Layouts.individual_base);		
+		get_historical_mo_provs	:= pre_final_base(lic_state = 'MO' and record_type = 'H');
+		non_historical_provs		:= pre_final_base(record_type = 'C');
+		non_mo_historical				:= pre_final_base(lic_state <> 'MO' and record_type = 'H');
+		
+		get_mo_apn		:= get_historical_mo_provs(taxonomy[1..4] = '363L' or taxonomy[1..4] = '364S' or taxonomy[1..3] = '367');
+		
+		non_mo_apn		:= get_historical_mo_provs(taxonomy[1..4] <> '363L' and taxonomy[1..4] <> '364S' and taxonomy[1..3] <> '367');
+		
+		clear_exp_stat	:= project(get_mo_apn, 
+																transform(enclarity.Layouts.individual_base,
+																	self.lic_end_date	:= '00000000',
+																	self.lic_status		:= '',
+																	self							:= left));
+																	
+		recombined_provs	:= non_historical_provs + non_mo_historical + non_mo_apn + clear_exp_stat;
 
-		RETURN project(sort_lnpid, enclarity.Layouts.individual_base);
+		RETURN recombined_provs;
 	END;
 			
 	EXPORT Associate_Base := FUNCTION

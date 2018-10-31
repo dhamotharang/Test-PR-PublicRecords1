@@ -2,7 +2,9 @@
 #workunit('name','Manual stale keys rename');
 filedate:='20180926';//header.version_build;
 all_packagekeys := DATASET([                                                                                                                                                                                                                              
-{'~thor_data400::key::header.rid_qa', '~thor_data400::key::header::'+filedate+'::rid'}  // put in the NEW version name                                                                                                                                                
+{'~thor_data400::key::header.rid_qa', '~thor_data400::key::header::'+filedate+'::rid'},  // put in the NEW version name   
+{'~thor_data400::key::header::qa::addr_unique_expanded', '~thor_data400::key::header::'+filedate+'::addr_unique_expanded'},  // put in the NEW version name                                                                                                                                                
+{'~thor_data400::key::fcra::header::qa::addr_unique_expanded', '~thor_data400::key::fcra::header::'+filedate+'::addr_unique_expanded'}                                                                                                                                             
 ], tools.Layout_SuperFilenames.inputlayout);                                                                                                                                                                                                                  
 
 // nothor(tools.fun_RenameFiles(all_packagekeys, true));        // true = testing                                                                                                                                                                                           
@@ -10,6 +12,7 @@ nothor(tools.fun_RenameFiles(all_packagekeys, false));        // true = testing
 /*
 Previous Runs
 ---------------
+20180926 W20181028-073122
 20180821 W20180923-121024
 0626 W20180717-105854
 0522 W20180620-134200

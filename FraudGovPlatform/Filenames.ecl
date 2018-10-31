@@ -64,7 +64,6 @@ module
 		export DemoData											:= tools.mod_FilenamesInput(Template('DemoData'),pversion);
 		export SourcesToAnonymize						:= tools.mod_FilenamesInput(Template('SourcesToAnonymize'),pversion);
 		export MBSInclusionDemoData					:= tools.mod_FilenamesInput(Template('MBSInclusionDemoData'),pversion);
-
 		export MBSDemoData									:= tools.mod_FilenamesInput(Template('MBSDemoData'),pversion);
 		
 		export ConfigRiskLevel							:= tools.mod_FilenamesInput(Template('ConfigRiskLevel'),pversion);

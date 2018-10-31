@@ -1,13 +1,10 @@
-﻿ import mdr,FCRA_ExperianCred,PRTE2_Header,Header_Incremental,SALT37,std,ut,PromoteSupers;
+ import mdr,FCRA_ExperianCred,PRTE2_Header,Header_Incremental,SALT37,std,ut,PromoteSupers;
 
-filedate := header.version_build;
 #IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
-// export File_FCRA_Header_prep(string filedate) :=header.file_headers(src<>'EN',src in mdr.sourceTools.set_scoring_FCRA,pflag3<>'I',pflag3<>'V',did>0);
-export File_FCRA_Header_prep() :=header.file_headers(src<>'EN',src in mdr.sourceTools.set_scoring_FCRA,pflag3<>'I',pflag3<>'V',did>0);
+export File_FCRA_Header_prep(string filedate) :=header.file_headers(src<>'EN',src in mdr.sourceTools.set_scoring_FCRA,pflag3<>'I',pflag3<>'V',did>0);
 #ELSE 
 
-// export File_FCRA_Header_prep(string filedate) := FUNCTION
-export File_FCRA_Header_prep() := FUNCTION
+export File_FCRA_Header_prep(string filedate) := FUNCTION
 
 hr0 := header.file_headers(src<>'EN',src in mdr.sourceTools.set_scoring_FCRA,pflag3<>'I',pflag3<>'V'):independent;
 

@@ -53,9 +53,6 @@ module
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MBSInclusionDemoData,FraudShared.Layouts.Input.MbsFdnMasterIDIndTypeInclusion,MBSInclusionDemoData,'CSV',,'|\n','|\t|');
 		
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MBSDemoData,FraudShared.Layouts.Input.Mbs,MBSDemoData,'CSV',,'|\n','|\t|');
-
-		
-
 		
 	
 	end;
