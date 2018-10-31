@@ -3,22 +3,22 @@
 export Build_All(
 
 	 string																pversion
-	,string																pContributoryServerIP 			= _control.IPAddress.bair_batchlz01
-	,string																pContributoryDirectory 		= '/data/otto/in/'
+	,string																pContributoryServerIP 			= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', FraudGovPlatform_Validation.Constants.LandingZoneServer_dev,FraudGovPlatform_Validation.Constants.LandingZoneServer_prod)
+	,string																pContributoryDirectory 		= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', FraudGovPlatform_Validation.Constants.ContributoryDirectory_dev,FraudGovPlatform_Validation.Constants.ContributoryDirectory_prod)
 	,string																pMBSServerIP 						= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10)
 	,string																pMBSFDNServerIP 					= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10)
-	,string																pMBSFraudGovDirectory			= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', '/data/super_credit/fraudgov/in/mbs/dev', '/data/super_credit/fraudgov/in/mbs/prod')
-	,string																pMBSFDNDirectory					= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', '/data/super_credit/fdn/in/mbs/prod', '/data/super_credit/fdn/in/mbs/prod')
+	,string																pMBSFraudGovDirectory			= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', FraudGovPlatform_Validation.Constants.MBSLandingZonePathBase_dev, FraudGovPlatform_Validation.Constants.MBSLandingZonePathBase_prod)
+	,string																pMBSFDNDirectory					= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', FraudGovPlatform_Validation.Constants.FDNMBSLandingZonePathBase_dev, FraudGovPlatform_Validation.Constants.FDNMBSLandingZonePathBase_prod)
 	// All sources are not updated each build if no updates to particular source skip that source base 
 	,boolean															PSkipIdentityDataBase			= false 
 	,boolean															PSkipKnownFraudBase				= false 
-	,boolean															PSkipDeltabaseBase					= false 
+	,boolean															PSkipDeltabaseBase				= false 
 	,boolean															PSkipAddressCache					= false 
 	,boolean															PSkipMainBase           		= false 
  	,dataset(FraudShared.Layouts.Base.Main)			pBaseMainFile						= IF(_Flags.Update.Main, FraudShared.Files().Base.Main.QA, DATASET([], FraudShared.Layouts.Base.Main))
 	,dataset(Layouts.Base.IdentityData)				pBaseIdentityDataFile			= IF(_Flags.Update.IdentityData, Files().Base.IdentityData.QA, DATASET([], Layouts.Base.IdentityData))
 	,dataset(Layouts.Base.KnownFraud)					pBaseKnownFraudFile				= IF(_Flags.Update.KnownFraud, Files().Base.KnownFraud.QA, DATASET([], Layouts.Base.KnownFraud))
-	,dataset(Layouts.Base.Deltabase)					pBaseDeltabaseFile				= IF(_Flags.Update.Deltabase, Files().Base.Deltabase.QA, DATASET([], Layouts.Base.Deltabase))	
+	,dataset(Layouts.Base.Deltabase)						pBaseDeltabaseFile				= IF(_Flags.Update.Deltabase, Files().Base.Deltabase.QA, DATASET([], Layouts.Base.Deltabase))	
 	,dataset(Layouts.Input.IdentityData)				pUpdateIdentityDataFile		= Files().Input.IdentityData.Sprayed
 	,dataset(Layouts.Input.KnownFraud)					pUpdateKnownFraudFile			= Files().Input.KnownFraud.Sprayed
 	,dataset(Layouts.Input.Deltabase)					pUpdateDeltabaseFile			= Files().Input.Deltabase.Sprayed
