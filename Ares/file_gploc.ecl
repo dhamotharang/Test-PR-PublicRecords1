@@ -115,6 +115,8 @@ expanded_legal := project(Ares.Files.ds_legal_entity, expand_legal_xform(left));
 // count(expanded_legal(c_type_value = ''));
 layout_w_institution_type := record(recordof(with_iso))
 	string institution_type;
+	expanded_legal.summary.names;
+	string abbrev_name := '';
 end;
 
 layout_w_institution_type instit_xform(with_iso l, expanded_legal r) := Transform
@@ -163,11 +165,43 @@ layout_w_institution_type instit_xform(with_iso l, expanded_legal r) := Transfor
 																inst_type ='Holding Company'=>'55',
 																inst_type ='Association'=>'90',
 																inst_type ='Unknown Type'=>'99', '99');
-	self := l;
-end;
+																abbrev_names := r.Summary.Names.Names(Type = 'Abbreviated Name');
+																legal_names := r.Summary.Names.Names(Type = 'Legal Title');
+																abbrev_name := MAP (count(abbrev_names) > 0 => abbrev_names[1].Value, count(legal_names) >0 => legal_names[1].Value,'' );
+																self.abbrev_name := abbrev_name;
+																self := l;
+																self := r.summary;
+	end;
 
 
 with_inst_type := join(with_iso, expanded_legal, left.institution_id = right.id , instit_xform(left, right));
+abbreviated_short := with_inst_type(length(abbrev_name)<=35);
+abbreviated_long  := with_inst_type(length(abbrev_name)>35); 
+
+// count(abbreviated_long);
+
+
+recordof(abbreviated_long) xform_trans_abbv(abbreviated_long l) := Transform
+	rep_ds  := Ares.Files.ds_lookup(fid ='ABBREVIATION_RULE').lookupBody(RegExFind(completetext, l.abbrev_name, NOCASE));
+	
+  iterator_layout := recordof(rep_ds) or {string abbv_name};
+	
+	iterator_ds := project(rep_ds, transform(iterator_layout, self.abbv_name := l.abbrev_name, self := left));
+
+	iterator_layout iter_xform(iterator_ds l, iterator_ds r) := transform
+		current_name := if(l.abbv_name = '', r.abbv_name, l.abbv_name);
+		self.abbv_name := regexreplace(r.completetext, current_name, r.abbreviatedtext);
+		self := R;
+	End;
+	
+	iterated := iterate(iterator_ds, iter_xform(left, right));
+	self.abbrev_name := if(count(iterated) > 0, iterated[count(iterated)].abbv_name, l.abbrev_name)[1..35];
+	self := l;
+End;
+
+trans_abbr := project(abbreviated_long, xform_trans_abbv(left));
+// abbreviated_long;
+// trans_abbr;
 
 with_office_type_layout := Record(recordof(with_inst_type))
 	string office_type;
@@ -181,7 +215,7 @@ with_office_type_layout add_ofc_type( with_inst_type l) := Transform
 	self := l;
 End;
 
-w_office_type := Project(with_inst_type, add_ofc_type(left));
+w_office_type := Project(abbreviated_short + trans_abbr , add_ofc_type(left));
 
 layout_gploc final_xform(w_office_type l) := Transform
 	self.Update_Flag := 'A';
