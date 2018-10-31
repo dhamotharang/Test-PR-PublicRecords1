@@ -7,6 +7,7 @@ RoxieIP := RiskWise.shortcuts.Dev156;
 
 //InputFile := '~temp::kel::consumer_nonfcra_1mm.csv'; //1 million
 InputFile := '~temp::kel::consumer_nonfcra_100k.csv';
+// InputFile := '~ak::in::specialcases.csv';
 
 /*
 Data Setting 		NonFCRA
@@ -32,7 +33,7 @@ Score_threshold := 80;
 RecordsToRun := 100; // 100;
 eyeball := 120;
 
-OutputFile := '~ak::out::PublicRecs::nonFCRA::Sprint4'+ ThorLib.wuid() ;
+OutputFile := '~ak::out::PublicRecs::nonFCRA::Sprint6'+ ThorLib.wuid() ;
 
 prii_layout := RECORD
     STRING Account             ;
@@ -64,7 +65,10 @@ END;
 
 p_in := DATASET(InputFile, prii_layout, CSV(QUOTE('"')));
 p := IF (RecordsToRun = 0, p_in, CHOOSEN (p_in, RecordsToRun));
-PP := PROJECT(P, TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout, SELF := LEFT));
+PP := PROJECT(P(Account != 'Account'), TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout, 
+SELF := LEFT;
+// SELF := [];
+));
 
 soapLayout := RECORD
   // STRING CustomerId; // This is used only for failed transactions here; it's ignored by the ECL service.
@@ -72,12 +76,12 @@ soapLayout := RECORD
   INTEGER ScoreThreshold;
 end;
 
-  // ResultSet:= PublicRecords_KEL.FnRoxie_GetAttrs(PP, Score_threshold);
+  ResultSet:= PublicRecords_KEL.FnRoxie_GetAttrs(PP, Score_threshold);
   
-  // output( Choosen(PP, eyeball), named('raw_input'));
+  output( Choosen(PP, eyeball), named('raw_input'));
    
-  // OUTPUT( ResultSet, NAMED('Results') );
-
+  OUTPUT( ResultSet, NAMED('Results') );
+/*
 layout_MAS_Test_Service_output := RECORD
 	PublicRecords_KEL.ECL_Functions.Attr_Layout;
 	STRING ErrorCode := '';
@@ -92,7 +96,6 @@ soapLayout trans (pp le):= TRANSFORM
 END;
 
 soap_in := PROJECT(pp, trans(LEFT));
-
 
 layout_MAS_Test_Service_output myFail(soap_in le) := TRANSFORM
 	SELF.ErrorCode := STD.Str.FilterOut(TRIM(FAILCODE + ' ' + FAILMESSAGE), '\n');
@@ -118,3 +121,4 @@ OUTPUT( CHOOSEN(Failed,eyeball), NAMED('bwr_results_Failed') );
 OUTPUT( COUNT(Failed), NAMED('Failed_Cnt') );
 
 output(Passed,,OutputFile, CSV(heading(single), quote('"')));
+*/
