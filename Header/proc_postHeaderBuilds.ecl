@@ -120,22 +120,9 @@ export proc_postHeaderBuilds := module
                                             header.LogBuild.single('Started :'+step)
                                             ,if(Header.version_build<>fn[sub..],fail('Header base does not match version'))
                                             ,checkLinkingVersion(header.version_build)
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
+
                                             ,parallel(make_hhid	,make_fcra_hhid)
                                             // ,notify('Build_Header_Keys','*')
-=======
-                                            ,bld_relatives
-                                            ,parallel(make_hhid, make_fcra_hhid)
-                                            // ,notify('Build_Header_Keys','*')
-                                            ,bld_relative_title
->>>>>>> Stashed changes
-=======
-                                            ,bld_relatives
-                                            ,parallel(make_hhid, make_fcra_hhid)
-                                            // ,notify('Build_Header_Keys','*')
-                                            ,bld_relative_title
->>>>>>> Stashed changes
                                             ,header.LogBuild.single('Completed :'+step)
                                             )
                                             :success(header.msg(cmpltd,elist_owners).good)

@@ -49,11 +49,7 @@ build_iDid := sequential(
 
 build_fcra := sequential(
                 header.LogBuild.single('STARTED:iFCRA'),
-<<<<<<< Updated upstream
                 Doxie.Proc_FCRA_Doxie_keys_All(,true,filedate),
-=======
-                Doxie.Proc_FCRA_Doxie_keys_All(,true),
->>>>>>> Stashed changes
                 header.LogBuild.single('end:iFCRA'),
                 ):failure(std.system.Email.SendEmail(emailList,'FAILED:iFCRA:'+workunit,wLink));
 
