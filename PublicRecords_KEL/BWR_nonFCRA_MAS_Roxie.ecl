@@ -76,12 +76,12 @@ soapLayout := RECORD
   INTEGER ScoreThreshold;
 end;
 
-  ResultSet:= PublicRecords_KEL.FnRoxie_GetAttrs(PP, Score_threshold);
+  // ResultSet:= PublicRecords_KEL.FnRoxie_GetAttrs(PP, Score_threshold);
   
-  output( Choosen(PP, eyeball), named('raw_input'));
+  // output( Choosen(PP, eyeball), named('raw_input'));
    
-  OUTPUT( ResultSet, NAMED('Results') );
-/*
+  // OUTPUT( ResultSet, NAMED('Results') );
+// /*
 layout_MAS_Test_Service_output := RECORD
 	PublicRecords_KEL.ECL_Functions.Attr_Layout;
 	STRING ErrorCode := '';
@@ -121,4 +121,3 @@ OUTPUT( CHOOSEN(Failed,eyeball), NAMED('bwr_results_Failed') );
 OUTPUT( COUNT(Failed), NAMED('Failed_Cnt') );
 
 output(Passed,,OutputFile, CSV(heading(single), quote('"')));
-*/
