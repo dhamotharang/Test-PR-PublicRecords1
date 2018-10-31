@@ -1,6 +1,4 @@
-
-﻿IMPORT Data_Services, Doxie, PhoneFinderReportDelta;
-
+﻿IMPORT Data_Services, Doxie;
 
 //PHPR-173: New Indices for Phone Finder Reporting Query
 //DF-23251: Add 'dx_' Prefix to Index Definitions
