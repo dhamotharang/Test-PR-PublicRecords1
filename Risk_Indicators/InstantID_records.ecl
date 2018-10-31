@@ -78,8 +78,9 @@ string20	historyDateTimeStamp := '' : stored('historyDateTimeStamp');  // new fo
 boolean IsPOBoxCompliant := false 		: stored('PoBoxCompliance');
 boolean ofac_only := true 						: stored('OfacOnly');
 boolean ExcludeWatchLists := false 		: stored('ExcludeWatchLists');
-String OFAC_version_Null := '' 			: stored('OFACversion');
-unsigned1 OFAC_version_temp := if(OFAC_version_Null = '', 1, (unsigned1) OFAC_version_Null);
+set_validOFACVersions := Risk_Indicators.iid_constants.set_validOFACVersions;
+unsigned1 OFAC_version_Null := 0 			: stored('OFACversion');
+unsigned1 OFAC_version_temp := if(OFAC_version_Null NOT IN set_validOFACVersions, 1, OFAC_version_Null);
 OFAC_version := if(trim(stringlib.stringtolowercase(_LoginID)) in ['keyxml','keydevxml'], 4, OFAC_version_temp);	// temporary code for Key Bank
 boolean Include_Additional_watchlists := FALSE	: stored('IncludeAdditionalWatchlists');
 boolean Include_Ofac := FALSE										: stored('IncludeOfac');
@@ -210,7 +211,7 @@ ofac_version_from_ESP :=
   MAP(
     ESP_version < 1.039 => 1, 
     ESP_version >= 1.039 and ESP_version < 1.49 => 2, 
-    ESP_version >= 1.49 and OFAC_version_Null = '' => 2,
+    ESP_version >= 1.49 and OFAC_version_Null = 0 => 2,
     ESP_version >= 1.49 and ofac_version < 2 => 2,
     ofac_version
   );
