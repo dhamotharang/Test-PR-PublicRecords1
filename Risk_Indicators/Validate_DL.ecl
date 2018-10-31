@@ -261,14 +261,15 @@ ret := CASE(state,
 									dl_len=9 AND dl_trim[1]>='A' AND dl_trim[1]<='Z' => '12',
 									dl_len=9 => '6',
 									'1'),
-    'WA' =>  	MAP(dob='' => '99',
-				    (dl_len=12 AND dl_trim[1..5]=walname[1..5] AND dl_trim[6]=fname[1] AND ((dl_trim[7]>='A' AND dl_trim[7]<='Z') OR
+		'WA' =>  	MAP(dob='' => '99',
+				    dl_len=12 AND dl_trim[1..5]=walname[1..5] AND dl_trim[6]=fname[1] AND ((dl_trim[7]>='A' AND dl_trim[7]<='Z') OR
 						dl_trim[7]='*') AND (INTEGER)(dl_trim[8..9])=(100-(INTEGER)(dob[3..4])) AND (dl_trim[10]='*' OR (dl_trim[10]>='A' AND dl_trim[10]<='Z') OR
 						IsAllNumeric(dl_trim[10])) AND (((dl_trim[11]>='A' AND dl_trim[11]<='Z') OR (dl_trim[12]>='A' AND dl_trim[12]<='Z')) OR IsAllNumeric(dl_trim[11])) => '0',
-				    dl_len=12 AND dl_trim[1..5]=walname[1..5] AND dl_trim[6]=fname[1] AND (dl_trim[7]>='A' AND dl_trim[7]<='Z' OR
-						dl_trim[7]='*') AND (INTEGER)(dl_trim[8..9])=(100-(INTEGER)(dob[3..4]))) 
-            OR (dl_len=12 AND dl_trim[1..3]='WDL')            
-            => '12',
+            
+				    (dl_len=12 AND dl_trim[1..5]=walname[1..5] AND dl_trim[6]=fname[1] AND (dl_trim[7]>='A' AND dl_trim[7]<='Z' OR
+						dl_trim[7]='*') AND (INTEGER)(dl_trim[8..9])=(100-(INTEGER)(dob[3..4])))
+            OR (dl_len=12 AND dl_trim[1..3]='WDL') => '12',
+
 				    dl_len=12 AND dl_trim[1..5]=walname[1..5] AND dl_trim[6]=fname[1] AND ((dl_trim[7]>='A' AND dl_trim[7]<='Z') OR dl_trim[7]='*') => '5',
 				    dl_len=12 AND dl_trim[1..5]=walname[1..5] AND dl_trim[6]=fname[1] => '10',
 				    dl_len=12 AND dl_trim[1..5]=walname[1..5] => '9',
