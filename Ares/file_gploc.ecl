@@ -2,108 +2,22 @@
 
 office := Ares.file_office_flat(tfpuid != '');
 
-//join office to city on office.city.fid = locations.location.address.city.fid
-location_layout := Record
-	string tfpuid;
-	string institution_id;
-	string office_type_code;
-	dataset(Ares.layouts.address) addresses;
-End;
+// office_w_country_iso_layout := record(recordof(office))
+	// string iso2;
+// End;
 
-location_layout loc_xform(recordof(office) l, RecordOf(office.locations) r) := Transform
-		self.tfpuid := l.tfpuid;
-		self.institution_id := l.institution_id;
-		self.office_type_code := l.summary.types[1].type;
-		self.addresses := r.address;
-End;
-//We have to get all the locations for each office.  We're keeping tfpuid to be the primary key. Each office can 
-//have multiple locations and each location can have multiple addresses.
-locations := normalize(office, Left.locations, loc_xform(LEFT,RIGHT));
-
-address_layout := Record
-	string tfpuid;
-	string institution_id;
-	string office_type_code;
-	Ares.layouts.address address;
-End;
-
-address_layout adr_xform(recordof(locations) l, Ares.layouts.address r) := Transform
-	self.tfpuid := l.tfpuid;
-	self.institution_id := l.institution_id;
-	self.office_type_code := l.office_type_code;
-	self.address := r;
-End;
-
-//Each location can have multiple addresses so we have to get them all.
-addresses := normalize(locations, Left.addresses, adr_xform(LEFT,RIGHT));
-
-
-city_layout_slim := Record
-	addresses.tfpuid;
-	addresses.institution_id;
-	addresses.office_type_code;
-	string cityid;
-End;
-
-//Slime layout to only required fields.
-office_city_slim := project(addresses, transform( city_layout_slim, 
-															self.cityid := if(left.address.city.link.href != '', std.str.splitwords(left.address.city.link.href,'/')[3], '');
-															self := left));
-	
-//Join to city dataset.
-office_city_join := join(office_city_slim, Ares.Files.ds_city, left.cityid = right.id);
-
-layout_city_slim := record
-    string id;
-		string fid;
-    string tfpid;
-		string tfpuid;
-		string office_type_code;
-		string institution_id;
-		string country_id;
-end;
-
-
-
-layout_country_slim := record
-	string country_id;
-End;
-
-layout_place := record
-	string link_href;
-  string link_rel;
-end;
-
-layout_country_slim country_id_xform(recordof(office_city_join.within.place) l) := Transform
-	self.country_id := if(l.link_href != '', std.str.splitwords(l.link_href,'/')[3], '');
-End;
-
-layout_city_slim city_xform(office_city_join l) := Transform
-	places := l.within.place;
-	country_ids := project(places(regexfind( '/country/id', link_href)), country_id_xform(left));
-	self.country_id := if(count(country_ids) > 0, country_ids[1].country_id,'');
-	self := l;
-End;
-
-
-city_with_country_id := project(office_city_join, city_xform(left));
-
-city_with_country_layout := record(recordof(city_with_country_id))
-	string iso2;
-End;
-
-city_with_country_layout cc_xform(city_with_country_id l, Ares.Files.ds_country r) := transform
-	self.iso2 := r.summary.iso2;
-	self := l;
-End;
-
-with_iso := join(city_with_country_id, Ares.Files.ds_country, left.country_id = right.id, cc_xform(left, right));
-
-expanded_legal_layout := recordof(Ares.Files.ds_legal_entity) or {string c_type_source, string c_type_value};
+// office_w_country_iso_layout cc_xform(office l, Ares.Files.ds_country r) := transform
+	// self.iso2 := r.summary.iso2;
+	// self := l;
+// End;
+// with_iso := join(city_with_country_id, Ares.Files.ds_country, left.country_id = right.id, cc_xform(left, right));
+// with_iso := join(office, Ares.Files.ds_country, left.primary_city_country_id = right.id, cc_xform(left, right));
+expanded_legal_layout := recordof(Ares.Files.ds_legal_entity) or {string c_type_source, string c_type_value, string headoffice_id};
 
 expanded_legal_layout expand_legal_xform(Ares.Files.ds_legal_entity l) := Transform
 	self.c_type_value := l.summary.types(type_source = 'TFP')[1].type_value;
 	self.c_type_source := if (self.c_type_value != '', 'TFP', '');
+	self.headoffice_id := std.str.splitwords(l.locations.headOffice.link_href,'/')[3];
 	self := l;
 End;
 
@@ -113,14 +27,17 @@ expanded_legal := project(Ares.Files.ds_legal_entity, expand_legal_xform(left));
 
 // count(expanded_legal(c_type_value != ''));
 // count(expanded_legal(c_type_value = ''));
-layout_w_institution_type := record(recordof(with_iso))
+layout_w_institution_type := record(recordof(office))
 	string institution_type;
+	string legal_entity_id;
 	expanded_legal.summary.names;
+	expanded_legal.headoffice_id;
 	string abbrev_name := '';
 end;
 
-layout_w_institution_type instit_xform(with_iso l, expanded_legal r) := Transform
+layout_w_institution_type instit_xform(office l, expanded_legal r) := Transform
 	inst_type := trim(r.c_type_value, left,right);
+	self.legal_entity_id := r.id;
 	self.institution_type := Map(	inst_type ='Depository Financial Institution'=>'00',
 																inst_type ='Commercial Bank'=>'01',
 																inst_type ='Savings Bank'=>'02',
@@ -165,16 +82,17 @@ layout_w_institution_type instit_xform(with_iso l, expanded_legal r) := Transfor
 																inst_type ='Holding Company'=>'55',
 																inst_type ='Association'=>'90',
 																inst_type ='Unknown Type'=>'99', '99');
-																abbrev_names := r.Summary.Names.Names(Type = 'Abbreviated Name');
-																legal_names := r.Summary.Names.Names(Type = 'Legal Title');
-																abbrev_name := MAP (count(abbrev_names) > 0 => abbrev_names[1].Value, count(legal_names) >0 => legal_names[1].Value,'' );
-																self.abbrev_name := abbrev_name;
-																self := l;
-																self := r.summary;
-	end;
+	abbrev_names := r.Summary.Names.Names(Type = 'Abbreviated Name');
+	legal_names := r.Summary.Names.Names(Type = 'Legal Title');
+	abbrev_name := MAP (count(abbrev_names) > 0 => abbrev_names[1].Value, count(legal_names) >0 => legal_names[1].Value,'' );
+	self.abbrev_name := abbrev_name;
+	self.headoffice_id := r.headoffice_id;
+	self := l;
+	self := r.summary;
+end;
 
 
-with_inst_type := join(with_iso, expanded_legal, left.institution_id = right.id , instit_xform(left, right));
+with_inst_type := join(office, expanded_legal, left.institution_id = right.id , instit_xform(left, right));
 abbreviated_short := with_inst_type(length(abbrev_name)<=35);
 abbreviated_long  := with_inst_type(length(abbrev_name)>35); 
 
@@ -217,13 +135,70 @@ End;
 
 w_office_type := Project(abbreviated_short + trans_abbr , add_ofc_type(left));
 
-layout_gploc final_xform(w_office_type l) := Transform
+w_headoffice_layout := record(recordof(w_office_type))
+	string headoffice_tfpuid;
+End;
+
+w_headoffice_layout xform_headoffice(w_office_type l, office r) := transform
+	self.headoffice_tfpuid := r.tfpuid;
+	self := l;
+End;
+
+w_headoffice := join(w_office_type, office, left.headoffice_id = right.id, xform_headoffice(left, right));
+
+w_current_assets_layout := record(recordof(w_headoffice))
+	string current_assets := '';
+end;
+
+//Ares.Files.ds_financialstatement(count(lineItems(fid = 'FDB003F'))>0);
+w_current_assets_layout xform_cur_ast(w_headoffice l, file_financialStatement_flat r) := transform
+	self.current_assets := r.lineItems(fid = 'FDB003F')[1].value;
+	self := l;
+end;
+
+w_current_assets := join(w_headoffice, file_financialStatement_flat, left.legal_entity_id = right.owner_id, xform_cur_ast(left,right));
+
+
+ds_fin := ares.file_financialStatement_flat;
+grp_fin_period_end_layout := record
+	ds_fin.owner_id;
+	last := max(group,ds_fin.periodEnd);
+end;
+
+latest_fin_recs := table(ds_fin, grp_fin_period_end_layout, owner_id);
+
+w_fin_dt_layout := record(recordof(w_current_assets))
+	string latest_fin_dt := '';
+end;
+
+w_fin_dt_layout xform_fin_dt(w_current_assets l, latest_fin_recs r) := Transform
+	self.latest_fin_dt := r.last;
+	self := l;
+end;
+
+w_fin_dt := join(w_current_assets, latest_fin_recs, left.legal_entity_id = right.owner_id, xform_fin_dt(left,right), left outer, keep(1));
+
+layout_gploc final_xform(w_fin_dt l) := Transform
 	self.Update_Flag := 'A';
-	self.ISO_Country_Code := l.iso2;
+	self.ISO_Country_Code := l.country_iso2;
 	self.Primary_Key_Accuity_Location_ID := l.tfpuid;
 	self.Institution_Type := l.institution_type;
 	self.Office_Type := l.office_type;
-	
+	self.Institution_Name_Abbreviated := l.abbrev_name;
+	self.Institution_Name_Full  := l.institution_fullname;
+	self.Branch_Name := l.branch_name;
+	self.Physical_Address_1  := l.physical_address1;
+	self.Physical_Address_2  := l.physical_address2;
+	self.City_Town := l.city_name;
+	self.State_Province_Region_Abbreviated := l.st_prov_rgn_abbv;
+	self.State_Province_Region_Full := l.st_prov_rgn;
+	self.Postal_Code := l.postal_code;
+	self.Country_Name_Full := l.country_name;
+	self.employer_tax_id  := l.employer_tax_id;
+	self.Head_Office_Accuity_Location_ID := l.headoffice_tfpuid;
+	self.Current_Assets := l.current_assets;
+	self.Date_of_Financials := l.latest_fin_dt;
+	self.Institution_Identifier := std.str.splitwords(l.tfpid, '-')[1];
 End;
-	final := Project(w_office_type, final_xform(left));
+	final := Project(w_fin_dt, final_xform(left));
 EXPORT file_gploc := final;
