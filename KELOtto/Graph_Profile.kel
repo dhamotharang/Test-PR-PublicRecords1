@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<profile xmlns="http://www.hpccsystems.com/schemas/KEL/profile">
+  <metadata kel="KELOtto.Graph">
+    <entity name="Customer" rows="100">
+      <property name="UID" count="100" />
+    </entity>
+    <entity name="Email" rows="2000000"> 
+      <property name="UID" count="2000000" />
+    </entity>
+    <entity name="Person" rows="20000000"> 
+      <property name="UID" count="20000000" />
+      <property name="Deceased" count="100000" />
+    </entity>
+    <entity name="Address" rows="20000000"> 
+      <property name="UID" count="20000000" />
+    </entity>
+    <entity name="SocialSecurityNumber" rows="20000000"> 
+      <property name="UID" count="20000000" />
+    </entity>
+    <entity name="InternetProtocol" rows="20000000"> 
+      <property name="UID" count="20000000" />
+    </entity>
+    <entity name="InternetProtocol" rows="300000"> 
+      <property name="UID" count="300000" />
+    </entity>
+    <entity name="Event" rows="200000000"> 
+      <property name="UID" count="200000000" />
+    </entity>
+    
+  </metadata>
+</profile>

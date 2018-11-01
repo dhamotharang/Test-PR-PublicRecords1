@@ -1,5 +1,5 @@
 ﻿import std;
-EXPORT DeltaAlerts(string SpecPackageName, string SpecKeyNickname, string SpecVersion, decimal6_3 AddedThresholdMin, decimal6_3 AddedThresholdMax, decimal6_3 ModifiedThresholdMin, decimal6_3 ModifiedThresholdMax, decimal6_3 RemovedThresholdMin, decimal6_3 RemovedThresholdMax, string emailList, boolean publish=true):= function;
+EXPORT DeltaAlerts(string SpecPackageName, string SpecKeyNickname, string SpecVersion, decimal6_3 AddedThresholdMin, decimal6_3 AddedThresholdMax, decimal6_3 ModifiedThresholdMin, decimal6_3 ModifiedThresholdMax, decimal6_3 RemovedThresholdMin, decimal6_3 RemovedThresholdMax, boolean publish=true):= function;
 
 	oldrecsPlus:=dataset('~thor_data400::DeltaStats::FullDeltaStats::full',DOPSGrowthCheck.layouts.Full_Delta_Stat_Layout,thor,__compressed__,opt);
 
@@ -17,7 +17,14 @@ EXPORT DeltaAlerts(string SpecPackageName, string SpecKeyNickname, string SpecVe
 	AddModifiedAlerts:=if(ModifiedAlerts,AddAddedAlerts + 'UniqueDID Growth: '+ SpecificInstances(Stat_Name='Delta_Modified')[1].results_percent + 'Min Threshold: ' + ModifiedThresholdMin + 'Max Threshold: ' + ModifiedThresholdMax + '\n',AddAddedAlerts);	
 	AddRemovedAlerts:=if(RemovedAlerts,AddModifiedAlerts + 'UniqueProxID Growth: '+ SpecificInstances(Stat_Name='Delta_Removed')[1].results_percent + 'Min Threshold: ' + RemovedThresholdMin + 'Max Threshold: ' + RemovedThresholdMax + '\n',AddModifiedAlerts);
 	
-	NewHistoryRec:=dataset([{SpecPackageName,SpecKeyNickname,SpecVersion,AddedAlerts,ModifiedAlerts,RemovedAlerts}],DOPSGrowthCheck.layouts.DeltaStatAlerts);
+	NewHistoryRec:=dataset([{SpecPackageName,
+													 SpecKeyNickname,
+													 SpecVersion,
+													 AddedAlerts,SpecificInstances(Stat_Name='Delta_Added')[1].results_percent,
+													 ModifiedAlerts,SpecificInstances(Stat_Name='Delta_Modified')[1].results_percent,
+													 RemovedAlerts,SpecificInstances(Stat_Name='Delta_Removed')[1].results_percent,
+													 AddedThresholdMin,AddedThresholdMax,ModifiedThresholdMin,ModifiedThresholdMax,RemovedThresholdMin,RemovedThresholdMax
+													 }],DOPSGrowthCheck.layouts.DeltaStatAlerts);
 	
 	ToPublish:=output(NewHistoryRec,,'~thor_data400::DeltaStats::DeltaStatsAlerts::using::'+workunit+SpecKeyNickname,thor,compressed,overwrite);
 	AddFile:=sequential(STD.FILE.StartSuperFileTransaction(),

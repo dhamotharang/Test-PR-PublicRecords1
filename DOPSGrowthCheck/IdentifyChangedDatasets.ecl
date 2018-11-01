@@ -29,7 +29,17 @@ dAlreadyDone:=project(ChangedDataSets,tAlreadyDone(Left));
 
 ConfigurationList:=dataset('~thor_data400::DeltaStats::AlertConfigurations',DOPSGrowthCheck.layouts.Configuration_Layout,thor,opt);
 
-SelectedConfigurations:=join(ConfigurationList,dAlreadyDone(Updated=true),left.packagename=right.packagename,transform(left));
+AddedVersion:=record
+DOPSGrowthCheck.layouts.Configuration_Layout;
+string version;
+end;
+
+AddedVersion tAddVersion(ConfigurationList L, dAlreadyDone R):=transform
+Self.version:=R.CertVersion;
+Self:=L;
+end;
+
+SelectedConfigurations:=join(ConfigurationList,dAlreadyDone(Updated=true),left.packagename=right.packagename,tAddVersion(left,right));
 
 return SelectedConfigurations;
 end;

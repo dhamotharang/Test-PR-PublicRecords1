@@ -1,5 +1,4 @@
-﻿import ut,roxiekeybuild, doxie_files,dops,DOPSGrowthCheck;
-
+﻿import ut,roxiekeybuild, doxie_files,dops,DOPSGrowthCheck, strata;
 
 export proc_build_key(string filedate) := function
 	SuperKeyName 					:= cluster.cluster_out+'key::hunting_fishing::';
@@ -62,7 +61,6 @@ export proc_build_key(string filedate) := function
 	RoxieKeyBuild.Mac_SK_Move_To_Built_V2(SuperKeyName_CCW_fcra+'@version@::did',BaseKeyName_CCW_fcra+'::did',mv5_fcra,2);
 	RoxieKeyBuild.Mac_SK_Move_To_Built_V2(SuperKeyName_CCW_fcra+'@version@::rid',BaseKeyName_CCW_fcra+'::rid',mv6_fcra,2);
 	
-
 	RoxieKeyBuild.Mac_Daily_Email_Local('EMERGES','SUCC',filedate,send_succ_msg,emerges.Spray_Notification_Email_Address);
 	RoxieKeyBuild.Mac_Daily_Email_Local('EMERGES','FAIL',filedate,send_fail_msg,'kgummadi@seisint.com;fhumayun@seisint.com');
 
@@ -73,8 +71,8 @@ export proc_build_key(string filedate) := function
   build_CCW_autokeys						:= emerges.Proc_CCW_AutokeyBuild(filedate);
 	build_CCW_autokeys_fcra				:= emerges.Proc_CCW_AutokeyBuild_fcra(filedate);
 	
-	update_dops := roxiekeybuild.updateversion('EmergesKeys',filedate,'kgummadi@seisint.com;fhumayun@seisint.com',,'N');
-  update_dops_fcra := roxiekeybuild.updateversion('FCRA_EmergesKeys',filedate,'kgummadi@seisint.com;fhumayun@seisint.com',,'F');
+	update_dops := dops.updateversion('EmergesKeys',filedate,'kgummadi@seisint.com;fhumayun@seisint.com',,'N');
+  update_dops_fcra := dops.updateversion('FCRA_EmergesKeys',filedate,'kgummadi@seisint.com;fhumayun@seisint.com;kent.wolf@lexisnexisrisk.com',,'F');
 	
 	build_roxie_keys := 
 	  if (fileservices.getsuperfilesubname('~thor_data400::base::emerges_hunt_vote_ccw',1) = fileservices.getsuperfilesubname('~thor_data400::base::emerges_BUILT',1),
@@ -97,19 +95,81 @@ export proc_build_key(string filedate) := function
 
 	// build_moxie_keys := emerges.proc_build_all_moxie_keys : success(output('moxie keys build completed')), failure(output('moxie key build failed'));
 
+  // DF-21635 - Show counts of blanked out fields in thor_Data400::key::hunters_doxie_did_fcra_*
+  post_stats_dox := OUTPUT(strata.macf_pops(doxie_files.key_hunters_did(TRUE),,,,,,FALSE,
+                        ['ace_fips_st', 'active_other', 'active_status', 'agecat', 'antelope', 'anterless', 'archery', 'bear'
+                         ,'biggame', 'bighorn', 'blind', 'bonus', 'buffalo', 'combosuper', 'cougar', 'crewmemeber'
+                         ,'day1', 'day14to15', 'day3', 'day7', 'dayfiller', 'deer', 'disabled', 'drawing'
+                         ,'duck', 'elk', 'fallfishing', 'family', 'fish', 'freshwater', 'goose', 'gun'
+                         ,'headhousehold', 'historyfiller', 'hunt', 'huntfill1', 'huntfiller', 'indian', 'javelina', 'junior'
+                         ,'lakesandresevoirs', 'landowner', 'lifetimepermit', 'lottery', 'lowincome', 'maiden_name', 'maiden_prior', 'mail_ace_fips_st'
+                         ,'mail_ace_zip', 'mail_addr_suffix', 'mail_addr1', 'mail_addr2', 'mail_cart', 'mail_chk_digit', 'mail_city'
+                         ,'mail_county', 'mail_cr_sort_sz', 'mail_dpbc', 'mail_err_stat', 'mail_fipscounty', 'mail_geo_blk', 'mail_geo_lat'
+                         ,'mail_geo_long', 'mail_geo_match', 'mail_lot', 'mail_lot_order', 'mail_msa', 'mail_p_city_name', 'mail_postdir'
+                         ,'mail_predir', 'mail_prim_name', 'mail_prim_range', 'mail_record_type', 'mail_sec_range', 'mail_st', 'mail_state'
+                         ,'mail_unit_desig', 'mail_v_city_name', 'mail_zip', 'mail_zip4', 'migbird', 'moose', 'motorvoterid'
+                         ,'muzzle', 'nonresident', 'occupation', 'other_phone', 'otherbirds', 'pheasant', 'phone', 'place_of_birth'
+                         ,'poliparty', 'race', 'record_type', 'regdate', 'regioncounty', 'regsource', 'res_county', 'resident'
+                         ,'retarded', 'salmon', 'saltwater', 'seasonannual', 'seniorcit', 'serviceman', 'setlinefish', 'shellfishcrab'
+                         ,'shellfishlobster', 'sikebull', 'skipass', 'smallgame', 'snowmobile', 'source_voterid', 'sportsman', 'steelhead'
+                         ,'sturgeon', 'sturgeon2', 'trap', 'trout', 'turkey', 'votefiller', 'votefiller2', 'voterstatus'
+                         ,'whitejubherring', 'work_phone']));  
+  // DF-21635 - Show counts of blanked out fields in thor_data400::key::hunting_fishing::fcra::qa::did
+  post_stats_did := OUTPUT(strata.macf_pops(emerges.Key_huntfish_did(TRUE),,,,,,FALSE,
+                        ['ace_fips_st', 'active_other', 'active_status', 'agecat', 'antelope', 'anterless', 'archery', 'bear'
+                         ,'biggame', 'bighorn', 'blind', 'bonus', 'buffalo', 'combosuper', 'cougar', 'crewmemeber'
+                         ,'day1', 'day14to15', 'day3', 'day7', 'dayfiller', 'deer', 'disabled', 'drawing'
+                         ,'duck', 'elk', 'fallfishing', 'family', 'fish', 'freshwater', 'goose', 'gun'
+                         ,'headhousehold', 'historyfiller', 'hunt', 'huntfill1', 'huntfiller', 'indian', 'javelina', 'junior'
+                         ,'lakesandresevoirs', 'landowner', 'lifetimepermit', 'lottery', 'lowincome', 'maiden_name', 'maiden_prior', 'mail_ace_fips_st'
+                         ,'mail_ace_zip', 'mail_addr_suffix', 'mail_addr1', 'mail_addr2', 'mail_cart', 'mail_chk_digit', 'mail_city'
+                         ,'mail_county', 'mail_cr_sort_sz', 'mail_dpbc', 'mail_err_stat', 'mail_fipscounty', 'mail_geo_blk', 'mail_geo_lat'
+                         ,'mail_geo_long', 'mail_geo_match', 'mail_lot', 'mail_lot_order', 'mail_msa', 'mail_p_city_name', 'mail_postdir'
+                         ,'mail_predir', 'mail_prim_name', 'mail_prim_range', 'mail_record_type', 'mail_sec_range', 'mail_st', 'mail_state'
+                         ,'mail_unit_desig', 'mail_v_city_name', 'mail_zip', 'mail_zip4', 'migbird', 'moose', 'motorvoterid'
+                         ,'muzzle', 'nonresident', 'occupation', 'other_phone', 'otherbirds', 'pheasant', 'phone', 'place_of_birth'
+                         ,'poliparty', 'race', 'record_type', 'regdate', 'regioncounty', 'regsource', 'res_county', 'resident'
+                         ,'retarded', 'salmon', 'saltwater', 'seasonannual', 'seniorcit', 'serviceman', 'setlinefish', 'shellfishcrab'
+                         ,'shellfishlobster', 'sikebull', 'skipass', 'smallgame', 'snowmobile', 'source_voterid', 'sportsman', 'steelhead'
+                         ,'sturgeon', 'sturgeon2', 'trap', 'trout', 'turkey', 'votefiller', 'votefiller2', 'voterstatus'
+                         ,'whitejubherring', 'work_phone']));  
+  // DF-21635 - Show counts of blanked out fields in thor_data400::key::hunting_fishing::fcra::qa::rid
+  post_stats_rid := OUTPUT(strata.macf_pops(eMerges.Key_HuntFish_Rid(TRUE),,,,,,FALSE,
+                        ['ace_fips_st', 'active_other', 'active_status', 'agecat', 'antelope', 'anterless', 'archery', 'bear'
+                         ,'biggame', 'bighorn', 'blind', 'bonus', 'buffalo', 'combosuper', 'cougar', 'crewmemeber'
+                         ,'day1', 'day14to15', 'day3', 'day7', 'dayfiller', 'deer', 'disabled', 'drawing'
+                         ,'duck', 'elk', 'fallfishing', 'family', 'fish', 'freshwater', 'goose', 'gun'
+                         ,'headhousehold', 'historyfiller', 'hunt', 'huntfill1', 'huntfiller', 'indian', 'javelina', 'junior'
+                         ,'lakesandresevoirs', 'landowner', 'lifetimepermit', 'lottery', 'lowincome', 'maiden_name', 'maiden_prior', 'mail_ace_fips_st'
+                         ,'mail_ace_zip', 'mail_addr_suffix', 'mail_addr1', 'mail_addr2', 'mail_cart', 'mail_chk_digit', 'mail_city'
+                         ,'mail_county', 'mail_cr_sort_sz', 'mail_dpbc', 'mail_err_stat', 'mail_fipscounty', 'mail_geo_blk', 'mail_geo_lat'
+                         ,'mail_geo_long', 'mail_geo_match', 'mail_lot', 'mail_lot_order', 'mail_msa', 'mail_p_city_name', 'mail_postdir'
+                         ,'mail_predir', 'mail_prim_name', 'mail_prim_range', 'mail_record_type', 'mail_sec_range', 'mail_st', 'mail_state'
+                         ,'mail_unit_desig', 'mail_v_city_name', 'mail_zip', 'mail_zip4', 'migbird', 'moose', 'motorvoterid'
+                         ,'muzzle', 'nonresident', 'occupation', 'other_phone', 'otherbirds', 'pheasant', 'phone', 'place_of_birth'
+                         ,'poliparty', 'race', 'record_type', 'regdate', 'regioncounty', 'regsource', 'res_county', 'resident'
+                         ,'retarded', 'salmon', 'saltwater', 'seasonannual', 'seniorcit', 'serviceman', 'setlinefish', 'shellfishcrab'
+                         ,'shellfishlobster', 'sikebull', 'skipass', 'smallgame', 'snowmobile', 'source_voterid', 'sportsman', 'steelhead'
+                         ,'sturgeon', 'sturgeon2', 'trap', 'trout', 'turkey', 'votefiller', 'votefiller2', 'voterstatus'
+                         ,'whitejubherring', 'work_phone']));  
+
+
 	post_build := sequential(
-													fileservices.startsuperfiletransaction(),
-													fileservices.clearsuperfile('~thor_data400::base::emerges_hunt_BUILT'),
-													fileservices.addsuperfile('~thor_data400::base::emerges_hunt_BUILT','~thor_data400::base::emerges_hunt_BUILDING',0,true),
-													fileservices.clearsuperfile('~thor_Data400::base::emerges_hunt_BUILDING'),
-													fileservices.clearsuperfile('~thor_data400::base::emerges_ccw_BUILT'),
-													fileservices.addsuperfile('~thor_data400::base::emerges_ccw_BUILT','~thor_data400::base::emerges_ccw_BUILDING',0,true),
-													fileservices.clearsuperfile('~thor_Data400::base::emerges_ccw_BUILDING'),
-													fileservices.clearsuperfile('~thor_data400::base::emerges_BUILT'),
-													fileservices.addsuperfile('~thor_data400::base::emerges_BUILT','~thor_data400::base::emerges_BUILDING',0,true),
-													fileservices.clearsuperfile('~thor_Data400::base::emerges_BUILDING'),
-													fileservices.finishsuperfiletransaction()
-													);	
+                              post_stats_dox,
+                              post_stats_did,
+                              post_stats_rid,
+                              fileservices.startsuperfiletransaction(),
+                              fileservices.clearsuperfile('~thor_data400::base::emerges_hunt_BUILT'),
+                              fileservices.addsuperfile('~thor_data400::base::emerges_hunt_BUILT','~thor_data400::base::emerges_hunt_BUILDING',0,true),
+                              fileservices.clearsuperfile('~thor_Data400::base::emerges_hunt_BUILDING'),
+                              fileservices.clearsuperfile('~thor_data400::base::emerges_ccw_BUILT'),
+                              fileservices.addsuperfile('~thor_data400::base::emerges_ccw_BUILT','~thor_data400::base::emerges_ccw_BUILDING',0,true),
+                              fileservices.clearsuperfile('~thor_Data400::base::emerges_ccw_BUILDING'),
+                              fileservices.clearsuperfile('~thor_data400::base::emerges_BUILT'),
+                              fileservices.addsuperfile('~thor_data400::base::emerges_BUILT','~thor_data400::base::emerges_BUILDING',0,true),
+                              fileservices.clearsuperfile('~thor_Data400::base::emerges_BUILDING'),
+                              fileservices.finishsuperfiletransaction()
+                          );	
 GetDops := dops.GetDeployedDatasets('P', 'B', 'F');
 OnlyEmerges:=GetDops(datasetname='FCRA_EmergesKeys');
 father_filedate := OnlyEmerges[1].buildversion;																
@@ -122,7 +182,7 @@ DOPSGrowthCheck.DeltaCommand('~thor_data400::key::ccw::fcra::'+filedate+'::rid',
 DOPSGrowthCheck.ChangesByField('~thor_data400::key::ccw::fcra::'+filedate+'::rid','~thor_data400::key::ccw::fcra::'+father_filedate+'::rid','FCRA_EmergesKeys','key_EmergesCCW_FCRA','emerges.key_ccw_rid(true)','persistent_record_id','',filedate,father_filedate),DOPSGrowthCheck.ChangesByField('~thor_data400::key::hunting_fishing::fcra::'+filedate+'::rid', '~thor_data400::key::hunting_fishing::fcra::'+father_filedate+'::rid', 'FCRA_EmergesKeys','key_HuntFish_FCRA','emerges.Key_HuntFish_Rid(true)', 'persistent_record_id','',filedate,father_filedate),
 DOPSGrowthCheck.PersistenceCheck('~thor_data400::base::emerges_hunt_vote_ccw',  '~thor_data400::base::emerges_hunt_vote_ccw_father',  'FCRA_EmergesKeys',  'key_EmergesCCW_FCRA',  'emerges.layout_hunt_ccw.rHuntCCWCleanAddr_layout',  'persistent_record_id',  Persistent_ID_Hun_CCW,  Persistent_ID_Hun_CCW,  filedate,  father_filedate,  ,  false),DOPSGrowthCheck.PersistenceCheck('~thor_data400::base::emerges_hunt_vote_ccw',  '~thor_data400::base::emerges_hunt_vote_ccw_father',  'FCRA_EmergesKeys',  'key_HuntFish_FCRA',  'emerges.layout_hunt_ccw.rHuntCCWCleanAddr_layout',  'persistent_record_id',  Persistent_ID_Hun_CCW,  Persistent_ID_Hun_CCW,  filedate,  father_filedate,  ,  false)
 );
-												
+													
 	return sequential(build_roxie_keys,
 										// build_moxie_keys,
 										post_build,

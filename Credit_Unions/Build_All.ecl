@@ -3,14 +3,14 @@
 export Build_All(
 
 	 string														pversion
-	,string														pDirectory			= '/data_build_5_2/credit_union/data'
-	,string														pServerIP				= _control.IPAddress.bctlpedata10
-	,string														pFilename				= '*txt'
+	,string														pDirectory				= '/data/data_build_5_2/credit_union/data/'+pversion
+	,string														pServerIP				= _control.IPAddress.bctlpedata11
+	,string														pFilename				= 'Credit_Union_Branch_Information.txt'
 	,string														pGroupName			= _Constants().groupname																		
-	,boolean													pIsTesting			= false
-	,boolean													pOverwrite			= false																															
-	,dataset(Layouts.Input.Sprayed	)	pSprayedFile		= Files().Input.using
-	,dataset(Layouts.Base						)	pBaseFile				= Files().base.qa										
+	,boolean													pIsTesting				= false
+	,boolean													pOverwrite				= false																															
+	,dataset(Layouts.Input.Sprayed	)	pSprayedFile					= Files().Input.using
+	,dataset(Layouts.Base						)	pBaseFile						= Files().base.qa										
 
 ) :=
 function
@@ -26,7 +26,7 @@ function
 		,Promote().Inputfiles.using2used
 		,Promote().Buildfiles.Built2QA
 		,QA_Records()
-		,BIPStats(pversion,'Credit_Unions')
+		//,BIPStats(pversion,'Credit_Unions')
 
 	) : success(Send_Emails(pversion,,not pIsTesting).Roxie), failure(send_emails(pversion,,not pIsTesting).buildfailure);
 	

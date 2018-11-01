@@ -36,16 +36,18 @@ EXPORT Standardize_NameAddr := MODULE
 			InvalidPart  := '%|UNKNOWN|UNKNOWN ADDRESS|PHYSICAL ADDRESS UNKNOWN|PYSICAL ADDRESS UNKNOWN|ADDRESS UNKNOWN|ADRESS UNKNOWN|UNKNOWN, UNKNOWN|ADDRESS UNKNOWN,|!|~';			
    				
 			cleanStreet  := REGEXREPLACE(InvalidPart,L.norm_Address,'');
-			
-			prepAddrLast 	  :=	L.norm_City + 
-														IF(L.norm_City <> '' and L.norm_State <> '', ', ', '') + L.norm_State + ' ' +
-														L.norm_Zip[1..5];
+					
+			prepAddrLast 	  :=	ut.CleanSpacesAndUpper(ut.CleanSpacesAndUpper(L.norm_city) + 
+														IF(L.norm_city <> '' and L.norm_State <> '', ', ', '') + L.norm_State + ' ' +
+													  IF(LENGTH(L.norm_Zip) >= 5 and Stringlib.StringFilterOut(L.norm_Zip[1..5], '0123456789') = ''
+														, L.norm_Zip[1..5], ''));													
 			
 			clean_AddrPrep	:= IF(prepAddrLast <> '', Address.CleanAddress182(cleanStreet, prepAddrLast), '');	
 			Address.Layout_Clean182_fips	clean_AddrRec	:=	transfer(clean_AddrPrep, Address.Layout_Clean182_fips);
 																												 
 			SELF.prep_Addr_line1     := IF(L.NORM_CTRYISOCD = 'USA' 
 			                                and EFX_STATE_TABLE.STATE(L.norm_State) != ''
+			                                and EFX_STATE_TABLE.STATE(L.norm_State) != 'INVALID'
 																			and ut.CleanSpacesAndUpper(clean_AddrPrep[1..64]) not in ['0','.'] 
 																			,Address.Addr1FromComponents(clean_AddrRec.prim_range,
 																																	 clean_AddrRec.predir,
@@ -57,7 +59,8 @@ EXPORT Standardize_NameAddr := MODULE
 																			,'');																																		
 																			
 			SELF.prep_Addr_line_last := IF(L.NORM_CTRYISOCD = 'USA' 
-			                                and EFX_STATE_TABLE.STATE(L.norm_State) != ''												
+			                                and EFX_STATE_TABLE.STATE(L.norm_State) != ''
+			                                and EFX_STATE_TABLE.STATE(L.norm_State) != 'INVALID'
 																		  ,Address.Addr2FromComponents(clean_AddrRec.p_city_name,
 																																	 clean_AddrRec.st,
 																																	 clean_AddrRec.zip)

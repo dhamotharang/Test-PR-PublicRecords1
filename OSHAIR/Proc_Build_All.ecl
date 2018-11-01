@@ -29,9 +29,9 @@ export Proc_Build_All(string filedate, string version) := function
 	//Update DOPS
 	dops_update :=dops.updateversion('OshairKeys', version, _Control.MyInfo.EmailAddressNotify + ';darren.knowles@lexisnexisrisk.com',,'N|B'); 
 
-	//Update ORBIT
-	
-	orbitUpdate := Orbit3.proc_CreateBuild_AddItem('OHSHAIR',filedate,'N|B');
+	//Update ORBIT MAG
+	// Changed from CreateBuild to use CreateBuild_AddItem so that it adds the item at build time
+	orbitUpdate := Orbit3.proc_Orbit3_CreateBuild_AddItem('OSHAIR',filedate,'N|B');
 	return sequential(process_date, 
 										spray_files,
 										oshair.promote(filedate).Inputfiles.Sprayed2Using,

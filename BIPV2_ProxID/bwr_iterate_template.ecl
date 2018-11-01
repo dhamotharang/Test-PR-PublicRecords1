@@ -1,4 +1,4 @@
-//fix prim range overlinking(diff prim ranges linking)
+﻿//fix prim range overlinking(diff prim ranges linking)
 IMPORT BIPV2_PROX_SALT_int_fullfile,SALT24,BIPV2_Tools,bipv2,salt25,tools;
 iteration := '@iteration@';
 pversion  := '@version@';

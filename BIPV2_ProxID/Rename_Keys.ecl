@@ -1,4 +1,4 @@
-import tools;
+﻿import tools;
 fbuildlayout := tools.Layout_FilenameVersions.builds;
 export Rename_Keys(
 	 string									pversion

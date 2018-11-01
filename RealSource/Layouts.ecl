@@ -8,11 +8,11 @@ IMPORT RealSource, AID, address, bipv2;
 		string  Suffix;
 		string  Address;
 		string  City;
-		string2  State;
-		string	 ZipCode; //changed to string vs string5 to catch invalid ziplength
-		string   ZipPlus4;
+		string2 State;
+		string	ZipCode; //changed to string vs string5 to catch invalid ziplength
+		string  ZipPlus4;
 		string10 Phone;
-		string8  DOB;
+		string8 DOB;
 		string  Email;
 		string  IPAddr;
 		string10  Datestamp;
