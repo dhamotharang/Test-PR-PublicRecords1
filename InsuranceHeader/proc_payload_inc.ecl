@@ -79,7 +79,10 @@ IMPORT HEADER , InsuranceHeader_xLink, mdr ,_Control,doxie ;
 																	                  SELF.DT_EFFECTIVE_LAST  := RIGHT.DT_EFFECTIVE_LAST,
                                    ),local) ; 
 
-   Key_InsuranceHeader_DID_Inc := INDEX(Incpayload, {unsigned6 s_did := did}, {Incpayload}-_Control.Layout_KeyExclusions, 
+
+   Incpayload_with_tn := Incpayload + header.fn_tn_corrections_ikb();
+
+   Key_InsuranceHeader_DID_Inc := INDEX(Incpayload_with_tn, {unsigned6 s_did := did}, {Incpayload_with_tn}-_Control.Layout_KeyExclusions, 
 						                            '~thor_data400::key::insuranceheader_xlink::' + doxie.Version_SuperKey + '::did' );
 		
 	 build_payload_inc := BUILDINDEX(Key_InsuranceHeader_DID_Inc, '~thor_data400::key::insuranceheader_xlink::'+filedate+'::did', OVERWRITE);
