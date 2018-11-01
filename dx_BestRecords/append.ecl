@@ -1,4 +1,4 @@
-EXPORT append(did_ds, did_field, permission_type, left_outer = 'true', on_thor = 'false') := FUNCTIONMACRO;
+EXPORT append(did_ds, did_field, permission_type, left_outer = 'true', on_thor = 'false') := FUNCTIONMACRO
 
 	IMPORT ut, watchdog, Infutor, doxie, dx_BestRecords;
 

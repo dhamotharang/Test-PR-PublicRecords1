@@ -1,4 +1,4 @@
-EXPORT get(did_ds, did_field, permission_type, on_thor = 'false') := FUNCTIONMACRO;
+EXPORT get(did_ds, did_field, permission_type, on_thor = 'false') := FUNCTIONMACRO
 
 	IMPORT dx_BestRecords, Doxie;
 
@@ -6,4 +6,4 @@ EXPORT get(did_ds, did_field, permission_type, on_thor = 'false') := FUNCTIONMAC
 	
 	RETURN dx_BestRecords.append(br_slim, did, permission_type, FALSE, on_thor);
 
-endmacro;
+ENDMACRO;

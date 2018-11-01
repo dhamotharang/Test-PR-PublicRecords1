@@ -1,6 +1,6 @@
 EXPORT mac_join (ds, d_field, key, use_dist, left_outer) := FUNCTIONMACRO
 
-	LOCAL out_rec := RECORD(recordof(ds))
+	LOCAL out_rec := RECORD(RECORDOF(ds))
 		dx_BestRecords.layout_best _best;
 	END;
 
@@ -23,9 +23,9 @@ EXPORT mac_join (ds, d_field, key, use_dist, left_outer) := FUNCTIONMACRO
 				SELF._best.age := if (RIGHT.dob = 0, 0, ut.age(RIGHT.dob)),
 				SELF._best := RIGHT,
 				SELF := LEFT),
-			#if (left_outer) 
+			#IF (left_outer) 
 				LEFT OUTER,            
-			#end
+			#END
 			KEEP(1), LIMIT(0))
 	);
 
