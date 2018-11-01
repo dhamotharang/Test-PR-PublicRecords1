@@ -1,8 +1,8 @@
 ﻿import wk_ut,_Control,Data_services,PromoteSupers;
-
+import _control,FraudGovPlatform_Validation;
 EXPORT _CRON_Master_Controller := MODULE
 
-SHARED THOR:=IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		Constants.ThorName_Dev,	Constants.ThorName_Prod);
+SHARED THOR:=IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_Validation.Constants.ThorName_Dev,	FraudGovPlatform_Validation.Constants.ThorName_Prod);
 SHARED valid_state := ['blocked','compiled','submitted','running','wait'];
 
 dummy:='';
