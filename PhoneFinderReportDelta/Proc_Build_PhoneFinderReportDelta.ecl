@@ -327,7 +327,7 @@ EXPORT Proc_Build_PhoneFinderReportDelta(string version, const varstring eclsour
 	//Update DOPs Page///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		dopsUpdate 					:= RoxieKeybuild.UpdateVersion('PhoneFinderRptDelta', version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com', , 'N');
+		dopsUpdate 					:= RoxieKeybuild.UpdateVersion('PhoneFinderRptDeltaKeys', version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com,darren.knowles@lexisnexisrisk.com', , 'N');
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Build Strata Reports for Build/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -374,14 +374,14 @@ EXPORT Proc_Build_PhoneFinderReportDelta(string version, const varstring eclsour
 																								sequential(bkDltTransCompanyRefCode, mvBltDltTransCompanyRefCode, mvQADltTransCompanyRefCode),
 																								sequential(bkDltTransDate, mvBltDltTransDate, mvQADltTransDate),
 																								sequential(bkDltTransPhone, mvBltDltTransPhone, mvQADltTransPhone),
-																								sequential(bkDltIdentLexID, mvBltDltIdentLexID, mvQADltIdentLexID))
-																			)/*, 
-																			dopsUpdate,
-																			buildStrata)*/:
+																								sequential(bkDltIdentLexID, mvBltDltIdentLexID, mvQADltIdentLexID)),
+																			
+																			dopsUpdate)
+																			/*buildStrata)*/:
 																														
 																			//Send Email Notifications
-																			Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com', 'PhoneFinderReportDelta Key Build Succeeded', workunit + ': Build completed.')),
-																			Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com', 'PhoneFinderReportDelta Build Failed', workunit + '\n' + FAILMESSAGE));
+																			Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com,darren.knowles@lexisnexisrisk.com', 'PhoneFinderReportDelta Key Build Succeeded', workunit + ': Build completed.')),
+																			Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com,darren.knowles@lexisnexisrisk.com', 'PhoneFinderReportDelta Build Failed', workunit + '\n' + FAILMESSAGE));
 
 	RETURN sendEmail;
 

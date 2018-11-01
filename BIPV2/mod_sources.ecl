@@ -430,6 +430,13 @@ export mod_sources := module
     ,MDR.sourceTools.set_LnPropertyV2         // S62a
     ,MDR.sourceTools.set_FDIC                 // S62a
     ,MDR.sourceTools.set_bk                   // S62a
+
+    ,MDR.sourceTools.set_vehicles             // S64, 3rd phase of upgrading sources, BH-503
+    ,MDR.sourceTools.set_Yellow_Pages         // S64
+    ,MDR.sourceTools.set_IRS_Non_Profit       // S64
+    ,MDR.sourceTools.set_WC                   // S64
+    ,MDR.sourceTools.set_FAA                  // S64
+    ,MDR.sourceTools.set_Dea                  // S64
 	];
 
 	// These sources participate in the header build, but are excluded
