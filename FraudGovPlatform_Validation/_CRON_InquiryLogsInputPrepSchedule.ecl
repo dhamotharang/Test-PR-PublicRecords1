@@ -1,8 +1,8 @@
 ﻿import _Control;
 
-EVERY_DAY_AT_6AM := '0 6 * * *';
+EVERY_DAY_AT_6AM := '0 10 * * *';
+ThorName	:=		IF(_control.ThisEnvironment.Name		<> 'Prod_Thor',		Constants.ThorName_Dev,	Constants.ThorName_Prod);
 
-ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev_eclcc','thor400_44_eclcc');
 lECL1 :=
  'import ut;\n'
 +'wuname := \'FraudGov InquiryLogs Input Prep\';\n'
@@ -15,7 +15,7 @@ lECL1 :=
 +' 	 ,msg\n'
 +' 	 +\'Build wuid \'+workunit\n'
 +' 	 );\n\n'
-+'valid_state := [\'blocked\',\'running\',\'wait\'];\n'
++'valid_state := [\'blocked\',\'compiled\',\'submitted\',\'running\',\'wait\',\'compiling\'];\n';
 +'d := sort(nothor(WorkunitServices.WorkunitList(\'\',,,wuname,\'\'))(wuid <> thorlib.wuid() and job = wuname and state in valid_state), -wuid);\n'
 +'d_wu := d[1].wuid;\n'
 +'active_workunit :=  exists(d);\n'
