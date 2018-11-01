@@ -1,10 +1,12 @@
 ﻿import _Control,STD;
 
-every_hour_8to5pm := '0 8-17 * * *';
-IP:= FraudGovPlatform_Validation.Constants.LandingZoneServer;
-RootDir := FraudGovPlatform_Validation.Constants.LandingZonePathBase;
+every_hour_8to5pm := '0 12-21 * * *';
+
+IP				:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		_control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
+RootDir		:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		Constants.LandingZonePathBase_dev,	Constants.LandingZonePathBase_prod);
+ThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		Constants.ThorName_Dev,	Constants.ThorName_Prod);
+
 LzFilePath :=FraudGovPlatform_Validation.Constants.LandingZoneFilePathRgx;
-ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev_eclcc','thor400_44_eclcc');
 
 dsFileList:=nothor(FileServices.RemoteDirectory(ip, RootDir,'*.dat',true))(regexfind(LzFilePath,name,nocase)):global(few);
 dsFileListSorted := sort(dsFileList,modified);
@@ -23,7 +25,7 @@ ECL :=
 +' 	 ,msg\n'
 +' 	 +\'Build wuid \'+workunit\n'
 +' 	 );\n\n'
-+'valid_state := [\'submitted\', \'compiling\',\'blocked\',\'running\',\'wait\'];\n'
++'valid_state := [\'blocked\',\'compiled\',\'submitted\',\'running\',\'wait\',\'compiling\'];\n';
 +'d := sort(nothor(WorkunitServices.WorkunitList(\'\',,,wuname,\'\'))(wuid <> thorlib.wuid() and job = wuname and state in valid_state), -wuid);\n'
 +'d_wu := d[1].wuid;\n'
 +'active_workunit :=  exists(d);\n'
