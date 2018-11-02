@@ -13,7 +13,7 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_ALL_La
 			SELF.InputFirstNameEcho := le.InputFirstNameEcho;
 			SELF.InputMiddleNameEcho := le.InputMiddleNameEcho;
 			SELF.InputLastNameEcho := le.InputLastNameEcho;			
-			SELF.InputAddressEcho := le.InputAddressEcho;
+			SELF.InputStreetEcho := le.InputStreetEcho;
 			SELF.InputCityEcho := le.InputCityEcho;
 			SELF.InputStateEcho := le.InputStateEcho; 
 			SELF.InputZipEcho := le.InputZipEcho;
@@ -29,7 +29,7 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_ALL_La
 			SELF.InputDLStateEcho := le.InputDLStateEcho;
      // Clean input
       cleaned_zip       := PublicRecords_KEL.ECL_Functions.Fn_Clean_Zip(le.InputZipEcho);
-      cleaned_Addr      := PublicRecords_KEL.ECL_Functions.Fn_Clean_Address_Roxie(le.InputAddressEcho, le.InputCityEcho, le.InputStateEcho, cleaned_zip);
+      cleaned_Addr      := PublicRecords_KEL.ECL_Functions.Fn_Clean_Address_Roxie(le.InputStreetEcho, le.InputCityEcho, le.InputStateEcho, cleaned_zip);
       cleaned_DL        := PublicRecords_KEL.ECL_Functions.Fn_Clean_DLNumber(le.InputDLNumberEcho);
       cleaned_email     := PublicRecords_KEL.ECL_Functions.Fn_Clean_Email(le.InputEmailEcho);
       cleaned_phone10   := PublicRecords_KEL.ECL_Functions.Fn_Clean_Phone(le.InputHomePhoneEcho);
@@ -55,21 +55,21 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_ALL_La
 		SELF.InputPrefixClean := IsBlank2Fields(NameNotPopulated, Constants.MISSING_INPUT_DATA,
 			cleaned_name.title, Constants.NO_DATA_FOUND);
 
-		SELF.InputPrimaryRangeClean := IsBlank2Fields(le.InputAddressEcho, Constants.MISSING_INPUT_DATA,
+		SELF.InputPrimaryRangeClean := IsBlank2Fields(le.InputStreetEcho, Constants.MISSING_INPUT_DATA,
 				cleaned_Addr.prim_range, Constants.NO_DATA_FOUND);
-		SELF.InputPreDirectionClean :=  IsBlank2Fields(le.InputAddressEcho, Constants.MISSING_INPUT_DATA,
+		SELF.InputPreDirectionClean :=  IsBlank2Fields(le.InputStreetEcho, Constants.MISSING_INPUT_DATA,
 				cleaned_Addr.predir, Constants.NO_DATA_FOUND);
-		SELF.InputPrimaryNameClean := IsBlank2Fields(le.InputAddressEcho, Constants.MISSING_INPUT_DATA,
+		SELF.InputPrimaryNameClean := IsBlank2Fields(le.InputStreetEcho, Constants.MISSING_INPUT_DATA,
 				cleaned_Addr.prim_name, Constants.NO_DATA_FOUND);
-		SELF.InputAddressSuffixClean := IsBlank2Fields(le.InputAddressEcho, Constants.MISSING_INPUT_DATA,
+		SELF.InputAddressSuffixClean := IsBlank2Fields(le.InputStreetEcho, Constants.MISSING_INPUT_DATA,
 				cleaned_Addr.addr_suffix, Constants.NO_DATA_FOUND);
-		SELF.InputPostDirectionClean := IsBlank2Fields(le.InputAddressEcho, Constants.MISSING_INPUT_DATA,
+		SELF.InputPostDirectionClean := IsBlank2Fields(le.InputStreetEcho, Constants.MISSING_INPUT_DATA,
 				cleaned_Addr.postdir, Constants.NO_DATA_FOUND);
-		SELF.InputUnitDesigClean := IsBlank2Fields(le.InputAddressEcho, Constants.MISSING_INPUT_DATA,
+		SELF.InputUnitDesigClean := IsBlank2Fields(le.InputStreetEcho, Constants.MISSING_INPUT_DATA,
 				cleaned_Addr.unit_desig, Constants.NO_DATA_FOUND);
-		SELF.InputSecondaryRangeClean := IsBlank2Fields(le.InputAddressEcho, Constants.MISSING_INPUT_DATA,
+		SELF.InputSecondaryRangeClean := IsBlank2Fields(le.InputStreetEcho, Constants.MISSING_INPUT_DATA,
 				cleaned_Addr.sec_range, Constants.NO_DATA_FOUND);
-		SELF.InputCityNameClean := IsBlank2Fields(le.InputCityEcho, Constants.MISSING_INPUT_DATA,
+		SELF.InputCityClean := IsBlank2Fields(le.InputCityEcho, Constants.MISSING_INPUT_DATA,
 				cleaned_Addr.p_city_name, Constants.NO_DATA_FOUND);
 		SELF.InputStateClean :=  IsBlank2Fields(le.InputStateEcho, Constants.MISSING_INPUT_DATA,
 				cleaned_Addr.st, Constants.NO_DATA_FOUND);
@@ -77,17 +77,17 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_ALL_La
 				cleaned_Addr.zip, Constants.NO_DATA_FOUND);
 		SELF.InputZip4Clean := IsBlank2Fields(le.InputZipEcho[6..9], Constants.MISSING_INPUT_DATA,
 				cleaned_Addr.zip4, Constants.NO_DATA_FOUND);
-		SELF.InputLatitudeClean := IsBlank2Fields(le.InputAddressEcho, Constants.MISSING_INPUT_DATA,
+		SELF.InputLatitudeClean := IsBlank2Fields(le.InputStreetEcho, Constants.MISSING_INPUT_DATA,
 				cleaned_Addr.geo_lat, Constants.NO_DATA_FOUND);
-		SELF.InputLongitudeClean := IsBlank2Fields(le.InputAddressEcho, Constants.MISSING_INPUT_DATA,
+		SELF.InputLongitudeClean := IsBlank2Fields(le.InputStreetEcho, Constants.MISSING_INPUT_DATA,
 				cleaned_Addr.geo_long, Constants.NO_DATA_FOUND);
-		SELF.InputAddressTypeClean := IsBlank2Fields(le.InputAddressEcho, Constants.MISSING_INPUT_DATA,
+		SELF.InputAddressTypeClean := IsBlank2Fields(le.InputStreetEcho, Constants.MISSING_INPUT_DATA,
 				cleaned_Addr.rec_type, Constants.NO_DATA_FOUND);
-		SELF.InputAddressStatusClean :=  IsBlank2Fields(le.InputAddressEcho, Constants.MISSING_INPUT_DATA,
+		SELF.InputAddressStatusClean :=  IsBlank2Fields(le.InputStreetEcho, Constants.MISSING_INPUT_DATA,
 				cleaned_Addr.err_stat, Constants.NO_DATA_FOUND);
-		SELF.InputCountyClean := IsBlank2Fields(le.InputAddressEcho, Constants.MISSING_INPUT_DATA,
+		SELF.InputCountyClean := IsBlank2Fields(le.InputStreetEcho, Constants.MISSING_INPUT_DATA,
 				cleaned_Addr.county, Constants.NO_DATA_FOUND);
-		SELF.InputGeoblockClean := IsBlank2Fields(le.InputAddressEcho, Constants.MISSING_INPUT_DATA,
+		SELF.InputGeoblockClean := IsBlank2Fields(le.InputStreetEcho, Constants.MISSING_INPUT_DATA,
 				cleaned_Addr.geo_blk, Constants.NO_DATA_FOUND);
 
 		SELF.InputEmailClean := IsBlank2Fields(le.InputEmailEcho, Constants.MISSING_INPUT_DATA,

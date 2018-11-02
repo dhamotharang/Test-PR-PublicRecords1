@@ -2,8 +2,8 @@
 
 EXPORT Input_Cleaned_Layout := RECORD
 	INTEGER InputUIDAppend; 
-	INTEGER7 AppendedLexID; 
-	INTEGER2 AppendedLexIDScore;  
+	INTEGER7 LexIDAppend; 
+	INTEGER2 LexIDAppendScore;  
 
 	STRING5  InputPrefixClean;
 	STRING20 InputFirstNameClean;
@@ -18,7 +18,7 @@ EXPORT Input_Cleaned_Layout := RECORD
 	STRING3 InputPostDirectionClean;
 	STRING10 InputUnitDesigClean;
 	STRING8 InputSecondaryRangeClean;
-	STRING25 InputCityNameClean; 
+	STRING25 InputCityClean; 
 	STRING3 InputStateClean;
 	STRING5 InputZip5Clean; 
 	STRING4 InputZip4Clean;

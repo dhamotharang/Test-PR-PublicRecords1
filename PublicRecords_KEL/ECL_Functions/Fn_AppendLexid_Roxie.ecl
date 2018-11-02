@@ -36,7 +36,7 @@ EXPORT Fn_AppendLexid_Roxie(
       SELF.postdir:= LEFT.InputPostDirectionClean;
       SELF.unit_desig:= LEFT.InputUnitDesigClean;
       SELF.sec_range:= LEFT.InputSecondaryRangeClean;
-      SELF.p_city_name:= LEFT.InputCityNameClean;
+      SELF.p_city_name:= LEFT.InputCityClean;
       SELF.st:= LEFT.InputStateClean;
       SELF.z5:= LEFT.InputZip5Clean;
       SELF.zip4:= LEFT.InputZip4Clean;
@@ -50,22 +50,22 @@ EXPORT Fn_AppendLexid_Roxie(
    LEFT.InputUIDAppend = RIGHT.Seq,
     TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_ALL_Layout, 
 			SELF.InputLexIDEcho := LEFT.InputLexIDEcho;
-      SELF.AppendedLexID := RIGHT.Did, 
-      SELF.AppendedLexIDscore := RIGHT.Score,
+      SELF.LexIDAppend := RIGHT.Did, 
+      SELF.LexIDAppendScore := RIGHT.Score,
       SELF.InputUIDAppend := LEFT.InputUIDAppend;
       SELF := LEFT),
    LEFT OUTER);
   
-  dids_with_good_scores := IndataGotDid((INTEGER) AppendedLexIDscore >= Score_threshold);
+  dids_with_good_scores := IndataGotDid((INTEGER) LexIDAppendScore >= Score_threshold);
 
   //Change the lexid and score to be 0 for records below the score threshold
   dids_with_below_scores := DEDUP(SORT(
-    PROJECT(IndataGotDid((INTEGER) AppendedLexIDscore < Score_threshold), 
+    PROJECT(IndataGotDid((INTEGER) LexIDAppendScore < Score_threshold), 
     TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_ALL_Layout, 
-      SELF.AppendedLexID := IF(LEFT.AppendedLexID = 0, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT, LEFT.AppendedLexID);
-      SELF.AppendedLexIDscore := IF(LEFT.AppendedLexIDscore = 0, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT,LEFT.AppendedLexIDscore);, 
+      SELF.LexIDAppend := IF(LEFT.LexIDAppend = 0, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT, LEFT.LexIDAppend);
+      SELF.LexIDAppendScore := IF(LEFT.LexIDAppendScore = 0, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT,LEFT.LexIDAppendScore);, 
       SELF := LEFT))
-      , InputUIDAppend, AppendedLexID), InputUIDAppend);
+      , InputUIDAppend, LexIDAppend), InputUIDAppend);
 
 RETURN dids_with_good_scores + dids_with_below_scores;
 

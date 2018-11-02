@@ -11,7 +11,7 @@ EXPORT Fn_InputEcho_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout_
 		SELF.InputFirstNameEcho:= le.FirstName;
 		SELF.InputMiddleNameEcho:= le.MiddleName;
 		SELF.InputLastNameEcho:= le.LastName;			
-		SELF.InputAddressEcho := le.StreetAddress;
+		SELF.InputStreetEcho := le.StreetAddress;
 		SELF.InputCityEcho := le.City;
 		SELF.InputStateEcho := le.State; 
 		SELF.InputZipEcho := le.Zip;

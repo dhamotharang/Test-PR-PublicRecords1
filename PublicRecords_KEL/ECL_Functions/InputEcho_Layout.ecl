@@ -7,7 +7,7 @@ EXPORT InputEcho_Layout := RECORD
 	STRING65 InputAccountEcho;
 	INTEGER7 InputLexIDEcho;
 	STRING78 InputFirstNameEcho;
-	STRING120 InputAddressEcho;
+	STRING120 InputStreetEcho;
 	STRING50 InputCityEcho;
 	STRING25 InputStateEcho; 
 	STRING10 InputZipEcho;

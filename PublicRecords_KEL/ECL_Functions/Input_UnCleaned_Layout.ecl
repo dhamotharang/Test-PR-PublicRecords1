@@ -7,7 +7,7 @@ EXPORT Input_UnCleaned_Layout := RECORD
 	STRING78 InputFirstNameEcho;
 	STRING78 InputMiddleNameEcho;
 	STRING78 InputLastNameEcho;
-	STRING120 InputAddressEcho;
+	STRING120 InputStreetEcho;
 	STRING50 InputCityEcho;
 	STRING25 InputStateEcho; 
 	STRING10 InputZipEcho;

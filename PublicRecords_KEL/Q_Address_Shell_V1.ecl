@@ -4,9 +4,9 @@ IMPORT B_Address,CFG_Compile,E_Address,E_Zip_Code FROM PublicRecords_KEL;
 IMPORT * FROM KEL011.Null;
 EXPORT Q_Address_Shell_V1(KEL.typ.str __P_PrimaryRange, KEL.typ.str __P_Predirectional, KEL.typ.str __P_PrimaryName, KEL.typ.str __P_Suffix, KEL.typ.str __P_Postdirectional, KEL.typ.uid __P_ZIP5, KEL.typ.str __P_SecondaryRange, CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault) := MODULE
   SHARED TYPEOF(B_Address(__in).__ENH_Address) __ENH_Address := B_Address(__in).__ENH_Address;
-  SHARED __EE112457 := __ENH_Address;
-  SHARED __EE112973 := __EE112457(__T(__AND(__OP2(__CN(__P_PrimaryRange),=,__EE112457.Primary_Range_),__AND(__OP2(__CN(__P_Predirectional),=,__EE112457.Predirectional_),__AND(__OP2(__CN(__P_PrimaryName),=,__EE112457.Primary_Name_),__AND(__OP2(__CN(__P_Suffix),=,__EE112457.Suffix_),__AND(__OP2(__CN(__P_Postdirectional),=,__EE112457.Postdirectional_),__AND(__OP2(__CN(__P_ZIP5),=,__EE112457.Z_I_P5_),__OP2(__CN(__P_SecondaryRange),=,__EE112457.Secondary_Range_)))))))));
-  SHARED __ST6760_Layout := RECORD
+  SHARED __EE113232 := __ENH_Address;
+  SHARED __EE113748 := __EE113232(__T(__AND(__OP2(__CN(__P_PrimaryRange),=,__EE113232.Primary_Range_),__AND(__OP2(__CN(__P_Predirectional),=,__EE113232.Predirectional_),__AND(__OP2(__CN(__P_PrimaryName),=,__EE113232.Primary_Name_),__AND(__OP2(__CN(__P_Suffix),=,__EE113232.Suffix_),__AND(__OP2(__CN(__P_Postdirectional),=,__EE113232.Postdirectional_),__AND(__OP2(__CN(__P_ZIP5),=,__EE113232.Z_I_P5_),__OP2(__CN(__P_SecondaryRange),=,__EE113232.Secondary_Range_)))))))));
+  SHARED __ST6767_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -46,5 +46,5 @@ EXPORT Q_Address_Shell_V1(KEL.typ.str __P_PrimaryRange, KEL.typ.str __P_Predirec
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(__EE112973,__ST6760_Layout));
+  EXPORT Res0 := __UNWRAP(PROJECT(__EE113748,__ST6767_Layout));
 END;
