@@ -47,7 +47,7 @@ EXPORT B_Input_B_I_I_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr Input_First_Name_Echo_;
     KEL.typ.nstr Input_Middle_Name_Echo_;
     KEL.typ.nstr Input_Last_Name_Echo_;
-    KEL.typ.nstr Input_Address_Echo_;
+    KEL.typ.nstr Input_Street_Echo_;
     KEL.typ.nstr Input_City_Echo_;
     KEL.typ.nstr Input_State_Echo_;
     KEL.typ.nstr Input_Zip_Echo_;
@@ -64,8 +64,8 @@ EXPORT B_Input_B_I_I_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr Input_Email_Echo_;
     KEL.typ.nstr Input_Employment_Echo_;
     KEL.typ.nstr Input_Archive_Date_Echo_;
-    KEL.typ.nint Appended_Lex_I_D_;
-    KEL.typ.nint Appended_Lex_I_D_Score_;
+    KEL.typ.nint Lex_I_D_Append_;
+    KEL.typ.nint Lex_I_D_Score_Append_;
     KEL.typ.nstr Input_Prefix_Clean_;
     KEL.typ.nstr Input_First_Name_Clean_;
     KEL.typ.nstr Input_Middle_Name_Clean_;
@@ -78,7 +78,7 @@ EXPORT B_Input_B_I_I_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr Input_Post_Direction_Clean_;
     KEL.typ.nstr Input_Unit_Desig_Clean_;
     KEL.typ.nstr Input_Secondary_Range_Clean_;
-    KEL.typ.nstr Input_City_Name_Clean_;
+    KEL.typ.nstr Input_City_Clean_;
     KEL.typ.nstr Input_State_Clean_;
     KEL.typ.nstr Input_Zip5_Clean_;
     KEL.typ.nstr Input_Zip4_Clean_;
@@ -120,7 +120,7 @@ EXPORT B_Input_B_I_I_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr Input_First_Name_Echo_;
     KEL.typ.nstr Input_Middle_Name_Echo_;
     KEL.typ.nstr Input_Last_Name_Echo_;
-    KEL.typ.nstr Input_Address_Echo_;
+    KEL.typ.nstr Input_Street_Echo_;
     KEL.typ.nstr Input_City_Echo_;
     KEL.typ.nstr Input_State_Echo_;
     KEL.typ.nstr Input_Zip_Echo_;
@@ -137,8 +137,8 @@ EXPORT B_Input_B_I_I_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr Input_Email_Echo_;
     KEL.typ.nstr Input_Employment_Echo_;
     KEL.typ.nstr Input_Archive_Date_Echo_;
-    KEL.typ.nint Appended_Lex_I_D_;
-    KEL.typ.nint Appended_Lex_I_D_Score_;
+    KEL.typ.nint Lex_I_D_Append_;
+    KEL.typ.nint Lex_I_D_Score_Append_;
     KEL.typ.nstr Input_Prefix_Clean_;
     KEL.typ.nstr Input_First_Name_Clean_;
     KEL.typ.nstr Input_Middle_Name_Clean_;
@@ -151,7 +151,7 @@ EXPORT B_Input_B_I_I_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr Input_Post_Direction_Clean_;
     KEL.typ.nstr Input_Unit_Desig_Clean_;
     KEL.typ.nstr Input_Secondary_Range_Clean_;
-    KEL.typ.nstr Input_City_Name_Clean_;
+    KEL.typ.nstr Input_City_Clean_;
     KEL.typ.nstr Input_State_Clean_;
     KEL.typ.nstr Input_Zip5_Clean_;
     KEL.typ.nstr Input_Zip4_Clean_;
