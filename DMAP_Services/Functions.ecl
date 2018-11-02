@@ -49,7 +49,7 @@ EXPORT Functions:= MODULE
       EXPORT boolean ln_branded := FALSE;
       EXPORT boolean probation_override := input_params.Probation_Override_Value;
       EXPORT string5 industry_class := input_params.Industry_Class;
-      EXPORT string ssn_mask := 'NONE';
+      EXPORT string ssn_mask := input_params.ssn_mask_val;
       EXPORT unsigned1 dob_mask := input_params.dob_mask_val;
     END;
 		addr:= Doxie.Comp_Subject_Addresses(dids_in, , , , mod_access).Addresses;
