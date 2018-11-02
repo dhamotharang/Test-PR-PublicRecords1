@@ -1,4 +1,4 @@
-
+﻿
 
 vxml := PROJECT(File_Sam, sam.XForm(LEFT, COUNTER));
 
@@ -47,5 +47,5 @@ SpraySam(version),
 oxml,
 //OUTPUT(COUNT(File_Converted),named('n_result')),							// should equl n_parent
 //OUTPUT(TABLE(Sam.File_Converted, {Sam.File_Converted.type, n := COUNT(GROUP)}, type)),	// sanity check
-Despray('~thor::out::sam::results', 'bctlpedata10.risk.regn.net','/data/hds_3/sam/output/sam.xml')
+Despray('~thor::out::sam::results', _Control.IPAddress.bctlpedata10,'/data/hds_3/sam/output/sam.xml')
 );

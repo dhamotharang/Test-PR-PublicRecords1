@@ -1,5 +1,5 @@
-import	STD;
-	destinationIP := 'bctlpedata10.risk.regn.net';
+﻿import	STD;
+	destinationIP := _Control.IPAddress.bctlpedata10;
 	destinationpath := '/data/hds_3/uniqueid/output/';
 
 EXPORT  UnsprayGeo(integer i) :=
