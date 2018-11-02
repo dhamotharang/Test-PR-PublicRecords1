@@ -7,7 +7,7 @@ IMPORT didville, PublicRecords_KEL;
 // this function will take the input data, append the DID and do all default values in layout output
 EXPORT Fn_AppendLexid_Roxie(
 							DATASET(PublicRecords_KEL.ECL_Functions.Input_ALL_Layout) indata,
-              INTEGER Score_threshold = 80
+							PublicRecords_KEL.Interface_Options Options
 					) := FUNCTION
 
   dedup_these := FALSE; //allow multiple DID's
@@ -56,11 +56,11 @@ EXPORT Fn_AppendLexid_Roxie(
       SELF := LEFT),
    LEFT OUTER);
   
-  dids_with_good_scores := IndataGotDid((INTEGER) LexIDAppendScore >= Score_threshold);
+  dids_with_good_scores := IndataGotDid((INTEGER) LexIDAppendScore >= Options.ScoreThreshold);
 
   //Change the lexid and score to be 0 for records below the score threshold
   dids_with_below_scores := DEDUP(SORT(
-    PROJECT(IndataGotDid((INTEGER) LexIDAppendScore < Score_threshold), 
+    PROJECT(IndataGotDid((INTEGER) LexIDAppendScore < Options.ScoreThreshold), 
     TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_ALL_Layout, 
       SELF.LexIDAppend := IF(LEFT.LexIDAppend = 0, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT, LEFT.LexIDAppend);
       SELF.LexIDAppendScore := IF(LEFT.LexIDAppendScore = 0, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT,LEFT.LexIDAppendScore);, 
