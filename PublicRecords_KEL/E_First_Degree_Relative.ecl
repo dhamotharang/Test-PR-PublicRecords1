@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 0.11.6
+﻿//HPCC Systems KEL Compiler Version 0.11.4
 IMPORT KEL011 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile,E_Person FROM PublicRecords_KEL;
@@ -45,16 +45,16 @@ EXPORT E_First_Degree_Relative(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefa
   EXPORT Relative__Orphan := JOIN(InData(__NN(Relative_)),E_Person(__in,__cfg).__Result,__EEQP(LEFT.Relative_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT SanityCheck := DATASET([{COUNT(Subject__Orphan),COUNT(Relative__Orphan)}],{KEL.typ.int Subject__Orphan,KEL.typ.int Relative__Orphan});
   EXPORT NullCounts := DATASET([
-    {'FirstDegreeRelative','PublicRecords_KEL.ECL_Functions.Blank_DataSet','LexID',COUNT(__d0(__NL(Subject_))),COUNT(__d0(__NN(Subject_)))},
-    {'FirstDegreeRelative','PublicRecords_KEL.ECL_Functions.Blank_DataSet','LexID',COUNT(__d0(__NL(Relative_))),COUNT(__d0(__NN(Relative_)))},
-    {'FirstDegreeRelative','PublicRecords_KEL.ECL_Functions.Blank_DataSet','Title',COUNT(__d0(__NL(Title_))),COUNT(__d0(__NN(Title_)))},
-    {'FirstDegreeRelative','PublicRecords_KEL.ECL_Functions.Blank_DataSet','RelationshipType',COUNT(__d0(__NL(Relationship_Type_))),COUNT(__d0(__NN(Relationship_Type_)))},
-    {'FirstDegreeRelative','PublicRecords_KEL.ECL_Functions.Blank_DataSet','RelationshipConfidence',COUNT(__d0(__NL(Relationship_Confidence_))),COUNT(__d0(__NN(Relationship_Confidence_)))},
-    {'FirstDegreeRelative','PublicRecords_KEL.ECL_Functions.Blank_DataSet','RelationshipScore',COUNT(__d0(__NL(Relationship_Score_))),COUNT(__d0(__NN(Relationship_Score_)))},
-    {'FirstDegreeRelative','PublicRecords_KEL.ECL_Functions.Blank_DataSet','Generation',COUNT(__d0(__NL(Generation_))),COUNT(__d0(__NN(Generation_)))},
-    {'FirstDegreeRelative','PublicRecords_KEL.ECL_Functions.Blank_DataSet','RelationshipDateFirstSeen',COUNT(__d0(__NL(Relationship_Date_First_Seen_))),COUNT(__d0(__NN(Relationship_Date_First_Seen_)))},
-    {'FirstDegreeRelative','PublicRecords_KEL.ECL_Functions.Blank_DataSet','RelationshipDateLastSeen',COUNT(__d0(__NL(Relationship_Date_Last_Seen_))),COUNT(__d0(__NN(Relationship_Date_Last_Seen_)))},
-    {'FirstDegreeRelative','PublicRecords_KEL.ECL_Functions.Blank_DataSet','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
-    {'FirstDegreeRelative','PublicRecords_KEL.ECL_Functions.Blank_DataSet','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))}]
+    {'FirstDegreeRelative','PublicRecords_KEL.ECL_Functions.Dataset_FDC','LexID',COUNT(__d0(__NL(Subject_))),COUNT(__d0(__NN(Subject_)))},
+    {'FirstDegreeRelative','PublicRecords_KEL.ECL_Functions.Dataset_FDC','LexID',COUNT(__d0(__NL(Relative_))),COUNT(__d0(__NN(Relative_)))},
+    {'FirstDegreeRelative','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Title',COUNT(__d0(__NL(Title_))),COUNT(__d0(__NN(Title_)))},
+    {'FirstDegreeRelative','PublicRecords_KEL.ECL_Functions.Dataset_FDC','RelationshipType',COUNT(__d0(__NL(Relationship_Type_))),COUNT(__d0(__NN(Relationship_Type_)))},
+    {'FirstDegreeRelative','PublicRecords_KEL.ECL_Functions.Dataset_FDC','RelationshipConfidence',COUNT(__d0(__NL(Relationship_Confidence_))),COUNT(__d0(__NN(Relationship_Confidence_)))},
+    {'FirstDegreeRelative','PublicRecords_KEL.ECL_Functions.Dataset_FDC','RelationshipScore',COUNT(__d0(__NL(Relationship_Score_))),COUNT(__d0(__NN(Relationship_Score_)))},
+    {'FirstDegreeRelative','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Generation',COUNT(__d0(__NL(Generation_))),COUNT(__d0(__NN(Generation_)))},
+    {'FirstDegreeRelative','PublicRecords_KEL.ECL_Functions.Dataset_FDC','RelationshipDateFirstSeen',COUNT(__d0(__NL(Relationship_Date_First_Seen_))),COUNT(__d0(__NN(Relationship_Date_First_Seen_)))},
+    {'FirstDegreeRelative','PublicRecords_KEL.ECL_Functions.Dataset_FDC','RelationshipDateLastSeen',COUNT(__d0(__NL(Relationship_Date_Last_Seen_))),COUNT(__d0(__NN(Relationship_Date_Last_Seen_)))},
+    {'FirstDegreeRelative','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
+    {'FirstDegreeRelative','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;
