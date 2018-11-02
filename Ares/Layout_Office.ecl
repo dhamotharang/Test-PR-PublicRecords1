@@ -4,6 +4,9 @@
 end;
 layout_names := record
 	string officeSortKey {xpath('officeSortKey')};
+	string officeTitlePrefix {xpath('officeTitlePrefix')};
+	string officeTitleSuffix {xpath('officeTitleSuffix')};
+	string officeTitleOverride {xpath('officeTitleOverride')};
 	dataset(layout_name) names{xpath('name')};
 End;
 layout_type := Record
@@ -32,8 +35,17 @@ layout_location := Record
 	dataset(layout_telecom) telecom {xpath('telecom')};
 End;
 
+layout_identifier := Record
+	string fid {xpath('@fid')};
+	string transferable {xpath('@transferable')};
+	string type {xpath('type')};
+	string value {xpath('value')};
+	string status {xpath('status')};
+End;
+
 layout_summary := record
 	dataset(layout_type) types{xpath('types/type')};
+	dataset(layout_identifier) identifiers {xpath('identifiers/identifier')};
 	layout_names names{xpath('names')};
 	string principalOffice {xpath('principalOffice')};
 	string leadLocation {xpath('leadLocation')};
