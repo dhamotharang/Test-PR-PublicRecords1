@@ -26,7 +26,7 @@ export MAC_BestAppend(infile,
 										) := MACRO
 										
 import didville, suppress, doxie, doxie_files, DeathV2_Services, AutoStandardI, SSNBest_Services,
-       watchdog, did_add, header_slimsort, ut, STD;
+       watchdog, did_add, header_slimsort, ut, STD, dx_BestRecords;
 
 os(string i) := if (i='','',trim(i)+' ');
 #uniquename(deathparams)
@@ -52,9 +52,11 @@ os(string i) := if (i='','',trim(i)+' ');
 %perm_flag% := dx_BestRecords.fn_get_perm_type(glb, UseNonBlankKey, %utility_flag%, %pre_glb_flag%, 
 	%filter_exp%, %filter_eq%, marketing, %cnsmr_flag%);
 
-#uniquename(add_flds)
-typeof(infile) %add_flds%(infile le, dx_BestRecords.layout_best ri, string options) := transform
-	self.best_phone := if ((glb and ~marketing) or ~clickdata, if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_PHONE',1)=0 or ri.glb_phone = 'N','', ri.phone ), le.best_phone);
+#uniquename(add_flds_marketing)
+typeof(infile) %add_flds_marketing%(infile le, dx_BestRecords.layout_best ri, string options) := transform
+  #if (not clickdata)
+		self.best_phone := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_PHONE',1)=0 or ri.glb_phone = 'N','', ri.phone );
+	#end
   self.best_ssn := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_SSN',1)=0 or ri.glb_ssn = 'N','', ri.ssn );
   //self.best_name := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','', os(ri.title)+os(ri.fname)+os(ri.mname)+os(ri.lname)+os(ri.NAME_suffix) );
   self.best_title := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','',ri.title);
@@ -69,10 +71,12 @@ typeof(infile) %add_flds%(infile le, dx_BestRecords.layout_best ri, string optio
   self.best_zip := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','',ri.zip);
   self.best_zip4 := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','',ri.zip4);
   self.best_addr_date := if ( stringlib.stringfind(options,'BEST_ALL',1)= 0 and stringlib.stringfind(options,'BEST_ADDRESS_DATE',1) = 0 or ri.glb_address = 'N',0,ri.addr_dt_last_seen);
-	self.best_prim_range := if (clickdata and marketing, if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','', os(ri.prim_range) ), le.best_prim_range);
-	self.best_prim_name := if (clickdata and marketing, if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','', os(ri.prim_name) ), le.best_prim_name);
-	self.best_sec_range := if (clickdata and marketing, if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','', os(ri.sec_range) ), le.best_sec_range);
-	self.best_addr_date_first_seen := if (clickdata and (marketing or ~glb), if ( stringlib.stringfind(options,'BEST_ALL',1)= 0 and stringlib.stringfind(options,'BEST_ADDRESS_DATE',1) = 0 or ri.glb_address = 'N',0,ri.addr_dt_first_seen), le.best_addr_date_first_seen);
+  #if(clickdata)
+		self.best_prim_range := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','', os(ri.prim_range) );
+		self.best_prim_name := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','', os(ri.prim_name) );
+		self.best_sec_range := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','', os(ri.sec_range) );
+		self.best_addr_date_first_seen := if ( stringlib.stringfind(options,'BEST_ALL',1)= 0 and stringlib.stringfind(options,'BEST_ADDRESS_DATE',1) = 0 or ri.glb_address = 'N',0,ri.addr_dt_first_seen);
+	#end
   self.best_dob := (string8)if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_DOB',1)=0 or ri.glb_dob = 'N','',if(ri.dob<0,'',(string8)ri.dob));
   self.best_dod := (string8)if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_DOD',1)=0,'',ri.dod);
   self.verify_best_phone := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_PHONE',1)=0,255, did_add.phone_match_score(le.phone10,ri.phone));
@@ -83,11 +87,80 @@ typeof(infile) %add_flds%(infile le, dx_BestRecords.layout_best ri, string optio
   self.verify_best_dob := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_DOB',1)=0,255,did_add.dob_match_score((integer)le.dob,(integer)ri.dob));
   self := le;
 end;
+  
+#uniquename(add_flds_nonglb)
+typeof(infile) %add_flds_nonglb%(infile le, dx_BestRecords.layout_best ri, string options) := transform
+  #if (not clickdata)
+		self.best_phone := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_PHONE',1)=0 or ri.glb_phone = 'N','', ri.phone );
+	#end
+  self.best_ssn := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_SSN',1)=0 or ri.glb_ssn = 'N','', ri.ssn );
+  //self.best_name := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','', os(ri.title)+os(ri.fname)+os(ri.mname)+os(ri.lname)+os(ri.NAME_suffix) );
+  self.best_title := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','',ri.title);
+  self.best_fname := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','',ri.fname);
+  self.best_mname := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','',ri.mname);
+  self.best_lname :=if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','',ri.lname);
+  self.best_name_suffix := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0 or ri.glb_name = 'N','',ri.name_suffix);
+  self.best_addr1 := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','', os(ri.prim_range)+os(ri.predir)+os(ri.prim_name)+os(ri.suffix)+os(ri.postdir)+IF(Std.Str.EndsWith(ri.prim_name,os(ri.unit_desig)+os(ri.sec_range)),'',os(ri.unit_desig)+os(ri.sec_range)) );
+  //self.best_addr2 := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','', os(ri.city_name)+os(ri.st)+ri.zip+IF(ri.zip4<>'','-'+ri.zip4,'') );
+  self.best_city :=if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','',ri.city_name);
+  self.best_state := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','',ri.st);
+  self.best_zip := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','',ri.zip);
+  self.best_zip4 := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0 or ri.glb_address = 'N','',ri.zip4);
+  self.best_addr_date := if ( stringlib.stringfind(options,'BEST_ALL',1)= 0 and stringlib.stringfind(options,'BEST_ADDRESS_DATE',1) = 0 or ri.glb_address = 'N',0,ri.addr_dt_last_seen);
+  #if(clickdata)
+		self.best_addr_date_first_seen := if ( stringlib.stringfind(options,'BEST_ALL',1)= 0 and stringlib.stringfind(options,'BEST_ADDRESS_DATE',1) = 0 or ri.glb_address = 'N',0,ri.addr_dt_first_seen);
+	#end
+  self.best_dob := (string8)if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_DOB',1)=0 or ri.glb_dob = 'N','',if(ri.dob<0,'',(string8)ri.dob));
+  self.best_dod := (string8)if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_DOD',1)=0,'',ri.dod);
+  self.verify_best_phone := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_PHONE',1)=0,255, did_add.phone_match_score(le.phone10,ri.phone));
+  self.verify_best_ssn := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_SSN',1)=0 and stringlib.stringfind(verify,'FUZZY_SSN',1) = 0, 255,
+						if (stringlib.stringfind(verify,'FUZZY_SSN',1) != 0, did_add.ssn_match_score(le.ssn, ri.ssn, true), did_add.ssn_match_score(le.ssn,ri.ssn)));
+  self.verify_best_name := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_NAME',1)=0,255, did_add.name_match_score(le.fname,le.mname,le.lname,ri.fname,ri.mname,ri.lname));
+  self.verify_best_address := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_ADDR',1)=0,255, did_add.Address_Match_Score(le.prim_range,le.prim_name,le.sec_range,le.z5,ri.prim_range,ri.prim_name,ri.sec_range,ri.zip,le.zip4,ri.zip4) );
+  self.verify_best_dob := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_DOB',1)=0,255,did_add.dob_match_score((integer)le.dob,(integer)ri.dob));
+  self := le;
+end;
+
+#uniquename(add_flds_glb)
+typeof(infile) %add_flds_glb%(infile le, dx_BestRecords.layout_best ri, string options) := transform
+	self.best_phone := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_PHONE',1)=0,'', ri.phone );
+	self.best_ssn := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_SSN',1)=0,'', ri.ssn );
+	//self.best_name := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0,'', os(ri.title)+os(ri.fname)+os(ri.mname)+os(ri.lname)+os(ri.NAME_suffix) );
+	self.best_title := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0,'',ri.title);
+	self.best_fname := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0,'',ri.fname);
+	self.best_mname := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0,'',ri.mname);
+	self.best_lname :=if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0,'',ri.lname);
+	self.best_name_suffix := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0,'',ri.name_suffix);
+	self.best_addr1 := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0,'', os(ri.prim_range)+os(ri.predir)+os(ri.prim_name)+os(ri.suffix)+os(ri.postdir)+IF(Std.Str.EndsWith(ri.prim_name,os(ri.unit_desig)+os(ri.sec_range)),'',os(ri.unit_desig)+os(ri.sec_range)) );
+	//self.best_addr2 := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0,'', os(ri.city_name)+os(ri.st)+ri.zip+IF(ri.zip4<>'','-'+ri.zip4,'') );
+	self.best_city :=if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0,'',ri.city_name);
+	self.best_state := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0,'',ri.st);
+	self.best_zip := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0,'',ri.zip);
+	self.best_zip4 := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0,'',ri.zip4);
+	self.best_addr_date := if ( stringlib.stringfind(options,'BEST_ALL',1)= 0 and stringlib.stringfind(options,'BEST_ADDRESS_DATE',1) = 0,0,ri.addr_dt_last_seen);
+	self.best_dob := (string8)if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_DOB',1)=0,'',if(ri.dob<0,'',(string8)ri.dob));
+	self.best_dod := (string8)if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_DOD',1)=0,'',ri.dod);
+	self.verify_best_phone := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_PHONE',1)=0,255, did_add.phone_match_score(le.phone10,ri.phone));
+	self.verify_best_ssn := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_SSN',1)=0 and stringlib.stringfind(verify,'FUZZY_SSN',1) = 0, 255,
+	if (stringlib.stringfind(verify,'FUZZY_SSN',1) != 0, did_add.ssn_match_score(le.ssn, ri.ssn, true), did_add.ssn_match_score(le.ssn,ri.ssn)));
+	self.verify_best_name := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_NAME',1)=0,255, did_add.name_match_score(le.fname,le.mname,le.lname,ri.fname,ri.mname,ri.lname));
+	self.verify_best_address := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_ADDR',1)=0,255, did_add.Address_Match_Score(le.prim_range,le.prim_name,le.sec_range,le.z5,ri.prim_range,ri.prim_name,ri.sec_range,ri.zip,le.zip4,ri.zip4) );
+	self.verify_best_dob := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_DOB',1)=0,255,did_add.dob_match_score((integer)le.dob,(integer)ri.dob));
+	self := le;
+end;
 
 // append best record informtion and transform to output format
 #uniquename(best_recs)
 %best_recs% := dx_BestRecords.append(infile, did, %perm_flag%);
-outfi := UNGROUP(project(%best_recs%, %add_flds%(left, left._best, supply)));
+
+#uniquename(recs_proj)
+%recs_proj% := MAP(
+	marketing => project(%best_recs%, %add_flds_marketing%(left, left._best, supply)), 
+	~glb => project(%best_recs%, %add_flds_nonglb%(left, left._best, supply)), 
+	project(%best_recs%, %add_flds_glb%(left, left._best, supply))
+);
+
+outfi := UNGROUP(%recs_proj%);
 			 
 typeof(infile) strip_thresh(infile le) := transform
   #if (not clickdata)

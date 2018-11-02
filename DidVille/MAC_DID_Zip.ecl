@@ -3,6 +3,8 @@ Made roxie friendl(ier) ... avoid flag in # statement
 */
 export MAC_DID_Zip(inrec,outrec,best_appended) := macro
 
+import dx_BestRecords;
+
 #uniquename(k)
 #uniquename(r)
 %k% := Doxie.Key_Zip_Did;
@@ -113,7 +115,7 @@ end;
 #uniquename(os)
 #uniquename(add_flds)
 %os%(string i) := if (i='','',trim(i)+' ');
-%pre_out% %add_flds%(%pre_out% le, watchdog.Key_Watchdog_nonglb ri) := transform
+%pre_out% %add_flds%(%pre_out% le, dx_BestRecords.layout_best ri) := transform
   self.best_phone :=  ri.phone;
   self.best_ssn :=  ri.ssn;
   self.best_name :=  %os%(ri.title)+%os%(ri.fname)+%os%(ri.mname)+%os%(ri.lname)+%os%(ri.NAME_suffix);
@@ -127,9 +129,11 @@ end;
   self := le;
 end;
 
+#uniquename(brecs)
 #uniquename(jt)
 #uniquename(sjt)
-%jt% := join(%pre_out%,watchdog.Key_Watchdog_nonglb,left.did<>0 and left.did = right.did,%add_flds%(LEFT,RIGHT),left outer);
+%brecs% := dx_BestRecords.append(%pre_out%, did, dx_BestRecords.Constants.perm_type.nonglb);
+%jt% := project(%brecs%, %add_flds%(left, left._best));
 %sjt% := sort(%jt%,-confidence);
 
 
