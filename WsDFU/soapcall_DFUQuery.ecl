@@ -2,8 +2,8 @@
 // #option('maxLength', 131072); // have to increase for the remote directory child datasets
 //////////////////////////////////////////////////////////////////////////////////////////////
 export soapcall_DFUQuery(
-  string   pFileName               = ''
-  ,string   pesp                    = 'dataland_esp.br.seisint.com'
+   string   pFileName               = ''
+  ,string   pesp                    = _Config.LocalEsp
 ) :=
 function
 
@@ -20,10 +20,10 @@ function
     INTEGER  FileSizeFrom          {xpath('FileSizeFrom'         )} := -1;
     INTEGER  FileSizeTo            {xpath('FileSizeTo'           )} := -1;
     INTEGER  FirstN                {xpath('FirstN'               )} := -1;
-    UNSIGNED PageSize              {xpath('PageSize'             )} := 10000;
+    UNSIGNED PageSize              {xpath('PageSize'             )} := 0;
     UNSIGNED PageStartFrom         {xpath('PageStartFrom'        )} := 0;
-    STRING   Sortby                {xpath('Sortby'               )} := 'Modified';
-    BOOLEAN  Descending            {xpath('Descending'           )} := true;
+    STRING   Sortby                {xpath('Sortby'               )} := '';
+    BOOLEAN  Descending            {xpath('Descending'           )} := false;
     BOOLEAN  OneLevelDirFileReturn {xpath('OneLevelDirFileReturn')} := false;
     UNSIGNED CacheHint             {xpath('CacheHint'            )} := 0;
     UNSIGNED MaxNumberOfFiles      {xpath('MaxNumberOfFiles'     )} := 0;
