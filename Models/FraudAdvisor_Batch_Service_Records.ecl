@@ -81,7 +81,11 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 			self.phone10 := le.Home_Phone;
 			self.wphone10 := le.Work_Phone;
 			
-			cleaned_name := address.CleanPerson73(le.UnParsedFullName);
+      //Use LFM format name cleaning for Paro
+      cleaned_name := IF(doParo or model_name IN models.FraudAdvisor_Constants.Paro_models,
+                             Address.CleanPersonLFM73(le.UnParsedFullName), 
+                             Address.CleanPerson73(le.UnParsedFullName)
+                        );
 			boolean valid_cleaned := le.UnParsedFullName <> '';
 			
 			self.fname := stringlib.stringtouppercase(if(le.Name_First='' AND valid_cleaned, cleaned_name[6..25], le.Name_First));
