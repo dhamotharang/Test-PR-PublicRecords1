@@ -2,8 +2,7 @@
 EVERY_DAY_AT_530PM := '30 21 * * *';
 
 IP			:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
-ThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor', Constants.ThorName_Dev,	Constants.ThorName_Prod);
-
+ThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_Validation.Constants.ThorName_Dev,	FraudGovPlatform_Validation.Constants.ThorName_Prod);
 lECL1 :=
  'import ut;\n'
 +'#CONSTANT	(\'Platform\',\'FraudGov\');\n'
