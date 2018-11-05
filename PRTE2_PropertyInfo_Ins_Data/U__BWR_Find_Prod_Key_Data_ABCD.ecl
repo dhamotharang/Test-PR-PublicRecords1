@@ -10,7 +10,7 @@ IMPORT PRTE2_Common;
 Add_Foreign_prod := PRTE2_Common.Constants.Add_Foreign_prod;
 AddrKey := PropertyCharacteristics.Key_PropChar_Address;
 RidKey 	:= PropertyCharacteristics.Key_PropChar_RID;
-salt311.MAC_Profile(RidKey);
+// salt311.MAC_Profile(RidKey);
 
 q_prange	:= '10';
 q_pname		:= '1st';
