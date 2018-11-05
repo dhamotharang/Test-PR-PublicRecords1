@@ -75,7 +75,7 @@ bad_sample := Sequential ( if ( count(stats (  issue_date_badcount > 0   )) > 0 
 						 );
 
  export out_all  :=  Sequential (  output(choosen(stats,1000) , named('PL_InputStats')),
-                                                          if ( count( bad_stats)  > 0  , Sequential ( bad_sample, Output(bad_stats_vendor,named ('Bad_Vendor_Set')), Output(bad_stats_source,named ('Bad_Source_Set')),
+                                                          if ( count( bad_stats)  > 100  , Sequential ( bad_sample, Output(bad_stats_vendor,named ('Bad_Vendor_Set')), Output(bad_stats_source,named ('Bad_Source_Set')),
                                                                                                                                  FAIL( 'Vendor : '+bad_stats[1].vendor+ ' , source st:' +bad_stats[1].source_st+' modified layout.Please verify')
 																							 )
 										          )
