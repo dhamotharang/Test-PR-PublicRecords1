@@ -200,12 +200,12 @@ layout_gploc final_xform(w_current_assets l) := Transform
 	self.City_Town := l.city_name;
 	self.State_Province_Region_Abbreviated := l.st_prov_rgn_abbv;
 	self.State_Province_Region_Full := l.st_prov_rgn;
-	self.Postal_Code := l.postal_code;
+	self.Postal_Code := IF (l.country_iso2 = 'US', l.postal_code[1..5], l.postal_code);
 	self.Country_Name_Full := l.country_name;
 	self.employer_tax_id  := l.employer_tax_id;
 	self.Head_Office_Accuity_Location_ID := l.headoffice_tfpuid;
-	self.Current_Assets := l.current_assets;
-	self.Date_of_Financials := l.latest_fin_dt;
+	self.Current_Assets := REALFORMAT((REAL)l.current_assets, 14, 0);
+	self.Date_of_Financials := if (l.current_assets != '' and l.latest_fin_dt != '', l.latest_fin_dt, '00000000');
 	self.Institution_Identifier := std.str.splitwords(l.tfpid, '-')[1];
 End;
 	final := Project(w_current_assets, final_xform(left));
