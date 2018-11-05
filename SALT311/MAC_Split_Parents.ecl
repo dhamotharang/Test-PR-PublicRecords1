@@ -16,5 +16,5 @@ EXPORT MAC_Split_Parents(infile,patchfile,did_name,pid_name,o) := MACRO
 		infile, %pids%,
 		LEFT.pid_name=RIGHT.pid_name,
 		TRANSFORM(RECORDOF(LEFT),SELF.pid_name:=if(RIGHT.pid_name != 0  ,LEFT.did_name  ,LEFT.pid_name),SELF:=LEFT),
-		LEFT OUTER, KEEP(1));
+		LEFT OUTER, KEEP(1),hash);
 ENDMACRO;

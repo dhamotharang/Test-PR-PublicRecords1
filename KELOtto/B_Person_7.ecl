@@ -4,8 +4,8 @@ IMPORT E_Customer,E_Person FROM KELOtto;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Person_7 := MODULE
   SHARED VIRTUAL TYPEOF(E_Person.__Result) __E_Person := E_Person.__Result;
-  SHARED __EE9814 := __E_Person;
-  EXPORT __ST9655_Layout := RECORD
+  SHARED __EE14343 := __E_Person;
+  EXPORT __ST14184_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.nint Lex_Id_;
@@ -74,9 +74,9 @@ EXPORT B_Person_7 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST9655_Layout __ND10517__Project(E_Person.Layout __PP9817) := TRANSFORM
-    SELF.Deceased_ := MAP(__T(__FN1(KEL.Routines.IsValidDate,__PP9817.Deceased_Date_))=>1,0);
-    SELF := __PP9817;
+  SHARED __ST14184_Layout __ND15046__Project(E_Person.Layout __PP14346) := TRANSFORM
+    SELF.Deceased_ := MAP(__T(__FN1(KEL.Routines.IsValidDate,__PP14346.Deceased_Date_))=>1,0);
+    SELF := __PP14346;
   END;
-  EXPORT __ENH_Person_7 := PROJECT(__EE9814,__ND10517__Project(LEFT));
+  EXPORT __ENH_Person_7 := PROJECT(__EE14343,__ND15046__Project(LEFT));
 END;
