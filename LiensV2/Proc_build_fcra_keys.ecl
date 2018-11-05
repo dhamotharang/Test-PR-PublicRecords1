@@ -1,4 +1,5 @@
-﻿import RoxieKeybuild,doxie_files,ut,PromoteSupers,Orbit3,DopsGrowthCheck,dops;
+﻿import RoxieKeybuild,doxie_files,ut,PromoteSupers,Orbit3,DopsGrowthCheck,dops,strata;
+
 export Proc_build_fcra_keys(string filedate) := function
 
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(doxie_files.Key_BocaShell_LiensV3_FCRA,'~thor_data400::key::liensv2::fcra::bocashell_did_v2','~thor_data400::key::liensv2::fcra::'+filedate+'::bocashell_did_v2',fcra_bshell_did_key3);
@@ -49,6 +50,16 @@ DOPSGrowthCheck.ChangesByField('~thor_data400::key::liensv2::fcra::'+filedate+':
 DopsGrowthCheck.PersistenceCheck('~thor_data400::key::liensv2::fcra::'+filedate+'::main::tmsid.rmsid','~thor_data400::key::liensv2::fcra::'+OnlyLiens[1].buildversion+'::main::tmsid.rmsid','FCRA_LiensV2Keys','key_liens_main_ID_FCRA','liensv2.key_liens_main_ID_FCRA','persistent_record_id',InputSet,DistSet,filedate,OnlyLiens[1].buildversion)
 );
 
+//DF-22188 - Verify to be deprecated fields are 0 or blank
+cnt_fcra_main_id := OUTPUT(strata.macf_pops(LiensV2.key_liens_main_ID_FCRA,,,,,,FALSE,
+																													['accident_date','accident_date','agency_city','case_title','date_vendor_removed','filing_time',
+																													 'judg_vacated_date','judge','lapse_date','legal_block','legal_borough',
+																													 'legal_lot','sherrif_indc','tax_code','vendor_entry_date']));
+cnt_fcra_party_id := OUTPUT(strata.macf_pops(LiensV2.key_liens_party_id_FCRA,,,,,,FALSE,
+																													['phone','tax_id']));
+cnt_fcra_autokey_payload := OUTPUT(strata.macf_pops(LiensV2.key_fcra_liens_autokeypayload,,,,,,FALSE,
+																						['tax_id']));
+
 build_fcra_keys := sequential(
 															parallel(
 															fcra_bshell_did_key3,fcra_did_key,
@@ -64,6 +75,7 @@ build_fcra_keys := sequential(
 					  qmv_fcra_did_key,qmv_fcra_main_trid_key,
 						qmv_fcra_party_trid_key,qmv_fcra_rmsid_key,mv_bdid_qa,mv_case_nbr_qa,mv_cert_nbr_qa,mv_filing_nbr_qa,mv_serial_nbr_qa),bld_autokeys,
 						DeltaCommands,
+						cnt_fcra_main_id,cnt_fcra_party_id, cnt_fcra_autokey_payload,
 						RoxieKeybuild.updateversion('FCRA_LiensV2Keys',filedate,'skasavajjala@seisint.coml,michael.gould@lexisnexisrisk.com',,'F'),
 						create_build);
 
