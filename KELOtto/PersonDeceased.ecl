@@ -40,7 +40,10 @@
   string3 death_rec_src;
   string16 state_death_id;
   string errorcode;
+  unsigned8 record_id;
+  unsigned6 fdn_file_info_id;
  END;
+
 
 rPersonDeceasedLayout := RECORD
   string30 acctno;
@@ -62,7 +65,7 @@ rPersonDeceasedLayout := RECORD
   string76 address;
   string77 county_residence;
   string23 county_death;
-  UNSIGNED did;
+  UNSIGNED8 did;
   unsigned1 did_score;
   string8 filedate;
   string1 rec_type;
@@ -84,9 +87,11 @@ rPersonDeceasedLayout := RECORD
   string3 death_rec_src;
   string16 state_death_id;
   string errorcode;
+  unsigned8 record_id;
+  unsigned6 fdn_file_info_id;
  END;
 
  
-PersonDeceasedFile := PROJECT(PULL(DATASET('~foreign::10.173.14.201::thor_data400::base::fraudgov::qa::death', PersonDeceasedLayout, THOR)), TRANSFORM(rPersonDeceasedLayout, SELF.did := (UNSIGNED)LEFT.did, SELF := LEFT));
+PersonDeceasedFile := PROJECT(PULL(DATASET('~thor_data400::base::fraudgov::qa::death', PersonDeceasedLayout, THOR)), TRANSFORM(rPersonDeceasedLayout, SELF.did := (UNSIGNED)LEFT.did, SELF := LEFT));
 
 EXPORT PersonDeceased := JOIN(KELOtto.CustomerLexId, PersonDeceasedFile, LEFT.did=(INTEGER)RIGHT.did, TRANSFORM({LEFT.AssociatedCustomerFileInfo, RECORDOF(RIGHT)}, SELF := RIGHT, SELF := LEFT), HASH,KEEP(1));
