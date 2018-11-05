@@ -56,6 +56,15 @@ with_department_layout department_xform(Accuity_Location_IDs L) := TRANSFORM
 END;
 
 Department_Function := project(Accuity_Location_IDs, department_xform(LEFT));
+
+Department_Function_with_codes_layout := RECORD
+		STRING name;
+		STRING code;
+END;
+
+departments_list := sort(Ares.Files.ds_lookup(fid ='JOB_TITLE_TYPE').lookupBody(tfpid != ''), tfpid); 
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Find 	Officer Name
 layout_party := RECORD(recordof(Relationship_ds.parties.party))
