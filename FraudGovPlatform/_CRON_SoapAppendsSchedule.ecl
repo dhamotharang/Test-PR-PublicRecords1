@@ -1,6 +1,6 @@
 ﻿import _Control,Std,FraudGovPlatform_Validation;
 
-ThorName	:=		IF(_control.ThisEnvironment.Name	<> 'Prod_Thor',		Constants.ThorName_Dev,	Constants.ThorName_Prod);
+ThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_Validation.Constants.ThorName_Dev,	FraudGovPlatform_Validation.Constants.ThorName_Prod);
 
 lECL1 :=
  'import ut;\n'
