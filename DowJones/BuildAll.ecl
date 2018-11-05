@@ -1,4 +1,4 @@
-﻿IMPORT STD;
+﻿IMPORT STD, _Control;
 djDespray(string logicalname, string outfile) :=
 	fileservices.Despray(logicalname,
 		_Control.IPAddress.bctlpedata10,

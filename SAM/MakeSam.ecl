@@ -1,4 +1,4 @@
-﻿
+﻿import _Control;
 
 vxml := PROJECT(File_Sam, sam.XForm(LEFT, COUNTER));
 

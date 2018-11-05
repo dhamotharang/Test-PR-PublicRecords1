@@ -1,4 +1,4 @@
-﻿import	STD;
+﻿import	STD, _Control;
 	destinationIP := _Control.IPAddress.bctlpedata10;
 	destinationpath := '/data/hds_3/uniqueid/output/';
 
