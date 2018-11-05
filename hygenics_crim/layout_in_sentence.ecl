@@ -47,5 +47,5 @@ string10	ProbationMinMonths;
 string10	ProbationMinDays;
 string100	ProbationStatus;
 string100	SourceName;
-string20  sourceid;
+string100 sourceid;
 end;

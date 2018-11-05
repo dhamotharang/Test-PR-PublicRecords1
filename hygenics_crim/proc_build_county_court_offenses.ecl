@@ -157,7 +157,7 @@ layout_j_final := record
                 string10             ProbationMinMonths     := '';
                 string10             ProbationMinDays       := '';
                 string100            ProbationStatus        := '';
-								string20             sourceid               := '';
+								string100             sourceid              := '';
                 //
 end;
 
@@ -742,18 +742,17 @@ self.court_off_desc_1         := trim(MAP(vVendor ='TS' and regexfind('[0-9.]+[ 
 														regexfind('SECOND DEGREE M[ISDEMEANOR.]*',trim(offensedegree))  => 'M2' ,
 														regexfind('THIRD DEGREE M[ISDEMEANOR.]*' ,trim(offensedegree))  => 'M3' ,
 														regexfind('FIFTH DEGREE M[ISDEMEANOR.]*' ,trim(offensedegree))  => 'M5' ,
-														regexfind('FOURTH DEGREE M[ISDEMEANOR.]*',trim(offensedegree))  => 'M4' ,             
-														
-														regexfind('FIRST DEGREE FELONY' ,trim(offensetype))  => 'F1' ,
-														regexfind('SECOND DEGREE FELONY',trim(offensetype))  => 'F2' ,
-														regexfind('THIRD DEGREE FELONY' ,trim(offensetype))  => 'F3' ,
-														regexfind('FIFTH DEGREE FELONY' ,trim(offensetype))  => 'F5' ,
-														regexfind('FOURTH DEGREE FELONY',trim(offensetype))  => 'F4' ,                                                                                                                                                                                                                                                                                             
-														regexfind('FIRST DEGREE M[ISDEMEANOR.]*' ,trim(offensetype))  => 'M1' ,
-														regexfind('SECOND DEGREE M[ISDEMEANOR.]*',trim(offensetype))  => 'M2' ,
-														regexfind('THIRD DEGREE M[ISDEMEANOR.]*' ,trim(offensetype))  => 'M3' ,
-														regexfind('FIFTH DEGREE M[ISDEMEANOR.]*' ,trim(offensetype))  => 'M5' ,
-														regexfind('FOURTH DEGREE M[ISDEMEANOR.]*',trim(offensetype))  => 'M4' ,                                                                                                                                                                                                                                                                   
+														regexfind('FOURTH DEGREE M[ISDEMEANOR.]*',trim(offensedegree))  => 'M4' ,     
+														regexfind('FIRST DEGREE FELONY|FELONY FIRST DEGREE' ,trim(offensetype))  => 'F1' ,
+														regexfind('SECOND DEGREE FELONY|FELONY SECOND DEGREE',trim(offensetype))  => 'F2' ,
+														regexfind('THIRD DEGREE FELONY|FELONY THIRD DEGREE' ,trim(offensetype))  => 'F3' ,
+														regexfind('FIFTH DEGREE FELONY|FELONY FIFTH DEGREE' ,trim(offensetype))  => 'F5' ,
+														regexfind('FOURTH DEGREE FELONY|FELONY FOURTH DEGREE',trim(offensetype))  => 'F4' ,                                                                                                                                                                                                                                                                                             
+														regexfind('FIRST DEGREE M[ISDEMEANOR.]*|M[ISDEMEANOR.]* FIRST DEGREE' ,trim(offensetype))  => 'M1' ,
+														regexfind('SECOND DEGREE M[ISDEMEANOR.]*|M[ISDEMEANOR.]* SECOND DEGREE',trim(offensetype))  => 'M2' ,
+														regexfind('THIRD DEGREE M[ISDEMEANOR.]*|M[ISDEMEANOR.]* THIRD DEGREE' ,trim(offensetype))  => 'M3' ,
+														regexfind('FIFTH DEGREE M[ISDEMEANOR.]*|M[ISDEMEANOR.]* FIFTH DEGREE' ,trim(offensetype))  => 'M5' ,
+														regexfind('FOURTH DEGREE M[ISDEMEANOR.]*|M[ISDEMEANOR.]* FOURTH DEGREE',trim(offensetype))  => 'M4' ,                                                                                                                                                                                                                                                                   
 														regexfind('MISD[EMEANOR]*[- ]*(ONE|FIRST|1ST)[ DEGREE]*',trim(offensetype)  + ' '+ trim(offensedegree)) => 'M1' ,
 														regexfind('MISD[EMEANOR]*[- ]*(MINOR)',trim(offensetype)  + ' '+ trim(offensedegree)) => 'MM' ,
 														regexfind('MISD[EMEANOR]*[- ]*(SECOND|2ND)[ DEGREE]*',trim(offensetype) + ' '+ trim(offensedegree))=> 'M2' ,
@@ -1116,6 +1115,8 @@ self.court_off_desc_1         := trim(MAP(vVendor ='TS' and regexfind('[0-9.]+[ 
   NVClarkadditional2  := hygenics_crim._f_parseNVClark_sentence.additional2(psent);
   NVClarkother        := hygenics_crim._f_parseNVClark_sentence.other(psent);
 	
+	
+								
   self.sent_date          := MAP(trim(l.SentenceDate)[1..2] between '19' and '20' 
                                and length(trim(l.SentenceDate))>=4 
                                and l.SentenceDate <= stringlib.GetDateYYYYMMDD() => trim(l.SentenceDate),                                                                                                                                                                                                 
@@ -1370,6 +1371,8 @@ self.court_off_desc_1         := trim(MAP(vVendor ='TS' and regexfind('[0-9.]+[ 
 																	 
                                    regexfind('(SUSPENDED) (SENTENCE:|LENGTH:) ([0-9]+ [A-Z]), (.*)', l.sentencestatus) => regexreplace('(SUSPENDED) (SENTENCE:|LENGTH:) ([0-9]+ [A-Z]), (.*)', l.sentencestatus,'$4'),
                                    sentstat_susp_time <> '' => '',
+																	 vVendor IN ['I0022'] => l.sentenceadditionalinfo[41..],
+
                                    l.sentencestatus                                                                                                                                                                                                                                                                             
                                    );
                 
@@ -1471,7 +1474,10 @@ self.court_off_desc_1         := trim(MAP(vVendor ='TS' and regexfind('[0-9.]+[ 
                               prob_dates <> '' =>  trim(prob_dates),
                                                                                                                                                                                                                                                 l.probationstatus);
   self.court_dt            := l.courtdate;               
-  self.court_county        := '';   
+
+	self.court_county        := MAP(regexfind('^COUNTY: ([A-Z ]+)[ ]+$',l.caseinfo) => 	regexreplace('^COUNTY: ([A-Z ]+)[ ]+$',l.caseinfo,'$1'),
+	                                regexfind('^COUNTY: ([A-Z]+)[ ]+$',l.caseinfo) => 	regexreplace('^COUNTY: ([A-Z]+)[ ]+$',l.caseinfo,'$1')
+									              ,'');
 	self.Hyg_classification_code := l.classification_code;
 end;
 

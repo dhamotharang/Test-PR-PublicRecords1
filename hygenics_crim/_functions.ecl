@@ -1389,24 +1389,25 @@ export fn_shorten_sourcename(string psourcename) := function
 		result1 :=  
 		      regexreplace('ARRESTS',
 					regexreplace('COMMON_PLEAS',
-					regexreplace('COMMON_PLEAS_COURT',
-					regexreplace('COUNTY',
-					regexreplace('DISTRICT_COURT',
-					regexreplace('CIRCUIT_COURT[S]*',
+					regexreplace('COMMON_PLEAS_COURT|COURT OF COMMON PLEAS',
+					regexreplace('COUNTY|COUNTY COURTS',
+					regexreplace('DISTRICT[ _]COURT',
+					regexreplace('CIRCUIT[_ ]COURT[S]*',
 					regexreplace('TRAFFIC_COURT',
-					regexreplace('MUNICIPAL_COURT',
+					regexreplace('MUNICIPAL[_ ]COURT',
 					regexreplace('MUNICIPAL_TRAFFIC_COURT',
-					//regexreplace('BROWN_MUNICIPAL',	
-					regexreplace('DEPARTMENT_OF_CORRECTIONS',
+					regexreplace('DEPARTMENT OF CORRECTIONS RELEASE[D]*',
+					regexreplace('DEPARTMENT OF CORRECTIONS - INMATE',	
+					regexreplace('DEPARTMENT[_ ]OF[_ ]CORRECTIONS',
 					regexreplace('DEPARTMENT_OF_CORRECTIONS_PROBATION',
 					regexreplace('DEPARTMENT_OF_CORRECTIONS_PAROLE',	
-					regexreplace('DEPARTMENT_OF_CORRECTIONS_ALTERNATE',
-					regexreplace('DEPARTMENT_OF_CORRECTIONS_ALTERNATE_FILE',
-					regexreplace('SUMMARY_COURTS',
+					regexreplace('DEPARTMENT_OF_CORRECTIONS_ALTERNATE|DEPARTMENT_OF_CORRECTIONS_ALTERNATE_FILE',
+					regexreplace('DEPARTMENT OF CORRECTIONS - SUPERVISED|DEPARTMENT OF CORRECTIONS [(]SUPERVISION[)]',
+					regexreplace('SUMMARY_COURTS|SUMMARY COURT',
 					regexreplace('ADMINISTRATOR_OF_THE_COURTS',
-					regexreplace('JUSTICE_OF_THE_PEACE_COURTS',
-					regexreplace('SUPERIOR_COURT',
-					regexreplace('JUSTICE_COURT',
+					regexreplace('JUSTICE_OF_THE_PEACE_COURTS|JUSTICE OF THE PEACE',
+					regexreplace('SUPERIOR[_ ]COURT|SUPERIOR CLERK OF COURTS',
+					regexreplace('JUSTICE[_ ]COURT[S]*',
 					//regexreplace('WEBSITE',
 					regexreplace('BOOKING',
 					regexreplace('COUNTY_POLICE',
@@ -1416,7 +1417,10 @@ export fn_shorten_sourcename(string psourcename) := function
           regexreplace('SHERIFFS_DEPARTMENT',
 					regexreplace('CURRENT_INMATES_LIST',
           regexreplace('DETENTION_CENTER',
-					regexreplace('_CW',psourcename,''),'DTC'),'CIL'),'SD'),'PD'),'SO'),'CTY_SO'),'CTY_PD'),'BKN')/*,'WEB')*/,'JUSTICE'),'SPC'),'JPC'),'AOC'),'SC'),'DOC_ALT'),'DOC_ALT'),'DOC_PAROLE'),'DOC_PROB'),'DOC'),'MTC'),'MC'),'TC'),'CRC'),'DC'),'CTY'),'CPC'),'CPC'),'ARR');
+					regexreplace('GENERAL SESSIONS COURT',
+					regexreplace('COUNTY AND DISTRICT COURTS|DISTRICT AND COUNTY COURTS',
+					regexreplace('_CW|_IE',psourcename,''),'CCDC'),'GSC'),'DTC'),'CIL'),'SD'),'PD'),'SO'),'CTY_SO'),'CTY_PD'),'BKN')/*,'WEB')*/,'JUSTICE'),'SPC'),'JPC'),'AOC'),'SC'),
+					                                      'DOC_SUP'),'DOC_ALT'),'DOC_PAROLE'),'DOC_PROB'),'DOC'),'DOCINM'),'DOCREL'),'MTC'),'MC'),'TC'),'CRC'),'DC'),'CTY'),'CPC'),'CPC'),'ARR');
 			
 					
 	space_count := 
@@ -1602,7 +1606,24 @@ export fn_shorten_sourcename(string psourcename) := function
 								 psourcename = 'MONTANA_VIOLENT_OFFENDER_REGISTRY                  '    => 'MT_VIOLENT_OFNREG',                   
 								 psourcename = 'NORTH_DAKOTA_OFFENDERS_AGAINST_CHILDREN            '    => 'ND_OFFND_AGANST_CHIL',
 								 psourcename = 'TEXAS_DALLAS_JUSTICE_OF_THE_PEACE_TRAFFIC          '    => 'TX_DALAS_JUSPEACE_TR',
-								 psourcename = 'GEORGIA_PAROLE_RELEASED_INMATES                    '    => 'GA_PAR_RELEASED_INM',
+								 psourcename = 'GEORGIA_PAROLE_RELEASED_INMATES                    '    => 'GA_PAR_RELEASED_INM', 
+								 psourcename = 'FL CAREER OFFENDER REGISTRY_IE'                                         => 'FL CAREER OFNDER REG',
+								 psourcename = 'IA ADMINISTRATIVE OFFICE OF COURTS(MISDEMEANORS)_IE'                    => 'IA AOC MISD',
+								 psourcename = 'IL STATE POLICE MURDERER AND VIOLENT OFFENDER AGAINST YOUTH REGISTRY_IE'=> 'IL STPOL MUR VIO REG',
+								 psourcename = 'KS BUREAU OF INVESTIGATION - VIOLENT AND DRUG_IE'                       => 'KS BUREAU VIO DRUG',
+                 psourcename = 'MD ADMINISTRATIVE OFFICE OF COURTS DISTRICT COURTS_IE   '               => 'MD AOC DISTRICT CRTS', 
+                 psourcename = 'ND DISTRICT AND MUNICIPAL COURTS_IE'                                    => 'ND_DISTRICT_MUN_CTRS',
+                 psourcename = 'OK VIOLENT CRIME OFFENDER REGISTRY_IE'                                  => 'OK_VIOLENT_OFNREG',   
+                 psourcename = 'RI DISTRICT AND SUPERIOR COURTS_IE'                                     => 'RI_DISTRICT_SUP_CTRS',
+								 psourcename = 'GA GWINNETT LAWRENCEVILLE - SUPERIOR COURT_IE'                          => 'GA GWINET LWRNCVILSC', 
+								 psourcename = 'LA ORLEANS PARISH DISTRICT COURT_IE'                                    => 'LA ORLEANSPARISH DC',
+								 psourcename = 'OH CUYAHOGA CLERK OF COURTS_IE'                                         => 'OH CUYAHOGA CLERKOC',
+								 psourcename = 'OH PORTAGE RAVENNA MUNICIPAL COURT_IE'                                  => 'OH PORTAGERAVENNAMC',
+								 psourcename = 'TX HARRIS COUNTY COURTS DISPOSITION_IE'                                 => 'TX HARRIS CTYCRTDISP',
+								 psourcename = 'SD DEPARTMENT OF CORRECTIONS ABSCONDERS_IE'                             => 'SD DOC ABSCONDERS',   
+								 psourcename = 'US FEDERAL BUREAU OF PRISONS FEDERAL INMATE REGISTRY_IE'                => 'US_FED_PRISONINM REG',
+
+								 
 								 
 								 
 								 result2);
@@ -2690,26 +2711,25 @@ map(
 
 /************************************************IE DATA START*************************************************************/ 	
 //-------------------------------IE AOC Batch 1 20181005 ---------------------------------------------------------
-  psourcename = 'FL CAREER OFFENDER REGISTRY_IE'                                          => 'IE001',
-	psourcename = 'IA ADMINISTRATIVE OFFICE OF COURTS(MISDEMEANORS)_IE'                     => 'IE002',
-	psourcename = 'IL STATE POLICE MURDERER AND VIOLENT OFFENDER AGAINST YOUTH REGISTRY_IE' => 'IE003',
-	psourcename = 'KS BUREAU OF INVESTIGATION - VIOLENT AND DRUG_IE'                        => 'IE004',
-	psourcename = 'MD ADMINISTRATIVE OFFICE OF COURTS DISTRICT COURTS_IE   '                => 'IE005',
-	psourcename = 'ND DISTRICT AND MUNICIPAL COURTS_IE'                                     => 'IE006',
-	psourcename = 'OK VIOLENT CRIME OFFENDER REGISTRY_IE'                                   => 'IE007',  //IE fix
-	psourcename = 'RI DISTRICT AND SUPERIOR COURTS_IE'                                      => 'IE008',  //IE fix
-  // psourcename = 'WI ADMINISTRATIVE OFFICE OF COURTS(CM)_IE'));                            => 'IE009',  //IE fix
-	// psourcename = 'WI ADMINISTRATIVE OFFICE OF COURTS(CF)_IE'));                            => 'IE010',  //IE fix
-	// psourcename = 'WI ADMINISTRATIVE OFFICE OF COURTS(CT)_IE'));                            => 'IE011',  //IE fix			
-	// psourcename = 'WV CIRCUIT COURTS'                                                       => 'IE012',
+  psourcename = 'FL CAREER OFFENDER REGISTRY_IE'                                          => 'I0001',
+	psourcename = 'IA ADMINISTRATIVE OFFICE OF COURTS(MISDEMEANORS)_IE'                     => 'I0002',
+	psourcename = 'IL STATE POLICE MURDERER AND VIOLENT OFFENDER AGAINST YOUTH REGISTRY_IE' => 'I0003',
+	psourcename = 'KS BUREAU OF INVESTIGATION - VIOLENT AND DRUG_IE'                        => 'I0004',
+	psourcename = 'MD ADMINISTRATIVE OFFICE OF COURTS DISTRICT COURTS_IE   '                => 'I0005',
+	psourcename = 'ND DISTRICT AND MUNICIPAL COURTS_IE'                                     => 'I0006',
+	psourcename = 'RI DISTRICT AND SUPERIOR COURTS_IE'                                      => 'I0008',  //IE fix
+  // psourcename = 'WI ADMINISTRATIVE OFFICE OF COURTS(CM)_IE'                               => 'I0009',  //IE fix compare with hygenics
+	// psourcename = 'WI ADMINISTRATIVE OFFICE OF COURTS(CF)_IE'                               => 'I0010',  //IE fix compare with hygenics
+	// psourcename = 'WI ADMINISTRATIVE OFFICE OF COURTS(CT)_IE'                               => 'I0011',  //IE fix			
+	
 //-------------------------------IE County Batch 1 20181005 ---------------------------------------------------
-  // psourcename 	=	 'CA KERN SUPERIOR COURT_IE'                                             => 'I0013',
-  // psourcename 	=	 'CA SAN BERNARDINO SUPERIOR COURT_IE'                                   => 'I0014',
+  psourcename 	=	 'CA KERN SUPERIOR COURT_IE'                                             => 'I0013',
+  psourcename 	=	 'CA SAN BERNARDINO SUPERIOR COURT_IE'                                   => 'I0014',
   // psourcename 	=	 'CO DENVER COUNTY COURT_IE'                                             => 'I0015',
   psourcename 	=	 'GA CARROLL SUPERIOR CLERK OF COURTS_IE '                              => 'I0016',
   psourcename 	=	 'GA GWINNETT LAWRENCEVILLE - SUPERIOR COURT_IE'                        => 'I0017',
   // psourcename 	=	 'IL KANE CIRCUIT COURT_IE'                                           	=> 'I0018',
-  // psourcename 	=	 'LA ORLEANS PARISH DISTRICT COURT_IE'                                	=> 'I0019',
+  psourcename 	=	 'LA ORLEANS PARISH DISTRICT COURT_IE'                                	=> 'I0019',
   // psourcename 	=	 'NE LANCASTER COUNTY AND DISTRICT COURTS_IE'                         	=> 'I0020',
   psourcename 	=	 'OH CUYAHOGA CLERK OF COURTS_IE'                                       => 'I0021',
   psourcename 	=	 'OH FAIRFIELD MUNICIPAL COURT_IE'                                      => 'I0022',
@@ -2727,12 +2747,12 @@ map(
   psourcename 	=	 'TN HAMILTON GENERAL SESSIONS COURT_IE'                                => 'I0034',
   psourcename 	=	 'TX BOWIE DISTRICT AND COUNTY COURTS_IE'                               => 'I0035',
   psourcename 	=	 'TX EL PASO COUNTY COURTS_IE'                                          => 'I0036',
-  // psourcename 	=	 'TX HARRIS COUNTY COURTS DISPOSITION_IE'                             	=> 'I0037',
+  psourcename 	=	 'TX HARRIS COUNTY COURTS DISPOSITION_IE'                             	=> 'I0037',
   psourcename 	=	 'TX TAYLOR COUNTY COURTS_IE'                                           => 'I0038',
   psourcename 	=	 'TX TAYLOR JUSTICE OF THE PEACE_IE'                                    => 'I0039',
-  psourcename 	=	 'NV CLARK JUSTICE COURTS_IE'  	                                        => '10040',
-  psourcename 	=	 'FL SARASOTA CIRCUIT COURT_IE'                                         => '10041', 
-
+  // psourcename 	=	 'NV CLARK JUSTICE COURTS_IE'  	                                        => '10040',
+  // psourcename 	=	 'FL SARASOTA CIRCUIT COURT_IE'                                         => '10041', 
+  psourcename   =  'WV CIRCUIT COURTS_IE'                                                 => 'I0012',
 //-------------------------------IE DOC Batch 1 20181005 ---------------------------------------------------
   psourcename = 'CO DEPARTMENT OF CORRECTIONS_IE'                                         => 'I0042',
   psourcename = 'FL DEPARTMENT OF CORRECTIONS - INMATE_IE'                                => 'I0043',
@@ -2740,14 +2760,17 @@ map(
   psourcename = 'FL DEPARTMENT OF CORRECTIONS - SUPERVISED_IE'                            => 'I0045',
   psourcename = 'NC DEPARTMENT OF CORRECTIONS (SUPERVISION)_IE'                           => 'I0046',
 	psourcename = 'NY DEPARTMENT OF CORRECTIONS RELEASED_IE'                                => 'I0047',
-  psourcename = 'SD DEPARTMENT OF CORRECTIONS ABSCONDERS_IE'                              => 'I0048',
-  psourcename = 'US FEDERAL BUREAU OF PRISONS FEDERAL INMATE REGISTRY_IE'                 => 'I0049',
-  psourcename = 'UT DEPARTMENT OF CORRECTIONS_IE'                                         => 'I0050',
+  psourcename = 'OK VIOLENT CRIME OFFENDER REGISTRY_IE'                                   => 'I0007',  //IE fix DOC?
+  psourcename = 'TX DEPARTMENT OF CORRECTIONS (PAROLE)_IE'                                => 'I0048',
+  psourcename = 'TX DEPARTMENT OF CORRECTIONS (PROBATION)_IE'                             => 'I0049',   
+	psourcename = 'SD DEPARTMENT OF CORRECTIONS ABSCONDERS_IE'                              => 'I0050',
+  psourcename = 'US FEDERAL BUREAU OF PRISONS FEDERAL INMATE REGISTRY_IE'                 => 'I0051',
+  psourcename = 'UT DEPARTMENT OF CORRECTIONS_IE'                                         => 'I0052',
 	
 //-------------------------------IE ARREST Batch 1 20181005 ---------------------------------------------------	
-  psourcename = 'NV CLARK ARREST_IE'                                                      => 'I0051',  
-  psourcename = 'SD MINNEHAHA ARREST_IE'                                                  => 'I0052',
-  psourcename = 'SD PENNINGTON ARREST_IE'                                                 => 'I0053',
+  psourcename = 'NV CLARK ARREST_IE'                                                      => 'I0053',  
+  psourcename = 'SD MINNEHAHA ARREST_IE'                                                  => 'I0054',
+  psourcename = 'SD PENNINGTON ARREST_IE'                                                 => 'I0055',
 
 /************************************************IE DATA END*************************************************************/
 																																						 
