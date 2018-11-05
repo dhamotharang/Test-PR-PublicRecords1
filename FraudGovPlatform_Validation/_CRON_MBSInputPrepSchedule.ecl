@@ -27,16 +27,16 @@ lECL1 :=
 +'		,sequential(FraudGovPlatform.Build_All(version).Spray_MBS)\n'
 +'	);\n'
 ;
-lECL1;
-// #WORKUNIT('protect',true);
-// #WORKUNIT('name', 'FraudGov MBS Input Prep Schedule');
 
-// d:=FileServices.RemoteDirectory(IP, RootDir+'ready/', '*.dat');
-// if(exists(d),_Control.fSubmitNewWorkunit(lECL1, ThorName ),'NO FILES TO SPRAY' )
-			// : WHEN(CRON(EVERY_DAY_AT_5AM))
-			// ,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
-																			// ,'FraudGov MBS Input Prep Schedule failure'
-																			// ,Constants.NOC_MSG
-																			// ));
+#WORKUNIT('protect',true);
+#WORKUNIT('name', 'FraudGov MBS Input Prep Schedule');
+
+d:=FileServices.RemoteDirectory(IP, RootDir+'ready/', '*.dat');
+if(exists(d),_Control.fSubmitNewWorkunit(lECL1, ThorName ),'NO FILES TO SPRAY' )
+			: WHEN(CRON(EVERY_DAY_AT_5AM))
+			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
+																			,'FraudGov MBS Input Prep Schedule failure'
+																			,Constants.NOC_MSG
+																			));
 																			
 																

@@ -1,17 +1,16 @@
-import _control,std,ut,wk_ut;
+﻿import _control,std,ut;
 // #option('maxLength', 131072); // have to increase for the remote directory child datasets
 //////////////////////////////////////////////////////////////////////////////////////////////
 export soapcall_DFUInfo(
    string   pfilename           = ''
   ,string   pcluster            = ''
   ,boolean  pUpdateDescription  = false
-  ,string   pFileName           = ''
   ,string   pDescription        = ''
-  ,string   pesp                = wk_ut._constants.LocalEsp
+  ,string   pesp                = _Config.LocalEsp
 ) :=
 function
 
-	export DFUInfoRequest :=
+	DFUInfoRequest :=
 	record, maxlength(100)
 		string  Name              {xpath('Name'               )} := pfilename         ;
 		string  Cluster           {xpath('Cluster'            )} := pcluster          ;
@@ -20,7 +19,7 @@ function
 		string  FileDesc          {xpath('FileDesc'           )} := pDescription      ;
 	end;
 	
-	export DFUFileParts_lay :=
+	DFUFileParts_lay :=
 	record
 		integer  Id         {xpath('Id'           )} ;
 		integer  Copy       {xpath('Copy'         )} ;
@@ -29,7 +28,7 @@ function
 		string   Partsize   {xpath('Partsize'     )} ;
 	end;
   
-	export lay_DFULogicalFiles :=
+	lay_DFULogicalFiles :=
 	record
     string    Prefix                  {xpath('Prefix'                 )};
     string    ClusterName             {xpath('NodeGroup'              )};
@@ -56,40 +55,40 @@ function
     integer   CompressedFileSize      {xpath('CompressedFileSize'     )};
   end;
 
-	export DFUInfoOutRecord :=
+	DFUInfoOutRecord :=
 	record, maxlength(100000)
 	
-		string exception_code     {xpath('Exceptions/Exception/Code'   )};
-		string exception_source   {xpath('Exceptions/Exception/Source' )};
-		string exception_msg      {xpath('Exceptions/Exception/Message')};
-		string Name               {xpath('FileDetail/Name'             )};
-		string Filename           {xpath('FileDetail/Filename'         )};
-		string Description        {xpath('FileDetail/Description'      )};
-		string Dir                {xpath('FileDetail/Dir'              )};
-		string PathMask           {xpath('FileDetail/PathMask'         )};
-		string Filesize           {xpath('FileDetail/Filesize'         )};
-		string ActualSize         {xpath('FileDetail/ActualSize'       )};
-		string RecordSize         {xpath('FileDetail/RecordSize'       )};
-		string RecordCount        {xpath('FileDetail/RecordCount'      )};
-		string Wuid               {xpath('FileDetail/Wuid'             )};
-		string Owner              {xpath('FileDetail/Owner'            )};
-		string Cluster            {xpath('FileDetail/Cluster'          )};
-		string JobName            {xpath('FileDetail/JobName'          )};
-		string Persistent         {xpath('FileDetail/Persistent'       )};
-		string Format             {xpath('FileDetail/Format'           )};
-		string MaxRecordSize      {xpath('FileDetail/MaxRecordSize'    )};
-		string CsvSeparate        {xpath('FileDetail/CsvSeparate'      )};
-		string CsvQuote           {xpath('FileDetail/CsvQuote'         )};
-		string CsvTerminate       {xpath('FileDetail/CsvTerminate'     )};
-		string CsvEscape          {xpath('FileDetail/CsvEscape'        )};
-		string Modified           {xpath('FileDetail/Modified'         )};
-		string Ecl                {xpath('FileDetail/Ecl'              )};	
-		string MinSkew                {xpath('FileDetail/Stat/MinSkew'              )};	
-		string MaxSkew                {xpath('FileDetail/Stat/MaxSkew'              )};	
-    integer CompressedFileSize      {xpath('FileDetail/CompressedFileSize'     )};
-    boolean IsCompressed            {xpath('FileDetail/IsCompressed'           )};
-    dataset(DFUFileParts_lay) DFUFileParts  {xpath('FileDetail/DFUFileParts/DFUPart')};
-    dataset(lay_DFULogicalFiles) Superfiles  {xpath('FileDetail/Superfiles/DFULogicalFile')};
+		string                        exception_code      {xpath('Exceptions/Exception/Code'                                                    )};
+		string                        exception_source    {xpath('Exceptions/Exception/Source'                                                  )};
+		string                        exception_msg       {xpath('Exceptions/Exception/Message'                                                 )};
+		string                        Name                {xpath('FileDetail/Name'                                                              )};
+		string                        Filename            {xpath('FileDetail/Filename'                                                          )};
+		string                        Description         {xpath('FileDetail/Description'                                                       )};
+		string                        Dir                 {xpath('FileDetail/Dir'                                                               )};
+		string                        PathMask            {xpath('FileDetail/PathMask'                                                          )};
+		string                        Filesize            {xpath('FileDetail/Filesize'                                                          )};
+		string                        ActualSize          {xpath('FileDetail/ActualSize'                                                        )};
+		string                        RecordSize          {xpath('FileDetail/RecordSize'                                                        )};
+		string                        RecordCount         {xpath('FileDetail/RecordCount'                                                       )};
+		string                        Wuid                {xpath('FileDetail/Wuid'                                                              )};
+		string                        Owner               {xpath('FileDetail/Owner'                                                             )};
+		string                        Cluster             {xpath('FileDetail/Cluster'                                                           )};
+		string                        JobName             {xpath('FileDetail/JobName'                                                           )};
+		string                        Persistent          {xpath('FileDetail/Persistent'                                                        )};
+		string                        Format              {xpath('FileDetail/Format'                                                            )};
+		string                        MaxRecordSize       {xpath('FileDetail/MaxRecordSize'                                                     )};
+		string                        CsvSeparate         {xpath('FileDetail/CsvSeparate'                                                       )};
+		string                        CsvQuote            {xpath('FileDetail/CsvQuote'                                                          )};
+		string                        CsvTerminate        {xpath('FileDetail/CsvTerminate'                                                      )};
+		string                        CsvEscape           {xpath('FileDetail/CsvEscape'                                                         )};
+		string                        Modified            {xpath('FileDetail/Modified'                                                          )};
+		string                        Ecl                 {xpath('FileDetail/Ecl'                                                               )};	
+		string                        MinSkew             {xpath('FileDetail/Stat/MinSkew'                                                      )};	
+		string                        MaxSkew             {xpath('FileDetail/Stat/MaxSkew'                                                      )};	
+    integer                       CompressedFileSize  {xpath('FileDetail/CompressedFileSize'                                                )};
+    boolean                       IsCompressed        {xpath('FileDetail/IsCompressed'                                                      )};
+    dataset(DFUFileParts_lay    ) DFUFileParts        {xpath('FileDetail/DFUFilePartsOnClusters/DFUFilePartsOnCluster/DFUFileParts/DFUPart' )};
+    dataset(lay_DFULogicalFiles ) Superfiles          {xpath('FileDetail/Superfiles/DFULogicalFile'                                         )};
   
 	end;
 

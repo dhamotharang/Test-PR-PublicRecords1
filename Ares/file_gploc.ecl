@@ -2,16 +2,6 @@
 
 office := Ares.file_office_flat(tfpuid != '');
 
-// office_w_country_iso_layout := record(recordof(office))
-	// string iso2;
-// End;
-
-// office_w_country_iso_layout cc_xform(office l, Ares.Files.ds_country r) := transform
-	// self.iso2 := r.summary.iso2;
-	// self := l;
-// End;
-// with_iso := join(city_with_country_id, Ares.Files.ds_country, left.country_id = right.id, cc_xform(left, right));
-// with_iso := join(office, Ares.Files.ds_country, left.primary_city_country_id = right.id, cc_xform(left, right));
 expanded_legal_layout := recordof(Ares.Files.ds_legal_entity) or {string c_type_source, string c_type_value, string headoffice_id};
 
 expanded_legal_layout expand_legal_xform(Ares.Files.ds_legal_entity l) := Transform
@@ -146,39 +136,57 @@ End;
 
 w_headoffice := join(w_office_type, office, left.headoffice_id = right.id, xform_headoffice(left, right));
 
-w_current_assets_layout := record(recordof(w_headoffice))
-	string current_assets := '';
-end;
+ds_fin := distribute(ares.file_financialStatement_flat, hash(owner_id));
 
-//Ares.Files.ds_financialstatement(count(lineItems(fid = 'FDB003F'))>0);
-w_current_assets_layout xform_cur_ast(w_headoffice l, file_financialStatement_flat r) := transform
-	self.current_assets := r.lineItems(fid = 'FDB003F')[1].value;
-	self := l;
-end;
-
-w_current_assets := join(w_headoffice, file_financialStatement_flat, left.legal_entity_id = right.owner_id, xform_cur_ast(left,right));
-
-
-ds_fin := ares.file_financialStatement_flat;
 grp_fin_period_end_layout := record
 	ds_fin.owner_id;
 	last := max(group,ds_fin.periodEnd);
 end;
 
-latest_fin_recs := table(ds_fin, grp_fin_period_end_layout, owner_id);
+latest_fin_recs := table(ds_fin, grp_fin_period_end_layout, owner_id,local);
 
-w_fin_dt_layout := record(recordof(w_current_assets))
+w_fin_dt_layout := record(recordof(w_headoffice))
 	string latest_fin_dt := '';
 end;
 
-w_fin_dt_layout xform_fin_dt(w_current_assets l, latest_fin_recs r) := Transform
+w_fin_dt_layout xform_fin_dt(w_headoffice l, latest_fin_recs r) := Transform
 	self.latest_fin_dt := r.last;
 	self := l;
 end;
 
-w_fin_dt := join(w_current_assets, latest_fin_recs, left.legal_entity_id = right.owner_id, xform_fin_dt(left,right), left outer, keep(1));
+w_fin_dt := join(w_headoffice, latest_fin_recs, left.legal_entity_id = right.owner_id, xform_fin_dt(left,right), left outer, keep(1));
+//////////////
+	// latest_fin_recs(owner_id = '00005613-9a19-4452-86cf-0cfdf82cef58');
+	// recordof(ds_fin) xform_latest_fin( latest_fin_recs l,ds_fin r) := transform
+		// self := r;
+	// end;
+	// latest_full_fin_recs := join(	latest_fin_recs, 
+																// ds_fin,
+																// left.owner_id = right.owner_id, 
+																// xform_latest_fin(left, right),
+																// local,
+																// keep(1));
+																
+////////////////////
 
-layout_gploc final_xform(w_fin_dt l) := Transform
+
+
+w_current_assets_layout := record(recordof(w_fin_dt))
+	string current_assets := '';
+end;
+
+//Ares.Files.ds_financialstatement(count(lineItems(fid = 'FDB003F'))>0);
+w_current_assets_layout xform_cur_ast(w_fin_dt l, file_financialStatement_flat r) := transform
+	self.current_assets := r.lineItems(fid = 'FDB003F')[1].value;
+	self := l;
+end;
+
+w_current_assets := join	(w_fin_dt, file_financialStatement_flat, 
+													left.legal_entity_id = right.owner_id and left.latest_fin_dt = right.periodEnd, 
+													xform_cur_ast(left,right), keep(1));
+
+
+layout_gploc final_xform(w_current_assets l) := Transform
 	self.Update_Flag := 'A';
 	self.ISO_Country_Code := l.country_iso2;
 	self.Primary_Key_Accuity_Location_ID := l.tfpuid;
@@ -192,13 +200,13 @@ layout_gploc final_xform(w_fin_dt l) := Transform
 	self.City_Town := l.city_name;
 	self.State_Province_Region_Abbreviated := l.st_prov_rgn_abbv;
 	self.State_Province_Region_Full := l.st_prov_rgn;
-	self.Postal_Code := l.postal_code;
+	self.Postal_Code := IF (l.country_iso2 = 'US', l.postal_code[1..5], l.postal_code);
 	self.Country_Name_Full := l.country_name;
 	self.employer_tax_id  := l.employer_tax_id;
 	self.Head_Office_Accuity_Location_ID := l.headoffice_tfpuid;
-	self.Current_Assets := l.current_assets;
-	self.Date_of_Financials := l.latest_fin_dt;
+	self.Current_Assets := REALFORMAT((REAL)l.current_assets, 14, 0);
+	self.Date_of_Financials := if (l.current_assets != '' and l.latest_fin_dt != '', l.latest_fin_dt, '00000000');
 	self.Institution_Identifier := std.str.splitwords(l.tfpid, '-')[1];
 End;
-	final := Project(w_fin_dt, final_xform(left));
+	final := Project(w_current_assets, final_xform(left));
 EXPORT file_gploc := final;
