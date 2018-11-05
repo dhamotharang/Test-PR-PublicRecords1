@@ -1,0 +1,1 @@
+EXPORT proc_Version := DATASET('~thor::insuranceHeader::postProc::version',{string version},THOR)[1].version;

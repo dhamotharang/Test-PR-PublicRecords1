@@ -1,23 +1,28 @@
 ﻿// Machine-readable versions of the spec file and subsets thereof
-IMPORT SALT38;
-EXPORT GenerationMod := MODULE(SALT38.iGenerationMod)
+IMPORT SALT311;
+EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.8.2';
-  EXPORT salt_MODULE := 'SALT38'; // Optional override by HACK:SALTMODULE
+  EXPORT salt_VERSION := 'V3.11.4';
+  EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
  
   // Core module configuration values
   EXPORT spc_MODULE := 'Anchor';
   EXPORT spc_NAMESCOPE := '';
   EXPORT spc_PROCESS := '';
+  EXPORT spc_PROCLAYOUTS := 'Process__Layouts';
   EXPORT spc_IDNAME := ''; // cluster id (input)
   EXPORT spc_IDFIELD := ''; // cluster id (output)
   EXPORT spc_RIDFIELD := 'RCID'; // record id
   EXPORT spc_CONFIG := 'Config';
+  EXPORT spc_CONFIGPARAM := FALSE;
+  EXPORT spc_SOURCEFIELD := '';
   EXPORT spc_FILEPREFIX := 'In_';
   EXPORT spc_FILENAME := 'Anchor';
   EXPORT spc_INGESTSTATUS := '';
+  EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:RCID';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,firstname,lastname,address_1,address_2,city,state,zipcode,sourceurl,ipaddress,optindate,emailaddress,anchorinternalcode,addresstype,dob,latitude,longitude,persistent_record_id,did,did_score,clean_title,clean_fname,clean_mname,clean_lname,clean_name_suffix,clean_name_score,rawaid,append_prep_address_situs,append_prep_address_last_situs,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,p_city_name,v_city_name,st,zip,zip4,cart,cr_sort_sz,lot,lot_order,dbpc,chk_digit,rec_type,county,geo_lat,geo_long,msa,geo_blk,geo_match,err_stat,process_date,date_first_seen,date_last_seen,date_vendor_first_reported,date_vendor_last_reported,clean_cname,current_rec,dotid,dotscore,dotweight,empid,empscore,empweight,powid,powscore,powweight,proxid,proxscore,proxweight,seleid,selescore,seleweight,orgid,orgscore,orgweight,ultid,ultscore,ultweight';
   EXPORT spc_HAS_TWOSTEP := FALSE;
   EXPORT spc_HAS_PARTITION := FALSE;
   EXPORT spc_HAS_FIELDTYPES := FALSE;
@@ -25,6 +30,11 @@ EXPORT GenerationMod := MODULE(SALT38.iGenerationMod)
   EXPORT spc_HAS_ASOF := FALSE;
   EXPORT spc_HAS_NONCONTIGUOUS := FALSE;
   EXPORT spc_HAS_SUPERFILES := FALSE;
+  EXPORT spc_HAS_CONSISTENT := FALSE;
+  EXPORT spc_HAS_EXTERNAL := FALSE;
+  EXPORT spc_HAS_PARENTS := FALSE;
+  EXPORT spc_HAS_FORCE := FALSE;
+  EXPORT spc_HAS_BLOCKLINK := FALSE;
  
   // The entire spec file
   EXPORT spcString :=
@@ -98,28 +108,28 @@ EXPORT GenerationMod := MODULE(SALT38.iGenerationMod)
     + 'FIELD:clean_cname:DERIVED:TYPE(STRING):0,0\n'
     + 'FIELD:current_rec:DERIVED:TYPE(BOOLEAN1):0,0\n'
     + '\n'
-    + '//Future BIP addition\n'
-    + '// FIELD:dotid:DERIVED:TYPE(UNSIGNED6):0,0\n'
-    + '// FIELD:dotscore:DERIVED:TYPE(UNSIGNED2):0,0\n'
-    + '// FIELD:dotweight:DERIVED:TYPE(UNSIGNED2):0,0\n'
-    + '// FIELD:empid:DERIVED:TYPE(UNSIGNED6):0,0\n'
-    + '// FIELD:empscore:DERIVED:TYPE(UNSIGNED2):0,0\n'
-    + '// FIELD:empweight:DERIVED:TYPE(UNSIGNED2):0,0\n'
-    + '// FIELD:powid:DERIVED:TYPE(UNSIGNED6):0,0\n'
-    + '// FIELD:powscore:DERIVED:TYPE(UNSIGNED2):0,0\n'
-    + '// FIELD:powweight:DERIVED:TYPE(UNSIGNED2):0,0\n'
-    + '// FIELD:proxid:DERIVED:TYPE(UNSIGNED6):0,0\n'
-    + '// FIELD:proxscore:DERIVED:TYPE(UNSIGNED2):0,0\n'
-    + '// FIELD:proxweight:DERIVED:TYPE(UNSIGNED2):0,0\n'
-    + '// FIELD:seleid:DERIVED:TYPE(UNSIGNED6):0,0\n'
-    + '// FIELD:selescore:DERIVED:TYPE(UNSIGNED2):0,0\n'
-    + '// FIELD:seleweight:DERIVED:TYPE(UNSIGNED2):0,0\n'
-    + '// FIELD:orgid:DERIVED:TYPE(UNSIGNED6):0,0\n'
-    + '// FIELD:orgscore:DERIVED:TYPE(UNSIGNED2):0,0\n'
-    + '// FIELD:orgweight:DERIVED:TYPE(UNSIGNED2):0,0\n'
-    + '// FIELD:ultid:DERIVED:TYPE(UNSIGNED6):0,0\n'
-    + '// FIELD:ultscore:DERIVED:TYPE(UNSIGNED2):0,0\n'
-    + '// FIELD:ultweight:DERIVED:TYPE(UNSIGNED2):0,0\n'
+    + '//BIP addition\n'
+    + 'FIELD:dotid:DERIVED:TYPE(UNSIGNED6):0,0\n'
+    + 'FIELD:dotscore:DERIVED:TYPE(UNSIGNED2):0,0\n'
+    + 'FIELD:dotweight:DERIVED:TYPE(UNSIGNED2):0,0\n'
+    + 'FIELD:empid:DERIVED:TYPE(UNSIGNED6):0,0\n'
+    + 'FIELD:empscore:DERIVED:TYPE(UNSIGNED2):0,0\n'
+    + 'FIELD:empweight:DERIVED:TYPE(UNSIGNED2):0,0\n'
+    + 'FIELD:powid:DERIVED:TYPE(UNSIGNED6):0,0\n'
+    + 'FIELD:powscore:DERIVED:TYPE(UNSIGNED2):0,0\n'
+    + 'FIELD:powweight:DERIVED:TYPE(UNSIGNED2):0,0\n'
+    + 'FIELD:proxid:DERIVED:TYPE(UNSIGNED6):0,0\n'
+    + 'FIELD:proxscore:DERIVED:TYPE(UNSIGNED2):0,0\n'
+    + 'FIELD:proxweight:DERIVED:TYPE(UNSIGNED2):0,0\n'
+    + 'FIELD:seleid:DERIVED:TYPE(UNSIGNED6):0,0\n'
+    + 'FIELD:selescore:DERIVED:TYPE(UNSIGNED2):0,0\n'
+    + 'FIELD:seleweight:DERIVED:TYPE(UNSIGNED2):0,0\n'
+    + 'FIELD:orgid:DERIVED:TYPE(UNSIGNED6):0,0\n'
+    + 'FIELD:orgscore:DERIVED:TYPE(UNSIGNED2):0,0\n'
+    + 'FIELD:orgweight:DERIVED:TYPE(UNSIGNED2):0,0\n'
+    + 'FIELD:ultid:DERIVED:TYPE(UNSIGNED6):0,0\n'
+    + 'FIELD:ultscore:DERIVED:TYPE(UNSIGNED2):0,0\n'
+    + 'FIELD:ultweight:DERIVED:TYPE(UNSIGNED2):0,0\n'
     + '\n'
     + '// CONCEPT statements should be used to group together interellated fields; such as address\n'
     + '// RELATIONSHIP is used to find non-obvious relationships between the clusters\n'
@@ -132,3 +142,4 @@ EXPORT GenerationMod := MODULE(SALT38.iGenerationMod)
     ],{STRING linkpath;STRING compulsory;STRING optional;STRING bonus;STRING required;STRING search});
  
 END;
+

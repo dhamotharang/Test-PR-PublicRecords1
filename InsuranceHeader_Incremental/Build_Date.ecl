@@ -5,7 +5,7 @@ EXPORT Build_Date := MODULE
   Alphalogical       := NOTHOR(STD.File.GetSuperFileSubName(Data_Services.foreign_prod + 'thor_data400::key::insuranceheader_xlink::qa::header',1));
 EXPORT AlphaKeyFull  := Alphalogical[STD.Str.Find(Alphalogical,'_xlink',1) + 8..STD.Str.Find(Alphalogical,'idl',1)-3];
 
-  Bocalogical        := NOTHOR(STD.File.GetSuperFileSubName(Data_Services.foreign_prod_boca + 'thor_data400::key::insuranceheader_xlink::qa::did::refs::name',1));
+  Bocalogical        := NOTHOR(STD.File.GetSuperFileSubName(Data_Services.foreign_prod + 'thor_data400::key::insuranceheader_xlink::qa::did::refs::name',1));
 EXPORT BocaKeyFull   := Bocalogical[STD.Str.Find(Bocalogical,'_xlink',1) + 8..STD.Str.Find(Bocalogical,'::did',1)-1];
 
 //EXPORT AlphaDops   := (UNSIGNED)did_add.get_EnvVariable('iheader_build_version','http://Iroxievip.sc.seisint.com:9876');
@@ -20,7 +20,7 @@ EXPORT IngestIncDate  := IngestIncFilename[STD.Str.Find(IngestIncFilename,'_w',1
        BaseFilename := NOTHOR(STD.File.GetSuperFileSubName('~thor_data400::base::insuranceheader::idl_policy_header',1));
 EXPORT BaseDate     := BaseFilename[STD.Str.Find(BaseFilename,'_w',1) + 2..STD.Str.Find(BaseFilename,'-',1)-1];
 
-        BocaFilename  := NOTHOR(STD.File.GetSuperFileSubName(Data_Services.foreign_prod_boca + 'thor_data400::base::header_raw',1));
+        BocaFilename  := NOTHOR(STD.File.GetSuperFileSubName(Data_Services.foreign_prod + 'thor_data400::base::header_raw',1));
 EXPORT	BocaRaw       := BocaFilename[STD.Str.Find(BocaFilename,'raw_',1) + 4..];
 
 EXPORT  BocaDopsOrig  := (UNSIGNED)did_add.get_EnvVariable('header_build_version','http://roxiebatch.br.seisint.com:9856');

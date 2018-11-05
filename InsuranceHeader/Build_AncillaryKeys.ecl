@@ -1,4 +1,4 @@
-import  tools,InsuranceHeader_PostProcess; 
+import  tools,InsuranceHeader_PostProcess, InsuranceHeader_AllPossibleSSNs, idl_header; 
 
 #workunit('name','Iheader Ancillary keys');
 
@@ -9,8 +9,8 @@ EXPORT Build_AncillaryKeys (string pVersion) := function
 	
 	// DL verification Keys 
 	tools.mac_WriteIndex('TheKeys.did.New'									  ,BuildDidKey							 );
-	tools.mac_WriteIndex('TheKeys.dln.New'									  ,BuildDLKey							   );														  
-
+	tools.mac_WriteIndex('TheKeys.dln.New'									  ,BuildDLKey							   );	
+	
   RunKeys           := sequential( BuildDidKey
 		                         ,BuildDLKey
 		                         ,InsuranceHeader_PostProcess.Promote(version).buildfiles.New2Built
@@ -20,9 +20,18 @@ EXPORT Build_AncillaryKeys (string pVersion) := function
   // CIID phone Keys 
   runCiidphone := InsuranceHeader.proc_ciidphone(pVersion).run ; 
 	
+  // All Possible SSN Key
+  runAllPossibleSSN  := InsuranceHeader_AllPossibleSSNs.proc_files(pversion).run; 
+	bkeyAllPossibleSSN := InsuranceHeader_AllPossibleSSNs.build_key.build_keys;
+	
+	RunKeyAllSSNs      := sequential(runAllPossibleSSN, bkeyAllPossibleSSN);
+	
 	return sequential(
 		 RunKeys
 		,runCiidphone 
+		,RunKeyAllSSNs
 	);
+	
+	
 	
 end; 
