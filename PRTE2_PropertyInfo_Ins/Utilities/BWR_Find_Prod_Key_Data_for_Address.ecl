@@ -21,6 +21,4 @@ JoinVersion := JOIN(ProdAddrKey(prim_range=q_prange AND prim_name=q_pname AND zi
 															TRANSFORM({ProdRidKey},
 															SELF := RIGHT
 															));
-OUTPUT(JoinVersion,NAMED('Payload_Data'));															
-
-
+OUTPUT(JoinVersion,NAMED('Payload_Data'));			
