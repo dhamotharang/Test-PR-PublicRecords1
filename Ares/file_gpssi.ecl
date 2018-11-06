@@ -187,5 +187,5 @@
 
 	final := Project(ssi_full_ds, final_xform(left));
 
-output(sort(final, -Accuity_Location_ID), named('final_output'));
-//EXPORT file_gpssi := final;
+//output(sort(final, -Accuity_Location_ID), named('final_output'));
+EXPORT file_gpssi := final;
