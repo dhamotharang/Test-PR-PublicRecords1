@@ -1,4 +1,4 @@
-/*2017-02-28T09:58:00Z (Wendy Ma)
+﻿/*2017-02-28T09:58:00Z (Wendy Ma)
 DF-18485
 */
 import header,ut;
@@ -145,8 +145,20 @@ lbest getdob(wvalidSSN l, bdob r) := transform
 	self := l;
 end;
 
-result_wdob := join(wvalidSSN, bdob, left.did = right.did,
+result_wdob_ := join(wvalidSSN, bdob, left.did = right.did,
 			 getdob(left, right), left outer, local);					 
+
+//exclude the minors from watchdog GLB
+wdob := distribute(Watchdog.file_best, did);
+ 
+lbest exclude_minors(result_wdob_ l, wdob r) := transform
+	self.did := IF(r.dob = 0 or ut.Age(r.dob) >= 21, l.did, SKIP);
+	//self.dob := r.dob;	// suppress dob
+	self := l;
+end;
+
+result_wdob := join(result_wdob_, wdob, left.did = right.did,
+			 exclude_minors(left, right), left outer, local);				
 			 
 return result_wdob ; 
 end; 

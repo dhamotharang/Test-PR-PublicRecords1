@@ -13,7 +13,7 @@ EXPORT map_SCS0853_conversion(STRING pVersion) := FUNCTION
 	src_st									:= code[1..2];	//License state
 	mari_dest								:= '~thor_data400::in::proflic_mari::';	
 	AddrExceptions := '(DRIVE|CENTER|BUILDING)';
-	CompNames  := '(DEVELOPMENT*|COMPANY|COMPANIES|^THE |^.* LLC)';
+	CompNames  := '(DEVELOPMENT*|COMPANY|COMPANIES|^THE .*|^.*ASSESSOR|ENTERPRISE*|^.* LLC)';
 	C_O_Ind    := '(C/O |C/O:|ATTN:|ATTN: |ATTN|ATTENTION:|ATT:|CO/)';
 	AddressSet := '(SUITE|DRIVE| DR$| ROAD| RD$|BLVD| STREET$| ST$|APT |APT.| AVE | AVE$| AVENUE| COURT| LANE| PLACE | PLACE$| SUITE| PL$| PL.| WAY$| TER$|' +
                 'CIRCLE$| ISLE | PARKWAY| PIKE|PO BOX|LN$| NW$| NE$| CT$| CT.| DR.|CENTURY 21| HIGHWAY| NW$)';
@@ -31,8 +31,9 @@ EXPORT map_SCS0853_conversion(STRING pVersion) := FUNCTION
 	oFile										:= OUTPUT(ClnUnprintable);
 	
 	//Filtering out BAD RECORDS
-	NonBlankName 						:= ClnUnprintable(TRIM(OFFICENAME+SLNUM+LAST_NAME+FULL_NAME) != '');
-	GoodNameRec							:= NonBlankName(OFFICENAME<>'NAME' AND NOT REGEXFIND('(TESTPERSON)', FIRST_NAME+' '+LAST_NAME, NOCASE));
+	NonBlankName 						:= ClnUnprintable(TRIM(OFFICENAME+LAST_NAME+FULL_NAME) != '');
+	GoodNameRec							:= NonBlankName(ut.CleanSpacesAndUpper(OFFICENAME)<>'NAME' AND ut.CleanSpacesAndUpper(FULL_NAME)<>'NAME' AND 
+	                                        NOT REGEXFIND('(TESTPERSON)', FIRST_NAME+' '+LAST_NAME, NOCASE));
 	
 	//Real Estate License to common MARIBASE layout
 	Prof_License_Mari.layouts.base			xformToCommon(GoodNameRec pInput) := TRANSFORM
@@ -138,15 +139,17 @@ EXPORT map_SCS0853_conversion(STRING pVersion) := FUNCTION
 		tempNick 							:= Prof_License_Mari.fGetNickname(tmpFullName,'nick');
 		stripNickName 				:= Prof_License_Mari.fGetNickname(tmpFullName,'strip_nick');
 		GoodName							:= IF(tempNick != '',stripNickName,tmpFullName);
-		ParsedName						:= Prof_License_Mari.mod_clean_name_addr.cleanFMLName(GoodName);
-		FirstName 						:= IF(ParsedName <> '',TRIM(ParsedName[6..25],LEFT,RIGHT),TrimNAME_FIRST);
-		MidName   						:= IF(ParsedName <> '',TRIM(ParsedName[26..45],LEFT,RIGHT),TrimNAME_MID);	
-		LastName  						:= IF(ParsedName <> '',TRIM(ParsedName[46..65],LEFT,RIGHT), TrimNAME_LAST); 
-		Suffix	  						:= TRIM(ParsedName[66..70],LEFT,RIGHT);
+		ParsedName						:= Prof_License_Mari.mod_clean_name_addr.cleanFMLName(GoodName);		
+		re_ParsedName         := IF(LENGTH(TRIM(ParsedName[46..65]))<2 and Address.CleanPersonFML73(GoodName) <> '',Address.CleanPersonFML73(GoodName),ParsedName);		
+			
+		FirstName 						:= IF(re_ParsedName <> '',TRIM(re_ParsedName[6..25],LEFT,RIGHT),TrimNAME_FIRST);
+		MidName   						:= IF(re_ParsedName <> '',TRIM(re_ParsedName[26..45],LEFT,RIGHT),TrimNAME_MID);	
+		LastName  						:= IF(re_ParsedName <> '',TRIM(re_ParsedName[46..65],LEFT,RIGHT), TrimNAME_LAST); 
+		Suffix	  						:= TRIM(re_ParsedName[66..70],LEFT,RIGHT);
 		
-		GoodFirstName 				:= IF(ParsedName <> '' AND tmpFullName[1] = FirstName[1],FirstName,TrimNAME_FIRST);
-		GoodMidName   				:= IF(ParsedName <> '' AND tmpFullName[1] = FirstName[1],MidName,TrimNAME_MID);	
-		GoodLastName  				:= IF(ParsedName <> '' AND tmpFullName[1] = FirstName[1],LastName,TrimNAME_LAST); 
+		GoodFirstName 				:= IF(re_ParsedName <> '' /*AND tmpFullName[1] = FirstName[1]*/,FirstName,TrimNAME_FIRST);
+		GoodMidName   				:= IF(re_ParsedName <> '' /*AND tmpFullName[1] = FirstName[1]*/,MidName,TrimNAME_MID);	
+		GoodLastName  				:= IF(re_ParsedName <> '' /*AND tmpFullName[1] = FirstName[1]*/,LastName,TrimNAME_LAST); 
 		
 		ConcatNAME_FULL 			:= StringLib.StringCleanSpaces(GoodLastName +' '+GoodFirstName);
 		SELF.NAME_ORG		    	:= ConcatNAME_FULL;

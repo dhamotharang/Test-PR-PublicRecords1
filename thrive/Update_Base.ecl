@@ -1,11 +1,11 @@
-import Address, Ut, lib_stringlib, _Control, business_header,_Validate,
+﻿import Address, Ut, lib_stringlib, _Control, business_header,_Validate,
 Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS, NID, AID;
 EXPORT Update_Base (string filedate, boolean pUseProd = false) := function
 std_input := thrive.StandardizeInputFile(filedate, pUseProd);
 //clean name
 NID.Mac_CleanParsedNames(std_input, cleanNames
 													, firstname:=orig_fname,middlename:=orig_mname,lastname:=orig_lname
-													, includeInRepository:=true, normalizeDualNames:=false
+													, includeInRepository:=true, normalizeDualNames:=false, useV2 := true
 												);
 
 //clean address

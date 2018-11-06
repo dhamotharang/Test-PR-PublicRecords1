@@ -1,212 +1,280 @@
-IMPORT SALT36;
+﻿IMPORT SALT311,STD;
 EXPORT Infutor_VIN_hygiene(dataset(Infutor_VIN_layout_VehicleV2) h) := MODULE
- 
+
 //A simple summary record
-EXPORT Summary(SALT36.Str30Type txt,BOOLEAN Glob=TRUE) := FUNCTION
+EXPORT Summary(SALT311.Str30Type  txt,BOOLEAN Glob=TRUE) := FUNCTION
   SummaryLayout := RECORD
     txt;
-    Source := MAX(GROUP,h.state_origin);    NumberOfRecords := COUNT(GROUP);
+    Source := IF(Glob, (TYPEOF(h.state_origin))'', MAX(GROUP,h.state_origin));
+    NumberOfRecords := COUNT(GROUP);
+    populated_iid_cnt := COUNT(GROUP,h.iid <> (TYPEOF(h.iid))'');
     populated_iid_pcnt := AVE(GROUP,IF(h.iid = (TYPEOF(h.iid))'',0,100));
-    maxlength_iid := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.iid)));
-    avelength_iid := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.iid)),h.iid<>(typeof(h.iid))'');
+    maxlength_iid := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.iid)));
+    avelength_iid := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.iid)),h.iid<>(typeof(h.iid))'');
+    populated_pid_cnt := COUNT(GROUP,h.pid <> (TYPEOF(h.pid))'');
     populated_pid_pcnt := AVE(GROUP,IF(h.pid = (TYPEOF(h.pid))'',0,100));
-    maxlength_pid := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.pid)));
-    avelength_pid := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.pid)),h.pid<>(typeof(h.pid))'');
+    maxlength_pid := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.pid)));
+    avelength_pid := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.pid)),h.pid<>(typeof(h.pid))'');
+    populated_vin_cnt := COUNT(GROUP,h.vin <> (TYPEOF(h.vin))'');
     populated_vin_pcnt := AVE(GROUP,IF(h.vin = (TYPEOF(h.vin))'',0,100));
-    maxlength_vin := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.vin)));
-    avelength_vin := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.vin)),h.vin<>(typeof(h.vin))'');
+    maxlength_vin := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.vin)));
+    avelength_vin := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.vin)),h.vin<>(typeof(h.vin))'');
+    populated_make_cnt := COUNT(GROUP,h.make <> (TYPEOF(h.make))'');
     populated_make_pcnt := AVE(GROUP,IF(h.make = (TYPEOF(h.make))'',0,100));
-    maxlength_make := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.make)));
-    avelength_make := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.make)),h.make<>(typeof(h.make))'');
+    maxlength_make := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.make)));
+    avelength_make := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.make)),h.make<>(typeof(h.make))'');
+    populated_model_cnt := COUNT(GROUP,h.model <> (TYPEOF(h.model))'');
     populated_model_pcnt := AVE(GROUP,IF(h.model = (TYPEOF(h.model))'',0,100));
-    maxlength_model := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.model)));
-    avelength_model := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.model)),h.model<>(typeof(h.model))'');
+    maxlength_model := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.model)));
+    avelength_model := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.model)),h.model<>(typeof(h.model))'');
+    populated_year_cnt := COUNT(GROUP,h.year <> (TYPEOF(h.year))'');
     populated_year_pcnt := AVE(GROUP,IF(h.year = (TYPEOF(h.year))'',0,100));
-    maxlength_year := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.year)));
-    avelength_year := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.year)),h.year<>(typeof(h.year))'');
+    maxlength_year := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.year)));
+    avelength_year := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.year)),h.year<>(typeof(h.year))'');
+    populated_class_code_cnt := COUNT(GROUP,h.class_code <> (TYPEOF(h.class_code))'');
     populated_class_code_pcnt := AVE(GROUP,IF(h.class_code = (TYPEOF(h.class_code))'',0,100));
-    maxlength_class_code := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.class_code)));
-    avelength_class_code := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.class_code)),h.class_code<>(typeof(h.class_code))'');
+    maxlength_class_code := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.class_code)));
+    avelength_class_code := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.class_code)),h.class_code<>(typeof(h.class_code))'');
+    populated_fuel_type_code_cnt := COUNT(GROUP,h.fuel_type_code <> (TYPEOF(h.fuel_type_code))'');
     populated_fuel_type_code_pcnt := AVE(GROUP,IF(h.fuel_type_code = (TYPEOF(h.fuel_type_code))'',0,100));
-    maxlength_fuel_type_code := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.fuel_type_code)));
-    avelength_fuel_type_code := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.fuel_type_code)),h.fuel_type_code<>(typeof(h.fuel_type_code))'');
+    maxlength_fuel_type_code := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.fuel_type_code)));
+    avelength_fuel_type_code := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.fuel_type_code)),h.fuel_type_code<>(typeof(h.fuel_type_code))'');
+    populated_mfg_code_cnt := COUNT(GROUP,h.mfg_code <> (TYPEOF(h.mfg_code))'');
     populated_mfg_code_pcnt := AVE(GROUP,IF(h.mfg_code = (TYPEOF(h.mfg_code))'',0,100));
-    maxlength_mfg_code := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.mfg_code)));
-    avelength_mfg_code := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.mfg_code)),h.mfg_code<>(typeof(h.mfg_code))'');
+    maxlength_mfg_code := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.mfg_code)));
+    avelength_mfg_code := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.mfg_code)),h.mfg_code<>(typeof(h.mfg_code))'');
+    populated_style_code_cnt := COUNT(GROUP,h.style_code <> (TYPEOF(h.style_code))'');
     populated_style_code_pcnt := AVE(GROUP,IF(h.style_code = (TYPEOF(h.style_code))'',0,100));
-    maxlength_style_code := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.style_code)));
-    avelength_style_code := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.style_code)),h.style_code<>(typeof(h.style_code))'');
+    maxlength_style_code := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.style_code)));
+    avelength_style_code := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.style_code)),h.style_code<>(typeof(h.style_code))'');
+    populated_mileagecd_cnt := COUNT(GROUP,h.mileagecd <> (TYPEOF(h.mileagecd))'');
     populated_mileagecd_pcnt := AVE(GROUP,IF(h.mileagecd = (TYPEOF(h.mileagecd))'',0,100));
-    maxlength_mileagecd := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.mileagecd)));
-    avelength_mileagecd := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.mileagecd)),h.mileagecd<>(typeof(h.mileagecd))'');
+    maxlength_mileagecd := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.mileagecd)));
+    avelength_mileagecd := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.mileagecd)),h.mileagecd<>(typeof(h.mileagecd))'');
+    populated_nbr_vehicles_cnt := COUNT(GROUP,h.nbr_vehicles <> (TYPEOF(h.nbr_vehicles))'');
     populated_nbr_vehicles_pcnt := AVE(GROUP,IF(h.nbr_vehicles = (TYPEOF(h.nbr_vehicles))'',0,100));
-    maxlength_nbr_vehicles := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.nbr_vehicles)));
-    avelength_nbr_vehicles := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.nbr_vehicles)),h.nbr_vehicles<>(typeof(h.nbr_vehicles))'');
+    maxlength_nbr_vehicles := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.nbr_vehicles)));
+    avelength_nbr_vehicles := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.nbr_vehicles)),h.nbr_vehicles<>(typeof(h.nbr_vehicles))'');
+    populated_idate_cnt := COUNT(GROUP,h.idate <> (TYPEOF(h.idate))'');
     populated_idate_pcnt := AVE(GROUP,IF(h.idate = (TYPEOF(h.idate))'',0,100));
-    maxlength_idate := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.idate)));
-    avelength_idate := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.idate)),h.idate<>(typeof(h.idate))'');
+    maxlength_idate := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.idate)));
+    avelength_idate := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.idate)),h.idate<>(typeof(h.idate))'');
+    populated_odate_cnt := COUNT(GROUP,h.odate <> (TYPEOF(h.odate))'');
     populated_odate_pcnt := AVE(GROUP,IF(h.odate = (TYPEOF(h.odate))'',0,100));
-    maxlength_odate := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.odate)));
-    avelength_odate := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.odate)),h.odate<>(typeof(h.odate))'');
+    maxlength_odate := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.odate)));
+    avelength_odate := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.odate)),h.odate<>(typeof(h.odate))'');
+    populated_fname_cnt := COUNT(GROUP,h.fname <> (TYPEOF(h.fname))'');
     populated_fname_pcnt := AVE(GROUP,IF(h.fname = (TYPEOF(h.fname))'',0,100));
-    maxlength_fname := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.fname)));
-    avelength_fname := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.fname)),h.fname<>(typeof(h.fname))'');
+    maxlength_fname := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.fname)));
+    avelength_fname := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.fname)),h.fname<>(typeof(h.fname))'');
+    populated_mi_cnt := COUNT(GROUP,h.mi <> (TYPEOF(h.mi))'');
     populated_mi_pcnt := AVE(GROUP,IF(h.mi = (TYPEOF(h.mi))'',0,100));
-    maxlength_mi := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.mi)));
-    avelength_mi := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.mi)),h.mi<>(typeof(h.mi))'');
+    maxlength_mi := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.mi)));
+    avelength_mi := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.mi)),h.mi<>(typeof(h.mi))'');
+    populated_lname_cnt := COUNT(GROUP,h.lname <> (TYPEOF(h.lname))'');
     populated_lname_pcnt := AVE(GROUP,IF(h.lname = (TYPEOF(h.lname))'',0,100));
-    maxlength_lname := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.lname)));
-    avelength_lname := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.lname)),h.lname<>(typeof(h.lname))'');
+    maxlength_lname := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.lname)));
+    avelength_lname := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.lname)),h.lname<>(typeof(h.lname))'');
+    populated_suffix_cnt := COUNT(GROUP,h.suffix <> (TYPEOF(h.suffix))'');
     populated_suffix_pcnt := AVE(GROUP,IF(h.suffix = (TYPEOF(h.suffix))'',0,100));
-    maxlength_suffix := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.suffix)));
-    avelength_suffix := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.suffix)),h.suffix<>(typeof(h.suffix))'');
+    maxlength_suffix := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.suffix)));
+    avelength_suffix := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.suffix)),h.suffix<>(typeof(h.suffix))'');
+    populated_gender_cnt := COUNT(GROUP,h.gender <> (TYPEOF(h.gender))'');
     populated_gender_pcnt := AVE(GROUP,IF(h.gender = (TYPEOF(h.gender))'',0,100));
-    maxlength_gender := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.gender)));
-    avelength_gender := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.gender)),h.gender<>(typeof(h.gender))'');
+    maxlength_gender := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.gender)));
+    avelength_gender := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.gender)),h.gender<>(typeof(h.gender))'');
+    populated_house_cnt := COUNT(GROUP,h.house <> (TYPEOF(h.house))'');
     populated_house_pcnt := AVE(GROUP,IF(h.house = (TYPEOF(h.house))'',0,100));
-    maxlength_house := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.house)));
-    avelength_house := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.house)),h.house<>(typeof(h.house))'');
+    maxlength_house := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.house)));
+    avelength_house := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.house)),h.house<>(typeof(h.house))'');
+    populated_predir_cnt := COUNT(GROUP,h.predir <> (TYPEOF(h.predir))'');
     populated_predir_pcnt := AVE(GROUP,IF(h.predir = (TYPEOF(h.predir))'',0,100));
-    maxlength_predir := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.predir)));
-    avelength_predir := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.predir)),h.predir<>(typeof(h.predir))'');
+    maxlength_predir := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.predir)));
+    avelength_predir := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.predir)),h.predir<>(typeof(h.predir))'');
+    populated_street_cnt := COUNT(GROUP,h.street <> (TYPEOF(h.street))'');
     populated_street_pcnt := AVE(GROUP,IF(h.street = (TYPEOF(h.street))'',0,100));
-    maxlength_street := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.street)));
-    avelength_street := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.street)),h.street<>(typeof(h.street))'');
+    maxlength_street := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.street)));
+    avelength_street := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.street)),h.street<>(typeof(h.street))'');
+    populated_strtype_cnt := COUNT(GROUP,h.strtype <> (TYPEOF(h.strtype))'');
     populated_strtype_pcnt := AVE(GROUP,IF(h.strtype = (TYPEOF(h.strtype))'',0,100));
-    maxlength_strtype := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.strtype)));
-    avelength_strtype := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.strtype)),h.strtype<>(typeof(h.strtype))'');
+    maxlength_strtype := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.strtype)));
+    avelength_strtype := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.strtype)),h.strtype<>(typeof(h.strtype))'');
+    populated_postdir_cnt := COUNT(GROUP,h.postdir <> (TYPEOF(h.postdir))'');
     populated_postdir_pcnt := AVE(GROUP,IF(h.postdir = (TYPEOF(h.postdir))'',0,100));
-    maxlength_postdir := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.postdir)));
-    avelength_postdir := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.postdir)),h.postdir<>(typeof(h.postdir))'');
+    maxlength_postdir := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.postdir)));
+    avelength_postdir := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.postdir)),h.postdir<>(typeof(h.postdir))'');
+    populated_apttype_cnt := COUNT(GROUP,h.apttype <> (TYPEOF(h.apttype))'');
     populated_apttype_pcnt := AVE(GROUP,IF(h.apttype = (TYPEOF(h.apttype))'',0,100));
-    maxlength_apttype := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.apttype)));
-    avelength_apttype := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.apttype)),h.apttype<>(typeof(h.apttype))'');
+    maxlength_apttype := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.apttype)));
+    avelength_apttype := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.apttype)),h.apttype<>(typeof(h.apttype))'');
+    populated_aptnbr_cnt := COUNT(GROUP,h.aptnbr <> (TYPEOF(h.aptnbr))'');
     populated_aptnbr_pcnt := AVE(GROUP,IF(h.aptnbr = (TYPEOF(h.aptnbr))'',0,100));
-    maxlength_aptnbr := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.aptnbr)));
-    avelength_aptnbr := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.aptnbr)),h.aptnbr<>(typeof(h.aptnbr))'');
+    maxlength_aptnbr := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.aptnbr)));
+    avelength_aptnbr := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.aptnbr)),h.aptnbr<>(typeof(h.aptnbr))'');
+    populated_city_cnt := COUNT(GROUP,h.city <> (TYPEOF(h.city))'');
     populated_city_pcnt := AVE(GROUP,IF(h.city = (TYPEOF(h.city))'',0,100));
-    maxlength_city := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.city)));
-    avelength_city := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.city)),h.city<>(typeof(h.city))'');
+    maxlength_city := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.city)));
+    avelength_city := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.city)),h.city<>(typeof(h.city))'');
+    populated_state_cnt := COUNT(GROUP,h.state <> (TYPEOF(h.state))'');
     populated_state_pcnt := AVE(GROUP,IF(h.state = (TYPEOF(h.state))'',0,100));
-    maxlength_state := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.state)));
-    avelength_state := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.state)),h.state<>(typeof(h.state))'');
+    maxlength_state := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.state)));
+    avelength_state := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.state)),h.state<>(typeof(h.state))'');
+    populated_zip_cnt := COUNT(GROUP,h.zip <> (TYPEOF(h.zip))'');
     populated_zip_pcnt := AVE(GROUP,IF(h.zip = (TYPEOF(h.zip))'',0,100));
-    maxlength_zip := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.zip)));
-    avelength_zip := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.zip)),h.zip<>(typeof(h.zip))'');
+    maxlength_zip := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.zip)));
+    avelength_zip := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.zip)),h.zip<>(typeof(h.zip))'');
+    populated_z4_cnt := COUNT(GROUP,h.z4 <> (TYPEOF(h.z4))'');
     populated_z4_pcnt := AVE(GROUP,IF(h.z4 = (TYPEOF(h.z4))'',0,100));
-    maxlength_z4 := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.z4)));
-    avelength_z4 := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.z4)),h.z4<>(typeof(h.z4))'');
+    maxlength_z4 := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.z4)));
+    avelength_z4 := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.z4)),h.z4<>(typeof(h.z4))'');
+    populated_dpc_cnt := COUNT(GROUP,h.dpc <> (TYPEOF(h.dpc))'');
     populated_dpc_pcnt := AVE(GROUP,IF(h.dpc = (TYPEOF(h.dpc))'',0,100));
-    maxlength_dpc := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.dpc)));
-    avelength_dpc := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.dpc)),h.dpc<>(typeof(h.dpc))'');
+    maxlength_dpc := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.dpc)));
+    avelength_dpc := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.dpc)),h.dpc<>(typeof(h.dpc))'');
+    populated_crte_cnt := COUNT(GROUP,h.crte <> (TYPEOF(h.crte))'');
     populated_crte_pcnt := AVE(GROUP,IF(h.crte = (TYPEOF(h.crte))'',0,100));
-    maxlength_crte := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.crte)));
-    avelength_crte := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.crte)),h.crte<>(typeof(h.crte))'');
+    maxlength_crte := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.crte)));
+    avelength_crte := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.crte)),h.crte<>(typeof(h.crte))'');
+    populated_cnty_cnt := COUNT(GROUP,h.cnty <> (TYPEOF(h.cnty))'');
     populated_cnty_pcnt := AVE(GROUP,IF(h.cnty = (TYPEOF(h.cnty))'',0,100));
-    maxlength_cnty := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.cnty)));
-    avelength_cnty := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.cnty)),h.cnty<>(typeof(h.cnty))'');
+    maxlength_cnty := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.cnty)));
+    avelength_cnty := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.cnty)),h.cnty<>(typeof(h.cnty))'');
+    populated_z4type_cnt := COUNT(GROUP,h.z4type <> (TYPEOF(h.z4type))'');
     populated_z4type_pcnt := AVE(GROUP,IF(h.z4type = (TYPEOF(h.z4type))'',0,100));
-    maxlength_z4type := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.z4type)));
-    avelength_z4type := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.z4type)),h.z4type<>(typeof(h.z4type))'');
+    maxlength_z4type := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.z4type)));
+    avelength_z4type := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.z4type)),h.z4type<>(typeof(h.z4type))'');
+    populated_dpv_cnt := COUNT(GROUP,h.dpv <> (TYPEOF(h.dpv))'');
     populated_dpv_pcnt := AVE(GROUP,IF(h.dpv = (TYPEOF(h.dpv))'',0,100));
-    maxlength_dpv := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.dpv)));
-    avelength_dpv := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.dpv)),h.dpv<>(typeof(h.dpv))'');
+    maxlength_dpv := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.dpv)));
+    avelength_dpv := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.dpv)),h.dpv<>(typeof(h.dpv))'');
+    populated_vacant_cnt := COUNT(GROUP,h.vacant <> (TYPEOF(h.vacant))'');
     populated_vacant_pcnt := AVE(GROUP,IF(h.vacant = (TYPEOF(h.vacant))'',0,100));
-    maxlength_vacant := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.vacant)));
-    avelength_vacant := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.vacant)),h.vacant<>(typeof(h.vacant))'');
+    maxlength_vacant := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.vacant)));
+    avelength_vacant := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.vacant)),h.vacant<>(typeof(h.vacant))'');
+    populated_phone_cnt := COUNT(GROUP,h.phone <> (TYPEOF(h.phone))'');
     populated_phone_pcnt := AVE(GROUP,IF(h.phone = (TYPEOF(h.phone))'',0,100));
-    maxlength_phone := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.phone)));
-    avelength_phone := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.phone)),h.phone<>(typeof(h.phone))'');
+    maxlength_phone := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.phone)));
+    avelength_phone := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.phone)),h.phone<>(typeof(h.phone))'');
+    populated_dnc_cnt := COUNT(GROUP,h.dnc <> (TYPEOF(h.dnc))'');
     populated_dnc_pcnt := AVE(GROUP,IF(h.dnc = (TYPEOF(h.dnc))'',0,100));
-    maxlength_dnc := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.dnc)));
-    avelength_dnc := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.dnc)),h.dnc<>(typeof(h.dnc))'');
+    maxlength_dnc := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.dnc)));
+    avelength_dnc := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.dnc)),h.dnc<>(typeof(h.dnc))'');
+    populated_internal1_cnt := COUNT(GROUP,h.internal1 <> (TYPEOF(h.internal1))'');
     populated_internal1_pcnt := AVE(GROUP,IF(h.internal1 = (TYPEOF(h.internal1))'',0,100));
-    maxlength_internal1 := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.internal1)));
-    avelength_internal1 := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.internal1)),h.internal1<>(typeof(h.internal1))'');
+    maxlength_internal1 := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.internal1)));
+    avelength_internal1 := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.internal1)),h.internal1<>(typeof(h.internal1))'');
+    populated_internal2_cnt := COUNT(GROUP,h.internal2 <> (TYPEOF(h.internal2))'');
     populated_internal2_pcnt := AVE(GROUP,IF(h.internal2 = (TYPEOF(h.internal2))'',0,100));
-    maxlength_internal2 := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.internal2)));
-    avelength_internal2 := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.internal2)),h.internal2<>(typeof(h.internal2))'');
+    maxlength_internal2 := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.internal2)));
+    avelength_internal2 := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.internal2)),h.internal2<>(typeof(h.internal2))'');
+    populated_internal3_cnt := COUNT(GROUP,h.internal3 <> (TYPEOF(h.internal3))'');
     populated_internal3_pcnt := AVE(GROUP,IF(h.internal3 = (TYPEOF(h.internal3))'',0,100));
-    maxlength_internal3 := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.internal3)));
-    avelength_internal3 := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.internal3)),h.internal3<>(typeof(h.internal3))'');
+    maxlength_internal3 := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.internal3)));
+    avelength_internal3 := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.internal3)),h.internal3<>(typeof(h.internal3))'');
+    populated_county_cnt := COUNT(GROUP,h.county <> (TYPEOF(h.county))'');
     populated_county_pcnt := AVE(GROUP,IF(h.county = (TYPEOF(h.county))'',0,100));
-    maxlength_county := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.county)));
-    avelength_county := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.county)),h.county<>(typeof(h.county))'');
+    maxlength_county := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.county)));
+    avelength_county := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.county)),h.county<>(typeof(h.county))'');
+    populated_msa_cnt := COUNT(GROUP,h.msa <> (TYPEOF(h.msa))'');
     populated_msa_pcnt := AVE(GROUP,IF(h.msa = (TYPEOF(h.msa))'',0,100));
-    maxlength_msa := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.msa)));
-    avelength_msa := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.msa)),h.msa<>(typeof(h.msa))'');
+    maxlength_msa := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.msa)));
+    avelength_msa := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.msa)),h.msa<>(typeof(h.msa))'');
+    populated_cbsa_cnt := COUNT(GROUP,h.cbsa <> (TYPEOF(h.cbsa))'');
     populated_cbsa_pcnt := AVE(GROUP,IF(h.cbsa = (TYPEOF(h.cbsa))'',0,100));
-    maxlength_cbsa := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.cbsa)));
-    avelength_cbsa := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.cbsa)),h.cbsa<>(typeof(h.cbsa))'');
+    maxlength_cbsa := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.cbsa)));
+    avelength_cbsa := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.cbsa)),h.cbsa<>(typeof(h.cbsa))'');
+    populated_ehi_cnt := COUNT(GROUP,h.ehi <> (TYPEOF(h.ehi))'');
     populated_ehi_pcnt := AVE(GROUP,IF(h.ehi = (TYPEOF(h.ehi))'',0,100));
-    maxlength_ehi := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.ehi)));
-    avelength_ehi := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.ehi)),h.ehi<>(typeof(h.ehi))'');
+    maxlength_ehi := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.ehi)));
+    avelength_ehi := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.ehi)),h.ehi<>(typeof(h.ehi))'');
+    populated_child_cnt := COUNT(GROUP,h.child <> (TYPEOF(h.child))'');
     populated_child_pcnt := AVE(GROUP,IF(h.child = (TYPEOF(h.child))'',0,100));
-    maxlength_child := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.child)));
-    avelength_child := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.child)),h.child<>(typeof(h.child))'');
+    maxlength_child := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.child)));
+    avelength_child := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.child)),h.child<>(typeof(h.child))'');
+    populated_homeowner_cnt := COUNT(GROUP,h.homeowner <> (TYPEOF(h.homeowner))'');
     populated_homeowner_pcnt := AVE(GROUP,IF(h.homeowner = (TYPEOF(h.homeowner))'',0,100));
-    maxlength_homeowner := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.homeowner)));
-    avelength_homeowner := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.homeowner)),h.homeowner<>(typeof(h.homeowner))'');
+    maxlength_homeowner := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.homeowner)));
+    avelength_homeowner := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.homeowner)),h.homeowner<>(typeof(h.homeowner))'');
+    populated_pctw_cnt := COUNT(GROUP,h.pctw <> (TYPEOF(h.pctw))'');
     populated_pctw_pcnt := AVE(GROUP,IF(h.pctw = (TYPEOF(h.pctw))'',0,100));
-    maxlength_pctw := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.pctw)));
-    avelength_pctw := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.pctw)),h.pctw<>(typeof(h.pctw))'');
+    maxlength_pctw := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.pctw)));
+    avelength_pctw := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.pctw)),h.pctw<>(typeof(h.pctw))'');
+    populated_pctb_cnt := COUNT(GROUP,h.pctb <> (TYPEOF(h.pctb))'');
     populated_pctb_pcnt := AVE(GROUP,IF(h.pctb = (TYPEOF(h.pctb))'',0,100));
-    maxlength_pctb := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.pctb)));
-    avelength_pctb := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.pctb)),h.pctb<>(typeof(h.pctb))'');
+    maxlength_pctb := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.pctb)));
+    avelength_pctb := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.pctb)),h.pctb<>(typeof(h.pctb))'');
+    populated_pcta_cnt := COUNT(GROUP,h.pcta <> (TYPEOF(h.pcta))'');
     populated_pcta_pcnt := AVE(GROUP,IF(h.pcta = (TYPEOF(h.pcta))'',0,100));
-    maxlength_pcta := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.pcta)));
-    avelength_pcta := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.pcta)),h.pcta<>(typeof(h.pcta))'');
+    maxlength_pcta := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.pcta)));
+    avelength_pcta := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.pcta)),h.pcta<>(typeof(h.pcta))'');
+    populated_pcth_cnt := COUNT(GROUP,h.pcth <> (TYPEOF(h.pcth))'');
     populated_pcth_pcnt := AVE(GROUP,IF(h.pcth = (TYPEOF(h.pcth))'',0,100));
-    maxlength_pcth := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.pcth)));
-    avelength_pcth := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.pcth)),h.pcth<>(typeof(h.pcth))'');
+    maxlength_pcth := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.pcth)));
+    avelength_pcth := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.pcth)),h.pcth<>(typeof(h.pcth))'');
+    populated_pctspe_cnt := COUNT(GROUP,h.pctspe <> (TYPEOF(h.pctspe))'');
     populated_pctspe_pcnt := AVE(GROUP,IF(h.pctspe = (TYPEOF(h.pctspe))'',0,100));
-    maxlength_pctspe := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.pctspe)));
-    avelength_pctspe := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.pctspe)),h.pctspe<>(typeof(h.pctspe))'');
+    maxlength_pctspe := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.pctspe)));
+    avelength_pctspe := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.pctspe)),h.pctspe<>(typeof(h.pctspe))'');
+    populated_pctsps_cnt := COUNT(GROUP,h.pctsps <> (TYPEOF(h.pctsps))'');
     populated_pctsps_pcnt := AVE(GROUP,IF(h.pctsps = (TYPEOF(h.pctsps))'',0,100));
-    maxlength_pctsps := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.pctsps)));
-    avelength_pctsps := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.pctsps)),h.pctsps<>(typeof(h.pctsps))'');
+    maxlength_pctsps := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.pctsps)));
+    avelength_pctsps := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.pctsps)),h.pctsps<>(typeof(h.pctsps))'');
+    populated_pctspa_cnt := COUNT(GROUP,h.pctspa <> (TYPEOF(h.pctspa))'');
     populated_pctspa_pcnt := AVE(GROUP,IF(h.pctspa = (TYPEOF(h.pctspa))'',0,100));
-    maxlength_pctspa := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.pctspa)));
-    avelength_pctspa := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.pctspa)),h.pctspa<>(typeof(h.pctspa))'');
+    maxlength_pctspa := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.pctspa)));
+    avelength_pctspa := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.pctspa)),h.pctspa<>(typeof(h.pctspa))'');
+    populated_mhv_cnt := COUNT(GROUP,h.mhv <> (TYPEOF(h.mhv))'');
     populated_mhv_pcnt := AVE(GROUP,IF(h.mhv = (TYPEOF(h.mhv))'',0,100));
-    maxlength_mhv := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.mhv)));
-    avelength_mhv := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.mhv)),h.mhv<>(typeof(h.mhv))'');
+    maxlength_mhv := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.mhv)));
+    avelength_mhv := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.mhv)),h.mhv<>(typeof(h.mhv))'');
+    populated_mor_cnt := COUNT(GROUP,h.mor <> (TYPEOF(h.mor))'');
     populated_mor_pcnt := AVE(GROUP,IF(h.mor = (TYPEOF(h.mor))'',0,100));
-    maxlength_mor := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.mor)));
-    avelength_mor := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.mor)),h.mor<>(typeof(h.mor))'');
+    maxlength_mor := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.mor)));
+    avelength_mor := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.mor)),h.mor<>(typeof(h.mor))'');
+    populated_pctoccw_cnt := COUNT(GROUP,h.pctoccw <> (TYPEOF(h.pctoccw))'');
     populated_pctoccw_pcnt := AVE(GROUP,IF(h.pctoccw = (TYPEOF(h.pctoccw))'',0,100));
-    maxlength_pctoccw := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.pctoccw)));
-    avelength_pctoccw := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.pctoccw)),h.pctoccw<>(typeof(h.pctoccw))'');
+    maxlength_pctoccw := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.pctoccw)));
+    avelength_pctoccw := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.pctoccw)),h.pctoccw<>(typeof(h.pctoccw))'');
+    populated_pctoccb_cnt := COUNT(GROUP,h.pctoccb <> (TYPEOF(h.pctoccb))'');
     populated_pctoccb_pcnt := AVE(GROUP,IF(h.pctoccb = (TYPEOF(h.pctoccb))'',0,100));
-    maxlength_pctoccb := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.pctoccb)));
-    avelength_pctoccb := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.pctoccb)),h.pctoccb<>(typeof(h.pctoccb))'');
+    maxlength_pctoccb := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.pctoccb)));
+    avelength_pctoccb := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.pctoccb)),h.pctoccb<>(typeof(h.pctoccb))'');
+    populated_pctocco_cnt := COUNT(GROUP,h.pctocco <> (TYPEOF(h.pctocco))'');
     populated_pctocco_pcnt := AVE(GROUP,IF(h.pctocco = (TYPEOF(h.pctocco))'',0,100));
-    maxlength_pctocco := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.pctocco)));
-    avelength_pctocco := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.pctocco)),h.pctocco<>(typeof(h.pctocco))'');
+    maxlength_pctocco := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.pctocco)));
+    avelength_pctocco := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.pctocco)),h.pctocco<>(typeof(h.pctocco))'');
+    populated_lor_cnt := COUNT(GROUP,h.lor <> (TYPEOF(h.lor))'');
     populated_lor_pcnt := AVE(GROUP,IF(h.lor = (TYPEOF(h.lor))'',0,100));
-    maxlength_lor := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.lor)));
-    avelength_lor := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.lor)),h.lor<>(typeof(h.lor))'');
+    maxlength_lor := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.lor)));
+    avelength_lor := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.lor)),h.lor<>(typeof(h.lor))'');
+    populated_sfdu_cnt := COUNT(GROUP,h.sfdu <> (TYPEOF(h.sfdu))'');
     populated_sfdu_pcnt := AVE(GROUP,IF(h.sfdu = (TYPEOF(h.sfdu))'',0,100));
-    maxlength_sfdu := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.sfdu)));
-    avelength_sfdu := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.sfdu)),h.sfdu<>(typeof(h.sfdu))'');
+    maxlength_sfdu := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.sfdu)));
+    avelength_sfdu := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.sfdu)),h.sfdu<>(typeof(h.sfdu))'');
+    populated_mfdu_cnt := COUNT(GROUP,h.mfdu <> (TYPEOF(h.mfdu))'');
     populated_mfdu_pcnt := AVE(GROUP,IF(h.mfdu = (TYPEOF(h.mfdu))'',0,100));
-    maxlength_mfdu := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.mfdu)));
-    avelength_mfdu := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.mfdu)),h.mfdu<>(typeof(h.mfdu))'');
+    maxlength_mfdu := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.mfdu)));
+    avelength_mfdu := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.mfdu)),h.mfdu<>(typeof(h.mfdu))'');
+    populated_processdate_cnt := COUNT(GROUP,h.processdate <> (TYPEOF(h.processdate))'');
     populated_processdate_pcnt := AVE(GROUP,IF(h.processdate = (TYPEOF(h.processdate))'',0,100));
-    maxlength_processdate := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.processdate)));
-    avelength_processdate := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.processdate)),h.processdate<>(typeof(h.processdate))'');
+    maxlength_processdate := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.processdate)));
+    avelength_processdate := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.processdate)),h.processdate<>(typeof(h.processdate))'');
+    populated_source_code_cnt := COUNT(GROUP,h.source_code <> (TYPEOF(h.source_code))'');
     populated_source_code_pcnt := AVE(GROUP,IF(h.source_code = (TYPEOF(h.source_code))'',0,100));
-    maxlength_source_code := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.source_code)));
-    avelength_source_code := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.source_code)),h.source_code<>(typeof(h.source_code))'');
+    maxlength_source_code := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.source_code)));
+    avelength_source_code := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.source_code)),h.source_code<>(typeof(h.source_code))'');
+    populated_state_origin_cnt := COUNT(GROUP,h.state_origin <> (TYPEOF(h.state_origin))'');
     populated_state_origin_pcnt := AVE(GROUP,IF(h.state_origin = (TYPEOF(h.state_origin))'',0,100));
-    maxlength_state_origin := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.state_origin)));
-    avelength_state_origin := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.state_origin)),h.state_origin<>(typeof(h.state_origin))'');
+    maxlength_state_origin := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.state_origin)));
+    avelength_state_origin := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.state_origin)),h.state_origin<>(typeof(h.state_origin))'');
+    populated_append_ownernametypeind_cnt := COUNT(GROUP,h.append_ownernametypeind <> (TYPEOF(h.append_ownernametypeind))'');
     populated_append_ownernametypeind_pcnt := AVE(GROUP,IF(h.append_ownernametypeind = (TYPEOF(h.append_ownernametypeind))'',0,100));
-    maxlength_append_ownernametypeind := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.append_ownernametypeind)));
-    avelength_append_ownernametypeind := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.append_ownernametypeind)),h.append_ownernametypeind<>(typeof(h.append_ownernametypeind))'');
+    maxlength_append_ownernametypeind := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.append_ownernametypeind)));
+    avelength_append_ownernametypeind := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.append_ownernametypeind)),h.append_ownernametypeind<>(typeof(h.append_ownernametypeind))'');
+    populated_fullname_cnt := COUNT(GROUP,h.fullname <> (TYPEOF(h.fullname))'');
     populated_fullname_pcnt := AVE(GROUP,IF(h.fullname = (TYPEOF(h.fullname))'',0,100));
-    maxlength_fullname := MAX(GROUP,LENGTH(TRIM((SALT36.StrType)h.fullname)));
-    avelength_fullname := AVE(GROUP,LENGTH(TRIM((SALT36.StrType)h.fullname)),h.fullname<>(typeof(h.fullname))'');
+    maxlength_fullname := MAX(GROUP,LENGTH(TRIM((SALT311.StrType)h.fullname)));
+    avelength_fullname := AVE(GROUP,LENGTH(TRIM((SALT311.StrType)h.fullname)),h.fullname<>(typeof(h.fullname))'');
   END;
     T := IF(Glob,TABLE(h,SummaryLayout),TABLE(h,SummaryLayout,state_origin,FEW));
   R1 := RECORD
@@ -215,8 +283,9 @@ EXPORT Summary(SALT36.Str30Type txt,BOOLEAN Glob=TRUE) := FUNCTION
   END;
   RETURN TABLE(T,R1);
 END;
- 
-EXPORT SourceCounts := Summary('SummaryBySource',FALSE);  R := RECORD
+
+EXPORT SourceCounts := Summary('SummaryBySource',FALSE);
+  R := RECORD
     STRING state_origin1;
     STRING state_origin2;
     UNSIGNED LinkingPotential;
@@ -228,9 +297,9 @@ EXPORT SourceCounts := Summary('SummaryBySource',FALSE);  R := RECORD
   END;
 EXPORT CrossLinkingPotential := JOIN(SourceCounts,SourceCounts,LEFT.Source<>RIGHT.Source,T(LEFT,RIGHT),ALL);
 summary0 := Summary('Summary');
-invRec := RECORD
+  invRec := RECORD
   UNSIGNED  FldNo;
-  SALT36.StrType FieldName;
+  SALT311.StrType FieldName;
   UNSIGNED NumberOfRecords;
   REAL8  populated_pcnt;
   UNSIGNED  maxlength;
@@ -247,18 +316,18 @@ END;
 EXPORT invSummary := NORMALIZE(summary0, 67, invert(LEFT,COUNTER));
 // The character counts
 // Move everything into 'inverted list' form so processing can be done 'in library'
-SALT36.MAC_Character_Counts.X_Data_Layout Into(h le,unsigned C) := TRANSFORM
+SALT311.MAC_Character_Counts.X_Data_Layout Into(h le,unsigned C) := TRANSFORM
   SELF.Src := le.state_origin;
-  SELF.Fld := TRIM(CHOOSE(C,TRIM((SALT36.StrType)le.iid),TRIM((SALT36.StrType)le.pid),TRIM((SALT36.StrType)le.vin),TRIM((SALT36.StrType)le.make),TRIM((SALT36.StrType)le.model),TRIM((SALT36.StrType)le.year),TRIM((SALT36.StrType)le.class_code),TRIM((SALT36.StrType)le.fuel_type_code),TRIM((SALT36.StrType)le.mfg_code),TRIM((SALT36.StrType)le.style_code),TRIM((SALT36.StrType)le.mileagecd),TRIM((SALT36.StrType)le.nbr_vehicles),TRIM((SALT36.StrType)le.idate),TRIM((SALT36.StrType)le.odate),TRIM((SALT36.StrType)le.fname),TRIM((SALT36.StrType)le.mi),TRIM((SALT36.StrType)le.lname),TRIM((SALT36.StrType)le.suffix),TRIM((SALT36.StrType)le.gender),TRIM((SALT36.StrType)le.house),TRIM((SALT36.StrType)le.predir),TRIM((SALT36.StrType)le.street),TRIM((SALT36.StrType)le.strtype),TRIM((SALT36.StrType)le.postdir),TRIM((SALT36.StrType)le.apttype),TRIM((SALT36.StrType)le.aptnbr),TRIM((SALT36.StrType)le.city),TRIM((SALT36.StrType)le.state),TRIM((SALT36.StrType)le.zip),TRIM((SALT36.StrType)le.z4),TRIM((SALT36.StrType)le.dpc),TRIM((SALT36.StrType)le.crte),TRIM((SALT36.StrType)le.cnty),TRIM((SALT36.StrType)le.z4type),TRIM((SALT36.StrType)le.dpv),TRIM((SALT36.StrType)le.vacant),TRIM((SALT36.StrType)le.phone),TRIM((SALT36.StrType)le.dnc),TRIM((SALT36.StrType)le.internal1),TRIM((SALT36.StrType)le.internal2),TRIM((SALT36.StrType)le.internal3),TRIM((SALT36.StrType)le.county),TRIM((SALT36.StrType)le.msa),TRIM((SALT36.StrType)le.cbsa),TRIM((SALT36.StrType)le.ehi),TRIM((SALT36.StrType)le.child),TRIM((SALT36.StrType)le.homeowner),TRIM((SALT36.StrType)le.pctw),TRIM((SALT36.StrType)le.pctb),TRIM((SALT36.StrType)le.pcta),TRIM((SALT36.StrType)le.pcth),TRIM((SALT36.StrType)le.pctspe),TRIM((SALT36.StrType)le.pctsps),TRIM((SALT36.StrType)le.pctspa),TRIM((SALT36.StrType)le.mhv),TRIM((SALT36.StrType)le.mor),TRIM((SALT36.StrType)le.pctoccw),TRIM((SALT36.StrType)le.pctoccb),TRIM((SALT36.StrType)le.pctocco),TRIM((SALT36.StrType)le.lor),TRIM((SALT36.StrType)le.sfdu),TRIM((SALT36.StrType)le.mfdu),TRIM((SALT36.StrType)le.processdate),TRIM((SALT36.StrType)le.source_code),TRIM((SALT36.StrType)le.state_origin),TRIM((SALT36.StrType)le.append_ownernametypeind),TRIM((SALT36.StrType)le.fullname)));
+  SELF.Fld := TRIM(CHOOSE(C,TRIM((SALT311.StrType)le.iid),TRIM((SALT311.StrType)le.pid),TRIM((SALT311.StrType)le.vin),TRIM((SALT311.StrType)le.make),TRIM((SALT311.StrType)le.model),TRIM((SALT311.StrType)le.year),TRIM((SALT311.StrType)le.class_code),TRIM((SALT311.StrType)le.fuel_type_code),TRIM((SALT311.StrType)le.mfg_code),TRIM((SALT311.StrType)le.style_code),TRIM((SALT311.StrType)le.mileagecd),TRIM((SALT311.StrType)le.nbr_vehicles),TRIM((SALT311.StrType)le.idate),TRIM((SALT311.StrType)le.odate),TRIM((SALT311.StrType)le.fname),TRIM((SALT311.StrType)le.mi),TRIM((SALT311.StrType)le.lname),TRIM((SALT311.StrType)le.suffix),TRIM((SALT311.StrType)le.gender),TRIM((SALT311.StrType)le.house),TRIM((SALT311.StrType)le.predir),TRIM((SALT311.StrType)le.street),TRIM((SALT311.StrType)le.strtype),TRIM((SALT311.StrType)le.postdir),TRIM((SALT311.StrType)le.apttype),TRIM((SALT311.StrType)le.aptnbr),TRIM((SALT311.StrType)le.city),TRIM((SALT311.StrType)le.state),TRIM((SALT311.StrType)le.zip),TRIM((SALT311.StrType)le.z4),TRIM((SALT311.StrType)le.dpc),TRIM((SALT311.StrType)le.crte),TRIM((SALT311.StrType)le.cnty),TRIM((SALT311.StrType)le.z4type),TRIM((SALT311.StrType)le.dpv),TRIM((SALT311.StrType)le.vacant),TRIM((SALT311.StrType)le.phone),TRIM((SALT311.StrType)le.dnc),TRIM((SALT311.StrType)le.internal1),TRIM((SALT311.StrType)le.internal2),TRIM((SALT311.StrType)le.internal3),TRIM((SALT311.StrType)le.county),TRIM((SALT311.StrType)le.msa),TRIM((SALT311.StrType)le.cbsa),TRIM((SALT311.StrType)le.ehi),TRIM((SALT311.StrType)le.child),TRIM((SALT311.StrType)le.homeowner),TRIM((SALT311.StrType)le.pctw),TRIM((SALT311.StrType)le.pctb),TRIM((SALT311.StrType)le.pcta),TRIM((SALT311.StrType)le.pcth),TRIM((SALT311.StrType)le.pctspe),TRIM((SALT311.StrType)le.pctsps),TRIM((SALT311.StrType)le.pctspa),TRIM((SALT311.StrType)le.mhv),TRIM((SALT311.StrType)le.mor),TRIM((SALT311.StrType)le.pctoccw),TRIM((SALT311.StrType)le.pctoccb),TRIM((SALT311.StrType)le.pctocco),TRIM((SALT311.StrType)le.lor),TRIM((SALT311.StrType)le.sfdu),TRIM((SALT311.StrType)le.mfdu),TRIM((SALT311.StrType)le.processdate),TRIM((SALT311.StrType)le.source_code),TRIM((SALT311.StrType)le.state_origin),TRIM((SALT311.StrType)le.append_ownernametypeind),TRIM((SALT311.StrType)le.fullname)));
   SELF.FldNo := C;
 END;
 SHARED FldInv0 := NORMALIZE(h,67,Into(LEFT,COUNTER));
 // Move everything into 'pairs' form so processing can be done 'in library'
-SALT36.MAC_Correlate.Data_Layout IntoP(h le,UNSIGNED C) := TRANSFORM
+SALT311.MAC_Correlate.Data_Layout IntoP(h le,UNSIGNED C) := TRANSFORM
   SELF.FldNo1 := 1 + (C / 67);
   SELF.FldNo2 := 1 + (C % 67);
-  SELF.Fld1 := TRIM(CHOOSE(SELF.FldNo1,TRIM((SALT36.StrType)le.iid),TRIM((SALT36.StrType)le.pid),TRIM((SALT36.StrType)le.vin),TRIM((SALT36.StrType)le.make),TRIM((SALT36.StrType)le.model),TRIM((SALT36.StrType)le.year),TRIM((SALT36.StrType)le.class_code),TRIM((SALT36.StrType)le.fuel_type_code),TRIM((SALT36.StrType)le.mfg_code),TRIM((SALT36.StrType)le.style_code),TRIM((SALT36.StrType)le.mileagecd),TRIM((SALT36.StrType)le.nbr_vehicles),TRIM((SALT36.StrType)le.idate),TRIM((SALT36.StrType)le.odate),TRIM((SALT36.StrType)le.fname),TRIM((SALT36.StrType)le.mi),TRIM((SALT36.StrType)le.lname),TRIM((SALT36.StrType)le.suffix),TRIM((SALT36.StrType)le.gender),TRIM((SALT36.StrType)le.house),TRIM((SALT36.StrType)le.predir),TRIM((SALT36.StrType)le.street),TRIM((SALT36.StrType)le.strtype),TRIM((SALT36.StrType)le.postdir),TRIM((SALT36.StrType)le.apttype),TRIM((SALT36.StrType)le.aptnbr),TRIM((SALT36.StrType)le.city),TRIM((SALT36.StrType)le.state),TRIM((SALT36.StrType)le.zip),TRIM((SALT36.StrType)le.z4),TRIM((SALT36.StrType)le.dpc),TRIM((SALT36.StrType)le.crte),TRIM((SALT36.StrType)le.cnty),TRIM((SALT36.StrType)le.z4type),TRIM((SALT36.StrType)le.dpv),TRIM((SALT36.StrType)le.vacant),TRIM((SALT36.StrType)le.phone),TRIM((SALT36.StrType)le.dnc),TRIM((SALT36.StrType)le.internal1),TRIM((SALT36.StrType)le.internal2),TRIM((SALT36.StrType)le.internal3),TRIM((SALT36.StrType)le.county),TRIM((SALT36.StrType)le.msa),TRIM((SALT36.StrType)le.cbsa),TRIM((SALT36.StrType)le.ehi),TRIM((SALT36.StrType)le.child),TRIM((SALT36.StrType)le.homeowner),TRIM((SALT36.StrType)le.pctw),TRIM((SALT36.StrType)le.pctb),TRIM((SALT36.StrType)le.pcta),TRIM((SALT36.StrType)le.pcth),TRIM((SALT36.StrType)le.pctspe),TRIM((SALT36.StrType)le.pctsps),TRIM((SALT36.StrType)le.pctspa),TRIM((SALT36.StrType)le.mhv),TRIM((SALT36.StrType)le.mor),TRIM((SALT36.StrType)le.pctoccw),TRIM((SALT36.StrType)le.pctoccb),TRIM((SALT36.StrType)le.pctocco),TRIM((SALT36.StrType)le.lor),TRIM((SALT36.StrType)le.sfdu),TRIM((SALT36.StrType)le.mfdu),TRIM((SALT36.StrType)le.processdate),TRIM((SALT36.StrType)le.source_code),TRIM((SALT36.StrType)le.state_origin),TRIM((SALT36.StrType)le.append_ownernametypeind),TRIM((SALT36.StrType)le.fullname)));
-  SELF.Fld2 := TRIM(CHOOSE(SELF.FldNo2,TRIM((SALT36.StrType)le.iid),TRIM((SALT36.StrType)le.pid),TRIM((SALT36.StrType)le.vin),TRIM((SALT36.StrType)le.make),TRIM((SALT36.StrType)le.model),TRIM((SALT36.StrType)le.year),TRIM((SALT36.StrType)le.class_code),TRIM((SALT36.StrType)le.fuel_type_code),TRIM((SALT36.StrType)le.mfg_code),TRIM((SALT36.StrType)le.style_code),TRIM((SALT36.StrType)le.mileagecd),TRIM((SALT36.StrType)le.nbr_vehicles),TRIM((SALT36.StrType)le.idate),TRIM((SALT36.StrType)le.odate),TRIM((SALT36.StrType)le.fname),TRIM((SALT36.StrType)le.mi),TRIM((SALT36.StrType)le.lname),TRIM((SALT36.StrType)le.suffix),TRIM((SALT36.StrType)le.gender),TRIM((SALT36.StrType)le.house),TRIM((SALT36.StrType)le.predir),TRIM((SALT36.StrType)le.street),TRIM((SALT36.StrType)le.strtype),TRIM((SALT36.StrType)le.postdir),TRIM((SALT36.StrType)le.apttype),TRIM((SALT36.StrType)le.aptnbr),TRIM((SALT36.StrType)le.city),TRIM((SALT36.StrType)le.state),TRIM((SALT36.StrType)le.zip),TRIM((SALT36.StrType)le.z4),TRIM((SALT36.StrType)le.dpc),TRIM((SALT36.StrType)le.crte),TRIM((SALT36.StrType)le.cnty),TRIM((SALT36.StrType)le.z4type),TRIM((SALT36.StrType)le.dpv),TRIM((SALT36.StrType)le.vacant),TRIM((SALT36.StrType)le.phone),TRIM((SALT36.StrType)le.dnc),TRIM((SALT36.StrType)le.internal1),TRIM((SALT36.StrType)le.internal2),TRIM((SALT36.StrType)le.internal3),TRIM((SALT36.StrType)le.county),TRIM((SALT36.StrType)le.msa),TRIM((SALT36.StrType)le.cbsa),TRIM((SALT36.StrType)le.ehi),TRIM((SALT36.StrType)le.child),TRIM((SALT36.StrType)le.homeowner),TRIM((SALT36.StrType)le.pctw),TRIM((SALT36.StrType)le.pctb),TRIM((SALT36.StrType)le.pcta),TRIM((SALT36.StrType)le.pcth),TRIM((SALT36.StrType)le.pctspe),TRIM((SALT36.StrType)le.pctsps),TRIM((SALT36.StrType)le.pctspa),TRIM((SALT36.StrType)le.mhv),TRIM((SALT36.StrType)le.mor),TRIM((SALT36.StrType)le.pctoccw),TRIM((SALT36.StrType)le.pctoccb),TRIM((SALT36.StrType)le.pctocco),TRIM((SALT36.StrType)le.lor),TRIM((SALT36.StrType)le.sfdu),TRIM((SALT36.StrType)le.mfdu),TRIM((SALT36.StrType)le.processdate),TRIM((SALT36.StrType)le.source_code),TRIM((SALT36.StrType)le.state_origin),TRIM((SALT36.StrType)le.append_ownernametypeind),TRIM((SALT36.StrType)le.fullname)));
+  SELF.Fld1 := TRIM(CHOOSE(SELF.FldNo1,TRIM((SALT311.StrType)le.iid),TRIM((SALT311.StrType)le.pid),TRIM((SALT311.StrType)le.vin),TRIM((SALT311.StrType)le.make),TRIM((SALT311.StrType)le.model),TRIM((SALT311.StrType)le.year),TRIM((SALT311.StrType)le.class_code),TRIM((SALT311.StrType)le.fuel_type_code),TRIM((SALT311.StrType)le.mfg_code),TRIM((SALT311.StrType)le.style_code),TRIM((SALT311.StrType)le.mileagecd),TRIM((SALT311.StrType)le.nbr_vehicles),TRIM((SALT311.StrType)le.idate),TRIM((SALT311.StrType)le.odate),TRIM((SALT311.StrType)le.fname),TRIM((SALT311.StrType)le.mi),TRIM((SALT311.StrType)le.lname),TRIM((SALT311.StrType)le.suffix),TRIM((SALT311.StrType)le.gender),TRIM((SALT311.StrType)le.house),TRIM((SALT311.StrType)le.predir),TRIM((SALT311.StrType)le.street),TRIM((SALT311.StrType)le.strtype),TRIM((SALT311.StrType)le.postdir),TRIM((SALT311.StrType)le.apttype),TRIM((SALT311.StrType)le.aptnbr),TRIM((SALT311.StrType)le.city),TRIM((SALT311.StrType)le.state),TRIM((SALT311.StrType)le.zip),TRIM((SALT311.StrType)le.z4),TRIM((SALT311.StrType)le.dpc),TRIM((SALT311.StrType)le.crte),TRIM((SALT311.StrType)le.cnty),TRIM((SALT311.StrType)le.z4type),TRIM((SALT311.StrType)le.dpv),TRIM((SALT311.StrType)le.vacant),TRIM((SALT311.StrType)le.phone),TRIM((SALT311.StrType)le.dnc),TRIM((SALT311.StrType)le.internal1),TRIM((SALT311.StrType)le.internal2),TRIM((SALT311.StrType)le.internal3),TRIM((SALT311.StrType)le.county),TRIM((SALT311.StrType)le.msa),TRIM((SALT311.StrType)le.cbsa),TRIM((SALT311.StrType)le.ehi),TRIM((SALT311.StrType)le.child),TRIM((SALT311.StrType)le.homeowner),TRIM((SALT311.StrType)le.pctw),TRIM((SALT311.StrType)le.pctb),TRIM((SALT311.StrType)le.pcta),TRIM((SALT311.StrType)le.pcth),TRIM((SALT311.StrType)le.pctspe),TRIM((SALT311.StrType)le.pctsps),TRIM((SALT311.StrType)le.pctspa),TRIM((SALT311.StrType)le.mhv),TRIM((SALT311.StrType)le.mor),TRIM((SALT311.StrType)le.pctoccw),TRIM((SALT311.StrType)le.pctoccb),TRIM((SALT311.StrType)le.pctocco),TRIM((SALT311.StrType)le.lor),TRIM((SALT311.StrType)le.sfdu),TRIM((SALT311.StrType)le.mfdu),TRIM((SALT311.StrType)le.processdate),TRIM((SALT311.StrType)le.source_code),TRIM((SALT311.StrType)le.state_origin),TRIM((SALT311.StrType)le.append_ownernametypeind),TRIM((SALT311.StrType)le.fullname)));
+  SELF.Fld2 := TRIM(CHOOSE(SELF.FldNo2,TRIM((SALT311.StrType)le.iid),TRIM((SALT311.StrType)le.pid),TRIM((SALT311.StrType)le.vin),TRIM((SALT311.StrType)le.make),TRIM((SALT311.StrType)le.model),TRIM((SALT311.StrType)le.year),TRIM((SALT311.StrType)le.class_code),TRIM((SALT311.StrType)le.fuel_type_code),TRIM((SALT311.StrType)le.mfg_code),TRIM((SALT311.StrType)le.style_code),TRIM((SALT311.StrType)le.mileagecd),TRIM((SALT311.StrType)le.nbr_vehicles),TRIM((SALT311.StrType)le.idate),TRIM((SALT311.StrType)le.odate),TRIM((SALT311.StrType)le.fname),TRIM((SALT311.StrType)le.mi),TRIM((SALT311.StrType)le.lname),TRIM((SALT311.StrType)le.suffix),TRIM((SALT311.StrType)le.gender),TRIM((SALT311.StrType)le.house),TRIM((SALT311.StrType)le.predir),TRIM((SALT311.StrType)le.street),TRIM((SALT311.StrType)le.strtype),TRIM((SALT311.StrType)le.postdir),TRIM((SALT311.StrType)le.apttype),TRIM((SALT311.StrType)le.aptnbr),TRIM((SALT311.StrType)le.city),TRIM((SALT311.StrType)le.state),TRIM((SALT311.StrType)le.zip),TRIM((SALT311.StrType)le.z4),TRIM((SALT311.StrType)le.dpc),TRIM((SALT311.StrType)le.crte),TRIM((SALT311.StrType)le.cnty),TRIM((SALT311.StrType)le.z4type),TRIM((SALT311.StrType)le.dpv),TRIM((SALT311.StrType)le.vacant),TRIM((SALT311.StrType)le.phone),TRIM((SALT311.StrType)le.dnc),TRIM((SALT311.StrType)le.internal1),TRIM((SALT311.StrType)le.internal2),TRIM((SALT311.StrType)le.internal3),TRIM((SALT311.StrType)le.county),TRIM((SALT311.StrType)le.msa),TRIM((SALT311.StrType)le.cbsa),TRIM((SALT311.StrType)le.ehi),TRIM((SALT311.StrType)le.child),TRIM((SALT311.StrType)le.homeowner),TRIM((SALT311.StrType)le.pctw),TRIM((SALT311.StrType)le.pctb),TRIM((SALT311.StrType)le.pcta),TRIM((SALT311.StrType)le.pcth),TRIM((SALT311.StrType)le.pctspe),TRIM((SALT311.StrType)le.pctsps),TRIM((SALT311.StrType)le.pctspa),TRIM((SALT311.StrType)le.mhv),TRIM((SALT311.StrType)le.mor),TRIM((SALT311.StrType)le.pctoccw),TRIM((SALT311.StrType)le.pctoccb),TRIM((SALT311.StrType)le.pctocco),TRIM((SALT311.StrType)le.lor),TRIM((SALT311.StrType)le.sfdu),TRIM((SALT311.StrType)le.mfdu),TRIM((SALT311.StrType)le.processdate),TRIM((SALT311.StrType)le.source_code),TRIM((SALT311.StrType)le.state_origin),TRIM((SALT311.StrType)le.append_ownernametypeind),TRIM((SALT311.StrType)le.fullname)));
   END;
 SHARED Pairs0 := NORMALIZE(ENTH(h,Config.CorrelateSampleSize),67*67,IntoP(LEFT,COUNTER))(FldNo1<FldNo2);
 SHARED FldIds := DATASET([{1,'iid'}
@@ -327,13 +396,14 @@ SHARED FldIds := DATASET([{1,'iid'}
       ,{64,'source_code'}
       ,{65,'state_origin'}
       ,{66,'append_ownernametypeind'}
-      ,{67,'fullname'}],SALT36.MAC_Character_Counts.Field_Identification);
-EXPORT AllProfiles := SALT36.MAC_Character_Counts.FN_Profile(FldInv0,FldIds);
- 
-EXPORT SrcProfiles := SALT36.MAC_Character_Counts.Src_Profile(FldInv0,FldIds);
- 
-EXPORT Correlations := SALT36.MAC_Correlate.Fn_Profile(Pairs0,FldIds);
- 
+      ,{67,'fullname'}],SALT311.MAC_Character_Counts.Field_Identification);
+EXPORT AllProfiles := SALT311.MAC_Character_Counts.FN_Profile(FldInv0,FldIds);
+
+EXPORT SrcProfiles := SALT311.MAC_Character_Counts.Src_Profile(FldInv0,FldIds);
+
+EXPORT Correlations := SALT311.MAC_Correlate.Fn_Profile(Pairs0,FldIds);
+
+
 ErrorRecord := RECORD
   UNSIGNED1 FieldNum;
   UNSIGNED1 ErrorNum;
@@ -341,73 +411,73 @@ ErrorRecord := RECORD
 END;
 ErrorRecord NoteErrors(h le,UNSIGNED1 c) := TRANSFORM
   SELF.ErrorNum := CHOOSE(c,
-    Infutor_VIN_Fields.InValid_iid((SALT36.StrType)le.iid),
-    Infutor_VIN_Fields.InValid_pid((SALT36.StrType)le.pid),
-    Infutor_VIN_Fields.InValid_vin((SALT36.StrType)le.vin),
-    Infutor_VIN_Fields.InValid_make((SALT36.StrType)le.make),
-    Infutor_VIN_Fields.InValid_model((SALT36.StrType)le.model),
-    Infutor_VIN_Fields.InValid_year((SALT36.StrType)le.year),
-    Infutor_VIN_Fields.InValid_class_code((SALT36.StrType)le.class_code),
-    Infutor_VIN_Fields.InValid_fuel_type_code((SALT36.StrType)le.fuel_type_code),
-    Infutor_VIN_Fields.InValid_mfg_code((SALT36.StrType)le.mfg_code),
-    Infutor_VIN_Fields.InValid_style_code((SALT36.StrType)le.style_code),
-    Infutor_VIN_Fields.InValid_mileagecd((SALT36.StrType)le.mileagecd),
-    Infutor_VIN_Fields.InValid_nbr_vehicles((SALT36.StrType)le.nbr_vehicles),
-    Infutor_VIN_Fields.InValid_idate((SALT36.StrType)le.idate),
-    Infutor_VIN_Fields.InValid_odate((SALT36.StrType)le.odate),
-    Infutor_VIN_Fields.InValid_fname((SALT36.StrType)le.fname),
-    Infutor_VIN_Fields.InValid_mi((SALT36.StrType)le.mi),
-    Infutor_VIN_Fields.InValid_lname((SALT36.StrType)le.lname),
-    Infutor_VIN_Fields.InValid_suffix((SALT36.StrType)le.suffix),
-    Infutor_VIN_Fields.InValid_gender((SALT36.StrType)le.gender),
-    Infutor_VIN_Fields.InValid_house((SALT36.StrType)le.house),
-    Infutor_VIN_Fields.InValid_predir((SALT36.StrType)le.predir),
-    Infutor_VIN_Fields.InValid_street((SALT36.StrType)le.street),
-    Infutor_VIN_Fields.InValid_strtype((SALT36.StrType)le.strtype),
-    Infutor_VIN_Fields.InValid_postdir((SALT36.StrType)le.postdir),
-    Infutor_VIN_Fields.InValid_apttype((SALT36.StrType)le.apttype),
-    Infutor_VIN_Fields.InValid_aptnbr((SALT36.StrType)le.aptnbr),
-    Infutor_VIN_Fields.InValid_city((SALT36.StrType)le.city),
-    Infutor_VIN_Fields.InValid_state((SALT36.StrType)le.state),
-    Infutor_VIN_Fields.InValid_zip((SALT36.StrType)le.zip),
-    Infutor_VIN_Fields.InValid_z4((SALT36.StrType)le.z4),
-    Infutor_VIN_Fields.InValid_dpc((SALT36.StrType)le.dpc),
-    Infutor_VIN_Fields.InValid_crte((SALT36.StrType)le.crte),
-    Infutor_VIN_Fields.InValid_cnty((SALT36.StrType)le.cnty),
-    Infutor_VIN_Fields.InValid_z4type((SALT36.StrType)le.z4type),
-    Infutor_VIN_Fields.InValid_dpv((SALT36.StrType)le.dpv),
-    Infutor_VIN_Fields.InValid_vacant((SALT36.StrType)le.vacant),
-    Infutor_VIN_Fields.InValid_phone((SALT36.StrType)le.phone),
-    Infutor_VIN_Fields.InValid_dnc((SALT36.StrType)le.dnc),
-    Infutor_VIN_Fields.InValid_internal1((SALT36.StrType)le.internal1),
-    Infutor_VIN_Fields.InValid_internal2((SALT36.StrType)le.internal2),
-    Infutor_VIN_Fields.InValid_internal3((SALT36.StrType)le.internal3),
-    Infutor_VIN_Fields.InValid_county((SALT36.StrType)le.county),
-    Infutor_VIN_Fields.InValid_msa((SALT36.StrType)le.msa),
-    Infutor_VIN_Fields.InValid_cbsa((SALT36.StrType)le.cbsa),
-    Infutor_VIN_Fields.InValid_ehi((SALT36.StrType)le.ehi),
-    Infutor_VIN_Fields.InValid_child((SALT36.StrType)le.child),
-    Infutor_VIN_Fields.InValid_homeowner((SALT36.StrType)le.homeowner),
-    Infutor_VIN_Fields.InValid_pctw((SALT36.StrType)le.pctw),
-    Infutor_VIN_Fields.InValid_pctb((SALT36.StrType)le.pctb),
-    Infutor_VIN_Fields.InValid_pcta((SALT36.StrType)le.pcta),
-    Infutor_VIN_Fields.InValid_pcth((SALT36.StrType)le.pcth),
-    Infutor_VIN_Fields.InValid_pctspe((SALT36.StrType)le.pctspe),
-    Infutor_VIN_Fields.InValid_pctsps((SALT36.StrType)le.pctsps),
-    Infutor_VIN_Fields.InValid_pctspa((SALT36.StrType)le.pctspa),
-    Infutor_VIN_Fields.InValid_mhv((SALT36.StrType)le.mhv),
-    Infutor_VIN_Fields.InValid_mor((SALT36.StrType)le.mor),
-    Infutor_VIN_Fields.InValid_pctoccw((SALT36.StrType)le.pctoccw),
-    Infutor_VIN_Fields.InValid_pctoccb((SALT36.StrType)le.pctoccb),
-    Infutor_VIN_Fields.InValid_pctocco((SALT36.StrType)le.pctocco),
-    Infutor_VIN_Fields.InValid_lor((SALT36.StrType)le.lor),
-    Infutor_VIN_Fields.InValid_sfdu((SALT36.StrType)le.sfdu),
-    Infutor_VIN_Fields.InValid_mfdu((SALT36.StrType)le.mfdu),
-    Infutor_VIN_Fields.InValid_processdate((SALT36.StrType)le.processdate),
-    Infutor_VIN_Fields.InValid_source_code((SALT36.StrType)le.source_code),
-    Infutor_VIN_Fields.InValid_state_origin((SALT36.StrType)le.state_origin),
-    Infutor_VIN_Fields.InValid_append_ownernametypeind((SALT36.StrType)le.append_ownernametypeind),
-    Infutor_VIN_Fields.InValid_fullname((SALT36.StrType)le.fullname),
+    Infutor_VIN_Fields.InValid_iid((SALT311.StrType)le.iid),
+    Infutor_VIN_Fields.InValid_pid((SALT311.StrType)le.pid),
+    Infutor_VIN_Fields.InValid_vin((SALT311.StrType)le.vin),
+    Infutor_VIN_Fields.InValid_make((SALT311.StrType)le.make),
+    Infutor_VIN_Fields.InValid_model((SALT311.StrType)le.model),
+    Infutor_VIN_Fields.InValid_year((SALT311.StrType)le.year),
+    Infutor_VIN_Fields.InValid_class_code((SALT311.StrType)le.class_code),
+    Infutor_VIN_Fields.InValid_fuel_type_code((SALT311.StrType)le.fuel_type_code),
+    Infutor_VIN_Fields.InValid_mfg_code((SALT311.StrType)le.mfg_code),
+    Infutor_VIN_Fields.InValid_style_code((SALT311.StrType)le.style_code),
+    Infutor_VIN_Fields.InValid_mileagecd((SALT311.StrType)le.mileagecd),
+    Infutor_VIN_Fields.InValid_nbr_vehicles((SALT311.StrType)le.nbr_vehicles),
+    Infutor_VIN_Fields.InValid_idate((SALT311.StrType)le.idate),
+    Infutor_VIN_Fields.InValid_odate((SALT311.StrType)le.odate),
+    Infutor_VIN_Fields.InValid_fname((SALT311.StrType)le.fname),
+    Infutor_VIN_Fields.InValid_mi((SALT311.StrType)le.mi),
+    Infutor_VIN_Fields.InValid_lname((SALT311.StrType)le.lname),
+    Infutor_VIN_Fields.InValid_suffix((SALT311.StrType)le.suffix),
+    Infutor_VIN_Fields.InValid_gender((SALT311.StrType)le.gender),
+    Infutor_VIN_Fields.InValid_house((SALT311.StrType)le.house),
+    Infutor_VIN_Fields.InValid_predir((SALT311.StrType)le.predir),
+    Infutor_VIN_Fields.InValid_street((SALT311.StrType)le.street),
+    Infutor_VIN_Fields.InValid_strtype((SALT311.StrType)le.strtype),
+    Infutor_VIN_Fields.InValid_postdir((SALT311.StrType)le.postdir),
+    Infutor_VIN_Fields.InValid_apttype((SALT311.StrType)le.apttype),
+    Infutor_VIN_Fields.InValid_aptnbr((SALT311.StrType)le.aptnbr),
+    Infutor_VIN_Fields.InValid_city((SALT311.StrType)le.city),
+    Infutor_VIN_Fields.InValid_state((SALT311.StrType)le.state),
+    Infutor_VIN_Fields.InValid_zip((SALT311.StrType)le.zip),
+    Infutor_VIN_Fields.InValid_z4((SALT311.StrType)le.z4),
+    Infutor_VIN_Fields.InValid_dpc((SALT311.StrType)le.dpc),
+    Infutor_VIN_Fields.InValid_crte((SALT311.StrType)le.crte),
+    Infutor_VIN_Fields.InValid_cnty((SALT311.StrType)le.cnty),
+    Infutor_VIN_Fields.InValid_z4type((SALT311.StrType)le.z4type),
+    Infutor_VIN_Fields.InValid_dpv((SALT311.StrType)le.dpv),
+    Infutor_VIN_Fields.InValid_vacant((SALT311.StrType)le.vacant),
+    Infutor_VIN_Fields.InValid_phone((SALT311.StrType)le.phone),
+    Infutor_VIN_Fields.InValid_dnc((SALT311.StrType)le.dnc),
+    Infutor_VIN_Fields.InValid_internal1((SALT311.StrType)le.internal1),
+    Infutor_VIN_Fields.InValid_internal2((SALT311.StrType)le.internal2),
+    Infutor_VIN_Fields.InValid_internal3((SALT311.StrType)le.internal3),
+    Infutor_VIN_Fields.InValid_county((SALT311.StrType)le.county),
+    Infutor_VIN_Fields.InValid_msa((SALT311.StrType)le.msa),
+    Infutor_VIN_Fields.InValid_cbsa((SALT311.StrType)le.cbsa),
+    Infutor_VIN_Fields.InValid_ehi((SALT311.StrType)le.ehi),
+    Infutor_VIN_Fields.InValid_child((SALT311.StrType)le.child),
+    Infutor_VIN_Fields.InValid_homeowner((SALT311.StrType)le.homeowner),
+    Infutor_VIN_Fields.InValid_pctw((SALT311.StrType)le.pctw),
+    Infutor_VIN_Fields.InValid_pctb((SALT311.StrType)le.pctb),
+    Infutor_VIN_Fields.InValid_pcta((SALT311.StrType)le.pcta),
+    Infutor_VIN_Fields.InValid_pcth((SALT311.StrType)le.pcth),
+    Infutor_VIN_Fields.InValid_pctspe((SALT311.StrType)le.pctspe),
+    Infutor_VIN_Fields.InValid_pctsps((SALT311.StrType)le.pctsps),
+    Infutor_VIN_Fields.InValid_pctspa((SALT311.StrType)le.pctspa),
+    Infutor_VIN_Fields.InValid_mhv((SALT311.StrType)le.mhv),
+    Infutor_VIN_Fields.InValid_mor((SALT311.StrType)le.mor),
+    Infutor_VIN_Fields.InValid_pctoccw((SALT311.StrType)le.pctoccw),
+    Infutor_VIN_Fields.InValid_pctoccb((SALT311.StrType)le.pctoccb),
+    Infutor_VIN_Fields.InValid_pctocco((SALT311.StrType)le.pctocco),
+    Infutor_VIN_Fields.InValid_lor((SALT311.StrType)le.lor),
+    Infutor_VIN_Fields.InValid_sfdu((SALT311.StrType)le.sfdu),
+    Infutor_VIN_Fields.InValid_mfdu((SALT311.StrType)le.mfdu),
+    Infutor_VIN_Fields.InValid_processdate((SALT311.StrType)le.processdate),
+    Infutor_VIN_Fields.InValid_source_code((SALT311.StrType)le.source_code),
+    Infutor_VIN_Fields.InValid_state_origin((SALT311.StrType)le.state_origin),
+    Infutor_VIN_Fields.InValid_append_ownernametypeind((SALT311.StrType)le.append_ownernametypeind),
+    Infutor_VIN_Fields.InValid_fullname((SALT311.StrType)le.fullname),
     0);
   SELF.FieldNum := IF(SELF.ErrorNum=0,SKIP,c); // Bail early to avoid creating record
   SELF.state_origin := le.state_origin;
@@ -429,4 +499,21 @@ PrettyErrorTotals := RECORD
 END;
 ValErr := TABLE(TotalErrors,PrettyErrorTotals);
 EXPORT ValidityErrors := JOIN(ValErr,TABLE(SourceCounts,{Source,NumberOfRecords}),LEFT.state_origin=RIGHT.Source,LOOKUP); // Add source group counts for STRATA compliance
+EXPORT StandardStats(BOOLEAN doSummaryGlobal = TRUE, BOOLEAN doSummaryPerSrc = TRUE, BOOLEAN doAllProfiles = TRUE) := FUNCTION
+  myTimeStamp := (UNSIGNED6)SALT311.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
+  fieldPopulationOverall := Summary('');
+  fieldPopulationPerSource := Summary('', FALSE);
+
+  SALT311.mod_StandardStatsTransforms.mac_hygieneSummaryTransform(Scrubs_VehicleV2, Infutor_VIN_Fields, 'RECORDOF(fieldPopulationOverall)', TRUE);
+
+  fieldPopulationOverall_Standard := IF(doSummaryGlobal, NORMALIZE(fieldPopulationOverall, COUNT(FldIds) * 6, xSummary(LEFT, COUNTER, myTimeStamp, 'all', 'all')));
+  fieldPopulationPerSource_Standard := IF(doSummaryPerSrc, NORMALIZE(fieldPopulationPerSource, COUNT(FldIds) * 6, xSummary(LEFT, COUNTER, myTimeStamp, 'src', 'src')));
+
+  fieldPopulationOverall_TotalRecs_Standard := IF(doSummaryGlobal, SALT311.mod_StandardStatsTransforms.mac_hygieneTotalRecs(fieldPopulationOverall, myTimeStamp, 'all', TRUE, 'all'));
+  fieldPopulationPerSource_TotalRecs_Standard := IF(doSummaryPerSrc, SALT311.mod_StandardStatsTransforms.mac_hygieneTotalRecs(fieldPopulationPerSource, myTimeStamp, 'src', TRUE, 'src'));
+
+  allProfiles_Standard := IF(doAllProfiles, SALT311.mod_StandardStatsTransforms.hygieneAllProfiles(AllProfiles, myTimeStamp, 10, 'all'));
+
+  RETURN fieldPopulationOverall_Standard & fieldPopulationOverall_TotalRecs_Standard & fieldPopulationPerSource_Standard & fieldPopulationPerSource_TotalRecs_Standard & allProfiles_Standard;
+END;
 END;

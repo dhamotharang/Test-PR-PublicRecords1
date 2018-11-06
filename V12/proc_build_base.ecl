@@ -71,7 +71,7 @@ EXPORT proc_build_base(STRING version) := FUNCTION
 	
 		NID.Mac_CleanParsedNames(dRecordID, FileClnName, 
 														firstname:=First_Name, lastname:=Last_Name, middlename := clean_mname, namesuffix := clean_name_suffix
-														,includeInRepository:=true, normalizeDualNames:=false);
+														,includeInRepository:=true, normalizeDualNames:=false, useV2 := true);
 	
 
 	InputFileClnName	:= Project(FileClnName, TRANSFORM(V12.layouts.V12_base,

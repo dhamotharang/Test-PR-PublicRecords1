@@ -1,4 +1,4 @@
-IMPORT _control, Doxie, PromoteSupers, RoxieKeyBuild, std, ut;
+﻿IMPORT _control, Doxie, dx_PhoneFinderReportDelta, PromoteSupers, RoxieKeyBuild, std, ut;
 
 EXPORT Proc_Build_PhoneFinderReportDelta(string version, const varstring eclsourceip, string thor_name, string idType, string oPhType, string rIndType, string trType):= FUNCTION
 	
@@ -150,28 +150,84 @@ EXPORT Proc_Build_PhoneFinderReportDelta(string version, const varstring eclsour
 	//Build Common PhoneFinder Report Deltabase Keys/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-		RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(PhoneFinderReportDelta.Key_Identities
-																								,'~thor_data400::key::phonefinderreportdelta::identities'
-																								,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::identities'
+		//DF-23251: Add 'dx_' Prefix to Index Definitions
+		//DF-23286: Update Keys
+		RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_PhoneFinderReportDelta.Key_Identities																//index
+																								,PhoneFinderReportDelta.File_PhoneFinder.Identities_Main							//dataset	
+																								,'~thor_data400::key::phonefinderreportdelta::identities'							//key superfile
+																								,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::identities'//key logical file
 																								,bkDltIdent
 																								);
-
-		RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(PhoneFinderReportDelta.Key_OtherPhones
+																																													
+		RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_PhoneFinderReportDelta.Key_OtherPhones
+																								,PhoneFinderReportDelta.File_PhoneFinder.OtherPhones_Main
 																								,'~thor_data400::key::phonefinderreportdelta::otherphones'
 																								,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::otherphones'
 																								,bkDltOPhones
 																								);
 
-		RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(PhoneFinderReportDelta.Key_RiskIndicators
+		RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_PhoneFinderReportDelta.Key_RiskIndicators
+																								,PhoneFinderReportDelta.File_PhoneFinder.RiskIndicators_Main
 																								,'~thor_data400::key::phonefinderreportdelta::riskindicators'
 																								,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::riskindicators'
 																								,bkDltRInd
 																								);
 																																													
-		RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(PhoneFinderReportDelta.Key_Transactions
+		RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_PhoneFinderReportDelta.Key_Transactions
+																								,PhoneFinderReportDelta.File_PhoneFinder.Transactions_Main
 																								,'~thor_data400::key::phonefinderreportdelta::transactions'
 																								,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::transactions'
 																								,bkDltTrans
+																								);
+		
+		//PHPR-173
+		RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_PhoneFinderReportDelta.Key_Transactions_UserId
+																								,PhoneFinderReportDelta.File_PhoneFinder.Transactions_Main
+																								,'~thor_data400::key::phonefinderreportdelta::transactions_userid'
+																								,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::transactions_userid'
+																								,bkDltTransUserID
+																								);
+																								
+		RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_PhoneFinderReportDelta.Key_Transactions_CompanyId
+																								,PhoneFinderReportDelta.File_PhoneFinder.Transactions_Main
+																								,'~thor_data400::key::phonefinderreportdelta::transactions_companyid'
+																								,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::transactions_companyid'
+																								,bkDltTransCompanyID
+																								);
+		
+		RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_PhoneFinderReportDelta.Key_Transactions_RefCode
+																								,PhoneFinderReportDelta.File_PhoneFinder.Transactions_Main
+																								,'~thor_data400::key::phonefinderreportdelta::transactions_refcode'
+																								,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::transactions_refcode'
+																								,bkDltTransRefCode
+																								);
+		
+		RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_PhoneFinderReportDelta.Key_Transactions_CompanyRefCode
+																								,PhoneFinderReportDelta.File_PhoneFinder.Transactions_Main
+																								,'~thor_data400::key::phonefinderreportdelta::transactions_companyrefcode'
+																								,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::transactions_companyrefcode'
+																								,bkDltTransCompanyRefCode
+																								);
+		
+		RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_PhoneFinderReportDelta.Key_Transactions_Date
+																								,PhoneFinderReportDelta.File_PhoneFinder.Transactions_Main
+																								,'~thor_data400::key::phonefinderreportdelta::transactions_date'
+																								,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::transactions_date'
+																								,bkDltTransDate
+																								);
+		
+		RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_PhoneFinderReportDelta.Key_Transactions_Phone
+																								,PhoneFinderReportDelta.File_PhoneFinder.Transactions_Main
+																								,'~thor_data400::key::phonefinderreportdelta::transactions_phone'
+																								,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::transactions_phone'
+																								,bkDltTransPhone
+																								);
+		
+		RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_PhoneFinderReportDelta.Key_Identities_LexId
+																								,PhoneFinderReportDelta.File_PhoneFinder.Identities_Main
+																								,'~thor_data400::key::phonefinderreportdelta::identities_lexid'
+																								,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::identities_lexid'
+																								,bkDltIdentLexID
 																								);
 																																													
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -210,11 +266,68 @@ EXPORT Proc_Build_PhoneFinderReportDelta(string version, const varstring eclsour
 
 		PromoteSupers.Mac_SK_Move_V2('~thor_data400::key::phonefinderreportdelta::transactions', 'Q',	mvQADltTrans, '4');
 		
+		//PHPR-173
+		//Transactions UserID
+		Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::phonefinderreportdelta::transactions_userid'
+																					,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::transactions_userid'
+																					,mvBltDltTransUserID
+																					);
+
+		PromoteSupers.Mac_SK_Move_V2('~thor_data400::key::phonefinderreportdelta::transactions_userid', 'Q',	mvQADltTransUserID, '4');
+		
+		//Transactions CompanyID
+		Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::phonefinderreportdelta::transactions_companyid'
+																					,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::transactions_companyid'
+																					,mvBltDltTransCompanyID
+																					);
+
+		PromoteSupers.Mac_SK_Move_V2('~thor_data400::key::phonefinderreportdelta::transactions_companyid', 'Q',	mvQADltTransCompanyID, '4');
+		
+		//Transactions RefCode
+		Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::phonefinderreportdelta::transactions_refcode'
+																					,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::transactions_refcode'
+																					,mvBltDltTransRefCode
+																					);
+
+		PromoteSupers.Mac_SK_Move_V2('~thor_data400::key::phonefinderreportdelta::transactions_refcode', 'Q',	mvQADltTransRefCode, '4');
+		
+		//Transactions CompanyRefCode
+		Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::phonefinderreportdelta::transactions_companyrefcode'
+																					,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::transactions_companyrefcode'
+																					,mvBltDltTransCompanyRefCode
+																					);
+
+		PromoteSupers.Mac_SK_Move_V2('~thor_data400::key::phonefinderreportdelta::transactions_companyrefcode', 'Q',	mvQADltTransCompanyRefCode, '4');
+		
+		//Transactions Date
+		Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::phonefinderreportdelta::transactions_date'
+																					,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::transactions_date'
+																					,mvBltDltTransDate
+																					);
+
+		PromoteSupers.Mac_SK_Move_V2('~thor_data400::key::phonefinderreportdelta::transactions_date', 'Q',	mvQADltTransDate, '4');
+		
+		//Transactions Phone
+		Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::phonefinderreportdelta::transactions_phone'
+																					,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::transactions_phone'
+																					,mvBltDltTransPhone
+																					);
+
+		PromoteSupers.Mac_SK_Move_V2('~thor_data400::key::phonefinderreportdelta::transactions_phone', 'Q',	mvQADltTransPhone, '4');
+		
+		//Identities LexID
+		Roxiekeybuild.Mac_SK_Move_to_Built_V2('~thor_data400::key::phonefinderreportdelta::identities_lexid'
+																					,'~thor_data400::key::'+version+'::PhoneFinderReportDelta::identities_lexid'
+																					,mvBltDltIdentLexID
+																					);
+
+		PromoteSupers.Mac_SK_Move_V2('~thor_data400::key::phonefinderreportdelta::identities_lexid', 'Q',	mvQADltIdentLexID, '4');
+			
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Update DOPs Page///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		dopsUpdate 					:= RoxieKeybuild.UpdateVersion('PhoneFinderRptDelta', version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com', , 'N');
+		dopsUpdate 					:= RoxieKeybuild.UpdateVersion('PhoneFinderRptDeltaKeys', version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com,darren.knowles@lexisnexisrisk.com', , 'N');
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Build Strata Reports for Build/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -253,14 +366,22 @@ EXPORT Proc_Build_PhoneFinderReportDelta(string version, const varstring eclsour
 																			parallel(	sequential(bkDltIdent, mvBltDltIdent, mvQADltIdent),
 																								sequential(bkDltOPhones, mvBltDltOPhones, mvQADltOPhones),
 																								sequential(bkDltRInd, mvBltDltRInd, mvQADltRInd), 
-																								sequential(bkDltTrans, mvBltDltTrans, mvQADltTrans))
-																			)/*, 
-																			dopsUpdate,
-																			buildStrata)*/:
+																								sequential(bkDltTrans, mvBltDltTrans, mvQADltTrans),
+																								
+																								sequential(bkDltTransUserID, mvBltDltTransUserID, mvQADltTransUserID),
+																								sequential(bkDltTransCompanyID, mvBltDltTransCompanyID, mvQADltTransCompanyID),
+																								sequential(bkDltTransRefCode, mvBltDltTransRefCode, mvQADltTransRefCode),
+																								sequential(bkDltTransCompanyRefCode, mvBltDltTransCompanyRefCode, mvQADltTransCompanyRefCode),
+																								sequential(bkDltTransDate, mvBltDltTransDate, mvQADltTransDate),
+																								sequential(bkDltTransPhone, mvBltDltTransPhone, mvQADltTransPhone),
+																								sequential(bkDltIdentLexID, mvBltDltIdentLexID, mvQADltIdentLexID)),
+																			
+																			dopsUpdate)
+																			/*buildStrata)*/:
 																														
 																			//Send Email Notifications
-																			Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com', 'PhoneFinderReportDelta Key Build Succeeded', workunit + ': Build completed.')),
-																			Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com', 'PhoneFinderReportDelta Build Failed', workunit + '\n' + FAILMESSAGE));
+																			Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com,darren.knowles@lexisnexisrisk.com', 'PhoneFinderReportDelta Key Build Succeeded', workunit + ': Build completed.')),
+																			Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com,darren.knowles@lexisnexisrisk.com', 'PhoneFinderReportDelta Build Failed', workunit + '\n' + FAILMESSAGE));
 
 	RETURN sendEmail;
 

@@ -18,7 +18,7 @@ dENasSource	:=	as_source(pFile,pForHeaderBuild,pFastHeader);
 // 01=previous address1
 // ...
 // 24=previous address24
-		self.rid											:= 900000000000 + l.uid;
+		self.rid					  :=0;//						:= 900000000000 + l.uid;
 		SELF.title                    :=if(l.title not in ['MR','MS'],'',l.title);
 
 		dt_first_seen                 := if(l.dt_first_seen <>0,l.dt_first_seen, l.dt_last_seen);

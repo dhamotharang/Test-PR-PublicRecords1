@@ -1,4 +1,4 @@
-BIPV2_ProxID._fun_CompareService(24533231892,7842,'20140129_72');
+﻿BIPV2_ProxID._fun_CompareService(24533231892,7842,'20140129_72');
 // STRING20 Proxidtwostr := '187841169'  ;
 // STRING20 Proxidtwostr := '24609721842'  ;
 // STRING20 Proxidtwostr := '30128522'  ;

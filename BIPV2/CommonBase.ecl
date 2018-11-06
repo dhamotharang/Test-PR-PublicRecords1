@@ -25,11 +25,7 @@ EXPORT CommonBase := MODULE
 	EXPORT Layout_Static := BIPV2.CommonBase_mod.Layout_Static;
 	
 	// default layout
-	EXPORT Layout := #IF(BIPV2._Config.BASE_LAYOUT_DYNAMIC)
-		Layout_Dynamic;
-	#ELSE
-		Layout_Static;
-	#END
+	EXPORT Layout := BIPV2.CommonBase_mod.Layout;
 	
 	
 	// Files and datasets

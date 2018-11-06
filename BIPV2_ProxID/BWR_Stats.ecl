@@ -1,4 +1,4 @@
-/*
+﻿/*
 For each of the IDS (Proxid/SeleId/OrgId):
 How many IDs total
 How many singletons (for a ProxId ? singleton means 1 dot, for SeleId ? singleton means 1 proxid etc)

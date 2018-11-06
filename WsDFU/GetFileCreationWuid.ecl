@@ -1,6 +1,5 @@
-import wk_ut;
-EXPORT GetFileCreationWuid(
+﻿EXPORT GetFileCreationWuid(
    string pfilename
-  ,string pesp          = wk_ut._constants.LocalEsp
+  ,string pesp          = _Config.LocalEsp
 ) :=
-WsDFU.soapcall_DFUInfo(pfilename,'',false,'','',pesp)[1].wuid;
+WsDFU.soapcall_DFUInfo(pfilename,'',false,'',pesp)[1].wuid;

@@ -121,10 +121,8 @@ export proc_postHeaderBuilds := module
                                             header.LogBuild.single('Started :'+step)
                                             ,if(Header.version_build<>fn[sub..],fail('Header base does not match version'))
                                             ,checkLinkingVersion(header.version_build)
-                                            ,bld_relatives
                                             ,parallel(make_hhid	,make_fcra_hhid)
                                             // ,notify('Build_Header_Keys','*')
-                                            ,bld_relative_title
                                             ,header.LogBuild.single('Completed :'+step)
                                             )
                                             :success(header.msg(cmpltd,elist_owners).good)
@@ -213,7 +211,7 @@ export proc_postHeaderBuilds := module
                                         header.LogBuild.single('Started :'+step)
                                         ,if(Header.version_build<>fn[sub..sub+7],fail('Header base does not match version'))
                                         ,checkLinkingVersion(header.version_build)
-                                        ,Doxie.Proc_FCRA_Doxie_keys_All()
+                                        ,Doxie.Proc_FCRA_Doxie_keys_All(,,header.version_build)
                                         // ,output(verify_keys('FCRA_PersonHeaderKeys',true),named('FCRA_PersonHeaderKeys'))
                                         // ,notify('Build_Header_boolean','*')
                                         ,header.LogBuild.single('Completed :'+step)

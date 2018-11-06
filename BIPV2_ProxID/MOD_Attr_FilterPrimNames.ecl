@@ -1,6 +1,6 @@
 ﻿// Logic to handle the matching around FilterPrimNames
  
-IMPORT salt37,ut,std;
+IMPORT SALT311,ut,std;
 EXPORT MOD_Attr_FilterPrimNames(DATASET(layout_DOT_Base) ih,UNSIGNED MatchThreshold = 30) := MODULE
 // Construct a function to filter matches to those that obey the force criteria on this attribute file.
 EXPORT ForceFilter(inhead,infile,id1,id2) := FUNCTIONMACRO
@@ -10,13 +10,13 @@ EXPORT ForceFilter(inhead,infile,id1,id2) := FUNCTIONMACRO
 ////
 childrec1 := 
 record
-    salt37.StrType Basis    ;/*HACK to get basis only*/
+    SALT311.StrType Basis    ;/*HACK to get basis only*/
 end;
   ChildRec := RECORD
     Cands0.Proxid;
 //    Cands0.Basis_Weight100;/*hack*/
-    // salt37.StrType Basis    := salt37.GetNthWord(Cands0.Basis,1,'|');/*HACK to get basis only*/
-    // salt37.StrType Context  := salt37.GetNthWord(Cands0.Basis,2,'|'); // Context for the basis ('<')
+    // SALT311.StrType Basis    := SALT311.GetNthWord(Cands0.Basis,1,'|');/*HACK to get basis only*/
+    // SALT311.StrType Context  := SALT311.GetNthWord(Cands0.Basis,2,'|'); // Context for the basis ('<')
     dataset(childrec1) childs := dataset([{Cands0.pname_digits}],childrec1);
   END;
   Cands  := TABLE(Cands0,ChildRec);
@@ -52,16 +52,16 @@ match_candidates(ih).Layout_Attribute_Matches Score(Cands le,Cands ri,UNSIGNED c
   SELF.Proxid2 := ri.Proxid;
   SELF.source_id := le.Basis;
   INTEGER2 cnp_number_score_temp := MAP(                         le.cnp_number = ri.cnp_number  => le.cnp_number_weight100,
-                        salt37.Fn_Fail_Scale(le.cnp_number_weight100,s.cnp_number_switch));
+                        SALT311.Fn_Fail_Scale(le.cnp_number_weight100,s.cnp_number_switch));
   INTEGER2 active_duns_number_score_temp := MAP( le.active_duns_number_isnull OR ri.active_duns_number_isnull => 0,
                         le.active_duns_number = ri.active_duns_number  => le.active_duns_number_weight100,
-                        salt37.Fn_Fail_Scale(le.active_duns_number_weight100,s.active_duns_number_switch));
+                        SALT311.Fn_Fail_Scale(le.active_duns_number_weight100,s.active_duns_number_switch));
   INTEGER2 active_enterprise_number_score_temp := MAP( le.active_enterprise_number_isnull OR ri.active_enterprise_number_isnull => 0,
                         le.active_enterprise_number = ri.active_enterprise_number  => le.active_enterprise_number_weight100,
-                        salt37.Fn_Fail_Scale(le.active_enterprise_number_weight100,s.active_enterprise_number_switch));
+                        SALT311.Fn_Fail_Scale(le.active_enterprise_number_weight100,s.active_enterprise_number_switch));
   INTEGER2 active_domestic_corp_key_score_temp := MAP( le.active_domestic_corp_key_isnull OR ri.active_domestic_corp_key_isnull => 0,
                         le.active_domestic_corp_key = ri.active_domestic_corp_key  => le.active_domestic_corp_key_weight100,
-                        salt37.Fn_Fail_Scale(le.active_domestic_corp_key_weight100,s.active_domestic_corp_key_switch));
+                        SALT311.Fn_Fail_Scale(le.active_domestic_corp_key_weight100,s.active_domestic_corp_key_switch));
   INTEGER2 cnp_number_score := IF ( cnp_number_score_temp >= Config.cnp_number_Force * 100, cnp_number_score_temp, SKIP ); // Enforce FORCE parameter
   INTEGER2 active_duns_number_score := IF ( active_duns_number_score_temp >= Config.active_duns_number_Force * 100, active_duns_number_score_temp, SKIP ); // Enforce FORCE parameter
   INTEGER2 active_enterprise_number_score := IF ( active_enterprise_number_score_temp >= Config.active_enterprise_number_Force * 100, active_enterprise_number_score_temp, SKIP ); // Enforce FORCE parameter

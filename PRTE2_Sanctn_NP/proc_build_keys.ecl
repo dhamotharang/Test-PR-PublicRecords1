@@ -1,25 +1,25 @@
-﻿import RoxieKeyBuild, prte2_sanctn,prte, dops;
+﻿import RoxieKeyBuild, prte2_sanctn_np,prte, dops, _control, PRTE2_Common;
 
 
-EXPORT proc_build_keys(string filedate) := function
+EXPORT proc_build_keys(string filedate, boolean skipDOPS=FALSE, string emailTo='') := function
 
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.bdid,												Constants.key_prefix+'bdid',												Constants.key_prefix+filedate+'::bdid',											key1);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.did,													Constants.key_prefix+'did',													Constants.key_prefix+filedate+'::did',												key2);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.incident,								Constants.key_prefix+'incident',								Constants.key_prefix+filedate+'::incident',							key3);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.incidentcode,				Constants.key_prefix+'incidentcode',				Constants.key_prefix+filedate+'::incidentcode',			key4);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.incident,								Constants.key_prefix+'incidenttext',				Constants.key_prefix+filedate+'::incidenttext',			key5);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.license_nbr,					Constants.key_prefix+'license_nbr',					Constants.key_prefix+filedate+'::license_nbr', 			key6);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.license_midex,			Constants.key_prefix+'license_midex',			Constants.key_prefix+filedate+'::license_midex', 	key7);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.linkids_incident,Constants.key_prefix+'incident_linkids',		Constants.key_prefix+filedate+'::incident_linkids', key8);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.linkids_party,			Constants.key_prefix+'party_linkids',	 	Constants.key_prefix+filedate+'::party_linkids', 							key9);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.midex_rpt_nbr,			Constants.key_prefix+'midex_rpt_nbr',			Constants.key_prefix+filedate+'::midex_rpt_nbr',		key10);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.nmls_id,									Constants.key_prefix+'nmls_id',			      Constants.key_prefix+filedate+'::nmls_id', 							key11);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.nmls_midex,						Constants.key_prefix+'nmls_midex',			  	Constants.key_prefix+filedate+'::nmls_midex', 				key12);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.party,											Constants.key_prefix+'party',											Constants.key_prefix+filedate+'::party',										key13);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.party_aka_dba,			Constants.key_prefix+'party_aka_dba',			Constants.key_prefix+filedate+'::party_aka_dba',			key14);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.partytext,							Constants.key_prefix+'partytext',								Constants.key_prefix+filedate+'::partytext',							key15);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.ssn4,												Constants.key_prefix+'ssn4',												Constants.key_prefix+filedate+'::ssn4',											key16);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.tin,													Constants.key_prefix+'tin',												Constants.key_prefix+filedate+'::tin',											key17);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.bdid,										Constants.key_prefix+'bdid',							Constants.key_prefix+filedate+'::bdid',							key1);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.did,										Constants.key_prefix+'did',								Constants.key_prefix+filedate+'::did',							key2);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.incident,								Constants.key_prefix+'incident',					Constants.key_prefix+filedate+'::incident',					key3);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.incidentcode,						Constants.key_prefix+'incidentcode',			Constants.key_prefix+filedate+'::incidentcode',			key4);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.incidenttext,						Constants.key_prefix+'incidenttext',			Constants.key_prefix+filedate+'::incidenttext',			key5);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.license_nbr,						Constants.key_prefix+'license_nbr',				Constants.key_prefix+filedate+'::license_nbr', 			key6);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.license_midex,					Constants.key_prefix+'license_midex',			Constants.key_prefix+filedate+'::license_midex', 		key7);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.incident_LinkIds.key,		Constants.key_prefix+'incident_linkids',	Constants.key_prefix+filedate+'::incident_linkids', key8);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.party_LinkIds.key,			Constants.key_prefix+'party_linkids',	 		Constants.key_prefix+filedate+'::party_linkids', 		key9);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.midex_rpt_nbr,					Constants.key_prefix+'midex_rpt_nbr',			Constants.key_prefix+filedate+'::midex_rpt_nbr',		key10);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.nmls_id,								Constants.key_prefix+'nmls_id',			      Constants.key_prefix+filedate+'::nmls_id', 					key11);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.nmls_midex,							Constants.key_prefix+'nmls_midex',			  Constants.key_prefix+filedate+'::nmls_midex', 			key12);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.party,									Constants.key_prefix+'party',							Constants.key_prefix+filedate+'::party',						key13);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.party_aka_dba,					Constants.key_prefix+'party_aka_dba',			Constants.key_prefix+filedate+'::party_aka_dba',		key14);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.partytext,							Constants.key_prefix+'partytext',					Constants.key_prefix+filedate+'::partytext',				key15);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.ssn4,										Constants.key_prefix+'ssn4',							Constants.key_prefix+filedate+'::ssn4',							key16);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(prte2_sanctn_np.Keys.tin,										Constants.key_prefix+'tin',								Constants.key_prefix+filedate+'::tin',							key17);
 
 build_roxie_keys	:=	parallel(key1,key2,key3,key4,key5,key6,key7,key8,key9,key10,key11,key12,key13,key14,key15,key16,key17);
 
@@ -67,13 +67,15 @@ RoxieKeyBuild.MAC_SK_Move_V2(Constants.SuperKeyName+'tin',												'Q',mv17_q
 
 To_qa	:=	parallel(mv1_qa, mv2_qa, mv3_qa, mv4_qa, mv5_qa, mv6_qa,mv7_qa,mv8_qa,mv9_qa,mv10_qa,mv11_qa,mv12_qa,mv13_qa,mv14_qa,mv15_qa,mv16_qa, mv17_qa);
 
-//build_autokeys
+build_autokeys := prte2_sanctn_np.proc_build_autokeys(filedate);
 
 //---------- making DOPS optional and only in PROD build -------------------------------													
-		// notifyEmail 								:= IF(emailTo<>'',emailTo,_control.MyInfo.EmailAddressNormal);
-		// NoUpdate 											:= OUTPUT('Skipping DOPS update because it was requested to not do it, or we are not in PROD');						
-		// updatedops   		 				:= PRTE.UpdateVersion('Sanctn_NPKeys',filedate,notifyEmail,'B','N','N');
-		// PerformUpdateOrNot 	:= IF(doDOPS,updatedops,NoUpdate);
+		notifyEmail 				:= IF(emailTo<>'',emailTo,_control.MyInfo.EmailAddressNormal);
+		is_running_in_prod 	:= PRTE2_Common.Constants.is_running_in_prod;
+		doDOPS 							:= is_running_in_prod AND NOT skipDOPS;
+		NoUpdate 						:= OUTPUT('Skipping DOPS update because it was requested to not do it, or we are not in PROD');						
+		updatedops   		 		:= PRTE.UpdateVersion('Sanctn_NPKeys',filedate,notifyEmail,'B','N','N');
+		PerformUpdateOrNot 	:= IF(doDOPS,updatedops,NoUpdate);
 //--------------------------------------------------------------------------------------
 
 // -- Actions
@@ -81,8 +83,8 @@ buildKey	:=	sequential(
 																					build_roxie_keys
 																					,Move_keys
 																					,to_qa
-																						// ,build_autokeys
-																						// ,PerformUpdateOrNot
+																					,build_autokeys
+																					,PerformUpdateOrNot
 																						);	
 
 return	buildKey;

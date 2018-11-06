@@ -1,31 +1,35 @@
 ﻿import DOPSGrowthCheck;
-export GenerateECLCommand(Dataset(DOPSGrowthCheck.layouts.Build_Data_Layout) BuildList) := function
-    IdentifyAttributes:=project(BuildList,transform(DOPSGrowthCheck.layouts.Attribute_Layout_For_Command,
+export GenerateECLCommand:= function
+    // IdentifyAttributes:=project(BuildList,transform(DOPSGrowthCheck.layouts.Attribute_Layout_For_Command,
     //Self.hasProdRecord:=DOPSGrowthCheck.HasPrevious(Left.PackageName,Left.KeyFile,Left.ProdVersion);
     //Self.hasProdRecord:='true';
-    Self.indexfields:=DOPSGrowthCheck.DopsLayoutFunctions.fgetkeyedcolumns(Left.KeyFileNew);
-    Self:=Left;));
+    // Self.indexfields:=DOPSGrowthCheck.DopsLayoutFunctions.fgetkeyedcolumns(Left.KeyFileNew);
+    // Self:=Left;));
+		IdentifyAttributes:=DOPSGrowthCheck.IdentifyChangedDatasets;
 
     CommandLayout:=RECORD
         string command;
         string FullCommand;
     END;
     
-
-    GenerateIndividualCommands:=PROJECT(IdentifyAttributes, transform(CommandLayout,
-            Self.command:='DOPSGrowthCheck.CalculateStats(\''+
-                            Left.PackageName        +'\',\''+
-                            Left.KeyAttribute       +'\',\''+
-                            Left.KeyNickName        +'\',\''+
-                            Left.KeyFileNew         +'\',\''+
-                            Left.indexfields        +'\',\''+
-							Left.PersistRecIDField  +'\',\''+
-							Left.EmailField         +'\',\''+
-							Left.PhoneField         +'\',\''+
-							Left.SSNField           +'\',\''+
-							Left.FeinField          +'\',\''+
-                            Left.CertVersion        +'\',\''+
-                            Left.ProdVersion        +'\')';
+		GenerateIndividualCommands:=PROJECT(IdentifyAttributes, transform(CommandLayout,
+            Self.command:='DOPSGrowthCheck.fnAlertTests(\''+
+                            Left.PackageName        				+'\',\''+
+                            Left.KeyNickName        				+'\',\''+
+                            Left.version	          				+'\','+
+                            Left.NumRecsThresholdMin        +','+
+														Left.NumRecsThresholdMax  			+','+
+														Left.UniqueThresholdMin         +','+
+														Left.UniqueThresholdMax         +','+
+														Left.PIDThresholdMax           	+','+
+														Left.AddedThresholdMin          +','+
+                            Left.AddedThresholdMax        	+','+
+														Left.ModifiedThresholdMin       +','+
+														Left.ModifiedThresholdMax       +','+
+														Left.RemovedThresholdMin        +','+
+														Left.RemovedThresholdMax        +','+
+														Left.PersistThresholdMax        +',\''+
+                            Left.emailList        					+'\')';
             Self.FullCommand:=Self.command;
             ));
 
@@ -35,5 +39,6 @@ export GenerateECLCommand(Dataset(DOPSGrowthCheck.layouts.Build_Data_Layout) Bui
     END;
 
     dCombineCommands:=rollup(GenerateIndividualCommands,true,tCombineCommands(left,right));
-    return dCombineCommands;
+		finalcommand:=dCombineCommands[1].FullCommand;
+    return finalcommand;
 end;

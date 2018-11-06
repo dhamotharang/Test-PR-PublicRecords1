@@ -1,10 +1,10 @@
 ﻿import _Control, NAC;
 
-every_day := '0 5 * * *';
-IP			:= NAC.Constants.LandingZoneServer;
-RootDir	:= NAC.Constants.LandingZonePathBase + '/msh/done/';
+EVERY_DAY_AT_6AM := '0 10 * * *';
 
-ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev','thor400_30');
+IP			:= 	NAC.Constants.LandingZoneServer;
+RootDir		:= 	NAC.Constants.LandingZonePathBase + '/msh/done/';
+ThorName	:=	IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		Constants.ThorName_Dev,	Constants.ThorName_Prod);
 
 lECL1 :=
  'import ut;\n'
@@ -18,7 +18,7 @@ lECL1 :=
 +' 	 ,msg\n'
 +' 	 +\'Build wuid \'+workunit\n'
 +' 	 );\n\n'
-+'valid_state := [\'blocked\',\'running\',\'wait\'];\n'
++'valid_state := [\'blocked\',\'compiled\',\'submitted\',\'running\',\'wait\',\'compiling\'];\n'
 +'d := sort(nothor(WorkunitServices.WorkunitList(\'\',,,wuname,\'\'))(wuid <> thorlib.wuid() and job = wuname and state in valid_state), -wuid);\n'
 +'d_wu := d[1].wuid;\n'
 +'active_workunit :=  exists(d);\n'
@@ -35,8 +35,8 @@ lECL1 :=
 d:=FileServices.RemoteDirectory(IP, RootDir+'ready/', '*.dat');
 
 if(exists(d),_Control.fSubmitNewWorkunit(lECL1, ThorName ),'NO FILES TO SPRAY' )
-			: WHEN(CRON(every_day))
+			: WHEN(CRON(EVERY_DAY_AT_6AM))
 			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
-																			,'FraudGov NAC Input Prep SCHEDULE failure'
+																			,'FraudGov NAC Input Prep Schedule failure'
 																			,FraudGovPlatform_Validation.Constants.NOC_MSG
 																			));
