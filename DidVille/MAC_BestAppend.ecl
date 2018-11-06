@@ -156,8 +156,8 @@ end;
 #uniquename(recs_proj)
 %recs_proj% := MAP(
 	marketing => project(%best_recs%, %add_flds_marketing%(left, left._best, supply)), 
-	~glb => project(%best_recs%, %add_flds_nonglb%(left, left._best, supply)), 
-	project(%best_recs%, %add_flds_glb%(left, left._best, supply))
+	glb => project(%best_recs%, %add_flds_glb%(left, left._best, supply)), 
+	project(%best_recs%, %add_flds_nonglb%(left, left._best, supply))
 );
 
 outfi := UNGROUP(%recs_proj%);
