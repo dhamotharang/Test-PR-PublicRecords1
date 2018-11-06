@@ -11,7 +11,7 @@ EXPORT Fn_InputEchoBusReps_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_
 				SELF.BusInputUIDAppend := le.BusInputUIDAppend;
 				SELF.InputLexIDEcho := (INTEGER) le.Rep1LexID;
 				SELF.InputFirstNameEcho:= le.Rep1firstname;
-				SELF.InputAddressEcho := le.Rep1Addr;
+				SELF.InputStreetEcho := le.Rep1Addr;
 				SELF.InputCityEcho := le.Rep1City;
 				SELF.InputStateEcho := le.Rep1State; 
 				SELF.InputZipEcho := le.Rep1Zip;
@@ -20,7 +20,8 @@ EXPORT Fn_InputEchoBusReps_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_
 				SELF.InputArchiveDateEcho := le.ArchiveDate;
 				SELF.InputWorkPhoneEcho := '';
 				SELF.InputUIDAppend := 0; //defined further below
-	END;
+				SELF := []; //Pop fields
+				END;
 	InputEcho1 := PROJECT(ds_input, GetInputEcho1(LEFT));
 
 	PublicRecords_KEL.ECL_Functions.InputEcho_Layout GetInputEcho2( RECORDOF(ds_input) le ) := 
@@ -30,7 +31,7 @@ EXPORT Fn_InputEchoBusReps_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_
 				SELF.BusInputUIDAppend := le.BusInputUIDAppend;
 				SELF.InputLexIDEcho := (INTEGER) le.Rep2LexID;
 				SELF.InputFirstNameEcho:= le.Rep2firstname;
-				SELF.InputAddressEcho := le.Rep2Addr;
+				SELF.InputStreetEcho := le.Rep2Addr;
 				SELF.InputCityEcho := le.Rep2City;
 				SELF.InputStateEcho := le.Rep2State; 
 				SELF.InputZipEcho := le.Rep2Zip;
@@ -39,7 +40,8 @@ EXPORT Fn_InputEchoBusReps_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_
 				SELF.InputArchiveDateEcho := le.ArchiveDate;
 				SELF.InputWorkPhoneEcho := '';
 				SELF.InputUIDAppend := 0; //defined further below
-	END;
+				SELF := []; //Pop fields
+				END;
 	InputEcho2 := PROJECT(ds_input, GetInputEcho2(LEFT));
 
 // PublicRecords_KEL.ECL_Functions.AttrWithDate_Layout GetInputEcho3( RECORDOF(ds_input) le ) := 
@@ -50,7 +52,7 @@ PublicRecords_KEL.ECL_Functions.InputEcho_Layout GetInputEcho3( RECORDOF(ds_inpu
 				SELF.BusInputUIDAppend := le.BusInputUIDAppend;
 				SELF.InputLexIDEcho := (INTEGER) le.Rep3LexID;
 				SELF.InputFirstNameEcho:= le.Rep3firstname;
-				SELF.InputAddressEcho := le.Rep3Addr;
+				SELF.InputStreetEcho := le.Rep3Addr;
 				SELF.InputCityEcho := le.Rep3City;
 				SELF.InputStateEcho := le.Rep3State; 
 				SELF.InputZipEcho := le.Rep3Zip;
@@ -59,7 +61,8 @@ PublicRecords_KEL.ECL_Functions.InputEcho_Layout GetInputEcho3( RECORDOF(ds_inpu
 				SELF.InputArchiveDateEcho := le.ArchiveDate;
 				SELF.InputWorkPhoneEcho := '';
 				SELF.InputUIDAppend := 0; //defined further below
-	END;
+				SELF := []; //Pop fields
+				END;
 	InputEcho3 := PROJECT(ds_input, GetInputEcho3(LEFT));
 
 	PublicRecords_KEL.ECL_Functions.InputEcho_Layout GetInputEcho4( RECORDOF(ds_input) le ) := 
@@ -69,7 +72,7 @@ PublicRecords_KEL.ECL_Functions.InputEcho_Layout GetInputEcho3( RECORDOF(ds_inpu
 				SELF.BusInputUIDAppend := le.BusInputUIDAppend;
 				SELF.InputLexIDEcho := (INTEGER) le.Rep4LexID;
 				SELF.InputFirstNameEcho:= le.Rep4firstname;
-				SELF.InputAddressEcho := le.Rep4Addr;
+				SELF.InputStreetEcho := le.Rep4Addr;
 				SELF.InputCityEcho := le.Rep4City;
 				SELF.InputStateEcho := le.Rep4State; 
 				SELF.InputZipEcho := le.Rep4Zip;
@@ -78,7 +81,8 @@ PublicRecords_KEL.ECL_Functions.InputEcho_Layout GetInputEcho3( RECORDOF(ds_inpu
 				SELF.InputArchiveDateEcho := le.ArchiveDate;
 				SELF.InputWorkPhoneEcho := '';
 				SELF.InputUIDAppend := 0; //defined further below
-	END;
+				SELF := []; //Pop fields
+				END;
 	InputEcho4 := PROJECT(ds_input, GetInputEcho4(LEFT));
 	
 	PublicRecords_KEL.ECL_Functions.InputEcho_Layout GetInputEcho5( RECORDOF(ds_input) le ) := 
@@ -88,7 +92,7 @@ PublicRecords_KEL.ECL_Functions.InputEcho_Layout GetInputEcho3( RECORDOF(ds_inpu
 				SELF.BusInputUIDAppend := le.BusInputUIDAppend;
 				SELF.InputLexIDEcho := (INTEGER) le.Rep5LexID;
 				SELF.InputFirstNameEcho:= le.Rep5firstname;
-				SELF.InputAddressEcho := le.Rep5Addr;
+				SELF.InputStreetEcho := le.Rep5Addr;
 				SELF.InputCityEcho := le.Rep5City;
 				SELF.InputStateEcho := le.Rep5State; 
 				SELF.InputZipEcho := le.Rep5Zip;
@@ -97,7 +101,8 @@ PublicRecords_KEL.ECL_Functions.InputEcho_Layout GetInputEcho3( RECORDOF(ds_inpu
 				SELF.InputArchiveDateEcho := le.ArchiveDate;
 				SELF.InputWorkPhoneEcho := '';
 				SELF.InputUIDAppend := 0; //defined further below
-	END;
+				SELF := []; //Pop fields
+				END;
 	InputEcho5 := PROJECT(ds_input, GetInputEcho5(LEFT));
 
 	srtedEcho := SORT(InputEcho1 + InputEcho2 + InputEcho3 + InputEcho4 + InputEcho5, BusInputUIDAppend, RepNumber);

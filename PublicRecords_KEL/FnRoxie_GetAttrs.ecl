@@ -17,7 +17,9 @@ EXPORT FnRoxie_GetAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout) In
   cleanInput := PublicRecords_KEL.ECL_Functions.Fn_CleanInput_Roxie( InputEcho );
   
   // Append LexID
-  withLexID := PublicRecords_KEL.ECL_Functions.Fn_AppendLexid_Roxie( cleanInput, Options );
+  withLexID := IF(Options.isFCRA, 
+		PublicRecords_KEL.ECL_Functions.Neutral_Lexid_Soapcall(cleanInput, Options), //FCRA uses soapcall
+		PublicRecords_KEL.ECL_Functions.Fn_AppendLexid_Roxie( cleanInput, Options ));
 
   //Put in format for Attributes
   InputAttrs := PROJECT(withLexID, TRANSFORM(PublicRecords_KEL.ECL_Functions.Attr_Layout,

@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 0.11.4
+﻿//HPCC Systems KEL Compiler Version 0.11.6
 IMPORT KEL011 AS KEL;
 IMPORT CFG_Compile,E_Business FROM PublicRecords_KEL;
 IMPORT * FROM KEL011.Null;

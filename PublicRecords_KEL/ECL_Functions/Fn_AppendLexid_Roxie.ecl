@@ -51,19 +51,19 @@ EXPORT Fn_AppendLexid_Roxie(
     TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_ALL_Layout, 
 			SELF.InputLexIDEcho := LEFT.InputLexIDEcho;
       SELF.LexIDAppend := RIGHT.Did, 
-      SELF.LexIDAppendScore := RIGHT.Score,
+      SELF.LexIDScoreAppend := RIGHT.Score,
       SELF.InputUIDAppend := LEFT.InputUIDAppend;
       SELF := LEFT),
    LEFT OUTER);
   
-  dids_with_good_scores := IndataGotDid((INTEGER) LexIDAppendScore >= Options.ScoreThreshold);
+  dids_with_good_scores := IndataGotDid((INTEGER) LexIDScoreAppend >= Options.ScoreThreshold);
 
   //Change the lexid and score to be 0 for records below the score threshold
   dids_with_below_scores := DEDUP(SORT(
-    PROJECT(IndataGotDid((INTEGER) LexIDAppendScore < Options.ScoreThreshold), 
+    PROJECT(IndataGotDid((INTEGER) LexIDScoreAppend < Options.ScoreThreshold), 
     TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_ALL_Layout, 
       SELF.LexIDAppend := IF(LEFT.LexIDAppend = 0, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT, LEFT.LexIDAppend);
-      SELF.LexIDAppendScore := IF(LEFT.LexIDAppendScore = 0, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT,LEFT.LexIDAppendScore);, 
+      SELF.LexIDScoreAppend := IF(LEFT.LexIDScoreAppend = 0, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT,LEFT.LexIDScoreAppend);, 
       SELF := LEFT))
       , InputUIDAppend, LexIDAppend), InputUIDAppend);
 

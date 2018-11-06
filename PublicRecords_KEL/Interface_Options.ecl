@@ -1,7 +1,16 @@
-﻿EXPORT Interface_Options := INTERFACE
+﻿IMPORT PublicRecords_KEL, Gateway;
+
+EXPORT Interface_Options := INTERFACE
 	EXPORT INTEGER ScoreThreshold := 80;
 	EXPORT BOOLEAN IsFCRA := FALSE;
-	
+		SHARED gateways_in := Gateway.Configuration.Get();
+		SHARED Gateway.Layouts.Config gw_switch(gateways_in le) := TRANSFORM
+			SELF.servicename := le.servicename;
+			SELF.url := le.url; 
+			SELF := le;
+		END;
+
+	EXPORT DATASET(Gateway.Layouts.Config) Gateways := PROJECT(gateways_in, gw_switch(LEFT));
 	
 	// Performance options to turn ON/OFF ENTITIES in during FDC build.
 	// By default, all ENTITIES are ON.

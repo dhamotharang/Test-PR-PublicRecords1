@@ -3,7 +3,7 @@
 EXPORT Input_Cleaned_Layout := RECORD
 	INTEGER InputUIDAppend; 
 	INTEGER7 LexIDAppend; 
-	INTEGER2 LexIDAppendScore;  
+	INTEGER2 LexIDScoreAppend;  
 
 	STRING5  InputPrefixClean;
 	STRING20 InputFirstNameClean;

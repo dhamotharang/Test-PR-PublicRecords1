@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 0.11.4
+﻿//HPCC Systems KEL Compiler Version 0.11.6
 IMPORT KEL011 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
@@ -21,15 +21,11 @@ EXPORT E_Zip_Code(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
   SHARED __Mapping := 'zip5(UID),zipclass(Zip_Class_:\'\'),city(City_:\'\'),state(State_:\'\'),county(County_:\'\'),cityname(City_Name_:\'\'),source(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   SHARED __Mapping0 := 'zip(UID),zipclass(Zip_Class_:\'\'),city(City_:\'\'),state(State_:\'\'),county(County_:\'\'),cityname(City_Name_:\'\'),source(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
-  SHARED InLayout __Mapping0_Transform(InLayout __r) := TRANSFORM
-    SELF.__Permits := CFG_Compile.Permit_FCRA | CFG_Compile.Permit_nonFCRA;
-    SELF := __r;
-  END;
   SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_Doxie__Key_Header,TRANSFORM(RECORDOF(__in.Dataset_Doxie__Key_Header),SELF:=RIGHT));
   EXPORT __d0_KELfiltered := __d0_Norm((UNSIGNED3)zip !=0);
   EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Header_Invalid := __d0_KELfiltered((KEL.typ.uid)zip = 0);
   SHARED __d0_Prefiltered := __d0_KELfiltered((KEL.typ.uid)zip <> 0);
-  SHARED __d0 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0),__Mapping0_Transform(LEFT)));
+  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0));
   EXPORT InData := __d0;
   EXPORT Data_Sources_Layout := RECORD
     KEL.typ.nstr Source_;

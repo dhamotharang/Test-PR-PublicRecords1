@@ -1,7 +1,7 @@
 ﻿IMPORT KnowledgeUniverse.PublicRecords_KEL.Entities;
 
 USE PublicRecords_KEL.ECL_Functions.Dataset_FDC(FDC,
-	Dataset_Doxie__Key_Header(
+	Dataset_Doxie__Key_Header( 
 		SSNAddress(FILTER((STRING10)prim_range != '' AND (STRING28)prim_name != '' AND (UNSIGNED3)zip != 0 AND (UNSIGNED)ssn != 0),
 			DateLastSeen = FORMAT('YYYYMM01')dt_last_seen, // Contains information for ASOF
 			DateFirstSeen = FORMAT('YYYYMM01')dt_first_seen, // Contains information for ASOF
@@ -107,8 +107,7 @@ USE PublicRecords_KEL.ECL_Functions.Dataset_FDC(FDC,
 			UID = zip),
 		ZipCodePerson(
 			Zip = zip,
-			Subject = did),
-		PERMITS([FCRA, nonFCRA])), // leaving FCRA and nonFCRA the same for now, since on Vault side, Header use statement is only defined for FCRA. During FDC fetch, we are pointing to the correct version of the key (FCRA or NonFCRA)
+			Subject = did)), // leaving FCRA and nonFCRA the same for now, since on Vault side, Header use statement is only defined for FCRA. During FDC fetch, we are pointing to the correct version of the key (FCRA or NonFCRA)
 		
 	Dataset_Header_Quick__Key_Did(
 		SocialSecurityNumber(FILTER((UNSIGNED)ssn != 0),	
@@ -209,8 +208,7 @@ USE PublicRecords_KEL.ECL_Functions.Dataset_FDC(FDC,
 			SecondaryRange = sec_range,
 			DateFirstSeen = FORMAT('YYYYMM01')dt_first_seen, // Contains information for ASOF
 			DateLastSeen = FORMAT('YYYYMM01')dt_last_seen, // Contains information for ASOF
-			Source = src),
-		PERMITS([FCRA, nonFCRA])), // leaving FCRA and nonFCRA the same for now, since on Vault side, Header use statement is only defined for FCRA. During FDC fetch, we are pointing to the correct version of the key (FCRA or NonFCRA)
+			Source = src)), // leaving FCRA and nonFCRA the same for now, since on Vault side, Header use statement is only defined for FCRA. During FDC fetch, we are pointing to the correct version of the key (FCRA or NonFCRA)
 
 			
 	Dataset_Doxie_Files__Key_Offenders_Risk(
@@ -286,7 +284,7 @@ USE PublicRecords_KEL.ECL_Functions.Dataset_FDC(FDC,
 			SentenceLengthDescription = sent_length_desc,
 			CurrentKnownInmateStatus = cur_stat_inm_desc,
 			CurrentLocationOfInmate = cur_loc_inm,
-			CurrentLocationSecurity = inm_com_cty,
+			CurrentLocationSecurity = cur_loc_sec,
 			IncarcerationAdmissionDate = latest_adm_dt,
 			ScheduledReleaseDate = sch_rel_dt,
 			ActualReleaseDate = act_rel_dt,
@@ -622,6 +620,7 @@ USE PublicRecords_KEL.ECL_Functions.Dataset_FDC(FDC,
 			CaseDate = case_date,
 			CaseTypeDescription = case_type_desc,
 			CountyOfSource = county_of_origin,
+			DataType = data_type,
 			DepartmentOfLawEnforcementNumber = dle_num,
 			FederalBureauOfInvestigationsNumber = fbi_num,
 			InmateNumber = doc_num,

@@ -15,5 +15,16 @@ EXPORT InputEcho_Layout := RECORD
 	STRING16 InputWorkPhoneEcho;
 	STRING54 InputEmailEcho;
 	STRING20 InputArchiveDateEcho; 
+	STRING1 InputAccountEchoPop;
+	STRING1 InputLexIDEchoPop;
+	STRING1 InputFirstNameEchoPop;
+	STRING1 InputStreetEchoPop;
+	STRING1 InputCityEchoPop;
+	STRING1 InputStateEchoPop;
+	STRING1 InputZipEchoPop;
+	STRING1 InputHomePhoneEchoPop;
+	STRING1 InputWorkPhoneEchoPop;
+	STRING1 InputEmailEchoPop;
+	STRING1 InputArchiveDateEchoPop;
 	INTEGER RepNumber;
 END;

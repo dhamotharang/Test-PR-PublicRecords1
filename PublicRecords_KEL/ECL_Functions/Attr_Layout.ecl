@@ -4,7 +4,7 @@
 EXPORT Attr_Layout := RECORD
 	PublicRecords_KEL.ECL_Functions.InputEcho_Layout AND NOT [BusInputUIDAppend, RepNumber];
 	INTEGER7 LexIDAppend; 
-	INTEGER2 LexIDScoreAppend;  
+	INTEGER2 LexIDScoreAppend; 
 	STRING5 InputPrefixClean;
 	STRING20 InputFirstNameClean;
 	STRING5 InputSuffixClean;
@@ -29,4 +29,28 @@ EXPORT Attr_Layout := RECORD
 	STRING10 InputHomePhoneClean;
 	STRING10 InputWorkPhoneClean;
 	STRING20 InputArchiveDateClean;
+	STRING3 InputPrefixCleanPop,
+	STRING3 InputFirstNameCleanPop,
+	STRING3 InputSuffixCleanPop,
+	STRING3 InputPrimaryRangeCleanPop,
+	STRING3 InputPreDirectionCleanPop,
+	STRING3 InputPrimaryNameCleanPop,
+	STRING3 InputAddressSuffixCleanPop,
+	STRING3 InputPostDirectionCleanPop,
+	STRING3 InputUnitDesigCleanPop,
+	STRING3 InputSecondaryRangeCleanPop,
+	STRING3 InputCityCleanPop, 
+	STRING3 InputStateCleanPop,
+	STRING3 InputZip5CleanPop,
+	STRING3 InputZip4CleanPop,
+	STRING3 InputLatitudeCleanPop,
+	STRING3 InputLongitudeCleanPop,
+	STRING3 InputCountyCleanPop,
+	STRING3 InputGeoblockCleanPop,
+	STRING3 InputAddressTypeCleanPop,
+	STRING3 InputAddressStatusCleanPop,
+	STRING3 InputEmailCleanPop,
+	STRING3 InputHomePhoneCleanPop,
+	STRING3 InputWorkPhoneCleanPop,
+	STRING3 InputArchiveDateCleanPop
  END;

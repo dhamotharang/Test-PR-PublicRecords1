@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 0.11.4
+﻿//HPCC Systems KEL Compiler Version 0.11.6
 IMPORT KEL011 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
@@ -29,27 +29,19 @@ EXPORT E_Person(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compil
   SHARED Date_First_Seen_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
   SHARED Date_Last_Seen_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
   SHARED __Mapping0 := 'did(UID),title(Title_),fname(First_Name_),mname(Middle_Name_),lname(Last_Name_),name_suffix(Name_Suffix_),lexidsegment(Lex_I_D_Segment_:\'\'),dob(Date_Of_Birth_:DATE),dod(Date_Of_Death_:DATE),gender(Gender_:\'\'),race(Race_:\'\'),racedescription(Race_Description_:\'\'),src(Source_:\'\'),dt_first_seen(Date_First_Seen_:EPOCH:Date_First_Seen_0Rule),dt_last_seen(Date_Last_Seen_:EPOCH:Date_Last_Seen_0Rule)';
-  SHARED InLayout __Mapping0_Transform(InLayout __r) := TRANSFORM
-    SELF.__Permits := CFG_Compile.Permit_FCRA | CFG_Compile.Permit_nonFCRA;
-    SELF := __r;
-  END;
   SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_Doxie__Key_Header,TRANSFORM(RECORDOF(__in.Dataset_Doxie__Key_Header),SELF:=RIGHT));
   EXPORT __d0_KELfiltered := __d0_Norm((UNSIGNED)did != 0);
   EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Header_Invalid := __d0_KELfiltered((KEL.typ.uid)did = 0);
   SHARED __d0_Prefiltered := __d0_KELfiltered((KEL.typ.uid)did <> 0);
-  SHARED __d0 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0),__Mapping0_Transform(LEFT)));
+  SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0));
   SHARED Date_First_Seen_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
   SHARED Date_Last_Seen_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
   SHARED __Mapping1 := 'did(UID),title(Title_),fname(First_Name_),mname(Middle_Name_),lname(Last_Name_),name_suffix(Name_Suffix_),lexidsegment(Lex_I_D_Segment_:\'\'),dob(Date_Of_Birth_:DATE),dateofdeath(Date_Of_Death_:DATE),gender(Gender_:\'\'),race(Race_:\'\'),racedescription(Race_Description_:\'\'),src(Source_:\'\'),dt_first_seen(Date_First_Seen_:EPOCH:Date_First_Seen_1Rule),dt_last_seen(Date_Last_Seen_:EPOCH:Date_Last_Seen_1Rule)';
-  SHARED InLayout __Mapping1_Transform(InLayout __r) := TRANSFORM
-    SELF.__Permits := CFG_Compile.Permit_FCRA | CFG_Compile.Permit_nonFCRA;
-    SELF := __r;
-  END;
   SHARED __d1_Norm := NORMALIZE(__in,LEFT.Dataset_Header_Quick__Key_Did,TRANSFORM(RECORDOF(__in.Dataset_Header_Quick__Key_Did),SELF:=RIGHT));
   EXPORT __d1_KELfiltered := __d1_Norm((UNSIGNED)did != 0);
   EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Header_Quick__Key_Did_Invalid := __d1_KELfiltered((KEL.typ.uid)did = 0);
   SHARED __d1_Prefiltered := __d1_KELfiltered((KEL.typ.uid)did <> 0);
-  SHARED __d1 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1),__Mapping1_Transform(LEFT)));
+  SHARED __d1 := __SourceFilter(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1));
   SHARED __Mapping2 := 'did(UID),title(Title_),fname(First_Name_),mname(Middle_Name_),lname(Last_Name_),name_suffix(Name_Suffix_),lexidsegment(Lex_I_D_Segment_:\'\'),dob(Date_Of_Birth_:DATE),dateofdeath(Date_Of_Death_:DATE),gender(Gender_:\'\'),race(Race_:\'\'),race_desc(Race_Description_:\'\'),src(Source_:\'\'),fcra_date(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   SHARED InLayout __Mapping2_Transform(InLayout __r) := TRANSFORM
     SELF.__Permits := CFG_Compile.Permit_FCRA;
