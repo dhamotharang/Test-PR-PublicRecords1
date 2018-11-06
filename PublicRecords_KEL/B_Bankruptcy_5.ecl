@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Bankruptcy FROM PublicRecords_KEL;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Bankruptcy_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Bankruptcy(__in,__cfg).__Result) __E_Bankruptcy := E_Bankruptcy(__in,__cfg).__Result;
-  SHARED __EE17360 := __E_Bankruptcy;
-  EXPORT __ST16886_Layout := RECORD
+  SHARED __EE17344 := __E_Bankruptcy;
+  EXPORT __ST16870_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Court_Code_;
@@ -24,9 +24,9 @@ EXPORT B_Bankruptcy_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST16886_Layout __ND17976__Project(E_Bankruptcy(__in,__cfg).Layout __PP17048) := TRANSFORM
+  SHARED __ST16870_Layout __ND17960__Project(E_Bankruptcy(__in,__cfg).Layout __PP17032) := TRANSFORM
     SELF.Boca_Shell_History_Date_ := IF(__cfg.CurrentDate >= KEL.Routines.Today(),__cfg.CurrentDate,KEL.Routines.DateFromParts(KEL.Routines.Year(__cfg.CurrentDate),KEL.Routines.Month(__cfg.CurrentDate),1));
-    SELF := __PP17048;
+    SELF := __PP17032;
   END;
-  EXPORT __ENH_Bankruptcy_5 := PROJECT(__EE17360,__ND17976__Project(LEFT));
+  EXPORT __ENH_Bankruptcy_5 := PROJECT(__EE17344,__ND17960__Project(LEFT));
 END;

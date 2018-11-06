@@ -5,7 +5,7 @@ USE PublicRecords_KEL.ECL_Functions.Dataset_FDC(FDC,
 		SSNAddress(FILTER((STRING10)prim_range != '' AND (STRING28)prim_name != '' AND (UNSIGNED3)zip != 0 AND (UNSIGNED)ssn != 0),
 			DateLastSeen = FORMAT('YYYYMM01')dt_last_seen, // Contains information for ASOF
 			DateFirstSeen = FORMAT('YYYYMM01')dt_first_seen, // Contains information for ASOF
-			Social = ssn,
+			Social = ssn, 
 			PrimaryRange = prim_range,
 			Predirectional = predir,
 			PrimaryName = prim_name,

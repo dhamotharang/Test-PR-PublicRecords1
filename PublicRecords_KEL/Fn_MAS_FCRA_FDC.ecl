@@ -30,7 +30,8 @@ EXPORT Fn_MAS_FCRA_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Attr_Layout) Inpu
 				TRANSFORM(Layouts_FDC.Layout_Doxie__Key_Header,
 					SELF.InputUIDAppend := LEFT.InputUIDAppend,
 					SELF.LexIDAppend := LEFT.LexIDAppend,
-					SELF := RIGHT), 
+					SELF := RIGHT,
+					SELF := []), 
 				LIMIT(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
 		DATASET([], Layouts_FDC.Layout_Doxie__Key_Header));
 
@@ -50,7 +51,8 @@ EXPORT Fn_MAS_FCRA_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Attr_Layout) Inpu
 				TRANSFORM(Layouts_FDC.Layout_Header_Quick__Key_Did,
 					SELF.InputUIDAppend := LEFT.InputUIDAppend,
 					SELF.LexIDAppend := LEFT.LexIDAppend,
-					SELF := RIGHT), 
+					SELF := RIGHT,
+					SELF := []), 
 				LIMIT(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
 		DATASET([], Layouts_FDC.Layout_Header_Quick__Key_Did));
 
@@ -69,7 +71,8 @@ EXPORT Fn_MAS_FCRA_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Attr_Layout) Inpu
 				TRANSFORM(Layouts_FDC.Layout_Doxie_Files__Key_BocaShell_Crim_FCRA_Denorm,
 					SELF.InputUIDAppend := LEFT.InputUIDAppend,
 					SELF.LexIDAppend := LEFT.LexIDAppend,
-					SELF := RIGHT), 
+					SELF := RIGHT,
+					SELF := []), 
 				LIMIT(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
 		DATASET([], Layouts_FDC.Layout_Doxie_Files__Key_BocaShell_Crim_FCRA_Denorm));
 		
@@ -94,7 +97,8 @@ EXPORT Fn_MAS_FCRA_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Attr_Layout) Inpu
 					SELF.InputUIDAppend := LEFT.InputUIDAppend,
 					SELF.LexIDAppend := LEFT.LexIDAppend,
 					SELF.src := Doxie_Files__Key_Offenders_Src(RIGHT.data_type),
-					SELF := RIGHT), 
+					SELF := RIGHT,
+					SELF := []), 
 				LIMIT(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
 		DATASET([], Layouts_FDC.Layout_Doxie_Files__Key_Offenders));
 
@@ -114,7 +118,8 @@ EXPORT Fn_MAS_FCRA_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Attr_Layout) Inpu
 				TRANSFORM(Layouts_FDC.Layout_Doxie_files__Key_Court_Offenses,
 					SELF.InputUIDAppend := LEFT.InputUIDAppend,
 					SELF.LexIDAppend := LEFT.LexIDAppend,
-					SELF := RIGHT), 
+					SELF := RIGHT,
+					SELF := []), 
 				LIMIT(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
 		DATASET([], Layouts_FDC.Layout_Doxie_files__Key_Court_Offenses));
 					
@@ -133,7 +138,8 @@ EXPORT Fn_MAS_FCRA_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Attr_Layout) Inpu
 				TRANSFORM(Layouts_FDC.Layout_Doxie_Files__Key_Offenses,
 					SELF.InputUIDAppend := LEFT.InputUIDAppend,
 					SELF.LexIDAppend := LEFT.LexIDAppend,
-					SELF := RIGHT), 
+					SELF := RIGHT, 
+					SELF := []), 
 				LIMIT(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
 		DATASET([], Layouts_FDC.Layout_Doxie_Files__Key_Offenses));
 					
@@ -151,7 +157,8 @@ EXPORT Fn_MAS_FCRA_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Attr_Layout) Inpu
 				TRANSFORM(Layouts_FDC.Layout_Doxie_Files__Key_Offenders_Risk,
 					SELF.InputUIDAppend := LEFT.InputUIDAppend,
 					SELF.LexIDAppend := LEFT.LexIDAppend,
-					SELF := RIGHT), 
+					SELF := RIGHT,
+					SELF := []), 
 				LIMIT(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
 		DATASET([], Layouts_FDC.Layout_Doxie_Files__Key_Offenders_Risk));
 		
@@ -170,7 +177,8 @@ EXPORT Fn_MAS_FCRA_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Attr_Layout) Inpu
 				TRANSFORM(Layouts_FDC.Layout_Doxie_Files__Key_Punishment,
 					SELF.InputUIDAppend := LEFT.InputUIDAppend,
 					SELF.LexIDAppend := LEFT.LexIDAppend,
-					SELF := RIGHT), 
+					SELF := RIGHT,
+					SELF := []), 
 				LIMIT(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
 		DATASET([], Layouts_FDC.Layout_Doxie_Files__Key_Punishment));
 		
