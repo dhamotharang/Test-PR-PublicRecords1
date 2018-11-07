@@ -361,7 +361,7 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 
 	business_recs_gong_old:=join(business_recs_all_old,key_gong_bus,
 											keyed(LEFT.bdid=right.bdid) and right.current_record_flag='Y',
-											flag_bus_old(LEFT,RIGHT),limit(ut.limits.DEFAULT),keep(1),left outer);
+											flag_bus_old(LEFT,RIGHT),limit(ut.limits.DEFAULT,skip),keep(1),left outer);
 	
 	//New Business header
 	business_recs_new				:= Location_Services.GetByBusinessIDs(bus_input).linkIdsBestOut;
