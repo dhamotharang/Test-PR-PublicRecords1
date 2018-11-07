@@ -1,4 +1,4 @@
-import AutoStandardI,iesp,watchdog,doxie,suppress,deathv2_Services,STD,ut,dx_BestRecords;
+import AutoStandardI,iesp,doxie,suppress,deathv2_Services,STD,ut,dx_BestRecords;
 
 EXPORT Functions := MODULE
 	shared gm := AutoStandardI.GlobalModule();

@@ -1,4 +1,4 @@
-import ut,doxie,NID,watchdog,autokey,header_quick,AutoHeaderV2,lib_metaphone,dx_BestRecords;
+import ut,doxie,NID,autokey,header_quick,AutoHeaderV2,lib_metaphone,dx_BestRecords;
 
 export fetch_SSN (dataset (AutoheaderV2.layouts.search) ds_search) := function
 
@@ -58,7 +58,7 @@ export fetch_SSN (dataset (AutoheaderV2.layouts.search) ds_search) := function
 					
 	best_recs := dx_BestRecords.append(p, did, dx_BestRecords.Constants.perm_type.glb, left_outer := false);
 	GoodSSNOnly := project(best_recs(_best.valid_ssn = 'G' and _best.ssn = temp_ssn_value), 
-		transform(recordof(p), self := left));
+		transform(AutoheaderV2.layouts.search_out, self := left));
 
 	ssn_res := if(temp_SearchGoodSSNOnly_value, GoodSSNOnly, p);
 

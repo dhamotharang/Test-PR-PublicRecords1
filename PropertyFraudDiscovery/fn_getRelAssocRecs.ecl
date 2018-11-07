@@ -1,4 +1,4 @@
-IMPORT Relationship,watchdog,Header,PAW,STD,ut,dx_BestRecords;
+IMPORT Relationship,Header,PAW,STD,ut,dx_BestRecords;
 
 EXPORT fn_getRelAssocRecs(DATASET(Layouts.batch_working) ds_work_recs,
 													IParams.BatchParams in_mod) := FUNCTION

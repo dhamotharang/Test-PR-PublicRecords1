@@ -1,4 +1,4 @@
-IMPORT watchdog, ut, AutoStandardI, NID, doxie, AutoHeaderV2, dx_BestRecords;
+IMPORT ut, AutoStandardI, NID, doxie, AutoHeaderV2, dx_BestRecords;
 
 EXPORT functions := MODULE
 

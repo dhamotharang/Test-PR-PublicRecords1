@@ -1,4 +1,4 @@
-import watchdog, dx_BestRecords;
+import dx_BestRecords;
 
 export Mac_Add_DOB_By_DID(infile, append_dob_field, outfile) := macro
 
