@@ -1,4 +1,4 @@
-import _control;
+﻿import _control;
 
 version := '12299';		// UPDATE EACH TIME
 basename := 'SAM_Exclusions_Public_Extract_12286.CSV';
@@ -62,6 +62,6 @@ OUTPUT(vxml1(COUNT(actions)>2)),
 OUTPUT(vxml2(COUNT(actions)>1)),
 OUTPUT(vxml2(COUNT(actions)>2)),
 oxml,
-Despray('~thor::out::epls::results', 'bctlpedata10.risk.regn.net','/data/hds_3/sam/output/epls.xml')
+Despray('~thor::out::epls::results', _Control.IPAddress.bctlpedata10,'/data/hds_3/sam/output/epls.xml')
 );
 

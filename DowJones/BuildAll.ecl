@@ -1,13 +1,13 @@
-IMPORT STD;
+﻿IMPORT STD, _Control;
 djDespray(string logicalname, string outfile) :=
 	fileservices.Despray(logicalname,
-		'bctlpedata10.risk.regn.net',
+		_Control.IPAddress.bctlpedata10,
 		'/data/hds_3/DowJones/output/' + outfile +'.xml',
 		allowoverwrite := true);
 
 UnsprayReport(string lfn) :=
 	STD.file.Despray(lfn,
-		'bctlpedata10.risk.regn.net',
+		_Control.IPAddress.bctlpedata10,
 		'/data/hds_3/DowJones/output/SanctionsReport.csv',
 //		'/hds_3/DowJones/testdata/SanctionsReport.csv',
 		allowoverwrite := true);
