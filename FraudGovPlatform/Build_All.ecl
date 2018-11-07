@@ -36,14 +36,14 @@ module
 					FraudShared.Promote().Inputfiles.Using2Used,
 					FraudShared.SprayMBSFiles(pversion := pVersion[1..8], pServerIP := pMBSServerIP,pDirectory := pMBSFraudGovDirectory),
 					FraudGovPlatform_Validation.SprayMBSFiles(pversion := pVersion[1..8], pServerIP := pMBSFDNServerIP, pDirectory := pMBSFDNDirectory),
-					If(_Flags.UseDemoData,FraudGovPlatform.Append_MBSDemoData(pversion).MbsIncl)
+					If(_Flags.UseDemoData,FraudGovPlatform.Append_MBSDemoData(pversion).MbsIncl),
+					FraudgovInfo(pversion,'MBS_Completed').postNewStatus
 					
 	);
 
 //	export dops_update := RoxieKeyBuild.updateversion('IdentityDataKeys', pversion, _Control.MyInfo.EmailAddressNotify,,'N'); 															
 	export input_portion := sequential(
-			FraudgovInfo(pversion,'Input_Phase').postNewStatus
-			,Build_Input(
+			 Build_Input(
 				 pversion
 				,PSkipIdentityDataBase
 				,PSkipKnownFraudBase
@@ -54,8 +54,7 @@ module
 	);
 
 	export base_portion := sequential(
-			FraudgovInfo(pversion,'Base_Phase').postNewStatus
-		  	,Build_Base(
+		  	 Build_Base(
 				 pversion
 				,PSkipIdentityDataBase
 				,PSkipKnownFraudBase
@@ -85,8 +84,7 @@ module
 	
 
 	export Build_FraudShared_Keys := sequential(
-			FraudgovInfo(pversion,'Base_Completed').SetPreviousVersion
-			,FraudShared.Build_Keys(
+			FraudShared.Build_Keys(
 			 pversion
 			,pBaseMainBuilt
 			).All
@@ -97,10 +95,11 @@ module
 			,FraudShared.Promote().buildfiles.Built2QA			
 			// Clean Up Shared Files	
 			,FraudShared.Promote().buildfiles.cleanup	
+			,FraudgovInfo(pversion,'Keys_Completed').SetPreviousVersion			
 		) : success(Send_Emails(pversion).BuildSuccess), failure(Send_Emails(pversion).BuildFailure);	
 
-	export keys_portion := if(		Mac_TestBuild(pversion) 			= 'Passed' and 
-												Mac_TestRecordID(pversion) 	= 'Passed' and 
+	export keys_portion := if(	Mac_TestBuild(pversion) 			= 'Passed' and 
+												Mac_TestRecordID(pversion) 		= 'Passed' and 
 												Mac_TestRinID(pversion) 			= 'Passed', 
 												Build_FraudShared_Keys, 
 												Rollback(pversion).All);

@@ -1,13 +1,13 @@
 ﻿EXPORT str_functions := Module
 import python;
 
-
-string padx(string s, integer count_x) := EMBED(PYTHON)
-form =  "{:X>"+str(count_x)+"}"
+//Pad left <, right >, center ^
+string padx(string s, string where, string pad_char, integer count_x) := EMBED(PYTHON)
+form =  "{:"+pad_char+where+str(count_x)+"}"
 s =form.format(s)
 return s
 ENDEMBED;
-Export pad(string s, integer count_x) := padx(s, count_x);
+Export pad(string s, string where, string pad_char, integer count_x) := padx(s, where, pad_char, count_x);
 
 
 
