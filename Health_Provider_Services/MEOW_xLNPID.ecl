@@ -81,8 +81,8 @@ EXPORT Raw_Results := IF(EXISTS(RR0),RR4);
       SELF := ri;
       SELF := le;
     END;
-    	RETURN JOIN( d,k,(LEFT.LNPID = RIGHT.LNPID),tr(LEFT,RIGHT), LEFT OUTER, LIMIT(0), KEEP(500)); // Ignore excess records without erroring
-    END;
+    	RETURN JOIN( d,k,(LEFT.LNPID = RIGHT.LNPID),tr(LEFT,RIGHT), LEFT OUTER, KEEP(10000)); // Ignore excess records without erroring    
+			END;
   EXPORT Raw_Data := Fetch_Stream(Uid_Results);
   // This macro can be used to score any data with field names matching the header standard to the input criteria
   EXPORT ScoreData(RD,Inv) := FUNCTIONMACRO
