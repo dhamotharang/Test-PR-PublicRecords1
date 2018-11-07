@@ -1,0 +1,5 @@
+testcompositionrun_info
+Monitoring WU W20170728-141838(HIPIE_BCTLWXCARMIGJX_HIPIE_Plugins.AppendPersonGSA.AppendPersonGSA_testcmp_CarmigJX) to completion.
+
+testcompositionrun_err
+Plugin AppendPersonGSA passed compliance check

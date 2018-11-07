@@ -1,4 +1,6 @@
-﻿EXPORT Input_Layout := record
+﻿IMPORT PublicRecords_KEL;
+
+EXPORT Input_Layout := record
 	STRING Account;
 	STRING FirstName;
 	STRING MiddleName;

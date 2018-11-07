@@ -1,0 +1,14 @@
+Info Log -
+
+Monitoring WU W20180214-202329(HIPIE_ALAPERIASSX-W7D_HIPIE_Plugins.ComputeSuspectProviderAddressScore.ComputeSuspectProviderAddressScore_1.2_testcmp_gaoyon01) to completion.
+Plugin ComputeSuspectProviderAddressScore's test composition ComputeSuspectProviderAddressScore_1.2_testcmp ran on cluster http://10.241.100.159:8010/ and created workunit W20180214-202329 with status completed
+Plugin ComputeSuspectProviderAddressScore's test composition ComputeSuspectProviderAddressScore_1.2_testcmp ran and completed with state "completed"
+Error comparing control workunit to run results for ComputeSuspectProviderAddressScore_1.2_testcmp: Could not retrieve workunit:
+	2018-02-15 01:23:45 GMT: WUInfo: Invalid Workunit ID: TEST-RUN
+
+
+Err Log - 
+
+c:\HIPIE_Plugins\ComputeSuspectProviderAddressScore\ComputeSuspectProviderAddressScore_1.2.dud(0,0):error H200:Error comparing control workunit to run results for ComputeSuspectProviderAddressScore_1.2_testcmp: Could not retrieve workunit:
+	2018-02-15 01:23:45 GMT: WUInfo: Invalid Workunit ID: TEST-RUN
+

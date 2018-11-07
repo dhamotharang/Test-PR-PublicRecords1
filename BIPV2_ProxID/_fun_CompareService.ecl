@@ -1,11 +1,18 @@
+﻿/*
+
+BIPV2_ProxID._fun_CompareService(930260601  ,930191835 );
+BIPV2_ProxID._fun_CompareService(930260601  ,930191835 ,'built'  ,true);
+
+*/
+
 import BIPV2_ProxID,tools;
 
 EXPORT _fun_CompareService(
 
    unsigned6  pProxid1
   ,unsigned6  pProxid2
-  ,string     pversion  = 'qa'
-  
+  ,string     pversion              = 'qa'
+  ,boolean    pUseOtherEnvironment  = false
 ) :=
 function
 
@@ -14,10 +21,10 @@ function
   unsigned8 Proxidtwo   := IF( pProxid1>pProxid2, pProxid2, pProxid1 );
 
   BFile := BIPV2_ProxID.In_DOT_Base;
-  kFile := BIPV2_ProxID.Keys(BFile,version);
+  kFile := BIPV2_ProxID.Keys(BFile,version,pUseOtherEnvironment);
 
-  odl   := PROJECT(CHOOSEN(KFile.Candidates(Proxid=Proxidone),100000),BIPV2_ProxID.match_candidates(BFile).layout_candidates);
-  odr   := PROJECT(CHOOSEN(KFile.Candidates(Proxid=ProxidTwo),100000),BIPV2_ProxID.match_candidates(BFile).layout_candidates);
+  odl   := PROJECT(CHOOSEN(KFile.Candidates(Proxid=Proxidone),100000),transform(BIPV2_ProxID.match_candidates(BFile).layout_candidates,self := left,self := []));
+  odr   := PROJECT(CHOOSEN(KFile.Candidates(Proxid=ProxidTwo),100000),transform(BIPV2_ProxID.match_candidates(BFile).layout_candidates,self := left,self := []));
   k     := KFile.Specificities_Key;
   s     := GLOBAL(PROJECT(k,BIPV2_ProxID.Layout_Specificities.R)[1]);
   odlv  := BIPV2_ProxID.Debug(BFile,s).RolledEntities(odl);
@@ -69,7 +76,7 @@ function
                                                                                               ,self.skipped := left.child(    regexfind('_skipped$' ,fieldname,nocase))[1].fieldvalue
                                                                                               ,self := left
                                                          )),rid),{recordof(left) - rid - rollupid});
-  dnorm_specs_filt2 := dproj3(count(child(regexfind('^conf$',fieldname,nocase))) >0 or (unsigned)score != 0);
+  dnorm_specs_filt2 := dproj3(count(child(regexfind('^conf$',fieldname,nocase) or regexfind('cnp_name',fieldname,nocase))) >0 or (unsigned)score != 0);
   
 // 24 24 right_hist_enterprise_number  
 // 24 23 hist_enterprise_number_score 0 

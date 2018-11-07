@@ -1,7 +1,7 @@
-IMPORT lib_StringLib;
+﻿IMPORT lib_StringLib;
 EXPORT ScrubCName (STRING40 CNAME, UNSIGNED2 pInstance = 1) := FUNCTION
 
-	Special_CHAR					:=	'|\\¦|@|\\$|%|¬||\\*|\\(|\\)|_|=|:|;|!|¢|\\}|\\.|\\{|\\?|\\|<|>|"|`|~|0x00|0xFF|0xBA|0xBB|0x5B|0x5D|\'';
+	Special_CHAR					:=	'|0xA6|@|\\$|%|0xAC||\\*|\\(|\\)|_|\\=|:|;|!|0xA2|\\}|\\.|\\{|\\?|\\|<|>|"|`|~|&|0x00|0xFF|0xBA|0xBB|0x5B|0x5D|\'';
 	Space_CHAR						:=	'\\,|\\\\|-';
 	Number_Rest_Spl_CHAR	:= '^([0-9#$-])*$';
 	hyphenated_number		 	:=  '^([0-9]+[-,/][0-9]+[-,/][0-9]+)$';

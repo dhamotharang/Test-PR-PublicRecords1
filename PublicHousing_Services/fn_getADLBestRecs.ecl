@@ -1,5 +1,5 @@
 
-IMPORT BatchDatasets, Didville, Doxie_Regression;
+IMPORT BatchDatasets, Didville;
 
 EXPORT fn_getADLBestRecs(DATASET(Layouts.batch_in) ds_batch_in, IParams.BatchParams in_mod ) :=
 	FUNCTION

@@ -465,5 +465,7 @@ EXPORT isCodeOS_O5(unsigned2 btst_did_summary) := btst_did_summary = 0;
 EXPORT isCodeOS_O6(unsigned2 btst_did_summary) := btst_did_summary = 1;
 //WC7 = btst_did_summary = 2;	
 EXPORT isCodeOS_O7(unsigned2 btst_did_summary) := btst_did_summary = 2;
-
+//for IID CCVI1810_1 chase
+EXPORT isCodeVerlast (string verlast) := verlast = '';
+EXPORT isCodeVerfirst (string verfirst) := verfirst = '';
 END;

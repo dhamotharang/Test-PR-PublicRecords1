@@ -1,0 +1,48 @@
+ID "HIPIE_Plugins.AppendCleanAddress.AppendCleanAddress_cmp";
+NAME "AppendCleanAddress_2.0_testcmp";
+LABEL "Test composition for Clean Addresses";
+DESCRIPTION "Auto-generated test composition for plugin AppendCleanAddress";
+VERSION "2.0.0";
+AUTHOR "CarmigJX";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING CompareWUID: DEFAULT("W20171214-100140");
+END
+
+INSTANCE OutDataset.OutDataset(Ins004)
+	name="~qa::appendcleanaddress::appendcleanaddress::output"
+	Method=THOR
+	dsInput=^Ins003|dsOutput
+END
+
+INSTANCE UseDataset.UseDataset(Ins001)
+	LogicalFilename="~qa::appendcleanaddress::appendcleanaddress::input"
+	Method=THOR
+	Structure="{string addr1,string addr2,string city,string st,string zip};"
+END    
+
+INSTANCE AppendCleanAddress.AppendCleanAddress(Ins003):VERSION("2.0.0")
+	dsInput=^Ins002|dsOutput
+	AddressLine1=addr1
+	AddressLine2=addr2
+	City=city
+	State=st
+	Zip=zip 
+	Prefix="Test"
+  EnableSearchLink="False"
+END 
+INSTANCE AppendCleanAddress.AppendCleanAddress(Ins002):VERSION("2.0.0")
+	dsInput=^Ins001|dsOutput
+	AddressLine1=addr1
+	AddressLine2=addr2
+	City=city
+	State=st
+	Zip=zip 
+	Prefix="Address"
+  EnableSearchLink="True"
+END  

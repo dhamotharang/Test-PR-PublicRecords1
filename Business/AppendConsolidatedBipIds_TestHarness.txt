@@ -1,0 +1,17 @@
+testcompositionrun_info.log
+C:\Users\carmigjx\git\HIPIE_Plugins\AppendACA\AppendACA.dud(59,129):error H101:no viable alternative at input 'TABLEHitRate(acaHitStats{WasFound,Cnt}):TITLE("Hit Rate"),LABEL("Status","Count"),VALUE(WasFound,Cnt),_pagination='
+C:\Users\carmigjx\git\HIPIE_Plugins\AppendACA\AppendACA.dud(0,0):error H101:Invalid contract HIPIE_Plugins.AppendACA.AppendACA, discarding
+
+C:\Users\carmigjx\git\HIPIE_Plugins\CleanStringColumn\cleanstringcolumn_testcmp.cmp(23,0):error H501:No contract found HIPIE_Plugins.CleanStringColumn.CleanStringColumn with version 1.0.0
+
+Monitoring WU W20160621-100415(HIPIE_BCTLW7CARMIGJX_AppendConsolidatedBipIds_testcmp_CarmigJX) to completion.
+
+
+testcompositionrun_err.log
+C:\Users\carmigjx\git\HIPIE_Plugins\Business\AppendConsolidatedBipIds_testcmp.txt(0,0):error H1602:AppendConsolidatedBipIds_testcmp: the following outputs are in control workunit W20160621-095007 but not in test workunit W20160621-100415:Result 4
+C:\Users\carmigjx\git\HIPIE_Plugins\Business\AppendConsolidatedBipIds_testcmp.txt(0,0):error H1602:AppendConsolidatedBipIds_testcmp: the following outputs are in test workunit W20160621-100415 but not in control workunit W20160621-095007:Result 4
+C:\Users\carmigjx\git\HIPIE_Plugins\Business\AppendConsolidatedBipIds_testcmp.txt(0,0):error H1602:AppendConsolidatedBipIds_testcmp: output Result 4 had different values. Control workunit W20160621-095007:
+[100 rows], test workunit W20160621-100415:
+null
+C:\Users\carmigjx\git\HIPIE_Plugins\Business\AppendConsolidatedBipIds_testcmp.txt(0,0):error H1602:AppendConsolidatedBipIds_testcmp: output Result 4 had different filenames. Control workunit W20160621-095007:qa::business::appendconsolidatedbipids::output, test workunit W20160621-100415:null
+

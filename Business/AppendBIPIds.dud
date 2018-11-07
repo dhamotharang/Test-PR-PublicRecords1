@@ -1,0 +1,83 @@
+﻿ID "65d9bbe5-5a6e-4973-b0d0-201c6659f79c";
+NAME AppendBIPIds;
+LABEL "Append BIP Ids";
+VERSION "1.0.0";
+AUTHOR "CarmigJX";
+CATEGORY APPEND;
+DESCRIPTION "Appends Business BIP ids";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING Prefix: LABEL("Append Columns Prefix"),DESCRIPTION("A string to prefix to the new dataset columns appended by this plugin."),OPTIONAL,NULL("");
+	DATASET dsInput: MAPBYNAME
+    FIELD CompanyName: LABEL("Company Name"),DESCRIPTION("Company Name");
+    FIELD PrimaryRange: LABEL("Primary Range"),DESCRIPTION("Primary Range, street number"),OPTIONAL,NULL("");
+    FIELD PrimaryName: LABEL("Primary Name"),DESCRIPTION("Primary Name, street name"),OPTIONAL,NULL("");
+    FIELD SecondaryRange: LABEL("Secondary Range"),DESCRIPTION("Secondary Range, Apt or Suite"),OPTIONAL,NULL("");
+    FIELD City: LABEL("City"),DESCRIPTION("City");
+    FIELD State: LABEL("State"),DESCRIPTION("Two-letter state abbreviation");
+    FIELD Zip5: LABEL("5-Digit Zip Code"),DESCRIPTION("Zip Code");
+    FIELD Fein: LABEL("Fein"),DESCRIPTION("Fein"),OPTIONAL,NULL("");
+    FIELD Phone: LABEL("Phone"),DESCRIPTION("Phone"),OPTIONAL,NULL("");
+  END
+  STRING ScoreThreshold:LABEL("Score Threshold"),DEFAULT("75"), OPTIONAL;
+  STRING WeightThreshold:LABEL("Weight Threshold"),OPTIONAL,NULL("");
+END
+
+OUTPUTS
+	DATASET dsOutput(dsInput): PREFIX(INPUTS.Prefix),APPEND
+		UNSIGNED6 UltID;
+    UNSIGNED6 OrgID;
+    UNSIGNED6 SeleID;
+    UNSIGNED6 ProxID;
+    UNSIGNED6 PowID;
+    UNSIGNED6 DotID;
+    UNSIGNED6 EmpID;
+    UNSIGNED  Score;
+    UNSIGNED  Weight;
+  END
+	DATASET BusinessHitStats: SIDE,WUID,SMALL
+		STRING WasFound: FEW;
+	INTEGER Cnt;
+END
+END
+VISUALIZE BIPIdsAppendStats: LABEL("Append BIP Ids Stats")
+	  TABLE HitRate(BusinessHitStats): TITLE("Hit Rate"),LABEL("Status","Count"),VALUE(WasFound,Cnt);
+END
+
+GENERATES INLINE
+	IMPORT Business;
+
+  dFinalOutput := Business.macAppendBIPIds(%dsInput%, %CompanyName%, %PrimaryRange%, %PrimaryName%, %SecondaryRange%,
+    %City%, %State%, %Zip5%, %Fein%, %Phone%, %^qPrefix%, %^qScoreThreshold%, %^qWeightThreshold%);
+
+  %^edsOutput% := dFinalOutput %^p%;
+
+  %^eBusinessHitStats% := TABLE(%dsOutput%,
+    {STRING  WasFound := IF((UNSIGNED)%Prefix%SeleID > 0, 'Matched', 'Unmatched'),INTEGER Cnt := COUNT(GROUP)},
+    (UNSIGNED)%Prefix%SeleID > 0,FEW);
+ENDGENERATES
+
+RESOURCES
+	SUPERFILE word_company_url: FILENAME("~thor_data400::key::bizlinkfull::qa::proxid::word::company_url"),URL("http://10.241.12.204:8010"),DALIIP("10.241.12.201"),CLUSTER("thor400_dev01");
+	SUPERFILE word_cnp_name: FILENAME("~thor_data400::key::bizlinkfull::qa::proxid::word::cnp_name"),URL("http://10.241.12.204:8010"),DALIIP("10.241.12.201"),CLUSTER("thor400_dev01");
+	SUPERFILE refs_l_phone: FILENAME("~thor_data400::key::bizlinkfull::qa::proxid::refs::l_phone"),URL("http://10.241.12.204:8010"),DALIIP("10.241.12.201"),CLUSTER("thor400_dev01");
+	SUPERFILE refs_l_address3: FILENAME("~thor_data400::key::bizlinkfull::qa::proxid::refs::l_address3"),URL("http://10.241.12.204:8010"),DALIIP("10.241.12.201"),CLUSTER("thor400_dev01");
+	SUPERFILE refs_l_address2: FILENAME("~thor_data400::key::bizlinkfull::qa::proxid::refs::l_address2"),URL("http://10.241.12.204:8010"),DALIIP("10.241.12.201"),CLUSTER("thor400_dev01");
+	SUPERFILE refs_l_cnpname_st: FILENAME("~thor_data400::key::bizlinkfull::qa::l_cnpname_st"),URL("http://10.241.12.204:8010"),DALIIP("10.241.12.201"),CLUSTER("thor400_dev01");
+	SUPERFILE refs_l_cnpname_zip: FILENAME("~thor_data400::key::bizlinkfull::qa::proxid::refs::l_cnpname_zip"),URL("http://10.241.12.204:8010"),DALIIP("10.241.12.201"),CLUSTER("thor400_dev01");
+	SUPERFILE refs_l_cnpname: FILENAME("~thor_data400::key::bizlinkfull::qa::proxid::refs::l_cnpname"),URL("http://10.241.12.204:8010"),DALIIP("10.241.12.201"),CLUSTER("thor400_dev01");
+	SUPERFILE biz_preferred: FILENAME("~thor_data400::key::bipv2::qa::biz_preferred"),URL("http://10.241.100.157:8010"),DALIIP("10.241.20.205"),CLUSTER("thor100_100cert");
+	ECL  Business:FILENAME("Business"), URL("<http://10.241.100.153:8010>"); 
+	ECL  Business_Header_SS:FILENAME("Business_Header_SS"), URL("<http://10.241.100.153:8010>"); 
+	ECL  BIPV2:FILENAME("BIPV2"), URL("<http://10.241.100.153:8010>"); 
+	ECL  SALT32:FILENAME("SALT32"), URL("<http://10.241.100.153:8010>"); 
+	LOGICALFILE test: FILENAME("~qa::business::appendbipids::input"),URL("http://10.241.100.159:8010"),DALIIP("10.241.100.159"),CLUSTER("thor100_100dev");
+	FILE readme: FILENAME("AppendBIPIds_ReadMe.txt"),LABEL("Plugin Readme File");
+	FILE AppendBIPIds_BuildTestDataset: FILENAME("AppendBIPIds_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+	FILE appendbipids_testcmp: FILENAME("appendbipids_testcmp.txt"),LABEL("Plugin Test Composition");
+END

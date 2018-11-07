@@ -1,0 +1,70 @@
+﻿ID "21635727-d7c6-40b8-b126-3c7f7a574a8f";
+NAME AppendDCABusinessAttributes;
+LABEL "Append DCA Business Attributes";
+VERSION "1.0.0";
+AUTHOR "CarmigJX";
+CATEGORY APPEND;
+DESCRIPTION "Append business attributes from DCA dataset";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING Prefix: LABEL("Append Column Prefix"),DEFAULT(""),DESCRIPTION("Prefix to be appended to the new fields");
+	DATASET dsInput: MAPBYNAME
+    FIELD UltID: LABEL("UltID"),DESCRIPTION("UltID");
+    FIELD OrgID: LABEL("OrgID"),DESCRIPTION("OrgID");
+    FIELD SeleID: LABEL("SeleID"),DESCRIPTION("SeleID");
+  END
+	STRING DPPAPURPOSE: LABEL("DPPA Purpose"),DEFAULT("^GLOBAL|DPPAPURPOSE");
+	STRING GLBPURPOSE: LABEL("GLB Purpose"),DEFAULT("^GLOBAL|GLBPURPOSE");
+	STRING DATARESTRICTIONMASK: LABEL("Data Restriction Mask"),DEFAULT("^GLOBAL|DATARESTRICTIONMASK");
+END
+
+OUTPUTS
+	DATASET dsOutput(dsInput): PREFIX(INPUTS.Prefix),APPEND
+    STRING EnterpriseNumber;
+    STRING CompanyType;
+    STRING BusinessDescription;
+    INTEGER NumberOfEmployees;
+    STRING SalesOrRevenue;
+    INTEGER Sales;
+    INTEGER Earnings;
+    INTEGER NetWorth;
+    INTEGER Assets;
+    INTEGER Liabilities;
+    STRING UpdateDate;
+  END	
+  DATASET DCAHitStats: SIDE,WUID,SMALL
+		STRING DCAHit: FEW;
+    INTEGER Cnt;
+  END
+END
+
+VISUALIZE DCAStats: LABEL("Append DCA Attributes Stats")
+  PIE HitRate(DCAHitStats{DCAHit,Cnt}): LABEL(DCAHit),WEIGHT(Cnt),TITLE("Hit Rate"), _charttype("AM_PIE");
+END
+
+GENERATES INLINE
+	IMPORT AppendDCABusinessAttributes;
+  %^edsOutput% := AppendDCABusinessAttributes.macAppendDCABusinessAttributes(%dsInput%, %UltID%, %OrgID%, %SeleID%, %^qPrefix%) %^p%;
+  
+  %^eDCAHitStats% := TABLE(%dsOutput%,
+    {STRING  DCAHit := IF(%Prefix%EnterpriseNumber <> '', 'Hit', 'NoHit'),INTEGER Cnt := COUNT(GROUP)},
+    %Prefix%EnterpriseNumber <> '', FEW);
+ENDGENERATES
+
+
+RESOURCES
+	FILE readme: FILENAME("AppendDCABusinessAttributes_ReadMe.txt"),LABEL("Plugin Readme File");
+	FILE appenddcabusinessattributes_testcmp: FILENAME("appenddcabusinessattributes_testcmp.txt"),LABEL("Plugin Test Composition");
+	FILE AppendDCABusinessAttributes_BuildTestDataset: FILENAME("AppendDCABusinessAttributes_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+  FILE checklist: FILENAME("AppendDCABusinessAttributesChecklist.xlsx"),LABEL("Plugin Checklist");
+ 	INDEX Keys.DCABusinessKey:FILENAME("~thor_data400::key::dca::qa::linkids"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");  
+  LOGICALFILE test:FILENAME("~qa::appenddcabusinessattributes::appenddcabusinessattributes::input"), URL("http://10.241.100.159:8010"), DALIIP("10.241.100.159"), CLUSTER("thor100_100dev");
+ 	ECL  AppendDCABusinessAttributes:FILENAME("AppendDCABusinessAttributes"), URL("<http://10.241.100.153:8010>"); 
+ 	ECL  hipie_ecl:FILENAME("hipie_ecl"), URL("<http://10.241.100.153:8010>"); 
+ 	ECL  ut:FILENAME("ut"), URL("<http://10.241.100.153:8010>"); 
+END

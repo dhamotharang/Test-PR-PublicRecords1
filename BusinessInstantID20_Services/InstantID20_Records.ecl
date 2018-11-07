@@ -1,4 +1,4 @@
-IMPORT BIPV2, Business_Risk_BIP, MDR, Risk_Reporting;
+﻿IMPORT BIPV2, Business_Risk_BIP, MDR, Risk_Reporting;
 
 EXPORT InstantID20_Records( DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo) ds_input,
                              BusinessInstantID20_Services.iOptions Options,
@@ -42,7 +42,7 @@ EXPORT InstantID20_Records( DATASET(BusinessInstantID20_Services.layouts.InputCo
 		ds_BusinessHeaderRecs := BusinessInstantID20_Services.fn_GetHeaderRecords(ds_CleanedInput, ds_BIPIDsFound, Options, linkingOptions, AllowedSourcesSet) : INDEPENDENT;
 		
 		// 7. Get Verification info.
-		ds_VerificationInfo := BusinessInstantID20_Services.fn_GetVerificationInfo(ds_OriginalInput, ds_BusinessHeaderRecs, ds_Shell_Results, Options);
+		ds_VerificationInfo := BusinessInstantID20_Services.fn_GetVerificationInfo(ds_CleanedInput, ds_BusinessHeaderRecs, ds_Shell_Results, Options);
 		
 		// 8. Get Firmographics info.
 		ds_FirmographicsInfo := BusinessInstantID20_Services.fn_GetFirmographics(ds_CleanedInput, ds_BIPIDsFound, Options, linkingOptions, AllowedSourcesSet);

@@ -11,7 +11,7 @@
 
 EXPORT Practitioner_Batch_Service(useCannedRecs = 'false') := 
 	MACRO	 	 
-	 #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+	 #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 		results := SearchPoint_Services.Practitioner_Batch_Service_Records(useCannedRecs);		
     OUTPUT( results, NAMED('Results'));				
 	ENDMACRO;	

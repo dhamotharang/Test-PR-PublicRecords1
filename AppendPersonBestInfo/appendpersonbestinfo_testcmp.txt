@@ -1,0 +1,45 @@
+ID "HIPIE_Plugins.AppendPersonBestInfo.AppendPersonBestInfo_cmp";
+NAME appendpersonbestinfo_testcmp;
+LABEL "Test composition for Append Person Best Info";
+DESCRIPTION "Auto-generated test composition for plugin AppendPersonBestInfo";
+VERSION "1.0.0";
+AUTHOR "CarmigJX";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING CompareWUID: DEFAULT("W20170207-171239");
+END
+
+INSTANCE OutDataset.OutDataset(Ins004): LABEL("Output Dataset"),VERSION("2.0")
+	dsInput="^Ins003|dsOutput"
+	name="~qa::appendpersonbestinfo::appendpersonbestinfo::output"
+	Method="THOR"
+END
+
+INSTANCE AppendPersonBestInfo.AppendPersonBestInfo(Ins003): LABEL("Append Person Best Info"),VERSION("1.0.0")
+	dsInput="^Ins002|dsOutput"
+  Lexid="did"
+  Prefix="Test"
+  GLBPURPOSE="3"
+  DATARESTRICTIONMASK="00000000000000000000000"
+END
+
+INSTANCE AppendPersonBestInfo.AppendPersonBestInfo(Ins002): LABEL("Append Person Best Info"),VERSION("1.0.0")
+  dsInput="^Ins001|dsOutput"
+  Lexid="did"
+  Prefix="Best"
+  GLBPURPOSE="3"
+  DATARESTRICTIONMASK="00000000000000000000001"
+END
+
+INSTANCE UseDataset.UseDataset(Ins001): LABEL("Use Dataset"),VERSION("1.1")
+	LogicalFilename="~qa::appendpersonbestinfo::appendpersonbestinfo::input"
+	Structure="RECORD
+    unsigned6 did;
+  END;"
+  Method="THOR"
+END

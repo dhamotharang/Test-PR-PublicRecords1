@@ -1,0 +1,154 @@
+﻿ID "a898f8cd-c432-4f40-4242-89cf5673562e";
+NAME AppendLNPID;
+LABEL "Provider ID Append";
+CATEGORY APPEND;
+VERSION "1.0.0";
+AUTHOR "periassx";
+DESCRIPTION "Append Provider ID using cleaned data as input";
+
+PERMISSIONS
+ VIEW:PUBLIC;
+ EDIT:PRIVATE;
+ RUN:PUBLIC;
+END
+ 
+INPUTS
+    INT Weight : LABEL("Weight"),DEFAULT(38),DESCRIPTION("Match weight threshold, points for data point matches.");
+    INT Distance : LABEL("Distance"),DEFAULT(3),DESCRIPTION("Distance between top candidate and next.");
+    STRING Prefix:LABEL("Append Column Prefix"),DEFAULT("Inp");
+    DATASET dsInput:MAPBYNAME
+    FIELD FirstName:LABEL("First Name"),DESCRIPTION("First Name");
+    FIELD MiddleName:LABEL("Middle Name"),DESCRIPTION("Middle Name"),OPTIONAL,NULL("");
+    FIELD LastName:LABEL("Last Name"),DESCRIPTION("Last Name");
+    FIELD NameSuffix:LABEL("Name Suffix"),DESCRIPTION("Suffix Name"),OPTIONAL,NULL("");        
+    FIELD Gender:LABEL("Gender"),DESCRIPTION("Sex"),OPTIONAL,NULL("");
+    FIELD SSN:LABEL("SSN"),DESCRIPTION("Social Security Number"),OPTIONAL,NULL("");
+    FIELD DateOfBirth:LABEL("Date of Birth"),DESCRIPTION("Date of Birth"),OPTIONAL,NULL("");
+    FIELD PrimaryRange:LABEL("Primary Range"),DESCRIPTION("Primary Range, Street Number"),OPTIONAL,NULL("");
+    FIELD PrimaryName:LABEL("Primary Name"),DESCRIPTION("Primary Name, Street Name"),OPTIONAL,NULL("");
+    FIELD SecondaryRange:LABEL("Secondary Range"),DESCRIPTION("Secondary Range, Apt or Suite"),OPTIONAL,NULL("");
+    FIELD CityName_Vanity:LABEL("City"),DESCRIPTION("City"),OPTIONAL,NULL("");
+    FIELD State:LABEL("State"),DESCRIPTION("Two-letter state abbreviation"),OPTIONAL,NULL("");
+    FIELD Zip5:LABEL("Zip Code"),DESCRIPTION("5-Digit Zip Code"),OPTIONAL,NULL("");
+    FIELD Phone:LABEL("Phone"),DESCRIPTION("10-Digit Phone Number"),OPTIONAL,NULL("");
+    FIELD Fax:LABEL("Fax"),DESCRIPTION("10-Digit Fax Number"),OPTIONAL,NULL("");				
+    FIELD LicenseNumber:LABEL("License Number"),DESCRIPTION("Medical License Number"),OPTIONAL,NULL("");				
+    FIELD LicenseState:LABEL("License Number State"),DESCRIPTION("2-Digit Medical License State"),OPTIONAL,NULL("");				
+    FIELD UPIN:LABEL("UPIN"),DESCRIPTION("6-Digit Unique Physician Identification Number"),OPTIONAL,NULL("");								
+    FIELD NPINumber:LABEL("NPI NUMBER"),DESCRIPTION("10-Digit Nation Provider Identification Number"),OPTIONAL,NULL("");								
+    FIELD DEANumber:LABEL("DEA NUMBER"),DESCRIPTION("9-Digit Drug Enforcement Administration Number"),OPTIONAL,NULL("");												
+    FIELD TaxID:LABEL("TAX ID"),DESCRIPTION("Tax Identification Number"),OPTIONAL,NULL("");																
+    FIELD Taxonomy:LABEL("TAXONOMY"),DESCRIPTION("10-Digit Provider Taxonomy Code"),OPTIONAL,NULL("");																
+    FIELD DataSource:LABEL("Data Source Code"),DESCRIPTION("2-Digit Lexis Nexis Source Code"),OPTIONAL,NULL("");														
+    FIELD DataSourceRecordID:LABEL("Data Source Record ID"),DESCRIPTION("Lexis Nexis Data Source Record Identifier"),OPTIONAL,NULL("");																
+    FIELD LexisNexisPersonID:LABEL("Lexis Nexis Person ID"),DESCRIPTION("Lexis Nexis Person Identifier"),OPTIONAL,NULL("");																
+    FIELD VendorID:LABEL("VENDOR ID"),DESCRIPTION("Vendor Identifier"),OPTIONAL,NULL("");																
+    END
+END
+
+OUTPUTS
+    DATASET dsOutput(dsInput):PREFIX(INPUTS.Prefix),APPEND
+      UNSIGNED8 LNPID;
+      UNSIGNED2 PIDWeight;
+      UNSIGNED2 PIDDistance;
+    END
+
+    DATASET HitStats:PREFIX(INPUTS.Prefix),SIDE, WUID
+        INTEGER1  Hit;
+        STRING2	  State;
+        UNSIGNED2 PIDWeight;
+        UNSIGNED2 PIDDistance;
+        INTEGER4  Cnt;
+    END    
+
+    DATASET PickHitStats:PREFIX(INPUTS.Prefix),SIDE, WUID
+        INTEGER Hit;
+        STRING Description;
+    END 
+
+    DATASET PerStats:PREFIX(INPUTS.Prefix),SIDE, WUID 
+        STRING  FieldName;
+        INTEGER FieldPercent;
+    END 
+END
+
+VISUALIZE LNPIDAppendStats:LABEL("Provider Append Stats")
+    TABLE SelectHitStats(PickHitStats{Hit, Description}) : VALUE(Hit, Description), LABEL("Hit", "Description"), SELECTS(Hit->TopStateCounts,ScoreDensity,HitDistanceDistribution,HitWeightDistribution);
+    BAR HitDistanceDistribution(HitStats{Hit, PIDDistance, SUM(Cnt)}) : FILTER(Hit),LABEL(PIDDistance),WEIGHT(SUM(Cnt)),SORT(-PIDDistance);
+    BAR WeightDistribution(HitStats{PIDWeight, SUM(Cnt)}) : LABEL(PIDWeight),WEIGHT(SUM(Cnt)),SORT(-PIDWeight),SELECTS(PIDWeight->WeightDistanceDistribution);
+    PIE BasicHitStats(HitStats{Hit, SUM(Cnt)}) : LABEL(Hit),WEIGHT(SUM(Cnt)),SELECTS(Hit->TopStateCounts,ScoreDensity,HitWeightDistribution,WeightDistanceDistribution);
+    BAR HitWeightDistribution(HitStats{Hit, PIDWeight, SUM(Cnt)}) : FILTER(Hit),LABEL(PIDWeight),WEIGHT(SUM(Cnt)),SORT(-PIDWeight),SELECTS(PIDWeight->WeightDistanceDistribution);
+    BAR WeightDistanceDistribution(HitStats{Hit, PIDWeight, PIDDistance, SUM(Cnt)}) : FILTER(Hit, PIDWeight),LABEL(PIDDistance),WEIGHT(SUM(Cnt)),SORT(-PIDDistance);
+    CHORO ScoreDensity(HitStats{Hit, State, SUM(Cnt)}) : FILTER(Hit),STATE(State),WEIGHT(SUM(Cnt)),COLOR("Red_Yellow_Blue");
+    CHORO RecordDensity(HitStats{State, SUM(Cnt) }) : STATE(State),WEIGHT(SUM(Cnt)),COLOR("Red_Yellow_Blue"),SELECTS(State->StateWeightChart);
+    BAR StateWeightChart(HitStats{State, PIDWeight, SUM(Cnt) }) : FILTER(State),LABEL(PIDWeight),WEIGHT(SUM(Cnt));
+    TABLE TopStateCounts(HitStats{Hit, State, SUM(Cnt)}) : FILTER(Hit),LABEL("State","Count"),VALUE(State, SUM(Cnt));
+    TABLE FieldPopulationPercentage(PerStats{FieldName, FieldPercent}) : VALUE (FieldName, FieldPercent), LABEL("FieldName", "FieldPercentage");	
+END
+
+GENERATES INLINE
+ IMPORT ut;
+ IMPORT HealthCare;
+
+ UNSIGNED weight := %Weight%;
+ UNSIGNED distance := %Distance%;
+
+ LNPIDResults := HealthCare.mac_assign_lnpid_with_description (%dsInput%, %FirstName%, %MiddleName%, %LastName%, %NameSuffix%, %Gender%, 
+                %PrimaryRange%, %PrimaryName%, %SecondaryRange%, %CityName_Vanity%, %State%, %Zip5%,
+                %SSN%, %DateOfBirth%, %Phone% , %LicenseState%, %LicenseNumber%, 
+                %TaxID%, %DEANumber%, %VendorID%, %NPINumber%,
+                %UPIN%, %LexisNexisPersonID%, /*bdid*/, %DataSource%, %DataSourceRecordID%, false, weight, distance, '%Prefix%');
+
+ %^edsOutput% := LNPIDResults %^p%; 
+ %^ePickHitStats% := DATASET([{1, 'Hits'}, {0, 'No Hits'}], {INTEGER %Prefix%Hit, string %Prefix%Description});
+ %^eHitStats% := TABLE(%dsOutput%, {INTEGER %Prefix%Hit := MAP(%Prefix%LNPID > 0 => 1, 0), STRING2 %Prefix%State := %State%, %Prefix%PIDWeight, %Prefix%PIDDistance, %Prefix%Cnt := COUNT(GROUP)}, MAP(%Prefix%LNPID > 0 => 1, 0), %State%, %Prefix%PIDWeight, %Prefix%PIDDistance, FEW);
+ 
+ 
+ IMPORT HealthCare;
+ PercentageResults := HealthCare.Mac_Field_Percentage (%dsInput%, '%Prefix%');
+ %^ePerStats% := TABLE (PercentageResults,{%Prefix%FieldName, %Prefix%FieldPercent}); 
+ENDGENERATES
+
+RESOURCES
+
+    LOGICALFILE testinput:FILENAME("~qa::appendlnpid::appendlnpid::input"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+
+    INDEX Key_HealthProvider_HEADER_REFS:FILENAME("~thor::key::healthcareprovider::qa::header::refs"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX Key_HealthProvider_HEADER_WORDS:FILENAME("~thor::key::healthcareprovider::qa::header::words"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX Key_HealthProvider_HEADER:FILENAME("~thor::key::healthcareprovider::qa::header"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX Key_HealthProvider_HEADER_SPECIFICITIES:FILENAME("~thor::key::healthcareprovider::qa::specificities::debug"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX Key_HealthProvider_ADDRESS:FILENAME("~thor::key::healthcareprovider::qa::address"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX Key_HealthProvider_BID:FILENAME("~thor::key::healthcareprovider::qa::bdid"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX Key_HealthProvider_BILLING_NPI:FILENAME("~thor::key::healthcareprovider::qa::billing::npi"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX Key_HealthProvider_BILLING_TAX:FILENAME("~thor::key::healthcareprovider::qa::billing::tax"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX Key_HealthProvider_CNSMR_DOB_LP:FILENAME("~thor::key::healthcareprovider::qa::cnsmr::dob"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX Key_HealthProvider_CNSMR_SSN_LP:FILENAME("~thor::key::healthcareprovider::qa::cnsmr::ssn"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX Key_HealthProvider_DEA:FILENAME("~thor::key::healthcareprovider::qa::dea"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX Key_HealthProvider_DOB_LP:FILENAME("~thor::key::healthcareprovider::qa::dob"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX Key_HealthProvider_FNAME:FILENAME("~thor::key::healthcareprovider::qa::fname"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX Key_HealthProvider_LEXID:FILENAME("~thor::key::healthcareprovider::qa::lexid"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX Key_HealthProvider_LIC:FILENAME("~thor::key::healthcareprovider::qa::lic"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX Key_HealthProvider_LNAME:FILENAME("~thor::key::healthcareprovider::qa::lname"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX Key_HealthProvider_MNAME:FILENAME("~thor::key::healthcareprovider::qa::mname"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX Key_HealthProvider_NAMED:FILENAME("~thor::key::healthcareprovider::qa::name"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX Key_HealthProvider_NAMEL:FILENAME("~thor::key::healthcareprovider::qa::namestlic"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX Key_HealthProvider_NPI:FILENAME("~thor::key::healthcareprovider::qa::npi"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX Key_HealthProvider_PHONE_LP:FILENAME("~thor::key::healthcareprovider::qa::phone"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX Key_HealthProvider_RID:FILENAME("~thor::key::healthcareprovider::qa::rid"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX Key_HealthProvider_SRC_RID:FILENAME("~thor::key::healthcareprovider::qa::source::rid"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX Key_HealthProvider_SSN_LP:FILENAME("~thor::key::healthcareprovider::qa::ssn"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX Key_HealthProvider_TAX:FILENAME("~thor::key::healthcareprovider::qa::tax"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX Key_HealthProvider_UPN:FILENAME("~thor::key::healthcareprovider::qa::upin"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX Key_HealthProvider_VEN:FILENAME("~thor::key::healthcareprovider::qa::vendorid"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    INDEX Key_HealthProvider_ZIP_PR:FILENAME("~thor::key::healthcareprovider::qa::zip"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+
+    ECL ut:FILENAME("ut"), URL("http:// 10.241.100.153:8010");
+    ECL Health_Provider_Services:FILENAME("Health_Provider_Services"), URL("http:// 10.241.100.153:8010");
+    ECL HealthCare:FILENAME("HealthCare"), URL("http:// 10.241.100.153:8010");
+    ECL hipie_ecl:FILENAME("hipie_ecl"), URL("http:// 10.241.100.153:8010");
+    FILE AppendLNPIDChecklist: FILENAME("AppendLNPIDChecklist.xlsx"),LABEL("Checklist");
+    FILE ReadMe : FILENAME("AppendLNPID_ReadMe.txt"),LABEL("Plugin Readme File");
+    FILE AppendLNPID_TestHarness: FILENAME("AppendLNPID_TestHarness.txt"),LABEL("Test Harness");
+    FILE AppendLNPID_BuildTestDataset: FILENAME("AppendLNPID_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+    FILE AppendLNPID_testcmp: FILENAME("AppendLNPID_testcmp.txt"),LABEL("Plugin Test Composition");
+END

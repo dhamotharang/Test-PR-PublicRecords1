@@ -5,6 +5,7 @@ EXPORT IParams := MODULE
 	EXPORT Params := INTERFACE(BatchShare.IParam.BatchParams, FCRA.iRules)
 		EXPORT STRING50 ReferenceCode := '';
 		EXPORT STRING50 BillingCode := '';
+		EXPORT STRING20 CompanyId := '';
 		EXPORT STRING120 EndUserCompanyName := '';
 		EXPORT STRING6 DOBMask := '';
 		EXPORT STRING PermissiblePurpose := '';
@@ -28,6 +29,7 @@ EXPORT IParams := MODULE
 		RETURN MODULE(PROJECT(bs_mod,Params,OPT))
 			EXPORT STRING50 ReferenceCode := '' : STORED('ReferenceCode');
 			EXPORT STRING50 BillingCode := '' : STORED('BillingCode');
+			EXPORT STRING20 CompanyId := '' : STORED('CompanyId');
 			EXPORT STRING120 EndUserCompanyName := '' : STORED('EndUserCompanyName');
 			EXPORT STRING6 DOBMask := Suppress.Constants.DATE_MASK_TYPE.NONE : STORED('DOBMask');
 			EXPORT STRING PermissiblePurpose := '' : STORED('PermissiblePurpose');
@@ -47,6 +49,8 @@ EXPORT IParams := MODULE
 		#STORED('ReferenceCode',ReferenceCode);
 		STRING50 BillingCode:=USER.BillingCode;
 		#STORED('BillingCode',BillingCode);
+		STRING20 CompanyId:=USER.CompanyId;
+		#STORED('CompanyId',CompanyId);
 		STRING120 EndUserCompanyName:=USER.EndUser.CompanyName;
 		#STORED('EndUserCompanyName',EndUserCompanyName);
 		

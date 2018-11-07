@@ -1,0 +1,47 @@
+﻿ID "CleanDate.CleanDate_cmp";
+NAME CleanDate_cmp;
+LABEL "Testing: Date standardization via CleanDate";
+DESCRIPTION "Test composition for CleanDate plugin";
+VERSION "1.0.0";
+AUTHOR "campda01";
+
+PERMISSIONS
+   VIEW:PUBLIC;
+   EDIT:PUBLIC;
+   RUN:PUBLIC;
+END
+
+INPUTS
+    STRING CompareWUID : DEFAULT("W20151104-151101");
+END
+
+INSTANCE UseDataset.UseDataset(Ins001)
+    LogicalFilename ="~qa::cleandate::cleandate::input"
+    Method=THOR
+    Structure="{ string date1, string date2, string date3 };"
+END
+
+INSTANCE CleanDate.CleanDate(Ins002)
+    prefix="clean_"
+    dsInput=^Ins001|dsOutput
+    inDate=date1
+    dateFormat="MONTH DD, YYYY"
+END
+INSTANCE CleanDate.CleanDate(Ins003)
+    prefix="clean2_"
+    dsInput=^Ins002|dsOutput
+    inDate=date2
+    dateFormat="MM/DD/YY"
+END
+INSTANCE CleanDate.CleanDate(Ins004)
+    prefix="clean3_"
+    dsInput=^Ins003|dsOutput
+    inDate=date3
+    dateFormat="MON DD, YYYY"
+END
+
+INSTANCE OutDataset.OutDataset(Ins005)
+    dsInput=^Ins004|dsOutput
+    name="~qa::cleandate::cleandate::output"
+    Method=THOR
+END

@@ -1,0 +1,140 @@
+﻿ID "a69d8ad6-819f-498d-8930-c02b63ed65e2";
+NAME AppendBIPBest;
+LABEL "Append BIP Best";
+VERSION "1.2.0";
+AUTHOR "CarmigJX";
+CATEGORY APPEND;
+DESCRIPTION "Append the best details for BIP Entities";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING Prefix: LABEL("Append Column Prefix"),DESCRIPTION("Prefix to be appended to the new fields");
+	DATASET dsInput: MAPBYNAME
+		FIELD UltID: LABEL("UltID"),DESCRIPTION("UltID");
+		FIELD SeleID: LABEL("SeleID"),DESCRIPTION("SeleID");
+		FIELD ProxID: LABEL("ProxID"),DESCRIPTION("ProxID");
+	END
+  STRING DPPAPURPOSE:LABEL("DPPA Purpose"),DEFAULT("^GLOBAL|DPPAPURPOSE");
+  STRING GLBPURPOSE:LABEL("GLB Purpose"),DEFAULT("^GLOBAL|GLBPURPOSE");
+  STRING DATARESTRICTIONMASK:LABEL("Data Restriction Mask"),DEFAULT("^GLOBAL|DATARESTRICTIONMASK");
+END
+
+OUTPUTS
+	DATASET dsOutput(dsInput): PREFIX(INPUTS.Prefix), APPEND
+		STRING UltCompanyName;
+    STRING9 UltFein;
+		STRING10 UltPrimaryRange;
+		STRING2 UltPreDirectional;
+		STRING28 UltPrimaryName;
+		STRING4 UltAddressSuffix;
+		STRING2 UltPostDirectional;
+		STRING10 UltUnitDesignation;
+		STRING8 UltSecondaryRange;
+		STRING25 UltPostalCity;
+		STRING25 UltVanityCity;
+		STRING2 UltState;
+		STRING5 UltZip;
+		STRING4 UltZip4;
+		STRING18 UltCounty;
+    STRING10 UltPhone;
+    INTEGER4 UltDateFirstSeen;
+    INTEGER4 UltDateLastSeen;
+		UNSIGNED4 UltIncorporationDate;
+    STRING8 UltSIC;
+		STRING6 UltNAICS;
+    STRING SeleCompanyName;
+    STRING9 SeleFein;
+		STRING10 SelePrimaryRange;
+		STRING2 SelePreDirectional;
+		STRING28 SelePrimaryName;
+		STRING4 SeleAddressSuffix;
+		STRING2 SelePostDirectional;
+		STRING10 SeleUnitDesignation;
+		STRING8 SeleSecondaryRange;
+		STRING25 SelePostalCity;
+		STRING25 SeleVanityCity;
+		STRING2 SeleState;
+		STRING5 SeleZip;
+		STRING4 SeleZip4;
+		STRING18 SeleCounty;
+    STRING10 SelePhone;
+    INTEGER4 SeleDateFirstSeen;
+    INTEGER4 SeleDateLastSeen;
+		UNSIGNED4 SeleIncorporationDate;
+    STRING8 SeleSIC;
+		STRING6 SeleNAICS;
+    BOOLEAN SeleIsActive;
+    BOOLEAN SeleIsDefunct;
+    STRING ProxCompanyName; 
+		STRING9 ProxFein;
+    STRING10 ProxPrimaryRange;
+		STRING2 ProxPreDirectional;
+		STRING28 ProxPrimaryName;
+		STRING4 ProxAddressSuffix;
+		STRING2 ProxPostDirectional;
+		STRING10 ProxUnitDesignation;
+		STRING8 ProxSecondaryRange;
+		STRING25 ProxPostalCity;
+		STRING25 ProxVanityCity;
+		STRING2 ProxState;
+		STRING5 ProxZip;
+		STRING4 ProxZip4;
+		STRING18 ProxCounty;
+    STRING10 ProxPhone;
+    INTEGER4 ProxDateFirstSeen;
+    INTEGER4 ProxDateLastSeen;
+		UNSIGNED4 ProxIncorporationDate;
+    STRING8 ProxSIC;
+		STRING6 ProxNAICS;
+	END
+	DATASET SeleCompanyNameStats: SIDE,WUID
+		STRING SeleCompanyName;
+		INTEGER SeleCompanyNameCnt: FEW;
+	END
+  DATASET ProxCompanyNameStats: SIDE,WUID
+		STRING ProxCompanyName;
+		INTEGER ProxCompanyNameCnt: FEW;
+	END
+	DATASET YearLastSeenStats: SIDE, WUID
+		INTEGER SeleYear: FEW;
+		INTEGER ProxYear: FEW;
+		INTEGER YearCnt: FEW;
+	END
+END
+
+VISUALIZE AppendBIPBestStats: LABEL("Append BIP Best Stats")
+	  TABLE SeleCompanyName(SeleCompanyNameStats): TITLE("Most recurring Sele Company Names"),LABEL("Sele Company Name","Sele Company Name Count"),VALUE(SeleCompanyName,SeleCompanyNameCnt);
+	  TABLE ProxCompanyName(ProxCompanyNameStats): TITLE("Most recurring Prox Company Names"),LABEL("Prox Company Name","Prox Company Name Count"),VALUE(ProxCompanyName,ProxCompanyNameCnt);
+	  TABLE SeleYearCount(YearLastSeenStats{SeleYear, SUM(YearCnt)}): TITLE("Sele Year Count"),LABEL("Sele Year","Sele Year Count"),VALUE(SeleYear,SUM(YearCnt)), SORT(-SeleYear);
+	  TABLE ProxYearCount(YearLastSeenStats{ProxYear, SUM(YearCnt)}): TITLE("Prox Year Count"),LABEL("Prox Year","Prox Year Count"),VALUE(ProxYear,SUM(YearCnt)), SORT(-ProxYear);
+END
+
+GENERATES INLINE
+	IMPORT Business, STD;
+	
+	BIPBest := Business.macAppendBIPBest(%dsInput%, %UltID%, %SeleID%, %ProxID%, %^qPrefix%,,
+   %^qDATARESTRICTIONMASK%,%^qGLBPURPOSE%,%^qDPPAPURPOSE%);	
+														 
+	%^edsOutput% 	:= BIPBest %^p%;
+	%^eSeleCompanyNameStats%	:= TOPN(TABLE(%dsOutput%,{SeleCompanyName:=%Prefix%SeleCompanyName, SeleCompanyNameCnt:=COUNT(GROUP)},%Prefix%SeleCompanyName), 50, -SeleCompanyNameCnt);
+	%^eProxCompanyNameStats%	:= TOPN(TABLE(%dsOutput%,{ProxCompanyName:=%Prefix%ProxCompanyName, ProxCompanyNameCnt:=COUNT(GROUP)},%Prefix%ProxCompanyName), 50, -ProxCompanyNameCnt);
+	YearStats := PROJECT(%dsOutput%, TRANSFORM({INTEGER SeleYear, INTEGER ProxYear},
+		SELF.SeleYear := LEFT.%Prefix%SeleDateLastSeen DIV 10000,
+		SELF.ProxYear := LEFT.%Prefix%ProxDateLastSeen DIV 10000));
+	%^eYearLastSeenStats% := TABLE(YearStats,{SeleYear, ProxYear, YearCnt:=COUNT(GROUP)}, SeleYear, ProxYear);
+ENDGENERATES
+
+
+RESOURCES
+	FILE readme: FILENAME("AppendBIPBest_README.txt"),LABEL("Plugin Readme File");
+	FILE AppendBIPBest_testcmp: FILENAME("AppendBIPBest_testcmp.txt"),LABEL("Plugin Test Composition");
+	FILE AppendBIPBest_BuildTestDataset: FILENAME("AppendBIPBest_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+	ECL  Business:FILENAME("Business"), URL("<http://10.241.100.153:8010>"); 
+  ECL  hipie_ecl:FILENAME("hipie_ecl"), URL("<http://10.241.100.153:8010>"); 
+  ECL  BIPV2:FILENAME("BIPV2"), URL("<http://10.241.100.153:8010>"); 
+	INDEX Keys.Key_BestStaticLinkIDs:FILENAME("~thor_data400::key::bipv2_best::qa::linkids"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100dev");  
+END

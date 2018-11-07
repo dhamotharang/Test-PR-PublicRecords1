@@ -1,0 +1,80 @@
+﻿NAME CleanDate;
+LABEL "Clean Date";
+CATEGORY CLEAN;
+VERSION "1.0.0";
+AUTHOR "campda01";
+DESCRIPTION "Clean date and standardize to UNSIGNED4 YYYYMMDD format";
+
+PERMISSIONS
+    VIEW:PUBLIC;
+    EDIT:PRIVATE;
+    RUN:PUBLIC;
+END
+
+INPUTS
+    STRING  prefix : LABEL("Append Columns Prefix"),DESCRIPTION("A string to prefix to the new dataset columns appended by this plugin."), OPTIONAL, NULL("");
+    DATASET dsInput : MAPBYNAME
+        FIELD   inDate : LABEL("Date Field");
+    END
+    STRING  dateFormat : LABEL("Date Format"),FIELDLENGTH(12),MAXLENGTH(20),DESCRIPTION("Format of date values, using MM (one- or two-digit month), MON (month abbreviation), DD (one- or two-digit day), YYYY (four-digit year) and/or YY (two digit year); example: DD-MON-YYYY would parse 2-Jun-1961.");
+END
+
+OUTPUTS
+    DATASET dsOutput(dsInput) : PREFIX(INPUTS.prefix), APPEND
+        UNSIGNED4   Date;
+        BOOLEAN     DateParsedValid;
+    END
+
+    DATASET cleanDateParsingStats : PREFIX(INPUTS.prefix), SIDE, WUID, SMALL
+        BOOLEAN     DateParsedValid : FEW;
+        UNSIGNED    Cnt;
+    END
+END
+
+GENERATES INLINE
+    IMPORT hipie_ecl;
+
+    // Main output dataset layout
+    DSOutLayout := RECORD
+        RECORDOF(%dsInput%);
+        UNSIGNED4   %prefix%Date;
+        BOOLEAN     %prefix%DateParsedValid;
+    END;
+
+    // Append new date and date flag fields
+    functionResult := hipie_ecl.FN_StandardizeDate(%dsInput%, %inDate%, %^qdateFormat%, date);
+
+    // Main output dataset
+    transformedResult := PROJECT
+        (
+            functionResult,
+            TRANSFORM
+                (
+                    DSOutLayout,
+                    SELF.%prefix%Date := LEFT.date,
+                    SELF.%prefix%DateParsedValid := LEFT.date_parsed_valid,
+                    SELF := LEFT
+                )
+        );
+
+    %^edsOutput% := transformedResult %^p%;
+
+    // Side:  Stats on successful date parsing
+    %^ecleanDateParsingStats% := TABLE
+        (
+            %dsOutput%,
+            {
+                %dsOutput%.%prefix%DateParsedValid,
+                UNSIGNED    %prefix%Cnt := COUNT(GROUP)
+            },
+            %prefix%DateParsedValid,
+            FEW
+        );
+ENDGENERATES
+
+RESOURCES
+    FILE readme:FILENAME("CleanDate_README.txt"),DESCRIPTION("README for this plugin"),LABEL("README");
+    FILE localfile:FILENAME("CleanDate_cmp.txt"),DESCRIPTION("Test composition for running this plugin"),LABEL("Test composition");
+    FILE testdata:FILENAME("CleanDate_BuildTestDataset.ecl"),DESCRIPTION("ECL Script for creating test composition input data"),LABEL("Test composition input data");    
+LOGICALFILE test:FILENAME("~qa::cleandate::cleandate::input"), URL("http://10.241.100.159:8010"), DALIIP("10.241.100.159"), CLUSTER("thor100_100dev");
+END

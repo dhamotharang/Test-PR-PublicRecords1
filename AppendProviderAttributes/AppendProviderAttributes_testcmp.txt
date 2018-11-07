@@ -1,0 +1,136 @@
+ID "HIPIE_Plugins.AppendProviderAttributes.AppendProviderAttributes_cmp";
+NAME AppendProviderAttributes_testcmp;
+LABEL "Test composition for Provider Shell Attribute Append";
+DESCRIPTION "Auto-generated test composition for plugin AppendProviderAttributes";
+
+VERSION "1.0.0";
+AUTHOR periassx;
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	BOOL KeepECL: DEFAULT("true");
+	STRING GCID: DEFAULT("192082831");
+	STRING JOBID: DEFAULT("0");
+	STRING FCRA: DEFAULT("UNDEFINED");
+	STRING DPPAPURPOSE: DEFAULT("00000000000000");
+	STRING GLBPURPOSE: DEFAULT("0011000000000000");
+	STRING DATAPERMISSIONMASK: DEFAULT("000000000100000000000000000000");
+	STRING DATARESTRICTIONMASK: DEFAULT("000000000000000000000000000000");
+	STRING SSNMASK: DEFAULT("ALL");
+	STRING INDUSTRYCLASS: DEFAULT("OTHER");
+	STRING DLMASK: DEFAULT("ALL");
+	STRING DOBMASK: DEFAULT("ALL");
+	STRING InputLogicalFilename: DEFAULT("~temp::in");
+	STRING OutputLogicalFilename: DEFAULT("~temp::out");
+	STRING ReferenceId: DEFAULT("192082831");
+	STRING InputProviderDs: DEFAULT("~qa::appendproviderattributes::appendproviderattributes::input");
+	STRING BATCHROXIEIP: DEFAULT("http://roxiebatch.sc.seisint.com:9856");
+	STRING OutputDs: DEFAULT("~thor_ramps::120617245::suspectaddress::output::provider");
+	STRING OutputLogicalDs: DEFAULT("~qa::appendproviderattributes::appendproviderattributes::output");
+	INT    PARALLELNODES: DEFAULT(50);
+	INT    BATCHSIZE: DEFAULT(100);
+	INT    PARALLELREQUESTS: DEFAULT(2);
+	STRING VIZSERVICEVERSION: DEFAULT("");
+	STRING CompareWUID: DEFAULT("W20180209-141459");	
+END
+
+INSTANCE UseDataset.UseDataset(Ins001): LABEL("Use Dataset"),VERSION("1.1")
+	LogicalFilename="^GLOBAL|InputProviderDs"
+	Method="THOR"
+	Structure="RECORD
+  string50 provider_key;
+  string10 provider_npi;
+  string12 provider_dea;
+  string10 provider_taxonomy;
+  string10 provider_tax_id;
+  string5 provider_tax_id_suffix;
+  string12 provider_num;
+  string5 provider_num_suffix;
+  string2 provider_num_qualifier;
+  string2 provider_security_code;
+  string3 network_code;
+  string50 provider_facility_name;
+  string12 provider_facility_num;
+  string30 provider_first_name;
+  string36 provider_last_name;
+  string36 provider_address_1;
+  string36 provider_address_2;
+  string24 provider_city;
+  string2 provider_state;
+  string9 provider_zip_cd;
+  string30 provider_county;
+  string2 provider_country;
+  string4 provider_region;
+  string9 prov_specialty_cd_1;
+  string9 prov_specialty_cd_2;
+  string2 provider_type;
+  string1 watch_cd;
+  string8 provider_latest_update_date;
+  string50 prov_user_def_01;
+  string50 prov_user_def_02;
+  string50 prov_user_def_03;
+  string50 prov_user_def_04;
+  string50 prov_user_def_05;
+  string50 prov_user_def_06;
+  string50 prov_user_def_07;
+  string50 prov_user_def_08;
+  string50 prov_user_def_09;
+  string50 prov_user_def_10;
+	unsigned8 InpLNPID;
+ END;
+"
+END
+
+INSTANCE AppendProviderAttributes.AppendProviderAttributes(Ins002): LABEL("Provider Shell Attribute Append"),VERSION("1.0.0")
+	dsInput="^Ins001|dsOutput"
+	DATARESTRICTIONMASK="^GLOBAL|DATARESTRICTIONMASK"
+	GLBPURPOSE="^GLOBAL|GLBPURPOSE"
+	LNPID_childds_recnum="1"
+	DPPAPURPOSE="^GLOBAL|DPPAPURPOSE"
+	DLMASK="^GLOBAL|DLMASK"
+	DATAPERMISSIONMASK="^GLOBAL|DATAPERMISSIONMASK"
+	Prefix="ProviderAttr"
+	FCRA="^GLOBAL|FCRA"
+	SSNMASK="^GLOBAL|SSNMASK"
+	JOBID="^GLOBAL|JOBID"
+	GCID="^GLOBAL|GCID"
+	INDUSTRYCLASS="^GLOBAL|INDUSTRYCLASS"
+	LNPID="InpLNPID"
+	DOBMASK="^GLOBAL|DOBMASK"
+END
+
+INSTANCE AppendProviderAttributes.AppendProviderAttributes(Ins004): LABEL("Provider Shell Attribute Append"),VERSION("1.0.0")
+	dsInput="^Ins001|dsOutput"
+	DATARESTRICTIONMASK="^GLOBAL|DATARESTRICTIONMASK"
+	GLBPURPOSE="^GLOBAL|GLBPURPOSE"
+	LNPID_childds_recnum="1"
+	DPPAPURPOSE="^GLOBAL|DPPAPURPOSE"
+	DLMASK="^GLOBAL|DLMASK"
+	DATAPERMISSIONMASK="^GLOBAL|DATAPERMISSIONMASK"
+	Prefix="ProviderAttr2"
+	FCRA="^GLOBAL|FCRA"
+	SSNMASK="^GLOBAL|SSNMASK"
+	JOBID="^GLOBAL|JOBID"
+	GCID="^GLOBAL|GCID"
+	INDUSTRYCLASS="^GLOBAL|INDUSTRYCLASS"
+	LNPID="InpLNPID"
+	DOBMASK="^GLOBAL|DOBMASK"
+END
+
+INSTANCE OutDataset.OutDataset(Ins003): LABEL("Output Dataset"),VERSION("2.0")
+	name="^GLOBAL|OutputLogicalDs"
+	dsInput="^Ins002|dsOutput"
+	UniqueIdentifier="1"
+	Method="THOR"
+END
+
+INSTANCE OutDataset.OutDataset(Ins005): LABEL("Output Dataset"),VERSION("2.0")
+	name="^GLOBAL|OutputLogicalDs"
+	dsInput="^Ins004|dsOutput"
+	UniqueIdentifier="2"
+	Method="THOR"
+END

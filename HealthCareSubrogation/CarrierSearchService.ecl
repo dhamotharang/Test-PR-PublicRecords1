@@ -9,7 +9,7 @@
 import AutoStandardI,iesp,ut, Address, CarrierID_Services, STD, Doxie, NID;
 // export CarrierSearchService () :=  FUNCTION
 export CarrierSearchService :=  MACRO
-  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+  #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 		#stored('PhoneticMatch','true');
 
     //get xml input 

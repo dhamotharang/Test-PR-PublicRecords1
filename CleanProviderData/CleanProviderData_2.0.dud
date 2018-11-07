@@ -1,0 +1,169 @@
+ID "g52af2cd-c242-4f40-2342-89an24234233e";
+NAME CleanProviderData;
+LABEL "Clean Provider Data";
+CATEGORY CLEAN;
+VERSION "2.0";
+AUTHOR "periassx";
+DESCRIPTION "Cleans and Standardizes Provider Name and Address";
+
+PERMISSIONS
+ VIEW:PUBLIC;
+ EDIT:PRIVATE;
+ RUN:PUBLIC;
+END
+ 
+INPUTS
+    STRING Prefix:LABEL("Append Column Prefix"),DEFAULT("CleanProvider");
+    DATASET dsInput:MAPBYNAME
+    FIELD ProviderKey:LABEL("Provider Key"),DESCRIPTION("Primary Key Used To Uniquely Identify Each Distinct Provider");
+    FIELD NPINumber:LABEL("NPI NUMBER"),DESCRIPTION("10-Digit Nation Provider Identification Number"),OPTIONAL,NULL("");						
+    FIELD DEANumber:LABEL("DEA NUMBER"),DESCRIPTION("9-Digit Drug Enforcement Administration Number"),OPTIONAL,NULL("");						
+	FIELD Taxonomy:LABEL("TAXONOMY"),DESCRIPTION("10-Digit Provider Taxonomy Code"),OPTIONAL,NULL("");																
+	FIELD ProviderTaxID:LABEL("TAX ID"),DESCRIPTION("Tax Identification Number"),OPTIONAL,NULL("");																
+    FIELD ProviderTaxIDSuffix:LABEL("TAX ID Suffix"),DESCRIPTION("Tax Identification Number Suffix"),OPTIONAL,NULL("");																
+    FIELD ProviderNumber:LABEL("Provider Number"),DESCRIPTION("Unique Provider Number"),OPTIONAL,NULL("");
+    FIELD ProviderNumberSuffix:LABEL("Provider Number Suffix"),DESCRIPTION("Primary Range, Street Number"),OPTIONAL,NULL("");
+    FIELD ProviderNumberQualifier:LABEL("Provider Number Qualifier"),DESCRIPTION("Provider Number Qualifier Value Associated With The Provider"),OPTIONAL,NULL("");
+    FIELD SecurityAuthorizationCode:LABEL("Security Code"),DESCRIPTION("Level Of Security For Investigators To View PHI Data"),OPTIONAL,NULL("");
+    FIELD NetworkCode:LABEL("Network Code"),DESCRIPTION("Provider Network Code"),OPTIONAL,NULL("");
+    FIELD FacilityName:LABEL("Provider Facility Name"),DESCRIPTION("Provider Facility Name"),OPTIONAL,NULL("");
+    FIELD FacilityNumber:LABEL("Provider Facility Number"),DESCRIPTION("Facility Number Is Where The Provider Practices"),OPTIONAL,NULL("");
+    FIELD FirstName:LABEL("First Name"),DESCRIPTION("First Name");
+    FIELD LastName:LABEL("Last Name"),DESCRIPTION("Last Name");
+	FIELD AddressLine1:LABEL("Address Line 1"),DESCRIPTION("Address Line 1"),OPTIONAL,NULL("");				
+	FIELD AddressLine2:LABEL("Address Line 2"),DESCRIPTION("Address Line 2"),OPTIONAL,NULL("");				
+	FIELD City:LABEL("City"),DESCRIPTION("City"),OPTIONAL,NULL("");
+	FIELD State:LABEL("State"),DESCRIPTION("Two-letter state abbreviation"),OPTIONAL,NULL("");
+	FIELD Zip5:LABEL("Zip Code"),DESCRIPTION("5-Digit Zip Code"),OPTIONAL,NULL("");
+	FIELD County:LABEL("County"),DESCRIPTION("County Name"),OPTIONAL,NULL("");																
+	FIELD Country:LABEL("Country"),DESCRIPTION("2-Byte Country Code"),OPTIONAL,NULL("");																
+	FIELD Regions:LABEL("Provider Regions"),DESCRIPTION("Provider Regions As Determined By Health Plan"),OPTIONAL,NULL("");																
+	FIELD SpecialityCode1:LABEL("Provider Speciality Code 1"),DESCRIPTION("Provider Speciality Code 1"),OPTIONAL,NULL("");														
+	FIELD SpecialityCode2:LABEL("Provider Speciality Code 2"),DESCRIPTION("Provider Speciality Code 2"),OPTIONAL,NULL("");																
+	FIELD ProviderType:LABEL("Provider Type"),DESCRIPTION("Indicator To Show Whether This Is Professional Or Facility Type Of Provider"),OPTIONAL,NULL("");																
+	FIELD WatchCode:LABEL("Watch Code"),DESCRIPTION("Internal Code Set For Reviewing"),OPTIONAL,NULL("");																
+	FIELD LastUpdateDate:LABEL("Last Update Date"),DESCRIPTION("Date The Provider Information Was Updated"),OPTIONAL,NULL("");																
+	FIELD UserDefinedField01:LABEL("User Defined Field 01"),DESCRIPTION("User Defined Field Needed For Displaying or Reporting"),OPTIONAL,NULL("");																
+	FIELD UserDefinedField02:LABEL("User Defined Field 02"),DESCRIPTION("User Defined Field Needed For Displaying or Reporting"),OPTIONAL,NULL("");																
+	FIELD UserDefinedField03:LABEL("User Defined Field 03"),DESCRIPTION("User Defined Field Needed For Displaying or Reporting"),OPTIONAL,NULL("");																
+	FIELD UserDefinedField04:LABEL("User Defined Field 04"),DESCRIPTION("User Defined Field Needed For Displaying or Reporting"),OPTIONAL,NULL("");																
+	FIELD UserDefinedField05:LABEL("User Defined Field 05"),DESCRIPTION("User Defined Field Needed For Displaying or Reporting"),OPTIONAL,NULL("");																
+	FIELD UserDefinedField06:LABEL("User Defined Field 06"),DESCRIPTION("User Defined Field Needed For Displaying or Reporting"),OPTIONAL,NULL("");																
+	FIELD UserDefinedField07:LABEL("User Defined Field 07"),DESCRIPTION("User Defined Field Needed For Displaying or Reporting"),OPTIONAL,NULL("");																
+	FIELD UserDefinedField08:LABEL("User Defined Field 08"),DESCRIPTION("User Defined Field Needed For Displaying or Reporting"),OPTIONAL,NULL("");																
+	FIELD UserDefinedField09:LABEL("User Defined Field 09"),DESCRIPTION("User Defined Field Needed For Displaying or Reporting"),OPTIONAL,NULL("");																
+	FIELD UserDefinedField10:LABEL("User Defined Field 10"),DESCRIPTION("User Defined Field Needed For Displaying or Reporting"),OPTIONAL,NULL("");																
+	FIELD ProviderDOB:LABEL("Provider DOB"),DESCRIPTION("Provider Date of Birth"),OPTIONAL,NULL("");																
+	FIELD ProviderSSN:LABEL("Provider SSN"),DESCRIPTION("Provider Social Security Number"),OPTIONAL,NULL("");																
+    END
+END
+
+OUTPUTS
+    DATASET dsOutput(dsInput):PREFIX(INPUTS.Prefix), APPEND
+		STRING50 ProviderKey;
+		STRING20 FirstName;
+		STRING20 MiddleName;
+		STRING20 LastName;
+		STRING5	 NameSuffix;
+		STRING10 PrimaryRange; 	
+		STRING2  PreDirectional;	
+		STRING28 PrimaryName;
+		STRING4  AddressSuffix; 
+		STRING2  PostDirectional;
+		STRING10 UnitDesignation;
+		STRING8  SecondaryRange;
+		STRING25 PostalCity;
+		STRING25 VanityCity;
+		STRING2  State;
+		STRING5  Zip5;
+		STRING4  Zip4;
+		STRING2  DBPC;
+		STRING1  CheckDigit;
+		STRING2  RecordType;
+		STRING2  FipsState;
+		STRING3  County;
+		STRING10 Latitude;
+		STRING11 Longitude;
+		STRING4  Msa;
+		STRING7  GeoBlock;
+		STRING1  GeoMatchCode;
+		STRING4  ErrorStatus;
+		STRING25 AddressKey;
+		STRING8  ProviderDOB;
+		STRING9  ProviderSSN;
+    END
+
+    DATASET ProviderTypeStats :PREFIX(INPUTS.Prefix), SIDE, SMALL, WUID
+        STRING10 TypeofProvider : FEW;
+        INTEGER  Cnt;
+    END
+	
+    DATASET StateStats :PREFIX(INPUTS.Prefix), SIDE, SMALL, WUID
+        STRING10 TypeofProvider : FEW;
+        STRING2  State : FEW;
+        INTEGER  Cnt;
+    END
+
+    DATASET CountyStats :PREFIX(INPUTS.Prefix), SIDE, SMALL, WUID
+        STRING10 TypeofProvider : FEW;
+		STRING2	 State : FEW;
+        STRING5  CountyCode : FEW;
+        INTEGER  Cnt;
+    END
+
+    DATASET PerStats:PREFIX(INPUTS.Prefix),SIDE, WUID
+        STRING  FieldName;
+        INTEGER FieldPercent;
+    END 
+
+    DATASET DuplicateProviderStats:PREFIX(INPUTS.Prefix),SIDE, WUID
+        STRING  FieldName;
+        INTEGER Cnt;
+    END 
+
+END
+
+VISUALIZE ProviderStats : LABEL("Provider File Stats")
+	PIE   ProviderTypeFound(ProviderTypeStats{TypeofProvider, SUM(Cnt)}) : TITLE("Provider Type"), LABEL(TypeofProvider), WEIGHT(SUM(Cnt)), SELECTS(TypeofProvider->StatesFound);
+	CHORO StatesFound(StateStats{TypeofProvider, State, SUM(Cnt)}) : FILTER(TypeofProvider), TITLE("Provider Found"), STATE(State), WEIGHT(SUM(Cnt)), COLOR(Red_Yellow_Blue);
+    CHORO CountyMap(CountyStats{CountyCode, SUM(Cnt) }) : COUNTY(CountyCode),WEIGHT(SUM(Cnt)),COLOR("Red_Yellow_Blue");	
+	TABLE FieldPopulationPercentage(PerStats{FieldName, FieldPercent}) : VALUE (FieldName, FieldPercent), LABEL("FieldName", "FieldPercentage");	
+	TABLE DuplicateProviderPercentage(DuplicateProviderStats{FieldName, Cnt}) : VALUE (FieldName, Cnt), LABEL("FieldName", "FieldCnt");		
+END
+
+GENERATES INLINE
+ import HealthCare;
+ CleanData := HealthCare.macCleanProviderDataV2 (%dsInput%,%ProviderKey%,%NPINumber%,%DEANumber%,%Taxonomy%,%ProviderTaxID%,%ProviderTaxIDSuffix%,
+                                                  	 %ProviderNumber%,%ProviderNumberSuffix%,%ProviderNumberQualifier%,%SecurityAuthorizationCode%,
+                                                  	 %NetworkCode%,%FacilityName%,%FacilityNumber%,%FirstName%,%LastName%,%AddressLine1%,%AddressLine2%,%City%,%State%,%Zip5%,                                                                           
+												  	 %County%,%Country%,%Regions%,%SpecialityCode1%,%SpecialityCode2%,%ProviderType%,%WatchCode%,%LastUpdateDate%,																		   
+												  	 %UserDefinedField01%,%UserDefinedField02%,%UserDefinedField03%,%UserDefinedField04%,
+                                                  	 %UserDefinedField05%,%UserDefinedField06%,%UserDefinedField07%,%UserDefinedField08%,
+                                                  	 %UserDefinedField09%,%UserDefinedField10%,%ProviderDOB%,%ProviderSSN%,'%Prefix%');
+ %^edsOutput% := CleanData %^p%;	
+
+ %^eProviderTypeStats% 		:= TABLE(%dsOutput%, {%Prefix%TypeofProvider := IF(%FacilityName% <> '','Facility  ','Individual'), %Prefix%Cnt := COUNT(GROUP)}, IF(%FacilityName% <> '', 'Facility  ', 'Individual'), FEW);
+ %^eStateStats% 	   		:= TABLE(%dsOutput%, {%Prefix%TypeofProvider := IF(%FacilityName% <> '','Facility  ','Individual'), %Prefix%State, %Prefix%Cnt := COUNT(GROUP)}, IF(%FacilityName% <> '','Facility  ','Individual'), %Prefix%State, FEW); 
+ %^eDuplicateProviderStats% := TABLE(PROJECT(TABLE(%dsOutput%, {%Prefix%ProviderKey, %Prefix%CNT := COUNT(GROUP)}, %Prefix%ProviderKey, FEW),TRANSFORM({STRING %Prefix%FieldName}, SELF.%Prefix%FieldName := IF(LEFT.%Prefix%CNT > 1, 'DuplicateProviderKey', 'UniqueProviderKey  '))),{%Prefix%FieldName, %Prefix%Cnt := COUNT(GROUP)}); 
+ %^eCountyStats% 			:= TABLE(PROJECT(%dsOutput%, TRANSFORM({STRING10 %Prefix%TypeofProvider, STRING2 %Prefix%State, STRING5 %Prefix%CountyCode}, SELF.%Prefix%State := LEFT.%Prefix%State; SELF.%Prefix%TypeofProvider := IF(LEFT.%FacilityName% <> '','Facility  ','Individual'), SELF.%Prefix%CountyCode := LEFT.%Prefix%FipsState + LEFT.%Prefix%County;)),{%Prefix%State, %Prefix%CountyCode, %Prefix%Cnt := COUNT(GROUP)}, %Prefix%State, %Prefix%CountyCode, FEW);  
+ 
+ import HealthCare;
+ PercentageResults := HealthCare.Mac_Field_Percentage (%dsInput%, '%Prefix%');
+ %^ePerStats% := TABLE (PercentageResults,{%Prefix%FieldName, %Prefix%FieldPercent}); 
+ENDGENERATES		
+
+
+RESOURCES
+    FILE ReadMe:FILENAME("CleanProviderData_2.0_ReadMe.txt"),DESCRIPTION("README for this plugin"),LABEL("ReadMe");
+    FILE localfile:FILENAME("CleanProviderData_2.0_testcmp.txt"),DESCRIPTION("Test composition for running this plugin"),LABEL("Test composition");
+    FILE CleanProviderData_BuildTestDataset: FILENAME("CleanProviderData_2.0_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+    LOGICALFILE test:FILENAME("~qa::cleanproviderdata::cleanproviderdata::input"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    ECL UT:FILENAME("ut"), URL("http://10.241.100.153:8010");
+    ECL HealthCare:FILENAME("HealthCare"), URL("http://10.241.100.153:8010");	
+    ECL HealthCareProvider:FILENAME("HealthCareProvider"), URL("http://10.241.100.153:8010");
+    ECL Address:FILENAME("Address"), URL("http://10.241.100.153:8010");
+    FILE CleanProviderData_TestHarness: FILENAME("CleanProviderData_TestHarness.txt"),LABEL("Test Harness");
+    FILE CleanProviderDataChecklist: FILENAME("CleanProviderDataChecklist.xlsx"),LABEL("Checklist");	
+END
+
+																   

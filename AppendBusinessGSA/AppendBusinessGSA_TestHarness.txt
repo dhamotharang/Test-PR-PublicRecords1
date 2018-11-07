@@ -1,0 +1,5 @@
+testcompositionrun_info
+Monitoring WU W20170728-094528(HIPIE_BCTLWXCARMIGJX_HIPIE_Plugins.AppendBusinessGSA.AppendBusinessGSA_testcmp_CarmigJX) to completion.
+
+testcompositionrun_err
+Plugin AppendBusinessGSA passed compliance check

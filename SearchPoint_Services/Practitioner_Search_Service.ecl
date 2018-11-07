@@ -35,7 +35,7 @@ IMPORT iesp, AutoStandardI, doxie;
 
 EXPORT Practitioner_Search_Service := 
    MACRO
-  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);     
+  #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);     
      // Get XML input 
      rec_in    := iesp.searchpoint.t_queryPractitionerRequest;
      ds_in     := DATASET ([], rec_in) : STORED ('queryPractitionerRequest', FEW);
