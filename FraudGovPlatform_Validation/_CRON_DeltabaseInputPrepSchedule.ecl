@@ -1,6 +1,6 @@
 ﻿import _Control;
 
-EVERY_DAY_AT_6AM := '0 10 * * *';
+EVERY_DAY_AT_6AM := '0 11 * * *';
 IP			:=		IF (_control.ThisEnvironment.Name	<> 'Prod_Thor',		_control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
 RootDir 	:=		IF (_control.ThisEnvironment.Name	<> 'Prod_Thor',		Constants.DeltaLandingZonePathBase_dev,Constants.DeltaLandingZonePathBase_prod);
 ThorName	:=		IF(_control.ThisEnvironment.Name	<> 'Prod_Thor',		Constants.ThorName_Dev,	Constants.ThorName_Prod);

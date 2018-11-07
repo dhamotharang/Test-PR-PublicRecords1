@@ -1,5 +1,5 @@
 ﻿import _Control,FraudGovPlatform_Validation;
-EVERY_DAY_AT_530PM := '30 21 * * *';
+EVERY_DAY_AT_530PM := '30 22 * * *';
 
 IP			:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
 ThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_Validation.Constants.ThorName_Dev,	FraudGovPlatform_Validation.Constants.ThorName_Prod);

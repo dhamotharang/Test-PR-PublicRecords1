@@ -1,6 +1,6 @@
 ﻿import _Control, NAC;
 
-EVERY_DAY_AT_6AM := '0 10 * * *';
+EVERY_DAY_AT_6AM := '0 11 * * *';
 
 IP			:= 	NAC.Constants.LandingZoneServer;
 RootDir		:= 	NAC.Constants.LandingZonePathBase + '/msh/done/';
