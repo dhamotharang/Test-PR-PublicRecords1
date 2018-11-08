@@ -17,7 +17,7 @@ EXPORT Raw(FraudGovPlatform_Services.IParam.BatchParams batch_params) := MODULE
 	
 	EXPORT GetCriminal(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in) := FUNCTION
 			
-		// As per GRP-248 only following offense Categories needs to be returned. 
+		// As per GRP-247 only following offense Categories needs to be returned. 
 		crim_batch_params := MODULE(CriminalRecords_BatchService.IParam.batch_params) 
 				EXPORT BOOLEAN IncludeBadChecks:= TRUE;
 				EXPORT BOOLEAN IncludeBribery:= TRUE;

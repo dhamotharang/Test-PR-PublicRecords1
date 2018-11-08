@@ -657,9 +657,18 @@ EXPORT Functions := MODULE
 		FraudGovPlatform_Services.Layouts.fragment_w_value_recs  ds_fragment_recs_w_trans(FraudShared_Services.layouts.layout_velocity_in L, 
 																																											FraudShared_Services.Layouts.Raw_Payload_rec R)  := TRANSFORM
 			
-			bank_account_number := IF(R.bank_account_number_1 <> '', R.bank_account_number_1 , R.bank_account_number_2);
-			SELF.fragment_value := CASE(L.fragment,
-																	Fragment_Types_const.BANK_ACCOUNT_NUMBER_FRAGMENT => bank_account_number,
+			BOOLEAN isBankAccountNumber1 := EXISTS(ds_freg_recs_in(bank_account_number <> '' AND bank_account_number = R.bank_account_number_1));
+			BOOLEAN isBankAccountNumber2 := EXISTS(ds_freg_recs_in(bank_account_number <> '' AND bank_account_number = R.bank_account_number_2));
+			
+			bankRountingNumber1 := IF(isBankAccountNumber1 AND R.bank_routing_number_1 <> '', TRIM(R.bank_routing_number_1, LEFT, RIGHT), ' '); 
+			bankRountingNumber2 := IF(isBankAccountNumber2 AND R.bank_routing_number_2 <> '', TRIM(R.bank_routing_number_2, LEFT, RIGHT), ' ');
+			
+			bank_info_to_use := MAP(isBankAccountNumber1 => bankRountingNumber1 + '@@@' + R.bank_account_number_1,
+															isBankAccountNumber2 => bankRountingNumber2 + '@@@' + R.bank_account_number_2,
+															'');
+			
+			SELF.fragment_value := CASE(L.fragment, 
+																	Fragment_Types_const.BANK_ACCOUNT_NUMBER_FRAGMENT => bank_info_to_use,
 																	Fragment_Types_const.DEVICE_ID_FRAGMENT => R.device_id,
 																	Fragment_Types_const.DRIVERS_LICENSE_NUMBER_FRAGMENT => R.drivers_license,
 																	// Fragment_Types_const.GEOLOCATION_FRAGMENT => R.clean_address.geo_lat + ' ' + R.clean_address.R.geo_long,
@@ -670,6 +679,7 @@ EXPORT Functions := MODULE
 																	Fragment_Types_const.PHONE_FRAGMENT => R.clean_phones.phone_number,
 																	Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT => STD.Str.CleanSpaces(R.address_1) + '@@@' + STD.Str.CleanSpaces(R.address_2),
 																	Fragment_Types_const.SSN_FRAGMENT => R.ssn,
+																	Fragment_Types_const.EMAIL_FRAGMENT => R.email_address,
 																	'');
 			SELF.file_type := R.classification_Permissible_use_access.file_type;
 			SELF := L;
@@ -679,7 +689,7 @@ EXPORT Functions := MODULE
 																	LEFT.record_id = RIGHT.record_id,
 																	ds_fragment_recs_w_trans(LEFT, RIGHT),
 																	LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
-
+		
 		RETURN ds_fragment_recs_w_value;
 	END;
 	
@@ -857,6 +867,10 @@ EXPORT Functions := MODULE
 	
 	EXPORT GetCleanAddressFragmentValue(string address) := FUNCTION
 		return REGEXREPLACE('@@@',address,', ');
+	END;	
+	
+	EXPORT GetCleanBankAccountFragmentValue(string bank_information) := FUNCTION
+		return REGEXFIND('(.*)@@@(.*)$',bank_information,2);
 	END;
 
 END;
