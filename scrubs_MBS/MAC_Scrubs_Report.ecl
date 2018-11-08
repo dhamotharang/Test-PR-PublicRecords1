@@ -3,10 +3,9 @@ EXPORT MAC_Scrubs_Report(BuildDate,myFolder,scopename,inputFile,MemailList)	:=	F
 	folder						:=	#EXPAND(myFolder);
 	inFile						:=	inputFile;
 	scrubs_name				:=	IF(TRIM(scopename,ALL)<>'',TRIM(scopename,ALL)+'_Scrubs','Scrubs');
-	scope_datasetName	:=	IF(TRIM(scopename,ALL)<>'',scopename+'_'+datasetName,datasetName);
-	profilename				:=	'Scrubs_MBS_'+scopename;
+	scope_datasetName		:=	IF(TRIM(scopename,ALL)<>'',scopename+'_'+datasetName,datasetName);
+	profilename				:=	'Scrubs_MBS'+ if(scopename != 'MBS' , '_'+scopename, '');
 	
-	myEmail		:=	_Control.MyInfo.EmailAddressNotify;		//	Email address to send notifications
 	// F	:=	inFile(process_date=filedate);						//	Records to scrub
 	F	:=	inFile;																				//	Records to scrub
 	S	:=	folder.#EXPAND(scrubs_name);									//	My scrubs module

@@ -1,10 +1,10 @@
 ﻿import _Control,tools,STD,FraudGovPlatform;
 
-EXPORT SprayAndQualifyInput(string version,
-	string ip 		= IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		Constants.LandingZoneServer_dev, Constants.LandingZoneServer_prod),
-	string rootDir = IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		Constants.LandingZonePathBase_dev,	Constants.LandingZonePathBase_prod), 
-	string destinationGroup = IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		Constants.ThorName_Dev,	Constants.ThorName_Prod)) := function
-
+EXPORT SprayAndQualifyInput(
+	STRING version,
+	STRING ip 		= IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		Constants.LandingZoneServer_dev, Constants.LandingZoneServer_prod),
+	STRING rootDir = IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		Constants.LandingZonePathBase_dev,	Constants.LandingZonePathBase_prod)
+) := FUNCTION
 
 ready    := rootDir+'ready/';
 done     := rootDir+'done/';
@@ -49,7 +49,7 @@ SprayIt:=sequential(
 							,//srcCSVseparator 
 							,'~<EOL>~,\n'//srcCSVterminator 
 							,//srcCSVquote 
-							,destinationGroup //destinationgroup
+							,thorlib.group() //destinationgroup
 							,FileSprayed //destinationlogicalname 
 							, //timeout 
 							,//espserverIPport 
