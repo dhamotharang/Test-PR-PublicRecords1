@@ -1,9 +1,9 @@
-import PromoteSupers,ut,mdr,Data_Services,std,InsuranceHeader,header;
-pairs:=distribute(dataset(header.Filename_iHeader_did_rid,header.Layout_LAB_Pairs,flat),hash(rid));
+﻿import PromoteSupers,ut,mdr,Data_Services,std,InsuranceHeader;
+pairs:=distribute(dataset(Filename_iHeader_did_rid,header.Layout_LAB_Pairs,flat),hash(rid));
 PromoteSupers.MAC_SF_BuildProcess(pairs,Data_Services.Data_Location.Prefix('Header')+'thor_data400::base::iheader_did_rid',copy_pairs,3,,true,pVersion:=Header.version_build);
 
 hr:=distribute(file_header_raw(header.Blocked_data()),hash(rid));
-droppedRids:=join(hr,header.File_LAB_Pairs
+droppedRids:=join(hr,File_LAB_Pairs
 											,left.rid=right.rid
 											,left only
 											,local):persist('~thor_data400::persist::missing_header_rid');
@@ -48,7 +48,7 @@ full_ := if ( fileservices.getsuperfilesubname('~thor_data400::base::header_raw_
               ,if(duplicateRidsCount >  0,  fail('Error - '  +duplicateRidsCount+' Duplicate RIDs found in LAB pairs'))
 							,if(droppedRidsNonBlankCnt >  maxAllowed,  fail('Error - '  +droppedRidsNonBlankCnt+' Non-Balnk RIDs missing in LAB pairs'))
 							,if(droppedRidsNonBlankCnt <= maxAllowed,output('Warning - '+droppedRidsNonBlankCnt+' Non-Balnk RIDs missing in LAB pairs'))
-							,if(droppedRidsNonBlankCnt >  0         ,output('Warning - '+droppedRidsBlankCnt+ ' Blank names RIDs missing in LAB pairs'))
+							,if(droppedRidsBlankCnt >  0         ,output('Warning - '+droppedRidsBlankCnt+ ' Blank names RIDs missing in LAB pairs'))
 							,pre
 							,build_raw_syncd
 							,update_log
