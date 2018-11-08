@@ -18,16 +18,10 @@ cnRec := doxie.layout_nbr_records_cn;
 export DATASET(cnRec) nbr_records_cn(
 	DATASET(targetRec) targetHR,
   unsigned1 proximity_radius = 10, 
-	string5		industry_class_value, // for MAC_GlbClean_Header
-	unsigned1 GLB_Purpose,
-	unsigned1	DPPA_Purpose,
-	boolean		probation_override_value, // for MAC_GlbClean_Header
-	boolean		no_scrub, 								// for MAC_GlbC
-	boolean		glbOK,
-	boolean		dppaok,
 	boolean checkRNA = true,  
 	string1		mode,												 // or part of results for the subject.
-	unsigned1 Neighbor_Recency
+	unsigned1 Neighbor_Recency,
+	doxie.IDataAccess modAccess
 ) := FUNCTION
 
   // how many addrs do we want on each side of each target?
@@ -109,9 +103,10 @@ export DATASET(cnRec) nbr_records_cn(
 													// add the other components of the address
     // should we go to the best file to get the best name for the neighbors ?													
 		// clean the records when it still have the src and dates 
-	 glb_ok := ut.glb_ok(glb_purpose,checkRNA);
-	 dppa_ok := ut.dppa_ok(dppa_purpose,checkRNA);
-	 header.MAC_GlbClean_Header(headerNbrForAddr, headerNbrForAddr_clean);
+	//TODO: why _ok are recalculated again here?	
+	 glb_ok  := modAccess.isValidGLB (checkRNA);
+	 dppa_ok := modAccess.isValidDPPA (checkRNA);
+	 header.MAC_GlbClean_Header(headerNbrForAddr, headerNbrForAddr_clean, , ,modAccess);
 			
 		// rollup records 
 	 df3:= group(

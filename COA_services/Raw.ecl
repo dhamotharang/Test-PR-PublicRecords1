@@ -48,19 +48,19 @@ export params := interface(AutoStandardI.InterfaceTranslator.application_type_va
 			
     	export  COA_services.Layouts.rawrec getMasterRec(Dataset (header.layout_header) in_recs, params in_mod, 
 																												Address.ICleanAddress clean_addr) := function
-			
-			  no_scrub := AutoStandardI.InterfaceTranslator.no_scrub.val(project(in_mod,AutoStandardI.InterfaceTranslator.no_scrub.params)); 
-				
-				glb_purpose := in_mod.glbPurpose;				
-				dppa_purpose := in_mod.dppapurpose;
-				
-				industry_class_value := in_mod.industryclass;
-        probation_override_value := in_mod.probationoverride;
-				
-				glb_ok := ut.glb_ok(glb_purpose);
-				dppa_ok := ut.dppa_ok(dppa_Purpose);
-				
-				// determine if unparsedfullname field was filled out or not and populate correct fields.
+				mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+					EXPORT unsigned1 glb := in_mod.glbPurpose;
+					EXPORT unsigned1 dppa := in_mod.dppapurpose;
+					EXPORT string DataPermissionMask := in_mod.DataPermissionMask;
+					EXPORT boolean probation_override := in_mod.probationoverride;
+					EXPORT string5 industry_class := in_mod.industryclass;
+					EXPORT string32 application_type := in_mod.ApplicationType;
+				END;
+
+				glb_ok := mod_access.isValidGLB ();
+				dppa_ok := mod_access.isValidDPPA ();
+
+								// determine if unparsedfullname field was filled out or not and populate correct fields.
 				
 			  fullName := Address.CleanNameFields(Address.CleanPerson73(in_mod.unparsedFullName));
 		
@@ -76,7 +76,7 @@ export params := interface(AutoStandardI.InterfaceTranslator.application_type_va
 						self.did := left.did));
 						
 				// take dids from header match and do quick header look with them.		
-				quick_recs := byDids(in_dids_slim, dppa_purpose, glb_purpose);
+				quick_recs := byDids(in_dids_slim, mod_access.dppa, mod_access.glb);
 				
 				//project to layout header to be cleaned.
 				quick_recs_header_format := project(quick_recs, transform(header.Layout_header,
@@ -90,7 +90,7 @@ export params := interface(AutoStandardI.InterfaceTranslator.application_type_va
 														          														
 				// clean quick header recs.
 				
-				header.MAC_GlbClean_Header(quick_recs_header_format,quick_recs_header_format_cleaned);
+				header.MAC_GlbClean_Header(quick_recs_header_format,quick_recs_header_format_cleaned, , , mod_access);
 				
 				// put cleaned quick headers into a common layout.
 				quick_recs_header_layout := project(quick_recs_header_format_cleaned, header.layout_header);
@@ -182,8 +182,8 @@ export params := interface(AutoStandardI.InterfaceTranslator.application_type_va
 							       											
 			  raw_recs_sorted := sort(raw_recs_master_deep,-latestDate);
 
-				Suppress.MAC_Suppress(raw_recs_sorted,pull_tmp,in_mod.ApplicationType,Suppress.Constants.LinkTypes.DID,DID);
-				Suppress.MAC_Suppress(pull_tmp,recs_ssn_pulled,in_mod.ApplicationType,Suppress.Constants.LinkTypes.SSN,ssn);
+				Suppress.MAC_Suppress(raw_recs_sorted,pull_tmp,mod_access.application_type,Suppress.Constants.LinkTypes.DID,DID);
+				Suppress.MAC_Suppress(pull_tmp,recs_ssn_pulled,mod_access.application_type,Suppress.Constants.LinkTypes.SSN,ssn);
 			
 				raw_recs_sorted2 := sort(recs_ssn_pulled,-latestDate);
 													
@@ -238,21 +238,20 @@ export params := interface(AutoStandardI.InterfaceTranslator.application_type_va
 			  in_prim_range := if (useAddr1, clean_addr.prim_range, in_mod.prim_range);
 				in_prim_name := if (useAddr1, clean_addr.prim_name, stringlib.StringToUpperCase(in_mod.prim_name));
 				
-		
-				no_scrub := AutoStandardI.InterfaceTranslator.no_scrub.val(project(in_mod,
-				                                     AutoStandardI.InterfaceTranslator.no_scrub.params)); 
-				
-				glb_purpose := in_mod.glbPurpose;				
-				dppa_purpose := in_mod.dppapurpose;
-				
-				industry_class_value := in_mod.industryclass;
-        probation_override_value := in_mod.probationoverride;
-				
-				glb_ok := ut.glb_ok(glb_purpose);
-				dppa_ok := ut.dppa_ok(dppa_Purpose);
-				
-				//in_recs2_did := project(in_recs2,{in_recs2.did});
-				
+
+        // NB: in_mod has mostly untranslated values (industryclass, for instance); this can cause complience issues
+				mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+					EXPORT unsigned1 glb := in_mod.glbPurpose;
+					EXPORT unsigned1 dppa := in_mod.dppapurpose;
+					EXPORT string DataPermissionMask := in_mod.DataPermissionMask;
+					EXPORT boolean probation_override := in_mod.probationoverride;
+					EXPORT string5 industry_class := in_mod.industryclass;
+					EXPORT string32 application_type := in_mod.ApplicationType;
+				END;
+
+				glb_ok := mod_access.isValidGLB ();
+				dppa_ok := mod_access.isValidDPPA ();
+
         // get did from master COA rec				
 		    doxie_ref_did_set2  := project(in_recs2, 
 						 transform(doxie.layout_references, 
@@ -284,7 +283,7 @@ export params := interface(AutoStandardI.InterfaceTranslator.application_type_va
 									, limit(coa_services.constants.max_recs_on_coa_util_join, skip)
 									);
 
-        header.MAC_GlbClean_Header(header_recs_coa, header_recs_coa_cleaned_pre);				
+        header.MAC_GlbClean_Header(header_recs_coa, header_recs_coa_cleaned_pre, , , mod_access);				
 
 				header_recs_coa_slim_latestDate := max (header_recs_coa_cleaned_pre, 
 						if (dt_last_seen > dt_first_seen, dt_last_seen, dt_first_seen));

@@ -4,9 +4,8 @@ export BatchRecords(/*ERO_Services.IParam.batchParams configData,*/
 										dataset(ERO_Services.Layouts.IntermediateData) ds_batch_in,
 										UNSIGNED1 did_limit=ERO_Services.Constants.Limits.DID_LIMIT,
 										BOOLEAN GetSSNBest=true) := function
-   gm := AutoStandardI.GlobalModule();
-   inglbPurpose :=  AutoStandardI.InterfaceTranslator.glb_purpose.val(PROJECT(gm,AutoStandardI.InterfaceTranslator.glb_purpose.params));
-   indppaPurpose :=  AutoStandardI.InterfaceTranslator.dppa_purpose.val(PROJECT(gm,AutoStandardI.InterfaceTranslator.dppa_purpose.params));
+   gm := AutoStandardI.GlobalModule(); //TODO: now only for IncludeMinors
+	 mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (gm);
 
 	 searchMod:= MODULE(PROJECT(gm, ERO_Services.IParam.searchParams,opt))	end;	
 	   // Set an adjusted did_limit to 1 just in case it gets accidently input as 0
@@ -199,7 +198,7 @@ export BatchRecords(/*ERO_Services.IParam.batchParams configData,*/
   // Check for 2 things: 
 	// 1. More than 1 did for the same acctno with the same lowest penalty value.
 	// 2. The input criteria for the acctno from step 1 would have had to have relative last and/or first name.
-	export layout_acctno_tie := record
+	layout_acctno_tie := record
     BatchShare.Layouts.ShareAcct;
 		string1 needsTieBreaker := '';
 		UNSIGNED subject_Penalty;
@@ -223,7 +222,7 @@ export BatchRecords(/*ERO_Services.IParam.batchParams configData,*/
 	                     transform(ERO_Services.Layouts.layout_extra_penalty, self := left),right outer, limit(ERO_Services.Constants.Limits.MAX_JOIN_LIMIT));
 	
 	ERO_Services.Layouts.layout_extra_penalty  setRelMatch(ds_ERO_all_penalty l) := transform
-    self.rel_match := ERO_Services.fn_relativeMatch(l, inglbpurpose, indppapurpose);
+    self.rel_match := ERO_Services.fn_relativeMatch(l, mod_access.glb, mod_access.dppa);
 	 self := l;
 	end;
 	
@@ -251,16 +250,13 @@ export BatchRecords(/*ERO_Services.IParam.batchParams configData,*/
 	//get best information from best file
 	ds_best :=  doxie.best_records(
 	               di            := best_dids
-	              ,use_global    := true
-                ,DPPA_override := indppapurpose
-				        ,GLB_override  := inglbpurpose
-                ,get_valid_ssn := false // get valid SSN: deprecated -- already in best file
                 ,IsFCRA        := false
                 ,doSuppress    := false // postpone masking until the very end
                 ,doTimeZone    := false // do not append time zone
 			          ,checkRNA      := false
 								,include_minors:= gm.IncludeMinors
-								,getSSNBest    := GetSSNBest
+								,getSSNBest    := GetSSNBest,
+								modAccess      := mod_access
 							);
   
 	ERO_Services.Layouts.Subject_out_temp  fillBestInfo(acctno_best_dids l, ds_best r) := transform
@@ -384,7 +380,7 @@ export BatchRecords(/*ERO_Services.IParam.batchParams configData,*/
 	subject_ids := project(subject_recs_best , fillLookupSubjects(left));
 
 	//addresses 
-	subject_w_addrs := ERO_Services.fn_add2Addrs(subject_ids, inglbpurpose, indppapurpose);//dataset(Layouts.LookupId)
+	subject_w_addrs := ERO_Services.fn_add2Addrs(subject_ids, mod_access);//dataset(Layouts.LookupId)
 	//address meta data
 	subject_w_meta := ERO_Services.fn_addAddrMeta(subject_w_addrs);//dataset(Layouts.LookupId)
 	//address phone info

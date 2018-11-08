@@ -1,5 +1,5 @@
 
-export mac_get_type_h(f_h_did, f_h_acctno, f_h_out, data_restriction_mask='') := macro
+export mac_get_type_h(f_h_did, f_h_acctno, f_h_out, modAccess) := macro
 
 import gong, doxie, address, progressive_phone, ut, STD;
 
@@ -28,7 +28,7 @@ doxie.mac_best_records(f_with_did(did<>0),
 											 dppa_ok,
 											 glb_ok, 
 											 ,
-											 doxie.DataRestriction.fixed_DRM);
+											 modAccess.DataRestrictionMask);
 
 #uniquename(f_subj_best)
 %f_subj_best% := join(f_with_did(did<>0), %outfile%,
@@ -76,14 +76,14 @@ end;
 							                    10,
 							                    Neighbors_Per_NA,
 							                    Neighbor_Recency,
-							                    industry_class_value,
-																	GLB_Purpose,
-							                    DPPA_Purpose,
-							                    probation_override_value,
-							                    no_scrub,
+							                    modAccess.industry_class,
+																	modAccess.glb,
+							                    modAccess.dppa,
+							                    modAccess.probation_override,
+							                    modAccess.no_scrub,
 							                    glb_ok,
 							                    dppa_ok,
-							                    ssn_mask_value, false, false,,false);  
+							                    modAccess.ssn_mask, false, false,,false);  
 																	// treat as subject because the header rows are only being used to look up phone rows and it will not be returned otherwise
 																	
 #uniquename(nbr_with_rank_rec)																	

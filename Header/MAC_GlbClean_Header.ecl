@@ -1,18 +1,16 @@
-export MAC_GlbClean_Header(infile,outfile, batch = false, IsFCRA = false) := macro
+export MAC_GlbClean_Header(infile,outfile, batch = false, IsFCRA = false, modAccess) := macro
 
-import mdr, ut, doxie,AutoStandardI,suppress, header, codes;
+//TODO: check if glb_ok nad dppa_ok can be moved here
+import mdr, ut, doxie, suppress, header, codes;
 
 #uniquename(isUtility)
-%isUtility% := industry_class_value='UTILI' : global;
-
-#uniquename(gmod)
-%gmod% := AutoStandardI.GlobalModule();
+%isUtility% := modAccess.industry_class = 'UTILI';
 
 #uniquename(appType)
-%appType% := AutoStandardI.InterfaceTranslator.application_type_val.val(project(%gmod%,AutoStandardI.InterfaceTranslator.application_type_val.params));
+%appType% := modAccess.application_type;
 
 #uniquename(suppressDMVInfo)
-%suppressDMVInfo% := %gmod%.suppressDMVInfo;
+%suppressDMVInfo% :=  modAccess.suppress_dmv;
 
 #uniquename(oformat)
 %oformat% := record
@@ -47,11 +45,11 @@ END;
 #uniquename(into)
 %oformat% %into% (%dl_rec% le, codes.Key_Codes_V3 R) := TRANSFORM
   _dppa_ok := #if (batch) le. #end dppa_ok;
-  _dppa    := #if (batch) le. #end dppa_purpose;
-  //? TODO: intertingly enough, also skip for batch
+  _dppa    := #if (batch) le.dppa_purpose #else modAccess.dppa #end;
+  //? TODO: interestingly enough, also skip for batch
   SELF.dppa := IF (le.dl_src = 0, FALSE, IF (_dppa_ok AND (R.file_name = ''), TRUE, SKIP));
 
-  SELF.glb := ~ut.PermissionTools.glb.HeaderIsPreGLB((unsigned3)le.dt_nonglb_last_seen, (unsigned3)le.dt_first_seen, le.src);
+  SELF.glb := ~modAccess.isHeaderPreGLB ((unsigned3)le.dt_nonglb_last_seen, (unsigned3)le.dt_first_seen, le.src);
 
   // if we filled in the ssn with a utility ssn and it's a utility customer, blank out
   clean_ssn := IF(le.pflag3 in ['U','X'],'',le.ssn);
@@ -71,7 +69,7 @@ END;
                   // header/translateSource returns a full source name, but all DL sources' names 
                   // start from have 2-char state abbreviation
                   KEYED (RIGHT.field_name2 = (string2) header.translateSource (LEFT.src)) AND
-                  KEYED (RIGHT.code = (string1) (#if(batch) LEFT. #end dppa_purpose)),
+                  KEYED (RIGHT.code = (string1) (#if(batch) LEFT.dppa_purpose #else modAccess.dppa #end)),
                   %into% (LEFT, RIGHT),
                   LEFT OUTER, 
                   LIMIT (0), KEEP (1)); // limit(0) since we checking just exists condition
@@ -84,9 +82,11 @@ END;
   boolean toDrop := (R.long_desc != '') AND 
                      ~(
                        #if (batch)
-                         L.
+                         L.probation_override_value
+                       #else
+                         modAccess.probation_override 
                        #end
-                       probation_override_value and l.src IN mdr.Probation_Smartlinx_Override);
+                       and l.src IN mdr.Probation_Smartlinx_Override);
   // in case of batch blank the record, otherwise skip.
   // TODO: this is contradict the usage above and below, where filters are applied freely.
   #if (batch)
@@ -109,7 +109,7 @@ END;
                    LIMIT (0), KEEP (1));
 
 #uniquename(Fetch3);
-%Fetch3% := IF (no_scrub, %Fetch2%, %ds_prob%); //no_scrub is the same as input parameter 'Raw'
+%Fetch3% := IF (modAccess.no_scrub, %Fetch2%, %ds_prob%); //no_scrub is the same as input parameter 'Raw'
 
 
 #uniquename(Fetch3a)
@@ -119,19 +119,19 @@ Suppress.MAC_Suppress(%Fetch3a%,%Fetch3b%,%appType%,Suppress.Constants.LinkTypes
 
 #uniquename(Fetch3c)
 #uniquename(Fetch3c_minors_cleaned)
-ut.PermissionTools.GLB.mac_FilterOutMinors(%Fetch3b%,%Fetch3c_minors_cleaned%,,,dob)
+%Fetch3c_minors_cleaned% := doxie.compliance.MAC_FilterOutMinors (%Fetch3b%,,dob, modAccess.show_minors);
 %Fetch3c% := if (IsFCRA, %Fetch3b%, %Fetch3c_minors_cleaned%);
 
 // Filter out any specific source(s) based upon the DataRestrictionMask.
 // As of October 2009 only Experian Credit Header is possibly being filtered out.
 #uniquename(Fetch3d)
-header.MAC_Filter_Sources(%Fetch3c%, %Fetch3d%, src, doxie.DataRestriction.fixed_DRM);
+%Fetch3d% := doxie.compliance.MAC_FilterSources (%Fetch3c%, src, modAccess.DataRestrictionMask);
 
 #uniquename(Fetch3e0)
 #uniquename(Fetch3e)
 %Fetch3e0% := Header.FilterDMVInfo(%Fetch3d%);
-%Fetch3e% := if(%suppressDMVInfo% and ~ut.IndustryClass.is_Knowx and ~isFCRA, %Fetch3e0%, %Fetch3d%);
+%Fetch3e% := if(%suppressDMVInfo% and modAccess.isConsumer () and ~isFCRA, %Fetch3e0%, %Fetch3d%);
 
-outfile := %Fetch3e%(glb_ok or ~glb);//,(dppa_ok AND drivers.state_dppa_ok(header.translateSource(src),dppa_purpose)) or ~dppa)
+outfile := %Fetch3e%(glb_ok or ~glb);
 
 endmacro;

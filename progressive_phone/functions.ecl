@@ -111,7 +111,7 @@ EXPORT functions := MODULE
                                   BOOLEAN isPFR = FALSE
                                   ) := FUNCTION
 
-    doxie.MAC_Header_Field_Declare()
+    //doxie.MAC_Header_Field_Declare()
     doxie.MAC_Selection_Declare()	
 
     integer sx_match_restriction_limit := if(default_sx_match_limit and inMod.SXMatchRestrictionLimit = '',10,(integer)inMod.SXMatchRestrictionLimit);
@@ -212,9 +212,20 @@ EXPORT functions := MODULE
 
     f_with_did := if(isPFR,f_pfr_with_orig_did,f_with_orig_did);
 
-    did_stream := dataset([{did_value}],{unsigned6 did});										
-    doxie.mac_best_records(did_stream,did,h_addr, dppa_ok, glb_ok,,Doxie.DataRestriction.fixed_DRM,,include_DOD:=true);
-    h_name := dedup(sort(doxie.Comp_Subject_Addresses(did_stream,DPPA_Purpose,GLB_Purpose,,,,false,,,).raw,
+
+    // TODO: the order of passing parameters was wrong, it is not clear what it should be. Needs verification.
+    // Easier to create a new module rather than read from global: too many defaults
+    gmod := AutoStandardI.GlobalModule ();
+    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (gmod);
+
+    glb_ok := mod_access.isValidGLB ();
+    dppa_ok := mod_access.isValidDPPA ();
+    did_value := AutoStandardI.InterfaceTranslator.did_value.val(project(gmod,AutoStandardI.InterfaceTranslator.did_value.params));
+
+    did_stream := dataset([{did_value}],{unsigned6 did});
+
+    doxie.mac_best_records(did_stream,did,h_addr, dppa_ok, glb_ok,,mod_access.DataRestrictionMask,,include_DOD:=true);
+    h_name := dedup(sort(doxie.Comp_Subject_Addresses(did_stream, , , , mod_access).raw,
                     -lname,-fname,-mname),lname,fname,mname);
 
     in_batch_rec calc_trans(doxie.layout_best a, doxie.Layout_presentation n) := transform
@@ -242,16 +253,16 @@ EXPORT functions := MODULE
                       
     //fetch different type of phones
     progressive_phone.mac_get_type_a(f_in_batch_for_a, f_out_type_a_pre)
-    progressive_phone.mac_get_type_b(f_with_did, f_in_batch, f_out_type_b,,Doxie.DataRestriction.fixed_DRM)
-    progressive_phone.mac_get_type_c(f_with_did, f_in_batch, f_out_type_c, glb_ok, inMod.IncludeLandlordPhones,,Doxie.DataRestriction.fixed_DRM)
-    progressive_phone.mac_get_type_e(f_with_did, f_in_batch, f_out_type_e, GLB_Purpose, Doxie.DataRestriction.fixed_DRM,inMod.IncludeRelativeCellPhones)
-    progressive_phone.mac_get_type_f(f_with_did, f_in_batch, f_out_type_f,Doxie.DataRestriction.fixed_DRM,sx_match_restriction_limit)
-    progressive_phone.mac_get_type_g(f_with_did, f_in_batch, f_out_type_g, GLB_Purpose, Doxie.DataRestriction.fixed_DRM, DPPA_Purpose)
-		progressive_phone.mac_get_type_h(f_with_did, f_in_batch, f_out_type_h, Doxie.DataRestriction.fixed_DRM)
+    progressive_phone.mac_get_type_b(f_with_did, f_in_batch, f_out_type_b,,mod_access)
+    progressive_phone.mac_get_type_c(f_with_did, f_in_batch, f_out_type_c, glb_ok, inMod.IncludeLandlordPhones,, mod_access)
+    progressive_phone.mac_get_type_e(f_with_did, f_in_batch, f_out_type_e, inMod.IncludeRelativeCellPhones, mod_access)
+    progressive_phone.mac_get_type_f(f_with_did, f_in_batch, f_out_type_f,sx_match_restriction_limit, mod_access)
+    progressive_phone.mac_get_type_g(f_with_did, f_in_batch, f_out_type_g, mod_access)
+		progressive_phone.mac_get_type_h(f_with_did, f_in_batch, f_out_type_h, mod_access)
     progressive_phone.mac_get_type_r(f_with_did, f_in_batch, f_out_type_r)
-    progressive_phone.mac_get_type_v(f_with_did, f_in_batch, f_out_type_v,,Doxie.DataRestriction.fixed_DRM)  // unrated
+    progressive_phone.mac_get_type_v(f_with_did, f_in_batch, f_out_type_v,, mod_access)  // unrated
     progressive_phone.mac_get_type_w(f_with_did, f_in_batch, f_out_type_w)
-    progressive_phone.mac_get_type_t(f_with_did, f_in_batch, f_out_type_t, GLB_Purpose, Doxie.DataRestriction.fixed_DRM, DPPA_Purpose)
+    progressive_phone.mac_get_type_t(f_with_did, f_in_batch, f_out_type_t, mod_access)
 
     batch_out_with_did := progressive_phone.layout_progressive_batch_out_with_did;
 
@@ -322,7 +333,7 @@ EXPORT functions := MODULE
     f_pre_death_check := if(inMod.DedupOutputPhones, dedup(f_out_srt, acctno, subj_phone10), f_out_srt);
 
     //death check														
-    deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
+    deathparams := DeathV2_Services.IParam.GetDeathRestrictions(gmod);
 
     f_post_death_filter := join(f_pre_death_check,doxie.key_death_masterV2_ssa_DID,
                               keyed(left.p_did = right.l_did)  and
@@ -489,7 +500,7 @@ EXPORT functions := MODULE
 
     f_out_final_scored_temp := progressive_phone.phones_score_model_v1(final_matched_noScore_nogateway, 
                                                                        f_with_did, 
-                                                                       GLB_Purpose, 
+                                                                       mod_access.glb, 
 																																																																							Doxie.DataRestriction.fixed_DRM);
 
         		

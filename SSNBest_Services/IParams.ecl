@@ -37,17 +37,17 @@ EXPORT IParams := MODULE
 	//this function is called to set the interface parameters before calling SSNBest_Services.Functions.fetchSSNs_generic
 	//NOTE that you can also call the fetchSSN's functions via your default stored batch params as is done in the SSNBest
 	//batch service or call setSSNBestParams_byInMod below
-	EXPORT setSSNBestParams(glb_,dppa_,DRM_,appType_,indClass_,ssnMask_,IncludeMinors_,suppress_and_mask_ = TRUE,checkRNA_ = FALSE) := FUNCTIONMACRO
+	EXPORT setSSNBestParams(mod_access,IncludeMinors_,suppress_and_mask_ = TRUE,checkRNA_ = FALSE) := FUNCTIONMACRO
     IMPORT BatchDatasets;
 
 	 in_mod :=
 		MODULE(SSNBest_Services.IParams.SSNBestParams)
-			EXPORT TYPEOF(BatchDatasets.IParams.BatchParams.GLBPurpose)          GLBPurpose          := glb_;
-			EXPORT TYPEOF(BatchDatasets.IParams.BatchParams.DPPAPurpose)         DPPAPurpose         := dppa_;
-			EXPORT TYPEOF(BatchDatasets.IParams.BatchParams.DataRestrictionMask) DataRestrictionMask := DRM_;
-			EXPORT TYPEOF(BatchDatasets.IParams.BatchParams.ApplicationType)     ApplicationType     := appType_;
-			EXPORT TYPEOF(BatchDatasets.IParams.BatchParams.industry_class)      industry_class      := indClass_;
-			EXPORT TYPEOF(BatchDatasets.IParams.BatchParams.ssn_mask)            ssn_mask            := ssnMask_;
+			EXPORT TYPEOF(BatchDatasets.IParams.BatchParams.GLBPurpose)          GLBPurpose          := mod_access.glb;//glb_;
+			EXPORT TYPEOF(BatchDatasets.IParams.BatchParams.DPPAPurpose)         DPPAPurpose         := mod_access.dppa;//dppa_;
+			EXPORT TYPEOF(BatchDatasets.IParams.BatchParams.DataRestrictionMask) DataRestrictionMask := mod_access.DataRestrictionMask;//DRM_;
+			EXPORT TYPEOF(BatchDatasets.IParams.BatchParams.ApplicationType)     ApplicationType     := mod_access.application_type;//appType_;
+			EXPORT TYPEOF(BatchDatasets.IParams.BatchParams.industry_class)      industry_class      := mod_access.industry_class;//indClass_;
+			EXPORT TYPEOF(BatchDatasets.IParams.BatchParams.ssn_mask)            ssn_mask            := mod_access.ssn_mask;//ssnMask_;
 			EXPORT TYPEOF(BatchDatasets.IParams.BatchParams.IncludeMinors)       IncludeMinors       := IncludeMinors_;
 			EXPORT BOOLEAN suppress_and_mask := suppress_and_mask_;
 		  EXPORT BOOLEAN check_RNA_        := checkRNA_;

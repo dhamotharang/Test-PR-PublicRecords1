@@ -2,6 +2,7 @@ import header, doxie, ut, AutoHeaderI, AutoStandardI, AutoheaderV2;
 doxie.MAC_Header_Field_Declare()
 doxie.MAC_Selection_Declare()
 
+mod_access := doxie.compliance.GetGlobalDataAccessModule ();
 // search header by address
 tempmod := module(project(AutoStandardI.GlobalModule(),AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full,opt))
   // I can blank some specific fields here to ease up a cleaning a little, if needed.
@@ -24,7 +25,7 @@ UncleanSearchRecs := JOIN(addr_matches_d,doxie.Key_Header,
                         transform (header.Layout_Header, Self := Right),
                         limit (ut.limits.HEADER_PER_DID, skip)); // formality, to avoid a warning
 
-header.MAC_GlbClean_Header(UncleanSearchRecs,SearchRecs);
+header.MAC_GlbClean_Header(UncleanSearchRecs,SearchRecs, , , mod_access);
 SortedSearchRecs := SORT(SearchRecs	
 												,prim_range
 												,predir

@@ -11,7 +11,15 @@ export Residents_Raw(
 	unsigned3 MaxResidentsPerAddr = 10
 ) := FUNCTION
 
-
+mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
+  EXPORT unsigned1 dppa := dppa_purpose;
+  EXPORT unsigned1 glb := glb_purpose;
+  EXPORT boolean ln_branded := ln_branded_value;
+  EXPORT boolean probation_override := probation_override_value;
+  EXPORT unsigned3 dateVal := ^.dateVal;
+  EXPORT string ssn_mask := ssn_mask_value;
+END;  
+	
 //***** FIND THOSE WHO RESIDED AT ADDRS RECENTLY
 
 
@@ -46,7 +54,7 @@ jd 	:= dedup(jd1, address_seq_no, keep(MaxResidentsPerAddr));
 
 //***** GATHER NAME/SSN/DOB INFO FOR THE DIDS WE FOUND
 dids := dedup(project(jd, doxie.layout_references));
-b := doxie.best_records(dids,false,dppa_purpose,glb_purpose,,,,,,header.constants.checkRNA)
+b := doxie.best_records(dids, checkRNA := header.constants.checkRNA, modAccess := mod_access)
 			(dod = '');
 
 outrec := record
@@ -68,7 +76,7 @@ end;
 
 wadd := join(j,b, left.did = right.did, addback(left, right), keep(1));
 
-suppress.MAC_Mask(wadd, msk, ssn, foo, true, false,, true);
+suppress.MAC_Mask(wadd, msk, ssn, foo, true, false,, true, , mod_access.ssn_mask);
 
 return msk;
 

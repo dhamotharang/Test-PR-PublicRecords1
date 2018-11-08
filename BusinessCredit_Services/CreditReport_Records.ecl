@@ -1,7 +1,18 @@
-﻿IMPORT BIPV2, Business_Credit, BusinessCredit_Services, Codes, Doxie, iesp, Suppress, Business_Credit_Scoring;
+IMPORT BIPV2, Business_Credit, BusinessCredit_Services, Codes, Doxie, iesp, Suppress;
 
 EXPORT CreditReport_Records(BusinessCredit_Services.Iparam.reportrecords inmod) := FUNCTION
-		
+
+    mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule()))
+      EXPORT unsigned1 glb := inmod.glbpurpose;
+      EXPORT unsigned1 dppa := inmod.dppapurpose;
+      EXPORT string DataPermissionMask := inmod.DataPermissionMask;
+      EXPORT string DataRestrictionMask := inmod.DataRestrictionMask;
+      EXPORT string32 application_type := inmod.ApplicationType;
+      EXPORT string ssn_mask := inmod.ssnmask;
+		  //TODO: the input is not supposed to include untranslated value for dob-mask
+      EXPORT unsigned1 dob_mask := suppress.date_mask_math.MaskIndicator (inmod.dobmask);
+    END;
+
 		BOOLEAN buzCreditAccess			:= BusinessCredit_Services.Functions.fn_useBusinessCredit(inmod.DataPermissionMask , inmod.Include_BusinessCredit);
 		BOOLEAN isBusinessIdExists	:= EXISTS(inmod.BusinessIds(UltID != 0 AND SeleID != 0 AND OrgID != 0));
 
@@ -28,7 +39,7 @@ EXPORT CreditReport_Records(BusinessCredit_Services.Iparam.reportrecords inmod) 
           
    		//GET Person Best Records.
   in_did 								:= IF(inmod.did <> '', DATASET([(UNSIGNED6)inmod.did], Doxie.layout_references));
-  authRep_BestRec 			:= IF(EXISTS(in_did), doxie.best_records(in_did,FALSE,inmod.DPPAPurpose, inmod.GLBPurpose));
+  authRep_BestRec 			:= IF(EXISTS(in_did), doxie.best_records(in_did,modAccess := mod_access));
    		
    		//GET All the Report Data.
 			// efficiency added these 2 lines.
@@ -44,8 +55,8 @@ EXPORT CreditReport_Records(BusinessCredit_Services.Iparam.reportrecords inmod) 
 																									 ))
 																									  , authRep_BestRec, buzCreditHeader_recs , buzCreditAccess, IndustryCode); 
    
-  Suppress.MAC_Suppress(BusBestInformation,BusBestInformation_suppressSSN,inmod.ApplicationType,Suppress.Constants.LinkTypes.SSN,AuthRepSSN);
-  Suppress.MAC_Suppress(BusBestInformation_suppressssn,BusBestInformation_suppressDID,inmod.ApplicationType,Suppress.Constants.LinkTypes.DID,UniqueId);
+  Suppress.MAC_Suppress(BusBestInformation,BusBestInformation_suppressSSN,mod_access.application_type,Suppress.Constants.LinkTypes.SSN,AuthRepSSN);
+  Suppress.MAC_Suppress(BusBestInformation_suppressssn,BusBestInformation_suppressDID,mod_access.application_type,Suppress.Constants.LinkTypes.DID,UniqueId);
    			
   BusInquiries 					:= BusinessCredit_Services.fn_getBusInquiries(inmod);
    		
