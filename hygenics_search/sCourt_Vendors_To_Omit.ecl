@@ -73,9 +73,12 @@
 '7O', // TEXAS_LAMAR_COUNTY_JUSTICE_OF_THE_PEACE_COURTS                                                      
 '7R', // FLORIDA_PASCO_COUNTY                                                                                
 '7S', // FLORIDA_PASCO_COUNTY_TRAFFIC                                                                        
+'7W', // FLORIDA_FLAGLER_COUNTY_CIRCUIT_COURT                                                                
+'7X', // FLORIDA_MANATEE_CIRCUIT_AND_COUNTY_COURTS                                                           
 '7Z', // ILLINOIS_PEORIA_COUNTY                                                                              
 '8A', // NEVADA_CLARK_COUNTY_DISTRICT_COURTS                                                                 
 '8F', // ILLINOIS_VIOLENT_OFFENDER_AGAINST_YOUTH                                                             
+'8M', // OHIO_FAYETTE_COUNTY_COMMON_PLEAS_COURT                                                              
 '8P', // OHIO_CUYAHOGA_COUNTY_CLEVELAND_MUNICIPAL_COURT                                                      
 '8Q', // OHIO_CUYAHOGA_COUNTY_CLEVELANDHEIGHTS_MUNICIPAL_COURT                                               
 '8V', // OHIO_COLUMBIANA_COUNTY_EASTLIVERPOOL_MUNICIPAL_COURT                                                
@@ -90,7 +93,6 @@
 '9U', // OHIO_UNION_COUNTY_COMMON_PLEAS_COURT                                                                
 '9V', // OHIO_WYANDOT_COUNTY_COMMON_PLEAS_COURT                                                              
 '9W', // TEXAS_KAUFMAN_COUNTY                                                                                
-'9X', // TEXAS_RANDALL_COUNTY                                                                                
 'BA', // ALABAMA_BALDWIN_COUNTY_ARRESTS                                                                      
 'BB', // ALABAMA_CALHOUN_COUNTY_ARRESTS                                                                      
 'BC', // ALABAMA_HOUSTON_COUNTY_ARRESTS                                                                      
@@ -137,11 +139,11 @@
 'DV', // MICHIGAN_DEPARTMENT_OF_CORRECTIONS                                                                  
 'DW', // MICHIGAN_DEPARTMENT_OF_CORRECTIONS_ALTERNATE_FILE                                                   
 'DY', // MISSISSIPPI_DEPARTMENT_OF_CORRECTIONS                                                               
+'EA', // NEW_JERSEY_DEPARTMENT_OF_CORRECTIONS                                                                
 'EB', // NEW_MEXICO_DEPARTMENT_OF_CORRECTIONS                                                                
 'EC', // NEVADA_DEPARTMENT_OF_CORRECTIONS                                                                    
 'EE', // OHIO_DEPARTMENT_OF_CORRECTIONS                                                                      
 'EF', // OKLAHOMA_DEPARTMENT_OF_CORRECTIONS                                                                  
-'EG', // OREGON_DEPARTMENT_OF_CORRECTIONS                                                                    
 'EM', // UTAH_DEPARTMENT_OF_CORRECTIONS                                                                      
 'EN', // VIRGINIA_DEPARTMENT_OF_CORRECTIONS                                                                  
 'EP', // WASHINGTON_DEPARTMENT_OF_CORRECTIONS                                                                
@@ -151,7 +153,6 @@
 'ET', // WEST_VIRGINIA_DEPARTMENT_OF_CORRECTIONS_ALTERNATE                                                   
 'EZ', // OHIO_SUMMIT_COUNTY_BARBERTON_MUNICIPAL_COURT                                                        
 'FB', // FLORIDA_SARASOTA_COUNTY                                                                             
-'FD', // FLORIDA_PALM_BEACH_COUNTY                                                                           
 'FQ', // FLORIDA_HERNANDO_COUNTY                                                                             
 'FR', // FLORIDA_ORANGE_COUNTY                                                                               
 'FS', // FLORIDA_PINELLAS_COUNTY                                                                             
