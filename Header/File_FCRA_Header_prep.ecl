@@ -1,4 +1,4 @@
- import mdr,FCRA_ExperianCred,PRTE2_Header,Header_Incremental,SALT37,std,ut,PromoteSupers;
+﻿ import mdr,FCRA_ExperianCred,PRTE2_Header,Header_Incremental,SALT37,std,ut,PromoteSupers;
 
 #IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
 export File_FCRA_Header_prep(string filedate) :=header.file_headers(src<>'EN',src in mdr.sourceTools.set_scoring_FCRA,pflag3<>'I',pflag3<>'V',did>0);
@@ -19,7 +19,7 @@ header.Layout_New_Records add_rid_all(old_en_fcra_prep l, new_en_as_header r) :=
  self                := r;
 end;
 
-join_old_new_en_0 :=  join( distribute(old_en_fcra_prep,hash(prim_name,zip,lname)),
+join_old_new_en :=  join( distribute(old_en_fcra_prep,hash(prim_name,zip,lname)),
 							distribute(new_en_as_header,hash(prim_name,zip,lname)),
 
 				left.fname      =right.fname       	and
@@ -45,12 +45,7 @@ join_old_new_en_0 :=  join( distribute(old_en_fcra_prep,hash(prim_name,zip,lname
                 ,add_rid_all(left,right)
 				,right outer
 				,local
-				): persist(                     '~thor_data400::persist::hbm::fcra_en::'+ filedate ,expire(60),REFRESH(TRUE));
-
-join_old_new_en:= if(nothor(std.file.fileexists(  '~thor_data400::persist::hbm::fcra_en::'+ filedate )) 
-            ,dataset(      '~thor_data400::persist::hbm::fcra_en::'+ filedate ,header.Layout_New_Records,thor)
-            ,join_old_new_en_0);
-
+				): persist('~thor_data400::persist::hbm::fcra_en::' ,expire(14),REFRESH(TRUE));
 
 with_no_rid_no_uid := join_old_new_en(rid=0):independent;
 with_old_rid_w_uid := join_old_new_en(rid>0):independent;

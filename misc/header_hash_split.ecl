@@ -18,8 +18,8 @@ DestinationIP_PA       := '10.173.84.223'; // PA_DISTRIX_LZ - /d$/import/distrix
 // C:\dropzone\Distrix
 Basefile      		:= '~thor_data400::base::headers_hashes_';
 Basefilev         := '~thor_data400::out::vinashrunk';
-punixPA           := '/c$/distrix/';
-punixOH           := '/c$/distrix/';
+punixPA           := '/mnt/disk1/distrix/';
+
 
 layout_header_hash := record
 unsigned8	hash_val;

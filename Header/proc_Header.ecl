@@ -38,9 +38,9 @@ export proc_header(string operatorEmailList, string extraNotifyEmailList) := mod
         :success(header.msg(if(incremental,'Incremental:','')+cmpltd(versionBuild),operatorEmailList).good)
         ,failure(header.msg(if(incremental,'Incremental:','')+failed(versionBuild),operatorEmailList).bad)
         ;
-        
-    export Ingest_Incremental(string versionBuild) := ingest(TRUE,versionBuild);
-    export STEP1 := ingest(FALSE,header.version_build);
+          
+    export run_ingest(boolean is_monthly = false, string versionBuild) := ingest(is_monthly, versionBuild);
+    
     #stored ('buildname', 'PersonHeader'   ); 
     #stored ('version'  , header.version_build); 
     
