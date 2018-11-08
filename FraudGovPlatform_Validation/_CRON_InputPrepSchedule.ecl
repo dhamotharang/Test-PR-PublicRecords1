@@ -1,9 +1,9 @@
 ﻿import _Control,STD;
 
-every_hour_8to5pm := '0 12-21 * * *';
+every_hour_8to5pm := '0 13-22 * * *';
 
 IP				:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		_control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
-RootDir		:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		Constants.LandingZonePathBase_dev,	Constants.LandingZonePathBase_prod);
+RootDir		:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		Constants.LandingZoneServer_dev,	Constants.LandingZoneServer_prod);
 ThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		Constants.ThorName_Dev,	Constants.ThorName_Prod);
 
 LzFilePath :=FraudGovPlatform_Validation.Constants.LandingZoneFilePathRgx;

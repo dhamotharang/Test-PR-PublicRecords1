@@ -14,6 +14,10 @@ lookup_lookupBody := record
 	string fid {xpath('./@fid')};
 	string fdbDescription {xpath('./@fdbDescription')};
 	string fdbDescriptionPlural {xpath('./@fdbDescriptionPlural')};
+	string fdbFormat {xpath('./@fdbFormat')};
+	string format {xpath('./@format')};
+	string ibanFormat {xpath('./@ibanFormat')};
+	string tfpFormat {xpath('./@tfpFormat')};
 	string tfpid {xpath('./@tfpid')};
 	string tfpDescription {xpath('./@tfpDescription')};
 	string tfpDescriptionAbbr {xpath('./@tfpDescriptionAbbr')};

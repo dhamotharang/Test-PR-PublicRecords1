@@ -1,9 +1,9 @@
 ﻿import _Control,tools,STD,FraudGovPlatform;
 
 EXPORT SprayAndQualifyInput(string version,
-	string ip = FraudGovPlatform_Validation.Constants.LandingZoneServer,
-	string rootDir = FraudGovPlatform_Validation.Constants.LandingZonePathBase, 
-	string destinationGroup = IF(_control.ThisEnvironment.Name	<> 'Prod_Thor',		Constants.ThorName_Dev,	Constants.ThorName_Prod)) := function
+	string ip 		= IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		Constants.LandingZoneServer_dev, Constants.LandingZoneServer_prod),
+	string rootDir = IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		Constants.LandingZonePathBase_dev,	Constants.LandingZonePathBase_prod), 
+	string destinationGroup = IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		Constants.ThorName_Dev,	Constants.ThorName_Prod)) := function
 
 
 ready    := rootDir+'ready/';

@@ -68,7 +68,7 @@ module
 	);
 	
 	Export All := map(	FraudgovInfo().CurrentStatus = 'Input_Phase' 									=> 	sequential(inputFiles, 	Send_Emails(pversion).BuildFailure),
-									FraudgovInfo().CurrentStatus in  ['Base_Phase','Base_Completed'] 	=> 	sequential(baseFiles, 	Send_Emails(pversion).BuildFailure)									
+									FraudgovInfo().CurrentStatus = 'Base_Completed' 								=> 	sequential(baseFiles, 	Send_Emails(pversion).BuildFailure)									
 								);
 end;
 
