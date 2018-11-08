@@ -32,10 +32,12 @@ EXPORT FnRoxie_GetAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout) In
   InputPII := KEL.Clean(PublicRecords_KEL.Q_Input_Attributes_V1(InputAttrs, (STRING) InputAttrs[1].InputArchiveDateClean[1..8]).res0, TRUE, TRUE, TRUE);
 	// Cast Attributes back to their string values
   InputPII_Attrs := project(InputPII, transform(PublicRecords_KEL.ECL_Functions.Attr_Layout, 
-		SELF := LEFT)); 
-  InputPII_srtd := SORT( InputPII_Attrs, InputUIDAppend ); 
+		SELF := LEFT,
+    SELF := [])); 
+
+	PersonAttributes := PublicRecords_KEL.FnRoxie_GetPersonAttributes(InputPII_Attrs, FDCDataset, Options); 
 	
-  RETURN InputPII_srtd;
+  RETURN PersonAttributes;
 
  END;
 
