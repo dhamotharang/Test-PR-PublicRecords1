@@ -1,5 +1,5 @@
 
-IMPORT BatchServices, Doxie, Doxie_Regression, ut, DeathV2_Services, PublicHousing_Services;
+IMPORT DeathV2_Services, PublicHousing_Services;
 
 EXPORT fn_getDeceasedRecs(DATASET(PublicHousing_Services.Layouts.batch_in) ds_batch_in, PublicHousing_Services.IParams.BatchParams in_mod) :=
 	FUNCTION

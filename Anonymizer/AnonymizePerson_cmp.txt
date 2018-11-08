@@ -1,0 +1,40 @@
+ID "anonymizeperson_cmp";
+NAME anonymizeperson;
+LABEL AnonymizePerson;
+DESCRIPTION "A template only with Data source input";
+VERSION "1.0.0";
+AUTHOR prichajx;
+PERMISSIONS
+VIEW:PRIVATE;
+EDIT:PRIVATE;
+RUN:PRIVATE;
+END  
+INPUTS 
+    STRING CompareWUID : DEFAULT("W20150923-130712"); 
+END
+INSTANCE UseDataset.UseDataset(Ins001): LABEL("Use Dataset"),VERSION("1.1.0")
+	LogicalFilename="~qa::anonymizer::anonymizeperson::input"
+	Method="THOR"
+	Structure="RECORD
+  string fname;
+  string lname;
+  string gender;
+  string ssn;
+  integer8 dob;
+ END;" 
+END
+INSTANCE OutDataset.OutDataset(Ins026): LABEL("Output Dataset"),VERSION("1.0.0")
+	dsInput="^Ins013|dsOutput"
+	name="~qa::anomymizer::anonymizeperson::output"
+	Method="THOR"
+END
+INSTANCE Anonymizer.AnonymizePerson(Ins013): LABEL("Anonymize Person"),VERSION("1.0.0")
+	dsInput="^Ins001|dsOutput"
+	DateOfBirth="dob"
+	SSN_childds_recnum="1"
+	FirstName="fname"
+	Lastname="lname"
+	Gender="gender"
+	SSN="ssn"
+END
+

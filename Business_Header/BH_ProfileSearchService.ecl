@@ -25,7 +25,7 @@
 import suppress, STD;
 
 export BH_ProfileSearchService() := macro
-#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 #stored('MileRadius',25);
 #stored('isProfileSearch',true);
 #stored('AllowNickNames',true);

@@ -1,0 +1,84 @@
+﻿ID "70990c35-0480-461f-8ec8-a93a8f656b48";
+NAME AppendPersonGSA;
+LABEL "Append Person GSA";
+VERSION "1.0.0";
+AUTHOR "CarmigJX";
+CATEGORY COMPUTE;
+DESCRIPTION "Appends GSA flag for a person and computes GSA details for use in visualization";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING Prefix: LABEL("Append Column Prefix"),DEFAULT(""),DESCRIPTION("Prefix to be appended to the new fields");
+	DATASET dsInput: MAPBYNAME
+	FIELD LexID: LABEL("LexID"),DESCRIPTION("LexID");
+	FIELD EntityContextUID: LABEL("Entity Context UID"),DESCRIPTION("Entity context UID");
+	FIELD AppendFields: MANY,LABEL("Append Fields"),DESCRIPTION("Fields that should be in Details output layout"),OPTIONAL,NULL(""),DEFAULT("");
+END
+	STRING DPPAPURPOSE: LABEL("DPPA Purpose"),DEFAULT("^GLOBAL|DPPAPURPOSE");
+	STRING GLBPURPOSE: LABEL("GLB Purpose"),DEFAULT("^GLOBAL|GLBPURPOSE");
+	STRING DATARESTRICTIONMASK: LABEL("Data Restriction Mask"),DEFAULT("^GLOBAL|DATARESTRICTIONMASK");
+END
+
+OUTPUTS
+	DATASET dsOutput(dsInput): PREFIX(INPUTS.Prefix),APPEND
+		INTEGER HasGsa;
+  END
+	DATASET dsDetails
+		INPUTS.AppendFields;
+    STRING GsaName;
+    STRING GsaClassification;
+    STRING GsaCTType;
+    STRING GsaDescription;
+    STRING GsaActionDate;
+    STRING GsaTermDate;
+    STRING1 GsaTermDateIndefinite;
+    STRING GsaCTCode;
+    STRING GsaAgencycomponent;
+    STRING GraphId;
+    INTEGER PersonHasGsa;
+    STRING PersonHasGsaDescription;
+  END
+	DATASET GsaHitStats: SIDE,WUID,SMALL
+		STRING GsaHit: FEW;
+    INTEGER Cnt;
+  END
+END
+
+VISUALIZE PersonGsaStats: LABEL("Append Person GSA Stats")
+  PIE HitRate(GsaHitStats{GsaHit,Cnt}): LABEL(GsaHit),WEIGHT(Cnt),TITLE("Hit Rate"), _charttype("AM_PIE");
+END
+
+GENERATES INLINE
+	IMPORT AppendPersonGsa;
+  %^sdsPersonGsa% := AppendPersonGsa.macAppendPersonGsa(%dsInput%, %LexID%, %^qPrefix%) %^p%;
+  
+	IMPORT AppendPersonGsa;  
+  %^edsDetails% := AppendPersonGSA.macComputePersonGsaDetails(%dsPersonGsa%, %Prefix%Name,%Prefix%Classification,%Prefix%CTType,%Prefix%Description,%Prefix%ActionDate,
+    %Prefix%TermDate,%Prefix%TermDateIndefinite,%Prefix%CTCode,%Prefix%Agencycomponent,%Prefix%HasGsa,
+    %EntityContextUID%, %^qAppendFields%, %^qPrefix%);  
+  
+	LOCAL rOutput := RECORD
+	 RECORDOF(%dsInput%);
+	 INTEGER %Prefix%HasGsa;
+	END;
+  %^edsOutput% := PROJECT(%dsPersonGsa%, TRANSFORM(rOutput, SELF := LEFT));
+  
+  %^eGsaHitStats% := TABLE(%dsOutput%,
+    {STRING  GsaHit := IF((BOOLEAN)%Prefix%HasGsa, 'Hit', 'NoHit'),INTEGER Cnt := COUNT(GROUP)},
+    %Prefix%HasGsa, FEW);
+ENDGENERATES
+
+RESOURCES
+	INDEX Keys.GsaPersonKey: FILENAME("~thor_data400::key::gsa::qa::did"),URL("http://10.241.100.157:8010"),DALIIP("10.241.100.157"),CLUSTER("thor100_100cert");
+	ECL AppendPersonGsa: FILENAME("AppendPersonGsa"),URL("<http://10.241.100.153:8010>");
+	ECL hipie_ecl: FILENAME("hipie_ecl"),URL("<http://10.241.100.153:8010>");
+	FILE readme: FILENAME("AppendPersonGSA_ReadMe.txt"),LABEL("Plugin Readme File");
+	FILE AppendPersonGSA_testcmp: FILENAME("AppendPersonGSA_testcmp.txt"),LABEL("Plugin Test Composition");
+	FILE AppendPersonGSA_BuildTestDataset: FILENAME("AppendPersonGSA_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+	FILE checklist: FILENAME("AppendPersonGSAChecklist.xlsx"),LABEL("Plugin Checklist");
+  LOGICALFILE test: FILENAME("~qa::appendpersongsa::appendpersongsa::input"),URL("http://10.241.100.159:8010"),DALIIP("10.241.100.159"),CLUSTER("thor100_100dev");
+END

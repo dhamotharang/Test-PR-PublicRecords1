@@ -1560,7 +1560,7 @@ Layout_working intoAttributes(attr le) := TRANSFORM
 	self.v4_SecurityFreeze	:= if(doVersion4, le.v4_SecurityFreeze	, '');
 	self.v4_SecurityAlert	:= if(doVersion4, le.v4_SecurityAlert	, '');
 	self.v4_IDTheftFlag	:= if(doVersion4, le.v4_IDTheftFlag	, '');
-	self.v4_ConsumerStatement	:= if(doVersion4, le.v4_ConsumerStatement	, '');
+	self.v4_ConsumerStatement	:= if(doVersion4 OR le.v4_ConsumerStatement='1', le.v4_ConsumerStatement	, '');  // version 3 doesn't have consumer statement attribute, so re-use the version4 attribute to suppress version 3 attributes if consumer statement=1
 	self.v4_PrescreenOptOut	:= if(doVersion4, le.v4_PrescreenOptOut	, '');
 
 	self := [];
@@ -1597,7 +1597,7 @@ Layout_working blankAttributes(attributes_temp le) := TRANSFORM
 	self.index4 := le.index4;
 	self.index5 := le.index5;
 	
-	self.isNoVer := if(doVersion3 and ExperianTransaction, le.isNoVer, '');
+	self.isNoVer := if(doVersion3, le.isNoVer, '');
 	self.v4_VerificationFailure := if(doVersion4 and ExperianTransaction, le.v4_VerificationFailure, '');
 	
 	SELF := [];

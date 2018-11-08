@@ -719,6 +719,7 @@ export callFraudPoint2(unsigned1 GLBPurpose,unsigned1 DPPAPurpose,string DataRes
 					export string DataRestriction       := DataRestrictionMask; // 0000000000000000000 to allow use of both Equifax and Experian, this is the default value for all legacy scoring products
 					export string DataPermission        := DataPermissionMask; 
           export boolean doParo_attrs         := false;
+          export string requestedattributegroups := '';
 		end;
 
 		// No gateways required

@@ -11,7 +11,7 @@ IMPORT BatchServices;
 
 export Trustee_BatchService() := 
 	MACRO
-	 #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+	 #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 		#OPTION('optimizeProjects', TRUE);
 		#constant('isFCRA', false);
 

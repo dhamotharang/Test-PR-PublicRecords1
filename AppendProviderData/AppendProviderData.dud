@@ -1,0 +1,137 @@
+﻿NAME AppendProviderData;
+LABEL "Provider ID Best Data Append";
+CATEGORY APPEND;
+VERSION "1.0.0";
+AUTHOR "periassx";
+DESCRIPTION "Append Provider ID Best Data using LNPID";
+
+PERMISSIONS
+ VIEW:PUBLIC;
+ EDIT:PRIVATE;
+ RUN:PUBLIC;
+END
+ 
+INPUTS
+    STRING Prefix:LABEL("Append Column Prefix"),DEFAULT("Inp");
+    DATASET dsInput:MAPBYNAME
+    FIELD LNPID:LABEL("Provider ID"),DESCRIPTION("Lexis Nexis Professional ID");
+    FIELD PrimaryRange:LABEL("Primary Range"),DESCRIPTION("Primary Range, Street Number"),OPTIONAL,NULL("");
+    FIELD PrimaryName:LABEL("Primary Name"),DESCRIPTION("Primary Name, Street Name"),OPTIONAL,NULL("");
+    FIELD SecondaryRange:LABEL("Secondary Range"),DESCRIPTION("Secondary Range, Apt or Suite"),OPTIONAL,NULL("");
+    FIELD CityName_Vanity:LABEL("City"),DESCRIPTION("City"),OPTIONAL,NULL("");
+    FIELD State:LABEL("State"),DESCRIPTION("Two-letter state abbreviation"),OPTIONAL,NULL("");
+    FIELD Zip5:LABEL("Zip Code"),DESCRIPTION("5-Digit Zip Code"),OPTIONAL,NULL("");
+	FIELD LicenseNumber:LABEL("License Number"),DESCRIPTION("Medical License Number"),OPTIONAL,NULL("");				
+	FIELD LicenseState:LABEL("License Number State"),DESCRIPTION("2-Digit Medical License State"),OPTIONAL,NULL("");				
+	FIELD NPINumber:LABEL("NPI NUMBER"),DESCRIPTION("10-Digit Nation Provider Identification Number"),OPTIONAL,NULL("");								
+	FIELD DEANumber:LABEL("DEA NUMBER"),DESCRIPTION("9-Digit Drug Enforcement Administration Number"),OPTIONAL,NULL("");												
+    END
+END
+
+OUTPUTS
+    DATASET dsOutput(dsInput):PREFIX(INPUTS.Prefix), APPEND
+		UNSIGNED8 LexID;
+		STRING1	  Header_Entity_Type;
+		STRING9	  Header_SSN;
+		STRING9	  Header_Consumer_SSN;
+		UNSIGNED4 Header_DateOfBirth;
+		UNSIGNED4 Header_Consumer_DateOfBirth;
+		STRING25  Header_LicenseNumber;
+		STRING25  Header_CleanedLicenseNumber;
+		STRING2	  Header_LicenseState;
+		STRING60  Header_LicenseType;
+		STRING60  Header_LicenseStatus;
+		UNSIGNED4 Header_DateLicenseExpired; 
+		STRING1	  Header_DeathIndicator;
+		UNSIGNED4 Header_DateOfDeath;
+		UNSIGNED4 Header_BillingTaxID;
+		STRING10  Header_Phone;
+		STRING10  Header_Fax;
+		STRING6	  Header_UPIN;
+		STRING10  Header_NPINUMBER;
+		STRING1	  Header_DEABusinessActivityIndicator;		
+		STRING10  Header_DEANumber;
+		UNSIGNED4 Header_DateDEAExpired;
+		BOOLEAN	  Header_isStateSanction;
+		BOOLEAN	  Header_isOfficeOfInspectorGeneralSanction;
+		BOOLEAN	  Header_isOfficeOfPersonalManagementSanction;
+		STRING10  Header_Taxonomy;
+		STRING50  Header_TaxonomyDescription;		
+		STRING3	  Header_SpecialityCode;	
+		STRING1	  Header_ProviderStatus;
+		UNSIGNED4 Header_LicenseCount;
+		UNSIGNED4 Header_LicenseStateCount;
+		UNSIGNED4 Header_ActiveLicenseCount;
+		UNSIGNED4 Header_InactiveLicenseCount;
+		UNSIGNED4 Header_RevokedLicenseCount;
+		UNSIGNED4 Header_DEACount;
+		UNSIGNED4 Header_ActiveDEACount;
+		UNSIGNED4 Header_ExpiredDEACount;
+		UNSIGNED4 Header_DeactivedNPICount;		
+		STRING10  Header_PracticePrimaryRange;
+		STRING2   Header_PracticePreDirection;
+		STRING28  Header_PracticePrimaryName;
+		STRING4   Header_PracticeAddressSuffix;
+		STRING2   Header_PracticePostDirection;
+		STRING10  Header_PracticeUnitDesignation;
+		STRING8   Header_PracticeSecondaryRange;
+		STRING25  Header_PracticeCityName_Vanity;
+		STRING2   Header_PracticeState;
+		STRING5   Header_PracticeZip5;
+		UNSIGNED4 Header_PracticeAddressLastVerified;
+		UNSIGNED4 Client_DateLicenseExpired;
+		STRING60  Client_LicenseType;		
+		STRING60  Client_LicenseStatus;		
+		UNSIGNED4 Client_DateNPIDeactivated;
+		STRING1	  Client_NPIFlag;
+		UNSIGNED4 Client_DateDEAExpired;		
+		STRING1	  Client_DEA_FLAG;		
+	END
+
+    DATASET LexIDStats:PREFIX(INPUTS.Prefix),SIDE, WUID
+        INTEGER1  Hit;
+        INTEGER4  Cnt;
+    END    
+
+    DATASET ProvTypeStats:PREFIX(INPUTS.Prefix),SIDE, WUID
+        STRING	  Provider_Type;
+        INTEGER4  Cnt;
+    END    
+
+    DATASET ProvStatusStats:PREFIX(INPUTS.Prefix),SIDE, WUID
+        STRING	  Provider_Status;
+        INTEGER4  Cnt;
+    END    
+
+    DATASET PerStats:PREFIX(INPUTS.Prefix),SIDE, WUID
+        STRING  FieldName;
+        INTEGER FieldPercent;
+    END
+END
+
+VISUALIZE AppendProviderDataStats:LABEL("Append Provider Data Stats")
+	PIE LexIDHitCounts(LexIDStats{Hit, Cnt}) : TITLE("LexIDStats") , LABEL(Hit), WEIGHT (Cnt) , COLOR ("Red_Yellow_Blue"); 
+	PIE ProviderStatusCounts(ProvStatusStats{Provider_Status, Cnt}) : TITLE("ProviderStatus") , LABEL(Provider_Status), WEIGHT (Cnt) , COLOR ("Red_Yellow_Blue"); 
+	TABLE ProvidersTypeStats(ProvTypeStats{Provider_Type, Cnt}) : VALUE (Provider_Type, Cnt) , LABEL ("Provider_Type", "Count");	
+	TABLE FieldPopulationPercentage(PerStats{FieldName, FieldPercent}) : VALUE (FieldName, FieldPercent) , LABEL ("FieldName", "FieldPercentage");	
+END
+
+GENERATES INLINE 
+ IMPORT ut;
+ IMPORT Health_Provider_Services;
+ IMPORT HealthCareProvider;
+ 
+ LNPIDResults := Health_Provider_Services.mac_append_provider_best_data (%dsInput%, %LNPID%, 
+								%PrimaryRange%, %PrimaryName%, %SecondaryRange%, %CityName_Vanity%, %State%, %Zip5%,
+								%LicenseState%, %LicenseNumber%, 
+								%DEANumber%, %NPINumber%, '%Prefix%');
+
+ %^edsOutput% := LNPIDResults %^p%; 
+ %^eLexIDStats% := TABLE(%dsOutput%, {INTEGER %Prefix%Hit := MAP(%Prefix%LexID > 0 => 1, 0), %Prefix%Cnt := COUNT(GROUP)}, MAP(%Prefix%LexID > 0 => 1, 0), FEW); 
+ %^eProvTypeStats% := TABLE(%dsOutput% (Header_TaxonomyDescription <> ''), {%Prefix%Provider_Type := Header_TaxonomyDescription, %Prefix%Cnt := COUNT(GROUP)}, Header_TaxonomyDescription, FEW);
+ %^eProvStatusStats% := TABLE(%dsOutput%, {%Prefix%Provider_Status := MAP (Header_ProviderStatus IN ['N',''] => 'Active', Header_ProviderStatus IN ['U','D'] => 'Deceased', Header_ProviderStatus IN ['R'] => 'Retired','Other'), %Prefix%Cnt := COUNT(GROUP)}, MAP (Header_ProviderStatus IN ['N',''] => 'Active', Header_ProviderStatus IN ['U','D'] => 'Deacesed', Header_ProviderStatus IN ['R'] => 'Retired','Other'), FEW);
+
+ IMPORT HealthCareProvider;
+ PercentageResults := HealthCareProvider.Mac_Field_Percentage (%dsOutput%, '%Prefix%');
+ %^ePerStats% := TABLE (PercentageResults,{%Prefix%FieldName, %Prefix%FieldPercent}); 
+ENDGENERATES

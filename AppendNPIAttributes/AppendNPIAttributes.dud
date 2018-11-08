@@ -1,0 +1,50 @@
+ID "c847c974-ae34-4bc5-b809-e98800066e4b";
+NAME AppendNPIAttributes;
+LABEL "AppendNPIAttributes";
+CATEGORY APPEND;
+VERSION "1.0.0";
+AUTHOR "gaoyon01";
+DESCRIPTION "Append NPI attributes using provider data with client NPI as input";
+
+PERMISSIONS
+ VIEW:PUBLIC;
+ EDIT:PRIVATE;
+ RUN:PUBLIC;
+END
+ 
+INPUTS
+    STRING Prefix:LABEL("Append Column Prefix"),DEFAULT("");
+
+    DATASET dsInput:MAPBYNAME
+      FIELD ClientNPI:LABEL("ClientNPI"),DESCRIPTION("Client NPI");
+    END
+END
+
+OUTPUTS
+    DATASET dsOutput(dsInput):PREFIX(INPUTS.Prefix),APPEND
+      STRING1 EntityTypeCode;
+    END
+END
+
+GENERATES INLINE
+ IMPORT AppendNPIAttributes;
+
+ NPIResults := AppendNPIAttributes.MacAppendNPIAttributes(%dsInput%, %ClientNPI%, '%Prefix%');
+
+ %^edsOutput% := NPIResults %^p%; 
+
+ENDGENERATES
+
+RESOURCES
+    LOGICALFILE testinput:FILENAME("~dev::appendnpiattributes::appendnpiattributes::input"), URL("http://10.241.100.159:8010"), DALIIP("10.241.100.159"), CLUSTER("thor100_100dev");
+
+    INDEX Key_NPPES_NPI:FILENAME("~thor_data400::key::nppes::qa::npi"), URL("http://10.241.100.159:8010"), DALIIP("10.241.100.159"), CLUSTER("thor100_100dev");
+
+    ECL AppendNPIAttributes:FILENAME("AppendNPIAttributes"), URL("http:// 10.241.100.159:8145/WsAttributes");
+
+    FILE Checklist: FILENAME("AppendNPIAttributesChecklist.xlsx"),LABEL("Checklist");
+    FILE ReadMe : FILENAME("AppendNPIAttributes_ReadMe.txt"),LABEL("Plugin Readme File");
+    FILE AppendNPIAttributes_TestHarness: FILENAME("AppendNPIAttributes_TestHarness.txt"),LABEL("Test Harness");
+    FILE AppendNPIAttributes_BuildTestDataset: FILENAME("AppendNPIAttributes_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+    FILE AppendNPIAttributes_testcmp: FILENAME("AppendNPIAttributes_testcmp.txt"),LABEL("Plugin Test Composition");
+END

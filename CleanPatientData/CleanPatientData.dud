@@ -1,0 +1,165 @@
+ID "f432f2cd-c234-4f40-2342-89cf22567233e";
+NAME CleanPatientData;
+LABEL "Clean Patient Data";
+CATEGORY CLEAN;
+VERSION "1.0.0";
+AUTHOR "periassx";
+DESCRIPTION "Cleans and Standardizes Patient Name and Address";
+
+PERMISSIONS
+ VIEW:PUBLIC;
+ EDIT:PRIVATE;
+ RUN:PUBLIC;
+END
+ 
+INPUTS
+    STRING Prefix:LABEL("Append Column Prefix"),DEFAULT("CleanPatient");
+    DATASET dsInput:MAPBYNAME
+    FIELD PatientKey:LABEL("Patient Key"),DESCRIPTION("Primary Key Used To Uniquely Identify Each Distinct Patient");
+    FIELD PatientNumber:LABEL("Patient Number"),DESCRIPTION("The ID Of The Member/Patient The Claim Processed Against");
+    FIELD PatientSequenceNumber:LABEL("Patient Sequence Number"),DESCRIPTION("The Number Is Used to Distinguish Dependents");
+    FIELD SecurityCode:LABEL("Security Code"),DESCRIPTION("The Code Is Used To Determine Level Of Security For Investigators To View PII Data");
+    FIELD PatientRelation:LABEL("Patient Relation"),DESCRIPTION("The Code Is Used To Identify Patient Relationship To Primary Insured");	
+	FIELD SSN:LABEL("Patient SSN"),DESCRIPTION("9-Digit Patient Social Security Number"),OPTIONAL,NULL("");								
+    FIELD FirstName:LABEL("First Name"),DESCRIPTION("First Name");
+	FIELD MiddleName:LABEL("Middle Name"),DESCRIPTION("Last Name");
+    FIELD LastName:LABEL("Last Name"),DESCRIPTION("Last Name");
+	FIELD AddressLine1:LABEL("Address Line 1"),DESCRIPTION("Address Line 1"),OPTIONAL,NULL("");				
+	FIELD AddressLine2:LABEL("Address Line 2"),DESCRIPTION("Address Line 2"),OPTIONAL,NULL("");				
+	FIELD City:LABEL("City"),DESCRIPTION("City"),OPTIONAL,NULL("");
+	FIELD State:LABEL("State"),DESCRIPTION("Two-letter state abbreviation"),OPTIONAL,NULL("");
+	FIELD Zip5:LABEL("Zip Code"),DESCRIPTION("5-Digit Zip Code"),OPTIONAL,NULL("");
+	FIELD County:LABEL("County"),DESCRIPTION("County Name"),OPTIONAL,NULL("");																
+	FIELD Country:LABEL("Country"),DESCRIPTION("2-Byte Country Code"),OPTIONAL,NULL("");																
+	FIELD DateOfBirth:LABEL("Date Of Birth"),DESCRIPTION("Date Of Birth"),OPTIONAL,NULL("");																
+	FIELD Gender:LABEL("Gender"),DESCRIPTION("Gender"),OPTIONAL,NULL("");																
+	FIELD DateOfDeath:LABEL("Date Of Death"),DESCRIPTION("Date Of Death"),OPTIONAL,NULL("");																	
+	FIELD InsuredEligibleEffectiveDate:LABEL("Insured Eligible Effective Date"),DESCRIPTION("Identifies The Eligibility Effective Date Of The Insured"),OPTIONAL,NULL("");																
+	FIELD InsuredEligibleExpirationDate:LABEL("Insured Eligible Expiration Date"),DESCRIPTION("Identifies The Eligibility Expiration Date Of The Insured"),OPTIONAL,NULL("");																
+	FIELD InsuredEligibleCoverageType:LABEL("Insured Eligible Coverage Type"),DESCRIPTION("Identifies The Coverage Type Of The Insured"),OPTIONAL,NULL("");																
+	FIELD InsuredEligibleStatus:LABEL("Insured Eligible Status"),DESCRIPTION("Identifies The Status Of The Coverage Of The Insured"),OPTIONAL,NULL("");																
+	FIELD PrimaryMemberKey:LABEL("Primary Member Key"),DESCRIPTION("Primary Member Key"),OPTIONAL,NULL("");																
+	FIELD PrimaryInsuredSSN:LABEL("Primary Insured SSN"),DESCRIPTION("Primary Insured Social Security Number"),OPTIONAL,NULL("");																
+	FIELD PrimaryInsuredNumber:LABEL("Primary Insured Identification Number"),DESCRIPTION("Identifies The Status Of The Coverage Of The Insured"),OPTIONAL,NULL("");																
+	FIELD PrimaryInsuredPolicyNumber:LABEL("Primary Insured Policy Number"),DESCRIPTION("Primary Insured Policy Number"),OPTIONAL,NULL("");																
+	FIELD PrimaryInsuredGroupNumber:LABEL("Primary Insured Group Number"),DESCRIPTION("Primary Insured Group Number"),OPTIONAL,NULL("");																
+	FIELD PrimaryInsuredDivisionNumber:LABEL("Primary Insured Division Number"),DESCRIPTION("Primary Insured Division Number"),OPTIONAL,NULL("");																
+	FIELD PatientLatestUpdateDate:LABEL("Patient Last Update Date"),DESCRIPTION("Patient Last Update Date"),OPTIONAL,NULL("");																
+	FIELD UserDefinedField01:LABEL("User Defined Field 01"),DESCRIPTION("User Defined Field Needed For Displaying or Reporting"),OPTIONAL,NULL("");																
+	FIELD UserDefinedField02:LABEL("User Defined Field 02"),DESCRIPTION("User Defined Field Needed For Displaying or Reporting"),OPTIONAL,NULL("");																
+	FIELD UserDefinedField03:LABEL("User Defined Field 03"),DESCRIPTION("User Defined Field Needed For Displaying or Reporting"),OPTIONAL,NULL("");																
+	FIELD UserDefinedField04:LABEL("User Defined Field 04"),DESCRIPTION("User Defined Field Needed For Displaying or Reporting"),OPTIONAL,NULL("");																
+	FIELD UserDefinedField05:LABEL("User Defined Field 05"),DESCRIPTION("User Defined Field Needed For Displaying or Reporting"),OPTIONAL,NULL("");																
+	FIELD UserDefinedField06:LABEL("User Defined Field 06"),DESCRIPTION("User Defined Field Needed For Displaying or Reporting"),OPTIONAL,NULL("");																
+	FIELD UserDefinedField07:LABEL("User Defined Field 07"),DESCRIPTION("User Defined Field Needed For Displaying or Reporting"),OPTIONAL,NULL("");																
+	FIELD UserDefinedField08:LABEL("User Defined Field 08"),DESCRIPTION("User Defined Field Needed For Displaying or Reporting"),OPTIONAL,NULL("");																
+	FIELD UserDefinedField09:LABEL("User Defined Field 09"),DESCRIPTION("User Defined Field Needed For Displaying or Reporting"),OPTIONAL,NULL("");																
+	FIELD UserDefinedField10:LABEL("User Defined Field 10"),DESCRIPTION("User Defined Field Needed For Displaying or Reporting"),OPTIONAL,NULL("");																
+    END
+END
+
+OUTPUTS
+    DATASET dsOutput(dsInput):PREFIX(INPUTS.Prefix), APPEND
+		STRING20 FirstName;
+		STRING20 MiddleName;
+		STRING20 LastName;
+		STRING5	 NameSuffix;
+		STRING10 PrimaryRange; 	
+		STRING2  PreDirectional;	
+		STRING28 PrimaryName;
+		STRING4  AddressSuffix; 
+		STRING2  PostDirectional;
+		STRING10 UnitDesignation;
+		STRING8  SecondaryRange;
+		STRING25 PostalCity;
+		STRING25 VanityCity;
+		STRING2  State;
+		STRING5  Zip5;
+		STRING4  Zip4;
+		STRING2  DBPC;
+		STRING1  CheckDigit;
+		STRING2  RecordType;
+		STRING2  FipsState;
+		STRING3  County;
+		STRING10 Latitude;
+		STRING11 Longitude;
+		STRING4  Msa;
+		STRING7  GeoBlock;
+		STRING1  GeoMatchCode;
+		STRING4  ErrorStatus;
+    END
+
+    DATASET PerStats:PREFIX(INPUTS.Prefix),SIDE, WUID
+        STRING  FieldName;
+        INTEGER FieldPercent;
+    END 
+END
+
+VISUALIZE ProviderStats : LABEL("Clean Patient Data Stats")
+	TABLE FieldPopulationPercentage(PerStats{FieldName, FieldPercent}) : VALUE (FieldName, FieldPercent), LABEL("FieldName", "FieldPercentage");	
+END
+
+GENERATES INLINE
+ import HealthCare;
+ CleanData := HealthCare.mac_clean_patient_data (%dsInput%,
+															   %PatientKey%,																   
+															   %PatientNumber%,
+																%PatientSequenceNumber%,
+																%SecurityCode%,
+																%PatientRelation%,
+																%SSN%,
+																%FirstName%,
+																%MiddleName%,
+																%LastName%,
+																%AddressLine1%,
+																%AddressLine2%,
+																%City%,
+																%State%,
+																%Zip5%,
+																%County%,
+																%Country%,
+																%DateOfBirth%,
+																%Gender%,
+																%DateOfDeath%,
+																%InsuredEligibleEffectiveDate%,
+																%InsuredEligibleExpirationDate%,
+																%InsuredEligibleCoverageType%,
+																%InsuredEligibleStatus%,
+																%PrimaryMemberKey%,
+																%PrimaryInsuredSSN%,
+																%PrimaryInsuredNumber%,
+																%PrimaryInsuredPolicyNumber%,
+																%PrimaryInsuredGroupNumber%,
+																%PrimaryInsuredDivisionNumber%,
+																%PatientLatestUpdateDate%,
+																%UserDefinedField01%,
+																%UserDefinedField02%,
+																%UserDefinedField03%,
+																%UserDefinedField04%,
+																%UserDefinedField05%,
+																%UserDefinedField06%,
+																%UserDefinedField07%,
+																%UserDefinedField08%,
+																%UserDefinedField09%,
+																%UserDefinedField10%,
+																'%Prefix%');
+ %^edsOutput% := CleanData %^p%;	
+
+ import HealthCare;
+ PercentageResults := HealthCare.Mac_Field_Percentage (%dsInput%, '%Prefix%');
+ %^ePerStats% := TABLE (PercentageResults,{%Prefix%FieldName, %Prefix%FieldPercent}); 
+ENDGENERATES		
+
+RESOURCES
+    FILE ReadMe:FILENAME("CleanPatientData_ReadMe.txt"),DESCRIPTION("README for this plugin"),LABEL("ReadMe");
+    FILE localfile:FILENAME("CleanPatientData_testcmp.txt"),DESCRIPTION("Test composition for running this plugin"),LABEL("Test composition");
+    LOGICALFILE test:FILENAME("~qa::cleanpatientdata::cleanpatientdata::input"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+    ECL UT:FILENAME("ut"), URL("http://10.241.100.153:8010");
+    ECL HealthCare:FILENAME("HealthCare"), URL("http://10.241.100.153:8010");	
+    ECL HealthCareProvider:FILENAME("HealthCareProvider"), URL("http://10.241.100.153:8010");
+    ECL Address:FILENAME("Address"), URL("http://10.241.100.153:8010");	
+    FILE CleanPatientData_BuildTestDataset: FILENAME("CleanPatientData_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+    FILE CleanPatientData_TestHarness: FILENAME("CleanPatientData_TestHarness.txt"),LABEL("Test Harness");
+    FILE CleanPatientDataChecklist: FILENAME("CleanPatientDataChecklist.xlsx"),LABEL("Checklist");	
+END
+

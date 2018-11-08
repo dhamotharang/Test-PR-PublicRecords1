@@ -1,0 +1,72 @@
+ID "HIPIE_Plugins.Business.ComputeBusinessAttributes_cmp";
+NAME computebusinessattributes_testcmp;
+LABEL "Test composition for Compute Business Attributes";
+DESCRIPTION "Auto-generated test composition for plugin ComputeBusinessAttributes";
+VERSION "1.0.0";
+AUTHOR "CarmigJX";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING CompareWUID: DEFAULT("W20171213-102757");
+END
+
+INSTANCE HIPIE_Plugins.OutDataset.OutDataset(Ins004): LABEL("Output Dataset"),VERSION("1.0.0")
+	dsInput="^Ins003|dsOutput"
+	name="~qa::business::computebusinessattributes::output"
+	Method="THOR"
+END
+
+INSTANCE HIPIE_Plugins.Business.ComputeBusinessAttributes(Ins003): LABEL("Compute Business Attributes"),VERSION("1.1.0")
+	dsInput="^Ins002|dsOutput"
+  UltID="ultid"
+  SeleID="seleid"
+  ProxID="proxid"
+  DateFirstSeen="datefirstseen"
+  DateLastSeen="datelastseen"
+  NewBusinessThreshold="180"
+  InactiveThreshold="18"
+  Prefix="Test"
+END
+
+INSTANCE HIPIE_Plugins.Business.ComputeBusinessAttributes(Ins002): LABEL("Compute Business Attributes"),VERSION("1.1.0")
+	dsInput="^Ins001|dsOutput"
+  UltID="ultid"
+  SeleID="seleid"
+  ProxID="proxid"
+  DateFirstSeen="datefirstseen"
+  DateLastSeen="datelastseen"
+  NewBusinessThreshold="200"
+  InactiveThreshold="24"
+  Prefix="BIPAttributes"
+END
+
+INSTANCE HIPIE_Plugins.UseDataset.UseDataset(Ins001): LABEL("Use Dataset"),VERSION("1.1")
+	LogicalFilename="~qa::business::computebusinessattributes::input"
+	Structure="RECORD
+    integer8 ultid;
+    integer8 seleid;
+    integer8 proxid;
+    string recordid;
+    string accountno;
+    string companyname;
+    string10 primaryrange;
+    string2 predirectional;
+    string28 primaryname;
+    string4 addresssuffix;
+    string2 postdirectional;
+    string10 unitdesignation;
+    string8 secondaryrange;
+    string25 city;
+    string2 state;
+    string5 zip;
+    string4 zip4;
+    string18 county;
+    integer4 datefirstseen;
+    integer4 datelastseen;
+  END;"
+	Method="THOR"
+END

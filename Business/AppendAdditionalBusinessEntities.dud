@@ -1,0 +1,117 @@
+﻿ID "4d74107b-4a18-4320-9221-1e938d4d8915";
+NAME AppendAdditionalBusinessEntities;
+LABEL "Append Additional Business Entities";
+VERSION "1.2.0";
+AUTHOR "CarmigJX";
+CATEGORY COMPUTE;
+DESCRIPTION "Adds additional rows of business entities that are not in the input dataset";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+  STRING Prefix: LABEL("Append Column Prefix"),DESCRIPTION("Prefix to be appended to the new fields"), OPTIONAL, DEFAULT("");
+  DATASET dsInput: MAPBYNAME
+		FIELD UltID: LABEL("UltID"),DESCRIPTION("UltID");
+		FIELD SeleID: LABEL("SeleID"),DESCRIPTION("SeleID");
+		FIELD ProxID: LABEL("ProxID"),DESCRIPTION("ProxID");
+		FIELD CompanyName: LABEL("Company Name"),DESCRIPTION("Company Name");
+		FIELD PrimaryRange: LABEL("Primary Range"),DESCRIPTION("Primary Range, street number");
+		FIELD PreDirectional: LABEL("Pre Directional"),DESCRIPTION("Pre Directional");
+		FIELD PrimaryName: LABEL("Primary Name"),DESCRIPTION("Primary Name, street name");
+		FIELD AddressSuffix: LABEL("Address Suffix"),DESCRIPTION("Address Suffix");
+		FIELD PostDirectional: LABEL("Post Directional"),DESCRIPTION("Post Directional");
+		FIELD UnitDesignation: LABEL("UnitDesignation"),DESCRIPTION("UnitDesignation");
+		FIELD SecondaryRange: LABEL("Secondary Range"),DESCRIPTION("Secondary Range, Apt or Suite");
+		FIELD PostalCity: LABEL("Postal City"),DESCRIPTION("Postal City");
+		FIELD VanityCity: LABEL("Vanity City"),DESCRIPTION("Vanity City");
+		FIELD State: LABEL("State"),DESCRIPTION("Two-letter state abbreviation");
+		FIELD Zip5: LABEL("5-Digit Zip Code"),DESCRIPTION("Zip Code 5");
+		FIELD Zip4: LABEL("4-Digit Zip Code"),DESCRIPTION("Zip Code 4");
+		FIELD County: LABEL("County"),DESCRIPTION("County");
+		FIELD Latitude: LABEL("Latitude"),DESCRIPTION("Latitude");
+		FIELD Longitude: LABEL("Longitude"),DESCRIPTION("Longitude");
+    FIELD FullAddress: LABEL("Full Address"), DESCRIPTION("Full address column"), OPTIONAL, NULL("");
+	END
+	ENUM("False","True") ReturnInactive: LABEL("Add inactive businesses?"),DESCRIPTION("Returns businesses that are no longer active"),OPTIONAL,DEFAULT("False");
+	ENUM("False","True") AddAllBusinesses: LABEL("Add all missing businesses?"),DESCRIPTION("Returns all the businesses within a jurisdiction"),OPTIONAL,DEFAULT("False");
+	ENUM("AK","AL","AR","AZ","CA","CO","CT","DE","DC","FL","GA","HI","IA","ID","IL","IN","KS","KY","LA","MA","MD","ME","MI","MN","MO","MS","MT","NC","ND","NE","NH","NJ","NM","NV","NY","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VA","VT","WA","WI","WV","WY","AS","GU","MP","CM","PR","VI","FM","MH","PW","AA","AE","AP") JurisdictionStates: LABEL("Jurisdiction States"), DESCRIPTION("States to look for new business entities"), MANY, ROWS(10);
+  STRING DPPAPURPOSE:LABEL("DPPA Purpose"),DEFAULT("^GLOBAL|DPPAPURPOSE");
+  STRING GLBPURPOSE:LABEL("GLB Purpose"),DEFAULT("^GLOBAL|GLBPURPOSE");
+  STRING DATARESTRICTIONMASK:LABEL("Data Restriction Mask"),DEFAULT("^GLOBAL|DATARESTRICTIONMASK");
+END
+
+OUTPUTS
+	DATASET dsOutput(dsInput): PREFIX(INPUTS.Prefix)
+    INTEGER1 IsUltInput;
+    INTEGER1 IsSeleInput;
+    INTEGER1 IsProxInput;
+    INTEGER1 IsNewBusinessHierarchy: OPTIONAL;
+  END
+	DATASET HitStats: SIDE,WUID
+		INTEGER NewUltIDCnt: FEW;
+		INTEGER OldUltIDCnt: FEW;
+		INTEGER NewSeleIDCnt: FEW;
+		INTEGER OldSeleIDCnt: FEW;
+		INTEGER NewProxIDCnt: FEW;
+		INTEGER OldProxIDCnt: FEW;
+    INTEGER NewBIPIDCnt:  FEW;
+		STRING County;
+		STRING State: FEW;
+  END
+	DATASET UltStats: SIDE, WUID
+		INTEGER NewProxIDCnt: FEW;
+		STRING UltID;
+	END
+END
+
+VISUALIZE AppendAdditionalBusinessEntitiesStats: LABEL("Append Additional Business Entities Stats")
+	TABLE StateHitRate(HitStats{State, SUM(NewUltIDCnt), SUM(OldUltIDCnt), SUM(NewSeleIDCnt), SUM(OldSeleIDCnt), SUM(NewProxIDCnt), SUM(OldProxIDCnt)}): 
+		TITLE("State Hit Rate"),
+		LABEL("State","New UltID Count","Old UltID Count","New SeleID Count","Old SeleID Count","New ProxID Count","Old ProxID Count"),
+		VALUE(State,SUM(NewUltIDCnt),SUM(OldUltIDCnt),SUM(NewSeleIDCnt),SUM(OldSeleIDCnt),SUM(NewProxIDCnt),SUM(OldProxIDCnt)),
+		SORT(-SUM(NewUltIDCnt), -SUM(NewSeleIDCnt), -SUM(NewProxIDCnt)),
+		SELECTS(State->CountyMap.State,MERGE);
+	CHORO CountyMap(HitStats{County, State, NewBIPIDCnt}) : 
+		TITLE("County Map"),
+		COUNTY(County),
+		FILTER(State),
+		WEIGHT(NewBIPIDCnt),
+		COLOR("Red_Yellow_Blue");
+	TABLE UltIDWithMostNewProxID(UltStats):TITLE("UltIDs with Most New ProxIDs"), LABEL("UltID", "New ProxID Count"), VALUE(UltID,NewProxIDCnt);
+END
+
+GENERATES INLINE
+	IMPORT Business, STD;
+	
+	sJurisdictionStates := Std.Str.SplitWords(%^qJurisdictionStates%,',');
+
+	BusinessWithNewEntities := Business.macAppendAdditionalBusinessEntities(%dsInput%, %UltID%, %SeleID%, %ProxID%, %CompanyName%,
+															%PrimaryRange%,%PreDirectional%,%PrimaryName%,%AddressSuffix%,%PostDirectional%,
+															%UnitDesignation%,%SecondaryRange%,%PostalCity%,%VanityCity%,%State%,
+															%Zip5%, %Zip4%,%Latitude%,%Longitude%,%County%, sJurisdictionStates, ,%^qPrefix%,%FullAddress%,
+                              %^qDATARESTRICTIONMASK%,%^qGLBPURPOSE%,%^qDPPAPURPOSE%,
+                              %ReturnInactive%, %AddAllBusinesses%);	
+														 
+	%^edsOutput% 	:= BusinessWithNewEntities %^p%;
+	%^eHitStats%	:= TABLE(%dsOutput%,{NewUltIDCnt:=COUNT(GROUP, %Prefix%isUltInput=0 AND %Prefix%isProxInput=1), OldUltIDCnt:=COUNT(GROUP, %Prefix%isUltInput=1 AND %Prefix%isProxInput=1),
+    NewSeleIDCnt:=COUNT(GROUP, %Prefix%isSeleInput=0 AND %Prefix%isProxInput=1), OldSeleIDCnt:=COUNT(GROUP, %Prefix%isSeleInput=1 AND %Prefix%isProxInput=1), 
+    NewProxIDCnt:=COUNT(GROUP, %Prefix%isProxInput=0), OldProxIDCnt:=COUNT(GROUP, %Prefix%isProxInput=1), 
+    NewBIPIDCnt := COUNT(GROUP, %Prefix%isUltInput=0 OR %Prefix%isSeleInput=0 OR %Prefix%isProxInput=0), 
+    STRING County:=(STRING)%County%, STRING State:=%State%}, %State%, %County%, MERGE);
+	%^eUltStats%	:= TOPN(TABLE(%dsOutput%,{NewProxIDCnt:=COUNT(GROUP, %Prefix%isProxInput = 0), STRING UltID := (STRING)%UltID%}, %UltID%, MERGE), 50, -NewProxIDCnt);
+ENDGENERATES
+
+
+RESOURCES
+	FILE readme: FILENAME("AppendAdditionalBusinessEntities_README.txt"),LABEL("Plugin Readme File");
+	FILE AppendAdditionalBusinessEntities_testcmp: FILENAME("AppendAdditionalBusinessEntities_testcmp.txt"),LABEL("Plugin Test Composition");
+	FILE AppendAdditionalBusinessEntities_BuildTestDataset: FILENAME("AppendAdditionalBusinessEntities_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+	ECL  Business:FILENAME("Business"), URL("<http://10.241.100.153:8010>"); 
+	ECL  BIPV2:FILENAME("BIPV2"), URL("<http://10.241.100.153:8010>"); 
+	ECL  hipie_ecl:FILENAME("hipie_ecl"), URL("<http://10.241.100.153:8010>"); 
+	ECL  AppendCleanAddress:FILENAME("AppendCleanAddress"), URL("<http://10.241.100.153:8010>"); 
+	INDEX Keys.Key_BestStaticLinkIDs:FILENAME("~thor_data400::key::bipv2_best::qa::linkids"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100dev");    
+END

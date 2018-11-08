@@ -1,0 +1,77 @@
+ID "e543f3cd-c453-4f40-4242-89cf5353353e";
+NAME CleanClaimData;
+LABEL "Clean Medical Claim Data";
+CATEGORY CLEAN;
+VERSION "1.0.0";
+AUTHOR "sasisa01";
+DESCRIPTION "Cleans Claim Data";
+
+PERMISSIONS
+ VIEW:PUBLIC;
+ EDIT:PRIVATE;
+ RUN:PUBLIC;
+END
+ 
+INPUTS
+    STRING Prefix:LABEL("Append Column Prefix"),DEFAULT("CleanClaim");
+    DATASET dsInput:MAPBYNAME
+    FIELD ProviderKey:LABEL("Provider Key"),DESCRIPTION("Primary Key Used To Uniquely Identify Each Distinct Provider");
+    FIELD PatientKey:LABEL("Patient Key"),DESCRIPTION("Primary Key Used To Uniquely Identify Each Distinct Patient");								
+    FIELD ClaimNumber:LABEL("CLAIM NUMBER"),DESCRIPTION("Claim Identifier Number"),OPTIONAL,NULL("");												
+	FIELD ClaimLineNumber:LABEL("CLAIM LINE NUMBER"),DESCRIPTION("Claim Line Identifier Number Within Each Claim"),OPTIONAL,NULL("");												
+	FIELD BeginingDateOfService:LABEL("BEGINING DATE OF SERVICE"),DESCRIPTION("Begining Date For The Service Provided To The Patient"),OPTIONAL,NULL("");																
+    FIELD EndingDateOfService:LABEL("ENDING DATE OF SERVICE"),DESCRIPTION("Ending Date For The Service Provided To The Patient"),OPTIONAL,NULL("");																
+    FIELD ServiceDate:LABEL("SERVICE DATE"),DESCRIPTION("Service Date"),OPTIONAL,NULL("");
+    FIELD ChargeAmount:LABEL("CHARGE AMOUNT"),DESCRIPTION("Amount Charged For The Service By Provider"),OPTIONAL,NULL("");
+    FIELD PaidAmount:LABEL("PAID AMOUNT"),DESCRIPTION("Amount Paid For The Service By Patient"),OPTIONAL,NULL("");
+    END
+END
+
+OUTPUTS
+    DATASET dsOutput(dsInput):PREFIX(INPUTS.Prefix), APPEND
+		STRING50 ProviderKey;
+		STRING50 PatientKey;
+		STRING55 ClaimNumber;
+		STRING10 ClaimLineNumber;
+		STRING8	 BeginingDateOfService;
+		STRING8  EndingDateOfService; 	
+		STRING8  ServiceDate;	
+		STRING18 ChargeAmount;
+		STRING18 PaidAmount; 
+	END
+
+    DATASET PerStats:PREFIX(INPUTS.Prefix),SIDE,WUID 
+        STRING  FieldName;
+        INTEGER FieldPercent;
+    END 
+
+END
+
+VISUALIZE ProviderStats : LABEL("Provider File Stats")
+	TABLE FieldPopulationPercentage(PerStats{FieldName, FieldPercent}) : VALUE (FieldName, FieldPercent), LABEL("FieldName", "FieldPercentage");	
+END
+
+GENERATES INLINE
+ IMPORT HealthCare, STD, HealthCareProvider,CleanClaimData;
+ CleanData := CleanClaimData.mac_clean_claim_data (%dsInput%,%ProviderKey%,%PatientKey%,%ClaimNumber%,%ClaimLineNumber%,%BeginingDateOfService%,%EndingDateOfService%,
+                                                  %ServiceDate%,%ChargeAmount%,%PaidAmount%, '%Prefix%');
+												  
+ %^edsOutput% := CleanData %^p%;	
+ 
+ IMPORT HealthCare;
+ PercentageResults := HealthCare.Mac_Field_Percentage (%dsInput%, '%Prefix%');
+ %^ePerStats% := TABLE (PercentageResults,{%Prefix%FieldName, %Prefix%FieldPercent}); 
+ENDGENERATES		
+
+
+RESOURCES
+    ECL STD:FILENAME("std"), URL("http://10.241.100.153:8010");
+	ECL HealthCare:FILENAME("HealthCare"), URL("http://10.241.100.153:8010");	
+	ECL HealthCareProvider:FILENAME("HealthCareProvider"), URL("http://10.241.100.153:8010");
+	ECL CleanClaimData:FILENAME("CleanClaimData"), URL("http://10.241.100.153:8010");
+	FILE ReadMe:FILENAME("CleanClaimData_ReadMe.txt"),DESCRIPTION("ReadMe for this plugin"),LABEL("ReadMe");
+	FILE CleanClaimData_testcmp: FILENAME("CleanClaimData_testcmp.txt"),LABEL("Plugin Test Composition");
+    FILE CleanClaimData_BuildTestDataset: FILENAME("CleanClaimData_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+    FILE CleanClaimData_TestHarness: FILENAME("CleanClaimData_TestHarness.txt"),LABEL("Test Harness");
+    FILE CleanClaimDataChecklist: FILENAME("CleanClaimDataChecklist.xlsx"),LABEL("Checklist");	
+END

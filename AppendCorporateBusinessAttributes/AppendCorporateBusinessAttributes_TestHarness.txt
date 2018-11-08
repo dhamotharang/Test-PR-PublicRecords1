@@ -1,0 +1,5 @@
+testcompositionrun_info
+Monitoring WU W20170504-143501(HIPIE_BCTLWXCARMIGJX_AppendCorporateBusinessAttributes_testcmp_CarmigJX) to completion.
+
+testcompositionrun_err
+Plugin AppendCorporateBusinessAttributes passed compliance check

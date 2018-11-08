@@ -1,0 +1,52 @@
+Plugin AppendNpiAttributes parsed correctly
+Plugin AppendNpiAttributes passed validation
+Plugin AppendNpiAttributes has Readme file AppendNpiAttributes_README.txt defined as a FILE Resource
+
+Plugin AppendNpiAttributes has test data bwr file AppendNpiAttributes_BuildTestDataset.ecl defined a
+s a FILE Resource
+Plugin AppendNpiAttributes has composition file AppendNpiAttributes_testcmp.txt defined as a FILE Re
+source
+Plugin AppendNpiAttributes has valid RESOURCES
+Plugin AppendNpiAttributes has valid test composition AppendNpiAttributes_testcmp.txt
+Plugin AppendNpiAttributes's test composition AppendNpiAttributes_testcmp has CompareWUID input
+Plugin AppendNpiAttributes's test composition AppendNpiAttributes_testcmp has ID defined
+Plugin AppendNpiAttributes's test composition AppendNpiAttributes_testcmp has a successful workunit
+run W20180626-112258
+Beginning attempt to run test composition AppendNpiAttributes_testcmp on cluster http://10.241.100.1
+59:8010/
+Loaded Function file functions
+Loaded Function file fn_getmostrecentservice
+Loaded Function file hipieconfig
+Loaded Function file fn_deployservices
+Loaded Function file hipie_layouts
+Loaded Function file workunitfunctions
+Loaded Function file sleep
+Loaded Function file utils
+Loaded Function file queryfunctions
+Loaded Function file filefunctions
+Loaded Function file packagefunctions
+Loaded Function file fn_getfields
+Loaded Function file errors
+Loaded Function file validate
+Deleting temporary dir c:\users\gaoyon01\hipie_eclide\10.241.100.159\gaoyon01_AppendNpiAttributes_te
+stcmp
+Syntax Checking HIPIE_ORLLW7GAOYON01_AppendNpiAttributes_testcmp_gaoyon01
+Syntax Checking HIPIE_ORLLW7GAOYON01_AppendNpiAttributes_testcmp_gaoyon01_deleteOldFiles
+Monitoring WU W20180626-113227(HIPIE_ORLLW7GAOYON01_AppendNpiAttributes_testcmp_gaoyon01) to complet
+ion.
+Plugin AppendNpiAttributes's test composition AppendNpiAttributes_testcmp ran on cluster http://10.2
+41.100.159:8010/ and created workunit W20180626-113227 with status completed
+Plugin AppendNpiAttributes's test composition AppendNpiAttributes_testcmp ran and completed with sta
+te "completed"
+Control workunit W20180626-112258 and this test workunit W20180626-113227 had the same number of res
+ults
+Control workunit W20180626-112258has no outputs that are missing from test workunit W20180626-113227
+
+No results were found in test workunit W20180626-113227 that weren't in the control workunit W201806
+26-112258
+All workunit results had the same number of records in the control workunit W20180626-112258 and thi
+s test workunit W20180626-113227
+The content of all workunit results was the same in the control workunit W20180626-112258 and the cu
+rrent test workunit W20180626-113227
+Plugin AppendNpiAttributes passed compliance check
+Plugin AppendNpiAttributes passed compliance check

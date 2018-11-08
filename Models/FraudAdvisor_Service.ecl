@@ -499,7 +499,6 @@ input_ok := if( (model_name='fp31604_0'
 						TRUE,
 						ERROR(301,doxie.ErrorCodes(301)));
 						
-
 //=============================================================
 //===  Description: This is the attribute version section. 
 //===  This defines all the different version of attributes 
@@ -509,15 +508,18 @@ attrV1 := 'version1';                       //version1 attributes
 attrV2 := 'fraudpointattrv2';               //version2 attributes
 IDattr := 'idattributes';                   //idattributes
 Paroattributes := Models.FraudAdvisor_Constants.attrvparo; //custom attributes for Paro
-attrV201 := 'fraudpointattrv201';           //custom attributes for Amex
-attributesV2set := [attrV2, attrV201]; 
+attrV201 := 'fraudpointattrv201';
+attrV202 := 'fraudpointattrv202';
+attrV203 := 'fraudpointattrv203';           //custom attributes for Amex
+attributesV2set := [attrV2, attrV201, attrV202, attrV203]; 
 
 doAttributesVersion1 := EXISTS(attributesIn(stringlib.stringtolowercase(name) = attrV1));	                        // output version1 if requested
 doIDAttributes := EXISTS(attributesIn(StringLib.StringToLowerCase(name) = IDattr));                               // Output IDAttributes if requested
 doAttributesVersion2 := EXISTS(attributesIn(stringlib.stringtolowercase(name) in attributesV2set)) and input_ok;	// output version2 if requested and minimum input entered
 doAttributesVersion201 := EXISTS(attributesIn(stringlib.stringtolowercase(name) = attrV201)) and input_ok;	      // output version201 if requested and minimum input entered
+doAttributesVersion202 := EXISTS(attributesIn(stringlib.stringtolowercase(name)=attrV202)) and input_ok;	        // output version202 if requested and minimum input entered
+doAttributesVersion203 := EXISTS(attributesIn(stringlib.stringtolowercase(name)=attrV203)) and input_ok;	        // output version203 if requested and minimum input entered
 doParoAttributes := EXISTS(attributesIn(stringlib.stringtolowercase(name) = Paroattributes)) and input_ok;	      // output Paro attrs if requested and minimum input entered
-
 
 risk_indicators.layout_input into_test_prep(r l) := transform
 	self.seq := l.seq;	
@@ -535,7 +537,7 @@ DisableInquiriesInCVI := True;																																								//Disable 
 unsigned3 LastSeenThresholdIn := map(	
 																		model_name IN ['fp1702_1','fp1702_2'] => risk_indicators.iid_constants.max_unsigned3,
 																		model_name IN ['fp1403_2','fp1510_2'] => 730, 
-																		doAttributesVersion201 => 9999,
+																		doAttributesVersion201 OR doAttributesVersion202 OR doAttributesVersion203 => 9999,
 																		risk_indicators.iid_constants.oneyear);	//Last Seen Threshold: 365 days (1 year) for fp1403_2, otherwise use default
 DisallowInsurancePhoneHeaderGateway := FALSE;																																	//Set to True to deny access to Insurance Phone Header Gateway
 boolean doInquiries := ~DisableInquiriesInCVI AND dataRestriction[risk_indicators.iid_constants.posInquiriesRestriction]<>risk_indicators.iid_constants.sTrue AND model_name IN ['fp1403_2','fp1510_2'];
@@ -566,7 +568,7 @@ isUtility					:= IF(isWFS34 OR doIDAttributes, FALSE, inIsUtility);
 // new options for fp attributes 2.0
 IncludeDLverification := if(doAttributesVersion2, true, false);
 bsVersion := map(
-  model_name IN Models.FraudAdvisor_Constants.BS_Version53_List or doParoAttributes => 53,
+  model_name IN Models.FraudAdvisor_Constants.BS_Version53_List or doParoAttributes or doAttributesVersion203 or doAttributesVersion202 => 53,
 	model_name IN ['fp1706_1','fp1705_1'] => 52,
 	model_name IN ['fp1506_1', 'fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9','fp1509_1','fp1512_1',
 		'fp31604_0', 'fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1','fp1609_2','fp1607_1'] => 51, 
@@ -591,7 +593,7 @@ unsigned8 BSOptions := map(model_name='fp31604_0' and input_ok   => Risk_indicat
 													 or doAttributesVersion2               => Risk_indicators.iid_constants.BSOptions.IncludeDoNotMail
 																																	+ Risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity
 																																	+ risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary
-																																	+ If(doAttributesVersion201,  Risk_indicators.iid_constants.BSOptions.AllowInsuranceDLInfo
+																																	+ If(doAttributesVersion201 OR doAttributesVersion202 OR doAttributesVersion203,  Risk_indicators.iid_constants.BSOptions.AllowInsuranceDLInfo
 																																															+ Risk_indicators.iid_constants.BSOptions.AlwaysCheckInsurance,0), //Can't use bitwise because of If-false branch here!
 																																	
 													 model_name IN ['fp1403_2','fp1510_2'] => Risk_indicators.iid_constants.BSOptions.IsInstantIDv1
@@ -1272,6 +1274,168 @@ Models.Layout_Parameters intoVersion2(Models.Layout_FraudAttributes le, integer 
 		c=	224 => 'SourceVehicleRegistration',
 		c=	225 => 'SourceDriversLicense',
 		c= 	226 => 'IdentityDriversLicenseComp',
+// ------------- begin 2.02 attributes
+    c= 227 => 'IDVerFNameBest',
+    c= 228 => 'IDVerLNameBest',
+    c= 229 => 'IDVerSSNBest',
+    c= 230 => 'VariationSearchSSNCtDay',
+    c= 231 => 'VariationSearchSSNCtWeek',
+    c= 232 => 'VariationSearchSSNCtMonth',
+    c= 233 => 'VariationSearchSSNCt3Month',
+    c= 234 => 'VariationSearchSSNCtNew',
+    c= 235 => 'VariationSearchAddrCtDay',
+    c= 236 => 'VariationSearchAddrCtWeek',
+    c= 237 => 'VariationSearchAddrCtMonth',
+    c= 238 => 'VariationSearchAddrCt3Month',
+    c= 239 => 'VariationSearchAddrCtNew',
+    c= 240 => 'VariationSearchPhoneCtDay',
+    c= 241 => 'VariationSearchPhoneCtWeek',
+    c= 242 => 'VariationSearchPhoneCtMonth',
+    c= 243 => 'VariationSearchPhoneCt3Month',
+    c= 244 => 'VariationSearchLNameCtDay',
+    c= 245 => 'VariationSearchLNameCtWeek',
+    c= 246 => 'VariationSearchLNameCtMonth',
+    c= 247 => 'VariationSearchLNameCt3Month',
+    c= 248 => 'VariationSearchFNameCtDay',
+    c= 249 => 'VariationSearchFNameCtWeek',
+    c= 250 => 'VariationSearchFNameCtMonth',
+    c= 251 => 'VariationSearchFNameCt3Month',
+    c= 252 => 'VariationSearchFNameCtNew',
+    c= 253 => 'VariationSearchDOBCtDay',
+    c= 254 => 'VariationSearchDOBCtWeek',
+    c= 255 => 'VariationSearchDOBCtMonth',
+    c= 256 => 'VariationSearchDOBCt3Month',
+    c= 257 => 'VariationSearchDOBCtNew',
+    c= 258 => 'VariationSearchEmailCt',
+    c= 259 => 'VariationSearchEmailCtDay',
+    c= 260 => 'VariationSearchEmailCtWeek',
+    c= 261 => 'VariationSearchEmailCtMonth',
+    c= 262 => 'VariationSearchEmailCt3Month',
+    c= 263 => 'VariationSearchEmailCtNew',
+    c= 264 => 'VariationSearchSSN1SubCt',
+    c= 265 => 'VariationSearchPhone1SubCt',
+    c= 266 => 'VariationSearchAddr1SubCt',
+    c= 267 => 'VariationSearchDOB1SubCt',
+    c= 268 => 'VariationSearchFName1SubCt',
+    c= 269 => 'VariationSearchLName1SubCt',
+    c= 270 => 'VariationSearchDOB1SubDayCt',
+    c= 271 => 'VariationSearchDOB1SubMoCt',
+    c= 272 => 'VariationSearchDOB1SubYrCt',
+    c= 273 => 'VariationSearchSSNSeqCt',
+    c= 274 => 'VariationSearchPhoneSeqCt',
+    c= 275 => 'VariationSearchAddrSeqCt',
+    c= 276 => 'VariationSearchDobSeqCt',
+    c= 277 => 'SearchSSNBestSearchCt',
+    c= 278 => 'DivSearchSSNBestIdentityCt',
+    c= 279 => 'DivSearchSSNBestLNameCt',
+    c= 280 => 'DivSearchSSNBestAddrCt',
+    c= 281 => 'DivSearchSSNBestDOBCt',
+    c= 282 => 'CorrNameDOBCt',
+    c= 283 => 'CorrAddrDOBCt',
+    c= 284 => 'CorrSSNDOBCt',
+    c= 285 => 'CorrSearchSSNNameCt',
+    c= 286 => 'CorrSearchVerSSNNameCt',
+    c= 287 => 'CorrSearchNamePhoneCt',
+    c= 288 => 'CorrSearchVerNamePhoneCt',
+    c= 289 => 'CorrSearchSSNAddrCt',
+    c= 290 => 'CorrSearchVerSSNAddrCt',
+    c= 291 => 'CorrSearchAddrDOBCt',
+    c= 292 => 'CorrSearchVerAddrDOBCt',
+    c= 293 => 'CorrSearchAddrPhoneCt',
+    c= 294 => 'CorrSearchVerAddrPhoneCt',
+    c= 295 => 'CorrSearchSSNDOBCt',
+    c= 296 => 'CorrSearchVerSSNDOBCt',
+    c= 297 => 'CorrSearchSSNPhoneCt',
+    c= 298 => 'CorrSearchVerSSNPhoneCt',
+    c= 299 => 'CorrSearchDOBPhoneCt',
+    c= 300 => 'CorrSearchVerDOBPhoneCt',
+    c= 301 => 'CorrSearchSSNAddrNameCt',
+    c= 302 => 'CorrSearchVerSSNAddrNameCt',
+    c= 303 => 'CorrSearchSSNNamePhoneCt',
+    c= 304 => 'CorrSearchVerSSNNamePhoneCt',
+    c= 305 => 'CorrSearchSSNAddrNamePhoneCt',
+    c= 306 => 'CorrSearchVerSSNAddrNamePhneCt',
+    c= 307 => 'DivSearchAddrSSNCtDay',
+    c= 308 => 'DivSearchAddrSSNCtWeek',
+    c= 309 => 'DivSearchAddrSSNCt1Month',
+    c= 310 => 'DivSearchAddrSSNCt3Month',
+    c= 311 => 'DivSearchAddrSSNCtNew',
+    c= 312 => 'DivSearchSSNIdentityCtDay',
+    c= 313 => 'DivSearchSSNIdentityCtWeek',
+    c= 314 => 'DivSearchSSNIdentityCt1Month',
+    c= 315 => 'DivSearchSSNIdentityCt3Month',
+    c= 316 => 'DivSearchSSNIdentityCtNew',
+    c= 317 => 'DivSearchAddrIdentityCtDay',
+    c= 318 => 'DivSearchAddrIdentityCtWeek',
+    c= 319 => 'DivSearchAddrIdentityCt1Month',
+    c= 320 => 'DivSearchAddrIdentityCt3Month',
+    c= 321 => 'DivSearchAddrIdentityCtNew',
+    c= 322 => 'DivSearchPhoneIdentityCt',
+    c= 323 => 'DivSearchPhoneIdentityCtDay',
+    c= 324 => 'DivSearchPhoneIdentityCtWeek',
+    c= 325 => 'DivSearchPhoneIdentityCt1Month',
+    c= 326 => 'DivSearchPhoneIdentityCt3Month',
+    c= 327 => 'DivSearchPhoneIdentityCtNew',
+    c= 328 => 'DivSearchSSNLNameCtDay',
+    c= 329 => 'DivSearchSSNLNameCtWeek',
+    c= 330 => 'DivSearchSSNLNameCt1Month',
+    c= 331 => 'DivSearchSSNLNameCt3Month',
+    c= 332 => 'DivSearchSSNLNameCtNew',
+    c= 333 => 'DivSearchSSNAddrCtDay',
+    c= 334 => 'DivSearchSSNAddrCtWeek',
+    c= 335 => 'DivSearchSSNAddrCt1Month',
+    c= 336 => 'DivSearchSSNAddrCt3Month',
+    c= 337 => 'DivSearchSSNAddrCtNew',
+    c= 338 => 'DivSearchSSNDOBCtDay',
+    c= 339 => 'DivSearchSSNDOBCtWeek',
+    c= 340 => 'DivSearchSSNDOBCt1Month',
+    c= 341 => 'DivSearchSSNDOBCt3Month',
+    c= 342 => 'DivSearchSSNDOBCtNew',
+    c= 343 => 'DivSearchAddrLNameCtDay',
+    c= 344 => 'DivSearchAddrLNameCtWeek',
+    c= 345 => 'DivSearchAddrLNameCt1Month',
+    c= 346 => 'DivSearchAddrLNameCt3Month',
+    c= 347 => 'DivSearchAddrLNameCtNew',
+    c= 348 => 'DivSearchEmailIdentityCt',
+    c= 349 => 'DivSearchEmailIdentityCtDay',
+    c= 350 => 'DivSearchEmailIdentityCtWeek',
+    c= 351 => 'DivSearchEmailIdentityCt1Month',
+    c= 352 => 'DivSearchEmailIdentityCt3Month',
+    c= 353 => 'DivSearchEmailIdentityCtNew',
+    c= 354 => 'SearchPhoneSearchCtDay',
+    c= 355 => 'SearchPhnSearchCtWeek',
+    c= 356 => 'SearchPhnSearchCt1Month',
+    c= 357 => 'SearchPhnSearchCt3Month',
+    c= 358 => 'SearchPhnSearchCtNew',
+    c= 359 => 'SourceTypeIndicator',
+    c= 360 => 'SourceTypeEmergence',
+    c= 361 => 'SourceTypeCredentialCt',
+    c= 362 => 'SourceTypeCredentialAgeOldest',
+    c= 363 => 'SourceTypeOtherCt',
+    c= 364 => 'SourceTypeOtherAgeOldest',
+    c= 365 => 'SourceCreditBureauCBOCt',
+    c= 366 => 'SourceCreditBureauVerSSN',
+    c= 367 => 'SourceCreditBureauVerAddr',
+    c= 368 => 'SourceCreditBureauVerDOB',
+    c= 369 => 'IDVerAddressMatchesCurrentV2',
+    c= 370 => 'SearchSSNUnVerAddrCt',
+    c= 371 => 'SearchSSNIdentitySearchCtDiff',
+    c= 372 => 'SearchNonBankSearchCtWeek',
+    c= 373 => 'SearchNonBankSearchCtYear',
+    c= 374 => 'SearchNonBankSearchCtRecency',
+    c= 375 => 'AssocCBOIdentityCt',
+    c= 376 => 'AssocCBOHHMemberCt',
+    c= 377 => 'SourceCreditBureauFSAge',
+    c= 378 => 'SourceCreditBureauFSAge25to59',
+    c= 379 => 'SourceCreditBureauCBOFSAge',
+    c= 380 => 'SourceCreditBureauNotSSNVer',
+    c= 381 => 'IdentitySyntheticRiskLevel',
+    c= 382 => 'IdentitySynthetic',
+    c= 383 => 'IdentityManipSSNRiskLevel',
+    c= 384 => 'IdentitySSNManip',
+    // ------------- begin 2.03 attributes
+    c= 385 => 'IDVerSSNVerAgeOldest',
+    c= 386 => 'IDVerSSNNotVerAgeOldest',
 		'INVALID'
 		);
 									 
@@ -1503,6 +1667,168 @@ Models.Layout_Parameters intoVersion2(Models.Layout_FraudAttributes le, integer 
 		c=	224 => le.version201.SourceVehicleRegistration,
 		c=	225 => le.version201.SourceDriversLicense,
 		c= 	226 => le.version201.IdentityDriversLicenseComp,
+// -------------- begin 2.02 attributes
+    c=  227 => le.version202.IDVerFNameBest,
+    c=  228 => le.version202.IDVerLNameBest,
+    c=  229 => le.version202.IDVerSSNBest,
+    c=  230 => le.version202.VariationSearchSSNCtDay,
+    c=  231 => le.version202.VariationSearchSSNCtWeek,
+    c=  232 => le.version202.VariationSearchSSNCtMonth,
+    c=  233 => le.version202.VariationSearchSSNCt3Month,
+    c=  234 => le.version202.VariationSearchSSNCtNew,
+    c=  235 => le.version202.VariationSearchAddrCtDay,
+    c=  236 => le.version202.VariationSearchAddrCtWeek,
+    c=  237 => le.version202.VariationSearchAddrCtMonth,
+    c=  238 => le.version202.VariationSearchAddrCt3Month,
+    c=  239 => le.version202.VariationSearchAddrCtNew,
+    c=  240 => le.version202.VariationSearchPhoneCtDay,
+    c=  241 => le.version202.VariationSearchPhoneCtWeek,
+    c=  242 => le.version202.VariationSearchPhoneCtMonth,
+    c=  243 => le.version202.VariationSearchPhoneCt3Month,
+    c=  244 => le.version202.VariationSearchLNameCtDay,
+    c=  245 => le.version202.VariationSearchLNameCtWeek,
+    c=  246 => le.version202.VariationSearchLNameCtMonth,
+    c=  247 => le.version202.VariationSearchLNameCt3Month,
+    c=  248 => le.version202.VariationSearchFNameCtDay,
+    c=  249 => le.version202.VariationSearchFNameCtWeek,
+    c=  250 => le.version202.VariationSearchFNameCtMonth,
+    c=  251 => le.version202.VariationSearchFNameCt3Month,
+    c=  252 => le.version202.VariationSearchFNameCtNew,
+    c=  253 => le.version202.VariationSearchDOBCtDay,
+    c=  254 => le.version202.VariationSearchDOBCtWeek,
+    c=  255 => le.version202.VariationSearchDOBCtMonth,
+    c=  256 => le.version202.VariationSearchDOBCt3Month,
+    c=  257 => le.version202.VariationSearchDOBCtNew,
+    c=  258 => le.version202.VariationSearchEmailCt,
+    c=  259 => le.version202.VariationSearchEmailCtDay,
+    c=  260 => le.version202.VariationSearchEmailCtWeek,
+    c=  261 => le.version202.VariationSearchEmailCtMonth,
+    c=  262 => le.version202.VariationSearchEmailCt3Month,
+    c=  263 => le.version202.VariationSearchEmailCtNew,
+    c=  264 => le.version202.VariationSearchSSN1SubCt,
+    c=  265 => le.version202.VariationSearchPhone1SubCt,
+    c=  266 => le.version202.VariationSearchAddr1SubCt,
+    c=  267 => le.version202.VariationSearchDOB1SubCt,
+    c=  268 => le.version202.VariationSearchFName1SubCt,
+    c=  269 => le.version202.VariationSearchLName1SubCt,
+    c=  270 => le.version202.VariationSearchDOB1SubDayCt,
+    c=  271 => le.version202.VariationSearchDOB1SubMoCt,
+    c=  272 => le.version202.VariationSearchDOB1SubYrCt,
+    c=  273 => le.version202.VariationSearchSSNSeqCt,
+    c=  274 => le.version202.VariationSearchPhoneSeqCt,
+    c=  275 => le.version202.VariationSearchAddrSeqCt,
+    c=  276 => le.version202.VariationSearchDobSeqCt,
+    c=  277 => le.version202.SearchSSNBestSearchCt,
+    c=  278 => le.version202.DivSearchSSNBestIdentityCt,
+    c=  279 => le.version202.DivSearchSSNBestLNameCt,
+    c=  280 => le.version202.DivSearchSSNBestAddrCt,
+    c=  281 => le.version202.DivSearchSSNBestDOBCt,
+    c=  282 => le.version202.CorrNameDOBCt,
+    c=  283 => le.version202.CorrAddrDOBCt,
+    c=  284 => le.version202.CorrSSNDOBCt,
+    c=  285 => le.version202.CorrSearchSSNNameCt,
+    c=  286 => le.version202.CorrSearchVerSSNNameCt,
+    c=  287 => le.version202.CorrSearchNamePhoneCt,
+    c=  288 => le.version202.CorrSearchVerNamePhoneCt,
+    c=  289 => le.version202.CorrSearchSSNAddrCt,
+    c=  290 => le.version202.CorrSearchVerSSNAddrCt,
+    c=  291 => le.version202.CorrSearchAddrDOBCt,
+    c=  292 => le.version202.CorrSearchVerAddrDOBCt,
+    c=  293 => le.version202.CorrSearchAddrPhoneCt,
+    c=  294 => le.version202.CorrSearchVerAddrPhoneCt,
+    c=  295 => le.version202.CorrSearchSSNDOBCt,
+    c=  296 => le.version202.CorrSearchVerSSNDOBCt,
+    c=  297 => le.version202.CorrSearchSSNPhoneCt,
+    c=  298 => le.version202.CorrSearchVerSSNPhoneCt,
+    c=  299 => le.version202.CorrSearchDOBPhoneCt,
+    c=  300 => le.version202.CorrSearchVerDOBPhoneCt,
+    c=  301 => le.version202.CorrSearchSSNAddrNameCt,
+    c=  302 => le.version202.CorrSearchVerSSNAddrNameCt,
+    c=  303 => le.version202.CorrSearchSSNNamePhoneCt,
+    c=  304 => le.version202.CorrSearchVerSSNNamePhoneCt,
+    c=  305 => le.version202.CorrSearchSSNAddrNamePhoneCt,
+    c=  306 => le.version202.CorrSearchVerSSNAddrNamePhneCt,
+    c=  307 => le.version202.DivSearchAddrSSNCtDay,
+    c=  308 => le.version202.DivSearchAddrSSNCtWeek,
+    c=  309 => le.version202.DivSearchAddrSSNCt1Month,
+    c=  310 => le.version202.DivSearchAddrSSNCt3Month,
+    c=  311 => le.version202.DivSearchAddrSSNCtNew,
+    c=  312 => le.version202.DivSearchSSNIdentityCtDay,
+    c=  313 => le.version202.DivSearchSSNIdentityCtWeek,
+    c=  314 => le.version202.DivSearchSSNIdentityCt1Month,
+    c=  315 => le.version202.DivSearchSSNIdentityCt3Month,
+    c=  316 => le.version202.DivSearchSSNIdentityCtNew,
+    c=  317 => le.version202.DivSearchAddrIdentityCtDay,
+    c=  318 => le.version202.DivSearchAddrIdentityCtWeek,
+    c=  319 => le.version202.DivSearchAddrIdentityCt1Month,
+    c=  320 => le.version202.DivSearchAddrIdentityCt3Month,
+    c=  321 => le.version202.DivSearchAddrIdentityCtNew,
+    c=  322 => le.version202.DivSearchPhoneIdentityCt,
+    c=  323 => le.version202.DivSearchPhoneIdentityCtDay,
+    c=  324 => le.version202.DivSearchPhoneIdentityCtWeek,
+    c=  325 => le.version202.DivSearchPhoneIdentityCt1Month,
+    c=  326 => le.version202.DivSearchPhoneIdentityCt3Month,
+    c=  327 => le.version202.DivSearchPhoneIdentityCtNew,
+    c=  328 => le.version202.DivSearchSSNLNameCtDay,
+    c=  329 => le.version202.DivSearchSSNLNameCtWeek,
+    c=  330 => le.version202.DivSearchSSNLNameCt1Month,
+    c=  331 => le.version202.DivSearchSSNLNameCt3Month,
+    c=  332 => le.version202.DivSearchSSNLNameCtNew,
+    c=  333 => le.version202.DivSearchSSNAddrCtDay,
+    c=  334 => le.version202.DivSearchSSNAddrCtWeek,
+    c=  335 => le.version202.DivSearchSSNAddrCt1Month,
+    c=  336 => le.version202.DivSearchSSNAddrCt3Month,
+    c=  337 => le.version202.DivSearchSSNAddrCtNew,
+    c=  338 => le.version202.DivSearchSSNDOBCtDay,
+    c=  339 => le.version202.DivSearchSSNDOBCtWeek,
+    c=  340 => le.version202.DivSearchSSNDOBCt1Month,
+    c=  341 => le.version202.DivSearchSSNDOBCt3Month,
+    c=  342 => le.version202.DivSearchSSNDOBCtNew,
+    c=  343 => le.version202.DivSearchAddrLNameCtDay,
+    c=  344 => le.version202.DivSearchAddrLNameCtWeek,
+    c=  345 => le.version202.DivSearchAddrLNameCt1Month,
+    c=  346 => le.version202.DivSearchAddrLNameCt3Month,
+    c=  347 => le.version202.DivSearchAddrLNameCtNew,
+    c=  348 => le.version202.DivSearchEmailIdentityCt,
+    c=  349 => le.version202.DivSearchEmailIdentityCtDay,
+    c=  350 => le.version202.DivSearchEmailIdentityCtWeek,
+    c=  351 => le.version202.DivSearchEmailIdentityCt1Month,
+    c=  352 => le.version202.DivSearchEmailIdentityCt3Month,
+    c=  353 => le.version202.DivSearchEmailIdentityCtNew,
+    c=  354 => le.version202.SearchPhoneSearchCtDay,
+    c=  355 => le.version202.SearchPhnSearchCtWeek,
+    c=  356 => le.version202.SearchPhnSearchCt1Month,
+    c=  357 => le.version202.SearchPhnSearchCt3Month,
+    c=  358 => le.version202.SearchPhnSearchCtNew,
+    c=  359 => le.version202.SourceTypeIndicator,
+    c=  360 => le.version202.SourceTypeEmergence,
+    c=  361 => le.version202.SourceTypeCredentialCt,
+    c=  362 => le.version202.SourceTypeCredentialAgeOldest,
+    c=  363 => le.version202.SourceTypeOtherCt,
+    c=  364 => le.version202.SourceTypeOtherAgeOldest,
+    c=  365 => le.version202.SourceCreditBureauCBOCt,
+    c=  366 => le.version202.SourceCreditBureauVerSSN,
+    c=  367 => le.version202.SourceCreditBureauVerAddr,
+    c=  368 => le.version202.SourceCreditBureauVerDOB,
+    c=  369 => le.version202.IDVerAddressMatchesCurrentV2,
+    c=  370 => le.version202.SearchSSNUnVerAddrCt,
+    c=  371 => le.version202.SearchSSNIdentitySearchCtDiff,
+    c=  372 => le.version202.SearchNonBankSearchCtWeek,
+    c=  373 => le.version202.SearchNonBankSearchCtYear,
+    c=  374 => le.version202.SearchNonBankSearchCtRecency,
+    c=  375 => le.version202.AssocCBOIdentityCt,
+    c=  376 => le.version202.AssocCBOHHMemberCt,
+    c=  377 => le.version202.SourceCreditBureauFSAge,
+    c=  378 => le.version202.SourceCreditBureauFSAge25to59,
+    c=  379 => le.version202.SourceCreditBureauCBOFSAge,
+    c=  380 => le.version202.SourceCreditBureauNotSSNVer,
+    c=  381 => le.version202.IdentitySyntheticRiskLevel,
+    c=  382 => le.version202.IdentitySynthetic,
+    c=  383 => le.version202.IdentityManipSSNRiskLevel,
+    c=  384 => le.version202.IdentitySSNManip,
+// -------------- begin 2.03 attributes	    
+    c=  385 => le.version203.IDVerSSNVerAgeOldest,
+    c=  386 => le.version203.IDVerSSNNotVerAgeOldest,
 		''
 		);
 END;
@@ -1802,6 +2128,8 @@ END;
 
 //Centralize the logic for getting the count for the attribute normalize's
 NormalizeCount := map( doAttributesVersion1                              => 162,
+                       doAttributesVersion203                            => 386,
+                       doAttributesVersion202                            => 384,
                        doAttributesVersion201 and SuppressCompromisedDLs => 226,
                        doAttributesVersion201                            => 225,
                        doAttributesVersion2                              => 217,
@@ -1812,12 +2140,13 @@ NormalizeCount := map( doAttributesVersion1                              => 162,
 name_pairs :=  normalize(pick_attr, NormalizeCount, intoVersion1(left, counter));
 v1 := project(name_pairs, transform(layout_attribute, self.attribute := left));
 
-
 v2_name_pairs :=  normalize(pick_attr, NormalizeCount, intoVersion2(left, counter));
 v2 := project(v2_name_pairs, transform(layout_attribute, self.attribute := left));
 		
 layout_AttributeGroup formAttributes(Models.Layout_FraudAttributes le) := TRANSFORM
-	self.name := map( doAttributesVersion201 => 'Version201',
+	self.name := map( doAttributesVersion203 => 'Version203',
+                    doAttributesVersion202 => 'Version202',
+                    doAttributesVersion201 => 'Version201',
 										doAttributesVersion2 => 'Version2',
 										'Version1'
 									);
@@ -1873,11 +2202,10 @@ layout_FDAttributesOut formAttributeGroup(Models.Layout_FraudAttributes le) := t
                             doParoAttributes                              => DATASET([form_ParoAttributes(le)]),
                                                                              DATASET([], layout_AttributeGroup)
                             );
-
-	self := [];
+  self := [];
 END;
 attributeOut := project(pick_attr, formAttributeGroup(left));
-
+// attributeOut := join(pick_attr,clam,  left.input.seq=right.seq, formAttributeGroup(LEFT,RIGHT));
 
 
 // Get the models
@@ -2199,12 +2527,30 @@ Models.layouts.FP_Layout_Model form_Paro(Paro_ret le, Paro_ret2 ri) := TRANSFORM
 END;
 paro_model := join(Paro_ret,Paro_ret2,left.seq=right.seq, form_Paro(LEFT,RIGHT));
 
-// Paro will need test seeds, incorporate them here?
-// paro_test_seed := project(fp_test_seed, Transform(Models.layouts.FP_Layout_Model,
-                                                  // self.i := left.Score,
-                                                  // self.));
+Models.layouts.Layout_Score_FP paro_testseeds_trans(fp_test_seed le, integer c) := transform 
+                self.i := le.score;
+                SELF.description := MAP(model_name='msnrsn_1' and c = 1 => '0 to 999', 
+																				model_name='msnrsn_1' and c = 2 => '250 to 999',
+																				model_name='rsn804_1'  and c = 1 =>  '250 to 999',
+																				model_name='msn1803_1' and c = 1 => '0 to 999','');
+                self.index := Models.FraudAdvisor_Constants.getBilling_Index(model_name);
+                // self.reason_codes := left.ri;
+                self := [];
+								
+end;	
+	
+paro_seeds_projected := project(fp_test_seed, paro_testseeds_trans(left,counter)); 
 
-// Paro_final := IF(test_data_enabled, paro_test_seed, paro_model);
+paro_test_seed := project(ut.ds_oneRecord, transform(Models.layouts.FP_Layout_Model,
+                self.accountnumber := account_value;
+                self.description := 'FraudPoint' + Std.Str.ToUpperCase(model_name);
+                self.scores := paro_seeds_projected;
+                self := [];
+                ));
+								
+Paro_final := IF(test_data_enabled, paro_test_seed, paro_model);
+// Paro_final := paro_model;
+
 
 testrec form_model(ret le, ret2 ri) := 
 TRANSFORM
@@ -2230,7 +2576,7 @@ END;
 
 fraudpoint2_model := if(input_ok, 
 	project(if(test_data_enabled, fp_test_seed, ret_fraudpoint2), form_fraudpoint2_model(LEFT)), 
-//	project( ret_fraudpoint2, form_fraudpoint2_model(LEFT)), 
+	// project( ret_fraudpoint2, form_fraudpoint2_model(LEFT)), 
 	dataset([], models.layouts.FP_layout_model) );
 
 //new for FraudPoint 3.0
@@ -2267,7 +2613,7 @@ TRANSFORM
 END;
 fraudpoint3_model := if(input_ok, 
 	project(if(test_data_enabled, fp_test_seed, ret_fraudpoint3), form_fraudpoint3_model(LEFT)), 
-//	project(ret_fraudpoint3, form_fraudpoint3_model(LEFT)), 
+	// project(ret_fraudpoint3, form_fraudpoint3_model(LEFT)), 
 	dataset([], models.layouts.FP_layout_model) );
 
 //end FP 3.0 code
@@ -2286,7 +2632,7 @@ fd_seeds := seed_files.GetFraudDefender(test_prep, account_value, Test_Data_Tabl
 
 
 final_v1 := if(Test_Data_Enabled, fd_seeds, final2);
-//final_v1 := final2;
+// final_v1 := final2;
 
 //=============================================
 //===  custom model descriptions            ===
@@ -2302,9 +2648,10 @@ Models.layouts.FP_Layout_Model form_custom_model( ret_custom le ) := TRANSFORM
 	self.scores := project( le, form_cscore(left) );
 	self := []; // 6 indices will be blank on all models except 2.0  (fp1109)
 end;
+
 fp1_test_seed := project(fp_test_seed, transform(Models.Layout_ModelOut, self := left));
 custom := project( if(Test_Data_Enabled, fp1_test_seed, ret_custom),form_custom_model(left) );
-//custom := project(ret_custom,form_custom_model(left) );
+// custom := project(ret_custom,form_custom_model(left) );
 
 // this custom fraud model was put into place in 2007 in it's own service.
 // to get rid of that service on roxie, we're putting that model in this service.
@@ -2330,7 +2677,7 @@ finalcustom := map( model_name in fraudpoint3_models => fraudpoint3_model,
                     model_name in Models.FraudAdvisor_Constants.fraudpoint3_custom_models => fraudpoint3_model,
                     model_name in fraudpoint2_models => fraudpoint2_model,
                     model_name = 'idn6051' => custom_idn6051,
-                    model_name in Models.FraudAdvisor_Constants.Paro_models => paro_model,
+                    model_name in Models.FraudAdvisor_Constants.Paro_models => Paro_final,
                     model_name in Models.FraudAdvisor_Constants.XML_custom_models OR model_name = 'ain801_1' => custom,
                     final_v1 ); 
 										

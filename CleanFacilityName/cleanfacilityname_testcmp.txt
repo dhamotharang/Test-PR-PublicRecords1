@@ -1,0 +1,41 @@
+ID "HIPIE_Plugins.CleanFacilityName.CleanFacilityName_cmp";
+NAME cleanfacilityname_testcmp;
+LABEL "Test composition for Clean Facility Name";
+DESCRIPTION "Auto-generated test composition for plugin CleanFacilityName";
+VERSION "1.0.0";
+AUTHOR "CarmigJX";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING CompareWUID: DEFAULT("W20171213-120048");
+END
+
+INSTANCE OutDataset.OutDataset(Ins004): LABEL("Output Dataset"),VERSION("2.0")
+	dsInput="^Ins003|dsOutput"
+	name="~qa::cleanfacilityname::cleanfacilityname::output"
+	Method="THOR"
+END
+
+INSTANCE CleanFacilityName.CleanFacilityName(Ins003): LABEL("Clean Facility Name"),VERSION("1.0.0")
+	dsInput="^Ins002|dsOutput"
+  Prefix="Test"
+  FacilityName="FacilityName"
+END
+
+INSTANCE CleanFacilityName.CleanFacilityName(Ins002): LABEL("Clean Facility Name"),VERSION("1.0.0")
+  dsInput="^Ins001|dsOutput"
+  Prefix="Clean"
+  FacilityName="FacilityName"
+END 
+
+INSTANCE UseDataset.UseDataset(Ins001): LABEL("Use Dataset"),VERSION("1.1")
+	LogicalFilename="~qa::cleanfacilityname::cleanfacilityname::input"
+	Structure="RECORD
+    string50 FacilityName;
+  END;"
+	Method="THOR"
+END

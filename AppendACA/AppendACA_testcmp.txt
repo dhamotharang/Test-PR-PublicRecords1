@@ -1,0 +1,62 @@
+ID "HIPIE_Plugins.AppendACA.AppendACA_testcmp";
+NAME AppendACA_testcmp;
+LABEL "Testing: Append Business Attributes";
+DESCRIPTION "Test composition for AppendACA plugin";
+VERSION "1.0.0";
+AUTHOR "campda01";
+
+PERMISSIONS
+   VIEW:PUBLIC;
+   EDIT:PRIVATE;
+   RUN:PUBLIC;
+END
+
+INPUTS
+    STRING CompareWUID : DEFAULT("W20171212-093647");
+END
+
+INSTANCE UseDataset.UseDataset(Ins001)
+    LogicalFilename ="~qa::appendaca::appendaca::input"
+    Method=THOR
+    Structure=STRING|predir, STRING|primRange, STRING|primName, STRING|secRange, STRING|postdir, STRING|addressSuffix, STRING|city, STRING|state, STRING|zip5
+END
+
+INSTANCE AppendACA.AppendACA(Ins002)
+    Prefix="aca_"
+    dsInput=^Ins001|dsOutput
+    PrimaryRange=primRange
+    PrimaryName=primName
+    AddressSuffix=addressSuffix
+    PreDirectional=predir
+    PostDirectional=postdir
+    SecondaryRange=secRange
+    City=city
+    State=state
+    Zip5=zip5
+END
+
+INSTANCE AppendACA.AppendACA(Ins004)
+    Prefix="aca2_"
+    dsInput=^Ins001|dsOutput
+    PrimaryRange=primRange
+    PrimaryName=primName
+    AddressSuffix=addressSuffix
+    PreDirectional=predir
+    PostDirectional=postdir
+    SecondaryRange=secRange
+    City=city
+    State=state
+    Zip5=zip5
+END
+
+INSTANCE OutDataset.OutDataset(Ins003)
+    dsInput=^Ins002|dsOutput
+    name="~qa::appendaca::appendaca::output"
+    Method=THOR
+END
+
+INSTANCE OutDataset.OutDataset(Ins005)
+    dsInput=^Ins004|dsOutput
+    name="~qa::appendaca::appendaca::output2"
+    Method=THOR
+END

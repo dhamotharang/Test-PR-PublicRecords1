@@ -332,6 +332,16 @@ export override_addr_type(string street_addr, string addr_type, string carr_rte)
 		'P', addr_type);
 	return checked_rare_PO;
 end;
+//iid logic with chase pio2 logic
+export override_addr_type_chase(string street_addr_chase, string addr_type_chase) := function
+	s_chase := stringlib.stringtouppercase(street_addr_chase);
+	checked_rare_PO_chase := if(
+		REGEXFIND( '^(P[\\s\\.]*[O0BM]?[\\.\\s]*)?((B([O0]X)?)|X)[\\s\\d\\.#]*', s_chase )  // po boxes (abbreviated)
+		OR REGEXFIND( '^POST[\\s\\.]*OFFICE[\\.\\s]*BOX[\\s\\d\\.#]*', s_chase ) // po boxes (spelled out)
+		OR REGEXFIND('((P[\\s\\.]*O[\\.\\s]*)|(POST[\\s]*OFFICE[\\s]*))+BOX',s_chase),
+		'P', addr_type_chase);
+	return checked_rare_PO_chase;
+end;
 
 export ssn_name_match := [4,7,9,10,11,12];
 
@@ -975,12 +985,68 @@ export Set_Equifax_Fraud_Alert_Codes := ['W','Q','X','V'];
 export OFAC4_NoGateway := 'watchlist server error';
 export FABatch_WatchlistModels := ['fp1109_0', 'fp31105_1', 'fp3710_0']; 
 export FAXML_WatchlistModels := ['fp1109_0', 'fp31105_1', 'fp3710_0', 'fp3904_1'];
-export RecoverScoreBatchWatchlistModels :=  ['RSN807_0_0'];   
+export RecoverScoreBatchWatchlistModels :=  ['RSN807_0_0'];
+export set_validOFACVersions := [1,2,3,4];   
 
 export fn_CreateFakeDID( STRING fname, STRING lname ) := 
     (UNSIGNED6)(STD.Str.Filter( (STRING)(HASH(fname,lname)), '0123456789' )[1..12]);
 
 // for dempsey riskview project, change the bankruptcy filter to only include these specific chapters
 export set_permitted_bk_chapters(integer bsversion, boolean insurancemode) := if(bsversion < 50 and ~insurancemode, ['7'], ['7', '9', '11', '12', '13', '15', '304']);
+
+//chase custom verification RQ-14821 to mirror RQ-13523
+export poAddress_expression := '((P[\\s\\.]*O[\\.\\s]*)|(POST[\\s]*OFFICE[\\s]*))+BOX';  //find reference to po box or post office box
+export onlyContains_express := '^(([\\s]*CO[\\.]?)|([\\s]*ASSOCIATES))$';
+export endingInc_expression := '(INC[.]*)$';
+export endsWith_expression := '([\\s]*ASSOC|[\\s]*ASSOCIATES|(AND)?[\\s\\&]*COMPANY|[\\.\\s\\&]*CO[\\.]?|[\\s]*ACCT|[\\s\\&]*LLP[\\.]?|[\\s\\&]*LLC[\\.]?)$';
+export lastEndsWith_expression := '([\\s]*DDS[\\.]?)$';
+export contains_expression := '(ACCOUNT|BUSINESS|\\&)';
+
+export Get_chase_NAS_NAP( string chase_f, string chase_l, string chase_addr,  integer curr_NAS_NAP) := function
+	Chase_nas_nap := Map(curr_NAS_NAP = 0 => curr_NAS_NAP,
+									 curr_NAS_NAP = 1 => curr_NAS_NAP,
+									 //NAS 2
+									 curr_NAS_NAP = 2 and (chase_f = '' or chase_l = '') => 0,
+									 //NAS 3
+									 curr_NAS_NAP = 3 and (chase_f = '' or chase_addr = '') => 0,
+									 //NAS 4
+									 curr_NAS_NAP = 4 and chase_f = '' => 1,
+									 //NAS 5
+									 curr_NAS_NAP = 5 and (chase_l = '' or chase_addr = '') => 0,
+									 //NAS 6
+									 curr_NAS_NAP = 6 and chase_addr = '' => 1,
+									 //NAS 7
+									 curr_NAS_NAP = 7 and chase_l = '' => 1,
+									 //NAS 8
+									 curr_NAS_NAP = 8 and chase_f = '' and chase_l = '' and chase_addr = '' => 0, 
+									 curr_NAS_NAP = 8 and chase_f = '' and chase_l = '' => 0,
+									 curr_NAS_NAP = 8 and chase_f = '' and chase_addr = '' => 0,
+									 curr_NAS_NAP = 8 and chase_l = '' and chase_addr = '' => 0,
+									 curr_NAS_NAP = 8 and chase_f = '' => 5,
+									 curr_NAS_NAP = 8 and chase_l = '' => 3,
+									 curr_NAS_NAP = 8 and chase_addr = '' => 2,
+									 //NAS 9
+									 curr_NAS_NAP = 9 and chase_f = '' and chase_l = '' => 1,
+									 curr_NAS_NAP = 9	and chase_f = '' => 7,
+									 curr_NAS_NAP = 9	and chase_l = '' => 4,
+									 //NAS 10
+									 curr_NAS_NAP = 10 and chase_f = '' and chase_addr = '' => 1,
+									 curr_NAS_NAP = 10 and chase_f = '' => 6,
+									 curr_NAS_NAP = 10 and chase_addr = '' => 4,
+									 //NAS 11
+									 curr_NAS_NAP = 11 and chase_l = '' and chase_addr = '' => 1,
+									 curr_NAS_NAP = 11	and	chase_l = '' => 6,
+									 curr_NAS_NAP = 11	and	chase_addr = '' => 7,
+									 //NAS 12
+									 curr_NAS_NAP = 12 and (chase_f = '' and chase_l = '' and chase_addr = '') => 1,
+									 curr_NAS_NAP = 12	and	(chase_f = '' and chase_l = '') => 6,
+									 curr_NAS_NAP = 12	and	(chase_f = '' and chase_addr = '') => 7,
+									 curr_NAS_NAP = 12	and	(chase_l = '' and chase_addr = '') => 4,
+									 curr_NAS_NAP = 12	and	chase_f = '' => 11,
+									 curr_NAS_NAP = 12	and	chase_l = '' => 10,//
+									 curr_NAS_NAP = 12	and	chase_addr = '' => 9,//
+									 curr_NAS_NAP);  //NAS 0 and NAS 1 no change
+	return Chase_nas_nap;
+end;
 
 end;

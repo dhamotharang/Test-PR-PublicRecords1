@@ -1,0 +1,122 @@
+﻿ID "HIPIE_Plugins.Business.AppendConsolidatedBipIds_cmp";
+NAME AppendConsolidatedBipIds_testcmp;
+LABEL "Test composition for Append Consolidated BipIds";
+DESCRIPTION "Auto-generated test composition for plugin AppendConsolidatedBipIds";
+VERSION "1.0.0";
+AUTHOR "CarmigJX";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING CompareWUID: DEFAULT("W20171213-094946");
+END
+
+INSTANCE OutDataset.OutDataset(Ins005): LABEL("Output Dataset"),VERSION("1.0.0")
+	dsInput="^Ins003|dsOutput"
+	name="~qa::business::appendconsolidatedbipids::output2"
+	Method="THOR"
+END
+
+INSTANCE OutDataset.OutDataset(Ins004): LABEL("Output Dataset"),VERSION("1.0.0")
+	dsInput="^Ins002|dsOutput"
+	name="~qa::business::appendconsolidatedbipids::output"
+	Method="THOR"
+END
+
+INSTANCE Business.AppendConsolidatedBipIds(Ins003): LABEL("Append Consolidated BipIds"),VERSION("1.0.0")
+  dsInput="^Ins002|dsOutput"
+  UltID1="ultid1"
+  OrgID1="orgid1"
+  SeleID1="seleid1"
+  ProxID1="proxid1"
+  PowID1="powid1"
+  Score1="score1"
+  Weight1="weight1"
+  UltID2="ultid2"
+  OrgID2="orgid2"
+  SeleID2="seleid2"
+  ProxID2="proxid2"
+  PowID2="powid2"
+  Score2="score2"
+  Weight2="weight2"
+  Prefix="testPrefix"
+END
+
+INSTANCE Business.AppendConsolidatedBipIds(Ins002): LABEL("Append Consolidated BipIds"),VERSION("1.0.0")
+  dsInput="^Ins001|dsOutput"
+  UltID1="ultid1"
+  OrgID1="orgid1"
+  SeleID1="seleid1"
+  ProxID1="proxid1"
+  PowID1="powid1"
+  Score1="score1"
+  Weight1="weight1"
+  UltID2="ultid2"
+  OrgID2="orgid2"
+  SeleID2="seleid2"
+  ProxID2="proxid2"
+  PowID2="powid2"
+  Score2="score2"
+  Weight2="weight2"
+END
+
+INSTANCE UseDataset.UseDataset(Ins001): LABEL("Use Dataset"),VERSION("1.1")
+	LogicalFilename="~qa::business::appendconsolidatedbipids::input"
+	Structure="RECORD
+    unsigned6 rid;
+    string companyname;
+    string primrange;
+    string primname;
+    string secrange;
+    string city;
+    string state;
+    string zip;
+    string fein;
+    boolean businesswasfound;
+    string120 businesscompanyname;
+    unsigned4 businessdatefirstseen;
+    unsigned4 businessdatelastseen;
+    string10 businessprimrange;
+    string2 businesspredir;
+    string28 businessprimname;
+    string4 businessaddrsuffix;
+    string2 businesspostdir;
+    string10 businessunitdesig;
+    string8 businesssecrange;
+    string25 businesspostalcityname;
+    string25 businessvanitycityname;
+    string2 businessstate;
+    string5 businesszip;
+    string4 businesszip4;
+    string2 businessstatefips;
+    string3 businesscountyfips;
+    string18 businesscountyname;
+    string10 businessphone;
+    unsigned4 businessincorporationdate;
+    boolean businesscompanynamematches;
+    boolean businesshasaddress;
+    boolean businessprimaddrmatches;
+    boolean businessfulladdrmatches;
+    unsigned2 businesscompaniesataddresshistorical;
+    unsigned4 businesscompaniesataddressdatefirstseen;
+    unsigned4 businesscompaniesataddressdatelastseen;
+    unsigned6 powid1;
+    unsigned6 proxid1;
+    unsigned6 seleid1;
+    unsigned6 orgid1;
+    unsigned6 ultid1;
+    unsigned8 weight1;
+    unsigned8 score1;
+    unsigned6 powid2;
+    unsigned6 proxid2;
+    unsigned6 seleid2;
+    unsigned6 orgid2;
+    unsigned6 ultid2;
+    unsigned8 weight2;
+    unsigned8 score2;
+  end;"
+  Method="THOR"
+END

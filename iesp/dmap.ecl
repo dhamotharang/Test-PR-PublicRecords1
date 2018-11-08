@@ -27,7 +27,7 @@ export t_DMAPBorrowerInfo := record
 	string12 UniqueId {xpath('UniqueId')};
 	iesp.share.t_Name Name {xpath('Name')};
 	string11 SSN {xpath('SSN')};
-	iesp.share.t_Date DOB {xpath('DOB')};
+	iesp.share.t_MaskableDate DOB {xpath('DOB')};
 	string10 Phone1 {xpath('Phone1')};
 	string10 Phone2 {xpath('Phone2')};
 	t_DMAPAddressInfo CurrentAddress {xpath('CurrentAddress')};

@@ -7,7 +7,7 @@
 
 
 export Nbr_Service := macro
-	#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+	#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	output(doxie.historic_nbr_summary(false))
 
 endmacro;

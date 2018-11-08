@@ -1,0 +1,12 @@
+testcompositionrun_info
+Monitoring WU W20170109-152051(HIPIE_BCTLWXCARMIGJX_AppendBankruptcyFlag_testcmp_CarmigJX) to completion.
+
+
+testcompositionrun_err
+Plugin AppendBankruptcyFlag passed compliance check
+
+
+
+
+
+
