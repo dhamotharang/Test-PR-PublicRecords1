@@ -66,7 +66,7 @@ nrec := record
 	string28 lname;
 	result;
 end;
-segrecs    := dx_BestRecords.append(result, did2, dx_BestRecords.Constants.perm_type.glb);
+segrecs    := dx_BestRecords.append(result, did2, dx_BestRecords.Constants.perm_type.glb, left_outer := false);
 NamesAdded := project(segrecs,
 									 transform(nrec,
 									           self.fname := left._best.fname,
