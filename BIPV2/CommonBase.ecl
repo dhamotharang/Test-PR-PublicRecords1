@@ -1,4 +1,4 @@
-// This module publishes the common BASE layout that gets passed from step to step
+﻿// This module publishes the common BASE layout that gets passed from step to step
 // during the internal linking process.
 //
 // It also publishes a set of SuperFiles representing the final result after all
@@ -14,7 +14,7 @@
 // Almost everyone who needs the header should reference #3.  #2 feeds back around
 // as the base file for the next build.
 
-IMPORT BIPV2, BIPV2_Company_Names, AID, _Control, Suppress, data_services;
+IMPORT ut, BIPV2, BIPV2_Company_Names, AID, _Control, Suppress, Data_Services;
 
 EXPORT CommonBase := MODULE
 
@@ -25,11 +25,7 @@ EXPORT CommonBase := MODULE
 	EXPORT Layout_Static := BIPV2.CommonBase_mod.Layout_Static;
 	
 	// default layout
-	EXPORT Layout := #IF(BIPV2._Config.BASE_LAYOUT_DYNAMIC)
-		Layout_Dynamic;
-	#ELSE
-		Layout_Static;
-	#END
+	EXPORT Layout := BIPV2.CommonBase_mod.Layout;
 	
 	
 	// Files and datasets
@@ -40,11 +36,11 @@ EXPORT CommonBase := MODULE
 	EXPORT FILE_FATHER_LOCAL      := '~' + filePrefix + 'father'      ;
 	EXPORT FILE_GRANDFATHER_LOCAL	:= '~' + filePrefix + 'grandfather' ;
 
-	EXPORT FILE_PROD_BUILT		    := data_services.foreign_prod + filePrefix + 'built'     ;
-	EXPORT FILE_PROD				      := data_services.foreign_prod + filePrefix + 'base'         ;
-	EXPORT FILE_FATHER_PROD	      := data_services.foreign_prod + filePrefix + 'father'       ;
-	EXPORT FILE_GRANDFATHER_PROD	:= data_services.foreign_prod + filePrefix + 'grandfather'  ;
-	EXPORT FILE_DATALAND		      := data_services.foreign_dataland + filePrefix + 'base'         ;
+	EXPORT FILE_PROD_BUILT		    := Data_Services.foreign_prod      + filePrefix + 'built'     ;
+	EXPORT FILE_PROD				      := Data_Services.foreign_prod      + filePrefix + 'base'         ;
+	EXPORT FILE_FATHER_PROD	      := Data_Services.foreign_prod      + filePrefix + 'father'       ;
+	EXPORT FILE_GRANDFATHER_PROD	:= Data_Services.foreign_prod      + filePrefix + 'grandfather'  ;
+	EXPORT FILE_DATALAND		      := Data_Services.foreign_dataland  + filePrefix + 'base'         ;
   
 	EXPORT FILE_BUILT				      := IF(_Control.ThisEnvironment.Name = 'Prod_Thor' ,FILE_LOCAL_BUILT         ,FILE_PROD_BUILT        );
 	EXPORT FILE_BASE				      := IF(_Control.ThisEnvironment.Name = 'Prod_Thor' ,FILE_LOCAL               ,FILE_PROD              );
@@ -74,9 +70,11 @@ EXPORT CommonBase := MODULE
 	// Apply any necessary post-processing to the header, before things like XLink pick it up
 	EXPORT clean(ds) := FUNCTIONMACRO
 		IMPORT Suppress;
+		IMPORT Bipv2_Suppression;
 		ds_exorcise := ds(ingest_status<>'Old'); // Exorcise all ghosts, which _can_ remove cluster base records!
 		ds_exclude  := ds_exorcise(BIPV2.mod_sources.srcInBase(source));
-		ds_reg      := Suppress.applyRegulatory.applyBIPV2(ds_exclude);
+		ds_suppress := Bipv2_Suppression.suppressClean(ds_exclude);
+		ds_reg      := Suppress.applyRegulatory.applyBIPV2(ds_suppress);
 		RETURN ds_reg;
 	ENDMACRO;
   
@@ -107,8 +105,8 @@ EXPORT CommonBase := MODULE
 			StringLib.StringToLowerCase(#TEXT(in_loc)),
 			''					=> '~',
 			'local'			=> '~',
-			'dataland'	=> data_services.foreign_dataland,
-			'prod'			=> data_services.foreign_prod,
+			'dataland'	=> Data_Services.foreign_dataland,
+			'prod'			=> Data_Services.foreign_prod,
 			ERROR('BIPV2.CommonBase.DS_OMNI -- bad location'));
 		
 		LOCAL ver := CASE(

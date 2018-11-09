@@ -1,4 +1,4 @@
-EXPORT IDconstants := 
+﻿EXPORT IDconstants := 
 MODULE
 
 export JoinTypes :=
@@ -38,5 +38,7 @@ export Set_Fetch_Level_Above_PowID     				:= [Fetch_Level_ProxID,Fetch_Level_SE
 export Set_Fetch_Level_Above_ProxID    				:= [Fetch_Level_SELEID,Fetch_Level_OrgID,Fetch_Level_UltID];
 export Set_Fetch_Level_Above_SELEID    				:= [Fetch_Level_OrgID,Fetch_Level_UltID];
 export Set_Fetch_Level_Above_OrgID		       	:= [Fetch_Level_UltID];
+
+export USE_LOCAL_KEYS := true;
 
 END;
