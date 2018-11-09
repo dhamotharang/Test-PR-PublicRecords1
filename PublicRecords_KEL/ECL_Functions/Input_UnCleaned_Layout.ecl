@@ -2,25 +2,26 @@
 //Contains the non-cleaned input
 
 EXPORT Input_UnCleaned_Layout := RECORD
-	INTEGER7 InputLexid;
-	STRING70 InputFirstName;
-	STRING70 InputMiddleName;
-	STRING70 InputLastName;
-	STRING120 InputAddress;
-	STRING50 InputCity;
-	STRING25 InputState; 
-	STRING10 InputZip;
-	STRING10 InputHomePhone;
-	STRING10 InputSSN;
-	STRING10 InputDateOfBirth;
-	STRING10 InputWorkPhone;
-	STRING10 InputIncome;
-	STRING20 InputDLNumber;
-	STRING25 InputDLState;
-	STRING10 InputBalance;
-	STRING10 InputChargeoFFd;
-	STRING70 InputFormername;
-	STRING50 InputEmail;
-	STRING100 InputEmployment;
-	STRING20 InputArchiveDate; 
+  STRING65 InputAccountEcho;
+	INTEGER7 InputLexidEcho;
+	STRING78 InputFirstNameEcho;
+	STRING78 InputMiddleNameEcho;
+	STRING78 InputLastNameEcho;
+	STRING120 InputStreetEcho;
+	STRING50 InputCityEcho;
+	STRING25 InputStateEcho; 
+	STRING10 InputZipEcho;
+	STRING16 InputHomePhoneEcho;
+	STRING10 InputSSNEcho;
+	STRING10 InputDateOfBirthEcho;
+	STRING16 InputWorkPhoneEcho;
+	STRING10 InputIncomeEcho;
+	STRING20 InputDLNumberEcho;
+	STRING25 InputDLStateEcho;
+	STRING10 InputBalanceEcho;
+	STRING10 InputChargeoFFdEcho;
+	STRING70 InputFormernameEcho;
+	STRING54 InputEmailEcho;
+	STRING100 InputEmploymentEcho;
+	STRING20 InputArchiveDateEcho; 
 END;

@@ -7,6 +7,7 @@ RoxieIP := RiskWise.shortcuts.Dev156;
 
 //InputFile := '~temp::kel::consumer_nonfcra_1mm.csv'; //1 million
 InputFile := '~temp::kel::consumer_nonfcra_100k.csv';
+// InputFile := '~ak::in::specialcases.csv';
 
 /*
 Data Setting 		NonFCRA
@@ -32,7 +33,7 @@ Score_threshold := 80;
 RecordsToRun := 100; // 100;
 eyeball := 120;
 
-OutputFile := '~ak::out::PublicRecs::nonFCRA::Sprint4'+ ThorLib.wuid() ;
+OutputFile := '~ak::out::PublicRecs::nonFCRA::Sprint6_3'+ ThorLib.wuid() ;
 
 prii_layout := RECORD
     STRING Account             ;
@@ -64,7 +65,10 @@ END;
 
 p_in := DATASET(InputFile, prii_layout, CSV(QUOTE('"')));
 p := IF (RecordsToRun = 0, p_in, CHOOSEN (p_in, RecordsToRun));
-PP := PROJECT(P, TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout, SELF := LEFT));
+PP := PROJECT(P(Account != 'Account'), TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout, 
+SELF := LEFT;
+// SELF := [];
+));
 
 soapLayout := RECORD
   // STRING CustomerId; // This is used only for failed transactions here; it's ignored by the ECL service.
@@ -72,7 +76,12 @@ soapLayout := RECORD
   INTEGER ScoreThreshold;
 end;
 
-  // ResultSet:= PublicRecords_KEL.FnRoxie_GetAttrs(PP, Score_threshold);
+	// Options := MODULE(PublicRecords_KEL.Interface_Options)
+		// EXPORT INTEGER ScoreThreshold := 80;
+		// EXPORT BOOLEAN isFCRA := FALSE;
+	// END;
+
+  // ResultSet:= PublicRecords_KEL.FnRoxie_GetAttrs(PP, Options);
   
   // output( Choosen(PP, eyeball), named('raw_input'));
    
@@ -93,7 +102,6 @@ END;
 
 soap_in := PROJECT(pp, trans(LEFT));
 
-
 layout_MAS_Test_Service_output myFail(soap_in le) := TRANSFORM
 	SELF.ErrorCode := STD.Str.FilterOut(TRIM(FAILCODE + ' ' + FAILMESSAGE), '\n');
 	// SELF.Account := le.Account;
@@ -104,6 +112,7 @@ bwr_results :=
 				SOAPCALL(soap_in, 
 				RoxieIP,
 				'publicrecords_kel.MAS_nonFCRA_Service', 
+				// 'publicrecords_kel.MAS_nonFCRA_Service.4', 
 				{soap_in}, 
 				DATASET(layout_MAS_Test_Service_output),
         RETRY(2), TIMEOUT(300),

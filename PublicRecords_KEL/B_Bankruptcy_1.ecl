@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 0.11.4
+﻿//HPCC Systems KEL Compiler Version 0.11.6
 IMPORT KEL011 AS KEL;
 IMPORT B_Bankruptcy_2,CFG_Compile,E_Bankruptcy FROM PublicRecords_KEL;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Bankruptcy_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Bankruptcy_2(__in,__cfg).__ENH_Bankruptcy_2) __ENH_Bankruptcy_2 := B_Bankruptcy_2(__in,__cfg).__ENH_Bankruptcy_2;
-  SHARED __EE23571 := __ENH_Bankruptcy_2;
-  EXPORT __ST10678_Layout := RECORD
+  SHARED __EE30215 := __ENH_Bankruptcy_2;
+  EXPORT __ST15080_Layout := RECORD
     KEL.typ.nstr Bankruptcy_Source_;
     KEL.typ.nstr Source_Description_;
     KEL.typ.nstr Original_Chapter_;
@@ -33,13 +33,13 @@ EXPORT B_Bankruptcy_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST10671_Layout := RECORD
+  EXPORT __ST15073_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Court_Code_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Original_Case_Number_;
-    KEL.typ.ndataset(__ST10678_Layout) Records_;
+    KEL.typ.ndataset(__ST15080_Layout) Records_;
     KEL.typ.ndataset(E_Bankruptcy(__in,__cfg).Deadlines_Layout) Deadlines_;
     KEL.typ.ndataset(E_Bankruptcy(__in,__cfg).Case_Details_Layout) Case_Details_;
     KEL.typ.ndataset(E_Bankruptcy(__in,__cfg).Court_Information_Layout) Court_Information_;
@@ -51,10 +51,10 @@ EXPORT B_Bankruptcy_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST10671_Layout __ND24183__Project(B_Bankruptcy_2(__in,__cfg).__ST11123_Layout __PP23203) := TRANSFORM
-    __EE23322 := __PP23203.Records_;
-    SELF.Records_ := __PROJECT(__EE23322,__ST10678_Layout);
-    SELF := __PP23203;
+  SHARED __ST15073_Layout __ND30827__Project(B_Bankruptcy_2(__in,__cfg).__ST16030_Layout __PP29847) := TRANSFORM
+    __EE29966 := __PP29847.Records_;
+    SELF.Records_ := __PROJECT(__EE29966,__ST15080_Layout);
+    SELF := __PP29847;
   END;
-  EXPORT __ENH_Bankruptcy_1 := PROJECT(__EE23571,__ND24183__Project(LEFT));
+  EXPORT __ENH_Bankruptcy_1 := PROJECT(__EE30215,__ND30827__Project(LEFT));
 END;
