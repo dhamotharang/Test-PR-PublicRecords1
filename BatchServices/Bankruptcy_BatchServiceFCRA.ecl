@@ -137,22 +137,29 @@ export Bankruptcy_BatchServiceFCRA(useCannedRecs = 'false') := MACRO
   ds_remote_linking_matches := BankruptcyV3_Services.fn_get_remote_linking_matches(ds_batch_in, ds_batch_for_remote_linking, batch_params.gateways);
   ds_batch_all_validated := ds_batch_validated_lexID + ds_remote_linking_matches;
 
-  //Add back records with no results for inquiry logging, and person context retrieval.
-  //Set AddlOptions to 1 so we don't overwrite inquiry_lexID values set by remote linking or input DID.
-  ds_batch_inquiry_lexID := FFD.Mac.InquiryLexidBatch(ds_batch_in, ds_batch_all_validated, BatchServices.layout_BankruptcyV3_Batch_out, 1);
+  //Find records on input which have no results but a did > 0 and extract the dids.
+  dids_no_results := JOIN(ds_batch_in(did > 0), ds_batch_all_validated, LEFT.acctno = RIGHT.acctno,
+    TRANSFORM(FFD.Layouts.DidBatch, SELF.did := LEFT.did, SELF.acctno := LEFT.acctno), LEFT ONLY);
 
   //Extract all inquiry_lexID values per acctno and use this data to call person context.
   //This is either set by input DID when matching, or remote linking's best_lexID.
-  dids := PROJECT(ds_batch_inquiry_lexID, TRANSFORM(FFD.Layouts.DidBatch,
+  dids_results := PROJECT(ds_batch_all_validated, TRANSFORM(FFD.Layouts.DidBatch,
     SELF.did := (UNSIGNED6)LEFT.inquiry_lexID, SELF.acctno := LEFT.acctno));
+
+  //Combine all the dids needed for person context.
+  dids := dids_no_results + dids_results;
 
   deduped_dids := DEDUP(SORT(dids(did>0), acctno, did), acctno, did);
   pc_recs := FFD.FetchPersonContext(deduped_dids, batch_params.gateways, FFD.Constants.DataGroupSet.Bankruptcy, inFFDOptionsMask);
 
   //Apply FCRA FFD suppression.
-  ds_batch_ffd := BankruptcyV3_Services.fn_fcra_ffd_batch(ds_batch_inquiry_lexID, pc_recs, inFFDOptionsMask, inFCRAPurpose);
+  ds_batch_ffd := BankruptcyV3_Services.fn_fcra_ffd_batch(ds_batch_all_validated, pc_recs, inFFDOptionsMask, inFCRAPurpose);
 
-  results_pre := SORT(ds_batch_ffd.records, acctno); // records in batch out layout
+  //Add back records with no results for inquiry logging.
+  //Set AddlOptions to 1 so we don't overwrite inquiry_lexID values set by remote linking or input DID.
+  ds_batch_inquiry_lexID := FFD.Mac.InquiryLexidBatch(ds_batch_in, ds_batch_ffd.records, BatchServices.layout_BankruptcyV3_Batch_out, 1);
+
+  results_pre := SORT(ds_batch_inquiry_lexID, acctno); // records in batch out layout
   consumer_statements := SORT(ds_batch_ffd.statements, acctno); // statements
   ut.mac_TrimFields(results_pre, 'results_pre', results);
 

@@ -50,8 +50,8 @@ export fn_fcra_ffd_batch(dataset(BatchServices.layout_BankruptcyV3_Batch_out) ds
 
     recs_main := join(recs_deb, slim_pc_recs,
                       left.tmsid = right.RecID1 and
-                      ((unsigned6)left.debtor_did  =  (unsigned6) right.lexid) and
-                      (left.acctno  =  right.acctno) and
+                      ((unsigned6)left.inquiry_lexID = (unsigned6)right.lexid) and
+                      (left.acctno = right.acctno) and
                       right.DataGroup = FFD.Constants.DataGroups.BANKRUPTCY_MAIN,
                       xmainStatements(left,right),
                       left outer,
