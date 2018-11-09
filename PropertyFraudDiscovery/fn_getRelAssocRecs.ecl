@@ -27,7 +27,7 @@ EXPORT fn_getRelAssocRecs(DATASET(Layouts.batch_working) ds_work_recs,
 	getRelativeName(UNSIGNED6 did) := FUNCTION
 		didRecs:=DATASET([{did}],{UNSIGNED6 did});
 		wdRecs:=dx_BestRecords.get(didRecs, did, dx_BestRecords.Constants.perm_type.glb);
-		RETURN STD.Str.CleanSpaces(wdRecs[1]._best.fname+' '+wdRecs[1]._best.lname+' '+wdRecs[1]._best.name_suffix);
+		RETURN STD.Str.CleanSpaces(wdRecs[1].fname+' '+wdRecs[1].lname+' '+wdRecs[1].name_suffix);
 	END;
 	#END
 
