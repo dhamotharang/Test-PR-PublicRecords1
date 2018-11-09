@@ -286,7 +286,7 @@ end;
 													 clean_name_provider.name_score, clean_name_provider_other.name_score,
 													 clean_name_authorized_official.name_score, RawAID_Mailing, AceAID_Mailing,
 													 RawAID_Location, AceAID_Location,
-													 xadl2_weight, xadl2_score, xadl2_distance, xadl2_keys_used, xadl2_keys_desc, 
+													 xadl2_weight, xadl2_score, xadl2_distance, xadl2_keys_used, xadl2_keys_desc,  //HC-1224	
 													 xadl2_matches, xadl2_matches_desc,
 												LOCAL);
 

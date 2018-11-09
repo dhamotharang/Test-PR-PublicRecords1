@@ -1,5 +1,5 @@
 ﻿import Address, BIPV2, Ut, lib_stringlib, _Control, business_header,_Validate,
-Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS, MDR,Health_Provider_Services;
+Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS, MDR, Health_Provider_Services;
 
 
 export Append_Ids :=	module
@@ -72,7 +72,7 @@ export Append_Ids :=	module
  
 		did_desc2 := project (dDidOut2,transform (recordof(dDidOut2), 
             self.xadl2_keys_desc := InsuranceHeader_xLink.Process_xIDL_Layouts(false).KeysUsedToText (left.xadl2_keys_used); 
-            self.xadl2_matches_desc := InsuranceHeader_xLink.fn_MatchesToText(left.xadl2_matches);
+            self.xadl2_matches_desc := InsuranceHeader_xLink.fn_MatchesToText(left.xadl2_matches); // HC-1224
             self := left;));
 														
 		foundDID2			:=	did_desc2(did <> 0);

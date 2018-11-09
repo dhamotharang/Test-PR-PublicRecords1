@@ -531,7 +531,7 @@ export Layouts := module
 			string50									Location_Prep_AddressLast;		
 			unsigned8									source_rec_id;
 			unsigned8	 								lnpid;
-			integer2									xadl2_weight 				:= 0;
+			integer2									xadl2_weight 				:= 0;	// HC-1224
 			unsigned2									xadl2_score	 				:= 0;
 			integer1									xadl2_distance			:= 0;
 			unsigned4									xadl2_keys_used			:= 0;
