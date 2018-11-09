@@ -1,0 +1,6 @@
+﻿IMPORT PublicRecords_KEL;
+
+EXPORT BIIPII_Layout := RECORD
+	INTEGER InputUID;
+	INTEGER InputID;
+END;

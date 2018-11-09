@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 0.11.4
+﻿//HPCC Systems KEL Compiler Version 0.11.6
 IMPORT KEL011 AS KEL;
 IMPORT B_Bankruptcy_1,B_Bankruptcy_2,B_Bankruptcy_3,B_Bankruptcy_4,B_Bankruptcy_5,B_Criminal_Offense_1,B_Criminal_Offense_2,B_First_Degree_Relative_1,B_Person,B_Person_1,B_Person_2,CFG_Compile,E_Bankruptcy,E_Criminal_Offense,E_First_Degree_Associations,E_First_Degree_Relative,E_Person,E_Person_Bankruptcy,E_Person_Offenses FROM PublicRecords_KEL;
 IMPORT * FROM KEL011.Null;
@@ -79,9 +79,9 @@ EXPORT Q_Consumer_Shell_V1(KEL.typ.uid __PLexID, KEL.typ.kdate __PArchiveDate, C
     SHARED TYPEOF(E_Person_Offenses(__in,__cfg).__Result) __E_Person_Offenses := E_Person_Offenses_Filtered(__in,__cfg).__Result;
   END;
   SHARED TYPEOF(B_Person(__in,__cfg_Local).__ENH_Person) __ENH_Person := B_Person_Local(__in,__cfg_Local).__ENH_Person;
-  SHARED __EE88374 := __ENH_Person;
-  SHARED __EE88749 := __EE88374(__T(__OP2(__EE88374.UID,=,__CN(__PLexID))));
-  SHARED __ST5629_Layout := RECORD
+  SHARED __EE126071 := __ENH_Person;
+  SHARED __EE126446 := __EE126071(__T(__OP2(__EE126071.UID,=,__CN(__PLexID))));
+  SHARED __ST7788_Layout := RECORD
     KEL.typ.nuid Lex_I_D_;
     KEL.typ.int Bankruptcy_Count_In_Last1_Month_ := 0;
     KEL.typ.int Bankruptcy_Count_In_Last3_Months_ := 0;
@@ -109,23 +109,23 @@ EXPORT Q_Consumer_Shell_V1(KEL.typ.uid __PLexID, KEL.typ.kdate __PArchiveDate, C
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST5629_Layout __ND88754__Project(B_Person(__in,__cfg_Local).__ST10254_Layout __PP88750) := TRANSFORM
-    SELF.Lex_I_D_ := __PP88750.UID;
-    SELF.Bankruptcy_Count_In_Last1_Month_ := KEL.Routines.BoundsFold(__PP88750.Bankruptcy_Count_In_Last1_Month_, -1,255);
-    SELF.Bankruptcy_Count_In_Last3_Months_ := KEL.Routines.BoundsFold(__PP88750.Bankruptcy_Count_In_Last3_Months_, -1,255);
-    SELF.Bankruptcy_Count_In_Last6_Months_ := KEL.Routines.BoundsFold(__PP88750.Bankruptcy_Count_In_Last6_Months_, -1,255);
-    SELF.Bankruptcy_Count_In_Last1_Year_ := KEL.Routines.BoundsFold(__PP88750.Bankruptcy_Count_In_Last1_Year_, -1,255);
-    SELF.Bankruptcy_Count_In_Last2_Years_ := KEL.Routines.BoundsFold(__PP88750.Bankruptcy_Count_In_Last2_Years_, -1,255);
-    SELF.Bankruptcy_Count_In_Last5_Years_ := KEL.Routines.BoundsFold(__PP88750.Bankruptcy_Count_In_Last5_Years_, -1,255);
-    SELF.Bankruptcy_Count_ := KEL.Routines.BoundsFold(__PP88750.Bankruptcy_Count_, -1,255);
-    SELF.Felony_Count_In_Last1_Month_ := KEL.Routines.BoundsFold(__PP88750.Felony_Count_In_Last1_Month_, -1,255);
-    SELF.Felony_Count_In_Last3_Months_ := KEL.Routines.BoundsFold(__PP88750.Felony_Count_In_Last3_Months_, -1,255);
-    SELF.Felony_Count_In_Last6_Months_ := KEL.Routines.BoundsFold(__PP88750.Felony_Count_In_Last6_Months_, -1,255);
-    SELF.Felony_Count_In_Last1_Year_ := KEL.Routines.BoundsFold(__PP88750.Felony_Count_In_Last1_Year_, -1,255);
-    SELF.Felony_Count_In_Last2_Years_ := KEL.Routines.BoundsFold(__PP88750.Felony_Count_In_Last2_Years_, -1,255);
-    SELF.Felony_Count_In_Last5_Years_ := KEL.Routines.BoundsFold(__PP88750.Felony_Count_In_Last5_Years_, -1,255);
-    SELF.Felony_Count_ := KEL.Routines.BoundsFold(__PP88750.Felony_Count_, -1,255);
-    SELF := __PP88750;
+  SHARED __ST7788_Layout __ND126451__Project(B_Person(__in,__cfg_Local).__ST14656_Layout __PP126447) := TRANSFORM
+    SELF.Lex_I_D_ := __PP126447.UID;
+    SELF.Bankruptcy_Count_In_Last1_Month_ := KEL.Routines.BoundsFold(__PP126447.Bankruptcy_Count_In_Last1_Month_, -1,255);
+    SELF.Bankruptcy_Count_In_Last3_Months_ := KEL.Routines.BoundsFold(__PP126447.Bankruptcy_Count_In_Last3_Months_, -1,255);
+    SELF.Bankruptcy_Count_In_Last6_Months_ := KEL.Routines.BoundsFold(__PP126447.Bankruptcy_Count_In_Last6_Months_, -1,255);
+    SELF.Bankruptcy_Count_In_Last1_Year_ := KEL.Routines.BoundsFold(__PP126447.Bankruptcy_Count_In_Last1_Year_, -1,255);
+    SELF.Bankruptcy_Count_In_Last2_Years_ := KEL.Routines.BoundsFold(__PP126447.Bankruptcy_Count_In_Last2_Years_, -1,255);
+    SELF.Bankruptcy_Count_In_Last5_Years_ := KEL.Routines.BoundsFold(__PP126447.Bankruptcy_Count_In_Last5_Years_, -1,255);
+    SELF.Bankruptcy_Count_ := KEL.Routines.BoundsFold(__PP126447.Bankruptcy_Count_, -1,255);
+    SELF.Felony_Count_In_Last1_Month_ := KEL.Routines.BoundsFold(__PP126447.Felony_Count_In_Last1_Month_, -1,255);
+    SELF.Felony_Count_In_Last3_Months_ := KEL.Routines.BoundsFold(__PP126447.Felony_Count_In_Last3_Months_, -1,255);
+    SELF.Felony_Count_In_Last6_Months_ := KEL.Routines.BoundsFold(__PP126447.Felony_Count_In_Last6_Months_, -1,255);
+    SELF.Felony_Count_In_Last1_Year_ := KEL.Routines.BoundsFold(__PP126447.Felony_Count_In_Last1_Year_, -1,255);
+    SELF.Felony_Count_In_Last2_Years_ := KEL.Routines.BoundsFold(__PP126447.Felony_Count_In_Last2_Years_, -1,255);
+    SELF.Felony_Count_In_Last5_Years_ := KEL.Routines.BoundsFold(__PP126447.Felony_Count_In_Last5_Years_, -1,255);
+    SELF.Felony_Count_ := KEL.Routines.BoundsFold(__PP126447.Felony_Count_, -1,255);
+    SELF := __PP126447;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(__EE88749,__ND88754__Project(LEFT)));
+  EXPORT Res0 := __UNWRAP(PROJECT(__EE126446,__ND126451__Project(LEFT)));
 END;

@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 0.11.4
+﻿//HPCC Systems KEL Compiler Version 0.11.6
 IMPORT KEL011 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile,E_Bankruptcy,E_Person FROM PublicRecords_KEL;
@@ -59,10 +59,10 @@ EXPORT E_Person_Bankruptcy(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
   EXPORT Bankrupt__Orphan := JOIN(InData(__NN(Bankrupt_)),E_Bankruptcy(__in,__cfg).__Result,__EEQP(LEFT.Bankrupt_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT SanityCheck := DATASET([{COUNT(Subject__Orphan),COUNT(Bankrupt__Orphan)}],{KEL.typ.int Subject__Orphan,KEL.typ.int Bankrupt__Orphan});
   EXPORT NullCounts := DATASET([
-    {'PersonBankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','Subject',COUNT(__d0(__NL(Subject_))),COUNT(__d0(__NN(Subject_)))},
-    {'PersonBankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','Bankrupt',COUNT(__d0(__NL(Bankrupt_))),COUNT(__d0(__NN(Bankrupt_)))},
-    {'PersonBankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','Source',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
-    {'PersonBankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
-    {'PersonBankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))}]
+    {'PersonBankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Subject',COUNT(__d0(__NL(Subject_))),COUNT(__d0(__NN(Subject_)))},
+    {'PersonBankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Bankrupt',COUNT(__d0(__NL(Bankrupt_))),COUNT(__d0(__NN(Bankrupt_)))},
+    {'PersonBankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Source',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
+    {'PersonBankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
+    {'PersonBankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;

@@ -15,10 +15,20 @@ EXPORT MAS_nonFCRA_Service() := MACRO
 
   // Read interface params
   ds_input := DATASET([],PublicRecords_KEL.ECL_Functions.Input_Layout) : STORED('input');
-  INTEGER Score_threshold := 90 : STORED('ScoreThreshold');
+  INTEGER Score_threshold := 80 : STORED('ScoreThreshold');
 
-  ResultSet:= PublicRecords_KEL.FnRoxie_GetAttrs(ds_input, Score_threshold);
-    
+	Options := MODULE(PublicRecords_KEL.Interface_Options)
+		EXPORT INTEGER ScoreThreshold := Score_threshold;
+		EXPORT BOOLEAN IsFCRA := FALSE;
+		
+		// Override Include* Entity/Association options here if certain entities can be turned off to speed up processing.
+		// This will bypass uneccesary key JOINS in PublicRecords_KEL.Fn_MAS_FCRA_FDC if the keys don't contribute to any 
+		// ENTITIES/ASSOCIATIONS being used by the query.
+		
+	END;	
+	
+  ResultSet:= PublicRecords_KEL.FnRoxie_GetAttrs(ds_input, Options);		
+		
   OUTPUT( ResultSet, NAMED('Results') );
 
 ENDMACRO;
