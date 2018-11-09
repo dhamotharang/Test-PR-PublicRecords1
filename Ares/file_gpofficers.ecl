@@ -76,8 +76,10 @@ with_codes_layout department_codes_xform (Department_Function L, department_list
 END;
 
 with_department_codes := join(Department_Function, department_list, LEFT.job_Title =RIGHT.id, department_codes_xform(LEFT,RIGHT));
+sorted_with_department_codes := SORT(with_department_codes,relationship_id);
+deduped_with_department_codes := DEDUP(sorted_with_department_codes,LEFT.relationship_id = RIGHT.relationship_id);
 
-//Find 	Officer Name
+//Find 	Officer's Name
 layout_party := RECORD(recordof(Relationship_ds.parties.party))
 	string relationship_id := '';
 END;
@@ -119,6 +121,8 @@ officer_name_layout officer_name_xform (employee_id_list L,recordof(Ares.Files.d
 END;
 
 Officer_Name := join(employee_id_list, Ares.Files.ds_person, LEFT.entity_reference = right.id, officer_name_xform(left,right));
+sorted_Officer_Name := SORT(Officer_Name,relationship_id);
+deduped_Officer_Name := DEDUP(sorted_Officer_Name,LEFT.relationship_id = RIGHT.relationship_id);
 
 layout_gpofficers := RECORD
 	STRING Update_Flag;
@@ -136,7 +140,7 @@ layout_gpofficers final_xform(Officer_Name L, with_codes_layout R ) := Transform
 	SELF.Officer_Name := L.given_name + ' ' + L.surname;
 End;
 
-final := join(Officer_Name, with_department_codes, LEFT.relationship_id = right.relationship_id, final_xform(left,right));
+final	:= join(deduped_Officer_Name, deduped_with_department_codes, LEFT.relationship_id = right.relationship_id, final_xform(left,right));
 
 EXPORT file_gpofficers := final;
 
