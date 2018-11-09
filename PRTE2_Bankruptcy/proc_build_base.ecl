@@ -15,9 +15,9 @@ EXPORT proc_build_base := FUNCTION
 	end;
 	
 	PRTE2_Bankruptcy.Layouts.Main_BaseV3_ext join_Main(Files.Main_in L, Files.Status_in R) := TRANSFORM
-	   SELF.status 			:= row(R,l_status);
-	   SELF            	:= L;
-		 SELF							:= [];
+	   SELF.status := row(R,l_status);
+	   SELF        := L;
+				SELF								:= [];
 	end;
 
 	jn_Main := JOIN(sort(distribute(PRTE2_Bankruptcy.Files.Main_in,hash(tmsid)),record,local)
@@ -146,20 +146,20 @@ ded_jSearch		:= DEDUP(jSearchAddr_new, ALL);
 									
 //DID & Name/Address Cleaning Main
 PRTE2_Bankruptcy.Layouts.Main_BaseV3_ext tClnMain(Layouts.Main_BaseV3_ext L) := TRANSFORM
-	//Name cleaning
+	//Name cleaning - if the clean names are passed in, use them.  Otherwise use results of the cleaner
 	tempTName					:= Address.CleanPersonFML73_fields(L.trusteename);
-	SELF.title				:= tempTName.title;
-	SELF.fname				:= tempTName.fname;
-	SELF.mname				:= tempTName.mname;
-	SELF.lname				:= tempTName.lname;
-	SELF.name_suffix	:= tempTName.name_suffix;
-	SELF.name_score		:= tempTName.name_score;
+	SELF.title				:= IF(TRIM(L.title)<>'', L.title, tempTName.title);
+	SELF.fname				:= IF(TRIM(L.fname)<>'', L.fname, tempTName.fname);
+	SELF.mname				:= IF(TRIM(L.mname)<>'', L.mname, tempTName.mname);
+	SELF.lname				:= IF(TRIM(L.lname)<>'', L.lname, tempTName.lname);
+	SELF.name_suffix	:= IF(TRIM(L.name_suffix)<>'', L.name_suffix, tempTName.name_suffix);
+	SELF.name_score		:= IF(TRIM(L.name_score)<>'', L.name_score, tempTName.name_score);
 	
 //Link_SSN can not be used to populate app_ssn field if vendor did not provide SSNbut Link_SSN field should be used for DID'g
 	temp_ssn :=  IF(L.app_ssn = '' and L.link_ssn <> '', l.link_ssn, l.app_ssn);
 
-//On;y valid for internal test records	
-	self.app_ssn := if(L.cust_name = 'LN_PR' and L.app_ssn = '' and L.link_ssn <> '', L.link_ssn, L.app_ssn);
+//Only valid for internal test records	
+self.app_ssn := if(L.cust_name <> '' and L.app_ssn = '' and L.link_ssn <> '', L.link_ssn, L.app_ssn);
 	
 //Linking ID
 	SELF.did					:= IF(trim(L.DID) != '',L.DID,
@@ -179,32 +179,38 @@ PromoteSupers.Mac_SF_BuildProcess(dedMain, Constants.BASE_PREFIX +'main', build_
 
 //DID & Name/Address cleaning Search
 PRTE2_Bankruptcy.Layouts.Search_Base_ext tCleanNAddr(ded_jSearch L) := TRANSFORM
-	//Name Cleaning
+	//Name cleaning - if the clean names are passed in, use them.  Otherwise use results of the cleaner
 	tempName	:= Address.CleanPersonFML73_fields(ut.CleanSpacesAndUpper(trim(L.orig_fname)+' '+trim(L.orig_mname)+' '+trim(L.orig_lname)+' '+trim(L.orig_name_suffix)));
-	SELF.title				:= tempName.title;
-	SELF.fname				:= tempName.fname;
-	SELF.mname				:= tempName.mname;
-	SELF.lname				:= tempName.lname;
-	SELF.name_suffix	:= tempName.name_suffix;
-	SELF.name_score		:= tempName.name_score;
-	SELF.cname				:= ut.CleanSpacesAndUpper(L.orig_company);
+	SELF.title				:= IF(TRIM(L.title)<>'', L.title, tempName.title);
+	SELF.fname				:= IF(TRIM(L.fname)<>'', L.fname, tempName.fname);
+	SELF.mname				:= IF(TRIM(L.mname)<>'', L.mname, tempName.mname);
+	SELF.lname				:= IF(TRIM(L.lname)<>'', L.lname, tempName.lname);
+	SELF.name_suffix	:= IF(TRIM(L.name_suffix)<>'', L.name_suffix, tempName.name_suffix);
+	SELF.name_score		:= IF(TRIM(L.name_score)<>'', L.name_score, tempName.name_score);
+ SELF.cname    := if(L.orig_company <> '', ut.CleanSpacesAndUpper(L.orig_company), ut.CleanSpacesAndUpper(L.orig_name));  
 
 //Link_SSN can not be used to populate fields if vendor did not provide SSN	but Link_SSN field should be used for DID'g	
 	temp_ssn := IF(L.app_ssn = '' and L.ssn <> '', L.ssn, 
 									IF(L.app_ssn = '' and L.link_ssn <> '', L.link_ssn, L.app_ssn));
 
-//On;y valid for internal test records										
-	SELF.app_ssn			:= if(L.cust_name = 'LN_PR' and  L.app_ssn = '' and L.ssn <> '', L.ssn,
-													if(L.cust_name = 'LN_PR' and  L.app_ssn = '' and L.link_ssn <> '', L.link_ssn,
-															L.app_ssn));
-	
+//Only valid for internal test records										
+
+SELF.app_ssn := if(L.cust_name <> '' and  L.app_ssn = '' and L.ssn <> '', L.ssn,
+                                                                   if(L.cust_name <> '' and  L.app_ssn = '' and L.link_ssn <> '', L.link_ssn,
+                                                                        L.app_ssn));
+															
+SELF.app_tax_id := if(L.cust_name <> '' and  L.app_tax_id = '' and L.tax_id <> '', L.tax_id,
+                                                                                if(L.cust_name <> '' and  L.app_tax_id = '' and L.link_fein <> '', L.link_fein,
+                                                                                                L.app_tax_id));
+//
 	//Linking ID's
 	SELF.DID  				:= IF(trim(L.DID) != '',L.DID,
 													(string12)prte2.fn_AppendFakeID.did(SELF.fname, SELF.lname, temp_ssn, L.link_dob, L.cust_name)); 
 	SELF.BDID 				:= IF(trim(L.BDID) != '', L.BDID,
 													(string12)prte2.fn_AppendFakeID.bdid(SELF.cname, L.prim_range, L.prim_name, L.v_city_name, L.st, L.zip, L.cust_name));
 	
-	vLinkingIds 			:= Prte2.fn_AppendFakeID.LinkIds(L.orig_company, L.link_fein, L.link_inc_date, L.prim_range, L.prim_name, L.sec_range, L.v_city_name, L.st, L.zip, L.cust_name);
+	vLinkingIds     := Prte2.fn_AppendFakeID.LinkIds(SELF.cname, L.link_fein, L.link_inc_date, L.prim_range, L.prim_name, L.sec_range, L.v_city_name, L.st, L.zip, L.cust_name);
+	
 	SELF.powid				:= vLinkingIds.powid;
 	SELF.proxid				:= vLinkingIds.proxid;
 	SELF.seleid				:= vLinkingIds.seleid;
@@ -225,4 +231,3 @@ PromoteSupers.Mac_SF_BuildProcess(dedSearch, Constants.BASE_PREFIX +'search', bu
 RETURN SEQUENTIAL(build_main_base, build_search_base);
 
 END;
-

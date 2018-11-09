@@ -1,4 +1,4 @@
-import iesp;
+﻿import iesp;
 
 export Layout_Output := RECORD
 	
@@ -793,5 +793,6 @@ export Layout_Output := RECORD
 	integer ssnLookupFlag := 0;
 	string120 errMsg := '';
 	risk_indicators.Layout_ConsumerFlags						ConsumerFlags;
-	dataset(iesp.share_fcra.t_ConsumerStatement) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MAX_CONSUMER_STATEMENTS)};
+	dataset(Risk_Indicators.Layouts.tmp_Consumer_Statements) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MAX_CONSUMER_STATEMENTS)};
+
 END;

@@ -1,4 +1,4 @@
-EXPORT Layouts := module
+﻿EXPORT Layouts := module
 
 	export CorpDataExportLayoutIn 					:= record
 	  string 			dataid;
@@ -167,13 +167,13 @@ EXPORT Layouts := module
 	
 	export Temp_NormalizedIndividualExport	:= record
 		CorpIndividualExportLayoutIn;
-	  string		  address1;
-	  string 			city;
-	  string 			state;
-	  string 			zip;
-	  string 			country;
-	  string 			addrtype;
-	  string 			addrdesc;			
+	  string		  c_address1;
+	  string 			c_city;
+	  string 			c_state;
+	  string 			c_zip;
+	  string 			c_country;
+	  string 			c_addrtype;
+	  string 			c_addrdesc;			
 	end;
 	
 	export Temp_CorpDataIndividualExport		:= record

@@ -1,4 +1,4 @@
-IMPORT iesp, Gateway;
+﻿IMPORT iesp, Gateway, MDR;
 EXPORT Constants :=
 MODULE
 
@@ -8,7 +8,7 @@ MODULE
 	EXPORT UNSIGNED1 MaxGatewayMatches   := 100;
 	EXPORT UNSIGNED1 MaxTUGatewayResults := 30;
 	EXPORT UNSIGNED1 MaxPhoneMatches     := 10;
-	EXPORT UNSIGNED1 MaxRoyalties        := 8; // accudata ocn royalty
+	EXPORT UNSIGNED1 MaxRoyalties        := 9; // zumigo royalty
 	
 	// Phone Porting 
 	EXPORT UNSIGNED1 MaxPortedMatches    	 := 100;	
@@ -76,7 +76,8 @@ MODULE
 	EXPORT RiskLevel		 := ENUM(PASS=1,WARN=2,FAILED=3);
 	EXPORT UNSIGNED1 OTPRiskLimit := 5;
 	EXPORT UNSIGNED1 InquiryDayLimit := 1;
-	EXPORT defaultRules	 := DATASET([{'Phone Association','H','1','0','No Identity',0,0,true,true}],iesp.phonefinder.t_PhoneFinderRiskIndicator);
+	EXPORT defaultRules	 := DATASET([{'Phone Association','H','1','0','No Identity',0,0,true,true}, {'Phone Association','H','1','-1','No phone associated with subject',0,0,true,true}],
+	                                iesp.phonefinder.t_PhoneFinderRiskIndicator);
 	EXPORT SET OF STRING enumCategory := ['Phone Association','Phone Activity','Phone Criteria'];
 	
 	EXPORT SpoofPhoneOrigin :=
@@ -117,4 +118,116 @@ MODULE
 		EXPORT Targus       := FALSE;
 		EXPORT PhoneMetadata:= FALSE;
 	END;
+	//Zumigo
+	EXPORT ConsentLevels   := ENUM(PII_Association = 0, Single_consumer = 1, Full_Consumer = 2);
+	// Batch only
+	EXPORT BatchRestrictedDirectMarketingSourcesSet :=  
+	                                    [MDR.sourceTools.src_AL_Experian_Veh,                                    
+	                                     MDR.SourceTools.src_Voters_v2,	
+																			 MDR.SourceTools.src_Wither_and_Die, 
+																			 MDR.SourceTools.src_AK_Watercraft,
+																			 MDR.SourceTOols.src_AK_Experian_Veh, 
+																			 MDR.SourceTools.src_CO_Experian_Veh, 
+																			 MDR.SourceTools.src_CO_Experian_DL, 
+																			 MDR.SourceTools.src_CT_Experian_Veh, 
+																			 MDR.SourceTools.src_CT_DL,           
+																			 MDR.SourceTools.src_DE_Experian_Veh, 
+																			 MDR.SourceTools.src_DE_Experian_DL,  
+																			 MDR.SourceTools.src_DC_Experian_Veh, 
+																			 MDR.SourceTools.src_FL_Experian_Veh, 
+																			 MDR.SourceTOols.src_FL_Veh,          
+																			 MDR.SourceTOols.src_FL_Watercraft,   
+																			 MDR.SourceTOols.src_FL_Veh,         
+																			 MDR.SourceTools.src_FL_DL,          
+																			 MDR.SourceTools.src_ID_Experian_DL,  
+																			 MDR.SourceTOols.src_ID_Veh,           
+																				MDR.SourceTools.src_ID_Experian_Veh, 
+																				MDR.SourceTOols.src_IL_Experian_Veh, 
+																				MDR.SourceTOols.src_IL_Experian_DL, 
+																				MDR.SourceTools.src_KS_Watercraft,
+																				MDR.SourceTools.src_KY_Watercraft, 
+																				MDR.SourceTools.src_KY_Experian_Veh, 
+																				MDR.SourceTools.src_KY_Veh,        
+																				MDR.SourceTools.src_KY_Watercraft,
+																				MDR.SourceTools.src_KY_Experian_DL, 
+																				MDR.SourceTools.src_LA_Experian_DL, 
+																				MDR.SourceTools.src_LA_Experian_Veh, 
+																				MDR.SourceTools.src_LA_DL,          
+																				MDR.SourceTools.src_ME_DL,          
+																				MDR.SourceTools.src_ME_Veh,          
+																				MDR.SourceTools.src_ME_Experian_Veh, 
+																				MDR.SourceTools.src_MD_Experian_DL, 
+																				MDR.SourceTools.src_MD_Watercraft, 
+																				MDR.SourceTools.src_MD_Experian_Veh, 
+																				MDR.SourceTools.src_MA_DL,          
+																				MDR.SourceTools.src_MA_Experian_Veh,
+																				MDR.SourceTools.src_MI_Watercraft,
+																				MDR.SourceTools.src_MI_Experian_Veh, 
+																				MDR.SourceTools.src_MI_DL,           
+																				MDR.SourceTools.src_MN_Veh,          
+																				MDR.SourceTools.src_MN_Experian_Veh,
+																			   MDR.SourceTools.src_MN_DL  , 
+																				 MDR.SourceTools.src_MS_Experian_DL  , 
+																				 MDR.SourceTools.src_MS_Experian_Veh , 
+																				 MDR.SourceTools.src_MS_Veh, 
+																				 MDR.SourceTools.src_MS_Veh, 
+																				 MDR.SourceTools.src_MO_Experian_Veh, 
+																				 MDR.SourceTools.src_MO_Veh,          
+																				 MDR.SourceTools.src_MO_Watercraft,
+																				 MDR.SourceTools.src_MT_Watercraft, 
+																				 MDR.SourceTools.src_MT_Experian_Veh, 
+																				 MDR.SourceTools.src_MT_Veh,
+																				 MDR.SourceTools.src_NE_Veh,
+																				 MDR.SourceTools.src_NE_Watercraft,
+																				 MDR.SourceTools.src_NV_Experian_Veh, 
+																				 MDR.SourceTools.src_NV_Veh, 
+																				 MDR.SourceTools.src_NV_DL ,
+																				 MDR.SourceTools.src_NH_Watercraft,
+																				 MDR.SourceTools.src_NH_Experian_DL,
+																				 MDR.SourceTools.src_NM_Experian_Veh,
+																				 MDR.SourceTools.src_NY_Experian_Veh, 
+																				 MDR.SourceTools.src_EMerge_CCW,
+																				 MDR.SourceTools.src_NC_Veh, 
+																				 MDR.SourceTools.src_ND_Experian_DL, 
+																				 MDR.SourceTools.src_ND_Experian_Veh , 
+																				 MDR.SourceTools.src_ND_Veh , 
+																				 MDR.SourceTools.src_ND_Watercraft,
+																				 MDR.SourceTools.src_OH_Experian_Veh, 
+																				 MDR.SourceTools.src_OH_Veh,
+																				 MDR.SourceTools.src_OH_DL,
+																				 MDR.SourceTools.src_OK_Experian_Veh , 
+																				 MDR.SourceTools.src_SC_Experian_Veh , 
+																				 MDR.SourceTools.src_SC_Watercraft, 
+																				 MDR.SourceTools.src_Professional_License, 
+																				 MDR.SourceTools.src_SC_Experian_DL,
+																				 MDR.SourceTools.src_TN_DL,
+																				 MDR.SourceTools.src_TN_Experian_Veh, 
+																				 MDR.SourceTools.src_TX_DL,																			
+																				 MDR.SourceTools.src_TX_Veh, 
+																				 MDR.SourceTools.src_TX_Experian_Veh, 
+																				 MDR.SourceTools.src_UT_Watercraft, 
+																				 MDR.SourceTools.src_UT_Experian_Veh , 
+																				 MDR.SourceTools.src_VA_Watercraft ,
+																				 MDR.SourceTools.src_WA_Watercraft , 
+																				 MDR.SourceTools.src_WI_Veh ,
+																				 MDR.SourceTools.src_WV_DL , 
+																				 MDR.SourceTools.src_WI_Experian_Veh, 
+																				 MDR.SourceTools.src_WI_DL , 
+																				 MDR.SourceTools.src_WY_DL, 
+																				 MDR.SourceTools.src_WY_Experian_Veh , 
+																				 MDR.SourceTools.src_WY_Veh , 
+																				 MDR.SourceTools.src_Targus_White_pages, 
+																				 MDR.SourceTools.src_LnPropV2_Fares_Asrs , 
+																				 MDR.SourceTools.src_Foreclosures , 
+																				 MDR.SourceTools.src_Equifax , 
+																				 MDR.SourceTools.src_EBR , 
+																				 MDR.SourceTools.src_Experian_Credit_Header  , 
+																				 MDR.SourceTools.src_Certegy ,
+																				 MDR.SourceTools.src_Yellow_Pages ,
+																				 MDR.SourceTools.src_Wired_Assets_Email , 
+																				 MDR.SourceTools.src_TUCS_Ptrack , 
+																				 MDR.SourceTools.src_Entiera ,
+																				 MDR.SourceTools.src_Wired_Assets_Owned, 
+																				 MDR.SourceTools.src_TU_CreditHeader 
+																				 ];
 END;

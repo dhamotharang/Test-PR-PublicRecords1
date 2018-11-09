@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="headerFileRollupRequest">
   <part name="DID" type="xsd:string"/>
   <part name="RID" type="xsd:string"/>
@@ -172,10 +172,10 @@ export PickListService := MACRO
   // direct library call: define search parameters
   search_mod := module (project (AutoStandardI.GlobalModule(), AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full, opt))
   end;
-  dids := AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do (search_mod);
+  dids := AutoHeaderI/LIBCALL_FetchI_Hdr_Indv/do (search_mod);
 */
   // same as in doxie/header_records, but I may need DIDs as a separate dataset
-  dids := doxie.get_dids_HHID (forceLocal := true, noFail := false);
+  dids := doxie.get_dids (forceLocal := true, noFail := false);
   all_header_recs := doxie.header_records_byDID (dids,
                                                  include_dailies := true, allow_wildcard := false, 
                                                  IncludeAllRecords := all_dids, isrollup:= true);

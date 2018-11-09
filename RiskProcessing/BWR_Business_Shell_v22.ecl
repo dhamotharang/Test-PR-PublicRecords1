@@ -1,4 +1,4 @@
-#workunit('name', 'Business_Shell_V22');
+﻿#workunit('name', 'Business_Shell_V22');
 
 IMPORT Business_Risk_BIP, RiskProcessing, Risk_Indicators, RiskWise, UT;
 
@@ -278,6 +278,7 @@ SOAPBusShell := SOAPCALL(InputBusShell,
 												'Business_Risk_BIP.Business_Shell_Service',
 												{InputBusShell},
 												DATASET(xLayout),
+												XPATH('*/Results/Result/Dataset[@name=\'Results\']/Row'),
 												PARALLEL(threads),
 												RETRY(3), TIMEOUT(300),
 												onFail(myFail(LEFT)));

@@ -1,11 +1,12 @@
-
+﻿
 
 EXPORT Layouts_Hogan := MODULE
 
 	EXPORT raw_in	:= RECORD
 		string1	ADDDELFLAG;
-		string1	INDIVBUSUN;
-		string1	AKA_YN;
+		string2	ENTITYTYPE; //	Contains INDIVBUSUN	and AKA_YN
+		// string1	INDIVBUSUN;
+		// string1	AKA_YN;
 		string1	ASSOCCODE;
 		string7	COURTID;
 		string2	FILETYPEID;
@@ -35,7 +36,10 @@ EXPORT Layouts_Hogan := MODULE
 		string6	ORIGBOOK;
 		string6	ORIGPAGE;
 		string32	ATYADDRESS;
-		string24	ATYCITY;
+		STRING8	DOB;	//	DF-21430
+		STRING8	Collection_Date;	//	DF-21430
+		STRING1	Unused;	//	DF-21430
+		// string24	ATYCITY;
 		string2	ATYSTATE;
 		string5	ATYZIP;
 		string1	AVAIL;
@@ -46,7 +50,7 @@ EXPORT Layouts_Hogan := MODULE
 		string1	VOL_INVOL;
 		string10	RMSID;
 		string50	EMPLOYER_NAME;
-		string2	lf;
+		STRING45	CaseLinkID;	//	DF-21430
 	END;
 	
 	EXPORT filing_type_lkp	:= RECORD

@@ -1,4 +1,4 @@
-import header_services, business_header, POE, Address, ut, mdr ;
+﻿import header_services, business_header, POE, Address, ut, mdr ;
 
 export Append_Supp(dataset(Layouts.Keybuild) pDataset) := FUNCTION
 
@@ -14,8 +14,8 @@ export Append_Supp(dataset(Layouts.Keybuild) pDataset) := FUNCTION
 	end;
 
 	EmpFullOut_HashBDID_v2 EmpHashBDID_v2(Layouts.Keybuild l) := transform                            
-	 self.hval := hashmd5(intformat((unsigned6)l.bdid,15,1), intformat((unsigned6)l.did,15,1));
-	 self.EmpHashTitleFormat := hashmd5(intformat((unsigned6)l.bdid,15,1), l.subject_job_title, l.subject_name.lname, l.subject_name.fname);
+	 self.hval := hashmd5(intformat((unsigned6)l.bdid,12,1), intformat((unsigned6)l.did,15,1));
+	 self.EmpHashTitleFormat := hashmd5(intformat((unsigned6)l.bdid,12,1), l.subject_job_title, l.subject_name.lname, l.subject_name.fname);
 	 self := l;
 	end;
 
@@ -25,7 +25,7 @@ export Append_Supp(dataset(Layouts.Keybuild) pDataset) := FUNCTION
 
   Suppression_Layout := header_services.Supplemental_Data.layout_in;
 
-  header_services.Supplemental_Data.mac_verify(	'employment_sup.txt', 
+  header_services.Supplemental_Data.mac_verify(	'employment_sup.txt',
 																								Suppression_Layout, 
 																								emp_ONLY_supp_ds_func	);
 	 
@@ -92,7 +92,7 @@ export Append_Supp(dataset(Layouts.Keybuild) pDataset) := FUNCTION
 																			(left.hval = right.hval) OR (left.EmpHashTitleFormat = right.EmpHashTitleFormat),
 																			tEmpAllSuppress(left),
 																			left only, all
-																	 );	
+																			);	
 		
 	// Injection file
 		

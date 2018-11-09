@@ -5,7 +5,7 @@ lay_inputs := tools.Layout_FilenameVersions.Inputs;
 
 EXPORT Promote(	STRING							pVersion					=	'',
 								STRING							pFilter						=	'',
-								BOOLEAN							pDelete				 		=	FALSE,				//** Change to TRUE when going into production
+								BOOLEAN							pDelete				 		=	TRUE,				//** Change to TRUE when going into production
 								BOOLEAN							pIsTesting			 	=	FALSE,
 								BOOLEAN							pClearFile				=	TRUE,
 								BOOLEAN							pIsDeltaBuild			=	FALSE,

@@ -1,5 +1,4 @@
-﻿
-IMPORT Address, BIPV2, Business_Risk_BIP, LN_PropertyV2, MDR, DueDiligence, SALT28, iesp;
+﻿IMPORT Address, BIPV2, Business_Risk_BIP, LN_PropertyV2, MDR, DueDiligence, SALT28, iesp;
 
 EXPORT getBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) BusnData, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -26,7 +25,8 @@ EXPORT getBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	// ------                                                                             ------
 	// ------ Add our sequence number to the Raw Property records found for this Business ------
 	// ------                                                                             ------
-	DueDiligence.Common.AppendSeq(PropertyRaw, BusnData, PropertyRaw_with_seq);
+	PropertyRaw_with_seq := DueDiligence.Common.AppendSeq(PropertyRaw, BusnData, TRUE);
+
 
   // ------                                                                                    ------	
   // ------ When this query runs in ARCHIVE MODE the History date on the input contains a date ------
@@ -82,6 +82,8 @@ EXPORT getBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 																			SELF.PropertyReportData.ultID  := LEFT.ultID,
 																			SELF.PropertyReportData.orgID  := LEFT.orgID,
 																			SELF.PropertyReportData.seleID := LEFT.seleID,
+																			SELF.PropertyReportData.proxID := LEFT.proxID,
+																			SELF.PropertyReportData.powID := LEFT.powID,
 																			SELF.LNFaresId                 := RIGHT.ln_fares_id,
 										                  SELF.TaxAssdValue              := (INTEGER)RIGHT.assessed_total_value,
 															        SELF.TaxAmount                 := (INTEGER)RIGHT.tax_amount, 
@@ -173,32 +175,32 @@ EXPORT getBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	//   DEBUGGING OUTPUTS
 	// *********************
 	 
-	 IF(DebugMode,     OUTPUT(CHOOSEN(BusnKeys, 100),              NAMED('Sample_BusnKeys_for_Property')));    	   	 
+	 IF(DebugMode,     OUTPUT(CHOOSEN(BusnKeys, 10),              NAMED('Sample_BusnKeys_for_Property')));    	   	 
 	
-	 IF(DebugMode,     OUTPUT(CHOOSEN(PropertyRaw_with_seq, 100),  NAMED('Sample_PropertyStep1_ALL')));
+	 IF(DebugMode,     OUTPUT(CHOOSEN(PropertyRaw_with_seq, 10),  NAMED('Sample_PropertyStep1_ALL')));
 	 IF(DebugMode,     OUTPUT(COUNT  (PropertyRaw_with_seq),       NAMED('HowManyPropertyStep1')));
 	 
 	 //IF(DebugMode,     OUTPUT(CHOOSEN(Property_Filtered, 100),     NAMED('Sample_Property_Filtered_Step2')));
 	 IF(DebugMode,     OUTPUT(COUNT  (Property_Filtered),          NAMED('HowManyPropertyAfterFilterStep2')));
 	 
-	 IF(DebugMode,     OUTPUT(CHOOSEN(Property_owned_at_some_point, 100),    NAMED('Sample_Property_owned_Step3')));
+	 IF(DebugMode,     OUTPUT(CHOOSEN(Property_owned_at_some_point, 10),    NAMED('Sample_Property_owned_Step3')));
 	 IF(DebugMode,     OUTPUT(COUNT  (Property_owned_at_some_point),         NAMED('HowManyPropertyStep3')));
 	 
-	 IF(DebugMode,     OUTPUT(CHOOSEN(Property_sold, 100),          NAMED('Sample_Property_sold_Step4')));
+	 IF(DebugMode,     OUTPUT(CHOOSEN(Property_sold, 10),          NAMED('Sample_Property_sold_Step4')));
 	 IF(DebugMode,     OUTPUT(COUNT  (Property_sold),              NAMED('HowManyPropertyStep4')));
 	 
-	 IF(DebugMode,     OUTPUT(CHOOSEN(Property_currently_owned, 50),     NAMED('Sample_Property_currently_owned_Step5')));
+	 IF(DebugMode,     OUTPUT(CHOOSEN(Property_currently_owned, 10),     NAMED('Sample_Property_currently_owned_Step5')));
 	 IF(DebugMode,     OUTPUT(COUNT  (Property_currently_owned),         NAMED('HowManyPropertyStep5')));
 	 
-   IF(DebugMode,     OUTPUT(CHOOSEN(BusPropertyOwnedWithDetails, 100),     NAMED('Sample_BusPropertyOwnedWithDetails_Step6')));
+   IF(DebugMode,     OUTPUT(CHOOSEN(BusPropertyOwnedWithDetails, 10),     NAMED('Sample_BusPropertyOwnedWithDetails_Step6')));
 	 IF(DebugMode,     OUTPUT(COUNT  (BusPropertyOwnedWithDetails),          NAMED('HowManyBusPropertyOwnedWithDetailsStep6')));	 
 	 
-	 IF(DebugMode,     OUTPUT(CHOOSEN(PropertyCurrentlyOwnedButLimited, 50),     NAMED('Sample_PropertyCurrentlyOwnedButLimited_Step6')));
+	 IF(DebugMode,     OUTPUT(CHOOSEN(PropertyCurrentlyOwnedButLimited, 10),     NAMED('Sample_PropertyCurrentlyOwnedButLimited_Step6')));
 	 IF(DebugMode,     OUTPUT(COUNT  (PropertyCurrentlyOwnedButLimited),         NAMED('HowManyPropertyCurrentlyOwnedButLimitedStep6')));
 	 
-	 IF(DebugMode,     OUTPUT(CHOOSEN(Summary_Current_Prop, 100),  NAMED('Summary_Property')));
+	 IF(DebugMode,     OUTPUT(CHOOSEN(Summary_Current_Prop, 50),  NAMED('Summary_Property')));
 	 
-	 IF(DebugMode,     OUTPUT(CHOOSEN(UpdateBusnPropertyWithReport, 100),  NAMED('UpdateBusnPropertyWithReport')));  
+	 IF(DebugMode,     OUTPUT(CHOOSEN(UpdateBusnPropertyWithReport, 10),  NAMED('UpdateBusnPropertyWithReport')));  
 	
 	RETURN UpdateBusnPropertyWithReport;
 

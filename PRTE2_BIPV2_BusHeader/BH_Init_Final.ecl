@@ -1,4 +1,4 @@
-﻿import BIPV2, Business_Header, PRTE2, PRTE2_Business_Header, STD, ut, mdr;
+﻿import BIPV2, BIPV2_Company_Names, Business_Header, PRTE2, PRTE2_Business_Header, STD, ut, mdr;
 
 export BH_Init_Final(
 		dataset(PRTE2_Business_Header.Layouts.Out.Layout_BH_Out	)	pInput_BusHdr_Init		= PRTE2_Business_Header.BH_Init()	
@@ -10,7 +10,7 @@ function
 	//*** Mapping Business Header
 	dBH_Search_Recs := pInput_BusHdr_Init(trim(long_bus_name) <> '');
 
-	PRTE2_BIPV2_BusHeader.Layouts.Temporary.Layout_BHL_Company trfMap_to_company_BHL(dBH_Search_Recs l, integer c) := transform
+	PRTE2_BIPV2_BusHeader.Layouts.Temporary.Layout_BHL_Company trfMap_to_company_BHL(dBH_Search_Recs l) := transform
 		
 		self.link_fein											:= STD.Str.CleanSpaces(l.link_fein);
 		self.link_inc_date									:= STD.Str.CleanSpaces(l.link_inc_date);
@@ -20,7 +20,7 @@ function
 	  self.dt_last_seen      							:= (unsigned4)l.dt_last_seen;																								  
 	  self.dt_vendor_first_reported 			:= (unsigned4)l.dt_vendor_first_reported;
 	  self.dt_vendor_last_reported  			:= (unsigned4)l.dt_vendor_last_reported;
-		self.rcid														:= c;
+		self.rcid														:= 0;
 		self.vl_id             							:= if(trim(l.cust_name) = '', '', ut.CleanSpacesAndUpper(l.src) + STD.Str.CleanSpaces(l.link_fein + l.link_inc_date));
 		self.company_bdid										:= l.bdid;
 	  self.company_phone									:= STD.Str.CleanSpaces(l.bus_phone);
@@ -32,7 +32,7 @@ function
 		self.company_name_type_raw					:= ut.CleanSpacesAndUpper(l.bus_type_desc);
 	  self.company_name      							:= ut.CleanSpacesAndUpper(l.long_bus_name);
 		self.company_org_structure_raw			:= '';
-		self.company_incorporation_date			:= (unsigned4)STD.Str.CleanSpaces(l.link_inc_date);
+		self.company_incorporation_date			:= if(trim(l.cust_name) = '',0,(unsigned4)STD.Str.CleanSpaces(l.link_inc_date));
 		self.company_address_type_raw				:= l.addr_type;
 	  self.company_address.prim_range     := l.prim_range;
 	  self.company_address.predir         := l.predir;
@@ -74,7 +74,7 @@ function
 		self 																:= [];
 	end;
 	
-	ds_company := project(dBH_Search_Recs, trfMap_to_company_BHL(left, counter));
+	ds_company := project(dBH_Search_Recs, trfMap_to_company_BHL(left));
 	
 	//*** Mapping Contacts
 	dBC_Init_Recs		:= pInput_BusCont_Init;
@@ -108,15 +108,6 @@ function
 			self.contact_dob									:= (unsigned4)l.contact_dob;
 			self.contact_score 								:= if(trim(l.cust_name) = '', (unsigned1)l.contact_score,
 																							if(l.did = 0, 1, 3));
-			//self.company_source_group					:= if(trim(l.cust_name) = '',
-			//																				ut.CleanSpacesAndUpper(l.company_source_group),
-			//																				ut.CleanSpacesAndUpper(l.link_fein + l.link_inc_date));
-			//self.vendor_id										:= if(trim(l.cust_name) = '',
-			//																				ut.CleanSpacesAndUpper(l.vendor_id),
-			//																				ut.CleanSpacesAndUpper(l.link_fein + l.link_inc_date));
-			//self.vl_id												:= if(trim(l.cust_name) = '',
-			//																				'',
-			//																				ut.CleanSpacesAndUpper(l.link_fein + l.link_inc_date));
 			self.contact_job_title_raw				:= ut.CleanSpacesAndUpper(l.company_title);
 			self.company_department						:= '';
 			self.contact_name.title						:= if(trim(l.cust_name) = '', l.contact_title, l.title);
@@ -181,55 +172,31 @@ function
 						 joinfiles(left,right),
 						 left outer,local);
 	
-	ds_BH_result := project(j1, PRTE2_BIPV2_BusHeader.Layouts.Temporary.Layout_BusLinking): persist('~prte::persist::PRTE2_BIPV2_BusHeader::ds_BH_result');
+	ds_BH_result := project(j1, transform(PRTE2_BIPV2_BusHeader.Layouts.Temporary.Layout_BusLinking, 
+																				self.rcid := counter, // Assigning an unique values per record.
+																				self 			:= left)
+												 ): persist('~prte::persist::PRTE2_BIPV2_BusHeader::BH_Init_Final::ds_BH_result');
+	
+	BIPV2_Company_Names.functions.mac_go(ds_BH_result, ds_BH_result_w_cnp, rcid, company_name, false, false);
 	
 	//*** Finally mapping to BIP BusHeader Base layout
-	PRTE2_BIPV2_BusHeader.Layouts.Base.Layout_CommonBase trfMap_To_BH_base(ds_BH_result l) := transform
+	PRTE2_BIPV2_BusHeader.Layouts.Base.Layout_CommonBase trfMap_To_BH_base(ds_BH_result_w_cnp l) := transform
 			self.rcid														:= l.rcid;
 			self.source													:= l.source;
 			self.ingest_status									:= '';
 			self.dotid													:= 0;																						
 			self.empid													:= 0;																																							
 			self.lgid3													:= 0;
-			self.powid													:= PRTE2.fn_AppendFakeID.LinkIds(l.company_name, l.company_fein, (string8)l.company_incorporation_date, 
-																																					 l.company_address.prim_range, l.company_address.prim_name, l.company_address.sec_range,
-																																					 l.company_address.v_city_name, l.company_address.st, l.company_address.zip, ''
-																																					).powid;
-																					
-			self.proxid													:= PRTE2.fn_AppendFakeID.LinkIds(l.company_name, l.company_fein, (string8)l.company_incorporation_date, 
-																																					 l.company_address.prim_range, l.company_address.prim_name, l.company_address.sec_range,
-																																					 l.company_address.v_city_name, l.company_address.st, l.company_address.zip, ''
-																																					).proxid;
-			self.seleid													:= if(trim(l.cust_name) = '', //   For Historical IRS data, using the link_fein(bdid) and (link_inc_date)dummy date because of these fields being blank.
-																								PRTE2.fn_AppendFakeID.LinkIds( l.company_name, l.link_fein, (string8)l.link_inc_date, 
-																																							 l.company_address.prim_range, l.company_address.prim_name, l.company_address.sec_range,
-																																							 l.company_address.v_city_name, l.company_address.st, l.company_address.zip, ''
-																																						 ).seleid,
-																								PRTE2.fn_AppendFakeID.LinkIds( l.company_name, l.company_fein, (string8)l.company_incorporation_date, 
-																																							 l.company_address.prim_range, l.company_address.prim_name, l.company_address.sec_range,
-																																							 l.company_address.v_city_name, l.company_address.st, l.company_address.zip, ''
-																																						 ).seleid
-																							 );
-			self.orgid													:= if(trim(l.cust_name) = '', //   For Historical IRS data, using the link_fein(bdid) and (link_inc_date)dummy date because of these fields being blank.
-																								PRTE2.fn_AppendFakeID.LinkIds( l.company_name, l.link_fein, (string8)l.link_inc_date, 
-																																							 l.company_address.prim_range, l.company_address.prim_name, l.company_address.sec_range,
-																																							 l.company_address.v_city_name, l.company_address.st, l.company_address.zip, ''
-																																						 ).orgid,
-																								PRTE2.fn_AppendFakeID.LinkIds( l.company_name, l.company_fein, (string8)l.company_incorporation_date, 
-																																							 l.company_address.prim_range, l.company_address.prim_name, l.company_address.sec_range,
-																																							 l.company_address.v_city_name, l.company_address.st, l.company_address.zip, ''
-																																						 ).orgid
-																							 );
-			self.ultid													:= if(trim(l.cust_name) = '',	//   For Historical IRS data, using the link_fein(bdid) and (link_inc_date)dummy date because of these fields being blank.
-																								PRTE2.fn_AppendFakeID.LinkIds( l.company_name, l.link_fein, (string8)l.link_inc_date, 
-																																							 l.company_address.prim_range, l.company_address.prim_name, l.company_address.sec_range,
-																																							 l.company_address.v_city_name, l.company_address.st, l.company_address.zip, ''
-																																						 ).ultid,
-																								PRTE2.fn_AppendFakeID.LinkIds( l.company_name, l.company_fein, (string8)l.company_incorporation_date, 
-																																							 l.company_address.prim_range, l.company_address.prim_name, l.company_address.sec_range,
-																																							 l.company_address.v_city_name, l.company_address.st, l.company_address.zip, ''
-																																						 ).ultid
-																							 );
+																						 // For Historical IRS data, the link_fein holds the bdid and link_inc_date (made up) because of these fields being blank.
+			temp_LinkIds 												:= PRTE2.fn_AppendFakeID.LinkIds( l.company_name, l.link_fein, l.link_inc_date,
+																																						 l.company_address.prim_range, l.company_address.prim_name, l.company_address.sec_range,
+																																						 l.company_address.v_city_name, l.company_address.st, l.company_address.zip, l.cust_name
+																																					);
+			self.powid													:= temp_LinkIds.powid;
+			self.proxid													:= temp_LinkIds.proxid;
+			self.seleid													:= temp_LinkIds.seleid;
+			self.orgid													:= temp_LinkIds.orgid;
+			self.ultid													:= temp_LinkIds.ultid;
 			self.cnt_rcid_per_dotid							:= 0;
 			self.cnt_dot_per_proxid							:= 0;
 			self.cnt_prox_per_lgid3							:= 0;
@@ -264,8 +231,8 @@ function
 			self.lname													:= l.contact_name.lname;
 			self.name_suffix										:= l.contact_name.name_suffix;
 			self.name_score											:= l.contact_name.name_score;
-			self.cnp_btype											:= '';
-			self.cnp_name												:= '';
+			self.cnp_btype											:= STD.Str.CleanSpaces(l.cnp_btype);
+			self.cnp_name												:= STD.Str.CleanSpaces(l.cnp_name);
 			boolean match_src 									:= MDR.sourceTools.SourceIsCorpV2(l.source);
 			boolean match_typ 									:= regexfind('\\b(INC|LLC|PLLC|LLP)\\b',self.cnp_btype,nocase);
 			boolean match_org 									:= regexfind('(corporation|corporate|llc|llp|sos|limited liability company|limited liability partnership)',trim(l.company_org_structure_raw,left,right),nocase);
@@ -285,9 +252,9 @@ function
 			self.company_name										:= l.company_name;
 			self.company_name_type_raw					:= l.company_name_type_raw;
 			self.company_name_type_derived			:= BIPV2.BL_Tables.CompanyNameTypeDesc(l.company_name_type_raw);
-			self.cnp_number											:= '';
-			self.cnp_hasnumber 									:= if(self.cnp_number <> '', 'T', 'F');
-			self.cnp_store_number								:= '';
+			self.cnp_number											:= trim(l.cnp_number);
+			self.cnp_hasnumber 									:= if(trim(l.cnp_number) <> '', 'T', 'F');
+			self.cnp_store_number								:= trim(l.cnp_store_number);
 			self.cnp_component_code							:= '';
 			self.cnp_lowv												:= '';
 			self.cnp_translated									:= false;
@@ -415,7 +382,7 @@ function
 			self 																:= l;			
 	end;
 	
-	ds_BH_base_out := project(ds_BH_result, trfMap_To_BH_base(left)) : persist('~prte::persist::PRTE2_BIPV2_BusHeader::BH_Init_Final');
+	ds_BH_base_out := project(ds_BH_result_w_cnp, trfMap_To_BH_base(left)) : persist('~prte::persist::PRTE2_BIPV2_BusHeader::BH_Init_Final');
 	
 	return ds_BH_base_out;
 	

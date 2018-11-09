@@ -180,13 +180,14 @@ EXPORT TaxRefundISv3_BatchService := MACRO
 																																						 
 	BOOLEAN  ReturnDetailedRoyalties := false : STORED('ReturnDetailedRoyalties');
 
+	dRoyaltiesByAcctno_FDN 	:= Royalty.RoyaltyFDNCoRR.GetBatchRoyaltiesByAcctno(Results_temp,fdn_count);
 	// dRoyaltiesByAcctno	:= Royalty.RoyaltyNetAcuity.GetBatchRoyaltiesByAcctno(gateways_in, dIPIn, Results_temp, TRUE);
-	dRoyalties	:= dataset([], Royalty.Layouts.RoyaltyForBatch);
+	dRoyalties	:= Royalty.GetBatchRoyalties(dRoyaltiesByAcctno_FDN, ReturnDetailedRoyalties) ;
 
 	BatchShare.MAC_RestoreAcctno(ds_batch_in,Results_temp,ds_output,,false);
 	Royalty.MAC_RestoreAcctno(ds_batch_in,dRoyalties, royalties);    
 
-	ds_results := PROJECT(ds_output, BatchServices.TaxRefundISv3_BatchService_Layouts.rec_batch_out - royalty_nag);
+	ds_results := PROJECT(ds_output, BatchServices.TaxRefundISv3_BatchService_Layouts.rec_batch_out AND NOT [royalty_nag,fdn_count]);
 
 	ut.mac_TrimFields(ds_results, 'ds_results', Results);
 

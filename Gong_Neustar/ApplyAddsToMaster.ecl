@@ -1,4 +1,4 @@
-import STD, ut;
+﻿import STD, ut;
 
 GetNewRecords(dataset(layout_gongMaster) adds, dataset(layout_gongMaster) mstr) := 
 
@@ -130,6 +130,8 @@ EXPORT ApplyAddsToMaster(dataset(layout_gongMaster) adds, dataset(layout_gongMas
 		master6 := unchanged & updates & newadds;
 		master7 := Mac_Assign_UniqueId(master6, persistent_record_id);
 		
-	//mac_raw_disc_cnt(master7, master8);	// this is temporary for debugging
-	return master7;
+		// rollup duplicate records
+		master8 := gong_neustar.fn_rollup(master7);
+		
+	return master8;
 END;

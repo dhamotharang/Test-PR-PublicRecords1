@@ -1,4 +1,4 @@
-IMPORT Address, BIPV2, Business_Header, Business_Risk_BIP, Gateway, MDR, NID, RiskWise, Risk_Indicators, UT;
+﻿IMPORT Address, BIPV2, BizLinkFull, Business_Header, Business_Risk_BIP, Gateway, MDR, NID, RiskWise, Risk_Indicators, UT;
 
 EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOrig, 
 															 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options) := FUNCTION
@@ -73,9 +73,9 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 		SELF.Input_Echo := le; // Keep our original input
 		
 		// Company Name Fields
-		CompanyName := IF(le.CompanyName <> '', ut.CleanCompany(le.CompanyName), ut.CleanCompany(le.AltCompanyName)); // If the customer didn't pass in a company but passed in an alt company name use the alt as the company name
+		CompanyName := IF(le.CompanyName <> '', BizLinkFull.Fields.Make_cnp_name(le.CompanyName), BizLinkFull.Fields.Make_cnp_name(le.AltCompanyName)); // If the customer didn't pass in a company but passed in an alt company name use the alt as the company name
 		SELF.Clean_Input.CompanyName := CompanyName;
-		SELF.Clean_Input.AltCompanyName := IF(le.CompanyName <> '', ut.CleanCompany(le.AltCompanyName), ''); // Blank out the cleaned AltCompanyName if CompanyName wasn't populated, as we copied Alt into the Main CompanyName field on the previous line
+		SELF.Clean_Input.AltCompanyName := IF(le.CompanyName <> '', BizLinkFull.Fields.Make_cnp_name(le.AltCompanyName), ''); // Blank out the cleaned AltCompanyName if CompanyName wasn't populated, as we copied Alt into the Main CompanyName field on the previous line
 		// Company Address Fields
 		companyAddress := Risk_Indicators.MOD_AddressClean.street_address(le.StreetAddress1 + ' ' + le.StreetAddress2, le.Prim_Range, le.Predir, le.Prim_Name, le.Addr_Suffix, le.Postdir, le.Unit_Desig, le.Sec_Range);
 		companyCleanAddr := Risk_Indicators.MOD_AddressClean.clean_addr(companyAddress, le.City, le.State, le.Zip);											

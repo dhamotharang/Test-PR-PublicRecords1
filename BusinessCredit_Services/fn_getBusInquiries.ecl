@@ -1,9 +1,9 @@
-IMPORT BIPV2, BusinessCredit_Services, iesp, Inquiry_AccLogs, ut;
+﻿IMPORT BIPV2, BusinessCredit_Services, iesp, Inquiry_AccLogs, ut;
 
 EXPORT fn_getBusInquiries (BusinessCredit_Services.Iparam.reportrecords inmod) := FUNCTION
 
-	InquiriesRaw			 	:= Inquiry_AccLogs.Key_Inquiry_LinkIds.kFetch2(inmod.BusinessIds,,,BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT);
-	InquiriesUpdateRaw 	:= Inquiry_AccLogs.Key_Inquiry_LinkIds_Update.kFetch2(inmod.BusinessIds,,,BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT);
+	InquiriesRaw			 	:= Inquiry_AccLogs.Key_Inquiry_LinkIds.kFetch2(inmod.BusinessIds, inmod.FetchLevel,,BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT);
+	InquiriesUpdateRaw 	:= Inquiry_AccLogs.Key_Inquiry_LinkIds_Update.kFetch2(inmod.BusinessIds, inmod.FetchLevel,,BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT);
 	InquiriesAllTemp		:= InquiriesRaw + InquiriesUpdateRaw;
 
 	Inquiry_Slim_Rec := RECORD

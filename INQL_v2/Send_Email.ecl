@@ -1,4 +1,4 @@
-import VersionControl, _control;
+﻿import VersionControl, _control;
 
 export Send_Email(string pversion, boolean pUseProd = false) := module
 	shared SuccessSubject	:= if(VersionControl.IsValidVersion(pversion)

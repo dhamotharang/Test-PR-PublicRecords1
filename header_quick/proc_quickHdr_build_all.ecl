@@ -1,6 +1,8 @@
-﻿import _control,ut,RoxieKeyBuild,header,PromoteSupers;
-export proc_quickHdr_build_all (string sourceIP, string filedate) := function
+﻿import _control,ut,RoxieKeyBuild,header,PromoteSupers,Data_Services;
+export proc_quickHdr_build_all (string sourceIP) := function
+   
 
+   SHARED filedate:=header.Sourcedata_month.v_eq_as_of_date;                                      
    EXPORT getVname (string superfile, string v_end = ':') := FUNCTION
 
         FileName:= fileservices.GetSuperFileSubName(superfile,1);
@@ -11,37 +13,27 @@ export proc_quickHdr_build_all (string sourceIP, string filedate) := function
         RETURN v_name;
 
     END;
-
-  xlink_superfile_ver := getVname('~thor_data400::key::insuranceheader_xlink::qa::did::refs::name')[1..8];
+  keyPrefix := Data_Services.Data_Location.Prefix('LAB_xLink'); // eg 	~thor400_44::
+  xlink_superfile_ver := getVname(keyPrefix+'key::insuranceheader_xlink::qa::did::refs::name')[1..8];
   header_raw_prod_ver := getVname('~thor_data400::base::header_raw_Prod','')[1..8];
   
   check_superfiles_are_in_sync := if ( xlink_superfile_ver <> header_raw_prod_ver
                                     ,fail('Superfiles are not in sync!'));
-	sprayIP := map(
-									sourceIP = 'bctlpedata10' => _control.IPAddress.bctlpedata10,
-									sourceIP
-									);	
-	
-	sourcePath 				:= '/data/data_lib_2_hus2/efx_hdrs/in/';
 	
 	destinationGroup	:= _control.TargetGroup.Thor400_44;
-	recordSize				:= 567;
+	recordSize				:= 600;
+  sprayIP           := header_quick._config.sprayIP(sourceIP);
+                                                     
+	weeklyFileName		:= FileServices.remotedirectory(sprayIP,header_quick._config.sourcePath,'WEEKLY_HEADER_*.DAT',false)(size != 0 )[1].name;
 	
-	checkFileExists		:= if(count(FileServices.remotedirectory(sprayIP,sourcePath,'MONTHLY_HEADER_*.DAT',false)(size != 0 )) = 4,
-													true,
-													false
-												 );
-												 
-	weeklyFileName		:= FileServices.remotedirectory(sprayIP,sourcePath,'WEEKLY_HEADER_*.DAT',false)(size != 0 )[1].name;
-	
-	sprayWeeklyFile		:= fileservices.sprayfixed(sprayIP,sourcePath+weeklyFileName,recordSize,destinationGroup,'~thor400_84::in::eq_weekly::'+filedate,-1,,,true,true,true);
+	sprayWeeklyFile		:= fileservices.sprayfixed(sprayIP,header_quick._config.sourcePath+weeklyFileName,recordSize,destinationGroup,'~thor400_84::in::eq_weekly::'+filedate,-1,,,true,true,true);
 	
 	monthly_verion		:= Header.Sourcedata_month.v_version;										 
 	sprayMonthlyFiles	:= parallel(
-																fileservices.sprayfixed(sprayIP,sourcePath+'MONTHLY_HEADER_E_'+monthly_verion+'.DAT',recordSize,destinationGroup,'~thor_data400::in::hdr_east_'+filedate,-1,,,true,true,true),
-																fileservices.sprayfixed(sprayIP,sourcePath+'MONTHLY_HEADER_W_'+monthly_verion+'.DAT',recordSize,destinationGroup,'~thor_data400::in::hdr_west_'+filedate,-1,,,true,true,true),
-																fileservices.sprayfixed(sprayIP,sourcePath+'MONTHLY_HEADER_S_'+monthly_verion+'.DAT',recordSize,destinationGroup,'~thor_data400::in::hdr_south_'+filedate,-1,,,true,true,true),
-																fileservices.sprayfixed(sprayIP,sourcePath+'MONTHLY_HEADER_C_'+monthly_verion+'.DAT',recordSize,destinationGroup,'~thor_data400::in::hdr_central_'+filedate,-1,,,true,true,true)
+																fileservices.sprayfixed(sprayIP,header_quick._config.sourcePath+'MONTHLY_HEADER_E_'+monthly_verion+'.DAT',recordSize,destinationGroup,'~thor_data400::in::hdr_east_'+filedate,-1,,,true,true,true),
+																fileservices.sprayfixed(sprayIP,header_quick._config.sourcePath+'MONTHLY_HEADER_W_'+monthly_verion+'.DAT',recordSize,destinationGroup,'~thor_data400::in::hdr_west_'+filedate,-1,,,true,true,true),
+																fileservices.sprayfixed(sprayIP,header_quick._config.sourcePath+'MONTHLY_HEADER_S_'+monthly_verion+'.DAT',recordSize,destinationGroup,'~thor_data400::in::hdr_south_'+filedate,-1,,,true,true,true),
+																fileservices.sprayfixed(sprayIP,header_quick._config.sourcePath+'MONTHLY_HEADER_C_'+monthly_verion+'.DAT',recordSize,destinationGroup,'~thor_data400::in::hdr_central_'+filedate,-1,,,true,true,true)
 																);
 																	
 	addWeeklySuper		:= sequential(
@@ -70,7 +62,7 @@ export proc_quickHdr_build_all (string sourceIP, string filedate) := function
 	PromoteSupers.MAC_SF_BuildProcess(Header.Mod_CreditBureau_address.flagged_nlr_addresses,'~thor_data400::prepped::nlr_addresses',bld_prepped,pcompress:=true,numgenerations:='2');
 	RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(Header.Mod_CreditBureau_address.Key_flagged_nlr_addresses,'~thor_data400::key::quickheader::flagged_nlr_addresses','~thor_data400::key::quickheader::'+filedate+'::flagged_nlr_addresses',bld_key);
 
-	doMonthly := if(checkFileExists
+	doMonthly := if(header_quick._config.isNewEquifaxMonthlyFile(sourceIP)
 											,sequential(
 																	sprayMonthlyFiles
 																	,addMonthlySuper
@@ -89,8 +81,10 @@ export proc_quickHdr_build_all (string sourceIP, string filedate) := function
 	
 	Source_Check_rep := header_quick.Proc_source_check_report();
 	
-	return sequential( 
+	return sequential(
                      check_superfiles_are_in_sync
+                    ,header_quick._config.set_v_version
+                    ,header_quick._config.set_v_eq_as_of_date
                     ,doWeekly
                     ,doMonthly
                     ,Inputs_Clear

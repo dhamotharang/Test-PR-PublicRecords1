@@ -1,13 +1,14 @@
-IMPORT  RoxieKeyBuild,ut,autokey,doxie, header_services,business_header,mdr, aid;
+﻿IMPORT  RoxieKeyBuild,ut,autokey,doxie, header_services,business_header,mdr, aid;
 
-export File_keybuildV2(pPawBase, ds_join
+export File_keybuild_BIPv2(
+
+	dataset(paw.layout.Employment_Out_BIPv2	) pPawBase	= paw.File_base_cleanAddr_keybuild_BIPv2
 	                                                
-) :=  MACRO
 
-  
-  dataset(recordof(pPawBase)) ds_join(string env = 'Prod') := function 
-	
-	// dBase:= pPawBase;
+) :=
+function
+
+	dBase 	  	  := pPawBase;
 	
 	Suppression_Layout := header_services.Supplemental_Data.layout_in;
 
@@ -24,18 +25,18 @@ export File_keybuildV2(pPawBase, ds_join
 	EmpHashBDIDFormat := header_services.Supplemental_Data.layout_out;
 
 	EmpFullOut_HashBDID := RECORD
-		paw.Layout.Employment_Out_BIPv2;
+		Layout.Employment_Out_BIPv2;
 		EmpHashBDIDFormat;
 	end;
 
-	EmpFullOut_HashBDID EmpHashBDID(paw.Layout.Employment_Out_bipv2 l) := transform                            
-	 self.hval := hashmd5(intformat((unsigned6)l.bdid,15,1), intformat((unsigned6)l.did,15,1)); 
+	EmpFullOut_HashBDID EmpHashBDID(Layout.Employment_Out_bipv2 l) := transform                            
+	 self.hval := hashmd5(intformat((unsigned6)l.bdid,12,1), intformat((unsigned6)l.did,15,1)); 
 	 self := l;
 	end;
 
 	EmpONLYHeader_withMD5 := project(pPawBase, EmpHashBDID(left));
 
-	paw.Layout.Employment_Out_bipv2 EmpONLYSuppress(EmpONLYHeader_withMD5 l) := transform
+	Layout.Employment_Out_bipv2 EmpONLYSuppress(EmpONLYHeader_withMD5 l) := transform
 	 self := l;
 	end;
 
@@ -59,18 +60,18 @@ export File_keybuildV2(pPawBase, ds_join
 	rHashVal := header_services.Supplemental_Data.layout_out;
 	
 	rEmp_withHash := RECORD
-		paw.Layout.Employment_Out_bipv2;
+		Layout.Employment_Out_bipv2;
 		rHashVal;
 	end;
 
-	rEmp_withHash addHash(paw.Layout.Employment_Out_bipv2 l) := transform                            
-	 self.hval := hashmd5(intformat((unsigned6)l.bdid,15,1), l.company_title, l.lname, l.fname);
+	rEmp_withHash addHash(Layout.Employment_Out_bipv2 l) := transform                            
+	 self.hval := hashmd5(intformat((unsigned6)l.bdid,12,1), l.company_title, l.lname, l.fname);
 	 self := l;
 	end;
 
 	ds_withHash := project(emp_ONLY_full_out_suppress, addHash(left));
 
-	paw.Layout.Employment_Out_bipv2 removeHash(ds_withHash l) := transform
+	Layout.Employment_Out_bipv2 removeHash(ds_withHash l) := transform
 	 self := l;
 	end;
 	
@@ -93,19 +94,19 @@ export File_keybuildV2(pPawBase, ds_join
 	rHashBDID := header_services.Supplemental_Data.layout_out;
 
 	rFullOut_HashBDID := RECORD
-		paw.Layout.Employment_Out_bipv2;
+		Layout.Employment_Out_bipv2;
 		rHashBDID;
 	end;
 
-	rFullOut_HashBDID tHashBDID(paw.Layout.Employment_Out_bipv2 l) := transform                            
-	 self.hval := hashmd5(intformat((unsigned6)l.bdid,15,1));
+	rFullOut_HashBDID tHashBDID(Layout.Employment_Out_bipv2 l) := transform                            
+	 self.hval := hashmd5(intformat((unsigned6)l.bdid,12,1));
 	 self := l;
 	end;
 
 
 	dEmpAllHeader_withMD5 := project(emp_by_title_suppress, tHashBDID(left));
 
-	paw.Layout.Employment_Out_bipv2 tEmpAllSuppress(dEmpAllHeader_withMD5 l) := transform
+	Layout.Employment_Out_bipv2 tEmpAllSuppress(dEmpAllHeader_withMD5 l) := transform
 	 self := l;
 	end;
 
@@ -202,10 +203,8 @@ export File_keybuildV2(pPawBase, ds_join
 
 	File_To_Append				 := project(Base_File_In, reformated_header(left, COUNTER)); 
 
-	File_To_Process_To_Key_JOIN := emp_all_full_out_suppress + File_To_Append;
+	File_To_Process_To_Key := emp_all_full_out_suppress + File_To_Append;
 	
-	return File_To_Process_To_Key_JOIN ; 
-	
-	end ;
+	return File_To_Process_To_Key;
 
-endmacro ;
+end;

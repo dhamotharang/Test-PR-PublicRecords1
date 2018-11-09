@@ -1,4 +1,4 @@
-import instantid_logs, aid, address, ut, did_add, header_slimsort, didville, header, address, watchdog, yellowpages, gong, cellphone, risk_indicators, lib_stringlib, ut, idl_header, address;
+﻿import instantid_logs, aid, address, ut, did_add, header_slimsort, didville, header, address, watchdog, yellowpages, gong, cellphone, risk_indicators, lib_stringlib, ut, idl_header, address, Std;
 
 export Map_InfutorCIDv2(string filedate) := function
 
@@ -36,7 +36,7 @@ end;
 /* Clean names, apply dates, change layout for new records */
 ifcid_new := project(IfCID_pNew, transform(clean_layout,
 																			
-																			GOODDATE(string indate) := if(indate between '19010101' and ut.getdate, indate, '');
+																			GOODDATE(string indate) := if(indate between '19010101' and (STRING8)Std.Date.Today(), indate, '');
 																			
 																			/* Clean out parans (Removes ( or ) and all characters following) and does not display names with junk fields */
 																			PRS_CLEANNAME(string ofname, string omname, string olname):= function
@@ -281,8 +281,9 @@ for_instant_append := didFILE(did = 0 AND phone != '' AND fname != '' AND lname 
 
 /* Original Instructions only Append Logs up to 2 years old - if restriction date is not populated it does not error. Default is '' */
 restriction_date := (string)((integer6)stringlib.getDateYYYYMMDD() - 20000);
-infutorcid.mac_InstantID_Logs_ADL_Append(for_instant_append, restriction_date, InstantIDAppend);
 
+// infutorcid.mac_InstantID_Logs_ADL_Append(for_instant_append, restriction_date, InstantIDAppend);
+InstantIDAppend := for_instant_append; //bypassing the DID append from log file for now since the file is missing. 
 not_instant_append := didFILE(did > 0 OR phone = '' OR fname = '' OR lname = '') + InstantIDAppend(did_instantid = 0); 
 
 INSTANTdidFile := distribute(instantIDAppend(did_instantid > 0), hash(did_instantid));

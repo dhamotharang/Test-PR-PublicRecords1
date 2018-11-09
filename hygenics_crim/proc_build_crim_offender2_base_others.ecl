@@ -1,9 +1,9 @@
-﻿import crim_common,did_add,didville,header,header_slimsort,ut,watchdog, address,nid,AID,AID_Support;
+﻿import crim_common,did_add,didville,header,header_slimsort,ut,watchdog, address,nid;
 
-def 	:= sort(distribute(hygenics_crim.file_in_defendant(statecode in ['PA','NC','OR']),hash(recordid)), recordid, local);
-ah		:= dedup(sort(distribute(hygenics_crim.file_in_addresshistory(statecode in ['PA','NC','OR']),hash(recordid)), recordid, local), record);
-aka	  	:= dedup(sort(distribute(hygenics_crim.file_in_alias(statecode in ['PA','NC','OR']),hash(recordid)), recordid, local), record);
-off 	:= dedup(sort(distribute(hygenics_crim.file_in_offense(statecode in ['PA','NC','OR']),hash(recordid)), recordid, local), record);
+def 	:= sort(distribute(hygenics_crim.file_in_defendant(statecode in ['PA','NC','OR']),hash(recordid,sourceid)), recordid,sourceid, local);
+ah		 := dedup(sort(distribute(hygenics_crim.file_in_addresshistory(statecode in ['PA','NC','OR']),hash(recordid,sourceid)), recordid,sourceid, local), record);
+aka	 := dedup(sort(distribute(hygenics_crim.file_in_alias(statecode in ['PA','NC','OR']),hash(recordid,sourceid)), recordid,sourceid, local), record);
+off 	:= dedup(sort(distribute(hygenics_crim.file_in_offense(statecode in ['PA','NC','OR']),hash(recordid,sourceid)), recordid,sourceid, local), record);
 
 	slimOffense_rec := RECORD 
 		off.recordid;
@@ -14,6 +14,7 @@ off 	:= dedup(sort(distribute(hygenics_crim.file_in_offense(statecode in ['PA','
 		off.Casetype;
 		off.Fileddate;
 		off.Courtname;
+		off.sourceid;
 	end;
 
 	slimOffense_rec slimOff(off l):= transform
@@ -21,11 +22,6 @@ off 	:= dedup(sort(distribute(hygenics_crim.file_in_offense(statecode in ['PA','
 	end;
 
 slim_off := project(off, slimOff(left),local);
-	
-	/*table(off, slimOffense_rec, 
-	off.recordid, off.statecode, 
-	off.DocketNumber, off.CaseNumber, off.Casetitle, off.Casetype, 
-	off.Fileddate, off.Courtname),hash(recordid));*/
 
 	def join_def_alias(def l, aka r) := transform 
 	  self.nametype 		:= 'A';
@@ -42,31 +38,36 @@ slim_off := project(off, slimOff(left),local);
 
 def_with_alias := join(def, aka,
 		left.recordid=right.recordid and 
-		left.statecode=right.statecode,
+		left.sourceid=right.sourceid,
 		join_def_alias(left,right),local,nosort);
 
 all_names 				:= def_with_alias + def;// :persist ('~thor_data200::persist::crim::aoc::offender_all_names_pa_nc_or');
 all_unique_names_dedup	:= dedup(sort(all_names, record,local), record,local);
-// all_unique_names		:= sort(distribute(all_unique_names_dedup, hash(recordid)), recordid, local);
 
-	def join_def_ah(def l, ah r) := transform 
+//Adding a flag to be used for sort below to ensure that the def address gets selected when available
+temp_layout :=record
+def;
+string sortflag := '';
+end;
+	temp_layout join_def_ah(def l, ah r) := transform 
 	  self := r;
 	  self := l;
 	end;
 
 	def_with_ahist := join(all_unique_names_dedup, ah,
 		left.recordid=right.recordid and 
-		left.statecode=right.statecode,
+		left.sourceid=right.sourceid,
 		join_def_ah(left,right),local,nosort);
 		
-all_names_addresses := def_with_ahist+ all_unique_names_dedup;
+all_names_addresses := def_with_ahist+ project(all_unique_names_dedup,transform(temp_layout,self:=Left; self.sortflag := 'P'));
 
 	layout_temp_offender addrPop(all_names_addresses l):= transform
 		self.street_address_1 := if(regexfind('[A-Z]+', stringlib.stringtouppercase(l.street), 0)<>'',
 									              trim(l.street+if(l.unit<>'', ' '+l.unit, ''), left, right),
 									              '');
 		self.street_address_2 :=_functions.CleanAddress(l.city+', '+l.orig_state+' '+l.orig_zip);
-		// self.append_Rawaid    := 0;
+		self.name_type_hd     := L.sortflag; // use this field temporarily to store the sort flag. It gets overwritten later.
+		
 		self := l;
 		self := [];
 	end;
@@ -74,7 +75,7 @@ all_names_addresses := def_with_ahist+ all_unique_names_dedup;
 addrProject 	:= project(all_names_addresses, addrPop(left));
 
 //Rollup Addresses
-sorted_rcommon	:= sort(distribute(addrProject, hash(recordid)), recordid, statecode, name, dob,  
+sorted_rcommon	:= sort(distribute(addrProject, hash(recordid,sourceid)), recordid, sourceid, name, dob,  
 						-street, -unit, -city, -orig_state, -orig_zip,
 						-street_address_1, -street_address_2,local);
 						
@@ -91,7 +92,7 @@ END;
 
 rollupAddrOut := ROLLUP(sorted_rcommon,
                         left.recordid = right.recordid and 
-						trim(left.statecode) = trim(right.statecode) and 
+						trim(left.sourceid) = trim(right.sourceid) and 
 						trim(left.name) = trim(Right.name) and 
 						trim(left.dob) = trim(Right.dob), 
 						rollupCrim(LEFT,RIGHT));
@@ -123,135 +124,13 @@ cleanAddress := hygenics_crim._fns_AddressCleaner(cleanAddress_prep):persist ('~
 	
 with_ssn			:= all_clean_name_addr;
 
-/*
-	matchset := ['S','D','A','Z'];
-	did_add.MAC_Match_Flex(all_clean_name_addr,matchset,orig_ssn,dob,fname,mname,lname,name_suffix,
-						prim_range,prim_name,sec_range,zip5,state,foo,did,layout_temp_offender,true,did_score,75,with_did)
-	did_add.MAC_Add_SSN_By_DID(with_did,did,ssn,with_ssn)
-*/
-/*
-dslayout := RECORD
-  string40 recordid;
-  string100 sourcename;
-  string20 sourcetype;
-  string2 statecode;
-  string20 recordtype;
-  string8 recorduploaddate;
-  string20 docnumber;
-  string20 fbinumber;
-  string20 stateidnumber;
-  string20 inmatenumber;
-  string20 aliennumber;
-  string9 orig_ssn;
-  string1 nametype;
-  string115 name;
-  string50 lastname;
-  string50 firstname;
-  string40 middlename;
-  string15 suffix;
-  string100 defendantstatus;
-  string200 defendantadditionalinfo;
-  string8 dob;
-  string50 birthcity;
-  string100 birthplace;
-  string3 age;
-  string10 gender;
-  string10 height;
-  string10 weight;
-  string10 haircolor;
-  string10 eyecolor;
-  string20 race;
-  string20 ethnicity;
-  string10 skincolor;
-  string100 bodymarks;
-  string20 physicalbuild;
-  string50 photoname;
-  string20 dlnumber;
-  string2 dlstate;
-  string20 phone;
-  string10 phonetype;
-  string1 uscitizenflag;
-  string20 addresstype;
-  string150 street;
-  string20 unit;
-  string50 city;
-  string2 orig_state;
-  string9 orig_zip;
-  string50 county;
-  string100 institutionname;
-  string200 institutiondetails;
-  string8 institutionreceiptdate;
-  string100 releasetolocation;
-  string200 releasetodetails;
-  string1 deceasedflag;
-  string8 deceaseddate;
-  string1 healthflag;
-  string100 healthdesc;
-  string10 bloodtype;
-  string8 sexoffenderregistrydate;
-  string8 sexoffenderregexpirationdate;
-  string100 sexoffenderregistrynumber;
-  string sourceid;
-  string40 j_recordid;
-  string2 j_statecode;
-  string115 j_name;
-  string50 j_lastname;
-  string50 j_firstname;
-  string40 j_middlename;
-  string15 j_suffix;
-  string8 j_dob;
-  string20 j_addresstype;
-  string150 j_street;
-  string20 j_unit;
-  string50 j_city;
-  string2 j_state;
-  string9 j_zip;
-  string5 title;
-  string20 fname;
-  string20 mname;
-  string20 lname;
-  string5 name_suffix;
-  string3 cleaning_score;
-  string10 prim_range;
-  string2 predir;
-  string28 prim_name;
-  string4 addr_suffix;
-  string2 postdir;
-  string10 unit_desig;
-  string8 sec_range;
-  string25 p_city_name;
-  string25 v_city_name;
-  string2 state;
-  string5 zip5;
-  string4 zip4;
-  string4 cart;
-  string1 cr_sort_sz;
-  string4 lot;
-  string1 lot_order;
-  string2 dpbc;
-  string1 chk_digit;
-  string2 rec_type;
-  string2 ace_fips_st;
-  string3 ace_fips_county;
-  string10 geo_lat;
-  string11 geo_long;
-  string4 msa;
-  string7 geo_blk;
-  string1 geo_match;
-  string4 err_stat;
-  unsigned6 did;
-  unsigned1 did_score;
-  string9 ssn;
- END;
-
-ds := dataset(ut.foreign_prod+'~thor_data200::persist::crim::aoc::offender_after_did_20110702', dslayout, flat);
-*/
-sort_with_ssn := distribute(with_ssn, hash(recordid)); //dedup(sort(distribute(with_ssn, hash(recordid)), recordid, local), record, local);//:persist('~thor_data200::persist::crim::aoc::offender_after_did_pa_nc_or');
+sort_with_ssn := distribute(with_ssn, hash(recordid,sourceid)); //dedup(sort(distribute(with_ssn, hash(recordid)), recordid, local), record, local);//:persist('~thor_data200::persist::crim::aoc::offender_after_did_pa_nc_or');
 sort_slim_off := slim_off ; //dedup(sort(distribute(slim_off, hash(recordid)), recordid, local), record, local);
 
 Layout_almostfinal_offender := record
  Layout_Common_Crim_Offender_orig;
  hygenics_crim.layout_in_defendant.recordid;
+ hygenics_crim.layout_in_defendant.sourceid;
 end;
  
 Layout_almostfinal_offender to_crim_offender(sort_slim_off l, sort_with_ssn r) := transform
@@ -378,33 +257,7 @@ Layout_almostfinal_offender to_crim_offender(sort_slim_off l, sort_with_ssn r) :
  
  self.race				:= if(length(trim(r.race))=1 and regexfind('[A-Z]', stringlib.stringtouppercase(r.race), 0)<>'' , trim(r.race), '');
  
- // string temp_race       := MAP(trim(r.race)='A' => 'ASIAN/PACIFIC ISLAND',
-								// trim(r.race)='B' => 'BLACK',
-								// trim(r.race)='H' => 'HISPANIC',
-								// trim(r.race)='I' => 'AMER INDIAN/ALASKAN',
-								//trim(r.race)='O' => 'OTHER',
-								// trim(r.race)='W' => 'WHITE',
-								// trim(r.race)='AMER INDIAN/ALASKAN' => 'AMER INDIAN/ALASKAN', 
-								// trim(r.race)='AMERICAN INDIAN OR A' => 'AMER INDIAN/ALASKAN',
-								// trim(r.race)='AMER IND' => 'AMER INDIAN/ALASKAN',            
-								// trim(r.race)='AMER INDIAN/ALASKAN' => 'AMER INDIAN/ALASKAN', 
-								// trim(r.race)='AMERICAN INDIAN' => 'AMER INDIAN/ALASKAN',     
-								// trim(r.race)='AMERICAN INDIAN / AL' => 'AMER INDIAN/ALASKAN',
-								// trim(r.race)='AMERICAN INDIAN OR A' => 'AMER INDIAN/ALASKAN',
-								// trim(r.race)='AMERICAN INDIAN/ALAS' => 'AMER INDIAN/ALASKAN',
-								// trim(r.race)='ASIAN' => 'ASIAN/PACIFIC ISLAND',
-								// trim(r.race)='ASIAN OR PACIFIC ISL' => 'ASIAN/PACIFIC ISLAND',
-								// trim(r.race)='ASIAN/PACIFIC ISLAND' => 'ASIAN/PACIFIC ISLAND',
-								// trim(r.race)='ASIAN OR PACIFIC ISL' => 'ASIAN/PACIFIC ISLAND',
-								// trim(r.race)='ASIAN/PAC.ISLD' => 'ASIAN/PACIFIC ISLAND',      
-								// trim(r.race)='ASIAN/PACIFIC ISLAND' => 'ASIAN/PACIFIC ISLAND',
-								// trim(r.race)='BLACK' => 'BLACK',
-								// trim(r.race)='BLACK OR AFRICAN AME' => 'BLACK',
-								// trim(r.race)='AFRICAN AMERICAN' => 'BLACK',
-								// trim(r.race)='CAUCASIAN' => 'WHITE',
-								//length(trim(r.race))>3 and trim(r.race) not in ['OTHER','UNKNOWN','BUSINESS'] => trim(r.race),
-								//'');
-								
+							
  string temp_ethn   := MAP(r.ethnicity in ['UNKNOWN', 'INVALID', 'NONE', ''] => '',
 							         r.ethnicity = 'AMER.' => 'AMERICAN',
 								       r.ethnicity <> '' => r.ethnicity,
@@ -525,13 +378,13 @@ end;
 
 result_comm 	:= join(sort_slim_off, sort_with_ssn, 
 					left.recordid=right.recordid and 
-					left.statecode=right.statecode,
+					left.sourceid=right.sourceid,
 					to_crim_offender(left,right), 
 					local, right outer);//:persist ('~thor_data200::persist::crim::aoc::offender_others2');
 
 //Assign primary name offender_key to aliases
-result_comm1	:= sort(distribute(result_comm(pty_typ='2' and state_origin in ['OR', 'PA']), hash(recordid, state_origin)), recordid, state_origin, case_number,local);
-result_comm2	:= sort(distribute(result_comm(pty_typ='0' and state_origin in ['OR', 'PA']), hash(recordid, state_origin)), recordid, state_origin, case_number,local); 
+result_comm1	:= sort(distribute(result_comm(pty_typ='2' and state_origin in ['OR', 'PA']), hash(recordid, sourceid)), recordid, sourceid, case_number,local);
+result_comm2	:= sort(distribute(result_comm(pty_typ='0' and state_origin in ['OR', 'PA']), hash(recordid, sourceid)), recordid, sourceid, case_number,local); 
 
 hygenics_crim.Layout_Common_Crim_Offender_orig transferkey (result_comm2 L, result_comm1 r) := transform
  self.offender_key := l.offender_key;
@@ -541,12 +394,12 @@ end;
 
 result_aliases1 := join(result_comm2,result_comm1, 
 					             left.recordid = right.recordid and 
-								 left.state_origin = right.state_origin and
-								 left.case_number = right.case_number,
+								          left.sourceid = right.sourceid and
+								          left.case_number = right.case_number,
 					             transferkey(left,right));//:persist ('~thor_data200::persist::crim::aoc::offender_alias_OR_PA');
 								 
-result_comm3	:= sort(distribute(result_comm(pty_typ='2' and state_origin in ['NC']), hash(recordid, state_origin)), recordid, state_origin, case_number,local);
-result_comm4	:= sort(distribute(result_comm(pty_typ='0' and state_origin in ['NC']), hash(recordid, state_origin)), recordid, state_origin, case_number,local); 
+result_comm3	:= sort(distribute(result_comm(pty_typ='2' and state_origin in ['NC']), hash(recordid, sourceid)), recordid, sourceid, case_number,local);
+result_comm4	:= sort(distribute(result_comm(pty_typ='0' and state_origin in ['NC']), hash(recordid, sourceid)), recordid, sourceid, case_number,local); 
 
 hygenics_crim.Layout_Common_Crim_Offender_orig transferkey2(result_comm4 L, result_comm3 r) := transform
  self.offender_key := l.offender_key;
@@ -557,9 +410,9 @@ end;
 
 result_aliases2 := join(result_comm4,result_comm3, 
 					             left.recordid = right.recordid and 
-								 left.state_origin = right.state_origin and
-								 left.case_number = right.case_number and
-								 (left.case_filing_dt = right.case_filing_dt or (left.case_filing_dt ='' and right.case_filing_dt ='')),
+								          left.sourceid = right.sourceid and
+								          left.case_number = right.case_number and
+								         (left.case_filing_dt = right.case_filing_dt or (left.case_filing_dt ='' and right.case_filing_dt ='')),
 					             transferkey2(left,right));//:persist ('~thor_data200::persist::crim::aoc::offender_alias_NC');
 
 result_aliases	:= result_aliases1 + result_aliases2;
@@ -572,11 +425,6 @@ sorted_r2common	:= sort(distribute(result_common2(trim(vendor, left, right)<>'')
 						            street_address_1,street_address_2,-case_court,local);
 						
 ////////////////////////////////////////////////////////////////////////
-						
-// sorted_r2common rollupCrim2(sorted_r2common L, sorted_r2common R) := TRANSFORM
-	// self.case_court					:= if(l.case_court = '', r.case_court, l.case_court);
-	// SELF 							:= L; 
-// END;
 
 sorted_r2common rollupCrim2(sorted_r2common L, sorted_r2common R) := TRANSFORM
 	self.case_court					:= if(l.case_court = '', r.case_court, l.case_court);
@@ -595,21 +443,16 @@ sorted_r2common rollupCrim2(sorted_r2common L, sorted_r2common R) := TRANSFORM
 	self.zip5 			      := if(l.zip5 			      = '', r.zip5 		       , l.zip5 		      );
 	SELF 							:= L; 
 END;
-// rollupOthOut := ROLLUP(sorted_r2common,
-                        // left.offender_key = right.offender_key and 
-						// trim(left.state_origin) = trim(right.state_origin) and 
-						// trim(left.pty_nm) = trim(Right.pty_nm) and 
-						// trim(left.dob) = trim(Right.dob), 
-						// rollupCrim2(LEFT,RIGHT));//:persist ('~thor_data200::persist::crim::aoc::offender_pa_nc_or');
+
 
 rollupOthOut := ROLLUP(sorted_r2common,
                        left.offender_key = right.offender_key and 
-						           trim(left.state_origin) = trim(right.state_origin) and 
-						           trim(left.pty_nm) = trim(Right.pty_nm) and 
-						           trim(left.dob) = trim(Right.dob) and
-											 (left.street_address_1 =	right.street_address_1 	or  right.street_address_1  =''	or left.street_address_1 	='') and 	
-											 (left.street_address_2 =	right.street_address_2 	or  right.street_address_2  =''	or left.street_address_2 	='') ,											 
-						           rollupCrim2(LEFT,RIGHT));//:persist ('~thor_data200::persist::crim::aoc::offender');
+						                 trim(left.state_origin) = trim(right.state_origin) and 
+						                 trim(left.pty_nm) = trim(Right.pty_nm) and 
+						                 trim(left.dob) = trim(Right.dob) and
+											           (left.street_address_1 =	right.street_address_1 	or  right.street_address_1  =''	or left.street_address_1 	='') and 	
+											           (left.street_address_2 =	right.street_address_2 	or  right.street_address_2  =''	or left.street_address_2 	='') ,											 
+						                 rollupCrim2(LEFT,RIGHT));//:persist ('~thor_data200::persist::crim::aoc::offender');
 
 
 

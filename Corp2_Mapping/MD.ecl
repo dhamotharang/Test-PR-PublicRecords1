@@ -1,4 +1,4 @@
-Import _Control, Corp2, lib_stringlib, Corp2_Raw_MD, Scrubs, Scrubs_Corp2_Mapping_MD_Main, Scrubs_Corp2_Mapping_MD_Event, Tools, UT, VersionControl, std;
+﻿Import _Control, Corp2, lib_stringlib, Corp2_Raw_MD, Scrubs, Scrubs_Corp2_Mapping_MD_Main, Scrubs_Corp2_Mapping_MD_Event, Tools, UT, VersionControl, std;
 
 export MD := MODULE
 
@@ -8,7 +8,7 @@ export MD := MODULE
 		state_fips	 	:= '24';
 		state_desc	 	:= 'MARYLAND';
 		
-		//Per CI :All records with ID_BUS_PREFIX_TYPE = "L" & (cd_address_type) ='L' â€“ do not use ,These are unincorporated accounts & Personal property addresses !"
+		//Per CI :All records with ID_BUS_PREFIX_TYPE = "L" & (cd_address_type) ='L' – do not use ,These are unincorporated accounts & Personal property addresses !"
 		AmendHist			:= dedup(sort(distribute(Corp2_Raw_MD.Files(filedate,pUseProd).input.AmendOutFile(corp2.t2u(id_bus_prefix)<>'L'),hash(id_bus_prefix + id_bus)),record,local),record,local):independent;
 		ARCAmendHist	:= dedup(sort(distribute(Corp2_Raw_MD.Files(filedate,pUseProd).input.ARCAmendOutFile(corp2.t2u(id_bus_prefix)<>'L'),hash(id_bus_prefix + id_bus)),record,local),record,local) :independent;
 		BusAddr				:= dedup(sort(distribute(Corp2_Raw_MD.Files(filedate,pUseProd).input.BusAddrOutFile(corp2.t2u(id_bus_prefix)<>'L' and corp2.t2u(cd_address_type) <>'L' ),hash(id_bus_prefix + id_bus)),record,local),record,local):independent;
@@ -148,7 +148,7 @@ export MD := MODULE
 		ds_Temp_EntityNameAddr := Entity_Addr + joinEntityARCNameAddr:independent;
 	
 	/* Per CI :'OT','OX' are Contacts only & do not use name types (OU, TA)" 
-		 'TA'â€“ do not pick up for tradename â€“ unincorporated accounts 
+		 'TA'– do not pick up for tradename – unincorporated accounts 
 		 'OU'- do not pick up for contacts - unincorporated account owners  */
 		Corp2_Mapping.LayoutsCommon.Main MD_corpTrans(Corp2_Raw_MD.Layouts.Temp_EntityNameTrade_AddrReserve input):=transform,
 		skip (corp2.t2u(input.cd_name_type)in ['OT','OU','OX','TA']	)   
@@ -198,7 +198,7 @@ export MD := MODULE
 																												'');
 			self.corp_orig_bus_type_cd									:= corp2.t2u(input.cd_bus_type);
 			self.corp_orig_bus_type_desc								:= map(corp2.t2u(input.BusTypedesc)<>''		=>corp2.t2u(input.BusTypedesc),//from table
-																												 corp2.t2u(input.cd_bus_type)='3'		=>'ORDINARY BUSINESS â€“ STOCK', //per CI
+																												 corp2.t2u(input.cd_bus_type)='3'		=>'ORDINARY BUSINESS – STOCK', //per CI
 																												 corp2.t2u(input.cd_bus_type)='20'	=>'OTHER', //  not in table  ,per CI 
 																												 corp2.t2u(input.cd_bus_type)='TR'	=>'TRADENAME', //  not in table  ,per CI 
 																												 corp2.t2u(input.cd_bus_type)=''		=>'',
@@ -743,11 +743,11 @@ export MD := MODULE
 	Event_CreateBitMaps				:= output(Event_N.BitmapInfile,,'~thor_data::corp_MD_event_scrubs_bits',overwrite,compressed);	//long term storage
 	Event_TranslateBitMap			:= output(Event_T);
 	//Creates Profile's alert template for Orbit - Can be copied & imported into Orbit; Only required first time & if scrub rules change
-	Event_AlertsCSVTemplate	  := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'Event','ScrubsAlerts', Event_OrbitStats, version,'Corp_'+ state_origin+'_Event').ProfileAlertsTemplate;
+	Event_AlertsCSVTemplate	  := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp2_'+ state_origin+'_Event').ProfileAlertsTemplate;
 	//Submits Profile's stats to Orbit
-	Event_SubmitStats 				:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'Event','ScrubsAlerts', Event_OrbitStats, version,'Corp_'+ state_origin+'_Event').SubmitStats;
+	Event_SubmitStats 				:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp2_'+ state_origin+'_Event').SubmitStats;
 
-	Event_ScrubsWithExamples	:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'Event','ScrubsAlerts', Event_OrbitStats, version,'Corp_'+ state_origin+'_Event').CompareToProfile_with_Examples;
+	Event_ScrubsWithExamples	:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp2_'+ state_origin+'_Event').CompareToProfile_with_Examples;
 	
 	Event_ScrubsAlert					:= Event_ScrubsWithExamples(RejectWarning = 'Y');
 	Event_ScrubsAttachment		:= Scrubs.fn_email_attachment(Event_ScrubsAlert);

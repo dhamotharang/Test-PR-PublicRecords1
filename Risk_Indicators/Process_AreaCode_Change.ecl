@@ -1,4 +1,4 @@
-Import Risk_Indicators, Data_Services, STD, ut;
+﻿Import Risk_Indicators, Data_Services, STD, ut;
 
 EXPORT Process_AreaCode_Change(string filedate) := FUNCTION
 
@@ -32,7 +32,7 @@ jAreaCode	:= sort(join(srtAreaCodeOld,srtAreaCodeNew,
 //Rollup to update with any changes
 srtPrevBase := sort(File_AreaCode_base,old_NPA,old_NXX,old_name,-old_date_extablished,-permissive_end);
 AppendNew := jAreaCode + srtPrevBase;
-dedNewBase := dedup(AppendNew,all);
+dedNewBase := dedup(AppendNew,all, EXCEPT old_lf,new_lf);
 
 Risk_Indicators.Layout_AreaCode_Change RollitUp(Risk_Indicators.Layout_AreaCode_Change L, Risk_Indicators.Layout_AreaCode_Change R) := TRANSFORM
 	self := L;

@@ -1,4 +1,4 @@
-//  The purpose of this development is take KansasProfessional License raw files and convert them to a common
+﻿//  The purpose of this development is take KansasProfessional License raw files and convert them to a common
 //  professional license (BASE) layout to be used for MARI and PL_BASE development.
 //	05/05/2015 T.George - New Development
 //************************************************************************************************************* */	
@@ -6,7 +6,7 @@
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib;
 
 EXPORT map_KSS0902_conversion(STRING pVersion) := FUNCTION
-
+#workunit('name','Yogurt: map_KSS0902_conversion');
 	code 		:= 'KSS0902';
 	src_cd	:= 'S0902';
 	src_st	:= 'KS';	//License state
@@ -73,15 +73,20 @@ EXPORT map_KSS0902_conversion(STRING pVersion) := FUNCTION
 			SELF.NAME_MID			:= mname;
 			SELF.NAME_LAST		:= lname;
 			SELF.NAME_SUFX		:= suffix;
-					 
-			SELF.LICENSE_NBR	:= 'NR';
+			
+			TrimLicense_NBR   := ut.CleanSpacesAndUpper(pInput.LICENSE_NUMBER);
+			SELF.LICENSE_NBR	:= IF(TrimLicense_NBR <> '',TrimLicense_NBR,'NR');
 			SELF.LICENSE_STATE:= src_st;
 		
 			SELF.RAW_LICENSE_TYPE		:= StringLib.StringToUpperCase(pInput.LICENSE_TYPE);
-			SELF.STD_LICENSE_TYPE		:= StringLib.StringToUpperCase(pInput.LICENSE_TYPE); 	
+			SELF.STD_LICENSE_TYPE		:= map(SELF.RAW_LICENSE_TYPE = 'GENERAL CERTIFIED' => 'G',
+			                               SELF.RAW_LICENSE_TYPE = 'STATE LICENSED' => 'L',
+																		 SELF.RAW_LICENSE_TYPE = 'PROVISIONAL (TRAINEE)' => 'P',
+																		 SELF.RAW_LICENSE_TYPE = 'RESIDENTIAL CERTIFIED' => 'R',
+																		 SELF.RAW_LICENSE_TYPE); 	
 				 
 			//Reformatting date from MM/DD/YYYY to YYYYMMDD
-			SELF.ORIG_ISSUE_DTE	  	:= '17530101';
+			SELF.ORIG_ISSUE_DTE	  	:= Prof_License_Mari.DateCleaner.fmt_dateMMDDYYYY(pInput.ORIGINAL_ISSUE_DATE);
 			SELF.CURR_ISSUE_DTE			:= '17530101';
 			SELF.EXPIRE_DTE					:= Prof_License_Mari.DateCleaner.fmt_dateMMDDYYYY(pInput.EXPIRATION_DATE);	 
 					 

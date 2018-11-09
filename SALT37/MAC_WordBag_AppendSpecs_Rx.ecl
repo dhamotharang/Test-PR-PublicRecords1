@@ -1,4 +1,4 @@
-EXPORT MAC_WordBag_AppendSpecs_Rx(instring,keyname,keyfield,o) := MACRO
+﻿EXPORT MAC_WordBag_AppendSpecs_Rx(instring,keyname,keyfield,o) := MACRO
 #UNIQUENAME(r)
 %r% := RECORD
   UNSIGNED2 pos;
@@ -24,11 +24,18 @@ EXPORT MAC_WordBag_AppendSpecs_Rx(instring,keyname,keyfield,o) := MACRO
 #UNIQUENAME(tr2)
 %r2% %tr2%(%n% le, keyname ri) := TRANSFORM
 	sLen := LENGTH(TRIM(le.s));
-  SELF.spec := IF(TRIM(ri.keyfield) > '', ri.field_specificity, IF(sLen < 4, 3*sLen, 10));
+  SELF.spec := ri.field_specificity;
   SELF := le;
   END;	
+#UNIQUENAME(j0)
+%j0% := JOIN( %n%, keyname, LEFT.s = RIGHT.keyfield, %tr2%(LEFT,RIGHT), LEFT OUTER, LIMIT(SALT37._Config.Constants.JoinLimit) );
+
+#UNIQUENAME(j1)
+%j1% := PROJECT(%j0%,TRANSFORM(%r2%,SELF.spec:=IF(LEFT.spec>0,LEFT.spec,IF(LENGTH(TRIM(LEFT.s)) < 4, 3*LENGTH(TRIM(LEFT.s)), 10)),SELF:=LEFT));
+
 #UNIQUENAME(j)
-%j% := JOIN( %n%, keyname, LEFT.s = RIGHT.keyfield, %tr2%(LEFT,RIGHT), LEFT OUTER, LIMIT(SALT37._Config.Constants.JoinLimit) );
+%j% := IF(SUM(%j0%,spec)>0,%j1%,%j0%);
+
 #UNIQUENAME(bse)
 %bse% := DATASET([{0,(SALT37.StrType)(100*SUM(%j%,spec))}],%r%);
 //%bse% := dataset([{0,(SALT37.StrType) 0}],%r%);

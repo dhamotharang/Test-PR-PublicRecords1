@@ -3,16 +3,26 @@ import Phonesplus_v2;
 EXPORT Layout_common := module
 
 	export sourceRefIn := record
-		string 			OCN_Master;
-		string 			Carrier_Name;
-		string 			Serv;
-		string 			Line;
-		string      Prepaid;
-		string 			High_Risk_Indicator;
-		string 			Spid;								//IConectiv
-		string 			Operator_Full_Name; //IConectiv Name
+		string 			Spid;
+		string 			Cc;					//Country Code
+		string 			Name;			//Operator Full Name
+		string 			Country;//ISO2
+		string    Code;			//Data Type: B = Both; R = Range; P = Port
+		string 			Date;			//Date/Time Entered in Table
 		string 			OCN;
+		string255 filename{virtual (logicalfilename)};
 	end;
+	
+	export sourceRefInHist := record
+		string 			Spid;
+		string 			Cc;					//Country Code
+		string 			Name;			//Operator Full Name
+		string 			Country;//ISO2
+		string    Code;			//Data Type: B = Both; R = Range; P = Port
+		string 			Date;			//Date/Time Entered in Table
+		string 			OCN;
+		string				filename;
+	end;	
 	
 	export sourceRefBase_temp := record
 		string8 dt_first_reported;
@@ -30,26 +40,88 @@ EXPORT Layout_common := module
 		string  operator_full_name;
 		boolean is_current;
 	end;
-	
+
 	export sourceRefBase := record
 		string8 dt_first_reported;
 		string8 dt_last_reported;
 		string8 dt_start;
 		string8 dt_end;
-		string8  ocn;
-		string60  carrier_name;
-		string60  name;
+		string8 ocn;
+		string60 carrier_name;
+		string60 name;
 		string1 serv;
 		string1 line;
 		string2 prepaid;
 		string2 high_risk_indicator;
 		unsigned8	activation_dt;
 		string5	number_in_service;
-		string10  spid;
-		string  operator_full_name;
+		string10 spid;
+		string60 operator_full_name;
 		boolean is_current;
+		string1 override_file;
+		string1	data_type;
+		string2	ocn_state;
+		string4	overall_ocn;
+		string4	target_ocn;
+		string4	overall_target_ocn;
+		string25 ocn_abbr_name;
+		string1	rural_lec_indicator;
+		string1 small_ilec_indicator;
+		string10 category;
+		string30 carrier_address1;
+		string30 carrier_address2;
+		string15 carrier_floor;
+		string15 carrier_room;
+		string30 carrier_city;
+		string2	carrier_state;
+		string9	carrier_zip;
+		string10 carrier_phone;
+		string80 affiliated_to;
+		string45 overall_company;
+		string20 contact_function;
+		string60 contact_name;	
+		string30 contact_title;
+		string30 contact_address1;
+		string30 contact_address2;
+		string30 contact_city;
+		string2	contact_state;
+		string9	contact_zip;
+		string10 contact_phone;
+		string10 contact_fax;
+		string60 contact_email;
+		string70 contact_information;
+		string10 prim_range;
+		string2	predir;
+		string28 prim_name;
+		string4	addr_suffix;
+		string2	postdir;
+		string10 unit_desig;
+		string8	sec_range;
+		string25 p_city_name;
+		string25 v_city_name;
+		string2	st;
+		string5	z5;
+		string4	zip4;
+		string4	cart;
+		string1	cr_sort_sz;
+		string4	lot;
+		string1	lot_order;
+		string2	dpbc;
+		string1	chk_digit;
+		string2	rec_type;
+		string2	ace_fips_st;
+		string3	fips_county;
+		string10 geo_lat;
+		string11 geo_long;
+		string4	msa;
+		string7	geo_blk;
+		string1	geo_match;
+		string4	err_stat;
+		unsigned8 append_rawaid;
+		string5 address_type;
+		string5 privacy_indicator;
 	end;
-	
+		
 	export portedMain := record
 		string5			source;
 		string2 		phoneType;
@@ -149,7 +221,7 @@ EXPORT Layout_common := module
 		string10 		point_code								:= ''; 
 		string3			country_code							:= '';
 		string1			dial_type									:= '';
-		//string1Â Â  	service_type
+		//string1�� 	service_type
 		string10 		routing_code							:= '';
 		unsigned8		porting_dt								:= 0;
 		string6			porting_time							:= '';
@@ -189,15 +261,6 @@ EXPORT Layout_common := module
 		string2			is_react									:= '';
 		unsigned8		call_forward_dt						:= 0;
 		string15		caller_id									:= '';
-		string60		subpoena_company_name			:= '';
-		string60		subpoena_contact_name			:= '';
-		string60		subpoena_carrier_address	:= '';
-		string20		subpoena_carrier_city			:= '';
-		string20		subpoena_carrier_state		:= '';
-		string5			subpoena_carrier_zip			:= '';
-		string30		subpoena_email						:= '';
-		string10 		subpoena_contact_phone		:= '';
-		string10 		subpoena_contact_fax			:= '';
 end;
 
 end;

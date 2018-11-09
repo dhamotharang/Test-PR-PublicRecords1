@@ -1,4 +1,4 @@
-import did_add,bair_composite;
+﻿import did_add,bair_composite;
 
 EXPORT AppendDID_Payload (string version = '', boolean pUseProd = false, boolean pDelta = false) := module
 	
@@ -6,10 +6,10 @@ EXPORT AppendDID_Payload (string version = '', boolean pUseProd = false, boolean
 	
 	r := bair.layouts.rCompositeBase;
 
-	// shared dsLexId_ := distribute(if(pDelta, dataset('~thor400_data::base::composite_public_safety_data_curr_delta', r, flat), bair_composite.Files(pUseProd,false).composite_base), hash(eid));
 	shared dsLexId_ := distribute(bair_composite.Files(pUseProd,pDelta).composite_base, hash(eid));
-	shared dsLexId 	:= dsLexId_(lexid <> 0);
+	shared dsLexId 	:= dsLexId_;//(lexid <> 0);
 	
+	shared mo 	:= Bair.Update_Base(version, pUseProd, pDelta).MO_base;
 	shared cfs 	:= Bair.Update_Base(version, pUseProd, pDelta).CFS_base;
 	shared per	:= Bair.Update_Base(version, pUseProd, pDelta).PERSONS_base;
 	shared cra	:= bair.Update_Base(version, pUseProd, pDelta).CRASH_base;
@@ -19,7 +19,7 @@ EXPORT AppendDID_Payload (string version = '', boolean pUseProd = false, boolean
 	
 	JoinCfs := join(
 							distribute(cfs, hash(eid))
-							,dsLexId(Prepped_rec_type in [const_mod.CFS_caller_addr,const_mod.CFS_complainant_addr,const_mod.CFS_Incident_addr])
+							,dsLexId(lexid <> 0 and Prepped_rec_type in [const_mod.CFS_caller_addr,const_mod.CFS_complainant_addr,const_mod.CFS_Incident_addr])
 							,left.eid = right.eid
 							,transform({cfs}
 								,self.eid 						:= left.eid
@@ -61,16 +61,32 @@ EXPORT AppendDID_Payload (string version = '', boolean pUseProd = false, boolean
 														
 	EXPORT cfs_w_lexid := dedup(JoinCfs, record, all);
 	
-	// if(not NewHeader and not pDelta
-													// ,cfs
-													// ,dedup(JoinCfs, record, all)
-												// );	
+	JoinMO := join(
+							distribute(mo, hash(eid))
+							,dsLexId(Prepped_rec_type = const_mod.Events_Mo_address_of_crime)
+							,left.eid = right.eid and left.recordid_raids = right.recordid_raids
+							,transform({mo}
+								,self.eid 						:= left.eid								
+								,self.city 						:= if(right.orig_city <> '', right.orig_city, left.city)
+								,self.state 					:= if(right.orig_st <> '', right.orig_st, left.state)
+								,self.zip 						:= if(right.orig_zip <> '', right.orig_zip, left.zip)							
+								,self := left)
+							,left outer
+							,keep(1)
+							,local
+							);
+																
+	EXPORT mo_w_lexid 		:= JoinMO;
+	
 	JoinPer := join(
 							distribute(per, hash(eid))
 							,dsLexId(Prepped_rec_type = const_mod.Events_Persons_persons_address)
 							,left.eid = right.eid and left.recordid_raids = right.recordid_raids
 							,transform({per}
-								,self.eid 						:= left.eid
+								,self.eid 						:= left.eid								
+								,self.city 						:= if(right.orig_city <> '', right.orig_city, left.city)
+								,self.state 					:= if(right.orig_st <> '', right.orig_st, left.state)
+								,self.zip 						:= if(right.orig_zip <> '', right.orig_zip, left.zip)
 								,self.lexid 					:= right.lexid
 								,self.lexid_score 		:= right.lexid_score
 								,self.xadl2_Weight 		:= right.xadl2_Weight
@@ -109,13 +125,9 @@ EXPORT AppendDID_Payload (string version = '', boolean pUseProd = false, boolean
 																
 	EXPORT per_w_lexid 		:= JoinPer;
 	
-	// if(not NewHeader and not pDelta
-															// ,per
-															// ,JoinPer
-															// );	
 	JoinCra := join(
 							distribute(cra, hash(eid))
-							,dsLexId(Prepped_rec_type in [const_mod.Crash_Incident, const_mod.Crash_Person, const_mod.Crash_Vehicle])
+							,dsLexId(lexid <> 0 and Prepped_rec_type in [const_mod.Crash_Incident, const_mod.Crash_Person, const_mod.Crash_Vehicle])
 							,left.eid = right.eid and left.per_id = right.per_id
 							,transform({cra}
 								,self.eid 						:= left.eid
@@ -157,10 +169,6 @@ EXPORT AppendDID_Payload (string version = '', boolean pUseProd = false, boolean
 																
 	EXPORT crash_w_lexid 	:= dedup(JoinCra,record,all);
 	
-	// if(not NewHeader and not pDelta
-															// ,cra
-															// ,dedup(JoinCra,record,all)
-															// );
 	JoinOff := join(
 							distribute(off, hash(eid))
 							,dsLexId(Prepped_rec_type = const_mod.Offenders_)
@@ -205,8 +213,4 @@ EXPORT AppendDID_Payload (string version = '', boolean pUseProd = false, boolean
 																
 	EXPORT off_w_lexid 		:= dedup(JoinOff,record,all);
 	
-	// if(not NewHeader and not pDelta
-														// ,off
-														// ,dedup(JoinOff,record,all)
-														// );	
 END;

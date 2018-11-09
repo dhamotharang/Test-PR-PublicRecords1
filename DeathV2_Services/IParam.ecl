@@ -1,4 +1,4 @@
-IMPORT AutoStandardI, BatchShare, BatchServices, ut;
+﻿IMPORT AutoStandardI, BatchShare, BatchServices, ut;
 
 EXPORT IParam := MODULE
 
@@ -27,11 +27,11 @@ EXPORT IParam := MODULE
 			EXPORT BOOLEAN 		ExtraMatchCodes 				:= FALSE : STORED('ExtraMatchCodes');
 			EXPORT BOOLEAN 		IncludeBlankDOD 				:= FALSE : STORED('IncludeBlankDOD');
 			EXPORT BOOLEAN 		NoDIDAppend 						:= FALSE : STORED('NoDIDAppend');
-			EXPORT UNSIGNED3 	DidScoreThreshold 			:= Constants.DEFAULT_DID_SCORE_THRESHOLD : STORED('DID_Score_Threshold');
+			EXPORT UNSIGNED3 DidScoreThreshold 			:= Constants.DEFAULT_DID_SCORE_THRESHOLD : STORED('DID_Score_Threshold');
 			EXPORT BOOLEAN 		MatchCodeADLAppend 			:= TRUE : STORED('MatchCode_ADL_Append');
 			EXPORT BOOLEAN 		PartialNameMatchCodes 	:= FALSE : STORED('PartialNameMatchCodes');
 			EXPORT STRING  		MatchCodeIncludes 			:= BatchServices.MatchCodes.default_includes : STORED('MatchCode_Includes');
-			EXPORT UNSIGNED2 	DaysBack 								:= 0 : STORED('DaysBack');		
+			EXPORT UNSIGNED2 DaysBack 								:= 0 : STORED('DaysBack');	
 		END;
 		
 		RETURN in_mod;
@@ -43,6 +43,7 @@ EXPORT IParam := MODULE
 	INTERFACE(AutoStandardI.DataPermissionI.params, AutoStandardI.DataRestrictionI.params, AutoStandardI.InterfaceTranslator.industry_class_val.params)	
 		EXPORT BOOLEAN UseDeathMasterSSAUpdates := FALSE;
 		EXPORT BOOLEAN IsConsumer := FALSE;
+		EXPORT BOOLEAN SuppressNonMarketingDeathSources := FALSE;		
 	END;
 	
 	EXPORT GetDeathRestrictions(inmod) := 
@@ -54,9 +55,10 @@ EXPORT IParam := MODULE
 		death_mod := MODULE(dmod)	
 			EXPORT BOOLEAN UseDeathMasterSSAUpdates := AutoStandardI.DataPermissionI.val(dmod).use_DeathMasterSSAUpdates;
 			EXPORT BOOLEAN IsConsumer := AutoStandardI.InterfaceTranslator.industry_class_value.val(dmod) = ut.IndustryClass.Knowx_IC;
+			EXPORT BOOLEAN SuppressNonMarketingDeathSources := FALSE : stored('SuppressNonMarketingDeathSources');	
 		END;		
 		
-		RETURN death_mod;
+	RETURN death_mod;
 	ENDMACRO;	
 
 END;

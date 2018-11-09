@@ -1,4 +1,4 @@
-IMPORT AutoHeaderI, AutokeyI, AutoStandardI, BatchShare, BIPV2, 
+﻿IMPORT AutoHeaderI, AutokeyI, AutoStandardI, BatchShare, BIPV2, 
        Suppress, TopBusiness_Services, FCRA;
 
 EXPORT IParam := MODULE
@@ -36,12 +36,12 @@ EXPORT IParam := MODULE
 																		it.rmsid_value.params,
 																		it.tmsid_value.params,
 																		TopBusiness_Services.iParam.BIDParams,
-																		FCRA.iRules)
+																		FCRA.iRules,
+																		FCRA.FCRAPurpose.params)
 			export integer1 non_subject_suppression 	:= Suppress.Constants.NonSubjectSuppression.doNothing;
 			export string person_filter_id := '';
 			export boolean includeCriminalIndicators := false;
 			export boolean subject_only := false;
-			export integer FCRAPurpose := FCRA.Constants.FCRAPurpose.NoValueProvided;
 	END;
 
 	EXPORT batch_params := INTERFACE (BatchShare.IParam.BatchParams,FCRA.iRules)

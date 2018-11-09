@@ -1,4 +1,4 @@
-EXPORT Out_File_Main_Stats_Population(pMain
+﻿EXPORT Out_File_Main_Stats_Population(pMain
                                      ,pOffenses
 									 ,pImages
 									 ,pCoverage
@@ -175,7 +175,7 @@ import STRATA, lib_date, hygenics_search;
     imgLength_CountNonZero                 := sum(group,if(pImages.imgLength<>0,1,0));
   end;
 
-//Flag records where coverage date > 30 days
+
 src_filter 				:= StringLib.StringFilter(pCoverage.src_upload_date, '0123456789');
 file_date_filter 	:= StringLib.StringFilter(pVersion, '0123456789');
 
@@ -183,12 +183,13 @@ file_date_filter 	:= StringLib.StringFilter(pVersion, '0123456789');
  :=
   record	
 		state												:= pCoverage.orig_state_code;
+		source_file                 := pCoverage.source_file;
     coverage_end_date						:= pCoverage.src_upload_date;
-		fcra_remove_flag						:= if(pCoverage.vendor_code in hygenics_search.Sex_Offenders_Not_Updating.SO_By_Key and pCoverage.source_file in Hygenics_search.Sex_Offenders_Not_Updating.SO_By_Source,
+		fcra_remove_flag						:= if(pCoverage.seisint_primary_key[1..4] in hygenics_search.Sex_Offenders_Not_Updating.SO_By_Key or pCoverage.source_file in Hygenics_search.Sex_Offenders_Not_Updating.SO_By_Source,
 																			'Y',
-																		if(trim(src_filter, left, right)<>'' and length(src_filter) = length(file_date_filter) and LIB_Date.DaysApart(src_filter, file_date_filter)<=180 and pCoverage.vendor_code not in hygenics_search.Sex_Offenders_Not_Updating.SO_By_Key and pCoverage.source_file not in Hygenics_search.Sex_Offenders_Not_Updating.SO_By_Source,
+																		if(trim(src_filter, left, right)<>'' and length(src_filter) = length(file_date_filter) and LIB_Date.DaysApart(src_filter, file_date_filter)<=180 and pCoverage.seisint_primary_key[1..4] not in hygenics_search.Sex_Offenders_Not_Updating.SO_By_Key and pCoverage.source_file not in Hygenics_search.Sex_Offenders_Not_Updating.SO_By_Source,
 																			'',
-																		if(trim(src_filter, left, right)='' and pCoverage.vendor_code not in hygenics_search.Sex_Offenders_Not_Updating.SO_By_Key and pCoverage.source_file not in Hygenics_search.Sex_Offenders_Not_Updating.SO_By_Source,
+																		if(trim(src_filter, left, right)='' and pCoverage.seisint_primary_key[1..4] not in hygenics_search.Sex_Offenders_Not_Updating.SO_By_Key and pCoverage.source_file not in Hygenics_search.Sex_Offenders_Not_Updating.SO_By_Source,
 																			'',
 																			'Y')));
   end;
@@ -392,11 +393,15 @@ dStats_File_Coverage := table(pCoverage
 													,%rPopulationStats_file_Coverage%
 													,few);
 					  
-%dPopulationStats_File_Coverage% := dedup(sort(dStats_File_Coverage, state, coverage_end_date), state, coverage_end_date);
-  
-STRATA.createXMLStats(%dPopulationStats_File_Coverage%
+// %dPopulationStats_File_Coverage% := dedup(sort(dStats_File_Coverage,source_file, state, coverage_end_date),source_file, state, coverage_end_date);
+ 
+%dPopulationStats_File_Coverage% := sort(table(dStats_File_Coverage,{source_file,state, coverage_end_date,fcra_remove_flag,cnt := count(group)}
+                                                       ,source_file,state,coverage_end_date,fcra_remove_flag,few),source_file);
+ 
+ 
+STRATA.createXMLStats(%dPopulationStats_File_Coverage% 
 											 ,'Sex Offender Hyg'
-											 ,'Coverage'
+											 ,'Coverage2'
 											 ,pVersion
 											 ,''
 											 ,%zCoverage%);  
@@ -431,8 +436,9 @@ STRATA.createXMLStats(%dPopulationStats_FCRA_File_Offenses%
 zOut := parallel(%zMain%
 									,%zOffenses%
 									,%zImages%
-									,%zCoverage%,
-									%zFCRAMain%
-									,%zFCRAOffenses%);
+									,%zCoverage%
+									,%zFCRAMain%
+									,%zFCRAOffenses%
+									);
 
 ENDMACRO;

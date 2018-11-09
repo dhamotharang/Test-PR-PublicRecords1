@@ -1,4 +1,4 @@
-IMPORT iesp, PhoneFinder_Services,std,ut;
+﻿IMPORT iesp, PhoneFinder_Services,std,ut;
 
 EXPORT GetPRIValue(PhoneFinder_Services.Layouts.PhoneFinder.Final SubjectPhone,
 										PhoneFinder_Services.iParam.ReportParams inMod):= FUNCTION
@@ -30,6 +30,7 @@ currentDate := (STRING)STD.Date.Today();
 										0  => SubjectPhone.fname='' AND SubjectPhone.lname='' AND SubjectPhone.listed_name='' AND SubjectPhone.prim_name='' AND SubjectPhone.batch_in.homephone<>'', // no identity
 										// Eventually we will obtain PortingStatus from the LIBD file, however for now we continue to use TU as authoritative
 										// 1  => SubjectPhone.PortingStatus='Inactive',
+									 -1 => SubjectPhone.phone = '',
 										1  => PhoneFinder_Services.Functions.PhoneStatusDesc((INTEGER)SubjectPhone.realtimephone_ext.statuscode)='INACTIVE',
 										2  => (UNSIGNED)SubjectPhone.dt_first_seen>(UNSIGNED)ut.date_math(currentDate,-l.Threshold ) AND 
 																		(UNSIGNED)SubjectPhone.dt_first_seen <= (UNSIGNED)ut.date_math(currentDate, -l.ThresholdA),
@@ -64,7 +65,13 @@ currentDate := (STRING)STD.Date.Today();
 																															(UNSIGNED)EventDate > (UNSIGNED)ut.date_math(currentDate, -l.Threshold))),		
 										28 => SubjectPhone.deceased = 'Y',																					
 										29 => SubjectPhone.st<> '' AND SubjectPhone.PhoneState <> SubjectPhone.st, //check for best.st <> st
-										30 => COUNT(SubjectPhone.InquiryDates((UNSIGNED4)inquiryDate>=(UNSIGNED)ut.date_math(currentDate, -l.Threshold))) >= MAX(l.ThresholdA,Constants.InquiryDayLimit),
+										//30 => COUNT(SubjectPhone.InquiryDates((UNSIGNED4)inquiryDate>=(UNSIGNED)ut.date_math(currentDate, -l.Threshold))) >= MAX(l.ThresholdA,Constants.InquiryDayLimit),
+										30 => COUNT(SubjectPhone.InquiryDates((UNSIGNED4)inquiryDate>=(UNSIGNED)ut.date_math(currentDate, -l.Threshold))) + SubjectPhone.RecordsReturned
+										                                                            >= MAX(l.ThresholdA,Constants.InquiryDayLimit),
+                    31=> 	SubjectPhone.CallForwardingIndicator   =	PhoneFinder_Services.Functions.CallForwardingDesc(1),							
+										32 => (UNSIGNED)SubjectPhone.dt_first_seen = 0,
+										33 => (UNSIGNED)SubjectPhone.dt_last_seen = 0,
+										34 => (UNSIGNED)SubjectPhone.dt_first_seen = 0 AND (UNSIGNED)SubjectPhone.dt_last_seen = 0,
 										FALSE);				
 		//Keep violating rules and risk indicator	based on individual rule.
 		SELF.Alerts 	 := IF(hasFailed, PROJECT(l, TRANSFORM(alertRec, SELF.flag := LEFT.Category,SELF.message := LEFT.RiskDescription)));
@@ -115,7 +122,7 @@ currentDate := (STRING)STD.Date.Today();
 	// OUTPUT(dsAlert.alerts);
 	// OUTPUT(alertResults);																										
 	// OUTPUT(risk);																																																	
-	// OUTPUT(PrimaryPhoneUpd);		
+	// OUTPUT(PrimaryPhoneUpd);
 	RETURN PrimaryPhoneUpd;
 END;
 
@@ -123,33 +130,37 @@ END;
 Indicator ID	Risk Alert
 0	No identity
 1	Phone is not active with this person
-2	First Seen Date is within â€œInput Aâ€ and â€œInput Bâ€ days (1st date range)
-3	Last Seen Date is within last â€œInput Bâ€ days
+2	First Seen Date is within “Input A” and “Input B” days (1st date range)
+3	Last Seen Date is within last “Input B” days
 4								Unused
 5	Primary Phone is listed as a Business
-6	Phone # has been ported within the past â€œInput Bâ€ days
-7	Phone # has been ported more than â€œInput Bâ€ times with this person.
-8	Phone # was the origination phone used to spoof another phone # within the past â€œInput Bâ€ days.
-9	Phone # has been spoofed within the past â€œInput Bâ€ days
+6	Phone # has been ported within the past “Input B” days
+7	Phone # has been ported more than “Input B” times with this person.
+8	Phone # was the origination phone used to spoof another phone # within the past “Input B” days.
+9	Phone # has been spoofed within the past “Input B” days
 10	 	 	 	 	 	 	Unused
 11	 	 	 	 	 	 	Unused
 12	 	 	 	 	 	 	Unused
 13	 	 	 	 	 	 	Unused
 14	 	 	 	 	 	 	Unused
-15	Phone # has received â€œInput Aâ€ OTP requests within the past â€œInput Bâ€ days.
+15	Phone # has received “Input A” OTP requests within the past “Input B” days.
 16	Phone # is a Prepaid Phone	 	 	
 17	Phone # is associated with a No Contract Carrier	 	 	
 18	Phone Service Type is Landline	 	 	
 19	Phone Service Type is Wireless	 	 	
 20	Phone Service Type is VOIP	 	 	
 21							Unused
-22	First Seen Date is within â€œInput Aâ€ and â€œInput Bâ€ days (2nd date range)	
-23	First Seen Date is within â€œInput Aâ€ and â€œInput Bâ€ days (3rd date range)	
+22	First Seen Date is within “Input A” and “Input B” days (2nd date range)	
+23	First Seen Date is within “Input A” and “Input B” days (3rd date range)	
 24	Primary address is zoned as Commercial	 	 	
-25	Primary address is not the â€œCurrent" address for the Primary Subject	 	 	
-26	Phone # was the destination phone used in a spoofing activity with the past â€œInput Bâ€ days.	 	
-27	Phone # was the spoofed phone used in a spoofing activity within the past â€œInput Bâ€ days. 	 	
+25	Primary address is not the “Current" address for the Primary Subject	 	 	
+26	Phone # was the destination phone used in a spoofing activity with the past “Input B” days.	 	
+27	Phone # was the spoofed phone used in a spoofing activity within the past “Input B” days. 	 	
 28	Primary Subject associated to the phone is deceased	 	 	
 29	Primary Phone Area Code is not in same state as Primary Address.	 	 	
-30	Phone # has had â€œInput Aâ€ search requests within the past â€œInput Bâ€ days	
+30	Phone # has had “Input A” search requests within the past “Input B” days	
+31  Phone # is currently being Forwarded
+32  No First Seen Date associated to Phone#
+33  No Last Seen Date associated to Phone #
+34  No First Seen and Last Seen Date associated to Phone #
 */	

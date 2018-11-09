@@ -1,5 +1,5 @@
-#stored('did_add_force', 'thor');
-import Nac, RoxieKeybuild;
+﻿#stored('did_add_force', 'thor');
+import Nac, dops, ut;
 export fn_Base2_from_Base1(string version) := FUNCTION
 b1 := nac.Files().Base;
 
@@ -24,7 +24,14 @@ doit := SEQUENTIAL(
 	nac_V2.Promote_Superfiles(Nac_V2.Superfile_List().sfCollisions, lfn_collisions),
 	OUTPUT(Nac_V2.NewCollisions(c2, c1),,'~nac::v2::newcollisions::' + version, COMPRESSED, OVERWRITE),
 	OUTPUT(NAC_V2.GetSampleRecords(version), named('v2_samples')),
-	RoxieKeybuild.updateversion('Nac2Keys',version,alertList,,'N')
+	//RoxieKeybuild.updateversion('Nac2Keys',version,alertList,,'N'),
+	if (ut.Weekday((integer)version[1..8]) = 'SATURDAY'
+										,dops.updateversion( 'Nac2Keys', version[1..8], alertList,'Y','N',l_isprodready:='Y')
+										,dops.updateversion( 'Nac2Keys', version[1..8], alertList,'N','N')
+			),
+	if (ut.Weekday((integer)version[1..8]) <> 'SATURDAY',
+							Nac_v2.CreateOrbitEntry(version)),
+	Nac.fn_Strata(version)
 );
 
 return doit;

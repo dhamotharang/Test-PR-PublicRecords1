@@ -1,4 +1,4 @@
-IMPORT Property, PRTE_CSV, autokey, BIPV2, AID;
+﻿IMPORT Property, PRTE_CSV, autokey, BIPV2, AID;
 
 EXPORT Layouts := MODULE
 
@@ -555,6 +555,26 @@ EXPORT Layouts := MODULE
    string9		name4_link_ssn;      
 			string9		name4_fein;
 			string8		name4_inc_date;
+		//Name5	
+			string8		name5_link_dob;
+   string9		name5_link_ssn;      
+			string9		name5_link_fein;
+			string8		name5_link_inc_date;
+		//Name6	
+			string8		name6_link_dob;
+   string9		name6_link_ssn;      
+			string9		name6_link_fein;
+			string8		name6_link_inc_date;
+		//Name7	
+			string8		name7_link_dob;
+   string9		name7_link_ssn;      
+			string9		name7_link_fein;
+			string8		name7_link_inc_date;
+		//Name8	
+			string8		name8_link_dob;
+   string9		name8_link_ssn;      
+			string9		name8_link_fein;
+			string8		name8_inc_date;		
 		end;
 		
 		EXPORT incoming_alpha := RECORD,maxlength(32768)
@@ -683,6 +703,26 @@ EXPORT Layouts := MODULE
    string9		name4_link_ssn;      
 			string9		name4_fein;
 			string8		name4_inc_date;
+			//Name5	
+			string8		name5_link_dob;
+   string9		name5_link_ssn;      
+			string9		name5_link_fein;
+			string8		name5_link_inc_date;
+		//Name6	
+			string8		name6_link_dob;
+   string9		name6_link_ssn;      
+			string9		name6_link_fein;
+			string8		name6_link_inc_date;
+		//Name7	
+			string8		name7_link_dob;
+   string9		name7_link_ssn;      
+			string9		name7_link_fein;
+			string8		name7_link_inc_date;
+		//Name8	
+			string8		name8_link_dob;
+   string9		name8_link_ssn;      
+			string9		name8_link_fein;
+			string8		name8_link_inc_date;
  end;
 	
 		EXPORT normalized := record
@@ -890,7 +930,7 @@ EXPORT Layouts := MODULE
 			unsigned1 did_score := 0;
 			unsigned6 bdid := 0;
 			unsigned1 bdid_score := 0;
-			string9 	ssn := 0;
+			string9 	ssn := '';
 			string60  name_Company;
 			string10	site_prim_range;
 			string2		site_predir;

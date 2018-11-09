@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Biz_Header_Service">
 <part name="company_name" type="xsd:string"/>
 <part name="prim_range" type="xsd:string"/>

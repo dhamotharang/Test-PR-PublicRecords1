@@ -1,4 +1,4 @@
-import Address, AutoStandardI, Business_Risk_BIP, Census_Data, Codes, Gateway, iesp, 
+﻿import Address, AutoStandardI, Business_Risk_BIP, Census_Data, Codes, Gateway, iesp, 
        IntlIID, Models, Risk_Indicators, Riskwise, Royalty, Seed_Files, Suppress, ut;
 
 // The following function obtains Consumer InstantID data for the Authorized Reps passed in. 
@@ -728,8 +728,8 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				self.combo_ssn := le.combo_ssn;
 				self.addressPOBox := (Risk_Indicators.rcSet.isCode12(le.addr_type) or Risk_Indicators.rcSet.isCodePO(le.zipclass)) and (actualIIDVersion=1 or FromFlexID);
 				self.addressCMRA := (le.hrisksic in risk_indicators.iid_constants.setCRMA or le.ADVODropIndicator='C') and (actualIIDVersion=1 or FromFlexID);
-				
-				self.SSNFoundForLexID := le.combo_ssn<>'' and actualIIDVersion=1;	
+					
+				self.SSNFoundForLexID := le.bestssn<>'' and actualIIDVersion=1;
 				
 				self.ADVODoNotDeliver := le.ADVODoNotDeliver;
 				self.ADVODropIndicator := le.ADVODropIndicator;

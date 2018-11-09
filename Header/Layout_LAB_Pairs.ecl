@@ -2,6 +2,7 @@ EXPORT Layout_LAB_Pairs
 	:= RECORD
 		unsigned8  did;
 		unsigned8  rid;
+        unsigned8  alpha_rid;
 		string1    ssn_ind;
 		string1    dob_ind;
 		string2    addr_ind;

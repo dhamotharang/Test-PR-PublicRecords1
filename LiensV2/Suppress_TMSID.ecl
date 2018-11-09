@@ -1,5 +1,5 @@
 ﻿  import dops;
-  export Suppress_TMSID := dops.SuppressID('liens').GetIDsAsSet();
+   export Suppress_TMSID(boolean isFCRA=false) := dops.SuppressID('liens').GetIDsAsSet(isFCRA);
 /*export Suppress_TMSID := ['SA1011035200503291973741500',
 																				 'HG95R42298031946FLDADC1',
 																				 'SA101103519960509000865726399653',

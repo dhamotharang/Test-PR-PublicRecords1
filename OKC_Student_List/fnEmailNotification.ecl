@@ -6,11 +6,11 @@
 		#DECLARE (Indx)
 		#SET (Indx,1);
 		#DECLARE (EmailBody)
-		#SET (EmailBody, '\'OKC Student List Update \'+'+#TEXT(subj)+'+\' - Top 100 OKC majors that are not mapped to ASL majors\\n\\n\\tMAJOR\\t\\t\\t\\t\\tCOUNT\\n\\t---------------------------------------------------------------------\\n\'');
+		#SET (EmailBody, '\'OKC Student List Update \'+'+#TEXT(subj)+'+\' - Top 25 OKC majors that are not mapped to ASL majors\\n\\n\\tMAJOR\\t\\t\\t\\t\\tCOUNT\\n\\t---------------------------------------------------------------------\\n\'');
 
 		//Construct the body of the message	
 		#LOOP
-			#IF (%Indx% > 100)
+			#IF (%Indx% > 25)
 				#BREAK
 			#ELSE
 				#APPEND(EmailBody, '+\'\\t\'+'+#TEXT(ds)+'['+%Indx%+'].major[1..25]+\'\\t\\t\\t\\t\'+'+#TEXT(ds)+'['+%Indx%+'].cnt+\'\\n\\r\'');

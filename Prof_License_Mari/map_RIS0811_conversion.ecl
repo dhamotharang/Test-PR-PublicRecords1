@@ -1,4 +1,4 @@
-/* Converting State of Rhode Island Dept of Business Regulation Mulitple Licenses File to MARI common layout
+﻿/* Converting State of Rhode Island Dept of Business Regulation Mulitple Licenses File to MARI common layout
 // Following allowable Real Estate License Type: APR, RLE, MTG, LND
 */
 import Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib, NID;
@@ -77,7 +77,7 @@ EXPORT map_RIS0811_conversion(STRING pVersion) := FUNCTION
 		TrimAddress2					:= ut.CleanSpacesAndUpper(pInput.ADDRESS_2);
 		TrimCity							:= ut.CleanSpacesAndUpper(pInput.CITY_1);
 		TrimState							:= ut.CleanSpacesAndUpper(pInput.STATE_1);
-		TrimZip								:= IF(TRIM(pInput.ZIP_1)='0','',ut.CleanSpacesAndUpper(pInput.ZIP_1));
+		TrimZip								  := StringLib.StringFilterOut((ut.CleanSpacesAndUpper(pInput.ZIP_1)),'="');
 				
     //Handling Business Names per License Type REE & REC
     CorpPattern	:= '(^.* LLC$|^.* LLC\\.$|^.* INC$|^.* INC\\.$|^.* COMPANY$|^.* CORP$|^.* CORP\\.$|^.* CORP|\\.COM$|.NET$|.ORG$)';
@@ -212,8 +212,10 @@ EXPORT map_RIS0811_conversion(STRING pVersion) := FUNCTION
 
 	  //Use address cleaner to clean address
 		tmpZip	  						:= MAP(LENGTH(TrimZip)=3 => '00'+TrimZip,
-		                             LENGTH(TrimZip)=4 => '0'+TrimZip,
-																 TrimZip);
+		                      LENGTH(TrimZip)=4 => '0'+TrimZip,
+																        TRIM(TrimZip) = '0' => '',
+																        TrimZip);
+																				
 		clnAddress1						:= Prof_License_Mari.mod_clean_name_addr.removeNameFromAddr(TrimAddress1, RemovePattern);
 		clnAddress2						:= Prof_License_Mari.mod_clean_name_addr.removeNameFromAddr(TrimAddress2, RemovePattern);
 

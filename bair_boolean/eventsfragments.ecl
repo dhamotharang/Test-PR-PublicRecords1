@@ -133,6 +133,7 @@ EXPORT eventsfragments(Types.StateList st_list=ALL, Boolean pDelta=true) := MODU
 																					self.wc_beat							:= left.beat,
 																					self.wc_rd								:= left.rd,
 																					self.wc_plate							:= left.plate,
+                                          self.synopsis_of_crime    := Text_Search.rtf2text(left.synopsis_of_crime),
 																					Self:=left,self:=[]));
 																					
 			SHARED events_base := SORT(DISTRIBUTE(bair_data1(eid <> '',ir_number<>''),HASH64(eid)),eid,-primaryrec,LOCAL);

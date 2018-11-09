@@ -1,0 +1,1 @@
+﻿EXPORT email_list := 'kevin.wilmoth@lexisnexisrisk.com';

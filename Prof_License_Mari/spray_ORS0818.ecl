@@ -1,5 +1,4 @@
-// spray ORS0818 Oregon Real Estate Appraisers Licenses Files for MARI	  
-IMPORT Prof_License_Mari, Lib_FileServices, lib_stringlib;
+﻿IMPORT Prof_License_Mari, Lib_FileServices, lib_stringlib;
 
 EXPORT spray_ORS0818(string pVersion) := MODULE
 
@@ -42,17 +41,21 @@ END;
 //  Spray All Files
 spray_all	:=
 	PARALLEL(
-		Prof_License_Mari.spray_common_modified.spray_csv(pVersion, code, 'State Licensed Appraiser.csv','comma');
+	 Prof_License_Mari.spray_common_modified.spray_csv(pVersion, code, 'AMC Company.csv','comma');
+	 Prof_License_Mari.spray_common_modified.spray_csv(pVersion, code, 'Registered Appraiser Assistant.csv','comma');
 		Prof_License_Mari.spray_common_modified.spray_csv(pVersion, code, 'State Certified General Appraiser.csv','comma');
 		Prof_License_Mari.spray_common_modified.spray_csv(pVersion, code, 'State Certified Residential Appraiser.csv','comma');
+		Prof_License_Mari.spray_common_modified.spray_csv(pVersion, code, 'State Licensed Appraiser.csv','comma');
 					);
 	
 //  Transform All Files
 xform_all
 	:= PARALLEL(
-							OUTPUT(TransformFile('State Licensed Appraiser.csv'),, destination + pVersion + '::State Licensed Appraiser.csv', CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE);							
+							OUTPUT(TransformFile('AMC Company.csv'),, destination + pVersion + '::AMC Company.csv', CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE);							
+							OUTPUT(TransformFile('Registered Appraiser Assistant.csv'),, destination + pVersion + '::Registered Appraiser Assistant.csv', CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE);							
 							OUTPUT(TransformFile('State Certified General Appraiser.csv'),, destination + pVersion + '::State Certified General Appraiser.csv', CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE);							
 							OUTPUT(TransformFile('State Certified Residential Appraiser.csv'),, destination + pVersion + '::State Certified Residential Appraiser.csv', CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE);							
+							OUTPUT(TransformFile('State Licensed Appraiser.csv'),, destination + pVersion + '::State Licensed Appraiser.csv', CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE);							
 							);	
 	
 	
@@ -61,9 +64,11 @@ super_all
 	:=	
 	SEQUENTIAL(
 		FileServices.StartSuperFileTransaction(),
-		AddToSuperfile('State Licensed Appraiser.csv'),
+		AddToSuperfile('AMC Company.csv'),
+		AddToSuperfile('Registered Appraiser Assistant.csv'),
 		AddToSuperfile('State Certified General Appraiser.csv'),
 		AddToSuperfile('State Certified Residential Appraiser.csv'),
+		AddToSuperfile('State Licensed Appraiser.csv'),		
 		FileServices.FinishSuperFileTransaction()
 	);
 
@@ -71,9 +76,11 @@ super_all
 remove_raw 
 	:= 
 		SEQUENTIAL(
-							 FileServices.DeleteLogicalFile(destination + pVersion + '::State Licensed Appraiser.raw'),
+							 FileServices.DeleteLogicalFile(destination + pVersion + '::AMC Company.raw'),
+							 FileServices.DeleteLogicalFile(destination + pVersion + '::Registered Appraiser Assistant.raw'),
 							 FileServices.DeleteLogicalFile(destination + pVersion + '::State Certified General Appraiser.raw'),
-							 FileServices.DeleteLogicalFile(destination + pVersion + '::State Certified Residential Appraiser.raw')
+							 FileServices.DeleteLogicalFile(destination + pVersion + '::State Certified Residential Appraiser.raw'),
+							 FileServices.DeleteLogicalFile(destination + pVersion + '::State Licensed Appraiser.raw')							 
 							 );
 
 

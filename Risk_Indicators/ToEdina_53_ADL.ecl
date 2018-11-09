@@ -1,4 +1,4 @@
-
+﻿
 multiple_file_test := false;  // only set this to true in development environment when testing multiple shell files at the same time
 
 import risk_indicators, riskprocessing, riskview;
@@ -528,6 +528,81 @@ export ToEdina_53_ADL( dataset(riskprocessing.layouts.layout_internal_shell) bs,
 	self.credit_derived_perf.archive_date_6mo												:= le.archive_date_6mo;	
 	self.credit_derived_perf.archive_date_12mo											:= le.archive_date_12mo;	
 	self.credit_derived_perf.archive_date_24mo											:= le.archive_date_24mo;
+
+	//new Inquiry PII tumblings counters for BS 5.3
+	self.inq_PII_tumblings.inq_ssnsperadl_1subs						:= le.acc_logs.inq_ssnsperadl_1subs;
+	self.inq_PII_tumblings.inq_phnsperadl_1subs						:= le.acc_logs.inq_phnsperadl_1subs;
+	self.inq_PII_tumblings.inq_primrangesperadl_1subs			:= le.acc_logs.inq_primrangesperadl_1subs;
+	self.inq_PII_tumblings.inq_dobsperadl_1subs						:= le.acc_logs.inq_dobsperadl_1subs;
+	self.inq_PII_tumblings.inq_fnamesperadl_1subs					:= le.acc_logs.inq_fnamesperadl_1subs;
+	self.inq_PII_tumblings.inq_lnamesperadl_1subs					:= le.acc_logs.inq_lnamesperadl_1subs;
+	self.inq_PII_tumblings.inq_dobsperadl_daysubs					:= le.acc_logs.inq_dobsperadl_daysubs;
+	self.inq_PII_tumblings.inq_dobsperadl_mosubs					:= le.acc_logs.inq_dobsperadl_mosubs;
+	self.inq_PII_tumblings.inq_dobsperadl_yrsubs					:= le.acc_logs.inq_dobsperadl_yrsubs;
+	self.inq_PII_tumblings.inq_ssnsperadl_1dig						:= le.acc_logs.inq_ssnsperadl_1dig;
+	self.inq_PII_tumblings.inq_phnsperadl_1dig						:= le.acc_logs.inq_phnsperadl_1dig;
+	self.inq_PII_tumblings.inq_primrangesperadl_1dig			:= le.acc_logs.inq_primrangesperadl_1dig;
+	self.inq_PII_tumblings.inq_dobsperadl_1dig						:= le.acc_logs.inq_dobsperadl_1dig;
+	self.inq_PII_tumblings.inq_primrangesperssn_1dig			:= le.acc_logs.inq_primrangesperssn_1dig;
+	self.inq_PII_tumblings.inq_dobsperssn_1dig						:= le.acc_logs.inq_dobsperssn_1dig;
+	self.inq_PII_tumblings.inq_ssnsperaddr_1dig						:= le.acc_logs.inq_ssnsperaddr_1dig;
+
+	self.swappedNames := le.iid.swappedNames;
+
+	//new Inquiry PII corroboration counters for BS 5.3
+	self.inq_PII_corroboration.inq_corrnameaddr						:= le.acc_logs.inq_corrnameaddr;
+	self.inq_PII_corroboration.inq_corrnameaddr_adl				:= le.acc_logs.inq_corrnameaddr_adl;
+	self.inq_PII_corroboration.inq_corrnamessn						:= le.acc_logs.inq_corrnamessn;
+	self.inq_PII_corroboration.inq_corrnamessn_adl				:= le.acc_logs.inq_corrnamessn_adl;
+	self.inq_PII_corroboration.inq_corrnamephone					:= le.acc_logs.inq_corrnamephone;
+	self.inq_PII_corroboration.inq_corrnamephone_adl			:= le.acc_logs.inq_corrnamephone_adl;
+	self.inq_PII_corroboration.inq_corraddrssn						:= le.acc_logs.inq_corraddrssn;
+	self.inq_PII_corroboration.inq_corraddrssn_adl				:= le.acc_logs.inq_corraddrssn_adl;
+	self.inq_PII_corroboration.inq_corrdobaddr						:= le.acc_logs.inq_corrdobaddr;
+	self.inq_PII_corroboration.inq_corrdobaddr_adl				:= le.acc_logs.inq_corrdobaddr_adl;
+	self.inq_PII_corroboration.inq_corraddrphone					:= le.acc_logs.inq_corraddrphone;
+	self.inq_PII_corroboration.inq_corraddrphone_adl			:= le.acc_logs.inq_corraddrphone_adl;
+	self.inq_PII_corroboration.inq_corrdobssn							:= le.acc_logs.inq_corrdobssn;
+	self.inq_PII_corroboration.inq_corrdobssn_adl					:= le.acc_logs.inq_corrdobssn_adl;
+	self.inq_PII_corroboration.inq_corrphonessn						:= le.acc_logs.inq_corrphonessn;
+	self.inq_PII_corroboration.inq_corrphonessn_adl				:= le.acc_logs.inq_corrphonessn_adl;
+	self.inq_PII_corroboration.inq_corrdobphone						:= le.acc_logs.inq_corrdobphone;
+	self.inq_PII_corroboration.inq_corrdobphone_adl				:= le.acc_logs.inq_corrdobphone_adl;
+	self.inq_PII_corroboration.inq_corrnameaddrssn				:= le.acc_logs.inq_corrnameaddrssn;
+	self.inq_PII_corroboration.inq_corrnameaddrssn_adl		:= le.acc_logs.inq_corrnameaddrssn_adl;
+	self.inq_PII_corroboration.inq_corrnamephonessn				:= le.acc_logs.inq_corrnamephonessn;
+	self.inq_PII_corroboration.inq_corrnamephonessn_adl		:= le.acc_logs.inq_corrnamephonessn_adl;
+	self.inq_PII_corroboration.inq_corrnameaddrphnssn			:= le.acc_logs.inq_corrnameaddrphnssn;
+	self.inq_PII_corroboration.inq_corrnameaddrphnssn_adl	:= le.acc_logs.inq_corrnameaddrphnssn_adl;
+
+	//MS-110
+	self.BRM_Derogs.liens_unreleased_count84				:= le.BJL.liens_unreleased_count84;
+	self.BRM_Derogs.liens_released_count84					:= le.BJL.liens_released_count84;
+	self.BRM_Derogs.filing_count120									:= le.BJL.filing_count120;
+	self.BRM_Derogs.liens_last_unrel_date84					:= le.BJL.liens_last_unrel_date84;
+	self.BRM_Derogs.liens_last_rel_date84						:= le.BJL.liens_last_rel_date84;
+	self.BRM_Derogs.liens_unrel_total_amount84			:= le.liens.liens_unrel_total_amount84;
+	self.BRM_Derogs.liens_unrel_total_amount				:= le.liens.liens_unrel_total_amount;
+	self.BRM_Derogs.liens_rel_total_amount84				:= le.liens.liens_rel_total_amount84;
+	self.BRM_Derogs.liens_rel_total_amount					:= le.liens.liens_rel_total_amount;
+	self.BRM_Derogs.bk_dismissed_historical_cnt120	:= le.BJL.bk_dismissed_historical_cnt120;
+	self.BRM_Derogs.bk_disposed_historical_cnt120		:= le.BJL.bk_disposed_historical_cnt120;
+	self.BRM_Derogs.attr_eviction_count84						:= le.BJL.eviction_count84; 
+
+	//MS-159
+	self.bus_addr_only_curr			:= le.Address_Verification.bus_addr_only_curr;
+	self.bus_addr_only					:= le.Address_Verification.bus_addr_only;
+
+	//MS-71
+	self.BIP_Header							:= le.BIP_Header;
+	
+	//MS-158
+	self.bus_property_owned_total					:= le.Address_Verification.bus_owned.property_total;
+	self.bus_property_owned_assess_total	:= le.Address_Verification.bus_owned.property_owned_assessed_total;
+	self.bus_property_owned_assess_count	:= le.Address_Verification.bus_owned.property_owned_assessed_count;
+	self.bus_property_sold_total					:= le.Address_Verification.bus_sold.property_total;
+	self.bus_property_sold_assess_total		:= le.Address_Verification.bus_sold.property_owned_assessed_total;
+	self.bus_property_sold_assess_count		:= le.Address_Verification.bus_sold.property_owned_assessed_count;
 		
 	self := le;
 	end;

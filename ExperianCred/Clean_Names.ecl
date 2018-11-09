@@ -1,5 +1,8 @@
-import ut, address;
-norm_name 	 := ExperianCred.Normalize_Names;
+﻿import ut, address;
+
+export Clean_Names(string ver):= module
+
+norm_name 	 := ExperianCred.Normalize_Names(ver).all;
 cached_names :=	distribute(Files.Cashed_Names_File, hash(Orig_lname, Orig_fname, Orig_mname)) :INDEPENDENT; 
 
 d_names		 := distribute(norm_name, hash(Orig_lname, Orig_fname, Orig_mname)) :INDEPENDENT; 
@@ -57,9 +60,9 @@ END;
 
 name_clean := project(names_to_clean, t_CleanName(LEFT));
 
-SEQUENTIAL(OUTPUT(name_clean,,Superfile_List.Cache_Name_File + version ,overwrite,__compressed__);
+SEQUENTIAL(OUTPUT(name_clean,,Superfile_List.Cache_Name_File + ver ,overwrite,__compressed__);
 		   FileServices.StartSuperFileTransaction(),				
-		   FileServices.AddSuperFile(Superfile_List.Cache_Name_File,Superfile_List.Cache_Name_File + version),
+		   FileServices.AddSuperFile(Superfile_List.Cache_Name_File,Superfile_List.Cache_Name_File + ver),
 		   FileServices.FinishSuperFileTransaction());
 
 all_cleaned_names := if(exists(names_in_cache) and exists(name_clean),  
@@ -67,4 +70,6 @@ all_cleaned_names := if(exists(names_in_cache) and exists(name_clean),
 						if(exists(names_in_cache), 
 						names_in_cache, name_clean)); 
 						 
-export Clean_Names := all_cleaned_names;
+export ALL:= all_cleaned_names;
+
+END;

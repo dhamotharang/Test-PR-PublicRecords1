@@ -1,11 +1,12 @@
-/*2015-11-16T21:02:23Z (Srilatha Katukuri)
+﻿/*2015-11-16T21:02:23Z (Srilatha Katukuri)
 #193680 - CR323
 */
-Import Data_Services, doxie,FLAccidents;
+Import Data_Services, doxie,FLAccidents, STD;
 
 // Contain all report id's till to date
 
-Reportversion := FLAccidents_Ecrash.Files.Base.Supplemental((trim(report_type_id,all) in ['A','DE'] and trim(vendor_code, left,right) <> 'COPLOGIC') or (trim(vendor_code, left, right) = 'COPLOGIC'));
+Reportversion := FLAccidents_Ecrash.Files.Base.Supplemental(( ((trim(report_type_id,all) in ['A','DE'] or STD.str.ToUpperCase(trim(vendor_code,left,right)) = 'CMPD') and 
+																															trim(vendor_code, left,right) <> 'COPLOGIC')) or trim(vendor_code, left, right) = 'COPLOGIC');
 
 dst_Report_base := distribute(Reportversion, hash(Super_report_id));
 srt_Report_base := sort(dst_Report_base, report_id, Super_report_id, local);

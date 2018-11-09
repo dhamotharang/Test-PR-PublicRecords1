@@ -1,4 +1,4 @@
-import lib_stringlib, watercraft, watercraft_preprocess, ut;
+﻿import lib_stringlib, watercraft, watercraft_preprocess, ut;
 
 // Translates wi_01.mp
 
@@ -116,7 +116,14 @@ watercraft.Layout_Watercraft_Coastguard_Base main_mapping_format(hull_clean_in L
 	self.vessel_service_type         :=  L.USE_1;
 	self.home_port_name              :=  if(county_reg(L.COUNTY) <> '',county_reg(L.COUNTY) +'COUNTY', '');
 	self.propulsion_type             :=  if(trim(L.ENGINE_TYPE) <> '',propulsion_type(L.ENGINE_TYPE), L.PROP);
-	self.doc_certificate_status      :=  doc_certificate_status(L.VERIFIED);
+//	self.doc_certificate_status      :=  doc_certificate_status(L.VERIFIED); //No longer codes
+//Shortening long definitions in order to not have to change base layout
+	tempVerify							:= ut.CleanSpacesAndUpper(L.VERIFIED);
+	self.doc_certificate_status      := MAP(tempVerify = 'RECREATIONAL VEHICLE ITSELF' => 'REC VEHICLE',
+																					tempVerify = 'REGISTRATION CERTIFICATE' => 'REGISTRATION',
+																					tempVerify = 'SUPPORTING DOCUMENT/BILL OF SALE' => 'SUPPORT DOC',
+																					tempVerify = '' => 'UNKNOWN',
+																					tempVerify);
 	self	:= L;
 	self	:= [];
 END;

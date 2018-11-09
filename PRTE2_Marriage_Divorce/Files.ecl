@@ -1,13 +1,14 @@
-IMPORT PRTE2_Marriage_Divorce, marriage_divorce_v2, doxie, ut, standard;
+﻿IMPORT PRTE2_Marriage_Divorce, marriage_divorce_v2, doxie, ut, standard;
 
 EXPORT Files := MODULE
 
 	EXPORT Main_in	:= DATASET(Constants.IN_PREFIX + 'main_base', Layouts.Main_in, 
 														CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
 										
-	EXPORT Base_out := DATASET(Constants.BASE_PREFIX + 'main', Layouts.Main_Base_out, THOR);
-	EXPORT Base			:= PROJECT(Base_out, Layouts.Main_Base);
-	EXPORT Search		:= DATASET(Constants.BASE_PREFIX + 'search', Layouts.Search_Base, THOR);
+	EXPORT Base_out 	:= DATASET(Constants.BASE_PREFIX + 'main', Layouts.Main_Base_out, THOR);
+	EXPORT Base				:= PROJECT(Base_out, Layouts.Main_Base);
+	EXPORT Search_ext	:= DATASET(Constants.BASE_PREFIX + 'search', Layouts.Search_Base_ext, THOR);
+	EXPORT Search			:= PROJECT(Search_ext, Layouts.Search_Base);
 	
 	//Autokeyfile
 	r00 := RECORD

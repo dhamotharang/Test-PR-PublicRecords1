@@ -1,0 +1,34 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_FAA
+FILENAME:FAA
+NAMESCOPE:Airmen_Cert
+OPTIONS:-gh
+
+FIELDTYPE:Invalid_Num:ALLOW(0123456789)
+FIELDTYPE:Invalid_Alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz)
+FIELDTYPE:Invalid_CerLevel:ENUM(P|S|C|A|Y|Z|W|T|U|V|)
+FIELDTYPE:Invalid_CerType:ENUM(P|F|M|Y|G|R|T|E|U|D|I|W|L|Z|N|H|A|X|J|)
+FIELDTYPE:Invalid_RecType:ENUM(01|02|03|04|05|06|07|)
+FIELDTYPE:Invalid_Date:CUSTOM(Scrubs.fn_valid_date>0)
+FIELDTYPE:Invalid_Flag:ENUM(H|I|A)
+FIELDTYPE:Invalid_LetterCode:ENUM(A|C)
+
+FIELD:date_first_seen:Like(Invalid_Date):TYPE(STRING8):0,0
+FIELD:date_last_seen:Like(Invalid_Date):TYPE(STRING8):0,0
+FIELD:current_flag:Like(Invalid_Flag):TYPE(STRING1):0,0
+FIELD:letter:Like(Invalid_LetterCode):TYPE(STRING1):0,0
+FIELD:unique_id:Like(Invalid_Num):TYPE(STRING7):0,0
+FIELD:rec_type:Like(Invalid_RecType):TYPE(STRING2):0,0
+FIELD:cer_type:Like(Invalid_CerType):TYPE(STRING1):0,0
+FIELD:cer_type_mapped:TYPE(STRING20):0,0
+FIELD:cer_level:Like(Invalid_CerLevel):TYPE(STRING1):0,0
+FIELD:cer_level_mapped:TYPE(STRING45):0,0
+FIELD:cer_exp_date:Like(Invalid_Num):TYPE(STRING8):0,0
+FIELD:ratings:TYPE(STRING99):0,0
+FIELD:filler:TYPE(STRING79):0,0
+FIELD:lfcr:TYPE(STRING2):0,0
+FIELD:persistent_record_id:TYPE(UNSIGNED8):0,0
+// CONCEPT statements should be used to group together interellated fields; such as address
+// RELATIONSHIP is used to find non-obvious relationships between the clusters
+// SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+// LINKPATH is used to define access paths for external linking

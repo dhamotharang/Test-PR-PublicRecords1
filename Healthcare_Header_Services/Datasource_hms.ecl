@@ -1,4 +1,4 @@
-import Org_Mast,HMS_STLIC,hms_kop_trgt_harv; 
+﻿import Org_Mast,HMS_STLIC,hms_kop_trgt_harv; 
  EXPORT Datasource_hms := Module
 
 //srcIndividualHeader
@@ -24,8 +24,8 @@ Export get_hms_Indiv (dataset(healthcare_header_services.Layouts.searchKeyResult
 																													self.vendorid:=left.vendorid;
   																												self.glb_ok := left.glb_ok;
 																													self.dppa_ok := left.dppa_ok;
-																													self.rawData.clean_issue_date:=if((string)right.clean_stlic_issue_date<>'',(string)right.clean_stlic_issue_date,left.rawData.clean_issue_date);
-																													self.rawData.clean_expiration_date:=if((string)right.clean_stlic_exp_date<>'' ,(string)right.clean_stlic_exp_date,left.rawData.clean_expiration_date);
+																													self.rawData.clean_issue_date:=if((string)LEFT.rawdata.clean_issue_date >(string)right.clean_stlic_issue_date,(string)left.rawData.clean_issue_date,(string)right.clean_stlic_issue_date);
+																													self.rawData.clean_expiration_date:=if((STRING)left.rawdata.clean_expiration_date > (STRING)right.clean_stlic_exp_date ,(STRING)left.rawdata.clean_expiration_date,(STRING)right.clean_stlic_exp_date);
 																									        self.rawdata.prim_range:=left.rawdata.prim_range;				
 																									        self.rawdata.prim_name:=left.rawdata.prim_name;				
 																									        self.rawdata.addr_suffix:=left.rawdata.addr_suffix;				
@@ -46,15 +46,7 @@ Export get_hms_Indiv (dataset(healthcare_header_services.Layouts.searchKeyResult
 			hms_providers_final_sorted := sort(baseRecs, acctno, LNPID, Src, statelicenses[1].LicenseNumber,statelicenses[1].LicenseState,-statelicenses[1].Termination_Date);
 			hms_providers_final_grouped := group(hms_providers_final_sorted, acctno, LNPID, Src,statelicenses[1].LicenseNumber,statelicenses[1].LicenseState);
 			hms_providers_rolled := rollup(hms_providers_final_grouped, group, Transforms.doHmsIndivRecordSrcIdRollup(left,rows(left)));
-			  // output(input,named('gethmsIndivInput'),extend);
-     	 // output(nohits,named('gethmsIndivInput_transformed'),extend);
-     	  // output(rawdataIndividualbyVendorid,named('gethmsIndivrawdataIndividualbyVendorid'),extend);
-     	  // output(NoAudits,named('gethmsIndivNoAudits'),extend);
-			  // output(Audits,named('gethmsIndivAudits'),extend);
-     	  // output(baseRecs,named('gethmsIndivbaseRecs'),extend);
-     	  // output(hms_providers_final_sorted,named('hms_providers_final_sorted'),extend);
-     	  // output(hms_providers_final_grouped,named('hms_providers_final_grouped'),extend);
-     	  // output(hms_providers_rolled,named('gethmsIndivFinal'),extend);
+			
 			
 			return hms_providers_rolled;
 end;

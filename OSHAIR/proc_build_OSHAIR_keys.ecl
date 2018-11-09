@@ -1,4 +1,4 @@
-import Address,doxie_files, ut, doxie, autokey,OSHAIR, RoxieKeyBuild;
+﻿import Address,doxie_files, ut, doxie, autokey,OSHAIR, RoxieKeyBuild;
 
 export proc_build_OSHAIR_keys(string filedate) := FUNCTION
 
@@ -7,97 +7,97 @@ export proc_build_OSHAIR_keys(string filedate) := FUNCTION
 /////////////////////////////////////////////////////////////////////////////////
 /* Build the DID key */
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(OSHAIR.Key_OSHAIR_BDID
-                                          ,'~thor_data400::key::oshair::bdid'
-										  ,'~thor_data400::key::oshair::'+filedate+'::bdid'
-										  ,bk_bdid);
+																					 ,'~thor_data400::key::oshair::bdid'
+																					 ,'~thor_data400::key::oshair::'+filedate+'::bdid'
+																					 ,bk_bdid);
 											
 /* Build the LINKIDS key */
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(OSHAIR.Key_OSHAIR_LinkIds.Key
-                                          ,'~thor_data400::key::oshair::linkids'
-										  ,'~thor_data400::key::oshair::'+filedate+'::linkids'
-										  ,bk_linkids);
+                                           ,'~thor_data400::key::oshair::linkids'
+																					 ,'~thor_data400::key::oshair::'+filedate+'::linkids'
+																					 ,bk_linkids);
 											
 /* Build the Inspection key */
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(OSHAIR.Key_OSHAIR_inspection
-										  ,'~thor_data400::key::oshair::inspection'
-										  ,'~thor_data400::key::oshair::'+filedate+'::inspection'
-										  ,bk_pyld_insp);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_local( OSHAIR.Key_OSHAIR_inspection
+																						,'~thor_data400::key::oshair::inspection'
+																						,'~thor_data400::key::oshair::'+filedate+'::inspection'
+																						,bk_pyld_insp);
 /* Build the Program key */
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(OSHAIR.Key_OSHAIR_program
-										  ,'~thor_data400::key::oshair::program'
-										  ,'~thor_data400::key::oshair::'+filedate+'::program'
-										  ,bk_pyld_pgm);
+																					 ,'~thor_data400::key::oshair::program'
+																					 ,'~thor_data400::key::oshair::'+filedate+'::program'
+																					 ,bk_pyld_pgm);
 /* Build the Related Activity key */
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(OSHAIR.Key_OSHAIR_related_activity
-										  ,'~thor_data400::key::oshair::related_activity'
-										  ,'~thor_data400::key::oshair::'+filedate+'::related_activity'
-										  ,bk_pyld_rel_act);
+																					 ,'~thor_data400::key::oshair::related_activity'
+																					 ,'~thor_data400::key::oshair::'+filedate+'::related_activity'
+																					 ,bk_pyld_rel_act);
 /* Build the Optional Information key */
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(OSHAIR.Key_OSHAIR_optional_info
-										  ,'~thor_data400::key::oshair::optional_info'
-										  ,'~thor_data400::key::oshair::'+filedate+'::optional_info'
-										  ,bk_pyld_opt_info);
+																					 ,'~thor_data400::key::oshair::optional_info'
+																					 ,'~thor_data400::key::oshair::'+filedate+'::optional_info'
+																					 ,bk_pyld_opt_info);
 /* Build the Violations key */
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(OSHAIR.Key_OSHAIR_violations
-										  ,'~thor_data400::key::oshair::violations'
-										  ,'~thor_data400::key::oshair::'+filedate+'::violations'
-										  ,bk_pyld_viol);
+																					 ,'~thor_data400::key::oshair::violations'
+																					 ,'~thor_data400::key::oshair::'+filedate+'::violations'
+																					 ,bk_pyld_viol);
 /* Build the Hazardous Substance key */
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(OSHAIR.Key_OSHAIR_hazardous_substance
-										  ,'~thor_data400::key::oshair::hazardous_substance'
-										  ,'~thor_data400::key::oshair::'+filedate+'::hazardous_substance'
-										  ,bk_pyld_haz_sub);
+																					 ,'~thor_data400::key::oshair::hazardous_substance'
+																					 ,'~thor_data400::key::oshair::'+filedate+'::hazardous_substance'
+																					 ,bk_pyld_haz_sub);
 /* Build the Accident key */
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(OSHAIR.Key_OSHAIR_accident
-										  ,'~thor_data400::key::oshair::accident'
-										  ,'~thor_data400::key::oshair::'+filedate+'::accident'
-										  ,bk_pyld_acc);
+																					 ,'~thor_data400::key::oshair::accident'
+																					 ,'~thor_data400::key::oshair::'+filedate+'::accident'
+																					 ,bk_pyld_acc);
 
 /////////////////////////////////////////////////////////////////////////////////
 // -- Move Keys to Built
 /////////////////////////////////////////////////////////////////////////////////
 
-Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::oshair::bdid'
-                                     ,'~thor_data400::key::oshair::'+filedate+'::bdid'
-									 ,mv2blt_bdid);
+Roxiekeybuild.Mac_SK_Move_to_Built_v2( '~thor_data400::key::oshair::bdid'
+																			 ,'~thor_data400::key::oshair::'+filedate+'::bdid'
+																			 ,mv2blt_bdid);
 Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::oshair::linkids'
-                                     ,'~thor_data400::key::oshair::'+filedate+'::linkids'
-									 ,mv2blt_linkids);									 
+																			 ,'~thor_data400::key::oshair::'+filedate+'::linkids'
+																			 ,mv2blt_linkids);									 
 Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::oshair::inspection'
-                                     ,'~thor_data400::key::oshair::'+filedate+'::inspection'
-									 ,mv2blt_insp);
+                                      ,'~thor_data400::key::oshair::'+filedate+'::inspection'
+																			,mv2blt_insp);
 Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::oshair::program'
-                                     ,'~thor_data400::key::oshair::'+filedate+'::program'
-									 ,mv2blt_pgm);
+																			 ,'~thor_data400::key::oshair::'+filedate+'::program'
+																			 ,mv2blt_pgm);
 Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::oshair::related_activity'
-                                     ,'~thor_data400::key::oshair::'+filedate+'::related_activity'
-									 ,mv2blt_rel_act);
+                                      ,'~thor_data400::key::oshair::'+filedate+'::related_activity'
+																			,mv2blt_rel_act);
 Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::oshair::optional_info'
-                                     ,'~thor_data400::key::oshair::'+filedate+'::optional_info'
-									 ,mv2blt_opt_info);
+                                      ,'~thor_data400::key::oshair::'+filedate+'::optional_info'
+																		  ,mv2blt_opt_info);
 Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::oshair::violations'
-                                     ,'~thor_data400::key::oshair::'+filedate+'::violations'
-									 ,mv2blt_viol);
+                                      ,'~thor_data400::key::oshair::'+filedate+'::violations'
+																			,mv2blt_viol);
 Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::oshair::hazardous_substance'
-                                     ,'~thor_data400::key::oshair::'+filedate+'::hazardous_substance'
-									 ,mv2blt_haz_sub);
+                                      ,'~thor_data400::key::oshair::'+filedate+'::hazardous_substance'
+																		  ,mv2blt_haz_sub);
 Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::oshair::accident'
-                                     ,'~thor_data400::key::oshair::'+filedate+'::accident'
-									 ,mv2blt_acc);
+                                      ,'~thor_data400::key::oshair::'+filedate+'::accident'
+																			,mv2blt_acc);
 
 /////////////////////////////////////////////////////////////////////////////////
 // -- Move Keys to QA
 /////////////////////////////////////////////////////////////////////////////////
 
-ut.mac_sk_move('~thor_data400::key::oshair::bdid','Q',mv2qa_bdid);
-ut.mac_sk_move('~thor_data400::key::oshair::linkids','Q',mv2qa_linkids);
-ut.mac_sk_move('~thor_data400::key::oshair::inspection','Q',mv2qa_insp);
-ut.mac_sk_move('~thor_data400::key::oshair::program','Q',mv2qa_pgm);
-ut.mac_sk_move('~thor_data400::key::oshair::related_activity','Q',mv2qa_rel_act);
-ut.mac_sk_move('~thor_data400::key::oshair::optional_info','Q',mv2qa_opt_info);
-ut.mac_sk_move('~thor_data400::key::oshair::violations','Q',mv2qa_viol);
-ut.mac_sk_move('~thor_data400::key::oshair::hazardous_substance','Q',mv2qa_haz_sub);
-ut.mac_sk_move('~thor_data400::key::oshair::accident','Q',mv2qa_acc);
+RoxieKeyBuild.mac_sk_move('~thor_data400::key::oshair::bdid','Q',mv2qa_bdid);
+RoxieKeyBuild.mac_sk_move('~thor_data400::key::oshair::linkids','Q',mv2qa_linkids);
+RoxieKeyBuild.mac_sk_move('~thor_data400::key::oshair::inspection','Q',mv2qa_insp);
+RoxieKeyBuild.mac_sk_move('~thor_data400::key::oshair::program','Q',mv2qa_pgm);
+RoxieKeyBuild.mac_sk_move('~thor_data400::key::oshair::related_activity','Q',mv2qa_rel_act);
+RoxieKeyBuild.mac_sk_move('~thor_data400::key::oshair::optional_info','Q',mv2qa_opt_info);
+RoxieKeyBuild.mac_sk_move('~thor_data400::key::oshair::violations','Q',mv2qa_viol);
+RoxieKeyBuild.mac_sk_move('~thor_data400::key::oshair::hazardous_substance','Q',mv2qa_haz_sub);
+RoxieKeyBuild.mac_sk_move('~thor_data400::key::oshair::accident','Q',mv2qa_acc);
 
 /////////////////////////////////////////////////////////////////////////////////
 // -- Build Autokeys
@@ -138,43 +138,42 @@ emailN := fileservices.sendemail('RoxieBuilds@seisint.com ; ehamel@seisint.com '
 /////////////////////////////////////////////////////////////////////////////////
 
 build_keys := sequential(// Build the keys
-						  parallel(bk_bdid
-							         ,bk_linkids
-						           ,bk_pyld_insp
-								   ,bk_pyld_pgm
-								   ,bk_pyld_rel_act
-								   ,bk_pyld_opt_info
-								   ,bk_pyld_viol
-								   ,bk_pyld_haz_sub
-								   ,bk_pyld_acc)
-					     ,// Move the keys to built
-					 	  parallel(mv2blt_bdid
-							     ,mv2blt_linkids
-								   ,mv2blt_insp
-								   ,mv2blt_pgm
-								   ,mv2blt_rel_act
-								   ,mv2blt_opt_info
-								   ,mv2blt_viol
-								   ,mv2blt_haz_sub
-								   ,mv2blt_acc)
-					     ,// Move the keys to qa
-					  	  parallel(mv2qa_bdid
-								   ,mv2qa_linkids
-								   ,mv2qa_insp
-								   ,mv2qa_pgm
-								   ,mv2qa_rel_act
-								   ,mv2qa_opt_info
-								   ,mv2qa_viol
-								   ,mv2qa_haz_sub
-								   ,mv2qa_acc)
-					     ,// Build the autokeys
-					      build_autokeys
+													parallel(bk_bdid
+																	 ,bk_linkids
+																	 ,bk_pyld_insp
+																	 ,bk_pyld_pgm
+																	 ,bk_pyld_rel_act
+																	 ,bk_pyld_opt_info
+																	 ,bk_pyld_viol
+																	 ,bk_pyld_haz_sub
+																	 ,bk_pyld_acc),
+													// Move the keys to built
+													parallel(mv2blt_bdid
+																	 ,mv2blt_linkids
+																	 ,mv2blt_insp
+																	 ,mv2blt_pgm
+																	 ,mv2blt_rel_act
+																	 ,mv2blt_opt_info
+																	 ,mv2blt_viol
+																	 ,mv2blt_haz_sub
+																	 ,mv2blt_acc),
+													  // Move the keys to qa
+														parallel(mv2qa_bdid
+																		 ,mv2qa_linkids
+																		 ,mv2qa_insp
+																		 ,mv2qa_pgm
+																		 ,mv2qa_rel_act
+																		 ,mv2qa_opt_info
+																		 ,mv2qa_viol
+																		 ,mv2qa_haz_sub
+																		 ,mv2qa_acc),
+													 // Build the autokeys
+														build_autokeys
 		                 );
 
 
 return parallel(build_keys
-				,emailN
-				);
+							  ,emailN);
 
 end;
 

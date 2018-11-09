@@ -1,4 +1,4 @@
-EXPORT MAC_ConsumerCreditReport_ReportServiceFCRA := MACRO
+﻿EXPORT MAC_ConsumerCreditReport_ReportServiceFCRA := MACRO
 
 	#WEBSERVICE(FIELDS(
 		/*---- Compliance Fields ----*/
@@ -6,7 +6,8 @@ EXPORT MAC_ConsumerCreditReport_ReportServiceFCRA := MACRO
 		'DOBMask',
 		'SSNMask',
 		'GLBPurpose',
-		'FCRAPurpose',
+		'PermissiblePurpose',
+		'FFDOptionsMask',
 		/*---- Other Fields ----*/
 		'IncludeLiensJudgments',
 		/*---- Gateways ----*/

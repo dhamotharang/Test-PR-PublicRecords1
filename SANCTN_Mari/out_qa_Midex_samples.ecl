@@ -1,4 +1,4 @@
-import SANCTN_Mari;
+﻿import SANCTN_Mari;
 
 	//base files from current build
   file_incident 			:= dataset('~thor_data400::base::sanctn::np::incident',
@@ -76,10 +76,15 @@ import SANCTN_Mari;
    
   //Join operation to get updates
   join_incident_text := join(dist_file_incident_text, dist_file_incident_text_father,
-														 LEFT.BATCH = RIGHT.BATCH AND LEFT.INCIDENT_NUM = RIGHT.INCIDENT_NUM,  
+														 LEFT.BATCH = RIGHT.BATCH AND 
+														 LEFT.INCIDENT_NUM = RIGHT.INCIDENT_NUM AND
+														 LEFT.SEQ = RIGHT.SEQ AND 
+														 LEFT.FIELD_TXT = RIGHT.FIELD_TXT AND 
+														 LEFT.FIELD_NAME = RIGHT.FIELD_NAME,  
 														 tx_join_incident_text(LEFT,RIGHT),
 														 LEFT ONLY,
-														 LOCAL);     
+														 LOCAL); 														 
+														 
 	sort_incident_text := sort(join_incident_text,BATCH,INCIDENT_NUM,FIELD_TXT,local);
 	dedp_incident_text := dedup(sort_incident_text,BATCH,INCIDENT_NUM,FIELD_TXT,local);
 	//cnt_incident_text  := output('# of updated incident text records is ' + count(dedp_incident_text) +'.');
@@ -185,7 +190,10 @@ import SANCTN_Mari;
 										 LEFT.BATCH = RIGHT.BATCH AND 
 										 LEFT.DBCODE = RIGHT.DBCODE AND
 										 LEFT.INCIDENT_NUM = RIGHT.INCIDENT_NUM AND
-										 LEFT.PARTY_NUM = RIGHT.PARTY_NUM,  
+										 LEFT.PARTY_NUM = RIGHT.PARTY_NUM AND
+										 LEFT.FIELD_NAME = RIGHT.FIELD_NAME AND  
+										 LEFT.SEQ = RIGHT.SEQ AND  
+										 LEFT.FIELD_TXT = RIGHT.FIELD_TXT,  
 										 tx_join_party_text(LEFT,RIGHT),
 										 LEFT ONLY,
 										 LOCAL);     

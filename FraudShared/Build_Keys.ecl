@@ -29,6 +29,26 @@ export Build_Keys(
   tools.mac_WriteIndex('TheKeys.Main.MbsFDNMasterIDKey.New'								,BuildMbsFDNMasterIDKey				 			);
   tools.mac_WriteIndex('TheKeys.Main.MbsFDNMasterIDExclKey.New'						,BuildMbsFDNMasterIDExclKey				 	);
 	tools.mac_WriteIndex('TheKeys.Main.MbsFDNMasterIDIndTypInclKey.New'			,BuildMbsFDNMasterIDIndTypInclKey	 	);
+	tools.mac_WriteIndex('TheKeys.Main.MbsVelocityRules.New'								,BuildMbsVelocityRules	 						);
+	tools.mac_WriteIndex('TheKeys.Main.MbsFdnIndType.New'										,BuildMbsFdnIndType			 						);
+	tools.mac_WriteIndex('TheKeys.Main.MbsDeltaBase.New'										,BuildMbsDeltaBase			 						);
+	tools.mac_WriteIndex('TheKeys.Main.CityState.New'												,BuildCityStateKey	 								);
+	tools.mac_WriteIndex('TheKeys.Main.Zip.New'															,BuildZipKey	 											);
+	tools.mac_WriteIndex('TheKeys.Main.CustomerID.New'											,BuildCustomerIDKey	 								);
+	tools.mac_WriteIndex('TheKeys.Main.County.New'													,BuildCountyKey	 										);
+	tools.mac_WriteIndex('TheKeys.Main.ReportedDate.New'										,BuildReportedDateKey	 							);
+	tools.mac_WriteIndex('TheKeys.Main.SerialNumber.New'										,BuildSerialNumberKey	 							);
+	tools.mac_WriteIndex('TheKeys.Main.MACAddress.New'											,BuildMACAddressKey	 								);
+	tools.mac_WriteIndex('TheKeys.Main.Host.New'														,BuildHostKey				 								);
+	tools.mac_WriteIndex('TheKeys.Main.User.New'														,BuildUserKey				 								);
+	tools.mac_WriteIndex('TheKeys.Main.HouseholdID.New'											,BuildHouseholdIDKey				 				);
+	tools.mac_WriteIndex('TheKeys.Main.CustomerProgram.New'									,BuildCustomerProgramKey				 		);
+	tools.mac_WriteIndex('TheKeys.Main.AmountPaid.New'											,BuildAmountPaidKey				 					);
+	tools.mac_WriteIndex('TheKeys.Main.BankRoutingNumber.New'								,BuildBankRoutingNumberKey					);
+	tools.mac_WriteIndex('TheKeys.Main.BankName.New'												,BuildBankNameKey										);
+	tools.mac_WriteIndex('TheKeys.Main.Isp.New'															,BuildIspKey												);
+	tools.mac_WriteIndex('TheKeys.Main.IPRange.New'													,BuildIPRangeKey										);
+	
 	VersionControl.macBuildNewLogicalKeyWithName(Get_Key_LinkIds.Key	,keynames(pversion,false).Main.LinkIds.new, BuildLinkIdsKey);
 													  
 	export full_build :=
@@ -52,9 +72,27 @@ export Build_Keys(
 			,BuildMbsProductIncludeKey
 			,BuildMbsFDNMasterIDKey
 			,BuildMbsFDNMasterIDExclKey
-			,If(Platform.Source = 'FraudGov'  ,BuildMbsFDNMasterIDIndTypInclKey)
+			,BuildMbsFDNMasterIDIndTypInclKey
+			,If(Platform.Source = 'FraudGov'  ,BuildMbsVelocityRules)
+			,If(Platform.Source = 'FraudGov'  ,BuildMbsFdnIndType)
+			,If(Platform.Source = 'FraudGov'  ,BuildMbsDeltaBase)
 			,BuildLinkIdsKey
-			
+			,If(Platform.Source = 'FraudGov'  ,BuildCityStateKey)
+			,If(Platform.Source = 'FraudGov'  ,BuildZipKey)
+			,If(Platform.Source = 'FraudGov'  ,BuildCustomerIDKey)
+			,If(Platform.Source = 'FraudGov'  ,BuildCountyKey)
+			,If(Platform.Source = 'FraudGov'  ,BuildReportedDateKey)
+			,If(Platform.Source = 'FraudGov'  ,BuildSerialNumberKey)
+			,If(Platform.Source = 'FraudGov'  ,BuildMACAddressKey)
+			,If(Platform.Source = 'FraudGov'  ,BuildHostKey)
+			,If(Platform.Source = 'FraudGov'  ,BuildUserKey)
+			,If(Platform.Source = 'FraudGov'  ,BuildHouseholdIDKey)
+			,If(Platform.Source = 'FraudGov'  ,BuildCustomerProgramKey)
+			,If(Platform.Source = 'FraudGov'  ,BuildAmountPaidKey)
+			,If(Platform.Source = 'FraudGov'  ,BuildBankRoutingNumberKey)
+			,If(Platform.Source = 'FraudGov'  ,BuildBankNameKey)
+			,If(Platform.Source = 'FraudGov'  ,BuildIspKey)
+			,If(Platform.Source = 'FraudGov'  ,BuildIPRangeKey)
 		 )
 		,Promote(pversion).buildfiles.New2Built
 	);

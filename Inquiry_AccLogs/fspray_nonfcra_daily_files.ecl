@@ -6,7 +6,7 @@ EXPORT fspray_nonfcra_daily_files := module
 	rootDir 		:= '/data/inquiry_data_01/';
 	readyDir		:= rootDir + 'spray_ready/';
 	sprayingDir	:= rootDir + 'spraying/';
-	doneDir 		:= rootDir + 'done/';
+	doneDir 		:= rootDir + 'done_nonfcra/';
 	errorDir 		:= rootDir + 'error/';
 	
 	GetFileList(string path, string pFilenameExp) := function
@@ -31,6 +31,8 @@ EXPORT fspray_nonfcra_daily_files := module
 		return files;
 	end;
 	
+	emails := 'jose.bello@lexisnexisrisk.com, debendra.kumar@lexisnexisrisk.com, Sudhir.Kasavajjala@lexisnexisrisk.com, Fernando.Incarnacao@lexisnexisrisk.com, Wenhong.Ma@lexisnexisrisk.com';
+	
 	export _spray := sequential(
 					nothor(apply(GetFiles(readyDir), STD.File.MoveExternalFile(pServerIP, readyDir + name, sprayingDir + name)))
 				 ,Inquiry_AccLogs.fSprayInputFiles(GetFiles(sprayingDir), false)
@@ -38,8 +40,8 @@ EXPORT fspray_nonfcra_daily_files := module
 				 ,nothor(apply(GetFiles(sprayingDir), STD.File.MoveExternalFile(pServerIP, sprayingDir + name, doneDir + name)))
 			 	 // ,Inquiry_AccLogs.Inquiry_daily_SuperfileContents(false)
 				 ,notify('Spray Complete','*')
-					) : SUCCESS(FileServices.SendEmail('jose.bello@lexisnexis.com, debendra.kumar@lexisnexis.com, Darren.Knowles@lexisnexis.com, Wenhong.Ma@lexisnexis.com,Fernando.Incarnacao@lexisnexis.com','Non-FCRA Logs Spray Complete - Inquiry Tracking, Case Connect, Score and Attribute', thorlib.wuid())),
-							Failure(FileServices.SendEmail('jose.bello@lexisnexis.com, debendra.kumar@lexisnexis.com, Darren.Knowles@lexisnexis.com, Wenhong.Ma@lexisnexis.com,Fernando.Incarnacao@lexisnexis.com','Non-FCRA Logs Spray Fail', thorlib.wuid() + ' - '
+					) : SUCCESS(FileServices.SendEmail(emails,'Non-FCRA Logs Spray Complete - Inquiry Tracking, Case Connect, Score and Attribute', thorlib.wuid())),
+							Failure(FileServices.SendEmail(emails,'Non-FCRA Logs Spray Fail', thorlib.wuid() + ' - '
 							+ '\n  *  Please go to bctlpedata10 inquiry_data_01 spray_ready to see what files need to be sprayed. May need gunzip. Resubmit WU. '+ FAILMESSAGE));
 
 end;

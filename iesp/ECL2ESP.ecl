@@ -1,4 +1,4 @@
-// This should be shared among all future services (in theory)
+﻿// This should be shared among all future services (in theory)
 IMPORT census_data, Risk_Indicators, ut, doxie, AutoStandardI,address, suppress, iesp, lib_stringlib;
   
 EXPORT ECL2ESP := MODULE
@@ -12,6 +12,9 @@ EXPORT ECL2ESP := MODULE
 	
   EXPORT iesp.share.t_Date toDate (unsigned4 d) := 
     row ({d DIV 10000, (d % 10000) DIV 100, d % 100}, iesp.share.t_Date);
+    
+  EXPORT iesp.share.t_Date2 toTDate2 (unsigned4 d) :=
+    row ({(STRING4)(d DIV 10000), (STRING2)((d % 10000) DIV 100), (STRING2)(d % 100)}, iesp.share.t_Date2);
 
   EXPORT iesp.share.t_Date toDateYM (unsigned3 d) := 
     row ({d DIV 100, d % 100, 0}, iesp.share.t_Date);
@@ -293,7 +296,7 @@ EXPORT ECL2ESP := MODULE
 		
     string50 DataRestrictionMask := global(xml_in).DataRestrictionMask; // must be provided: '1'
     #stored('DataRestrictionMask', DataRestrictionMask);
-    string20 DataPermissionMask := global(xml_in).DataPermissionMask;   // def=''
+    string50 DataPermissionMask := global(xml_in).DataPermissionMask;   // def=''
     #stored('DataPermissionMask', DataPermissionMask);
     // integer MaxWaitSeconds {xpath('MaxWaitSeconds')}; // may be needed for soap calls?
     string50 QueryId := global(xml_in).QueryId; 

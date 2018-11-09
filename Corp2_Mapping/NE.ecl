@@ -1,4 +1,4 @@
-IMPORT ut, corp2_raw_ne, tools, corp2, versioncontrol, Scrubs, scrubs_corp2_mapping_ne_main, Scrubs_corp2_mapping_ne_Event, std;
+﻿IMPORT ut, corp2_raw_ne, tools, corp2, versioncontrol, Scrubs, scrubs_corp2_mapping_ne_main, Scrubs_corp2_mapping_ne_Event, std;
 
 EXPORT NE  := MODULE; 
 
@@ -468,13 +468,13 @@ EXPORT NE  := MODULE;
 		// Orbit Stats
 		Main_OrbitStats						:= Main_U.OrbitStats();
 		//Creates Profile's alert template for Orbit - Can be copied & imported into Orbit; Only required first time & if scrub rules change
-		Main_AlertsCSVTemplate	  := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'Main','ScrubsAlerts', Main_OrbitStats, version,'Corp_'+ state_origin+' '+'_Main').ProfileAlertsTemplate;
+		Main_AlertsCSVTemplate	  := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp2_'+ state_origin+'_Main').ProfileAlertsTemplate;
 		//Submits Profile's stats to Orbit
-		Main_SubmitStats 					:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'Main' ,'ScrubsAlerts', Main_OrbitStats, version,'Corp_'+ state_origin+' '+'_Main').SubmitStats;
+		Main_SubmitStats 					:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'_Main' ,'ScrubsAlerts', Main_OrbitStats, version,'Corp2_'+ state_origin+'_Main').SubmitStats;
 		//Outputs files
 		Main_CreateBitMaps				:= output(Main_N.BitmapInfile,,'~thor_data::corp_NE_main_scrubs_bits',overwrite,compressed);	//long term storage
 		Main_TranslateBitMap			:= output(Main_T);
-		Main_ScrubsWithExamples		:= Scrubs.OrbitProfileStats('Scrubs_Corp_MappingMain_NE' ,'ScrubsAlerts', Main_OrbitStats, version,'Corp_NE_Main').CompareToProfile_with_Examples;
+		Main_ScrubsWithExamples		:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'_Main' ,'ScrubsAlerts', Main_OrbitStats, version,'Corp2_'+ state_origin+'_Main').CompareToProfile_with_Examples;
 
 		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
@@ -596,13 +596,13 @@ EXPORT NE  := MODULE;
 		//Orbit Stats
 		Event_OrbitStats					:= Event_U.OrbitStats();
 			//Creates Profile's alert template for Orbit - Can be copied & imported into Orbit; Only required first time & if scrub rules change
-		Event_AlertsCSVTemplate	  := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'Event','ScrubsAlerts', Event_OrbitStats, version,'Corp_'+ state_origin+'_Event').ProfileAlertsTemplate;
+		Event_AlertsCSVTemplate	  := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp2_'+ state_origin+'_Event').ProfileAlertsTemplate;
 		//Submits Profile's stats to Orbit
-		Event_SubmitStats 				:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'Event','ScrubsAlerts', Event_OrbitStats, version,'Corp_'+ state_origin+'_Event').SubmitStats;
+		Event_SubmitStats 				:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp2_'+ state_origin+'_Event').SubmitStats;
 		//Outputs files
 		Event_CreateBitMaps				:= output(Event_N.BitmapInfile,,'~thor_data::corp_ne_event_scrubs_bits',overwrite,compressed);	//long term storage
 		Event_TranslateBitMap			:= output(Event_T);
-		Event_ScrubsWithExamples	:= Scrubs.OrbitProfileStats('Scrubs_Corp_MappingEvent_'+ state_origin,'ScrubsAlerts', Event_OrbitStats, version,'Corp_NE_Event').CompareToProfile_with_Examples;
+		Event_ScrubsWithExamples	:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+ state_origin+'_Event','ScrubsAlerts', Event_OrbitStats, version,'Corp2_'+ state_origin+'_Event').CompareToProfile_with_Examples;
 		
 		Event_ScrubsAlert					:= Event_ScrubsWithExamples(RejectWarning = 'Y');
 		Event_ScrubsAttachment		:= Scrubs.fn_email_attachment(Event_ScrubsAlert);

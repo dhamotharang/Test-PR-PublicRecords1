@@ -1,4 +1,4 @@
-import advo,Risk_Indicators,Standard,ut,PhonesFeedback_Services,iesp,paw_services, AddressFeedback_Services, Royalty;
+﻿import advo,Risk_Indicators,Standard,ut,PhonesFeedback_Services,iesp,paw_services, AddressFeedback_Services, Royalty, progressive_phone;
 
 export Layout_Rollup := MODULE
 
@@ -298,7 +298,7 @@ export KeyRec_feedback := RECORD
   boolean fdn_waf_contrib_data    := false; // Added for FDN project
   boolean fdn_results_found       := false; // Added for FDN project
   boolean fdn_indicators_returned := false; // Added for FDN bug 196447
-
+	DATASET(iesp.ContactPlus.t_ContactPlusProgPhoneRecord) progressive_phones {MAXCOUNT(doxie.rollup_limits.progressivePhone)};
 	unsigned2 output_seq_no;
   BOOLEAN BusinessCreditMatch  := FALSE; // added for SBFE project 
 	

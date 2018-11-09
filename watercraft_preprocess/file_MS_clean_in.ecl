@@ -1,4 +1,4 @@
-import watercraft, watercraft_preprocess, ut, lib_StringLib;
+﻿import watercraft, watercraft_preprocess, ut, lib_StringLib;
 
 fIn_raw := watercraft_preprocess.Files_raw.MS;
 setValidSuffix	:= ['JR','SR','II','III','IV','VI','VII','VIII','IX'];
@@ -47,8 +47,9 @@ self.LAST_NAME	:= tempLName;
 self.ADDRESS_1	:= IF(REGEXFIND('^[^A-Z0-9_]',L.ADDRESS_1),REGEXREPLACE('^[^A-Z0-9_]',L.ADDRESS_1,''),ut.CleanSpacesAndUpper(L.ADDRESS_1));
 self.CITY				:= ut.CleanSpacesAndUpper(L.CITY);
 self.STATE			:= ut.CleanSpacesAndUpper(L.STATE);
-self.BOAT_TYPE_CODE	:= ut.CleanSpacesAndUpper(L.BOAT_TYPE_CODE);
-self.STATUS			:= ut.CleanSpacesAndUpper(L.STATUS);
+// self.BOAT_TYPE_CODE	:= ut.CleanSpacesAndUpper(L.BOAT_TYPE_CODE);		//DF-19984 - Layout change, deleted
+// self.STATUS			:= ut.CleanSpacesAndUpper(L.STATUS);										//DF-19984 - Layout change, deleted
+self.SUFFIX			:= ut.CleanSpacesAndUpper(L.SUFFIX);											//DF-19984 - Layout change, new field
 self	:= L;
 END;
 

@@ -1,4 +1,4 @@
-import InsuranceHeader_PostProcess,PRTE,_control;
+﻿import InsuranceHeader_PostProcess,PRTE,_control;
  
 EXPORT CustTest_Proc_GoExternal(STRING fileVersion) := FUNCTION
 	modCustTestFile := custTest_Files(fileVersion);
@@ -18,9 +18,11 @@ EXPORT CustTest_Proc_GoExternal(STRING fileVersion) := FUNCTION
 	BK10    := 	if(~fileservices.fileexists(modCustTestFile.relative_logical),BUILDINDEX(Key_InsuranceHeader_RELATIVE().Key, 	modCustTestFile.relative_logical,OVERWRITE));
 	segmentationKey := InsuranceHeader_PostProcess.segmentation_keys.key_did_ind;
 	BK11    := 	if(~fileservices.fileexists(modCustTestFile.seg_logical)     ,BUILDINDEX(segmentationKey, 					modCustTestFile.seg_logical, 	 OVERWRITE));
+	BK12 :=  if(~fileservices.fileexists(modCustTestFile.id_history_logical) ,BUILDINDEX(Process_xIDL_Layouts().KeyIDHistory,modCustTestFile.id_history_logical,OVERWRITE));
+	BK13    := 	if(~fileservices.fileexists(modCustTestFile.dobf_logical),		BUILDINDEX(Key_InsuranceHeader_DOBF().Key, 	modCustTestFile.dobf_logical,OVERWRITE));
 	RETURN SEQUENTIAL(buildSpec,
 										PARALLEL(BaseK,BK0,BK1,BK2,BK3,BK4,BK5,
-										BK6,BK7,BK8,BK9,BK10,BK11)
+										BK6,BK7,BK8,BK9,BK10,BK11,BK12,BK13)
                     
                    // ,PRTE.UpdateVersion('PersonLABKeys',											//	Package name
                                          // fileVersion,												//	Package version

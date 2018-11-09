@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Phone_NoReconn_Service">
    <part name="IncludeRealTimePhones" type="xsd:boolean"/>
    <part name="Acctno" type="xsd:string"/>
@@ -21,7 +21,10 @@
    <part name="City" type="xsd:string"/>
    <part name="State" type="xsd:string"/>
    <part name="Zip" type="xsd:string"/>
+   <part name="County" type="xsd:string"/>
    <part name="Phone" type="xsd:string"/>
+	 <part name="date_first_seen" type="xsd:unsigned"/>
+   <part name="date_last_seen" type="xsd:unsigned"/>
    <part name="ExcludeCurrentGong" type="xsd:boolean"/>
    <part name="IncludePhonesFeedback" type="xsd:boolean"/>
    <part name="IncludeAddressFeedback" type="xsd:boolean"/>
@@ -51,7 +54,6 @@
 	 <part name="SuppressNewPorting" type="xsd:boolean"/>
    <part name="SuppressPortedTestDate" type="xsd:string"/>
    <part name="excludeLandlines" type="xsd:boolean"/>
-   <part name="SuppressTelcordiaOnly" type="xsd:boolean"/>
    <part name="SuppressBlankNameAddress" type="xsd:boolean"/>
 </message>
 */
@@ -80,8 +82,7 @@ EXPORT phone_noreconn_search := MACRO
 	boolean excludeBusiness := false : stored('ExcludeBusiness');
 	boolean excludeLandlines := false : stored('ExcludeLandlines');	
 	boolean SuppressNewPorting := excludeLandlines : stored('SuppressNewPorting');
-  boolean SuppressTelcordiaOnly := false : stored('SuppressTelcordiaOnly');
-  boolean SuppressBlankNameAddress := false : stored('SuppressBlankNameAddress');
+ boolean SuppressBlankNameAddress := false : stored('SuppressBlankNameAddress');
 
 	doxie.MAC_Header_Field_Declare();
 	globalmod := AutoStandardI.GlobalModule();
@@ -114,13 +115,17 @@ EXPORT phone_noreconn_search := MACRO
 			EXPORT BOOLEAN   IncludeLastResort := FALSE : STORED('IncludeLastResort');
 			EXPORT BOOLEAN   IncludeRealTimePhones := call_PVS;
 			EXPORT BOOLEAN   IncludeHRI := FALSE : STORED('IncludeHRI');
+			EXPORT UNSIGNED  datefirstseen := date_first_seen_value;
+			EXPORT UNSIGNED  datelastseen := date_last_seen_value;
+			EXPORT STRING30  County := county_value;
 	END;
 	gateways_in := Gateway.Configuration.Get();
 
 	phoneOnlySearch := srchMod.Phone != '' and
 										 srchMod.FirstName = '' and srchMod.LastName = '' and srchMod.MiddleName = '' and srchMod.NameSuffix = '' and
 										 srchMod.Addr = '' and srchMod.PrimRange = '' and srchMod.PrimName = '' and srchMod.SecRange = '' and
-										 srchMod.City = '' and srchMod.State = '' and srchMod.Zip = '' and srchMod.DID = '' and srchMod.UnParsedFullName = '';
+										 srchMod.City = '' and srchMod.State = '' and srchMod.Zip = '' and srchMod.County = '' and
+										 srchMod.DID = '' and srchMod.UnParsedFullName = '';
 
 	dids_deduped := dedup(sort(doxie.Get_Dids(true,true),did),did)(did<>0);		
 			
@@ -129,13 +134,9 @@ EXPORT phone_noreconn_search := MACRO
 
 	resultOut_w_tzone_no_suppress := doxie.phone_noreconn_records(srchMod).val(filteredDids, gateways_in);
   
-  // Suppress telcordia only records if those are the only records we return
-  resultOut_w_tzone_tel := if(~SuppressTelcordiaOnly or (SuppressTelcordiaOnly and exists(resultOut_w_tzone_no_suppress(telcordia_only = 'N'))),
-                          resultOut_w_tzone_no_suppress);
-	
 	// Suppress records without full name and address 
-	resultOut_w_tzone := if(~SuppressBlankNameAddress or (SuppressBlankNameAddress and exists(resultOut_w_tzone_tel(listed_name != '' OR (fname != '' AND lname!= '') OR (prim_name != '' AND ((city_name != '' AND st != '' ) OR zip != ''))))),
-                          resultOut_w_tzone_tel);
+	resultOut_w_tzone := if(~SuppressBlankNameAddress or (SuppressBlankNameAddress and exists(resultOut_w_tzone_no_suppress(listed_name != '' OR (fname != '' AND lname!= '') OR (prim_name != '' AND ((city_name != '' AND st != '' ) OR zip != ''))))),
+                          resultOut_w_tzone_no_suppress);
 
 	boolean  batch_friendly := false : stored('BatchFriendly');
 	boolean  IncludePhonesFeedback := false : stored('IncludePhonesFeedback');
@@ -514,11 +515,66 @@ EXPORT phone_noreconn_search := MACRO
 	ds_results_ported_checked := MAP( excludeLandlines => port_results(service_type != doxie.phone_noreconn_constants.servDesc[1]),
 																		SuppressNewPorting => port_results,
 																		cmp_res_out);
+  	// End of June 2016 corrections 
+	  // ****************************																		
+																		
+  
+	// ** START *** mods for Reverse Search Plus to filter on dt_last/first_seen added here
+	// **** these modifications to use datefirstseen and datelastseen will not
+	// **** apply to any records returned from any of the 3 targus/metronet/qsent gateway calls
+	// the vendor_id = TG is targus and vendor_id = MN is metronet and typeflag = I or P is qsentv2 data
+	//
+	dt_first_seenValueTrimmed := trim((string) (srchMod.datefirstseen),left,right);
+	dt_last_seenValueTrimmed := trim((string) (srchMod.datelastseen),left,right);
+  len_dt_first_seenValueTrimmmed := length(dt_first_seenValueTrimmed);
+	len_dt_last_seenValueTrimmed :=   length(dt_last_seenValueTrimmed);
+	dt_first_seenValue := if (len_dt_first_seenValueTrimmmed = 6, srchMod.datefirstseen, 0); 
+                          
+	dt_last_seenValue  := if (len_dt_last_seenValueTrimmed = 6, srchMod.datelastseen, 0);
+														
+	// srchmod.datefirstSeen and srchmod.datelastseen always 6 in length set by autostandardi.intefacetranslator											    
+	// called within the doxie.MAC_Header_Field_Declare() above.  Double check here so that filter below
+	// is done correctly.
+  dt_filterOk :=  ((len_dt_first_seenValueTrimmmed = 6) and (len_dt_last_seenValueTrimmed = 6)) OR
+	                ((len_dt_first_seenValueTrimmmed = 6) and srchMod.datelastseen = 0) OR
+									(srchMod.datefirstseen = 0 AND len_dt_last_seenValueTrimmed = 6);
+  ds_results_ported_checked_gatewayOnly := ds_results_ported_checked(vendor_id = 'TG' OR
+	                                                                   vendor_id ='MN' OR
+																																		 typeflag = 'I' OR
+																																		 typeflag = 'P');
+  ds_results_ported_checked_nonGateway := ds_results_ported_checked(vendor_id <> 'TG' AND
+	                                                                  vendor_iD <> 'MN' AND
+																																		typeflag <> 'I' AND
+																																		typeflag <> 'P');
+	
+                                                                                                                 
+	ds_results_ported_checkedFilteredSlimBoth := ds_results_ported_checked_nonGateway(
+	                                                ((unsigned4) (dt_first_seen[1..6])) >= dt_first_seenValue   and 
+                                                  ((unsigned4) (dt_last_seen[1..6])) <= dt_last_seenValue																								
+																												);
+	ds_results_ported_checkedFilteredSlimJustFirstSeen := ds_results_ported_checked_nonGateway(
+	                                                 (((unsigned4) (dt_first_seen[1..6])) >= dt_first_seenValue)																									  
+                                                        );
+	ds_results_ported_checkedFilteredSlimJustLastSeen := ds_results_ported_checked_nonGateway(
+	                                                      (((unsigned4) (dt_last_seen[1..6]))<= dt_last_seenValue)																												
+																												           );																				 																										 
+	ds_results_ported_checkedFilteredDateTmp := IF (srchMod.DateFirstSeen <> 0 and srchMod.DateLastSeen <> 0 and dt_filterOK,
+                              ds_results_ported_checkedFilteredSlimBoth,
+															If (srchMod.DateFirstSeen <> 0 and srchMod.DateLastSeen = 0 and dt_filterOK,
+															       ds_results_ported_checkedFilteredSlimJustFirstSeen,
+																		 if (srchMod.DateFirstSeen = 0 and srchMod.DateLastSeen <> 0 and dt_filterOK,
+																		    ds_results_ported_checkedFilteredSlimJustLastSeen,																		
+															ds_results_ported_checked)));
+  															
+	ds_results_ported_checkedFilteredDate := if (dt_filterOk, ds_results_ported_checkedFilteredDateTmp &
+	                                                          ds_results_ported_checked_gatewayOnly,
+                                                ds_results_ported_checkedFilteredDateTmp);																														
+																					   
+	// ** END *** of mods for Reverse Search Plus to filter on dt_last/first_seen
+																		
+  // the string 'FB'  in attr names stands for phones FeedBack (FB)																		
 
-	doxie.MAC_Marshall_Results_NoCount(ds_results_ported_checked,resultsPreFB,,disp_cnt);
-
-	// End of June 2016 corrections 
-	// ****************************
+	doxie.MAC_Marshall_Results_NoCount(ds_results_ported_checkedFilteredDate,resultsPreFB,,disp_cnt);
 
 	PhonesFeedback_Services.Mac_Append_Feedback(resultsPreFB
 																							,did
@@ -530,8 +586,7 @@ EXPORT phone_noreconn_search := MACRO
 	AddressFeedback_Services.MAC_Append_Feedback(resultsWithPhnFB, resultsAddrFB, address_feedback,,,,,,,,,,1);
 
 	resultsWithAddrFB := if(IncludeAddressFeedback, resultsAddrFB, resultsWithPhnFB);
-
-
+	
 	results := if(UseDateSort,sort(resultsWithAddrFB,-dt_last_seen,penalt),resultsWithAddrFB);
 
 	results_friendly := project(results, transform(recordof(results), 
@@ -539,7 +594,7 @@ EXPORT phone_noreconn_search := MACRO
 											 self.SSCDescription := [],
 											 self.RealTimePhone_Ext := [],
 											 self := left));
-			 
+
 	Royalty.MAC_RoyaltyLastResort(results,lastresort_royalties)
 	targus_royalties := Royalty.RoyaltyTargus.GetOnlineRoyalties(results,,,trackPDE:=phoneOnlySearch,trackWCS:=doxie.DataPermission.use_confirm, trackVE:=~phoneOnlySearch);
 	Royalty.MAC_RoyaltyQSENT(results, qsent_royalties, use_qt, call_PVS and use_PVS)						
@@ -557,7 +612,18 @@ EXPORT phone_noreconn_search := MACRO
 
 	out_rslt := output(if(~batch_friendly,results,results_friendly), named('Results'));
 
-
+  //OUTPUT(dt_filterOk, named('dt_filterOk'));
+	// output(dt_first_seenValueTrimmed, named('dt_first_seenValueTrimmed'));
+	// output(dt_last_seenValueTrimmed, named('dt_last_seenValueTrimmed'));
+	// output(ds_results_ported_checked_nonGateway, named('ds_results_ported_checked_nonGateway'));
+	// output(dt_last_seenValueTrimmed, named('dt_last_seenValueTrimmed'));
+  // output(dt_last_seenValue, named('dt_last_seenValue'));
+	// output(ds_results_ported_checkedFilteredDate, named('ds_results_ported_checkedFilteredDate'));
+	// output(resultsWithAddrFBFilteredSlimJustFirstSeen, named('resultsWithAddrFBFilteredSlimJustFirstSeen'));
+	// output(resultsWithAddrFBFilteredSlimJustLastSeen, named('resultsWithAddrFBFilteredSlimJustLastSeen'));
+	// output(ds_results_ported_checked, named('ds_results_ported_checked'));
+	// output(ds_results_ported_checkedFilteredSlimJustFirstSeen, named('ds_results_ported_checkedFilteredSlimJustFirstSeen'));
+	// output(ds_results_ported_checkedFilteredDate, named('ds_results_ported_checkedFilteredDate'));
 	// OUTPUT(use_PVS,NAMED('use_PVS'));
 	// OUTPUT(call_pvs,NAMED('call_pvs'));
 	// OUTPUT(PVS_GW_w_tzone,NAMED('PVS_GW_w_tzone'))

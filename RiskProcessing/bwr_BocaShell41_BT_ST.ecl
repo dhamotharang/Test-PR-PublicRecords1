@@ -1,4 +1,4 @@
-#workunit('name','NonFCRA BT-ST Bocashell 4.1 Process');
+﻿#workunit('name','NonFCRA BT-ST Bocashell 4.1 Process');
 
 /* *** Note that Netacuity is turned ON *** needs to use Cert gateway  */
 
@@ -10,6 +10,7 @@ unsigned1 eyeball := 10;
 string DataRestrictionMask := '0000000000000000000000000';	// byte 6, if 1, restricts experian, byte 8, if 1, restricts equifax, 12 restricts ADVO
 unsigned1 glba := 1;
 unsigned1 dppa := 3;
+unsigned3 LastSeenThreshold := 0;	//# of days to consider header records as being recent for verification.  0 will use default (41 and lower = 365 days, 50 and higher = include all) 
 
 //===================  input-output files  ======================
 infile_name  := '~jpyon::in::dell_1545_new_bt_st_input_in';
@@ -125,6 +126,7 @@ l :=	RECORD
 	string DataRestrictionMask;
 	dataset(risk_indicators.Layout_Gateways_In) gateways;
 	integer bsversion;
+	unsigned3 LastSeenThreshold;
 END;
 
 l t_f(ds_input le, INTEGER c) := TRANSFORM
@@ -137,6 +139,7 @@ l t_f(ds_input le, INTEGER c) := TRANSFORM
 	self.glbpurpose := glba;
 	self.gateways := riskwise.shortcuts.gw_netacuityv4;
 	SELF.datarestrictionmask := datarestrictionmask;
+	SELF.LastSeenThreshold := LastSeenThreshold;
 	self.bsversion := 41;		
 	SELF := le;
 	//SELF := [];

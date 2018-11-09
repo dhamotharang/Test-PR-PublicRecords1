@@ -1,4 +1,4 @@
-IMPORT BIPV2, Business_Credit, iesp, TopBusiness_Services;
+﻿IMPORT BIPV2, Business_Credit, iesp, TopBusiness_Services;
   
  
 EXPORT Layouts := MODULE
@@ -288,7 +288,7 @@ EXPORT InputEcho := RECORD
 		integer2 AcctDet1_Close_Year ;
 		integer2 AcctDet1_Close_Month ;
 		integer2 AcctDet1_Close_Day ;
-		string30 AcctDet1_AccountClosureReason ;
+		string100 AcctDet1_AccountClosureReason ;
 		string12 AcctDet1_OriginalAmount ;
 		string12 AcctDet1_AmountOutstanding ;
 		boolean  AcctDet1_CollateralIndicator ;
@@ -343,7 +343,7 @@ EXPORT InputEcho := RECORD
 		integer2 AcctDet2_Close_Year ;
 		integer2 AcctDet2_Close_Month ;
 		integer2 AcctDet2_Close_Day ;
-		string30 AcctDet2_AccountClosureReason ;
+		string100 AcctDet2_AccountClosureReason ;
 		string12 AcctDet2_OriginalAmount ;
 		string12 AcctDet2_AmountOutstanding ;
 		boolean  AcctDet2_CollateralIndicator ;

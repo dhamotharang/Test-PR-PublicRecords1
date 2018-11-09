@@ -89,7 +89,6 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
 
 		PromoteSupers.MAC_SF_BuildProcess(df_activity,'~PRTE::BASE::corrections::activity', writefile_activity,,,,filedate);
 
-		sequential(writefile_court_offenses,writefile_offenses,writefile_offenders,writefile_punishment,writefile_activity);
-
-		Return 'success';
+		return sequential(writefile_court_offenses,writefile_offenses,writefile_offenders,writefile_punishment,writefile_activity);
+		
 END;

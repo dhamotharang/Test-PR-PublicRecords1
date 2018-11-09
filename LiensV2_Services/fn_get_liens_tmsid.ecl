@@ -1,4 +1,4 @@
-// FUNCTION TO GET LIENS FROM A SET OF TMSID
+﻿// FUNCTION TO GET LIENS FROM A SET OF TMSID
 
 //IMPORTANT FCRA-NOTE:
 //  Corresponding FCRA-compliant/neutral data are used here,
@@ -16,7 +16,7 @@ export fn_get_liens_tmsid(
   boolean includeCriminalIndicators = FALSE,
 	DATASET(FFD.Layouts.PersonContextBatchSlim) ds_slim_pc = FFD.Constants.BlankPersonContextBatchSlim,
 	integer8 inFFDOptionsMask = 0,
-	integer FCRAPurpose = FCRA.Constants.FCRAPurpose.NoValueProvided
+	integer FCRAPurpose = FCRA.FCRAPurpose.NoValueProvided
 ) := function
 
 	// 	GET PARTY INFO FIRST FOR PULL IDS

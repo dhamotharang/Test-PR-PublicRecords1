@@ -1,4 +1,4 @@
-/*2016-05-21T00:39:26Z (Kevin Huls)
+﻿/*2016-05-21T00:39:26Z (Kevin Huls)
 Automated reinstate from 2016-05-19T17:50:17Z
 */
 /*--SOAP--
@@ -754,7 +754,7 @@ Layout_InstandID_NuGenExt format_out(ret le, fs R) := TRANSFORM
 	
 	self.dobmatchlevel := le.dobmatchlevel;
 	
-	self.SSNFoundForLexID := le.combo_ssn<>'' and actualIIDVersion=1;	// is this correct?
+	self.SSNFoundForLexID := le.bestssn<>'' and actualIIDVersion=1;	// is this correct?
 	self.addressPOBox := (Risk_Indicators.rcSet.isCode12(le.addr_type) or Risk_Indicators.rcSet.isCodePO(le.zipclass)) and actualIIDVersion=1;
 	self.addressCMRA := (le.hrisksic in risk_indicators.iid_constants.setCRMA or le.ADVODropIndicator='C') and actualIIDVersion=1;
 	

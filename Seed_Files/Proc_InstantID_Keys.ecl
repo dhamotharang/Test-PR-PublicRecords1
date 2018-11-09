@@ -1,4 +1,4 @@
-import roxiekeybuild,seed_files;
+﻿import roxiekeybuild,seed_files;
 
 export Proc_InstantID_Keys(string filedate) := 
 function
@@ -45,6 +45,16 @@ roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.Key_OSAttributes,'abc','~t
 roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.BIID20_keys.BIID20keypart1,'abc','~thor_data400::key::testseed::'+filedate+'::Part1::BIID_V2',biid20Pt1);
 roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.BIID20_keys.BIID20keypart2,'abc','~thor_data400::key::testseed::'+filedate+'::Part2::BIID_V2',biid20Pt2);
 roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.BIID20_keys.BIID20keypart3,'abc','~thor_data400::key::testseed::'+filedate+'::Part3::BIID_V2',biid20Pt3);
+roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.key_SmallBusinessAnalyticsV20,'abc','~thor_data400::key::testseed::'+filedate+'::smallbusinessanalyticsv20',sba20);
+roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.VerificationOfOccupancy_Report_keys.Summary,'abc','~thor_data400::key::testseed::'+filedate+'::VOOreport::Summary',vor1);
+roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.VerificationOfOccupancy_Report_keys.TargetSummary,'abc','~thor_data400::key::testseed::'+filedate+'::VOOreport::TargetSummary',vor2);
+roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.VerificationOfOccupancy_Report_keys.Sources,'abc','~thor_data400::key::testseed::'+filedate+'::VOOreport::Sources',vor3);
+roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.VerificationOfOccupancy_Report_keys.OwnedProperties,'abc','~thor_data400::key::testseed::'+filedate+'::VOOreport::OwnedProperties',vor4);
+roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.VerificationOfOccupancy_Report_keys.OwnedPropertiesAsOf,'abc','~thor_data400::key::testseed::'+filedate+'::VOOreport::OwnedPropertiesAsOf',vor5);
+roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.VerificationOfOccupancy_Report_keys.PhoneAndUtility,'abc','~thor_data400::key::testseed::'+filedate+'::VOOreport::PhoneAndUtility',vor6);
+roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.VerificationOfOccupancy_Report_keys.AssociatedIdentities,'abc','~thor_data400::key::testseed::'+filedate+'::VOOreport::AssociatedIdentities',vor7);
+
+
 
 
 roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::testseed::@version@::instantid','~thor_data400::key::testseed::'+filedate+'::instantid',a1);
@@ -88,6 +98,15 @@ roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::testseed::@version@::
 roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::testseed::@version@::Part1::BIID_V2','~thor_data400::key::testseed::'+filedate+'::Part1::BIID_V2',biid20Pt1built);
 roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::testseed::@version@::Part2::BIID_V2','~thor_data400::key::testseed::'+filedate+'::Part2::BIID_V2',biid20Pt2built);
 roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::testseed::@version@::Part3::BIID_V2','~thor_data400::key::testseed::'+filedate+'::Part3::BIID_V2',biid20Pt3built);
+roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::testseed::@version@::smallbusinessanalyticsv20','~thor_data400::key::testseed::'+filedate+'::smallbusinessanalyticsv20',sba20built);
+roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::testseed::@version@::VOOreport::Summary','~thor_data400::key::testseed::'+filedate+'::VOOreport::Summary',vor1built);
+roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::testseed::@version@::VOOreport::TargetSummary','~thor_data400::key::testseed::'+filedate+'::VOOreport::TargetSummary',vor2built);
+roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::testseed::@version@::VOOreport::Sources','~thor_data400::key::testseed::'+filedate+'::VOOreport::Sources',vor3built);
+roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::testseed::@version@::VOOreport::OwnedProperties','~thor_data400::key::testseed::'+filedate+'::VOOreport::OwnedProperties',vor4built);
+roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::testseed::@version@::VOOreport::OwnedPropertiesAsOf','~thor_data400::key::testseed::'+filedate+'::VOOreport::OwnedPropertiesAsOf',vor5built);
+roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::testseed::@version@::VOOreport::PhoneAndUtility','~thor_data400::key::testseed::'+filedate+'::VOOreport::PhoneAndUtility',vor6built);
+roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::testseed::@version@::VOOreport::AssociatedIdentities','~thor_data400::key::testseed::'+filedate+'::VOOreport::AssociatedIdentities',vor7built);
+
 
 
 roxiekeybuild.Mac_SK_Move('~thor_data400::key::testseed::@version@::instantid','Q',a2);
@@ -131,15 +150,27 @@ roxiekeybuild.Mac_SK_Move('~thor_data400::key::testseed::@version@::osattributes
 roxiekeybuild.Mac_SK_Move('~thor_data400::key::testseed::@version@::Part1::BIID_V2','Q',biid20Pt1qa);
 roxiekeybuild.Mac_SK_Move('~thor_data400::key::testseed::@version@::Part2::BIID_V2','Q',biid20Pt2qa);
 roxiekeybuild.Mac_SK_Move('~thor_data400::key::testseed::@version@::Part3::BIID_V2','Q',biid20Pt3qa);
+roxiekeybuild.Mac_SK_Move('~thor_data400::key::testseed::@version@::smallbusinessanalyticsv20','Q',sba20qa);
+roxiekeybuild.Mac_SK_Move('~thor_data400::key::testseed::@version@::VOOreport::Summary','Q',vor1qa);
+roxiekeybuild.Mac_SK_Move('~thor_data400::key::testseed::@version@::VOOreport::TargetSummary','Q',vor2qa);
+roxiekeybuild.Mac_SK_Move('~thor_data400::key::testseed::@version@::VOOreport::Sources','Q',vor3qa);
+roxiekeybuild.Mac_SK_Move('~thor_data400::key::testseed::@version@::VOOreport::OwnedProperties','Q',vor4qa);
+roxiekeybuild.Mac_SK_Move('~thor_data400::key::testseed::@version@::VOOreport::OwnedPropertiesAsOf','Q',vor5qa);
+roxiekeybuild.Mac_SK_Move('~thor_data400::key::testseed::@version@::VOOreport::PhoneAndUtility','Q',vor6qa);
+roxiekeybuild.Mac_SK_Move('~thor_data400::key::testseed::@version@::VOOreport::AssociatedIdentities','Q',vor7qa);
 
 
-buildkey := parallel(a,b,c,ca,aa,bb,cc,d,e,f,g,h,i,j,k,l,m,n,hc,amlr,amlrb, amlrv2,amlrbv2,idfa,idfc,idfe,idfi,idfn,idfp,idfs,vo,intlgg,prbo,sba,sbfe,sbm, osm, osattributesm, biid20Pt1,biid20Pt2,biid20Pt3);
-movekey := sequential(a1,b1,c1,ca1,aa1,bb1,cc1,d1,e1,f1,g1,h1,i1,j1,k1,l1,m1,n1,hcbuilt,amlrbuilt,amlrbbuilt,amlrbuiltv2,amlrbbuiltv2,idfabuilt,idfcbuilt,idfebuilt,idfibuilt,idfnbuilt,idfpbuilt,idfsbuilt,vobuilt,intlggbuilt,prbobuilt,sbabuilt,sbfebuilt,sbmbuilt,osbuilt, osattributesbuilt, biid20Pt1built,biid20Pt2built,biid20Pt3built);
-movetoqa := sequential(a2,b2,c2,ca2,aa2,bb2,cc2,d2,e2,f2,g2,h2,i2,j2,k2,l2,m2,n2,hcqa,amlrqa,amlrbqa, amlrqav2,amlrbqav2,idfaqa,idfcqa,idfeqa,idfiqa,idfnqa,idfpqa,idfsqa,voqa,intlggqa,prboqa,sbaqa,sbfeqa,sbmqa,osqa, osattributesqa, biid20Pt1qa,biid20Pt2qa,biid20Pt3qa);
 
-dops_update := Roxiekeybuild.updateversion('TestseedKeys',filedate,'john.freibaum@lexisnexis.com,Anantha.Venkatachalam@lexisnexis.com',,'N');
+buildkey := parallel(a,b,c,ca,aa,bb,cc,d,e,f,g,h,i,j,k,l,m,n,hc,amlr,amlrb, amlrv2,amlrbv2,idfa,idfc,idfe,idfi,idfn,idfp,idfs,vo,intlgg,prbo,sba,sbfe,sbm, osm, osattributesm, biid20Pt1,biid20Pt2,biid20Pt3,sba20,vor1,vor2,vor3,vor4,vor5,vor6,vor7);
+movekey := sequential(a1,b1,c1,ca1,aa1,bb1,cc1,d1,e1,f1,g1,h1,i1,j1,k1,l1,m1,n1,hcbuilt,amlrbuilt,amlrbbuilt,amlrbuiltv2,amlrbbuiltv2,idfabuilt,idfcbuilt,idfebuilt,idfibuilt,idfnbuilt,idfpbuilt,idfsbuilt,vobuilt,intlggbuilt,prbobuilt,sbabuilt,sbfebuilt,sbmbuilt,osbuilt, osattributesbuilt, biid20Pt1built,biid20Pt2built,biid20Pt3built,sba20built,vor1built,vor2built,vor3built,vor4built,vor5built,vor6built,vor7built);
+movetoqa := sequential(a2,b2,c2,ca2,aa2,bb2,cc2,d2,e2,f2,g2,h2,i2,j2,k2,l2,m2,n2,hcqa,amlrqa,amlrbqa, amlrqav2,amlrbqav2,idfaqa,idfcqa,idfeqa,idfiqa,idfnqa,idfpqa,idfsqa,voqa,intlggqa,prboqa,sbaqa,sbfeqa,sbmqa,osqa, osattributesqa, biid20Pt1qa,biid20Pt2qa,biid20Pt3qa,sba20qa,vor1qa,vor2qa,vor3qa,vor4qa,vor5qa,vor6qa,vor7qa);
+
+
+ dops_update := Roxiekeybuild.updateversion('TestseedKeys',filedate,'john.freibaum@lexisnexisrisk.com,Anantha.Venkatachalam@lexisnexisrisk.com',,'N');
+
 
 return sequential(buildkey,movekey,movetoqa,dops_update);
+
 
 
 end;

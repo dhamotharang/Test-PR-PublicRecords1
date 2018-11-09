@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="InstantIDArchiveSearchRequest"  wuTimeout="300000">	
 	<part name="gateways" 						type="tns:XmlDataSet" cols="110" rows="4"/>
 	<part name="_CompanyId"  					type="xsd:string"/>
@@ -17,8 +17,12 @@ EXPORT Search_Service := MACRO
 
 	search_by := GLOBAL (first_row.SearchBy);
 	report_by := ROW (search_by, transform (iesp.bpsreport.t_BpsReportBy, SELF := Left; SELF := []));
-  iesp.ECL2ESP.SetInputReportBy (report_by);
-  iesp.ECL2ESP.SetInputAddress (search_by.Address);
+ 
+	iesp.ECL2ESP.SetInputReportBy (report_by);
+
+  // set User, Base and generic search options
+	iesp.ECL2ESP.SetInputBaseRequest (first_row);
+  iesp.ECL2ESP.SetInputSearchOptions (PROJECT(first_row.options,TRANSFORM(iesp.share.t_BaseSearchOptionEx, SELF := LEFT, SELF := [])));
 
   // set User, Base and generic search options
 	iesp.ECL2ESP.SetInputBaseRequest (first_row);
@@ -39,6 +43,7 @@ EXPORT Search_Service := MACRO
 	// Gateway configurations
 	dGateways := Gateway.Configuration.Get();
 	results := InstantID_Archiving_Services.Search_Records.doSingleSearch(tempmod, dGateways);
+
 	output(results, named('Results'));
 	
 ENDMACRO;

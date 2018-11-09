@@ -1,4 +1,4 @@
-IMPORT AutoKeyB2, doxie, UCCv2, ut, AutoKeyI, AutoHeaderI;
+﻿IMPORT AutoKeyB2, doxie, UCCv2, UCCv2_Services, AutoKeyI, AutoHeaderI, Data_Services;
 
 export Get_ids := module
 export params := interface(
@@ -13,7 +13,7 @@ boolean noFail = false, boolean noDeepDive = false,
 		outrec := UCCv2_Services.layout_search_ids;
 
 		constants		:= UCCV2.Constants(UCCv2.Version.key);
-		ak_keyname	:= ut.foreign_prod + 'thor_data400::key::ucc::autokey::';// constants.ak_keyname;
+		ak_keyname	:= Data_Services.Data_location.Prefix('UCC') + 'thor_data400::key::ucc::autokey::';// constants.ak_keyname;
 		ak_typeStr	:= constants.ak_typeStr;
 		ak_dataset	:= UCCV2.file_SearchAutokey;
 
@@ -34,7 +34,7 @@ boolean noFail = false, boolean noDeepDive = false,
 			export forceLocal := true;
 	export noFail := true;
 	end;
-	dids_from_input := AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do(temp_did_mod);
+	dids_from_input := PROJECT(AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do(temp_did_mod), doxie.Layout_references);
 
 	// bdid
 	temp_bdid_mod := module(project(in_mod,AutoHeaderI.LIBIN.FetchI_Hdr_Biz.full,opt))

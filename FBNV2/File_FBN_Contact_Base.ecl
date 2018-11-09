@@ -1,1 +1,1 @@
-export File_FBN_Contact_Base := project(FBNV2.File_FBN_Contact_Base_AID(tmsid not in FBNV2.Suppress_TMSID), transform(layout_common.contact, self := left));
+﻿export File_FBN_Contact_Base := project(FBNV2.File_FBN_Contact_Base_AID(tmsid not in FBNV2.Suppress_TMSID()), transform(layout_common.contact, self := left));

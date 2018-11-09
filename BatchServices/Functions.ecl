@@ -1,6 +1,6 @@
-IMPORT Autokey_batch, AutoHeaderI, AutoStandardI, Doxie, LN_PropertyV2_Services, uccv2_services,  
+﻿IMPORT Autokey_batch, AutoHeaderI, AutoStandardI, Doxie, LN_PropertyV2_Services, uccv2_services,  
        prof_LicenseV2_Services, Prof_License, Address, doxie_raw, ut, NID, BatchServices, fcra, LN_PropertyV2,
-       AutoHeaderV2;
+       AutoHeaderV2, STD;
 
 SSN_LABEL 				:= PROJECT(AutoStandardI.GlobalModule(), AutoStandardI.LIBIN.PenaltyI_SSN.full, opt);
 ADDRESS_LABEL 		:= PROJECT(AutoStandardI.GlobalModule(), AutoStandardI.LIBIN.PenaltyI_Addr.full, opt);
@@ -129,7 +129,7 @@ EXPORT Functions := MODULE
         export boolean KeepOldSsns := true;
 			END;
 
-			// Note: AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do method is impossible to implement now due to the compile-
+			// Note: AutoHeaderI/LIBCALL_FetchI_Hdr_Indv/do method is impossible to implement now due to the compile-
 			// time error on the keyword 'skip'. Instead, we'll invoke 'references', which will perform a DID lookup
 			// on the person him-herself, but not on the household. We'll switch back to the 'do' method when Gavin 
 			// fixes the problem with 'skip'. See bug #32760.
@@ -1064,5 +1064,69 @@ EXPORT Functions := MODULE
 
 			RETURN ds_fcraOutRecs;
 		END;
-	
+
+	EXPORT st2abbrev(STRING state) := FUNCTION
+		clean_state := ut.CleanSpacesAndUpper(state);
+		name2Abbrev := ut.st2abbrev(clean_state);
+		validAbbrev := MAP(
+			clean_state = 'AL' => 'AL',
+			clean_state = 'AK' => 'AK',
+			clean_state = 'AR' => 'AR',
+			clean_state = 'AS' => 'AS',
+			clean_state = 'AZ' => 'AZ',
+			clean_state = 'CA' => 'CA',
+			clean_state = 'CO' => 'CO',
+			clean_state = 'CT' => 'CT',
+			clean_state = 'DC' => 'DC',
+			clean_state = 'DE' => 'DE',
+			clean_state = 'FL' => 'FL',
+			clean_state = 'GA' => 'GA',
+			clean_state = 'GU' => 'GU',
+			clean_state = 'HI' => 'HI',
+			clean_state = 'IA' => 'IA',
+			clean_state = 'ID' => 'ID',
+			clean_state = 'IL' => 'IL',
+			clean_state = 'IN' => 'IN',
+			clean_state = 'KS' => 'KS',
+			clean_state = 'KY' => 'KY',
+			clean_state = 'LA' => 'LA',
+			clean_state = 'MA' => 'MA',
+			clean_state = 'MD' => 'MD',
+			clean_state = 'ME' => 'ME',
+			clean_state = 'MI' => 'MI',
+			clean_state = 'MN' => 'MN',
+			clean_state = 'MO' => 'MO',
+			clean_state = 'MS' => 'MS',
+			clean_state = 'MT' => 'MT',
+			clean_state = 'NC' => 'NC',
+			clean_state = 'ND' => 'ND',
+			clean_state = 'NE' => 'NE',
+			clean_state = 'NH' => 'NH',
+			clean_state = 'NJ' => 'NJ',
+			clean_state = 'NM' => 'NM',
+			clean_state = 'NV' => 'NV',
+			clean_state = 'NY' => 'NY',
+			clean_state = 'OH' => 'OH',
+			clean_state = 'OK' => 'OK',
+			clean_state = 'OR' => 'OR',
+			clean_state = 'PA' => 'PA',
+			clean_state = 'PR' => 'PR',
+			clean_state = 'RI' => 'RI',
+			clean_state = 'SC' => 'SC',
+			clean_state = 'SD' => 'SD',
+			clean_state = 'TN' => 'TN',
+			clean_state = 'TX' => 'TX',
+			clean_state = 'US' => 'US',
+			clean_state = 'UT' => 'UT',
+			clean_state = 'VA' => 'VA',
+			clean_state = 'VI' => 'VI',
+			clean_state = 'VT' => 'VT',
+			clean_state = 'WA' => 'WA',
+			clean_state = 'WI' => 'WI',
+			clean_state = 'WV' => 'WV',
+			clean_state = 'WY' => 'WY',
+			'');	
+		RETURN IF(name2Abbrev!='', name2Abbrev, validAbbrev);
+	END;
+
 END;

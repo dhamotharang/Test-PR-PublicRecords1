@@ -1,4 +1,4 @@
-import did_add,ut,census_data,suppress,DriversV2_Services,doxie_crs,
+﻿import did_add,ut,census_data,suppress,DriversV2_Services,doxie_crs,
   PersonSearch_Services,header,Standard, Advo,Gateway,Royalty,AutoStandardI;
 
 export rollup_presentation(DATASET(layout_presentation) presRecs,
@@ -51,7 +51,7 @@ export rollup_presentation(DATASET(layout_presentation) presRecs,
 	srchedPhoneMatch(Layout_HeaderFileSearch l) :=
 		phone_value <> '' and (l.listed_phone=phone_value or l.listed_phone[4..10]=phone_value);
 
-	with_risk := base_presentation(presRecs);
+	with_risk := doxie.base_presentation(presRecs);
 
 	tasrtd := pull(sort(with_risk,did))((INTEGER)did<>0);
 	tagrp := group(tasrtd,did);
@@ -246,7 +246,7 @@ export rollup_presentation(DATASET(layout_presentation) presRecs,
 
 	ta1_pre := if (addressOnlySort, ta1_addr_srtd, ta1_srtd);
 
-	ta1 := GLOBAL(IF(reduced_data_value, us_search(penalt<score_threshold_value or all_dids), ta1_pre));
+	ta1 := GLOBAL(IF(reduced_data_value, doxie.us_search(penalt<score_threshold_value or all_dids), ta1_pre));
 
 	tempmod := module(project(AutoStandardI.GlobalModule(),doxie.expandedPhones.searchParams, OPT))
 		EXPORT STRING14  DID := '';
@@ -400,7 +400,7 @@ export rollup_presentation(DATASET(layout_presentation) presRecs,
 														left.seq = right.seq,
 														group,
 														denormAddr(left, rows(right)),right outer);
-														
+										
   // This section of coding immediately below was added for the FDN project.
   // Set shorter alias names for the new FDN DPM & DRM positions to be passed into the new function.
   boolean FDNContDataPermitted := doxie.DataPermission.use_FDNContributoryData;
@@ -416,7 +416,7 @@ export rollup_presentation(DATASET(layout_presentation) presRecs,
                                     denorm_addr);
 
 	doxie.MAC_Marshall_Results(ds_denorm_addr_with_fdninds,ta2);
-
+	
 	// ******************** After choosing records, append more info ********************* 
 
 	// SSN HRI's
@@ -671,14 +671,15 @@ export rollup_presentation(DATASET(layout_presentation) presRecs,
 	result := if(ut.IndustryClass.is_knowx, project(final, fixAddrDates(LEFT)), final);
 	
 	Royalty.MAC_RoyaltyLastResort(phonePlusRawRecs,lastresort_royalties);
-	targus_royalties := Royalty.RoyaltyTargus.GetOnlineRoyalties(phonePlusRawRecs,,,,doxie.DataPermission.use_confirm);
-	royalties := dataset([], Royalty.Layouts.Royalty) + if(use_tg , targus_royalties) + if (use_LR, lastresort_royalties);
- 
-	doxie.Layout_Rollup.header_rolled final_result() := TRANSFORM 
+	FDN_check     := ds_denorm_addr_with_fdninds(fdn_results_found = true);
+  FDN_Royalties := Royalty.RoyaltyFDNCoRR.GetOnlineRoyalties(FDN_check);
+  targus_royalties := Royalty.RoyaltyTargus.GetOnlineRoyalties(phonePlusRawRecs,,,,doxie.DataPermission.use_confirm);
+	royalties := dataset([], Royalty.Layouts.Royalty) + if(IncludeFraudDefenseNetwork, FDN_Royalties) + if(use_tg , targus_royalties) + if (use_LR, lastresort_royalties);
+  
+  doxie.Layout_Rollup.header_rolled final_result() := TRANSFORM 
 		self.Results := project(result, doxie.layout_rollup.KeyRec_Seq);  
 		self.Royalty := royalties;
 		self.householdRecordsAvailable := household_count;
 	END;
- 
   return DATASET([final_result()]);	
 END;

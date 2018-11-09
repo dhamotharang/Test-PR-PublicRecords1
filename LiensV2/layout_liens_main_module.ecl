@@ -1,4 +1,4 @@
-export layout_liens_main_module := module 
+﻿export layout_liens_main_module := module 
 
 export layout_filing_status := record, maxlength(10000)
 
@@ -55,6 +55,11 @@ BOOLEAN	bCBFlag	:=	FALSE;
 unsigned8 persistent_record_id :=0 ; 
 
 dataset(layout_filing_status) filing_status;
-
+	STRING2		Filing_Type_ID		:=	'';
+	STRING8		Collection_Date	:=	'';
+	STRING45	CaseLinkID						:=	'';
+	STRING50 TMSID_old							:=	'';
+	STRING50 RMSID_old							:=	'';
+	BOOLEAN		CaseLinkID_Prop_Flag	:=	FALSE;
 end;
 end;	

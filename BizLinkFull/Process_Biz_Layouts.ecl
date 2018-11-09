@@ -1,6 +1,6 @@
-EXPORT Process_Biz_Layouts := MODULE
+﻿EXPORT Process_Biz_Layouts := MODULE
  
-IMPORT SALT33;
+IMPORT SALT37;
 SHARED h := File_BizHead;//The input file
  
 EXPORT KeyName := BizLinkFull.Filename_keys.meow; /*HACK07meow*/
@@ -10,10 +10,10 @@ EXPORT KeyName := BizLinkFull.Filename_keys.meow; /*HACK07meow*/
          which preserves those values for singletons (which we need) and leaves those
          values as arbitrary where we dont care about them.  */
 import bipv2;
-  s01:=DEDUP(SORT(h(BIPV2.mod_sources.srcInBase(source)),EXCEPT rcid,vl_id,source_record_id),EXCEPT rcid,vl_id,source_record_id);
+  s01:=DEDUP(SORT(DISTRIBUTE(h(BIPV2.mod_sources.srcInBase(source)),HASH32(proxid)),EXCEPT rcid,vl_id,source_record_id,LOCAL),EXCEPT rcid,vl_id,source_record_id,LOCAL);
 /* HACK  Now taking the post-collapsed key data and truncating the few remaining proxids
          that have more than 9999 records */  
-  s:=DEDUP(SORT(s01,proxid,rcid),proxid,KEEP(9999));
+  s:=DEDUP(SORT(s01,proxid,rcid,LOCAL),proxid,LOCAL,KEEP(9999));
 EXPORT Key := INDEX(s,{ultid,orgid,seleid,proxid,powid},{s},KeyName);
 //Create keys to get from lower-order identifiers to the full hierarchy
  
@@ -34,9 +34,9 @@ EXPORT KeyorgidUp := INDEX(s,{orgid},{s},KeyorgidUpName);
 // Create key to get from historic versions of higher order keys
  
 EXPORT KeyIDHistoryName := BizLinkFull.Filename_keys.sup_rcid; /*HACK07sup_rcid*/
-  s := TABLE(h,{ultid,orgid,seleid,proxid,powid,rcid},rcid,ultid,orgid,seleid,proxid,powid,MERGE);
+  SHARED sIDHist := TABLE(h,{ultid,orgid,seleid,proxid,powid,rcid},rcid,ultid,orgid,seleid,proxid,powid,MERGE);
  
-EXPORT KeyIDHistory := INDEX(s,{rcid},{s},KeyIDHistoryName);
+EXPORT KeyIDHistory := INDEX(sIDHist,{rcid},{sIDHist},KeyIDHistoryName);
  
 EXPORT BuildAll := PARALLEL(BUILDINDEX(Key, OVERWRITE),BUILDINDEX(KeyproxidUp, OVERWRITE),BUILDINDEX(KeyseleidUp, OVERWRITE),BUILDINDEX(KeyorgidUp, OVERWRITE),BUILDINDEX(KeyIDHistory, OVERWRITE));
 EXPORT layout_zip_cases := RECORD
@@ -44,17 +44,18 @@ EXPORT layout_zip_cases := RECORD
   INTEGER2 Weight; // we now always store weight in _cases
 END;
 EXPORT id_stream_layout := RECORD
-    SALT33.UIDType UniqueId;
+    SALT37.UIDType UniqueId;
     INTEGER2 Weight;
     UNSIGNED4 KeysUsed := 0;
     UNSIGNED4 KeysFailed := 0;
-    SALT33.UIDType seleid;
-    SALT33.UIDType orgid;
-    SALT33.UIDType ultid;
-    SALT33.UIDType proxid;
-    SALT33.UIDType powid; // Is an UNCLE - may be left blank unless required for filtering
-    SALT33.UIDType rcid := 0; // Unique record ID for external file
-  END;
+    BOOLEAN IsTruncated := FALSE;
+    SALT37.UIDType seleid;
+    SALT37.UIDType orgid;
+    SALT37.UIDType ultid;
+    SALT37.UIDType proxid;
+    SALT37.UIDType powid; // Is an UNCLE - may be left blank unless required for filtering
+    SALT37.UIDType rcid := 0; // Unique record ID for external file
+END;
 // This function produces elements with the full hierarchy filled in - even if only a 'child' ID was provided
 EXPORT id_stream_complete(DATASET(id_stream_layout) id) := FUNCTION
   CF0 := id.proxid<>0 AND id.seleid=0;
@@ -66,7 +67,7 @@ EXPORT id_stream_complete(DATASET(id_stream_layout) id) := FUNCTION
     SELF.powid := ri.powid;
     SELF := le;
   END;
-  J0 := JOIN(C0,KeyproxidUp,LEFT.proxid=RIGHT.proxid,Fill0(LEFT,RIGHT),LEFT OUTER);
+  J0 := JOIN(C0,KeyproxidUp,LEFT.proxid=RIGHT.proxid,Fill0(LEFT,RIGHT),LEFT OUTER,LIMIT(Config_BIP.JoinLimit));
   CF1 := id.seleid<>0 AND id.orgid=0  AND ~CF0;
   C1 := id(CF1); // In need of filling up
   id_stream_layout Fill1(id_stream_layout le,KeyseleidUp ri) := TRANSFORM
@@ -74,14 +75,14 @@ EXPORT id_stream_complete(DATASET(id_stream_layout) id) := FUNCTION
     SELF.ultid := ri.ultid;
     SELF := le;
   END;
-  J1 := JOIN(C1,KeyseleidUp,LEFT.seleid=RIGHT.seleid,Fill1(LEFT,RIGHT),LEFT OUTER);
+  J1 := JOIN(C1,KeyseleidUp,LEFT.seleid=RIGHT.seleid,Fill1(LEFT,RIGHT),LEFT OUTER,LIMIT(Config_BIP.JoinLimit));
   CF2 := id.orgid<>0 AND id.ultid=0  AND ~CF0  AND ~CF1;
   C2 := id(CF2); // In need of filling up
   id_stream_layout Fill2(id_stream_layout le,KeyorgidUp ri) := TRANSFORM
     SELF.ultid := ri.ultid;
     SELF := le;
   END;
-  J2 := JOIN(C2,KeyorgidUp,LEFT.orgid=RIGHT.orgid,Fill2(LEFT,RIGHT),LEFT OUTER);
+  J2 := JOIN(C2,KeyorgidUp,LEFT.orgid=RIGHT.orgid,Fill2(LEFT,RIGHT),LEFT OUTER,LIMIT(Config_BIP.JoinLimit));
   RETURN id(rcid<>0 AND proxid=0 OR ultid<>0  AND ~CF0  AND ~CF1  AND ~CF2)+J0+J1+J2;
 END;
 // This function produces elements with the full hierarchy filled in - presuming that the minor-most incoming id is historic
@@ -91,14 +92,14 @@ EXPORT id_stream_historic(DATASET(id_stream_layout) id) := FUNCTION
     SELF := ri; // The new values for that ID
     SELF := le; // Remainder of id_stream information
   END;
-  J := JOIN(C,KeyIDHistory,LEFT.rcid=RIGHT.rcid,Load(LEFT,RIGHT),LIMIT(BizLinkFull.Config.JoinLimit));
+  J_rec := JOIN(C,KeyIDHistory,LEFT.rcid=RIGHT.rcid,Load(LEFT,RIGHT),LIMIT(Config_BIP.JoinLimit));
   C0 := id(proxid<>0); // proxid is the minormost element
   id_stream_layout Load0(id_stream_layout le,KeyIDHistory ri) := TRANSFORM
     SELF.rcid := 0; // Don't want record id
     SELF := ri; // The new values for that ID
     SELF := le; // Remainder of id_stream information
   END;
-  J0 := JOIN(C0,KeyIDHistory,LEFT.proxid=RIGHT.rcid,Load0(LEFT,RIGHT),LIMIT(BizLinkFull.Config.JoinLimit));
+  J0 := JOIN(C0,KeyIDHistory,LEFT.proxid=RIGHT.rcid,Load0(LEFT,RIGHT),LIMIT(Config_BIP.JoinLimit));
   C1 := id(seleid<>0,proxid=0); // seleid is the minormost element
   id_stream_layout Load1(id_stream_layout le,KeyIDHistory ri) := TRANSFORM
     SELF.rcid := 0; // Don't want record id
@@ -107,7 +108,7 @@ EXPORT id_stream_historic(DATASET(id_stream_layout) id) := FUNCTION
     SELF := ri; // The new values for that ID
     SELF := le; // Remainder of id_stream information
   END;
-  J1 := JOIN(C1,KeyIDHistory,LEFT.seleid=RIGHT.rcid,Load1(LEFT,RIGHT),LIMIT(BizLinkFull.Config.JoinLimit));
+  J1 := JOIN(C1,KeyIDHistory,LEFT.seleid=RIGHT.rcid,Load1(LEFT,RIGHT),LIMIT(Config_BIP.JoinLimit));
   C2 := id(orgid<>0,seleid=0); // orgid is the minormost element
   id_stream_layout Load2(id_stream_layout le,KeyIDHistory ri) := TRANSFORM
     SELF.rcid := 0; // Don't want record id
@@ -117,7 +118,7 @@ EXPORT id_stream_historic(DATASET(id_stream_layout) id) := FUNCTION
     SELF := ri; // The new values for that ID
     SELF := le; // Remainder of id_stream information
   END;
-  J2 := JOIN(C2,KeyIDHistory,LEFT.orgid=RIGHT.rcid,Load2(LEFT,RIGHT),LIMIT(BizLinkFull.Config.JoinLimit));
+  J2 := JOIN(C2,KeyIDHistory,LEFT.orgid=RIGHT.rcid,Load2(LEFT,RIGHT),LIMIT(Config_BIP.JoinLimit));
   C3 := id(ultid<>0,orgid=0); // ultid is the minormost element
   id_stream_layout Load3(id_stream_layout le,KeyIDHistory ri) := TRANSFORM
     SELF.rcid := 0; // Don't want record id
@@ -128,7 +129,7 @@ EXPORT id_stream_historic(DATASET(id_stream_layout) id) := FUNCTION
     SELF := ri; // The new values for that ID
     SELF := le; // Remainder of id_stream information
   END;
-  J3 := JOIN(C3,KeyIDHistory,LEFT.ultid=RIGHT.rcid,Load3(LEFT,RIGHT),LIMIT(BizLinkFull.Config.JoinLimit));
+  J3 := JOIN(C3,KeyIDHistory,LEFT.ultid=RIGHT.rcid,Load3(LEFT,RIGHT),LIMIT(Config_BIP.JoinLimit));
   C4 := id(powid<>0,proxid=0); // powid is available and proxid is not
   id_stream_layout Load4(id_stream_layout le,KeyIDHistory ri) := TRANSFORM
     SELF.rcid := 0; // Don't want record id
@@ -137,13 +138,45 @@ EXPORT id_stream_historic(DATASET(id_stream_layout) id) := FUNCTION
     SELF := ri; // The new values for that ID
     SELF := le; // Remainder of id_stream information
   END;
-  J4 := JOIN(C4,KeyIDHistory,LEFT.powid=RIGHT.rcid,Load4(LEFT,RIGHT),LIMIT(BizLinkFull.Config.JoinLimit));
-  RETURN J+J0+J1+J2+J3+J4;
+  J4 := JOIN(C4,KeyIDHistory,LEFT.powid=RIGHT.rcid,Load4(LEFT,RIGHT),LIMIT(Config_BIP.JoinLimit));
+  RETURN J_rec+J0+J1+J2+J3+J4;
 END;
+EXPORT Fetch_Stream(DATASET(id_stream_layout) d) := FUNCTION
+    k := Key;
+    DLayout := RECORD
+      id_stream_layout;
+      BOOLEAN did_fetch;
+      RECORDOF(k) AND NOT id_stream_layout; // No HEADERSEARCH specified 
+    END;
+    DLayout tr(id_stream_layout le, k ri) := TRANSFORM
+      SELF.did_fetch := ri.proxid<>0;
+      SELF.proxid := IF ( SELF.did_fetch, ri.proxid, le.proxid ); // Copy from 'real data' if it exists
+      SELF.seleid := IF ( SELF.did_fetch, ri.seleid, le.seleid ); // Copy from 'real data' if it exists
+      SELF.orgid := IF ( SELF.did_fetch, ri.orgid, le.orgid ); // Copy from 'real data' if it exists
+      SELF.ultid := IF ( SELF.did_fetch, ri.ultid, le.ultid ); // Copy from 'real data' if it exists
+      SELF.powid := IF ( SELF.did_fetch, ri.powid, le.powid ); // Copy from 'real data' if it exists
+      SELF.rcid := IF ( SELF.did_fetch, ri.rcid, le.rcid ); // Copy from 'real data' if it exists
+      SELF := ri;
+      SELF := le;
+    END;
+    J := JOIN( d,k,(LEFT.ultid = RIGHT.ultid) AND (LEFT.orgid = 0 OR LEFT.orgid = RIGHT.orgid) AND (LEFT.seleid = 0 OR LEFT.seleid = RIGHT.seleid) AND (LEFT.proxid = 0 OR LEFT.proxid = RIGHT.proxid) AND (LEFT.powid = 0 OR LEFT.powid = RIGHT.powid),tr(LEFT,RIGHT), LEFT OUTER, KEEP(10000)/*, LIMIT(Config_BIP.JoinLimit)*/); // Ignore excess records without erroring
+    RETURN J;
+END;
+ 
+EXPORT Fetch_Stream_Expanded(DATASET(id_stream_layout) d) := FUNCTION
+  rd1 := Fetch_Stream(d);
+  old := PROJECT(rd1(~did_fetch),id_stream_layout); // Failed to fetch
+  renew_candidates := id_stream_historic(old); // See if more recent version of ID is fetchable
+  renewed := Fetch_Stream(renew_candidates);
+  RETURN rd1(did_fetch OR KeysFailed<>0)+renewed;
+END;
+ 
 EXPORT InputLayout := RECORD
-  SALT33.UIDType UniqueId; // This had better be unique or it will all break horribly
+  SALT37.UIDType UniqueId; // This had better be unique or it will all break horribly
   UNSIGNED2 MaxIDs := 50; // Maximum number of candidate IDs
   UNSIGNED2 LeadThreshold := 0; // Maximum distance from best to worst (0 => no pruning)
+  BOOLEAN bGetAllScores := TRUE;
+  BOOLEAN disableForce := FALSE;
   h.parent_proxid;
   h.sele_proxid;
   h.org_proxid;
@@ -188,87 +221,30 @@ EXPORT InputLayout := RECORD
   h.org_flag;
   h.ult_flag;
   h.fallback_value;
-  SALT33.StrType CONTACTNAME;//Wordbag field for concept
-  SALT33.StrType STREETADDRESS;//Wordbag field for concept
+  SALT37.StrType CONTACTNAME;//Wordbag field for concept
+  SALT37.StrType STREETADDRESS;//Wordbag field for concept
 // Below only used in header search (data returning) case
   BOOLEAN MatchRecords := false; // Only show records which match
   BOOLEAN FullMatch := false; // Only show proxid if it has a record which fully matches
-  SALT33.UIDType Entered_rcid := 0; // Allow user to enter rcid to pull data
-  SALT33.UIDType Entered_proxid := 0; // Allow user to enter proxid to pull data
-  SALT33.UIDType Entered_seleid := 0; // Allow user to enter seleid to pull data
-  SALT33.UIDType Entered_orgid := 0; // Allow user to enter orgid to pull data
-  SALT33.UIDType Entered_ultid := 0; // Allow user to enter ultid to pull data
-  SALT33.UIDType Entered_powid := 0; // Allow user to enter powid to pull data
-END;
-// A function to turn data in the input layout function into 'baby' match candidates form
-EXPORT InputToMC(DATASET(InputLayout) Inp) := FUNCTION
-  r := RECORD
-    inp.parent_proxid;
-    inp.sele_proxid;
-    inp.org_proxid;
-    inp.ultimate_proxid;
-    inp.has_lgid;
-    inp.empid;
-    inp.source;
-    inp.source_record_id;
-    inp.source_docid;
-    inp.company_name;
-    inp.company_name_prefix;
-    STRING240 cnp_name := SALT33.fn_WordBag_AppendSpecs_Fake(inp.cnp_name); // Needs to look like a wordbag 
-    inp.cnp_number;
-    inp.cnp_btype;
-    inp.cnp_lowv;
-    inp.company_phone;
-    inp.company_phone_3;
-    inp.company_phone_3_ex;
-    inp.company_phone_7;
-    inp.company_fein;
-    inp.company_sic_code1;
-    inp.active_duns_number;
-    inp.prim_range;
-    inp.prim_name;
-    inp.sec_range;
-    inp.city;
-    inp.city_clean;
-    inp.st;
-    TYPEOF(h.zip) zip := inp.zip_cases[1].zip;
-    STRING240 company_url := SALT33.fn_WordBag_AppendSpecs_Fake(inp.company_url); // Needs to look like a wordbag 
-    inp.isContact;
-    inp.contact_did;
-    inp.title;
-    inp.fname;
-    inp.fname_preferred;
-    inp.mname;
-    inp.lname;
-    inp.name_suffix;
-    STRING5 name_suffix_NormSuffix := fn_normSuffix(inp.name_suffix);
-    inp.contact_ssn;
-    inp.contact_email;
-    inp.sele_flag;
-    inp.org_flag;
-    inp.ult_flag;
-    inp.fallback_value;
-    rcid := inp.Entered_rcid;
-    ultid := inp.Entered_ultid;
-    orgid := inp.Entered_orgid;
-    seleid := inp.Entered_seleid;
-    proxid := inp.Entered_proxid;
-    powid := inp.Entered_powid;
-  END;
-  RETURN TABLE(inp,r);
+  SALT37.UIDType Entered_rcid := 0; // Allow user to enter rcid to pull data
+  SALT37.UIDType Entered_proxid := 0; // Allow user to enter proxid to pull data
+  SALT37.UIDType Entered_seleid := 0; // Allow user to enter seleid to pull data
+  SALT37.UIDType Entered_orgid := 0; // Allow user to enter orgid to pull data
+  SALT37.UIDType Entered_ultid := 0; // Allow user to enter ultid to pull data
+  SALT37.UIDType Entered_powid := 0; // Allow user to enter powid to pull data
 END;
  
-EXPORT HardKeyMatch(InputLayout le) := le.cnp_name <> (typeof(le.cnp_name))'' AND EXISTS(le.zip_cases) OR le.cnp_name <> (typeof(le.cnp_name))'' AND le.st <> (typeof(le.st))'' OR le.cnp_name <> (typeof(le.cnp_name))'' OR le.company_name_prefix <> (typeof(le.company_name_prefix))'' OR le.prim_name <> (typeof(le.prim_name))'' AND le.city <> (typeof(le.city))'' AND le.st <> (typeof(le.st))'' OR le.prim_name <> (typeof(le.prim_name))'' AND EXISTS(le.zip_cases) OR le.prim_name <> (typeof(le.prim_name))'' AND le.prim_range <> (typeof(le.prim_range))'' AND EXISTS(le.zip_cases) OR le.company_phone_7 <> (typeof(le.company_phone_7))'' OR le.company_fein <> (typeof(le.company_fein))'' OR le.company_url <> (typeof(le.company_url))'' OR le.fname_preferred <> (typeof(le.fname_preferred))'' AND le.lname <> (typeof(le.lname))'' OR le.contact_ssn <> (typeof(le.contact_ssn))'' OR le.contact_email <> (typeof(le.contact_email))'' OR le.company_sic_code1 <> (typeof(le.company_sic_code1))'' AND EXISTS(le.zip_cases) OR le.source_record_id <> (typeof(le.source_record_id))'' AND le.source <> (typeof(le.source))'' OR le.contact_did <> (typeof(le.contact_did))'';
+EXPORT HardKeyMatch(InputLayout le) := le.cnp_name <> (TYPEOF(le.cnp_name))'' AND Fields.InValid_cnp_name((SALT37.StrType)le.cnp_name)=0 AND EXISTS(le.zip_cases) OR le.cnp_name <> (TYPEOF(le.cnp_name))'' AND Fields.InValid_cnp_name((SALT37.StrType)le.cnp_name)=0 AND le.st <> (TYPEOF(le.st))'' AND Fields.InValid_st((SALT37.StrType)le.st)=0 OR le.cnp_name <> (TYPEOF(le.cnp_name))'' AND Fields.InValid_cnp_name((SALT37.StrType)le.cnp_name)=0 OR le.company_name_prefix <> (TYPEOF(le.company_name_prefix))'' AND Fields.InValid_company_name_prefix((SALT37.StrType)le.company_name_prefix)=0 OR le.prim_name <> (TYPEOF(le.prim_name))'' AND Fields.InValid_prim_name((SALT37.StrType)le.prim_name)=0 AND le.city <> (TYPEOF(le.city))'' AND Fields.InValid_city((SALT37.StrType)le.city)=0 AND le.st <> (TYPEOF(le.st))'' AND Fields.InValid_st((SALT37.StrType)le.st)=0 OR le.prim_name <> (TYPEOF(le.prim_name))'' AND Fields.InValid_prim_name((SALT37.StrType)le.prim_name)=0 AND EXISTS(le.zip_cases) OR le.prim_name <> (TYPEOF(le.prim_name))'' AND Fields.InValid_prim_name((SALT37.StrType)le.prim_name)=0 AND le.prim_range <> (TYPEOF(le.prim_range))'' AND Fields.InValid_prim_range((SALT37.StrType)le.prim_range)=0 AND EXISTS(le.zip_cases) OR le.company_phone_7 <> (TYPEOF(le.company_phone_7))'' AND Fields.InValid_company_phone_7((SALT37.StrType)le.company_phone_7)=0 OR le.company_fein <> (TYPEOF(le.company_fein))'' AND Fields.InValid_company_fein((SALT37.StrType)le.company_fein)=0 OR le.company_url <> (TYPEOF(le.company_url))'' AND Fields.InValid_company_url((SALT37.StrType)le.company_url)=0 OR le.fname_preferred <> (TYPEOF(le.fname_preferred))'' AND Fields.InValid_fname_preferred((SALT37.StrType)le.fname_preferred)=0 AND le.lname <> (TYPEOF(le.lname))'' AND Fields.InValid_lname((SALT37.StrType)le.lname)=0 OR le.contact_ssn <> (TYPEOF(le.contact_ssn))'' AND Fields.InValid_contact_ssn((SALT37.StrType)le.contact_ssn)=0 OR le.contact_email <> (TYPEOF(le.contact_email))'' AND Fields.InValid_contact_email((SALT37.StrType)le.contact_email)=0 OR le.company_sic_code1 <> (TYPEOF(le.company_sic_code1))'' AND Fields.InValid_company_sic_code1((SALT37.StrType)le.company_sic_code1)=0 AND EXISTS(le.zip_cases) OR le.source_record_id <> (TYPEOF(le.source_record_id))'' AND Fields.InValid_source_record_id((SALT37.StrType)le.source_record_id)=0 AND le.source <> (TYPEOF(le.source))'' AND Fields.InValid_source((SALT37.StrType)le.source)=0 OR le.contact_did <> (TYPEOF(le.contact_did))'' AND Fields.InValid_contact_did((SALT37.StrType)le.contact_did)=0;
 EXPORT LayoutScoredFetch := RECORD // Nulls required for linkpaths that do not have field
   h.proxid;
   INTEGER2 Weight; // Specificity attached to this match
   UNSIGNED2 Score := 0; // Chances of being correct as a percentage
-  SALT33.UIDType Reference := 0;//Presently for batch
+  SALT37.UIDType Reference := 0;//Presently for batch
   h.seleid; // Parent id - in case child does not resolve
   h.orgid; // Parent id - in case child does not resolve
   h.ultid; // Parent id - in case child does not resolve
   h.powid; // Uncle id - in case child does not resolve
-  SALT33.UIDType rcid := 0;
+  SALT37.UIDType rcid := 0;
   BOOLEAN ForceFailed := FALSE;
   TYPEOF(h.parent_proxid) parent_proxid := (TYPEOF(h.parent_proxid))'';
   INTEGER2 parent_proxidWeight := 0;
@@ -305,7 +281,7 @@ EXPORT LayoutScoredFetch := RECORD // Nulls required for linkpaths that do not h
   INTEGER1 company_name_prefix_match_code := 0;
   TYPEOF(h.cnp_name) cnp_name := (TYPEOF(h.cnp_name))'';
   INTEGER2 cnp_nameWeight := 0;
-  DATASET(SALT33.layout_gss_cases) cnp_name_GSS_cases := DATASET([],SALT33.layout_gss_cases);
+  DATASET(SALT37.layout_gss_cases) cnp_name_GSS_cases := DATASET([],SALT37.layout_gss_cases);
   INTEGER2 cnp_name_GSS_Weight := 0;
   INTEGER1 cnp_name_match_code := 0;
   TYPEOF(h.cnp_number) cnp_number := (TYPEOF(h.cnp_number))'';
@@ -361,7 +337,7 @@ EXPORT LayoutScoredFetch := RECORD // Nulls required for linkpaths that do not h
   INTEGER1 zip_match_code := 0;
   TYPEOF(h.company_url) company_url := (TYPEOF(h.company_url))'';
   INTEGER2 company_urlWeight := 0;
-  DATASET(SALT33.layout_gss_cases) company_url_GSS_cases := DATASET([],SALT33.layout_gss_cases);
+  DATASET(SALT37.layout_gss_cases) company_url_GSS_cases := DATASET([],SALT37.layout_gss_cases);
   INTEGER2 company_url_GSS_Weight := 0;
   INTEGER1 company_url_match_code := 0;
   TYPEOF(h.isContact) isContact := (TYPEOF(h.isContact))'';
@@ -406,31 +382,31 @@ EXPORT LayoutScoredFetch := RECORD // Nulls required for linkpaths that do not h
   TYPEOF(h.fallback_value) fallback_value := (TYPEOF(h.fallback_value))'';
   INTEGER2 fallback_valueWeight := 0;
   INTEGER1 fallback_value_match_code := 0;
-  SALT33.StrType CONTACTNAME := ''; // Concepts always a wordbag
+  SALT37.StrType CONTACTNAME := ''; // Concepts always a wordbag
   INTEGER2 CONTACTNAMEWeight := 0;
   INTEGER1 CONTACTNAME_match_code := 0;
-  SALT33.StrType STREETADDRESS := ''; // Concepts always a wordbag
+  SALT37.StrType STREETADDRESS := ''; // Concepts always a wordbag
   INTEGER2 STREETADDRESSWeight := 0;
   INTEGER1 STREETADDRESS_match_code := 0;
   UNSIGNED4 keys_used; // A bitmap of the keys used
   UNSIGNED4 keys_failed; // A bitmap of the keys that failed the fetch
 END;
  
-EXPORT LayoutScoredFetch update_forcefailed(LayoutScoredFetch le) := TRANSFORM
-  SELF.ForceFailed := (le.prim_rangeWeight < Config_BIP.prim_range_Force);
+EXPORT LayoutScoredFetch update_forcefailed(LayoutScoredFetch le, BOOLEAN disableForce = FALSE) := TRANSFORM
+  SELF.ForceFailed := IF(disableForce, FALSE, (le.prim_rangeWeight < Config_BIP.prim_range_Force));
   SELF := le;
 END;
  
-EXPORT isLeftWinner(INTEGER2 l_weight,INTEGER2 r_weight, INTEGER1 l_mc=SALT33.MatchCode.NoMatch, INTEGER1 r_mc=SALT33.MatchCode.NoMatch) :=
+EXPORT isLeftWinner(INTEGER2 l_weight,INTEGER2 r_weight, INTEGER1 l_mc=SALT37.MatchCode.NoMatch, INTEGER1 r_mc=SALT37.MatchCode.NoMatch) :=
   MAP(l_mc=r_mc => l_weight>=r_weight, // matchcodes the same; so irrelevant
-      l_mc=SALT33.MatchCode.ExactMatch => TRUE, // Left (only) is exact
-      r_mc=SALT33.MatchCode.ExactMatch => FALSE, // Right (only) is exact
+      l_mc=SALT37.MatchCode.ExactMatch => TRUE, // Left (only) is exact
+      r_mc=SALT37.MatchCode.ExactMatch => FALSE, // Right (only) is exact
       l_weight>=r_weight); // weight only
  
-EXPORT isWeightForcedDown(INTEGER2 l_weight,INTEGER2 r_weight, INTEGER1 l_mc=SALT33.MatchCode.NoMatch, INTEGER1 r_mc=SALT33.MatchCode.NoMatch) :=
+EXPORT isWeightForcedDown(INTEGER2 l_weight,INTEGER2 r_weight, INTEGER1 l_mc=SALT37.MatchCode.NoMatch, INTEGER1 r_mc=SALT37.MatchCode.NoMatch) :=
   IF((isLeftWinner(l_weight,r_weight,l_mc,r_mc) AND (l_weight < r_weight)) OR  (NOT isLeftWinner(l_weight,r_weight,l_mc,r_mc) AND (l_weight > r_weight)),true,false);
  
-EXPORT LayoutScoredFetch combine_scores(LayoutScoredFetch le,LayoutScoredFetch ri) := TRANSFORM
+EXPORT LayoutScoredFetch combine_scores(LayoutScoredFetch le,LayoutScoredFetch ri, BOOLEAN In_disableForce = FALSE) := TRANSFORM
   BOOLEAN parent_proxidWeightForcedDown := IF ( isWeightForcedDown(le.parent_proxidWeight,ri.parent_proxidWeight,le.parent_proxid_match_code,ri.parent_proxid_match_code),TRUE,FALSE );
   SELF.parent_proxidWeight := IF ( isLeftWinner(le.parent_proxidWeight,ri.parent_proxidWeight,le.parent_proxid_match_code,ri.parent_proxid_match_code ), le.parent_proxidWeight, ri.parent_proxidWeight );
   SELF.parent_proxid := IF ( isLeftWinner(le.parent_proxidWeight,ri.parent_proxidWeight,le.parent_proxid_match_code,ri.parent_proxid_match_code ), le.parent_proxid, ri.parent_proxid );
@@ -640,8 +616,9 @@ EXPORT LayoutScoredFetch combine_scores(LayoutScoredFetch le,LayoutScoredFetch r
   SELF.powid := IF ( le.powid=ri.powid, le.powid, 0 ); // Zero out if collapsing a parent
   SELF.keys_used := le.keys_used | ri.keys_used;
   SELF.keys_failed := le.keys_failed | ri.keys_failed;
-  SELF.ForceFailed := (SELF.prim_rangeWeight < Config_BIP.prim_range_Force)/*HACK03*/ OR SELF.cnp_nameWeight < 4;
-  SELF.Weight := MAX(0,SELF.parent_proxidWeight) + MAX(0,SELF.sele_proxidWeight) + MAX(0,SELF.org_proxidWeight) + MAX(0,SELF.ultimate_proxidWeight) + MAX(0,SELF.has_lgidWeight) + MAX(0,SELF.empidWeight) + MAX(0,SELF.sourceWeight) + MAX(0,SELF.source_record_idWeight) + MAX(0,SELF.source_docidWeight) + MAX(0,SELF.company_nameWeight) + MAX(0,SELF.company_name_prefixWeight) + MAX(0,SELF.cnp_nameWeight) + MAX(0,SELF.cnp_numberWeight) + MAX(0,SELF.cnp_btypeWeight) + MAX(0,SELF.cnp_lowvWeight) + MAX(0,SELF.company_phoneWeight) + MAX(0,SELF.company_phone_3Weight) + MAX(0,SELF.company_phone_3_exWeight) + MAX(0,SELF.company_phone_7Weight) + MAX(0,SELF.company_feinWeight) + MAX(0,SELF.company_sic_code1Weight) + MAX(0,SELF.active_duns_numberWeight) + MAX(0,SELF.cityWeight) + MAX(0,SELF.city_cleanWeight) + MAX(0,SELF.stWeight) + MAX(0,SELF.zipWeight) + MAX(0,SELF.company_urlWeight) + MAX(0,SELF.isContactWeight) + MAX(0,SELF.contact_didWeight) + MAX(0,SELF.titleWeight) + MAX(0,SELF.fname_preferredWeight) + MAX(0,SELF.name_suffixWeight) + MAX(0,SELF.contact_ssnWeight) + MAX(0,SELF.contact_emailWeight) + MAX(0,SELF.sele_flagWeight) + MAX(0,SELF.org_flagWeight) + MAX(0,SELF.ult_flagWeight) + MAX(0,SELF.fallback_valueWeight) + MAX(0,SELF.fnameWeight) + MAX(0,SELF.mnameWeight) + MAX(0,SELF.lnameWeight) + MAX(0,SELF.prim_rangeWeight) + MAX(0,SELF.prim_nameWeight) + MAX(0,SELF.sec_rangeWeight);
+  SELF.ForceFailed := IF(In_disableForce, FALSE, (SELF.prim_rangeWeight < Config_BIP.prim_range_Force))/*HACK03*/ OR SELF.cnp_nameWeight < 4;
+  INTEGER2 Weight := MAX(0,SELF.parent_proxidWeight) + MAX(0,SELF.sele_proxidWeight) + MAX(0,SELF.org_proxidWeight) + MAX(0,SELF.ultimate_proxidWeight) + MAX(0,SELF.has_lgidWeight) + MAX(0,SELF.empidWeight) + MAX(0,SELF.sourceWeight) + MAX(0,SELF.source_record_idWeight) + MAX(0,SELF.source_docidWeight) + MAX(0,SELF.company_nameWeight) + MAX(0,SELF.company_name_prefixWeight) + MAX(0,SELF.cnp_nameWeight) + MAX(0,SELF.cnp_numberWeight) + MAX(0,SELF.cnp_btypeWeight) + MAX(0,SELF.cnp_lowvWeight) + MAX(0,SELF.company_phoneWeight) + MAX(0,SELF.company_phone_3Weight) + MAX(0,SELF.company_phone_3_exWeight) + MAX(0,SELF.company_phone_7Weight) + MAX(0,SELF.company_feinWeight) + MAX(0,SELF.company_sic_code1Weight) + MAX(0,SELF.active_duns_numberWeight) + MAX(0,SELF.cityWeight) + MAX(0,SELF.city_cleanWeight) + MAX(0,SELF.stWeight) + MAX(0,SELF.zipWeight) + MAX(0,SELF.company_urlWeight) + MAX(0,SELF.isContactWeight) + MAX(0,SELF.contact_didWeight) + MAX(0,SELF.titleWeight) + MAX(0,SELF.fname_preferredWeight) + MAX(0,SELF.name_suffixWeight) + MAX(0,SELF.contact_ssnWeight) + MAX(0,SELF.contact_emailWeight) + MAX(0,SELF.sele_flagWeight) + MAX(0,SELF.org_flagWeight) + MAX(0,SELF.ult_flagWeight) + MAX(0,SELF.fallback_valueWeight) + MAX(0,SELF.fnameWeight) + MAX(0,SELF.mnameWeight) + MAX(0,SELF.lnameWeight) + MAX(0,SELF.prim_rangeWeight) + MAX(0,SELF.prim_nameWeight) + MAX(0,SELF.sec_rangeWeight);
+  SELF.Weight := IF(Weight>0,Weight,MAX(le.Weight,ri.Weight));
   SELF := le;
 END;
  
@@ -650,6 +627,7 @@ SHARED OutputLayout_Base := RECORD,MAXLENGTH(32000)
   BOOLEAN Ambiguous := FALSE; // has >= 20 dids within an order of magnitude of best
   BOOLEAN ShortList := FALSE; // has < 20 dids within an order of magnitude of best
   BOOLEAN Handful := FALSE; // has <6 IDs within two orders of magnitude of best
+  BOOLEAN IsTruncated := FALSE; // more results available than were returned
   BOOLEAN Resolved := FALSE; // certain with 3 nines of accuracy
   BOOLEAN Resolved_seleid := FALSE; // certain with 3 nines of accuracy
   BOOLEAN Resolved_orgid := FALSE; // certain with 3 nines of accuracy
@@ -666,7 +644,7 @@ EXPORT OutputLayout := RECORD(OutputLayout_Base),MAXLENGTH(32000)
   InputLayout;
 END;
 EXPORT OutputLayout_Batch := RECORD(OutputLayout_Base),MAXLENGTH(32006)
-  SALT33.UIDType Reference;
+  SALT37.UIDType Reference;
 END;
 EXPORT MAC_Add_ResolutionFlags() := MACRO
   SELF.Verified := EXISTS(SELF.results);
@@ -682,7 +660,7 @@ ENDMACRO;
 EXPORT ScoreSummary(DATASET(OutputLayout_Base) ds0) := FUNCTION
   ds := PROJECT(ds0(EXISTS(Results)),TRANSFORM(LayoutScoredFetch,SELF := LEFT.Results[1]));
   R := RECORD
-    SALT33.StrType Summary;
+    SALT37.StrType Summary;
   END;
   R tosummary(ds le) := TRANSFORM
     SELF.Summary := IF(le.parent_proxidWeight = 0,'','|'+IF(le.parent_proxidWeight < 0,'-','')+'parent_proxid')+IF(le.sele_proxidWeight = 0,'','|'+IF(le.sele_proxidWeight < 0,'-','')+'sele_proxid')+IF(le.org_proxidWeight = 0,'','|'+IF(le.org_proxidWeight < 0,'-','')+'org_proxid')+IF(le.ultimate_proxidWeight = 0,'','|'+IF(le.ultimate_proxidWeight < 0,'-','')+'ultimate_proxid')+IF(le.has_lgidWeight = 0,'','|'+IF(le.has_lgidWeight < 0,'-','')+'has_lgid')+IF(le.empidWeight = 0,'','|'+IF(le.empidWeight < 0,'-','')+'empid')+IF(le.sourceWeight = 0,'','|'+IF(le.sourceWeight < 0,'-','')+'source')+IF(le.source_record_idWeight = 0,'','|'+IF(le.source_record_idWeight < 0,'-','')+'source_record_id')+IF(le.source_docidWeight = 0,'','|'+IF(le.source_docidWeight < 0,'-','')+'source_docid')+IF(le.company_nameWeight = 0,'','|'+IF(le.company_nameWeight < 0,'-','')+'company_name')+IF(le.company_name_prefixWeight = 0,'','|'+IF(le.company_name_prefixWeight < 0,'-','')+'company_name_prefix')+IF(le.cnp_nameWeight = 0,'','|'+IF(le.cnp_nameWeight < 0,'-','')+'cnp_name')+IF(le.cnp_numberWeight = 0,'','|'+IF(le.cnp_numberWeight < 0,'-','')+'cnp_number')+IF(le.cnp_btypeWeight = 0,'','|'+IF(le.cnp_btypeWeight < 0,'-','')+'cnp_btype')+IF(le.cnp_lowvWeight = 0,'','|'+IF(le.cnp_lowvWeight < 0,'-','')+'cnp_lowv')+IF(le.company_phoneWeight = 0,'','|'+IF(le.company_phoneWeight < 0,'-','')+'company_phone')+IF(le.company_phone_3Weight = 0,'','|'+IF(le.company_phone_3Weight < 0,'-','')+'company_phone_3')+IF(le.company_phone_3_exWeight = 0,'','|'+IF(le.company_phone_3_exWeight < 0,'-','')+'company_phone_3_ex')+IF(le.company_phone_7Weight = 0,'','|'+IF(le.company_phone_7Weight < 0,'-','')+'company_phone_7')+IF(le.company_feinWeight = 0,'','|'+IF(le.company_feinWeight < 0,'-','')+'company_fein')+IF(le.company_sic_code1Weight = 0,'','|'+IF(le.company_sic_code1Weight < 0,'-','')+'company_sic_code1')+IF(le.active_duns_numberWeight = 0,'','|'+IF(le.active_duns_numberWeight < 0,'-','')+'active_duns_number')+IF(le.prim_rangeWeight = 0,'','|'+IF(le.prim_rangeWeight < 0,'-','')+'prim_range')+IF(le.prim_nameWeight = 0,'','|'+IF(le.prim_nameWeight < 0,'-','')+'prim_name')+IF(le.sec_rangeWeight = 0,'','|'+IF(le.sec_rangeWeight < 0,'-','')+'sec_range')+IF(le.cityWeight = 0,'','|'+IF(le.cityWeight < 0,'-','')+'city')+IF(le.city_cleanWeight = 0,'','|'+IF(le.city_cleanWeight < 0,'-','')+'city_clean')+IF(le.stWeight = 0,'','|'+IF(le.stWeight < 0,'-','')+'st')+IF(le.zipWeight = 0,'','|'+IF(le.zipWeight < 0,'-','')+'zip')+IF(le.company_urlWeight = 0,'','|'+IF(le.company_urlWeight < 0,'-','')+'company_url')+IF(le.isContactWeight = 0,'','|'+IF(le.isContactWeight < 0,'-','')+'isContact')+IF(le.contact_didWeight = 0,'','|'+IF(le.contact_didWeight < 0,'-','')+'contact_did')+IF(le.titleWeight = 0,'','|'+IF(le.titleWeight < 0,'-','')+'title')+IF(le.fnameWeight = 0,'','|'+IF(le.fnameWeight < 0,'-','')+'fname')+IF(le.fname_preferredWeight = 0,'','|'+IF(le.fname_preferredWeight < 0,'-','')+'fname_preferred')+IF(le.mnameWeight = 0,'','|'+IF(le.mnameWeight < 0,'-','')+'mname')+IF(le.lnameWeight = 0,'','|'+IF(le.lnameWeight < 0,'-','')+'lname')+IF(le.name_suffixWeight = 0,'','|'+IF(le.name_suffixWeight < 0,'-','')+'name_suffix')+IF(le.contact_ssnWeight = 0,'','|'+IF(le.contact_ssnWeight < 0,'-','')+'contact_ssn')+IF(le.contact_emailWeight = 0,'','|'+IF(le.contact_emailWeight < 0,'-','')+'contact_email')+IF(le.sele_flagWeight = 0,'','|'+IF(le.sele_flagWeight < 0,'-','')+'sele_flag')+IF(le.org_flagWeight = 0,'','|'+IF(le.org_flagWeight < 0,'-','')+'org_flag')+IF(le.ult_flagWeight = 0,'','|'+IF(le.ult_flagWeight < 0,'-','')+'ult_flag')+IF(le.fallback_valueWeight = 0,'','|'+IF(le.fallback_valueWeight < 0,'-','')+'fallback_value')+IF(le.CONTACTNAMEWeight = 0,'','|'+IF(le.CONTACTNAMEWeight < 0,'-','')+'CONTACTNAME')+IF(le.STREETADDRESSWeight = 0,'','|'+IF(le.STREETADDRESSWeight < 0,'-','')+'STREETADDRESS');
@@ -691,136 +669,135 @@ EXPORT ScoreSummary(DATASET(OutputLayout_Base) ds0) := FUNCTION
   RETURN SORT(TABLE(P,{Summary, Cnt := COUNT(GROUP)},Summary,FEW),-Cnt);
 END;
 EXPORT AdjustScoresForNonExactMatches(DATASET(LayoutScoredFetch) in_data) := FUNCTION
- 
 aggregateRec := RECORD
   in_data.reference;
-  parent_proxidWeight := MAX(GROUP,IF( in_data.parent_proxid_match_code=SALT33.MatchCode.ExactMatch, in_data.parent_proxidWeight,0 ));
-  sele_proxidWeight := MAX(GROUP,IF( in_data.sele_proxid_match_code=SALT33.MatchCode.ExactMatch, in_data.sele_proxidWeight,0 ));
-  org_proxidWeight := MAX(GROUP,IF( in_data.org_proxid_match_code=SALT33.MatchCode.ExactMatch, in_data.org_proxidWeight,0 ));
-  ultimate_proxidWeight := MAX(GROUP,IF( in_data.ultimate_proxid_match_code=SALT33.MatchCode.ExactMatch, in_data.ultimate_proxidWeight,0 ));
-  has_lgidWeight := MAX(GROUP,IF( in_data.has_lgid_match_code=SALT33.MatchCode.ExactMatch, in_data.has_lgidWeight,0 ));
-  empidWeight := MAX(GROUP,IF( in_data.empid_match_code=SALT33.MatchCode.ExactMatch, in_data.empidWeight,0 ));
-  sourceWeight := MAX(GROUP,IF( in_data.source_match_code=SALT33.MatchCode.ExactMatch, in_data.sourceWeight,0 ));
-  source_record_idWeight := MAX(GROUP,IF( in_data.source_record_id_match_code=SALT33.MatchCode.ExactMatch, in_data.source_record_idWeight,0 ));
-  source_docidWeight := MAX(GROUP,IF( in_data.source_docid_match_code=SALT33.MatchCode.ExactMatch, in_data.source_docidWeight,0 ));
-  company_nameWeight := MAX(GROUP,IF( in_data.company_name_match_code=SALT33.MatchCode.ExactMatch, in_data.company_nameWeight,0 ));
-  company_name_prefixWeight := MAX(GROUP,IF( in_data.company_name_prefix_match_code=SALT33.MatchCode.ExactMatch, in_data.company_name_prefixWeight,0 ));
-  cnp_nameWeight := MAX(GROUP,IF( in_data.cnp_name_match_code=SALT33.MatchCode.ExactMatch, in_data.cnp_nameWeight,0 ));
-  cnp_numberWeight := MAX(GROUP,IF( in_data.cnp_number_match_code=SALT33.MatchCode.ExactMatch, in_data.cnp_numberWeight,0 ));
-  cnp_btypeWeight := MAX(GROUP,IF( in_data.cnp_btype_match_code=SALT33.MatchCode.ExactMatch, in_data.cnp_btypeWeight,0 ));
-  cnp_lowvWeight := MAX(GROUP,IF( in_data.cnp_lowv_match_code=SALT33.MatchCode.ExactMatch, in_data.cnp_lowvWeight,0 ));
-  company_phoneWeight := MAX(GROUP,IF( in_data.company_phone_match_code=SALT33.MatchCode.ExactMatch, in_data.company_phoneWeight,0 ));
-  company_phone_3Weight := MAX(GROUP,IF( in_data.company_phone_3_match_code=SALT33.MatchCode.ExactMatch, in_data.company_phone_3Weight,0 ));
-  company_phone_3_exWeight := MAX(GROUP,IF( in_data.company_phone_3_ex_match_code=SALT33.MatchCode.ExactMatch, in_data.company_phone_3_exWeight,0 ));
-  company_phone_7Weight := MAX(GROUP,IF( in_data.company_phone_7_match_code=SALT33.MatchCode.ExactMatch, in_data.company_phone_7Weight,0 ));
-  company_feinWeight := MAX(GROUP,IF( in_data.company_fein_match_code=SALT33.MatchCode.ExactMatch, in_data.company_feinWeight,0 ));
-  company_sic_code1Weight := MAX(GROUP,IF( in_data.company_sic_code1_match_code=SALT33.MatchCode.ExactMatch, in_data.company_sic_code1Weight,0 ));
-  active_duns_numberWeight := MAX(GROUP,IF( in_data.active_duns_number_match_code=SALT33.MatchCode.ExactMatch, in_data.active_duns_numberWeight,0 ));
-  prim_rangeWeight := MAX(GROUP,IF( in_data.prim_range_match_code=SALT33.MatchCode.ExactMatch, in_data.prim_rangeWeight,0 ));
-  prim_nameWeight := MAX(GROUP,IF( in_data.prim_name_match_code=SALT33.MatchCode.ExactMatch, in_data.prim_nameWeight,0 ));
-  sec_rangeWeight := MAX(GROUP,IF( in_data.sec_range_match_code=SALT33.MatchCode.ExactMatch, in_data.sec_rangeWeight,0 ));
-  cityWeight := MAX(GROUP,IF( in_data.city_match_code=SALT33.MatchCode.ExactMatch, in_data.cityWeight,0 ));
-  city_cleanWeight := MAX(GROUP,IF( in_data.city_clean_match_code=SALT33.MatchCode.ExactMatch, in_data.city_cleanWeight,0 ));
-  stWeight := MAX(GROUP,IF( in_data.st_match_code=SALT33.MatchCode.ExactMatch, in_data.stWeight,0 ));
-  zipWeight := MAX(GROUP,IF( in_data.zip_match_code=SALT33.MatchCode.ExactMatch, in_data.zipWeight,0 ));
-  company_urlWeight := MAX(GROUP,IF( in_data.company_url_match_code=SALT33.MatchCode.ExactMatch, in_data.company_urlWeight,0 ));
-  isContactWeight := MAX(GROUP,IF( in_data.isContact_match_code=SALT33.MatchCode.ExactMatch, in_data.isContactWeight,0 ));
-  contact_didWeight := MAX(GROUP,IF( in_data.contact_did_match_code=SALT33.MatchCode.ExactMatch, in_data.contact_didWeight,0 ));
-  titleWeight := MAX(GROUP,IF( in_data.title_match_code=SALT33.MatchCode.ExactMatch, in_data.titleWeight,0 ));
-  fnameWeight := MAX(GROUP,IF( in_data.fname_match_code=SALT33.MatchCode.ExactMatch, in_data.fnameWeight,0 ));
-  fname_preferredWeight := MAX(GROUP,IF( in_data.fname_preferred_match_code=SALT33.MatchCode.ExactMatch, in_data.fname_preferredWeight,0 ));
-  mnameWeight := MAX(GROUP,IF( in_data.mname_match_code=SALT33.MatchCode.ExactMatch, in_data.mnameWeight,0 ));
-  lnameWeight := MAX(GROUP,IF( in_data.lname_match_code=SALT33.MatchCode.ExactMatch, in_data.lnameWeight,0 ));
-  name_suffixWeight := MAX(GROUP,IF( in_data.name_suffix_match_code=SALT33.MatchCode.ExactMatch, in_data.name_suffixWeight,0 ));
-  contact_ssnWeight := MAX(GROUP,IF( in_data.contact_ssn_match_code=SALT33.MatchCode.ExactMatch, in_data.contact_ssnWeight,0 ));
-  contact_emailWeight := MAX(GROUP,IF( in_data.contact_email_match_code=SALT33.MatchCode.ExactMatch, in_data.contact_emailWeight,0 ));
-  sele_flagWeight := MAX(GROUP,IF( in_data.sele_flag_match_code=SALT33.MatchCode.ExactMatch, in_data.sele_flagWeight,0 ));
-  org_flagWeight := MAX(GROUP,IF( in_data.org_flag_match_code=SALT33.MatchCode.ExactMatch, in_data.org_flagWeight,0 ));
-  ult_flagWeight := MAX(GROUP,IF( in_data.ult_flag_match_code=SALT33.MatchCode.ExactMatch, in_data.ult_flagWeight,0 ));
-  fallback_valueWeight := MAX(GROUP,IF( in_data.fallback_value_match_code=SALT33.MatchCode.ExactMatch, in_data.fallback_valueWeight,0 ));
-  CONTACTNAMEWeight := MAX(GROUP,IF( in_data.CONTACTNAME_match_code=SALT33.MatchCode.ExactMatch, in_data.CONTACTNAMEWeight,0 ));
-  STREETADDRESSWeight := MAX(GROUP,IF( in_data.STREETADDRESS_match_code=SALT33.MatchCode.ExactMatch, in_data.STREETADDRESSWeight,0 ));
+  parent_proxidWeight := MAX(GROUP,IF( in_data.parent_proxid_match_code=SALT37.MatchCode.ExactMatch, in_data.parent_proxidWeight,0 ));
+  sele_proxidWeight := MAX(GROUP,IF( in_data.sele_proxid_match_code=SALT37.MatchCode.ExactMatch, in_data.sele_proxidWeight,0 ));
+  org_proxidWeight := MAX(GROUP,IF( in_data.org_proxid_match_code=SALT37.MatchCode.ExactMatch, in_data.org_proxidWeight,0 ));
+  ultimate_proxidWeight := MAX(GROUP,IF( in_data.ultimate_proxid_match_code=SALT37.MatchCode.ExactMatch, in_data.ultimate_proxidWeight,0 ));
+  has_lgidWeight := MAX(GROUP,IF( in_data.has_lgid_match_code=SALT37.MatchCode.ExactMatch, in_data.has_lgidWeight,0 ));
+  empidWeight := MAX(GROUP,IF( in_data.empid_match_code=SALT37.MatchCode.ExactMatch, in_data.empidWeight,0 ));
+  sourceWeight := MAX(GROUP,IF( in_data.source_match_code=SALT37.MatchCode.ExactMatch, in_data.sourceWeight,0 ));
+  source_record_idWeight := MAX(GROUP,IF( in_data.source_record_id_match_code=SALT37.MatchCode.ExactMatch, in_data.source_record_idWeight,0 ));
+  source_docidWeight := MAX(GROUP,IF( in_data.source_docid_match_code=SALT37.MatchCode.ExactMatch, in_data.source_docidWeight,0 ));
+  company_nameWeight := MAX(GROUP,IF( in_data.company_name_match_code=SALT37.MatchCode.ExactMatch, in_data.company_nameWeight,0 ));
+  company_name_prefixWeight := MAX(GROUP,IF( in_data.company_name_prefix_match_code=SALT37.MatchCode.ExactMatch, in_data.company_name_prefixWeight,0 ));
+  cnp_nameWeight := MAX(GROUP,IF( in_data.cnp_name_match_code=SALT37.MatchCode.ExactMatch, in_data.cnp_nameWeight,0 ));
+  cnp_numberWeight := MAX(GROUP,IF( in_data.cnp_number_match_code=SALT37.MatchCode.ExactMatch, in_data.cnp_numberWeight,0 ));
+  cnp_btypeWeight := MAX(GROUP,IF( in_data.cnp_btype_match_code=SALT37.MatchCode.ExactMatch, in_data.cnp_btypeWeight,0 ));
+  cnp_lowvWeight := MAX(GROUP,IF( in_data.cnp_lowv_match_code=SALT37.MatchCode.ExactMatch, in_data.cnp_lowvWeight,0 ));
+  company_phoneWeight := MAX(GROUP,IF( in_data.company_phone_match_code=SALT37.MatchCode.ExactMatch, in_data.company_phoneWeight,0 ));
+  company_phone_3Weight := MAX(GROUP,IF( in_data.company_phone_3_match_code=SALT37.MatchCode.ExactMatch, in_data.company_phone_3Weight,0 ));
+  company_phone_3_exWeight := MAX(GROUP,IF( in_data.company_phone_3_ex_match_code=SALT37.MatchCode.ExactMatch, in_data.company_phone_3_exWeight,0 ));
+  company_phone_7Weight := MAX(GROUP,IF( in_data.company_phone_7_match_code=SALT37.MatchCode.ExactMatch, in_data.company_phone_7Weight,0 ));
+  company_feinWeight := MAX(GROUP,IF( in_data.company_fein_match_code=SALT37.MatchCode.ExactMatch, in_data.company_feinWeight,0 ));
+  company_sic_code1Weight := MAX(GROUP,IF( in_data.company_sic_code1_match_code=SALT37.MatchCode.ExactMatch, in_data.company_sic_code1Weight,0 ));
+  active_duns_numberWeight := MAX(GROUP,IF( in_data.active_duns_number_match_code=SALT37.MatchCode.ExactMatch, in_data.active_duns_numberWeight,0 ));
+  prim_rangeWeight := MAX(GROUP,IF( in_data.prim_range_match_code=SALT37.MatchCode.ExactMatch, in_data.prim_rangeWeight,0 ));
+  prim_nameWeight := MAX(GROUP,IF( in_data.prim_name_match_code=SALT37.MatchCode.ExactMatch, in_data.prim_nameWeight,0 ));
+  sec_rangeWeight := MAX(GROUP,IF( in_data.sec_range_match_code=SALT37.MatchCode.ExactMatch, in_data.sec_rangeWeight,0 ));
+  cityWeight := MAX(GROUP,IF( in_data.city_match_code=SALT37.MatchCode.ExactMatch, in_data.cityWeight,0 ));
+  city_cleanWeight := MAX(GROUP,IF( in_data.city_clean_match_code=SALT37.MatchCode.ExactMatch, in_data.city_cleanWeight,0 ));
+  stWeight := MAX(GROUP,IF( in_data.st_match_code=SALT37.MatchCode.ExactMatch, in_data.stWeight,0 ));
+  zipWeight := MAX(GROUP,IF( in_data.zip_match_code=SALT37.MatchCode.ExactMatch, in_data.zipWeight,0 ));
+  company_urlWeight := MAX(GROUP,IF( in_data.company_url_match_code=SALT37.MatchCode.ExactMatch, in_data.company_urlWeight,0 ));
+  isContactWeight := MAX(GROUP,IF( in_data.isContact_match_code=SALT37.MatchCode.ExactMatch, in_data.isContactWeight,0 ));
+  contact_didWeight := MAX(GROUP,IF( in_data.contact_did_match_code=SALT37.MatchCode.ExactMatch, in_data.contact_didWeight,0 ));
+  titleWeight := MAX(GROUP,IF( in_data.title_match_code=SALT37.MatchCode.ExactMatch, in_data.titleWeight,0 ));
+  fnameWeight := MAX(GROUP,IF( in_data.fname_match_code=SALT37.MatchCode.ExactMatch, in_data.fnameWeight,0 ));
+  fname_preferredWeight := MAX(GROUP,IF( in_data.fname_preferred_match_code=SALT37.MatchCode.ExactMatch, in_data.fname_preferredWeight,0 ));
+  mnameWeight := MAX(GROUP,IF( in_data.mname_match_code=SALT37.MatchCode.ExactMatch, in_data.mnameWeight,0 ));
+  lnameWeight := MAX(GROUP,IF( in_data.lname_match_code=SALT37.MatchCode.ExactMatch, in_data.lnameWeight,0 ));
+  name_suffixWeight := MAX(GROUP,IF( in_data.name_suffix_match_code=SALT37.MatchCode.ExactMatch, in_data.name_suffixWeight,0 ));
+  contact_ssnWeight := MAX(GROUP,IF( in_data.contact_ssn_match_code=SALT37.MatchCode.ExactMatch, in_data.contact_ssnWeight,0 ));
+  contact_emailWeight := MAX(GROUP,IF( in_data.contact_email_match_code=SALT37.MatchCode.ExactMatch, in_data.contact_emailWeight,0 ));
+  sele_flagWeight := MAX(GROUP,IF( in_data.sele_flag_match_code=SALT37.MatchCode.ExactMatch, in_data.sele_flagWeight,0 ));
+  org_flagWeight := MAX(GROUP,IF( in_data.org_flag_match_code=SALT37.MatchCode.ExactMatch, in_data.org_flagWeight,0 ));
+  ult_flagWeight := MAX(GROUP,IF( in_data.ult_flag_match_code=SALT37.MatchCode.ExactMatch, in_data.ult_flagWeight,0 ));
+  fallback_valueWeight := MAX(GROUP,IF( in_data.fallback_value_match_code=SALT37.MatchCode.ExactMatch, in_data.fallback_valueWeight,0 ));
+  CONTACTNAMEWeight := MAX(GROUP,IF( in_data.CONTACTNAME_match_code=SALT37.MatchCode.ExactMatch, in_data.CONTACTNAMEWeight,0 ));
+  STREETADDRESSWeight := MAX(GROUP,IF( in_data.STREETADDRESS_match_code=SALT37.MatchCode.ExactMatch, in_data.STREETADDRESSWeight,0 ));
 END;
   R1 := TABLE(in_data,aggregateRec,Reference);
  
 LayoutScoredFetch FixScores(LayoutScoredFetch le, aggregateRec ri) := TRANSFORM
-  SELF.parent_proxidWeight := MAP( ri.parent_proxidWeight=0 OR le.parent_proxid_match_code=SALT33.MatchCode.ExactMatch => le.parent_proxidWeight,MIN(le.parent_proxidWeight,ri.parent_proxidWeight-1) );
-  SELF.sele_proxidWeight := MAP( ri.sele_proxidWeight=0 OR le.sele_proxid_match_code=SALT33.MatchCode.ExactMatch => le.sele_proxidWeight,MIN(le.sele_proxidWeight,ri.sele_proxidWeight-1) );
-  SELF.org_proxidWeight := MAP( ri.org_proxidWeight=0 OR le.org_proxid_match_code=SALT33.MatchCode.ExactMatch => le.org_proxidWeight,MIN(le.org_proxidWeight,ri.org_proxidWeight-1) );
-  SELF.ultimate_proxidWeight := MAP( ri.ultimate_proxidWeight=0 OR le.ultimate_proxid_match_code=SALT33.MatchCode.ExactMatch => le.ultimate_proxidWeight,MIN(le.ultimate_proxidWeight,ri.ultimate_proxidWeight-1) );
-  SELF.has_lgidWeight := MAP( ri.has_lgidWeight=0 OR le.has_lgid_match_code=SALT33.MatchCode.ExactMatch => le.has_lgidWeight,MIN(le.has_lgidWeight,ri.has_lgidWeight-1) );
-  SELF.empidWeight := MAP( ri.empidWeight=0 OR le.empid_match_code=SALT33.MatchCode.ExactMatch => le.empidWeight,MIN(le.empidWeight,ri.empidWeight-1) );
-  SELF.sourceWeight := MAP( ri.sourceWeight=0 OR le.source_match_code=SALT33.MatchCode.ExactMatch => le.sourceWeight,MIN(le.sourceWeight,ri.sourceWeight-1) );
-  SELF.source_record_idWeight := MAP( ri.source_record_idWeight=0 OR le.source_record_id_match_code=SALT33.MatchCode.ExactMatch => le.source_record_idWeight,MIN(le.source_record_idWeight,ri.source_record_idWeight-1) );
-  SELF.source_docidWeight := MAP( ri.source_docidWeight=0 OR le.source_docid_match_code=SALT33.MatchCode.ExactMatch => le.source_docidWeight,MIN(le.source_docidWeight,ri.source_docidWeight-1) );
-  SELF.company_nameWeight := MAP( ri.company_nameWeight=0 OR le.company_name_match_code=SALT33.MatchCode.ExactMatch => le.company_nameWeight,MIN(le.company_nameWeight,ri.company_nameWeight-1) );
-  SELF.company_name_prefixWeight := MAP( ri.company_name_prefixWeight=0 OR le.company_name_prefix_match_code=SALT33.MatchCode.ExactMatch => le.company_name_prefixWeight,MIN(le.company_name_prefixWeight,ri.company_name_prefixWeight-1) );
-  SELF.cnp_nameWeight := MAP( ri.cnp_nameWeight=0 OR le.cnp_name_match_code=SALT33.MatchCode.ExactMatch => le.cnp_nameWeight,MIN(le.cnp_nameWeight,ri.cnp_nameWeight-1) );
-  SELF.cnp_numberWeight := MAP( ri.cnp_numberWeight=0 OR le.cnp_number_match_code=SALT33.MatchCode.ExactMatch => le.cnp_numberWeight,MIN(le.cnp_numberWeight,ri.cnp_numberWeight-1) );
-  SELF.cnp_btypeWeight := MAP( ri.cnp_btypeWeight=0 OR le.cnp_btype_match_code=SALT33.MatchCode.ExactMatch => le.cnp_btypeWeight,MIN(le.cnp_btypeWeight,ri.cnp_btypeWeight-1) );
-  SELF.cnp_lowvWeight := MAP( ri.cnp_lowvWeight=0 OR le.cnp_lowv_match_code=SALT33.MatchCode.ExactMatch => le.cnp_lowvWeight,MIN(le.cnp_lowvWeight,ri.cnp_lowvWeight-1) );
-  SELF.company_phoneWeight := MAP( ri.company_phoneWeight=0 OR le.company_phone_match_code=SALT33.MatchCode.ExactMatch => le.company_phoneWeight,MIN(le.company_phoneWeight,ri.company_phoneWeight-1) );
-  SELF.company_phone_3Weight := MAP( ri.company_phone_3Weight=0 OR le.company_phone_3_match_code=SALT33.MatchCode.ExactMatch => le.company_phone_3Weight,MIN(le.company_phone_3Weight,ri.company_phone_3Weight-1) );
-  SELF.company_phone_3_exWeight := MAP( ri.company_phone_3_exWeight=0 OR le.company_phone_3_ex_match_code=SALT33.MatchCode.ExactMatch => le.company_phone_3_exWeight,MIN(le.company_phone_3_exWeight,ri.company_phone_3_exWeight-1) );
-  SELF.company_phone_7Weight := MAP( ri.company_phone_7Weight=0 OR le.company_phone_7_match_code=SALT33.MatchCode.ExactMatch => le.company_phone_7Weight,MIN(le.company_phone_7Weight,ri.company_phone_7Weight-1) );
-  SELF.company_feinWeight := MAP( ri.company_feinWeight=0 OR le.company_fein_match_code=SALT33.MatchCode.ExactMatch => le.company_feinWeight,MIN(le.company_feinWeight,ri.company_feinWeight-1) );
-  SELF.company_sic_code1Weight := MAP( ri.company_sic_code1Weight=0 OR le.company_sic_code1_match_code=SALT33.MatchCode.ExactMatch => le.company_sic_code1Weight,MIN(le.company_sic_code1Weight,ri.company_sic_code1Weight-1) );
-  SELF.active_duns_numberWeight := MAP( ri.active_duns_numberWeight=0 OR le.active_duns_number_match_code=SALT33.MatchCode.ExactMatch => le.active_duns_numberWeight,MIN(le.active_duns_numberWeight,ri.active_duns_numberWeight-1) );
-  SELF.prim_rangeWeight := MAP( ri.prim_rangeWeight=0 OR le.prim_range_match_code=SALT33.MatchCode.ExactMatch => le.prim_rangeWeight,MIN(le.prim_rangeWeight,ri.prim_rangeWeight-1) );
-  SELF.prim_nameWeight := MAP( ri.prim_nameWeight=0 OR le.prim_name_match_code=SALT33.MatchCode.ExactMatch => le.prim_nameWeight,MIN(le.prim_nameWeight,ri.prim_nameWeight-1) );
-  SELF.sec_rangeWeight := MAP( ri.sec_rangeWeight=0 OR le.sec_range_match_code=SALT33.MatchCode.ExactMatch => le.sec_rangeWeight,MIN(le.sec_rangeWeight,ri.sec_rangeWeight-1) );
-  SELF.cityWeight := MAP( ri.cityWeight=0 OR le.city_match_code=SALT33.MatchCode.ExactMatch => le.cityWeight,MIN(le.cityWeight,ri.cityWeight-1) );
-  SELF.city_cleanWeight := MAP( ri.city_cleanWeight=0 OR le.city_clean_match_code=SALT33.MatchCode.ExactMatch => le.city_cleanWeight,MIN(le.city_cleanWeight,ri.city_cleanWeight-1) );
-  SELF.stWeight := MAP( ri.stWeight=0 OR le.st_match_code=SALT33.MatchCode.ExactMatch => le.stWeight,MIN(le.stWeight,ri.stWeight-1) );
-  SELF.zipWeight := MAP( ri.zipWeight=0 OR le.zip_match_code=SALT33.MatchCode.ExactMatch => le.zipWeight,MIN(le.zipWeight,ri.zipWeight-1) );
-  SELF.company_urlWeight := MAP( ri.company_urlWeight=0 OR le.company_url_match_code=SALT33.MatchCode.ExactMatch => le.company_urlWeight,MIN(le.company_urlWeight,ri.company_urlWeight-1) );
-  SELF.isContactWeight := MAP( ri.isContactWeight=0 OR le.isContact_match_code=SALT33.MatchCode.ExactMatch => le.isContactWeight,MIN(le.isContactWeight,ri.isContactWeight-1) );
-  SELF.contact_didWeight := MAP( ri.contact_didWeight=0 OR le.contact_did_match_code=SALT33.MatchCode.ExactMatch => le.contact_didWeight,MIN(le.contact_didWeight,ri.contact_didWeight-1) );
-  SELF.titleWeight := MAP( ri.titleWeight=0 OR le.title_match_code=SALT33.MatchCode.ExactMatch => le.titleWeight,MIN(le.titleWeight,ri.titleWeight-1) );
-  SELF.fnameWeight := MAP( ri.fnameWeight=0 OR le.fname_match_code=SALT33.MatchCode.ExactMatch => le.fnameWeight,MIN(le.fnameWeight,ri.fnameWeight-1) );
-  SELF.fname_preferredWeight := MAP( ri.fname_preferredWeight=0 OR le.fname_preferred_match_code=SALT33.MatchCode.ExactMatch => le.fname_preferredWeight,MIN(le.fname_preferredWeight,ri.fname_preferredWeight-1) );
-  SELF.mnameWeight := MAP( ri.mnameWeight=0 OR le.mname_match_code=SALT33.MatchCode.ExactMatch => le.mnameWeight,MIN(le.mnameWeight,ri.mnameWeight-1) );
-  SELF.lnameWeight := MAP( ri.lnameWeight=0 OR le.lname_match_code=SALT33.MatchCode.ExactMatch => le.lnameWeight,MIN(le.lnameWeight,ri.lnameWeight-1) );
-  SELF.name_suffixWeight := MAP( ri.name_suffixWeight=0 OR le.name_suffix_match_code=SALT33.MatchCode.ExactMatch => le.name_suffixWeight,MIN(le.name_suffixWeight,ri.name_suffixWeight-1) );
-  SELF.contact_ssnWeight := MAP( ri.contact_ssnWeight=0 OR le.contact_ssn_match_code=SALT33.MatchCode.ExactMatch => le.contact_ssnWeight,MIN(le.contact_ssnWeight,ri.contact_ssnWeight-1) );
-  SELF.contact_emailWeight := MAP( ri.contact_emailWeight=0 OR le.contact_email_match_code=SALT33.MatchCode.ExactMatch => le.contact_emailWeight,MIN(le.contact_emailWeight,ri.contact_emailWeight-1) );
-  SELF.sele_flagWeight := MAP( ri.sele_flagWeight=0 OR le.sele_flag_match_code=SALT33.MatchCode.ExactMatch => le.sele_flagWeight,MIN(le.sele_flagWeight,ri.sele_flagWeight-1) );
-  SELF.org_flagWeight := MAP( ri.org_flagWeight=0 OR le.org_flag_match_code=SALT33.MatchCode.ExactMatch => le.org_flagWeight,MIN(le.org_flagWeight,ri.org_flagWeight-1) );
-  SELF.ult_flagWeight := MAP( ri.ult_flagWeight=0 OR le.ult_flag_match_code=SALT33.MatchCode.ExactMatch => le.ult_flagWeight,MIN(le.ult_flagWeight,ri.ult_flagWeight-1) );
-  SELF.fallback_valueWeight := MAP( ri.fallback_valueWeight=0 OR le.fallback_value_match_code=SALT33.MatchCode.ExactMatch => le.fallback_valueWeight,MIN(le.fallback_valueWeight,ri.fallback_valueWeight-1) );
-  SELF.CONTACTNAMEWeight := MAP( ri.CONTACTNAMEWeight=0 OR le.CONTACTNAME_match_code=SALT33.MatchCode.ExactMatch => le.CONTACTNAMEWeight,MIN(le.CONTACTNAMEWeight,ri.CONTACTNAMEWeight-1) );
-  SELF.STREETADDRESSWeight := MAP( ri.STREETADDRESSWeight=0 OR le.STREETADDRESS_match_code=SALT33.MatchCode.ExactMatch => le.STREETADDRESSWeight,MIN(le.STREETADDRESSWeight,ri.STREETADDRESSWeight-1) );
-  SELF.Weight := MAX(0,SELF.parent_proxidWeight) + MAX(0,SELF.sele_proxidWeight) + MAX(0,SELF.org_proxidWeight) + MAX(0,SELF.ultimate_proxidWeight) + MAX(0,SELF.has_lgidWeight) + MAX(0,SELF.empidWeight) + MAX(0,SELF.sourceWeight) + MAX(0,SELF.source_record_idWeight) + MAX(0,SELF.source_docidWeight) + MAX(0,SELF.company_nameWeight) + MAX(0,SELF.company_name_prefixWeight) + MAX(0,SELF.cnp_nameWeight) + MAX(0,SELF.cnp_numberWeight) + MAX(0,SELF.cnp_btypeWeight) + MAX(0,SELF.cnp_lowvWeight) + MAX(0,SELF.company_phoneWeight) + MAX(0,SELF.company_phone_3Weight) + MAX(0,SELF.company_phone_3_exWeight) + MAX(0,SELF.company_phone_7Weight) + MAX(0,SELF.company_feinWeight) + MAX(0,SELF.company_sic_code1Weight) + MAX(0,SELF.active_duns_numberWeight) + MAX(0,SELF.cityWeight) + MAX(0,SELF.city_cleanWeight) + MAX(0,SELF.stWeight) + MAX(0,SELF.zipWeight) + MAX(0,SELF.company_urlWeight) + MAX(0,SELF.isContactWeight) + MAX(0,SELF.contact_didWeight) + MAX(0,SELF.titleWeight) + MAX(0,SELF.fname_preferredWeight) + MAX(0,SELF.name_suffixWeight) + MAX(0,SELF.contact_ssnWeight) + MAX(0,SELF.contact_emailWeight) + MAX(0,SELF.sele_flagWeight) + MAX(0,SELF.org_flagWeight) + MAX(0,SELF.ult_flagWeight) + MAX(0,SELF.fallback_valueWeight) + MAX(0,SELF.fnameWeight) + MAX(0,SELF.mnameWeight) + MAX(0,SELF.lnameWeight) + MAX(0,SELF.prim_rangeWeight) + MAX(0,SELF.prim_nameWeight) + MAX(0,SELF.sec_rangeWeight);
+  SELF.parent_proxidWeight := MAP( ri.parent_proxidWeight=0 OR le.parent_proxid_match_code=SALT37.MatchCode.ExactMatch => le.parent_proxidWeight,MIN(le.parent_proxidWeight,ri.parent_proxidWeight-1) );
+  SELF.sele_proxidWeight := MAP( ri.sele_proxidWeight=0 OR le.sele_proxid_match_code=SALT37.MatchCode.ExactMatch => le.sele_proxidWeight,MIN(le.sele_proxidWeight,ri.sele_proxidWeight-1) );
+  SELF.org_proxidWeight := MAP( ri.org_proxidWeight=0 OR le.org_proxid_match_code=SALT37.MatchCode.ExactMatch => le.org_proxidWeight,MIN(le.org_proxidWeight,ri.org_proxidWeight-1) );
+  SELF.ultimate_proxidWeight := MAP( ri.ultimate_proxidWeight=0 OR le.ultimate_proxid_match_code=SALT37.MatchCode.ExactMatch => le.ultimate_proxidWeight,MIN(le.ultimate_proxidWeight,ri.ultimate_proxidWeight-1) );
+  SELF.has_lgidWeight := MAP( ri.has_lgidWeight=0 OR le.has_lgid_match_code=SALT37.MatchCode.ExactMatch => le.has_lgidWeight,MIN(le.has_lgidWeight,ri.has_lgidWeight-1) );
+  SELF.empidWeight := MAP( ri.empidWeight=0 OR le.empid_match_code=SALT37.MatchCode.ExactMatch => le.empidWeight,MIN(le.empidWeight,ri.empidWeight-1) );
+  SELF.sourceWeight := MAP( ri.sourceWeight=0 OR le.source_match_code=SALT37.MatchCode.ExactMatch => le.sourceWeight,MIN(le.sourceWeight,ri.sourceWeight-1) );
+  SELF.source_record_idWeight := MAP( ri.source_record_idWeight=0 OR le.source_record_id_match_code=SALT37.MatchCode.ExactMatch => le.source_record_idWeight,MIN(le.source_record_idWeight,ri.source_record_idWeight-1) );
+  SELF.source_docidWeight := MAP( ri.source_docidWeight=0 OR le.source_docid_match_code=SALT37.MatchCode.ExactMatch => le.source_docidWeight,MIN(le.source_docidWeight,ri.source_docidWeight-1) );
+  SELF.company_nameWeight := MAP( ri.company_nameWeight=0 OR le.company_name_match_code=SALT37.MatchCode.ExactMatch => le.company_nameWeight,MIN(le.company_nameWeight,ri.company_nameWeight-1) );
+  SELF.company_name_prefixWeight := MAP( ri.company_name_prefixWeight=0 OR le.company_name_prefix_match_code=SALT37.MatchCode.ExactMatch => le.company_name_prefixWeight,MIN(le.company_name_prefixWeight,ri.company_name_prefixWeight-1) );
+  SELF.cnp_nameWeight := MAP( ri.cnp_nameWeight=0 OR le.cnp_name_match_code=SALT37.MatchCode.ExactMatch => le.cnp_nameWeight,MIN(le.cnp_nameWeight,ri.cnp_nameWeight-1) );
+  SELF.cnp_numberWeight := MAP( ri.cnp_numberWeight=0 OR le.cnp_number_match_code=SALT37.MatchCode.ExactMatch => le.cnp_numberWeight,MIN(le.cnp_numberWeight,ri.cnp_numberWeight-1) );
+  SELF.cnp_btypeWeight := MAP( ri.cnp_btypeWeight=0 OR le.cnp_btype_match_code=SALT37.MatchCode.ExactMatch => le.cnp_btypeWeight,MIN(le.cnp_btypeWeight,ri.cnp_btypeWeight-1) );
+  SELF.cnp_lowvWeight := MAP( ri.cnp_lowvWeight=0 OR le.cnp_lowv_match_code=SALT37.MatchCode.ExactMatch => le.cnp_lowvWeight,MIN(le.cnp_lowvWeight,ri.cnp_lowvWeight-1) );
+  SELF.company_phoneWeight := MAP( ri.company_phoneWeight=0 OR le.company_phone_match_code=SALT37.MatchCode.ExactMatch => le.company_phoneWeight,MIN(le.company_phoneWeight,ri.company_phoneWeight-1) );
+  SELF.company_phone_3Weight := MAP( ri.company_phone_3Weight=0 OR le.company_phone_3_match_code=SALT37.MatchCode.ExactMatch => le.company_phone_3Weight,MIN(le.company_phone_3Weight,ri.company_phone_3Weight-1) );
+  SELF.company_phone_3_exWeight := MAP( ri.company_phone_3_exWeight=0 OR le.company_phone_3_ex_match_code=SALT37.MatchCode.ExactMatch => le.company_phone_3_exWeight,MIN(le.company_phone_3_exWeight,ri.company_phone_3_exWeight-1) );
+  SELF.company_phone_7Weight := MAP( ri.company_phone_7Weight=0 OR le.company_phone_7_match_code=SALT37.MatchCode.ExactMatch => le.company_phone_7Weight,MIN(le.company_phone_7Weight,ri.company_phone_7Weight-1) );
+  SELF.company_feinWeight := MAP( ri.company_feinWeight=0 OR le.company_fein_match_code=SALT37.MatchCode.ExactMatch => le.company_feinWeight,MIN(le.company_feinWeight,ri.company_feinWeight-1) );
+  SELF.company_sic_code1Weight := MAP( ri.company_sic_code1Weight=0 OR le.company_sic_code1_match_code=SALT37.MatchCode.ExactMatch => le.company_sic_code1Weight,MIN(le.company_sic_code1Weight,ri.company_sic_code1Weight-1) );
+  SELF.active_duns_numberWeight := MAP( ri.active_duns_numberWeight=0 OR le.active_duns_number_match_code=SALT37.MatchCode.ExactMatch => le.active_duns_numberWeight,MIN(le.active_duns_numberWeight,ri.active_duns_numberWeight-1) );
+  SELF.prim_rangeWeight := MAP( ri.prim_rangeWeight=0 OR le.prim_range_match_code=SALT37.MatchCode.ExactMatch => le.prim_rangeWeight,MIN(le.prim_rangeWeight,ri.prim_rangeWeight-1) );
+  SELF.prim_nameWeight := MAP( ri.prim_nameWeight=0 OR le.prim_name_match_code=SALT37.MatchCode.ExactMatch => le.prim_nameWeight,MIN(le.prim_nameWeight,ri.prim_nameWeight-1) );
+  SELF.sec_rangeWeight := MAP( ri.sec_rangeWeight=0 OR le.sec_range_match_code=SALT37.MatchCode.ExactMatch => le.sec_rangeWeight,MIN(le.sec_rangeWeight,ri.sec_rangeWeight-1) );
+  SELF.cityWeight := MAP( ri.cityWeight=0 OR le.city_match_code=SALT37.MatchCode.ExactMatch => le.cityWeight,MIN(le.cityWeight,ri.cityWeight-1) );
+  SELF.city_cleanWeight := MAP( ri.city_cleanWeight=0 OR le.city_clean_match_code=SALT37.MatchCode.ExactMatch => le.city_cleanWeight,MIN(le.city_cleanWeight,ri.city_cleanWeight-1) );
+  SELF.stWeight := MAP( ri.stWeight=0 OR le.st_match_code=SALT37.MatchCode.ExactMatch => le.stWeight,MIN(le.stWeight,ri.stWeight-1) );
+  SELF.zipWeight := MAP( ri.zipWeight=0 OR le.zip_match_code=SALT37.MatchCode.ExactMatch => le.zipWeight,MIN(le.zipWeight,ri.zipWeight-1) );
+  SELF.company_urlWeight := MAP( ri.company_urlWeight=0 OR le.company_url_match_code=SALT37.MatchCode.ExactMatch => le.company_urlWeight,MIN(le.company_urlWeight,ri.company_urlWeight-1) );
+  SELF.isContactWeight := MAP( ri.isContactWeight=0 OR le.isContact_match_code=SALT37.MatchCode.ExactMatch => le.isContactWeight,MIN(le.isContactWeight,ri.isContactWeight-1) );
+  SELF.contact_didWeight := MAP( ri.contact_didWeight=0 OR le.contact_did_match_code=SALT37.MatchCode.ExactMatch => le.contact_didWeight,MIN(le.contact_didWeight,ri.contact_didWeight-1) );
+  SELF.titleWeight := MAP( ri.titleWeight=0 OR le.title_match_code=SALT37.MatchCode.ExactMatch => le.titleWeight,MIN(le.titleWeight,ri.titleWeight-1) );
+  SELF.fnameWeight := MAP( ri.fnameWeight=0 OR le.fname_match_code=SALT37.MatchCode.ExactMatch => le.fnameWeight,MIN(le.fnameWeight,ri.fnameWeight-1) );
+  SELF.fname_preferredWeight := MAP( ri.fname_preferredWeight=0 OR le.fname_preferred_match_code=SALT37.MatchCode.ExactMatch => le.fname_preferredWeight,MIN(le.fname_preferredWeight,ri.fname_preferredWeight-1) );
+  SELF.mnameWeight := MAP( ri.mnameWeight=0 OR le.mname_match_code=SALT37.MatchCode.ExactMatch => le.mnameWeight,MIN(le.mnameWeight,ri.mnameWeight-1) );
+  SELF.lnameWeight := MAP( ri.lnameWeight=0 OR le.lname_match_code=SALT37.MatchCode.ExactMatch => le.lnameWeight,MIN(le.lnameWeight,ri.lnameWeight-1) );
+  SELF.name_suffixWeight := MAP( ri.name_suffixWeight=0 OR le.name_suffix_match_code=SALT37.MatchCode.ExactMatch => le.name_suffixWeight,MIN(le.name_suffixWeight,ri.name_suffixWeight-1) );
+  SELF.contact_ssnWeight := MAP( ri.contact_ssnWeight=0 OR le.contact_ssn_match_code=SALT37.MatchCode.ExactMatch => le.contact_ssnWeight,MIN(le.contact_ssnWeight,ri.contact_ssnWeight-1) );
+  SELF.contact_emailWeight := MAP( ri.contact_emailWeight=0 OR le.contact_email_match_code=SALT37.MatchCode.ExactMatch => le.contact_emailWeight,MIN(le.contact_emailWeight,ri.contact_emailWeight-1) );
+  SELF.sele_flagWeight := MAP( ri.sele_flagWeight=0 OR le.sele_flag_match_code=SALT37.MatchCode.ExactMatch => le.sele_flagWeight,MIN(le.sele_flagWeight,ri.sele_flagWeight-1) );
+  SELF.org_flagWeight := MAP( ri.org_flagWeight=0 OR le.org_flag_match_code=SALT37.MatchCode.ExactMatch => le.org_flagWeight,MIN(le.org_flagWeight,ri.org_flagWeight-1) );
+  SELF.ult_flagWeight := MAP( ri.ult_flagWeight=0 OR le.ult_flag_match_code=SALT37.MatchCode.ExactMatch => le.ult_flagWeight,MIN(le.ult_flagWeight,ri.ult_flagWeight-1) );
+  SELF.fallback_valueWeight := MAP( ri.fallback_valueWeight=0 OR le.fallback_value_match_code=SALT37.MatchCode.ExactMatch => le.fallback_valueWeight,MIN(le.fallback_valueWeight,ri.fallback_valueWeight-1) );
+  SELF.CONTACTNAMEWeight := MAP( ri.CONTACTNAMEWeight=0 OR le.CONTACTNAME_match_code=SALT37.MatchCode.ExactMatch => le.CONTACTNAMEWeight,MIN(le.CONTACTNAMEWeight,ri.CONTACTNAMEWeight-1) );
+  SELF.STREETADDRESSWeight := MAP( ri.STREETADDRESSWeight=0 OR le.STREETADDRESS_match_code=SALT37.MatchCode.ExactMatch => le.STREETADDRESSWeight,MIN(le.STREETADDRESSWeight,ri.STREETADDRESSWeight-1) );
+  Weight := MAX(0,SELF.parent_proxidWeight) + MAX(0,SELF.sele_proxidWeight) + MAX(0,SELF.org_proxidWeight) + MAX(0,SELF.ultimate_proxidWeight) + MAX(0,SELF.has_lgidWeight) + MAX(0,SELF.empidWeight) + MAX(0,SELF.sourceWeight) + MAX(0,SELF.source_record_idWeight) + MAX(0,SELF.source_docidWeight) + MAX(0,SELF.company_nameWeight) + MAX(0,SELF.company_name_prefixWeight) + MAX(0,SELF.cnp_nameWeight) + MAX(0,SELF.cnp_numberWeight) + MAX(0,SELF.cnp_btypeWeight) + MAX(0,SELF.cnp_lowvWeight) + MAX(0,SELF.company_phoneWeight) + MAX(0,SELF.company_phone_3Weight) + MAX(0,SELF.company_phone_3_exWeight) + MAX(0,SELF.company_phone_7Weight) + MAX(0,SELF.company_feinWeight) + MAX(0,SELF.company_sic_code1Weight) + MAX(0,SELF.active_duns_numberWeight) + MAX(0,SELF.cityWeight) + MAX(0,SELF.city_cleanWeight) + MAX(0,SELF.stWeight) + MAX(0,SELF.zipWeight) + MAX(0,SELF.company_urlWeight) + MAX(0,SELF.isContactWeight) + MAX(0,SELF.contact_didWeight) + MAX(0,SELF.titleWeight) + MAX(0,SELF.fname_preferredWeight) + MAX(0,SELF.name_suffixWeight) + MAX(0,SELF.contact_ssnWeight) + MAX(0,SELF.contact_emailWeight) + MAX(0,SELF.sele_flagWeight) + MAX(0,SELF.org_flagWeight) + MAX(0,SELF.ult_flagWeight) + MAX(0,SELF.fallback_valueWeight) + MAX(0,SELF.fnameWeight) + MAX(0,SELF.mnameWeight) + MAX(0,SELF.lnameWeight) + MAX(0,SELF.prim_rangeWeight) + MAX(0,SELF.prim_nameWeight) + MAX(0,SELF.sec_rangeWeight);
+  SELF.Weight := IF(Weight>0,Weight,MAX(0,le.Weight)); // JA 20171109: I had this commented out to mimic SALT 3.3, but changed it back in order to implement Edin's recommended hack
   SELF := le;
 END;
  
   R2 := JOIN(in_data,R1,LEFT.reference=RIGHT.reference,FixScores(LEFT,RIGHT));
   RETURN SORT(GROUP(R2,Reference,ALL),-weight,proxid);
 END;
-EXPORT CombineAllScores(DATASET(LayoutScoredFetch) in_data,BOOLEAN bIncludeFilter=TRUE/*HACK22*/,BOOLEAN bGetAllScores=TRUE) := FUNCTION
-OutputLayout_Batch Create_Output(LayoutScoredFetch le, DATASET(LayoutScoredFetch) ri) := TRANSFORM
-  SELF.Results := ri;
-  SELF.Reference := le.Reference;
-  SELF.Results_seleid := IF(bGetAllScores,SORT( ROLLUP( SORT( SELF.Results,seleid),LEFT.seleid=RIGHT.seleid,Combine_Scores(LEFT,RIGHT)),-Weight),DATASET([],LayoutScoredFetch));
-  SELF.Results_orgid := IF(bGetAllScores,SORT( ROLLUP( SORT( SELF.Results_seleid,orgid),LEFT.orgid=RIGHT.orgid,Combine_Scores(LEFT,RIGHT)),-Weight),DATASET([],LayoutScoredFetch));
-  SELF.Results_ultid := IF(bGetAllScores,SORT( ROLLUP( SORT( SELF.Results_orgid,ultid),LEFT.ultid=RIGHT.ultid,Combine_Scores(LEFT,RIGHT)),-Weight),DATASET([],LayoutScoredFetch));
-  SELF.Results_powid := IF(bGetAllScores,SORT( ROLLUP( SORT( SELF.Results,powid),LEFT.powid=RIGHT.powid,Combine_Scores(LEFT,RIGHT)),-Weight),DATASET([],LayoutScoredFetch));
-  MAC_Add_ResolutionFlags()
-END;
-  r0_ := ROLLUP( SORT( GROUP( SORT ( DISTRIBUTE(In_Data,HASH(reference)),Reference, LOCAL ), Reference, LOCAL),proxid),LEFT.proxid=RIGHT.proxid,Combine_Scores(LEFT,RIGHT));
-  r0 := IF(bIncludeFilter,r0_(SALT33.DebugMode OR ~ForceFailed),r0_)/*HACK13*/;
+EXPORT CombineAllScores(DATASET(LayoutScoredFetch) in_data, BOOLEAN In_bGetAllScores = TRUE, BOOLEAN In_disableForce = FALSE) := FUNCTION
+  OutputLayout_Batch Create_Output(LayoutScoredFetch le, DATASET(LayoutScoredFetch) ri) := TRANSFORM
+    SELF.Results := ri;
+    SELF.Reference := le.Reference;
+    SELF.Results_seleid := IF(In_bGetAllScores,SORT( ROLLUP( SORT( SELF.Results,-seleid),LEFT.seleid=RIGHT.seleid,Combine_Scores(LEFT,RIGHT, In_disableForce)),-Weight,-(proxid=SELF.Results[1].proxid),-proxid));
+    SELF.Results_orgid := IF(In_bGetAllScores,SORT( ROLLUP( SORT( SELF.Results_seleid,-orgid),LEFT.orgid=RIGHT.orgid,Combine_Scores(LEFT,RIGHT, In_disableForce)),-Weight,-(seleid=SELF.Results[1].seleid),-seleid));
+    SELF.Results_ultid := IF(In_bGetAllScores,SORT( ROLLUP( SORT( SELF.Results_orgid,-ultid),LEFT.ultid=RIGHT.ultid,Combine_Scores(LEFT,RIGHT, In_disableForce)),-Weight,-(orgid=SELF.Results[1].orgid),-orgid));
+    SELF.Results_powid := IF(In_bGetAllScores, SORT( ROLLUP( SORT( SELF.Results,-powid),LEFT.powid=RIGHT.powid,Combine_Scores(LEFT,RIGHT, In_disableForce)),-Weight,-(proxid=SELF.Results[1].proxid),-proxid));
+    MAC_Add_ResolutionFlags()
+  END;
+  r0 := ROLLUP( SORT( GROUP( SORT ( DISTRIBUTE(In_Data,HASH(reference)),Reference, LOCAL ), Reference, LOCAL),proxid),LEFT.proxid=RIGHT.proxid,Combine_Scores(LEFT,RIGHT,In_disableForce))(SALT37.DebugMode OR ~ForceFailed);
   r1 := AdjustScoresForNonExactMatches(UNGROUP(r0));
   R2 := ROLLUP( TOPN(r1,100,-Weight),GROUP, Create_Output(LEFT,ROWS(LEFT)) );
-  SALT33.MAC_External_AddPcnt(R2,LayoutScoredFetch,Results,OutputLayout_Batch,27,R3);
-  SALT33.MAC_External_AddPcnt(R3,LayoutScoredFetch,Results_seleid,OutputLayout_Batch,27,R4);
-  SALT33.MAC_External_AddPcnt(R4,LayoutScoredFetch,Results_orgid,OutputLayout_Batch,27,R5);
-  SALT33.MAC_External_AddPcnt(R5,LayoutScoredFetch,Results_ultid,OutputLayout_Batch,27,R6);
-  SALT33.MAC_External_AddPcnt(R6,LayoutScoredFetch,Results_powid,OutputLayout_Batch,27,R7);
+  SALT37.MAC_External_AddPcnt(R2,LayoutScoredFetch,Results,OutputLayout_Batch,27,R3);
+  SALT37.MAC_External_AddPcnt(R3,LayoutScoredFetch,Results_seleid,OutputLayout_Batch,27,R4);
+  SALT37.MAC_External_AddPcnt(R4,LayoutScoredFetch,Results_orgid,OutputLayout_Batch,27,R5);
+  SALT37.MAC_External_AddPcnt(R5,LayoutScoredFetch,Results_ultid,OutputLayout_Batch,27,R6);
+  SALT37.MAC_External_AddPcnt(R6,LayoutScoredFetch,Results_powid,OutputLayout_Batch,27,R7);
   RETURN r7;
 END;
-EXPORT CombineLinkpathScores(DATASET(LayoutScoredFetch) in_data) := FUNCTION
+EXPORT CombineLinkpathScores(DATASET(LayoutScoredFetch) in_data, BOOLEAN In_disableForce = TRUE) := FUNCTION
 // Note - results are returned distributed by HASH(reference) - this is part of the specification
-  rolled := ROLLUP ( SORT( DISTRIBUTE( in_data, HASH(reference) ), Reference, proxid, LOCAL), Combine_Scores(LEFT,RIGHT), Reference, proxid, LOCAL);
+  rolled := ROLLUP ( SORT( DISTRIBUTE( in_data, HASH(reference) ), Reference, proxid, LOCAL), Combine_Scores(LEFT,RIGHT, In_disableForce), Reference, proxid, LOCAL);
   RETURN DEDUP( SORT( rolled, Reference, -weight, LOCAL ), Reference, KEEP(Config_BIP.LinkpathCandidateCount),LOCAL);
 END;
 EXPORT KeysUsedToText(UNSIGNED4 k) := FUNCTION
@@ -828,92 +805,92 @@ EXPORT KeysUsedToText(UNSIGNED4 k) := FUNCTION
   RETURN list[1..LENGTH(TRIM(list))-1]; // Strim last ,
 end;
 EXPORT Layout_RolledEntity := RECORD,MAXLENGTH(63000)
-  SALT33.UIDType proxid;
-  DATASET(SALT33.Layout_FieldValueList) parent_proxid_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) sele_proxid_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) org_proxid_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) ultimate_proxid_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) has_lgid_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) empid_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) source_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) source_record_id_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) source_docid_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) company_name_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) company_name_prefix_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) cnp_name_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) cnp_number_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) cnp_btype_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) cnp_lowv_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) company_phone_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) company_phone_3_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) company_phone_3_ex_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) company_phone_7_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) company_fein_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) company_sic_code1_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) active_duns_number_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) city_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) city_clean_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) st_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) zip_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) company_url_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) isContact_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) contact_did_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) title_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) fname_preferred_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) name_suffix_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) contact_ssn_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) contact_email_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) sele_flag_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) org_flag_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) ult_flag_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) fallback_value_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) CONTACTNAME_Values := DATASET([],SALT33.Layout_FieldValueList);
-  DATASET(SALT33.Layout_FieldValueList) STREETADDRESS_Values := DATASET([],SALT33.Layout_FieldValueList);
+  SALT37.UIDType proxid;
+  DATASET(SALT37.Layout_FieldValueList) parent_proxid_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) sele_proxid_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) org_proxid_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) ultimate_proxid_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) has_lgid_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) empid_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) source_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) source_record_id_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) source_docid_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) company_name_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) company_name_prefix_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) cnp_name_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) cnp_number_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) cnp_btype_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) cnp_lowv_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) company_phone_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) company_phone_3_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) company_phone_3_ex_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) company_phone_7_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) company_fein_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) company_sic_code1_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) active_duns_number_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) city_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) city_clean_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) st_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) zip_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) company_url_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) isContact_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) contact_did_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) title_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) fname_preferred_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) name_suffix_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) contact_ssn_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) contact_email_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) sele_flag_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) org_flag_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) ult_flag_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) fallback_value_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) CONTACTNAME_Values := DATASET([],SALT37.Layout_FieldValueList);
+  DATASET(SALT37.Layout_FieldValueList) STREETADDRESS_Values := DATASET([],SALT37.Layout_FieldValueList);
 END;
  
 SHARED RollEntities(dataset(Layout_RolledEntity) infile) := FUNCTION
   Layout_RolledEntity RollValues(Layout_RolledEntity le,Layout_RolledEntity ri) := TRANSFORM
   SELF.proxid := le.proxid;
-    SELF.parent_proxid_values := SALT33.fn_combine_fieldvaluelist(le.parent_proxid_values,ri.parent_proxid_values);
-    SELF.sele_proxid_values := SALT33.fn_combine_fieldvaluelist(le.sele_proxid_values,ri.sele_proxid_values);
-    SELF.org_proxid_values := SALT33.fn_combine_fieldvaluelist(le.org_proxid_values,ri.org_proxid_values);
-    SELF.ultimate_proxid_values := SALT33.fn_combine_fieldvaluelist(le.ultimate_proxid_values,ri.ultimate_proxid_values);
-    SELF.has_lgid_values := SALT33.fn_combine_fieldvaluelist(le.has_lgid_values,ri.has_lgid_values);
-    SELF.empid_values := SALT33.fn_combine_fieldvaluelist(le.empid_values,ri.empid_values);
-    SELF.source_values := SALT33.fn_combine_fieldvaluelist(le.source_values,ri.source_values);
-    SELF.source_record_id_values := SALT33.fn_combine_fieldvaluelist(le.source_record_id_values,ri.source_record_id_values);
-    SELF.source_docid_values := SALT33.fn_combine_fieldvaluelist(le.source_docid_values,ri.source_docid_values);
-    SELF.company_name_values := SALT33.fn_combine_fieldvaluelist(le.company_name_values,ri.company_name_values);
-    SELF.company_name_prefix_values := SALT33.fn_combine_fieldvaluelist(le.company_name_prefix_values,ri.company_name_prefix_values);
-    SELF.cnp_name_values := SALT33.fn_combine_fieldvaluelist(le.cnp_name_values,ri.cnp_name_values);
-    SELF.cnp_number_values := SALT33.fn_combine_fieldvaluelist(le.cnp_number_values,ri.cnp_number_values);
-    SELF.cnp_btype_values := SALT33.fn_combine_fieldvaluelist(le.cnp_btype_values,ri.cnp_btype_values);
-    SELF.cnp_lowv_values := SALT33.fn_combine_fieldvaluelist(le.cnp_lowv_values,ri.cnp_lowv_values);
-    SELF.company_phone_values := SALT33.fn_combine_fieldvaluelist(le.company_phone_values,ri.company_phone_values);
-    SELF.company_phone_3_values := SALT33.fn_combine_fieldvaluelist(le.company_phone_3_values,ri.company_phone_3_values);
-    SELF.company_phone_3_ex_values := SALT33.fn_combine_fieldvaluelist(le.company_phone_3_ex_values,ri.company_phone_3_ex_values);
-    SELF.company_phone_7_values := SALT33.fn_combine_fieldvaluelist(le.company_phone_7_values,ri.company_phone_7_values);
-    SELF.company_fein_values := SALT33.fn_combine_fieldvaluelist(le.company_fein_values,ri.company_fein_values);
-    SELF.company_sic_code1_values := SALT33.fn_combine_fieldvaluelist(le.company_sic_code1_values,ri.company_sic_code1_values);
-    SELF.active_duns_number_values := SALT33.fn_combine_fieldvaluelist(le.active_duns_number_values,ri.active_duns_number_values);
-    SELF.city_values := SALT33.fn_combine_fieldvaluelist(le.city_values,ri.city_values);
-    SELF.city_clean_values := SALT33.fn_combine_fieldvaluelist(le.city_clean_values,ri.city_clean_values);
-    SELF.st_values := SALT33.fn_combine_fieldvaluelist(le.st_values,ri.st_values);
-    SELF.zip_values := SALT33.fn_combine_fieldvaluelist(le.zip_values,ri.zip_values);
-    SELF.company_url_values := SALT33.fn_combine_fieldvaluelist(le.company_url_values,ri.company_url_values);
-    SELF.isContact_values := SALT33.fn_combine_fieldvaluelist(le.isContact_values,ri.isContact_values);
-    SELF.contact_did_values := SALT33.fn_combine_fieldvaluelist(le.contact_did_values,ri.contact_did_values);
-    SELF.title_values := SALT33.fn_combine_fieldvaluelist(le.title_values,ri.title_values);
-    SELF.fname_preferred_values := SALT33.fn_combine_fieldvaluelist(le.fname_preferred_values,ri.fname_preferred_values);
-    SELF.name_suffix_values := SALT33.fn_combine_fieldvaluelist(le.name_suffix_values,ri.name_suffix_values);
-    SELF.contact_ssn_values := SALT33.fn_combine_fieldvaluelist(le.contact_ssn_values,ri.contact_ssn_values);
-    SELF.contact_email_values := SALT33.fn_combine_fieldvaluelist(le.contact_email_values,ri.contact_email_values);
-    SELF.sele_flag_values := SALT33.fn_combine_fieldvaluelist(le.sele_flag_values,ri.sele_flag_values);
-    SELF.org_flag_values := SALT33.fn_combine_fieldvaluelist(le.org_flag_values,ri.org_flag_values);
-    SELF.ult_flag_values := SALT33.fn_combine_fieldvaluelist(le.ult_flag_values,ri.ult_flag_values);
-    SELF.fallback_value_values := SALT33.fn_combine_fieldvaluelist(le.fallback_value_values,ri.fallback_value_values);
-    SELF.CONTACTNAME_values := SALT33.fn_combine_fieldvaluelist(le.CONTACTNAME_values,ri.CONTACTNAME_values);
-    SELF.STREETADDRESS_values := SALT33.fn_combine_fieldvaluelist(le.STREETADDRESS_values,ri.STREETADDRESS_values);
+    SELF.parent_proxid_values := SALT37.fn_combine_fieldvaluelist(le.parent_proxid_values,ri.parent_proxid_values);
+    SELF.sele_proxid_values := SALT37.fn_combine_fieldvaluelist(le.sele_proxid_values,ri.sele_proxid_values);
+    SELF.org_proxid_values := SALT37.fn_combine_fieldvaluelist(le.org_proxid_values,ri.org_proxid_values);
+    SELF.ultimate_proxid_values := SALT37.fn_combine_fieldvaluelist(le.ultimate_proxid_values,ri.ultimate_proxid_values);
+    SELF.has_lgid_values := SALT37.fn_combine_fieldvaluelist(le.has_lgid_values,ri.has_lgid_values);
+    SELF.empid_values := SALT37.fn_combine_fieldvaluelist(le.empid_values,ri.empid_values);
+    SELF.source_values := SALT37.fn_combine_fieldvaluelist(le.source_values,ri.source_values);
+    SELF.source_record_id_values := SALT37.fn_combine_fieldvaluelist(le.source_record_id_values,ri.source_record_id_values);
+    SELF.source_docid_values := SALT37.fn_combine_fieldvaluelist(le.source_docid_values,ri.source_docid_values);
+    SELF.company_name_values := SALT37.fn_combine_fieldvaluelist(le.company_name_values,ri.company_name_values);
+    SELF.company_name_prefix_values := SALT37.fn_combine_fieldvaluelist(le.company_name_prefix_values,ri.company_name_prefix_values);
+    SELF.cnp_name_values := SALT37.fn_combine_fieldvaluelist(le.cnp_name_values,ri.cnp_name_values);
+    SELF.cnp_number_values := SALT37.fn_combine_fieldvaluelist(le.cnp_number_values,ri.cnp_number_values);
+    SELF.cnp_btype_values := SALT37.fn_combine_fieldvaluelist(le.cnp_btype_values,ri.cnp_btype_values);
+    SELF.cnp_lowv_values := SALT37.fn_combine_fieldvaluelist(le.cnp_lowv_values,ri.cnp_lowv_values);
+    SELF.company_phone_values := SALT37.fn_combine_fieldvaluelist(le.company_phone_values,ri.company_phone_values);
+    SELF.company_phone_3_values := SALT37.fn_combine_fieldvaluelist(le.company_phone_3_values,ri.company_phone_3_values);
+    SELF.company_phone_3_ex_values := SALT37.fn_combine_fieldvaluelist(le.company_phone_3_ex_values,ri.company_phone_3_ex_values);
+    SELF.company_phone_7_values := SALT37.fn_combine_fieldvaluelist(le.company_phone_7_values,ri.company_phone_7_values);
+    SELF.company_fein_values := SALT37.fn_combine_fieldvaluelist(le.company_fein_values,ri.company_fein_values);
+    SELF.company_sic_code1_values := SALT37.fn_combine_fieldvaluelist(le.company_sic_code1_values,ri.company_sic_code1_values);
+    SELF.active_duns_number_values := SALT37.fn_combine_fieldvaluelist(le.active_duns_number_values,ri.active_duns_number_values);
+    SELF.city_values := SALT37.fn_combine_fieldvaluelist(le.city_values,ri.city_values);
+    SELF.city_clean_values := SALT37.fn_combine_fieldvaluelist(le.city_clean_values,ri.city_clean_values);
+    SELF.st_values := SALT37.fn_combine_fieldvaluelist(le.st_values,ri.st_values);
+    SELF.zip_values := SALT37.fn_combine_fieldvaluelist(le.zip_values,ri.zip_values);
+    SELF.company_url_values := SALT37.fn_combine_fieldvaluelist(le.company_url_values,ri.company_url_values);
+    SELF.isContact_values := SALT37.fn_combine_fieldvaluelist(le.isContact_values,ri.isContact_values);
+    SELF.contact_did_values := SALT37.fn_combine_fieldvaluelist(le.contact_did_values,ri.contact_did_values);
+    SELF.title_values := SALT37.fn_combine_fieldvaluelist(le.title_values,ri.title_values);
+    SELF.fname_preferred_values := SALT37.fn_combine_fieldvaluelist(le.fname_preferred_values,ri.fname_preferred_values);
+    SELF.name_suffix_values := SALT37.fn_combine_fieldvaluelist(le.name_suffix_values,ri.name_suffix_values);
+    SELF.contact_ssn_values := SALT37.fn_combine_fieldvaluelist(le.contact_ssn_values,ri.contact_ssn_values);
+    SELF.contact_email_values := SALT37.fn_combine_fieldvaluelist(le.contact_email_values,ri.contact_email_values);
+    SELF.sele_flag_values := SALT37.fn_combine_fieldvaluelist(le.sele_flag_values,ri.sele_flag_values);
+    SELF.org_flag_values := SALT37.fn_combine_fieldvaluelist(le.org_flag_values,ri.org_flag_values);
+    SELF.ult_flag_values := SALT37.fn_combine_fieldvaluelist(le.ult_flag_values,ri.ult_flag_values);
+    SELF.fallback_value_values := SALT37.fn_combine_fieldvaluelist(le.fallback_value_values,ri.fallback_value_values);
+    SELF.CONTACTNAME_values := SALT37.fn_combine_fieldvaluelist(le.CONTACTNAME_values,ri.CONTACTNAME_values);
+    SELF.STREETADDRESS_values := SALT37.fn_combine_fieldvaluelist(le.STREETADDRESS_values,ri.STREETADDRESS_values);
   END;
   ds_roll := ROLLUP( SORT( DISTRIBUTE( infile, HASH(proxid) ), proxid, LOCAL ), LEFT.proxid = RIGHT.proxid, RollValues(LEFT,RIGHT),LOCAL);
   Layout_RolledEntity SortValues(Layout_RolledEntity le) := TRANSFORM
@@ -967,49 +944,83 @@ EXPORT RolledEntities(DATASET(RECORDOF(Key)) in_data) := FUNCTION
  
 Layout_RolledEntity into(in_data le) := TRANSFORM
   SELF.proxid := le.proxid;
-  SELF.parent_proxid_Values := IF ( (SALT33.StrType)le.parent_proxid = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.parent_proxid)}],SALT33.Layout_FieldValueList));
-  SELF.sele_proxid_Values := IF ( (SALT33.StrType)le.sele_proxid = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.sele_proxid)}],SALT33.Layout_FieldValueList));
-  SELF.org_proxid_Values := IF ( (SALT33.StrType)le.org_proxid = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.org_proxid)}],SALT33.Layout_FieldValueList));
-  SELF.ultimate_proxid_Values := IF ( (SALT33.StrType)le.ultimate_proxid = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.ultimate_proxid)}],SALT33.Layout_FieldValueList));
-  SELF.has_lgid_Values := DATASET([{TRIM((SALT33.StrType)le.has_lgid)}],SALT33.Layout_FieldValueList);
-  SELF.empid_Values := DATASET([{TRIM((SALT33.StrType)le.empid)}],SALT33.Layout_FieldValueList);
-  SELF.source_Values := IF ( (SALT33.StrType)le.source = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.source)}],SALT33.Layout_FieldValueList));
-  SELF.source_record_id_Values := IF ( (SALT33.StrType)le.source_record_id = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.source_record_id)}],SALT33.Layout_FieldValueList));
-  SELF.source_docid_Values := DATASET([{TRIM((SALT33.StrType)le.source_docid)}],SALT33.Layout_FieldValueList);
-  SELF.company_name_Values := IF ( (SALT33.StrType)le.company_name = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.company_name)}],SALT33.Layout_FieldValueList));
-  SELF.company_name_prefix_Values := IF ( (SALT33.StrType)le.company_name_prefix = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.company_name_prefix)}],SALT33.Layout_FieldValueList));
-  SELF.cnp_name_Values := IF ( (SALT33.StrType)le.cnp_name = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.cnp_name)}],SALT33.Layout_FieldValueList));
-  SELF.cnp_number_Values := IF ( (SALT33.StrType)le.cnp_number = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.cnp_number)}],SALT33.Layout_FieldValueList));
-  SELF.cnp_btype_Values := IF ( (SALT33.StrType)le.cnp_btype = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.cnp_btype)}],SALT33.Layout_FieldValueList));
-  SELF.cnp_lowv_Values := IF ( (SALT33.StrType)le.cnp_lowv = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.cnp_lowv)}],SALT33.Layout_FieldValueList));
-  SELF.company_phone_Values := DATASET([{TRIM((SALT33.StrType)le.company_phone)}],SALT33.Layout_FieldValueList);
-  SELF.company_phone_3_Values := IF ( (SALT33.StrType)le.company_phone_3 = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.company_phone_3)}],SALT33.Layout_FieldValueList));
-  SELF.company_phone_3_ex_Values := IF ( (SALT33.StrType)le.company_phone_3_ex = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.company_phone_3_ex)}],SALT33.Layout_FieldValueList));
-  SELF.company_phone_7_Values := IF ( (SALT33.StrType)le.company_phone_7 = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.company_phone_7)}],SALT33.Layout_FieldValueList));
-  SELF.company_fein_Values := IF ( (SALT33.StrType)le.company_fein = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.company_fein)}],SALT33.Layout_FieldValueList));
-  SELF.company_sic_code1_Values := IF ( (SALT33.StrType)le.company_sic_code1 = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.company_sic_code1)}],SALT33.Layout_FieldValueList));
-  SELF.active_duns_number_Values := DATASET([{TRIM((SALT33.StrType)le.active_duns_number)}],SALT33.Layout_FieldValueList);
-  SELF.city_Values := IF ( (SALT33.StrType)le.city = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.city)}],SALT33.Layout_FieldValueList));
-  SELF.city_clean_Values := IF ( (SALT33.StrType)le.city_clean = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.city_clean)}],SALT33.Layout_FieldValueList));
-  SELF.st_Values := IF ( (SALT33.StrType)le.st = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.st)}],SALT33.Layout_FieldValueList));
-  SELF.zip_Values := IF ( (SALT33.StrType)le.zip = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.zip)}],SALT33.Layout_FieldValueList));
-  SELF.company_url_Values := IF ( (SALT33.StrType)le.company_url = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.company_url)}],SALT33.Layout_FieldValueList));
-  SELF.isContact_Values := IF ( (SALT33.StrType)le.isContact = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.isContact)}],SALT33.Layout_FieldValueList));
-  SELF.contact_did_Values := IF ( (SALT33.StrType)le.contact_did = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.contact_did)}],SALT33.Layout_FieldValueList));
-  SELF.title_Values := IF ( (SALT33.StrType)le.title = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.title)}],SALT33.Layout_FieldValueList));
-  SELF.fname_preferred_Values := IF ( (SALT33.StrType)le.fname_preferred = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.fname_preferred)}],SALT33.Layout_FieldValueList));
-  SELF.name_suffix_Values := IF ( (SALT33.StrType)le.name_suffix = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.name_suffix)}],SALT33.Layout_FieldValueList));
-  SELF.contact_ssn_Values := IF ( (SALT33.StrType)le.contact_ssn = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.contact_ssn)}],SALT33.Layout_FieldValueList));
-  SELF.contact_email_Values := IF ( (SALT33.StrType)le.contact_email = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.contact_email)}],SALT33.Layout_FieldValueList));
-  SELF.sele_flag_Values := IF ( (SALT33.StrType)le.sele_flag = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.sele_flag)}],SALT33.Layout_FieldValueList));
-  SELF.org_flag_Values := IF ( (SALT33.StrType)le.org_flag = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.org_flag)}],SALT33.Layout_FieldValueList));
-  SELF.ult_flag_Values := IF ( (SALT33.StrType)le.ult_flag = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.ult_flag)}],SALT33.Layout_FieldValueList));
-  SELF.fallback_value_Values := IF ( (SALT33.StrType)le.fallback_value = '',DATASET([],SALT33.Layout_FieldValueList),DATASET([{TRIM((SALT33.StrType)le.fallback_value)}],SALT33.Layout_FieldValueList));
-  self.CONTACTNAME_Values := IF ( (SALT33.StrType)le.fname = '' AND (SALT33.StrType)le.mname = '' AND (SALT33.StrType)le.lname = '',dataset([],SALT33.Layout_FieldValueList),dataset([{TRIM((SALT33.StrType)le.fname) + ' ' + TRIM((SALT33.StrType)le.mname) + ' ' + TRIM((SALT33.StrType)le.lname)}],SALT33.Layout_FieldValueList));
-  self.STREETADDRESS_Values := IF ( (SALT33.StrType)le.prim_range = '' AND (SALT33.StrType)le.prim_name = '' AND (SALT33.StrType)le.sec_range = '',dataset([],SALT33.Layout_FieldValueList),dataset([{TRIM((SALT33.StrType)le.prim_range) + ' ' + TRIM((SALT33.StrType)le.prim_name) + ' ' + TRIM((SALT33.StrType)le.sec_range)}],SALT33.Layout_FieldValueList));
+  SELF.parent_proxid_Values := IF ( (SALT37.StrType)le.parent_proxid = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.parent_proxid)}],SALT37.Layout_FieldValueList));
+  SELF.sele_proxid_Values := IF ( (SALT37.StrType)le.sele_proxid = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.sele_proxid)}],SALT37.Layout_FieldValueList));
+  SELF.org_proxid_Values := IF ( (SALT37.StrType)le.org_proxid = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.org_proxid)}],SALT37.Layout_FieldValueList));
+  SELF.ultimate_proxid_Values := IF ( (SALT37.StrType)le.ultimate_proxid = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.ultimate_proxid)}],SALT37.Layout_FieldValueList));
+  SELF.has_lgid_Values := DATASET([{TRIM((SALT37.StrType)le.has_lgid)}],SALT37.Layout_FieldValueList);
+  SELF.empid_Values := DATASET([{TRIM((SALT37.StrType)le.empid)}],SALT37.Layout_FieldValueList);
+  SELF.source_Values := IF ( (SALT37.StrType)le.source = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.source)}],SALT37.Layout_FieldValueList));
+  SELF.source_record_id_Values := IF ( (SALT37.StrType)le.source_record_id = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.source_record_id)}],SALT37.Layout_FieldValueList));
+  SELF.source_docid_Values := DATASET([{TRIM((SALT37.StrType)le.source_docid)}],SALT37.Layout_FieldValueList);
+  SELF.company_name_Values := IF ( (SALT37.StrType)le.company_name = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.company_name)}],SALT37.Layout_FieldValueList));
+  SELF.company_name_prefix_Values := IF ( (SALT37.StrType)le.company_name_prefix = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.company_name_prefix)}],SALT37.Layout_FieldValueList));
+  SELF.cnp_name_Values := IF ( (SALT37.StrType)le.cnp_name = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.cnp_name)}],SALT37.Layout_FieldValueList));
+  SELF.cnp_number_Values := IF ( (SALT37.StrType)le.cnp_number = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.cnp_number)}],SALT37.Layout_FieldValueList));
+  SELF.cnp_btype_Values := IF ( (SALT37.StrType)le.cnp_btype = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.cnp_btype)}],SALT37.Layout_FieldValueList));
+  SELF.cnp_lowv_Values := IF ( (SALT37.StrType)le.cnp_lowv = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.cnp_lowv)}],SALT37.Layout_FieldValueList));
+  SELF.company_phone_Values := DATASET([{TRIM((SALT37.StrType)le.company_phone)}],SALT37.Layout_FieldValueList);
+  SELF.company_phone_3_Values := IF ( (SALT37.StrType)le.company_phone_3 = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.company_phone_3)}],SALT37.Layout_FieldValueList));
+  SELF.company_phone_3_ex_Values := IF ( (SALT37.StrType)le.company_phone_3_ex = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.company_phone_3_ex)}],SALT37.Layout_FieldValueList));
+  SELF.company_phone_7_Values := IF ( (SALT37.StrType)le.company_phone_7 = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.company_phone_7)}],SALT37.Layout_FieldValueList));
+  SELF.company_fein_Values := IF ( (SALT37.StrType)le.company_fein = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.company_fein)}],SALT37.Layout_FieldValueList));
+  SELF.company_sic_code1_Values := IF ( (SALT37.StrType)le.company_sic_code1 = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.company_sic_code1)}],SALT37.Layout_FieldValueList));
+  SELF.active_duns_number_Values := DATASET([{TRIM((SALT37.StrType)le.active_duns_number)}],SALT37.Layout_FieldValueList);
+  SELF.city_Values := IF ( (SALT37.StrType)le.city = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.city)}],SALT37.Layout_FieldValueList));
+  SELF.city_clean_Values := IF ( (SALT37.StrType)le.city_clean = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.city_clean)}],SALT37.Layout_FieldValueList));
+  SELF.st_Values := IF ( (SALT37.StrType)le.st = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.st)}],SALT37.Layout_FieldValueList));
+  SELF.zip_Values := IF ( (SALT37.StrType)le.zip = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.zip)}],SALT37.Layout_FieldValueList));
+  SELF.company_url_Values := IF ( (SALT37.StrType)le.company_url = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.company_url)}],SALT37.Layout_FieldValueList));
+  SELF.isContact_Values := IF ( (SALT37.StrType)le.isContact = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.isContact)}],SALT37.Layout_FieldValueList));
+  SELF.contact_did_Values := IF ( (SALT37.StrType)le.contact_did = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.contact_did)}],SALT37.Layout_FieldValueList));
+  SELF.title_Values := IF ( (SALT37.StrType)le.title = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.title)}],SALT37.Layout_FieldValueList));
+  SELF.fname_preferred_Values := IF ( (SALT37.StrType)le.fname_preferred = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.fname_preferred)}],SALT37.Layout_FieldValueList));
+  SELF.name_suffix_Values := IF ( (SALT37.StrType)le.name_suffix = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.name_suffix)}],SALT37.Layout_FieldValueList));
+  SELF.contact_ssn_Values := IF ( (SALT37.StrType)le.contact_ssn = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.contact_ssn)}],SALT37.Layout_FieldValueList));
+  SELF.contact_email_Values := IF ( (SALT37.StrType)le.contact_email = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.contact_email)}],SALT37.Layout_FieldValueList));
+  SELF.sele_flag_Values := IF ( (SALT37.StrType)le.sele_flag = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.sele_flag)}],SALT37.Layout_FieldValueList));
+  SELF.org_flag_Values := IF ( (SALT37.StrType)le.org_flag = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.org_flag)}],SALT37.Layout_FieldValueList));
+  SELF.ult_flag_Values := IF ( (SALT37.StrType)le.ult_flag = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.ult_flag)}],SALT37.Layout_FieldValueList));
+  SELF.fallback_value_Values := IF ( (SALT37.StrType)le.fallback_value = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.fallback_value)}],SALT37.Layout_FieldValueList));
+  SELF.CONTACTNAME_Values := IF ( (SALT37.StrType)le.fname = '' AND (SALT37.StrType)le.mname = '' AND (SALT37.StrType)le.lname = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.fname) + ' ' + TRIM((SALT37.StrType)le.mname) + ' ' + TRIM((SALT37.StrType)le.lname)}],SALT37.Layout_FieldValueList));
+  SELF.STREETADDRESS_Values := IF ( (SALT37.StrType)le.prim_range = '' AND (SALT37.StrType)le.prim_name = '' AND (SALT37.StrType)le.sec_range = '',DATASET([],SALT37.Layout_FieldValueList),DATASET([{TRIM((SALT37.StrType)le.prim_range) + ' ' + TRIM((SALT37.StrType)le.prim_name) + ' ' + TRIM((SALT37.StrType)le.sec_range)}],SALT37.Layout_FieldValueList));
 END;
 AsFieldValues := PROJECT(in_data,into(LEFT));
   RETURN RollEntities(AsFieldValues);
 END;
+// Records which already had the ultid,orgid,seleid,proxid on them may not be up to date. Update those IDs
+EXPORT UpdateIDs(DATASET(InputLayout) in) := FUNCTION
+  id_stream_layout init(in le) := TRANSFORM
+    SELF.UniqueId := le.UniqueId;
+    SELF.Weight := Config_BIP.MatchThreshold; // Assume at least 'threshold' met
+    SELF.seleid := le.Entered_seleid;
+    SELF.orgid := le.Entered_orgid;
+    SELF.ultid := le.Entered_ultid;
+    SELF.powid := le.Entered_powid;
+    SELF.proxid := le.Entered_proxid;
+    SELF.rcid := le.Entered_rcid;
+  END;
+  idupdate_candidates := PROJECT(in,init(LEFT));
+  ids_updated0 := id_stream_historic(idupdate_candidates);
+  ids_updated := PROJECT(ids_updated0,TRANSFORM(LayoutScoredFetch,SELF.Reference:=LEFT.UniqueId,SELF.keys_used:=0,SELF.keys_failed:=0,SELF:=LEFT));
+  RETURN CombineLinkpathScores(ids_updated);
 END;
+// JA 20171114
+EXPORT AdjustKeysUsedAndFailed(DATASET(LayoutScoredFetch) in_data) := FUNCTION
+  LayoutScoredFetch AdjustFlags(LayoutScoredFetch le, UNSIGNED4 flagFail) := TRANSFORM // JA 20171114: UNSIGNED4 substituted for Config_BIP.KeysBitmapType 
+    SELF.keys_used := le.keys_used | flagFail;
+    SELF.keys_failed := le.keys_failed | flagFail;
+    SELF := le;
+  END;
+  outR := {UNSIGNED4 keys_failed; };
+  outR AggregateFlags(LayoutScoredFetch le, outR ri) := TRANSFORM
+    SELF.keys_failed := ri.keys_failed | le.keys_failed;
+  END;
+  agg := AGGREGATE(in_data(proxid=0),outR,AggregateFlags(LEFT,RIGHT),FEW);
+  flgFail := agg[1].keys_failed;
+  RETURN IF(COUNT(in_data(proxid = 0)) > 0, IF(COUNT(in_data(proxid <> 0)) > 0, PROJECT(in_data(proxid <> 0), AdjustFlags(LEFT, flgFail)), PROJECT(in_data(proxid = 0)[1..1], AdjustFlags(LEFT, flgFail))), in_data);
+  END;
 
+// if at least one key failed and at least one not key failed row, remove keys failed rows and put keys failed into put into existing rows
+// if you have only key failed rows - aggregate, and return one with all aggregated
+END;

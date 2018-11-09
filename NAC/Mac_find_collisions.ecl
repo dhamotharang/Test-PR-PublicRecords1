@@ -1,3 +1,4 @@
+﻿
 EXPORT Mac_find_collisions
 	(
 	infile
@@ -277,8 +278,9 @@ match:=join(inf_ddp,inf_ddp,
 			left.month_field=right.month_field and
 		#end
 
-		left.Client_Eligible_Status_Indicator=right.Client_Eligible_Status_Indicator and
-		left.Case_Benefit_Type=right.Case_Benefit_Type and
+		//left.Client_Eligible_Status_Indicator=right.Client_Eligible_Status_Indicator and
+		IF(left.Case_Benefit_Type='D','S',left.Case_Benefit_Type)=
+					IF(right.Case_Benefit_Type='D','S',right.Case_Benefit_Type) and
 		left.seq_field<>right.seq_field and
 		(left.Case_Identifier<>right.Case_Identifier
 		or

@@ -2,10 +2,16 @@
 EXPORT WorkunitTimingDetails(string esp
 														,string fromemail
 														,string toemaillist
-														,string p_wuid = ''
+														// includeendtime = true to capture only WU's that have both start and endtime
+														// some WU's don't have end time and it may be needed for various other process
+														,boolean includeendtime = true
+														,string dopsenv = dops.constants.dopsenvironment
 														) := module
 	shared states := ['completed','aborted','failed'];
-	shared startwu := 'W20160101-000000';
+	// no of workunits in dev is more compared to prod, hence limiting the count else
+	// it is failing with buffer overlimit error
+	shared noofdaysbehind := if (dopsenv = 'dev',5,20);
+	shared startwu := 'W' + (string)STD.Date.AdjustDate(STD.Date.Today(),0,0,-noofdaysbehind) + '-' + (string)STD.Date.CurrentTime(true);
 	shared endwu := 'W' + (string)STD.Date.Today() + '-' + (string)STD.Date.CurrentTime(true);
 	shared integer baskets := 500;
 	
@@ -21,6 +27,7 @@ EXPORT WorkunitTimingDetails(string esp
 		integer totalthortime := 0;
 		integer totalprocesstime := 0;
 		integer totaldfutime := 0;
+		string dfujobid := '';
 		dataset(lib_workunitservices.WsTiming) wutimings;
 		dataset(lib_workunitservices.WsTimeStamp) wutimestamp;
 	end;
@@ -33,6 +40,7 @@ EXPORT WorkunitTimingDetails(string esp
 		string state;
 		string starttime := '';
 		string endtime := '';
+		string dfujobid := '';
 		unsigned8 totalcompiletime := 0;
 		unsigned8 totaltime := 0;
 		unsigned8 totalthortime := 0;
@@ -44,14 +52,11 @@ EXPORT WorkunitTimingDetails(string esp
 		
 	end;
 	
-	export GetWUList() := sort(if (p_wuid = ''
-													,lib_workunitservices.WorkunitServices.workunitlist
+	export GetWUList() := sort(lib_workunitservices.WorkunitServices.workunitlist
 														(lowwuid := startwu 
-															, highwuid := endwu)(stringlib.StringToLowerCase(state) in states)
-													,	lib_workunitservices.WorkunitServices.workunitlist
-														(lowwuid := p_wuid 
-															, highwuid := endwu)	
-														), wuid);
+															, highwuid := endwu)(stringlib.StringToLowerCase(state) in states), wuid);
+	
+	
 	
 	export GetDetails() := function
 	
@@ -68,8 +73,16 @@ EXPORT WorkunitTimingDetails(string esp
 		
 		dWUTimingDetails := project(dGetWUList,xConvertToLocalLayout(left));
 		
+		rWUTimingDetails xGetDFUWUIDs(dWUTimingDetails l,lib_workunitservices.WsTiming r) := transform
+			self.dfujobid := if (regexfind('SPRAY',std.str.touppercase(trim(r.name,left,right)),nocase)
+														,r.name
+														,'');
+			self := l;
+		end;
 		
-		rDataVizInfo xCaptureTimings(dWUTimingDetails l,integer c) := transform
+		dGetDFUWUIDs := dedup(sort(normalize(dWUTimingDetails,left.wutimings,xGetDFUWUIDs(left,right)),dfujobid), record);
+		
+		rDataVizInfo xCaptureTimings(dGetDFUWUIDs l,integer c) := transform
 			s_time := l.wutimestamp(trim(id,left,right) = 'Created')[1].time;
 			e_time := sort(l.wutimestamp(trim(id,left,right) = 'QueryFinished'),-time)[1].time;
 			startseconds := if (s_time <> '',STD.Date.SecondsFromParts((integer)s_time[1..4]
@@ -101,10 +114,14 @@ EXPORT WorkunitTimingDetails(string esp
 			self.totaldfutime := dfutime;
 			self.totalcompiletime := compiletime;
 			self.cnt := c;
+			self.job := regexreplace('[\'â]',l.job,'');
 			self := l;
 		end;
 		
-		dCaptureTimings := project(dWUTimingDetails,xCaptureTimings(left,counter))(starttime <> '' and endtime <> '');
+		dCaptureTimings := if (includeendtime
+															,project(dGetDFUWUIDs,xCaptureTimings(left,counter))(starttime <> '' and endtime <> '')
+															,project(dGetDFUWUIDs,xCaptureTimings(left,counter))
+															);
 		
 		
 		
@@ -170,7 +187,7 @@ EXPORT WorkunitTimingDetails(string esp
 		end;
 	
 		rSOAPResponse := SOAPCALL(
-				dops.constants.prboca.serviceurl('dev'),
+				dops.constants.prboca.serviceurl(dopsenv),
 				'UpdateWUTimings',
 				rUpdateWUTimingsRequest,
 				rUpdateWUTimingsResponse,
@@ -220,9 +237,11 @@ EXPORT WorkunitTimingDetails(string esp
 		soapds := dataset('~dataops::soapcalls::wutimingstoupdatedb',soap_recs,thor,opt);
 		
 		return if (regexfind('hthor', thorlib.cluster())
-							,sequential(
+						,if (~fileservices.fileexists('~wutimings::job::running')
+								,sequential(
+									output(dataset([{WORKUNIT}],{string wuid}),,'~wutimings::job::running',overwrite)
 									//output(choosen(ds,100)),
-									output(soap_response,,'~dataops::soapcalls::wutimingstoupdatedb',overwrite),
+									,output(soap_response,,'~dataops::soapcalls::wutimingstoupdatedb',overwrite),
 									if(count(soapds(rstatus[1].Code = '-1')) > 0,
 									sequential(
 										//output(choosen(soapds(rstatus[1].Code = '-1'),100)),
@@ -232,21 +251,25 @@ EXPORT WorkunitTimingDetails(string esp
 																	,
 																	,
 																	,fromemail)),
-										output('No Soap failures')
-											)
+										output('No Soap failures'))
+										,fileservices.deletelogicalfile('~wutimings::job::running')
+											
 									)
+									,output('Another job running')
+								)
 							,fail('run on a hthor cluster'));
 									
 			
 	end;
 	
-	/*
+	
 	export run() := UpdateDOPS() : success(output('Workunit completed successfully'))
-									,failure(dops.GetWUErrorMessages(WORKUNIT
+									,failure(sequential
+															(dops.GetWUErrorMessages(WORKUNIT
 																							,esp
 																							,
 																							,fromemail
 																							,toemaillist)
+																,fileservices.deletelogicalfile('~wutimings::job::running'))
 														);
-	*/
 end;

@@ -1,7 +1,4 @@
-/*2017-06-29T19:46:55Z (dschlangen)
-C:\Users\schlandv\AppData\Roaming\HPCC Systems\eclide\dschlangen\dataland_staging\Risk_Indicators\getAllBocaShellData\2017-06-29T19_46_55Z.ecl
-*/
-IMPORT Ut, riskwise, models, easi, doxie, dma, fcra_opt_out, USPIS_HotList, AML, gateway, LN_PropertyV2_Services, riskview;
+﻿IMPORT Ut, riskwise, models, easi, doxie, dma, fcra_opt_out, USPIS_HotList, AML, gateway, LN_PropertyV2_Services, riskview, Business_Risk_BIP, BIPV2, MDR, ADVO;
 
 EXPORT getAllBocaShellData (
   GROUPED DATASET (risk_indicators.Layout_output) iid, 
@@ -146,13 +143,76 @@ EXPORT getAllBocaShellData (
 	prop_common_thor := sort(group(sort(prop_common_thor_pre, seq, local), seq, local),prim_name,prim_range,zip5,sec_range,census_loose,dataSrce);
 	prop_common := IF(onThor, prop_common_thor, prop_common_roxie);
 	
-		
+	//*** MS-158: take the owned/sold properties and search ADVO by address to identify if an address is a business address so they can be counted and rolled up seperately in new shell fields.
+
+	Risk_Indicators.Layouts.Layout_Relat_Prop_Plus_BusInd tf_pre_ADVO(prop_common l, p r) := transform
+		self.zip5 												:= l.zip5;
+		self.prim_range 									:= l.prim_range;
+		self.prim_name 										:= l.prim_name;
+		self.addr_suffix 									:= l.addr_suffix;
+		self.predir 											:= l.predir;
+		self.postdir 											:= l.postdir;
+		self.sec_range 										:= l.sec_range;
+		self.city_name										:= l.city_name;
+		self.st 													:= l.st;
+		self.historydate									:= r.historydate;
+		self.Residential_or_Business_Ind	:= '';
+		self															:= l;
+	end;
+									
+	pre_ADVO := group(join(prop_common(~isrelat), p,	//we're only counting the input subject's properties, so we can drop any relatives properties before searching ADVO
+												 left.seq = right.seq,
+												 tf_pre_ADVO(left, right), left outer), seq); 
+
+	Risk_Indicators.Layouts.Layout_Relat_Prop_Plus_BusInd getAdvo1(pre_ADVO le, Advo.Key_Addr1_history ri) := TRANSFORM
+		self.Residential_or_Business_Ind	:= ri.Residential_or_Business_Ind;
+		self 															:= le;
+	END;
+	
+	//do search of ADVO by property to pick up address type - we are specifically looking for business addresses
+	prop_with_advo_roxie := join(pre_ADVO, Advo.Key_Addr1_history,  //Advo.Key_Addr1_FCRA_history or Advo.Key_Addr1_history - replace and roll to most recent
+					left.zip5 != '' and 
+					left.prim_range != '' and
+					keyed(left.zip5 = right.zip) and
+					keyed(left.prim_range = right.prim_range) and
+					keyed(left.prim_name = right.prim_name) and
+					keyed(left.addr_suffix = right.addr_suffix) and
+					keyed(left.predir = right.predir) and
+					keyed(left.postdir = right.postdir) and
+					keyed(left.sec_range = right.sec_range)  and
+					((unsigned)RIGHT.date_first_seen < (unsigned)Risk_Indicators.iid_constants.full_history_date(left.historydate)), 
+					getAdvo1(LEFT,RIGHT), 
+					left outer,
+					atmost(riskwise.max_atmost));
+
+	prop_with_advo_thor := join(distribute(pre_ADVO, hash64(zip5,
+																												 prim_range,
+																												 prim_name)), 
+					distribute(pull(Advo.Key_Addr1_history), hash64(zip, prim_range, prim_name)),  
+					left.zip5 != '' and 
+					left.prim_range != '' and
+					left.zip5 = right.zip and
+					left.prim_range = right.prim_range and
+					left.prim_name = right.prim_name and
+					left.addr_suffix = right.addr_suffix and
+					left.predir = right.predir and
+					left.postdir = right.postdir and
+					left.sec_range = right.sec_range  and
+					((unsigned)RIGHT.date_first_seen < (unsigned)Risk_Indicators.iid_constants.full_history_date(left.historydate)), 
+					getAdvo1(LEFT,RIGHT), 
+					left outer,
+					atmost(riskwise.max_atmost), LOCAL);
+					
+	prop_with_advo := if(onThor, group(sort(prop_with_advo_thor, seq), seq), prop_with_advo_roxie);
+
+	prop_with_advo_deduped :=  dedup(sort(prop_with_advo, seq, did, zip5, prim_range, prim_name, addr_suffix, predir, postdir, sec_range, -date_first_seen), 
+																												seq, did, zip5, prim_range, prim_name, addr_suffix, predir, postdir, sec_range);
+	
   single_property := 
-		IF(
-			BSversion >= 50,
-			prop_common,
-			IF(production_realtime_mode, prop, prop_hist)
-		);
+		MAP(BSversion >= 53 and ~isFCRA	=> group(prop_with_advo_deduped, seq), //new business property fields are nonFCRA only
+				BSversion >= 50 						=> prop_common,
+																			 IF(production_realtime_mode, prop, prop_hist)
+			 );
 
 // AML	
 	Layout_prop_ownership := RECORD
@@ -401,8 +461,8 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
   // =============== Derogs ===============
 
   derogs := IF (IsFCRA,
-                Risk_Indicators.Boca_Shell_Derogs_FCRA (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion, BSOptions, IncludeLnJ, onThor),
-                Risk_Indicators.Boca_Shell_Derogs      (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), BSversion));
+                Risk_Indicators.Boca_Shell_Derogs_FCRA (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion, BSOptions, IncludeLnJ, onThor, iid),
+								Risk_Indicators.Boca_Shell_Derogs      (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), BSversion));
   
 	derogs_hist := IF (IsFCRA,
                      Risk_Indicators.Boca_Shell_Derogs_Hist_FCRA (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion, BSOptions, IncludeLnJ),
@@ -439,7 +499,9 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
 	// =============== Student File ===============
 	student_rolled := IF (IsFCRA,
 													Risk_Indicators.Boca_Shell_Student_FCRA (ids_only(~isrelat), bsversion, onThor),
-													Risk_Indicators.Boca_Shell_Student      (ids_only(~isrelat), bsversion));
+													Risk_Indicators.Boca_Shell_Student      (ids_only(~isrelat), bsversion, filter_out_fares));  
+													// filter_out_fares is our option that tells us we are running this for leadIntegrity.
+													// Use that same option here as our marketing flag within student function
 
 
 // =============== Aircraft ===============
@@ -987,11 +1049,36 @@ relat_prop := IF (includeRelativeInfo,
                   JOIN(relat_count, Rel_Property_Rolled, LEFT.seq=RIGHT.seq, add_relat_prop(LEFT,RIGHT), LEFT OUTER, MANY LOOKUP, PARALLEL),
                   relat_count);
 
+//MS-158: added new business property count and assessed value fields for owned and sold properties.  Special value definitions:
+//				-1 = DID not found
+//				-2 = no properties found for input subject or isFCRA (can't calculate for FCRA)
+//				-3 = no assessed value on property records found (this valid for the assessed value fields)
 
 risk_indicators.Layout_Boca_Shell add_per_prop(risk_indicators.Layout_Boca_Shell le, Per_Property_Rolled ri) := TRANSFORM
+	prop_hit														:= le.seq = ri.seq; //indicate if we got any property hits for this person
 	SELF.Address_Verification.owned     := ri.owned;
 	SELF.Address_Verification.sold      := ri.sold;
 	SELF.Address_Verification.ambiguous := ri.ambiguous;
+	SELF.Address_Verification.bus_owned.property_total 								:= map(le.DID = 0																			=>	-1,
+																																					 ~prop_hit or isFCRA														=>	-2,
+																																																															ri.bus_owned.property_total);
+	SELF.Address_Verification.bus_owned.property_owned_assessed_total := map(le.DID = 0																			=>	-1,
+																																					 ~prop_hit or isFCRA														=>	-2,
+																																					 ri.bus_owned.property_owned_assessed_total = 0	=> 	-3,
+																																																															ri.bus_owned.property_owned_assessed_total);
+	SELF.Address_Verification.bus_owned.property_owned_assessed_count := map(le.DID = 0																			=>	-1,
+																																					 ~prop_hit or isFCRA														=>	-2,
+																																																															ri.bus_owned.property_owned_assessed_count);
+	SELF.Address_Verification.bus_sold.property_total 								:= map(le.DID = 0																			=>	-1,
+																																					 ~prop_hit or isFCRA														=>	-2,
+																																																															ri.bus_sold.property_total);
+	SELF.Address_Verification.bus_sold.property_owned_assessed_total 	:= map(le.DID = 0																			=>	-1,
+																																					 ~prop_hit or isFCRA														=>	-2,
+																																					 ri.bus_sold.property_owned_assessed_total = 0	=> 	-3,
+																																																															ri.bus_sold.property_owned_assessed_total);
+	SELF.Address_Verification.bus_sold.property_owned_assessed_count 	:= map(le.DID = 0																			=>	-1,
+																																					 ~prop_hit or isFCRA														=>	-2,
+																																																															ri.bus_sold.property_owned_assessed_count);
 	SELF := le;
 END;
 per_prop := JOIN(relat_prop, Per_Property_Rolled, LEFT.seq=RIGHT.seq, add_per_prop(LEFT,RIGHT), LEFT OUTER, MANY LOOKUP);
@@ -1621,7 +1708,67 @@ defaultOffset := project(final2,
 		self.ACC_logs.HighRiskCredit.Count12_24mos	:= if(defaultOffset_24mos, -1, left.ACC_logs.HighRiskCredit.Count12_24mos); 
 		self := left));
 		
-final53 := if(bsversion >= 53 and isFCRA, defaultOffset, final2);
+finalOffset := if(bsversion >= 53 and isFCRA, defaultOffset, final2);
+
+//MS-71: add BIP header information to the shell
+options := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
+	EXPORT UNSIGNED1	DPPA_Purpose 											:= dppa;
+	EXPORT UNSIGNED1	GLBA_Purpose 											:= glb;
+	EXPORT STRING50		DataRestrictionMask								:= DataRestriction;
+	EXPORT STRING50		DataPermissionMask								:= DataPermission;
+	EXPORT STRING10		IndustryClass											:= '';
+	EXPORT UNSIGNED1	LinkSearchLevel										:= Business_Risk_BIP.Constants.LinkSearch.Default;
+	EXPORT UNSIGNED1	BusShellVersion										:= Business_Risk_BIP.Constants.Default_BusShellVersion;
+	EXPORT UNSIGNED1	MarketingMode											:= 0;
+	EXPORT STRING50		AllowedSources										:= Business_Risk_BIP.Constants.Default_AllowedSources;
+	EXPORT UNSIGNED1	BIPBestAppend											:= Business_Risk_BIP.Constants.BIPBestAppend.Default;
+	EXPORT UNSIGNED1	OFAC_Version											:= 0;
+	EXPORT REAL				Global_Watchlist_Threshold				:= 0;
+	EXPORT UNSIGNED1	KeepLargeBusinesses								:= 0;
+	EXPORT BOOLEAN    IncludeTargusGateway 							:= false;
+	EXPORT BOOLEAN    RunTargusGatewayAnywayForTesting 	:= false;
+	EXPORT BOOLEAN    OverrideExperianRestriction 			:= false;	
+	EXPORT BOOLEAN    DoNotUseAuthRepInBIPAppend  			:= false;
+	EXPORT BOOLEAN		IsBIID20													:= false;	
+END;
+
+linkingOptions := MODULE(BIPV2.mod_sources.iParams)
+	EXPORT STRING DataRestrictionMask		:= Options.DataRestrictionMask; 
+	EXPORT BOOLEAN ignoreFares					:= FALSE; 
+	EXPORT BOOLEAN ignoreFidelity				:= FALSE; 
+	EXPORT BOOLEAN AllowAll							:= IF(Options.AllowedSources = Business_Risk_BIP.Constants.AllowDNBDMI, TRUE, FALSE); 
+	EXPORT BOOLEAN AllowGLB							:= Risk_Indicators.iid_constants.GLB_OK(Options.GLBA_Purpose, FALSE );
+	EXPORT BOOLEAN AllowDPPA						:= Risk_Indicators.iid_constants.DPPA_OK(Options.DPPA_Purpose, FALSE );
+	EXPORT UNSIGNED1 DPPAPurpose				:= Options.DPPA_Purpose;
+	EXPORT UNSIGNED1 GLBPurpose					:= Options.GLBA_Purpose;
+	EXPORT BOOLEAN IncludeMinors				:= TRUE; 
+	EXPORT BOOLEAN LNBranded						:= TRUE; 
+END;
+
+AllowedSourcesSet := 
+		SET(
+			CHOOSEN(
+				Business_Risk_BIP.Constants.AllowedSources(
+						(
+							Source <> MDR.SourceTools.src_Dunn_Bradstreet OR 
+							StringLib.StringFind(Options.AllowedSources, Business_Risk_BIP.Constants.AllowDNBDMI, 1) > 0
+						) AND
+						(
+							Options.MarketingMode = Business_Risk_BIP.Constants.Default_MarketingMode OR 
+							Source NOT IN SET(Business_Risk_BIP.Constants.MarketingRestrictedSources, Source)
+						) AND
+						(
+							Options.OverrideExperianRestriction = True OR
+							Source NOT IN SET(Business_Risk_BIP.Constants.ExperianRestrictedSources, Source)
+						)
+				), 
+				300
+			), 
+			Source );
+
+withBIP_Header := Risk_Indicators.Boca_Shell_BIP_Header(finalOffset, Options, linkingOptions, AllowedSourcesSet, isFCRA); 
+
+final53 := if(bsversion >= 53, group(withBIP_Header, seq), finalOffset);
 
 // output(derogs_added_back, named('derogs_added_back'));
 // output(final, named('final'));
@@ -1640,5 +1787,16 @@ final53 := if(bsversion >= 53 and isFCRA, defaultOffset, final2);
 // output(relat_rolled, named('relat_rolled'));
 // output(final2, named('final2'));
 // output(IncludeLnJ, named('IncludeLnJ'));
+// output(prop_common, named('prop_common'));
+// output(pre_ADVO, named('pre_ADVO'));
+// output(prop_with_advo, named('prop_with_advo'));
+// output(prop_with_advo_deduped, named('prop_with_advo_deduped'));
+// output(advo_hits, named('advo_hits'));
+// output(prop_common_53, named('prop_common_53'));
+// output(single_property, named('single_property'));
+// output(Rel_Property_Rolled, named('Rel_Property_Rolled'));
+// output(Per_Property_Rolled, named('Per_Property_Rolled'));
+// output(per_prop, named('per_prop'));
+
 RETURN final53; 
 END;

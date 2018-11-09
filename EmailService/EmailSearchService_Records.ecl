@@ -1,11 +1,12 @@
-import ut,AutoStandardI,doxie,suppress,Email_Data,codes;
+﻿import ut,AutoStandardI,doxie,suppress,Email_Data,codes,D2C;
 
 export EmailSearchService_Records := MODULE
 
   // export recs(Grouped dataset(Assorted_Layouts.did_w_input) in_dids =dataset([],Assorted_Layouts.did_w_input),
 //For deployment to dev64, comment out line above and uncoment the line below:
 export recs(Grouped dataset(Assorted_Layouts.did_w_input) in_dids,
-			boolean by_email_key=FALSE, string32 appType=Suppress.Constants.ApplicationTypes.Default,boolean multipleRoyalties=FALSE) := FUNCTION
+			boolean by_email_key=FALSE, string32 appType=Suppress.Constants.ApplicationTypes.Default,boolean multipleRoyalties=FALSE,
+			string5 industry_class = '' ) := FUNCTION
 		
 		Assorted_Layouts.layout_entiera_rollup_w_seq get_penalt(Assorted_Layouts.did_w_input l,Email_Data.Key_Did r):=transform
 		
@@ -107,8 +108,11 @@ export recs(Grouped dataset(Assorted_Layouts.did_w_input) in_dids,
 			self := [];
 		END;
 
-
-		recs_w_dids_penalt := join(in_dids,Email_Data.Key_Did,keyed(left.did=right.did),
+		
+		recs_w_dids_penalt := join(in_dids,Email_Data.Key_Did,
+													keyed(left.did=right.did) and 
+													~( industry_class = ut.IndustryClass.Knowx_IC and 
+														 right.email_src in D2C.Constants.EmailRestrictedSources ),
 				get_penalt(left,right),
 				keep(Constants.recs_per_did),limit(ut.limits.default));
 

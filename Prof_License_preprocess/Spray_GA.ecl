@@ -1,8 +1,8 @@
-EXPORT Spray_GA(dataset({string ftype,string fdate})infile) := module
+﻿EXPORT Spray_GA(dataset({string ftype,string fdate})infile) := module
 
 //Spray Medical
 
-import lib_fileservices,_control;
+import lib_fileservices,_control,lib_thorlib;
 
 	string					MedCSVSeparator				:=	'\t';
 	string					MedCSVQuote						:=	'"';
@@ -14,7 +14,7 @@ import lib_fileservices,_control;
 	         
 	string pServer			:=  _Control.IPAddress.bctlpedata11 ;
 	
-	string pGroupName			:= if ( _Control.ThisEnvironment.Name <> 'Prod_Thor' ,  'thor400_dev01', 'thor400_60' );
+	string pGroupName			:= thorlib.group();
 
 	
 	

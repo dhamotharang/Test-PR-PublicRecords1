@@ -1,2 +1,2 @@
-IMPORT BIPV2;
+﻿IMPORT BIPV2;
 EXPORT KeySuffix :='_qa';

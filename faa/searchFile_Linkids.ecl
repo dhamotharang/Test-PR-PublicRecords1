@@ -1,4 +1,4 @@
-import faa, ut, BIPV2;
+﻿import faa, ut, BIPV2;
 
 f := faa.file_aircraft_registration_bldg; 
 
@@ -16,10 +16,14 @@ outf_dedup:= dedup(sort(distribute(project(outf, transform(Layout_Searchfile, se
 														hash(n_number,serial_number, mfr_mdl_code, eng_mfr_mdl, year_mfr, type_registrant,name,
 																	street,street2,city,state,zip_code,region,orig_county,country,last_action_date,cert_issue_date,certification,
 																	type_aircraft,type_engine,status_code,mode_s_code,fract_owner,aircraft_mfr_name,model_name)),
-											n_number,serial_number, mfr_mdl_code, eng_mfr_mdl, year_mfr, type_registrant,name,
-												street,street2,city,state,zip_code,region,orig_county,country,last_action_date,cert_issue_date,certification,
-												type_aircraft,type_engine,status_code,mode_s_code,fract_owner,aircraft_mfr_name,model_name,- date_last_seen,local),
-												except aircraft_id, date_first_seen, date_last_seen,lot,local) ; 
+															n_number,serial_number, mfr_mdl_code, eng_mfr_mdl, year_mfr, type_registrant,name,
+															street,street2,city,state,zip_code,region,orig_county,country,last_action_date,cert_issue_date,certification,
+															type_aircraft,type_engine,status_code,mode_s_code,fract_owner,aircraft_mfr_name,model_name,- date_last_seen,local),
+												// KS-1199 dedup on fields that are input to persistent_record_id
+												// except aircraft_id, date_first_seen, date_last_seen,lot,local) ; 
+												n_number,serial_number,mfr_mdl_code,eng_mfr_mdl,year_mfr,type_registrant,name,street,street2,city,state,
+												zip_code,region,orig_county,country,last_action_date,cert_issue_date,certification,type_aircraft,type_engine,
+												status_code,mode_s_code,fract_owner,aircraft_mfr_name,model_name,local);										
 												
 												
   Layout_Searchfile_out := RECORD

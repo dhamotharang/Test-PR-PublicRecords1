@@ -1,4 +1,4 @@
-import ut, _validate, address, did_add,aid, std, nac, SALT32;
+﻿import ut, _validate, address, did_add,aid, std, nac, SALT32;
 
 EXPORT Update_Base (string version, boolean pUseProd = false, boolean pUseDelta = false) := MODULE
 	
@@ -183,8 +183,7 @@ EXPORT Update_Base (string version, boolean pUseProd = false, boolean pUseDelta 
 								 ,Bair.AgencyDeletes.eids_to_delete(regexfind('^CFS', eid))
 								 ,left.eid = right.eid
 								 ,left only
-								 ,lookup
-								 ,local);
+								 ,lookup);
 							
 		#uniquename(base_nightly_f)				
 		%base_nightly_f% 	:= MAC_JOININPUTS_CFS(FALSE);
@@ -268,8 +267,7 @@ EXPORT Update_Base (string version, boolean pUseProd = false, boolean pUseDelta 
 										 ,Bair.AgencyDeletes.eids_to_delete(regexfind('^EVE', eid))
 										 ,left.eid = right.eid
 										 ,left only
-										 ,lookup
-										 ,local), hash(eid, crime));
+										 ,lookup), hash(eid, crime));
 		
 		#uniquename(base_nightly_f)
 		%base_nightly_f% := MAC_JOININPUTS_MO_UDF(false);
@@ -342,8 +340,7 @@ EXPORT Update_Base (string version, boolean pUseProd = false, boolean pUseDelta 
 							 ,Bair.AgencyDeletes.eids_to_delete(regexfind('^EVE', eid))
 							 ,left.eid = right.eid
 							 ,left only
-							 ,lookup
-							 ,local);
+							 ,lookup);
 					 
 		#uniquename(base_nightly_f)
 		%base_nightly_f% 	:= MAC_JOININPUTS_PERSONS_UDF(false);
@@ -436,8 +433,7 @@ EXPORT Update_Base (string version, boolean pUseProd = false, boolean pUseDelta 
 							 ,Bair.AgencyDeletes.eids_to_delete(regexfind('^EVE', eid))
 							 ,left.eid = right.eid
 							 ,left only
-							 ,lookup
-							 ,local);
+							 ,lookup);
 					 
 		#uniquename(base_nightly_f)
 		%base_nightly_f%  := MAC_JOININPUTS_MO(false);
@@ -536,8 +532,7 @@ EXPORT Update_Base (string version, boolean pUseProd = false, boolean pUseDelta 
 										 ,Bair.AgencyDeletes.eids_to_delete(regexfind('^EVE', eid))
 										 ,left.eid = right.eid
 										 ,left only
-										 ,lookup
-										 ,local);
+										 ,lookup);
 					 
 		#uniquename(base_nightly_f)
 		%base_nightly_f%  := MAC_JOININPUTS_PERSONS(false);
@@ -640,8 +635,7 @@ EXPORT Update_Base (string version, boolean pUseProd = false, boolean pUseDelta 
 							 ,Bair.AgencyDeletes.eids_to_delete(regexfind('^EVE', eid))
 							 ,left.eid = right.eid
 							 ,left only
-							 ,lookup
-							 ,local);
+							 ,lookup);
 					 
 		#uniquename(base_nightly_f)
 		%base_nightly_f%  := MAC_JOININPUTS_VEHICLE(false);
@@ -840,17 +834,18 @@ EXPORT Update_Base (string version, boolean pUseProd = false, boolean pUseDelta 
 	
 		stdoff 					:= Bair.Standardize_Input(version, pUseProd, pPrepped).offenders_offender;
 		stdoff_class 		:= Bair.Standardize_Input(version, pUseProd, pPrepped).offenders_offender_classification;
-		stdclass 				:= Bair.Standardize_Input(version, pUseProd, pPrepped).offenders_classification;			
+		// stdclass 				:= Bair.Standardize_Input(version, pUseProd, pPrepped).offenders_classification;			
+		stdclass 				:= bair.files().offenders_class_Base.built;			
 		stdDataProvider := Bair.Standardize_Input(version, pUseProd).Event_data_provider;
 		
 		DataProvider 		:= if(count(stdDataProvider) <> 0, stdDataProvider, Bair.files().dataprovider_base.built);
 		
 		class 
-				:= join(distribute(stdoff_class, hash(classification))
-							,distribute(stdclass, hash(classification_code))
+				:= join(stdoff_class
+							,stdclass
    						,left.classification = right.classification_code
-   						,left outer
-   						,local);
+							,lookup
+   						,left outer);
 		
 		OffJoinClass
 				:= join(distribute(stdoff, hash(agency_offender_id, ori))
@@ -901,8 +896,7 @@ EXPORT Update_Base (string version, boolean pUseProd = false, boolean pUseDelta 
 										 ,Bair.AgencyDeletes.eids_to_delete(regexfind('^OFF', eid))
 										 ,left.eid = right.eid
 										 ,left only
-										 ,lookup
-										 ,local);
+										 ,lookup);
 					 
 		#uniquename(base_nightly_f)
 		%base_nightly_f% 	:= MAC_JOININPUTS_OFFENDERS(false);
@@ -957,8 +951,7 @@ EXPORT Update_Base (string version, boolean pUseProd = false, boolean pUseDelta 
 								Bair.files().AgencyDeletes_base.Built(regexfind('^OFF', eid)),
 								left.eid = right.eid,
 								left only,
-								lookup,
-								local);
+								lookup);
 												
 		Bair.MAC_Join(%res%,%new_base%,%int_deltas%,%linkflags%);	
 		base_r_ := %res%;
@@ -1070,8 +1063,7 @@ EXPORT Update_Base (string version, boolean pUseProd = false, boolean pUseDelta 
 										 ,Bair.AgencyDeletes.eids_to_delete(regexfind('^CRA', eid))
 										 ,left.eid = right.eid
 										 ,left only
-										 ,lookup
-										 ,local);
+										 ,lookup);
 		
 		#uniquename(base_nightly_f)
 		%base_nightly_f% := MAC_JOININPUTS_CRASH(false);
@@ -1170,8 +1162,7 @@ EXPORT Update_Base (string version, boolean pUseProd = false, boolean pUseDelta 
 										 ,Bair.AgencyDeletes.eids_to_delete(regexfind('^LPR', eid))
 										 ,left.eid = right.eid
 										 ,left only
-										 ,lookup
-										 ,local);
+										 ,lookup);
 					 
 		#uniquename(base_nightly_f)
 		%base_nightly_f% := MAC_JOININPUTS_LPR(FALSE);
@@ -1241,8 +1232,7 @@ EXPORT Update_Base (string version, boolean pUseProd = false, boolean pUseDelta 
 								,DataProvider
 								,left.data_provider_id = right.data_provider_id
 								,lookup
-								,LEFT OUTER
-								,local);
+								,LEFT OUTER);
 											
 		#uniquename(base_f)
 		%base_f%
@@ -1644,8 +1634,7 @@ EXPORT Update_Base (string version, boolean pUseProd = false, boolean pUseDelta 
 							 ,Bair.AgencyDeletes.eids_to_delete(regexfind('^OFF', eid))
 							 ,left.eid = right.eid
 							 ,left only
-							 ,lookup
-							 ,local);
+							 ,lookup);
 					 
 		#uniquename(base_nightly_f)
 		%base_nightly_f% 	:= MAC_JOININPUTS_OFF_PIC(FALSE);

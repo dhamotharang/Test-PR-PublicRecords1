@@ -1,12 +1,12 @@
-import bipv2,bipv2_files,BIPV2_ProxID,ut,salt26,tools,strata,bipv2_tools,wk_ut,std,tools;
+﻿import bipv2,bipv2_files,BIPV2_ProxID,ut,salt26,tools,strata,bipv2_tools,wk_ut,std,tools;
 EXPORT _Preprocess(
    dataset(layouts.orig_DOT_Base) pDataset          = BIPV2_Files.files_dotid().DS_BASE
   ,string                         pversion          = bipv2.KeySuffix  
   ,string                         pFilename         = BIPV2_Files.files_dotid().FILE_BASE  //should be the filename from the above dataset
   ,string                         pStrataBuildStep  = ''
   ,boolean                        pFilterMC         = false
-  ,boolean                        pDoStrata         = true
-  ,boolean                        pCopy2StorageThor = true
+  ,boolean                        pDoStrata         = BIPV2_ProxID._Constants().doStrata
+  ,boolean                        pCopy2StorageThor = BIPV2_ProxID._Constants().copy2storagethor
 ) := 
 function
 

@@ -1,7 +1,7 @@
 ﻿EXPORT mSpray:=MODULE
   EXPORT actionSprayFiles(STRING sVersion = constants.sVersion):=FUNCTION
     sLocalDirectory:=constants.sLocationIn+sVersion+'::';
-	  sRemoteDirectory:=constants.sRemoteLocation+sVersion+'/';
+	  sRemoteDirectory:=constants.sRemoteLocation+sVersion[1..8]+'/';
     dFilesToSpray:=DATASET([
       {'mylife1.dat'},
       {'mylife2.dat'},
@@ -14,7 +14,7 @@
     RETURN NOTHOR(
       APPLY(
   	    dFilesToSpray,
-  		  FileServices.SprayVariable(constants.sRemoteIPAddress,sRemoteDirectory+dFilesToSpray.filename,,,,,thorlib.cluster(),sLocalDirectory+dFilesToSpray.filename,,,,TRUE)
+  		  FileServices.SprayVariable(constants.sRemoteIPAddress,sRemoteDirectory+dFilesToSpray.filename,,,,,thorlib.group(),sLocalDirectory+dFilesToSpray.filename,,,,TRUE)
   	  )
     );
   END;

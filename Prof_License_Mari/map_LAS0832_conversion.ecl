@@ -28,8 +28,9 @@ EXPORT map_LAS0832_conversion(STRING pVersion) := FUNCTION
 	//BROK.0000042407.A-CORP        	KELLER WILLIAMS REALTY 1-888-351-5111, L.L.C.  - contains 888                                                                                                       	BROK.CORP - Broker Corporation                    	ACTIVE                                            	NORMAL LICENSE STATU
 	//BROK.0995680761.A03-BRNC      	KELLER WILLIAMS REALTY 1-888-351-5111, L.L.C.  - contains 888                                                                                                       	BROK.BRNC - Broker Branch Office                  	ACTIVE                                            	NORMAL LICENSE STATU
 
+ //Jira-DF 20443 Per Data Receiving Communication, the Active & Inactive record should be included.
 	ValidFile						:= re(TRIM(ORG_NAME,LEFT,RIGHT) != ' ' 
-	                          AND StringLib.StringToUpperCase(LIC)[1..3] != 'APR' AND StringLib.StringToUpperCase(LICSTAT) != 'INACTIVE'
+	                          AND StringLib.StringToUpperCase(LIC)[1..3] != 'APR' /* AND StringLib.StringToUpperCase(LICSTAT) != 'INACTIVE'*/
 	                          AND NOT REGEXFIND(Prof_License_Mari.filters.BadNameFilter, StringLib.StringToUpperCase(TRIM(ORG_NAME,LEFT,RIGHT))));
 
 	maribase_plus_dbas := RECORD,MAXLENGTH(5200)

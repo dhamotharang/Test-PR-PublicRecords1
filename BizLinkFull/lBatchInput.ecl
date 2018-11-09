@@ -1,4 +1,4 @@
-EXPORT lBatchInput:=RECORD
+﻿EXPORT lBatchInput:=RECORD
   UNSIGNED   acctno;
   STRING120  company_name;
   STRING10   prim_range;
@@ -20,3 +20,4 @@ EXPORT lBatchInput:=RECORD
   STRING60   contact_email;
   UNSIGNED6  entered_proxid;
 END;
+

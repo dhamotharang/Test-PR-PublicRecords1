@@ -1,4 +1,4 @@
-#workunit('name','nonfcrashell 5.2');
+﻿#workunit('name','nonfcrashell 5.2');
 
 // Reads sample data from input file, makes a SOAP call to service specified and (optionally),
 // saves results in output file. 
@@ -13,7 +13,7 @@
 
 IMPORT Risk_Indicators, RiskWise, data_services, _control, gateway;
 
-unsigned record_limit :=   10;    //number of records to read from input file; 0 means ALL
+unsigned record_limit :=   0;    //number of records to read from input file; 0 means ALL
 unsigned1 parallel_calls := 30;  //number of parallel soap calls to make [1..30]
 unsigned1 eyeball := 25;
 boolean RemoveFares := false;	// change this to TRUE for FARES filtering
@@ -22,7 +22,7 @@ string DataRestrictionMask := '0000000000000000000000000';	// byte 6, if 1, rest
 																								// byte 10 restricts Transunion, 12 restricts ADVO, 13 restricts bureau deceased data
 string DataPermissionMask  := '0000000001101';	//position 10 is SSA, position 11 is FDN test fraud/contributory fraud, position 13 is Insurance DL
 string IntendedPurpose := '';  // leave blank in nonfcra
-
+unsigned3 LastSeenThreshold := 0;	//# of days to consider header records as being recent for verification.  0 will use default (41 and lower = 365 days, 50 and higher = include all) 
 unsigned1 glba := 1;
 unsigned1 dppa := 3;
 boolean RetainInputDID := FALSE; //Change to TRUE to retain the input LexID
@@ -123,6 +123,7 @@ l assignAccount (ds_input le, INTEGER c) := TRANSFORM
   SELF.datarestrictionmask := datarestrictionmask;
   SELF.datapermissionmask := datapermissionmask;
   SELF.RemoveFares := RemoveFares;
+  SELF.LastSeenThreshold := LastSeenThreshold;
 	self.bsversion := 52;	
 	// if you are running realtime mode with today's date and you need realtime inquiries turn on deltabase searching
 	// self.gateways := project(riskwise.shortcuts.gw_delta_dev, transform(Gateway.Layouts.Config, self := left, self := []) );   //dev deltabase

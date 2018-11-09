@@ -1,4 +1,4 @@
-/*2015-07-23T17:13:43Z (Srilatha Katukuri)
+﻿/*2015-07-23T17:13:43Z (Srilatha Katukuri)
 #173256 - removing EA and Adding TM in notification process
 */
 /*2015-02-18T00:03:55Z (Ayeesha Kayttala)
@@ -9,11 +9,10 @@ export proc_build_dupe_extract(string filedate,string timestamp):= function
 import ut;
 
 //state_report_number is unique for TF.
-incident := project(FLAccidents_Ecrash.Infiles.incident(work_type_id in ['1', 'NULL','0'] and source_id in ['TF','EA']), transform({FLAccidents_Ecrash.Layout_Infiles.incident_new}, 
-                                                     self.case_identifier := if(left.source_id = 'TF', left.state_report_number,left.case_identifier), 
-																										 SELF.ori_number := IF (left.ori_number = 'FL0130600','FL0130000',left.ori_number); //MDPD ORI correction remove this code after the historical update completed successfully
-													                           SELF.report_agency_ori := IF (left.report_agency_ori = 'FL0130600','FL0130000',left.report_agency_ori); //MDPD ORI correction remove this code after the historical update completed successfully
-																										 self:= left));
+incident := project(FLAccidents_Ecrash.Infiles.incident(work_type_id in ['1', 'NULL','0'] and source_id in ['TF','EA']), 
+                                                        transform({FLAccidents_Ecrash.Layout_Infiles.incident_new}, 
+                                                                  self.case_identifier := if(left.source_id = 'TF', left.state_report_number, left.case_identifier);
+																										                                        self:= left;));
 																										 
 allrecs := sort(distribute(incident,hash(case_identifier))
 			,case_identifier,agency_id,loss_state_abbr,report_type_id,source_id,crash_date,Sent_to_HPCC_DateTime,report_id,local)(hash_key != '"Hash_Key"');

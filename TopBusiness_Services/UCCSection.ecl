@@ -1,4 +1,4 @@
-/* TBD:
+﻿/* TBD:
    1. Revise all "joins" for type, keep, limit, etc. and 
       replace join limit with Constants.
    2. Research/resolve open issues, search on "???"
@@ -61,7 +61,7 @@ EXPORT UCCSection := MODULE;
   // Next join to get all the UCC "main" recs/filing data needed to output on the report and 
 	// determine the overall UCC "status".
 	set_terminated_types := ['LAPSED','L','RELEASE','EXPUNGED','DELETED',
-	                         'TERMINATED','TERMINATION','UCC3 TERMINATION'];
+	                         'TERMINATED','TERMINATION','UCC3 TERMINATION', 'UCC-3 TERMINATION'];
 
   ds_uccmain_keyrecs := join(ds_linkids_keyrecs_deduped,UCCV2.Key_Rmsid_Main(),
                                keyed(left.tmsid = right.tmsid), //get all recs for the tmsids

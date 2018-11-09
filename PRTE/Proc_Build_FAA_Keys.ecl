@@ -1,4 +1,4 @@
-import	_control, PRTE_CSV;
+﻿import	_control, PRTE_CSV;
 
 export Proc_Build_FAA_Keys (
 														 string		pIndexVersion					= ''
@@ -71,4 +71,5 @@ function
 																				) 
 										 );
 
-end;
+end: DEPRECATED('Use PRTE2_FAA.Proc_Buid_Keys');
+

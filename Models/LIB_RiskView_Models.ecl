@@ -1,7 +1,4 @@
-/*2017-04-06T23:35:52Z (laure fischer)
-RR-11164 - RVT1608_2 - added to list of valid v50 models
-*/
-// This MODULE EXPORTs all of our model calls.  By doing this, each library can request a specific module and thus only those models are compiled.
+﻿// This MODULE EXPORTs all of our model calls.  By doing this, each library can request a specific module and thus only those models are compiled.
 
 IMPORT Models, Risk_Indicators, RiskView;
 
@@ -24,13 +21,14 @@ EXPORT LIB_RiskView_Models (
 	SHARED returnCode				:= arguments.returnCode;
 	SHARED payFrequency			:= arguments.payFrequency;
 	SHARED customInputs			:= arguments.Custom_Inputs;
+	shared isPreScreenPurpose := StringLib.StringToUpperCase(intendedPurpose) = 'PRESCREENING';
 	
 	/* Model Validation -- Use this when trying to validate a new model through the RiskView.Search_Service */
   EXPORT TurnOnValidation := FALSE; // When TRUE allows for Layout_Debug to be OUTPUT in the Search_Service
 	//EXPORT TurnOnValidation := TRUE; // When TRUE allows for Layout_Debug to be OUTPUT in the RiskView.Search_Service
 	
 	
-	EXPORT ValidatingModel := Models.RVB1610_1_0 (BocaShell); // Change this to the model you are tring to validate
+	EXPORT ValidatingModel := Models.RVA1611_2_0 (BocaShell, False); // Change this to the model you are tring to validate
 	
 	
 	// Version 4.0
@@ -107,6 +105,15 @@ EXPORT LIB_RiskView_Models (
    ***************************************************************************** */
 
 
+/*
+FCRA Logger is used for Batch and XML. For FCRA we need to use the calcIndex(which adds 70).
+As the Logger does this code:
+if( modelIdentifier >= 100 ){
+		position = (modelIdentifier % 100) + 30; 
+By us adding 70 in ECL, the logger will convert it to be the same value that ESP has and the value
+that is sent INTO calcindex for ECL.
+*/
+
 	EXPORT ValidV50Models := DATASET([// Model Name |    Output Name     | Model Index   | Model Type
                                     //     v      |         v          |    v          |    v
 																			{'RVA1503_0', MType_A+'RVA1503_0', calcIndex( 40), '0-999', 0},
@@ -122,7 +129,7 @@ EXPORT LIB_RiskView_Models (
 																			{'RVG1511_1', MType_G+'RVG1511_1', calcIndex( 50), '0-999', 0},
 																			{'RVG1605_1', MType_G+'RVG1605_1', calcIndex( 51), '0-999', 0},
 																			{'MLA1608_0', 'MLA1608_0', calcIndex( 52), '', calcIndex( 49)}, //Military Lending Act (Equifax gateway)
-																			//place hold for #53 between #52 and #54 ( as I just realized now #53 doesnâ€™t exist.)
+																			//place hold for #53 between #52 and #54 ( as I just realized now #53 doesn’t exist.)
 																			{'RVA1607_1', MType_A+'RVA1607_1', calcIndex( 54), '0-999', 0},
 																			{'RVP1605_1', MType_G+'RVP1605_1', calcIndex( 55), '0-999', 0},
 																		  {'RVA1605_1', MType_A+'RVA1605_1', calcIndex( 56), '0-999', 0},
@@ -134,6 +141,10 @@ EXPORT LIB_RiskView_Models (
 																			{'RVG1705_1', MType_G+'RVG1705_1', calcIndex( 62), '0-999', 0}, //Telecheck Gaming
 																			{'RVC1609_1', MType_G+'RVC1609_1', calcIndex( 63), '0-999', 0}, //TJR
 																			{'RVB1610_1', MType_B+'RVB1610_1', calcIndex( 64), '0-999', 0}, //USAA
+																			{'RVG1706_1', MType_G+'RVG1706_1', calcIndex( 65), '0-999', 0}, //Telecheck nonGaming
+																			{'RVA1611_1', MType_A+'RVA1611_1', calcIndex( 66), '0-999', 0}, //Ford Motor Credit
+																			{'RVA1611_2', MType_A+'RVA1611_2', calcIndex( 67), '0-999', 0}, //Ford Motor Credit
+																			
 																		// ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
 																			{'RVA9999_9', MType_A+'RVA9999_9', 0, '0-999', 0},
 																			{'RVB9999_9', MType_B+'RVB9999_9', 0, '0-999', 0},
@@ -172,8 +183,9 @@ EXPORT LIB_RiskView_Models (
 											'RVG1702_1' => UNGROUP(Models.RVG1702_1_0(BocaShell)),
 											'RVG1705_1' => UNGROUP(Models.RVG1705_1_0(BocaShell)),
 											'RVB1610_1' => UNGROUP(Models.RVB1610_1_0(BocaShell)),
-											
-											
+											'RVG1706_1' => UNGROUP(Models.RVG1706_1_0(BocaShell)),		
+											'RVA1611_1' => UNGROUP(Models.RVA1611_1_0(BocaShell, isPreScreenPurpose)),	
+											'RVA1611_2' => UNGROUP(Models.RVA1611_2_0(BocaShell, isPreScreenPurpose)),	
 											// ----------------------------------------------------------------------------------
 											// ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
 											'RVA9999_9' => UNGROUP(Models.FAKE_0_0(BocaShell, 'RV50')),

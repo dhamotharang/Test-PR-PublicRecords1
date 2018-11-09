@@ -1,8 +1,8 @@
-import ut, address, Risk_Indicators, Models, gateway;
+﻿import ut, address, Risk_Indicators, Models, gateway;
 
 export NP2O_Function(dataset(Layout_PRII) indata, dataset(Gateway.Layouts.Config) gateways, unsigned1 glb, unsigned1 dppa, string4 tribCode,
 							string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
-							string50 DataPermission=risk_indicators.iid_constants.default_DataPermission) := FUNCTION
+							string50 DataPermission=risk_indicators.iid_constants.default_DataPermission, OFACversion = 1):= FUNCTION
 
 boolean OFAC := tribCode in ['np21','np25','np27','np50','np60','np80','np81','np82','np90','np91','np92']; 
 
@@ -64,9 +64,15 @@ END;
 
 prep := PROJECT(indata, into(LEFT));
 
-ofac_version := if(tribcode in ['np90','np91','np92'], 3, 1);
-include_ofac := if(tribcode in ['np90','np91','np92'], true, false);
-watchlist_threshold := if(tribcode in ['np90','np91','np92'], 0.85, 0.84);
+ofac_version := map( tribcode = 'np21' and OFACversion = 4 => OFACversion,
+																				tribcode in ['np90','np91','np92'] => 3, 
+																																														1);
+include_ofac := map(	tribcode = 'np21' and OFACversion = 4 => true,
+																					tribcode in ['np90','np91','np92'] => true, 
+																					false);
+watchlist_threshold := map( tribcode = 'np21' and OFACversion = 4 => 0.85, 
+																											tribcode in ['np90','np91','np92'] => 0.85, 
+																										 0.84);
 
 //options for target model fp1403 to get cvi from np31
 DisableInquiriesInCVI := True;			//Disable Customer Network: True

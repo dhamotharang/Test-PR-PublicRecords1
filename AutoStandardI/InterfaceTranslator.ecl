@@ -1,4 +1,4 @@
-import AutoStandardI;
+﻿import AutoStandardI;
 import address, doxie, ut, corp2_services, vehiclev2_services, business_header_ss, business_header,
        header, suppress, STD;
 
@@ -613,9 +613,9 @@ export InterfaceTranslator := module
 	end;
 	export casenumber_value := module
 		export params := interface
-			export string17 casenumber;
+			export string25 casenumber;
 		end;
-		export string17 val(params in_mod) := in_mod.casenumber;
+		export string25 val(params in_mod) := in_mod.casenumber;
 	end;
 	export filingjurisdiction_val := module //TODO: only in prof_LicenseV2_Services/ProfLicSearch; move to "value"
 		export params := interface
@@ -729,7 +729,7 @@ export InterfaceTranslator := module
       ssn_filt := ssn_filtered_value.val(in_mod);
 			app_type := application_type_val.val (in_mod);
 			Suppress.MAC_Suppress_Set(app_type,supp_set);
-			supp_key := suppress.Key_New_Suppression (
+			supp_key := suppress.Key_New_Suppression() (
 				keyed (product in supp_set),
 				keyed (linking_type=Suppress.Constants.LinkTypes.SSN),
 				keyed (Linking_ID=ssn_filt));

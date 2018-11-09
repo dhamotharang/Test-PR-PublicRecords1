@@ -1,4 +1,4 @@
-import Codes;
+﻿import Codes;
 
 /*
 	*************************************************************************************
@@ -52,6 +52,7 @@ export Master := dataset(
 			{'ROYALTY', 'EN_RTPERSON_SRCH', '142'		, 'G', ''			, 'Experian Realtime Person Search'},
 			{'ROYALTY', 'EXP_NC_CRIM',      '143'		, 'G', ''			, 'Experian North Carolina Criminal Records'},
 			{'ROYALTY', 'EXPERIAN_PLATE_VIN', '144'		, 'G', ''		, 'Experian plate to VIN'},
+			{'ROYALTY', 'EXPERIAN_AUTO_CHECK', '145'	, 'G', ''		, 'Experian AutoCheck auto history'},
 			// RESERVED: 150-159 - Inview Business Report 
 			{'ROYALTY', 'INVIEW_DEFAULT'		, '150', 'G', ''			, 'Business InView - Default'}, 
 			{'ROYALTY', 'INVIEW_REPORT'			, '151', 'G', ''			, 'Business InView - BCRCI, BFRLEVL, BCIR Custom'}, 
@@ -106,7 +107,7 @@ export Master := dataset(
 			// RESERVED: 390-399 - Delaware Corporation (ESP only)
 			{'ROYALTY', 'DELCORP_SRCH2'		, '390', 'G', ''			, 'Delaware Corporation'}, 
 			{'ROYALTY', 'DELCORP_RPT2'		, '391', 'G', ''			, 'Delaware Corporation'}, 
-			// RESERVED: 400-409 - Social Media Locator - Social Intelligence - AFI Social Media Locator Search â€“ Project #2503 (ESP only)
+			// RESERVED: 400-409 - Social Media Locator - Social Intelligence - AFI Social Media Locator Search – Project #2503 (ESP only)
 			{'ROYALTY', 'SMLOCATOR'				, '400', 'G', ''			, 'Social Media Locator (Social Intelligence)'}, 
 			{'ROYALTY', 'SMLOCATOR_DEMO'	, '401', 'G', ''			, 'Social Media Locator (Social Intelligence) - DEMO'}, 
 			// RESERVED: 410-419 - Worldview Validate - Global Data Consortium (ESP only)
@@ -221,6 +222,21 @@ export Master := dataset(
       {'ROYALTY', 'EFX_TWN_VOI',                      '622', 'G', '' , 'Equifax TWN Verification of Income'},	
       {'ROYALTY', 'EFX_TWN_EI',                       '623', 'G', '' , 'Equifax TWN Employment Indicator'},	
       {'ROYALTY', 'EFX_TWN_EI_ENH',                   '624', 'G', '' , 'Equifax TWN Enhanced Employment Indicator'},
+			{'ROYALTY', 'EFX_ATTR',                         '625', 'G', '' , 'Equifax Data Attributes model 5391'},
+			{'ROYALTY', 'DMD',                              '640', 'I', '' , 'Health Care Practitioner email addresses'},
+			{'ROYALTY', 'FDNCORR',                          '650', 'I', '' , 'LexisNexis internal FDN logging'},
+			{'ROYALTY', 'DHC',                              '660', 'I', '' , 'DHC affiliations dataset'},
+      {'ROYALTY', 'DHC_IDN',                          '661', 'I', '' , 'DHC affiliations where facility type is IDN'},
+      {'ROYALTY', 'DHC_ACO',                          '662', 'I', '' , 'DHC affiliations where facility type is ACO'},
+      {'ROYALTY', 'DHC_GPO',                          '663', 'I', '' , 'DHC affiliations where facility type is GPO'},
+      {'ROYALTY', 'AHA_EXEC_CONTACTS',                '670', 'I', '' , 'HCO executive contacts where the data source is AHA'},
+      {'ROYALTY', 'AHA_HOSP_PROFILER',                '671', 'I', '' , 'AHA hospital profiler dataset'},
+      {'ROYALTY', 'AHA_HOSP_PROFILER',                '672', 'I', '' , 'AHA full profile dataset'},
+      {'ROYALTY', 'MCH_EXEC_CONTACTS',                '676', 'I', '' , 'HCO executive contacts where the data source is MCH'},
+      {'ROYALTY', 'HLD',                              '678', 'I', '' , 'HLD email addresses'},
+      {'ROYALTY', 'AMA_ID',                           '680', 'I', '' , 'AMA ID dataset where the data source is DMD'},
+      {'ROYALTY', 'ABMS',                             '682', 'I', '' , 'ABMS distinct LNPID dataset'},
+			{'ROYALTY', 'ACCUITY_BANK_ROUTING',             '690', 'I', '' , 'Accuity Bank Routing Data'},
 			{'ROYALTY', 'CORTERA_REPORT',                   '700', 'G', '' , 'Cortera business info gateway'},
 			{'ROYALTY', 'ACCUDATA_DEFAULT',                 '710', 'G', '' , 'Accudata standard request'},
 			{'ROYALTY', 'ACCUDATA_CNAM_CNM2',               '711', 'G', '' , 'Accudata phone number calling name'},

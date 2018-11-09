@@ -1,4 +1,4 @@
-#OPTION('allowedClusters','thor400_44,thor400_60');
+﻿#OPTION('allowedClusters','thor400_44,thor400_66');
 IMPORT Roxiekeybuild,bankruptcyv3, Banko,bankruptcyv2,lib_fileservices, lib_stringlib, _control,did_add, ut , fcra, dops, STD, Orbit3;
 
 
@@ -146,14 +146,14 @@ roxiekeybuild.Mac_SK_Move_V3('~thor_data400::key::banko::fcra::@version@::courtc
 updatedops :=  
 							if( dops.GetBuildVersion('BankruptcyV2Keys','B','N','T')[1..8] <> filedate[1..8] and dops.GetBuildVersion('FCRA_BankruptcyKeys','B','F','T')[1..8] <> filedate[1..8],
 							sequential(
-									RoxieKeybuild.updateversion('BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com,John.Freibaum@lexisnexisrisk.com, kevin.reeder@lexisnexisrisk.com, Michael.Gould@lexisnexisrisk.com, Randy.Reyes@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com, intel357@bellsouth.net',,'N',,'Y'),
-									RoxieKeybuild.updateversion('FCRA_BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com,John.Freibaum@lexisnexisrisk.com, kevin.reeder@lexisnexisrisk.com, Michael.Gould@lexisnexisrisk.com, Randy.Reyes@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com, intel357@bellsouth.net',,'F',,'Y'),
+									dops.updateversion('BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com,John.Freibaum@lexisnexisrisk.com, kevin.reeder@lexisnexisrisk.com, Michael.Gould@lexisnexisrisk.com, Randy.Reyes@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com, intel357@bellsouth.net',,'N',,'Y'),
+									dops.updateversion('FCRA_BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com,John.Freibaum@lexisnexisrisk.com, kevin.reeder@lexisnexisrisk.com, Michael.Gould@lexisnexisrisk.com, Randy.Reyes@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com, intel357@bellsouth.net',,'F',,'Y'),
 									Banko.Manage_Input_Files(true)
 										),
 							if (~(ut.Weekday((integer)filedate[1..8]) = 'SATURDAY' or ut.Weekday((integer)filedate[1..8]) = 'SUNDAY'),
 								sequential(
-									RoxieKeybuild.updateversion('BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com,John.Freibaum@lexisnexisrisk.com, kevin.reeder@lexisnexisrisk.com, Michael.Gould@lexisnexisrisk.com, Randy.Reyes@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com',,'N'),
-									RoxieKeybuild.updateversion('FCRA_BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com,John.Freibaum@lexisnexisrisk.com, kevin.reeder@lexisnexisrisk.com, Michael.Gould@lexisnexisrisk.com, Randy.Reyes@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com',,'F'),
+									dops.updateversion('BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com,John.Freibaum@lexisnexisrisk.com, kevin.reeder@lexisnexisrisk.com, Michael.Gould@lexisnexisrisk.com, Randy.Reyes@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com',,'N'),
+									dops.updateversion('FCRA_BKEventsKeys',filedate,'Christopher.Brodeur@lexisnexisrisk.com,John.Freibaum@lexisnexisrisk.com, kevin.reeder@lexisnexisrisk.com, Michael.Gould@lexisnexisrisk.com, Randy.Reyes@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com',,'F'),
 									Banko.Manage_Input_Files(true)
 										)
 										

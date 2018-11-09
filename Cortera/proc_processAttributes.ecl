@@ -6,6 +6,7 @@ EXPORT proc_processAttributes(dataset(Cortera.Layout_Header_Out) hdr, dataset(Co
 			self.processDate := Std.Date.Today();
 			self.dt_first_seen := hdr.dt_first_seen;
 			self.dt_last_seen := hdr.dt_last_seen;
+			self.dt_vendor_first_reported := (unsigned4)version;
 			self.dt_vendor_last_reported := (unsigned4)version;
 			self.current_rec := true;
 			self := attr;

@@ -313,7 +313,8 @@ attrLnJ :=  if( IncludeLnJ /*and FilterLnJ = false*/,
 riskview5_attr_search_results_attrv5 := join(clam, attrv5, left.seq=right.seq,
 transform(riskview.layouts.layout_riskview5_search_results, 
 	self.LexID := if(right.did=0, '', (string)right.did);
-	self.ConsumerStatements := left.ConsumerStatements;
+	self.ConsumerStatements := project(left.ConsumerStatements, transform(
+		iesp.share_fcra.t_ConsumerStatement, self.dataGroup := '', self := left));
 	self := right,
 	self := left,
 	self := []), LEFT OUTER, KEEP(1), ATMOST(100));

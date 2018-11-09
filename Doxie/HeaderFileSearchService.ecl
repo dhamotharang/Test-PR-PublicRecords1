@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="headerFileSearchRequest" fast_display = "true">
 	<part name="seq" type="xsd:integer"/>
   <part name="SSN" type="xsd:string"/>
@@ -91,7 +91,7 @@
 <message name="headerFileSearchRequest" wuTimeout="300000">
 */
 
-IMPORT PhonesFeedback,PhonesFeedback_Services,doxie,Risk_Indicators,iesp,AddressFeedback,AddressFeedback_Services,WSInput;
+IMPORT PhonesFeedback,PhonesFeedback_Services,doxie,Risk_Indicators,iesp,AddressFeedback,AddressFeedback_Services,WSInput,Royalty;
 EXPORT HeaderFileSearchService := MACRO
 		
 		//The following macro defines the field sequence on WsECL page of query. 
@@ -175,9 +175,15 @@ EXPORT HeaderFileSearchService := MACRO
 																		 FDNContDataPermitted, FDNInqDataPermitted),
 																	//Otherwise just pass along the original results dataset
 																	results);
-
+  
+    FDN_check     := ds_results_with_fdninds(fdn_results_found = true);   
+	  FDN_Royalties := Royalty.RoyaltyFDNCoRR.GetOnlineRoyalties(FDN_check);
+    royalties     := if(IncludeFraudDefenseNetwork, FDN_Royalties);
+    OUTPUT(Royalties, NAMED('RoyaltySet'));
+		
 		doxie.MAC_Marshall_Results(ds_results_with_fdninds,ta2);
 		ta3 := TABLE(ta2,{unsigned4 seq := seq_value,ta2});
+		
 		MAP( did_only => output(DEDUP(table(outf, {did}), did)),
 				 Raw_Records => output(outf),
 			 output(ta3, NAMED('Results')))

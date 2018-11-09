@@ -1,4 +1,4 @@
-#workunit('name','Hygenics SexPred Pre-process: Spray Hygenics Raw Data');
+﻿#workunit('name','Hygenics SexPred Pre-process: Spray Hygenics Raw Data');
 IMPORT lib_stringlib, lib_fileservices, _control,lib_thorlib, digssoff;
 
 EXPORT Spray_Soff_Files (String srcIP,
@@ -49,6 +49,7 @@ EXPORT Spray_Soff_Files (String srcIP,
 						OPFileName, 
 						-1,,, 
 						true, 
+						true,
 						true),
 
 	output('Source Lookup not found'+' '+srcIP+' '+RemoteLoc+' '+remoteFileName));

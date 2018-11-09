@@ -1,4 +1,4 @@
-#workunit('name','NonFCRA BocaShell 4.1');
+﻿#workunit('name','NonFCRA BocaShell 4.1');
 
 // Reads sample data from input file, makes a SOAP call to service specified and (optionally),
 // saves results in output file. 
@@ -22,6 +22,7 @@ string DataRestrictionMask := '0000000000000000000000000';	// byte 6, if 1, rest
 																								// byte 10 restricts Transunion, 12 restricts ADVO, 13 restricts bureau deceased data
 unsigned1 glba := 1;
 unsigned1 dppa := 3;
+unsigned3 LastSeenThreshold := 0;	//# of days to consider header records as being recent for verification.  0 will use default (41 and lower = 365 days, 50 and higher = include all) 
 
 //===================  input-output files  ======================
 infile_name := '~jpyon::in::axcess_3339_f_s_in';
@@ -91,6 +92,7 @@ l assignAccount (ds_input le, INTEGER c) := TRANSFORM
   SELF.IncludeScore := true;
   SELF.datarestrictionmask := datarestrictionmask;
   SELF.RemoveFares := RemoveFares;
+	SELF.LastSeenThreshold := LastSeenThreshold;
 	self.bsversion := 41;				
   SELF := le;
   SELF := [];

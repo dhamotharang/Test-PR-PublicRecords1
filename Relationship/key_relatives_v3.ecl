@@ -1,8 +1,9 @@
-import doxie,ut,data_services;
-res := File_Relative(not(confidence IN ['NOISE','LOW'] OR (type = '2ND DEGREE' AND confidence = 'MEDIUM')));
+﻿import doxie,ut,data_services;
+res := relationship.File_Relative(not(confidence IN ['NOISE','LOW']));
 
-export Key_Relatives_v3 := INDEX(res, 
+resNeutral := functions_output.convertTitledToKey(res);
+
+export Key_Relatives_v3 := INDEX(resNeutral, 
 {did1},
-{res},   
+{resNeutral},   
 data_services.Data_Location.Relatives+'thor_data400::key::relatives_v3_' + doxie.version_superkey);
-

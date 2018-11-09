@@ -1,4 +1,4 @@
-IMPORT RiskWise;
+﻿IMPORT RiskWise;
 EXPORT fn_get_zips(STRING sCity,STRING sState,STRING sZip,UNSIGNED iRadius):=FUNCTION
   iZipRadius:=IF((sCity='' OR sState='') AND sZip='',0,iRadius);
   dWithinRadius:=TABLE(RiskWise.Key_ZipCitySt(keyed(city=StringLib.StringToUpperCase(sCity) AND state=StringLib.StringToUpperCase(sState))),{SET OF UNSIGNED zips:=ziplib.ZipsWithinRadius((STRING)zip5,iZipRadius)});

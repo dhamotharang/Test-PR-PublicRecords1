@@ -1,4 +1,4 @@
-// Begin code to perform the matching itself
+﻿// Begin code to perform the matching itself
  
 IMPORT SALT33,ut,std;
 EXPORT matches(DATASET(layout_BizHead) ih,UNSIGNED MatchThreshold = Config_BIP.MatchThreshold) := MODULE
@@ -4819,3 +4819,4 @@ EXPORT PostIDs := BizLinkFull.Fields.UIDConsistency(Patched_Infile_thin); // Exp
 EXPORT PatchingError0 := PreIDs.IdCounts[2].cnt - PostIDs.IdCounts[2].cnt - MatchesPerformed - COUNT(BasicMatch(ih).patch_file)  + SlicesPerformed; // Should be zero
 EXPORT DuplicateRids0 := COUNT(Patched_Infile_thin) - PostIDs.IdCounts[1].Cnt; // Should be zero
 END;
+

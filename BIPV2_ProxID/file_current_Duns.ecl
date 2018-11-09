@@ -1,4 +1,4 @@
-import dnb_dmi;
+﻿import dnb_dmi;
 EXPORT file_current_Duns(
 	 dataset(dnb_dmi.Layouts.base.companies	)	pFile_DNB_Base	= dnb_dmi.files().base.companies.qa
 	,string														        pPersistname		= '~thor_data400::persist::BIPV2_ProxID::file_current_Duns'	

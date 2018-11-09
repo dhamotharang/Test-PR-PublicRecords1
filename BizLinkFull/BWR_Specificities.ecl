@@ -1,8 +1,7 @@
-//This is the code to execute in a builder window
+﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','BizLinkFull.BWR_Specificities - Specificities - SALT V3.3.1');
-IMPORT BizLinkFull,SALT33;
-IMPORT SALTTOOLS30;
+#workunit('name','BizLinkFull.BWR_Specificities - Specificities - SALT V3.7.2');
+IMPORT BizLinkFull,SALT37;
 SpecMod := BizLinkFull.specificities(BizLinkFull.File_BizHead);
 // Display the specificities and the specificity shifts
 // NOTE:This is done by automatically by BWR_Iterate for people doing a full internal build
@@ -12,14 +11,9 @@ OUTPUT(SpecMod.SpcShift,NAMED('SpcShift'));
 // Uncommenting the line below gives a detailed profile of the specificities of each field
 // OUTPUT(SpecMod.AllProfiles,NAMED('SpcProfiles'));
  
-// On repository-based HPCC platforms, the following macro will patch your SPC attribute with the
-// latest POPULATION count and specificity/switch values.  See comments in the macro for more options!
-// SALTTOOLS30.mac_Patch_SPC(SpecMod.Specificities,'BizLinkFull.<your_spc_attribute>',BizLinkFull.File_BizHead);
- 
-  OUTPUT(BizLinkFull.SEE_Specificities_Comp.SEE_Specificities_Comp_Ins001_DDL,NAMED('SEE_Specificities_Comp_Ins001_DDL'));
-  BizLinkFull.SEE_Specificities_Comp.Build_Ins001_StatsType.BuildAll;
-  BizLinkFull.SEE_Specificities_Comp.Build_Ins001_vSpecificities.BuildAll;
-  OUTPUT(DATASET([  {'(a.innerHTML ? a : b.innerHTML ? b : c.innerHTML ? c : d).innerHTML = "<a href=\'http://viz.hpccsystems.com/v1.2.2/apps/legacyDash.html?Hostname=" + document.location.hostname + "&Port=" + document.location.port + "&Protocol=" + document.location.protocol.substring(0,document.location.protocol.length-1) + "&Wuid=" + this.Wuid + "&ResultName=" + "SEE_Specificities_Comp_Ins001_DDL" + "\'>Dashboard for Salt Specificities(Ins001)</a>"'}
-], {varstring Test__javascript}),NAMED('Dashboard_Links'));
-  BizLinkFull.SEE_Specificities_Comp.Build_Ins001_vDetail.BuildAll;
+// The following macro OUTPUTs your SPC file patched with the latest POPULATION count and
+// specificity/switch values.  See comments in the macro for more options!
+// IMPORT SALTTOOLS30;
+// SpcPatch := SALTTOOLS30.mac_Patch_spcString(SpecMod.Specificities,BizLinkFull.File_BizHead,BizLinkFull.GenerationMod.spcString);
+// OUTPUT(SpcPatch,NAMED('SpcPatch'));
  

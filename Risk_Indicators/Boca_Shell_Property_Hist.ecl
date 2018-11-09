@@ -1,4 +1,4 @@
-import LN_PropertyV2, ut, RiskWise;
+﻿import LN_PropertyV2, ut, RiskWise;
 
 export Boca_Shell_Property_Hist (GROUPED DATASET(Layout_PropertyRecord) p_address,
                                  GROUPED DATASET(Layout_Boca_Shell_ids) ids, 
@@ -579,7 +579,7 @@ All_Added := UNGROUP(wDistressed+pre_property_fid(own_fares_id=''));
 
 
 
-Layouts.layout_relat_prop_plusv4 to_relat_prop(Deeds_added le) :=
+Layouts.Layout_Relat_Prop_Plus_BusInd to_relat_prop(Deeds_added le) :=
 TRANSFORM
 	SELF.isrelat := le.isrelat;
 	SELF.seq := le.seq;
@@ -609,6 +609,8 @@ TRANSFORM
 	SELF.county := le.county;
 	SELF.geo_blk := le.geo_blk;
 	SELF.census_loose := true;
+	SELF.Residential_or_Business_Ind  := '';
+	SELF.historydate  := 0;
 	SELF := le;
 END;
 Property := PROJECT(All_added, to_relat_prop(LEFT));

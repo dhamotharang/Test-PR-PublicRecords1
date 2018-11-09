@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Company Search">
   <part name="CompanySearchRequest" type="tns:XmlDataSet" cols="80" rows="50"/>
  </message>
@@ -70,3 +70,4 @@ EXPORT svcWheelCompanyName() := FUNCTION
   
   RETURN output( res, named( 'Results' ) );
 END;
+

@@ -1,4 +1,4 @@
-// Constants
+﻿// Constants
 // Moved over from PRTE2 module to create specialized PRTE2_Foreclosure module.
 
 IMPORT _Control, ut, PRTE, PRTE2, PRTE2_Common;
@@ -8,7 +8,7 @@ EXPORT Constants := MODULE
 		EXPORT in_prefix_name						:= '~prte::in::foreclosure::';
 		EXPORT base_prefix_name					:= '~prte::base::foreclosure';
 		
-		EXPORT LandingZoneIP						:= PRTE2_Common.Constants.EDATA11;
+		EXPORT LandingZoneIP						:= PRTE2_Common.Constants.bctlpedata11;
 																 
 	//custom keys		
 		EXPORT key_foreclosure_prefix 		:= '~prte::key::foreclosure::';

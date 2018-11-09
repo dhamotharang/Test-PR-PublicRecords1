@@ -26,7 +26,7 @@ fn_getBankruptcy(dataset(Infutor.rIndicatorFlags) srcin) := FUNCTION
 		 UNSIGNED6 LexId;
 		END;
 	
-		bk := DEDUP(SORT(DISTRIBUTE(PROJECT(BankruptcyV2.file_bankruptcy_search_v3_supp_bip(did<>'000000000000'), TRANSFORM(rBankruptcy,
+		bk := DEDUP(SORT(DISTRIBUTE(PROJECT(BankruptcyV2.file_bankruptcy_search_v3_supp_bip(did<>'000000000000',name_type[1]='D'), TRANSFORM(rBankruptcy,
 							self.LexId := (unsigned6)left.did;)), LexId), LexId, LOCAL), LexId, LOCAL);
 							
 		result := JOIN(srcin, bk, left.LexId=right.LexId, TRANSFORM(Infutor.rIndicatorFlags,
@@ -66,7 +66,7 @@ fn_getLiens(dataset(Infutor.rIndicatorFlags) srcin) := FUNCTION
 		 UNSIGNED6 	LexId;
 		END;
 	
-		liens1 := DISTRIBUTE(PROJECT(LiensV2.file_liens_party(did<>'000000000000',
+		liens1 := DISTRIBUTE(PROJECT(LiensV2.file_liens_party(did<>'000000000000', name_type[1] in ['C','D'],
 										NOT d2c.Constants.LiensRestrictedSources(tmsid)),
 								TRANSFORM(rLiens,
 									self.LexId := (unsigned6)left.did;

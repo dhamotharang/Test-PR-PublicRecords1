@@ -1,4 +1,4 @@
-IMPORT iesp, Doxie, ut;
+﻿IMPORT iesp, Doxie, risk_indicators, std;
 
 EXPORT Functions :=  MODULE;
 /*search_type mapping:
@@ -249,7 +249,7 @@ EXPORT Functions :=  MODULE;
 			//taking off the last AND below
 			FieldsSQL := trim(tmpFieldsSQL[1..length(tmpFieldsSQL) -3], left, right);	
 	
-			final:= project(ut.ds_oneRecord, transform(Layouts.IIDI2SQLlayout, 
+			final:= project(Risk_Indicators.iid_constants.ds_Record, transform(Layouts.IIDI2SQLlayout, 
 											self.SQLWhereCriteria := FieldsSQL;
 											self.SQLValues := SQL_Values_List;
 											));
@@ -315,7 +315,7 @@ EXPORT Functions :=  MODULE;
 		SHARED tmpFieldsSQL := tmpDates + CompanyIdSQL;
 	
 		SHARED tmpStartDate := if(hasStartDate, in_mod.StartDate, '20130101');
-		SHARED tmpEndDate := if(hasEndDate, (string) in_mod.EndDate, (string) ut.getdate);
+		SHARED tmpEndDate := if(hasEndDate, (string) in_mod.EndDate, (string) STD.Date.Today());
 		SHARED DATASET		StartDateValueSQL		:= dataset([{trim(tmpStartDate, left, right)}], Layouts.delta_value)	;
 		SHARED DATASET		EndDateValueSQL		 	:= dataset([{trim(tmpEndDate, left, right)}], Layouts.delta_value)	;
 		SHARED DATASET		CompanyIdValueSQL		:= if(hasCompanyId, dataset([{trim(in_mod.CompanyId, left, right)}], Layouts.delta_value))	;
@@ -344,7 +344,7 @@ EXPORT Functions :=  MODULE;
 		SHARED tmpFieldsSQL := tmpDates + CompanyIdSQL + CountryIdSQL;
 	
 		SHARED tmpStartDate := if(hasStartDate, in_mod.StartDate, '20150101');
-		SHARED tmpEndDate := if(hasEndDate, (string) in_mod.EndDate, (string) ut.getdate);
+		SHARED tmpEndDate := if(hasEndDate, (string) in_mod.EndDate, (string) STD.Date.Today());
 		SHARED DATASET		StartDateValueSQL		:= dataset([{trim(tmpStartDate, left, right)}], Layouts.delta_value);
 		SHARED DATASET		EndDateValueSQL		 	:= dataset([{trim(tmpEndDate, left, right)}], Layouts.delta_value);
 		SHARED DATASET		CompanyIdValueSQL		:= if(hasCompanyId, dataset([{trim(in_mod.CompanyId, left, right)}], Layouts.delta_value))	;
@@ -370,12 +370,12 @@ EXPORT Functions :=  MODULE;
 	END;
 
 	EXPORT GetEndDate(IParam.summary_params in_mod) := FUNCTION
-			tmpEndDate := if(in_mod.EndDate <> '', in_mod.EndDate, (string) ut.getdate);
+			tmpEndDate := if(in_mod.EndDate <> '', in_mod.EndDate, (string) STD.Date.Today());
 			RETURN tmpEndDate;
 	END;
 	
 	EXPORT GetIIDI2EndDate(IParam.IIDI2_summary_params in_mod) := FUNCTION
-			tmpEndDate := if(in_mod.EndDate <> '', in_mod.EndDate, (string) ut.getdate);
+			tmpEndDate := if(in_mod.EndDate <> '', in_mod.EndDate, (string) STD.Date.Today());
 			RETURN tmpEndDate;
 	END;
 	

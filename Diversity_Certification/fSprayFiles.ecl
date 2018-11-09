@@ -1,4 +1,4 @@
-import lib_fileservices,_control,lib_stringlib;
+﻿import lib_fileservices,_control,lib_stringlib;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///// Spray all states data residing in a dated folder.
@@ -12,7 +12,7 @@ import lib_fileservices,_control,lib_stringlib;
 												   ,'|'
 												   ,'\\n,\\r\\n'     
 												   ,'[\'\']'
-												   ,'thor400_30'
+												   ,'thor400_44'
 												   ,cluster+'in::Diversity_Certification::'+filedate+'::allStates_Data'
 												   ,-1
 												   ,

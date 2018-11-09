@@ -1,8 +1,8 @@
-import	_control,lib_fileservices;
+﻿import	_control,lib_fileservices;
 
 export Spray_Experian(	string	pFileDate,
 												string	pProcessDate,
-												string	pGroupName	=	'thor400_60',
+												string	pGroupName	=	'thor400_36',
 												boolean	pOverwrite	=	false
 											)	:=
 function

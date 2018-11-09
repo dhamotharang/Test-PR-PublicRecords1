@@ -1,4 +1,4 @@
-﻿import ut, _Control;
+﻿import ut, _Control, dops;
 EXPORT Constants := module
 
 	export yogurt(string superfilename = '') := module
@@ -8,7 +8,7 @@ EXPORT Constants := module
 		//export startwu := 'W' + startdate + '-' + l_time;
 		export endwu := 'W' + enddate + '-' + l_time;
 		export startwudaysbehind := 'W' + ut.date_math(enddate,-20) + '-' + l_time;
-		export serv := 'server=http://10.241.31.11:8010 ';
+		export serv := 'server=http://10.173.26.7:8010 ';
 		export nsplit := ' nosplit=1 ';
 		export dstcluster := 'dstcluster=thor40_25_yogurt ';
 		export over := 'overwrite=1 ';
@@ -31,7 +31,7 @@ EXPORT Constants := module
 	
 	export esp := module
 		export bocaprodthor := 'prod_esp.br.seisint.com';
-		export yogurtthorforboca := '10.241.31.11';
+		export yogurtthorforboca := '10.173.26.7';
 	end;
 	// Set this value to get files older than n days
 	export getthreshold(integer noofdays = 0) := module
@@ -47,10 +47,14 @@ EXPORT Constants := module
 	export adminemailsfordeletion := 'joseph.lezcano@lexisnexis.com, valerie.minnis@lexisnexis.com, tamika.edman@lexisnexis.com, Anantha.Venkatachalam@lexisnexis.com, Charlene.Ros@lexisnexis.com';
 
 	export allowedclusters(string environment) := module
-		export clusterset := map(
+		export clusterset := if (dops.constants.ThorEnvironment = 'prod'
+														,map(
 															environment = 'yogurt-thor' => ['thor40_31_yogurt'],
-															environment = 'boca-prod-thor' => ['thor400_30','thor400_20','thor400_60','thor400_44'],
-															['NA']
+															environment = 'boca-prod-thor' => ['thor400_30','thor400_20','thor400_60','thor400_44','thor400_66','thor400_36'],
+															['NA'])
+														,map(
+															environment = 'boca-dev-thor' => ['thor400_dev','thor400_sta','thor50_dev','thor50_dev02'],
+															['NA'])
 														);
 														
 	end;

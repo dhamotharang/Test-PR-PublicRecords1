@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Biz_Comp_Service">
 <part name="parent_proxid" type="xsd:string"/>
 <part name="ultimate_proxid" type="xsd:string"/>
@@ -153,3 +153,4 @@ EXPORT Biz_Comp_Service := MACRO
   e := BizLinkFull.Externals.Fetch(pm.Uid_Results,Options); // Perform data-bomb fetch
   OUTPUT(e,NAMED('DataBombs'));
 ENDMACRO;
+

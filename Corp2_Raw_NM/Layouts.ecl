@@ -1,36 +1,24 @@
-EXPORT Layouts := module
+﻿EXPORT Layouts := module
 
-	export ImportMasterLayoutIn := Record
-			string  id;
-			string  corp_nmscc;
-			string  corp_type;
-			string  corp_stat;
-			string  corp_name;
-			string  corp_doi_date;
-			string  corp_agent_name;
-			string  corp_street1;
-			string  corp_city;
-			string  corp_state;
-			string  corp_country;
-			string  corp_zip;
+ export ImportMasterLayoutIn := Record
+			string  BusinessNumber;
+			string  BusinessType;
+			string  BusinessStatus;
+			string  Corp_Name;
+			string  DateOfIncorporation;
+			string  BusinessAgentName;
+			string  AddressLine1;
+			string  AddressLine2;
+			string  City;
+			string  StateCode;
+			string  Country;
+			string  Zip;
 	end;
-
 	export ImportMasterLayoutBase := Record
 			string1		action_flag;
 			unsigned4	dt_first_received;
 			unsigned4	dt_last_received;
-			string  	id;
-			string  	corp_nmscc;
-			string  	corp_type;
-			string  	corp_stat;
-			string  	corp_name;
-			string  	corp_doi_date;
-			string  	corp_agent_name;
-			string 	 	corp_street1;
-			string  	corp_city;
-			string  	corp_state;
-			string  	corp_country;
-			string  	corp_zip;
+			ImportMasterLayoutIn;
 	end;
 
 end;

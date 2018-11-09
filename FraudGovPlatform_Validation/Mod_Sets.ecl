@@ -1,10 +1,17 @@
 ﻿EXPORT Mod_Sets := Module
 
 EXPORT threshld:=0.05;
+
 EXPORT validDelimiter := '~|~';
-EXPORT validTerminators := ['~<EOL>~','\n'];
+EXPORT validTerminators := '~<EOL>~';
+
+EXPORT validDelimiterDeltabase := '|\t|';
+EXPORT validTerminatorsDeltabase := '|\n';
+
 EXPORT IdentityData_numberOfColumns := 58;
-EXPORT KnownFraud_numberOfColumns := 117;
+EXPORT KnownFraud_numberOfColumns	:= 117;
+EXPORT Deltabase_numberOfColumns	:=56;
+EXPORT VelocityRules_numberOfColumns	:=15;
 
 EXPORT CriticalFieldError_IdentityData	:= [
 															'Customer_Name'
@@ -35,6 +42,15 @@ EXPORT CriticalFieldError_KnownFraud	:= [
 															,'reported_time'
 															,'reported_by'
 														];	
+														
+EXPORT CriticalFieldError_Deltabase	:= [
+															'Customer_Account_Number'
+															,'Customer_program'								
+															,'Customer_County'
+															,'Customer_State'											
+															,'Customer_Agency_Vertical_Type'
+															,'reported_date'
+														];															
 
 EXPORT Agency_Vertical_Type 
 		:= 
@@ -58,6 +74,7 @@ EXPORT IES_Benefit_Type
 			,'C'			// Child Care
 			,'I'			// Woman, Infant, Children
 			,'N'			// Child Nutrition
+			,'U'			// Unemployment
 			];
 			
 EXPORT Benefit_Type :=

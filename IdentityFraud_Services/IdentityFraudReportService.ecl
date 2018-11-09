@@ -1,4 +1,4 @@
-// TODO: define ESDL interface
+﻿// TODO: define ESDL interface
 // TODO: expose "get minors"
 /*--SOAP--
 <message name="IdentityFraudReportService" wuTimeout="300000">
@@ -93,7 +93,7 @@
 
 
 
-IMPORT iesp, doxie, AutoHeaderI, AutoStandardI, PersonReports, ut, seed_files, suppress;
+IMPORT iesp, doxie, AutoHeaderI, AutoStandardI, IdentityFraud_Services, PersonReports, ut, seed_files, suppress;
 
 EXPORT IdentityFraudReportService () := MACRO
 #constant('SelectIndividually', true); // we will setup all components explicitly
@@ -183,7 +183,7 @@ string DataPermission := Risk_Indicators.iid_constants.default_DataPermission : 
   dids_input := dataset ([(unsigned6) did_value], doxie.layout_references);
 
   // dids from standard header search
-  dids_search := AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do (search_mod);
+  dids_search := PROJECT(AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do(search_mod), doxie.layout_references);
 
   // dids by DL and state (can also read them directly from XML)
   string  dl_number := '' : stored ('dl_number'); //"translation" is trivial

@@ -1,4 +1,4 @@
-/*2015-05-20T20:04:26Z (Xuran Yan)
+﻿/*2015-05-20T20:04:26Z (Xuran Yan)
 Changed scoring queries to use Bankruptcy V3 per Bug: 179687
 */
 
@@ -481,7 +481,7 @@ EXPORT PostBeneficiaryFraud_Functions := MODULE
 	  END;
 	
     // project for final roll
-    total_rec convert(R_I.Layouts.layout_relat_prop_plusv4 le,
+    total_rec convert(R_I.Layouts.Layout_Relat_Prop_Plus_BusInd le,
 		                  PBF_Layout.Combined_Attributes ri) := TRANSFORM
 	    BOOLEAN is_owner := IF(le.property_status_applicant = 'O', TRUE, FALSE);
 		  // Since the various date fields aren't guaranteed to be filled in, below is the order of

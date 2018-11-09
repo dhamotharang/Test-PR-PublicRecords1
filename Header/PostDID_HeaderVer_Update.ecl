@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////////////
+﻿//////////////////////////////////////////////////////////////////////////////////////
 //	
 //	AttribHeadere	:	Header.PostDID_HeaderVer_Update
 //	Parameters	:	Datasetname
@@ -9,9 +9,9 @@
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
-import did_add,_Control;
+import did_add,_Control,std;
 
-export PostDID_HeaderVer_Update(string datasetname,string pkgvar='header_file_version',STRING roxie_ip=_Control.RoxieEnv.prod_batch_neutral) := function
+export PostDID_HeaderVer_Update(string datasetname,string pkgvar='header_build_version',STRING roxie_ip=_Control.RoxieEnv.prod_batch_neutral) := function
 
 	// Flag file which contains the prod header version used for last DID process
 
@@ -19,11 +19,7 @@ export PostDID_HeaderVer_Update(string datasetname,string pkgvar='header_file_ve
 	
 	// Temp file which will be renamed after the process
 	
-	tempflagfilename := '~thor_data400::temp::' + datasetname + '::prodheaderversion';
-	
-	// Contains the prod header version
-	
-	prodversionfilename := '~thor_data400::temp::prodversion';
+	newflagfilename := '~thor_data400::flag::' + datasetname + '::prodheaderversion::'+workunit;
 	
 	// Get header version
 	
@@ -38,9 +34,7 @@ export PostDID_HeaderVer_Update(string datasetname,string pkgvar='header_file_ve
 	
 	// Datasets
 	
-	datesetfile_ds := dataset(flagfilename,prodheaderdate_rec,thor);
-	
-	prodheaderversion_ds := dataset(prodversionfilename,prodheaderdate_rec,thor);
+	datesetfile_ds := dataset(flagfilename,prodheaderdate_rec,thor,OPT);
 	
 	// Replace the version - if the flag file above already exists
 	
@@ -57,19 +51,26 @@ export PostDID_HeaderVer_Update(string datasetname,string pkgvar='header_file_ve
 	proj_out := dataset([{hdrversion,pkgvar}],{string10 prodheaderdate,string pkgvariable});
 
 		
-	create_out := if(fileservices.fileexists(flagfilename),
-						sequential(
-									if ( count(datesetfile_ds(pkgvariable = pkgvar)) > 0,
-									output(process_out,,tempflagfilename,overwrite),
-									output(datesetfile_ds + proj_out,,tempflagfilename,overwrite)
-									),
-									fileservices.deletelogicalfile(flagfilename),
-									fileservices.renamelogicalfile(tempflagfilename,flagfilename)
-									),
-					output(proj_out,,flagfilename,overwrite)
-					);
+	create_out := 
+                sequential(
+                            if(fileservices.fileexists(flagfilename),sequential(
+                                std.file.startsuperfiletransaction(),
+                                std.file.clearsuperfile(flagfilename),
+                                std.file.finishsuperfiletransaction(),
+                                if ( count(datesetfile_ds(pkgvariable = pkgvar)) > 0,
+                                        output(process_out,,newflagfilename,overwrite),
+                                        output(datesetfile_ds + proj_out,,newflagfilename,overwrite)
+                                )),
+                                sequential( std.file.createsuperfile(flagfilename),
+                                            output(proj_out,,newflagfilename,overwrite)
+                                )
+                            ),
+                            std.file.startsuperfiletransaction(),
+                            std.file.clearsuperfile (flagfilename,true),  //delete when clearing
+                            std.file.addsuperfile   (flagfilename,newflagfilename),
+                            std.file.finishsuperfiletransaction()
+                );
 
-	
 	return create_out;
 	
-end;
+end; 

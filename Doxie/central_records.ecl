@@ -99,8 +99,8 @@ nod := if(include_NoticeOfDefaults_val, nod_for.nod);
 frcl := if(include_foreclosures_val, nod_for.foreclosure);
 phpl := if(Include_PhonesPlus_val, 
            moxie_phonesplus_server.phonesplus_did_records(dids, con.max_phonesplus, score_threshold_value,glb_purpose,dppa_purpose,,true,true).w_timezone);
-email := map(Include_Email_Addresses_val and email_dedup_val => doxie.fn_dedup_email(dids,ssn_mask_value,application_type_value), // checking if to dedup emails
-             Include_Email_Addresses_val  => doxie.email_records(dids,ssn_mask_value,application_type_value),
+email := map(Include_Email_Addresses_val and email_dedup_val => doxie.fn_dedup_email(dids,ssn_mask_value,application_type_value,industry_class_value), // checking if to dedup emails
+             Include_Email_Addresses_val  => doxie.email_records(dids,ssn_mask_value,application_type_value,,industry_class_value),
              dataset([],EmailService.Assorted_Layouts.layout_report_rollup));
 // Premium Phones
 dedup_phones:=dataset(dedupPremiumPhones,doxie.premium_phone.phone_rec)+

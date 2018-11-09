@@ -1,4 +1,4 @@
-dRawData:=BIPV2_Testing.files.xlink;
+﻿dRawData:=BIPV2_Testing.files.xlink;
 dRawData;
 lBatchInput:=RECORD
   UNSIGNED   uniquid;
@@ -57,3 +57,4 @@ PIPE(
   '-q "<svcbatch format=\'raw\'><input_data id=\'id\' format=\'raw\'></input_data></svcbatch>"',
   lBatchOutput
 );
+

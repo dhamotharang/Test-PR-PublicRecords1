@@ -1,4 +1,4 @@
-/*2016-05-21T00:50:26Z (Kevin Huls)
+﻿/*2016-05-21T00:50:26Z (Kevin Huls)
 RQ-12730: Emerging Identities
 */
 /*2016-05-18T19:05:55Z (Kevin Huls)
@@ -214,6 +214,7 @@ export reasoncode_settings := RECORD
 	boolean IsInstantID := false;
 	unsigned1 IIDVersion := 0;
 	boolean EnableEmergingID := false;
+	boolean IsIdentifier2 := false;
 end;
 
 export actioncode_settings := RECORD
@@ -493,5 +494,42 @@ red_flags_combined_layouts := record
 	red_flags_batch_layout;
 end;
 
+EXPORT Paro_IT1O_layout := record
+  string1   paro_bansmatchflag := '';
+  string12  paro_banscasenum := '';
+  string2   paro_bansprcode := '';
+  string2   paro_bansdispcode := '';
+  string8   paro_bansdatefiled := '';
+  string15  paro_bansfirst := '';
+  string15  paro_bansmiddle := '';
+  string20  paro_banslast := '';
+  string30  paro_banscnty := '';
+  string1   paro_bansecoaflag := '';
+  string1   paro_decsflag := '';
+  string8   paro_decsdob := '';
+  string5   paro_decszip := '';
+  string5   paro_decszip2 := '';
+  string20  paro_decslast := '';
+  string15  paro_decsfirst := '';
+  string8   paro_decsdod := '';
+  string1   paro_inputaddrcharflag := '';
+  string1   paro_inputsocscharflag := '';
+  string9   paro_correctsocs := '';
+  string1   paro_phonestatusflag := '';
+  string10  paro_phone := '';
+  string3   paro_altareacode := '';
+  string8   paro_splitdate := '';
+  string1   paro_addrstatusflag := '';
+  string1   paro_addrcharflag := '';
+  string15  paro_first := '';
+  string20  paro_last := '';
+  string50  paro_addr := '';
+  string30  paro_city := '';
+  string2   paro_state := '';
+  string11  paro_zip := '';
+  string1   paro_hownstatusflag := '';
+  string3   paro_estincome := '';
+  string3   paro_median_hh_size := ''; // takes the place of score2
+end;
 
 END;

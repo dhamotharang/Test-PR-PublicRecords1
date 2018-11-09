@@ -1,3 +1,4 @@
+﻿import ut;
 export Mapping_IN_As_ProfLic:= Function
 
 Prof_License.Layout_proLic_in 	Map_IN_Trans(Layout_IN_raw.clean_input L) := TRANSFORM
@@ -24,8 +25,8 @@ Prof_License.Layout_proLic_in 	Map_IN_Trans(Layout_IN_raw.clean_input L) := TRAN
      SELF.county_str			 := L.County;
      SELF.license_number 		 := L.LicenseNo;
      SELF.license_type 			 := L.LicenseType;
-     SELF.issue_date 			 := L.LicenseDateFrom;
-     SELF.expiration_date 		 := L.LicenseDateTo;
+     SELF.issue_date 			 :=  if ( regexfind('[/]', L.LicenseDateFrom) ,ut.date_slashed_MMDDYYYY_to_YYYYMMDD( L.LicenseDateFrom), L.LicenseDateFrom);
+     SELF.expiration_date 		 := if ( regexfind('[/]', L.LicenseDateTo) ,ut.date_slashed_MMDDYYYY_to_YYYYMMDD(L.LicenseDateTo),L.LicenseDateTo); 
      SELF.status 				 := L.LicenseStatus;
 	 SELF.vendor 				 := 'OKC';
      SELF						 :=[];

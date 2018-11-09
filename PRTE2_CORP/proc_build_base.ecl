@@ -172,7 +172,7 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
                                             //Append ID(s)
                                             SELF.bdid := prte2.fn_AppendFakeID.bdid(RIGHT.corp_legal_name,	LEFT.corp_address1.prim_range,	LEFT.corp_address1.prim_name, LEFT.corp_address1.v_city_name, LEFT.corp_address1.st, LEFT.corp_address1.zip, RIGHT.cust_name);
                                             //generating linkids
-                                            vLinkingIds := prte2.fn_AppendFakeID.LinkIds(RIGHT.corp_legal_name, RIGHT.corp_ra_fein, RIGHT.corp_inc_date, LEFT.corp_address1.prim_range, LEFT.corp_address1.prim_name, 
+                                            vLinkingIds := prte2.fn_AppendFakeID.LinkIds(RIGHT.corp_legal_name, (string9)RIGHT.link_fein, RIGHT.link_inc_date, LEFT.corp_address1.prim_range, LEFT.corp_address1.prim_name, 
                                                                                          LEFT.corp_address1.sec_range, LEFT.corp_address1.v_city_name, LEFT.corp_address1.st, LEFT.corp_address1.zip, RIGHT.cust_name);
                                         
                                             SELF.powid	:= vLinkingIds.powid;
@@ -273,20 +273,8 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
                                             SELF.cont_score		    := CleanName.name_score;
   
                                             SELF.cont_phone10 := Address.CleanPhone(RIGHT.cont_phone_number);
-      
-                                            //Append ID(s)
-                                            SELF.bdid := prte2.fn_AppendFakeID.bdid(RIGHT.corp_legal_name,	LEFT.corp_address1.prim_range,	LEFT.corp_address1.prim_name, LEFT.corp_address1.v_city_name, LEFT.corp_address1.st, LEFT.corp_address1.zip, RIGHT.cust_name);
-                                            //generating linkids
-                                            vLinkingIds := prte2.fn_AppendFakeID.LinkIds(RIGHT.corp_legal_name, RIGHT.cont_fein, RIGHT.link_inc_date, LEFT.cont_address.prim_range, LEFT.cont_address.prim_name, 
-                                                                                         LEFT.cont_address.sec_range, LEFT.cont_address.v_city_name, LEFT.cont_address.st, LEFT.cont_address.zip, RIGHT.cust_name);
-                                        
-                                            SELF.powid	:= vLinkingIds.powid;
-                                            SELF.proxid	:= vLinkingIds.proxid;
-                                            SELF.seleid	:= vLinkingIds.seleid;
-                                            SELF.orgid	:= vLinkingIds.orgid;
-                                            SELF.ultid	:= vLinkingIds.ultid;	   
-                                            
-                                            SELF.did :=  prte2.fn_AppendFakeID.did(CleanName.fname, CleanName.lname, RIGHT.cont_ssn, RIGHT.cont_dob, RIGHT.cust_name);
+                                                                                             
+                                            SELF.did :=  prte2.fn_AppendFakeID.did(CleanName.fname, CleanName.lname, RIGHT.link_ssn, RIGHT.link_dob, RIGHT.cust_name);
                                          
                                             SELF.record_type := 'C';
                                             
@@ -294,10 +282,21 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
                                             SELF := [];
                                           )                                  
                                  );
-  
+d_cont_NewRecordsClean2 := JOIN(d_cont_NewRecordsClean,
+                             d_corp_NewRecordsClean,
+                             LEFT.corp_key=RIGHT.corp_key,
+                             TRANSFORM(prte2_Corp.Layouts.cont_Base_Layout,
+														               SELF.bdid := RIGHT.bdid,
+																					        SELF.powid	:=  RIGHT.powid;
+                             SELF.proxid	:= RIGHT.proxid;
+                             SELF.seleid	:= RIGHT.seleid;
+                             SELF.orgid	:=  RIGHT.orgid;
+                             SELF.ultid	:=  RIGHT.ultid;	   
+                             SELF := LEFT));
+
    
   //Concatenating Original & New Records
-  d_cont_base := d_cont_NewRecordsClean + d_cont_OldRecords; 
+  d_cont_base := d_cont_NewRecordsClean2 + d_cont_OldRecords; 
  
  
   //event file

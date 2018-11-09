@@ -1,4 +1,4 @@
-import AutoStandardI,doxie_cbrs,civilCourt_Services,civil_Court,iesp, ut, Address, doxie, NID;
+﻿import AutoStandardI,doxie_cbrs,civilCourt_Services,civil_Court,iesp, ut, Address, doxie, NID, D2C;
 
 export SearchService_Records := module
 	export params := interface
@@ -39,14 +39,17 @@ export SearchService_Records := module
     strictMatchOn := AutoStandardI.InterfaceTranslator.StrictMatch_value.val(project(in_mod,
 		                         AutoStandardI.InterfaceTranslator.strictMatch_value.params));
  		phoneticsOn := AutoStandardI.InterfaceTranslator.Phonetics.val(project(in_mod,
-		                         AutoStandardI.InterfaceTranslator.phonetics.params)); 
+		                         AutoStandardI.InterfaceTranslator.phonetics.params));
+		industryclass := AutoStandardI.InterfaceTranslator.industry_class_value.val(project(in_mod,
+														 AutoStandardI.InterfaceTranslator.industry_class_value.params));
 		
 		// Get the IDs, pull the payload records and add Aircraft_number (n_number to them.
 		ids := civilCourt_Services.SearchService_IDs.val(in_mod);
 		
 		// join to payload key.
 		recs := join(ids, civil_court.key_caseID,
-		             keyed(left.case_key =  right.case_key),
+		             keyed(left.case_key =  right.case_key) and
+											(~ut.IndustryClass.is_Knowx OR right.vendor not in D2c.Constants.CivilCourtRestrictedSources),
 											transform(civilCourt_Services.Layouts.PartyLayoutPlusSlim,																																								
 																self:=right, // set for use later.	
 																self := []), 															
@@ -111,7 +114,8 @@ export SearchService_Records := module
 		
 		// now get the other parties from each particular case and filter based on search criteria		
    function_recs := join(recs_person_slim_mname, civil_court.key_caseID,
-	                          keyed(left.case_key = right.case_key),
+	                          keyed(left.case_key = right.case_key) and
+																	(~ut.IndustryClass.is_Knowx OR right.vendor not in D2c.Constants.CivilCourtRestrictedSources),
 														 transform(civilCourt_Services.Layouts.PartyLayoutPlus,
 														     self:=right), limit(iesp.constants.MAX_COUNT_CIVIL_COURT_SEARCH_RESPONSE_RECORDS, skip));
 																 

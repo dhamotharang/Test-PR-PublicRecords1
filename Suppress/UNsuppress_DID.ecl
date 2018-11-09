@@ -1,6 +1,6 @@
 ﻿//Unsuppresses DIDs and SSNs.
   import dops;  
-	 export UNsuppress_DID := dops.SuppressID('unsuppress').GetIDsAsSet(,true);
+	 export UNsuppress_DID(boolean isFCRA=false) := dops.SuppressID('unsuppress').GetIDsAsSet(isFCRA,true);
 /*EXPORT UNsuppress_DID := ['000083897043',
 '001098741402',
 '531083300',

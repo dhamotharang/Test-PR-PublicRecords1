@@ -25,7 +25,8 @@ module
     export MBSTableCol                   := tools.mod_FilenamesInput(Template('MBSTableCol'                      ),pversion);
     export MBSColValDesc                 := tools.mod_FilenamesInput(Template('MBSColValDesc'                    ),pversion);
     export MBSmarketAppend               := tools.mod_FilenamesInput(Template('MBSmarketAppend'                  ),pversion);
-		export MbsFdnMasterIDIndTypeInclusion	:= tools.mod_FilenamesInput(Template('MbsFdnMasterIDIndTypeInclusion'   ),pversion);
+		export MbsFdnMasterIDIndTypeInclusion:= tools.mod_FilenamesInput(Template('MbsFdnMasterIDIndTypeInclusion'   ),pversion);
+		export MbsVelocityRules							 :=	tools.mod_FilenamesInput(Template('MbsVelocityRules'   							 ),pversion);
 
 
 		export dAll_filenames :=
@@ -40,7 +41,8 @@ module
 			MBSTableCol.dAll_filenames +
 			MBSColValDesc.dAll_filenames +
 			MBSmarketAppend.dAll_filenames +
-			if(Platform.Source = 'FraudGov',MbsFdnMasterIDIndTypeInclusion.dAll_filenames) ;
+			MbsFdnMasterIDIndTypeInclusion.dAll_filenames +
+			MbsVelocityRules.dAll_filenames;
 			
 			
 	end;

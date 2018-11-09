@@ -1,4 +1,4 @@
-import header_services,mdr,ut;
+﻿import header_services,mdr,ut;
 
 /////////////////////////////////////////////////////////////////////////
 in_hdr := File_Prep_BC_CleanAddr_KeyBuild;
@@ -19,7 +19,7 @@ rFullOut_HashDIDAddress := record
 end;
 
 rFullOut_HashDIDAddress tHashDIDAddress(Layout_Business_Contact_Plus l) := transform                            
- self.hval := hashmd5(intformat(l.bdid,15,1),(string)l.state,(string)l.zip,(string)l.city,
+ self.hval := hashmd5(intformat((unsigned6)l.bdid,12,1),(string)l.state,(string)l.zip,(string)l.city,
 									(string)l.prim_name,(string)l.prim_range,(string)l.predir,(string)l.addr_suffix,(string)l.postdir,(string)l.sec_range);
  self := l;
 end;
@@ -57,7 +57,7 @@ rFullOut_HashBDID := record
 end;
 
 rFullOut_HashBDID tHashBDID(Business_Header.Layout_Business_Contact_Plus_orig l) := transform                            
- self.hval := hashmd5(intformat((unsigned6)l.bdid,15,1));
+ self.hval := hashmd5(intformat((unsigned6)l.bdid,12,1));
  self := l;
 end;
 
@@ -94,7 +94,7 @@ rFullOut_HashBDIDDID := record
 end;
 
 rFullOut_HashBDIDDID tHashBDIDDID(Business_Header.Layout_Business_Contact_Plus l) := transform                            
- self.hval := hashmd5(intformat((unsigned6)l.bdid,15,1), intformat((unsigned6)l.did,15,1));
+ self.hval := hashmd5(intformat((unsigned6)l.bdid,12,1), intformat((unsigned6)l.did,15,1));
  self := l;
 end;
 
@@ -132,7 +132,7 @@ BCbytitle_withHash := RECORD
 end;
 
 BCbytitle_withHash addBCHash(Business_Header.Layout_Business_Contact_Plus_Orig l) := transform                            
- self.hval := hashmd5(intformat((unsigned6)l.bdid,15,1), (string35)l.company_title, (string20)l.lname, (string20)l.fname);
+ self.hval := hashmd5(intformat((unsigned6)l.bdid,12,1), (string35)l.company_title, (string20)l.lname, (string20)l.fname);
  self := l;
 end;
 

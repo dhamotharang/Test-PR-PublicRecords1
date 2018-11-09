@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="NP2OBatchService">
 	<part name="tribcode" type="xsd:string"/>
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
@@ -34,14 +34,20 @@ tribcode := StringLib.StringToLowerCase(tribcode_value);
 
 productSet := ['np21','np22','np24','np25','np27','np50','np60','np80','np81','np82','np90', 'np91', 'np92'];
 
+BridgerGateway := gateways_in(servicename='bridgerwlc')[1].url!='';
+
+OFACversion := map(BridgerGateway and tribcode = 'np21' => 4,
+																			tribcode in ['np90','np91','np92'] => 3,
+																																																			1);
 
 targusGatewaySet := ['np21','np22','np24','np25','np27','np50','np60','np80','np81','np82','np90', 'np91', 'np92'];
 attusSet := ['np80','np81','np82'];
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := le.servicename;
-	self.url := map(tribcode in attusSet and le.servicename = 'attus' => le.url,  // attus gateway
-				 tribcode in targusGatewaySet and le.servicename = 'targus' => le.url,  // targus gateway
+	self.url := map(tribcode in attusSet and le.servicename = 'attus' => le.url, // attus gateway
+				 tribcode in targusGatewaySet and le.servicename = 'targus' => le.url, // targus gateway
+				 tribcode = 'np21' and le.servicename = 'bridgerwlc' => le.url, // bridger gateway
 				 ''); // default to no gateway call		
 	self := le;
 end;
@@ -78,7 +84,7 @@ RiskWise.Layout_PRII addseq(batchin le, integer C) := transform
 end;
 f := project(batchin, addseq(LEFT,COUNTER));
 
-almost_final := RiskWise.NP2O_Function(f, gateways, glb, dppa, tribCode, DataRestriction, DataPermission);
+almost_final := RiskWise.NP2O_Function(f, gateways, glb, dppa, tribCode, DataRestriction, DataPermission, OFACversion);
 final := project(almost_final, RiskWise.Layout_NP2O);
 
 ret := if(tribCode in productSet, final, dataset([],RiskWise.Layout_NP2O));

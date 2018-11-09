@@ -1,4 +1,4 @@
-IMPORT SALT33,ut,std;
+﻿IMPORT SALT33,ut,std;
 EXPORT Key_Classify_PS_PH := MODULE
  
 //PHONE:?:MAINNAME:DOB:+:P_CITY_NAME:ST
@@ -87,8 +87,8 @@ EXPORT ScoredEID_HASHFetch(TYPEOF(h.PHONE) param_PHONE = (TYPEOF(h.PHONE))'',TYP
   RawData := RawFetch(param_PHONE,param_FNAME,param_MNAME,param_LNAME,param_DOB);
  
   Process_PS_Layouts.LayoutScoredFetch Score(RawData le) := TRANSFORM
-    SELF.keys_used := 1 << 6; // Set bitmap for key used
-    SELF.keys_failed := IF(le.EID_HASH = 0, 1 << 6, 0); // Set bitmap for key failed
+    SELF.keys_used := 1 << 7; // Set bitmap for key used
+    SELF.keys_failed := IF(le.EID_HASH = 0, 1 << 7, 0); // Set bitmap for key failed
     SELF.PHONE_match_code := MAP(le.PHONE = (TYPEOF(le.PHONE))'' OR le.PHONE = (TYPEOF(le.PHONE))'' => SALT33.MatchCode.OneSideNull,match_methods(File_Classify_PS).match_PHONE(le.PHONE,param_PHONE,TRUE));
     SELF.PHONEWeight := (50+MAP ( le.PHONE = param_PHONE  => le.PHONE_weight100,
           le.PHONE = (TYPEOF(le.PHONE))'' OR param_PHONE = (TYPEOF(le.PHONE))'' => 0,
@@ -178,7 +178,7 @@ EXPORT ScoredFetch_Batch(DATASET(InputLayout_Batch) recs,BOOLEAN AsIndex) := FUN
  
   Process_PS_Layouts.LayoutScoredFetch Score_Batch(Key le,recs ri) := TRANSFORM
     SELF.Reference := ri.reference; // Copy reference field
-    SELF.keys_used := 1 << 6; // Set bitmap for key used
+    SELF.keys_used := 1 << 7; // Set bitmap for key used
     SELF.keys_failed := 0; // Set bitmap for key failed
     SELF.PHONE_match_code := MAP(le.PHONE = (TYPEOF(le.PHONE))'' OR le.PHONE = (TYPEOF(le.PHONE))'' => SALT33.MatchCode.OneSideNull,match_methods(File_Classify_PS).match_PHONE(le.PHONE,ri.PHONE,TRUE));
     SELF.PHONEWeight := (50+MAP ( le.PHONE = ri.PHONE  => le.PHONE_weight100,

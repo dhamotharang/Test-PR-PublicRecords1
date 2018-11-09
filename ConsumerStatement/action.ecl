@@ -1,7 +1,7 @@
-/*2013-11-27T02:42:43Z (Ananth Vankatachalam)
+﻿/*2013-11-27T02:42:43Z (Ananth Vankatachalam)
 
 */
-import roxiekeybuild,Orbit3;
+import roxiekeybuild, Scrubs_ConsumerStatement,dops,Orbit3;
 EXPORT action(string infiledate,string indexenvstring) := module
 	
 	shared createindex(indexdataset,infiledate,suffix,indexenv, retval) := macro
@@ -101,19 +101,20 @@ EXPORT action(string infiledate,string indexenvstring) := module
 	export update_dops := function
 		return map(
 	             indexenvstring = 'nonfcra' => 
-							 RoxieKeybuild.updateversion ( 'ConsumerStatementKeys',infiledate,'skasavajjala@seisint.com',,'N','D'),
+							 dops.updateversion ( 'ConsumerStatementKeys',infiledate,'skasavajjala@seisint.com',,'N'),
 							 indexenvstring = 'fcra' => 
-							 RoxieKeybuild.updateversion ( 'FCRA_ConsmrStmtKeys',infiledate,'skasavajjala@seisint.com',,'F') 
+							 dops.updateversion ( 'FCRA_ConsmrStmtKeys',infiledate,'skasavajjala@seisint.com',,'F') 
 							);
 							
 	end;
 	
-	export create_build := function
-		return map(
+	export update_orbit := function
+	return map(
 	             indexenvstring = 'nonfcra' => 
 							 Orbit3.proc_Orbit3_CreateBuild ( 'Consumer Statement',infiledate),
 							 indexenvstring = 'fcra' => 
-							 Orbit3.proc_Orbit3_CreateBuild ( 'Consumer Statement',infiledate,'F') 
+		           Orbit3.proc_Orbit3_CreateBuild ( 'FCRA Consumer Statement',infiledate,'F')
+
 							);
 							
 	end;
@@ -125,7 +126,9 @@ EXPORT action(string infiledate,string indexenvstring) := module
 											,build_keys
 											,promote_keys
 											,update_dops
-										  ,create_build
+											,update_orbit
+											,Scrubs_ConsumerStatement.fn_RunScrubs(infiledate[1..8],'')
+										
 										);
 	end;
 	

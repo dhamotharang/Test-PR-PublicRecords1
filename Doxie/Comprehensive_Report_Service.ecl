@@ -343,19 +343,30 @@ END;
 
 foreclosure_table :=normalize(all_records, left.foreclosure_children,foreclosure_child(right));
 
+iesp.frauddefensenetwork.t_FDNSearchRecord fdn_child(iesp.frauddefensenetwork.t_FDNSearchRecord l):=transform
+self := l;
+END;
+fdn_table :=normalize(all_records, left.fdn_children,fdn_child(right));
+
+iesp.frauddefensenetwork.t_FDNRecord FDNrecords_child(iesp.frauddefensenetwork.t_FDNRecord l):=transform
+self := l;
+END;
+FDNrecords_table :=normalize(fdn_table, left.MatchDetails.records, FDNrecords_child(right));
+
 Royalty.RoyaltyFares.MAC_SetA(property_table, foreclosure_table, royalties_fares);
 Royalty.MAC_RoyaltyEmail(all_records.email_children, royalties_email);
 Royalty.RoyaltyVehicles.MAC_ReportSet(all_records.RealTime_Vehicle_children, royalties_rtv, datasource, vehicleinfo.vin);
 Royalty.MAC_RoyaltyMetronet(all_records.premium_phone_children,metronet_royalties,vendor,MDR.sourceTools.src_Metronet_Gateway);
 Royalty.RoyaltyEFXDataMart.MAC_GetWebRoyalties(all_records.premium_phone_children,equifax_royalties,vendor,MDR.sourceTools.src_EQUIFAX);
-	
+FDN_Royalties := Royalty.RoyaltyFDNCoRR.GetOnlineRoyalties(FDNrecords_table);	
 //----------------------------------------
 trackFares := not ut.IndustryClass.is_knowx and (Include_Properties_val or Include_PriorProperties or Include_foreclosures_val);
 royalties := if(trackFares,royalties_fares) +
 					 	 if(Include_Email_Addresses_val,royalties_email) +
 						 if(IncludeRTVeh_val, royalties_rtv) +
-						 if(Include_PremiumPhones_val, metronet_royalties + equifax_royalties);
-
+						 if(Include_PremiumPhones_val, metronet_royalties + equifax_royalties) +
+	           if(IncludeFDNSubjectOnly or IncludeFDNAllAssociations, FDN_Royalties);
+						 						 
 //***** ALERT WORK *****
 
 alerters := doxie_crs.alert_hashes(all_records);

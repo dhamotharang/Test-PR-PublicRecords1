@@ -1,4 +1,4 @@
-IMPORT  doxie,mdr,  NID,BIPV2;
+﻿IMPORT  doxie,mdr,  NID,BIPV2,ut;
 
 EXPORT keys := MODULE
 
@@ -208,15 +208,18 @@ EXPORT keys := MODULE
 		 {FILES.DS_gong_history_npa_nxx_line}, 
 		'~prte::key::gong_history_npa_nxx_line_' + doxie.Version_SuperKey );
 				 
-	EXPORT key_gong_history_phone(boolean IsFCRA) := INDEX(
-		file_history_phone(IsFCRA), 
-		{p7 := phone7,p3 := area_code,st,
-			boolean current_flag := if(current_record_flag='Y',true,false),
-			boolean business_flag := if(listing_type_bus='B',true,false)},
-		{file_history_phone(IsFCRA)}, 
-		if(IsFCRA,
-		'~prte::key::gong_history::fcra::' + doxie.Version_SuperKey  + '::phone',
-		'~prte::key::gong_history_phone_' + doxie.Version_SuperKey ));
+	EXPORT key_gong_history_phone(boolean IsFCRA) := function
+	ut.MAC_CLEAR_FIELDS(file_history_phone(IsFCRA), file_history_phone_cleared,Constants.fields_to_clear);
+	keyfile := if(isFCRA, file_history_phone_cleared,file_history_phone_cleared(isFCRA));
+	return INDEX(keyfile, 
+								{p7 := phone7,p3 := area_code,st,
+								boolean current_flag := if(current_record_flag='Y',true,false),
+								boolean business_flag := if(listing_type_bus='B',true,false)},
+								{keyfile}, 
+								if(IsFCRA,
+									'~prte::key::gong_history::fcra::' + doxie.Version_SuperKey  + '::phone',
+									'~prte::key::gong_history_phone_' + doxie.Version_SuperKey ));
+end;
 
 	EXPORT key_gong_history_wdtg := INDEX(
 		FILES.DS_gong_history_wdtg, 

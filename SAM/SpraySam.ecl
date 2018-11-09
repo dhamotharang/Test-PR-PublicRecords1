@@ -1,4 +1,4 @@
-
+﻿
 import _control, std;
 
 basename := 'SAM_Exclusions_Public_Extract_';		//12299.CSV';
@@ -12,7 +12,7 @@ SpraySamFile(string version) :=
 		FileServices.SprayVariable(_control.IPAddress.bctlpedata10,
 							srcdir + basename + version + '.CSV',
 							12000000,',','"\n','"',
-							'thor400_60',		//_control.TargetGroup.ADL_400,
+							'thor400_44',		//_control.TargetGroup.ADL_400,
 							dest + version,
 							,,,true,true,false
 						);

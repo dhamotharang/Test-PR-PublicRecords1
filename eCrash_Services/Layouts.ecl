@@ -1,9 +1,19 @@
-IMPORT FLAccidents_Ecrash,iesp;
+﻿IMPORT FLAccidents_Ecrash,iesp;
 
 //** Added the fix for bug 138974
 
 EXPORT Layouts := MODULE
-
+			// VIYER - ECH -4910 
+			EXPORT KY_Response_incident := RECORD
+				 iesp.ky_search.t_KYCrashSearchIncident;
+				 iesp.ky_search.t_KYCrashSearchResponse._Header.Message ;				 
+				 iesp.ecrash.t_ECrashSearchAgency.Agencyid ;
+				 string2 source_id;
+				 boolean IsReadyForPublic; 
+				 boolean PrimaryAgency;
+				 boolean AgencyMatch;
+			END;
+			
 			EXPORT ECrashSearchAgency_alias_extended := RECORD
 				string JurisdictionState;
 				string Jurisdiction;
@@ -25,6 +35,7 @@ EXPORT Layouts := MODULE
 				string jurisAndStateIfParms; 
 				string jurisAndStateIfParmsElseNotNull;
 				string fNameStateSQL; 
+				string vinLicenseTagOfficerBadgeSQL;
 				string simplePartialReportNumberWhere;
 		END;		
 		
@@ -49,6 +60,7 @@ EXPORT Layouts := MODULE
 			STRING20 person_creation_date := '';
 			STRING formattedStateReportNumber := '';
 			UNSIGNED1 is_deleted := 0;
+			STRING3 unit_number := '';
 		END;	
 
 		//variable length strings with maxlength are used because this layout is used
@@ -109,6 +121,7 @@ EXPORT Layouts := MODULE
 			string36 deltaKeyID{xpath('delta_key_id')};
 //** Changed the record layout so that date_added from deltabase results can be captured.			
 			string20 date_added{xpath('date_added')};
+			string contrib_source{xpath('contrib_source')};
 			string2 reportCode{xpath('report_code')};
 			string2 jurisdictionState{xpath('jurisdiction_state')};
 			string100 jurisdiction{xpath('jurisdiction')};
@@ -133,6 +146,7 @@ EXPORT Layouts := MODULE
 			string vendorReportID{xpath('vendor_report_id')};
 			string pageCount{xpath('page_count')};
 			unsigned1 isDeleted{xpath('is_deleted')};
+			string12 officerID{xpath('officer_id')};
 		END;
 
 		EXPORT DeltaPersonRecord := RECORD
@@ -161,6 +175,7 @@ EXPORT Layouts := MODULE
 			string100 makeDescription{xpath('make_description')};
 			string100 modelDescription{xpath('model_description')};
 			string12 tagNbr{xpath('tag_number')};
+			string12 tagState{xpath('tag_state')};
 		END;
 		
 		EXPORT DeltaJoinedRecord := RECORD
@@ -270,5 +285,21 @@ EXPORT Layouts := MODULE
 			DATASET(eCrashRecordStructure) deltabaseReportsAll;
 			DATASET(RECORDOF(FLAccidents_Ecrash.Key_eCrashv2_Supplemental)) reportsAllSlim;
 		END;
-	
+		
+		EXPORT SearchParameters := RECORD
+				string Vin;	
+				string DriversLicenseNum;
+				string OfficerBadge;
+				string LicensePlate;
+				string CrossStreet;
+				string LocStreet;
+				string8 start_date;
+				string8 end_date;
+				string JurisdictionState;
+				string Jurisdiction;
+				string AgencyId;
+				string AgencyORI;
+				boolean primaryagency;
+		END;
+
 END;

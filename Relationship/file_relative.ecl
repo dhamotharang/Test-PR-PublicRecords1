@@ -1,5 +1,5 @@
-IMPORT PRTE,PRTE2_Header,Std;
-rl:= relationship.layout_getrelationship.RelativeRec;
+﻿IMPORT PRTE,PRTE2_Header,Std;
+rl:= relationship.layout_output.titled;
 
 #IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
 
@@ -22,5 +22,5 @@ dKeyHeader__relatives3 := project(payload,transform(rl,
 ));
 export file_relative := dedup(sort(dKeyHeader__relatives3,record),except title, all)(did1>0,did2>0,did1<>did2);
 #ELSE
-export file_relative :=dataset('~foreign::10.194.12.1::thor_data400::base::insurance_header::relative',rl,flat);
+export file_relative :=dataset('~thor_data400::base::insuranceheader::qa::relatives_v3',rl,flat);
 #END

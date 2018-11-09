@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="PB1O_BatchService">
 	<part name="tribcode" type="xsd:string"/>
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
@@ -30,9 +30,15 @@ batchin := dataset([],Riskwise.Layout_PB1O_BatchIn) : stored('batch_in', few);
 tribcode := StringLib.StringToLowerCase(tribcode_value);
 
 gateways_in := Gateway.Configuration.Get();
+
+BridgerGateway := gateways_in(servicename='bridgerwlc')[1].url!='';
+
+OFACversion := if(BridgerGateway and tribcode_value = '', 4, 1);
+
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := le.servicename;
-	self.url := map(tribcode='pb01' and le.servicename in ['targus'] => le.url,  // use targus gateway if needed
+	self.url := map(tribcode='pb01' and le.servicename in ['targus'] => le.url,// use targus gateway if needed
+																	tribcode = '' and le.servicename in ['bridgerwlc'] => le.url,
 				 ''); // default to no gateway call			 
 	self := le;
 end;
@@ -77,7 +83,7 @@ end;
 f := project(batchin, addseq(LEFT,COUNTER));
 //output(f, named('PB1I'));
 
-ret := RiskWise.PB1O_Function(f, gateways, GLB_Purpose, DPPA_Purpose, DataRestriction:=DataRestriction, DataPermission:=DataPermission);
+ret := RiskWise.PB1O_Function(f, gateways, GLB_Purpose, DPPA_Purpose, DataRestriction:=DataRestriction, DataPermission:=DataPermission, OFACversion:=OFACversion);
 output(ret, named('Results'));
 
 endmacro;

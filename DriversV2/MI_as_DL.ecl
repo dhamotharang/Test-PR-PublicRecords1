@@ -1,4 +1,6 @@
-import Ut, lib_stringlib, Drivers;
+﻿import Ut, lib_stringlib, Drivers;
+
+export MI_as_DL(dataset(DriversV2.Layouts_DL_MI_In.Layout_MI_Cleaned) pFile_MI_Input) := function
 
 string8 lFixDate(string8 pDateIn)
  := if(pDateIn[5..8] in ['    ','0000'],
@@ -9,7 +11,7 @@ string8 lFixDate(string8 pDateIn)
 bad_names  := ['UNKNOWN','UNK','UNKN','NONE','N/A','UNAVAILABLE'];
 bad_mnames := ['NMN','NMI'];
 
-DriversV2.Layout_DL_Extended tMI_To_Common(Drivers.File_MI_Full pInput)
+DriversV2.Layout_DL_Extended tMI_To_Common(pFile_MI_Input pInput)
  := transform
 	self.orig_state 							:= 'MI';
 	self.dt_first_seen 						:= (unsigned8)pInput.append_PROCESS_DATE div 100;
@@ -73,4 +75,8 @@ DriversV2.Layout_DL_Extended tMI_To_Common(Drivers.File_MI_Full pInput)
 	//self.addr_type              := pInput.addr_type;
 end;
 
-export MI_as_DL := project(Drivers.File_MI_Full + DriversV2.File_DL_MI_Cleaned, tMI_To_Common(left))  : persist(DriversV2.Constants.Cluster + 'Persist::DL2::DrvLic_MI_as_DL');
+MI_as_DL_mapper := project(pFile_MI_Input, tMI_To_Common(left));
+
+return MI_as_DL_mapper;
+
+end;

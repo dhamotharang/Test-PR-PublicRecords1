@@ -134,6 +134,8 @@ export ctg_TrespassofRealProperty          := 'TRESPASS_OF_REALPROPERTY';
 export ctg_PeepingTom                      := 'PEEPING_TOM'; 
 export ctg_Other                           := 'OTHER'; 
 export ctg_Unclassified                    := 'CANNOT_CLASSIFY'; 
+export ctg_Warrant_Fugitive                := 'WARRANT_FUGITIVE';
+export ctg_Obstruct_Resist                 := 'OBSTRUCT_RESIST';
 // export ctg_Embezzlement                 := 'EMBEZZLEMENT';        //Currently Not used
 // export ctg_Extortion_Blackmail          := 'EXTORTION_BLACKMAIL'; //Currently Not used 
 
@@ -182,7 +184,9 @@ export category_to_bitmap  (string category = '')  := map(
 													category = ctg_TrespassofRealProperty         	=> ut.bit_set(0,38),      
 													category = ctg_PeepingTom                     	=> ut.bit_set(0,39),      
 													category = ctg_Other                            => ut.bit_set(0,40),      
-													category = ctg_Unclassified                     => ut.bit_set(0,41),      
+													category = ctg_Unclassified                     => ut.bit_set(0,41),   
+													category = ctg_Warrant_Fugitive                 => ut.bit_set(0,42),  
+													category = ctg_Obstruct_Resist                  => ut.bit_set(0,43),
 													0); //Max 64 sources
  
 
@@ -232,11 +236,15 @@ export	string	Get_category_from_bitmap(unsigned bitmap_category) := function
 																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_PeepingTom                      )),' ' + ctg_PeepingTom                     ,'')	
 																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Other                           )),' ' + ctg_Other                          ,'')	
 																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Unclassified                    )),' ' + ctg_Unclassified                   ,'')	
+																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Warrant_Fugitive                )),' ' + ctg_Warrant_Fugitive               ,'')	
+																					+if(fis_match(bitmap_category, category_to_bitmap(ctg_Obstruct_Resist                 )),' ' + ctg_Obstruct_Resist                ,'')
 																																								
 												 );                                                                                                      	
 		
 		return		stringlib.stringfindreplace(trim(stringlib.stringcleanspaces(translate_bitmap),left,right),'  ',' ');
 end;	
+
+
 
 
 export is_company(string temp_name) := function 
@@ -1045,7 +1053,7 @@ step1 := MAP( p_case_number[1..4] ='ARR:' => p_case_number[5..],
 						 );
 clean_case_num := stringlib.stringfilter(stringlib.stringtouppercase(step1),'abcdefABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890');
 
-//clean_case_num2 := unicodelib.unicodefilterout(clean_case_num,U'' );
+//clean_case_num2 := unicodelib.unicodefilterout(clean_case_num,U'î' );
 
 No_leading_Zero  := regexreplace('^[0]+(.*)',(string)clean_case_num,'$1');
 
@@ -1590,7 +1598,11 @@ export fn_shorten_sourcename(string psourcename) := function
 								 psourcename = 'MASSACHUSETTS_WEST_BRIDGEWATER_ARRESTS_CW          '    => 'MA_WES_BRDGEWATR_ARR',
 								 psourcename = 'MONTANA_YELLOWSTONE_COUNTY_DETENTION_CW            '    => 'MT_YELLOWSTONCTY_DET', 
 								 psourcename = 'FLORIDA_OSCEOLA_COUNTY_CORRECTIONS_CW              '    => 'FL_OSCEOLA_CTY_CORR', 
-
+								 psourcename = 'UTAH_WHITE_COLLAR_CRIME_OFFENDER_REGISTRY          '    => 'UT_WHITECOLAR_OFNREG',                                                           
+								 psourcename = 'MONTANA_VIOLENT_OFFENDER_REGISTRY                  '    => 'MT_VIOLENT_OFNREG',                   
+								 psourcename = 'NORTH_DAKOTA_OFFENDERS_AGAINST_CHILDREN            '    => 'ND_OFFND_AGANST_CHIL',
+								 psourcename = 'TEXAS_DALLAS_JUSTICE_OF_THE_PEACE_TRAFFIC          '    => 'TX_DALAS_JUSPEACE_TR',
+								 psourcename = 'GEORGIA_PAROLE_RELEASED_INMATES                    '    => 'GA_PAR_RELEASED_INM',
 								 
 								 
 								 result2);
@@ -1646,6 +1658,12 @@ map(
 	psourcename = 'UTAH_JUSTICE_COURT'                                   => '8G',
   psourcename = 'WEST_VIRGINIA_CIRCUIT_COURTS'                         => '8H',
 	
+	
+/////////////////////////////////////////////////////////////20171025 
+	psourcename = 'UTAH_WHITE_COLLAR_CRIME_OFFENDER_REGISTRY' 		       => '10D',
+	psourcename = 'MONTANA_VIOLENT_OFFENDER_REGISTRY        ' 			     => '10E',
+	psourcename = 'NORTH_DAKOTA_OFFENDERS_AGAINST_CHILDREN  ' 			     => '10F',
+	 
  /**************************************************************/	
   //DOC	
 	//stringlib.stringfind(psourcename,'DEPARTMENT_OF_CORRECTIONS',1) >0 	=> statecode,
@@ -1718,6 +1736,10 @@ map(
   psourcename = 'OKLAHOMA_DOC_VIOLENT_OFFENDER_REGISTRY'                   => 'ZB',
 	psourcename = 'SOUTH_CAROLINA_DEPARMENT_OF_PROBATION_PAROLE_AND_PARDON'  => '6H',
   psourcename = 'MICHIGAN_DEPARTMENT_OF_CORRECTIONS_WEBSITE'               => '6W', // VC 20141027
+	
+/////////////////////////////////////////////////////////////20171025 
+	psourcename = 'GEORGIA_PAROLE_RELEASED_INMATES'           		           => '10G',
+	
  /**************************************************************/
   //County
 	psourcename = 'ARIZONA_MARICOPA_COUNTY_GILBERT_MUNICIPAL_COURT' 	=> 'RE',                                                     
@@ -2133,10 +2155,14 @@ map(
 	psourcename = 'OHIO_WYANDOT_COUNTY_COMMON_PLEAS_COURT'                => '9V',
 	psourcename = 'TEXAS_KAUFMAN_COUNTY'                                  => '9W',
 	psourcename = 'TEXAS_RANDALL_COUNTY'                                  => '9X',
-	// psourcename = ''                               => '9Y',
-	// psourcename = ''                                  => '9Z',
-	// psourcename = ''                                  => '10A',
-	
+
+	 /////////////////////////////////////////////////////////////20171025 
+ 
+ psourcename = 'CALIFORNIA_EL_DORADO_COUNTY_SUPERIOR_COURT'            => '9Y',
+ psourcename = 'FLORIDA_MANATEE_COUNTY'                                => '9Z',
+ psourcename = 'OHIO_VINTON_COUNTY_COMMON_PLEAS_COURT'                 => '10A',
+ psourcename = 'TEXAS_AUSTIN_COUNTY_MUNICIPAL_COURT'                   => '10B',
+ psourcename = 'TEXAS_DALLAS_JUSTICE_OF_THE_PEACE_TRAFFIC'             => '10C',
  //Arrests( New Vendor_Code_Assignd by Neha)
  
  psourcename = 'ALABAMA_BALDWIN_COUNTY_ARRESTS' => 'BA',
@@ -3386,6 +3412,15 @@ vendor_code = '9V' => 'OHIO_WYANDOT_COUNTY_COMMON_PLEAS_COURT'                ,
 vendor_code = '9W' => 'TEXAS_KAUFMAN_COUNTY'                                  ,
 vendor_code = '9X' => 'TEXAS_RANDALL_COUNTY'                                  ,
 
+vendor_code = '9Y'  => 'CALIFORNIA_EL_DORADO_COUNTY_SUPERIOR_COURT'           ,
+vendor_code = '9Z'  => 'FLORIDA_MANATEE_COUNTY'                               ,
+vendor_code = '10A' => 'OHIO_VINTON_COUNTY_COMMON_PLEAS_COURT'                ,
+vendor_code = '10B' => 'TEXAS_AUSTIN_COUNTY_MUNICIPAL_COURT'                  ,
+vendor_code = '10C' => 'TEXAS_DALLAS_JUSTICE_OF_THE_PEACE_TRAFFIC'            ,
+vendor_code = '10D' => 'UTAH_WHITE_COLLAR_CRIME_OFFENDER_REGISTRY'            ,
+vendor_code = '10E' => 'MONTANA_VIOLENT_OFFENDER_REGISTRY        '            ,
+vendor_code = '10F' => 'NORTH_DAKOTA_OFFENDERS_AGAINST_CHILDREN  '            ,
+vendor_code = '10G' => 'GEORGIA_PAROLE_RELEASED_INMATES'                      ,
  //************************CRIMWISE*******************************/
  vendor_code = 'W0001' => 'ILLINOIS_ADMINISTRATOR_OF_THE_COURTS                        ',
  vendor_code = 'W0002' => 'MINNESOTA_ADMINISTRATOR_OF_THE_COURTS                       ',
@@ -3717,6 +3752,8 @@ vendor_code = '9X' => 'TEXAS_RANDALL_COUNTY'                                  ,
  vendor_code = 'W0319' =>'OHIO_SENECA_COUNTY_TIFFIN_MUNICIPAL_COURT     ' ,
  //AOC                                                                     
  vendor_code = 'W0320' =>'KANSAS_OFFENDER_REGISTRY                      ' ,
+ 
+ 
  //************************LN Sources****************************/
  vendor_code = '3N' => 'LOUSIANA - EAST BATON ROUGE',
  vendor_code = '3O' => 'LOUISIANA - JEFFERSON COUNTY ',
@@ -3771,7 +3808,7 @@ vendor_code = '9X' => 'TEXAS_RANDALL_COUNTY'                                  ,
  vendor_code = '2C' => 'OKLAHOMA PUSHMATAHA COUNTY',
  vendor_code = '2F' => 'OKLAHOMA ROGER MILLS COUNTY',
  vendor_code = '2D' => 'OKLAHOMA ROGERS COUNTY',
- vendor_code = '2E' => 'OKLAHOMA TULSA COUNTY  ',
+ vendor_code = '2E' => 'OKLAHOMA TULSA COUNTYÂ  ',
  // vendor_code = 'OR' => 'OREGON DEPARTMENT OF CORRECTIONS',
  // vendor_code = '2Q' => 'SOUTH CAROLINA GREENVILLE COUNTY',
  // vendor_code = '2X' => 'SOUTH CAROLINA YORK COUNTY',

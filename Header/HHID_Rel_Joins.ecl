@@ -1,5 +1,5 @@
 import ut,prte2_header;
-fin := header.file_relatives(number_cohabits>5);
+fin := header.File_Relatives_v3(number_cohabits>5);
 
 r := record
   unsigned6 person1;
@@ -20,14 +20,14 @@ ids_a := record
   unsigned6 hhid;
   end;
 
-ids_a app_hh_inf(f le, hhid_table_i ri) := transform
+ids_a app_hh_inf(f le, header.hhid_table_i ri) := transform
   self.address_id := ri.addr_id;
   self.hhid := ri.hhid_indiv;
   self := le;
   end;
 
 
-jn := join(f,hhid_table_i,left.person1=right.did,app_hh_inf(left,right),hash);
+jn := join(f,header.hhid_table_i,left.person1=right.did,app_hh_inf(left,right),hash);
 
 lname_equiv := record
   unsigned6 le_hhid;
@@ -35,12 +35,12 @@ lname_equiv := record
   unsigned1 flag := 0;
   end;
 
-lname_equiv take_both(jn le, hhid_table_i ri) := transform
+lname_equiv take_both(jn le, header.hhid_table_i ri) := transform
   self.le_hhid := le.hhid;
   self.ri_hhid := ri.hhid_indiv;
   end;
 
-l_e := join(jn,hhid_table_i,left.address_id=right.addr_id and
+l_e := join(jn,header.hhid_table_i,left.address_id=right.addr_id and
                   left.person2=right.did and
                   left.hhid>right.hhid_indiv,take_both(left,right),hash);
 

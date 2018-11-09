@@ -1,4 +1,4 @@
-// GAS0825 / Georgia Real Estate Commission & Appraisers Board / Multiple Professions //
+﻿// GAS0825 / Georgia Real Estate Commission & Appraisers Board / Multiple Professions //
 
 
 export layout_GAS0825 := module
@@ -28,7 +28,7 @@ export apr := record
 END;
 
 export re_active := record
-  string20   LIC_NUMR;
+ string20   LIC_NUMR;
 	string30   LAST_NAME;
 	string30   FIRST_NAME;
 	string30   MIDDLE_NAME;
@@ -46,7 +46,7 @@ export re_active := record
 	string30   COUNTY;
 	string1    FILLER1;
 	string10   EXPIRATION_DATE;
-	string1    FILLER6;
+	// string1    FILLER6;
 	string30   OFF_SLNUM;
 	string10   LIC_TYPE;
 	string1    FILLER2;

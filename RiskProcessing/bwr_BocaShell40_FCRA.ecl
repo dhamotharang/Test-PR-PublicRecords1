@@ -17,6 +17,7 @@ unsigned record_limit :=    0;    //number of records to read from input file; 0
 unsigned1 parallel_calls := 30;  //number of parallel soap calls to make [1..30]
 unsigned1 eyeball := 10;
 string DataRestrictionMask := '1000010001000100000000000'; // to restrict fares, experian, transunion and experian FCRA 
+unsigned3 LastSeenThreshold := 0;	//# of days to consider header records as being recent for verification.  0 will use default (41 and lower = 365 days, 50 and higher = include all) 
 
 //===================  input-output files  ======================
 infile_name :=  '~dvstemp::in::shell_4_0_barclay_1331_f_s';
@@ -101,6 +102,7 @@ l assignAccount (ds_input le, INTEGER c) := TRANSFORM
 
   self.IncludeScore := true;
 	SELF.datarestrictionmask := datarestrictionmask;
+	SELF.LastSeenThreshold := LastSeenThreshold;
 	self.bsversion := 4;		
 	SELF := le;
 	SELF := [];

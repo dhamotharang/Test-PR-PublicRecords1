@@ -1,4 +1,4 @@
-﻿import tools, _control;
+﻿import tools, _control,lib_thorlib;
 
 export SprayMBSFiles(
 	 string		pServerIP		                   						= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10)
@@ -15,8 +15,9 @@ export SprayMBSFiles(
 	,string   pFilenameMBSFdnHHID            						= 'hhid_fdn_accounts*'
 	,string   pFilenameMBSTableCol           						= 'table_column.txt'
 	,string   pFilenameMBSColValDesc         						= 'column_value_desc.txt'
+	,string 	pFilenameMbsVelocityRules									= '*velocity_rules.txt'
 	,string		pversion
-	,string		pGroupName	                   = Platform.groupname()																		
+	,string		pGroupName	                   = thorlib.group()																		
 	,boolean	pIsTesting	                   = false
 	,boolean	pOverwrite	                   =  true
 	,boolean	pReplicate	                   =	true
@@ -84,6 +85,7 @@ function
   MAC_FilesToSprayCSV(pFilenameMBSFdnHHID         									,Filenames(pversion).Input.MBSFdnHHID 											,FilesToSprayMBSFdnHHID 											);
   MAC_FilesToSprayCSVPipe(pFilenameMBSTableCol         							,Filenames(pversion).Input.MBSTableCol 											,FilesToSprayMBSTableCol 											);
   MAC_FilesToSprayCSVPipe(pFilenameMBSColValDesc         						,Filenames(pversion).Input.MBSColValDesc 										,FilesToSprayMBSColValDesc 										);
+	MAC_FilesToSprayCSVPipe(pFilenameMbsVelocityRules      						,Filenames(pversion).Input.MbsVelocityRules									,FilesToSprayMbsVelocityRules									);
 
 	SprayTheFile(dataset(tools.Layout_Sprays.Info) FilesToSpray) :=
 		tools.fun_Spray(FilesToSpray,,,pOverwrite,pReplicate,true,pIsTesting,,Platform.Name() + ' ' + pversion,pNameOutput,pShouldSprayMultipleFilesAs1 := pSprayMultipleFilesAs1);
@@ -100,9 +102,9 @@ function
 		 ,if(not _Flags.FileExists.Input.MBSFdnHHID                   	or pOverwrite,SprayTheFile(FilesToSprayMBSFdnHHID       								))
 		 ,if(not _Flags.FileExists.Input.MBSTableCol                  	or pOverwrite,SprayTheFile(FilesToSprayMBSTableCol       								))
 		 ,if(not _Flags.FileExists.Input.MBSColValDesc                	or pOverwrite,SprayTheFile(FilesToSprayMBSColValDesc       							))
-
+		 ,if(not _Flags.FileExists.Input.MbsFdnMasterIDIndTypeInclusion or pOverwrite,SprayTheFile(FilesToSprayMbsFdnMasterIDIndTypeInclusion		))
 		 ,if(Platform.Source = 'FraudGov' and
-				(not _Flags.FileExists.Input.MbsFdnMasterIDIndTypeInclusion	or pOverwrite),SprayTheFile(FilesToSprayMbsFdnMasterIDIndTypeInclusion))
+				(not _Flags.FileExists.Input.MbsVelocityRules 							or pOverwrite),SprayTheFile(FilesToSprayMbsVelocityRules								))
 		);
 
 end;

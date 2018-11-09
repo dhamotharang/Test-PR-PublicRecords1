@@ -68,7 +68,7 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				SELF := [];
 			END;
 			
-			dStd := dedup(NORMALIZE(res, 3, tMapping(LEFT,counter)), all);
+			dStd := dedup(NORMALIZE(res(quarantined = '0'), 3, tMapping(LEFT,counter)), all);
 
 			return dStd;
 		
@@ -92,7 +92,7 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 			r tMapping(res L,  integer C) := TRANSFORM
 				self.data_provider_id		:=L.ori;
 				self.data_provider_ori	:=L.data_provider_ori;
-				self.incident						:=(string)L.cfs_id;
+				self.incident						:=L.event_number;
 				self.orig_name					:=trim(L.complainant,left,right);
 				self.Prepped_rec_type		:=choose(C
 																	,Bair._Constant.CFS_caller_addr
@@ -121,7 +121,7 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				SELF := [];
 			END;
 			
-			dStd := dedup(NORMALIZE(res, 3, tMapping(LEFT,counter)), all);
+			dStd := dedup(NORMALIZE(res(quarantined = '0'), 3, tMapping(LEFT,counter)), all);
 			return dStd;
 		
 	END;
@@ -176,7 +176,7 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				SELF := [];
 			END;				
 
-			dStd := PROJECT(res, tMapping(LEFT));
+			dStd := PROJECT(res(quarantined = '0'), tMapping(LEFT));
 			return dStd;
 	END;
 	
@@ -225,7 +225,7 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				SELF := [];
 			END;				
 
-			dStd := PROJECT(res, tMapping(LEFT));
+			dStd := PROJECT(res(quarantined = '0'), tMapping(LEFT));
 			return dStd;
 	END;
 
@@ -284,7 +284,7 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				self := [];
 			END;
 			
-			dStd := PROJECT(res, tMapping(LEFT));
+			dStd := PROJECT(res(quarantined = '0'), tMapping(LEFT));
 			return dStd;
 	END;
 	
@@ -338,7 +338,7 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				self := [];
 			END;
 				
-			dStd := PROJECT(res, tMapping(LEFT));
+			dStd := PROJECT(res(quarantined = '0'), tMapping(LEFT));
 			return dStd;
 	END;
 	
@@ -401,7 +401,7 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				self := [];
 			END;				
 
-			dStd := PROJECT(res, tMapping(LEFT));
+			dStd := PROJECT(res(quarantined = '0'), tMapping(LEFT));
 			return dStd;
 	END;
 	
@@ -459,7 +459,7 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				self := [];
 			END;
 				
-			dStd := PROJECT(res, tMapping(LEFT));
+			dStd := PROJECT(res(quarantined = '0'), tMapping(LEFT));
 			return dStd;
 	END;
 	
@@ -524,7 +524,7 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				self:=[];
 			END;
 			
-		dStd := dedup(NORMALIZE(res, 2, tMapping(LEFT,counter)), all);
+		dStd := dedup(NORMALIZE(res(quarantined = '0'), 2, tMapping(LEFT,counter)), all);
 		return dStd;
 		
 	END;
@@ -583,7 +583,7 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				self:=[];
 			END;
 				
-			dStd := dedup(NORMALIZE(res, 2, tMapping(LEFT,counter)), all);
+			dStd := dedup(NORMALIZE(res(quarantined = '0'), 2, tMapping(LEFT,counter)), all);
 			return dStd;
 		
 	END;
@@ -722,7 +722,7 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				self:=[];
 			END;				
 
-			dStd := dedup(sort(Normalize(res,3, tMapping(LEFT,counter)),record,except Prepped_rec_type),record,except Prepped_rec_type);
+			dStd := dedup(sort(Normalize(res(quarantined = '0'),3, tMapping(LEFT,counter)),record,except Prepped_rec_type),record,except Prepped_rec_type);
 			return dStd;
 	END;
 	
@@ -855,7 +855,7 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				self:=[];
 			END;
 				
-			dStd := dedup(sort(Normalize(res,3, tMapping(LEFT,counter)),record,except Prepped_rec_type),record,except Prepped_rec_type);
+			dStd := dedup(sort(Normalize(res(quarantined = '0'),3, tMapping(LEFT,counter)),record,except Prepped_rec_type),record,except Prepped_rec_type);
 			return dStd;		
 	END;
 	

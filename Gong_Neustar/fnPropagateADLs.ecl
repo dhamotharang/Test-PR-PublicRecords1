@@ -1,4 +1,4 @@
-import ut, watchdog;
+﻿import ut, watchdog;
 
 export fnPropagateADLs(
 			dataset(layout_history) inhistory = File_GongHistory,		// = dataset('~thor_data400::base::gong_history',layout_historyaid, flat, __compressed__), 
@@ -110,7 +110,7 @@ joinBack := join(distHist(did = 0), rollup_matches(pdid <> ''),
 					transform(recordof(inhistory),
 							self.did := right.new_did,
 							self.pdid := right.pdid,
-							self := left), left outer, local);
+							self := left), left outer, local, skew(1.0));
 						
 export history := project(distHist(did > 0) + flaggedGdPh(name_first = '' or name_last = '' or flag = '00'), {recordof(joinBack)}) + joinBack;
 
@@ -119,14 +119,14 @@ export history := project(distHist(did > 0) + flaggedGdPh(name_first = '' or nam
 
 tbMatches := table(seqDID((pdid = '0001' or pdid >= '1000') and did > 0), {phone10, name_first, name_last, name_middle, did}, phone10, name_first, name_last, name_middle, did);
 
-joinBackBase := join(gongbase(did = 0), tbMatches,
+joinBackBase := join(DISTRIBUTE(gongbase(did = 0),hash32(phone10)), tbMatches,
 					left.phone10 = right.phone10 and
 					left.name_first = right.name_first and
 					left.name_last = right.name_last and
 					left.name_middle = right.name_middle,
 					transform(recordof(gongbase),
 							self.did := right.did,
-							self := left), left outer);
+							self := left), left outer, skew(0.1));
 
 export base := project(gongbase(did > 0), {recordof(joinBackBase)}) + joinBackBase;
 

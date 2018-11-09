@@ -1,9 +1,9 @@
-import Business_Header, ut, PRTE2;
+﻿import Business_Header, ut, PRTE2;
 
 export BH_Rel_Types(
 
 	dataset(Layouts.Out.Layout_BH_Out	)				pIn_BH_Init		= BH_Init()
-	//dataset(Layouts.Out.Layout_BH_Out	)				pIn_BH_Init		= dataset('~prte::base::business_header::bh_init', Layouts.Out.Layout_BH_Out, thor)
+	//dataset(Layouts.Out.Layout_BH_Out	)				pIn_BH_Init		= dataset('~prte::persist::PRTE2_Business_Header::BH_Init', Layouts.Out.Layout_BH_Out, thor)
 	
 ) :=
 function
@@ -11,8 +11,8 @@ function
 	//*** For historical records group_id's already exists in the input files, so taking them directly.
 	dBH_Init_Historical := pIn_BH_Init(trim(rel1_bdid) <> '' and trim(cust_name) = '');
 	
-	//*** Taking the New/Current business header records by filtering on cust_name = LN_PR.
-	dBH_Init_Current := pIn_BH_Init(trim(cust_name) = 'LN_PR');
+	//*** Taking the New/Current business header records by filtering on cust_name <> ''.
+	dBH_Init_Current := pIn_BH_Init(trim(cust_name) <> '');
 
 	dBH_Init_Current_dis := distribute(dBH_Init_Current, hash(link_fein, link_inc_date));
 

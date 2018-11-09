@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="PhoneFinderBatchService">
   <part name="TransactionType" type="xsd:byte" default="0" size="1" description="0 - Basic, 1 - Premium 2 - Ultimate"/>
 	<separator/>
@@ -87,19 +87,29 @@ MACRO
 																						      UserRules,
 																							    allRules);	
 		EXPORT BOOLEAN   IncludeOtherPhoneRiskIndicators:= FALSE : STORED('IncludeOtherPhoneRiskIndicators');
-		EXPORT BOOLEAN 	 DetailedRoyalties 	 := FALSE : STORED('ReturnDetailedRoyalties');
+		EXPORT BOOLEAN 	 DetailedRoyalties 	            := FALSE : STORED('ReturnDetailedRoyalties');
+		EXPORT UNSIGNED1 LineIdentityConsentLevel       := 0 : STORED('LineIdentityConsentLevel');	
+		EXPORT STRING20  Usecase                        := '': STORED('LineIdentityUseCase');
+		EXPORT STRING3 	 ProductCode                    := '': STORED('ProductCode');
+		EXPORT STRING8	 BillingId                      := '': STORED('BillingId');
+		EXPORT BOOLEAN   UseZumigoIdentity	 := doxie.DataPermission.use_ZumigoIdentity and TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate and BillingId <>'';
+				
+					 BOOLEAN   DirectMarketing := FALSE : STORED('DirectMarketingSourcesOnly');
+		EXPORT BOOLEAN   DirectMarketingSourcesOnly := DirectMarketing AND TransactionType = PhoneFinder_Services.Constants.TransType.BASIC;
+
 	END;
 	
 	modBatchRecords := PhoneFinder_Services.PhoneFinder_BatchRecords(dBatchReq,reportMod,
    																																		IF(reportMod.TransactionType = PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT,
    																																											dGateways(servicename IN PhoneFinder_Services.Constants.PhoneRiskAssessmentGateways),dGateways));
    	
-   	results	  := modBatchRecords.dBatchOut;
-   	royalties	:= modBatchRecords.dRoyalties;
-   	
-   	OUTPUT(results,NAMED('Results'));
-   	OUTPUT(royalties,NAMED('RoyaltySet'));
-
+    royalties	:= modBatchRecords.dRoyalties;
+   	results	:= modBatchRecords.dBatchOut;
+   	Zumigo_Log	:= modBatchRecords.Zumigo_History_Recs;
+ 
+   OUTPUT(results,named('Results'));
+   OUTPUT(royalties,named('RoyaltySet'));
+   OUTPUT(Zumigo_Log,named('LOG_DELTA_PHONEFINDER_DELTA_PHONES_GATEWAY'));
 
 ENDMACRO;
 

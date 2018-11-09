@@ -1,4 +1,4 @@
-IMPORT address,AID,bair;
+﻿IMPORT address,AID,bair;
 
 EXPORT Layouts := MODULE
 	SHARED max_size := _Dataset().max_record_size;
@@ -461,6 +461,7 @@ EXPORT Layouts := MODULE
 	//-
 	export SprayedClassification_CSV 	:= RECORD
 		STRING			data_provider_id;
+		STRING			agency_offender_id;
 		STRING			classification;
 		STRING			agency_category;
 		STRING			agency_level;
@@ -476,10 +477,8 @@ EXPORT Layouts := MODULE
 		STRING			classification_date;
 		STRING			expiration_date;
 		STRING			timestamp;
-		STRING			agency_offender_id := '';
 		STRING			id := '';
 		STRING			offender_id := '';
-
 	END;
 	//-
 	export SprayedPictures_CSV 	:= RECORD

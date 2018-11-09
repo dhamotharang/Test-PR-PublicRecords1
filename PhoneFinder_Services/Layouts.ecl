@@ -1,4 +1,4 @@
-IMPORT Autokey_batch,BatchShare,doxie,Doxie_Raw,iesp,Royalty,PhonesInfo,PhoneFraud;
+﻿IMPORT Autokey_batch,BatchShare,doxie,Doxie_Raw,iesp,Royalty,PhonesInfo,PhoneFraud;
 
 EXPORT Layouts :=
 MODULE
@@ -235,7 +235,11 @@ MODULE
 			STRING4 PhoneRiskIndicator;
 			BOOLEAN OTPRIFailed;
 			DATASET(Alert) Alerts;
-			DATASET({STRING17 InquiryDate})									InquiryDates;					
+			DATASET({STRING17 InquiryDate})									InquiryDates;		
+			UNSIGNED RecordsReturned;
+			BOOLEAN PhoneOwnershipIndicator;
+			STRING rec_source;
+			STRING15 CallForwardingIndicator;
 		END;
 		
 		EXPORT ExcludePhones :=
@@ -278,6 +282,7 @@ MODULE
 			STRING40	primary_address_type;				
 			UNSIGNED1 phone_source;
 			STRING1 	tnt;
+			BOOLEAN PhoneOwnershipIndicator;
 		END;
 		
 		EXPORT PhoneSlim :=
@@ -316,6 +321,8 @@ MODULE
 			STRING4 PhoneRiskIndicator;
 			BOOLEAN OTPRIFailed;
 			DATASET(Alert) Alerts;
+			BOOLEAN PhoneOwnershipIndicator;
+			STRING15 CallForwardingIndicator;
 		END;
 		
 		EXPORT IdentityIesp :=
@@ -378,7 +385,8 @@ MODULE
 								'STRING8  Identity' + %'cntIdentity'% + '_FirstSeenWithPrimaryPhone;' +
 								'STRING8  Identity' + %'cntIdentity'% + '_LastSeenWithPrimaryPhone;' +
 								'STRING8  Identity' + %'cntIdentity'% + '_TimeWithPrimaryPhone;' +
-								'STRING8  Identity' + %'cntIdentity'% + '_TimeSinceLastSeenWithPrimaryPhone;');
+								'STRING8  Identity' + %'cntIdentity'% + '_TimeSinceLastSeenWithPrimaryPhone;' +
+								'BOOLEAN  Identity' + %'cntIdentity'% + '_PhoneOwnershipIndicator;');
 				#SET(cntIdentity,%cntIdentity% + 1)
 			#END
 		#END
@@ -437,7 +445,9 @@ MODULE
 								'STRING8  OtherPhone' + %'cntPhone'% + '_DateFirstSeen;' +
 								'STRING8  OtherPhone' + %'cntPhone'% + '_DateLastSeen;' +
 								'STRING8  OtherPhone' + %'cntPhone'% + '_MonthsWithPhone;' +
-								'STRING8  OtherPhone' + %'cntPhone'% + '_MonthsSinceLastSeen;');
+								'STRING8  OtherPhone' + %'cntPhone'% + '_MonthsSinceLastSeen;' +
+								'BOOLEAN  OtherPhone' + %'cntPhone'% + '_PhoneOwnershipIndicator;' +
+								'STRING15  OtherPhone' + %'cntPhone'% + '_CallForwardingIndicator;');
 				#SET(cntPhone,%cntPhone% + 1)
 			#END
 		#END
@@ -607,6 +617,7 @@ MODULE
 			STRING4 PhoneRiskIndicator;
 			BOOLEAN OTPRIFailed;
 			%Alerts%
+			STRING15 CallForwardingIndicator;
 			STRING   CallerID;
 			STRING   CompanyNumber;
 			STRING   Name;
@@ -735,4 +746,17 @@ MODULE
 	EXPORT OTPRec := RECORD
 		RECORDOF(PhoneFraud.Key_OTP);
 	END;
+	
+	EXPORT DeltaInquiryDataRecord := RECORD
+	    	UNSIGNED8    seq;
+				STRING10     phone;
+	END;
+	
+	EXPORT DeltaInquiry_recout := RECORD
+	  UNSIGNED8    seq;
+		STRING10     phone;
+	  UNSIGNED RecordsReturned;
+	END;
+	
+	
 END;

@@ -1,4 +1,4 @@
-import Autokey_batch, LN_PropertyV2_Services, Suppress;
+﻿import Autokey_batch, LN_PropertyV2_Services, Suppress;
 
 ///////////////////////////////////////////////////////////////////////////////
 // This code was previously in BatchServices.STR_Records. I'm moving it over here so
@@ -50,7 +50,7 @@ MODULE
 	//////////////////////////////////////////////////////////////////////////
 	
 	fidsToPull1 := 
-		join(ds_props_with_parties, Suppress.Key_New_Suppression,
+		join(ds_props_with_parties, Suppress.Key_New_Suppression(),
 					keyed(right.Product in map (in_mod.ApplicationType = Suppress.Constants.ApplicationTypes.PeopleWise => Suppress.Constants.SuppressPeopleWise,
 															 in_mod.ApplicationType = Suppress.Constants.ApplicationTypes.LE => Suppress.Constants.SuppressLE,
 															 Suppress.Constants.SuppressGeneral)) and 
@@ -59,7 +59,7 @@ MODULE
 					 keyed(intformat((unsigned6)left.owners[1].owner_did,12,1) = right.Linking_ID),
 				 transform(LN_PropertyV2_Services.layouts.fid, self := left),keep(1));
 	fidsToPull2 := 
-		join(ds_props_with_parties, Suppress.Key_New_Suppression, 
+		join(ds_props_with_parties, Suppress.Key_New_Suppression(), 
 					keyed(right.Product in map (in_mod.ApplicationType = Suppress.Constants.ApplicationTypes.PeopleWise => Suppress.Constants.SuppressPeopleWise,
 															 in_mod.ApplicationType = Suppress.Constants.ApplicationTypes.LE => Suppress.Constants.SuppressLE,
 															 Suppress.Constants.SuppressGeneral)) and 

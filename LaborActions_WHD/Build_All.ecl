@@ -1,6 +1,9 @@
-IMPORT versioncontrol, _control, ut;
+﻿IMPORT versioncontrol, _control, ut, Orbit3, Roxiekeybuild;
 
 EXPORT Build_All(STRING	pversion) := MODULE
+
+		#workunit('name','Yogurt:LaborActions_WHD Build - ' + pversion);
+		
 		EXPORT spray_files	:= fSpray(pversion);
 		
 		EXPORT dkeybuild		:=	Update_Base(files().input.using,files().base.qa,pversion);
@@ -11,7 +14,10 @@ EXPORT Build_All(STRING	pversion) := MODULE
 		NewBase			:=	project(files(pversion).keybuild.logical,TRANSFORM(Layouts.Base,SELF := LEFT;));
    	VersionControl.macBuildNewLogicalFile( Filenames(pversion).base.new 
 																						,NewBase
-																						,Build_Base_File );	
+																						,Build_Base_File );
+																						
+		dops_update := Roxiekeybuild.updateversion('LaborActionsWHDKeys',pversion,'Randy.Reyes@lexisnexisrisk.com;Manuel.Tarectecan@lexisnexisrisk.com',,'N'); 
+		orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('Labor Actions WHD', pversion);
 				
 		full_build 	:= SEQUENTIAL( 
 				 				   nothor(APPLY(filenames().Base.dAll_filenames, APPLY(dSuperfiles, versioncontrol.mUtilities.createsuper(name))))
@@ -30,6 +36,8 @@ EXPORT Build_All(STRING	pversion) := MODULE
 									,proc_build_linkid_key(pversion) /* Build LINKID Roxie Keys */								
 									,out_STRATApopulation_stats(pversion)
 									,send_email(pversion).buildsuccess
+									,dops_update
+									,orbit_update
 														) : success(Sequential(send_email(pversion).buildsuccess,send_email(pversion).roxie.qa)), 
 																failure(send_email(pversion).buildfailure);
    

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 	<message name="ChargebackDefender_Service">
 	<part name="account" type="xsd:string"/>
 	<part name="UnparsedFullName" type="xsd:string"/>
@@ -299,6 +299,7 @@ export ChargebackDefender_Service := MACRO
 	layout_settings checkSettings( attributesIn le ) := TRANSFORM
 		name := StringLib.StringToLowercase(le.name); 
 		self.bsVersion    := map(
+			genericModelName IN ['osn1504_0'] => 51, //all OS models should run the 51 clam
 			name in attributes_v4 => 4,
 			name in attributes_v1 => 3,
 			2
@@ -333,9 +334,8 @@ export ChargebackDefender_Service := MACRO
 	goodAttributeRequest := not exists(settings) or not exists(settings(not validRequest));
 	//if bsversion 50 for the model and want cbd attributes of 40, then we need to run the clam as 50 for CBD
 	//and run another clam for 4 for attributes.
-	bsV5andAttrV4 := if(bsversion >= 51 and attrbsversion = 4, true, false);
   doscore := if(bsversion >= 51, true, false);
-	
+
 	doIdentity     := exists(settings(getIdentity));
 	doRelationship := exists(settings(getRelationship));
 	doVelocity     := exists(settings(getVelocity));
@@ -532,32 +532,8 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 		ipid_only
 	);
 	
-	//don't give imputed input to version 4 attributes - bsversion - running with 4 for attributes
-	iid_results2 := Models.ChargebackDefender_Function(indata, gateways_in, glb_purpose, dppa_purpose, ipid_only, dataRestriction, ofac_only,
-					suppressneardups, require2Ele, attrbsversion, dataPermission );
-	clam4Attributes := Risk_Indicators.BocaShell_BtSt_Function(
-		iid_results2,
-		gateways_in,
-		dppa_purpose,
-		glb_purpose,
-		isUtility,
-		false, 
-		includeRelatives,
-		includeDLInfo,
-		includeVehicles,
-		includeDerogs,
-		attrbsversion,//bsversion - running with 4 for attributes
-		false, // do score
-		true, // nugen
-		DataRestriction,
-		BSOptions,
-		DataPermission, 
-		ScoresInput,
-		NetAcuity_v4, //true for CBD5.1 models
-		ipid_only
-	);
 	
-		Models.Layout_Chargeback_Out addIP_BTSTFunc(mapped_results le, clam ri) := TRANSFORM
+	Models.Layout_Chargeback_Out addIP_BTSTFunc(mapped_results le, clam ri) := TRANSFORM
 			self.ipdata.ipcontinent := ri.ip2o.continent;
 			self.ipdata.ipcountry := StringLib.StringToUpperCase(ri.ip2o.countrycode);
 			self.ipdata.iproutingtype := if(Stringlib.StringFilterOut(ri.ip2o.ipaddr[1],'0123456789') = '', ri.ip2o.iproutingmethod, '');
@@ -572,9 +548,7 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 	withIP_BTST := JOIN(mapped_results, clam, (left.chargeback.seq*2) = right.bill_to_out.seq, addIP_BTSTFunc(left,right), left outer);
 
 	productID := Risk_Reporting.ProductID.Models__ChargebackDefender_Service;
-	intermediateLog1 := Risk_Reporting.To_LOG_Boca_Shell_BtSt(clam, productID, bsversion);  
-	intermediateLog2 := if(bsV5andAttrV4, Risk_Reporting.To_LOG_Boca_Shell_BtSt(clam4Attributes, productID, attrbsversion));
-	intermediateLog := intermediateLog1 + intermediateLog2;
+	intermediateLog := Risk_Reporting.To_LOG_Boca_Shell_BtSt(clam, productID, bsversion);  
 	
 	Models.Layout_CD_CustomModelInputs getCustomInputs(indata le, INTEGER c) := TRANSFORM
 		SELF.Seq := le.seq;
@@ -751,8 +725,7 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 	
 	// ****get attributes
 	//if running modeling shell 50 and want attributes then use the 4 clam output for attribtues
-	shell2Use := if(bsV5andAttrV4, clam4Attributes, clam);
-	attributes := Models.getCBDAttributes(shell2Use, account_value, indata, attrversion);	
+	attributes := Models.getCBDAttributes(clam, account_value, indata, attrversion);	
 	attr_test_seed := Models.CBDAttributes_TestSeed_FN(testPrep, account_value, Test_Data_Table_Name);  //Deactivate test seed keys - Comment out this line
 	
 	attrs := map(	test_data_enabled => attr_test_seed, //Deactivate test seed keys - comment out the remainder of the top line, starting after the map definition.
@@ -871,7 +844,6 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 	// Middle part is the database name, in this case: 'log__mbs'
 	// Must end with '_intermediate__log'
   OUTPUT(intermediateLog, NAMED('LOG_log__mbs_intermediate__log'));
-	
 	//Improved Scout Logging
 	IF(~DisableOutcomeTracking, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
 #End

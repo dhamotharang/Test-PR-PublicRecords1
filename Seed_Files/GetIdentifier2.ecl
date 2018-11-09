@@ -1,4 +1,4 @@
-
+﻿
 import risk_indicators, iesp, identifier2, address;
 
 export GetIdentifier2(DATASET (risk_indicators.Layout_InstantID_NuGenPlus) iid_results, string20 TestDataTableName) := FUNCTION
@@ -43,6 +43,8 @@ export GetIdentifier2(DATASET (risk_indicators.Layout_InstantID_NuGenPlus) iid_r
 	identifier2.layout_Identifier2 add_identifier2(iid_results le, seed_files.Key_Identifier2 rt) := transform			
 		self.InputSSNMatchesLastAndDOB.InputSSNMatchesLastAndDOB := (boolean)(unsigned)rt.InputSSNMatchesLastAndDOB; 
 		self.InputSSNMatchesLastAndDOB.RiskIndicators := row({rt.InputSSNMatchesLastAndDOB_riskindicator,rt.InputSSNMatchesLastAndDOB_riskindicatordescription},iesp.share.t_RiskIndicator) ; 
+    self.DiscoveredDOB.DOBDiscovered := rt.DiscoveredDOB_DOBDiscovered;
+    self.InputAddressEverOccupant.WasEverOccupant := rt.InputAddressEverOccupant_WasEverOccupant;
 		self.passportValidated := le.passportValidated='Y';
 		self.watchlists := project( le.watchlists, xform_wl(left) );
 		self.DOBMatchLevel := (integer)le.dobmatchlevel;		//***KWH - CIV

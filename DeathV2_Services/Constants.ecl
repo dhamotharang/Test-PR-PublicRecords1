@@ -1,4 +1,4 @@
-IMPORT death_master;
+﻿IMPORT death_master, MDR;
 
 EXPORT Constants := MODULE
 	
@@ -15,5 +15,11 @@ EXPORT Constants := MODULE
 	EXPORT DEFAULT_DID_SCORE_THRESHOLD	:= 100;
 	// BatchServices.Constants.DEATH_SERVICE_JOIN_LIMIT
 	EXPORT DEATH_SERVICE_JOIN_LIMIT := 1000;
+	
+	EXPORT src_Death_NonMarketing_Sources := [MDR.sourceTools.src_Enclarity,
+																																											MDR.sourceTools.src_Death_CA, 
+																																											MDR.sourceTools.src_Death_MI, 
+																																											MDR.sourceTools.src_Death_Restricted,
+																																											MDR.sourceTools.src_TUCS_Ptrack];
 	
 END;

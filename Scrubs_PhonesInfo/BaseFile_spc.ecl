@@ -1,4 +1,4 @@
-MODULE:Scrubs_PhonesInfo
+﻿MODULE:Scrubs_PhonesInfo
 FILENAME:PhonesInfo
 NAMESCOPE:BaseFile
 
@@ -73,12 +73,3 @@ FIELD:is_deact:LIKE(Invalid_YN):TYPE(STRING2):0,0
 FIELD:is_react:Like(Invalid_YN):TYPE(STRING2):0,0
 FIELD:call_forward_dt:LIKE(Invalid_Date):TYPE(UNSIGNED8):0,0
 FIELD:caller_id:LIKE(Invalid_Char):TYPE(STRING15):0,0
-FIELD:subpoena_company_name:LIKE(Invalid_Char):TYPE(STRING60):0,0
-FIELD:subpoena_contact_name:LIKE(Invalid_Char):TYPE(STRING60):0,0
-FIELD:subpoena_carrier_address:LIKE(Invalid_Char):TYPE(STRING60):0,0
-FIELD:subpoena_carrier_city:LIKE(Invalid_Char):TYPE(STRING20):0,0
-FIELD:subpoena_carrier_state:LIKE(Invalid_State):TYPE(STRING20):0,0
-FIELD:subpoena_carrier_zip:LIKE(Invalid_Num_Blank):TYPE(STRING5):0,0
-FIELD:subpoena_email:LIKE(Invalid_Char):TYPE(STRING30):0,0
-FIELD:subpoena_contact_phone:LIKE(Invalid_Phone):TYPE(STRING10):0,0
-FIELD:subpoena_contact_fax:LIKE(Invalid_Phone):TYPE(STRING10):0,0

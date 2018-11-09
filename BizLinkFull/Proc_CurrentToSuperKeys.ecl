@@ -1,4 +1,4 @@
-EXPORT Proc_CurrentToSuperKeys := PARALLEL( // parallel should be ok - all using different superkey
+﻿EXPORT Proc_CurrentToSuperKeys := PARALLEL( // parallel should be ok - all using different superkey
      Process_Biz_Layouts.AssignCurrentKeyToSuperFile // Assign main datafile
     ,Key_BizHead_.AssignCurrentKeyToSuperFile // Assign uberkey
     ,Key_BizHead_.AssignCurrentValueKeyToSuperFile // Assign values for uberkey
@@ -12,3 +12,4 @@ EXPORT Proc_CurrentToSuperKeys := PARALLEL( // parallel should be ok - all using
     ,Key_BizHead_L_EMAIL.AssignCurrentKeyToSuperFile // Assign linkpath
     ,Key_BizHead_L_SOURCE.AssignCurrentKeyToSuperFile // Assign linkpath
 );
+

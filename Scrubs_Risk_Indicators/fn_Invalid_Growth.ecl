@@ -1,0 +1,1 @@
+﻿EXPORT fn_Invalid_Growth(string percent_change) := if((decimal5_2)percent_change>=15.0,0,1);

@@ -569,7 +569,7 @@ EXPORT Layouts := MODULE
 		STRING50  url;
 		STRING50  email;
 		STRING3   Years_in_business;
-		STRING20 Business_Type; // pulled from bip v2 header.. similar to corp_filing_type below 
+		STRING60 Business_Type; // pulled from bip v2 header.. similar to corp_filing_type below 
 		STRING1 Input_residential;
 		UNSIGNED2  Input_total_businesses_active;
 		UNSIGNED2  Input_total_businesses_history;

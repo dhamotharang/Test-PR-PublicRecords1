@@ -1,4 +1,4 @@
-import header,doxie,ut,data_services,Relationship;
+﻿import header,doxie,ut,data_services,Relationship;
 
 
 relative_alpharetta := header.File_Relatives_Insurance(true);
@@ -15,17 +15,20 @@ relative_alpharetta := header.File_Relatives_Insurance(true);
 													)
 */
 
+relTitled := project(relative_alpharetta, Relationship.layout_output.titled);
+relNeutral := Relationship.functions_output.convertTitledToKey(relTitled);
+
 indexed_layout := RECORD
-   relative_alpharetta.did1;
+   relNeutral.did1;
   END;
 	
 payload_layout := record
-		Relationship.layout_GetRelationship.RelativeRec AND NOT did1;
+		Relationship.layout_output.key AND NOT did1;
 end;
 
-payload := project(relative_alpharetta,payload_layout);
+payload := project(relNeutral,payload_layout);
 
-export Key_Relatives_v3 := INDEX(relative_alpharetta
+export Key_Relatives_v3 := INDEX(relNeutral
 																,indexed_layout
 																,payload_layout
 																,data_services.Data_Location.Relatives 

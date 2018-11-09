@@ -1,10 +1,10 @@
-﻿import crim_common, did_add, didville, header, header_slimsort, ut, watchdog, address, lib_date,nid,AID,AID_Support,std ;
+﻿import crim_common, did_add, didville, header, header_slimsort, ut, watchdog, address, lib_date,nid;
 
-def 		:= distribute(hygenics_crim.file_in_defendant_arrests,hash(recordid));
-ah			:= dedup(sort(distribute(hygenics_crim.file_in_address_history_arrests,hash(recordid)), record, local), record,local);
-aka	  	:= dedup(sort(distribute(hygenics_crim.file_in_alias_arrests,hash(recordid)), record, local), record,local);
+def 		:= distribute(hygenics_crim.file_in_defendant_arrests,hash(recordid,sourceid));
+ah			:= dedup(sort(distribute(hygenics_crim.file_in_address_history_arrests,hash(recordid,sourceid)), record, local), record,local);
+aka	  	:= dedup(sort(distribute(hygenics_crim.file_in_alias_arrests,hash(recordid,sourceid)), record, local), record,local);
 off 		:= hygenics_crim.file_in_offense_arrests;
-cha 		:= dedup(sort(distribute(hygenics_crim.file_in_charge_arrests,hash(recordid)), record, local), record,local);
+cha 		:= dedup(sort(distribute(hygenics_crim.file_in_charge_arrests,hash(recordid,sourceid)), record, local), record,local);
 
 	slimOffense_rec := RECORD 
 		off.recordid;
@@ -19,9 +19,10 @@ cha 		:= dedup(sort(distribute(hygenics_crim.file_in_charge_arrests,hash(recordi
 		off.CourtDate;
 		off.OffenseDate;
 		off.caseid;
+		off.sourceid;
 	end;
 
-slim_off := dedup(sort(distribute(project(off, slimOffense_rec),hash(recordid)), record, local), record,local);
+slim_off := dedup(sort(distribute(project(off, slimOffense_rec),hash(recordid,sourceid)), record, local), record,local);
 
 	def join_def_alias(def l, aka r) := transform 
 		self.nametype 		:= 'A';
@@ -146,6 +147,7 @@ with_ssn						:= all_clean_name_addr;
 	Layout_almostfinal_offender := record
 		Layout_Common_Crim_Offender_orig;
 		hygenics_crim.layout_in_defendant.recordid;
+		hygenics_crim.layout_in_defendant.sourceid;
 	end;
  
 	Layout_almostfinal_offender to_crim_offender(with_ssn l, slim_AllOffChg r) := transform
@@ -270,14 +272,14 @@ with_ssn						:= all_clean_name_addr;
 	 self.dob_alias					:= '';
 	 self.place_of_birth		:= trim(trim(l.birthcity)+' '+ l.birthplace);
 
-	 self.street_address_1	//:= trim(l.street)+if(l.unit<>'', ' '+l.unit, '');
-	                        :=  map(l.sourcename='NORTH_CAROLINA_MECKLENBURG_COUNTY_ARRESTS' and regexfind('([A-Za-z]+)( NC$)',trim(l.street)) 
+
+   tempstreet             :=  map(l.sourcename='NORTH_CAROLINA_MECKLENBURG_COUNTY_ARRESTS' and regexfind('([A-Za-z]+)( NC$)',trim(l.street)) 
 	                                       	 => regexreplace('([A-Za-z]+)( NC$)',trim(l.street),''),l.street+if(l.unit<>'', ' '+l.unit, ''));	
-																					 
-	 self.street_address_2	:= trim(trim(trim(l.city)+' '+trim(l.orig_state))+' '+trim(l.orig_zip));
-	 self.street_address_3	:= '';
-	 self.street_address_4	:= '';
-	 self.street_address_5	:= '';
+   self.street_address_1	:= If(length(tempstreet)>25, tempstreet[1..25],tempstreet);
+   self.street_address_2	:= If(length(tempstreet)>25, tempstreet[26..],'');
+   self.street_address_3	:= trim(l.city);
+   self.street_address_4	:= trim(l.orig_state);
+   self.street_address_5	:= trim(l.orig_zip);
 	 
 	 self.race				  		:= if(length(trim(l.race))=1 and regexfind('[A-Z]', l.race, 0)<>'' , trim(l.race), '');
 	 
@@ -329,13 +331,13 @@ with_ssn						:= all_clean_name_addr;
 	 self 					:= l;
 	end;
 
-result_comm 		:= join(distribute(with_ssn ,hash(recordid)), distribute(slim_AllOffChg ,hash(recordid)), 
+result_comm 		:= join(distribute(with_ssn ,hash(recordid,sourceid)), distribute(slim_AllOffChg ,hash(recordid,sourceid)), 
 					            left.recordid=right.recordid and 
 								left.statecode=right.statecode,
 					            to_crim_offender(left,right), 
 					            left outer, local);//:persist ('~thor_data200::persist::crim::arrest::offender_after_did');
 
-result_common1	:= dedup(sort(distribute(result_comm, hash(recordid, state_origin)), record,local), record,local);
+result_common1	:= dedup(sort(distribute(result_comm, hash(recordid,sourceid)), record,local), record,local);
 
 	//Following code requird if we are using persistent offender_key - based on DOC numbers etc					
 	Layout_Common_Crim_Offender_orig transferkey (result_common1 L, result_common1 R) := transform
@@ -346,7 +348,7 @@ result_common1	:= dedup(sort(distribute(result_comm, hash(recordid, state_origin
 
 result_aliases := join(result_common1(pty_typ ='2'),result_common1(pty_typ ='0'), 
 					             left.recordid = right.recordid and 
-											 left.state_origin = right.state_origin,
+											 left.sourceid = right.sourceid,
 					             transferkey(left,right), 
 					             local);
 

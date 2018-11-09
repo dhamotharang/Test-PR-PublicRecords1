@@ -1,4 +1,4 @@
-import ut, risk_indicators, models, scoring, riskwise;
+﻿import ut, risk_indicators, models, scoring, riskwise;
 #workunit('name','Consumer IID-FP Process');
 #option ('hthorMemoryLimit', 1000);
 #option ('linkCountedRows', false); 
@@ -158,7 +158,11 @@ l t_f(f le, INTEGER c) := TRANSFORM
 	// the following 2 lines are included for e3220 searching, please do not use on regular runs *************************************************************************************
 	//self.gateways := dataset([{'targus','http://rw_score_dev:Password01@rwgatewaycert.br.seisint.com:8090/wsGateway/?ver_=1.70'}], risk_indicators.Layout_Gateways_In);
 	// self.gateways := dataset([{'targus','http://rw_data_prod:Password01@gatewayprodesp.sc.seisint.com:7726/wsGateway/?ver_=1.70'}], risk_indicators.Layout_Gateways_In);
-	self.gateways := dataset([{'insurancephoneheader','http://rw_score_dev:Password01@gatewaycertesp.sc.seisint.com:7526/WsPrism/?ver_=1.82'}], risk_indicators.Layout_Gateways_In);
+	
+	// for production runs, use the production gateway
+	// self.gateways := dataset([{'insurancephoneheader','http://rw_score_dev:Password01@gatewaycertesp.sc.seisint.com:7526/WsPrism/?ver_=1.82'}], risk_indicators.Layout_Gateways_In);
+	self.gateways := dataset([{'insurancephoneheader','HTTP://api_prod_gw_roxie:g0h3%40t2x@gatewayprodesp.sc.seisint.com:7726/WsGatewayEx/?ver_=1.87'}], risk_indicators.Layout_Gateways_In);
+	
 	// self.gateways := dataset([], risk_indicators.Layout_Gateways_In);
 
 /* **** Use if Targus and InsurancePhoneHeader is needed  **** */

@@ -1,6 +1,7 @@
-//****************Maps header sources to a common layout********************
+﻿//****************Maps header sources to a common layout********************
 import Gong, ut, _validate, Header, Mdr;
-phone_file := Header.File_Headers(MDR.sourceTools.SourceIsOnProbation(src) = false and src not in mdr.sourceTools.set_Utility_sources and phone <> '' and src not in mdr.sourceTools.set_Phonesplus) +
+//DF-22944 modified filter to choose specific header sources in case new phone number sources are added without our knowledge
+phone_file := Header.File_Headers(src in mdr.sourceTools.set_Phonesplus_Header and MDR.sourceTools.SourceIsOnProbation(src) = false and phone <> '' ) +
 							 Header.File_TN_did (phone <> '');
 
 //Select records with valid phone numbers

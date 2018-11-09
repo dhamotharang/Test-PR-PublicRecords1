@@ -1,4 +1,4 @@
-import doxie, tools, std, lib_stringlib;
+﻿import doxie, tools, std, lib_stringlib;
 
 export Keys(
 	 string	 version		= ''
@@ -44,8 +44,8 @@ module
 	
 	shared offenders_Base
 		:= join(
-				bair.Files(version,pUseProd,pDelta).offenders_Base.Built(LENGTH(eid)	> 3 and quarantined = '0')
-				,Off_images
+				distribute(bair.Files(version,pUseProd,pDelta).offenders_Base.Built(LENGTH(eid)	> 3 and quarantined = '0'), hash(eid))
+				,distribute(Off_images, hash(eid))
 				,left.eid = right.eid
 				,transform(bair.layouts.dbo_offenders_Key,
 						self.has_image := right.has_image;

@@ -1,4 +1,4 @@
-//Executable code
+﻿//Executable code
 IMPORT SALT33;
 EXPORT Proc_Iterate(STRING iter,DATASET(Layout_BizHead) InFile0 = BizLinkFull.In_BizHead,STRING OutFileNameP = '~temp::proxid::BizLinkFull::it',UNSIGNED MatchThreshold = Config_BIP.MatchThreshold,BOOLEAN Debugging = true) := MODULE
 SHARED InFile := InFile0;
@@ -56,3 +56,4 @@ SHARED LinkPhase(BOOLEAN again) := SEQUENTIAL(PARALLEL(OutputSamples,ExecutionSt
 EXPORT DoAll := LinkPhase(FALSE);
 EXPORT DoAllAgain := LinkPhase(TRUE);
 END;
+

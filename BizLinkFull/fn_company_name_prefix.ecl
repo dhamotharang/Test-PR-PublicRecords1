@@ -1,4 +1,4 @@
-EXPORT fn_company_name_prefix(string company_name) := //wanted to pass in unsigned1 numchars = 5, but that must already be known when we build the set_too_common
+﻿EXPORT fn_company_name_prefix(string company_name) := //wanted to pass in unsigned1 numchars = 5, but that must already be known when we build the set_too_common
 FUNCTION
 import ut;
 // return company_name[1..numchars];//old, simple behavior
@@ -17,3 +17,4 @@ if(
 );
 return pf;
 END;
+

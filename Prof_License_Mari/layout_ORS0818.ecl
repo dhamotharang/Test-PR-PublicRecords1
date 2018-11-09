@@ -1,22 +1,50 @@
-// ORS0818 / Oregon Appraiser Certification and Licensure Board	/ Real Estate Appraisers //
+﻿// ORS0818 / OREGON APPRAISER CERTIFICATION AND LICENSURE BOARD	/ REAL ESTATE APPRAISERS //
 
-export layout_ORS0818 := MODULE
+EXPORT LAYOUT_ORS0818 := MODULE
 
-	export incoming := record
-		string150  ORG_NAME;
-		string150  OFFICENAME;
-		string30   PHONE;								//fmt XXX XXX-XXXX
-		string150  ADDRESS;
-		string30   LIC_NUMR;
-		string50   LIC_TYPE;						//File Type Description
-		string30   ISSUED;           		//fmt M/DD/YYYY,MM/D/YYYY,M/D/YYYY,MM/DD/YYYY
-		string30   EXPIRES;				  		//fmt M/DD/YYYY,MM/D/YYYY,M/D/YYYY,MM/DD/YYYY
-		string		 STATUS;
+	EXPORT INCOMING := RECORD
+	STRING10   BOARD;          //--NEW FIELD
+ STRING2    LIC_TYPE;       //--NEW FIELD
+ STRING20   LIC_NO;         //--NEW FIELD
+ STRING20   LIC_NUM;        //--NEW FIELD(SAME AS LICESENO FIELD)
+ STRING30   LIC_NUMR;       //--ENCOMPASSES LICENSETYPE, LICENSENO/LICENSENUMERIC FIELDS
+ STRING100  BOARDNAME;      //--NEW FIELD
+ STRING50   LIC_TYPE_DS;    //  LICENSE TYPE DESCRIPTION
+ STRING30   PREFIX;         //   --NEW FIELD
+ STRING30   LNAME;          //   --NEW FIELD
+ STRING30   FNAME;          //   --NEW FIELD
+ STRING30   MNAME;          //   --NEW FIELD
+ STRING30   SUFFIX;         //   --NEW FIELD
+ STRING150  FULL_NAME;      //   --NEW FIELD(SAME AS LICENSEENAME)
+ STRING150  ORG_NAME;       //LICENSEENAME;
+ STRING150  ADDRESS1;               //   --NEW FIELD
+ STRING100  ADDRESS2;               //   --NEW FIELD
+ STRING30   CITY;                   //   --NEW FIELD
+ STRING30   COUNTY;                 //   --NEW FIELD
+ STRING2    STATE;                  //   --NEW FIELD
+ STRING10   ZIP;                    //   --NEW FIELD
+ STRING10   COUNTRY;                //   --NEW FIELD
+ STRING30   LICENSEDBY;             //   --NEW FIELD(INCLUDE TIME)
+ STRING30   ISSUE_DTE;              //   --NEW FIELD(INCLUDE TIME)
+ STRING30   ORIG_DTE;               //   --NEW FIELD(INCLUDE TIME)
+ STRING30   RENEWAL_DTE;            
+ STRING30   EXPIRE_DTE;             //--(INCLUDE TIME)
+ STRING10   STATUS;
+ STRING10   FACILITY;               //   --NEW FIELD
+ STRING10   SUPERVISOR;             //   --NEW FIELD
+ STRING10   PARENTBOARD;            //   --NEW FIELD
+ STRING30   PARENTLIC_TYPE;         //   --NEW FIELD
+ STRING10   PARENTLIC_NO;           //   --NEW FIELD
+ STRING10   HASFA;                  //--NEW FIELD
+ STRING10   TITLE;                  //--NEW FIELD
+ STRING150  OFFICENAME;
+ STRING30   PHONE;
+ STRING100  CONTACT_ADDR;         //--NEW FIELD (SEEMS TO MATCHES PARSED ADDRESS FIELDS)
 	END;
 
 
-	export common := record
-		incoming;
-		string8	file_date;
+	EXPORT COMMON := RECORD
+		INCOMING;
+		STRING8	FILE_DATE;
 	END;
 END;	

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="MidexSearchService">
 
 	<!-- COMPLIANCE/USER SETTINGS -->
@@ -84,7 +84,8 @@ EXPORT MidexSearchService :=
     #STORED('TIN',                     search_by.TIN);
     #STORED('companyName',             search_by.companyName);
 		#STORED('NMLSId',                  search_by.NMLSId);
-	  #STORED('StartLoadDate',           iesp.ECL2ESP.DateToString(search_by.StartLoadDate));
+	  #STORED('StartLoadDate',           iesp.ECL2ESP.t_DateToString8(search_by.StartLoadDate));
+    // #STORED('StartLoadDate',           iesp.ECL2ESP.DateToString(search_by.StartLoadDate));
     #STORED('EnableAlert',             alert_Input.EnableAlert);
     
     iesp.ECL2ESP.SetInputName    (search_by.Name);

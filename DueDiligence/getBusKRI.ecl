@@ -194,16 +194,16 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		
 																		
 		/*BUSINESS SOS AGE RANGE*/ 
-		SOSAge := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)le.SOSIncorporationDate, (STRING)le.historyDate); //return 0 day to hit the 8 level if no date  (less than 1 year)       
-		sosFlag9 := IF(le.NoSOSFilingEver AND (UNSIGNED)le.SOSIncorporationDate = 0, 'T', 'F');                                                            		 //business has no SOS filing reported
-		sosFlag8 := IF(sosFlag9 = 'F' AND SOSAge < ut.DaysInNYears(1), 'T', 'F');                                		 //business SOS incropration date reported as less than 1 year ago
-		sosFlag7 := IF(sosFlag9 = 'F' AND SOSAge >= ut.DaysInNYears(1) AND SOSAge < ut.DaysInNYears(2), 'T', 'F');   //business SOS incropration date reported between 1 and 2 years ago
-		sosFlag6 := IF(sosFlag9 = 'F' AND SOSAge >= ut.DaysInNYears(2) AND SOSAge < ut.DaysInNYears(3), 'T', 'F');   //business SOS incropration date reported between 2 and 3 years ago
-		sosFlag5 := IF(sosFlag9 = 'F' AND SOSAge >= ut.DaysInNYears(3) AND SOSAge < ut.DaysInNYears(4), 'T', 'F');   //business SOS incropration date reported between 3 and 4 years ago
-		sosFlag4 := IF(sosFlag9 = 'F' AND SOSAge >= ut.DaysInNYears(4) AND SOSAge < ut.DaysInNYears(6), 'T', 'F');   //business SOS incropration date reported between 4 and 6 years ago
-		sosFlag3 := IF(sosFlag9 = 'F' AND SOSAge >= ut.DaysInNYears(6) AND SOSAge < ut.DaysInNYears(8), 'T', 'F');   //business SOS incropration date reported between 6 and 8 years ago
-		sosFlag2 := IF(sosFlag9 = 'F' AND SOSAge >= ut.DaysInNYears(8) AND SOSAge < ut.DaysInNYears(10), 'T', 'F');  //business SOS incropration date reported between 8 and 10 years ago
-		sosFlag1 := IF(sosFlag9 = 'F' AND SOSAge >= ut.DaysInNYears(10), 'T', 'F');                               	 //business SOS incropration date reported 10 or more years ago
+		SOSAge := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)le.SOSIncorporationDate, (STRING)le.historyDate);       
+		sosFlag9 := IF(le.NoSOSFilingEver AND (UNSIGNED)le.SOSIncorporationDate = 0, 'T', 'F');                                                            		 
+		sosFlag8 := IF(sosFlag9 = 'F' AND SOSAge < ut.DaysInNYears(1), 'T', 'F');                                		 
+		sosFlag7 := IF(sosFlag9 = 'F' AND SOSAge >= ut.DaysInNYears(1) AND SOSAge < ut.DaysInNYears(2), 'T', 'F');  
+		sosFlag6 := IF(sosFlag9 = 'F' AND SOSAge >= ut.DaysInNYears(2) AND SOSAge < ut.DaysInNYears(3), 'T', 'F');   
+		sosFlag5 := IF(sosFlag9 = 'F' AND SOSAge >= ut.DaysInNYears(3) AND SOSAge < ut.DaysInNYears(4), 'T', 'F');   
+		sosFlag4 := IF(sosFlag9 = 'F' AND SOSAge >= ut.DaysInNYears(4) AND SOSAge < ut.DaysInNYears(6), 'T', 'F'); 
+		sosFlag3 := IF(sosFlag9 = 'F' AND SOSAge >= ut.DaysInNYears(6) AND SOSAge < ut.DaysInNYears(8), 'T', 'F');   
+		sosFlag2 := IF(sosFlag9 = 'F' AND SOSAge >= ut.DaysInNYears(8) AND SOSAge < ut.DaysInNYears(10), 'T', 'F');  
+		sosFlag1 := IF(sosFlag9 = 'F' AND SOSAge >= ut.DaysInNYears(10), 'T', 'F');                               	 
 		
 		sosConcat := sosFlag9 + sosFlag8 + sosFlag7 + sosFlag6 + sosFlag5 + sosFlag4 + sosFlag3 + sosFlag2 + sosFlag1;
 		sosFlag0 := IF(STD.Str.Find(sosConcat, 'T', 1) = 0, 'T', 'F');  //Insufficient information reported on business and cannot calculate
@@ -215,16 +215,16 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 
 
 		/*BUSINESS PUBLIC RECORD AGE RANGE*/ 
-		HDRAge := DueDiligence.Common.DaysApartWithZeroEmptyDate((string)le.BusnHdrDtFirstSeen, (STRING)le.historyDate); //return 0 day to hit the 8 level if no date  (less than 1 year)
-		hdrAgeFlag9 := IF(le.srcCount = 0, 'T', 'F');                                                                	 			//business not reported in public records
-		hdrAgeFlag8 := IF(hdrAgeFlag9 = 'F' AND HDRAge < ut.DaysInNYears(1), 'T', 'F');                                			//business first reported in public records less than 1 year ago
-		hdrAgeFlag7 := IF(hdrAgeFlag9 = 'F' AND HDRAge >= ut.DaysInNYears(1) AND HDRAge < ut.DaysInNYears(2), 'T', 'F');   	//business first reported in public records between 1 and 2 years ago
-		hdrAgeFlag6 := IF(hdrAgeFlag9 = 'F' AND HDRAge >= ut.DaysInNYears(2) AND HDRAge < ut.DaysInNYears(3), 'T', 'F');   	//business first reported in public records between 2 and 3 years ago
-		hdrAgeFlag5 := IF(hdrAgeFlag9 = 'F' AND HDRAge >= ut.DaysInNYears(3) AND HDRAge < ut.DaysInNYears(4), 'T', 'F');   	//business first reported in public records between 3 and 4 years ago
-		hdrAgeFlag4 := IF(hdrAgeFlag9 = 'F' AND HDRAge >= ut.DaysInNYears(4) AND HDRAge < ut.DaysInNYears(6), 'T', 'F');   	//business first reported in public records between 4 and 6 years ago
-		hdrAgeFlag3 := IF(hdrAgeFlag9 = 'F' AND HDRAge >= ut.DaysInNYears(6) AND HDRAge < ut.DaysInNYears(8), 'T', 'F');   	//business first reported in public records between 6 and 8 years ago
-		hdrAgeFlag2 := IF(hdrAgeFlag9 = 'F' AND HDRAge >= ut.DaysInNYears(8) AND HDRAge < ut.DaysInNYears(10), 'T', 'F');  	//business first reported in public records between 8 and 10 years ago
-		hdrAgeFlag1 := IF(hdrAgeFlag9 = 'F' AND HDRAge >= ut.DaysInNYears(10), 'T', 'F');                               		//business first reported in public records 10 or more years ago
+		HDRAge := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)le.BusnHdrDtFirstSeen, (STRING)le.historyDate); 
+		hdrAgeFlag9 := IF(le.srcCount = 0, 'T', 'F');                                                                	 			
+		hdrAgeFlag8 := IF(hdrAgeFlag9 = 'F' AND HDRAge < ut.DaysInNYears(1), 'T', 'F');                                			
+		hdrAgeFlag7 := IF(hdrAgeFlag9 = 'F' AND HDRAge >= ut.DaysInNYears(1) AND HDRAge < ut.DaysInNYears(2), 'T', 'F');
+		hdrAgeFlag6 := IF(hdrAgeFlag9 = 'F' AND HDRAge >= ut.DaysInNYears(2) AND HDRAge < ut.DaysInNYears(3), 'T', 'F');
+		hdrAgeFlag5 := IF(hdrAgeFlag9 = 'F' AND HDRAge >= ut.DaysInNYears(3) AND HDRAge < ut.DaysInNYears(4), 'T', 'F');
+		hdrAgeFlag4 := IF(hdrAgeFlag9 = 'F' AND HDRAge >= ut.DaysInNYears(4) AND HDRAge < ut.DaysInNYears(6), 'T', 'F');
+		hdrAgeFlag3 := IF(hdrAgeFlag9 = 'F' AND HDRAge >= ut.DaysInNYears(6) AND HDRAge < ut.DaysInNYears(8), 'T', 'F');
+		hdrAgeFlag2 := IF(hdrAgeFlag9 = 'F' AND HDRAge >= ut.DaysInNYears(8) AND HDRAge < ut.DaysInNYears(10), 'T', 'F');
+		hdrAgeFlag1 := IF(hdrAgeFlag9 = 'F' AND HDRAge >= ut.DaysInNYears(10), 'T', 'F');
 		
 		hdrAgeConcat := hdrAgeFlag9 + hdrAgeFlag8 + hdrAgeFlag7 + hdrAgeFlag6 + hdrAgeFlag5 + hdrAgeFlag4 + hdrAgeFlag3 + hdrAgeFlag2 + hdrAgeFlag1;
 		hdrAgeFlag0 := IF(STD.Str.Find(hdrAgeConcat, 'T', 1) = 0, 'T', 'F');   //Insufficient information reported on business and cannot calculate
@@ -236,7 +236,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		
 		
 		/*BUSINESS STRUCTURE TYPE*/ 
-		structure := IF(le.hdBusnType = '', le.adrBusnType, le.hdBusnType);
+		structure := IF(le.hdBusnType = DueDiligence.Constants.EMPTY, le.adrBusnType, le.hdBusnType);
 		structFlag9 := IF(structure = DueDiligence.Constants.CMPTYP_PROPRIETORSHIP OR structure = DueDiligence.Constants.CMPTYP_ASSUMED_NAME_DBA, 'T', 'F');
 		structFlag8 := IF(structure = DueDiligence.Constants.CMPTYP_TRUST, 'T', 'F');
 		structFlag7 := IF(structure = DueDiligence.Constants.CMPTYP_LIMITED_LIABILITY_CORP, 'T', 'F');
@@ -245,7 +245,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		structFlag4 := IF(structure = DueDiligence.Constants.CMPTYP_CORP_BUSINESS OR structure = DueDiligence.Constants.CMPTYP_FOREIGN_CORP, 'T', 'F');
 		structFlag3 := IF(structure = DueDiligence.Constants.CMPTYP_PROFESSIONAL_CORP OR structure = DueDiligence.Constants.CMPTYP_PROFESSIONAL_ASSOC, 'T', 'F');
 		structFlag2 := IF(structure = DueDiligence.Constants.CMPTYP_LIMITED_PARTNERSHIP OR structure = DueDiligence.Constants.CMPTYP_LIMITED_LIABILITY_PARTNERSHIP, 'T', 'F');
-		structFlag1 := IF(structure = '', 'T', 'F');
+		structFlag1 := IF(structure = DueDiligence.Constants.EMPTY, 'T', 'F');
 		
 		structConcat := structFlag9 + structFlag8 + structFlag7 + structFlag6 + structFlag5 + structFlag4 + structFlag3 + structFlag2 + structFlag1;
 		structFlag0 := IF(STD.Str.Find(structConcat, 'T', 1) = 0, 'T', 'F');  	//Insufficient information reported on business and cannot calculate
@@ -277,18 +277,19 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		
 
 		/*BUSINESS STABILITY RISK*/
-		stabReinstateDays := DueDiligence.Common.DaysApartWithZeroEmptyDate((string)le.sosLastReinstateDate, (STRING)le.historyDate);
-		stabFirstSeenDays := DueDiligence.Common.DaysApartWithZeroEmptyDate((string)le.firstReportedAtInputAddress, (STRING)le.historyDate);
-		stabFlag9 := IF(le.feinIsSSN, 'T', 'F');
-		stabFlag8 := IF(le.sosAllDissolveInactiveSuspend, 'T', 'F');
-		stabFlag7 := IF(le.sosLastReinstateDate > 0 AND stabReinstateDays <= ut.DaysInNYears(1), 'T', 'F');
-		stabFlag6 := IF(le.busIsSOHO, 'T', 'F');
-		stabFlag5 := IF(le.sosBusNameChange OR le.sosBusAddressChange OR le.sosContactNameChange OR le.sosContactAddressChange, 'T', 'F');
-		stabFlag4 := IF(le.firstReportedAtInputAddress > 0 AND stabFirstSeenDays <= 90, 'T', 'F');
-		stabFlag3 := sosFlag9;
-		stabFlag2 := IF(le.sosAllDissolveInactiveSuspend = FALSE AND le.sosLastReinstateDate = 0 AND le.sosHasAtleastOneActiveFiling = FALSE, 'T', 'F');
-		stabFlag1 := IF(le.sosHasAtleastOneActiveFiling, 'T', 'F');
-													
+		stabFirstSeenDays := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)le.firstReportedAtInputAddress, (STRING)le.historyDate);
+		stabFlag9 := IF(le.sosAllDissolveInactiveSuspend, 'T', 'F');
+		stabFlag8 := IF(le.sosHasAtleastOneOtherStatusFiling AND le.sosHasAtleastOneDissolvedFiling = FALSE AND 
+												le.sosHasAtleastOneInactiveFiling = FALSE AND le.sosHasAtleastOneSuspendedFiling = FALSE AND 
+												le.sosHasAtleastOneActiveFiling = FALSE AND le.sosLastReinstateDate = 0, 'T', 'F');
+		stabFlag7 := IF(le.notFoundInHeader, 'T', 'F');
+		stabFlag6 := IF(le.inputAddressVerified = FALSE OR le.inputAddressProvided = FALSE, 'T', 'F');
+		stabFlag5 := IF(le.vacant OR le.cmra, 'T', 'F');
+		stabFlag4 := IF(le.feinIsSSN OR le.busIsSOHO, 'T', 'F');
+		stabFlag3 := IF(le.firstReportedAtInputAddress > 0 AND stabFirstSeenDays <= 90, 'T', 'F');
+		stabFlag2 := IF(le.firstReportedAtInputAddress > 0 AND stabFirstSeenDays BETWEEN 91 AND ut.DaysInNYears(1), 'T', 'F');
+		stabFlag1 := IF(le.firstReportedAtInputAddress > 0 AND stabFirstSeenDays > ut.DaysInNYears(1), 'T', 'F');
+												
 		stabConcat := stabFlag9 + stabFlag8 + stabFlag7 + stabFlag6 + stabFlag5 + stabFlag4 + stabFlag3 + stabFlag2 + stabFlag1;
 		stabFlag0 := IF(STD.Str.Find(stabConcat, 'T', 1) = 0, 'T', 'F');  //Insufficient information reported on business and cannot calculate
 		
@@ -296,6 +297,134 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		
 		SELF.BusStabilityRisk_Flags := stabConcat_Final;
 		SELF.BusStabilityRisk := (STRING)(10-STD.Str.Find(stabConcat_Final, 'T', 1)); 
+		
+		
+		/*BUSINESS SHELL SHELF RISK*/
+		nonCreditFirstSeen := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)le.busnHdrDtFirstSeenNonCredit, (STRING)le.historyDate);
+		differSOSAndNoCredit := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)le.busnHdrDtFirstSeenNonCredit, (STRING)le.SOSIncorporationDate);
+		shellShelfFlag9 := IF(le.numOfBusFoundAtAddr > 50 AND ((le.numOfBusIncInStateLooseLaws/le.numOfBusFoundAtAddr) * 100) > 25, 'T', 'F');
+		shellShelfFlag8 := IF(le.numOfBusFoundAtAddr > 50 AND ((le.numOfBusNoReportedFein/le.numOfBusFoundAtAddr) * 100) > 75, 'T', 'F');
+		shellShelfFlag7 := IF(le.registeredAgentExists AND (le.agentShelfBusn OR le.agentPotentialNIS), 'T', 'F');
+		shellShelfFlag6 := IF((le.SOSIncorporationDate > 0 AND SOSAge >= ut.DaysInNYears(2)) AND
+														((le.busnHdrDtFirstSeenNonCredit > 0 AND nonCreditFirstSeen < ut.DaysInNYears(2) AND
+														le.busnHdrDtFirstSeenNonCredit > 0 AND le.SOSIncorporationDate > 0 AND differSOSAndNoCredit >= ut.DaysInNYears(2)) OR
+														le.srcCount = 0), 'T', 'F');
+		shellShelfFlag5 := IF(le.registeredAgentExists AND le.atleastOneAgentSameAddrAsBus, 'T', 'F');												
+		shellShelfFlag4 := IF(le.privatePostExists OR le.mailDropExists OR le.remailerExists OR le.storageFacilityExists OR le.undeliverableSecRangeExists, 'T', 'F');
+		shellShelfFlag3 := IF(le.shellHdrSrcCnt = 0 AND le.creditSrcCnt = 0, 'T', 'F');
+		shellShelfFlag2 := IF(le.incorpWithLooseLaws, 'T', 'F');
+				
+		shellShelfConcat := shellShelfFlag9 + shellShelfFlag8 + shellShelfFlag7 + shellShelfFlag6 + shellShelfFlag5 + shellShelfFlag4 + shellShelfFlag3 + shellShelfFlag2;
+		shellShelfFlag1 := IF(STD.Str.Find(shellShelfConcat, 'T', 1) = 0, 'T', 'F');
+		shellShelfFlag0 := 'F';  //Insufficient information reported on business and cannot calculate
+		
+		shellShelfConcat_Final := shellShelfConcat + shellShelfFlag1 + shellShelfFlag0;
+		
+		SELF.BusShellShelfRisk_Flags := shellShelfConcat_Final;
+		SELF.BusShellShelfRisk := (STRING)(10-STD.Str.Find(shellShelfConcat_Final, 'T', 1)); 
+		
+		
+		/*BUSINESS EXECUTIVE OFFICERS RISK*/
+		highRiskFound := le.atleastOneActiveLawAcctExec OR le.atleastOneActiveFinRealEstateExec OR le.atleastOneActiveMedicalExec OR 
+											le.atleastOneActiveBlastPilotExec OR le.atleastOneInactiveLawAcctExec OR le.atleastOneInactiveFinRealEstateExec OR 
+											le.atleastOneInactiveMedicalExec OR le.atleastOneInactiveBlastPilotExec;
+		execOfficerRisk9 := IF(le.atleastOneActiveLawAcctExec, 'T', 'F');
+		execOfficerRisk8 := IF(le.atleastOneActiveFinRealEstateExec, 'T', 'F');
+		execOfficerRisk7 := IF(le.atleastOneActiveMedicalExec, 'T', 'F');
+		execOfficerRisk6 := IF(le.atleastOneActiveBlastPilotExec, 'T', 'F');
+		execOfficerRisk5 := IF(le.atleastOneInactiveLawAcctExec, 'T', 'F');
+		execOfficerRisk4 := IF(le.atleastOneInactiveFinRealEstateExec, 'T', 'F');
+		execOfficerRisk3 := IF(le.atleastOneInactiveMedicalExec, 'T', 'F');
+		execOfficerRisk2 := IF(le.atleastOneInactiveBlastPilotExec, 'T', 'F');
+		execOfficerRisk1 := IF(le.numOfBusExecs = 0 OR highRiskFound = FALSE, 'T', 'F');
+												
+		execOfficerRiskConcat := execOfficerRisk9 + execOfficerRisk8 + execOfficerRisk7 + execOfficerRisk6 + execOfficerRisk5 + execOfficerRisk4 + execOfficerRisk3 + execOfficerRisk2 + execOfficerRisk1;
+		execOfficerRiskFlag0 := IF(STD.Str.Find(execOfficerRiskConcat, 'T', 1) = 0, 'T', 'F');  //Insufficient information reported on business and cannot calculate
+		
+		execOfficerRiskConcat_Final := execOfficerRiskConcat + execOfficerRiskFlag0;
+		
+		SELF.BusExecOfficersRisk_Flags := execOfficerRiskConcat_Final;
+		SELF.BusExecOfficersRisk := (STRING)(10-STD.Str.Find(execOfficerRiskConcat_Final, 'T', 1));
+		
+		
+		
+    /* BUSINESS GEOGRAPHIC RISK  */  
+		BusGeoRisk_Flag9 := IF (le.CountyHasHighCrimeIndex   
+		                    AND le.CountyBordersForgeinJur
+												AND (le.HIDTA OR le.HIFCA),      'T','F');                                      /* Set the Index value to 9 */	
+												
+		BusGeoRisk_Flag8 := IF (le.CityBorderStation 
+		                    OR  le.CityFerryCrossing  
+												OR  le.CityRailStation ,         'T','F');                                      /* Set the Index value to 8 */
+												
+		BusGeoRisk_Flag7 := IF (le.CountyBordersForgeinJur,  'T','F');                                      /* Set the Index value to 7 */
+		
+		BusGeoRisk_Flag6 := IF (~le.CountyBordersForgeinJur 
+		                    AND  le.CountyBorderOceanForgJur, 'T','F');                                    /* Set the Index value to 6 */
+												
+		BusGeoRisk_Flag5 := IF (le.CountyHasHighCrimeIndex
+		                    AND (le.HIDTA OR le.HIFCA),       'T','F');                                    /* Set the Index value to 5 */
+												
+		BusGeoRisk_Flag4 := IF (le.CountyHasHighCrimeIndex, 'T','F');                                       /* Set the Index value to 4 */
+		                                                                 
+		BusGeoRisk_Flag3 := IF (le.HIFCA, 'T','F');                                                         /* Set the Index value to 3 */
+		
+		BusGeoRisk_Flag2 := IF (le.HIDTA, 'T','F');                                                         /* Set the Index value to 2  */
+		
+		BusGeoRisk_Flag1 := IF (~le.CountyHasHighCrimeIndex,'T','F');                                       /* Set the Index value to 1 */
+	
+
+		BusGeoRisk_Flag_Concat := BusGeoRisk_Flag9 +
+																			BusGeoRisk_Flag8 +
+																			BusGeoRisk_Flag7 +
+																			BusGeoRisk_Flag6 +
+																			BusGeoRisk_Flag5 +
+																			BusGeoRisk_Flag4 +
+																			BusGeoRisk_Flag3 +
+																			BusGeoRisk_Flag2 +
+																			BusGeoRisk_Flag1;
+	
+
+
+		BusGeoRisk_Flag0        := IF(STD.Str.Find(BusGeoRisk_Flag_Concat, 'T', 1) = 0, 'T', 'F');     /* Insufficient information reported on the business */
+		BusGeoRisk_Flag_final   := BusGeoRisk_Flag_Concat + BusGeoRisk_Flag0; 
+		
+		self.BusGeographicRisk_Flags   :=  BusGeoRisk_Flag_final;                                             /* This a string of T or F based on how the data used to calculate the KRI  */
+		self.BusGeographicRisk         := (STRING)(10-STD.Str.Find(BusGeoRisk_Flag_final, 'T', 1));           /* Set the index to the position of the first 'T'.  */
+			
+			
+		
+		
+		/* BUSINESS MATCH LEVEL  */  																																																	 
+		 BusMatchLevel_Flag9 := If (le.weight < 80, 'T','F');                            /* Index value of 9 was set */
+		 BusMatchLevel_Flag8 := IF (le.weight BETWEEN 80 AND 84, 'T','F');               /* Index value of 8 was set */
+		 BusMatchLevel_Flag7 := IF (le.weight BETWEEN 85 AND 89, 'T','F');               /* Index value of 7 was set */
+		 BusMatchLevel_Flag6 := IF (le.weight BETWEEN 90 AND 91, 'T','F');                /* Index value of 6 was set */
+		 BusMatchLevel_Flag5 := IF (le.weight BETWEEN 92 AND 93, 'T','F');                /* Index value of 5 was set */
+		 BusMatchLevel_Flag4 := IF (le.weight BETWEEN 94 AND 95, 'T','F');                /* Index value of 4 was set */
+		 BusMatchLevel_Flag3 := IF (le.weight BETWEEN 96 AND 97, 'T','F');                /* Index value of 3 was set */
+		 BusMatchLevel_Flag2 := IF (le.weight BETWEEN 98 AND 99, 'T','F');                /* Index value of 2 was set */
+		 BusMatchLevel_Flag1 := IF (le.weight > 99, 'T','F');                             /* Index value of 1 was set */
+		 
+		 BusMatchLevel_Flag_Concat := BusMatchLevel_Flag9 +
+																			BusMatchLevel_Flag8 +
+																			BusMatchLevel_Flag7 +
+																			BusMatchLevel_Flag6 +
+																			BusMatchLevel_Flag5 +
+																			BusMatchLevel_Flag4 +
+																			BusMatchLevel_Flag3 +
+																			BusMatchLevel_Flag2 +
+																			BusMatchLevel_Flag1;
+		 
+		 BusMatchLevel_Flag0       := IF(STD.Str.Find(BusMatchLevel_Flag_Concat, 'T', 1) = 0, 'T', 'F');     /* Insufficient information reported on the business */
+		 BusMatchLevel_Flag_final  := BusMatchLevel_Flag_Concat + BusMatchLevel_Flag0; 
+		
+		 self.BusMatchLevel_Flags  :=  BusMatchLevel_Flag_final;                                            /* This a string of T or F based on how the data used to calculate the KRI  */
+		 self.BusMatchLevel        := (STRING)(10 - STD.Str.Find(BusMatchLevel_Flag_final, 'T', 1));        /* Set the index to the position of the first 'T'.  */  
+		
+		
+		
+		
 
 			
 		SELF := le;
@@ -314,8 +443,8 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 																										SELF.BusAssetOwnVehicle_Flags := INVALID_BUSINESS_FLAGS;
 																										SELF.BusAccessToFundsProperty := INVALID_BUSINESS_SCORE;
 																										SELF.BusAccessToFundsProperty_Flags := INVALID_BUSINESS_FLAGS;
-																										// SELF.BusGeographicRisk := INVALID_BUSINESS_SCORE;
-																										// SELF.BusGeographicRisk_Flags := INVALID_BUSINESS_FLAGS;
+																										SELF.BusGeographicRisk := INVALID_BUSINESS_SCORE;
+																										SELF.BusGeographicRisk_Flags := INVALID_BUSINESS_FLAGS;
 																										SELF.BusValidityRisk := INVALID_BUSINESS_SCORE;
 																										SELF.BusValidityRisk_Flags := INVALID_BUSINESS_FLAGS;
 																										SELF.BusStabilityRisk := INVALID_BUSINESS_SCORE;
@@ -328,10 +457,10 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 																										SELF.BusSOSAgeRange_Flags := INVALID_BUSINESS_FLAGS;
 																										SELF.BusPublicRecordAgeRange := INVALID_BUSINESS_SCORE;
 																										SELF.BusPublicRecordAgeRange_Flags := INVALID_BUSINESS_FLAGS;
-																										// SELF.BusShellShelfRisk := INVALID_BUSINESS_SCORE;
-																										// SELF.BusShellShelfRisk_Flags := INVALID_BUSINESS_FLAGS;
-																										// SELF.BusMatchLevel := INVALID_BUSINESS_SCORE;
-																										// SELF.BusMatchLevel_Flags := INVALID_BUSINESS_FLAGS;
+																										SELF.BusShellShelfRisk := INVALID_BUSINESS_SCORE;
+																										SELF.BusShellShelfRisk_Flags := INVALID_BUSINESS_FLAGS;
+																										SELF.BusMatchLevel := INVALID_BUSINESS_SCORE;
+																										SELF.BusMatchLevel_Flags := INVALID_BUSINESS_FLAGS;
 																										// SELF.BusLegalEvents := INVALID_BUSINESS_SCORE;
 																										// SELF.BusLegalEvents_Flags := INVALID_BUSINESS_FLAGS;
 																										// SELF.BusLegalEventsFelonyType := INVALID_BUSINESS_SCORE;
@@ -340,8 +469,8 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 																										// SELF.BusHighRiskNewsProfiles_Flags := INVALID_BUSINESS_FLAGS;
 																										// SELF.BusLinkedBusRisk := INVALID_BUSINESS_SCORE;
 																										// SELF.BusLinkedBusRisk_Flags := INVALID_BUSINESS_FLAGS;
-																										// SELF.BusExecOfficersRisk := INVALID_BUSINESS_SCORE;
-																										// SELF.BusExecOfficersRisk_Flags := INVALID_BUSINESS_FLAGS;
+																										SELF.BusExecOfficersRisk := INVALID_BUSINESS_SCORE;
+																										SELF.BusExecOfficersRisk_Flags := INVALID_BUSINESS_FLAGS;
 																										// SELF.BusExecOfficersResidencyRisk := INVALID_BUSINESS_SCORE;
 																										// SELF.BusExecOfficersResidencyRisk_Flags := INVALID_BUSINESS_FLAGS;
 																										SELF := LEFT;));

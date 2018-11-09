@@ -1,7 +1,4 @@
-/*2015-03-20T01:00:06Z (Andrea Koenen)
-RR: 177270: check in for review. Set 5.0 to have a default the same for real time and archive
-*/
-/*--LIBRARY--*/
+﻿/*--LIBRARY--*/
 
 import doxie, ut, DID_Add, address, UtilFile, riskwise, iesp, patriot, fcra, gateway;
 
@@ -123,7 +120,8 @@ with_DID := risk_indicators.iid_getDID_prepOutput(indata, dppa, glb, isFCRA, BSv
 	END;
 	with_overrides := PROJECT(with_did, add_flags(LEFT));
 
-with_PersonContext := if(isFCRA, Risk_Indicators.checkPersonContext(with_overrides, gateways), with_did);
+onThor := false;
+with_PersonContext := if(isFCRA, Risk_Indicators.checkPersonContext(with_overrides, gateways, onThor, BSversion), with_did);
 	
 commonstart := risk_indicators.iid_common_function(with_PersonContext, dppa, glb, isUtility, ln_branded,
 															suppressNearDups, isFCRA, bsversion,

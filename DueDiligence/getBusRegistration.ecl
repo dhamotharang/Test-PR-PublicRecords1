@@ -1,4 +1,4 @@
-﻿import Address_Attributes, Business_Risk, BIPV2, BusReg, Business_Risk_BIP, DueDiligence, Corp2, Riskwise, Risk_Indicators, business_header;
+﻿IMPORT Address_Attributes, Business_Risk, BIPV2, BusReg, Business_Risk_BIP, DueDiligence, Corp2, Riskwise, Risk_Indicators, business_header;
 
 /* 
 	Following Keys being used:
@@ -18,7 +18,7 @@ EXPORT getBusRegistration(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																												 Options.KeepLargeBusinesses);
 	
 	// Add back our Seq numbers
-	DueDiligence.Common.AppendSeq(regBusRaw, indata, regBusSeq);
+	regBusSeq := DueDiligence.Common.AppendSeq(regBusRaw, indata, TRUE);
 
 	// Filter out records after our history date.
 	regBusFiltRec := DueDiligence.Common.FilterRecords(regBusSeq, dt_first_seen, dt_vendor_first_reported);
@@ -32,17 +32,9 @@ EXPORT getBusRegistration(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	
 	//sort current registered business
 	regBusSort := SORT(regBusFilt, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), -record_date);
-	regBusDedup := DEDUP(regBusSort, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), record_date);
+	regBusDedup := DEDUP(regBusSort, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
 	
-	rollForRegBusHit := ROLLUP(regBusDedup, 
-															LEFT.seq = RIGHT.seq AND
-															LEFT.ultID = RIGHT.ultID AND
-															LEFT.orgID = RIGHT.orgID AND
-															LEFT.seleID = RIGHT.seleID,
-															TRANSFORM({RECORDOF(regBusFilt)},
-																				SELF := LEFT;));
-	
-	addRegBusHit := JOIN(indata, rollForRegBusHit,
+	addRegBusHit := JOIN(indata, regBusDedup,
 												LEFT.seq = RIGHT.seq AND
 												LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
 												LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
@@ -71,14 +63,88 @@ EXPORT getBusRegistration(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	
 
 
+	//get registered agent information
+	busRegAgent := regBusFilt(rawfields.ra_name <> DueDiligence.Constants.EMPTY AND clean_ra_address.prim_name <> DueDiligence.Constants.EMPTY);
+	sortBusRegAgent := SORT(busRegAgent, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), clean_ra_address.prim_range, clean_ra_address.predir, clean_ra_address.prim_name, clean_ra_address.addr_suffix, clean_ra_address.postdir, clean_ra_address.zip, dt_first_seen);
+
+	rollBusRegAgent := ROLLUP(sortBusRegAgent,
+													LEFT.seq = RIGHT.seq AND
+													LEFT.ultID = RIGHT.ultID AND
+													LEFT.orgID = RIGHT.orgID AND
+													LEFT.seleID = RIGHT.seleID AND
+													LEFT.clean_ra_address.prim_range = RIGHT.clean_ra_address.prim_range AND
+													LEFT.clean_ra_address.predir = RIGHT.clean_ra_address.predir AND
+													LEFT.clean_ra_address.prim_name = RIGHT.clean_ra_address.prim_name AND
+													LEFT.clean_ra_address.addr_suffix = RIGHT.clean_ra_address.addr_suffix AND
+													LEFT.clean_ra_address.postdir = RIGHT.clean_ra_address.postdir AND
+													LEFT.clean_ra_address.zip = RIGHT.clean_ra_address.zip,
+													TRANSFORM({RECORDOF(LEFT)},
+																		 SELF.dt_last_seen := MAX(LEFT.dt_last_seen, RIGHT.dt_last_seen);
+																		 SELF := LEFT;));
+	
+	projectBusRegAgent := PROJECT(rollBusRegAgent, TRANSFORM(DueDiligence.LayoutsInternal.AgentLayout,
+																														SELF.ultID := LEFT.ultID;
+																														SELF.orgID := LEFT.orgID;
+																														SELF.seleID := LEFT.seleID;
+																														SELF.proxID := LEFT.proxID;
+																														SELF.powID := LEFT.powID;
+																														SELF.agents := PROJECT(LEFT, TRANSFORM(DueDiligence.Layouts.LayoutAgent,
+																																																		SELF.source := DueDiligence.Constants.SOURCE_BUSINESS_REGISTRATION;
+																																																		SELF.prim_range := LEFT.clean_ra_address.prim_range;
+																																																		SELF.predir := LEFT.clean_ra_address.predir;
+																																																		SELF.prim_name := LEFT.clean_ra_address.prim_name;
+																																																		SELF.addr_suffix := LEFT.clean_ra_address.addr_suffix;
+																																																		SELF.postdir := LEFT.clean_ra_address.postdir;
+																																																		SELF.unit_desig := LEFT.clean_ra_address.unit_desig;
+																																																		SELF.sec_range := LEFT.clean_ra_address.sec_range;
+																																																		SELF.city := LEFT.clean_ra_address.v_city_name;
+																																																		SELF.state := LEFT.clean_ra_address.st;
+																																																		SELF.zip5 := LEFT.clean_ra_address.zip;
+																																																		SELF.zip4 := LEFT.clean_ra_address.zip4;
+																																																		SELF.fullName := LEFT.rawfields.ra_name;
+																																																		SELF.dateFirstSeen := LEFT.dt_first_seen;
+																																																		SELF.dateLastSeen := LEFT.dt_last_seen;
+																																																		SELF := [];));
+																														SELF := LEFT;
+																														SELF := [];));
+																											
+	rollRegAgents := ROLLUP(projectBusRegAgent,
+													LEFT.seq = RIGHT.seq AND
+													LEFT.ultID = RIGHT.ultID AND
+													LEFT.orgID = RIGHT.orgID AND
+													LEFT.seleID = RIGHT.seleID,
+													TRANSFORM(DueDiligence.LayoutsInternal.AgentLayout,
+																		SELF.agents := LEFT.agents + RIGHT.agents;
+																		SELF := LEFT;));
+																	
+	addRegisteredAgents := JOIN(addRegBusSicNaic, rollRegAgents,
+															LEFT.seq = RIGHT.seq AND
+															LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
+															LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
+															LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
+															TRANSFORM(DueDiligence.Layouts.Busn_Internal,
+																				SELF.registeredAgentExists := LEFT.registeredAgentExists OR EXISTS(RIGHT.agents);
+																				SELF.registeredAgents := LEFT.registeredAgents + RIGHT.agents;
+																				SELF := LEFT;),
+															LEFT OUTER);
+
+
+
+
+	// OUTPUT(regBusFilt, NAMED('regBusFilt'));
 	// OUTPUT(outRegBusSic, NAMED('outRegBusSic'));
 	// OUTPUT(outRegBusNaic, NAMED('outRegBusNaic'));
 	// OUTPUT(allRegBusSicNaic, NAMED('allRegBusSicNaic'));
 	// OUTPUT(sortRegBusRollSicNaic, NAMED('sortRegBusRollSicNaic'));
 	// OUTPUT(addRegBusSicNaic, NAMED('addRegBusSicNaic'));	
-	// OUTPUT(projectDateLastSeen, NAMED('projectDateLastSeen'));
-	// OUTPUT(dateLastSeenSort, NAMED('dateLastSeenSort'));
-	// OUTPUT(rollDateLastSeen, NAMED('rollDateLastSeen'));
 	
-	RETURN addRegBusSicNaic;
-	END;
+	// OUTPUT(busRegAgent, NAMED('busRegAgent'));	
+	// OUTPUT(sortBusRegAgent, NAMED('sortBusRegAgent'));	
+	// OUTPUT(rollBusRegAgent, NAMED('rollBusRegAgent'));	
+	// OUTPUT(projectBusRegAgent, NAMED('projectBusRegAgent'));	
+	// OUTPUT(rollRegAgents, NAMED('rollRegAgents'));	
+	// OUTPUT(addRegisteredAgents, NAMED('addRegisteredAgents'));	
+
+	
+	RETURN addRegisteredAgents;
+END;

@@ -1,4 +1,4 @@
-EXPORT MAC_HeaderFileRollupService := MACRO
+﻿EXPORT MAC_HeaderFileRollupService := MACRO
 	#WEBSERVICE(FIELDS(	'ApplicationType',
 											'DataPermissionMask',
 											'DataRestrictionMask',
@@ -96,11 +96,22 @@ EXPORT MAC_HeaderFileRollupService := MACRO
 											'IncludePeopleAtWork',
 											'IncludePhonesFeedback',
 											'IncludePhonesPlus',
+											'IncludeProgessivePhone',
 											'IncludeRelativeNames',
 											'IncludeSourceList',
 											'IncludeZeroDIDRefs',
+											'MaxNumAssociate',
+											'MaxNumAssociateOther',
+											'MaxNumFamilyOther',
+											'MaxNumFamilyClose',
+											'MaxNumParent',
+											'MaxNumSpouse',
+											'MaxNumSubject',
+											'MaxNumNeighbor',
 											'MaxResults',
 											'MaxResultsThisTime',
+											'ScoreModel',
+											'ReturnPhoneScore',
 											'SkipRecords',
 											'Gateways'));
 ENDMACRO;

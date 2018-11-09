@@ -1,4 +1,4 @@
-IMPORT PRTE2_UCC, UCCV2;
+﻿IMPORT PRTE2_UCC, UCCV2;
 
 EXPORT Layouts := MODULE
 
@@ -14,6 +14,8 @@ EXPORT Layouts := MODULE
 		STRING10	bug_num;
 		STRING8 	link_dob;
 		STRING8		link_inc_date;
+		STRING9		link_fein;
+		STRING9		link_ssn;
 	END;
 	
 	EXPORT Main_ext	:= RECORD, MAXLENGTH(32767)
@@ -32,6 +34,8 @@ EXPORT Layouts := MODULE
 		STRING10	bug_num;
 		STRING8 	link_dob;
 		STRING8		link_inc_date;
+		STRING9		link_fein;
+		STRING9		link_ssn;
 	END;
 
 	EXPORT Party := RECORD, MAXLENGTH(32767)

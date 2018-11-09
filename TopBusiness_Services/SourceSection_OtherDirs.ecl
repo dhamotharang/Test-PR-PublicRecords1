@@ -1,7 +1,7 @@
-/* Status as of 10/20/2015, coding is DONE to count source docs for these sources: 
+﻿/* Status as of 10/20/2015, coding is DONE to count source docs for these sources: 
       12. Other Directories - ABIUS(aka UsaBiz from InfoUSA), ACF(American Corporate Finance), 
                               AMIDIR, AMS, BBB(mbr&nonmbr),
-                              BusRegs, CNLD_Facilites, Credit Unions, DEADCO(from InfoUSA), 
+                              BusRegs, CNLD_Facilites, Cortera, Credit Unions, DEADCO(from InfoUSA), 
                               Diversity Cert, DnB_Fein, FBN, LaborActions_WHD,    
                               Martindale-Hubell, NCPDP, Redbooks, SDA, SDAA, Sheila Greco, 
                               SKA, Spoke & Utilities
@@ -202,7 +202,39 @@ EXPORT SourceSection_OtherDirs := MODULE
 		 end;
 	
   ds_cnldfac_counts := project(ds_in_ids_srcrecs_inlayout,tf_cnldfac_count(left));
+	
+  // ***** Get Cortera Counts
+	ds_cortera_keyrecs :=  TopBusiness_Services.Key_Fetches(ds_in_ids_woacctno, // input file to join key with
+										                                    FETCH_LEVEL
+																												,TopBusiness_Services.Constants.defaultJoinLimit
+										                                   ).ds_cortera_linkidskey_recs;
+  
+  ds_cortera_keyrecs_dd := dedup(sort(ds_cortera_keyrecs,
+		     			                     #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),	
+                                   link_id),
+	     			                  #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),	
+                              link_id);
 
+  //table to count # of recs (cortera_keys) per group (set of linkids)
+	ds_cortera_keyrecs_dd_tabled := table(ds_cortera_keyrecs_dd,
+	                                   //v--- Create table layout on the fly
+                                     {#expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
+											                recs_count := count(group)
+																		 },
+																     #expand(BIPV2.IDmacros.mac_ListTop3Linkids()),few);
+
+  TopBusiness_Services.SourceSection_Layouts.rec_SourceCount 
+	   tf_cortera_count(recordof(ds_cortera_keyrecs_dd_tabled) l) :=transform
+        self.category_desc     := TopBusiness_Services.Constants.OtherDirCategoryName,
+	      self.category_doccount := l.recs_count;
+				self.Section           := '';                                  //section name not needed, 
+				self.Source            := MDR.sourceTools.src_Cortera; 
+				self                   := l;  // to assign top3 linkids
+			  self                   := []; // to null unused linkids
+		 end;
+
+   ds_cortera_counts := project(ds_cortera_keyrecs_dd_tabled,tf_cortera_count(left));
+	 
   // ***** Get Credit Unions counts
   TopBusiness_Services.SourceSection_Layouts.rec_SourceCount 
 	   tf_crdtun_count(TopBusiness_services.Layouts.rec_input_ids_wSrc l) :=transform
@@ -524,6 +556,7 @@ EXPORT SourceSection_OtherDirs := MODULE
 									   ds_busreg_counts  +
 										 //ds_clia_counts    +
                      ds_cnldfac_counts + 
+										 ds_cortera_counts +
                      ds_crdtun_counts  +
 									   ds_deadco_counts  + 
 										 //ds_debtset_counts + // debtset = debt settlement      

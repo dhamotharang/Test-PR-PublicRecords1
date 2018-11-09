@@ -1,12 +1,11 @@
-IMPORT PRTE2_PhonesPlus, PRTE2_Common, PhonesPlus_V2, CellPhone, Address, ut, doxie, autokey, Data_Services;
+﻿IMPORT PRTE2_PhonesPlus, PRTE2_Common, PhonesPlus_V2, CellPhone, Address, ut, doxie, autokey, Data_Services;
 
 EXPORT Files := MODULE
 
-	//EXPORT Alpharetta_base_in := DATASET(PRTE2_Common.Cross_Module_Files.PhonesPlus_Base_SF_Name, Layouts.Alpha_CSV_Layout, THOR);
-	EXPORT Alpharetta_base_in := DATASET('~prct::base::ct::phonesplus::qa::all_data', Layouts.Alpha_CSV_Layout, THOR);
+	EXPORT Alpharetta_base_in := DATASET(PRTE2_Common.Cross_Module_Files.PhonesPlus_Base_SF_Name, Layouts.Alpha_CSV_Layout, THOR);
 	
 	EXPORT Boca_GE_in	:= DATASET(PRTE2_PhonesPlus.Constants.IN_PREFIX + 'boca::ge', PRTE2_PhonesPlus.Layouts.Base_in,
-																		CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
+																																CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
 																		
 	EXPORT PhonesHist_in	:= DATASET(PRTE2_PhonesPlus.Constants.IN_PREFIX + 'boca::hist', PRTE2_PhonesPlus.Layouts.Base_common,
 																			CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));

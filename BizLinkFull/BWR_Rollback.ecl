@@ -1,4 +1,4 @@
-//ModifiedBy:vern_p bentley
+﻿//ModifiedBy:vern_p bentley
 //ModifiedDate:2015-10-27T18:22:45Z
 //Description:migrated from Dataland for BIPV2 Sprint 1
 import BizLinkFull,tools;
@@ -15,3 +15,4 @@ sequential(
 	,BizLinkFull.Rollback(pversion,pDeleteBuildFiles,pIsTesting,'BizLinkFull',tools.fun_Groupname('92')).father2qa
 	,BizLinkFull.Rollback(pversion,pDeleteBuildFiles,pIsTesting,'BizLinkFull',tools.fun_Groupname('30')).father2qa
 );
+

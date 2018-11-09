@@ -1,11 +1,14 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="ComprehensiveReport" wuTimeout="300000">
-</message>
+<part name="IncludeEquifaxAcctDecisioning" type="xsd:boolean"/>
+	
+ </message>
 */
 /*--INFO-- This service searches all available datafiles for fcra-compliant entries.*/
 
 export Comprehensive_Report_Service := MACRO
-IMPORT doxie, doxie_crs, AutoStandardI, CriminalRecords_Services, suppress, iesp, FFD, Gateway, WSInput, Royalty;
+IMPORT  AutoStandardI, CriminalRecords_Services, doxie, doxie_crs, 
+        EquifaxDecisioning, FFD, Gateway, iesp, Royalty, suppress, WSInput;
 
 WSInput.MAC_FCRA_Comprehensive_Report_Service();
 
@@ -19,7 +22,8 @@ WSInput.MAC_FCRA_Comprehensive_Report_Service();
 
 // use remote header data, apply fcra-filtering; note, party type must be blanked on FCRA-side!
 boolean IsFCRA := true;
-
+BOOLEAN EquifaxDecisioningRequested := FALSE : STORED('IncludeEquifaxAcctDecisioning');
+input_params := AutoStandardI.GlobalModule(isFCRA);
 doxie.MAC_Selection_Declare();
 
 // SOAPCALL to a neutral side to get LexId
@@ -33,7 +37,7 @@ did_fcra := dids[1].did;
 application_type_value := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(isFCRA),AutoStandardI.InterfaceTranslator.application_type_val.params));
 
 // FFD - BEGIN				 
-integer8 inFFDMask 					:= FFD.FFDMask.Get(inApplicationType:=application_type_value);
+integer8 inFFDMask := FFD.FFDMask.Get(inApplicationType:=application_type_value);
 boolean ShowConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDMask);
 
 // get person context
@@ -57,14 +61,21 @@ cent := doxie.central_records (IsFCRA, '', ds_header, nss, slim_pc_recs, inFFDMa
 // get DIDs calculated on a neutral side (same as in central records)
 besr := normalize (choosen (cent, 1), left.best_information_children, transform(right));
 
+eq_act_dec_rec := 
+  EquifaxDecisioning.getAttributes(besr, 
+                                   gateways,
+                                   EquifaxDecisioningRequested, 
+                                   input_params.DataPermissionMask
+                                  );
+
 tempmod := module(project(AutoStandardI.GlobalModule(IsFCRA),CriminalRecords_Services.IParam.report,opt))
-    export string14 did := (string) dids[1].did;
-    export string25 doc_number   := '' ;
-    export string60 offender_key := '' ;
-    export boolean  IncludeAllCriminalRecords := true;
-    export boolean  IncludeSexualOffenses := false;  
-		export integer8 FFDOptionsMask := inFFDMask;
-		export boolean  SkipPersonContextCall := true;
+  export string14 did := (string) dids[1].did;
+  export string25 doc_number := '';
+  export string60 offender_key := '';
+  export boolean  IncludeAllCriminalRecords := true;
+  export boolean  IncludeSexualOffenses := false;
+  export integer8 FFDOptionsMask := inFFDMask;
+  export boolean  SkipPersonContextCall := true;
 end;
 crmr := CriminalRecords_Services.ReportService_Records.val(tempmod, IsFCRA, pc_recs);
 docr2 := IF (Include_CriminalRecords_val, crmr[1].CriminalRecords);
@@ -72,10 +83,11 @@ docr2 := IF (Include_CriminalRecords_val, crmr[1].CriminalRecords);
 so_rec := doxie.SexOffender_Search_Records(besr, isFCRA, slim_pc_recs, inFFDMask);
 soff := if(Include_SexualOffenses_val, dedup(sort(so_rec,seisint_primary_key),seisint_primary_key));
 
-doxie_crs.layout_report patch(doxie.layout_central_records l) := transform
-	self.DOC2_children         := global (docr2);
-	self.sex_offenses_children := global(soff);
-	self := l;
+doxie_crs.layout_report_fcra patch(doxie.layout_central_records l) := transform
+  self.DOC2_children         := global (docr2);
+  self.sex_offenses_children := global(soff);
+  self.Eq_Decisioning_Attr   := eq_act_dec_rec[1];
+  self := l;
   self := []; //vehicles, images
 end;
 
@@ -85,15 +97,14 @@ consumer_statements := if(ShowConsumerStatements and exists(all_records), FFD.pr
 outputErrors := output (remote_header_err, NAMED('exception'), EXTEND);
 
 // 'FARES' fcra-props are filtered out by definition; (no royalties).
-// keep empty royalties for the sake of the same output as regular CRS
-royalties := DATASET ([], Royalty.Layouts.Royalty);
-
+royalties := IF(EquifaxDecisioningRequested, Royalty.RoyaltyEqDecisioning.GetOnlineRoyalties(eq_act_dec_rec));
 
 DO_ALL := parallel(
   output (all_records,named('CRS_result')),
   output (consumer_statements,named('ConsumerStatements')),
   output (royalties,named('RoyaltySet')),
-	outputErrors);
+  outputErrors);
 DO_ALL;
+
 ENDMACRO;
  // Comprehensive_Report_Service ();

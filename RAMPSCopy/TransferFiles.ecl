@@ -1,5 +1,8 @@
-import did_add, dops, lib_fileservices, STD, lib_stringlib;
-EXPORT TransferFiles(string destenv = '',integer noofgens = 2) := module
+﻿import did_add, dops, lib_fileservices, STD, lib_stringlib;
+EXPORT TransferFiles(string destenv = '',integer noofgens = 2, boolean useeclcccluster = true) := module
+
+	
+	export clustertorun := if (useeclcccluster, STD.system.Job.Target(),'hthor');
 
 	export RoxiePackage(string esp, string port, string target, boolean iscopy = false) := function
 		dPackageKeys := dedup(sort(dops.GetRoxiePackage(esp
@@ -27,24 +30,23 @@ EXPORT TransferFiles(string destenv = '',integer noofgens = 2) := module
 																,xFilesReadyForLive(left,right)
 																),superfile, subfile), superfile, subfile);
 
-		rtFilesToMove := record
+		/*rtFilesToMove := record
 			dFilesReadyForLive.superfile;
 			integer scnt := count(group);
 		end;
 
-		dtFilesToMove := table(dFilesReadyForLive,rtFilesToMove,superfile, few);
+		dtFilesToMove := table(dFilesReadyForLive,rtFilesToMove,superfile, few);*/
 
-		rdFilesToMove pGroupSubFiles(dFilesReadyForLive l, dtFilesToMove r) := transform
+		rdFilesToMove pGroupSubFiles(dFilesReadyForLive l, dFilesReadyForLive r) := transform
 			
-			self.cnt := r.scnt;
-			self := l;
+			self.cnt := if(l.superfile = r.superfile, l.cnt + 1, 1);
+			self := r;
 			
 		end;
 		
-		dGroupSubFiles := join(dFilesReadyForLive
-															,dtFilesToMove
-															,left.superfile = right.superfile
+		dGroupSubFiles := iterate(dFilesReadyForLive
 															,pGroupSubFiles(left,right));
+		
 		
 		return dGroupSubFiles;
 		
@@ -223,14 +225,19 @@ EXPORT TransferFiles(string destenv = '',integer noofgens = 2) := module
 												
 																				
 																						sequential(
-																								if (fileservices.findsuperfilesubname('~'+superfile+'_delete', '~'+subfile) > 0
-																									,fileservices.removesuperfile('~'+superfile+'_delete','~'+subfile)),
-																								fileservices.addsuperfile('~'+superfile+'_delete','~'+superfile+'_father',,true),
-																								fileservices.clearsuperfile('~'+superfile+'_father'),
-																								fileservices.addsuperfile('~'+superfile+'_father','~'+superfile,,true),
-																								fileservices.clearsuperfile('~'+superfile),
-																								fileservices.removesuperfile('~'+superfile+'_delete','~'+subfile),
-																								fileservices.removesuperfile('~'+superfile+'_father','~'+subfile),
+																								if (cnt  = 1
+																									,sequential
+																										(
+																											if (fileservices.findsuperfilesubname('~'+superfile+'_delete', '~'+subfile) > 0
+																											,fileservices.removesuperfile('~'+superfile+'_delete','~'+subfile)),
+																											fileservices.addsuperfile('~'+superfile+'_delete','~'+superfile+'_father',,true),
+																											fileservices.clearsuperfile('~'+superfile+'_father'),
+																											fileservices.addsuperfile('~'+superfile+'_father','~'+superfile,,true),
+																											fileservices.clearsuperfile('~'+superfile),
+																											fileservices.removesuperfile('~'+superfile+'_delete','~'+subfile),
+																											fileservices.removesuperfile('~'+superfile+'_father','~'+subfile),
+																										)
+																									),
 																								fileservices.addsuperfile('~'+superfile,'~'+subfile),
 																								fileservices.removeownedsubfiles('~'+superfile+'_delete',true)
 																							)
@@ -335,10 +342,10 @@ EXPORT TransferFiles(string destenv = '',integer noofgens = 2) := module
 		return map(
 															jobtype = 'stage' => output(RAMPSCopy.WorkUnitModule(trim(RAMPSCopy.constants(destenv).ramps.dstesp,left,right),RAMPSCopy.constants(destenv).ramps.port).fSubmitNewWorkunit(
 																	'#workunit(\'name\',\'Move Boca Indexes to Staging\');\r\n'+
-																	'sequential(\r\noutput(rampscopy.constants(\''+destenv+'\').rampsfileds,,\'~\'+rampscopy.constants(\''+destenv+'\').rampsfile+\'_cert\',overwrite)\r\n,RAMPSCopy.TransferFiles(\''+destenv+'\').MoveCopiedToStaging()) : failure(fileservices.deletelogicalfile(\'~\'+rampscopy.constants(\''+destenv+'\').rampsfile+\'_cert\'));','hthor')),
+																	'sequential(\r\noutput(rampscopy.constants(\''+destenv+'\').rampsfileds,,\'~\'+rampscopy.constants(\''+destenv+'\').rampsfile+\'_cert\',overwrite)\r\n,RAMPSCopy.TransferFiles(\''+destenv+'\','+(string)noofgens+','+if(useeclcccluster,'true','false')+').MoveCopiedToStaging()) : failure(fileservices.deletelogicalfile(\'~\'+rampscopy.constants(\''+destenv+'\').rampsfile+\'_cert\'));',clustertorun)),
 															jobtype = 'live' => output(RAMPSCopy.WorkUnitModule(trim(RAMPSCopy.constants(destenv).ramps.dstesp,left,right),RAMPSCopy.constants(destenv).ramps.port).fSubmitNewWorkunit(
 																	'#workunit(\'name\',\'Move Staging Indexes to Live\');\r\n'+
-																	'RAMPSCopy.TransferFiles(\''+destenv+'\','+(string)noofgens+').MoveStagingToLive() : failure(\r\n' +
+																	'RAMPSCopy.TransferFiles(\''+destenv+'\','+(string)noofgens+','+if(useeclcccluster,'true','false')+').MoveStagingToLive() : failure(\r\n' +
 																						'fileservices.sendemail(\r\n' +
 																								'RAMPSCopy.constants(\''+destenv+'\').rToEmail\r\n' +
 																								',\'RAMPS Stage to Live Move Failed\'\r\n' +
@@ -347,7 +354,7 @@ EXPORT TransferFiles(string destenv = '',integer noofgens = 2) := module
 																								',\r\n' +
 																								',RAMPSCopy.constants(\''+destenv+'\').rFromEmail\r\n' +
 																								')\r\n' +
-																						');','hthor')),
+																						');',clustertorun)),
 															output('NA')
 														);
 	
@@ -377,8 +384,8 @@ EXPORT TransferFiles(string destenv = '',integer noofgens = 2) := module
 																				,RAMPSCopy.constants(destenv).rFromEmail
 																			),
 																output(RAMPSCopy.WorkUnitModule(RAMPSCopy.constants(destenv).boca.srcesp,RAMPSCopy.constants(destenv).boca.port).fSubmitNewWorkunit(
-																	'#workunit(\'name\',\'Copy Files to RAMPS '+ stringlib.StringToUpperCase(destenv) +' thor\')\r\n'+
-																	'Rampscopy.TransferFiles(\''+destenv+'\').begincopy : WHEN(CRON(\'0 17,21 * * *\'));','hthor'))
+																	'#workunit(\'name\',\''+ STD.system.Job.Name() +'\')\r\n'+
+																	'Rampscopy.TransferFiles(\''+destenv+'\','+(string)noofgens+','+if(useeclcccluster,'true','false')+').begincopy : WHEN(CRON(\'0 17,21 * * *\'));',clustertorun))
 																)
 														);
 		

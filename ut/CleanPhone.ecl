@@ -1,7 +1,7 @@
-// This function takes in a raw phone field, and will return a cleaned phone
+﻿// This function takes in a raw phone field, and will return a cleaned phone
 // only works for U.S. phones right now
 export CleanPhone(string pPhone) :=
-define function
+function
 
 	alpha		:= '[[:alpha:]]+';
 	whitespace	:= '[[:space:]]*';
@@ -22,7 +22,7 @@ define function
 	phonenumber_regex := '(' + areacode + ')?' +  separator1 + seven + extension + whitespace;
 
 	phone_number := regexreplace(phonenumber_regex, pPhone, '$2$3$4');
-	find_phone_number := regexfind(phonenumber_regex, pPhone, nocase);
+	find_phone_number := regexfind(phonenumber_regex, pPhone);
 	clean_phone_length := length(trim(phone_number));
 	
 	clean_phone := if(find_phone_number,

@@ -1,4 +1,4 @@
-import ut,tools,_control,std;
+﻿import ut,tools,_control,std;
 export mod_email := module
 
 	// export emailList := 'Charles.Morton@LexisNexis.com' +
@@ -13,12 +13,13 @@ export mod_email := module
                                                       // +   ',Todd.Leonard@LexisNexis.com'
                                                       +   ',Laverne.Bentley@LexisNexis.com'
                                                       +   ',Aleida.Lima@LexisNexis.com'
-                                                      +   ',David.Wheelock@lexisnexis.com'
+                                                      +   ',Kevin.Wilmoth@lexisnexisrisk.com'
                                                       +   ',Janet.Anderson@lexisnexisrisk.com'
                                                       +   ',Paul.Wahbe@lexisnexis.com'
                                                       +   ',dustin.skaggs@lexisnexis.com'
                                                       +   ',Sudhir.Kasavajjala@lexisnexis.com'
                                                       +   ',Ayeesha.Kayttala@lexisnexis.com'
+                                                      +   ',Robert.Pressel@lexisnexis.com'
                       );
 	 
 	SHARED String COMPLETED_STATUS 	:= 'COMPLETED';

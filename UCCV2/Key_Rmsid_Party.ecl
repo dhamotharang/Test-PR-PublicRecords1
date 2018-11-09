@@ -1,11 +1,11 @@
-import  UCCV2,RoxieKeyBuild,ut,autokey,doxie,fcra, BIPV2;
+﻿import  UCCV2,RoxieKeyBuild,ut,autokey,doxie,fcra, BIPV2;
 
 export Key_rmsid_party (boolean  IsFCRA = false) := function
 
 		KeyName       := cluster.cluster_out+'Key::ucc::';
 		
-		dMain					:= dedup(sort(distribute(File_UCC_Main_Base,hash(tmsid,rmsid)),tmsid,rmsid,local),tmsid,rmsid,local);
-		dPartyDist		:= distribute(UCCV2.File_UCC_Party_Base_AID,hash(tmsid,rmsid));
+		dMain					:= dedup(sort(distribute(File_UCC_Main_Base_FCRA,hash(tmsid,rmsid)),tmsid,rmsid,local),tmsid,rmsid,local);
+		dPartyDist		:= distribute(UCCV2.File_UCC_Party_Base_FCRA.Party_Base_AID,hash(tmsid,rmsid));
 		
 		Layout_Party_linkids := record
 		uccv2.Layout_UCC_Common.Layout_Party_with_aid-source_rec_id-prep_addr_line1-prep_addr_last_line-rawaid-aceaid;
@@ -80,8 +80,9 @@ export Key_rmsid_party (boolean  IsFCRA = false) := function
                        tmsid,fname,lname,mname,prim_name,prim_range,company_name),tmsid,rmsid);
 
 	  return_file		:= IF (IsFCRA
-												,INDEX(dSort ,{tmsid,rmsid},{dSort},KeyName +'fcra::party_Rmsid_' + Doxie.Version_SuperKey)
+												,INDEX(dataset([],Layout_Party_linkids) ,{tmsid,rmsid},{dataset([],Layout_Party_linkids)},KeyName +'fcra::party_Rmsid_' + Doxie.Version_SuperKey)
 												,INDEX(dSort ,{tmsid,rmsid},{dSort},KeyName +'party_Rmsid_' + Doxie.Version_SuperKey)
 											  );
 		return(return_file); 
+		
 end;

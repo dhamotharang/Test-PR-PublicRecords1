@@ -1,4 +1,4 @@
-import iesp, AutoStandardI, ut, doxie, suppress,American_student_list,American_student_services, standard,codes,risk_indicators,American_Student_Services,lib_stringlib;
+﻿import iesp, AutoStandardI, ut, doxie, suppress,American_student_list,American_student_services, standard,codes,risk_indicators,American_Student_Services,lib_stringlib;
 
 export Functions := MODULE
 
@@ -312,8 +312,8 @@ export Functions := MODULE
 								lowPeriod+'-'+highPeriod);
 	END;	
 	EXPORT rollup_recs(dataset(American_Student_Services.Layouts.finalRecs) StudentRecs) := FUNCTION	
-	  ds_sorted := sort(StudentRecs, did,college_name,college_major_exploded,prim_name,prim_range,predir,postdir, p_city_name,state,zip,zip4,telephone,fname,mname,lname,ssn,dob_formatted,iscurrent);
-	
+	  ds_sorted := sort(StudentRecs, did,college_name,college_major_exploded,prim_name,prim_range,predir,postdir, p_city_name,state,zip,zip4,telephone,fname,mname,lname,ssn,dob_formatted,iscurrent,src);
+
 	  ds_sorted xform_roll(ds_sorted L, ds_sorted R) := Transform
 				self.iscurrent := if(l.iscurrent,l.iscurrent,r.iscurrent);
 				self.date_vendor_first_reported := if(l.date_vendor_first_reported < r.date_vendor_first_reported and  (unsigned4) l.date_vendor_first_reported <> 0  , l.date_vendor_first_reported, r.date_vendor_first_reported);
@@ -342,6 +342,7 @@ export Functions := MODULE
 				self.TuitionCode := if(l.TuitionCode <> '', l.TuitionCode, r.TuitionCode);
 				self.TuitionExploded := if(l.TuitionExploded <> '', l.TuitionExploded, r.TuitionExploded);
 				self.ClassRank := if(l.ClassRank <> '', l.ClassRank, r.ClassRank);
+				self.src := if(l.src <> '', l.src, r.src);
 				self.ClassRankExploded := fn_get_classRank(l.ClassRankExploded, r.ClassRankExploded);
 				self.SchoolPeriod := fn_get_schoolPeriod(l.schoolPeriod, r.schoolPeriod);				
 				self := if(l.iscurrent, L, R);
@@ -367,10 +368,9 @@ export Functions := MODULE
 											ut.nneq(left.ssn, right.ssn) and
 											ut.nneq(left.dob_formatted , right.dob_formatted) 
 											,xform_roll(left,right));
-	
-    return ds_rollup;
+			return ds_rollup;
   END;
-EXPORT	add_college_indicators(dataset(American_Student_Services.Layouts.finalRecs) studentrecs, dataset(American_Student_Services.layouts.deepDids) all_dids) := FUNCTION			
+EXPORT add_college_indicators(dataset(American_Student_Services.Layouts.finalRecs) studentrecs, dataset(American_Student_Services.layouts.deepDids) all_dids) := FUNCTION			
  	
 	  college_indicators := GetCollegeIndicators(project(all_dids,doxie.layout_references), false);
 	
@@ -412,6 +412,11 @@ EXPORT	add_college_indicators(dataset(American_Student_Services.Layouts.finalRec
 		  return yyyy;
 		// NOTE: Pass yy<100 and delta<100 or craziness ensues
 	  end;
+ student_rec:= record
+ iesp.student.t_StudentRecord;
+ string2 src;
+ end;
+		
     all_dids := project(dids,transform(American_student_services.layouts.deepDids, self.isDeepDive := false, self := left));													
 	  recs_by_dids := American_student_services.Raw.getPayloadByDIDS(all_dids);
 	  sup_recs_by_dids := American_student_services.Raw.getSupplementalStudentInfobyDIDs(all_dids);
@@ -420,7 +425,7 @@ EXPORT	add_college_indicators(dataset(American_Student_Services.Layouts.finalRec
 	  commonParam := PROJECT(aInputData, American_Student_Services.IParam.reportParams);
 	  studentrecs := apply_restrictions(all_recs, commonParam);		
     student_w_indicators := add_college_indicators(studentrecs, all_dids);
-		iesp.student.t_StudentRecord iesp_format(student_w_indicators l) := transform
+		student_rec iesp_format(student_w_indicators l) := transform
 			self._Penalty := 0;//l.record_penalty;  //no penalty for report records.
 			self.AlsoFound := l.isDeepDive;
 			self.UniqueId := intformat(l.did,12,1);
@@ -454,8 +459,10 @@ EXPORT	add_college_indicators(dataset(American_Student_Services.Layouts.finalRec
 		  self.SchoolPeriod := l.SchoolPeriod;
 	    self.SchoolSize := l.SchoolSizeExploded;
 	    self.Tuition := l.TuitionExploded;
+			self.src := l.src;
 		end;
-    report_recs := project(student_w_indicators, iesp_format(LEFT));		
+    report_recs1 := project(student_w_indicators, iesp_format(LEFT));
+		report_recs := Project(report_recs1, iesp.student.t_StudentRecord);
 		
 		iesp.student.t_StudentRecord roll_current_only(iesp.student.t_StudentRecord l,iesp.student.t_StudentRecord r) := transform
 			 self.ClassRank := fn_get_classRank(l.ClassRank, r.ClassRank);
@@ -464,11 +471,12 @@ EXPORT	add_college_indicators(dataset(American_Student_Services.Layouts.finalRec
 	     self.Tuition := if (l.Tuition <> '', l.Tuition, r.Tuition);
 		   self := l;
 		end;
-		s_report_recs := sort(report_recs, CollegeData.Name, - IsCurrent, -classRank, -LastReported, -FirstReported, record);
+		student_report_recs := sort(report_recs1, CollegeData.Name, - IsCurrent, -classRank, -LastReported, -FirstReported, src, record);
+		s_report_recs := Project(student_report_recs, iesp.student.t_StudentRecord);
 	  rollup_current_only := rollup(s_report_recs, left.CollegeData.Name = right.CollegeData.Name,roll_current_only(left,right));
-	  outrecs := if (onlyCurrent, rollup_current_only, report_recs);
+		outrecs := if (onlyCurrent, rollup_current_only, report_recs);
 		sorted_outrecs := sort(outrecs,- IsCurrent, -iesp.ecl2esp.DateToInteger(LastReported));
-    return sorted_outrecs;
+ 	return sorted_outrecs;
 	END;
 	
 END;

@@ -1,8 +1,8 @@
-/* ************************************************************************************************************************
+﻿/* ************************************************************************************************************************
 This is just to perfect the CSV data - so this can happen PRIOR to saving the CSV version of the base file (we spray/despray that)
 INPUT: Alpha CSV LAYOUT directly from the sprayed file
 OUTPUT: Alpha CSV LAYOUT
-
+TEMP_ADDRESS_WORKAROUND TILL DATA3 IS DONE HERE
 ************************************************************************************************************************ */
 IMPORT PRTE2_Common,std;
 
@@ -26,13 +26,11 @@ EXPORT Transforms := MODULE
 					// SELF.addr_error	:= IF(clean_address.errorCode[1]='E',clean_address.errorCode,'');
 					
 					// NOTE: 
-					// Nancy will edit these fields: property_street_address, property_city, property_state, property_zip
+					// ***************>> Nancy will edit these fields: property_street_address, property_city_state_zip
 					// 		We then just need to update the other addresses in the record based on what she changes or adds.
 					clean_address := PRTE2_Common.Clean_Address.cleanAddr1Addr2(l.property_street_address, l.property_city_state_zip);
 					// SELF.property_street_address := clean_address.addr1;	// I think we should just keep Nancy's values for the above incoming fields.
-					// SELF.property_city 	:= clean_address.v_city_name;		// I think we should just keep Nancy's values for the above incoming fields.
-					// SELF.property_state := clean_address.st;							// I think we should just keep Nancy's values for the above incoming fields.
-					// SELF.property_zip 	:= clean_address.zip;							// I think we should just keep Nancy's values for the above incoming fields.
+					// SELF.property_city_state_zip := clean_address.addr2;
 					// TEMP FIX:
 					// hasProblem := STD.STR.Find(L.fares_unformatted_apn,' .') + STD.STR.Find(L.fares_unformatted_apn,'. ') >0;
 					// apnTmp := appendIFDot4(ridString[1..3],cleanAddress.cart,cleanAddress.lot,cleanAddress.fips_county)+cleanAddress.geo_long[3..];
@@ -40,7 +38,11 @@ EXPORT Transforms := MODULE
 					// hasAPNN := L.apn_number <> '';
 					// SELF.apn_number := IF(hasAPNN and hasProblem,apnTmp,L.apn_number);
 					// ---------------------------------------------------------------------------------------------------------
-					SELF.property_city_state_zip := clean_address.addr2;
+					// SELF.property_city 	:= clean_address.v_city_name;
+					// SELF.property_state := clean_address.st;					
+					// SELF.property_zip 	:= clean_address.zip;
+					
+					// Do we need to use hasError logic like we do in the fn_spray_add process?
 					SELF.prim_name  := clean_address.prim_name;
 					SELF.predir     := clean_address.predir;
 					SELF.prim_range := clean_address.prim_range;

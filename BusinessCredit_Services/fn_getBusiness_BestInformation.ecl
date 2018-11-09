@@ -1,4 +1,4 @@
-IMPORT Address, Business_Credit, BIPV2, BIPV2_Best, BIPV2_Best_SBFE, Codes, Doxie, DCAV2, iesp, TopBusiness_Services;
+﻿IMPORT Address, Business_Credit, BIPV2, BIPV2_Best, BIPV2_Best_SBFE, Codes, Doxie, DCAV2, iesp, TopBusiness_Services;
 
 EXPORT fn_getBusiness_BestInformation (BusinessCredit_Services.Iparam.reportrecords inmod,
 																				DATASET(BusinessCredit_Services.Layouts.TopBusinessRecord) topBusinessRecs,
@@ -75,7 +75,7 @@ EXPORT fn_getBusiness_BestInformation (BusinessCredit_Services.Iparam.reportreco
 			
 		//getting ultimate ParentCompanyName
 		parentDS 				:= PROJECT(ds_busheaderRecs(ParentAboveSELE = TRUE),TRANSFORM(BIPV2.IDlayouts.l_xlink_ids2, self.seleid := left.ultimate_proxid,self := []));
-		parentInfo			:= BIPV2_Best.Key_LinkIds.kfetch2(parentDS,,,,FALSE,TopBusiness_Services.Constants.BestKfetchMaxLimit)(proxid=0);
+		parentInfo			:= BIPV2_Best.Key_LinkIds.kfetch2(parentDS,inmod.FetchLevel,,,FALSE,TopBusiness_Services.Constants.BestKfetchMaxLimit)(proxid=0);
 		parent_company	:= ParentInfo[1].company_name[1].company_name;
 		// information from sbfe
 		buzCredit_tradeline := JOIN(buzCreditHeader_recs , Business_Credit.key_tradeline(), 

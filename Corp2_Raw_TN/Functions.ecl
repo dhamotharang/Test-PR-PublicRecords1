@@ -1,4 +1,4 @@
-IMPORT corp2, corp2_mapping;
+﻿IMPORT corp2, corp2_mapping;
 
 EXPORT Functions := MODULE
 		//****************************************************************************
@@ -96,6 +96,7 @@ EXPORT Functions := MODULE
 											uc_s = 'CHINA' 																													=> 'CHN',
 											uc_s = 'COLOMBIA'																												=> 'COL',
 											uc_s = 'CURACAO' 																												=> 'CUW',
+											uc_s = 'DOMINICA' 																											=> 'DM',
 											uc_s = 'ENGLAND' 																												=> 'GBR',
 											uc_s = 'FINLAND' 																												=> 'FIN',
 											uc_s = 'FRANCE' 																												=> 'FRA',
@@ -182,6 +183,7 @@ EXPORT Functions := MODULE
 								 uc_s = 'LIMITED LIABILITY PARTNERSHIP' => '01',
 								 uc_s = 'GENERAL PARTNERSHIP' 					=> '01',
 								 uc_s = 'LIMITED PARTNERSHIP' 					=> '01',
+								 uc_s = 'LP 1988 ACT'										=> '01',
 								 uc_s = 'FOREIGN REGISTERED NAME' 			=> '11',
 								 uc_s = 'FOREIGN NAME' 									=> '12',
 								 '**'
@@ -202,6 +204,7 @@ EXPORT Functions := MODULE
 								 uc_s = 'LIMITED LIABILITY PARTNERSHIP' => 'LEGAL',
 								 uc_s = 'GENERAL PARTNERSHIP' 					=> 'LEGAL',
 								 uc_s = 'LIMITED PARTNERSHIP' 					=> 'LEGAL',
+								 uc_s = 'LP 1988 ACT'										=> 'LEGAL',
 								 uc_s = 'FOREIGN NAME' 									=> uc_s,
 								 uc_s = 'FOREIGN REGISTERED NAME' 			=> uc_s,
 								 '**|'+uc_s
@@ -223,8 +226,9 @@ EXPORT Functions := MODULE
 								 uc_s = 'LIMITED LIABILITY PARTNERSHIP' => uc_s,
 								 uc_s = 'GENERAL PARTNERSHIP' 					=> uc_s,
 								 uc_s = 'LIMITED PARTNERSHIP' 					=> uc_s,
+								 uc_s = 'LP 1988 ACT'										=> uc_s,
 								 uc_s = 'FOREIGN NAME' 									=> '',
-								 uc_s = 'FOREIGN REGISTERED NAME' 			=> '',
+								 uc_s = 'FOREIGN REGISTERED NAME' 			=> '',								 
 								 '**|'+uc_s
 								);
 		END;

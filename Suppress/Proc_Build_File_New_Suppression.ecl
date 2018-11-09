@@ -1,4 +1,4 @@
-import Doxie,RoxieKeyBuild,ut,crim_common,header_services, official_records;
+﻿import Doxie,RoxieKeyBuild,ut,crim_common,header_services, official_records;
 
 //Data_Type: 1 = Offender_key, 2 = Official Records, 3 = Bob Records
 
@@ -128,11 +128,13 @@ end;
 //###########################################################################################################
 //###########################################################################################################
 
-New_Suppression := PROJECT(df_Supplemental,AllRecords(LEFT)) + PROJECT(web_suppress,web_suppress_Output(LEFT)) + PROJECT(LE_Offender_Keys,off_key_Output_le(LEFT)) + PROJECT(LN_OptOut(did not in Suppress.UNsuppress_DID),LN_Opt_Out_Records(LEFT)) + PROJECT(PPLWise_OptOut,PPLWise_Opt_Out_Records(LEFT)) + PROJECT(df_PullSSN_LE,PopNewSupp_LE(LEFT)) /*+  df_peoplewise*/ + df_suppress_lab;
-
+New_Suppression_base := PROJECT(df_Supplemental,AllRecords(LEFT)) + PROJECT(web_suppress,web_suppress_Output(LEFT)) + PROJECT(LE_Offender_Keys,off_key_Output_le(LEFT)) + PROJECT(LN_OptOut,LN_Opt_Out_Records(LEFT)) + PROJECT(PPLWise_OptOut,PPLWise_Opt_Out_Records(LEFT)) + PROJECT(df_PullSSN_LE,PopNewSupp_LE(LEFT)) /*+  df_peoplewise*/ + df_suppress_lab;
+New_Suppression      := New_Suppression_base(Linking_ID not in Suppress.UNsuppress_DID());
+New_Suppression_fcra := New_Suppression_base(Linking_ID not in Suppress.UNsuppress_DID(true));
 															
 RoxieKeyBuild.Mac_SF_BuildProcess(new_suppression,'~thor_data400::base::new_suppression_file','~thor_data400::base::new_suppression::'+pVersion+'::data',build_file,2);
+RoxieKeyBuild.Mac_SF_BuildProcess(new_suppression_fcra,'~thor_data400::base::new_suppression_file_fcra','~thor_data400::base::new_suppression_fcra::'+pVersion+'::data',build_file_fcra,2);
 
-return build_file;
+return sequential(build_file, build_file_fcra);
 
 end;

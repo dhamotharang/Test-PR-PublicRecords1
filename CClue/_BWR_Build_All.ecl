@@ -1,4 +1,4 @@
-pversion 	:= 	'20170621';
+﻿pversion 	:= 	CCLUE.Get_Version_Date() : Independent;										;		// modify to current date
 
 /////////////////////////////////////////////////////////////
 // -- Quick Documentation
@@ -8,7 +8,7 @@ pversion 	:= 	'20170621';
 // --			 You will receive build emails to this address
 /////////////////////////////////////////////////////////////
 #workunit('protect','true');
-#workunit('name', CClue._Dataset().Name + ' Build - ' + pversion);
-CClue.Build_All(pversion) ;  
+#workunit('name','Yogurt:'+ CClue._Dataset().Name + '');
+CClue.Build_All(pversion);  
 
 

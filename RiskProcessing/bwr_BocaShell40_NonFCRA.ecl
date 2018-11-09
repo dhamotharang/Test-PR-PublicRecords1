@@ -1,4 +1,4 @@
-#workunit('name','NonFCRA BocaShell 4.0');
+﻿#workunit('name','NonFCRA BocaShell 4.0');
 
 // Reads sample data from input file, makes a SOAP call to service specified and (optionally),
 // saves results in output file. 
@@ -22,6 +22,7 @@ string DataRestrictionMask := '0000000000000000000000000';	// byte 6, if 1, rest
 																								// byte 10 restricts Transunion, 12 restricts ADVO, 13 restricts bureau deceased data
 unsigned1 glba := 1;
 unsigned1 dppa := 3;
+unsigned3 LastSeenThreshold := 0;	//# of days to consider header records as being recent for verification.  0 will use default (41 and lower = 365 days, 50 and higher = include all) 
 
 //===================  input-output files  ======================
 infile_name := '~dvstemp::in::shell_4_0_chase_1139_sample_input';
@@ -92,6 +93,7 @@ l assignAccount (ds_input le, INTEGER c) := TRANSFORM
   SELF.datarestrictionmask := datarestrictionmask;
   SELF.RemoveFares := RemoveFares;
 	self.LeadIntegrityMode := LeadIntegrityMode;
+	SELF.LastSeenThreshold := LastSeenThreshold;
 	self.bsversion := 4;				
   SELF := le;
   SELF := [];
@@ -103,23 +105,16 @@ output(choosen(p_f,eyeball), named('BSInput'));
 s := Risk_Indicators.test_BocaShell_SoapCall (PROJECT (p_f, TRANSFORM (Risk_Indicators.Layout_InstID_SoapCall, SELF := LEFT)),
                                                 bs_service, roxieIP, parallel_calls);
 
-ox := RECORD
-	unsigned8 time_ms := 0;
-	STRING30 AccountNumber;
-	risk_indicators.Layout_Boca_Shell;
-	STRING200 errorcode;
-END;
-	
-ox getold(s le, l ri) :=	TRANSFORM
+riskprocessing.layouts.layout_internal_shell_noDatasets	getold(s le, l ri) :=	TRANSFORM
   SELF.AccountNumber := ri.old_account_number;
   SELF := le;
 END;
-
+	
 res := JOIN (s,p_f,LEFT.seq=(unsigned)RIGHT.accountnumber,getold(LEFT,RIGHT));
 res_err := res (errorcode<>'');
 
-OUTPUT (choosen(res,eyeball), NAMED ('result'));
-OUTPUT (choosen(res_err,eyeball), NAMED ('res_err'));
+OUTPUT (choosen(res, eyeball), NAMED ('result'));
+OUTPUT (choosen(res_err, eyeball), NAMED ('res_err'));
 
 OUTPUT (res, , outfile_name, CSV(QUOTE('"')), overwrite);
 OUTPUT (res_err, , outfile_name + '_err', CSV(QUOTE('"')), overwrite);
@@ -128,8 +123,8 @@ OUTPUT (res_err, , outfile_name + '_err', CSV(QUOTE('"')), overwrite);
 // the conversion portion-----------------------------------------------------------------------
 
 	
-f := dataset(outfile_name, ox, csv(quote('"'), maxlength(15000)));
-// output(choosen(f,eyeball), named('infile'));
+f := dataset(outfile_name, riskprocessing.layouts.layout_internal_shell_noDatasets, csv(quote('"'), maxlength(15000)));
+output(choosen(f, eyeball), named('infile'));
 
 
 risk_indicators.Layout_Boca_Shell_Edina_v4 convertToEdina_v4(f le) := transform

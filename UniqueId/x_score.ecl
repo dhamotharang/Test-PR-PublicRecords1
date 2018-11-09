@@ -1,4 +1,4 @@
-import STD, Address;
+﻿import STD, Address;
 
 
 /*
@@ -17,7 +17,7 @@ import STD, Address;
       SELF.err_stat    := sCleanAddress[179..182];
 */
 string CleanAddress(string s) := FUNCTION
-	string fs := IF(std.str.Find(s, 'Â§', 1)=0,'|','Â§');		// field separator
+	string fs := IF(std.str.Find(s, '§', 1)=0,'|','§');		// field separator
 	words := std.str.splitwords(s,fs,true);	// undocumented last parameter allows null entries
 	sCleanAddress:=address.cleanaddress182(
 					TRIM(Std.Str.touppercase(words[2] + ' ' + words[3])),
@@ -43,8 +43,8 @@ boolean CompareNames(string name1, string name2) := MAP(
 
 
 boolean CompareAKA(unicode name1, unicode name2) := FUNCTION
-	string fs1 := IF(std.uni.Find(name1, U'Â§', 1)=0,'|','Â§');		// field separator
-	string fs2 := IF(std.uni.Find(name2, U'Â§', 1)=0,'|','Â§');		// field separator
+	string fs1 := IF(std.uni.Find(name1, U'§', 1)=0,'|','§');		// field separator
+	string fs2 := IF(std.uni.Find(name2, U'§', 1)=0,'|','§');		// field separator
 	words1 := std.str.splitwords((string)name1,fs1,true);
 	words2 := std.str.splitwords((string)name2,fs2,true);
 	// just compare full names for now

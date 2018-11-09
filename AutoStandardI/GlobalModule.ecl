@@ -1,11 +1,11 @@
-import doxie,address,suppress, AutoStandardI, BIPV2, lib_thorlib;
+﻿import doxie,address,suppress, AutoStandardI, BIPV2, lib_thorlib;
 
 export GlobalModule(boolean isFCRA = false) := module
 	export boolean OnlyCurrentLegal := FALSE : STORED('OnlyCurrentLegal');
 	export boolean useGlobalScope := true;
   export boolean isPRP:= false : STORED('isPRP');
-	export boolean ignoreFares := AutoStandardI.Constants.IGNORE_FARES_DEFAULT : stored('ignoreFares');
-	export boolean ignoreFidelity := AutoStandardI.Constants.IGNORE_FIDELITY_DEFAULT : stored('ignoreFidelity');
+	export boolean ignoreFares := false : stored('ignoreFares');
+	export boolean ignoreFidelity := false : stored('ignoreFidelity');
 	export string120 nameasis := '' : stored('nameasis');
 	export string120 asisname := '' : stored('asisname');
 	export string120 cn := '' : stored('cn');
@@ -118,7 +118,7 @@ export GlobalModule(boolean isFCRA = false) := module
 	export string6 dobmask := 'NONE' : stored('DOBMask');
 	export string5 industryclass := '' : stored('IndustryClass');
 	export boolean probationoverride := false : stored('ProbationOverride');
-	export boolean lnbranded := AutoStandardI.Constants.LNBRANDED_DEFAULT : stored('LnBranded');
+	export boolean lnbranded := false : stored('LnBranded');
 	export boolean nonexclusion := false : stored('NonExclusion');
 	export boolean searchgoodssnonly := false : stored('SearchGoodSSNOnly');
 	export boolean searchignoresaddressonly := false : stored('SearchIgnoresAddressOnly');
@@ -137,7 +137,7 @@ export GlobalModule(boolean isFCRA = false) := module
 	export string101 rmsid := '' : stored('RMSID');
 	export string50 liencasenumber := '' : stored('LienCaseNumber');
 	export string25 irsserialnumber := '' : stored('IRSSerialNumber');
-	export string17 casenumber := '' : stored('CaseNumber');
+	export string25 casenumber := '' : stored('CaseNumber');
 	export string50 filingnumber := '' : stored('FilingNumber');
 	export string20 filingjurisdiction := '' : stored('FilingJurisdiction');
 	export string20 filingdatebegin := '' : stored('FilingDateBegin');
@@ -297,11 +297,11 @@ export GlobalModule(boolean isFCRA = false) := module
 	export unsigned MaxORWorkComp   := 50 : stored('MaxORWorkComp');
 	export unsigned MaxMotorVehicle := 50 : stored('MaxMotorVehicle');
 	export boolean AllowAll := false : stored('AllowAll');
-	export boolean AllowGLB := AutoStandardI.Constants.ALLOW_GLB_DEFAULT : stored('AllowGLB');
-	export boolean AllowDPPA := AutoStandardI.Constants.ALLOW_DPPA_DEFAULT : stored('AllowDPPA');
+	export boolean AllowGLB := false : stored('AllowGLB');
+	export boolean AllowDPPA := false : stored('AllowDPPA');
 	export unsigned1 DPPAPurpose := 0 : stored('DPPAPurpose');
 	export unsigned1 GLBPurpose := AutoStandardI.Constants.GLBPurpose_default : stored('GLBPurpose');
-	export boolean IncludeMinors := AutoStandardI.Constants.INCLUDE_MINORS_DEFAULT : stored('IncludeMinors');
+	export boolean IncludeMinors := false : stored('IncludeMinors');
 	export boolean KeepOldSsns := false : stored('KeepOldSsns');
 	export boolean UsingKeepSSNs := false : stored('UsingKeepSSNs');
 	export string30 primname := '' : stored('primname');

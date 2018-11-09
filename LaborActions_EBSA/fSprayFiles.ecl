@@ -1,4 +1,4 @@
-import lib_fileservices,_control,lib_stringlib;
+﻿import lib_fileservices,_control,lib_stringlib;
 
 export fSprayFiles(string filedate)	:=	function
 		/* 
@@ -44,7 +44,7 @@ export fSprayFiles(string filedate)	:=	function
 		do_spray									:=	if (count(FileServices.RemoteDirectory(serverip,'/data/hds_180/SIM/LaborActions_EBSA/'+filedate+'/','*.txt')(size>0)) >0,
 																					FileServices.SprayVariable(	serverip,
 																																			'/data/hds_180/SIM/LaborActions_EBSA/'+filedate+'/'+'*.txt',
-																																			,',',,,'thor400_60',cluster+'in::'+ _Dataset().name + '::'+filedate,-1,,,true,,true)
+																																			,',',,,'thor400_36',cluster+'in::'+ _Dataset().name + '::'+filedate,-1,,,true,,true)
 																			);
 																			
 		addSuper									:=	if (count(FileServices.RemoteDirectory(serverip,'/data/hds_180/SIM/LaborActions_EBSA/'+filedate+'/','*.txt')(size>0)) >0,

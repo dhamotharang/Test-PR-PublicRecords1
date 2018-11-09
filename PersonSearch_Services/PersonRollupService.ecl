@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="PersonRollupService" wuTimeout="300000">
  	<part name="UnParsedFullName" type="xsd:string"/>
 	<part name="FirstName"        type="xsd:string"/>
@@ -181,11 +181,15 @@ EXPORT PersonRollupService () := MACRO
 
 	end;
 
-	tempresults := PersonSearch_Services.Rollup_Records.val(tempmod);
+	tempresults   := PersonSearch_Services.Rollup_Records.val(tempmod);
+	FDN_check     := tempresults(FDNResultsFound = true);
+  FDN_Royalties := Royalty.RoyaltyFDNCoRR.GetOnlineRoyalties(FDN_check);
+  royalties     := if(tempmod.IncludeFraudDefenseNetwork, FDN_Royalties);
 
 	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(tempresults, results, 
                          iesp.rollupbpssearch.t_RollupBpsSearchResponse, Records, false, SubjectTotalCount);
 
+  output(royalties,named('RoyaltySet'));
   output(results,named('Results'));
 
 ENDMACRO;

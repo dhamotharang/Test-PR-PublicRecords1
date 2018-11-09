@@ -1,4 +1,4 @@
-EXPORT Layout_Runway := record
+﻿EXPORT Layout_Runway := record
 	Unsigned seq := 0;
 	Unsigned did := 0;
 	
@@ -684,6 +684,40 @@ string2 FP1611_1_0_reason4 := '';
 string2 FP1611_1_0_reason5 := '';
 string2 FP1611_1_0_reason6 := '';
 
+String3 FP1702_2_0_score := '';
+string2 FP1702_2_0_reason1 := '';
+string2 FP1702_2_0_reason2 := '';
+string2 FP1702_2_0_reason3 := '';
+string2 FP1702_2_0_reason4 := '';
+string2 FP1702_2_0_reason5 := '';
+string2 FP1702_2_0_reason6 := '';
+
+
+String3 FP1702_1_0_score := '';
+string2 FP1702_1_0_reason1 := '';
+string2 FP1702_1_0_reason2 := '';
+string2 FP1702_1_0_reason3 := '';
+string2 FP1702_1_0_reason4 := '';
+string2 FP1702_1_0_reason5 := '';
+string2 FP1702_1_0_reason6 := '';
+
+String3 FP1706_1_0_score := '';
+string2 FP1706_1_0_reason1 := '';
+string2 FP1706_1_0_reason2 := '';
+string2 FP1706_1_0_reason3 := '';
+string2 FP1706_1_0_reason4 := '';
+string2 FP1706_1_0_reason5 := '';
+string2 FP1706_1_0_reason6 := '';
+
+String3 FP1609_2_0_score := '';
+string2 FP1609_2_0_reason1 := '';
+string2 FP1609_2_0_reason2 := '';
+string2 FP1609_2_0_reason3 := '';
+string2 FP1609_2_0_reason4 := '';
+string2 FP1609_2_0_reason5 := '';
+string2 FP1609_2_0_reason6 := '';
+
+
 String3 FP31105_1_0_score := '';
 string2 FP31105_1_0_reason1 := '';
 string2 FP31105_1_0_reason2 := '';
@@ -1054,6 +1088,18 @@ string2 RVA711_0_0_reason2 := '';
 string2 RVA711_0_0_reason3 := '';
 string2 RVA711_0_0_reason4 := '';
 
+String3 RVA1611_1_0_score := '';
+string3 RVA1611_1_0_reason1 := '';
+string3 RVA1611_1_0_reason2 := '';
+string3 RVA1611_1_0_reason3 := '';
+string3 RVA1611_1_0_reason4 := '';
+
+String3 RVA1611_2_0_score := '';
+string3 RVA1611_2_0_reason1 := '';
+string3 RVA1611_2_0_reason2 := '';
+string3 RVA1611_2_0_reason3 := '';
+string3 RVA1611_2_0_reason4 := '';
+
 String3 RVB1003_0_0_score := '';
 string2 RVB1003_0_0_reason1 := '';
 string2 RVB1003_0_0_reason2 := '';
@@ -1363,6 +1409,12 @@ string2 RVG1705_1_0_reason1 := '';
 string2 RVG1705_1_0_reason2 := '';
 string2 RVG1705_1_0_reason3 := '';
 string2 RVG1705_1_0_reason4 := '';
+
+String3 RVG1706_1_0_score := '';
+string3 RVG1706_1_0_reason1 := '';
+string3 RVG1706_1_0_reason2 := '';
+string3 RVG1706_1_0_reason3 := '';
+string3 RVG1706_1_0_reason4 := '';
 
 String3 RVP804_0_0_score := '';
 string2 RVP804_0_0_reason1 := '';

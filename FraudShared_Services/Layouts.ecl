@@ -1,4 +1,4 @@
-IMPORT BatchShare, FraudShared, iesp, FraudDefenseNetwork_Services;
+﻿IMPORT BatchShare, FraudShared, iesp, FraudDefenseNetwork_Services;
 
 EXPORT Layouts := MODULE
 
@@ -120,5 +120,53 @@ EXPORT Layouts := MODULE
     string  RecsReturned                  {XPATH('RecsReturned'),MAXLENGTH(5)};
     integer responsetime                  {XPATH('_call_latency_ms')};
   END;
+	
+	SHARED STRING30 fragment;
+	SHARED STRING30 contributionType;
+	SHARED STRING30 transactionType;
 
+	EXPORT layout_velocity_in :=  RECORD 	//this layout is for the records found for each customer 
+																				//based on records they have access to see each record 
+																				//found prior to this is broken down into mulitple records 
+																				//1 for each fragment type and contribution match type
+		BatchShare.Layouts.ShareAcct;
+		fragment; // correlates candidate to the incoming request that produced it
+		contributionType; // how I can tell which ruleType to apply
+		unsigned4	date;
+		unsigned2 age := 0;
+		unsigned8 record_id;
+	END;
+
+	//this layout is for the RULES for each customer read from MBS file (read ahead of this point from KEY)
+	EXPORT  layout_rules := RECORD
+		fragment;
+		contributionType;
+		unsigned1		fragment_weight;
+		unsigned1		category_weight;
+		unsigned1 	ruleNum;
+		unsigned2 	numDays;
+		unsigned2 	maxCnt;
+		string  		description;
+	END;	
+	
+	EXPORT layout_buckets :=  RECORD //the following layout are for TABLES used for counting
+																	 //Maybe we can just use layout_rules without creating a 
+																	 //separate record layout, but let's see exactly what we 
+																	 //get from MBS first.
+		BatchShare.Layouts.ShareAcct;
+		layout_rules;
+		unsigned8 record_id;
+	END;
+	
+	EXPORT layout_buckets_found := RECORD
+		layout_buckets - [record_id];
+		INTEGER foundCnt;
+		DATASET({unsigned8 record_id}) ds_record_ids;
+	END;
+	
+	EXPORT layout_scored_buckets := RECORD
+			layout_buckets_found;
+			INTEGER velocity_score;
+	END;
+	
 END;

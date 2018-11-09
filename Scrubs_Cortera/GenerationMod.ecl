@@ -16,7 +16,7 @@ EXPORT GenerationMod := MODULE
     + 'FIELDTYPE:name:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz./\\ \',&()123:"-):LENGTHS(0,1..)\n'
     + 'FIELDTYPE:bizname:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789./@"_&,#():!*+?;$% /\\\'-):LENGTHS(0,1..)\n'
     + 'FIELDTYPE:feintype:ALLOW(0123456789):LENGTHS(0,9)\n'
-    + 'FIELDTYPE:Invalid_Date:Custom(Scrubs.fn_valid_date>0)\n'
+    + 'FIELDTYPE:Invalid_Date:Custom(Scrubs.fn_valid_date>0,\'future\')\n'
     + 'FIELDTYPE:OwnershipTypes:enum(P|V| )\n'
     + 'FIELDTYPE:StatusTypes:enum(A|D| )\n'
     + 'FIELDTYPE:YesNo:enum(Y|N| )\n'

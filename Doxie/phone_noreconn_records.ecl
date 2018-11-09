@@ -1,4 +1,4 @@
-import doxie_raw, gong_services, phonesPlus_Services, Suppress, risk_indicators, targus, ut, Gateway, Census_data;
+﻿import doxie_raw, gong_services, phonesPlus_Services, Suppress, risk_indicators, targus, ut, Gateway, Census_data;
 
 EXPORT phone_noreconn_records(phone_noreconn_param.searchParams inMod) := module
 																																							
@@ -26,12 +26,14 @@ UNSIGNED1 score_threshold_value := inMod.ScoreThreshold; // used in macros
 phoneOnlySearch := inMod.Phone != '' and
                    inMod.FirstName = '' and inMod.LastName = '' and inMod.MiddleName = '' and inMod.NameSuffix = '' and
                    inMod.Addr = '' and inMod.PrimRange = '' and inMod.PrimName = '' and inMod.SecRange = '' and
-                   inMod.City = '' and inMod.State = '' and inMod.Zip = '' and inMod.DID = '' and inMod.UnParsedFullName = '';
+									 inMod.City = '' and inMod.State = '' and inMod.Zip = '' and inMod.county = '' and
+                   inMod.DID = '' and inMod.UnParsedFullName = '';
 
 phoneStSearch := inMod.Phone != '' and inMod.State != '' and
                  inMod.FirstName = '' and inMod.LastName = '' and inMod.MiddleName = '' and inMod.NameSuffix = '' and
                  inMod.Addr = '' and inMod.PrimRange = '' and inMod.PrimName = '' and inMod.SecRange = '' and
-                 inMod.City = '' and inMod.Zip = '' and inMod.DID = '' and inMod.UnParsedFullName = '';
+                 inMod.City = '' and inMod.Zip = '' and inMod.County = '' and 
+								 inMod.DID = '' and inMod.UnParsedFullName = '';
 
 fullNameAddressSearch := (inMod.FirstName != '' and inMod.LastName != '' or inMod.UnParsedFullName != '') and
                          (inMod.Addr != '' or inMod.PrimName != '') and 

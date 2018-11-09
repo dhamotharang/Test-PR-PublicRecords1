@@ -1,4 +1,4 @@
-/*
+﻿/*
   _Control.Config
     This attribute should be checked into each environment with its own values, like _Control.ThisEnvironment.
     
@@ -13,13 +13,13 @@ module
   export dev_name           := 'Dataland'                         ;
 
   export prod_dali          := 'prod_dali.br.seisint.com'         ;
-  export dev_dali           := '10.241.12.201'                    ; //dataland_dali.br.seisint.com
+  export dev_dali           := 'dataland_dali.br.seisint.com'     ; //10.173.14.201
 
-  export prod_hthor         := 'hthor'                            ;
-  export dev_hthor          := 'hthor_dev'                        ;
+  export prod_hthor         := 'hthor_eclcc'                            ;
+  export dev_hthor          := 'hthor_dev_eclcc'                        ;
 
   export ProdEsps           := ['prod_esp.br.seisint.com'     ,'10.173.84.202'  ,'10.173.85.202'  ,'10.241.20.202','10.241.30.202','10.173.84.205' ];
-  export DevEsps            := ['10.241.12.207','dataland_esp.br.seisint.com'  ,'10.241.12.204'                                 ];  
+  export DevEsps            := ['10.173.14.204','dataland_esp.br.seisint.com'  ,'10.173.14.207'                                 ];  
   
   export emailSender        := 'eclsystem@seisint.com'            ;
   export MailServer         := 'mailout.br.seisint.com'           ;
@@ -34,39 +34,42 @@ module
   */
   export Groupname(
     
-     string		pHint					= ''
-    ,boolean	pForMacroUse	= false 
-    
+     string   pHint         = ''
+    ,boolean  pForMacroUse  = false 
+    ,boolean  pUseGit       = true
   ) :=
   function
 
+    addeclcc := if(pUseGit = true ,'_eclcc','');
+
     returnstring :=
-    map( _Control.ThisEnvironment.name	 = 'Dataland' =>	
-                                                          map( pHint = '50'			=> if(not pForMacroUse	,'thor50_dev'		,'\'thor50_dev\''			)
-                                                              ,pHint = '02'			=> if(not pForMacroUse	,'thor50_dev02'	,'\'thor50_dev02\''	  )
-                                                              ,pHint = 'prod'		=> if(not pForMacroUse	,'thor400_prod' ,'\'thor400_prod\''	  )
-                                                              ,pHint = 'sta'    => if(not pForMacroUse	,'thor400_sta'	,'\'thor400_sta\''		)
-                                                              ,pHint = 'dev'		=> if(not pForMacroUse	,'thor400_dev'	,'\'thor400_dev\''	  )
-                                                              ,										 if(not pForMacroUse	,'thor400_dev'	,'\'thor400_dev\''  	)
-                                                          )
-      ,																										map( pHint = '20'			  => if(not pForMacroUse	,'thor400_20'			    ,'\'thor400_20\''			    )																												
-                                                              ,pHint = '60'			  => if(not pForMacroUse	,'thor400_60'			    ,'\'thor400_60\''			    )																												
-                                                              ,pHint = '44'			  => if(not pForMacroUse	,'thor400_44'			    ,'\'thor400_44\''			    )																												
-                                                              ,pHint = 'scoring'  => if(not pForMacroUse	,'thor400_44_scoring'	,'\'thor400_44_scoring\'' )																												
-                                                              ,pHint = 'sla'			=> if(not pForMacroUse	,'thor400_44_sla'			,'\'thor400_44_sla\''			)																												
-                                                              ,										   if(not pForMacroUse	,'thor400_20'			    ,'\'thor400_20\''			    )
+    map( _Control.ThisEnvironment.name   = 'Dataland' =>  
+                                                          map( pHint = '50'     => if(not pForMacroUse  ,'thor50_dev'   + addeclcc  ,'\'thor50_dev' + addeclcc + '\''     )
+                                                              ,pHint = '02'     => if(not pForMacroUse  ,'thor50_dev02' + addeclcc  ,'\'thor50_dev02' + addeclcc + '\''   )
+                                                              ,pHint = 'prod'   => if(not pForMacroUse  ,'thor400_prod' + addeclcc  ,'\'thor400_prod' + addeclcc + '\''   )
+                                                              ,pHint = 'sta'    => if(not pForMacroUse  ,'thor400_sta'  + addeclcc  ,'\'thor400_sta' + addeclcc + '\''    )
+                                                              ,pHint = 'dev'    => if(not pForMacroUse  ,'thor400_dev'  + addeclcc  ,'\'thor400_dev' + addeclcc + '\''    )
+                                                              ,                    if(not pForMacroUse  ,'thor400_dev'  + addeclcc  ,'\'thor400_dev' + addeclcc + '\''    )
+                                                          ) 
+      ,                                                   map( pHint = '36'       => if(not pForMacroUse  ,'thor400_36'         + addeclcc  ,'\'thor400_36'         + addeclcc + '\'' )                                                       
+                                                              ,pHint = '66'       => if(not pForMacroUse  ,'thor400_66'         + addeclcc  ,'\'thor400_66'         + addeclcc + '\'' )                                                       
+                                                              ,pHint = '44'       => if(not pForMacroUse  ,'thor400_44'         + addeclcc  ,'\'thor400_44'         + addeclcc + '\'' )                                                       
+                                                              ,pHint = 'scoring'  => if(not pForMacroUse  ,'thor400_44_scoring' + addeclcc  ,'\'thor400_44_scoring' + addeclcc + '\'' )                                                       
+                                                              ,pHint = 'sla'      => if(not pForMacroUse  ,'thor400_44_sla'     + addeclcc  ,'\'thor400_44_sla'     + addeclcc + '\'' )                                                       
+                                                              ,                      if(not pForMacroUse  ,'thor400_44'         + addeclcc  ,'\'thor400_44'         + addeclcc + '\'' )
                                                           )
     );
+                                                                              
 
     return returnstring;
         
-  end;  
+  end;
 
   // ----------------------------------------------------------------------------------------
   // -- the following should not need to be changed for a new environment
   // ----------------------------------------------------------------------------------------
 
-	export IsDev                  := if(regexfind(dev_name, _Control.ThisEnvironment.Name, nocase)  ,true ,false	);
+  export IsDev                  := if(regexfind(dev_name, _Control.ThisEnvironment.Name, nocase)  ,true ,false  );
   
   export DevEsp                 := DevEsps[1];
   export ProdEsp                := ProdEsps[1];

@@ -1,4 +1,4 @@
-IMPORT FLAccidents_Ecrash, ut, doxie, lib_stringlib;
+﻿IMPORT FLAccidents_Ecrash, ut, doxie, lib_stringlib;
 
 //** late fix for bug 128352 highlighted with lines below, two sections ************************************
 //** Added the fix for bug 138974
@@ -13,10 +13,22 @@ EXPORT ConstantsDeltaBase := MODULE
 		EXPORT Join_Columns 		:= 	' k.delta_key_id,k.date_added,k.report_code,k.jurisdiction_state,k.jurisdiction,k.case_identifier,k.state_report_number,' + 
 																'k.original_case_ident,k.original_st_rpt_num,k.date_of_loss,k.accident_location_street,k.accident_location_crossstreet,'+ 
 																'k.accident_location_nextstreet,k.agency_id,k.agency_ori,k.report_hashkey,k.has_coversheet,k.is_ready_for_public,k.vendor_code,'+
-																'k.report_link_id,k.report_type_id, p.delta_key_id as pdelta_key_id,p.person_type,p.name_first,p.name_middle,p.name_last,' + 
-																'p.name_suffix,p.dob,p.driver_license_number,p.address,p.city,p.state,p.zip_code,k.report_id,k.incident_id,k.is_deleted ';
-		EXPORT Join_FROM				:=	' FROM delta_ec.delta_key k, delta_ec.delta_person p';
-		EXPORT Join_WHERE				:=	' WHERE k.delta_key_id = p.delta_key_id ';
+																'k.report_link_id,k.report_type_id,k.contrib_source,k.officer_id, p.delta_key_id as pdelta_key_id,p.person_type,p.name_first,p.name_middle,p.name_last,' + 
+																// 'p.name_suffix,p.dob,p.driver_license_number,p.address,p.city,p.state,p.zip_code,k.report_id,k.incident_id,k.is_deleted ';
+																'p.name_suffix,p.dob,p.driver_license_number,p.address,p.city,p.state,p.zip_code,p.vehicle_unit_number,k.report_id,k.incident_id,k.is_deleted,' +
+																// 'v.vin,v.tag_number,v.tag_state'; 
+																'v.vin,v.tag_number,v.unit_number'; 
+		// EXPORT Join_FROM				:=	' FROM delta_ec.delta_key k, delta_ec.delta_person p';
+		// EXPORT Join_WHERE				:=	' WHERE k.delta_key_id = p.delta_key_id ';
+
+		EXPORT Join_FROM				:=	' FROM delta_ec.delta_key k ' +
+																'LEFT JOIN delta_ec.delta_person AS p use index(p_delta_key_id_idx) ON p.delta_key_id = k.delta_key_id ' + 
+																'LEFT JOIN delta_ec.delta_vehicle AS v	use index(v_delta_key_id_idx) ON v.delta_key_id = k.delta_key_id ' + 
+																//we don't want to join by p.vehicle_unit_number if person record doesn't exist because we still want to return a record with the vehicle data
+																//we need "OR v.unit_number IS NULL" because according to the logic that builds payload data if vehicle has empty unit_number - we
+																//want to assign that vehicle to ALL of the person records
+																'AND (IF (p.delta_key_id IS NULL, TRUE, p.vehicle_unit_number = v.unit_number) OR v.unit_number IS NULL)';
+		EXPORT Join_WHERE				:=	' WHERE ';
 		
 		SHARED ImageRetrievalSqlSelectFrom :=	'SELECT k.date_added,k.state_report_number,k.original_st_rpt_num,k.case_identifier,k.original_case_ident,' + 
 																'k.report_code,k.date_of_loss,k.agency_ori,k.agency_id,k.jurisdiction,k.jurisdiction_state,k.report_id,k.delta_key_id,' + 
@@ -33,7 +45,7 @@ EXPORT ConstantsDeltaBase := MODULE
 		EXPORT ImageRetrievalSql := ImageRetrievalSqlSelectFrom + ' USE INDEX(ix_caseid_aid_jstate_rcode_dadded_rid) ' + ImageRetrievalSqlJoin;	
 		
 		EXPORT JoinSetupString	:=	SELECTSTMT + Join_Columns + Join_FROM + Join_WHERE;
-		PersonInnerSelect := 'AND k.delta_key_id IN (SELECT k.delta_key_id FROM delta_ec.delta_key k, delta_ec.delta_person p WHERE k.delta_key_id = p.delta_key_id ';
+		PersonInnerSelect := ' k.delta_key_id IN (SELECT k.delta_key_id ' + Join_FROM + 'WHERE ' ;
 		EXPORT PersonOuterToInnerSelect := JoinSetupString + PersonInnerSelect;
 		
 		EXPORT TmImageSql := 'SELECT report_data FROM delta_ec.delta_report_data';
@@ -108,8 +120,7 @@ EXPORT ConstantsDeltaBase := MODULE
 				self.vin									:= DeltaRecord.vin;
 				self.vehicle_year					:= DeltaRecord.vehicleYear;
 				self.make_description			:= DeltaRecord.makeDescription;
-				self.model_description			:= DeltaRecord.modelDescription;
-				
+				self.model_description		:= DeltaRecord.modelDescription;
 // ****** For resolving bug 138974 modified the transform to capture date_added.
 				self.date_added           := DeltaRecord.date_added;
 				self.report_id						:= DeltaRecord.reportID;
@@ -125,6 +136,11 @@ EXPORT ConstantsDeltaBase := MODULE
 				self.vendor_report_id     := DeltaRecord.vendorReportID;
 				self.is_deleted				    := DeltaRecord.isDeleted;
 				
+				//Added contrib_source
+				self.contrib_source       := DeltaRecord.contrib_source;
+				
+				self.unit_number					:= DeltaRecord.unitNumber;
+				self.officer_id						:= DeltaRecord.officerID;
 				self := [];
 		END;
 				 //THIS.prim_range,predir,prim_name := LEFT.address				//we don't have cleaned address so cannot fill these 3 fields.

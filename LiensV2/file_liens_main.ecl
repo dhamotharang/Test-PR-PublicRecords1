@@ -1,4 +1,4 @@
-import liensv2,ut,LiensV2_preprocess;
+﻿import liensv2,ut,LiensV2_preprocess;
 
 liensv2.Layout_liens_main_module.layout_liens_main forkey(LiensV2.layout_liens_main_module_for_hogan.layout_liens_main l) :=
 TRANSFORM
@@ -8,20 +8,25 @@ TRANSFORM
 													l.rmsid[1..3]	=	'HGR',
 													'',l.release_date
 												);
+	// DF-21976 Populate Collection_Date when
+	SELF.collection_date	:=	IF(
+													l.collection_Date	=	''	AND	l.tmsid[1..2]	 =	'HG',
+													l.process_date,l.collection_Date
+												);
 	SELF							:=	l;
 END;
 
 HOGAN_main := project(LiensV2.file_Hogan_main, forkey(left));
 
-pre_file_liens_main := project((HOGAN_main(tmsid not in Liensv2.Suppress_TMSID)
-                        + LiensV2.file_ILFDLN_main(tmsid not in Liensv2.Suppress_TMSID)
-												+ LiensV2.file_NYC_main(tmsid not in Liensv2.Suppress_TMSID)
-												+ LiensV2.file_NYFDLN_main(tmsid not in Liensv2.Suppress_TMSID)
-												+ LiensV2.file_SA_main(tmsid not in Liensv2.Suppress_TMSID)
-												+ LiensV2.file_chicago_law_main(tmsid not in Liensv2.Suppress_TMSID)
-												+ LiensV2.file_CA_federal_main(tmsid not in Liensv2.Suppress_TMSID)
-												+ LiensV2.file_Superior_main(tmsid not in Liensv2.Suppress_TMSID)
-												+ LiensV2.file_MA_main(tmsid not in Liensv2.Suppress_TMSID)), 
+pre_file_liens_main := project((HOGAN_main(tmsid not in Liensv2.Suppress_TMSID())
+                        + LiensV2.file_ILFDLN_main(tmsid not in Liensv2.Suppress_TMSID())
+												+ LiensV2.file_NYC_main(tmsid not in Liensv2.Suppress_TMSID())
+												+ LiensV2.file_NYFDLN_main(tmsid not in Liensv2.Suppress_TMSID())
+												+ LiensV2.file_SA_main(tmsid not in Liensv2.Suppress_TMSID())
+												+ LiensV2.file_chicago_law_main(tmsid not in Liensv2.Suppress_TMSID())
+												+ LiensV2.file_CA_federal_main(tmsid not in Liensv2.Suppress_TMSID())
+												+ LiensV2.file_Superior_main(tmsid not in Liensv2.Suppress_TMSID())
+												+ LiensV2.file_MA_main(tmsid not in Liensv2.Suppress_TMSID())), 
 						transform({liensv2.Layout_liens_main_module.layout_liens_main }, 
  self.tmsid :=  ut.CleanSpacesAndUpper(left.tmsid ), 
  self.rmsid :=  ut.CleanSpacesAndUpper(left.rmsid ),

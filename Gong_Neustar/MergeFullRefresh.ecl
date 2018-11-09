@@ -1,4 +1,4 @@
-import STD, ut;
+﻿import STD, ut;
 
 GetReplacedRecords(dataset(Gong_Neustar.layout_gongMaster) adds, dataset(Gong_Neustar.layout_gongMaster) mstr, string8 filedate) := 
 
@@ -79,6 +79,8 @@ GetUpdates(dataset(Gong_Neustar.layout_gongMaster) adds, dataset(Gong_Neustar.la
 									self := LEFT;
 						),
 				LEFT OUTER, KEEP(1)); 
+				
+//InBoth(dataset(layout_gongMaster) updates, dataset(layout_gongMaster) replaced) := FUNCTIO
 
 EXPORT MergeFullRefresh(dataset(layout_gongMaster) refresh, dataset(layout_gongMaster) mstr) := FUNCTION
 
@@ -88,7 +90,12 @@ EXPORT MergeFullRefresh(dataset(layout_gongMaster) refresh, dataset(layout_gongM
 
 	updates := GetUpdates(refresh, curr);
 	replaced := GetReplacedRecords(refresh, curr, filedate);
-
-	return updates & replaced & notcurr;
+	
+	master7 := updates & replaced & notcurr;
+		
+		// rollup duplicate records
+	master8 := gong_neustar.fn_rollup(master7);
+	
+	return master8;
 
 END;

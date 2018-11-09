@@ -1,4 +1,4 @@
-//************************************************************************************************************* */	
+﻿//************************************************************************************************************* */	
 //  The purpose of this development is take MS Real Estate Commission raw file and convert it to a common
 //  professional license (MARIFLAT_out) layout to be used for MARI and PL_BASE development.
 //************************************************************************************************************* */	
@@ -14,6 +14,7 @@ EXPORT map_MSS0815_conversion(STRING pVersion) := FUNCTION
 	
 	//Dataset reference files for lookup joins
 	Cmvtranslation	:= Prof_License_Mari.files_References.cmvtranslation(SOURCE_UPD =src_cd);
+	county_names    := Prof_License_Mari.files_References.county_names(SOURCE_UPD =src_cd);
 	O_Cmvtranslation:= OUTPUT(Cmvtranslation);
 	
 	GR_Lic_types := ['BO','C','NRBO','NRC'];
@@ -42,15 +43,31 @@ EXPORT map_MSS0815_conversion(STRING pVersion) := FUNCTION
 	oRE 									:= OUTPUT(re);
 	ds_MS_RealEstate 			:= apr + re;							//For input files 20121129 and 20130304
 
+	// Translate County Names
+  rCounty_Names := RECORD,MAXLENGTH(6500)
+	apr;
+	STRING50 COUNTY_NAME;
+	END;
+	
+rCounty_Names cnty(ds_MS_RealEstate L, county_names R) := TRANSFORM
+    SELF.COUNTY_NAME      := IF(R.COUNTY_NAMES != '',R.COUNTY_NAMES, L.COUNTY); 
+		SELF := L;
+	END;
+
+  ds_county_name         := JOIN(ds_MS_RealEstate, county_names,
+																TRIM(LEFT.COUNTY,LEFT,RIGHT)= TRIM(RIGHT.COUNTY_NBR,LEFT,RIGHT)
+																AND RIGHT.field='CNTY_NAME', 
+																cnty(LEFT,RIGHT),LEFT OUTER,LOOKUP);	
+
 	//Remove bad records before processing
-	ValidMSFile	:= ds_MS_RealEstate((TRIM(NAME_FULL,LEFT,RIGHT) <> ' ' AND NOT REGEXFIND('ORG_NAME\\(80\\)', TRIM(NAME_FULL,LEFT,RIGHT))) OR 
+	ValidMSFile	:= ds_county_name((TRIM(NAME_FULL,LEFT,RIGHT) <> ' ' AND NOT REGEXFIND('ORG_NAME\\(80\\)', TRIM(NAME_FULL,LEFT,RIGHT))) OR 
 																	 TRIM(LIC_NBR,LEFT,RIGHT) = 'DELETED' OR 
 																	 TRIM(LIC_STATUS,LEFT,RIGHT) = 'DELETED');
 																	 
   ut.CleanFields(ValidMSFile,clnValidMSFile);
 
 	//MS Real Estate layout to Common
-	Prof_License_Mari.layouts.base transformToCommon(Prof_License_Mari.layout_MSS0815.common L) := TRANSFORM
+	Prof_License_Mari.layouts.base transformToCommon(rCounty_Names L) := TRANSFORM
 	
 		SELF.PRIMARY_KEY			:= 0;											//Generate sequence number (not yet initiated)
 		SELF.CREATE_DTE				:= thorlib.wuid()[2..9];	//yyyymmdd
@@ -99,18 +116,20 @@ EXPORT map_MSS0815_conversion(STRING pVersion) := FUNCTION
 		TrimMidName             := ut.CleanSpacesAndUpper(L.NAME_MID);		
 		TrimFullName						:= ut.CleanSpacesAndUpper(L.NAME_FULL);
 		TrimCompany						  := ut.CleanSpacesAndUpper(L.COMPANY);
+		TrimContact 				 	  := ut.CleanSpacesAndUpper(L.BROKER_NAME);
+		TrimDBA                 := ut.CleanSpacesAndUpper(L.DBA);
+		
 		mariParse         		  := MAP(tempTypeCd='GR' AND  prof_license_mari.func_is_company(TrimFullName) = TRUE => 'GR',
 																   tempTypeCd='MD' AND  prof_license_mari.func_is_company(TrimFullName) = FALSE => 'MD',
-																   prof_license_mari.func_is_company(L.NAME_FULL) = TRUE => 'GR',
+																   prof_license_mari.func_is_company(TrimFullName) = TRUE => 'GR',
 																   tempTypeCd);				
 		
 		tmpLastName						  := REGEXFIND('(.*),(.*)', TrimFullName, 1);
 		tmpFirstName						:= REGEXFIND('(.*),(.*)', TrimFullName, 2);
 		trimOrgName						:= STD.Str.CleanSpaces(tmpFirstName + ' ' + tmpLastName);
-		TrimContact 					:= ut.CleanSpacesAndUpper(L.BROKER_NAME);
-
+		
 		ClnOrgName						:= MAP(REGEXFIND('(-CLOSED|- CLOSED -|- CLOSED| CLOSED|\\(CLOSED\\)|-DECEASED|- DECEASED -|- DECEASED)',TrimFullName)=>  
-																		REGEXREPLACE('(-CLOSED|- CLOSED -|- CLOSED| CLOSED|\\(CLOSED\\)|-DECEASED|- DECEASED -|- DECEASED)',TrimFullName,''),
+																   REGEXREPLACE('(-CLOSED|- CLOSED -|- CLOSED| CLOSED|\\(CLOSED\\)|-DECEASED|- DECEASED -|- DECEASED)',TrimFullName,''),
 		                             REGEXFIND(', LLC',TrimFullName)=>REGEXREPLACE(', LLC',TrimFullName,' LLC'),
 		                             REGEXFIND(', AND',TrimFullName)=>REGEXREPLACE(', AND',TrimFullName,' AND'),
 																 REGEXFIND(', INC',TrimFullName)=>REGEXREPLACE(', INC',TrimFullName,' INC'),
@@ -120,7 +139,20 @@ EXPORT map_MSS0815_conversion(STRING pVersion) := FUNCTION
 																 REGEXFIND(', CORP',TrimFullName)=>REGEXREPLACE(', CORP',TrimFullName,' CORP'),
 																 REGEXFIND(', COMPANY',TrimFullName)=>REGEXREPLACE(', COMPANY',TrimFullName,' COMPANY'),
 		                             TrimFullName);
-		ClnFullName           := REGEXREPLACE('(-CLOSED|- CLOSED -|- CLOSED| CLOSED|\\(CLOSED\\)|-DECEASED|- DECEASED -|- DECEASED)',trimOrgName,'');
+		ClnFullName           := REGEXREPLACE('(-CLOSED|- CLOSED -|- CLOSED| - CLOSED| CLOSED|\\(CLOSED\\)|-DECEASED|- DECEASED -|- DECEASED)',trimOrgName,'');
+		tmpCompany            := MAP(TRIM(TrimCompany,ALL) = TRIM(TrimFullName,ALL)=>'',
+		                             REGEXFIND('REAL,ESTATE',trimCompany)=>REGEXREPLACE('REAL,ESTATE',trimCompany,'REAL ESTATE'),
+		                             REGEXFIND(', LLC',trimCompany)=>REGEXREPLACE(', LLC',trimCompany,' LLC'),
+		                             REGEXFIND(', AND',trimCompany)=>REGEXREPLACE(', AND',trimCompany,' AND'),
+																 REGEXFIND(', INC',trimCompany)=>REGEXREPLACE(', INC',trimCompany,' INC'),
+																 REGEXFIND(', &',trimCompany)=>REGEXREPLACE(', &',trimCompany,' &'),
+																 REGEXFIND('OF,',trimCompany)=>REGEXREPLACE('OF,',trimCompany,'OF '),
+																 REGEXFIND(', OF',trimCompany)=>REGEXREPLACE(', OF',trimCompany,' OF'),
+																 REGEXFIND(', CORP',trimCompany)=>REGEXREPLACE(', CORP',trimCompany,' CORP'),
+																 REGEXFIND(', COMPANY',trimCompany)=>REGEXREPLACE(', COMPANY',trimCompany,' COMPANY'),
+																 TrimCompany);
+		ClnCompany            := REGEXREPLACE('(-CLOSED|- CLOSED -|- CLOSED| - CLOSED| CLOSED|\\(CLOSED\\)|-DECEASED|- DECEASED -|- DECEASED)',trimCompany,'');
+		 		
 		//Remove nickname
 		IndvName							:= IF(tempTypeCd = 'MD',ut.CleanSpacesAndUpper(ClnFullName),'');
 		FixNickName						:= REGEXREPLACE('\'',IndvName,'"');
@@ -138,16 +170,16 @@ EXPORT map_MSS0815_conversion(STRING pVersion) := FUNCTION
 		ParsedLastName				:= TRIM(ParsedName[46..65],LEFT,RIGHT);
 		Suffix	  						:= TRIM(ParsedName[66..70],LEFT,RIGHT);
 		ClnLastName						:= IF(NOT REGEXFIND('[ ]+',ParsedLastName),ParsedLastName,
-																IF((ParsedLastName+' '+Suffix)=TRIM(L.NAME_LAST,LEFT,RIGHT),ParsedLastName,   //Like Van Dyke
+																IF((ParsedLastName+' '+Suffix)=TRIM(TrimLastName,LEFT,RIGHT),ParsedLastName,   //Like Van Dyke
 																   REGEXFIND('(.*) (.*)', ParsedLastName, 2)));
 		ClnMidName						:= IF(NOT REGEXFIND('[ ]+',ParsedLastName),ParsedMidName,
-																IF((ParsedLastName+' '+Suffix)=TRIM(L.NAME_LAST,LEFT,RIGHT),ParsedMidName,   //Like Van Dyke
+																IF((ParsedLastName+' '+Suffix)=TRIM(TrimLastName,LEFT,RIGHT),ParsedMidName,   //Like Van Dyke
 																   ParsedMidName + ' ' + REGEXFIND('(.*) (.*)', ParsedLastName, 1)));
 		FirstName							:= IF(ParsedFirstName != '' AND LENGTH(ParsedLastName)!=1 AND TrimFullName[1] = ClnLastName[1],ParsedFirstName,
-		                            IF(TrimFirstName != '', TrimFirstName, ParsedLastName));
+		                            IF(TrimFirstName != '', TrimFirstName, ParsedFirstName));
 		MidName								:= IF(ClnMidName != '' AND LENGTH(ParsedLastName)!=1 AND TrimFullName[1] = ClnLastName[1],ClnMidName,
 		                            IF(TrimMidName != '', TrimMidName,ClnMidName));
-    GoodMidName           := REGEXREPLACE('(".*")',MidName,'');		
+    GoodMidName           := REGEXREPLACE('\\(.*\\)',REGEXREPLACE('(".*")',MidName,''),'');		
 		LastName							:= IF(ClnLastName != '' AND LENGTH(ParsedLastName)!=1 AND TrimFullName[1] = ClnLastName[1],ClnLastName,
 		                            IF(TrimLastName != '', TrimLastName,ParsedLastName));
 		SufxName              := IF(tmpSufxName != '',tmpSufxName,TRIM(ParsedName[66..70],LEFT,RIGHT));
@@ -166,13 +198,15 @@ EXPORT map_MSS0815_conversion(STRING pVersion) := FUNCTION
 																 REGEXFIND(DBApattern,tempOrgName) AND NOT REGEXFIND('(.*),(.*)',tempOrgName)=>STD.Str.CleanSpaces(REGEXREPLACE(DBApattern,tempOrgName,'')),
 																 STD.Str.CleanSpaces(tempOrgName));	
 
-		GetDBAName						:= MAP(REGEXFIND(DBApattern,tempOrgName) AND REGEXFIND('(.*);(.*)',tempOrgName)=>STD.Str.CleanSpaces(REGEXFIND('(.*);(.*)',tempOrgName,2)),
+    GetDBAName						:= MAP(REGEXFIND(DBApattern,tempOrgName) AND REGEXFIND('(.*);(.*)',tempOrgName)=>STD.Str.CleanSpaces(REGEXFIND('(.*);(.*)',tempOrgName,2)),
 																 REGEXFIND(DBApattern,tempOrgName) AND REGEXFIND('(.*,THE),(.*)',tempOrgName)=>STD.Str.CleanSpaces(REGEXFIND('(.*,THE),(.*)',tempOrgName,2)),
 																 REGEXFIND(DBApattern,tempOrgName) AND REGEXFIND('(.*,THE) (.*)',tempOrgName)=>STD.Str.CleanSpaces(REGEXFIND('(.*,THE) (.*)',tempOrgName,2)),
 		                             REGEXFIND(DBApattern,tempOrgName) AND REGEXFIND('(.*),(.*)',tempOrgName)=>STD.Str.CleanSpaces(REGEXREPLACE(DBApattern,REGEXFIND('(.*),(.*)',tempOrgName,2),'')),
 																 REGEXFIND(DBApattern,tempOrgName) AND NOT REGEXFIND('(.*),(.*)',tempOrgName)=>STD.Str.CleanSpaces(REGEXREPLACE(DBApattern,tempOrgName,'')),
-																 ut.CleanSpacesAndUpper(L.DBA));
-		
+																 REGEXFIND('(.*);(.*) DBA$',ClnCompany) => STD.Str.CleanSpaces(REGEXFIND('(.*);(.*) DBA$',ClnCompany,2)),
+																 REGEXFIND('(.*),(.*) DBA$',ClnCompany) => STD.Str.CleanSpaces(REGEXFIND('(.*),(.*) DBA$',ClnCompany,2)),
+																 REGEXFIND('(.*) DBA,(.*)$',ClnCompany) => STD.Str.CleanSpaces(REGEXFIND('(.*) DBA,(.*)$',ClnCompany,1)),
+																 ut.CleanSpacesAndUpper(TrimDBA));
 		//Clean and Standardize Org_Name
 		stdOrgSuffix					:= TRIM(Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(GetOrgName),LEFT,RIGHT);
 		getSuffix							:= TRIM(Prof_License_Mari.mod_clean_name_addr.GetCorpSuffix(stdOrgSuffix),LEFT,RIGHT);
@@ -239,7 +273,7 @@ EXPORT map_MSS0815_conversion(STRING pVersion) := FUNCTION
 		SELF.provnote_2				:= IF(tmpInactiveDate='','','INACTIVE DATE='+tmpInactiveDate2);
 		
 		SELF.ADDR_BUS_IND			:= IF(TRIM(L.CITY) != ' ','B','');
-		SELF.NAME_ORG_ORIG		:= ut.CleanSpacesAndUpper(L.NAME_FULL);
+		SELF.NAME_ORG_ORIG		:= TrimFullName;
 		SELF.NAME_FORMAT			:= 'L';
 
 		SELF.NAME_MARI_DBA	  := IF(SELF.NAME_DBA != ' ',STD.Str.CleanSpaces(REGEXREPLACE(' DBA',tmpNameDBA,'')),' ');
@@ -249,7 +283,7 @@ EXPORT map_MSS0815_conversion(STRING pVersion) := FUNCTION
 		TrimPhone_1             := StringLib.StringFilter(L.PHONE,'0123456789');
 		TrimPhone_Type_1        := MAP(ut.CleanSpacesAndUpper(L.PHONE_TYPE) = 'HOME'=> 'HOME PHONE',
 		                               ut.CleanSpacesAndUpper(L.PHONE_TYPE) = 'BUS'=> 'BUSINESS PHONE',
-																	 ut.CleanSpacesAndUpper(L.PHONE_TYPE) = 'CELL'=> 'CELL PHONE','');
+																	                ut.CleanSpacesAndUpper(L.PHONE_TYPE) = 'CELL'=> 'CELL PHONE','');
 		SELF.PHN_MARI_1				  := IF(TrimPhone_1 = '0000000000', '', ut.CleanPhone(TrimPhone_1)); //Business Phone
 		SELF.PHN_PHONE_1        := SELF.PHN_MARI_1;
 		
@@ -281,33 +315,25 @@ EXPORT map_MSS0815_conversion(STRING pVersion) := FUNCTION
 		IsCompany1            := NOT prof_license_mari.func_is_address(trimAddr1) AND prof_license_mari.func_is_company(trimAddr1) AND NOT REGEXFIND(AddressPattern,trimAddr1);
 		IsCompany2            := NOT prof_license_mari.func_is_address(trimAddr2) AND prof_license_mari.func_is_company(trimAddr1) AND NOT REGEXFIND(AddressPattern,trimAddr2);
 		
-		//This field is new starting from 20130304
-		tmpCompany            := MAP(TRIM(TrimCompany,ALL) = TRIM(TrimFullName,ALL)=>'',
-		                             REGEXFIND('REAL,ESTATE',trimCompany)=>REGEXREPLACE('REAL,ESTATE',trimCompany,'REAL ESTATE'),
-		                             REGEXFIND(', LLC',trimCompany)=>REGEXREPLACE(', LLC',trimCompany,' LLC'),
-		                             REGEXFIND(', AND',trimCompany)=>REGEXREPLACE(', AND',trimCompany,' AND'),
-																 REGEXFIND(', INC',trimCompany)=>REGEXREPLACE(', INC',trimCompany,' INC'),
-																 REGEXFIND(', &',trimCompany)=>REGEXREPLACE(', &',trimCompany,' &'),
-																 REGEXFIND('OF,',trimCompany)=>REGEXREPLACE('OF,',trimCompany,'OF '),
-																 REGEXFIND(', OF',trimCompany)=>REGEXREPLACE(', OF',trimCompany,' OF'),
-																 REGEXFIND(', CORP',trimCompany)=>REGEXREPLACE(', CORP',trimCompany,' CORP'),
-																 REGEXFIND(', COMPANY',trimCompany)=>REGEXREPLACE(', COMPANY',trimCompany,' COMPANY'),
-																 TrimCompany);
-    GoodCompany           := IF(prof_license_mari.func_is_address(trimCompany)= TRUE AND prof_license_mari.func_is_company(trimCompany)= FALSE,'',
-		                            tmpCompany);
+		//This field is new starting from 20130304                          														 
+    GoodCompany           := IF(prof_license_mari.func_is_address(clnCompany)= TRUE AND prof_license_mari.func_is_company(ClnCompany)= FALSE,'',
+		                            ClnCompany);
 		temp_OfficeName				:= MAP(GoodCompany<>'' => GoodCompany,
 		                             IsCompany1 => trimAddr1,
 																 IsCompany2 => trimAddr2,
 																 '');
 																 
-    GetOfficeName					:= MAP(NOT REGEXFIND(DBApattern,tempOrgName) AND REGEXFIND('(.*);(.*)',tempOrgName)=>STD.Str.CleanSpaces(REGEXFIND('(.*);(.*)',tempOrgName,2)),	                             
-																 REGEXFIND(DBApattern,temp_OfficeName) AND REGEXFIND(';',temp_OfficeName)=>STD.Str.CleanSpaces(REGEXFIND('(.*);(.*)',temp_OfficeName,1)),
-		                             REGEXFIND(DBApattern,temp_OfficeName) AND REGEXFIND(',',temp_OfficeName)=>STD.Str.CleanSpaces(REGEXFIND('(.*), (.*)',temp_OfficeName,1)),
+    GetOfficeName					:= MAP(NOT REGEXFIND(DBApattern,tempOrgName) AND REGEXFIND('(.*);(.*)',tempOrgName)=>STD.Str.CleanSpaces(REGEXFIND('(.*);(.*)',tempOrgName,2)),	 
+		                             REGEXFIND('(.*);(.*) DBA$',temp_OfficeName) => REGEXFIND('(.*);(.*) DBA$',temp_OfficeName,1),
+																 REGEXFIND('(.*),(.*) DBA$',temp_OfficeName) => REGEXFIND('(.*),(.*) DBA$',temp_OfficeName,1),
+																 REGEXFIND('(.*) DBA,(.*)$',temp_OfficeName) => REGEXFIND('(.*) DBA,(.*)$',temp_OfficeName,2),
+                                 REGEXFIND(DBApattern,temp_OfficeName) AND REGEXFIND(';',temp_OfficeName)=>STD.Str.CleanSpaces(REGEXFIND('(.*);(.*)',temp_OfficeName,1)),
+		                             REGEXFIND(DBApattern,temp_OfficeName) AND REGEXFIND(',',temp_OfficeName)=>STD.Str.CleanSpaces(REGEXFIND('(.*),(.*)',temp_OfficeName,1)),
 																 REGEXFIND(DBApattern,temp_OfficeName) AND NOT REGEXFIND(',',temp_OfficeName)=>Prof_License_Mari.mod_clean_name_addr.GetCorpName(temp_OfficeName),
-																 TRIM(GetOrgName,ALL) = TRIM(temp_OfficeName) =>'',	
+																 REGEXFIND(DBApattern,temp_OfficeName) => Prof_License_Mari.mod_clean_name_addr.GetDBAName(temp_OfficeName),
+		                             TRIM(GetOrgName,ALL) = TRIM(temp_OfficeName) => '',	
 																 STD.Str.CleanSpaces(temp_OfficeName)
-																);																	 
-																 
+																);						
 	  std_officename		    := MAP(GetOfficeName=''=> '',
 		                             GetOfficeName = GetOrgName => '',
 																 Prof_License_Mari.mod_clean_name_addr.strippunctMisc(Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(GetOfficeName)));
@@ -336,11 +362,11 @@ EXPORT map_MSS0815_conversion(STRING pVersion) := FUNCTION
 		                            STD.Str.CleanSpaces(REGEXREPLACE('/',GetOrgName,' ')),
 		                            TRIM(SELF.NAME_OFFICE,LEFT,RIGHT));
 
-
 		//Use address cleaner to clean address
 		trimCity						:= ut.CleanSpacesAndUpper(L.CITY);
 		trimState						:= ut.CleanSpacesAndUpper(L.STATE);
-		tmpZip	            := MAP(LENGTH(TRIM(L.ZIP))=3 => '00'+TRIM(L.ZIP),LENGTH(TRIM(L.ZIP))=4 => '0'+TRIM(L.ZIP),TRIM(L.ZIP));
+		trimzip             := REGEXREPLACE('-',ut.CleanSpacesAndUpper(L.ZIP),'');
+		tmpZip	            := MAP(LENGTH(trimzip)=3 => '00'+trimzip,LENGTH(trimzip)=4 => '0'+trimzip,trimzip);
   		
 	  //Extract company name
 		clnAddress1						:= TRIM(Prof_License_Mari.mod_clean_name_addr.removeNameFromAddr(trimAddr1, RemovePattern));
@@ -355,7 +381,7 @@ EXPORT map_MSS0815_conversion(STRING pVersion) := FUNCTION
 		SELF.ADDR_STATE_1		  := trimState;
 		SELF.ADDR_ZIP5_1		  := tmpZip[1..5];
 		SELF.ADDR_ZIP4_1		  := tmpZip[6..9];
-		SELF.ADDR_CNTY_1			:= STD.Str.ToUpperCase(TRIM(L.COUNTY,LEFT,RIGHT));
+		SELF.ADDR_CNTY_1			:= STD.Str.ToUpperCase(TRIM(L.COUNTY_NAME,LEFT,RIGHT));
 		
 		// SELF.PROVNOTE_1				:= 'DEPARTMENT: ' + ut.fnTrim2Upper(L.DEPARTMENT);
 		

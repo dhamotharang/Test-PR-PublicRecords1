@@ -1,5 +1,5 @@
-
-import header,codes,did_add,didville,ut,header_slimsort,watchdog,doxie_files,roxiekeybuild,Risk_Indicators,doxie, death_master;
+﻿
+import header,codes,did_add,didville,ut,header_slimsort,watchdog,doxie_files,roxiekeybuild,Risk_Indicators,doxie, death_master,Scrubs_Risk_Indicators,Orbit3;
 
 export proc_RiskIndicator_buildkey(string filedate) := function
   #uniquename(version_date)
@@ -232,10 +232,14 @@ full1 := 	sequential(	parallel(a1,a2,a3,a4,a5,a7,a9,a10,a11,a12,a13,a14,a15,a16,
 
 	move_qa	:=	parallel(move1,move2,move3,move4,move5,move7,move9,move10,move11,move12,move13,move14,move15,move16,move17,move18,move19,move20,move21,move22,move23,move24,move25,move26,move27);
                        
-    UpdateRoxiePage := RoxieKeybuild.updateversion('RiskTableKeys',filedate,'Michael.Gould@lexisnexis.com',,'N|BN');
-		UpdateFCRARoxiePage := RoxieKeybuild.updateversion('FCRA_RiskTableKeys',filedate,'Michael.Gould@lexisnexis.com',,'F');
+//// Please do not add automatic update of DOPS 
+
+//  Build Orbit entry with Build In Progress status
 
 
-return sequential(full1,move_qa/*,parallel(UpdateRoxiePage,UpdateFCRARoxiePage)*/);
+   oRiskIndicator       := Orbit3.proc_Orbit3_CreateBuild_AddItem ('Risk Indicator', filedate,'N', ,true,true);  
+	 oFcra_Risk_Indicator := Orbit3.proc_Orbit3_CreateBuild_AddItem ('FCRA_Risk_Indicator',filedate,'F', ,true,true);   
+
+return sequential(full1,move_qa,Scrubs_Risk_Indicators.fn_GenerateStats(filedate),Scrubs_Risk_Indicators.fn_RunScrubs(filedate,''),oRiskIndicator,oFcra_Risk_Indicator);
 END;				
 									

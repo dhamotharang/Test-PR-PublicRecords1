@@ -1,10 +1,10 @@
-﻿import crim_common,did_add,didville,header,header_slimsort,ut,watchdog, address,nid, AID,AID_Support;
-
-def 	:= sort(distribute(hygenics_crim.file_in_defendant(statecode not in ['NC','PA','OR']),hash(recordid)), recordid, local);
-ah		:= dedup(sort(distribute(hygenics_crim.file_in_addresshistory(statecode not in ['NC','PA','OR']),hash(recordid)), recordid, local), record);
-aka	  := dedup(sort(distribute(hygenics_crim.file_in_alias(statecode not in ['NC','PA','OR']),hash(recordid)), recordid, local), record);
-off 	:= dedup(sort(distribute(hygenics_crim.file_in_offense(statecode not in ['NC','PA','OR']),hash(recordid)), recordid, local), record);
-
+﻿import crim_common,did_add,didville,header,header_slimsort,ut,watchdog, address,nid;
+def 	:= sort(distribute(hygenics_crim.file_in_defendant(statecode not in ['NC','PA','OR'] ),hash(recordid,sourceid)), recordid,sourceid, local);
+ah		 := dedup(sort(distribute(hygenics_crim.file_in_addresshistory(statecode not in ['NC','PA','OR'] ),hash(recordid,sourceid)), recordid,sourceid, local), record);
+aka	 := dedup(sort(distribute(hygenics_crim.file_in_alias(statecode not in ['NC','PA','OR'] ),hash(recordid,sourceid)), recordid,sourceid, local), record);
+off 	:= dedup(sort(distribute(hygenics_crim.file_in_offense(statecode not in ['NC','PA','OR'] ),hash(recordid,sourceid)), recordid,sourceid, local), record);
+// output(def( recordid ='MTCOR985'));				
+// output(ah( recordid ='MTCOR985'));	
 	slimOffense_rec := RECORD 
 		off.recordid;
 		off.statecode;
@@ -14,6 +14,7 @@ off 	:= dedup(sort(distribute(hygenics_crim.file_in_offense(statecode not in ['N
 		off.Casetype;
 		off.Fileddate;
 		off.Courtname;
+		off.sourceid;
 	end;
 
 	slimOffense_rec slimOff(off l):= transform
@@ -38,7 +39,7 @@ slim_off := project(off, slimOff(left),local);
 
 def_with_alias := join(def, aka,
 		left.recordid=right.recordid and 
-		left.statecode=right.statecode,
+		left.sourceid=right.sourceid,
 		join_def_alias(left,right),local,nosort);
 
 all_names 				:= def_with_alias + def;// :persist ('~thor_data200::persist::crim::aoc::offender_all_names');
@@ -46,35 +47,44 @@ all_names 				:= def_with_alias + def;// :persist ('~thor_data200::persist::crim
 // all_unique_names		    := distribute(all_names, hash(recordid));
 all_unique_names_dedup	:= dedup(sort(all_names, record,local), record,local);
 
-	def join_def_ah(def l, ah r) := transform 
+//Adding a flag to be used for sort below to ensure that the def address gets selected when available
+temp_layout :=record
+def;
+string sortflag := '';
+end;
+
+	temp_layout join_def_ah(def l, ah r) := transform 
+	  self.sortflag := 'H';
 	  self := r;
 	  self := l;
 	end;
-
+ 
 	def_with_ahist := join(all_unique_names_dedup, ah,
 		left.recordid=right.recordid and 
-		left.statecode=right.statecode,
+		left.sourceid=right.sourceid,
 		join_def_ah(left,right),local,nosort);
 		
-all_names_addresses := def_with_ahist+ all_unique_names_dedup;
+		
+all_names_addresses := def_with_ahist+ 
+                       project(all_unique_names_dedup,transform(temp_layout,self:=Left; self.sortflag := 'P'));
 
 	layout_temp_offender addrPop(all_names_addresses l):= transform
 		self.street_address_1 := if(regexfind('[A-Z]+', stringlib.stringtouppercase(l.street), 0)<>'',
 									              trim(l.street+if(l.unit<>'', ' '+l.unit, ''), left, right),
 									              '');
 		self.street_address_2 := _functions.CleanAddress(l.city+', '+l.orig_state+' '+l.orig_zip);
-		// self.append_Rawaid := 0;
+		self.name_type_hd     := L.sortflag; // use this field temporarily to store the sort flag. It gets overwritten later.
 		self := l;
 		self := [];
 	end;
 
 addrProject 	:= project(all_names_addresses, addrPop(left),local);
-
+// output(addrProject( recordid ='MTCOR985'));
 //Rollup Addresses
-sorted_rcommon	:= sort(distribute(addrProject, hash(recordid)), recordid, statecode, name, dob,  
+sorted_rcommon	:= sort(distribute(addrProject, hash(recordid,sourceid)), recordid, sourceid, name, dob,-name_type_hd,  
 						            -street, -unit, -city, -orig_state, -orig_zip,
 						            -street_address_1, -street_address_2,local);
-						
+// output(sorted_rcommon( recordid ='MTCOR985'));						
 sorted_rcommon rollupCrim(sorted_rcommon L, sorted_rcommon R) := TRANSFORM
 	self.street						  := if(l.street = '', r.street, l.street);
 	self.unit						    := if(l.unit = '', r.unit, l.unit);
@@ -88,12 +98,12 @@ END;
 
 rollupAddrOut := ROLLUP(sorted_rcommon,
                         left.recordid = right.recordid and 
-						            trim(left.statecode) = trim(right.statecode) and 
+						            trim(left.sourceid) = trim(right.sourceid) and 
 						            trim(left.name) = trim(Right.name) and 
 						            trim(left.dob) = trim(Right.dob), 
 						            rollupCrim(LEFT,RIGHT)) ;
 						 
-
+// output(rollupAddrOut( recordid ='MTCOR985'));
 //Address Cleaner	
 layout_temp_offender clean_name_add (rollupAddrOut l) := transform
  self.j_RecordID 			:= l.recordid;
@@ -120,7 +130,7 @@ cleanAddress := hygenics_crim._fns_AddressCleaner(cleanAddress_prep):persist ('~
   with_ssn			:= all_clean_name_addr ;
 
 
-sort_with_ssn := distribute(with_ssn, hash(recordid)); //dedup(sort(distribute(with_ssn, hash(recordid)), recordid, local), record, local); VC
+sort_with_ssn := distribute(with_ssn, hash(recordid,sourceid)); //dedup(sort(distribute(with_ssn, hash(recordid)), recordid, local), record, local); VC
 sort_slim_off := slim_off ; //dedup(sort(distribute(slim_off, hash(recordid)), recordid, local), record, local);VC
 
 Layout_almostfinal_offender := record
@@ -334,7 +344,7 @@ end;
 
 result_comm := join(sort_slim_off, sort_with_ssn, 
 					              left.recordid=right.recordid 
-					          and left.statecode=right.statecode,
+					          and left.sourceid=right.sourceid,
 					          to_crim_offender(left,right), 
 					          local, right outer);//:persist ('~thor_data200::persist::crim::aoc::offender_all');
 
@@ -352,14 +362,14 @@ end;
 
 result_aliases := join(result_common1(pty_typ ='2'),result_common1(pty_typ ='0'), 
 					             left.recordid = right.recordid and 
-								       left.state_origin = right.state_origin and
-								       left.case_number = right.case_number and 
-								       (left.case_filing_dt = right.case_filing_dt or (left.case_filing_dt ='' and right.case_filing_dt ='')),
+								          left.state_origin = right.state_origin and
+								          left.case_number = right.case_number and 
+								         (left.case_filing_dt = right.case_filing_dt or (left.case_filing_dt ='' and right.case_filing_dt ='')),
 					             transferkey(left,right), 
 					             local);
 
 result_common2 := project(result_common1(pty_typ ='0'),hygenics_crim.Layout_Common_Crim_Offender_orig)+result_aliases;	
-// output(result_common2(vendor = 'VB' and case_number in ['711GC0801962000','711GC0301647000']));					
+// output(result_common2(vendor = '10E' and recordid ='MTCOR985'));					
 //REMOVE RECORDS WITH NO VENDOR CODE ASSIGNED//////////////////////
 
 //Rollup Other Fields

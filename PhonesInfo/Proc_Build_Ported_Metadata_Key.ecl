@@ -1,7 +1,4 @@
-/*2017-06-03T01:15:16Z (Judy Tao)
-DF-19364
-*/
-import _control, Doxie, PromoteSupers, RoxieKeyBuild, std, ut, Orbit3, Scrubs_PhonesInfo,buildLogger;
+﻿import _control, Dops, Doxie, PromoteSupers, RoxieKeyBuild, std, ut, Orbit3, Scrubs_PhonesInfo,buildLogger;
 
 EXPORT Proc_Build_Ported_Metadata_Key(string version):= function
 
@@ -59,8 +56,8 @@ EXPORT Proc_Build_Ported_Metadata_Key(string version):= function
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 //Update DOps Page///////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	dopsUpdate 		:= Roxiekeybuild.updateversion('PhonesMetadataKeys', version, 'charlene.ros@lexisnexisrisk.com,judy.tao@lexisnexisrisk.com,gregory.rose@lexisnexisrisk.com,darren.knowles@lexisnexisrisk.com',,'N');
-	 
+	dopsUpdate 		:= dops.updateversion('PhonesMetadataKeys', version, 'charlene.ros@lexisnexisrisk.com,judy.tao@lexisnexisrisk.com,gregory.rose@lexisnexisrisk.com,darren.knowles@lexisnexisrisk.com',,'N');
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 //Update Orbit///////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -70,51 +67,52 @@ EXPORT Proc_Build_Ported_Metadata_Key(string version):= function
 //Run Strata Stats///////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	PhonesInfo.Out_STRATA_Population_Stats(PhonesInfo.File_TCPA.Main_Current,
-																				 PhonesInfo.File_iConectiv.Main_Current,
-																				 PhonesInfo.File_LIDB.Response_Processed,
-																				 PhonesInfo.File_Deact.Main_Current,
-																				 PhonesInfo.File_Metadata.PortedMetadata_Main,
-																				 PhonesInfo.File_Source_Reference.Main,
-																				 version,
-																				 buildStrata
-																				 );
+																																							 PhonesInfo.File_iConectiv.Main_Current,
+																																							 PhonesInfo.File_LIDB.Response_Processed,
+																																							 PhonesInfo.File_Deact_GH.Main_Current,
+																																							 PhonesInfo.File_Deact.Main_Current2,
+																																							 PhonesInfo.File_Metadata.PortedMetadata_Main,
+																																							 PhonesInfo.File_Source_Reference.Main,
+																																							 version,
+																																							 buildStrata
+																																							 );
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 //Run Scrub Reports//////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////																				 
 	ScrubsRuns	:= sequential(Scrubs_PhonesInfo.RawFileScrubs(version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'), 
-															Scrubs_PhonesInfo.IndividualBaseFileScrubs(version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'),
-															Scrubs_PhonesInfo.PostBuildScrubs(version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'),
-															Scrubs_PhonesInfo.ScrubsProcessLIDB_Current(version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'),
-															Scrubs_PhonesInfo.ScrubsProcessLIDB_Received(version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'),
-															Scrubs_PhonesInfo.ScrubsProcessLIDB_Processed(version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'),
-															);
+																										Scrubs_PhonesInfo.IndividualBaseFileScrubs(version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'),
+																										Scrubs_PhonesInfo.PostBuildScrubs(version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'),
+																										Scrubs_PhonesInfo.ScrubsProcessLIDB_Current(version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'),
+																										Scrubs_PhonesInfo.ScrubsProcessLIDB_Received(version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'),
+																										Scrubs_PhonesInfo.ScrubsProcessLIDB_Processed(version, _control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'),
+																										);
 															
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 //Run Build & Send Notification Emails///////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	sendEmail		:= sequential(BuildLogger.BuildStart(false),
-															BuildLogger.PrepStart(false),
-															BuildLogger.PrepEnd(false),
-															BuildLogger.BaseStart(False),
-																buildComBase, 
-															BuildLogger.BaseEnd(False),
-																clearDelete, 
-																moveComBase, 
-															BuildLogger.KeyStart(false), 
-																bkPhonesPortedmetadata, mvBltPhonesPortedmetadata, mvQAPhonesPortedmetadata,
-																bkPhonesMetadataCarrierName, mvBltPhonesMetadataCarrierName, mvQAPhonesMetadataCarrierName, 
-															BuildLogger.KeyEnd(false),
-															BuildLogger.PostStart(False),
-																dopsUpdate, 
-																buildStrata, 
-																Sample_PhonesMetadata, 
-																ScrubsRuns,
-															BuildLogger.PostEnd(False),
-														BuildLogger.BuildEnd(false) /*orbitUpdate*/):
-														Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com', 'PhonesInfo Ported & Metadata Key Build Succeeded', workunit + ': Build complete.')),
-														Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com', 'PhonesInfo Ported & Metadata Key Build Failed', workunit + '\n' + FAILMESSAGE)
-														);
+																										BuildLogger.PrepStart(false),
+																										BuildLogger.PrepEnd(false),
+																										BuildLogger.BaseStart(False),
+																											buildComBase, 
+																										BuildLogger.BaseEnd(False),
+																											clearDelete, 
+																											moveComBase, 
+																										BuildLogger.KeyStart(false), 
+																											bkPhonesPortedmetadata, mvBltPhonesPortedmetadata, mvQAPhonesPortedmetadata,
+																											bkPhonesMetadataCarrierName, mvBltPhonesMetadataCarrierName, mvQAPhonesMetadataCarrierName, 
+																										BuildLogger.KeyEnd(false),
+																										BuildLogger.PostStart(False),
+																											dopsUpdate, 
+																											buildStrata, 
+																											Sample_PhonesMetadata, 
+																											ScrubsRuns,
+																										BuildLogger.PostEnd(False),
+																										BuildLogger.BuildEnd(false)):
+																									Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' /*+ ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'*/, 'PhonesInfo Ported & Metadata Key Build Succeeded', workunit + ': Build complete.')),
+																									Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' /*+ ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com'*/, 'PhonesInfo Ported & Metadata Key Build Failed', workunit + '\n' + FAILMESSAGE)
+																									);
 	return sendEmail;														
 
 END;

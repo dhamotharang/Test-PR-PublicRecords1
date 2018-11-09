@@ -1,9 +1,9 @@
-IMPORT _control,lib_fileservices,Address;
+﻿IMPORT _control,lib_fileservices,Address;
 //This file is copied from Spray_Experian. It reads the input directory and sprays all files in the directory to the target
 //location. The input files are with txt extention and delimited by tab.
 EXPORT Spray_Infutor_Vin(string	pProcessDate,
 	                       string	pFileDate     ='',
-												 string	pGroupName	  =	'thor400_60',
+												 string	pGroupName	  =	'thor400_36',
 												 boolean	pOverwrite	=	true
 											)	:=
 FUNCTION

@@ -1,8 +1,10 @@
-export IPAddress 
+﻿export IPAddress 
  :=
   module
-	export  string  bctlpedata10    :=  'bctlpedata10.risk.regn.net';     // 10.121.149.192
-	export  string  bctlpedata11    :=  'bctlpedata11.risk.regn.net';     // 10.121.149.193
+	/*export  string  bctlpedata10    :=  'bctlpedata10.risk.regn.net';     // 10.121.149.192
+	export  string  bctlpedata11    :=  'bctlpedata11.risk.regn.net';     // 10.121.149.193*/
+	export  string  bctlpedata10    :=  'uspr-edata10.risk.regn.net';     // 10.121.149.192 (primary - bctlpedata10); 10.195.76.30 (secondary - alalpedata10)
+ 	export  string  bctlpedata11    :=  'uspr-edata11.risk.regn.net';     // 10.121.149.193 (primary - bctlpedata11); 10.195.76.31 (secondary - alalpedata11)
 	export  string  bctlpedata12    :=  'bctlpedata12.risk.regn.net';     // 10.121.149.194
 	export	string	edata10			    :=	'edata10-bld.br.seisint.com';			// 10.150.13.201
 	export	string	edata11			    :=	'edata11-bld.br.seisint.com';			// 10.150.12.242
@@ -19,13 +21,13 @@ export IPAddress
 	export  string  prodlz          := '10.194.64.250';
 	export	string	dataland_esp	  :=	'dataland_esp.br.seisint.com';			// 10.173.29.160
 	export	string	dataland_dali	  :=	'dataland_dali.br.seisint.com';			// 10.173.28.12
-	export	string	adataland_esp	  :=	'10.194.10.2';			// 10.173.29.160
-	export	string	adataland_dali	:=	'10.194.10.1';			// 10.173.28.12	
+	export	string	adataland_esp	  :=	'alpha_dev_thor_esp.risk.regn.net';			// 10.173.29.160
+	export	string	adataland_dali	:=	'alpha_dev_thor_dali.risk.regn.net';			// 10.173.28.12	
 	export	string	dataland_sasha	:=	'10.173.65.201';						// No br domain DNS entry
 	
 	export	string	alpharetta_poc_thor	:=	'10.194.10.5';
-	export	string	aprod_thor_esp	    :=	'10.194.12.2';				// 10.173.84.202
-	export	string	aprod_thor_dali	    :=	'10.194.12.1';				// 10.173.84.201
+	export	string	aprod_thor_esp	    :=	'alpha_prod_thor_dali.risk.regn.net';				// 10.173.84.202
+	export	string	aprod_thor_dali	    :=	'alpha_prod_thor_dali.risk.regn.net';				// 10.173.84.201
 	export	string	prod_thor_esp	      :=	'prod_esp.br.seisint.com';				// 10.173.84.202
 	export	string	prod_thor_dali	    :=	'prod_dali.br.seisint.com';				// 10.173.84.201
 	export	string	prod_thor_sasha	    :=	'10.173.85.204';						// No br domain DNS entry

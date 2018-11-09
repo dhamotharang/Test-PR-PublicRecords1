@@ -1,4 +1,5 @@
-export macRecordSuppression(inDS, outDS, inphone) := macro // person suppressions only
+﻿export macRecordSuppression(inDS, outDS, inphone) := macro // person suppressions only
+import dops;
 
 #UNIQUENAME(SuppressionLayout)
 #UNIQUENAME(phone)
@@ -38,8 +39,9 @@ end;
   Create as many records as needed for the suppression.
   Matches by name and number first, then will try name and address */
   
-%SuppressionDS% := dataset([ /* LIST TO SUPPRESS - enter fields the same way they appear in gong, gong history, and master */
-														{'name_prefix','name_first','name_middle','name_last','name_suffix','phone','prim_range','predir','prim_name','suffix','postdir','unit_desig','sec_range','p_city_name','v_city_name','st','z5'},
+dops.SuppressRecords.GetRecords(%SuppressionLayout%,'gong',,,,%SuppressionDS%);
+//%SuppressionDS% := dataset([ /* LIST TO SUPPRESS - enter fields the same way they appear in gong, gong history, and master */
+														/*{'name_prefix','name_first','name_middle','name_last','name_suffix','phone','prim_range','predir','prim_name','suffix','postdir','unit_desig','sec_range','p_city_name','v_city_name','st','z5'},
 														{'','david','','souter','','','530','','N','','','','','washington','washington','dc','20024'},
 														{'','j','r','rosa','','','','','sweet clover','','','','','','','','89509'},
 														{'','david','','elwood','','3369982510','','','','','','','','','','',''},
@@ -57,7 +59,7 @@ end;
 														{'MR','David','H','Souter','','','','','','','','','','WEARE','WEARE','NH','03281'},
 														{'MR','David','H','Souter','','','','','','','','','','WEARE','EAST WEARE','NH','03281'},
 														{'MR','David','H','Souter','','','','','','','','','','WEARE','EAST WEARE','NH','03281'}
-														], %SuppressionLayout%); 
+														], %SuppressionLayout%); */
 
 %StandarizeField%(string %inField%) := stringlib.stringtouppercase(trim(%inField%, left, right));
 

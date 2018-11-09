@@ -1,4 +1,4 @@
-IMPORT doxie, codes, fcra, ut, FFD;
+﻿IMPORT doxie, codes, fcra, ut, FFD;
 
 EXPORT get_watercraft(dataset(WatercraftV2_Services.Layouts.search_watercraftkey) in_watercraftkeys, 
 											string in_ssn_mask_type = '',
@@ -92,12 +92,12 @@ EXPORT get_watercraft(dataset(WatercraftV2_Services.Layouts.search_watercraftkey
 														(left.sequence_key = right.sequence_key) and
 														(dateVal=0 or (unsigned3) right.purchase_date[1..6] <= dateVal),
 														get_main (left, right), left outer);
-				
-			layout_report_w_extra_info fullrecroll(layout_report_w_extra_info l,dataset(layout_report_w_extra_info) r)
+		
+		layout_report_w_extra_info fullrecroll(layout_report_w_extra_info l,dataset(layout_report_w_extra_info) r)
 				:=transform
+				self.lienholders := choosen(Normalize(r,left.lienholders,Transform(RIGHT)),ut.limits.MAX_WATERCRAFT_LH);
+				self.engines := choosen(Normalize(r,left.engines,Transform(RIGHT)),ut.limits.MAX_WATERCRAFT_ENGINES);
 				
-				self.lienholders := choosen(r.lienholders,ut.limits.MAX_WATERCRAFT_LH);
-				self.engines := choosen(r.engines,ut.limits.MAX_WATERCRAFT_ENGINES);
 				self :=l;   // we only need the owners from the left side because every record to be rolled up will have
 										// the same owners
 			END;

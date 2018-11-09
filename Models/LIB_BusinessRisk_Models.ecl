@@ -1,4 +1,4 @@
-/*2016-01-25T19:36:17Z (laura Weiner_prod)
+﻿/*2016-01-25T19:36:17Z (laura Weiner_prod)
 Pass boca shell into SBBM model
 */
 // This MODULE EXPORTs all of our BusinessRisk model calls.  By doing this, each library 
@@ -26,7 +26,8 @@ EXPORT LIB_BusinessRisk_Models(
 	EXPORT TurnOnValidation := FALSE; // When TRUE allows for Layout_Debug to be OUTPUT from SmallBusiness_BIP_Service
 	// EXPORT TurnOnValidation := TRUE; // When TRUE allows for Layout_Debug to be OUTPUT from SmallBusiness_BIP_Service
 
-	EXPORT ValidatingModel := Models.SBBM1601_0_0(busShell, bocaShell); // Change this to the model you are trying to validate	
+	EXPORT ValidatingModel := Models.SLBO1702_0_2(busShell); // Change this to the model you are trying to validate	
+	// EXPORT ValidatingModel := Models.SLBB1702_0_2(busShell, bocaShell); // Change this to the model you are trying to validate	
 
 	// The calcIndex function returns the 'billing_index' given the report_option
 	// value. billing_index is needed by batch.  it is passed to the ESP logging
@@ -46,8 +47,13 @@ EXPORT LIB_BusinessRisk_Models(
 	EXPORT BusinessRisk_Models := 
 			DATASET([ // Model Name    |  Output Name  |  Model Index  | Model Type
 								//       v       |       v       |       v       |    v
-									{'SBBM1601_0_0', 'SBBM1601_0_0', calcIndex( 46), '0-999'}, // TODO: pass a valid value to calcIndex()
-									{'SBOM1601_0_0', 'SBOM1601_0_0', calcIndex( 47), '0-999'}, // TODO: pass a valid value to calcIndex()
+									{'SBBM1601_0_0', 'SBBM1601_0_0', calcIndex( 46), '0-999'}, //blended
+									{'SBOM1601_0_0', 'SBOM1601_0_0', calcIndex( 47), '0-999'}, //not blended
+									// We don't think the above 2 models are actually being used or reported to anyone except here.
+									// FCRA uses logger which requires the calcIndex. For future (nonFCRA) models, we don't need to use calcIndex(). We can use the same value
+									// that is housed in ESP.
+									{'SLBB1702_0_2', 'SLBB1702_0_2', 5, '0-999'}, //blended
+									{'SLBO1702_0_2', 'SLBO1702_0_2', 6, '0-999'}, //not blended
 								// ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
 									{'SBBM9999_9'  , 'SBBM9999_9'  , 0             , '0-999'},
 									{'SBOM9999_9'  , 'SBOM9999_9'  , 0             , '0-999'}
@@ -62,6 +68,8 @@ EXPORT LIB_BusinessRisk_Models(
 											// -------------------------------- FLAGSHIP MODELS ---------------------------------
 											'SBBM1601_0_0' => UNGROUP(Models.SBBM1601_0_0(busShell, bocaShell)),
 											'SBOM1601_0_0' => UNGROUP(Models.SBOM1601_0_0(busShell)),
+											'SLBB1702_0_2' => UNGROUP(Models.SLBB1702_0_2(busShell, bocaShell)),
+											'SLBO1702_0_2' => UNGROUP(Models.SLBO1702_0_2(busShell)),
 											// ----------------------------------------------------------------------------------
 											// --------------------------------- CUSTOM MODELS ----------------------------------
 

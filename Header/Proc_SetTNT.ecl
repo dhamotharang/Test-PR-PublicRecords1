@@ -1,8 +1,6 @@
-import mdr, PromoteSupers;
+﻿import mdr, PromoteSupers;
 
 chk_rids := if(mdr.MAX_RID > 700000000000, fail('MAX RID is approaching or past max capacity - string12.  TS(7) TU RIDs also begin with 8.'));
-
-chk_build := output('Checking input files...') : success(inputs_set(FALSE));
 
 outhead := distribute(header.Last_Rollup,hash(did));
 

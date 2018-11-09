@@ -1,4 +1,4 @@
-IMPORT Data_Services, lib_StringLib;
+﻿IMPORT Data_Services, lib_StringLib;
 	Incidents := FLAccidents_Ecrash.IncidentsAfterSuppression(Source_id IN ['EA','TM','TF'] );
 
 	// Suppress the DE records basing on the drivers_exchange_flag in the agency file. 
@@ -56,8 +56,9 @@ IMPORT Data_Services, lib_StringLib;
 	IncidentsAfterTMTF	:= 	CleanIncidents(report_code IN ['EA']) + Jn_TM_Reports  + TFReports :INDEPENDENT;
 
 	//Meow Key
+	
 
-	iMeowKey 							:= INDEX(DATASET([],FLAccidents_Ecrash.Layout_VehIncidents.MeowLayout),{idfield}, {FLAccidents_Ecrash.Layout_VehIncidents.MeowLayout -{idfield}}, '~foreign::10.194.12.1::thor_data400::key::ecrash_cru::qa::idfield::meow');
+	iMeowKey 							:= INDEX(DATASET([],FLAccidents_Ecrash.Layout_VehIncidents.MeowLayout),{idfield}, {FLAccidents_Ecrash.Layout_VehIncidents.MeowLayout -{idfield}}, '~foreign::'+Constants.alpha_ip+'::thor_data400::key::ecrash_cru::qa::idfield::meow');
 			 
 	MeowKey 							:= DISTRIBUTE(PULL(iMeowKey(report_code IN ['EA','TM','TF'])),HASH32(vehicle_incident_id));
 		

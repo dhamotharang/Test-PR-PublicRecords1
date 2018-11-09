@@ -1,4 +1,4 @@
-EXPORT FirstNames2 := DATASET([         
+﻿EXPORT FirstNames2 := DATASET([         
                                         
 {'AFERDITA','F'},                                
 {'AFOLAKE','F'},
@@ -184,8 +184,10 @@ EXPORT FirstNames2 := DATASET([
 {'DAMARIOUS','M'},
 {'DALVIN','M'},
 {'DENNYS','M'},
+{'DEASION','M'},
 {'DEPAYNE','F'},
 {'DONTA','M'},
+{'DUSTYN','M'},
 {'DUSTION','M'},
 {'DYEANN', 'F'},
 {'DYLANN','M'},
@@ -211,6 +213,7 @@ EXPORT FirstNames2 := DATASET([
 {'JAMEIS','M'},                                       
 {'JAYLA','F'},    
 {'JAYRON','M'},    
+{'JULINE','F'},    
 {'KARISTA','F'},                        
 {'KATERINE','F'},            
 {'KEDRA','F'},
@@ -221,6 +224,7 @@ EXPORT FirstNames2 := DATASET([
 {'LATRELL','M'},                                 
 {'LENOA','F'},                
 {'LEWIS','M'},
+{'LIDIA','F'},                
 {'LILYA','F'},                
 {'LINDITA','F'},
 {'LUCIANE','F'},                
@@ -231,6 +235,7 @@ EXPORT FirstNames2 := DATASET([
 {'NARDIA','F'},
 {'NEVENKA','F'}, 
 {'OSEAS','M'},                                
+{'PATINA','F'},
 {'ROSALI','F'},
 {'ROSEMARI','F'},            
 {'ROZINA','F'},                                  
@@ -238,6 +243,7 @@ EXPORT FirstNames2 := DATASET([
 {'PAGONA','F'},                
 {'ROSE-MARIE','F'},          
 {'SAMORA','F'},
+{'SCHAMECHE','M'},                                                                                                                                       
 {'SHANEL','F'},              
 {'SHAWUN','M'},              
 {'SHPRESA','F'},                                 
@@ -254,6 +260,7 @@ EXPORT FirstNames2 := DATASET([
 {'VJOLLCA','F'},                                 
 {'VONLEY','F'},
 {'VONNY','F'},
+{'YOANDY','M'},
 {'ZAYVION','M'},
 
 // African (Nigerian) first names

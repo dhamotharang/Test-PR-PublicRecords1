@@ -1,4 +1,4 @@
-IMPORT SALT33,ut,std;
+﻿IMPORT SALT33,ut,std;
 EXPORT Key_Classify_PS_VIN := MODULE
  
 //VIN:?:LNAME:+:P_CITY_NAME
@@ -57,8 +57,8 @@ EXPORT ScoredEID_HASHFetch(TYPEOF(h.VIN) param_VIN = (TYPEOF(h.VIN))'',TYPEOF(h.
   RawData := RawFetch(param_VIN,param_LNAME);
  
   Process_PS_Layouts.LayoutScoredFetch Score(RawData le) := TRANSFORM
-    SELF.keys_used := 1 << 8; // Set bitmap for key used
-    SELF.keys_failed := IF(le.EID_HASH = 0, 1 << 8, 0); // Set bitmap for key failed
+    SELF.keys_used := 1 << 9; // Set bitmap for key used
+    SELF.keys_failed := IF(le.EID_HASH = 0, 1 << 9, 0); // Set bitmap for key failed
     SELF.VIN_match_code := MAP(le.VIN = (TYPEOF(le.VIN))'' OR le.VIN = (TYPEOF(le.VIN))'' => SALT33.MatchCode.OneSideNull,match_methods(File_Classify_PS).match_VIN(le.VIN,param_VIN,TRUE));
     SELF.VINWeight := (50+MAP ( le.VIN = param_VIN  => le.VIN_weight100,
           le.VIN = (TYPEOF(le.VIN))'' OR param_VIN = (TYPEOF(le.VIN))'' => 0,
@@ -92,7 +92,7 @@ EXPORT ScoredFetch_Batch(DATASET(InputLayout_Batch) recs,BOOLEAN AsIndex) := FUN
  
   Process_PS_Layouts.LayoutScoredFetch Score_Batch(Key le,recs ri) := TRANSFORM
     SELF.Reference := ri.reference; // Copy reference field
-    SELF.keys_used := 1 << 8; // Set bitmap for key used
+    SELF.keys_used := 1 << 9; // Set bitmap for key used
     SELF.keys_failed := 0; // Set bitmap for key failed
     SELF.VIN_match_code := MAP(le.VIN = (TYPEOF(le.VIN))'' OR le.VIN = (TYPEOF(le.VIN))'' => SALT33.MatchCode.OneSideNull,match_methods(File_Classify_PS).match_VIN(le.VIN,ri.VIN,TRUE));
     SELF.VINWeight := (50+MAP ( le.VIN = ri.VIN  => le.VIN_weight100,

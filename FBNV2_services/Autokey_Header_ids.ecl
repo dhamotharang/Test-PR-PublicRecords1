@@ -1,4 +1,4 @@
-import AutoKeyB2, AutoKeyI, AutoHeaderI, AutoStandardI, FBNv2;
+﻿import AutoKeyB2, AutoKeyI, AutoHeaderI, AutoStandardI, FBNv2, FBNv2_services;
 
 export Autokey_Header_ids := module
 	export params := interface(
@@ -44,12 +44,13 @@ export Autokey_Header_ids := module
 			export forceLocal := true;
 			export noFail := true;
 		end;
-		dids := if(is_ContSearchL,AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do(temp_did_mod));
-
+		dids := if(is_ContSearchL,
+			PROJECT(AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do(temp_did_mod), doxie.layout_references));
+			
 		newbydid := FBNv2_services.FBN_raw.get_rmsids_from_dids(dedup(newdids+dids,all));
 
 		//***** BDIDs
-		tempbhmod := module(project(AutoStandardI.GlobalModule(),AutoHeaderI.LIBIN.FetchI_Hdr_Biz.full,opt))
+		tempbhmod := module(project(in_mod,AutoHeaderI.LIBIN.FetchI_Hdr_Biz.full,opt))
 			export boolean score_results := false;
 			export boolean nofail := true;
 		end;

@@ -1,10 +1,11 @@
-import Business_Header, ut,address,mdr;
+﻿import Business_Header, ut,address,mdr;
 
 export fEBR_As_Business_Contact(dataset(layout_0010_header_base) pInputHeaderBase, dataset(Layout_5610_Demographic_Data_Base) pInputDemoBase, boolean isPRCT = false) :=
 function
 	//////////////////////////////////////////////////////////////////////////////////////////////
 	// -- Input Files to process
 	//////////////////////////////////////////////////////////////////////////////////////////////
+	//*** Removed the filters that had in place to filert out the quartely unload records - as per Jira DF-23116.
 	demo_base 		:= pInputDemoBase;
 
 	layout_BH_contact 	:= Business_Header.Layout_Business_Contact_Full_New;

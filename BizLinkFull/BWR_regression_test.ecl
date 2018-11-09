@@ -1,4 +1,4 @@
-IMPORT BIPV2;
+﻿IMPORT BIPV2;
 THISMODULE:=BizLinkFull;
 INPUTLAYOUT:=THISMODULE.Process_Biz_Layouts.InputLayout;
 MEOW:=THISMODULE.MEOW_Biz;
@@ -60,3 +60,4 @@ dRadiusCheck:=DATASET([{'Lower-radius results all in higher-radius ones',bRadius
 //---------------------------------------------------------------------------
 dResults:=dMaxResults+dLeadThresholdWorks+dNoMemoryErrors+dStateRestricted+dVeryLargeResults+dPlural+dRadiusCheck;
 dResults;
+

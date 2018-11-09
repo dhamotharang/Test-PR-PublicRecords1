@@ -1,4 +1,4 @@
-import header, riskwise, address, ut;
+﻿import header, riskwise, address, ut;
 
 EXPORT Boca_Shell_Address_Occupancy(GROUPED DATASET (Layout_Boca_Shell) clam, boolean isFCRA, boolean onThor = false) := function
 
@@ -15,6 +15,8 @@ EXPORT Boca_Shell_Address_Occupancy(GROUPED DATASET (Layout_Boca_Shell) clam, bo
 		unsigned length_of_residence := 0;
 		boolean utility_only := false;
 		integer non_bureau_source_count := 0;
+		integer	bus_addr_only_curr;
+		integer	bus_addr_only;
 	end;
 	
 	AddrHistKey := header.key_addr_hist(isFCRA);
@@ -75,6 +77,12 @@ EXPORT Boca_Shell_Address_Occupancy(GROUPED DATASET (Layout_Boca_Shell) clam, bo
 		
 		self.date_last_seen := if(ri.date_last_seen > le.historydate, le.historydate, ri.date_last_seen);
 		
+		self.bus_addr_only_curr := map(self.occupancy_status = 1 and ri.addresstype = 'BUS'		=>	1,		//this is a current business address
+																	 self.occupancy_status = 1 and ri.addresstype <> 'BUS'	=>	0,		//this is a current non-business address
+																																															-2);	//not a current address	
+		self.bus_addr_only			:= map(ri.addresstype = 'BUS'	and address_history_seq <> 255	=>	1,		//this is a business address
+																	 ri.addresstype <> 'BUS' and address_history_seq <> 255	=>	0,		//this is a non-business address
+																																															-2);	//not a valid address
 		self := ri;
 	END;
 	
@@ -125,6 +133,12 @@ EXPORT Boca_Shell_Address_Occupancy(GROUPED DATASET (Layout_Boca_Shell) clam, bo
 			self.input_addr_match_history := left.input_addr_match_history or right.input_addr_match_history;
 			self.current_addr_match_history := left.current_addr_match_history or right.current_addr_match_history;
 			self.occupancy_status := left.occupancy_status;
+			self.bus_addr_only_curr := map(left.bus_addr_only_curr = -2 and right.bus_addr_only_curr = -2			=> 	-2,																												//neither address is valid
+																		 left.bus_addr_only_curr >= 0 and right.bus_addr_only_curr >= 0			=> 	min(left.bus_addr_only_curr, right.bus_addr_only_curr), 	//if any current addr is not a business, return 0
+																																																						max(left.bus_addr_only_curr, right.bus_addr_only_curr));	//keep the valid addr over the non valid addr
+			self.bus_addr_only 			:= map(left.bus_addr_only = -2 and right.bus_addr_only = -2								=> 	-2,																												//neither address is valid
+																		 left.bus_addr_only >= 0 and right.bus_addr_only >= 0								=> 	min(left.bus_addr_only, right.bus_addr_only),							//if any addr is not a business, return 0
+																																																						max(left.bus_addr_only, right.bus_addr_only));						//keep the valid addr over the non valid addr
 			self := left;
 			) );
 
@@ -165,6 +179,13 @@ EXPORT Boca_Shell_Address_Occupancy(GROUPED DATASET (Layout_Boca_Shell) clam, bo
 	self.address_verification.inputAddr_non_relative_DID_count := if(~isFCRA, 
 		min(125, inputAddr_non_relative_DID_count),  // cap this at 125 since we defined the field to be integer1
 		0);  // don't populate this field in FCRA
+
+	self.address_verification.bus_addr_only_curr 	:= map(left.DID = 0 or left.truedid = false 		=> -1,
+																											 left.seq <> right.seq 										=> -2, 
+																																																	 right.bus_addr_only_curr);
+	self.address_verification.bus_addr_only 			:= map(left.DID = 0 or left.truedid = false			=> -1,
+																											 left.seq <> right.seq 										=> -2, 
+																																																	 right.bus_addr_only);
 		
 	self := left;
 	), 
@@ -188,25 +209,30 @@ EXPORT Boca_Shell_Address_Occupancy(GROUPED DATASET (Layout_Boca_Shell) clam, bo
 
 			self := left), left outer, keep(1));
 
-	// output(with_addr_history, named('with_address_history'));	
-	// output(occupancy_sorted, named('occupancy_sort'));
+	// output(with_addr_history, named('with_addr_history'));
+	// output(occupancy_sorted, named('occupancy_sorted'));
 	// output(iterated_addresses, named('iterated_addresses'));
-	// output(potential_occupied_candidates, named('potential_occupied_candidates'));
 	// output(occupied_address, named('occupied_address'));
 	// output(with_occupancy, named('with_occupancy'));
-	
+
 	// output(mostRecent4, named('mostRecent4'));
 	// output(lres_stats, named('lres_stats'));
+	// output(with_addr_history, named('with_addr_history'));
+	// output(iterated_addresses, named('iterated_addresses'));
+	// output(occupied_address, named('occupied_address'));
+	// output(with_occupancy, named('with_occupancy'));
+	// output(choosen(occupied_address(bus_addr_only_curr = 1), 10), named('bus_addr_only_curr'));
+	// output(choosen(occupied_address(bus_addr_only = 1), 10), named('bus_addr_only'));
 	
 	return with_length_of_residence;
 	
 end;
 
 // Occupancy Index: 
-// 	0 â€“ No address given or No addresses available on header
+// 	0 – No address given or No addresses available on header
 
 // 	1 - Currently Occupied
-// Input/Current address matches the â€œOccupied Addressâ€ found when applying Occupancy Logic.
+// Input/Current address matches the “Occupied Address” found when applying Occupancy Logic.
 
 // 	2 - Occupancy Unclear (Current Occupancy Shown at 2+ addresses)
 // After applying the Occupancy Logic, 2 or more addresses still appear tied and the input/current address matches one of them.
@@ -217,15 +243,15 @@ end;
 // 	4 - Unoccupied and No Association with LexID
 // After applying the Occupancy Logic, the input address does not match the Occupied Address, and also does not appear in the LexIDs address history
 
-// 	5 - Verified PO Box â€“ alternative street address currently occupied 
+// 	5 - Verified PO Box – alternative street address currently occupied 
 // Input address is a PO Box that is associated with the LexID AND a street address is found to be currently occupied
 
-// 	6 - Verified PO Box â€“ no street address currently listed 
+// 	6 - Verified PO Box – no street address currently listed 
 // Input address is a PO Box that is associated with the LexID AND there is no street address currently occupied
 
-// 	7 - Unverified PO Box â€“ alternative street address currently occupied
+// 	7 - Unverified PO Box – alternative street address currently occupied
 // Input address is  PO Box that is NOT found with the LexID AND a street address is found to be currently occupied
 
-// 	8 - Unverified PO Box â€“ no street address currently listed
+// 	8 - Unverified PO Box – no street address currently listed
 // Input address is a PO Box that is NOT found with the LexID AND there is no street address currently occupied
 

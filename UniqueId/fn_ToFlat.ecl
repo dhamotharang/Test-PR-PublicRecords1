@@ -1,5 +1,5 @@
-EXPORT fn_ToFlat(DATASET(Layout_XGX) src) := FUNCTION
-fs := U'Â§';		// field separator
+﻿EXPORT fn_ToFlat(DATASET(Layout_XGX) src) := FUNCTION
+fs := U'§';		// field separator
 AKAs := normalize(src,left.aka_list.aka,transform({Layout_generic,	UniqueId.Layout_Watchlist.layout_aliases},
 									self.primarykey := LEFT.primarykey;
 									self.info := TRIM(right.type)+fs+TRIM(right.category)+fs+TRIM(right.first_name)+fs+TRIM(right.middle_name)+fs+TRIM(right.last_name)+fs+TRIM(right.generation)+fs+TRIM(right.full_name)+fs+TRIM(right.comments);

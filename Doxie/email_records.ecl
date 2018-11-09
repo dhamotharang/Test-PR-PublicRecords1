@@ -1,7 +1,8 @@
-import EmailService,Suppress;
+﻿import EmailService,Suppress;
 
 export email_records(Dataset(doxie.layout_references) dids,
- string6 ssn_mask = '', string32 appType = Suppress.Constants.ApplicationTypes.DEFAULT,boolean multipleRoyalties = false) := FUNCTION
+ string6 ssn_mask = '', string32 appType = Suppress.Constants.ApplicationTypes.DEFAULT,
+ boolean multipleRoyalties = false, string5 industry_class = '') := FUNCTION
 
 	mac_input() := MACRO
 		self.seq := 1;
@@ -21,7 +22,7 @@ END;
 	ids := group(project(dids,get_input(left)),seq,did);
 	
 	
-	res0:= EmailService.EmailSearchService_Records.recs(ids, false, appType,multipleRoyalties);
+	res0:= EmailService.EmailSearchService_Records.recs(ids, false, appType, multipleRoyalties, industry_class);
 	
 	res := project(res0,EmailService.Assorted_Layouts.layout_report_rollup);
 	

@@ -1,4 +1,4 @@
-// TODO: create common defaults to use in AutoStandardI.GlobalModule, here, etc.
+﻿// TODO: create common defaults to use in AutoStandardI.GlobalModule, here, etc.
 
 // Encapsulates input parameters for each particular component
 // (probably will be split and moved to each correspondent service)
@@ -627,7 +627,7 @@ export all_others:= interface
   export string101 rmsid := '';
   export string50 liencasenumber := '';
   export string25 irsserialnumber := '';
-  export string17 casenumber := '';
+  export string25 casenumber := '';
   export string50 filingnumber := '';
   export string20 filingjurisdiction := '';
   export string20 filingdatebegin := '';

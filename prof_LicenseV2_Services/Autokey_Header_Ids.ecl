@@ -1,4 +1,4 @@
-import AutokeyB2,doxie,Prof_LicenseV2, business_header, 
+﻿import AutokeyB2,doxie,Prof_LicenseV2, business_header, 
        doxie_cbrs,Ingenix_NatlProf,ut,AutoKeyI,AutoStandardI,AutoHeaderI;
 
 export Autokey_Header_ids := MODULE
@@ -8,7 +8,7 @@ export params := interface(AutoKeyI.AutoKeyStandardFetchBaseInterface, AutoStand
 		export boolean noFail := false;
 	end;		 			
 	
-shared local_get_dids := 	doxie.Get_Dids(true,true);
+shared local_get_dids := PROJECT (doxie.Get_Dids(true,true), doxie.layout_references);
 	
 export val_prolic(params in_params) := function
 

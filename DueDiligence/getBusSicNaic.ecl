@@ -1,4 +1,4 @@
-﻿import BIPV2, Business_Risk_BIP, CalBus, DCAV2, DueDiligence, EBR, FBNv2, OSHAIR, YellowPages, STD;
+﻿IMPORT BIPV2, Business_Risk_BIP, CalBus, DCAV2, DueDiligence, EBR, FBNv2, OSHAIR, YellowPages, STD;
 
 /*
 	Following Keys being used:
@@ -25,7 +25,7 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																							 Options.KeepLargeBusinesses);																						 
 																							 
 	// Add back our Seq numbers
-	DueDiligence.Common.AppendSeq(oshaRaw, indata, oshaRawSeq);
+	oshaRawSeq := DueDiligence.Common.AppendSeq(oshaRaw, indata, TRUE);
 			
 	// Filter out records after our history date.
 	oshaFiltRecs := DueDiligence.Common.FilterRecordsSingleDate(oshaRawSeq, inspection_opening_date);
@@ -65,8 +65,8 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																															 Options.KeepLargeBusinesses);
 																															 
 	// Add back our Seq numbers
-	DueDiligence.Common.AppendSeq(ebr5600Raw, indata, ebr5600RawSeq);
-			
+	ebr5600RawSeq := DueDiligence.Common.AppendSeq(ebr5600Raw, indata, TRUE);
+
 	// Filter out records after our history date.
 	ebrFiltRec := DueDiligence.Common.FilterRecordsSingleDate(ebr5600RawSeq, date_first_seen);
 	
@@ -106,7 +106,7 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																			 Options.KeepLargeBusinesses);		
 																							
 	// Add back our Seq numbers
-	DueDiligence.Common.AppendSeq(dcaRaw, indata, dcaRawSeq);
+	dcaRawSeq := DueDiligence.Common.AppendSeq(dcaRaw, indata, TRUE);
 			
 	// Filter out records after our history date.
 	dcaFiltRec := DueDiligence.Common.FilterRecords(dcaRawSeq, date_first_seen, date_vendor_first_reported);
@@ -168,7 +168,7 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																			 Options.KeepLargeBusinesses);	
 																			 
 	// Add back our Seq numbers
-	DueDiligence.Common.AppendSeq(fbnRaw, indata, fbnRawSeq);
+	fbnRawSeq := DueDiligence.Common.AppendSeq(fbnRaw, indata, TRUE);
 			
 	// Filter out records after our history date.
 	fbnFiltRec := DueDiligence.Common.FilterRecords(fbnRawSeq, dt_first_seen, dt_vendor_first_reported);
@@ -204,7 +204,7 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																											 Options.KeepLargeBusinesses);
 																									 
 	// Add back our Seq numbers
-	DueDiligence.Common.AppendSeq(ypRaw, indata, ypRawSeq);
+	ypRawSeq := DueDiligence.Common.AppendSeq(ypRaw, indata, TRUE);
 			
 	// Filter out records after our history date.
 	ypFiltRec := DueDiligence.Common.FilterRecordsSingleDate(ypRawSeq, pub_date);
@@ -237,8 +237,7 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																		SELF := LEFT;),
 													LEFT OUTER);
 													
-
-												
+											
 	// ---------------- CALBUS - California Business ---------------------
 	calBusRaw := CalBus.Key_Calbus_LinkIDS.kFetch2(linkIDs,
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
@@ -247,7 +246,7 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																							Options.KeepLargeBusinesses);
 																							
 	// Add back our Seq numbers
-	DueDiligence.Common.AppendSeq(calBusRaw, indata, calBusRawSeq);
+	calBusRawSeq := DueDiligence.Common.AppendSeq(calBusRaw, indata, TRUE);
 			
 	// Filter out records after our history date.
 	calBusFiltRec := DueDiligence.Common.FilterRecordsSingleDate(calBusRawSeq, dt_first_seen);
@@ -271,6 +270,8 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																		SELF.SicNaicSources := LEFT.SicNaicSources + RIGHT.sources;
 																		SELF := LEFT;),
 													LEFT OUTER);
+
+
 
 
 	//Grab all the SIC and NAIC codes from all sources
@@ -306,28 +307,6 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	//Determine if industry level or risk was hit	
 	uniqueIndustriesSort := SORT(allCodes, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), sicCode, naicCode);
 	
-	
-	// DueDiligence.LayoutsInternal.SicNaicUniqueIndustryLayout rollSICNAICSource(DueDiligence.LayoutsInternal.SicNaicUniqueIndustryLayout le, DueDiligence.LayoutsInternal.SicNaicUniqueIndustryLayout ri) := TRANSFORM
-		// SELF.Source := IF(StringLib.StringFind(le.Source, ',', 1) > 0, '\'' + le.Source + '\'', le.Source); // Because this is a comma delimited list - if a source contains a comma, put quotes around it
-		// SELF.DateFirstSeen := IF(le.DateFirstSeen = 0, MAX(le.DateFirstSeen, ri.DateFirstSeen), MIN(le.DateFirstSeen, ri.DateFirstSeen));
-		// SELF.DateLastSeen := MAX(le.DateLastSeen, ri.DateLastSeen);
-		// SELF.RecordCount := le.RecordCount + ri.RecordCount;
-		
-		// SELF := le;
-	// END;
-	
-	// test := ROLLUP(SORT((allCodes((INTEGER)SICCode > 0 AND Source <> '')), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), ((INTEGER)SICCode), -IsPrimary, -DateLastSeen, -DateFirstSeen), 
-					// LEFT.seq = RIGHT.seq AND
-					// LEFT.ultID = RIGHT.ultID AND
-					// LEFT.orgID = RIGHT.orgID AND
-					// LEFT.seleID = RIGHT.seleID AND
-					// LEFT.SICCode = RIGHT.SICCode, 
-					// rollSICNAICSource(LEFT, RIGHT));
-	
-	
-	// test2 := SORT(test, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), -DateLastSeen);
-	
-	
 	uniqueIndustries := ROLLUP(uniqueIndustriesSort, 
 															LEFT.seq = RIGHT.seq AND
 															LEFT.ultID = RIGHT.ultID AND
@@ -345,11 +324,11 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																				SELF.moderateRiskIndustExists := LEFT.moderateRiskIndustExists OR RIGHT.moderateRiskIndustExists;
 																				SELF.lowRiskIndustExists := LEFT.lowRiskIndustExists OR RIGHT.lowRiskIndustExists;
 																				
-																				sicFound := RIGHT.sicCodes <> '' AND STD.Str.Find(LEFT.sicCodes, RIGHT.sicCodes, 1) = 0;	
-																				naicFound := RIGHT.naicCodes <> '' AND STD.Str.Find(LEFT.naicCodes, RIGHT.naicCodes, 1) = 0;	
+																				sicFound := RIGHT.sicCodes <> DueDiligence.Constants.EMPTY AND STD.Str.Find(LEFT.sicCodes, RIGHT.sicCodes, 1) = 0;	
+																				naicFound := RIGHT.naicCodes <> DueDiligence.Constants.EMPTY AND STD.Str.Find(LEFT.naicCodes, RIGHT.naicCodes, 1) = 0;	
 																				
-																				SELF.sicCodes := IF(sicFound, IF(LEFT.sicCodes = '', RIGHT.sicCodes, LEFT.sicCodes + ',' + RIGHT.sicCodes), LEFT.sicCodes);
-																				SELF.naicCodes := IF(naicFound, IF(LEFT.naicCodes = '', RIGHT.naicCodes, LEFT.naicCodes + ',' + RIGHT.naicCodes), LEFT.naicCodes);
+																				SELF.sicCodes := IF(sicFound, IF(LEFT.sicCodes = DueDiligence.Constants.EMPTY, RIGHT.sicCodes, LEFT.sicCodes + ',' + RIGHT.sicCodes), LEFT.sicCodes);
+																				SELF.naicCodes := IF(naicFound, IF(LEFT.naicCodes = DueDiligence.Constants.EMPTY, RIGHT.naicCodes, LEFT.naicCodes + ',' + RIGHT.naicCodes), LEFT.naicCodes);
 																				SELF := LEFT;));
 																				
 	addIndustry := JOIN(addYpSicNaic, uniqueIndustries,
@@ -373,9 +352,11 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																SELF := LEFT;),
 											LEFT OUTER);
 	
-													
+											
 
 
+	// OUTPUT(ebr5600Raw, NAMED('ebr5600Raw'));
+	// OUTPUT(ebr5600RawSeq, NAMED('ebr5600RawSeq'));
 	// OUTPUT(allYpSicNaic, NAMED('allYpSicNaic'));
 	// OUTPUT(sortYpRollSicNaic, NAMED('sortYpRollSicNaic'));
 	// OUTPUT(allCodes, NAMED('allCodes'));

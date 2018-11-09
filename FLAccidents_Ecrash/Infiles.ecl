@@ -1,4 +1,4 @@
-﻿import Data_services,lib_fileservices, lib_stringLib;
+﻿import Data_services, STD, ut;
 
 export Infiles    := module
 
@@ -33,11 +33,11 @@ export agency0     := dataset(Data_Services.foreign_prod+'thor_data400::in::ecra
 export agency:= project(agency0, transform({agency0}, 
                             self.agency_id := IF(trim(Left.agency_id,left,right) <>'', Left.agency_id,ERROR('agency file bad')),
 														agency_name := IF(trim(Left.agency_name,left,right) <>'', Left.agency_name,ERROR('agency file bad'));
-														self.agency_name := IF(stringlib.stringtouppercase(trim(agency_name,left,right)) IN ['\\N', 'NULL'],  '', agency_name);
-														self.source_id := IF(stringlib.stringtouppercase(trim(left.source_id,left,right)) IN ['\\N', 'NULL'],  '', left.source_id);
-														self.agency_state_abbr := IF(stringlib.stringtouppercase(trim(left.agency_state_abbr,left,right)) IN ['\\N', 'NULL'],  '', left.agency_state_abbr);
-														self.agency_ori := IF(stringlib.stringtouppercase(trim(left.agency_ori,left,right)) IN ['\\N', 'NULL'],  '', left.agency_ori);
-														self.append_overwrite_flag := IF(stringlib.stringtouppercase(trim(left.append_overwrite_flag,left,right)) IN ['\\N', 'NULL'],  '', left.append_overwrite_flag);
+														self.agency_name := IF(STD.Str.ToUpperCase(trim(agency_name,left,right)) IN ['\\N', 'NULL'],  '', agency_name);
+														self.source_id := IF(STD.Str.ToUpperCase(trim(left.source_id,left,right)) IN ['\\N', 'NULL'],  '', left.source_id);
+														self.agency_state_abbr := IF(STD.Str.ToUpperCase(trim(left.agency_state_abbr,left,right)) IN ['\\N', 'NULL'],  '', left.agency_state_abbr);
+														self.agency_ori := IF(STD.Str.ToUpperCase(trim(left.agency_ori,left,right)) IN ['\\N', 'NULL'],  '', left.agency_ori);
+														self.append_overwrite_flag := IF(STD.Str.ToUpperCase(trim(left.append_overwrite_flag,left,right)) IN ['\\N', 'NULL'],  '', left.append_overwrite_flag);
                             self:= left));
 //export dagency				:= dedup(sort(distribute(agency, hash32(agency_id)),agency_id),agency_id);
 shared billingagencies := dataset(Data_Services.foreign_prod+'thor_data400::in::ecrash::billingagency_raw'
@@ -92,14 +92,12 @@ incidents := join(distribute(incident, hash(incident_id)), incidents_todelete,
 					
 //filter out Nassau TF
 export tincident  := project(incidents(~(source_id in ['TF','TM'] and agency_id = '1603437')),transform(FLAccidents_Ecrash.Layout_Infiles_Fixed.incident
-													,self.incident_id := left.incident_id[1..9], 
-													self.case_identifier := stringlib.stringtouppercase(left.case_identifier),
-													self.state_report_number := stringlib.stringtouppercase(left.state_report_number),
-													self.crash_time := if(left.incident_id in ['10560507','10405314', '10405522','10403933','10560555','10560530']  , '', left.crash_time),  
-													SELF.ori_number := IF (left.ori_number = 'FL0130600','FL0130000',left.ori_number); //MDPD ORI correction remove this code after the historical update completed successfully
-								        	SELF.report_agency_ori := IF (left.report_agency_ori = 'FL0130600','FL0130000',left.report_agency_ori); //MDPD ORI correction remove this code after the historical update completed successfully
-													SELF.contrib_source := IF(stringlib.stringtouppercase(trim(left.contrib_source,left,right)) IN ['\\N', 'NULL'],  '', left.contrib_source);
-													self:= left));		
+													,SELF.incident_id := LEFT.incident_id[1..9]; 
+													 SELF.case_identifier := STD.Str.ToUpperCase(LEFT.case_identifier);
+													 SELF.state_report_number := STD.Str.ToUpperCase(LEFT.state_report_number);
+													 SELF.crash_time := IF(left.incident_id IN ['10560507','10405314', '10405522','10403933','10560555','10560530']  , '', LEFT.crash_time);
+													 SELF.contrib_source := IF(STD.Str.ToUpperCase(TRIM(LEFT.contrib_source,left,right)) IN ['\\N', 'NULL'],  '', LEFT.contrib_source);
+													 SELF:= LEFT;));		
 
  jpersn := 	join(distribute(persn, hash(incident_id)), incidents_todelete, 
 								trim(left.incident_id, all)= trim(right.incident_id,all),
@@ -107,7 +105,7 @@ export tincident  := project(incidents(~(source_id in ['TF','TM'] and agency_id 
 																	
 													
 export tpersn     := project(jpersn, transform(FLAccidents_Ecrash.Layout_Infiles_Fixed.persn
-                          		,self.person_type := /*stringlib.StringFilter(*/stringlib.stringtouppercase(left.person_type);//,'ABCDEFGHIJKLMNOPQRSTUVWXYZ |');
+                          		,self.person_type := /*stringlib.StringFilter(*/STD.Str.ToUpperCase(left.person_type);//,'ABCDEFGHIJKLMNOPQRSTUVWXYZ |');
 															,self:= left));			
 															
 jvehicl := 	join(distribute(vehicl, hash(incident_id)), incidents_todelete,
@@ -131,24 +129,24 @@ export tcommercial:= project(commercl, transform(FLAccidents_Ecrash.Layout_Infil
 
 dincident_EA :=	dedup(sort(distribute(
 																		tincident(source_id not in ['TF','TM'] and work_type_id not in ['2','3'] and trim(vendor_code,left,right) <> 'COPLOGIC'),hash(case_identifier))
-															,case_identifier,agency_id,loss_state_abbr,report_type_id,crash_date,Sent_to_HPCC_DateTime,creation_date,report_id,local)
+															,case_identifier,agency_id,loss_state_abbr,report_type_id,crash_date,Sent_to_HPCC_DateTime,creation_date,report_id,record,local)
 													,case_identifier,agency_id,loss_state_abbr,report_type_id,crash_date,right,local
 											);
 dincident_EA_Coplogic :=	dedup(sort(distribute(
 																		tincident(source_id not in ['TF','TM'] and work_type_id not in ['2','3'] and trim(vendor_code,left,right) = 'COPLOGIC'),hash(case_identifier))
-															,case_identifier,agency_id,loss_state_abbr,report_type_id,crash_date,Sent_to_HPCC_DateTime,creation_date,report_id,local)
+															,case_identifier,agency_id,loss_state_abbr,report_type_id,crash_date,Sent_to_HPCC_DateTime,creation_date,report_id,record,local)
 													,case_identifier,agency_id,loss_state_abbr,report_type_id,crash_date,supplemental_report,right,local
 											);											
 dincident_EA_CRU:= 	dedup(sort(distribute(
 																		tincident(work_type_id in ['2','3']),hash(case_identifier))
-															,case_identifier,agency_id,loss_state_abbr,work_type_id,report_type_id,cru_order_id,Sent_to_HPCC_DateTime,creation_date,CRU_Sequence_Nbr,report_id,local)
+															,case_identifier,agency_id,loss_state_abbr,work_type_id,report_type_id,cru_order_id,Sent_to_HPCC_DateTime,creation_date,CRU_Sequence_Nbr,report_id,record,local)
 													,case_identifier,agency_id,loss_state_abbr,work_type_id,report_type_id,cru_order_id,right,local
 										);
 											
 
 dincident_TF :=  	dedup(sort(distribute(
 																		tincident(source_id in ['TM','TF']),hash(state_report_number))
-															,state_report_number,agency_id,ORI_Number,loss_state_abbr,work_type_id,report_type_id,source_id,Sent_to_HPCC_DateTime,creation_date,report_id,local)
+															,state_report_number,agency_id,ORI_Number,loss_state_abbr,work_type_id,report_type_id,source_id,Sent_to_HPCC_DateTime,creation_date,report_id,record,local)
 													,state_report_number,agency_id,ORI_Number,loss_state_abbr,work_type_id,report_type_id,source_id,right,local)
 											;	
 											
@@ -199,8 +197,8 @@ d_person :=		dedup(
 									sort(
 										tpersn(incident_id!=''),
 												incident_id,vehicle_unit_number,last_name,first_name,date_of_birth,address,city,state,zip_code,home_phone,map(regexfind('DRIVER|VEHICLE DRIVER|VEHICLEDRIVER' , person_type) => 3
-                                                                                                                                      ,regexfind('OWNER|VEHICLE OWNER|VEHICLEOWNER' , person_type) => 2,1),creation_date,local)
-								       ,incident_id,vehicle_unit_number,last_name,first_name,date_of_birth,address,city,state,zip_code,right,local); 
+                                                                                                                                      ,regexfind('OWNER|VEHICLE OWNER|VEHICLEOWNER' , person_type) => 2,1),creation_date,person_id,local)
+								       ,incident_id,vehicle_unit_number,last_name,first_name,date_of_birth,address,city,state,zip_code,home_phone,right,local); 
 											 
 //------------------------------------------------------------------------------------------------------------------
 FLAccidents_Ecrash.Layout_Infiles_Fixed.cmbnd  trecs2(jrecs1 L, tpersn R) := transform
@@ -221,7 +219,7 @@ self.Insurance_Expired:=l.Insurance_Expired;
 self.Insurance_Exempt:=l.Insurance_Exempt; 
 self.Insurance_Type:=l.Insurance_Type; 
 self.Insurance_Company_Code:=l.Insurance_Company_Code; 
-self.Address2 := lib_StringLib.StringLib.StringCleanSpaces(trim(L.Address2,left,right));
+self.Address2 := STD.str.CleanSpaces(trim(L.Address2,left,right));
 self := R;
 self := L;
 self := [];
@@ -338,8 +336,8 @@ shared uAgency := dedup(sort(distribute(agency(Agency_ID != ''), hash32(Agency_I
 
 FLAccidents_Ecrash.Layout_Infiles_Fixed.agency_cmbnd jagency0(uBillingagencies le, uAgency ri) := transform
 																																		self.Agency_ori := ri.Agency_ori;
-																																		self.Agency_State_abbr := stringlib.stringtouppercase(trim(ri.Agency_State_abbr,left,right));
-																																		self.Agency_Name := stringlib.stringtouppercase(trim(ri.Agency_Name,left,right));
+																																		self.Agency_State_abbr := STD.Str.ToUpperCase(trim(ri.Agency_State_abbr,left,right));
+																																		self.Agency_Name := STD.Str.ToUpperCase(trim(ri.Agency_Name,left,right));
 																																		self.Mbsi_Agency_ID := ri.Agency_ID;
 																																		self.Cru_Agency_ID := le.Cru_Agency_ID;
 																																		self.Cru_State_Number := (unsigned3)le.Cru_State_Number;

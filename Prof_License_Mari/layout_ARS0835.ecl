@@ -1,6 +1,4 @@
-// ARS0835 Layout * Arkansas Real Estate Commission / Real Estate / 
-
-
+﻿// ARS0835 Layout * Arkansas Real Estate Commission / Real Estate / 
 EXPORT layout_ARS0835 := MODULE 
 
   EXPORT Active := RECORD, MAXLENGTH(717)
@@ -9,11 +7,12 @@ EXPORT layout_ARS0835 := MODULE
 	STRING30   LastName,
 	STRING10   Suffix,
 	STRING100  FullName,
-	//Address1-2 are added back in 20160602
+
+	//Address1-3 and company are added back in 20180202-- re-introduced
 	STRING50   Address1,
-	STRING50   Address2,
+	STRING50   Address2,    
 	STRING50   Address3,   //city, state, zip
-	STRING100  Company,
+	STRING100  Company,	
 	STRING50   FirmAddress1,
 	STRING50   FirmAddress2,
 	STRING30   FirmCity,
@@ -52,7 +51,7 @@ EXPORT layout_ARS0835 := MODULE
 	STRING10   FirstLicenseDate,
 	STRING10   IssueDate,
 	STRING10   ExpirationDate,         //removed as of 20130327. Added back as of 20130430
-	STRING10	 CEAccru,						//continue education hours accrued. Added since 20130531. Back again in 20130924
+	// STRING10	 CEAccru,						//continue education hours accrued. Added since 20130531. Back again in 20130924
  END;
  
  EXPORT Common := record

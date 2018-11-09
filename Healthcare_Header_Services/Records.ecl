@@ -1,4 +1,4 @@
-import doxie,iesp,ut,AutoStandardI,Address,Ingenix_NatlProf,Healthcare_Services;
+﻿import doxie,iesp,ut,AutoStandardI,Address,Ingenix_NatlProf,Healthcare_Services;
 EXPORT Records := module
 	Layouts.common_runtime_config buildRunTimeConfig():=transform
 		self.cfg_Version := 1;
@@ -99,6 +99,7 @@ EXPORT Records := module
 		// output(getIndividuals, Named('getRecordsIndividual_getIndividuals'),extend);
 		// output(mergedIndividuals, Named('getRecordsIndividual_mergedIndividuals'),extend);
 		// output(groupedIndividuals, Named('getRecordsIndividual_groupedIndividuals'),extend);
+		// output(DistinctInputRecsbyAcctno, Named('DistinctInputRecsbyAcctno'),extend);
 		// output(rolledIndividuals, Named('getRecordsIndividual_rolledIndividuals'),extend);
 		// output(finalIndividuals, Named('getRecordsIndividual_finalIndividuals'),extend);
 		// output(getGSASanctionsHits, Named('getRecordsIndividual_getGSASanctionsHits'),extend);
@@ -292,15 +293,15 @@ EXPORT Records := module
 		exactLNPIDMatches := finalRecs(isExactLNPID=true);
 		nonExactLNPIDMatchRecs := join(finalRecs,exactLNPIDMatches,left.acctno=right.acctno,transform(left),left only);
 		finalRecsFiltered := sort(exactLNPIDMatches+nonExactLNPIDMatchRecs,acctno,record_penalty);
-//output(getIndividuals,named('getIndividuals'),overwrite);		
-//output(getBusinesses,named('getBusinesses'));		
-// output(finalRecs,named('finalRecsgetRecordsRaw'));		
-// output(exactLNPIDMatches,named('exactLNPIDMatches'));		
-// output(nonExactLNPIDMatchRecs,named('nonExactLNPIDMatchRecs'));		
-// output(finalRecsFiltered,named('finalRecsFiltered'));		
+		// output(getIndividuals,named('getRecordsRaw_getIndividuals'),extend);		
+		// output(getBusinesses,named('getRecordsRaw_getBusinesses'),extend);		
+		// output(finalRecs,named('getRecordsRaw_finalRecsgetRecordsRaw'),extend);		
+		// output(exactLNPIDMatches,named('getRecordsRaw_exactLNPIDMatches'),extend);		
+		// output(nonExactLNPIDMatchRecs,named('getRecordsRaw_nonExactLNPIDMatchRecs'),extend);		
+		// output(finalRecsFiltered,named('getRecordsRaw_finalRecsFiltered'),extend);		
 		return finalRecsFiltered;
 	end;
-	Shared getRecordsAppend (dataset(Layouts.autokeyInput) input, dataset(layouts.CombinedHeaderResults) rawRecs, dataset(Layouts.common_runtime_config) cfg = RunTimeConfig) := function
+	Export getRecordsAppend (dataset(Layouts.autokeyInput) input, dataset(layouts.CombinedHeaderResults) rawRecs, dataset(Layouts.common_runtime_config) cfg = RunTimeConfig) := function
 		//Upgrade to full output format
 		rawDoxieFmt := project(rawRecs,layouts.CombinedHeaderResultsDoxieLayout);
 		//Get slimmed down records to get additional lookup data
@@ -403,15 +404,15 @@ EXPORT Records := module
 		normDups:=normalize(rolledDups,left.dupAcctno,transform(Layouts.rawNormRec,self.dupAcctno := right.acctno, self:=left;));
 		processDups := join(normDups,appendSupplementalData,left.acctno=right.acctno,transform(recordof(appendSupplementalData),self.acctno:=left.dupAcctno;self:=right),keep(Constants.MAX_RECS_ON_JOIN), limit(0));
 		reCombineAndSort:=sort(appendSupplementalData+processDups,Acctno,record_penalty,if(Src=Healthcare_Header_Services.Constants.SRC_GSA_SANC,2,0));
-		// output(input,Named('ServiceInput'));
-		// output(dupFree,Named('ServiceDupFree'));
-		//output(rawRecs,Named('rawRecs'));
+		// output(input,Named('getRecordsRawDoxie_ServiceInput'),extend);
+		// output(dupFree,Named('getRecordsRawDoxie_ServiceDupFree'),extend);
+		// output(rawRecs,Named('getRecordsRawDoxie_rawRecs'),extend);
 		// output(appendSupplementalData,Named('ServiceAppendSupplementalData'));
 		// output(findDups,Named('ServiceFindDups'));
-		// output(rolledDups,Named('ServiceRolledDups'));
-		// output(normDups,Named('ServiceNormDups'));
-		// output(processDups,Named('ServiceProcessDups'));
-		//output(reCombineAndSort,Named('getRecordsRawDoxieReCombineAndSort'));
+		// output(rolledDups,Named('getRecordsRawDoxie_ServiceRolledDups'));
+		// output(normDups,Named('getRecordsRawDoxie_ServiceNormDups'),extend);
+		// output(processDups,Named('ServiceProcessDups'),extend);
+		// output(reCombineAndSort,Named('getRecordsRawDoxieReCombineAndSort'),extend);
 		return reCombineAndSort;
 	end;
 	Export fmtRecordsLegacyReport (dataset(Layouts.CombinedHeaderResultsDoxieLayout) rawRecs,dataset(Layouts.common_runtime_config) cfg = RunTimeConfig) := function

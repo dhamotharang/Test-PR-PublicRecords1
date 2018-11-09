@@ -1,13 +1,45 @@
-
-/* *****************************************************************************************************************
+﻿/* *****************************************************************************************************************
 PRTE2_Header_Ins._Developer_Notes
 NOTHING IN HERE BUILDS ANY PRODUCT KEYS ... ONLY TO PREPARE THE ALPHARETTA HEADER BASE FILE.
-To build use:
+2018 - new - Boca Personnel will do all building steps.
+Ask Boca personnel before actually building new keys - To build use:
 PRTE.BWR_Build
+
+*****************************************************************************************************************
+Sept 2017 - just checked the new Boca build - they pull in our data via the OLD, OLD logic including PRTE_CSV
+	PRTE2_Header.files.file_old_ptre_header_in
+			=> dedup(PRTE.Get_payload.header,record,all)
+				=> PRTE.Get_payload does this and then other pre-processing
+								ds1 := PRTE_CSV.Header.dthor_data400__key__header__data;
+								ds2 := PRTE_CSV.ge_header_base.AlphaFinalHeaderDS;					// THIS references our base Alpharetta file
+								ds	:= ds1+ds2;
+PRTE.Get_Header_Base - see titles in relatives - does Ins data get this?
+Header.File_HHID_Current, Header.File_HHID - does Ins need HHID?
+*****************************************************************************************************************
 
 Keys are built with the prefix:   
 prte::key::header::*
 
+Jan 2017 - as of now, the process Boca uses - still uses the old data gathering
+PRTE2_Header.proc_build_base
+		PRTE.file_PRTE_Header
+         Uses Get_Header_Base.payload
+                Which Uses on line 792 PRTE.Get_payload.header
+                      Which line 10 does the append of our old base file…
+												ds2 := PRTE_CSV.ge_header_base.AlphaFinalHeaderDS;
+
+PRTE_CSV.ge_header_base.AlphaFinalHeaderDS
+	AlphaFinalHeaderName := PRTE2_Common.Cross_Module_Files.AlphaFinalHeaderBaseName;
+	EXPORT AlphaFinalHeaderDS := DATASET(AlphaFinalHeaderName,layout_payload-rtitle,THOR);		//DIDs plus relationships
+**********************************************************************************************************
+At this point, we are working to replace the build process for the PersonHeaderKeys, PersonLABKeys and WatchdogKeys.
+We are using the same input file as the current production build, namely PRTE.File_PRTE_Header, which will be replaced 
+in the future with the PRTE base file. This file will be created using the prte2_.....as_header code, but we cannot start 
+using this option until we have all the base files available.
+The main change at this point is that we started relying on the original production code to build the keys rather than the 
+PRCT-specific build logic.
+Regards,
+Gabriel Marcan  (1/9/17)
 **********************************************************************************************************
 5/17/15 ...  NEW PROCESS FOR ADDING NEW BOCA HEADER RECORDS!!
 ALPHARETTA SIDE:

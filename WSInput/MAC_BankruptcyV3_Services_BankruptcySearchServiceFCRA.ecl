@@ -1,4 +1,4 @@
-// This service created to add Web Service fields for BankruptcyV3_Services.BankruptcySearchServiceFCRA
+﻿// This service created to add Web Service fields for BankruptcyV3_Services.BankruptcySearchServiceFCRA
 
 EXPORT MAC_BankruptcyV3_Services_BankruptcySearchServiceFCRA := MACRO
 
@@ -54,6 +54,7 @@ EXPORT MAC_BankruptcyV3_Services_BankruptcySearchServiceFCRA := MACRO
 												'ApplyNonsubjectRestrictions',
 												'SuppressWithdrawnBankruptcy',
 												'FFDOptionsMask',
+                        'EnableCaseNumberFilterSearch',
 												/*----  Pagination Fields ----*/
 												'MaxResults',
 												'MaxResultsThisTime',

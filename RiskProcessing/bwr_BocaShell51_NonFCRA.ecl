@@ -1,4 +1,4 @@
-/*2015-09-25T19:35:58Z (Kevin Huls_prod)
+﻿/*2015-09-25T19:35:58Z (Kevin Huls_prod)
 Changed to call 'ToEdina_v51' to format the FDN and FP3 model output fields.
 */
 #workunit('name','NonFCRA BocaShell 5.1');
@@ -29,6 +29,7 @@ unsigned1 glba := 1;
 unsigned1 dppa := 3;
 boolean RetainInputDID := FALSE; //Change to TRUE to retain the input LexID
 boolean isPrescreen := FALSE; 
+unsigned3 LastSeenThreshold := 0;	//# of days to consider header records as being recent for verification.  0 will use default (41 and lower = 365 days, 50 and higher = include all) 
 
 //===================  input-output filenames  ======================
 
@@ -132,6 +133,7 @@ self.ExcludeIbehavior := true;  // set this back to false if they would like to 
   SELF.datarestrictionmask := datarestrictionmask;
   SELF.datapermissionmask  := datapermissionmask;
   SELF.RemoveFares         := RemoveFares;
+  SELF.LastSeenThreshold := LastSeenThreshold;
 	self.bsversion           := 51;				
   SELF := le;
   SELF := [];

@@ -1,9 +1,9 @@
- 
-EXPORT MAC_PopulationStatistics(infile,Ref='',Input_corp_key = '',Input_corp_supp_key = '',Input_corp_vendor = '',Input_corp_vendor_county = '',Input_corp_vendor_subcode = '',Input_corp_state_origin = '',Input_corp_process_date = '',Input_corp_sos_charter_nbr = '',Input_event_filing_reference_nbr = '',Input_event_amendment_nbr = '',Input_event_filing_date = '',Input_event_date_type_cd = '',Input_event_date_type_desc = '',Input_event_filing_cd = '',Input_event_filing_desc = '',Input_event_corp_nbr = '',Input_event_corp_nbr_cd = '',Input_event_corp_nbr_desc = '',Input_event_roll = '',Input_event_frame = '',Input_event_start = '',Input_event_end = '',Input_event_microfilm_nbr = '',Input_event_desc = '',Input_event_revocation_comment1 = '',Input_event_revocation_comment2 = '',Input_event_book_number = '',Input_event_page_number = '',Input_event_certification_number = '',OutFile) := MACRO
-  IMPORT SALT32,Scrubs_Corp2_Mapping_GA_Event;
+﻿ 
+EXPORT MAC_PopulationStatistics(infile,Ref='',Input_corp_key = '',Input_corp_supp_key = '',Input_corp_vendor = '',Input_corp_vendor_county = '',Input_corp_vendor_subcode = '',Input_corp_state_origin = '',Input_corp_process_date = '',Input_corp_sos_charter_nbr = '',Input_event_filing_reference_nbr = '',Input_event_amendment_nbr = '',Input_event_filing_date = '',Input_event_date_type_cd = '',Input_event_date_type_desc = '',Input_event_filing_cd = '',Input_event_filing_desc = '',Input_event_corp_nbr = '',Input_event_corp_nbr_cd = '',Input_event_corp_nbr_desc = '',Input_event_roll = '',Input_event_frame = '',Input_event_start = '',Input_event_end = '',Input_event_microfilm_nbr = '',Input_event_desc = '',Input_event_revocation_comment1 = '',Input_event_revocation_comment2 = '',Input_event_book_nbr = '',Input_event_page_nbr = '',Input_event_certification_nbr = '',OutFile) := MACRO
+  IMPORT SALT38,Scrubs_Corp2_Mapping_GA_Event;
   #uniquename(of)
   %of% := RECORD
-    SALT32.Str512Type fields;
+    SALT38.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM
@@ -47,7 +47,7 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_corp_key = '',Input_corp_sup
 +    #IF( #TEXT(Input_corp_process_date)='' )
       '' 
     #ELSE
-        IF( (unsigned)le.Input_corp_process_date = 0,'', ':corp_process_date(' + SALT32.fn_date_valid_as_text((unsigned)le.Input_corp_process_date) + ')' )
+        IF( (unsigned)le.Input_corp_process_date = 0,'', ':corp_process_date(' + SALT38.fn_date_valid_as_text((unsigned)le.Input_corp_process_date) + ')' )
     #END
  
 +    #IF( #TEXT(Input_corp_sos_charter_nbr)='' )
@@ -164,22 +164,22 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_corp_key = '',Input_corp_sup
         IF( le.Input_event_revocation_comment2 = (TYPEOF(le.Input_event_revocation_comment2))'','',':event_revocation_comment2')
     #END
  
-+    #IF( #TEXT(Input_event_book_number)='' )
++    #IF( #TEXT(Input_event_book_nbr)='' )
       '' 
     #ELSE
-        IF( le.Input_event_book_number = (TYPEOF(le.Input_event_book_number))'','',':event_book_number')
+        IF( le.Input_event_book_nbr = (TYPEOF(le.Input_event_book_nbr))'','',':event_book_nbr')
     #END
  
-+    #IF( #TEXT(Input_event_page_number)='' )
++    #IF( #TEXT(Input_event_page_nbr)='' )
       '' 
     #ELSE
-        IF( le.Input_event_page_number = (TYPEOF(le.Input_event_page_number))'','',':event_page_number')
+        IF( le.Input_event_page_nbr = (TYPEOF(le.Input_event_page_nbr))'','',':event_page_nbr')
     #END
  
-+    #IF( #TEXT(Input_event_certification_number)='' )
++    #IF( #TEXT(Input_event_certification_nbr)='' )
       '' 
     #ELSE
-        IF( le.Input_event_certification_number = (TYPEOF(le.Input_event_certification_number))'','',':event_certification_number')
+        IF( le.Input_event_certification_nbr = (TYPEOF(le.Input_event_certification_nbr))'','',':event_certification_nbr')
     #END
 ;
   END;

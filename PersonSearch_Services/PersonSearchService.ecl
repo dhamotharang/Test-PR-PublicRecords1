@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="PersonSearchService" wuTimeout="300000">
  	<part name="UnParsedFullName" type="xsd:string"/>
 	<part name="FirstName"        type="xsd:string"/>
@@ -69,7 +69,7 @@
 /*--INFO-- Replacement for Moxie bpssearch */
 /*--USES-- ut.input_xslt */
 
-IMPORT iesp,AutoStandardI, doxie;
+IMPORT iesp,AutoStandardI, doxie, Royalty;
 EXPORT PersonSearchService () := MACRO
 
 	//The following macro defines the field sequence on WsECL page of query. 
@@ -176,10 +176,13 @@ EXPORT PersonSearchService () := MACRO
 	end;
 
 	tempresults := PersonSearch_Services.Search_Records.val(tempmod);
-
+	FDN_check     := tempresults(FDNResultsFound=true);
+  FDN_Royalties := Royalty.RoyaltyFDNCoRR.GetOnlineRoyalties(FDN_check);
+  royalties     := if(tempmod.IncludeFraudDefenseNetwork, FDN_Royalties);
 	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(tempresults, results, 
                          iesp.bpssearch.t_BpsSearchResponse, Records, false, SubjectTotalCount);
 
+  output(royalties,named('RoyaltySet'));
   output(results,named('Results'));
 
 ENDMACRO;

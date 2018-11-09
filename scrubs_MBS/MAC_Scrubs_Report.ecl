@@ -3,10 +3,9 @@ EXPORT MAC_Scrubs_Report(BuildDate,myFolder,scopename,inputFile,MemailList)	:=	F
 	folder						:=	#EXPAND(myFolder);
 	inFile						:=	inputFile;
 	scrubs_name				:=	IF(TRIM(scopename,ALL)<>'',TRIM(scopename,ALL)+'_Scrubs','Scrubs');
-	scope_datasetName	:=	IF(TRIM(scopename,ALL)<>'',scopename+'_'+datasetName,datasetName);
-	profilename				:=	'Scrubs_MBS_'+scopename;
+	scope_datasetName		:=	IF(TRIM(scopename,ALL)<>'',scopename+'_'+datasetName,datasetName);
+	profilename				:=	'Scrubs_MBS'+ if(scopename != 'MBS' , '_'+scopename, '');
 	
-	myEmail		:=	_Control.MyInfo.EmailAddressNotify;		//	Email address to send notifications
 	// F	:=	inFile(process_date=filedate);						//	Records to scrub
 	F	:=	inFile;																				//	Records to scrub
 	S	:=	folder.#EXPAND(scrubs_name);									//	My scrubs module
@@ -83,8 +82,9 @@ EXPORT MAC_Scrubs_Report(BuildDate,myFolder,scopename,inputFile,MemailList)	:=	F
 	//This will translate the bitmap(s)
 	T := S.FromBits(DS);	// Use the FromBits module; makes my bitmap datafile easier to get to read
 	TranslateBitmap	:=	OUTPUT(T);
-	
-	new_entry:=dataset([{DatasetName,ProfileName,scopename,filedate,TotalRecs,NumRules,NumFailedRules,ErroredRecords,TotalRemovedRecs,PcntErroredRec,workunit}],Scrubs.Layouts.LogRecord);
+	NumRemovedRecs := '';
+	WU := '';
+	new_entry:=dataset([{DatasetName,ProfileName,scopename,filedate,TotalRecs,NumRules,NumFailedRules,ErroredRecords,TotalRemovedRecs,PcntErroredRec,NumRemovedRecs,WU,workunit}],Scrubs.Layouts.LogRecord);
 	outnew:=output(new_entry,named(scope_datasetName+'_LogEntry_'+filedate));
 
 	EmailReport:=if(MemailList <>'' , fileservices.sendEmail(MemailList,

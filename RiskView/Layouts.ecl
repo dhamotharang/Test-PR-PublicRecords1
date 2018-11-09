@@ -1,4 +1,4 @@
-
+﻿
 IMPORT iesp, header, watercraft, BankruptcyV2, american_student_list, AlloyMedia_student_list,
 				Prof_LicenseV2, Impulse_Email, iBehavior, risk_indicators;
 
@@ -792,6 +792,15 @@ export layout_riskview5 := record
 	string3 Telecommunications_reason4;
 	string3 Telecommunications_reason5;
 	
+	string3 Crossindustry_Index;
+	string30 Crossindustry_Score_Name := '';
+	string3 Crossindustry_score;
+	string3 Crossindustry_reason1;
+	string3 Crossindustry_reason2;
+	string3 Crossindustry_reason3;
+	string3 Crossindustry_reason4;
+	string3 Crossindustry_reason5;
+	
 	string3 Custom_Index;
 	string30 Custom_Score_Name := '';
 	string3 Custom_score;
@@ -861,6 +870,7 @@ export layout_riskview5_search_results := record
 	string10 BankCard_Type := '';
 	string10 Short_term_lending_Type := '';
 	string10 Telecommunications_Type := '';
+	string10 Crossindustry_Type := '';
 	string10 Custom_Type := '';	
 	string10 Custom2_Type := '';	
 	string10 Custom3_Type := '';	
@@ -897,7 +907,8 @@ end;
 							'STRING10 Liens' + %'cntLiens'% + '_FilingPage;' +
 							'STRING60 Liens' + %'cntLiens'% + '_Agency;' +
 							'string35 Liens' + %'cntLiens'% + '_AgencyCounty;' +
-							'string2 Liens' + %'cntLiens'% + '_AgencyState;');										
+							'string2 Liens' + %'cntLiens'% + '_AgencyState;' +
+							'string25 Liens' + %'cntLiens'% + '_ConsumerStatementId;');										
 								
 				#SET(cntLiens,%cntLiens% + 1)
 			#END
@@ -930,7 +941,8 @@ end;
 						'STRING1 Jgmts' + %'cntJgmts'% + '_Eviction;' +
 						'STRING60 Jgmts' + %'cntJgmts'% + '_Agency;' +
 						'string35 Jgmts' + %'cntJgmts'% + '_AgencyCounty;' +
-						'string2 Jgmts' + %'cntJgmts'% + '_AgencyState;');										
+						'string2 Jgmts' + %'cntJgmts'% + '_AgencyState;' +
+						'string25 Jgmts' + %'cntJgmts'% + '_ConsumerStatementId;');											
 				#SET(cntJgmts,%cntJgmts% + 1)
 			#END
 		#END
@@ -940,12 +952,14 @@ export layout_riskview_lnj_batch := record
 	%Jgmts%
 end;
 
+
 export layout_riskview5_batch_response := record
 	string30 acctno;
 	layout_riskview5;
   string5  Exception_code := '';
 	string3	 Billing_Index2 := '';
 	layout_riskview_lnj_batch;
+	
 end;
 
 export attributes_internal_layout := record
@@ -953,7 +967,6 @@ export attributes_internal_layout := record
 	unsigned seq;
 	unsigned did;
 	layout_riskview_attributes_5;
-	// Risk_Indicators.Layouts_Derog_Info.final_LJ_Public_Records;
 	Risk_Indicators.Layouts_Derog_Info.LJ_Attributes;
 	Risk_Indicators.Layouts_Derog_Info.LJ_DataSets;
 end;

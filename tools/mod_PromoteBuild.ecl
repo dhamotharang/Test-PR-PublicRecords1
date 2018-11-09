@@ -1,4 +1,4 @@
-export mod_PromoteBuild(
+﻿export mod_PromoteBuild(
 	 string																		pversion	
 	,dataset(Layout_FilenameVersions.builds)	pFilenames
 	,string																		pFilter						  = ''
@@ -11,6 +11,7 @@ export mod_PromoteBuild(
   ,boolean                                  pIncludeBuiltDelete = false
 	,string																		pCleanupFilter			= ''
   ,boolean		                              pIsDeltaBuild	      = false
+  ,boolean		                              pForceGenPromotion	= false
 ) :=
 module
 
@@ -28,11 +29,11 @@ module
 	export new2qa								:= if(pIsTesting = false ,nothor(apply(lnames	,mod_Promote.fNew2QA						(templatename,templatenameNew,pversion,pDelete,,IsNewNamingConvention							))),output(lnames(filter),all));
 	export new2base						  := if(pIsTesting = false ,nothor(apply(lnames	,mod_Promote.fNew2Base					(templatename,templatenameNew,pversion,pDelete,,IsNewNamingConvention,pClearSuperFirst))),output(lnames(filter),all));
 	export new2qaMult						:= if(pIsTesting = false ,nothor(apply(lnames	,mod_Promote.fNew2QAMult				(templatename,templatenameNew,pversion,pDelete,,IsNewNamingConvention							))),output(lnames(filter),all));
-	export built2qa 						:= if(pIsTesting = false ,nothor(apply(lnames	,mod_Promote.fBuilt2QA					(templatename,pnGenerations,pDelete,,IsNewNamingConvention,pIsDeltaBuild	))),output(lnames(filter),all));
+	export built2qa 						:= if(pIsTesting = false ,nothor(apply(lnames	,mod_Promote.fBuilt2QA					(templatename,pnGenerations,pDelete,,IsNewNamingConvention,pIsDeltaBuild,pForceGenPromotion	))),output(lnames(filter),all));
 	export qa2prod 							:= if(pIsTesting = false ,nothor(apply(lnames	,mod_Promote.fQA2Prod						(templatename,pDelete																				))),output(lnames(filter),all));
 	export QA2BusinessHeader		:= if(pIsTesting = false ,nothor(apply(lnames	,mod_Promote.fQA2BusinessHeader	(templatename,IsNewNamingConvention													))),output(lnames(filter),all));
 	export LockSuper(string		pToVersion
 									,string		pFromVersion
 													)		:= if(pIsTesting = false ,nothor(apply(lnames	,mod_Promote.fSuper2SuperLock		(templatename	,pToVersion	,pFromVersion											))),output(lnames(filter),all));
-  export Cleanup              := if(pIsTesting = false ,nothor(apply(lnames	,mod_Promote._fVersionIntegrityCheck	(templatename,pDelete	,pIncludeBuiltDelete,pCleanupFilter))),output(lnames(filter),all));
+  export Cleanup              := if(pIsTesting = false ,nothor(apply(lnames	,mod_Promote._fVersionIntegrityCheck	(templatename,pDelete	,pIncludeBuiltDelete,pCleanupFilter,pForceGenPromotion))),output(lnames(filter),all));
 end;

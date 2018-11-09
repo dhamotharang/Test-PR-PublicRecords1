@@ -1,4 +1,4 @@
-import tools, std;
+﻿import tools, std;
 
 lay_builds 	:= tools.Layout_FilenameVersions.builds;
 
@@ -124,6 +124,11 @@ export Promote(string     version      =  ''
 		export Promote_offenders_picture := module						
 			dataset(lay_builds)  pBaseFilenames := bair.Filenames(version, pUseProd, pDelta).dbo_offenders_picture_Base.dAll_filenames;
 			export buildfiles := tools.mod_PromoteBuild(version,pBaseFilenames,pFilter,pDelete,pisTesting := false, pnGenerations := 1);    
+    end;
+		
+		export Promote_offenders_class := module				
+			dataset(lay_builds)  pBuildFilenames := bair.Filenames(version, pUseProd, pDelta).dbo_offenders_class_Base.dAll_filenames;
+			export buildfiles := tools.mod_PromoteBuild(version,pBuildFilenames,pFilter,pDelete,pisTesting := false, pnGenerations := 1);    
     end;
 		
 		export Promote_crash := module				

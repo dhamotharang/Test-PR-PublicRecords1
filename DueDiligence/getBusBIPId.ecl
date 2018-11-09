@@ -6,15 +6,23 @@ EXPORT getBusBIPId(DATASET(DueDiligence.Layouts.CleanedData) indata,
 										BOOLEAN includeReport) := FUNCTION
 
 
-	//check to see if any of the input provided a seleid to search on 
+
+	// ------                                                                                     ------
+	// ------ check to see if any of the input provided a seleid to search on                     ------  
+	// ------ IF YES                                                                              ------
+	// ------      proceed by calling the SearchInputByLEXID                                      ------
+	// ------                                                                                     ------
 	inputLexID := indata((UNSIGNED)cleanedInput.business.lexID > 0);
 	
-	searchInputByLexID := PROJECT(inputLexID, TRANSFORM(BIPV2.IDFunctions.rec_SearchInput, SELF.inSeleid := LEFT.cleanedInput.business.lexID; SELF := [];));
+	searchInputByLexID := PROJECT(inputLexID, TRANSFORM(BIPV2.IDFunctions.rec_SearchInput, 
+																											SELF.inSeleid := LEFT.cleanedInput.business.lexID; 
+																											SELF.acctNo := (STRING)LEFT.cleanedInput.seq; 
+																											SELF := [];));
 
-	// linkIDs := IF(EXISTS(inputLexID), BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(searchInputLayout).Data2_, indata);
 	linkIDs := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(searchInputByLexID).Data2_;
 	
 	joinFoundBipIDs := JOIN(inputLexID, linkIDs,
+													LEFT.cleanedInput.seq = (UNSIGNED)RIGHT.acctNo AND
 													LEFT.cleanedInput.business.lexID = (STRING)RIGHT.seleID,
 													TRANSFORM({BOOLEAN lessSearchDate, RECORDOF(RIGHT)},
 																			lessThanDt := IF(LEFT.cleanedInput.historyDateYYYYMMDD = DueDiligence.Constants.date8Nines, STD.Date.Today(), LEFT.cleanedInput.historyDateYYYYMMDD);
@@ -29,7 +37,7 @@ EXPORT getBusBIPId(DATASET(DueDiligence.Layouts.CleanedData) indata,
 													LEFT.seleID = RIGHT.seleID,
 													TRANSFORM({RECORDOF(LEFT)}, SELF := LEFT;));
 	
-	
+	//This data will include an address associated with this LexID
 	addFoundBipIDs := JOIN(indata, rollFoundBips,
 													LEFT.cleanedInput.business.lexID = (STRING)RIGHT.seleID,
 													TRANSFORM(DueDiligence.Layouts.CleanedData,
@@ -40,79 +48,43 @@ EXPORT getBusBIPId(DATASET(DueDiligence.Layouts.CleanedData) indata,
 																			SELF.cleanedInput.business.BIP_IDs.UltID.LinkID := RIGHT.ultID;
 																			SELF := LEFT;),
 													LEFT OUTER);
-	
+	//Put the data including the Clean this address into the Busines Shell layout for the further processing by the BIP_LINK_ID_Append logic
 	cleanedInput := DueDiligence.Common.GetCleanBIPShell(addFoundBipIDs);
 	
-	//Grab just the clean input to pass to the BIP Linking Process
+	//Do 1 more reformatting step to Grab just the clean input to pass to the BIP Linking Process
 	prepBIPAppend := PROJECT(cleanedInput, TRANSFORM(Business_Risk_BIP.Layouts.Input, SELF := LEFT.Clean_Input));
 	
+	
+	// ------                                                                                     ------
+	// ------ Continue the BIP Linking process                                                    ------  
+	// ------  at this point some companies have a LinkID and some don't                          ------
+	// ------  the end result is all companies will have a LINKID appended                        ------
+	
 	bipAppend := Business_Risk_BIP.BIP_LinkID_Append(prepBIPAppend);
-	
-	
-	withBIP := JOIN(cleanedInput, bipAppend, 
-										LEFT.Seq = RIGHT.Seq, 
-										TRANSFORM(Business_Risk_BIP.Layouts.Shell,
-																SELF.BIP_IDs := RIGHT;
-																SELF.Verification.InputIDMatchPowID		:= (STRING)RIGHT.PowID.LinkID;
-																SELF.Verification.InputIDMatchProxID	:= (STRING)RIGHT.ProxID.LinkID;
-																SELF.Verification.InputIDMatchSeleID	:= (STRING)RIGHT.SeleID.LinkID;
-																SELF.Verification.InputIDMatchOrgID		:= (STRING)RIGHT.OrgID.LinkID;
-																SELF.Verification.InputIDMatchUltID		:= (STRING)RIGHT.UltID.LinkID;
-																SELF := LEFT),
-										LEFT OUTER, KEEP(1), ATMOST(100), FEW);
 
-
-	// Don't bother running a bunch of searches on Seq's that didn't find any ID's, just add them back at the end
-	noLinkIDsFound := withBIP(BIP_IDs.PowID.LinkID = 0 AND BIP_IDs.ProxID.LinkID = 0 AND BIP_IDs.SeleID.LinkID = 0 AND BIP_IDs.OrgID.LinkID = 0 AND BIP_IDs.UltID.LinkID = 0);
-	// Only run the searches with Seq's that found BIP Link ID's that we can search with
-	linkIDsFoundTemp := withBIP(BIP_IDs.PowID.LinkID <> 0 OR BIP_IDs.ProxID.LinkID <> 0 OR BIP_IDs.SeleID.LinkID <> 0 OR BIP_IDs.OrgID.LinkID <> 0 OR BIP_IDs.UltID.LinkID <> 0);
-	
-	//creating a new options to pass into the BIP_Best_Append to overwite the BIPBestAppend passed in
-	tempOptions := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
-		EXPORT UNSIGNED1	DPPA_Purpose 				:= options.DPPA_Purpose;
-		EXPORT UNSIGNED1	GLBA_Purpose 				:= options.GLBA_Purpose;
-		EXPORT STRING50		DataRestrictionMask	:= options.DataRestrictionMask;
-		EXPORT STRING50		DataPermissionMask	:= options.DataPermissionMask;
-		EXPORT STRING10		IndustryClass				:= options.IndustryClass;
-		EXPORT UNSIGNED1	LinkSearchLevel			:= options.LinkSearchLevel;
-		EXPORT UNSIGNED1	BusShellVersion			:= options.BusShellVersion;
-		EXPORT UNSIGNED1	MarketingMode				:= options.MarketingMode;
-		EXPORT STRING50		AllowedSources			:= options.AllowedSources;
-		EXPORT UNSIGNED1	BIPBestAppend	 			:= Business_Risk_BIP.Constants.BIPBestAppend.AllBlankFields;  //Fill in any fields from the best BIP data that are currently blank, keep populated fields
-	END;
-	
-	allowedSourcesSet := SET(DATASET([], Business_Risk_BIP.Layout_AllowedSources), Source); //as of 5/26/17 not used in BIP_Best_Append
-	
-	// Append "Best" Company information if only BIP ID's were passed in and it was requested in the Options that we perform the BIPBestAppend process, otherwise this function just returns what was sent to it
-	linkIDsFound := Business_Risk_BIP.BIP_Best_Append(linkIDsFoundTemp, tempOptions, linkingOptions, allowedSourcesSet);
-	
-	//Return all businesses
-	allIDs := noLinkIDsFound + linkIDsFound;
-	
-	final := JOIN(indata, allIDs,
-								LEFT.inputEcho.seq = RIGHT.clean_input.seq AND
-								LEFT.inputEcho.business.accountNumber = RIGHT.clean_input.acctNo,
+  
+	final := JOIN(indata, bipAppend,
+								LEFT.cleanedInput.seq = RIGHT.seq,
 								TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-																			SELF.busn_info.BIP_IDs := RIGHT.BIP_IDs;
-																			SELF.busn_info.lexID := (STRING)RIGHT.BIP_IDs.SeleID.LinkID;
-																			SELF.historyDate := RIGHT.Clean_Input.HistoryDate;
+																			SELF.seq := LEFT.cleanedInput.seq;
+																			
+																			SELF.busn_info.BIP_IDs.UltID.LinkID := RIGHT.UltID.LinkID;
+																			SELF.busn_info.BIP_IDs.OrgID.LinkID := RIGHT.OrgID.LinkID;
+																			SELF.busn_info.BIP_IDs.SeleID.LinkID := RIGHT.SeleID.LinkID;
+																			SELF.busn_info.BIP_IDs.ProxID.LinkID := RIGHT.ProxID.LinkID;
+																			SELF.busn_info.BIP_IDs.PowID.LinkID := RIGHT.PowID.LinkID;
+																			SELF.weight := RIGHT.weight;
+																			
+																			SELF.busn_info.lexID := (STRING)RIGHT.SeleID.LinkID;
+																			SELF.historyDate := LEFT.cleanedInput.historyDateYYYYMMDD;
+																			
+																			SELF.inputaddressprovided := LEFT.cleanedInput.addressProvided;
+																			SELF.fullinputaddressprovided := LEFT.cleanedInput.fullAddressProvided;
 																			SELF.relatedDegree := DueDiligence.Constants.INQUIRED_BUSINESS_DEGREE;
 																			
-																			SELF.busn_info.companyName := RIGHT.clean_input.companyName;
-																			SELF.busn_info.altCompanyName := RIGHT.clean_input.altCompanyName;
-																			SELF.busn_info.fein := RIGHT.clean_input.fein;
-																			SELF.busn_info.phone := RIGHT.clean_input.phone10;
-																			SELF.busn_info.accountNumber := RIGHT.clean_input.acctNo;
-																			
-																			SELF.busn_info.address := RIGHT.clean_input;
-																			SELF.busn_info.address.geo_lat := RIGHT.clean_input.lat;
-																			SELF.busn_info.address.geo_long := RIGHT.clean_input.long;
-																			SELF.busn_info.address.rec_type := RIGHT.clean_input.addr_type;
-																			SELF.busn_info.address.err_stat := RIGHT.clean_input.addr_status;
-																			SELF.busn_info.address.geo_blk := RIGHT.clean_input.geo_block;
-																																						
+																			SELF.busn_info := LEFT.cleanedInput.business;
 																			SELF.busn_input := LEFT.inputEcho.business;
-																			SELF := RIGHT.clean_input;
+																			
 																			SELF := [];),
 								LEFT OUTER);
 
@@ -132,11 +104,6 @@ EXPORT getBusBIPId(DATASET(DueDiligence.Layouts.CleanedData) indata,
 	// OUTPUT(cleanedInput, NAMED('cleanedInput'));
 	// OUTPUT(prepBIPAppend, NAMED('prepBIPAppend'));
 	// OUTPUT(bipAppend, NAMED('bipAppend'));
-	// OUTPUT(withBIP, NAMED('withBIP'));
-	// OUTPUT(noLinkIDsFound, NAMED('noLinkIDsFound'));
-	// OUTPUT(linkIDsFoundTemp, NAMED('linkIDsFoundTemp'));
-	// OUTPUT(linkIDsFound, NAMED('linkIDsFound'));
-	// OUTPUT(allIDs, NAMED('allIDs'));
 	// OUTPUT(final, NAMED('final'));
 	
 	return final;

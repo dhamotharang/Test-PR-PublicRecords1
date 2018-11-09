@@ -1,4 +1,4 @@
-//This is the code to execute in a builder window
+﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
 #workunit('name','BizLinkFull.BWR_Ingest - Ingest - SALT V3.3.1');
 IMPORT BizLinkFull,SALT33;
@@ -11,3 +11,4 @@ N_U := OUTPUT(ingestMod.NewRecords_Notag+ingestMod.UpdatedRecords_Notag,,'<your_
 ingestMod.DoStats;
 O;
 N_U;
+

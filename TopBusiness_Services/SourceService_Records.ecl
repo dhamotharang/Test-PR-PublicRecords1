@@ -1,4 +1,4 @@
-//NOTE: The coding in this attribute needs to be kept in sync with the datasets in
+﻿//NOTE: The coding in this attribute needs to be kept in sync with the datasets in
 //      iesp.topbusinesssourcedoc.t_TopBusinessSourceDocRecord
 
 import BIPV2,iesp;
@@ -160,6 +160,15 @@ export SourceService_Records(
 																						self.CorporateFilings := dataset(left),
 																						self.acctno := 'SINGLE',
 																						self := []));
+  
+  // CORTERA - source= 'RR' source_docid=link_id
+	cortera_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptCortera(source,section));
+	cortera_docs     := CHOOSEN(TopBusiness_Services.CorteraSource_Records(cortera_source_docids,inoptions,false)
+																						.SourceView_Recs,iesp.Constants.TOPBUSINESS.MAX_COUNT_CORTERA_RECORD);
+	cortera_prepared := PROJECT(cortera_docs,transform(TopBusiness_Services.SourceService_Layouts.OutputLayout,
+																						self.CorteraRecords := dataset(left),
+																						self.acctno := 'SINGLE',
+																						self := []));																						
 	
 	// Crash Carrier
 	crash_source_docids := deduped_sources(TopBusiness_Services.SourceServiceInfo.IncludeRptCrash(source,section));
@@ -564,6 +573,7 @@ export SourceService_Records(
 		+ busreg_prepared
 		+ cnld_prepared
 		+ corp_prepared    
+		+ cortera_prepared
     + crash_prepared
     + dca_prepared         
     + dea_prepared  
@@ -601,6 +611,7 @@ export SourceService_Records(
 			self.BusinessRegistrationRecords := left.BusinessRegistrationRecords + right.BusinessRegistrationRecords,
 			self.CNLDFacilities := left.CNLDFacilities + right.CNLDFacilities,	
 			self.CorporateFilings := left.CorporateFilings + right.CorporateFilings,
+			self.CorteraRecords := left.CorteraRecords + right.CorteraRecords;
 			self.CrashCarriers := left.CrashCarriers + right.CrashCarriers,
 			self.DcaRecords := left.DcaRecords + right.DcaRecords,
 			self.DeaRecords := left.DeaRecords + right.DeaRecords,
@@ -667,6 +678,9 @@ export SourceService_Records(
   // output(corp_source_docids,             named('corp_source_docids'));
 	// output(corp_docs,                      named('corp_docs'));
 	// output(corp_prepared,                  named('corp_prepared'));
+	// output(cortera_source_docids,             named('cortera_source_docids'));
+	// output(cortera_docs,                      named('cortera_docs'));
+	// output(cortera_prepared,                  named('cortera_prepared'));
 	// output(crash_source_docids,             named('crash_source_docids'));
 	// output(crash_docs,                      named('crash_docs'));
 	// output(crash_prepared,                  named('crash_prepared'));

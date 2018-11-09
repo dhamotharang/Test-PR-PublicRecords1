@@ -105,7 +105,7 @@ Prof_License.Layout_proLic_in map2architec( File_MN.architect l) := transform
   self.business_flag                    := 'N';                                                                        
   self.source_st                         := 'MN';                                                                            
   self.orig_name                         := l.FNAME+' '+l.LNAME;                                                 
-  self.company_name                 := l.BUSNAME;                                                               
+ // self.company_name                 := l.BUSNAME;                                                               
   self.orig_addr_1                       := l.ADDRESS1;                                                                    
   self.orig_addr_2                       := l.ADDRESS2;                                                                    
   self.orig_city                         := l.CITY;                                                                          
@@ -148,7 +148,7 @@ Prof_License.Layout_proLic_in map2bldg( File_MN.bldg l) := transform
 self.profession_or_board                            := 'Building Contractors';                                                            											
 self.business_flag                        := 'N';                                                                                                 
 self.source_st                             := 'MN';                                                                                                     
-self.orig_name                             := '';                                                                     
+self.orig_name                             := l.NAME;                                                                     
 //self.company_name                     := l.CompanyName;                                                                                        
 self.orig_addr_1                           := l.Addr1;                                                                                             
 self.orig_addr_2                           := l.Addr2;                                                                                             
@@ -172,14 +172,14 @@ self.status                                :=  if ( ut.DaysApart ( self.expirati
 self.license_number                        := l.LicNumber;                                                                                            
 self.phone                                 := l.Phone_No;                                                                                                  
 self.dob                              := ' ';                                                                                                       
-self.license_type                          := if (trim(l.LicNumber[1..2]) = 'BC' , 'BUILDING CONTRACTOR'  , '');                                                   
+self.license_type                          := l.LICTYPE;                                            
                                                                                                                             
 self.board_action_indicator                := ' ';                                                                                         
 self.date_first_seen                       := infile(ftype = 'available')[1].fdate;                                                                                     
 self.date_last_seen                        := infile(ftype = 'available')[1].fdate;                                                                                      
 self.status_status_cds                     := '';                                                                                         
-self.additional_name_addr_type             := if ( l.DBA <> '', 'DoingBusinessAs' , '');                                             
-self.additional_orig_name                  := l.DBA;                                                                                      
+//self.additional_name_addr_type             := if ( l.DBA <> '', 'DoingBusinessAs' , '');                                             
+//self.additional_orig_name                  := l.DBA;                                                                                      
 self.status_effective_dt                   := '';                                                            
 self.misc_occupation                       := '';                                             
                                                                                                                             

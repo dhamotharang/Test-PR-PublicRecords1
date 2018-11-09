@@ -1,4 +1,4 @@
-import AVM_V2, ln_property, ut, RoxieKeyBuild;
+﻿import AVM_V2, ln_property, ut,Scrubs_AVM;
 
 // now that the AVM build is accepting a history date, 
 // the first 8 bytes of the filedate passed into this Proc must be a valid date
@@ -18,16 +18,11 @@ export Proc_Build_File_and_Keys(string filedate) := function
 	medians_with_history := AVM_V2.File_AVM_Medians_Hist(ungroup(current_medians));
 	ut.mac_sf_buildprocess(medians_with_history, '~thor_data400::base::avm_v2_medians', build_avm_medians, 2,, true);
 	
-// step4: build the AVM keys
-// step5 : Update Dops
-   update_dops := Sequential( RoxieKeyBuild.updateversion('AVMV2Keys',filedate,'skasavajjala@seisint.com',,'N'),
-					                    RoxieKeyBuild.updateversion('FCRA_AVMV2Keys',filedate,'skasavajjala@seisint.com',,'F')
-														);
-	
-// step6: build strata
+// step4: build the AVM keys	
+// step5: build strata
    out_strata_stats := AVM_V2.out_AVM_Strata_Population(filedate);
 
-	do_all := sequential(build_avm, build_avm_comps, build_avm_medians, AVM_V2.buildkeys(filedate),/*update_dops,*/out_strata_stats);
+	do_all := sequential(build_avm, build_avm_comps, build_avm_medians, AVM_V2.buildkeys(filedate),out_strata_stats,Scrubs_AVM.fnRunScrubs(filedate,''));
 
 return do_all;
 

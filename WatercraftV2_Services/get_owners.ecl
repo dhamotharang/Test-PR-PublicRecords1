@@ -1,4 +1,4 @@
-import doxie, suppress, Census_Data, ut, watercraft, AutoStandardI, fcra, FFD, WatercraftV2_Services;
+﻿import doxie, suppress, Census_Data, ut, watercraft, AutoStandardI, fcra, FFD, WatercraftV2_Services;
 
 EXPORT get_owners(dataset(WatercraftV2_Services.layouts.owner_raw_rec) owner_key_recs, 
 									string in_ssn_mask_type,
@@ -46,9 +46,9 @@ EXPORT get_owners(dataset(WatercraftV2_Services.layouts.owner_raw_rec) owner_key
 				ssn_clean := if (IsFCRA, owner_recs_unmsk, ssn_pulled);
 				suppress.mac_mask(ssn_clean, owner_recs_0, ssn, blank, true, false, maskVal:=in_ssn_mask_type);
 				suppress.mac_mask(owner_recs_0, owner_recs_1, orig_ssn, blank, true, false, maskVal:=in_ssn_mask_type);
-
+								
 				int_rec rollowners(int_rec l,dataset(int_rec) r):=transform
-					self.owners := Choosen(r.owners,ut.limits.MAX_WATERCRAFT_OWNERS);
+					self.owners := Choosen(Normalize(r,left.owners, Transform(RIGHT)),ut.limits.MAX_WATERCRAFT_OWNERS);
 					self :=l;
 				END;
 
@@ -122,7 +122,7 @@ EXPORT get_owners(dataset(WatercraftV2_Services.layouts.owner_raw_rec) owner_key
 				Census_Data.MAC_Fips2County_Keyed(search_recs_dep, st, county, county_name, owner_recs_unmsk)
 
 				outrec rollowners(outrec l,dataset(outrec) r):=transform
-					self.owners := choosen(r.owners,ut.limits.MAX_WATERCRAFT_OWNERS);
+					self.owners := Choosen(Normalize(r,left.owners, Transform(RIGHT)),ut.limits.MAX_WATERCRAFT_OWNERS);
 					self.StatementIDs := [];
 					self.isDisputed := false; 
 					self :=l;

@@ -1,8 +1,10 @@
-import  address, ut, header_slimsort, did_add, didville,watchdog, ExperianCred, _validate;
+﻿import  address, ut, header_slimsort, did_add, didville,watchdog, ExperianCred, _validate;
+
+export Build_base(string ver) := module
 
 name_clean := Files.Cashed_Names_File;
 addr_clean := Files.Cashed_Address_File;
-norm_addr :=  Normalize_Address;
+norm_addr :=  Normalize_Address(ver).all;
 
 //-----------------------------------------------------------------
 //join Clean Names to normalized data
@@ -84,8 +86,8 @@ Layouts.Layout_Out t_join_get_address (get_name  le, addr_clean ri) := TRANSFORM
 
 	SELF.date_last_seen 			   :=   (unsigned)valid_Address_Update_Date;
 	
-	SELF.date_vendor_first_reported    := 	(unsigned)version;
-	SELF.date_vendor_last_reported     :=   (unsigned)version;	
+	SELF.date_vendor_first_reported    := 	(unsigned)ver;
+	SELF.date_vendor_last_reported     :=   (unsigned)ver;	
 	
 	SELF.current_rec_flag			   :=   if(le.AddressSeq = 1 and le.NameType = 'C1', 
 											   1,0);
@@ -247,7 +249,7 @@ Layouts.Layout_Out t_rollup (build_experian_base_s  le, build_experian_base_s ri
  self.Orig_Address_Update_date	 := (string)ut.max2((unsigned)le.Orig_Address_Update_date, (unsigned)ri.Orig_Address_Update_date);
  self.Orig_Consumer_Create_Date  := (string)ut.min2((unsigned)le.Orig_Consumer_Create_Date, (unsigned)ri.Orig_Consumer_Create_Date);
  self.date_first_seen 			 		 :=  ut.min2(le.date_first_seen, ri.date_first_seen);
- self.date_last_seen 			   		 :=  if(le.date_vendor_last_reported = (unsigned)version,
+ self.date_last_seen 			   		 :=  if(le.date_vendor_last_reported = (unsigned)ver,
 																		   le.date_last_seen,
 																			 ri.date_last_seen);
  self.date_vendor_first_reported := ut.min2(le.date_vendor_first_reported, ri.date_vendor_first_reported);
@@ -316,7 +318,10 @@ Experian_dec_dedp   := dedup(sort(distribute(Experian_dec , hash(Encrypted_Exper
 Experian_base_d2     := distribute(apply_deletes,  hash(Encrypted_Experian_PIN));
 
 Layouts.Layout_Out t_apply_deceased(Experian_base_d2 le, Experian_dec_dedp ri) := transform
-	self.deceased_ind     := if(ri.Encrypted_Experian_PIN <> '' and le.NameType[..2] <> 'SP', 1, 0);
+	self.deceased_ind     :=  if(le.Encrypted_Experian_PIN <> ri.Encrypted_Experian_PIN , // no match 
+                               le.deceased_ind,                   // Keep existing (left)
+                               if(le.NameType[..2] <> 'SP', 1, 0) // Else consider NameType and assign new value
+                              );
 	SELF := le;
 end;
 
@@ -356,7 +361,7 @@ reset_dt_last_seen   := join (distribute(apply_deceased, hash(Encrypted_Experian
 																												left.delete_flag  <> 1 and
 																												left.deceased_Ind <> 1 and
 																												left.date_last_seen >= right.max_dt_last_seen,
-																												ut.max2((unsigned)version, left.date_last_seen),
+																												ut.max2((unsigned)ver, left.date_last_seen),
 																												left.date_last_seen),
 															 self := left),
 															 left outer,
@@ -374,4 +379,7 @@ Apply_Delete_codes := join(distribute(reset_dt_last_seen, hash(Encrypted_Experia
 #ELSE
 Apply_Delete_codes := reset_dt_last_seen;
 #END					 
-export Build_Base := apply_delete_codes;
+
+export All := apply_delete_codes;
+
+END;

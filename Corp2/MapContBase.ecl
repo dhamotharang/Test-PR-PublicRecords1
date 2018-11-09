@@ -1,4 +1,4 @@
-import ut, address, _validate, corp2, Corp2_Mapping, mdr, Business_Header, Business_Header_SS;
+﻿import ut, address, _validate, corp2, Corp2_Mapping, mdr, Business_Header, Business_Header_SS;
 
 EXPORT MapContBase (
 										dataset(Corp2_Mapping.LayoutsCommon.Temporary) inContBase
@@ -284,8 +284,17 @@ cont_update_combined_rollup := rollup(cont_update_combined_sort, RollupUpdate(le
 													AssignDIDs(left, right),
 													left outer,
 													local);
+													
+	corp2.Layout_Corporate_Direct_Cont_base_Expanded 	trfSuppress(corp2.Layout_Corporate_Direct_Cont_base_Expanded pinput)	:=	transform
+		self.did	:=	if(pInput.did=2282107993 and pInput.corp_key='36-4078164',
+												0,
+												pInput.did);
+		self			:=	pInput;
+	end;
+													
+	SuppressLexid	:=	project (cont_did_append, trfSuppress(left));
 							
-	cont_did_append_Sort := sort(cont_did_append,record,local);	
+	cont_did_append_Sort := sort(SuppressLexid,record,local);	
 							
 	returndataset := cont_did_append_Sort;
 

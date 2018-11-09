@@ -1,11 +1,15 @@
-import _control, tools;
+﻿import _control, tools;
+
+pversion := '20180111';    // Enter version date in CCYYMMDD formate
+
+#workunit ('name', 'SPRAY - PRTE Business Header Input files - ' + pversion);
 
 PRTE2_Business_Header.Spray(
-	 pversion				:= '20170718'
+	 pversion				:= pversion
 	,pServerIP			:= _control.IPAddress.bctlpedata12
 	,pDirectory			:= '/data/data_build_4/prct/BusinessHeader/'
-	,pFilenameBH		:= '*prct__businessrecs___lnpr_20170718*txt'
-	,pFilenameBC		:= '*prct__businessrecs__contacts_lnpr*20170712*txt'	
+	,pFilenameBH		:= '*prct__businessrecs__*'+pversion+'*txt'
+	,pFilenameBC		:= '*prct___businessrecs__contacts_*'+pversion+'*txt'
 	,pGroupName			:= tools.fun_Clustername_DFU()																
 	,pIsTesting			:= false
 	,pOverwrite			:= false

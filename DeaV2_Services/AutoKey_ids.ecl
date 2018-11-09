@@ -1,10 +1,10 @@
-/*2007-10-15T21:26:20Z (Eitan Halper-Stromberg)
+﻿/*2007-10-15T21:26:20Z (Eitan Halper-Stromberg)
 27190
 */
 
 
 // #stored('Zip','32601');
-import autokeyb,autokeyb2,doxie,doxie_raw,business_header,doxie_cbrs,corp2,DEA,autokeyi,AutoStandardI,AutoHeaderI;
+import autokeyb2,doxie,business_header,doxie_cbrs,DEA,autokeyi,AutoStandardI,AutoHeaderI;
 
 export autokey_ids(boolean workhard = false, boolean nofail = false, boolean NoDeepDives = true) := FUNCTION
 				business_header.doxie_MAC_Field_Declare()
@@ -33,7 +33,7 @@ export autokey_ids(boolean workhard = false, boolean nofail = false, boolean NoD
 				
 				// ***** DIDs
 
-				dids := if(is_ContSearchL,doxie.Get_Dids(true,true),dataset([],doxie.layout_references));
+				dids := if(is_ContSearchL, PROJECT (doxie.Get_Dids(true,true), doxie.layout_references));
 				newdids1 := PROJECT(newdids,transform ( doxie.layout_references, SELF.did:=LEFT.indid ));
 				newbydid1 := DEA_raw.get_dids(dedup(newdids1+dids,all));
 				

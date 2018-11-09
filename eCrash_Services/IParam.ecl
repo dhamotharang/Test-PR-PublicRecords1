@@ -1,4 +1,4 @@
-import AutoKeyI, AutoStandardI, iesp;
+﻿import AutoKeyI, AutoStandardI, iesp;
 
 export IParam := module
 	
@@ -32,6 +32,12 @@ export IParam := module
 		export string AgencyORI :='';
 		export string200 SqlSearchEspURL := '';
 		export string SqlSearchEspNAME := '';
+		export string KY_SearchEspNAME := '';
+		export string200 KY_SearchEspURL := '';
+		export string officerBadgeNumber := '';
+		export string driversLicenseNumber := '';
+		export string VehicleVin := '';
+		export string LicensePlate := '';
 	end;
 	
 	export searchrecords := interface(

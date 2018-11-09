@@ -1,12 +1,7 @@
-/*2014-11-05T23:13:55Z (Martin Clary)
- Bug: 165107 - Change the american student/alloy merge logic in the shell
-*/
-/*2014-10-23T00:12:10Z (Martin Clary)
-Bug: 165107  -Change the american student/alloy merge logic in the shell
-*/
-import american_student_list, Riskwise, AlloyMedia_student_list;
+﻿
+import american_student_list, Riskwise, AlloyMedia_student_list, MDR;
 
-export Boca_Shell_Student(GROUPED DATASET(Layout_Boca_Shell_ids) ids_only, integer bsversion) := FUNCTION
+export Boca_Shell_Student(GROUPED DATASET(Layout_Boca_Shell_ids) ids_only, integer bsversion, boolean isMarketing) := FUNCTION
 		
 	Layout_AS_Plus := RECORD
 		Riskwise.Layouts.Layout_American_Student student;
@@ -27,7 +22,9 @@ export Boca_Shell_Student(GROUPED DATASET(Layout_Boca_Shell_ids) ids_only, integ
 		self.src := ri.historical_flag; // ASL records will be indicated by a historical (H) or current (C) indicator
 	end;
 	student_file := join(ids_only, american_student_list.key_DID, 
-		left.did!=0
+		left.did!=0 
+		and if(bsversion >= 4, true, if(right.source = MDR.sourceTools.src_OKC_Student_List, false, true)) 
+		and (~(right.source=mdr.sourceTools.src_OKC_Student_List and right.collegeid in Risk_Indicators.iid_constants.Set_Restricted_Colleges_For_Marketing) or isMarketing=false)
 		and keyed(left.did=right.l_did)
 		and (unsigned3)(right.date_first_seen[1..6]) < left.historydate,
 		student(left,right), left outer, atmost(keyed(left.did=right.l_did), 100)
@@ -36,21 +33,22 @@ export Boca_Shell_Student(GROUPED DATASET(Layout_Boca_Shell_ids) ids_only, integ
 	Layout_AS_Plus roll( Layout_AS_Plus le, Layout_AS_Plus ri ) := TRANSFORM
 		self := map(
 
-			// Use any other record over File Type 'M'
+			// Use any other record over File Type 'M' 
 			le.student.file_type='M' and ri.student.file_type<>'M' => ri,
 			ri.student.file_type='M' and le.student.file_type<>'M'=> le,
 		
 			// current ASL over historical
-			le.src='C' and ri.src='H' => le,
-			le.src='H' and ri.src='C' => ri,
+			le.src in ['C','O'] and ri.src='H' => le,
+			le.src='H' and ri.src in ['C','O'] => ri,
+		
 			
 			// take the newer record when the DLS are unequal
 			le.student.date_last_seen > ri.student.date_last_seen => le,
 			le.student.date_last_seen < ri.student.date_last_seen => ri,
 
 			// take american student over alloy
-			le.src in ['C','H'] and ri.src = 'A' => le,
-			ri.src in ['C','H'] and le.src = 'A' => ri,
+			le.src in ['C','H','O'] and ri.src = 'A' => le,
+			ri.src in ['C','H','O'] and le.src = 'A' => ri,
 
 			// take the newer record when the DFS are unequal
 			le.student.date_first_seen > ri.student.date_first_seen => le,

@@ -1,4 +1,4 @@
-IMPORT SALT33;
+﻿IMPORT SALT37;
 EXPORT Layout_Specificities := MODULE
 SHARED L := Layout_BizHead;
 EXPORT parent_proxid_ChildRec := RECORD

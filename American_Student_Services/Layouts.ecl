@@ -1,4 +1,4 @@
-import American_student_list, doxie;
+﻿import American_student_list, doxie;
 
 EXPORT Layouts := MODULE
 	
@@ -59,6 +59,7 @@ EXPORT Layouts := MODULE
 		string20 TuitionExploded;
 		string50 college_major_exploded := '';
 		string1 public_private_code := '';
+		STRING2 src :='';
 	END;
 	
 	EXPORT college_data := record

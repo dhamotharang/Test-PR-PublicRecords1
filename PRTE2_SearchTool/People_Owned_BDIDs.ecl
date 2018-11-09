@@ -1,4 +1,4 @@
-import data_services, doxie_cbrs;
+﻿import data_services, doxie_cbrs;
 EXPORT People_Owned_BDIDs := Module
 //read in busines_header_contacts_filepos
 
@@ -61,9 +61,10 @@ execs_wo_did_rolled := rollup(group(sort(execs_with_title_info(did = 0),lname,fn
 
 shared dedup_titles_execs := sort(execs_w_did_rolled + execs_wo_did_rolled,title_rank,-dt_last_seen,if(did != 0,0,1));
 	
-doxie_cbrs.mac_Selection_Declare()
+// doxie_cbrs.mac_Selection_Declare()
 
-export records := choosen(dedup_titles_execs,Max_Executives_val);
+// export records := choosen(dedup_titles_execs,Max_Executives_val);
+export records := dedup_titles_execs;
 export records_count := count(dedup_titles_execs); 
 
 

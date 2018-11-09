@@ -1,4 +1,4 @@
-IMPORT Address, BatchShare, Gateway, FFD, iesp, PersonContext, Risk_Indicators, RiskView, Standard, Suppress;
+﻿IMPORT Address, BatchShare, Gateway, FFD, iesp, PersonContext, Risk_Indicators, RiskView, Standard, Suppress;
 
 EXPORT Functions := MODULE
 
@@ -76,20 +76,22 @@ EXPORT Functions := MODULE
 
 		ds_dids:=PROJECT(ds_work_in(did!=0),TRANSFORM(FFD.Layouts.DidBatch,SELF:=LEFT));
 		DataGroupSet:=IF(in_mod.FetchLiensJudgments,FFD.Constants.DataGroupSet.Liens,FFD.Constants.DataGroupSet.Person);
-		ds_prsnCntxt:=FFD.FetchPersonContext(ds_dids,in_mod.gateways,DataGroupSet);
+		showConsumerStatements:=FFD.FFDMask.isShowConsumerStatements(in_mod.FFDOptionsMask);
+		ds_prsnCntxt:=IF(showConsumerStatements,FFD.FetchPersonContext(ds_dids,in_mod.gateways,DataGroupSet),DATASET([],FFD.Layouts.PersonContextBatch));
 
-		iesp.share_fcra.t_ConsumerStatement xformConsumerStatement(ds_prsnCntxt L) := TRANSFORM	
+		Risk_Indicators.Layouts.tmp_Consumer_Statements xformConsumerStatement(ds_prsnCntxt L) := TRANSFORM	
 			SELF.UniqueId:=L.LexID;
 			SELF.Timestamp:=iesp.ECL2ESP.toTimeStamp(stringlib.stringfilter(L.DateAdded,' 0123456789'));
 			SELF.StatementId:=L.StatementId;
 			SELF.StatementType:=L.RecordType;
 			SELF.DataGroup:=L.DataGroup;
 			SELF.Content:=L.Content;
+			SELF.RecIdForStId:=L.RecId1;
 		END;
 
 		ds_cnsmrStatements:=PROJECT(ds_prsnCntxt,xformConsumerStatement(LEFT));
 
-		ConsumerCreditReport_Services.Layouts.workRec addChildRecs(ds_work_in L, DATASET(iesp.share_fcra.t_ConsumerStatement) R) := TRANSFORM
+		ConsumerCreditReport_Services.Layouts.workRec addChildRecs(ds_work_in L, DATASET(Risk_Indicators.Layouts.tmp_Consumer_Statements) R) := TRANSFORM
 			hasAlert:=EXISTS(R(StatementType=PersonContext.Constants.RecordTypes.FA));
 			SELF.error_code:=MAP(
 				L.error_code>0 => L.error_code,
@@ -182,7 +184,17 @@ EXPORT Functions := MODULE
 
 		ds_input := PROJECT(ds_ccr_resp(UniqueId1=UniqueId2),xformInput(LEFT));
 
-		ds_LiensJudgments := Risk_Indicators.Boca_Shell_Liens_LnJ_FCRA(in_mod.bsVersion,0,GROUP(ds_input,seq),TRUE);
+		Risk_Indicators.Layout_Output xformPersonContext(ds_ccr_resp L) := TRANSFORM
+			SELF.seq:=(UNSIGNED)L.AccountNumber;
+			SELF.historyDate:=Risk_Indicators.iid_constants.default_history_date;
+			SELF.did:=(UNSIGNED)L.UniqueId1;
+			SELF:=L;
+			SELF:=[];
+		END;
+
+		ds_withPersonContext := PROJECT(ds_ccr_resp(UniqueId1=UniqueId2),xformPersonContext(LEFT));
+
+		ds_LiensJudgments := Risk_Indicators.Boca_Shell_Liens_LnJ_FCRA(in_mod.bsVersion,0,GROUP(ds_input,seq),TRUE,,GROUP(ds_withPersonContext,seq));
 
 		ds_input_shell := PROJECT(ds_LiensJudgments,TRANSFORM(RiskView.Layouts.shell_NoScore,
 			SELF.trueDid:=TRUE;

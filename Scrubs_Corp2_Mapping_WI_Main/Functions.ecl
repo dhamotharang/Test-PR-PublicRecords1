@@ -1,4 +1,4 @@
-IMPORT corp2;
+﻿IMPORT corp2;
 	
 EXPORT Functions := MODULE
 
@@ -25,8 +25,8 @@ EXPORT Functions := MODULE
 
 		
 		//Below table needs to be updated when we see new Org_Struc codes in Raw updates!
-		EXPORT set_valid_org_structure_cd := ['01','02','03','04','05','06','07','08','09','10','11','12',
-																					'13','14','15','16','96',''];
+		EXPORT set_valid_org_structure_cd := ['01','02','03','04','05','06','07','08','09','10','11',
+																					'12','13','14','15','16','17','18','24','25','96',''];
 																					
 		//Below table needs to be updated when we see new status codes in Raw updates!	
 		EXPORT set_valid_status_cd := [ 'ADS','CAN','CMC','CNF','CNS','COM','DEL','DIS','DLQ','DNP','EXP','FDE',

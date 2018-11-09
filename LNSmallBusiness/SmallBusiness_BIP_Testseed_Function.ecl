@@ -1,4 +1,4 @@
-/*2016-12-16T20:17:06Z (aleksandar tomovic)
+﻿/*2016-12-16T20:17:06Z (aleksandar tomovic)
 RR-10443 & RQ-13115
 */
 IMPORT Business_Risk_BIP, BusinessCredit_Services, Gateway, IESP, Models, Risk_Indicators, RiskWise, Seed_Files, UT, Royalty;
@@ -2186,7 +2186,15 @@ EXPORT SmallBusiness_BIP_Testseed_Function (
 			RIGHT.modelname = BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL, 
 			getModelKey(LEFT, RIGHT), INNER, KEEP(1)
 		);
-
+ SLBO1702_0_2_results := 
+		JOIN(
+			Input, Seed_Files.key_SmallBusModels, 
+			KEYED(TestDataTableName = RIGHT.tablename AND 
+			EXISTS(ModelsRequested(ModelName = BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO)) AND 
+			getHashValue_for_models(LEFT) = RIGHT.HashValue) AND
+			RIGHT.modelname = BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO, 
+			getModelKey(LEFT, RIGHT), INNER, KEEP(1)
+		);
 	SBBM1601_0_0_results := 
 		JOIN(
 			Input, Seed_Files.key_SmallBusModels, 
@@ -2196,10 +2204,18 @@ EXPORT SmallBusiness_BIP_Testseed_Function (
 			RIGHT.modelname = BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL, 
 			getModelKey(LEFT, RIGHT), INNER, KEEP(1)
 		);
-
+	SLBB1702_0_2_results := 
+		JOIN(
+			Input, Seed_Files.key_SmallBusModels, 
+			KEYED(TestDataTableName = RIGHT.tablename AND 
+			EXISTS(ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB)) AND 
+			getHashValue_for_models(LEFT) = RIGHT.HashValue) AND
+			RIGHT.modelname = BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB, 
+			getModelKey(LEFT, RIGHT), INNER, KEEP(1)
+		);
 	Model_Results := 
 		SORT( 
-			(SBBM1601_0_0_results + SBOM1601_0_0_results), // Sort to the top the "real" model names.
+			(SBBM1601_0_0_results + SBOM1601_0_0_results + SLBO1702_0_2_results + SLBB1702_0_2_results), // Sort to the top the "real" model names.
 			seq,
 			IF( StringLib.StringFind(modelname,'1601_0_0',1) > 0, 0, 1 ), 
 			ModelName 

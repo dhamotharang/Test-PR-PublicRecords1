@@ -1,14 +1,18 @@
-import SANCTN,RoxieKeyBuild,PromoteSupers,Scrubs_SANCTNKeys;
+﻿import SANCTN,RoxieKeyBuild,PromoteSupers,Scrubs_SANCTNKeys, dops;
 
-export MAC_SANCTN_Build(filedate) := MACRO
+export MAC_SANCTN_Build(filedate,skipTest=false) := MACRO
 #workunit('name','SANCTN Build ' + filedate);
 
 
 #uniquename(spray_payload)
+#uniquename(input_delta)
+#uniquename(input_test)
 #uniquename(parse_data)
 #uniquename(clean_data)
 // #uniquename(append_did)
 #uniquename(base_transfer)
+#uniquename(base_delta)
+#uniquename(base_test)
 #uniquename(build_keys)
 #uniquename(updatedops)
 #uniquename(qa_samp)
@@ -17,6 +21,10 @@ export MAC_SANCTN_Build(filedate) := MACRO
 
 // Spray the new file onto Thor
 %spray_payload% := SANCTN.spray_SANCTN_inputfile(filedate);
+
+%input_delta%		:= SANCTN.fnDeltaInput(filedate);
+%input_test%		:= SANCTN.fnInputFileCheck(filedate);
+													 
 
 // Parse each of the records types out of the combined file
 %parse_data%     := parallel(output(choosen(SANCTN.parse_SANCTN_incident_in,100))
@@ -52,9 +60,12 @@ PromoteSupers.MAC_SF_BuildProcess(combined_incident_data, SANCTN.cluster_name +'
 
 %base_transfer% := parallel(base_aka_dba_out,base_license_out,base_rebuttal_out, base_party_out,base_incident_out);
 
+%base_delta%		:= SANCTN.fnDeltaBaseFiles(filedate);
+%base_test%		:= SANCTN.fnBaseFilesCheck(filedate);
+
 %build_keys%  := SANCTN.proc_build_SANCTN_keys(filedate);
 							 
-%updatedops% := RoxieKeyBuild.updateversion('SanctnKeys',filedate,'skasavajjala@seisint.com',,'N|B');
+%updatedops% := dops.updateversion('SanctnKeys',filedate,'skasavajjala@seisint.com',,'N|B');
 
 %qa_samp%    := SANCTN.out_incident_party_samples;
 
@@ -72,9 +83,17 @@ SANCTN.Out_File_SANCTN_Stats_Population_V2 (SANCTN.file_base_incident
 
 sequential(
 					%spray_payload%
+					,%input_delta%
+					#if(skiptest=true)
+					,if(%input_test%=false,fail)
+					#end
           ,%parse_data%
           ,%clean_data%
 					,%base_transfer%
+					,%base_delta%
+					#if(skiptest=true)
+					,if(%base_test%=false,fail)
+					#end
 					,%build_keys%
 					,%qa_samp%
 					,%updatedops%

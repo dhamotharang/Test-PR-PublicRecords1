@@ -39,7 +39,7 @@ EXPORT InValidMessageFT_feintype(UNSIGNED1 wh) := CHOOSE(wh,SALT36.HygieneErrors
 EXPORT MakeFT_Invalid_Date(SALT36.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_Invalid_Date(SALT36.StrType s) := WHICH(~Scrubs.fn_valid_date(s)>0);
+EXPORT InValidFT_Invalid_Date(SALT36.StrType s) := WHICH(~Scrubs.fn_valid_date(s,'future')>0);
 EXPORT InValidMessageFT_Invalid_Date(UNSIGNED1 wh) := CHOOSE(wh,SALT36.HygieneErrors.CustomFail('Scrubs.fn_valid_date'),SALT36.HygieneErrors.Good);
 
 EXPORT MakeFT_OwnershipTypes(SALT36.StrType s0) := FUNCTION

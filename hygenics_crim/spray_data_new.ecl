@@ -1,10 +1,10 @@
-// EXPORT spray_data_new := 'todo';
+﻿// EXPORT spray_data_new := 'todo';
  IMPORT lib_stringlib, lib_fileservices, _control,digssoff;
 
 export spray_data_new  := MODULE 
 
-	export srcIP       		  := 'bctlpedata11.risk.regn.net';
-	export targetGrp   		  := 'thor400_20';
+	export srcIP       		  := _control.IPAddress.bctlpedata11;
+	export targetGrp   		  := 'thor400_44';
 	export src_root   := '/data/stub_cleaning/court/hygenics/criminal/';
 	
 	sourceCsvSeparater := '\\,';
@@ -23,7 +23,8 @@ export spray_data_new  := MODULE
 																														    OPFileName,
 																														    -1,,,
 																														    true,
-																														    true);
+																														    true,
+																																true);
 																											 
 
 export DOC_def (string p_date, string p_source)  := FUNCTION

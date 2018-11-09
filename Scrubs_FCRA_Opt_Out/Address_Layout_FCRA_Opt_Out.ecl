@@ -1,0 +1,1 @@
+﻿EXPORT Address_Layout_FCRA_Opt_Out := recordof(Scrubs_FCRA_Opt_Out.Address_in_FCRA_Opt_out);

@@ -10,6 +10,9 @@ EndDate := ut.GetDate;
 BeginDateTemp := ut.date_math(EndDate, -365);//'20160501';//
 BeginDate := IF(BeginDateTemp >= '20160501', BeginDateTemp, '20160501'); // Tracking didn't fully start until this date, eliminate the "test" days before this date.
 
+BadEndDate := '20171031'; 
+BadBeginDate := '20171102';
+
 eyeball := 100;
 
 /* ***********************************************************************************************
@@ -21,20 +24,21 @@ eyeball := 100;
 LogFile := Score_Logs.Key_ScoreLogs_XMLTransactionID;
 
 LogsRaw := DISTRIBUTE(PULL(LogFile (StringLib.StringToUpperCase(TRIM(Product)) IN ['CHARGEBACKDEFENDER'] AND 
-		datetime[1..8] BETWEEN BeginDate AND EndDate //AND StringLib.StringToLowerCase(TRIM(login_id)) 
+	((datetime[1..8] BETWEEN BeginDate AND BadEndDate) OR
+	(datetime[1..8] BETWEEN BadBeginDate AND EndDate)) 		
+			//AND StringLib.StringToLowerCase(TRIM(login_id)) 
 		//NOT IN Risk_Reporting.Constants.IgnoredLogins AND customer_id NOT IN Risk_Reporting.Constants.IgnoredAccountIDs
 		)));
 
 // In order to join the parsed input and output together I need to force the transaction id into the inputxml, and I needed a root XML node for the outputxml.  This seemed like the most reasonable way to do that.
-Logs := PROJECT(LogsRaw, TRANSFORM({RECORDOF(LogsRaw), STRING30 TransactionID, STRING10 AccountID, STRING8 TransactionDate}, 
+Logs_1 := PROJECT(LogsRaw, TRANSFORM({RECORDOF(LogsRaw), STRING30 TransactionID, STRING10 AccountID, STRING8 TransactionDate}, 
 				SELF.inputxml := StringLib.StringFindReplace(LEFT.inputxml, '<ChargebackDefender>', '<ChargebackDefender><TransactionId>' + LEFT.Transaction_Id + '</TransactionId>'); 
 				SELF.outputxml := '<ChargebackDefender>' + LEFT.outputxml + '</ChargebackDefender>';
 				SELF.TransactionID := LEFT.Transaction_ID;
 				SELF.AccountID := LEFT.customer_id;
 				SELF.TransactionDate := LEFT.DateTime[1..8];
-				SELF := LEFT));
-				
-OUTPUT(CHOOSEN(Logs, eyeball), NAMED('Sample_Raw_Logs'));
+				SELF := LEFT));		
+OUTPUT(CHOOSEN(Logs_1, eyeball), NAMED('Sample_Raw_Logs_1'));
 
 Risk_Reporting.Layouts.Parsed_ChargeBackDefender_Layout parseInput () := TRANSFORM
 	SELF.TransactionID	:= TRIM(XMLTEXT('TransactionId')); // Forced into the record so I can join it all together
@@ -115,10 +119,107 @@ Risk_Reporting.Layouts.Parsed_ChargeBackDefender_Layout parseInput () := TRANSFO
 	
 	SELF := [];
 END;
-parsedInput := PARSE(Logs, inputxml, parseInput(), XML('ChargebackDefender'));
+parsedInput_1 := PARSE(Logs_1, inputxml, parseInput(), XML('ChargebackDefender'));
+OUTPUT(CHOOSEN(parsedInput_1, eyeball), NAMED('Sample_parsedInput_1'));
+LOGS_11 := JOIN(DISTRIBUTE(parsedInput_1, HASH64(TransactionID)), DISTRIBUTE(Logs_1, HASH64(TransactionID)),
+	LEFT.TransactionID = RIGHT.TransactionID,
+	TRANSFORM(RIGHT), ATMOST(RiskWise.max_atmost), LOCAL);
+	
+Logs_2 := PROJECT(LogsRaw, TRANSFORM({RECORDOF(LogsRaw), STRING30 TransactionID, STRING10 AccountID, STRING8 TransactionDate}, 
+				SELF.inputxml := StringLib.StringFindReplace(LEFT.inputxml, '<ChargebackDefenderRequest>', '<ChargebackDefenderRequest><TransactionId>' + LEFT.Transaction_Id + '</TransactionId>'); 
+				SELF.outputxml := '<ChargebackDefender>' + LEFT.outputxml + '</ChargebackDefender>';
+				SELF.TransactionID := LEFT.Transaction_ID;
+				SELF.AccountID := LEFT.customer_id;
+				SELF.TransactionDate := LEFT.DateTime[1..8];
+				SELF := LEFT));		
+OUTPUT(CHOOSEN(Logs_2, eyeball), NAMED('Sample_Raw_Logs_2'));
 
-OUTPUT(CHOOSEN(parsedInput, eyeball), NAMED('Sample_Parsed_Input'));
+Risk_Reporting.Layouts.Parsed_ChargeBackDefender_Layout parseInput2 () := TRANSFORM
+	SELF.TransactionID	:= TRIM(XMLTEXT('TransactionId')); // Forced into the record so I can join it all together
+	SELF.CompanyName		:= TRIM(XMLTEXT('User/EndUser/CompanyName'));
+	SELF.OrderType 			:= TRIM(XMLTEXT('Options/OrderType'));
 
+	SELF.FullName				:= TRIM(XMLTEXT('SearchBy/BillTo/Name/Full'));
+	SELF.FirstName			:= TRIM(XMLTEXT('SearchBy/BillTo/Name/First'));
+	SELF.MiddleName			:= TRIM(XMLTEXT('SearchBy/BillTo/Name/Middle'));
+	SELF.LastName				:= TRIM(XMLTEXT('SearchBy/BillTo/Name/Last'));
+	SELF.SSN						:= Risk_Reporting.Common.ParseSSN(XMLTEXT('SearchBy/BillTo/SSN'));
+	SELF.DOB						:= TRIM(XMLTEXT('SearchBy/BillTo/DOB')) + 
+												Risk_Reporting.Common.ParseDate(XMLTEXT('SearchBy/BillTo/DOB/Year'), 
+												XMLTEXT('SearchBy/BillTo/DOB/Month'), XMLTEXT('SearchBy/BillTo/DOB/Day'));
+	SELF.Address				:= Risk_Reporting.Common.ParseAddress(XMLTEXT('SearchBy/BillTo/Address/StreetAddress1'), 
+												XMLTEXT('SearchBy/BillTo/Address/StreetAddress2'), 
+												XMLTEXT('SearchBy/BillTo/Address/StreetNumber'), 
+												XMLTEXT('SearchBy/BillTo/Address/StreetPreDirection'), 
+												XMLTEXT('SearchBy/BillTo/Address/StreetName'),
+												XMLTEXT('SearchBy/BillTo/Address/StreetSuffix'), 
+												XMLTEXT('SearchBy/BillTo/Address/StreetPostDirection'), 
+												XMLTEXT('SearchBy/BillTo/Address/UnitDesignation'),
+												XMLTEXT('SearchBy/BillTo/Address/UnitNumber'));
+	SELF.City						:= TRIM(XMLTEXT('SearchBy/BillTo/Address/City'));
+	SELF.State					:= TRIM(XMLTEXT('SearchBy/BillTo/Address/State'));
+	SELF.Zip						:= Risk_Reporting.Common.ParseZIP(XMLTEXT('SearchBy/BillTo/Address/Zip5'));
+	SELF.DL							:= TRIM(XMLTEXT('SearchBy/BillTo/DriverLicenseNumber'));
+	SELF.DLState				:= TRIM(XMLTEXT('SearchBy/BillTo/DriverLicenseState'));
+
+	SELF.HomePhone			:= Risk_Reporting.Common.ParsePhone(XMLTEXT('SearchBy/BillTo/Phone10'));
+	//SELF.WorkPhone			:= Risk_Reporting.Common.ParsePhone(XMLTEXT('SearchBy/WPhone10'));
+	SELF.Email					:= TRIM(XMLTEXT('SearchBy/BillTo/EmailAddress'));
+	SELF.IPAddress			:= TRIM(XMLTEXT('SearchBy/BillTo/IPAddress'));
+	//Ship to
+	SELF.FullName2				:= TRIM(XMLTEXT('SearchBy/ShipTo/Name/Full'));
+	SELF.FirstName2			:= TRIM(XMLTEXT('SearchBy/ShipTo/Name/First'));
+	SELF.MiddleName2			:= TRIM(XMLTEXT('SearchBy/ShipTo/Name/Middle'));
+	SELF.LastName2				:= TRIM(XMLTEXT('SearchBy/ShipTo/Name/Last'));
+	SELF.DOB2						:= TRIM(XMLTEXT('SearchBy/ShipTo/DOB')) + 
+												Risk_Reporting.Common.ParseDate(XMLTEXT('SearchBy/ShipTo/DOB/Year'), 
+												XMLTEXT('SearchBy/ShipTo/DOB/Month'), XMLTEXT('SearchBy/ShipTo/DOB/Day'));
+	SELF.Address2				:= Risk_Reporting.Common.ParseAddress(XMLTEXT('SearchBy/ShipTo/Address/StreetAddress1'), 
+												XMLTEXT('SearchBy/ShipTo/Address/StreetAddress2'), 
+												XMLTEXT('SearchBy/ShipTo/Address/StreetNumber'), 
+												XMLTEXT('SearchBy/ShipTo/Address/StreetPreDirection'), 
+												XMLTEXT('SearchBy/ShipTo/Address/StreetName'),
+												XMLTEXT('SearchBy/ShipTo/Address/StreetSuffix2'), 
+												XMLTEXT('SearchBy/ShipTo/Address/StreetPostDirection'), 
+												XMLTEXT('SearchBy/ShipTo/Address/UnitDesignation'),
+												XMLTEXT('SearchBy/ShipTo/Address/UnitNumber'));
+	SELF.City2						:= TRIM(XMLTEXT('SearchBy/ShipTo/Address/City'));
+	SELF.State2					:= TRIM(XMLTEXT('SearchBy/ShipTo/Address/State'));
+	SELF.Zip2						:= Risk_Reporting.Common.ParseZIP(XMLTEXT('SearchBy/ShipTo/Address/Zip5'));
+	SELF.DL2						:= TRIM(XMLTEXT('SearchBy/ShipTo/DriverLicenseNumber'));
+	SELF.DLState2				:= TRIM(XMLTEXT('SearchBy/ShipTo/DriverLicenseState'));
+	SELF.HomePhone2			:= Risk_Reporting.Common.ParsePhone(XMLTEXT('SearchBy/ShipTo/Phone10'));
+	SELF.Email2					:= TRIM(XMLTEXT('SearchBy/ShipTo/EmailAddress'));
+	SELF.OptionName1    := TRIM(XMLTEXT('Options/IncludeModels/ModelRequests[1]/ModelRequest[1]/ModelOptions[1]/ModelOption[1]/OptionName'));
+	SELF.OptionValue1   := TRIM(XMLTEXT('Options/IncludeModels/ModelRequests[1]/ModelRequest[1]/ModelOptions[1]/ModelOption[1]/OptionValue'));
+	SELF.OptionName2    := TRIM(XMLTEXT('Options/IncludeModels/ModelRequests[1]/ModelRequest[1]/ModelOptions[1]/ModelOption[2]/OptionName'));
+	SELF.OptionValue2   := TRIM(XMLTEXT('Options/IncludeModels/ModelRequests[1]/ModelRequest[1]/ModelOptions[1]/ModelOption[2]/OptionValue'));
+	SELF.OptionName3    := TRIM(XMLTEXT('Options/IncludeModels/ModelRequests[1]/ModelRequest[1]/ModelOptions[1]/ModelOption[3]/OptionName'));
+	SELF.OptionValue3   := TRIM(XMLTEXT('Options/IncludeModels/ModelRequests[1]/ModelRequest[1]/ModelOptions[1]/ModelOption[3]/OptionValue'));
+	SELF.OptionName4    := TRIM(XMLTEXT('Options/IncludeModels/ModelRequests[1]/ModelRequest[1]/ModelOptions[1]/ModelOption[4]/OptionName'));
+	SELF.OptionValue4   := TRIM(XMLTEXT('Options/IncludeModels/ModelRequests[1]/ModelRequest[1]/ModelOptions[1]/ModelOption[4]/OptionValue'));
+	SELF.OptionName5    := TRIM(XMLTEXT('Options/IncludeModels/ModelRequests[1]/ModelRequest[1]/ModelOptions[1]/ModelOption[5]/OptionName'));
+	SELF.OptionValue5   := TRIM(XMLTEXT('Options/IncludeModels/ModelRequests[1]/ModelRequest[1]/ModelOptions[1]/ModelOption[5]/OptionValue'));
+	SELF.OptionName6    := TRIM(XMLTEXT('Options/IncludeModels/ModelRequests[1]/ModelRequest[1]/ModelOptions[1]/ModelOption[6]/OptionName'));
+	SELF.OptionValue6   := TRIM(XMLTEXT('Options/IncludeModels/ModelRequests[1]/ModelRequest[1]/ModelOptions[1]/ModelOption[6]/OptionValue'));
+	SELF.OptionName7    := TRIM(XMLTEXT('Options/IncludeModels/ModelRequests[1]/ModelRequest[1]/ModelOptions[1]/ModelOption[7]/OptionName'));
+	SELF.OptionValue7   := TRIM(XMLTEXT('Options/IncludeModels/ModelRequests[1]/ModelRequest[1]/ModelOptions[1]/ModelOption[7]/OptionValue'));
+	SELF.OptionName8    := TRIM(XMLTEXT('Options/IncludeModels/ModelRequests[1]/ModelRequest[1]/ModelOptions[1]/ModelOption[8]/OptionName'));
+	SELF.OptionValue8   := TRIM(XMLTEXT('Options/IncludeModels/ModelRequests[1]/ModelRequest[1]/ModelOptions[1]/ModelOption[8]/OptionValue'));
+	SELF.OptionName9    := TRIM(XMLTEXT('Options/IncludeModels/ModelRequests[1]/ModelRequest[1]/ModelOptions[1]/ModelOption[9]/OptionName'));
+	SELF.OptionValue9   := TRIM(XMLTEXT('Options/IncludeModels/ModelRequests[1]/ModelRequest[1]/ModelOptions[1]/ModelOption[9]/OptionValue'));
+	SELF.OptionName10   := TRIM(XMLTEXT('Options/IncludeModels/ModelRequests[1]/ModelRequest[1]/ModelOptions[1]/ModelOption[10]/OptionName'));
+	SELF.OptionValue10  := TRIM(XMLTEXT('Options/IncludeModels/ModelRequests[1]/ModelRequest[1]/ModelOptions[1]/ModelOption[10]/OptionValue'));
+	
+	SELF := [];
+END;
+parsedInput_2 := PARSE(Logs_2, inputxml, parseInput2(), XML('ChargebackDefenderRequest'));
+OUTPUT(CHOOSEN(parsedInput_2, eyeball), NAMED('Sample_parsedInput_2'));
+LOGS_22 := JOIN(DISTRIBUTE(parsedInput_2, HASH64(TransactionID)), DISTRIBUTE(Logs_2, HASH64(TransactionID)),
+	LEFT.TransactionID = RIGHT.TransactionID,
+	TRANSFORM(RIGHT), ATMOST(RiskWise.max_atmost), LOCAL);
+Logs := Logs_11+ LOGS_22; //since the rawlog_1 has all the records, we only want the records with the correct XML tags we could link them to
+output(choosen(logs,100));
 Parsed_Layout_Temp := RECORD
 	Risk_Reporting.Layouts.Parsed_ChargeBackDefender_Layout;
 	
@@ -383,10 +484,13 @@ Parsed_Layout_Temp parseOutput () := TRANSFORM
 	
 	SELF := [];
 END;
-parsedOutputTemp := PARSE(Logs, outputxml, parseOutput(), XML('ChargebackDefender'));
-
+parsedOutputTemp_1 := PARSE(Logs_11, outputxml, parseOutput(), XML('ChargebackDefender'));
+parsedOutputTemp_2 := PARSE(Logs_22, outputxml, parseOutput(), XML('ChargebackDefender'));
+parsedOutputTemp := parsedOutputTemp_1 +parsedOutputTemp_2;
 OUTPUT(CHOOSEN(parsedOutputTemp, eyeball), NAMED('Sample_Parsed_Output'));
 
+		
+		
 Risk_Reporting.Layouts.Parsed_ChargeBackDefender_Layout normScores(Parsed_Layout_Temp le, UNSIGNED1 t) := TRANSFORM
 	SELF.Score := CASE(t,
 		1 => le.Score1,
@@ -567,7 +671,8 @@ Risk_Reporting.Layouts.Parsed_ChargeBackDefender_Layout combineParsedRecords(Ris
 END;
 
 // Join the parsed input/output and then filter out the results where no model was requested or where this was an income estimated model and not a true RiskView model
-parsedRecordsTemp := JOIN(parsedInput, parsedOutput, 
+parsedRecordsTemp_in := parsedInput_1+parsedInput_2 ;
+parsedRecordsTemp := JOIN(parsedRecordsTemp_in, parsedOutput, 
 	LEFT.TransactionID = RIGHT.TransactionID, combineParsedRecords(LEFT, RIGHT), 
 	KEEP(10), ATMOST(RiskWise.max_atmost)) 
 	(TRIM(StringLib.StringToUpperCase(model)) NOT IN ['', '00 TO 50', '10 TO 50']);
@@ -1249,6 +1354,5 @@ FileServices.SendEmail(Risk_Reporting.Constants.emailv2ChargeBackDefenderReports
 																		(UNSIGNED4)GETENV('SMTPport', '25'),
 																		'ThorReport@lexisnexis.com');		
 																		
-																		
-																		
+						
 																		

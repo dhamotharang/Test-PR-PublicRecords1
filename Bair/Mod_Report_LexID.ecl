@@ -1,4 +1,4 @@
-import std, bair_composite;
+﻿import std, bair_composite;
 EXPORT Mod_Report_LexID(string version = '', boolean pDelta = false) := module;
 	
 	shared rLexID := record
@@ -42,18 +42,18 @@ EXPORT Mod_Report_LexID(string version = '', boolean pDelta = false) := module;
 		+'</td></tr>\n'
 		;
 	
-	com_a := dedup(table(dataset(bair_composite.Filenames(,pDelta).composite_input, bair.layouts.rCompositeBase, flat, opt)(lexid <> 0), {eid, lexid}), record, all);
-	com_b := dedup(table(dataset(bair_composite.Filenames(,pDelta).composite_input + '_father', bair.layouts.rCompositeBase, flat, opt)(lexid <> 0), {eid, lexid}), record, all);
+	com_a := table(dataset(bair_composite.Filenames(,pDelta).composite_input, bair.layouts.rCompositeBase, flat, opt)(lexid <> 0), {eid, lexid}, record, few, merge);
+	com_b := table(dataset(bair_composite.Filenames(,pDelta).composite_input + '_father', bair.layouts.rCompositeBase, flat, opt)(lexid <> 0), {eid, lexid}, record, few, merge);
 	
-	per_b 			:= dedup(table(bair.files(,,pDelta).persons_base.delete(lexid <> 0), {eid, lexid}), record, all);
-	cfs_b 			:= dedup(table(bair.files(,,pDelta).cfs_base.delete(lexid <> 0), {eid, lexid}), record, all);
-	off_b 			:= dedup(table(bair.files(,,pDelta).offenders_base.delete(lexid <> 0), {eid, lexid}), record, all);
-	cra_b 			:= dedup(table(bair.files(,,pDelta).crash_base.delete(lexid <> 0), {eid, lexid}), record, all);
-
-	per_a 			:= dedup(table(bair.files(,,pDelta).persons_base.built(lexid <> 0), {eid, lexid}), record, all);
-	cfs_a 			:= dedup(table(bair.files(,,pDelta).cfs_base.built(lexid <> 0), {eid, lexid}), record, all);
-	off_a 			:= dedup(table(bair.files(,,pDelta).offenders_base.built(lexid <> 0), {eid, lexid}), record, all);
-	cra_a 			:= dedup(table(bair.files(,,pDelta).crash_base.built(lexid <> 0), {eid, lexid}), record, all);
+	per_b 			:= table(bair.files(,,pDelta).persons_base.delete(lexid <> 0), {eid, lexid}, record, few, merge);
+	cfs_b 			:= table(bair.files(,,pDelta).cfs_base.delete(lexid <> 0), {eid, lexid}, record, few, merge);
+	off_b 			:= table(bair.files(,,pDelta).offenders_base.delete(lexid <> 0), {eid, lexid}, record, few, merge);
+	cra_b 			:= table(bair.files(,,pDelta).crash_base.delete(lexid <> 0), {eid, lexid}, record, few, merge);
+	
+	per_a 			:= table(bair.files(,,pDelta).persons_base.built(lexid <> 0), {eid, lexid}, record, few, merge);
+	cfs_a 			:= table(bair.files(,,pDelta).cfs_base.built(lexid <> 0), {eid, lexid}, record, few, merge);
+	off_a 			:= table(bair.files(,,pDelta).offenders_base.built(lexid <> 0), {eid, lexid}, record, few, merge);
+	cra_a 			:= table(bair.files(,,pDelta).crash_base.built(lexid <> 0), {eid, lexid}, record, few, merge);
 
 	com_lexid_cnt_b 		:= count(com_b);
 	com_lexid_uniqcnt_b := count(dedup(com_b, lexid, all));

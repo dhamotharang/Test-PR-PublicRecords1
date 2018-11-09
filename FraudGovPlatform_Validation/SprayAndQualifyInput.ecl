@@ -1,6 +1,10 @@
-import _Control,tools,STD,FraudGovPlatform;
+﻿import _Control,tools,STD,FraudGovPlatform;
 
-EXPORT SprayAndQualifyInput(string version,string ip,string rootDir, string destinationGroup) := function
+EXPORT SprayAndQualifyInput(
+	STRING version,
+	STRING ip 		= IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		Constants.LandingZoneServer_dev, Constants.LandingZoneServer_prod),
+	STRING rootDir = IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		Constants.LandingZonePathBase_dev,	Constants.LandingZonePathBase_prod)
+) := FUNCTION
 
 ready    := rootDir+'ready/';
 done     := rootDir+'done/';
@@ -9,7 +13,7 @@ spraying := rootDir+'spraying/';
 
 dsFileList:=nothor(FileServices.RemoteDirectory(ip, ready, '*.dat')):independent;
 dsFileListSorted := sort(dsFileList,modified);
-fname:=dsFileListSorted[1].Name:independent;
+fname	:=dsFileListSorted[1].Name:independent;
 UpSt:=stringlib.stringtouppercase(fname[1..2]);
 UpType := map(
 						 STD.Str.Contains( fname, 'IdentityData'	, true	) => 'IDENTITYDATA'
@@ -24,8 +28,8 @@ MoveSprayingToDone  :=nothor(FileServices.MoveExternalFile(IP,spraying+fname,don
 
 FileFound:=exists(dsFileListSorted);
 ReportFileFound:=if(FileFound
-					,output('Found File To Spray',named('Found_File_To_Spray'))
-					,output('No File To Spray',named('No_File_To_Spray'))
+					,output('Found File To Spray',named('Contributory_Found_File_To_Spray'))
+					,output('No File To Spray',named('Contributory_No_File_To_Spray'))
 					);
 
 IsEmptyFile:=dsFileListSorted[1].size = 0;
@@ -41,11 +45,11 @@ SprayIt:=sequential(
 						,nothor(FileServices.SprayVariable(
 							 IP //sourceIP 
 							,spraying + fname //sourcepath 
-							,//maxrecordsize 
+							,5000000000//maxrecordsize 
 							,//srcCSVseparator 
 							,'~<EOL>~,\n'//srcCSVterminator 
 							,//srcCSVquote 
-							,destinationGroup //destinationgroup
+							,thorlib.group() //destinationgroup
 							,FileSprayed //destinationlogicalname 
 							, //timeout 
 							,//espserverIPport 
@@ -57,57 +61,58 @@ SprayIt:=sequential(
 						);	
 								
 // Validate delimiters
-ValidateDelimiter :=Mod_stats.ValidateDelimiter(fname).ValidationResults;
+ValidateDelimiter :=Mod_stats.ValidateDelimiter(fname,mod_sets.validDelimiter, mod_sets.validTerminators).ValidationResults;
 InvalidDelimiterFound 		:=exists(ValidateDelimiter(err='F1'));
 
 // Validate number of Columns
-ValidateColumns 	:=Mod_stats.ValidateNumberOfColumns(fname).ValidationResults;
+ValidateColumns 	:=Mod_stats.ValidateNumberOfColumns(fname,mod_sets.validDelimiter, mod_sets.validTerminators).ValidationResults;
 InvalidNumberOfColumnsFound :=exists(ValidateColumns(err='F2'));
 
 // ValidateInputFields
 																										
 treshld_  		:=	Mod_Sets.threshld;							
-FileStats			:=	Mod_Stats.ValidateInputFields(fname).ValidationResults;
-RecWithErrors := 	Mod_Stats.ValidateInputFields(fname).RecordsRejected;
+FileStats			:=	Mod_Stats.ValidateInputFields(fname,mod_sets.validDelimiter, mod_sets.validTerminators).ValidationResults;
+RecWithErrors := 	Mod_Stats.ValidateInputFields(fname,mod_sets.validDelimiter, mod_sets.validTerminators).RecordsRejected;
 
-ExcessiveInvalidRecordsFound:=exists(FileStats(err[1]='E',RecWithErrors/RecordsTotal>treshld_));
-
+ExcessiveInvalidRecordsFound:= exists(FileStats(err[1]='E',RecWithErrors/RecordsTotal>treshld_));
 					
 MoveToPass:=sequential(
-										 output('File '+fname+' content accepted',named('File_content_accepted'))
+										 output('File '+fname+' content accepted',named('Contributory_File_content_accepted'))
 										,MoveSprayingToDone
 										,map(
 													 UpType = 'IDENTITYDATA' 	=> fileservices.AddSuperfile(IdentityData_Passed,FileSprayed)
 													,UpType = 'KNOWNFRAUD'		=> fileservices.AddSuperfile(KnownFraud_Passed,FileSprayed)
 										 )
-										,Send_Email(st:=UpSt,fn:=fname,ut:=UpType).FileValidationReport
+										,Send_Email(st:=UpSt,fn:=fname,ut:=UpType).FileValidationReport(mod_sets.validDelimiter, mod_sets.validTerminators)
 						);
 															
 MoveToReject:=sequential(
-											 output('File '+fname+' contains fatal errors.  File will be rejected',named('File_content_rejected'))
+											 output('File '+fname+' contains fatal errors.  File will be rejected',named('Contributory_File_content_rejected'))
 											,MoveSprayingToError
 											,map(
 														 UpType = 'IDENTITYDATA' 	=> fileservices.AddSuperfile(IdentityData_Rejected,FileSprayed) 
-														,UpType = 'KNOWNFRAUD'		=> fileservices.AddSuperfile(KnownFraud_Rejected,FileSprayed))
-											 );											
+														,UpType = 'KNOWNFRAUD'		=> fileservices.AddSuperfile(KnownFraud_Rejected,FileSprayed)
+											 ));	
+											 
 							
 ReportExcessiveInvalidRecords := 	sequential (
 										  MoveToReject
-										 ,Send_Email(st:=UpSt,fn:=fname,ut:=UpType).FileValidationReport
+										 ,Send_Email(st:=UpSt,fn:=fname,ut:=UpType).FileValidationReport(mod_sets.validDelimiter, mod_sets.validTerminators)
 								);
 
+								
 ReportInvalidDelimiter := sequential (
 				 MoveToReject
-				,Send_Email(st:=UpSt,fn:=fname,ut:=UpType).InvalidDelimiterError
+				,Send_Email(st:=UpSt,fn:=fname,ut:=UpType).InvalidDelimiterError(mod_sets.validDelimiter, mod_sets.validTerminators)
 		);
 
 ReportInvalidNumberOfColumns := sequential (				
 				 MoveToReject
-				,Send_Email(st:=UpSt,fn:=fname,ut:=UpType).InvalidNumberOfColumns
+				,Send_Email(st:=UpSt,fn:=fname,ut:=UpType).InvalidNumberOfColumns(mod_sets.validDelimiter, mod_sets.validTerminators)
 		);
 
 ReportEmptyFile := sequential (
-				 output('File '+ip+ready+fname+' empty',named('File_empty'))
+				 output('File '+ip+ready+fname+' empty',named('Contributory_File_empty'))
 				,MoveReadyToError
 				,Send_Email(st:=UpSt,fn:=FileSprayed,ut:=UpType).FileEmptyErrorAlert
 		);

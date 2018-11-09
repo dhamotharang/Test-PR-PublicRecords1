@@ -1,6 +1,6 @@
-IMPORT ut, FLAccidents_Ecrash;
+﻿IMPORT ut, FLAccidents_Ecrash, eCrash_Services;
 
-EXPORT RawDeltaBaseSQL(IParam.searchrecords in_mod) := MODULE
+EXPORT RawDeltaBaseSQL(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 
 		EXPORT boolean	hasReportNumberParm 	:= in_mod.reportnumber <> '';
 		EXPORT boolean	hasRequestHashKey 		:= in_mod.RequestHashKey;
@@ -52,11 +52,31 @@ EXPORT RawDeltaBaseSQL(IParam.searchrecords in_mod) := MODULE
 		EXPORT string		ALLStreetSQL						:= accidentStreetSQL+crossStreetSQL+nextStreetSQL;
 		EXPORT string		ANYStreetSQLifParms			:= IF(hasANYStreet,' AND ('+ALLStreetSQL+')','');
 		EXPORT string   location_search_sql := IF (hasAccidentStreet, ' AND k.accident_location_street LIKE "%'+in_mod.AccidentLocationStreet+'%"', '') + IF (hasCrossStreet, ' AND k.accident_location_crossstreet LIKE "%'+in_mod.AccidentLocationCrossStreet+'%"','');
+		EXPORT boolean 	hasDolStartdate := in_mod.DolStartdate <> '';
+		EXPORT boolean 	hasDolEnddate := in_mod.DolEnddate <> '';
+		EXPORT boolean 	hasVin := in_mod.VehicleVin <> '';
+		EXPORT boolean 	haslicenseNbr := in_mod.driversLicenseNumber <> '';
+		EXPORT boolean 	hasTag := in_mod.LicensePlate <> '';
+		EXPORT boolean 	hasOfficerBadge := in_mod.OfficerBadgeNumber <> '';
+		
+		EXPORT boolean isDOLOnly := ((hasDolStartdate AND hasDolEnddate) OR hasInputDOL)
+			AND ~hasOneNameParm 
+			AND	~hasANYStreet
+			AND ~hasReportNumberParm 
+			AND ~hasVin
+			AND ~haslicenseNbr
+			AND ~hasTag
+			AND ~hasOfficerBadge;
+		
+		vinSQL := IF(hasVin, ' AND v.vin = "' + in_mod.VehicleVin + '"', '');
+		licenseSQL := IF(haslicenseNbr, ' AND p.driver_license_number = "' + in_mod.driversLicenseNumber + '"', '');
+		tagSQL := IF(hasTag, ' AND v.tag_number = "' + in_mod.LicensePlate + '"', '');		
+		officerBadgeSQL := IF(hasOfficerBadge, ' AND k.officer_id = "' + in_mod.OfficerBadgeNumber + '"', '');
 
 		
-	  shared dataset(Layouts.ECrashSearchAgency_alias_extended) GetNormzd_aliasrecs(IParam.searchrecords tmod):= FUNCTION
+	  shared dataset(eCrash_Services.Layouts.ECrashSearchAgency_alias_extended) GetNormzd_aliasrecs(eCrash_Services.IParam.searchrecords tmod):= FUNCTION
 		
-			layouts.ECrashSearchAgency_alias_extended xform_normalize({tmod.Agencies} R, integer cnt) := TRANSFORM
+			eCrash_Services.layouts.ECrashSearchAgency_alias_extended xform_normalize({tmod.Agencies} R, integer cnt) := TRANSFORM
 				
 					hasAgencyORI 	  := R.AgencyORI <> '';
 					agencyORISQL 		:= IF(hasAgencyORI,' AND k.agency_ori="'+TRIM(R.AgencyORI)+'"','');
@@ -72,7 +92,12 @@ EXPORT RawDeltaBaseSQL(IParam.searchrecords in_mod) := MODULE
 					jurisAndStateIfParms 	:= jurisIfParmSQL+jurisStateIfParmSQL;
 					jurisAndStateIfParmsElseNotNull := jurisNotNullIfNoParmSQL+jurisAndStateIfParms;
 					fNameStateSQL           := jurisStateIfParmSQL + jurisIfParmSQL + firstNameSQL;
-					simplePartialReportNumberWhere := fuzzyCaseIdentitySQL + jurisAndStateIfParmsElseNotNull+ANYStreetSQLifParms;						
+					
+					
+					vinLicenseTagOfficerBadgeSQL := vinSQL + licenseSQL + tagSQL + officerBadgeSQL;
+					
+					
+					simplePartialReportNumberWhere := jurisAndStateIfParmsElseNotNull+ANYStreetSQLifParms;						
 				
 					Self.hasAgencyORI				:= hasAgencyORI; // boolean
 					Self.agencyORISQL				:= agencyORISQL; // string					
@@ -89,6 +114,7 @@ EXPORT RawDeltaBaseSQL(IParam.searchrecords in_mod) := MODULE
 					self.jurisAndStateIfParms    := jurisAndStateIfParms; // string
 					self.jurisAndStateIfParmsElseNotNull := jurisAndStateIfParmsElseNotNull;  // string
 					self.fNameStateSQL		:= fNameStateSQL; // string
+					self.vinLicenseTagOfficerBadgeSQL := vinLicenseTagOfficerBadgeSQL; //string
 					self.simplePartialReportNumberWhere := simplePartialReportNumberWhere; //string
 					self := R;						
 			END;
@@ -109,24 +135,24 @@ EXPORT RawDeltaBaseSQL(IParam.searchrecords in_mod) := MODULE
 		END;
 
 		// -------------------------------------------------------------------------------------------------
-		EXPORT SQL_LIMIT := ConstantsDeltaBase.LIMITCLAUSE;
-		setupSQLSTMT := ConstantsDeltaBase.JoinSetupString;
+		EXPORT SQL_LIMIT := eCrash_Services.ConstantsDeltaBase.LIMITCLAUSE;
+		setupSQLSTMT := eCrash_Services.ConstantsDeltaBase.JoinSetupString;
 
 		// If the whereString was EMPTY - keep the entire SQL String empty.
 		EXPORT protectedSQLSetupSTMT(STRING debugName, STRING whereString) := FUNCTION
 				boolean whereNotEmpty := whereString<>''; 
-				deltabaseDateAdded := ' AND k.date_added > "' + GetDeltabaseDateAdded() + '"'; 
-				string finalSQL := IF(whereNotEmpty, setupSQLSTMT + whereString + deltabaseDateAdded + SQL_LIMIT, '');
+				deltabaseDateAdded := ' k.date_added > "' + GetDeltabaseDateAdded() + '"'; 
+				string finalSQL := IF(whereNotEmpty, setupSQLSTMT + deltabaseDateAdded + whereString + SQL_LIMIT, '');
 				// IF(whereNotEmpty,OUTPUT(finalSQL,NAMED('BAPDEBUG_'+debugName)));
 				RETURN finalSQL;
 		END;
 
 		//Person name lookup has to be a subquery to get incidentIDs with an outer query pulling back all persons for those incidents.
-		specialPersonSetupSTMT := ConstantsDeltaBase.PersonOuterToInnerSelect;
+		specialPersonSetupSTMT := eCrash_Services.ConstantsDeltaBase.PersonOuterToInnerSelect;
 
 		EXPORT protectedPersonSQLSetupSTMT(STRING debugName, STRING whereString) := FUNCTION
 				boolean whereNotEmpty := whereString<>'';
-				deltabaseDateAdded := ' AND k.date_added > "' + GetDeltabaseDateAdded() + '"';
+				deltabaseDateAdded := ' k.date_added > "' + GetDeltabaseDateAdded() + '"';
 				string finalSQL := IF(whereNotEmpty, specialPersonSetupSTMT + deltabaseDateAdded + whereString +')' + SQL_LIMIT, '');
 				// IF(whereNotEmpty,OUTPUT(finalSQL,NAMED('BAPDEBUG_'+debugName)));
 				RETURN finalSQL;
@@ -134,17 +160,19 @@ EXPORT RawDeltaBaseSQL(IParam.searchrecords in_mod) := MODULE
 		// -------------------------------------------------------------------------------------------------
 		
 		// -------------------------------------------------------------------------------------------------
-		EXPORT byReportNumberWhere(Layouts.ECrashSearchAgency_alias_extended Rec) := FUNCTION
-				string exactReportNumberSQL := exactCaseIdentitySQL + Rec.requestedHashKeySQLifParms + Rec.jurisAndStateIfParmsElseNotNull;
+		EXPORT byReportNumberWhere(eCrash_Services.Layouts.ECrashSearchAgency_alias_extended Rec) := FUNCTION
+				string exactReportNumberSQL := exactCaseIdentitySQL 
+					+ Rec.requestedHashKeySQLifParms 
+					+ Rec.jurisAndStateIfParmsElseNotNull 
+					+ Rec.vinLicenseTagOfficerBadgeSQL;
 				boolean shouldPerform := hasReportNumberParm AND NOT obviousPartial;
 				// I think if we only get 4 - lets not try an exact lookup, could lead to massive response in error.
 				RETURN IF(shouldPerform,exactReportNumberSQL,'');
 		END;
 		
 		EXPORT byReportNumberSQL() := FUNCTION
-				// RETURN protectedSQLSetupSTMT('byRpNum',byReportNumberWhere());
-				Layouts.R_DeltaBaseSelectRequest xform_prj(Layouts.ECrashSearchAgency_alias_extended R) := TRANSFORM
-					Self.Select := protectedSQLSetupSTMT('byRpNum',byReportNumberWhere(R));
+				eCrash_Services.Layouts.R_DeltaBaseSelectRequest xform_prj(eCrash_Services.Layouts.ECrashSearchAgency_alias_extended R) := TRANSFORM
+					Self.Select := protectedPersonSQLSetupSTMT('byRpNum',byReportNumberWhere(R));
 				END;				
 				return PROJECT(Normalized_recs,XFORM_prj(left));
 		END;
@@ -153,27 +181,32 @@ EXPORT RawDeltaBaseSQL(IParam.searchrecords in_mod) := MODULE
 		//TODO   we could also safely add +fuzzyCaseIdentitySQL+jurisAndStateIfParms if we need this to narrow better
 		//TODO   *OR* I can remove the existing ANYStreetSQLifParms ... not sure how long that's been there but it hasn't appeared to hurt anything.
 		//TODO 7-9-13 ... I think I really need to add fuzzyCaseIdentitySQL here to limit rows returned.
-		EXPORT byAutoRecsWhere(Layouts.ECrashSearchAgency_alias_extended Rec) := FUNCTION
-				RETURN IF(hasOneNameParm, fuzzyCaseIdentitySQL+fullNameSQLifParms+ANYStreetSQLifParms+ Rec.jurisAndStateIfParmsElseNotNull,'');
+		EXPORT byAutoRecsWhere(eCrash_Services.Layouts.ECrashSearchAgency_alias_extended Rec) := FUNCTION
+				RETURN IF(
+					isDOLOnly, 
+					'',
+					fullNameSQLifParms
+					+ ANYStreetSQLifParms
+					+ Rec.jurisAndStateIfParmsElseNotNull
+					+ Rec.vinLicenseTagOfficerBadgeSQL
+				);
 		END;
 		
-		EXPORT byAutoRecsSQL() := FUNCTION
-				//RETURN protectedPersonSQLSetupSTMT('byAutoRecs',byAutoRecsWhere());						
-				Layouts.R_DeltaBaseSelectRequest xform_prj(Layouts.ECrashSearchAgency_alias_extended R) := TRANSFORM
+		EXPORT byAutoRecsSQL() := FUNCTION		
+				eCrash_Services.Layouts.R_DeltaBaseSelectRequest xform_prj(eCrash_Services.Layouts.ECrashSearchAgency_alias_extended R) := TRANSFORM
 					Self.Select := protectedPersonSQLSetupSTMT('byAutoRecs',byAutoRecsWhere(R));
 				END;
 				RETURN PROJECT(Normalized_recs,XFORM_prj(left));	
 				
 		END;
 		
-		EXPORT byDOLExactWhere(Layouts.ECrashSearchAgency_alias_extended Rec) := FUNCTION
+		EXPORT byDOLExactWhere(eCrash_Services.Layouts.ECrashSearchAgency_alias_extended Rec) := FUNCTION
 				RETURN IF(hasInputDOL,DOLEqualsSQLIfParms + Rec.simplePartialReportNumberWhere,'');
 		END;
 		
 		EXPORT byDOLExactSQL() := FUNCTION
-				//RETURN protectedSQLSetupSTMT('byDOLExact',byDOLExactWhere());
-				
-				Layouts.R_DeltaBaseSelectRequest xform_prj(Layouts.ECrashSearchAgency_alias_extended R) := TRANSFORM
+					
+				eCrash_Services.Layouts.R_DeltaBaseSelectRequest xform_prj(eCrash_Services.Layouts.ECrashSearchAgency_alias_extended R) := TRANSFORM
 					Self.Select := protectedSQLSetupSTMT('byDOLExact',byDOLExactWhere(R));
 				END;
 				RETURN PROJECT(Normalized_recs,XFORM_prj(left));	
@@ -181,16 +214,15 @@ EXPORT RawDeltaBaseSQL(IParam.searchrecords in_mod) := MODULE
 		END;
 				
 		// -------------------------------------------------------------------------------------------------
-		EXPORT byDOLFuzzyWhere(String8 minDate, String8 maxDate,Layouts.ECrashSearchAgency_alias_extended Rec) := FUNCTION
+		EXPORT byDOLFuzzyWhere(String8 minDate, String8 maxDate,eCrash_Services.Layouts.ECrashSearchAgency_alias_extended Rec) := FUNCTION
 				dolBetweenString := DOLBetweenOrEqSQL(minDate,maxDate);
 				out := dolBetweenString + Rec.simplePartialReportNumberWhere;
 				RETURN out;
 		END;
 
 		EXPORT byDOLFuzzySQL(String8 minDate, String8 maxDate) := FUNCTION
-				// RETURN protectedSQLSetupSTMT('byDOLFuzzy',byDOLFuzzyWhere(minDate, maxDate));
-				
-				Layouts.R_DeltaBaseSelectRequest xform_prj(Layouts.ECrashSearchAgency_alias_extended R) := TRANSFORM
+								
+				eCrash_Services.Layouts.R_DeltaBaseSelectRequest xform_prj(eCrash_Services.Layouts.ECrashSearchAgency_alias_extended R) := TRANSFORM
 					Self.Select := protectedSQLSetupSTMT('byDOLFuzzy',byDOLFuzzyWhere(minDate,maxDate,R));
 				END;
 				RETURN PROJECT(Normalized_recs,XFORM_prj(left));	
@@ -199,7 +231,7 @@ EXPORT RawDeltaBaseSQL(IParam.searchrecords in_mod) := MODULE
 		
 				
 		// -------------------------------------------------------------------------------------------------
-		EXPORT byPartialReportNumberWhere(STRING8 minDate, STRING8 maxDate,Layouts.ECrashSearchAgency_alias_extended Rec) := FUNCTION
+		EXPORT byPartialReportNumberWhere(STRING8 minDate, STRING8 maxDate,eCrash_Services.Layouts.ECrashSearchAgency_alias_extended Rec) := FUNCTION
 				// a superior stmt if DOL parm is there
 				dolEnhancedPartialRptNumWhere := DOLBetweenOrEqSQL(minDate,maxDate)+ Rec.simplePartialReportNumberWhere;
 				string partialReportNumReturnWhere := if(hasInputDOL, dolEnhancedPartialRptNumWhere, Rec.simplePartialReportNumberWhere);
@@ -208,9 +240,8 @@ EXPORT RawDeltaBaseSQL(IParam.searchrecords in_mod) := MODULE
 		END;
 		
 		EXPORT byPartialReportNumberSQL(STRING8 minDate, STRING8 maxDate) := FUNCTION
-				//RETURN protectedSQLSetupSTMT('byPrtlRptNum',byPartialReportNumberWhere(minDate, maxDate));
-				
-				Layouts.R_DeltaBaseSelectRequest xform_prj(Layouts.ECrashSearchAgency_alias_extended R) := TRANSFORM
+								
+				eCrash_Services.Layouts.R_DeltaBaseSelectRequest xform_prj(eCrash_Services.Layouts.ECrashSearchAgency_alias_extended R) := TRANSFORM
 					Self.Select := protectedSQLSetupSTMT('byPrtlRptNum',byPartialReportNumberWhere(minDate, maxDate, R));
 				END;
 				RETURN PROJECT(Normalized_recs,XFORM_prj(left));			
@@ -223,12 +254,16 @@ EXPORT RawDeltaBaseSQL(IParam.searchrecords in_mod) := MODULE
 		);
 		
 		EXPORT STRING GetImageRetrievalSqlByReportId(STRING ReportId, STRING DateAdded) := 
-			GetSqlByWhere(
-				ConstantsDeltabase.ImageRetrievalSqlByReportId, 
-				'k.report_id = ' + ReportId + ' AND k.date_added > ' + '"' + DateAdded + '"'
+			IF(
+				TRIM(ReportId) != '' AND TRIM(DateAdded) != '',
+				GetSqlByWhere(
+					eCrash_Services.ConstantsDeltabase.ImageRetrievalSqlByReportId, 
+					'k.report_id = ' + ReportId + ' AND k.date_added > ' + '"' + DateAdded + '"'
+				),
+				''
 			);	
 		
-		EXPORT GetImageRetrievalSql(Layouts.eCrashRecordStructure SearchBy, STRING ReportIdWhere = '', STRING DateAddedIn = '') := FUNCTION
+		EXPORT GetImageRetrievalSql(eCrash_Services.Layouts.eCrashRecordStructure SearchBy, STRING ReportIdWhere = '', STRING DateAddedIn = '') := FUNCTION
 			STRING ReportIdWhereSql := IF(
 				ReportIdWhere = '',
 				'',
@@ -254,10 +289,10 @@ EXPORT RawDeltaBaseSQL(IParam.searchrecords in_mod) := MODULE
 					'" AND k.date_of_loss = "' + dateFormatted(TRIM(SearchBy.accident_date)) + 
      			'" AND k.report_type_id = "' + TRIM(SearchBy.report_type_id) + '"'+ ReportIdWhereSql;
 
-			ResultRaw := GetSqlByWhere(ConstantsDeltabase.ImageRetrievalSql, WhereClause);
+			ResultRaw := GetSqlByWhere(eCrash_Services.ConstantsDeltabase.ImageRetrievalSql, WhereClause);
 			
 			DateAdded := IF(DateAddedIn = '', GetDeltabaseDateAdded(), DateAddedIn);
-			Result := ResultRaw + ' AND k.date_added > "' + DateAdded + '"' + ConstantsDeltaBase.LIMITCLAUSE;	
+			Result := ResultRaw + ' AND k.date_added > "' + DateAdded + '"' + eCrash_Services.ConstantsDeltaBase.LIMITCLAUSE;	
 				
 			RETURN Result; 
 		END;
@@ -265,47 +300,46 @@ EXPORT RawDeltaBaseSQL(IParam.searchrecords in_mod) := MODULE
 		
 		EXPORT GetTmImageSql(SET OF STRING ReportIds) := FUNCTION
 			ReportIdsString := fn_CombineWords(ReportIds, ',');
-			Where := 'report_id IN (' + ReportIdsString + ') ORDER BY date_added DESC LIMIT 1';
+			Where := IF(
+				TRIM(ReportIdsString) = '',
+				'',
+				'report_id IN (' + ReportIdsString + ') ORDER BY date_added DESC LIMIT 1'
+			);
 			
-			RETURN GetSqlByWhere(ConstantsDeltabase.TmImageSql, Where);
+			RETURN GetSqlByWhere(eCrash_Services.ConstantsDeltabase.TmImageSql, Where);
 		END;
 	
-		EXPORT byLocationWhere(Layouts.ECrashSearchAgency_alias_extended Rec) := FUNCTION
-				RETURN ANYStreetSQLifParms + Rec.jurisStateIfParmSQL + Rec.jurisIfParmSQL;
+		EXPORT byLocationWhere(eCrash_Services.Layouts.ECrashSearchAgency_alias_extended Rec) := FUNCTION
+				RETURN ANYStreetSQLifParms + Rec.jurisStateIfParmSQL + Rec.jurisIfParmSQL + Rec.vinLicenseTagOfficerBadgeSQL;
 		END;
 		
 		EXPORT byLocationSQL() := FUNCTION
-				// RETURN protectedSQLSetupSTMT('byLocation',byLocationWhere());
-				
-				Layouts.R_DeltaBaseSelectRequest xform_prj(Layouts.ECrashSearchAgency_alias_extended R) := TRANSFORM
-					Self.Select := protectedSQLSetupSTMT('byLocation',byLocationWhere(R));
+				eCrash_Services.Layouts.R_DeltaBaseSelectRequest xform_prj(eCrash_Services.Layouts.ECrashSearchAgency_alias_extended R) := TRANSFORM
+					Self.Select := protectedPersonSQLSetupSTMT('byLocation',byLocationWhere(R));
 				END;
 				RETURN PROJECT(Normalized_recs,XFORM_prj(left));		
 		END;		
 		
 		
 	
-		EXPORT byFirstNameAndStateWhere(Layouts.ECrashSearchAgency_alias_extended Rec) := FUNCTION
-			  RETURN IF(hasFirst, Rec.fNameStateSQL, '');
+		EXPORT byFirstNameAndStateWhere(eCrash_Services.Layouts.ECrashSearchAgency_alias_extended Rec) := FUNCTION
+			  RETURN IF(hasFirst, Rec.fNameStateSQL + Rec.vinLicenseTagOfficerBadgeSQL, '');
 		END;
 		
 		EXPORT byFirstNameAndState() := FUNCTION
-			  //RETURN protectedPersonSQLSetupSTMT('byFnameState',byFirstNameAndStateWhere());    
-				
-				Layouts.R_DeltaBaseSelectRequest xform_prj(Layouts.ECrashSearchAgency_alias_extended R) := TRANSFORM
+				eCrash_Services.Layouts.R_DeltaBaseSelectRequest xform_prj(eCrash_Services.Layouts.ECrashSearchAgency_alias_extended R) := TRANSFORM
 					Self.Select := protectedPersonSQLSetupSTMT('byFnameState',byFirstNameAndStateWhere(R));
 				END;
 				RETURN PROJECT(Normalized_recs,XFORM_prj(left));		
 		END;
 	
-		EXPORT associatedReportsByReportLinkID(Layouts.recs_with_penalty rec) := FUNCTION
+		EXPORT associatedReportsByReportLinkID(eCrash_Services.Layouts.recs_with_penalty rec) := FUNCTION
 		    sqlWhereString := ' AND k.report_link_id = "' +TRIM(rec.ReportLinkID)+ '" AND k.report_type_id <> "' +TRIM(rec.report_type_id)+ '"';
 			  RETURN protectedSQLSetupSTMT('associatedReportsByReportLinkID',sqlWhereString);    
 		END;
 		
 		
 		EXPORT subscriptionWhere() := FUNCTION
-				//RETURN jurisStateIfParmSQL + jurisIfParmSQL + ' AND k.report_type_id = "A"';
 				Primary_rec := Normalized_recs(PrimaryAgency = true);				
 				RETURN Primary_rec[1].jurisStateIfParmSQL + Primary_rec[1].jurisIfParmSQL + ' AND k.report_type_id = "A"';	
 		END;
@@ -321,7 +355,7 @@ EXPORT RawDeltaBaseSQL(IParam.searchrecords in_mod) := MODULE
 		END;
 	
 		EXPORT GetDocumentsByReportIdSQL(STRING ReportId, STRING DateAdded) := FUNCTION
-			  RETURN ConstantsDeltaBase.Document_Select + ' report_id IN ( ' + ReportId + ' )  AND date_added > "' + DateAdded + '"' + SQL_LIMIT;
+			  RETURN eCrash_Services.ConstantsDeltaBase.Document_Select + ' report_id IN ( ' + ReportId + ' )  AND date_added > "' + DateAdded + '"' + SQL_LIMIT;
     END;
 
 		EXPORT GetDocumentsSQL(FLAccidents_Ecrash.Key_eCrashv2_Supplemental SearchBy, STRING DateAdded) := FUNCTION
@@ -346,7 +380,7 @@ EXPORT RawDeltaBaseSQL(IParam.searchrecords in_mod) := MODULE
 					' AND date_added > "' + DateAdded + '"';
 					
 					
-			RETURN ConstantsDeltaBase.Document_Select + WhereClause + SQL_LIMIT;
+			RETURN eCrash_Services.ConstantsDeltaBase.Document_Select + WhereClause + SQL_LIMIT;
 		END;
 
 END;

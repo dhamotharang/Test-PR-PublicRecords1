@@ -1,5 +1,5 @@
-EXPORT layouts := MODULE
-  IMPORT AID;
+﻿EXPORT layouts := MODULE
+  IMPORT AID, bipv2;
 
 	EXPORT layout_Acquireweb_Email_Individuals:=RECORD
 		STRING	AWID_Ind;
@@ -17,45 +17,24 @@ EXPORT layouts := MODULE
 	END;
 
 	EXPORT layout_Acquireweb_Email_Emails:=RECORD
-		STRING	AWID_Email;
 		STRING	emailid;
+		STRING	AWID_Email;
 		STRING	email;
 		STRING	ACTIVECODE;
 		STRING	EmailExportDate;
 	END;
-
-	EXPORT layout_Acquireweb_Base:=RECORD
-	  // Information from the original files
-    STRING awid;
-    STRING firstname;
-    STRING lastname;
-    STRING address1;
-    STRING address2;
-    STRING city;
-    STRING state;
-    STRING zip;
-    STRING zip4;
-    STRING phone;
-    STRING dob;
-    STRING emailid;
-    STRING email;
-    STRING activecode;
-		
-		// Information harvested from the DID lookup process
-    UNSIGNED8 did;
-    UNSIGNED8 did_score;
-		UNSIGNED8 aid;
-		
-		// Information harvested from the CleanPersonFML73 function
-    STRING5 clean_title;
+	
+	EXPORT layout_clean_name := RECORD
+		STRING5 clean_title;
     STRING20 clean_fname;
     STRING20 clean_mname;
     STRING20 clean_lname;
     STRING5 clean_name_suffix;
     STRING3 clean_name_score;
-		
-		// information harvested from the AID lookup process
-    STRING10 clean_prim_range;
+	END;
+	
+	EXPORT layout_clean_addr := RECORD
+		STRING10 clean_prim_range;
     STRING2 clean_predir;
     STRING28 clean_prim_name;
     STRING4 clean_addr_suffix;
@@ -81,11 +60,43 @@ EXPORT layouts := MODULE
     STRING7 clean_geo_blk;
     STRING1 clean_geo_match;
     STRING4 clean_err_stat;
+	END;
+
+	EXPORT layout_Acquireweb_Base:=RECORD
+		UNSIGNED6 rcid; //Used for Ingest process
+	  // Information from the original files
+    STRING awid;
+    STRING firstname;
+    STRING lastname;
+    STRING address1;
+    STRING address2;
+    STRING city;
+    STRING state;
+    STRING zip;
+    STRING zip4;
+    STRING phone;
+    STRING dob;
+    STRING emailid;
+    STRING email;
+    STRING activecode;
+		
+		// Information harvested from the DID lookup process
+    UNSIGNED8 did;
+    UNSIGNED8 did_score;
+		UNSIGNED8 aid;
+		
+		// Information harvested from the CleanPersonFML73 function
+    layout_clean_name;
+		
+		// information harvested from the AID lookup process
+    layout_clean_addr;
 
     // Instance tracking fields
 		STRING8 date_first_seen;
 		STRING8 date_last_seen;
 		STRING8 date_vendor_first_reported;
 		STRING8 date_vendor_last_reported;
+		BOOLEAN current_rec;
 	END;
+
 END;

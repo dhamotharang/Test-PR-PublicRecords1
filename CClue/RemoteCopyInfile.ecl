@@ -1,8 +1,9 @@
-import _Control, ut, tools;
+﻿import _Control, ut, tools;
 
-EXPORT RemoteCopyInfile(	string	pInSuperFile						=  '~foreign::' + '10.194.12.1' + '::'+'thor::base::cclue::qa::search::output' //~foreign::10.194.12.1::
-												,	string	pCluster								= 'thor400_sta01'
-												, string	pRemoteIp								= '10.194.12.1:7070'   // insurance prod 
+EXPORT RemoteCopyInfile(	string	pInSuperFile						= '~foreign::' + _control.IPAddress.aprod_thor_dali + '::'+'thor::base::cclue::qa::search::output' // ~foreign::10.194.12.1::
+												,	string	pCluster								= _Constants().groupname							 // 'thor400_sta01'
+												, string	pRemoteIp								= _control.IPAddress.aprod_thor_dali   // insurance prod 
+												//, string	pRemoteIp								= _control.IPAddress.adataland_dali   // insurance dataland 
 												, boolean	pCompressed							= true
 												, string	pEmailNotificationList	= _control.MyInfo.EmailAddressNotify
 												, boolean pIsTesting							= false
@@ -23,7 +24,7 @@ EXPORT RemoteCopyInfile(	string	pInSuperFile						=  '~foreign::' + '10.194.12.1
 		
 		email_subject_success :=	'Success';
 		
-		email_body_success :=  'Remote Copied CClue file from Insurance Thor - 10.194.12.1:7070 to '+ _Control.ThisEnvironment.Name +'\n\n Input Superfile Name :- ' + pInSuperFile + '\n Input logicalfile Name:- ' + InLogicalFile_Name + '\n Remote Copied logicalfile Name:- ' + OutLogicalFile_Name;
+		email_body_success :=  'Remote Copied CClue file from Insurance Thor - '+ pRemoteIp +' to '+ _Control.ThisEnvironment.Name +'\n\n Input Superfile Name :- ' + pInSuperFile + '\n Input logicalfile Name:- ' + InLogicalFile_Name + '\n Remote Copied logicalfile Name:- ' + OutLogicalFile_Name;
 		
 		email_subject_Skipped :=	'SKIPPED';
 		

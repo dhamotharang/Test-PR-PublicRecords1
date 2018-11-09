@@ -388,13 +388,11 @@ EXPORT GetBusHeaderMetaData := MODULE
                                       SELF.acctno := LEFT.acctno;
                                       SELF := LEFT,
                                       SELF := RIGHT,
-                                      SELF := []), LEFT OUTER);
-  			 
-    BusHeaderMetaDataOut := ds_allMetadata;
+                                      SELF := []), LEFT OUTER);  			
     
     // set all the fields in here
     // join back to the acctno at the end.
-	 ds_resultsTmp := PROJECT(JOIN(BatchInputIn,  BusHeaderMetaDataOut,
+	 ds_resultsTmp := PROJECT(JOIN(BatchInputIn,  ds_allMetadata,
                                       LEFT.acctno = RIGHT.acctno AND
                                       BIPV2.IDmacros.mac_JoinTop3Linkids(),
                                       TRANSFORM(BusinessBatch_BIP.Layouts.BusHeaderMetaDataTmp,
@@ -405,7 +403,7 @@ EXPORT GetBusHeaderMetaData := MODULE
                                                 SELF := LEFT,
                                                 SELF := RIGHT,
                                                 SELF := []),
-                                      LEFT OUTER),                                 
+                                      LEFT OUTER),                                
                             BusinessBatch_BIP.Layouts.BusHeaderMetaDataFinal);	  	
 										 
 		// output(BatchInputIn, named('BatchInputIn'));
@@ -440,13 +438,14 @@ EXPORT GetBusHeaderMetaData := MODULE
 		// output(ds_NaicsCodeDescriptions, named('ds_NaicsCodeDescriptions'));
 		// output(ds_NaicsCodeDescriptions, named('ds_NaicsCodeDescriptions'));
 		// output(ds_NaicsCodeWLinkIds, named('ds_NaicsCodeWLinkIds'));
-		// output(ds_IndustryRecsDenormNAICSCode, named('ds_IndustryRecsDenormNAICSCode'));
+		//output(ds_IndustryRecsDenormSicCode, named('ds_IndustryRecsDenormSicCode'));
+		//output(ds_IndustryRecsDenormNAICSCode, named('ds_IndustryRecsDenormNAICSCode'));
 		//output(ds_busHeaderRecsSlim, named('ds_busHeaderRecsSlim'));
 		// output(count(ds_busHeaderRecsLinkIDs(business_status != '')),named('cnt_ds_busHeaderRecsLinkIDs'));
 		// output(ds_IndustryRecsDenorm, named('ds_IndustryRecsDenorm'));
 	 //output(ds_SicCodeRecsWAcctno, named('ds_SicCodeRecsWAcctno'));
 
-		//output(ds_AllCodesRecsWAcctno, named('ds_AllCodesRecsWAcctno'));
+		// output(ds_AllCodesRecsWAcctno, named('ds_AllCodesRecsWAcctno'));
 		// output(ds_allMetadata, named('ds_allMetadata'));
 	//output(ds_resultsTmp, named('ds_resultsTmp'));
     

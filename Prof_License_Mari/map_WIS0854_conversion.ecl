@@ -1,4 +1,4 @@
-/* Converting Wisconsin Dept of Regulation and Licensing Professional License File to MARI common layout
+﻿/* Converting Wisconsin Dept of Regulation and Licensing Professional License File to MARI common layout
 // Following allowable Real Estate License Type: APR, RLE, MTG, LND
 */
 IMPORT ut
@@ -121,25 +121,29 @@ Prof_License_Mari.layouts.base	xformToCommon(Prof_License_Mari.layout_WIS0854.sr
 		
 		SuffixPattern         := '(JR\\.|SR\\.| JR$| JR | SR$| SR | III| II| IV$| IV | IV| VII$| VII | VI$| VI )';
 		removesuffix          := REGEXREPLACE(SuffixPattern,GoodFullName,'');
-		TmpSuffix             := TRIM(REGEXFIND(SuffixPattern,GoodFullName,0),LEFT,RIGHT);															
+		TmpSuffix1            := TRIM(REGEXFIND(SuffixPattern,GoodFullName,0),LEFT,RIGHT);															
 		
 		ClnLFMName						:= Prof_License_Mari.mod_clean_name_addr.cleanLFMName(removeSuffix);																
 																	
 		GoodNAME_FIRST := MAP(REGEXFIND('(.*),(.*),([A-Za-z ]*)',removeSuffix) => REGEXFIND('(.*),(.*),([A-Za-z ]*)',removeSuffix,2),
 		                      REGEXFIND('(.*),([A-Za-z ]*)',removeSuffix) => REGEXFIND('(.*),([A-Za-z ]*)',removeSuffix,2),
-													ClnLFMName<>'' => TRIM(ClnLFMName[6..25],LEFT,RIGHT),
-												 '');
+													           ClnLFMName<>'' => TRIM(ClnLFMName[6..25],LEFT,RIGHT),
+												            '');
 		GoodNAME_MID   := MAP(REGEXFIND('(.*),(.*),([A-Za-z ]*)',removeSuffix)=>REGEXFIND('(.*),(.*),([A-Za-z ]*)',removeSuffix,3),
 		                      REGEXFIND('(.*),([A-Za-z ]*)',removeSuffix) => '',
 		                      ClnLFMName<>'' => TRIM(ClnLFMName[26..45],LEFT,RIGHT),
 		                      '');
-		GoodNAME_LAST  := MAP(REGEXFIND('(.*),(.*),([A-Za-z ]*)',removeSuffix) => REGEXFIND('(.*),(.*),([A-Za-z ]*)',removeSuffix,1),
+		TempNAME_LAST  := MAP(REGEXFIND('(.*),(.*),([A-Za-z ]*)',removeSuffix) => REGEXFIND('(.*),(.*),([A-Za-z ]*)',removeSuffix,1),
 		                      REGEXFIND('(.*),([A-Za-z ]*)',removeSuffix) => REGEXFIND('(.*),([A-Za-z ]*)',removeSuffix,1),
-												  ClnLFMName<>''=> TRIM(ClnLFMName[46..65],LEFT,RIGHT),
-												  '');
-		GoodNAME_SUFX  := IF(TmpSuffix <> '',TmpSuffix,
-		                            IF(ClnLFMName<>'',TRIM(ClnLFMName[66..70],LEFT,RIGHT),''));
-					
+												            ClnLFMName<>''=> TRIM(ClnLFMName[46..65],LEFT,RIGHT),
+												            '');
+		GoodNAME_LAST  := REGEXREPLACE(',',REGEXREPLACE(SuffixPattern,TempNAME_LAST,''),'');		
+		
+
+		TmpSuffix2     := TRIM(REGEXFIND(SuffixPattern,TempNAME_LAST,0),LEFT,RIGHT);		
+		GoodNAME_SUFX  := MAP(TmpSuffix1 <> '' => TmpSuffix1,
+		                      TmpSuffix2 <> '' => TmpSuffix2,
+		                      '');
 
 		Suffix	  := GoodNAME_SUFX;
 		ConcatNAME_FULL := 	StringLib.StringCleanSpaces(GoodNAME_LAST +' '+	GoodNAME_FIRST);

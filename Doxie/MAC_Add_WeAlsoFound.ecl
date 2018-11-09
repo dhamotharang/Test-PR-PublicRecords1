@@ -1,8 +1,8 @@
-export MAC_Add_WeAlsoFound(inputs, outputs, in_glb, in_dppa, str_out=false, enableNationalAccidents=false, enableExtraAccidents=false) :=
+﻿export MAC_Add_WeAlsoFound(inputs, outputs, in_glb, in_dppa, str_out=false, enableNationalAccidents=false, enableExtraAccidents=false) :=
 MACRO
 
 import doxie, WatercraftV2_Services, Email_Data, paw_services, Prof_LicenseV2,
-       FLAccidents_eCrash, Accident_Services, Relationship,std,ut;
+       FLAccidents_eCrash, Accident_Services, Relationship,std,ut,D2C;
 			 Relationship.mac_read_application_type();
 
 // phones+ counts have to be done outside of transform, since macro declares IMPORTs, 
@@ -82,7 +82,10 @@ inputs tra(inputs l) := transform
 	eCrashAccident_count := IF(enableExtraAccidents,COUNT(CHOOSEN(accidentNbrs(report_code IN Accident_Services.Constants.eCrashAccident_source),255)),0);
   phonesplus_count := GetPhonesPlusCount (udid, in_glb, in_dppa, industry_class_value, doxie.DataRestriction.fixed_DRM);
 
-	email_count := if(exists(Email_Data.Key_Did(keyed(udid=did))),1,0);
+	email_count := if(
+											exists(Email_Data.Key_Did(keyed(udid=did) and 
+															~( industry_class_value = ut.IndustryClass.Knowx_IC and email_src in D2C.Constants.EmailRestrictedSources )
+																																		  )),1,0);
 	self.comp_prop_count := (comp_prop_count);
 	self.veh_cnt :=  (veh_cnt);
 	self.dl_cnt  :=  (dl_cnt);

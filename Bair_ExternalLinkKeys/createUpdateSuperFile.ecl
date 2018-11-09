@@ -1,4 +1,4 @@
-EXPORT createUpdateSuperFile(string pversion, boolean pUseDelta = false) := MODULE
+﻿EXPORT createUpdateSuperFile(string pversion, boolean pUseDelta = false) := MODULE
 											
 	EXPORT createSuperFiles() := FUNCTION
 		superFiles := SEQUENTIAL(
@@ -18,6 +18,7 @@ EXPORT createUpdateSuperFile(string pversion, boolean pUseDelta = false) := MODU
 			IF( NOT fileservices.superfileexists(KeyNames(pversion,pUseDelta).latlong_super),fileservices.createsuperfile(KeyNames(pversion,pUseDelta).latlong_super)),
 			IF( NOT fileservices.superfileexists(KeyNames(pversion,pUseDelta).plate_super),fileservices.createsuperfile(KeyNames(pversion,pUseDelta).plate_super)),
 			IF( NOT fileservices.superfileexists(KeyNames(pversion,pUseDelta).company_super),fileservices.createsuperfile(KeyNames(pversion,pUseDelta).company_super)),
+			IF( NOT fileservices.superfileexists(KeyNames(pversion,pUseDelta).address1_super),fileservices.createsuperfile(KeyNames(pversion,pUseDelta).address1_super)),
 	//father		
 			//IF( NOT fileservices.superfileexists(KeyNames(pversion,pUseDelta).spec_father),fileservices.createsuperfile(KeyNames(pversion,pUseDelta).spec_father)),															
 			IF( NOT fileservices.superfileexists(KeyNames(pversion,pUseDelta).meow_father),fileservices.createsuperfile(KeyNames(pversion,pUseDelta).meow_father)),		
@@ -34,6 +35,7 @@ EXPORT createUpdateSuperFile(string pversion, boolean pUseDelta = false) := MODU
 			IF( NOT fileservices.superfileexists(KeyNames(pversion,pUseDelta).latlong_father),fileservices.createsuperfile(KeyNames(pversion,pUseDelta).latlong_father)),
 			IF( NOT fileservices.superfileexists(KeyNames(pversion,pUseDelta).plate_father),fileservices.createsuperfile(KeyNames(pversion,pUseDelta).plate_father)),
 			IF( NOT fileservices.superfileexists(KeyNames(pversion,pUseDelta).company_father),fileservices.createsuperfile(KeyNames(pversion,pUseDelta).company_father)),
+			IF( NOT fileservices.superfileexists(KeyNames(pversion,pUseDelta).address1_father),fileservices.createsuperfile(KeyNames(pversion,pUseDelta).address1_father)),
 			);												
 		RETURN superFiles;
 	END;
@@ -78,8 +80,9 @@ EXPORT createUpdateSuperFile(string pversion, boolean pUseDelta = false) := MODU
 	t12	:= updatexIDLSuperFile(KeyIn.lfz_super,				KeyIn.lfz_father,				KeyIn.lfz_logical			,pUseDelta,		KeyIn.lfz_Delta);	
 	t13	:= updatexIDLSuperFile(KeyIn.latlong_super,		KeyIn.latlong_father,		KeyIn.latlong_logical	,pUseDelta, 	KeyIn.latlong_Delta);	
 	t14	:= updatexIDLSuperFile(KeyIn.company_super,		KeyIn.company_father,		KeyIn.company_logical	,pUseDelta, 	KeyIn.company_Delta);	
+	t15	:= updatexIDLSuperFile(KeyIn.address1_super,	KeyIn.address1_father,	KeyIn.address1_logical,pUseDelta, 	KeyIn.address1_Delta);	
 
-	export updateAllSF := sequential(nothor(fileservices.StartSuperFileTransaction()),t1, 
-	t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13,t14,nothor(fileservices.FinishSuperFileTransaction()));
+	export updateAllSF := sequential(createSuperFiles(),nothor(fileservices.StartSuperFileTransaction()),t1, 
+	t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13,t14,t15,nothor(fileservices.FinishSuperFileTransaction()));
 	
 end;

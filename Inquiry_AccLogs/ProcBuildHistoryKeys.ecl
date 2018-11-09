@@ -1,4 +1,4 @@
-#workunit('name','Weekly NonFCRA Inquiry Tracking Keys');
+﻿#workunit('name','Weekly NonFCRA Inquiry Tracking Keys');
 import ut, aid, lib_stringlib, address, did_add, Data_Services, Business_Header_SS,standard, header_slimsort, didville, business_header,watchdog, mdr, header,data_services;
 import autokeyb2, zz_cemtemp, doxie, autokey,AutoKeyI, RoxieKeyBuild,doxie,RoxieKeyBuild,DayBatchEda,EDA_VIA_XML,risk_indicators,doxie_cbrs,relocations;
 
@@ -34,7 +34,7 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Inquiry_AccLogs.Key_Inquiry_Billgroup
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Inquiry_AccLogs.Key_Inquiry_LinkIds.key,'~thor_data400::key::inquiry_table::LinkIds','~thor_data400::key::inquiry::'+vBase+'::LinkIds',bk_linkids);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Inquiry_AccLogs.Key_Inquiry_name,'~thor_data400::key::inquiry_table::name','~thor_data400::key::inquiry::'+vBase+'::name',bk_name);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Inquiry_AccLogs.Key_Inquiry_ipaddr,'~thor_data400::key::inquiry_table::ipaddr','~thor_data400::key::inquiry::'+vBase+'::ipaddr',bk_ipaddr);
-
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Inquiry_AccLogs.Key_Inquiry_fein,'~thor_data400::key::inquiry_table::fein','~thor_data400::key::inquiry::'+vBase+'::fein',bk_fein);
 ////////////////////////////////// MOVE KEYS to BUILT
 
 RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::inquiry::'+vBase+'::transaction_id','~thor_data400::key::inquiry_table::transaction_id',mv_trans,3);
@@ -48,7 +48,7 @@ RoxieKeyBuild.Mac_SK_Move_to_Built('~thor_data400::key::inquiry::'+vBase+'::Link
 // RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::inquiry_table::'+vBase+'::did','~thor_data400::key::inquiry_table_did',mv_didold,3);
 RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::inquiry::'+vBase+'::name','~thor_data400::key::inquiry_table::name',mv_name,3);
 RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::inquiry::'+vBase+'::ipaddr','~thor_data400::key::inquiry_table::ipaddr',mv_ipaddr,3);
-
+RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::inquiry::'+vBase+'::fein','~thor_data400::key::inquiry_table::fein',mv_fein,3);
 ////////////////////////////////// MOVE KEYS to QA
  
 ut.MAC_SK_Move_v2('~thor_data400::key::inquiry_table::transaction_id','Q',mv2qa_trans);
@@ -61,15 +61,16 @@ RoxieKeyBuild.Mac_SK_Move_V2('~thor_data400::key::inquiry_table::@version@::bill
 ut.Mac_SK_Move_V2('~thor_data400::key::inquiry_table::LinkIds','Q',mv2qa_LinkIds);
 ut.MAC_SK_Move_v2('~thor_data400::key::inquiry_table::name','Q',mv2qa_name);
 ut.MAC_SK_Move_v2('~thor_data400::key::inquiry_table::ipaddr','Q',mv2qa_ipaddr);
+ut.MAC_SK_Move_v2('~thor_data400::key::inquiry_table::fein','Q',mv2qa_fein);
 
 BuildKeys :=	sequential(
 											output(vBase, named('Version'));
 											IF(vBase=vK , Output('No update since last weekly release'),
 											   sequential(
 											   IF(vKbase>vK, OUTPUT('Key Base file is aleady existing'),Inquiry_AccLogs.fnMapBaseAppendsJennyNew(,vBase).Do_Appends),
-											   parallel(bk_did, bk_trans,bk_phone, bk_addr, bk_ssn,  bk_name, bk_ipaddr,bk_bgroup, bk_email, bk_linkids);   
-											   parallel(mv_addr,mv_trans, mv_did, mv_phone, mv_ssn, mv_email, mv_name, mv_ipaddr, mv_bgroup, mv_LinkIds);
-											   parallel(mv2qa_addr,mv2qa_trans, mv2qa_did, mv2qa_phone, mv2qa_ssn, mv2qa_email,mv2qa_name, mv2qa_ipaddr, mv2qa_bgroup, mv2qa_LinkIds);				 
+											   parallel(bk_did, bk_trans,bk_phone, bk_addr, bk_ssn,  bk_name, bk_ipaddr,bk_bgroup, bk_email, bk_linkids,bk_fein);   
+											   parallel(mv_addr,mv_trans, mv_did, mv_phone, mv_ssn, mv_email, mv_name, mv_ipaddr, mv_bgroup, mv_LinkIds, mv_fein);
+											   parallel(mv2qa_addr,mv2qa_trans, mv2qa_did, mv2qa_phone, mv2qa_ssn, mv2qa_email,mv2qa_name, mv2qa_ipaddr, mv2qa_bgroup, mv2qa_LinkIds,mv2qa_fein);				 
 											   Inquiry_AccLogs.STRATA_Inquiry_Weekly_Tracking(vBase);
 											   output(choosen(inquiry_acclogs.File_Inquiry_BaseSourced.history(person_q.appended_adl > 0 and search_info.datetime[1..8]>vk),100), named('Sample_Archive_Records'));
 											   output(choosen(inquiry_acclogs.File_Inquiry_BaseSourced.history(person_q.Email_Address <> ''and search_info.datetime[1..8]>vk), 5), named('Sample_Archive_Email_Records'));

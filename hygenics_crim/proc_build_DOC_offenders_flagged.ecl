@@ -1,4 +1,4 @@
-import /*doxie_build,*/ut,lib_date;
+﻿import /*doxie_build,*/ut,lib_date;
 
 //Flag inmates that are currently incarcerated curr_incar_flag = 'Y' or ''
 /*
@@ -25,7 +25,7 @@ Line item 76 where the status is parole but because of the ctrl_date was greater
 //vendor_list :=  ['AR','AL','AZ',     'CO','CT','DC','FL','GA',     'HI','IA',     'ID','IL','IN','KS','KY','LA','MD','ME','MI',     'MN','MO','MS','MT','NC','NE','ND','NH','NJ','NM','NV','NY','OH','OK','OR','PA','RI','SC','TN','TX','UT','VA',     'WA','WI','WV'];
 
 	vendor_list :=  ['DB','DA','DD','DF','DH','DG','EQ','DI','DJ','DK','DL','DO','DP','DM','DQ','DN','SB','DR','DS','DU','DT','DV','DW','DZ','EU','DY','DX','EV','EX','EW','EY','EA','EB','EC','ED','EE','EF','EG','EH','EI','EJ','EK','EL','EM','EN','EO','EP','ER','ES','ET',
-	                 'WL','WC','WD','WE','WF','WG','WH','WJ','WK','NC','WA','OR','EV','EG','VE','6H','6X','6Z','ZB','6W' ];                                    
+	                 'WL','WC','WD','WE','WF','WG','WH','WJ','WK','NC','WA','OR','EV','EG','VE','6H','6X','6Z','ZB','6W','10G' ];                                    
 
 						 
 //remove the persists before moving the code to prod.

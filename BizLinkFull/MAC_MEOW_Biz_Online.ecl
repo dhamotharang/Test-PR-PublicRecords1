@@ -1,11 +1,14 @@
-EXPORT MAC_MEOW_Biz_Online(infile,Ref='',Input_parent_proxid = '',Input_sele_proxid = '',Input_org_proxid = '',Input_ultimate_proxid = '',Input_has_lgid = '',Input_empid = '',Input_source = '',Input_source_record_id = '',Input_source_docid = '',Input_company_name = '',Input_company_name_prefix = '',Input_cnp_name = '',Input_cnp_number = '',Input_cnp_btype = '',Input_cnp_lowv = '',Input_company_phone = '',Input_company_phone_3 = '',Input_company_phone_3_ex = '',Input_company_phone_7 = '',Input_company_fein = '',Input_company_sic_code1 = '',Input_active_duns_number = '',Input_prim_range = '',Input_prim_name = '',Input_sec_range = '',Input_city = '',Input_city_clean = '',Input_st = '',Input_zip = '',Input_company_url = '',Input_isContact = '',Input_contact_did = '',Input_title = '',Input_fname = '',Input_fname_preferred = '',Input_mname = '',Input_lname = '',Input_name_suffix = '',Input_contact_ssn = '',Input_contact_email = '',Input_sele_flag = '',Input_org_flag = '',Input_ult_flag = '',Input_fallback_value = '',Input_CONTACTNAME = '',Input_STREETADDRESS = '',OutFile,Stats='',In_MaxIds=50,In_LeadThreshold=0) := MACRO
-  IMPORT SALT33,BizLinkFull;
+﻿ 
+EXPORT MAC_MEOW_Biz_Online(infile,Ref='',Input_parent_proxid = '',Input_sele_proxid = '',Input_org_proxid = '',Input_ultimate_proxid = '',Input_has_lgid = '',Input_empid = '',Input_source = '',Input_source_record_id = '',Input_source_docid = '',Input_company_name = '',Input_company_name_prefix = '',Input_cnp_name = '',Input_cnp_number = '',Input_cnp_btype = '',Input_cnp_lowv = '',Input_company_phone = '',Input_company_phone_3 = '',Input_company_phone_3_ex = '',Input_company_phone_7 = '',Input_company_fein = '',Input_company_sic_code1 = '',Input_active_duns_number = '',Input_prim_range = '',Input_prim_name = '',Input_sec_range = '',Input_city = '',Input_city_clean = '',Input_st = '',Input_zip = '',Input_company_url = '',Input_isContact = '',Input_contact_did = '',Input_title = '',Input_fname = '',Input_fname_preferred = '',Input_mname = '',Input_lname = '',Input_name_suffix = '',Input_contact_ssn = '',Input_contact_email = '',Input_sele_flag = '',Input_org_flag = '',Input_ult_flag = '',Input_fallback_value = '',Input_CONTACTNAME = '',Input_STREETADDRESS = '',Soapcall_RoxieIP = '',Soapcall_Timeout = 3600,Soapcall_Time_Limit = 0,Soapcall_Retry = 0,Soapcall_Parallel = 2,OutFile,Stats='',In_MaxIds=50,In_LeadThreshold=0, In_bGetAllScores = 'true', In_disableForce = 'false') := MACRO
+  IMPORT SALT37,BizLinkFull;
   ServiceModule := 'BizLinkFull.';
 #uniquename(into)
 BizLinkFull.Process_Biz_Layouts.InputLayout %into%(infile le) := TRANSFORM
   SELF.UniqueId := le.Ref;
   SELF.MaxIds := In_MaxIds;
   SELF.LeadThreshold := In_LeadThreshold;
+  SELF.bGetAllScores := In_bGetAllScores;
+  SELF.disableForce := In_disableForce;
   #IF ( #TEXT(Input_parent_proxid) <> '' )
     SELF.parent_proxid := (TYPEOF(SELF.parent_proxid))le.Input_parent_proxid;
   #ELSE
@@ -237,10 +240,16 @@ BizLinkFull.Process_Biz_Layouts.InputLayout %into%(infile le) := TRANSFORM
     SELF.STREETADDRESS := (TYPEOF(SELF.STREETADDRESS))'';
   #END
 END;
+#uniquename(Soapcall_RoxieIP_temp)
+  #IF ( #TEXT(Soapcall_RoxieIP) <> '' )
+	  %Soapcall_RoxieIP_temp% := Soapcall_RoxieIP;
+  #ELSE
+      %Soapcall_RoxieIP_temp% := BizLinkFull.MEOW_roxieip;
+  #END
 #uniquename(pr)
   %pr% := PROJECT(infile,%into%(LEFT)); // Into roxie input format
 #uniquename(res_out)
-SALT33.MAC_Soapcall(%pr%,BizLinkFull.Process_Biz_Layouts.OutputLayout, BizLinkFull.MEOW_roxieIP, ServiceModule+'MEOW_Biz_Service', %res_out%);
+SALT37.MAC_Soapcall(%pr%,BizLinkFull.Process_Biz_Layouts.OutputLayout, %Soapcall_RoxieIP_temp%, ServiceModule+'MEOW_Biz_Service', %res_out%,,,Soapcall_Timeout,Soapcall_Time_Limit,Soapcall_Retry,Soapcall_Parallel);
 OutFile := %res_out%;
   #IF (#TEXT(Stats)<>'')
     Stats := BizLinkFull.Process_Biz_Layouts.ScoreSummary(OutFile);

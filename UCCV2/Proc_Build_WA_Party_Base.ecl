@@ -1,7 +1,12 @@
-IMPORT Address, NID, UCCV2, ut;
+﻿IMPORT Address, NID, UCCV2, ut;
 
-newInput   := UCCV2.File_WA_in;	 
-   
+newInput   			:= 	UCCV2.File_WA_in;	
+suppressionFile	:=	if (COUNT(NOTHOR(FileServices.SuperFileContents(uccv2.Cluster.Cluster_In + 'in::uccv2::WA::suppression'))) > 0,
+													UCCV2.File_WA_Suppression,
+													DATASET([], UCCV2.Layout_File_WA_Suppression)
+												);
+NeedSuppression	:=	COUNT(NOTHOR(FileServices.SuperFileContents(uccv2.Cluster.Cluster_In + 'in::uccv2::WA::suppression'))) > 0;
+
 trimUpper(string s) := function
 			return trim(stringlib.StringToUppercase(s),left,right);
 			end;   
@@ -63,10 +68,33 @@ UCCV2.Layout_UCC_Common.Layout_Party_with_AID RollupUpdate(UCCV2.Layout_UCC_Comm
 		self													:= L;
 	  end;
 
-dParties := PROJECT(newInput, bldParty(LEFT));
+dParties := distribute(PROJECT(newInput, bldParty(LEFT)),hash(tmsid));
+
+UCCV2.Layout_File_WA_Suppression	GetTMISID(UCCV2.Layout_File_WA_Suppression l) := transform
+	self.filing := 	'WA' + StringLib.StringFilterOut(l.filing,'-');
+	self				:=	l;
+end;
+	 
+GetTMSIDSuppression	:=	distribute(project(suppressionFile, GetTMISID(left)),hash(filing));
+
+UCCV2.Layout_UCC_Common.Layout_Party_with_AID JoinForKeeps(UCCV2.Layout_UCC_Common.Layout_Party_with_AID l, UCCV2.Layout_File_WA_Suppression r)	:=	transform
+	self	:=	l;
+end;
+										
+Keepers		:=	join(	dParties,
+										GetTMSIDSuppression,
+										left.tmsid=right.filing,
+										JoinForKeeps(left, right),
+										Left only,
+										local);	
+										
+TempParties	:=	if (NeedSuppression,
+											Keepers,
+											dParties
+										);								
 
 // Since the layout contains nametype, need to declare the NID attriubte to be something else.
-NID.Mac_CleanFullNames(dParties, VerifyPersons, Orig_name, , nid_nametype);
+NID.Mac_CleanFullNames(TempParties, VerifyPersons, Orig_name, , nid_nametype);
 
 person_flags := ['P', 'D'];
 // An executive decision was made to consider Unclassifed and Invalid names as company names for UCC.

@@ -1,4 +1,4 @@
-// mod_sources
+﻿// mod_sources
 // 1. various ways to retrieve a bitmap corresponding to one or more sources
 // 2. lists of sources included in header, and partitioned vs. citizen
 
@@ -24,8 +24,9 @@ export mod_sources := module
 		PROP_FARES,			// 16
 		PROP_FIDELITY,	// 32
 		PROP_DAYTON,    // 64
-    MV_INFUTOR,			// 128
-    WC_INFUTOR			// 256
+  MV_INFUTOR,			// 128
+  WC_INFUTOR,			// 256
+  MARKETING_UNRESTRICTED // 512
 		);
 	
 	
@@ -45,7 +46,7 @@ export mod_sources := module
 	export string15	faux_vlid(string12 fid)			:= '---' + fid; // left-pad with 3 irrelevant characters
 	
 	
-	export unsigned src2code(string2 src, string34 vl_id='') := map(
+	export unsigned exclusiveSrc2code(string2 src, string34 vl_id='') := map(
 		MDR.sourceTools.SourceIsDPPA(src)									=> code.DPPA,
 		MDR.sourceTools.SourceIsDunn_Bradstreet(src)			=> code.DNB,
 		MDR.sourceTools.SourceIsEBR(src)									=> code.EBR,
@@ -58,7 +59,9 @@ export mod_sources := module
 		
 	export unsigned code2bmap(code c) := ut.bit_set(0,(unsigned)c);
 	
-	export unsigned src2bmap(string2 src, string34 vl_id='') := code2bmap(src2code(src,vl_id)); // called by SALT - becomes *_data_permits
+ export unsigned inclusiveSrc2bmap (string2 src) :=  if(src in MDR.sourceTools.set_Marketing_Restricted, 0, code2bmap(code.MARKETING_UNRESTRICTED));
+              
+	export unsigned src2bmap(string2 src, string34 vl_id='') := code2bmap(exclusiveSrc2code(src,vl_id)) | inclusiveSrc2bmap(src); // called by SALT - becomes *_data_permits
 	
 	shared l_code	:= {code c};
 	shared l_src	:= {string2 src};
@@ -116,7 +119,7 @@ export mod_sources := module
       boolean glb := ivals.GLB.ok(in_mod.GLBPurpose) OR ivals.GLB.HeaderIsPreGLB(0,dt_first_seen,src);
       
       boolean other_restrictions := case(
-                                          src2code(src,vl_id),
+                                          exclusiveSrc2code(src,vl_id),
                                           code.DPPA						=> ivals.DPPA.state_ok(MDR.SourceTools.DPPAOriginState(src),ivals.DPPA.stored_value,,src),
                                           code.DNB						=> ivals.AllowAll OR dnbWillMask,
                                           code.EBR						=> ~ivals.DRM.EBR,
@@ -257,6 +260,7 @@ export mod_sources := module
     + MDR.sourceTools.set_Workers_Compensation 
     + MDR.sourceTools.set_Yellow_Pages         
     + MDR.sourceTools.set_Cortera         
+    + MDR.sourceTools.set_Infutor_NARB        
   ;
   
   // -- ingest_blacklist
@@ -308,6 +312,7 @@ export mod_sources := module
     + MDR.sourceTools.set_Workers_Compensation 
     + MDR.sourceTools.set_Yellow_Pages                  
     + MDR.sourceTools.set_Cortera                 
+    + MDR.sourceTools.set_Infutor_NARB                 
   ;
 
   export base_blacklist :=
@@ -387,6 +392,7 @@ export mod_sources := module
 		MDR.sourceTools.SourceIsCClue                 (src) => '37',
 		MDR.sourceTools.SourceIsBusiness_Credit       (src) => '38',
 		MDR.sourceTools.SourceIsCortera               (src) => '39',
+		MDR.sourceTools.SourceIsInfutor_NARB               (src) => '40',
 		nonCode
 	);
 	export boolean srcInBIPV2Header(string2 src) := src2numCode(src) <> nonCode;
@@ -416,6 +422,21 @@ export mod_sources := module
 		,MDR.sourceTools.set_TXBUS					// S18
 		,MDR.sourceTools.set_Experian_CRDB	// S27
     ,MDR.sourceTools.set_Business_Credit// S31
+    ,MDR.sourceTools.set_Cortera        // S61(BH-501)
+    ,MDR.sourceTools.set_Infutor_NARB        // S61(BH-528)
+    ,MDR.sourceTools.set_Workers_Compensation // S62a(BH-502)
+    ,MDR.sourceTools.set_CClue                // S62a
+    ,MDR.sourceTools.set_BBB                  // S62a
+    ,MDR.sourceTools.set_LnPropertyV2         // S62a
+    ,MDR.sourceTools.set_FDIC                 // S62a
+    ,MDR.sourceTools.set_bk                   // S62a
+
+    ,MDR.sourceTools.set_vehicles             // S64, 3rd phase of upgrading sources, BH-503
+    ,MDR.sourceTools.set_Yellow_Pages         // S64
+    ,MDR.sourceTools.set_IRS_Non_Profit       // S64
+    ,MDR.sourceTools.set_WC                   // S64
+    ,MDR.sourceTools.set_FAA                  // S64
+    ,MDR.sourceTools.set_Dea                  // S64
 	];
 
 	// These sources participate in the header build, but are excluded
@@ -498,6 +519,7 @@ export mod_sources := module
 		'36' => MDR.sourceTools.set_Experian_CRDB[1],
 		'37' => MDR.sourceTools.set_CClue[1],
 		'39' => MDR.sourceTools.set_Cortera[1],
+		'40' => MDR.sourceTools.set_Infutor_NARB[1],
 		nonCode
 	);
 	export TranslateCode(string2 code) := TranslateSource_aggregate(code2src1(code));

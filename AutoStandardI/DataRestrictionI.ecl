@@ -1,4 +1,4 @@
-// !!!NOTE1: ECL developers:  
+﻿// !!!NOTE1: ECL developers:  
 //           If you want to add coding to use a new position to restrict certain data, 
 //           FIRST THE PRODUCT OR PROJECT MANAGER SHOULD CREATE AN ISIT TICKET DESCRIBING WHAT
 //           DATA IS TO BE RESTRICTED AND THE REQUEST SHOULD BE COMMUNICATED TO: 
@@ -123,6 +123,10 @@ export DataRestrictionI := module
 		// ATT LIDB = Line Information DataBase data
 		export boolean isATT_LIDBRestricted(drm_type drm='') := ~allow and (fixed_DRM[43] not in ['0','']);
 		export boolean ATT_LIDB := isATT_LIDBRestricted(fixed_DRM);	
+		
+		// AccuData - OCN (Carrier & Porting) & CNAM (CallerID Name)
+		export boolean isAccuDataRestricted(drm_type drm='') := ~allow and (fixed_DRM[44] not in ['0','']);
+		export boolean AccuData := isAccuDataRestricted(fixed_DRM);			
 
   end;
 

@@ -1,4 +1,4 @@
-#workunit('name','ADL Bocashell 5.0-nonfcra DID Input');
+﻿#workunit('name','ADL Bocashell 5.0-nonfcra DID Input');
 
 
 // Reads sample data from input file, makes a SOAP call to service specified and (optionally),
@@ -21,6 +21,7 @@ unsigned record_limit :=   0;    //number of records to read from input file; 0 
 unsigned1 parallel_calls := 10;  //number of parallel soap calls to make [1..30]
 unsigned1 eyeball := 10;
 string DataRestrictionMask := '1000010001000100000000000'; // to restrict fares, experian, transunion and experian FCRA 
+unsigned3 LastSeenThreshold := 0;	//# of days to consider header records as being recent for verification.  0 will use default (41 and lower = 365 days, 50 and higher = include all) 
 
 //===================  input-output files  ======================
 infile_name :=    '~jpyon::in::ln_4933_verid_p1_f_s_in';
@@ -99,6 +100,7 @@ l := RECORD
 	string neutral_gateway;
 	string DataRestrictionMask;
 	integer bsversion;
+	unsigned3 LastSeenThreshold;
 END;
 
 l t_f(ds_input le, INTEGER c) := TRANSFORM
@@ -130,7 +132,7 @@ l t_f(ds_input le, INTEGER c) := TRANSFORM
 	self.DateOfBirth := le.dateofbirth;
 	self.HomePhone := le.homephone;
 	self.ssn := le.ssn;
-
+  SELF.LastSeenThreshold := LastSeenThreshold;
 	self := le;
 END;
 

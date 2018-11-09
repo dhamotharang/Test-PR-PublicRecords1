@@ -1,4 +1,4 @@
-IMPORT corp2;
+﻿IMPORT corp2;
 	
 EXPORT Functions := MODULE
 
@@ -16,8 +16,8 @@ EXPORT Functions := MODULE
 															 uc_code IN ['40','41','42','43']																=> TRUE,
 															 uc_code IN ['50','51']																					=> TRUE,
 															 uc_code IN ['60','61','62','63','64','65','66','67','68','69']	=> TRUE,
-															 uc_code IN ['70','71','72','73','74','75','76','77']						=> TRUE,
-															 uc_code IN ['80','81']																					=> TRUE,
+															 uc_code IN ['70','71','72','73','74','75','76','77']						=> TRUE,												
+															 uc_code IN ['80','81','84','85','86','87','89']								=> TRUE,
 															 uc_code IN ['95']																							=> TRUE,
 															 uc_code IN ['']																								=> TRUE,
 															 FALSE

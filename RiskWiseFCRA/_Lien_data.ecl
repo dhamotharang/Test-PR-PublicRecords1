@@ -1,12 +1,12 @@
-IMPORT suppress; // formality: sp that MACRO itself would pass syntax check
+﻿IMPORT suppress; // formality: sp that MACRO itself would pass syntax check
 
 EXPORT _Lien_data(in_dids, flag_file, liens_main_o, liens_party_o, nss = Suppress.Constants.NonSubjectSuppression.doNothing,
 									_history_date = 999999, getDebtorOnly = true, excludeSuits = false, year_limit = 7) := MACRO
 
   IMPORT liensv2, FCRA, riskwise, doxie, ut, Risk_Indicators, STD;
-	
+
 	_MAX_OVERRIDE_LIMIT := 100;
-	_todaysdate := ut.GetDate;
+	_todaysdate := (string) STD.Date.Today();
 	
 	layout_liens_main  := liensv2.Layout_liens_main_module.layout_liens_main;
   layout_liens_party := liensv2.layout_liens_party;	
@@ -20,30 +20,18 @@ EXPORT _Lien_data(in_dids, flag_file, liens_main_o, liens_party_o, nss = Suppres
 	lien_correct_tmsid_rmsid := SET( flag_file(file_id = FCRA.FILE_ID.LIEN), record_id );
 	lien_correct_ffid        := SET( flag_file(file_id = FCRA.FILE_ID.LIEN), flag_file_id );
 
-	liens_party1 := JOIN (liens_slim, liensv2.key_liens_party_id_FCRA, 
+	liens_party := JOIN (liens_slim, liensv2.key_liens_party_id_FCRA, 
 					 Left.tmsid<>''
 						 AND keyed (Left.tmsid = Right.tmsid)
 						 AND keyed (Left.rmsid = Right.rmsid)
-						 AND left.did=(unsigned)right.did
-						 AND right.name_type = 'D'
+						 AND ((left.did=(unsigned)right.did and right.name_type = 'D') OR
+									//if debtorOnly is false show more of the plaintiffs which doesn't use a did check
+									(~getDebtorOnly and right.name_type = 'C'))
 						 AND (string50)right.tmsid + (string50)right.rmsid not in lien_correct_tmsid_rmsid  // old way - exclude corrected records
 						 and trim((string)right.persistent_record_id) not in lien_correct_tmsid_rmsid,  // new way - exclude corrected records that match the persistent_record_id
 					 transform(layout_liens_party, self := right),
 					 ATMOST(keyed (Left.tmsid = Right.tmsid) and keyed (Left.rmsid = Right.rmsid), riskwise.max_atmost));
 
- liens_party2 := JOIN (liens_slim, liensv2.key_liens_party_id_FCRA, 
-					 Left.tmsid<>''
-						 AND keyed (Left.tmsid = Right.tmsid)
-						 AND keyed (Left.rmsid = Right.rmsid)
-						 AND ((left.did=(unsigned)right.did and right.name_type = 'D')
-						 or  right.name_type = 'C')
-						 AND (string50)right.tmsid + (string50)right.rmsid not in lien_correct_tmsid_rmsid  // old way - exclude corrected records
-						 and trim((string)right.persistent_record_id) not in lien_correct_tmsid_rmsid,  // new way - exclude corrected records that match the persistent_record_id
-					 transform(layout_liens_party, self := right),
-					 ATMOST(keyed (Left.tmsid = Right.tmsid) and keyed (Left.rmsid = Right.rmsid), riskwise.max_atmost));
-	//if debtorOnly is false show more of the plaintiffs which doesn't use a did check
-	liens_party := if(getDebtorOnly = false, liens_party2, liens_party1);
-					 
 	party_override := fcra.key_Override_liensv2_party_ffid (keyed (flag_file_id IN lien_correct_ffid));
 	
 	party_new := PROJECT (CHOOSEN (party_override, _MAX_OVERRIDE_LIMIT), TRANSFORM (layout_liens_party, SELF := Left; Self := []));

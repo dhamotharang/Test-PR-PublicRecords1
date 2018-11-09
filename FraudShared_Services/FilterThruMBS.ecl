@@ -1,4 +1,4 @@
-IMPORT iesp, FraudShared;
+﻿IMPORT iesp, FraudShared, FraudGovPlatform_Services;
 
 EXPORT FilterThruMBS(
   DATASET(FraudShared_Services.Layouts.Raw_Payload_rec) ds_ids,
@@ -81,19 +81,29 @@ EXPORT FilterThruMBS(
     Exclude_Ind_Type, ds_file_types_in,
     LEFT.classification_Permissible_use_access.file_type = RIGHT.FileType,
     TRANSFORM(LEFT));
-          
-  ALlFilteringResult := IF(EXISTS(ds_file_types_in), Include_file_Type, Exclude_Ind_Type);
-    
-  // OUTPUT(FdnMasterId_exclude_result, NAMED('FdnMasterId_exclude_result'));  
-  // OUTPUT(ind_exclude_result,       NAMED('ind_exclude_result'));
-  // OUTPUT(product_include_one,      NAMED('product_include_one'));
-  // OUTPUT(product_include_rest,    NAMED('product_include_rest'));
-  // OUTPUT(pro_include_Code,        NAMED('pro_include_Code'));
-  // OUTPUT(pro_include_all,           NAMED('pro_include_all'));
-  // OUTPUT(Exclude_Ind_Type,        NAMED('ExcludeInd_Type'));
-  // OUTPUT(Include_file_Type,        NAMED('Include_file_Type'));
-  // OUTPUT(ALlFilteringResult,      NAMED('ALlFilteringResult'));
+         
+  ds_results_pre := IF(EXISTS(ds_file_types_in), Include_file_Type, Exclude_Ind_Type);
+	
+	/* Include all records that matches the FraudGov Inclusion key, when fraud_platform = 'FraudGov' */
+	Include_FraudGov := JOIN(
+		ds_results_pre , FraudShared.Key_mbsfdnmasteridindtypeinclusion(fraud_platform),
+		KEYED(LEFT.classification_Permissible_use_access.fdn_file_info_id = RIGHT.fdn_file_info_id) AND
+		//RIGHT.inclusion_id = gc_id_in AND
+		RIGHT.FdnMasterId IN SetFdnMasterIds AND
+		RIGHT.ind_type = ind_type_in,
+		TRANSFORM(LEFT));
 
-  RETURN AllFilteringResult;
+	
+	ds_results := IF(fraud_platform = FraudGovPlatform_Services.Constants.FRAUD_PLATFORM , Include_FraudGov , ds_results_pre);
+
+	// OUTPUT(ds_ids, named('ds_ids'));
+	// OUTPUT(FdnMasterId_exclude_result, named('FdnMasterId_exclude_result'));
+	// OUTPUT(ind_exclude_result, named('ind_exclude_result'));
+	// OUTPUT(pro_include_Code, named('pro_include_Code'));
+	// OUTPUT(Exclude_Ind_Type, named('Exclude_Ind_Type'));
+	// OUTPUT(Include_file_Type, named('Include_file_Type'));
+	// OUTPUT(Include_FraudGov, named('Include_FraudGov'));
+
+  RETURN ds_results;
   
 END;

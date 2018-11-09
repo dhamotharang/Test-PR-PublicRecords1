@@ -22,6 +22,7 @@
   <part name="FEIN"		  					type="xsd:string"/>
 	
 	<!-- CaseNumber -->
+	<part name="EnableCaseNumberFilterSearch" type="xsd:boolean"/>
 	<part name="CaseNumber"         type="xsd:string"/>
 	
   <part name="FilingJurisdiction"	type='xsd:string'/>	
@@ -80,6 +81,7 @@ export BankruptcySearchServiceFCRA(
 		integer1 lname_sort		:= 0 : stored('LastNameSort');
 		integer1 cname_sort		:= 0 : stored('CompanyNameSort');
 		boolean suppress_withdrawn_bankruptcy	:= false 	: stored('SuppressWithdrawnBankruptcy');
+		boolean Enable_CaseNumFilterSrch	:= false 	: stored('EnableCaseNumberFilterSearch');
 		
     //Check if the customer is a Collections customer
     fcra_subj_only := false : stored ('ApplyNonsubjectRestrictions');
@@ -99,7 +101,7 @@ export BankruptcySearchServiceFCRA(
 		//if more than one DID is found this call will fail the service with desired error message
     unsigned6 input_did := (unsigned6) did_value;
 
-		EnableCaseNumFilter := CaseNumber_value != '';
+		EnableCaseNumFilter := CaseNumber_value != '' and Enable_CaseNumFilterSrch;
     // gateways := Gateway.Constants.void_gateway : stored ('gateways', few);
 		gateways := Gateway.Configuration.Get();
 		picklist_res := FCRA.PickListSoapcall.non_esdl(gateways, true, ~EnableCaseNumFilter and returnByDidOnly and (input_did = 0)); 
@@ -115,7 +117,8 @@ export BankruptcySearchServiceFCRA(
                                                                      in_ssn := ssn_value,
                                                                      in_lname := lname_value,
                                                                      in_fname := fname_value,
-                                                                     in_case_number := CaseNumber_value);
+                                                                     in_case_number := CaseNumber_value,
+                                                                     in_did := input_did);
 		rec_out := record
 			bankruptcyv3_services.layouts.layout_rollup, 
 			Text_Search.Layout_ExternalKey,
@@ -193,9 +196,10 @@ export BankruptcySearchServiceFCRA(
 										self:= left));
 										
     CaseNumberErrorCode := 
-      FCRA.Functions.fn_CheckCaseNumMinInput(CaseNumber_value, fname_value,
-                                             lname_value,ssn_value,state_val);
-    if(CaseNumberErrorCode != 0,  
+      FCRA.Functions.CheckCaseNumMinInput(CaseNumber_value, fname_value,
+                                             lname_value,ssn_value,state_val,(unsigned6)did_value);
+                                             
+    if(Enable_CaseNumFilterSrch and CaseNumberErrorCode != 0,  
        FAIL(CaseNumberErrorCode, ut.MapMessageCodes(CaseNumberErrorCode)));
 
     if(EnableCaseNumFilter and count(final(matched_party.did != final[1].matched_party.did)) > 0,  

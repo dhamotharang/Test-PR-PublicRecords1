@@ -1,4 +1,4 @@
-import iesp, Seed_Files, risk_indicators, Address, Suppress, ut;
+﻿import iesp, Seed_Files, risk_indicators, Address, Suppress, ut, STD, FFD;
 
 EXPORT TestSeed_Function(iesp.fcraconsumerprofilereport.t_ConsumerProfileReportBy in_rec,
 												 ConsumerProfile_Services.IParam.options in_param) := FUNCTION
@@ -16,15 +16,16 @@ EXPORT TestSeed_Function(iesp.fcraconsumerprofilereport.t_ConsumerProfileReportB
 		cleanName		:= Address.CleanNameFields(Address.CleanPerson73(L.Name.Full)).CleanNameRecord;
 		string fname_val := if(useCleanName, cleanName.fname, stringlib.stringtouppercase(L.Name.First));
 		string lname_val := if(useCleanName, cleanName.lname, stringlib.stringtouppercase(L.Name.Last));
-		self.hashkey := Seed_Files.Hash_InstantID(
-															(string15)stringlib.stringtouppercase(fname_val),
-															(string20)stringlib.stringtouppercase(lname_val),
-															(string9)L.SSN,
-															risk_indicators.nullstring,
-															(string5)(L.Address.zip5),
-															(string10)L.Phone10,
-															risk_indicators.nullstring
-															);
+		self.hashkey := 		Seed_Files.Hash_InstantID(
+   															(string15)stringlib.stringtouppercase(fname_val),
+   															(string20)stringlib.stringtouppercase(lname_val),
+   															(string9)L.SSN,
+   															risk_indicators.nullstring,
+   															(string5)(L.Address.zip5),
+   															(string10)L.Phone10,
+   															risk_indicators.nullstring
+   															);
+
 	END;
 	
 	search_rec := project(dataset(in_rec), getSearchKey(LEFT));
@@ -47,6 +48,7 @@ EXPORT TestSeed_Function(iesp.fcraconsumerprofilereport.t_ConsumerProfileReportB
 		self.DateFirstSeen 	:= iesp.ECL2ESP.toDatestring8(L.dt_first_seen);
 		self.DateLastSeen 	:= iesp.ECL2ESP.toDatestring8(L.dt_last_seen);
 		self.Address 				:= L;
+		self := [];
 	END;
 	
 	dob_mask 			:= in_param.dob_mask;
@@ -61,6 +63,7 @@ EXPORT TestSeed_Function(iesp.fcraconsumerprofilereport.t_ConsumerProfileReportB
 																						Self.Day   := if ((dob_mask = sc.DAY) or (dob_mask = sc.ALL), 'XX', (string)consumer_dob.Day)));
 		self.Name			:= L;
 		self.Address	:= L;
+		self := [];
 	end;
 	
 	iesp.fcraconsumerprofilereport.t_ConsumerProfileInputConfirmation xformSeedInputConf(cpReport L) := transform
@@ -87,12 +90,27 @@ EXPORT TestSeed_Function(iesp.fcraconsumerprofilereport.t_ConsumerProfileReportB
 		self.Code := if(alert_code <> '', alert_code, skip);
 		self.Description := alert_desc;
 	end;
+	
+	iesp.fcraconsumerprofilereport.t_ConsumerProfileAKA xformAKAsOut(recordof(cpAKAs) L) := transform
+		self.StatementIds := [];
+		self.isDisputed := [];
+		self := L;
+	end;
+		
+	iesp.share_fcra.t_ConsumerStatement xformAddConsumerStatement(recordof(cpReport) L, integer c) := transform
+		self.uniqueId := (string16)L.did;
+		self.content := IF(L.consumerstatement <> '', L.consumerstatement, skip);
+		self.StatementId := 1000 + c;
+		self.StatementType := FFD.Constants.RecordType.CS;
+		self.DataGroup := '';
+		self.Timestamp := iesp.ECL2ESP.toTimeStamp((STRING8)(STD.Date.Today()));
+	end;
 		
 	boolean isBillable := false;
 	iesp.fcraconsumerprofilereport.t_ConsumerProfileResult xformSeedResult(cpReport L) := TRANSFORM		
 		self.isBillable 					:= isBillable;
 		self.ConsumerInformation 	:= project(L, xformSeedConsumerInfo(left));
-		self.AKAs 								:= choosen(project(sort(cpAkas,seq), iesp.share.t_Name), iesp.Constants.ConsumerProfile.MAX_COUNT_AKAS); 
+		self.AKAs 									:= choosen(project(sort(cpAkas,seq), xformAKAsOut(left)), iesp.Constants.ConsumerProfile.MAX_COUNT_AKAS); 
 		self.InputConfirmation 		:= project(L, xformSeedInputConf(left));
 		self.AddressStability 		:= L.AddressStability;
 		self.AddressHistories 		:= choosen(project(sort(cpAddrHist, seq), xformSeedAddrHist(left)), iesp.Constants.ConsumerProfile.MAX_COUNT_ADDR_HIST);
@@ -104,11 +122,13 @@ EXPORT TestSeed_Function(iesp.fcraconsumerprofilereport.t_ConsumerProfileReportB
 		self.HighRiskIndicators 	:= choosen(normalize(cpReport_masked, 5, xformSeedHRI(left, counter)), iesp.Constants.MaxCountHRI);
 		self.ConsumerStatement 		:= L.consumerstatement;
 		self.Alerts 							:= choosen(normalize(cpReport_masked, 5, xformSeedAlerts(left, counter)), iesp.Constants.ConsumerProfile.MAX_COUNT_ALERTS);
+		self := [];	
 	END;
-	
+		
 	ConsumerProfile_Services.Layouts.cp_out_layout xformSeedOut() := transform
 		self.Result := project(cpReport_masked, xformSeedResult(LEFT))[1];
 		self.Royalty := [];
+		self.ConsumerStatements := project(cpReport, xformAddConsumerStatement(left, counter));
 	end;
 	final_seed:= dataset([xformSeedOut()]);
 	

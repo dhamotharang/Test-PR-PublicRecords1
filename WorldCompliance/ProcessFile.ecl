@@ -74,7 +74,7 @@ EXPORT ProcessFile(DATASET(Layouts.rEntity) infile, boolean useLexId = false) :=
 										
 	withAddr := JOIN(withInfo, AllAddresses, LEFT.id=Right.id,
 					TRANSFORM(Layout_XG.routp,
-						self.address_list.address := RIGHT.address;
+						self.address_list.address := CHOOSEN(RIGHT.address,256); //256 limit protection on addresses
 						self := LEFT;
 					), LEFT OUTER, LOCAL);
 					

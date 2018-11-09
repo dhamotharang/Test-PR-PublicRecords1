@@ -1551,6 +1551,10 @@ EXPORT ecrashv2_accnbrv1 := RECORD
 	
 	//Appriss Integration
 	STRING1 Releasable;
+	
+	//Added 7/12/18 Jira DF-22370
+	STRING10 date_report_submitted;
+ 
   unsigned8 __internal_fpos__;
  END;
  
@@ -1952,15 +1956,7 @@ EXPORT ecrashv2_partialaccnbr := RECORD
  
 EXPORT ecrashv2_photoid := RECORD
   string11 super_report_id;
-  string11 document_id;
-  string11 incident_id;
-  string64 document_hash_key;
-  string19 date_created;
-  string1 is_deleted;
-  string3 report_type;
-  string3 page_count;
-  string3 extension;
-  unsigned8 __internal_fpos__;
+	FLAccidents_Ecrash.Layouts.PhotoLayout;
  END;
  
 EXPORT ecrashv2_prefname_state := RECORD

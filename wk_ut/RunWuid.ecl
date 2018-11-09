@@ -1,4 +1,4 @@
-﻿/*
+/*
 
   TODO:  compile list of most common "fluke" errors and allow this process to kick those wuids off again without intervention.
 
@@ -155,7 +155,7 @@ functionmacro
                             + 'Version         : ' + pversion                                                                           + '\n'
                             + 'Runner Wuid link: ' + 'http://' + localesp + ':8010/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=' + workunit   + '#/stub/Summary\n' 
                             + if(trim(Errors) != '' ,'FailMessage(s): \n' + Errors + '\n','')
-                            + iff(getstate in ['failed','aborted']
+                            + iff(getstate in ['failed','aborted','unknown']
                                 , '\nThis workunit ' + getstate + '.  I am awaiting your advice on what to do next.\n'
                                 + 'Here are your options(Simply click the link beside your choice to advise the process.):\n\n'
                                 + 'Rerun iteration              : ' + wk_ut.Push_Event_Result_Link(pWaitEvent,'Rerun',localesp) + '\n'
@@ -290,6 +290,7 @@ functionmacro
         ,blank_reruns
       );//default  send an email 
 
+  child_status_result := trim(wk_ut.get_Scalar_Result(workunit ,'ChildStatus'));
 
   doit := sequential(
      output(wk_ut.getTimeDate()                             ,named('DateTime'         ),overwrite)
@@ -299,10 +300,11 @@ functionmacro
     ,output(if(pForceSkip = false,Advice,'skip')            ,named('Advice'           ),overwrite) // master will get this result to see what happened with the child
     ,output(if((unsigned)TimesCalled + 1 > 1, childstate,''),named('ChildStatus'      ),overwrite)
     ,map(
-       (LastWork in ['Get Iteration Info','Sending email--default'] and regexfind('run'       ,Advice,nocase)) or LastWork in ['','[undefined]']      => kickWuid           //Kick off new wuid(first time or rerun)
-      , LastWork =   'Kicked Off Iteration'                         or  trim(wk_ut.get_Scalar_Result(workunit ,'ChildStatus')) = 'completed'          => Gather_Child_Info  //Gather info on wuid after completed/failed/aborted.  if completed, fail this wuid and notify parent.
-      , LastWork =   'Get Iteration Info'                           and regexfind('fail|skip' ,Advice,nocase)                                         => failOrSkip         //if advice to skip or fail, notify parent.
-      ,                                                                                                                                                  default            //send default email.  shouldn't happen, but if does no biggie.
+       (trim(LastWork) in ['Get Iteration Info'  ,'Sending email--default'] and regexfind('run'       ,Advice,nocase) and child_status_result in ['failed','aborted','unknown']) or trim(LastWork) in ['','[undefined]']  => kickWuid                         //Kick off new wuid(first time or rerun)
+      , trim(LastWork) in ['Get Iteration Info'  ,'Sending email--default'] and regexfind('fail|skip' ,Advice,nocase) and child_status_result in ['failed','aborted','unknown']                                           => failOrSkip                       //if advice to skip or fail, notify parent.
+      , child_status_result     in ['completed','failed','aborted','unknown']                                                                                                                                             => Gather_Child_Info                //Gather info on wuid after completed/failed/aborted.  if completed, fail this wuid and notify parent.
+      , child_status_result not in ['completed','failed','aborted','unknown']                                                                                                                                             => default //STD.System.Debug.Sleep ( 1000 )  //if it gets notified before the iteration is finished, sleep for a second, then go back in the scheduler.  No biggie.
+      ,                                                                                                                                                                                                                      default                          //send default email.  shouldn't happen, but if does no biggie.
     )  
   );
 

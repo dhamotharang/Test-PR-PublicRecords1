@@ -147,7 +147,6 @@ AMLResults := soapcall(p_f, roxieIP,
 				{p_f}, 
 				DATASET(xlayout),
 				PARALLEL(threads), 
-				XPATH('*/Results/Result/Dataset[@name=\'Results\']/Row'),
 				onFail(myFail(LEFT)));
 				
 output(count(AMLResults), named('countAMLResults'));

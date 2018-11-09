@@ -122,6 +122,6 @@
 		LEFT.predir     = RIGHT.predir AND
 		LEFT.postdir    = RIGHT.postdir AND
 		LEFT.sec_range  = RIGHT.sec_range,
-		rollOccupants(LEFT,RIGHT), LOCAL):PERSIST('~jshaw::persist::address_velocity');
+		rollOccupants(LEFT,RIGHT), LOCAL):PERSIST('~prte::jshaw::persist::address_velocity');
 	
 EXPORT file_address_velocity := withOccupants;

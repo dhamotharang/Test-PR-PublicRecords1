@@ -1,4 +1,4 @@
-Import Civ_Court, ut;
+﻿Import Civ_Court, ut;
 #option('multiplePersistInstances',FALSE);
 
 Ct_Civ :=  Civ_Court.File_In_CT;
@@ -153,18 +153,18 @@ JcCt_Doc := join(Distribute(JudCase_CaseType, Hash32(DispositionDockLegCode)),
 										Left.DispositionDockLegCode = Right.DockLegCode, xJcCtDoc(Left, Right),  Left outer, Lookup, local);
 
 Lay_MatterActivity xJcCtDoc_Kpd(JcCt_Doc L, CT_Civ.File_KeyPointDates R) := Transform
-Self.WritEntryDate := CT_Civ.DateConversion(R.WritEntryDate);
-Self.TrialListClaimDate := CT_Civ.DateConversion(R.TrialListClaimDate);
-Self.VerdictTrialCompleteDate := CT_Civ.DateConversion(R.VerdictTrialCompleteDate);
-Self.InitDispositionDate := CT_Civ.DateConversion(R.InitDispositionDate);
-Self.AppealAppellateDate := CT_Civ.DateConversion(R.AppealAppellateDate);
-Self.AppealSupremeCourtDate := CT_Civ.DateConversion(R.AppealSupremeCourtDate);
-Self.DispOfAppealDate := CT_Civ.DateConversion(R.DispOfAppealDate);
-Self.ReturnDate := CT_Civ.DateConversion(R.ReturnDate);
-Self.FileDate := CT_Civ.DateConversion(R.FileDate);
-Self.DispositionDate := CT_Civ.DateConversion(R.DispositionDate);
-Self.AssignedDate := CT_Civ.DateConversion(R.AssignedDate);
-Self.ReferralDate := CT_Civ.DateConversion(R.ReferralDate);
+Self.WritEntryDate := CT_Civ.DateConversion(R.WritEntryDate[1..10]);
+Self.TrialListClaimDate := CT_Civ.DateConversion(R.TrialListClaimDate[1..10]);
+Self.VerdictTrialCompleteDate := CT_Civ.DateConversion(R.VerdictTrialCompleteDate[1..10]);
+Self.InitDispositionDate := CT_Civ.DateConversion(R.InitDispositionDate[1..10]);
+Self.AppealAppellateDate := CT_Civ.DateConversion(R.AppealAppellateDate[1..10]);
+Self.AppealSupremeCourtDate := CT_Civ.DateConversion(R.AppealSupremeCourtDate[1..10]);
+Self.DispOfAppealDate := CT_Civ.DateConversion(R.DispOfAppealDate[1..10]);
+Self.ReturnDate := CT_Civ.DateConversion(R.ReturnDate[1..10]);
+Self.FileDate := CT_Civ.DateConversion(R.FileDate[1..10]);
+Self.DispositionDate := CT_Civ.DateConversion(R.DispositionDate[1..10]);
+Self.AssignedDate := CT_Civ.DateConversion(R.AssignedDate[1..10]);
+Self.ReferralDate := CT_Civ.DateConversion(R.ReferralDate[1..10]);
 Self := L;
 Self := [];
 End;

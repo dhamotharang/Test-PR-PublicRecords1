@@ -1,4 +1,4 @@
-import ut, BankruptcyV2, doxie;
+﻿import ut, BankruptcyV2, doxie,dops;
 
 layout_date := RECORD
 	unsigned4 date;
@@ -53,9 +53,9 @@ rollup_layout get_bkrupt_search(BankruptcyV2.file_bankruptcy_search_v3 L) := tra
 end;
 
 w_bk := project(BankruptcyV2.file_bankruptcy_search_v3((integer)did != 0 and name_type='D' and case_number<>'' and court_code<>''), get_bkrupt_search(left));
-
+FCRATest:=w_bk(court_code+case_number not in dops.SuppressID('bankruptcy').GetIDsAsSet(true));
 				
-rollup_layout roll_bankrupt (w_bk le, w_bk ri) := TRANSFORM
+rollup_layout roll_bankrupt (FCRATest le, FCRATest ri) := TRANSFORM
   boolean takeLeft := le.date_last_seen >= ri.date_last_seen;
 	SELF.date_last_seen := IF (takeLeft, le.date_last_seen, ri.date_last_seen);
   SELF.filing_type := IF (takeLeft, le.filing_type, ri.filing_type);
@@ -75,7 +75,7 @@ rollup_layout roll_bankrupt (w_bk le, w_bk ri) := TRANSFORM
 	SELF := le;
 END;
 
-ds_sorted := SORT (distribute(w_bk, hash(did)), did, court_code, case_number, -date_last_seen, local);
+ds_sorted := SORT (distribute(FCRATest, hash(did)), did, court_code, case_number, -date_last_seen, local);
 bankrupt_rolled := ROLLUP (ds_sorted, LEFT.did=RIGHT.did, roll_bankrupt(LEFT,RIGHT), local);
 
 bankrupt_slim := PROJECT (bankrupt_rolled, slimrec);

@@ -1,4 +1,4 @@
-IMPORT FCRA, ut, RiskWise, ln_propertyv2;
+﻿IMPORT FCRA, ut, RiskWise, ln_propertyv2;
 
 EXPORT Boca_Shell_Property_FCRA (GROUPED DATASET(layout_PropertyRecord) addresses,
                                  GROUPED DATASET(Layout_Boca_Shell_ids) ids) := FUNCTION
@@ -481,7 +481,7 @@ layout_out := RECORD
 	string4	assessed_value_year;
 END;
 
-Layouts.layout_relat_prop_plusv4 to_relat_prop(all_added le) := TRANSFORM
+Layouts.Layout_Relat_Prop_Plus_BusInd to_relat_prop(all_added le) := TRANSFORM
 	SELF.isrelat := le.isrelat;
 	SELF.seq := le.seq;
 	SELF.did := le.did;
@@ -509,6 +509,8 @@ Layouts.layout_relat_prop_plusv4 to_relat_prop(all_added le) := TRANSFORM
 	SELF.county := le.county;
 	SELF.geo_blk := le.geo_blk;
 	SELF.census_loose := true;
+	SELF.Residential_or_Business_Ind  := '';
+	SELF.historydate  := 0;
 	SELF := le;
 END;
 Property := PROJECT(wDistressed, to_relat_prop(LEFT));

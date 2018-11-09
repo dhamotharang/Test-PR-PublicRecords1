@@ -1,10 +1,10 @@
-IMPORT doxie,iesp,PersonReports,AutoStandardI,Address,ut,
+﻿IMPORT doxie,iesp,PersonReports,PublicProfileServices,AutoStandardI,Address,ut,
 	ATF_Services,CriminalRecords_Services,Foreclosure_Services,
-	Hunting_Fishing_Services,InternetDomain_Services,Identifier2,VehicleV2_Services, NID, header;
+	Hunting_Fishing_Services,InternetDomain_Services,VehicleV2_Services, NID, header;
 
 EXPORT Records := MODULE
 
-		EXPORT BOOLEAN validDidRec(Layouts.DidRecord didRec,IParam.searchParams rptByMod) := FUNCTION
+		EXPORT BOOLEAN validDidRec(PublicProfileServices.Layouts.DidRecord didRec,PublicProfileServices.IParam.searchParams rptByMod) := FUNCTION
 		hdrRecs := doxie.header_records_byDID(DATASET([{didRec.did,FALSE}],doxie.layout_references_hh));
 
 		// INPUT DOB EXISTS IN DATASET OF HEADER RECORDS
@@ -39,25 +39,25 @@ EXPORT Records := MODULE
 		BOOLEAN existsAddr := existsStreet AND ((existsCity AND existsState) OR existsZip);
 
 		// VALIDATE SETS
-		setNameSsnDob  := IF(existsName AND existsSSN AND existsDOB ,Constants.setNameSsnDob ,[]);
-		setNameSsnAddr := IF(existsName AND existsSSN AND existsAddr,Constants.setNameSsnAddr,[]);
-		setNameDobAddr := IF(existsName AND existsDOB AND existsAddr,Constants.setNameDobAddr,[]);
-		setSsnDobAddr  := IF(existsSSN  AND existsDOB AND existsAddr,Constants.setSsnDobAddr ,[]);
-		setNameSSN  := IF(existsName AND existsSSN ,Constants.setNameSSN ,[]);
-		setNameAddr := IF(existsName AND existsAddr,Constants.setNameAddr,[]);
-		setNameDOB  := IF(existsName AND existsDOB ,Constants.setNameDOB ,[]);
-		setAddrOnly := IF(existsAddr,Constants.setAddrOnly,[]);
-		setSSNOnly  := IF(existsSSN ,Constants.setSSNOnly ,[]);
+		setNameSsnDob  := IF(existsName AND existsSSN AND existsDOB ,PublicProfileServices.Constants.setNameSsnDob ,[]);
+		setNameSsnAddr := IF(existsName AND existsSSN AND existsAddr,PublicProfileServices.Constants.setNameSsnAddr,[]);
+		setNameDobAddr := IF(existsName AND existsDOB AND existsAddr,PublicProfileServices.Constants.setNameDobAddr,[]);
+		setSsnDobAddr  := IF(existsSSN  AND existsDOB AND existsAddr,PublicProfileServices.Constants.setSsnDobAddr ,[]);
+		setNameSSN  := IF(existsName AND existsSSN ,PublicProfileServices.Constants.setNameSSN ,[]);
+		setNameAddr := IF(existsName AND existsAddr,PublicProfileServices.Constants.setNameAddr,[]);
+		setNameDOB  := IF(existsName AND existsDOB ,PublicProfileServices.Constants.setNameDOB ,[]);
+		setAddrOnly := IF(existsAddr,PublicProfileServices.Constants.setAddrOnly,[]);
+		setSSNOnly  := IF(existsSSN ,PublicProfileServices.Constants.setSSNOnly ,[]);
 
 		// DATASETS
-		DS1 := DATASET([{didRec.srchBy}],{SET OF STRING Key {MAXLENGTH(Constants.MAX_LEN)}});
+		DS1 := DATASET([{didRec.srchBy}],{SET OF STRING Key {MAXLENGTH(PublicProfileServices.Constants.MAX_LEN)}});
 		DS2 := DATASET([{setNameSsnDob},{setNameSsnAddr},{setNameDobAddr},{setSsnDobAddr},{setNameSSN},
-			{setNameAddr},{setNameDOB},{setAddrOnly},{setSSNOnly}],{SET OF STRING Key {MAXLENGTH(Constants.MAX_LEN)}});
+			{setNameAddr},{setNameDOB},{setAddrOnly},{setSSNOnly}],{SET OF STRING Key {MAXLENGTH(PublicProfileServices.Constants.MAX_LEN)}});
 
 		RETURN EXISTS(JOIN(DS1,DS2,LEFT.Key=RIGHT.Key));
 	END;
 
-	EXPORT getHdrDids(IParam.searchParams rptByMod) := FUNCTION
+	EXPORT getHdrDids(PublicProfileServices.IParam.searchParams rptByMod) := FUNCTION
 		BOOLEAN validDOB  := rptByMod.DOB!=0;
 		BOOLEAN validSSN  := TRIM(rptByMod.SSN)!='' AND LENGTH(TRIM(rptByMod.SSN))=9;
 		BOOLEAN validName := TRIM(rptByMod.LastName)!='' AND LENGTH(TRIM(rptByMod.LastName))>1;;
@@ -74,27 +74,27 @@ EXPORT Records := MODULE
 		BOOLEAN srchBySSNOnly  := rptByMod.IncludeSSN AND validSSN;
 
 		srchReq := DATASET([
-			Transforms.initSrch(srchByNameSsnDob ,Constants.setNameSsnDob ,rptByMod),
-			Transforms.initSrch(srchByNameSsnAddr,Constants.setNameSsnAddr,rptByMod),
-			Transforms.initSrch(srchByNameDobAddr,Constants.setNameDobAddr,rptByMod),
-			Transforms.initSrch(srchBySsnDobAddr ,Constants.setSsnDobAddr ,rptByMod),
-			Transforms.initSrch(srchByNameSSN    ,Constants.setNameSSN    ,rptByMod),
-			Transforms.initSrch(srchByNameAddr   ,Constants.setNameAddr   ,rptByMod),
-			Transforms.initSrch(srchByNameDOB    ,Constants.setNameDOB    ,rptByMod),
-			Transforms.initSrch(srchByAddrOnly   ,Constants.setAddrOnly   ,rptByMod),
-			Transforms.initSrch(srchBySSNOnly    ,Constants.setSSNOnly    ,rptByMod)]);
+			PublicProfileServices.Transforms.initSrch(srchByNameSsnDob ,PublicProfileServices.Constants.setNameSsnDob ,rptByMod),
+			PublicProfileServices.Transforms.initSrch(srchByNameSsnAddr,PublicProfileServices.Constants.setNameSsnAddr,rptByMod),
+			PublicProfileServices.Transforms.initSrch(srchByNameDobAddr,PublicProfileServices.Constants.setNameDobAddr,rptByMod),
+			PublicProfileServices.Transforms.initSrch(srchBySsnDobAddr ,PublicProfileServices.Constants.setSsnDobAddr ,rptByMod),
+			PublicProfileServices.Transforms.initSrch(srchByNameSSN    ,PublicProfileServices.Constants.setNameSSN    ,rptByMod),
+			PublicProfileServices.Transforms.initSrch(srchByNameAddr   ,PublicProfileServices.Constants.setNameAddr   ,rptByMod),
+			PublicProfileServices.Transforms.initSrch(srchByNameDOB    ,PublicProfileServices.Constants.setNameDOB    ,rptByMod),
+			PublicProfileServices.Transforms.initSrch(srchByAddrOnly   ,PublicProfileServices.Constants.setAddrOnly   ,rptByMod),
+			PublicProfileServices.Transforms.initSrch(srchBySSNOnly    ,PublicProfileServices.Constants.setSSNOnly    ,rptByMod)]);
 
 		IF(NOT TRUE IN SET(srchReq,validSrch) AND rptByMod.UniqueID='',FAIL(301,doxie.ErrorCodes(301)));
 
-		hdrDids    := PROJECT(srchReq,Transforms.getDids(LEFT,COUNTER));
-		normDids   := NORMALIZE(hdrDids,LEFT.didRecs,TRANSFORM(Layouts.didRecord,SELF:=RIGHT));
-		filterDids := PROJECT(normDids,TRANSFORM(Layouts.didRecord,SELF.seq:=IF(validDidRec(LEFT,rptByMod),LEFT.seq,SKIP),SELF:=LEFT));
+		hdrDids    := PROJECT(srchReq,PublicProfileServices.Transforms.getDids(LEFT,COUNTER));
+		normDids   := NORMALIZE(hdrDids,LEFT.didRecs,TRANSFORM(PublicProfileServices.Layouts.didRecord,SELF:=RIGHT));
+		filterDids := PROJECT(normDids,TRANSFORM(PublicProfileServices.Layouts.didRecord,SELF.seq:=IF(validDidRec(LEFT,rptByMod),LEFT.seq,SKIP),SELF:=LEFT));
 		dedupDids  := DEDUP(SORT(filterDids,did,seq),did);
 
 		RETURN dedupDids;
 	END;
 
-	EXPORT PersonSummary(IParam.searchParams rptByMod) := FUNCTION
+	EXPORT PersonSummary(PublicProfileServices.IParam.searchParams rptByMod) := FUNCTION
 
 		getID(iesp.sexualoffender.t_SexOffRecordIdNumbers recID) := FUNCTION
 			ID := MAP(TRIM(recID.OffenderId)!='' => recID.OffenderId,
@@ -109,7 +109,7 @@ EXPORT Records := MODULE
 		
 		// ONLY DID USED FROM GLOBAL MODULE
 		glbMod := AutoStandardI.GlobalModule();
-		dids := IF(rptByMod.UniqueID='',Functions.FetchI_Hdr_Indv_do(rptByMod),
+		dids := IF(rptByMod.UniqueID='',PublicProfileServices.Functions.FetchI_Hdr_Indv_do(rptByMod),
 			DATASET([{(UNSIGNED6)rptByMod.UniqueID}],doxie.layout_references));
 
 		atfMod := MODULE(PROJECT(glbMod,ATF_Services.IParam.search_params,opt))
@@ -200,7 +200,7 @@ EXPORT Records := MODULE
 		RETURN ROW(setIndividual());
 	END;
 
-	EXPORT currentResidentsOnly(IParam.searchParams rptByMod, DATASET(doxie.layout_presentation) hdrRecs) := FUNCTION
+	EXPORT currentResidentsOnly(PublicProfileServices.IParam.searchParams rptByMod, DATASET(doxie.layout_presentation) hdrRecs) := FUNCTION
 		a := address.GetCleanAddress(rptByMod.addr,rptByMod.city+' '+rptByMod.state+' '+rptByMod.zip,address.Components.Country.US).str_addr;
 		clnAddr := Address.CleanFields(a);
 		doxie.layout_presentation filterCurrentResidents(doxie.layout_presentation L) := TRANSFORM
@@ -213,7 +213,7 @@ EXPORT Records := MODULE
 			BOOLEAN matchState := TRIM(clnAddr.st)!='' AND TRIM(clnAddr.st)=TRIM(L.st);
 			BOOLEAN matchZip := TRIM(clnAddr.zip)!='' AND TRIM(clnAddr.zip)=TRIM(L.zip);
 			BOOLEAN matchAddr := matchStreet AND ((matchCity AND matchState) OR matchZip);
-			BOOLEAN isCurrent := doxie.isrecent(L.dt_last_seen+'01',Constants.MIN_MONTHS);
+			BOOLEAN isCurrent := doxie.isrecent(L.dt_last_seen+'01',PublicProfileServices.Constants.MIN_MONTHS);
 			SELF.did := IF(isCurrent AND matchAddr,L.did,SKIP);
 			SELF := L;
 		END;
@@ -222,7 +222,7 @@ EXPORT Records := MODULE
 
 	Export HeaderSummaryFilter(dataset(doxie.layout_presentation) inrecs, boolean searchContainsSSN = false) := FUNCTION
 		//Add filters for NLR (No longer reported) data removal.
-		filterCriteria := if(searchContainsSSN,Constants.filterNLR_SSN,Constants.filterNLR);
+		filterCriteria := if(searchContainsSSN,PublicProfileServices.Constants.filterNLR_SSN,PublicProfileServices.Constants.filterNLR);
 		inrecs_pulled:=join(inrecs,header.key_NLR_payload,
 													keyed(left.did=right.did)
 													and keyed (left.rid=right.rid)
@@ -232,24 +232,24 @@ EXPORT Records := MODULE
 		return inrecs_pulled;
 	END;
 	
-	EXPORT HeaderSummary(IParam.searchParams rptByMod) := FUNCTION
+	EXPORT HeaderSummary(PublicProfileServices.IParam.searchParams rptByMod) := FUNCTION
 
 		hdrDids := getHdrDids(rptByMod);
 		hdrTemp := doxie.header_records_byDID(PROJECT(hdrDids,doxie.layout_references_hh));
 		//Remove undesireable record sources
-		hdrTemp1 := hdrTemp(src not in Constants.srcFilter);
+		hdrTemp1 := hdrTemp(src not in PublicProfileServices.Constants.srcFilter);
 		hdrRecs := PROJECT(hdrTemp1,TRANSFORM(doxie.layout_presentation,SELF:=LEFT));
 
 		// FILTER HEADER RECORDS BY INPUT SSN AND DOB YYYYMM
-		SoHdr  := HeaderSummaryFilter(hdrRecs(did IN SET(hdrDids(srchBy=Constants.setSSNOnly),did),ssn=rptByMod.ssn),true);
-		NsHdr  := HeaderSummaryFilter(hdrRecs(did IN SET(hdrDids(srchBy=Constants.setNameSSN),did),ssn=rptByMod.ssn),true);
-		NdHdr  := HeaderSummaryFilter(hdrRecs(did IN SET(hdrDids(srchBy=Constants.setNameDOB),did),dob[1..6]=rptByMod.dob[1..6]));
-		NaHdr  := HeaderSummaryFilter(hdrRecs(did IN SET(hdrDids(srchBy=Constants.setNameAddr),did)));
-		AoHdr  := HeaderSummaryFilter(currentResidentsOnly(rptByMod,hdrRecs(did IN SET(hdrDids(srchBy=Constants.setAddrOnly),did))));
-		NsdHdr := HeaderSummaryFilter(hdrRecs(did IN SET(hdrDids(srchBy=Constants.setNameSsnDob) ,did),ssn=rptByMod.ssn,dob[1..6]=rptByMod.dob[1..6]),true);
-		NsaHdr := HeaderSummaryFilter(hdrRecs(did IN SET(hdrDids(srchBy=Constants.setNameSsnAddr),did),ssn=rptByMod.ssn),true);
-		NdaHdr := HeaderSummaryFilter(hdrRecs(did IN SET(hdrDids(srchBy=Constants.setNameDobAddr),did),dob[1..6]=rptByMod.dob[1..6]));
-		SdaHdr := HeaderSummaryFilter(hdrRecs(did IN SET(hdrDids(srchBy=Constants.setSsnDobAddr) ,did),ssn=rptByMod.ssn,dob[1..6]=rptByMod.dob[1..6]),true);
+		SoHdr  := HeaderSummaryFilter(hdrRecs(did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setSSNOnly),did),ssn=rptByMod.ssn),true);
+		NsHdr  := HeaderSummaryFilter(hdrRecs(did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setNameSSN),did),ssn=rptByMod.ssn),true);
+		NdHdr  := HeaderSummaryFilter(hdrRecs(did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setNameDOB),did),dob[1..6]=rptByMod.dob[1..6]));
+		NaHdr  := HeaderSummaryFilter(hdrRecs(did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setNameAddr),did)));
+		AoHdr  := HeaderSummaryFilter(currentResidentsOnly(rptByMod,hdrRecs(did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setAddrOnly),did))));
+		NsdHdr := HeaderSummaryFilter(hdrRecs(did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setNameSsnDob) ,did),ssn=rptByMod.ssn,dob[1..6]=rptByMod.dob[1..6]),true);
+		NsaHdr := HeaderSummaryFilter(hdrRecs(did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setNameSsnAddr),did),ssn=rptByMod.ssn),true);
+		NdaHdr := HeaderSummaryFilter(hdrRecs(did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setNameDobAddr),did),dob[1..6]=rptByMod.dob[1..6]));
+		SdaHdr := HeaderSummaryFilter(hdrRecs(did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setSsnDobAddr) ,did),ssn=rptByMod.ssn,dob[1..6]=rptByMod.dob[1..6]),true);
 
 		hdrFilt := SoHdr+NsHdr+NdHdr+NaHdr+AoHdr+NsdHdr+NsaHdr+NdaHdr+SdaHdr;
 		cntSsnDob := PublicProfileServices.Functions.cntUnqSsnDob(hdrFilt);
@@ -258,39 +258,39 @@ EXPORT Records := MODULE
 			KEEP(1),LIMIT(PublicProfileServices.Constants.MAX_DIDS,SKIP)),PublicProfileServices.Layouts.hdrRollupRecord);
 
 		// SEPARATE ROLLUP RECORDS
-		SoRoll := hdrRoll((INTEGER)did IN SET(hdrDids(srchBy=Constants.setSSNOnly),did));
-		NsRoll := hdrRoll((INTEGER)did IN SET(hdrDids(srchBy=Constants.setNameSSN),did));
-		NdRoll := hdrRoll((INTEGER)did IN SET(hdrDids(srchBy=Constants.setNameDOB),did));
-		NaRoll := hdrRoll((INTEGER)did IN SET(hdrDids(srchBy=Constants.setNameAddr),did));
-		AoRoll := hdrRoll((INTEGER)did IN SET(hdrDids(srchBy=Constants.setAddrOnly),did));
+		SoRoll := hdrRoll((INTEGER)did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setSSNOnly),did));
+		NsRoll := hdrRoll((INTEGER)did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setNameSSN),did));
+		NdRoll := hdrRoll((INTEGER)did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setNameDOB),did));
+		NaRoll := hdrRoll((INTEGER)did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setNameAddr),did));
+		AoRoll := hdrRoll((INTEGER)did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setAddrOnly),did));
 
-		NsdRoll := hdrRoll((INTEGER)did IN SET(hdrDids(srchBy=Constants.setNameSsnDob),did));
-		NsaRoll := hdrRoll((INTEGER)did IN SET(hdrDids(srchBy=Constants.setNameSsnAddr),did));
-		NdaRoll := hdrRoll((INTEGER)did IN SET(hdrDids(srchBy=Constants.setNameDobAddr),did));
-		SdaRoll := hdrRoll((INTEGER)did IN SET(hdrDids(srchBy=Constants.setSsnDobAddr),did));
+		NsdRoll := hdrRoll((INTEGER)did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setNameSsnDob),did));
+		NsaRoll := hdrRoll((INTEGER)did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setNameSsnAddr),did));
+		NdaRoll := hdrRoll((INTEGER)did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setNameDobAddr),did));
+		SdaRoll := hdrRoll((INTEGER)did IN SET(hdrDids(srchBy=PublicProfileServices.Constants.setSsnDobAddr),did));
 
 		// IESP SUBJECT RECORDS
-		SoSub := PROJECT(CHOOSEN(SoRoll,iesp.Constants.PublicProfile.MAX_SUBJECT_RECORDS),Transforms.SetSubject(LEFT));
-		NsSub := PROJECT(CHOOSEN(NsRoll,iesp.Constants.PublicProfile.MAX_SUBJECT_RECORDS),Transforms.SetSubject(LEFT));
-		NdSub := PROJECT(CHOOSEN(NdRoll,iesp.Constants.PublicProfile.MAX_SUBJECT_RECORDS),Transforms.SetSubject(LEFT));
-		NaSub := PROJECT(CHOOSEN(NaRoll,iesp.Constants.PublicProfile.MAX_SUBJECT_RECORDS),Transforms.SetSubject(LEFT));
-		AoSub := PROJECT(CHOOSEN(AoRoll,iesp.Constants.PublicProfile.MAX_SUBJECT_RECORDS),Transforms.SetSubject(LEFT));
+		SoSub := PROJECT(CHOOSEN(SoRoll,iesp.Constants.PublicProfile.MAX_SUBJECT_RECORDS),PublicProfileServices.Transforms.SetSubject(LEFT));
+		NsSub := PROJECT(CHOOSEN(NsRoll,iesp.Constants.PublicProfile.MAX_SUBJECT_RECORDS),PublicProfileServices.Transforms.SetSubject(LEFT));
+		NdSub := PROJECT(CHOOSEN(NdRoll,iesp.Constants.PublicProfile.MAX_SUBJECT_RECORDS),PublicProfileServices.Transforms.SetSubject(LEFT));
+		NaSub := PROJECT(CHOOSEN(NaRoll,iesp.Constants.PublicProfile.MAX_SUBJECT_RECORDS),PublicProfileServices.Transforms.SetSubject(LEFT));
+		AoSub := PROJECT(CHOOSEN(AoRoll,iesp.Constants.PublicProfile.MAX_SUBJECT_RECORDS),PublicProfileServices.Transforms.SetSubject(LEFT));
 
-		NsdSub := PROJECT(CHOOSEN(NsdRoll,iesp.Constants.PublicProfile.MAX_SUBJECT_RECORDS),Transforms.SetSubject(LEFT,Constants.keyNameSsnDob));
-		NsaSub := PROJECT(CHOOSEN(NsaRoll,iesp.Constants.PublicProfile.MAX_SUBJECT_RECORDS),Transforms.SetSubject(LEFT,Constants.keyNameSsnAddr));
-		NdaSub := PROJECT(CHOOSEN(NdaRoll,iesp.Constants.PublicProfile.MAX_SUBJECT_RECORDS),Transforms.SetSubject(LEFT,Constants.keyNameDobAddr));
-		SdaSub := PROJECT(CHOOSEN(SdaRoll,iesp.Constants.PublicProfile.MAX_SUBJECT_RECORDS),Transforms.SetSubject(LEFT,Constants.keySsnDobAddr));
+		NsdSub := PROJECT(CHOOSEN(NsdRoll,iesp.Constants.PublicProfile.MAX_SUBJECT_RECORDS),PublicProfileServices.Transforms.SetSubject(LEFT,PublicProfileServices.Constants.keyNameSsnDob));
+		NsaSub := PROJECT(CHOOSEN(NsaRoll,iesp.Constants.PublicProfile.MAX_SUBJECT_RECORDS),PublicProfileServices.Transforms.SetSubject(LEFT,PublicProfileServices.Constants.keyNameSsnAddr));
+		NdaSub := PROJECT(CHOOSEN(NdaRoll,iesp.Constants.PublicProfile.MAX_SUBJECT_RECORDS),PublicProfileServices.Transforms.SetSubject(LEFT,PublicProfileServices.Constants.keyNameDobAddr));
+		SdaSub := PROJECT(CHOOSEN(SdaRoll,iesp.Constants.PublicProfile.MAX_SUBJECT_RECORDS),PublicProfileServices.Transforms.SetSubject(LEFT,PublicProfileServices.Constants.keySsnDobAddr));
 		CmbSub := NsdSub & NsaSub & NdaSub & SdaSub;
 
 		// IESP RESULT RECORDS
-		SoRes  := ROW(Transforms.setSSNResults(SoSub));
-		NsRes  := ROW(Transforms.setNameSSNResults(NsSub));
-		NdRes  := ROW(Transforms.setNameDOBResults(NdSub));
-		NaRes  := ROW(Transforms.setNameAddrResults(NaSub));
-		AoRes  := ROW(Transforms.setAddrResults(AoSub));
-		CmbRes := ROW(Transforms.setCombinationResults(CmbSub));
+		SoRes  := ROW(PublicProfileServices.Transforms.setSSNResults(SoSub));
+		NsRes  := ROW(PublicProfileServices.Transforms.setNameSSNResults(NsSub));
+		NdRes  := ROW(PublicProfileServices.Transforms.setNameDOBResults(NdSub));
+		NaRes  := ROW(PublicProfileServices.Transforms.setNameAddrResults(NaSub));
+		AoRes  := ROW(PublicProfileServices.Transforms.setAddrResults(AoSub));
+		CmbRes := ROW(PublicProfileServices.Transforms.setCombinationResults(CmbSub));
 
-		Layouts.hdrSumRecord initSummary() := TRANSFORM
+		PublicProfileServices.Layouts.hdrSumRecord initSummary() := TRANSFORM
 			SELF.SSNResults := GLOBAL(SoRes);
 			SELF.NameSSNResults := GLOBAL(NsRes);
 			SELF.NameDOBResults := GLOBAL(NdRes);

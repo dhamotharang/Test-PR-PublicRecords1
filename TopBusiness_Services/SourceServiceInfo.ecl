@@ -1,4 +1,4 @@
-import MDR;
+﻿import MDR;
 
 EXPORT SourceServiceInfo := MODULE
 
@@ -82,6 +82,7 @@ EXPORT SourceServiceInfo := MODULE
 			MDR.sourceTools.set_Calbus,
 			MDR.sourceTools.set_CNLD_Facilities,
 			MDR.sourceTools.set_CorpV2,
+			MDR.sourceTools.set_Cortera,
 			MDR.sourceTools.set_CrashCarrier,
 			MDR.sourceTools.set_DCA,
 			MDR.sourceTools.set_Dea,
@@ -113,7 +114,7 @@ EXPORT SourceServiceInfo := MODULE
 			MDR.sourceTools.set_OR_Worker_Comp,			
 			MDR.sourceTools.set_OSHAIR,
 			MDR.sourceTools.set_Professional_License,
-			MDR.sourceTools.set_property,
+			MDR.sourceTools.set_property,			
 			MDR.sourceTools.set_SEC_Broker_Dealer,
 			MDR.sourceTools.set_Sheila_Greco,
 			MDR.sourceTools.set_Spoke,
@@ -221,6 +222,11 @@ EXPORT SourceServiceInfo := MODULE
 	EXPORT IncludeRptCNLDFacility(string source, string section) := FUNCTION
 		 RETURN(MDR.sourceTools.SourceIsCNLD_Facilities(source) or
 						MDR.sourceTools.set_CNLD_Facilities[1] in sectionToCheck(section));
+	END;
+	
+	EXPORT IncludeRptCortera(string source, string section) := FUNCTION
+		 RETURN(MDR.sourceTools.SourceIsCortera(source) or
+						MDR.sourceTools.set_Cortera[1] in sectionToCheck(section));
 	END;
 	
 	EXPORT IncludeRptCrash(string source, string section) := FUNCTION

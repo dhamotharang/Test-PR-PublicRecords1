@@ -671,7 +671,8 @@ EXPORT TaxRefundISv3_BatchService_Layouts := MODULE
 			// TRIS v3 2015 enhancement, new field ---v
 			string4   BestAddrChangeDistance; // "-1" or 0-9999 // TRIS v3 2015 enhancements req 4.1.10
 			// v3.1 with fdn
-			boolean fdn_id_risk; 
+			boolean fdn_id_risk;
+			unsigned1 FDN_Count  := 0;
 
 			string15 risk_status;
 			string1 identity_risk;

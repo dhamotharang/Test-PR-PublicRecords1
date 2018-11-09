@@ -1,29 +1,12 @@
-﻿
-IMPORT Address, BIPV2, Business_Risk_BIP, LN_PropertyV2, MDR, DueDiligence, UT, iesp, Census_Data;
+﻿IMPORT Address, BIPV2, Business_Risk_BIP, LN_PropertyV2, MDR, DueDiligence, UT, iesp, Census_Data;
 
 EXPORT reportBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) UpdateBusnPropertyForAttributeLogic, 
 											   DATASET(DueDiligence.LayoutsInternal.PropertySlimLayout) PropertyCurrentlyOwnedButLimited,
 											   boolean DebugMode = FALSE
 											   ) := FUNCTION
 
-	 // ------                                                                                    ------   
-	 // ------ Convert the fips code to a County Name for reporting                               ------ 
-	 // ------  DON'T NEED - DELETE next release                                                                                  ------
-	  PropertyCurentlyOwnedForReporting := PropertyCurrentlyOwnedButLimited;  //for debugging
-	 // PropertyCurentlyOwnedForReporting := join(PropertyCurrentlyOwnedButLimited, Census_Data.file_Fips2County,
-													 // left.st = right.state_fips and
-													 // /* take the last 3 digits of the 5 digit value */  
-													 // left.countyFIPS[3..5] = right.county_fips,
-											  // TRANSFORM(RECORDOF(LEFT),
-															// self.countyName:= right.county_name;
-															// self := left),
-															// lookup, 
-															// left outer);
-															
-
-
-
 	 
+												
 	// ------                                                                                    ------
   // ------ create the ChildDataset of Property                                                ------
 	// ------                                                                                    ------
@@ -33,7 +16,7 @@ EXPORT reportBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) UpdateBusnP
 	END;
 	 
 	 
-	iesp.duediligencereport.t_DDRProperty    FormatTheListOfProperty(RECORDOF(PropertyCurentlyOwnedForReporting) le, Integer PropertySeq) := TRANSFORM 
+	iesp.duediligencereport.t_DDRProperty    FormatTheListOfProperty(RECORDOF(PropertyCurrentlyOwnedButLimited) le, Integer PropertySeq) := TRANSFORM 
                                                  SELF.Sequence                      := PropertySeq;
  	                                               SELF.OwnerOccupied                 := MAP(
 																								                                            le.OwnerOccupied = 'Y'   => 'Y',
@@ -45,7 +28,7 @@ EXPORT reportBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) UpdateBusnP
 																								 SELF.PurchaseDetails.PurchaseDate.Month := (integer)le.SaleDate[4..2];
 																								 SELF.PurchaseDetails.PurchaseDate.Day   := (integer)le.SaleDate[6..2];
 																								 SELF.PurchaseDetails.LengthofOwnership  := le.lengthOfOwnership;
-																								 SELF.MostRecentTax.TaxPrice        := le.TaxAssdValue;    //* I think i have the wrong field?  
+																								 SELF.MostRecentTax.TaxPrice        := le.TaxAssdValue;          //* check this field?  
 																								 SELF.MostRecentTax.TaxYear.Year    := (integer)le.TaxYear;
 																								 SELF.Address.StreetNumber          := le.prim_range;
 																								 SELF.Address.StreetPreDirection    := le.predir; 
@@ -63,9 +46,9 @@ EXPORT reportBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) UpdateBusnP
 				                                         SELF                               := [];
 																								 END;  
 	 
-	 
+	  
 	PropertyChildDataset  :=   
-		PROJECT(PropertyCurentlyOwnedForReporting,
+		PROJECT(PropertyCurrentlyOwnedButLimited,
 			TRANSFORM(PropertyChildDatasetLayout,
 				SELF.seq             := LEFT.PropertyReportData.seq,
 				SELF.PropChild       := PROJECT(LEFT, FormatTheListOfProperty(LEFT, COUNTER)))); 
@@ -90,16 +73,11 @@ EXPORT reportBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) UpdateBusnP
 	//   DEBUGGING OUTPUTS
 	// *********************
 	 
-	  IF(DebugMode,     OUTPUT(CHOOSEN(PropertyCurentlyOwnedForReporting, 50),     NAMED('Sample_PropertyCurentlyOwnedForReporting_Step8')));
-	  IF(DebugMode,     OUTPUT(COUNT  (PropertyCurentlyOwnedForReporting),         NAMED('HowManyPropertyCurentlyOwnedForReportingStep8')));
+	  IF(DebugMode,     OUTPUT(COUNT  (PropertyCurrentlyOwnedButLimited),         NAMED('HowManyPropertyCurrentlyOwnedButLimited')));
+	  IF(DebugMode,     OUTPUT(CHOOSEN(PropertyChildDataset, 100),                NAMED('PropertyChildDataset')));
 	 
-	 
-	  IF(DebugMode,     OUTPUT(CHOOSEN(PropertyChildDataset, 100),  NAMED('PropertyChildDataset')));
-	 
-	  PropertyReportDataAdded  := UpdateBusnPropertyWithReport;
-	  // PropertyReportDataAdded    := UpdateBusnPropertyForAttributeLogic;   //***for debugging
 		
-		Return PropertyReportDataAdded;
+		Return UpdateBusnPropertyWithReport;
 		
 	END;   
 	

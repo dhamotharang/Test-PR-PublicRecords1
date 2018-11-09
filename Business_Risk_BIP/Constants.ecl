@@ -1,4 +1,4 @@
-IMPORT AutoKeyI, BIPV2, Business_Risk_BIP, Gateway, iesp, MDR, Risk_Indicators, UT;
+﻿IMPORT AutoKeyI, BIPV2, Business_Risk_BIP, Gateway, iesp, MDR, Risk_Indicators, UT;
 
 EXPORT Constants := MODULE
 	EXPORT LinkSearch := ENUM(
@@ -197,14 +197,6 @@ EXPORT Constants := MODULE
 	EXPORT MarketingRestrictedSources := DATASET([
 						{MDR.sourceTools.src_Business_Credit},
 						{MDR.SourceTools.src_Business_Registration},
-						{MDR.SourceTools.src_ID_Corporations},
-						{MDR.SourceTools.src_FL_Corporations},
-						{MDR.SourceTools.src_KS_Corporations},
-						{MDR.SourceTools.src_NM_Corporations},
-						{MDR.SourceTools.src_PA_Corporations},
-						{MDR.SourceTools.src_SC_Corporations},
-						{MDR.SourceTools.src_WA_Corporations},
-						{MDR.SourceTools.src_WV_Corporations},
 						{MDR.SourceTools.src_FBNV2_CA_Orange_county},
 						{MDR.SourceTools.src_FBNV2_CA_Santa_Clara},
 						{MDR.SourceTools.src_FBNV2_CA_San_Bernadino},
@@ -228,9 +220,6 @@ EXPORT Constants := MODULE
 						{MDR.SourceTools.src_SDA},
 						{MDR.SourceTools.src_SDAA},
 						{MDR.SourceTools.src_EBR},
-						{MDR.SourceTools.src_UCC},
-						{MDR.SourceTools.src_UCCV2},
-						{MDR.SourceTools.src_UCCV2_WA_Hist},
 						{MDR.SourceTools.src_SKA},
 						{MDR.SourceTools.src_Frandx},
 						{MDR.SourceTools.src_IN_Liquor_Licenses},
@@ -315,7 +304,6 @@ EXPORT Constants := MODULE
 						{MDR.SourceTools.src_Voters_v2},
 						{MDR.SourceTools.src_WA_Experian_Veh},
 						{MDR.SourceTools.src_WV_DL},
-						{MDR.SourceTools.src_WV_Hist_Corporations},
 						{MDR.SourceTools.src_WY_Veh},
 						{MDR.SourceTools.src_Whois_domains},
 						{MDR.SourceTools.src_ZUtil_Work_Phone},

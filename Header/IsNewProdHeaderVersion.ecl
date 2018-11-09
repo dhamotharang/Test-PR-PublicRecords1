@@ -1,4 +1,4 @@
-import did_add,_Control,ut;
+﻿import did_add,_Control,ut;
 
 //////////////////////////////////////////////////////////////////////////////////////
 //	
@@ -12,7 +12,7 @@ import did_add,_Control,ut;
 //
 //////////////////////////////////////////////////////////////////////////////////////
 import _Control;
-export IsNewProdHeaderVersion(string datasetname,string pkgvar='header_file_version',STRING roxie_ip=_Control.RoxieEnv.prod_batch_neutral,dataset(header.Layout_PackageVariable) ds  = dataset([],header.Layout_PackageVariable)) := 
+export IsNewProdHeaderVersion(string datasetname,string pkgvar='header_build_version',STRING roxie_ip=_Control.RoxieEnv.prod_batch_neutral,dataset(header.Layout_PackageVariable) ds  = dataset([],header.Layout_PackageVariable)) := 
 function
 
 	// Flag file name

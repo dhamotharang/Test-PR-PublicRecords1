@@ -1,4 +1,4 @@
-/*****
+﻿/*****
  This attribute is used by the name repository
  to preclean a name before cleaning it
  it removes punctuation and tokens that are not part of a name
@@ -7,9 +7,9 @@ import STD;
 rgxGen := '(JR|SR|I|II|III|IV|V|VI|2ND|3RD|4TH|5TH|6TH|1|2|3|4|5|6|7|8|9)';
 rgxSureGen := '(JR|SR|II|III|IV|2ND|3RD|4TH|5TH|6TH)';
 rgxHonor := 
- '(MD|DMD|DDS|CNFP|CNM|CNP|CPA|CSW|DR|PHD|ESQ|RN|RPN|LPN|LN|DO|DC|DPM|DPC|DD|LMT|DVM|PSYD|ASID|CLU|JD|OD|CFP|AA|AS|NP|FNP|ARNP|MSW|LCSW|LSW|ACSW|LMHC|LMFT|CMT|LPCC|MA|SJ|OP|MBA|MSD|CTM|DTM|CPS|ADJ|DWP|SEC|VDM|VMD|PA-C|PA|RPA-C|RPA|APA-C|CSJ|SSJ|BVM|CSC|MSN|CPNP|FNP|CRNP|PBLN|PMLN|RLTR|LRCP|CRNA|MBBS|PNP|RNP|CNS|LMHP|LIMHP|PLMHP|MDIV|CEO|CFO)';
+ '(MD|DMD|DDS|CNFP|CNM|CNP|CPA|CSW|DR|PHD|ESQ|RN|RPN|LPN|LN|DO|DC|DPM|DPC|DD|LMT|DVM|PSYD|ASID|CLU|JD|OD|CFP|AA|AS|NP|FNP|ARNP|MSW|LCSW|LSW|ACSW|LMHC|LMFT|CMT|LPCC|MA|SJ|OP|MBA|MSD|CTM|DTM|CPS|ADJ|DWP|SEC|VDM|VMD|PA-C|PA|RPA-C|RPA|APA-C|CSJ|SSJ|BVM|CSC|MSN|CPNP|FNP|CRNP|PBLN|PMLN|RLTR|LRCP|CRNA|MBBS|PNP|RNP|CNS|CMS|CMRS|LMHP|LIMHP|PLMHP|MDIV|CEO|CFO)';
 rgxSureHonor := 	// no oriental names
- '(MD|DMD|DDS|CNFP|CNM|CNP|CPA|CSW|DR|PHD|ESQ|RN|RPN|LPN|LN|DC|DPM|DPC|DD|LMT|DVM|PSYD|ASID|CLU|JD|OEmergency Medical D|CFP|AA|NP|ARNP|MSW|LCSW|LSW|ACSW|LMHC|LMFT|CMT|LPCC|SJ|OP|MBA|MSD|CTM|DTM|CPS|ADJ|DWP|SEC|VDM|VMD|PA-C|PA|RPA-C|RPA|APA-C|CSJ|SSJ|BVM|CSC|MSN|CPNP|FNP|CRNP|PBLN|PMLN|RLTR|LRCP|CRNA|MBBS|PNP|RNP|CNS|LMHP|LIMHP|PLMHP|MDIV|CEO|CFO)';
+ '(MD|DMD|DDS|CNFP|CNM|CNP|CPA|CSW|DR|PHD|ESQ|RN|RPN|LPN|LN|DC|DPM|DPC|DD|LMT|DVM|PSYD|ASID|CLU|JD|OEmergency Medical D|CFP|AA|NP|ARNP|MSW|LCSW|LSW|ACSW|LMHC|LMFT|CMT|LPCC|SJ|OP|MBA|MSD|CTM|DTM|CPS|ADJ|DWP|SEC|VDM|VMD|PA-C|PA|RPA-C|RPA|APA-C|CSJ|SSJ|BVM|CSC|MSN|CPNP|FNP|CRNP|PBLN|PMLN|RLTR|LRCP|CRNA|MBBS|PNP|RNP|CNS|CMS|C<RS|LMHP|LIMHP|PLMHP|MDIV|CEO|CFO)';
 rgxSuffix := '(' + rgxGen + '|' + rgxHonor + ')';
 rgxSureSuffix := '(' + rgxSureGen + '|' + rgxSureHonor + ')';
 rgxLast := '(DI |DA |DEL |DE LA |DE LOS |DES |DE |DELLA |DELLO |DOS |DU |LA |MC |VON |VAN DER |VAN |VANDER |VANDEN |ST |EL |LE |[ODANL]\')?([A-Z]+[A-Z\'-]+)';
@@ -44,7 +44,7 @@ string RemoveNickname(string s) :=
 	REGEXREPLACE('([("][A-Z]+[)"])$',s,'');
 //	REGEXREPLACE('(\\([A-Z]+\\))$',s,'');
 	
-rgxSpouse := rgxConnector + ' *(WIFE|WF|HUSBAND|SPOUSE)[ ,]+[A-Z]+';
+rgxSpouse := rgxConnector + ' *(WIFE|WF|HUSBAND|HUSB|SPOUSE)[ ,]+[A-Z]+';
 rgxHusbandWife := '^.+[, ]HUSBAND .+WIFE$';
 rgxHusbandWifeAtEnd := '\\b(HUSBAND|WIFE|HUSBAND WIFE)[)]?$';
 string RemoveMrMrs(string s1) := FUNCTION
@@ -57,7 +57,7 @@ string RemoveMrMrs(string s1) := FUNCTION
 	REGEXFIND('( AND |&) *(HIS|HER) +(HUSBAND|WIFE)\\b',s) => REGEXREPLACE('\\b(HIS|HER) +(HUSBAND|WIFE)\\b',s, ''),
 	REGEXFIND('(' + rgxConnector + ' *(ANO|WIFE|WF|JLRS|GUEST(S)?|PARENT(S)?|CHILD(REN?)))$', s) => // ANO = ANOther (i.e. anonymous)
 		REGEXREPLACE('(' + rgxConnector + ' *(ANO|WIFE|WF|JLRS|GUEST(S)?|PARENT(S)?|CHILD(REN?)))$', s,''),
-	REGEXFIND(rgxSpouse, s) => REGEXREPLACE('\\b(WIFE|WF|HUSBAND|SPOUSE)\\b', s, ''),
+	REGEXFIND(rgxSpouse, s) => REGEXREPLACE('\\b(WIFE|WF|HUSBAND|HUSB|SPOUSE)\\b', s, ''),
 	REGEXFIND(rgxHusbandWife, s) => REGEXREPLACE('\\b(WIFE)$', REGEXREPLACE('\\b(HUSBAND)\\b', s, '&'), ''),
 	REGEXFIND(rgxHusbandWifeAtEnd, s) => REGEXREPLACE(rgxHusbandWifeAtEnd, s, ''),
 	s);
@@ -93,35 +93,42 @@ string ReverseGen(string s) :=
 			REGEXFIND('^(0)\'[A-Z]', s) => 'O'+s[2..],	
 	s);
 
-	rgxAKA0 := '^([A-Z]+), ([A-Z]+) AKA +(.+)$';
-	rgxAKA1 := '^([A-Z]+) +AKA +[^,]+, *(.+)$';
-	rgxAKA2 := '^([^,]+), *([A-Z]+) +AKA +(.+)$';
-	rgxAKA3 := '^([A-Z]+) +AKA, +(.+)$';
-	rgxAKA4 := '^([A-Z]+), ([A-Z]+ [A-Z]+) AKA +(.+)$';
-	rgxAKA5 := '^([A-Z]+), ([A-Z]+ [A-Z]+ [A-Z]+) AKA +(.+)$';
-	rgxAKA6 := '^([A-Z ,]+)([(/]AKA[ ,][^)]+\\)?)$';
+	rgxAKA0 := '^([A-Z]+), ([A-Z]+) (AKA|FKA|NKA) +(.+)$';
+	rgxAKA1 := '^([A-Z]+) +(AKA|FKA|NKA) +[^,]+, *(.+)$';
+	rgxAKA2 := '^([^,]+), *([A-Z]+) +(AKA|FKA|NKA) +(.+)$';
+	rgxAKA3 := '^([A-Z]+) +(AKA|FKA|NKA), +(.+)$';
+	rgxAKA4 := '^([A-Z]+), ([A-Z]+ [A-Z]+) (AKA|FKA|NKA) +(.+)$';
+	rgxAKA5 := '^([A-Z]+), ([A-Z]+ [A-Z]+ [A-Z]+) (AKA|FKA|NKA) +(.+)$';
+	rgxAKA6 := '^([A-Z ,]+)([(/](AKA|FKA|NKA)[ ,][^)]+\\)?)$';
+	rgxAKA7 := '\\b(AKA|FKA|NKA)[ ,]*$';
+	rgxAKA8 := '^([A-Z]+ [A-Z]+( [A-Z]+)?) (AKA|FKA|NKA) ([A-Z]+ [A-Z]+( [A-Z]+)?)$';
 	rgxJohnDoe1 := '^(JOHN|JANE) DOE AKA +(.+)$';
 string RemoveAKA(string s) := MAP(
-	s[1..4] in ['AKA ','FKA '] => s[5..],
-	s[1..4] in ['AKA,','FKA,'] => TRIM(s[5..],LEFT),
+	s[1..4] in ['AKA ','FKA ','NKA '] => s[5..],
+	s[1..4] in ['AKA,','FKA,','NKA,'] => TRIM(s[5..],LEFT),
+	// 'JOHN DOE AKA BARSHEE, M JOHNSON';
+	REGEXFIND(rgxJohnDoe1, s) => REGEXREPLACE(rgxJohnDoe1, s, '$2'),
 	// ORTEGA, ROBERT JOE AKA BOBB
 	REGEXFIND(rgxAKA0, s) => REGEXREPLACE(rgxAKA0, s, '$1, $2'),
 	//STONE AKA GRAVEEN, BETTY JANE
-	REGEXFIND(rgxAKA1, s) => REGEXREPLACE(rgxAKA1, s, '$1, $2'),
+	REGEXFIND(rgxAKA1, s) => REGEXREPLACE(rgxAKA1, s, '$1, $3'),
 	//ORTIZ, RAYMOND AKA (BOZO)
 	REGEXFIND(rgxAKA2, s) => REGEXREPLACE(rgxAKA2, s, '$1, $2'),
 	//'ORTIZ AKA, BOZO';
-	REGEXFIND(rgxAKA3, s) => REGEXREPLACE(rgxAKA3, s, '$1, $2'),
+	REGEXFIND(rgxAKA3, s) => REGEXREPLACE(rgxAKA3, s, '$1, $3'),
 	//'ORTIZ, RAYMOND JAMES AKA BOZO';
 	REGEXFIND(rgxAKA4, s) => REGEXREPLACE(rgxAKA4, s, '$1, $2'),
 	//DELEE, OTIS D THOMPSON AKA DORO
 	REGEXFIND(rgxAKA5, s) => REGEXREPLACE(rgxAKA4, s, '$1, $2'),
 	// 'BRADFORD, JAMES S (AKA, JIMBO BRADFORD)';
 	REGEXFIND(rgxAKA6, s) => REGEXREPLACE(rgxAKA6, s, '$1'),
-	// 'JOHN DOE AKA BARSHEE, M JOHNSON';
-	REGEXFIND(rgxJohnDoe1, s) => REGEXREPLACE(rgxJohnDoe1, s, '$2'),
+	// 'BRADFORD, JAMES S (AKA)';
+	REGEXFIND(rgxAKA7, s) => Std.Str.ExcludeLastWord(s),
+	// LAURIA A AQUILINA FKA LAURIE A. DABNEY                                                                                                                
+	REGEXFIND(rgxAKA8, s) => REGEXREPLACE(rgxAKA8, s, '$1 & $4'),
 
-	StringLib.StringFind(s, ' AKA ', 1) > 0 => StringLib.StringFindReplace(s, ' AKA ', ' '),
+	REGEXFIND('( (AKA|FKA|NKA) )', s) => REGEXREPLACE('( (AKA|FKA|NKA) )', s, ' '),
+	//StringLib.StringFind(s, ' AKA ', 1) > 0 => StringLib.StringFindReplace(s, ' AKA ', ' '),
 	StringLib.StringFind(s, '-AKA-', 1) > 0 => StringLib.StringFindReplace(s, '-AKA-', '-'),
 	REGEXFIND('(/AKA)$', s) => REGEXREPLACE('(/AKA)$', s, ''),
 	REGEXFIND('([A-Z])/AKA\\b', s) => REGEXREPLACE('([A-Z])/AKA\\b', s, '$1 '),
@@ -136,10 +143,11 @@ rgxEtAl := '\\b(ETAL|ET AL|ET ALS|ETALS)\\b';
 rgxEtuxInterjected := '(JR|SR|II|III|IV) (ETUX|ET UX|ET-UX|ET UM|ETUM|ET VIR|ETVIR) [A-Z]+';
 rgxEtuxDual := '[A-Z]+ (ETUX|ET UX|ET-UX|ET UM|ETUM|ET VIR|ETVIR|& ETUX|(AND |&) *(HIS |HER )? *(HUSBAND|WIFE)) [A-Z]+';
 rgxEtux := '\\b(ETUX|ET UX|ET-UX|ET UM|ETUM|ET VIR|ETVIR)\\b';
-rgxEtuxAtEnd := '\\b(ET ?UX ET ?AL|ETUX|ET UX|ET-UX|ET UM|ETUM|ET VIR|ETVIR|UX|ET|AND|OR|LTR(S)?|MKD|MCC|VLB|RF|TRT|MB|HRS|TST|TLT|RTS|TTS|TRSRS|HSB|JP|FC|FST|LW|HWJT|HWLP|RLT|RVT|LVG|DTD|MGP|JTV|RVC|PMB|COC|CPRS|CPWR(S)?|JTS|JTWRS|JT/ROS|[JKD]/REF|TRU ST|HUSBAND *( AND |&) *WIFE)$';
+rgxEtuxAtEnd := '\\b(ET ?UX ET ?AL|ET ?AL ET ?UX|ETUX|ET UX|ET-UX|ET UM|ETUM|ET VIR|ETVIR|UX|ET|AND|OR|LTR(S)?|MKD|MCC|VLB|RF|TRT|MB|HRS|TST|TLT|RTS|TTS|TRSRS|HSB|JP|FC|FST|LW|HWJT|HWLP|RLT|RVT|LVG|DTD|MGP|JTV|RVC|PMB|COC|CPRS|CPWR(S)?|JTS|JTWRS|JT/ROS|[JKD]/REF|TRU ST|HUSBAND *( AND |&) *WIFE)$';
 rgxEtuxAtFront := '^(&? *(ETUX|ET UX|ET-UX|ET UM|ETUM|ET VIR|ETVIR))\\b';
 rgxEtuxAtFrontDbl := '^(&? *(ETUX|ET UX|ET-UX|ET UM|ETUM|ETAL|ET VIR|ETVIR) *& *(ETUX|ET UX|ET-UX|ET UM|ETUM|ETAL|ET AL|ET VIR|ETVIR|ET|H&W))';
 rgxEtuxAssumed := '^[A-Z]+ +(ETVIR|ET VIR|ETUX|ET UX) +[A-Z]+$';	// man and/or wife
+
 rgxRT := '\\b(RT|JT)$';
 rgxSlashTrustee := '(/(TE|TR|JT))\\b';
 rgxInmate := '\\b(INMATE # *[A-Z0-9]+)\\b';
@@ -147,13 +155,25 @@ rgxInmate := '\\b(INMATE # *[A-Z0-9]+)\\b';
 RemovePaDoMa(string s) := IF(
 REGEXFIND('(& *(PA|DO|MA|ET))$', s), REGEXREPLACE('(& *(PA|DO|MA|ET))$', s,''), s);
 
-RemoveEtAl(string s) :=	IF(REGEXFIND(rgxEtAl, s), REGEXREPLACE(rgxEtAl, s,''), s);
+//remove etal, etux, etc.
+RemoveEtAl(string s) := FUNCTION 
+				s1 :=	MAP(
+						REGEXFIND(rgxEtuxAtEnd, s) => REGEXREPLACE(rgxEtuxAtEnd, s,''),
+						REGEXFIND(rgxEtuxAssumed, s) => REGEXREPLACE('(ETVIR|ET VIR|ETUX|ET UX)', s,''),
+						REGEXFIND(rgxEtuxDual, s) => REGEXREPLACE(rgxEtux, s,'&'),
+						REGEXFIND(rgxEtuxAtFrontDbl, s) => REGEXREPLACE(rgxEtuxAtFrontDbl, s,''),
+						REGEXFIND(rgxEtuxAtFront, s) => REGEXREPLACE(rgxEtuxAtFront, s,''),
+						REGEXFIND(rgxEtAl, s) => REGEXREPLACE(rgxEtAl, s,''),
+						s);
+				RETURN IF(REGEXFIND(rgxEtAl, s1), REGEXREPLACE(rgxEtAl, s1,''), s1);
+END;
 
 rgxMispelledTrust := ' (TRU ST|TRUS, T|TR, UST)$';
 CheckMispelledTrust(string s) := IF(REGEXFIND(rgxMispelledTrust, s), REGEXREPLACE(rgxMispelledTrust, s, ' TRUST'), s);
 
 rgxTitles := '^((ARCH)?BISHOP|HONOU?RABLE|(IR)?REVOCABLE) +[A-Z]+ +[A-Z]+ +[A-Z]+$';
 rgxTitles1 := '^((ARCH)?BISHOP|HONOU?RABLE|(IR)?REVOCABLE)';
+regxRevocable := '\\b((IR)?REVOCABLE)$';
 
 RemoveTrustAndDegrees(string s) := 
 			CheckMispelledTrust(
@@ -175,18 +195,13 @@ RemoveTrustAndDegrees(string s) :=
 						REGEXFIND(rgxHonorFirst, s) => REGEXREPLACE(rgxHonorFirst, s,'$2'),
 						REGEXFIND(rgxRT, s) => REGEXREPLACE(rgxRT, s,''),
 
-						REGEXFIND(rgxEtuxAssumed, s) => REGEXREPLACE('(ETVIR|ET VIR|ETUX|ET UX)', s,''),
-						REGEXFIND(rgxEtuxDual, s) => REGEXREPLACE(rgxEtux, s,'&'),
-						REGEXFIND(rgxEtuxAtEnd, s) => REGEXREPLACE(rgxEtuxAtEnd, s,''),
-						REGEXFIND(rgxEtuxAtFrontDbl, s) => REGEXREPLACE(rgxEtuxAtFrontDbl, s,''),
-						REGEXFIND(rgxEtuxAtFront, s) => REGEXREPLACE(rgxEtuxAtFront, s,''),
-						
 						REGEXFIND(rgxIsHonor, s) =>	REGEXREPLACE(rgxIsHonor, s, ''),
 						REGEXFIND('(,(ML|RV|LE|LT))$', s) => REGEXREPLACE('(,(ML|RV|LT))$', s,''),
 						REGEXFIND('^(\\(?REM\\)?[:;, -]+)', s) => REGEXREPLACE('^(\\(?REM\\)?[:;, -]+)', s,''),
 						REGEXFIND('(AND|OR) +[A-Z] [A-Z]$', s) => s, // override next statement for dual names
 						REGEXFIND('^([A-Z]+[, ]+[A-Z]+ +[A-Z]+) +[A-Z] [A-Z]$', s) => REGEXREPLACE('^([A-Z]+[, ]+[A-Z]+ +[A-Z]+) +[A-Z] [A-Z]$', s,'$1'),
 						REGEXFIND(rgxInmate, s) => REGEXREPLACE(rgxInmate, s,''),
+						REGEXFIND(regxRevocable, s) => REGEXREPLACE(regxRevocable, s,''),
 						//REGEXFIND(rgxTitles, s) => REGEXREPLACE(rgxTitles1, s,''),
 						s
 				));
@@ -218,7 +233,7 @@ string RemoveHonors(string s) :=
 				RemoveTrustAndDegrees(
 					RemovePropertyIdentifiers(
 						RemoveAKA(
-							s
+							Std.Str.CleanSpaces(s)
 						)
 					)
 				)
@@ -386,7 +401,8 @@ rgxDualMissingAmp2 := '^[A-Z]+ +[A-Z]+ +([A-Z]{2,}) +[A-Z]+ +[A-Z]+ +\\1+$';
 rgxDualMissingAmp3 := '^[A-Z]+ +[A-Z]+ +(TR|TTEE|TRUSTEE|JTRS) +[A-Z]+ +[A-Z]+ +\\1+$';
 rgxDualMissingAmpFix3 := '^([A-Z]+ +[A-Z]+) +[A-Z]+ +([A-Z]+ +[A-Z]+) +[A-Z]+$';
 
-FixupDual(string s) := MAP(
+FixupDual(string s) := 
+	MAP(
 			REGEXFIND('\\b(AND,)', s) => Std.Str.FindReplace(s, ' AND,', ' AND '),
 			REGEXFIND('\\bAND\\b', s) => s,
 			REGEXFIND(rgxDualMissingAmp1, s) => REGEXREPLACE(rgxDualMissingAmpFix, s, '$1&$2'),
@@ -622,8 +638,32 @@ rgxPunct := '[ ,+!?_*&:#%"\'/\\\\-]+';		//  ,+;!?_*&:#%"'/\-
 string QuickTrim(string s) := 
 			REGEXREPLACE(rgxPunct+'$',s,'');	
 
+rgxApos1 := '[^A-Z0-9_]\'([A-Z0-9_]+)';
+rgxApos2 := '([A-Z0-9_]+)\'( |$)';
+rgxOname := '\\b(O|D)[\']+ *([A-Z]+)\\b';
 
-export string PrecleanName(string name) := Std.Str.CleanSpaces(QuickTrim(	
-		SuffixToAlpha(FixupSlash(
-					TRIM(QuickTrim(StringLib.StringToUpperCase(NameTester.RemoveNonPrintingChars(name))),LEFT,RIGHT)
-			))));
+string RemoveApostrophe(string s) :=  REGEXREPLACE(rgxApos2, 
+																					REGEXREPLACE(rgxApos1, 
+																						REGEXREPLACE(rgxOname, 
+																							Std.Str.FindReplace(s,'\'\'', '\''),
+																						 '$1$2'),
+																					' $1'), ' $1 ');
+
+export string PrecleanName(string name) := 
+		Std.Str.CleanSpaces(
+			QuickTrim(	
+				SuffixToAlpha(
+					FixupSlash(
+						Std.Str.CleanSpaces(
+							QuickTrim(
+								RemoveApostrophe(
+									StringLib.StringToUpperCase(
+										NameTester.RemoveNonPrintingChars(name)
+									)
+								)
+							)
+						)	
+					)
+			)
+		)
+	);

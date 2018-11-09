@@ -1,0 +1,1 @@
+﻿EXPORT File_WA_Suppression := DATASET(Cluster.Cluster_In + 'in::uccv2::WA::suppression', UCCV2.Layout_File_WA_Suppression,csv(separator(','),TERMINATOR(['\n','\r\n']),HEADING(1)));

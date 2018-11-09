@@ -1,9 +1,9 @@
-import ut, codes, address, business_risk, Risk_Indicators,gateway, Royalty, MDR;
+﻿import ut, codes, address, business_risk, Risk_Indicators,gateway, Royalty, MDR;
 
 export PB1O_Function(DATASET(Layout_PB1I) indata, dataset(Gateway.Layouts.Config) gateways, 
 						unsigned1 glb, unsigned1 dppa, boolean isUtility=false, boolean ln_branded=false,
 						string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
-						string50 DataPermission=risk_indicators.iid_constants.default_DataPermission) := function
+						string50 DataPermission=risk_indicators.iid_constants.default_DataPermission, OFACversion = 1) := function
 	
 // populate the input values to business instant id with the original input values
 business_risk.Layout_Input into_bus_input(indata le) := transform
@@ -87,8 +87,10 @@ prep := project(indata,into_bus_input(LEFT));
 boolean hasbdids := false;
 boolean ExcludeWatchLists := false;
 boolean OFAC := true;
+Real Global_WatchList_Threshold := if(OFACversion = 4, 0.85, 0.84);
+boolean include_ofac := if(OFACversion = 4, True, False);
  
-biid_results := business_risk.InstantID_Function(prep,gateways,hasbdids,dppa,glb,isUtility,ln_branded,'pb01',ExcludeWatchLists,ofac, dataRestriction:=DataRestriction, dataPermission:=dataPermission);
+biid_results := business_risk.InstantID_Function(prep,gateways,hasbdids,dppa,glb,isUtility,ln_branded,'pb01',ExcludeWatchLists,ofac, ofac_version := OFACversion, include_ofac := include_ofac, Global_WatchList_Threshold := Global_WatchList_Threshold, dataRestriction:=DataRestriction, dataPermission:=dataPermission);
 dRoyalties := DATASET([], Royalty.Layouts.Royalty) : STORED('Bus_Royalties');
 
 min2(integer L, integer R) :=  if (l < r , l, r);								
@@ -455,11 +457,8 @@ riskwise.layout_pb1o fillempty(biid_ret le) := transform
 	self.alertentity := if(le.rep_present, le.alertentity, '');
 end;
 
-
 res := project(biid_ret, fillempty(left));
 #STORED('Royalties', dRoyalties);
 return res;
 
 end;
-
-

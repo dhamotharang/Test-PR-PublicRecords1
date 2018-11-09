@@ -1,4 +1,4 @@
-import _Control;
+﻿import _Control;
 export EnvironmentVariables := module
 
 	export username := 'svc_pr_orbit_hpcc@mbs';
@@ -14,12 +14,12 @@ export EnvironmentVariables := module
 	export statLogicalFilePrefix := '~ProfileStat::';
 	export statLandingZoneFilePrefix := 
 		if (_control.ThisEnvironment.Name = 'Prod_Thor', 
-			'\\\\risk.regn.net\\BUS\\Orbit\\ProfileStats\\ProfileStat-', 
+			'C:\\Orbit\\ProfileStats\\ProfileStat-', 
 			'D:\\ProfileStats\\ProfileStat-'
 		);
 	export statLandingZoneServer := 
 		if (_control.ThisEnvironment.Name = 'Prod_Thor', 
-			'10.195.88.85',// - Alpha //'10.237.6.40', - Boca
+			'BCTWPIORBIT101.risk.regn.net',// - Alpha //'10.237.6.40', - Boca
 			'10.121.145.163'
 		);
 

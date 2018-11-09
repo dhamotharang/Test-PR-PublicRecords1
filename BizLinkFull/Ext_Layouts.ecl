@@ -1,4 +1,4 @@
-EXPORT Ext_Layouts := MODULE
+﻿EXPORT Ext_Layouts := MODULE
   IMPORT SALT26;// Create a unique identifier for each child file
 // Compute the External File Record counts - gathered from all the child files
 EXPORT EFR_Child := RECORD
@@ -20,3 +20,4 @@ EXPORT EFR_Layout := RECORD
   DATASET(EFR_Child) Hits;
 END;
 END;
+

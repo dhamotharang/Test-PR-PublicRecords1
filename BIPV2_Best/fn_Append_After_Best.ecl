@@ -1,4 +1,4 @@
-import BIPV2, BIPV2_Best,ut, Census_Data, BIPv2_HRCHY;
+﻿import BIPV2, BIPV2_Best,ut, Census_Data, BIPv2_HRCHY;
 EXPORT fn_Append_After_Best (linkid,best_file,pHrchyBase,pFips2County) := FUNCTIONMACRO
 bip_business_header := pHrchyBase;
 best_company_name_l := RECORD
@@ -168,7 +168,7 @@ best_src_name_append := join(
 temp_lay1 := record
   unsigned6 linkid;
   string120 company_name;
-  unsigned1 company_name_data_permits;
+  unsigned2 company_name_data_permits; 
 end;
 best_src_name_append_p := distribute(project(best_src_name_append,transform(temp_lay1,
   self.company_name_data_permits := BIPV2.mod_sources.src2bmap(left.name_source, left.name_vl_id),
@@ -241,8 +241,12 @@ company_address_flat := join(
   ),lookup,left outer
 );
 //-------append company_incorporation_date
-import mdr;
-company_inc_dt := dedup(sort(distribute(company_names_(company_incorporation_date > 0,~mdr.sourceTools.sourceisCortera(source)), hash(linkid)), linkid, company_incorporation_date, local), linkid, local);
+isYearOnlyDate := company_names_.company_incorporation_date%10000 = 0;
+isYearMonthOnlyDate := company_names_.company_incorporation_date%100 = 0;
+isValidIncDate := company_names_.company_incorporation_date >=17641029; // 17641029 per Tim Bernhard: As far as the oldest date – let’s just draw a line with 17641029… There are some older, still existing cos, but I’m using the Hartford Courant as my oldest, valid date.
+company_inc_dt := dedup(sort(distribute(company_names_(isValidIncDate), hash(linkid)), linkid, isYearOnlyDate, isYearMonthOnlyDate, company_incorporation_date, local), linkid, local);
+
+
 company_inc_dt_src := dedup(sort(join(
   distribute(company_inc_dt, hash(linkid)),
   distribute(company_names_, hash(linkid)),
@@ -258,7 +262,7 @@ company_inc_dt_src := dedup(sort(join(
 ),linkid, company_incorporation_date, source,source_record_id, vl_id, local),linkid, company_incorporation_date, source,source_record_id, vl_id, local);
 temp_lay2 := record
   unsigned6 linkid;
-  unsigned1 company_incorporation_date_permits;
+  unsigned2 company_incorporation_date_permits;
 end;
 company_inc_dt_src_p := distribute(project(company_inc_dt_src, transform(temp_lay2, self.company_incorporation_date_permits := BIPV2.mod_sources.src2bmap(left.source, left.vl_id), self := left)), hash(linkid));
 aggr_company_inc_dt_src := rollup(company_inc_dt_src_p,left.linkid = right.linkid,transform(temp_lay2,

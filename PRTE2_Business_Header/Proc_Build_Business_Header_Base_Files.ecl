@@ -27,8 +27,9 @@ module
 										 BuildSearch
 										,BuildRelatives
 										,BuildRelativesGroup
-										,promote(pversion,'^.*base::business_header.*?(search|relatives|stat).*$').new2built
+										,promote(pversion,'^.*prte::base::business_header.*?(search|relatives).*$').new2built
 										,BuildStat
+										,promote(pversion,'^.*prte::base::business_header.*?(stat).*$').new2built
 								); 
 
 end;

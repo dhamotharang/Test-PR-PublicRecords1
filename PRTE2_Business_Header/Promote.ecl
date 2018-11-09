@@ -1,4 +1,4 @@
-import VersionControl, tools;
+﻿import VersionControl, tools;
 
 export Promote(
 
@@ -14,7 +14,7 @@ module
 	shared dInputFilenames := 	Filenames(pversion).input.dAll_filenames;
 	
 	shared dfilenames		:=  Filenames(pversion).base.dAll_filenames
-												//+ Keynames				(pversion).dAll_filenames
+												+ Keynames(pversion).dAll_filenames
 												;
 												
 	shared filter				:= if(pFilter = ''	,true

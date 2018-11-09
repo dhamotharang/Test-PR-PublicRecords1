@@ -1,4 +1,4 @@
-IMPORT AutoStandardI, BIPV2, Business_Credit, iesp, ut, MDR;
+﻿IMPORT AutoStandardI, BIPV2, Business_Credit, iesp, ut, MDR, BusinessCredit_Services;
 
 EXPORT fn_getPrimaryIndustry(DATASET(BIPV2.IDlayouts.l_xlink_ids2) Linkids, 
 																	String DatapermissionMask, 
@@ -21,6 +21,7 @@ EXPORT fn_getPrimaryIndustry(DATASET(BIPV2.IDlayouts.l_xlink_ids2) Linkids,
 	
 	//Fetching Business Header Records.
 	ds_busHeaderRecs 		:= BIPV2.Key_BH_Linking_Ids.kfetch2(Linkids,BIPV2.IDconstants.Fetch_Level_SELEID,,,BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT,TRUE); //We wanted to fetch all the records for Se level. 
+	ds_busHeaderRecsSlim := ds_busHeaderRecs(source not in BusinessCredit_Services.Constants.EXCLUDED_EXPERIAN_SRC);	
 	ds_sbfeLinkRecs 		:= Business_Credit.Key_LinkIds().kfetch2(Linkids , BIPV2.IDconstants.Fetch_Level_SELEID,,DatapermissionMask);
 
 	ds_sbfeSICNAICSRecs	:= JOIN(ds_sbfeLinkRecs , Business_Credit.Key_BusinessClassification(), 
@@ -42,11 +43,11 @@ EXPORT fn_getPrimaryIndustry(DATASET(BIPV2.IDlayouts.l_xlink_ids2) Linkids,
 																					SELF 								:= []) , LIMIT(BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT, SKIP));
 
 
-	ds_SicNaicsRecsToUse :=	IF( NOT EXISTS(ds_busHeaderRecs) ,ds_sbfeSICNAICSRecs);
+	ds_SicNaicsRecsToUse :=	IF( NOT EXISTS(ds_busHeaderRecsSlim) ,ds_sbfeSICNAICSRecs);
 
-	slim_layout trans(RECORDOF(ds_busHeaderRecs) L, INTEGER C) := TRANSFORM
+	slim_layout trans(RECORDOF(ds_busHeaderRecsSlim) L, INTEGER C) := TRANSFORM
 		Sic_Code				:= CHOOSE(C,L.company_sic_code1,L.company_sic_code2,L.company_sic_code3,L.company_sic_code4,L.company_sic_code5)[1..4];
-		Naics_Code 			:= CHOOSE(C,L.company_naics_code1,L.company_naics_code2,L.company_naics_code3,L.company_naics_code4,L.company_naics_code5)[1..4];
+		Naics_Code 			:= CHOOSE(C,L.company_naics_code1,L.company_naics_code2,L.company_naics_code3,L.company_naics_code4,L.company_naics_code5)[1..6];
 		SELF.Sic_Code 	:= Sic_Code;
 		SELF.Naics_Code := Naics_Code;
 		SELF.Best_Code	:=  MAP ((INTEGER)Sic_Code > 0 => Sic_Code,
@@ -55,7 +56,7 @@ EXPORT fn_getPrimaryIndustry(DATASET(BIPV2.IDlayouts.l_xlink_ids2) Linkids,
 		SELF 						:= L;
 	END;
 	
-	ds_BIPSICNAICSRecs := NORMALIZE(ds_busHeaderRecs,5,trans(LEFT,COUNTER));
+	ds_BIPSICNAICSRecs := NORMALIZE(ds_busHeaderRecsSlim,5,trans(LEFT,COUNTER));
 	
 	Recs := IF(buzCreditAccess ,ds_BIPSICNAICSRecs + ds_SicNaicsRecsToUse, ds_BIPSICNAICSRecs);
 	
@@ -85,5 +86,9 @@ EXPORT fn_getPrimaryIndustry(DATASET(BIPV2.IDlayouts.l_xlink_ids2) Linkids,
 																		RECORD);
 	
 	EXPORT bestIndustryCode := DEDUP(recs_rollup_sort,#expand(BIPV2.IDmacros.mac_ListTop3Linkids()));
-
+	// output(ds_SicNaicsRecsToUse, named('ds_SicNaicsRecsToUse'));
+	// output(ds_busHeaderRecsSlim, named('ds_busHeaderRecsSlim'));
+	// output(ds_BIPSICNAICSRecs, named('ds_BIPSICNAICSRecs'));
+	
+  //return (recs_rollup_sort);
 END;

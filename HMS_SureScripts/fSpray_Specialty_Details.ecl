@@ -1,7 +1,7 @@
-import lib_fileservices,tools,_control,lib_stringlib,Versioncontrol;
+﻿import lib_fileservices,tools,_control,lib_stringlib,Versioncontrol;
 
 export fSpray_Specialty_Details(string version, boolean pUseProd = false)	:=	DATASET([
- 	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+ 	{_control.IPAddress.bctlpedata10	                    //SourceIP			 Remote Server's IP address									
  	,'/data/hds_180/SureScripts/SpecialtyMapping/'+version[..8]+'/'         //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'*.txt' // Note the casing of the file name                                 //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
  	,0                                               //record_size	     record length of files to be sprayed(for fixed length files only)      

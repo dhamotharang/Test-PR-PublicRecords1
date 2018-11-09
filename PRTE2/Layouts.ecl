@@ -1,4 +1,4 @@
-//* PRT2.Layouts 
+﻿//* PRT2.Layouts 
 //* PROJECT:  PRCT-PII build Property Key Files from Matt's Input File *//
 
 import PRTE_CSV;
@@ -2562,6 +2562,78 @@ end;
 		unsigned6 New_Seq_no;
 		foreclosure_batch_in;	
 	end;
-			
+	
+Export Norm:=Record
+ string40 Company_Name;
+ string9 Link_Fein;
+ string8 Link_Inc_date;
+ string10 Cust_Name;
+ unsigned6 seleid;
+ unsigned6 orgid;
+ unsigned6 ultid;
+ string6 relation;
+ integer6 Parent_outcome;
+ End;
+ 
+Export Linkid_Rec:=Record
+ string40 Parent_Company_Name;
+ string9 Parent_Link_FEIN;
+ string8 Parent_Link_Inc_Date;
+ unsigned6 Parent_seleid;
+ unsigned6 Parent_orgid;
+ unsigned6 Parent_ultid;
+ string40 Child_company_name;
+ string9 Child_Link_Fein;
+ string8 Child_Link_Inc_Date;
+ unsigned6 Child_seleid;
+ unsigned6 Child_orgid;
+ unsigned6 Child_ultid;
+ string10 Parent_Cust_Name;
+ string10 Child_Cust_Name;
+ integer6 Parent_outcome; 
+ end; 
+ 
+	EXPORT AID_Clean_Layout := Record
+			string city_st_zip_field_name := '';
+			string street_field_name := '';
+			string city_field_name := '';
+			string state_field_name := '';
+			string zip_field_name := '';
+			string clean_addr_field_name := '';
+			string raw_AID_field_name := '';
+	End;
+	
+	// export AID_Address := record
+		// string addr1_fieldname;
+		// string addr2_fieldname;
+		// string rawaid := '';
+		// string prim_range := '';
+		// string predir := '';
+		// string prim_name := '';
+		// string addr_suffix := '';
+		// string postdir := '';
+		// string unit_desig := '';
+		// string sec_range := '';
+		// string p_city_name := '';
+		// string v_city_name := '';
+		// string st := '';
+		// string zip := '';
+		// string zip4 := '';
+		// string cart := '';
+		// string cr_sort_sz := '';
+		// string lot := '';
+		// string lot_order := '';
+		// string dbpc := '';
+		// string chk_digit := '';
+		// string rec_type := '';
+		// string fips_state := '';
+		// string fips_county := '';
+		// string geo_lat := '';
+		// string geo_long := '';
+		// string msa := '';
+		// string geo_blk := '';
+		// string geo_match := '';
+		// string err_stat := '';
+// End;
 		
 END;

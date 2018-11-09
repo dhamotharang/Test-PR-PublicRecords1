@@ -1,4 +1,4 @@
-import versioncontrol,tools;
+﻿import versioncontrol,tools;
 
 export Filenames(string version = '', boolean pUseProd = false, boolean pUseDelta = false ) := module
 	
@@ -297,19 +297,6 @@ export Filenames(string version = '', boolean pUseProd = false, boolean pUseDelt
 	export intel_dbo_entity_photo_Base		  							
 			:= tools.mod_FilenamesBuild(intel_dbo_entity_photo_lBaseTemplate, version);
 	
-	export offenders_dbo_classification_lBaseTemplate_built	
-			:= thor_cluster + 'base::' + dsName + '::offenders::dbo::classification::built';
-	export offenders_dbo_classification_lBaseTemplate				
-			:= thor_cluster + 'base::' + dsName+ '::offenders::dbo::classification::@version@';
-	export offenders_dbo_classification_lKeyTemplate	  			
-			:= thor_cluster + 'base::' + dsName + '_keybuild' + '::offenders::dbo::classification::@version@';		
-	export offenders_dbo_classification_lInputTemplate 			
-			:= thor_cluster + 'in::' + dsName + '::offenders::dbo::classification' ;
-	export offenders_dbo_classification_lInputHistTemplate 	
-			:= thor_cluster + 'in::' + dsName + '::offenders::dbo::classification::history';
-	export offenders_dbo_classification_Base		  						
-			:= tools.mod_FilenamesBuild(offenders_dbo_classification_lBaseTemplate, version);
-	
 	export offenders_dbo_offender_classification_lBaseTemplate_built	
 			:= thor_cluster + 'base::' + dsName + '::offenders::dbo::offender_classification::built';
 	export offenders_dbo_offender_classification_lBaseTemplate				
@@ -348,7 +335,20 @@ export Filenames(string version = '', boolean pUseProd = false, boolean pUseDelt
 			:= thor_cluster + 'in::'   + dsName + '::offenders::dbo::offender_picture::history';
 	export offenders_dbo_picture_Base		  										
 			:= tools.mod_FilenamesBuild(offenders_dbo_picture_lBaseTemplate, version);
-				
+	
+	export offenders_dbo_classification_lBaseTemplate_built	
+			:= thor_cluster + 'base::' + dsName + '::offenders::dbo::classification::built';
+	export offenders_dbo_classification_lBaseTemplate				
+			:= thor_cluster + 'base::' + dsName+ '::offenders::dbo::classification::@version@';
+	export offenders_dbo_classification_lKeyTemplate	  			
+			:= thor_cluster + 'base::' + dsName + '_keybuild' + '::offenders::dbo::classification::@version@';		
+	export offenders_dbo_classification_lInputTemplate 			
+			:= thor_cluster + 'in::' + dsName + '::offenders::dbo::classification' ;
+	export offenders_dbo_classification_lInputHistTemplate 	
+			:= thor_cluster + 'in::' + dsName + '::offenders::dbo::classification::history';
+	export offenders_dbo_classification_Base		  						
+			:= tools.mod_FilenamesBuild(offenders_dbo_classification_lBaseTemplate, version);
+			
 	export crash_dbo_crash_lBaseTemplate_built							
 			:= thor_cluster + 'base::' + dsName + '::crash::dbo::crash::built';
 	export crash_dbo_crash_lBaseTemplate										
@@ -531,6 +531,19 @@ export Filenames(string version = '', boolean pUseProd = false, boolean pUseDelt
 	export dbo_offenders_Picture_Base		  									
 			:= tools.mod_FilenamesBuild(dbo_offenders_Picture_lBaseTemplate, version);			
 	
+	export dbo_offenders_class_lBaseTemplate_built				
+			:= thor_cluster + 'base::' + dsName + '::dbo::offenders_classification::built' + suffixBaseBuilt;
+	export dbo_offenders_class_lBaseTemplate							
+			:= thor_cluster + 'base::' + dsName+ '::dbo::offenders_classification' + suffixBaseVersion;
+	export dbo_offenders_class_lKeyTemplate	  						
+			:= thor_cluster + 'base::' + dsName + '_keybuild' + '::dbo::offenders_classification::@version@';
+	export dbo_offenders_class_lInputTemplate 			
+			:= thor_cluster + 'in::'   + dsName + '::dbo::offenders_classification' ;
+	export dbo_offenders_class_lInputHistTemplate 	
+			:= thor_cluster + 'in::'   + dsName + '::dbo::offenders_classification::history';
+	export dbo_offenders_class_Base		  									
+			:= tools.mod_FilenamesBuild(dbo_offenders_class_lBaseTemplate, version);
+			
 	export dbo_crash_lBaseTemplate_built						
 			:= thor_cluster + 'base::' + dsName + '::dbo::crash::built' + suffixBaseBuilt;
 	export dbo_crash_lBaseTemplate									

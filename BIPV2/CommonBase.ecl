@@ -1,4 +1,4 @@
-// This module publishes the common BASE layout that gets passed from step to step
+﻿// This module publishes the common BASE layout that gets passed from step to step
 // during the internal linking process.
 //
 // It also publishes a set of SuperFiles representing the final result after all
@@ -25,11 +25,7 @@ EXPORT CommonBase := MODULE
 	EXPORT Layout_Static := BIPV2.CommonBase_mod.Layout_Static;
 	
 	// default layout
-	EXPORT Layout := #IF(BIPV2._Config.BASE_LAYOUT_DYNAMIC)
-		Layout_Dynamic;
-	#ELSE
-		Layout_Static;
-	#END
+	EXPORT Layout := BIPV2.CommonBase_mod.Layout;
 	
 	
 	// Files and datasets
@@ -74,9 +70,11 @@ EXPORT CommonBase := MODULE
 	// Apply any necessary post-processing to the header, before things like XLink pick it up
 	EXPORT clean(ds) := FUNCTIONMACRO
 		IMPORT Suppress;
+		IMPORT Bipv2_Suppression;
 		ds_exorcise := ds(ingest_status<>'Old'); // Exorcise all ghosts, which _can_ remove cluster base records!
 		ds_exclude  := ds_exorcise(BIPV2.mod_sources.srcInBase(source));
-		ds_reg      := Suppress.applyRegulatory.applyBIPV2(ds_exclude);
+		ds_suppress := Bipv2_Suppression.suppressClean(ds_exclude);
+		ds_reg      := Suppress.applyRegulatory.applyBIPV2(ds_suppress);
 		RETURN ds_reg;
 	ENDMACRO;
   

@@ -1,4 +1,4 @@
-import address, ADVO, Business_Header_SS, models, riskwise, ut, USPIS_HotList, codes, Suppress, AutoStandardI, seed_files, iesp, 
+﻿import address, ADVO, Business_Header_SS, models, riskwise, ut, USPIS_HotList, codes, Suppress, AutoStandardI, seed_files, iesp, 
 			 IntlIID, YellowPages, gateway, Royalty, MDR, census_data, OFAC_XG5, Risk_Reporting, STD, Inquiry_AccLogs;
 // NOTE! If you make any logic changes here, please change also BusinessInstantID20_Services.fn_GetConsumerInstantIDRecs.
 
@@ -153,7 +153,7 @@ string8 TimeofApplication := '' : stored('TimeofApplication');
 
 boolean IncludeDPBC := false : stored('IncludeDPBC');
 boolean EnableEmergingID := false : stored('EnableEmergingID');
-
+boolean IsIdentifier2 := false : stored('IsIdentifier2');
 temp := record
 		dataset(iesp.share.t_StringArrayItem) WatchList {xpath('WatchList/Name'), MAXCOUNT(iesp.Constants.MaxCountWatchLists)};
 end;
@@ -207,7 +207,8 @@ d := dataset([{(unsigned)account_value}],rec);
 
 // JRP 02/12/2008 - Dataset of actioncode and reasoncode settings which are passed to the getactioncodes and reasoncodes functions.
 boolean IsInstantID := true;
-reasoncode_settings := dataset([{IsInstantID, actualIIDVersion, EnableEmergingID}],riskwise.layouts.reasoncode_settings);
+
+reasoncode_settings := dataset([{IsInstantID, actualIIDVersion, EnableEmergingID, IsIdentifier2}],riskwise.layouts.reasoncode_settings);
 actioncode_settings := dataset([{IsPOBoxCompliant, IsInstantID}],riskwise.layouts.actioncode_settings);
 
 // Check to see if Red Flags or Fraud Advisor Requested
@@ -625,7 +626,7 @@ TRANSFORM
 	self.addressPOBox := (Risk_Indicators.rcSet.isCode12(le.addr_type) or Risk_Indicators.rcSet.isCodePO(le.zipclass)) and (actualIIDVersion=1 or FromFlexID);
 	self.addressCMRA := (le.hrisksic in risk_indicators.iid_constants.setCRMA or le.ADVODropIndicator='C') and (actualIIDVersion=1 or FromFlexID);
 	
-	self.SSNFoundForLexID := le.combo_ssn<>'' and actualIIDVersion=1;	
+	self.SSNFoundForLexID := le.bestssn<>'' and actualIIDVersion=1;
 	
 	self.ADVODoNotDeliver := le.ADVODoNotDeliver;
 	self.ADVODropIndicator := le.ADVODropIndicator;

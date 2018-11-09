@@ -1,4 +1,4 @@
-IMPORT tools;
+﻿IMPORT tools;
 
 EXPORT Files(STRING  pversion = '',
              BOOLEAN pUseProd = FALSE) := MODULE
@@ -27,6 +27,27 @@ EXPORT Files(STRING  pversion = '',
 		                        GenDutyStd, 'CSV', , pTerminator := ['\n','\r\n'], pSeparator := ',', pHeading := 1);
 		tools.mac_FilesInput(Filenames(pversion, pUseProd).Input.ViolationEvent, Layouts_input.ViolationEvent,
 		                        ViolationEvent, 'CSV', , pTerminator := ['\n','\r\n'], pSeparator := ',', pHeading := 1);
+	END;
+	
+	/////////////////////////////////////////////////////////////////
+	// -- Base File Versions
+	//////////////////////////////////////////////////////////////////	
+	EXPORT Base := MODULE
+	
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Accident,OSHAIR.layout_OSHAIR_accident_clean,Accident);
+		
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.hazardous,OSHAIR.layout_OSHAIR_hazardous_substance_clean,hazardous);
+		
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Inspection,OSHAIR.layout_OSHAIR_inspection_clean_BIP,Inspection);
+		
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.OptionalInfo,OSHAIR.layout_OSHAIR_optional_info_clean,OptionalInfo);
+		
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.program,OSHAIR.layout_OSHAIR_program_clean,program);
+		
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.related_activity,OSHAIR.layout_OSHAIR_related_activity_clean,related_activity);
+		
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.violations,OSHAIR.layout_OSHAIR_violations_clean,violations);
+	
 	END;
 
 END;

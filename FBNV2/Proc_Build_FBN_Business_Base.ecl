@@ -1,4 +1,4 @@
-import address,fbnv2, did_add, didville,ut,header_slimsort,UCCV2,business_header,Business_Header_SS,watchdog,MDR,aid,PromoteSupers;
+﻿import address,fbnv2, did_add, didville,ut,header_slimsort,UCCV2,business_header,Business_Header_SS,watchdog,MDR,aid,PromoteSupers;
 
 dBusiness   :=  ungroup(Mapping_FBN_BUSREG_Business)+
 								ungroup(Mapping_FBN_CA_Orange_Business)+
@@ -341,6 +341,6 @@ ut.MAC_Append_Rcid (rolledup_recs,source_rec_id,out_file);
 										 
 dPostDIDandBDIDPersist	:=	out_file:persist(fbnv2.cluster.cluster_out+'persist::FBNv2::Business');
 					
-PromoteSupers.MAC_SF_BuildProcess(dPostDIDandBDIDPersist,fbnv2.cluster.cluster_out+'base::FBNv2::Business',Out, 3);
+PromoteSupers.MAC_SF_BuildProcess(dPostDIDandBDIDPersist,fbnv2.cluster.cluster_out+'base::FBNv2::Business',Out, 3,pCompress:=true);
 
 export  Proc_Build_FBN_Business_Base     :=	Out;

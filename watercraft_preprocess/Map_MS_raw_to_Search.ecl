@@ -1,4 +1,4 @@
-import watercraft, watercraft_preprocess, ut, lib_StringLib, STD;
+﻿import watercraft, watercraft_preprocess, ut, lib_StringLib, STD;
 // translates  ms_phase01.mp Ab intio graph into ECL 
 // Name/Address cleaning will be done after all raw files are in one common format to eliminate multiple passes to the cleaner for each source
 
@@ -32,6 +32,7 @@ Watercraft_preprocess.Layout_Watercraft_Search_Common search_mapping_format(hull
 	self.orig_name_first			:=	L.FIRST_NAME;
 	self.orig_name_middle			:=	L.MID;
 	self.orig_name_last				:=	L.LAST_NAME;
+	self.orig_name_suffix			:= L.SUFFIX;												//DF-19984 - Layout change, new field
 	self.orig_address_1				:=	trim(L.ADDRESS_1, left, right);
 	self.orig_city						:=	L.CITY;
 	self.orig_state						:=	L.STATE;

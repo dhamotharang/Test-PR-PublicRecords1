@@ -1,7 +1,7 @@
-import doxie, ut, header, infutor, STD;
+﻿import doxie, ut, header, infutor, STD;
 
 // Formerly the contents of doxie.header_records;  Allows for the passing of a dataset of DIDs,
-// rather than calling doxie.get_dids
+// rather than calling doxie\get_dids
 
 export header_records_byDID(
 	dataset(doxie.layout_references_hh) dids,

@@ -1,16 +1,16 @@
-import tools, _control;
+﻿import tools, _control;
 
 export proc_Build_All(
 
 	 string											pversion
-	,string											pDirectory		= '/data/hds_180/SalesChannel/data_files/'
-	,string											pServerIP			= _control.IPAddress.bctlpedata10
+	,string											pDirectory		= '/data/hds_180/SalesChannel/data_files/'+pversion
+	,string											pServerIP			= _control.IPAddress.bctlpedata11
 	,string											pFilename			= '*txt'
 	,string											pGroupName		= _Constants().groupname																		
 	,boolean										pIsTesting		= false
 	,boolean										pOverwrite		= false																															
 	,dataset(Layouts.Input		)	pSprayedFile	= Files().Input.using
-	,dataset(Layouts.Base			)	pBaseFile			= Files().base.qa										
+	,dataset(Layouts.Base_new	)	pBaseFile			= Files().base.qa										
 
 ) :=
 function

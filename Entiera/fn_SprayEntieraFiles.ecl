@@ -1,4 +1,4 @@
-import	lib_FileServices, lib_StringLib, _Validate, _Control, AID;
+﻿import	lib_FileServices, lib_StringLib, _Validate, _Control, AID;
 
 #workunit('name','Entiera Spray & Prep');
 
@@ -6,7 +6,7 @@ export	fn_SprayEntieraFiles(
 															string	pSourceFileName,
 															string	pThorFileName,
 															string	pProcessDate,
-															string	pSourceIP				=	'bctlpedata11.risk.regn.net',
+															string	pSourceIP				=	'_Control.IPAddress.bctlpedata11',
 															boolean	pOverwriteFlag	= false
 														)
  :=
@@ -95,6 +95,8 @@ export	fn_SprayEntieraFiles(
 																				__compressed__
 																			 );
 																																
+		zClearSuperfile	:=	lib_fileservices.FileServices.ClearSuperFile(Constants.PreppedFileSuperFileName);
+		
 		zAddToSuper	:=	lib_FileServices.FileServices.AddSuperFile(Constants.PreppedFileSuperFileName, lThorFileName);
 
 		zDeleteSprayed	:=	lib_FileServices.FileServices.DeleteLogicalFile(lTempFileName);
@@ -115,6 +117,7 @@ export	fn_SprayEntieraFiles(
 																	 zAppendDateOverwriteYes,
 																	 zAppendDateOverwriteNo
 																	),
+																zClearSuperfile,
 																zAddToSuper,
 																zDeleteSprayed,
 																zEmailDone

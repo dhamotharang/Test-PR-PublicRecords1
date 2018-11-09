@@ -5,18 +5,10 @@ EXPORT fnMapCommon_Batch_Linkids := Module
 
 export ready_file := function
 
-fadditionfile := Inquiry_AccLogs.fnMapCommon_Batch.additionfile
-										(
-									    regexfind('SBFE SMALL BUSINESS ATTRIBUTES INPUT|SBFE SMALL BUSINESS ATTRIBUTES HITS|SBFE CREDIT SCORES INPUT|' +
-																'SBFE CREDIT SCORES HITS|SBFE ANALYTIC SERVICES|SBFE BUSINESS ONLY MODEL|SBFE BUSINESS BLENDED MODEL|' +
-																'SBFE CREDIT SCORE WITHOUT SBFE DATA|SBFE CREDIT SCORE WITH BLENDED DATA ONLY|'+
-																'SB MONITORING WITH SBFE DATA INPUT|SB ALERTS WITH SBFE DATA HITS|SB MONITORING WITH SBFE DATA P2 INPUT|'+
-																'BIIDV2 COMPLIANCE WITH SBFE VALID INPUT'
-																,stringlib.stringtouppercase(orig_function_name))
-										);
-												
-						
 
+fadditionfile := Inquiry_AccLogs.fnMapCommon_Batch.additionfile
+									(orig_process_id in ['306','311','49','375']);
+										
 inquiry_acclogs.fncleanfunctions.cleanfields(fadditionfile, cleaned_fields);
 
 input_data_dist := distribute(cleaned_fields, hash(orig_job_id));
@@ -28,6 +20,7 @@ companyRec := RECORD
 		string 		orig_datetime_stamp;
 		string20 	orig_job_id;
 		string 		orig_sequence_number;
+		string    orig_process_id;
 			
 		string20 	orig_company_fax_number;         
 		string9 	orig_fein;                
@@ -36,7 +29,8 @@ companyRec := RECORD
 		string32 	orig_company_structure;   
 		string3 	orig_company_years_in_business; 
 		string8 	orig_company_start_date;       
-		string12 	orig_company_yearly_revenue; 
+		string12 	orig_company_yearly_revenue;
+		string100 orig_company_alternate_name; 
 
 END;
 
@@ -45,6 +39,7 @@ cleanCompanyRec := RECORD
 		string datetime;
 		string20 transaction_id;
 		string sequence_number;
+		string process_id;
 
 		string20 	company_fax_number;         
 		string9 	company_fein;                
@@ -54,7 +49,8 @@ cleanCompanyRec := RECORD
 		string3 	company_years_in_business; 
 		string8 	company_start_date;       
 		string12 	company_yearly_revenue; 
-
+		string100 company_alternate_name; 
+		
 END;
 
 cleanCompany := project(input_data_dedup,
@@ -63,6 +59,7 @@ cleanCompany := project(input_data_dedup,
 									self.datetime := fixtime;	
 									self.Transaction_ID := left.orig_job_id;
 									self.Sequence_number := left.orig_sequence_number;
+									self.process_id     := left.orig_process_id;
 									
 									self.company_fax_number        		:=	inquiry_acclogs.fncleanfunctions.clean_phone(left.orig_company_fax_number);         
 									self.company_fein                	:=	left.orig_fein;                
@@ -72,6 +69,8 @@ cleanCompany := project(input_data_dedup,
 									self.company_years_in_business 		:=	left.orig_company_years_in_business; 
 									self.company_start_date       		:=	left.orig_company_start_date;       
 									self.company_yearly_revenue 			:=	left.orig_company_yearly_revenue; 
+									self.company_alternate_name       :=  left.orig_company_alternate_name;
+									
 									self := left;
 									self := []));
 
@@ -255,6 +254,8 @@ DeNormCleanInputRec := RECORD
 		string datetime;
 		string20 transaction_id;
 		string sequence_number;
+    string process_id;
+		
 		string20 	company_fax_number;         
 		string9 	company_fein;                
 		string8 	company_sic_code;            
@@ -263,6 +264,8 @@ DeNormCleanInputRec := RECORD
 		string3 	company_years_in_business; 
 		string8 	company_start_date;       
 		string12 	company_yearly_revenue;
+		string100 company_alternate_name;		
+		
 		DATASET(cleanSubjectRec) subjects;
 END;
 
@@ -290,6 +293,8 @@ AppendTransCompanySubjects := project(DeNormCleanInput, transform(inquiry_acclog
 			self.datetime 															:= left.datetime ;
 			self.transaction_id													:= left.transaction_id;
 			self.sequence_number                       	:= left.sequence_number;                      
+			self.process_id                             := left.process_id;
+			
 			self.cmp_fax_number        									:= left.company_fax_number;        
 			self.cmp_fein                								:= left.company_fein;              
 			self.cmp_sic_code            								:= left.company_sic_code;        
@@ -298,6 +303,7 @@ AppendTransCompanySubjects := project(DeNormCleanInput, transform(inquiry_acclog
 			self.cmp_years_in_business 									:= left.company_years_in_business; 
 			self.cmp_bus_start_date       							:= left.company_start_date; 
 			self.cmp_yearly_revenue 										:= left.company_yearly_revenue;
+			self.cmp_alt_name				 										:= left.company_alternate_name;			
 			
 			self.pii2_first_name    			:= left.subjects[2].subj_first_name;
 			self.pii2_middle_name    			:= left.subjects[2].subj_middle_name;

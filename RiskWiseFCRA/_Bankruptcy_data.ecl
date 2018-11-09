@@ -1,8 +1,7 @@
+﻿EXPORT _Bankruptcy_data(in_dids, flag_file, bankruptcy_search_o, bankruptcy_o, bankruptcy_courts_o=[], history_date_=999999, bankruptcy_withdraws_o=[]) := MACRO
 
+  IMPORT BankruptcyV3, BankruptcyV2, FCRA, riskwise, STD;
 
-EXPORT _Bankruptcy_data(in_dids, flag_file, bankruptcy_search_o, bankruptcy_o, bankruptcy_courts_o=[], history_date_=999999, bankruptcy_withdraws_o=[]) := MACRO
-
-IMPORT BankruptcyV3, BankruptcyV2, FCRA, riskwise, doxie, ut;
 	layout_bankruptcy   := RECORDOF (bankruptcyV2.Layout_bankruptcy_main_v3.layout_bankruptcy_main_filing);
 	layout_bkr_search   := RECORDOF (BankruptcyV2.layout_bankruptcy_search_v3);
 
@@ -11,7 +10,7 @@ IMPORT BankruptcyV3, BankruptcyV2, FCRA, riskwise, doxie, ut;
 	bankrupt_ffid := SET (flag_file (file_id = FCRA.FILE_ID.BANKRUPTCY), flag_file_id);
 	
 	MAX_OVERRIDE_LIMIT_ := FCRA.compliance.MAX_OVERRIDE_LIMIT;
-	todaysdate_ := ut.GetDate;
+	todaysdate_ := (string) STD.Date.Today();
 	isFCRA_ := true;
 	
 // -------------  BANKRUPTCY SEARCH  -------------

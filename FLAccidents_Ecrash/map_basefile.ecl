@@ -1,24 +1,10 @@
-/*2015-08-28T21:20:33Z (Srilatha Katukuri)
-#181860 - Changed Base name to Documents
-*/
-/*2015-08-28T21:17:20Z (Srilatha Katukuri)
-#181860 - hcanged the base file name to documents
-*/
-/*2015-08-08T00:11:43Z (Srilatha Katukuri)
-#181860 - PRUS
-*/
-/*2015-04-15T20:00:39Z (Srilatha Katukuri)
-#173256 Check in
-*/
-/*2015-02-11T00:48:03Z (Ayeesha Kayttala)
-bug# 173256 - code review 
-*/
-export map_basefile(string filedate) := function
+﻿export map_basefile(string filedate) := function
 
-import FLAccidents, Address, ut, did_add, header_slimsort, driversv2,lib_StringLib,AID,scrubs,scrubs_ecrash,nid;
+import FLAccidents, Address, ut, did_add, header_slimsort, driversv2,lib_StringLib,AID,scrubs,scrubs_ecrash,nid,PromoteSupers;
 
  d      := FLAccidents_Ecrash.Infiles.cmbnd;
  dvina	:= FLAccidents.File_VINA;
+ acmbnd := FLAccidents_Ecrash.Infiles.agencycmbnd;
  
 ////////////////////////////////////////////////////////////////////////////
 //Clean names and addresses then append vina info
@@ -46,7 +32,7 @@ end;
 
 // Add name_type 
 
-  Address.Mac_Is_Business_Parsed(	cleanAddr,fPreclean,FIRST_NAME,MIDDLE_NAME,LAST_NAME,'',,name_type);
+  Address.Mac_Is_Business_Parsed(	cleanAddr,fPreclean,FIRST_NAME,MIDDLE_NAME,LAST_NAME,'');
 
 //Parse appended 182 byte clean address field and standardize data values
 
@@ -204,19 +190,19 @@ end;
 	self.geo_match 						    := L.clean[178];
 	self.err_stat 						    := L.clean[179..182];
 //Parse 73 byte clean name field
-   CleanName							        := if (l.name_type <> 'B', Address.CleanPersonFML73(regexreplace(' +',L.FIRST_NAME+' '+L.MIDDLE_NAME+' '+L.LAST_NAME,' ')),'');
+   CleanName							        := if (l.nametype <> 'B', Address.CleanPersonFML73(regexreplace(' +',L.FIRST_NAME+' '+L.MIDDLE_NAME+' '+L.LAST_NAME,' ')),'');
   //CleanName							      := Address.CleanPersonFML73(regexreplace(' +',L.FIRST_NAME+' '+L.MIDDLE_NAME+' '+L.LAST_NAME,' '));
-  self.nameType							    := l.name_type;	
-  lfname							          := if(l.name_type <> 'B',CleanName[6..25], L.FIRST_NAME);
-  lmname							          := if(l.name_type <> 'B',CleanName[26..45],L.MIDDLE_NAME);
-  llname							          := if(l.name_type <> 'B',CleanName[46..65],L.LAST_NAME);
-	self.title                    := if(l.name_type <> 'B',CleanName[1..5],'');
+  self.nameType							    := l.nametype;	
+  lfname							          := if(l.nametype <> 'B',CleanName[6..25], L.FIRST_NAME);
+  lmname							          := if(l.nametype <> 'B',CleanName[26..45],L.MIDDLE_NAME);
+  llname							          := if(l.nametype <> 'B',CleanName[46..65],L.LAST_NAME);
+	self.title                    := if(l.nametype <> 'B',CleanName[1..5],'');
 	self.fname							      := if(lfname ='UNKNOWN','',lfname);
   self.mname							      := if(lmname ='UNKNOWN','',lmname);
   self.lname							      := if(llname ='UNKNOWN','',llname);
-  self.suffix 					        := if(l.name_type <> 'B',CleanName[66..70],'');
-  self.name_score						    := if(l.name_type <> 'B',CleanName[71..73],'');
-  self.cname                    := if(l.name_type = 'B',L.FIRST_NAME+' '+L.MIDDLE_NAME+' '+L.LAST_NAME,'');
+  self.suffix 					        := if(l.nametype <> 'B',CleanName[66..70],'');
+  self.name_score						    := if(l.nametype <> 'B',CleanName[71..73],'');
+  self.cname                    := if(l.nametype = 'B',L.FIRST_NAME+' '+L.MIDDLE_NAME+' '+L.LAST_NAME,'');
   self.orig_fname               := l.FIRST_NAME;
   self.orig_lname               := l.last_name;
   self.orig_mname               := l.middle_name;
@@ -413,18 +399,18 @@ string8     fSlashedMDYtoCYMD(string pDateIn)
 	self.geo_match 						    := L.clean[178];
 	self.err_stat 						    := L.clean[179..182];
 //Parse 73 byte clean name field
-  CleanName							        := if (l.name_type <> 'B', Address.CleanPersonFML73(regexreplace(' +',L.FIRST_NAME+' '+L.MIDDLE_NAME+' '+L.LAST_NAME,' ')),'');
-  self.nameType							    := l.name_type;	
-  lfname							          := if(l.name_type <> 'B',CleanName[6..25], L.FIRST_NAME);
-  lmname							          := if(l.name_type <> 'B',CleanName[26..45],L.MIDDLE_NAME);
-  llname							          := if(l.name_type <> 'B',CleanName[46..65],L.LAST_NAME);
-	self.title                    := if(l.name_type <> 'B',CleanName[1..5],'');
+  CleanName							        := if (l.nametype <> 'B', Address.CleanPersonFML73(regexreplace(' +',L.FIRST_NAME+' '+L.MIDDLE_NAME+' '+L.LAST_NAME,' ')),'');
+  self.nameType							    := l.nametype;	
+  lfname							          := if(l.nametype <> 'B',CleanName[6..25], L.FIRST_NAME);
+  lmname							          := if(l.nametype <> 'B',CleanName[26..45],L.MIDDLE_NAME);
+  llname							          := if(l.nametype <> 'B',CleanName[46..65],L.LAST_NAME);
+	self.title                    := if(l.nametype <> 'B',CleanName[1..5],'');
 	self.fname							      := if(lfname ='UNKNOWN','',lfname);
   self.mname							      := if(lmname ='UNKNOWN','',lmname);
   self.lname							      := if(llname ='UNKNOWN','',llname);
-  self.suffix 					        := if(l.name_type <> 'B',CleanName[66..70],'');
-  self.name_score						    := if(l.name_type <> 'B',CleanName[71..73],'');
-  self.cname                    := if(l.name_type = 'B',L.FIRST_NAME+' '+L.MIDDLE_NAME+' '+L.LAST_NAME,'');
+  self.suffix 					        := if(l.nametype <> 'B',CleanName[66..70],'');
+  self.name_score						    := if(l.nametype <> 'B',CleanName[71..73],'');
+  self.cname                    := if(l.nametype = 'B',L.FIRST_NAME+' '+L.MIDDLE_NAME+' '+L.LAST_NAME,'');
   self.orig_fname               := l.FIRST_NAME;
   self.orig_lname               := l.last_name;
   self.orig_mname               := l.middle_name;
@@ -570,15 +556,16 @@ end;
   //append bitmap to base
   dbuildbase := project (scrub_file_step1.BitmapInfile,FLAccidents_Ecrash.Layout_Basefile);
 
- 	ut.MAC_SF_BuildProcess(dbuildbase,'~thor_data400::base::ecrash',buildBase,,,true);
-  ut.MAC_SF_BuildProcess(FLAccidents_Ecrash.BuildSuppmentalReports.compare_add_new,'~thor_data400::base::ecrash_supplemental',buildsuppBase,,,true);
-	ut.MAC_SF_BuildProcess(FLAccidents_Ecrash.BuildSuppmentalReports.TMafterTF,'~thor_data400::base::ecrash_TMafterTF',buildBaseTMafterTF,,,true);
-	ut.MAC_SF_BuildProcess(FLAccidents_Ecrash.BuildPhotoFile.CmbndPhotos,'~thor_data400::base::ecrash_documents',buildDocumentBase,,,true);
+ 	PromoteSupers.Mac_SF_BuildProcess(dbuildbase,'~thor_data400::base::ecrash',buildBase,,,true);
+  PromoteSupers.Mac_SF_BuildProcess(FLAccidents_Ecrash.BuildSuppmentalReports.compare_add_new,'~thor_data400::base::ecrash_supplemental',buildsuppBase,,,true);
+	PromoteSupers.Mac_SF_BuildProcess(FLAccidents_Ecrash.BuildSuppmentalReports.TMafterTF,'~thor_data400::base::ecrash_TMafterTF',buildBaseTMafterTF,,,true);
+	PromoteSupers.Mac_SF_BuildProcess(FLAccidents_Ecrash.BuildPhotoFile.CmbndPhotos,'~thor_data400::base::ecrash_documents',buildDocumentBase,,,true);
+	PromoteSupers.Mac_SF_BuildProcess(acmbnd,'~thor_data400::base::agency_cmbnd',buildAgencyCmbndBase,,,true);
 
 //sequential( buildphotoBaseFile);
 
 
- map_all := sequential(  buildsuppBase
+return sequential(  buildsuppBase
                     ,submit_stats
 		                //output Scrubs Report
 		                ,output(Scrubs_report_with_examples, all, named('ScrubsReportWithExamples'))
@@ -587,10 +574,10 @@ end;
                     ,buildBase  
 										,buildDocumentBase
 										,buildBaseTMafterTF
-										,fn_Validate			
-										,Proc_Build_Alpha(filedate)
-										 ) ;
+										,buildAgencyCmbndBase
+									);
 
-return map_all;
 end;
+
+
 

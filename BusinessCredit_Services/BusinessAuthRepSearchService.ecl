@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BusinessAuthRepSearchService">
 
 	<!-- XML REQUEST -->
@@ -32,6 +32,8 @@ EXPORT BusinessAuthRepSearchService :=
     #CONSTANT('IncludeBusinessCredit',          TRUE);
     #CONSTANT('IncludeHRI',                     TRUE);
     #CONSTANT('UsingKeepSSNs',                  TRUE);
+    // v-- Added for RQ-13563 to purposely force off the use of FDN keys
+    #CONSTANT('IncludeFraudDefenseNetwork',     FALSE);
 
     STRING50 DLNumber_Value  := SearchBy.DLNumber : STORED('DLNumber');
     STRING2  DLState_Value   := SearchBy.DLState  : STORED('DLState');

@@ -1,4 +1,4 @@
-import liensv2,doxie,CriminalRecords_Services, FFD, FCRA, ut, STD;
+﻿import liensv2,doxie,CriminalRecords_Services, FFD, FCRA, ut, STD;
 
 export GetCRSOutput (
   GROUPED DATASET (liensv2_services.layout_lien_party_raw) party_in, //join with key_party_id
@@ -11,7 +11,7 @@ export GetCRSOutput (
   BOOLEAN includeCriminalIndicators = FALSE,
 	DATASET (FFD.Layouts.PersonContextBatchSlim) ds_slim_pc = FFD.Constants.BlankPersonContextBatchSlim,
 	integer8 inFFDOptionsMask = 0,
-	integer FCRAPurpose = FCRA.Constants.FCRAPurpose.NoValueProvided	
+	integer FCRAPurpose = FCRA.FCRAPurpose.NoValueProvided	
 ) := FUNCTION
 
   doxie.MAC_Header_Field_Declare(IsFCRA); // only for DisplayMatchedParty_value !
@@ -58,7 +58,7 @@ export GetCRSOutput (
 	ds_party_raw_w_ins_flag_itr := ungroup(iterate(ds_party_raw_w_ins_flag_sort, tIterate(left, right)));
 	
 	// Filter records for FCRA insurance
-	ds_party_raw_filter := if(isFCRA and FCRAPurpose = FCRA.Constants.FCRAPurpose.InsuranceApplication,
+	ds_party_raw_filter := if(isFCRA and FCRAPurpose = FCRA.FCRAPurpose.InsuranceApplication,
                             group(sort(project(ds_party_raw_w_ins_flag_itr(bcbflag), liensv2_services.layout_lien_party_raw), acctno), acctno),
                             ds_party_raw_pre);
   
@@ -106,7 +106,7 @@ export GetCRSOutput (
 	// ROLLUP CASE INFORMATION
 	ds_case_rolled := rollup(ds_case_sort, left.tmsid = right.tmsid, xf_case_rollup(left,right));
 	
-	ds_case_filtered := ds_case_rolled(~IsFCRA OR (FCRAPurpose != FCRA.Constants.FCRAPurpose.InsuranceApplication) OR bcbflag); //If FCRAPurpose=6 return only records with bcbflag set to true, else return all. 
+	ds_case_filtered := ds_case_rolled(~IsFCRA OR (FCRAPurpose != FCRA.FCRAPurpose.InsuranceApplication) OR bcbflag); //If FCRAPurpose=6 return only records with bcbflag set to true, else return all. 
 	
   //===== ROLLUP HISTORY =====
 
@@ -127,7 +127,7 @@ export GetCRSOutput (
 		// FCRA - Insurance liens and judgments, FCRAPurpose = 6
 		oldest_orig_filing_dt := min(l.filings, orig_filing_date);
 		is_liens_ok := FCRA.lien_is_ok((string)STD.Date.Today(), oldest_orig_filing_dt);
-		filings := if(isFCRA and FCRAPurpose = FCRA.Constants.FCRAPurpose.InsuranceApplication,
+		filings := if(isFCRA and FCRAPurpose = FCRA.FCRAPurpose.InsuranceApplication,
                   if(is_liens_ok, l.filings(bcbflag), dataset([], LiensV2_Services.layout_lien_history_w_bcb)),
                   l.filings);
 		

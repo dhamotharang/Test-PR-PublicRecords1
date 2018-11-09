@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="LiensSearchServiceFCRA">
   
   <part name="DID" 					type="xsd:string"/>
@@ -54,9 +54,12 @@
 */
 /*--INFO-- This service searches the FCRA LiensV2 files.*/
 
-import liensv2_services, STD, FCRA, FFD;
+import liensv2_services, STD, FCRA, FFD, WSInput;
 
 export LiensSearchServiceFCRA() := macro
+
+	WSInput.MAC_LiensV2_LiensSearchServiceFCRA();
+
 	#constant('getBdidsbyExecutive',FALSE);
 	#constant('SearchGoodSSNOnly',true);
 	#constant('SearchIgnoresAddressOnly',true);
@@ -71,16 +74,12 @@ export LiensSearchServiceFCRA() := macro
 	boolean judgments_only := false : stored('JudgmentsOnly');	
 	doxie.MAC_Header_Field_Declare(isFCRA);
 
-	// FFD				 
-	integer8 valFFDOptionsMask := FFD.FFDMask.Get();
-
 	//------------------------------------------------------------------------------------	
 	//soap call for remote DIDs for Collections
   fcra_subj_only := false : stored ('ApplyNonsubjectRestrictions');
 	boolean isCollections := application_type_value IN AutoStandardI.Constants.COLLECTION_TYPES;
 	boolean returnByDidOnly := fcra_subj_only OR isCollections;
 	//------------------------------------------------------------------------------------
-	// gateways := dataset([], Gateway.layouts.config) : stored ('gateways', few);
 	gateways := Gateway.Configuration.Get();
 	picklist_res := FCRA.PickListSoapcall.non_esdl(gateways, true, returnByDidOnly and (did_value='')); //call gateway only when returnByDidOnly is true
 	//------------------------------------------------------------------------------------
@@ -93,7 +92,7 @@ export LiensSearchServiceFCRA() := macro
 	gm := AutoStandardI.GlobalModule(isFCRA);
 	liens_params := module(project(gm, LiensV2_Services.IParam.search_params, opt))
 		export string14 DID := rdid;
-		export unsigned2 pt := 10 			: stored('PenaltThreshold');
+		export unsigned2 pt := 10 : stored('PenaltThreshold');
 		export string CertificateNumber := '' : stored('CertificateNumber');
 		export unsigned8 maxresults := maxresults_val;
 		export string1 partyType := party_type;
@@ -107,8 +106,8 @@ export LiensSearchServiceFCRA() := macro
 		export string101 rmsid := rmsid_value;
 		export string50 tmsid := tmsid_value;
 		export boolean subject_only := returnByDidOnly;
-		export integer8 FFDOptionsMask := valFFDOptionsMask;		 
-	  export integer FCRAPurpose := FCRA.Constants.FCRAPurpose.NoValueProvided : stored('FCRAPurpose');
+		export integer8 FFDOptionsMask := FFD.FFDMask.Get();		 
+	  export integer FCRAPurpose := FCRA.FCRAPurpose.Get();
 	END;
 	all_recs_and_statements := LiensV2_Services.LiensSearchService_records(liens_params, isFCRA);
 	all_recs := all_recs_and_statements.records;
@@ -117,9 +116,9 @@ export LiensSearchServiceFCRA() := macro
 	// returns filtered results if filter is specifed
 	recs_filt := all_recs((evictions_only and eviction = 'Y') 
 													or (liens_only 
-														and (StringLib.StringToUpperCase(StringLib.StringCleanSpaces(filings[1].filing_type_desc)) in liensv2.filing_type_desc.LIEN)) 
+														and (STD.Str.ToUpperCase(STD.Str.CleanSpaces(filings[1].filing_type_desc)) in liensv2.filing_type_desc.LIEN)) 
 													or (judgments_only 
-														and (StringLib.StringToUpperCase(StringLib.StringCleanSpaces(filings[1].filing_type_desc)) in liensv2.filing_type_desc.JUDGMENT)));
+														and (STD.Str.ToUpperCase(STD.Str.CleanSpaces(filings[1].filing_type_desc)) in liensv2.filing_type_desc.JUDGMENT)));
 
 	need_filter := evictions_only or liens_only or judgments_only;
 

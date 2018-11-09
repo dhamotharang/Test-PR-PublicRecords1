@@ -1,4 +1,4 @@
-IMPORT Address,NID;
+﻿IMPORT Address,NID;
 EXPORT fn_CleanFullNames(inFile, Field, 
 nameid = 'nid',
 namtype = 'nametype',		// name type field
@@ -48,7 +48,7 @@ r := RECORD
   NID.Common.xNID __nid;
 END;
 
-	new_layout xform(r L, Nid.Layout_Repository R) := TRANSFORM
+	new_layout xform(new_layout L, Nid.Layout_Repository R) := TRANSFORM
 		self.namType 	:= R.nametype;
 		self.nameid		:= R.NID;
 		
@@ -73,6 +73,34 @@ END;
 											'');
 #end
 
+		self := L;
+	END;
+
+	new_layout xform1(r L, Nid.Layout_Repository R) := TRANSFORM
+		self.namType 	:= R.nametype;
+		self.nameid		:= L.__NID;
+		
+		self._title		:= R.cln_title;
+		self._fname		:= R.cln_fname;
+		self._mname		:= R.cln_mname;
+		self._lname		:= R.cln_lname;
+		self._suffix	  := R.cln_suffix;
+		self._title2		:= R.cln_title2;
+		self._fname2		:= R.cln_fname2;
+		self._mname2		:= R.cln_mname2;
+		self._lname2		:= R.cln_lname2;
+		self._suffix2   := R.cln_suffix2;
+		
+		self._name_ind := R.nameind;
+#if(_cleanBiznames=true)
+		//self._cname := R.std_biz;
+		// temporary ... biz name in repository may be out of date
+		self._cname := case(self.namType,
+											'B' => NID.clnBizName(R.name),
+											'T' => NID.clnTrustName(R.name),
+											'');
+#end
+		self.Field := L.field;
 		self := L;
 	END;
 	
@@ -122,17 +150,21 @@ END;
 				SELF := LEFT)),
 			__nid);					
 						
-						
-	matches := JOIN(dsin, SORT(Nid.Overrides(true) + 
-											if(useV2,Nid.NameRepository(derivation=0),Nid.NameRepositoryV1(derivation=0)),
-											nid, -derivation, LOCAL),
+		matches1 := JOIN(dsin,  Nid.Overrides(true) ,
 						LEFT.__nid = RIGHT.NID,
+						xform1(LEFT, RIGHT),
+						LOOKUP, FEW, LEFT OUTER);
+					
+		matches2 := JOIN(DISTRIBUTE(matches1(namType=''),nameid), 
+											if(useV2,Nid.NameRepository(derivation=0),Nid.NameRepositoryV1(derivation=0)),
+						LEFT.nameid = RIGHT.NID,
 						xform(LEFT, RIGHT),
-						LOCAL, KEEP(1), LEFT OUTER, NOSORT(RIGHT)) : INDEPENDENT;
-						
-		nomatches := PROJECT(matches(Nid=0), xform2(LEFT)) : INDEPENDENT; 
+						LOCAL, KEEP(1), LEFT OUTER);
+		matches := matches1(namType<>'') + matches2 : INDEPENDENT;
+							
+		nomatches := PROJECT(matches(namtype=''), xform2(LEFT)) : INDEPENDENT; 
 	
-		tempout := IF(EXISTS(nomatches), matches(NID<>0) + nomatches, matches) +
+		tempout := IF(EXISTS(nomatches), matches(namtype<>'') + nomatches, matches) +
 				PROJECT(DISTRIBUTE(inFile(Field='')),
 					TRANSFORM(new_layout, 
 							SELF.nameid := Nid.Common.BlankNid;

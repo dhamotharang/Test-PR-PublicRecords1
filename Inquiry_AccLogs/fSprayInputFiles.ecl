@@ -1,4 +1,4 @@
-import Versioncontrol, _Control, fbn_new,lib_thorlib , ut, std, tools;
+﻿import Versioncontrol, _Control, fbn_new,lib_thorlib , ut, std, tools;
 
 pDate 			:= (string8)std.date.today():INDEPENDENT;
 file_types 	:= ['bridger','riskwise','banko_batch','banko','batch','custom','InquiryTracking','delta_shell','deconfliction','transaction','accounting_log','accurint'];
@@ -83,7 +83,7 @@ end;
 export fSprayInputFiles(dataset({FsFilenameRecord}) filelist, boolean fcra = false) := function
 	
 	pServerIP		:= _control.IPAddress.bctlpedata10;
-	pGroupName	:= ThorLib.Group();//if(fcra, 'thor35_21', 'thor120_50_a');
+	pGroupName	:= if(fcra, 'thor20_52', 'thor120_50_a'); //ThorLib.Group();
 	pPrefix			:= if(fcra, '~thor10_231', '~thor100_21');
 	directory 	:= '/data/inquiry_data_01/spraying';	
 	

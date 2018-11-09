@@ -1,4 +1,4 @@
-import tools,std,BIPV2_Files,wk_ut,bipv2_build,BIPV2_ProxID;
+﻿import tools,std,BIPV2_Files,wk_ut,bipv2_build,BIPV2_ProxID;
 //have to fix keys attribute too
 EXPORT _Proc_Iterate(
    piteration
@@ -41,10 +41,10 @@ functionmacro
     ,BIPV2_ProxID.promote(,'base',pDelete := true,pIncludeBuiltDelete := true,pCleanupFilter := 'base').Cleanup //cleanup iterations as we go
     ,BIPV2_ProxID._Output_Review_Samples(pMatchThreshold)
     // ,outputwksummary
-    ,BIPV2_ProxID.promote(combo,'(wkhistory|changes)').new2qaMult
+    ,if(BIPV2_ProxID._Constants().Add2WorkmanSuper  ,BIPV2_ProxID.promote(combo,'(wkhistory|changes)').new2qaMult)
     ,BIPV2_Tools.mac_Check_Samples(BIPV2_ProxID.files(combo).base.logical,'Prox' + siter)
     // ,BIPV2_ProxID.fStatMissingProxIDLinks(BIPV2_ProxID.In_DOT_Base, piteration)
-		,constructTraceFiles//PUT BACK!!!
+		,if(BIPV2_ProxID._Constants().doTraceBackFiles  ,constructTraceFiles)//PUT BACK!!!
     ,BIPV2_Build.mod_email.SendSuccessEmail(msg := wk_ut.get_Errors(workunit),subProduct := wk_ut.get_jobname(workunit))
   );
 ENDmacro;

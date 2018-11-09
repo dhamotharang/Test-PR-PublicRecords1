@@ -1,6 +1,6 @@
-#warning('deprecated. logic moved to doxie.SexOffender_Search_People_Records');
+﻿#warning('deprecated. logic moved to doxie.SexOffender_Search_People_Records');
 //fetch sexoffender records locally, by did or by sid
-import doxie,sexoffender,drivers,header,ut,doxie_raw;
+import doxie,sexoffender,drivers,header,ut,doxie_raw,STD;
 
 export sexoffender_search_people_local (
   DATASET (doxie.layout_best) ds_best  = DATASET ([], doxie.layout_best),
@@ -14,7 +14,7 @@ string14 uid_value := '' : stored('UniqueId');
 pre_dids := 	MAP( uid_value<>''		=> DATASET([{(unsigned)uid_value}],layout_references),
 				Law_Enforcement	=> doxie.Get_SRNA_DIDs, 
 				did_value<>''		=> DATASET([{(unsigned)did_value}],layout_references),
-				doxie.Get_Dids(,~isCRS));
+				PROJECT (doxie.Get_Dids(,~isCRS), doxie.layout_references));
 
 // on FCRA side DIDs should be pre-calculated
 dids := if (IsFCRA, project (ds_best, doxie.layout_references), pre_dids);//(Include_SexualOffenses_val);
@@ -73,7 +73,7 @@ addresses_added := DENORMALIZE(fetchedlocal, xtra_addresses,
 																LEFT.seisint_primary_key=RIGHT.seisint_primary_key, 
 																add_addresses(LEFT,RIGHT));
 
-todaysDate := ut.GetDate;
+todaysDate := (string) STD.Date.Today();
 
 layout_sexoffender_searchperson filter_addresses(addresses_added le) :=
 TRANSFORM

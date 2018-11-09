@@ -1,4 +1,4 @@
-
+﻿
 /*
 This module has two functions that are not necessarily related.  The reason they are together is that the implementation makes sense together.
 1) you will never be able to perfectly compute all edit distances at build time.  so, at runtime, we sometimes make mistakes.  this corrects the ugliest of those by applying penaltydivisor.
@@ -220,3 +220,4 @@ END;//MODULE
 http://dataland_esp:8010/?inner=../WsWorkunits/WUInfo%3FWuid%3DW20130522-154512
 is a pretty good example of how this should work
 */
+

@@ -1,4 +1,4 @@
-IMPORT BIPV2_Files;
+﻿IMPORT BIPV2_Files;
 IMPORT BizLinkFull;
   dBase:=PULL(BIPV2_Files.files_CommonBase.KEY_HISTORY);
   lParentChild:={UNSIGNED parent;STRING versiondate;UNSIGNED1 level;UNSIGNED child;STRING level_name;};
@@ -16,3 +16,4 @@ IMPORT BizLinkFull;
   dParentChild:=SORT(DISTRIBUTE(dUlts+dOrgs+dProxs+dDots,HASH32(parent)),RECORD);
   
 EXPORT Key_Hierarchy:=INDEX(dParentChild,{parent},{dParentChild},BizLinkFull.filename_keys.hierarchy);  
+

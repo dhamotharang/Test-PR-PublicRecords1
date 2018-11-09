@@ -1,8 +1,8 @@
-﻿import NID,crim_common,did_add,didville,header,header_slimsort,ut,watchdog, address,AID,AID_Support;
+﻿import NID,crim_common,did_add,didville,header,header_slimsort,ut,watchdog, address;
 
-def 	:= sort(distribute(hygenics_crim.file_in_defendant_counties(),hash(recordid)),recordid,local);
-ah		:= dedup(sort(distribute(hygenics_crim.file_in_addresshistory_counties,hash(recordid)), recordid, local), record,local);
-aka	  := dedup(sort(distribute(hygenics_crim.file_in_alias_counties(),hash(recordid)), recordid, local), record,local);
+def 	:= sort(distribute(hygenics_crim.file_in_defendant_counties(),hash(recordid,sourceid)),recordid,local);
+ah		:= dedup(sort(distribute(hygenics_crim.file_in_addresshistory_counties,hash(recordid,sourceid)), recordid, local), record,local);
+aka	  := dedup(sort(distribute(hygenics_crim.file_in_alias_counties(),hash(recordid,sourceid)), recordid, local), record,local);
 off 	:= hygenics_crim.file_in_offense_counties ();
 
 slimOffense_rec := RECORD 
@@ -15,10 +15,11 @@ slimOffense_rec := RECORD
 	off.Fileddate;
 	off.Courtname;
 	off.offensetype;
+	off.sourceid;
 end;
 
 
-slim_off := dedup(sort(distribute(project(off, slimOffense_rec),hash(recordid)), record, local), record,local);
+slim_off := dedup(sort(distribute(project(off, slimOffense_rec),hash(recordid,sourceid)), record, local), record,local);
 
 def join_def_alias(def l, aka r) := transform 
   self.nametype 		:= 'A';
@@ -35,7 +36,7 @@ end;
 
 def_with_alias := join(def, aka,
 		left.recordid=right.recordid and 
-		left.statecode=right.statecode,
+		left.sourceid=right.sourceid,
 		join_def_alias(left,right),local,nosort);
 		
 
@@ -88,18 +89,11 @@ def join_def_ah(def l, ah r) := transform
 end;
 
 def_with_ahist := join(all_unique_names_dedup, ah,
-		left.recordid=right.recordid and left.statecode=right.statecode,
+		left.recordid=right.recordid and left.sourceid=right.sourceid,
 		join_def_ah(left,right),local,nosort);
 		
 all_names_addresses := def_with_ahist+ all_unique_names_dedup;
-// output(all_names_addresses(recordid ='OHJEFFERSONTORONTO24465'));
-//Populate Address fields
-// addAddress_layout := record
-	// all_names_addresses;
-	// string street_address_1;
-	// string street_address_2;
-	// unsigned8 	append_Rawaid;
-// end;
+
 
 layout_temp_offender addrPop(all_names_addresses l):= transform
  self.j_RecordID 			:= l.recordid;
@@ -118,7 +112,7 @@ layout_temp_offender addrPop(all_names_addresses l):= transform
 	                                  regexfind('^[A-Z]+[,] OK [0-9\\-]+[ ]*$',l.street) => _functions.CleanAddress(l.street),
 															 l.sourcename ='TEXAS_COLLIN_COUNTY_WEBSITE' and stringlib.stringfind(l.street,',',1)>0 => l.street[stringlib.stringfind(l.street,',',1)+1..],
 	                             _functions.CleanAddress(l.city+', '+l.orig_state+' '+l.orig_zip));
-	// self.append_Rawaid := 0;
+
 	self := l;
 	self := [];
 end;
@@ -144,6 +138,7 @@ cleanAddress := hygenics_crim._fns_AddressCleaner(addrProject):persist ('~thor_d
 Layout_almostfinal_offender := record
  hygenics_crim.Layout_Common_Crim_Offender_orig;
  hygenics_crim.layout_in_defendant.recordid;
+  hygenics_crim.layout_in_defendant.sourceid;
  end;
  
 Layout_almostfinal_offender to_crim_offender(with_ssn l, slim_off r) := transform
@@ -217,11 +212,12 @@ Layout_almostfinal_offender to_crim_offender(with_ssn l, slim_off r) := transfor
  self.dob_alias			:= '';
  self.place_of_birth	:= trim(trim(l.birthcity)+' '+ l.birthplace);
 
- self.street_address_1	:= trim(l.street)+if(l.unit<>'', ' '+l.unit, '');
- self.street_address_2	:= trim(trim(trim(l.city)+' '+trim(l.orig_state))+' '+trim(l.orig_zip));
- self.street_address_3	:= '';
- self.street_address_4	:= '';
- self.street_address_5	:= '';
+ tempstreet             := trim(l.street)+if(l.unit<>'', ' '+l.unit, '');
+ self.street_address_1	:= If(length(tempstreet)>25, tempstreet[1..25],tempstreet);
+ self.street_address_2	:= If(length(tempstreet)>25, tempstreet[26..],'');
+ self.street_address_3	:= trim(l.city);
+ self.street_address_4	:= trim(l.orig_state);
+ self.street_address_5	:= trim(l.orig_zip);
  
  self.race				  := if(length(trim(l.race))=1 and regexfind('[A-Z]', l.race, 0)<>'' , trim(l.race), '');
  
@@ -273,10 +269,10 @@ Layout_almostfinal_offender to_crim_offender(with_ssn l, slim_off r) := transfor
  self 							    := l;
 end;
 
-result_common1 := join(distribute(with_ssn ,hash(recordid)), 
+result_common1 := join(distribute(with_ssn ,hash(recordid,sourceid)), 
                        slim_off, 
 					             left.recordid=right.recordid and 
-											 left.statecode=right.statecode,
+											 left.sourceid=right.sourceid,
 					             to_crim_offender(left,right), 
 					             left outer, local);//:persist ('~thor_data200::persist::crimtemp::aoc::offender_after_did_Vaani');
 
@@ -291,7 +287,8 @@ hygenics_crim.Layout_Common_Crim_Offender_orig transferkey (result_common1 L, re
 end; 					
 
 result_aliases := join(result_common1(pty_typ ='2'),result_common1(pty_typ ='0'), 
-					             left.recordid = right.recordid and left.state_origin = right.state_origin and 
+					             left.recordid = right.recordid and 
+											 left.sourceid = right.sourceid and 
 											 (left.case_number= right.case_number or (left.case_number='' and right.case_number ='' )) and
 											 (left.case_filing_dt = right.case_filing_dt or (left.case_filing_dt ='' and right.case_filing_dt ='')),
 					             transferkey(left,right), 

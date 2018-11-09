@@ -1,4 +1,4 @@
-IMPORT autokeyb2, VotersV2, doxie, Votersv2_services, ut, AutoKeyI, AutoStandardI;
+﻿IMPORT autokeyb2, VotersV2, doxie, Votersv2_services, ut, AutoKeyI, AutoStandardI;
 
 EXPORT Get_ids
  (boolean workhard = false, boolean nofail =false, boolean IncludeDeepDives = true) := FUNCTION
@@ -33,7 +33,7 @@ EXPORT Get_ids
   dids_search := PROJECT (hasdid, doxie.Layout_references);
 
   // dids (from input)
-  dids_input  := doxie.Get_Dids (true,true);
+  dids_input  := PROJECT (doxie.Get_Dids (true,true), doxie.layout_references);
 
   all_dids := DEDUP (dids_search + dids_input, ALL);
 

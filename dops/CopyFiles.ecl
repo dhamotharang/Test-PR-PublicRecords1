@@ -1,4 +1,4 @@
-import wk_ut, STD, lib_fileservices;
+﻿import wk_ut, STD, lib_fileservices;
 EXPORT CopyFiles(string srcesp
 								,string destesp
 								,string srcdali
@@ -113,8 +113,8 @@ EXPORT CopyFiles(string srcesp
 		rFileList proj_recs(srclist l) := transform
 			self.name := l.name;
 			self.newlogicalname := if ( dstSubNameSuffix = ''
-											,if (srcdali = destdali,'dstname=~'+l.name+'::copyfrom'+l.ClusterName, 'dstname=~'+l.name)
-											,'dstname=~'+l.name+'_'+dstSubNameSuffix
+											,if (srcdali = destdali,l.name+'::copyfrom'+l.ClusterName, l.name)
+											,l.name+'_'+dstSubNameSuffix
 											);
 			self.cmd := 'server=http://'+ destesp + ':8010 ' 
 									+ 'overwrite=1 ' 
@@ -146,7 +146,7 @@ EXPORT CopyFiles(string srcesp
 	
 		preplist := sort(GetSourceList, name);
 	
-		// Get file list in destination cluster/esp
+	/*	// Get file list in destination cluster/esp
 		indest_full := if (filepattern <> '',
 									wk_ut.get_DFUQuery(,destcluster,,,,,,,,,,,,,,,,,destesp).dnorm(regexfind(filepattern,name,nocase)),
 									wk_ut.get_DFUQuery(,destcluster,,,,,,,,,,,,,,,,,destesp).dnorm
@@ -156,15 +156,18 @@ EXPORT CopyFiles(string srcesp
 		indest_slim :=  if (srcdali = destdali,
 													sort(indest_full(regexfind('::copyfrom[0-9a-zA-Z]+',name,nocase)),name),
 													sort(indest_full,name)
-												);
+												);*/
 
-		rCopyFiles get_recs(preplist l, indest_slim r) := transform
-			self.existsondest := if (r.name <> '', true, false);
+		rCopyFiles get_recs(preplist l) := transform
+			self.existsondest := if (srcdali = destdali
+																	,if (STD.File.FileExists('~'+l.newlogicalname), true, false)
+																	,if (STD.File.FileExists('~foreign::'+destdali+'::'+l.newlogicalname),true, false)
+																	);
 			self := l;
 		end;
 
 		
-		noncopiedrecs := if (srcdali = destdali,
+		noncopiedrecs := projecT(preplist,get_recs(left));/*if (srcdali = destdali,
 												// use join based on parameters passed
 												join(preplist, indest_slim,
 														if ( dstSubNameSuffix = ''
@@ -181,7 +184,7 @@ EXPORT CopyFiles(string srcesp
 														get_recs(left,right),
 														left outer)
 														
-												);
+												);*/
 														
 		
 		return noncopiedrecs;

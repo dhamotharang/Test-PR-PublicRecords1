@@ -1,4 +1,4 @@
-EXPORT UpdateRampsDSFile(string destenv = '') := function
+﻿EXPORT UpdateRampsDSFile(string destenv = '') := function
 	return output(dataset([
 																		{'thor::key::healthcareprovider::qa::header::refs','','',''}
 ,{'thor::key::healthcareprovider::qa::header::words','','',''}
@@ -68,7 +68,11 @@ EXPORT UpdateRampsDSFile(string destenv = '') := function
 ,{'thor_data400::key::bizlinkfull::qa::proxid::sup::seleid','','',''}
 ,{'thor_data400::key::bizlinkfull::qa::proxid::words','','',''}
 ,{'thor_data400::key::insuranceheader_segmentation::did_ind_qa','','',''}
-
+,{'thor_data400::key::gsa::qa::linkids','','',''}
+,{'thor_data400::key::gsa::qa::did','','',''}
+,{'thor_data400::key::dca::qa::linkids','','',''}
+,{'thor_data400::key::corp2::qa::corp::linkids','','',''}
+,{'thor_data400::key::insuranceheader_xlink::qa::did::refs::dobf','','',''}
 																	]
 															,rampscopy.layouts.filestocopy),,'~'+rampscopy.constants(destenv).dslistfile,overwrite);
 end;

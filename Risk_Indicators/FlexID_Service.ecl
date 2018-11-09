@@ -1,4 +1,4 @@
-/*2016-05-21T00:27:27Z (Kevin Huls)
+﻿/*2016-05-21T00:27:27Z (Kevin Huls)
 Automated reinstate from 2016-05-19T17:47:55Z
 */
 /*2015-12-30T20:07:33Z (Kevin Huls)
@@ -364,7 +364,7 @@ export FlexID_Service := MACRO
 
 		self.Result.ValidElementSummary.addressPOBox := le.addressPOBox;
 		self.Result.ValidElementSummary.addressCMRA := (le.ADVODropIndicator='C' or le.addressCMRA);
-		self.Result.ValidElementSummary.SSNFoundForLexID := le.combo_ssn<>'' and (unsigned)le.InstantIDVersion=1;	// is this correct?
+		self.Result.ValidElementSummary.SSNFoundForLexID := le.SSNFoundForLexID;	
 
 		self.result.nameaddressssnsummary := le.nas_summary;
 		

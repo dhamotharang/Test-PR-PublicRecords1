@@ -1,4 +1,4 @@
-import did_add, ut, header_slimsort, header, WatchDog, didville, fair_isaac, Business_Header_SS, Business_Header, Lib_StringLib, AK_Comm_Fish_Vessels,mdr,header,AID,address,idl_header, Watercraft_infutor, watercraft_preprocess, STD;
+﻿import did_add, ut, header_slimsort, header, WatchDog, didville, fair_isaac, Business_Header_SS, Business_Header, Lib_StringLib, AK_Comm_Fish_Vessels,mdr,header,AID,address,idl_header, Watercraft_infutor, watercraft_preprocess, STD;
 
 //New ECL raw conversion process
 dJoined_new := dataset('~thor_data400::in::watercraft_search_common',Watercraft_preprocess.Layout_Watercraft_Search_Common,flat);
@@ -246,8 +246,8 @@ end ;
 
 dPreDID							  := project(dBaseFlipOut,tPrepForDIDandBDID(left)): persist('~thor_data400::persist::watercraft_PreDID');
 //** source record id logic
-PreviousBase   				:= distribute(Watercraft.File_Base_Search_Prod,hash64(state_origin,source_code,watercraft_key));
-Update_Base     			:= distribute(dPreDID ,hash64(state_origin,source_code,watercraft_key));
+PreviousBase   				:= distribute(Watercraft.File_Base_Search_Prod(trim(watercraft_key) <> ''),hash64(state_origin,source_code,watercraft_key));
+Update_Base     			:= distribute(dPreDID(trim(watercraft_key) <> ''),hash64(state_origin,source_code,watercraft_key));
      
 rPreDIDRecord  trans_recID(rPreDIDRecord l,Watercraft.Layout_Watercraft_Search_Base r):=transform
 	 self.source_rec_id := r.source_rec_id;
@@ -255,13 +255,13 @@ rPreDIDRecord  trans_recID(rPreDIDRecord l,Watercraft.Layout_Watercraft_Search_B
 end;
 Append_recID    := join(Update_Base ,PreviousBase,
 											  ut.CleanSpacesAndUpper(left.watercraft_key  ) 					 =  ut.CleanSpacesAndUpper(right.watercraft_key   )  and   
-												ut.CleanSpacesAndUpper(left.sequence_key  )						 =  ut.CleanSpacesAndUpper(right.sequence_key   )  and   
+												// ut.CleanSpacesAndUpper(left.sequence_key  )						 =  ut.CleanSpacesAndUpper(right.sequence_key   )  and   
 												ut.CleanSpacesAndUpper(left.state_origin  ) 						 =  ut.CleanSpacesAndUpper(right.state_origin   )  and   
 												ut.CleanSpacesAndUpper(left.source_code  ) 						 =  ut.CleanSpacesAndUpper(right.source_code   )  and   
-												ut.CleanSpacesAndUpper(left.dppa_flag  ) 							 =  ut.CleanSpacesAndUpper(right.dppa_flag   )  and   
+												// ut.CleanSpacesAndUpper(left.dppa_flag  ) 							 =  ut.CleanSpacesAndUpper(right.dppa_flag   )  and   
 												ut.CleanSpacesAndUpper(left.orig_name  )       				 =  ut.CleanSpacesAndUpper(right.orig_name   )  and   
-												ut.CleanSpacesAndUpper(left.orig_name_type_code  ) 		 =  ut.CleanSpacesAndUpper(right.orig_name_type_code   )  and   
-												ut.CleanSpacesAndUpper(left.orig_name_type_description) =  ut.CleanSpacesAndUpper(right.orig_name_type_description   )  and   
+												//ut.CleanSpacesAndUpper(left.orig_name_type_code  ) 		 =  ut.CleanSpacesAndUpper(right.orig_name_type_code   )  and   
+												// ut.CleanSpacesAndUpper(left.orig_name_type_description) =  ut.CleanSpacesAndUpper(right.orig_name_type_description   )  and   
 												ut.CleanSpacesAndUpper(left.orig_name_first  )					 =  ut.CleanSpacesAndUpper(right.orig_name_first   )  and   
 												ut.CleanSpacesAndUpper(left.orig_name_middle  ) 				 =  ut.CleanSpacesAndUpper(right.orig_name_middle   )  and   
 												ut.CleanSpacesAndUpper(left.orig_name_last  ) 					 =  ut.CleanSpacesAndUpper(right.orig_name_last     )  and   
@@ -272,16 +272,16 @@ Append_recID    := join(Update_Base ,PreviousBase,
 												ut.CleanSpacesAndUpper(left.orig_state  )               =  ut.CleanSpacesAndUpper(right.orig_state   )  and   
 												ut.CleanSpacesAndUpper(left.orig_zip  )                 =  ut.CleanSpacesAndUpper(right.orig_zip     )  and   
 												ut.CleanSpacesAndUpper(left.orig_fips  )                =  ut.CleanSpacesAndUpper(right.orig_fips    )  and   
-												ut.CleanSpacesAndUpper(left.orig_province   )           =  ut.CleanSpacesAndUpper(right. orig_province  )  and   
-												ut.CleanSpacesAndUpper(left.orig_country    )           =  ut.CleanSpacesAndUpper(right.orig_country   )  and   
+												// ut.CleanSpacesAndUpper(left.orig_province   )           =  ut.CleanSpacesAndUpper(right. orig_province  )  and   
+												// ut.CleanSpacesAndUpper(left.orig_country    )           =  ut.CleanSpacesAndUpper(right.orig_country   )  and   
 												ut.CleanSpacesAndUpper(left.dob  )                      =  ut.CleanSpacesAndUpper(right.dob   )  and   
-												ut.CleanSpacesAndUpper(left.orig_ssn  )                 =  ut.CleanSpacesAndUpper(right.orig_ssn   )  and   
-												ut.CleanSpacesAndUpper(left.orig_fein  )                =  ut.CleanSpacesAndUpper(right.orig_fein    )  and   
-												ut.CleanSpacesAndUpper(left.gender  )                   =  ut.CleanSpacesAndUpper(right.gender   )  and   
-												ut.CleanSpacesAndUpper(left.phone_1  )                  =  ut.CleanSpacesAndUpper(right.phone_1   )  and   
-												ut.CleanSpacesAndUpper(left.phone_2  )                  =  ut.CleanSpacesAndUpper(right.phone_2   )	 and
-												ut.CleanSpacesAndUpper(left.Reg_Owner_Name_2)           =  ut.CleanSpacesAndUpper(right.Reg_Owner_Name_2 ),
-												trans_recID(left,right),left outer,local)  ; 
+												ut.CleanSpacesAndUpper(left.ssn  )                 			=  ut.CleanSpacesAndUpper(right.ssn   )  and   
+												ut.CleanSpacesAndUpper(left.orig_fein  )                =  ut.CleanSpacesAndUpper(right.orig_fein    ),  
+												//ut.CleanSpacesAndUpper(left.gender  )                   =  ut.CleanSpacesAndUpper(right.gender   )  and   
+												// ut.CleanSpacesAndUpper(left.phone_1  )                  =  ut.CleanSpacesAndUpper(right.phone_1   )  and   
+												// ut.CleanSpacesAndUpper(left.phone_2  )                  =  ut.CleanSpacesAndUpper(right.phone_2   ),
+												// ut.CleanSpacesAndUpper(left.Reg_Owner_Name_2)           =  ut.CleanSpacesAndUpper(right.Reg_Owner_Name_2 ),
+												trans_recID(left,right), left outer, lookup, local); 
 												 
 //*** End of source rec_id logic 
 

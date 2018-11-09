@@ -1,9 +1,9 @@
-//
+﻿//
 
-export Roll_Relative_Property(GROUPED DATASET(Layouts.layout_relat_prop_plusv4) ds)  := FUNCTION
+export Roll_Relative_Property(GROUPED DATASET(Layouts.Layout_Relat_Prop_Plus_BusInd) ds)  := FUNCTION
 
 // first roll to get relative count
-Layouts.layout_relat_prop_plusv4 roll_relat_property(Layouts.layout_relat_prop_plusv4 le, Layouts.layout_relat_prop_plusv4 ri) :=
+Layouts.Layout_Relat_Prop_Plus_BusInd roll_relat_property(Layouts.Layout_Relat_Prop_Plus_BusInd le, Layouts.Layout_Relat_Prop_Plus_BusInd ri) :=
 TRANSFORM
 	SELF.property_count := le.property_count+IF(le.did=ri.did,0,ri.property_count);
 	SELF.property_total := le.property_total+ri.property_total;

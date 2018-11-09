@@ -1,4 +1,4 @@
-IMPORT  RoxieKeyBuild,ut,autokey,doxie, header_services,business_header,mdr, aid;
+﻿IMPORT  RoxieKeyBuild,ut,autokey,doxie, header_services,business_header,mdr, aid;
 
 export File_keybuild(
 
@@ -29,7 +29,7 @@ function
 	end;
 
 	EmpFullOut_HashBDID EmpHashBDID(Layout.Employment_Out l) := transform                            
-	 self.hval := hashmd5(intformat((unsigned6)l.bdid,15,1), intformat((unsigned6)l.did,12,1));
+	 self.hval := hashmd5(intformat((unsigned6)l.bdid,12,1), intformat((unsigned6)l.did,15,1));
 	 self := l;
 	end;
 
@@ -64,7 +64,7 @@ function
 	end;
 
 	rEmp_withHash addHash(Layout.Employment_Out l) := transform                            
-	 self.hval := hashmd5(intformat((unsigned6)l.bdid,15,1), l.company_title, l.lname, l.fname);
+	 self.hval := hashmd5(intformat((unsigned6)l.bdid,12,1), l.company_title, l.lname, l.fname);
 	 self := l;
 	end;
 
@@ -98,7 +98,7 @@ function
 	end;
 
 	rFullOut_HashBDID tHashBDID(Layout.Employment_Out l) := transform                            
-	 self.hval := hashmd5(intformat((unsigned6)l.bdid,15,1));
+	 self.hval := hashmd5(intformat((unsigned6)l.bdid,12,1));
 	 self := l;
 	end;
 
@@ -185,7 +185,7 @@ function
 																								attr );
 	Base_File_In := attr();
 	
-	//UNSIGNED6 endMax := MAX(paw.File_Base, contact_id);
+	// UNSIGNED6 endMax := MAX(paw.File_Base, contact_id);
 	
 	paw.Layout.Employment_Out reformated_header(Base_File_In L, INTEGER c) := 
 	transform

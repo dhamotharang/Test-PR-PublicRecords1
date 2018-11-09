@@ -1,4 +1,4 @@
-#workunit('name','FCRA Bocashell 5.3 Process');
+﻿#workunit('name','FCRA Bocashell 5.3 Process');
 
 isFCRA := true;
 
@@ -21,7 +21,7 @@ unsigned1 eyeball := 20;
 string DataRestrictionMask := '1000010001000100000000000'; // to restrict fares, experian, transunion and experian FCRA 
 boolean RetainInputDID := FALSE; //Change to TRUE to retain the input LexID
 string IntendedPurpose := 'APPLICATION';
-
+unsigned3 LastSeenThreshold := 0;	//# of days to consider header records as being recent for verification.  0 will use default (41 and lower = 365 days, 50 and higher = include all) 
 
 //===================  input-output files  ======================
 infile_name :=  ut.foreign_prod+'jpyon::in::adp_7555_new_file4_f_s_in';
@@ -81,7 +81,6 @@ l := RECORD
 END;
 	
 l assignAccount (ds_input le, INTEGER c) := TRANSFORM
-	self.ExcludeIbehavior := true;  // set this back to false if they would like to include this data for their test.  this is temporary until end of July 2017
 	
   SELF.old_account_number := le.Account;
   SELF.AccountNumber := (STRING)c;
@@ -91,6 +90,7 @@ l assignAccount (ds_input le, INTEGER c) := TRANSFORM
 	self.did := le.LexID;
   self.IncludeScore := true;
 	SELF.datarestrictionmask := datarestrictionmask;	
+  SELF.LastSeenThreshold := LastSeenThreshold;
 	self.bsversion := 53;	
 	self.IncludeLnJ := true;
 	self.Include_nonFCRA_Collections_Inquiries := false;

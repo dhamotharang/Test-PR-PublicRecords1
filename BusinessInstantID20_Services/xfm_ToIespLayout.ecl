@@ -1,4 +1,4 @@
-IMPORT iesp, risk_indicators, ut;
+﻿IMPORT iesp, risk_indicators, ut;
 
 // --------------------[ Components for InputEcho section ]--------------------
 
@@ -908,7 +908,7 @@ iesp.businessinstantid20.t_BIID20AuthorizedRepresentativeResults xfm_AddAuthRepR
 		SELF.VerifiedInput.Address.StreetPostDirection := le.VerPostDir;
 		SELF.VerifiedInput.Address.UnitDesignation	   := le.VerUnitDesignation;
 		SELF.VerifiedInput.Address.UnitNumber          := le.VerSecRange;
-		SELF.VerifiedInput.Address.StreetAddress1	     := '';
+		SELF.VerifiedInput.Address.StreetAddress1	     := le.veraddr;
 		SELF.VerifiedInput.Address.StreetAddress2	     := '';
 		SELF.VerifiedInput.Address.City	               := le.vercity;
 		SELF.VerifiedInput.Address.State               := le.verstate;	
@@ -1023,7 +1023,7 @@ iesp.businessinstantid20.t_BIID20AuthorizedRepresentativeResults xfm_AddAuthRepR
 		SELF.PhoneAddress.StreetPostDirection	:= le.PhonePostDir;
 		SELF.PhoneAddress.UnitDesignation			:= le.PhoneUnitDesignation;
 		SELF.PhoneAddress.UnitNumber					:= le.PhoneSecRange;
-		SELF.PhoneAddress.StreetAddress1			:= '';
+		SELF.PhoneAddress.StreetAddress1			:= le.phone_address;
 		SELF.PhoneAddress.StreetAddress2			:= '';
 		SELF.PhoneAddress.City								:= le.phone_city;
 		SELF.PhoneAddress.State								:= le.phone_st;

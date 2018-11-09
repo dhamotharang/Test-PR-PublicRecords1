@@ -1,4 +1,4 @@
-import AutokeyB2,doxie,Txbus,doxie_raw, business_header, doxie_cbrs, autokeyi, AutoStandardI, AutoHeaderI;
+﻿import AutokeyB2,doxie,Txbus, business_header, doxie_cbrs, autokeyi, AutoStandardI, AutoHeaderI;
 
 export Autokey_Header_ids(boolean workHard = true,boolean noFail = false,boolean includeDeepDive=true) := 
 
@@ -29,7 +29,7 @@ ids := autokeyi.AutoKeyStandardFetch(tempmod).ids;
 TXBUSV2_Services.mac_get_payload_ids(ids,t,ds,outpl,did,bdid, typestr,, newdids, newbdids)
 
 //***** DIDs
-dids := if(is_ContSearchL,doxie.Get_Dids(true,true),dataset([],doxie.layout_references));
+dids := if(is_ContSearchL, PROJECT (doxie.Get_Dids(true,true), doxie.layout_references));
 
 newbydid := TxBusV2_Services.TxBus_raw.get_TaxNumber_from_dids(dedup(newdids+dids,all));
 

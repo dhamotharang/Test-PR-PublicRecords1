@@ -1,4 +1,4 @@
-IMPORT ut,RoxieKeyBuild,_control, PRTE2_Gong,PRTE2_Common, PRTE;
+﻿IMPORT ut,RoxieKeyBuild,_control, PRTE2_Gong,PRTE2_Common, PRTE, strata;
 
 EXPORT proc_build_keys(string file_date, boolean skipDOPS=FALSE, string emailTo='') := FUNCTION
 	
@@ -461,6 +461,21 @@ EXPORT proc_build_keys(string file_date, boolean skipDOPS=FALSE, string emailTo=
 		'Q', 
 		move_qa_key_gong_historyfcra_phone);
 		
+	//DF-22185 Verify followings fields are cleared in fcra keys
+cnt_gong_fcra_address := OUTPUT(strata.macf_pops(Keys.key_gong_history_address(true),,,,,,FALSE,
+																['caption_text','county_code','designation','disc_cnt18','disc_cnt6',
+																'prior_area_code','see_also_text']), 
+																named('CNT_HISTORY_ADDRESS_FCRA'));
+cnt_gong_fcra_did 		:= OUTPUT(strata.macf_pops(Keys.key_gong_history_did(true),,,,,,FALSE,
+																['caption_text','county_code','designation','disc_cnt18','disc_cnt6',
+																'prior_area_code','see_also_text']), 
+																named('CNT_HISTORY_DID_FCRA'));
+cnt_gong_fcra_phone 	:= OUTPUT(strata.macf_pops(Keys.key_gong_history_phone(true),,,,,,FALSE,
+																['caption_text','county_code','designation','disc_cnt18','disc_cnt6',
+																'prior_area_code','see_also_text']), 
+																 named('CNT_HISTORY_PHONE_FCRA'));
+	
+		
 	//---------- making DOPS optional and only in PROD build -------------------------------
 	notifyEmail					:= IF(emailTo<>'',emailTo,_control.MyInfo.EmailAddressNormal);
 	NoUpdate 						:= OUTPUT('Skipping DOPS update because it was requested to not do it, or we are not in PROD'); 
@@ -585,6 +600,8 @@ EXPORT proc_build_keys(string file_date, boolean skipDOPS=FALSE, string emailTo=
 				move_qa_key_gong_historyfcra_address, 
 				move_qa_key_gong_historyfcra_did, 
 				move_qa_key_gong_historyfcra_phone,
-				PerformUpdateOrNot);
+				parallel(cnt_gong_fcra_address, cnt_gong_fcra_did, cnt_gong_fcra_phone),
+				PerformUpdateOrNot
+				);
 
 END;
