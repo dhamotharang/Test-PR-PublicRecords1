@@ -1,4 +1,4 @@
-#stored('did_add_force','thor');
+﻿#stored('did_add_force','thor');
 import address, 
 	   business_header_ss, 
 	   business_header, 
@@ -286,6 +286,8 @@ end;
 													 clean_name_provider.name_score, clean_name_provider_other.name_score,
 													 clean_name_authorized_official.name_score, RawAID_Mailing, AceAID_Mailing,
 													 RawAID_Location, AceAID_Location,
+													 xadl2_weight, xadl2_score, xadl2_distance, xadl2_keys_used, xadl2_keys_desc, 
+													 xadl2_matches, xadl2_matches_desc,
 												LOCAL);
 
 	nppes.Layouts.base rollupBase(nppes.Layouts.base L, nppes.Layouts.base R) := TRANSFORM
@@ -311,6 +313,8 @@ end;
 																		clean_name_provider.name_score, clean_name_provider_other.name_score,
 																		clean_name_authorized_official.name_score, RawAID_Mailing, AceAID_Mailing,
 																		RawAID_Location, AceAID_Location, source_rec_id, lnpid,
+																		xadl2_weight, xadl2_score, xadl2_distance, xadl2_keys_used, xadl2_keys_desc, 
+																		xadl2_matches, xadl2_matches_desc,																		
 																 LOCAL);
 
   nppes.Layouts.base doiterate(nppes.Layouts.base L, nppes.Layouts.base R) := TRANSFORM

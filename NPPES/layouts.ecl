@@ -1,5 +1,4 @@
-import AID, address, BIPV2;
-
+﻿import AID, address, BIPV2;
 export Layouts := module	
 	 					
 		export Vendor := record, maxlength(100000)
@@ -334,7 +333,7 @@ export Layouts := module
 			STRING70    Healthcare_Provider_Taxonomy_Group_15;
 		end;
 		
-		export base := record
+		export base_prev := record
 			bipv2.IDlayouts.l_xlink_ids;
 			unsigned6									did					:= 0;
 			unsigned1									did_score		:= 0;
@@ -434,6 +433,114 @@ export Layouts := module
 			unsigned8	 lnpid;
 		end;				
 		
+		export base := record
+			bipv2.IDlayouts.l_xlink_ids;
+			unsigned6									did												:= 0;
+			unsigned1									did_score									:= 0;
+			unsigned6									Bdid											:= 0;
+			unsigned1									bdid_score								:= 0;
+			string8   								process_date  						:= '0';
+			unsigned4 								dt_first_seen							:= 0;
+			unsigned4 								dt_last_seen							:= 0;
+			unsigned4 								dt_vendor_first_reported	:= 0;
+			unsigned4 								dt_vendor_last_reported		:= 0;			
+			Vendor;
+			string100									taxonomy_desc1;
+			string100									taxonomy_desc2;
+			string100									taxonomy_desc3;
+			string100									taxonomy_desc4;
+			string100									taxonomy_desc5;
+			string100									taxonomy_desc6;
+			string100									taxonomy_desc7;
+			string100									taxonomy_desc8;
+			string100									taxonomy_desc9;
+			string100									taxonomy_desc10;
+			string100									taxonomy_desc11;
+			string100									taxonomy_desc12;
+			string100									taxonomy_desc13;
+			string100									taxonomy_desc14;
+			string100									taxonomy_desc15;			
+			string12									entity_type_desc;
+			string11									deactivation_reason_desc;
+			string26									organization_name_type_desc;
+			string17									last_name_type_desc;
+			string50                 	mailing_country_desc;
+			string50                 	practice_location_country_desc;
+			string28                 	other_pid_issuer_desc_1;                
+			string28                 	other_pid_issuer_desc_2;                
+			string28                 	other_pid_issuer_desc_3;                
+			string28                 	other_pid_issuer_desc_4;                
+			string28                 	other_pid_issuer_desc_5;                
+			string28                 	other_pid_issuer_desc_6;                
+			string28                 	other_pid_issuer_desc_7;                
+			string28                 	other_pid_issuer_desc_8;                
+			string28                 	other_pid_issuer_desc_9;                
+			string28                 	other_pid_issuer_desc_10;               
+			string28                 	other_pid_issuer_desc_11;               
+			string28                 	other_pid_issuer_desc_12;               
+			string28                 	other_pid_issuer_desc_13;               
+			string28                 	other_pid_issuer_desc_14;               
+			string28                 	other_pid_issuer_desc_15;               
+			string28                 	other_pid_issuer_desc_16;               
+			string28                 	other_pid_issuer_desc_17;               
+			string28                 	other_pid_issuer_desc_18;               
+			string28                 	other_pid_issuer_desc_19;               
+			string28                 	other_pid_issuer_desc_20;               
+			string28                 	other_pid_issuer_desc_21;               
+			string28                 	other_pid_issuer_desc_22;               
+			string28                 	other_pid_issuer_desc_23;               
+			string28                 	other_pid_issuer_desc_24;               
+			string28                 	other_pid_issuer_desc_25;               
+			string28                 	other_pid_issuer_desc_26;               
+			string28                 	other_pid_issuer_desc_27;               
+			string28                 	other_pid_issuer_desc_28;               
+			string28                 	other_pid_issuer_desc_29;               
+			string28                 	other_pid_issuer_desc_30;               
+			string28                 	other_pid_issuer_desc_31;               
+			string28                 	other_pid_issuer_desc_32;               
+			string28                 	other_pid_issuer_desc_33;               
+			string28                 	other_pid_issuer_desc_34;               
+			string28                 	other_pid_issuer_desc_35;               
+			string28                 	other_pid_issuer_desc_36;               
+			string28                 	other_pid_issuer_desc_37;               
+			string28                 	other_pid_issuer_desc_38;               
+			string28                 	other_pid_issuer_desc_39;               
+			string28                 	other_pid_issuer_desc_40;               
+			string28                 	other_pid_issuer_desc_41;               
+			string28                 	other_pid_issuer_desc_42;               
+			string28                 	other_pid_issuer_desc_43;               
+			string28                 	other_pid_issuer_desc_44;               
+			string28                 	other_pid_issuer_desc_45;               
+			string28                 	other_pid_issuer_desc_46;               
+			string28                 	other_pid_issuer_desc_47;               
+			string28                  other_pid_issuer_desc_48;               
+			string28                  other_pid_issuer_desc_49;               
+			string28                  other_pid_issuer_desc_50;               			
+			Address.Layout_Clean_Name	clean_name_provider;
+			Address.Layout_Clean_Name	clean_name_provider_other;
+			Address.Layout_Clean_Name	clean_name_authorized_official;
+			string10 									cleanMailingPhone;
+			string10 									cleanLocationPhone;
+			AID.Common.xAID         	RawAID_Mailing;
+			AID.Common.xAID         	AceAID_Mailing;
+			string100									Mailing_Prep_Address1;
+			string50									Mailing_Prep_AddressLast;
+			AID.Common.xAID         	RawAID_Location;			
+			AID.Common.xAID         	AceAID_Location;			
+			string100									Location_Prep_Address1;
+			string50									Location_Prep_AddressLast;		
+			unsigned8									source_rec_id;
+			unsigned8	 								lnpid;
+			integer2									xadl2_weight 				:= 0;
+			unsigned2									xadl2_score	 				:= 0;
+			integer1									xadl2_distance			:= 0;
+			unsigned4									xadl2_keys_used			:= 0;
+			string										xadl2_keys_desc			:= '';
+			string60									xadl2_matches				:= '';
+			string										xadl2_matches_desc	:= '';
+		end;				
+		
+		
 		export Address_Layout := record
 			unsigned8										unique_id;	        //to denormalize to original record
 			unsigned4										address_type;   	//mailing or location
@@ -447,13 +554,23 @@ export Layouts := module
 		export KeyBuildFirst := record
 			integer                 unique_id; 
 			base;			
+			// base // - [xadl2_weight, xadl2_score, xadl2_distance, xadl2_keys_used, xadl2_keys_desc, xadl2_matches, xadl2_matches_desc];			
+			Address.Layout_Clean182_fips 				clean_mailing_address;
+			Address.Layout_Clean182_fips        clean_location_address;
+			unsigned1 zero := 0;
+			end;
+			
+		export KeyBuildFirst_noxadl := record
+			integer                 unique_id; 
+			base - [xadl2_weight, xadl2_score, xadl2_distance, xadl2_keys_used, xadl2_keys_desc, xadl2_matches, xadl2_matches_desc];			
 			Address.Layout_Clean182_fips 				clean_mailing_address;
 			Address.Layout_Clean182_fips        clean_location_address;
 			unsigned1 zero := 0;
 			end;
 			
 		export KeyBuild_BIP := record
-			base - [lnpid];		
+			// base - [lnpid];		
+			base - [lnpid, xadl2_weight, xadl2_score, xadl2_distance, xadl2_keys_used, xadl2_keys_desc, xadl2_matches, xadl2_matches_desc];						
 			Address.Layout_Clean182_fips 				clean_mailing_address;
 			Address.Layout_Clean182_fips        clean_location_address;
 			Address.Layout_Clean182_fips 				clean_norm_address;
@@ -467,6 +584,7 @@ export Layouts := module
 		export TempKeyBuild := record			//For BDID and DID purposes
 			integer                 unique_id; 
 			base;			
+			// base // - [xadl2_weight, xadl2_score, xadl2_distance, xadl2_keys_used, xadl2_keys_desc, xadl2_matches, xadl2_matches_desc];						
 			Address.Layout_Clean182_fips 				clean_mailing_address;
 			Address.Layout_Clean182_fips                 clean_location_address;
 			string10	mailing_prim_range; 			
