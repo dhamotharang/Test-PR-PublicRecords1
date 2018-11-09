@@ -234,8 +234,8 @@ get_licdesc( string practype ) := case ( practype,
   self.additional_orig_name :=  l.FNAME +  ' ' +  l.LNAME ;
   self.additional_name_order := if (l.FNAME +  l.LNAME <> '',  'FML' , '' ) ;
   self.misc_practice_type := trim(get_licdesc(StringLib.stringfilterout(trim(l.PRACTYP1), '*')))[1..50];
-	self.issue_date            := if ( fSlashedMDYtoCYMD(trim(l.ISSUEDT)) = '00000000', '',fSlashedMDYtoCYMD(trim(l.ISSUEDT)));
-  self.expiration_date       := if ( fSlashedMDYtoCYMD(trim(l.EXPDATE)) = '00000000', '',fSlashedMDYtoCYMD(trim(l.EXPDATE)));
+	self.issue_date            := dateconv(trim(l.ISSUEDT));
+  self.expiration_date       := dateconv(trim(l.EXPDATE));
 	self := [];
 end;                                                                                                                                                                                                                                                                                        
                                                              
@@ -264,8 +264,8 @@ Prof_License.Layout_proLic_in map2social( insocial l ) := transform
   self.orig_zip              := StringLib.stringfilter(l.Zipcode, '0123456789')[1..9];
   self.phone                 :=  '';//StringLib.stringfilter(l.Business_Phone, '0123456789')[1..10];
   self.license_number        := if ( l.CredentialNumber <> '', (string)intformat((integer)trim(l.CredentialNumber),6,1) , '' ) ;
-  self.issue_date            := StringLib.StringFilterout(l.FirstEffectiveDate,'-/');
-  self.expiration_date       := StringLib.StringFilterout(l.ExpirationDate,'-/');
+  self.issue_date            :=  dateconv(trim(l.FirstEffectiveDate));
+  self.expiration_date       := dateconv(trim(l.ExpirationDate));
   self.source_st             := 'SC';
   self.vendor                := 'South Carolina Board of Social Work Exam';
   self.profession_or_board            := 'Social Workers';
@@ -300,8 +300,8 @@ Prof_License.Layout_proLic_in map2psy( inpsy l ) := transform
   self.orig_zip              := StringLib.stringfilter(l.Zipcode, '0123456789')[1..9];
   self.phone                 :=  '';//StringLib.stringfilter(l.Business_Phone, '0123456789')[1..10];
   self.license_number        := if ( l.CredentialNumber <> '', (string)intformat((integer)trim(l.CredentialNumber),6,1) , '' ) ;
-  self.issue_date            := StringLib.StringFilterout(l.FirstEffectiveDate,'-/');
-  self.expiration_date       := StringLib.StringFilterout(l.ExpirationDate,'-/');
+  self.issue_date            := dateconv(trim(l.FirstEffectiveDate));
+  self.expiration_date       :=dateconv(trim(l.ExpirationDate));
   self.source_st             := 'SC';
   self.vendor                := 'South Carolina Board of Examiners in Psychologists';
   self.profession_or_board            := 'Psychology';
