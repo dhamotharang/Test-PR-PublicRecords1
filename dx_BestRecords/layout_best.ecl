@@ -1,7 +1,7 @@
-import dx_BestRecords, AID;
+IMPORT dx_BestRecords, AID;
 
-export layout_best := record
-  unsigned6 did := 0;
+EXPORT layout_best := RECORD
+	unsigned6 did := 0;
 	qstring10 phone := '';
 	string4 timezone :='';
 	qstring9 ssn := '';
@@ -24,7 +24,7 @@ export layout_best := record
 	qstring5 zip := '';
 	qstring4 zip4 := '';
 	unsigned3 addr_dt_last_seen := 0;
-	UNSIGNED3 addr_dt_first_seen := 0;
+	unsigned3 addr_dt_first_seen := 0;
 	qstring8 DOD := '';
 	qstring17 Prpty_deed_id := '';
 	qstring22 Vehicle_vehnum := '';
@@ -32,13 +32,12 @@ export layout_best := record
 	qstring15 DL_number := '';
 	integer4 run_date := 0;
 	integer4 total_records := 0;
-  unsigned1 age := 0;
-  string1 valid_ssn := '';
+	unsigned1 age := 0;
+	string1 valid_ssn := '';
 	string1 glb_name := '';
 	string1 glb_address := '';
 	string1 glb_dob := '';
 	string1 glb_ssn := '';
 	string1 glb_phone := '';
-  STRING10 ADL_ind := '';	
-	boolean _valid := false;
-end;
+	string10 ADL_ind := '';	
+END;

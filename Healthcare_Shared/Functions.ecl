@@ -983,7 +983,7 @@ EXPORT Functions := MODULE
 		ssn_mask_val := AutoStandardI.InterfaceTranslator.ssn_mask_val.val(project(gm,AutoStandardI.InterfaceTranslator.ssn_mask_val.params)); 
 		byDids := dedup(normalize(input,left.dids,transform(Healthcare_Shared.Layouts.layout_sanc_DID,self.acctno := left.acctno;self.InternalID:=left.InternalID;self.did:=right.did;self.freq:=right.freq;self:=[])),all);
 		Healthcare_Shared.Layouts.layout_ssns_freq get_provider_ssns(Healthcare_Shared.Layouts.layout_sanc_DID l, dx_BestRecords.layout_best r) := transform
-			self.ssn := if (r._valid and (r.valid_ssn = 'G' or r.valid_ssn = ' ' or r.valid_ssn = ''), r.ssn, '');
+			self.ssn := if (r.did <> 0 and (r.valid_ssn = 'G' or r.valid_ssn = ' ' or r.valid_ssn = ''), r.ssn, '');
 			self := l;
 		end;
 

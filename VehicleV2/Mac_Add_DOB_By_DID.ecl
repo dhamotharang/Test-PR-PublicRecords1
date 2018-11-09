@@ -7,7 +7,7 @@ export Mac_Add_DOB_By_DID(infile, append_dob_field, outfile) := macro
 
 #uniquename(add_dl)
 typeof(infile) %add_dl%(infile L, dx_BestRecords.layout_best R) := TRANSFORM
-  SELF.append_dob_field := if (R._valid and L.orig_dob = '', (string8) R.dob, '');
+  SELF.append_dob_field := if (R.did <> 0 and L.orig_dob = '', (string8) R.dob, '');
   SELF := L;
 END;
 
