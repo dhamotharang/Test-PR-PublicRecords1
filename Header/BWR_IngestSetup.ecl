@@ -1,7 +1,7 @@
 ﻿#workunit('name','HeaderIngestSetup');
 IMPORT wk_ut,STD,dops,ut,_control,zz_gmarcan,Header;
 
-EXPORT BWR_IngestSetup(boolean skip_action=true) := FUNCTION
+EXPORT BWR_IngestSetup(string emailList, boolean skip_action=true) := FUNCTION
 
 // Converts the date from 'M?/D?/YYYY H?:M?:S? AM/PM' to ISO8601
 toIso8601(string tf1) := function
@@ -116,7 +116,7 @@ restoreWuid('~thor_data400::base::consumer_targus')
 report := 
 ck('DLV2Keys'           ,'~thor_data400::BASE::dl2::DLHeader_Building'           ,'~thor_200::base::dl2::drvlic_aid')+
 ck('DLV2Keys_F'          ,'~thor_data400::BASE::dl2::DLHeader_Building'           ,'~thor_200::base::dl2::drvlic_aid_father')+
-ck('DLV2Keys_D'          ,'~thor_data400::BASE::dl2::DLHeader_Building'           ,'~thor_200::base::dl2::drvlic_aid_delete')+
+// ck('DLV2Keys_D'          ,'~thor_data400::BASE::dl2::DLHeader_Building'           ,'~thor_200::base::dl2::drvlic_aid_delete')+
 ck('EmergesKeys'        ,'~thor_data400::base::emergesHeader_Building'           ,'~thor_data400::base::emerges_hunt_vote_ccw')+
 ck('ATFKeys'            ,'~thor_data400::BASE::atfHeader_Building'               ,'~thor_data400::base::atf_firearms_explosives')+
 ck('ProfLicKeys'        ,'~thor_data400::Base::ProfLicHeader_Building'           ,'~thor_data400::base::prof_licenses_AID')+
@@ -124,22 +124,22 @@ ck('FCRA_ProfLicKeys'   ,'~thor_data400::Base::ProfLicHeader_Building'          
 ck('DeathMasterKeys'    ,'~thor_data400::Base::DeathHeader_Building'             ,'~thor_data400::base::did_death_masterV2_SSA')+
 ck('DeathMasterKeys_F'  ,'~thor_data400::Base::DeathHeader_Building'             ,'~thor_data400::base::did_death_masterv2_ssa_father')+
 ck('DeathMasterKeys_G'  ,'~thor_data400::Base::DeathHeader_Building'             ,'~thor_data400::base::did_death_masterv2_ssa_grandfather')+
-ck('DeathMasterKeys_D'  ,'~thor_data400::Base::DeathHeader_Building'             ,'~thor_data400::base::did_death_masterv2_ssa_delete')+
+// ck('DeathMasterKeys_D'  ,'~thor_data400::Base::DeathHeader_Building'             ,'~thor_data400::base::did_death_masterv2_ssa_delete')+
 ck('ForeclosureKeys'    ,'~thor_data400::Base::ForeclosureHeader_Building'       ,'~thor_data400::BASE::foreclosure')+
 ck('FAAKeys'            ,'~thor_data400::Base::AirmenHeader_Building'            ,'~thor_data400::base::faa_airmen_BUILT')+
 ck('WatercraftKeys'     ,'~thor_data400::Base::WatercraftSrchHeader_Building'    ,'~thor_data400::base::watercraft_search')+
 ck('DEAKeys'            ,'~thor_data400::Base::DeaHeader_Building'               ,'~thor_data400::base::dea')+
 ck('DEAKeys_F'          ,'~thor_data400::Base::DeaHeader_Building'               ,'~thor_data400::base::dea_father')+
-ck('DEAKeys_D'          ,'~thor_data400::Base::DeaHeader_Building'               ,'~thor_data400::base::dea_delete')+
+// ck('DEAKeys_D'          ,'~thor_data400::Base::DeaHeader_Building'               ,'~thor_data400::base::dea_delete')+
 ck('LNPropertyV2Keys'   ,'~thor_data400::BASE::LN_PropV2SrchHeader_Building'     ,'~thor_data400::base::ln_propertyv2::search','B')+
 ck('AmericanstudentKeys','~thor_data400::Base::ASLHeader_Building'               ,'~thor_data400::base::american_student_list')+
 ck('OKC_SL_dumy_use_asl','~thor_data400::Base::OKC_SLHeader_Building'            ,'~thor_data400::base::okc_student_list')+
 ck('VotersV2Keys'       ,'~thor_data400::BASE::Voters_Header_Building'           ,'~thor_data400::Base::Voters_Reg')+
 ck('VehicleV2Keys'      ,'~thor_data400::base::vehicles_v2_party_header_building','~thor_data400::base::vehiclev2::party')+
 ck('VehicleV2Keys_F'    ,'~thor_data400::base::vehicles_v2_party_header_building','~thor_data400::base::vehiclev2::party_father')+
-ck('VehicleV2Keys_D'    ,'~thor_data400::base::vehicles_v2_party_header_building','~thor_data400::base::vehiclev2::party_delete')+
+// ck('VehicleV2Keys_D'    ,'~thor_data400::base::vehicles_v2_party_header_building','~thor_data400::base::vehiclev2::party_delete')+
 ck('CertegyKeys'        ,'~thor_data400::base::certegyheader_building'           ,'~thor_data400::base::certegy')+
-ck('SexOffenderKeys'    ,'~thor_data400::base::sex_offender_mainpublic_building' ,'~thor_data400::base::sex_offender_mainpublic')+
+// ck('SexOffenderKeys'    ,'~thor_data400::base::sex_offender_mainpublic_building' ,'~thor_data400::base::sex_offender_mainpublic')+
 ck('TargusKeys'         ,'~thor_data400::base::consumer_targusHeader_Building'   ,'~thor_data400::base::consumer_targus') +
 ck('TargusKeys_F'       ,'~thor_data400::base::consumer_targusHeader_Building'   ,'~thor_data400::base::consumer_targus_father') :independent;
 
@@ -220,7 +220,7 @@ ok_to_run_update := (//quick_header_is_not_running AND
                      raw_is_not_running //AND  most_recent_external_base_is_done
                     );
 
-run_inputs_set := std.system.Email.sendemail(_control.MyInfo.EmailAddressNotify,'PLEASE RUN',
+run_inputs_set := std.system.Email.sendemail(emailList,'PLEASE RUN',
                                                 '#workunit(\'name\',\'Header_Input_Set\');\n'
                                                +'Header.Inputs_Set();');
 
@@ -238,13 +238,16 @@ part2 := zz_gmarcan.mac_convertDs.toHTML(yes_update,logical_file_name,pre_reset_
                                             roxie_package_name,current_prod_roxie_version,
                                             current_prod_roxie_cert_deployment_datetime,base_file_time_stamp);
 
-attachment := regexreplace('</BODY></HTML>',part1,'</BR>')+'<P><u>The following WILL BE UPDATED:</u></P>'+
+part1a :=     regexreplace('<BODY>',part1,'<BODY><P><u>The following will NOT be updated:</u></P>');
+
+attachment := 
+              regexreplace('</BODY></HTML>',part1a,'</BR>')+'<P><u>The following WILL be updated:</u></P>'+
               regexreplace('<HTML>.*<BODY>',part2,'</BR>');
 
 wLink := 'http://prod_esp.br.seisint.com:8010/?Wuid='+workunit+'&Widget=WUDetailsWidget#/stub/Summary';
 
 send_report := STD.System.Email.SendEmailAttachText(
-				_control.MyInfo.EmailAddressNotify,			            // recipientAddress
+				emailList,			            // recipientAddress
 
 				'HeaderIngestSetup No Update Report',  	                // subjectText
 				'Please find report attached.'+
