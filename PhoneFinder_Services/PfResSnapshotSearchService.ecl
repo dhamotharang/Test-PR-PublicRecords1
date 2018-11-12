@@ -21,12 +21,12 @@ EXPORT PfResSnapshotSearchService := MACRO
   search_by    := GLOBAL(first_row.SearchBy);
   
   // Fail the Service if No Input is Provided 
-  MAP(search_by.CompanyID = '' and search_by.ReferenceCode = '' and  search_by.UserId = '' and search_by.PhoneNumber ='' and search_by.UniqueId = '' => FAIL(301, doxie.ErrorCodes(301)),
-		  (search_by.CompanyID <> '' or search_by.ReferenceCode <> '' or  search_by.UserId <> '' or search_by.PhoneNumber <> '') and 
+  MAP(~EXISTS(search_by.CompanyIds) and search_by.ReferenceCode = '' and  search_by.UserId = '' and search_by.PhoneNumber ='' and search_by.UniqueId = '' => FAIL(301, doxie.ErrorCodes(301)),
+		  (EXISTS(search_by.CompanyIds) or search_by.ReferenceCode <> '' or  search_by.UserId <> '' or search_by.PhoneNumber <> '') and 
 			search_by.TransactionDateRange.StartDate.Year = 0  => FAIL(301, doxie.ErrorCodes(301))); 
      
   PhoneFinder_Services.Layouts.PFResSnapShotSearch t_input(iesp.phonefindertransactionsearch.t_PhoneFinderTransactionSearchRequest l) := TRANSFORM
-		self.CompanyId := l.SearchBy.CompanyId;
+		self.Companies := CHOOSEN(PROJECT(l.SearchBy.CompanyIds, PhoneFinder_Services.Layouts.Input_CompanyId), iesp.Constants.PfResSnapshot.MaxCompanyIds);
 		self.PhoneNumber := l.SearchBy.PhoneNumber;
 		self.UserId := l.SearchBy.UserId;
 		self.ReferenceCode := l.SearchBy.ReferenceCode;
