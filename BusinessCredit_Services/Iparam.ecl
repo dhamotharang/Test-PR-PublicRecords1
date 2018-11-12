@@ -1,4 +1,4 @@
-IMPORT AutoHeaderI, AutoStandardI, BIPV2, BatchShare, STD;
+﻿IMPORT AutoStandardI, BIPV2, BatchShare, STD;
 
 EXPORT IParam := MODULE
 
@@ -56,6 +56,8 @@ EXPORT IParam := MODULE
 		EXPORT STRING  DataPermissionMask 		:= AutoStandardI.Constants.DataPermissionMask_default;
 		EXPORT STRING	 DataRestrictionMask 		:= AutoStandardI.Constants.DataRestrictionMask_default;
 		EXPORT BOOLEAN Include_BusinessCredit := FALSE;
+		EXPORT BOOLEAN LimitPaymentHistory24Months := FALSE;
+		EXPORT STRING SBFEContributorIds := '';  
 		EXPORT STRING1 FetchLevel 						:= BIPV2.IDconstants.Fetch_Level_SELEID;
     EXPORT BOOLEAN IncludeScores          := TRUE; // Always TRUE unless called from LNSmallBusiness.SmallBusiness_BIP_Combined_Service 
     EXPORT BOOLEAN TestDataEnabled        := FALSE;

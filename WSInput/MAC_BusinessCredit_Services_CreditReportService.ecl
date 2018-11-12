@@ -1,4 +1,4 @@
-// This service created to add Web Service fields for BusinessCredit_Services.CreditReportService
+﻿// This service created to add Web Service fields for BusinessCredit_Services.CreditReportService
 
 EXPORT MAC_BusinessCredit_Services_CreditReportService := MACRO
 
