@@ -1,5 +1,5 @@
 ﻿IMPORT Address,BIPV2,BipV2_Best,BIPV2_Build,DCA,ExecAtHomeV2,Gong,
-       PAW,ProfileBooster,Std,watchdog;       
+       PAW,ProfileBooster,Std,dx_BestRecords;       
 
 EXPORT Transforms := 
 MODULE
@@ -128,7 +128,7 @@ MODULE
   END;
   
   EXPORT ExecAtHomeV2.Layouts.expandedLayout xfmAddWatchdogFields(ExecAtHomeV2.Layouts.expandedLayout l, 
-                                                                  watchdog.Layout_best_flags r) := 
+                                                                  dx_BestRecords.layout_best r) := 
   TRANSFORM
     SELF.person_best_fname := r.fname;
     SELF.person_best_mname := r.mname;
