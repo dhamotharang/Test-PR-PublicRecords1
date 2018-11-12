@@ -20,8 +20,9 @@ export IdAppendLocal := module
 				left.request_id = right.uniqueid
 					and (right.proxid = 0 or left.proxid = right.proxid or allBest),
 				transform(BIPV2.IDAppendLayouts.svcAppendOut,
+					hasMatch := right.proxid != 0 or right.seleid != 0;
 					sameProx := left.proxid = right.proxid or (not allBest and isSeleBest);
-					self.proxid := if(sameProx, left.proxid, right.proxid),
+					self.proxid := if(sameProx or not hasMatch, left.proxid, right.proxid),
 					self.proxscore := if(sameProx, left.proxscore, 0);
 					self.proxweight := if(sameProx, left.proxweight, 0);
 					self.company_name := right.company_name[1].company_name,

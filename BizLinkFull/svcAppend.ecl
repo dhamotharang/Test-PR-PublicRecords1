@@ -5,7 +5,7 @@
 	boolean includeBest := false : stored('include_best');
 	boolean allBest := false : stored('all_best');
 	string fetchLevel := BIPV2.IdConstants.fetch_level_proxid : stored('fetch_level');
-	boolean do_append := true : stored('do_append');
+	boolean re_append := true : stored('re_append');
 	unsigned score_threshold := 75 : stored('score_threshold');
 	unsigned weight_threshold := 0 : stored('weight_threshold');
 	boolean disable_salt_force := true : stored('disable_salt_force');
@@ -29,8 +29,7 @@
 		,primForcePost := prim_force_post 
 		,useFuzzy := use_fuzzy
 		,doZipExpansion := do_zip_expansion
-		,doAppend := do_append
-		,fromThor := from_thor
+		,reAppend := re_append
 	);
 
 	withAppendThor := BIPV2.IdAppendThorLocal(
