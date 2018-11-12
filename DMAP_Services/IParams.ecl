@@ -4,25 +4,23 @@ gm:= AutoStandardI.GlobalModule();
 
 EXPORT IParams := MODULE
 
-EXPORT ReportParams := INTERFACE
-  EXPORT UNSIGNED1 glba := 0;
-  EXPORT UNSIGNED1 dppa := 0;
-  EXPORT STRING dpm := AutoStandardI.Constants.DataPermissionMask_default;
-  EXPORT STRING drm := AutoStandardI.Constants.DataRestrictionMask_default;
-  EXPORT STRING5 industry_class := '';
-  EXPORT STRING6 ssn_mask_val := 'NONE'; 
-  EXPORT UNSIGNED1 dob_mask_val := suppress.constants.dateMask.NONE;
-	EXPORT BOOLEAN probation_override_value := FALSE;
-  EXPORT BOOLEAN IncludeModel:= TRUE; 	
-	EXPORT BOOLEAN IncludeReport:= TRUE;	
-	EXPORT BOOLEAN glb_ok:= FALSE;
-	EXPORT BOOLEAN dppa_ok:= FALSE;
-  EXPORT BOOLEAN isUtility:=  FALSE;
-  
-END;
+	EXPORT ReportParams := INTERFACE
+		EXPORT UNSIGNED1 glba := AutoStandardI.Constants.GLBPurpose_default;
+		EXPORT UNSIGNED1 dppa := 0;
+		EXPORT STRING dpm := AutoStandardI.Constants.DataPermissionMask_default;
+		EXPORT STRING drm := AutoStandardI.Constants.DataRestrictionMask_default;
+		EXPORT STRING5 industry_class := '';
+		EXPORT STRING6 ssn_mask_val := 'NONE'; 
+		EXPORT UNSIGNED1 dob_mask_val := suppress.constants.dateMask.NONE;
+		EXPORT BOOLEAN probation_override_value := FALSE;
+		EXPORT BOOLEAN IncludeModel:= TRUE;
+		EXPORT BOOLEAN glb_ok:= FALSE;
+		EXPORT BOOLEAN dppa_ok:= FALSE;
+		EXPORT BOOLEAN isUtility:=  FALSE;
+	END;
 
-  EXPORT get_Params() := FUNCTION
-  
+	EXPORT get_Params() := FUNCTION
+
 		in_mod := MODULE(ReportParams)
 			EXPORT UNSIGNED1 dob_mask_val:= AutoStandardI.InterfaceTranslator.dob_mask_value.val(PROJECT(gm,AutoStandardI.InterfaceTranslator.dob_mask_value.params));
 			EXPORT STRING6 ssn_mask_val := AutoStandardI.InterfaceTranslator.ssn_mask_value.val(PROJECT(gm,AutoStandardI.InterfaceTranslator.ssn_mask_value.params));
@@ -36,8 +34,8 @@ END;
 			EXPORT BOOLEAN glb_ok:= ut.glb_ok(GLBA);
 			EXPORT BOOLEAN dppa_ok:= ut.dppa_ok(DPPA);
 		END;	
-   
-   RETURN in_mod;
-  END;
+	 
+	 RETURN in_mod;
+	END;
 
 END;
