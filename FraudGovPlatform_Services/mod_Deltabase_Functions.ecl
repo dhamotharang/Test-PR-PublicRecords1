@@ -56,7 +56,7 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 				SELF.ReportedDateTime.Second := (INTEGER)(L.Reported_Time[5..6]);
 				SELF.IndustryTypeDescription := L.classification_source.Industry_segment;
 				SELF.ReportedBy := L.classification_Permissible_use_access.user_added;
-				SELF.ActivityReason := L.Referral_reason;
+				SELF.ActivityReason := L.reason_description;
 				SELF.UniqueId := (STRING)L.did;
 				SELF.Name.Full := L.raw_Full_name;
 				SELF.Name.First := L.raw_first_name;
@@ -117,7 +117,7 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 				// SELF.Customer_Person_ID := L.client_uid;
 				SELF.uid := (INTEGER)L.client_uid;
 				SELF.Type_of_Referral := L.inquiry_source;
-				SELF.Referral_Reason := L.reason_description;
+				SELF.reason_description := L.reason_description;
 				SELF.SSN := L.SSN;
 				SELF.DOB := L.DOB;
 				// SELF.UID := L.lex_id;
