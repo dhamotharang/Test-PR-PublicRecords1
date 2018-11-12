@@ -66,8 +66,8 @@ EXPORT Functions:= MODULE
 	
 	// Function to calculate Verification Of Occupancy score for the subject and all the addresses. 
  	EXPORT fn_VOOScore(DATASET($.Layouts.borrower_layout) Input,
-										$.IParams.ReportParams input_params):= FUNCTION							 
-		
+										$.IParams.ReportParams input_params):= FUNCTION
+			
 		VerificationOfOccupancy.Layouts.Layout_VOOIn xform_vooIn($.Layouts.borrower_layout L) := TRANSFORM
 			SELF.LexID 								:= L.did;	
 			SELF.Seq									:= L.Address.AddrSeq;
@@ -95,7 +95,7 @@ EXPORT Functions:= MODULE
 			SELF											:= [];
 		END;
 		voo_in := PROJECT(Input, xform_vooIn(LEFT));		
-		voo_out:= VerificationOfOccupancy.Search_Function(voo_in, input_params.drm, input_params.glba, input_params.dppa, input_params.isUtility, $.Constants.ATTRIBUTES_VERSION, input_params.IncludeModel, input_params.dpm, input_params.IncludeReport).VOOReport;
+		voo_out:= VerificationOfOccupancy.Search_Function(voo_in, input_params.drm, input_params.glba, input_params.dppa, input_params.isUtility, $.Constants.ATTRIBUTES_VERSION, input_params.IncludeModel, input_params.dpm).VOOReport;
 		
 		$.Layouts.dmap_Layout xform_vooOut(VerificationOfOccupancy.Layouts.Layout_VOOBatchOutReport L, $.Layouts.borrower_layout R) := TRANSFORM
 			InferredOwnershipTypeIndex								:= (INTEGER)L.attributes.version1.InferredOwnershipTypeIndex;
@@ -105,8 +105,8 @@ EXPORT Functions:= MODULE
 			SELF.VerificationOfOccupancyScore 				:= VerificationOfOccupancyScore;
 			SELF.OwnOrRent														:= MAP(VerificationOfOccupancyScore>50 AND InferredOwnershipTypeIndex=0=> $.Constants.RENT,
 																											 VerificationOfOccupancyScore>=0 AND InferredOwnershipTypeIndex>=1=> $.Constants.OWN,	
-																											 $.Constants.INSUFFICIENT_EVIDENCE); // Insufficient evidence 
-					
+																											 $.Constants.INSUFFICIENT_EVIDENCE); // Insufficient evidence
+																											 
 			asOfDate:= fn_AsOfDate(R.dateFirstSeen, R.dateLastSeen);							
 			SELF.AsOfDate															:= IF(std.Date.IsValidDate((INTEGER)asOfDate), asOfDate, $.Constants.DEFAULT_ASOFDATE);
 			SELF.DOB 																	:= R.dob;
@@ -134,6 +134,17 @@ EXPORT Functions:= MODULE
 		subject_with_maskedInfo:= ROW($.Transforms.xform_dataMask(subject_current_info, input_params));
 	
 	RETURN subject_with_maskedInfo;
+	END;
+	
+	EXPORT fn_getOwnedProp(DATASET($.Layouts.borrower_layout) subject_info):= FUNCTION
+
+    voo_shell_in := PROJECT(subject_info, $.Transforms.xform_vooShellIn(LEFT));
+    prop_ownership:= VerificationOfOccupancy.getPropOwnership(voo_shell_in);
+    owned_properties:= prop_ownership(property_owned='1' AND property_sold<>'1');
+    Owned_Addr := PROJECT(owned_properties, $.Transforms.xform_vooOwnedAddr(LEFT));
+    deduped_owned_addr:= DEDUP(SORT(Owned_Addr, Zip, PrimName, PrimRange, SecRange), Zip, PrimName, PrimRange, SecRange);
+		
+	RETURN deduped_owned_addr;
 	END;
 	
 	// Function to get fids for the Input Property Address & Owned Property Address
