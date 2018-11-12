@@ -10,7 +10,7 @@ despray(STRING file, string DestinationIP, string destination) := IF(FileService
 		fileservices.despray(file,DestinationIP,destination,,,,TRUE), 
 		OUTPUT('File "' + file + '" does not exist, so no despray performed'));
 
-DestinationIP_PA       := '10.173.84.221'; // PA_DISTRIX_LZ - /d$/import/distrix/ \n
+DestinationIP_PA       := '10.173.84.223'; // PA_DISTRIX_LZ - /d$/import/distrix/ \n
 
 // PA
 // D:\import\Distrix
@@ -18,8 +18,8 @@ DestinationIP_PA       := '10.173.84.221'; // PA_DISTRIX_LZ - /d$/import/distrix
 // C:\dropzone\Distrix
 Basefile      		:= '~thor_data400::base::headers_hashes_';
 Basefilev         := '~thor_data400::out::vinashrunk';
-punixPA           := '/c$/distrix/';
-punixOH           := '/c$/distrix/';
+punixPA           := '/mnt/disk1/distrix/';
+
 
 layout_header_hash := record
 unsigned8	hash_val;
@@ -64,7 +64,7 @@ send_email:= fileservices.SendEmail(
 																			+'10.173.84.223 - PA_DISTRIX_LZ - /c$/distrix/\n'
 																		);
 
-send_bad_email := FileServices.sendemail('gabriel.marcan@lexisnexisrisk.com', 'Header hashes build failed', failmessage,'');
+send_bad_email := FileServices.sendemail('gabriel.marcan@lexisnexisrisk.com;debendra.kumar@lexisnexisrisk.com', 'Header hashes build failed', failmessage,'');
 
 export header_hash_split := sequential(
 																			build_base,header_split,

@@ -4,7 +4,7 @@ EXPORT SprayAndQualifyNAC(
 	string pversion,
 	string ip = NAC.Constants.LandingZoneServer,
 	string rootDir = NAC.Constants.LandingZonePathBase + '/msh/done/', 
-	string destinationGroup = if(_Control.ThisEnvironment.Name<> 'Prod_Thor','thor400_dev','thor400_44'))
+	string destinationGroup = IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		Constants.ThorName_Dev,	Constants.ThorName_Prod))
 := FUNCTION	
 	dsFileList:=nothor(FileServices.RemoteDirectory(ip, rootDir, 'FL_MSH_' + pversion[1..8] + '*.dat')):independent;
 
