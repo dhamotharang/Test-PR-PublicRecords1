@@ -378,7 +378,10 @@ MODULE
 			SELF.CallForwardingIndicator := IF(ri.CallForwardingIndicator = '' or le.CallForwardingIndicator = PhoneFinder_Services.Functions.CallForwardingDesc(1),
 			                                   le.CallForwardingIndicator , 
 			                                   ri.CallForwardingIndicator);
-			SELF.PhoneStatus	            := IF(le.phonestatus = PhoneFinder_Services.Constants.PhoneStatus.NotAvailable,ri.phonestatus,le.phonestatus);
+			SELF.PhoneStatus	                := IF(le.phonestatus = PhoneFinder_Services.Constants.PhoneStatus.NotAvailable,ri.phonestatus,le.phonestatus);    
+   SELF.carrier_name                := IF(le.carrier_name != '', le.carrier_name, ri.carrier_name);
+   SELF.phone_region_city           := IF(le.phone_region_city != '', le.phone_region_city, ri.phone_region_city);
+   SELF.phone_region_st             := IF(le.phone_region_st != '', le.phone_region_st, ri.phone_region_st);   
 			SELF                 		       := le;
 		END;		
 		dPhoneRollup := ROLLUP(dPhoneSort,
