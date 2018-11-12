@@ -53,7 +53,8 @@ EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod
                      SELF.Account_Closure_Basis := IF(LEFT.Account_Closure_Basis != '', LEFT.Account_Closure_Basis, RIGHT.Account_Closure_Basis),
                      SELF                       := LEFT // always keep the most recent record
                     ));
-	
+     // SBCREDIT ADD											
+	EXPORT TradeRecs_dedup_Count := COUNT(TradeRecs_dedup);
  	SHARED TradeRecs_Active := TradeRecs_dedup(recent_activity_indicator = 'Y');
 	SHARED TradeRecs_Active_AC_Open := TradeRecs_dedup(date_account_closed = '' AND
                                       // RQ-13023
@@ -259,7 +260,9 @@ EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod
 	past_7_year_creditutil_tab_sort := SORT(past_7_year_creditutil_tab, #EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()), -year);
 
 	PaymentHistoryRecs := DEDUP(SORT(TradeRecs_Raw,#EXPAND(BusinessCredit_Services.Macros.mac_ListBusAccounts()) , -cycle_end_date), cycle_end_date);
-	
+	 
+	setofContributorIDs :=  Std.Str.SplitWords(inmod.SBFEContributorIds, BusinessCredit_Services.Constants.Delimiter); // creates a set of contributor IDs;
+								
 	iesp.businesscreditreport.t_BusinessCreditAccountPaymentHistory trans_paymenthistory (PaymentHistoryRecs L ) := TRANSFORM
 
 		paymentStatus := BusinessCredit_Services.Functions.fn_WorstStatus(L.Date_Account_Closed, L.Account_Closure_Basis, L.Account_Status_1, L.Account_Status_2, L.Payment_Status_Category);
@@ -275,6 +278,7 @@ EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod
 																										AND STD.Str.Contains(paymentStatus, 'Overdue', TRUE);
 	END;
 
+      
 	iesp.businesscreditreport.t_BusinessCreditAccountDetail trans_AccDetail (TradeRecs_dedup L) := TRANSFORM
     // Not being used anywhere in the code
 		// currentStatus 					:= BusinessCredit_Services.Functions.fn_WorstStatus(L.Date_Account_Closed, L.Account_Closure_Basis, L.Account_Status_1, L.Payment_Status_Category);
@@ -313,20 +317,114 @@ EXPORT fn_getBuzCreditTrades (BusinessCredit_Services.Iparam.reportrecords inmod
 		SELF.GovernmentGuaranteedCategory :=	BusinessCredit_Services.Functions.fn_GovernmentGuaranteedCategoryDesc(L.Government_Guarantee_Category);
 		SELF.NumberOfGuarantors						:=	L.Number_Of_Guarantors;
 		SELF.YearlyCreditUtils						:=	CHOOSEN(PROJECT(past_7_year_creditutil_tab_sort(Sbfe_Contributor_Number = L.Sbfe_Contributor_Number and 
-																																													Contract_Account_Number = L.Contract_Account_Number and
-																																													Account_Type_Reported 	= L.Account_Type_Reported), 
+																														                    Contract_Account_Number = L.Contract_Account_Number and
+																																	    Account_Type_Reported 	= L.Account_Type_Reported), 
 																									iesp.businesscreditreport.t_BusinessYearlyCreditUtilized), BusinessCredit_Services.Constants.MAX_YEARLY_CREDIT_UTIL);
-		SELF.AccountPaymentHistory				:= 	CHOOSEN(PROJECT(PaymentHistoryRecs (Sbfe_Contributor_Number = L.Sbfe_Contributor_Number and 
-																																							Contract_Account_Number = L.Contract_Account_Number and
-																																							Account_Type_Reported = L.Account_Type_Reported) ,
-																																							trans_paymenthistory(LEFT)), BusinessCredit_Services.Constants.MAX_PAYMENT_HISTORY);
+		tmpAccountPaymentHistory :=  PROJECT(PaymentHistoryRecs (Sbfe_Contributor_Number = L.Sbfe_Contributor_Number and 
+																							Contract_Account_Number = L.Contract_Account_Number and
+																							Account_Type_Reported = L.Account_Type_Reported) ,
+																						      trans_paymenthistory(LEFT));
+		// SBCREDIT ADD here till end of transform
+		SELF.AccountPaymentHistory := if (inmod.LimitPaymentHistory24Months, 
+													CHOOSEN(tmpAccountPaymentHistory,BusinessCredit_Services.Constants.TWO_YR_PAYMENT_HISTORY),
+													CHOOSEN(tmpAccountPaymentHistory, BusinessCredit_Services.Constants.MAX_PAYMENT_HISTORY)
+													);
+           																															
+		 SELF.PaymentStatus :=  tmpAccountPaymentHistory[1].PaymentStatus; 
+		 SELF.ChargedOff  :=    if ( L.Account_Status_1 IN BusinessCredit_Services.Constants.SET_CHARGEOFF_STATUS OR
+                                                             L.Account_Status_2 IN BusinessCredit_Services.Constants.SET_CHARGEOFF_STATUS OR
+											  (UNSIGNED) L.amount_charged_off_by_creditor > 0 OR
+											  (UNSIGNED) L.total_charge_off_recoveries_to_date > 0 OR
+											  (UNSIGNED) L.Charge_Off_Type_Indicator > 0 OR
+						( ((UNSIGNED)L. date_account_was_charged_off != 0 AND (UNSIGNED4) TRIM(L.date_account_was_charged_off,LEFT,RIGHT) <= todaysDate)),
+						                             'Y','N');          																		
+           SELF.ChargedOffDate :=      iesp.ecl2esp.ToDateString8(L.Date_account_was_charged_Off);
+		SELF.ChargedOffAmount := L.Amount_charged_off_by_creditor;
+		SELF.ChargedOffType.Code := L.charge_off_type_indicator;
+		SELF.ChargedOffType.Description:= Map(L.charge_off_type_indicator = '001' => BusinessCredit_Services.Constants.PrincipalOnly,
+												                     L.charge_off_type_indicator = '002' => BusinessCredit_Services.Constants.PrincipalAndInterest,
+												                     L.charge_off_type_indicator = '003' => BusinessCredit_Services.Constants.AmountEqualToBadDebtReserve,
+												            '');       											
+          SELF.TotalChargedOffRecoveries :=  L.total_charge_off_recoveries_to_date;
+																												 
+           SELF.UniqueAccountDetailNumber := hash64(L.Sbfe_Contributor_Number, L.Contract_Account_Number,  L.Account_Type_Reported);
+					                                                                              
+					                                                   // since this rollup based on initial value of TradeRecs_dedup which is already rolledup 
+														   // on these 3 fields (L.Sbfe_Contributor_Number, L.Contract_Account_Number,  L.Account_Type_Reported,)															 
+					                                               
+			   SELF.ContributedByInquirer := IF (EXISTS(setofContributorIDs),
+				                                                         IF (L.Sbfe_Contributor_Number in setofContributorIDs, 'Y', 'N'),
+													        '');  // need to keep this as a string so that it can be Y or N or '' (roxie no output tag if null)
+															// so then esp will not  output tag.
+				 
+																							
 	END;
-
+	
 	AccDetail_Recs 				         := PROJECT(TradeRecs_dedup , trans_AccDetail(LEFT));
-	EXPORT AccDetail_Recs_Combined := 
-    CHOOSEN(SORT(AccDetail_Recs, 
-                 BusinessCredit_Services.Functions.fn_AccountStatus_sort_order(AccountStatus), 
-                 -AccountReportedDate , RECORD), 
-            iesp.Constants.BusinessCredit.MaxTradelines); 
-
+	
+	  // logic added here to get a max 50 of recs with chargedOff = 'Y' to top. always get at least 10 if available and keep at top.  If more than 10 then if any left after
+		// (50- non charge off recs ) put that set of recs at bottom
+		//   If there are no recs = chargeoff ='N' then just output as many chargeoff = 'Y' as possible up to 50.
+	  AccDetail_recsChargedOff := sort (AccDetail_Recs(ChargedOff = 'Y'), -AccountReportedDate, RECORD);
+	  AccDetail_recsNoChargedOff := sort(AccDetail_Recs(ChargedOff = 'N'), BusinessCredit_Services.Functions.fn_AccountStatus_sort_orderCreditTrades(AccountStatus),
+																											  -AccountReportedDate);
+	  AccDetail_recsNumChargedOffToKeep := IF (COUNT(AccDetail_recsChargedOff) < BusinessCredit_Services.Constants.TOTALTRADELINECOUNT, 
+		                                                              COUNT(AccDetail_recsChargedOff), BusinessCredit_Services.Constants.TOTALTRADELINECOUNT);
+       countNonChargeOffRecs := Count(AccDetail_recsNoChargedOff);
+	   MoreThanTenChargeOffs := AccDetail_recsNumChargedOffToKeep > BusinessCredit_Services.Constants.topchargeoffCount; 
+		 
+	  AccDetail_recsNumNoChargedOffToKeep :=   IF (EXISTS(AccDetail_recsChargedOff),		
+		                                                                                 IF ( (AccDetail_recsNumChargedOffToKeep <= BusinessCredit_Services.Constants.TOTALTRADELINECOUNT)  AND (~(MoreThanTenChargeOffs)),									
+																			     (BusinessCredit_Services.Constants.TOTALTRADELINECOUNT - AccDetail_recsNumChargedOffToKeep),
+																					 IF  (MoreThanTenChargeOffs,																					       											
+																							countNonChargeOffRecs, 
+																						0)																																																																																														                     												  																																																											     
+																	    ),
+																	BusinessCredit_Services.Constants.TOTALTRADELINECOUNT
+																 );																																																																				
+																									 
+          NumChargeOffsToPutOnEnd :=  IF (MoreThanTenChargeOffs AND (AccDetail_recsNumNoChargedOffToKeep >=  (BusinessCredit_Services.Constants.TOTALTRADELINECOUNT -  BusinessCredit_Services.Constants.topchargeoffCount)),
+														0,
+													               IF ( MoreThanTenChargeOffs  AND (AccDetail_recsNumNoChargedOffToKeep < (BusinessCredit_Services.Constants.TOTALTRADELINECOUNT -  BusinessCredit_Services.Constants.topchargeoffCount)),					                                                                
+                                                                                             BusinessCredit_Services.Constants.TOTALTRADELINECOUNT -  AccDetail_recsNumNoChargedOffToKeep - BusinessCredit_Services.Constants.topchargeoffCount,																																					
+																	0)
+															);
+					                                   
+           ChargeOffsRecsToPutOnEnd :=  if (MoreThanTenChargeOffs,
+					                                              JOIN(CHOOSEN(AccDetail_recsChargedOff,BusinessCredit_Services.Constants.TOTALTRADELINECOUNT), 
+					                                                   CHOOSEN(AccDetail_recsChargedOff,BusinessCredit_Services.Constants.topchargeoffCount), 
+														    LEFT.UniqueAccountDetailNumber = RIGHT.UniqueAccountDetailNumber,
+														   TRANSFORM(iesp.businesscreditreport.t_BusinessCreditAccountDetail,
+															     SELF := LEFT), LEFT ONLY)
+													       ,
+														dataset ([], iesp.businesscreditreport.t_BusinessCreditAccountDetail)
+														);
+         					                                                         
+		// still need to sort within here by status 
+		 FinalAccDetail_recs := if ( ~(MoreThanTenChargeOffs),
+		                                                   CHOOSEN(SORT(AccDetail_recsChargedOff,  -AccountReportedDate, RECORD),AccDetail_recsNumChargedOffToKeep) & 
+		                                                   CHOOSEN(SORT(AccDetail_recsNoChargedOff,  BusinessCredit_Services.Functions.fn_AccountStatus_sort_orderCreditTrades(AccountStatus),
+																											  -AccountReportedDate, RECORD),
+																											 AccDetail_recsNumNoChargedOffToKeep),
+											// else case									 					 
+											CHOOSEN(SORT(AccDetail_recsChargedOff,  -AccountReportedDate, RECORD),BusinessCredit_Services.Constants.topchargeoffCount) & 
+											CHOOSEN(SORT(AccDetail_recsNoChargedOff, BusinessCredit_Services.Functions.fn_AccountStatus_sort_orderCreditTrades(AccountStatus),
+																											  -AccountReportedDate, RECORD), AccDetail_recsNumNoChargedOffToKeep) &											
+                                                          CHOOSEN(SORT(ChargeOffsRecsToPutOnEnd, -AccountReportedDate),		NumChargeOffsToPutOnEnd)																												
+														);
+																												
+             // c_AccDetail_recsChargedOff := count(AccDetail_recsChargedOff);
+		   // c_AccDetail_recsNoChargedOff := count(AccDetail_recsNoChargedOff);
+            // output(MoreThanTenChargeOffs, named('MoreThanTenChargeOffs'));											
+						// output(AccDetail_recsNumNoChargedOffToKeep, named('AccDetail_recsNumNoChargedOffToKeep'));
+						// output(NumChargeOffsToPutOnEnd ,named('NumChargeOffsToPutOnEnd'));
+						// output(c_AccDetail_recsChargedOff, named('c_AccDetail_recsChargedOff'));
+						// output(c_AccDetail_recsNoChargedOff, named('count_AccDetail_recsNoChargedOff'));
+						
+           // output(CHOOSEN(AccDetail_recsChargedOff,50), named('first3'));
+		// output(CHOOSEN(AccDetail_recsChargedOff,2), named('first2')); 		
+		// output(ChargeOffsRecsToPutOnEnd, named('ChargeOffsRecsToPutOnEnd'));
+	 // added coding for pushing chargeoff recs to top of heap..
+	 
+	EXPORT   AccDetail_Recs_Combined :=   CHOOSEN( FinalAccDetail_recs,  iesp.Constants.BusinessCredit.MaxTradelines);							            
 END;

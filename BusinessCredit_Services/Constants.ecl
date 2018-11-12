@@ -13,6 +13,11 @@ EXPORT Constants := MODULE
 		EXPORT INTEGER 		SIX_MONTHS							:= -180;
 		EXPORT INTEGER 		NINE_MONTHS							:= -270;
 		EXPORT INTEGER 		ONE_YEAR								:= -365; 
+		
+		EXPORT UNSIGNED1	TWO_YR_PAYMENT_HISTORY      := 24;  // Small Bus credit Report SBFE Addition
+		EXPORT UNSIGNED1  TOPCHARGEOFFCOUNT := 10; // Small Bus credit Report SBFE Addition
+		EXPORT UNSIGNED1  TOTALTRADELINECOUNT := 50; // Small Bus credit Report SBFE Addition
+
 		EXPORT UNSIGNED2 	DBT_MIN_RANGE						:= 0;
 		EXPORT UNSIGNED2 	DBT_MAX_RANGE						:= 105;
 		EXPORT STRING3		MIN_SCORE_RANGE					:= '0';
@@ -63,9 +68,13 @@ EXPORT Constants := MODULE
 		  END;
     EXPORT SET OF STRING EXCLUDED_EXPERIAN_SRC  := [MDR.sourceTools.src_EBR, MDR.sourceTools.src_Experian_CRDB];  //experian source removal
      
-    EXPORT SET OF STRING Closed_Account_Status_Codes := ['002','003','004','005','008','009','011','016','017','018','022'];
-		
+    EXPORT SET OF STRING Closed_Account_Status_Codes := ['002','003','004','005','008','009','011','016','017','018','022'];	
+			
 		EXPORT STRING3 NO_HIT_SCORE := '222';
 		
 		EXPORT UNSIGNED2 BIPID_WEIGHT_THRESHOLD := 44;
+		EXPORT STRING20 PrincipalOnly:= 'Principal Only';
+		EXPORT  STRING30 PrincipalAndInterest := 'Principal and Interest';
+		EXPORT STRING35 AmountEqualToBadDebtReserve  := 'Amount Equal to Bad Debt Reserve';
+		EXPORT STRING1 Delimiter := '|';
 END;
