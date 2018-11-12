@@ -1,11 +1,11 @@
-﻿	use := record
-		string use {xpath('./')};
+﻿	use_record := record
+		string use_value {xpath('./')};
 		string use_abbreviation {xpath('./@abbreviation')};
 	end;
 
 	layout_usage := record
 		string usage_all 	{xpath('@all')};
-		dataset(use) use 	{xpath('use')};
+		dataset(use_record) use_type 	{xpath('use')};
 	end;
 
 	routing_code := record
