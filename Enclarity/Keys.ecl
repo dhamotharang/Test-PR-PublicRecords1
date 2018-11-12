@@ -6,11 +6,21 @@ export Keys(string		pversion							= '',boolean pUseProd = false) := module
 	shared fac_Base_gk							:= facility_Base(group_key <> '');
 	shared fac_Base_ak							:= facility_Base(addr_key <> '');
 
-	shared individual_Base					:= Files(pversion,pUseProd).individual_Base.Built;
+	shared revised_ind_layout	:= record
+		Enclarity.Layouts.individual_base - 
+				[xadl2_weight, xadl2_score, xadl2_distance, xadl2_keys_used, xadl2_keys_desc, xadl2_matches, xadl2_matches_desc];
+	end;
+	
+	shared individual_Base					:= project(Files(pversion,pUseProd).individual_Base.Built, revised_ind_layout);
 	shared ind_Base_gk							:= individual_Base(group_key <> '');
 	shared ind_Base_lnpid						:= individual_Base(lnpid > 0);
 
-	shared associate_Base						:= Files(pversion,pUseProd).associate_Base.Built;
+	shared revised_assoc_layout	:= record
+		Enclarity.Layouts.associate_base - 
+				[xadl2_weight, xadl2_score, xadl2_distance, xadl2_keys_used, xadl2_keys_desc, xadl2_matches, xadl2_matches_desc];
+	end;
+
+	shared associate_Base						:= project(Files(pversion,pUseProd).associate_Base.Built, revised_assoc_layout);
 	shared assoc_Base_gk						:= associate_Base(group_key <> '');
 	shared assoc_Base_ak						:= associate_Base(addr_key <> '');
 	shared assoc_Base_bill_tin			:= dedup(associate_Base((unsigned)bill_tin > 0),bill_tin,group_key,sloc_group_key,billing_group_key,all);
@@ -37,7 +47,6 @@ export Keys(string		pversion							= '',boolean pUseProd = false) := module
 	make_lic_base	:= 									Update_Base(pversion,pUseProd).Modified_License_Base; 
 	
 	shared license_base							:= make_lic_base;  
-	// shared license_base							:= dataset('~thor_data400::base::enclarity::modified_license_persist_for_keys::' + pversion, enclarity.Layouts.license_base, thor);
 	shared lic_Base_gk							:= license_Base(group_key <> '');
 	shared lic_Base_lic							:= license_Base(lic_num_in <> '');
 
