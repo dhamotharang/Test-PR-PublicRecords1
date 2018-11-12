@@ -260,9 +260,8 @@ donotmail_key := dma.key_DNM_Name_Address;
 	withInfutor_thor := join(distribute(rolledDeceased, did), 
 													 distribute(pull(ProfileBooster.Key_Infutor_DID), did),
 		left.DID = right.DID, 
-		getInfutor(left,right), left outer, keep(1), local)
-	// ;	
-	: PERSIST('~PROFILEBOOSTER::with_infutor_thor_full'); // remove persists because low on disk space and it's rebuilding persist file each time anyway
+		getInfutor(left,right), left outer, keep(1), local);
+	// : PERSIST('~PROFILEBOOSTER::with_infutor_thor_full'); // remove persists because low on disk space and it's rebuilding persist file each time anyway
 	
 	withInfutor := if(onThor, withInfutor_thor, withInfutor_roxie);
 	
@@ -706,7 +705,7 @@ end;
 																	self.HHInterestSportPersonMmbrCnt 	:= if(left.rec_type in [ProfileBooster.Constants.recType.Prospect,ProfileBooster.Constants.recType.Household] and right.sportsInterest = 1, 1, 0);  
 																	self.RaAInterestSportPersonMmbrCnt	:= if(left.rec_type = ProfileBooster.Constants.recType.Relative and right.sportsInterest = 1, 1, 0); 
 																	self := left), left outer, parallel);
-	with_Sports_thor := withSports_temp : PERSIST('~PROFILEBOOSTER::with_Sports_thor') ;  // try adding another stopping point here to help out  // remove persists because low on disk space and it's rebuilding persist file each time anyway
+	with_Sports_thor := withSports_temp; //: PERSIST('~PROFILEBOOSTER::with_Sports_thor') ;  // try adding another stopping point here to help out  // remove persists because low on disk space and it's rebuilding persist file each time anyway
 	withSports := if(onThor, with_Sports_thor, withSports_temp);																	
 
 
