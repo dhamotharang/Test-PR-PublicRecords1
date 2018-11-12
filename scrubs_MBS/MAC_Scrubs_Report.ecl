@@ -77,7 +77,7 @@ EXPORT MAC_Scrubs_Report(BuildDate,myFolder,scopename,inputFile,MemailList)	:=	F
 	//This will output a file with bitmap(s) and a processed file with all on fail flags activated for the rules
 	bitfile_name		:=	'~thor_data::'+scope_datasetName+'_Scrubs_Bits';
 	processedfile_name		:=	'~thor_data::'+scope_datasetName+'_Processed_File';
-	CreateBitmaps		:=	OUTPUT( N.BitmapInfile,,bitfile_name, OVERWRITE, compressed, named(scope_datasetName+'_BitFile_'+filedate)); // long term storage
+	CreateBitmaps		:=	OUTPUT( N.BitmapInfile,,bitfile_name, OVERWRITE, compressed, named(scope_datasetName+'_BitFile')); // long term storage
 	DS  := DATASET(bitfile_name,S.Bitmap_Layout,FLAT); // Read in my data (which has bitmap appended
 	//This will translate the bitmap(s)
 	T := S.FromBits(DS);	// Use the FromBits module; makes my bitmap datafile easier to get to read
@@ -85,7 +85,7 @@ EXPORT MAC_Scrubs_Report(BuildDate,myFolder,scopename,inputFile,MemailList)	:=	F
 	NumRemovedRecs := '';
 	WU := '';
 	new_entry:=dataset([{DatasetName,ProfileName,scopename,filedate,TotalRecs,NumRules,NumFailedRules,ErroredRecords,TotalRemovedRecs,PcntErroredRec,NumRemovedRecs,WU,workunit}],Scrubs.Layouts.LogRecord);
-	outnew:=output(new_entry,named(scope_datasetName+'_LogEntry_'+filedate));
+	outnew:=output(new_entry,named(scope_datasetName+'_LogEntry'));
 
 	EmailReport:=if(MemailList <>'' , fileservices.sendEmail(MemailList,
 																			'Scrubs Plus Reporting '+ProfileName,
@@ -110,7 +110,7 @@ EXPORT MAC_Scrubs_Report(BuildDate,myFolder,scopename,inputFile,MemailList)	:=	F
 	Super_Log_File	:='~thor_data400::Scrubs_MBS::MBS::Log';
 	SuperFile_Entries	:=	dataset(Super_Log_File,Scrubs.Layouts.LogRecord,thor,opt);
 	
-	Create_New_File	:=	sequential(output(SuperFile_Entries+new_entry,,Super_Log_File+'_temp',thor,overwrite,named(scope_datasetName+'_LogEntryFull_'+filedate)),
+	Create_New_File	:=	sequential(output(SuperFile_Entries+new_entry,,Super_Log_File+'_temp',thor,overwrite,named(scope_datasetName+'_LogEntryFull')),
 																																																						 STD.File.StartSuperFileTransaction(),
 																																																						 STD.File.RemoveSuperFile(SuperFile,Super_Log_File,true),
 																																																						 STD.File.FinishSuperFileTransaction());
