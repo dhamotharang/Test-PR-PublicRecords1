@@ -1,5 +1,5 @@
 ﻿// #workunit('name','HeaderIngestSetup');
-IMPORT wk_ut,STD,dops,ut,_control,zz_gmarcan,Header;
+IMPORT wk_ut,STD,dops,ut,_control,Header;
 
 EXPORT BWR_IngestSetup(string emailList, boolean skip_action=true) := FUNCTION
 
@@ -231,10 +231,10 @@ no_update := project(wk_ut.get_DS_Result(workunit,'input_did_NOT_make_prod_yet',
 yes_update := project(wk_ut.get_DS_Result(workunit,'inputs_made_it_to_prod',recReport),
                      {recordof(LEFT) AND NOT {LEFT.superfilename, LEFT._wuid}});
 
-part1 := zz_gmarcan.mac_convertDs.toHTML(no_update,roxie_package_name,current_prod_roxie_version,
+part1 := header.mac_convertDs.IngestSetuptoHTML(no_update,roxie_package_name,current_prod_roxie_version,
                                               pre_reset_header_building,logical_file_name);
 
-part2 := zz_gmarcan.mac_convertDs.toHTML(yes_update,logical_file_name,pre_reset_header_building,
+part2 := header.mac_convertDs.IngestSetuptoHTML(yes_update,logical_file_name,pre_reset_header_building,
                                             roxie_package_name,current_prod_roxie_version,
                                             current_prod_roxie_cert_deployment_datetime,base_file_time_stamp);
 
