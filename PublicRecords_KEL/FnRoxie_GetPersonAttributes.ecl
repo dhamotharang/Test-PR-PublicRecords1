@@ -31,18 +31,18 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Attr_
 	PersonAttributesWithLexID := JOIN(RecordsWithLexID, PersonAttributesClean, LEFT.InputUIDAppend = RIGHT.InputUIDAppend AND LEFT.LexidAppend = RIGHT.LexID, 
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Attr_Layout,
 			ResultsFound := RIGHT.LexID > 0;
-			SELF.FelonyCnt1Y := IF(ResultsFound, RIGHT.FelonyCnt1Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
-			SELF.FelonyCnt7Y := IF(ResultsFound, RIGHT.FelonyCnt7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
+			SELF.FelonyCnt1Y := RIGHT.FelonyCnt1Y;
+			SELF.FelonyCnt7Y := RIGHT.FelonyCnt7Y;
 			SELF.FelonyNew1Y := IF(ResultsFound, (STRING)RIGHT.FelonyNew1Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
 			SELF.FelonyOld1Y := IF(ResultsFound, (STRING)RIGHT.FelonyOld1Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND); 
 			SELF.FelonyNew7Y := IF(ResultsFound, (STRING)RIGHT.FelonyNew7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND); 
 			SELF.FelonyOld7Y := IF(ResultsFound, (STRING)RIGHT.FelonyOld7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
 			SELF.MonSinceNewestFelonyCnt1Y := IF(ResultsFound, (INTEGER)RIGHT.MonSinceNewestFelonyCnt1Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
 			SELF.MonSinceOldestFelonyCnt1Y := IF(ResultsFound, (INTEGER)RIGHT.MonSinceOldestFelonyCnt1Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
-			SELF.MonSinceNewestFelonyCnt7Y := IF(ResultsFound, (INTEGER)RIGHT.MonSinceNewestFelonyCnt7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
+			SELF.MonSinceNewestFelonyCnt7Y := IF(ResultsFound, (INTEGER)RIGHT.MonSinceNewestFelonyCnt7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT); 
 			SELF.MonSinceOldestFelonyCnt7Y := IF(ResultsFound, (INTEGER)RIGHT.MonSinceOldestFelonyCnt7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
-			SELF.NonFelonyCnt1Y := IF(ResultsFound, RIGHT.NonFelonyCnt1Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
-			SELF.NonFelonyCnt7Y := IF(ResultsFound, RIGHT.NonFelonyCnt7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
+			SELF.NonFelonyCnt1Y := RIGHT.NonFelonyCnt1Y;
+			SELF.NonFelonyCnt7Y := RIGHT.NonFelonyCnt7Y;
 			SELF.NonfelonyNew1Y := IF(ResultsFound, (STRING)RIGHT.NonfelonyNew1Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
 			SELF.NonfelonyOld1Y := IF(ResultsFound, (STRING)RIGHT.NonfelonyOld1Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
 			SELF.NonfelonyNew7Y := IF(ResultsFound, (STRING)RIGHT.NonfelonyNew7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
@@ -82,8 +82,8 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Attr_
 			SELF.MonSinceOldestArrestCnt7Y := MAP(Options.IsFCRA 				=> 0,
 															NOT Options.IsFCRA AND ResultsFound => (INTEGER)RIGHT.MonSinceOldestArrestCnt7Y, 
 																																		 PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
-			SELF.CrimCnt1Y := IF(ResultsFound, RIGHT.CrimCnt1Y, 0);
-			SELF.CrimCnt7Y := IF(ResultsFound, RIGHT.CrimCnt7Y, 0);
+			SELF.CrimCnt1Y := RIGHT.CrimCnt1Y;
+			SELF.CrimCnt7Y := RIGHT.CrimCnt7Y;
 			SELF.CrimNew1Y := IF(ResultsFound, (STRING)RIGHT.CrimNew1Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
 			SELF.CrimOld1Y := IF(ResultsFound, (STRING)RIGHT.CrimOld1Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
 			SELF.CrimNew7Y := IF(ResultsFound, (STRING)RIGHT.CrimNew7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
@@ -92,8 +92,8 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Attr_
 			SELF.MonSinceOldestCrimCnt1Y := IF(ResultsFound, (INTEGER)RIGHT.MonSinceOldestCrimCnt1Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
 			SELF.MonSinceNewestCrimCnt7Y := IF(ResultsFound, (INTEGER)RIGHT.MonSinceNewestCrimCnt7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
 			SELF.MonSinceOldestCrimCnt7Y := IF(ResultsFound, (INTEGER)RIGHT.MonSinceOldestCrimCnt7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
-			SELF.CrimSeverityIndex7Y := IF(ResultsFound, (STRING)RIGHT.CrimSeverityIndex7Y, '0');
-			SELF.CrimBehaviorIndex7Y := IF(ResultsFound, (STRING)RIGHT.CrimBehaviorIndex7Y, '0');
+			SELF.CrimSeverityIndex7Y := (STRING)RIGHT.CrimSeverityIndex7Y;
+			SELF.CrimBehaviorIndex7Y := (STRING)RIGHT.CrimBehaviorIndex7Y;
 			SELF := LEFT;
 		),LEFT OUTER, KEEP(1)); 
 	

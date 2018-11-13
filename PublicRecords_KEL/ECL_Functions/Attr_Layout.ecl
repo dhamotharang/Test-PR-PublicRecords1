@@ -29,29 +29,29 @@ EXPORT Attr_Layout := RECORD
 	STRING10 InputHomePhoneClean;
 	STRING10 InputWorkPhoneClean;
 	STRING20 InputArchiveDateClean;
-	STRING3 InputPrefixCleanPop,
-	STRING3 InputFirstNameCleanPop,
-	STRING3 InputSuffixCleanPop,
-	STRING3 InputPrimaryRangeCleanPop,
-	STRING3 InputPreDirectionCleanPop,
-	STRING3 InputPrimaryNameCleanPop,
-	STRING3 InputAddressSuffixCleanPop,
-	STRING3 InputPostDirectionCleanPop,
-	STRING3 InputUnitDesigCleanPop,
-	STRING3 InputSecondaryRangeCleanPop,
-	STRING3 InputCityCleanPop, 
-	STRING3 InputStateCleanPop,
-	STRING3 InputZip5CleanPop,
-	STRING3 InputZip4CleanPop,
-	STRING3 InputLatitudeCleanPop,
-	STRING3 InputLongitudeCleanPop,
-	STRING3 InputCountyCleanPop,
-	STRING3 InputGeoblockCleanPop,
-	STRING3 InputAddressTypeCleanPop,
-	STRING3 InputAddressStatusCleanPop,
-	STRING3 InputEmailCleanPop,
-	STRING3 InputHomePhoneCleanPop,
-	STRING3 InputWorkPhoneCleanPop,
+	STRING3 InputPrefixCleanPop;
+	STRING3 InputFirstNameCleanPop;
+	STRING3 InputSuffixCleanPop;
+	STRING3 InputPrimaryRangeCleanPop;
+	STRING3 InputPreDirectionCleanPop;
+	STRING3 InputPrimaryNameCleanPop;
+	STRING3 InputAddressSuffixCleanPop;
+	STRING3 InputPostDirectionCleanPop;
+	STRING3 InputUnitDesigCleanPop;
+	STRING3 InputSecondaryRangeCleanPop;
+	STRING3 InputCityCleanPop;
+	STRING3 InputStateCleanPop;
+	STRING3 InputZip5CleanPop;
+	STRING3 InputZip4CleanPop;
+	STRING3 InputLatitudeCleanPop;
+	STRING3 InputLongitudeCleanPop;
+	STRING3 InputCountyCleanPop;
+	STRING3 InputGeoblockCleanPop;
+	STRING3 InputAddressTypeCleanPop;
+	STRING3 InputAddressStatusCleanPop;
+	STRING3 InputEmailCleanPop;
+	STRING3 InputHomePhoneCleanPop;
+	STRING3 InputWorkPhoneCleanPop;
 	STRING3 InputArchiveDateCleanPop;
 	// Criminal History Felony
 	INTEGER2 FelonyCnt1Y;
@@ -78,10 +78,10 @@ EXPORT Attr_Layout := RECORD
 	// Criminal History - Arrest
 	INTEGER2 ArrestCnt1Y;
 	INTEGER2 ArrestCnt7Y;
-	STRING ArrestNew1Y;
-	STRING ArrestOld1Y;
-	STRING ArrestNew7Y;
-	STRING ArrestOld7Y;
+	STRING10 ArrestNew1Y;
+	STRING10 ArrestOld1Y;
+	STRING10 ArrestNew7Y;
+	STRING10 ArrestOld7Y;
 	INTEGER1 MonSinceNewestArrestCnt1Y;
 	INTEGER1 MonSinceOldestArrestCnt1Y;
 	INTEGER1 MonSinceNewestArrestCnt7Y,
@@ -89,15 +89,15 @@ EXPORT Attr_Layout := RECORD
 	// Criminal History - Criminal Conviction	
 	INTEGER2 CrimCnt1Y;
 	INTEGER2 CrimCnt7Y;
-	STRING CrimNew1Y;
-	STRING CrimOld1Y;
-	STRING CrimNew7Y;
-	STRING CrimOld7Y;
+	STRING10 CrimNew1Y;
+	STRING10 CrimOld1Y;
+	STRING10 CrimNew7Y;
+	STRING10 CrimOld7Y;
 	INTEGER1 MonSinceNewestCrimCnt1Y;
 	INTEGER1 MonSinceOldestCrimCnt1Y;
 	INTEGER1 MonSinceNewestCrimCnt7Y;
 	INTEGER1 MonSinceOldestCrimCnt7Y;
 	// Criminal History - Others
-	STRING CrimSeverityIndex7Y;
-	STRING CrimBehaviorIndex7Y;
+	STRING5 CrimSeverityIndex7Y;
+	STRING3 CrimBehaviorIndex7Y;
  END;
