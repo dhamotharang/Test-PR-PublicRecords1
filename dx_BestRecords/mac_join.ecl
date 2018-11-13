@@ -4,6 +4,18 @@ EXPORT mac_join (ds, d_field, key, use_dist, left_outer) := FUNCTIONMACRO
 		dx_BestRecords.layout_best _best;
 	END;
 
+#IF (use_dist)
+	LOCAL ds_res := JOIN (DISTRIBUTE (ds, hash64(d_field)), DISTRIBUTE(PULL(key), hash64(did)),
+		(LEFT.d_field = RIGHT.did),           
+		TRANSFORM (out_rec,
+			SELF._best.age := if (RIGHT.dob = 0, 0, ut.age(RIGHT.dob)),
+			SELF._best := RIGHT,
+			SELF := LEFT),
+		#IF (left_outer) 
+			LEFT OUTER,            
+		#END
+		KEEP(1), LIMIT(0), LOCAL);
+#ELSE
 	LOCAL ds_res := JOIN (ds, key,
 		KEYED(LEFT.d_field = RIGHT.did),
 		TRANSFORM (out_rec,
@@ -14,6 +26,7 @@ EXPORT mac_join (ds, d_field, key, use_dist, left_outer) := FUNCTIONMACRO
 			LEFT OUTER,            
 		#END
 		KEEP(1), LIMIT(0));
+#END
 
 	RETURN ds_res;
 
