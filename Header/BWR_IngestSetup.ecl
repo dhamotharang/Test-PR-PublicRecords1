@@ -52,10 +52,10 @@ isNewerOrProdCertDeployAFTERfileWuidBuildEnd(string roxie_package_name, string s
 
         current_prod_roxie_cert_deployment_datetime := toIso8601(current_prod_roxie_cert_deployment_datetime0);
 
-        logical_file_name := '~'+fileservices.SuperFileContents(superfilename)[1].name;
-        hdr_ingst_building_content := '~'+fileservices.SuperFileContents(buildingSuperfilename)[1].name;
+        logical_file_name := '~'+nothor(fileservices.SuperFileContents(superfilename)[1].name);
+        hdr_ingst_building_content := '~'+nothor(fileservices.SuperFileContents(buildingSuperfilename)[1].name);
         
-        _wuid := when(STD.File.GetLogicalFileAttribute(logical_file_name,'workunit'),
+        _wuid := when(nothor(STD.File.GetLogicalFileAttribute(logical_file_name,'workunit')),
                       output(dataset([{superfilename,logical_file_name}],{string sf, string f1}),named(ingest_action + 'f1'),extend),before);
         wuidTimeStamp := STD.System.Workunit.WorkunitTimeStamps(_wuid);
         
@@ -65,7 +65,7 @@ isNewerOrProdCertDeployAFTERfileWuidBuildEnd(string roxie_package_name, string s
 
         // So we use this instead:
         base_file_time_stamp := if(logical_file_name='~','0',
-                                    when(STD.File.GetLogicalFileAttribute(logical_file_name,'modified'),
+                                    when(nothor(STD.File.GetLogicalFileAttribute(logical_file_name,'modified')),
                                      output(dataset([{superfilename,logical_file_name}],{string sf, string f2}),named(ingest_action + 'f2'),extend),before)
                                    );
 
@@ -75,8 +75,8 @@ isNewerOrProdCertDeployAFTERfileWuidBuildEnd(string roxie_package_name, string s
         repNotInProd := if(logical_file_name<>'~',output(ds,named(ingest_action + 'input_did_NOT_make_prod_yet'),extend));
         repYesInProd := if(logical_file_name<>'~',output(ds,named(ingest_action + 'inputs_made_it_to_prod'),extend));
         LikelyInProd :=(base_file_time_stamp<current_prod_roxie_cert_deployment_datetime);
-        currentFileTm:=STD.File.GetLogicalFileAttribute(hdr_ingst_building_content,'modified');
-        possbleFileTm:=STD.File.GetLogicalFileAttribute(logical_file_name,'modified');
+        currentFileTm:=nothor(STD.File.GetLogicalFileAttribute(hdr_ingst_building_content,'modified'));
+        possbleFileTm:=nothor(STD.File.GetLogicalFileAttribute(logical_file_name,'modified'));
         Newer        := possbleFileTm>currentFileTm;
         return  when(Newer and LikelyInProd,
                       if(LikelyInProd,repYesInProd,repNotInProd)
@@ -85,8 +85,8 @@ isNewerOrProdCertDeployAFTERfileWuidBuildEnd(string roxie_package_name, string s
 end;
 
 // Restores the wuid that created the logical file in the given base file
-lgn(string sp_name) := '~'+fileservices.SuperFileContents(sp_name)[1].name;
-_wuid(string sp_name) := STD.File.GetLogicalFileAttribute(lgn(sp_name),'workunit');
+lgn(string sp_name) := '~'+nothor(fileservices.SuperFileContents(sp_name)[1].name);
+_wuid(string sp_name) := nothor(STD.File.GetLogicalFileAttribute(lgn(sp_name),'workunit'));
 restoreWuid(string sp_name) := output(wk_ut.Restore_Workunit(_wuid(sp_name)),named(ingest_action + 'wuids_restore'),extend);
 
 // Reusable call to check packages vs. base file dates
