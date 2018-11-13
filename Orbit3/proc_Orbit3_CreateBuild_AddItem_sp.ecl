@@ -1,8 +1,18 @@
-﻿import  ut,Orbit3,_Control;
-export proc_Orbit3_CreateBuild_AddItem(string buildname,string Buildvs,string Envmt = 'N', boolean skipcreatebuild = false,boolean skipupdatebuild = false, boolean skipaddcomponents = false, boolean runcreatebuild = true, boolean runaddcomponentsonly = false) := function
- return _control.fSubmitNewWorkunit('#workunit(\'name\',\'Orbit Create Build Instance'+ buildname + '-- '+Buildvs+'\');\r\n'+
-																																		 'Orbit3.proc_Orbit3_CreateBuild_AddItem_sp( \''+buildname+'\',  \''+Buildvs+'\', \''+Envmt+'\','+skipcreatebuild+', '+skipupdatebuild+', '+skipaddcomponents+', '+runcreatebuild+', '+runaddcomponentsonly+');'
-																																		  ,_Control.Config.Esp2Hthor(_Control.Config.LocalEsp));
+﻿import ut,Orbit3,_Control;
+export proc_Orbit3_CreateBuild_AddItem_sp(string buildname,string Buildvs,string Envmt = 'N', boolean skipcreatebuild = false,boolean skipupdatebuild = false, boolean skipaddcomponents = false, boolean runcreatebuild = true, boolean runaddcomponentsonly = false) := function
+
+	tokenval := orbit3.GetToken() : independent;
+
+	create_build := orbit3.CreateBuild(buildname,
+									Buildvs,
+									tokenval,		
+									).retcode : independent;
+									
+	get_buildinst := Orbit3.GetBuildInstance(buildname,
+									Buildvs,
+									tokenval,		
+									).retcode : independent;
+									
 	
 									
 	Update_build_1 := Orbit3.UpdateBuildInstance(buildname,
