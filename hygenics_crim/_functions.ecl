@@ -2,9 +2,6 @@
 C:\Users\ChikteVP\AppData\Roaming\HPCC Systems\eclide\vchikte\DATALAND_EOSS_Proxy\hygenics_crim\_functions\2015-01-30T16_17_48Z.ecl
 */
 import ut,STD,_validate;
-             
-                                                                                                                                        
-
 
 export _functions := module
 export StreetAddressToFilter := ['0 05181992','0 BONITA SPRINGS','0 GIVEN','0 IMMOKALEE','0 NAPLES','0 NOIT GIVEN','0 NOT GIVEN 15','0 NOT GIVEN 9204',
@@ -2358,6 +2355,10 @@ map(
 
 //------------------------------------------Hygenics Crim Arrest Phase2 Batch4 ---------------------------------------------- 	
  psourcename = 'KENTUCKY_MONROE_COUNTY_ARRESTS' => '6I',
+//------------------------------------------Hygenics Crim County 20181107 ---------------------------------------------- 
+ psourcename = 'TEXAS_WISE_COUNTY_DISTRICT_COURT                                       ' => '10H',
+//------------------------------------------Hygenics Crimwise DOC 20181107 ---------------------------------------------- 
+ psourcename = 'MINNESOTA_PREDATORY_OFFENDER_REGISTRY                                  ' => '10I', 
 /***************************************************HYGENICS CRIM END************************************************************/ 
 
 /************************************************HYGENICS CRIMWISE START*********************************************************/
@@ -2706,6 +2707,34 @@ map(
  psourcename = 'OHIO_SENECA_COUNTY_TIFFIN_MUNICIPAL_COURT_CW                           ' => 'W0319',
  //AOC                                                                                 
  psourcename = 'KANSAS_OFFENDER_REGISTRY_CW                                            ' => 'W0320',
+ 
+ //------------------------------------------Hygenics Crimwise Arrest 20181107 ----------------------------------------------
+ psourcename = 'CALIFORNIA_SANTA_CRUZ_POLICE_DEPARTMENT_CW                             ' => 'W0321',
+ psourcename = 'FLORIDA_ALACHUA_COUNTY_SHERIFFS_OFFICE_V2_CW                           ' => 'W0322',
+ psourcename = 'FLORIDA_CLAY_COUNTY_SHERIFF_CW                                         ' => 'W0323',
+ psourcename = 'FLORIDA_DIXIE_COUNTY_SHERIFF_CW                                        ' => 'W0324',
+ psourcename = 'INDIANA_HENDRICKS_COUNTY_SHERIFFS_OFFICE_CW                            ' => 'W0325',
+ psourcename = 'INDIANA_PORTER_COUNTY_SHERIFFS_OFFICE_CW                               ' => 'W0326',
+ psourcename = 'MASSACHUSETTS_BROOKLINE_POLICE_DEPARTMENT_CW                           ' => 'W0327',
+ psourcename = 'MASSACHUSETTS_HANOVER_POLICE_DEPARTMENT_CW                             ' => 'W0328',
+ psourcename = 'MASSACHUSETTS_HINGHAM_CW                                               ' => 'W0329',
+ psourcename = 'MASSACHUSETTS_IPSWICH_POLICE_DEPARTMENT_CW                             ' => 'W0330',
+ psourcename = 'MASSACHUSETTS_PEMBROKE_POLICE_DEPARTMENT_CW                            ' => 'W0331',
+ psourcename = 'MASSACHUSETTS_SANDWICH_POLICE_DEPARTMENT_CW                            ' => 'W0332',
+ psourcename = 'MASSACHUSETTS_WAYLAND_POLICE_DEPARTMENT_CW                             ' => 'W0333',
+ psourcename = 'MASSACHUSETTS_WHITMAN_CW                                               ' => 'W0334',
+ psourcename = 'MINNESOTA_HENNEPIN_COUNTY_JAIL_CW                                      ' => 'W0335',
+ psourcename = 'NEW_HAMPSHIRE_LACONIA_POLICE_DEPARTMENT_CW                             ' => 'W0336',
+ psourcename = 'NORTH_CAROLINA_DURHAM_COUNTY_SHERIFFS_OFFICE_CW                        ' => 'W0337',
+ psourcename = 'NORTH_CAROLINA_RUTHERFORD_COUNTY_DETENTION_CENTER_V2_CW                ' => 'W0338',
+ psourcename = 'OREGON_CLACKAMAS_COUNTY_SHERIFF_CW                                     ' => 'W0339',
+ psourcename = 'TEXAS_ANDERSON_COUNTY_JAIL_CW                                          ' => 'W0340',
+ psourcename = 'TEXAS_KNOX_COUNTY_SHERIFF_CW                                           ' => 'W0341',
+ psourcename = 'TEXAS_RANDALL_COUNTY_ARRESTS_CW                                        ' => 'W0342',
+ psourcename = 'TEXAS_WALLER_COUNTY_JAIL_CW                                            ' => 'W0343',
+  //------------------------------------------Hygenics Crimwise County 20181107 ----------------------------------------------
+ psourcename = 'OHIO_CARROLL_COUNTY_COMMON_PLEAS_COURT_CW                              ' => 'W0344',			
+
 
 /************************************************HYGENICS CRIMWISE END*************************************************************/
 
@@ -2754,18 +2783,18 @@ map(
   // psourcename 	=	 'FL SARASOTA CIRCUIT COURT_IE'                                         => '10041', 
   psourcename   =  'WV CIRCUIT COURTS_IE'                                                 => 'I0012',
 //-------------------------------IE DOC Batch 1 20181005 ---------------------------------------------------
-  psourcename = 'CO DEPARTMENT OF CORRECTIONS_IE'                                         => 'I0042',
-  psourcename = 'FL DEPARTMENT OF CORRECTIONS - INMATE_IE'                                => 'I0043',
-  psourcename = 'FL DEPARTMENT OF CORRECTIONS - RELEASE_IE'                               => 'I0044',
-  psourcename = 'FL DEPARTMENT OF CORRECTIONS - SUPERVISED_IE'                            => 'I0045',
-  psourcename = 'NC DEPARTMENT OF CORRECTIONS (SUPERVISION)_IE'                           => 'I0046',
-	psourcename = 'NY DEPARTMENT OF CORRECTIONS RELEASED_IE'                                => 'I0047',
-  psourcename = 'OK VIOLENT CRIME OFFENDER REGISTRY_IE'                                   => 'I0007',  //IE fix DOC?
-  psourcename = 'TX DEPARTMENT OF CORRECTIONS (PAROLE)_IE'                                => 'I0048',
-  psourcename = 'TX DEPARTMENT OF CORRECTIONS (PROBATION)_IE'                             => 'I0049',   
+  // psourcename = 'CO DEPARTMENT OF CORRECTIONS_IE'                                         => 'I0042',
+  // psourcename = 'FL DEPARTMENT OF CORRECTIONS - INMATE_IE'                                => 'I0043',
+  // psourcename = 'FL DEPARTMENT OF CORRECTIONS - RELEASE_IE'                               => 'I0044',
+  // psourcename = 'FL DEPARTMENT OF CORRECTIONS - SUPERVISED_IE'                            => 'I0045',
+  // psourcename = 'NC DEPARTMENT OF CORRECTIONS (SUPERVISION)_IE'                           => 'I0046',
+	// psourcename = 'NY DEPARTMENT OF CORRECTIONS RELEASED_IE'                                => 'I0047',
+  // psourcename = 'OK VIOLENT CRIME OFFENDER REGISTRY_IE'                                   => 'I0007',  //IE fix DOC?
+  // psourcename = 'TX DEPARTMENT OF CORRECTIONS (PAROLE)_IE'                                => 'I0048',
+  // psourcename = 'TX DEPARTMENT OF CORRECTIONS (PROBATION)_IE'                             => 'I0049',   
 	psourcename = 'SD DEPARTMENT OF CORRECTIONS ABSCONDERS_IE'                              => 'I0050',
-  psourcename = 'US FEDERAL BUREAU OF PRISONS FEDERAL INMATE REGISTRY_IE'                 => 'I0051',
-  psourcename = 'UT DEPARTMENT OF CORRECTIONS_IE'                                         => 'I0052',
+  // psourcename = 'US FEDERAL BUREAU OF PRISONS FEDERAL INMATE REGISTRY_IE'                 => 'I0051',
+  // psourcename = 'UT DEPARTMENT OF CORRECTIONS_IE'                                         => 'I0052',
 	
 //-------------------------------IE ARREST Batch 1 20181005 ---------------------------------------------------	
   psourcename = 'NV CLARK ARREST_IE'                                                      => 'I0053',  
@@ -2775,14 +2804,6 @@ map(
 /************************************************IE DATA END*************************************************************/
 																																						 
  '');                                                                            											
-
-
-
-      
-
- 
-         
- 
 
  return vendor;                                                                                       
 end;                                                                                   
