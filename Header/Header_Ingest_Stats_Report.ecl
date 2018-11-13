@@ -1,4 +1,4 @@
-﻿IMPORT data_services, wk_ut, header, ut, zz_gmarcan;
+﻿IMPORT data_services, wk_ut, header, ut;
 
 EXPORT Header_Ingest_Stats_Report(string forceNewVersion = '',unsigned1 percent_nbm_change_threshold = 30) := FUNCTION
 

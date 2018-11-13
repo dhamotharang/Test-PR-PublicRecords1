@@ -3,6 +3,8 @@ IMPORT wk_ut,STD,dops,ut,_control,Header;
 
 EXPORT BWR_IngestSetup(string emailList, boolean skip_action=true) := FUNCTION
 
+ingest_action := if(skip_action, 'After Ingest - ', 'Before Ingest - ');
+
 // Converts the date from 'M?/D?/YYYY H?:M?:S? AM/PM' to ISO8601
 toIso8601(string tf1) := function
 
@@ -50,11 +52,11 @@ isNewerOrProdCertDeployAFTERfileWuidBuildEnd(string roxie_package_name, string s
 
         current_prod_roxie_cert_deployment_datetime := toIso8601(current_prod_roxie_cert_deployment_datetime0);
 
-        logical_file_name := '~'+fileservices.SuperFileContents(superfilename)[1].name;
-        hdr_ingst_building_content := '~'+fileservices.SuperFileContents(buildingSuperfilename)[1].name;
+        logical_file_name := '~'+nothor(fileservices.SuperFileContents(superfilename)[1].name);
+        hdr_ingst_building_content := '~'+nothor(fileservices.SuperFileContents(buildingSuperfilename)[1].name);
         
-        _wuid := when(STD.File.GetLogicalFileAttribute(logical_file_name,'workunit'),
-                      output(dataset([{superfilename,logical_file_name}],{string sf, string f1}),named('f1'),extend),before);
+        _wuid := nothor(when(STD.File.GetLogicalFileAttribute(logical_file_name,'workunit'),
+                      output(dataset([{superfilename,logical_file_name}],{string sf, string f1}),named(ingest_action + 'f1'),extend),before));
         wuidTimeStamp := STD.System.Workunit.WorkunitTimeStamps(_wuid);
         
         // This is too much. For example, if the wuid gets stuck for a long time after the keys are built.
@@ -62,19 +64,19 @@ isNewerOrProdCertDeployAFTERfileWuidBuildEnd(string roxie_package_name, string s
         file_wuid_complete_datetime := max(wuidTimeStamp,time);
 
         // So we use this instead:
-        base_file_time_stamp := if(logical_file_name='~','0',
+        base_file_time_stamp := nothor(if(logical_file_name='~','0',
                                     when(STD.File.GetLogicalFileAttribute(logical_file_name,'modified'),
-                                     output(dataset([{superfilename,logical_file_name}],{string sf, string f2}),named('f2'),extend),before)
-                                   );
+                                     output(dataset([{superfilename,logical_file_name}],{string sf, string f2}),named(ingest_action + 'f2'),extend),before)
+                                   ));
 
         ds := dataset([{superfilename,logical_file_name,hdr_ingst_building_content,roxie_package_name,current_prod_roxie_version+'<<',
                                   current_prod_roxie_cert_deployment_datetime,_wuid, base_file_time_stamp}],
                         recReport);
-        repNotInProd := if(logical_file_name<>'~',output(ds,named('input_did_NOT_make_prod_yet'),extend));
-        repYesInProd := if(logical_file_name<>'~',output(ds,named('inputs_made_it_to_prod'),extend));
+        repNotInProd := if(logical_file_name<>'~',output(ds,named(ingest_action + 'input_did_NOT_make_prod_yet'),extend));
+        repYesInProd := if(logical_file_name<>'~',output(ds,named(ingest_action + 'inputs_made_it_to_prod'),extend));
         LikelyInProd :=(base_file_time_stamp<current_prod_roxie_cert_deployment_datetime);
-        currentFileTm:=STD.File.GetLogicalFileAttribute(hdr_ingst_building_content,'modified');
-        possbleFileTm:=STD.File.GetLogicalFileAttribute(logical_file_name,'modified');
+        currentFileTm:=nothor(STD.File.GetLogicalFileAttribute(hdr_ingst_building_content,'modified'));
+        possbleFileTm:=nothor(STD.File.GetLogicalFileAttribute(logical_file_name,'modified'));
         Newer        := possbleFileTm>currentFileTm;
         return  when(Newer and LikelyInProd,
                       if(LikelyInProd,repYesInProd,repNotInProd)
@@ -83,9 +85,9 @@ isNewerOrProdCertDeployAFTERfileWuidBuildEnd(string roxie_package_name, string s
 end;
 
 // Restores the wuid that created the logical file in the given base file
-lgn(string sp_name) := '~'+fileservices.SuperFileContents(sp_name)[1].name;
-_wuid(string sp_name) := STD.File.GetLogicalFileAttribute(lgn(sp_name),'workunit');
-restoreWuid(string sp_name) := output(wk_ut.Restore_Workunit(_wuid(sp_name)),named('wuids_restore'),extend);
+lgn(string sp_name) := '~'+nothor(fileservices.SuperFileContents(sp_name)[1].name);
+_wuid(string sp_name) := nothor(STD.File.GetLogicalFileAttribute(lgn(sp_name),'workunit'));
+restoreWuid(string sp_name) := output(wk_ut.Restore_Workunit(_wuid(sp_name)),named(ingest_action + 'wuids_restore'),extend);
 
 // Reusable call to check packages vs. base file dates
 ck(string pk, string buildingSuperfilename, string sp_name, string clstr='N') := dataset([{pk,sp_name,
@@ -171,10 +173,10 @@ w_s	:='W'+ut.date_math(workunit[2..9],-40)+'-000000';
 w_e		:='W'+ut.date_math(workunit[2..9], 2)+'-000000';
 in_progress_states := ['unknown','submitted','compiling','compiled','blocked','running','wait','paused'];
 
-QHwuidList  := wk_ut.get_WorkunitList(w_s,w_e,pJobname:='*Quick*');
-IngwuidList := wk_ut.get_WorkunitList(w_s,w_e,pJobname:='*HeaderIngestSetup*');
-RawWuidList := wk_ut.get_WorkunitList(w_s,w_e,pJobname:='*Header Ingest*');
-ExlWuidList := wk_ut.get_WorkunitList(w_s,w_e,pJobname:='*XADL keys and externals base files*');
+QHwuidList  := nothor(wk_ut.get_WorkunitList(w_s,w_e,pJobname:='*Quick*'));
+IngwuidList := nothor(wk_ut.get_WorkunitList(w_s,w_e,pJobname:='*HeaderIngestSetup*'));
+RawWuidList := nothor(wk_ut.get_WorkunitList(w_s,w_e,pJobname:='*Header Ingest*'));
+ExlWuidList := nothor(wk_ut.get_WorkunitList(w_s,w_e,pJobname:='*XADL keys and externals base files*'));
 
 ActiveQHwuidList := QHwuidList(state in in_progress_states);
 ActiveIngWidList := IngwuidList(state in in_progress_states);
@@ -196,17 +198,17 @@ most_recent_external_base_compltd := if( count(RecentPlWidListC) <1, '0', wuidCm
 
 report_condition_status := ORDERED(
 
-output(QHwuidList,named('QHwuidList')),
-output(IngwuidList,named('IngwuidList')),
-output(RawWuidList,named('RawWuidList')),
-output(ExlWuidList,named('ExlWuidList')),
-output(RecentPlWidListA,named('RecentPlWidListA')),
-output(RecentPlWidListC,named('RecentPlWidListC')),
-output(quick_header_is_not_running,named('quick_header_is_not_running')),
-output(more_ingest_is_not_running,named('more_ingest_is_not_running')),
-output(raw_is_not_running,named('raw_is_not_running')),
-output(most_recent_external_base_started,named('most_recent_external_base_started')),
-output(most_recent_external_base_compltd,named('most_recent_external_base_compltd'))
+output(QHwuidList,named(ingest_action + 'QHwuidList')),
+output(IngwuidList,named(ingest_action + 'IngwuidList')),
+output(RawWuidList,named(ingest_action + 'RawWuidList')),
+output(ExlWuidList,named(ingest_action + 'ExlWuidList')),
+output(RecentPlWidListA,named(ingest_action + 'RecentPlWidListA')),
+output(RecentPlWidListC,named(ingest_action + 'RecentPlWidListC')),
+output(quick_header_is_not_running,named(ingest_action + 'quick_header_is_not_running')),
+// output(more_ingest_is_not_running,named(ingest_action + 'more_ingest_is_not_running')),
+// output(raw_is_not_running,named(ingest_action + 'raw_is_not_running')),
+output(most_recent_external_base_started,named(ingest_action + 'most_recent_external_base_started')),
+output(most_recent_external_base_compltd,named(ingest_action + 'most_recent_external_base_compltd'))
 
 );
 
@@ -224,11 +226,11 @@ run_inputs_set := std.system.Email.sendemail(emailList,'PLEASE RUN',
                                                 '#workunit(\'name\',\'Header_Input_Set\');\n'
                                                +'Header.Inputs_Set();');
 
-no_update := project(wk_ut.get_DS_Result(workunit,'input_did_NOT_make_prod_yet',recReport),
+no_update := project(wk_ut.get_DS_Result(workunit,ingest_action + 'input_did_NOT_make_prod_yet',recReport),
                      {LEFT.roxie_package_name,LEFT.current_prod_roxie_version,
                                               LEFT.pre_reset_header_building,LEFT.logical_file_name});
 
-yes_update := project(wk_ut.get_DS_Result(workunit,'inputs_made_it_to_prod',recReport),
+yes_update := project(wk_ut.get_DS_Result(workunit,ingest_action + 'inputs_made_it_to_prod',recReport),
                      {recordof(LEFT) AND NOT {LEFT.superfilename, LEFT._wuid}});
 
 part1 := header.mac_convertDs.IngestSetuptoHTML(no_update,roxie_package_name,current_prod_roxie_version,
@@ -249,26 +251,26 @@ wLink := 'http://prod_esp.br.seisint.com:8010/?Wuid='+workunit+'&Widget=WUDetail
 send_report := STD.System.Email.SendEmailAttachText(
 				emailList,			            // recipientAddress
 
-				'HeaderIngestSetup No Update Report',  	                // subjectText
+				ingest_action + 'HeaderIngestSetup No Update Report',  	                // subjectText
 				'Please find report attached.'+
-                '\n\nRESET WILL RUN:'+if(ok_to_run_update,'YES','NO')+
+                '\n\nRESET WILL RUN: YES'+
                 '\n\nThis report was generated by:\n'+wLink,			// bodyText
 				attachment, 				                            // attachment
 				'text/html',				                            // fileMimeType
 				'no_updates_status.html'  	                            // defaultFileName
 );
-action_setup := if (ok_to_run_update, sequential(Header.Inputs_Clear(report2)
-                                                ,run_inputs_set
-                                                ,output('Inputs have been cleared. Running Inputs_set'))
-                                    , output('Not updating header inputs. Conditions not met')
-                    );
+action_setup := sequential(
+                     Header.Inputs_Clear(report2)
+                    ,run_inputs_set
+                    ,output(ingest_action + 'Inputs have been cleared. Running Inputs_set')
+                );
 return
 sequential(
              restore
             ,report_condition_status
             ,STD.System.Debug.Sleep (10000)
-            ,output(report,named('auto_report'))
-            ,output(report2,named('package_decision_report')) 
+            ,output(report,named(ingest_action + 'auto_report'))
+            ,output(report2,named(ingest_action + 'package_decision_report')) 
             ,if(~skip_action,action_setup)
             ,send_report
            );
