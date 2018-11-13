@@ -77,7 +77,7 @@ ECL := ECL0
 	       + '#WORKUNIT(\'name\', wuname);\n'
 	 );
 
-THOR := if (active_workunit,'hthor','thor400_44_eclcc');
+THOR := if (active_workunit,'hthor_eclcc','thor400_44_eclcc');
 
 NOC_MSG
 	:=
