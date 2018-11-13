@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Credit_Scoring, Business_Risk_BIP, BusinessCredit_Services, iesp, LNSmallBusiness, Risk_Indicators, ut, std;
+﻿IMPORT BIPV2, Business_Credit_Scoring, BusinessCredit_Services, iesp, LNSmallBusiness, Risk_Indicators, std;
 
 EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmallBiz_BIP_CombinedReport_IParams SmallBizCombined_inmod ) := 
   FUNCTION
@@ -224,6 +224,8 @@ EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmal
 		    EXPORT STRING32  ApplicationType        := SmallBizCombined_inmod.ApplicationType;
         EXPORT STRING14  DID                    := (STRING14)SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_LexID;
         EXPORT BOOLEAN   Include_BusinessCredit := TRUE; // Always true when called from here
+	 EXPORT BOOLEAN  LimitPaymentHistory24Months  :=  SmallBizCombined_inmod. LimitPaymentHistory24Months; // small bus Credit Report w SBFE addition
+	  EXPORT STRING     SBFEContributorIds  := SmallBizCombined_inmod.SBFEContributorIds; // small bus Credit Report w SBFE addition
         EXPORT STRING1   FetchLevel 					  := BIPV2.IDconstants.Fetch_Level_SELEID;
         EXPORT BOOLEAN   IncludeScores          := FALSE; // Don't return scores becasue we are getting them from LNSmallBizAna 
         EXPORT BOOLEAN   AllowAll               := FALSE;
@@ -410,7 +412,7 @@ ds_newModels;
       TRANSFORM
         SELF._Header    := IF( ~SmallBizCombined_inmod.TestDataEnabled, iesp.ECL2ESP.GetHeaderRow()); //Don't populate the header row if testseeds are requested.
 				SELF.BillingHit := (INTEGER)SBA_Results[1].BillingHit;
-        SELF.InputEcho  := ROW([],iesp.smallbusinessbipcombinedreport.t_SmallBusinessBipCombinedReportSearchBy); //SmallBizCombined_inmod.searchBy[1] ; // Grab the exact input from the "search" ESDL near the top
+        SELF.InputEcho  := ROW([],iesp.smallbusinessbipcombinedreport.t_SmallBusinessBipCombinedReportSearchBy); 
         SELF.SmallBusinessAnalyticsResults := ds_Final_SmallBizAnaResults;
         SELF.CreditReportRecords           := ds_Final_CreditReportRecords;	
         SELF.SmallBiz_SBFE_Royalty         := (INTEGER)SBA_Results[1].SBFEAccountCount > 0;
@@ -423,7 +425,7 @@ ds_newModels;
       TRANSFORM
         SELF._Header    := IF( ~SmallBizCombined_inmod.TestDataEnabled, iesp.ECL2ESP.GetHeaderRow()); //Don't populate the header row if testseeds are requested.
 				SELF.BillingHit := (INTEGER)SBA_Results[1].BillingHit;
-        SELF.InputEcho  := ROW([],iesp.smallbusinessbipcombinedreport.t_SmallBusinessBipCombinedReportSearchBy); //SmallBizCombined_inmod.searchBy[1] ; // Grab the exact input from the "search" ESDL near the top
+        SELF.InputEcho  := ROW([],iesp.smallbusinessbipcombinedreport.t_SmallBusinessBipCombinedReportSearchBy); 
         SELF.SmallBusinessAnalyticsResults := ds_Final_SmallBizAnaResults;
         SELF.CreditReportRecords           := ds_Final_CreditReportRecords_NoHit;	
         SELF.SmallBiz_SBFE_Royalty         := (INTEGER)SBA_Results[1].SBFEAccountCount > 0;

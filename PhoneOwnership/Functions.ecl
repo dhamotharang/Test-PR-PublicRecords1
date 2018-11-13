@@ -98,7 +98,9 @@ EXPORT evaluateNameMatch(STRING LFName,STRING LLName,STRING RFName,STRING RLName
 	EXPORT GetBestInfo(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn) :=FUNCTION
 
 		dids := DEDUP(PROJECT(dBatchIn(did<>0),doxie.layout_references),did,ALL);
-		dBestRecs := Doxie.best_records(dids);
+
+		mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
+		dBestRecs := Doxie.best_records(dids, modAccess := mod_access);
 		
 		PhoneOwnership.Layouts.PhonesCommon getBestInfo(PhoneOwnership.Layouts.PhonesCommon l, doxie.layout_best r) := TRANSFORM
 			SELF.acctno		 := l.acctno;

@@ -4,16 +4,16 @@
 
 //(WorkforceSolutionServices.IParam.report_params in_params)
 EXPORT Transforms := module
-	
+
 	shared	iesp.share.t_User SetUser (WorkforceSolutionServices.IParam.report_params in_params) := transform
-    Self.GLBPurpose := (string) in_params.GLBPurpose;
-    Self.DLPurpose := (string) in_params.DPPAPurpose;
-    Self := [];
-  end;
-  
-	
-  export iesp.person_picklist.t_PersonPickListRequest InRequest_to_Picklist
-	(iesp.employment_verification_fcra.t_FcraVerificationOfEmploymentReportRequest L, 
+		Self.GLBPurpose := (string) in_params.GLBPurpose;
+		Self.DLPurpose := (string) in_params.DPPAPurpose;
+		Self := [];
+	end;
+
+
+	export iesp.person_picklist.t_PersonPickListRequest InRequest_to_lexID_Resolution
+	(iesp.employment_verification_fcra.t_FcraVerificationOfEmploymentReportRequest L,
 	 WorkforceSolutionServices.IParam.report_params in_params) := transform
 		self.user := row (SetUser(in_params));
 		self.remotelocations:= l.remotelocations;
@@ -24,26 +24,26 @@ EXPORT Transforms := module
 		self.searchby.address := l.ReportBy.address;
 		self.searchby.dob := l.ReportBy.dob;
 		self := [];
-	end;	
-			
-  export iesp.person_picklist.t_PersonPickListRequest GwEmployee_to_Picklist
+	end;
+
+	export iesp.person_picklist.t_PersonPickListRequest GwEmployee_to_lexID_Resolution
 	(WorkforceSolutionServices.Layouts.gateway_employee L,
 	 WorkforceSolutionServices.IParam.report_params in_params) := transform
 		self.user := row (SetUser(in_params));
 		self.remotelocations:= [];
-		self.servicelocations := []; 
+		self.servicelocations := [];
 		self.options.ReturnUniqueIdsOnly := true;
 		self.options := [];
 		self.searchby.ssn := l.ssn;
 		self.searchby.name.first := l.FirstName;
 		self.searchby.name.middle := [];
 		self.searchby.name.last := l.LastName;
-		self.searchby.dob := l.DtBirth;  
+		self.searchby.dob := l.DtBirth;
 		self := [];
 	end;
 
 
-shared iesp.employment_verification.t_FcraInfoDetail toFcraInfoDetail(iesp.equifax_evs.t_FcraInfoDetail l ) := TRANSFORM  
+shared iesp.employment_verification.t_FcraInfoDetail toFcraInfoDetail(iesp.equifax_evs.t_FcraInfoDetail l ) := TRANSFORM
 		self.fcraactiondetail.fcrainfoid 	:=	l.fcraactiondetail.fcrainfoid ;
 		self.fcraactiondetail.fcraactiontypecode 	:=	l.fcraactiondetail.fcraactiontypecode ;
 		self.fcraactiondetail.message            	:=	l.fcraactiondetail.message            ;
@@ -53,7 +53,7 @@ shared iesp.employment_verification.t_FcraInfoDetail toFcraInfoDetail(iesp.equif
 		self.fcraactiondetail.incidentnumber        	:=	l.fcraactiondetail.incidentnumber        ;
 		self.fcraactiondetail.fcramoreinformation.url 	:=	l.fcraactiondetail.fcramoreinformation.url ;
 		self.fcraactiondetail.fcramoreinformation.phonenumber 	:=	l.fcraactiondetail.fcramoreinformation.phonenumber ;
-		self.fcraactiondetail.fcrainfodataitems	:=	l.fcraactiondetail.fcrainfodataitems; 
+		self.fcraactiondetail.fcrainfodataitems	:=	l.fcraactiondetail.fcrainfodataitems;
 		self.fcraactioncreated.userid 	:=	l.fcraactioncreated.userid ;
 		self.fcraactioncreated.username.full	:=	[];
 		self.fcraactioncreated.username.first 	:=	l.fcraactioncreated.firstname ;
@@ -88,7 +88,7 @@ shared iesp.employment_verification.t_FcraInfoDetail toFcraInfoDetail(iesp.equif
 		self.fcraactioncreated.datetimestamp.minute 	:=	l.fcraactioncreated.datetimestamp.minute  ;
 		self.fcraactioncreated.datetimestamp.second 	:=	l.fcraactioncreated.datetimestamp.second  ;
 		self.fcraactioncreated.comments 	:=	l.fcraactioncreated.comments ;
-		self.fcraactionclosed.userid 	:=	l.fcraactionclosed.userid;		
+		self.fcraactionclosed.userid 	:=	l.fcraactionclosed.userid;
 		self.fcraactionclosed.username.full 	:=	[];
 		self.fcraactionclosed.username.first 	:=	l.fcraactionclosed.firstname;
 		self.fcraactionclosed.username.middle 	:=	l.fcraactionclosed.middlename;
@@ -97,7 +97,7 @@ shared iesp.employment_verification.t_FcraInfoDetail toFcraInfoDetail(iesp.equif
 		self.fcraactionclosed.username.prefix 	:=	[];
 		self.fcraactionclosed.email 	:=	l.fcraactionclosed.email      ;
 		self.fcraactionclosed.daytimephone 	:=	l.fcraactionclosed.daytimephone ;
-		self.fcraactionclosed.eveningphone 	:=	l.fcraactionclosed.eveningphone ;	
+		self.fcraactionclosed.eveningphone 	:=	l.fcraactionclosed.eveningphone ;
 		self.fcraactionclosed.useraddress.streetnumber 	:=	[];
 		self.fcraactionclosed.useraddress.streetpredirection 	:=	[];
 		self.fcraactionclosed.useraddress.streetname         	:=	[];
@@ -121,10 +121,10 @@ shared iesp.employment_verification.t_FcraInfoDetail toFcraInfoDetail(iesp.equif
 		self.fcraactionclosed.datetimestamp.hour24 	:=		l.fcraactionclosed.datetimestamp.hour24;
 		self.fcraactionclosed.datetimestamp.minute 	:=		l.fcraactionclosed.datetimestamp.minute;
 		self.fcraactionclosed.datetimestamp.second 	:=	l.fcraactionclosed.datetimestamp.second;
-		self.fcraactionclosed.comments 	:=	l.fcraactionclosed.comments;		
+		self.fcraactionclosed.comments 	:=	l.fcraactionclosed.comments;
 end;
 
-shared iesp.employment_verification.t_VerificationOfEmploymentAnnualComp 
+shared iesp.employment_verification.t_VerificationOfEmploymentAnnualComp
 			toAnnualComp(iesp.equifax_evs.t_TsVAnnualComp l) := transform
 			self.employmentyear := 	l.tsvyear;
 			self.basesalary     := 	l.tsvbase;
@@ -144,7 +144,7 @@ shared iesp.employment_verification.t_VerificationOfEmploymentAnnualComp
 end;
 
 
-shared iesp.employment_verification.t_VerificationOfEmploymentRecord 
+shared iesp.employment_verification.t_VerificationOfEmploymentRecord
 	GwRecord_to_Record(iesp.equifax_evs.t_TsVResponse_V100 L , unsigned DID , string input_ssn_mask_value, string input_dob_mask_value) := transform
 		Self.TransactionDate := l.DtTransaction;
 		self.employer.employeraddress.streetnumber				:=	[];
@@ -232,11 +232,11 @@ shared iesp.employment_verification.t_VerificationOfEmploymentRecord
 		Self.Completeness := l.Completeness;
 		Self.ServerRespId  := l.SrvrtId;
 		Self.DemoTransaction := l.DemoTrn;
-		Self.FcraInfo.FcraInfoDetails := project(l.FcraInfo.FcraInfoDetails,toFcraInfoDetail(left)); 
+		Self.FcraInfo.FcraInfoDetails := project(l.FcraInfo.FcraInfoDetails,toFcraInfoDetail(left));
 	end;
 
 
-	export iesp.employment_verification_fcra.t_FcraVerificationOfEmploymentReportRecord 
+	export iesp.employment_verification_fcra.t_FcraVerificationOfEmploymentReportRecord
 		toRecords(iesp.equifax_evs.t_EvsResponse l , unsigned DID , string input_ssn_mask_value, string input_dob_mask_value) := transform
 			self.signonresp.status.code := l.SignonMsgsRsV1.SonRs.Status.code;
 			self.signonresp.status.message := l.SignonMsgsRsV1.SonRs.Status.message;
@@ -246,18 +246,18 @@ shared iesp.employment_verification.t_VerificationOfEmploymentRecord
 			_trnRs := l.TsVerMsgsRsV1.TsVTwnSelectTrnRs;
 			self.verificationofemploymentresp.transactionuid := _trnRs.TrnUID;
 			self.verificationofemploymentresp.status.code := _trnRs.status.code ;
-			self.verificationofemploymentresp.status.message := _trnRs.status.message; 
+			self.verificationofemploymentresp.status.message := _trnRs.status.message;
 			self.verificationofemploymentresp.status.severity := _trnRs.status.severity;
 			self.verificationofemploymentresp.masterserverid := _trnRs.MasterSrvRtId;
 			self.verificationofemploymentresp.TransactionPurpose.code := _trnRs.TrnPurpose.Code ;
 			self.verificationofemploymentresp.TransactionPurpose.message := _trnRs.TrnPurpose.Message;
 			self.verificationofemploymentresp.specialhandling.demohandling := _trnRs.specialhandling.DemoHandling;
 			self.verificationofemploymentresp.specialhandling.complimentary := _trnRs.specialhandling.complimentary; ;
-			self.verificationofemploymentresp.verificationofemploymentselectrecord.verificationofemploymentrecorddata := 
+			self.verificationofemploymentresp.verificationofemploymentselectrecord.verificationofemploymentrecorddata :=
 			project(_trnRs.TsVTwnSelectRs.tsvresponsedata,GwRecord_to_Record(left , DID , input_ssn_mask_value , input_dob_mask_value));
-			self.Pdf := l.TsVerPDF; 
+			self.Pdf := l.TsVerPDF;
 			Self.UniqueID := (string) DID;
 	end;
-	
+
 
 END;

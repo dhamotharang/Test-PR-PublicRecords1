@@ -1,4 +1,4 @@
-import address, did_add, doxie, header_slimsort, suppress, ut,header, didville,NID;
+﻿import address, did_add, doxie, header_slimsort, suppress, ut,header, didville,NID;
 /* 
 Required inputs include one of the ssn inputs, yob, and zip, all others are optional.
 The standard behavior is to only return one result or fail if no unique match.  
@@ -8,6 +8,8 @@ AllowMultipleResults overrides this.
 
 // Read user input
 inp := DID_Numeric_Services.inputs;
+
+mod_access := inp.mod_access;
 
 input_ssn4 									:= inp.input_ssn4;
 zip_value 									:= inp.zip_value;
@@ -20,18 +22,14 @@ input_zip										:= inp.input_zip;
 ssn4_value									:= inp.ssn4_value;
 ssn5_value									:= inp.ssn5_value;
 ssn_value										:= inp.ssn_value;
-dppa_purpose								:= inp.dppa_purpose;
-glb_purpose									:= inp.glb_purpose;
+dppa_purpose								:= mod_access.dppa;
+glb_purpose									:= mod_access.glb;
 maxresults_val 							:= inp.maxresults_val;
-ssn_mask_value 							:= inp.ssn_mask_value;
+ssn_mask_value 							:= mod_access.ssn_mask;
 AllowMultipleResults_value 	:= inp.AllowMultipleResults_value; 
-industry_class_value 				:= inp.industry_class_value;
-glb_ok											:= inp.glb_ok;
-dppa_ok											:= inp.dppa_ok;
-probation_override_value		:= inp.probation_override_value;
-no_scrub										:= inp.no_scrub;
+glb_ok											:= mod_access.isValidGLB ();
+dppa_ok											:= mod_access.isValidDPPA ();
 thresh_value								:= inp.thresh_value;
-
 
 
 //***** DEFINE THE INDEX READS
@@ -172,29 +170,23 @@ did := PROJECT(key_res,doxie.layout_references);
 
 //***** SCORING (DO NOT CHECK PERMISSIONS) AND DISPLAY (CHECK PERMISSIONS)
 
-// Function for getting header recs
-get_header_recs(dataset(doxie.layout_references_hh) dids,unsigned1 dppa,unsigned1 glb) := 
-	doxie.mod_header_records(false,true,,,dppa,glb,,,false,industry_class_value,,true).results(dids);
-
-// Function for getting best records
-get_br(dataset(doxie.layout_references) did,dppa,glb) :=
-		doxie.best_records(did,false,dppa,glb,,, doSuppress:=false);
-
-
 // Get best records with and without permissions. The one with permission checked will be used for field
 // display, the one without will be used to calculate address score
 
-br := get_br(did,255,255);		
-br_permission_check := get_br(did,dppa_purpose,glb_purpose);
-
+br_permission_check := doxie.best_records(did, doSuppress:=false, modAccess := mod_access);
 							
 // Pass in dppa and glb 255 so that we get all records back. We want all records so that we can have the best
 // address score reflect the best address. We will only display the address that user is permitted to see, this
 // is done by calling header.MAC_GlbClean_Header
+  mod_access_unrestricted := MODULE (mod_access)
+    EXPORT unsigned1 dppa := 255;
+    EXPORT unsigned1 glb := 255;
+  END;
+  br := doxie.best_records (did, doSuppress:=false, modAccess := mod_access_unrestricted);
 
-header_recs_wo_permission_check := get_header_recs(project(did,doxie.layout_references_hh),255,255); 
+header_recs_wo_permission_check := doxie.mod_header_records(false,true,,,true,ModAccess := mod_access_unrestricted).results(project(did,doxie.layout_references_hh));
 for_permission_check := project(header_recs_wo_permission_check, doxie.layout_header_records);
-Header.MAC_GlbClean_Header(for_permission_check,pre_header_recs_w_permission_check)
+Header.MAC_GlbClean_Header(for_permission_check,pre_header_recs_w_permission_check, , , mod_access)
 header_recs_w_permission_check := project(pre_header_recs_w_permission_check, doxie.layout_presentation);
 
 

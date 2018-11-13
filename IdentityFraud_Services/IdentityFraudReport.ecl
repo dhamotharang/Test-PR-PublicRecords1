@@ -23,12 +23,32 @@ EXPORT IdentityFraudReport (
 
   // cannot use doxie/header_records_byDID: it fails at a certain limit on number of records, and here I may have
   // dozens of DIDs
-  shared header_obj := doxie.mod_header_records (
-                     false, true, false, 0, //DoSearch, include dailies, allow_wildcard, dateVal
-                     param.dppapurpose, param.glbpurpose, false, //ln_branded_value
-                     true, param.probation_override, //include_gong, probation_override_value
-                     '', false, false, // industry_class_value, no_scrub, suppress_gong_noncurrent
-                     [], false, false, true   // daily_autokey_skipset, AllowGongFallBack, ApplyBpsFilter, GongByDidOnly
+
+  // Inherit missing values from the global module; it is safer in case new fields added to the IDataAccess interface.
+  // Can't project from {input} because of different type of ssn_mask (string vs. string6);
+  shared mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule (IsFCRA)))
+    EXPORT unsigned1 glb := param.glbpurpose;
+    EXPORT unsigned1 dppa := param.dppapurpose;
+    EXPORT string DataPermissionMask := DataPermission; 
+    EXPORT string DataRestrictionMask := param.DataRestrictionMask;
+    EXPORT boolean ln_branded := FALSE;       //hardcoded for mod_header_records call
+    EXPORT boolean probation_override := param.probation_override;
+    EXPORT string5 industry_class := '';      //hardcoded for mod_header_records call
+    EXPORT string32 application_type := param.applicationtype;
+    EXPORT boolean no_scrub := FALSE;         //hardcoded for mod_header_records call
+    EXPORT unsigned3 date_threshold := 0;            //hardcoded for mod_header_records call
+    EXPORT string ssn_mask := param.ssn_mask;
+    EXPORT unsigned1 dl_mask := IF (param.mask_dl, 1, 0);
+    export unsigned1 dob_mask := param.dob_mask;
+  END;
+
+
+ shared header_obj := doxie.mod_header_records (
+                     false, true, false, //DoSearch, include dailies, allow_wildcard
+                     true,               // include_gong
+                     false,              // suppress_gong_noncurrent
+                     [], false, false, true,    // daily_autokey_skipset, AllowGongFallBack, ApplyBpsFilter, GongByDidOnly
+                     mod_access
                 );
 
   header_all_subj := header_obj.Results (project (input_dids, doxie.layout_references_hh));
@@ -52,10 +72,11 @@ EXPORT IdentityFraudReport (
   shared dids := if (subj_did!=0, input_dids);
 
 	// emails addresses for the primary identity
-	email_recs	:=	doxie.email_records(dids(did	=	subj_did),param.ssn_mask,param.applicationtype,true);
+	email_recs	:=	doxie.email_records(dids(did	=	subj_did),mod_access.ssn_mask,mod_access.application_type,true);
 	
 	// normalize the child dataset emails so as to restrict the number of emails shown to the customer
 	shared email_recs_norm	:=	Functions.GetEmails(email_recs, param, IsFCRA);
+
 	
   // ========================================================================
   // Get Best data for subject and imposters
@@ -78,24 +99,24 @@ EXPORT IdentityFraudReport (
   // since "best record" exists not for every possible imposter; must use as much DIDs as possibly feasible here
   imposters_dids := if (subj_did != 0, choosen (sort (imposters_all_dids, -last_seen), IMPOSTERS_ABS_MAX));
 
-  best_subj := doxie.best_records (dids, , //use_global
-        param.dppapurpose, param.glbpurpose, 
-        false, // get valid SSN: deprecated -- already in best file
+  best_subj := doxie.best_records (dids,
         IsFCRA, 
         false, //postpone masking until the very end
         false, // do not append time zone
-        ,includeDOD:=true); // use non-blank key = false
+        ,includeDOD:=true, // use non-blank key = false
+        modAccess := mod_access
+        );
 	
   // ... and here I can pickup the desired number of imposters
   best_imposter := choosen (
-    doxie.best_records (project (imposters_dids, doxie.layout_references), , //use_global
-        param.dppapurpose, param.glbpurpose, 
-        false, // get valid SSN: deprecated -- already in best file
+    doxie.best_records (project (imposters_dids, doxie.layout_references),
         IsFCRA, 
         false, //postpone masking until the very end
         false, // do not append time zone
-       ,header.constants.checkRNA,
-			 includeDOD:=true ),
+        ,
+        header.constants.checkRNA,
+ 			 includeDOD:=true,
+       modAccess := mod_access),
     param.max_imposters);
 	
   // prevent imposters/associated identities to be fetched in case subject wasn't found:
@@ -125,8 +146,8 @@ EXPORT IdentityFraudReport (
   // Now imposters: get header records, apply RNA permissions
   header_all_rna := header_obj.Results (project (best_imposter, doxie.layout_references_hh));
 
-  GLB_Purpose := param.glbpurpose;
-  dppa_Purpose := param.dppapurpose;
+  GLB_Purpose := mod_access.glb;
+  dppa_Purpose := mod_access.dppa;
   Header.MAC_GLB_DPPA_Clean_RNA(header_all_rna,headerRNA);	
 
 
@@ -444,16 +465,14 @@ EXPORT IdentityFraudReport (
   // ========================================================================
   //     Get detailed relatives description (compare to ContactCard)
   // ========================================================================
-            dateVal := 0;
-            ln_branded_value := false;
             probation := false;
             Relative_Depth := 3;
             max_relatives := 0; //means all;
             isCRS := false; //not used
             max_associates := 0;
-						
-  rel := Doxie_Raw.relative_raw (dids, dateVal, param.dppapurpose, param.glbpurpose, param.ssn_mask, 
-                                            ln_branded_value, probation, true, true,
+
+  rel := Doxie_Raw.relative_raw (dids, mod_access.date_threshold, mod_access.dppa, mod_access.glb, mod_access.ssn_mask, 
+                                            mod_access.ln_branded, probation, true, true,
                                             Relative_Depth, max_relatives, isCRS, max_associates);
 
   rel_det := choosen(rel(isRelative and depth = 1), 100);
@@ -616,8 +635,8 @@ EXPORT IdentityFraudReport (
   report_patched := Functions.PatchDates (report); // patch dates
 
   // masking: ssn, dl, dob
-  boolean do_mask := (param.ssn_mask != '' and param.ssn_mask != 'NONE') or param.mask_dl or
-                     (param.dob_mask != suppress.Constants.DateMask.NONE);
+  boolean do_mask := (mod_access.ssn_mask != '' and mod_access.ssn_mask != 'NONE') or (mod_access.dl_mask = 1) or
+                     (mod_access.dob_mask != suppress.Constants.DateMask.NONE);
   individual := if (do_mask, Functions.MaskReport (report_patched, param), report_patched);
 	
   export	results				:=	individual;

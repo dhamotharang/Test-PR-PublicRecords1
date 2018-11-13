@@ -11,6 +11,8 @@
 
 import doxie, header, suppress, ut;
 doxie.MAC_Header_Field_Declare();
+mod_access := doxie.compliance.GetGlobalDataAccessModule ();
+
 boolean RandR := false : stored('RandR');
 // contents of doxie.Layout_AddressSearch
 //	unsigned seq;
@@ -21,7 +23,7 @@ boolean RandR := false : stored('RandR');
 //	string5 zip;
 did_val := (unsigned6)did_value;
 UncleanParentRecs := doxie.Key_Header(keyed(s_did = did_val)and prim_name[1..6] != 'PO BOX');
-header.MAC_GlbClean_Header(UncleanParentRecs,BigParentRecs);
+header.MAC_GlbClean_Header(UncleanParentRecs,BigParentRecs, , , mod_access);
 
 recordof(doxie.Key_Header) doBigParentProject(BigParentRecs l) := TRANSFORM
 	SELF := l;
@@ -63,7 +65,7 @@ UncleanChildRecs := JOIN(DidsFromAddresses,doxie.Key_Header,
 									and LEFT.zip = RIGHT.zip
 									, doKeyHeaderJoin(RIGHT)
 									, LEFT OUTER);
-header.MAC_GlbClean_Header(UncleanChildRecs,BigChildRecs);
+header.MAC_GlbClean_Header(UncleanChildRecs,BigChildRecs, , , mod_access);
 recordof(doxie.Key_Header) doBigChildProject(BigChildRecs l) := TRANSFORM
 	SELF := l;
 END;

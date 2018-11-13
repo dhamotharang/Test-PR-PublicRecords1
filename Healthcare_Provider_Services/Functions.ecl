@@ -1,5 +1,5 @@
-import iesp, AutoStandardI,Ingenix_NatlProf, doxie,doxie_files,DeaV2_Services,Business_Risk,prof_licensev2_services,DeathV2_Services,doxie_crs,ut,clia,
-			BankruptcyV3_Services,bankruptcyv2_services,LiensV2_Services,Identifier2,Business_Header,address, NPPES, ams, dea, watchdog, suppress, Healthcare_Services;
+﻿import iesp, AutoStandardI, Ingenix_NatlProf, doxie, doxie_files, ut,
+			Business_Header,address, NPPES, Healthcare_Services;
 export Functions := Module
 
 	shared myLayouts := Healthcare_Provider_Services.layouts;
@@ -496,49 +496,6 @@ export Functions := Module
 		penaltyRecs := sort(project(NPPESRec, setPenalty(LEFT)), record_penalty);	
 		// penaltyRecs := project(NPPESRec, setPenalty(LEFT));				
 		RETURN penaltyRecs;
-	END;
-
-	EXPORT apply_penalty_dids(Dataset(myLayouts.deepDids) dids, 
-												IParams.reportParams aInputData) := FUNCTION												
-		
-		rawdata:=doxie.mod_header_records(true,,,,,,,,false).mod_Header(project(dids,Doxie.layout_references_hh)).records;
-
-		doxie.layout_presentation setPenalty(doxie.layout_presentation RawRecs) := TRANSFORM		
-			tempIndvMod := MODULE(PROJECT(aInputData, AutoStandardI.LIBIN.PenaltyI.full,opt))
-				export allow_wildcard := false;
-				export city_field := RawRecs.city_name;
-				export fname_field := RawRecs.fname;
-				export lname_field := RawRecs.lname;
-				export mname_field := RawRecs.mname;
-				export pname_field := RawRecs.prim_name;
-				export postdir_field := RawRecs.postdir;
-				export prange_field := RawRecs.prim_range;
-				export predir_field := RawRecs.predir;
-				export ssn_field := RawRecs.ssn;  
-				export state_field := RawRecs.st;
-				export suffix_field := RawRecs.suffix;
-				export sec_range_field := RawRecs.sec_range;
-				export zip_field := RawRecs.zip;
-				export did_field := (string)RawRecs.did;
-				export city2_field := '';
-				export county_field := '';
-				export dob_field := (string)RawRecs.dob;
-				export dod_field := '';
-				export phone_field := RawRecs.phone;
-				export bdid_field := '';
-				export cname_field := '';
-				export fein_field := '';
-				export agehigh := 0;
-				export agelow := 0;
-			END;
-						
-			SELF.penalt:= AutoStandardI.LIBCALL_PenaltyI.val(tempIndvMod);
-			SELF := RawRecs;
-		END;
-	
-		penaltyRecs := project(rawdata, setPenalty(LEFT));
-		resultsDids := project(dedup(sort(penaltyRecs(penalt=0),did),did),transform(myLayouts.deepDids,self:=left));
-		RETURN resultsDids;
 	END;
 
 	EXPORT apply_penalty_bdids(Dataset(myLayouts.deepBDids) bdids, 

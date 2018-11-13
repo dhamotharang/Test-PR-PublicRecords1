@@ -1,4 +1,4 @@
-export mac_get_type_b(f_b_did, f_b_acctno, f_b_out, use_input=false, data_restriction_mask='') := macro
+export mac_get_type_b(f_b_did, f_b_acctno, f_b_out, use_input=false, modAccess) := macro
 
 import STD, gong, ut, progressive_phone, NID, Lib_Word;
 
@@ -13,7 +13,7 @@ import STD, gong, ut, progressive_phone, NID, Lib_Word;
 %gong_did% := gong.key_history_did;
 
 #uniquename(blue_recs)
-progressive_phone.mac_get_blue(f_b_did, %blue_recs%, true, false, false, data_restriction_mask)
+progressive_phone.mac_get_blue(f_b_did, %blue_recs%, true, false, false, modAccess)
 
 #uniquename(blue_phone_recs)
 %blue_phone_recs% := %blue_recs%(length(trim(phone))=10);

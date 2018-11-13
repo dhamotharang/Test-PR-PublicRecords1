@@ -1,5 +1,5 @@
-
-export historic_nbr_records(hr,outrecs,checkRNA=true) := macro
+﻿
+export historic_nbr_records(hr,outrecs,checkRNA=true, modAccess) := macro
 import header,doxie,ut,suppress;
 
 
@@ -217,14 +217,14 @@ end;
 				
 #uniquename(outf4a)	
 #uniquename(outf4b)	
-header.MAC_GlbClean_Header(%dirty_outf4%,%outf4a%);
+header.MAC_GlbClean_Header(%dirty_outf4%,%outf4a%, , ,modAccess);
 #uniquename(outf4a1)	
 header.MAC_GLB_DPPA_Clean_RNA(%outf4a%,%outf4a1%);
 #uniquename(outf4a2)	
 %outf4a2% := If (checkRNA=true,%outf4a1%,%outf4a%);
 
  // output(%outf4a%);
-suppress.MAC_Mask(%outf4a2%,%outf4b%,ssn,foo,true,false,,true);
+suppress.MAC_Mask(%outf4a2%,%outf4b%,ssn,foo,true,false,,true,,modAccess.ssn_mask);
 // output(%outf4b%);
 
 #uniquename(outf5)

@@ -20,6 +20,8 @@
 import doxie, autokey, ut, header, suppress;
 
 doxie.MAC_Header_Field_Declare();
+mod_access := doxie.compliance.GetGlobalDataAccessModule ();
+
 Layout_Names := RECORD
 	STRING30  name_first;
 	STRING30  name_middle;
@@ -177,7 +179,7 @@ UncleanHeaderRecs := JOIN(DedupedCombinedRecs,doxie.Key_Header,
 									);
 // output(count(HeaderRecs),NAMED('HeaderRecsCount'));
 // output(HeaderRecs,NAMED('HeaderRecs'));
-header.MAC_GlbClean_Header(UncleanHeaderRecs,BigHeaderRecs);
+header.MAC_GlbClean_Header(UncleanHeaderRecs,BigHeaderRecs, , , mod_access);
 header.Layout_Header doBigHeaderProject(BigHeaderRecs l) := TRANSFORM
 	SELF := l;
 END;

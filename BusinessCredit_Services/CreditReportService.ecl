@@ -49,7 +49,8 @@ EXPORT CreditReportService := MACRO
 	#STORED('UltID',ReportBy.Company.BusinessIds.UltID);
 	#STORED('DID',ReportBy.AuthorizedRep.UniqueId);
 	#STORED('IncludeBusinessCredit',Options.IncludeBusinessCredit);
-	
+	#STORED('LimitPaymentHistory24Months',Options.LimitPaymentHistory24Months); //  busines credit	report w SBFE data project additions	
+	#STORED('ContributorIDs', Options.ContributorIDs); // bus credit report w SBFE data project additions.
 	UNSIGNED6 s_DotID  := 0 : STORED('DotID');
 	UNSIGNED6 s_EmpID  := 0 : STORED('EmpID');
 	UNSIGNED6 s_PowID  := 0 : STORED('PowID');
@@ -114,7 +115,9 @@ EXPORT CreditReportService := MACRO
 		EXPORT BOOLEAN 		Include_BusinessCredit 			:= 	FALSE :  STORED('IncludeBusinessCredit');
 		EXPORT STRING 		DataRestrictionMask 				:= global_mod.DataRestrictionMask;
 		EXPORT STRING 		DataPermissionMask 					:= global_mod.DataPermissionMask;
-    EXPORT BOOLEAN    TestDataEnabled             := Users.TestDataEnabled;
+		EXPORT BOOLEAN          LimitPaymentHistory24Months                  := FALSE :  STORED('LimitPaymentHistory24Months');
+		EXPORT STRING             SBFEContributorIds          :=  '' : STORED('ContributorIds');
+		EXPORT BOOLEAN    TestDataEnabled             := Users.TestDataEnabled;
 		EXPORT STRING     TestDataTableName           := TRIM(users.TestDataTableName, LEFT, RIGHT);
 	END;
 	

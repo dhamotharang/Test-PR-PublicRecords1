@@ -29,7 +29,9 @@ EXPORT MAC_BusinessCredit_Services_BCD_SmallBizCombinedReport := MACRO
       'IncludeTargusGateway',
       'RunTargusGatewayAnywayForTesting',
       'TestDataEnabled',
-      'TestDataTableName'
+      'TestDataTableName',
+	 'LimitPaymentHistory24Months',
+	 'SBFEContributorIds'
       ));
 
 ENDMACRO;

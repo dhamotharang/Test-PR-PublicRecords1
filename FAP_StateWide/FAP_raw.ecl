@@ -1,9 +1,9 @@
-IMPORT VotersV2_Services,doxie,UCCv2_Services,doxie
-,prof_LicenseV2_Services,VehicleV2_Services
-,bankruptcyv2_Services,LiensV2_Services,marriage_divorce_v2_Services
-,DeathV2_Services,FAB_StateWide,LN_PropertyV2_Services,doxie_raw,Statewide_Services
-,Business_Header,Driversv2_Services, Targus,AutoStandardI,WatercraftV2_services
-,Address,suppress,CriminalRecords_Services,header,FCRA;
+IMPORT VotersV2_Services, doxie, UCCv2_Services,
+  prof_LicenseV2_Services, VehicleV2_Services,
+  bankruptcyv2_Services, LiensV2_Services, marriage_divorce_v2_Services,
+  DeathV2_Services, FAB_StateWide, LN_PropertyV2_Services, Statewide_Services,
+  Business_Header, Driversv2_Services, Targus, AutoStandardI, WatercraftV2_services,
+  Address, suppress, CriminalRecords_Services, header;
 
 //***** SET of FUNCTIONS
 
@@ -18,9 +18,10 @@ EXPORT FAP_raw := MODULE
 			RETURN FullName;
 	END;
 	
-	shared unsigned4 max_limit := 2000;
-	shared out_layout  := FAB_StateWide.layout_FAB_Statewide_out;	
+	unsigned4 max_limit := 2000;
+	out_layout  := FAB_StateWide.layout_FAB_Statewide_out;	
   Business_Header.doxie_MAC_Field_Declare()
+  mod_access := doxie.compliance.GetGlobalDataAccessModule ();
 
 	       
   EXPORT search := MODULE
@@ -487,7 +488,7 @@ EXPORT FAP_raw := MODULE
 						set of string2 eq_src_set := ['EQ','QH','WH'];
 						header_recs := JOIN(dids,doxie.Key_Header,LEFT.did = RIGHT.s_did
 														and RIGHT.src in eq_src_set);
-						header.MAC_GlbClean_Header(header_recs,headerCleaned);
+						header.MAC_GlbClean_Header(header_recs,headerCleaned, , , mod_access);
 						doxie.MAC_PruneOldSSNs (headerCleaned, ds_prunned, ssn, did);
 						Suppress.MAC_Mask(ds_prunned, ds_masked, ssn, null, true, false);
             EQ_recs := PROJECT(ds_masked,recordof(doxie.Key_Header));
@@ -520,7 +521,7 @@ EXPORT FAP_raw := MODULE
 						set of string2 en_src_set := ['EN'];
 						header_recs := JOIN(dids,doxie.Key_Header,LEFT.did = RIGHT.s_did
 														and RIGHT.src in en_src_set);
-						header.MAC_GlbClean_Header(header_recs,headerCleaned);	
+						header.MAC_GlbClean_Header(header_recs,headerCleaned, , , mod_access);	
 						doxie.MAC_PruneOldSSNs (headerCleaned, ds_prunned, ssn, did);
 						Suppress.MAC_Mask(ds_prunned, ds_masked, ssn, null, true, false);
             EN_recs := PROJECT(ds_masked,recordof(doxie.Key_Header));
@@ -553,7 +554,7 @@ EXPORT FAP_raw := MODULE
 						set of string2 tn_src_set := ['TN'];
 						header_recs := JOIN(dids,doxie.Key_Header,LEFT.did = RIGHT.s_did
 														and RIGHT.src in tn_src_set);
-						header.MAC_GlbClean_Header(header_recs,headerCleaned);	
+						header.MAC_GlbClean_Header(header_recs,headerCleaned, , , mod_access);	
 						doxie.MAC_PruneOldSSNs (headerCleaned, ds_prunned, ssn, did);
 						Suppress.MAC_Mask(ds_prunned, ds_masked, ssn, null, true, false);
             TN_recs := PROJECT(ds_masked,recordof(doxie.Key_Header));

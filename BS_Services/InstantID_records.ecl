@@ -1,16 +1,19 @@
-import risk_indicators, doxie, seed_files;
+﻿import risk_indicators, doxie, seed_files, AutoStandardI;
 
 //***** Call traditional InstantID
 iir_temp := Risk_Indicators.InstantID_records;
 iir := project(iir_temp, risk_indicators.Layout_InstandID_NuGen);
 
 //***** Pull the DID off of the InstantID result and use it to get more addresses and names
-doxie.MAC_Selection_Declare();
-doxie.MAC_Header_Field_Declare();
+
+gmod := AutoStandardI.GlobalModule();
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (gmod);
+dial_contactprecision_value := AutoStandardI.InterfaceTranslator.dial_contactprecision_value.val(project(gmod,AutoStandardI.InterfaceTranslator.dial_contactprecision_value.params)); 
+
 DIDs := project(iir(DID > 0), Doxie.layout_references);
 csa := 
 	doxie.Comp_Subject_Addresses(
-		dids,dateVal,dppa_purpose,glb_purpose,ln_branded_value,,probation_override_value,industry_class_value,no_scrub,dial_contactprecision_value);
+    dids,,dial_contactprecision_value, , mod_access);
 
 //***** rollup the addrs and get them into the right layout
 addr_unrolled := project(csa.addresses, bs_services.layouts.addresses);
@@ -22,7 +25,7 @@ doxie.MAC_Address_Rollup(addr_unrolled, bs_services.Constants.max_addresses, add
 //***** get the best info
 besti := 
 	project(
-		doxie.best_records (dids, , , , , false, , , useNonBlankKey := true,checkRNA:=false ,includeDOD:=true), 
+		doxie.best_records (dids, false, , , useNonBlankKey := true,checkRNA:=false ,includeDOD:=true, modAccess := mod_access), 
 		transform(
 			bs_services.layouts.best_info,
 			self := left, 

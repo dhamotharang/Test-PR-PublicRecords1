@@ -82,8 +82,9 @@ export Functions := module
 	export appendBest(dataset(BatchShare.Layouts.ShareBest) ds_in) := 
 	function
 	
+    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
 		dids 					:= dedup(sort(project(ds_in(did>0), doxie.layout_references), did));
-		ds_best_recs 	:= doxie.best_records(dids);					
+		ds_best_recs 	:= doxie.best_records(dids, modAccess := mod_access);					
 
 		BatchShare.Layouts.ShareBest xt_append_best(BatchShare.Layouts.ShareBest l, doxie.layout_best r) := 
 		transform

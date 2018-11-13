@@ -1,9 +1,9 @@
 import doxie, phonesplus, ut;
 
-export mac_get_type_v(f_v_did, f_v_acctno, f_v_out, use_input=false, data_restriction_mask=false) := macro
+export mac_get_type_v(f_v_did, f_v_acctno, f_v_out, use_input=false, modAccess) := macro
 
 #uniquename(blue_recs)
-progressive_phone.mac_get_blue(f_v_did, %blue_recs%,,,true, data_restriction_mask)
+progressive_phone.mac_get_blue(f_v_did, %blue_recs%,,,true, modAccess)
 
 #uniquename(f_six_months)
 %f_six_months% := %blue_recs%(ut.DaysApart(StringLib.GetDateYYYYMMDD(),(string6)dt_last_seen + '15')<=180,

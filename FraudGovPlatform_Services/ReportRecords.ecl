@@ -56,7 +56,7 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 	
 		ds_entityNameUID := FraudGovPlatform_Services.Utilities.getAnalyticsUID(ds_fragment_recs_rolled);
 
-		ds_delta_recentActivity := mod_Deltabase_Functions(batch_params).getDeltabaseReportRecords(ds_batch_in_extended);
+		ds_delta_recentActivity := FraudGovPlatform_Services.mod_Deltabase_Functions(batch_params).getDeltabaseReportRecords(ds_batch_in_extended);
 
 		ds_recentTransactions_sorted := SORT(ds_delta_recentActivity,-eventDate.year, -eventDate.Month, -eventDate.day);
 
@@ -74,9 +74,11 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 																			TRANSFORM(iesp.fraudgovreport.t_FraudGovElementCardDetails, 
 																				SELF.ScoreDetails.RecordType := FraudGovConst_.RecordType.ELEMENT,
 																				SELF.ScoreDetails.ElementType := LEFT.fragment,
-																				SELF.ScoreDetails.ElementValue := IF(LEFT.fragment = FraudGovFragConst_.PHYSICAL_ADDRESS_FRAGMENT, 
-																																						FraudGovPlatform_Services.Functions.GetCleanAddressFragmentValue(LEFT.fragment_value),
-																																						LEFT.fragment_value);
+																				SELF.ScoreDetails.ElementValue := MAP(LEFT.fragment = FraudGovFragConst_.PHYSICAL_ADDRESS_FRAGMENT 
+																																								=> FraudGovPlatform_Services.Functions.GetCleanAddressFragmentValue(LEFT.fragment_value),
+																																							LEFT.fragment = FraudGovFragConst_.BANK_ACCOUNT_NUMBER_FRAGMENT
+																																								=> FraudGovPlatform_Services.Functions.GetCleanBankAccountFragmentValue(LEFT.fragment_value),
+																																							LEFT.fragment_value);
 																				SELF.ScoreDetails.Score := RIGHT.Score_,
 																				SELF.NoOfIdentities := RIGHT.cl_identity_count_,
 																				SELF.NoOfRecentTransactions := numOfDeltabaseTransactions,
@@ -117,6 +119,9 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 																		LEFT.entity_type_ = FraudGovKelConst_.ENTITY_TYPE_SSN => FraudGovFragConst_.SSN_FRAGMENT,
 																		LEFT.entity_type_ = FraudGovKelConst_.ENTITY_TYPE_PHONENO => FraudGovFragConst_.PHONE_FRAGMENT,
 																		LEFT.entity_type_ = FraudGovKelConst_.ENTITY_TYPE_IPADDRESS => FraudGovFragConst_.IP_ADDRESS_FRAGMENT,
+																		LEFT.entity_type_ = FraudGovKelConst_.ENTITY_TYPE_EMAIL=> FraudGovFragConst_.EMAIL_FRAGMENT,
+																		LEFT.entity_type_ = FraudGovKelConst_.ENTITY_TYPE_BANKACCOUNT=> FraudGovFragConst_.BANK_ACCOUNT_NUMBER_FRAGMENT,
+																		LEFT.entity_type_ = FraudGovKelConst_.ENTITY_TYPE_DLNUMBER=> FraudGovFragConst_.DRIVERS_LICENSE_NUMBER_FRAGMENT,
 																		''), 
 															SELF.ScoreDetails.ElementValue := IF(	LEFT.entity_type_ = FraudGovKelConst_.ENTITY_TYPE_LEXID,
 																																		LEFT.tree_uid_[4..],

@@ -339,7 +339,7 @@ EXPORT Functions := MODULE
 															(skip_autokey_element_matching  OR (l.prim_range = r.clean_address.prim_range AND
 															l.prim_name = r.clean_address.prim_name AND
 															l.sec_range = r.clean_address.sec_range AND
-															// l.unit_desig = r.clean_address.unit_desig AND
+															l.unit_desig = r.clean_address.unit_desig AND
 															((l.p_city_name = r.clean_address.p_city_name AND l.st = r.clean_address.st ) OR l.z5 = r.clean_address.zip))),
 															DATASET([{FraudGovPlatform_Services.Constants.Fragment_Types.PHYSICAL_ADDRESS_FRAGMENT}],
 																	{STRING fragmentType}));
@@ -393,9 +393,14 @@ EXPORT Functions := MODULE
 												 l.geo_long = r.clean_address.geo_long, 
 												 DATASET([{FraudGovPlatform_Services.Constants.Fragment_Types.GEOLOCATION_FRAGMENT}], 
 														{STRING fragmentType}));
+
+			emailAddress := IF(l.email_address <> '' AND
+													(l.email_address = r.email_address), 
+													DATASET([{FraudGovPlatform_Services.Constants.Fragment_Types.EMAIL_FRAGMENT}], 
+															{STRING fragmentType}));
 									
 			SELF.fragment_matches := person + name + ssn + physicalAddress + mailingAddress + IPAddress + 
-															 phone + deviceID + driversLicenseNumber + bankAccountNumber + geolocation;
+															 phone + deviceID + driversLicenseNumber + bankAccountNumber + geolocation + emailAddress;
 
 			SELF := [];
 		END; // END OF TRANSFORM															 
