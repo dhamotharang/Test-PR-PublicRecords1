@@ -21,7 +21,7 @@ shared FraudPoint_Orig		:= fSOAPAppend(UpdatePii).FraudPoint.Orig;
 
 shared Ciid_Anon					:= fSOAPAppend(UpdatePii).Ciid.Anon;
 
-// shared Crim_Anon					:= fSOAPAppend().Crim.Anon;
+shared Crim_Anon					:= fSOAPAppend().Crim.Anon;
 
 shared Death_Anon					:= fSOAPAppend(UpdatePii).Death.Anon;
 
@@ -40,7 +40,7 @@ tools.mac_WriteFile(Filenames(pversion).Base.FraudPoint_Orig.New,FraudPoint_Orig
 
 //
 tools.mac_WriteFile(Filenames(pversion).Base.CIID_Anon.New,Ciid_Anon,Build_ciid_Anon);
-// tools.mac_WriteFile(Filenames(pversion).Base.Crim_Anon.New,Crim_Anon,Build_crim_Anon);
+tools.mac_WriteFile(Filenames(pversion).Base.Crim_Anon.New,Crim_Anon,Build_crim_Anon);
 tools.mac_WriteFile(Filenames(pversion).Base.Death_Anon.New,Death_Anon,Build_death_Anon);
 												
 Export All := 	Sequential
@@ -51,7 +51,7 @@ Export All := 	Sequential
    											,Build_death_Orig
    											,Build_fraudpoint_Orig
    											,Build_ciid_Anon
-   											// ,Build_crim_Anon
+   											,Build_crim_Anon
    											,Build_death_Anon
    											,Promote(pversion).buildfiles.New2Built
 											,Build_ciid_Base
