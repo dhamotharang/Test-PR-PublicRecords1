@@ -1,4 +1,4 @@
-﻿IMPORT data_services, wk_ut, header, ut, zz_gmarcan;
+﻿IMPORT data_services, wk_ut, header, ut;
 
 EXPORT Header_Ingest_Stats_Report(string forceNewVersion = '',unsigned1 percent_nbm_change_threshold = 30) := FUNCTION
 
@@ -226,7 +226,7 @@ rj:= output(sort(report_final,-abs_nbm_change_pct_of_newHr),named('significant_c
 
 s_c_rpt := wk_ut.get_DS_Result(workunit,'significant_change_report',r_report);
 
-html := header.MAC_ConvertDS_to_HTML(s_c_rpt,src,src_desc,newHr_cnt,prev_nbm_cnt,nbm_cnt,nbm_pct_of_newHr,pct_nbm_change,nbm_change,nbm_change_pct_of_newHr,abs_nbm_change_pct_of_newHr,prod_cnt,nbm_pct_prod_cnt);
+html := header.mac_convertDs.IngestStattoHTML(s_c_rpt,src,src_desc,newHr_cnt,prev_nbm_cnt,nbm_cnt,nbm_pct_of_newHr,pct_nbm_change,nbm_change,nbm_change_pct_of_newHr,abs_nbm_change_pct_of_newHr,prod_cnt,nbm_pct_prod_cnt);
                                             
 body       := regexreplace('<BODY>',html,'<BODY><P><u>Significant Change Report:</u></P>');
 attachment := regexreplace('</BODY></HTML>',body,'</BR>');

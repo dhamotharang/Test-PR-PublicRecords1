@@ -6,12 +6,7 @@ export proc_header(string operatorEmailList, string extraNotifyEmailList) := mod
     #stored ('emailList', operatorEmailList   );
     
     shared today := (STRING8)Std.Date.Today();
-
-    // step(string versionBuild):='Yogurt:'+versionBuild+' Header Ingest';
-    step(string versionBuild):=versionBuild+' Header Ingest';
-        
-    cmpltd(string versionBuild):=step(versionBuild)+' completed';
-    failed(string versionBuild):=step(versionBuild)+' failed';
+    
     fn:=nothor(fileservices.SuperFileContents('~thor_data400::in::hdr_raw',1)[1].name);
     sub:=stringlib.stringfind(fn,today[1..2],1);
 
@@ -24,8 +19,8 @@ export proc_header(string operatorEmailList, string extraNotifyEmailList) := mod
     SHARED INGEST(boolean incremental=FALSE,string versionBuild)
        := sequential(
             #stored ('version'  , versionBuild); 
-            #WORKUNIT('name', step(versionBuild));
-            header.LogBuild.single('Started :'+step(versionBuild))           
+            #WORKUNIT('name', versionBuild + ' Header Ingest');
+            header.LogBuild.single('Started :'+ versionBuild + ' Header Ingest')           
            ,if(~incremental and versionBuild[5..6]<>fn[sub+4..sub+5],fail('Current month Equifax missing'))
            ,check_eq_monthly_file_version
            ,Header.Inputs_Sequence(incremental,versionBuild)
@@ -33,10 +28,10 @@ export proc_header(string operatorEmailList, string extraNotifyEmailList) := mod
            ,if(~incremental,header.build_source_key())
            ,Header.build_header_raw(versionBuild,incremental)
            ,if(exists(file_header_raw(src='')),fail('Blank source codes found - please review header_raw'))
-           ,header.LogBuild.single('Completed :'+step(versionBuild))
+           ,header.LogBuild.single('Completed :'+ versionBuild + ' Header Ingest')
         )
-        :success(header.msg(if(incremental,'Incremental:','')+cmpltd(versionBuild),operatorEmailList).good)
-        ,failure(header.msg(if(incremental,'Incremental:','')+failed(versionBuild),operatorEmailList).bad)
+        :success(header.msg(if(incremental,'Incremental:','') + versionBuild + ' Header Ingest Completed',operatorEmailList).good)
+        ,failure(header.msg(if(incremental,'Incremental:','') + versionBuild + ' Header Ingest Failed',operatorEmailList).bad)
         ;
           
     export run_ingest(boolean is_monthly = false, string versionBuild) := ingest(is_monthly, versionBuild);
