@@ -1,4 +1,4 @@
-﻿#workunit('name','HeaderIngestSetup');
+﻿// #workunit('name','HeaderIngestSetup');
 IMPORT wk_ut,STD,dops,ut,_control,zz_gmarcan,Header;
 
 EXPORT BWR_IngestSetup(string emailList, boolean skip_action=true) := FUNCTION
@@ -264,7 +264,7 @@ action_setup := if (ok_to_run_update, sequential(Header.Inputs_Clear(report2)
                     );
 return
 sequential(
-            restore
+             restore
             ,report_condition_status
             ,STD.System.Debug.Sleep (10000)
             ,output(report,named('auto_report'))
