@@ -16,31 +16,31 @@ dlog(string8 build_version) :=dops.TrackBuild().fSetInfoinWorktunit(dops_dataset
 
 percent_nbm_change_threshold:=100;
 
-sf_name(boolean isMonthly) := '~thor_data400::out::header_ingest_status_' + if(isMonthly, 'mon', 'inc');
+sf_name(boolean incremental) := '~thor_data400::out::header_ingest_status_' + if(incremental, 'inc', 'mon');
 
-EXPORT hdr_bld_ingest(string8 build_version, boolean isMonthly, unsigned2 status) := sequential(
-                               if(isMonthly, dlog(build_version))
+EXPORT hdr_bld_ingest(string8 build_version, boolean incremental, unsigned2 status) := sequential(
+                               if(~incremental, dlog(build_version))
                               ,if(status = 0,
                                  sequential(
-                                   Header.LogBuildStatus(sf_name(isMonthly), build_version, 1).Write // 1 -> Ingest started
+                                   Header.LogBuildStatus(sf_name(incremental), build_version, 1).Write // 1 -> Ingest started
                                    )
                                  )
                                ,if(status < 2,
                                  sequential(
                                    setup_ingest,
-                                   Header.LogBuildStatus(sf_name(isMonthly), build_version, 2).Write // 2 -> Ingest Setup Completed
+                                   Header.LogBuildStatus(sf_name(incremental), build_version, 2).Write // 2 -> Ingest Setup Completed
                                    )
                                  )
                                ,if(status < 3,
                                  sequential(
-                                   Header.proc_Header(operatorEmailList,extraNotifyEmailList).run_ingest(isMonthly, build_version),
-                                   Header.LogBuildStatus(sf_name(isMonthly), build_version, 3).Write // 3 -> Ingest Run Completed
+                                   Header.proc_Header(operatorEmailList,extraNotifyEmailList).run_ingest(incremental, build_version),
+                                   Header.LogBuildStatus(sf_name(incremental), build_version, 3).Write // 3 -> Ingest Run Completed
                                    )
                                  )
                                ,if(status < 4,
                                  sequential(
                                    Header.Header_Ingest_Stats_Report(build_version, percent_nbm_change_threshold),
-                                   Header.LogBuildStatus(sf_name(isMonthly), build_version, 0).Write  // 0 -> Ingest Build Completed
+                                   Header.LogBuildStatus(sf_name(incremental), build_version, 0).Write  // 0 -> Ingest Build Completed
                                    )
                                  )
                              );
