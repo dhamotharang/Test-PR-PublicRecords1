@@ -233,10 +233,10 @@ no_update := project(wk_ut.get_DS_Result(workunit,ingest_action + 'input_did_NOT
 yes_update := project(wk_ut.get_DS_Result(workunit,ingest_action + 'inputs_made_it_to_prod',recReport),
                      {recordof(LEFT) AND NOT {LEFT.superfilename, LEFT._wuid}});
 
-part1 := header.mac_convertDs.IngestSetuptoHTML(no_update,roxie_package_name,current_prod_roxie_version,
+part1 := header.mac_convertDs.toHTML(no_update,roxie_package_name,current_prod_roxie_version,
                                               pre_reset_header_building,logical_file_name);
 
-part2 := header.mac_convertDs.IngestSetuptoHTML(yes_update,logical_file_name,pre_reset_header_building,
+part2 := header.mac_convertDs.toHTML(yes_update,logical_file_name,pre_reset_header_building,
                                             roxie_package_name,current_prod_roxie_version,
                                             current_prod_roxie_cert_deployment_datetime,base_file_time_stamp);
 
