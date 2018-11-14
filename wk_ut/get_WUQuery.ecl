@@ -1,4 +1,4 @@
-﻿/*
+/*
   WUQuery gets workunits, archived & not archived
        <Type>archived workunits</Type>
 */
@@ -166,4 +166,3 @@ export WuidList := project(global(dnorm,few),transform(WsWorkunitRecord,
 ));
   
 end;
-

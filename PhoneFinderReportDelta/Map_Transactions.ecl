@@ -1,6 +1,4 @@
-
 ﻿IMPORT dx_PhoneFinderReportDelta, std;
-
 
 EXPORT Map_Transactions(string8 version) := FUNCTION
 	

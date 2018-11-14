@@ -8,7 +8,6 @@ EXPORT Map_Identities(string8 version) := FUNCTION
 	//DF-23286: Update Keys
 	dx_PhoneFinderReportDelta.Layout_PhoneFinder.Identities_Main trId(inFile l):= transform
 		self.date_file_loaded := version;
-
 		self.lexid						:= (unsigned)l.lexid;
 		self.full_name				:= Std.Str.FindReplace(PhoneFinderReportDelta._Functions.rmNull(l.full_name), '\\', '');//DF-23251
 		self.full_address			:= PhoneFinderReportDelta._Functions.rmNull(l.full_address);

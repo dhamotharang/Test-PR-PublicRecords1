@@ -1,4 +1,4 @@
-import AID, SexOffender, lib_date, address, hygenics_soff, lib_stringlib, nid;
+﻿import AID, SexOffender, lib_date, address, hygenics_soff, lib_stringlib, nid;
 
 ds := hygenics_soff.Mapping_Offender;
 
@@ -556,8 +556,9 @@ cleanAddress := dataset('~thor_200::persist::soff_offender_aid2', dslayout, flat
 
 //Name ID/////////////////////////////////
 
-	nid.mac_cleanfullnames(cleanAddress, cleanfullnames, name_orig);
-
+	//nid.mac_cleanfullnames(cleanAddress, cleanfullnames, name_orig);
+	nid.mac_cleanfullnames(cleanAddress, cleanfullnames, name_orig,,,,,,,,,,,,,,,,,,, true);
+	
 	cleanfullnames projFile(cleanfullnames l):= transform
 		self := l;
 	end;

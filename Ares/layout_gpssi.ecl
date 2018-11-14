@@ -1,10 +1,6 @@
 ﻿EXPORT layout_gpssi := RECORD
 	STRING1		Update_Flag 										:= '';
-<<<<<<< Updated upstream
 	INTEGER8	Primary_Key											;
-=======
-	STRING8		Primary_Key											:= '';
->>>>>>> Stashed changes
 	STRING8		Accuity_Location_ID							:= '';
 	STRING20	Correspondent_Type							:= '';
 	STRING300	Filler1													:= '';

@@ -1,4 +1,4 @@
-﻿export constants := module
+export constants := module
 
 export ssn_indicators := module
 
@@ -65,8 +65,7 @@ export checkRNA := true; // there are additional glb and dppa restrictions for R
  // records (5B max) and end at 800,000,000,000.  Sequencing is top bound because bottom (header max rid)
  // is not know at the time of source build.
  export external_sources_end_rid := 800000000000;
-
- export EN_start_rid := 900000000000;
+ export EN_start_rid:=900000000000;
 
   // LexID types
   EXPORT DidType := MODULE

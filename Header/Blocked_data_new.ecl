@@ -1,4 +1,4 @@
-﻿//Monthly Blocked data
+//Monthly Blocked data
 export Blocked_data_new := 
 MACRO
 	~(
