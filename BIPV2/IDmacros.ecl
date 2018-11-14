@@ -127,11 +127,11 @@ MACRO
 
 	#uniquename(infileWithIDsLeveled2)
 	%infileWithIDsLeveled2% :=
-		dedup(sort(distribute(infileWithIDsLeveled, hash32(ultid, orgid, seleid)), 
+		dedup(sort(distribute(infileWithIDsLeveled, hash32(ultid)), 
 		           ultid, orgid, seleid, proxid, powid, empid, uniqueId,local),
 		      ultid, orgid, seleid, proxid, powid, empid, uniqueId,local);
 
-	IDsReadyForKeyedJoin := dedup(%infileWithIDsLeveled2%, ultid, orgid, seleid, proxid, powid, empid);
+	IDsReadyForKeyedJoin := dedup(%infileWithIDsLeveled2%, ultid, orgid, seleid, proxid, powid, empid, local);
 
 	outrec := record	
 		unsigned2 fetch_error_code;
