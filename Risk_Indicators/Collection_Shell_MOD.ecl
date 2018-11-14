@@ -259,8 +259,8 @@ export getBestCleaned(dataset(doxie.layout_references) deduped_dids,string50 Dat
 		filter_exp_flag := ~experian_permitted, 
 		pre_glb_flag := (DataRestriction[23] = '1'));
 
-	best_recs_roxie := dx_BestRecords.append(deduped_dids, did, wdog_perm, on_thor := false);
-	best_recs_thor := dx_BestRecords.append(deduped_dids, did, wdog_perm, on_thor := true);
+	best_recs_roxie := dx_BestRecords.append(deduped_dids, did, wdog_perm, use_dist := false);
+	best_recs_thor := dx_BestRecords.append(deduped_dids, did, wdog_perm, use_dist := true);
 
 	best_data_roxie := project(best_recs_roxie, get_best_layout(left, left._best));
 	best_data_thor := project(best_recs_thor, get_best_layout(left, left._best), local);
