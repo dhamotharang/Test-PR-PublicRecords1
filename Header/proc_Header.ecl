@@ -34,7 +34,7 @@ export proc_header(string operatorEmailList, string extraNotifyEmailList) := mod
         ,failure(header.msg(if(incremental,'Incremental:','') + versionBuild + ' Header Ingest Failed',operatorEmailList).bad)
         ;
           
-    export run_ingest(boolean is_monthly = false, string versionBuild) := ingest(is_monthly, versionBuild);
+    export run_ingest(boolean incremental = false, string versionBuild) := ingest(incremental, versionBuild);
     
     #stored ('buildname', 'PersonHeader'   ); 
     #stored ('version'  , header.version_build); 
