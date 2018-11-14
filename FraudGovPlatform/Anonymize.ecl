@@ -88,4 +88,47 @@ EXPORT Anonymize  := Module
 																																										 
 	End;
 	
+	Export Crim(dataset(Layouts.crim) pCrimFile)		:= Module
+		
+	shared anonymizeSources := join ( pCrimFile,
+													Sources_To_Anonymize,
+													left.fdn_file_info_id = right.fdn_file_info_id,
+													transform(recordof(left), self := left;),
+													inner,
+													LOOKUP);
+													
+		anonymize_Input	:= Project(anonymizeSources,FraudGovPlatform.Layouts.crim);
+													
+			anonymizePerson :=Anonymizer.mac_AnonymizePerson(anonymize_Input,fname,lname);
+		anonymizePerson1 :=Anonymizer.mac_AnonymizePerson(anonymizePerson,,,,ssn,dob);
+		anonymizeAddress :=Anonymizer.macAnonymizeAddress(anonymizePerson1,prim_range,predir,prim_name
+											,addr_suffix,postdir,unit_desig,sec_range,p_city_name,v_city_name,st,zip5,zip4);									
+			
+		FraudGovplatform.Layouts.crim		TrAddress(anonymizeAddress l)	:=	Transform
+																			self.street_address_1 :=ut.CleanSpacesAndUpper(trim(l.prim_range)+' '+
+																																										 trim(l.predir) +' '+
+																																										 trim(l.prim_name)+' '+
+																																										 trim(l.addr_suffix)+' '+
+																																										 trim(l.postdir)+' '+
+																																										 trim(l.unit_desig)+' '+
+																																										 trim(l.sec_range));
+																			self.street_address_3	:= l.p_city_name;
+																			self.street_address_4	:= l.st;
+																			self.street_address_5	:= l.zip5;
+																			self									:= l;
+																			end;
+																																										 
+																																										 
+		shared crim_anonymized	:= Project(anonymizeAddress,TrAddress(left));
+		
+		shared Crim_orig 			:= join(pCrimFile,
+																	anonymizeSources,
+																	left =right
+																	,transform(Layouts.crim, self := left),
+																	left only);
+											
+		export all				:= crim_anonymized + Crim_orig;						
+																																										 
+	End;
+	
 End;
