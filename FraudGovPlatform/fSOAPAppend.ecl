@@ -272,7 +272,7 @@ Export orig	:= if(updatepii,dedup((ciid_base_map + ciid_orig),all),ciid_base_map
 
 Export	anon	:= if(updatepii,dedup((ciid_prep + ciid_anon),all),ciid_prep); // Anonymized + Non-Anonymzied file
 
-Export all				:= dedup(anon + ciid_demo_anon,all);	//Append demo data
+Export all				:= dedup(anon + if(_flags.UseDemoData,ciid_demo_anon),all);	//Append demo data
 
 END;
 
@@ -282,26 +282,8 @@ service_name	:= 'criminalrecords_batchservice.batchservice';
 soap_host		:= riskwise.shortcuts.prod_batch_analytics_roxie;
 
 layout_in   := CriminalRecords_BatchService.Layouts.batch_in;
+
 layout_out  := CriminalRecords_BatchService.Layouts.batch_out;
-
-//FraudGov only retunring the records for following crim categories. Per GRP-247
-#CONSTANT('includebadchecks', TRUE);
-#CONSTANT('includebribery', TRUE);
-#CONSTANT('ncludeburglarycomm', TRUE);
-#CONSTANT('ncludeburglaryres', TRUE);
-#CONSTANT('ncludeburglaryveh', TRUE);
-#CONSTANT('ncludecomputer', TRUE);
-#CONSTANT('ncludecounterfeit', TRUE);
-#CONSTANT('ncludefraud', TRUE);
-#CONSTANT('ncludeidtheft', TRUE);
-#CONSTANT('ncludemvtheft', TRUE);
-#CONSTANT('ncluderobberycomm', TRUE);
-#CONSTANT('ncluderobberyres', TRUE);
-#CONSTANT('ncludeshoplift', TRUE);
-#CONSTANT('ncludestolenprop', TRUE);
-#CONSTANT('ncludetheft', TRUE);
-#CONSTANT('ncludetraffic', TRUE);
-
 
 layout_in make_batch_in(pii_base L) := TRANSFORM
 	SELF.acctno := (string)l.record_id;
@@ -320,8 +302,36 @@ layout_in make_batch_in(pii_base L) := TRANSFORM
 	SELF := [];
 END;
 
-soap_input := DISTRIBUTE(project(pii_base, make_batch_in(left)),RANDOM() % nodes);
+//Removed the Constant parameters for soap input and added them as flags as in Roxie. GRP-2332
 
+layout_soap := RECORD
+	DATASET(layout_in) batch_in;
+	BOOLEAN IncludeBadChecks:= TRUE;
+	BOOLEAN IncludeBribery:= TRUE;
+	BOOLEAN IncludeBurglaryComm:= TRUE;
+	BOOLEAN IncludeBurglaryRes:= TRUE;
+	BOOLEAN IncludeBurglaryVeh:= TRUE;
+	BOOLEAN IncludeComputer:= TRUE;
+	BOOLEAN IncludeCounterfeit:= TRUE;
+	BOOLEAN IncludeFraud:= TRUE;
+	BOOLEAN IncludeIdTheft:= TRUE;
+	BOOLEAN IncludeMVTheft:= TRUE;
+	BOOLEAN IncludeRobberyComm:= TRUE;
+	BOOLEAN IncludeRobberyRes:= TRUE;
+	BOOLEAN IncludeShoplift:= TRUE;
+	BOOLEAN IncludeStolenProp:= TRUE;
+	BOOLEAN IncludeTheft:= TRUE;
+	BOOLEAN IncludeAtLeast1Offense:= TRUE;
+END;
+
+layout_Soap trans(pii_base L) := TRANSFORM
+	batch := PROJECT(L, make_batch_in(LEFT));
+	SELF.batch_in := batch;
+	self := L;
+END;
+
+soap_input := DISTRIBUTE(project(pii_base, trans(LEFT)),RANDOM() % nodes);
+								
 xlayout := RECORD
 	(layout_out)
 	STRING errorcode;
@@ -337,7 +347,6 @@ soap_results := soapcall( soap_input,
 						service_name,  
 						{soap_input},
 						DATASET(xlayout),
-						HEADING('<batch_in><Row>','</Row></batch_in>'),
 						PARALLEL(threads), 
 						onFail(myFail(LEFT))
 						)
@@ -354,15 +363,14 @@ shared Crim_recid_map	:= Join(Pii_Base_norm, P, left.record_id = right.record_id
 shared Crim_base_map	:= Join(pii_input , Crim_recid_map, left.record_id=right.record_id,Transform(Layouts.Crim
 																	,self.fdn_file_info_id	:= left.fdn_file_info_id,self:=right));
 
-// shared Crim_prep	:= Anonymize.Crim(Crim_base_map).all;
+shared Crim_prep	:= Anonymize.Crim(Crim_base_map).all;
 
-crim_combine	:= dedup((Crim_base_map + crim_orig),record,all);
+Export orig		:= if(updatepii,dedup((Crim_base_map + Crim_orig),all),Crim_base_map);	// Non-Anonymzied file
 
-Export orig		:= if(updatepii, crim_combine,Crim_base_map);	// Non-Anonymzied file
+Export	anon	:= if(updatepii,dedup((Crim_prep + crim_anon),all),Crim_prep); // Anonymized + Non-Anonymzied file
 
-Export all			:= dedup(orig + crim_demo_anon,all); //Append demo data
-
-									
+Export all			:= dedup(anon + if(_flags.UseDemoData,crim_demo_anon),all); //Append demo data
+							
 END;
 
 EXPORT Death	:= MODULE
@@ -443,7 +451,7 @@ Export orig	:= if(updatepii,dedup((p + Death_orig),all),death_base_map);	//Non A
 
 Export anon	:= if(updatepii,dedup((Death_prep + Death_anon),all),Death_prep);	 // Anonymized + Non-Anonymzied file
 
-Export all		:= dedup(anon + Death_demo_anon,all);	//Append demo data
+Export all		:= dedup(anon + if(_flags.UseDemoData,Death_demo_anon),all);	//Append demo data
 				
 END;
 
@@ -554,7 +562,7 @@ Fp_combine	:= dedup((Fp_base_map + fraudpoint_orig),record,all);
 
 Export orig		:= if(updatepii, Fp_combine,Fp_base_map);	
 
-Export all		:= dedup(orig + FraudPoint_Demo,all);	 //Append demo data
+Export all		:= dedup(orig + if(_flags.UseDemoData,FraudPoint_Demo),all);	 //Append demo data
 
 END;
 

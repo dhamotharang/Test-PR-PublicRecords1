@@ -1,9 +1,10 @@
-﻿
+﻿/*
 ssi_link := record
 	string ssi_link_href {xpath('link/@href')};
 	string ssi_link_rel {xpath('link/@rel')};
+	layouts.layout_link entityReference {xpath('link')};
 end;
-
+*/
 ssiset_link := record
 	string ssiset_link_href {xpath('ssiSet/link/@href')};
 	string ssiset_link_rel {xpath('ssiSet/link/@rel')};
@@ -19,8 +20,8 @@ export layout_ssiset := record
 	string status	 {xpath('status')};		
 	string presence_link_href {xpath('presence/link/@href')};
 	string presence_link_rel {xpath('presence/link/@rel')};
-	dataset(ssi_link) ssis {xpath('ssis/ssi')};
-	dataset(ssiset_link) extendsSSISet {xpath('extendsSSISet')};
+	dataset(layouts.layout_link) ssi_reference {xpath('ssis/ssi/link')};
+	dataset(ssiset_link) extendsSSI {xpath('extendsSSISet')};
 	string validationDate {xpath('validationDate')};
 	string validationDate_accuracy {xpath('validationDate/@accuracy')};
 	string renewalDate {xpath('renewalDate')};

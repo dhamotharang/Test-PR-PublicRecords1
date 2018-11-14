@@ -1,6 +1,6 @@
 ﻿import _Control;
 
-EVERY_DAY_AT_6AM := '0 10 * * *';
+EVERY_DAY_AT_6AM := '0 11 * * *';
 ThorName	:=		IF(_control.ThisEnvironment.Name		<> 'Prod_Thor',		Constants.ThorName_Dev,	Constants.ThorName_Prod);
 
 lECL1 :=
