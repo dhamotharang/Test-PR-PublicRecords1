@@ -2,8 +2,7 @@
 
 export macSprayFiles(
 
-	 //pServerIP		= _control.IPAddress.bctlpedata11
-	 //pServerIP 		= 'uspr-edata11.risk.regn.net'
+	 pServerIP		= _control.IPAddress.bctlpedata11
 	 //pServerIP 		= 'bctlpedata11.risk.regn.net'
 	,pDirectory		= ''
 	,pFilename		= ''
@@ -28,7 +27,7 @@ macro
 
 	%FilesToSpray% := DATASET([
 
-	 	{_control.IPAddress.bctlpedata11
+	 	{pServerIP
 	 	,pDirectory
 	 	,pFilename
 	 	,%recordlength%
