@@ -1,4 +1,4 @@
-﻿import _Control,header,Roxiekeybuild,dops; 
+import _Control,header,Roxiekeybuild,dops; 
 
 elist:=         'gabriel.marcan@lexisnexisrisk.com'
              + ',Debendra.Kumar@lexisnexisrisk.com'
@@ -22,6 +22,10 @@ dops.updateversion('AddressRawAIDKeys'      ,h_version,elist,,'N'); // header //
 
 dops.updateversion('FCRA_PersonHeaderKeys'  ,h_version,elist,,'F'); // header // FCRA_Header
 dops.updateversion('AddressRawAIDKeys'      ,h_version,elist,,'F'); // header // FCRA_Header
+
+dops.updateversion('RemoteLinkingKeys'      ,h_version,elist,,'N'); // header // RemoteLinkingKeys
+
+
 
 dops.updateversion('PersonHeaderKeys'       ,h_version,elist,,'B'); // header // <=== NOTE !! RELEASE THE DAY AFTER
 dops.updateversion('PowerSearchKeys'        ,h_version,elist,,'B'); // header // <=== NOTE !! RELEASE THE DAY AFTER

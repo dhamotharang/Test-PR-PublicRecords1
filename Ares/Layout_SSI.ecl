@@ -1,11 +1,20 @@
+<<<<<<< Updated upstream
 ﻿	use_record := record
 		string use_value {xpath('./')};
+=======
+﻿	use := record
+		string use {xpath('./')};
+>>>>>>> Stashed changes
 		string use_abbreviation {xpath('./@abbreviation')};
 	end;
 
 	layout_usage := record
 		string usage_all 	{xpath('@all')};
+<<<<<<< Updated upstream
 		dataset(use_record) use_type 	{xpath('use')};
+=======
+		dataset(use) use 	{xpath('use')};
+>>>>>>> Stashed changes
 	end;
 
 	routing_code := record

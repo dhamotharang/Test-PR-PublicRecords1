@@ -6,10 +6,13 @@ relation_layout := record
 	string routingCode_href {xpath('routingCode/link/@href')};
 	string context {xpath('routingCode/context')};
 end;
+
 usageLocation_layout := record
 	string primaryAssignee {xpath('@primaryAssignee')};
 	string rankAtLocation {xpath('@rankAtLocation')};
 	dataset(relation_layout) relatedCodes {xpath('relatedCodes/relation')};
+	layouts.layout_link presence_link {xpath('presence/link')};
+	layouts.layout_link department_link {xpath('department/link')};
 end;
 
 export layout_routingCode := record,  MAXLENGTH(350000)

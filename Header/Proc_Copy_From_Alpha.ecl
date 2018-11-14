@@ -88,7 +88,7 @@ end;
 // ************************************************************************************************************************************
 
 EXPORT Copy := sequential(
-         nothor(apply(linking_keys+base_relative ,copy_files    (nm,src_name,'thor400_44','from_alpha1','thor_data400')))
+         nothor(apply(linking_keys(+base_relative ,copy_files    (nm,src_name,'thor400_44','from_alpha1','thor_data400')))
         ,nothor(apply(linking_keys               ,copy_files    (nm,src_name,'thor400_36','local'      ,'thor400_36'  )))
         ,nothor(apply(linking_keys+base_relative ,update_supers (ver(nm,'built', 'thor400_44')         ,ver(nm,filedate))))
 );

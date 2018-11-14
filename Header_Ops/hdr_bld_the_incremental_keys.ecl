@@ -2,7 +2,7 @@
 #stored ('buildname', 'header_incremental_keys'   ); 
 #stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com,Debendra.Kumar@lexisnexisrisk.com,Isabel.Ma@lexisnexisrisk.com');
 string  emailList  := ''  :stored('emailList');
-string  rpt_qa_email_list:='BocaRoxiePackageTeam@lexisnexis.com,Prasanna.Kolli@lexisnexisrisk.com';
+string  rpt_qa_email_list:='BocaRoxiePackageTeam@lexisnexis.com,Isabel.Ma@lexisnexisrisk.com';
 import Header,_control,std,InsuranceHeader,doxie, dops;
 
 wk:=workunit;
@@ -70,16 +70,31 @@ Deploy :=    sequential(
                 ):failure(std.system.Email.SendEmail(emailList,'FAILED:Deploy:'+workunit,wLink));
 
 // isProd_eq_Cert_Ver;
+// build_fcra;
 
 // /* STEP 1 */ icheck; // HTHOR;
 // /* STEP 2 */ Refresh_copy; // HTHOR
 // /* STEP 3 */ update_inc_idl; // HTHOR
 // /* STEP 4 */ build_inc_key; // * THOR *
 // /* STEP 4.5 */ move_to_QA; // * HTHOR *
-/* STEP 5 */ if(isProd_eq_Cert_Ver, Deploy); // HTHOR 
-// /* STEP 6 */ Header.Proc_Copy_Keys_To_Dataland.Incrementals; // DATALAND HTHOR
+// /* STEP 5 */ if(isProd_eq_Cert_Ver, Deploy); // HTHOR 
+/* STEP 6 */ Header.Proc_Copy_Keys_To_Dataland.Incrementals; // DATALAND HTHOR
 
 /*
+20181109
+1 W20181107-123929
+2 W20181107-130527
+3 W20181107-150552
+4 W20181107-152343
+4.5 W20181108-091335
+
+20181105
+1 W20181107-123929
+2 W20181107-130527
+3 W20181107-150552
+4 W20181107-152343
+4.5 W20181108-091335
+
 20181019
 1 W20181024-144243
 2 W20181024-151820

@@ -59,7 +59,7 @@ EXPORT map_SCS0853_conversion(STRING pVersion) := FUNCTION
 		TrimNAME_MID 					:= ut.CleanSpacesAndUpper(pInput.MID_NAME);
 		TrimNAME_LAST 				:= ut.CleanSpacesAndUpper(pInput.LAST_NAME);
 		TrimNAME_PREFX        := ut.CleanSpacesAndUpper(pInput.TITLE);
-		TrimLic_Type					:= ut.CleanSpacesAndUpper(pInput.LICENSE_DESC);
+		TrimLic_Type					:= ut.CleanSpacesAndUpper(pInput.SUB_CAT);
 		TrimNAME_ORG					:= ut.CleanSpacesAndUpper(pInput.FULL_NAME);
 		TrimNAME_OFFICE 			:= ut.CleanSpacesAndUpper(pInput.OFFICENAME);
 
@@ -78,10 +78,10 @@ EXPORT map_SCS0853_conversion(STRING pVersion) := FUNCTION
 		// License Information - SC license search website shows license # without prefix, thus not included here either.
 		//Used by 20150121												 
 		SELF.LICENSE_NBR	  	:= IF(REGEXFIND('^([0-9]+)', Trim_SLNUM), Trim_SLNUM,
-																REGEXFIND('[A-Z]+ \\.([0-9]+)[ ]*([A-Z]+$)',Trim_SLNUM,1)
+																REGEXFIND('[A-Z]+ \\.([0-9]+)',Trim_SLNUM,1)
 																);
 		
-		SELF.RAW_LICENSE_TYPE	:= IF(pInput.SUB_CAT <> '',ut.CleanSpacesAndUpper(pInput.SUB_CAT),TrimLic_Type);
+		SELF.RAW_LICENSE_TYPE	:= TrimLic_Type;
 		
 		//Uncomment for 20140410
 		SELF.STD_LICENSE_TYPE := IF(LENGTH(TRIM(SELF.raw_license_type)) > 4,

@@ -225,7 +225,8 @@ supression_status_report := sequential(output_as_is_files);
 
 // /* STEP 1 */ sequential(o1,o2,o3,o4,o5); // Check: JUST RUN. It will generate report
 // /* STEP 2 */ add_alpha_suppressions; 
-/* STEP 3 */ sequential(o1,o2,o3,o4,o5); // Check: JUST RUN. It will generate report
+// /* STEP 3 */ sequential(o1,o2,o3,o4,o5); // Check: JUST RUN. It will generate report
+/* STEP 4 */ promote; // Promote to superfiles thor_data400::key::pre_file_header_building::
 
 /*
 

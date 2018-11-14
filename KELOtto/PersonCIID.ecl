@@ -1,6 +1,6 @@
 ﻿IMPORT KELOtto;
 
-r:=RECORD
+r:= RECORD
   string12 did;
   string5 title;
   string20 fname;
@@ -179,9 +179,11 @@ r:=RECORD
   string3 cvicustomscore;
   string1 instantidversion;
   string errorcode;
+  unsigned8 record_id;
+  unsigned6 fdn_file_info_id;
  END;
 
-newr:=RECORD
+newr := RECORD
   UNSIGNED8 did;
   string5 title;
   string20 fname;
@@ -360,11 +362,13 @@ newr:=RECORD
   string3 cvicustomscore;
   string1 instantidversion;
   string errorcode;
-	STRING Hri;
+  unsigned8 record_id;
+  unsigned6 fdn_file_info_id;
+  STRING Hri;
  END;
 
 
-PersonCIIDAttr := PROJECT(PULL(dataset('~foreign::10.173.14.201::thor_data400::base::fraudgov::qa::ciid',r,flat)), 
+PersonCIIDAttr := PROJECT(PULL(dataset('~thor_data400::base::fraudgov::qa::ciid',r,flat)), 
               TRANSFORM(newr, self.did := (UNSIGNED8)left.did, 
 							SELF.Hri := TRIM(LEFT.hri_1) + '|' + TRIM(LEFT.hri_2) + '|' + TRIM(LEFT.hri_3) + '|' + TRIM(LEFT.hri_4) + '|' + TRIM(LEFT.hri_5) + '|' + TRIM(LEFT.hri_6) + '|' + TRIM(LEFT.hri_7) + '|' + TRIM(LEFT.hri_8) + '|' + TRIM(LEFT.hri_9) + '|' + TRIM(LEFT.hri_10) + '|' + TRIM(LEFT.hri_11) + '|' + TRIM(LEFT.hri_12) + '|' + TRIM(LEFT.hri_13) + '|' + TRIM(LEFT.hri_14) + '|' + TRIM(LEFT.hri_15) + '|' + TRIM(LEFT.hri_16) + '|' + TRIM(LEFT.hri_17) + '|' + TRIM(LEFT.hri_18) + '|' + TRIM(LEFT.hri_19) + '|' + TRIM(LEFT.hri_20),
 							SELF := LEFT));

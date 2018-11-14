@@ -5,7 +5,7 @@ wuname := 'Create Raw Header Stats: '+ versionBuild;
 
 #WORKUNIT('priority','high');
 #WORKUNIT('name', wuname);
-#OPTION('AllowedClusters','thor400_66 ,thor400_44');
+#OPTION('AllowedClusters','thor400_36 ,thor400_44');
 
 statsEmailRecepients:= if(incremental, Header.email_list.statsInc, Header.email_list.statsMon);
 
@@ -29,7 +29,7 @@ return sequential(stats, if(~incremental,run_rel_avb));
 END;
 
 boolean incremental:=true;
-run_stats(Header.email_list.BocaDevelopers,incremental,'20181016');
+run_stats(Header.email_list.BocaDevelopers,incremental,'20181106');
 
 // run on p_svc_person_header: Header_AVB.Stat is sandboxed
 // run on thor (eg 44) 
@@ -46,6 +46,7 @@ run_stats(Header.email_list.BocaDevelopers,incremental,'20181016');
 
 Previous runs
 -------------
+20181031 W20181102-125955
 20181002 W20181003-155000
 20180911 W20180912-233629
 20180904 W20180905-164827

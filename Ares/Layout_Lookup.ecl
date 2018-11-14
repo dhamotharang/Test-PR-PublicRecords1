@@ -11,6 +11,17 @@ end;
 
 lookup_lookupBody := record
 	string id {xpath('./@id')}:='';
+	string fid {xpath('./@fid')};
+	string fdbDescription {xpath('./@fdbDescription')};
+	string fdbDescriptionPlural {xpath('./@fdbDescriptionPlural')};
+	string fdbFormat {xpath('./@fdbFormat')};
+	string format {xpath('./@format')};
+	string ibanFormat {xpath('./@ibanFormat')};
+	string tfpFormat {xpath('./@tfpFormat')};
+	string tfpid {xpath('./@tfpid')};
+	string tfpDescription {xpath('./@tfpDescription')};
+	string tfpDescriptionAbbr {xpath('./@tfpDescriptionAbbr')};
+	string workGroup {xpath('./@workGroup')};
 	string seq {xpath('./@seq')};
 	string completeText {xpath('./@completeText')}:='';
 	string abbreviatedText {xpath('./@abbreviatedText')}:='';
