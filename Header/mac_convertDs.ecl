@@ -1,5 +1,6 @@
-﻿EXPORT MAC_ConvertDS_to_HTML
-  (raw_data, col1='td1',col2='td2',col3='td3',col4='td4',col5='td5',col6='td6',col7='td7',col8='td8',col9='td9',col10='td10',col11='td11',col12='td12',skipParentTages = false) := FUNCTIONMACRO
+﻿EXPORT mac_convertDs := MODULE
+
+  EXPORT toHTML(raw_data, col1='td1',col2='td2',col3='td3',col4='td4',col5='td5',col6='td6',col7='td7',col8='td8',col9='td9',col10='td10',col11='td11',col12='td12',skipParentTages = false) := FUNCTIONMACRO
     IMPORT std;
     pre_p := record
         string html := '';
@@ -84,3 +85,5 @@
     return v3;
 
 ENDMACRO;
+
+END;

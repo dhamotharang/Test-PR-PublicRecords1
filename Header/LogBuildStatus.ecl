@@ -10,7 +10,7 @@ EXPORT LogBuildStatus(string sf_name, string version = '', unsigned2 status = 0)
 
     shared rec := {string version, unsigned2 status};
 	ds	:= dataset([{version, status}],rec) + dataset(sf_name, rec, thor)(version <> version);
-	PromoteSupers.MAC_SF_BuildProcess(ds, sf_name, PostVer ,2,,true);
+	PromoteSupers.MAC_SF_BuildProcess(ds, sf_name, PostVer ,2,,true,thorlib.wuid()+(string)status);
 	EXPORT Write := sequential(
                         if(~STD.File.FileExists(sf_name), STD.File.CreateSuperFile(sf_name)),
                         if(~STD.File.FileExists(sf_name + '_father'), STD.File.CreateSuperFile(sf_name + '_father')),
