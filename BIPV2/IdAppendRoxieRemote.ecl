@@ -9,7 +9,7 @@ export IdAppendRoxieRemote(
 		,boolean primForcePost = false 
 		,boolean useFuzzy = true
 		,boolean doZipExpansion = true
-		,boolean doAppend = true
+		,boolean reAppend = true
 	) := module
 
 
@@ -27,7 +27,7 @@ export IdAppendRoxieRemote(
 		dataset(row(
 			transform(IdAppendLayouts.SoapRequest,
 				self.append_input := inputDs,
-				self.do_append := doAppend,
+				self.re_append := reAppend,
 				self.score_threshold := scoreThreshold,
 				self.weight_threshold := weightThreshold,
 				self.disable_salt_force := disableSaltForce,
@@ -98,7 +98,7 @@ export IdAppendRoxieRemote(
 		soapError := soapResult(error_code != 0);
 		withError := project(inputDs, transform(recordof(soapResult),
 			self.request_id := left.request_id,
-			self := soapError[1]
+			self := soapError[1],
 		));
 
 		return if(exists(soapError), withError, soapResult);

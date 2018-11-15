@@ -101,7 +101,7 @@ export IdAppendLayouts := module
 		boolean prim_force_post {xpath('prim_force_post')},
 		boolean use_fuzzy {xpath('use_fuzzy')},
 		boolean do_zip_expansion {xpath('do_zip_expansion')},
-		boolean do_append {xpath('do_append')},
+		boolean re_append {xpath('re_append')},
 		boolean from_thor {xpath('from_thor')},
 
 		boolean include_best {xpath('include_best')},
