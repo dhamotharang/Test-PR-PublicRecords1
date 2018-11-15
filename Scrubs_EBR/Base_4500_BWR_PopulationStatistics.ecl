@@ -1,0 +1,7 @@
+﻿//This is the code to execute in a builder window
+#OPTION('multiplePersistInstances', FALSE);
+#workunit('name','Scrubs_EBR.Base_4500_BWR_PopulationStatistics - Population Statistics - SALT V3.11.4');
+IMPORT Scrubs_EBR,SALT311;
+// In the line below substitute the file you want statistics for; and substitute any field names you can
+  Scrubs_EBR.Base_4500_MAC_PopulationStatistics(YourFileName,/*Reference Field*/,/* powid_field */,/* proxid_field */,/* seleid_field */,/* orgid_field */,/* ultid_field */,/* bdid_field */,/* date_first_seen_field */,/* date_last_seen_field */,/* process_date_first_seen_field */,/* process_date_last_seen_field */,/* record_type_field */,/* process_date_field */,/* file_number_field */,/* segment_code_field */,/* sequence_number_field */,/* total_ucc_filed_field */,/* coll_count_ucc_field */,/* coll_code1_field */,/* coll_desc1_field */,/* coll_code2_field */,/* coll_desc2_field */,/* coll_code3_field */,/* coll_desc3_field */,/* coll_code4_field */,/* coll_desc4_field */,/* coll_code5_field */,/* coll_desc5_field */,/* coll_code6_field */,/* coll_desc6_field */,/* coll_code7_field */,/* coll_desc7_field */,/* coll_code8_field */,/* coll_desc8_field */,/* coll_code9_field */,/* coll_desc9_field */,/* coll_code10_field */,/* coll_desc10_field */,/* coll_code11_field */,/* coll_desc11_field */,/* coll_code12_field */,/* coll_desc12_field */,/* addtnl_coll_codes_field */,outfile);
+  OUTPUT(outfile,NAMED('PopulationStatistics'));
