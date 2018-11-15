@@ -23,6 +23,7 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_ALL_La
 		SELF.InputArchiveDateEcho := le.InputArchiveDateEcho;
 		SELF.InputArchiveDateClean := le.InputArchiveDateEcho; 
 		SELF.InputUIDAppend := le.InputUIDAppend;
+		SELF.BusInputUIDAppend := le.BusInputUIDAppend;
 		SELF.InputSSNEcho := le.InputSSNEcho;
 		SELF.InputDateOfBirthEcho := le.InputDateOfBirthEcho;
 		SELF.InputDLNumberEcho := le.InputDLNumberEcho;
@@ -93,7 +94,8 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_ALL_La
 		SELF.DateValid := cleaned_DOB.DateValid;  
 		SELF.ValidPortion_00 := cleaned_DOB.ValidPortion_00; 
 		SELF.ValidPortion_01 := cleaned_DOB.ValidPortion_01; 
-
+		
+		SELF.RepNumber := le.RepNumber;
 		SELF := [];
     END;
 

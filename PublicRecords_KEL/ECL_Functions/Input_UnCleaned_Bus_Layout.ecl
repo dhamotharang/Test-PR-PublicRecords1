@@ -1,6 +1,4 @@
-﻿IMPORT PublicRecords_KEL;
-
-EXPORT AttrBusWithUID_Layout := RECORD
+﻿EXPORT Input_UnCleaned_Bus_Layout := RECORD
 		INTEGER BusInputUIDAppend;
 		INTEGER7 InputLexIDBusExtendedFamilyEcho;
 		INTEGER7 InputLexIDBusLegalFamilyEcho;
@@ -14,11 +12,11 @@ EXPORT AttrBusWithUID_Layout := RECORD
 		STRING25 BusInputStateEcho;
 		STRING10 BusInputZipEcho;
 		STRING16 BusInputPhoneEcho;
+		STRING10 BusInputTINEcho;
 		STRING45 BusInputIPAddressEcho;
 		STRING50 BusInputURLEcho;
 		STRING54 BusInputEmailEcho;
 		STRING6 BusInputSICCodeEcho;
 		STRING6 BusInputNAICSCodeEcho;
 		STRING20 BusInputArchiveDateEcho;
-		INTEGER InputUIDAppend;
-END;
+   END; 

@@ -137,7 +137,11 @@ soapLayout := RECORD
   INTEGER ScoreThreshold;
 end;
 
-ResultSet:= PublicRecords_KEL.FnRoxie_GetBusAttrs(inDataReadyDist);
+	Options := MODULE(PublicRecords_KEL.Interface_Options)
+		EXPORT INTEGER ScoreThreshold := 80;
+	END;
+	
+ResultSet:= PublicRecords_KEL.FnRoxie_GetBusAttrs(inDataReadyDist, Options);
 
 OUTPUT(CHOOSEN(inDataReady, eyeball), NAMED('Raw_input'));
 OUTPUT( ResultSet, NAMED('Results') );

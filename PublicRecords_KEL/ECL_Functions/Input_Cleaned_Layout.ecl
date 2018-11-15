@@ -2,6 +2,7 @@
 
 EXPORT Input_Cleaned_Layout := RECORD
 	INTEGER InputUIDAppend; 
+	INTEGER BusInputUIDAppend;	
 	INTEGER7 LexIDAppend; 
 	INTEGER2 LexIDScoreAppend;  
 
@@ -28,7 +29,6 @@ EXPORT Input_Cleaned_Layout := RECORD
 	STRING7 InputGeoblockClean;
 	STRING3 InputAddressTypeClean;
 	STRING4 InputAddressStatusClean;
-	STRING25 InputCountryClean;
 	STRING50 InputEMailClean;
 	STRING10 InputHomePhoneClean;
 	STRING10 InputWorkPhoneClean;
