@@ -130,7 +130,7 @@ IMPORT doxie,ut,_Control,AutoStandardI,AutoheaderV2;
   end;
   AutoStandardI.PermissionI_Tools.val(perm_mod).GLB.mac_FilterOutMinors(hr,res_filtered,,perm_mod);
 // output(	res_filtered, named('res_filtered'));
-  EXPORT dataset (AutoheaderV2.layouts.search_out) results := hr;
+  EXPORT dataset (AutoheaderV2.layouts.search_out) results := res_filtered;
 
   // ... if only one message is of interest to the caller, use (status = Constants.STATUS._MNAME)
   fetched_msg := dedup (sort (lib_dids (did = 0), fetch_hit, index_hit), fetch_hit, index_hit);

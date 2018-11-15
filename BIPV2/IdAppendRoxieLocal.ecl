@@ -16,8 +16,7 @@ export IdAppendRoxieLocal(
 		,boolean primForcePost = false 
 		,boolean useFuzzy = true
 		,boolean doZipExpansion = true
-		,boolean doAppend = true
-		,boolean fromThor = false // TODO:
+		,boolean reAppend = true
 	) := function
 
 inputRecPlus := {
@@ -30,7 +29,7 @@ inputRecPlus := {
 };
 
 inputDsZip :=
-	project(inputDs(doAppend or (proxid = 0 and seleid = 0)), transform(inputRecPlus,
+	project(inputDs(reAppend or (proxid = 0 and seleid = 0)), transform(inputRecPlus,
 		airportReplacement := BIPV2.fn_translate_city(Str.ToUpperCase(left.city));
 		newCity := Str.ToUpperCase(if(count(airportReplacement) = 0, left.city, airportReplacement[1]));
 		newState0 := Str.ToUpperCase(if(count(airportReplacement) = 0, left.state, airportReplacement[2]));
@@ -182,10 +181,13 @@ topScores :=
 			self.seleid := if(left.proxid != 0, 0, left.seleid);
 			self := left;
 			self := []));
-	passThru := if(doAppend, dataset([], recordof(passThru0)),
+	passThru := if(reAppend, dataset([], recordof(passThru0)),
 	               BizLinkFull.Process_Biz_Layouts.id_stream_complete(passThru0));
 
-	passThruPreSuppress := project(passThru, transform(recordof(preSuppression), self := left, self := []));
+	passThruPreSuppress := project(passThru, transform(recordof(preSuppression),
+		self.request_id := left.uniqueid,
+		self := left,
+		self := []));
 
 	suppressed :=  BIPV2_Suppression.macSuppress(preSuppression + passThruPreSuppress);
 
