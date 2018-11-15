@@ -15,7 +15,7 @@ header_get_wuid_results(filedate,res_name,out_rec,step) := FUNCTIONMACRO
 												'sync'   => '*' + filedate+' Header Sync;Rollup & Stats',
 												'');
 				
-				raw_wuids := wk_ut.get_WorkunitList(w_s,w_e,pJobname:=trim(job_name) ,pesp :=  esp);
+				raw_wuids := nothor(wk_ut.get_WorkunitList(w_s,w_e,pJobname:=trim(job_name) ,pesp :=  esp));
 				
 				
 				rec_fls := record
