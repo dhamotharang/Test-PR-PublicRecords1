@@ -1,12 +1,9 @@
-﻿import ut, _Control, did_add, std;
+import ut, _Control, did_add, std;
 
 // if for some reason the environment variable isn't there (like when you're not running this function on a roxie which has package files, use today's date)
 EXPORT get_Build_Date(string variable_name) := function
 	today := (STRING8)Std.Date.Today();
-	
-	
-	env_variable := if(variable_name = 'doc_build_version', '20181024',
-		thorlib.getenv(variable_name,today)[1..8]);
+	env_variable := thorlib.getenv(variable_name,today)[1..8];
 	
 	return env_variable;
 	

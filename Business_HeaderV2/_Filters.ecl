@@ -1,4 +1,4 @@
-﻿import header, phonesplus, irs_Dummy, doxie, business_header;
+import header, phonesplus, irs_Dummy, doxie, business_header;
 export _Filters :=
 module
 

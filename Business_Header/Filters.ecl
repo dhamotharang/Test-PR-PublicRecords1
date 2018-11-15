@@ -1,4 +1,4 @@
-﻿import header, phonesplus, irs_Dummy, doxie, ut, PAW, corp2,mdr;
+import header, phonesplus, irs_Dummy, doxie, ut, PAW, corp2,mdr;
 
 export Filters :=
 module

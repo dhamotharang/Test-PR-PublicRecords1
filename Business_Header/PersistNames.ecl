@@ -1,4 +1,4 @@
-﻿import versioncontrol;
+import versioncontrol;
 export PersistNames(
 
 	boolean	pUseOtherEnvironment = false	//if true on dataland, use prod, if true on prod, use dataland
