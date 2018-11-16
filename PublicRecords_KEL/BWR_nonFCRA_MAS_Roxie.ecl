@@ -30,10 +30,14 @@ DataRestrictionMask := '0000000000000000000000000000000000000000000000000';
 
 Score_threshold := 80;
 // Score_threshold := 90;
-RecordsToRun := 100; // 100;
+RecordsToRun := 0; // 100;
 eyeball := 120;
 
-OutputFile := '~ak::out::PublicRecs::nonFCRA::Sprint6_3'+ ThorLib.wuid() ;
+// Universally Set the History Date YYYYMMDD for ALL records. Set to 0 to use the History Date located on each record of the input file
+// histDate := '0';
+histDate := '20181116';
+
+OutputFile := '~CDAL::Consumer_Criminal_100K_RoxieDev_current_11162018_NonFCRA'+ ThorLib.wuid() ;
 
 prii_layout := RECORD
     STRING Account             ;
@@ -66,6 +70,7 @@ END;
 p_in := DATASET(InputFile, prii_layout, CSV(QUOTE('"')));
 p := IF (RecordsToRun = 0, p_in, CHOOSEN (p_in, RecordsToRun));
 PP := PROJECT(P(Account != 'Account'), TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout, 
+SELF.historydate := if(histDate = '0', LEFT.historydate, histDate); 
 SELF := LEFT;
 // SELF := [];
 ));
@@ -111,7 +116,7 @@ END;
 bwr_results := 
 				SOAPCALL(soap_in, 
 				RoxieIP,
-				'publicrecords_kel.MAS_nonFCRA_Service', 
+				'publicrecords_kel.MAS_nonFCRA_Service.8', 
 				// 'publicrecords_kel.MAS_nonFCRA_Service.4', 
 				{soap_in}, 
 				DATASET(layout_MAS_Test_Service_output),

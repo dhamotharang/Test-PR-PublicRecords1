@@ -30,7 +30,11 @@ Score_threshold := 80;
 RecordsToRun := 0; // 100;
 eyeball := 100;
 
-OutputFile := '~ak::out::PublicRecs::FCRA::Sprint6_3'+ ThorLib.wuid() ;
+// Universally Set the History Date YYYYMMDD for ALL records. Set to 0 to use the History Date located on each record of the input file
+// histDate := '0';
+histDate := '20181116';
+
+OutputFile := '~CDAL::Consumer_Criminal_100K_RoxieDev_current_11162018_FCRA'+ ThorLib.wuid() ;
 
 prii_layout := RECORD
     STRING Account             ;
@@ -65,6 +69,7 @@ p := IF (RecordsToRun = 0, P_IN, CHOOSEN (P_IN, RecordsToRun));
 //p2 := p_in;
 //p := p2(Account in ['TMOBSEP7088-158349', 'TMOBSEP7088-87504','TARG4547-221442', 'TMOBJUN7088-196571','AAAA7833-104166']); 
 PP := PROJECT(P(Account != 'Account'), TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout, 
+SELF.historydate := if(histDate = '0', LEFT.historydate, histDate);
 SELF := LEFT));
 
 soapLayout := RECORD
@@ -111,7 +116,7 @@ END;
 bwr_results := 
 				SOAPCALL(soap_in, 
 				RoxieIP,
-				'publicrecords_kel.MAS_FCRA_Service', 
+				'publicrecords_kel.MAS_FCRA_Service.51', 
 				// 'publicrecords_kel.MAS_FCRA_Service.43', 
 				{soap_in}, 
 				DATASET(layout_MAS_Test_Service_output),
