@@ -1,4 +1,4 @@
-NOTE: In proc_lgid3 we do some funky stuff with vl_id and company_name during init/postProcess
+﻿NOTE: In proc_lgid3 we do some funky stuff with vl_id and company_name during init/postProcess
 
 
 =-=-=-= BIPV2_LGID3.BasicMatch =-=-=-=
