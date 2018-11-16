@@ -20,6 +20,6 @@
 export Did_Numeric_Service() := 
 MACRO
 
-output(DID_Numeric_Services.records,NAMED(doxie.strResultsName));
+output(Didville.did_numeric_records,NAMED(doxie.strResultsName));
 
 ENDMACRO;

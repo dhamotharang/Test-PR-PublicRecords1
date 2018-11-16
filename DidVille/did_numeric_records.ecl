@@ -7,7 +7,7 @@ AllowMultipleResults overrides this.
 
 
 // Read user input
-inp := DID_Numeric_Services.inputs;
+inp := Didville.did_numeric_inputs;
 
 mod_access := inp.mod_access;
 
@@ -397,4 +397,4 @@ if(
 	)
 );
 
-export records := sort(j4, -score, -yob, -DID, record);
+export did_numeric_records := sort(j4, -score, -yob, -DID, record);
