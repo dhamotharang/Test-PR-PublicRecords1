@@ -1,12 +1,19 @@
 ﻿/* PublicRecords_KEL.BWR_Business_MAS_Roxie */
+IMPORT RiskWise, STD;
+
+
 Threads := 1;
 RecordsToRun := 100; // 100;
 eyeball := 120;
 
+historyDate := 0; // Set to 0 to use ArchiveDate on input file. 
+Score_threshold := 80;
+RoxieIP := RiskWise.shortcuts.Dev156;
+
 InputFile := '~temp::kel::ally_01_business_uat_sample_100k_20181015.csv'; //100k file
 // InputFile := '~temp::kel::ally_01_business_uat_sample_1m_20181015.csv'; //1m file
 
-OutputFile := '~ak::out::PublicRecs::Business::Sprint6'+ ThorLib.wuid() ;
+OutputFile := '~lweiner::out::PublicRecs::Business::Sprint7'+ ThorLib.wuid() ;
 
 prii_layout := RECORD
 	STRING AccountNumber         ;  
@@ -125,23 +132,58 @@ inData := DATASET(InputFile, prii_layout, CSV(QUOTE('"')));
 OUTPUT(CHOOSEN(inData, eyeball), NAMED('inData'));
 inDataRecs := IF (RecordsToRun = 0, inData, CHOOSEN (inData, RecordsToRun));
 inDataReady := PROJECT(inDataRecs(AccountNumber != 'AccountNumber'), TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout, 
+	SELF.ArchiveDate := IF(historyDate = 0, LEFT.ArchiveDate, (STRING)HistoryDate);
 	SELF := LEFT, 
- 	// SELF := [] 
+	// SELF := [] 
 	));
 inDataReadyDist := DISTRIBUTE(inDataReady, RANDOM());
 // inDataReadyDist := inDataReady;
 
 soapLayout := RECORD
-  STRING CustomerId; // This is used only for failed transactions here; it's ignored by the ECL service.
-  DATASET(PublicRecords_KEL.ECL_Functions.Input_ALL_Bus_Layout) input;
-  INTEGER ScoreThreshold;
+	// STRING CustomerId; // This is used only for failed transactions here; it's ignored by the ECL service.
+	DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout) input;
+	INTEGER ScoreThreshold;
 end;
 
-	Options := MODULE(PublicRecords_KEL.Interface_Options)
-		EXPORT INTEGER ScoreThreshold := 80;
-	END;
+// Uncomment this code to run as test harness on Thor instead of SOAPCALL to Roxie
+// Options := MODULE(PublicRecords_KEL.Interface_Options)
+	// EXPORT INTEGER ScoreThreshold := Score_threshold;
+// END;
 	
-ResultSet:= PublicRecords_KEL.FnRoxie_GetBusAttrs(inDataReadyDist, Options);
+// ResultSet:= PublicRecords_KEL.FnRoxie_GetBusAttrs(inDataReadyDist, Options);
+
+layout_MAS_Business_Service_output := RECORD
+	PublicRecords_KEL.ECL_Functions.AttrBus_Layout;
+	STRING ErrorCode := '';
+END;
+
+soapLayout trans (inDataReadyDist le):= TRANSFORM 
+	// SELF.CustomerId := le.CustomerId;
+	SELF.input := PROJECT(le, TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout,
+		SELF := LEFT;
+		SELF := []));
+	SELF.ScoreThreshold := Score_threshold;
+END;
+
+soap_in := PROJECT(inDataReadyDist, trans(LEFT));
+
+
+layout_MAS_Business_Service_output myFail(soap_in le) := TRANSFORM
+	SELF.ErrorCode := STD.Str.FilterOut(TRIM(FAILCODE + ' ' + FAILMESSAGE), '\n');
+	// SELF.Account := le.Account;
+	SELF := [];
+END;
+
+ResultSet := 
+				SOAPCALL(soap_in, 
+				RoxieIP,
+				'publicrecords_kel.MAS_Business_nonFCRA_Service', 
+				{soap_in}, 
+				DATASET(layout_MAS_Business_Service_output),
+				RETRY(2), TIMEOUT(300),
+				PARALLEL(threads), 
+				onFail(myFail(LEFT)));
+
 
 OUTPUT(CHOOSEN(inDataReady, eyeball), NAMED('Raw_input'));
 OUTPUT( ResultSet, NAMED('Results') );
@@ -153,4 +195,20 @@ OUTPUT( CHOOSEN(Passed,eyeball), NAMED('bwr_results_Passed') );
 OUTPUT( CHOOSEN(Failed,eyeball), NAMED('bwr_results_Failed') );
 OUTPUT( COUNT(Failed), NAMED('Failed_Cnt') );
 
-output(Passed,,OutputFile, CSV(heading(single), quote('"')));
+// OUTPUT(Passed,,OutputFile, CSV(HEADING(single), QUOTE('"')));
+
+LayoutOut_With_Extras := RECORD
+	RECORDOF(Passed);
+	STRING ln_project_id         ;
+	STRING pf_fraud              ;
+	STRING pf_bad                ;
+	STRING pf_funded             ;
+	STRING pf_declined           ;
+	STRING pf_approved_not_funded; 
+END;
+
+Passed_with_PF := JOIN(Passed, inDataRecs, LEFT.BusInputAccountEcho = RIGHT.AccountNumber, TRANSFORM(LayoutOut_With_Extras,
+	SELF := LEFT,
+	SELF := RIGHT), LEFT OUTER, KEEP(1));
+	
+OUTPUT(Passed_with_PF,,OutputFile, CSV(HEADING(single), QUOTE('"')));
