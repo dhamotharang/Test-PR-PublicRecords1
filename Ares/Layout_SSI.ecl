@@ -70,6 +70,7 @@
 		string status	 {xpath('status')};		
 		string correspondentType {xpath('correspondentType')};
 		string preferred   {xpath('preferred')};
+		string additional_info {xpath('additionalInfo')};
 		layout_usage usage {xpath('usage')};
 		layout_route route {xpath('route')};
 		layout_extends_ssi extendsSSI {xpath('extendsSSI')};

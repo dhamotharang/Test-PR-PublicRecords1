@@ -44,8 +44,8 @@
 			self.beneficiary_routing_code_id := if(count(l.route.beneficiary.routingCodes) > 0, if(l.route.beneficiary[1].routingCodes[1].link_href != '', std.str.splitwords(l.route.beneficiary[1].routingCodes[1].link_href,'/')[3], ''), '');											
 			self.further_office_id	:= if(count(l.route.intermediary) > 0, std.str.splitwords(l.route.intermediary[2].presence_link_href,'/')[3], '');;
 			self.further2_office_id := if(count(l.route.intermediary) > 0, std.str.splitwords(l.route.intermediary[3].presence_link_href,'/')[3], '');
-			self.further_routing_code_id := if(count(l.route.intermediary.routingCodes) > 0, if(l.route.intermediary[1].routingCodes[2].link_href != '', std.str.splitwords(l.route.intermediary[2].routingCodes[1].link_href,'/')[3], ''), '');
-			self.further2_routing_code_id := if(count(l.route.intermediary.routingCodes) > 0, if(l.route.intermediary[1].routingCodes[3].link_href != '', std.str.splitwords(l.route.intermediary[3].routingCodes[1].link_href,'/')[3], ''), '');
+			self.further_routing_code_id := if(count(l.route.intermediary) > 0, if(l.route.intermediary[2].routingCodes[1].link_href != '', std.str.splitwords(l.route.intermediary[2].routingCodes[1].link_href,'/')[3], ''), '');
+			self.further2_routing_code_id := if(count(l.route.intermediary) > 0, if(l.route.intermediary[3].routingCodes[1].link_href != '', std.str.splitwords(l.route.intermediary[3].routingCodes[1].link_href,'/')[3], ''), '');
 			self.ssi_set_id := if(l.set_link_href != '', std.str.splitwords(l.set_link_href,'/')[3], '');
 			self.owner_tfpuid			:= '';
 			self.owner_bic_code			:= '';

@@ -98,8 +98,11 @@ Person := ENTITY(FLAT(UID(AssociatedCustomerFileInfo, LexId),
     STRING DeceasedSsn,
     STRING state_death_flag,
     STRING death_rec_src,
-    STRING state_death_id
-
+    STRING state_death_id,
+    
+    STRING curr_incar_flag,
+    STRING off_cat_list
+    
     ),
 	MODEL(UID,
     rCustomer,
@@ -170,8 +173,9 @@ Person := ENTITY(FLAT(UID(AssociatedCustomerFileInfo, LexId),
     v2_validationaddrproblems,
     v2_inputaddrageoldest,
     v2_inputaddrdwelltype,
-		v2_divssnidentitycountnew
-    
+		v2_divssnidentitycountnew,
+    curr_incar_flag,
+    Offenses {off_cat_list}
     ));	
 
 Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id), 
@@ -835,6 +839,11 @@ USE KELOtto.PersonDeceased(FLAT,
      DeceasedMatchCode = matchcode)
      );
 
+USE KELOtto.PersonCrim(FLAT,
+  Person(FILTER((UNSIGNED)did>0),
+    LexId = did
+    ));
+
 USE KELOtto.AddressPersonAssociations.PersonAddressMatchStats(FLAT,
   PersonPerson);
 
@@ -946,6 +955,10 @@ Person: => DeceasedNameMatch := MAP(COUNT(FullName(FirstName=DeceasedFirst AND L
 Person: => DeceasedDobMatch := MAP(COUNT(ReportedDateOfBirth(DeceasedDateOfBirth=DateOfBirth))>0 => 1, 0);
 Person: => DeceasedMatch := MAP(Deceased=1 AND DeceasedNameMatch=1 AND DeceasedDobMatch=1 => 1, 0);
 Person: => DeceasedMatchDescription := MAP(DeceasedMatch=1 => 'Full Matched Deceased Identity', '');
+
+Person: => CurrentlyIncarceratedFlag := MAP(curr_incar_flag='Y' =>1, 0);
+Person: => FraudOffensesFlag := MAP(COUNT(Offenses(CONTAINS(off_cat_list,'FRAUD'))) > 0 => 1, 0);
+
 // NOTE: This is "best" from the contributed not Best Best.
 Person: => BestFullName := ONLY(TOPN(FullName(NOT FirstName:Null AND NOT LastName:Null), 1, FirstName, LastName));
 Person: => Label := TRIM(BestFullName.FirstName) + ' ' + TRIM(BestFullName.LastName);
@@ -1574,6 +1587,8 @@ QUERY: showCustomerPersonEntities <= Person
                               KrHighRiskFlag,
                               KrMediumRiskFlag,
 
+                              CurrentlyIncarceratedFlag,
+                              FraudOffensesFlag,
                               
                               DeceasedMatch,
                               DeathPriorToAllEvents,
