@@ -3,7 +3,7 @@
 #option('skipFileFormatCrcCheck', 1);
 #option ('filteredReadSpillThreshold', 9999) ;
 // The variable production =  false makes Transunion_did to hit newest slimsorts. bug# 40562
-#stored ('production', false);
+// #stored ('production', false);
 
 fcra_add_super(string typ) := if(fileservices.getsuperfilesubcount('~thor_data400::Base::FCRA_HeaderKey_Building')>0
              ,output('Nothing added to base::FCRA_HeaderKey_building.')

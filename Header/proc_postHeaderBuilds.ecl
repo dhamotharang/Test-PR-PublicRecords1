@@ -76,7 +76,7 @@ export proc_postHeaderBuilds := module
 		export XADLkeys := sequential(
                                          header.LogBuild.single('Started :'+step)
                                         ,if(Header.version_build<>fn[sub..sub+7],fail('Header base does not match version'))
-                                        ,nothor(Header.Proc_Copy_From_Alpha.Copy)
+                                        // ,nothor(Header.Proc_Copy_From_Alpha.Copy)
                                         ,checkLinkingVersion(header.version_build)
                                         ,bld_Transunion_LN
                                         ,bld_Transunion_Ptrak
