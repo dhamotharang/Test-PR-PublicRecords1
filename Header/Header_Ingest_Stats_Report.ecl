@@ -244,6 +244,6 @@ send_report := STD.System.Email.SendEmailAttachText(
 				'Header_Ingest_Stats_Report.html'
                 );
 
-return sequential(ra,rb/*,rc,rd*/,re,rf,rg,rh,ri,rj,/*send_report*/);
+return sequential(ra,rb,rc,rd,re,rf,rg,rh,ri,rj,send_report);
 
 end;
