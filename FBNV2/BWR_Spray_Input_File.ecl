@@ -1,6 +1,6 @@
 ﻿import FBNV2,_control, std, lib_fileservices, _control;
 
-export BWR_Spray_Input_File (string filename,string filedate,string source) 
+export BWR_Spray_Input_File(string filename,string filedate,string source) 
 		:= function
 		
 			leMailTarget      := _control.MyInfo.EmailAddressNotify;
@@ -19,10 +19,11 @@ export BWR_Spray_Input_File (string filename,string filedate,string source)
 								trim(source,left,right) = 'Dallas'   => fSendMail('FBN Spray and Build Not Set Up For This Source','This Source Has Not Been Sent By Vendor In A Long Time'),
 								trim(source,left,right) = 'InfoUSA'   => fSendMail('FBN Spray and Build Not Set Up For This Source','This Source HasNot Been Sent By Vendor In A Long Time'),		
 								trim(source,left,right) = 'San_Bernardino'   => fSendMail('FBN Spray and Build Not Set Up For This Source','This Source Has Not Been Sent By Vendor In A Long Time'),		
-								trim(source,left,right) = 'NY'   => fSendMail('FBN Spray and Build Not Set Up For This Source','This Source Has Not Been Sent By Vendor In A Long Time'),
+								trim(source,left,right) = 'NY'   => fSendMail('FBN Spray and Build Not Set Up For This Source','This Source Has Not Been Sent By Vendor In A Long Time'),		
+								trim(source,left,right) = 'Experian'   => fSendMail('FBN Spray Started','Valid Source Parameter Entered'),
 								FAIL('Source Parameter passed did not match the Sources, please check the source value passed.'));	
 
-				sourceip 					:= _control.IPAddress.bctlpedata12;
+				sourceip 					:= _control.IPAddress.bctlpedata11;
 				
 				superfilename 		:= FBNV2.Get_Input_Superfilename(source); 						
 				logicalfilename 	:= FBNV2.Get_Input_Superfilename(source)[1..length(trim(superfilename))-length('Sprayed')]+filedate;
@@ -55,14 +56,17 @@ export BWR_Spray_Input_File (string filename,string filedate,string source)
 																 trim(source,left,right) = 'Santa_Clara' => FileServices.SprayVariable(sourceip,filename, ,,,'"',groupname,logicalfilename,-1,,,true,true,true),
 														     trim(source,left,right) = 'Harris' => spray_Harris,
 																 trim(source,left,right) = 'Orange' => FileServices.SprayVariable(sourceip,filename, ,,,'"',groupname,logicalfilename,-1,,,true,true,true),
-																 trim(source,left,right) = 'Ventura' => FileServices.SprayVariable(sourceip,filename, ,'\\~','\\n,\\r\\n','"',groupname,logicalfilename,-1,,,true,true,true),																 
+																 trim(source,left,right) = 'Ventura' => FileServices.SprayVariable(sourceip,filename, ,'\\~','\\n,\\r\\n','"',groupname,logicalfilename,-1,,,true,true,true),		
+																 trim(source,left,right) = 'Experian' => fsprayFBNfiles(filename,filedate,sourceip),															 
 																 output('Source Parameter passed did not match the Sources, please check the source value passed.'));
 																 
 				create_super			:= FileServices.CreateSuperFile(superfilename,false);
 				add_super 				:= sequential(FileServices.RemoveOwnedSubFiles(superfilename),
 				                                FileServices.StartSuperFileTransaction(),
-																				// FileServices.ClearSuperFile(superfilename), 
-																				// FileServices.RemoveOwnedSubFiles(superfilename),
+																				
+																				FileServices.ClearSuperFile(superfilename), 
+																				FileServices.RemoveOwnedSubFiles(superfilename),
+																				
 																				fileservices.addsuperfile(superfilename,logicalfilename),
 																				FileServices.FinishSuperFileTransaction()
 																			 );
@@ -86,13 +90,19 @@ export BWR_Spray_Input_File (string filename,string filedate,string source)
 																			  );
 																				
 				retval 						:= sequential(validateSource(source),
-				                                spray_file,																				
-																				if(~FileServices.FileExists(superfilename), create_super),
-																				add_super,
-																				preprocess_file,
+				                                spray_file,
+																				if (source!='Experian',
+																				     sequential( 																								
+																							if(~FileServices.FileExists(superfilename), create_super),
+																							add_super,
+																							preprocess_file
+																					   )
+																				   ),
 																				if (source='Filing',
 																							addExtractSuper
-																						)																				
+																						)	
+																				//uncomment when scrubs is added		
+																				,RunScrubsOnInput(source,filedate,leMailTarget)																				
 																				);
 		 return retval;
 		

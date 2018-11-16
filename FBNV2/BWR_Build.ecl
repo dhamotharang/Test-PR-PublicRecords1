@@ -1,6 +1,6 @@
 ﻿import FBNV2, Lib_FileServices, Roxiekeybuild, _Control, orbit_report;
 
-export BWR_Build(string filename, string filedate, string source, string sourceip) := FUNCTION
+export BWR_Build(string filedate) := FUNCTION
 
 #workunit('name', 'FBN Build Busreg, CA(4), CP Hist, Experian, FL, TX' + fileDate);
  
@@ -8,21 +8,6 @@ leMailTarget      := _control.MyInfo.EmailAddressNotify;
 
 fSendMail(string pSubject, string pBody)
       := lib_fileservices.fileservices.sendemail(leMailTarget,pSubject,pBody);	
-			
-validateSource(string pSource) :=
-			map(trim(source,left,right) = 'Orange' => fSendMail('FBN Build Started','Valid Source Parameter Entered'),		
-								trim(source,left,right) = 'San_Diego'   => fSendMail('FBN Build Started','Valid Source Parameter Entered'),
-								trim(source,left,right) = 'Santa_Clara'   => fSendMail('FBN Build Started','Valid Source Parameter Entered'),		
-								trim(source,left,right) = 'Ventura'   => fSendMail('FBN Build Started','Valid Source Parameter Entered'),
-								trim(source,left,right) = 'Event'   => fSendMail('FBN Build Started','Valid Source Parameter Entered'),		
-								trim(source,left,right) = 'Filing'   => fSendMail('FBN Build Started','Valid Source Parameter Entered'),		
-								trim(source,left,right) = 'Harris'   => fSendMail('FBN Build Started','Valid Source Parameter Entered'),		
-								trim(source,left,right) = 'Dallas'   => FAIL('FBN Spray and Build Not Set Up For This Source.  This Source Has Not Been Sent By Vendor In A Long Time'),
-								trim(source,left,right) = 'InfoUSA'   => FAIL('FBN Spray and Build Not Set Up For This Source.  This Source Has Not Been Sent By Vendor In A Long Time'),
-								trim(source,left,right) = 'San_Bernardino'   => FAIL('FBN Spray and Build Not Set Up For This Source.  This Source Has Not Been Sent By Vendor In A Long Time'),		
-								trim(source,left,right) = 'NY'   => FAIL('FBN Spray and Build Not Set Up For This Source.  This Source Has Not Been Sent By Vendor In A Long Time'),	
-								trim(source,left,right) = 'Experian'   => fSendMail('FBN Build Started','Valid Source Parameter Entered'),
-								FAIL('Source Parameter passed did not match the Sources, please check the source value passed.'));	
 
 buildkeys := parallel(FBNV2.proc_Build_Autokey(filedate,File_FBN_Business_Base,File_FBN_Contact_Base),
 							FBNV2.Proc_Build_Keys(filedate)) :  success(SendEmail(filedate).key_success), failure(SendEmail(filedate).build_failure);
@@ -32,10 +17,8 @@ UpdateRoxiePage := RoxieKeybuild.updateversion('Fbn2Keys', filedate, _control.My
 orbit_report.FBN_Stats(getretval);
 	  
 buildprocess := sequential(
-							validateSource(source),
-							fSprayInputFiles(filename,filedate,source,sourceip),
-							Proc_Build_FBN_Contact_Base(source), 
-							Proc_Build_FBN_Business_Base(source),
+							Proc_Build_FBN_Contact_Base, 
+							Proc_Build_FBN_Business_Base,
 							fSendMail('FBN Build Part 1 of 2','Base Files Build Complete, Starting Key Build'),
 							BuildKeys,
 							Proc_build_boolean_keys(filedate),

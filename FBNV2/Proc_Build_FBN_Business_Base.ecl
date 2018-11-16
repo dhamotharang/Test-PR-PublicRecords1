@@ -1,20 +1,18 @@
 ﻿IMPORT  address, fbnv2,  did_add,  didville, ut, header_slimsort, business_header, Business_Header_SS, watchdog, MDR, aid, PromoteSupers;
 
-export   Proc_Build_FBN_Business_Base(string source) := FUNCTION
-
 dBusinessInputs := 
                    //commented sources have not been sent by vendor in a long time, unsure of format
-                   map(trim(source,left,right) in ['Filing','Event'] => ungroup(Mapping_FBN_FL_Business),
-									               // trim(source,left,right) = 'Dallas' => ungroup(Mapping_FBN_TXD_Business),
-				                         // trim(source,left,right) = 'InfoUSA'   => ungroup(Mapping_FBN_InfoUSA_Business),
-				                         // trim(source,left,right) = 'San_Bernardino'   => ungroup(Mapping_FBN_CA_San_Bernardino_Business),
-				                         trim(source,left,right) = 'San_Diego'   => ungroup(Mapping_FBN_CA_San_Diego_Business),
-																 trim(source,left,right) = 'Santa_Clara' => ungroup(Mapping_FBN_CA_Santa_Clara_Business),
-														     trim(source,left,right) = 'Harris' => ungroup(Mapping_FBN_TX_Harris_Business),
-														     // trim(source,left,right) = 'NY' => ungroup(Mapping_FBN_NY_Business),
-																 trim(source,left,right) = 'Orange' => ungroup(Mapping_FBN_CA_Orange_Business),
-																 trim(source,left,right) = 'Ventura' => ungroup(Mapping_FBN_CA_Ventura_Business),
-																 trim(source,left,right) = 'Experian' => ungroup(Mapping_FBN_Experian_Business));
+                   ungroup(Mapping_FBN_FL_Business)+
+									               //ungroup(Mapping_FBN_TXD_Business)+
+				                         //ungroup(Mapping_FBN_InfoUSA_Business)+
+				                         //ungroup(Mapping_FBN_CA_San_Bernardino_Business)+
+				                         ungroup(Mapping_FBN_CA_San_Diego_Business)+
+																 ungroup(Mapping_FBN_CA_Santa_Clara_Business)+
+														     ungroup(Mapping_FBN_TX_Harris_Business)+
+														     //ungroup(Mapping_FBN_NY_Business)+
+																 ungroup(Mapping_FBN_CA_Orange_Business)+
+																 ungroup(Mapping_FBN_CA_Ventura_Business)+
+																 ungroup(Mapping_FBN_Experian_Business);
 
 Previous_Base	  := distribute(FBNV2.File_FBN_Business_Base_AID, hash64(tmsid));
 	
@@ -353,7 +351,5 @@ ut.MAC_Append_Rcid (rolledup_recs,source_rec_id,out_file);
 dPostDIDandBDIDPersist	:=	out_file:persist(fbnv2.cluster.cluster_out+'persist::FBNv2::Business');
 					
 PromoteSupers.MAC_SF_BuildProcess(dPostDIDandBDIDPersist,fbnv2.cluster.cluster_out+'base::FBNv2::Business',Out, 3,pCompress:=true);
-				
-return out;	
 
-END;
+export  Proc_Build_FBN_Business_Base     :=	Out;

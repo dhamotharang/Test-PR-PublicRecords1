@@ -27,7 +27,7 @@ export spray_raw_data(string st,string filedate, string sourceip, string dirPath
 			self				:=	[];
 		end;
 
-		newfile:=OUTPUT(PROJECT(raw_fbn, trfNewLayout(left)), ,FBNv2.cluster.cluster_out+'in::'+filedate+'::Raw_Fbn::'+st);
+		newfile:=OUTPUT(PROJECT(raw_fbn, trfNewLayout(left)), ,FBNv2.cluster.cluster_out+'in::'+filedate+'::Raw_Fbn::'+st,OVERWRITE);
 
 		addSuper:=FileServices.AddSuperFile(FBNv2.cluster.cluster_out + 'in::'+filedate+'::fbn_allStates', 
 				                         FBNv2.cluster.cluster_out+'in::'+filedate+'::Raw_Fbn::'+st);
