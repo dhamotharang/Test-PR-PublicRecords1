@@ -52,36 +52,36 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Attr_
 			SELF.MonSinceNewestNonfelonyCnt7Y := IF(ResultsFound, (INTEGER)RIGHT.MonSinceNewestNonfelonyCnt7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
 			SELF.MonSinceOldestNonfelonyCnt7Y := IF(ResultsFound, (INTEGER)RIGHT.MonSinceOldestNonfelonyCnt7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
 			// Arrest fields are NonFCRA only
-			SELF.ArrestCnt1Y := MAP(Options.IsFCRA 											=> 0,
-															NOT Options.IsFCRA AND ResultsFound => RIGHT.ArrestCnt1Y, 
-																																	0);
-			SELF.ArrestCnt7Y := MAP(Options.IsFCRA 											=> 0,
+			SELF.ArrestCnt1Y := MAP(Options.IsFCRA 	AND ResultsFound		=> PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT,
+                              NOT Options.IsFCRA AND ResultsFound => RIGHT.ArrestCnt1Y, 
+																																	PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
+			SELF.ArrestCnt7Y := MAP(Options.IsFCRA AND ResultsFound 		=> PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT,
 															NOT Options.IsFCRA AND ResultsFound => RIGHT.ArrestCnt7Y, 
-															0);
-			SELF.ArrestNew1Y := MAP(Options.IsFCRA 											=> '',
+                                                                  PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
+			SELF.ArrestNew1Y := MAP(Options.IsFCRA AND ResultsFound 		=> PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND,
 															NOT Options.IsFCRA AND ResultsFound => (STRING)RIGHT.ArrestNew1Y, 
-																																		 PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
-			SELF.ArrestOld1Y := MAP(Options.IsFCRA 											=> '',
-															NOT Options.IsFCRA AND ResultsFound => 
-																																		 (STRING)RIGHT.ArrestOld1Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
-			SELF.ArrestNew7Y := MAP(Options.IsFCRA 											=> '',
+																																	PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.ArrestOld1Y := MAP(Options.IsFCRA AND ResultsFound 		=> PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND,
+															NOT Options.IsFCRA AND ResultsFound => (STRING)RIGHT.ArrestOld1Y, 
+                                                                  PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.ArrestNew7Y := MAP(Options.IsFCRA AND ResultsFound 		=> PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND,
 															NOT Options.IsFCRA AND ResultsFound => (STRING)RIGHT.ArrestNew7Y, 
-																																		 PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
-			SELF.ArrestOld7Y := MAP(Options.IsFCRA 											=> '',
+																																	PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.ArrestOld7Y := MAP(Options.IsFCRA AND ResultsFound 		=> PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND,
 															NOT Options.IsFCRA AND ResultsFound => (STRING)RIGHT.ArrestOld7Y, 
-																																		 PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
-			SELF.MonSinceNewestArrestCnt1Y := MAP(Options.IsFCRA 				=> 0,
+																																	PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+      SELF.MonSinceNewestArrestCnt1Y := MAP(Options.IsFCRA AND ResultsFound	=> PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT,
 															NOT Options.IsFCRA AND ResultsFound => (INTEGER)RIGHT.MonSinceNewestArrestCnt1Y, 
-																																		 PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
-			SELF.MonSinceOldestArrestCnt1Y := MAP(Options.IsFCRA 				=> 0,
+																																	PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
+			SELF.MonSinceOldestArrestCnt1Y := MAP(Options.IsFCRA AND ResultsFound => PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT,
 															NOT Options.IsFCRA AND ResultsFound => (INTEGER)RIGHT.MonSinceOldestArrestCnt1Y, 
-																																		 PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
-			SELF.MonSinceNewestArrestCnt7Y := MAP(Options.IsFCRA 				=> 0,
+																																	PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
+			SELF.MonSinceNewestArrestCnt7Y := MAP(Options.IsFCRA AND ResultsFound	=> PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT,
 															NOT Options.IsFCRA AND ResultsFound => (INTEGER)RIGHT.MonSinceNewestArrestCnt7Y, 
-																																		 PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
-			SELF.MonSinceOldestArrestCnt7Y := MAP(Options.IsFCRA 				=> 0,
+																																	PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
+			SELF.MonSinceOldestArrestCnt7Y := MAP(Options.IsFCRA AND ResultsFound	=> PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT,
 															NOT Options.IsFCRA AND ResultsFound => (INTEGER)RIGHT.MonSinceOldestArrestCnt7Y, 
-																																		 PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
+																																	PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
 			SELF.CrimCnt1Y := RIGHT.CrimCnt1Y;
 			SELF.CrimCnt7Y := RIGHT.CrimCnt7Y;
 			SELF.CrimNew1Y := IF(ResultsFound, (STRING)RIGHT.CrimNew1Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
@@ -120,16 +120,16 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Attr_
 			SELF.MonSinceNewestNonfelonyCnt7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.MonSinceOldestNonfelonyCnt7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			// Arrest fields are nonFCRA only
-			SELF.ArrestCnt1Y := IF(Options.IsFCRA, 0, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
-			SELF.ArrestCnt7Y := IF(Options.IsFCRA, 0, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
-			SELF.ArrestNew1Y := IF(Options.IsFCRA, '', PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
-			SELF.ArrestOld1Y := IF(Options.IsFCRA, '', PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
-			SELF.ArrestNew7Y := IF(Options.IsFCRA, '', PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
-			SELF.ArrestOld7Y := IF(Options.IsFCRA, '', PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
-			SELF.MonSinceNewestArrestCnt1Y := IF(Options.IsFCRA, 0, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
-			SELF.MonSinceOldestArrestCnt1Y := IF(Options.IsFCRA, 0, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
-			SELF.MonSinceNewestArrestCnt7Y := IF(Options.IsFCRA, 0, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
-			SELF.MonSinceOldestArrestCnt7Y := IF(Options.IsFCRA, 0, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT);
+			SELF.ArrestCnt1Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.ArrestCnt7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.ArrestNew1Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.ArrestOld1Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.ArrestNew7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.ArrestOld7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.MonSinceNewestArrestCnt1Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.MonSinceOldestArrestCnt1Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.MonSinceNewestArrestCnt7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.MonSinceOldestArrestCnt7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.CrimCnt1Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.CrimCnt7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.CrimNew1Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
@@ -147,4 +147,4 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Attr_
 	PersonAttributes := SORT( PersonAttributesWithLexID + PersonAttributesWithoutLexID, InputUIDAppend ); 
 	
 	RETURN PersonAttributes;
-END;	
+END;

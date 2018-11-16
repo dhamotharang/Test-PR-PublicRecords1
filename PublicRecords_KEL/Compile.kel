@@ -1,2 +1,2 @@
 ﻿﻿﻿#OPTION(querytypes, 'normal') //this is only for FDC mode - RoxieDev or RoxieProd
-IMPORT KnowledgeUniverse.PublicRecords_KEL.Graph;
+IMPORT KnowledgeUniverse.PublicRecords_KEL.Graph; 

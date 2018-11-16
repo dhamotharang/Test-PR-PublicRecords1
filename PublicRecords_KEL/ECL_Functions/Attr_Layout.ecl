@@ -53,28 +53,6 @@ EXPORT Attr_Layout := RECORD
 	STRING3 InputHomePhoneCleanPop;
 	STRING3 InputWorkPhoneCleanPop;
 	STRING3 InputArchiveDateCleanPop;
-	// Criminal History Felony
-	INTEGER2 FelonyCnt1Y;
-	INTEGER2 FelonyCnt7Y; 
-	STRING FelonyNew1Y; 
-	STRING FelonyOld1Y; 
-	STRING FelonyNew7Y; 
-	STRING FelonyOld7Y; 
-	INTEGER1 MonSinceNewestFelonyCnt1Y;
-	INTEGER1 MonSinceOldestFelonyCnt1Y; 
-	INTEGER1 MonSinceNewestFelonyCnt7Y; 
-	INTEGER1 MonSinceOldestFelonyCnt7Y;
-	// Criminal History NonFelony
-	INTEGER2 NonFelonyCnt1Y;
-	INTEGER2 NonfelonyCnt7Y;
-	STRING NonfelonyNew1Y;
-	STRING NonfelonyOld1Y;
-	STRING NonfelonyNew7Y;
-	STRING NonfelonyOld7Y;
-	INTEGER1 MonSinceNewestNonfelonyCnt1Y;
-	INTEGER1 MonSinceOldestNonfelonyCnt1Y;
-	INTEGER1 MonSinceNewestNonfelonyCnt7Y;
-	INTEGER1 MonSinceOldestNonfelonyCnt7Y;
 	// Criminal History - Arrest
 	INTEGER2 ArrestCnt1Y;
 	INTEGER2 ArrestCnt7Y;
@@ -84,8 +62,8 @@ EXPORT Attr_Layout := RECORD
 	STRING10 ArrestOld7Y;
 	INTEGER1 MonSinceNewestArrestCnt1Y;
 	INTEGER1 MonSinceOldestArrestCnt1Y;
-	INTEGER1 MonSinceNewestArrestCnt7Y,
-	INTEGER1 MonSinceOldestArrestCnt7Y,
+	INTEGER1 MonSinceNewestArrestCnt7Y;
+	INTEGER1 MonSinceOldestArrestCnt7Y;	
 	// Criminal History - Criminal Conviction	
 	INTEGER2 CrimCnt1Y;
 	INTEGER2 CrimCnt7Y;
@@ -96,7 +74,29 @@ EXPORT Attr_Layout := RECORD
 	INTEGER1 MonSinceNewestCrimCnt1Y;
 	INTEGER1 MonSinceOldestCrimCnt1Y;
 	INTEGER1 MonSinceNewestCrimCnt7Y;
-	INTEGER1 MonSinceOldestCrimCnt7Y;
+	INTEGER1 MonSinceOldestCrimCnt7Y;	
+	// Criminal History Felony
+	INTEGER2 FelonyCnt1Y;
+	INTEGER2 FelonyCnt7Y; 
+	STRING10 FelonyNew1Y; 
+	STRING10 FelonyOld1Y; 
+	STRING10 FelonyNew7Y; 
+	STRING10 FelonyOld7Y; 
+	INTEGER1 MonSinceNewestFelonyCnt1Y;
+	INTEGER1 MonSinceOldestFelonyCnt1Y; 
+	INTEGER1 MonSinceNewestFelonyCnt7Y; 
+	INTEGER1 MonSinceOldestFelonyCnt7Y;
+	// Criminal History NonFelony
+	INTEGER2 NonFelonyCnt1Y;
+	INTEGER2 NonfelonyCnt7Y;
+	STRING10 NonfelonyNew1Y;
+	STRING10 NonfelonyOld1Y;
+	STRING10 NonfelonyNew7Y;
+	STRING10 NonfelonyOld7Y;
+	INTEGER1 MonSinceNewestNonfelonyCnt1Y;
+	INTEGER1 MonSinceOldestNonfelonyCnt1Y;
+	INTEGER1 MonSinceNewestNonfelonyCnt7Y;
+	INTEGER1 MonSinceOldestNonfelonyCnt7Y;
 	// Criminal History - Others
 	STRING5 CrimSeverityIndex7Y;
 	STRING3 CrimBehaviorIndex7Y;
