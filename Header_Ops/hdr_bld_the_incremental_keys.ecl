@@ -3,7 +3,7 @@
 #stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com,Debendra.Kumar@lexisnexisrisk.com');
 string  emailList  := ''  :stored('emailList');
 string  rpt_qa_email_list:='BocaRoxiePackageTeam@lexisnexis.com,Prasanna.Kolli@lexisnexisrisk.com';
-import Header,_control,std,InsuranceHeader;
+import Header,_control,std,InsuranceHeader,Doxie;
 
 wk:=workunit;
 wServer:= _control.ThisEnvironment.ESP_IPAddress;
@@ -42,7 +42,7 @@ build_iDid := sequential(
 
 build_fcra := sequential(
                 header.LogBuild.single('start:iFCRA'),
-                Doxie.Proc_FCRA_Doxie_keys_All(,true),
+                Doxie.Proc_FCRA_Doxie_keys_All(,true,filedate),
                 header.LogBuild.single('end:iFCRA'),
                 ):failure(std.system.Email.SendEmail(emailList,'FAILED:iFCRA:'+workunit,wLink));
 

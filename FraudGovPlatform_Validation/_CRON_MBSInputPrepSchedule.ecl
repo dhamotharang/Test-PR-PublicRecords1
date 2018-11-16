@@ -1,12 +1,12 @@
 ﻿import _Control;
 
-EVERY_DAY_AT_5AM := '0 5 * * *';
-IP:=Constants.LandingZoneServer;
-RootDir := Constants.MBSLandingZonePathBase;
-ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev_eclcc','thor400_44_eclcc');
-
+EVERY_DAY_AT_5AM := '0 10 * * *';
+IP				:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		_control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
+RootDir		:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		Constants.MBSLandingZonePathBase_dev,	Constants.MBSLandingZonePathBase_prod);
+ThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		Constants.ThorName_Dev,	Constants.ThorName_Prod);
 lECL1 :=
  'import ut;\n'
++'#CONSTANT	(\'Platform\',\'FraudGov\');\n'
 +'wuname := \'FraudGov MBS Input Prep\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
@@ -17,14 +17,14 @@ lECL1 :=
 +' 	 ,msg\n'
 +' 	 +\'Build wuid \'+workunit\n'
 +' 	 );\n\n'
-+'valid_state := [\'blocked\',\'running\',\'wait\'];\n'
++'valid_state := [\'blocked\',\'compiled\',\'submitted\',\'running\',\'wait\',\'compiling\'];\n'
 +'d := sort(nothor(WorkunitServices.WorkunitList(\'\',,,wuname,\'\'))(wuid <> thorlib.wuid() and job = wuname and state in valid_state), -wuid);\n'
 +'d_wu := d[1].wuid;\n'
 +'active_workunit :=  exists(d);\n'
 +'version:=ut.GetDate : independent;\n'
 +'if(active_workunit\n'
 +'		,email(\'**** WARNING - Workunit \'+d_wu+\' in Wait, Queued, or Running *******\')\n'
-+'		,sequential(FraudShared.SprayMBSFiles(\''+IP+'\',\''+RootDir+'\',pVersion := version))\n'
++'		,sequential(FraudGovPlatform.Build_All(version).Spray_MBS)\n'
 +'	);\n'
 ;
 

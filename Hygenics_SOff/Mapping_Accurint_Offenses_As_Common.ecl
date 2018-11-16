@@ -2612,7 +2612,8 @@ o2 defCategory(o2 l):= transform
 						'SAC; 05CR480|'+
 						'SAC; 2012CR809|'+
             'RCW 9A 44 100 ATTEMPTED INCDECENT LIBERTIES|'+
-						
+						'PRED CRM SX ASSL;|'+
+
 						
 						'SAC-ATTEMPT'
 						,				

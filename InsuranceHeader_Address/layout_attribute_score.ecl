@@ -1,0 +1,22 @@
+﻿EXPORT layout_attribute_score := record
+	INTEGER2 Conf;
+  INTEGER2 Conf_Prop;
+  INTEGER2 DateOverlap := 0;
+  unsigned8 ADDRESS_GROUP_ID1;
+  unsigned8 ADDRESS_GROUP_ID2;
+  unsigned8 RID1;
+  unsigned8 RID2;
+  INTEGER2 DID_score;
+  INTEGER2 addr_score;
+  INTEGER2 locale_score;
+  INTEGER2 zip_score;
+  INTEGER2 prim_range_num_score;
+  INTEGER2 prim_name_num_score;
+  INTEGER2 prim_range_alpha_score;
+  INTEGER2 prim_name_alpha_score;
+  INTEGER2 prim_range_fract_score;
+  INTEGER2 sec_range_alpha_score;
+  INTEGER2 sec_range_num_score;
+  INTEGER2 city_score;
+  INTEGER2 st_score;
+END;

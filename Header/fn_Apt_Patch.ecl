@@ -1,10 +1,10 @@
 import header,ut,did_add;
 
-export fn_Apt_Patch(boolean isEN=false) := function
+export fn_Apt_Patch(boolean isEN=false,string filedate) := function
 
-apts := header.fn_ApartmentBuildings(isEN)(apt_cnt > 1);
-dh := header.file_fcra_header_prep(if(isEN,true,src<>'EN'),prim_name != '', prim_range != '');
-dh_excl := header.file_fcra_header_prep(if(isEN,true,src<>'EN') and (prim_name = '' or prim_range = ''));
+apts := header.fn_ApartmentBuildings(isEN, filedate)(apt_cnt > 1);
+dh := header.file_fcra_header_prep(filedate)(if(isEN,true,src<>'EN'),prim_name != '', prim_range != '');
+dh_excl := header.file_fcra_header_prep(filedate)(if(isEN,true,src<>'EN') and (prim_name = '' or prim_range = ''));
 
 slimrec := record
 	dh.prim_name;

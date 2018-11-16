@@ -1,10 +1,10 @@
 ﻿import _Control, NAC;
 
-EVERY_DAY_AT_6AM := '0 6 * * *';
-IP			:= NAC.Constants.LandingZoneServer;
-RootDir	:= NAC.Constants.LandingZonePathBase + '/msh/done/';
+EVERY_DAY_AT_6AM := '0 11 * * *';
 
-ThorName := if(_Control.ThisEnvironment.Name='Dataland','thor400_dev_eclcc','thor400_44_eclcc');
+IP			:= 	NAC.Constants.LandingZoneServer;
+RootDir		:= 	NAC.Constants.LandingZonePathBase + '/msh/done/';
+ThorName	:=	IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		Constants.ThorName_Dev,	Constants.ThorName_Prod);
 
 lECL1 :=
  'import ut;\n'
@@ -18,7 +18,7 @@ lECL1 :=
 +' 	 ,msg\n'
 +' 	 +\'Build wuid \'+workunit\n'
 +' 	 );\n\n'
-+'valid_state := [\'blocked\',\'running\',\'wait\'];\n'
++'valid_state := [\'blocked\',\'compiled\',\'submitted\',\'running\',\'wait\',\'compiling\'];\n'
 +'d := sort(nothor(WorkunitServices.WorkunitList(\'\',,,wuname,\'\'))(wuid <> thorlib.wuid() and job = wuname and state in valid_state), -wuid);\n'
 +'d_wu := d[1].wuid;\n'
 +'active_workunit :=  exists(d);\n'

@@ -1,4 +1,4 @@
-﻿IMPORT LeadIntegrity_Vault_Layout, _control;
+﻿IMPORT LeadIntegrity_Vault_Layout, _control, LeadIntegrity_Vault;
 
 Layout_LeadIntegrity_Attr_Output := RECORD
 	unsigned4 seq;
@@ -10,7 +10,7 @@ EXPORT LeadIntegrity_Validation(STRING8 date_in, STRING part_in) := MODULE
 
 		EXPORT dset_Input_Validation() := FUNCTION
 
-				dset_Input := DATASET('~in::marketmagnifier::leadintegrity::'+date_in+ '_' + TRIM(part_in)+'_of_15', LeadIntegrity_Vault_Layout.Layout_LeadIntegrity_Inlayout, THOR);
+				dset_Input := DATASET(LeadIntegrity_Vault.Constants.MMPrefix + date_in+ '_' + TRIM(part_in)+'_of_15', LeadIntegrity_Vault_Layout.Layout_LeadIntegrity_Inlayout, THOR);
 	
 				dset_Input_lexid := DISTRIBUTE(dset_Input,HASH64(lexid));	
 
@@ -31,7 +31,7 @@ EXPORT LeadIntegrity_Validation(STRING8 date_in, STRING part_in) := MODULE
 				tab2 := TABLE(dset_Input_seq,lay_tab2,seq,LOCAL)(cnt > 1);
 
 				fn_IndvFilecount(STRING2 part) := FUNCTION
-					IndvFilecount := DATASET('~in::marketmagnifier::leadintegrity::'+date_in+ '_' + TRIM(part_in)+'_of_15', 
+					IndvFilecount := DATASET(LeadIntegrity_Vault.Constants.MMPrefix + date_in+ '_' + TRIM(part_in)+'_of_15', 
 																	 LeadIntegrity_Vault_Layout.Layout_LeadIntegrity_Inlayout,
 																	 CSV(HEADING(SINGLE),SEPARATOR('|')),OPT);
 					RETURN IndvFilecount;
@@ -74,11 +74,11 @@ EXPORT LeadIntegrity_Validation(STRING8 date_in, STRING part_in) := MODULE
 																					
 				lead_integrity_output_suffix := date_in + '::lead_integrity_attrib::p' + TRIM(part_in);  
 
-				dset_Input := DISTRIBUTE(DATASET('~in::marketmagnifier::leadintegrity::'+lead_integrity_input_suffix,
+				dset_Input := DISTRIBUTE(DATASET(LeadIntegrity_Vault.Constants.MMPrefix + lead_integrity_input_suffix,
 																			   LeadIntegrity_Vault_Layout.Layout_LeadIntegrity_Inlayout,
 																				 CSV(HEADING(0),SEPARATOR('|')))(acctno<>'acctno'),HASH64(lexid));
 
-				dset_output := DISTRIBUTE(DATASET('~out::base::ar::' + lead_integrity_output_suffix,
+				dset_output := DISTRIBUTE(DATASET(LeadIntegrity_Vault.Constants.ARPrefix + lead_integrity_output_suffix,
 																					Layout_LeadIntegrity_Attr_Output,
 																				  CSV(HEADING(0),SEPARATOR('|'),quote('"'))),HASH64(lexid));
 

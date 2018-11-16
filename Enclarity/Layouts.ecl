@@ -1,4 +1,4 @@
-IMPORT Address, BIPV2, AID;
+﻿IMPORT Address, BIPV2, AID;
 
 export layouts:= Module
 	export Collapse_input := record
@@ -451,6 +451,13 @@ export layouts:= Module
 			src_and_date;
 			UNSIGNED6 did;
 			UNSIGNED1	did_score :=0;
+			INTEGER2	xadl2_weight 				:= 0;
+			UNSIGNED2	xadl2_score	 				:= 0;
+			INTEGER1	xadl2_distance			:= 0;
+			UNSIGNED4	xadl2_keys_used			:= 0;
+			STRING		xadl2_keys_desc			:= '';
+			STRING60	xadl2_matches				:= '';
+			STRING		xadl2_matches_desc	:= '';			
 			UNSIGNED6 bdid;
 			UNSIGNED1 bdid_score := 0;	
 			STRING100	prepped_name;
@@ -637,6 +644,13 @@ export layouts:= Module
 			src_and_date;
 			UNSIGNED6 did	:= 0;
 			UNSIGNED2 did_score		:= 0;
+			INTEGER2	xadl2_weight 				:= 0;
+			UNSIGNED2	xadl2_score	 				:= 0;
+			INTEGER1	xadl2_distance			:= 0;
+			UNSIGNED4	xadl2_keys_used			:= 0;
+			STRING		xadl2_keys_desc			:= '';
+			STRING60	xadl2_matches				:= '';
+			STRING		xadl2_matches_desc	:= '';			
 			UNSIGNED6 bdid :=0;
 			UNSIGNED1 bdid_score := 0;	
 			clean_name;
