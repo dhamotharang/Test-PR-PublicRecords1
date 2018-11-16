@@ -294,7 +294,7 @@ rolled_licenses_final := project(rolled_licenses2, transform(RiskWise.Layouts.La
 // output(license_recs,NAMED('license_recs'));
 // output(rolled_licenses_pre,NAMED('rolled_licenses_pre'));
 // output(rolled_licenses,NAMED('rolled_licenses'));
-// output(rolled_licenses2,NAMED('rolled_licenses2'));
+output(rolled_licenses2,NAMED('rolled_licenses2'));
 // output(license_recs_good, named('license_recs_good'));
 // output(mari_recs, named('mari_recs'));
 

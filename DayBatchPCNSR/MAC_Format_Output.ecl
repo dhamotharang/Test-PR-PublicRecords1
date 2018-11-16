@@ -1,4 +1,4 @@
-export MAC_Format_Output(linked,search) := MACRO
+﻿export MAC_Format_Output(linked,search) := MACRO
 		
 		isHit := DayBatchPCNSR.isProcessHit(TRIM(linked.matchCode),TRIM(search));
 		retInput := DayBatchPCNSR.returnsInput(search);
