@@ -116,10 +116,12 @@ dpnew:=dedup(sort(distribute(pnew,hash32(rid,zip,fname,lname)),rid,zip,fname,lna
 nneq(string s1, string s2) := if (s1<>'' AND s2<>'' AND s1<>s2,true,false);
 
 {dpnew} chk(dpnew L, dpnew R) :=transform, skip(~(L.rid=R.rid AND 
-																																															( nneq(L.zip,R.zip) OR 
-																																															  nneq(L.zip,R.zip) OR
-																																																 nneq(L.zip,R.zip)   )
-																																														))
+                                                  ( nneq(L.zip,R.zip) OR 
+                                                   nneq(L.zip,R.zip)  OR
+                                                   nneq(L.zip,R.zip)   
+                                                  )
+                                                 )
+                                               )
   self:=R
 
 end;

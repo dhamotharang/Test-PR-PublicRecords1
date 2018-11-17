@@ -42,14 +42,16 @@ getVersion (string s) := regexfind('([_:])(2[0-9]{7})[^0-9]?[:^]?',s,2);
 incremental_father_superfile_name := data_services.foreign_prod+'thor_data400::base::header_raw_incremental_father';
 incremental_currnt_superfile_name := data_services.foreign_prod+'thor_data400::base::header_raw_incremental';
 
-incremental_father_filename := if(count(fileservices.SuperFileContents(incremental_father_superfile_name))>0,
-																	fileservices.SuperFileContents(incremental_father_superfile_name)[1].name,':20010101');
+incremental_father_filename := if(count(nothor(fileservices.SuperFileContents(incremental_father_superfile_name)))>0
+                                ,nothor(fileservices.SuperFileContents(incremental_father_superfile_name)[1].name)
+                                ,':20010101'
+                                );
 
 incremental_father_version := getVersion(incremental_father_filename);
-incremental_latest_version := getVersion(fileservices.SuperFileContents(incremental_currnt_superfile_name)[1].name);
+incremental_latest_version := nothor(getVersion(fileservices.SuperFileContents(incremental_currnt_superfile_name)[1].name));
 
-monthly_latest_raw_version := getVersion(fileservices.SuperFileContents('~thor_data400::base::header_raw')[1].name);
-monthly_prevs__raw_version := getVersion(fileservices.SuperFileContents('~thor_data400::base::header_raw_syncd_built')[1].name);
+monthly_latest_raw_version := nothor(getVersion(fileservices.SuperFileContents('~thor_data400::base::header_raw')[1].name));
+monthly_prevs__raw_version := nothor(getVersion(fileservices.SuperFileContents('~thor_data400::base::header_raw_syncd_built')[1].name));
 
 latest_current_raw_version := if(forceNewVersion='',max(incremental_latest_version , monthly_latest_raw_version),forceNewVersion);
 cmp_latest_monthly_version := if( latest_current_raw_version = monthly_latest_raw_version,
@@ -103,9 +105,8 @@ ci := header_get_wuid_results(latest_current_raw_version,'Header_Inputs' ,rWthSp
 
 r_nbm := {string2  src, string30 src_desc, unsigned count_};
 prev_nbm := header_get_wuid_results(cmp_latest_monthly_version,'no_basic_match_monthly',r_nbm,'ingest');
-            //header_get_wuid_results(cmp_latest_monthly_version,'no_basic_match_incremental',r_nbm,'ingest');
-curr_nbm := //header_get_wuid_results(latest_current_raw_version,'no_basic_match_monthly',r_nbm,'ingest')+
-            header_get_wuid_results(latest_current_raw_version,'no_basic_match_incremental',r_nbm,'ingest');
+curr_nbm := header_get_wuid_results(latest_current_raw_version,'no_basic_match_incremental',r_nbm,'ingest');
+
 rc:=output(prev_nbm,named('prev_nbm'));
 rd:=output(curr_nbm,named('curr_nbm'));
 
