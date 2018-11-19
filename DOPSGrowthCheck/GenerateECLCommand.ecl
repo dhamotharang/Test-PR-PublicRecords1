@@ -39,6 +39,6 @@ export GenerateECLCommand:= function
     END;
 
     dCombineCommands:=rollup(GenerateIndividualCommands,true,tCombineCommands(left,right));
-		finalcommand:=if(dCombineCommands[1].FullCommand<>'',dCombineCommands[1].FullCommand,'output(No Tests performed)');;
+		finalcommand:=if(dCombineCommands[1].FullCommand<>'',dCombineCommands[1].FullCommand,'output(No Tests performed)');
     return finalcommand;
 end;
