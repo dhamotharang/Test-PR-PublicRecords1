@@ -31,9 +31,9 @@ import didville, suppress, doxie, doxie_files, DeathV2_Services, AutoStandardI, 
 os(string i) := if (i='','',trim(i)+' ');
 #uniquename(deathparams)
 %deathparams% := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
-// Bug: 53541. For some of the services we want to use the _nonblank key (so we return the maximum 
-// number of first/last names). At the time of this change, watchdog.Key_Watchdog_marketing 
-// does not have a nonblank key file.
+// Bug: 53541. For some of the services we want to use the _nonblank data (so we return the maximum 
+// number of first/last names). At the time of this change, the watchdog marketing data 
+// does not have a nonblank variant.
 
 // relevant flags for best records permissions
 #uniquename(pre_glb_flag)
