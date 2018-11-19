@@ -805,10 +805,6 @@ EXPORT product_files := MODULE
 		EXPORT base_quick_header := header_files.base_quick_header_slim;
 				
 		EXPORT base_file_util_daily := header_files.base_file_util_daily_slim;
-			      
-		// =========================== ORIGINALLY: ===========================
-		// base_file_neighbor := watchdog.Key_watchdog_glb;
-		// ===================================================================
 		
 		EXPORT person_best_filename_raw := address.person_best_filename_raw;
 		EXPORT person_best_filename := address.person_best_filename;

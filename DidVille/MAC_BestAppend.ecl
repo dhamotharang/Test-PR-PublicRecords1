@@ -49,7 +49,7 @@ os(string i) := if (i='','',trim(i)+' ');
 
 // get appropriate best_records permission flag
 #uniquename(perm_flag)
-%perm_flag% := dx_BestRecords.fn_get_perm_type(glb, UseNonBlankKey, %utility_flag%, %pre_glb_flag%, 
+%perm_flag% := dx_BestRecords.fn_get_perm_type(glb_ok, UseNonBlankKey, %utility_flag%, %pre_glb_flag%, 
 	%filter_exp%, %filter_eq%, marketing, %cnsmr_flag%);
 
 #uniquename(add_flds_marketing)
@@ -156,7 +156,7 @@ end;
 #uniquename(recs_proj)
 %recs_proj% := MAP(
 	marketing => project(%best_recs%, %add_flds_marketing%(left, left._best, supply)), 
-	glb => project(%best_recs%, %add_flds_glb%(left, left._best, supply)), 
+	glb_ok => project(%best_recs%, %add_flds_glb%(left, left._best, supply)), 
 	project(%best_recs%, %add_flds_nonglb%(left, left._best, supply))
 );
 

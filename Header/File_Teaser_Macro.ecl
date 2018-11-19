@@ -1,5 +1,5 @@
 export File_Teaser_Macro(teaserInFile, teaserOutFile, is_watchdog_best = 'true') := MACRO
-	import AutoStandardI,ut,suppress,doxie_files,infutor;
+	import AutoStandardI,ut,suppress,doxie_files,dx_BestRecords;
 
 	// filter probation data
 	hdrNonProb := teaserInFile(mdr.sourcetools.sourceisonprobation(src)=false);
@@ -78,13 +78,10 @@ export File_Teaser_Macro(teaserInFile, teaserOutFile, is_watchdog_best = 'true')
 	// need to determine the best/most current address per DID and mark it differently than
 	// the remaining addresses 
 	// a match on best address is first priority, then recency
-	infutor_best := table(pull(infutor.key_infutor_best_did), {did,lname, fname, mname, prim_name, city_name,st, zip, dob});
-    wdog_best := table(pull(Watchdog.key_watchdog_nonglb_nonblank), {did,lname, fname, mname, prim_name, city_name,st, zip, dob});
+	best_type := if(is_watchdog_best, dx_BestRecords.Constants.perm_type.nonglb_nonblank, 
+		dx_BestRecords.Constants.perm_type.infutor);
 
-	wdog := if(is_watchdog_best, wdog_best, infutor_best);
-	wdog_dist := distribute(wdog, hash(did));
-
-	layout_teaser getBest(hdrUniqNameAddr l, wdog_dist r) := transform
+	layout_teaser getBest(hdrUniqNameAddr l, dx_BestRecords.layout_best r) := transform
 		// mark the matching address as best
 		self.bestAddr := r.did <> 0 and l.prim_name = r.prim_name and l.city_name = r.city_name and
 										 l.st = r.st and l.zip = r.zip;
@@ -96,8 +93,8 @@ export File_Teaser_Macro(teaserInFile, teaserOutFile, is_watchdog_best = 'true')
 		self := l;
 	end;
 	
-	hdrAddrBest := join(hdrUniqNameAddr, wdog_dist,left.did = right.did,  
-													getBest(left, right), left outer, local);
+	hdrAddrBestAp := dx_BestRecords.append(hdrUniqNameAddr, did, best_type, use_dist := true);
+	hdrAddrBest := project(hdrAddrBestAp, getBest(left, left._best), local);
 													
 	hdrAddrSorted := group(sort(ungroup(hdrAddrBest), did, -(bestAddr), -dt_last_seen, record, local), did, local);
 
