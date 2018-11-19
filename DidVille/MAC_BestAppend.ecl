@@ -26,7 +26,7 @@ export MAC_BestAppend(infile,
 										) := MACRO
 										
 import didville, suppress, doxie, doxie_files, DeathV2_Services, AutoStandardI, SSNBest_Services,
-       watchdog, did_add, header_slimsort, ut, STD, dx_BestRecords;
+       did_add, header_slimsort, ut, STD, dx_BestRecords;
 
 os(string i) := if (i='','',trim(i)+' ');
 #uniquename(deathparams)
