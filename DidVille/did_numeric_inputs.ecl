@@ -2,7 +2,7 @@ import AutoStandardI,ut,doxie;
 
 gmod := AutoStandardI.GlobalModule();
 
-export inputs := 
+export did_numeric_inputs := 
 MODULE
 
 // Read and format some of the inputs
