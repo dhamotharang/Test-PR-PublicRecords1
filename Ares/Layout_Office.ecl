@@ -24,6 +24,7 @@ end;
 layout_telecom := Record
 	string fid {xpath('@fid')};
 	string rank_ {xpath('@rank')};
+	string type {xpath('type')};
 	string phoneCountryCode {xpath('phoneCountryCode')};
 	string phoneAreaCode {xpath('phoneAreaCode')};
 	string phoneNumber {xpath('phoneNumber')};
