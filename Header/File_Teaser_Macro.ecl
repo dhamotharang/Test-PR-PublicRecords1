@@ -93,7 +93,7 @@ export File_Teaser_Macro(teaserInFile, teaserOutFile, is_watchdog_best = 'true')
 		self := l;
 	end;
 	
-	hdrAddrBestAp := dx_BestRecords.append(hdrUniqNameAddr, did, best_type, use_dist := true);
+	hdrAddrBestAp := dx_BestRecords.append(hdrUniqNameAddr, did, best_type, use_distributed := true);
 	hdrAddrBest := project(hdrAddrBestAp, getBest(left, left._best), local);
 													
 	hdrAddrSorted := group(sort(ungroup(hdrAddrBest), did, -(bestAddr), -dt_last_seen, record, local), did, local);

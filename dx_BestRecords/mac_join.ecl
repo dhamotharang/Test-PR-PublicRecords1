@@ -1,10 +1,10 @@
-EXPORT mac_join (ds, d_field, key, use_dist, left_outer) := FUNCTIONMACRO
+EXPORT mac_join (ds, d_field, key, use_distributed, left_outer) := FUNCTIONMACRO
 
 	LOCAL out_rec := RECORD(RECORDOF(ds))
 		dx_BestRecords.layout_best _best;
 	END;
 
-#IF (use_dist)
+#IF (use_distributed)
 	LOCAL ds_res := JOIN (DISTRIBUTE (ds, hash64(d_field)), DISTRIBUTE(PULL(key), hash64(did)),
 		(LEFT.d_field = RIGHT.did),           
 		TRANSFORM (out_rec,

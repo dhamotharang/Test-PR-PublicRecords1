@@ -39,7 +39,7 @@ end;
 na := join(distribute(fna, hash(did)), distribute(lna, hash(did)), left.did = right.did, natra(left, right), local);
 
 // APPEND BEST RECORD DATA TO RECS
-dbst := dx_BestRecords.append(d_d, did, dx_BestRecords.Constants.perm_type.glb, use_dist := true);
+dbst := dx_BestRecords.append(d_d, did, dx_BestRecords.Constants.perm_type.glb, use_distributed := true);
 
 recordof(dbst) patchit(dbst l, na r) := transform
 	self._best.fname := if(l._best.fname = '', r.fname, l._best.fname);
