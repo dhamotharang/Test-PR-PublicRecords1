@@ -80,9 +80,8 @@ export File_Teaser_Macro(teaserInFile, teaserOutFile, is_watchdog_best = 'true')
 	// a match on best address is first priority, then recency
 	best_type := if(is_watchdog_best, dx_BestRecords.Constants.perm_type.nonglb_nonblank, 
 		dx_BestRecords.Constants.perm_type.infutor);
-	hdrAddrBestAp := dx_BestRecords.append(hdrUniqNameAddr, did, best_type, use_dist := true);
 
-	layout_teaser getBest(hdrAddrBestAp l, dx_BestRecords.layout_best r) := transform
+	layout_teaser getBest(hdrUniqNameAddr l, dx_BestRecords.layout_best r) := transform
 		// mark the matching address as best
 		self.bestAddr := r.did <> 0 and l.prim_name = r.prim_name and l.city_name = r.city_name and
 										 l.st = r.st and l.zip = r.zip;
@@ -94,6 +93,7 @@ export File_Teaser_Macro(teaserInFile, teaserOutFile, is_watchdog_best = 'true')
 		self := l;
 	end;
 	
+	hdrAddrBestAp := dx_BestRecords.append(hdrUniqNameAddr, did, best_type, use_dist := true);
 	hdrAddrBest := project(hdrAddrBestAp, getBest(left, left._best), local);
 													
 	hdrAddrSorted := group(sort(ungroup(hdrAddrBest), did, -(bestAddr), -dt_last_seen, record, local), did, local);
