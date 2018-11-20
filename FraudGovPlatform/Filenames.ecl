@@ -110,6 +110,7 @@ module
 		export Crim					:= tools.mod_FilenamesBuild(Template('Crim'),pversion);
 		export Death				:= tools.mod_FilenamesBuild(Template('Death'),pversion);
 		export FraudPoint		:= tools.mod_FilenamesBuild(Template('FraudPoint'),pversion);
+		export IPMetaData		:= tools.mod_FilenamesBuild(Template('IPMetaData'),pversion);
 		
 		
 		//Kel Files
@@ -131,25 +132,15 @@ module
 		export CIID_Orig				:= tools.mod_FilenamesBuild(Template('CIID_Orig'),pversion);
 		export Crim_Orig				:= tools.mod_FilenamesBuild(Template('Crim_Orig'),pversion);
 		export Death_Orig				:= tools.mod_FilenamesBuild(Template('Death_Orig'),pversion);
-		export FraudPoint_Orig	:= tools.mod_FilenamesBuild(Template('FraudPoint_Orig'),pversion);
-		
-		// soap appends anonymized
-		export CIID_Anon				:= tools.mod_FilenamesBuild(Template('CIID_Anon'),pversion);
-		export Crim_Anon				:= tools.mod_FilenamesBuild(Template('Crim_Anon'),pversion);
-		export Death_Anon				:= tools.mod_FilenamesBuild(Template('Death_Anon'),pversion);
-		
+			
 		// DemoData Files - SOAP Appends
 		export Pii_Demo					:= tools.mod_FilenamesBuild(Template('Pii_Demo'),pversion);
 		export CIID_Demo				:= tools.mod_FilenamesBuild(Template('CIID_Demo'),pversion);
 		export Crim_Demo				:= tools.mod_FilenamesBuild(Template('Crim_Demo'),pversion);
 		export Death_Demo				:= tools.mod_FilenamesBuild(Template('Death_Demo'),pversion);
 		export FraudPoint_Demo	:= tools.mod_FilenamesBuild(Template('FraudPoint_Demo'),pversion);
+		Export IpMetaData_Demo	:= tools.mod_FilenamesBuild(Template('IpMetaData_Demo'),pversion);
 			
-		// DemoData Anonymized Files - SOAP Appends
-		export CIID_Demo_Anon				:= tools.mod_FilenamesBuild(Template('CIID_Demo_Anon'),pversion);
-		export Crim_Demo_Anon				:= tools.mod_FilenamesBuild(Template('Crim_Demo_Anon'),pversion);
-		export Death_Demo_Anon			:= tools.mod_FilenamesBuild(Template('Death_Demo_Anon'),pversion);
-		
 		export dAll_filenames :=
 			IdentityData.dAll_filenames +
 			KnownFraud.dAll_filenames +
@@ -176,13 +167,11 @@ module
 			Crim_Demo.dAll_filenames + 
 			Death_Demo.dAll_filenames + 
 			FraudPoint_Demo.dAll_filenames + 
-			CIID_Demo_Anon.dAll_filenames + 
-			Crim_Demo_Anon.dAll_filenames + 
-			Death_Demo_Anon.dAll_filenames +
+			IpMetaData_Demo.dAll_filenames + 
 			CIID_Orig.dAll_filenames +
 			Crim_Orig.dAll_filenames +
 			Death_Orig.dAll_filenames +
-			FraudPoint_Orig.dAll_filenames
+			IPMetaData.dAll_filenames;
 			; 
 	
 	end;
