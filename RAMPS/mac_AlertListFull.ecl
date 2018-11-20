@@ -1,6 +1,8 @@
-IMPORT dx_BestRecords;
+IMPORT Watchdog;
 
 EXPORT mac_AlertListFull(AlertInputFile, in_did, OutputAppends, BasicOutGraph) := FUNCTIONMACRO 
+
+WatchDogBestIndex := Watchdog.Key_watchdog_glb;
 
 OutputAppendsFull := OutputAppends;
 
@@ -12,13 +14,13 @@ BiDirectionalGraph := BasicOutGraph + PROJECT(BasicOutGraph(cluster_id != associ
 // This needs to be replaced with the Best Macro that takes GLB, DPPA etc..
 // Patch in names for all the nodes so they can appear in the child dataset. 
 
-BestApp := dx_BestRecords.append(DEDUP(SORT(BiDirectionalGraph, associated_did), associated_did), 
-	associated_did, dx_BestRecords.Constants.perm_type.glb, left_outer := FALSE);
-AllDidNames := PROJECT(BestApp, 
-	TRANSFORM(
-		{UNSIGNED6 did, STRING Name}, 
-		SELF.Name := TRIM((TRIM(LEFT._best.fname) + TRIM(' ' + TRIM(LEFT._best.mname)) + ' ' + TRIM(LEFT._best.lname))[1..100]),
-		SELF := LEFT));
+AllDidNames := JOIN(DEDUP(SORT(BiDirectionalGraph, associated_did), associated_did), WatchDogBestIndex, 
+                        LEFT.associated_did=RIGHT.did, 
+											  TRANSFORM(
+											   {RIGHT.did, STRING Name}, 
+												 SELF.Name := TRIM((TRIM(RIGHT.fname) + TRIM(' ' + TRIM(RIGHT.mname)) + ' ' + TRIM(RIGHT.lname))[1..100]),
+												 SELF := RIGHT), 
+												KEYED);
 
 FullGraphWithNames := JOIN(BiDirectionalGraph, AllDidNames, 
                         LEFT.associated_did=RIGHT.did, 
