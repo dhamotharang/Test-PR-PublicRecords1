@@ -1,4 +1,4 @@
-import doxie,iesp, Lib_BridgerScore, AutoStandardI,NPPES,Healthcare_Header_Services;
+import doxie, iesp, AutoStandardI, NPPES, Healthcare_Header_Services;
 
 EXPORT Transforms :=  MODULE
 	export iesp.healthcare.t_HealthCareBusinessAddress processAddress(doxie.ingenix_provider_module.ingenix_addr_rpt_rec inAddr):= TRANSFORM
