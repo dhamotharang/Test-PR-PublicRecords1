@@ -26,6 +26,11 @@ module
 		export _KnownFraudDelete := FileSprayed+'::Delete::KnownFraud';
 		export KnownFraud	:= _KnownFraudPassed;
 
+		export _SafeListPassed := _KnownFraudPassed;  
+		export _SafeListRejected := _KnownFraudRejected;
+		export _SafeListDelete := _KnownFraudDelete;
+		export SafeList	:= _SafeListPassed;
+		
 		export _DeltabasePassed := FileSprayed+'::Passed::Deltabase';  
 		export _DeltabaseRejected := FileSprayed+'::Rejected::Deltabase';
 		export _DeltabaseDelete := FileSprayed+'::Delete::Deltabase';

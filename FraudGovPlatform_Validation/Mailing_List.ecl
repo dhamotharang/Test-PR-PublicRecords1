@@ -18,17 +18,13 @@
 	/* ******************************************************************************************************* */
 	/* ADD CUSTOMER'S LISTS BEYOND THIS LINE																															  */
 	/* ******************************************************************************************************* */
-	shared list_248283691 := 'sample1@email.com'
-										+	';sample2@email.com'
-										+	';sample3@email.com'
-										;
+	shared list_248283671 := Dev_list;
 										
 	shared fn_mail_recipiant(string recipiant) := function
 		return		map(
 									recipiant='Validation' =>
 										map (
-													 st = '248283691' and ut = 'IDENTITYDATA'	=> list_248283691 + Dev_list
-													,st = '248283691' and ut = 'KNOWNFRAUD'		=> list_248283691 + Dev_list
+													 st = '248283671'	=> list_248283671
 													,Dev_list
 													)
 									,recipiant='Alert'		=> Dev_list
