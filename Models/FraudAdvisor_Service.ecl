@@ -1273,7 +1273,7 @@ Models.Layout_Parameters intoVersion2(Models.Layout_FraudAttributes le, integer 
 		c=	223 => 'IDVerSSNDriversLicense',
 		c=	224 => 'SourceVehicleRegistration',
 		c=	225 => 'SourceDriversLicense',
-		c= 	226 => 'IdentityDriversLicenseComp',
+		c= 	226 => IF(suppressCompromisedDLs,'IdentityDriversLicenseComp',''),
 // ------------- begin 2.02 attributes
     c= 227 => 'IDVerFNameBest',
     c= 228 => 'IDVerLNameBest',
@@ -1666,7 +1666,7 @@ Models.Layout_Parameters intoVersion2(Models.Layout_FraudAttributes le, integer 
 		c=	223 => le.version201.IDVerSSNDriversLicense,
 		c=	224 => le.version201.SourceVehicleRegistration,
 		c=	225 => le.version201.SourceDriversLicense,
-		c= 	226 => le.version201.IdentityDriversLicenseComp,
+		c= 	226 => IF(suppressCompromisedDLs,le.version201.IdentityDriversLicenseComp,''),
 // -------------- begin 2.02 attributes
     c=  227 => le.version202.IDVerFNameBest,
     c=  228 => le.version202.IDVerLNameBest,
@@ -2140,7 +2140,7 @@ NormalizeCount := map( doAttributesVersion1                              => 162,
 name_pairs :=  normalize(pick_attr, NormalizeCount, intoVersion1(left, counter));
 v1 := project(name_pairs, transform(layout_attribute, self.attribute := left));
 
-v2_name_pairs :=  normalize(pick_attr, NormalizeCount, intoVersion2(left, counter));
+v2_name_pairs :=  normalize(pick_attr, NormalizeCount, intoVersion2(left, counter))(name<>'');
 v2 := project(v2_name_pairs, transform(layout_attribute, self.attribute := left));
 		
 layout_AttributeGroup formAttributes(Models.Layout_FraudAttributes le) := TRANSFORM
