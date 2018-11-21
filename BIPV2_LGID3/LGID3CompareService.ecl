@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="LGID3CompareService">
 <part name="LGID3One" type="xsd:string"/>
 <part name="LGID3Two" type="xsd:string"/>
