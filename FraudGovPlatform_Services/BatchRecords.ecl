@@ -77,6 +77,7 @@ EXPORT BatchRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_i
 		ds_raw_cluster_recs := FraudGovPlatform_Services.Functions.getClusterDetails(ds_entityNameUID, batch_params, FALSE);
 		ds_cluster_recs_scores := ds_raw_cluster_recs(entity_context_uid_ = tree_uid_);
 
+																
 		ds_results_w_scores := JOIN(ds_results_w_velocities, ds_cluster_recs_scores, 
 																LEFT.acctno = RIGHT.acctno,
 																	TRANSFORM(FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw, 
@@ -85,7 +86,36 @@ EXPORT BatchRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_i
 																		SELF := LEFT),
 																		LEFT OUTER
 																);
+																
+		ds_realtime_recs := JOIN(ds_results_w_velocities(identity_resolved = 'Y'), ds_cluster_recs_scores, 
+																LEFT.acctno = RIGHT.acctno,
+																	TRANSFORM(FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw, 
+																		SELF.identity_resolved := FraudGovPlatform_Services.Constants.IDENTITY_RESOLVED_REALTIME;
+																		SELF := LEFT),
+																		LEFT ONLY
+																);
+
 		
-		EXPORT ds_results := ds_results_w_scores;
+		ds_realtime_w_score := mod_RealTimeScoring(ds_realtime_recs, batch_params).ds_w_realTimeScore;
+		
+		// OUTPUT(ds_results_w_scores,named('ds_results_w_scores'));
+		// OUTPUT(ds_realtime_recs,named('ds_realtime_recs'));
+		// OUTPUT(ds_realtime_w_score,named('ds_realtime_w_score'));
+		
+		
+		EXPORT ds_results := JOIN(ds_results_w_scores, ds_realtime_w_score,
+															LEFT.acctno = RIGHT.acctno,
+															TRANSFORM(FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw,
+																				SELF.risk_score := IF(RIGHT.identity_resolved = FraudGovPlatform_Services.Constants.IDENTITY_RESOLVED_REALTIME,
+																															RIGHT.risk_score,
+																															LEFT.risk_score),
+																				SELF.risk_level := IF(RIGHT.identity_resolved = FraudGovPlatform_Services.Constants.IDENTITY_RESOLVED_REALTIME,
+																															FraudGovPlatform_Services.Utilities.GetRiskLevel(RIGHT.risk_score),
+																															FraudGovPlatform_Services.Utilities.GetRiskLevel(LEFT.risk_score)),
+																				SELF.identity_resolved := IF(RIGHT.identity_resolved = FraudGovPlatform_Services.Constants.IDENTITY_RESOLVED_REALTIME,
+																																		 RIGHT.identity_resolved, 
+																																		 LEFT.identity_resolved),
+																				SELF := LEFT),
+															LEFT OUTER);
 		
 END;

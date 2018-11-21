@@ -40,6 +40,7 @@ EXPORT LIB_Boca_Shell_Function_FCRA (
 	IN_isDirectToConsumerPurpose := args.IN_isDirectToConsumer;
 	IncludeLnJ := args.bs_IncludeLnJ;
  in_ReportingPeriod := args.bs_ReportingPeriod;
+ in_IntendedPurpose := args.bs_IntendedPurpose;
 
 
 	// when running FCRA shell version 4 or higher in prescreen mode for attributes, set append best=2 so we append an SSN to input if it's missing
@@ -55,7 +56,7 @@ EXPORT LIB_Boca_Shell_Function_FCRA (
 									isUtility, isLN, includeRelativeInfo, require2Ele,
 									IN_OFAC_Only, IN_SuppressNearDups, IN_From_BIID, IN_ExcludeWatchLists, IN_From_IT1O,
 									IN_OFAC_Version, IN_Include_OFAC, IN_Include_additional_watchlists, IN_Global_watchlist_threshold,
-									IN_BSversion, nugen, ADL_Based_Shell, DataRestriction, append_best, BSOptions, DataPermission
+									IN_BSversion, nugen, ADL_Based_Shell, DataRestriction, append_best, BSOptions, DataPermission, IN_IntendedPurpose
 									)
 	, seq), seq);
 

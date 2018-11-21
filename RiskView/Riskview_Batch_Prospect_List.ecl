@@ -369,7 +369,7 @@ bsversion := 50;  // hard code this for now
 		suppressNearDups, fromBIID, excludeWatchlists, fromIT1O,
 		ofacVersion, includeOfac, includeAddWatchlists, watchlistThreshold,
 		bsVersion, isPreScreenPurpose, doScore, ADL_Based_Shell:=false, datarestriction:=datarestriction, BSOptions:=BSOptions,
-		datapermission:=datapermission, IN_isDirectToConsumer:=isDirectToConsumerPurpose
+		datapermission:=datapermission, IN_isDirectToConsumer:=isDirectToConsumerPurpose,IntendedPurpose := 'PRESCREEN'
 	);
 
 #if(Models.LIB_RiskView_Models().TurnOnValidation = FALSE)

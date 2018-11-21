@@ -172,7 +172,7 @@ clam := Risk_Indicators.Boca_Shell_Function_FCRA(cleanIn, gateways, dppa, glba, 
 																								 suppressNearDups, fromBIID, excludeWatchlists, fromIT1O,
 																								 ofacVersion, includeOfac, includeAddWatchlists, watchlistThreshold,
 																								 bsVersion, isPreScreen, doScore, nugen, ADL_Based_Shell, datarestriction:=DataRestriction,
-																								 BSOptions:=BSOptions, datapermission:=DataPermission);
+																								 BSOptions:=BSOptions, datapermission:=DataPermission,IntendedPurpose:='PRESCREEN');
 
 
 
