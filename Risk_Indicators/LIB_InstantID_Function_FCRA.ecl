@@ -44,6 +44,7 @@ BSOptions := args.BSOptions;
 LastSeenThreshold := args.LastSeenThreshold;
 companyID := args.companyID;
 DataPermission := args.DataPermission;
+IntendedPurpose := args.IntendedPurpose;
 
 // step 1.  Get the DID and prep the layout_output dataset
 with_DID := risk_indicators.iid_getDID_prepOutput(indata, dppa, glb, isFCRA, BSversion, DataRestriction, append_best, gateways, BSOptions);
@@ -120,7 +121,7 @@ with_DID := risk_indicators.iid_getDID_prepOutput(indata, dppa, glb, isFCRA, BSv
 	END;
 	with_overrides := PROJECT(with_did, add_flags(LEFT));
 
-with_PersonContext := if(isFCRA, Risk_Indicators.checkPersonContext(with_overrides, gateways, BSversion), with_did);
+with_PersonContext := if(isFCRA, Risk_Indicators.checkPersonContext(with_overrides, gateways, BSversion, intendedPurpose), with_did);
 	
 commonstart := risk_indicators.iid_common_function(with_PersonContext, dppa, glb, isUtility, ln_branded,
 															suppressNearDups, isFCRA, bsversion,
