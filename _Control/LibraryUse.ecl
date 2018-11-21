@@ -1,4 +1,4 @@
-import _Control;
+﻿import _Control;
 export LibraryUse := MODULE
 
 /*
@@ -23,11 +23,11 @@ export ForceOffOne_NID__lib_PFirst := FALSE;
 export ForceOffOne_AutoHeaderI__LIB_FetchI_Hdr_Indv := FALSE;
 // export ForceOffOne_AutoHeaderI__LIB_FetchI_Hdr_Indv := TRUE;
 
-export ForceOffOne_Risk_Indicators__LIB_InstantID_Function := FALSE;
-// export ForceOffOne_Risk_Indicators__LIB_InstantID_Function := TRUE;
+// export ForceOffOne_Risk_Indicators__LIB_InstantID_Function := FALSE;
+export ForceOffOne_Risk_Indicators__LIB_InstantID_Function := TRUE;
 
-export ForceOffOne_Risk_Indicators__LIB_Boca_Shell_Function := FALSE;
-// export ForceOffOne_Risk_Indicators__LIB_Boca_Shell_Function := TRUE;
+// export ForceOffOne_Risk_Indicators__LIB_Boca_Shell_Function := FALSE;
+export ForceOffOne_Risk_Indicators__LIB_Boca_Shell_Function := TRUE;
 
 export ForceOffOne_Models__LIB_RiskView_V40 := FALSE;
 // export ForceOffOne_Models__LIB_RiskView_V40 := TRUE;

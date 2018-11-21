@@ -1,4 +1,4 @@
-import gong, riskwise, address, ut, Gateway;
+﻿import gong, riskwise, address, ut, Gateway;
 
 export ADL_Based_Modeling_Function(DATASET (risk_indicators.layout_input) indata,
 																		DATASET (Gateway.Layouts.Config) gateways,
@@ -25,7 +25,8 @@ export ADL_Based_Modeling_Function(DATASET (risk_indicators.layout_input) indata
 																		boolean doScore = false, 
 																		boolean nugen = false,
 																		string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
-																		string50 DataPermission=risk_indicators.iid_constants.default_DataPermission
+																		string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
+                                    string100 IntendedPurpose=''
 																		) := function										
 										
 
@@ -54,7 +55,8 @@ iid_results_with_flags := risk_indicators.ADL_Based_Modeling_IID_function(indata
 																		dob_radius, 
 																		DataRestriction,
 																		BSOptions,
-																		DataPermission);
+																		DataPermission,
+                                    IntendedPurpose);
 
 // ====================================================================
 // step 2.  trim off the flags to pass just layout output into shell

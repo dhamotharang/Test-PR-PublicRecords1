@@ -60,7 +60,7 @@ EXPORT ReportRecords_FCRA(iesp.fcraconsumerprofilereport.t_ConsumerProfileReport
 		require2ele, doRelatives, doDL, doVehicle, doDerogs, ofacOnly,
 		suppressNearDups, fromBIID, excludeWatchlists, fromIT1O,
 		ofacVersion, includeOfac, includeAddWatchlists, watchlistThreshold,
-			bsVersion, isPreScreen, doScore, ADL_Based_Shell:=false, datarestriction:=datarestriction, BSOptions:=BSOptions
+			bsVersion, isPreScreen, doScore, ADL_Based_Shell:=false, datarestriction:=datarestriction, BSOptions:=BSOptions, IntendedPurpose:=in_param.intended_purpose
 	));
 	//Get HRIs
 	hri_ds := ConsumerProfile_Services.Functions.getHighRiskIndicators(clam[1]);

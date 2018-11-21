@@ -14,20 +14,21 @@ export InstantID_Function(DATASET(risk_indicators.layout_input) indata1, dataset
 													real in_global_watchlist_threshold =.84,integer2 in_dob_radius = -1, unsigned1 in_BSversion=1,
 													boolean in_runSSNCodes=true, boolean in_runBestAddrCheck=true, boolean in_runChronoPhoneLookup=true,	boolean in_runAreaCodeSplitSearch=true,
 													boolean in_allowCellphones=false,
-													string10 in_ExactMatchLevel=iid_constants.default_ExactMatchLevel,
-													string50 in_DataRestriction=iid_constants.default_DataRestriction,
+													string10 in_ExactMatchLevel=risk_indicators.iid_constants.default_ExactMatchLevel,
+													string50 in_DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
 													string10 in_CustomDataFilter='',
 													boolean in_runDLverification=false,
 													dataset(iesp.share.t_StringArrayItem) watchlists_requested=dataset([], iesp.share.t_StringArrayItem),
-													dataset(layouts.Layout_DOB_Match_Options) DOBMatchOptions=dataset([], layouts.layout_dob_match_options),													
+													dataset(risk_indicators.layouts.Layout_DOB_Match_Options) DOBMatchOptions=dataset([], risk_indicators.layouts.layout_dob_match_options),													
 													unsigned2 in_EverOccupant_PastMonths = 0,
 													unsigned4 in_EverOccupant_StartDate = 99999999,
 													unsigned1 in_append_best=0, 
 													unsigned8 in_BSOptions = 0,
-													unsigned3 in_LastSeenThreshold = iid_constants.oneyear,
+													unsigned3 in_LastSeenThreshold = risk_indicators.iid_constants.oneyear,
 													string20 in_CompanyID = '',
-													string50 in_DataPermission=iid_constants.default_DataPermission,
-													boolean in_IncludeNAPData = false
+													string50 in_DataPermission=risk_indicators.iid_constants.default_DataPermission,
+													boolean in_IncludeNAPData = false,
+                          string100 in_IntendedPurpose = ''
 													) :=
 FUNCTION
 
@@ -104,6 +105,7 @@ seq_map := join( indata1, indata,
 			export string20 CompanyID := in_CompanyID;
 			export string50 DataPermission := in_DataPermission;
 			export boolean IncludeNAPData := in_IncludeNAPData;
+			export string100 IntendedPurpose := in_IntendedPurpose;
 		END;
 
 	// Call Library
@@ -116,7 +118,7 @@ seq_map := join( indata1, indata,
 								in_runSSNCodes, in_runBestAddrCheck, in_runChronoPhoneLookup, in_runAreaCodeSplitSearch, // optimization options	
 								in_allowCellphones, in_ExactMatchLevel, in_DataRestriction, in_CustomDataFilter, in_runDLverification,
 								watchlists_requested, DOBMatchOptions, in_EverOccupant_PastMonths, in_EverOccupant_StartDate, in_append_best,
-								in_BSOptions_override, in_LastSeenThreshold, in_CompanyID, in_DataPermission, in_IncludeNAPData);
+								in_BSOptions_override, in_LastSeenThreshold, in_CompanyID, in_DataPermission, in_IncludeNAPData, in_IntendedPurpose);
 
 	iid_results := base;
 	
