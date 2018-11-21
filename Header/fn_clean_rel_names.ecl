@@ -38,19 +38,17 @@ end;
 
 na := join(distribute(fna, hash(did)), distribute(lna, hash(did)), left.did = right.did, natra(left, right), local);
 
-// APPEND BEST RECORD DATA TO RECS
-dbst := dx_BestRecords.append(d_d, did, dx_BestRecords.Constants.perm_type.glb, use_distributed := true);
-
-recordof(dbst) patchit(dbst l, na r) := transform
-	self._best.fname := if(l._best.fname = '', r.fname, l._best.fname);
-	self._best.lname := if(l._best.lname = '', r.lname, l._best.lname);
+dx_BestRecords.layout_best patchit(dx_BestRecords.layout_best l, na r) := transform
+	self.fname := if(l.fname = '', r.fname, l.fname);
+	self.lname := if(l.lname = '', r.lname, l.lname);
 	self := l;
 end;
 
-// PATCH MISSING BEST RECORD NAMES
-dpch := join(dbst, na, left.did = right.did, patchit(left, right), left outer, keep(1), local);
+// GET RECS FROM THE BEST KEY
+bna := dx_BestRecords.append(na, did, dx_BestRecords.Constants.perm_type.glb, use_distributed := true);
+br := project(bna, patchit(left._best, left), local);
 
-// PROJECT TO MY REL RECORDS TO CLEAN THEM UP
+// JOIN TO MY REL RECORDS TO CLEAN THEM UP
 pb(string30 n, string30 bestn, string30 othern) := 
 	 if((bestn <> '' and UT.stringsimilar(n, bestn) < 3) or 
 		stringlib.stringcontains(bestn, n, true) or
@@ -60,13 +58,13 @@ pb(string30 n, string30 bestn, string30 othern) :=
 		bestn,
 		n);
 
-d tobest(dbst l) := transform
-	self.fname := pb(l.fname, l._best.fname, l.lname);
-	self.lname := pb(l.lname, l._best.lname, l.fname);
+d tobest(d l, br r) := transform
+	self.fname := pb(l.fname, r.fname, l.lname);
+	self.lname := pb(l.lname, r.lname, l.fname);
 	self := l;
 end;
 
-jb = project(dbst, tobest(left), local);
+jb := join(d_d, br, left.did = right.did, tobest(left, right), left outer, keep(1), local);
 
 // IF HYPHENATED, MAKE TWO ROWS FROM IT - actually, the ideal would be to keep the hyphenated and know it is early-late in the details calculator
 isHyphenated(string lname) := stringlib.stringfind(lname,'-',1) > 0;
@@ -82,6 +80,7 @@ jb_split := jb(not isHyphenated(lname)) +
 															self := left));
 
 // output(d, named('d'));
+// output(br, named('br'));
 // output(jb_split, named('jb_split'));
 return jb_split;
 endmacro;
