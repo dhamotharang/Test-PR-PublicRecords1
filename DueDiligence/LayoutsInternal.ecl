@@ -176,24 +176,12 @@ EXPORT LayoutsInternal := MODULE
     //DPPA verification fields
     STRING2 stateOrigin;
     STRING2 sourceCode;
-    
-    //TO BE REMOVED AFTER DUEDIL-424
-    InternalSeqAndIdentifiersLayout  VehicleReportData;
-    string2			Source_Code;
-    string1     Orig_name_type;
-    string5			Orig_Make_Code;                 
-    string3			Orig_Series_Code;
-    string25		Orig_Series_Desc;               
-    string3			Orig_Model_Code;                
-    UNSIGNED4   historyDateYYYYMMDD;
-    unsigned4   sl_vehicleCount  := 0;
   END;		
  
  EXPORT SharedVehicleSlim := RECORD
-    InternalSeqAndIdentifiersLayout;
-    UNSIGNED4 totalvehicleCount;  //TO BE REMOVED AFTER DUEDIL-424 
+    InternalSeqAndIdentifiersLayout; 
     UNSIGNED6 maxBasePrice;
-    DATASET(DueDiligence.Layouts.VehicleDataLayout) allVehicles;
+    DATASET(DueDiligence.Layouts.VehicleDataLayout) allVehicles {MAXCOUNT(DueDiligence.Constants.MAX_VEHICLE)};
   END;
 
 
