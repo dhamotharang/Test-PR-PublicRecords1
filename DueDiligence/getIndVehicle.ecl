@@ -1,4 +1,4 @@
-﻿IMPORT DueDiligence, STD, VehicleV2;
+﻿IMPORT DueDiligence, VehicleV2;
 
 /*
 	Following Keys being used:
@@ -64,7 +64,7 @@ EXPORT getIndVehicle(DATASET(DueDiligence.Layouts.Indv_Internal) inData, UNSIGNE
   //           VehicleV2.Key_Vehicle_Party_Key                       
   // and select only records where history field is empty           
   // to get just the currently owned vehicles                       
-  VehicleSlimParty := JOIN(rollVehicles, VehicleV2.Key_Vehicle_Party_Key,                                 
+  vehicleSlimParty := JOIN(rollVehicles, VehicleV2.Key_Vehicle_Party_Key,                                 
                             KEYED(LEFT.Vehicle_Key = RIGHT.vehicle_key)   AND
                             KEYED(LEFT.Iteration_Key = RIGHT.iteration_key) AND 
                             KEYED(LEFT.Sequence_Key  = RIGHT.sequence_key),
@@ -80,21 +80,12 @@ EXPORT getIndVehicle(DATASET(DueDiligence.Layouts.Indv_Internal) inData, UNSIGNE
 																			SELF := LEFT;),
                             //keep only the records that match on both sides
                             ATMOST(DueDiligence.Constants.MAX_ATMOST));
-                            
-                            
-  //Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently
-	vehicleSlimCleanDate := DueDiligence.Common.CleanDatasetDateFields(VehicleSlimParty, 'dateFirstSeen');
-	
-	// Filter out records after our history date.
-	vehicleFilt := DueDiligence.Common.FilterRecordsSingleDate(vehicleSlimCleanDate, dateFirstSeen);      
-  
-  transformFiltData := PROJECT(vehicleFilt, TRANSFORM(DueDiligence.LayoutsInternal.VehicleSlimLayout, SELF := LEFT;));
 
               
-  VehicleSummary := DueDiligence.getSharedVehicle(transformFiltData, dppa);
+  vehicleSummary := DueDiligence.getSharedVehicle(vehicleSlimParty, dppa);
    
    
-  addIndVehicleData := JOIN(inData, VehicleSummary,
+  addIndVehicleData := JOIN(inData, vehicleSummary,
 															LEFT.seq = RIGHT.seq AND
 															LEFT.inquiredDID = RIGHT.did,
 															TRANSFORM(DueDiligence.Layouts.Indv_Internal,
@@ -102,7 +93,8 @@ EXPORT getIndVehicle(DATASET(DueDiligence.Layouts.Indv_Internal) inData, UNSIGNE
 																								SELF.VehicleBaseValue := RIGHT.maxBasePrice;
 																								SELF.perVehicle := RIGHT.AllVehicles;  
 																								SELF := LEFT;),
-														 LEFT OUTER);
+														  LEFT OUTER,
+                              ATMOST(1));
 
   
 
@@ -113,9 +105,7 @@ EXPORT getIndVehicle(DATASET(DueDiligence.Layouts.Indv_Internal) inData, UNSIGNE
  // OUTPUT(sortVehicles, NAMED('sortVehicles'));
  // OUTPUT(rollVehicles, NAMED('rollVehicles'));
  // OUTPUT(VehicleSlimParty, NAMED('VehicleSlimParty'));  
- // OUTPUT(vehicleFilt, NAMED('vehicleFilt'));  
- // OUTPUT(transformFiltData, NAMED('transformFiltData'));  
- // OUTPUT(VehicleSummary, NAMED('VehicleSummary'));  
+ // OUTPUT(vehicleSummary, NAMED('VehicleSummary'));  
  // OUTPUT(addIndVehicleData, NAMED('inData_AfterAddingVehicle'));  
  
 

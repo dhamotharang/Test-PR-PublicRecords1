@@ -564,31 +564,13 @@ EXPORT Layouts := MODULE
     STRING8 titleDate;
     STRING2 registeredState;
     STRING8 registeredDate;
-    
-    /* data that describes the vehicle */
-    string25		Orig_VIN;                        
-		string4			Orig_Year;
-    string36		Orig_Make_Desc; 
-    string30		Orig_Model_Desc;
-    string30    license_Plate_Type; 
-    string50    Class_Type;
-    unsigned6   Vina_Price; 
-    /* title  */  
-    string2     Title_State;                   
-	  integer2    Title_Year;                      
-		integer2    Title_Month;                     
-		integer2    Title_Day;                    
-    /* registration */  
-    string2     Registered_State;                    
-	  integer2    Registered_Year;                    
-		integer2    Registered_Month;                  
-		integer2    Registered_Day; 
 	END;
   
 	EXPORT BusReportDetails := RECORD
     DATASET(BusPropertyDataLayout) busProperties {MAXCOUNT(DueDiligence.Constants.MAX_PROPERTIES)};
     DATASET(WatercraftDataLayout) busWatercraft {MAXCOUNT(DueDiligence.Constants.MAX_WATERCRAFT)};
     DATASET(AircraftDataLayout) busAircraft {MAXCOUNT(DueDiligence.Constants.MAX_AIRCRAFT)};
+    DATASET(VehicleDataLayout) busVehicle {MAXCOUNT(DueDiligence.Constants.MAX_VEHICLE)}; 
     DATASET(CommonGeographicLayout) operatingLocations {MAXCOUNT(DueDiligence.Constants.MAX_OPERATING_LOCATIONS)};
     BOOLEAN FEINSourceContainsE5;
     STRING9 FEIN_Masked_For_Report;
