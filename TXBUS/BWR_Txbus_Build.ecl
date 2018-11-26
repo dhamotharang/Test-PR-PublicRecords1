@@ -1,8 +1,6 @@
-﻿import Tools;
-
-// Please fill the version date.
+﻿// Please fill the version date.
 version_date := '20070625';
-pIsTesting   := Tools._Constants.IsDataland;
+pIsTesting   := TXBUS._Flags.IsTesting;
 
 #if (trim(version_date,left, right) = '') 
 	output('BUIDLD FAILED!!! - Version_date not provided.');

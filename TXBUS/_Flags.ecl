@@ -1,10 +1,7 @@
-﻿import VersionControl, tools;
+﻿import VersionControl;
 
-export _Flags :=
-tools.Flags(
-   pExistCurrentSprayed	 := Exists(nothor(fileservices.superfilecontents(TXBUS.Constants.Cleaned_name)))
-	,pExistBaseFile				 := Exists(nothor(fileservices.superfilecontents(TXBUS.Constants.Base_name)))
-	,pIsUpdateFullFile		 := true
-	,pShouldFilter				 := true
- );
+export _Flags :=	module
+
+ export IsTesting := VersionControl._Flags.IsDataland;
  
+end;

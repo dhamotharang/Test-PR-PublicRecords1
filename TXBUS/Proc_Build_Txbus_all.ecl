@@ -15,7 +15,7 @@ Mac_Txbus_Spray(hostname
 
 
 //Start Build Process
-pIsTesting := Tools._Constants.IsDataland;
+pIsTesting := TXBUS._Flags.IsTesting;
 DoBuild    := Proc_build_Txbus(filedate,pIsTesting);
 
 //Do Orbit Report

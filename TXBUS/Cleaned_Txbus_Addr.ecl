@@ -4,12 +4,7 @@ in_file   := Txbus.File_Txbus_In.File_Cleaned_Super;
 
 base_file := project(Txbus.File_Txbus_Base, transform(Txbus.Layouts_txbus.Layout_Common,self:=left));
 
-pShouldUpdate	:= txbus._Flags.Update;
-
-update_combined		:= if(pShouldUpdate
-												,in_file + base_file
-												,in_file
-												);
+update_combined		:= in_file + base_file;
 															
 Temp_Txbus_Layout_Common:=record
 		Txbus.Layouts_Txbus.Layout_Common;

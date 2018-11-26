@@ -86,7 +86,8 @@ build_files := sequential(Scrub_Raw_File,
                           parallel(build_autokeys, build_booleanKeys), 
 													UpdateRoxiePage, 
 													build_stats,													
-													orbitUpdate
+													orbitUpdate 
+													//BIPStats(filedate)
 													);
 
 return parallel(build_files, emailN);
