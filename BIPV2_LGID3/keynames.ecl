@@ -5,7 +5,6 @@ EXPORT keynames(
 ) :=
 module
 	shared lfileprefix		          := _Constants(pUseOtherEnvironment).prefix	;
-
 	export specificities_debug      := tools.mod_FilenamesBuild(lfileprefix + 'thor_data400::key::BIPV2_LGID3::@version@::specificities_debug'    ,pversion );// key::BIPV2_LGID3::LGID3::Debug::specificities_debug'
 	export match_sample_debug       := tools.mod_FilenamesBuild(lfileprefix + 'thor_data400::key::BIPV2_LGID3::@version@::match_sample_debug'     ,pversion );// key::BIPV2_LGID3::LGID3::Debug::match_sample_debug';
 	export patched_candidates       := tools.mod_FilenamesBuild(lfileprefix + 'thor_data400::key::BIPV2_LGID3::@version@::patched_candidates'     ,pversion );// key::BIPV2_LGID3::LGID3::Datafile::patched_candidates';
@@ -18,6 +17,5 @@ module
     + match_sample_debug     .dall_filenames
     + patched_candidates     .dall_filenames
     + attribute_matches      .dall_filenames
-    ;
-    
+    ;    
 end;

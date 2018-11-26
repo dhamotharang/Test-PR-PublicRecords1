@@ -1,4 +1,4 @@
-IMPORT std,data_services;
+﻿IMPORT std,data_services;
 
 EXPORT Proc_Copy_Keys_To_Dataland := MODULE
 
@@ -7,12 +7,13 @@ SHARED getLogical1f(string sf) := STD.File.SuperFileContents(sf)[1].name;
 SHARED getLogical1 (string sf) := getLogical1f(sf)[STD.Str.find(getLogical1f(sf),'thor',1)..];
 shared getLogical1i(string sf) := getLogical1(STD.Str.FindReplace(sf,'qa','inc'));
 
-SHARED elist :=  'gabriel.marcan@lexisnexisrisk.com;'
-         +'aleida.lima@lexisnexisrisk.com'
+SHARED elist :=  'gabriel.marcan@lexisnexisrisk.com'
+         +',aleida.lima@lexisnexisrisk.com'
+         +',Debendra.Kumar@lexisnexisrisk.com'
          ;
 
 dClstr := '	thor400_dev';//'thor400_sta01_2';
-
+  
 SHARED copy(string fl1, string fl2=fl1) :=
     if(~STD.File.FileExists('~'+fl2),
        std.file.copy(fp+fl1,dClstr,'~'+fl2,compress:=true,allowoverwrite :=true),
@@ -93,7 +94,6 @@ EXPORT Incrementals := sequential(
             output(verify_xadl_files)
         ) : success ( STD.System.Email.SendEmail (elist,'Completed:Incremental linking key copy to dataland',workunit)),
             failure ( STD.System.Email.SendEmail (elist,'FAILED!:Incremental linking key copy to dataland',workunit));
-
 
 EXPORT Full := sequential(
             STD.System.Email.SendEmail (elist,'STARTED:Full linking keys copy to dataland',workunit),

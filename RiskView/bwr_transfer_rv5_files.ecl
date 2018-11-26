@@ -128,8 +128,8 @@ dops.xFerRoxieFiles(filestocopyds
 											,true
 											,false
 											,_Control.RoxieEnv.prod_batch_fcra 	// FCRA prod roxie IP
-											, '10.173.84.202' 									// prod thor ESP
-											, '10.173.44.105' 									// prod thor dali
+											,_Control.IPAddress.prod_thor_esp		// prod thor ESP
+											,_Control.IPAddress.prod_thor_dali	// prod thor dali
 											, '8010'														// prod thor ESP port
 											,['thor400_44'		
 											  ,'thor400_20'

@@ -25,50 +25,13 @@ layout_link_place := record
   string link_rel {xpath('link/@rel')};
 	string name {xpath('name')};
 end;
-
-layout_summary := record
-	string status {xpath('status')};
-	dataset(type_summary) types {xpath('types')};
-	layout_names names {xpath('names')};
-	layout_link institution {xpath('institution')};
-	layout_link office {xpath('office')};
-	string useInAddress{xpath('useInAddress')};
-end;
-
-street_addr_layout := record
-	string addressLine1  {xpath('addressLine1')};
-	string addressLine2  {xpath('addressLine2')};
-	string addressLine3  {xpath('addressLine3')};
-	string addressLine4  {xpath('addressLine4')};
-end;
-
-layout_address := record
-	string link_href  {xpath('link/@href')}; 
-	string link_rel   {xpath('link/@rel')};
-	string type       {xpath('type')};
-	string addr_function   {xpath('function')};
-	street_addr_layout streetAddress {xpath('streetAddress')};
-	layout_link_place city           {xpath('city')};
-	layout_link_place subarea        {xpath('subarea')};
-	layout_link_place area           {xpath('area')};
-	layout_link_place country        {xpath('country')};
-	string postalCode {xpath('postalCode')};
-end;
-
-telecom := record
-	string link_href 		 {xpath('link/@href')};
-	string link_rel          {xpath('link/@rel')};
-	string type              {xpath('type')};
-	string phoneCountryCode  {xpath('phoneCountryCode')};
-	string phoneAreaCode     {xpath('phoneAreaCode')};
-	string phoneNumber       {xpath('phoneNumber')};
-	string value             {xpath('value')};
-end;
-
-layout_location := record
-	string primary {xpath('./@primary')};
-	layout_address address {xpath('address')};
-	dataset(telecom) telecom {xpath('telecom')};
+layout_line_item := record
+	string fid {xpath('@fid')};
+	string calculated {xpath('@calculated')};
+	string name {xpath('name')};
+	string value{xpath('value')};
+	string normalizedValue {xpath('normalizedValue')};
+	string note {xpath('note')};	
 end;
 
 
@@ -80,8 +43,28 @@ export layout_financialstatement := record
 	string source {xpath('@source')};
 	string owner_link_href {xpath('owner/link/@href')};
 	string owner_link_rel {xpath('owner/link/@rel')};
-	string tfpid {xpath('@tfpid')};
-	layout_summary summary {xpath('summary')};	
-	dataset(layout_location) locations {xpath('locations/location')};	
+//////////////
+	STRING6 statementType {xpath('statementType')};
+  string periodStart {xpath('periodStart')};
+	string periodStart_accuracy {xpath('periodStart/@accuracy')};
+	string periodEnd {xpath('periodEnd')};
+	string periodEnd_accuracy {xpath('periodEnd/@accuracy')};
+   
+    // Layout_financialYearEnd financialYearEnd;
+  layout_link currency {xpath('currency')};
+    // UNSIGNED1 orderOfMagnitude;
+    // Layout_exchangeRates exchangeRates;
+    // STRING5 consolidated;
+/////////////////
+
+	dataset(layout_line_item) lineItems {xpath('lineItems/item')};
+	
+	
+	//////////////////
+
+    // Layout_missingReason missingReason;
+    // STRING13 accountingStandards;
+    // Layout_ns_md__ResourceMetadata ns_md__ResourceMetadata;
+    // STRING5 excludeFromRankings;
 
 end;

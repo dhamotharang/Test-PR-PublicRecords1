@@ -420,10 +420,8 @@ EXPORT Functions :=  MODULE
 	ENDMACRO;
 
 	Current_Build := FraudShared.Files().Base.Main.Built;
-	Demo_Data	:= Files().Input.DemoData.Sprayed;
-	Current_Build_And_Demo := if(_Flags.UseDemoData, Current_Build + Demo_Data, Current_Build);
 	
-	EXPORT LastRinID := MAX(Current_Build_And_Demo(DID >= FraudGovPlatform.Constants().FirstRinID), DID):independent;
+	EXPORT LastRinID := MAX(Current_Build(DID >= FraudGovPlatform.Constants().FirstRinID), DID):independent;
 
 END; 
 			
