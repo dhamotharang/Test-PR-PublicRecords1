@@ -382,7 +382,7 @@ ret := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purp
 																					DOBMatchOptions_in, EverOccupant_PastMonths, EverOccupant_StartDate, AppendBest, BSOptions, 
 																					LastSeenThreshold,
 																					CompanyID, DataPermission, IncludeNAPData);
-
+//might be able to set special chase conditions here at a later date, 
 // want is to fail immediately as we don't want customers to think there was no hit on OFAC
 
 if(exists(ret(watchlist_table = 'ERR')), FAIL('Bridger Gateway Error'));
@@ -434,24 +434,32 @@ TRANSFORM
 	SELF.transaction_id := 0;
 
 	isFirstExpressionFound := if(ischase, if(regexfind(Risk_Indicators.iid_constants.onlyContains_express + '|' + Risk_Indicators.iid_constants.contains_expression + '|' + Risk_Indicators.iid_constants.endsWith_expression, TRIM(STD.STR.ToUpperCase(fname_val)), NOCASE), TRUE, FALSE), FALSE);
+	// for chase checking fname for busienss relations.  
+	
 	verfirst := Map(ischase AND isFirstExpressionFound => '',
 											 le.combo_firstcount>0 => le.combo_first,
 											 '');
+											 
+											 
 	self.verfirst := verfirst;
 	isLastExpressionFound  := if(ischase, if(regexfind(Risk_Indicators.iid_constants.onlyContains_express + '|' + Risk_Indicators.iid_constants.contains_expression + '|' + Risk_Indicators.iid_constants.endsWith_expression + '|' + Risk_Indicators.iid_constants.lastEndsWith_expression + '|' + Risk_Indicators.iid_constants.endingInc_expression, TRIM(STD.STR.ToUpperCase(lname_val)), NOCASE), TRUE, FALSE), FALSE);
+	
 	verlast := Map(ischase AND isLastExpressionFound => '',
 											le.combo_lastcount>0 => le.combo_last, 
 											'');
 	self.verlast := verlast;
 
+	isAddrExpressionFound := if(ischase AND le.addr_type ='P', TRUE,FALSE);
+	
 	veraddr := Map(ischase AND le.addr_type ='P' => '', //for chase, if po box matches iid or chase pio2 logic then we blank out
 											le.combo_addrcount>0 => Risk_Indicators.MOD_AddressClean.street_address('',le.combo_prim_range,
 														le.combo_predir,le.combo_prim_name,le.combo_suffix,le.combo_postdir,le.combo_unit_desig,le.combo_sec_range),
 											'');	
-											
+	
 								
 	SELF.veraddr := veraddr;
-		
+	boolean chase_expressions := if(isFirstExpressionFound or isLastExpressionFound or isAddrExpressionFound, TRUE, FALSE);
+
 	// clean the verified address to get the delivery point barcode information from the cleaner
 	clean_ver_address := risk_indicators.MOD_AddressClean.clean_addr( veraddr, le.combo_city, le.combo_state, le.combo_zip ) ;
 	// don't reference the clean fields unless the option to IncludeDPBC is turned on
@@ -503,10 +511,10 @@ TRANSFORM
 	SELF.verify_dob := IF(le.combo_dobcount>0,'Y','N');
 	//new for Emerging Identities - a fake DID means we verified first, last and SSN in getDIDprepOutput so set NAS to 9
 	NAS_summary1 := If(le.DID = Risk_Indicators.iid_constants.EmailFakeIds, 9, 
-											if(ischase, Risk_Indicators.iid_constants.Get_chase_NAS_NAP(verfirst, verlast, veraddr, le.socsverlevel), le.socsverlevel)); 
+											if(ischase and chase_expressions, Risk_Indicators.iid_constants.Get_chase_NAS_NAP(verfirst, verlast, veraddr, le.socsverlevel), le.socsverlevel)); 
 	SELF.NAS_summary := NAS_summary1;
 	
-	NAP_summary1 := if(ischase, Risk_Indicators.iid_constants.Get_chase_NAS_NAP(verfirst, verlast, veraddr, le.phoneverlevel),le.phoneverlevel);								
+	NAP_summary1 := if(ischase and chase_expressions, Risk_Indicators.iid_constants.Get_chase_NAS_NAP(verfirst, verlast, veraddr, le.phoneverlevel),le.phoneverlevel);								
 	SELF.NAP_summary := NAP_summary1;
 	
 	SELF.NAP_Type    := le.nap_type;
@@ -636,10 +644,11 @@ TRANSFORM
 	SELF.Watchlist_Entity_Name := le.Watchlist_Entity_Name;
 
 	//chase wants their custom cvi mapped to the normal and custom cvi and reason codes. 
-	cvi_temp := MAP(ischase => risk_indicators.cviScoreV1(NAP_summary1,NAS_summary1,le,le.correctssn,le.correctaddr,le.correcthphone,customCVIvalue,veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,CustomCVIModelName),
+	cvi_temp := MAP(ischase and chase_expressions => risk_indicators.cviScoreV1(NAP_summary1,NAS_summary1,le,le.correctssn,le.correctaddr,le.correcthphone,customCVIvalue,veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,CustomCVIModelName),
+									ischase => risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,customCVIvalue,veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,CustomCVIModelName),
 									actualIIDVersion=0 => risk_indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,customCVIvalue,veraddr,verlast),
 										risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,customCVIvalue,veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI));
-																			
+	//need two chase checks here because chase would like their model returned in the normal CVI slot even though it is a custom model call. one for Custom model with modification, and one without.																		
 	
 	isCodeDI := risk_indicators.rcSet.isCodeDI(le.DIDdeceased) and actualIIDVersion=1;
 	
@@ -651,7 +660,7 @@ TRANSFORM
 							isCodeDI AND (INTEGER)cvi_temp > 10 => '10',
 							cvi_temp);
 	
-	custom_cvi_temp := MAP(ischase => risk_indicators.cviScoreV1(NAP_summary1,NAS_summary1,le,le.correctssn,le.correctaddr,le.correcthphone,customCVIvalue,veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,CustomCVIModelName),
+	custom_cvi_temp := MAP(ischase and chase_expressions => risk_indicators.cviScoreV1(NAP_summary1,NAS_summary1,le,le.correctssn,le.correctaddr,le.correcthphone,customCVIvalue,veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,CustomCVIModelName),
 													CustomCVIModelName <> '' => risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,customCVIvalue,veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,CustomCVIModelName),
 													'');
 	
@@ -686,7 +695,7 @@ TRANSFORM
 
 	// add a sequence number to the reason codes for sorting in XML
 	
-	reasoncode_settings_chase := dataset([{IsInstantID, actualIIDVersion, EnableEmergingID, IsIdentifier2, ischase, verfirst, verlast}],riskwise.layouts.reasoncode_settings);
+	reasoncode_settings_chase := dataset([{IsInstantID, actualIIDVersion, EnableEmergingID, IsIdentifier2, ischase, isFirstExpressionFound, isLastExpressionFound, isAddrExpressionFound}],riskwise.layouts.reasoncode_settings);
 
 	
 	risk_indicators.mac_add_sequence(risk_indicators.reasonCodes(le, NumReturnCodes, reasoncode_settings), reasons_with_seq);
@@ -695,17 +704,19 @@ TRANSFORM
 
   empty_reasons := dataset([], risk_indicators.Layout_Desc);
 	risk_indicators.mac_add_sequence(empty_reasons, empty_reasons_with_seq);
-	self.ri := If(ischase, reason_with_seq_chase(hri<>''), reasons_with_seq(hri<>''));
-	SELF.fua := if(ischase, risk_indicators.getActionCodes(le, 4, NAS_summary1, NAP_summary1, ac_settings := actioncode_settings),risk_indicators.getActionCodes(le, 4, SELF.NAS_summary, SELF.NAP_summary, ac_settings := actioncode_settings));
+	
+	self.ri := If(ischase and chase_expressions, reason_with_seq_chase(hri<>''), reasons_with_seq(hri<>''));
+	
+	SELF.fua := if(ischase and chase_expressions , risk_indicators.getActionCodes(le, 4, NAS_summary1, NAP_summary1, ac_settings := actioncode_settings),risk_indicators.getActionCodes(le, 4, SELF.NAS_summary, SELF.NAP_summary, ac_settings := actioncode_settings));
 	
 	self.cviCustomScore_name := if(Valid_CCVI, CustomCVIModelName, '');
 	
-	self.cviCustomScore_ri  := MAP(ischase=> reason_with_seq_chase(hri<>''),
+	self.cviCustomScore_ri  := MAP(ischase and chase_expressions => reason_with_seq_chase(hri<>''),
 																	CustomCVIModelName <> ''=>reasons_with_seq(hri<>''), 
 																	empty_reasons_with_seq);
 																	
-	SELF.cviCustomScore_fua := MAP(ischase => risk_indicators.getActionCodes(le, 4, NAS_summary1, NAP_summary1, ac_settings := actioncode_settings),
-																	~ischase and CustomCVIModelName <> '' => risk_indicators.getActionCodes(le, 4, SELF.NAS_summary, SELF.NAP_summary, ac_settings := actioncode_settings),
+	SELF.cviCustomScore_fua := MAP(ischase and chase_expressions => risk_indicators.getActionCodes(le, 4, NAS_summary1, NAP_summary1, ac_settings := actioncode_settings),
+																	CustomCVIModelName <> '' => risk_indicators.getActionCodes(le, 4, SELF.NAS_summary, SELF.NAP_summary, ac_settings := actioncode_settings),
 																	empty_reasons);
 		
 	self.verdl := le.verified_dl;

@@ -412,7 +412,7 @@ fs := project(f, into_seq(LEFT,COUNTER));
 
 // JRP 02/12/2008 - Dataset of actioncode and reasoncode settings which are passed to the getactioncodes and reasoncodes functions.
 boolean IsInstantID := true;
-reasoncode_settings := dataset([{IsInstantID, actualIIDVersion, EnableEmergingID}],riskwise.layouts.reasoncode_settings);
+reasoncode_settings := dataset([{IsInstantID, actualIIDVersion, EnableEmergingID, '', ischase}],riskwise.layouts.reasoncode_settings);
 actioncode_settings := dataset([{IsPOBoxCompliant, IsInstantID}],riskwise.layouts.actioncode_settings);
 
 
@@ -553,13 +553,15 @@ Layout_InstandID_NuGenExt format_out(ret le, fs R) := TRANSFORM
 											'');
 		self.verlast := verlast;
 
+	isAddrExpressionFound := if(ischase AND le.addr_type ='P', TRUE,FALSE);
 
 	veraddr := Map(ischase AND le.addr_type ='P' => '', //for chase, if po box matches iid or chase pio2 logic then we blank out
 											le.combo_addrcount>0 => Risk_Indicators.MOD_AddressClean.street_address('',le.combo_prim_range,
 														le.combo_predir,le.combo_prim_name,le.combo_suffix,le.combo_postdir,le.combo_unit_desig,le.combo_sec_range),
 											'');	
 	SELF.veraddr := veraddr;	
-	
+  boolean chase_expressions := if(isFirstExpressionFound or isLastExpressionFound or isAddrExpressionFound, TRUE, FALSE);
+
 	// clean the verified address to get the delivery point barcode information from the cleaner
 	clean_ver_address := risk_indicators.MOD_AddressClean.clean_addr( veraddr, le.combo_city, le.combo_state, le.combo_zip ) ;
 	// don't reference the clean fields unless the option to IncludeDPBC is turned on
@@ -611,10 +613,10 @@ Layout_InstandID_NuGenExt format_out(ret le, fs R) := TRANSFORM
 	SELF.verify_addr := IF(le.addrmultiple,'O','');
 	SELF.verify_dob := IF(le.combo_dobcount>0,'Y','N');
 	//new for Emerging Identities - a fake DID means we verified first, last and SSN in getDIDprepOutput so set NAS to 9
-	NAS_summary1 := If(le.DID = Risk_Indicators.iid_constants.EmailFakeIds, 9, If(ischase, Risk_Indicators.iid_constants.Get_chase_NAS_NAP(verfirst, verlast, veraddr, le.socsverlevel), le.socsverlevel)); 
+	NAS_summary1 := If(le.DID = Risk_Indicators.iid_constants.EmailFakeIds, 9, If(ischase and chase_expressions, Risk_Indicators.iid_constants.Get_chase_NAS_NAP(verfirst, verlast, veraddr, le.socsverlevel), le.socsverlevel)); 
 	SELF.NAS_summary := NAS_summary1;
 	
-	NAP_summary1 := if(ischase, Risk_Indicators.iid_constants.Get_chase_NAS_NAP(verfirst, verlast, veraddr, le.phoneverlevel),le.phoneverlevel);								
+	NAP_summary1 := if(ischase and chase_expressions, Risk_Indicators.iid_constants.Get_chase_NAS_NAP(verfirst, verlast, veraddr, le.phoneverlevel),le.phoneverlevel);								
 	SELF.NAP_summary := NAP_summary1;
 	
 	SELF.NAP_Type    := le.nap_type;
@@ -742,12 +744,14 @@ Layout_InstandID_NuGenExt format_out(ret le, fs R) := TRANSFORM
 	SELF.Watchlist_contry := le.Watchlist_contry;
 	SELF.Watchlist_Entity_Name := le.Watchlist_Entity_Name;
 
-	SELF.fua := if(ischase, risk_indicators.getActionCodes(le,4, NAS_summary1, NAP_summary1, ac_settings := actioncode_settings),risk_indicators.getActionCodes(le,4, SELF.NAS_summary, SELF.NAP_summary, ac_settings := actioncode_settings /*, rc*/));
+	SELF.fua := if(ischase and chase_expressions, risk_indicators.getActionCodes(le,4, NAS_summary1, NAP_summary1, ac_settings := actioncode_settings),risk_indicators.getActionCodes(le,4, SELF.NAS_summary, SELF.NAP_summary, ac_settings := actioncode_settings /*, rc*/));
 	
-	cvi_temp := MAP(ischase => risk_indicators.cviScoreV1(NAP_summary1,NAS_summary1,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI),
+	cvi_temp := MAP(ischase and chase_expressions => risk_indicators.cviScoreV1(NAP_summary1,NAS_summary1,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI),
+									ischase => risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI),
 										actualIIDVersion=0 => risk_indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC),	
 										risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI));
-										
+		//need two chase checks here because chase would like their model returned in the normal CVI slot even though it is a custom model call. one for Custom model with modification, and one without.																		
+									
 	isCodeDI := risk_indicators.rcSet.isCodeDI(le.DIDdeceased) and actualIIDVersion=1;
 	
 	SELF.CVI := map(	IncludeMSoverride and risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months) and (integer)cvi_temp > 10 => '10',
@@ -789,13 +793,13 @@ Layout_InstandID_NuGenExt format_out(ret le, fs R) := TRANSFORM
 	risk_indicators.mac_add_sequence(le.watchlists, watchlists_with_seq);
 	self.watchlists := watchlists_with_seq;
 	
-	reasoncode_settings_chase := dataset([{IsInstantID, actualIIDVersion, EnableEmergingID, '',ischase, verfirst, verlast}],riskwise.layouts.reasoncode_settings);
+	reasoncode_settings_chase := dataset([{IsInstantID, actualIIDVersion, EnableEmergingID, '', ischase, isFirstExpressionFound, isLastExpressionFound, isAddrExpressionFound}],riskwise.layouts.reasoncode_settings);
 
 	// add a sequence number to the reason codes for sorting in XML
 	risk_indicators.mac_add_sequence(risk_indicators.reasonCodes(le, NumReturnCodes, reasoncode_settings), reasons_with_seq);
 	risk_indicators.mac_add_sequence(risk_indicators.reasonCodes(le, NumReturnCodes, reasoncode_settings_chase), reason_with_seq_chase);
 
-	self.ri := if(ischase, reason_with_seq_chase, reasons_with_seq);
+	self.ri := if(ischase and chase_expressions, reason_with_seq_chase, reasons_with_seq);
 		
 	passportline := r.PassportUpperLine + r.PassportLowerLine;
 	self.passportValidated := if(IntlIID.ValidationFunctions().passportValidation(passportline, r.dob[3..8], r.gender), 'Y','N');
@@ -806,7 +810,7 @@ Layout_InstandID_NuGenExt format_out(ret le, fs R) := TRANSFORM
 	self.addressPOBox := (Risk_Indicators.rcSet.isCode12(le.addr_type) or Risk_Indicators.rcSet.isCodePO(le.zipclass)) and actualIIDVersion=1;
 	self.addressCMRA := (le.hrisksic in risk_indicators.iid_constants.setCRMA or le.ADVODropIndicator='C') and actualIIDVersion=1;
 	
-	custom_cvi_temp := MAP(ischase => risk_indicators.cviScoreV1(NAP_summary1,NAS_summary1,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,CustomCVIModelName_in),
+	custom_cvi_temp := MAP(ischase and chase_expressions => risk_indicators.cviScoreV1(NAP_summary1,NAS_summary1,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,CustomCVIModelName_in),
 													CustomCVIModelName_in <> '' => risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,le.correctssn,le.correctaddr,le.correcthphone,'',veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,CustomCVIModelName_in),
 													'');
 	
