@@ -33,6 +33,7 @@ EXPORT Constants :=
         EXPORT DATASET(LNSmallBusiness.Layouts.ModelNameRec) CREDIT_BLENDED := DATASET([BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_BLENDED], LNSmallBusiness.Layouts.ModelNameRec); 
         
         EXPORT DATASET(LNSmallBusiness.Layouts.ModelNameRec) BLENDED_SLBB        := DATASET([BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_SLBB], LNSmallBusiness.Layouts.ModelNameRec); 
+        EXPORT DATASET(LNSmallBusiness.Layouts.ModelNameRec) BLENDED_BBFM        := DATASET([BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_BBFM], LNSmallBusiness.Layouts.ModelNameRec); 
         EXPORT DATASET(LNSmallBusiness.Layouts.ModelNameRec) CREDIT_SLBO         := DATASET([BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_SLBO], LNSmallBusiness.Layouts.ModelNameRec); 
         EXPORT DATASET(LNSmallBusiness.Layouts.ModelNameRec) CREDIT_BLENDED_SLBB_SLBO := DATASET([BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_BLENDED_SLBB_SLBO], LNSmallBusiness.Layouts.ModelNameRec); 
 
@@ -74,12 +75,11 @@ EXPORT Constants :=
       'B2BPaid12M',
       'B2BBalanceAvg03M'
     ];
-  
+    
   Export OutputType := module
       EXPORT string1 PDF_ONLY := 'P';    //Means ‘PDF Only’
       EXPORT string1 PDF_AND_XML := 'B'; //Means ‘PDF and XML’
       EXPORT string1 XML_ONLY := 'X';    //Means ‘XML Only’
       EXPORT string1 BLANK := '';        // Empty/Nothing/NotPresent 
   end;
-
   END;
