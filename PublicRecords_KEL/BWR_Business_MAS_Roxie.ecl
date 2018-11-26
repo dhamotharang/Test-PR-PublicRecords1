@@ -3,17 +3,19 @@ IMPORT RiskWise, STD;
 
 
 Threads := 1;
-RecordsToRun := 100; // 100;
+RecordsToRun := 0; // 100;
 eyeball := 120;
 
-historyDate := 0; // Set to 0 to use ArchiveDate on input file. 
+// historyDate := 0; // Set to 0 to use ArchiveDate on input file. 
+historyDate := 20181126; // Set to 0 to use ArchiveDate on input file. 
 Score_threshold := 80;
 RoxieIP := RiskWise.shortcuts.Dev156;
 
 InputFile := '~temp::kel::ally_01_business_uat_sample_100k_20181015.csv'; //100k file
 // InputFile := '~temp::kel::ally_01_business_uat_sample_1m_20181015.csv'; //1m file
 
-OutputFile := '~lweiner::out::PublicRecs::Business::Sprint7'+ ThorLib.wuid() ;
+OutputFile := '~cdal::BusinessPop_PublicRecs_11262018'+ ThorLib.wuid() ;
+
 
 prii_layout := RECORD
 	STRING AccountNumber         ;  
@@ -177,7 +179,7 @@ END;
 ResultSet := 
 				SOAPCALL(soap_in, 
 				RoxieIP,
-				'publicrecords_kel.MAS_Business_nonFCRA_Service', 
+				'publicrecords_kel.MAS_Business_nonFCRA_Service.7', 
 				{soap_in}, 
 				DATASET(layout_MAS_Business_Service_output),
 				RETRY(2), TIMEOUT(300),
@@ -207,8 +209,8 @@ LayoutOut_With_Extras := RECORD
 	STRING pf_approved_not_funded; 
 END;
 
-Passed_with_PF := JOIN(Passed, inDataRecs, LEFT.BusInputAccountEcho = RIGHT.AccountNumber, TRANSFORM(LayoutOut_With_Extras,
-	SELF := LEFT,
-	SELF := RIGHT), LEFT OUTER, KEEP(1));
-	
+Passed_with_PF := JOIN(inDataRecs, Passed, LEFT.AccountNumber = RIGHT.BusInputAccountEcho, TRANSFORM(LayoutOut_With_Extras,
+                SELF := RIGHT, //fields from passed
+                SELF := LEFT), //input performance fields
+                INNER, KEEP(1));
 OUTPUT(Passed_with_PF,,OutputFile, CSV(HEADING(single), QUOTE('"')));

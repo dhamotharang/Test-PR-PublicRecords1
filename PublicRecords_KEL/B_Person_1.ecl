@@ -6,17 +6,17 @@ EXPORT B_Person_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
   SHARED VIRTUAL TYPEOF(B_Criminal_Offense_2(__in,__cfg).__ENH_Criminal_Offense_2) __ENH_Criminal_Offense_2 := B_Criminal_Offense_2(__in,__cfg).__ENH_Criminal_Offense_2;
   SHARED VIRTUAL TYPEOF(B_Person_2(__in,__cfg).__ENH_Person_2) __ENH_Person_2 := B_Person_2(__in,__cfg).__ENH_Person_2;
   SHARED VIRTUAL TYPEOF(E_Person_Offenses(__in,__cfg).__Result) __E_Person_Offenses := E_Person_Offenses(__in,__cfg).__Result;
-  SHARED __EE57492 := __ENH_Person_2;
-  SHARED __EE58213 := __ENH_Criminal_Offense_2;
-  SHARED __EE72506 := __EE58213;
-  SHARED __EE72519 := __EE72506.Offense_Charges_;
-  SHARED __CC4652 := 2556;
-  __JC73148(B_Criminal_Offense_2(__in,__cfg).__ST15406_Layout __EE72519) := __T(__AND(__NOT(__NT(__EE72519.Age_In_Days_)),__OP2(__EE72519.Age_In_Days_,<=,__CN(__CC4652))));
-  SHARED __EE73149 := __EE72506(EXISTS(__CHILDJOINFILTER(__EE72519,__JC73148)));
-  SHARED __EE58211 := __E_Person_Offenses;
-  SHARED __EE71361 := __EE58211(__NN(__EE58211.Subject_) AND __NN(__EE58211.Offense_));
-  SHARED __EE72509 := __EE71361;
-  SHARED __ST66848_Layout := RECORD
+  SHARED __EE66042 := __ENH_Person_2;
+  SHARED __EE66763 := __ENH_Criminal_Offense_2;
+  SHARED __EE81056 := __EE66763;
+  SHARED __EE81069 := __EE81056.Offense_Charges_;
+  SHARED __CC5513 := 2556;
+  __JC81698(B_Criminal_Offense_2(__in,__cfg).__ST18194_Layout __EE81069) := __T(__AND(__NOT(__NT(__EE81069.Age_In_Days_)),__OP2(__EE81069.Age_In_Days_,<=,__CN(__CC5513))));
+  SHARED __EE81699 := __EE81056(EXISTS(__CHILDJOINFILTER(__EE81069,__JC81698)));
+  SHARED __EE66761 := __E_Person_Offenses;
+  SHARED __EE79911 := __EE66761(__NN(__EE66761.Subject_) AND __NN(__EE66761.Offense_));
+  SHARED __EE81059 := __EE79911;
+  SHARED __ST75398_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Offender_Key_;
     KEL.typ.nstr Offense_Type_;
@@ -62,7 +62,7 @@ EXPORT B_Person_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.nstr Court_County_;
     KEL.typ.nstr Arrest_Offense_Level_Mapped_;
     KEL.typ.nstr Court_Offense_Level_Mapped_;
-    KEL.typ.ndataset(B_Criminal_Offense_2(__in,__cfg).__ST15406_Layout) Offense_Charges_;
+    KEL.typ.ndataset(B_Criminal_Offense_2(__in,__cfg).__ST18194_Layout) Offense_Charges_;
     KEL.typ.ndataset(E_Criminal_Offense(__in,__cfg).Criminal_Data_Sources_Layout) Criminal_Data_Sources_;
     KEL.typ.ndataset(E_Criminal_Offense(__in,__cfg).Court_Offense_Level_Layout) Court_Offense_Level_;
     KEL.typ.ndataset(E_Criminal_Offense(__in,__cfg).Offender_Level_Layout) Offender_Level_;
@@ -78,55 +78,55 @@ EXPORT B_Person_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC73241(B_Criminal_Offense_2(__in,__cfg).__ST15359_Layout __EE73149, E_Person_Offenses(__in,__cfg).Layout __EE72509) := __EEQP(__EE72509.Offense_,__EE73149.UID);
-  __ST66848_Layout __JT73241(B_Criminal_Offense_2(__in,__cfg).__ST15359_Layout __l, E_Person_Offenses(__in,__cfg).Layout __r) := TRANSFORM
+  __JC81791(B_Criminal_Offense_2(__in,__cfg).__ST18147_Layout __EE81699, E_Person_Offenses(__in,__cfg).Layout __EE81059) := __EEQP(__EE81059.Offense_,__EE81699.UID);
+  __ST75398_Layout __JT81791(B_Criminal_Offense_2(__in,__cfg).__ST18147_Layout __l, E_Person_Offenses(__in,__cfg).Layout __r) := TRANSFORM
     SELF.Data_Sources__1_ := __r.Data_Sources_;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE73335 := JOIN(__EE72509,__EE73149,__JC73241(RIGHT,LEFT),__JT73241(RIGHT,LEFT),INNER,HASH);
-  SHARED __ST64724_Layout := RECORD
+  SHARED __EE81885 := JOIN(__EE81059,__EE81699,__JC81791(RIGHT,LEFT),__JT81791(RIGHT,LEFT),INNER,HASH);
+  SHARED __ST73274_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Criminal_Offense().Typ) Offense_;
     KEL.typ.ndataset(E_Person_Offenses(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.nuid U_I_D__1_;
-    KEL.typ.ndataset(B_Criminal_Offense_2(__in,__cfg).__ST15406_Layout) Offense_Charges_;
+    KEL.typ.ndataset(B_Criminal_Offense_2(__in,__cfg).__ST18194_Layout) Offense_Charges_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __ST64724_Layout __ND73340__Project(__ST66848_Layout __PP73336) := TRANSFORM
-    SELF.UID := __PP73336.Subject_;
-    SELF.Data_Sources_ := __PP73336.Data_Sources__1_;
-    SELF.U_I_D__1_ := __PP73336.UID;
-    SELF := __PP73336;
+  SHARED __ST73274_Layout __ND81890__Project(__ST75398_Layout __PP81886) := TRANSFORM
+    SELF.UID := __PP81886.Subject_;
+    SELF.Data_Sources_ := __PP81886.Data_Sources__1_;
+    SELF.U_I_D__1_ := __PP81886.UID;
+    SELF := __PP81886;
   END;
-  SHARED __EE73401 := PROJECT(__EE73335,__ND73340__Project(LEFT));
-  SHARED __ST64809_Layout := RECORD
+  SHARED __EE81951 := PROJECT(__EE81885,__ND81890__Project(LEFT));
+  SHARED __ST73359_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) UID;
     KEL.typ.bool Exp1_ := FALSE;
     KEL.typ.bool Exp2_ := FALSE;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __ST64809_Layout __ND73406__Project(__ST64724_Layout __PP73402) := TRANSFORM
-    __CC4652 := 2556;
-    __BS73412 := __T(__PP73402.Offense_Charges_);
-    SELF.Exp1_ := EXISTS(__BS73412(__T(__AND(__AND(__OP2(__T(__PP73402.Offense_Charges_).Is_Criminal_Count_,=,__CN(TRUE)),__OP2(__T(__PP73402.Offense_Charges_).Age_In_Days_,<=,__CN(__CC4652))),__NOT(__NT(__T(__PP73402.Offense_Charges_).Age_In_Days_))))));
-    __BS73435 := __T(__PP73402.Offense_Charges_);
-    SELF.Exp2_ := EXISTS(__BS73435(__T(__AND(__AND(__OP2(__T(__PP73402.Offense_Charges_).Is_Felony_,=,__CN(TRUE)),__OP2(__T(__PP73402.Offense_Charges_).Age_In_Days_,<=,__CN(__CC4652))),__NOT(__NT(__T(__PP73402.Offense_Charges_).Age_In_Days_))))));
-    SELF := __PP73402;
+  SHARED __ST73359_Layout __ND81956__Project(__ST73274_Layout __PP81952) := TRANSFORM
+    __CC5513 := 2556;
+    __BS81962 := __T(__PP81952.Offense_Charges_);
+    SELF.Exp1_ := EXISTS(__BS81962(__T(__AND(__AND(__OP2(__T(__PP81952.Offense_Charges_).Is_Criminal_Count_,=,__CN(TRUE)),__OP2(__T(__PP81952.Offense_Charges_).Age_In_Days_,<=,__CN(__CC5513))),__NOT(__NT(__T(__PP81952.Offense_Charges_).Age_In_Days_))))));
+    __BS81985 := __T(__PP81952.Offense_Charges_);
+    SELF.Exp2_ := EXISTS(__BS81985(__T(__AND(__AND(__OP2(__T(__PP81952.Offense_Charges_).Is_Felony_,=,__CN(TRUE)),__OP2(__T(__PP81952.Offense_Charges_).Age_In_Days_,<=,__CN(__CC5513))),__NOT(__NT(__T(__PP81952.Offense_Charges_).Age_In_Days_))))));
+    SELF := __PP81952;
   END;
-  SHARED __EE73461 := PROJECT(__EE73401,__ND73406__Project(LEFT));
-  SHARED __ST64829_Layout := RECORD
+  SHARED __EE82011 := PROJECT(__EE81951,__ND81956__Project(LEFT));
+  SHARED __ST73379_Layout := RECORD
     KEL.typ.int C_O_U_N_T___Exp1_ := 0;
     KEL.typ.int C_O_U_N_T___Exp1__1_ := 0;
     KEL.typ.ntyp(E_Person().Typ) UID;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __EE73482 := PROJECT(__CLEANANDDO(__EE73461,TABLE(__EE73461,{KEL.typ.int C_O_U_N_T___Exp1_ := COUNT(GROUP,__EE73461.Exp1_),KEL.typ.int C_O_U_N_T___Exp1__1_ := COUNT(GROUP,__EE73461.Exp2_),UID},UID,MERGE)),__ST64829_Layout);
-  SHARED __ST67028_Layout := RECORD
+  SHARED __EE82032 := PROJECT(__CLEANANDDO(__EE82011,TABLE(__EE82011,{KEL.typ.int C_O_U_N_T___Exp1_ := COUNT(GROUP,__EE82011.Exp1_),KEL.typ.int C_O_U_N_T___Exp1__1_ := COUNT(GROUP,__EE82011.Exp2_),UID},UID,MERGE)),__ST73379_Layout);
+  SHARED __ST75578_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Gender_;
     KEL.typ.nstr Lex_I_D_Segment_;
@@ -146,17 +146,17 @@ EXPORT B_Person_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC73488(B_Person_2(__in,__cfg).__ST15719_Layout __EE57492, __ST64829_Layout __EE73482) := __EEQP(__EE57492.UID,__EE73482.UID);
-  __ST67028_Layout __JT73488(B_Person_2(__in,__cfg).__ST15719_Layout __l, __ST64829_Layout __r) := TRANSFORM
+  __JC82038(B_Person_2(__in,__cfg).__ST18782_Layout __EE66042, __ST73379_Layout __EE82032) := __EEQP(__EE66042.UID,__EE82032.UID);
+  __ST75578_Layout __JT82038(B_Person_2(__in,__cfg).__ST18782_Layout __l, __ST73379_Layout __r) := TRANSFORM
     SELF.U_I_D__1_ := __r.UID;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE73519 := JOIN(__EE57492,__EE73482,__JC73488(LEFT,RIGHT),__JT73488(LEFT,RIGHT),LEFT OUTER,HASH);
-  SHARED __EE58382 := __EE58213.Offense_Charges_;
-  __JC68483(B_Criminal_Offense_2(__in,__cfg).__ST15406_Layout __EE58382) := __T(__NOT(__NT(__EE58382.Age_In_Days_)));
-  SHARED __EE68484 := __EE58213(EXISTS(__CHILDJOINFILTER(__EE58382,__JC68483)));
-  SHARED __ST65813_Layout := RECORD
+  SHARED __EE82069 := JOIN(__EE66042,__EE82032,__JC82038(LEFT,RIGHT),__JT82038(LEFT,RIGHT),LEFT OUTER,HASH);
+  SHARED __EE66932 := __EE66763.Offense_Charges_;
+  __JC77033(B_Criminal_Offense_2(__in,__cfg).__ST18194_Layout __EE66932) := __T(__NOT(__NT(__EE66932.Age_In_Days_)));
+  SHARED __EE77034 := __EE66763(EXISTS(__CHILDJOINFILTER(__EE66932,__JC77033)));
+  SHARED __ST74363_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Offender_Key_;
     KEL.typ.nstr Offense_Type_;
@@ -202,7 +202,7 @@ EXPORT B_Person_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.nstr Court_County_;
     KEL.typ.nstr Arrest_Offense_Level_Mapped_;
     KEL.typ.nstr Court_Offense_Level_Mapped_;
-    KEL.typ.ndataset(B_Criminal_Offense_2(__in,__cfg).__ST15406_Layout) Offense_Charges_;
+    KEL.typ.ndataset(B_Criminal_Offense_2(__in,__cfg).__ST18194_Layout) Offense_Charges_;
     KEL.typ.ndataset(E_Criminal_Offense(__in,__cfg).Criminal_Data_Sources_Layout) Criminal_Data_Sources_;
     KEL.typ.ndataset(E_Criminal_Offense(__in,__cfg).Court_Offense_Level_Layout) Court_Offense_Level_;
     KEL.typ.ndataset(E_Criminal_Offense(__in,__cfg).Offender_Level_Layout) Offender_Level_;
@@ -218,14 +218,14 @@ EXPORT B_Person_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC71379(B_Criminal_Offense_2(__in,__cfg).__ST15359_Layout __EE68484, E_Person_Offenses(__in,__cfg).Layout __EE71361) := __EEQP(__EE71361.Offense_,__EE68484.UID);
-  __ST65813_Layout __JT71379(B_Criminal_Offense_2(__in,__cfg).__ST15359_Layout __l, E_Person_Offenses(__in,__cfg).Layout __r) := TRANSFORM
+  __JC79929(B_Criminal_Offense_2(__in,__cfg).__ST18147_Layout __EE77034, E_Person_Offenses(__in,__cfg).Layout __EE79911) := __EEQP(__EE79911.Offense_,__EE77034.UID);
+  __ST74363_Layout __JT79929(B_Criminal_Offense_2(__in,__cfg).__ST18147_Layout __l, E_Person_Offenses(__in,__cfg).Layout __r) := TRANSFORM
     SELF.Data_Sources__1_ := __r.Data_Sources_;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE71380 := JOIN(__EE71361,__EE68484,__JC71379(RIGHT,LEFT),__JT71379(RIGHT,LEFT),INNER,HASH);
-  SHARED __ST66183_Layout := RECORD
+  SHARED __EE79930 := JOIN(__EE79911,__EE77034,__JC79929(RIGHT,LEFT),__JT79929(RIGHT,LEFT),INNER,HASH);
+  SHARED __ST74733_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Offender_Key_;
     KEL.typ.nstr Offense_Type_;
@@ -271,7 +271,7 @@ EXPORT B_Person_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.nstr Court_County_;
     KEL.typ.nstr Arrest_Offense_Level_Mapped_;
     KEL.typ.nstr Court_Offense_Level_Mapped_;
-    KEL.typ.ndataset(B_Criminal_Offense_2(__in,__cfg).__ST15406_Layout) Offense_Charges_;
+    KEL.typ.ndataset(B_Criminal_Offense_2(__in,__cfg).__ST18194_Layout) Offense_Charges_;
     KEL.typ.ndataset(E_Criminal_Offense(__in,__cfg).Criminal_Data_Sources_Layout) Criminal_Data_Sources_;
     KEL.typ.ndataset(E_Criminal_Offense(__in,__cfg).Court_Offense_Level_Layout) Court_Offense_Level_;
     KEL.typ.ndataset(E_Criminal_Offense(__in,__cfg).Offender_Level_Layout) Offender_Level_;
@@ -302,13 +302,13 @@ EXPORT B_Person_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __ST66183_Layout __JT71487(__ST65813_Layout __l, B_Criminal_Offense_2(__in,__cfg).__ST15406_Layout __r) := TRANSFORM
+  __ST74733_Layout __JT80037(__ST74363_Layout __l, B_Criminal_Offense_2(__in,__cfg).__ST18194_Layout __r) := TRANSFORM
     SELF.__RecordCount := __r.__RecordCount;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE71488 := NORMALIZE(__EE71380,__T(LEFT.Offense_Charges_),__JT71487(LEFT,RIGHT));
-  SHARED __ST63313_Layout := RECORD
+  SHARED __EE80038 := NORMALIZE(__EE79930,__T(LEFT.Offense_Charges_),__JT80037(LEFT,RIGHT));
+  SHARED __ST71863_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Criminal_Offense().Typ) Offense_;
@@ -373,7 +373,7 @@ EXPORT B_Person_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.nstr Court_County_;
     KEL.typ.nstr Arrest_Offense_Level_Mapped_;
     KEL.typ.nstr Court_Offense_Level_Mapped_;
-    KEL.typ.ndataset(B_Criminal_Offense_2(__in,__cfg).__ST15406_Layout) Offense_Charges_;
+    KEL.typ.ndataset(B_Criminal_Offense_2(__in,__cfg).__ST18194_Layout) Offense_Charges_;
     KEL.typ.ndataset(E_Criminal_Offense(__in,__cfg).Criminal_Data_Sources_Layout) Criminal_Data_Sources_;
     KEL.typ.ndataset(E_Criminal_Offense(__in,__cfg).Court_Offense_Level_Layout) Court_Offense_Level_;
     KEL.typ.ndataset(E_Criminal_Offense(__in,__cfg).Offender_Level_Layout) Offender_Level_;
@@ -385,15 +385,15 @@ EXPORT B_Person_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __ST63313_Layout __ND71599__Project(__ST66183_Layout __PP71489) := TRANSFORM
-    SELF.UID := __PP71489.Subject_;
-    SELF.Data_Sources_ := __PP71489.Data_Sources__1_;
-    SELF.U_I_D__1_ := __PP71489.UID;
-    SELF.Data_Sources__1_ := __PP71489.Data_Sources_;
-    SELF := __PP71489;
+  SHARED __ST71863_Layout __ND80149__Project(__ST74733_Layout __PP80039) := TRANSFORM
+    SELF.UID := __PP80039.Subject_;
+    SELF.Data_Sources_ := __PP80039.Data_Sources__1_;
+    SELF.U_I_D__1_ := __PP80039.UID;
+    SELF.Data_Sources__1_ := __PP80039.Data_Sources_;
+    SELF := __PP80039;
   END;
-  SHARED __EE71958 := PROJECT(__EE71488,__ND71599__Project(LEFT));
-  SHARED __ST63752_Layout := RECORD
+  SHARED __EE80508 := PROJECT(__EE80038,__ND80149__Project(LEFT));
+  SHARED __ST72302_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) UID;
     KEL.typ.nkdate Exp1_;
     KEL.typ.nkdate Exp2_;
@@ -406,29 +406,29 @@ EXPORT B_Person_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __ST63752_Layout __ND73531__Project(__ST63313_Layout __PP71959) := TRANSFORM
-    __CC4640 := 365;
-    __BS71975 := __T(__PP71959.Offense_Charges_);
-    SELF.Exp1_ := IF(EXISTS(__BS71975(__T(__AND(__AND(__OP2(__T(__PP71959.Offense_Charges_).Is_Arrest_,=,__CN(TRUE)),__OP2(__T(__PP71959.Offense_Charges_).Age_In_Days_,<=,__CN(__CC4640))),__NOT(__NT(__T(__PP71959.Offense_Charges_).Age_In_Days_)))))),__ECAST(KEL.typ.nkdate,__PP71959.Criminal_Date_),__ECAST(KEL.typ.nkdate,__N(KEL.typ.kdate)));
-    __CC4652 := 2556;
-    __BS71999 := __T(__PP71959.Offense_Charges_);
-    SELF.Exp2_ := IF(EXISTS(__BS71999(__T(__AND(__AND(__OP2(__T(__PP71959.Offense_Charges_).Is_Arrest_,=,__CN(TRUE)),__OP2(__T(__PP71959.Offense_Charges_).Age_In_Days_,<=,__CN(__CC4652))),__NOT(__NT(__T(__PP71959.Offense_Charges_).Age_In_Days_)))))),__ECAST(KEL.typ.nkdate,__PP71959.Criminal_Date_),__ECAST(KEL.typ.nkdate,__N(KEL.typ.kdate)));
-    __BS72023 := __T(__PP71959.Offense_Charges_);
-    SELF.Exp3_ := IF(EXISTS(__BS72023(__T(__AND(__AND(__OP2(__T(__PP71959.Offense_Charges_).Is_Criminal_Count_,=,__CN(TRUE)),__OP2(__T(__PP71959.Offense_Charges_).Age_In_Days_,<=,__CN(__CC4640))),__NOT(__NT(__T(__PP71959.Offense_Charges_).Age_In_Days_)))))),__ECAST(KEL.typ.nkdate,__PP71959.Criminal_Date_),__ECAST(KEL.typ.nkdate,__N(KEL.typ.kdate)));
-    __BS72047 := __T(__PP71959.Offense_Charges_);
-    SELF.Exp4_ := IF(EXISTS(__BS72047(__T(__AND(__AND(__OP2(__T(__PP71959.Offense_Charges_).Is_Criminal_Count_,=,__CN(TRUE)),__OP2(__T(__PP71959.Offense_Charges_).Age_In_Days_,<=,__CN(__CC4652))),__NOT(__NT(__T(__PP71959.Offense_Charges_).Age_In_Days_)))))),__ECAST(KEL.typ.nkdate,__PP71959.Criminal_Date_),__ECAST(KEL.typ.nkdate,__N(KEL.typ.kdate)));
-    __BS72071 := __T(__PP71959.Offense_Charges_);
-    SELF.Exp5_ := IF(EXISTS(__BS72071(__T(__AND(__AND(__OP2(__T(__PP71959.Offense_Charges_).Is_Felony_,=,__CN(TRUE)),__OP2(__T(__PP71959.Offense_Charges_).Age_In_Days_,<=,__CN(__CC4640))),__NOT(__NT(__T(__PP71959.Offense_Charges_).Age_In_Days_)))))),__ECAST(KEL.typ.nkdate,__PP71959.Criminal_Date_),__ECAST(KEL.typ.nkdate,__N(KEL.typ.kdate)));
-    __BS72095 := __T(__PP71959.Offense_Charges_);
-    SELF.Exp6_ := IF(EXISTS(__BS72095(__T(__AND(__AND(__OP2(__T(__PP71959.Offense_Charges_).Is_Felony_,=,__CN(TRUE)),__OP2(__T(__PP71959.Offense_Charges_).Age_In_Days_,<=,__CN(__CC4652))),__NOT(__NT(__T(__PP71959.Offense_Charges_).Age_In_Days_)))))),__ECAST(KEL.typ.nkdate,__PP71959.Criminal_Date_),__ECAST(KEL.typ.nkdate,__N(KEL.typ.kdate)));
-    __BS72119 := __T(__PP71959.Offense_Charges_);
-    SELF.Exp7_ := IF(EXISTS(__BS72119(__T(__AND(__AND(__OP2(__T(__PP71959.Offense_Charges_).Is_Non_Felony_Records_,=,__CN(TRUE)),__OP2(__T(__PP71959.Offense_Charges_).Age_In_Days_,<=,__CN(__CC4640))),__NOT(__NT(__T(__PP71959.Offense_Charges_).Age_In_Days_)))))),__ECAST(KEL.typ.nkdate,__PP71959.Criminal_Date_),__ECAST(KEL.typ.nkdate,__N(KEL.typ.kdate)));
-    __BS72143 := __T(__PP71959.Offense_Charges_);
-    SELF.Exp8_ := IF(EXISTS(__BS72143(__T(__AND(__AND(__OP2(__T(__PP71959.Offense_Charges_).Is_Non_Felony_Records_,=,__CN(TRUE)),__OP2(__T(__PP71959.Offense_Charges_).Age_In_Days_,<=,__CN(__CC4652))),__NOT(__NT(__T(__PP71959.Offense_Charges_).Age_In_Days_)))))),__ECAST(KEL.typ.nkdate,__PP71959.Criminal_Date_),__ECAST(KEL.typ.nkdate,__N(KEL.typ.kdate)));
-    SELF := __PP71959;
+  SHARED __ST72302_Layout __ND82081__Project(__ST71863_Layout __PP80509) := TRANSFORM
+    __CC5501 := 365;
+    __BS80525 := __T(__PP80509.Offense_Charges_);
+    SELF.Exp1_ := IF(EXISTS(__BS80525(__T(__AND(__AND(__OP2(__T(__PP80509.Offense_Charges_).Is_Arrest_,=,__CN(TRUE)),__OP2(__T(__PP80509.Offense_Charges_).Age_In_Days_,<=,__CN(__CC5501))),__NOT(__NT(__T(__PP80509.Offense_Charges_).Age_In_Days_)))))),__ECAST(KEL.typ.nkdate,__PP80509.Criminal_Date_),__ECAST(KEL.typ.nkdate,__N(KEL.typ.kdate)));
+    __CC5513 := 2556;
+    __BS80549 := __T(__PP80509.Offense_Charges_);
+    SELF.Exp2_ := IF(EXISTS(__BS80549(__T(__AND(__AND(__OP2(__T(__PP80509.Offense_Charges_).Is_Arrest_,=,__CN(TRUE)),__OP2(__T(__PP80509.Offense_Charges_).Age_In_Days_,<=,__CN(__CC5513))),__NOT(__NT(__T(__PP80509.Offense_Charges_).Age_In_Days_)))))),__ECAST(KEL.typ.nkdate,__PP80509.Criminal_Date_),__ECAST(KEL.typ.nkdate,__N(KEL.typ.kdate)));
+    __BS80573 := __T(__PP80509.Offense_Charges_);
+    SELF.Exp3_ := IF(EXISTS(__BS80573(__T(__AND(__AND(__OP2(__T(__PP80509.Offense_Charges_).Is_Criminal_Count_,=,__CN(TRUE)),__OP2(__T(__PP80509.Offense_Charges_).Age_In_Days_,<=,__CN(__CC5501))),__NOT(__NT(__T(__PP80509.Offense_Charges_).Age_In_Days_)))))),__ECAST(KEL.typ.nkdate,__PP80509.Criminal_Date_),__ECAST(KEL.typ.nkdate,__N(KEL.typ.kdate)));
+    __BS80597 := __T(__PP80509.Offense_Charges_);
+    SELF.Exp4_ := IF(EXISTS(__BS80597(__T(__AND(__AND(__OP2(__T(__PP80509.Offense_Charges_).Is_Criminal_Count_,=,__CN(TRUE)),__OP2(__T(__PP80509.Offense_Charges_).Age_In_Days_,<=,__CN(__CC5513))),__NOT(__NT(__T(__PP80509.Offense_Charges_).Age_In_Days_)))))),__ECAST(KEL.typ.nkdate,__PP80509.Criminal_Date_),__ECAST(KEL.typ.nkdate,__N(KEL.typ.kdate)));
+    __BS80621 := __T(__PP80509.Offense_Charges_);
+    SELF.Exp5_ := IF(EXISTS(__BS80621(__T(__AND(__AND(__OP2(__T(__PP80509.Offense_Charges_).Is_Felony_,=,__CN(TRUE)),__OP2(__T(__PP80509.Offense_Charges_).Age_In_Days_,<=,__CN(__CC5501))),__NOT(__NT(__T(__PP80509.Offense_Charges_).Age_In_Days_)))))),__ECAST(KEL.typ.nkdate,__PP80509.Criminal_Date_),__ECAST(KEL.typ.nkdate,__N(KEL.typ.kdate)));
+    __BS80645 := __T(__PP80509.Offense_Charges_);
+    SELF.Exp6_ := IF(EXISTS(__BS80645(__T(__AND(__AND(__OP2(__T(__PP80509.Offense_Charges_).Is_Felony_,=,__CN(TRUE)),__OP2(__T(__PP80509.Offense_Charges_).Age_In_Days_,<=,__CN(__CC5513))),__NOT(__NT(__T(__PP80509.Offense_Charges_).Age_In_Days_)))))),__ECAST(KEL.typ.nkdate,__PP80509.Criminal_Date_),__ECAST(KEL.typ.nkdate,__N(KEL.typ.kdate)));
+    __BS80669 := __T(__PP80509.Offense_Charges_);
+    SELF.Exp7_ := IF(EXISTS(__BS80669(__T(__AND(__AND(__OP2(__T(__PP80509.Offense_Charges_).Is_Non_Felony_Records_,=,__CN(TRUE)),__OP2(__T(__PP80509.Offense_Charges_).Age_In_Days_,<=,__CN(__CC5501))),__NOT(__NT(__T(__PP80509.Offense_Charges_).Age_In_Days_)))))),__ECAST(KEL.typ.nkdate,__PP80509.Criminal_Date_),__ECAST(KEL.typ.nkdate,__N(KEL.typ.kdate)));
+    __BS80693 := __T(__PP80509.Offense_Charges_);
+    SELF.Exp8_ := IF(EXISTS(__BS80693(__T(__AND(__AND(__OP2(__T(__PP80509.Offense_Charges_).Is_Non_Felony_Records_,=,__CN(TRUE)),__OP2(__T(__PP80509.Offense_Charges_).Age_In_Days_,<=,__CN(__CC5513))),__NOT(__NT(__T(__PP80509.Offense_Charges_).Age_In_Days_)))))),__ECAST(KEL.typ.nkdate,__PP80509.Criminal_Date_),__ECAST(KEL.typ.nkdate,__N(KEL.typ.kdate)));
+    SELF := __PP80509;
   END;
-  SHARED __EE73612 := PROJECT(__EE71958,__ND73531__Project(LEFT));
-  SHARED __ST63820_Layout := RECORD
+  SHARED __EE82162 := PROJECT(__EE80508,__ND82081__Project(LEFT));
+  SHARED __ST72370_Layout := RECORD
     KEL.typ.nkdate M_A_X___Criminal_Date_;
     KEL.typ.nkdate M_A_X___Criminal_Date__1_;
     KEL.typ.nkdate M_I_N___Criminal_Date_;
@@ -447,8 +447,8 @@ EXPORT B_Person_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __EE73693 := PROJECT(__CLEANANDDO(__EE73612,TABLE(__EE73612,{KEL.Aggregates.MaxNG(__EE73612.Exp1_) M_A_X___Criminal_Date_,KEL.Aggregates.MaxNG(__EE73612.Exp2_) M_A_X___Criminal_Date__1_,KEL.Aggregates.MinNG(__EE73612.Exp1_) M_I_N___Criminal_Date_,KEL.Aggregates.MinNG(__EE73612.Exp2_) M_I_N___Criminal_Date__1_,KEL.Aggregates.MaxNG(__EE73612.Exp3_) M_A_X___Criminal_Date__2_,KEL.Aggregates.MinNG(__EE73612.Exp3_) M_I_N___Criminal_Date__2_,KEL.Aggregates.MinNG(__EE73612.Exp4_) M_I_N___Criminal_Date__3_,KEL.Aggregates.MaxNG(__EE73612.Exp5_) M_A_X___Criminal_Date__3_,KEL.Aggregates.MinNG(__EE73612.Exp5_) M_I_N___Criminal_Date__4_,KEL.Aggregates.MinNG(__EE73612.Exp6_) M_I_N___Criminal_Date__5_,KEL.Aggregates.MaxNG(__EE73612.Exp7_) M_A_X___Criminal_Date__4_,KEL.Aggregates.MaxNG(__EE73612.Exp8_) M_A_X___Criminal_Date__5_,KEL.Aggregates.MinNG(__EE73612.Exp7_) M_I_N___Criminal_Date__6_,KEL.Aggregates.MinNG(__EE73612.Exp8_) M_I_N___Criminal_Date__7_,UID},UID,MERGE)),__ST63820_Layout);
-  SHARED __ST67242_Layout := RECORD
+  SHARED __EE82243 := PROJECT(__CLEANANDDO(__EE82162,TABLE(__EE82162,{KEL.Aggregates.MaxNG(__EE82162.Exp1_) M_A_X___Criminal_Date_,KEL.Aggregates.MaxNG(__EE82162.Exp2_) M_A_X___Criminal_Date__1_,KEL.Aggregates.MinNG(__EE82162.Exp1_) M_I_N___Criminal_Date_,KEL.Aggregates.MinNG(__EE82162.Exp2_) M_I_N___Criminal_Date__1_,KEL.Aggregates.MaxNG(__EE82162.Exp3_) M_A_X___Criminal_Date__2_,KEL.Aggregates.MinNG(__EE82162.Exp3_) M_I_N___Criminal_Date__2_,KEL.Aggregates.MinNG(__EE82162.Exp4_) M_I_N___Criminal_Date__3_,KEL.Aggregates.MaxNG(__EE82162.Exp5_) M_A_X___Criminal_Date__3_,KEL.Aggregates.MinNG(__EE82162.Exp5_) M_I_N___Criminal_Date__4_,KEL.Aggregates.MinNG(__EE82162.Exp6_) M_I_N___Criminal_Date__5_,KEL.Aggregates.MaxNG(__EE82162.Exp7_) M_A_X___Criminal_Date__4_,KEL.Aggregates.MaxNG(__EE82162.Exp8_) M_A_X___Criminal_Date__5_,KEL.Aggregates.MinNG(__EE82162.Exp7_) M_I_N___Criminal_Date__6_,KEL.Aggregates.MinNG(__EE82162.Exp8_) M_I_N___Criminal_Date__7_,UID},UID,MERGE)),__ST72370_Layout);
+  SHARED __ST75792_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Gender_;
     KEL.typ.nstr Lex_I_D_Segment_;
@@ -483,14 +483,14 @@ EXPORT B_Person_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC73701(__ST67028_Layout __EE73519, __ST63820_Layout __EE73693) := __EEQP(__EE73519.UID,__EE73693.UID);
-  __ST67242_Layout __JT73701(__ST67028_Layout __l, __ST63820_Layout __r) := TRANSFORM
+  __JC82251(__ST75578_Layout __EE82069, __ST72370_Layout __EE82243) := __EEQP(__EE82069.UID,__EE82243.UID);
+  __ST75792_Layout __JT82251(__ST75578_Layout __l, __ST72370_Layout __r) := TRANSFORM
     SELF.U_I_D__2_ := __r.UID;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE73747 := JOIN(__EE73519,__EE73693,__JC73701(LEFT,RIGHT),__JT73701(LEFT,RIGHT),LEFT OUTER,HASH);
-  EXPORT __ST15188_Layout := RECORD
+  SHARED __EE82297 := JOIN(__EE82069,__EE82243,__JC82251(LEFT,RIGHT),__JT82251(LEFT,RIGHT),LEFT OUTER,HASH);
+  EXPORT __ST17976_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Gender_;
     KEL.typ.nstr Lex_I_D_Segment_;
@@ -525,27 +525,27 @@ EXPORT B_Person_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST15188_Layout __ND73752__Project(__ST67242_Layout __PP73748) := TRANSFORM
+  SHARED __ST17976_Layout __ND82302__Project(__ST75792_Layout __PP82298) := TRANSFORM
     __CC3069 := '-98';
-    SELF.Arrest_New1_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,__PP73748.M_A_X___Criminal_Date_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
-    SELF.Arrest_New7_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,__PP73748.M_A_X___Criminal_Date__1_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
-    SELF.Arrest_Old1_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,__PP73748.M_I_N___Criminal_Date_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
-    SELF.Arrest_Old7_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,__PP73748.M_I_N___Criminal_Date__1_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
-    SELF.Crim_Cnt7_Y_ := KEL.Routines.BoundsFold(__PP73748.C_O_U_N_T___Exp1_,0,999);
-    SELF.Crim_New1_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,__PP73748.M_A_X___Criminal_Date__2_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
-    SELF.Crim_Old1_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,__PP73748.M_I_N___Criminal_Date__2_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
-    SELF.Crim_Old7_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,__PP73748.M_I_N___Criminal_Date__3_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
-    SELF.Felony_Cnt7_Y_ := KEL.Routines.BoundsFold(__PP73748.C_O_U_N_T___Exp1__1_,0,999);
-    SELF.Felony_New1_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,__PP73748.M_A_X___Criminal_Date__3_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
-    SELF.Felony_Old1_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,__PP73748.M_I_N___Criminal_Date__4_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
-    SELF.Felony_Old7_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,__PP73748.M_I_N___Criminal_Date__5_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
-    SELF.Mon_Since_Newest_Crim_Cnt7_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP73748.Crim_New7_Y_),__PP73748.Current_Date_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
-    SELF.Mon_Since_Newest_Felony_Cnt7_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP73748.Felony_New7_Y_),__PP73748.Current_Date_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
-    SELF.Nonfelony_New1_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,__PP73748.M_A_X___Criminal_Date__4_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
-    SELF.Nonfelony_New7_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,__PP73748.M_A_X___Criminal_Date__5_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
-    SELF.Nonfelony_Old1_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,__PP73748.M_I_N___Criminal_Date__6_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
-    SELF.Nonfelony_Old7_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,__PP73748.M_I_N___Criminal_Date__7_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
-    SELF := __PP73748;
+    SELF.Arrest_New1_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,__PP82298.M_A_X___Criminal_Date_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
+    SELF.Arrest_New7_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,__PP82298.M_A_X___Criminal_Date__1_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
+    SELF.Arrest_Old1_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,__PP82298.M_I_N___Criminal_Date_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
+    SELF.Arrest_Old7_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,__PP82298.M_I_N___Criminal_Date__1_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
+    SELF.Crim_Cnt7_Y_ := KEL.Routines.BoundsFold(__PP82298.C_O_U_N_T___Exp1_,0,999);
+    SELF.Crim_New1_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,__PP82298.M_A_X___Criminal_Date__2_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
+    SELF.Crim_Old1_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,__PP82298.M_I_N___Criminal_Date__2_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
+    SELF.Crim_Old7_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,__PP82298.M_I_N___Criminal_Date__3_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
+    SELF.Felony_Cnt7_Y_ := KEL.Routines.BoundsFold(__PP82298.C_O_U_N_T___Exp1__1_,0,999);
+    SELF.Felony_New1_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,__PP82298.M_A_X___Criminal_Date__3_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
+    SELF.Felony_Old1_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,__PP82298.M_I_N___Criminal_Date__4_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
+    SELF.Felony_Old7_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,__PP82298.M_I_N___Criminal_Date__5_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
+    SELF.Mon_Since_Newest_Crim_Cnt7_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP82298.Crim_New7_Y_),__PP82298.Current_Date_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
+    SELF.Mon_Since_Newest_Felony_Cnt7_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__FN2(KEL.Routines.MonthsBetween,KEL.Routines.CastStringToDate(__PP82298.Felony_New7_Y_),__PP82298.Current_Date_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
+    SELF.Nonfelony_New1_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,__PP82298.M_A_X___Criminal_Date__4_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
+    SELF.Nonfelony_New7_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,__PP82298.M_A_X___Criminal_Date__5_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
+    SELF.Nonfelony_Old1_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,__PP82298.M_I_N___Criminal_Date__6_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
+    SELF.Nonfelony_Old7_Y_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nstr,__PP82298.M_I_N___Criminal_Date__7_)),__ECAST(KEL.typ.nstr,__CN(__CC3069)));
+    SELF := __PP82298;
   END;
-  EXPORT __ENH_Person_1 := PROJECT(__EE73747,__ND73752__Project(LEFT));
+  EXPORT __ENH_Person_1 := PROJECT(__EE82297,__ND82302__Project(LEFT));
 END;

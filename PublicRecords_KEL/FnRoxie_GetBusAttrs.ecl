@@ -34,7 +34,8 @@ EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Lay
 		
 	// Remove the fields like datefirstseen and datelastseen from final attribute output
 	InputPIIBIIAttrs := SORT(PROJECT(InputPIIBII, TRANSFORM(PublicRecords_KEL.ECL_Functions.AttrBus_Layout, 
-		SELF := LEFT)), BusInputUIDAppend);	
+		SELF := LEFT,
+		SELF := [])), BusInputUIDAppend);	
 		
 	RETURN InputPIIBIIAttrs;
 END;
