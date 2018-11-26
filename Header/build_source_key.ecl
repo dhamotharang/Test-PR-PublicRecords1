@@ -1,6 +1,6 @@
 import roxiekeybuild,ak_perm_fund,atf,bankrupt,drivers,emerges,govdata,prof_license,property,utilfile,vehlic,ut,ln_tu,ln_property,ln_mortgage,faa,watercraft,dea;
 
-export build_source_key(string filedate=header.version_build,boolean pFastHeader = false) := function
+export build_source_key(string filedate,boolean pFastHeader = false) := function
 
 dl_index                 := Header.Key_Src_DLv2(,false);
 bkv3_index               := Header.Key_Src_bkv2(,false);
