@@ -1,8 +1,8 @@
-import ut,roxiekeybuild,promotesupers;
+﻿import ut,roxiekeybuild,promotesupers;
 
 export Proc_FCRAacceptSK_toQA(string filedate, boolean pFastHeader=false) := function
 
-roxiekeybuild.Mac_SK_Move('~thor_data400::key::fcra::header','Q',out1);
+roxiekeybuild.Mac_SK_Move_v2('~thor_data400::key::fcra::header','Q',out1,2);
 roxiekeybuild.MAC_SK_Move_v2('~thor_data400::key::fcra::hdr_apt_bldgs','Q',out2,2)
 roxiekeybuild.MAC_SK_Move_v2('~thor_data400::key::fcra::en_hdr_apt_bldgs','Q',out3,2)
 roxiekeybuild.MAC_SK_Move('~thor_data400::key::fcra::header_address','Q',out4);

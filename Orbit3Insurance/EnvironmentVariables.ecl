@@ -3,7 +3,7 @@ export EnvironmentVariables := module
 	export domainname := 'LexisNexis';
 	// Testing service url  -  All Data builds are to use the OrbitServicePR. Do use not OrbitServiceInsurance.
 	export serviceurl := if (_control.ThisEnvironment.Name = 'Prod_Thor',
-												'https://orbit3.risk.regn.net/Orbit3/Orbit3Services/OrbitServicePR.svc',			//Prod URL
+												'https://orbitinsurance.noam.lnrm.net/Orbit3/Orbit3Services/OrbitServicePR.svc',			//Prod URL
 												'https://qa.orbit3.risk.regn.net/orbit3/Orbit3Services/OrbitServicePR.svc');	//Dev URL
 
 	export namespace := 'http://lexisnexis.com/Orbit/" xmlns:orb="http://lexisnexis.com/Orbit/" xmlns:arr="http://schemas.microsoft.com/2003/10/Serialization/Arrays"  xmlns:i="http://www.w3.org/2001/XMLSchema-instance';

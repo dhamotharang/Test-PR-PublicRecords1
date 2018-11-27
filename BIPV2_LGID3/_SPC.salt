@@ -1,7 +1,6 @@
-﻿//SALTVERSION:30
-OPTIONS:-gh -ga -p2 -gs2
+﻿OPTIONS:-gh -ga -p2 -gs2
 MODULE:BIPV2_LGID3 
-FILENAME:LGID3 
+FILENAME:LGID3
  
 // ------------------------------------
 //  IDs and Tuning
@@ -10,7 +9,7 @@ IDFIELD:EXISTS:LGID3
 RIDFIELD:rcid
 IDPARENTS:seleid,orgid,ultid
 IDCHILDREN:proxid,dotid
-RECORDS:7154133270
+RECORDS:7082984780
 POPULATION:225000000
 NINES:3
 BLOCKTHRESHOLD:5 
@@ -22,15 +21,15 @@ HACK:CUSTOMINTERNALJOIN:_mj_extra
 //  Field validation/cleaning
 // ------------------------------------
 FIELDTYPE:multiword:CAPS:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):SPACES( <>{}[]-^=!+&,./):ONFAIL(CLEAN)
-FIELDTYPE:Noblanks:LENGTHS(1..):ONFAIL(REJECT)
+FIELDTYPE:Noblanks:LIKE(multiword):LENGTHS(1..):ONFAIL(CLEAN,REJECT)
 // ------------------------------------
 //  Linking fields
 // ------------------------------------
 // Exclude clusters linked by Hrchy
 //FIELDTYPE:not_hrchy:ENUM(0|1):ONFAIL(REJECT)
 //FIELD:nodes_total:LIKE(not_hrchy):CARRY:0,0
-FIELD:sbfe_id:26,466
-FIELDTYPE:not_hrchy_parent:ENUM('0'):ONFAIL(REJECT)
+FIELD:sbfe_id:27,475
+FIELDTYPE:not_hrchy_parent:ENUM(_ENUM_Not_Hrchy_Parent):ONFAIL(REJECT)
 FIELD:nodes_below_st:LIKE(not_hrchy_parent):CARRY:0,0
 FIELD:Lgid3IfHrchy:FORCE(--):PROP:27,0
 //LGID3 iteration may split sele cluster, the following will be used to merge them back.
@@ -38,23 +37,22 @@ FIELD:OriginalSeleId:CARRY:0,0
 FIELD:OriginalOrgId:CARRY:0,0
 // Legal Name
 // FIELD:company_name:LIKE(multiword):BAGOFWORDS(MOST):EDIT1(2):PROP:FORCE(+):TYPE(string250):25,147
-FIELD:company_name:LIKE(multiword):LIKE(Noblanks):BAGOFWORDS(MOST):EDIT1(2):PROP:TYPE(string250):26,343
-FIELD:cnp_number:PROP:FORCE(--,OR(sbfe_id)):13,0
+FIELD:company_name:TYPE(STRING250):LIKE(Noblanks):BAGOFWORDS(MOST):EDIT1(2):PROP:TYPE(string250):26,398
+FIELD:cnp_number:PROP:FORCE(--,OR(sbfe_id)):13,2
 // NOTE: This assumes we hack the data to blank company_name except when it's a Legal Name.
 // Given field specificities and the THRESHOLD we've set above, we in-effect require
 // a match on at least one of: duns_number, company_charter_number, or company_fein
 // DUNS number (v2)
-FIELD:active_duns_number:PROP:SWITCH0:27,33
-FIELD:duns_number:PROP:SWITCH0:27,42
-CONCEPT:duns_number_concept:active_duns_number:duns_number:27,94
+FIELD:active_duns_number:PROP:SWITCH0:27,57
+FIELD:duns_number:PROP:SWITCH0:27,68
+CONCEPT:duns_number_concept:active_duns_number:duns_number:27,111
 //CONCEPT:company_csz:v_city_name:st:zip:FORCE(+-2):14,23
 //FIELD:duns_number:PROP:25,260
 // Company_charter_number or company_fein (v1)
-FIELD:company_fein:26,153
-FIELD:company_inc_state:PROP:FORCE(+,OR(active_duns_number),OR(duns_number),OR(duns_number_concept),OR(company_fein),OR(sbfe_id)):6,32
-FIELD:company_charter_number:PROP:CONTEXT(company_inc_state):26,97
-FIELD:cnp_btype:3,52
-
+FIELD:company_fein:26,196
+FIELD:company_inc_state:PROP:FORCE(+,OR(active_duns_number),OR(duns_number),OR(duns_number_concept),OR(company_fein),OR(sbfe_id)):6,34
+FIELD:company_charter_number:PROP:CONTEXT(company_inc_state):26,110
+FIELD:cnp_btype:3,56
 // ----------------------------------------------------
 //  FYI -- no effect, but helpful during sample review
 // ----------------------------------------------------
@@ -98,3 +96,4 @@ BLOCKLINK:NAMED(OverLinks):BASIS(company_name)
 
 //Underlinks
 ATTRIBUTEFILE:UnderLinks:NAMED(file_underLink):VALUES(UnderLinkId):IDFIELD(LGID3):41,0
+
