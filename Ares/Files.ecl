@@ -24,6 +24,8 @@ Export ds_ssiset := dataset(Constants.filename_SSISet, layout_ssiset, XML('SSISE
 
 Export ds_routingcode := DATASET(Constants.filename_RoutingCode, layout_RoutingCode,XML('routingcode', NOROOT));
 
+Export ds_product := DATASET(Constants.filename_Product, layout_Product, XML('product', NOROOT));
+
 shared area := DATASET(Constants.filename_Area, {STRING area {XPATH('<>')}},XML('area', NOROOT));
 shared city := DATASET(Constants.filename_City,{STRING city {XPATH('<>')}},XML('city', NOROOT));
 shared country := DATASET(Constants.filename_Country,{STRING country {XPATH('<>')}},XML('country', NOROOT));
@@ -50,7 +52,7 @@ Export ds_legalentity := project(legalentity, {string legalentity});
 Export ds_lookup_raw := project(lookup, {string lookup});
 Export ds_office_raw := project(office, {string office});
 Export ds_person_raw := project(person, {string person});
-Export ds_product := project(product, {string product});
+Export ds_product_raw := project(product, {string product});
 Export ds_relationship_raw := project(relationship, {string relationship});
 Export ds_routingcode_raw := project(routingcode, {string routingcode});
 Export ds_ssi_raw := project(ssi, {string ssi});

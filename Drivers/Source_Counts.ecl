@@ -1,8 +1,7 @@
-﻿v := drivers.File_Dl;
-
+﻿
 countrec := record
-	v.source_code;
-	v.orig_state;
+	string2 source_code;
+	string2 orig_state;
 	unsigned6 counted;
 	string2 src;
 end;

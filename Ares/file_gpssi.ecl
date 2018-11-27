@@ -118,9 +118,9 @@
 		self.Further_2_BIC                   := if (l.further2_bic_code != '' and length(l.further2_bic_code) < 11, Ares.str_functions.pad(l.further2_bic_code, '>', 'X', 11), l.further2_bic_code);
 		self.Further_2_BIC_Without_Padding   := l.further2_bic_code;
 		self.Correspondent_Effective_Date    := l.created_on_date;
-		self.Correspondent_Deactivation_Date := '';
+		self.Correspondent_Deactivation_Date := l.deleted_on_date;
 		self.Correspondent_Update_Date       := l.validationDate;
-		self.SSI_Notes                       := '';
+		self.SSI_Notes                       := l.additional_info;
 	End;
 
 	final := Project(ssi_full_ds, final_xform(left));
