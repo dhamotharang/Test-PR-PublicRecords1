@@ -24,16 +24,14 @@ EmailPeople	:=	if(emailList <>'' AND NOT skipEmail, fileservices.sendEmail(email
 																			dataset_name+' v'+version+': Build End','See: '+wuid+ ' / '+log_File));
 																			
 MergeWithFullFile:=_control.fSubmitNewWorkunit(
-									 'SuperFile_Entries	:=	dataset(\''+Super_Log_File+'\',BuildLogger.Layouts.layout_log,thor,opt);\r\n'+
-									 'TempSuperFile:=dataset(\''+TempSuperFile+'\',BuildLogger.Layouts.layout_log,thor,opt);\r\n'+
-									 'ordered(BuildLogger.CreateFullEntry(TempSuperFile,\''+KeyName+'\'),\r\n'+
-									 'output(SuperFile_Entries+TempSuperFile,,\''+Super_Log_File+workunit+'\',thor,overwrite),\r\n'+
-									 'sequential(STD.File.StartSuperFileTransaction(),\r\n'+
-									 'STD.File.ClearSuperFile(\''+SuperFile+'\',true),\r\n'+
-									 'STD.File.FinishSuperFileTransaction());\r\n'+
+									  'SuperFile_Entries	:=	dataset(\''+SuperFile+'\',BuildLogger.Layouts.layout_log,thor,opt);\r\n'+
+									  'TempSuperFile:=dataset(\''+TempSuperFile+'\',BuildLogger.Layouts.layout_log,thor,opt);\r\n'+
+									  'ordered(BuildLogger.CreateFullEntry(TempSuperFile,\''+KeyName+'\'),\r\n'+
+									  'output(SuperFile_Entries+TempSuperFile,,\''+SuperFile+workunit+'\',thor,overwrite),\r\n'+
 										'nothor(global(sequential(\r\n'+
 										'STD.File.StartSuperFileTransaction(),\r\n'+
-										'STD.File.AddSuperFile(\''+SuperFile+'\',\''+Super_Log_File+workunit+'\'),\r\n'+
+										'STD.File.ClearSuperFile(\''+SuperFile+'\',true),\r\n'+
+										'STD.File.AddSuperFile(\''+SuperFile+'\',\''+SuperFile+workunit+'\'),\r\n'+
 										'STD.File.FinishSuperFileTransaction()))),\r\n'+
 										'sequential(STD.File.StartSuperFileTransaction(),\r\n'+
 										'STD.File.ClearSuperFile(\''+TempSuperFile+'\',true),\r\n'+
