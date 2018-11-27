@@ -1,4 +1,6 @@
-﻿import _Control, doxie, doxie_files, risk_indicators, riskwise, watchdog, ut,CriminalRecords_Services;
+﻿import _Control, doxie, doxie_files, risk_indicators, riskwise, ut,CriminalRecords_Services, 
+	dx_BestRecords;
+
 onThor := _Control.Environment.OnThor;
 
 export Collection_Shell_MOD := module
@@ -236,85 +238,32 @@ end;
 export getBestCleaned(dataset(doxie.layout_references) deduped_dids,string50 DataRestriction, integer GLB_Purpose, boolean clean_address=true)  := function
 	// permitted if not specifically restricted
 	experian_permitted := DataRestriction[risk_indicators.iid_constants.posExperianRestriction]<>risk_indicators.iid_constants.sTrue;
-  IndustryClass := '';
 	
-	MAC_best_transform(trans_name, flex_key_name) := MACRO
-		best_rec trans_name(deduped_dids l, flex_key_name r) := transform
-			self.did := l.did;
-			// need the lat and long, so we need to clean the best address
-			street_addr  := Risk_Indicators.MOD_AddressClean.street_address('',R.prim_Range, R.predir, R.prim_name, R.suffix, R.postdir, R.unit_desig, R.sec_range);
-			cleaned_addr := if(clean_address, Risk_Indicators.MOD_AddressClean.clean_addr(street_addr, r.city_name, r.st, r.zip), '');
-			self.street_addr := street_addr;
-			self.lat := cleaned_addr[146..155];
-			self.long := cleaned_addr[156..166];
-			self.addr_type := cleaned_addr[139];
-			self.addr_status := cleaned_addr[179..182];
-			self.county := cleaned_addr[143..145];
-			self.geo_blk := cleaned_addr[171..177];
-			self := r;
-		END;
-		
-	ENDMACRO;
-									
-	MAC_best_transform(get_watchdog_glb, watchdog.Key_Watchdog_GLB);
-	MAC_best_transform(get_watchdog_glb_nonutil, watchdog.Key_Watchdog_glb_nonutil);
-	MAC_best_transform(get_watchdog_glb_nonExperian, watchdog.Key_Watchdog_GLB_nonExperian);
-	MAC_best_transform(get_watchdog_non_glb, watchdog.Key_Watchdog_nonglb);
-	MAC_best_transform(get_watchdog_nonglb_V2, watchdog.Key_Watchdog_nonglb_V2);
+	best_rec get_best_layout(deduped_dids l, dx_BestRecords.layout_best r) := transform
+		self.did := l.did;
+		// need the lat and long, so we need to clean the best address
+		street_addr  := Risk_Indicators.MOD_AddressClean.street_address('',R.prim_Range, R.predir, R.prim_name, R.suffix, R.postdir, R.unit_desig, R.sec_range);
+		cleaned_addr := if(clean_address, Risk_Indicators.MOD_AddressClean.clean_addr(street_addr, r.city_name, r.st, r.zip), '');
+		self.street_addr := street_addr;
+		self.lat := cleaned_addr[146..155];
+		self.long := cleaned_addr[156..166];
+		self.addr_type := cleaned_addr[139];
+		self.addr_status := cleaned_addr[179..182];
+		self.county := cleaned_addr[143..145];
+		self.geo_blk := cleaned_addr[171..177];
+		self := r;
+	END;
 
-	best_data_roxie := if (ut.glb_ok(GLB_Purpose), 
-							 if(experian_permitted, 
-								if(IndustryClass = ut.IndustryClass.UTILI_IC,
-									join(deduped_dids, Watchdog.Key_watchdog_glb_nonutil,
-										left.did != 0 and keyed(left.did = right.did),
-											get_watchdog_glb_nonutil(left,right), left outer, keep(1)),
-									join(deduped_dids, watchdog.Key_Watchdog_GLB,
-										left.did != 0 and keyed(left.did = right.did),
-											get_watchdog_glb(left,right), left outer, keep(1))),
-								 
-								 join(deduped_dids, watchdog.Key_Watchdog_GLB_nonExperian,
-											left.did != 0 and keyed(left.did = right.did),
-											 get_watchdog_glb_nonExperian(LEFT,RIGHT), left outer, keep(1)) ),
-											 
-							 // if glb isn't ok, use the nonglb key	 
-							 if(DataRestriction[23] = '1',
-									join(deduped_dids, watchdog.Key_Watchdog_nonglb_V2,
-										left.did != 0 and keyed(left.did = right.did),
-										get_watchdog_nonglb_V2(LEFT,RIGHT),left outer, keep(1)),
-										
-									join(deduped_dids, watchdog.Key_Watchdog_nonglb,
-										left.did != 0 and keyed(left.did = right.did),
-										get_watchdog_non_glb(LEFT,RIGHT),left outer, keep(1))));
+	wdog_perm := dx_BestRecords.fn_get_perm_type(glb_flag := ut.glb_ok(GLB_Purpose), 
+		utility_flag := false, 
+		filter_exp_flag := ~experian_permitted, 
+		pre_glb_flag := (DataRestriction[23] = '1'));
 
-	best_data_thor := if (ut.glb_ok(GLB_Purpose), 
-							 if(experian_permitted, 
-								if(IndustryClass = ut.IndustryClass.UTILI_IC,
-									join(distribute(deduped_dids, hash64(did)), 
-										distribute(pull(Watchdog.Key_watchdog_glb_nonutil), hash64(did)),
-										left.did != 0 and (left.did = right.did),
-											get_watchdog_glb_nonutil(left,right), left outer, keep(1), LOCAL),
-											
-									join(distribute(deduped_dids, hash64(did)), 
-										distribute(pull(watchdog.Key_Watchdog_GLB), hash64(did)),
-										left.did != 0 and (left.did = right.did),
-											get_watchdog_glb(left,right), left outer, keep(1), LOCAL)),
-											
-								 join(distribute(deduped_dids, hash64(did)), 
-											distribute(pull(watchdog.Key_Watchdog_GLB_nonExperian), hash64(did)),
-											left.did != 0 and (left.did = right.did),
-											 get_watchdog_glb_nonExperian(LEFT,RIGHT), left outer, keep(1), LOCAL)),
-											 
-							 // if glb isn't ok, use the nonglb key	 
-							 if(DataRestriction[23] = '1',
-									join(distribute(deduped_dids, hash64(did)), 
-										distribute(pull(watchdog.Key_Watchdog_nonglb_V2), hash64(did)),
-										left.did != 0 and (left.did = right.did),
-										get_watchdog_nonglb_V2(LEFT,RIGHT),left outer, keep(1), LOCAL),
-										
-									join(distribute(deduped_dids, hash64(did)), 
-										distribute(pull(watchdog.Key_Watchdog_nonglb), hash64(did)),
-										left.did != 0 and (left.did = right.did),
-										get_watchdog_non_glb(LEFT,RIGHT),left outer, keep(1), LOCAL)));
+	best_recs_roxie := dx_BestRecords.append(deduped_dids, did, wdog_perm, use_distributed := false);
+	best_recs_thor := dx_BestRecords.append(deduped_dids, did, wdog_perm, use_distributed := true);
+
+	best_data_roxie := project(best_recs_roxie, get_best_layout(left, left._best));
+	best_data_thor := project(best_recs_thor, get_best_layout(left, left._best), local);
 										
   #IF(onThor)
 		best_data := best_data_thor;
