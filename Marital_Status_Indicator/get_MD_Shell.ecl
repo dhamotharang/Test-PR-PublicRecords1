@@ -76,7 +76,6 @@ export get_MD_shell(DATASET(recordof(marital_status_indicator.key_MSI_Best_did))
 	fRelatives 	:= distribute(doxie.Key_Relatives, person1);
 	did_lookup 	:= distribute(doxie.Key_Did_Lookups_v2, did);
 	households 	:= distribute(doxie.Key_HHID_Did, hhid_relat);
-	// watchdog 		:= distribute(Watchdog.Key_Watchdog_nonglb, did);
 	watchdog 		:= distribute(marital_status_indicator.key_MSI_best_did, did);
 	pkMD_did 		:= distribute(marriage_divorce_v2.key_mar_div_did(false), did);
 	pkMD_main 	:= distribute(marriage_divorce_v2.key_mar_div_id_main(false), record_id);
