@@ -10,7 +10,6 @@ string  KeyName				:= ''				:stored('KeyName');
 EXPORT BuildEnd(boolean skipEmail = false) := function
 TempSuperFile:='~thor_data400::'+dataset_name+'::BuildLog::Temp';
 SuperFile:='~thor_data400::datasets::buildlogs';
-Super_Log_File:='~thor_data400::'+dataset_name+'::BuildLog';
 log_File:='~thor_data400::'+dataset_name+'::BuildLog::Temp::Build_End';
 
 new_entry		:= dataset([{dataset_name,version,'Build_End',std.str.filter(Std.Date.SecondsToString(Std.Date.CurrentSeconds(TRUE), '%F%H%M%S%u'),'0123456789'),job_name,wuid}],BuildLogger.Layouts.layout_log);
