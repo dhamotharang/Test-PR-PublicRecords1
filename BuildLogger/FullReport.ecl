@@ -1,4 +1,4 @@
-import data_services, dops, std, ut, _control;
+﻿import data_services, dops, std, ut, _control;
 	
 	MoveToUsed:=STD.File.PromoteSuperFileList(['~thor_data400::datasets::fullbuildlogs::temp','~thor_data400::datasets::fullbuildlogs::using']);
 	
@@ -50,10 +50,10 @@ import data_services, dops, std, ut, _control;
 	FullFile:=CompleteRecs+UnFilled+NewCalculated;
 	
 	SuperFile:='~thor_data400::datasets::fullbuildlogs';
-	Super_Log_File:='~thor_data400::datasets::FullLog';
+	Super_Log_File:='~thor_data400::datasets::FullLog::'+workunit;
 
 IndividLog:=dataset(Super_Log_File,BuildLogger.Layouts.Process_Record,thor,opt);
-Newlog:=output(FullFile,,Super_Log_File+'_temp',thor,overwrite);
+Newlog:=output(FullFile,,Super_Log_File,thor,overwrite);
 clearusing:=SEQUENTIAL(
 STD.File.StartSuperFileTransaction(),
 STD.File.ClearSuperFile('~thor_data400::datasets::fullbuildlogs::using',true),
@@ -62,15 +62,11 @@ STD.File.FinishSuperFileTransaction()
 
  EXPORT FullReport:= 	sequential( MoveToUsed,
 												Newlog,
-												_control.fSubmitNewWorkunit('nothor(global(sequential(if(std.file.FileExists(\''+Super_Log_File+'\'),sequential(STD.File.StartSuperFileTransaction(),\r\n'+
-																							 'STD.File.RemoveSuperFile(\''+SuperFile+'\',\''+Super_Log_File+'\',true),\r\n'+
-																							 'STD.File.FinishSuperFileTransaction())),\r\n'+
-				
-												'fileservices.deleteLogicalFile(\''+Super_Log_File+'\'),\r\n'+
-												'fileservices.renameLogicalFile(\''+Super_Log_File+'_temp\',\''+Super_Log_File+'\'),\r\n'+
-												'STD.File.StartSuperFileTransaction(),\r\n'+
-												'STD.File.AddSuperFile(\''+SuperFile+'\',\''+Super_Log_File+'\'),\r\n'+
-												'STD.File.FinishSuperFileTransaction())))',std.system.job.target()),
+												nothor(global(sequential(
+												STD.File.StartSuperFileTransaction(),
+												STD.File.ClearSuperFile(SuperFile,true),
+												STD.File.AddSuperFile(SuperFile,Super_Log_File),
+												STD.File.FinishSuperFileTransaction()))),
 												clearusing
 												);
 

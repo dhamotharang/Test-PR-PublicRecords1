@@ -1,4 +1,4 @@
-import std,ut,_control;
+﻿import std,ut,_control;
 
 string  version		 		:= workunit :stored('version'  );
 string  emailList  		:= ''       :stored('emailList');
@@ -19,7 +19,7 @@ PublishLastEntry:=sequential(output(new_entry,,log_File,thor,overwrite),
 															STD.File.AddSuperFile(TempSuperFile,log_File),
 															STD.File.FinishSuperFileTransaction())))
 														 );
-SuperFile_Entries	:=	dataset(Super_Log_File,BuildLogger.Layouts.layout_log,thor,opt);
+
 EmailPeople	:=	if(emailList <>'' AND NOT skipEmail, fileservices.sendEmail(emailList,
 																			dataset_name+' v'+version+': Build End','See: '+wuid+ ' / '+log_File));
 																			
@@ -27,14 +27,13 @@ MergeWithFullFile:=_control.fSubmitNewWorkunit(
 									 'SuperFile_Entries	:=	dataset(\''+Super_Log_File+'\',BuildLogger.Layouts.layout_log,thor,opt);\r\n'+
 									 'TempSuperFile:=dataset(\''+TempSuperFile+'\',BuildLogger.Layouts.layout_log,thor,opt);\r\n'+
 									 'ordered(BuildLogger.CreateFullEntry(TempSuperFile,\''+KeyName+'\'),\r\n'+
-									 'output(SuperFile_Entries+TempSuperFile,,\''+Super_Log_File+'_temp\',thor,overwrite),\r\n'+
+									 'output(SuperFile_Entries+TempSuperFile,,\''+Super_Log_File+workunit+'\',thor,overwrite),\r\n'+
 									 'sequential(STD.File.StartSuperFileTransaction(),\r\n'+
-									 'STD.File.RemoveSuperFile(\''+SuperFile+'\',\''+Super_Log_File+'\',true),\r\n'+
+									 'STD.File.ClearSuperFile(\''+SuperFile+'\',true),\r\n'+
 									 'STD.File.FinishSuperFileTransaction());\r\n'+
-										'nothor(global(sequential(fileservices.deleteLogicalFile(\''+Super_Log_File+'\'),\r\n'+
-										'fileservices.renameLogicalFile(\''+Super_Log_File+'_temp\',\''+Super_Log_File+'\'),\r\n'+
+										'nothor(global(sequential(\r\n'+
 										'STD.File.StartSuperFileTransaction(),\r\n'+
-										'STD.File.AddSuperFile(\''+SuperFile+'\',\''+Super_Log_File+'\'),\r\n'+
+										'STD.File.AddSuperFile(\''+SuperFile+'\',\''+Super_Log_File+workunit+'\'),\r\n'+
 										'STD.File.FinishSuperFileTransaction()))),\r\n'+
 										'sequential(STD.File.StartSuperFileTransaction(),\r\n'+
 										'STD.File.ClearSuperFile(\''+TempSuperFile+'\',true),\r\n'+
