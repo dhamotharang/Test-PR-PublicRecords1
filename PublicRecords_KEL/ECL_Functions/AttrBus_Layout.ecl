@@ -132,6 +132,8 @@ EXPORT AttrBus_Layout := RECORD
 		STRING1 BusInputRep5DLEchoPop;		
 		
 		// Business Clean
+		STRING120 BusInputNameClean;
+		STRING120 BusInputAlternateNameClean;
 		STRING10 BusInputPrimRangeClean;
 		STRING3 BusInputPreDirClean;
 		STRING28 BusInputPrimNameClean;
@@ -278,6 +280,8 @@ EXPORT AttrBus_Layout := RECORD
 		STRING54 BusInputRep5EmailClean;
 		
 		//Clean Pop
+		STRING3 BusInputNameCleanPop;
+		STRING3 BusInputAlternateNameCleanPop;
 		STRING3 BusInputPrimRangeCleanPop;
 		STRING3 BusInputPreDirCleanPop;
 		STRING3 BusInputPrimNameCleanPop;
