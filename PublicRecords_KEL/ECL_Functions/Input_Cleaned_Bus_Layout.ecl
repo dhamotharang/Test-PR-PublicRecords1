@@ -1,6 +1,7 @@
 ﻿EXPORT Input_Cleaned_Bus_Layout := RECORD
 	INTEGER BusInputUIDAppend;
-	
+	STRING120 BusInputNameClean;
+	STRING120 BusInputAlternateNameClean;
 	STRING10 BusInputPrimRangeClean;
 	STRING3 BusInputPreDirClean;
 	STRING28 BusInputPrimNameClean;
