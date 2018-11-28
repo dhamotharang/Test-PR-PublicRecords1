@@ -1,4 +1,4 @@
-﻿EXPORT Layout_GPOfficers := RECORD
+﻿EXPORT layout_gpoff := RECORD
 	STRING1 UpdateFlag := '';
 	STRING8 PrimaryKey := '';
 	STRING8 Accuity_Location_ID := '';
