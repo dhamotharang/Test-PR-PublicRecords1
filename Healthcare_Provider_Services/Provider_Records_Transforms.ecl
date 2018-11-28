@@ -1,4 +1,4 @@
-import doxie,iesp, Lib_BridgerScore, AutoStandardI,NPPES,DidVille,BatchServices,Business_Header_SS;
+import doxie, iesp, AutoStandardI, NPPES, DidVille, BatchServices, Business_Header_SS;
 
 EXPORT Provider_Records_Transforms := MODULE
 		shared myLayouts := Healthcare_Provider_Services.Layouts;

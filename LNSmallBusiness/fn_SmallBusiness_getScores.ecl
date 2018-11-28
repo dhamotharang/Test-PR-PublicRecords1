@@ -176,7 +176,8 @@ EXPORT fn_SmallBusiness_getScores( DATASET(Business_Risk_BIP.Layouts.Input) Shel
 					setModelName(BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO)) ) + 		
 			IF( BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB IN set_model_names, // blended model
 					setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB, Boca_Shell_Grouped)) ) + 
-
+      IF( BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM IN set_model_names, // blended model
+					setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM, Boca_Shell_Grouped)) ) + 
 			IF( BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL IN set_model_names, // blended model no felonies
 					setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL, Boca_Shell_Grouped)) ) + 
             IF( BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL IN set_model_names, // non-blended or Business Only model
@@ -186,6 +187,7 @@ EXPORT fn_SmallBusiness_getScores( DATASET(Business_Risk_BIP.Layouts.Input) Shel
 
 		Model_Results := IF( allow_scores or 
 						(BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB IN set_model_names OR
+						BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM IN set_model_names OR
 						BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO IN set_model_names or
 						BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL IN set_model_names OR
 						BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL IN set_model_names),

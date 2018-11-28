@@ -6,9 +6,13 @@ import iesp;
 
 export phonefindertransactionsearch := MODULE
 			
-export t_PhoneFinderTransactionSearchBy := record
+export t_PhoneFinderCompanyInfo := record
 	string16 CompanyId {xpath('CompanyId')};
-	string32 ReferenceCode {xpath('ReferenceCode')};
+end;
+		
+export t_PhoneFinderTransactionSearchBy := record
+	dataset(t_PhoneFinderCompanyInfo) CompanyIds {xpath('CompanyIds/CompanyId'), MAXCOUNT(iesp.Constants.PfResSnapshot.MaxCompanyIds)};
+	string60 ReferenceCode {xpath('ReferenceCode')};
 	string60 UserId {xpath('UserId')};
 	string12 UniqueId {xpath('UniqueId')};
 	string10 PhoneNumber {xpath('PhoneNumber')};
@@ -72,6 +76,7 @@ export t_PhoneFinderTransactionSearchRecord := record
 	string8 ProductCode {xpath('ProductCode')};
 	string16 CompanyId {xpath('CompanyId')};
 	string60 ReferenceCode {xpath('ReferenceCode')};
+	string30 PhoneFinderType {xpath('PhoneFinderType')};
 	t_PhoneFinderSearchParameters PhoneFinderSearchParameters {xpath('PhoneFinderSearchParameters')};
 	t_PrimaryPhone PrimaryPhone {xpath('PrimaryPhone')};
 	dataset(t_PhoneIdentity) Identities {xpath('Identities/Identity'), MAXCOUNT(iesp.Constants.PfResSnapshot.MaxIdentities)};

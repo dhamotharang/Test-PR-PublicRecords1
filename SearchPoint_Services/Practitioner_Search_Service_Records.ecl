@@ -874,20 +874,16 @@ Zipcode                     zipcode              Yes        Yes
 	   // -----[ DEA: DEA Key ]-----
          deaSearchRecs          := DEA.Key_dea_reg_num( KEYED( dea_registration_number = deaNum ) AND NOT is_company_flag );
 			
-			deaRecsPlusDOB         := JOIN( deaSearchRecs,
-													  Watchdog.Key_watchdog_glb,
-			                                KEYED( (INTEGER) LEFT.did = RIGHT.did),
-													  TRANSFORM( {RECORDOF( deaSearchRecs ), STRING dob}, 
-													             dobORG     := (STRING) RIGHT.dob;
-																	 SELF.dob   := convertDOB;
-																	 SELF.title := IF( LEFT.title != '',
-																							 LEFT.title,
-																	                   RIGHT.title
- 																						  );
-																	 SELF     := LEFT;
-																 )
-													  , LEFT OUTER			 
-												   );						
+			deaRecsBest := dx_BestRecords.append(deaSearchRecs, did, dx_BestRecords.Constants.perm_type.glb);
+			deaRecsPlusDOB := PROJECT( deaSearchRecs,
+				TRANSFORM( {RECORDOF( deaSearchRecs ), STRING dob}, 
+					dobORG     := (STRING) LEFT._best.dob;
+					SELF.dob   := convertDOB;
+					SELF.title := IF( LEFT.title != '',
+							LEFT.title,
+							LEFT._best.title);
+					SELF     := LEFT;
+				);					
   													 
                    
 			SearchPoint_Services.Layouts.PractitionerSearch.layout_summary xfm_summary_info( RECORDOF( deaRecsPlusDOB ) l) :=

@@ -28,7 +28,8 @@ export iid_base_function(DATASET(risk_indicators.layout_input) indata, dataset(G
 													unsigned3 LastSeenThreshold = iid_constants.oneyear,
 													string20 companyID='',
 													string50 DataPermission=iid_constants.default_DataPermission,
-													boolean IncludeNAPData = false
+													boolean IncludeNAPData = false,
+                          string100 IntendedPurpose = ''
 													) := FUNCTION
 
 // step 1.  Get the DID and prep the layout_output dataset
@@ -109,7 +110,7 @@ risk_indicators.layout_output add_flags(risk_indicators.Layout_output le) := TRA
 END;
 with_overrides := if( isFCRA, PROJECT(with_did, add_flags(LEFT)), with_did);
 
-with_PersonContext := if(isFCRA, Risk_Indicators.checkPersonContext(with_overrides, gateways, BSversion), with_did);
+with_PersonContext := if(isFCRA, Risk_Indicators.checkPersonContext(with_overrides, gateways, BSversion, IntendedPurpose), with_did);
 
 commonstart := risk_indicators.iid_common_function(with_PersonContext, dppa, glb, isUtility, ln_branded, 
 															suppressNearDups, isFCRA, bsversion,

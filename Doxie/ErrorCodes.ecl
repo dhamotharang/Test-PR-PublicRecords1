@@ -4,6 +4,7 @@ export varstring ErrorCodes(integer c) :=
 			11	=> 'Search is too broad',
 			20  => 'No records found - gateway',
 			21	=> 'Too many subjects found - gateway',
+			22	=> 'Gateway returned a failure',
 			203	=> 'Too many subjects found',
 			301	=> 'Insufficient input',
 			302 => 'At least three leading characters required',

@@ -1,11 +1,21 @@
 ﻿IMPORT iesp, doxie, dx_PhoneFinderReportDelta;
 
 EXPORT PfResSnapshotSearchRecords (PhoneFinder_Services.Layouts.PFResSnapShotSearch dInput)  := FUNCTION
-                                   
+  
+                                     
   //Pulling Records from the keys 
-  by_companyid := PROJECT(LIMIT(dx_PhoneFinderReportDelta.Key_Transactions_CompanyId(KEYED(company_id = dInput.CompanyID AND (transaction_date = dInput.StartDate  OR (dInput.EndDate<>'' AND  transaction_date BETWEEN dInput.StartDate AND dInput.EndDate)))),
-                          PhoneFinder_Services.Constants.PfResSnapshot.MaxRecords, FAIL(203, PhoneFinder_Services.Constants.PfResSnapshotErrorMessages.Companyid)), TRANSFORM({PhoneFinder_Services.Layouts.delta_phones_rpt_transaction.transaction_id}, SELF:=LEFT));
-                                                                                               
+  by_companyid := JOIN(dInput.Companies, dx_PhoneFinderReportDelta.Key_Transactions_CompanyId,
+                       KEYED(LEFT.CompanyId = RIGHT.company_id AND 
+                       (RIGHT.transaction_date = dInput.StartDate  OR (dInput.EndDate<>'' AND  RIGHT.transaction_date BETWEEN dInput.StartDate AND dInput.EndDate))),                       
+                       TRANSFORM({PhoneFinder_Services.Layouts.delta_phones_rpt_transaction.transaction_id},
+                       SELF := RIGHT), LIMIT(PhoneFinder_Services.Constants.PfResSnapshot.MaxRecords, FAIL(203, PhoneFinder_Services.Constants.PfResSnapshotErrorMessages.Companyid)));
+  
+  by_cmpid_refcode := JOIN(dInput.Companies, dx_PhoneFinderReportDelta.Key_Transactions_CompanyRefCode,
+                        KEYED(LEFT.CompanyId = RIGHT.company_id AND RIGHT.reference_code = dInput.ReferenceCode AND
+                        (RIGHT.transaction_date = dInput.StartDate  OR (dInput.EndDate<>'' AND  RIGHT.transaction_date BETWEEN dInput.StartDate AND dInput.EndDate))),                       
+                        TRANSFORM({PhoneFinder_Services.Layouts.delta_phones_rpt_transaction.transaction_id},
+                        SELF := RIGHT), LIMIT(PhoneFinder_Services.Constants.PfResSnapshot.MaxRecords, FAIL(203, PhoneFinder_Services.Constants.PfResSnapshotErrorMessages.CmpId_Refrcode)));
+ 
   by_userid      := PROJECT(LIMIT(dx_PhoneFinderReportDelta.Key_Transactions_UserId(KEYED(user_id = dInput.UserID AND (transaction_date = dInput.StartDate  OR (dInput.EndDate<>'' AND  transaction_date BETWEEN dInput.StartDate AND dInput.EndDate)))),
                             PhoneFinder_Services.Constants.PfResSnapshot.MaxRecords, FAIL(203, PhoneFinder_Services.Constants.PfResSnapshotErrorMessages.UserId)), TRANSFORM({PhoneFinder_Services.Layouts.delta_phones_rpt_transaction.transaction_id}, SELF:=LEFT));
    
@@ -18,15 +28,15 @@ EXPORT PfResSnapshotSearchRecords (PhoneFinder_Services.Layouts.PFResSnapShotSea
   by_lexid       := PROJECT(LIMIT(dx_PhoneFinderReportDelta.Key_Identities_LexId(KEYED(lexid = dInput.UniqueId)), 
                             PhoneFinder_Services.Constants.PfResSnapshot.MaxRecords, FAIL(203, PhoneFinder_Services.Constants.PfResSnapshotErrorMessages.LexId)), TRANSFORM({PhoneFinder_Services.Layouts.delta_phones_rpt_transaction.transaction_id}, SELF:=LEFT));
   
-  by_cmpid_refcode := PROJECT(LIMIT(dx_PhoneFinderReportDelta.Key_Transactions_CompanyRefCode(KEYED(company_id = dInput.CompanyID) AND KEYED(reference_code = dInput.ReferenceCode) AND (transaction_date = dInput.StartDate  OR (dInput.EndDate<>'' AND  transaction_date BETWEEN dInput.StartDate AND dInput.EndDate))), 
-                            PhoneFinder_Services.Constants.PfResSnapshot.MaxRecords, FAIL(203, PhoneFinder_Services.Constants.PfResSnapshotErrorMessages.CmpId_Refrcode)), TRANSFORM({PhoneFinder_Services.Layouts.delta_phones_rpt_transaction.transaction_id}, SELF:=LEFT));
+  SearchbyCompanyids := EXISTS(dInput.Companies); 
+
   //Determining the search                           
   map_searchs := MAP(dInput.UniqueId <> 0      => by_lexid,
                      dInput.PhoneNumber <>'' AND dInput.StartDate <> '' => by_phone,
                      dInput.UserID    <>''   AND dInput.StartDate <> ''   => by_userid,
-                     dInput.CompanyID <> ''  AND dInput.ReferenceCode<>'' AND dInput.StartDate <> '' => by_cmpid_refcode,
-                     dInput.CompanyID <>''   AND dInput.StartDate <> ''   => by_companyid,                     
-                     dInput.ReferenceCode<>''AND dInput.StartDate <> '' => by_refncode              
+                     SearchbyCompanyids AND dInput.ReferenceCode<>'' AND dInput.StartDate <> '' => by_cmpid_refcode,
+                     dInput.ReferenceCode <>'' AND dInput.StartDate <> '' => by_refncode,
+                     SearchbyCompanyids  AND dInput.StartDate <> ''   => by_companyid                  
                      );
                                                                                                           
  iesp.phonefindertransactionsearch.t_PhoneFinderTransactionSearchRecord  t_trans ({PhoneFinder_Services.Layouts.delta_phones_rpt_transaction.transaction_id} l,
@@ -37,6 +47,7 @@ EXPORT PfResSnapshotSearchRecords (PhoneFinder_Services.Layouts.PFResSnapShotSea
     SELF.ProductCode := r.product_code;
     SELF.CompanyId := r.company_Id;
     SELF.ReferenceCode := r.reference_code;
+    SELF.PhoneFinderType := r.phonefinder_type;    
     SELF.PhoneFinderSearchParameters.UniqueId := (STRING)r.submitted_lexid;
     SELF.PhoneFinderSearchParameters.PhoneNumber :=r.submitted_phonenumber;
     SELF.PhoneFinderSearchParameters.Name.First := r.submitted_firstname;
@@ -65,14 +76,16 @@ EXPORT PfResSnapshotSearchRecords (PhoneFinder_Services.Layouts.PFResSnapShotSea
                          KEYED(LEFT.transaction_id = RIGHT.transaction_id),
                          t_trans(LEFT, RIGHT),
                          LIMIT(0), KEEP(1));
+   
+   InputCmpIds :=  SET(dInput.Companies, Companyid);                      
  
   //Filtering the Records with additional search criteria and limiting to MaxSearchRecords
-  dfiltered_recs := LIMIT(dGet_trans_recs((dInput.CompanyID = '' OR CompanyID = dInput.CompanyID) AND 
-                        (dInput.UserID =''          OR UserID = dInput.UserID) AND 
-                        (dInput.ReferenceCode =''   OR ReferenceCode = dInput.ReferenceCode) AND 
-                        (dInput.PhoneNumber =''     OR PrimaryPhone.PhoneNumber = dInput.PhoneNumber) 
-                        AND (dInput.StartDate= '' OR  (iesp.ECL2ESP.t_DateToString8(TransactionDate) = dInput.StartDate  OR (dInput.EndDate<>'' AND  iesp.ECL2ESP.t_DateToString8(TransactionDate) BETWEEN dInput.StartDate AND dInput.EndDate)))), 
-                        PhoneFinder_Services.Constants.PfResSnapshot.MaxSearchRecords, FAIL(203, doxie.ErrorCodes(203)));
+  dfiltered_recs := LIMIT(dGet_trans_recs((~SearchbyCompanyids OR CompanyID IN InputCmpIds) AND
+                           (dInput.UserID ='' OR UserID = dInput.UserID) AND 
+                           (dInput.ReferenceCode =''  OR ReferenceCode = dInput.ReferenceCode) AND 
+                           (dInput.PhoneNumber =''    OR PrimaryPhone.PhoneNumber = dInput.PhoneNumber) 
+                           AND (dInput.StartDate= ''  OR (iesp.ECL2ESP.t_DateToString8(TransactionDate) = dInput.StartDate  OR (dInput.EndDate<>'' AND  iesp.ECL2ESP.t_DateToString8(TransactionDate) BETWEEN dInput.StartDate AND dInput.EndDate)))), 
+                           PhoneFinder_Services.Constants.PfResSnapshot.MaxSearchRecords, FAIL(203, doxie.ErrorCodes(203)));
                       
   identity_wth_tid_rec :=RECORD
     string16 transaction_id;

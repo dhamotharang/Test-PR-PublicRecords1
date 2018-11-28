@@ -1,344 +1,107 @@
-// -- BIPV2_LGID3._ApplyHacks('BIPV2_LGID3',,true).do_all_hacks;
-
-import SALTTOOLS22,STD,wk_ut,tools;
-
-
+﻿IMPORT tools, wk_ut;
 EXPORT _ApplyHacks(
-   string   pModule               = 'BIPV2_LGID3'
-  ,string   pEsp                  = wk_ut._Constants.LocalEsp + ':8145'
-  ,boolean  pShouldSaveAttributes = false
-) :=
-module
-  EXPORT fGetAttribute(STRING att                 ):=SALTTOOLS22.mod_Soapcalls.fGetAttributes(pModule,att,pEsp)(COUNT(results)>0)[1].results[1].Text;
-  EXPORT fPutAttribute(STRING att,STRING ecl_text ):=OUTPUT(SALTTOOLS22.mod_Soapcalls.fSaveAttribute(pModule,att,ecl_text,pEsp));
-  
-  // ----------------------------------------------------------------------------
-  // -- fHackMatches
-  // ----------------------------------------------------------------------------
-  export fHackMatches(
-  
-     string   pAttribute            = 'matches' //this can be used for Debug and matches attributes
-    ,boolean  pShouldSaveAttribute  = false
-    
-  ) :=
-  function
+	STRING pModule = 'BIPV2_LGID3',
+	string pESP = wk_ut._Constants.LocalEsp + ':8145'
+	)
+:=MODULE
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Matches&Debug both
+EXPORT ds_matches := DATASET([
+						{pModule,'matches','(n = 0 =>.*?)(,\'AttributeFile:\'[+][(]STRING[)][(]n-10000[)][)];)','HACKMatches01','$1\n'
+      		+ ',n = 100 => \':duns_number\'/*HACKMatches01*/\n'
+      		+ ',n = 101 => \':company_fein\'/*HACKMatches01*/\n'
+      		+ '$2/*HACKMatches01*/\n','add rules for extra mjs'},
+						{pModule,'matches','SALT311.mac_avoid_transitives[(]All_Matches,LGID31,LGID32,Conf,DateOverlap,Rule,o[)];','HACKMatches02', '// $1 /*HACKMatches02 - disable default salt mac_avoid_transitives*/\n'
+      		+ 'import BIPV2_Tools; /*HACKMatches02 - import for new transitives macro*/\n'
+      		+ 'BIPV2_Tools.mac_avoid_transitives(All_Matches,LGID31,LGID32,Conf,DateOverlap,Rule,o); // HACKMatches02 - Use new transitives macro*/\n','replace transitives macro'},
+					{pModule,'matches','(SALT311.MAC_)(ParentId|ChildId)(_Patch)','HACKMatches03','/*HACKMatches03*/BIPV2_Tools.MAC_$2$3','replace SALT311.MAC_ParentId_Patch and SALT311.MAC_ChildId_Patch with BIPV2_Tools.MAC_ParentId_Patch'}
+			],tools.layout_attribute_hacks2);
 
-    dme := dataset([
-    {
-       '(n = 0 =>.*?)(,\'AttributeFile:\'[+][(]STRING[)][(]n-10000[)][)];)'
-      ,'n = 100'
-      ,'$1\n'
-      + ',n = 100 => \':duns_number\'\n'
-      + ',n = 101 => \':company_fein\'\n'
-      + '$2\n'
-      ,'add rules for extra mjs' 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//BasicMatch 
+EXPORT ds_BasicMatch :=   DATASET([
+    {  pModule
+      ,'BasicMatch','(// It is important.*?EXPORT basic_match_count := COUNT[(]NotBlocked[)];)'  ,'HACKBasicMatch'  ,  '/* $1 */\n'
+      		+ '// HACKBasicMatch - disable BasicMatch altogether\n'
+      		+ 'EXPORT patch_file := dataset([],Rec);\n'
+      		+ 'EXPORT input_file := h00_match;\n'
+      		+ 'EXPORT basic_match_count := 0;\n','disable basic match altogether\n'
     }
-    ,{
-       'SALT30[.]mac_avoid_transitives[(]All_Matches,LGID31,LGID32,Conf,DateOverlap,Rule,o[)];'
-      ,'BIPV2_Tools[.]mac_avoid_transitives'
-      ,'// $1 /* HACK - disable default salt mac_avoid_transitives*/\n'
-      + 'import BIPV2_Tools; /*HACK - import for new transitives macro*/\n'
-      + 'BIPV2_Tools.mac_avoid_transitives(All_Matches,LGID31,LGID32,Conf,DateOverlap,Rule,o); // HACK - Use new transitives macro*/\n'
-      ,'replace transitives macro'
-    }
-    ,{ 
-       '(EXPORT matches[(]DATASET[(]layout_LGID3[)] ih,UNSIGNED MatchThreshold = Config[.]MatchThreshold[)] := MODULE)'
-      ,'ih_thin'
-      ,'$1\n'
-     + 'SHARED ih_thin := TABLE(ih,{ultid,orgid,seleid,lgid3,proxid,dotid,rcid}); // HACK - slim layout for ut.MAC_Patch_Id, etc later on.\n'
-      ,'add ih_thin dataset\n' 
-    }
-    ,{
-       'SALT30[.]MAC_ParentId_Patch'
-      ,''
-      ,'BIPV2_Tools.MAC_ParentId_Patch'
-      ,'replace SALT30.MAC_ParentId_Patch with BIPV2_Tools.MAC_ParentId_Patch\n' 
-    }
-    ,{
-       'SALT30[.]MAC_ChildId_Patch'
-      ,''
-      ,'BIPV2_Tools.MAC_ChildId_Patch'
-      ,'replace SALT30.MAC_ChildId_Patch with BIPV2_Tools.MAC_ChildId_Patch\n' 
-    }
-    ,{
-       'ut.MAC_Patch_Id[(]ih,LGID3,BasicMatch[(]ih[)][.]patch_file,LGID31,LGID32,ihbp[)];'
-      ,''
-      ,'ut.MAC_Patch_Id(ih_thin,LGID3,BasicMatch(ih).patch_file,LGID31,LGID32,ihbp);'
-      ,'replace ih with ih_thin in call to ut.MAC_Patch_Id\n' 
-    }
-    ,{
-       'EXPORT Patched_Infile := PatchDotID;'
-      ,''
-      ,'SHARED Patched_Infile_thin := PatchDotID : INDEPENDENT; // HACK\n'
-     + 'EXPORT Patched_Infile := JOIN(ih, Patched_Infile_thin, LEFT.rcid=RIGHT.rcid, TRANSFORM(RECORDOF(ih),SELF:=RIGHT,SELF:=LEFT), KEEP(1), HASH); // HACK\n'
-      ,'replace Patched_Infile to join back to full layout\n' 
-    }
-    ,{
-       'id_shift_r note_change[(]ih le,patched_infile ri[)] := TRANSFORM'
-      ,''
-      ,'id_shift_r note_change(ih_thin le,patched_infile_thin ri) := TRANSFORM // HACK'
-      ,'change parameters to thin layouts in note_change transform\n' 
-    }
+  ],Tools.layout_attribute_hacks2);
 
-    ,{
-       'EXPORT IdChanges := JOIN[(]ih,patched_infile'
-      ,''
-      ,'EXPORT IdChanges := JOIN(ih_thin/*HACK*/,patched_infile_thin/*HACK*/'
-      ,'Thin files going into IDChanges\n' 
-    }
-    ,{
-       'EXPORT PreIDs := BIPV2_LGID3.Fields[.]UIDConsistency[(]ih[)]; // Export whole consistency module'
-      ,''
-      ,'EXPORT PreIDs := BIPV2_LGID3.Fields.UIDConsistency(ih_thin/*HACK*/); // Export whole consistency module'
-      ,'Thin files going into PreIDs\n' 
-    }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Proc_Iterate
+EXPORT ds_ProcIterate :=   DATASET([
+			{pModule,'Proc_Iterate','SHARED ChangeName := \'[~]temp::LGID3::BIPV2_LGID3::changes_it\'[+]iter;'  ,'HACKProcIterate01'  ,
+			'/*HACKProcIterate01*/import bipv2;\n'
+        + 'SHARED ChangeName := \'~temp::LGID3::BIPV2_LGID3::changes_it\'+iter+\'_\'+ bipv2.KeySuffix;',
+      	'add keysuffix to changes filename\n'},
+			{pModule,'Proc_Iterate','(dsBMSF := CHOOSEN[(]BM.Block, 1000[)];)'  ,'HACKProcIterate02'  ,
+			'/*HACKProcIterate02*/ //$1',
+      	'comment out the code'},
+			{pModule,'Proc_Iterate','(BMSF := OUTPUT[(]dsBMSF, NAMED [(]\'BasicMatch_Block\'[)][)];)'  ,'HACKProcIterate03'  ,
+			'/*HACKProcIterate03*/ //$1',
+      	'comment out the code'},
+			{pModule,'Proc_Iterate','(EXPORT OutputExtraSamples := PARALLEL[(]OMatchSamples, OBSamples, OAS, BMS, Thr, OMSD, BMSF[)];)'  ,'HACKProcIterate04'  ,
+			'/*HACKProcIterate03*/ //$1',
+      	'comment out the code'}
+  ],Tools.layout_attribute_hacks2);
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//match_candidates
+EXPORT ds_MatchCandidates  :=  DATASET([
+      {pModule,'match_candidates','(,HINT[(]parallel_match[)])'  ,'HACKmatch_candidates00' ,'/*$1*//*HACKmatch_candidates00 to prevent memory limit exceeded error*/','remove hint(parallel_match)'},
+	    {pModule,'match_candidates','(SHARED UnderLinks_prop7 := JOIN\\(UnderLinks_prop6,company_inc_state_props,left.LGID3=right.LGID3,LOCAL\\);)',
+				'HACKmatch_candidates01', 
+				'/*HACKmatch_candidates01*/ SHARED UnderLinks_prop7 := JOIN(UnderLinks_prop6,company_inc_state_props,left.LGID3=right.LGID3,LEFT OUTER, LOCAL);',
+				'Add Left Outer'},
+	    {pModule,'match_candidates','(SHARED UnderLinks_pp := TABLE)(.*?;)',
+				'HACKmatch_candidates02', 
+				'/*HACKmatch_candidates02*/ SHARED UnderLinks_pp := TABLE(UnderLinks_prp,Layout_UnderLinks_Candidates)((~company_inc_state_isnull OR ~active_duns_number_isnull OR ~duns_number_isnull OR ~(active_duns_number_isnull AND duns_number_isnull) OR ~company_fein_isnull OR ~sbfe_id_isnull));',
+				'active_duns_number_isnull in place of active_duns_concept_isnull'}
+		],Tools.layout_attribute_hacks2);
 
-    ,{
-       'EXPORT PostIDs := BIPV2_LGID3.Fields.UIDConsistency[(]Patched_Infile[)]; // Export whole consistency module'
-      ,''
-      ,'EXPORT PostIDs := BIPV2_LGID3.Fields.UIDConsistency(Patched_Infile_thin); // Export whole consistency module'
-      ,'Thin files going into PostIDs\n' 
-    }
-    
-    ,{
-       'EXPORT DuplicateRids0 := COUNT[(]Patched_Infile[)] - PostIDs.IdCounts[[]1[]][.]rcid_Count; // Should be zero'
-      ,''
-      ,'EXPORT DuplicateRids0 := COUNT(Patched_Infile_thin) - PostIDs.IdCounts[1].rcid_Count; // Should be zero'
-      ,'Thin files going into DuplicateRids0\n' 
-    }
-    ],tools.layout_attribute_hacks);
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Config
+EXPORT ds_Config  :=  DATASET([
+       {pModule,'Config','DoSliceouts := TRUE'  ,'HACKConfig'  ,'DoSliceouts := false/*HACKConfig*/','turn off sliceouts'}
+  ],Tools.layout_attribute_hacks2);
 
-    RETURN tools.HackAttribute(pModule,pAttribute,dme,pShouldSaveAttribute).saveit;
-  
-  end;
-  
-  /////////////Keys
-  export fHackBasicMatch(
-  
-     string   pAttribute            = 'BasicMatch' 
-    ,boolean  pShouldSaveAttribute  = false
-    
-  ) :=
-  function
-  
-    dme := dataset([{
-       '(// It is important.*?EXPORT basic_match_count := COUNT[(]PickOne[)];)'
-      ,'EXPORT basic_match_count := 0'
-      , '/* $1 */\n'
-      + '// HACK - disable BasicMatch altogether\n'
-      + 'EXPORT patch_file := dataset([],Rec);\n'
-      + 'EXPORT input_file := h00_match;\n'
-      + 'EXPORT basic_match_count := 0;\n'
-      ,'fix dedup skew\n'
-    }
-    ],tools.layout_attribute_hacks);
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//MOD_Attr_UnderLinks hacks
+EXPORT ds_MOD_Attr_UnderLinks  :=  DATASET([
+	    {pModule,'MOD_Attr_UnderLinks', 
+		'(INTEGER2 company_inc_state_score := IF \\( company_inc_state_score_temp > Config.company_inc_state_Force \\* 100 OR active_duns_number_score > Config.company_inc_state_OR1_active_duns_number_Force\\*100 OR duns_number_score > Config.company_inc_state_OR2_duns_number_Force\\*100 OR duns_number_concept_score > Config.company_inc_state_OR3_duns_number_concept_Force\\*100 OR company_fein_score > Config.company_inc_state_OR4_company_fein_Force\\*100 OR sbfe_id_score > Config.company_inc_state_OR5_sbfe_id_Force\\*100, company_inc_state_score_temp, SKIP \\); // Enforce FORCE parameter)',
+		'HACKMOD_Attr_UnderLinks01',
+		' /*HACKMOD_Attr_UnderLinks01*/ INTEGER2 company_inc_state_score := IF ( company_inc_state_score_temp > Config.company_inc_state_Force * 100 OR ( company_fein_score > Config.company_inc_state_OR4_company_fein_Force*100) OR ( sbfe_id_score > Config.company_inc_state_OR5_sbfe_id_Force*100), company_inc_state_score_temp,0);',
+		'Remove missing parameters and skip'}, 
+	    {pModule,'MOD_Attr_UnderLinks',
+		'(INTEGER2 Lgid3IfHrchy_score := IF \\( Lgid3IfHrchy_score_temp >= Config.Lgid3IfHrchy_Force \\* 100, Lgid3IfHrchy_score_temp, SKIP \\); // Enforce FORCE parameter)',
+		'HACKMOD_Attr_UnderLinks02',
+		' /*HACKMOD_Attr_UnderLinks02*/ INTEGER2 Lgid3IfHrchy_score := IF ( Lgid3IfHrchy_score_temp >= Config.Lgid3IfHrchy_Force * 100, Lgid3IfHrchy_score_temp,0);',
+		'Remove skip'}, 
+	    {pModule,'MOD_Attr_UnderLinks',
+		'(INTEGER2 cnp_number_score := IF \\( cnp_number_score_temp >= Config.cnp_number_Force \\* 100 OR sbfe_id_score > Config.cnp_number_OR1_sbfe_id_Force\\*100, cnp_number_score_temp, SKIP \\); // Enforce FORCE parameter)',
+		'HACKMOD_Attr_UnderLinks03',
+		' /*HACKMOD_Attr_UnderLinks03*/ INTEGER2 cnp_number_score := IF ( cnp_number_score_temp >= Config.cnp_number_Force * 100 OR ( sbfe_id_score > Config.cnp_number_OR1_sbfe_id_Force*100), cnp_number_score_temp,0);', 
+		'Remove skip'}, 
+	    {pModule,'MOD_Attr_UnderLinks',
+		'(SELF.Conf := ri.Basis_weight100/100;)',
+		'HACKMOD_Attr_UnderLinks04', 
+		' /*HACKMOD_Attr_UnderLinks04*/ SELF.Conf := Config.MatchThreshold+1;',
+		'Remove skip' 
+		}
+  ],Tools.layout_attribute_hacks2);
+	
+/*-------------------------------Hack Action-------------------------------------------*/
+EXPORT aHack(DATASET(Tools.Layout_attribute_hacks2) d,bSaveIt=TRUE):=Tools.HackAttribute2(d,bSaveIt,pESP).saveit;
 
-    RETURN tools.HackAttribute(pModule,pAttribute,dme,pShouldSaveAttribute).saveit;
-    
-  END;
+EXPORT dAll := 
+ds_Matches+
+ds_BasicMatch+
+ds_ProcIterate+
+ds_config+
+ds_MatchCandidates+
+ds_MOD_Attr_UnderLinks;
 
-  /////////////fHackCompareService
-  export fHackCompareService(
-  
-     string   pAttribute            = 'LGID3CompareService' 
-    ,boolean  pShouldSaveAttribute  = false
-    
-  ) :=
-  function
-  
-    dme := dataset([{
-       // '^(?!.*?BIPV2_LGID3[.]_fn_CompareService.*).*$'
-       '.*LGID3CompareService.*'
-       
-      ,'BIPV2_LGID3._fn_CompareService'
-      
-      ,
-        '/*--SOAP--\n'
-      + '<message name="LGID3CompareService">\n'
-      + '<part name="LGID3One" type="xsd:string"/>\n'
-      + '<part name="LGID3Two" type="xsd:string"/>\n'
-      + '</message>\n'
-      + '*/\n'
-      + '/*--INFO-- Compare two IDs to see if they should be joined.<p>If it is easier you may place the two IDs on the first line and they will be parsed into first and second.</p>*/\n'
-      + 'EXPORT LGID3CompareService := MACRO\n'
-      + '  IMPORT SALT30,BIPV2_LGID3,ut;\n'
-      + 'STRING50 LGID3onestr := \'\'  : STORED(\'LGID3One\');\n'
-      + 'STRING20 LGID3twostr := \'*\'  : STORED(\'LGID3two\');\n'
-      + 'BIPV2_LGID3._fn_CompareService((unsigned6)LGID3onestr,(unsigned6)LGID3twostr);\n'
-      + 'ENDMACRO;\n'
-      
-      ,'because it has _fn_CompareService in it, which likely means it was already hacked.\n'
-    }
-    ],tools.layout_attribute_hacks);
-
-    RETURN tools.HackAttribute(pModule,pAttribute,dme,pShouldSaveAttribute).saveit;
-
-  END;
-
-  /////////////Keys
-  export fHackMatch_Candidates(
-  
-     string   pAttribute            = 'match_candidates' 
-    ,boolean  pShouldSaveAttribute  = false
-    
-  ) :=
-  function
-  
-    dme := dataset([{
-       '(,HINT[(]parallel_match[)])'
-      ,'/*,HINT[(]parallel_match[)][*]//[*]HACK to prevent memory limit exceeded error[*]/'
-      ,'/*$1*//*HACK to prevent memory limit exceeded error*/'
-      ,'remove hint(parallel_match)\n'
-    }
-    ],tools.layout_attribute_hacks);
-
-    RETURN tools.HackAttribute(pModule,pAttribute,dme,pShouldSaveAttribute).saveit;
-
-  END;
-
-  /////////////Fields
-  export fHackFields(
-  
-     string   pAttribute            = 'Fields' 
-    ,boolean  pShouldSaveAttribute  = false
-    
-  ) :=
-  function
-
-// 2)	In the Fields attribute, add this line immediately before î€šproxid_Twoparentsî€š:
-  // f_thin := TABLE(f(proxid<>0,lgid3<>0),{proxid,lgid3},proxid,lgid3,MERGE); // HACK
-// and then change the self-JOIN parameters to reference î€šf_thinî€š instead of î€šfî€š
-// 3)	Do the same as #2 for î€šlgid3_Twoparentsî€š and î€šorgid_Twoparentsî€š, with the applicable field-pairs for each
-// 4)	Also near the end of the Fields attribute, change each of the "*_Unbased" JOINs so the left side will filter-out null values... "f" becomes "f(parentid<>0)"
-/*
-  EXPORT Proxid_Twoparents := DEDUP(JOIN(f,f,LEFT.Proxid=RIGHT.Proxid AND LEFT.lgid3>RIGHT.lgid3,TRANSFORM({salt30.UIDType lgid31,salt30.UIDType Proxid,salt30.UIDType lgid32},SELF.lgid31:=LEFT.lgid3,SELF.lgid32:=RIGHT.lgid3,SELF.Proxid:=LEFT.Proxid),HASH),WHOLE RECORD,ALL);
-  EXPORT lgid3_Twoparents := DEDUP(JOIN(f,f,LEFT.lgid3=RIGHT.lgid3 AND LEFT.orgid>RIGHT.orgid,TRANSFORM({salt30.UIDType orgid1,salt30.UIDType lgid3,salt30.UIDType orgid2},SELF.orgid1:=LEFT.orgid,SELF.orgid2:=RIGHT.orgid,SELF.lgid3:=LEFT.lgid3),HASH),WHOLE RECORD,ALL);
-  EXPORT orgid_Twoparents := DEDUP(JOIN(f,f,LEFT.orgid=RIGHT.orgid AND LEFT.ultid>RIGHT.ultid,TRANSFORM({salt30.UIDType ultid1,salt30.UIDType orgid,salt30.UIDType ultid2},SELF.ultid1:=LEFT.ultid,SELF.ultid2:=RIGHT.ultid,SELF.orgid:=LEFT.orgid),HASH),WHOLE RECORD,ALL);
-
-  EXPORT Proxid_Unbased := JOIN(f,bases,LEFT.Proxid=RIGHT.Proxid,TRANSFORM(LEFT),LEFT ONLY,HASH);
-  EXPORT lgid3_Unbased := JOIN(f,bases,LEFT.lgid3=RIGHT.lgid3,TRANSFORM(LEFT),LEFT ONLY,HASH);
-  EXPORT orgid_Unbased := JOIN(f,bases,LEFT.orgid=RIGHT.orgid,TRANSFORM(LEFT),LEFT ONLY,HASH);
-  EXPORT ultid_Unbased := JOIN(f,bases,LEFT.ultid=RIGHT.ultid,TRANSFORM(LEFT),LEFT ONLY,HASH);
-*/
-
-    dme := dataset([{
-       '(EXPORT lgid3_Twoparents := DEDUP[(]JOIN[(])f,f,(LEFT[.]lgid3=RIGHT[.]lgid3 AND LEFT[.]seleid>RIGHT[.]seleid,TRANSFORM[(][{]salt30[.]UIDType seleid1,salt30[.]UIDType lgid3,salt30[.]UIDType seleid2[}],SELF[.]seleid1:=LEFT[.]seleid,SELF[.]seleid2:=RIGHT[.]seleid,SELF[.]lgid3:=LEFT[.]lgid3[)],HASH[)],WHOLE RECORD,ALL[)];)'
-      ,''
-      ,  'f_thin := TABLE(f(lgid3<>0,seleid<>0),{lgid3,seleid},lgid3,seleid,MERGE); // HACK lgid3 two parents to dedup self join dataset\n'
-       + '$1 f_thin,f_thin, $2 /* HACK - lgid3 Two Parents to dedup dataset*/\n'
-      ,'thin f before going into lgid3_Twoparents\n'
-    }
-    ,{
-       '(EXPORT seleid_Twoparents := DEDUP[(]JOIN[(])f,f,(LEFT[.]seleid=RIGHT[.]seleid AND LEFT[.]orgid>RIGHT[.]orgid,TRANSFORM[(][{]salt30[.]UIDType orgid1,salt30[.]UIDType seleid,salt30[.]UIDType orgid2[}],SELF[.]orgid1:=LEFT[.]orgid,SELF[.]orgid2:=RIGHT[.]orgid,SELF[.]seleid:=LEFT[.]seleid[)],HASH[)],WHOLE RECORD,ALL[)];)' 
-       ,''
-       ,  'f_thin := TABLE(f(seleid<>0,orgid<>0),{seleid,orgid},seleid,orgid,MERGE); // HACK seleid two parents to dedup self join dataset\n'
-        + '$1 f_thin,f_thin, $2 /* HACK - seleid Two Parents to dedup dataset*/\n'
-      ,'thin f before going into seleid_Twoparents\n'
-    }
-
-    ,{
-       '(EXPORT orgid_Twoparents := DEDUP[(]JOIN[(])f,f,(LEFT[.]orgid=RIGHT[.]orgid AND LEFT[.]ultid>RIGHT[.]ultid,TRANSFORM[(][{]salt30[.]UIDType ultid1,salt30[.]UIDType orgid,salt30[.]UIDType ultid2[}],SELF[.]ultid1:=LEFT[.]ultid,SELF[.]ultid2:=RIGHT[.]ultid,SELF[.]orgid:=LEFT[.]orgid[)],HASH[)],WHOLE RECORD,ALL[)];)' 
-       ,''
-       ,  'f_thin := TABLE(f(orgid<>0,ultid<>0),{orgid,ultid},orgid,ultid,MERGE); // HACK orgid two parents to dedup self join dataset\n'
-        + '$1 f_thin,f_thin, $2 /* HACK - orgid Two Parents to dedup dataset*/\n'
-      ,'thin f before going into orgid_Twoparents\n'
-    }
-    ,{
-       '(EXPORT lgid3_Unbased := JOIN[(]f)(,bases,LEFT[.]lgid3=RIGHT[.]lgid3,TRANSFORM[(]LEFT[)],LEFT ONLY,HASH[)];)' 
-       ,''
-       ,'$1 (lgid3<>0) $2 // HACK lgid3 Unbased.  Add filter\n'
-      ,'hacking lgid3_unbased\n'
-    }
-    ,{
-       '(EXPORT seleid_Unbased := JOIN[(]f)(,bases,LEFT[.]seleid=RIGHT[.]seleid,TRANSFORM[(]LEFT[)],LEFT ONLY,HASH[)];)' 
-       ,''
-       ,'$1 (seleid<>0) $2 // HACK seleid Unbased.  Add filter\n'
-      ,'hacking seleid_unbased\n'
-    }
-    ,{
-       '(EXPORT orgid_Unbased := JOIN[(]f)(,bases,LEFT[.]orgid=RIGHT[.]orgid,TRANSFORM[(]LEFT[)],LEFT ONLY,HASH[)];)' 
-       ,''
-       ,'$1 (orgid<>0) $2 // HACK orgid Unbased.  Add filter\n'
-      ,'hacking orgid_unbased\n'
-    }
-    ,{
-       '(EXPORT ultid_Unbased := JOIN[(]f)(,bases,LEFT[.]ultid=RIGHT[.]ultid,TRANSFORM[(]LEFT[)],LEFT ONLY,HASH[)];)' 
-       ,''
-       ,'$1 (ultid<>0) $2 // HACK ultid Unbased.  Add filter\n'
-      ,'hacking ultid_unbased\n'
-    }
-    ,{
-       '(f := TABLE[(]infile,[{]LGID3,rcid,seleid,orgid,ultid[}][)]);' 
-       ,''
-       ,'$1 : global; // HACK IDIntegrity to speed it up\n'
-      ,'hacking IDIntegritySpeedBoost\n\n'
-    }
-    ],tools.layout_attribute_hacks);
-
-    RETURN tools.HackAttribute(pModule,pAttribute,dme,pShouldSaveAttribute).saveit;
-
-    
-  END;
-
-  export fHackConfig(
-  
-     string   pAttribute            = 'Config' 
-    ,boolean  pShouldSaveAttribute  = false
-    
-  ) :=
-  function
-  
-    EclCode   := fGetAttribute(pAttribute) : independent;
-    
-    hackConfigCondition := pAttribute = 'Config' and not regexfind('DoSliceouts := false',EclCode,nocase);
-
-    HackConfig := if(hackConfigCondition 
-                        ,regexreplace('DoSliceouts := TRUE',EclCode,'DoSliceouts := false',nocase)
-                        ,EclCode
-                     );
-    HackConfig_message := if(hackConfigCondition ,'','Did not Hack ' + pAttribute + ' to disable Sliceouts\n');
-
-    dme := dataset([{
-       'DoSliceouts := TRUE'
-      ,'DoSliceouts := false'
-      ,'DoSliceouts := false'
-      ,'turn off sliceouts\n'
-    }
-    ],tools.layout_attribute_hacks);
-
-    RETURN tools.HackAttribute(pModule,pAttribute,dme,pShouldSaveAttribute).saveit;
-
-  END;
-
-  export fHackProc_Iterate(
-  
-     string   pAttribute            = 'Proc_Iterate' 
-    ,boolean  pShouldSaveAttribute  = false
-    
-  ) :=
-  function
-  
-    dme := dataset([{
-          'ChangeName := \'~temp::LGID3::BIPV2_LGID3::changes_it\'+iter;\n'
-      ,''
-      ,   'import bipv2;\n'
-        + 'ChangeName := \'~temp::LGID3::BIPV2_LGID3::changes_it\'+iter+\'_\'+ bipv2.KeySuffix;\n'
-      ,'add keysuffix to changes filename\n'
-    }
-    ],tools.layout_attribute_hacks);
-
-    RETURN tools.HackAttribute(pModule,pAttribute,dme,pShouldSaveAttribute).saveit;
-
-  END;
-
-  export do_all_hacks := 
-    sequential(
-       fHackMatches         ('matches'              ,pShouldSaveAttributes)
-      ,fHackBasicMatch      ('BasicMatch'           ,pShouldSaveAttributes)
-      ,fHackCompareService  ('LGID3CompareService'  ,pShouldSaveAttributes)
-      ,fHackMatch_Candidates('match_candidates'     ,pShouldSaveAttributes)
-      ,fHackFields          ('Fields'               ,pShouldSaveAttributes)
-      ,fHackConfig          ('Config'               ,pShouldSaveAttributes)
-      ,fHackProc_Iterate    ('Proc_Iterate'         ,pShouldSaveAttributes)
-    );
-end;
+EXPORT aHackIt := aHack(dAll);
+END;

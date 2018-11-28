@@ -263,7 +263,8 @@ bsversion := IF(Crossindustry_model in [ 'RVS1706_0'] or
 		bsVersion, isPreScreenPurpose, doScore, ADL_Based_Shell:=ADL_Based_Shell, datarestriction:=datarestriction, BSOptions:=BSOptions,
 		datapermission:=datapermission, IN_isDirectToConsumer:=isDirectToConsumerPurpose,
 		IncludeLnJ :=IncludeLnJ,
-    ReportingPeriod := ReportingPeriod 
+    ReportingPeriod := ReportingPeriod,
+    IntendedPurpose := Intended_Purpose
 	);
 	
 #if(Models.LIB_RiskView_Models().TurnOnValidation = FALSE)

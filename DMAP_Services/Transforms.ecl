@@ -1,4 +1,4 @@
-﻿IMPORT $, address, iesp, Doxie, progressive_phone, ut, LN_PropertyV2_Services, STD, Suppress;
+﻿IMPORT $, address, iesp, Doxie, progressive_phone, ut, LN_PropertyV2_Services, STD, Suppress, VerificationOfOccupancy;
 
 date6todate8(date):= (UNSIGNED4)ut.date6_to_date8(date);
 
@@ -141,13 +141,46 @@ EXPORT Transforms := MODULE
 		SELF:= L.PropertyAddr;
 		SELF:= L;
 	END;
-	
-	EXPORT $.Layouts.addr_layout xform_subjectToaddrLayout($.Layouts.dmap_Layout L):= TRANSFORM
-		SELF.is_input_property:= FALSE;
-		SELF:= L.Address;
-		SELF:= [];
-	END;
-	
+		
+  EXPORT $.Layouts.addr_layout xform_vooOwnedAddr(VerificationOfOccupancy.Layouts.Layout_property L) := TRANSFORM
+    SELF.PrimRange:= L.property_prim_range;
+    SELF.PreDir:= L.property_predir;
+    SELF.PrimName:= L.property_prim_name;
+    SELF.AddrSuffix:= L.property_suffix;
+    SELF.PostDir:= L.property_postdir;
+    SELF.UnitDesig:= L.property_unit_desig;
+    SELF.SecRange:= L.property_sec_range;
+    SELF.CityName:= L.property_city;
+    SELF.St:= L.property_st;
+    SELF.Zip:= L.property_zip;
+    SELF.is_input_property:= FALSE;
+    SELF.AddrSeq := L.Seq;
+    SELF:= [];
+  END;
+		
+  EXPORT VerificationOfOccupancy.Layouts.Layout_VOOShell xform_vooShellIn(DMAP_Services.Layouts.borrower_layout L) := TRANSFORM
+    todaysDate	 						:= std.Date.Today();
+    SELF.DID 								:= L.did;		
+    SELF.Seq								:= L.Address.AddrSeq;			
+    SELF.historydate 				:= (INTEGER)(todaysDate[1..6]);
+    SELF.ssn 								:= L.ssn;
+    SELF.dob 								:= L.dob;
+    SELF.fname  						:= L.Name.First;
+    SELF.mname 							:= L.Name.Middle;
+    SELF.lname  						:= L.Name.last;
+    SELF.prim_range					:= L.Address.PrimRange;
+    SELF.predir							:= L.Address.Predir;
+    SELF.prim_name					:= L.Address.primname;
+    SELF.addr_suffix				:= L.Address.AddrSuffix;
+    SELF.postdir						:= L.Address.Postdir;
+    SELF.unit_desig					:= L.Address.UnitDesig;
+    SELF.sec_range					:= L.Address.SecRange;
+    SELF.p_city_name        := L.Address.CityName;
+    SELF.st        					:= L.Address.St;
+    SELF.z5      						:= L.Address.zip;
+    SELF										:= [];
+  END;	
+		
 	EXPORT $.Layouts.dmap_Layout xform_dataMask($.Layouts.dmap_Layout L, $.IParams.ReportParams input_params):= TRANSFORM
 		t_dob			 :=	iesp.ECL2ESP.toMaskableDatestring8(L.dob);
 		masked_dob := IF( L.dob != '',

@@ -59,11 +59,8 @@ EXPORT ReportService() := MACRO
 			SELF.name_last := reportby.Name.Last;
 			SELF.name_suffix := reportby.Name.Suffix; 
 			SELF.addr := reportBy.Address.StreetAddress1;
-			SELF.predir := reportBy.Address.StreetPredirection;
-			SELF.prim_range := reportBy.Address.StreetNumber;
-			SELF.prim_name := reportBy.Address.StreetName;
-			SELF.addr_suffix := reportBy.Address.StreetSuffix;
-			SELF.postdir := reportBy.Address.StreetPostdirection;
+			//removing assigment of parsed fields, because we want to clean the address in the same way as search service based on streetaddress1. 
+			//the address cleaning is happening few line below by calling "MAC_CleanAddresses" where streetaddress1 is broken into cleaned parsed fields.
 			SELF.p_city_name := reportBy.Address.City; 
 			SELF.st := reportBy.Address.State; 
 			SELF.z5 := reportBy.Address.Zip5; 
@@ -125,8 +122,9 @@ EXPORT ReportService() := MACRO
 	hasGeoLocation := IF(report_in[1].geo_lat != '' AND report_in[1].geo_long != '', 1,0);
 	hasIpAddress := IF(report_in[1].ip_address != '', 1,0);
 	hasPhone := IF(report_in[1].phoneno != '', 1,0);
+	hasEmail := IF(report_in[1].email_address != '', 1,0);
 
-	inputCount := hasName + hasAddress + hasMailingAddress + hasLexId + hasSsn + hasBankAccount + hasDeviceId + hasDriversLicense + hasGeoLocation + hasIpAddress + hasPhone;
+	inputCount := hasName + hasAddress + hasMailingAddress + hasLexId + hasSsn + hasBankAccount + hasDeviceId + hasDriversLicense + hasGeoLocation + hasIpAddress + hasPhone + hasEmail;
 	
 	BOOLEAN isValidDate := FraudGovPlatform_Services.Functions.IsValidInputDate(reportBy.DOB);
 	

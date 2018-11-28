@@ -60,8 +60,8 @@ EXPORT Functions := MODULE
       noRecordsFound:=R.err_search=Standard.Errors.SEARCH.DID_NOT_FOUND;
       hasTooManySubjects:=R.err_search=Standard.Errors.SEARCH.DID_MULTIPLE;
       SELF.did:=IF(noRecordsFound OR hasTooManySubjects,L.did,R.did);
-      SELF.err_search:=R.err_search;
-      SELF.error_code:=R.error_code;
+      SELF.err_search:=IF(noRecordsFound OR hasTooManySubjects,R.err_search,L.err_search);
+      SELF.error_code:=IF(noRecordsFound OR hasTooManySubjects,R.error_code,L.error_code);
       SELF:=L;
     END;
 
@@ -179,19 +179,28 @@ EXPORT Functions := MODULE
     END;
 
     ConsumerCreditReport_Services.Layouts.ccrResp appendUniqueid(ds_ccr_resp L, ds_didville_out R) := TRANSFORM
+      hasSoapFailure:=L._Header.Status>0;
+      ErrorMessages:=NORMALIZE(L.ConsumerCreditReports,LEFT.ErrorMessages,TRANSFORM(iesp.conscredit_resp.t_CCRErrorMessage,SELF:=RIGHT));
+      hasGatewayFailure:=EXISTS(ErrorMessages((UNSIGNED)ErrorCode>0));
       noRecordsFound:=R.err_search=Standard.Errors.SEARCH.DID_NOT_FOUND;
       hasTooManySubjects:=R.err_search=Standard.Errors.SEARCH.DID_MULTIPLE;
       UniqueId2:=IF(noRecordsFound OR hasTooManySubjects,'',(STRING)R.did);
-      hasMatchingIds:=(UNSIGNED)L.UniqueId1=(UNSIGNED)UniqueId2;
+      hasMatchingIds:=(UNSIGNED)L.UniqueId1=(UNSIGNED)UniqueId2 AND NOT (hasSoapFailure OR hasGatewayFailure);
       SELF.UniqueId2:=UniqueId2;
       SELF._Header.QueryId:=L.AccountNumber;
       SELF._Header.Exceptions:=MAP(
+        hasSoapFailure OR
+        hasGatewayFailure => L._Header.Exceptions+ConsumerCreditReport_Services.Constants.GATEWAY_FAILURE,
         noRecordsFound => L._Header.Exceptions+ConsumerCreditReport_Services.Constants.NO_LEXID_FOUND_G,
         hasTooManySubjects => L._Header.Exceptions+ConsumerCreditReport_Services.Constants.TOO_MANY_SUBJECTS_G,
         NOT hasMatchingIds => L._Header.Exceptions+ConsumerCreditReport_Services.Constants.NON_MATCHING_LEXID,
         L._Header.Exceptions);
       SELF.UniqueId:=IF(hasMatchingIds,UniqueId2,'');
-      SELF.ConsumerCreditReports:=IF(hasMatchingIds,PROJECT(L.ConsumerCreditReports,applyMasking(LEFT)));
+      SELF.ConsumerCreditReports:=MAP(
+        hasMatchingIds => PROJECT(L.ConsumerCreditReports,applyMasking(LEFT)),
+        hasGatewayFailure => PROJECT(L.ConsumerCreditReports,TRANSFORM(iesp.consumercreditreport_fcra.t_FcraCCReport,
+          SELF.ErrorMessages:=ErrorMessages,SELF:=[])),
+        DATASET([],iesp.consumercreditreport_fcra.t_FcraCCReport));
       SELF.ConsumerStatements:=IF(hasMatchingIds,L.ConsumerStatements);
       SELF.ConsumerAlerts:=IF(hasMatchingIds,L.ConsumerAlerts);
       SELF.LiensJudgmentsReports:=IF(hasMatchingIds,L.LiensJudgmentsReports);
@@ -363,8 +372,9 @@ EXPORT Functions := MODULE
                                 DATASET(ConsumerCreditReport_Services.Layouts.workRec) ds_work_in) := FUNCTION
 
     ConsumerCreditReport_Services.Layouts.ccrResp restoreAcctNo(ds_ccr_resp L,ds_work_in R) := TRANSFORM
-      SELF._Header.Exceptions:=L._Header.Exceptions;
-      SELF._Header:=iesp.ECL2ESP.GetHeaderRow();
+      hdr:=iesp.ECL2ESP.GetHeaderRow();
+      SELF._Header.QueryId:=hdr.QueryId;
+      SELF._Header.TransactionId:=hdr.TransactionId;
       orig_acctno:=R.orig_acctno;
       SELF.AccountNumber:=IF(orig_acctno!='',orig_acctno,L.AccountNumber);
       SELF.InputEcho:=PROJECT(R,TRANSFORM(iesp.consumercreditreport_fcra.t_FcraCCRReportBy,
