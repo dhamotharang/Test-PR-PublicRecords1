@@ -34,31 +34,19 @@ END;
 //get all the departments
 departments_with_office_ids := project(department_ds ,deparment_xform(LEFT));
 
-output(departments_with_office_ids, NAMED('departments_with_office_ids'));
-
 layout_department_id office_department_xform (RECORDOF(file_office_flat_ds) L, RECORDOF(departments_with_office_ids) R):= TRANSFORM
 	SELF.parsed_office_id := L.id;
 	SELF.office_tfpuid := L.tfpuid;
   //NOTE: intentionally added a space to value MAIN, A.A
   SELF.office_Contact_Type := convertToCodes(L.locations.telecom[1].type);
   SELF.office_Contact_Information := std.str.FilterOut(L.locations.telecom[1].value,'+');   
-	
-	//SELF.office_telecom := project(L.locations.telecom,TRANSFORM(layout_tel, SELF := LEFT, SELF := []));
-	//SELF.office_telecom := IF(L.locations[1].primary ='true',project(L.locations.telecom,TRANSFORM(layout_tel, SELF := LEFT, SELF := [])));
-   SELF.office_telecom := project(L.locations(primary='true').telecom,TRANSFORM(layout_tel, SELF := LEFT, SELF := []));	
-	
-	
-	//SELF.department_telecom := project(R.locations.telecom,TRANSFORM(layout_tel, SELF := LEFT, SELF := []));
-	//SELF.department_telecom :=IF(R.locations[1].primary = 'true', project(R.locations.telecom,TRANSFORM(layout_tel, SELF := LEFT, SELF := [])));
-	//SELF.department_telecom :=IF(R.locations(primary='true'), project(R.locations.telecom,TRANSFORM(layout_tel, SELF := LEFT, SELF := [])));
+	SELF.office_telecom := project(L.locations(primary='true').telecom,TRANSFORM(layout_tel, SELF := LEFT, SELF := []));	
 	SELF.department_telecom :=project(R.locations(primary='true').telecom,TRANSFORM(layout_tel, SELF := LEFT, SELF := []));
 	SELF := R;
 END;
 
 //join departments and office
 office_with_dpt_ds := join(file_office_flat_ds,departments_with_office_ids, LEFT.id = RIGHT.parsed_office_id, office_department_xform(LEFT,RIGHT));
-output(office_with_dpt_ds, NAMED('office_with_dpt_ds'));
-output(office_with_dpt_ds(parsed_office_id='00009619-ee94-4dd5-8747-08b4d27137b0'));
 
 STRING findDepartmentCode(STRING _type) := FUNCTION
 	  STRING code := ares.files.ds_lookup(fid ='DEPARTMENT_TYPE').lookupbody(id = _type)[1].tfpid;
@@ -75,9 +63,6 @@ END;
 
 //add the department codes to each office record.
 office_with_dept_codes_ds:= JOIN(office_with_dpt_ds,department_list, LEFT.summary.types[1].type = RIGHT.id, with_codes_xform(LEFT,RIGHT));
-
-OUTPUT(office_with_dept_codes_ds, NAMED('office_with_dept_codes_ds'));
-OUTPUT(office_with_dept_codes_ds(parsed_office_id='00009619-ee94-4dd5-8747-08b4d27137b0'), NAMED('office_with_dept_codes_ds_count'));
 
 layout_w_telecom := RECORD
   STRING office_id;
@@ -100,22 +85,10 @@ END;
 department_telecoms_normed := normalize(office_with_dept_codes_ds,LEFT.department_telecom, telecoms_xform(RIGHT, LEFT.parsed_office_id, LEFT.office_department, LEFT.office_tfpuid));
 office_telecoms_normed := normalize(office_with_dept_codes_ds,LEFT.office_telecom, telecoms_xform(RIGHT, LEFT.parsed_office_id, LEFT.office_department, LEFT.office_tfpuid));
 
-OUTPUT(department_telecoms_normed, NAMED('department_telecoms_normed'));
-output(department_telecoms_normed(office_id='00009619-ee94-4dd5-8747-08b4d27137b0'));
-
-OUTPUT(office_telecoms_normed, NAMED('office_telecoms_normed'));
-output(office_telecoms_normed(office_id='00009619-ee94-4dd5-8747-08b4d27137b0'));
-
 result := department_telecoms_normed + office_telecoms_normed;
 sorted_result := SORT(result,RECORD);
 deduped_result := DEDUP (sorted_result,RECORD);
-									
-OUTPUT(SORT(result,office_id), NAMED('final_result'));
-output(SORT(result(office_id='00009619-ee94-4dd5-8747-08b4d27137b0'), phonenumber, dpt_code));
-
-OUTPUT(deduped_result, NAMED('deduped_result'));
-output(SORT(deduped_result(office_id='00009619-ee94-4dd5-8747-08b4d27137b0'),dpt_code, phonenumber ), NAMED('deduped_output'));
-
+	
 layout_contacts := RECORD
 	STRING Update_Flag;
 	STRING Primary_Key;
@@ -138,26 +111,6 @@ End;
 
 final	:= PROJECT(result,final_xform(LEFT));
 
-//EXPORT file_gpcontacts := file_office_flat_ds;
-//EXPORT file_gpcontacts :=department_ds;
-//EXPORT file_gpcontacts := departments_with_office_ids;
-//EXPORT file_gpcontacts := office_ds;
-//EXPORT file_gpcontacts := department_list;
-//output(count(office_with_dept_codes_ds(tfpid='50196020'));
-//EXPORT file_gpcontacts := office_with_dept_codes_ds;
-//EXPORT file_gpcontacts :=telecoms_normed;
-//EXPORT file_gpcontacts :=ds;
-
-//EXPORT file_gpcontacts :=locations;
-//EXPORT file_gpcontacts :=result;
-//EXPORT file_gpcontacts :=deduped_result;
-
-//EXPORT file_gpcontacts := combinedResults;
-//EXPORT file_gpcontacts := combinedResults_deduped;
-
-//EXPORT file_gpcontacts := office_result;
-//EXPORT file_gpcontacts := final(Accuity_Location_ID='50196020');
-//output(sort(final(Accuity_Location_ID='50196020'),department));
 EXPORT file_gpcontacts := final;
 
 
