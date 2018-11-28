@@ -1,7 +1,11 @@
-import lib_stringlib, ut, address, idl_header, aid, NID;
+﻿import lib_stringlib, ut, address, idl_header, aid, NID;
 
-in_file := Txbus.File_Txbus_In.File_Cleaned_Super;
+in_file   := Txbus.File_Txbus_In.File_Cleaned_Super;
 
+base_file := project(Txbus.File_Txbus_Base, transform(Txbus.Layouts_txbus.Layout_Common,self:=left));
+
+update_combined		:= in_file + base_file;
+															
 Temp_Txbus_Layout_Common:=record
 		Txbus.Layouts_Txbus.Layout_Common;
 		string73 tempTaxpayerName;
@@ -15,7 +19,7 @@ Temp_Txbus_layout_Common trans_Name(Txbus.Layouts_Txbus.Layout_Common l) :=trans
 			self							 		:= l;
 			
 end;
-dCleanName := project(in_file,trans_Name(left));
+dCleanName := project(update_combined,trans_Name(left));
 //*** Cleaning person names using the new NID name cleaner.
 NID.Mac_CleanFullNames(dCleanName, cleaned_name_output, tempTaxpayerName);
 
