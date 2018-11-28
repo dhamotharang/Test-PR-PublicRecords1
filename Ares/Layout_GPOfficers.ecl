@@ -5,4 +5,5 @@
   STRING5 Department_Function := '';
 	STRING100 OfficerName := '';
 	STRING35	Filler1 := '';
+	String2 crlf := '\r\n'; 
 END;
