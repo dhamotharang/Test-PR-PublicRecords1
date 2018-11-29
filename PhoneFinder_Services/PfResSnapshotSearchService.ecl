@@ -26,7 +26,7 @@ EXPORT PfResSnapshotSearchService := MACRO
 			search_by.TransactionDateRange.StartDate.Year = 0  => FAIL(301, doxie.ErrorCodes(301))); 
      
   PhoneFinder_Services.Layouts.PFResSnapShotSearch t_input(iesp.phonefindertransactionsearch.t_PhoneFinderTransactionSearchRequest l) := TRANSFORM
-		self.Companies := CHOOSEN(PROJECT(l.SearchBy.CompanyIds, PhoneFinder_Services.Layouts.Input_CompanyId), iesp.Constants.PfResSnapshot.MaxCompanyIds);
+		self.CompanyIds := CHOOSEN(PROJECT(l.SearchBy.CompanyIds, TRANSFORM(PhoneFinder_Services.Layouts.Input_CompanyId, SELF.CompanyId := LEFT.Value)), iesp.Constants.PfResSnapshot.MaxCompanyIds);
 		self.PhoneNumber := l.SearchBy.PhoneNumber;
 		self.UserId := l.SearchBy.UserId;
 		self.ReferenceCode := l.SearchBy.ReferenceCode;
@@ -42,6 +42,5 @@ EXPORT PfResSnapshotSearchService := MACRO
   iesp.ECL2ESP.Marshall.MAC_Marshall_Results(ds_out, Results, 
                                              iesp.phonefindertransactionsearch.t_PhoneFinderTransactionSearchResponse,,false,, InputEcho, search_by,
                                              iesp.Constants.PfResSnapshot.MaxSearchRecords);
-  
   OUTPUT(Results, NAMED('Results'));
 ENDMACRO;
