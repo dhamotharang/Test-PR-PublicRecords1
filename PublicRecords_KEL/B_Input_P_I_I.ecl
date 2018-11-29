@@ -4,8 +4,8 @@ IMPORT B_Input_P_I_I_1,CFG_Compile,E_Person,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Input_P_I_I(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Input_P_I_I_1(__in,__cfg).__ENH_Input_P_I_I_1) __ENH_Input_P_I_I_1 := B_Input_P_I_I_1(__in,__cfg).__ENH_Input_P_I_I_1;
-  SHARED __EE123308 := __ENH_Input_P_I_I_1;
-  EXPORT __ST15532_Layout := RECORD
+  SHARED __EE123115 := __ENH_Input_P_I_I_1;
+  EXPORT __ST15540_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nstr Input_Account_Echo_;
@@ -172,20 +172,21 @@ EXPORT B_Input_P_I_I(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST15532_Layout __ND123476__Project(B_Input_P_I_I_1(__in,__cfg).__ST17418_Layout __PP122481) := TRANSFORM
-    SELF.I_Rep_Number_Value_ := __PP122481.Rep_Number_;
-    SELF.Input_Account_Echo_Pop_Value_ := FN_Compile.FN_Is_Echo_Populated(__ECAST(KEL.typ.nstr,__PP122481.Input_Account_Echo_));
+  SHARED __ST15540_Layout __ND123283__Project(B_Input_P_I_I_1(__in,__cfg).__ST17425_Layout __PP122287) := TRANSFORM
+    SELF.I_Rep_Number_Value_ := __PP122287.Rep_Number_;
+    SELF.Input_Account_Echo_Pop_Value_ := FN_Compile.FN_Is_Echo_Populated(__ECAST(KEL.typ.nstr,__PP122287.Input_Account_Echo_));
     __CC3026 := '-99';
     __CC3031 := '-98';
-    SELF.Input_Archive_Date_Clean_Pop_Value_ := FN_Compile.FN_Is_Clean_Populated(__ECAST(KEL.typ.nstr,__PP122481.Input_Archive_Date_Clean_Value_),__ECAST(KEL.typ.nstr,__CN(__CC3026)),__ECAST(KEL.typ.nstr,__CN(__CC3031)));
-    SELF.Input_Archive_Date_Echo_Pop_Value_ := FN_Compile.FN_Is_Echo_Populated(__ECAST(KEL.typ.nstr,__PP122481.Input_Archive_Date_Echo_));
-    SELF.Input_Archive_Date_Value_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP122481.Input_Archive_Date_Echo_),__ECAST(KEL.typ.nstr,__CN(__CC3026)));
-    SELF.Input_Lex_I_D_Echo_Pop_Value_ := FN_Compile.FN_Is_Echo_Populated(__ECAST(KEL.typ.nstr,__PP122481.Input_Lex_I_D_Echo_));
-    SELF.Input_Suffix_Clean_Pop_Value_ := FN_Compile.FN_Is_Clean_Populated(__ECAST(KEL.typ.nstr,__PP122481.Input_Suffix_Clean_Value_),__ECAST(KEL.typ.nstr,__CN(__CC3026)),__ECAST(KEL.typ.nstr,__CN(__CC3031)));
-    SELF.Input_Work_Phone_Clean_Pop_Value_ := FN_Compile.FN_Is_Clean_Populated(__ECAST(KEL.typ.nstr,__PP122481.Input_Work_Phone_Clean_Value_),__ECAST(KEL.typ.nstr,__CN(__CC3026)),__ECAST(KEL.typ.nstr,__CN(__CC3031)));
-    SELF.Input_Work_Phone_Echo_Pop_Value_ := FN_Compile.FN_Is_Echo_Populated(__ECAST(KEL.typ.nstr,__PP122481.Input_Work_Phone_Echo_));
-    SELF.Input_Work_Phone_Value_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP122481.Input_Work_Phone_Echo_),__ECAST(KEL.typ.nstr,__CN(__CC3026)));
-    SELF := __PP122481;
+    SELF.Input_Archive_Date_Clean_Pop_Value_ := FN_Compile.FN_Is_Clean_Populated(__ECAST(KEL.typ.nstr,__PP122287.Input_Archive_Date_Clean_Value_),__ECAST(KEL.typ.nstr,__CN(__CC3026)),__ECAST(KEL.typ.nstr,__CN(__CC3031)));
+    SELF.Input_Archive_Date_Echo_Pop_Value_ := FN_Compile.FN_Is_Echo_Populated(__ECAST(KEL.typ.nstr,__PP122287.Input_Archive_Date_Echo_));
+    SELF.Input_Archive_Date_Value_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP122287.Input_Archive_Date_Echo_),__ECAST(KEL.typ.nstr,__CN(__CC3026)));
+    SELF.Input_Lex_I_D_Echo_Pop_Value_ := FN_Compile.FN_Is_Echo_Populated(__ECAST(KEL.typ.nstr,__PP122287.Input_Lex_I_D_Echo_));
+    SELF.Input_Prefix_Clean_Pop_Value_ := FN_Compile.FN_Is_Clean_Populated(__ECAST(KEL.typ.nstr,__PP122287.Input_Prefix_Clean_Value_),__ECAST(KEL.typ.nstr,__CN(__CC3026)),__ECAST(KEL.typ.nstr,__CN(__CC3031)));
+    SELF.Input_Suffix_Clean_Pop_Value_ := FN_Compile.FN_Is_Clean_Populated(__ECAST(KEL.typ.nstr,__PP122287.Input_Suffix_Clean_Value_),__ECAST(KEL.typ.nstr,__CN(__CC3026)),__ECAST(KEL.typ.nstr,__CN(__CC3031)));
+    SELF.Input_Work_Phone_Clean_Pop_Value_ := FN_Compile.FN_Is_Clean_Populated(__ECAST(KEL.typ.nstr,__PP122287.Input_Work_Phone_Clean_Value_),__ECAST(KEL.typ.nstr,__CN(__CC3026)),__ECAST(KEL.typ.nstr,__CN(__CC3031)));
+    SELF.Input_Work_Phone_Echo_Pop_Value_ := FN_Compile.FN_Is_Echo_Populated(__ECAST(KEL.typ.nstr,__PP122287.Input_Work_Phone_Echo_));
+    SELF.Input_Work_Phone_Value_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP122287.Input_Work_Phone_Echo_),__ECAST(KEL.typ.nstr,__CN(__CC3026)));
+    SELF := __PP122287;
   END;
-  EXPORT __ENH_Input_P_I_I := PROJECT(__EE123308,__ND123476__Project(LEFT));
+  EXPORT __ENH_Input_P_I_I := PROJECT(__EE123115,__ND123283__Project(LEFT));
 END;

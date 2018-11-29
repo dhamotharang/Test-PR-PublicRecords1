@@ -116,7 +116,7 @@ END;
 bwr_results := 
 				SOAPCALL(soap_in, 
 				RoxieIP,
-				'publicrecords_kel.MAS_FCRA_Service', 
+				'publicrecords_kel.MAS_FCRA_Service.55', 
 				{soap_in}, 
 				DATASET(layout_MAS_Test_Service_output),
         RETRY(2), TIMEOUT(300),

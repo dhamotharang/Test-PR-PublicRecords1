@@ -6,8 +6,8 @@ Threads := 1;
 RecordsToRun := 0; // 100;
 eyeball := 120;
 
-// historyDate := 0; // Set to 0 to use ArchiveDate on input file. 
-historyDate := 20181126; // Set to 0 to use ArchiveDate on input file. 
+historyDate := 0; // Set to 0 to use ArchiveDate on input file. 
+// historyDate := 20181128; // Set to 0 to use ArchiveDate on input file. 
 Score_threshold := 80;
 RoxieIP := RiskWise.shortcuts.Dev156;
 
@@ -179,7 +179,7 @@ END;
 ResultSet := 
 				SOAPCALL(soap_in, 
 				RoxieIP,
-				'publicrecords_kel.MAS_Business_nonFCRA_Service',
+				'publicrecords_kel.MAS_Business_nonFCRA_Service.11',
 				{soap_in}, 
 				DATASET(layout_MAS_Business_Service_output),
 				RETRY(2), TIMEOUT(300),
