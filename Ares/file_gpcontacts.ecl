@@ -87,7 +87,7 @@ office_telecoms_normed := normalize(office_with_dept_codes_ds,LEFT.office_teleco
 result := department_telecoms_normed + office_telecoms_normed;
 sorted_result := SORT(result,RECORD);
 deduped_result := DEDUP (sorted_result,RECORD);
-OUTPUT(deduped_result, NAMED('deduped_result'));	
+
 layout_contacts := RECORD
 	STRING Update_Flag;
 	STRING Primary_Key;
