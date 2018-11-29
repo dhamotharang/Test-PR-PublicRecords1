@@ -6,12 +6,8 @@ import iesp;
 
 export phonefindertransactionsearch := MODULE
 			
-export t_PhoneFinderCompanyInfo := record
-	string16 CompanyId {xpath('CompanyId')};
-end;
-		
 export t_PhoneFinderTransactionSearchBy := record
-	dataset(t_PhoneFinderCompanyInfo) CompanyIds {xpath('CompanyIds/CompanyId'), MAXCOUNT(iesp.Constants.PfResSnapshot.MaxCompanyIds)};
+	dataset(iesp.share.t_StringArrayItem) CompanyIds {xpath('CompanyIds/CompanyId'), MAXCOUNT(iesp.Constants.PfResSnapshot.MaxCompanyIds)};
 	string60 ReferenceCode {xpath('ReferenceCode')};
 	string60 UserId {xpath('UserId')};
 	string12 UniqueId {xpath('UniqueId')};
