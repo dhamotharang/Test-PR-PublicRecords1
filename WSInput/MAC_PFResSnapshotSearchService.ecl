@@ -4,6 +4,6 @@ EXPORT MAC_PFResSnapshotSearchService() := MACRO
 
   #WEBSERVICE(FIELDS(	
 	/*---- Search Fields ----*/
-  'PFResSnapshotServiceRequest'          
+  'PhoneFinderTransactionSearchRequest'          
 									));
 ENDMACRO;	
