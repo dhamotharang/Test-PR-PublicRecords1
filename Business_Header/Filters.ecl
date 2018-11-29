@@ -1160,8 +1160,8 @@ module
 														;
 				
 				// -- JIRA - LNK-1501 - Wrong consumer tied to Business connection and possible employee
-				filterbugLNK1501 := pInput.phone in [3032981000] and trim(pInput.lname) = 'HUNT' and trim(pInput.fname) in ['CHRISTOPHE','CHRISTOPHER'] 
-														and regexfind('ANSCHUTZ CO', pInput.company_name, nocase)
+				filterbugLNK1501 := l.phone in [3032981000] and trim(l.lname) = 'HUNT' and trim(l.fname) in ['CHRISTOPHE','CHRISTOPHER'] 
+														and regexfind('ANSCHUTZ CO', l.company_name, nocase)
 														and l.did = 1192309336;
 				
 				phone 				:= (unsigned6)ut.CleanPhone(header.fn_blank_bogus_phones((string)l.phone));  // Zero the phone if more than 10-digits
@@ -1404,8 +1404,8 @@ module
 														and l.did = 1714518962
 														;
 				// -- JIRA - LNK-1501 - Wrong consumer tied to Business connection and possible employee
-				filterbugLNK1501 := pInput.phone in [3032981000] and trim(pInput.lname) = 'HUNT' and trim(pInput.fname) in ['CHRISTOPHE','CHRISTOPHER'] 
-														and regexfind('ANSCHUTZ CO', pInput.company_name, nocase)
+				filterbugLNK1501 := l.phone in [3032981000] and trim(l.lname) = 'HUNT' and trim(l.fname) in ['CHRISTOPHE','CHRISTOPHER'] 
+														and regexfind('ANSCHUTZ CO', l.company_name, nocase)
 														and l.did = 1192309336;
 				// --- Bug#35653 -  For the "Eq_employer" source first & last seen dates are set to zero/blank as the 
 				// dates coming in from the base file are harded coded.
