@@ -17,4 +17,5 @@
 	STRING10 Attribute_Effective_Date := '';
 	STRING10 Attribute_Deactivation_Date := '';
 	STRING35 Filler := '';
+	String2 crlf := '\r\n'; 
 End;
