@@ -1,6 +1,6 @@
 ﻿/*--SOAP--
 <message name="PFReportsSearchService">
-	<part name="PFResSnapshotServiceRequest" type="tns:XmlDataSet" cols="80" rows="30"/> 
+	<part name="PhoneFinderTransactionSearchRequest" type="tns:XmlDataSet" cols="80" rows="30"/> 
 </message>
 */
 /*--INFO-- This service hits the Phonefinder reporting keys by userid, billing group, lexid, phonenumber and returns transaction records. 
@@ -13,7 +13,7 @@ EXPORT PfResSnapshotSearchService := MACRO
 
   // Get XML Input
   rec_in		:= iesp.phonefindertransactionsearch.t_PhoneFinderTransactionSearchRequest;
-  ds_in			:= DATASET([], rec_in) : STORED('PfResSnapshotServiceRequest', few);
+  ds_in			:= DATASET([], rec_in) : STORED('PhoneFinderTransactionSearchRequest', few);
   first_row	:= ds_in[1] : INDEPENDENT;
 
   iesp.ECL2ESP.SetInputBaseRequest(first_row);
