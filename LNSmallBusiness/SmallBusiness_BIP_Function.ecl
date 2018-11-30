@@ -198,6 +198,8 @@ EXPORT SmallBusiness_BIP_Function (
 		SELF := [];
 	END;
 	Shell_Input := PROJECT(SeqInput, convertToBusinessShellInput(LEFT));
+  
+  OverrideExperianRestriction := IF(EXISTS(ModelsRequested(ModelName IN BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_BBFM)), TRUE, FALSE);
 	 
 /* ************************************************************************
 	 *                      Grab Business Shell Results                     *
@@ -220,7 +222,7 @@ EXPORT SmallBusiness_BIP_Function (
 																																 IncludeTargusGateway,
 																																 Gateways,
 																																 RunTargusGateway, /* for testing purposes only */ 
-																																 FALSE,
+																																 OverrideExperianRestriction,
 																																 FALSE,
 																																 FALSE,
                                  CorteraRetrotest,

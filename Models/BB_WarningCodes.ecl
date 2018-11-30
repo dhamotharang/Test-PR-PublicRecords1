@@ -438,7 +438,7 @@ END;
 	 liens_unreleased_count84         := le.clam.bjl.liens_unreleased_count84;
 	 attr_eviction_count84            := le.clam.BJL.eviction_count84;
 	 filing_count120                  := le.clam.bjl.filing_count120;
-	 inq_total_count03                := le.busShell.Inquiry.Inquiry24Month;
+	 inq_total_count03                := le.busShell.Inquiry.Inquiry03Month;
 	 addr_input_type_advo             := le.busShell.Input_Characteristics.InputAddrTypeNoID;
    tin_match_cons_name              := le.busShell.Verification.FEINPersonNameMatch;
 	 cons_record_match_addr           := le.busShell.Business_To_Person_Link.BusFEINPersonAddrOverlap;
@@ -456,7 +456,7 @@ END;
 	 pop_bus_zip                      := le.busShell.Input.InputCheckBusZip;
 	 addr_input_zipcode_mismatch      := le.busShell.Verification.AddrZipMismatch;
 	 pop_bus_altname                  := le.busShell.Input.InputCheckBusAltName;
-	 phn_input_valid                  := le.busShell.Input.InputCheckBusAltName;
+	 phn_input_valid                  := le.busShell.Verification.InputPhoneValidNoID;
 	 addr_input_valid                 := le.busShell.Verification.InputAddrValidNoID;
 	 addr_input_pobox                 := le.busShell.Verification.AddrPOBox;
 	 addr_input_zipcode_type          := le.busShell.Verification.AddrZipType;
@@ -1319,7 +1319,7 @@ ds_WCCodes :=
         {'60B'}, {'61B'}, {'62B'}, {'63B'}, {'64P'}, {'65B'}, {'66P'}, {'67P'}, {'68P'}, {'69B'},
         {'70B'}, {'71B'}, {'72B'}, {'73P'}, {'74P'}, {'75B'}, {'76B'}, {'77B'}, {'78B'}, {'79P'}, 
         {'80P'}, {'81P'}, {'82P'}, {'83P'}
-			], { STRING2 wccode }
+			], { STRING4 wccode }
 		);
 
 	getWCPriority(STRING4 wc) := 
@@ -1884,6 +1884,7 @@ TopWarningCodes := PROJECT(ds_TopRiskIndicators, TRANSFORM(HRILayout,
                   //  SELF.clam                             := ri;
 									//	SELF.busShell                         := le;
                     self.HRIs                             := TopWarningCodes;
+                    
          
 
 #else
