@@ -3,16 +3,11 @@
 export proc_build_autokeys(string filedate, boolean isFCRA = false) := function
 
 todaysdate := ut.GetDate;
-
-// DF-22108 FCRA Consumer Data Deprecation for FCRA_BankruptcyKeys - thor_data400::key::bankruptcy::autokey::fcra::payload_qa
-b_fcra := BankruptcyV3.file_search_autokey;
-ut.MAC_CLEAR_FIELDS(b_fcra, b_fcra_cleared, BankruptcyV3.Constants().fields_to_clear.autokey_payload);
-
 b := if (isFCRA,
-			b_fcra_cleared,
+			BankruptcyV3.file_search_autokey,
 			BankruptcyV2.file_search_autokey(isFCRA)
 		 );
-		 
+
 autokey.mac_useFakeIDs 
 	(b, 
 	ds_withFakeID_AKB,  
@@ -74,17 +69,10 @@ ds_inLayoutMaster_AKB :=
 			self.b := []; 
 			) 
 	 ); 
-
-// DF-22108 FCRA Consumer Data Deprecation for FCRA_BankruptcyKeys - thor_data400::key::bankruptcy::autokey::fcra::payload_qa
-ut.MAC_CLEAR_FIELDS(ds_inLayoutMaster_AKB, ds_inLayoutMaster_AKB_cleared, BankruptcyV3.Constants().fields_to_clear.autokey_payload);
-ds_inLayoutMaster_AKB_new := if (isFCRA,
-																				 ds_inLayoutMaster_AKB_cleared,
-																				 ds_inLayoutMaster_AKB
-																				 );
 	  
 	 
  mod_AKB := module(AutokeyB2.Fn_Build.params) 
-	export dataset(autokey.layouts.master) L_indata := ds_inLayoutMaster_AKB_new; 
+	export dataset(autokey.layouts.master) L_indata := ds_inLayoutMaster_AKB; 
 	export string L_inkeyname := 
 					BankruptcyV2.Constants(  filedate,   isFCRA).ak_keyname; 
 	export string L_inlogical := 
