@@ -1,3 +1,6 @@
+﻿/*2018-11-26T20:15:42Z (xsheng_prod)
+C:\Users\shenxi01\AppData\Roaming\HPCC Systems\eclide\xsheng_prod\New_Dataland\Prof_License_Mari\map_NVS0857_conversion\2018-11-26T20_15_42Z.ecl
+*/
 /* Converting Nevada Real Estate Division / Real Estate Appraisers Licenses File to MARI common layout
 // Following allowable Real Estate License Type: APR, RLE, MTG, LND
 */
@@ -159,7 +162,7 @@ EXPORT map_NVS0857_conversion(STRING pVersion) := FUNCTION
 					
 		//Reformatting date to YYYYMMDD
 		SELF.CURR_ISSUE_DTE		:= '17530101';
-		SELF.ORIG_ISSUE_DTE		:= '17530101';
+		SELF.ORIG_ISSUE_DTE		:= IF(pInput.ISSEDT != '',Prof_License_Mari.DateCleaner.fmt_dateMMDDYYYY(pInput.ISSEDT),'17530101');
 		SELF.EXPIRE_DTE				:= IF(pInput.EXPDT != '',Prof_License_Mari.DateCleaner.fmt_dateMMDDYYYY(pInput.EXPDT),'17530101');
 		
 		//LICSTAT has been removed. Use expiration date to determine the license status
