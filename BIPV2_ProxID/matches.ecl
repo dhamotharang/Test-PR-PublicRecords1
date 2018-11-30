@@ -234,7 +234,16 @@ j1 := JOIN(DISTRIBUTE(All_Attribute_Matches,HASH(Proxid2)),hd,LEFT.Proxid2=RIGHT
 match_candidates(ih).layout_candidates strim(j1 le) := TRANSFORM
   SELF := le;
 END;
-attr_match := JOIN(DISTRIBUTE(j1,HASH(Proxid1)),hd,LEFT.Proxid1 = RIGHT.Proxid AND ( LEFT.SALT_Partition = RIGHT.SALT_Partition OR LEFT.SALT_Partition='' OR RIGHT.SALT_Partition = '' ),match_join( RIGHT,PROJECT(LEFT,strim(LEFT)),LEFT.Rule, LEFT.Conf,LEFT.support_cnp_name),LOCAL); // Will be distributed by DID1
+attr_match := JOIN(DISTRIBUTE(j1,HASH(Proxid1)),hd,LEFT.Proxid1 = RIGHT.Proxid AND ( LEFT.SALT_Partition = RIGHT.SALT_Partition OR LEFT.SALT_Partition='' OR RIGHT.SALT_Partition = '' )
+AND LEFT.cnp_number = RIGHT.cnp_number AND LEFT.prim_name_derived = RIGHT.prim_name_derived/*HACKMatches02*/
+    AND LEFT.st = RIGHT.st
+    AND LEFT.prim_range_derived = RIGHT.prim_range_derived
+    AND ( ~left.st_isnull AND ~right.st_isnull )
+    AND ( left.active_enterprise_number = right.active_enterprise_number OR left.active_enterprise_number_isnull OR right.active_enterprise_number_isnull )
+    AND ( left.active_domestic_corp_key = right.active_domestic_corp_key OR left.active_domestic_corp_key_isnull OR right.active_domestic_corp_key_isnull )
+    AND (( ~left.cnp_name_isnull AND ~right.cnp_name_isnull ) OR LEFT.support_cnp_name > 0 or (left.active_domestic_corp_key = right.active_domestic_corp_key OR left.active_domestic_corp_key_isnull OR right.active_domestic_corp_key_isnull ) OR ( ~left.active_duns_number_isnull AND ~right.active_duns_number_isnull ) OR ( ~left.company_fein_isnull AND ~right.company_fein_isnull ))
+    AND ( ~left.prim_name_derived_isnull AND ~right.prim_name_derived_isnull ) AND (~left.company_address_isnull AND ~right.company_address_isnull )  
+    ,match_join( RIGHT,PROJECT(LEFT,strim(LEFT)),LEFT.Rule, LEFT.Conf,LEFT.support_cnp_name),LOCAL); // Will be distributed by DID1
 with_attr := attr_match + all_mjs;
 all_matches1 := MOD_Attr_ForeignCorpkey(ih).ForceFilter(ih,with_attr,Proxid1,Proxid2); // Restrict to those matches obeying force upon ForeignCorpkey
 all_matches2 := MOD_Attr_RAAddresses(ih).ForceFilter(ih,all_matches1,Proxid1,Proxid2); // Restrict to those matches obeying force upon RAAddresses
