@@ -272,6 +272,7 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 					+ ' length(' + dqString(L.mailing_state)+ ') > 0 AND mailing_state= ' + dqString(L.mailing_state)+ ' AND '
 					+ ' length(' + dqString(L.mailing_zip)+ ') > 0 AND mailing_zip= ' + dqString(L.mailing_zip)+ ') OR '
 					+ ' (length(' + dqString(L.phone)+ ') > 0 AND phone= ' + dqString(L.phone)+ ') OR '
+					+ ' (length(' + dqString(L.email_address)+ ') > 0 AND email_address= ' + dqString(L.email_address)+ ') OR '
 					+ ' (length(' + dqString(L.ip_address)+ ') > 0 AND ip_address= ' + dqString(L.ip_address)+ ') OR '
 					+ ' (length(' + dqString(L.device_id)+ ') > 0 AND device_id= ' + dqString(L.device_id)+ ') OR '
 					+ ' (length(' + dqString(L.bank_account_number)+ ') > 0 AND bank_account_number= ' + dqString(L.bank_account_number)+ ') OR '
@@ -295,7 +296,9 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 			db_records_filtered := DeltabaseMBSFilter(deltabase_recs_norm);
 			ds_timeline_records := GetRecentTimelineDetails(db_records_filtered);
 			
-			//output(ds_timeline_records,named('ds_timeline_records'));
+			// output(deltabase_recs_norm,named('deltabase_recs_norm'));
+			// output(db_records_filtered,named('db_records_filtered'));
+			// output(ds_timeline_records,named('ds_timeline_records'));
 
 			return ds_timeline_records;
 	END;
@@ -360,8 +363,7 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 		
 			Layout_DeltabaseSelect xRead_search() := TRANSFORM
 				SELF.Select := 'SELECT * FROM delta_fraudgov.delta_identity WHERE '
-					+ ' date_added >= ' + last_data_build_date
-					+ FraudGovPlatform_Services.Constants.limiter;
+					+ ' date_added >= ' + last_data_build_date;
 			END;
 			
 			readDeltabase := DATASET([xRead_search()]);
@@ -375,6 +377,10 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 			deltabase_recs_norm := NORMALIZE(soapcall_out, LEFT.deltaFields, NormIt(RIGHT));																					
 			db_records_filtered := DeltabaseMBSFilter(deltabase_recs_norm);
 			ds_timeline_records := GetRecentTimelineDetails(db_records_filtered);
+			
+			// output(deltabase_recs_norm,named('deltabase_recs_norm'));
+			// output(db_records_filtered,named('db_records_filtered'));
+			// output(ds_timeline_records,named('ds_timeline_records'));
 			
 			return ds_timeline_records(FileType <> FraudGovPlatform_Services.Constants.PayloadFileTypeEnum.StatusUpdate);
 	END;
