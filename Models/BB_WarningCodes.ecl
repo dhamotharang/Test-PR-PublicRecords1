@@ -1146,7 +1146,7 @@ wc13b := sos_standing = '1';
 
 wc14b := sos_standing = '2';
 
-wc15p := fp_srchunvrfdssncount > '2' or fp_srchunvrfdaddrcount > '2' or fp_srchunvrfddobcount > '2' or fp_srchunvrfdphonecount > '2';
+wc15p := (integer)fp_srchunvrfdssncount > 2 or (integer)fp_srchunvrfdaddrcount > 2 or (integer)fp_srchunvrfddobcount > 2 or (integer)fp_srchunvrfdphonecount > 2;
 
 wc16p := fp_srchcomponentrisktype >= '5';
 
@@ -1164,7 +1164,8 @@ wc22p := fp_varrisktype >= '5';
 
 wc23b := pop_bus_phone = '1' and hphnpop  and in_bus_phone10 != in_phone10 and inq_consumer_phone >= '6';
 
-wc24b := pop_bus_addr = '1' and addrpop  and in_bus_streetaddress1 != in_streetaddress and inq_consumer_addr >= '6';
+//wc24b := pop_bus_addr = '1' and addrpop  and in_bus_streetaddress1 != in_streetaddress and inq_consumer_addr >= '6';
+wc24b := (integer)pop_bus_addr = 1 and addrpop  and in_bus_streetaddress1 != in_streetaddress and (integer)inq_consumer_addr >= 6;
 
 _sum_bureau := if(max((integer)ver_src_eq, (integer)ver_src_en, (integer)ver_src_tn) = NULL, NULL, sum((integer)ver_src_eq, (integer)ver_src_en, (integer)ver_src_tn));
 
@@ -1192,7 +1193,7 @@ wc28p := 0 <= earliest_header_date AND earliest_header_date <= 60;
 
 wc29p := addrs_per_adl_c6 >= 2 or ( avg_lres >= 0 and avg_lres <= 12);
 
-wc30b := ver_src_id_mth_since_fs >= '0' and ver_src_id_mth_since_fs <= '12';
+wc30b := (integer)ver_src_id_mth_since_fs >= 0 and (integer)ver_src_id_mth_since_fs <= 12;
 
 wc31p := inq_adlsperphone > 2;
 
@@ -1230,7 +1231,7 @@ wc47p := felony_count > 0;
 
 wc48p := if(max(liens_unreleased_count84, attr_eviction_count84, filing_count120, felony_count) = NULL, NULL, sum(if(liens_unreleased_count84 = NULL, 0, liens_unreleased_count84), if(attr_eviction_count84 = NULL, 0, attr_eviction_count84), if(filing_count120 = NULL, 0, filing_count120), if(felony_count = NULL, 0, felony_count))) > 2;
 
-wc49b := inq_total_count03 > '2';
+wc49b := (integer)inq_total_count03 > 2;
 
 wc50p := inq_peradl > 5;
 
@@ -1274,7 +1275,7 @@ wc69b := (pop_bus_addr = '1' and addr_input_pobox = '1') or (pop_bus_zip = '1' a
 
 wc70b := pop_bus_phone = '1' and phn_input_residential = '1';
 
-wc71b := pop_bus_phone = '1' and phn_input_distance_addr > '10';
+wc71b := (integer)pop_bus_phone = 1 and (integer)phn_input_distance_addr > 10;
 
 wc72b := pop_bus_fein = '1' and ver_fein_src_count <='0' and ver_src_id_count > '0';
 
@@ -1288,7 +1289,7 @@ wc76b := pop_bus_addr = '0' or (pop_bus_addr = '1' and pop_bus_city = '0' and po
 
 wc77b := pop_bus_phone = '0';
 
-wc78b := pop_bus_fein = '0';
+wc78b :=  pop_bus_fein = '0';
 
 wc79p :=  not fnamepop  or not lnamepop ;
 
@@ -1299,6 +1300,7 @@ wc81p := not((ssnlength in ['4', '9']));
 wc82p := not hphnpop ;
 
 wc83p :=  not dobpop ;
+
 
 /* Engineering will need to construct the following final Warning Code variables by
 hand based on the spreadsheet sent by Lea:
