@@ -16,7 +16,7 @@ end;
  
 // latest no incremental (LEFT ONLY)
 unmatchedOld := JOIN(hr,DISTRIBUTE(KeyPayloadInc(SRC[1..3]='ADL'),HASH(rid))
-                                  ,LEFT.rid = RIGHT.source_rid AND 
+                                  ,LEFT.rid = RIGHT.rid AND 
                                    LEFT.src = RIGHT.src[4..5]
                                   ,TRANSFORM ({hr}, SELF := LEFT)
                                   ,LEFT ONLY
@@ -82,9 +82,13 @@ unmatchedOld := JOIN(hr,DISTRIBUTE(KeyPayloadInc(SRC[1..3]='ADL'),HASH(rid))
 
                                    ),local) ; 
 
-IncPayLoad := header.fn_incremental_payload(src<>'EN',src in mdr.sourceTools.set_scoring_FCRA,pflag3<>'I',pflag3<>'V');
+IncPayLoad := project(
+      header.fn_incremental_payload(src<>'EN',src in mdr.sourceTools.set_scoring_FCRA,pflag3<>'I',pflag3<>'V'),
+      layout_hdr_with_effective_dates);
 
-suppressed := SALT37.MAC_DatasetAsOf(MatchedOldToUpdate, RID, DID,, DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST,, 'YYYYMMDD', TRUE);
+allNewAndUpdated:=IncPayLoad + MatchedOldToUpdate;
+
+suppressed := SALT37.MAC_DatasetAsOf(allNewAndUpdated, RID, DID,, DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST,, 'YYYYMMDD', TRUE);
  
  all_fcra := unmatchedOld + project(suppressed,{{suppressed}-[DT_EFFECTIVE_FIRST,DT_EFFECTIVE_LAST] });
 
