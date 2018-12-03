@@ -506,7 +506,7 @@ function
   export Scrub_Strata_SummaryStats :=Strata.macf_CreateXMLStats(vv ,'BIPV2','Ingest',BIPV2.KeySuffix,BIPV2_Build.mod_email.emailList,'SummaryStatsSmpl','Scrubs',false,false);
   export Scrub_Strata_BadValues :=Strata.macf_CreateXMLStats(xx ,'BIPV2','Ingest',BIPV2.KeySuffix,BIPV2_Build.mod_email.emailList,'BadValues','Scrubs',false,false);
 
- 
+  import BIPV2_QA_Tool;
 	// Merge Base SuperFile with Ingest SuperFile - queue up the results for DOT
   // for strata: ds_roll,xtab_types and the count fields(put into 1 dataset)
 	EXPORT fn_runIngest(
@@ -528,6 +528,7 @@ function
       ,doStats
       ,do_runingest_strata()
       ,BIPV2_Files.files_ingest.updateSuperFiles(f_ingest_out)
+      ,BIPV2_QA_Tool.mac_Ingest_Stats(workunit,pversion)
       ,copyempid2StorageThor_prepingestfile  
       ,copyempid2StorageThor_fathercommonbase
       // ,if(not wk_ut._constants.IsDev ,tools.Copy2_Storage_Thor(filename := f_ingest_in  ,pDeleteSourceFile  := true)) //copy prepingest file to storage thor after using it.

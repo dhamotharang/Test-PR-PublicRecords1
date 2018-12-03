@@ -1,4 +1,4 @@
-import tools,std,BIPV2_Files,wk_ut,bipv2_build,BIPV2_ProxID_mj6;
+﻿import tools,std,BIPV2_Files,wk_ut,bipv2_build,BIPV2_ProxID_mj6;
 //have to fix keys attribute too
 EXPORT _Proc_Iterate(
    piteration
@@ -11,7 +11,7 @@ EXPORT _Proc_Iterate(
 ) := 
 functionmacro
     
-  import tools,std,BIPV2_Files,wk_ut,bipv2_build,BIPV2_ProxID_mj6;
+  import tools,std,BIPV2_Files,wk_ut,bipv2_build,BIPV2_ProxID_mj6,BIPV2_QA_Tool;
   
   InFile            := pInfile;
   string siter      := piteration;
@@ -44,6 +44,7 @@ functionmacro
     ,BIPV2_ProxID_mj6._promote(combo,'wkhistory').new2qaMult
     ,BIPV2_ProxID_mj6._mac_Check_Samples(BIPV2_ProxID_mj6._files(combo).base.logical,'ProxMj6' + siter)
 		,constructTraceFiles
+    ,BIPV2_QA_Tool.mac_Iteration_Stats(workunit  ,proxid ,pversion  ,piteration  ,BIPV2_Proxid_mj6.Config.MatchThreshold ,'BIPV2_Proxid_mj6')
     ,BIPV2_Build.mod_email.SendSuccessEmail(msg := wk_ut.get_Errors(workunit),subProduct := wk_ut.get_jobname(workunit))
   );
 ENDmacro;
