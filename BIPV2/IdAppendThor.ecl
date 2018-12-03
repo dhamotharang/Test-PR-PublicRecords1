@@ -85,7 +85,7 @@ export IdAppendThor(
 			resLocal := project(res0, transform(BIPV2.IdAppendLayouts.AppendWithRecsOutput, self := left, self := []));	
 			res := resRemote;
 		#ELSE
-			res := resRemote
+			res := resRemote;
 		#END
 
 		return if(scoreThreshold > 50 or not reAppend or allowInvalidResults,
