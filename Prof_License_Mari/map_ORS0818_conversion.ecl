@@ -155,7 +155,9 @@ Prof_License_Mari.layouts.base 		xformToCommon(Prof_License_Mari.layout_ORS0818.
 		ConcatNAME_FULL 			:= 	StringLib.StringCleanSpaces(LastName +' '+FirstName);	
 		
 	 tmpNameOrg			   := 	IF(SELF.TYPE_CD = 'MD',TRIM(LastName,LEFT,RIGHT)+' '+TRIM(FirstName,LEFT,RIGHT)
-													        	    	,Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(TrimNAME_ORG));  //business name with standard corp abbr.
+													        	,IF(SELF.TYPE_CD = 'GR' and TrimNAME_ORG = '' and TrimNAME_OFFICE!='' 
+																		 ,Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(TrimNAME_OFFICE)
+																		 ,Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(TrimNAME_ORG)));  //business name with standard corp abbr.
 	                           
 	 getCorpOnly			  :=  IF(REGEXFIND(DBA_Ind, tmpNameOrg),Prof_License_Mari.mod_clean_name_addr.GetCorpName(tmpNameOrg)
 											              ,StringLib.StringFindReplace(tmpNameOrg,'/',' '));		 //get names without DBA prefix

@@ -1693,5 +1693,6 @@ EXPORT dsSourceCriteria := DATASET([
 {'Vessels - EC (CFSP) 2018/1657 Democratic People\'s Republic of Korea List Prohibited Entry into Ports','1679'},
 {'Vessels - EC (CFSP) 2018/1657 Democratic People\'s Republic of Korea List Subject to Asset Freeze','1680'},
 {'Vessels - EC 2018/1654 Democratic People\'s Republic of Korea List Prohibited Entry into Ports','1681'},
-{'Vessels - EC 2018/1654 Democratic People\'s Republic of Korea List Subject to Seizure','1682'}
+{'Vessels - EC 2018/1654 Democratic People\'s Republic of Korea List Subject to Seizure','1682'},
+{'EC 2018/1809 ISIL (Da\'esh) and Al-Qaida List','1683'}
 ],r);
