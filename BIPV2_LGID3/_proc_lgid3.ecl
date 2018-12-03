@@ -1,4 +1,4 @@
-﻿import BIPV2_Files, BIPV2, MDR, BIPV2_LGID3,ut,bipv2_build,wk_ut,tools,std,BIPV2_Tools,mdr,SALTTOOLS22;  
+import BIPV2_Files, BIPV2, MDR, BIPV2_LGID3,ut,bipv2_build,wk_ut,tools,std,BIPV2_Tools,mdr,SALTTOOLS22;  
 // Init receives a file in common layout, and narrows it for use in all iterations. We widen
 // back to the common layout before promoting it to the base/father/grandfather superfiles.
 l_common  := BIPV2.CommonBase.Layout;
@@ -269,8 +269,6 @@ EXPORT DATASET(l_common) postProcess(DATASET(l_base) ds, DATASET(l_common) ds_co
 	shared specBuild := specMod.Build;
 	shared specDebug := parallel(OUTPUT(specMod.Specificities,NAMED('Specificities')),OUTPUT(specMod.SpcShift,NAMED('SpcShift'))
                       ,SALTTOOLS22.mac_Patch_SPC(SpecMod.Specificities,'BIPV2_LGID3._SPC',input,,false));
-<<<<<<< HEAD
-  
   /* ---------------------- SALT Iteration ----------------------------- */
   shared possibleMatches := output(BIPV2_LGID3.matches(input).PossibleMatches,,f_hist(iter),overwrite,compressed);
   shared saltMod  := BIPV2_LGID3.Proc_Iterate(iter, input, f_out(''));
@@ -287,21 +285,6 @@ EXPORT DATASET(l_common) postProcess(DATASET(l_base) ds, DATASET(l_common) ds_co
   
 
   export updateSuperfiles(string fname=f_out(iter), dataset(l_common) ds_common=ds_hrchy) := 
-=======
-	
-	/* ---------------------- SALT Iteration ----------------------------- */
-	shared possibleMatches := output(BIPV2_LGID3.matches(input).PossibleMatches,,f_hist(iter),overwrite,compressed);
-	shared saltMod 	:= BIPV2_LGID3.Proc_Iterate(iter, input, f_out(''));
-	shared linking	:= parallel(saltmod.DoAllAgain, possibleMatches);
-	
-	/* ---------------------- SALT Output -------------------------------- */
-	shared updateBuilding(string fname=f_out(iter)) := BIPv2_Files.files_lgid3.updateBuilding(fname);
-	shared before_restore_ds := dataset(f_out(iter),l_base,thor);
-	shared restoredDs :=postProcess(before_restore_ds,ds_hrchy);
-	shared the_stat_ds :=BIPV2_Strata.PersistenceStats(restoredDs,BIPV2.CommonBase.DS_BASE,rcid,lgid3);
-	
-	export updateSuperfiles(string fname=f_out(iter), dataset(l_common) ds_common=ds_hrchy) := 
->>>>>>> e01f8279b7d44ec37ee2150a8fd72204efea55f7
   function
   
     kick_copy2_storage_thor_post  := BIPV2_Tools.Copy2_Storage_Thor(fname  ,pversion ,'lgid3_postprocess');
@@ -311,13 +294,9 @@ EXPORT DATASET(l_common) postProcess(DATASET(l_base) ds, DATASET(l_common) ds_co
        output(restoredDs,,                                        fname+'_post', compressed, overwrite)
       ,BIPV2_LGID3._ManageLgid3Indexes(before_restore_ds , restoredDs, pversion).out //added for data retrieve
       ,BIPv2_Files.files_lgid3.updateSuperfiles(fname+'_post')
-<<<<<<< HEAD
       ,Strata.macf_CreateXMLStats(ds_lgid3_persistence_stats ,'BIPV2','Persistence'  ,BIPV2.KeySuffix,BIPV2_Build.mod_email.emailList,'LGID3','Stats',false,false) //group on cluster_type, stat_desc
       ,QA_Tool_lgid3_persistence_record_stats 
       ,QA_Tool_lgid3_persistence_cluster_stats
-=======
-      ,Strata.macf_CreateXMLStats(the_stat_ds ,'BIPV2','Persistence'	,BIPV2.KeySuffix,BIPV2_Build.mod_email.emailList,'LGID3','Stats',false,false) //group on cluster_type, stat_desc
->>>>>>> e01f8279b7d44ec37ee2150a8fd72204efea55f7
       ,copy2StorageThor_post
       // ,if(not wk_ut._constants.IsDev ,tools.Copy2_Storage_Thor(filename := fname  ,pDeleteSourceFile  := true))  //copy orig file to storage thor
     );
@@ -346,7 +325,6 @@ EXPORT DATASET(l_common) postProcess(DATASET(l_base) ds, DATASET(l_common) ds_co
   ds_lgid3_rcids  := join(ds_lgid3  ,ds_commonbase_rcids  ,left.rcid = right.rcid ,transform(left)  ,lookup);
   ds_agg_LNK197_lgids := join(ds_lgid3  ,table(ds_lgid3_rcids,{lgid3},lgid3,merge)  ,left.lgid3 = right.lgid3 ,transform(left)  ,lookup);
   export output_lnk_197  := output(BIPV2_LGID3._AggLgid3s(ds_agg_LNK197_lgids) ,named('ds_agg_LNK197_lgids'),all);
-<<<<<<< HEAD
 
   import BIPV2_QA_Tool;
   export lgid3_iteration_stats := BIPV2_QA_Tool.mac_Iteration_Stats(workunit  ,lgid3 ,pversion  ,iter  ,BIPV2_LGID3.Config.MatchThreshold ,'BIPV2_LGID3');
@@ -361,21 +339,9 @@ EXPORT DATASET(l_common) postProcess(DATASET(l_base) ds, DATASET(l_common) ds_co
   export MultIter(unsigned startIter, unsigned numIters) := 
       'BIPV2_LGID3 Controller ' + pversion + ' ' + (string)startiter + '-' + (string)(startiter + numiters - 1);
   export MultIter_run(startIter, numIters,doInit,doSpec,doIter = 'true',doPost = 'true',pversion = 'bipv2.KeySuffix',pcluster = 'BIPV2_Build._Constants().Groupname') := functionmacro
-=======
-  // -- Run Iteration
-	export runIter := sequential(linking,outputReviewSamples, updateBuilding(), updateLinkHist,BIPV2_LGID3._Lgid3Changes(iter,pversion, input).out,output_lnk_197)
-		: SUCCESS(bipv2_build.mod_email.SendSuccessEmail(,'BIPv2', , 'LGID3')),
-			FAILURE(bipv2_build.mod_email.SendFailureEmail(,'BIPv2', failmessage, 'LGID3'));
-	
-	export runSpecIter := sequential(specBuild,runIter);
-	
-	export MultIter(unsigned startIter, unsigned numIters) := 
-			'BIPV2_LGID3 Controller ' + pversion + ' ' + (string)startiter + '-' + (string)(startiter + numiters - 1);
-  export MultIter_run(startIter, numIters,doInit,doSpec,doIter = 'true',doPost = 'true',pversion = 'bipv2.KeySuffix') := functionmacro
->>>>>>> e01f8279b7d44ec37ee2150a8fd72204efea55f7
     import wk_ut, tools,bipv2_build;
     pHint     := if(_Control.ThisEnvironment.name='Dataland','40'/*HACK*/,'20');
-    cluster		:= BIPV2_Build._Constants().Groupname;
+    cluster		:= pcluster;
     version		:= pversion;
     previter	:= (string)(startiter - 1);
     lastIter	:= (string)(startiter - 1 + numIters);
@@ -395,12 +361,7 @@ EXPORT DATASET(l_common) postProcess(DATASET(l_base) ds, DATASET(l_common) ds_co
       ,pOutputFilename   := '~bipv2_build::@version@_@iteration@::workunit_history::proc_lgid3.iterations'
       ,pOutputSuperfile  := '~bipv2_build::qa::workunit_history' 
       ,pSummaryFilename  := '~bipv2_build::@version@_@iteration@::summary_report::proc_lgid3.iterations'
-<<<<<<< HEAD
-      ,pSummarySuperfile := '~bipv2_build::qa::summary_report::proc_lgid3.iterations'   
-      // ,pForceSkip        := true                                              
-=======
       ,pSummarySuperfile := '~bipv2_build::qa::summary_report::proc_lgid3.iterations'                                                 
->>>>>>> e01f8279b7d44ec37ee2150a8fd72204efea55f7
     );
     kickPost	:= wk_ut.mac_ChainWuids(eclPost,1,1,version,,cluster,pOutputEcl := false,pUniqueOutput := 'LGID3Post',pNotifyEmails := BIPV2_Build.mod_email.emailList
       ,pOutputFilename   := '~bipv2_build::' + version + '::workunit_history::proc_lgid3.Post'
