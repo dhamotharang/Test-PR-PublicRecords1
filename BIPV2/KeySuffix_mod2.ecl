@@ -70,7 +70,8 @@ end;
 // export constant_ThisBuild_versionDate := '20181002'; // S63
 // export constant_ThisBuild_versionDate := '20181002a'; // S63a
 // export constant_ThisBuild_versionDate := '20181101'; // S64
-export constant_ThisBuild_versionDate := '20181101a'; // S64a
+// export constant_ThisBuild_versionDate := '20181101a'; // S64a
+export constant_ThisBuild_versionDate := '20181203'; // S65
 
 
 
@@ -149,6 +150,7 @@ dataset([
 ,{  63, 'a',  '20181002a',  '20181002', '', '',         '',         'Ingested S63 base  + no ingest/same data, start at proxid, BH-541, BH-439. BH-544 -- BIP Build 63a - October 2018'}
 ,{  64, '' ,  '20181101' ,  '20181101', '', '',         '',         'Ingested S63a base, BH-542, BH-503. BH-482 -- BIP Build 64 - November 2018'}
 ,{  64, 'a',  '20181101a',  '20181101', '', '',         '',         'Ingested S64 base, BH-354. BH-580 -- BIP Build 64a - November 2018'}
+,{  65, '' ,  '20181203',  '20181203', '', '',         '',         'Ingested S64a base, BH-520, BH-578,BH-584,BH-581. BH-483 -- BIP Build 65 - December 2018'}
 
 
 //						version,			ingest			ToThor			ToCertRox		ToProdRox		//these are not exact field names.  they just help w read and update.
