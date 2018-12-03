@@ -1,4 +1,4 @@
-﻿import ut;
+import ut;
 
 /*
 get them in the proper format
@@ -7,7 +7,7 @@ set to the other date if original value was set to 0
 set to 0 if the date precedes the min DOB -> header.fn_compare_dates_to_dob
 */
 
-export fn_fix_dates(dataset(recordof(header.layout_header)) in_hdr, boolean pFastHeader=false,string versionBuild = '') := function
+export fn_fix_dates(dataset(recordof(header.layout_header)) in_hdr, boolean pFastHeader=false,string versionBuild) := function
 
 today_in_ym := (unsigned3)if(pFastHeader,Header.Sourcedata_month.v_eq_as_of_date[1..6],versionBuild[1..6]);
 

@@ -1,33 +1,31 @@
-IMPORT HEADER , InsuranceHeader_xLink, mdr ,_Control,doxie, SALT37 ;
+import mdr,InsuranceHeader_xLink;
+export fn_incremental_payload := function
 
-EXPORT File_headers_inc_FCRA(dataset(header.layout_header) hdr) := FUNCTION
-
- Key := InsuranceHeader_xLink.Process_xIDL_Layouts().key; 
+Key := InsuranceHeader_xLink.Process_xIDL_Layouts().key; 
  
  KeyPayloadInc:= INDEX(Key,InsuranceHeader_xLink.KeyNames('INC').header_super);
- 
- layout_hdr_with_effective_dates := RECORD
-    {hdr};
- 	UNSIGNED4 DT_EFFECTIVE_FIRST, 
-	UNSIGNED4 DT_EFFECTIVE_LAST; 
-end;
 
- hr  := DISTRIBUTE(hdr(header.Blocked_data()), HASH(rid));
+ hr0 := header.File_header_raw_latest.File;
  
-// latest no incremental (LEFT ONLY)
-unmatchedOld := JOIN(hr,DISTRIBUTE(KeyPayloadInc(SRC[1..3]='ADL'),HASH(rid))
+ hr  := DISTRIBUTE(hr0(header.Blocked_data()), HASH(rid));
+ 
+ t:= { 
+  header.layout_header,
+ 	string1 valid_dob := '';
+	unsigned6 hhid := 0;
+	STRING18 county_name := '';
+	STRING120 listed_name := '';
+	STRING10 listed_phone := '';
+	unsigned4 dod := 0;
+	STRING1 death_code := '';
+	unsigned4 lookup_did := 0;
+	UNSIGNED4 DT_EFFECTIVE_FIRST, 
+	UNSIGNED4 DT_EFFECTIVE_LAST} ; 
+	
+ Incpayload := JOIN(hr,DISTRIBUTE(KeyPayloadInc(SRC[1..3]='ADL'),HASH(source_rid))
                                   ,LEFT.rid = RIGHT.source_rid AND 
                                    LEFT.src = RIGHT.src[4..5]
-                                  ,TRANSFORM ({hr}, SELF := LEFT)
-                                  ,LEFT ONLY
-                                  
-                                  , LOCAL);
-
-// latest incrementals and suppressions (inner) - transfer flags and setup effective dates
- MatchedOldToUpdate := JOIN(hr,DISTRIBUTE(KeyPayloadInc(SRC[1..3]='ADL'),HASH(rid))
-                                  ,LEFT.rid = RIGHT.rid AND 
-                                   LEFT.src = RIGHT.src[4..5]
-                                  ,TRANSFORM(layout_hdr_with_effective_dates,
+                                  ,TRANSFORM(t,
                                    SELF.did := RIGHT.did;
                                    SELF.jflag2 := RIGHT.ambiguous;		
                                    SELF.src := RIGHT.src[4..5];
@@ -76,17 +74,10 @@ unmatchedOld := JOIN(hr,DISTRIBUTE(KeyPayloadInc(SRC[1..3]='ADL'),HASH(rid))
                                    SELF.address_ind:=0;  
                                    SELF.name_ind:=0;  
                                    SELF.persistent_record_ID := 0,
-                                   
-                                   SELF.DT_EFFECTIVE_FIRST := RIGHT.DT_EFFECTIVE_FIRST,
-                                   SELF.DT_EFFECTIVE_LAST  := RIGHT.DT_EFFECTIVE_LAST,
-
+																	                  SELF.DT_EFFECTIVE_FIRST := RIGHT.DT_EFFECTIVE_FIRST,
+																	                  SELF.DT_EFFECTIVE_LAST  := RIGHT.DT_EFFECTIVE_LAST,
                                    ),local) ; 
 
-IncPayLoad := header.fn_incremental_payload(src<>'EN',src in mdr.sourceTools.set_scoring_FCRA,pflag3<>'I',pflag3<>'V');
+return Incpayload;
 
-suppressed := SALT37.MAC_DatasetAsOf(MatchedOldToUpdate, RID, DID,, DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST,, 'YYYYMMDD', TRUE);
- 
- all_fcra := unmatchedOld + project(suppressed,{{suppressed}-[DT_EFFECTIVE_FIRST,DT_EFFECTIVE_LAST] });
-
-return all_fcra;
-END;
+end;
