@@ -1,4 +1,4 @@
-import BIPV2_Files, BIPV2, MDR, BIPV2_POWID,wk_ut,tools,std, linkingtools;
+﻿import BIPV2_Files, BIPV2, MDR, BIPV2_POWID,wk_ut,tools,std, linkingtools;
 // Init receives a file in common layout, and widens it for use in all iterations. We thin
 // back to the common layout before promoting it to the base/father/grandfather superfiles.
 l_common := BIPV2.CommonBase.Layout;
@@ -77,10 +77,18 @@ export _proc_powid(
 	shared linking	:= parallel(saltmod.DoAllAgain/*, possibleMatches*/);
 	
 	/*-----------------------For Persistence stats of the powid cluster and records -------------*/
+  import BIPV2_QA_Tool;
   shared the_base:=	dataset(f_out(iter),l_base,thor);
 	shared the_father:=BIPV2.CommonBase.DS_BASE;
-	shared the_stat_ds :=BIPV2_Strata.PersistenceStats(the_base,the_father,rcid,powid);
-	shared sele_stat_ds:=BIPV2_Strata.PersistenceStats(ds_powid_down,the_father,rcid,seleid);   
+	shared ds_powid_persistence_stats   :=  BIPV2_Strata.PersistenceStats(the_base      ,the_father ,rcid,powid ) : independent;
+	shared ds_seleid_persistence_stats  :=  BIPV2_Strata.PersistenceStats(ds_powid_down ,the_father ,rcid,seleid) : independent;   
+
+	shared QA_Tool_powid_persistence_record_stats     := BIPV2_QA_Tool.mac_persistence_records_stats(ds_powid_persistence_stats ,'powid' ,Build_Date);
+  shared QA_Tool_powid_persistence_cluster_stats    := BIPV2_QA_Tool.mac_persistence_cluster_stats(ds_powid_persistence_stats ,'powid' ,Build_Date);
+
+	shared QA_Tool_seleid_persistence_record_stats     := BIPV2_QA_Tool.mac_persistence_records_stats(ds_seleid_persistence_stats ,'seleid' ,Build_Date);
+  shared QA_Tool_seleid_persistence_cluster_stats    := BIPV2_QA_Tool.mac_persistence_cluster_stats(ds_seleid_persistence_stats ,'seleid' ,Build_Date);
+  
 	/* ---------------------- SALT Output -------------------------------- */
 	shared updateBuilding(string fname=f_out(iter)) := _files_powid.updateBuilding(fname);
 	export updateSuperfiles(string fname=f_out(iter), DATASET(l_common) ds_common=ds_powid_down) := 
@@ -91,8 +99,12 @@ export _proc_powid(
   
     return sequential(
        output(postProcess(dataset(fname,l_base,thor),ds_common),, fname+'_post', compressed, overwrite)
-       ,Strata.macf_CreateXMLStats(the_stat_ds ,'BIPV2','Persistence'	,BIPV2.KeySuffix,BIPV2_Build.mod_email.emailList,'POWID','Stats',false,false) //group on cluster_type, stat_desc
-       ,Strata.macf_CreateXMLStats(sele_stat_ds ,'BIPV2','Persistence'	,BIPV2.KeySuffix,BIPV2_Build.mod_email.emailList,'SELEID','Stats',false,false) //group on cluster_type, stat_desc
+       ,Strata.macf_CreateXMLStats(ds_powid_persistence_stats  ,'BIPV2','Persistence'	,BIPV2.KeySuffix,BIPV2_Build.mod_email.emailList,'POWID' ,'Stats',false,false) //group on cluster_type, stat_desc
+       ,Strata.macf_CreateXMLStats(ds_seleid_persistence_stats ,'BIPV2','Persistence'	,BIPV2.KeySuffix,BIPV2_Build.mod_email.emailList,'SELEID','Stats',false,false) //group on cluster_type, stat_desc
+       ,QA_Tool_powid_persistence_record_stats 
+       ,QA_Tool_powid_persistence_cluster_stats
+       ,QA_Tool_seleid_persistence_record_stats 
+       ,QA_Tool_seleid_persistence_cluster_stats
        ,_files_powid.updateSuperfiles(fname+'_post')
       ,copy2StorageThor_post
       // ,if(not wk_ut._constants.IsDev ,tools.Copy2_Storage_Thor(filename := fname  ,pDeleteSourceFile  := true))  //copy orig file to storage thor
@@ -113,10 +125,14 @@ export _proc_powid(
     RETURN ds3;
   end;	
 	
+	/*-----------------------QA Tool Iteration Stats -------------*/
+  import BIPV2_QA_Tool;
+  export POWID_iteration_stats := BIPV2_QA_Tool.mac_Iteration_Stats(workunit  ,POWID ,Build_Date  ,iter  ,BIPV2_powid.Config.MatchThreshold ,'BIPV2_POWID');
+
 	/* ---------------------- Take Action -------------------------------- */
 	export runSpecBuild := sequential(specBuild, specDebug);
 	
-	export runIter := sequential(linking, outputReviewSamples, updateBuilding()/*, updateLinkHist*/)
+	export runIter := sequential(linking, outputReviewSamples, updateBuilding(),POWID_iteration_stats/*, updateLinkHist*/)
 		: SUCCESS(bipv2_build.mod_email.SendSuccessEmail(,'BIPv2', , 'POWID')),
 			FAILURE(bipv2_build.mod_email.SendFailureEmail(,'BIPv2', failmessage, 'POWID'));
 	

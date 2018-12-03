@@ -1,4 +1,4 @@
-/*
+﻿/*
   // -- example of a run
 EmpStartIteration  := 1   ;
 EmpNumIterations   := 1   ;
@@ -80,7 +80,11 @@ EXPORT _proc_empid_down(
 	/* ---------------------- Take Action -------------------------------- */
 	// export runSpecBuild := sequential(specBuild, specDebug);
 	
-	export runIter := sequential(linking, outputReviewSamples, updateBuilding()/*, updateLinkHist*/)
+	/*-----------------------QA Tool Iteration Stats -------------*/
+  import BIPV2_QA_Tool;
+  export Empid_Down_iteration_stats := BIPV2_QA_Tool.mac_Iteration_Stats(workunit  ,empid ,Build_Date  ,iter  ,BIPV2_Empid_down.Config.MatchThreshold ,'BIPV2_Empid_Down');
+
+	export runIter := sequential(linking, outputReviewSamples, updateBuilding(),Empid_Down_iteration_stats/*, updateLinkHist*/)
 		: SUCCESS(bipv2_build.mod_email.SendSuccessEmail(,'BIPv2', , 'EmpID_Down')),
 			FAILURE(bipv2_build.mod_email.SendFailureEmail(,'BIPv2', failmessage, 'EmpID_Down'));
 	
