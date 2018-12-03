@@ -1,10 +1,10 @@
 ﻿import header, did_add, ut, data_services;
 
-export stat(boolean incremental=FALSE, string filedate=header.version_build) := module
+export stat(boolean incremental=FALSE, string filedate=header.version_build, string operatorEmailList) := module
 
 		#stored ('buildname', 'PersonHeader'   ); 
 		#stored ('version'  , filedate); 
-		#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com'    ); 
+		#stored ('emailList', operatorEmailList  ); 
 
         NewHeaderFileN := STRINGLIB.STRINGFILTEROUT(header.File_Header_Raw_Flag[1].lfn, '~');
         NewHeaderFileI := 'thor_data400::base::header_raw_incremental';

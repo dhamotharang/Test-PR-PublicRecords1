@@ -1685,5 +1685,14 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2018/1605 Burundi List','1671'},
 {'Vessels - EC (CFSP) 2018/1613 Democratic People\'s Republic of Korea List Deflagged','1672'},
 {'Vessels - EC (CFSP) 2018/1613 Democratic People\'s Republic of Korea List Prohibited Entry into Ports','1673'},
-{'Vessels - EC 2018/1606 Democratic People\'s Republic of Korea List Prohibited Entry into Ports','1674'}
+{'Vessels - EC 2018/1606 Democratic People\'s Republic of Korea List Prohibited Entry into Ports','1674'},
+{'EC (CFSP) 2018/1656 Venezuela List','1675'},
+{'EC 2018/1653 Venezuela List','1676'},
+{'OFAC - Iran Freedom and Counter-Proliferation Act of 2012','1677'},
+{'Vessels - EC (CFSP) 2018/1657 Democratic People\'s Republic of Korea List Deflagged','1678'},
+{'Vessels - EC (CFSP) 2018/1657 Democratic People\'s Republic of Korea List Prohibited Entry into Ports','1679'},
+{'Vessels - EC (CFSP) 2018/1657 Democratic People\'s Republic of Korea List Subject to Asset Freeze','1680'},
+{'Vessels - EC 2018/1654 Democratic People\'s Republic of Korea List Prohibited Entry into Ports','1681'},
+{'Vessels - EC 2018/1654 Democratic People\'s Republic of Korea List Subject to Seizure','1682'},
+{'EC 2018/1809 ISIL (Da\'esh) and Al-Qaida List','1683'}
 ],r);

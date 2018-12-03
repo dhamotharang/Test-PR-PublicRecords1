@@ -1,4 +1,15 @@
-﻿/*  compiling
+﻿/*
+
+I send in the URL but as you mentioned it is never honored. Attribute in Alpha Prod: tools.mod_SubmitNewWorkunit
+Sample Alpha Dev call (compile): W20181127-102501 
+
+essentially I just define #CONSTANTS that the SubmitNewWorkunit is expecting. 
+#CONSTANT('WUIDbranch', 'DF-21523');
+#CONSTANT('WUIDurl', 'https://gitlab.ins.risk.regn.net/NewporTM/Alpha_Dev.git');
+
+
+
+  compiling
       only run iterations once
       don't need to get results from the iterations...(not sure)
       don't send options for rerunning/skip/failure or output them to the childrunner wuid

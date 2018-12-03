@@ -6,7 +6,7 @@ wuname := 'Create Raw Header Stats: '+ versionBuild;
 
 #WORKUNIT('priority','high');
 #WORKUNIT('name', wuname);
-#OPTION('AllowedClusters','thor400_66 ,thor400_44');
+#OPTION('AllowedClusters','thor400_36 ,thor400_44');
 
 statsEmailRecepients:=
 
@@ -60,6 +60,8 @@ sequential(dlog,run_stats(incremental,header.version_build,operatorEmailList));
 // whether a new header_raw needs to be copyed to Alpharetta
 // Estimated THOR time: 20Min
 
-// 20180526 W20180702-091910
+// 20181023 W20181029-101350
+// 20180724 W20180827-115225
+// 20180626 W20180702-091910
 // 20180423 
 // 20180320 http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180321-123412#/stub/Summary

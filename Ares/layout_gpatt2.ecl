@@ -1,0 +1,21 @@
+﻿EXPORT layout_gpatt2 := Record
+	STRING1 Update_Flag := '';
+	STRING8 Primary_Key := '';
+	STRING6 Routing_Type := '';
+	STRING20 Routing_Code := '';
+	STRING20 Routing_Code_Alternate_Presentation := '';
+	STRING20 Override_Routing_Code := '';
+	STRING20 Override_Routing_Code_Alternate_Presentation := '';
+	STRING20 Clearing_System := '';
+	STRING17 Membership_Type := '';
+	STRING6 Routing_Type_Additional_Information := '';
+	STRING1 Routing_Code_Status := '';
+	STRING1 ACH_Flag := '';
+	STRING1 Fedwire_Funds_Status := '';
+	STRING1 Fedwire_Securities_Status := '';
+	STRING1 Wire_Transaction_Code := '';
+	STRING10 Attribute_Effective_Date := '';
+	STRING10 Attribute_Deactivation_Date := '';
+	STRING35 Filler := '';
+	String2 crlf := '\r\n'; 
+End;

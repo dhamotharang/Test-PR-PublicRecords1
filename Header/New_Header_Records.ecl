@@ -139,7 +139,7 @@ concat0 := if(~pFastHeader,
 		 + Experian_in
 		 + Exprn_ph_in
 		 + AlloyMedia_in
-		 + dataset('~thor_data::asheader::cd_seed_20180313',Header.Layout_New_Records,flat),
+		 + dataset('~thor_data::asheader::cd_seed',Header.Layout_New_Records,flat),
 		 
 		 dl_in
 		 + ba_in
