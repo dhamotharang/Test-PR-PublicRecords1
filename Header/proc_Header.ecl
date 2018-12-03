@@ -51,7 +51,7 @@ export proc_header(string operatorEmailList, string extraNotifyEmailList) := mod
             header.LogBuild.single('Started :'+step)
             ,if(Header.version_build<>fn[sub..sub+7],fail('Header_raw does not match version'))
             ,Header.build_header_raw_syncd
-            ,header.Proc_SetTNT
+            ,header.Proc_SetTNT(version_build)
             ,header.Proc_Regression_Test
             ,header.Proc_BuildStats
             ,Strata.modOrbitAdaptersForPersonHdrBld.fnGetCrossSourceAction(dataset(workunit('STATS'),ut.layout_stats_extend), Header.version_build)
