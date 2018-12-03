@@ -31,6 +31,7 @@ export Proc_Build_All(string filedate, string version) := function
 
 	//Update ORBIT MAG
 	// Changed from CreateBuild to use CreateBuild_AddItem so that it adds the item at build time
+	// Changed to use the version date instead of filedate so that both dops and orbit use the same version - 12/3/2018
 	orbitUpdate := Orbit3.proc_Orbit3_CreateBuild_AddItem('OSHAIR',version,'N|B');
 	return sequential(process_date, 
 										spray_files,
