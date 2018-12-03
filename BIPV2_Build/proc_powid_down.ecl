@@ -1,4 +1,4 @@
-IMPORT BIPV2_Files, BIPV2, BIPv2_powid_down,wk_ut,tools,std;
+﻿IMPORT BIPV2_Files, BIPV2, BIPv2_powid_down,wk_ut,tools,std;
 l_base := BIPV2.CommonBase.Layout;
 EXPORT proc_powid_down(
 	DATASET(l_base) input = DATASET([],l_base),
@@ -63,7 +63,11 @@ EXPORT proc_powid_down(
 	/* ---------------------- Take Action -------------------------------- */
 	export runSpecBuild := sequential(specBuild, specDebug);
 	
-	export runIter := sequential(linking, outputReviewSamples, updateBuilding(), updateLinkHist)
+	/*-----------------------QA Tool Iteration Stats -------------*/
+  import BIPV2_QA_Tool;
+  export POWID_Down_iteration_stats := BIPV2_QA_Tool.mac_Iteration_Stats(workunit  ,POWID ,bipv2.KeySuffix  ,iter  ,BIPV2_powid_down.Config.MatchThreshold ,'BIPV2_POWID_Down');
+
+	export runIter := sequential(linking, outputReviewSamples, updateBuilding(), updateLinkHist,POWID_Down_iteration_stats)
 		: SUCCESS(mod_email.SendSuccessEmail(,'BIPv2', , 'POWID_Down')),
 			FAILURE(mod_email.SendFailureEmail(,'BIPv2', failmessage, 'POWID_Down'));
 	

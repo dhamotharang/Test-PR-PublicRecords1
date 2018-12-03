@@ -1,4 +1,4 @@
-IMPORT lib_thorlib,RoxieKeyBuild; 
+﻿IMPORT lib_thorlib,RoxieKeyBuild; 
 EXPORT Proc_build_candidates (DATASET(Layouts.Inrec) datasetSuppression, STRING Version) := FUNCTION
 
 		oldData := IF(nothor(FileServices.FileExists(FileNames.Baseseleprox)), 
@@ -12,8 +12,7 @@ EXPORT Proc_build_candidates (DATASET(Layouts.Inrec) datasetSuppression, STRING 
 																 self := left, 
 																 self := []));
 																 
-		AllData   := DEDUP(oldData + newData,seleid,proxid,ALL) ;
-    
+    AllData   := DEDUP(oldData (seleid <> 6962180 ) /*+ newData*/,seleid,proxid,ALL) ;    
     Build_base :=  OUTPUT(AllData,,FileNames.BaseLogicalF(Version), overwrite) ; 
     Update_base := CreateUpdateSuperFile.updateSuperFile(FileNames.Baseseleprox,	FileNames.Baseseleproxfather,FileNames.BaseLogicalF(Version));
 		
