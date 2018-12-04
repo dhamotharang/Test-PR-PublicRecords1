@@ -13,7 +13,7 @@ function
 
   ds_convert := project(pWk_ut_files  ,transform(layouts.wks_slim
     ,self.Build_name  := regexfind('^.*::(.*)$',left.__filename,1)
-    ,self.owner       := WsDFU.GetOwner(left.__filename,left.esp)
+    ,self.owner       := WsDFU.GetOwner(left.__filename,if(trim(left.esp) = ''  ,WsDFU._Config.LocalEsp ,left.esp))
     ,self             := left
     ,self             := []
   ));

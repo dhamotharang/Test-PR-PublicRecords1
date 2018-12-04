@@ -73,13 +73,17 @@ export build_hrchy(
     
     shared doQAPromotion := if(pPromote2qa = true  ,lpromote2QA);
     
-    /* ---------------------- Strata Quick ID Check --------------------------------*/
-    import BIPV2_Strata,strata,linkingtools;
+    import BIPV2_Strata,strata,linkingtools,BIPV2_QA_Tool;
 
-    shared the_stat_ds :=BIPV2_Strata.PersistenceStats(BIPV2_Files.files_proxid().DS_PROXID_BUILT, BIPV2.CommonBase.DS_BASE,rcid,proxid);
-  
+    /* ---------------------- Proxid Persistence Stats --------------------------------*/
+    shared ds_proxid_persistence_stats                := BIPV2_Strata.PersistenceStats(BIPV2_Files.files_proxid().DS_PROXID_BUILT, BIPV2.CommonBase.DS_BASE,rcid,proxid) : independent;
+    shared QA_Tool_Proxid_persistence_record_stats    := BIPV2_QA_Tool.mac_persistence_records_stats(ds_proxid_persistence_stats ,'Proxid' ,pversion);
+    shared QA_Tool_Proxid_persistence_cluster_stats   := BIPV2_QA_Tool.mac_persistence_cluster_stats(ds_proxid_persistence_stats ,'Proxid' ,pversion);
+
+    /* ---------------------- Strata Quick ID Check --------------------------------*/
     export dostrata_ID_Check(boolean pIsTesting = false) := BIPV2_Strata.mac_BIP_ID_Check(head1,'Hrchy','Infile',pversion,pIsTesting);
     
+    /* ---------------------- Copy Intermediate file to Storage Thor --------------------------------*/
     export kick_copy2_storage_thor := BIPV2_Tools.Copy2_Storage_Thor('~' + nothor(std.file.superfilecontents(headstring)[1].name),pversion,'Build_hrchy');
 
     export runIter := 
@@ -88,7 +92,9 @@ export build_hrchy(
           BIPV2_Proxid._TraceBackKeys(pversion).out
          ,output('finished proxid key and super files')
          ,dostrata_ID_Check()
-         ,Strata.macf_CreateXMLStats(the_stat_ds ,'BIPV2','Persistence' ,BIPV2.KeySuffix,BIPV2_Build.mod_email.emailList,'PROXID','Stats',false,false) //group on cluster_type, stat_desc
+         ,Strata.macf_CreateXMLStats(ds_proxid_persistence_stats ,'BIPV2','Persistence' ,BIPV2.KeySuffix,BIPV2_Build.mod_email.emailList,'PROXID','Stats',false,false) //group on cluster_type, stat_desc
+         ,QA_Tool_Proxid_persistence_record_stats 
+         ,QA_Tool_Proxid_persistence_cluster_stats
          ,output('finished strata')
       ))
       ,parallel(DoBuild, DoStats)

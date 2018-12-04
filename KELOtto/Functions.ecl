@@ -15,10 +15,10 @@
 
 	EXPORT CalculatePercentile(InDs, Grouping, Val, PercentileRankColumnName, QuartileRank) := FUNCTIONMACRO
 		//LOCAL t1 := TABLE(InDs, #EXPAND('{, ' + Grouping + ', INTEGER cnt := count(group)}'), #EXPAND(Grouping), MERGE);
-    LOCAL Me := PROJECT(InDS, TRANSFORM({RECORDOF(LEFT), STRING HashID}, SELF.HashID := #EXPAND('LEFT.' + REGEXREPLACE(',', Grouping, ' + \'|\' + LEFT.')), SELF := LEFT));
+    LOCAL Me := DISTRIBUTE(PROJECT(InDS, TRANSFORM({RECORDOF(LEFT), STRING HashID}, SELF.HashID := #EXPAND('LEFT.' + REGEXREPLACE(',', Grouping, ' + \'|\' + LEFT.')), SELF := LEFT)), HASH32(HashId));
 		LOCAL t1 := TABLE(Me, {HashID, Val, INTEGER cnt := count(group)}, HashID, Val, MERGE);
     LOCAL TotalCandidates := TABLE(Me, {HashID, INTEGER TotalCandidates := count(group)}, HashID, MERGE);
-    LOCAL t2 := JOIN(t1, TotalCandidates, LEFT.HashID=RIGHT.HashID, HASH);   
+    LOCAL t2 := JOIN(t1, TotalCandidates, LEFT.HashID=RIGHT.HashID, LOCAL);   
     
 		LOCAL ResType := RECORD
 			RECORDOF(t2);
@@ -34,9 +34,9 @@
 			SELF := R;
 		END;
 		
-		LOCAL i1 := UNGROUP(ITERATE(PROJECT(GROUP(SORT(t2,HashID, Val, RECORD), HashID), TRANSFORM(ResType, self := LEFT, self := [])), T(LEFT,RIGHT)));
+		LOCAL i1 := UNGROUP(ITERATE(PROJECT(GROUP(SORT(t2,HashID, Val, RECORD), HashID, LOCAL), TRANSFORM(ResType, self := LEFT, self := [])), T(LEFT,RIGHT)));
     
-		LOCAL Final := JOIN(Me, i1, LEFT.HashID=RIGHT.HashID AND LEFT.Val=RIGHT.Val, TRANSFORM({RECORDOF(LEFT), #EXPAND('RIGHT.' + PercentileRankColumnName), #EXPAND('RIGHT.' +QuartileRank)}, self := LEFT, self := RIGHT), HASH);
+		LOCAL Final := JOIN(Me, i1, LEFT.HashID=RIGHT.HashID AND LEFT.Val=RIGHT.Val, TRANSFORM({RECORDOF(LEFT), #EXPAND('RIGHT.' + PercentileRankColumnName), #EXPAND('RIGHT.' +QuartileRank)}, self := LEFT, self := RIGHT), LOCAL);
 		RETURN Final;
     
 	ENDMACRO;
