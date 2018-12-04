@@ -1,5 +1,5 @@
 ﻿import ut,Orbit3,_Control;
-export Proc_Orbit3_CreateBuild_sp(string buildname,string Buildvs,string Envmt = 'N', boolean skipcreatebuild = false,boolean skipupdatebuild = false,boolean runcreatebuild = true) := function
+export Proc_Orbit3_CreateBuild_sp(string buildname,string Buildvs,string Envmt = 'N', string email_list = '',boolean skipcreatebuild = false,boolean skipupdatebuild = false,boolean runcreatebuild = true) := function
 
 	tokenval := orbit3.GetToken();
 
@@ -26,7 +26,7 @@ sendemail(string keyword = '',string status = '') := function
 												 'N/A'
 												 );
 	   	 emailtoall :=  fileservices.sendemail(
-												_Control.MyInfo.EmailAddressNotify +'; sudhir.kasavajjala@lexisnexis.com',
+												Send_Email(Buildvs,email_list).emaillist,
 												' Orbit for Build : '+buildname+',version: '+Buildvs+',Env : '+Orbit3.Constants(Envmt).which_env,
 												'BuildName:'+buildname+'\n'+
 												'---------------------'+'\n'+
