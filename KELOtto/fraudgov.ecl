@@ -1,4 +1,6 @@
-﻿source := RECORD
+﻿IMPORT Std;
+
+source := RECORD
    unsigned2 source_type_id;
    string25 source_type;
    unsigned2 primary_source_entity_id;
@@ -359,7 +361,10 @@ fraudgov_dataset_base := PROJECT(fraudgov_dataset_base_prep,
 											 SELF := LEFT));
 
 // trim the data down for R&D speed.
-fraudgov_dataset := fraudgov_dataset_base((UNSIGNED)event_date < 20180407);// and did % 100 in [0] OR did = 899999999550 or ssn = '294287743' or event_type_1 = '10000' or bank_account_number_1 != '' or drivers_license != '');
+
+Set_did:=[1488418290,8389852385,1921409109,2435345412,1834342568,1589581232];
+
+fraudgov_dataset := fraudgov_dataset_base((UNSIGNED)event_date <= Std.Date.Today());// and (did % 10 in [0] OR did = 899999999550 or ssn = '294287743' or event_type_1 = '10000' or bank_account_number_1 != '' or drivers_license != '' or did in set_did));
 
 
 // Lets FAKE SOME CUSTOMERS!!!!!
