@@ -101,7 +101,9 @@ Person := ENTITY(FLAT(UID(AssociatedCustomerFileInfo, LexId),
     STRING state_death_id,
     
     STRING curr_incar_flag,
-    STRING off_cat_list
+    STRING off_cat_list,
+    INTEGER name_ssn_dob_match
+    
     
     ),
 	MODEL(UID,
@@ -174,8 +176,11 @@ Person := ENTITY(FLAT(UID(AssociatedCustomerFileInfo, LexId),
     v2_inputaddrageoldest,
     v2_inputaddrdwelltype,
 		v2_divssnidentitycountnew,
+    
     curr_incar_flag,
+    name_ssn_dob_match,
     Offenses {off_cat_list}
+    
     ));	
 
 Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id), 
@@ -844,6 +849,7 @@ USE KELOtto.PersonCrim(FLAT,
     LexId = did
     ));
 
+
 USE KELOtto.AddressPersonAssociations.PersonAddressMatchStats(FLAT,
   PersonPerson);
 
@@ -867,7 +873,8 @@ Event: => KrHighRiskIdentityFlag := MAP(COUNT(EventTypes(EventType IN ['10000','
 Event: => KrMediumRiskIdentityFlag := MAP(COUNT(EventTypes(EventType IN ['10003','14001']))>0 => 1, 0);
 Event: => KrHighRiskAddressFlag := MAP(COUNT(EventTypes(EventType IN ['301','302']))>0 => 1, 0);
 Event: => KrMediumRiskAddressFlag := MAP(COUNT(EventTypes(EventType IN ['300']))>0 => 1, 0);
-Event: => Age := DAYSBETWEEN(EventDate, DATEFROMPARTS(2018, 4, 7));
+Event: => DemoCustomer := rCustomer.CustomerId IN ['248283691','248283681','248283671'];
+Event: => Age := IF(DemoCustomer, DAYSBETWEEN(EventDate, DATEFROMPARTS(2018, 4, 7)), DAYSBETWEEN(EventDate, rCustomer.EventDateMax));
 Event: => Hri03Flag := MAP(COUNT(HriList(CONTAINS(Hri,'03'))) > 0 => 1, 0);
 Event: => Hri06Flag := MAP(COUNT(HriList(CONTAINS(Hri,'06'))) > 0 => 1, 0);
 Event: => Hri07Flag := MAP(COUNT(HriList(CONTAINS(Hri,'07'))) > 0 => 1, 0);
@@ -956,8 +963,11 @@ Person: => DeceasedDobMatch := MAP(COUNT(ReportedDateOfBirth(DeceasedDateOfBirth
 Person: => DeceasedMatch := MAP(Deceased=1 AND DeceasedNameMatch=1 AND DeceasedDobMatch=1 => 1, 0);
 Person: => DeceasedMatchDescription := MAP(DeceasedMatch=1 => 'Full Matched Deceased Identity', '');
 
-Person: => CurrentlyIncarceratedFlag := MAP(curr_incar_flag='Y' =>1, 0);
-Person: => FraudOffensesFlag := MAP(COUNT(Offenses(CONTAINS(off_cat_list,'FRAUD'))) > 0 => 1, 0);
+Person: => CurrentlyIncarceratedFlag := MAP(name_ssn_dob_match = 1 AND curr_incar_flag='Y' => 1, 0);
+Person: => FraudOffenseCount := COUNT(Offenses(CONTAINS(off_cat_list,'FRAUD')));
+Person: => FraudOffensesFlag := MAP(name_ssn_dob_match = 1 AND FraudOffenseCount > 0 => 1, 0);
+Person: => AssociatedWithIncarceratedFlag := MAP(name_ssn_dob_match = 0 AND curr_incar_flag='Y' => 1, 0);
+Person: => AssociatedWithFraudOffensesFlag := MAP(name_ssn_dob_match = 0 AND FraudOffenseCount > 0 => 1, 0);
 
 // NOTE: This is "best" from the contributed not Best Best.
 Person: => BestFullName := ONLY(TOPN(FullName(NOT FirstName:Null AND NOT LastName:Null), 1, FirstName, LastName));
@@ -1589,6 +1599,8 @@ QUERY: showCustomerPersonEntities <= Person
 
                               CurrentlyIncarceratedFlag,
                               FraudOffensesFlag,
+                              AssociatedWithIncarceratedFlag,
+                              AssociatedWithFraudOffensesFlag,
                               
                               DeceasedMatch,
                               DeathPriorToAllEvents,
@@ -1841,7 +1853,9 @@ QUERY: showCustomerDriversLicenseEntities <= DriversLicense
 															ClElementCount,
                               ClIdentityCountPercentile,
                               ClEventCountPercentile,
-                              ClImpactWeight
+                              ClImpactWeight,
+                              
+                              LicenseState := State
 /*
                               KrHighRiskFlag,
                               KrMediumRiskFlag,
