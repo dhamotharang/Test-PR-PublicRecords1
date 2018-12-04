@@ -13,6 +13,7 @@ module
 				,boolean	pDelete				      = false
         ,boolean  pIncludeBuiltDelete = false
         ,string   pFilter             = ''
+				,boolean	pForceGenPromotion	= false
 			) :=
 			function
 				pversions			:= Tools.mod_FilenamesBuild(pTemplateName);
@@ -34,8 +35,8 @@ module
 						
 						if(	Tools.mod_Utilities.compare_supers(pVersions.Father, pVersions.Built) or
 							Tools.mod_Utilities.compare_supers(pVersions.Father, pVersions.Qa) or
-							Tools.mod_Utilities.compare_supers(pVersions.Father, pVersions.Prod),
-								parallel(
+						 (Tools.mod_Utilities.compare_supers(pVersions.Father, pVersions.Prod) and pForceGenPromotion = false),								
+						   parallel(
 									 loutput('_fVersionIntegrityCheck(): ' + pVersions.Father + ' superfile = built, qa or prod, clearing Father')
 									,fileservices.clearsuperfile(pVersions.Father)
 								)

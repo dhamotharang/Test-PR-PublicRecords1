@@ -57,16 +57,9 @@ The following steps to update the BH build process.
 
 	Open the below code in the builder window and just update the build version date value and kick off the build.
 
-	PRTE2_Business_Header.BWR_Build_All
+	PRTE2_Business_Header.BWR_Build_Legacy_BIP_All
 
-************
-* Step 3:-
-************
-	When the build starts running, kick off the PRCT BIPV2 Business header build process too with the same version date, since the BIP Business Header build also uses the same input files.
-
-	PRTE2_BIPV2_BusHeader.BWR_Build_All
-
-	When the builds completes it will build all the Business Header base files and keys needed for the prct roxie package files. 
+	When the builds completes it will build all the (Legacy & BIP) Business Header related base files and keys needed for the prct roxie package files. 
 
 ************
 * Step 4:-
@@ -79,7 +72,6 @@ The following steps to update the BH build process.
 
 	PRCT roxie package files:- 
 	1)BusinessHeaderKeys   (PRTE Business Header build)
-
 	2)BIPV2FullKeys				 (PRTE BIPV2 Business Header Build)
 	3)BIPV2WeeklyKeys			 (PRTE BIPV2 Business Header Build)
 	

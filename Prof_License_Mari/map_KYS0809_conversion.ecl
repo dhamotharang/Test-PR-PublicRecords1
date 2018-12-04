@@ -1,4 +1,4 @@
-//************************************************************************************************************* */	
+﻿//************************************************************************************************************* */	
 //  The purpose of this development is take KY Appraisers License raw files and convert them to a common
 //  professional license (MARIFLAT_out) layout to be used for MARI and PL_BASE development.
 //************************************************************************************************************* */	
@@ -10,7 +10,7 @@ EXPORT map_KYS0809_conversion(STRING pVersion) := FUNCTION
 	src_cd									:= code[3..7];
 	src_st									:= code[1..2];	//License state
 	mari_dest								:= '~thor_data400::in::proflic_mari::';	
-	#workunit('name','Prof License MARI- '+code);
+	#workunit('name','Yogurt: Prof License MARI- '+code);
 	AddrExceptions := '(DRIVE|CENTER|BUILDING)';
 	Valid_License_Type := ['CG','CR','SL','SR'];
 	//Credentials

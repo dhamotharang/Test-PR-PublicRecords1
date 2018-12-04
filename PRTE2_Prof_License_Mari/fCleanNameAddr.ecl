@@ -5,36 +5,42 @@ PRTE2.CleanFields(dsBaseFile, dsBaseFile2);
 
 
 dsBaseFile3:=project(dsBaseFile2,
-Transform(layouts.search_work,
+Transform(layouts.search,
 
 SELF.Append_BusAddrFirst:= left.ADDR_ADDR1_1 + ' ' + left.ADDR_ADDR2_1;	
-SELF.Append_BusAddressFirst:= left.ADDR_ADDR1_1 + ' ' + left.ADDR_ADDR2_1;	
 																													 
 SELF.Append_BusAddrLast:=	left.ADDR_CITY_1 + IF(left.ADDR_CITY_1 <> '',', ','') + left.ADDR_STATE_1 
 																											 + ' ' + left.ADDR_ZIP5_1;
-SELF.Append_BusAddressLast:=	left.ADDR_CITY_1 + IF(left.ADDR_CITY_1 <> '',', ','') + left.ADDR_STATE_1 
-																											 + ' ' + left.ADDR_ZIP5_1;
-																											 
+	
+	
+self.ADDR_CITY_1 :=	TRIM(left.ADDR_CITY_1,LEFT,RIGHT);
+self.ADDR_STATE_1 :=TRIM(left.ADDR_STATE_1,Left,right);
+self.ADDR_zip5_1 :=TRIM(left.ADDR_zip5_1,Left,right);
+ 
 												 
 Self.Append_MailAddrFirst:= left.ADDR_ADDR1_2 + ' ' + left.ADDR_ADDR2_2;	
-Self.Append_MailAddressFirst:= left.ADDR_ADDR1_2 + ' ' + left.ADDR_ADDR2_2;	
 
 SElf.Append_MailAddrLast :=	left.ADDR_CITY_2 + IF(left.ADDR_CITY_2 <> '',', ','') + left.ADDR_STATE_2 
 																															 + ' ' + left.ADDR_ZIP5_2;	
-SElf.Append_MailAddressLast :=	left.ADDR_CITY_2 + IF(left.ADDR_CITY_2 <> '',', ','') + left.ADDR_STATE_2 
-																															 + ' ' + left.ADDR_ZIP5_2;					 
+
+self.ADDR_CITY_2 :=	TRIM(left.ADDR_CITY_2,LEFT,RIGHT);
+self.ADDR_STATE_2 :=TRIM(left.ADDR_STATE_2,Left,right);
+self.ADDR_zip5_2 :=TRIM(left.ADDR_zip5_2,Left,right);																												 
 self:=Left;	
 self:=[];
-));
+));																												 
+
 
 dsBaseFile4 := PRTE2.AddressCleaner(dsBaseFile3,  
- ['Append_BusAddressFirst', 'Append_MailAddressFirst'],
- ['Append_BusAddressLast', 'Append_MailAddressLast'],
- [],
- [],
- [],
- ['BusAddress', 'MailAddress'],
- ['BusAddress_rawaid', 'MailAddress_rawaid']);
+																				['Append_BusAddrFirst','Append_MailAddrFirst'],
+																				['dummy','dummy2'], //blank field, not used but passed for attribute purposes
+																				['ADDR_CITY_1','ADDR_City_2'],
+																				['ADDR_STATE_1','ADDR_STATE_2'],
+																				['ADDR_ZIP5_1','ADDR_ZIP5_2'],
+																				['BusAddress','MailAddress'],
+																				['BusAddress_rawaid','MailAddress_rawaid']
+																				);
+
 
 DS_out	:=	Project(dsBaseFile4,
 Transform(recordof(dsBaseFile4),
@@ -47,8 +53,8 @@ SELF.NAME_SUFFIX	:= if(Left.type_cd='MD',Left.name_sufx,'');
 SELF.NAME_COMPANY	:= IF(Left.type_cd = 'GR' and Left.name_mari_org != '', Left.name_mari_org, Left.name_office);
 SELF.NAME_COMPANY_DBA := IF(Left.NAME_MARI_DBA <> '', Left.NAME_MARI_DBA, Left.NAME_DBA);
 
-SELF.Append_BusAddrFirst := Left.Append_BusAddressFirst; 
-SELF.Append_BusAddrLast	 :=	Left.Append_BusAddressLast;
+SELF.Append_BusAddrFirst := Left.Append_BusAddrFirst; 
+SELF.Append_BusAddrLast	 :=	Left.Append_BusAddrLast;
 
 self.BUS_PRIM_RANGE 	:= Left.busaddress.prim_range;
 self.BUS_PREDIR				:= Left.busaddress.predir;
@@ -78,8 +84,8 @@ self.BUS_GEO_BLK			:= Left.busaddress.geo_blk;
 self.BUS_GEO_MATCH		:= Left.busaddress.geo_match;
 self.BUS_ERR_STAT			:= Left.busaddress.err_stat;
 
-SELF.Append_MailAddrFirst := 	Left.Append_MailAddressFirst; 
-SELF.Append_MailAddrLast	:=	Left.Append_MailAddressLast;
+SELF.Append_MailAddrFirst := 	Left.Append_MailAddrFirst; 
+SELF.Append_MailAddrLast	:=	Left.Append_MailAddrLast;
 self.MAIL_PRIM_RANGE 	:= Left.MailAddress.prim_range;
 self.MAIL_PREDIR			:= Left.MailAddress.predir;
 self.MAIL_PRIM_NAME		:= Left.MailAddress.prim_name;
@@ -117,9 +123,10 @@ self_bug_num:=Left.Bug_num;
 
 SELF.did :=  prte2.fn_AppendFakeID.did(self.fname, self.lname, self.link_ssn, self.link_dob, self.cust_name);
 
-SELF.bdid := prte2.fn_AppendFakeID.bdid(self.name_company,	self.BUS_PRIM_RANGE,	self.BUS_PRIM_NAME, self.BUS_V_CITY_NAME, self.BUS_STATE, self.BUS_ZIP5, 'LN_PR');
-                                             vLinkingIds := prte2.fn_AppendFakeID.LinkIds(self.name_company, (string9)self.link_fein, self.link_inc_date, self.MAIL_PRIM_RANGE, self.BUS_PRIM_NAME, 
-                                                            self.BUS_SEC_RANGE, self.BUS_V_CITY_NAME, self.BUS_STATE, self.BUS_ZIP5, 'LN_PR');
+
+SELF.bdid := prte2.fn_AppendFakeID.bdid(self.name_company,	self.BUS_PRIM_RANGE,	self.BUS_PRIM_NAME, self.BUS_V_CITY_NAME, self.BUS_STATE, (string5)self.BUS_ZIP5, self.Cust_name);
+                                             vLinkingIds := prte2.fn_AppendFakeID.LinkIds(self.name_company, (string9)self.link_fein, self.link_inc_date, self.BUS_PRIM_RANGE, self.BUS_PRIM_NAME, 
+                                                            self.BUS_SEC_RANGE, self.BUS_V_CITY_NAME, self.BUS_STATE, (string5)self.BUS_ZIP5, 'LN_PR');
                                         
                                             SELF.powid	:= vLinkingIds.powid;
                                             SELF.proxid	:= vLinkingIds.proxid;

@@ -1,4 +1,6 @@
-﻿source := RECORD
+﻿IMPORT Std;
+
+source := RECORD
    unsigned2 source_type_id;
    string25 source_type;
    unsigned2 primary_source_entity_id;
@@ -232,6 +234,7 @@ fraudgov_layout := RECORD,maxlength(60000)
   string50 profession_type;
   string12 corresponding_professional_ids;
   string2 licensed_pr_state;
+  string25 vin;
   source classification_source;
   activity classification_activity;
   entity classification_entity;
@@ -310,6 +313,7 @@ fraudgov_layout := RECORD,maxlength(60000)
   string60 business_risk_code;
   string60 mailing_address_risk_code;
   string60 device_risk_code;
+  string60 identity_risk_code;
   string10 tax_preparer_id;
   string8 start_date;
   string8 end_date;
@@ -319,7 +323,10 @@ fraudgov_layout := RECORD,maxlength(60000)
  END;
 
 //fraudgov_dataset_base_prep := PULL(DATASET('~foreign::10.173.14.201::thor_data400::base::fraudgov::20180529_anonymized::main',fraudgov_layout,THOR));
-fraudgov_dataset_base_prep := PULL(DATASET('~foreign::10.173.14.201::thor_data400::base::fraudgov::qa::main',fraudgov_layout,THOR));
+//fraudgov_dataset_base_prep := PULL(DATASET('~foreign::10.173.14.201::thor_data400::base::nookse01::qa::main',fraudgov_layout,THOR));
+fraudgov_dataset_base_prep := PULL(DATASET('~thor_data400::base::fraudgov::qa::main',fraudgov_layout,THOR));
+// fraudgov_dataset_base_prep := PULL(DATASET('~foreign::10.173.14.201::thor_data400::base::nookse01::qa::main',fraudgov_layout,THOR));
+ 
 
 // Prep!!!
 // Add an address id (rawaid is always 0)
@@ -327,14 +334,37 @@ fraudgov_dataset_base_prep := PULL(DATASET('~foreign::10.173.14.201::thor_data40
 // ipaddress id
 
 fraudgov_dataset_base := PROJECT(fraudgov_dataset_base_prep, 
-                       TRANSFORM({RECORDOF(LEFT), UNSIGNED8 OttoAddressId, UNSIGNED8 OttoIpAddressId, UNSIGNED8 OttoEmailId}, 
+                       TRANSFORM({
+                         RECORDOF(LEFT), 
+                         STRING SsnFormatted, 
+                         STRING Phone_Number_Formatted, 
+                         STRING Cell_phone_Formatted, 
+                         UNSIGNED8 OttoAddressId, 
+                         UNSIGNED8 OttoIpAddressId, 
+                         UNSIGNED8 OttoEmailId, 
+                         UNSIGNED8 OttoSSNId,
+                         UNSIGNED8 OttoBankAccountId,
+                         UNSIGNED8 OttoBankAccountId2,
+                         UNSIGNED8 OttoDriversLicenseId},
+                       SELF.bank_account_number_1 := TRIM(LEFT.bank_account_number_1, LEFT, RIGHT),
+                       SELF.bank_account_number_2 := TRIM(LEFT.bank_account_number_2, LEFT, RIGHT),
+                       SELF.SsnFormatted := LEFT.ssn[1..3] + '-' + LEFT.ssn[4..5] + '-' + LEFT.ssn[6..9], 
+                       SELF.Phone_Number_Formatted := MAP(TRIM(LEFT.clean_phones.phone_number) !='' => '(' + LEFT.clean_phones.phone_number[1..3] + ') ' + LEFT.clean_phones.phone_number[4..6] + '-' + LEFT.clean_phones.phone_number[7..10], ''),
+                       SELF.Cell_phone_Formatted := MAP(TRIM(LEFT.clean_phones.cell_phone) != '' => '(' + LEFT.clean_phones.cell_phone[1..3] + ') ' + LEFT.clean_phones.cell_phone[4..6] + '-' + LEFT.clean_phones.cell_phone[7..10], ''),
 											 SELF.OttoAddressId := HASH32(LEFT.address_1, LEFT.address_2),
 											 SELF.OttoIpAddressId := HASH32(LEFT.ip_address), 
-											 SELF.OttoEmailId := HASH32(LEFT.email_address), 
+											 SELF.OttoEmailId := HASH32(LEFT.email_address),
+                       SELF.OttoSSNId := HASH32(LEFT.ssn),
+                       SELF.OttoBankAccountId := HASH32(TRIM(LEFT.bank_routing_number_1, LEFT, RIGHT) + '|' + TRIM(LEFT.bank_account_number_1, LEFT, RIGHT)),
+                       SELF.OttoBankAccountId2 := HASH32(TRIM(LEFT.bank_routing_number_2, LEFT, RIGHT) + '|' + TRIM(LEFT.bank_account_number_2, LEFT, RIGHT)),
+                       SELF.OttoDriversLicenseId := HASH32(LEFT.drivers_license),
 											 SELF := LEFT));
 
 // trim the data down for R&D speed.
-fraudgov_dataset := fraudgov_dataset_base((UNSIGNED)event_date < 20180407);// and did % 200 in [0] OR did = 899999999550);
+
+Set_did:=[1488418290,8389852385,1921409109,2435345412,1834342568,1589581232];
+
+fraudgov_dataset := fraudgov_dataset_base((UNSIGNED)event_date <= Std.Date.Today());// and (did % 10 in [0] OR did = 899999999550 or ssn = '294287743' or event_type_1 = '10000' or bank_account_number_1 != '' or drivers_license != '' or did in set_did));
 
 
 // Lets FAKE SOME CUSTOMERS!!!!!

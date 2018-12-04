@@ -6,11 +6,11 @@ EXPORT SALT37.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_addr_type'
 EXPORT FieldTypeNum(SALT37.StrType fn) := CASE(fn,'invalid_addr_type' => 1,'invalid_alpha' => 2,'invalid_alphanumeric' => 3,'invalid_alphanumericpound' => 4,'invalid_alphapound' => 5,'invalid_alphaspace' => 6,'invalid_alphaspacequote' => 7,'invalid_gender' => 8,'invalid_numeric' => 9,'invalid_numericpound' => 10,0);
  
 EXPORT MakeFT_invalid_addr_type(SALT37.StrType s0) := FUNCTION
-  s1 := SALT37.stringfilter(s0,'#BCHLPUXY'); // Only allow valid symbols
+  s1 := SALT37.stringfilter(s0,'#BCDHLPUXY'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_addr_type(SALT37.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT37.StringFilter(s,'#BCHLPUXY'))));
-EXPORT InValidMessageFT_invalid_addr_type(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInChars('#BCHLPUXY'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_addr_type(SALT37.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT37.StringFilter(s,'#BCDHLPUXY'))));
+EXPORT InValidMessageFT_invalid_addr_type(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInChars('#BCDHLPUXY'),SALT37.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_alpha(SALT37.StrType s0) := FUNCTION
   s1 := SALT37.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'); // Only allow valid symbols

@@ -1,4 +1,4 @@
-//dtype: 'identities', 'otherphones', 'riskindicators', or 'transactions'
+﻿//dtype: 'identities', 'otherphones', 'riskindicators', or 'transactions'
 
 EXPORT Empty_PhoneFinderReport(string version, string etype):= FUNCTION
 	

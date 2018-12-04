@@ -4,8 +4,8 @@ EXPORT fSprayDd(
 
 	STRING		pVersion              = '',
 	BOOLEAN   pUseProd              = FALSE,
-	//STRING		pServerIP							= _control.IPAddress.bctlpedata10,
-	STRING		pServerIP							= 'bctlpedata10.risk.regn.net',
+	STRING		pServerIP							= _control.IPAddress.bctlpedata10,
+	//STRING		pServerIP							= 'bctlpedata10.risk.regn.net',
 	STRING		pRawfile							= '*.dat',
 	STRING		pDirectory						= '/data/run_enclarity/emdeon/input/',
 	STRING		pGroupName						= IF((tools._Constants.IsDataland),'thor40_241','thor400_44'),

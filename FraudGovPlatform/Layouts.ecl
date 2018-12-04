@@ -239,7 +239,14 @@ EXPORT Layouts := MODULE
 			string25	Drivers_License_Number;
 			string10	geo_lat;
 			string11	geo_long;
-			string14	reported_date;			
+			string75	reported_date;			
+			unsigned3	file_type;
+			string10	deceitful_confidence;
+			string30	user_added;
+			string250	reason_description;
+			string30	event_type_1;
+			string30	event_entity_1;
+			string100 	source_input := 'Deltabase';
 		END;
 	
 		EXPORT validate_record := record
@@ -333,6 +340,45 @@ EXPORT Layouts := MODULE
 			unsigned1		Deltabase := 0;
 			Provenance;
 		END;
+		EXPORT Deltabase := RECORD
+			Sprayed.Deltabase;
+			unsigned8		Unique_Id ;
+			Address.Layout_Clean_Name				cleaned_name;
+			unsigned8		address_id;			
+			string100		address_1 := '';   
+			string50		address_2 := '';				
+			Address.Layout_Clean182_fips			clean_address;
+			unsigned8		mailing_address_id;	
+			string100		mailing_address_1 := '';   
+			string50		mailing_address_2 := '';				
+			Address.Layout_Clean182_fips			additional_address;
+			clean_phones	clean_phones;
+			string10		clean_SSN;
+			string10		clean_Zip;
+			string25		clean_IP_Address;
+			string10		clean_dob;
+			unsigned6 		did; 
+			unsigned1		did_score;
+			unsigned6		ind_type;
+			unsigned1		Deltabase := 1;
+			Provenance;
+			string12		cell_phone := '';
+		END;
+		EXPORT SourcesToAnonymize := RECORD
+			unsigned6			fdn_file_info_id;
+		END;
+		
+		EXPORT ConfigRiskLevel	:= RECORD
+		  STRING entitytype;
+			STRING field;
+			STRING value;
+			STRING low;
+			STRING high;
+			STRING risklevel;
+			STRING weight;
+			STRING uidescription;
+		END;
+		
 	END;
 
 
@@ -402,6 +448,38 @@ EXPORT Layouts := MODULE
 			unsigned6		ind_type;				
 			unsigned1		Deltabase := 0;
 		END;
+		EXPORT Deltabase	:= 
+			record 
+			Sprayed.Deltabase ;
+			unsigned8		Unique_Id ;
+			Address.Layout_Clean_Name		cleaned_name;
+			string100		address_1 := '';
+			string50		address_2 := '';
+			Address.Layout_Clean182_fips	clean_address;
+			string100		mailing_address_1 := '';
+			string50		mailing_address_2 := '';
+			Address.Layout_Clean182_fips	additional_address;
+			clean_phones	clean_phones;
+			string10		clean_SSN;
+			string10		clean_Zip;
+			string25		clean_IP_Address;
+			string10		clean_dob;
+			unsigned6		did ; 
+			unsigned1		did_score;
+			string			current ;
+			unsigned4		dt_first_seen;
+			unsigned4		dt_last_seen;
+			unsigned4		dt_vendor_first_reported;
+			unsigned4		dt_vendor_last_reported;
+			unsigned2		name_ind:=0;
+			unsigned8		NID:=0;
+			unsigned4		process_date;
+			string100		Source;
+			unsigned8		source_rec_id;
+			unsigned6		ind_type;
+			string12		cell_phone := '';	
+			unsigned1		Deltabase := 1;
+		END;
 
 		EXPORT AddressCache := record
 			unsigned8			address_id;
@@ -410,6 +488,7 @@ EXPORT Layouts := MODULE
 			string50       address_2 := '';
 			Address.Layout_Clean182_fips					clean_address;
 		END;
+		
 	END;
 
 	export OutputF := module
@@ -481,6 +560,8 @@ Export PII	:=RECORD
   string10 home_phone;
   string10 work_phone_;
   string25 ip_address;
+	unsigned8 Record_ID;
+	unsigned6 fdn_file_info_id;
 
 END;
 
@@ -662,17 +743,23 @@ Export CIID := RECORD
 	boolean addresscmra;
 	string3 cvicustomscore;
 	string1 instantidversion;
-	STRING errorcode
+	STRING errorcode;
+	unsigned8 Record_ID;
+	unsigned6 fdn_file_info_id;
  END;
  
  Export Crim	:= RECORD
  CriminalRecords_BatchService.Layouts.batch_out;
  string errorcode;
+ unsigned8 Record_ID;
+ unsigned6 fdn_file_info_id;
  END;
  
  Export Death	:= RECORD
  DeathV2_Services.Layouts.BatchOut;
  string errorcode;
+ unsigned8 Record_ID;
+ unsigned6 fdn_file_info_id;
  END;
  
  Export FraudPoint	:= RECORD
@@ -689,6 +776,8 @@ Export CIID := RECORD
 	string2 v2_InputAddrDwellType;
 	string3 v2_divssnidentitycountnew;
   string errorcode;
+	unsigned8 Record_ID;
+	unsigned6 fdn_file_info_id;
  END;
  
 END;

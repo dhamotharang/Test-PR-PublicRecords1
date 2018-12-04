@@ -1,12 +1,12 @@
 ﻿IMPORT	ut, AID, AID_Support, DID_Add, Business_Header_SS, address, NID, STD, PromoteSupers,
 							PRTE2, Anchor; //using a cleaning functions in these repositories;
-#workunit('name', 'RealSource Email Build');
+#workunit('name', 'Yogurt: RealSource Email Build');
 // #constant(AID_Support.Constants.StoredWhichAIDCache, AID_Support.Constants.eCache.ForNonHeader);
 // #STORED('did_add_force','thor');
 				
 EXPORT proc_build_base(STRING8 version) := FUNCTION
 
-	dsBase			:= RealSource.Files.base_out;
+	dsBase			:= RealSource.Files.base_bip;
 	IngestPrep	:= RealSource.prep_ingest_file;
 
 	ingestMod		:= RealSource.Ingest(,,dsBase,IngestPrep);
@@ -14,7 +14,7 @@ EXPORT proc_build_base(STRING8 version) := FUNCTION
 	
 	//Populate current_rec based on whether or not record is in the new input file as this is a full replace
 	//Unknown = 1 Ancient = 2 Old = 3 Unchanged = 4 Updated = 5 New = 6
-	PopCurrentRec	:= Project(new_base, TRANSFORM(RealSource.Layouts.Base, SELF.current_rec := IF(LEFT.__Tpe in [2,3],FALSE,TRUE);
+	PopCurrentRec	:= Project(new_base, TRANSFORM(RealSource.Layouts.Base_w_bip, SELF.current_rec := IF(LEFT.__Tpe in [2,3],FALSE,TRUE);
 																																				SELF := LEFT;
 																																				SELF:= [];));
 	
@@ -32,7 +32,7 @@ EXPORT proc_build_base(STRING8 version) := FUNCTION
 	OUTPUT(InvalidName,,'~thor_data400::out::RealSource_invalid_names_'+version,OVERWRITE,__COMPRESSED__);
 	OUTPUT(COUNT(InvalidName),NAMED('TotalInvalidRecords_'+version));
 	
-	InputFileClnName	:= PROJECT(FileClnName(nametype != 'I'),TRANSFORM(RealSource.Layouts.Base,
+	InputFileClnName	:= PROJECT(FileClnName(nametype != 'I'),TRANSFORM(RealSource.Layouts.Base_w_bip,
 																																			BOOLEAN IsName	:=	LEFT.nametype IN person_flags OR
 																																													(LEFT.nametype = 'U' AND trim(LEFT.cln_fname) != '' AND TRIM(LEFT.cln_lname) != ''); 
 																																			SELF.clean_title				:=	IF(IsName, LEFT.cln_title, '');
@@ -47,7 +47,7 @@ EXPORT proc_build_base(STRING8 version) := FUNCTION
 		//AID process
 	unsigned4 lAIDFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;
 	
-	RealSource.Layouts.Base tProjectAIDClean_prep(RealSource.Layouts.Base pInput) := TRANSFORM
+	RealSource.Layouts.Base_w_bip tProjectAIDClean_prep(RealSource.Layouts.Base_w_BIP pInput) := TRANSFORM
 	  clnFullAddr	:= STD.Str.CleanSpaces(pInput.address);
 		self.Append_Prep_Address_Situs			:=	Address.fn_addr_clean_prep(clnFullAddr, 'first');
 		self.Append_Prep_Address_Last_Situs	:=	Address.fn_addr_clean_prep(pInput.city
@@ -66,7 +66,7 @@ EXPORT proc_build_base(STRING8 version) := FUNCTION
 	AID.MacAppendFromRaw_2Line(rsAID_Addr,Append_Prep_Address_Situs, Append_Prep_Address_Last_Situs, RawAID,
 																											rsCleanAID, lAIDFlags);	
 	
-	RealSource.Layouts.Base tProjectClean(rsCleanAID pInput) := TRANSFORM
+	RealSource.Layouts.Base_w_bip tProjectClean(rsCleanAID pInput) := TRANSFORM
 		SELF.prim_range    := pInput.aidwork_acecache.prim_range;
     SELF.predir        := pInput.aidwork_acecache.predir;
     SELF.prim_name     := pInput.aidwork_acecache.prim_name;
@@ -97,7 +97,7 @@ EXPORT proc_build_base(STRING8 version) := FUNCTION
     SELF  													:= pInput;		
 	END;
 
-	RealSource.Layouts.Base tProjectNoAddrClean(rsAID_NoAddr pInput) := TRANSFORM
+	RealSource.Layouts.Base_w_bip tProjectNoAddrClean(rsAID_NoAddr pInput) := TRANSFORM
 		cl_addr	:= Address.CleanAddress182(pInput.Append_Prep_Address_Situs, TRIM(pInput.city) + ' ' + TRIM(pInput.state) + ' ' + TRIM(pInput.ZipCode)+TRIM(pInput.ZipPlus4));
 		SELF.prim_range  	:=  cl_addr[1..10];
 		SELF.predir  			:=  cl_addr[11..12];
@@ -153,15 +153,15 @@ EXPORT proc_build_base(STRING8 version) := FUNCTION
 													,st																// State
 													,phone														// Phone
 													,DID 															// DID  			
-													,RealSource.Layouts.Base			 		// Output Layout
+													,RealSource.Layouts.Base_w_bip 		// Output Layout
 													,TRUE															// has score field
 													,DID_score												// did_score
 													,75	  														// threshold 
 													,rsCleanAID_DID										// Output Dataset
 													);
 													
-		//Add BIP fields --Future Change
-/*	bdid_matchset	:= ['A','P'];
+		//Add BIP fields
+	bdid_matchset	:= ['A','P'];
 	Business_Header_SS.MAC_Add_BDID_Flex(rsCleanAID_DID												// Input Dataset
 																			,bdid_matchset												// BDID Matchset what fields to match on
 																			,clean_cname													// company_name
@@ -188,12 +188,12 @@ EXPORT proc_build_base(STRING8 version) := FUNCTION
 																			,																			// mname
 																			,																			// lname
 																			,																			// contact ssn
-																			,'RS'																	// Source  MDR.sourceTools
+																			,																			// Source  MDR.sourceTools
 																			,rcid																	// Source_Record_Id
 																			,																			// Src_Matching_is_priorty
 																			);
-*/												
-	PromoteSupers.Mac_SF_BuildProcess(rsCleanAID_DID,RealSource.thor_cluster+'base::email::RealSource',build_base,3,,true);
+												
+	PromoteSupers.Mac_SF_BuildProcess(dsBIP_out,RealSource.thor_cluster+'base::email::RealSource',build_base,3,,true);
 
 	RETURN SEQUENTIAL(build_base, ingestMod.DoStats);	
 	

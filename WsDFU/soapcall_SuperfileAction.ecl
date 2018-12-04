@@ -1,7 +1,7 @@
-/*
+﻿/*
   SuperfileAction can add to superfile, etc.
 */
-import _control,ut,wk_ut;
+import _control,ut;
 // #option('maxLength', 131072); // have to increase for the remote directory child datasets
 //////////////////////////////////////////////////////////////////////////////////////////////
 export soapcall_SuperfileAction(
@@ -11,7 +11,7 @@ export soapcall_SuperfileAction(
   ,string                pbefore              = ''    //add the subfile before this file in the superfile
   ,boolean               pdelete              = false //true = remove it from superfile and delete it. false = remove it from superfile
   ,boolean               premoveSuperfile     = false //true = delete superfile, false=keep superfile
-  ,string                pesp                 = wk_ut._constants.LocalEsp
+  ,string                pesp                 = _Config.LocalEsp
 ) :=                           
 function
 

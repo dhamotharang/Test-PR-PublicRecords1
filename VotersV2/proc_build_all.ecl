@@ -4,7 +4,7 @@
 // Please pay special attention to the layout changes and notify
 // data fabrication team.
 //-------------------------------------------------------------------
-import orbit_report,Lib_FileServices, STRATA, PromoteSupers, roxiekeybuild, risk_indicators, _control, Scrubs, Scrubs_Voters, tools, STD, ut;
+import orbit_report,Lib_FileServices, STRATA, PromoteSupers, roxiekeybuild, risk_indicators, _control, Scrubs, Scrubs_Voters, tools, STD, ut, Orbit3;
 
 export proc_build_all(string filedate) := function
 
@@ -27,12 +27,15 @@ export proc_build_all(string filedate) := function
 	
 	update_dops := sequential(RoxieKeyBuild.updateversion('VotersV2Keys',filedate,mailTarget,,'N|B'),
 	                          RoxieKeyBuild.updateversion('FCRA_VotersV2Keys',filedate,mailTarget,,'F')
-													 );
+															);
 	
 	build_stats := VotersV2.Out_Base_Stats_Population_Voters(filedate);
 	orbit_report.Voters_Stats(getretval);
   build_gender := risk_indicators.Gender_Base;
-
+															
+	orbit_update := sequential(Orbit3.proc_Orbit3_CreateBuild_AddItem('Voter Registrations',filedate,'N|B'),
+																	Orbit3.proc_Orbit3_CreateBuild_AddItem('FCRA Voter Registrations',filedate,'F')
+																);
 	return if(thorlib.wuid()[2..5] <= VotersV2._Flags.stop_year,
 	          sequential(build_base,
                        Scrubs.ScrubsPlus('Voters','Scrubs_Voters','Scrubs_Voters_Base_History','Base_History',filedate,mailTarget),
@@ -41,6 +44,7 @@ export proc_build_all(string filedate) := function
 										build_gender,
 										parallel(update_dops,build_stats),
 										SampleRecs,
+										orbit_update,
 										send_mail('Emerges Voters Build','Base files, keys & stats completed successfully!'),
 										getretval),
 					 sequential(

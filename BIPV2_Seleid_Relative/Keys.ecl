@@ -1,4 +1,4 @@
-EXPORT Keys(DATASET(layout_Base) ih) := MODULE
+﻿EXPORT Keys(DATASET(layout_Base) ih) := INLINE MODULE
 SHARED s := Specificities(ih).Specificities;
 EXPORT SpecificitiesDebugKeyName := '~'+'key::BIPV2_Seleid_Relative::Seleid::Debug::specificities_debug';
 EXPORT Specificities_Key := INDEX(s,{1},{s},SpecificitiesDebugKeyName);

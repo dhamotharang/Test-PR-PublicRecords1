@@ -1,9 +1,9 @@
-import ut,wk_ut,std;
+﻿import ut,std;
 EXPORT GetFileParts(
 
    string pfilename  = ''
   ,string pcluster   = ''
-  ,string pesp       = wk_ut._constants.LocalEsp
+  ,string pesp       = _Config.LocalEsp
   
 ) :=
 function
@@ -17,7 +17,7 @@ function
 		string   Partsize   {xpath('Partsize'     )} ;
 	end;
 
-  ds_dfuinfo := WsDFU.soapcall_DFUInfo(pfilename ,pcluster ,pesp);
+  ds_dfuinfo := WsDFU.soapcall_DFUInfo(pfilename ,pcluster ,,,pesp);
 
   norm_lay := {string name,string owner,string Cluster,string MinSkew, string MaxSkew,DFUFileParts_lay,unsigned PartSize_int,string PartSize_};
   

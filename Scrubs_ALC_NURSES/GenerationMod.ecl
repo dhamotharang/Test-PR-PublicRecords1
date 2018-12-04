@@ -23,7 +23,7 @@ EXPORT GenerationMod := MODULE
     + 'FIELDTYPE:invalid_numericpound:ALLOW(#0123456789)\n'
     + 'FIELDTYPE:invalid_alphanumeric:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789)\n'
     + 'FIELDTYPE:invalid_gender:ENUM(M|F|B|I|U| )\n'
-    + 'FIELDTYPE:invalid_addr_type:ALLOW(#BCHLPUXY)\n'
+    + 'FIELDTYPE:invalid_addr_type:ALLOW(#BCDHLPUXY)\n'
     + 'FIELDTYPE:invalid_license_number:ALLOW( .-#*\\ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789):CUSTOM(ALC.Custom_Scrubs.fn_valid_tx_nurse_license_no<1,reg_state)\n'
     + 'FIELDTYPE:invalid_marital_status:ENUM(M|S| )\n'
     + '//BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking\n'

@@ -9,7 +9,7 @@ inNHR := header.New_Header_Records()(header.Blocked_data_new())
 header.macGetCleanAddr(inNHR, RawAID, true, inNHR_addr_recleaned);
 NHRin := distribute(inNHR_addr_recleaned,hash(prim_name,zip,lname));
 
-inPHR0 := Header.File_header_raw_latest.File(~header.IsOldUtil(versionBuild));
+inPHR0 := Header.File_header_raw_latest.File(~header.IsOldUtil(versionBuild,,,,7));
 inPHR  := inPHR0(header.Blocked_data_new());
 PHin   := distribute(inPHR,hash(prim_name,zip,lname));
 
@@ -86,7 +86,8 @@ r_nbm2 := record
 	count_            := count(group);
 end;
 ta2 := sort(table(oNMNHRM, r_nbm2, src, few), -count_);
-Strata.modOrbitAdaptersForPersonHdrBld.fnGetNoBasicMatchAction(ta2,  versionBuild);
+// Strata.modOrbitAdaptersForPersonHdrBld.fnGetNoBasicMatchAction(ta2,  versionBuild);
+submit_strata:=Strata.modOrbitAdaptersForPersonHdrBld.fnGetNoBasicMatchAction(ta2,  versionBuild);
 output(ta2, all, named('no_basic_match_monthly'));
 
 ut.MAC_Sequence_Records(oNMNHR,uid,outfile1);
@@ -115,10 +116,12 @@ dpnew:=dedup(sort(distribute(pnew,hash32(rid,zip,fname,lname)),rid,zip,fname,lna
 nneq(string s1, string s2) := if (s1<>'' AND s2<>'' AND s1<>s2,true,false);
 
 {dpnew} chk(dpnew L, dpnew R) :=transform, skip(~(L.rid=R.rid AND 
-																																															( nneq(L.zip,R.zip) OR 
-																																															  nneq(L.zip,R.zip) OR
-																																																 nneq(L.zip,R.zip)   )
-																																														))
+                                                  ( nneq(L.zip,R.zip) OR 
+                                                   nneq(L.zip,R.zip)  OR
+                                                   nneq(L.zip,R.zip)   
+                                                  )
+                                                 )
+                                               )
   self:=R
 
 end;
@@ -139,7 +142,7 @@ header.macGetCleanAddr(merged_with_prim, RawAID, true, merged_with_prim_addr_rec
 
 merged_addr_recleaned := merged_no_prim + merged_with_prim_addr_recleaned;
 
-OldUtil := Header.File_Latest_Header_Raw(TRUE)(header.IsOldUtil(versionBuild));
+OldUtil := Header.File_Latest_Header_Raw(TRUE)(header.IsOldUtil(versionBuild,,,,7));
 patched:=Header.fn_clear_deletion_candidates(merged_addr_recleaned + OldUtil,versionBuild);//****** remove PII off deleted records
 
 patched1:=header.fn_fix_dates(patched,,versionBuild);
@@ -154,6 +157,9 @@ patched3  := patched2( ~(rid>mxr_monthly AND pflag1='A' AND fname='' AND lname='
 
 output(table(newblanks,{src,cnt:=count(group)},src,few),named('BlankedNewRecordsRemoved'),all);
 
-export final := patched3 : persist('Header_Joined::'+ versionBuild,expire(60));
+// export final := patched3 : persist('Header_Joined::'+ versionBuild,expire(60));
+pre_final:= patched3 : persist('Header_Joined::'+ versionBuild,expire(60));
+export final := when(pre_final,submit_strata);
+
 
 end;

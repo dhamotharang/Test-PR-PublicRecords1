@@ -49,7 +49,7 @@ noComp   := noComp0	(
 											and ~regexfind('^dickless$|^dickles$',trim(lname),nocase)
 										);
 
-noOldUtil:=noComp(~header.IsOldUtil(versionBuild));
+noOldUtil:=noComp(~header.IsOldUtil(versionBuild,,,,7));
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // again, at this point there should be absolutely no duplicates
 // within or across clusters - if there are, we have a problem
