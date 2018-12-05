@@ -20,8 +20,8 @@ EXPORT Fn_InputEcho_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout_
 		SELF.InputEmailEcho := le.Email; 
 		SELF.InputArchiveDateEcho := le.historydate;
 		SELF.InputSSNEcho := le.SSN;
-		SELF.InputDateOfBirthEcho := le.DateOfBirth;
-		SELF.InputDLNumberEcho := le.DLNumber;
+		SELF.InputDOBEcho := le.DateOfBirth;
+		SELF.InputDLEcho := le.DLNumber;
 		SELF.InputDLStateEcho := le.DLState;	
 		//
 		SELF.InputIncomeEcho := le.Income;

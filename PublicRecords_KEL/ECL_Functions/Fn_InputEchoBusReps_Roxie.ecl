@@ -20,8 +20,8 @@ EXPORT Fn_InputEchoBusReps_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_
 				SELF.InputZipEcho := le.Rep1Zip;
 				SELF.InputHomePhoneEcho := le.Rep1HomePhone;
 				SELF.InputSSNEcho := le.Rep1SSN;
-				SELF.InputDateOfBirthEcho := le.Rep1DOB;
-				SELF.InputDLNumberEcho := le.Rep1DLNumber;
+				SELF.InputDOBEcho := le.Rep1DOB;
+				SELF.InputDLEcho := le.Rep1DLNumber;
 				SELF.InputDLStateEcho := le.Rep1DLState;
 				SELF.InputFormernameEcho := le.Rep1FormerLastName;
 				SELF.InputEmailEcho := le.Rep1EmailAddress; 
@@ -47,8 +47,8 @@ EXPORT Fn_InputEchoBusReps_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_
 				SELF.InputZipEcho := le.Rep2Zip;
 				SELF.InputHomePhoneEcho := le.Rep2HomePhone;
 				SELF.InputSSNEcho := le.Rep2SSN;
-				SELF.InputDateOfBirthEcho := le.Rep2DOB;
-				SELF.InputDLNumberEcho := le.Rep2DLNumber;
+				SELF.InputDOBEcho := le.Rep2DOB;
+				SELF.InputDLEcho := le.Rep2DLNumber;
 				SELF.InputDLStateEcho := le.Rep2DLState;
 				SELF.InputFormernameEcho := le.Rep2FormerLastName;
 				SELF.InputEmailEcho := le.Rep2EmailAddress; 
@@ -74,8 +74,8 @@ EXPORT Fn_InputEchoBusReps_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_
 				SELF.InputZipEcho := le.Rep3Zip;
 				SELF.InputHomePhoneEcho := le.Rep3HomePhone;
 				SELF.InputSSNEcho := le.Rep3SSN;
-				SELF.InputDateOfBirthEcho := le.Rep3DOB;
-				SELF.InputDLNumberEcho := le.Rep3DLNumber;
+				SELF.InputDOBEcho := le.Rep3DOB;
+				SELF.InputDLEcho := le.Rep3DLNumber;
 				SELF.InputDLStateEcho := le.Rep3DLState;
 				SELF.InputFormernameEcho := le.Rep3FormerLastName;
 				SELF.InputEmailEcho := le.Rep3EmailAddress; 
@@ -101,8 +101,8 @@ EXPORT Fn_InputEchoBusReps_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_
 				SELF.InputZipEcho := le.Rep4Zip;
 				SELF.InputHomePhoneEcho := le.Rep4HomePhone;
 				SELF.InputSSNEcho := le.Rep4SSN;
-				SELF.InputDateOfBirthEcho := le.Rep4DOB;
-				SELF.InputDLNumberEcho := le.Rep4DLNumber;
+				SELF.InputDOBEcho := le.Rep4DOB;
+				SELF.InputDLEcho := le.Rep4DLNumber;
 				SELF.InputDLStateEcho := le.Rep4DLState;
 				SELF.InputFormernameEcho := le.Rep4FormerLastName;
 				SELF.InputEmailEcho := le.Rep4EmailAddress; 
@@ -128,8 +128,8 @@ EXPORT Fn_InputEchoBusReps_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_
 				SELF.InputZipEcho := le.Rep5Zip;
 				SELF.InputHomePhoneEcho := le.Rep5HomePhone;
 				SELF.InputSSNEcho := le.Rep5SSN;
-				SELF.InputDateOfBirthEcho := le.Rep5DOB;
-				SELF.InputDLNumberEcho := le.Rep5DLNumber;
+				SELF.InputDOBEcho := le.Rep5DOB;
+				SELF.InputDLEcho := le.Rep5DLNumber;
 				SELF.InputDLStateEcho := le.Rep5DLState;
 				SELF.InputFormernameEcho := le.Rep5FormerLastName;
 				SELF.InputEmailEcho := le.Rep5EmailAddress; 

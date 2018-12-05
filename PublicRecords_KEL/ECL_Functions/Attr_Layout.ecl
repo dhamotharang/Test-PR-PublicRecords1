@@ -29,6 +29,14 @@ EXPORT Attr_Layout := RECORD
 	STRING10 InputHomePhoneClean;
 	STRING10 InputWorkPhoneClean;
 	STRING20 InputArchiveDateClean;
+	STRING50 InputMiddleNameClean;
+	STRING50 InputLastNameClean;
+	STRING InputStreetClean;
+	STRING InputFullAddressClean;
+	STRING10 InputSSNClean;
+	STRING20 InputDOBClean;
+	STRING20 InputDLClean;
+	STRING3 InputDLStateClean;
 	STRING3 InputPrefixCleanPop;
 	STRING3 InputFirstNameCleanPop;
 	STRING3 InputSuffixCleanPop;
@@ -53,6 +61,14 @@ EXPORT Attr_Layout := RECORD
 	STRING3 InputHomePhoneCleanPop;
 	STRING3 InputWorkPhoneCleanPop;
 	STRING3 InputArchiveDateCleanPop;
+	STRING3 InputMiddleNameCleanPop;
+	STRING3 InputLastNameCleanPop;
+	STRING3 InputStreetCleanPop;
+	STRING3 InputFullAddressCleanPop;
+	STRING3 InputSSNCleanPop;
+	STRING3 InputDOBCleanPop;
+	STRING3 InputDLCleanPop;
+	STRING3 InputDLStateCleanPop;
 	// Criminal History - Arrest
 	INTEGER2 ArrestCnt1Y;
 	INTEGER2 ArrestCnt7Y;

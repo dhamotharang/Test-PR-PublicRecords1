@@ -52,34 +52,34 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Attr_
 			SELF.MonSinceNewestNonfelonyCnt7Y := IF(ResultsFound, (INTEGER)RIGHT.MonSinceNewestNonfelonyCnt7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
 			SELF.MonSinceOldestNonfelonyCnt7Y := IF(ResultsFound, (INTEGER)RIGHT.MonSinceOldestNonfelonyCnt7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
 			// Arrest fields are NonFCRA only
-			SELF.ArrestCnt1Y := MAP(Options.IsFCRA 	AND ResultsFound		=> 0,
+			SELF.ArrestCnt1Y := MAP(Options.IsFCRA 		=> 0,
                               NOT Options.IsFCRA AND ResultsFound => RIGHT.ArrestCnt1Y, 
 																																	PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
-			SELF.ArrestCnt7Y := MAP(Options.IsFCRA AND ResultsFound 		=> 0,
+			SELF.ArrestCnt7Y := MAP(Options.IsFCRA		=> 0,
 															NOT Options.IsFCRA AND ResultsFound => RIGHT.ArrestCnt7Y, 
                                                                   PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
-			SELF.ArrestNew1Y := MAP(Options.IsFCRA AND ResultsFound 		=> '',
+			SELF.ArrestNew1Y := MAP(Options.IsFCRA 		=> '',
 															NOT Options.IsFCRA AND ResultsFound => (STRING)RIGHT.ArrestNew1Y, 
 																																	PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
-			SELF.ArrestOld1Y := MAP(Options.IsFCRA AND ResultsFound 		=> '',
+			SELF.ArrestOld1Y := MAP(Options.IsFCRA 		=> '',
 															NOT Options.IsFCRA AND ResultsFound => (STRING)RIGHT.ArrestOld1Y, 
                                                                   PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
-			SELF.ArrestNew7Y := MAP(Options.IsFCRA AND ResultsFound 		=> '',
+			SELF.ArrestNew7Y := MAP(Options.IsFCRA  		=> '',
 															NOT Options.IsFCRA AND ResultsFound => (STRING)RIGHT.ArrestNew7Y, 
 																																	PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
-			SELF.ArrestOld7Y := MAP(Options.IsFCRA AND ResultsFound 		=> '',
+			SELF.ArrestOld7Y := MAP(Options.IsFCRA  		=> '',
 															NOT Options.IsFCRA AND ResultsFound => (STRING)RIGHT.ArrestOld7Y, 
 																																	PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
-      SELF.MonSinceNewestArrestCnt1Y := MAP(Options.IsFCRA AND ResultsFound	=> 0,
+      SELF.MonSinceNewestArrestCnt1Y := MAP(Options.IsFCRA 	=> 0,
 															NOT Options.IsFCRA AND ResultsFound => (INTEGER)RIGHT.MonSinceNewestArrestCnt1Y, 
 																																	PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
-			SELF.MonSinceOldestArrestCnt1Y := MAP(Options.IsFCRA AND ResultsFound => 0,
+			SELF.MonSinceOldestArrestCnt1Y := MAP(Options.IsFCRA  => 0,
 															NOT Options.IsFCRA AND ResultsFound => (INTEGER)RIGHT.MonSinceOldestArrestCnt1Y, 
 																																	PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
-			SELF.MonSinceNewestArrestCnt7Y := MAP(Options.IsFCRA AND ResultsFound	=> 0,
+			SELF.MonSinceNewestArrestCnt7Y := MAP(Options.IsFCRA => 0,
 															NOT Options.IsFCRA AND ResultsFound => (INTEGER)RIGHT.MonSinceNewestArrestCnt7Y, 
 																																	PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
-			SELF.MonSinceOldestArrestCnt7Y := MAP(Options.IsFCRA AND ResultsFound	=> 0,
+			SELF.MonSinceOldestArrestCnt7Y := MAP(Options.IsFCRA 	=> 0,
 															NOT Options.IsFCRA AND ResultsFound => (INTEGER)RIGHT.MonSinceOldestArrestCnt7Y, 
 																																	PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
 			SELF.CrimCnt1Y := RIGHT.CrimCnt1Y;

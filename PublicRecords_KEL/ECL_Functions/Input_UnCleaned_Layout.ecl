@@ -13,10 +13,10 @@ EXPORT Input_UnCleaned_Layout := RECORD
 	STRING10 InputZipEcho;
 	STRING16 InputHomePhoneEcho;
 	STRING10 InputSSNEcho;
-	STRING10 InputDateOfBirthEcho;
+	STRING10 InputDOBEcho;
 	STRING16 InputWorkPhoneEcho;
 	STRING10 InputIncomeEcho;
-	STRING20 InputDLNumberEcho;
+	STRING20 InputDLEcho;
 	STRING25 InputDLStateEcho;
 	STRING10 InputBalanceEcho;
 	STRING10 InputChargeoFFdEcho;

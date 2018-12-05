@@ -35,9 +35,9 @@ eyeball := 120;
 
 // Universally Set the History Date YYYYMMDD for ALL records. Set to 0 to use the History Date located on each record of the input file
 // histDate := '0';
-histDate := '20181128';
+histDate := '20181204';
 
-OutputFile := '~CDAL::Consumer_Criminal_100K_RoxieDev_current_11282018_NonFCRA'+ ThorLib.wuid() ;
+OutputFile := '~CDAL::Consumer_InputExtra_100K_RoxieDev_current_12042018_NonFCRA'+ ThorLib.wuid() ;
 
 prii_layout := RECORD
     STRING Account             ;
@@ -116,7 +116,7 @@ END;
 bwr_results := 
 				SOAPCALL(soap_in, 
 				RoxieIP,
-				'publicrecords_kel.MAS_nonFCRA_Service.14', 
+				'publicrecords_kel.MAS_nonFCRA_Service.24', 
 				{soap_in}, 
 				DATASET(layout_MAS_Test_Service_output),
         RETRY(2), TIMEOUT(300),
@@ -131,3 +131,4 @@ OUTPUT( CHOOSEN(Failed,eyeball), NAMED('bwr_results_Failed') );
 OUTPUT( COUNT(Failed), NAMED('Failed_Cnt') );
 
 output(Passed,,OutputFile, CSV(heading(single), quote('"')));
+OUTPUT(PP);

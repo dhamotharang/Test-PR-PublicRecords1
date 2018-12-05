@@ -16,7 +16,7 @@ EXPORT Fn_AppendLexid_Roxie(
   indata_did := PROJECT(indata, 
     TRANSFORM(didville.Layout_Did_OutBatch, 
       SELF.Did := LEFT.InputLexIDEcho;
-      SELF.dl_nbr:= LEFT.InputDLNumberClean;
+      SELF.dl_nbr:= LEFT.InputDLClean;
       SELF.email:= LEFT.InputEmailClean;
       //Same between the layouts
       SELF.Score := 0;

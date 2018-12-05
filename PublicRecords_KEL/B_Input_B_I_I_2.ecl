@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Business,E_Input_B_I_I,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Input_B_I_I_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Input_B_I_I(__in,__cfg).__Result) __E_Input_B_I_I := E_Input_B_I_I(__in,__cfg).__Result;
-  SHARED __EE25524 := __E_Input_B_I_I;
-  EXPORT __ST18312_Layout := RECORD
+  SHARED __EE28525 := __E_Input_B_I_I;
+  EXPORT __ST19745_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Business().Typ) Company_;
     KEL.typ.nint Bus_Input_U_I_D_Append_;
@@ -29,6 +29,8 @@ EXPORT B_Input_B_I_I_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr Bus_Input_N_A_I_C_S_Code_Echo_;
     KEL.typ.nstr Bus_Input_T_I_N_Echo_;
     KEL.typ.nstr Bus_Input_Archive_Date_Echo_;
+    KEL.typ.nstr Bus_Input_Name_Clean_;
+    KEL.typ.nstr Bus_Input_Alternate_Name_Clean_;
     KEL.typ.nstr Bus_Input_Prim_Range_Clean_;
     KEL.typ.nstr Bus_Input_Pre_Dir_Clean_;
     KEL.typ.nstr Bus_Input_Prim_Name_Clean_;
@@ -56,9 +58,9 @@ EXPORT B_Input_B_I_I_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST18312_Layout __ND25522__Project(E_Input_B_I_I(__in,__cfg).Layout __PP25278) := TRANSFORM
-    SELF.Addr_Not_Populated_ := IF(FN_Compile.FN_Addr_Not_Populated_Check(__ECAST(KEL.typ.nstr,__PP25278.Bus_Input_Street_Echo_),__ECAST(KEL.typ.nstr,__PP25278.Bus_Input_City_Echo_),__ECAST(KEL.typ.nstr,__PP25278.Bus_Input_State_Echo_),__ECAST(KEL.typ.nstr,__PP25278.Bus_Input_Zip_Echo_)),TRUE,FALSE);
-    SELF := __PP25278;
+  SHARED __ST19745_Layout __ND28523__Project(E_Input_B_I_I(__in,__cfg).Layout __PP28269) := TRANSFORM
+    SELF.Addr_Not_Populated_ := IF(FN_Compile.FN_Addr_Not_Populated_Check(__ECAST(KEL.typ.nstr,__PP28269.Bus_Input_Street_Echo_),__ECAST(KEL.typ.nstr,__PP28269.Bus_Input_City_Echo_),__ECAST(KEL.typ.nstr,__PP28269.Bus_Input_State_Echo_),__ECAST(KEL.typ.nstr,__PP28269.Bus_Input_Zip_Echo_)),TRUE,FALSE);
+    SELF := __PP28269;
   END;
-  EXPORT __ENH_Input_B_I_I_2 := PROJECT(__EE25524,__ND25522__Project(LEFT));
+  EXPORT __ENH_Input_B_I_I_2 := PROJECT(__EE28525,__ND28523__Project(LEFT));
 END;

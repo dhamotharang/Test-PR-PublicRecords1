@@ -15,6 +15,12 @@ EXPORT InputEcho_Layout := RECORD
 	STRING16 InputWorkPhoneEcho;
 	STRING54 InputEmailEcho;
 	STRING20 InputArchiveDateEcho; 
+	STRING78 InputMiddleNameEcho;
+	STRING78 InputLastNameEcho;   
+	STRING10 InputSSNEcho;
+	STRING20 InputDOBEcho;
+	STRING20 InputDLEcho;
+	STRING3 InputDLStateEcho;
 	STRING1 InputAccountEchoPop;
 	STRING1 InputLexIDEchoPop;
 	STRING1 InputFirstNameEchoPop;
@@ -26,5 +32,11 @@ EXPORT InputEcho_Layout := RECORD
 	STRING1 InputWorkPhoneEchoPop;
 	STRING1 InputEmailEchoPop;
 	STRING1 InputArchiveDateEchoPop;
+	STRING1 InputMiddleNameEchoPop;
+	STRING1 InputLastNameEchoPop;
+	STRING1 InputSSNEchoPop;
+	STRING1 InputDOBEchoPop;
+	STRING1 InputDLEchoPop;
+	STRING1 InputDLStateEchoPop;
 	INTEGER RepNumber;
 END;
