@@ -9,15 +9,10 @@ ver_fcra_prod_ver := dops.GetBuildVersion('FCRA_PersonHeaderKeys','B','F','P')[1
 ver_wkly_cert_ver := dops.GetBuildVersion('PersonHeaderWeeklyKeys','B','N','C')[1..8];
 ver_wkly_prod_ver := dops.GetBuildVersion('PersonHeaderWeeklyKeys','B','N','P')[1..8];
 
-// These may change if the build process changes
-lastUpdatedLabQA_SF:='~thor400_36::key::insuranceheader_xlink::qa::header';
-lastUpdatesFCRAqa_SF:='~thor_data400::key::fcra::header::address_rank_qa';
-lastUpdatesWklyQA_SF:='~thor_data400::key::header::qa::addr_unique_expanded';
-
 // Gets the version from the latest QA file on Thor
-lastestIkbVersionOnThor  := regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatedLabQA_SF)[1].name, 0);
-lastestFCRAversionOnThor := regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesFCRAqa_SF)[1].name, 0);
-lastestWklyversionOnThor := regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesWklyQA_SF)[1].name, 0);
+lastestIkbVersionOnThor  := header.Proc_Copy_From_Alpha_Incrementals().lastestIkbVersionOnThor;
+lastestFCRAversionOnThor := header.Proc_Copy_From_Alpha_Incrementals().lastestFCRAversionOnThor;
+lastestWklyversionOnThor := header.Proc_Copy_From_Alpha_Incrementals().lastestWklyversionOnThor;
 
 // back door to skip deployments. Create a dummy file to hold off the deployment, and delete when all clear
 dontskip_ikb:=~std.file.fileexists('~thor_data400::header::ikb::skip_dops_ikb');
