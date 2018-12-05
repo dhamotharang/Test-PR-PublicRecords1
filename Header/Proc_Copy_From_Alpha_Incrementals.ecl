@@ -211,36 +211,36 @@ elist:= _control.MyInfo.EmailAddressNotify
 // KEEP LINE BELOW UNTL you can make sure the named variables udops call is working properly
 // udops := Roxiekeybuild.updateversion('PersonLabKeys'        ,'20170901',elist,,'N',,,,,,'DR'); // header // PersonXLAB
 
-SHARED udops := sequential(
+SHARED udops(string3 skipPackage='000') := sequential(
+
+                if(skipPackage[1]='0',
                 dops.updateversion(
                                      l_datasetname:='PersonLabKeys' // Name of the package to update
                                     ,l_uversion   :=filedate        // Version to update to
                                     ,l_email_t    :=elist           // Who to email
                                     ,l_inenvment  :='N'             // nFCRA
                                     ,l_updateflag :='DR'            // Delta Replace (must sepcify, because default is FULL)
-                                    )
-                                    
-               ,dops.updateversion(
+                                    )),
+                if(skipPackage[2]='0',
+                dops.updateversion(
                                      l_datasetname:='PersonHeaderWeeklyKeys'
-                                     ,l_uversion   :=filedate        // Version to update to
+                                    ,l_uversion   :=filedate        // Version to update to
                                     ,l_email_t    :=elist           // Who to email
                                     ,l_inenvment  :='N'             // nFCRA
-                                   )
-
-               ,dops.updateversion(
+                                   )),
+                if(skipPackage[3]='0',
+                dops.updateversion(
                                      l_datasetname:='FCRA_PersonHeaderKeys' // Name of the package to update
                                     ,l_uversion   :=filedate                // Version to update to
                                     ,l_email_t    :=elist                   // Who to email
                                     ,l_inenvment  :='F'                     // FCRA
-                                  )
+                                  ))
                 );
 
-SHARED orbit_update_entries(string createORupdate) := function
-
-    tokenval := orbit3.GetToken();
-    rec_rep := {STRING  Name, STRING  Status, STRING  Message};
+SHARED tokenval := orbit3.GetToken();
+SHARED rec_rep := {STRING  Name, STRING  Status, STRING  Message};
     
-    update_entry(string buildname, string Buildvs, string Envmt) := FUNCTION
+SHARED    update_entry(string buildname, string Buildvs, string Envmt) := FUNCTION
              
             submit_change1 := Orbit3.UpdateBuildInstance(buildname, Buildvs, tokenval, 'BUILD_AVAILABLE_FOR_USE',
                                                                     Orbit3.Constants(Envmt).platform_upd).retcode ;
@@ -249,7 +249,8 @@ SHARED orbit_update_entries(string createORupdate) := function
                         project(submit_change1, transform(rec_rep,SELF.Name:=buildname,SELF:=LEFT))
                         );
     END;
-    update_bentry(string buildname, string Buildvs, string Envmt) := FUNCTION
+
+SHARED update_bentry(string buildname, string Buildvs, string Envmt) := FUNCTION
             
             status := Orbit3.Constants(Envmt).platform_upd(PlatformName='Boolean Roxie Production');
             submit_change1 := Orbit3.UpdateBuildInstance(buildname, Buildvs, tokenval, 'BUILD_AVAILABLE_FOR_USE',
@@ -259,7 +260,7 @@ SHARED orbit_update_entries(string createORupdate) := function
                         project(submit_change1, transform(rec_rep,SELF.Name:=buildname,SELF:=LEFT))
                         );
     END;
-    create_entry(string buildname, string Buildvs) := FUNCTION
+SHARED create_entry(string buildname, string Buildvs) := FUNCTION
     
             submit_change1 := Orbit3.CreateBuild        (buildname, Buildvs, tokenval).retcode;
             submit_change2 := Orbit3.UpdateBuildInstance(buildname, Buildvs, tokenval).retcode;
@@ -268,17 +269,19 @@ SHARED orbit_update_entries(string createORupdate) := function
                        project(submit_change2, transform(rec_rep,SELF.Name:=buildname,SELF:=LEFT))
                       );
     end;
-    
+
+ SHARED orbit_update_entries(string createORupdate, string skipPackage='000') := function
+
     RETURN if (createORupdate='create',
                         sequential(
-                                output(create_entry('PersonXLAB_Inc'            ,filedate))
-                                ,output(create_entry('FCRA_Header'               ,filedate))
-                                ,output(create_entry('Header_IKB'               ,filedate))
+                                if(skipPackage[1]='0',output(create_entry('PersonXLAB_Inc' ,filedate))),
+                                if(skipPackage[2]='0',output(create_entry('FCRA_Header'    ,filedate))),
+                                if(skipPackage[3]='0',output(create_entry('Header_IKB'     ,filedate)))
                         ),
                         sequential(
-                                output(update_entry('PersonXLAB_Inc'            ,filedate,'N'))
-                                ,output(update_entry('FCRA_Header'               ,filedate,'N'))
-                                ,output(update_entry('Header_IKB'               ,filedate,'N'))
+                                if(skipPackage[1]='0',output(update_entry('PersonXLAB_Inc' ,filedate,'N'))),
+                                if(skipPackage[2]='0',output(update_entry('FCRA_Header'    ,filedate,'N'))),
+                                if(skipPackage[3]='0',output(update_entry('Header_IKB'     ,filedate,'N')))
                         )
                );
  
@@ -300,17 +303,17 @@ EXPORT movetoQA := sequential(
         update_inc_superfiles()
         );
         
-EXPORT deploy(string emailList,string rpt_qa_email_list) := sequential(               
-                udops,
-                orbit_update_entries('create'),
-                orbit_update_entries('update'),
+EXPORT deploy(string emailList,string rpt_qa_email_list,string skipPackage='000') := sequential(               
+                udops(skipPackage),
+                orbit_update_entries('create',skipPackage),
+                orbit_update_entries('update',skipPackage),
                 std.system.Email.SendEmail(rpt_qa_email_list+','+emailList,'New boca Header IKB deployment',
                      
                      'Hello,\n\nPlease note that the following datasets have been updated for CERT deployment:'
                     +'\n\n'
-                    +'PersonXLAB_Inc\n'
-                    +'FCRA_Header\n'
-                    +'PersonHeaderWeeklyKeys\n'
+                    +if(skipPackage[1]='0','PersonXLAB_Inc\n','')
+                    +if(skipPackage[2]='0','FCRA_Header\n','')
+                    +if(skipPackage[3]='0','PersonHeaderWeeklyKeys\n','')
                     +'\n'
                     +'Deployment version: '+filedate+'\n'
                     +'\n'
