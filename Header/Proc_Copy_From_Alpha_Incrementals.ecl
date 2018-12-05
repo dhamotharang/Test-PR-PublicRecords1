@@ -216,8 +216,7 @@ EXPORT update_inc_superfiles(boolean skipIncSFupdate=false) := function
 end;
 EXPORT update_inc_idl(boolean skipIncSFupdate=false) := updateSupers('::header',skipIncSFupdate,'::idl');
 
-elist:= _control.MyInfo.EmailAddressNotify
-        ;
+SHARED elist:= Header.email_list.BocaDevelopers;
 
 // KEEP LINE BELOW UNTL you can make sure the named variables udops call is working properly
 // udops := Roxiekeybuild.updateversion('PersonLabKeys'        ,'20170901',elist,,'N',,,,,,'DR'); // header // PersonXLAB
@@ -242,7 +241,7 @@ SHARED udops(string3 skipPackage='000') := sequential(
                 if(skipPackage[3]='0',
                 dops.updateversion(
                                      l_datasetname:='PersonHeaderWeeklyKeys'
-                                    ,l_uversion   :=lastUpdatesWklyQA_SF        // Version to update to
+                                    ,l_uversion   :=lastestWklyversionOnThor        // Version to update to
                                     ,l_email_t    :=elist           // Who to email
                                     ,l_inenvment  :='N'             // nFCRA
                                    ))
@@ -287,12 +286,12 @@ SHARED create_entry(string buildname, string Buildvs) := FUNCTION
                         sequential(
                                 if(skipPackage[1]='0',output(create_entry('PersonXLAB_Inc' ,lastestIkbVersionOnThor))),
                                 if(skipPackage[2]='0',output(create_entry('FCRA_Header'    ,lastestFCRAversionOnThor))),
-                                if(skipPackage[3]='0',output(create_entry('Header_IKB'     ,lastUpdatesWklyQA_SF)))
+                                if(skipPackage[3]='0',output(create_entry('Header_IKB'     ,lastestWklyversionOnThor)))
                         ),
                         sequential(
                                 if(skipPackage[1]='0',output(update_entry('PersonXLAB_Inc' ,lastestIkbVersionOnThor,'N'))),
                                 if(skipPackage[2]='0',output(update_entry('FCRA_Header'    ,lastestFCRAversionOnThor,'N'))),
-                                if(skipPackage[3]='0',output(update_entry('Header_IKB'     ,lastUpdatesWklyQA_SF,'N')))
+                                if(skipPackage[3]='0',output(update_entry('Header_IKB'     ,lastestWklyversionOnThor,'N')))
                         )
                );
  
@@ -332,8 +331,7 @@ EXPORT deploy(string emailList,string rpt_qa_email_list,string skipPackage='000'
                     +'\n'
                     +'If you have any question or concerns please contact:\n'
                     // +emailList
-                    +'debendra.kumar@lexisnexisrisk.com\n'
-                    +'Gabriel.Marcan@lexisnexisrisk.com'
+                    +elist
                     +'\nThank you,')
                 // copy_to_dataland;
 );
