@@ -1,4 +1,4 @@
-IMPORT dops,std;
+﻿IMPORT dops,std;
 EXPORT proc_deploy_ikb(string emailList, string rpt_qa_email_list) := FUNCTION
 
 // Get versions for packages from DOPS
@@ -20,9 +20,9 @@ lastestFCRAversionOnThor := regexfind('[0-9]{8}', std.file.superfilecontents(las
 lastestWklyversionOnThor := regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesWklyQA_SF)[1].name, 0);
 
 // back door to skip deployments. Create a dummy file to hold off the deployment, and delete when all clear
-dontskip_ikb:=~std.file.fileexists('thor_data400::header::ikb::skip_dops_ikb');
-dontskip_fcra:=~std.file.fileexists('thor_data400::header::ikb::skip_dops_fcra');
-dontskip_wkly:=~std.file.fileexists('thor_data400::header::ikb::skip_dops_weekly');
+dontskip_ikb:=~std.file.fileexists('~thor_data400::header::ikb::skip_dops_ikb');
+dontskip_fcra:=~std.file.fileexists('~thor_data400::header::ikb::skip_dops_fcra');
+dontskip_wkly:=~std.file.fileexists('~thor_data400::header::ikb::skip_dops_weekly');
 
 // Check each package for skips or availability of CERT for deployment
 ikbShouldUpdate := ( dontskip_ikb  AND lastestIkbVersionOnThor  > ver_lab_cert_ver  AND ver_lab_cert_ver  = ver_lab_prod_ver );
