@@ -215,7 +215,12 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 				 L.fragment = Fragment_Types_const.BANK_ACCOUNT_NUMBER_FRAGMENT => 
 															ds_delta_recentTransactions(BankInformation1.BankAccountNumber = 
 																			FraudGovPlatform_Services.Functions.GetCleanBankAccountFragmentValue(L.fragment_value)),
-				 L.fragment = Fragment_Types_const.EMAIL_FRAGMENT => ds_delta_recentTransactions(EmailAddress = L.fragment_value),																			
+				 L.fragment = Fragment_Types_const.EMAIL_FRAGMENT => ds_delta_recentTransactions(
+																																		STD.Str.ToUpperCase(STD.Str.CleanSPaces(EmailAddress)) = 
+																																		STD.Str.ToUpperCase(STD.Str.CleanSPaces(L.fragment_value))),																			
+				 L.fragment = Fragment_Types_const.DRIVERS_LICENSE_NUMBER_FRAGMENT => 
+															ds_delta_recentTransactions(DriversLicense.DriversLicenseNumber = L.fragment_value AND 
+																													DriversLicense.DriversLicenseState = ds_batch_in[1].dl_state),
 				 DATASET([], iesp.fraudgovreport.t_FraudGovTimelineDetails));
 
 		ds_recentTransactions_sorted := SORT(ds_recentTransactions,-eventDate.year, -eventDate.Month, -eventDate.day);

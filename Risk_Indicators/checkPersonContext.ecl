@@ -3,10 +3,9 @@ onThor := _Control.Environment.OnThor;
 
 // this function will be used by every FCRA transaction coming in from a scoring product.  
 // Search PersonContext.GetPersonContext by LexID to find out if the consumer has any disputes on file.  
-// Eventually PersonContext will also contain information about security freeze, fraud alert, id theft flag as well
 
 EXPORT checkPersonContext(grouped DATASET(risk_indicators.layout_output) input_with_DID, 
-		DATASET (Gateway.Layouts.Config) gateways, integer BSversion=1) := function
+		DATASET (Gateway.Layouts.Config) gateways, integer BSversion=1, string100 IntendedPurpose='') := function
 
 URL := gateways(stringlib.StringToLowerCase(trim(servicename))=gateway.constants.ServiceName.delta_personcontext)[1].url;
 
@@ -28,11 +27,15 @@ dsResponse := PersonContext.GetPersonContext(dsRequest[1]);
 
 // go back to limiting the results to just 100 records per LexID.  Just used dedup instead of TopN which didn't work in batch mode
 dsResponseRecords_roxie := dedup(
-	sort(dsResponse[1].records, dsResponse[1].records.LexID, -(integer) stringLib.StringFilter(dsResponse[1].records.dateadded[1..10], '0123456789'), dsResponse[1].records.statementID), 
+	sort(dsResponse[1].records, dsResponse[1].records.LexID, 
+	if(recordtype in [personContext.Constants.RecordTypes.cs, personcontext.Constants.RecordTypes.rs], 2, 1),  // condider alerts to be higher priority than consumer statements https://jira.rsi.lexisnexis.com/browse/DEMPSEY-273
+	-(integer) stringLib.StringFilter(dsResponse[1].records.dateadded[1..10], '0123456789'), dsResponse[1].records.statementID), 
 	dsResponse[1].records.LexID, keep(iesp.Constants.MAX_CONSUMER_STATEMENTS));
 
 // When running on thor, GetPersonContext takes in multiple rows of data and returns multiple rows of data, instead of using child datasets like the roxie version in order to avoid errors 
-dsResponseRecords_thor := DEDUP(SORT(PersonContext.GetPersonContext_thor(PCKeys), LexID, -(integer) stringLib.StringFilter(dateadded[1..10], '0123456789'), statementID), LexID, keep(iesp.Constants.MAX_CONSUMER_STATEMENTS)) ;
+dsResponseRecords_thor := DEDUP(SORT(PersonContext.GetPersonContext_thor(PCKeys), LexID, 
+if(recordtype in [personContext.Constants.RecordTypes.cs, personcontext.Constants.RecordTypes.rs], 2, 1),  // condider alerts to be higher priority than consumer statements, https://jira.rsi.lexisnexis.com/browse/DEMPSEY-273
+-(integer) stringLib.StringFilter(dateadded[1..10], '0123456789'), statementID), LexID, keep(iesp.Constants.MAX_CONSUMER_STATEMENTS)) ;
 
 #IF(onThor)
 	dsResponseRecords := dsResponseRecords_thor;
@@ -44,10 +47,10 @@ temp_statements := record
 	unsigned LexID;
 	boolean ConsumerStatement;
 	boolean dispute_on_file;
+	boolean security_freeze;
 	boolean security_alert;
 	boolean id_theft_flag;
-  boolean legal_hold_alert;
-  
+  boolean legal_hold_alert;  
 	Risk_Indicators.Layout_Overrides;
 	dataset(Risk_Indicators.Layouts.tmp_Consumer_Statements) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MAX_CONSUMER_STATEMENTS)};
 end;
@@ -60,12 +63,14 @@ PersonContext_transformed := project(dsResponseRecords(searchStatus=personContex
 		statementid := left.statementid;
 		statementtype := left.recordtype;
 		datagroup := left.datagroup;
-		// content := left.content;
     Content := CASE(left.RecordType, 
                     FFD.Constants.RecordType.IT => FFD.Constants.AlertMessage.IDTheftMessage,
                     FFD.Constants.RecordType.LH => FFD.Constants.AlertMessage.LegalHoldMessage,
                     FFD.Constants.RecordType.SF => FFD.Constants.AlertMessage.FreezeMessage,
-                    FFD.Constants.RecordType.FA => FFD.Constants.AlertMessage.FraudMessage,
+                    // if content is populated on Fraud Alert, the content is a consumer phone number to contact.  append that to the end of the statement
+                    FFD.Constants.RecordType.FA => FFD.Constants.AlertMessage.FraudMessage + 
+                                  if(trim(left.content)='', '', 
+                                  ' ' + FFD.Constants.AlertMessage.ConsumerPhoneMessage + left.Content + '.' ), 
                     left.Content);
                             
 // 2016-06-01 19:27:32   
@@ -76,20 +81,31 @@ PersonContext_transformed := project(dsResponseRecords(searchStatus=personContex
 		ts_minute := trim(left.dateadded[15..16]);
 		ts_second := trim(left.dateadded[18..19]);
 		
-    // requirement 3.4 of riskview dempsey requirements
-    //b.	Record Level statements shall NOT be returned in the XML response for legacy riskview (riskview versions older than 50)
-    valid_statements := if(bsversion < 50, [personContext.Constants.RecordTypes.cs], [personContext.Constants.RecordTypes.cs, personcontext.Constants.RecordTypes.rs] );
-		self.ConsumerStatement := statementtype in valid_statements;
+		self.ConsumerStatement := statementtype in [personContext.Constants.RecordTypes.cs];
 	
 		isDispute := statementtype = personContext.Constants.RecordTypes.dr;
+		securityfreeze := statementtype = personContext.Constants.RecordTypes.sf;    
 		securityfraudalert := statementtype = personContext.Constants.RecordTypes.fa;    
 		legal_hold_alert := statementtype in [personContext.Constants.RecordTypes.la, personContext.Constants.RecordTypes.lh];
     id_theft_flag := statementtype = personContext.Constants.RecordTypes.it;
     record_level_statement := statementtype = personContext.Constants.RecordTypes.rs;
 		
+    		
+		// for legal hold, we only consider the legal hold if the legal flag = SA or SP.  otherwise we need to skip that record,  https://jira.rsi.lexisnexis.com/browse/DEMPSEY-277
+		skip_legal_hold := left.recordtype=FFD.Constants.RecordType.LH and trim(left.content) not in [PersonContext.Constants.LegalFlag.SuppressProduct,PersonContext.Constants.LegalFlag.SuppressAll]; 
+    self.legal_hold_alert := if(skip_legal_hold, skip, legal_hold_alert);  
+    
+    // check the intended purpose against the content field to see if the security freeze applies
+    apply_the_security_freeze := map(
+                                    left.recordtype<>FFD.Constants.RecordType.SF => true,  // if we have a recordtype other than security freeze, let it flow 
+                                    left.recordtype=FFD.Constants.RecordType.SF and trim(intendedPurpose)='' => true,
+                                    left.recordtype=FFD.Constants.RecordType.SF and left.content='*' => true,
+                                    risk_indicators.iid_constants.doesFreezeApply(left.content, IntendedPurpose) => true,
+                                    false);
+    self.security_freeze := if(apply_the_security_freeze, securityfreeze, skip);
+    
 		self.dispute_on_file := isDispute;
 		self.security_alert := securityfraudalert;
-    self.legal_hold_alert := legal_hold_alert;
     self.id_theft_flag := id_theft_flag;
     
 // this list will grow as we add more types of alerts to person context that we need to suppress data for
@@ -192,6 +208,7 @@ rolled_personContext := rollup(PersonContext_sorted, left.lexid=right.lexid,
 		// set the flags to true if any of the records in the rollup show as true
 		self.ConsumerStatement := left.consumerstatement or right.consumerstatement;
 		self.dispute_on_file := left.dispute_on_file or right.dispute_on_file;
+		self.security_freeze := left.security_freeze or right.security_freeze;
 		self.security_alert := left.security_alert or right.security_alert;
 		self.id_theft_flag := left.id_theft_flag or right.id_theft_flag;
 		self.legal_hold_alert := left.legal_hold_alert or right.legal_hold_alert;
@@ -229,6 +246,7 @@ with_personContext := join(input_with_DID, rolled_personContext, left.did=right.
 		SELF.ConsumerFlags.corrected_flag := if(left.consumerFlags.corrected_flag or right.lexid<>0, true, false);
 		SELF.ConsumerFlags.consumer_statement_flag := consumer_statement_flag;
 		SELF.ConsumerFlags.dispute_flag := right.dispute_on_file;
+		SELF.ConsumerFlags.security_freeze := right.security_freeze;
 		self.ConsumerFlags.security_alert := right.security_alert;
     self.ConsumerFlags.legal_hold_alert := right.legal_hold_alert;  // 100H
     self.ConsumerFlags.id_theft_flag := right.id_theft_flag; // 100G

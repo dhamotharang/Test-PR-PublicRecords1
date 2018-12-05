@@ -50,18 +50,18 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 
 	busAircraft := DueDiligence.getBusAircraft(busWatercraft, options);
 	
-	busVehicle := DueDiligence.getBusVehicle(busAircraft, options, linkingOptions, includeReport);
+	busVehicle := DueDiligence.getBusVehicle(busAircraft, options, linkingOptions);
 
 	busReg := DueDiligence.getBusRegistration(busVehicle, options, linkingOptions);
 	
 	busGeoRisk := DueDiligence.getBusGeographicRisk(busReg, options);   
 
-	/*attributes taking in inquired and linked businesses*/
+	//attributes taking in inquired and linked businesses
 	busHeader := DueDiligence.getBusHeader(busGeoRisk, options, linkingOptions, includeReport);
 	
 	busSOS := DueDiligence.getBusSOSDetail(busHeader, options, linkingOptions, includeReport);
 
-	/*attributes that must be called after other attributes*/
+	//attributes that must be called after other attributes
 	addrRisk := DueDiligence.getBusAddrData(busSOS, options, includeReport);  //must be called after getBusSOSDetail & getBusRegistration
 	
 	busAsInd := DueDiligence.getBusAsInd(addrRisk, options);  //must be called after getBusSOSDetail & getBusHeader
@@ -77,19 +77,14 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 																										SELF := LEFT;));
 
  
- 	//***There are sections of the report that need to be populated with bits and pieces of information that spans accross the multiple attributes.
-	
-	AddBusinessDataForReport   :=  IF(includeReport, 
-                                   DueDiligence.getBusReport(addCounts, options, linkingOptions, DD_SSNMask),
-                              /* ELSE */
-																   addCounts);
+ 	//If a report is requested, populate the data needed for report	
+	AddBusinessDataForReport := IF(includeReport, DueDiligence.getBusReport(addCounts, options, linkingOptions, DD_SSNMask), addCounts);
 
 	//Populate the index for the customer
 	busKRI := DueDiligence.getBusKRI(AddBusinessDataForReport + inquiredBusNoBIP);
 
 	
-	/*debugging section */   
-	//IF(debugMode, OUTPUT(DD_SSNMask, NAMED('DD_SSNMask')));
+	//debugging section  
 	IF(debugMode, OUTPUT(inquiredBus, NAMED('inquiredBus')));
 	IF(debugMode, OUTPUT(inquiredBusWithBIP, NAMED('inquiredBusWithBIP')));
 	IF(debugMode, OUTPUT(inquiredBusNoBIP, NAMED('inquiredBusNoBIP')));

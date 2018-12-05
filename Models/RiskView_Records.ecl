@@ -374,7 +374,7 @@ VALIDATING := false;
 		suppressNearDups, fromBIID, excludeWatchlists, fromIT1O,
 		ofacVersion, includeOfac, includeAddWatchlists, watchlistThreshold,
 			bsVersion, isPreScreen, doScore, ADL_Based_Shell:=false, datarestriction:=datarestriction, BSOptions:=BSOptions,
-			datapermission:=datapermission,IN_isDirectToConsumer:=isDirectToConsumerPurpose	
+			datapermission:=datapermission,IN_isDirectToConsumer:=isDirectToConsumerPurpose, IntendedPurpose:=purpose_value	
 	);
 	adl_clam := Risk_Indicators.Boca_Shell_Function_FCRA(
 		bsprep, gateways, dppa, glba, isUtility, isLN,
@@ -382,7 +382,7 @@ VALIDATING := false;
 		suppressNearDups, fromBIID, excludeWatchlists, fromIT1O,
 		ofacVersion, includeOfac, includeAddWatchlists, watchlistThreshold,
 		bsVersion, isPreScreen, doScore, ADL_Based_Shell:=true, datarestriction:=datarestriction, BSOptions:=BSOptions,
-		datapermission:=datapermission,IN_isDirectToConsumer:=isDirectToConsumerPurpose	
+		datapermission:=datapermission,IN_isDirectToConsumer:=isDirectToConsumerPurpose, IntendedPurpose:=purpose_value	
 	);
 
 	Models.Layout_Reason_Codes form_rc(Models.Layout_ModelOut le) := TRANSFORM

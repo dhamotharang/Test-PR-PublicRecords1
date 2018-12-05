@@ -1049,4 +1049,95 @@ export Get_chase_NAS_NAP( string chase_f, string chase_l, string chase_addr,  in
 	return Chase_nas_nap;
 end;
 
+export IntendedPurposeCodes(string IntendedPurpose) := case( stringlib.stringtouppercase(IntendedPurpose),
+'APPLICATION' => ['110'],
+'CREDIT TRANSACTION' => ['110'],
+'CREDIT MORTGAGE' => ['110'],
+'CREDIT TRANSACTION (NON-SPECIFIC)' => ['110'],
+'CREDIT TRANSACTION (MORTGAGE)' => ['110'],
+'CREDIT TRANSATION' => ['110'],
+'CREDIT TRANSACTION (AUTO)' => ['110'],
+'CREDIT TRANSACTION (HOME EQUITY)' => ['110'],
+'CREDIT TRANSACTION (PERSONAL LOAN)' => ['110'],
+'CREDIT TRANSACTION (CREDIT CARD)' => ['110'],
+'CREDIT APPLICATION' => ['110'],
+'CHILD SUPPORT' => ['112', '212'],
+'COLLECTIONS' => ['113'],
+'COURT ORDER' => ['114'],
+'COURT ORDER OR SUBPOENA' => ['114', '214'],
+'DEMAND DEPOSIT' => ['115'],
+'GOVERNMENT' => ['118', '218'],
+'GOVERNMENT LICENSE OR BENEFIT' => ['118', '218'],
+'HOUSING COUNSELING' => ['121'],
+'HOUSING COUNSELING AGENCY' => ['121', '221'],
+'LEGITIMATE BUSINESS NEED' => ['127', '227'],
+'POTENTIAL INVESTOR' => ['129'],
+'TENANT SCREENING' => ['132'],
+'BENEFIT GRANTING' => ['211'],
+// 'CHILD SUPPORT' => ['212'],
+'COURT ORDER / SUBPOENA' => ['214'],
+// 'COURT ORDER OR SUBPOENA' => ['214'],
+'EMPLOYER OR VOLUNTEER SCREENING' => ['216'],
+'EMPLOYMENT' => ['216'],
+'EMPLOYMENT SCREENING' => ['216'],
+// 'GOVERNMENT' => ['218'],
+// 'GOVERNMENT LICENSE OR BENEFIT' => ['218'],
+'HEALTHCARE CREDIT' => ['219'],
+'HEALTHCARE CREDIT TRANSACTION' => ['219'],
+'HEALTHCARE CREDIT APPLICATION' => ['219'],
+'HEALTHCARE LEGITIMATEBUSINESSNEED' => ['220'],
+'HEALTHCARE LEGITIMATE BUSINESS NEED' => ['220'],
+// 'HOUSING COUNSELING AGENCY' => ['221'],
+'INSURANCE APPLICATION' => ['222'],
+'INSURANCE CREDIT APPLICATION' => ['222'],
+'INSURANCE PORTFOLIOREVIEW' => ['223'],
+'INSURANCE PORTFOLIO REVIEW' => ['223'],
+'INSURANCE RENEWALS' => ['224'],
+'INSURANCE UNDERWRITING' => ['225'],
+'INVESTIGATION' => ['226'],
+'LEGITIMATE BUSINESS NEED - ACCOUNT OPENING' => ['227'],
+'LEGITIMATE BUSINESS NEED - CHECKING' => ['227'],
+'LEGITIMATE BUSINESS NEED - ACCOUNT REVIEW' => ['227'],
+// 'LEGITIMATE BUSINESS NEED' => ['227'],
+'PORTFOLIO REVIEW' => ['228'],
+'ACCOUNT REVIEW' => ['228'],
+'PRESCREENING' => ['230'],
+'FIRM OFFER OF INSURANCE (PRE-SCREEN)' => ['230'],
+'PRESCREEN  ' => ['230'],
+'INSURANCE PRESCREEN' => ['230'],
+'RENTAL CAR' => ['231'],
+'WRITTEN CONSENT' => ['233'],
+'INSTRUCTED BY CONSUMER' => ['233'],
+'WRITTEN CONSENT - DIRECT TO CONSUMER' => ['234'],
+'WRITTEN CONSENT - PREQUALIFICATION' => ['235'],
+['']);
+
+
+// create a dataset of codes from the content
+// create a dataset of codes from the IntendedPurpose
+// check if there are any of them that overlap
+// if you have a match between content and input IntendedPurpose, apply the security freeze
+EXPORT doesFreezeApply(string personContext_content, string100 IntendedPurpose) := function
+
+  myContentSet := STD.Str.SplitWords(personContext_content, ',');
+  codes_count := COUNT(myContentSet);
+  content_codes_ds := DATASET(codes_count, TRANSFORM({string code_value}, SELF.code_value := STD.Str.CleanSpaces(myContentSet[COUNTER])));
+
+  intended_codes_set := IntendedPurposeCodes(IntendedPurpose);
+  ipc_count := COUNT(intended_codes_set);
+  IntendedPurpose_codes_ds := DATASET(ipc_count, TRANSFORM({string code_value}, SELF.code_value := STD.Str.CleanSpaces(intended_codes_set[COUNTER])));
+
+  matched_codes := join(IntendedPurpose_codes_ds, content_codes_ds, left.code_value=right.code_value);
+  // output(myContentSet, named('myContentSet'));
+  // output(codes_count, named('codes_count'));
+  // output(content_codes_ds, named('content_codes_ds'));
+  // output(intended_codes_set, named('intended_codes_set'));
+  // output(ipc_count, named('ipc_count'));
+  // output(IntendedPurpose_codes_ds, named('intendedPurpose_codes_ds'));
+  // output(matched_codes, named('matched_codes'));
+
+  return count(matched_codes) > 0;
+
+end;
+
 end;

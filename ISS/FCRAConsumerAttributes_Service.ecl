@@ -308,7 +308,7 @@ export FCRAConsumerAttributes_Service := MACRO
 		suppressNearDups, fromBIID, excludeWatchlists, fromIT1O,
 		ofacVersion, includeOfac, includeAddWatchlists, watchlistThreshold,
 			bsVersion, isPreScreen, doScore, ADL_Based_Shell:=false, datarestriction:=datarestriction, BSOptions:=BSOptions,
-			datapermission:=datapermission
+			datapermission:=datapermission, IntendedPurpose := optionsIn.IntendedPurpose
 	);
 	adl_clam(unsigned1 bsVersion) := Risk_Indicators.Boca_Shell_Function_FCRA(
 		iid_prep, gateways, dppa, glba, isUtility, isLN,
@@ -316,7 +316,7 @@ export FCRAConsumerAttributes_Service := MACRO
 		suppressNearDups, fromBIID, excludeWatchlists, fromIT1O,
 		ofacVersion, includeOfac, includeAddWatchlists, watchlistThreshold,
 		bsVersion, isPreScreen, doScore, ADL_Based_Shell:=true, datarestriction:=datarestriction, BSOptions:=BSOptions,
-		datapermission:=datapermission
+		datapermission:=datapermission, IntendedPurpose := optionsIn.IntendedPurpose
 	);																										
 
 	finalClam(unsigned1 bsversion) := if(ADLBasedShell, adl_clam(bsversion), clam(bsversion));

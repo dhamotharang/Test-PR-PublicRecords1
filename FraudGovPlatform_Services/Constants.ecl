@@ -28,6 +28,8 @@
     EXPORT TRANSACTION   := 3; // 3 = Transactions
     EXPORT RELATIONSHIP_ANALYTICS := 4; // 4 = Rel. Analytics
   END;
+	
+	EXPORT IDENTITY_RESOLVED_REALTIME := 'R';
 
   // GOV FDN id key classification_entity.entity_type field possible data values
   EXPORT Entity_Types := MODULE
@@ -69,7 +71,9 @@
 																			Fragment_Types.IP_ADDRESS_FRAGMENT,
 																			Fragment_Types.DRIVERS_LICENSE_NUMBER_FRAGMENT,
 																			Fragment_Types.BANK_ACCOUNT_NUMBER_FRAGMENT,
-																			Fragment_Types.DEVICE_ID_FRAGMENT
+																			Fragment_Types.DEVICE_ID_FRAGMENT,
+																			Fragment_Types.EMAIL_FRAGMENT,
+																			Fragment_Types.GEOLOCATION_FRAGMENT
 																		];
 	
 	EXPORT Contribution_Types := MODULE

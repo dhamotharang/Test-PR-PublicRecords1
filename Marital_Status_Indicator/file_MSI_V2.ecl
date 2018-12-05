@@ -1,15 +1,11 @@
 import doxie, lib_fileservices, ut, watchdog;
 
 //Constants
-// string	effdt := (string)Watchdog.Key_Watchdog_nonglb[1].run_date;
-// string	effdt := '20120501';
 test := fileservices.LogicalFileList('thor_data400::key::header::test20::relatives');
 string 	date :=(test[1].modified[1..10]);
 string	effdt := date[1..4] + date[6..7] + date[9..10];
 
-//start with watchdog
-// ds_in := watchdog.file_best(adl_ind in ['CORE','DEAD'] and did <> 0);//use this on main build
-// ds_in := distribute(Watchdog.Key_Watchdog_nonglb(adl_ind in ['CORE','DEAD'] and did <> 0), did);//use this on main build
+//start with best did
 ds_in := distribute(marital_status_indicator.key_MSI_Best_did(adl_ind in ['CORE','DEAD'] and did <> 0), did);//use this on main build
 
 ////////////////////////////

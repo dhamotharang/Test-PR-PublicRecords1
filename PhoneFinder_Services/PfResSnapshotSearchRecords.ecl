@@ -4,13 +4,13 @@ EXPORT PfResSnapshotSearchRecords (PhoneFinder_Services.Layouts.PFResSnapShotSea
   
                                      
   //Pulling Records from the keys 
-  by_companyid := JOIN(dInput.Companies, dx_PhoneFinderReportDelta.Key_Transactions_CompanyId,
+  by_companyid := JOIN(dInput.CompanyIds, dx_PhoneFinderReportDelta.Key_Transactions_CompanyId,
                        KEYED(LEFT.CompanyId = RIGHT.company_id AND 
                        (RIGHT.transaction_date = dInput.StartDate  OR (dInput.EndDate<>'' AND  RIGHT.transaction_date BETWEEN dInput.StartDate AND dInput.EndDate))),                       
                        TRANSFORM({PhoneFinder_Services.Layouts.delta_phones_rpt_transaction.transaction_id},
                        SELF := RIGHT), LIMIT(PhoneFinder_Services.Constants.PfResSnapshot.MaxRecords, FAIL(203, PhoneFinder_Services.Constants.PfResSnapshotErrorMessages.Companyid)));
   
-  by_cmpid_refcode := JOIN(dInput.Companies, dx_PhoneFinderReportDelta.Key_Transactions_CompanyRefCode,
+  by_cmpid_refcode := JOIN(dInput.CompanyIds, dx_PhoneFinderReportDelta.Key_Transactions_CompanyRefCode,
                         KEYED(LEFT.CompanyId = RIGHT.company_id AND RIGHT.reference_code = dInput.ReferenceCode AND
                         (RIGHT.transaction_date = dInput.StartDate  OR (dInput.EndDate<>'' AND  RIGHT.transaction_date BETWEEN dInput.StartDate AND dInput.EndDate))),                       
                         TRANSFORM({PhoneFinder_Services.Layouts.delta_phones_rpt_transaction.transaction_id},
@@ -28,7 +28,7 @@ EXPORT PfResSnapshotSearchRecords (PhoneFinder_Services.Layouts.PFResSnapShotSea
   by_lexid       := PROJECT(LIMIT(dx_PhoneFinderReportDelta.Key_Identities_LexId(KEYED(lexid = dInput.UniqueId)), 
                             PhoneFinder_Services.Constants.PfResSnapshot.MaxRecords, FAIL(203, PhoneFinder_Services.Constants.PfResSnapshotErrorMessages.LexId)), TRANSFORM({PhoneFinder_Services.Layouts.delta_phones_rpt_transaction.transaction_id}, SELF:=LEFT));
   
-  SearchbyCompanyids := EXISTS(dInput.Companies); 
+  SearchbyCompanyids := EXISTS(dInput.CompanyIds); 
 
   //Determining the search                           
   map_searchs := MAP(dInput.UniqueId <> 0      => by_lexid,
@@ -77,7 +77,7 @@ EXPORT PfResSnapshotSearchRecords (PhoneFinder_Services.Layouts.PFResSnapShotSea
                          t_trans(LEFT, RIGHT),
                          LIMIT(0), KEEP(1));
    
-   InputCmpIds :=  SET(dInput.Companies, Companyid);                      
+   InputCmpIds :=  SET(dInput.CompanyIds, Companyid);                      
  
   //Filtering the Records with additional search criteria and limiting to MaxSearchRecords
   dfiltered_recs := LIMIT(dGet_trans_recs((~SearchbyCompanyids OR CompanyID IN InputCmpIds) AND
@@ -136,11 +136,13 @@ EXPORT PfResSnapshotSearchRecords (PhoneFinder_Services.Layouts.PFResSnapShotSea
   
    RIs_wth_tid_rec := RECORD
      string16 transaction_id;
+     integer1 PhoneId;
      iesp.phonefindertransactionsearch.t_PhoneRiskIndicators;
    END; 
      
    RIs_wth_tid_rec tAppendRiskInd(RECORDOF(dx_PhoneFinderReportDelta.Key_RiskIndicators) r) :=
        TRANSFORM
+        SELF.PhoneId := r.phone_id, 
         SELF.RiskId := r.risk_indicator_id, 
         SELF.Level := r.risk_indicator_level,
         SELF.RiskDescription := r.risk_indicator_text,
@@ -160,7 +162,8 @@ EXPORT PfResSnapshotSearchRecords (PhoneFinder_Services.Layouts.PFResSnapShotSea
  
   //Denormalizing OtherPhoneRecs with OtherPhone RI's  
   dNormOtherPhones_RIs := DENORMALIZE(dGet_otherphone_recs, dGet_OthersRIs,
-                                     LEFT.transaction_id = RIGHT.transaction_id,
+                                     LEFT.transaction_id = RIGHT.transaction_id and 
+                                     LEFT.PhoneId = RIGHT.PhoneId,
                                      GROUP,
                                      TRANSFORM(otherphn_wth_tid_rec,
                                      SELF.RiskIndicators := CHOOSEN(SORT(PROJECT(ROWS(RIGHT), iesp.phonefindertransactionsearch.t_PhoneRiskIndicators), RiskId, Level, Category),iesp.Constants.PfResSnapshot.MaxRIs),

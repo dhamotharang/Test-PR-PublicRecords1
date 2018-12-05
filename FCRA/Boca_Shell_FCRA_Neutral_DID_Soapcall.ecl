@@ -24,7 +24,8 @@ export Boca_Shell_FCRA_Neutral_DID_Soapcall(DATASET(risk_indicators.layout_input
 								string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
 								unsigned1 append_best=0, 
 								unsigned8 BSOptions=0,
-								string50 DataPermission=risk_indicators.iid_constants.default_DataPermission) :=
+								string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
+                string100 IntendedPurpose='') :=
 FUNCTION
 
 ret := risk_indicators.InstantID_Function(iid,
@@ -50,7 +51,8 @@ ret := risk_indicators.InstantID_Function(iid,
 										in_runDLverification := FALSE,
 										in_append_best := append_best,
 										in_BSOptions := BSOptions,
-										in_DataPermission := DataPermission);
+										in_DataPermission := DataPermission,
+                    in_IntendedPurpose := IntendedPurpose);
 	
 	iid_results_with_flags := risk_indicators.ADL_Based_Modeling_IID_Function(iid,
 																																				gateways, 
@@ -73,7 +75,8 @@ ret := risk_indicators.InstantID_Function(iid,
 																																				-1,
 																																				DataRestriction,
 																																				BSOptions,
-																																				DataPermission);
+																																				DataPermission,
+                                                                        IntendedPurpose);
 										
 	just_iid_results := project(iid_results_with_flags, risk_indicators.Layout_Output);
 	

@@ -24,6 +24,8 @@
 
 export Did_Zip_Service := MACRO
 
+import dx_BestRecords;
+
 string30 fname_val := '' : stored('FirstName');
 string30 lname_val := '' : stored('LastName');
 string5 zip_value := '' : stored('Zip');
@@ -127,7 +129,7 @@ end;
 pre_out := project(res2,slim(LEFT));
 
 os(string i) := if (i='','',trim(i)+' ');
-pre_out add_flds(pre_out le, watchdog.Key_Watchdog_nonglb ri) := transform
+pre_out add_flds(pre_out le, dx_BestRecords.layout_best ri) := transform
   self.best_phone :=  ri.phone;
   self.best_ssn :=  ri.ssn;
   self.best_name :=  os(ri.title)+os(ri.fname)+os(ri.mname)+os(ri.lname)+os(ri.NAME_suffix);
@@ -141,7 +143,8 @@ pre_out add_flds(pre_out le, watchdog.Key_Watchdog_nonglb ri) := transform
   self := le;
 end;
 
-jt := join(pre_out,watchdog.Key_Watchdog_nonglb,left.did<>0 and left.did = right.did,add_flds(LEFT,RIGHT),left outer);
+brap := dx_BestRecords.append(pre_out, did, dx_BestRecords.Constants.perm_type.nonglb);
+jt := project(brap, add_flds(left, left._best));
 sjt := sort(jt,-confidence);
 
 outf := if(best_appended,sjt,pre_out);

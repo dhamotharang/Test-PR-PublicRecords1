@@ -248,6 +248,7 @@ EXPORT Layouts := MODULE
 		STRING2 mailing_state;
 		STRING5 mailing_zip;
 		STRING10 phone;
+		STRING256 email_address;
 		STRING25 ip_address;
 		STRING50 device_id;
 		STRING20 bank_account_number;

@@ -54,7 +54,7 @@ EXPORT fn_getRelatives(DATASET(HomesteadExemptionV2_Services.Layouts.propIdRec) 
 	END;
 
 	search_dids:=PROJECT(ds_srch_recs,TRANSFORM(Relationship.layout_GetRelationship.DIDs_layout,SELF:=LEFT));
-	ds_rel_recs:=Relationship.proc_GetRelationship(search_dids,RelativeFlag:=TRUE).result;
+	ds_rel_recs:=Relationship.proc_GetRelationship(search_dids,RelativeFlag:=TRUE,doSkip:=TRUE).result;
 	ds_1st_recs:=PROJECT(ds_rel_recs(title IN Header.relative_titles.set_FirstDegreeRelative),TRANSFORM(relSlimRec,SELF:=LEFT));
 
 	RETURN DENORMALIZE(ds_srch_recs,ds_1st_recs,LEFT.did=RIGHT.did1,GROUP,relativeRecords(LEFT,ROWS(RIGHT)));

@@ -1,4 +1,4 @@
-import _Control;
+﻿import _Control;
 export LibraryUse := MODULE
 
 /*

@@ -1,4 +1,4 @@
-﻿IMPORT iesp, Gateway, Royalty;
+﻿IMPORT doxie, iesp, Gateway, Royalty, STD;
 
 EXPORT SoapCall_CCR(DATASET(iesp.conscredit_req.t_ConsumerCreditReportRequest) ccrReq,
 										Gateway.Layouts.Config gateway_cfg,
@@ -53,8 +53,13 @@ EXPORT SoapCall_CCR(DATASET(iesp.conscredit_req.t_ConsumerCreditReportRequest) c
 			STRING  Message  := XMLTEXT('faultstring');
 		END;
 		soapMsg := DATASET([L.soap_message],{STRING line});
-		parsedSoapResponse := PARSE(soapMsg,line,faultRec,XML('soap:Envelope/soap:Body/soap:Fault'));
+		// the SOAP message can be in XML or TEXT
+		parsedSoapResponse := MAP(
+			STD.Str.Find(soapMsg[1].line,'<soap:Fault>')>0 => PARSE(soapMsg,line,faultRec,XML('soap:Envelope/soap:Body/soap:Fault')),
+			L.soap_message!='' => DATASET([{'Roxie',100,'',doxie.ErrorCodes(100)}],faultRec),
+			DATASET([],faultRec));
 		soapFault := PROJECT(parsedSoapResponse,iesp.share.t_WsException);
+		SELF.response._header.Status := soapFault[1].Code;
 		SELF.response._header.Message := soapFault[1].Message;
 		SELF.response._header.Exceptions := CHOOSEN(soapFault,iesp.Constants.MaxResponseExceptions);
 		SELF:=L;
