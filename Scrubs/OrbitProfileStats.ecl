@@ -70,7 +70,9 @@ output(RemoveBlankRules),
 																																		 'Scrubs.StatSubmit(Submission,CalculateWarnings,\''+pProfileName+'\',\''+CustomTag+'\',\''+pProfileType+'\',\''+versionDate+'\',\''+FileType+'\',\''+workunit+'\');'
 																																		 ,std.system.job.target())));
 																																		 
-																																		 
+
+shared CalculateWarnings:=Scrubs.OrbitProfileStatsPost310(pProfileName,'ScrubsAlerts',CleanStats,versionDate,pProfileName).CompareToProfile_for_Orbit;
+EXPORT SubmitStatsInWU :=	Scrubs.StatSubmit(CleanStats,CalculateWarnings,pProfileName,CustomTag,pProfileType,versionDate,FileType,workunit);																														 
 
 EXPORT SummaryStats := dedup(sort(project(CleanStats,
 																					transform(SALT311.ScrubsOrbitLayout and not [rejectwarning, rawcodemissing, rawcodemissingcnt],

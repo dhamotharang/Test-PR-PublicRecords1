@@ -1,4 +1,4 @@
-﻿EXPORT ScrubsPlus_PassFile(inputFile,DatasetName,ScrubsModule,ScrubsProfileName,ScopeName='',filedate,emailList='', UseOnFail=false)	:=	FUNCTIONMACRO 
+﻿EXPORT ScrubsPlus_PassFile(inputFile,DatasetName,ScrubsModule,ScrubsProfileName,ScopeName='',filedate,emailList='', UseOnFail=false,SubmitInWu=false)	:=	FUNCTIONMACRO 
 IMPORT tools,std,ut,SALT311;
 
 	folder						:=	#EXPAND(ScrubsModule);
@@ -137,8 +137,11 @@ IMPORT tools,std,ut,SALT311;
 																			'Total Number of Removed Recs:'+TotalRemovedRecs+'\n'+
 																			'Workunit:'+tools.fun_GetWUBrowserString()+'\n'));
 																			
+	#IF(SubmitInWu = true)
+	SubmitStats						:=	Scrubs.OrbitProfileStatsPost310(profilename,'ScrubsAlerts',Orbit_stats,filedate,profilename).SubmitStatsInWU;
+	#ELSE
 	SubmitStats						:=	Scrubs.OrbitProfileStatsPost310(profilename,'ScrubsAlerts',Orbit_stats,filedate,profilename).SubmitStats;
-	
+	#END
 	SuperFile:='~thor_data400::ScrubsPlus::log';
 	Super_Log_File:='~thor_data400::ScrubsPlus::'+ScrubsModule+'::Log::'+workunit+'::'+Prefix;
 	
