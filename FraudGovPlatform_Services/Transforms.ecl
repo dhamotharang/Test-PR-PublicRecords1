@@ -418,6 +418,7 @@ EXPORT Transforms := MODULE
 					SELF.mailing_state := L.mailing_st;
 					SELF.mailing_zip := L.mailing_z5;
 					SELF.phone := L.phoneno;
+					SELF.email_address := L.email_address;
 					SELF.ip_address := L.ip_address;
 					SELF.device_id := L.device_id;
 					SELF.bank_account_number := L.bank_account_number;

@@ -1,4 +1,4 @@
-import BIPV2_Files, BIPV2, MDR, BIPV2_LGID3,ut,bipv2_build,wk_ut,tools,std,BIPV2_Tools,mdr,SALTTOOLS22;
+﻿import BIPV2_Files, BIPV2, MDR, BIPV2_LGID3,ut,bipv2_build,wk_ut,tools,std,BIPV2_Tools,mdr,SALTTOOLS22;  
 // Init receives a file in common layout, and narrows it for use in all iterations. We widen
 // back to the common layout before promoting it to the base/father/grandfather superfiles.
 l_common  := BIPV2.CommonBase.Layout;
@@ -38,12 +38,12 @@ export _proc_lgid3(
 		
 		ds_init := BIPV2_Tools.initParentID(ds, proxid, lgid3);
 		ds_base := PROJECT(ds_init,toBase(LEFT));
+				
 		RETURN ds_base;
 	END;
 	/* ---------------------- Pre-processing ---------------------------- */
 	EXPORT DATASET(l_base) preProcess2(DATASET(l_common) ds) := 
   FUNCTION
-  
 		l_base toBase(l_common L) := 
     TRANSFORM
 			isLegal	:= (L.company_name_type_derived='LEGAL' or (L.company_name_type_derived='FBN' and mdr.sourcetools.sourceisCorpV2(L.source)));
@@ -72,20 +72,86 @@ export _proc_lgid3(
     
 	END;		
   /* ---------------------- Strata Quick ID Check --------------------------------*/
-  import BIPV2_Strata,strata;
+  import BIPV2_Strata,strata, linkingtools;
   export dostrata_ID_Check(dataset(l_common) pDataset ,boolean pIsTesting = false) := BIPV2_Strata.mac_BIP_ID_Check(pDataset,'LGID3','Preprocess',pversion,pIsTesting);
 	/* ---------------------- Init From Hrchy ---------------------------- */
 	// SHARED ds_hrchy := dataset(ut.foreign_prod + 'thor_data400::bipv2::internal_linking::building::20141015',BIPV2.CommonBase.Layout,thor);//(v_city_name in ['BOCA RATON','DAYTON','SPRINGBORO','MIAMISBURG'],st in ['FL','OH']);//HACK
 	SHARED ds_hrchy := BIPV2_Files.files_hrchy.FILE_HRCY_BASE_LF_FULL_BUILDING;
+	//SHARED ds_hrchy := dataset('~thor_data400::bipv2d::internal_linking::20170424_keep',BIPV2.CommonBase.Layout,thor);
+	SHARED preprocessResult:=preProcess(ds_hrchy);
+	
+														//=ds_hrchy						//=preprocessResult
+	export getInitialChanges(DATASET(l_common) dsb, DATASET(l_base) dsa) := Function
+			lgid3Prox:=project(dsa,transform({string20 version, unsigned6 proxid,unsigned6 lgid3}, 
+			   self.version:=pversion; self.proxid:=left.proxid; self.lgid3:=left.lgid3));
+			lgid3Prox_ded:=dedup(sort(lgid3Prox, lgid3,proxid,skew(1.0)),lgid3,proxid);
+			
+			superInit:='~thor_data400::BIPV2_LGID3::init_super::lgid3prox' + pversion;
+			b0:=if(STD.File.SuperFileExists(superInit)=false,
+			       STD.File.CreateSuperFile(superInit));
+			Lgid3ProxPath:='~thor_data400::BIPV2_LGID3::lgid3prox::init'+pversion;
+			f_lgid3Prox_ded:=output(lgid3Prox_ded,,Lgid3ProxPath,COMPRESSED,OVERWRITE);
+			act5:=STD.File.AddSuperFile(superInit,Lgid3ProxPath);
+			
+/* 			todo:=SEQUENTIAL(
+   											 STD.File.StartSuperFileTransaction(),
+   											 STD.File.ClearSuperFile('~thor_data400::BIPV2_LGID3::lgid3_changes',true),
+   											 STD.File.FinishSuperFileTransaction()
+   											);
+*/
+      superChange:='~thor_data400::BIPV2_LGID3::lgid3_changes::super' + pversion;
+			AA:=STD.File.SuperFileExists(superChange);
+			b1:=if(AA=false, STD.File.CreateSuperFile(superChange));
+			
+/* 			todo2:=SEQUENTIAL(
+   											 STD.File.StartSuperFileTransaction(),
+   											 STD.File.ClearSuperFile('~thor_data400::BIPV2_LGID3::lgid3_match_sample_debug',true),
+   											 STD.File.FinishSuperFileTransaction()
+   											);
+*/
+      superMatch:='~thor_data400::BIPV2_LGID3::lgid3_match_sample_debug::super' + pversion;
+			AA2:=STD.File.SuperFileExists(superMatch);
+			//b2:=if(AA2=true,todo2, STD.File.CreateSuperFile('~thor_data400::BIPV2_LGID3::lgid3_match_sample_debug'));
+			b2:=if(AA2<>true,STD.File.CreateSuperFile(superMatch));
+		Change_rec:=RECORD
+			string20 version;
+			string20 iterNumber;
+			unsigned6 lgid3_before;
+			unsigned6 lgid3_after;
+			unsigned6 seleid_before;
+			unsigned6 seleid_after;
+		end;		
+		ds_c:=join(dsb,dsa,left.rcid=right.rcid, transform(Change_rec,
+																												self.version :=pversion;
+																												self.lgid3_before :=left.lgid3;
+																												self.lgid3_after  :=right.lgid3;
+																												self.seleid_before:=left.seleid;
+																												self.seleid_after :=right.seleid;
+																												self.iterNumber   :='I'+pversion));
+		ds_r:= ds_c(lgid3_before <> lgid3_after or seleid_before <> seleid_after);
+		ds_r1:=dedup(ds_r,version,iterNumber,lgid3_before,lgid3_after,seleid_before,seleid_after,all);
+		
+		qqPath:='~thor_data400::BIPV2_LGID3::lgid3_changes::I'+pversion;
+		act_init:=output(ds_r1,,qqPath,COMPRESSED,OVERWRITE);
+		act4:=STD.File.AddSuperFile(superChange,qqPath);
+		return sequential(b1,b2,act_init,act4,b0,f_lgid3Prox_ded,act5);
+		
+	end;
+	
 	EXPORT init(DATASET(l_common) ds=ds_hrchy, BOOLEAN idReset=false) := SEQUENTIAL(
-     dostrata_ID_Check(ds_hrchy)
+    dostrata_ID_Check(ds_hrchy) 
 		,BIPV2_Files.files_lgid3.clearBuilding
-		,OUTPUT(preProcess(ds),,f_init,COMPRESSED,OVERWRITE)
+		,getInitialChanges(ds_hrchy, preprocessResult)
+		,OUTPUT(preprocessResult,,f_init,COMPRESSED,OVERWRITE)
+		//,OUTPUT(preProcess(ds),,f_init,COMPRESSED,OVERWRITE)
 		,BIPV2_Files.files_lgid3.updateBuilding(f_init)
 	);
+  export kick_copy2_storage_thor  := BIPV2_Tools.Copy2_Storage_Thor('~' + nothor(std.file.superfilecontents(BIPV2_Files.files_hrchy.FILENAME_HRCY_BASE_LF_FULL_BUILDING)[1].name) ,pversion ,'lgid3_preprocess');
+  export copy2StorageThor         := if(not wk_ut._constants.IsDev ,output(kick_copy2_storage_thor ,named('copy2_Storage_Thor__html')));  //copy orig file to storage thor
 	EXPORT initFromHrchy := sequential(
      init(ds_hrchy, TRUE)
-    ,if(not wk_ut._constants.IsDev ,tools.Copy2_Storage_Thor(filename := '~' + nothor(std.file.superfilecontents(BIPV2_Files.files_hrchy.FILENAME_HRCY_BASE_LF_FULL_BUILDING)[1].name)  ,pDeleteSourceFile  := true))  //copy orig file to storage thor
+    ,copy2StorageThor
+    // ,if(not wk_ut._constants.IsDev ,tools.Copy2_Storage_Thor(filename := '~' + nothor(std.file.superfilecontents(BIPV2_Files.files_hrchy.FILENAME_HRCY_BASE_LF_FULL_BUILDING)[1].name)  ,pDeleteSourceFile  := true))  //copy orig file to storage thor
   ); // HACK - preserve id values someday
 	
 	
@@ -112,7 +178,8 @@ EXPORT DATASET(l_common) postProcess(DATASET(l_base) ds, DATASET(l_common) ds_co
 			maxSeleId := Max(group,ds.OriginalSeleId);
 			maxOrgId  := Max(group,ds.OriginalOrgId);
 		end;
-		TheSeleTable0 :=table(ds,TheSeleStruct,seleid);
+		
+		TheSeleTable0 :=table(ds,TheSeleStruct,seleid,skew(0.9));
 		
 		//The above we get : pair of (seleid, originalseleid), possible results : (1000,1000), (500,1000), (444,0). 
 		//The (1000,1000) means (a) 1000-cluster itself or (b) a leafnode of the 1000-sele cluster or (c) a leafnode of it joining some singletons 
@@ -210,12 +277,26 @@ EXPORT DATASET(l_common) postProcess(DATASET(l_base) ds, DATASET(l_common) ds_co
 	
 	/* ---------------------- SALT Output -------------------------------- */
 	shared updateBuilding(string fname=f_out(iter)) := BIPv2_Files.files_lgid3.updateBuilding(fname);
-	export updateSuperfiles(string fname=f_out(iter), dataset(l_common) ds_common=ds_hrchy) := sequential(
-		output(postProcess(dataset(fname,l_base,thor),ds_common),, fname+'_post', compressed, overwrite),
-		BIPv2_Files.files_lgid3.updateSuperfiles(fname+'_post')
-    ,if(not wk_ut._constants.IsDev ,tools.Copy2_Storage_Thor(filename := fname  ,pDeleteSourceFile  := true))  //copy orig file to storage thor
-	);
+	shared before_restore_ds := dataset(f_out(iter),l_base,thor);
+	shared restoredDs :=postProcess(before_restore_ds,ds_hrchy);
+	shared the_stat_ds :=BIPV2_Strata.PersistenceStats(restoredDs,BIPV2.CommonBase.DS_BASE,rcid,lgid3);
 	
+	export updateSuperfiles(string fname=f_out(iter), dataset(l_common) ds_common=ds_hrchy) := 
+  function
+  
+    kick_copy2_storage_thor_post  := BIPV2_Tools.Copy2_Storage_Thor(fname  ,pversion ,'lgid3_postprocess');
+    copy2StorageThor_post         := if(not wk_ut._constants.IsDev ,output(kick_copy2_storage_thor_post ,named('copy2_Storage_Thor__html')));  //copy orig file to storage thor
+    return sequential(
+      //output(postProcess(dataset(fname,l_base,thor),ds_common),, fname+'_post', compressed, overwrite),
+       output(restoredDs,,                                        fname+'_post', compressed, overwrite)
+      ,BIPV2_LGID3._ManageLgid3Indexes(before_restore_ds , restoredDs, pversion).out //added for data retrieve
+      ,BIPv2_Files.files_lgid3.updateSuperfiles(fname+'_post')
+      ,Strata.macf_CreateXMLStats(the_stat_ds ,'BIPV2','Persistence'	,BIPV2.KeySuffix,BIPV2_Build.mod_email.emailList,'LGID3','Stats',false,false) //group on cluster_type, stat_desc
+      ,copy2StorageThor_post
+      // ,if(not wk_ut._constants.IsDev ,tools.Copy2_Storage_Thor(filename := fname  ,pDeleteSourceFile  := true))  //copy orig file to storage thor
+    );
+	end;
+  
 	/* ---------------------- SALT History ------------------------------- */
 	shared updateLinkHist   	:= BIPv2_Files.files_lgid3.updateLinkHist(f_hist(iter));
 		
@@ -233,8 +314,14 @@ EXPORT DATASET(l_common) postProcess(DATASET(l_base) ds, DATASET(l_common) ds_co
 	
 	/* ---------------------- Take Action -------------------------------- */
 	export runSpecBuild := sequential(specBuild, specDebug);
-	
-	export runIter := sequential(linking, outputReviewSamples, updateBuilding(), updateLinkHist)
+  ds_lgid3      := BIPV2_LGID3.In_LGID3    ;
+  ds_commonbase := bipv2.CommonBase.ds_base (seleid = 46640408) : persist('~persist::lbentley::LNK::324::ds_filtered44');
+  ds_commonbase_rcids := table(ds_commonbase  ,{rcid});
+  ds_lgid3_rcids  := join(ds_lgid3  ,ds_commonbase_rcids  ,left.rcid = right.rcid ,transform(left)  ,lookup);
+  ds_agg_LNK197_lgids := join(ds_lgid3  ,table(ds_lgid3_rcids,{lgid3},lgid3,merge)  ,left.lgid3 = right.lgid3 ,transform(left)  ,lookup);
+  export output_lnk_197  := output(BIPV2_LGID3._AggLgid3s(ds_agg_LNK197_lgids) ,named('ds_agg_LNK197_lgids'),all);
+  // -- Run Iteration
+	export runIter := sequential(linking,outputReviewSamples, updateBuilding(), updateLinkHist,BIPV2_LGID3._Lgid3Changes(iter,pversion, input).out,output_lnk_197)
 		: SUCCESS(bipv2_build.mod_email.SendSuccessEmail(,'BIPv2', , 'LGID3')),
 			FAILURE(bipv2_build.mod_email.SendFailureEmail(,'BIPv2', failmessage, 'LGID3'));
 	

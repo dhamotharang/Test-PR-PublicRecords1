@@ -254,7 +254,7 @@ export FcraInsurView_Service := MACRO
 		suppressNearDups, fromBIID, excludeWatchlists, fromIT1O,
 		ofacVersion, includeOfac, includeAddWatchlists, watchlistThreshold,
 			bsVersion, isPreScreen, doScore, ADL_Based_Shell:=false, datarestriction:=datarestriction, BSOptions:=BSOptions,
-			datapermission:=datapermission,IN_isDirectToConsumer:=isDirectToConsumerPurpose	
+			datapermission:=datapermission,IN_isDirectToConsumer:=isDirectToConsumerPurpose, IntendedPurpose := intended_purpose
 	);
 	adl_clam := Risk_Indicators.Boca_Shell_Function_FCRA(
 		bsprep, gateways, DPPAPurpose, GLBPurpose, isUtility, isLN,
@@ -262,7 +262,7 @@ export FcraInsurView_Service := MACRO
 		suppressNearDups, fromBIID, excludeWatchlists, fromIT1O,
 		ofacVersion, includeOfac, includeAddWatchlists, watchlistThreshold,
 		bsVersion, isPreScreen, doScore, ADL_Based_Shell:=true, datarestriction:=datarestriction, BSOptions:=BSOptions,
-		datapermission:=datapermission,IN_isDirectToConsumer:=isDirectToConsumerPurpose	
+		datapermission:=datapermission,IN_isDirectToConsumer:=isDirectToConsumerPurpose, IntendedPurpose := intended_purpose
 	);
 
 	clam_to_check := if(DoAddressAppend, adl_clam[1], clam[1]);

@@ -10,7 +10,12 @@ export Property_History_Function(DATASET(Layout_PropHistory_In) inData,
 						   BOOLEAN lnBranded=false, BOOLEAN doAVM=false) := 
 FUNCTION
 
-
+  mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+	  EXPORT unsigned1 glb := glba;
+	  EXPORT unsigned1 dppa := ^.dppa;
+		EXPORT boolean ln_branded := lnBranded;
+		EXPORT string32 application_type := applicationType;
+	END;
 	
   key_search := LN_PropertyV2.key_search_fid();	
   key_addr   := LN_PropertyV2.key_addr_fid();
@@ -267,7 +272,7 @@ FUNCTION
 	owner_bdid :=dedup(sort(project(owner_wdids_bdids(did=0 and bdid<>0),into_ref2(LEFT)),bdid),bdid);
 	
 	// get best records by did
-	OB0 := doxie.best_records(owner_did, false, dppa, glba, true, includeDOD:=true);
+	OB0 := doxie.best_records(owner_did, includeDOD:=true, modAccess := mod_access);
 	
 	// get best records by bdid
 	OB1 := doxie_cbrs.fn_best_records(owner_bdid, false);
@@ -522,7 +527,7 @@ END;
 
 	didList := PROJECT(addr_didList, xtract4REferences(LEFT));
 
-	bestRecords_all := sort(doxie.best_records(didList, false, dppa, glba, true),-addr_dt_last_seen);
+	bestRecords_all := sort(doxie.best_records(didList, modAccess := mod_access),-addr_dt_last_seen);
 	
 	// restrict minors
 	bestRecords	:= bestRecords_all(ut.PermissionTools.GLB.minorOK(age));
@@ -627,14 +632,14 @@ END;
 	// Compliance code...
 	
 	// suppression
-	Suppress.MAC_Suppress_Child.nokeyLinked(out_preCompliance,,out_pull1,applicationType,Suppress.Constants.LinkTypes.DID,did,,owners,true);
-	Suppress.MAC_Suppress_Child.nokeyLinked(out_pull1,,out_pull2,applicationType,Suppress.Constants.LinkTypes.DID,did,,current_residents,true);
-	Suppress.MAC_Suppress_Child.nokeyLinked(out_pull2,,out_pull3,applicationType,Suppress.Constants.LinkTypes.SSN,hri_ssn[1].ssn,,owners,true);
-	Suppress.MAC_Suppress_Child.nokeyLinked(out_pull3,,out_pull4,applicationType,Suppress.Constants.LinkTypes.SSN,hri_ssn[1].ssn,,current_residents,true);
-	Suppress.MAC_Suppress_Child.nokeyLinked(out_pull4,,out_pull5,applicationType,Suppress.Constants.LinkTypes.DID,sale.buyers[1].did,,transactions,true);
-	Suppress.MAC_Suppress_Child.nokeyLinked(out_pull5,,out_pull6,applicationType,Suppress.Constants.LinkTypes.SSN,sale.buyers[1].hri_ssn[1].ssn,,transactions,true);
-	Suppress.MAC_Suppress_Child.nokeyLinked(out_pull6,,out_pull7,applicationType,Suppress.Constants.LinkTypes.DID,sale.sellers[1].did,,transactions,true);
-	Suppress.MAC_Suppress_Child.nokeyLinked(out_pull7,,out_pull8,applicationType,Suppress.Constants.LinkTypes.SSN,sale.sellers[1].hri_ssn[1].ssn,,transactions,true);
+	Suppress.MAC_Suppress_Child.nokeyLinked(out_preCompliance,,out_pull1,mod_access.application_type,Suppress.Constants.LinkTypes.DID,did,,owners,true);
+	Suppress.MAC_Suppress_Child.nokeyLinked(out_pull1,,out_pull2,mod_access.application_type,Suppress.Constants.LinkTypes.DID,did,,current_residents,true);
+	Suppress.MAC_Suppress_Child.nokeyLinked(out_pull2,,out_pull3,mod_access.application_type,Suppress.Constants.LinkTypes.SSN,hri_ssn[1].ssn,,owners,true);
+	Suppress.MAC_Suppress_Child.nokeyLinked(out_pull3,,out_pull4,mod_access.application_type,Suppress.Constants.LinkTypes.SSN,hri_ssn[1].ssn,,current_residents,true);
+	Suppress.MAC_Suppress_Child.nokeyLinked(out_pull4,,out_pull5,mod_access.application_type,Suppress.Constants.LinkTypes.DID,sale.buyers[1].did,,transactions,true);
+	Suppress.MAC_Suppress_Child.nokeyLinked(out_pull5,,out_pull6,mod_access.application_type,Suppress.Constants.LinkTypes.SSN,sale.buyers[1].hri_ssn[1].ssn,,transactions,true);
+	Suppress.MAC_Suppress_Child.nokeyLinked(out_pull6,,out_pull7,mod_access.application_type,Suppress.Constants.LinkTypes.DID,sale.sellers[1].did,,transactions,true);
+	Suppress.MAC_Suppress_Child.nokeyLinked(out_pull7,,out_pull8,mod_access.application_type,Suppress.Constants.LinkTypes.SSN,sale.sellers[1].hri_ssn[1].ssn,,transactions,true);
 	// NOTE: The entries above with [1] are child datasets where there could conceivably
 	//       be more than one record.  Ideally, we should have a way to suppress based on
 	//       any of them rather than just the first.

@@ -35,13 +35,15 @@ export Check_Records(DATASET(iesp.checkpersonsearch.t_CheckPersonSearchRequest) 
    DL2use := StringLib.StringToUpperCase(search_by.DriverLicense.LicenseNumber);
 	 DLState2use := StringLib.StringToUpperCase(search_by.DriverLicense.IssueState);
 	
-   glb_ok := AutoStandardI.InterfaceTranslator.glb_ok.val(project(gm,AutoStandardI.InterfaceTranslator.glb_ok.params));  
-	 ssnMask := AutoStandardI.InterfaceTranslator.ssn_mask_value.val(project(gm,AutoStandardI.InterfaceTranslator.ssn_mask_value.params)); 
-	 dob_mask_value := AutoStandardI.InterfaceTranslator.dob_mask_value.val(project(gm,AutoStandardI.InterfaceTranslator.dob_mask_value.params)); 
 	 SSN2use := AutoStandardI.InterfaceTranslator.ssn_value.val(project(gm, AutoStandardI.InterfaceTranslator.ssn_value.params));  
  	 lname_val := AutoStandardI.InterfaceTranslator.lname_value.val(project(gm,AutoStandardI.InterfaceTranslator.lname_value.params));
 	 lname_set_val := AutoStandardI.InterfaceTranslator.lname_set_value.val(project(gm,AutoStandardI.InterfaceTranslator.lname_set_value.params));
 	 cleaned_lname_val := AutoStandardI.InterfaceTranslator.cleaned_input_lname.val(project(gm,AutoStandardI.InterfaceTranslator.cleaned_input_lname.params));
+
+ 	 mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (gm);
+   glb_ok := mod_access.isValidGLB();  
+	 dob_mask_value := mod_access.dob_mask; 
+
 	 lname_val_length := length(trim(lname_val));
 	 short_lname_val := if (lname_val_length < Constants.MIN_LNAME, true, false);
 	 short_cleaned_lname_val := if (length(trim(cleaned_lname_val)) < Constants.MIN_LNAME, true, false);
@@ -199,7 +201,8 @@ export Check_Records(DATASET(iesp.checkpersonsearch.t_CheckPersonSearchRequest) 
   filteredRecs_nodup := dedup(sort(filteredRecs,UniqueId, -DateLastSeen),UniqueId);
 	
 	  // INCLUDE BEST FILE address and dob/dod for each DID found:
-  bestrecs := doxie.best_records(project(filteredRecs_nodup,transform(doxie.layout_references, self.did := (unsigned6)left.UniqueId)),includeDOD:=true);
+  bestrecs := doxie.best_records(project(filteredRecs_nodup,transform(doxie.layout_references, self.did := (unsigned6)left.UniqueId)),
+	                               includeDOD:=true, modAccess := mod_access);
 	best_by_did := dedup(bestrecs, did);  //reduce this set to 1 record per DID,  should already have best row on top.
 
 	combined_rec includeBest(filteredRecs_nodup L, best_by_did R) := transform
@@ -220,7 +223,7 @@ export Check_Records(DATASET(iesp.checkpersonsearch.t_CheckPersonSearchRequest) 
 	                    includeBest(LEFT,RIGHT),
 	                    KEEP(1), LIMIT(0));
 	//mask SSN
-   Suppress.MAC_Mask(bestResults, recsMaskedSSN, SSNInfo.ssn, null, true, false, false, false, '', ssnMask);												
+   Suppress.MAC_Mask(bestResults, recsMaskedSSN, SSNInfo.ssn, null, true, false, false, false, '', mod_access.ssn_mask);												
 	
 	//mask DOB
   combined_rec  maskDOB(combined_rec L) := TRANSFORM

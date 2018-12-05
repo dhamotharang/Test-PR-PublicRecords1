@@ -1,10 +1,21 @@
-IMPORT address, AutoStandardI, BIPV2, BIPV2_Best, doxie, LNSmallBusiness, TopBusiness_Services;
+IMPORT address, BIPV2, BIPV2_Best, doxie, LNSmallBusiness, TopBusiness_Services;
 
 EXPORT fn_addBestInfo (LNSmallBusiness.IParam.LNSmallBiz_BIP_CombinedReport_IParams SmallBizCombined_inmod, 
                        INTEGER BestInfoNeeded
                       )  := 
   FUNCTION
-    
+
+    mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule ()))
+      EXPORT unsigned1 glb := SmallBizCombined_inmod.glbpurpose;
+      EXPORT unsigned1 dppa := SmallBizCombined_inmod.dppapurpose;	
+      EXPORT string DataPermissionMask := SmallBizCombined_inmod.datapermissionmask;
+      EXPORT string DataRestrictionMask := SmallBizCombined_inmod.datarestrictionmask;
+      EXPORT boolean ln_branded := SmallBizCombined_inmod.lnbranded;
+      EXPORT string5 industry_class := SmallBizCombined_inmod.industryclass; 
+      EXPORT string32 application_type := SmallBizCombined_inmod.applicationtype;
+      EXPORT string ssn_mask := SmallBizCombined_inmod.ssnmask; 
+    END;
+
     // When the search input does not contain an company phone number, we need to 
     //   find it using the Best function.
     // As of 2016-06-17, there is ONLY one input company to search, so ds_SBA_Input will never have more than one record.
@@ -106,10 +117,6 @@ EXPORT fn_addBestInfo (LNSmallBusiness.IParam.LNSmallBiz_BIP_CombinedReport_IPar
      
       //GET Person Best Record for Auth Rep1
 		  authRep1_BestRec := doxie.best_records(DATASET([SmallBizCombined_inmod.ds_SBA_Input[1].Rep_1_LexID], Doxie.layout_references),
-                                             FALSE,  // use_global
-                                             SmallBizCombined_inmod.DPPAPurpose, 
-                                             SmallBizCombined_inmod.GLBAPurpose,
-                                             FALSE,  // get_valid_ssn
                                              FALSE,  // IsFCRA
                                              FALSE,  // doSuppress
                                              FALSE,  // doTimeZone
@@ -117,7 +124,8 @@ EXPORT fn_addBestInfo (LNSmallBusiness.IParam.LNSmallBiz_BIP_CombinedReport_IPar
                                              FALSE,  // checkRNA
                                              FALSE,  // includeDOD
                                              FALSE,  // include_minors
-                                             FALSE   // getSSNBest
+                                             FALSE,   // getSSNBest
+                                             mod_access
                                             );
 		
       ds_SBA_Company_withPhone_add_Rep1Info  :=  
@@ -151,10 +159,6 @@ EXPORT fn_addBestInfo (LNSmallBusiness.IParam.LNSmallBiz_BIP_CombinedReport_IPar
            
       //GET Person Best Record for Auth Rep2
 		  authRep2_BestRec := doxie.best_records(DATASET([SmallBizCombined_inmod.ds_SBA_Input[1].Rep_2_LexID], Doxie.layout_references),
-                                             FALSE,  // use_global
-                                             SmallBizCombined_inmod.DPPAPurpose, 
-                                             SmallBizCombined_inmod.GLBAPurpose,
-                                             FALSE,  // get_valid_ssn
                                              FALSE,  // IsFCRA
                                              FALSE,  // doSuppress
                                              FALSE,  // doTimeZone
@@ -162,7 +166,8 @@ EXPORT fn_addBestInfo (LNSmallBusiness.IParam.LNSmallBiz_BIP_CombinedReport_IPar
                                              FALSE,  // checkRNA
                                              FALSE,  // includeDOD
                                              FALSE,  // include_minors
-                                             FALSE   // getSSNBest
+                                             FALSE,   // getSSNBest
+                                             mod_access
                                             );
 		
       ds_SBA_Company_withPhone_add_Rep2Info  :=  
@@ -194,10 +199,6 @@ EXPORT fn_addBestInfo (LNSmallBusiness.IParam.LNSmallBiz_BIP_CombinedReport_IPar
                            );
       //GET Person Best Record for Auth Rep3
 		  authRep3_BestRec := doxie.best_records(DATASET([SmallBizCombined_inmod.ds_SBA_Input[1].Rep_3_LexID], Doxie.layout_references),
-                                             FALSE,  // use_global
-                                             SmallBizCombined_inmod.DPPAPurpose, 
-                                             SmallBizCombined_inmod.GLBAPurpose,
-                                             FALSE,  // get_valid_ssn
                                              FALSE,  // IsFCRA
                                              FALSE,  // doSuppress
                                              FALSE,  // doTimeZone
@@ -205,7 +206,8 @@ EXPORT fn_addBestInfo (LNSmallBusiness.IParam.LNSmallBiz_BIP_CombinedReport_IPar
                                              FALSE,  // checkRNA
                                              FALSE,  // includeDOD
                                              FALSE,  // include_minors
-                                             FALSE   // getSSNBest
+                                             FALSE,   // getSSNBest
+                                             mod_access
                                             );
 		
       ds_SBA_Company_withPhone_add_Rep3Info  :=  

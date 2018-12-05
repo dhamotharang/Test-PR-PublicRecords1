@@ -8,6 +8,21 @@ import doxie, doxie_crs, iesp, ut, DeathV2_Services, Risk_Indicators, Address, h
 int_rec := iesp.identitymanagementreport.t_IdmReportRNASlim;
 export RARecords (IdentityManagement_Services.IParam._report in_params, dataset (doxie.layout_references) dids) :=	MODULE
 
+  // Get values missing from the input from global.
+  // Can't project from {input} because of different type of ssn_mask (string vs. string6);
+  gmod := AutoStandardI.GlobalModule ();
+  mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (gmod))
+    EXPORT unsigned1 glb := in_params.glbpurpose;
+    EXPORT unsigned1 dppa := in_params.dppapurpose;
+    EXPORT string DataPermissionMask := in_params.DataPermissionMask;
+    EXPORT string DataRestrictionMask := in_params.DataRestrictionMask;
+    EXPORT boolean ln_branded := in_params.ln_branded;
+    EXPORT string5 industry_class := in_params.industryclass;
+    EXPORT string32 application_type := in_params.applicationtype;
+    EXPORT unsigned3 date_threshold := in_params.dateVal;
+    EXPORT string ssn_mask := in_params.ssn_mask;
+  END;
+
 		//Doxie files used are - doxie.relative_summary & doxie.Comp_Addresses
 		layout_comp_names := record
 			doxie_crs.layout_comp_names; // [did; fname; mname; lname; ssn; ssn_unmasked; dob; age;]
@@ -78,7 +93,7 @@ export RARecords (IdentityManagement_Services.IParam._report in_params, dataset 
 		// roll up aka names that belong to same DID
 		akas_name_ready := rollup (grp_aka_ready, group, RollAKAName (Left, rows (Left)));
 		
-		best_akas := doxie.best_records (rel_dids, , in_params.DPPAPurpose, in_params.GLBPurpose, true, , , , true,header.constants.checkRNA);
+    best_akas := doxie.best_records (rel_dids, , , , true, header.constants.checkRNA, modAccess := mod_access);
 
 		unsigned1 GetAge (integer4 dob) := IF (dob<>0, ut.GetAge((string8) dob),0); //Quick function to get age
 		
@@ -119,8 +134,8 @@ export RARecords (IdentityManagement_Services.IParam._report in_params, dataset 
 				Self := L; // copy about 25 fields
 		END;
 
-		rna_glb_ok := ut.glb_ok(in_params.GLBPurpose, header.constants.checkRNA);
-		death_params := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
+		rna_glb_ok := mod_access.isValidGLB(header.constants.checkRNA);
+		death_params := DeathV2_Services.IParam.GetDeathRestrictions(gmod);
 
 		rel_w_d_pre := JOIN (aka, doxie.key_death_masterV2_ssa_DID, 
                             keyed (Left.did = Right.l_did)

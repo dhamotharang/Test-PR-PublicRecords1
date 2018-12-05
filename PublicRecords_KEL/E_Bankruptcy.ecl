@@ -1,4 +1,4 @@
-﻿//HPCC Systems KEL Compiler Version 0.11.4
+﻿//HPCC Systems KEL Compiler Version 0.11.6
 IMPORT KEL011 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
@@ -76,11 +76,11 @@ EXPORT E_Bankruptcy(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
   SHARED __SortedTable := SORT(__Table,KeyVal);
   EXPORT Lookup := PROJECT(__SortedTable,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT));
   SHARED __d0_Out := RECORD
-    RECORDOF(PublicRecords_KEL.ECL_Functions.Blank_DataSet);
+    RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC);
     KEL.typ.uid UID := 0;
   END;
   SHARED __d0_UID_Mapped := JOIN(__in,Lookup,TRIM((STRING)LEFT.TMSID) + '|' + TRIM((STRING)LEFT.Court_Code) + '|' + TRIM((STRING)LEFT.Case_Number) = RIGHT.KeyVal,TRANSFORM(__d0_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),HASH);
-  EXPORT PublicRecords_KEL_ECL_Functions_Blank_DataSet_Invalid := __d0_UID_Mapped(UID = 0);
+  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Invalid := __d0_UID_Mapped(UID = 0);
   SHARED __d0_Prefiltered := __d0_UID_Mapped(UID <> 0);
   SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping));
   EXPORT InData := __d0;
@@ -233,58 +233,58 @@ EXPORT E_Bankruptcy(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
   EXPORT Court_Code__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Court_Code_);
   EXPORT Case_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Case_Number_);
   EXPORT Original_Case_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Original_Case_Number_);
-  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Blank_DataSet_Invalid),COUNT(T_M_S_I_D__SingleValue_Invalid),COUNT(Court_Code__SingleValue_Invalid),COUNT(Case_Number__SingleValue_Invalid),COUNT(Original_Case_Number__SingleValue_Invalid)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Blank_DataSet_Invalid,KEL.typ.int T_M_S_I_D__SingleValue_Invalid,KEL.typ.int Court_Code__SingleValue_Invalid,KEL.typ.int Case_Number__SingleValue_Invalid,KEL.typ.int Original_Case_Number__SingleValue_Invalid});
+  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Invalid),COUNT(T_M_S_I_D__SingleValue_Invalid),COUNT(Court_Code__SingleValue_Invalid),COUNT(Case_Number__SingleValue_Invalid),COUNT(Original_Case_Number__SingleValue_Invalid)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Invalid,KEL.typ.int T_M_S_I_D__SingleValue_Invalid,KEL.typ.int Court_Code__SingleValue_Invalid,KEL.typ.int Case_Number__SingleValue_Invalid,KEL.typ.int Original_Case_Number__SingleValue_Invalid});
   EXPORT NullCounts := DATASET([
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','UID',COUNT(PublicRecords_KEL_ECL_Functions_Blank_DataSet_Invalid),COUNT(__d0)},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','TMSID',COUNT(__d0(__NL(T_M_S_I_D_))),COUNT(__d0(__NN(T_M_S_I_D_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','CourtCode',COUNT(__d0(__NL(Court_Code_))),COUNT(__d0(__NN(Court_Code_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','CaseNumber',COUNT(__d0(__NL(Case_Number_))),COUNT(__d0(__NN(Case_Number_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','OriginalCaseNumber',COUNT(__d0(__NL(Original_Case_Number_))),COUNT(__d0(__NN(Original_Case_Number_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','BankruptcySource',COUNT(__d0(__NL(Bankruptcy_Source_))),COUNT(__d0(__NN(Bankruptcy_Source_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','SourceDescription',COUNT(__d0(__NL(Source_Description_))),COUNT(__d0(__NN(Source_Description_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','OriginalChapter',COUNT(__d0(__NL(Original_Chapter_))),COUNT(__d0(__NN(Original_Chapter_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','FilingType',COUNT(__d0(__NL(Filing_Type_))),COUNT(__d0(__NN(Filing_Type_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','BusinessFlag',COUNT(__d0(__NL(Business_Flag_))),COUNT(__d0(__NN(Business_Flag_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','CorporateFlag',COUNT(__d0(__NL(Corporate_Flag_))),COUNT(__d0(__NN(Corporate_Flag_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','DischargedDate',COUNT(__d0(__NL(Discharged_Date_))),COUNT(__d0(__NN(Discharged_Date_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','Disposition',COUNT(__d0(__NL(Disposition_))),COUNT(__d0(__NN(Disposition_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','DebtorType',COUNT(__d0(__NL(Debtor_Type_))),COUNT(__d0(__NN(Debtor_Type_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','DebtorSequence',COUNT(__d0(__NL(Debtor_Sequence_))),COUNT(__d0(__NN(Debtor_Sequence_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','DispositionType',COUNT(__d0(__NL(Disposition_Type_))),COUNT(__d0(__NN(Disposition_Type_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','DispositionReason',COUNT(__d0(__NL(Disposition_Reason_))),COUNT(__d0(__NN(Disposition_Reason_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','DispositionTypeDescription',COUNT(__d0(__NL(Disposition_Type_Description_))),COUNT(__d0(__NN(Disposition_Type_Description_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','NameType',COUNT(__d0(__NL(Name_Type_))),COUNT(__d0(__NN(Name_Type_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','ScreenDescription',COUNT(__d0(__NL(Screen_Description_))),COUNT(__d0(__NN(Screen_Description_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','DecodedDescription',COUNT(__d0(__NL(Decoded_Description_))),COUNT(__d0(__NN(Decoded_Description_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','DateFiled',COUNT(__d0(__NL(Date_Filed_))),COUNT(__d0(__NN(Date_Filed_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','RecordType',COUNT(__d0(__NL(Record_Type_))),COUNT(__d0(__NN(Record_Type_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','DateVendorFirstReported',COUNT(__d0(__NL(Date_Vendor_First_Reported_))),COUNT(__d0(__NN(Date_Vendor_First_Reported_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','DateVendorLastReported',COUNT(__d0(__NL(Date_Vendor_Last_Reported_))),COUNT(__d0(__NN(Date_Vendor_Last_Reported_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','DateCreated',COUNT(__d0(__NL(Date_Created_))),COUNT(__d0(__NN(Date_Created_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','CaseClosingDate',COUNT(__d0(__NL(Case_Closing_Date_))),COUNT(__d0(__NN(Case_Closing_Date_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','ReopenDate',COUNT(__d0(__NL(Reopen_Date_))),COUNT(__d0(__NN(Reopen_Date_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','CaseID',COUNT(__d0(__NL(Case_I_D_))),COUNT(__d0(__NN(Case_I_D_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','DefendantID',COUNT(__d0(__NL(Defendant_I_D_))),COUNT(__d0(__NN(Defendant_I_D_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','CourtName',COUNT(__d0(__NL(Court_Name_))),COUNT(__d0(__NN(Court_Name_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','CourtLocation',COUNT(__d0(__NL(Court_Location_))),COUNT(__d0(__NN(Court_Location_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','JudgeName',COUNT(__d0(__NL(Judge_Name_))),COUNT(__d0(__NN(Judge_Name_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','JudgeIdentification',COUNT(__d0(__NL(Judge_Identification_))),COUNT(__d0(__NN(Judge_Identification_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','FilingJurisdiction',COUNT(__d0(__NL(Filing_Jurisdiction_))),COUNT(__d0(__NN(Filing_Jurisdiction_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','AssetsValue',COUNT(__d0(__NL(Assets_Value_))),COUNT(__d0(__NN(Assets_Value_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','LiabilitiesValue',COUNT(__d0(__NL(Liabilities_Value_))),COUNT(__d0(__NN(Liabilities_Value_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','MeetingDate',COUNT(__d0(__NL(Meeting_Date_))),COUNT(__d0(__NN(Meeting_Date_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','MeetingTime',COUNT(__d0(__NL(Meeting_Time_))),COUNT(__d0(__NN(Meeting_Time_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','ClaimsDeadline',COUNT(__d0(__NL(Claims_Deadline_))),COUNT(__d0(__NN(Claims_Deadline_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','ComplaintDeadline',COUNT(__d0(__NL(Complaint_Deadline_))),COUNT(__d0(__NN(Complaint_Deadline_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','CaseType',COUNT(__d0(__NL(Case_Type_))),COUNT(__d0(__NN(Case_Type_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','SplitCase',COUNT(__d0(__NL(Split_Case_))),COUNT(__d0(__NN(Split_Case_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','FiledInError',COUNT(__d0(__NL(Filed_In_Error_))),COUNT(__d0(__NN(Filed_In_Error_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','StatusDate',COUNT(__d0(__NL(Status_Date_))),COUNT(__d0(__NN(Status_Date_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','StatusType',COUNT(__d0(__NL(Status_Type_))),COUNT(__d0(__NN(Status_Type_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','CommentsFilingDate',COUNT(__d0(__NL(Comments_Filing_Date_))),COUNT(__d0(__NN(Comments_Filing_Date_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','CommentsDescription',COUNT(__d0(__NL(Comments_Description_))),COUNT(__d0(__NN(Comments_Description_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','Source',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Blank_DataSet','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))}]
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Invalid),COUNT(__d0)},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','TMSID',COUNT(__d0(__NL(T_M_S_I_D_))),COUNT(__d0(__NN(T_M_S_I_D_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CourtCode',COUNT(__d0(__NL(Court_Code_))),COUNT(__d0(__NN(Court_Code_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CaseNumber',COUNT(__d0(__NL(Case_Number_))),COUNT(__d0(__NN(Case_Number_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','OriginalCaseNumber',COUNT(__d0(__NL(Original_Case_Number_))),COUNT(__d0(__NN(Original_Case_Number_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','BankruptcySource',COUNT(__d0(__NL(Bankruptcy_Source_))),COUNT(__d0(__NN(Bankruptcy_Source_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','SourceDescription',COUNT(__d0(__NL(Source_Description_))),COUNT(__d0(__NN(Source_Description_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','OriginalChapter',COUNT(__d0(__NL(Original_Chapter_))),COUNT(__d0(__NN(Original_Chapter_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','FilingType',COUNT(__d0(__NL(Filing_Type_))),COUNT(__d0(__NN(Filing_Type_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','BusinessFlag',COUNT(__d0(__NL(Business_Flag_))),COUNT(__d0(__NN(Business_Flag_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CorporateFlag',COUNT(__d0(__NL(Corporate_Flag_))),COUNT(__d0(__NN(Corporate_Flag_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DischargedDate',COUNT(__d0(__NL(Discharged_Date_))),COUNT(__d0(__NN(Discharged_Date_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Disposition',COUNT(__d0(__NL(Disposition_))),COUNT(__d0(__NN(Disposition_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DebtorType',COUNT(__d0(__NL(Debtor_Type_))),COUNT(__d0(__NN(Debtor_Type_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DebtorSequence',COUNT(__d0(__NL(Debtor_Sequence_))),COUNT(__d0(__NN(Debtor_Sequence_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DispositionType',COUNT(__d0(__NL(Disposition_Type_))),COUNT(__d0(__NN(Disposition_Type_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DispositionReason',COUNT(__d0(__NL(Disposition_Reason_))),COUNT(__d0(__NN(Disposition_Reason_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DispositionTypeDescription',COUNT(__d0(__NL(Disposition_Type_Description_))),COUNT(__d0(__NN(Disposition_Type_Description_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','NameType',COUNT(__d0(__NL(Name_Type_))),COUNT(__d0(__NN(Name_Type_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ScreenDescription',COUNT(__d0(__NL(Screen_Description_))),COUNT(__d0(__NN(Screen_Description_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DecodedDescription',COUNT(__d0(__NL(Decoded_Description_))),COUNT(__d0(__NN(Decoded_Description_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFiled',COUNT(__d0(__NL(Date_Filed_))),COUNT(__d0(__NN(Date_Filed_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','RecordType',COUNT(__d0(__NL(Record_Type_))),COUNT(__d0(__NN(Record_Type_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateVendorFirstReported',COUNT(__d0(__NL(Date_Vendor_First_Reported_))),COUNT(__d0(__NN(Date_Vendor_First_Reported_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateVendorLastReported',COUNT(__d0(__NL(Date_Vendor_Last_Reported_))),COUNT(__d0(__NN(Date_Vendor_Last_Reported_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateCreated',COUNT(__d0(__NL(Date_Created_))),COUNT(__d0(__NN(Date_Created_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CaseClosingDate',COUNT(__d0(__NL(Case_Closing_Date_))),COUNT(__d0(__NN(Case_Closing_Date_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ReopenDate',COUNT(__d0(__NL(Reopen_Date_))),COUNT(__d0(__NN(Reopen_Date_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CaseID',COUNT(__d0(__NL(Case_I_D_))),COUNT(__d0(__NN(Case_I_D_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DefendantID',COUNT(__d0(__NL(Defendant_I_D_))),COUNT(__d0(__NN(Defendant_I_D_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CourtName',COUNT(__d0(__NL(Court_Name_))),COUNT(__d0(__NN(Court_Name_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CourtLocation',COUNT(__d0(__NL(Court_Location_))),COUNT(__d0(__NN(Court_Location_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','JudgeName',COUNT(__d0(__NL(Judge_Name_))),COUNT(__d0(__NN(Judge_Name_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','JudgeIdentification',COUNT(__d0(__NL(Judge_Identification_))),COUNT(__d0(__NN(Judge_Identification_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','FilingJurisdiction',COUNT(__d0(__NL(Filing_Jurisdiction_))),COUNT(__d0(__NN(Filing_Jurisdiction_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','AssetsValue',COUNT(__d0(__NL(Assets_Value_))),COUNT(__d0(__NN(Assets_Value_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','LiabilitiesValue',COUNT(__d0(__NL(Liabilities_Value_))),COUNT(__d0(__NN(Liabilities_Value_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','MeetingDate',COUNT(__d0(__NL(Meeting_Date_))),COUNT(__d0(__NN(Meeting_Date_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','MeetingTime',COUNT(__d0(__NL(Meeting_Time_))),COUNT(__d0(__NN(Meeting_Time_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ClaimsDeadline',COUNT(__d0(__NL(Claims_Deadline_))),COUNT(__d0(__NN(Claims_Deadline_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','ComplaintDeadline',COUNT(__d0(__NL(Complaint_Deadline_))),COUNT(__d0(__NN(Complaint_Deadline_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CaseType',COUNT(__d0(__NL(Case_Type_))),COUNT(__d0(__NN(Case_Type_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','SplitCase',COUNT(__d0(__NL(Split_Case_))),COUNT(__d0(__NN(Split_Case_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','FiledInError',COUNT(__d0(__NL(Filed_In_Error_))),COUNT(__d0(__NN(Filed_In_Error_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','StatusDate',COUNT(__d0(__NL(Status_Date_))),COUNT(__d0(__NN(Status_Date_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','StatusType',COUNT(__d0(__NL(Status_Type_))),COUNT(__d0(__NN(Status_Type_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CommentsFilingDate',COUNT(__d0(__NL(Comments_Filing_Date_))),COUNT(__d0(__NN(Comments_Filing_Date_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','CommentsDescription',COUNT(__d0(__NL(Comments_Description_))),COUNT(__d0(__NN(Comments_Description_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','Source',COUNT(__d0(__NL(Source_))),COUNT(__d0(__NN(Source_)))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
+    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;

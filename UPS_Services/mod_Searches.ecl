@@ -305,32 +305,33 @@ export mod_Searches := MODULE
 
 
 		export records(params in_mod) := FUNCTION
-			
-			
-			dppaVal := AIT.DPPA_Purpose.val(project(in_mod, AIT.DPPA_Purpose.params));
-			glbVal := AIT.GLB_Purpose.val(project(in_mod, AIT.GLB_Purpose.params));
-			industryClass := AIT.industry_class_val.val(project(in_mod,AIT.industry_class_val.params));
+
+      // {in_mod} is basically GlobalModule, but it doesn't define all fields required for projection.
+      mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+        EXPORT unsigned1 glb := AIT.GLB_Purpose.val(project(in_mod,AIT.GLB_Purpose.params));
+        EXPORT unsigned1 dppa := AIT.DPPA_Purpose.val(project(in_mod,AIT.DPPA_Purpose.params));
+        EXPORT string DataPermissionMask := in_mod.DataPermissionMask;
+        EXPORT boolean ln_branded := FALSE;
+        EXPORT boolean probation_override := FALSE;
+        EXPORT string5 industry_class := AIT.industry_class_val.val(project(in_mod,AIT.industry_class_val.params));
+        EXPORT string32 application_type := AIT.application_type_val.val(project(in_mod,AIT.application_type_val.params));
+        EXPORT boolean no_scrub := FALSE;
+        EXPORT unsigned3 date_threshold := 0;
+      END;
 
 			// use mod_header_records ONLY to resolve DIDs, skipping daily/util/gong lookups.
-			
 			HeaderRecordLookup(DATASET(doxie.layout_references_hh) dids) := 
 					doxie.mod_header_records(false, /* do daily/gong/quick search */
 																	 false, /* include dailies */
 																	 false, /* allow wildcard */
-																	 0,     /* dateval */
-																	 dppaVal,
-																	 glbVal,
-																	 false, /* ln_branded_value */
 																	 false,	/* include_gong */
-																	 false, /* probation_override_value */
-																	 industryClass,
-																	 false, /* no scrub */
 																	 false, /* suppress_gong_noncurrent */
 																	 [],    /* daily_autokey_skipset */
 																	 false, /* AllowGongFallBack */
 																	 false,  /* ApplyBpsFilter */
-																	 false).mod_Header(dids); /* GongByDidOnly */
-			
+																	 false, /* GongByDidOnly */
+																	 mod_access).mod_Header(dids);
+
 			// use mod_header_records only to access daily/gong/util files.  In addition to
 			// the values in GlobalModule being used for lookups, any records related to the
 			// DIDs passed in will be included
@@ -339,19 +340,13 @@ export mod_Searches := MODULE
 					doxie.mod_header_records(NOT EXISTS(dids),  /* do daily/gong/quick search */
 																	 NOT EXISTS(dids),  /* include dailies */
 																	 true,  /* allow wildcard */
-																	 0,     /* dateval */
-																	 dppaVal,
-																	 glbVal,
-																	 false, /* ln_branded_value */
 																	 NOT EXISTS(dids),	/* include_gong */
-																	 false, /* probation_override_value */
-																	 industryClass,
-																	 false, /* no scrub */
 																	 false, /* suppress_gong_noncurrent */
 																	 [],    /* daily_autokey_skipset */
 																	 false, /* AllowGongFallBack */
 																	 false,  /* ApplyBpsFilter */
-																	 EXISTS(dids)).mod_Daily(dids); /* GongByDidOnly */
+																	 EXISTS(dids),  /* GongByDidOnly */
+																	 mod_access).mod_Daily(dids);
 
 
 			// might need this for a call to autoheaderi fetch

@@ -2,8 +2,8 @@
 <message name="BkReport_BatchServiceFCRA">
   <part name="DPPAPurpose"          type="xsd:byte"/>
   <part name="GLBPurpose"           type="xsd:byte"/>
-  <part name="SSNMask"			  type="xsd:string"/>
-  <part name="ApplicationType"   	type="xsd:string"/>
+  <part name="SSNMask"     type="xsd:string"/>
+  <part name="ApplicationType"    type="xsd:string"/>
 
   <part name="MaxResults"           type="xsd:unsignedInt"/>
   <part name="Max_Results_Per_Acct" type="xsd:byte"/>
@@ -15,15 +15,15 @@
   <part name="Match_Debtors"        type="xsd:boolean"/>
 
   <part name="SuppressWithdrawnBankruptcy" type="xsd:boolean"/>
-  <part name="FFDOptionsMask"   	  type="xsd:string"/>
-  <part name="FCRAPurpose"   	  type="xsd:string"/>
+  <part name="FFDOptionsMask"      type="xsd:string"/>
+  <part name="FCRAPurpose"      type="xsd:string"/>
 
-  <part name="Use_FixCase"		  type="xsd:boolean"/>
+  <part name="Use_FixCase"    type="xsd:boolean"/>
 
-  <part name="Chapter_Includes"	  type="xsd:string"/>
-  <part name="DCode_Includes"  	  type="xsd:string"/>
+  <part name="Chapter_Includes"   type="xsd:string"/>
+  <part name="DCode_Includes"     type="xsd:string"/>
 
-  <part name="DaysBack"		 	  type="xsd:unsignedInt"/>
+  <part name="DaysBack"      type="xsd:unsignedInt"/>
 </message>
 */
 
@@ -37,15 +37,15 @@ export BkReport_BatchServiceFCRA(useCannedRecs = 'false') :=
     #CONSTANT('isFCRA', true);
     #CONSTANT('noDeepDive', true)
 
-    STRING7 in_ssn_mask				:= 'NONE'	: STORED('SSNMask');
+    STRING7 in_ssn_mask    := 'NONE' : STORED('SSNMask');
 
-    //	Build party_type set.
-    BOOLEAN match_attorneys := FALSE 	: STORED('Match_Attorneys');
-    BOOLEAN match_creditors := FALSE 	: STORED('Match_Creditors');
-    BOOLEAN match_debtors   := TRUE 	: STORED('Match_Debtors');
-    BOOLEAN use_fixcase			:= FALSE	: STORED('Use_FixCase');
+    // Build party_type set.
+    BOOLEAN match_attorneys := FALSE  : STORED('Match_Attorneys');
+    BOOLEAN match_creditors := FALSE  : STORED('Match_Creditors');
+    BOOLEAN match_debtors   := TRUE  : STORED('Match_Debtors');
+    BOOLEAN use_fixcase   := FALSE : STORED('Use_FixCase');
 
-    BOOLEAN suppress_withdrawn_bankruptcy	:= FALSE 	: STORED('SuppressWithdrawnBankruptcy');
+    BOOLEAN suppress_withdrawn_bankruptcy := FALSE  : STORED('SuppressWithdrawnBankruptcy');
     STRING32 application_type := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
     INTEGER8 inFFDOptionsMask := FFD.FFDMask.Get(inApplicationType := application_type);
     INTEGER inFCRAPurpose := FCRA.FCRAPurpose.Get();
@@ -68,26 +68,19 @@ export BkReport_BatchServiceFCRA(useCannedRecs = 'false') :=
     //Retrieve gateway configs for person context since it will be run on the inquiry lexID.
     gateways := Gateway.Configuration.Get();
 
-    /*	Grab the input XML and throw into a dataset. */
+    /* Grab the input XML and throw into a dataset. */
     ds_batch_in := DATASET([], BatchServices.layout_BkReport_Batch_in) : STORED('batch_in', FEW);
 
-    //TODO: Once KTR is updated, filter out searches with no lexID in the input.
-    // For now it was decided to allow these inquiries to function as they did previously.
-    // Any inquiries with a lexID however will adhere to new compliance functionality
-    // Which will verify the result lexIDs against the input, and call person context
-    // Only on the inquiry lexID instead of each record's debtor DID.
-    // More details in https://jira.rsi.lexisnexis.com/browse/RR-12498
-
+    //Inquiries without a DID value will be rejected by lexID validation, since there is no PII to resolve a lexID.
     ds_in := if (not useCannedRecs,
-            ds_batch_in,
-            BatchServices._Sample_Records.BkReport.ds_sample_input);
-
+      ds_batch_in((UNSIGNED6)did > 0),
+      BatchServices._Sample_Records.BkReport.ds_sample_input);
     /*
       Separate records into case/court searches and tmsid searches so that we can
       'operate' on the court codes of those records that use court/case search.
     */
-    ds_tmsid			:= ds_in(tmsid != '');
-    ds_court_case_in 	:= ds_in(tmsid  = '');
+    ds_tmsid := ds_in(tmsid != '');
+    ds_court_case_in := ds_in(tmsid  = '');
 
     /* Build lookup table to be used in translating from incoming 'court' to 'moxie_court' value to build TMSID */
     layout_court_lookup := RECORD
@@ -95,9 +88,9 @@ export BkReport_BatchServiceFCRA(useCannedRecs = 'false') :=
       bankruptcyv3.key_bankruptcyV3_courts.moxie_court;
     END;
 
-    court_lookup_table 	:= TABLE(bankruptcyv3.key_bankruptcyV3_courts, layout_court_lookup);
+    court_lookup_table := TABLE(bankruptcyv3.key_bankruptcyV3_courts, layout_court_lookup);
 
-    /* 	Translate from incoming 'court' to 'moxie court' value value to build TMSID
+    /* Translate from incoming 'court' to 'moxie court' value value to build TMSID
         Moved the court look up above the key join for the full case number because
         the banko.Key_Banko_courtcode_fullcasenumber keys are coded off of the
         moxie court id, not the court id coming in. */
@@ -142,19 +135,19 @@ export BkReport_BatchServiceFCRA(useCannedRecs = 'false') :=
                       SELF := LEFT),
             LEFT ONLY);
 
-    /* 	If specified, 'fix' the case numbers */
-    ds_casenums_fixed 	:= PROJECT(ds_moxie_court_abbrev_case_num,
+    /* If specified, 'fix' the case numbers */
+    ds_casenums_fixed := PROJECT(ds_moxie_court_abbrev_case_num,
       TRANSFORM(BatchServices.layout_BkReport_Batch_in,
         SELF.case_number := BatchServices.Functions.Bankruptcy.fn_fix_case(LEFT.case_number, LEFT.court),
         SELF := LEFT));
 
-    ds_moxie_court_abbrev_case_in		:= IF(use_fixcase, ds_casenums_fixed, ds_moxie_court_abbrev_case_num);
+    ds_moxie_court_abbrev_case_in := IF(use_fixcase, ds_casenums_fixed, ds_moxie_court_abbrev_case_num);
 
     // remove rec_count counter from full case number ds
     ds_moxie_court_from_full_case_in :=
       PROJECT(ds_moxie_court_from_full_case, BatchServices.layout_BkReport_Batch_in);
 
-    /* 	Union case/court search records with tmsid search records */
+    /* Union case/court search records with tmsid search records */
     ds_all := ds_tmsid + ds_moxie_court_abbrev_case_in + ds_moxie_court_from_full_case_in;
 
     /*
@@ -163,42 +156,34 @@ export BkReport_BatchServiceFCRA(useCannedRecs = 'false') :=
     */
     BankruptcyV3_Services.layouts.layout_tmsid_ext xfm_tmsid_ext(BatchServices.layout_BkReport_Batch_in L) := TRANSFORM
       SELF.acctno := L.acctno;
-      SELF.tmsid 	:= IF(L.tmsid != '', L.tmsid, 'BK' + TRIM(L.court, ALL) + TRIM(L.case_number, ALL));
+      SELF.tmsid := IF(L.tmsid != '', L.tmsid, 'BK' + TRIM(L.court, ALL) + TRIM(L.case_number, ALL));
       SELF := [];
     END;
 
     ds_tmsid_ext := PROJECT(ds_all, xfm_tmsid_ext(LEFT));
-    /* 	Send records through the bankruptcy batchservice report function. */
+    /* Send records through the bankruptcy batchservice report function. */
     ds_recs := BatchServices.Bankruptcy_BatchService_Records.report(ds_tmsid_ext, party_types,
       TRUE, FALSE, in_ssn_mask,
       suppress_withdrawn_bankruptcy);
 
-    //Get person context records depending on whether the first inquiry has a did value provided.
-    //This is all or nothing by design, as once KTR is updated all queries will require this value.
-    dids_provided := EXISTS(ds_all((unsigned6)did>0));
-    dids_in := PROJECT(ds_all, TRANSFORM(FFD.Layouts.DidBatch, SELF.did := (unsigned6)LEFT.did, SELF.acctno := LEFT.acctno));
-    dids_debtors := PROJECT(ds_recs, TRANSFORM(FFD.Layouts.DidBatch, SELF.did := (unsigned6)LEFT.debtor_did, SELF.acctno := LEFT.acctno));
-    dids := DEDUP(SORT(if(dids_provided, dids_in, dids_debtors), did, acctno), did, acctno);
-    pc_recs := FFD.FetchPersonContext(dids((unsigned6)did>0), gateways, FFD.Constants.DataGroupSet.Bankruptcy, inFFDOptionsMask);
+    //Retrieve person context data for inquiry dids.
+    dids := PROJECT(ds_in, TRANSFORM(FFD.Layouts.DidBatch, SELF.did := (unsigned6)LEFT.did, SELF.acctno := LEFT.acctno));
+    pc_recs := FFD.FetchPersonContext(dids, gateways, FFD.Constants.DataGroupSet.Bankruptcy, inFFDOptionsMask);
 
     //Do a join against input lexIDs, only keep those with matching debtor_did.
-    //This is not done after inquiryLexId batch because a filter after that loses mismatched records
-    //which are to be kept for logging purposes.
-    //Wrapped in an if for now until KTR is updated..
-    ds_recs_validated_lexID := IF(dids_provided,
-      JOIN(ds_recs, ds_all((unsigned6)did > 0),
-        LEFT.acctno = RIGHT.acctno AND (unsigned6)LEFT.debtor_did = (unsigned6)RIGHT.did,
-        TRANSFORM(BatchServices.layout_BankruptcyV3_Batch_out, SELF := LEFT),
-        KEEP(1), LIMIT(0)), ds_recs);
+    //Assign inquiry_lexID so it works with fn_fcra_ffd_batch properly which joins alerts on this value.
+    ds_recs_validated_lexID := JOIN(ds_recs, ds_in,
+      LEFT.acctno = RIGHT.acctno AND (unsigned6)LEFT.debtor_did = (unsigned6)RIGHT.did,
+      TRANSFORM(BatchServices.layout_BankruptcyV3_Batch_out, SELF.inquiry_lexID := RIGHT.did,
+      SELF := LEFT), KEEP(1), LIMIT(0));
 
     //Retrieve FFD statements and apply suppression. This will also add alert flags.
     res := BankruptcyV3_Services.fn_fcra_ffd_batch(ds_recs_validated_lexID, pc_recs, inFFDOptionsMask, inFCRAPurpose);
 
-    //Add inquiry lexIDs to the results. This also adds any suppressed records as blanks for inquiry logging purposes.
-    ds_recs_inquiry_lexID := FFD.Mac.InquiryLexidBatch(ds_all, res.records, BatchServices.layout_BankruptcyV3_Batch_out, 0);
+    //Ensure all inquiries are properly logged, regardless of suppression or bk results.
+    ds_recs_inquiry_lexID := FFD.Mac.InquiryLexidBatch(ds_in, res.records, BatchServices.layout_BankruptcyV3_Batch_out, 1);
 
     results_pre  := sort(ds_recs_inquiry_lexID, acctno);
-    //Again, filter out LH statements for now, this should be changed to default PC behaviour eventually.
     consumer_statements  := sort(res.statements, acctno);
 
     ut.mac_TrimFields(results_pre, 'results_pre', results);
@@ -206,9 +191,7 @@ export BkReport_BatchServiceFCRA(useCannedRecs = 'false') :=
     //DEBUG--------------------------------------------------------------------------
     // OUTPUT(ds_all, NAMED('ds_all'));
     // OUTPUT(ds_tmsid_ext, NAMED('ds_tmsid_ext'));
-    // OUTPUT(dids_provided, NAMED('dids_provided'));
     // OUTPUT(pc_recs, NAMED('ds_res_pc_recs'));
-    // OUTPUT(ds_recs_inquiry_lexID, NAMED('ds_recs_inquiry_lexID'));
     // OUTPUT(ds_recs_validated_lexID, NAMED('ds_recs_validated_lexID'));
     //END DEBUG ----------------------------------------------------------------------------
 

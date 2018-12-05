@@ -11,7 +11,7 @@ export MAC_BestAppend(infile,
                       supply,
 											verify,
 											thresh_val,
-											glb,
+											glb_ok,
 											outfile,
 											marketing=false, 
                       fixed_DRM,
@@ -26,38 +26,34 @@ export MAC_BestAppend(infile,
 										) := MACRO
 										
 import didville, suppress, doxie, doxie_files, DeathV2_Services, AutoStandardI, SSNBest_Services,
-       watchdog, did_add, header_slimsort, STD;
+       did_add, header_slimsort, ut, STD, dx_BestRecords;
 
 os(string i) := if (i='','',trim(i)+' ');
 #uniquename(deathparams)
 %deathparams% := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
-// Bug: 53541. For some of the services we want to use the _nonblank key (so we return the maximum 
-// number of first/last names). At the time of this change, watchdog.Key_Watchdog_marketing 
-// does not have a nonblank key file.
+// Bug: 53541. For some of the services we want to use the _nonblank data (so we return the maximum 
+// number of first/last names). At the time of this change, the watchdog marketing data 
+// does not have a nonblank variant.
 
-MarketingKeyFileToUse  := watchdog.Key_Watchdog_marketing;
-MarketingKeyFilePreGLBToUse  := watchdog.Key_Watchdog_marketing_V2;
+// relevant flags for best records permissions
+#uniquename(pre_glb_flag)
+%pre_glb_flag% := doxie.DataRestriction.restrictPreGLB;
+#uniquename(cnsmr_flag)
+%cnsmr_flag% := false;
+#uniquename(utility_flag)
+%utility_flag% := IndustryClass_val = ut.IndustryClass.UTILI_IC;
+#uniquename(filter_exp)
+%filter_exp% := doxie.DataRestriction.isECHRestricted(fixed_DRM);
+#uniquename(filter_eq)
+%filter_eq% := doxie.DataRestriction.isEQCHRestricted(fixed_DRM);
 
-NonGlbKeyFileToUse		 						:= Watchdog.Key_Watchdog_nonglb; 
-NonGlbKeyFilePreGLBToUse		 			:= Watchdog.Key_Watchdog_nonglb_V2;
-NonGlbKeyFileNonBlankToUse		 		:= Watchdog.Key_Watchdog_nonglb_nonblank;
-NonGlbKeyFilePreGLBNonBlankToUse	:= Watchdog.Key_Watchdog_nonglb_nonblank_V2;
-													
-GlbKeyFileToUse         := watchdog.Key_Watchdog_glb;
-GlbNonUtilKeyToUse			:= watchdog.Key_Watchdog_glb_nonutil;
-GlbKeyFileNonBlankToUse := watchdog.Key_Watchdog_glb_nonblank;
-GlbNonUtilNonBlankKeyToUse := watchdog.Key_Watchdog_GLB_nonutil_nonblank;
+// get appropriate best_records permission flag
+#uniquename(perm_flag)
+%perm_flag% := dx_BestRecords.fn_get_perm_type(glb_ok, UseNonBlankKey, %utility_flag%, %pre_glb_flag%, 
+	%filter_exp%, %filter_eq%, marketing, %cnsmr_flag%);
 
-GlbNonExperianKeyFileToUse := watchdog.Key_Watchdog_GLB_nonExperian;
-GlbNonExperianKeyFileNonBlankToUse := watchdog.Key_Watchdog_GLB_nonExperian_nonblank;
-
-GlbNonEquifaxKeyFileToUse := watchdog.Key_Watchdog_GLB_nonEquifax;
-GlbNonEquifaxKeyFileNonBlankToUse := watchdog.Key_Watchdog_GLB_nonEquifax_nonblank;
-
-GlbNonExperianNonEquifaxKeyFileToUse := watchdog.Key_Watchdog_GLB_nonExperian_nonEquifax;
-GlbNonExperianNonEquifaxKeyFileNonBlankToUse := watchdog.Key_Watchdog_GLB_nonExperian_nonEquifax_nonblank;
-
-typeof(infile) add_flds_marketing(infile le, MarketingKeyFileToUse ri,string options) := transform
+#uniquename(add_flds_marketing)
+typeof(infile) %add_flds_marketing%(infile le, dx_BestRecords.layout_best ri, string options) := transform
   #if (not clickdata)
 		self.best_phone := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_PHONE',1)=0 or ri.glb_phone = 'N','', ri.phone );
 	#end
@@ -90,10 +86,10 @@ typeof(infile) add_flds_marketing(infile le, MarketingKeyFileToUse ri,string opt
   self.verify_best_address := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_ADDR',1)=0,255, did_add.Address_Match_Score(le.prim_range,le.prim_name,le.sec_range,le.z5,ri.prim_range,ri.prim_name,ri.sec_range,ri.zip, le.zip4, ri.zip4) );
   self.verify_best_dob := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_DOB',1)=0,255,did_add.dob_match_score((integer)le.dob,(integer)ri.dob));
   self := le;
-  end;
+end;
   
-
-typeof(infile) add_flds_nonglb(infile le, NonGlbKeyFileToUse ri,string options) := transform
+#uniquename(add_flds_nonglb)
+typeof(infile) %add_flds_nonglb%(infile le, dx_BestRecords.layout_best ri, string options) := transform
   #if (not clickdata)
 		self.best_phone := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_PHONE',1)=0 or ri.glb_phone = 'N','', ri.phone );
 	#end
@@ -123,45 +119,48 @@ typeof(infile) add_flds_nonglb(infile le, NonGlbKeyFileToUse ri,string options) 
   self.verify_best_address := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_ADDR',1)=0,255, did_add.Address_Match_Score(le.prim_range,le.prim_name,le.sec_range,le.z5,ri.prim_range,ri.prim_name,ri.sec_range,ri.zip,le.zip4,ri.zip4) );
   self.verify_best_dob := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_DOB',1)=0,255,did_add.dob_match_score((integer)le.dob,(integer)ri.dob));
   self := le;
-  end;
+end;
 
-  DidVille.MAC_BestAppendAddFieldsGlb(outfi1,infile,GlbKeyFileToUse,supply,verify);
-	DidVille.MAC_BestAppendAddFieldsGlb(outfinonutil, infile, GlbNonUtilKeyToUse, supply, verify);
-  DidVille.MAC_BestAppendAddFieldsGlb(outfi1nb, infile, GLBKeyFileNonBlankToUse, supply, verify);	
-	DidVille.MAC_BestAppendAddFieldsGlb(outfinonutilnb, infile, GLBNonUtilNonBlankKeyToUse, supply, verify);
-	DidVille.MAC_BestAppendAddFieldsGlb(outfi1nexp,infile,GlbNonExperianKeyFileToUse,supply,verify);	
-	DidVille.MAC_BestAppendAddFieldsGlb(outfi1nexpnb, infile, GlbNonExperianKeyFileNonBlankToUse, supply, verify);		
-	DidVille.MAC_BestAppendAddFieldsGlb(outfi1neq,infile,GlbNonEquifaxKeyFileToUse,supply,verify);	
-	DidVille.MAC_BestAppendAddFieldsGlb(outfi1neqnb, infile, GlbNonEquifaxKeyFileNonBlankToUse, supply, verify);
-	DidVille.MAC_BestAppendAddFieldsGlb(outfi1nexpneq,infile,GlbNonExperianNonEquifaxKeyFileToUse,supply,verify);	
-	DidVille.MAC_BestAppendAddFieldsGlb(outfi1nexpneqnb, infile, GlbNonExperianNonEquifaxKeyFileNonBlankToUse, supply, verify);	  
+#uniquename(add_flds_glb)
+typeof(infile) %add_flds_glb%(infile le, dx_BestRecords.layout_best ri, string options) := transform
+	self.best_phone := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_PHONE',1)=0,'', ri.phone );
+	self.best_ssn := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_SSN',1)=0,'', ri.ssn );
+	//self.best_name := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0,'', os(ri.title)+os(ri.fname)+os(ri.mname)+os(ri.lname)+os(ri.NAME_suffix) );
+	self.best_title := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0,'',ri.title);
+	self.best_fname := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0,'',ri.fname);
+	self.best_mname := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0,'',ri.mname);
+	self.best_lname :=if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0,'',ri.lname);
+	self.best_name_suffix := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_NAME',1)=0,'',ri.name_suffix);
+	self.best_addr1 := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0,'', os(ri.prim_range)+os(ri.predir)+os(ri.prim_name)+os(ri.suffix)+os(ri.postdir)+IF(Std.Str.EndsWith(ri.prim_name,os(ri.unit_desig)+os(ri.sec_range)),'',os(ri.unit_desig)+os(ri.sec_range)) );
+	//self.best_addr2 := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0,'', os(ri.city_name)+os(ri.st)+ri.zip+IF(ri.zip4<>'','-'+ri.zip4,'') );
+	self.best_city :=if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0,'',ri.city_name);
+	self.best_state := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0,'',ri.st);
+	self.best_zip := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0,'',ri.zip);
+	self.best_zip4 := if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_ADDR',1)=0,'',ri.zip4);
+	self.best_addr_date := if ( stringlib.stringfind(options,'BEST_ALL',1)= 0 and stringlib.stringfind(options,'BEST_ADDRESS_DATE',1) = 0,0,ri.addr_dt_last_seen);
+	self.best_dob := (string8)if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_DOB',1)=0,'',if(ri.dob<0,'',(string8)ri.dob));
+	self.best_dod := (string8)if ( stringlib.stringfind(options,'BEST_ALL',1)=0 and stringlib.stringfind(options,'BEST_DOD',1)=0,'',ri.dod);
+	self.verify_best_phone := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_PHONE',1)=0,255, did_add.phone_match_score(le.phone10,ri.phone));
+	self.verify_best_ssn := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_SSN',1)=0 and stringlib.stringfind(verify,'FUZZY_SSN',1) = 0, 255,
+	if (stringlib.stringfind(verify,'FUZZY_SSN',1) != 0, did_add.ssn_match_score(le.ssn, ri.ssn, true), did_add.ssn_match_score(le.ssn,ri.ssn)));
+	self.verify_best_name := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_NAME',1)=0,255, did_add.name_match_score(le.fname,le.mname,le.lname,ri.fname,ri.mname,ri.lname));
+	self.verify_best_address := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_ADDR',1)=0,255, did_add.Address_Match_Score(le.prim_range,le.prim_name,le.sec_range,le.z5,ri.prim_range,ri.prim_name,ri.sec_range,ri.zip,le.zip4,ri.zip4) );
+	self.verify_best_dob := if ( stringlib.stringfind(verify,'BEST_ALL',1)=0 and stringlib.stringfind(verify,'BEST_DOB',1)=0,255,did_add.dob_match_score((integer)le.dob,(integer)ri.dob));
+	self := le;
+end;
 
-	outfi1m := join(infile,MarketingKeyFileToUse,left.did != 0 AND left.did=right.did,add_flds_marketing(left,right,supply),left outer, KEEP (1));
-  outfi1mpglb := join(infile,MarketingKeyFilePreGLBToUse,left.did != 0 AND left.did=right.did,add_flds_marketing(left,right,supply),left outer, KEEP (1));
-	
-	outfi2 := join(infile,NonGlbKeyFileToUse,left.did != 0 AND left.did=right.did,add_flds_nonglb(left,right,supply),left outer, KEEP (1));
-	outfi2PreGlb := join(infile,NonGlbKeyFilePreGLBToUse,left.did != 0 AND left.did=right.did,add_flds_nonglb(left,right,supply),left outer, KEEP (1));
-  outfi2NonBlank := join(infile,NonGlbKeyFileNonBlankToUse,left.did != 0 AND left.did=right.did,add_flds_nonglb(left,right,supply),left outer, KEEP (1));
-	outfi2PreGlbNonBlank := join(infile,NonGlbKeyFilePreGLBNonBlankToUse,left.did != 0 AND left.did=right.did,add_flds_nonglb(left,right,supply),left outer, KEEP (1));
-	
-	filter_exp 	:= doxie.DataRestriction.isECHRestricted(fixed_DRM);
-	filter_eq 	:= doxie.DataRestriction.isEQCHRestricted(fixed_DRM);
-  is_utility 	:= IndustryClass_val = ut.IndustryClass.UTILI_IC;
-	
-  outfi := IF(marketing, IF(Doxie.DataRestriction.restrictPreGLB, UNGROUP(outfi1mpglb), UNGROUP(outfi1m)),
-					 MAP(
-							 UseNonBlankKey	and glb and 												is_utility 	=> UNGROUP(outfinonutilnb),
-																	glb and 												is_utility 	=> UNGROUP(outfinonutil),						 
-						   UseNonBlankKey and glb and filter_exp and filter_eq						=> UNGROUP(outfi1nexpneqnb),	
-																	glb and filter_exp and filter_eq 					 	=> UNGROUP(outfi1nexpneq),		
-							 UseNonBlankKey and glb and filter_exp 													=> UNGROUP(outfi1nexpnb),
-																	glb and filter_exp 													=> UNGROUP(outfi1nexp),
-							 UseNonBlankKey and glb and filter_eq 													=> UNGROUP(outfi1neqnb),
-																	glb and filter_eq 													=> UNGROUP(outfi1neq),
-							 UseNonBlankKey	and glb 																				=> UNGROUP(outfi1nb),
-																	glb 																				=> UNGROUP(outfi1),							 
-							 IF(UseNonBlankKey, IF(Doxie.DataRestriction.restrictPreGLB, UNGROUP(outfi2PreGlbNonBlank), UNGROUP(outfi2NonBlank)),
-								IF(Doxie.DataRestriction.restrictPreGLB, UNGROUP(outfi2PreGlb), UNGROUP(outfi2)))));
+// append best record informtion and transform to output format
+#uniquename(best_recs)
+%best_recs% := dx_BestRecords.append(infile, did, %perm_flag%);
+
+#uniquename(recs_proj)
+%recs_proj% := MAP(
+	marketing => project(%best_recs%, %add_flds_marketing%(left, left._best, supply)), 
+	glb_ok => project(%best_recs%, %add_flds_glb%(left, left._best, supply)), 
+	project(%best_recs%, %add_flds_nonglb%(left, left._best, supply))
+);
+
+outfi := UNGROUP(%recs_proj%);
 			 
 typeof(infile) strip_thresh(infile le) := transform
   #if (not clickdata)
@@ -240,7 +239,7 @@ typeof(infile) strip_minors(infile le, doxie_files.key_minors_hash re) := transf
 	#uniquename(outfile_Death)
 	%outfile_death% := join(%outfile_noDeath%,doxie.key_death_masterV2_ssa_DID,
 																keyed(left.did = right.l_did)  and
-																not DeathV2_Services.functions.Restricted(right.src, right.glb_flag, glb, %deathparams%),
+																not DeathV2_Services.functions.Restricted(right.src, right.glb_flag, glb_ok, %deathparams%),
 																%fillDOD%(LEFT,RIGHT),left outer, KEEP(1), LIMIT(0));
   //determine whether we need to join to the deathmaster data for the DOD value
   include_DOD := if ( stringlib.stringfind(supply,'BEST_ALL',1)=0 and stringlib.stringfind(supply,'BEST_DOD',1)=0, FALSE, TRUE);
@@ -271,7 +270,7 @@ typeof(infile) strip_minors(infile le, doxie_files.key_minors_hash re) := transf
 
 	mid1b := join(outfile1,header_slimsort.key_did_Ssn_nonglb,left.did = right.did,get_max_ssn_ng(LEFT,RIGHT),left outer);
 
-	mid2 := dedup(sort(if (glb,mid1,mid1b),did,-ismatch,-freq),seq,did);
+	mid2 := dedup(sort(if (glb_ok,mid1,mid1b),did,-ismatch,-freq),seq,did);
 
 	typeof(infile) into_orig(mid2 L) := transform
 		self := l;
@@ -282,12 +281,21 @@ typeof(infile) strip_minors(infile le, doxie_files.key_minors_hash re) := transf
   outfile_ := if (stringlib.stringfind(supply,'MAX_SSN',1) = 0,outfile1,mid3);
 	
 	didville.Mac_Common_Field_Declare();
+	// TODO: only ssn_mask_value is taken, and it'd be better to take it from global module, since it is called above anyway
 
-	ssnBestParams := SSNBest_Services.IParams.setSSNBestParams(glb_purpose_value,
-																														 dppa_purpose_value
-	                                                           ,fixed_DRM,appType
-																														 ,IndustryClass_val
-																														 ,ssn_mask_value
+  // need just a few things, so no projecting
+  mod_access := MODULE (doxie.IDataAccess)
+    EXPORT unsigned1 glb := glb_purpose_value;
+    EXPORT unsigned1 dppa := dppa_purpose_value;
+    EXPORT string DataRestrictionMask := fixed_DRM;
+    EXPORT string5 industry_class := IndustryClass_val;
+		EXPORT string32 application_type := appType;
+		EXPORT string ssn_mask := ssn_mask_value;
+    EXPORT dl_mask := dl_mask_val;
+		// input include_minors -- is it include only or dppa as well?
+  END;
+
+	ssnBestParams := SSNBest_Services.IParams.setSSNBestParams(mod_access
 																														 ,include_minors
 																														 ,suppress_and_mask_:=FALSE); //since suppression and masking is done below
 																										
@@ -297,9 +305,9 @@ typeof(infile) strip_minors(infile le, doxie_files.key_minors_hash re) := transf
   outfile_2 := if(GetSSNBest, with_bestSSNs, outfile_);
 	
 	//**** Pull by DID and by both SSN fields
-	Suppress.MAC_Suppress(outfile_2,outfile_pulled_DID,appType,Suppress.Constants.LinkTypes.DID,did);
-	Suppress.MAC_Suppress(outfile_pulled_DID,outfile_pulled_SSN,appType,Suppress.Constants.LinkTypes.SSN,best_ssn);
-	Suppress.MAC_Suppress(outfile_pulled_SSN,outfile_pulled_MAX,appType,Suppress.Constants.LinkTypes.SSN,max_ssn);
+	Suppress.MAC_Suppress(outfile_2,outfile_pulled_DID,mod_access.application_type,Suppress.Constants.LinkTypes.DID,did);
+	Suppress.MAC_Suppress(outfile_pulled_DID,outfile_pulled_SSN,mod_access.application_type,Suppress.Constants.LinkTypes.SSN,best_ssn);
+	Suppress.MAC_Suppress(outfile_pulled_SSN,outfile_pulled_MAX,mod_access.application_type,Suppress.Constants.LinkTypes.SSN,max_ssn);
 
 	//**** Mask
 	suppress.MAC_Mask(outfile_pulled_MAX,	outfile_masked,	best_ssn,	nodl,true,false);

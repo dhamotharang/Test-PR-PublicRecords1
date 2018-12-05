@@ -1,4 +1,4 @@
-export mac_get_type_g(f_g_did, f_g_acctno, f_g_out, glb_purpose=0, data_restriction_mask='', dppa_purpose=0) := macro
+export mac_get_type_g(f_g_did, f_g_acctno, f_g_out, modAccess) := macro
 
 import Phones, phonesplus, doxie, ut, progressive_phone, Phonesplus_v2;
 
@@ -67,15 +67,15 @@ end;
                       left.did = right.l_did 
 											and
 											~Phones.Functions.IsPhoneRestricted(right.origstate, 
-																											    glb_purpose,
-																											    dppa_purpose,
-																											    industry_class_value,
+																											    modAccess.glb,
+																											    modAccess.dppa,
+																											    modAccess.industry_class,
 																													, //checkRNA
 																													right.datefirstseen,
 																													right.dt_nonglb_last_seen,
 																													right.rules,
 																													right.src_all,
-																													data_restriction_mask
+																													modAccess.DataRestrictionMask
 																												 ),
  	                 %by_phonesplus_did%(left, right),
 			       limit(ut.limits.PHONE_PER_PERSON * %incoming_rows%, skip));
@@ -121,21 +121,21 @@ end;
 %LR_raw%	:= join(f_g_did(did<>0), %LR_index_did%,
                      Keyed(left.did = right.l_did) and use_LR and
 										 ~Phones.Functions.IsPhoneRestricted(right.origstate, 
-																											   glb_purpose,
-																											   dppa_purpose,
-																											   industry_class_value,
+																											   modAccess.glb,
+																											   modAccess.dppa,
+																											   modAccess.industry_class,
 																												 , //checkRNA
 																												 right.datefirstseen,
 																												 right.dt_nonglb_last_seen,
 																												 right.rules,
 																												 right.src_all,
-																												 data_restriction_mask
+																												 modAccess.DataRestrictionMask
 																												),
 										 %by_royalty_did%(left, right),
 									 limit(ut.limits.PHONE_PER_PERSON * %incoming_rows%, skip));
 		
 #uniquename(f_g_out_raw_post_filter)	
-Header.MAC_Filter_Sources(%f_g_out_raw%,%f_g_out_raw_post_filter%,src,data_restriction_mask);									
+Header.MAC_Filter_Sources(%f_g_out_raw%,%f_g_out_raw_post_filter%,src,modAccess.DataRestrictionMask);									
 
 #uniquename(f_g_out_ready)				
 %f_g_out_ready% := project(%f_g_out_raw_post_filter%,%layout_with_c_score_src%); 

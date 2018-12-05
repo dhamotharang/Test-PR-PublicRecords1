@@ -25,7 +25,7 @@
   </message>
 */
 								
-import Relationship, doxie, Header, watchdog;
+import Relationship, doxie, Header, dx_BestRecords;
 
 EXPORT service_GetRelationship() := FUNCTION
   unsigned6 input_DID   := 0           : stored('DID');
@@ -66,13 +66,12 @@ nrec := record
 	string28 lname;
 	result;
 end;
-segkey     := watchdog.Key_Watchdog_glb;
-NamesAdded := join(result,segkey,
-                   keyed(left.did2 = right.did),
+segrecs    := dx_BestRecords.append(result, did2, dx_BestRecords.Constants.perm_type.glb, left_outer := false);
+NamesAdded := project(segrecs,
 									 transform(nrec,
-									           self.fname := right.fname,
-														 self.mname := right.mname,
-														 self.lname := right.lname,
+									           self.fname := left._best.fname,
+														 self.mname := left._best.mname,
+														 self.lname := left._best.lname,
 														 self.title_str := Header.relative_titles.fn_get_str_title(left.title);
 														 self := left));
 

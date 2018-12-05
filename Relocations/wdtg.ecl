@@ -1,4 +1,4 @@
-//
+﻿//
 //	Where Did They Go?
 //
 //	Search for gong recs that appeared near a certain moment in time, near some area(s).
@@ -33,7 +33,7 @@
 	get_gong_by_did(did[,targetDate][,radius][,maxDaysBefore][,maxDaysAfter][,fuzzyLast][,exactFirst][,allowNonCurrent])
 */
 
-import Gong, ut, doxie, NID, header;
+import Gong, ut, doxie, NID;
 
 
 // STUB - are these two routines worthy of inclusion in module ut?
@@ -126,15 +126,16 @@ export wdtg := module
 		
 		// get the header records for the target subject, and reduce to just zips
 		dids := dataset( [ targetDID ], doxie.layout_references );
-		doxie.MAC_Header_Field_Declare();
+
+    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ());
 		headerRecs := 
-			doxie.Comp_Subject_Addresses(dids,dateVal,dppa_purpose,glb_purpose,ln_branded_value,,probation_override_value,industry_class_value,no_scrub).addresses;
+      doxie.Comp_Subject_Addresses(dids,mod_access := mod_access).addresses;
 		headerSort	:= sort(headerRecs,-dt_last_seen);
 		headerRecs_z := project(headerRecs, transform(layout_zip, self.zip:=left.zip, self.reason:='header'));
 		// output(headerSort, named('headerSort')); // DEBUG
 		
 		// get target names from the best record
-		br := doxie.best_records (dids,,dppa_purpose,glb_purpose,,/*isfcra*/);
+		br := doxie.best_records (dids, modAccess := mod_access);
 		targetFirst := br[1].fname;
 		targetMiddle := br[1].mname;
 		

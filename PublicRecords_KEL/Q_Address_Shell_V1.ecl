@@ -1,12 +1,12 @@
-﻿//HPCC Systems KEL Compiler Version 0.11.4
+﻿//HPCC Systems KEL Compiler Version 0.11.6
 IMPORT KEL011 AS KEL;
 IMPORT B_Address,CFG_Compile,E_Address,E_Zip_Code FROM PublicRecords_KEL;
 IMPORT * FROM KEL011.Null;
 EXPORT Q_Address_Shell_V1(KEL.typ.str __P_PrimaryRange, KEL.typ.str __P_Predirectional, KEL.typ.str __P_PrimaryName, KEL.typ.str __P_Suffix, KEL.typ.str __P_Postdirectional, KEL.typ.uid __P_ZIP5, KEL.typ.str __P_SecondaryRange, CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault) := MODULE
   SHARED TYPEOF(B_Address(__in).__ENH_Address) __ENH_Address := B_Address(__in).__ENH_Address;
-  SHARED __EE90348 := __ENH_Address;
-  SHARED __EE90864 := __EE90348(__T(__AND(__OP2(__CN(__P_PrimaryRange),=,__EE90348.Primary_Range_),__AND(__OP2(__CN(__P_Predirectional),=,__EE90348.Predirectional_),__AND(__OP2(__CN(__P_PrimaryName),=,__EE90348.Primary_Name_),__AND(__OP2(__CN(__P_Suffix),=,__EE90348.Suffix_),__AND(__OP2(__CN(__P_Postdirectional),=,__EE90348.Postdirectional_),__AND(__OP2(__CN(__P_ZIP5),=,__EE90348.Z_I_P5_),__OP2(__CN(__P_SecondaryRange),=,__EE90348.Secondary_Range_)))))))));
-  SHARED __ST6226_Layout := RECORD
+  SHARED __EE128045 := __ENH_Address;
+  SHARED __EE128561 := __EE128045(__T(__AND(__OP2(__CN(__P_PrimaryRange),=,__EE128045.Primary_Range_),__AND(__OP2(__CN(__P_Predirectional),=,__EE128045.Predirectional_),__AND(__OP2(__CN(__P_PrimaryName),=,__EE128045.Primary_Name_),__AND(__OP2(__CN(__P_Suffix),=,__EE128045.Suffix_),__AND(__OP2(__CN(__P_Postdirectional),=,__EE128045.Postdirectional_),__AND(__OP2(__CN(__P_ZIP5),=,__EE128045.Z_I_P5_),__OP2(__CN(__P_SecondaryRange),=,__EE128045.Secondary_Range_)))))))));
+  SHARED __ST8385_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -46,5 +46,5 @@ EXPORT Q_Address_Shell_V1(KEL.typ.str __P_PrimaryRange, KEL.typ.str __P_Predirec
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(__EE90864,__ST6226_Layout));
+  EXPORT Res0 := __UNWRAP(PROJECT(__EE128561,__ST8385_Layout));
 END;

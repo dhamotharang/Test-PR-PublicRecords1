@@ -1,4 +1,4 @@
-import ut,doxie,NID,watchdog,autokey,header_quick,AutoHeaderV2,lib_metaphone;
+import ut,doxie,NID,autokey,header_quick,AutoHeaderV2,lib_metaphone,dx_BestRecords;
 
 export fetch_SSN (dataset (AutoheaderV2.layouts.search) ds_search) := function
 
@@ -56,13 +56,9 @@ export fetch_SSN (dataset (AutoheaderV2.layouts.search) ds_search) := function
 	p := p0+ IF((~temp_fuzzy_ssn OR temp_isCRS )	AND NOT EXISTS(p0) AND useSSnPartialFetch
 					,SSNPartial_Fetch);
 					
-	GoodSSNOnly := join(p, watchdog.Key_watchdog_glb,
-						keyed(left.did > 0 and left.did = right.did) and
-						right.valid_ssn = 'G' and
-						right.ssn = temp_ssn_value,
-						transform(left),
-						keep(1),
-						limit(0));
+	best_recs := dx_BestRecords.append(p, did, dx_BestRecords.Constants.perm_type.glb, left_outer := false);
+	GoodSSNOnly := project(best_recs(_best.valid_ssn = 'G' and _best.ssn = temp_ssn_value), 
+		transform(AutoheaderV2.layouts.search_out, self := left));
 
 	ssn_res := if(temp_SearchGoodSSNOnly_value, GoodSSNOnly, p);
 

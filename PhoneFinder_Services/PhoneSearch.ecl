@@ -1,4 +1,4 @@
-﻿IMPORT AutoStandardI,DeathV2_Services,Didville,Doxie,Doxie_Raw,Gateway,Suppress,ut;
+﻿IMPORT DeathV2_Services,Didville,Doxie,Doxie_Raw,Gateway,Suppress,ut;
 
 lBatchIn       := PhoneFinder_Services.Layouts.BatchInAppendDID;
 lCommon        := PhoneFinder_Services.Layouts.PhoneFinder.Common;
@@ -10,6 +10,18 @@ EXPORT PhoneSearch( DATASET(lBatchIn)                        dIn,
 										PhoneFinder_Services.iParam.ReportParams inMod,
 										DATASET(Gateway.Layouts.Config)          dGateways) :=
 FUNCTION
+
+  mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+    EXPORT unsigned1 glb := inMod.GLBPurpose;
+    EXPORT unsigned1 dppa := inMod.DPPAPurpose;
+    EXPORT string DataPermissionMask := inMod.DataPermissionMask;
+    EXPORT string DataRestrictionMask := inMod.DataRestrictionMask;
+    EXPORT string5 industry_class := inMod.IndustryClass;
+    EXPORT string32 application_type := inMod.ApplicationType;
+    EXPORT boolean show_minors := inMod.IncludeMinors OR (inMod.GLBPurpose = 2);
+    EXPORT string ssn_mask := inMod.SSNMask;
+  END;
+
 	dResultsByPhone := PhoneFinder_Services.GetPhones(dIn,inMod,dGateways);
 	
 	// Search by PII - Don't use royalty based sources when searching on PII when phone is also sent in
@@ -49,7 +61,7 @@ FUNCTION
 	dWFDIDs := DEDUP(SORT(PROJECT(dWFDedup,doxie.layout_references),did),did);
 	
 	// Best information
-	dWFBestInfo := Doxie.best_records(dWFDIDs,includeDOD:=true);
+	dWFBestInfo := Doxie.best_records(dWFDIDs, includeDOD:=true, modAccess := mod_access);
 	
 	lFinal tAppendBestInfo(dWFDedup le,dWFBestInfo ri) :=
 	TRANSFORM
@@ -103,7 +115,7 @@ FUNCTION
 																							 self.dob := (string)left.dob,																						 
 																							 self := left, self := []));
 
-	BOOLEAN glb_ok := AutoStandardI.InterfaceTranslator.glb_ok.val(PROJECT(inMod,AutoStandardI.InterfaceTranslator.glb_ok.params,OPT));
+	BOOLEAN glb_ok := mod_access.isValidGLB ();
 	DIDsAdded := didville.did_service_common_function(file_in,
 																							 glb_flag := glb_ok, 
 																							 glb_purpose_value := inMod.GLBPurpose, 

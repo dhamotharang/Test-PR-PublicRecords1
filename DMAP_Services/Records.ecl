@@ -26,36 +26,41 @@ EXPORT Records($.Layouts.Input_Layout input, $.IParams.ReportParams input_params
 
 	addr_with_dates:= JOIN(best_recs, addr_recs,  
 											 LEFT.did= RIGHT.did,
-											 xform_addr(LEFT, RIGHT, COUNTER), LEFT OUTER);
-
-	//	Get Verification of Occupancy Score for all the records
-	voo_recs:= $.Functions.fn_VOOScore(addr_with_dates, input_params);
-		
+											 xform_addr(LEFT, RIGHT, COUNTER));
+  
+	// Test case: did "17851725" misses the best record in the JOIN.
+	// Check if the addr_with_dates has the best record if not add the best record.  
+	all_address_recs:= IF(EXISTS(addr_with_dates(is_best_address)), addr_with_dates, addr_with_dates + best_recs);
+	
 	// Separating the best records and sorting them on descending DateLastSeen.
-	sorted_best_recs:= SORT(voo_recs(is_best_address), -DateLastSeen);
+	sorted_best_recs:= SORT(all_address_recs(is_best_address), -DateLastSeen);	
 	
 	bestlastseen := sorted_best_recs[1].DateLastSeen;
 	
-	// Separating the non-best records and filtering out the addresses reported after best address last seen
-	filtered_prior_recs:= voo_recs(~is_best_address AND DateLastSeen<= bestlastseen);
+	// Separating the non-best records and filtering out the prior address reported after best address last seen
+	filtered_prior_recs:= all_address_recs(~is_best_address AND DateLastSeen<= bestlastseen);
 	
-	//	Sort the prior records on descending datelastseen
 	sorted_prior_recs:= SORT(filtered_prior_recs, -DateLastSeen);
+	
+	voo_input:= sorted_best_recs[1]+ sorted_prior_recs[1];
+
+	//	Get Verification of Occupancy Score for best and prior the records
+	voo_recs:= $.Functions.fn_VOOScore(voo_input, input_params);
 		
 	//	Subject info with current Address
-	subject_with_currentAddr:= sorted_best_recs[1];
+	subject_with_currentAddr:= voo_recs(is_best_address)[1];
 	
 	// Subject data masking
 	subject_data_masked:= $.Functions.fn_data_masking(subject_with_currentAddr, input_params);
 		
 	//	Subject info with previous Address
-	subject_with_priorAddr:= sorted_prior_recs[1];
+	subject_with_priorAddr:= voo_recs(~is_best_address)[1];
 			
 	//	Get phones for the borrower
 	phones:= $.Functions.fn_get_phones(best_recs[1]);
 	
 	// Joining the subject_owned_address and Input_Address to get fids.
-	subject_owned_addr:= PROJECT(voo_recs(OwnOrRent= $.Constants.OWN), $.Transforms.xform_subjectToaddrLayout(LEFT));
+	subject_owned_addr:= $.Functions.fn_getOwnedProp(all_address_recs);
 			
 	input_prop_addr:= DATASET([$.Transforms.xform_inputToaddrLayout(input)]);
 
@@ -93,7 +98,7 @@ EXPORT Records($.Layouts.Input_Layout input, $.IParams.ReportParams input_params
 	// OUTPUT(in, NAMED('in'));
 	// OUTPUT(best_recs, NAMED('best_recs'));
 	// OUTPUT(addr_recs, NAMED('addr_recs'));
-	// OUTPUT(addr_with_dates, NAMED('addr_with_dates'));
+	// OUTPUT(all_address_recs, NAMED('all_address_recs'));
 	// OUTPUT(voo_recs, NAMED('voo_recs'));
 	// OUTPUT(sorted_best_recs, NAMED('sorted_best_recs'));
 	// OUTPUT(sorted_prior_recs, NAMED('sorted_prior_recs'));

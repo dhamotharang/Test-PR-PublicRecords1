@@ -121,10 +121,12 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 											SELF.AnalyticsRecordId := LEFT.tree_uid_,
 											SELF.RecordType := FraudGovPlatform_Services.Constants.RecordType.CLUSTER,																										
 											SELF.ElementType := LEFT.entity_name,
-											//Cleaning out @@@ from LEFT.entity_value when ELEMNT is of type address,
+											//Cleaning out @@@ from LEFT.entity_value when //ELEMENT is of type address OR BANK ACCOUNT NUMBER,
 											// @@@ was addded to calcualte the matching HASH value for tree_uid
-											SELF.ElementValue := IF(LEFT.entity_name = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT,
-																							FraudGovPlatform_Services.Functions.GetCleanAddressFragmentValue(LEFT.entity_value),
+											SELF.ElementValue := MAP(LEFT.entity_name = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT 
+																									=> FraudGovPlatform_Services.Functions.GetCleanAddressFragmentValue(LEFT.entity_value),
+																							LEFT.entity_name = Fragment_Types_const.BANK_ACCOUNT_NUMBER_FRAGMENT
+																									=> FraudGovPlatform_Services.Functions.GetCleanBankAccountFragmentValue(LEFT.entity_value),
 																							LEFT.entity_value);
 											SELF.score := LEFT.cluster_score_,
 											SELF.ClusterName := LEFT.label_,
@@ -143,7 +145,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 																	LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
 	
 	// getting the records from deltabase database.
-	ds_delta_recentTransactions := mod_Deltabase_Functions(batch_params).getDeltabaseSearchRecords();
+	ds_delta_recentTransactions := FraudGovPlatform_Services.mod_Deltabase_Functions(batch_params).getDeltabaseSearchRecords();
 	
 	//Getting the public records best to fill identity Detail card.
 	ds_GovBest := FraudGovPlatform_Services.Functions.getGovernmentBest(ds_dids_to_use, batch_params);
@@ -174,8 +176,12 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 		SELF.ElementType := L.fragment;
 		//Cleaning out @@@ from LEFT.entity_value when ELEMENT is of type address,
 		// @@@ was addded to calcualte the matching HASH value for tree_uid
-		SELF.ElementValue := IF(L.fragment = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT,REGEXREPLACE('@@@',L.fragment_value,', '),L.fragment_value);
-		
+		SELF.ElementValue := MAP(L.fragment = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT 
+																=> FraudGovPlatform_Services.Functions.GetCleanAddressFragmentValue(L.fragment_value),
+														L.fragment = Fragment_Types_const.BANK_ACCOUNT_NUMBER_FRAGMENT
+																=> FraudGovPlatform_Services.Functions.GetCleanBankAccountFragmentValue(L.fragment_value),
+														L.fragment_value);
+
 		SELF.ElementInformation := ds_elementsInformation(fragment_value = L.fragment_value)[1];
 		
 		SELF.Score := L.Score;
@@ -194,7 +200,6 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 																				Address.NameFromComponents(STD.Str.CleanSpaces(Name.First), '', 
 																				STD.Str.CleanSpaces(Name.Last),'')) = STD.Str.ToUpperCase(STD.Str.CleanSpaces(L.fragment_value))),
 
-																						
 				 L.fragment = Fragment_Types_const.PHYSICAL_ADDRESS_FRAGMENT => 
 															ds_delta_recentTransactions(
 					  												STD.Str.ToUpperCase(
@@ -207,6 +212,15 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 																		
 				 L.fragment = Fragment_Types_const.PHONE_FRAGMENT => ds_delta_recentTransactions(Phones[1].PhoneNumber = L.fragment_value),
 				 L.fragment = Fragment_Types_const.IP_ADDRESS_FRAGMENT => ds_delta_recentTransactions(IpAddress = L.fragment_value),
+				 L.fragment = Fragment_Types_const.BANK_ACCOUNT_NUMBER_FRAGMENT => 
+															ds_delta_recentTransactions(BankInformation1.BankAccountNumber = 
+																			FraudGovPlatform_Services.Functions.GetCleanBankAccountFragmentValue(L.fragment_value)),
+				 L.fragment = Fragment_Types_const.EMAIL_FRAGMENT => ds_delta_recentTransactions(
+																																		STD.Str.ToUpperCase(STD.Str.CleanSPaces(EmailAddress)) = 
+																																		STD.Str.ToUpperCase(STD.Str.CleanSPaces(L.fragment_value))),																			
+				 L.fragment = Fragment_Types_const.DRIVERS_LICENSE_NUMBER_FRAGMENT => 
+															ds_delta_recentTransactions(DriversLicense.DriversLicenseNumber = L.fragment_value AND 
+																													DriversLicense.DriversLicenseState = ds_batch_in[1].dl_state),
 				 DATASET([], iesp.fraudgovreport.t_FraudGovTimelineDetails));
 
 		ds_recentTransactions_sorted := SORT(ds_recentTransactions,-eventDate.year, -eventDate.Month, -eventDate.day);
@@ -255,8 +269,10 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	// output(ds_ElementsNIdentities, named('ds_ElementsNIdentities'));
 	// output(ds_fragment_recs_sorted, named('ds_fragment_recs_sorted'));
 	// output(ds_fragment_recs_rolled, named('ds_fragment_recs_rolled'));
+	// output(ds_entityNameUID, named('ds_entityNameUID'));
 	// output(ds_raw_cluster_recs, named('ds_raw_cluster_recs'));
 	// output(ds_clusters, named('ds_clusters'));
+	// output(ds_elementsInformation, named('ds_elementsInformation'));
 	// output(ds_delta_recentTransactions,named('ds_delta_recentTransactions'));
 	// output(ds_GovBest, named('ds_GovBest'));
 	// output(ds_contributoryBest, named('ds_contributoryBest'));

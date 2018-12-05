@@ -26,13 +26,15 @@
 	<part name="RunTargusGatewayAnywayForTesting" type="xsd:boolean"/>
   <part name="TestDataEnabled" type="xsd:boolean"/> 
   <part name="TestDataTableName" type="xsd:string"/> 
+  <part name=''LimitPaymentHistory24Months" type = "xsd:boolean"/>
+   <part name="SBFEContributorIds" type = "xsd:string"/>
 </message>
 */
 /*--INFO-- Small Business BIP Combined XML Service - This service returns Small Business Attributes and Scores as well as the SBFE Credit Report */
 
 // #OPTION('expandSelectCreateRow', TRUE);
 IMPORT Address, AutoStandardI, BIPV2, Business_Risk_BIP, BusinessCredit_Services, 
-       Gateway, IESP, MDR, OFAC_XG5, Phones, Royalty, UT, Inquiry_AccLogs, Risk_Reporting, STD;
+       Gateway, IESP, MDR, OFAC_XG5, Phones, Royalty, Inquiry_AccLogs, Risk_Reporting, STD;
 
 EXPORT SmallBusiness_BIP_Combined_Service := 
   MACRO 
@@ -70,7 +72,9 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
       'IncludeTargusGateway',
       'RunTargusGatewayAnywayForTesting',
       'TestDataEnabled',
-      'TestDataTableName'
+      'TestDataTableName',
+	 'LimitPaymentHistory24Months',
+	 'SBFEContributorIds'
       ));
 		
     /* ************************************************************************
@@ -94,7 +98,7 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
 			 *  Fields needed for improved Scout Logging  *
 			 **********************************************/
 			string32 _LoginID               := ''	: STORED('_LoginID');
-			outofbandCompanyID							:= '' : STORED('_CompanyID');
+			outofbandCompanyID		:= '' : STORED('_CompanyID');
 			string20 CompanyID              := if(users.CompanyId != '', users.CompanyId, outofbandCompanyID);
 			string20 FunctionName           := '' : STORED('_LogFunctionName');
 			string50 ESPMethod              := '' : STORED('_ESPMethodName');
@@ -162,6 +166,9 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
                                           search.AuthorizedRep3.Address.StreetAddress1);
 
     // Option Fields
+		
+    BOOLEAN LimitPaymentHistory24MonthsVal := FALSE : STORED('LimitPaymentHistory24Months');
+    STRING  ContributorIds := '' : STORED('SBFEContributorIds');
     UNSIGNED3 HistoryDateYYYYMM		    := (INTEGER)Business_Risk_BIP.Constants.NinesDate     : STORED('HistoryDateYYYYMM');
     UNSIGNED6 HistoryDate             := (INTEGER)Business_Risk_BIP.Constants.NinesDateTime : STORED('HistoryDate');
     UNSIGNED1	Link_Search_Level       := Business_Risk_BIP.Constants.LinkSearch.Default     : STORED('LinkSearchLevel');
@@ -350,13 +357,15 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
        EXPORT STRING32  ApplicationType                 := global_mod.ApplicationType;
        EXPORT STRING1   FetchLevel 					            := BIPV2.IDconstants.Fetch_Level_SELEID;
        EXPORT BOOLEAN   IncludeCreditReport             := option.IncludeCreditReport;  
+       EXPORT BOOLEAN   LimitPaymentHistory24Months := LimitPaymentHistory24MonthsVal;
+	  EXPORT STRING       SBFEContributorIds := ContributorIds;			
        EXPORT BOOLEAN   MinInputMetForAuthRepPopulated  := MinimumInputMetForAuthorizedRepPopulated;
        EXPORT DATASET(iesp.Share.t_StringArrayItem) Watchlists_Requested := Watchlists_Requested_;
        EXPORT DATASET(Gateway.Layouts.Config) Gateways  := Gateways_;
        EXPORT DATASET(LNSmallBusiness.Layouts.AttributeGroupRec) AttributesRequested := Attributes_Requested;
        EXPORT DATASET(LNSmallBusiness.Layouts.ModelNameRec) ModelsRequested := Models_Requested;
        EXPORT DATASET(LNSmallBusiness.Layouts.ModelOptionsRec) ModelOptions := Model_Options;
-			 EXPORT BOOLEAN   UseInputDataAsIs                := TRUE;
+	  EXPORT BOOLEAN   UseInputDataAsIs                := TRUE;
       END;
     
   ds_Results_withSmBizSBFEroyalty := LNSmallBusiness.SmallBusiness_BIP_Combined_Service_Records(SmallBizCombined_inmod);
@@ -378,10 +387,8 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
                           ds_Results_withSmBizSBFEroyalty[1].SmallBiz_SBFE_Royalty, 1, 0);
                           
     ds_SBFE_CountRoyalLayout := DATASET([{SBFE_RoyalCount}], {INTEGER SBFEAccountCount});                                           
-
     ds_combinedSBFE_royalties := IF( TestData_Enabled, Royalty.RoyaltySBFE.GetNoRoyaltiesPlus(OutputType), 
                                      Royalty.RoyaltySBFE.GetOnlineRoyaltiesPlus(ds_SBFE_CountRoyalLayout,OutputType) );
-
 
    /* ************************************************************************
     *                    Targus Royalties                                    *

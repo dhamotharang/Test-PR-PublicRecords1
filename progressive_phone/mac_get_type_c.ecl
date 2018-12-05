@@ -1,4 +1,4 @@
-export mac_get_type_c(f_c_did, f_c_acctno, f_c_out, is_glb_ok=true, use_landlord=false, use_input_only=false, data_restriction_mask='') := macro
+export mac_get_type_c(f_c_did, f_c_acctno, f_c_out, is_glb_ok=true, use_landlord=false, use_input_only=false, modAccess) := macro
   import progressive_phone, header, ut, gong, risk_indicators, NID, Std;
 	
 #uniquename(gong_addr_key)
@@ -13,7 +13,7 @@ export mac_get_type_c(f_c_did, f_c_acctno, f_c_out, is_glb_ok=true, use_landlord
 //all addresses with a date last seen newer than six months
 
 #uniquename(blue_recs)
-progressive_phone.mac_get_blue(f_c_did, %blue_recs%, true, true, false, data_restriction_mask)
+progressive_phone.mac_get_blue(f_c_did, %blue_recs%, true, true, false, modAccess)
 
 #uniquename(todays_date)
 %todays_date% := (string8) Std.Date.Today();

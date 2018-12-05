@@ -1,4 +1,4 @@
-﻿import iesp, doxie, LN_PropertyV2_Services, address, fcra, std, FFD;
+﻿import iesp, doxie, LN_PropertyV2_Services, address, fcra, std, FFD, AutoStandardI;
 
 iesp.share.t_Address SetPartyAddress (LN_PropertyV2_Services.layouts.parties.pparty P) := iesp.ECL2ESP.SetAddress (
   P.prim_name, P.prim_range, P.predir, P.postdir, P.suffix, P.unit_desig, P.sec_range,
@@ -11,6 +11,20 @@ EXPORT property_records (
 	dataset (fcra.Layout_override_flag) flagfile = fcra.compliance.blank_flagfile,
 	dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim
 ) := MODULE
+
+  gmod := AutoStandardI.GlobalModule (IsFCRA);
+
+  shared mod_access := MODULE (PROJECT (in_params, doxie.IDataAccess, DataPermissionMask, DataRestrictionMask, ln_branded, probation_override))
+    EXPORT unsigned1 glb := in_params.GLBPurpose;
+    EXPORT unsigned1 dppa := in_params.DPPAPurpose;
+    EXPORT string5 industry_class := in_params.industryclass; 
+    EXPORT string32 application_type := AutoStandardI.InterfaceTranslator.application_type_val.val(project(gmod,AutoStandardI.InterfaceTranslator.application_type_val.params));
+    EXPORT boolean no_scrub := AutoStandardI.InterfaceTranslator.no_scrub.val(project(gmod,AutoStandardI.InterfaceTranslator.no_scrub.params));
+    EXPORT unsigned3 date_threshold := in_params.dateVal;
+    EXPORT boolean suppress_dmv := gmod.SuppressDMVInfo;
+    EXPORT string ssn_mask := in_params.ssn_mask; 
+    EXPORT unsigned1 dl_mask :=	AutoStandardI.InterfaceTranslator.dl_mask_val.val(project(gmod,AutoStandardI.InterfaceTranslator.dl_mask_val.params)); ;
+  END;
 
   shared input_dids_set := SET (dids, did);
 
@@ -245,18 +259,17 @@ EXPORT property_records (
   // Generally, returns rolled up property records
 
   // choose subject's addresses/names depending on fcra:
-  csa_raw := doxie.Comp_Subject_Addresses (dids, 0, in_params.DPPAPurpose, in_params.GLBPurpose,
-    in_params.ln_branded, , in_params.probation_override);   //, industry_class_value, no_scrub
+  csa_raw := doxie.Comp_Subject_Addresses (dids, , , , mod_access);
 
   // similar to doxie/central_header
-  csa_raw_fcra := FCRA.comp_subject (dids, in_params.DPPAPurpose, in_params.GLBPurpose, 
+  csa_raw_fcra := FCRA.comp_subject (dids, mod_access.dppa, mod_access.glb, 
                                      false, // exclude Gong so far
                                      ,,, flagfile,slim_pc_recs,in_params.FFDOptionsMask);
 
   csa_addresses := if (IsFCRA, csa_raw_fcra.addresses, csa_raw.addresses);
   csa_names := if (IsFCRA, csa_raw_fcra.names, csa_raw.names);
 
-  crs_prop := LN_PropertyV2_Services.CRS_records (csa_addresses, csa_names, in_params.applicationtype, 
+  crs_prop := LN_PropertyV2_Services.CRS_records (csa_addresses, csa_names, mod_access.application_type, 
 																									 in_params.non_subject_suppression, isFCRA,
 																									 slim_pc_recs, in_params.FFDOptionsMask, flagfile);
   shared base_property := crs_prop (in_params.use_nonsubjectproperty or owned,

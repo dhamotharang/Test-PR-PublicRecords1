@@ -2,8 +2,22 @@
 This function gets Relatives, Employers, Associates, and Businesses (REAB) for accounts with input for 
 firstname, lastname, and (DID or SSN or full address or DOB).
 */
-IMPORT BatchServices,BIPV2,BIPV2_Build,Codes,DeathV2_Services,Doxie,Doxie_Raw,EmailService,Header,MDR,PAW,PhoneOwnership,Phones,POE,STD,Suppress,ut;
+IMPORT BatchServices,BIPV2,BIPV2_Build,Codes,DeathV2_Services,Doxie,Doxie_Raw,EmailService,Header,
+       MDR,PAW,PhoneOwnership,Phones,POE,STD,Suppress,ut;
+
 EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwnership.IParams.BatchParams inMod) :=FUNCTION //
+
+  mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
+      EXPORT unsigned1 glb := inMod.glbpurpose;
+      EXPORT unsigned1 dppa := inMod.dppapurpose;
+      EXPORT string DataPermissionMask := inMod.DataPermissionMask;
+      EXPORT string DataRestrictionMask := inMod.DataRestrictionMask;
+      EXPORT string5 industry_class := inMod.industryclass;
+      EXPORT string32 application_type := inMod.applicationtype;
+      EXPORT string ssn_mask := inMod.ssn_mask;
+      EXPORT unsigned1 dl_mask :=	IF (inMod.mask_dl, 1, 0);
+		END;	
+
 	Constants := PhoneOwnership.Constants;
 	//REA Utilities
 	validFullSSN(STRING ssn):= LENGTH(STD.Str.FilterOut(ssn,'0123456789')) = 9;
@@ -19,7 +33,7 @@ EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwners
 																,acctno,seq),acctno);
 	subjectDIDs := PROJECT(needREA,Doxie.layout_references);													
 	// *** Relatives and associates
-	dsRA := Doxie_Raw.relative_raw(DEDUP(subjectDIDs,ALL),,inMod.dppaPurpose,inMod.glbPurpose,,,,,,Constants.MAX_RelativeDept);
+	dsRA := Doxie_Raw.relative_raw(DEDUP(subjectDIDs,ALL),,mod_access.dppa, mod_access.glb,,,,,,Constants.MAX_RelativeDept);
 	dsUniqueRA := DEDUP(SORT(dsRA,srcdid,person2,-rel_dt_last_seen,rel_dt_first_seen,titleno),srcdid,person2);
 	deathParams := PROJECT(inMod, DeathV2_Services.IParam.DeathRestrictions, OPT);
 	
@@ -34,7 +48,7 @@ EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwners
 	END;
 	dsRAwDeceased := JOIN(dsUniqueRA, Doxie.key_death_masterV2_ssa_DID,
 							KEYED(LEFT.person2 = RIGHT.l_did) AND
-							NOT DeathV2_Services.Functions.Restricted(RIGHT.src, RIGHT.glb_flag, ut.glb_ok(inMod.GLBPurpose), deathParams),
+							NOT DeathV2_Services.Functions.Restricted(RIGHT.src, RIGHT.glb_flag, mod_access.isValidGLB(), deathParams),
 							updateRelatives(LEFT,RIGHT),
 							LEFT OUTER,
 							LIMIT(0),KEEP(1));
@@ -54,7 +68,7 @@ EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwners
 						LIMIT(Constants.MAX_RECORDS,SKIP));				
 										 
 	relativesDid := DEDUP(PROJECT(dsRelatives(did<>0),doxie.layout_references),did,ALL);
-	dsRelativeBestRecs := Doxie.best_records(relativesDid,DPPA_override:=inMod.DPPAPurpose,GLB_override:=inMod.GLBPurpose);
+	dsRelativeBestRecs := Doxie.best_records(relativesDid, modAccess := mod_access);
 	ut.PermissionTools.GLB.mac_FilterOutMinors(dsRelativeBestRecs,dsRABest_noMinors,did,,dob);		
 	dsRelativesInfo := JOIN(dsRelatives,dsRABest_noMinors,
 							LEFT.did = RIGHT.did,
@@ -157,7 +171,7 @@ EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwners
 								BIPV2.IDmacros.mac_JoinAllLinkids(),
 								rollBusiness(LEFT,RIGHT)); 										 
 	
-	Suppress.MAC_Suppress(dsRelativesInfo,dsRelativesUnrestricted,inMod.ApplicationType,Suppress.Constants.LinkTypes.DID,DID);
+	Suppress.MAC_Suppress(dsRelativesInfo,dsRelativesUnrestricted,mod_access.application_type,Suppress.Constants.LinkTypes.DID,DID);
 	// Returns a max of 15 identities including max 2 employers and max 2 businesses	
 	REAB := UNGROUP(TOPN(GROUP(SORT(dsRelativesUnrestricted(fname <> '' AND lname <> ''),acctno,isdeceased,-isfirstdegree,titleno),acctno),Constants.MAXCOUNT_Relative,acctno) & 
 									TOPN(GROUP(SORT(dsEmployer,acctno,-dt_last_seen,dt_first_seen,bdid),acctno),Constants.MAXCOUNT_Employer,acctno) & 

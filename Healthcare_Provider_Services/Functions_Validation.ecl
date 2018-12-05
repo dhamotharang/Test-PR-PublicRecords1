@@ -1,4 +1,5 @@
-import iesp,ut,Business_Header,Business_Header_SS,Risk_Indicators,doxie,watchdog,suppress;
+import iesp,ut,Business_Header,Business_Header_SS,Risk_Indicators,doxie,suppress,dx_BestRecords;
+
 export Functions_Validation := Module
 		shared myLayouts := Healthcare_Provider_Services.layouts;
 		shared myConst := Healthcare_Provider_Services.Constants;
@@ -63,9 +64,10 @@ export Functions_Validation := Module
 																										self.FlipLName:=left.FirstName;self:=left)),record),record);
 			getdidfromssn := if(hasSSN and hasName,Choosen(Doxie.Key_Header_SSN(keyed(s1=src.ssn[1]),keyed(s2=src.ssn[2]),keyed(s3=src.ssn[3]),keyed(s4=src.ssn[4]),keyed(s5=src.ssn[5]),keyed(s6=src.ssn[6]),keyed(s7=src.ssn[7]),keyed(s8=src.ssn[8]),keyed(s9=src.ssn[9])),10));
 			didbasedssn := dedup(sort(project(getdidfromssn,myLayouts.layout_did),record),record);
-			bestInfo:=Choosen(watchdog.Key_watchdog_glb(keyed(did=didbasedssn[1].did) and 
-																					((fname[1]=src.name_first[1] and lname = src.name_last) or 
-																					 (fname[1]=src.name_last[1] and lname = src.name_first))),10);
+			bestRecs := dx_BestRecords.get(dataset([{didbasedssn[1].did}], doxie.layout_references), 
+				did, dx_BestRecords.Constants.perm_type.glb);
+			bestInfo:=bestRecs(((fname[1]=src.name_first[1] and lname = src.name_last) or 
+													(fname[1]=src.name_last[1] and lname = src.name_first)));
 			bestInfo_match := join(bestInfo,nameRecs,left.ssn=right.ssn,transform(recordof(bestInfo),
 														self.ssn := if(ut.NameMatch100(left.fname[1],'',left.lname,right.FName,'',right.LName)>80 or
 																					 ut.NameMatch100(left.fname[1],'',left.lname,right.FName,'',right.LName)>80 or

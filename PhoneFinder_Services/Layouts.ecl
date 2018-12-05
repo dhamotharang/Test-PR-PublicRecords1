@@ -772,15 +772,19 @@ MODULE
 		STRING10     phone;
 	  UNSIGNED RecordsReturned;
 	END;
+    
+  EXPORT Input_CompanyId := RECORD
+		STRING16  CompanyId;
+	END;
 
 	EXPORT PFResSnapShotSearch := RECORD
-      STRING8 StartDate;
-      STRING8 EndDate;
-      STRING60 UserId;
-      STRING16 CompanyId;
-      STRING15 PhoneNumber; 		
-      STRING60 ReferenceCode;
-      UNSIGNED8 UniqueId;
+    STRING8 StartDate;
+    STRING8 EndDate;
+    STRING60 UserId;
+    DATASET(Input_CompanyId) CompanyIds {MAXCOUNT(iesp.Constants.PfResSnapshot.MaxCompanyIds)};
+    STRING15 PhoneNumber; 		
+    STRING60 ReferenceCode;
+    UNSIGNED8 UniqueId;
 	END;
 	
 	//	DeltaPhones

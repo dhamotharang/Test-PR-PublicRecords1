@@ -7,7 +7,7 @@ import ut, doxie, suppress, codes, driversv2_services, watchdog, risk_indicators
 t_yesNo	:= PersonReports.layouts.t_yesNo; // string3
 yesNo		:= PersonReports.layouts.yesNo;
 
-doxie.MAC_Header_Field_Declare()
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ());
 
 export Addrs_imposters_rels_assocs(dataset(doxie.layout_references) dids, boolean checkrna = header.constants.checkRNA) := MODULE
 
@@ -17,7 +17,7 @@ shared layout_comp_names_w_title := record
 end;
 
 // Best records for subject_information, AKAs, Imposters -checkRNA = false for subject_info,AKA and TRUE for imposters
-shared bestrecs := doxie.best_records(dids, , DPPA_Purpose, GLB_Purpose, true, false, , , true, checkrna);
+shared bestrecs := doxie.best_records(dids, false, , , true, checkrna, modAccess := mod_access);
 // Fetch records using SSN
 shared sslr := doxie.SSN_Lookups;
 
@@ -204,7 +204,7 @@ with_ssn_info get_dead(with_ssn_info l,doxie.key_death_masterv2_ssa_did r):=tran
 	self := [];
 END;
 
-is_glb_ok := ut.glb_ok(GLB_Purpose,checkrna);
+is_glb_ok := mod_access.isValidGLB (checkrna);
 deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
 
 imposters_w_d_info := dedup(sort(
@@ -251,12 +251,12 @@ bestrecs_w_issuance0 := project(join(prep_bestrecs,sslr,
 																add_issuance_w_title(left,right),keep(1),left outer),
 															identity_flat_w_title(left));
 
-Suppress.MAC_Mask(bestrecs_w_issuance0, export bestrecs_w_issuance_contactcard, ssn, null, true, false);
+Suppress.MAC_Mask(bestrecs_w_issuance0, export bestrecs_w_issuance_contactcard, ssn, null, true, false, maskVal := mod_access.ssn_mask);
 
 // AKAS Section
 subj_names := join(pre_subj_names,dids,left.did=right.did);
 with_issuance_info_subj0 := join(subj_names,sslr,left.ssn[1..5]=right.ssn5_unmasked,add_issuance_w_title(left,right),keep(1),left outer);
-Suppress.MAC_Mask(with_issuance_info_subj0, with_issuance_info_subj, ssn, null, true, false);
+Suppress.MAC_Mask(with_issuance_info_subj0, with_issuance_info_subj, ssn, null, true, false, maskVal := mod_access.ssn_mask);
 
 with_ssn_info_w_title add_dls(with_ssn_info_w_title l, roll_dlsr r):=transform
 	self.drivers_licenses := r.drivers_licenses;

@@ -1,4 +1,4 @@
-import doxie_crs, ut, header, doxie,doxie_raw,lib_date,codes,PhonesFeedback_Services,PhonesFeedback,Address;
+﻿import doxie_crs, ut, header, doxie,doxie_raw,lib_date,codes,PhonesFeedback_Services,PhonesFeedback,Address;
 
 EXPORT Person_records_functions := Module
 
@@ -11,15 +11,16 @@ EXPORT Person_records_functions := Module
 	shared historic_nbr_records_crs(boolean checkRNA=true,dataset (doxie.layout_references) dids=dataset ([],doxie.layout_references)) := FUNCTION
 		doxie.MAC_Selection_Declare();
 		doxie.MAC_Header_Field_Declare();
-		doxie.historic_nbr_records(header_records(,,,,,dids),a,checkRNA);
+    mod_access := doxie.compliance.GetGlobalDataAccessModule();
+		doxie.historic_nbr_records(header_records(,,,,,dids),a,checkRNA, mod_access);
 		ut.PermissionTools.GLB.mac_FilterOutMinors(a,afil,,,dob)
 		RETURN afil;
 	END;
 	export Comp_Subject_Addresses_wrap(dataset (doxie.layout_references) dids=dataset([],doxie.layout_references)) := function
 		doxie.MAC_Selection_Declare();
 		doxie.MAC_Header_Field_Declare();
-		csa := Doxie.Comp_Subject_Addresses(dids,dateVal,dppa_purpose,glb_purpose,ln_branded_value,,probation_override_value,industry_class_value,
-																							 no_scrub,dial_contactprecision_value, Addresses_PerSubject);
+    mod_access := doxie.compliance.GetGlobalDataAccessModule ();
+		csa := Doxie.Comp_Subject_Addresses(dids,,dial_contactprecision_value, Addresses_PerSubject, mod_access);
 		return csa;
 	END;
 	EXPORT nbr_records(dataset (doxie.layout_references) dids=dataset ([],doxie.layout_references)) := function
@@ -385,6 +386,8 @@ EXPORT Person_records_functions := Module
 
 	export ssn_persons ( boolean checkRNA = false,dataset (doxie.layout_references) dids=dataset ([],doxie.layout_references) ) := function
 		doxie.MAC_Header_Field_Declare();
+    mod_access := doxie.compliance.GetGlobalDataAccessModule ();
+
 		keepOldSsns := doxie.keep_old_ssns_val;
 
 		dids_ssns := record
@@ -503,7 +506,7 @@ EXPORT Person_records_functions := Module
 																 self := left), 
 											 left only);
 		combined := jdirty+daily_ssns;
-		header.MAC_GlbClean_Header(combined,j_preRNA);
+		header.MAC_GlbClean_Header(combined,j_preRNA, , , mod_access);
 		Header.MAC_GLB_DPPA_Clean_RNA(j_preRNA, j_postRNA)
 		j:= if(checkRNA,j_postRNA,j_preRNA);
 

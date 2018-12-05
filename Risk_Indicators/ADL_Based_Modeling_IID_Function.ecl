@@ -22,7 +22,8 @@ export ADL_Based_Modeling_IID_Function(DATASET (risk_indicators.layout_input) in
 																		integer2 dob_radius = -1,
 																		string50 DataRestriction=iid_constants.default_DataRestriction,
 																		unsigned8 BSOptions=0,
-																		string50 DataPermission=risk_indicators.iid_constants.default_DataPermission
+																		string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
+                                    string100 IntendedPurpose=''
 																		) := function		
 
 
@@ -425,7 +426,8 @@ iid_results := risk_indicators.InstantID_Function(iid_prep,
 										dob_radius,
 										bsversion,
 										in_DataRestriction := DataRestriction,
-										in_BSOptions := BSOptions);
+										in_BSOptions := BSOptions,
+                    in_IntendedPurpose := IntendedPurpose);
 
 
 iid_results_with_flags := group( sort(

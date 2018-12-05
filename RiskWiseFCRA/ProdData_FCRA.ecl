@@ -33,6 +33,7 @@
 	<part name="delta_PersonContext_gateway" type="xsd:string"/>
   <part name="DisplayDeployedEnvironment" type="xsd:boolean"/>
   <part name="DataRestrictionMask" type="xsd:string"/>
+  <part name="IntendedPurpose" type="xsd:string"/>
  </message>
 */
 
@@ -76,7 +77,8 @@ export ProdData_FCRA := MACRO
 	'IncludeThrive',
 	'IncludeWatercraft',	
 	'DisplayDeployedEnvironment',
-	'DataRestrictionMask'
+	'DataRestrictionMask',
+  'IntendedPurpose'
 	));
 
 boolean	isFCRA := true;
@@ -115,6 +117,7 @@ unsigned1 DPPA := RiskWise.permittedUse.fraudDPPA : stored('DPPAPurpose');
 unsigned1 GLB := RiskWise.permittedUse.fraudGLBA  : stored('GLBPurpose');
 BOOLEAN DisplayDeployedEnvironment := FALSE : STORED('DisplayDeployedEnvironment');
 string DataRestrictionMask := '' : STORED('DataRestrictionMask');
+string IntendedPurpose := '' : STORED('IntendedPurpose');
 string delta_PersonContext_gateway := '' : STORED('delta_PersonContext_gateway');
 boolean Include_PersonContext := false : STORED('IncludePersonContext');
 
@@ -447,7 +450,7 @@ gateways := project(gw_personContext, transform(gateway.layouts.config, self := 
 
 bsversion := 50;
     
-pc := Risk_Indicators.checkPersonContext(group(input_with_did, seq), gateways, bsversion);
+pc := Risk_Indicators.checkPersonContext(group(input_with_did, seq), gateways, bsversion, intendedPurpose);
 if(include_personContext or delta_personcontext_gateway <> '', output(pc, named('person_context')) );
 
 //
