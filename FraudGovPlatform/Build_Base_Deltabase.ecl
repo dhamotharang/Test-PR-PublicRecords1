@@ -32,7 +32,7 @@ module
 	DeltabaseSource := join(	DeltabaseUpdate,
 									MBS, 
 									(unsigned6) left.Customer_Account_Number = right.gc_id AND 
-									left.ind_type = right.ind_type and left.Deltabase = right.Deltabase
+									left.Deltabase = right.Deltabase
 									,TRANSFORM(FraudGovPlatform.Layouts.Base.Deltabase,SELF.Source := RIGHT.fdn_file_code; SELF := LEFT) ,lookup); 
 
   // Rollup Update and previous base 

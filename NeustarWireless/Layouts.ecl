@@ -49,9 +49,9 @@ EXPORT Layouts := MODULE
 		EXPORT Main := RECORD
 			//raw fields in optimized layout			
 			string10 	phone; 		
-			string15  fname; 		
+			string150 fname; 		
 			string1  	mname; 				
-			string20  lname; 				
+			string150 lname; 				
 			string5  	salutation; 	
 			string3  	suffix;  
 			string1  	gender; 			

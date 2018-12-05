@@ -52,7 +52,11 @@ module
 		self.ind_type 	:= functions.ind_type_fn(l.Customer_Program);
 		self.file_type := 1 ;
 		
-		source_input := if (l.source_input = '', 'KNFD',l.source_input);
+		source_input := map(
+						 STD.Str.Contains( l.fn, 'KnownFraud'	, true	) => 'KNFD'
+						,STD.Str.Contains( l.fn, 'SafeList'		, true	)	=> 'SAFELIST'
+						,'UNKNOWN'
+				 );
 		self.source_input := source_input;
 		SELF.unique_id := hash64(hashmd5(
 								ut.CleanSpacesAndUpper(l.customer_name) + ',' +  
@@ -191,24 +195,21 @@ module
 				or 	(Customer_State in FraudGovPlatform_Validation.Mod_Sets.States) = FALSE
 				or 	(Customer_Agency_Vertical_Type in FraudGovPlatform_Validation.Mod_Sets.Agency_Vertical_Type) = FALSE
 				or 	(Customer_Program in FraudGovPlatform_Validation.Mod_Sets.IES_Benefit_Type) = FALSE
-			)and PSkipValidations = false);
+			)and PSkipValidations = false and source_input = 'KNFD' );
 			
-
 	NotInMbs := join(	f1,
-						FraudShared.Files().Input.MBS.sprayed(status = 1)
-									,left.Customer_Account_Number =(string)right.gc_id
-										and left.file_type = right.file_type 
-										and left.ind_type = right.ind_type AND 
- 										( 
-											left.Deltabase = 1											
-											OR 
-											(	left.Deltabase = 0 AND
-												left.customer_State = right.Customer_State AND
-												left.Customer_County = right.Customer_County AND 	
-												left.Customer_Agency_Vertical_Type = right.Customer_Vertical
-											)
-										),																			
-									TRANSFORM(Layouts.Input.knownfraud,SELF := LEFT),LEFT ONLY,lookup);
+								FraudShared.Files().Input.MBS.sprayed(status = 1) 
+								,left.Customer_Account_Number =(string)right.gc_id
+								AND left.file_type = right.file_type
+								AND left.ind_type = right.ind_type
+								AND (		( left.source_input = 'KNFD' 			and	right.confidence_that_activity_was_deceitful != 3 )
+											OR	( left.source_input = 'SAFELIST' 	and	right.confidence_that_activity_was_deceitful = 3 ))	
+								AND	left.customer_State 	= right.Customer_State
+								AND	left.Customer_County 	= right.Customer_County
+								AND	left.Customer_Agency_Vertical_Type = right.Customer_Vertical,
+								TRANSFORM(Layouts.Input.knownfraud,SELF := LEFT),
+								LEFT ONLY,
+								LOOKUP);
 	//Exclude Errors
 	shared ByPassed_records := f1_errors + NotInMbs;
 	f1_bypass_dedup := files().Input.ByPassed_KnownFraud.sprayed + project(ByPassed_records, FraudGovPlatform.Layouts.Input.knownfraud);
