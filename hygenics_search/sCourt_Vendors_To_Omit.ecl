@@ -141,7 +141,6 @@
 'EB', // NEW_MEXICO_DEPARTMENT_OF_CORRECTIONS                                                                
 'EC', // NEVADA_DEPARTMENT_OF_CORRECTIONS                                                                    
 'ED', // NEW_YORK_DEPARTMENT_OF_CORRECTIONS                                                                  
-'EE', // OHIO_DEPARTMENT_OF_CORRECTIONS                                                                      
 'EF', // OKLAHOMA_DEPARTMENT_OF_CORRECTIONS                                                                  
 'EM', // UTAH_DEPARTMENT_OF_CORRECTIONS                                                                      
 'EN', // VIRGINIA_DEPARTMENT_OF_CORRECTIONS                                                                  
@@ -215,6 +214,7 @@
 'IS', // NORTH_CAROLINA_DURHAM_COUNTY_ARRESTS                                                                
 'IT', // NORTH_CAROLINA_GUILFORD_COUNTY_ARRESTS                                                              
 'IU', // NORTH_CAROLINA_LINCOLN_COUNTY_ARRESTS                                                               
+'IV', // NORTH_CAROLINA_MECKLENBURG_COUNTY_ARRESTS                                                           
 'IW', // NORTH_CAROLINA_RANDOLPH_COUNTY_ARRESTS                                                              
 'IX', // NORTH_CAROLINA_ROWAN_COUNTY_ARRESTS                                                                 
 'IY', // NORTH_CAROLINA_UNION_COUNTY_ARRESTS                                                                 
@@ -297,6 +297,7 @@
 'OI', // OHIO_COLUMBIANA_COUNTY                                                                              
 'OM', // OHIO_ALLEN_COUNTY                                                                                   
 'ON', // OHIO_PORTAGE_COUNTY                                                                                 
+'OO', // OHIO_LICKING_COUNTY                                                                                 
 'OP', // OHIO_GREENE_COUNTY_XENIA_MUNICIPAL_COURT                                                            
 'OQ', // OHIO_CLERMONT_COUNTY                                                                                
 'OS', // OHIO_ROSS_COUNTY                                                                                    
