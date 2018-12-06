@@ -325,7 +325,9 @@ EXPORT deploy(string emailList,string rpt_qa_email_list,string skipPackage='000'
                     +if(skipPackage[2]='0','FCRA_Header\n','')
                     +if(skipPackage[3]='0','PersonHeaderWeeklyKeys\n','')
                     +'\n'
-                    +'Deployment version: '+filedate+'\n'
+                    +if(skipPackage[1]='0','PersonXLAB_Inc Deployment version: \n' + lastestIkbVersionOnThor,'')
+                    +if(skipPackage[2]='0','FCRA_Header Deployment version: \n' + lastestFCRAversionOnThor,'')
+                    +if(skipPackage[3]='0','PersonHeaderWeeklyKeys Deployment version: \n' + lastestWklyversionOnThor,'')
                     +'\n'
                     +'Corespondiong Orbit entries have been created and updated.\n'
                     +'\n'
