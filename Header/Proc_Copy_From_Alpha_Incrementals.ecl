@@ -3,6 +3,17 @@
 // use test_copy=TRUE to take no action, and just run the report on what action would take place.
 EXPORT Proc_copy_From_Alpha_Incrementals(boolean test_copy=false) := MODULE
 
+// These may change if the build process changes
+shared lastUpdatedLabQA_SF:='~thor400_36::key::insuranceheader_xlink::qa::header';
+shared lastUpdatesFCRAqa_SF:='~thor_data400::key::fcra::header::address_rank_qa';
+shared lastUpdatesWklyQA_SF:='~thor_data400::key::header::qa::addr_unique_expanded';
+
+// Gets the version from the latest QA file on Thor
+export lastestIkbVersionOnThor  := regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatedLabQA_SF)[1].name, 0);
+export lastestFCRAversionOnThor := regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesFCRAqa_SF)[1].name, 0);
+export lastestWklyversionOnThor := regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesWklyQA_SF)[1].name, 0);
+
+
 // generic function to get the FIRST subfie in the super
 SHARED ifname(string sf) := nothor(STD.File.SuperFileContents(sf)[1].name);
 
@@ -205,8 +216,7 @@ EXPORT update_inc_superfiles(boolean skipIncSFupdate=false) := function
 end;
 EXPORT update_inc_idl(boolean skipIncSFupdate=false) := updateSupers('::header',skipIncSFupdate,'::idl');
 
-elist:= _control.MyInfo.EmailAddressNotify
-        ;
+SHARED elist:= Header.email_list.BocaDevelopers;
 
 // KEEP LINE BELOW UNTL you can make sure the named variables udops call is working properly
 // udops := Roxiekeybuild.updateversion('PersonLabKeys'        ,'20170901',elist,,'N',,,,,,'DR'); // header // PersonXLAB
@@ -216,25 +226,25 @@ SHARED udops(string3 skipPackage='000') := sequential(
                 if(skipPackage[1]='0',
                 dops.updateversion(
                                      l_datasetname:='PersonLabKeys' // Name of the package to update
-                                    ,l_uversion   :=filedate        // Version to update to
+                                    ,l_uversion   :=lastestIkbVersionOnThor     // Version to update to
                                     ,l_email_t    :=elist           // Who to email
                                     ,l_inenvment  :='N'             // nFCRA
                                     ,l_updateflag :='DR'            // Delta Replace (must sepcify, because default is FULL)
-                                    )),
+                                    )),                
                 if(skipPackage[2]='0',
                 dops.updateversion(
-                                     l_datasetname:='PersonHeaderWeeklyKeys'
-                                    ,l_uversion   :=filedate        // Version to update to
-                                    ,l_email_t    :=elist           // Who to email
-                                    ,l_inenvment  :='N'             // nFCRA
-                                   )),
-                if(skipPackage[3]='0',
-                dops.updateversion(
                                      l_datasetname:='FCRA_PersonHeaderKeys' // Name of the package to update
-                                    ,l_uversion   :=filedate                // Version to update to
+                                    ,l_uversion   :=lastestFCRAversionOnThor                // Version to update to
                                     ,l_email_t    :=elist                   // Who to email
                                     ,l_inenvment  :='F'                     // FCRA
-                                  ))
+                                  )),
+                if(skipPackage[3]='0',
+                dops.updateversion(
+                                     l_datasetname:='PersonHeaderWeeklyKeys'
+                                    ,l_uversion   :=lastestWklyversionOnThor        // Version to update to
+                                    ,l_email_t    :=elist           // Who to email
+                                    ,l_inenvment  :='N'             // nFCRA
+                                   ))
                 );
 
 SHARED tokenval := orbit3.GetToken();
@@ -274,14 +284,14 @@ SHARED create_entry(string buildname, string Buildvs) := FUNCTION
 
     RETURN if (createORupdate='create',
                         sequential(
-                                if(skipPackage[1]='0',output(create_entry('PersonXLAB_Inc' ,filedate))),
-                                if(skipPackage[2]='0',output(create_entry('FCRA_Header'    ,filedate))),
-                                if(skipPackage[3]='0',output(create_entry('Header_IKB'     ,filedate)))
+                                if(skipPackage[1]='0',output(create_entry('PersonXLAB_Inc' ,lastestIkbVersionOnThor))),
+                                if(skipPackage[2]='0',output(create_entry('FCRA_Header'    ,lastestFCRAversionOnThor))),
+                                if(skipPackage[3]='0',output(create_entry('Header_IKB'     ,lastestWklyversionOnThor)))
                         ),
                         sequential(
-                                if(skipPackage[1]='0',output(update_entry('PersonXLAB_Inc' ,filedate,'N'))),
-                                if(skipPackage[2]='0',output(update_entry('FCRA_Header'    ,filedate,'N'))),
-                                if(skipPackage[3]='0',output(update_entry('Header_IKB'     ,filedate,'N')))
+                                if(skipPackage[1]='0',output(update_entry('PersonXLAB_Inc' ,lastestIkbVersionOnThor,'N'))),
+                                if(skipPackage[2]='0',output(update_entry('FCRA_Header'    ,lastestFCRAversionOnThor,'N'))),
+                                if(skipPackage[3]='0',output(update_entry('Header_IKB'     ,lastestWklyversionOnThor,'N')))
                         )
                );
  
@@ -321,8 +331,7 @@ EXPORT deploy(string emailList,string rpt_qa_email_list,string skipPackage='000'
                     +'\n'
                     +'If you have any question or concerns please contact:\n'
                     // +emailList
-                    +'debendra.kumar@lexisnexisrisk.com\n'
-                    +'Gabriel.Marcan@lexisnexisrisk.com'
+                    +elist
                     +'\nThank you,')
                 // copy_to_dataland;
 );

@@ -36,7 +36,7 @@
 		
 		LOCAL i1 := UNGROUP(ITERATE(PROJECT(GROUP(SORT(t2,HashID, Val, RECORD), HashID, LOCAL), TRANSFORM(ResType, self := LEFT, self := [])), T(LEFT,RIGHT)));
     
-		LOCAL Final := JOIN(Me, i1, LEFT.HashID=RIGHT.HashID AND LEFT.Val=RIGHT.Val, TRANSFORM({RECORDOF(LEFT), #EXPAND('RIGHT.' + PercentileRankColumnName), #EXPAND('RIGHT.' +QuartileRank)}, self := LEFT, self := RIGHT), LOCAL);
+		LOCAL Final := JOIN(Me, i1, LEFT.HashID=RIGHT.HashID AND LEFT.Val=RIGHT.Val, TRANSFORM({RECORDOF(LEFT), #EXPAND('RIGHT.' + PercentileRankColumnName), #EXPAND('RIGHT.' +QuartileRank)}, self := LEFT, self := RIGHT), HASH);
 		RETURN Final;
     
 	ENDMACRO;
