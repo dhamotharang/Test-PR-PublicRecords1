@@ -331,7 +331,8 @@ EXPORT deploy(string emailList,string rpt_qa_email_list,string skipPackage='000'
                     +'\n'
                     +'If you have any question or concerns please contact:\n'
                     // +emailList
-                    +elist
+                    +'Debendra.Kumar@lexisnexisrisk.com\n'
+                    +'gabriel.marcan@lexisnexisrisk.com\n'
                     +'\nThank you,')
                 // copy_to_dataland;
 );
