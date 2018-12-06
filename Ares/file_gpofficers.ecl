@@ -66,8 +66,12 @@ with_codes_layout := RECORD
 	STRING descpriton;
 	STRING code;
 END;
-
+//NOTE: this only has the job titles not the types/type
 department_list := sort(Ares.Files.ds_lookup(fid ='JOB_TITLE_TYPE').lookupBody(tfpid != ''), tfpid); 
+
+//TODO: account for dept types by using lookup func.
+//Ares.Files.ds_lookup(fid='DEPARTMENT_TYPE').lookupBody(tfpDescription='Same Day Settlement');
+
 
 with_codes_layout department_codes_xform (Department_Function L, department_list R):= TRANSFORM
 		SELF.descpriton :=R.fdbdescription;
@@ -77,6 +81,7 @@ END;
 
 with_department_codes := join(Department_Function, department_list, LEFT.job_Title =RIGHT.id, department_codes_xform(LEFT,RIGHT));
 sorted_with_department_codes := SORT(with_department_codes,relationship_id);
+
 deduped_with_department_codes := DEDUP(sorted_with_department_codes,LEFT.relationship_id = RIGHT.relationship_id);
 
 //Find 	Officer's Name
@@ -124,24 +129,15 @@ Officer_Name := join(employee_id_list, Ares.Files.ds_person, LEFT.entity_referen
 sorted_Officer_Name := SORT(Officer_Name,relationship_id);
 deduped_Officer_Name := DEDUP(sorted_Officer_Name,LEFT.relationship_id = RIGHT.relationship_id);
 
-layout_gpofficers := RECORD
-	STRING Update_Flag;
-	STRING Primary_Key;
-	STRING Accuity_Location_ID;
-	STRING Department := '';
-	STRING Officer_Name;
-END;
-
-layout_gpofficers final_xform(Officer_Name L, with_codes_layout R ) := Transform
-	SELF.Update_Flag := 'A';
-	SELF.Primary_Key := '';
+RECORDOF(layout_gpoff) final_xform(Officer_Name L, with_codes_layout R ) := Transform
+	SELF.UpdateFlag := 'A';
+	SELF.PrimaryKey := '';
 	SELF.Accuity_Location_ID := R.Accuity_Location_ID;
 	SELF.Department := R.code;
-	SELF.Officer_Name := L.given_name + ' ' + L.surname;
+	SELF.OfficerName := L.given_name + ' ' + L.surname;
 End;
 
 final	:= join(deduped_Officer_Name, deduped_with_department_codes, LEFT.relationship_id = right.relationship_id, final_xform(left,right));
-
 EXPORT file_gpofficers := final;
 
 
