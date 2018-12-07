@@ -44,12 +44,12 @@ with_department_layout := RECORD
 	Accuity_Location_IDs.relationship_id;
 	Accuity_Location_IDs.officeid;
 	Accuity_Location_IDs.accuity_location_id;
-	STRING departmen_type := '';
+	STRING department_type := '';
 	STRING job_Title := '';
 END;
 
 with_department_layout department_xform(Accuity_Location_IDs L) := TRANSFORM
-	SELF.departmen_type := L.department.types.types[1].department_types_type;
+	SELF.department_type := L.department.types.types[1].department_types_type;
 	SELF.job_Title := L.jobTitle;
 	SELF := L;
 END;
@@ -66,20 +66,37 @@ with_codes_layout := RECORD
 	STRING descpriton;
 	STRING code;
 END;
-//NOTE: this only has the job titles not the types/type
+//job titles.
 department_list := sort(Ares.Files.ds_lookup(fid ='JOB_TITLE_TYPE').lookupBody(tfpid != ''), tfpid); 
 
-//TODO: account for dept types by using lookup func.
-//Ares.Files.ds_lookup(fid='DEPARTMENT_TYPE').lookupBody(tfpDescription='Same Day Settlement');
+//department type.
+department_type_list := SORT(Ares.Files.ds_lookup(fid='DEPARTMENT_TYPE').lookupBody(tfpid != ''),tfpid);
 
+//job title and department type.
+combined_dept_list := sort((department_list + department_type_list),tfpid);
 
-with_codes_layout department_codes_xform (Department_Function L, department_list R):= TRANSFORM
-		SELF.descpriton :=R.fdbdescription;
+//account for the dept value whether dept job title or type is empty.
+asigned_dpt_id_layout := RECORD(RECORDOF(Department_Function))
+	STRING asigned_dpt_id;
+END;
+
+asigned_dpt_id_layout assigned_xform (Department_Function L):= TRANSFORM
+	SELF.asigned_dpt_id := MAP(L.department_type !='' AND L.job_title != '' =>L.department_type,
+  													 L.department_type !='' AND L.job_title = '' =>L.department_type,
+														 L.job_title);
+	SELF := L;
+END;
+
+assigned_dpt_codes  := PROJECT(Department_Function,assigned_xform(LEFT));
+
+with_codes_layout department_codes_xform (Department_Function L, combined_dept_list R):= TRANSFORM
+		SELF.descpriton :=R.tfpdescription;
 		SELF.code :=R.tfpid;
 	  SELF := L;
 END;
 
-with_department_codes := join(Department_Function, department_list, LEFT.job_Title =RIGHT.id, department_codes_xform(LEFT,RIGHT));
+with_department_codes := join(assigned_dpt_codes, combined_dept_list, LEFT.asigned_dpt_id =RIGHT.id, department_codes_xform(LEFT,RIGHT));
+
 sorted_with_department_codes := SORT(with_department_codes,relationship_id);
 
 deduped_with_department_codes := DEDUP(sorted_with_department_codes,LEFT.relationship_id = RIGHT.relationship_id);
@@ -138,6 +155,10 @@ RECORDOF(layout_gpoff) final_xform(Officer_Name L, with_codes_layout R ) := Tran
 End;
 
 final	:= join(deduped_Officer_Name, deduped_with_department_codes, LEFT.relationship_id = right.relationship_id, final_xform(left,right));
+
+output(sort(final,department),NAMED('final1'));
+output(final(Accuity_Location_ID = '10000011'),NAMED('final2'));
+output(final(OfficerName= 'Kim Gassaway'),NAMED('final3'));
 EXPORT file_gpofficers := final;
 
 
