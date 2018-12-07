@@ -68,23 +68,17 @@ MODULE
 	
 	dSearchRecs_pre_a		 := dSearchRecs_pre(((did <> 0 AND fname <> ''AND lname <> '') OR typeflag = Phones.Constants.TypeFlag.DataSource_PV) OR listed_name <> '');
 	
- PhoneFinder_Services.Layouts.PhoneFinder.Final withInputphone(PhoneFinder_Services.Layouts.PhoneFinder.Final L) := TRANSFORM
-   SELF.acctno               := L.acctno;
-	  SELF.seq                  := L.seq;
-	  SELF.phone                := L.batch_in.homephone;
-	  SELF.batch_in.homephone   := L.batch_in.homephone;
-	  SELF.phonestatus          := PhoneFinder_Services.Constants.PhoneStatus.NotAvailable;
-   BOOLEAN UseInternal_pvs    := inMod.UseInHousePhoneMetadata AND L.typeflag = 'P';
-   SELF.coc_description      := IF(UseInternal_pvs, L.coc_description, '');
-   SELF.carrier_name         := IF(UseInternal_pvs, L.carrier_name, '');
-   SELF.phone_region_city    := IF(UseInternal_pvs, L.phone_region_city, '');
-   SELF.phone_region_st      := IF(UseInternal_pvs, L.phone_region_st, '');
-   SELF.RealTimePhone_Ext    := IF(UseInternal_pvs, L.RealTimePhone_Ext);
-	  SELF                      := [];
+ PhoneFinder_Services.Layouts.PhoneFinder.Final withInputphone(PhoneFinder_Services.Layouts.BatchInAppendDID L) := TRANSFORM
+  SELF.acctno               := L.acctno;
+	 SELF.seq                  := L.seq;
+	 SELF.phone                := L.homephone;
+	 SELF.batch_in.homephone   := L.homephone;
+	 SELF.phonestatus          := PhoneFinder_Services.Constants.PhoneStatus.NotAvailable;
+		SELF                      := [];
  END;
 
  SHARED dSearchRecs := IF(IsPhoneRiskAssessment,
-                     PROJECT(dSearchRecs_pre, withInputphone(LEFT)), dSearchRecs_pre_a);
+                     PROJECT(dInPhone, withInputphone(LEFT)), dSearchRecs_pre_a);
  
  SHARED dSubjectInfo := PhoneFinder_Services.Functions.GetSubjectInfo(dSearchRecs, inMod);
 
@@ -111,7 +105,8 @@ MODULE
   // get remaining phone metadata
  SHARED dSearchResultsUnfiltered := IF(inMod.IsGetMetaData
       																												,PhoneFinder_Services.GetPhonesMetadata(dZum_final,inMod,dGateways,dinBestInfo,dSubjectInfo)
-      																												,dZum_final);
+      																												,dZum_final);	
+
  inputOptionCheck := inMod.IncludeInhousePhones OR inMod.IncludeTargus OR inMod.IncludeAccudataOCN OR 
                      inMod.IncludeEquifax OR inMod.IncludeTransUnionIQ411 OR inMod.IncludeTransUnionPVS OR 
                      inMod.UseInHousePhoneMetadata OR inMod.IncludeOTP OR inMod.IncludePorting OR inMod.IncludeSpoofing OR inMod.InputZumigoOptions;
