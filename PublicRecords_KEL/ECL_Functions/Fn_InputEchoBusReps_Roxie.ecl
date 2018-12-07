@@ -5,7 +5,7 @@ IMPORT PublicRecords_KEL, STD;
 EXPORT Fn_InputEchoBusReps_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_UID_Bus_Layout) ds_input) := FUNCTION
 
 
-	PublicRecords_KEL.ECL_Functions.Input_ALL_Layout GetInputEcho1( RECORDOF(ds_input) le ) := 
+	PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII GetInputEcho1( RECORDOF(ds_input) le ) := 
       TRANSFORM
 				SELF.RepNumber := 1;
 				SELF.InputAccountEcho := le.AccountNumber;
@@ -32,7 +32,7 @@ EXPORT Fn_InputEchoBusReps_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_
 	END;
 	InputEcho1 := PROJECT(ds_input, GetInputEcho1(LEFT));
 
-	PublicRecords_KEL.ECL_Functions.Input_ALL_Layout GetInputEcho2( RECORDOF(ds_input) le ) := 
+	PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII GetInputEcho2( RECORDOF(ds_input) le ) := 
       TRANSFORM
 				SELF.RepNumber := 2;
 				SELF.InputAccountEcho := le.AccountNumber;
@@ -59,7 +59,7 @@ EXPORT Fn_InputEchoBusReps_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_
 	END;
 	InputEcho2 := PROJECT(ds_input, GetInputEcho2(LEFT));
 
-	PublicRecords_KEL.ECL_Functions.Input_ALL_Layout GetInputEcho3( RECORDOF(ds_input) le ) := 
+	PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII GetInputEcho3( RECORDOF(ds_input) le ) := 
       TRANSFORM
 				SELF.RepNumber := 3;
 				SELF.InputAccountEcho := le.AccountNumber;
@@ -86,7 +86,7 @@ EXPORT Fn_InputEchoBusReps_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_
 	END;
 	InputEcho3 := PROJECT(ds_input, GetInputEcho3(LEFT));
 
-	PublicRecords_KEL.ECL_Functions.Input_ALL_Layout GetInputEcho4( RECORDOF(ds_input) le ) := 
+	PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII GetInputEcho4( RECORDOF(ds_input) le ) := 
       TRANSFORM
 				SELF.RepNumber := 4;
 				SELF.InputAccountEcho := le.AccountNumber;
@@ -113,7 +113,7 @@ EXPORT Fn_InputEchoBusReps_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_
 	END;
 	InputEcho4 := PROJECT(ds_input, GetInputEcho4(LEFT));
 	
-	PublicRecords_KEL.ECL_Functions.Input_ALL_Layout GetInputEcho5( RECORDOF(ds_input) le ) := 
+	PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII GetInputEcho5( RECORDOF(ds_input) le ) := 
       TRANSFORM
 				SELF.RepNumber := 5;
 				SELF.InputAccountEcho := le.AccountNumber;
@@ -141,7 +141,7 @@ EXPORT Fn_InputEchoBusReps_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_
 	InputEcho5 := PROJECT(ds_input, GetInputEcho5(LEFT));
 
 	srtedEcho := SORT(InputEcho1 + InputEcho2 + InputEcho3 + InputEcho4 + InputEcho5, BusInputUIDAppend, RepNumber);
-	EchoWUqId := PROJECT(srtedEcho, TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_ALL_Layout, SELF.InputUIDAppend := COUNTER, SELF := LEFT));
+	EchoWUqId := PROJECT(srtedEcho, TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII, SELF.InputUIDAppend := COUNTER, SELF := LEFT));
 
 	RETURN EchoWUqId;
 END;

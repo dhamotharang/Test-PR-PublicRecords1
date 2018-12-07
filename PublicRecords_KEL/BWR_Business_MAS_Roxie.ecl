@@ -9,13 +9,13 @@ eyeball := 120;
 historyDate := 0; // Set to 0 to use ArchiveDate on input file. 
 // historyDate := 20181128; // Set to 0 to use ArchiveDate on input file. 
 Score_threshold := 80;
+Output_Master_Results := TRUE;
 RoxieIP := RiskWise.shortcuts.Dev156;
 
 InputFile := '~temp::kel::ally_01_business_uat_sample_100k_20181015.csv'; //100k file
 // InputFile := '~temp::kel::ally_01_business_uat_sample_1m_20181015.csv'; //1m file
 
 OutputFile := '~cdal::BusinessPop_PublicRecs_11262018'+ ThorLib.wuid() ;
-
 
 prii_layout := RECORD
 	STRING AccountNumber         ;  
@@ -145,6 +145,7 @@ soapLayout := RECORD
 	// STRING CustomerId; // This is used only for failed transactions here; it's ignored by the ECL service.
 	DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout) input;
 	INTEGER ScoreThreshold;
+	BOOLEAN OutputMasterResults;
 end;
 
 // Uncomment this code to run as test harness on Thor instead of SOAPCALL to Roxie
@@ -155,7 +156,8 @@ end;
 // ResultSet:= PublicRecords_KEL.FnRoxie_GetBusAttrs(inDataReadyDist, Options);
 
 layout_MAS_Business_Service_output := RECORD
-	PublicRecords_KEL.ECL_Functions.AttrBus_Layout;
+	DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster) MasterResults {XPATH('Results/Result/Dataset[@name=\'MasterResults\']/Row')};
+	DATASET(PublicRecords_KEL.ECL_Functions.Layout_Business_NonFCRA) Results {XPATH('Results/Result/Dataset[@name=\'Results\']/Row')};
 	STRING ErrorCode := '';
 END;
 
@@ -165,10 +167,12 @@ soapLayout trans (inDataReadyDist le):= TRANSFORM
 		SELF := LEFT;
 		SELF := []));
 	SELF.ScoreThreshold := Score_threshold;
+	SELF.OutputMasterResults := Output_Master_Results;
 END;
 
 soap_in := PROJECT(inDataReadyDist, trans(LEFT));
 
+OUTPUT(CHOOSEN(soap_in, eyeball), NAMED('Sample_SOAPInput'));
 
 layout_MAS_Business_Service_output myFail(soap_in le) := TRANSFORM
 	SELF.ErrorCode := STD.Str.FilterOut(TRIM(FAILCODE + ' ' + FAILMESSAGE), '\n');
@@ -179,9 +183,10 @@ END;
 ResultSet := 
 				SOAPCALL(soap_in, 
 				RoxieIP,
-				'publicrecords_kel.MAS_Business_nonFCRA_Service.12',
+				'publicrecords_kel.MAS_Business_nonFCRA_Service',
 				{soap_in}, 
 				DATASET(layout_MAS_Business_Service_output),
+				XPATH('*'),
 				RETRY(2), TIMEOUT(300),
 				PARALLEL(threads), 
 				onFail(myFail(LEFT)));
@@ -190,27 +195,54 @@ ResultSet :=
 OUTPUT(CHOOSEN(inDataReady, eyeball), NAMED('Raw_input'));
 OUTPUT( ResultSet, NAMED('Results') );
 
-Passed := ResultSet(TRIM(BusInputAccountEcho) <> '');
-Failed := ResultSet(TRIM(BusInputAccountEcho) = ''); 
+
+Passed := ResultSet(TRIM(Results[1].BusInputAccountEcho) <> '');
+Failed := ResultSet(TRIM(Results[1].BusInputAccountEcho) = ''); 
 
 OUTPUT( CHOOSEN(Passed,eyeball), NAMED('bwr_results_Passed') );
 OUTPUT( CHOOSEN(Failed,eyeball), NAMED('bwr_results_Failed') );
 OUTPUT( COUNT(Failed), NAMED('Failed_Cnt') );
 
-// OUTPUT(Passed,,OutputFile, CSV(HEADING(single), QUOTE('"')));
-
-LayoutOut_With_Extras := RECORD
-	RECORDOF(Passed);
-	STRING ln_project_id         ;
-	STRING pf_fraud              ;
-	STRING pf_bad                ;
-	STRING pf_funded             ;
-	STRING pf_declined           ;
+LayoutMaster_With_Extras := RECORD
+	PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster;
+	STRING ErrorCode;
+	STRING ln_project_id;
+	STRING pf_fraud;
+	STRING pf_bad;
+	STRING pf_funded;
+	STRING pf_declined;
 	STRING pf_approved_not_funded; 
+	STRING Perf;
+	STRING Proj;
 END;
 
-Passed_with_PF := JOIN(inDataRecs, Passed, LEFT.AccountNumber = RIGHT.BusInputAccountEcho, TRANSFORM(LayoutOut_With_Extras,
-                SELF := RIGHT, //fields from passed
-                SELF := LEFT), //input performance fields
-                INNER, KEEP(1));
-OUTPUT(Passed_with_PF,,OutputFile, CSV(HEADING(single), QUOTE('"')));
+Layout_Business := RECORD
+	PublicRecords_KEL.ECL_Functions.Layout_Business_NonFCRA;
+	STRING ErrorCode;
+END;
+
+Passed_with_Extras := SORT(
+	JOIN(inDataRecs, Passed, LEFT.AccountNumber = RIGHT.MasterResults[1].BusInputAccountEcho, 
+		TRANSFORM(LayoutMaster_With_Extras,
+			SELF := RIGHT.MasterResults[1], //fields from passed
+			SELF := LEFT, //input performance fields
+			SELF.ErrorCode := RIGHT.ErrorCode,
+			SELF := []),
+		INNER, KEEP(1)),
+	BusInputUIDAppend);
+	
+Passed_Business := SORT(
+	JOIN(inDataRecs, Passed, LEFT.AccountNumber = RIGHT.Results[1].BusInputAccountEcho, 
+		TRANSFORM(Layout_Business,
+			SELF := RIGHT.Results[1], //fields from passed
+			SELF := LEFT, //input performance fields
+			SELF.Errorcode := RIGHT.ErrorCode,
+			SELF := []),
+		INNER, KEEP(1)),
+	BusInputUIDAppend);
+	
+IF(Output_Master_Results, OUTPUT(CHOOSEN(Passed_with_Extras, eyeball), NAMED('Sample_Master_Layout')));
+OUTPUT(CHOOSEN(Passed_Business, eyeball), NAMED('Sample_NonFCRA_Layout'));
+
+IF(Output_Master_Results, OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout', CSV(HEADING(single), QUOTE('"'))));
+OUTPUT(Passed_Business,,OutputFile, CSV(HEADING(single), QUOTE('"')));

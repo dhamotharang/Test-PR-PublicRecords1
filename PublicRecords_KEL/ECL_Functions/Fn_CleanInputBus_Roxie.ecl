@@ -1,8 +1,8 @@
 ﻿IMPORT PublicRecords_KEL, STD;
 
-EXPORT Fn_CleanInputBus_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_ALL_Bus_Layout) ds_input) := FUNCTION
+EXPORT Fn_CleanInputBus_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII) ds_input) := FUNCTION
 
-		PublicRecords_KEL.ECL_Functions.Input_ALL_Bus_Layout xfm_GetInputCleaned(PublicRecords_KEL.ECL_Functions.Input_ALL_Bus_Layout le ) := 
+		PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII xfm_GetInputCleaned(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII le ) := 
 			TRANSFORM
 				cleaned_name			:= PublicRecords_KEL.ECL_Functions.Fn_Clean_Business_Name(le.BusInputNameEcho);
 				cleaned_alt_name	:= PublicRecords_KEL.ECL_Functions.Fn_Clean_Business_Name(le.BusInputAlternateNameEcho);

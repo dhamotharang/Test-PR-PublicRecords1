@@ -2,7 +2,7 @@
 
 EXPORT Fn_InputEchoBus_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_UID_Bus_Layout) ds_input) := FUNCTION
 
-    PublicRecords_KEL.ECL_Functions.Input_ALL_Bus_Layout GetInputBusEchoed( RECORDOF(ds_input) le ) := 
+    PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII GetInputBusEchoed( RECORDOF(ds_input) le ) := 
       TRANSFORM
         SELF.BusInputUIDAppend := le.BusInputUIDAppend;  
 				SELF.BusInputNameEcho := le.CompanyName;           

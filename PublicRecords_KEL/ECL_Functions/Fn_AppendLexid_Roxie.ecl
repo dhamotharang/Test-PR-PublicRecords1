@@ -6,7 +6,7 @@ IMPORT didville, PublicRecords_KEL;
 
 // this function will take the input data, append the DID and do all default values in layout output
 EXPORT Fn_AppendLexid_Roxie(
-							DATASET(PublicRecords_KEL.ECL_Functions.Input_ALL_Layout) indata,
+							DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) indata,
 							PublicRecords_KEL.Interface_Options Options
 					) := FUNCTION
 
@@ -48,7 +48,7 @@ EXPORT Fn_AppendLexid_Roxie(
  //Since Layout_Did_OutBatch doesn't have all the output from our indata, rejoin back to indata
   IndataGotDid := JOIN(indata, resu,
    LEFT.InputUIDAppend = RIGHT.Seq,
-    TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_ALL_Layout, 
+    TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII, 
 			SELF.InputLexIDEcho := LEFT.InputLexIDEcho;
       SELF.LexIDAppend := RIGHT.Did, 
       SELF.LexIDScoreAppend := RIGHT.Score,
@@ -61,9 +61,9 @@ EXPORT Fn_AppendLexid_Roxie(
   //Change the lexid and score to be 0 for records below the score threshold
   dids_with_below_scores := DEDUP(SORT(
     PROJECT(IndataGotDid((INTEGER) LexIDScoreAppend < Options.ScoreThreshold), 
-    TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_ALL_Layout, 
-      SELF.LexIDAppend := IF(LEFT.LexIDAppend = 0, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT, LEFT.LexIDAppend);
-      SELF.LexIDScoreAppend := IF(LEFT.LexIDScoreAppend = 0, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT,LEFT.LexIDScoreAppend);, 
+    TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII, 
+      SELF.LexIDAppend := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+      SELF.LexIDScoreAppend := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
       SELF := LEFT))
       , InputUIDAppend, LexIDAppend), InputUIDAppend);
 

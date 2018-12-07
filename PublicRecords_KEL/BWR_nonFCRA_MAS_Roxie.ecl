@@ -30,7 +30,8 @@ DataRestrictionMask := '0000000000000000000000000000000000000000000000000';
 
 Score_threshold := 80;
 // Score_threshold := 90;
-RecordsToRun := 0; // 100;
+Output_Master_Results := TRUE;
+RecordsToRun := 0;
 eyeball := 120;
 
 // Universally Set the History Date YYYYMMDD for ALL records. Set to 0 to use the History Date located on each record of the input file
@@ -79,11 +80,13 @@ soapLayout := RECORD
   // STRING CustomerId; // This is used only for failed transactions here; it's ignored by the ECL service.
   DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout) input;
   INTEGER ScoreThreshold;
+	BOOLEAN OutputMasterResults;
 end;
 
 	// Options := MODULE(PublicRecords_KEL.Interface_Options)
 		// EXPORT INTEGER ScoreThreshold := 80;
 		// EXPORT BOOLEAN isFCRA := FALSE;
+		// EXPORT BOOLEAN OutputMasterResults := TRUE;
 	// END;
 
   // ResultSet:= PublicRecords_KEL.FnRoxie_GetAttrs(PP, Options);
@@ -93,7 +96,8 @@ end;
   // OUTPUT( ResultSet, NAMED('Results') );
 
 layout_MAS_Test_Service_output := RECORD
-	PublicRecords_KEL.ECL_Functions.Attr_Layout;
+	DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster) MasterResults {XPATH('Results/Result/Dataset[@name=\'MasterResults\']/Row')};
+	DATASET(PublicRecords_KEL.ECL_Functions.Layout_Person_NonFCRA) Results {XPATH('Results/Result/Dataset[@name=\'Results\']/Row')};
 	STRING ErrorCode := '';
 END;
 
@@ -103,9 +107,13 @@ soapLayout trans (pp le):= TRANSFORM
     SELF := LEFT;
     SELF := []));
 	SELF.ScoreThreshold := Score_threshold;
+	SELF.OutputMasterResults := Output_Master_Results;
 END;
 
 soap_in := PROJECT(pp, trans(LEFT));
+
+OUTPUT(CHOOSEN(P, eyeball), NAMED('Sample_Input'));
+OUTPUT(CHOOSEN(soap_in, eyeball), NAMED('Sample_SOAPInput'));
 
 layout_MAS_Test_Service_output myFail(soap_in le) := TRANSFORM
 	SELF.ErrorCode := STD.Str.FilterOut(TRIM(FAILCODE + ' ' + FAILMESSAGE), '\n');
@@ -116,9 +124,10 @@ END;
 bwr_results := 
 				SOAPCALL(soap_in, 
 				RoxieIP,
-				'publicrecords_kel.MAS_nonFCRA_Service.24', 
+				'publicrecords_kel.MAS_nonFCRA_Service', 
 				{soap_in}, 
 				DATASET(layout_MAS_Test_Service_output),
+				XPATH('*'),
         RETRY(2), TIMEOUT(300),
 				PARALLEL(threads), 
         onFail(myFail(LEFT)));
@@ -130,5 +139,47 @@ OUTPUT( CHOOSEN(Passed,eyeball), NAMED('bwr_results_Passed') );
 OUTPUT( CHOOSEN(Failed,eyeball), NAMED('bwr_results_Failed') );
 OUTPUT( COUNT(Failed), NAMED('Failed_Cnt') );
 
-output(Passed,,OutputFile, CSV(heading(single), quote('"')));
-OUTPUT(PP);
+
+LayoutMaster_With_Extras := RECORD
+	PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster;
+	STRING ErrorCode;
+	STRING ln_project_id;
+	STRING pf_fraud;
+	STRING pf_bad;
+	STRING pf_funded;
+	STRING pf_declined;
+	STRING pf_approved_not_funded; 
+	STRING Perf;
+	STRING Proj;
+END;
+
+Layout_Person := RECORD
+	PublicRecords_KEL.ECL_Functions.Layout_Person_NonFCRA;
+	STRING ErrorCode;
+END;
+
+Passed_with_Extras := SORT(
+	JOIN(p, Passed, LEFT.Account = RIGHT.MasterResults[1].InputAccountEcho, 
+		TRANSFORM(LayoutMaster_With_Extras,
+			SELF := RIGHT.MasterResults[1], //fields from passed
+			SELF := LEFT, //input performance fields
+			SELF.ErrorCode := RIGHT.ErrorCode,
+			SELF := []),
+		INNER, KEEP(1)),
+	InputUIDAppend);
+	
+Passed_Person := SORT(
+	JOIN(p, Passed, LEFT.Account = RIGHT.Results[1].InputAccountEcho, 
+		TRANSFORM(Layout_Person,
+			SELF := RIGHT.Results[1], //fields from passed
+			SELF := LEFT, //input performance fields
+			SELF.ErrorCode := RIGHT.ErrorCode,
+			SELF := []),
+		INNER, KEEP(1)),
+	InputUIDAppend);
+	
+IF(Output_Master_Results, OUTPUT(CHOOSEN(Passed_with_Extras, eyeball), NAMED('Sample_Master_Layout')));
+OUTPUT(CHOOSEN(Passed_Person, eyeball), NAMED('Sample_NonFCRA_Layout'));
+
+IF(Output_Master_Results, OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout', CSV(HEADING(single), QUOTE('"'))));
+OUTPUT(Passed_Person,,OutputFile, CSV(HEADING(single), QUOTE('"')));

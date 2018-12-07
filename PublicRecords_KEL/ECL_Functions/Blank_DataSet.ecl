@@ -1,1 +1,0 @@
-﻿EXPORT Blank_Dataset := DATASET([], {UNSIGNED6 LexID, UNSIGNED6 BDID});
