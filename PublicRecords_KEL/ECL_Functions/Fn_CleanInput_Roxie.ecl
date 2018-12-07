@@ -1,13 +1,15 @@
 ﻿IMPORT PublicRecords_KEL, STD;
 
-EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_ALL_Layout) ds_input = DATASET([],PublicRecords_KEL.ECL_Functions.Input_ALL_Layout)) := 
+EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) ds_input = DATASET([],PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII)) := 
   FUNCTION
     IsBlank := PublicRecords_KEL.ECL_Functions.SetConstants.IsBlank;
     IsBlank2Fields := PublicRecords_KEL.ECL_Functions.SetConstants.IsBlank2Fields;
     Constants := PublicRecords_KEL.ECL_Functions.Constants;     
 
-    PublicRecords_KEL.ECL_Functions.Input_ALL_Layout GetInputCleaned(PublicRecords_KEL.ECL_Functions.Input_ALL_Layout le, INTEGER C) := transform
+    PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII GetInputCleaned(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII le, INTEGER C) := transform
 		//Input Echo perserved
+		SELF.InputUIDAppend := le.InputUIDAppend;
+		SELF.BusInputUIDAppend := le.BusInputUIDAppend;
 		SELF.InputAccountEcho := le.InputAccountEcho;
 		SELF.InputLexIDEcho := le.InputLexIDEcho;
 		SELF.InputFirstNameEcho := le.InputFirstNameEcho;
@@ -22,11 +24,9 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_ALL_La
 		SELF.InputEmailEcho := le.InputEmailEcho; 
 		SELF.InputArchiveDateEcho := le.InputArchiveDateEcho;
 		SELF.InputArchiveDateClean := le.InputArchiveDateEcho; 
-		SELF.InputUIDAppend := le.InputUIDAppend;
-		SELF.BusInputUIDAppend := le.BusInputUIDAppend;
 		SELF.InputSSNEcho := le.InputSSNEcho;
-				SELF.InputDOBEcho  := le.InputDOBEcho;
-				SELF.InputDLEcho     := le.InputDLEcho;
+		SELF.InputDOBEcho := le.InputDOBEcho;
+		SELF.InputDLEcho := le.InputDLEcho;
 		SELF.InputDLStateEcho := le.InputDLStateEcho;
 		// Clean input
 		cleaned_zip       := PublicRecords_KEL.ECL_Functions.Fn_Clean_Zip(le.InputZipEcho);
@@ -75,13 +75,14 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_ALL_La
 		SELF.InputDOBClean := cleaned_DOB.ValidPortion_00; 
 		SELF.InputDLClean := cleaned_DL;  
 		SELF.InputDLStateClean := le.InputDLStateEcho;  
-
+		
+		// Cleaned DOB metadata
 		SELF.DateAsNumsOnly := cleaned_DOB.DateAsNumsOnly; 
 		SELF.result := cleaned_DOB.result;  
 		SELF.Populated := cleaned_DOB.Populated; 
 		SELF.YearFilled := cleaned_DOB.YearFilled; 
 		SELF.MonthFilled := cleaned_DOB.MonthFilled; 
-		SELF.DayFilled := cleaned_DOB.MonthFilled;  
+		SELF.DayFilled := cleaned_DOB.DayFilled;  
 		SELF.YearNonZero := cleaned_DOB.YearNonZero; 
 		SELF.MonthNonZero := cleaned_DOB.MonthNonZero; 
 		SELF.DayNonZero := cleaned_DOB.DayNonZero;  
@@ -96,6 +97,7 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_ALL_La
 		SELF.ValidPortion_01 := cleaned_DOB.ValidPortion_01; 
 		
 		SELF.RepNumber := le.RepNumber;
+		SELF := le;
 		SELF := [];
     END;
 

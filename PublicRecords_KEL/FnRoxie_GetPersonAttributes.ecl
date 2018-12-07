@@ -1,7 +1,7 @@
 ﻿IMPORT KEL011 AS KEL;
-IMPORT PublicRecords_KEL;
+IMPORT PublicRecords_KEL, Risk_Indicators;
 
-EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Attr_Layout) InputData,
+EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) InputData,
 			DATASET(PublicRecords_KEL.ECL_Functions.Layouts_FDC().Layout_FDC) FDCDataset,
 			PublicRecords_KEL.Interface_Options Options) := FUNCTION
 
@@ -29,7 +29,8 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Attr_
 	
 	// Cast Attributes back to their string values
 	PersonAttributesWithLexID := JOIN(RecordsWithLexID, PersonAttributesClean, LEFT.InputUIDAppend = RIGHT.InputUIDAppend AND LEFT.LexidAppend = RIGHT.LexID, 
-		TRANSFORM(PublicRecords_KEL.ECL_Functions.Attr_Layout,
+		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutPerson,
+			SELF.CrimHistoryBuild := Risk_Indicators.get_Build_date('doc_build_version');
 			ResultsFound := RIGHT.LexID > 0;
 			SELF.FelonyCnt1Y := RIGHT.FelonyCnt1Y;
 			SELF.FelonyCnt7Y := RIGHT.FelonyCnt7Y;
@@ -98,7 +99,8 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Attr_
 		),LEFT OUTER, KEEP(1)); 
 	
 	PersonAttributesWithoutLexID := PROJECT(RecordsWithoutLexID,
-		TRANSFORM(PublicRecords_KEL.ECL_Functions.Attr_Layout,
+		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutPerson,
+			SELF.CrimHistoryBuild := Risk_Indicators.get_Build_date('doc_build_version');
 			SELF.FelonyCnt1Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.FelonyCnt7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.FelonyNew1Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;

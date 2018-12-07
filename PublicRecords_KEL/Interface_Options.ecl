@@ -3,6 +3,9 @@
 EXPORT Interface_Options := INTERFACE
 	EXPORT INTEGER ScoreThreshold := 80;
 	EXPORT BOOLEAN IsFCRA := FALSE;
+	EXPORT BOOLEAN ExcludeConsumerShell := FALSE;
+	EXPORT BOOLEAN OutputMasterResults := FALSE;
+	
 		SHARED gateways_in := Gateway.Configuration.Get();
 		SHARED Gateway.Layouts.Config gw_switch(gateways_in le) := TRANSFORM
 			SELF.servicename := le.servicename;

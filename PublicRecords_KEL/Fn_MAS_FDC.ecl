@@ -1,8 +1,9 @@
 ﻿IMPORT Doxie, Doxie_Files, Header_Quick;
 
-EXPORT Fn_MAS_FCRA_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Attr_Layout) Input,
-											PublicRecords_KEL.Interface_Options Options
-											) := FUNCTION
+EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) Input,
+									PublicRecords_KEL.Interface_Options Options,
+									DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII) BusinessInput = DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII)
+									) := FUNCTION
 
 	Layouts_FDC := PublicRecords_KEL.ECL_Functions.Layouts_FDC(Options);
 	Common := PublicRecords_KEL.ECL_Functions.Common(Options);
