@@ -134,7 +134,7 @@ ck('DEAKeys'            ,'~thor_data400::Base::DeaHeader_Building'              
 ck('DEAKeys_F'          ,'~thor_data400::Base::DeaHeader_Building'               ,'~thor_data400::base::dea_father')+
 // ck('DEAKeys_D'          ,'~thor_data400::Base::DeaHeader_Building'               ,'~thor_data400::base::dea_delete')+
 ck('LNPropertyV2Keys'   ,'~thor_data400::BASE::LN_PropV2SrchHeader_Building'     ,'~thor_data400::base::ln_propertyv2::search','B')+
-ck('AmericanstudentKeys','~thor_data400::Base::ASLHeader_Building'               ,'~thor_data400::base::american_student_list')+
+// ck('AmericanstudentKeys','~thor_data400::Base::ASLHeader_Building'               ,'~thor_data400::base::american_student_list')+
 ck('OKC_SL_dumy_use_asl','~thor_data400::Base::OKC_SLHeader_Building'            ,'~thor_data400::base::okc_student_list')+
 ck('VotersV2Keys'       ,'~thor_data400::BASE::Voters_Header_Building'           ,'~thor_data400::Base::Voters_Reg')+
 ck('VehicleV2Keys'      ,'~thor_data400::base::vehicles_v2_party_header_building','~thor_data400::base::vehiclev2::party')+
