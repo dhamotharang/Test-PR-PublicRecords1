@@ -26,6 +26,23 @@ SHARED fName8(string mid, string kNm) := '~thor400_36::key::insuranceheader_xlin
 SHARED currLgInc(string KNm) := '~'+ifname(fName('inc',kNm));
 SHARED currLgInc8(string KNm) := regexreplace('thor_data400',currLgInc(kNm),'thor400_36');
 
+// Get the version date for the incrementals from one of the incremental superfiles in Alpharetta
+// Get version of latest incremental keys in Alpharetta
+SHARED getFileVersion(string sf,boolean alp=false) := FUNCTION
+
+        sfc := nothor(STD.File.SuperFileContents(sf));
+        frName:=sfc[1].name;
+        fd1 := if(alp,regexfind('::2[0-9]{7}[a-z]{0,1}ib:',frName,0),regexfind('::2[0-9]{7}[a-z]{0,1}:',frName,0));
+        filedate := if(alp,fd1[3..(length(fd1)-3)],fd1[3..(length(fd1)-1)]);
+        output(dataset([{frName,filedate}],{string lg_ck, string fldt}),named('checked_file'),extend);
+        
+        return filedate;
+        // return '20181005';
+
+END;
+
+EXPORT  filedate := getFileVersion(ut.foreign_aprod+'thor_data400::key::insuranceheader_xlink::inc_boca::did::refs::relative',true):INDEPENDENT ;
+
 // check if we have a local copy already   
 EXPORT ok_to_copy(string filedate) := filedate<>'' and (~std.file.fileexists('~thor_data400::key::insuranceheader_xlink::'+filedate+'::did::refs::address'));
 
@@ -284,6 +301,8 @@ EXPORT movetoQA(string filedate) := sequential(
     fc8(fName(filedate, '::did'), fName8(filedate, '::did')),
     update_inc_superfiles(,filedate)
     );
+
+copy_to_dataland:= _control.fSubmitNewWorkunit('Header.Proc_Copy_Keys_To_Dataland.Incrementals','hthor_sta','Dataland');
         
 EXPORT deploy(string emailList,string rpt_qa_email_list,string skipPackage='000') := sequential(               
     udops(skipPackage),
@@ -306,6 +325,7 @@ EXPORT deploy(string emailList,string rpt_qa_email_list,string skipPackage='000'
         +'If you have any question or concerns please contact:\n'
         +'Debendra.Kumar@lexisnexisrisk.com\n'
         +'gabriel.marcan@lexisnexisrisk.com\n'
-        +'\nThank you,');
+        +'\nThank you,'),
+    copy_to_dataland;
 );
 END;
