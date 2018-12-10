@@ -7,7 +7,9 @@ EXPORT proc_build_base(string	pVersion,BOOLEAN	pUseProd	=	FALSE) := function
 	
 	FileLogical := dataset(filename,Infutor_NARC3.Layout_Infile,csv( separator('\t'),heading(1), terminator(['\n', '\r\n']), quote(['"'])));	
   
-Infutor_NARC3.Layout_Basefile		tMapping(FileLogical L) := TRANSFORM
+  dedup_FileLogical := dedup(sort(FileLogical,record),record);	
+	
+Infutor_NARC3.Layout_Basefile		tMapping(dedup_FileLogical L) := TRANSFORM
 		SELF.Date_vendor_first_reported := (unsigned)pVersion;
 		SELF.Date_vendor_last_reported 	:= (unsigned)pVersion;
 		SELF.date_first_seen := '0';  //Blank dates are acceptable since raw data does not 
@@ -20,7 +22,7 @@ Infutor_NARC3.Layout_Basefile		tMapping(FileLogical L) := TRANSFORM
 		SELF 	:= [];
 	END;
 
-std_input := project(FileLogical, tMapping(LEFT));
+std_input := project(dedup_FileLogical, tMapping(LEFT));
 
 
 //Clean Name 
@@ -98,26 +100,32 @@ cleanAdd_t := project(cleanAddr,tr(left));
 													75, d_did
 												  );
 												
-//Need to output new base before base_with_tag.Dostats can be called.
- //build_base := output(d_did,,'~thor_data400::base::infutor_narc3_20181116xa',overwrite);
+							 
+  //////d_did is outpout
 
-  // return sequential(build_base//,
-	                  //base_with_tag.Dostats										
-				           // );		
+  	
+  todays_processed_file := dataset(infutor_narc3.Filenames(pVersion).Base.WithdrawnStatus.new,infutor_narc3.Layout_Basefile,thor); 
+ 
+	current_base := dedup(sort(Infutor_NARC3.Files.base,record),record);
+	
+	//Ingest todays_processed_file into current_base to get new_base
+	base_with_tag := Infutor_NARC3.Ingest(false,,current_base,todays_processed_file);
+	
+	new_base :=  base_with_tag.AllRecords;	
+	
+  add_record_type	:= Project(new_base, TRANSFORM(Infutor_NARC3.Layout_Basefile, 
+																								   self.record_type := left.__Tpe;
+																								   self := left;
+																									 self:= [];));
+	
+	//Need to output new base before base_with_tag.Dostats can be called. 
+  VersionControl.macBuildNewLogicalFile(Filenames(pVersion).Base.WithdrawnStatus.new	,add_record_type, build_logical_file,true);									 	
+	
+  return sequential(build_logical_file,
+	                  base_with_tag.Dostats										
+				           );		
 									 
- VersionControl.macBuildNewLogicalFile(Filenames(pVersion).Base.WithdrawnStatus.new	,d_did, build_infutor_narc3_file,true);									 
-
- return build_infutor_narc3_file;
-									 
- end;
-
-
-
-	//Need to output new base before base_with_tag.Dostats can be called.
-  // build_base := output(add_rec_type,,'~thor_data400::base::federal_bureau_of_prisons_'+version+'_'+thorlib.wuid(), __compressed__); 
-
-  // return sequential(build_base,
-	                  // base_with_tag.Dostats										
-				           // );		
+end;
+ 
 									 
 

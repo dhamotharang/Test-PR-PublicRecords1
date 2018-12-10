@@ -2,6 +2,7 @@
 import address,AID;
 
 EXPORT Layout_Basefile := record
+ integer8 key;
  Infutor_NARC3.Layout_Infile;
  address.Layout_Clean_Name.title;
  address.Layout_Clean_Name.fname;

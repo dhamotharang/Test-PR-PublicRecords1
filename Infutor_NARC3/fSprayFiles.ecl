@@ -21,8 +21,8 @@ FUNCTION
 			pDirectory, 															//	SourceDirectory
 			pFilename,																//	directory_filter
 			0, 																				//	record_size, for fix length only
-			Filenames(pVersionDate).input.new(pVersionDate),	//	Thor_filename_template
-			[ {Filenames(pVersionDate).input.sprayed	}	],		//	dSuperfilenames
+			Filenames(pVersionDate).input.withdrawnstatus.new(pVersionDate),	//	Thor_filename_template
+			[ {Filenames(pVersionDate).input.withdrawnstatus.sprayed}	],	//	dSuperfilenames
 			pGroupName, 															//	fun_Groupname
 			pVersionDate, 														//	FileDate
 			'[0-9]{8}', 															//	date_regex
