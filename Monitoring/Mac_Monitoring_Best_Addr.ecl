@@ -26,7 +26,7 @@ export Mac_Monitoring_Best_Addr
 	did_match = false,
 	rank_in = 'dataset([],AddrBest.layout_header_ext)',
 	Max_records = 1,
-	did_append_in = 'dataset([],addrBest.BestAddr_common.acc_did_rec )'
+	did_append_in
 ) := MACRO
 
 import Advo, NID, batchservices, ut;
@@ -152,7 +152,7 @@ END;
 	#uniquename(partial_addr_matches)
 	%partial_addr_matches% := denormalize(%slim_h0%(is_input),%slim_h0%(~is_input),
 		left.did_field = right.did_field and
-		left.rid = right.rid and
+		left.rid = right.rid and  // This contains actual did
 		left.prim_range = right.prim_range 
 		and stringlib.stringfind(trim(left.prim_name)+' ',trim(right.prim_name)+' ',1)>0
 		and (left.st=right.st or left.st='')
@@ -501,7 +501,7 @@ END;
 	end;
 	%rank_seq% := join(%dep_grp%, rank_in,
 											left.did		 		= right.did		 			and //account number
-											left.rid = right.rid   		and   // actual did
+											left.rid 				= right.rid   			and   // actual did
 											left.zip 				= right.zip					and
 											left.prim_range = right.prim_range	and
 											left.predir		 	= right.predir			and
@@ -515,6 +515,7 @@ END;
 	%best_recs% := if(%Ranking_Requested%,sort(%rank_seq%,did,best_address_number),ungroup(%dep_grp%));	
 	
 	// Additional checks with didappend to return matching did 
+	// In rare cases where top most did from bestrecs does not match did from didappend, we try to bring matching input didappend did records  to the top
 	
 	
 	#uniquename(rfields_exp_didappend)
