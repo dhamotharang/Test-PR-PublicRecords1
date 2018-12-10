@@ -2,6 +2,10 @@
 // see header.proc_deploy_ikb for more information
 
 IMPORT _control;
+
+//UTC is 5 hours ahead, so UTC: 17:01 = EST: 12:01
+DAILY_AT_NOON := '01 17 * * *';
+
 ecl:=
         'IMPORT header;\n'+
         '#WORKUNIT(\'name\',\'Header IKB Deployment\');\n'+
@@ -9,4 +13,7 @@ ecl:=
         'rpt_qa_email_list:=\'BocaRoxiePackageTeam@lexisnexis.com,Isabel.Ma@lexisnexisrisk.com\';\n'+
         'header.proc_deploy_ikb(emailList,rpt_qa_email_list)';
 
-_control.fSubmitNewWorkunit(ecl,'hthor_eclcc'):WHEN( CRON('30 8,12,14 * * *'));
+
+_control.fSubmitNewWorkunit(ecl,'hthor_eclcc'):WHEN( CRON(DAILY_AT_NOON));  
+
+
