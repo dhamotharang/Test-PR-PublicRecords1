@@ -2,7 +2,7 @@
 
 EXPORT hdr_bld_ikb(string filedate) := module
 
-   #stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com,Debendra.Kumar@lexisnexisrisk.com,Isabel.Ma@lexisnexisrisk.com');
+   #stored ('emailList', Header.email_list.BocaDevelopers + ',Isabel.Ma@lexisnexisrisk.com');
    string  emailList := ''  :stored('emailList');
 
    string  rpt_qa_email_list:='BocaRoxiePackageTeam@lexisnexis.com,Isabel.Ma@lexisnexisrisk.com';
@@ -11,21 +11,15 @@ EXPORT hdr_bld_ikb(string filedate) := module
    wServer:= _control.ThisEnvironment.ESP_IPAddress;
    wLink := 'http://'+wServer+':8010/?Widget=WUDetailsWidget&Wuid='+wk+'#/stub/Summary';
 
-   hdr_prod_ver := dops.GetBuildVersion('FCRA_PersonHeaderKeys','B','F','P'); //prod boca fcra
-   hdr_cert_ver := dops.GetBuildVersion('FCRA_PersonHeaderKeys','B','F','C'); //cert boca fcra
-
-   hdr_thor_prod := regexfind('[0-9]{8}', std.file.superfilecontents('~thor_data400::base::header_prod')[1].name, 0);
-   isProd_eq_Cert_Ver := hdr_prod_ver = hdr_cert_ver and hdr_cert_ver[1..8] >= hdr_thor_prod;
-
    CopyKeys := sequential(
                     header.LogBuild.single('STARTED:iCopyKeys'),
-                    Header.Proc_Copy_From_Alpha_Incrementals().Refresh_copy,
+                    Header.Proc_Copy_From_Alpha_Incrementals().Refresh_copy(filedate),
                     header.LogBuild.single('COMPLETED:iCopyKeys')
                     );
 
    UpdateIncIdl := sequential(
                     header.LogBuild.single('START:iIDL'),
-                    Header.Proc_Copy_From_Alpha_Incrementals().update_inc_idl(),
+                    Header.Proc_Copy_From_Alpha_Incrementals().update_inc_idl(,filedate),
                     header.LogBuild.single('COMPLETED:iIDL')
                     );
                     
@@ -44,11 +38,11 @@ EXPORT hdr_bld_ikb(string filedate) := module
                     header.LogBuild.single('end:iFCRA'),
                     );
 
-   BuildKeys := sequential(BuildiDid, if(isProd_eq_Cert_Ver, BuildFcra));
+   BuildKeys := sequential(BuildiDid, BuildFcra);
 
    MovetoQA := sequential(
                     header.LogBuild.single('STARTED:imovetoQA'),
-                    header.Proc_Copy_From_Alpha_Incrementals().movetoQA,
+                    header.Proc_Copy_From_Alpha_Incrementals().movetoQA(filedate),
                     output(header.Verify_XADL1_base_files,named('Verify_XADL1_base_files_after'), all),
                     header.LogBuild.single('COMPLETED:imovetoQA'),
                     );
@@ -59,7 +53,7 @@ EXPORT hdr_bld_ikb(string filedate) := module
                     header.LogBuild.single('COMPLETED:iUpdate')
                     );
                     
-   EXPORT all := sequential(CopyKeys, UpdateIncIdl, BuildKeys, MovetoQA, Deploy)
+   EXPORT all := sequential(CopyKeys, UpdateIncIdl, BuildKeys, MovetoQA)
                   : failure(std.system.Email.SendEmail(emailList,'FAILED:IKB BUILD:'+workunit,wLink));
                 
 END;

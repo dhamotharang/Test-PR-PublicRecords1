@@ -59,11 +59,11 @@ Export ds_ssi_raw := project(ssi, {string ssi});
 Export ds_ssiset_raw := project(ssiset, {string ssiset});
 
 Export gpatt2_mc := Dataset('~thor_data400::qc::ares::gpatt2_mc.txt', layout_gpatt2, flat);
-// Export gpcnt_mc := Dataset('~thor_data400::qc::ares::gpcnt_mc.txt', layout_gpcnt, flat);
+Export gpcnt_mc := Dataset('~thor_data400::qc::ares::gpcnt_mc.txt', layout_gpcnt, flat);
 Export gpcod2_mc := Dataset('~thor_data400::qc::ares::gpcod2_mc.txt', layout_gpcod2, flat);
 Export gpcor2_mc := Dataset('~thor_data400::qc::ares::gpcor2_mc.txt', layout_gpssi, flat);
 Export gploc_mc := Dataset('~thor_data400::qc::ares::gploc_mc.txt', layout_gploc, flat);
-Export gpoff_mc := Dataset('~thor_data400::qc::ares::gpoff_mc.txt', Layout_GPOfficers, flat);
+Export gpoff_mc := Dataset('~thor_data400::qc::ares::gpoff_mc.txt', Layout_GPOff, flat);
 Export gpsub_mc := Dataset('~thor_data400::qc::ares::gpsub_mc.txt', layout_gpssi_set, flat);
 
 end;

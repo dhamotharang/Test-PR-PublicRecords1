@@ -26,22 +26,17 @@ module
 		FraudShared.Layouts.Input.MBS;
 		unsigned1 Deltabase := 0;
 	end;
-	MBS	:= project(FraudShared.Files().Input.MBS.sprayed(status = 1), transform(MBS_Layout, self.Deltabase := If(regexfind('DELTA', left.fdn_file_code, nocase),1,0); self := left));
 	
 	KnownFraudSource  := join(	KnownFraudUpdate,
-												MBS, 
-												(unsigned6) left.Customer_Account_Number = right.gc_id and 
-												left.file_type = right.file_type  AND
-												left.ind_type = right.ind_type AND 
-												( 
-													left.Deltabase = 1											
-													OR 
-													(	left.Deltabase = 0 AND														
-														left.customer_State = right.Customer_State AND
-														left.Customer_County = right.Customer_County AND 	
-														left.Customer_Agency_Vertical_Type = right.Customer_Vertical
-													)
-												),												
+												FraudShared.Files().Input.MBS.sprayed(status = 1) 
+												,left.Customer_Account_Number =(string)right.gc_id
+												AND left.file_type = right.file_type
+												AND left.ind_type = right.ind_type
+												AND (( left.source_input = 'KNFD' 			and	right.confidence_that_activity_was_deceitful != 3 )
+													OR	( left.source_input = 'SAFELIST' 	and	right.confidence_that_activity_was_deceitful = 3 ))	
+												AND	left.customer_State 	= right.Customer_State
+												AND	left.Customer_County 	= right.Customer_County
+												AND	left.Customer_Agency_Vertical_Type = right.Customer_Vertical,										
 												TRANSFORM(Layouts.Base.KnownFraud,SELF.Source := RIGHT.fdn_file_code; SELF := LEFT));
 
   // Rollup Update and previous base 

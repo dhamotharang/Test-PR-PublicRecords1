@@ -1093,6 +1093,8 @@
 		export string KEYWORD_USSGE									:= '781';		
 		export string KEYWORD_OFAC_NIC							:= '782';		
 		export string KEYWORD_JPJFTC								:= '783';		
+		export string KEYWORD_TNCNLT								:= '784';		
+		export string KEYWORD_RUUSEM_50_WC					:= '785';		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
 	
