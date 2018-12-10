@@ -102,7 +102,7 @@ END;
 
 with_department_codes := join(assigned_dpt_codes, combined_dept_list, LEFT.asigned_dpt_id =RIGHT.id, department_codes_xform(LEFT,RIGHT));
 // output(with_department_codes,NAMED('with_department_codes'));
- output(with_department_codes(Accuity_Location_ID='10000200'),NAMED('department_by_id_10000200'));
+ //output(with_department_codes(Accuity_Location_ID='10000200'),NAMED('department_by_id_10000200'));
 // output(with_department_codes(Accuity_Location_ID='10000011'),NAMED('department_by_id_10000011'));
 
 
@@ -130,27 +130,30 @@ layout_party parties_xform(recordof(Relationship_ds.parties.party) r, string id)
 end;
 
 parties :=  normalize(Relationship_ds,left.parties.party, parties_xform(right, left.id));
-output(parties,NAMED('parties'));
+//output(parties,NAMED('parties'));
 
 
 //filter by employee type
 parties_type_employee_list := parties(partyType='employee');
-output(parties_type_employee_list,NAMED('only_employees'));
+//output(parties_type_employee_list,NAMED('only_employees'));
 
 parties_type_employee_layout := RECORD
 	STRING party_type := '';
-	STRING entity_reference := '';
+	STRING person_id_link_href := '';
+	STRING person_id  := '';
 	STRING relationship_id := '';
 END;
 
 parties_type_employee_layout parties_type_xfrom(parties_type_employee_list L) := TRANSFORM
 	SELF.party_type := L.partyType;
-	SELF.entity_reference := if(L.entityReference[1].href != '', std.str.splitwords(L.entityReference[1].href,'/')[3], '');
+	SELF.person_id_link_href := L.entityReference[1].href;
+	SELF.person_id  := if(L.entityReference[1].href != '', std.str.splitwords(L.entityReference[1].href,'/')[3], '');
 	SELF.relationship_id := L.relationship_id;
+	SELF := L;
 END;
 
 employee_id_list := project(parties_type_employee_list, parties_type_xfrom(LEFT));
-output(employee_id_list,NAMED('employee_id_list'));
+//output(employee_id_list,NAMED('employee_id_list'));
 
 officer_name_layout := RECORD
 	STRING given_name := '';
@@ -163,27 +166,11 @@ officer_name_layout officer_name_xform (employee_id_list L,recordof(Ares.Files.d
 	SELF.surname := R.summary.names[1].surname_value;
 	SELF.relationship_id := L.relationship_id;
 END;
-output(person_ds,NAMED('person_list'));
-output(person_ds(relatedEntities.relation_link.href != ''),NAMED('person_list_ds'));
 
-layout_entities_parsed := RECORD(recordof(Ares.Files.ds_person))
-	STRING href_parsed;
-END;
+//output(person_ds,NAMED('person_ds'));
+//output(person_ds(id='b93e1ac3-6922-47a3-b0de-dd0baf1bfacb'),NAMED('person_by_id'));
 
-layout_entities_parsed peron_xform(person_ds L) := TRANSFORM
-	//TODO parse the href from relatedEntities;
-	//SELF.entity_reference := if(L.entityReference[1].href != '', std.str.splitwords(L.entityReference[1].href,'/')[3], '');
-	SELF.href_parsed := L.relatedEntities.relation_link[1].href;
-	SELF := L;
-END;
-
-person_with_entities_ds := project(person_ds,peron_xform(LEFT)); 
-output(person_with_entities_ds,NAMED('person_with_entities_ds'));
-output(person_with_entities_ds(href_parsed!=''),NAMED('person_with_entities_parsed'));
-
-
-//TODO: join on entity_reference not on id
-Officer_Name := join(employee_id_list, person_ds, LEFT.entity_reference = right.id, officer_name_xform(left,right));
+Officer_Name := join(employee_id_list, person_ds, LEFT.person_id = right.id, officer_name_xform(left,right));
 sorted_Officer_Name := SORT(Officer_Name,relationship_id);
 deduped_Officer_Name := DEDUP(sorted_Officer_Name,LEFT.relationship_id = RIGHT.relationship_id);
 
