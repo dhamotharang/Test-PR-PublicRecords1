@@ -10,7 +10,7 @@
                         '_cvi_,_v2__sourcerisklevel_,_v2__assocsuspicousidentitiescount_,_v2__assoccreditbureauonlycount_,_v2__inputaddrageoldest_,_v2__inputaddrdwelltype_,_v2__divssnidentitycountnew_,' + 
                         'hri03_flag_,hri06_flag_,hri07_flag_,hri08_flag_,hri11_flag_,hri12_flag_,hri14_flag_,hri15_flag_,hri19_flag_,hri25_flag_,hri26_flag_,hri27_flag_,hri28_flag_,hri29_flag_,hri30_flag_,hri31_flag_,hri37_flag_,hri38_flag_,hri41_flag_,hri48_flag_,hri50_flag_,hri51_flag_,hri52_flag_,hri71_flag_,hri83_flag_,hri90_flag_,hri_cl_flag_,hri_co_flag_,hri_dd_flag_,hri_df_flag_,hri_iv_flag_,hri_it_flag_,hri_mi_flag_,hri_mo_flag_,hri_ms_flag_,hri_nf_flag_,hri_pa_flag_,hri_po_flag_,hri_va_flag_,' +
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
-												'cl_active30_identity_count_,cl_active7_identity_count_,currently_incarcerated_flag_,fraud_offenses_flag_');
+												'cl_active30_identity_count_,cl_active7_identity_count_,currently_incarcerated_flag_,fraud_offenses_flag_,associated_with_incarcerated_flag_,associated_with_fraud_offenses_flag_');
                         
   SHARED AddressStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Address.Res0, 'industry_type_,customer_id_,entity_context_uid_', 
                         'identity_count_,score_,event_count_,' +
