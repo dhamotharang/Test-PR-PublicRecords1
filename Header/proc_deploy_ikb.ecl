@@ -25,7 +25,7 @@ fcraShouldUpdate:= ( dontskip_fcra AND lastestFCRAversionOnThor > ver_fcra_cert_
 wklyShouldUpdate:= ( dontskip_wkly AND lastestWklyversionOnThor > ver_wkly_cert_ver AND ver_wkly_cert_ver = ver_wkly_prod_ver);
 
 // Generates a report prior to deployment
-output(dataset([
+rpt := output(dataset([
     {'labKeys',ver_lab_cert_ver,ver_lab_prod_ver,lastestIkbVersionOnThor,ikbShouldUpdate},
     {'fcraKeys',ver_fcra_cert_ver,ver_fcra_prod_ver,lastestFCRAversionOnThor,fcraShouldUpdate},
     {'wklyKeys',ver_wkly_cert_ver,ver_wkly_prod_ver,lastestWklyversionOnThor,wklyShouldUpdate}
@@ -37,6 +37,14 @@ skipPackage:= if(ikbShouldUpdate,'0','1')+  // 'skipPackage[1]'
               if(wklyShouldUpdate,'0','1'); // 'skipPackage[3]'
 
 // calls deployment with skip parameters
-RETURN header.Proc_Copy_From_Alpha_Incrementals().deploy(emailList,rpt_qa_email_list,skipPackage);
+doIt :=   sequential(
+           rpt
+          ,if(skipPackage = '111'
+           ,output('No New Data Available for Deployment')
+           ,header.Proc_Copy_From_Alpha_Incrementals().deploy(emailList,rpt_qa_email_list,skipPackage)
+           )
+          );
+
+return doIt;
 
 END;
