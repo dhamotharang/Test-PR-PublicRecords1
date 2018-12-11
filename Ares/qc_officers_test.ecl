@@ -11,6 +11,7 @@ qcofficer := Project(mc_ds, Transform(Ares.layout_gpoff or {string version},
 																						self := left));
 																					
 Output(count(qcofficer)-count(myofficer),named('cnt_defference'));
+Output(mc_ds,named('mc_ds'));
 
 cmbofficers := sort(myofficer + qcofficer, RECORD);
 
@@ -28,7 +29,10 @@ rolled := Rollup(combined_sorted, xform(left), Accuity_Location_ID,Department,Of
 Output(count(rolled),named('cnt_rolled'));
 Output(count(rolled(version='both')), named('cnt_matching'));
 Output(count(rolled(version='mine')), named('cnt_mine_only'));
-Output(count(rolled(version='qc')), named('cnt_qc_only'));													
+Output(count(rolled(version='qc')), named('cnt_qc_only'));	
+
+//output( rolled(Accuity_Location_ID = '10002920', department = '290'), named('rolledup_by_id'));
+output( rolled(Accuity_Location_ID = '10001060', department = '520'), named('rolledup_by_id'));
 
 mine := rolled(version='mine');
 qc := rolled(version='qc');
@@ -60,5 +64,14 @@ End;
 //joined_ds := join(mine, qc, left.Accuity_Location_ID = right.Accuity_Location_ID AND left.Department = right.Department,xform_diff(left,right));                                                                                                            
 joined_ds := join(deduped_mine, deduped_qc, left.Accuity_Location_ID = right.Accuity_Location_ID AND left.Department = right.Department,xform_diff(left,right));                                                                                                            
 
+sorted_joined_ds := sort(joined_ds,accuity_location_id,Department);
 output(joined_ds, named('diffs'));
 output(COUNT(joined_ds), named('diffs_cnt'));
+output(joined_ds(l_officername = 'J Paul Barnes'), named('diffs_Barnes'));
+output(joined_ds(r_officername='Stan Sessions'), named('diffs_Sessions'));
+
+  
+
+ 
+
+
