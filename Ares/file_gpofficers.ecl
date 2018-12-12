@@ -154,12 +154,16 @@ Officer_Name := join(employee_id_list, person_ds, LEFT.person_id = right.id, off
 sorted_Officer_Name := SORT(Officer_Name,relationship_id);
 deduped_Officer_Name := DEDUP(sorted_Officer_Name,LEFT.relationship_id = RIGHT.relationship_id);
 
+STRING regex := '<[^>]+>';
+
 RECORDOF(layout_gpoff) final_xform(Officer_Name L, with_codes_layout R ) := Transform
 	SELF.UpdateFlag := 'A';
 	SELF.PrimaryKey := '';
 	SELF.Accuity_Location_ID := R.Accuity_Location_ID;
 	SELF.Department := R.code;
-	SELF.OfficerName := L.given_name + ' ' + L.surname;
+	//TODO: find regex to replalce SELF.OfficerName := L.given_name + ' ' + L.surname;
+	SELF.OfficerName := REGEXREPLACE(regex,L.given_name,'') + ' ' +  REGEXREPLACE(regex,L.surname,'');	
+	
 End;
 
 final	:= join(deduped_Officer_Name, deduped_with_department_codes, LEFT.relationship_id = right.relationship_id, final_xform(left,right));
