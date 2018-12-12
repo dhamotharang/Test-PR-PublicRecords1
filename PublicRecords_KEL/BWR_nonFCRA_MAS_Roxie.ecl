@@ -31,7 +31,7 @@ DataRestrictionMask := '0000000000000000000000000000000000000000000000000';
 Score_threshold := 80;
 // Score_threshold := 90;
 Output_Master_Results := TRUE;
-RecordsToRun := 100;
+RecordsToRun := 0;
 eyeball := 120;
 
 // Universally Set the History Date YYYYMMDD for ALL records. Set to 0 to use the History Date located on each record of the input file
