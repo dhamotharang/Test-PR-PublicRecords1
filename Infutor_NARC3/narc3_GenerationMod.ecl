@@ -50,7 +50,7 @@ EXPORT narc3_GenerationMod := MODULE(SALT311.iGenerationMod)
     + '\n'
     + 'FIELD:orig_hhid:DERIVED:TYPE(STRING20):0,0 \n'
     + 'FIELD:orig_pid:DERIVED:TYPE(STRING20):0,0\n'
-    + 'FIELD:orig_fname:TYPE(STRING15):0,0 //\n'
+    + 'FIELD:orig_fname:TYPE(STRING15):0,0 ///\n'
     + 'FIELD:orig_mname:TYPE(STRING1):0,0 //  \n'
     + 'FIELD:orig_lname:TYPE(STRING20):0,0 //\n'
     + 'FIELD:orig_suffix:TYPE(STRING10):0,0 //\n'

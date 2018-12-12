@@ -10,7 +10,7 @@ INGESTFILE:narc3_Update:NAMED(Infutor_NARC3.Files.base)
 
 FIELD:orig_hhid:DERIVED:TYPE(STRING20):0,0 
 FIELD:orig_pid:DERIVED:TYPE(STRING20):0,0
-FIELD:orig_fname:TYPE(STRING15):0,0 //
+FIELD:orig_fname:TYPE(STRING15):0,0 ///
 FIELD:orig_mname:TYPE(STRING1):0,0 //  
 FIELD:orig_lname:TYPE(STRING20):0,0 //
 FIELD:orig_suffix:TYPE(STRING10):0,0 //

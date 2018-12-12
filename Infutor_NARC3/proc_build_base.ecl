@@ -3,7 +3,7 @@ import ut, _validate, NID, AID, address, std, did_add, VersionControl,didville;
 
 EXPORT proc_build_base(string	pVersion,BOOLEAN	pUseProd	=	FALSE) := function
 
-	filename_in :=  Filenames(pVersion,pUseProd).Input.WithdrawnStatus.Using;
+	filename_in :=  Filenames(pVersion,pUseProd).Input.consumer.Using;
 	
 	FileLogical_in := dataset(filename_in,Infutor_NARC3.Layout_Infile,csv( separator('\t'),heading(1), terminator(['\n', '\r\n']), quote(['"'])));	
   
@@ -141,7 +141,7 @@ hhid := project(infutor_narc_all, transform(Infutor_NARC3.Layout_Basefile, self.
  dedup_hhid := dedup(sort(hhid,record),record);
  
 	//Need to output new base before base_with_tag.Dostats can be called. 
-  VersionControl.macBuildNewLogicalFile(Filenames(pVersion).Base.WithdrawnStatus.new	,dedup_hhid, build_logical_file,true);									 	
+  VersionControl.macBuildNewLogicalFile(Filenames(pVersion).Base.consumer.new	,dedup_hhid, build_logical_file,true);									 	
 	
   return sequential(build_logical_file,
 	                  base_with_tag.Dostats										

@@ -6,15 +6,9 @@ EXPORT Keynames(STRING	pversion							=	'',
 
 	SHARED	lkeyTemplate			:=	_Dataset(pUseOtherEnvironment).thor_cluster_files	+	'key::'	+	_Dataset().name	+	IF(isFCRA,'::fcra','')	+	'::@version@::';
 
-	EXPORT	lstatus						:=	'status';
-	EXPORT	lwithdrawnstatus	:=	'withdrawnstatus';
+  //list all keys here 
+	EXPORT	did		:=	VersionControl.mBuildFilenameVersions(lkeyTemplate+'did',pversion);
 
-	EXPORT	Status						:=	VersionControl.mBuildFilenameVersions(lkeyTemplate+lstatus,pversion);
-	EXPORT	WithdrawnStatus		:=	VersionControl.mBuildFilenameVersions(lkeyTemplate+lwithdrawnstatus,pversion);
+	EXPORT	dAll_filenames := did.dAll_filenames;
 
-	EXPORT	dAll_filenames		:=
-		Status.dAll_filenames						+
-		WithdrawnStatus.dAll_filenames
-	;
-
-END;
+END;    
