@@ -98,7 +98,7 @@ deduped_result := DEDUP (sorted_result,RECORD);
 	// STRING Filler;
 // END;
 
-layout_gpcnt final_xform(result L) := Transform
+recordof(ares.layout_gpcnt) final_xform(result L) := Transform
 	SELF.Update_Flag := 'A';
 	SELF.Primary_Key := '';
 	SELF.Accuity_Location_ID := L.office_tfpuid;
