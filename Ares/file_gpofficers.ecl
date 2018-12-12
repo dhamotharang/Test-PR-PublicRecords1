@@ -154,7 +154,8 @@ Officer_Name := join(employee_id_list, person_ds, LEFT.person_id = right.id, off
 sorted_Officer_Name := SORT(Officer_Name,relationship_id);
 deduped_Officer_Name := DEDUP(sorted_Officer_Name,LEFT.relationship_id = RIGHT.relationship_id);
 
-STRING regex := '<[^>]+>';
+//STRING regex := '<[^>]+>';
+STRING regex :='[^A-Za-z\\s\\-\\.\\\'\\,]';
 
 RECORDOF(layout_gpoff) final_xform(Officer_Name L, with_codes_layout R ) := Transform
 	SELF.UpdateFlag := 'A';
