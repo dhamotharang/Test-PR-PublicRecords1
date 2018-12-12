@@ -184,7 +184,7 @@ END;
 ResultSet := 
 				SOAPCALL(soap_in, 
 				RoxieIP,
-				'publicrecords_kel.MAS_Business_nonFCRA_Service.16',
+				'publicrecords_kel.MAS_Business_nonFCRA_Service',
 				{soap_in}, 
 				DATASET(layout_MAS_Business_Service_output),
 				XPATH('*'),
