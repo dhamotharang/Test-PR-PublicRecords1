@@ -152,6 +152,10 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
     SELF.did_score := ri.did_score; // Derived(NEW)
     SELF.clean_phone := ri.clean_phone; // Derived(NEW)
     SELF.clean_dob := ri.clean_dob; // Derived(NEW)
+    SELF.process_date := MAP ( le.__Tpe = 0 => ri.process_date,
+                     ri.__Tpe = 0 => le.process_date,
+                     (UNSIGNED)le.process_date < (UNSIGNED)ri.process_date => ri.process_date, // Want the highest value
+                     le.process_date);
     SELF.date_first_seen := MAP ( le.__Tpe = 0 OR (UNSIGNED)le.date_first_seen = 0 => ri.date_first_seen,
                      ri.__Tpe = 0 OR (UNSIGNED)ri.date_first_seen = 0 => le.date_first_seen,
                      (UNSIGNED)le.date_first_seen < (UNSIGNED)ri.date_first_seen => le.date_first_seen, // Want the lowest non-zero value
@@ -175,7 +179,7 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
     __Tpe0 := MAP (
       le.__Tpe = 0 => ri.__Tpe,
       le.__Tpe = RecordType.Updated OR ri.__Tpe = 0 OR ri.__Tpe = le.__Tpe => le.__Tpe,
-      SELF.date_first_seen <> le.date_first_seen OR SELF.date_last_seen <> le.date_last_seen OR SELF.date_vendor_first_reported <> le.date_vendor_first_reported OR SELF.date_vendor_last_reported <> le.date_vendor_last_reported => RecordType.Updated,
+      SELF.process_date <> le.process_date OR SELF.date_first_seen <> le.date_first_seen OR SELF.date_last_seen <> le.date_last_seen OR SELF.date_vendor_first_reported <> le.date_vendor_first_reported OR SELF.date_vendor_last_reported <> le.date_vendor_last_reported => RecordType.Updated,
       RecordType.Unchanged);
     SELF.__Tpe := __Tpe0;
     SELF := le; // Take current version - noting update if needed

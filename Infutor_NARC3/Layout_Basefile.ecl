@@ -40,11 +40,13 @@ EXPORT Layout_Basefile := record
  UNSIGNED1 did_score 				:= 0;
  string10  clean_Phone;
  string8	 clean_DOB;	
+ string8	 process_date;
  string8 	 date_first_seen  	:='0';
  string8 	 date_last_seen 		:='0';
  UNSIGNED6 Date_vendor_first_reported;
  UNSIGNED6 Date_vendor_last_reported;
- string1  record_type;
+ //string1  record_type;
+ unsigned1 record_type;
  string2 	src;
  AID.Common.xAID		RawAID;
  UNSIGNED6 LexHHID 					:= 0;
