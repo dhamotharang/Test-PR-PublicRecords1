@@ -6,8 +6,9 @@ Threads := 1;
 RecordsToRun := 0; // 100;
 eyeball := 120;
 
-historyDate := 0; // Set to 0 to use ArchiveDate on input file. 
-// historyDate := 20181128; // Set to 0 to use ArchiveDate on input file. 
+// historyDate := 0; // Set to 0 to use ArchiveDate on input file. 
+historyDate := 20181212; // Set to 0 to use ArchiveDate on input file. 
+
 Score_threshold := 80;
 Output_Master_Results := TRUE;
 RoxieIP := RiskWise.shortcuts.Dev156;
@@ -15,7 +16,7 @@ RoxieIP := RiskWise.shortcuts.Dev156;
 InputFile := '~temp::kel::ally_01_business_uat_sample_100k_20181015.csv'; //100k file
 // InputFile := '~temp::kel::ally_01_business_uat_sample_1m_20181015.csv'; //1m file
 
-OutputFile := '~cdal::BusinessPop_PublicRecs_11262018'+ ThorLib.wuid() ;
+OutputFile := '~cdal::BusinessPop_PublicRecs_BusinessInputExtra_12122018'+ ThorLib.wuid() ;
 
 prii_layout := RECORD
 	STRING AccountNumber         ;  
@@ -183,7 +184,7 @@ END;
 ResultSet := 
 				SOAPCALL(soap_in, 
 				RoxieIP,
-				'publicrecords_kel.MAS_Business_nonFCRA_Service',
+				'publicrecords_kel.MAS_Business_nonFCRA_Service.16',
 				{soap_in}, 
 				DATASET(layout_MAS_Business_Service_output),
 				XPATH('*'),

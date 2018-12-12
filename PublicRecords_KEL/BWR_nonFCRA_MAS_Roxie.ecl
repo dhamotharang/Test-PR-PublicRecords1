@@ -5,9 +5,9 @@ threads := 1;
 
 RoxieIP := RiskWise.shortcuts.Dev156;
 
-// InputFile := '~temp::kel::consumer_nonfcra_1mm.csv'; //1 million
 InputFile := '~temp::kel::consumer_nonfcra_100k.csv';
-// InputFile := '~ak::in::specialcases.csv';
+// InputFile := '~temp::kel::consumer_nonfcra_1mm.csv'; //1 million
+
 
 /*
 Data Setting 		NonFCRA
@@ -31,14 +31,14 @@ DataRestrictionMask := '0000000000000000000000000000000000000000000000000';
 Score_threshold := 80;
 // Score_threshold := 90;
 Output_Master_Results := TRUE;
-RecordsToRun := 0;
+RecordsToRun := 100;
 eyeball := 120;
 
 // Universally Set the History Date YYYYMMDD for ALL records. Set to 0 to use the History Date located on each record of the input file
 // histDate := '0';
-histDate := '20181204';
+histDate := '20181212';
 
-OutputFile := '~CDAL::Consumer_InputExtra_100K_RoxieDev_current_12042018_NonFCRA'+ ThorLib.wuid() ;
+OutputFile := '~CDAL::specialcases_Consumer_RoxieDev_current_12122018_NonFCRA'+ ThorLib.wuid() ;
 
 prii_layout := RECORD
     STRING Account             ;
@@ -124,7 +124,7 @@ END;
 bwr_results := 
 				SOAPCALL(soap_in, 
 				RoxieIP,
-				'publicrecords_kel.MAS_nonFCRA_Service', 
+				'publicrecords_kel.MAS_nonFCRA_Service.27', 
 				{soap_in}, 
 				DATASET(layout_MAS_Test_Service_output),
 				XPATH('*'),

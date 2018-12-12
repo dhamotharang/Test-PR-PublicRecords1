@@ -93,7 +93,7 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 			SELF.MonSinceOldestCrimCnt1Y := IF(ResultsFound, (INTEGER)RIGHT.MonSinceOldestCrimCnt1Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
 			SELF.MonSinceNewestCrimCnt7Y := IF(ResultsFound, (INTEGER)RIGHT.MonSinceNewestCrimCnt7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
 			SELF.MonSinceOldestCrimCnt7Y := IF(ResultsFound, (INTEGER)RIGHT.MonSinceOldestCrimCnt7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
-			SELF.CrimSeverityIndex7Y := IF(ResultsFound, (STRING)RIGHT.CrimSeverityIndex7Y,'0-0');
+			SELF.CrimSeverityIndex7Y := IF(ResultsFound, (STRING)RIGHT.CrimSeverityIndex7Y,'0 - 0');
 			SELF.CrimBehaviorIndex7Y := IF(ResultsFound, (STRING)RIGHT.CrimBehaviorIndex7Y,'0');
 			SELF := LEFT;
 		),LEFT OUTER, KEEP(1)); 
