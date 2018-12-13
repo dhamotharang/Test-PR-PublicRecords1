@@ -1,4 +1,4 @@
-IMPORT Address, NID, UCCV2, ut;
+﻿IMPORT Address, NID, UCCV2, ut;
 
 person_flags := ['P', 'D'];
 // An executive decision was made to consider Unclassifed and Invalid names as company names for UCC.
@@ -233,7 +233,10 @@ dPartyBase              :=  dedup(dAppendRmsid  ,except dt_first_seen,
 														   dt_vendor_first_reported, All);
 														   
 														   
-OutParty                :=  output(dPartyBase  ,,UCCV2.cluster.cluster_out+'base::UCC::Party::dnb',overwrite,__compressed__);
+dPartyBaseFilt					:=	dPartyBase(tmsid <> 'DNB11538536120180807'	or (tmsid='DNB11538536120180807' and ut.CleanSpacesAndUpper(orig_name)<>'HOWARD STATE BANK'));
+														   
+														   
+OutParty                :=  output(dPartyBaseFilt  ,,UCCV2.cluster.cluster_out+'base::UCC::Party::dnb',overwrite,__compressed__);
 AddSuperfile            :=  FileServices.AddSuperFile(UCCV2.cluster.cluster_out+'base::UCC::Party_Name',UCCV2.cluster.cluster_out+'base::UCC::Party::dnb');
 
 export proc_build_dnb_party_base    :=sequential(OutParty,AddSuperfile); 

@@ -1,4 +1,4 @@
-﻿EXPORT Functions := MODULE
+﻿﻿EXPORT Functions := MODULE
   IMPORT Std;
   EXPORT GenerateJoinEquality(Val) := FUNCTIONMACRO
     Layout := {STRING ColumnName};

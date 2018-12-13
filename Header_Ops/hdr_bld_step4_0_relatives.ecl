@@ -5,11 +5,13 @@
 #STORED ('production', false);
 #STORED ('_Validate_Year_Range_Low', '1800');
 #STORED ('_Validate_Year_Range_high', ut.GetDate[1..4]);
+#stored ('isHeaderBuild',TRUE);
 #OPTION ('multiplePersistInstances',FALSE);
 #OPTION ('implicitSubSort',FALSE);
 #OPTION ('implicitBuildIndexSubSort',FALSE);
 #OPTION ('implicitJoinSubSort',FALSE);
 #OPTION ('implicitGroupSubSort',FALSE);
+
 // #stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com,Debendra.Kumar@lexisnexisrisk.com'); 
 
 build_version:= header.version_build;
@@ -25,4 +27,6 @@ sequential(dlog,Header.proc_postHeaderBuilds.relatives);
 // Estimated THOR time: 36-48hrs
 // header.version_build
 
+// 20180724 W20180818-094327
+// 20180626 W20180712-090444
 // 20180522 W20180614-144751

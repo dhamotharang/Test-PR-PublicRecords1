@@ -175,6 +175,19 @@ EXPORT ds_Matches := DATASET([
 											,'SALT311.MAC_SliceOut_ByRID(ihbp01/*HACKMatches07b*/,rcid,Proxid,ToSlice,rcid,sliced0);','github 3140 issue'},
 								{pModule,'matches','sliced := IF[(] Config.DoSliceouts, sliced0, ih1[)]'  ,'HACKMatches07c'  
 											,'sliced := IF( Config.DoSliceouts, sliced0, ihbp01/*HACKMatches07c*/)','github 3140 issue'}
+
+								{pModule,'matches','attr_match := JOIN[(]DISTRIBUTE[(]j1,HASH[(]Proxid1[)][)],hd,LEFT[.]Proxid1 = RIGHT[.]Proxid AND [(] LEFT[.]SALT_Partition = RIGHT[.]SALT_Partition OR LEFT[.]SALT_Partition=\'\' OR RIGHT[.]SALT_Partition = \'\' )'  ,'HACKMatches08'  
+											, 'attr_match := JOIN(DISTRIBUTE(j1,HASH(Proxid1)),hd,LEFT.Proxid1 = RIGHT.Proxid AND ( LEFT.SALT_Partition = RIGHT.SALT_Partition OR LEFT.SALT_Partition='' OR RIGHT.SALT_Partition = '' )\n'
+                      + 'AND LEFT.cnp_number = RIGHT.cnp_number AND LEFT.prim_name_derived = RIGHT.prim_name_derived/*HACKMatches02*/\n'
+                      + 'AND LEFT.st = RIGHT.st\n'
+                      + 'AND LEFT.prim_range_derived = RIGHT.prim_range_derived\n'
+                      + 'AND ( ~left.st_isnull AND ~right.st_isnull )\n'
+                      + 'AND ( left.active_enterprise_number = right.active_enterprise_number OR left.active_enterprise_number_isnull OR right.active_enterprise_number_isnull )\n'
+                      + 'AND ( left.active_domestic_corp_key = right.active_domestic_corp_key OR left.active_domestic_corp_key_isnull OR right.active_domestic_corp_key_isnull )\n'
+                      + 'AND (( ~left.cnp_name_isnull AND ~right.cnp_name_isnull ) OR LEFT.support_cnp_name > 0 or (left.active_domestic_corp_key = right.active_domestic_corp_key OR left.active_domestic_corp_key_isnull OR right.active_domestic_corp_key_isnull ) OR ( ~left.active_duns_number_isnull AND ~right.active_duns_number_isnull ) OR ( ~left.company_fein_isnull AND ~right.company_fein_isnull ))\n'
+                      + 'AND ( ~left.prim_name_derived_isnull AND ~right.prim_name_derived_isnull ) AND (~left.company_address_isnull AND ~right.company_address_isnull )\n'                      
+                      ,'BH-578 -- add hack to proxid to speed up attribute matches'}
+
 								],tools.layout_attribute_hacks2);								
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Keys

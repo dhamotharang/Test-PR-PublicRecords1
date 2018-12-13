@@ -46,16 +46,16 @@ statusemail := FileServices.sendemail('sudhir.kasavajjala@lexisnexis.com,michael
 ds := dataset('~thor_data400::watchdog::header_version',{string wtype,string hdr_version,boolean ishdrnew,string issubmitted,string iscompleted},thor,opt);
 
 
-LaunchJobs := map(    count(ds(wtype = 'glb' and hdr_version = build_date and ishdrnew = false and issubmitted = 'Y' and iscompleted = 'Y' )) = 1 => Sequential(_control.fSubmitNewWorkunit(ECL1('nonglb','nonfcra'), _Control.Config.GroupName('36'))),
-                     count(ds(wtype = 'nonglb' and hdr_version = build_date and ishdrnew = false and issubmitted = 'Y' and iscompleted = 'Y' )) = 1 => Sequential(_control.fSubmitNewWorkunit(ECL1('glb_nonen','nonfcra'), _Control.Config.GroupName('36'))),
-										 count(ds(wtype = 'glb_nonen' and hdr_version = build_date and ishdrnew = false and issubmitted = 'Y' and iscompleted = 'Y')) = 1 => Sequential(_control.fSubmitNewWorkunit(ECL1('glb_noneq','nonfcra'), _Control.Config.GroupName('36'))),
-                     count(ds(wtype = 'glb_noneq' and hdr_version = build_date and ishdrnew = false and issubmitted = 'Y' and iscompleted = 'Y')) = 1 => Sequential(_control.fSubmitNewWorkunit(ECL1('glb_nonen_noneq','nonfcra'), _Control.Config.GroupName('36'))),
-                     count(ds(wtype = 'glb_nonen_noneq' and hdr_version = build_date and ishdrnew = false and issubmitted = 'Y' and iscompleted = 'Y')) = 1 => Sequential(_control.fSubmitNewWorkunit(ECL1('nonglb_nonutility','nonfcra'),_Control.Config.GroupName('36'))),
-                     count(ds(wtype = 'nonglb_nonutility' and hdr_version = build_date and ishdrnew = false and issubmitted = 'Y' and iscompleted = 'Y')) = 1 => Sequential(_control.fSubmitNewWorkunit(ECL1('nonutility','nonfcra'), _Control.Config.GroupName('36'))),
-                     count(ds(wtype = 'nonutility' and hdr_version = build_date and ishdrnew = false and issubmitted = 'Y' and iscompleted = 'Y')) = 1 => Sequential(_control.fSubmitNewWorkunit(ECL1('nonglb_noneq','nonfcra'), _Control.Config.GroupName('36'))),
-                     count(ds(wtype = 'nonglb_noneq' and hdr_version = build_date and ishdrnew = false and issubmitted = 'Y' and iscompleted = 'Y')) = 1 => Sequential(_control.fSubmitNewWorkunit(ECL1('supplemental','nonfcra'), _Control.Config.GroupName('36'))),
+LaunchJobs := map(    count(ds(wtype = 'glb' and hdr_version = build_date and ishdrnew = false and issubmitted = 'N' and iscompleted = 'N' )) = 1 => Sequential(_control.fSubmitNewWorkunit(ECL1('nonglb','nonfcra'), _Control.Config.GroupName('36'))),
+                     count(ds(wtype = 'nonglb' and hdr_version = build_date and ishdrnew = false and issubmitted = 'N' and iscompleted = 'N' )) = 1 => Sequential(_control.fSubmitNewWorkunit(ECL1('glb_nonen','nonfcra'), _Control.Config.GroupName('36'))),
+										 count(ds(wtype = 'glb_nonen' and hdr_version = build_date and ishdrnew = false and issubmitted = 'N' and iscompleted = 'N')) = 1 => Sequential(_control.fSubmitNewWorkunit(ECL1('glb_noneq','nonfcra'), _Control.Config.GroupName('36'))),
+                     count(ds(wtype = 'glb_noneq' and hdr_version = build_date and ishdrnew = false and issubmitted = 'N' and iscompleted = 'N')) = 1 => Sequential(_control.fSubmitNewWorkunit(ECL1('glb_nonen_noneq','nonfcra'), _Control.Config.GroupName('36'))),
+                     count(ds(wtype = 'glb_nonen_noneq' and hdr_version = build_date and ishdrnew = false and issubmitted = 'N' and iscompleted = 'N')) = 1 => Sequential(_control.fSubmitNewWorkunit(ECL1('nonglb_nonutility','nonfcra'),_Control.Config.GroupName('36'))),
+                     count(ds(wtype = 'nonglb_nonutility' and hdr_version = build_date and ishdrnew = false and issubmitted = 'N' and iscompleted = 'N')) = 1 => Sequential(_control.fSubmitNewWorkunit(ECL1('nonutility','nonfcra'), _Control.Config.GroupName('36'))),
+                     count(ds(wtype = 'nonutility' and hdr_version = build_date and ishdrnew = false and issubmitted = 'N' and iscompletd = 'N')) = 1 => Sequential(_control.fSubmitNewWorkunit(ECL1('nonglb_noneq','nonfcra'), _Control.Config.GroupName('36'))),
+                     count(ds(wtype = 'nonglb_noneq' and hdr_version = build_date and ishdrnew = false and issubmitted = 'N' and iscompleted = 'N')) = 1 => Sequential(_control.fSubmitNewWorkunit(ECL1('supplemental','nonfcra'), _Control.Config.GroupName('36'))),
                      count(ds(wtype = 'supplemental' and hdr_version = build_date and ishdrnew = false and issubmitted = 'N' and iscompleted = 'N')) = 1  => Sequential(_control.fSubmitNewWorkunit(ECL1('glb','nonfcra'), _Control.Config.GroupName('36'))),
-										 count(ds(wtype = 'supplemental' and hdr_version = build_date and ishdrnew = false and issubmitted = 'Y' and iscompleted = 'Y')) = 1 => Sequential(_control.fSubmitNewWorkunit(ECL2, _Control.Config.GroupName('36'))),
+										 count(ds(wtype = 'supplemental' and hdr_version = build_date and ishdrnew = false and issubmitted = 'N' and iscompleted = 'N')) = 1 => Sequential(_control.fSubmitNewWorkunit(ECL2, _Control.Config.GroupName('36'))),
 										 Output('No Job scheduled')
                      );
 												

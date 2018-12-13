@@ -1,4 +1,4 @@
-﻿Import FraudShared,riskwise,risk_indicators,data_services,CriminalRecords_BatchService,DeathV2_Services,models;
+﻿Import FraudShared,riskwise,risk_indicators,data_services,CriminalRecords_BatchService,DeathV2_Services,models,AppendIpMetadata,std;
 EXPORT fSOAPAppend(boolean	UpdatePii   = _Flags.Update.Pii)	:= MODULE
 
 Shared nodes				:= thorlib.nodes();
@@ -49,6 +49,8 @@ shared death_base 			:= Files().base.death.qa;
 
 shared fraudpoint_base	:= Files().base.fraudpoint.qa;
 
+shared IpAppend_Base		:= Files().base.IpMetaData.qa;
+
 //original soap output files
 
 shared ciid_orig				:= Files().base.ciid_orig.built;
@@ -57,25 +59,6 @@ shared crim_orig				:= Files().base.crim_orig.built;
 
 shared death_orig 			:= Files().base.death_orig.built;
 
-shared fraudpoint_orig 			:= Files().base.fraudpoint_orig.built;
-
-//original soap output files
-
-shared ciid_anon				:= Files().base.ciid_anon.built;
-
-shared crim_anon				:= Files().base.crim_anon.built;
-
-shared death_anon 			:= Files().base.death_anon.built;
-
-//Demo soap files anonymized
-
-shared ciid_demo_anon				:= Files().base.ciid_demo_anon.qa;
-
-shared crim_demo_anon				:= Files().base.crim_demo_anon.qa;
-
-shared death_demo_anon 			:= Files().base.death_demo_anon.qa;
-
-shared fraudpoint_demo 			:= Files().base.fraudpoint_demo.qa;
 
 //Pii
 Export Pii := Module
@@ -266,13 +249,11 @@ shared ciid_base_map	:= Join(pii_input ,ciid_recid_map, left.record_id=right.rec
 
 //Anonymize if needed for a specific source
 
-shared ciid_prep	:= Anonymize.ciid(ciid_base_map).all;
+shared ciid_anon	:= Anonymize.ciid(ciid_base_map).all;
 
 Export orig	:= if(updatepii,dedup((ciid_base_map + ciid_orig),all),ciid_base_map); //Non Anonymzie file
 
-Export	anon	:= if(updatepii,dedup((ciid_prep + ciid_anon),all),ciid_prep); // Anonymized + Non-Anonymzied file
-
-Export all				:= dedup(anon + ciid_demo_anon,all);	//Append demo data
+Export all		:= if(updatepii,dedup((ciid_anon + ciid_base),all),ciid_anon);
 
 END;
 
@@ -282,26 +263,8 @@ service_name	:= 'criminalrecords_batchservice.batchservice';
 soap_host		:= riskwise.shortcuts.prod_batch_analytics_roxie;
 
 layout_in   := CriminalRecords_BatchService.Layouts.batch_in;
+
 layout_out  := CriminalRecords_BatchService.Layouts.batch_out;
-
-//FraudGov only retunring the records for following crim categories. Per GRP-247
-#CONSTANT('includebadchecks', TRUE);
-#CONSTANT('includebribery', TRUE);
-#CONSTANT('ncludeburglarycomm', TRUE);
-#CONSTANT('ncludeburglaryres', TRUE);
-#CONSTANT('ncludeburglaryveh', TRUE);
-#CONSTANT('ncludecomputer', TRUE);
-#CONSTANT('ncludecounterfeit', TRUE);
-#CONSTANT('ncludefraud', TRUE);
-#CONSTANT('ncludeidtheft', TRUE);
-#CONSTANT('ncludemvtheft', TRUE);
-#CONSTANT('ncluderobberycomm', TRUE);
-#CONSTANT('ncluderobberyres', TRUE);
-#CONSTANT('ncludeshoplift', TRUE);
-#CONSTANT('ncludestolenprop', TRUE);
-#CONSTANT('ncludetheft', TRUE);
-#CONSTANT('ncludetraffic', TRUE);
-
 
 layout_in make_batch_in(pii_base L) := TRANSFORM
 	SELF.acctno := (string)l.record_id;
@@ -320,8 +283,36 @@ layout_in make_batch_in(pii_base L) := TRANSFORM
 	SELF := [];
 END;
 
-soap_input := DISTRIBUTE(project(pii_base, make_batch_in(left)),RANDOM() % nodes);
+//Removed the Constant parameters for soap input and added them as flags as in Roxie. GRP-2332
 
+layout_soap := RECORD
+	DATASET(layout_in) batch_in;
+	BOOLEAN IncludeBadChecks:= TRUE;
+	BOOLEAN IncludeBribery:= TRUE;
+	BOOLEAN IncludeBurglaryComm:= TRUE;
+	BOOLEAN IncludeBurglaryRes:= TRUE;
+	BOOLEAN IncludeBurglaryVeh:= TRUE;
+	BOOLEAN IncludeComputer:= TRUE;
+	BOOLEAN IncludeCounterfeit:= TRUE;
+	BOOLEAN IncludeFraud:= TRUE;
+	BOOLEAN IncludeIdTheft:= TRUE;
+	BOOLEAN IncludeMVTheft:= TRUE;
+	BOOLEAN IncludeRobberyComm:= TRUE;
+	BOOLEAN IncludeRobberyRes:= TRUE;
+	BOOLEAN IncludeShoplift:= TRUE;
+	BOOLEAN IncludeStolenProp:= TRUE;
+	BOOLEAN IncludeTheft:= TRUE;
+	BOOLEAN IncludeAtLeast1Offense:= TRUE;
+END;
+
+layout_Soap trans(pii_base L) := TRANSFORM
+	batch := PROJECT(L, make_batch_in(LEFT));
+	SELF.batch_in := batch;
+	self := L;
+END;
+
+soap_input := DISTRIBUTE(project(pii_base, trans(LEFT)),RANDOM() % nodes);
+								
 xlayout := RECORD
 	(layout_out)
 	STRING errorcode;
@@ -337,7 +328,6 @@ soap_results := soapcall( soap_input,
 						service_name,  
 						{soap_input},
 						DATASET(xlayout),
-						HEADING('<batch_in><Row>','</Row></batch_in>'),
 						PARALLEL(threads), 
 						onFail(myFail(LEFT))
 						)
@@ -354,15 +344,12 @@ shared Crim_recid_map	:= Join(Pii_Base_norm, P, left.record_id = right.record_id
 shared Crim_base_map	:= Join(pii_input , Crim_recid_map, left.record_id=right.record_id,Transform(Layouts.Crim
 																	,self.fdn_file_info_id	:= left.fdn_file_info_id,self:=right));
 
-// shared Crim_prep	:= Anonymize.Crim(Crim_base_map).all;
+shared Crim_anon	:= Anonymize.Crim(Crim_base_map).all;
 
-crim_combine	:= dedup((Crim_base_map + crim_orig),record,all);
+Export orig		:= if(updatepii,dedup((Crim_base_map + Crim_orig),all),Crim_base_map);	// Non-Anonymzied file
 
-Export orig		:= if(updatepii, crim_combine,Crim_base_map);	// Non-Anonymzied file
-
-Export all			:= dedup(orig + crim_demo_anon,all); //Append demo data
-
-									
+Export all			:= if(updatepii,dedup((Crim_anon + Crim_base),all),Crim_anon);
+							
 END;
 
 EXPORT Death	:= MODULE
@@ -437,13 +424,11 @@ shared death_base_map	:= Join(pii_input ,Death_recid_map, left.record_id=right.r
 																	,self.fdn_file_info_id	:= left.fdn_file_info_id,self:=right));
 
 //Anonymize if needed for a specific source
-shared Death_prep	:= Anonymize.Death(p).all;
+shared Death_anon	:= Anonymize.Death(death_base_map).all;
 
-Export orig	:= if(updatepii,dedup((p + Death_orig),all),death_base_map);	//Non Anonymzie file
+Export orig	:= if(updatepii,dedup((death_base_map + Death_orig),all),death_base_map);	//Non Anonymzie file
 
-Export anon	:= if(updatepii,dedup((Death_prep + Death_anon),all),Death_prep);	 // Anonymized + Non-Anonymzied file
-
-Export all		:= dedup(anon + Death_demo_anon,all);	//Append demo data
+Export all	:= if(updatepii,dedup((Death_anon + Death_base),all),Death_anon);	
 				
 END;
 
@@ -550,11 +535,19 @@ shared Fp_base_map	:= Join(pii_input ,Fp_recid_map, left.record_id=right.record_
 																	self.did:=left.did,self.fdn_file_info_id	:= left.fdn_file_info_id,self:=right));
 																	
 
-Fp_combine	:= dedup((Fp_base_map + fraudpoint_orig),record,all);
+Fp_combine	:= dedup((Fp_base_map + fraudpoint_base),all);
 
-Export orig		:= if(updatepii, Fp_combine,Fp_base_map);	
+Export all		:= if(updatepii, Fp_combine,Fp_base_map);	 
 
-Export all		:= dedup(orig + FraudPoint_Demo,all);	 //Append demo data
+END;
+
+EXPORT IPMetaData	:= MODULE
+
+IpAppend	:= AppendIpMetadata.macAppendIPMetadata(pii_input,ip_address);
+
+pIpAppend	:= Project(IpAppend, Layouts.IPMetaData);
+
+Export All	:= If(UpdatePii, (pIpAppend + IpAppend_Base) , pIpAppend);
 
 END;
 

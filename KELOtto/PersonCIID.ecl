@@ -368,10 +368,15 @@ newr := RECORD
  END;
 
 
-PersonCIIDAttr := PROJECT(PULL(dataset('~thor_data400::base::fraudgov::qa::ciid',r,flat)), 
+PersonCIIDAttr1 := PROJECT(PULL(dataset('~thor_data400::base::fraudgov::qa::ciid',r,flat)), 
               TRANSFORM(newr, self.did := (UNSIGNED8)left.did, 
 							SELF.Hri := TRIM(LEFT.hri_1) + '|' + TRIM(LEFT.hri_2) + '|' + TRIM(LEFT.hri_3) + '|' + TRIM(LEFT.hri_4) + '|' + TRIM(LEFT.hri_5) + '|' + TRIM(LEFT.hri_6) + '|' + TRIM(LEFT.hri_7) + '|' + TRIM(LEFT.hri_8) + '|' + TRIM(LEFT.hri_9) + '|' + TRIM(LEFT.hri_10) + '|' + TRIM(LEFT.hri_11) + '|' + TRIM(LEFT.hri_12) + '|' + TRIM(LEFT.hri_13) + '|' + TRIM(LEFT.hri_14) + '|' + TRIM(LEFT.hri_15) + '|' + TRIM(LEFT.hri_16) + '|' + TRIM(LEFT.hri_17) + '|' + TRIM(LEFT.hri_18) + '|' + TRIM(LEFT.hri_19) + '|' + TRIM(LEFT.hri_20),
 							SELF := LEFT));
-							
+
+PersonCIIDAttr := JOIN(PersonCIIDAttr1, KELOtto.fraudgov, left.record_id=right.record_id, 
+              TRANSFORM({RECORDOF(LEFT), UNSIGNED8 OttoAddressId}, 
+              SELF.OttoAddressId := HASH32(RIGHT.address_1, RIGHT.address_2),
+              SELF := LEFT), KEEP(1), HASH);
+
 EXPORT PersonCIID := JOIN(KELOtto.CustomerLexId, PersonCIIDAttr, LEFT.did=(INTEGER)RIGHT.did, TRANSFORM({LEFT.AssociatedCustomerFileInfo, RECORDOF(RIGHT)}, SELF := RIGHT, SELF := LEFT), HASH, KEEP(1));
 

@@ -80,7 +80,8 @@ end;
 office_w_iso2 := join(office_w_area, Ares.Files.ds_country, left.primary_country_id = right.id, xform_iso(left, right));
 
 layout_expanded xform_countryname(office_w_iso2 l, Ares.Files.ds_country r) := transform
-	self.country_name := r.summary.names.names(type='Country Name')[1].value;
+	country_name := r.summary.names.names(type='Country Name')[1].value;
+	self.country_name := if(country_name = 'USA', 'United States', country_name);
 	self := l;
 end;
 
@@ -90,6 +91,6 @@ office_w_country_name := join(office_w_iso2, Ares.Files.ds_country, left.primary
 
 
 
-EXPORT file_office_flat := office_w_country_name;
+EXPORT file_office_flat := office_w_country_name  : persist('persist::ares::file_office_flat');;
 
 

@@ -1,4 +1,4 @@
-IMPORT ut, Scrubs, Codes;
+﻿IMPORT ut, Scrubs, Codes;
 
 EXPORT Functions := MODULE
 
@@ -27,11 +27,12 @@ EXPORT Functions := MODULE
   // Class C - Any single vehicle, or combination of vehicles, that does not meet the definition of Class A or Class B, but is either designed to transport 16 or more passengers, including the driver, or is placarded for hazardous materials. (Holders of a Class C license may, with any appropriate endorsements, operate all vehicles within Classes C and D).
   // Class D - Any single passenger vehicle or combination, except a semi-trailer unit, truck-trailer combination, tractor, or truck with a gross vehicle weight rating (GVWR) over 26,000 lbs., bus or school bus.
   // Class M - A motorcycle or any other motor vehicle having a seat or saddle for the rider and designed to travel with no more than three wheels in contact with the ground.
+  // Class I - Identification card.
   //****************************************************************************
   EXPORT fn_verify_lic_class(STRING code) := FUNCTION
 	  uc_code := ut.CleanSpacesAndUpper(code);
     isValidCode	:= CASE(LENGTH(uc_code),
-                        1 => IF(Stringlib.StringFilterOut(uc_code[1], 'ABCDM') = '', TRUE, FALSE),
+                        1 => IF(Stringlib.StringFilterOut(uc_code[1], 'ABCDMI') = '', TRUE, FALSE),
                         2 => IF(Stringlib.StringFilterOut(uc_code[1], 'ABCD')  = ''  AND 
                                 Stringlib.StringFilterOut(uc_code[2], 'M')     = '', TRUE, FALSE),
                         FALSE);
@@ -67,8 +68,22 @@ EXPORT Functions := MODULE
   //                  a valid state abbreviation.
 	//****************************************************************************
 	EXPORT fn_verify_state(STRING code) := function    
-		RETURN IF(LENGTH(Codes.St2Name(code)) > 0, 1, 0);
+		RETURN IF(LENGTH(ut.CleanSpacesAndUpper(Codes.St2Name(code))) > 0, 1, 0);
   END;
 
+
+  //****************************************************************************
+	//fn_verify_zip:  returns true or false based upon whether or not the zip is 
+  //                  valid for a given US address.
+	//****************************************************************************
+	EXPORT fn_verify_zip(STRING zip, string code) := function    
+		RETURN IF(LENGTH(ut.CleanSpacesAndUpper(Codes.St2Name(code))) > 0,
+								if(Stringlib.StringFilterOut(zip, '0123456789') = '' , 
+										1, 
+										0
+									 ),
+								1
+							 );
+  END;
 
 END; //End Functions Module

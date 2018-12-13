@@ -90,6 +90,14 @@ module
       ,'comment out match history.  not needed and fails anyway.\n'
     
     }
+
+    ,{
+       ':= MODULE'
+      ,'HACK INLINE FOR ROXIE'
+      ,':= INLINE MODULE/*HACK INLINE FOR ROXIE*/'
+      ,'ADD INLINE TO MODULE DEFINITION FOR ROXIE\n'
+    
+    }
     ],tools.layout_attribute_hacks);
     RETURN tools.HackAttribute(pModule,pAttribute,dme,pShouldSaveAttribute).saveit;
   END;
@@ -167,6 +175,13 @@ module
         + 'J2 := SORT(R,Seleid2,dedup_val);\n'
         + '/*HACKS END*/'
       ,'recreate manually the dist,group, and sort for notelink join'
+    ,{
+       ':= MODULE'
+      ,'HACK INLINE FOR ROXIE'
+      ,':= INLINE MODULE/*HACK INLINE FOR ROXIE*/'
+      ,'ADD INLINE TO MODULE DEFINITION FOR ROXIE\n'
+    
+    }
     }
     ],tools.layout_attribute_hacks);
     RETURN tools.HackAttribute(pModule,pAttribute,dme,pShouldSaveAttribute).saveit;

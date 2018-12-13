@@ -55,8 +55,7 @@ export proc_postHeaderBuilds := module
 
 		#stored ('buildname', 'PersonHeader'   ); 
 		#stored ('version'  , header.version_build); 
-		#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com'    ); 
-
+		
 		thor1:='thor400_44';
 		thor2:='thor400_36';
 
@@ -69,7 +68,8 @@ export proc_postHeaderBuilds := module
 		build_slimsorts      := header_slimsort.Proc_Make_Name_xxx(thor1, thor2)
 		: success(sequential(output('XADL1keys completed'),header.msg('XADL1keys completed',elist_owners).good))
 		;
-		step:='Yogurt:'+Header.version_build+' XADL keys and externals base files';
+		// step:='Yogurt:'+Header.version_build+' XADL keys and externals base files';
+		step:=Header.version_build+' XADL keys and externals base files';
 		#WORKUNIT('name', step);
 		cmpltd:=step+' completed';
 		failed:=step+' failed';
@@ -80,10 +80,9 @@ export proc_postHeaderBuilds := module
                                         ,checkLinkingVersion(header.version_build)
                                         ,bld_Transunion_LN
                                         ,bld_Transunion_Ptrak
-                                        // ,notify('Build_Relatives','*')
                                         ,build_slimsorts
                                         ,nothor(Header.Proc_Copy_From_Alpha.CopyOthers)
-                                        ,Header.Proc_Copy_RemoteLinkingKeys_From_Alpha(version)
+                                        ,Header.Proc_Copy_RemoteLinkingKeys_From_Alpha(header.version_build)
                                         ,header.LogBuild.single('Completed :'+step)
                                         )
                                         :success(header.msg(cmpltd,elist_owners).good)
@@ -94,9 +93,9 @@ export proc_postHeaderBuilds := module
 		
 		#stored ('buildname', 'PersonHeader'   ); 
 		#stored ('version'  , header.version_build); 
-		#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com;debendra.kumar@lexisnexisrisk.com'    ); 
-
-		step:='Yogurt:'+Header.version_build+' Relative and HHID base files';
+		
+		// step:='Yogurt:'+Header.version_build+' Relative and HHID base files';
+		step:=Header.version_build+' Relative and HHID base files';
 		#WORKUNIT('name', step);
 		cmpltd:=step+' completed';
 		failed:=step+' failed';
@@ -122,7 +121,6 @@ export proc_postHeaderBuilds := module
                                             ,if(Header.version_build<>fn[sub..],fail('Header base does not match version'))
                                             ,checkLinkingVersion(header.version_build)
                                             ,parallel(make_hhid	,make_fcra_hhid)
-                                            // ,notify('Build_Header_Keys','*')
                                             ,header.LogBuild.single('Completed :'+step)
                                             )
                                             :success(header.msg(cmpltd,elist_owners).good)
@@ -133,10 +131,10 @@ export proc_postHeaderBuilds := module
 		
 		#stored ('buildname', 'PersonHeader'   ); 
 		#stored ('version'  , header.version_build); 
-		#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com'    );
 		#stored ('build_operator', _control.MyInfo.EmailAddressNotify );
 
-		step:='Yogurt:'+Header.version_build+' Header, slimsorts, and relative Keys';
+		// step:='Yogurt:'+Header.version_build+' Header, slimsorts, and relative Keys';
+		step:=Header.version_build+' Header, slimsorts, and relative Keys';
 		#WORKUNIT('name', step);
 		
 		cmpltd
@@ -155,10 +153,6 @@ export proc_postHeaderBuilds := module
                                             ,if(Header.version_build<>fn[sub..sub+7],fail('Header base does not match version'))
                                             ,checkLinkingVersion(header.version_build)
                                             ,Doxie.Proc_Doxie_Keys_All()
-                                            // ,output(verify_keys('PersonHeaderKeys'),named('PersonHeaderKeys'))
-                                            // ,output(verify_keys('RelativeKeys'),named('RelativeKeys'))
-                                            // ,output(verify_keys('PersonSlimsortKeys'),named('PersonSlimsortKeys'))
-                                            // ,notify('Finalize_Header_build','*')
                                             ,Header.Proc_Copy_To_Alpha(header.version_build)
                                             ,if(isQuarterly, misc.header_hash_split, output('Hash files are not created in this build'))
                                             ,header.LogBuild.single('Completed :'+step)
@@ -171,8 +165,7 @@ export proc_postHeaderBuilds := module
 		
 		#stored ('buildname', 'PersonHeader'   ); 
 		#stored ('version'  , header.version_build); 
-		#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com'    ); 
-
+		
 		step:=Header.version_build+' Move header_raw and source keys to prod';
 		#WORKUNIT('name', step);
 		cmpltd:=step+' completed';
@@ -185,10 +178,7 @@ export proc_postHeaderBuilds := module
                                             ,checkLinkingVersion(header.version_build)
                                             ,nothor(Header.move_header_raw_to_prod())
                                             ,Header.Proc_Copy_From_Alpha.MoveToQA
-                                            // ,output(Verify_XADL1_base_files,named('XADLfiles'),all)
                                             ,header.Proc_Accept_SRC_toQA()
-                                            // ,output(verify_keys('SourceKeys'),named('SourceKeys'))
-                                            // ,notify('Build_FCRA_Header','*')
                                             ,notify('build_property_full','*')
                                             ,header.LogBuild.single('Completed :'+step)
                                             )
@@ -201,9 +191,9 @@ export proc_postHeaderBuilds := module
 		
 		#stored ('buildname', 'PersonHeader'   ); 
 		#stored ('version'  , header.version_build); 
-		#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com'    ); 
-
-		step:='Yogurt:'+Header.version_build+' FCRA Header and keys';
+		
+		// step:='Yogurt:'+Header.version_build+' FCRA Header and keys';
+		step:=Header.version_build+' FCRA Header and keys';
 		#WORKUNIT('name', step);
 		cmpltd:=step+' completed';
 		failed:=step+' failed';
@@ -212,8 +202,6 @@ export proc_postHeaderBuilds := module
                                         ,if(Header.version_build<>fn[sub..sub+7],fail('Header base does not match version'))
                                         ,checkLinkingVersion(header.version_build)
                                         ,Doxie.Proc_FCRA_Doxie_keys_All(,,header.version_build)
-                                        // ,output(verify_keys('FCRA_PersonHeaderKeys',true),named('FCRA_PersonHeaderKeys'))
-                                        // ,notify('Build_Header_boolean','*')
                                         ,header.LogBuild.single('Completed :'+step)
                                         )
                                         :success(header.msg(cmpltd,elist_fcra).good)
@@ -225,10 +213,9 @@ export proc_postHeaderBuilds := module
 		
 		#stored ('buildname', 'PersonHeader'   ); 
 		#stored ('version'  , header.version_build); 
-		#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com'    ); 
-
-
-		step:='Yogurt:'+Header.version_build+' PowerSearch Keys';
+		
+		// step:='Yogurt:'+Header.version_build+' PowerSearch Keys';
+		step:=Header.version_build+' PowerSearch Keys';
 		#WORKUNIT('name', step);
 		cmpltd:=step+' completed';
 		failed:=step+' failed';
@@ -237,7 +224,6 @@ export proc_postHeaderBuilds := module
                                             ,if(Header.version_build<>fn[sub..sub+7],fail('Header base does not match version'))
                                             ,checkLinkingVersion(header.version_build)
                                             ,Text_FragV1.Build_PowerSearch_Keys(Header.version_build)
-                                            // ,output(verify_keys('PowerSearchKeys',,true),named('PowerSearchKeys'))
                                             ,header.LogBuild.single('Completed :'+step)
                                             )
                                             :success(header.msg(cmpltd,elist_owners).good)

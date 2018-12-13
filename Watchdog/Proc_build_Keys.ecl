@@ -1,6 +1,6 @@
-import ut,lib_keylib,lib_fileservices,RoxieKeybuild,Orbit3,Suppress,_control,header;
+﻿import ut,lib_keylib,lib_fileservices,RoxieKeybuild,Orbit3,Suppress,_control,header;
 
-leMailTarget := 'dataops@seisint.com';
+leMailTarget := 'dataops@seisint.com;michael.gould@lexisnexisrisk.com';
 
 // Get filedate from the watchdog check file
 
@@ -125,7 +125,7 @@ file_remove := sequential(
 
 
 email_success := fileservices.sendemail(
-										'roxiebuilds@seisint.com;sudhir.kasavajjala@lexisnexis.com',
+										'roxiebuilds@seisint.com;sudhir.kasavajjala@lexisnexis.com;michael.gould@lexisnexis.com',
 										'Watchdog Weekly Build Succeeded - ' + filedate,
 										'Keys:\n' +
 										
@@ -149,16 +149,13 @@ email_success := fileservices.sendemail(
 										);
 
 email_failure := fileservices.sendemail(
-										'roxiebuilds@seisint.com;;sudhir.kasavajjala@lexisnexis.com',
+										'roxiebuilds@seisint.com;sudhir.kasavajjala@lexisnexis.com;michael.gould@lexisnexisrisk.com',
 										'Watchdog Weekly Roxie Build Failed - ' + filedate,
 										failmessage
 										);
 										
-update_version := RoxieKeyBuild.updateversion('WatchdogKeys',filedate,'skasavajjala@seisint.com',,'N|B');
+update_version := RoxieKeyBuild.updateversion('WatchdogKeys',filedate,'michael.gould.lexisnexisrisk.com@seisint.com',,'N|B');
 create_build := Orbit3.proc_Orbit3_CreateBuild('Watchdog Best',filedate,'N|B');
-//update_idops := RoxieKeyBuild.updateversion('WatchdogKeys',filedate,'skasavajjala@seisint.com',,'N',,,'A');
-
-//create_build := Proc_OrbitI_CreateBuild(filedate);
 										
 export Proc_build_Keys := sequential(wchk,build_keys,move_to_built,move_keys
 			,parallel(eighth_key,eighthDotOne_key),mv8,mv8_1,move8,move8_1 // builds off seventh key and uses MOXIE out file that will be deleted

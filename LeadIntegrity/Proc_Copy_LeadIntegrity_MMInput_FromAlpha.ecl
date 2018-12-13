@@ -1,6 +1,6 @@
 ﻿EXPORT Proc_Copy_LeadIntegrity_MMInput_FromAlpha(Version,dali='Prod',ProcToRun=1) := FUNCTIONMACRO
 
-import std,_control;
+import std,_control, LeadIntegrity.Constants;
 
 //******************************************************************************************************************
 //**                                Copy Lead Integrity Input Data from Alpha Dev to Boca
@@ -11,21 +11,21 @@ destGrp 		:= _Control.TargetGroup.Thor400_44;
 sourceDali 	:= if (dali = 'Dev',_Control.IPAddress.adataland_dali, _Control.IPAddress.aprod_thor_dali);
 
 
-srce01_of_15 				:= '~in::marketmagnifier::leadintegrity::' + Version + '_01_of_15';
-srce02_of_15 				:= '~in::marketmagnifier::leadintegrity::' + Version + '_02_of_15';
-srce03_of_15 				:= '~in::marketmagnifier::leadintegrity::' + Version + '_03_of_15';
-srce04_of_15 				:= '~in::marketmagnifier::leadintegrity::' + Version + '_04_of_15';
-srce05_of_15 				:= '~in::marketmagnifier::leadintegrity::' + Version + '_05_of_15';
-srce06_of_15 				:= '~in::marketmagnifier::leadintegrity::' + Version + '_06_of_15';
-srce07_of_15 				:= '~in::marketmagnifier::leadintegrity::' + Version + '_07_of_15';
-srce08_of_15 				:= '~in::marketmagnifier::leadintegrity::' + Version + '_08_of_15';
-srce09_of_15 				:= '~in::marketmagnifier::leadintegrity::' + Version + '_09_of_15';
-srce10_of_15 				:= '~in::marketmagnifier::leadintegrity::' + Version + '_10_of_15';
-srce11_of_15 				:= '~in::marketmagnifier::leadintegrity::' + Version + '_11_of_15';
-srce12_of_15 				:= '~in::marketmagnifier::leadintegrity::' + Version + '_12_of_15';
-srce13_of_15 				:= '~in::marketmagnifier::leadintegrity::' + Version + '_13_of_15';
-srce14_of_15 				:= '~in::marketmagnifier::leadintegrity::' + Version + '_14_of_15';
-srce15_of_15 				:= '~in::marketmagnifier::leadintegrity::' + Version + '_15_of_15';
+srce01_of_15 				:= '~in::marketmagnifier' + LeadIntegrity.Constants.ExtraPrefix + '::leadintegrity::' + Version + '_01_of_15';
+srce02_of_15 				:= '~in::marketmagnifier' + LeadIntegrity.Constants.ExtraPrefix + '::leadintegrity::' + Version + '_02_of_15';
+srce03_of_15 				:= '~in::marketmagnifier' + LeadIntegrity.Constants.ExtraPrefix + '::leadintegrity::' + Version + '_03_of_15';
+srce04_of_15 				:= '~in::marketmagnifier' + LeadIntegrity.Constants.ExtraPrefix + '::leadintegrity::' + Version + '_04_of_15';
+srce05_of_15 				:= '~in::marketmagnifier' + LeadIntegrity.Constants.ExtraPrefix + '::leadintegrity::' + Version + '_05_of_15';
+srce06_of_15 				:= '~in::marketmagnifier' + LeadIntegrity.Constants.ExtraPrefix + '::leadintegrity::' + Version + '_06_of_15';
+srce07_of_15 				:= '~in::marketmagnifier' + LeadIntegrity.Constants.ExtraPrefix + '::leadintegrity::' + Version + '_07_of_15';
+srce08_of_15 				:= '~in::marketmagnifier' + LeadIntegrity.Constants.ExtraPrefix + '::leadintegrity::' + Version + '_08_of_15';
+srce09_of_15 				:= '~in::marketmagnifier' + LeadIntegrity.Constants.ExtraPrefix + '::leadintegrity::' + Version + '_09_of_15';
+srce10_of_15 				:= '~in::marketmagnifier' + LeadIntegrity.Constants.ExtraPrefix + '::leadintegrity::' + Version + '_10_of_15';
+srce11_of_15 				:= '~in::marketmagnifier' + LeadIntegrity.Constants.ExtraPrefix + '::leadintegrity::' + Version + '_11_of_15';
+srce12_of_15 				:= '~in::marketmagnifier' + LeadIntegrity.Constants.ExtraPrefix + '::leadintegrity::' + Version + '_12_of_15';
+srce13_of_15 				:= '~in::marketmagnifier' + LeadIntegrity.Constants.ExtraPrefix + '::leadintegrity::' + Version + '_13_of_15';
+srce14_of_15 				:= '~in::marketmagnifier' + LeadIntegrity.Constants.ExtraPrefix + '::leadintegrity::' + Version + '_14_of_15';
+srce15_of_15 				:= '~in::marketmagnifier' + LeadIntegrity.Constants.ExtraPrefix + '::leadintegrity::' + Version + '_15_of_15';
 
 
 
