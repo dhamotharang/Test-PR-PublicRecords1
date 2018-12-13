@@ -77,16 +77,10 @@ module
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Crim_Demo,Layouts.Crim,Crim_Demo);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Death_Demo,Layouts.Death,Death_Demo);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.FraudPoint_Demo,Layouts.FraudPoint,FraudPoint_Demo);
-		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.CIID_Demo_Anon,Layouts.CIID,CIID_Demo_Anon);
-		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Crim_Demo_Anon,Layouts.Crim,Crim_Demo_Anon,,,,,,true);
-		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Death_Demo_Anon,Layouts.Death,Death_Demo_Anon);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.CIID_Orig,Layouts.CIID,CIID_Orig,,,,,,true);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Crim_Orig,Layouts.Crim,Crim_Orig,,,,,,true);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Death_Orig,Layouts.Death,Death_Orig,,,,,,true);
-		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.FraudPoint_Orig,Layouts.FraudPoint,FraudPoint_Orig,,,,,,true);
-		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.CIID_Anon,Layouts.CIID,CIID_Anon,,,,,,true);
-		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Crim_Anon,Layouts.Crim,Crim_Anon,,,,,,true);
-		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Death_Anon,Layouts.Death,Death_Anon,,,,,,true);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.IPMetaData,Layouts.IPMetaData,IPMetaData,,,,,,true);
 	end;
 
 	export OutputF := module

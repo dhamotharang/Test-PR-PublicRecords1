@@ -1,6 +1,6 @@
 ﻿import _Control, NAC;
 
-EVERY_DAY_AT_6AM := '0 10 * * *';
+EVERY_DAY_AT_6AM := '0 11 * * *';
 
 IP			:= 	NAC.Constants.LandingZoneServer;
 RootDir		:= 	NAC.Constants.LandingZonePathBase + '/msh/done/';
@@ -13,7 +13,7 @@ lECL1 :=
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
 +'email(string msg):=fileservices.sendemail(\n'
-+'   \'oscar.barrientos@lexisnexis.com\'\n'
++'   FraudGovPlatform_Validation.Mailing_List().Alert\n'
 +' 	 ,\'FraudGov NAC Input Prep\'\n'
 +' 	 ,msg\n'
 +' 	 +\'Build wuid \'+workunit\n'

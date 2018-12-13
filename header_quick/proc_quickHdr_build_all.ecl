@@ -87,6 +87,7 @@ export proc_quickHdr_build_all (string sourceIP) := function
                     ,header_quick._config.set_v_eq_as_of_date
                     ,doWeekly
                     ,doMonthly
+                    ,notify('Header Ingest Scheduler', '*')
                     ,Inputs_Clear
                     ,Inputs_Set(filedate)
                     ,buildAll

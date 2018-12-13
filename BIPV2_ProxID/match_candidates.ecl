@@ -612,7 +612,7 @@ SALT311.MAC_Choose_JoinType(j1,s.nulls_active_enterprise_number,Specificities(ih
 SHARED j0_dist := DISTRIBUTE(j0, HASH(Proxid));
 SHARED Annotated_NoDedup := j0_dist : PERSIST('~temp::Proxid::BIPV2_ProxID::mc_nodedup',EXPIRE(BIPV2_ProxID.Config.PersistExpire)); // No dedup- for aggressive slicing
 SHARED Annotated_Dedup := IF(Config.FastSlice, j0_dist, MAC_RollupCandidates(Annotated_NoDedup, fieldListWithPropFlags, fieldList, FALSE));
-SHARED Annotated := Annotated_Dedup : PERSIST('~temp::Proxid::BIPV2_ProxID::mc',EXPIRE(BIPV2_ProxID.Config.PersistExpire)); // Distributed for keybuild case
+export Annotated := Annotated_Dedup : PERSIST('~temp::Proxid::BIPV2_ProxID::mc',EXPIRE(BIPV2_ProxID.Config.PersistExpire)); // Distributed for keybuild case
  
 //Now prepare candidate file for SrcRidVlid attribute file
 layout_SrcRidVlid_candidates add_SrcRidVlid_active_enterprise_number(layout_SrcRidVlid_candidates le,Specificities(ih).active_enterprise_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM

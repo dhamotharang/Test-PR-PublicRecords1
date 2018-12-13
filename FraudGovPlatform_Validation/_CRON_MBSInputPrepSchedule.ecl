@@ -1,6 +1,6 @@
 ﻿import _Control;
 
-EVERY_DAY_AT_5AM := '0 9 * * *';
+EVERY_DAY_AT_5AM := '0 10 * * *';
 IP				:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		_control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
 RootDir		:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		Constants.MBSLandingZonePathBase_dev,	Constants.MBSLandingZonePathBase_prod);
 ThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		Constants.ThorName_Dev,	Constants.ThorName_Prod);
@@ -12,7 +12,7 @@ lECL1 :=
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
 +'email(string msg):=fileservices.sendemail(\n'
-+'   \'oscar.barrientos@lexisnexis.com\'\n'
++'   FraudGovPlatform_Validation.Mailing_List().Alert\n'
 +' 	 ,\'FraudGov MBS Input Prep\'\n'
 +' 	 ,msg\n'
 +' 	 +\'Build wuid \'+workunit\n'

@@ -6,7 +6,7 @@ EXPORT MAC_Scrubs_Report(BuildDate,myFolder,scopename,version,inputFile,MemailLi
 	scope_datasetName		:=	IF(TRIM(scopename,ALL)<>'',scopename+'_'+datasetName,datasetName);
 	profilename				:=	'Scrubs_FraudGov_'+scopename+'_v'+version;
 	
-	myEmail		:=	_Control.MyInfo.EmailAddressNotify;		//	Email address to send notifications
+	myEmail		:=	FraudGovPlatform.Email_Notification_Lists().BuildSuccess;		//	Email address to send notifications
 	// F	:=	inFile(process_date=filedate);						//	Records to scrub
 	F	:=	inFile;																				//	Records to scrub
 	S	:=	folder.#EXPAND(scrubs_name);									//	My scrubs module

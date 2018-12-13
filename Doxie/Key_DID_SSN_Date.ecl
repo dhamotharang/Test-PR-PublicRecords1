@@ -1,4 +1,4 @@
-import doxie_build, doxie, header_services, data_services;
+﻿import doxie_build, doxie, header_services, data_services;
 export Key_DID_SSN_Date(boolean IsFCRA = false) := function
 
 Suppression_Layout 	:= header_services.Supplemental_Data.layout_in;
@@ -20,7 +20,7 @@ slim_rec GetRightJoinInfo(slim_rec R) := transform
 	
 // NOTE: using doxie.Key_DID_SSN_Date will not work on all HPCC systems due to memory availability.
 //dsd_tmp := doxie.Key_DID_SSN_Date;
-dsd_in := if(isFCRA,doxie_build.file_FCRA_header_building,doxie_build.file_header_building);
+dsd_in := if(isFCRA,doxie_build.file_FCRA_header_built,doxie_build.file_header_building);
 
 dsd_tmp := doxie.DID_SSN_Date(dsd_in);
 

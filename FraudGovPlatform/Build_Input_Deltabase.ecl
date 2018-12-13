@@ -127,7 +127,7 @@ module
 	NotInMbs := join(f1,
 								MBS(Deltabase = 1),
 										left.Customer_Account_Number =(string)right.gc_id and
-										left.ind_type = right.ind_type,
+										left.Deltabase = right.Deltabase,
 										TRANSFORM(Layouts.Input.Deltabase,SELF := LEFT),LEFT ONLY, lookup);
 	//Exclude Errors
 	shared ByPassed_records := f1_errors + NotInMbs;

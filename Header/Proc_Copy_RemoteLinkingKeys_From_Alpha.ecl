@@ -3,17 +3,10 @@
 EXPORT Proc_Copy_RemoteLinkingKeys_From_Alpha(string filedate) := FUNCTION
 
   import std,_control;
-  step:='Yogurt:'+Header.version_build+' COPY ALPHA Remote Linking Keys...';
-  
-#WORKUNIT('name', step);
-#stored ('emailList', 'debendra.kumar@lexisnexisrisk.com'); 
-
-  cmpltd:=step+' completed';
-  failed:=step+' failed';
   
   fc(string f1, string f2):= sequential(
            output(dataset([{f1,'thor400_44',f2}],{string src,string clsr, string trg}),named('copy_report'),extend),
-           if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_44',f2,,,,,true,true,,true))
+           if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_44','~' + f2,,,,,true,true,,true))
            );
   
   aDali := _control.IPAddress.aprod_thor_dali;
@@ -22,7 +15,7 @@ EXPORT Proc_Copy_RemoteLinkingKeys_From_Alpha(string filedate) := FUNCTION
   sSufx := '::full::current';
   
   get_alogical(string sf):= nothor(fileservices.GetSuperFileSubName(lc+sf,1));
-
+  
   copyKeys := sequential(
      fc(get_alogical(aPref + 'specificities' + sSufx) , aPref + 'specificities::' + filedate + '::publish')
     ,fc(get_alogical(aPref + 'ssn' + sSufx)           , aPref + 'ssn::' + filedate + '::publish')
@@ -54,17 +47,16 @@ EXPORT Proc_Copy_RemoteLinkingKeys_From_Alpha(string filedate) := FUNCTION
     );
   
   QAfiles := STD.File.logicalfilelist('thor_data400::insuranceheader_remotelinking::did::word*::qa::current',FALSE,TRUE);
+    
   moveKeys := sequential(    
         STD.File.StartSuperFileTransaction( )
-       ,nothor(apply(QAfiles, STD.File.PromoteSuperFileList(['~' + name, '~' + regexreplace('::qa', name, '::father')], '~' + regexreplace('qa::current', name, filedate))))
+       ,nothor(apply(QAfiles, STD.File.PromoteSuperFileList(['~' + name, '~' + regexreplace('::qa', name, '::father')], '~' + regexreplace('qa::current', name, filedate) + '::publish')))
        ,STD.File.FinishSuperFileTransaction( )
        );
   
   seq := sequential(
-          header.LogBuild.single('Started :'+step),
           copyKeys,
-          moveKeys,
-          header.LogBuild.single('Completed :'+step)
+          moveKeys
           );
   return seq;
    

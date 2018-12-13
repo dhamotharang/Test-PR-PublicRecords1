@@ -187,7 +187,9 @@ EXPORT Layouts := MODULE
 			string		reason_cleared_code;
 			string100 source_input := 'Contributory';
 		END;
-
+		EXPORT SafeList	:= RECORD
+			KnownFraud;
+		END;
 		EXPORT Deltabase := RECORD
 			unsigned6	InqLog_ID;
 			string20	customer_account_number;
@@ -780,4 +782,64 @@ Export CIID := RECORD
 	unsigned6 fdn_file_info_id;
  END;
  
+ Export IPMetaData	:= RECORD
+  unsigned6 did;
+  string25 ip_address;
+	unsigned8 Record_ID;
+	unsigned6 fdn_file_info_id;
+  string20 iprngbeg;
+  string20 iprngend;
+  string5 edgecountry;
+  string10 edgeregion;
+  string60 edgecity;
+  string10 edgeconnspeed;
+  unsigned8 edgemetrocode;
+  string10 edgelatitude;
+  string10 edgelongitude;
+  string10 edgepostalcode;
+  unsigned8 edgecountrycode;
+  unsigned8 edgeregioncode;
+  unsigned8 edgecitycode;
+  unsigned8 edgecontinentcode;
+  string5 edgetwolettercountry;
+  unsigned8 edgeinternalcode;
+  string20 edgeareacodes;
+  unsigned8 edgecountryconf;
+  unsigned8 edgeregionconf;
+  unsigned8 edgecitycong;
+  unsigned8 edgepostalconf;
+  integer8 edgegmtoffset;
+  string5 edgeindst;
+  string10 siccode;
+  string70 domainname;
+  string200 ispname;
+  string10 homebiztype;
+  unsigned8 asn;
+  string200 asnname;
+  string40 primarylang;
+  string105 secondarylang;
+  string15 proxytype;
+  string15 proxydescription;
+  string5 isanisp;
+  string70 companyname;
+  string10 ranks;
+  string10 households;
+  string10 women;
+  string10 women18to34;
+  string10 women35to49;
+  string10 men;
+  string10 men18to34;
+  string10 men35to49;
+  string10 teens;
+  string10 kids;
+  unsigned8 naicscode;
+  unsigned8 cbsacode;
+  string55 cbsatitle;
+  string10 cbsatype;
+  unsigned8 csacode;
+  string55 csatitle;
+  unsigned8 mdcode;
+  string55 mdtitle;
+  string100 organizationname;
+ END;
 END;
