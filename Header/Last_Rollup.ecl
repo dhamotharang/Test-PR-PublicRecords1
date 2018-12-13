@@ -1,5 +1,7 @@
 import ut,did_add,mdr,idl_header;
 
+export Last_Rollup(string filedate) := FUNCTION
+
 inf := distribute(header.with_tnt,hash(did))(src<>'D$');
 
 //-- Slim record to ease the join burdone
@@ -175,9 +177,11 @@ BR_s := sort(dinfile, rid,dt_vendor_last_reported,dt_vendor_first_reported,dt_la
 
 merged := rollup(BR_s,left.rid=right.rid,header.tra_merge_headers(left,right),local);
 
-fix_dates  := header.fn_fix_dates(merged);
+fix_dates  := header.fn_fix_dates(merged,,filedate);
 set_titles := header.fn_apply_title(fix_dates);
 
 if ( count(set_titles(did>rid)) <> 0, output('DID > RID constraint violated') );
 
-export Last_Rollup := (set_titles + Dummy_records.NonFCRAseed) : persist('persist::last_rollup');
+_Last_Rollup := (set_titles + Dummy_records.NonFCRAseed) : persist('persist::last_rollup');
+return _Last_Rollup;
+END;

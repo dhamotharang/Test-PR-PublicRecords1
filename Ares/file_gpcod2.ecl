@@ -10,7 +10,7 @@ w_location_layout xform_w_location(rcodes l, file_office_flat r) := transform
 	self.location_id := r.tfpuid;
 	self := l;
 end;
-w_location := join(rcodes , file_office_flat, left.primaryOfficeID = right.id, xform_w_location(left, right), keep(1));
+w_location := join(rcodes , file_office_flat, left.primaryOfficeID = right.id, xform_w_location(left, right));
 
 w_department_layout := record(recordof(w_location))
 	string department_type;
@@ -21,7 +21,7 @@ w_department_layout xform_w_dep(w_location l, files.ds_department r) := transfor
 	self := l;
 end;
 
-w_department := join(w_location, files.ds_department, left.department = right.id, xform_w_dep(left, right), keep(1));
+w_department := join(w_location, files.ds_department, left.department = right.id, xform_w_dep(left, right), left outer, keep(1));
 
 w_dep_type_layout := record(recordof(w_department))
 	string dep_type;
@@ -34,7 +34,7 @@ w_dep_type_layout xform_add_dep_type(w_department l, dep_func_lookups r) := tran
 	self := l;
 end;
 
-w_dep_type := join(w_department, dep_func_lookups, left.department_type = right.id, xform_add_dep_type(left, right), keep(1));
+w_dep_type := join(w_department, dep_func_lookups, left.department_type = right.id, xform_add_dep_type(left, right),left outer, keep(1));
 
 w_prim_city_layout := record(recordof(w_dep_type))
 	string prim_city;
@@ -78,11 +78,14 @@ layout_gpcod2 xform_final(w_rc_lookups l, integer c) := Transform
 	self.Accuity_Location_ID := l.location_id;
 	self.Department_Function :=  if(l.codeType = 'ABA',  l.dep_type, 'MAIN');
 	self.Routing_Code_Alternate_Presentation := l.routing_raw;
-	self.Routing_Code := if(l.routingnumber_alt != '', 	l.routingnumber_alt, 
-																											if(l.rc_mask != '', Ares.str_functions.mask(l.routing_raw, l.rc_mask),l.routing_raw ));
+	self.Routing_Code := MAP(self.Routing_Type = 'SWIFT' => Ares.str_functions.pad(l.routing_raw,'<','X',11),
+													 self.Routing_Type = 'BIC' => Ares.str_functions.pad(l.routing_raw,'<','X',11),
+													 l.routingnumber_alt != '' => 	l.routingnumber_alt, 
+													 l.rc_mask != '' => Ares.str_functions.mask(l.routing_raw, l.rc_mask),
+													 l.routing_raw );
 	self := l;
 End;
 
 final := Project(w_rc_lookups, xform_final(left, counter));
 
-EXPORT file_gpcod2 := final;
+EXPORT file_gpcod2 := final : persist('persist::ares::routingcodes');

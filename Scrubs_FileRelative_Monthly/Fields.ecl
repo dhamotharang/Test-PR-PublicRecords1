@@ -4,453 +4,418 @@ EXPORT Fields := MODULE
 EXPORT NumFields := 88;
  
 // Processing for each FieldType
-EXPORT SALT39.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'Invalid_Alpha','Invalid_Num','type','confidence','did1','did2','cohabit_score','cohabit_cnt','coapt_score','coapt_cnt','copobox_score','copobox_cnt','cossn_score','cossn_cnt','copolicy_score','copolicy_cnt','coclaim_score','coclaim_cnt','coproperty_score','coproperty_cnt','bcoproperty_score','bcoproperty_cnt','coforeclosure_score','coforeclosure_cnt','bcoforeclosure_score','bcoforeclosure_cnt','colien_score','colien_cnt','bcolien_score','bcolien_cnt','cobankruptcy_score','cobankruptcy_cnt','bcobankruptcy_score','bcobankruptcy_cnt','covehicle_score','covehicle_cnt','coexperian_score','coexperian_cnt','cotransunion_score','cotransunion_cnt','coenclarity_score','coenclarity_cnt','coecrash_score','coecrash_cnt','bcoecrash_score','bcoecrash_cnt','cowatercraft_score','cowatercraft_cnt','coaircraft_score','coaircraft_cnt','comarriagedivorce_score','comarriagedivorce_cnt','coucc_score','coucc_cnt','lname_score','phone_score','dl_nbr_score','total_cnt','total_score','cluster','generation','gender','lname_cnt','rel_dt_first_seen','rel_dt_last_seen','overlap_months','hdr_dt_first_seen','hdr_dt_last_seen','age_first_seen','isanylnamematch','isanyphonematch','isearlylnamematch','iscurrlnamematch','ismixedlnamematch','ssn1','ssn2','dob1','dob2','current_lname1','current_lname2','early_lname1','early_lname2','addr_ind1','addr_ind2','r2rdid','r2cnt','personal','business','other','title');
-EXPORT FieldTypeNum(SALT39.StrType fn) := CASE(fn,'Invalid_Alpha' => 1,'Invalid_Num' => 2,'type' => 3,'confidence' => 4,'did1' => 5,'did2' => 6,'cohabit_score' => 7,'cohabit_cnt' => 8,'coapt_score' => 9,'coapt_cnt' => 10,'copobox_score' => 11,'copobox_cnt' => 12,'cossn_score' => 13,'cossn_cnt' => 14,'copolicy_score' => 15,'copolicy_cnt' => 16,'coclaim_score' => 17,'coclaim_cnt' => 18,'coproperty_score' => 19,'coproperty_cnt' => 20,'bcoproperty_score' => 21,'bcoproperty_cnt' => 22,'coforeclosure_score' => 23,'coforeclosure_cnt' => 24,'bcoforeclosure_score' => 25,'bcoforeclosure_cnt' => 26,'colien_score' => 27,'colien_cnt' => 28,'bcolien_score' => 29,'bcolien_cnt' => 30,'cobankruptcy_score' => 31,'cobankruptcy_cnt' => 32,'bcobankruptcy_score' => 33,'bcobankruptcy_cnt' => 34,'covehicle_score' => 35,'covehicle_cnt' => 36,'coexperian_score' => 37,'coexperian_cnt' => 38,'cotransunion_score' => 39,'cotransunion_cnt' => 40,'coenclarity_score' => 41,'coenclarity_cnt' => 42,'coecrash_score' => 43,'coecrash_cnt' => 44,'bcoecrash_score' => 45,'bcoecrash_cnt' => 46,'cowatercraft_score' => 47,'cowatercraft_cnt' => 48,'coaircraft_score' => 49,'coaircraft_cnt' => 50,'comarriagedivorce_score' => 51,'comarriagedivorce_cnt' => 52,'coucc_score' => 53,'coucc_cnt' => 54,'lname_score' => 55,'phone_score' => 56,'dl_nbr_score' => 57,'total_cnt' => 58,'total_score' => 59,'cluster' => 60,'generation' => 61,'gender' => 62,'lname_cnt' => 63,'rel_dt_first_seen' => 64,'rel_dt_last_seen' => 65,'overlap_months' => 66,'hdr_dt_first_seen' => 67,'hdr_dt_last_seen' => 68,'age_first_seen' => 69,'isanylnamematch' => 70,'isanyphonematch' => 71,'isearlylnamematch' => 72,'iscurrlnamematch' => 73,'ismixedlnamematch' => 74,'ssn1' => 75,'ssn2' => 76,'dob1' => 77,'dob2' => 78,'current_lname1' => 79,'current_lname2' => 80,'early_lname1' => 81,'early_lname2' => 82,'addr_ind1' => 83,'addr_ind2' => 84,'r2rdid' => 85,'r2cnt' => 86,'personal' => 87,'business' => 88,'other' => 89,'title' => 90,0);
+EXPORT SALT39.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'DEFAULT','ALPHA','NUMBER','WORDBAG','type','confidence','did1','did2','cohabit_score','cohabit_cnt','coapt_score','coapt_cnt','copobox_score','copobox_cnt','cossn_score','cossn_cnt','copolicy_score','copolicy_cnt','coclaim_score','coclaim_cnt','coproperty_score','coproperty_cnt','bcoproperty_score','bcoproperty_cnt','coforeclosure_score','coforeclosure_cnt','bcoforeclosure_score','bcoforeclosure_cnt','colien_score','colien_cnt','bcolien_score','bcolien_cnt','cobankruptcy_score','cobankruptcy_cnt','bcobankruptcy_score','bcobankruptcy_cnt','covehicle_score','covehicle_cnt','coexperian_score','coexperian_cnt','cotransunion_score','cotransunion_cnt','coenclarity_score','coenclarity_cnt','coecrash_score','coecrash_cnt','bcoecrash_score','bcoecrash_cnt','cowatercraft_score','cowatercraft_cnt','coaircraft_score','coaircraft_cnt','comarriagedivorce_score','comarriagedivorce_cnt','coucc_score','coucc_cnt','lname_score','phone_score','dl_nbr_score','total_cnt','total_score','cluster','generation','gender','lname_cnt','rel_dt_first_seen','rel_dt_last_seen','overlap_months','hdr_dt_first_seen','hdr_dt_last_seen','age_first_seen','isanylnamematch','isanyphonematch','isearlylnamematch','iscurrlnamematch','ismixedlnamematch','ssn1','ssn2','dob1','dob2','current_lname1','current_lname2','early_lname1','early_lname2','addr_ind1','addr_ind2','r2rdid','r2cnt','personal','business','other','title');
+EXPORT FieldTypeNum(SALT39.StrType fn) := CASE(fn,'DEFAULT' => 1,'ALPHA' => 2,'NUMBER' => 3,'WORDBAG' => 4,'type' => 5,'confidence' => 6,'did1' => 7,'did2' => 8,'cohabit_score' => 9,'cohabit_cnt' => 10,'coapt_score' => 11,'coapt_cnt' => 12,'copobox_score' => 13,'copobox_cnt' => 14,'cossn_score' => 15,'cossn_cnt' => 16,'copolicy_score' => 17,'copolicy_cnt' => 18,'coclaim_score' => 19,'coclaim_cnt' => 20,'coproperty_score' => 21,'coproperty_cnt' => 22,'bcoproperty_score' => 23,'bcoproperty_cnt' => 24,'coforeclosure_score' => 25,'coforeclosure_cnt' => 26,'bcoforeclosure_score' => 27,'bcoforeclosure_cnt' => 28,'colien_score' => 29,'colien_cnt' => 30,'bcolien_score' => 31,'bcolien_cnt' => 32,'cobankruptcy_score' => 33,'cobankruptcy_cnt' => 34,'bcobankruptcy_score' => 35,'bcobankruptcy_cnt' => 36,'covehicle_score' => 37,'covehicle_cnt' => 38,'coexperian_score' => 39,'coexperian_cnt' => 40,'cotransunion_score' => 41,'cotransunion_cnt' => 42,'coenclarity_score' => 43,'coenclarity_cnt' => 44,'coecrash_score' => 45,'coecrash_cnt' => 46,'bcoecrash_score' => 47,'bcoecrash_cnt' => 48,'cowatercraft_score' => 49,'cowatercraft_cnt' => 50,'coaircraft_score' => 51,'coaircraft_cnt' => 52,'comarriagedivorce_score' => 53,'comarriagedivorce_cnt' => 54,'coucc_score' => 55,'coucc_cnt' => 56,'lname_score' => 57,'phone_score' => 58,'dl_nbr_score' => 59,'total_cnt' => 60,'total_score' => 61,'cluster' => 62,'generation' => 63,'gender' => 64,'lname_cnt' => 65,'rel_dt_first_seen' => 66,'rel_dt_last_seen' => 67,'overlap_months' => 68,'hdr_dt_first_seen' => 69,'hdr_dt_last_seen' => 70,'age_first_seen' => 71,'isanylnamematch' => 72,'isanyphonematch' => 73,'isearlylnamematch' => 74,'iscurrlnamematch' => 75,'ismixedlnamematch' => 76,'ssn1' => 77,'ssn2' => 78,'dob1' => 79,'dob2' => 80,'current_lname1' => 81,'current_lname2' => 82,'early_lname1' => 83,'early_lname2' => 84,'addr_ind1' => 85,'addr_ind2' => 86,'r2rdid' => 87,'r2cnt' => 88,'personal' => 89,'business' => 90,'other' => 91,'title' => 92,0);
  
-EXPORT MakeFT_Invalid_Alpha(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'); // Only allow valid symbols
-  RETURN  s1;
+EXPORT MakeFT_DEFAULT(SALT39.StrType s0) := FUNCTION
+  s1 := if ( SALT39.StringFind('"\'',s0[1],1)>0 and SALT39.StringFind('"\'',s0[LENGTH(TRIM(s0))],1)>0,s0[2..LENGTH(TRIM(s0))-1],s0 );// Remove quotes if required
+  s2 := TRIM(s1,LEFT); // Left trim
+  RETURN  s2;
 END;
-EXPORT InValidFT_Invalid_Alpha(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'))));
-EXPORT InValidMessageFT_Invalid_Alpha(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_DEFAULT(SALT39.StrType s) := WHICH(s[1]=' ' AND LENGTH(TRIM(s))>0,SALT39.StringFind('"\'',s[1],1)<>0 and SALT39.StringFind('"\'',s[LENGTH(TRIM(s))],1)<>0);
+EXPORT InValidMessageFT_DEFAULT(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLeft,SALT39.HygieneErrors.Inquotes('"\''),SALT39.HygieneErrors.Good);
  
-EXPORT MakeFT_Invalid_Num(SALT39.StrType s0) := FUNCTION
+EXPORT MakeFT_ALPHA(SALT39.StrType s0) := FUNCTION
+  s1 := SALT39.stringtouppercase(s0); // Force to upper case
+  s2 := SALT39.stringfilter(s1,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'); // Only allow valid symbols
+  RETURN  s2;
+END;
+EXPORT InValidFT_ALPHA(SALT39.StrType s) := WHICH(SALT39.stringtouppercase(s)<>s,LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'))));
+EXPORT InValidMessageFT_ALPHA(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotCaps,SALT39.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ'),SALT39.HygieneErrors.Good);
+ 
+EXPORT MakeFT_NUMBER(SALT39.StrType s0) := FUNCTION
   s1 := SALT39.stringfilter(s0,'0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_Invalid_Num(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789'))));
-EXPORT InValidMessageFT_Invalid_Num(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_NUMBER(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789'))));
+EXPORT InValidMessageFT_NUMBER(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789'),SALT39.HygieneErrors.Good);
+ 
+EXPORT MakeFT_WORDBAG(SALT39.StrType s0) := FUNCTION
+  s1 := SALT39.stringtouppercase(s0); // Force to upper case
+  s2 := SALT39.stringfilter(s1,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 <>{}[]-^=!+&,./'); // Only allow valid symbols
+  s3 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s2,' <>{}[]-^=!+&,./',' ') ); // Insert spaces but avoid doubles
+  RETURN  s3;
+END;
+EXPORT InValidFT_WORDBAG(SALT39.StrType s) := WHICH(SALT39.stringtouppercase(s)<>s,LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 <>{}[]-^=!+&,./'))));
+EXPORT InValidMessageFT_WORDBAG(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotCaps,SALT39.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 <>{}[]-^=!+&,./'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_type(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'); // Only allow valid symbols
-  RETURN  MakeFT_Invalid_Alpha(s1);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_type(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'))));
-EXPORT InValidMessageFT_type(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_type(SALT39.StrType s) := WHICH();
+EXPORT InValidMessageFT_type(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_confidence(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Alpha(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_confidence(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ '))),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0));
-EXPORT InValidMessageFT_confidence(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ '),SALT39.HygieneErrors.NotWords('1,0'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_confidence(SALT39.StrType s) := WHICH(~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0));
+EXPORT InValidMessageFT_confidence(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotWords('1,0'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_did1(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_did1(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_did1(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotWords('1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_did1(SALT39.StrType s) := WHICH(~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_did1(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotWords('1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_did2(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_did2(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_did2(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotWords('1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_did2(SALT39.StrType s) := WHICH(~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_did2(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotWords('1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_cohabit_score(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_cohabit_score(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_cohabit_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_cohabit_score(SALT39.StrType s) := WHICH(~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_cohabit_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_cohabit_cnt(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_cohabit_cnt(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_cohabit_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,1'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_cohabit_cnt(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_cohabit_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,1'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_coapt_score(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_coapt_score(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2 OR LENGTH(TRIM(s)) = 3),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_coapt_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,2,3'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_coapt_score(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2 OR LENGTH(TRIM(s)) = 3),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_coapt_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,2,3'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_coapt_cnt(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_coapt_cnt(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_coapt_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,1'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_coapt_cnt(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_coapt_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,1'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_copobox_score(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_copobox_score(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_copobox_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,2'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_copobox_score(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_copobox_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,2'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_copobox_cnt(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_copobox_cnt(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_copobox_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,1,2'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_copobox_cnt(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_copobox_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,1,2'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_cossn_score(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_cossn_score(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_cossn_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,2'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_cossn_score(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_cossn_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,2'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_cossn_cnt(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_cossn_cnt(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_cossn_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,1'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_cossn_cnt(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_cossn_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,1'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_copolicy_score(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_copolicy_score(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2 OR LENGTH(TRIM(s)) = 3),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_copolicy_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,2,3'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_copolicy_score(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2 OR LENGTH(TRIM(s)) = 3),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_copolicy_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,2,3'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_copolicy_cnt(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_copolicy_cnt(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_copolicy_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,1,2'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_copolicy_cnt(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_copolicy_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,1,2'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_coclaim_score(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_coclaim_score(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2 OR LENGTH(TRIM(s)) = 3),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_coclaim_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,2,3'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_coclaim_score(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2 OR LENGTH(TRIM(s)) = 3),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_coclaim_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,2,3'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_coclaim_cnt(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_coclaim_cnt(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_coclaim_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,1'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_coclaim_cnt(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_coclaim_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,1'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_coproperty_score(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_coproperty_score(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2 OR LENGTH(TRIM(s)) = 3),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_coproperty_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,2,3'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_coproperty_score(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2 OR LENGTH(TRIM(s)) = 3),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_coproperty_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,2,3'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_coproperty_cnt(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_coproperty_cnt(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_coproperty_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,1'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_coproperty_cnt(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_coproperty_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,1'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_bcoproperty_score(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_bcoproperty_score(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_bcoproperty_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,2'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_bcoproperty_score(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_bcoproperty_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,2'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_bcoproperty_cnt(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_bcoproperty_cnt(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_bcoproperty_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,1'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_bcoproperty_cnt(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_bcoproperty_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,1'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_coforeclosure_score(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_coforeclosure_score(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))));
-EXPORT InValidMessageFT_coforeclosure_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_coforeclosure_score(SALT39.StrType s) := WHICH();
+EXPORT InValidMessageFT_coforeclosure_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_coforeclosure_cnt(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_coforeclosure_cnt(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))));
-EXPORT InValidMessageFT_coforeclosure_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_coforeclosure_cnt(SALT39.StrType s) := WHICH();
+EXPORT InValidMessageFT_coforeclosure_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_bcoforeclosure_score(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_bcoforeclosure_score(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))));
-EXPORT InValidMessageFT_bcoforeclosure_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_bcoforeclosure_score(SALT39.StrType s) := WHICH();
+EXPORT InValidMessageFT_bcoforeclosure_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_bcoforeclosure_cnt(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_bcoforeclosure_cnt(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))));
-EXPORT InValidMessageFT_bcoforeclosure_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_bcoforeclosure_cnt(SALT39.StrType s) := WHICH();
+EXPORT InValidMessageFT_bcoforeclosure_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_colien_score(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_colien_score(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_colien_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,2'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_colien_score(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_colien_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,2'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_colien_cnt(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_colien_cnt(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_colien_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,1'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_colien_cnt(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_colien_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,1'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_bcolien_score(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_bcolien_score(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))));
-EXPORT InValidMessageFT_bcolien_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_bcolien_score(SALT39.StrType s) := WHICH();
+EXPORT InValidMessageFT_bcolien_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_bcolien_cnt(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_bcolien_cnt(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))));
-EXPORT InValidMessageFT_bcolien_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_bcolien_cnt(SALT39.StrType s) := WHICH();
+EXPORT InValidMessageFT_bcolien_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_cobankruptcy_score(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_cobankruptcy_score(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_cobankruptcy_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,2'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_cobankruptcy_score(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_cobankruptcy_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,2'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_cobankruptcy_cnt(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_cobankruptcy_cnt(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_cobankruptcy_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,1'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_cobankruptcy_cnt(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_cobankruptcy_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,1'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_bcobankruptcy_score(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_bcobankruptcy_score(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_bcobankruptcy_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,2'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_bcobankruptcy_score(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_bcobankruptcy_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,2'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_bcobankruptcy_cnt(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_bcobankruptcy_cnt(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_bcobankruptcy_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,1'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_bcobankruptcy_cnt(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_bcobankruptcy_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,1'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_covehicle_score(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_covehicle_score(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2 OR LENGTH(TRIM(s)) = 3),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_covehicle_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,2,3'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_covehicle_score(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2 OR LENGTH(TRIM(s)) = 3),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_covehicle_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,2,3'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_covehicle_cnt(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_covehicle_cnt(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_covehicle_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,1,2'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_covehicle_cnt(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_covehicle_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,1,2'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_coexperian_score(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_coexperian_score(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_coexperian_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,2'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_coexperian_score(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_coexperian_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,2'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_coexperian_cnt(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_coexperian_cnt(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_coexperian_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,1'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_coexperian_cnt(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_coexperian_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,1'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_cotransunion_score(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_cotransunion_score(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_cotransunion_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,2'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_cotransunion_score(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_cotransunion_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,2'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_cotransunion_cnt(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_cotransunion_cnt(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_cotransunion_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,1'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_cotransunion_cnt(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_cotransunion_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,1'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_coenclarity_score(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_coenclarity_score(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0));
-EXPORT InValidMessageFT_coenclarity_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0'),SALT39.HygieneErrors.NotWords('0'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_coenclarity_score(SALT39.StrType s) := WHICH();
+EXPORT InValidMessageFT_coenclarity_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_coenclarity_cnt(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_coenclarity_cnt(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0));
-EXPORT InValidMessageFT_coenclarity_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0'),SALT39.HygieneErrors.NotWords('0'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_coenclarity_cnt(SALT39.StrType s) := WHICH();
+EXPORT InValidMessageFT_coenclarity_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_coecrash_score(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_coecrash_score(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_coecrash_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,2'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_coecrash_score(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_coecrash_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,2'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_coecrash_cnt(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_coecrash_cnt(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_coecrash_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,1'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_coecrash_cnt(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_coecrash_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,1'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_bcoecrash_score(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_bcoecrash_score(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_bcoecrash_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,2'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_bcoecrash_score(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_bcoecrash_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,2'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_bcoecrash_cnt(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_bcoecrash_cnt(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_bcoecrash_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,1'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_bcoecrash_cnt(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_bcoecrash_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,1'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_cowatercraft_score(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_cowatercraft_score(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0));
-EXPORT InValidMessageFT_cowatercraft_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0'),SALT39.HygieneErrors.NotWords('0'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_cowatercraft_score(SALT39.StrType s) := WHICH();
+EXPORT InValidMessageFT_cowatercraft_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_cowatercraft_cnt(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_cowatercraft_cnt(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))));
-EXPORT InValidMessageFT_cowatercraft_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_cowatercraft_cnt(SALT39.StrType s) := WHICH();
+EXPORT InValidMessageFT_cowatercraft_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_coaircraft_score(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_coaircraft_score(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))));
-EXPORT InValidMessageFT_coaircraft_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_coaircraft_score(SALT39.StrType s) := WHICH();
+EXPORT InValidMessageFT_coaircraft_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_coaircraft_cnt(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_coaircraft_cnt(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))));
-EXPORT InValidMessageFT_coaircraft_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_coaircraft_cnt(SALT39.StrType s) := WHICH();
+EXPORT InValidMessageFT_coaircraft_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_comarriagedivorce_score(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_comarriagedivorce_score(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))));
-EXPORT InValidMessageFT_comarriagedivorce_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_comarriagedivorce_score(SALT39.StrType s) := WHICH();
+EXPORT InValidMessageFT_comarriagedivorce_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_comarriagedivorce_cnt(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_comarriagedivorce_cnt(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))));
-EXPORT InValidMessageFT_comarriagedivorce_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_comarriagedivorce_cnt(SALT39.StrType s) := WHICH();
+EXPORT InValidMessageFT_comarriagedivorce_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_coucc_score(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_coucc_score(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_coucc_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,2'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_coucc_score(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_coucc_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,2'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_coucc_cnt(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_coucc_cnt(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_coucc_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,1'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_coucc_cnt(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_coucc_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,1'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_lname_score(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_lname_score(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2 OR LENGTH(TRIM(s)) = 1 OR LENGTH(TRIM(s)) = 3),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_lname_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,2,1,3'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_lname_score(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2 OR LENGTH(TRIM(s)) = 1 OR LENGTH(TRIM(s)) = 3),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_lname_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,2,1,3'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_phone_score(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_phone_score(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_phone_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,2'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_phone_score(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_phone_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,2'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_dl_nbr_score(SALT39.StrType s0) := FUNCTION
   s1 := SALT39.stringfilter(s0,'-0123456789 '); // Only allow valid symbols
@@ -461,20 +426,18 @@ EXPORT InValidFT_dl_nbr_score(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH
 EXPORT InValidMessageFT_dl_nbr_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('-0123456789 '),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_total_cnt(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_total_cnt(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 1 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_total_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('1,2'),SALT39.HygieneErrors.NotWords('1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_total_cnt(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 1 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_total_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('1,2'),SALT39.HygieneErrors.NotWords('1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_total_score(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_total_score(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 2 OR LENGTH(TRIM(s)) = 3 OR LENGTH(TRIM(s)) = 4),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_total_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('2,3,4'),SALT39.HygieneErrors.NotWords('1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_total_score(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 2 OR LENGTH(TRIM(s)) = 3 OR LENGTH(TRIM(s)) = 4),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_total_score(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('2,3,4'),SALT39.HygieneErrors.NotWords('1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_cluster(SALT39.StrType s0) := FUNCTION
   s1 := SALT39.stringfilter(s0,' ABCDEFGHIJKLMNOPQRSTUVWXYZ_ '); // Only allow valid symbols
@@ -501,60 +464,53 @@ EXPORT InValidFT_gender(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(
 EXPORT InValidMessageFT_gender(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars(' FM '),SALT39.HygieneErrors.NotLength('1,0'),SALT39.HygieneErrors.NotWords('1,0'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_lname_cnt(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_lname_cnt(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 1 OR LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0));
-EXPORT InValidMessageFT_lname_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('1,0,2'),SALT39.HygieneErrors.NotWords('1,0'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_lname_cnt(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 1 OR LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 2),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0));
+EXPORT InValidMessageFT_lname_cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('1,0,2'),SALT39.HygieneErrors.NotWords('1,0'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_rel_dt_first_seen(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_rel_dt_first_seen(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 8),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_rel_dt_first_seen(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,8'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_rel_dt_first_seen(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 8),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_rel_dt_first_seen(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,8'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_rel_dt_last_seen(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_rel_dt_last_seen(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 8),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_rel_dt_last_seen(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('0,8'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_rel_dt_last_seen(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 8),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_rel_dt_last_seen(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('0,8'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_overlap_months(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_overlap_months(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_overlap_months(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_overlap_months(SALT39.StrType s) := WHICH(~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_overlap_months(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_hdr_dt_first_seen(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_hdr_dt_first_seen(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 8),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_hdr_dt_first_seen(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('8'),SALT39.HygieneErrors.NotWords('1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_hdr_dt_first_seen(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 8),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_hdr_dt_first_seen(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('8'),SALT39.HygieneErrors.NotWords('1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_hdr_dt_last_seen(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_hdr_dt_last_seen(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 8),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_hdr_dt_last_seen(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('8'),SALT39.HygieneErrors.NotWords('1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_hdr_dt_last_seen(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 8),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_hdr_dt_last_seen(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('8'),SALT39.HygieneErrors.NotWords('1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_age_first_seen(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_age_first_seen(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 2 OR LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0));
-EXPORT InValidMessageFT_age_first_seen(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('2,0,1'),SALT39.HygieneErrors.NotWords('1,0'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_age_first_seen(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 2 OR LENGTH(TRIM(s)) = 0 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0));
+EXPORT InValidMessageFT_age_first_seen(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('2,0,1'),SALT39.HygieneErrors.NotWords('1,0'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_isanylnamematch(SALT39.StrType s0) := FUNCTION
   s1 := SALT39.stringfilter(s0,' 01 '); // Only allow valid symbols
@@ -597,36 +553,32 @@ EXPORT InValidFT_ismixedlnamematch(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>L
 EXPORT InValidMessageFT_ismixedlnamematch(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars(' 01 '),SALT39.HygieneErrors.NotLength('0,1'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_ssn1(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_ssn1(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 9 OR LENGTH(TRIM(s)) = 0),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0));
-EXPORT InValidMessageFT_ssn1(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('9,0'),SALT39.HygieneErrors.NotWords('1,0'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_ssn1(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 9 OR LENGTH(TRIM(s)) = 0),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0));
+EXPORT InValidMessageFT_ssn1(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('9,0'),SALT39.HygieneErrors.NotWords('1,0'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_ssn2(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_ssn2(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 9 OR LENGTH(TRIM(s)) = 0),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0));
-EXPORT InValidMessageFT_ssn2(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('9,0'),SALT39.HygieneErrors.NotWords('1,0'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_ssn2(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 9 OR LENGTH(TRIM(s)) = 0),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0));
+EXPORT InValidMessageFT_ssn2(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('9,0'),SALT39.HygieneErrors.NotWords('1,0'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_dob1(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_dob1(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 8 OR LENGTH(TRIM(s)) = 0),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0));
-EXPORT InValidMessageFT_dob1(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('8,0'),SALT39.HygieneErrors.NotWords('1,0'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_dob1(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 8 OR LENGTH(TRIM(s)) = 0),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0));
+EXPORT InValidMessageFT_dob1(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('8,0'),SALT39.HygieneErrors.NotWords('1,0'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_dob2(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_dob2(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 8 OR LENGTH(TRIM(s)) = 0),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0));
-EXPORT InValidMessageFT_dob2(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('8,0'),SALT39.HygieneErrors.NotWords('1,0'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_dob2(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 8 OR LENGTH(TRIM(s)) = 0),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0));
+EXPORT InValidMessageFT_dob2(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('8,0'),SALT39.HygieneErrors.NotWords('1,0'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_current_lname1(SALT39.StrType s0) := FUNCTION
   s1 := SALT39.stringfilter(s0,'-ABCDEFGHIJKLMNOPQRSTUVWXYZ '); // Only allow valid symbols
@@ -645,52 +597,46 @@ EXPORT InValidFT_current_lname2(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENG
 EXPORT InValidMessageFT_current_lname2(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('-ABCDEFGHIJKLMNOPQRSTUVWXYZ '),SALT39.HygieneErrors.NotWords('1,2'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_early_lname1(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Alpha(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_early_lname1(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ '))),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 2));
-EXPORT InValidMessageFT_early_lname1(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ '),SALT39.HygieneErrors.NotWords('1,2'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_early_lname1(SALT39.StrType s) := WHICH(~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 2));
+EXPORT InValidMessageFT_early_lname1(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotWords('1,2'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_early_lname2(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Alpha(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_early_lname2(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ '))),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 2));
-EXPORT InValidMessageFT_early_lname2(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('ABCDEFGHIJKLMNOPQRSTUVWXYZ '),SALT39.HygieneErrors.NotWords('1,2'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_early_lname2(SALT39.StrType s) := WHICH(~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 2));
+EXPORT InValidMessageFT_early_lname2(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotWords('1,2'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_addr_ind1(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_addr_ind1(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_addr_ind1(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_addr_ind1(SALT39.StrType s) := WHICH(~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_addr_ind1(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_addr_ind2(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_addr_ind2(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_addr_ind2(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_addr_ind2(SALT39.StrType s) := WHICH(~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_addr_ind2(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_r2rdid(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_r2rdid(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_r2rdid(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_r2rdid(SALT39.StrType s) := WHICH(~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_r2rdid(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_r2cnt(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_r2cnt(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_r2cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_r2cnt(SALT39.StrType s) := WHICH(~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 0 OR SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_r2cnt(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_personal(SALT39.StrType s0) := FUNCTION
   s1 := SALT39.stringfilter(s0,' 01 '); // Only allow valid symbols
@@ -717,17 +663,16 @@ EXPORT InValidFT_other(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(S
 EXPORT InValidMessageFT_other(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars(' 01 '),SALT39.HygieneErrors.NotLength('0,1'),SALT39.HygieneErrors.NotWords('0,1'),SALT39.HygieneErrors.Good);
  
 EXPORT MakeFT_title(SALT39.StrType s0) := FUNCTION
-  s1 := SALT39.stringfilter(s0,'0123456789 '); // Only allow valid symbols
-  s2 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s1,' ',' ') ); // Insert spaces but avoid doubles
-  RETURN  MakeFT_Invalid_Num(s2);
+  s1 := SALT39.stringcleanspaces( SALT39.stringsubstituteout(s0,' ',' ') ); // Insert spaces but avoid doubles
+  RETURN  s1;
 END;
-EXPORT InValidFT_title(SALT39.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT39.StringFilter(s,'0123456789 '))),~(LENGTH(TRIM(s)) = 2 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
-EXPORT InValidMessageFT_title(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotInChars('0123456789 '),SALT39.HygieneErrors.NotLength('2,1'),SALT39.HygieneErrors.NotWords('1'),SALT39.HygieneErrors.Good);
+EXPORT InValidFT_title(SALT39.StrType s) := WHICH(~(LENGTH(TRIM(s)) = 2 OR LENGTH(TRIM(s)) = 1),~(SALT39.WordCount(SALT39.StringSubstituteOut(s,' ',' ')) = 1));
+EXPORT InValidMessageFT_title(UNSIGNED1 wh) := CHOOSE(wh,SALT39.HygieneErrors.NotLength('2,1'),SALT39.HygieneErrors.NotWords('1'),SALT39.HygieneErrors.Good);
  
 EXPORT SALT39.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'type','confidence','did1','did2','cohabit_score','cohabit_cnt','coapt_score','coapt_cnt','copobox_score','copobox_cnt','cossn_score','cossn_cnt','copolicy_score','copolicy_cnt','coclaim_score','coclaim_cnt','coproperty_score','coproperty_cnt','bcoproperty_score','bcoproperty_cnt','coforeclosure_score','coforeclosure_cnt','bcoforeclosure_score','bcoforeclosure_cnt','colien_score','colien_cnt','bcolien_score','bcolien_cnt','cobankruptcy_score','cobankruptcy_cnt','bcobankruptcy_score','bcobankruptcy_cnt','covehicle_score','covehicle_cnt','coexperian_score','coexperian_cnt','cotransunion_score','cotransunion_cnt','coenclarity_score','coenclarity_cnt','coecrash_score','coecrash_cnt','bcoecrash_score','bcoecrash_cnt','cowatercraft_score','cowatercraft_cnt','coaircraft_score','coaircraft_cnt','comarriagedivorce_score','comarriagedivorce_cnt','coucc_score','coucc_cnt','lname_score','phone_score','dl_nbr_score','total_cnt','total_score','cluster','generation','gender','lname_cnt','rel_dt_first_seen','rel_dt_last_seen','overlap_months','hdr_dt_first_seen','hdr_dt_last_seen','age_first_seen','isanylnamematch','isanyphonematch','isearlylnamematch','iscurrlnamematch','ismixedlnamematch','ssn1','ssn2','dob1','dob2','current_lname1','current_lname2','early_lname1','early_lname2','addr_ind1','addr_ind2','r2rdid','r2cnt','personal','business','other','title');
 EXPORT SALT39.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'type','confidence','did1','did2','cohabit_score','cohabit_cnt','coapt_score','coapt_cnt','copobox_score','copobox_cnt','cossn_score','cossn_cnt','copolicy_score','copolicy_cnt','coclaim_score','coclaim_cnt','coproperty_score','coproperty_cnt','bcoproperty_score','bcoproperty_cnt','coforeclosure_score','coforeclosure_cnt','bcoforeclosure_score','bcoforeclosure_cnt','colien_score','colien_cnt','bcolien_score','bcolien_cnt','cobankruptcy_score','cobankruptcy_cnt','bcobankruptcy_score','bcobankruptcy_cnt','covehicle_score','covehicle_cnt','coexperian_score','coexperian_cnt','cotransunion_score','cotransunion_cnt','coenclarity_score','coenclarity_cnt','coecrash_score','coecrash_cnt','bcoecrash_score','bcoecrash_cnt','cowatercraft_score','cowatercraft_cnt','coaircraft_score','coaircraft_cnt','comarriagedivorce_score','comarriagedivorce_cnt','coucc_score','coucc_cnt','lname_score','phone_score','dl_nbr_score','total_cnt','total_score','cluster','generation','gender','lname_cnt','rel_dt_first_seen','rel_dt_last_seen','overlap_months','hdr_dt_first_seen','hdr_dt_last_seen','age_first_seen','isanylnamematch','isanyphonematch','isearlylnamematch','iscurrlnamematch','ismixedlnamematch','ssn1','ssn2','dob1','dob2','current_lname1','current_lname2','early_lname1','early_lname2','addr_ind1','addr_ind2','r2rdid','r2cnt','personal','business','other','title');
 EXPORT FieldNum(SALT39.StrType fn) := CASE(fn,'type' => 0,'confidence' => 1,'did1' => 2,'did2' => 3,'cohabit_score' => 4,'cohabit_cnt' => 5,'coapt_score' => 6,'coapt_cnt' => 7,'copobox_score' => 8,'copobox_cnt' => 9,'cossn_score' => 10,'cossn_cnt' => 11,'copolicy_score' => 12,'copolicy_cnt' => 13,'coclaim_score' => 14,'coclaim_cnt' => 15,'coproperty_score' => 16,'coproperty_cnt' => 17,'bcoproperty_score' => 18,'bcoproperty_cnt' => 19,'coforeclosure_score' => 20,'coforeclosure_cnt' => 21,'bcoforeclosure_score' => 22,'bcoforeclosure_cnt' => 23,'colien_score' => 24,'colien_cnt' => 25,'bcolien_score' => 26,'bcolien_cnt' => 27,'cobankruptcy_score' => 28,'cobankruptcy_cnt' => 29,'bcobankruptcy_score' => 30,'bcobankruptcy_cnt' => 31,'covehicle_score' => 32,'covehicle_cnt' => 33,'coexperian_score' => 34,'coexperian_cnt' => 35,'cotransunion_score' => 36,'cotransunion_cnt' => 37,'coenclarity_score' => 38,'coenclarity_cnt' => 39,'coecrash_score' => 40,'coecrash_cnt' => 41,'bcoecrash_score' => 42,'bcoecrash_cnt' => 43,'cowatercraft_score' => 44,'cowatercraft_cnt' => 45,'coaircraft_score' => 46,'coaircraft_cnt' => 47,'comarriagedivorce_score' => 48,'comarriagedivorce_cnt' => 49,'coucc_score' => 50,'coucc_cnt' => 51,'lname_score' => 52,'phone_score' => 53,'dl_nbr_score' => 54,'total_cnt' => 55,'total_score' => 56,'cluster' => 57,'generation' => 58,'gender' => 59,'lname_cnt' => 60,'rel_dt_first_seen' => 61,'rel_dt_last_seen' => 62,'overlap_months' => 63,'hdr_dt_first_seen' => 64,'hdr_dt_last_seen' => 65,'age_first_seen' => 66,'isanylnamematch' => 67,'isanyphonematch' => 68,'isearlylnamematch' => 69,'iscurrlnamematch' => 70,'ismixedlnamematch' => 71,'ssn1' => 72,'ssn2' => 73,'dob1' => 74,'dob2' => 75,'current_lname1' => 76,'current_lname2' => 77,'early_lname1' => 78,'early_lname2' => 79,'addr_ind1' => 80,'addr_ind2' => 81,'r2rdid' => 82,'r2cnt' => 83,'personal' => 84,'business' => 85,'other' => 86,'title' => 87,0);
-EXPORT SET OF SALT39.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW'],['ALLOW','WORDS'],['ALLOW','WORDS'],['ALLOW','WORDS'],['ALLOW','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW'],['ALLOW'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','WORDS'],['ALLOW','WORDS'],['ALLOW','WORDS'],['ALLOW','WORDS'],['ALLOW','WORDS'],['ALLOW','WORDS'],['ALLOW','WORDS'],['ALLOW','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],[]);
+EXPORT SET OF SALT39.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,[],['WORDS'],['WORDS'],['WORDS'],['WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],[],[],[],[],['LENGTHS','WORDS'],['LENGTHS','WORDS'],[],[],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],[],[],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],[],[],[],[],[],[],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['ALLOW','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['LENGTHS','WORDS'],['ALLOW','WORDS'],['ALLOW','WORDS'],['WORDS'],['WORDS'],['WORDS'],['WORDS'],['WORDS'],['WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['ALLOW','LENGTHS','WORDS'],['LENGTHS','WORDS'],[]);
 EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation

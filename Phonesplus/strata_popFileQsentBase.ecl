@@ -1,5 +1,6 @@
-import strata;
+﻿import strata;
 
+export strata_popFileQsentBase(string pversion) := function;
 ds := Phonesplus.file_Qsent_base;
 
 rPopulationStats_file_Qsent_base
@@ -90,6 +91,8 @@ rPopulationStats_file_Qsent_base
 
 tStats := table(ds,rPopulationStats_file_Qsent_base,few);
 
-strata.createXMLStats(tStats,'Qsent','data',Phonesplus.version,'',resultsOut);
+strata.createXMLStats(tStats,'Qsent','data',pversion,'',resultsOut);
 
-export strata_popFileQsentBase := resultsOut;
+return resultsOut;
+end;
+

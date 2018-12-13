@@ -1,5 +1,5 @@
-import Address, BIPV2, Ut, lib_stringlib, _Control, business_header,_Validate,
-Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS, MDR,Health_Provider_Services;
+﻿import Address, BIPV2, Ut, lib_stringlib, _Control, business_header,_Validate,
+Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS, MDR, Health_Provider_Services;
 
 
 export Append_Ids :=	module
@@ -30,14 +30,20 @@ export Append_Ids :=	module
          ,cleanMailingPhone										// phone
          ,did                       // Did
          ,nppes.Layouts.TempKeyBuild					// output layout
-         ,false                     // Does output record have the score
+         // ,false                     // Does output record have the score
+         ,true                     // Does output record have the score
          ,did_score                 // did score field
          ,75                        // score threshold
          ,dDidOut1										// output dataset    );
           );
  
-        foundDID1		 :=	dDidOut1(did <> 0);
-		missingDID1      :=	dDidOut1(did = 0);			
+		did_desc1 := project (dDidOut1,transform (recordof(dDidOut1), 
+             self.xadl2_keys_desc := InsuranceHeader_xLink.Process_xIDL_Layouts(false).KeysUsedToText (left.xadl2_keys_used); 
+             self.xadl2_matches_desc := InsuranceHeader_xLink.fn_MatchesToText(left.xadl2_matches);
+             self := left;));
+
+    foundDID1		 :=	did_desc1(did <> 0);
+		missingDID1      :=	did_desc1(did = 0);			
 		
 		//Next try to get a DID using Location Address
 		DID_Add.MAC_Match_Flex(
@@ -57,17 +63,23 @@ export Append_Ids :=	module
          ,cleanLocationPhone										// phone
          ,did                       // Did
          ,nppes.Layouts.TempKeyBuild					// output layout
-         ,false                     // Does output record have the score
+         // ,false                     // Does output record have the score
+         ,true                    // Does output record have the score
          ,did_score                 // did score field
          ,75                        // score threshold
          ,dDidOut2										// output dataset    );
           );
+ 
+		did_desc2 := project (dDidOut2,transform (recordof(dDidOut2), 
+            self.xadl2_keys_desc := InsuranceHeader_xLink.Process_xIDL_Layouts(false).KeysUsedToText (left.xadl2_keys_used); 
+            self.xadl2_matches_desc := InsuranceHeader_xLink.fn_MatchesToText(left.xadl2_matches); // HC-1224
+            self := left;));
 														
-		foundDID2		:=	dDidOut2(did <> 0);
-		missingDID2      :=	dDidOut2(did = 0);
+		foundDID2			:=	did_desc2(did <> 0);
+		missingDID2   :=	did_desc2(did = 0);
 
-      //If there were no missingDID1 records, then all records will be in foundDID1 
-      return if(exists(missingDID1),
+    //If there were no missingDID1 records, then all records will be in foundDID1 
+    return if(exists(missingDID1),
 				foundDID1 + foundDID2 + missingDID2,
 				foundDID1);
    end;
@@ -201,7 +213,7 @@ export Append_Ids :=	module
 			dWithLNpids				:=  fAppendLNpid (dCombinedBDIDs);
   
 			//project back to the same layout that was passed into this function
-			outDataset := project(/*dCombinedBDIDs*/dWithLNpids,nppes.Layouts.KeyBuildFirst) : persist ('Final_NPI_DID::nppes');
+			outDataset := project(/* dCombinedBDIDs*/dWithLNpids,nppes.Layouts.KeyBuildFirst) : persist ('Final_NPI_DID::nppes');
 							
       return outDataset;
    

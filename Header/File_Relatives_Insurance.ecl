@@ -3,7 +3,7 @@ EXPORT File_Relatives_Insurance(boolean suppressed=false) :=FUNCTION
 
 		file := dataset(
 		 	data_services.Data_Location.Relatives
-		 +'thor_data400::base::relatives_insurance::boca_copy'
+		 +'thor_data400::base::insuranceheader::qa::relatives_v3'
 		,Relationship.layout_output.titled
 		,flat);
 		
