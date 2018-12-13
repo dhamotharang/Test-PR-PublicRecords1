@@ -150,8 +150,6 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
     SELF.err_stat := ri.err_stat; // Derived(NEW)
     SELF.did := ri.did; // Derived(NEW)
     SELF.did_score := ri.did_score; // Derived(NEW)
-    SELF.clean_phone := ri.clean_phone; // Derived(NEW)
-    SELF.clean_dob := ri.clean_dob; // Derived(NEW)
     SELF.process_date := MAP ( le.__Tpe = 0 => ri.process_date,
                      ri.__Tpe = 0 => le.process_date,
                      (UNSIGNED)le.process_date < (UNSIGNED)ri.process_date => ri.process_date, // Want the highest value
@@ -187,27 +185,35 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
  
   // Ingest Files: Rollup to get unique new records
   DistIngest0 := DISTRIBUTE(FilesToIngest0, HASH32(orig_fname,orig_mname,orig_lname,orig_suffix,orig_gender,orig_address
-             ,orig_city,orig_state,orig_zip,orig_dpc));
+             ,orig_city,orig_state,orig_zip,orig_dpc
+             ,clean_phone,clean_dob));
   SortIngest0 := SORT(DistIngest0,orig_fname,orig_mname,orig_lname,orig_suffix,orig_gender,orig_address
-             ,orig_city,orig_state,orig_zip,orig_dpc, __Tpe, key, LOCAL);
+             ,orig_city,orig_state,orig_zip,orig_dpc
+             ,clean_phone,clean_dob, __Tpe, key, LOCAL);
   GroupIngest0 := GROUP(SortIngest0,orig_fname,orig_mname,orig_lname,orig_suffix,orig_gender,orig_address
-             ,orig_city,orig_state,orig_zip,orig_dpc, LOCAL, ORDERED, STABLE);
+             ,orig_city,orig_state,orig_zip,orig_dpc
+             ,clean_phone,clean_dob, LOCAL, ORDERED, STABLE);
   SHARED AllIngestRecs0 := UNGROUP(ROLLUP(GroupIngest0,TRUE,MergeData(LEFT,RIGHT)));
  
   // Existing Base: combine delta with base file
   DistBase0 := DISTRIBUTE(Base0+Delta0, HASH32(orig_fname,orig_mname,orig_lname,orig_suffix,orig_gender,orig_address
-             ,orig_city,orig_state,orig_zip,orig_dpc));
+             ,orig_city,orig_state,orig_zip,orig_dpc
+             ,clean_phone,clean_dob));
   SortBase0 := SORT(DistBase0,orig_fname,orig_mname,orig_lname,orig_suffix,orig_gender,orig_address
-             ,orig_city,orig_state,orig_zip,orig_dpc, __Tpe, key, LOCAL);
+             ,orig_city,orig_state,orig_zip,orig_dpc
+             ,clean_phone,clean_dob, __Tpe, key, LOCAL);
   GroupBase0 := GROUP(SortBase0,orig_fname,orig_mname,orig_lname,orig_suffix,orig_gender,orig_address
-             ,orig_city,orig_state,orig_zip,orig_dpc, LOCAL, ORDERED, STABLE);
+             ,orig_city,orig_state,orig_zip,orig_dpc
+             ,clean_phone,clean_dob, LOCAL, ORDERED, STABLE);
   SHARED AllBaseRecs0 := UNGROUP(ROLLUP(GroupBase0,TRUE,MergeData(LEFT,RIGHT)));
  
   // Everything: combine ingest and base recs
   Sort0 := SORT(AllBaseRecs0+AllIngestRecs0,orig_fname,orig_mname,orig_lname,orig_suffix,orig_gender,orig_address
-             ,orig_city,orig_state,orig_zip,orig_dpc, __Tpe,key,LOCAL);
+             ,orig_city,orig_state,orig_zip,orig_dpc
+             ,clean_phone,clean_dob, __Tpe,key,LOCAL);
   Group0 := GROUP(Sort0,orig_fname,orig_mname,orig_lname,orig_suffix,orig_gender,orig_address
-             ,orig_city,orig_state,orig_zip,orig_dpc,LOCAL, ORDERED, STABLE);
+             ,orig_city,orig_state,orig_zip,orig_dpc
+             ,clean_phone,clean_dob,LOCAL, ORDERED, STABLE);
   SHARED AllRecs0 := UNGROUP(ROLLUP(Group0,TRUE,MergeData(LEFT,RIGHT)));
  
   //Now need to update 'rid' numbers on new records
