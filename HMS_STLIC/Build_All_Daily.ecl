@@ -21,7 +21,8 @@ EXPORT Build_all_daily(string pversion, boolean pUseProd = false) := FUNCTION
 
 	built := sequential(
 						spray_
-						,checkspray_ 
+						// ,checkspray_ 
+						,HMS_STLIC.Preprocessor.Run_the_prep(pversion,pUseProd).write_them
 						,Build_Base.build_base_statelicense(pVersion,pUseProd).statelicense_all
 						,Build_Keys.Build_Keys_statelicense(pversion,pUseProd).statelicense_all
 						,Scrub_HMsStlic(pversion,pUseProd).ScrubIt
@@ -37,7 +38,7 @@ EXPORT Build_all_daily(string pversion, boolean pUseProd = false) := FUNCTION
 						FileServices.RemoveOwnedSubFiles('~thor400_data::base::hms_stl::hms_statelicense',true),
 						FileServices.AddSuperFile('~thor400_data::base::hms_stl::hms_statelicense','~thor400_data::base::hms_stl::hms_statelicense::' + pVersion),
 
-						parallel(
+						// parallel(
 									FileServices.ClearSuperFile(HMS_STLIC.Filenames(pVersion,pUseProd).address_lInputHistTemplate),
 									FileServices.ClearSuperFile(HMS_STLIC.Filenames(pVersion,pUseProd).license_lInputHistTemplate),
 									FileServices.ClearSuperFile(HMS_STLIC.Filenames(pVersion,pUseProd).entity_lInputHistTemplate),
@@ -49,9 +50,9 @@ EXPORT Build_all_daily(string pversion, boolean pUseProd = false) := FUNCTION
 									FileServices.ClearSuperFile(HMS_STLIC.Filenames(pVersion,pUseProd).phone_lInputHistTemplate),
 									FileServices.ClearSuperFile(HMS_STLIC.Filenames(pVersion,pUseProd).specialty_lInputHistTemplate),
 									FileServices.ClearSuperFile(HMS_STLIC.Filenames(pVersion,pUseProd).disciplinaryact_lInputHistTemplate),
-									FileServices.ClearSuperFile(HMS_STLIC.Filenames(pVersion,pUseProd).stliclookup_lInputHistTemplate)
-					),
-					parallel(
+									FileServices.ClearSuperFile(HMS_STLIC.Filenames(pVersion,pUseProd).stliclookup_lInputHistTemplate),
+					// ),
+					// parallel(
 									FileServices.AddSuperFile(HMS_STLIC.Filenames(pVersion,pUseProd).address_lInputHistTemplate,HMS_STLIC._Dataset(pUseProd).thor_cluster_files + 'in::' + HMS_STLIC._Dataset().name + '::hms_address::' + pVersion),
 									FileServices.AddSuperFile(HMS_STLIC.Filenames(pVersion,pUseProd).license_lInputHistTemplate,HMS_STLIC._Dataset(pUseProd).thor_cluster_files + 'in::' + HMS_STLIC._Dataset().name + '::hms_license::' + pVersion),
 									FileServices.AddSuperFile(HMS_STLIC.Filenames(pVersion,pUseProd).entity_lInputHistTemplate,HMS_STLIC._Dataset(pUseProd).thor_cluster_files + 'in::' + HMS_STLIC._Dataset().name + '::hms_entity::' + pVersion),
@@ -63,9 +64,9 @@ EXPORT Build_all_daily(string pversion, boolean pUseProd = false) := FUNCTION
 									FileServices.AddSuperFile(HMS_STLIC.Filenames(pVersion,pUseProd).phone_lInputHistTemplate,HMS_STLIC._Dataset(pUseProd).thor_cluster_files + 'in::' + HMS_STLIC._Dataset().name + '::hms_phone::' + pVersion),
 									FileServices.AddSuperFile(HMS_STLIC.Filenames(pVersion,pUseProd).specialty_lInputHistTemplate,HMS_STLIC._Dataset(pUseProd).thor_cluster_files + 'in::' + HMS_STLIC._Dataset().name + '::hms_specialty::' + pVersion),
 									FileServices.AddSuperFile(HMS_STLIC.Filenames(pVersion,pUseProd).disciplinaryact_lInputHistTemplate,HMS_STLIC._Dataset(pUseProd).thor_cluster_files + 'in::' + HMS_STLIC._Dataset().name + '::hms_disciplinaryact::' + pVersion),
-									FileServices.AddSuperFile(HMS_STLIC.Filenames(pVersion,pUseProd).stliclookup_lInputHistTemplate,HMS_STLIC._Dataset(pUseProd).thor_cluster_files + 'in::' + HMS_STLIC._Dataset().name + '::hms_stliclookup::' + pVersion)
-					),					
-					parallel(
+									FileServices.AddSuperFile(HMS_STLIC.Filenames(pVersion,pUseProd).stliclookup_lInputHistTemplate,HMS_STLIC._Dataset(pUseProd).thor_cluster_files + 'in::' + HMS_STLIC._Dataset().name + '::hms_stliclookup::' + pVersion),
+					// ),					
+					// parallel(
 								FileServices.AddSuperFile('~thor400_data::in::hms_stl::hms_address_consolidated','~thor400_data::in::hms_stl::hms_address::' + pVersion),
 								FileServices.AddSuperFile('~thor400_data::in::hms_stl::hms_csr_consolidated','~thor400_data::in::hms_stl::hms_csr::' + pVersion),
 								FileServices.AddSuperFile('~thor400_data::in::hms_stl::hms_dea_consolidated','~thor400_data::in::hms_stl::hms_dea::' + pVersion),
@@ -77,11 +78,11 @@ EXPORT Build_all_daily(string pversion, boolean pUseProd = false) := FUNCTION
 								FileServices.AddSuperFile('~thor400_data::in::hms_stl::hms_npi_consolidated','~thor400_data::in::hms_stl::hms_npi::' + pVersion),
 								FileServices.AddSuperFile('~thor400_data::in::hms_stl::hms_phone_consolidated','~thor400_data::in::hms_stl::hms_phone::' + pVersion),
 								FileServices.AddSuperFile('~thor400_data::in::hms_stl::hms_specialty_consolidated','~thor400_data::in::hms_stl::hms_specialty::' + pVersion),
-								FileServices.AddSuperFile('~thor400_data::in::hms_stl::hms_stliclookup_consolidated','~thor400_data::in::hms_stl::hms_stliclookup::' + pVersion)
+								FileServices.AddSuperFile('~thor400_data::in::hms_stl::hms_stliclookup_consolidated','~thor400_data::in::hms_stl::hms_stliclookup::' + pVersion),
 					
-					),
+					// ),
 					
-					parallel(
+					// parallel(
 								
 								FileServices.RemoveOwnedSubFiles('~thor400_data::in::hms_stl::hms_address_consolidated',true),
 								FileServices.RemoveOwnedSubFiles('~thor400_data::in::hms_stl::hms_csr_consolidated',true),
@@ -94,9 +95,23 @@ EXPORT Build_all_daily(string pversion, boolean pUseProd = false) := FUNCTION
 								FileServices.RemoveOwnedSubFiles('~thor400_data::in::hms_stl::hms_npi_consolidated',true),
 								FileServices.RemoveOwnedSubFiles('~thor400_data::in::hms_stl::hms_phone_consolidated',true),
 								FileServices.RemoveOwnedSubFiles('~thor400_data::in::hms_stl::hms_specialty_consolidated',true),
-								FileServices.RemoveOwnedSubFiles('~thor400_data::in::hms_stl::hms_stliclookup_consolidated',true)
+								FileServices.RemoveOwnedSubFiles('~thor400_data::in::hms_stl::hms_stliclookup_consolidated',true),
+								
+								FileServices.RemoveOwnedSubFiles('~thor400_data::temp_in::hms_stl::hms_address',true),
+								FileServices.RemoveOwnedSubFiles('~thor400_data::temp_in::hms_stl::hms_csr',true),
+								FileServices.RemoveOwnedSubFiles('~thor400_data::temp_in::hms_stl::hms_dea',true),
+								FileServices.RemoveOwnedSubFiles('~thor400_data::temp_in::hms_stl::hms_disciplinaryact',true),
+								FileServices.RemoveOwnedSubFiles('~thor400_data::temp_in::hms_stl::hms_education',true),
+								FileServices.RemoveOwnedSubFiles('~thor400_data::temp_in::hms_stl::hms_entity',true),
+								FileServices.RemoveOwnedSubFiles('~thor400_data::temp_in::hms_stl::hms_language',true),
+								FileServices.RemoveOwnedSubFiles('~thor400_data::temp_in::hms_stl::hms_license',true),
+								FileServices.RemoveOwnedSubFiles('~thor400_data::temp_in::hms_stl::hms_npi',true),
+								FileServices.RemoveOwnedSubFiles('~thor400_data::temp_in::hms_stl::hms_phone',true),
+								FileServices.RemoveOwnedSubFiles('~thor400_data::temp_in::hms_stl::hms_specialty',true),
+								FileServices.RemoveOwnedSubFiles('~thor400_data::temp_in::hms_stl::hms_stliclookup',true),
+
 			
-					),
+					// ),
 					
 					FileServices.FinishSuperFileTransaction()
 						// End Archive sequential
