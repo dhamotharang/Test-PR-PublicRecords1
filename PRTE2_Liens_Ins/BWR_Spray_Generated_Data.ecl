@@ -1,10 +1,15 @@
-﻿// BWR_Spray_Generated_Data 
-// we don't bother with 3 generation files so delete after we do the appends.
+﻿/* ************************************************************************************
+PRTE2_Liens_Ins.BWR_Spray_Generated_Data
+
+we don't bother with 3 generation files just delete the spray after we convert and do the appends.
+for add-new spray in Linda's data, convert to the "IN" layout and append to the prod base file.
+************************************************************************************ */
+
 IMPORT PRTE2_Liens_Ins;
 
-CSVNameMain := 'LindaMain.txt';
-CSVNameParty := 'LindaParty.txt';
-UseProdData := FALSE;
+CSVNameMain := 'prte__base__liensv2__main_5_ins_20181203.txt';
+CSVNameParty := 'prte__base__liensv2__ins_party_20181207.txt';
+UseProdData := TRUE;		// This forces fn_Generated_Data_Merge to use the prod "IN" base file if true.
 
 SprayInFile1 := PRTE2_Liens_Ins.fSprays_Generated.fSpray_Main(CSVNameMain);
 SprayInFile2 := PRTE2_Liens_Ins.fSprays_Generated.fSpray_Party(CSVNameParty);
