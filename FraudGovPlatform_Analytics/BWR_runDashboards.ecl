@@ -3,14 +3,16 @@
 IMPORT FraudGovPlatform_Analytics, STD;
 vizVersion 			:= '3';	
 fileName 				:= '~gov::otto::dashboardruns';
+runProd					:= FALSE;
+useProdData			:= TRUE;
 custLogicalfilename := filename+'::customer::'+vizVersion+'::'+(STRING8)STD.Date.Today();
 clusterLogicalfilename := filename+'::clusterdetails::'+vizVersion+'::'+(STRING8)STD.Date.Today();
 
 //Currently we need to run this in thor in order to create the log file
 //In the future we will be wrapping the HTTPCALL in a NOTHOR action because we don't want to 
 //risk this running multiple times
-dRunCustDashboard					:= DATASET(FraudGovPlatform_Analytics.fnRunCustomerDashboard(vizVersion, runProd := false, useProdData := true));
-dRunClusDetailsDashboard	:= DATASET(FraudGovPlatform_Analytics.fnRunClusterDetailsDashboard(vizVersion, runProd := false, useProdData := true));
+dRunCustDashboard					:= DATASET(FraudGovPlatform_Analytics.fnRunCustomerDashboard(vizVersion, runProd, useProdData));
+dRunClusDetailsDashboard	:= DATASET(FraudGovPlatform_Analytics.fnRunClusterDetailsDashboard(vizVersion, runProd, useProdData));
 RunCustDashboard 					:= OUTPUT(dRunCustDashboard,,custLogicalfilename, thor, overwrite);
 RunClusDetailsDashboard 	:= OUTPUT(dRunClusDetailsDashboard,,clusterLogicalfilename, thor, overwrite);
 
