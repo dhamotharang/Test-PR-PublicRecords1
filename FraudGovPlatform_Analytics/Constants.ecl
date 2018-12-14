@@ -45,4 +45,27 @@
 		EXPORT STRING DRIVER_LICENSE := 'Driver License';
 		EXPORT STRING UNK := 'unk';
 	END;	
+	EXPORT RampsWebServices := MODULE
+		EXPORT EncodedCredentials	:= 'Y2FybWlnang6Q2Fzc2l1czIwMTg=';
+		EXPORT reqSource					:= 'batch';		
+		EXPORT DspProd						:= 'dsp';
+		EXPORT DspQa							:= 'dsp-qa';
+		EXPORT HpccConnectionProd	:= 'ramps';
+		EXPORT HpccConnectionQa		:= 'ramps_cert';
+		EXPORT EclCompileStrategy	:= 'REMOTE';											
+		EXPORT KeepEcl						:= 'FALSE';	
+		EXPORT CustomerDashboard 	:= MODULE
+			EXPORT CompositionUuid									:= '92db8d0a-075f-4dad-a9bd-65b7633f06ce'; 	//Customer Dashboard Composition ID
+			EXPORT InputLogicalGraphFilename 				:= 'gov::otto::customerdashtopclusters';
+			EXPORT InputLogicalEntityStatsFilename	:= 'gov::otto::customerdashtopentitystats';
+		END;
+		EXPORT ClusterDetailsDashboard := MODULE
+			EXPORT CompositionUuid																:= '38635781-fb5e-4ee7-9952-e0963bd0a875'; 	//Cluster Details Dashboard Composition ID		
+			EXPORT InputLogicalGraphFilename											:= 'gov::otto::fullgraph';
+			EXPORT InputLogicalEntityStatsFilename								:= 'gov::otto::entitystats';
+			EXPORT InputLogicalPersonEventsFilename								:= 'gov::otto::personevents';
+			EXPORT InputLogicalPersonAssociationsStatsFilename 		:= 'gov::otto::person_associations_stats';
+			EXPORT InputLogicalPersonAssociationsDetailsFilename	:= 'gov::otto::person_associations_details';
+		END;
+	END;
 END;
