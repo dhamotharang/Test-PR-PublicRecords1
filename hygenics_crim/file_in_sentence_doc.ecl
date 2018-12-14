@@ -17,4 +17,4 @@ sentence_ie   := dataset(data_services.foreign_prod+'thor_200::in::crim::HD::doc
 
 proj_sent_ie  := Project(sentence_ie,transform(hygenics_crim.layout_in_sentence,self.sourcename := trim(left.sourcename)+'_IE'; self := left;));
 
-export file_in_sentence_doc := sentence    +proj_sent_cw;
+export file_in_sentence_doc := sentence    +proj_sent_cw+proj_sent_ie;
