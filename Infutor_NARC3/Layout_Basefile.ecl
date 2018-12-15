@@ -30,7 +30,7 @@ EXPORT Layout_Basefile := record
 	string15	orig_APTNBR;
 	string28	orig_CITY;
 	string2	  orig_STATE;
-	string5	  orig_orig_ZIP;
+	string5	  orig_ZIP;
 	string4	  orig_Z4;
 	string3	  orig_DPC;
 	string1	  orig_Z4TYPE;
@@ -42,7 +42,7 @@ EXPORT Layout_Basefile := record
 	string5	  orig_DMA;
 	string3	  orig_County_Code;
 	string1	  orig_Time_Zone;	//code
-	string	  orig_Time_Zone_descr;	//code
+	string	  orig_Time_Zone_descr;	//code descr
 	string1	  orig_Daylight_Savings;
 	string11	orig_Latitude;
 	string11	orig_Longitude;
@@ -54,7 +54,7 @@ EXPORT Layout_Basefile := record
 	string1	  orig_DMA_TPS_DNC_Flag_3;
 	string3	  orig_Length_of_Residence;
 	string1	  orig_Homeowner_Renter;	//code
-	string2	  orig_Homeowner_Renter_descr;	//code descr
+	string	  orig_Homeowner_Renter_descr;	//code descr
 	string4	  orig_Year_Built;
 	string1	  orig_Mobile_Home_Indicator;
 	string1	  orig_Pool_Owner;

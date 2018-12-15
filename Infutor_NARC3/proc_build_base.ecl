@@ -5,12 +5,58 @@ EXPORT proc_build_base(string	pVersion,BOOLEAN	pUseProd	=	FALSE) := function
 
 	filename_in :=  Filenames(pVersion,pUseProd).Input.consumer.Using;
 	
-	FileLogical_in := dataset(filename_in,Infutor_NARC3.Layout_Infile,csv( separator('\t'),heading(1), terminator(['\n', '\r\n']), quote(['"'])));	
+	FileLogical_in := dataset(filename_in,infutor_narc3.Layout_Infile,csv( separator('\t'),heading(1), terminator(['\n', '\r\n']), quote(['"'])));	
   
-  dedup_FileLogical_in := dedup(sort(FileLogical_in,record),record);	
-	
+  dedup_FileLogical_in := dedup(sort(FileLogical_in,record),record);
+
 Infutor_NARC3.Layout_Basefile		tMapping(dedup_FileLogical_in L) := TRANSFORM
-    SELF.process_date := (String8)Std.Date.Today();
+    //lkps
+    SELF.orig_Time_Zone_descr := Infutor_NARC3.get_decr.TimeZone(l.orig_Time_Zone);	//code descr
+    SELF.orig_Homeowner_Renter_descr := Infutor_NARC3.get_decr.Homeowner_Renter(l.orig_Homeowner_Renter);	//code descr
+		SELF.orig_Estimated_Income_descr := Infutor_NARC3.get_decr.EstimatedIncome(l.orig_Estimated_Income);	//code descr
+		SELF.orig_Marital_Status_descr := Infutor_NARC3.get_decr.MaritalStatus(l.orig_Marital_Status);	//code descr
+		SELF.orig_Wealth_Score_Estimated_Net_worth_descr := Infutor_NARC3.get_decr.WealthScore(l.orig_Wealth_Score_Estimated_Net_worth);	//code descr
+		SELF.orig_Dwelling_Type_descr := Infutor_NARC3.get_decr.DwellingType(l.orig_Dwelling_Type);	//code descr
+		SELF.orig_Home_Market_Value_descr := Infutor_NARC3.get_decr.HomeMarketValue(l.orig_Home_Market_Value);	//code descr
+		SELF.orig_Education_descr := Infutor_NARC3.get_decr.Education(l.orig_Education);	//code descr 	
+		SELF.orig_ETHNICITY_descr := Infutor_NARC3.get_decr.ETHNICITY(l.orig_ETHNICITY);	//code descr		
+		SELF.orig_Child_Age_Ranges_descr := Infutor_NARC3.get_decr.ChildAgeRanges(l.orig_Child_Age_Ranges);	//code descr	
+		SELF.orig_Number_of_Children_in_HH_descr := Infutor_NARC3.get_decr.NumberOfChildrenInHH(l.orig_Number_of_Children_in_HH);	//code descr	
+		SELF.orig_Womens_Apparel_Purchasing_Indicator_descr := Infutor_NARC3.get_decr.WomensApparelPurchasingIndicator(l.orig_Womens_Apparel_Purchasing_Indicator);	//code descr		
+		SELF.orig_Mens_Apparel_Purchasing_Indcator_descr := Infutor_NARC3.get_decr.MensApparelPurchasingIndcator(l.orig_Mens_Apparel_Purchasing_Indcator);	//code descr
+		SELF.orig_Pet_Lovers_or_owners_descr := Infutor_NARC3.get_decr.PetLoversOrOwners(l.orig_Pet_Lovers_or_owners);	//code descr	
+		SELF.orig_Arts_Bundle_descr := Infutor_NARC3.get_decr.ArtsBundle(l.orig_Arts_Bundle);	//code descr	
+		SELF.orig_Collectibles_Bundle_descr := Infutor_NARC3.get_decr.CollectiblesBundle(l.orig_Collectibles_Bundle);	//code descr	
+		SELF.orig_Hobbies_Home_and_Garden_Bundle_descr := Infutor_NARC3.get_decr.HobbiesHomeAndGardenBundle(l.orig_Hobbies_Home_and_Garden_Bundle);	//code descr	
+		SELF.orig_Home_Improvement_descr := Infutor_NARC3.get_decr.HomeImprovement(l.orig_Home_Improvement);	//code descr
+		SELF.orig_Cooking_and_Wine_descr := Infutor_NARC3.get_decr.CookingAndWine(l.orig_Cooking_and_Wine);	//code descr	
+		SELF.orig_Travel_Enthusiasts_descr := Infutor_NARC3.get_decr.TravelEnthusiasts(l.orig_Travel_Enthusiasts);	//code descr	
+		SELF.orig_Physical_Fitness_descr := Infutor_NARC3.get_decr.PhysicalFitness(l.orig_Physical_Fitness);	//code descr
+		SELF.orig_Self_Improvement_descr := Infutor_NARC3.get_decr.SelfImprovement(l.orig_Self_Improvement);	//code descr	
+		SELF.orig_Spectator_Sports_Interest_descr := Infutor_NARC3.get_decr.SpectatorSportsInterest(l.orig_Spectator_Sports_Interest);	//code descr 
+		SELF.orig_Outdoors_descr := Infutor_NARC3.get_decr.Outdoors(l.orig_Outdoors);	//code descr	
+	
+	  SELF.orig_Percent_Range_Black_descr := Infutor_NARC3.get_decr.PenetrationPercentageRanges(l.orig_Percent_Range_Black);	//code descr
+		SELF.orig_Percent_Range_White_descr := Infutor_NARC3.get_decr.PenetrationPercentageRanges(l.orig_Percent_Range_White);	//code descr
+		SELF.orig_Percent_Range_Hispanic_descr := Infutor_NARC3.get_decr.PenetrationPercentageRanges(l.orig_Percent_Range_Hispanic);	//code descr
+		SELF.orig_Percent_Range_Asian_descr := Infutor_NARC3.get_decr.PenetrationPercentageRanges(l.orig_Percent_Range_Asian);	//code descr
+		SELF.orig_Percent_Range_English_Speaking_descr := Infutor_NARC3.get_decr.PenetrationPercentageRanges(l.orig_Percent_Range_English_Speaking);	//code descr
+		SELF.orig_Percnt_Range_Spanish_Speaking_descr := Infutor_NARC3.get_decr.PenetrationPercentageRanges(l.orig_Percnt_Range_Spanish_Speaking);	//code descr
+		SELF.orig_Percent_Range_Asian_Speaking_descr := Infutor_NARC3.get_decr.PenetrationPercentageRanges(l.orig_Percent_Range_Asian_Speaking);	//code descr
+		SELF.orig_Percent_Range_SFDU_descr := Infutor_NARC3.get_decr.PenetrationPercentageRanges(l.orig_Percent_Range_SFDU);	//code descr
+		SELF.orig_Percent_Range_MFDU_descr := Infutor_NARC3.get_decr.PenetrationPercentageRanges(l.orig_Percent_Range_MFDU);	//code descr
+
+		SELF.orig_MHV_descr := Infutor_NARC3.get_decr.MHV(l.orig_MHV);	//code descr	
+
+		SELF.orig_MOR_descr := Infutor_NARC3.get_decr.PenetrationPercentageRanges(l.orig_MOR);	//code descr
+		SELF.orig_CAR_descr := Infutor_NARC3.get_decr.PenetrationPercentageRanges(l.orig_CAR);	//code descr
+		SELF.orig_Penetration_Range_White_Collar_descr := Infutor_NARC3.get_decr.PenetrationPercentageRanges(l.orig_Penetration_Range_White_Collar);	//code descr
+		SELF.orig_Penetration_Range_Blue_Collar_descr := Infutor_NARC3.get_decr.PenetrationPercentageRanges(l.orig_Penetration_Range_Blue_Collar);	//code descr
+		SELF.orig_Penetration_Range_Other_Occupation_descr := Infutor_NARC3.get_decr.PenetrationPercentageRanges(l.orig_Penetration_Range_Other_Occupation);	//code descr
+	
+	  SELF.orig_DEMOLEVEL_descr := Infutor_NARC3.get_decr.DEMOLEVEL(l.orig_DEMOLEVEL);	//code descr
+
+		SELF.process_date := (String8)Std.Date.Today();
 		SELF.Date_vendor_first_reported := (unsigned)pVersion;
 		SELF.Date_vendor_last_reported 	:= (unsigned)pVersion;
 		SELF.date_first_seen := '0';  //Blank dates are acceptable since raw data does not 
@@ -18,9 +64,11 @@ Infutor_NARC3.Layout_Basefile		tMapping(dedup_FileLogical_in L) := TRANSFORM
 		SELF.clean_phone 								:= if(ut.CleanPhone(L.orig_Telephone_Number_1) [1] not in ['0','1'],ut.CleanPhone(L.orig_Telephone_Number_1), '') ;
 		SELF.clean_dob 									:= if(L.orig_dob <> '', _validate.date.fCorrectedDateString(L.orig_dob,false), '');
 		self.src := 'XX';
+
 		SELF  :=  L;
 		SELF 	:= [];
 	END;
+
 
 std_input := project(dedup_FileLogical_in, tMapping(LEFT));
 
@@ -111,36 +159,10 @@ cleanAdd_t := project(cleanAddr,tr(left));
 													prim_range, prim_name, sec_range, zip, st,clean_phone, 
 													DID, Infutor_NARC3.Layout_Basefile, true, did_score,
 													75, d_did
-												  );
-													
-//Append HHID
-//Temp Layout to append HHID
-temp_Layout := record
-Infutor_NARC3.Layout_Basefile;
-unsigned6 hhid := 0;
-end;
-
-//Debugging code
-d_did_hhid := project(d_did, temp_Layout);
-
-//append hhid 
-append_value := 'HHID_PLUS';
-
-//----Append HHID for recs with and without did
-with_did 		:= d_did_hhid(did > 0);
-without_did	:= d_did_hhid(did = 0);
-
-didville.MAC_HHID_Append(with_did, append_value, 	Append_HHID1);
-
-didville.MAC_HHID_Append_By_Address(without_did, Append_HHID2, hhid, lname, prim_range, prim_name, sec_range, st, zip);
-infutor_narc_all := Append_HHID1+ Append_HHID2;
-
-hhid := project(infutor_narc_all, transform(Infutor_NARC3.Layout_Basefile, self.lexhhid := left.hhid, self := left));
-
- dedup_hhid := dedup(sort(hhid,record),record);
+												  );	
  
 	//Need to output new base before base_with_tag.Dostats can be called. 
-  VersionControl.macBuildNewLogicalFile(Filenames(pVersion).Base.consumer.new	,dedup_hhid, build_logical_file,true);									 	
+  VersionControl.macBuildNewLogicalFile(Filenames(pVersion).Base.consumer.new	,d_did, build_logical_file,true);									 	
 	
   return sequential(build_logical_file,
 	                  base_with_tag.Dostats										
