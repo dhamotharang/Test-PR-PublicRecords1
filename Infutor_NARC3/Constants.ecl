@@ -14,8 +14,8 @@ INLINE MODULE
 	
 	//	Directory to Spray from
 	EXPORT	Directory	:=	IF(	_control.thisenvironment.name='Dataland',
-														'/data/projects/infutor_narc3',
-														'/data/projects/infutor_narc3');
+														'/data/projects/infutor_narc3/'+pFileDate,
+														'/data/projects/infutor_narc3/'+pFileDate);
 	
 
 END;

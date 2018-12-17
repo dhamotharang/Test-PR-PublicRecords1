@@ -3,8 +3,8 @@
 IMPORT	VersionControl, tools,	_control,STD;
 EXPORT	fSprayFiles(
 	STRING			pVersionDate		=	'',
-	STRING			pServerIP				= Constants().serverIP,	
-	STRING			pDirectory			= Constants().Directory,
+	STRING			pServerIP				= Infutor_NARC3.Constants(pVersionDate).serverIP,	
+	STRING			pDirectory			= Infutor_NARC3.Constants(pVersionDate).Directory,
 	STRING			pFilename				=	'NARC3_*.txt',
 	STRING			pGroupName			=	_Dataset().groupname,
 	BOOLEAN		  pIsTesting			=	FALSE,
