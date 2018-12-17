@@ -151,7 +151,7 @@ END;
 	
 	#uniquename(partial_addr_matches)
 	%partial_addr_matches% := denormalize(%slim_h0%(is_input),%slim_h0%(~is_input),
-		left.did_field = right.did_field and
+		left.did_field = right.did_field and // This contains Account number
 		left.rid = right.rid and  // This contains actual did
 		left.prim_range = right.prim_range 
 		and stringlib.stringfind(trim(left.prim_name)+' ',trim(right.prim_name)+' ',1)>0
@@ -162,8 +162,8 @@ END;
 
 	#uniquename(no_addr_matches)
 	%no_addr_matches% :=join(%slim_h0%(~is_input),%partial_addr_matches%,
-		left.did_field = right.did_field and
-		left.rid = right.rid and
+		left.did_field = right.did_field and	// This contains Account number
+		left.rid = right.rid and	// This contains actual did
 		left.prim_name = right.prim_name and 
 		left.prim_range = right.prim_range 
 		and (left.st=right.st or right.st='')
@@ -529,9 +529,9 @@ END;
 	#uniquename(getUpdatebestdid)
 	
 	%rfields_exp_didappend% %getUpdatebestdid%(%best_recs% l,did_append_in  r) := TRANSFORM
-				self.isdidappend := if(l.rid = r.did,true,false);
+				self.isdidappend := l.rid = r.did;
 				self := l;
-				self		 := [];
+				self := [];
 	end;
 	
 		
