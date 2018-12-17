@@ -438,7 +438,7 @@ END;
 	 liens_unreleased_count84         := le.clam.bjl.liens_unreleased_count84;
 	 attr_eviction_count84            := le.clam.BJL.eviction_count84;
 	 filing_count120                  := le.clam.bjl.filing_count120;
-	 inq_total_count03                := le.busShell.Inquiry.Inquiry24Month;
+	 inq_total_count03                := le.busShell.Inquiry.Inquiry03Month;
 	 addr_input_type_advo             := le.busShell.Input_Characteristics.InputAddrTypeNoID;
    tin_match_cons_name              := le.busShell.Verification.FEINPersonNameMatch;
 	 cons_record_match_addr           := le.busShell.Business_To_Person_Link.BusFEINPersonAddrOverlap;
@@ -456,7 +456,7 @@ END;
 	 pop_bus_zip                      := le.busShell.Input.InputCheckBusZip;
 	 addr_input_zipcode_mismatch      := le.busShell.Verification.AddrZipMismatch;
 	 pop_bus_altname                  := le.busShell.Input.InputCheckBusAltName;
-	 phn_input_valid                  := le.busShell.Input.InputCheckBusAltName;
+	 phn_input_valid                  := le.busShell.Verification.InputPhoneValidNoID;
 	 addr_input_valid                 := le.busShell.Verification.InputAddrValidNoID;
 	 addr_input_pobox                 := le.busShell.Verification.AddrPOBox;
 	 addr_input_zipcode_type          := le.busShell.Verification.AddrZipType;
@@ -1146,7 +1146,7 @@ wc13b := sos_standing = '1';
 
 wc14b := sos_standing = '2';
 
-wc15p := fp_srchunvrfdssncount > '2' or fp_srchunvrfdaddrcount > '2' or fp_srchunvrfddobcount > '2' or fp_srchunvrfdphonecount > '2';
+wc15p := (integer)fp_srchunvrfdssncount > 2 or (integer)fp_srchunvrfdaddrcount > 2 or (integer)fp_srchunvrfddobcount > 2 or (integer)fp_srchunvrfdphonecount > 2;
 
 wc16p := fp_srchcomponentrisktype >= '5';
 
@@ -1164,7 +1164,8 @@ wc22p := fp_varrisktype >= '5';
 
 wc23b := pop_bus_phone = '1' and hphnpop  and in_bus_phone10 != in_phone10 and inq_consumer_phone >= '6';
 
-wc24b := pop_bus_addr = '1' and addrpop  and in_bus_streetaddress1 != in_streetaddress and inq_consumer_addr >= '6';
+//wc24b := pop_bus_addr = '1' and addrpop  and in_bus_streetaddress1 != in_streetaddress and inq_consumer_addr >= '6';
+wc24b := (integer)pop_bus_addr = 1 and addrpop  and in_bus_streetaddress1 != in_streetaddress and (integer)inq_consumer_addr >= 6;
 
 _sum_bureau := if(max((integer)ver_src_eq, (integer)ver_src_en, (integer)ver_src_tn) = NULL, NULL, sum((integer)ver_src_eq, (integer)ver_src_en, (integer)ver_src_tn));
 
@@ -1192,7 +1193,7 @@ wc28p := 0 <= earliest_header_date AND earliest_header_date <= 60;
 
 wc29p := addrs_per_adl_c6 >= 2 or ( avg_lres >= 0 and avg_lres <= 12);
 
-wc30b := ver_src_id_mth_since_fs >= '0' and ver_src_id_mth_since_fs <= '12';
+wc30b := (integer)ver_src_id_mth_since_fs >= 0 and (integer)ver_src_id_mth_since_fs <= 12;
 
 wc31p := inq_adlsperphone > 2;
 
@@ -1230,7 +1231,7 @@ wc47p := felony_count > 0;
 
 wc48p := if(max(liens_unreleased_count84, attr_eviction_count84, filing_count120, felony_count) = NULL, NULL, sum(if(liens_unreleased_count84 = NULL, 0, liens_unreleased_count84), if(attr_eviction_count84 = NULL, 0, attr_eviction_count84), if(filing_count120 = NULL, 0, filing_count120), if(felony_count = NULL, 0, felony_count))) > 2;
 
-wc49b := inq_total_count03 > '2';
+wc49b := (integer)inq_total_count03 > 2;
 
 wc50p := inq_peradl > 5;
 
@@ -1274,7 +1275,7 @@ wc69b := (pop_bus_addr = '1' and addr_input_pobox = '1') or (pop_bus_zip = '1' a
 
 wc70b := pop_bus_phone = '1' and phn_input_residential = '1';
 
-wc71b := pop_bus_phone = '1' and phn_input_distance_addr > '10';
+wc71b := (integer)pop_bus_phone = 1 and (integer)phn_input_distance_addr > 10;
 
 wc72b := pop_bus_fein = '1' and ver_fein_src_count <='0' and ver_src_id_count > '0';
 
@@ -1288,7 +1289,7 @@ wc76b := pop_bus_addr = '0' or (pop_bus_addr = '1' and pop_bus_city = '0' and po
 
 wc77b := pop_bus_phone = '0';
 
-wc78b := pop_bus_fein = '0';
+wc78b :=  pop_bus_fein = '0';
 
 wc79p :=  not fnamepop  or not lnamepop ;
 
@@ -1299,6 +1300,7 @@ wc81p := not((ssnlength in ['4', '9']));
 wc82p := not hphnpop ;
 
 wc83p :=  not dobpop ;
+
 
 /* Engineering will need to construct the following final Warning Code variables by
 hand based on the spreadsheet sent by Lea:
@@ -1319,7 +1321,7 @@ ds_WCCodes :=
         {'60B'}, {'61B'}, {'62B'}, {'63B'}, {'64P'}, {'65B'}, {'66P'}, {'67P'}, {'68P'}, {'69B'},
         {'70B'}, {'71B'}, {'72B'}, {'73P'}, {'74P'}, {'75B'}, {'76B'}, {'77B'}, {'78B'}, {'79P'}, 
         {'80P'}, {'81P'}, {'82P'}, {'83P'}
-			], { STRING2 wccode }
+			], { STRING4 wccode }
 		);
 
 	getWCPriority(STRING4 wc) := 
@@ -1884,6 +1886,7 @@ TopWarningCodes := PROJECT(ds_TopRiskIndicators, TRANSFORM(HRILayout,
                   //  SELF.clam                             := ri;
 									//	SELF.busShell                         := le;
                     self.HRIs                             := TopWarningCodes;
+                    
          
 
 #else
