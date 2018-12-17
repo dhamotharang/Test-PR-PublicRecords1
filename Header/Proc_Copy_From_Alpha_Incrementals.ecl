@@ -9,9 +9,9 @@ shared lastUpdatesFCRAqa_SF:='~thor_data400::key::fcra::header::address_rank_qa'
 shared lastUpdatesWklyQA_SF:='~thor_data400::key::header::qa::addr_unique_expanded';
 
 // Gets the version from the latest QA file on Thor
-export lastestIkbVersionOnThor  := regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatedLabQA_SF)[1].name, 0);
-export lastestFCRAversionOnThor := regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesFCRAqa_SF)[1].name, 0);
-export lastestWklyversionOnThor := regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesWklyQA_SF)[1].name, 0);
+export lastestIkbVersionOnThor  := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatedLabQA_SF)[1].name, 0));
+export lastestFCRAversionOnThor := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesFCRAqa_SF)[1].name, 0));
+export lastestWklyversionOnThor := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesWklyQA_SF)[1].name, 0));
 
 
 // generic function to get the FIRST subfie in the super
