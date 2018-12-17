@@ -40,11 +40,7 @@ ECL3 := '\n'
 +'#WORKUNIT(\'protect\',true);\n\n'
 
 +'import Header, header_ops;\n\n'
-+'build_ikb := sequential(\n'
-+'              header.LogBuild.single(\'STARTED:IKB BUILD\'),\n'
-+'              header_ops.hdr_bld_ikb(\'' + filedate + '\').all,\n'
-+'              header.LogBuild.single(\'END:IKB BUILD\')\n'
-+'             );\n\n'
++'build_ikb := header_ops.hdr_bld_ikb(\'' + filedate + '\').all;\n\n'
 +'build_ikb;';
 
 ECL := if(active_wk
