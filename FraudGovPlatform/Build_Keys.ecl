@@ -14,15 +14,13 @@ export Build_Keys(
 	tools.mac_WriteIndex('TheKeys.Main.WeightingChart.New'										,BuildWeightingChartKey			);
 													  
 	export full_build :=
-	sequential(
 		 parallel(
 			 BuildWeightingChartKey
 			,BuildClusterDetailsKey	
 			,BuildElementPivotKey
 			,BuildScoreBreakdownKey	
 		 )
-		,Promote(pversion).buildfiles.New2Built
-	);
+		;
 		
 	export All :=
 			if(tools.fun_IsValidVersion(pversion)
