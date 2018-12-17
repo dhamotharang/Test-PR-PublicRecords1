@@ -11,43 +11,27 @@ EXPORT hdr_bld_ikb(string filedate) := module
    wServer:= _control.ThisEnvironment.ESP_IPAddress;
    wLink := 'http://'+wServer+':8010/?Widget=WUDetailsWidget&Wuid='+wk+'#/stub/Summary';
 
-   CopyKeys := sequential(
-                    // header.LogBuild.single('STARTED:iCopyKeys'),
-                    Header.Proc_Copy_From_Alpha_Incrementals().Refresh_copy(filedate),
-                    // header.LogBuild.single('COMPLETED:iCopyKeys')
-                    );
+   CopyKeys := Header.Proc_Copy_From_Alpha_Incrementals().Refresh_copy(filedate);
 
-   UpdateIncIdl := sequential(
-                    // header.LogBuild.single('START:iIDL'),
-                    Header.Proc_Copy_From_Alpha_Incrementals().update_inc_idl(,filedate),
-                    // header.LogBuild.single('COMPLETED:iIDL')
-                    );
+   UpdateIncIdl := Header.Proc_Copy_From_Alpha_Incrementals().update_inc_idl(,filedate);
                     
    BuildiDid := sequential(
-                    // header.LogBuild.single('STARTED:iDid'),
                     std.file.ClearSuperFile('~thor400_44::key::insuranceheader_xlink::inc::header'),
                     std.file.AddSuperFile('~thor400_44::key::insuranceheader_xlink::inc::header',
                                           '~thor_data400::key::insuranceheader_xlink::'+filedate+'::idl'),
-                    InsuranceHeader.proc_payload_inc(filedate),
-                    // header.LogBuild.single('COMPLETED:iDid')
+                    InsuranceHeader.proc_payload_inc(filedate)
                     );
 
-   BuildFcra := sequential(
-                    // header.LogBuild.single('STARTED:iFCRA'),
-                    Doxie.Proc_FCRA_Doxie_keys_All(,true,filedate),
-                    // header.LogBuild.single('end:iFCRA'),
-                    );
-
+   BuildFcra := Doxie.Proc_FCRA_Doxie_keys_All(,true,filedate);
+   
    BuildKeys := sequential(BuildiDid, BuildFcra);
 
    MovetoQA := sequential(
-                    // header.LogBuild.single('STARTED:imovetoQA'),
                     header.Proc_Copy_From_Alpha_Incrementals().movetoQA(filedate),
-                    output(header.Verify_XADL1_base_files,named('Verify_XADL1_base_files_after'), all),
-                    // header.LogBuild.single('COMPLETED:imovetoQA'),
+                    output(header.Verify_XADL1_base_files,named('Verify_XADL1_base_files_after'), all)
                     );
                     
-   EXPORT all := sequential(CopyKeys, UpdateIncIdl, BuildKeys, MovetoQA);
+   EXPORT all := sequential(CopyKeys, UpdateIncIdl, BuildKeys, MovetoQA)
                   : failure(std.system.Email.SendEmail(emailList,'FAILED:IKB BUILD:'+workunit,wLink));
                 
 END;
