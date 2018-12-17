@@ -2,9 +2,9 @@
 
 export Build_All(
 	 string															pversion	
-	,string															pDirectory			= '/data/hds_180/Equifax_Business_Data/' + pversion[1..8]
+	,string															pDirectory			= '/data/hds_180/Equifax_Business_Data/build/' + pversion[1..8]
 	,string															pServerIP				= _control.IPAddress.bctlpedata11
-	,string															pFilename				= ''
+	,string															pFilename				= '*.txt'
   ,string															pGroupName			= STD.System.Thorlib.Group( )	  		
 	,boolean														pIsTesting			= false
 	,boolean														pOverwrite			= false																												
@@ -27,8 +27,7 @@ function
 		//for future use
 		// ,BIPStats(pversion) 
 		,Equifax_Business_Data.QA_Records()
-	// ) : success(Send_Emails(pversion,,not pIsTesting).Roxie), 
-	) : success(Send_Emails(pversion,,not pIsTesting).buildsuccess), 
+	) : success(Send_Emails(pversion,,not pIsTesting).Roxie), 
 	    failure(send_emails(pversion,,not pIsTesting).buildfailure);
 	
 	return
