@@ -14,7 +14,7 @@ EXPORT Layouts := MODULE
 		STRING10 InputZipEcho;
 		STRING10 InputSSNEcho;
 		STRING10 InputDOBEcho;
-		STRING20 InputDLEcho;
+		STRING50 InputDLEcho;
 		STRING25 InputDLStateEcho;
 		STRING16 InputHomePhoneEcho;
 		STRING16 InputWorkPhoneEcho;
@@ -28,7 +28,7 @@ EXPORT Layouts := MODULE
 		STRING5 InputPrefixClean;
 		STRING20 InputFirstNameClean;
 		STRING20 InputMiddleNameClean;
-		STRING20 InputLastNameClean;
+		STRING30 InputLastNameClean;
 		STRING5 InputSuffixClean;
 		STRING10 InputPrimaryRangeClean;
 		STRING3 InputPreDirectionClean;
@@ -51,7 +51,7 @@ EXPORT Layouts := MODULE
 		STRING4 InputAddressStatusClean;
 		STRING9 InputSSNClean;
 		STRING10 InputDOBClean;
-		STRING20 InputDLClean;
+		STRING50 InputDLClean;
 		STRING3 InputDLStateClean;
 		STRING10 InputHomePhoneClean;
 		STRING10 InputWorkPhoneClean;
@@ -154,8 +154,8 @@ EXPORT Layouts := MODULE
 	SHARED LayoutInputBIIRepEchoInternal := RECORD
 		INTEGER7 BusInputRep1LexIDEcho;
 		STRING78 BusInputRep1FirstNameEcho;
-		STRING20 BusInputRep1MiddleNameEcho;
-		STRING30 BusInputRep1LastNameEcho;
+		STRING78 BusInputRep1MiddleNameEcho;
+		STRING78 BusInputRep1LastNameEcho;
 		STRING120 BusInputRep1StreetEcho;
 		STRING50 BusInputRep1CityEcho;
 		STRING25 BusInputRep1StateEcho;
@@ -164,12 +164,12 @@ EXPORT Layouts := MODULE
 		STRING10 BusInputRep1SSNEcho;
 		STRING10 BusInputRep1DOBEcho;
 		STRING54 BusInputRep1EmailEcho;
-		STRING20 BusInputRep1DLEcho;
-		STRING3	BusInputRep1DLStateEcho;
+		STRING50 BusInputRep1DLEcho;
+		STRING25 BusInputRep1DLStateEcho;
 		INTEGER7 BusInputRep2LexIDEcho;
 		STRING78 BusInputRep2FirstNameEcho;
-		STRING20 BusInputRep2MiddleNameEcho;
-		STRING30 BusInputRep2LastNameEcho;
+		STRING78 BusInputRep2MiddleNameEcho;
+		STRING78 BusInputRep2LastNameEcho;
 		STRING120 BusInputRep2StreetEcho;
 		STRING50 BusInputRep2CityEcho;
 		STRING25 BusInputRep2StateEcho;
@@ -178,12 +178,12 @@ EXPORT Layouts := MODULE
 		STRING10 BusInputRep2SSNEcho;
 		STRING10 BusInputRep2DOBEcho;
 		STRING54 BusInputRep2EmailEcho;
-		STRING20 BusInputRep2DLEcho;
-		STRING3	BusInputRep2DLStateEcho;
+		STRING50 BusInputRep2DLEcho;
+		STRING25 BusInputRep2DLStateEcho;
 		INTEGER7 BusInputRep3LexIDEcho;
 		STRING78 BusInputRep3FirstNameEcho;
-		STRING20 BusInputRep3MiddleNameEcho;
-		STRING30 BusInputRep3LastNameEcho;
+		STRING78 BusInputRep3MiddleNameEcho;
+		STRING78 BusInputRep3LastNameEcho;
 		STRING120 BusInputRep3StreetEcho;
 		STRING50 BusInputRep3CityEcho;
 		STRING25 BusInputRep3StateEcho;
@@ -192,12 +192,12 @@ EXPORT Layouts := MODULE
 		STRING10 BusInputRep3SSNEcho;
 		STRING10 BusInputRep3DOBEcho;
 		STRING54 BusInputRep3EmailEcho;
-		STRING20 BusInputRep3DLEcho;
-		STRING3	BusInputRep3DLStateEcho;
+		STRING50 BusInputRep3DLEcho;
+		STRING25 BusInputRep3DLStateEcho;
 		INTEGER7 BusInputRep4LexIDEcho;
 		STRING78 BusInputRep4FirstNameEcho;
-		STRING20 BusInputRep4MiddleNameEcho;
-		STRING30 BusInputRep4LastNameEcho;
+		STRING78 BusInputRep4MiddleNameEcho;
+		STRING78 BusInputRep4LastNameEcho;
 		STRING120 BusInputRep4StreetEcho;
 		STRING50 BusInputRep4CityEcho;
 		STRING25 BusInputRep4StateEcho;
@@ -206,12 +206,12 @@ EXPORT Layouts := MODULE
 		STRING10 BusInputRep4SSNEcho;
 		STRING10 BusInputRep4DOBEcho;
 		STRING54 BusInputRep4EmailEcho;
-		STRING20 BusInputRep4DLEcho;
-		STRING3	BusInputRep4DLStateEcho;
+		STRING50 BusInputRep4DLEcho;
+		STRING25 BusInputRep4DLStateEcho;
 		INTEGER7 BusInputRep5LexIDEcho;
 		STRING78 BusInputRep5FirstNameEcho;
-		STRING20 BusInputRep5MiddleNameEcho;
-		STRING30 BusInputRep5LastNameEcho;
+		STRING78 BusInputRep5MiddleNameEcho;
+		STRING78 BusInputRep5LastNameEcho;
 		STRING120 BusInputRep5StreetEcho;
 		STRING50 BusInputRep5CityEcho;
 		STRING25 BusInputRep5StateEcho;
@@ -220,8 +220,8 @@ EXPORT Layouts := MODULE
 		STRING10 BusInputRep5SSNEcho;
 		STRING10 BusInputRep5DOBEcho;
 		STRING54 BusInputRep5EmailEcho;
-		STRING20 BusInputRep5DLEcho;
-		STRING3	BusInputRep5DLStateEcho;
+		STRING50 BusInputRep5DLEcho;
+		STRING25 BusInputRep5DLStateEcho;
 	END;
 	
 	SHARED LayoutInputBIIBusinessCleanInternal := RECORD
@@ -287,7 +287,7 @@ EXPORT Layouts := MODULE
 		STRING10 BusInputRep1PhoneClean;
 		STRING10 BusInputRep1SSNClean;
 		STRING10 BusInputRep1DOBClean;
-		STRING20 BusInputRep1DLClean;
+		STRING50 BusInputRep1DLClean;
 		STRING3	BusInputRep1DLStateClean;
 		STRING54 BusInputRep1EmailClean;
 		STRING5	BusInputRep2PrefixClean;
@@ -317,7 +317,7 @@ EXPORT Layouts := MODULE
 		STRING10 BusInputRep2PhoneClean;
 		STRING10 BusInputRep2SSNClean;
 		STRING10 BusInputRep2DOBClean;
-		STRING20 BusInputRep2DLClean;
+		STRING50 BusInputRep2DLClean;
 		STRING3	BusInputRep2DLStateClean;
 		STRING54 BusInputRep2EmailClean;
 		STRING5	BusInputRep3PrefixClean;
@@ -347,7 +347,7 @@ EXPORT Layouts := MODULE
 		STRING10 BusInputRep3PhoneClean;
 		STRING10 BusInputRep3SSNClean;
 		STRING10 BusInputRep3DOBClean;
-		STRING20 BusInputRep3DLClean;
+		STRING50 BusInputRep3DLClean;
 		STRING3	BusInputRep3DLStateClean;
 		STRING54 BusInputRep3EmailClean;
 		STRING5	BusInputRep4PrefixClean;
@@ -377,7 +377,7 @@ EXPORT Layouts := MODULE
 		STRING10 BusInputRep4PhoneClean;
 		STRING10 BusInputRep4SSNClean;
 		STRING10 BusInputRep4DOBClean;
-		STRING20 BusInputRep4DLClean;
+		STRING50 BusInputRep4DLClean;
 		STRING3	BusInputRep4DLStateClean;
 		STRING54 BusInputRep4EmailClean;
 		STRING5	BusInputRep5PrefixClean;
@@ -407,7 +407,7 @@ EXPORT Layouts := MODULE
 		STRING10 BusInputRep5PhoneClean;
 		STRING10 BusInputRep5SSNClean;
 		STRING10 BusInputRep5DOBClean;
-		STRING20 BusInputRep5DLClean;
+		STRING50 BusInputRep5DLClean;
 		STRING3	BusInputRep5DLStateClean;
 		STRING54 BusInputRep5EmailClean;
 	END;

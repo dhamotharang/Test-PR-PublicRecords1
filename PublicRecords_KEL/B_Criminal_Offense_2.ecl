@@ -11,7 +11,7 @@ EXPORT B_Criminal_Offense_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault
     KEL.typ.nstr Case_Type_Description_;
     KEL.typ.nkdate Offense_Date_;
     KEL.typ.nstr Offense_Score_;
-    KEL.typ.nint Data_Type_;
+    KEL.typ.nstr Data_Type_;
     KEL.typ.nstr Traffic_Flag_;
     KEL.typ.nstr Conviction_Flag_;
     KEL.typ.nint Age_In_Days_;
@@ -79,7 +79,7 @@ EXPORT B_Criminal_Offense_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault
     KEL.typ.ndataset(E_Criminal_Offense(__in,__cfg).Conviction_Overrides_Layout) Conviction_Overrides_;
     KEL.typ.ndataset(E_Criminal_Offense(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.nkdate Current_Date_;
-    KEL.typ.nint Recent_Offender_Level_;
+    KEL.typ.nstr Recent_Offender_Level_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
@@ -87,7 +87,7 @@ EXPORT B_Criminal_Offense_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault
   SHARED __ST21007_Layout __ND31448__Project(B_Criminal_Offense_3(__in,__cfg).__ST22193_Layout __PP30220) := TRANSFORM
     __EE30455 := __PP30220.Offense_Charges_;
     __ST21054_Layout __ND31427__Project(B_Criminal_Offense_3(__in,__cfg).__ST22240_Layout __PP30903) := TRANSFORM
-      SELF.Is_Arrest_ := __OP2(__PP30903.Data_Type_,=,__CN(5));
+      SELF.Is_Arrest_ := __OP2(__PP30903.Data_Type_,=,__CN('5'));
       SELF.Is_Non_Felony_Records_ := __AND(__NOT(__PP30903.Dismissed_Charges_),__NOT(__OP2(__PP30903.Offense_Score_,=,__CN('F'))));
       SELF := __PP30903;
     END;

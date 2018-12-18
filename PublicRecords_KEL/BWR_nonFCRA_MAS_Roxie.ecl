@@ -36,9 +36,9 @@ eyeball := 120;
 
 // Universally Set the History Date YYYYMMDD for ALL records. Set to 0 to use the History Date located on each record of the input file
 // histDate := '0';
-histDate := '20181212';
+histDate := '20181218';
 
-OutputFile := '~CDAL::specialcases_Consumer_RoxieDev_current_12122018_NonFCRA'+ ThorLib.wuid() ;
+OutputFile := '~CDAL::Consumer_Arrest_Bug_100K_RoxieDev_current_12182018_NonFCRA'+ ThorLib.wuid() ;
 
 prii_layout := RECORD
     STRING Account             ;
@@ -124,7 +124,7 @@ END;
 bwr_results := 
 				SOAPCALL(soap_in, 
 				RoxieIP,
-				'publicrecords_kel.MAS_nonFCRA_Service', 
+				'publicrecords_kel.MAS_nonFCRA_Service.30', 
 				{soap_in}, 
 				DATASET(layout_MAS_Test_Service_output),
 				XPATH('*'),
