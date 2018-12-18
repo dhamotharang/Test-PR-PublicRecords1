@@ -18,8 +18,8 @@ EXPORT proc_build_all (string pVersion):= function
 	
 	build_infutor_narc3	:=	SEQUENTIAL(
 		versioncontrol.mUtilities.createsupers(dAll_filenames),
-		spray_raw,
-		infutor_narc3.Promote(pVersion).inputfiles.Sprayed2Using,
+		//spray_raw,
+		//infutor_narc3.Promote(pVersion).inputfiles.Sprayed2Using,
 		Infutor_NARC3.proc_build_base(pVersion),
 		infutor_narc3.Promote(pVersion).Inputfiles.Using2Used,
 		infutor_narc3.Promote(pVersion, 'base',pIsDeltaBuild:=FALSE).buildfiles.New2Built,
@@ -27,10 +27,10 @@ EXPORT proc_build_all (string pVersion):= function
 		Infutor_NARC3.proc_build_keys(pVersion),
 		infutor_narc3.Promote(pVersion,'key').BuildFiles.New2Built,
 		infutor_narc3.Promote(,'key').BuildFiles.Built2QA,
+		// dops_update,
+		// orbit_update,
 		// scrubs,
 		// strata,
-		dops_update,
-		orbit_update,
 	) : SUCCESS(Send_Emails(pVersion,pBuildMessage:='Infutor Narc3 Basefile Build is complete').BuildMessage),
 			FAILURE(Send_Emails(pVersion).BuildFailure);	
 	
