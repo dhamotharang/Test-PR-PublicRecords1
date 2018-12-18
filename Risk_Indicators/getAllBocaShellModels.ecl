@@ -173,7 +173,7 @@ input_ok := if((
 							true,
 							false
 						);
-						
+		
 
 		// flagship v5
 	self.rv_scores.bankcardv5  := if( i=26 and input_ok, ri.score, le.rv_scores.bankcardv5 );
@@ -221,6 +221,9 @@ input_ok := if((
 	self.fd_scores.reason4fp := if(i=11, ri.ri[4].hri, le.fd_scores.reason4fp);
 	self.fd_scores.reason5fp := if(i=11, ri.ri[5].hri, le.fd_scores.reason5fp);
 	self.fd_scores.reason6fp := if(i=11, ri.ri[6].hri, le.fd_scores.reason6fp);
+	
+	
+	
 	
 	self := le;
 end;
@@ -406,22 +409,26 @@ end;
 	wFP2 := join(wFP, fp2, left.seq=right.seq, doFP1109Model(LEFT,RIGHT), left outer);
 #END
 
+
+
 // new Flagship models for Fraudpoint 3 - same output as FP1109
 Layout_Boca_Shell doFP31505Model(Layout_Boca_Shell le, models.layouts.layout_fp1109 ri) := transform
-	self.fd_scores.fraudpoint_V3 := ri.score;
-	self.fd_scores.StolenIdentityIndex_V3 := ri.StolenIdentityIndex;
-	self.fd_scores.SyntheticIdentityIndex_V3 := ri.SyntheticIdentityIndex;
-	self.fd_scores.ManipulatedIdentityIndex_V3 := ri.ManipulatedIdentityIndex;
-	self.fd_scores.VulnerableVictimIndex_V3 := ri.VulnerableVictimIndex;
-	self.fd_scores.FriendlyFraudIndex_V3 := ri.FriendlyFraudIndex;
-	self.fd_scores.SuspiciousActivityIndex_V3 := ri.SuspiciousActivityIndex;
-	self.fd_scores.reason1FP_V3 := ri.ri[1].hri;
-	self.fd_scores.reason2FP_V3 := ri.ri[2].hri;
-	self.fd_scores.reason3FP_V3 := ri.ri[3].hri;
-	self.fd_scores.reason4FP_V3 := ri.ri[4].hri;
-	self.fd_scores.reason5FP_V3 := ri.ri[5].hri;
-	self.fd_scores.reason6FP_V3 := ri.ri[6].hri;
-	
+//RQ-14827 FP 3 & FP 3 FDN min input to match FP XML service																					
+input_fp3_ok := Risk_Indicators.iid_constants.FP3_FDN_Min_Input(le.Shell_Input.fname, le.Shell_Input.lname, le.Shell_Input.ssn, le.Shell_Input.in_streetAddress, le.Shell_Input.z5);																																					
+																							
+	self.fd_scores.fraudpoint_V3 := if(input_fp3_ok, ri.score, le.fd_scores.fraudpoint_V3 );
+	self.fd_scores.StolenIdentityIndex_V3 := if(  input_fp3_ok, ri.StolenIdentityIndex, le.fd_scores.StolenIdentityIndex_V3 );
+	self.fd_scores.SyntheticIdentityIndex_V3 := if(  input_fp3_ok, ri.SyntheticIdentityIndex, le.fd_scores.SyntheticIdentityIndex_V3 );
+	self.fd_scores.ManipulatedIdentityIndex_V3 := if(  input_fp3_ok, ri.ManipulatedIdentityIndex, le.fd_scores.ManipulatedIdentityIndex_V3 );
+	self.fd_scores.VulnerableVictimIndex_V3 := if(  input_fp3_ok, ri.VulnerableVictimIndex, le.fd_scores.VulnerableVictimIndex_V3 );
+	self.fd_scores.FriendlyFraudIndex_V3 := if(  input_fp3_ok, ri.FriendlyFraudIndex, le.fd_scores.FriendlyFraudIndex_V3 );
+	self.fd_scores.SuspiciousActivityIndex_V3 := if(  input_fp3_ok, ri.SuspiciousActivityIndex, le.fd_scores.SuspiciousActivityIndex_V3 );
+	self.fd_scores.reason1FP_V3 := if(  input_fp3_ok, ri.ri[1].hri, le.fd_scores.reason1FP_V3 );
+	self.fd_scores.reason2FP_V3 := if(  input_fp3_ok, ri.ri[2].hri, le.fd_scores.reason2FP_V3 );
+	self.fd_scores.reason3FP_V3 := if(  input_fp3_ok, ri.ri[3].hri, le.fd_scores.reason3FP_V3 );
+	self.fd_scores.reason4FP_V3 := if(  input_fp3_ok, ri.ri[4].hri, le.fd_scores.reason4FP_V3 );
+	self.fd_scores.reason5FP_V3 := if(  input_fp3_ok, ri.ri[5].hri, le.fd_scores.reason5FP_V3 );
+	self.fd_scores.reason6FP_V3 := if(  input_fp3_ok, ri.ri[6].hri, le.fd_scores.reason6FP_V3 );
 	self := le;
 end;
 
@@ -432,20 +439,22 @@ end;
 #END
 
 Layout_Boca_Shell doFP3FDN1505Model(Layout_Boca_Shell le, models.layouts.layout_fp1109 ri) := transform
-	self.fd_scores.fraudpoint_V3_FDN := ri.score;
-	self.fd_scores.StolenIdentityIndex_V3_FDN := ri.StolenIdentityIndex;
-	self.fd_scores.SyntheticIdentityIndex_V3_FDN := ri.SyntheticIdentityIndex;
-	self.fd_scores.ManipulatedIdentityIndex_V3_FDN := ri.ManipulatedIdentityIndex;
-	self.fd_scores.VulnerableVictimIndex_V3_FDN := ri.VulnerableVictimIndex;
-	self.fd_scores.FriendlyFraudIndex_V3_FDN := ri.FriendlyFraudIndex;
-	self.fd_scores.SuspiciousActivityIndex_V3_FDN := ri.SuspiciousActivityIndex;
-	self.fd_scores.reason1FP_V3_FDN := ri.ri[1].hri;
-	self.fd_scores.reason2FP_V3_FDN := ri.ri[2].hri;
-	self.fd_scores.reason3FP_V3_FDN := ri.ri[3].hri;
-	self.fd_scores.reason4FP_V3_FDN := ri.ri[4].hri;
-	self.fd_scores.reason5FP_V3_FDN := ri.ri[5].hri;
-	self.fd_scores.reason6FP_V3_FDN := ri.ri[6].hri;
-	
+//RQ-14827 FP 3 & FP 3 FDN min input to match FP XML service			
+input_fp3_FDN_ok := Risk_Indicators.iid_constants.FP3_FDN_Min_Input(le.Shell_Input.fname, le.Shell_Input.lname, le.Shell_Input.ssn, le.Shell_Input.in_streetAddress, le.Shell_Input.z5);																			
+
+	self.fd_scores.fraudpoint_V3_FDN := if(input_fp3_FDN_ok, ri.score, le.fd_scores.fraudpoint_V3_FDN );
+	self.fd_scores.StolenIdentityIndex_V3_FDN := if(input_fp3_FDN_ok, ri.StolenIdentityIndex, le.fd_scores.StolenIdentityIndex_V3_FDN );
+	self.fd_scores.SyntheticIdentityIndex_V3_FDN := if(input_fp3_FDN_ok, ri.SyntheticIdentityIndex, le.fd_scores.SyntheticIdentityIndex_V3_FDN );
+	self.fd_scores.ManipulatedIdentityIndex_V3_FDN := if(input_fp3_FDN_ok, ri.ManipulatedIdentityIndex, le.fd_scores.ManipulatedIdentityIndex_V3_FDN );
+	self.fd_scores.VulnerableVictimIndex_V3_FDN := if(input_fp3_FDN_ok, ri.VulnerableVictimIndex, le.fd_scores.VulnerableVictimIndex_V3_FDN );
+	self.fd_scores.FriendlyFraudIndex_V3_FDN := if(input_fp3_FDN_ok, ri.FriendlyFraudIndex, le.fd_scores.FriendlyFraudIndex_V3_FDN );
+	self.fd_scores.SuspiciousActivityIndex_V3_FDN := if(input_fp3_FDN_ok, ri.SuspiciousActivityIndex, le.fd_scores.SuspiciousActivityIndex_V3_FDN );
+	self.fd_scores.reason1FP_V3_FDN := if(input_fp3_FDN_ok, ri.ri[1].hri, le.fd_scores.reason1FP_V3_FDN );
+	self.fd_scores.reason2FP_V3_FDN := if(input_fp3_FDN_ok, ri.ri[2].hri, le.fd_scores.reason2FP_V3_FDN );
+	self.fd_scores.reason3FP_V3_FDN := if(input_fp3_FDN_ok, ri.ri[3].hri, le.fd_scores.reason3FP_V3_FDN );
+	self.fd_scores.reason4FP_V3_FDN := if(input_fp3_FDN_ok, ri.ri[4].hri, le.fd_scores.reason4FP_V3_FDN );
+	self.fd_scores.reason5FP_V3_FDN := if(input_fp3_FDN_ok, ri.ri[5].hri, le.fd_scores.reason5FP_V3_FDN );
+	self.fd_scores.reason6FP_V3_FDN := if(input_fp3_FDN_ok, ri.ri[6].hri, le.fd_scores.reason6FP_V3_FDN );	
 	self := le;
 end;
 
