@@ -16,7 +16,7 @@ EXPORT prep_ingest := FUNCTION
     SELF.lastname    := IF(L.LASTNAME = 'NULL','',ClnLname);
 		SELF.date_vendor_first_reported := version;
     SELF.date_vendor_last_reported  := version;
-		SELF.date_first_seen            := STD.date.ConvertDateFormat(L.IndExportDate,'%m-%d-%Y', '%Y%m%d');
+		SELF.date_first_seen            := STD.date.ConvertDateFormat(L.IndExportDate,'%Y-%m-%d', '%Y%m%d');
     SELF.date_last_seen             := SELF.date_first_seen;
 		SELF.current_rec 	:= TRUE;
 		SELF				:= L;
