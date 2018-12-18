@@ -7,7 +7,7 @@ EXPORT GenerateDashboards(
 
 	IMPORT FraudGovPlatform_Analytics, STD;
 	vizVersion 			:= '3';	
-	fileName 				:= '~gov::otto::dashboardruns';
+	fileName 				:= '~' + FraudGovPlatform_Analytics.Constants.RampsWebServices.fileScope + 'dashboardruns';
 	custLogicalfilename := filename+'::customer::'+vizVersion+'::'+(STRING8)STD.Date.Today();
 	clusterLogicalfilename := filename+'::clusterdetails::'+vizVersion+'::'+(STRING8)STD.Date.Today();
 

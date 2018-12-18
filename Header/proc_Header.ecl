@@ -20,7 +20,7 @@ export proc_header(string operatorEmailList, string extraNotifyEmailList) := mod
        := sequential(
             #stored ('version'  , versionBuild); 
             #WORKUNIT('name', versionBuild + ' Header Ingest');         
-           ,if(~incremental and versionBuild[5..6]<>fn[sub+4..sub+5],fail('Current month Equifax missing'))
+            if(~incremental and versionBuild[5..6]<>fn[sub+4..sub+5],fail('Current month Equifax missing'))
            ,check_eq_monthly_file_version
            ,Header.Inputs_Sequence(incremental,versionBuild)
            ,Header.Inputs_List
@@ -46,7 +46,7 @@ export proc_header(string operatorEmailList, string extraNotifyEmailList) := mod
     fn:=nothor(fileservices.SuperFileContents('~thor_data400::base::header_raw',1)[1].name);
     sub:=stringlib.stringfind(fn,today[1..2],1);
     export STEP2 := sequential(
-            ,if(Header.version_build<>fn[sub..sub+7],fail('Header_raw does not match version'))
+             if(Header.version_build<>fn[sub..sub+7],fail('Header_raw does not match version'))
             ,Header.build_header_raw_syncd
             ,header.Proc_SetTNT(version_build)
             ,header.Proc_Regression_Test
