@@ -781,7 +781,7 @@ MODULE
     STRING8 StartDate;
     STRING8 EndDate;
     STRING60 UserId;
-    DATASET(Input_CompanyId) Companies {XPATH('CompanyIds/CompanyId'), MAXCOUNT(iesp.Constants.PfResSnapshot.MaxCompanyIds)};
+    DATASET(Input_CompanyId) CompanyIds {MAXCOUNT(iesp.Constants.PfResSnapshot.MaxCompanyIds)};
     STRING15 PhoneNumber; 		
     STRING60 ReferenceCode;
     UNSIGNED8 UniqueId;
