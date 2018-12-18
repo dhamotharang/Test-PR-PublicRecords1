@@ -1,4 +1,4 @@
-﻿/*--SOAP--
+﻿
 <message name="BCD_SmallBizCombinedReport" wuTimeout="300000">
 	<part name="SmallBizCombinedReportRequest" type="tns:XmlDataSet" cols="110" rows="75"/>
   <!-- Option Fields --> 
@@ -485,6 +485,6 @@ EXPORT BCD_SmallBizCombinedReport :=
     // OUTPUT(ds_Results.CreditReportRecords[1].AdditionalInfo.CompanyNameVariations,  NAMED('CompanyNameVariations'));
 
     OUTPUT(ds_Results,   NAMED('Results')); 
-    OUTPUT(ds_Royalties, NAMED('ds_Royalties'));
+    OUTPUT(ds_Royalties, NAMED('RoyaltySet'));
     
 ENDMACRO;
