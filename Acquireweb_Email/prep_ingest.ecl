@@ -1,4 +1,4 @@
-﻿IMPORT Acquireweb_Email, MDR, prte2, ut, STD, VersionControl;
+﻿IMPORT Acquireweb_Email, prte2, ut, STD, VersionControl;
 
 EXPORT prep_ingest := FUNCTION
 
@@ -26,4 +26,5 @@ EXPORT prep_ingest := FUNCTION
   pAppendInput	:= PROJECT(ClnIndvIn,tAppendFields(LEFT));
 	
 	RETURN pAppendInput;
+	
 END;
