@@ -27,7 +27,7 @@ export Proc_Build_All(string filedate, string version) := function
 																					,do_strata);
 
 	//Update DOPS
-	dops_update :=dops.updateversion('OshairKeys', version, _Control.MyInfo.EmailAddressNotify + 'michael.gould@lexisnexisrisk.com;darren.knowles@lexisnexisrisk.com',,'N|B'); 
+	dops_update :=dops.updateversion('OshairKeys', version, _Control.MyInfo.EmailAddressNotify + ';michael.gould@lexisnexisrisk.com;darren.knowles@lexisnexisrisk.com',,'N|B'); 
 
 	//Update ORBIT MAG
 	// Changed from CreateBuild to use CreateBuild_AddItem so that it adds the item at build time
