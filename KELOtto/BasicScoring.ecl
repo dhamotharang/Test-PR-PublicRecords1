@@ -219,7 +219,8 @@
 																											{'cl_event_count_percentile_', (STRING)LEFT.cl_event_count_percentile_},
 																											{'cl_impact_weight_', (STRING)LEFT.cl_impact_weight_},
 																											{'cl_element_count_', (STRING)LEFT.cl_element_count_},
-                                                      {'event_count_', (STRING)LEFT.event_count_}
+																											{'license_state_', (STRING)LEFT.license_state_},
+																											{'event_count_', (STRING)LEFT.event_count_}
 																											], FlagsRec);
 															 SELF := LEFT));// : PERSIST('~temp::deleteme65');
 				
