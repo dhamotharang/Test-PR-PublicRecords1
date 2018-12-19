@@ -96,8 +96,8 @@ end;
   // OUTPUT( ResultSet, NAMED('Results') );
 
 layout_MAS_Test_Service_output := RECORD
-	DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster) MasterResults {XPATH('Results/Result/Dataset[@name=\'MasterResults\']/Row')};
-	DATASET(PublicRecords_KEL.ECL_Functions.Layout_Person_NonFCRA) Results {XPATH('Results/Result/Dataset[@name=\'Results\']/Row')};
+	PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster MasterResults {XPATH('Results/Result/Dataset[@name=\'MasterResults\']/Row')};
+	PublicRecords_KEL.ECL_Functions.Layout_Person_NonFCRA Results {XPATH('Results/Result/Dataset[@name=\'Results\']/Row')};
 	STRING ErrorCode := '';
 END;
 
@@ -159,9 +159,9 @@ Layout_Person := RECORD
 END;
 
 Passed_with_Extras := SORT(
-	JOIN(p, Passed, LEFT.Account = RIGHT.MasterResults[1].InputAccountEcho, 
+	JOIN(p, Passed, LEFT.Account = RIGHT.MasterResults.InputAccountEcho, 
 		TRANSFORM(LayoutMaster_With_Extras,
-			SELF := RIGHT.MasterResults[1], //fields from passed
+			SELF := RIGHT.MasterResults, //fields from passed
 			SELF := LEFT, //input performance fields
 			SELF.ErrorCode := RIGHT.ErrorCode,
 			SELF := []),
@@ -169,9 +169,9 @@ Passed_with_Extras := SORT(
 	InputUIDAppend);
 	
 Passed_Person := SORT(
-	JOIN(p, Passed, LEFT.Account = RIGHT.Results[1].InputAccountEcho, 
+	JOIN(p, Passed, LEFT.Account = RIGHT.Results.InputAccountEcho, 
 		TRANSFORM(Layout_Person,
-			SELF := RIGHT.Results[1], //fields from passed
+			SELF := RIGHT.Results, //fields from passed
 			SELF := LEFT, //input performance fields
 			SELF.ErrorCode := RIGHT.ErrorCode,
 			SELF := []),

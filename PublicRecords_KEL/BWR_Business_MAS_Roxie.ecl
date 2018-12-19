@@ -157,8 +157,8 @@ end;
 // ResultSet:= PublicRecords_KEL.FnRoxie_GetBusAttrs(inDataReadyDist, Options);
 
 layout_MAS_Business_Service_output := RECORD
-	DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster) MasterResults {XPATH('Results/Result/Dataset[@name=\'MasterResults\']/Row')};
-	DATASET(PublicRecords_KEL.ECL_Functions.Layout_Business_NonFCRA) Results {XPATH('Results/Result/Dataset[@name=\'Results\']/Row')};
+	PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster MasterResults {XPATH('Results/Result/Dataset[@name=\'MasterResults\']/Row')};
+	PublicRecords_KEL.ECL_Functions.Layout_Business_NonFCRA Results {XPATH('Results/Result/Dataset[@name=\'Results\']/Row')};
 	STRING ErrorCode := '';
 END;
 
@@ -197,8 +197,8 @@ OUTPUT(CHOOSEN(inDataReady, eyeball), NAMED('Raw_input'));
 OUTPUT( ResultSet, NAMED('Results') );
 
 
-Passed := ResultSet(TRIM(Results[1].BusInputAccountEcho) <> '');
-Failed := ResultSet(TRIM(Results[1].BusInputAccountEcho) = ''); 
+Passed := ResultSet(TRIM(Results.BusInputAccountEcho) <> '');
+Failed := ResultSet(TRIM(Results.BusInputAccountEcho) = ''); 
 
 OUTPUT( CHOOSEN(Passed,eyeball), NAMED('bwr_results_Passed') );
 OUTPUT( CHOOSEN(Failed,eyeball), NAMED('bwr_results_Failed') );
@@ -223,9 +223,9 @@ Layout_Business := RECORD
 END;
 
 Passed_with_Extras := SORT(
-	JOIN(inDataRecs, Passed, LEFT.AccountNumber = RIGHT.MasterResults[1].BusInputAccountEcho, 
+	JOIN(inDataRecs, Passed, LEFT.AccountNumber = RIGHT.MasterResults.BusInputAccountEcho, 
 		TRANSFORM(LayoutMaster_With_Extras,
-			SELF := RIGHT.MasterResults[1], //fields from passed
+			SELF := RIGHT.MasterResults, //fields from passed
 			SELF := LEFT, //input performance fields
 			SELF.ErrorCode := RIGHT.ErrorCode,
 			SELF := []),
@@ -233,9 +233,9 @@ Passed_with_Extras := SORT(
 	BusInputUIDAppend);
 	
 Passed_Business := SORT(
-	JOIN(inDataRecs, Passed, LEFT.AccountNumber = RIGHT.Results[1].BusInputAccountEcho, 
+	JOIN(inDataRecs, Passed, LEFT.AccountNumber = RIGHT.Results.BusInputAccountEcho, 
 		TRANSFORM(Layout_Business,
-			SELF := RIGHT.Results[1], //fields from passed
+			SELF := RIGHT.Results, //fields from passed
 			SELF := LEFT, //input performance fields
 			SELF.Errorcode := RIGHT.ErrorCode,
 			SELF := []),
