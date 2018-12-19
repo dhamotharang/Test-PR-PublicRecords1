@@ -20,7 +20,7 @@ tools.mac_WriteFile(Fraudshared.Filenames().Input.mbsfdnmasteridindtypeinclusion
 									pCsvout := true,
 									pSeparator := '|\t|',
 									pOverwrite := true,
-									pTerminator := '\n',
+									pTerminator := '|\n',
 									pQuote:= '');
 
 Export MbsIncl		:= Sequential( Build_MbsInclusion_PatchFile
