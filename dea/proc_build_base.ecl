@@ -1,8 +1,6 @@
 ﻿Import fieldstats, business_header, business_header_ss, did_add, didville, ut, census_data, 
 STRATA, header, MDR, BIPV2,Health_Provider_Services, DEA, std, promotesupers;
 
-#stored('did_add_force','thor');
-
 Export proc_build_base(String filedate) := Function
 
 df	:=	DEA.Proc_Build_Preprocess(filedate);
@@ -56,17 +54,10 @@ fieldstats.mac_stat_file(df_Rollup,pre,'DEA',50,6,false,
 		                     cname,'String','M');
 
 dfseq := record
-	unsigned8 	did									:= 0;
-	unsigned1 	did_score						:= 0;
-	integer2		xadl2_weight 				:= 0;
-	unsigned2		xadl2_score	 				:= 0;
-	integer1		xadl2_distance			:= 0;
-	unsigned4		xadl2_keys_used			:= 0;
-	string			xadl2_keys_desc			:= '';
-	string60		xadl2_matches				:= '';
-	string			xadl2_matches_desc	:= '';
-	string9 		best_ssn						:= '';
-	Unsigned6		bdid 								:= 0;
+	unsigned8 did:=0;
+	unsigned1 did_score:=0;
+	string9 best_ssn:='';
+	Unsigned6	bdid := 0;
 	df_Rollup;
 	BIPV2.IDlayouts.l_xlink_ids;		   	//Added for BIP project
 	String2 src := MDR.sourceTools.src_DEA;             		 	//Added for BIP project
@@ -93,11 +84,8 @@ dfseq into_seq(df L) := transform
 																ut.CleanSpacesAndUpper(L.Bus_Activity_Sub_Code) +
 																ut.CleanSpacesAndUpper(L.Exp_of_Payment_Indicator)
 																);
-								// Self.did := (unsigned8)L.did;
-								// Self.bdid := (unsigned6)L.bdid;
-								Self := L;
-								Self := [];
-				End;
+	Self := L;
+End;
 
 df2 := project(df_Rollup,into_seq(LEFT))
     : PERSIST('~thor_data400::persist::DEA::proc_build_base::seq');
@@ -105,20 +93,15 @@ df2 := project(df_Rollup,into_seq(LEFT))
 d_ :=df2  (fname<>'' and lname<>'' and prim_name<>'') ;
 d__:=df2(~(fname<>'' and lname<>'' and prim_name<>''));
 
-matchset := ['N','A'];
+matchset := ['A'];
 did_add.MAC_Match_Flex
 	(d_, matchset,					
-	 '','', fname, mname, lname, name_suffix, 
-	 prim_range, prim_name, sec_range, zip, st,'', 
+	 foo,foo, fname, mname, lname, name_suffix, 
+	 prim_range, prim_name, sec_range, zip, st,foo, 
 	 DID, dfseq, true, did_score,
 	 75, d1,true,src);
-	 
-did_desc1 := project (d1,transform (recordof(df2), 
-                       self.xadl2_keys_desc := InsuranceHeader_xLink.Process_xIDL_Layouts(false).KeysUsedToText (left.xadl2_keys_used); 
-                       self.xadl2_matches_desc := InsuranceHeader_xLink.fn_MatchesToText(left.xadl2_matches);
-                       self := left;));	 
 
-outf1:=did_desc1 + d__ ;
+outf1:=d1 + d__ ;
 
 did_add.MAC_Add_SSN_By_DID(outf1,did,best_ssn,df4);
 
@@ -163,7 +146,7 @@ business_header_ss.MAC_Add_BDID_FLEX(
 								,mname								// mname
 								,lname								// lname
 								,											// Contact_SSN
-								,source								// Source MDR.sourceTools
+								,source								// Source  MDR.sourceTools
 								,source_rec_id					// Source_Reccord_Id
 								,true									// Src_Matching_is_priorty
 );						

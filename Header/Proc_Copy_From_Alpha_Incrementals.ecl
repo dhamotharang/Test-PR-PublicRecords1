@@ -9,9 +9,9 @@ shared lastUpdatesFCRAqa_SF:='~thor_data400::key::fcra::header::address_rank_qa'
 shared lastUpdatesWklyQA_SF:='~thor_data400::key::header::qa::addr_unique_expanded';
 
 // Gets the version from the latest QA file on Thor
-export lastestIkbVersionOnThor  := regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatedLabQA_SF)[1].name, 0);
-export lastestFCRAversionOnThor := regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesFCRAqa_SF)[1].name, 0);
-export lastestWklyversionOnThor := regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesWklyQA_SF)[1].name, 0);
+export lastestIkbVersionOnThor  := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatedLabQA_SF)[1].name, 0));
+export lastestFCRAversionOnThor := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesFCRAqa_SF)[1].name, 0));
+export lastestWklyversionOnThor := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesWklyQA_SF)[1].name, 0));
 
 
 // generic function to get the FIRST subfie in the super
@@ -58,7 +58,7 @@ EXPORT copy_addr_uniq_keys_from_alpha(string filedt) := function
   
   aDali := _control.IPAddress.aprod_thor_dali;
   lc := '~foreign::' + aDali + '::';
-  get_alogical(string sf):=fileservices.GetSuperFileSubName(lc+sf,1);
+  get_alogical(string sf):=nothor(fileservices.GetSuperFileSubName(lc+sf,1));
     
   AddrSFKeyName(boolean fcra)  := '~thor_data400::key::' + if(fcra, 'fcra::', '') + 'header::qa::addr_unique_expanded';
   AddrDSFKeyName(boolean fcra) := '~thor_data400::key::' + if(fcra, 'fcra::', '') + 'header::delete::addr_unique_expanded';
@@ -71,8 +71,8 @@ EXPORT copy_addr_uniq_keys_from_alpha(string filedt) := function
     
   moveKeys := sequential(    
         STD.File.StartSuperFileTransaction( )
-       ,STD.file.PromoteSuperFileList([AddrSFKeyName(true), AddrDSFKeyName(true)], AddrLFKeyName(true)) //Fcra
-       ,STD.file.PromoteSuperFileList([AddrSFKeyName(false), AddrDSFKeyName(false)], AddrLFKeyName(false)) //NFcra
+       ,nothor(STD.file.PromoteSuperFileList([AddrSFKeyName(true), AddrDSFKeyName(true)], AddrLFKeyName(true))) //Fcra
+       ,nothor(STD.file.PromoteSuperFileList([AddrSFKeyName(false), AddrDSFKeyName(false)], AddrLFKeyName(false))) //NFcra
        ,STD.File.FinishSuperFileTransaction( )
        );
   
@@ -93,7 +93,7 @@ EXPORT copy_from_alpha(string filedt) := function
     aDali := _control.IPAddress.aprod_thor_dali;
 
     lc := '~foreign::' + aDali + '::';
-    get_alogical(string sf):=fileservices.GetSuperFileSubName(lc+sf,1);
+    get_alogical(string sf):=nothor(fileservices.GetSuperFileSubName(lc+sf,1));
     
     // incremental key prefix
     aPref := 'thor_data400::key::insuranceheader_xlink::inc_boca::';
