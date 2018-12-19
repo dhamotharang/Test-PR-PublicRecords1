@@ -45,4 +45,28 @@
 		EXPORT STRING DRIVER_LICENSE := 'Driver License';
 		EXPORT STRING UNK := 'unk';
 	END;	
+	EXPORT RampsWebServices := MODULE
+		EXPORT fileScope					:= 'thor_data400::base::fraudgov::qa::kel::';
+		EXPORT EncodedCredentials	:= 'Y2FybWlnang6TmV3WWVhcjIwMTkh';
+		EXPORT reqSource					:= 'batch';		
+		EXPORT DspProd						:= 'dsp';
+		EXPORT DspQa							:= 'dsp-qa';
+		EXPORT HpccConnectionProd	:= 'ramps';
+		EXPORT HpccConnectionQa		:= 'ramps_cert';
+		EXPORT EclCompileStrategy	:= 'REMOTE';											
+		EXPORT KeepEcl						:= 'FALSE';	
+		EXPORT CustomerDashboard 	:= MODULE
+			EXPORT CompositionUuid									:= '92db8d0a-075f-4dad-a9bd-65b7633f06ce'; 	//Customer Dashboard Composition ID
+			EXPORT InputLogicalGraphFilename 				:= fileScope + 'customerdashtopclusters';
+			EXPORT InputLogicalEntityStatsFilename	:= fileScope + 'customerdashtopentitystats';
+		END;
+		EXPORT ClusterDetailsDashboard := MODULE
+			EXPORT CompositionUuid																:= '38635781-fb5e-4ee7-9952-e0963bd0a875'; 	//Cluster Details Dashboard Composition ID		
+			EXPORT InputLogicalGraphFilename											:= fileScope + 'fullgraph';
+			EXPORT InputLogicalEntityStatsFilename								:= fileScope + 'entitystats';
+			EXPORT InputLogicalPersonEventsFilename								:= fileScope + 'personevents';
+			EXPORT InputLogicalPersonAssociationsStatsFilename 		:= fileScope + 'person_associations_stats';
+			EXPORT InputLogicalPersonAssociationsDetailsFilename	:= fileScope + 'person_associations_details';
+		END;
+	END;
 END;

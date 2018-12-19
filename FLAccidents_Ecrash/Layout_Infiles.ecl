@@ -44,6 +44,9 @@
 		STRING Type_Hazardous;
 		STRING Type_Other;
 		STRING Citation_Status;
+		//PRtCC new fields
+		STRING Violation_Code3;
+		STRING Violation_Code4;
 	END;
 
 
@@ -460,6 +463,9 @@
 		//Nucleus 
 		STRING Platform;
 		STRING Agency_Report_Number;
+		//PRtCC new fields
+		STRING Dispatch_Time;
+		STRING Additional_Keying;
 	END;
 
 	EXPORT persn_NEW := RECORD ,MAXLENGTH(20000)
@@ -618,6 +624,9 @@
 		STRING date_of_birth_derived;
 		STRING Report_Injury_Status; 
 		STRING Address2;
+		//PRtCC new fields
+		STRING Dui_Suspected;
+		STRING Report_Contributing_Circumstances_p;
 	END;
 
 	EXPORT vehicl_NEW:= RECORD,MAXLENGTH(20000)

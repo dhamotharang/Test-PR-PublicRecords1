@@ -1,4 +1,4 @@
-IMPORT HMS_STLIC, ut;
+﻿IMPORT HMS_STLIC, ut;
 
 EXPORT Consolidate_In_File (string pVersion, boolean pUseProd):= FUNCTION
 
@@ -307,7 +307,6 @@ EXPORT Consolidate_In_File (string pVersion, boolean pUseProd):= FUNCTION
 									 THOR,OVERWRITE,compressed);
 		
 		write	:= sequential(
-					parallel(
 									ouput_addr_file,
 									ouput_lic_file,
 									ouput_ent_file,
@@ -319,9 +318,7 @@ EXPORT Consolidate_In_File (string pVersion, boolean pUseProd):= FUNCTION
 									ouput_language_file,
 									ouput_specialty_file,
 									ouput_disciplinaryact_file,
-									ouput_stliclookup_file
-					)
-					
+									ouput_stliclookup_file					
 				);
 					
 		return write;
