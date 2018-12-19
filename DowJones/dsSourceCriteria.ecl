@@ -1698,7 +1698,7 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2018/1868 Libya List','1684'},
 {'EC 2018/1863 Libya List','1685'},
 {'Government of Russia - Special Economic Measures in Connection with the Unfriendly Actions of Ukraine','1686'},
-{'EC (CFSP) 2018/1930 Ukraine List,','1687'},
+{U'EC (CFSP) 2018/1930 Ukraine List','1687'},
 {'EC 2018/1866 Banned Air Carriers List','1688'},
 {'EC 2018/1929 Ukraine List','1689'}
 ],r);
