@@ -1,4 +1,4 @@
-﻿import tools, _control, FraudShared, Orbit3, Scrubs_MBS, FraudGovPlatform_Validation,STD;
+﻿import tools, _control, FraudShared, Orbit3, Scrubs_MBS, FraudGovPlatform_Validation,STD,FraudGovPlatform_Analytics;
 
 export Build_All(
 
@@ -28,6 +28,9 @@ export Build_All(
 	,boolean                                     pUpdateKnownFraudFlag			= _Flags.Update.KnownFraud
 	,boolean                                     pUpdateDeltabaseFlag			= _Flags.Update.Deltabase
 	,boolean                                     PSkipKeysPortion					= false
+	,boolean 																		 pRunProd 								= False	// Default to Cert. Refreshs the RIN Analytics Dashboard in CERT/PROD 
+	,boolean 																		 pUseProdData 						= True	// Default to prod data. The data used to refresh the RIN Analytics Dashboard
+
 ) :=
 module
 
@@ -88,20 +91,24 @@ module
 			
 	) : success(Send_Emails(pversion).BuildSuccess), failure(Send_Emails(pversion).BuildFailure);
 	
-
-	export Build_FraudShared_Keys := sequential(
-			FraudShared.Build_Keys(
-			 pversion
-			,pBaseMainBuilt
-			).All
-		  ,FraudShared.Build_AutoKeys(
-			 pversion
-			,pBaseMainBuilt)
+	//Create Orbit Builds
+	export	create_build := Orbit3.proc_Orbit3_CreateBuild_AddItem('FraudGov',pversion);
+	
+		export Build_FraudShared_Keys := sequential(
+			 FraudShared.Build_Keys( pversion,	pBaseMainBuilt).All
+		  ,FraudShared.Build_AutoKeys(pversion,	pBaseMainBuilt)
+			//Create SOAP appends
+			,FraudGovPlatform.Build_Base_Pii(pversion).All
+			//Build KEL keys & files
+			,FraudGovPlatform.Build_Kel(pversion).All
 			// Promote Shared Files
 			,FraudShared.Promote().buildfiles.Built2QA			
 			// Clean Up Shared Files	
 			,FraudShared.Promote().buildfiles.cleanup	
 			,FraudgovInfo(pversion,'Keys_Completed').SetPreviousVersion			
+			,create_build
+			,Send_Emails(pversion).Roxie
+			,FraudGovPlatform_Analytics.GenerateDashboards(pRunProd,pUseProdData)
 		) : success(Send_Emails(pversion).BuildSuccess), failure(Send_Emails(pversion).BuildFailure);	
 
 	export keys_portion := if(	Mac_TestBuild(pversion) 			= 'Passed' and 
@@ -146,7 +153,4 @@ module
 	) : SUCCESS(Send_Emails(pversion,pBuildMessage:='MBS Scrubs are complete').BuildMessage),
 			FAILURE(Send_Emails(pversion).BuildFailure);
 			
-	//Create Orbit Builds
-	export	create_build := Orbit3.proc_Orbit3_CreateBuild_AddItem('FraudGov',pversion);
-	
 end;
