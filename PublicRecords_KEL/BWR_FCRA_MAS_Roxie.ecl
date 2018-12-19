@@ -123,7 +123,7 @@ END;
 bwr_results := 
 				SOAPCALL(soap_in, 
 				RoxieIP,
-				'publicrecords_kel.MAS_FCRA_Service.71', 
+				'publicrecords_kel.MAS_FCRA_Service', 
 				{soap_in}, 
 				DATASET(layout_MAS_Test_Service_output),
 				XPATH('*'),
