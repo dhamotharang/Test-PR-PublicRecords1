@@ -16,12 +16,6 @@ module
 				,Build_Input_KnownFraud(pversion).All)	
 			,if(PSkipDeltabaseBase , output('Deltabase input skipped')
 				,Build_Input_Deltabase(pversion).All)					
-			//Clear Individual Sprayed Files			
-			,Promote(pVersion).inputfiles.Sprayed2Using
-			,Promote(pVersion).inputfiles.Using2Used
-			,Promote(pVersion).inputfiles.New2Sprayed			
-			,Promote(pversion).sprayedfiles.Passed2Delete
-			,Promote(pversion).sprayedfiles.Rejected2Delete
 		 )
 		,output('No Valid version parameter passed, skipping FraudGovPlatform.Build_Input atribute')
 	 );

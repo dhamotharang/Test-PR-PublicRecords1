@@ -9,6 +9,7 @@ export Build_All(
 	,string																pMBSFDNServerIP 					= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10)
 	,string																pMBSFraudGovDirectory			= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', FraudGovPlatform_Validation.Constants.MBSLandingZonePathBase_dev, FraudGovPlatform_Validation.Constants.MBSLandingZonePathBase_prod)
 	,string																pMBSFDNDirectory					= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', FraudGovPlatform_Validation.Constants.FDNMBSLandingZonePathBase_dev, FraudGovPlatform_Validation.Constants.FDNMBSLandingZonePathBase_prod)
+	,string 															pDeltabaseRootDir 				= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', FraudGovPlatform_Validation.Constants.DeltaLandingZonePathBase_dev, FraudGovPlatform_Validation.Constants.DeltaLandingZonePathBase_prod)
 	// All sources are not updated each build if no updates to particular source skip that source base 
 	,boolean															PSkipIdentityDataBase			= false 
 	,boolean															PSkipKnownFraudBase				= false 
@@ -46,7 +47,6 @@ module
 																							pFilenameMBSFdnCCID := 'mbsi_fdn_accounts_' + (string)yesterday_date + '*'
 																						),
 					If(_Flags.UseDemoData,FraudGovPlatform.Append_MBSDemoData(pversion).MbsIncl),
-					FraudgovInfo(pversion,'MBS_Completed').postNewStatus,
 					Scrubs_MBS.BuildSCRUBSReport(pversion, FraudGovPlatform.Email_Notification_Lists().BuildSuccess)				
 	);
 
@@ -87,28 +87,40 @@ module
 			).All
 			,FraudgovInfo(pversion,'Base_Completed').postNewStatus
 			,notify('Base_Completed','*')
-			,notify('Build_FraudGov_PII_SOAP_Appends','*')
-			
-	) : success(Send_Emails(pversion).BuildSuccess), failure(Send_Emails(pversion).BuildFailure);
+	);
 	
 	//Create Orbit Builds
 	export	create_build := Orbit3.proc_Orbit3_CreateBuild_AddItem('FraudGov',pversion);
-	
-		export Build_FraudShared_Keys := sequential(
-			 FraudShared.Build_Keys( pversion,	pBaseMainBuilt).All
-		  ,FraudShared.Build_AutoKeys(pversion,	pBaseMainBuilt)
+	export Build_FraudShared_Keys := sequential(
+
+			//Clear Individual Sprayed Files			
+			,Promote(pVersion).inputfiles.Sprayed2Using
+			,Promote(pVersion).inputfiles.Using2Used
+			,Promote(pVersion).inputfiles.New2Sprayed			
+			,Promote(pversion).sprayedfiles.Passed2Delete
+			,Promote(pversion).sprayedfiles.Rejected2Delete
+			,Promote(pversion).buildfiles.Built2QA
+			,FraudShared.Build_Keys( pversion,	pBaseMainBuilt).All
+		  	,FraudShared.Build_AutoKeys(pversion,	pBaseMainBuilt)
+
+			// Build FraudGov Keys
+			,FraudShared.Build_Keys( pversion,	pBaseMainBuilt).All
+		  	,FraudShared.Build_AutoKeys(pversion,	pBaseMainBuilt)
+
 			//Create SOAP appends
 			,FraudGovPlatform.Build_Base_Pii(pversion).All
+
 			//Build KEL keys & files
 			,FraudGovPlatform.Build_Kel(pversion).All
+
 			// Promote Shared Files
 			,FraudShared.Promote().buildfiles.Built2QA			
 			// Clean Up Shared Files	
 			,FraudShared.Promote().buildfiles.cleanup	
-			,FraudgovInfo(pversion,'Keys_Completed').SetPreviousVersion			
 			,create_build
 			,Send_Emails(pversion).Roxie
 			,FraudGovPlatform_Analytics.GenerateDashboards(pRunProd,pUseProdData)
+			,FraudgovInfo(pversion,'Keys_Completed').SetPreviousVersion			
 		) : success(Send_Emails(pversion).BuildSuccess), failure(Send_Emails(pversion).BuildFailure);	
 
 	export keys_portion := if(	Mac_TestBuild(pversion) 			= 'Passed' and 
@@ -117,13 +129,12 @@ module
 												Build_FraudShared_Keys, 
 												Rollback(pversion).All);
 	
-	export full_build := sequential(
-		 Spray_MBS
-		,Create_Supers
+	export Full_Build := sequential(
+		 Create_Supers
+		,Spray_MBS
+		,FraudGovPlatform_Validation.SprayAndQualifyDeltabase(pversion,pMBSServerIP,pDeltabaseRootDir)
 		,input_portion
 		,base_portion
-		,if(PSkipKeysPortion, output('keys_portion skipped')
-				,keys_portion)
 	) : success(Send_Emails(pversion).BuildSuccess), failure(Send_Emails(pversion).BuildFailure);
 	
 	export Build_Base_Files :=
@@ -140,7 +151,7 @@ module
 
 	export All :=
 	if(tools.fun_IsValidVersion(pversion)
-		,full_build
+		,Full_Build
 		,output('No Valid version parameter passed, skipping FraudGovPlatform.Build_All')
 	);
 
