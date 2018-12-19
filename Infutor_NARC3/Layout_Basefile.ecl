@@ -2,7 +2,7 @@
 import address,AID;
 
 EXPORT Layout_Basefile := record
-	integer8  key;
+	integer8  recordid;
 	string2 	src;
 	string8	  process_date;
 	string8 	date_first_seen  	:='0';
@@ -188,6 +188,7 @@ EXPORT Layout_Basefile := record
 	address.Layout_Clean182.err_stat;
 	UNSIGNED6  did 							:= 0;	
 	UNSIGNED1  did_score 				:= 0;
+	string9	   ssn_append := '';
 	string10   clean_Phone;
 	string8	   clean_DOB;	
 	unsigned1  record_type;	

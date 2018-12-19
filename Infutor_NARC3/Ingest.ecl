@@ -208,6 +208,7 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
     SELF.geo_match := ri.geo_match; // Derived(NEW)
     SELF.err_stat := ri.err_stat; // Derived(NEW)
     SELF.did := ri.did; // Derived(NEW)
+    SELF.ssn_append := ri.ssn_append; // Derived(NEW)
     SELF.did_score := ri.did_score; // Derived(NEW)
     SELF.clean_phone := ri.clean_phone; // Derived(NEW)
     SELF.clean_dob := ri.clean_dob; // Derived(NEW)
@@ -228,7 +229,7 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
              ,orig_dpc,orig_telephone_number_1));
   SortIngest0 := SORT(DistIngest0,orig_fname
              ,orig_mname,orig_lname,orig_suffix,orig_gender,orig_dob,orig_address,orig_city,orig_state,orig_zip
-             ,orig_dpc,orig_telephone_number_1, __Tpe, key, LOCAL);
+             ,orig_dpc,orig_telephone_number_1, __Tpe, recordid, LOCAL);
   GroupIngest0 := GROUP(SortIngest0,orig_fname
              ,orig_mname,orig_lname,orig_suffix,orig_gender,orig_dob,orig_address,orig_city,orig_state,orig_zip
              ,orig_dpc,orig_telephone_number_1, LOCAL, ORDERED, STABLE);
@@ -240,7 +241,7 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
              ,orig_dpc,orig_telephone_number_1));
   SortBase0 := SORT(DistBase0,orig_fname
              ,orig_mname,orig_lname,orig_suffix,orig_gender,orig_dob,orig_address,orig_city,orig_state,orig_zip
-             ,orig_dpc,orig_telephone_number_1, __Tpe, key, LOCAL);
+             ,orig_dpc,orig_telephone_number_1, __Tpe, recordid, LOCAL);
   GroupBase0 := GROUP(SortBase0,orig_fname
              ,orig_mname,orig_lname,orig_suffix,orig_gender,orig_dob,orig_address,orig_city,orig_state,orig_zip
              ,orig_dpc,orig_telephone_number_1, LOCAL, ORDERED, STABLE);
@@ -249,7 +250,7 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
   // Everything: combine ingest and base recs
   Sort0 := SORT(AllBaseRecs0+AllIngestRecs0,orig_fname
              ,orig_mname,orig_lname,orig_suffix,orig_gender,orig_dob,orig_address,orig_city,orig_state,orig_zip
-             ,orig_dpc,orig_telephone_number_1, __Tpe,key,LOCAL);
+             ,orig_dpc,orig_telephone_number_1, __Tpe,recordid,LOCAL);
   Group0 := GROUP(Sort0,orig_fname
              ,orig_mname,orig_lname,orig_suffix,orig_gender,orig_dob,orig_address,orig_city,orig_state,orig_zip
              ,orig_dpc,orig_telephone_number_1,LOCAL, ORDERED, STABLE);
@@ -260,13 +261,13 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
   // Do not use PROJECT,COUNTER because it is very slow if any of the fields are not fixed length
   NR := AllRecs0(__Tpe=RecordType.New);
   ORe := AllRecs0(__Tpe<>RecordType.New);
-  PrevBase := MAX(ORe,key);
+  PrevBase := MAX(ORe,recordid);
   WithRT AddNewRid(WithRT le, WithRT ri) := TRANSFORM
-    SELF.key := IF ( le.key=0, PrevBase+1+thorlib.node(), le.key+thorlib.nodes() );
+    SELF.recordid := IF ( le.recordid=0, PrevBase+1+thorlib.node(), le.recordid+thorlib.nodes() );
     SELF := ri;
   END;
-  NR1 := ITERATE(NR(key=0),AddNewRid(LEFT,RIGHT),LOCAL);
-  SHARED AllRecs := ORe+NR1+NR(key<>0) : PERSIST('~temp::Infutor_NARC3::Ingest_Cache',EXPIRE(Infutor_NARC3.Config.PersistExpire));
+  NR1 := ITERATE(NR(recordid=0),AddNewRid(LEFT,RIGHT),LOCAL);
+  SHARED AllRecs := ORe+NR1+NR(recordid<>0) : PERSIST('~temp::Infutor_NARC3::Ingest_Cache',EXPIRE(Infutor_NARC3.Config.PersistExpire));
   SHARED UpdateStatsFull := SORT(TABLE(AllRecs, {__Tpe,SALT311.StrType INGESTSTATUS:=RTToText(AllRecs.__Tpe),UNSIGNED Cnt:=COUNT(GROUP)}, __Tpe, FEW),__Tpe, FEW);
   SHARED UpdateStatsInc := SORT(UpdateStatsFull(__Tpe = RecordType.New), __Tpe, INGESTSTATUS, FEW);
   EXPORT UpdateStats := IF(incremental, UpdateStatsInc, UpdateStatsFull);
@@ -283,8 +284,8 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
   EXPORT AllRecords := IF(incremental, NewRecords, PROJECT(AllRecs, NoFlagsRec));
   EXPORT AllRecords_NoTag := PROJECT(AllRecords,Layout_basefile); // Records in 'pure' format
  
-f := TABLE(dsBase,{key}) : GLOBAL;
-rcid_clusters := SALT311.MOD_ClusterStats.Counts(f,key);
+f := TABLE(dsBase,{recordid}) : GLOBAL;
+rcid_clusters := SALT311.MOD_ClusterStats.Counts(f,recordid);
 DuplicateRids0 := COUNT(dsBase) - SUM(rcid_clusters,NumberOfClusters); // Should be zero
 d := DATASET([{DuplicateRids0}],{UNSIGNED2 DuplicateRids0});
 EXPORT ValidityStats := OUTPUT(d,NAMED('ValidityStatistics'));

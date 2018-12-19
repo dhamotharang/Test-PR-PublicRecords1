@@ -160,9 +160,12 @@ cleanAdd_t := project(cleanAddr,tr(left));
 													DID, Infutor_NARC3.Layout_Basefile, true, did_score,
 													75, d_did
 												  );	
+													
+//Append SSN by DID													
+	did_add.MAC_Add_SSN_By_DID(d_did, did, ssn_append, out_with_ssn);												
  
 	//Need to output new base before base_with_tag.Dostats can be called. 
-  VersionControl.macBuildNewLogicalFile(Filenames(pVersion).Base.consumer.new	,d_did, build_logical_file,true);									 	
+  VersionControl.macBuildNewLogicalFile(Filenames(pVersion).Base.consumer.new	,out_with_ssn, build_logical_file,true);									 	
 	
   return sequential(build_logical_file,
 	                  base_with_tag.Dostats										

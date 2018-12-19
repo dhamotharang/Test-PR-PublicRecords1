@@ -11,7 +11,7 @@ EXPORT	Filenames(STRING	pVersion	=	'',
 	EXPORT	Input						:=	MODULE
 	
 	  //list all raw inputs here
-		EXPORT	Consumer	:=	versioncontrol.mInputFilenameVersions(lInputTemplate	+	'consumer',	pVersion);      
+		EXPORT	Consumer	:=	versioncontrol.mInputFilenameVersions(lInputTemplate + 'consumer',pVersion);      
 		
 		EXPORT	dAll_filenames	:= Consumer.dAll_filenames;		
 	END;
