@@ -37,9 +37,7 @@ EXPORT E_Social_Security_Number := MODULE
   END;
   SHARED __d0_KELfiltered := KELOtto.fraudgovshared((UNSIGNED)ssn <> 0);
   SHARED __d0_Trim := PROJECT(__d0_KELfiltered,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.ssn)));
-  SHARED __d1_KELfiltered := KELOtto.PersonCIID((UNSIGNED)ssn <> 0);
-  SHARED __d1_Trim := PROJECT(__d1_KELfiltered,TRANSFORM(__Trimmed,SELF.KeyVal:=TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.ssn)));
-  EXPORT __All_Trim := __d0_Trim + __d1_Trim;
+  EXPORT __All_Trim := __d0_Trim;
   SHARED __TabRec := RECORD, MAXLENGTH(5000)
     __All_Trim.KeyVal;
     UNSIGNED4 Cnt := COUNT(GROUP);
@@ -63,15 +61,7 @@ EXPORT E_Social_Security_Number := MODULE
   EXPORT KELOtto_fraudgovshared_Invalid := __d0_UID_Mapped(UID = 0);
   SHARED __d0_Prefiltered := __d0_UID_Mapped(UID <> 0);
   SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0));
-  SHARED __d1_Out := RECORD
-    RECORDOF(KELOtto.PersonCIID);
-    KEL.typ.uid UID := 0;
-  END;
-  SHARED __d1_UID_Mapped := JOIN(__d1_KELfiltered,Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.ssn) = RIGHT.KeyVal,TRANSFORM(__d1_Out,SELF.UID:=RIGHT.UID,SELF:=LEFT),HASH);
-  EXPORT KELOtto_PersonCIID_Invalid := __d1_UID_Mapped(UID = 0);
-  SHARED __d1_Prefiltered := __d1_UID_Mapped(UID <> 0);
-  SHARED __d1 := __SourceFilter(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping));
-  EXPORT InData := __d0 + __d1;
+  EXPORT InData := __d0;
   EXPORT Source_Customers_Layout := RECORD
     KEL.typ.ntyp(E_Customer.Typ) _r_Source_Customer_;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -164,7 +154,7 @@ EXPORT E_Social_Security_Number := MODULE
   EXPORT _state__death__id__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,_state__death__id_);
   EXPORT _r_Customer__Orphan := JOIN(InData(__NN(_r_Customer_)),E_Customer.__Result,__EEQP(LEFT._r_Customer_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT _r_Source_Customer__Orphan := JOIN(InData(__NN(_r_Source_Customer_)),E_Customer.__Result,__EEQP(LEFT._r_Source_Customer_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
-  EXPORT SanityCheck := DATASET([{COUNT(_r_Customer__Orphan),COUNT(_r_Source_Customer__Orphan),COUNT(KELOtto_fraudgovshared_Invalid),COUNT(KELOtto_PersonCIID_Invalid),COUNT(_r_Customer__SingleValue_Invalid),COUNT(Ssn__SingleValue_Invalid),COUNT(Otto_S_S_N_Id__SingleValue_Invalid),COUNT(Ssn_Formatted__SingleValue_Invalid),COUNT(_v2__divssnidentitycountnew__SingleValue_Invalid),COUNT(Deceased_Date__SingleValue_Invalid),COUNT(Deceased_Date_Of_Birth__SingleValue_Invalid),COUNT(Deceased_First__SingleValue_Invalid),COUNT(Deceased_Middle__SingleValue_Invalid),COUNT(Deceased_Last__SingleValue_Invalid),COUNT(Deceased_Match_Code__SingleValue_Invalid),COUNT(_isdeepdive__SingleValue_Invalid),COUNT(_county__death__SingleValue_Invalid),COUNT(Deceased_Ssn__SingleValue_Invalid),COUNT(_state__death__flag__SingleValue_Invalid),COUNT(_death__rec__src__SingleValue_Invalid),COUNT(_state__death__id__SingleValue_Invalid)}],{KEL.typ.int _r_Customer__Orphan,KEL.typ.int _r_Source_Customer__Orphan,KEL.typ.int KELOtto_fraudgovshared_Invalid,KEL.typ.int KELOtto_PersonCIID_Invalid,KEL.typ.int _r_Customer__SingleValue_Invalid,KEL.typ.int Ssn__SingleValue_Invalid,KEL.typ.int Otto_S_S_N_Id__SingleValue_Invalid,KEL.typ.int Ssn_Formatted__SingleValue_Invalid,KEL.typ.int _v2__divssnidentitycountnew__SingleValue_Invalid,KEL.typ.int Deceased_Date__SingleValue_Invalid,KEL.typ.int Deceased_Date_Of_Birth__SingleValue_Invalid,KEL.typ.int Deceased_First__SingleValue_Invalid,KEL.typ.int Deceased_Middle__SingleValue_Invalid,KEL.typ.int Deceased_Last__SingleValue_Invalid,KEL.typ.int Deceased_Match_Code__SingleValue_Invalid,KEL.typ.int _isdeepdive__SingleValue_Invalid,KEL.typ.int _county__death__SingleValue_Invalid,KEL.typ.int Deceased_Ssn__SingleValue_Invalid,KEL.typ.int _state__death__flag__SingleValue_Invalid,KEL.typ.int _death__rec__src__SingleValue_Invalid,KEL.typ.int _state__death__id__SingleValue_Invalid});
+  EXPORT SanityCheck := DATASET([{COUNT(_r_Customer__Orphan),COUNT(_r_Source_Customer__Orphan),COUNT(KELOtto_fraudgovshared_Invalid),COUNT(_r_Customer__SingleValue_Invalid),COUNT(Ssn__SingleValue_Invalid),COUNT(Otto_S_S_N_Id__SingleValue_Invalid),COUNT(Ssn_Formatted__SingleValue_Invalid),COUNT(_v2__divssnidentitycountnew__SingleValue_Invalid),COUNT(Deceased_Date__SingleValue_Invalid),COUNT(Deceased_Date_Of_Birth__SingleValue_Invalid),COUNT(Deceased_First__SingleValue_Invalid),COUNT(Deceased_Middle__SingleValue_Invalid),COUNT(Deceased_Last__SingleValue_Invalid),COUNT(Deceased_Match_Code__SingleValue_Invalid),COUNT(_isdeepdive__SingleValue_Invalid),COUNT(_county__death__SingleValue_Invalid),COUNT(Deceased_Ssn__SingleValue_Invalid),COUNT(_state__death__flag__SingleValue_Invalid),COUNT(_death__rec__src__SingleValue_Invalid),COUNT(_state__death__id__SingleValue_Invalid)}],{KEL.typ.int _r_Customer__Orphan,KEL.typ.int _r_Source_Customer__Orphan,KEL.typ.int KELOtto_fraudgovshared_Invalid,KEL.typ.int _r_Customer__SingleValue_Invalid,KEL.typ.int Ssn__SingleValue_Invalid,KEL.typ.int Otto_S_S_N_Id__SingleValue_Invalid,KEL.typ.int Ssn_Formatted__SingleValue_Invalid,KEL.typ.int _v2__divssnidentitycountnew__SingleValue_Invalid,KEL.typ.int Deceased_Date__SingleValue_Invalid,KEL.typ.int Deceased_Date_Of_Birth__SingleValue_Invalid,KEL.typ.int Deceased_First__SingleValue_Invalid,KEL.typ.int Deceased_Middle__SingleValue_Invalid,KEL.typ.int Deceased_Last__SingleValue_Invalid,KEL.typ.int Deceased_Match_Code__SingleValue_Invalid,KEL.typ.int _isdeepdive__SingleValue_Invalid,KEL.typ.int _county__death__SingleValue_Invalid,KEL.typ.int Deceased_Ssn__SingleValue_Invalid,KEL.typ.int _state__death__flag__SingleValue_Invalid,KEL.typ.int _death__rec__src__SingleValue_Invalid,KEL.typ.int _state__death__id__SingleValue_Invalid});
   EXPORT NullCounts := DATASET([
     {'SocialSecurityNumber','KELOtto.fraudgovshared','UID',COUNT(KELOtto_fraudgovshared_Invalid),COUNT(__d0)},
     {'SocialSecurityNumber','KELOtto.fraudgovshared','AssociatedCustomerFileInfo',COUNT(__d0(__NL(_r_Customer_))),COUNT(__d0(__NN(_r_Customer_)))},
@@ -187,28 +177,6 @@ EXPORT E_Social_Security_Number := MODULE
     {'SocialSecurityNumber','KELOtto.fraudgovshared','state_death_id',COUNT(__d0(__NL(_state__death__id_))),COUNT(__d0(__NN(_state__death__id_)))},
     {'SocialSecurityNumber','KELOtto.fraudgovshared','Hri',COUNT(__d0(__NL(Hri_))),COUNT(__d0(__NN(Hri_)))},
     {'SocialSecurityNumber','KELOtto.fraudgovshared','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
-    {'SocialSecurityNumber','KELOtto.fraudgovshared','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
-    {'SocialSecurityNumber','KELOtto.PersonCIID','UID',COUNT(KELOtto_PersonCIID_Invalid),COUNT(__d1)},
-    {'SocialSecurityNumber','KELOtto.PersonCIID','AssociatedCustomerFileInfo',COUNT(__d1(__NL(_r_Customer_))),COUNT(__d1(__NN(_r_Customer_)))},
-    {'SocialSecurityNumber','KELOtto.PersonCIID','SourceCustomerFileInfo',COUNT(__d1(__NL(_r_Source_Customer_))),COUNT(__d1(__NN(_r_Source_Customer_)))},
-    {'SocialSecurityNumber','KELOtto.PersonCIID','Ssn',COUNT(__d1(__NL(Ssn_))),COUNT(__d1(__NN(Ssn_)))},
-    {'SocialSecurityNumber','KELOtto.PersonCIID','OttoSSNId',COUNT(__d1(__NL(Otto_S_S_N_Id_))),COUNT(__d1(__NN(Otto_S_S_N_Id_)))},
-    {'SocialSecurityNumber','KELOtto.PersonCIID','SsnFormatted',COUNT(__d1(__NL(Ssn_Formatted_))),COUNT(__d1(__NN(Ssn_Formatted_)))},
-    {'SocialSecurityNumber','KELOtto.PersonCIID','v2_divssnidentitycountnew',COUNT(__d1(__NL(_v2__divssnidentitycountnew_))),COUNT(__d1(__NN(_v2__divssnidentitycountnew_)))},
-    {'SocialSecurityNumber','KELOtto.PersonCIID','DeceasedDate',COUNT(__d1(__NL(Deceased_Date_))),COUNT(__d1(__NN(Deceased_Date_)))},
-    {'SocialSecurityNumber','KELOtto.PersonCIID','DeceasedDateOfBirth',COUNT(__d1(__NL(Deceased_Date_Of_Birth_))),COUNT(__d1(__NN(Deceased_Date_Of_Birth_)))},
-    {'SocialSecurityNumber','KELOtto.PersonCIID','DeceasedFirst',COUNT(__d1(__NL(Deceased_First_))),COUNT(__d1(__NN(Deceased_First_)))},
-    {'SocialSecurityNumber','KELOtto.PersonCIID','DeceasedMiddle',COUNT(__d1(__NL(Deceased_Middle_))),COUNT(__d1(__NN(Deceased_Middle_)))},
-    {'SocialSecurityNumber','KELOtto.PersonCIID','DeceasedLast',COUNT(__d1(__NL(Deceased_Last_))),COUNT(__d1(__NN(Deceased_Last_)))},
-    {'SocialSecurityNumber','KELOtto.PersonCIID','DeceasedMatchCode',COUNT(__d1(__NL(Deceased_Match_Code_))),COUNT(__d1(__NN(Deceased_Match_Code_)))},
-    {'SocialSecurityNumber','KELOtto.PersonCIID','isdeepdive',COUNT(__d1(__NL(_isdeepdive_))),COUNT(__d1(__NN(_isdeepdive_)))},
-    {'SocialSecurityNumber','KELOtto.PersonCIID','county_death',COUNT(__d1(__NL(_county__death_))),COUNT(__d1(__NN(_county__death_)))},
-    {'SocialSecurityNumber','KELOtto.PersonCIID','DeceasedSsn',COUNT(__d1(__NL(Deceased_Ssn_))),COUNT(__d1(__NN(Deceased_Ssn_)))},
-    {'SocialSecurityNumber','KELOtto.PersonCIID','state_death_flag',COUNT(__d1(__NL(_state__death__flag_))),COUNT(__d1(__NN(_state__death__flag_)))},
-    {'SocialSecurityNumber','KELOtto.PersonCIID','death_rec_src',COUNT(__d1(__NL(_death__rec__src_))),COUNT(__d1(__NN(_death__rec__src_)))},
-    {'SocialSecurityNumber','KELOtto.PersonCIID','state_death_id',COUNT(__d1(__NL(_state__death__id_))),COUNT(__d1(__NN(_state__death__id_)))},
-    {'SocialSecurityNumber','KELOtto.PersonCIID','Hri',COUNT(__d1(__NL(Hri_))),COUNT(__d1(__NN(Hri_)))},
-    {'SocialSecurityNumber','KELOtto.PersonCIID','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},
-    {'SocialSecurityNumber','KELOtto.PersonCIID','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))}]
+    {'SocialSecurityNumber','KELOtto.fraudgovshared','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
 END;
