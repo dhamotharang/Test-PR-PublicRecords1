@@ -257,7 +257,7 @@ END;
 		UNSIGNED8											ace_aid														:= 0;
 	  STRING100											prep_addr_line1		    			 			:= '';
 	  STRING50											prep_addr_line_last		    				:= '';
-	  UNSIGNED4                     clean_date_created                := 0;
+		UNSIGNED4                     clean_date_created                := 0;
 		UNSIGNED4                     clean_extract_date                := 0;
 		UNSIGNED4                     clean_record_update_refresh_date  := 0;		
 		UNSIGNED4 										clean_dead_date                   := 0;
@@ -272,7 +272,8 @@ END;
 		UNSIGNED4                     clean_certexp8_date               := 0;
 		UNSIGNED4                     clean_certexp9_date               := 0;
 		UNSIGNED4                     clean_certexp10_date              := 0;
-	END; //End Base
+END;		
+	
 	
   		
 	////////////////////////////////////////////////////////////////////////

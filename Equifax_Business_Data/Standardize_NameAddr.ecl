@@ -128,7 +128,7 @@ EXPORT Standardize_NameAddr := MODULE
 		AID.MacAppendFromRaw_2Line(dWith_address, prep_addr_line1, prep_addr_line_last, raw_aid, dwithAID, lFlags);
 		
 		dBase := project(dwithAID
-			,transform(Layouts.base,
+			,transform(Layouts.Base,
 			 self.ace_aid	      := left.aidwork_acecache.aid					;
 				self.raw_aid        := left.aidwork_rawaid								;
 				self.prim_range			:= left.aidwork_acecache.prim_range		;
@@ -161,7 +161,7 @@ EXPORT Standardize_NameAddr := MODULE
 				self								                      := left																;
 			)
 		)
-		+ project(dWithout_address,transform(Equifax_Business_Data.Layouts.base, self := left));
+		+ project(dWithout_address,transform(Equifax_Business_Data.Layouts.Base, self := left));
 
 		return dBase;
 		

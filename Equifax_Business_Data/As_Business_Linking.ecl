@@ -68,7 +68,9 @@ EXPORT As_Business_Linking (
         self.company_foreign_date := 0;  
         self.event_filing_date := 0;  
         self.company_name_status_raw := '';
-        self.company_status_raw := if(l.EFX_DEAD = 'Y', 'DEFUNCT', '');  
+				self.company_status_raw := '';
+				//possible future change
+        // self.company_status_raw := if(l.EFX_DEAD = 'Y', 'DEFUNCT', '');  
 				self.dt_first_seen_company_name := 0;
         self.dt_last_seen_company_name := 0;
         self.dt_first_seen_company_address := 0;
@@ -94,3 +96,4 @@ EXPORT As_Business_Linking (
 
 		return from_dedp;
 		
+end;

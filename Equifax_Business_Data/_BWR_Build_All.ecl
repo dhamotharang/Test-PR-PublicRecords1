@@ -1,4 +1,5 @@
-﻿
+﻿Import AID, AID_Support, _control;
+
 pversion 	:= '20181113'								 ;		// modify to current date
 /////////////////////////////////////////////////////////////
 // -- Quick Documentation
@@ -12,4 +13,5 @@ pversion 	:= '20181113'								 ;		// modify to current date
 
 #workunit('name', Equifax_Business_Data._Dataset().Name + ' Build ' + pversion);
 
-Equifax_Business_Data.Build_All(pversion);                               
+Equifax_Business_Data.Build_All(pversion); 
+                                
