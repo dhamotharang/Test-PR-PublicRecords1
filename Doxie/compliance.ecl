@@ -88,13 +88,15 @@ EXPORT compliance := MODULE
 
   shared dateOK (unsigned3 nonglb_last_seen, unsigned3 first_seen) :=
            (nonglb_last_seen <> 0 or (first_seen <= dateEffective and first_seen > 0)); 
+	shared preGLBRestrict (string DRM) := DRM[23] NOT IN ['0',''];
+	
   EXPORT SrcNeverRestricted (string2 src) := src NOT IN mdr.sourcetools.set_GLB;
   shared SrcAlwaysRestricted (string2 src) := src IN mdr.sourcetools.set_AlwaysGLB;
 
   EXPORT HeaderIsPreGLB (unsigned3 nonglb_last_seen, unsigned3 first_seen, string2 src, string DataRestrictionMask) := 
     MAP (SrcAlwaysRestricted (src) => FALSE,
          SrcNeverRestricted (src) => TRUE,
-         DataRestrictionMask[23] = '1' => FALSE,
+         preGLBRestrict (DataRestrictionMask) => FALSE,
          dateOK (nonglb_last_seen, first_seen));
 
 
@@ -160,6 +162,9 @@ EXPORT compliance := MODULE
       MDR.sourceTools.SourceIsTransUnion_Credit_Header (src) => isTCHRestricted(drm),
       MDR.sourceTools.SourceIsEquifax (src) => isEQCHRestricted(drm),
       FALSE);
+
+		// Customer allowed to see GLB protected data prior to June 2001 ('Pre GLB'), position 23.		
+		EXPORT boolean isPreGLBRestricted(drm_type drm) := ~allowAll AND preGLBRestrict(drm);
 
 // This macro will be used to conditionally remove records for certain source(s) from an
 // input file based upon the contents of a specific field within the input file and 
