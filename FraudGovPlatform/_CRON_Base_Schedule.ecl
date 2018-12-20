@@ -26,7 +26,7 @@ lECL1 :=
 +'active_workunit :=  exists(d);\n'
 +'if(active_workunit\n'
 +'		,email(\'**** WARNING - Workunit \'+d_wu+\' in Wait, Queued, or Running *******\')\n'
-+'		,FraudGovPlatform.Build_All(version).Full_Build\n'
++'		,FraudGovPlatform.Build_All(version).Build_FraudGov_Base\n'
 +'	);\n'
 ;
 

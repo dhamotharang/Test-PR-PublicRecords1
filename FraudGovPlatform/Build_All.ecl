@@ -62,8 +62,14 @@ module
 			,AddressesInfo(pversion).Post				 
 	);
 
+	Spray_Deltabase := FraudGovPlatform_Validation.SprayAndQualifyDeltabase(pversion,pMBSServerIP,pDeltabaseRootDir);
+	
 	export base_portion := sequential(
-		  	 Build_Base(
+			Create_Supers
+			,Spray_MBS
+			,Spray_Deltabase
+			,input_portion
+		  	,Build_Base(
 				 pversion
 				,PSkipIdentityDataBase
 				,PSkipKnownFraudBase
@@ -94,7 +100,7 @@ module
 	export Build_FraudShared_Keys := sequential(
 
 			//Clear Individual Sprayed Files			
-			,Promote(pVersion).inputfiles.Sprayed2Using
+			 Promote(pVersion).inputfiles.Sprayed2Using
 			,Promote(pVersion).inputfiles.Using2Used
 			,Promote(pVersion).inputfiles.New2Sprayed			
 			,Promote(pversion).sprayedfiles.Passed2Delete
@@ -129,38 +135,22 @@ module
 												Build_FraudShared_Keys, 
 												Rollback(pversion).All);
 	
-	export Full_Build := sequential(
-		 Create_Supers
-		,Spray_MBS
-		,FraudGovPlatform_Validation.SprayAndQualifyDeltabase(pversion,pMBSServerIP,pDeltabaseRootDir)
-		,input_portion
-		,base_portion
-	) : success(Send_Emails(pversion).BuildSuccess), failure(Send_Emails(pversion).BuildFailure);
-	
-	export Build_Base_Files :=
+	export Build_FraudGov_Base := 
 	if(tools.fun_IsValidVersion(pversion)
-		,sequential(input_portion, base_portion)
-		,output('No Valid version parameter passed, skipping FraudGovPlatform.Build_All')
-	);
+		,base_portion 
+		,output('No Valid version parameter passed, skipping FraudGovPlatform.Build_Base')
+	): success(Send_Emails(pversion).BuildSuccess), failure(Send_Emails(pversion).BuildFailure);
 
-	export Build_Key_Files :=
+	export Build_Fraudgov_Keys :=
 	if(tools.fun_IsValidVersion(pversion)
 		,keys_portion
-		,output('No Valid version parameter passed, skipping FraudGovPlatform.Build_All')
+		,output('No Valid version parameter passed, skipping FraudGovPlatform.Build_Keys')
 	);
-
+	
 	export All :=
-	if(tools.fun_IsValidVersion(pversion)
-		,Full_Build
-		,output('No Valid version parameter passed, skipping FraudGovPlatform.Build_All')
+	if(tools.fun_IsValidVersion(pversion),
+		 sequential(base_portion,keys_portion)
+		,output('No Valid version parameter passed, skipping FraudGovPlatform.All')
 	);
-
-	//	Scrubs (Which require ORBIT)
-	EXPORT	ScrubsReports	:=	
-	IF(tools.fun_IsValidVersion(pversion)
-		,Scrubs_MBS.BuildSCRUBSReport(pversion)
-		,OUTPUT('No Valid version parameter passed, skipping FraudGovPlatform.Build_All().ScrubsReports')
-	) : SUCCESS(Send_Emails(pversion,pBuildMessage:='MBS Scrubs are complete').BuildMessage),
-			FAILURE(Send_Emails(pversion).BuildFailure);
-			
+		
 end;

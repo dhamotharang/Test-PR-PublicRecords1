@@ -85,7 +85,7 @@ Go:=sequential(
 EXPORT Schedules := Go;
 
 Go:=sequential(
-//						 CRON_Keys_Controller
+						 CRON_Keys_Controller
 //						,CRON_SoapAppends_Controller
 						true
 						);
