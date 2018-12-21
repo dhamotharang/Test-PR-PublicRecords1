@@ -16,7 +16,7 @@ module
 	
  
 	Export	IdentityData := project (inBaseIdentityData , transform(FraudShared.Layouts.Base.Main , 
-		self.Record_ID := left.source_rec_id; 
+		self.Record_ID := 0; 
 		self.customer_id := left.Customer_Account_Number;
 		self.Sub_Customer_ID := ''; 
 		self.ln_report_date := left.Date_of_Transaction[1..8];
@@ -48,7 +48,7 @@ module
 	)); 
  
 	Export	KnownFraud := project (inBaseKnownFraud , transform(FraudShared.Layouts.Base.Main , 
-		self.Record_ID := left.source_rec_id;
+		self.Record_ID := 0;
 		self.customer_id := left.Customer_Account_Number;
 		self.Sub_Customer_ID := ''; 
 		self.ln_report_date := left.reported_date;
@@ -73,7 +73,7 @@ module
 	)); 
 
 	Export	Deltabase := project (inBaseDeltabase , transform(FraudShared.Layouts.Base.Main , 
-		self.Record_ID := left.source_rec_id;
+		self.Record_ID := 0;
 		self.customer_id := left.Customer_Account_Number;
 		self.Sub_Customer_ID := ''; 
 		self.Fraud_Point_Score:= '';  
@@ -115,15 +115,17 @@ module
 	)); 
 
 
-	// Append MBS classification attributes 
+	// Apply MBS classification and Sharing Rules
 	CombinedClassification := Functions.Classification(IdentityData + KnownFraud + Deltabase); 
-	
-	// append rid 
+		 
 	// Filter header records
-	NewBaseRid := CombinedClassification (Customer_event_id not in ['CUST_ID_NUM','CUSTOMERID']);
- 
+	NewBaseCombined := CombinedClassification (Customer_event_id not in ['CUST_ID_NUM','CUSTOMERID']);
+
+ 	// Append rid
+	NewBaseRID := Append_RID (NewBaseCombined); 
+
 	// Append RinID
-	NewBaseRinID := Append_RinID (NewBaseRid);
+	NewBaseRinID := Append_RinID (NewBaseRID);
 
 	EXPORT Build_Base_Main := FraudShared.Build_Base_Main(pversion,NewBaseRinID);
 

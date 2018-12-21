@@ -8,7 +8,7 @@ EXPORT Constants(string	pVersion='') := MODULE
 	//	Server IP to Spray from
 	EXPORT	serverIP	:=	IF(	_control.thisenvironment.name='Dataland',
 														_Control.IPAddress.bctlpedata12,
-														_Control.IPAddress.bctlpedata10);
+														_Control.IPAddress.bctlpedata11);
 	
 	//	Directory to Spray from
 	EXPORT	Directory	:=	'/data/hds_2/neustar_wireless/data/';
