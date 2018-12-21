@@ -5,6 +5,7 @@ ThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_
 lECL1 :=
  'import ut;\n'
 +'#CONSTANT	(\'Platform\',\'FraudGov\');\n'
++'#OPTION(\'multiplePersistInstances\',FALSE);\n'
 +'wuname := \'FraudGov Build Keys\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
@@ -23,7 +24,7 @@ lECL1 :=
 +'if(active_workunit\n'
 +'		,email(\'**** WARNING - Workunit \'+d_wu+\' in Wait, Queued, or Running *******\')\n'
 +'		,sequential(FraudGovPlatform.Build_All(version).Build_Fraudgov_Keys\n'
-+'	);\n'
++'	));\n'
 ;
 
 #WORKUNIT('protect',true);
