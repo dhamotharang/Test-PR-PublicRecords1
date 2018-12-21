@@ -1,5 +1,5 @@
 ﻿import _Control,FraudGovPlatform_Validation;
-EVERY_DAY_AT_3AM := '0 8 * * *';
+EVERY_DAY_AT_3AM := '0 8 * * 1-5';
 
 IP			:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
 ThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_Validation.Constants.ThorName_Dev,	FraudGovPlatform_Validation.Constants.ThorName_Prod);
@@ -29,13 +29,13 @@ lECL1 :=
 +'		,FraudGovPlatform.Build_All(version).Build_FraudGov_Base\n'
 +'	);\n'
 ;
+lECL1;
+// #WORKUNIT('protect',true);
+// #WORKUNIT('name', 'FraudGov Build Base Schedule');
 
-#WORKUNIT('protect',true);
-#WORKUNIT('name', 'FraudGov Build Base Schedule');
-
-_Control.fSubmitNewWorkunit(lECL1,ThorName)
-			: WHEN(CRON(EVERY_DAY_AT_3AM))
-			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
-																			,'FraudGov Build Base Schedule failure'
-																			,FraudGovPlatform_Validation.Constants.NOC_MSG
-																			));
+// _Control.fSubmitNewWorkunit(lECL1,ThorName)
+			// : WHEN(CRON(EVERY_DAY_AT_3AM))
+			// ,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
+																			// ,'FraudGov Build Base Schedule failure'
+																			// ,FraudGovPlatform_Validation.Constants.NOC_MSG
+																			// ));
