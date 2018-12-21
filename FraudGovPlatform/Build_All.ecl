@@ -106,8 +106,6 @@ module
 			,Promote(pversion).sprayedfiles.Passed2Delete
 			,Promote(pversion).sprayedfiles.Rejected2Delete
 			,Promote(pversion).buildfiles.Built2QA
-			,FraudShared.Build_Keys( pversion,	pBaseMainBuilt).All
-		  	,FraudShared.Build_AutoKeys(pversion,	pBaseMainBuilt)
 
 			// Build FraudGov Keys
 			,FraudShared.Build_Keys( pversion,	pBaseMainBuilt).All
