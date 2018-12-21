@@ -22,7 +22,7 @@ lECL1 :=
 +'version:=ut.GetDate : independent;\n'
 +'if(active_workunit\n'
 +'		,email(\'**** WARNING - Workunit \'+d_wu+\' in Wait, Queued, or Running *******\')\n'
-+'		,sequential(FraudGovPlatform.Build_All(version).Build_Key_Files\n'
++'		,sequential(FraudGovPlatform.Build_All(version).Build_Fraudgov_Keys\n'
 +'	);\n'
 ;
 
