@@ -24,7 +24,7 @@ lECL1 :=
 +'if(active_workunit\n'
 +'		,email(\'**** WARNING - Workunit \'+d_wu+\' in Wait, Queued, or Running *******\')\n'
 +'		,sequential(FraudGovPlatform.Build_All(version).Build_Fraudgov_Keys\n'
-+'	);\n'
++'	));\n'
 ;
 
 #WORKUNIT('protect',true);
