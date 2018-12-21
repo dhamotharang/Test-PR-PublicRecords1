@@ -9,9 +9,9 @@ shared lastUpdatesFCRAqa_SF:='~thor_data400::key::fcra::header::address_rank_qa'
 shared lastUpdatesWklyQA_SF:='~thor_data400::key::header::qa::addr_unique_expanded';
 
 // Gets the version from the latest QA file on Thor
-export lastestIkbVersionOnThor  := regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatedLabQA_SF)[1].name, 0);
-export lastestFCRAversionOnThor := regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesFCRAqa_SF)[1].name, 0);
-export lastestWklyversionOnThor := regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesWklyQA_SF)[1].name, 0);
+export lastestIkbVersionOnThor  := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatedLabQA_SF)[1].name, 0));
+export lastestFCRAversionOnThor := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesFCRAqa_SF)[1].name, 0));
+export lastestWklyversionOnThor := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesWklyQA_SF)[1].name, 0));
 
 
 // generic function to get the FIRST subfie in the super
@@ -30,13 +30,13 @@ SHARED currLgInc8(string KNm) := regexreplace('thor_data400',currLgInc(kNm),'tho
 // Get version of latest incremental keys in Alpharetta
 SHARED getFileVersion(string sf,boolean alp=false) := FUNCTION
 
-        sfc := nothor(STD.File.SuperFileContents(sf));
-        frName:=sfc[1].name;
-        fd1 := if(alp,regexfind('::2[0-9]{7}[a-z]{0,1}ib:',frName,0),regexfind('::2[0-9]{7}[a-z]{0,1}:',frName,0));
-        filedate := if(alp,fd1[3..(length(fd1)-3)],fd1[3..(length(fd1)-1)]);
-        output(dataset([{frName,filedate}],{string lg_ck, string fldt}),named('checked_file'),extend);
-        
-        return filedate;
+    sfc := nothor(STD.File.SuperFileContents(sf));
+    frName:=sfc[1].name;
+    fd1 := if(alp,regexfind('::2[0-9]{7}[a-z]{0,1}ib:',frName,0),regexfind('::2[0-9]{7}[a-z]{0,1}:',frName,0));
+    filedt := if(alp,fd1[3..(length(fd1)-3)],fd1[3..(length(fd1)-1)]);
+    output(dataset([{frName,filedt}],{string lg_ck, string fldt}),named('checked_file'),extend);
+    
+    return filedt;
         // return '20181005';
 
 END;
@@ -44,25 +44,25 @@ END;
 EXPORT  filedate := getFileVersion(ut.foreign_aprod+'thor_data400::key::insuranceheader_xlink::inc_boca::did::refs::relative',true):INDEPENDENT ;
 
 // check if we have a local copy already   
-EXPORT ok_to_copy(string filedate) := filedate<>'' and (~std.file.fileexists('~thor_data400::key::insuranceheader_xlink::'+filedate+'::did::refs::address'));
+EXPORT ok_to_copy(string filedt) := filedt<>'' and (~std.file.fileexists('~thor_data400::key::insuranceheader_xlink::'+filedt+'::did::refs::address'));
 
 SHARED fc(string f1, string f2):= sequential(
-           output(dataset([{f1,'thor400_44',f2}],{string src,string clsr, string trg}),named('copy_report'),extend),
-           if(~test_copy,if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_44',f2,,,,,true,true,,true))));
+    output(dataset([{f1,'thor400_44',f2}],{string src,string clsr, string trg}),named('copy_report'),extend),
+    if(~test_copy,if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_44',f2,,,,,true,true,,true))));
 
 SHARED fc8(string f1, string f2):= sequential(
-            output(dataset([{f1,'thor400_36',f2}],{string src,string clsr, string trg}),named('copy_report'),extend),
-            if(~test_copy,if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_36',f2,,,,,true,true,,true))));
+    output(dataset([{f1,'thor400_36',f2}],{string src,string clsr, string trg}),named('copy_report'),extend),
+    if(~test_copy,if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_36',f2,,,,,true,true,,true))));
 
-EXPORT copy_addr_uniq_keys_from_alpha(string filedate) := function
+EXPORT copy_addr_uniq_keys_from_alpha(string filedt) := function
   
   aDali := _control.IPAddress.aprod_thor_dali;
   lc := '~foreign::' + aDali + '::';
-  get_alogical(string sf):=fileservices.GetSuperFileSubName(lc+sf,1);
+  get_alogical(string sf):=nothor(fileservices.GetSuperFileSubName(lc+sf,1));
     
   AddrSFKeyName(boolean fcra)  := '~thor_data400::key::' + if(fcra, 'fcra::', '') + 'header::qa::addr_unique_expanded';
   AddrDSFKeyName(boolean fcra) := '~thor_data400::key::' + if(fcra, 'fcra::', '') + 'header::delete::addr_unique_expanded';
-  AddrLFKeyName(boolean fcra)  := '~thor_data400::key::' + if(fcra, 'fcra::', '') + 'header::' + filedate + '::addr_unique_expanded';
+  AddrLFKeyName(boolean fcra)  := '~thor_data400::key::' + if(fcra, 'fcra::', '') + 'header::' + filedt + '::addr_unique_expanded';
 
   copyKeys := sequential(
      fc(get_alogical('thor_data400::key::insuranceheader_incremental::fcra::qa::addr_unique_expanded'), AddrLFKeyName(true))
@@ -71,8 +71,8 @@ EXPORT copy_addr_uniq_keys_from_alpha(string filedate) := function
     
   moveKeys := sequential(    
         STD.File.StartSuperFileTransaction( )
-       ,STD.file.PromoteSuperFileList([AddrSFKeyName(true), AddrDSFKeyName(true)], AddrLFKeyName(true)) //Fcra
-       ,STD.file.PromoteSuperFileList([AddrSFKeyName(false), AddrDSFKeyName(false)], AddrLFKeyName(false)) //NFcra
+       ,nothor(STD.file.PromoteSuperFileList([AddrSFKeyName(true), AddrDSFKeyName(true)], AddrLFKeyName(true))) //Fcra
+       ,nothor(STD.file.PromoteSuperFileList([AddrSFKeyName(false), AddrDSFKeyName(false)], AddrLFKeyName(false))) //NFcra
        ,STD.File.FinishSuperFileTransaction( )
        );
   
@@ -80,20 +80,20 @@ EXPORT copy_addr_uniq_keys_from_alpha(string filedate) := function
   return seq;  
 END;    
                 
-EXPORT copy_from_alpha(string filedate) := function
+EXPORT copy_from_alpha(string filedt) := function
     
     // create a new blank file for the insuranceheader_segmentation key 
     ecl1:=  PRTE2_Header.fn_bld_blank_index(
         '','InsuranceHeader_PostProcess.segmentation_keys.key_did_ind ',
         'thor_data400::key::insuranceheader_segmentation::did_ind',           
-        '::did_ind','~thor_data400::key::insuranceheader_segmentation::',filedate,'01')
+        '::did_ind','~thor_data400::key::insuranceheader_segmentation::',filedt,'01')
         + '\r\n'+'bld01;';
 
     // aDali := '10.194.126.207';//_control.IPAddress.adataland_dali;
     aDali := _control.IPAddress.aprod_thor_dali;
 
     lc := '~foreign::' + aDali + '::';
-    get_alogical(string sf):=fileservices.GetSuperFileSubName(lc+sf,1);
+    get_alogical(string sf):=nothor(fileservices.GetSuperFileSubName(lc+sf,1));
     
     // incremental key prefix
     aPref := 'thor_data400::key::insuranceheader_xlink::inc_boca::';
@@ -103,55 +103,55 @@ EXPORT copy_from_alpha(string filedate) := function
 
      _Control.fSubmitNewWorkunit(ecl1,'thor400_44') // creates blank segmentation did_ind key
     
-    ,fc(get_alogical(aPref+'did::refs::address') ,fName(filedate, '::did::refs::address'))
-    ,fc(get_alogical(aPref+'did::refs::dln')     ,fName(filedate, '::did::refs::dln'))
-    ,fc(get_alogical(aPref+'did::refs::dob')     ,fName(filedate, '::did::refs::dob'))
-    ,fc(get_alogical(aPref+'did::refs::dobf')    ,fName(filedate, '::did::refs::dobf')) //new key
-    ,fc(get_alogical(aPref+'did::refs::lfz')     ,fName(filedate, '::did::refs::lfz'))
-    ,fc(get_alogical(aPref+'did::refs::name')    ,fName(filedate, '::did::refs::name'))
-    ,fc(get_alogical(aPref+'did::refs::ph')      ,fName(filedate, '::did::refs::ph'))
-    ,fc(get_alogical(aPref+'did::refs::relative'),fName(filedate, '::did::refs::relative'))
-    ,fc(get_alogical(aPref+'did::refs::ssn')     ,fName(filedate, '::did::refs::ssn'))
-    ,fc(get_alogical(aPref+'did::refs::ssn4')    ,fName(filedate, '::did::refs::ssn4'))
-    ,fc(get_alogical(aPref+'did::refs::zip_pr')  ,fName(filedate, '::did::refs::zip_pr'))
-    ,fc(get_alogical(aPref+'did::sup::rid')      ,fName(filedate, '::did::sup::rid'))
-    ,fc(get_alogical(aPref+'header')             ,fName(filedate, '::idl'))
+    ,fc(get_alogical(aPref+'did::refs::address') ,fName(filedt, '::did::refs::address'))
+    ,fc(get_alogical(aPref+'did::refs::dln')     ,fName(filedt, '::did::refs::dln'))
+    ,fc(get_alogical(aPref+'did::refs::dob')     ,fName(filedt, '::did::refs::dob'))
+    ,fc(get_alogical(aPref+'did::refs::dobf')    ,fName(filedt, '::did::refs::dobf')) //new key
+    ,fc(get_alogical(aPref+'did::refs::lfz')     ,fName(filedt, '::did::refs::lfz'))
+    ,fc(get_alogical(aPref+'did::refs::name')    ,fName(filedt, '::did::refs::name'))
+    ,fc(get_alogical(aPref+'did::refs::ph')      ,fName(filedt, '::did::refs::ph'))
+    ,fc(get_alogical(aPref+'did::refs::relative'),fName(filedt, '::did::refs::relative'))
+    ,fc(get_alogical(aPref+'did::refs::ssn')     ,fName(filedt, '::did::refs::ssn'))
+    ,fc(get_alogical(aPref+'did::refs::ssn4')    ,fName(filedt, '::did::refs::ssn4'))
+    ,fc(get_alogical(aPref+'did::refs::zip_pr')  ,fName(filedt, '::did::refs::zip_pr'))
+    ,fc(get_alogical(aPref+'did::sup::rid')      ,fName(filedt, '::did::sup::rid'))
+    ,fc(get_alogical(aPref+'header')             ,fName(filedt, '::idl'))
        
     //copy to cluster - thor400_36
-    ,fc8(fName(filedate, '::did::refs::address') ,fName8(filedate, '::did::refs::address'))
-    ,fc8(fName(filedate, '::did::refs::dln')     ,fName8(filedate, '::did::refs::dln'))
-    ,fc8(fName(filedate, '::did::refs::dob')     ,fName8(filedate, '::did::refs::dob'))
-    ,fc8(fName(filedate, '::did::refs::dobf')     ,fName8(filedate, '::did::refs::dobf')) //new key
-    ,fc8(fName(filedate, '::did::refs::lfz')     ,fName8(filedate, '::did::refs::lfz'))
-    ,fc8(fName(filedate, '::did::refs::name')    ,fName8(filedate, '::did::refs::name'))
-    ,fc8(fName(filedate, '::did::refs::ph')      ,fName8(filedate, '::did::refs::ph'))
-    ,fc8(fName(filedate, '::did::refs::relative'),fName8(filedate, '::did::refs::relative'))
-    ,fc8(fName(filedate, '::did::refs::ssn')     ,fName8(filedate, '::did::refs::ssn'))
-    ,fc8(fName(filedate, '::did::refs::ssn4')    ,fName8(filedate, '::did::refs::ssn4'))
-    ,fc8(fName(filedate, '::did::refs::zip_pr')  ,fName8(filedate, '::did::refs::zip_pr'))
-    ,fc8(fName(filedate, '::did::sup::rid')      ,fName8(filedate, '::did::sup::rid'))
-    ,fc8(fName(filedate, '::idl')                ,fName8(filedate, '::idl'))
+    ,fc8(fName(filedt, '::did::refs::address') ,fName8(filedt, '::did::refs::address'))
+    ,fc8(fName(filedt, '::did::refs::dln')     ,fName8(filedt, '::did::refs::dln'))
+    ,fc8(fName(filedt, '::did::refs::dob')     ,fName8(filedt, '::did::refs::dob'))
+    ,fc8(fName(filedt, '::did::refs::dobf')    ,fName8(filedt, '::did::refs::dobf')) //new key
+    ,fc8(fName(filedt, '::did::refs::lfz')     ,fName8(filedt, '::did::refs::lfz'))
+    ,fc8(fName(filedt, '::did::refs::name')    ,fName8(filedt, '::did::refs::name'))
+    ,fc8(fName(filedt, '::did::refs::ph')      ,fName8(filedt, '::did::refs::ph'))
+    ,fc8(fName(filedt, '::did::refs::relative'),fName8(filedt, '::did::refs::relative'))
+    ,fc8(fName(filedt, '::did::refs::ssn')     ,fName8(filedt, '::did::refs::ssn'))
+    ,fc8(fName(filedt, '::did::refs::ssn4')    ,fName8(filedt, '::did::refs::ssn4'))
+    ,fc8(fName(filedt, '::did::refs::zip_pr')  ,fName8(filedt, '::did::refs::zip_pr'))
+    ,fc8(fName(filedt, '::did::sup::rid')      ,fName8(filedt, '::did::sup::rid'))
+    ,fc8(fName(filedt, '::idl')                ,fName8(filedt, '::idl'))
     );
 
     return copy_incremental_keys;
 END;
 
-SHARED updateSupers(string kNm,boolean skipIncSFupdate=false,string kNml=kNm, string filedate):= sequential(
+SHARED updateSupers(string kNm,boolean skipIncSFupdate=false,string kNml=kNm, string filedt):= sequential(
            
-      output(dataset([{'remove',fName('qa' ,kNm),currLgInc(kNm)}],{string20 action, string f1, string f2}),named('action_report'),extend);
-      output(dataset([{'remove',fName4('qa' ,kNm),currLgInc(kNm)}],{string20 action, string f1, string f2}),named('action_report'),extend);
-      output(dataset([{'remove',fName8('qa' ,kNm),currLgInc8(kNm)}],{string20 action, string f1, string f2}),named('action_report'),extend);
-      
-      output(dataset([{'remove',fName('inc',kNm),''}],{string20 action, string f1, string f2}),named('action_report'),extend);
-      output(dataset([{'clear ',fName('inc',kNm),''}],{string20 action, string f1, string f2}),named('action_report'),extend);
-      output(dataset([{'add   ',fName('inc',kNm),fName(fileDate,kNml)}],{string20 action, string f1, string f2}),named('action_report'),extend);
-      output(dataset([{'add   ',fName('inc',kNm),fName8(fileDate,kNml)}],{string20 action, string f1, string f2}),named('action_report'),extend);
-      
-      output(dataset([{'add   ',fName( 'qa' ,kNm),fName(filedate,kNml)}],{string20 action, string f1, string f2}),named('action_report'),extend);
-      output(dataset([{'add   ',fName4('qa' ,kNm),fName(filedate,kNml)}],{string20 action, string f1, string f2}),named('action_report'),extend);
-      output(dataset([{'add   ',fName8( 'qa' ,kNm),fName8(filedate,kNml)}],{string20 action, string f1, string f2}),named('action_report'),extend);
-                      
-      if(~test_copy, sequential(
+    output(dataset([{'remove',fName('qa' ,kNm),currLgInc(kNm)}],{string20 action, string f1, string f2}),named('action_report'),extend);
+    output(dataset([{'remove',fName4('qa' ,kNm),currLgInc(kNm)}],{string20 action, string f1, string f2}),named('action_report'),extend);
+    output(dataset([{'remove',fName8('qa' ,kNm),currLgInc8(kNm)}],{string20 action, string f1, string f2}),named('action_report'),extend);
+
+    output(dataset([{'remove',fName('inc',kNm),''}],{string20 action, string f1, string f2}),named('action_report'),extend);
+    output(dataset([{'clear ',fName('inc',kNm),''}],{string20 action, string f1, string f2}),named('action_report'),extend);
+    output(dataset([{'add   ',fName('inc',kNm),fName(filedt,kNml)}],{string20 action, string f1, string f2}),named('action_report'),extend);
+    output(dataset([{'add   ',fName('inc',kNm),fName8(filedt,kNml)}],{string20 action, string f1, string f2}),named('action_report'),extend);
+
+    output(dataset([{'add   ',fName( 'qa' ,kNm),fName(filedt,kNml)}],{string20 action, string f1, string f2}),named('action_report'),extend);
+    output(dataset([{'add   ',fName4('qa' ,kNm),fName(filedt,kNml)}],{string20 action, string f1, string f2}),named('action_report'),extend);
+    output(dataset([{'add   ',fName8( 'qa' ,kNm),fName8(filedt,kNml)}],{string20 action, string f1, string f2}),named('action_report'),extend);
+                  
+    if(~test_copy, sequential(
        std.file.startsuperfiletransaction(),
                           
        // remove the previous incrementals from the monthly regular lab key qa superfiles
@@ -168,40 +168,38 @@ SHARED updateSupers(string kNm,boolean skipIncSFupdate=false,string kNml=kNm, st
        // std.file.RemoveOwnedSubFiles      (fName('inc',kNm)),
        if(~skipIncSFupdate,std.file.RemoveOwnedSubFiles      (fName('inc',kNm),true)),
        if(~skipIncSFupdate,std.file.clearsuperfile           (fName('inc',kNm))),
-       if(~skipIncSFupdate,std.file.addsuperfile             (fName('inc',kNm),fName(fileDate,kNml))),
-       if(~skipIncSFupdate,std.file.addsuperfile             (fName('inc',kNm),fName8(fileDate,kNml))),
+       if(~skipIncSFupdate,std.file.addsuperfile             (fName('inc',kNm),fName(filedt,kNml))),
+       if(~skipIncSFupdate,std.file.addsuperfile             (fName('inc',kNm),fName8(filedt,kNml))),
                
        // Add the new incrementals to the monthly regular lab keys qa superfiles
-       std.file.AddSuperFile             (fName ('qa',kNm),fName (filedate,kNml)),
-       std.file.AddSuperFile             (fName4('qa',kNm),fName (filedate,kNml)),
-       std.file.AddSuperFile             (fName8('qa',kNm),fName8(filedate,kNml)),
+       std.file.AddSuperFile             (fName ('qa',kNm),fName (filedt,kNml)),
+       std.file.AddSuperFile             (fName4('qa',kNm),fName (filedt,kNml)),
+       std.file.AddSuperFile             (fName8('qa',kNm),fName8(filedt,kNml)),
        std.file.finishsuperfiletransaction()
-      ))
+    ))
   );
 
 // Remove incrementals from 'qa', update 'inc' superfiles and add new incrementals to the 'qa' superfiles
-EXPORT update_inc_superfiles(boolean skipIncSFupdate=false, string filedate) := function
+EXPORT update_inc_superfiles(boolean skipIncSFupdate=false, string filedt) := function
 
     return sequential(
-
-     updateSupers('::did::refs::address',skipIncSFupdate, ,filedate)
-    ,updateSupers('::did::refs::dln',skipIncSFupdate, ,filedate)
-    ,updateSupers('::did::refs::dob',skipIncSFupdate, ,filedate)
-    ,updateSupers('::did::refs::dobf',skipIncSFupdate, ,filedate)
-    ,updateSupers('::did::refs::lfz',skipIncSFupdate, ,filedate)
-    ,updateSupers('::did::refs::name',skipIncSFupdate, ,filedate)
-    ,updateSupers('::did::refs::ph',skipIncSFupdate, ,filedate)
-    ,updateSupers('::did::refs::relative',skipIncSFupdate, ,filedate)
-    ,updateSupers('::did::refs::ssn',skipIncSFupdate, ,filedate)
-    ,updateSupers('::did::refs::ssn4',skipIncSFupdate, ,filedate)
-    ,updateSupers('::did::refs::zip_pr',skipIncSFupdate, ,filedate)
-    ,updateSupers('::did::sup::rid',skipIncSFupdate, ,filedate)
-    ,updateSupers('::did'          ,skipIncSFupdate, ,filedate)
-    
+     updateSupers('::did::refs::address',skipIncSFupdate, ,filedt)
+    ,updateSupers('::did::refs::dln',skipIncSFupdate, ,filedt)
+    ,updateSupers('::did::refs::dob',skipIncSFupdate, ,filedt)
+    ,updateSupers('::did::refs::dobf',skipIncSFupdate, ,filedt)
+    ,updateSupers('::did::refs::lfz',skipIncSFupdate, ,filedt)
+    ,updateSupers('::did::refs::name',skipIncSFupdate, ,filedt)
+    ,updateSupers('::did::refs::ph',skipIncSFupdate, ,filedt)
+    ,updateSupers('::did::refs::relative',skipIncSFupdate, ,filedt)
+    ,updateSupers('::did::refs::ssn',skipIncSFupdate, ,filedt)
+    ,updateSupers('::did::refs::ssn4',skipIncSFupdate, ,filedt)
+    ,updateSupers('::did::refs::zip_pr',skipIncSFupdate, ,filedt)
+    ,updateSupers('::did::sup::rid',skipIncSFupdate, ,filedt)
+    ,updateSupers('::did'          ,skipIncSFupdate, ,filedt)    
     );
 END;
 
-EXPORT update_inc_idl(boolean skipIncSFupdate=false, string filedate) := updateSupers('::header',skipIncSFupdate,'::idl', filedate);
+EXPORT update_inc_idl(boolean skipIncSFupdate=false, string filedt) := updateSupers('::header',skipIncSFupdate,'::idl', filedt);
 
 SHARED elist:= Header.email_list.BocaDevelopers;
 
@@ -284,22 +282,22 @@ SHARED orbit_update_entries(string createORupdate, string skipPackage='000') := 
 END;
 
 // run on hthor
-EXPORT Refresh_copy(string filedate) :=  FUNCTION
+EXPORT Refresh_copy(string filedt) :=  FUNCTION
 
-    nocopy := ~test_copy AND ~ok_to_copy(filedate);
+    nocopy := ~test_copy AND ~ok_to_copy(filedt);
 
     return if(nocopy
          ,output('No copy. see outputs')
          ,sequential(
-           copy_from_alpha(filedate)
-          ,copy_addr_uniq_keys_from_alpha(filedate)
+           copy_from_alpha(filedt)
+          ,copy_addr_uniq_keys_from_alpha(filedt)
         ));
 END;
 
-EXPORT movetoQA(string filedate) := sequential(
+EXPORT movetoQA(string filedt) := sequential(
     // The following can only copy after the key is built in Boca
-    fc8(fName(filedate, '::did'), fName8(filedate, '::did')),
-    update_inc_superfiles(,filedate)
+    fc8(fName(filedt, '::did'), fName8(filedt, '::did')),
+    update_inc_superfiles(,filedt)
     );
 
 copy_to_dataland:= _control.fSubmitNewWorkunit('Header.Proc_Copy_Keys_To_Dataland.Incrementals','hthor_sta','Dataland');

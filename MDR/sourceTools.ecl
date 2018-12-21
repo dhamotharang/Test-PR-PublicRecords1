@@ -49,7 +49,7 @@ MODULE
 	export src_OKC_Students_List         := 'S1';
 	export src_AMIDIR                    := 'ML';  // American Medical Info Directory
 	export src_AMS                       := 'SJ';  // Advantage Management Solutions
-	export src_Anchor																				:= 'AN';		// Anchor Computer email data
+	export src_Anchor										 := 'AN';		// Anchor Computer email data
 	export src_Bair_Analytics            := 'B+';  // Bair Analytics agency-reported relational data dump
 	export src_Bankruptcy                := 'BA';
 	export src_Bankruptcy_Attorney       := 'BY';
@@ -317,6 +317,7 @@ MODULE
 	export src_MPRD_Individual           := 'QN'; 
 	export src_MMCP						           := '61';  // Michigan/Illinois Medicaid Custom Program
 	export src_NaturalDisaster_Readiness := 'NR';
+	export src_NeustarWireless					 := 'N2';  //Neustar Wireless Phones 
 	export src_NCOA                      := 'NC';
 	export src_NCPDP                     := 'J2';  // National Council for Prescription Drug Programs
 	export src_NPPES                     := 'NP';  // US National Provider & Plan Enumeration System
@@ -1536,7 +1537,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_OKC_Students_List         := [src_OKC_Students_List         ];
 	export set_AMIDIR                    := [src_AMIDIR                    ];
 	export set_AMS                       := [src_AMS                       ];
-	export set_Anchor																				:= [src_Anchor																				];
+	export set_Anchor										 := [src_Anchor										 ];
 	export set_Bair_Analytics            := [src_Bair_Analytics            ];
 	export set_Bankruptcy_Attorney       := [src_Bankruptcy_Attorney       ];
 	export set_Bankruptcy_Trustee        := [src_Bankruptcy_Trustee        ];
@@ -1800,6 +1801,7 @@ export set_NonDerog_FCRA_sources_v50 := [
   export set_NaturalDisaster_Readiness := [src_NaturalDisaster_Readiness ];
 	export set_NCPDP                     := [src_NCPDP                     ];
 	export set_NCOA                      := [src_NCOA                      ];
+	export set_NeustarWireless					 := [src_NeustarWireless					 ];
 	export set_NPPES                     := [src_NPPES                     ];
 	export set_OIG                       := [src_OIG                       ];
 	export set_One_Click_Data            := [src_One_Click_Data            ];
@@ -2579,7 +2581,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_AlloyMedia_consumer				,'Alloy Media Opt-in Consumer non-directory'								 }
 		,{src_AMIDIR                    ,'Medical Information Directory'                             }
 		,{src_AMS                       ,'Advantage Management Solutions'                            }
-		,{src_Anchor																				,'Anchor Computer Email Addresses'																											}
+		,{src_Anchor										,'Anchor Computer Email Addresses'  												 }
 		,{src_Bair_Analytics            ,'Bair Analytics agency-reported relational data'            }
 		,{src_Bankruptcy                ,'Bankruptcy'                                                }
 		,{src_Bankruptcy_Attorney       ,'Bankruptcy Attorneys'                                      }
@@ -2846,6 +2848,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_NaturalDisaster_Readiness	,'NaturalDisaster Readiness'																 }
 		,{src_NCOA                      ,'NCOA'                                                      }
 		,{src_NCPDP											,'NCPDP'																										 }
+		,{src_NeustarWireless						,'Neustar Wireless Phones'																	 }
 		,{src_NPPES                     ,'NPPES'                                                     }
 		,{src_OIG                       ,'OIG'                                                       }
 		,{src_One_Click_Data            ,'One Click Data'                                            }
@@ -3087,7 +3090,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_AlloyMedia_Consumer			 =>	'Alloy Media Opt-in Consumer non-directory'												
 		,src_AMIDIR                    => 'Medical Information Directory'                        
 		,src_AMS                       => 'Advantage Management Solutions'
-		,src_Anchor																			 =>	'Anchor Computer Email Addresses'
+		,src_Anchor										 =>	'Anchor Computer Email Addresses'
 		,src_Bair_Analytics            => 'Bair Analytics agency-reported relational data'
 		,src_Bankruptcy                => 'Bankruptcy'                                           
 		,src_Bankruptcy_Attorney       => 'Bankruptcy Attorneys'                                 
@@ -3353,7 +3356,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_MMCP						           => 'Michigan Medicaid Custom Program'                                      
 		,src_NCOA                      => 'NCOA'                                                 
 		,src_NaturalDisaster_Readiness => 'NaturalDisaster Readiness'														
-		,src_NCPDP										 => 'NCPDP'																								
+		,src_NCPDP										 => 'NCPDP'							
+		,src_NeustarWireless					 => 'Neustar Wireless Phones'
 		,src_NPPES                     => 'NPPES'                                                
 		,src_OIG                       => 'OIG'                                       
 		,src_One_Click_Data            => 'One Click Data'                                       

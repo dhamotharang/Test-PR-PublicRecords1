@@ -128,6 +128,9 @@ module
 		export kel_person_associations_stats		:= tools.mod_FilenamesBuild(Template('kel::person_associations_stats'),pversion);
 		export kel_person_associations_details	:= tools.mod_FilenamesBuild(Template('kel::person_associations_details'),pversion);
 		export kel_entity_scorebreakdown				:= tools.mod_FilenamesBuild(Template('kel::entity_scorebreakdown'),pversion);
+		export kel_CustomerStatsPivot				:= tools.mod_FilenamesBuild(Template('kel::CustomerStatsPivot'),pversion);
+		export kel_CustomerDashTopEntityStats				:= tools.mod_FilenamesBuild(Template('kel::CustomerDashTopEntityStats'),pversion);
+		export kel_CustomerDashTopClustersAndElements				:= tools.mod_FilenamesBuild(Template('kel::CustomerDashTopClustersAndElements'),pversion);
 		
 		export Main_Orig	:= tools.mod_FilenamesBuild(Template('Main_Orig'),pversion);
 		export Main_Anon	:= tools.mod_FilenamesBuild(Template('Main_anon'),pversion);
@@ -165,6 +168,9 @@ module
 			kel_person_associations_stats.dAll_filenames +
 			kel_person_associations_details.dAll_filenames +
 			kel_entity_scorebreakdown.dAll_filenames + 
+			kel_CustomerStatsPivot.dAll_filenames + 
+			kel_CustomerDashTopEntityStats.dAll_filenames + 
+			kel_CustomerDashTopClustersAndElements.dAll_filenames + 
  			Main_Orig.dAll_filenames + 
 			Main_Anon.dAll_filenames + 
 			Pii_Demo.dAll_filenames + 
