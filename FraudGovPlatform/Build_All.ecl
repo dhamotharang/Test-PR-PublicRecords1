@@ -131,7 +131,7 @@ module
 												Mac_TestRecordID(pversion) 		= 'Passed' and 
 												Mac_TestRinID(pversion) 			= 'Passed', 
 												Build_FraudShared_Keys, 
-												Rollback(pversion).All);
+												Rollback().All);
 	
 	export Build_FraudGov_Base := 
 	if(tools.fun_IsValidVersion(pversion)
