@@ -78,7 +78,7 @@ module
 		// Rollback Built Files
 		if(FraudGovPlatform._Flags.UseDemoData, 
 				STD.File.AddSuperFile(FraudShared.Filenames(PreviousVersion).Base.Main.Built,	FraudGovPlatform.Filenames(PreviousVersion).Input.DemoData.Sprayed)),		
-		STD.File.AddSuperFile(FraudShared.Filenames(PreviousVersion).Base.Main.Built		,FraudShared.Filenames(PreviousVersion).Base.Main_Anon.New),
+		STD.File.AddSuperFile(FraudShared.Filenames(PreviousVersion).Base.Main.Built		,FraudGovPlatform.Filenames(PreviousVersion).Base.Main_Anon.New),
 		STD.File.AddSuperFile(FraudGovPlatform.Filenames(PreviousVersion).Base.Main_Orig.Built		, FraudShared.Filenames(PreviousVersion).Base.Main.New),	
 		STD.File.AddSuperFile(FraudGovPlatform.Filenames(PreviousVersion).Base.Main_Anon.Built		, FraudGovPlatform.Filenames(PreviousVersion).Base.Main_Anon.New),	
 		STD.File.AddSuperFile(FraudGovPlatform.Filenames(PreviousVersion).Base.addresscache.Built		,FraudGovPlatform.Filenames(PreviousVersion).Base.addresscache.New),
