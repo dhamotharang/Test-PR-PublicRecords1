@@ -40,4 +40,5 @@ EXPORT IDataAccess := INTERFACE
            $.compliance.HeaderIsPreGLB (nonglb_last_seen, first_seen, src, DataRestrictionMask);
 
   EXPORT boolean isConsumer () := industry_class = 'CNSMR';
+  EXPORT boolean isUtility () := industry_class = 'UTILI';
 END;
