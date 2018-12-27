@@ -1095,6 +1095,8 @@
 		export string KEYWORD_JPJFTC								:= '783';		
 		export string KEYWORD_TNCNLT								:= '784';		
 		export string KEYWORD_RUUSEM_50_WC					:= '785';		
+		export string KEYWORD_SECO_MAL							:= '786';		
+		export string KEYWORD_UN_MAL								:= '787';		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
 	
