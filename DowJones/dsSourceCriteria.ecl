@@ -1706,5 +1706,9 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2018/1946 South Sudan List','1692'},
 {'EC 2018/1931 Democratic Republic of the Congo List','1693'},
 {'EC 2018/1934 South Sudan List','1694'},
-{'Guernsey Financial Services Commission - Prohibition Orders','1695'}
+{'Guernsey Financial Services Commission - Prohibition Orders','1695'},
+{'EC (CFSP) 2018/2054 Myanmar/Burma List','1696'},
+{'EC 2018/2053  Myanmar/Burma List','1697'},
+{'SECO (Switzerland) Mali List','1698'},
+{'UN Security Council Resolution 2374 (2017) Mali List','1699'}
 ],r);
