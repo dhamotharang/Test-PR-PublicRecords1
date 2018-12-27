@@ -29,13 +29,13 @@ lECL1 :=
 +'		,FraudGovPlatform.Build_All(version).Build_FraudGov_Base\n'
 +'	);\n'
 ;
-lECL1;
-// #WORKUNIT('protect',true);
-// #WORKUNIT('name', 'FraudGov Build Base Schedule');
 
-// _Control.fSubmitNewWorkunit(lECL1,ThorName)
-			// : WHEN(CRON(EVERY_DAY_AT_3AM))
-			// ,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
-																			// ,'FraudGov Build Base Schedule failure'
-																			// ,FraudGovPlatform_Validation.Constants.NOC_MSG
-																			// ));
+#WORKUNIT('protect',true);
+#WORKUNIT('name', 'FraudGov Build Base Schedule');
+
+_Control.fSubmitNewWorkunit(lECL1,ThorName)
+			: WHEN(CRON(EVERY_DAY_AT_3AM))
+			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
+																			,'FraudGov Build Base Schedule failure'
+																			,FraudGovPlatform_Validation.Constants.NOC_MSG
+																			));

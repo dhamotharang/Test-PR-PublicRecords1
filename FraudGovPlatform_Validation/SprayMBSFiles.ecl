@@ -5,7 +5,7 @@ export SprayMBSFiles(
 	,string		pDirectory	                   						= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', Constants.FDNMBSLandingZonePathBase_dev, Constants.FDNMBSLandingZonePathBase_prod)	
 	,string   pFilenameMBSmarketAppend       						= '*fdn_market*txt'
 	,string   pFilenameMBSFdnCCID            						= '*mbsi_fdn_accounts*'
-	,string   pFilenameMBSFdnHHID            						= '*hhid_fdn_accounts.txt'
+	,string   pFilenameMBSFdnHHID            						= '*hhid_fdn_accounts.csv'
 	,string		pversion
 	,string		pGroupName	                   = thorlib.group()																		
 	,boolean	pIsTesting	                   = false
