@@ -109,6 +109,8 @@ module
 
 			// Build FraudGov Keys
 			,FraudShared.Build_Keys( pversion,	pBaseMainBuilt).All
+			,if(_Flags.UseDemoData, 
+				STD.File.AddSuperFile(FraudShared.Filenames().Base.Main.Built,	Filenames().Input.DemoData.Sprayed))
 		  	,FraudShared.Build_AutoKeys(pversion,	pBaseMainBuilt)
 
 			//Create SOAP appends
@@ -124,7 +126,7 @@ module
 			,create_build
 			,Send_Emails(pversion).Roxie
 			,FraudGovPlatform_Analytics.GenerateDashboards(pRunProd,pUseProdData)
-			,FraudgovInfo(pversion,'Keys_Completed').SetPreviousVersion			
+			,FraudgovInfo(pversion[1..8],'Keys_Completed').SetPreviousVersion			
 		) : success(Send_Emails(pversion).BuildSuccess), failure(Send_Emails(pversion).BuildFailure);	
 
 	export keys_portion := if(	Mac_TestBuild(pversion) 			= 'Passed' and 
