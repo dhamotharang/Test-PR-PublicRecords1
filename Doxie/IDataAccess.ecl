@@ -38,6 +38,14 @@ EXPORT IDataAccess := INTERFACE
            $.compliance.dppa_state_ok (st, dppa, header_source, source_code);
   EXPORT boolean isHeaderPreGLB (unsigned3 nonglb_last_seen, unsigned3 first_seen, string2 src) := 
            $.compliance.HeaderIsPreGLB (nonglb_last_seen, first_seen, src, DataRestrictionMask);
+  EXPORT boolean isPreGLBRestricted () := 
+           $.compliance.isPreGLBRestricted (DataRestrictionMask);
+
+  // credit reporting restrictions
+  EXPORT boolean isECHRestricted () :=
+           $.compliance.isECHRestricted (DataRestrictionMask);
+  EXPORT boolean isEQCHRestricted() :=
+           $.compliance.isEQCHRestricted (DataRestrictionMask);
 
   EXPORT boolean isConsumer () := industry_class = 'CNSMR';
   EXPORT boolean isUtility () := industry_class = 'UTILI';

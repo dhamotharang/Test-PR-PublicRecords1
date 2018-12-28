@@ -1,11 +1,11 @@
-import dx_BestRecords;
+import dx_BestRecords, Doxie;
 
 EXPORT Functions := MODULE
 
 	EXPORT $.Constants.perm_type get_perm_type(boolean glb_flag = false, boolean nonblank_flag = false, 
 		boolean utility_flag = false, boolean pre_glb_flag = false, 
 		boolean filter_exp_flag = false, boolean filter_eq_flag = false, 
-		boolean marketing_flag = false, boolean cnsmr_flag = false) := function
+		boolean marketing_flag = false, boolean cnsmr_flag = false) := FUNCTION
 
 		ptype_val := 
 			IF(marketing_flag, 
@@ -35,6 +35,22 @@ EXPORT Functions := MODULE
 						)
 			)));
 		RETURN ptype_val;
+
 	END;
-	
+
+	EXPORT $.Constants.perm_type get_perm_type_idata(doxie.IDataAccess modAccess, boolean checkRNA = false, 
+		boolean useNonBlankKey = false, boolean useMarketing = false) := FUNCTION
+		
+		glb_flag := modAccess.isValidGLB(checkRNA);
+		pre_glb_flag := modAccess.isPreGLBRestricted();
+		cnsmr_flag := modAccess.isConsumer();
+		utility_flag := modAccess.isUtility();
+		filter_exp := modAccess.isECHRestricted();
+		filter_eq := modAccess.isEQCHRestricted();
+
+		RETURN get_perm_type(glb_flag, useNonBlankKey, utility_flag, pre_glb_flag, 
+			filter_exp, filter_eq, useMarketing, cnsmr_flag);
+
+	END;
+
 END;
