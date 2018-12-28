@@ -11,7 +11,7 @@ EXPORT Constants(string	pVersion='') := MODULE
 														_Control.IPAddress.bctlpedata11);
 	
 	//	Directory to Spray from
-	EXPORT	Directory	:=	'/data/hds_2/neustar_wireless/data/';
+	EXPORT	Directory	:=	'/data/hds_2/neustar_wireless/data/'+ pVersion + '/';
 
 	EXPORT FileToSpray := 'Wireless2_' + pVersion + '.txt';
 	
