@@ -2,7 +2,7 @@
 EXPORT	fSprayFiles(
 	STRING		pVersionDate,
 	STRING		pServerIP				= Constants().serverIP,
-	STRING		pDirectory			= Constants().Directory,
+	STRING		pDirectory			= Constants(pVersionDate).Directory,
 	STRING		pFilename				=	Constants(pVersionDate).FileToSpray,
 	STRING		pGroupName			=	Constants().ThorGroup,
 	BOOLEAN		pIsTesting			=	FALSE,
