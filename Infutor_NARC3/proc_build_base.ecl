@@ -90,14 +90,16 @@ std_input := project(dedup_FileLogical_in, tMapping(LEFT));
 //Clean Name 
 NID.Mac_CleanParsedNames(add_record_type, cleanNames0
 		, firstname:=orig_FNAME,middlename:=orig_mname,lastname:=orig_LNAME,namesuffix:=orig_SUFFIX
-		, includeInRepository:=true, normalizeDualNames:=false,useV2:=true
+		, includeInRepository:=true, normalizeDualNames:=false,useV2:=false
 		);
 		
-cleanNames := cleanNames0(nametype='P');
+//cleanNames := cleanNames0(nametype='P');
+
+cleanNames := cleanNames0;
 
 cleanNames_t := project(cleanNames, transform({recordof(cleanNames), string orig_addr1, string orig_addr2},
 
-																							self.orig_addr1 := trim(stringlib.stringfilterout(left.orig_ADDRESS,'.^!$+<>@=%?*\''), left, right),			
+																							self.orig_addr1 := regexreplace('GENERAL DELIVERY',trim(stringlib.stringfilterout(left.orig_ADDRESS,'.^!$+<>@=%?*\''), left, right),''),			
 																							self.orig_addr2 := trim(StringLib.StringCleanSpaces(
 																																					trim(left.orig_city)
 																																					+  if(left.orig_city <> '',',','')

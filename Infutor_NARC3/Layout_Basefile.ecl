@@ -153,12 +153,15 @@ EXPORT Layout_Basefile := record
 	string1	  orig_Penetration_Range_Other_Occupation;	//code
 	string	  orig_Penetration_Range_Other_Occupation_descr;	//code descr
 	string1	  orig_DEMOLEVEL;	//code
-	string	  orig_DEMOLEVEL_descr;	//code descr
-	address.Layout_Clean_Name.title;
-	address.Layout_Clean_Name.fname;
-	address.Layout_Clean_Name.mname;
-	address.Layout_Clean_Name.lname;
-	address.Layout_Clean_Name.name_suffix;
+	string	  orig_DEMOLEVEL_descr;	//code descr	
+  unsigned8 nid;
+  string1   nametype;
+  string5   title;
+  string20  fname;
+  string20  mname;
+  string20  lname;
+  string5   name_suffix;
+  unsigned2 name_ind;	
 	address.Layout_Clean182.prim_range;
 	address.Layout_Clean182.predir;
 	address.Layout_Clean182.prim_name;

@@ -184,7 +184,7 @@ EXPORT get_decr := MODULE
 	  RETURN CASE (STD.Str.ToUpperCase(STD.Str.CleanSpaces(NumberOfChildrenInHH)), 
 									'A'  =>	'no children',
 									'B'  =>	'less than 3',
-									'C'  =>	'3 - 5',  
+									'C'  =>	'3 to 5',  
 									'');
 	END;	
 	
