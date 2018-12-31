@@ -48,7 +48,7 @@ BuildAll:= sequential
 				phonesplus_dops_update,
 				phonesplus_v2.Proc_build_Promonitor_extract,
 				Phonesplus_v2.Proc_Build_Surname_File(pversion),
-	
+				Phonesplus_v2.Fn_Extract_LeadsEnhancementforDeathofInsured(pversion),	
 	parallel
 		   (Phonesplus.sample_PhonesplusBase,
 				Phonesplus_v2.Strata_Phonesplus(pversion),
