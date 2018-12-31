@@ -70,6 +70,8 @@ EXPORT As_Business_Linking (
         self.event_filing_date := 0;  
         self.company_name_status_raw := '';
         self.company_status_raw := '';  
+				//possible future change
+        // self.company_status_raw := if(l.EFX_DEAD = 'Y', 'DEFUNCT', '');  
 				self.dt_first_seen_company_name := 0;
         self.dt_last_seen_company_name := 0;
         self.dt_first_seen_company_address := 0;
@@ -77,9 +79,9 @@ EXPORT As_Business_Linking (
         self.match_company_name := '';
         self.match_branch_city := '';
         self.match_geo_city := '';
-				self.company_fein := '0';
-        self.duns_number := '0';	
-				self.contact_ssn := '0';
+				self.company_fein := '';
+        self.duns_number := '';	
+				self.contact_ssn := '';
 				self 							   						 := l;
 				self 							   						 := [];
 		end;

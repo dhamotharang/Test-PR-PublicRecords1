@@ -6,23 +6,21 @@
 // an IDFIELD merge does not trigger IDPARENTS splitting -- they are free to merge and
 // stay merged going forward.
 EXPORT MAC_Split_Parents(infile,patchfile,did_name,pid_name,o) := MACRO
-
 	#uniquename(pids)
-	#uniquename(infile0)
-	#uniquename(infileN0)
+	#uniquename(infile_null)
+	#uniquename(infile_nonnull)
 
-	%infile0%   := infile(pid_name=0);
-	%infileN0%  := infile(pid_name<>0);
+	%infile_null%    := infile(pid_name=0);
+	%infile_nonnull% := infile(pid_name<>0);
 
 	%pids% := JOIN(
-		%infileN0%, patchfile,
+		%infile_nonnull%, patchfile,
 		LEFT.did_name=RIGHT.did_name AND LEFT.pid_name<>0,
 		TRANSFORM({LEFT.pid_name},SELF:=LEFT),
 		KEEP(1));
-	o := JOIN(
-		%infileN0%, %pids%,
+	o := %infile_null% + JOIN(
+		%infile_nonnull%, %pids%,
 		LEFT.pid_name=RIGHT.pid_name,
-		TRANSFORM(RECORDOF(LEFT),SELF.pid_name:=if(RIGHT.pid_name != 0  ,LEFT.did_name  ,LEFT.pid_name),SELF:=LEFT),
-		LEFT OUTER, KEEP(1),hash)
-    +%infile0%; 
+		TRANSFORM(RECORDOF(LEFT),SELF.pid_name:=if(RIGHT.pid_name!=0,LEFT.did_name,LEFT.pid_name),SELF:=LEFT),
+		LEFT OUTER, KEEP(1), HASH);
 ENDMACRO;
