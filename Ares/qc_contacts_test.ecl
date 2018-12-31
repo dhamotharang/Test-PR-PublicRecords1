@@ -1,5 +1,4 @@
 ﻿contacts_ds := Ares.file_gpcontacts;
-//OUTPUT(officers_ds, NAMED('officers_ds'));
 
 mc_ds:=Ares.Files.gpcnt_mc;
 
@@ -16,25 +15,25 @@ qcContact := Project(mc_ds, Transform(Ares.layout_gpcnt or {string version},
 																						
 OUTPUT(qcContact, NAMED('qcContact'));																						
 														
-// cmbContacts := sort(myContacts + qcContact, RECORD);
-// OUTPUT(cmbContacts, NAMED('cmbContacts'));
+ cmbContacts := sort(myContacts + qcContact, RECORD);
+ OUTPUT(cmbContacts, NAMED('cmbContacts'));
 
-// RecordOf(cmbContacts) xform(cmbContacts l) := Transform
-	// self.version := 'both';
-	// self := l;
-// End;				
+RecordOf(cmbContacts) xform(cmbContacts l) := Transform
+	self.version := 'both';
+	self := l;
+End;				
 
-// cmbContacts_dist := distribute(cmbContacts, hash(Accuity_Location_ID,Department,Contact_Type,Contact_Information));
+cmbContacts_dist := distribute(cmbContacts, hash(Accuity_Location_ID,Department,Contact_Type,Contact_Information));
 
-// combined_sorted := sort(cmbContacts_dist,Accuity_Location_ID,Department,Contact_Type,Contact_Information,local);
+combined_sorted := sort(cmbContacts_dist,Accuity_Location_ID,Department,Contact_Type,Contact_Information,local);
 
-// rolled := Rollup(combined_sorted, xform(left), record, local);
+rolled := Rollup(combined_sorted, xform(left), record, local);
 
-// OUTPUT(rolled, NAMED('rolled'));
+OUTPUT(rolled, NAMED('rolled'));
 
-// Output(count(rolled(version='both')), named('cnt_matching'));
-// Output(count(rolled(version='mine')), named('cnt_mine_only'));
-// Output(count(rolled(version='qc')), named('cnt_qc_only'));													
+Output(count(rolled(version='both')), named('cnt_matching'));
+Output(count(rolled(version='mine')), named('cnt_mine_only'));
+Output(count(rolled(version='qc')), named('cnt_qc_only'));													
 
 // Output(sort(rolled(version='mine'),Accuity_Location_ID) , named('mine_only'));
 // Output(sort(rolled(version='mine',Accuity_Location_ID !=''),Accuity_Location_ID), named('mine_by_Accuity_Location_ID'));
@@ -51,22 +50,30 @@ OUTPUT(qcContact, NAMED('qcContact'));
 
 
 
-// mine := rolled(version='mine');
-// qc := rolled(version='qc');
+mine := rolled(version='mine');
+qc := rolled(version='qc');
 
-// diff_layout := record
-	// mine.Accuity_Location_ID;
-	// mine.Department;
-	// string diff;
-// End;
+diff_layout := record
+	mine.Accuity_Location_ID;
+	mine.Department;
+	STRING l_contactype;
+	STRING l_contactinfo;
+	STRING r_contactype;
+	STRING r_contactinfo;
+	string diff;
+End;
 
-// diff_layout xform_diff(mine l, qc r) := Transform
-	// self.Accuity_Location_ID := l.Accuity_Location_ID;
-	// self.Department := l.Department;
-  // self.diff := ROWDIFF(L,R);
-// End;
+diff_layout xform_diff(mine l, qc r) := Transform
+	self.Accuity_Location_ID := l.Accuity_Location_ID;
+	self.Department := l.Department;
+  self.diff := ROWDIFF(L,R);
+	self.l_contactype :=l.Contact_Type;
+	self.r_contactype :=r.Contact_Type;
+	self.l_contactinfo:=l.Contact_Information;
+	self.r_contactinfo:=r.Contact_Information;
+End;
 
-// joined := join(mine, qc, left.Accuity_Location_ID = right.Accuity_Location_ID AND left.Department = right.Department,xform_diff(left,right));                                                                                                            
+joined := join(mine, qc, left.Accuity_Location_ID = right.Accuity_Location_ID AND left.Department = right.Department,xform_diff(left,right));                                                                                                            
                                                                                                          
                                                                                                                                 
-// output(joined, named('joined_diffs'));
+output(joined, named('joined_diffs'));

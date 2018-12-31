@@ -65,8 +65,8 @@ end;
 
 STRING convertToCodes(STRING type_) := FUNCTION
 		STRING code := ares.files.ds_lookup(fid ='TELECOM_TYPE').lookupbody(id = type_)[1].id;
-		STRING result := IF(std.str.EqualIgnoreCase(code,'telephone'),'tel',code);
-	RETURN result;
+		STRING result := IF(std.str.EqualIgnoreCase(code,'telephone'),'Tel',code);
+	RETURN std.str.ToCapitalCase(result);
 END;
 
 layout_w_telecom telecoms_xform(layout_tel L, STRING id, STRING dptCode, STRING tfpuid):= TRANSFORM
