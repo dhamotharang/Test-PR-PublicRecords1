@@ -201,7 +201,6 @@ EXPORT ReportService() := MACRO
 	IF(isValidInput,
 		PARALLEL( 
 			output(results, NAMED('Results')),
-			output(Options.MaxTimelineDetails,named('ReportService_MaxTimeLine'));
 			output(ds_reportrecords.ds_royalties, NAMED('RoyaltySet'))
 		),
 		FAIL(303,doxie.ErrorCodes(303)));
