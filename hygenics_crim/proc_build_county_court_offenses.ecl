@@ -675,9 +675,7 @@ self.court_off_desc_1         := trim(MAP(vVendor ='TS' and regexfind('[0-9.]+[ 
 														regexfind('MUNICIPAL[ ]*[/(]LOCAL[/)][- ]*',trim(offenseclass) + ' '+ trim(offensedegree)) =>'MO',
                             
 														regexfind('MUNICIPAL[                ]*ORDINANCE',trim(offenseclass) + ' '+ trim(offensedegree)) =>'MO',                   
-														regexfind('COUNTY[       ]*ORDINANCE',trim(offenseclass) + ' '+ trim(offensedegree)) =>'CO',                    
-														
-                           
+														regexfind('COUNTY[       ]*ORDINANCE',trim(offenseclass) + ' '+ trim(offensedegree)) =>'CO',             
                             //SEALED MISDEMEANOR                                                                                                                                                                                                                                                                            
                             regexfind('(CLASS)[ ]([A-Z][0-9]*)[ ](F)(ELONY)',offenseclass)      => regexreplace('(CLASS)[ ]([A-Z][0-9]*)[ ](F)(ELONY)',offenseclass,'$3$2'),       
                             regexfind('(CLASS)[ ]([A-Z][0-9]*)[ ](M)(ISDEMEANOR)',offenseclass) => regexreplace('(CLASS)[ ]([A-Z][0-9]*)[ ](M)(ISDEMEANOR)',offenseclass,'$3$2'),   
@@ -747,8 +745,14 @@ self.court_off_desc_1         := trim(MAP(vVendor ='TS' and regexfind('[0-9.]+[ 
 														regexfind('SECOND DEGREE FELONY|FELONY SECOND DEGREE',trim(offensetype))  => 'F2' ,
 														regexfind('THIRD DEGREE FELONY|FELONY THIRD DEGREE' ,trim(offensetype))  => 'F3' ,
 														regexfind('FIFTH DEGREE FELONY|FELONY FIFTH DEGREE' ,trim(offensetype))  => 'F5' ,
-														regexfind('FOURTH DEGREE FELONY|FELONY FOURTH DEGREE',trim(offensetype))  => 'F4' ,                                                                                                                                                                                                                                                                                             
-														regexfind('FIRST DEGREE M[ISDEMEANOR.]*|M[ISDEMEANOR.]* FIRST DEGREE' ,trim(offensetype))  => 'M1' ,
+														regexfind('FOURTH DEGREE FELONY|FELONY FOURTH DEGREE',trim(offensetype))  => 'F4' ,  
+														regexfind('SIXTH DEGREE FELONY|FELONY SIXTH DEGREE',trim(offensetype))  => 'F6' ,													
+
+														regexfind('(F)[ELONY]+ CLASS ([A-Z])',offensetype) => regexreplace('(F)[ELONY]+ CLASS ([A-Z])',offensetype,'$1$2'),     
+														regexfind('(P)[ETTY]+ (O)FFENSE CLASS ([1-9])',offensetype) => regexreplace('(P)[ETTY]+ (O)FFENSE CLASS ([1-9])',offensetype,'$1$2$3'),
+                            regexfind('(M)[ISDEMEANOR]+ CLASS ([A-Z])',offensetype) => regexreplace('(M)[ISDEMEANOR]+ CLASS ([A-Z])',offensetype,'$1$2'),     
+													
+													  regexfind('FIRST DEGREE M[ISDEMEANOR.]*|M[ISDEMEANOR.]* FIRST DEGREE' ,trim(offensetype))  => 'M1' ,
 														regexfind('SECOND DEGREE M[ISDEMEANOR.]*|M[ISDEMEANOR.]* SECOND DEGREE',trim(offensetype))  => 'M2' ,
 														regexfind('THIRD DEGREE M[ISDEMEANOR.]*|M[ISDEMEANOR.]* THIRD DEGREE' ,trim(offensetype))  => 'M3' ,
 														regexfind('FIFTH DEGREE M[ISDEMEANOR.]*|M[ISDEMEANOR.]* FIFTH DEGREE' ,trim(offensetype))  => 'M5' ,
@@ -802,6 +806,7 @@ self.court_off_desc_1         := trim(MAP(vVendor ='TS' and regexfind('[0-9.]+[ 
                             length(trim(offensetype)) =1 and offenseclass  <> ''=>  offensetype[1..1]+offenseclass[1..1],
 														length(trim(offensetype)) =1 and offensedegree <> ''=>  offensetype[1..1]+offensedegree[1..1],
 														trim(offensetype)+trim(offenseclass)+trim(offensedegree) in ['F','M'] => trim(offensetype)+trim(offenseclass)+trim(offensedegree),
+														trim(offensetype) ='PETTY OFFENSE' => 'PO',
                             length(trim(offenseclass)) <= 2 => trim(offenseclass),
 												    length(trim(offensedegree)) <= 2 and regexfind('[0-9A-Z0-9]+',offensedegree) => trim(offensedegree),
 														offensetype in ['F','M'] => trim(offensetype),
