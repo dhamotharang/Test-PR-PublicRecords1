@@ -7,7 +7,7 @@ RecordsToRun := 0; // 100;
 eyeball := 120;
 
 // historyDate := 0; // Set to 0 to use ArchiveDate on input file. 
-historyDate := 20181212; // Set to 0 to use ArchiveDate on input file. 
+historyDate := 20181227; // Set to 0 to use ArchiveDate on input file. 
 
 Score_threshold := 80;
 Output_Master_Results := TRUE;
@@ -16,7 +16,7 @@ RoxieIP := RiskWise.shortcuts.Dev156;
 InputFile := '~temp::kel::ally_01_business_uat_sample_100k_20181015.csv'; //100k file
 // InputFile := '~temp::kel::ally_01_business_uat_sample_1m_20181015.csv'; //1m file
 
-OutputFile := '~cdal::BusinessPop_PublicRecs_BusinessInputExtra_12122018'+ ThorLib.wuid() ;
+OutputFile := '~cdal::BusinessPop_PublicRecs_SpecialVaules_BankruptcyBuildDate_12272018'+ ThorLib.wuid() ;
 
 prii_layout := RECORD
 	STRING AccountNumber         ;  
@@ -222,25 +222,23 @@ Layout_Business := RECORD
 	STRING ErrorCode;
 END;
 
-Passed_with_Extras := SORT(
+Passed_with_Extras := 
 	JOIN(inDataRecs, Passed, LEFT.AccountNumber = RIGHT.MasterResults.BusInputAccountEcho, 
 		TRANSFORM(LayoutMaster_With_Extras,
 			SELF := RIGHT.MasterResults, //fields from passed
 			SELF := LEFT, //input performance fields
 			SELF.ErrorCode := RIGHT.ErrorCode,
 			SELF := []),
-		INNER, KEEP(1)),
-	BusInputUIDAppend);
+		INNER, KEEP(1));
 	
-Passed_Business := SORT(
+Passed_Business := 
 	JOIN(inDataRecs, Passed, LEFT.AccountNumber = RIGHT.Results.BusInputAccountEcho, 
 		TRANSFORM(Layout_Business,
 			SELF := RIGHT.Results, //fields from passed
 			SELF := LEFT, //input performance fields
 			SELF.Errorcode := RIGHT.ErrorCode,
 			SELF := []),
-		INNER, KEEP(1)),
-	BusInputUIDAppend);
+		INNER, KEEP(1));
 	
 IF(Output_Master_Results, OUTPUT(CHOOSEN(Passed_with_Extras, eyeball), NAMED('Sample_Master_Layout')));
 OUTPUT(CHOOSEN(Passed_Business, eyeball), NAMED('Sample_NonFCRA_Layout'));

@@ -36,9 +36,9 @@ eyeball := 120;
 
 // Universally Set the History Date YYYYMMDD for ALL records. Set to 0 to use the History Date located on each record of the input file
 // histDate := '0';
-histDate := '20181218';
+histDate := '20181231';
 
-OutputFile := '~CDAL::Consumer_Arrest_Bug_100K_RoxieDev_current_12182018_NonFCRA'+ ThorLib.wuid() ;
+OutputFile := '~CDAL::Consumer_ArrestSpecialValue_Bug_100K_RoxieDev_current_12312018_NonFCRA'+ ThorLib.wuid() ;
 
 prii_layout := RECORD
     STRING Account             ;
@@ -158,25 +158,23 @@ Layout_Person := RECORD
 	STRING ErrorCode;
 END;
 
-Passed_with_Extras := SORT(
+Passed_with_Extras := 
 	JOIN(p, Passed, LEFT.Account = RIGHT.MasterResults.InputAccountEcho, 
 		TRANSFORM(LayoutMaster_With_Extras,
 			SELF := RIGHT.MasterResults, //fields from passed
 			SELF := LEFT, //input performance fields
 			SELF.ErrorCode := RIGHT.ErrorCode,
 			SELF := []),
-		INNER, KEEP(1)),
-	InputUIDAppend);
+		INNER, KEEP(1));
 	
-Passed_Person := SORT(
+Passed_Person := 
 	JOIN(p, Passed, LEFT.Account = RIGHT.Results.InputAccountEcho, 
 		TRANSFORM(Layout_Person,
 			SELF := RIGHT.Results, //fields from passed
 			SELF := LEFT, //input performance fields
 			SELF.ErrorCode := RIGHT.ErrorCode,
 			SELF := []),
-		INNER, KEEP(1)),
-	InputUIDAppend);
+		INNER, KEEP(1));
 	
 IF(Output_Master_Results, OUTPUT(CHOOSEN(Passed_with_Extras, eyeball), NAMED('Sample_Master_Layout')));
 OUTPUT(CHOOSEN(Passed_Person, eyeball), NAMED('Sample_NonFCRA_Layout'));

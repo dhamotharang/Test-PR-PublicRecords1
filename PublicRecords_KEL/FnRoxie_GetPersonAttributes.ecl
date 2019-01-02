@@ -54,11 +54,9 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 			SELF.MonSinceOldestNonfelonyCnt7Y := IF(ResultsFound, (INTEGER)RIGHT.MonSinceOldestNonfelonyCnt7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
 			// Arrest fields are NonFCRA only
 			SELF.ArrestCnt1Y := MAP(Options.IsFCRA 		=> 0,
-                              NOT Options.IsFCRA AND ResultsFound => RIGHT.ArrestCnt1Y, 
-																																	PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
+                              NOT Options.IsFCRA AND ResultsFound => RIGHT.ArrestCnt1Y, 0);
 			SELF.ArrestCnt7Y := MAP(Options.IsFCRA		=> 0,
-															NOT Options.IsFCRA AND ResultsFound => RIGHT.ArrestCnt7Y, 
-                                                                  PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
+															NOT Options.IsFCRA AND ResultsFound => RIGHT.ArrestCnt7Y, 0);
 			SELF.ArrestNew1Y := MAP(Options.IsFCRA 		=> '',
 															NOT Options.IsFCRA AND ResultsFound => (STRING)RIGHT.ArrestNew1Y, 
 																																	PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
@@ -95,6 +93,7 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 			SELF.MonSinceOldestCrimCnt7Y := IF(ResultsFound, (INTEGER)RIGHT.MonSinceOldestCrimCnt7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
 			SELF.CrimSeverityIndex7Y := IF(ResultsFound, (STRING)RIGHT.CrimSeverityIndex7Y,'0 - 0');
 			SELF.CrimBehaviorIndex7Y := IF(ResultsFound, (STRING)RIGHT.CrimBehaviorIndex7Y,'0');
+      SELF.BkHistoryBuild := Risk_Indicators.get_Build_date('bankruptcy_daily');
 			SELF := LEFT;
 		),LEFT OUTER, KEEP(1)); 
 	
@@ -144,6 +143,7 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 			SELF.MonSinceOldestCrimCnt7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.CrimSeverityIndex7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF.CrimBehaviorIndex7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+      SELF.BkHistoryBuild := Risk_Indicators.get_Build_date('bankruptcy_daily');
 			SELF := LEFT)); 	
 			
 	PersonAttributes := SORT( PersonAttributesWithLexID + PersonAttributesWithoutLexID, InputUIDAppend ); 
