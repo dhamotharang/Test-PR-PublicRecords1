@@ -154,7 +154,6 @@ Officer_Name := join(employee_id_list, person_ds, LEFT.person_id = right.id, off
 sorted_Officer_Name := SORT(Officer_Name,relationship_id);
 deduped_Officer_Name := DEDUP(sorted_Officer_Name,LEFT.relationship_id = RIGHT.relationship_id);
 
-//STRING regex := '<[^>]+>';
 STRING regex :='[^A-Za-z\\s\\-\\.\\\'\\,]';
 
 RECORDOF(layout_gpoff) final_xform(Officer_Name L, with_codes_layout R ) := Transform
@@ -162,7 +161,6 @@ RECORDOF(layout_gpoff) final_xform(Officer_Name L, with_codes_layout R ) := Tran
 	SELF.PrimaryKey := '';
 	SELF.Accuity_Location_ID := R.Accuity_Location_ID;
 	SELF.Department := R.code;
-	//TODO: find regex to replalce SELF.OfficerName := L.given_name + ' ' + L.surname;
 	SELF.OfficerName := REGEXREPLACE(regex,L.given_name,'') + ' ' +  REGEXREPLACE(regex,L.surname,'');	
 	
 End;
