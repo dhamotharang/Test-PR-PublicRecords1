@@ -9,7 +9,7 @@ elist:=         'gabriel.marcan@lexisnexisrisk.com'
 // // // // // // // // // FullHeader DOPS update
 
 // h_version := Header.version_build;
-h_version := '20180926';
+h_version := '20180926'; // 821)), 724, 626, 522, 423, 320
 
 dops.updateversion('SourceKeys'             ,h_version,elist,,'N'); // header // Show Sources <=== NOTE !! RELEASE THE DAY AFTER
 dops.updateversion('PersonHeaderKeys'       ,h_version,elist,,'N'); // header // Header
