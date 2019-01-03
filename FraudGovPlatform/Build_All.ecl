@@ -123,11 +123,12 @@ module
 			,FraudShared.Promote().buildfiles.Built2QA			
 			// Clean Up Shared Files	
 			,FraudShared.Promote().buildfiles.cleanup	
+			//Remove the Demo file from father sf, which was moved from qa as a promote routeine
+			,STD.File.RemoveSuperFile(FraudShared.Filenames().Base.Main.Father,	Filenames().Input.DemoData.Sprayed)
 			,create_build
-			,Send_Emails(pversion).Roxie
 			,FraudGovPlatform_Analytics.GenerateDashboards(pRunProd,pUseProdData)
 			,FraudgovInfo(pversion[1..8],'Keys_Completed').SetPreviousVersion			
-		) : success(Send_Emails(pversion).BuildSuccess), failure(Send_Emails(pversion).BuildFailure);	
+		) : success(Send_Emails(pversion).Roxie), failure(Send_Emails(pversion).BuildFailure);	
 
 	export keys_portion := if(	Mac_TestBuild(pversion) 			= 'Passed' and 
 												Mac_TestRecordID(pversion) 		= 'Passed' and 
