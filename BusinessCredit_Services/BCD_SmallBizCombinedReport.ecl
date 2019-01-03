@@ -1,4 +1,5 @@
-﻿
+﻿/*--SOAP--
+
 <message name="BCD_SmallBizCombinedReport" wuTimeout="300000">
 	<part name="SmallBizCombinedReportRequest" type="tns:XmlDataSet" cols="110" rows="75"/>
   <!-- Option Fields --> 
