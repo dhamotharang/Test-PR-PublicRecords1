@@ -152,7 +152,8 @@ seq_map := join( pre_iid1, pre_iid,
 							true,  // filter out fares always true in FCRA
 							DataRestriction,
 							BSOptions, glb, gateways, DataPermission, IN_isDirectToConsumer, 
-							IncludeLnJ, ReportingPeriod := ReportingPeriod 
+							IncludeLnJ, ReportingPeriod, adl_based_shell
+
        );
 
 
