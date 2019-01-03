@@ -88,16 +88,6 @@ result := department_telecoms_normed + office_telecoms_normed;
 sorted_result := SORT(result,RECORD);
 deduped_result := DEDUP (sorted_result,RECORD);
 
-// layout_contacts := RECORD
-	// STRING Update_Flag;
-	// STRING Primary_Key;
-	// STRING Accuity_Location_ID;
-	// STRING Department := '';
-	// STRING Contact_Type;
-	// STRING Contact_Information;
-	// STRING Filler;
-// END;
-
 recordof(ares.layout_gpcnt) final_xform(result L) := Transform
 	SELF.Update_Flag := 'A';
 	SELF.Primary_Key := '';
