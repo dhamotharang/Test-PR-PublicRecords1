@@ -166,9 +166,10 @@ EXPORT copyOthers := sequential(
 // ************************************************************************************************************************************
 ld :='thor_data400::key::insuranceheader_xlink::<<version>>::did';
 reltv_n_othr:=base_relative + additional_keys;
+ikb_ver:=header._info.get_version_link_qa_inc:INDEPENDENT;
 EXPORT MoveToQA :=sequential(
-
-     nothor(apply(linking_keys, update_supers(  ver(nm,'father','thor400_44'  ), ver(nm,'qa'    ,'thor400_44'  )) ))
+     output(ikb_ver,named('current_ikb_version')) // get the ikb version ahead of the update, so that we can ensure it is re-instated after the move of the full lab keys
+    ,nothor(apply(linking_keys, update_supers(  ver(nm,'father','thor400_44'  ), ver(nm,'qa'    ,'thor400_44'  )) ))
     ,nothor(apply(linking_keys, update_supers(  ver(nm,'qa'    ,'thor400_44'), ver(nm,filedate,'thor_data400')) ))
     ,nothor(apply(linking_keys, update_supers(  ver(nm,'qa'    ,'thor400_36'  ), ver(nm,filedate,'thor400_36'  )) ))
     ,nothor(apply(linking_keys, update_supers(  ver(nm,'qa'    ,'thor_data400'  ), ver(nm,filedate,'thor_data400')) ))
@@ -177,7 +178,7 @@ EXPORT MoveToQA :=sequential(
     ,                           update_supers(  ver(ld,'qa'    ,'thor_data400'), ver(ld,filedate,'thor_data400'))
     ,                           update_supers(  ver(ld,'qa'    ,'thor400_44'  ), ver(ld,filedate,'thor_data400'))
     ,                           update_supers(  ver(ld,'qa'    ,'thor400_36'  ), ver(ld,filedate,'thor_data400'))
-    ,nothor(Header.Proc_Copy_From_Alpha_Incrementals().update_inc_superfiles(true,filedate)) // Restore the incremental keys into the qa superfiles
+    ,nothor(Header.Proc_Copy_From_Alpha_Incrementals().update_inc_superfiles(true,ikb_ver)) // Restore the incremental keys into the qa superfiles
     ,_control.fSubmitNewWorkunit('Header.Proc_Copy_Keys_To_Dataland.Full','hthor_sta_eclcc','Dataland') // Copy and update new full keys in dataland
 );
 // ************************************************************************************************************************************
