@@ -1694,5 +1694,21 @@ EXPORT dsSourceCriteria := DATASET([
 {'Vessels - EC (CFSP) 2018/1657 Democratic People\'s Republic of Korea List Subject to Asset Freeze','1680'},
 {'Vessels - EC 2018/1654 Democratic People\'s Republic of Korea List Prohibited Entry into Ports','1681'},
 {'Vessels - EC 2018/1654 Democratic People\'s Republic of Korea List Subject to Seizure','1682'},
-{'EC 2018/1809 ISIL (Da\'esh) and Al-Qaida List','1683'}
+{'EC 2018/1809 ISIL (Da\'esh) and Al-Qaida List','1683'},
+{'EC (CFSP) 2018/1868 Libya List','1684'},
+{'EC 2018/1863 Libya List','1685'},
+{'Government of Russia - Special Economic Measures in Connection with the Unfriendly Actions of Ukraine','1686'},
+{U'EC (CFSP) 2018/1930 Ukraine List','1687'},
+{'EC 2018/1866 Banned Air Carriers List','1688'},
+{'EC 2018/1929 Ukraine List','1689'},
+{'EC (CFSP) 2018/1930 Ukraine List','1690'},
+{'EC (CFSP) 2018/1940 Democratic Republic of the Congo List','1691'},
+{'EC (CFSP) 2018/1946 South Sudan List','1692'},
+{'EC 2018/1931 Democratic Republic of the Congo List','1693'},
+{'EC 2018/1934 South Sudan List','1694'},
+{'Guernsey Financial Services Commission - Prohibition Orders','1695'},
+{'EC (CFSP) 2018/2054 Myanmar/Burma List','1696'},
+{'EC 2018/2053  Myanmar/Burma List','1697'},
+{'SECO (Switzerland) Mali List','1698'},
+{'UN Security Council Resolution 2374 (2017) Mali List','1699'}
 ],r);

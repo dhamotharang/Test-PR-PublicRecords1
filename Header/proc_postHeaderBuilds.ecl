@@ -4,6 +4,7 @@ export proc_postHeaderBuilds := module
 
 		
 		shared elist_owners 				:=   'gabriel.marcan@lexisnexisrisk.com'
+											    +',Debendra.Kumar@lexisnexisrisk.com'
 											    +',jose.bello@lexisnexisrisk.com'
                                                 ;
 
@@ -176,6 +177,7 @@ export proc_postHeaderBuilds := module
                                             ,if(Header.version_build<>fn[sub..sub+7],fail('Header base does not match version'))
                                             ,if(exists(wl),fail('QUICK HEADER is running'))
                                             ,checkLinkingVersion(header.version_build)
+                                            ,header.Proc_AcceptSK_toQA(header.version_build)
                                             ,nothor(Header.move_header_raw_to_prod())
                                             ,Header.Proc_Copy_From_Alpha.MoveToQA
                                             ,header.Proc_Accept_SRC_toQA()

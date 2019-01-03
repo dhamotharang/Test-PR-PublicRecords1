@@ -26,8 +26,19 @@ FileSprayed 				:= FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+ fname;
 Deltabase_Passed		:= FraudGovPlatform.Filenames().Sprayed._DeltabasePassed;
 Deltabase_Rejected	:= FraudGovPlatform.Filenames().Sprayed._DeltabaseRejected;
 
+ClearFiles	:= SEQUENTIAL(
+	STD.File.StartSuperFileTransaction(),
+	STD.File.RemoveSuperFile( Deltabase_Passed, FileSprayed , true ),
+	STD.File.RemoveSuperFile( Deltabase_Rejected, FileSprayed, true ),
+	STD.File.FinishSuperFileTransaction()
+);
+	
+	
+
+
 SprayIt:=SEQUENTIAL(
 						OUTPUT('Spraying: '+ ip + rootDir + version[1..8] + '/' + fname_temp + ' -> ' + FileSprayed) 
+						,NOTHOR(ClearFiles)
 						,NOTHOR(FileServices.SprayVariable(
 							 IP //sourceIP 
 							,rootDir + version[1..8] + '/' + fname_temp //sourcepath 

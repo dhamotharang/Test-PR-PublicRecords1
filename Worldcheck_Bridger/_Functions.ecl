@@ -1195,6 +1195,11 @@
 				trim(kword, left, right) = 'USSGE' =>SubGroup_Constants.numKeywordsID.KEYWORD_USSGE,
 				trim(kword, left, right) = 'OFAC-NIC' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_NIC,
 				trim(kword, left, right) = 'JPJFTC' =>SubGroup_Constants.numKeywordsID.KEYWORD_JPJFTC,
+				trim(kword, left, right) = 'TNCNLT' =>SubGroup_Constants.numKeywordsID.KEYWORD_TNCNLT,
+				trim(kword, left, right) = 'RUUSEM-50-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_RUUSEM_50_WC,
+				trim(kword, left, right) = 'SECO-MAL' =>SubGroup_Constants.numKeywordsID.KEYWORD_SECO_MAL,
+				trim(kword, left, right) = 'UN-MAL' =>SubGroup_Constants.numKeywordsID.KEYWORD_UN_MAL,
+
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);

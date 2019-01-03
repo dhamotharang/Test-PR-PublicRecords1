@@ -34,7 +34,7 @@ EXPORT E_Person_Event := MODULE
     RECORDOF(__d0_Subject__Mapped);
     KEL.typ.uid Social_;
   END;
-  SHARED __d0_Social__Mapped := JOIN(__d0_Subject__Mapped,E_Social_Security_Number.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.Ssn) = RIGHT.KeyVal,TRANSFORM(__d0_Social__Layout,SELF.Social_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d0_Social__Mapped := JOIN(__d0_Subject__Mapped,E_Social_Security_Number.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.Ssn) = RIGHT.KeyVal,TRANSFORM(__d0_Social__Layout,SELF.Social_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,LOOKUP);
   SHARED __d0_Phone_Number__Layout := RECORD
     RECORDOF(__d0_Social__Mapped);
     KEL.typ.uid Phone_Number_;
