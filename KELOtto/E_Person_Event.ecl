@@ -98,7 +98,7 @@ EXPORT E_Person_Event := MODULE
     RECORDOF(__d1_Phone_Number__Mapped);
     KEL.typ.uid Emailof_;
   END;
-  SHARED __d1_Emailof__Mapped := JOIN(__d1_Phone_Number__Mapped,E_Email.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.Email_Address) = RIGHT.KeyVal,TRANSFORM(__d1_Emailof__Layout,SELF.Emailof_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,LOOKUP);
+  SHARED __d1_Emailof__Mapped := JOIN(__d1_Phone_Number__Mapped,E_Email.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.Email_Address) = RIGHT.KeyVal,TRANSFORM(__d1_Emailof__Layout,SELF.Emailof_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
   SHARED __d1_Location__Layout := RECORD
     RECORDOF(__d1_Emailof__Mapped);
     KEL.typ.uid Location_;
@@ -118,12 +118,12 @@ EXPORT E_Person_Event := MODULE
     RECORDOF(__d1_Routing_Bank__Mapped);
     KEL.typ.uid Account_;
   END;
-  SHARED __d1_Account__Mapped := JOIN(__d1_Routing_Bank__Mapped,E_Bank_Account.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.bank_routing_number_1) + '|' + TRIM((STRING)LEFT.bank_account_number_1) = RIGHT.KeyVal,TRANSFORM(__d1_Account__Layout,SELF.Account_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,LOOKUP);
+  SHARED __d1_Account__Mapped := JOIN(__d1_Routing_Bank__Mapped,E_Bank_Account.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.bank_routing_number_1) + '|' + TRIM((STRING)LEFT.bank_account_number_1) = RIGHT.KeyVal,TRANSFORM(__d1_Account__Layout,SELF.Account_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
   SHARED __d1_Licence__Layout := RECORD
     RECORDOF(__d1_Account__Mapped);
     KEL.typ.uid Licence_;
   END;
-  SHARED __d1_Licence__Mapped := JOIN(__d1_Account__Mapped,E_Drivers_License.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.drivers_license) = RIGHT.KeyVal,TRANSFORM(__d1_Licence__Layout,SELF.Licence_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,LOOKUP);
+  SHARED __d1_Licence__Mapped := JOIN(__d1_Account__Mapped,E_Drivers_License.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.drivers_license) = RIGHT.KeyVal,TRANSFORM(__d1_Licence__Layout,SELF.Licence_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
   SHARED __d1_Transaction__Layout := RECORD
     RECORDOF(__d1_Licence__Mapped);
     KEL.typ.uid Transaction_;

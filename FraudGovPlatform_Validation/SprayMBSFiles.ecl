@@ -2,7 +2,7 @@
 
 export SprayMBSFiles(
 	 string		pServerIP		                   						= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10)
-	,string		pDirectory	                   						= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', '/data/super_credit/fdn/in/mbs/prod', '/data/super_credit/fdn/in/mbs/prod')	
+	,string		pDirectory	                   						= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', Constants.FDNMBSLandingZonePathBase_dev, Constants.FDNMBSLandingZonePathBase_prod)	
 	,string   pFilenameMBSmarketAppend       						= '*fdn_market*txt'
 	,string   pFilenameMBSFdnCCID            						= '*mbsi_fdn_accounts*'
 	,string   pFilenameMBSFdnHHID            						= '*hhid_fdn_accounts.csv'

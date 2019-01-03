@@ -1,4 +1,4 @@
-import BIPV2;
+﻿import BIPV2;
 
 export layout_DEA_Out_BaseV2 := record
 	layout_DEA_In_modified;

@@ -1,4 +1,4 @@
-﻿import header, Census_data, Gong, Watchdog, did_add, ut, doxie_build, PRTE2_Header, doxie_build;
+﻿import header, Census_data, Gong, Watchdog, did_add, ut, doxie_build, PRTE2_Header;
 
 head := doxie_build.file_fcra_header_built; 
 

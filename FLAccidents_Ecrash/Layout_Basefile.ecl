@@ -17,8 +17,9 @@
 	STRING9 court_time;
 	STRING200 citation_detail1;
 	STRING3 local_code;
-	STRING30 violation_code1;
-	STRING30 violation_code2;
+	//PRtcc datatype update
+	STRING60 violation_code1;
+	STRING60 violation_code2;
 	STRING7 multiple_charges_indicator;
 	STRING7 dui_indicator;
 	STRING11 commercial_id;
@@ -488,7 +489,8 @@
 	STRING30 special_function_in_transport;
 	STRING30 special_function_in_transport_other_unit;
 	STRING7 emergency_use;
-	STRING2 posted_satutory_speed_limit;
+	//PRtcc datatype update
+	STRING7 posted_satutory_speed_limit;
 	STRING15 direction_of_travel_before_crash;
 	STRING60 trafficway_description;
 	STRING50 traffic_control_device_type;
@@ -808,7 +810,8 @@
 	STRING7 other_unit_permanent_registration3	;
 	STRING30 other_unit_type3	;
 	STRING70 damaged_areas3	;
-	STRING64 driver_distracted_by;	
+	//PRtcc datatype update
+	STRING200 driver_distracted_by;	
 	STRING64 non_motorist_type;	
 	STRING64 seating_position_row;	
 	STRING64 seating_position_seat	;
@@ -831,13 +834,15 @@
 	STRING   Report_Collision_Type;
 	STRING   Report_First_Harmful_Event;
 	STRING   Report_Light_Condition;
-	STRING   Report_Weather_Condition;
-	STRING   Report_Road_Condition;
-	STRING   Report_Injury_Status;
+	//PRtcc datatype update
+	STRING200 Report_Weather_Condition;
+	STRING200 Report_Road_Condition;
+	STRING100 Report_Injury_Status;
 	STRING   Report_Damage_Extent;
 	STRING   Report_Vehicle_Type;
 	STRING   Report_Traffic_Control_Device_Type;
-	STRING   Report_Contributing_Circumstances_v;
+	//PRtcc datatype update
+	STRING200 Report_Contributing_Circumstances_v;
 	STRING   Report_Vehicle_Maneuver_Action_Prior;
 	STRING   Report_Vehicle_Body_Type;
 
@@ -871,4 +876,12 @@
 	//Nucleus 
 	STRING50 Platform;
 	STRING40 Agency_Report_Number;
+	
+	//PRtCC new fields
+	STRING60 Violation_Code3;
+	STRING60 Violation_Code4;
+	STRING20 Dispatch_Time;
+	STRING1 Additional_Keying;
+	STRING200 Dui_Suspected;
+	STRING200 Report_Contributing_Circumstances_p;
 END;

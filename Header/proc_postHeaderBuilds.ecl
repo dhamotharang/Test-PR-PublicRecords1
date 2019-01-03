@@ -1,4 +1,7 @@
 ﻿import header,ut,PersonLinkingADL2V3,header_slimsort,Roxiekeybuild,Text_FragV1,Doxie,data_services,misc,_control,Std,PromoteSupers,InsuranceHeader_xLink;
+import Scrubs_HeaderSlimSortSrc_Monthly;
+import Scrubs_FileRelative_Monthly;
+import Scrubs_Headers_Monthly;
 
 export proc_postHeaderBuilds := module
 
@@ -63,7 +66,7 @@ export proc_postHeaderBuilds := module
 		bld_Transunion_LN    := Header.transunion_did
 		: success(sequential(output('TU/LT completed'),header.msg('TU/LT completed',elist_owners).good))
 		;
-		bld_Transunion_Ptrak := Header.build_tucs_did
+		bld_Transunion_Ptrak := Header.build_tucs_did(header.version_build)
 		: success(sequential(output('TS/TN completed'),header.msg('TS/TN completed',elist_owners).good))
 		;
 		build_slimsorts      := header_slimsort.Proc_Make_Name_xxx(thor1, thor2)
@@ -231,5 +234,10 @@ export proc_postHeaderBuilds := module
                                             :success(header.msg(cmpltd,elist_owners).good)
                                             ,failure(header.msg(failed,elist_owners).bad)
                                             ;
+        export run_scrubs_reports:= sequential(
+                                            Scrubs_HeaderSlimSortSrc_Monthly.proc_generate_report(),
+                                            Scrubs_FileRelative_Monthly.proc_generate_report(),
+                                            Scrubs_Headers_Monthly.proc_generate_report()
 
+        );
 end;

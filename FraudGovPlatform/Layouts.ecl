@@ -187,7 +187,9 @@ EXPORT Layouts := MODULE
 			string		reason_cleared_code;
 			string100 source_input := 'Contributory';
 		END;
-
+		EXPORT SafeList	:= RECORD
+			KnownFraud;
+		END;
 		EXPORT Deltabase := RECORD
 			unsigned6	InqLog_ID;
 			string20	customer_account_number;
