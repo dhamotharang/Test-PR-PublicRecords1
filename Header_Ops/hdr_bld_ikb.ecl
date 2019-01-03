@@ -16,9 +16,9 @@ EXPORT hdr_bld_ikb(string filedate) := module
    UpdateIncIdl := Header.Proc_Copy_From_Alpha_Incrementals().update_inc_idl(,filedate);
                     
    BuildiDid := sequential(
-                    std.file.ClearSuperFile('~thor400_44::key::insuranceheader_xlink::inc::header'),
-                    std.file.AddSuperFile('~thor400_44::key::insuranceheader_xlink::inc::header',
-                                          '~thor_data400::key::insuranceheader_xlink::'+filedate+'::idl'),
+                    nothor(std.file.ClearSuperFile('~thor400_44::key::insuranceheader_xlink::inc::header')),
+                    nothor(std.file.AddSuperFile('~thor400_44::key::insuranceheader_xlink::inc::header',
+                                          '~thor_data400::key::insuranceheader_xlink::'+filedate+'::idl')),
                     InsuranceHeader.proc_payload_inc(filedate)
                     );
 
@@ -32,6 +32,6 @@ EXPORT hdr_bld_ikb(string filedate) := module
                     );
                     
    EXPORT all := sequential(CopyKeys, UpdateIncIdl, BuildKeys, MovetoQA)
-                  : failure(std.system.Email.SendEmail(emailList,'FAILED:IKB BUILD:'+workunit,wLink));
+                     : failure(std.system.Email.SendEmail(emailList,'FAILED:IKB BUILD:'+workunit,wLink));
                 
 END;
