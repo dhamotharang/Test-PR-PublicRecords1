@@ -1,13 +1,13 @@
 import ut,header,dops;
 build_version:= header.version_build;
 
-dops_datasetname:=header._config.dops_datasetname;
+dops_datasetname:=header._info.dops_datasetname;
 
 dlog(string bld_cmp_nm):=dops.TrackBuild().fSetInfoinWorktunit(dops_datasetname,build_version,bld_cmp_nm);
 
 sf_name := '~thor_data400::out::header_post_move_status';
 
-status := Header.LogBuildStatus(sf_name, build_version).GetLatestCompletedStatus:INDEPENDENT;
+status := Header.LogBuildStatus(sf_name, build_version).GetLatestVersionCompletedStatus:INDEPENDENT;
 
 update_status(unsigned2 new_status) := Header.LogBuildStatus(sf_name,build_version,new_status).Write;
 
