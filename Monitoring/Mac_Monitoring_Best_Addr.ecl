@@ -540,7 +540,7 @@ END;
 																	(STRING)left.did = right.acctno and
 																	left.rid = right.did,
 											%getUpdatebestdid%(left, right),
-											left outer, limit(0));
+											left outer, keep(1),limit(0));
 											
 	#uniquename(sortbest_recs_didappend)									
 												
