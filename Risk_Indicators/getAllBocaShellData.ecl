@@ -17,7 +17,9 @@ EXPORT getAllBocaShellData (
 	string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
 	boolean isDirectToConsumerPurpose = false,
 	boolean IncludeLnJ = false,
- integer2 ReportingPeriod = 84  
+ integer2 ReportingPeriod = 84,
+  boolean adl_based_shell= false
+ 
   ) := FUNCTION
 	
 	// check the first record in the batch to determine if this a realtime transaction or an archive test
@@ -1704,7 +1706,7 @@ final := if(~isFCRA and BSversion>=41, group(wFDAttrV2,seq), BSdata);	// only do
 
 // --------------------[ add models ]--------------------
 
-wModels := risk_indicators.getAllBocaShellModels(final, isFCRA, easi_census);
+wModels := risk_indicators.getAllBocaShellModels(final, isFCRA, easi_census,adl_based_shell);
 
 // append riskview alerts for bsversion >= 50 and fcra
 isCalifornia_in_person := false;  // for this purpose within the shell, the applicant won't be applying in person in california.  that is a product specific setting
