@@ -810,22 +810,7 @@ USE KELOtto.PersonCIID(FLAT,
   Person(FILTER((UNSIGNED)did>0),
     LexId = did,
     SubjectSsnCount = subjectssncount
-    ),
-	Address(FILTER((STRING10)prim_range <> '' AND (STRING28)prim_name <> '' AND (UNSIGNED3)z5 <> 0),
-		PrimaryRange = prim_range,
-		Predirectional = predir,
-		PrimaryName = prim_name,
-		Suffix =addr_suffix,
-		Postdirectional = postdir,
-		UnitDesignation = unit_desig,
-		SecondaryRange = sec_range,
-		PostalCity = p_city_name,
-		State = st,
-		Zip = z5,
-		Zip4 = zip4,
-		Latitude = lat,
-		Longitude = long),
-	SocialSecurityNumber(FILTER((UNSIGNED)ssn <> 0))
+    )
 );
 
 USE KELOtto.PersonFraudPoint(FLAT,
@@ -869,6 +854,7 @@ Event: => FullAddress := Location.FullAddress;
 Event: => Latitude := Location.Latitude;
 Event: => Longitude := Location.Longitude;
 Event: => LatLongId := STRING(Latitude) + ' ' + STRING(Longitude);
+Event: => EventTypeCount := COUNT(EventTypes);
 Event: => KrHighRiskIdentityFlag := MAP(COUNT(EventTypes(EventType IN ['10000','10001','10002','10004','10005','10006','10007','11000','11001','11002','11003','11004','11005','11006','11007','11008','11009','11010','11011','11012','11013','11014','11015','11016','11017','11018','11019','12000','12001','12002','12003','12004','12005','12006','12007','13000','13001','13002','13003','13004','13005','13006','13007','1400']))>0 => 1, 0);
 Event: => KrMediumRiskIdentityFlag := MAP(COUNT(EventTypes(EventType IN ['10003','14001']))>0 => 1, 0);
 Event: => KrHighRiskAddressFlag := MAP(COUNT(EventTypes(EventType IN ['301','302']))>0 => 1, 0);
@@ -1529,7 +1515,7 @@ Customer: => HighFrequencyAddressCount := SUM(PersonAddress(Location.InCustomerP
 Customer: => AllHighFrequencyAddressCount := SUM(PersonAddress{Location}, Location.HighFrequencyFlag);
 Customer: => HighFrequencyAddressPercent := HighFrequencyAddressCount / AddressCount;
 Customer: => AllHighFrequencyAddressPercent := AllHighFrequencyAddressCount / AllAddressCount;
-Customer: => EventDateMax := MAX(PersonEvent, EventDate);
+Customer: => EventDateMax := MAX(PersonEvent(Transaction.EventTypeCount=0), EventDate); // only count non-performance data rows. The reason is that after the fact people will be validating and that will move the max date.
 
 
 QUERY: Temp <= PersonBankAccount;

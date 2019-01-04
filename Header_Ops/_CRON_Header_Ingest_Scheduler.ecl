@@ -9,11 +9,11 @@
 // Expected execution time -> Estimated 24-48 hrs
 	
 import ut,wk_ut,_control,STD, header;
-#WORKUNIT('name', 'Header Ingest Scheduler');
+#WORKUNIT('name', 'PersonHeader: Build_Header_Ingest');
 			
 ECL0:=  
 '// Header_ops._CRON_Header_Ingest_Scheduler\n\n'
-+'// scheduler job name -> Header Ingest Scheduler\n\n'
++'// scheduler job name -> PersonHeader: Build_Header_Ingest\n\n'
 +'// ON_NOTIFY: Header_Ops.hdr_bld_ingest\n\n'
 +'// ACTIONS:\n'
 +'// -------------\n'
@@ -100,7 +100,7 @@ NOC_MSG
 	;
     
 #WORKUNIT('protect',true);
-wk_ut.CreateWuid(ECL,THOR,wk_ut._constants.ProdEsp) : when('Header Ingest Scheduler')
+wk_ut.CreateWuid(ECL,THOR,wk_ut._constants.ProdEsp) : when('Build_Header_Ingest')
                             ,FAILURE(fileservices.sendemail(Header.email_list.BocaDevelopersEx
                                 ,'*** ALERT **** Header Ingest Scheduler Failure'
                                 ,NOC_MSG

@@ -1,9 +1,13 @@
 ﻿import header,ut,PersonLinkingADL2V3,header_slimsort,Roxiekeybuild,Text_FragV1,Doxie,data_services,misc,_control,Std,PromoteSupers,InsuranceHeader_xLink;
+import Scrubs_HeaderSlimSortSrc_Monthly;
+import Scrubs_FileRelative_Monthly;
+import Scrubs_Headers_Monthly;
 
 export proc_postHeaderBuilds := module
 
 		
 		shared elist_owners 				:=   'gabriel.marcan@lexisnexisrisk.com'
+											    +',Debendra.Kumar@lexisnexisrisk.com'
 											    +',jose.bello@lexisnexisrisk.com'
                                                 ;
 
@@ -62,7 +66,7 @@ export proc_postHeaderBuilds := module
 		bld_Transunion_LN    := Header.transunion_did
 		: success(sequential(output('TU/LT completed'),header.msg('TU/LT completed',elist_owners).good))
 		;
-		bld_Transunion_Ptrak := Header.build_tucs_did
+		bld_Transunion_Ptrak := Header.build_tucs_did(header.version_build)
 		: success(sequential(output('TS/TN completed'),header.msg('TS/TN completed',elist_owners).good))
 		;
 		build_slimsorts      := header_slimsort.Proc_Make_Name_xxx(thor1, thor2)
@@ -176,6 +180,7 @@ export proc_postHeaderBuilds := module
                                             ,if(Header.version_build<>fn[sub..sub+7],fail('Header base does not match version'))
                                             ,if(exists(wl),fail('QUICK HEADER is running'))
                                             ,checkLinkingVersion(header.version_build)
+                                            ,header.Proc_AcceptSK_toQA(header.version_build)
                                             ,nothor(Header.move_header_raw_to_prod())
                                             ,Header.Proc_Copy_From_Alpha.MoveToQA
                                             ,header.Proc_Accept_SRC_toQA()
@@ -229,5 +234,10 @@ export proc_postHeaderBuilds := module
                                             :success(header.msg(cmpltd,elist_owners).good)
                                             ,failure(header.msg(failed,elist_owners).bad)
                                             ;
+        export run_scrubs_reports:= sequential(
+                                            Scrubs_HeaderSlimSortSrc_Monthly.proc_generate_report(),
+                                            Scrubs_FileRelative_Monthly.proc_generate_report(),
+                                            Scrubs_Headers_Monthly.proc_generate_report()
 
+        );
 end;

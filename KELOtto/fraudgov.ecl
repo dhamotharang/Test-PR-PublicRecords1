@@ -324,7 +324,7 @@ fraudgov_layout := RECORD,maxlength(60000)
 
 //fraudgov_dataset_base_prep := PULL(DATASET('~foreign::10.173.14.201::thor_data400::base::fraudgov::20180529_anonymized::main',fraudgov_layout,THOR));
 //fraudgov_dataset_base_prep := PULL(DATASET('~foreign::10.173.14.201::thor_data400::base::nookse01::qa::main',fraudgov_layout,THOR));
-fraudgov_dataset_base_prep := PULL(DATASET('~thor_data400::base::fraudgov::qa::main',fraudgov_layout,THOR));
+fraudgov_dataset_base_prep := PULL(DATASET('~thor_data400::base::fraudgov::built::main',fraudgov_layout,THOR));
 // fraudgov_dataset_base_prep := PULL(DATASET('~foreign::10.173.14.201::thor_data400::base::nookse01::qa::main',fraudgov_layout,THOR));
  
 

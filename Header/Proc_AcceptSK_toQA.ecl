@@ -114,7 +114,7 @@ ut.mac_SF_Move('~thor_data400::base::file_header_building','P',mv_fhb2prod);
 ut.mac_SF_Move('~thor_data400::base::gong_did','P',mv_gong2prod);
 
 e_mail_success := fileservices.sendemail(
-'roxiedeployment@seisint.com,' + Header.email_list.BocaDevelopers,
+ Header.email_list.BocaDevelopers,
 'Header Roxie Build Succeeded ' + filedate,
 'keys:  1)   thor_data400::key::did_hhid_qa(thor_data400::key::header::HHID::'+filedate+'::did.ver),\n' + 
 '       2)   thor_data400::key::hhid_did_qa(thor_data400::key::header::HHID::'+filedate+'::hhid.ver),\n' + 
@@ -190,7 +190,7 @@ e_mail_success := fileservices.sendemail(
 '       73)   thor_data400::key::header.ssn4_v2.did(thor_data400::key::header::'+filedate+'::ssn4_v2.did),\n' +
 '       74)   thor_data400::key::aid::RawAID_to_ACECahe(thor_data400::key::aid::'+filedate+'::RawAID_to_ACECahe),\n' +
 '       75)   thor_data400::key::relatives_v2_qa(thor_data400::key::header::'+filedate+'::relatives_v2),\n' +
-'      have been built and ready to be deployed to QA.');
+'      ');
 							
 
 
