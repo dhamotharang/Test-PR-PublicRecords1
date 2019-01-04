@@ -222,7 +222,7 @@ export BatchRecords(/*ERO_Services.IParam.batchParams configData,*/
 	                     transform(ERO_Services.Layouts.layout_extra_penalty, self := left),right outer, limit(ERO_Services.Constants.Limits.MAX_JOIN_LIMIT));
 	
 	ERO_Services.Layouts.layout_extra_penalty  setRelMatch(ds_ERO_all_penalty l) := transform
-    self.rel_match := ERO_Services.fn_relativeMatch(l, mod_access.glb, mod_access.dppa);
+    self.rel_match := ERO_Services.fn_relativeMatch(l, mod_access);
 	 self := l;
 	end;
 	

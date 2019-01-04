@@ -1,23 +1,24 @@
-import doxie,doxie_raw,header,Suppress,ut;
+import doxie, doxie_raw, header, Suppress;
 
 export Relative_Records(boolean checkRNA=true) := FUNCTION
   doxie.MAC_Selection_Declare()
-  doxie.MAC_Header_Field_Declare()
+  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
 
   dids_pre := get_dids()(Include_relatives_val or include_associates_val);
-  Suppress.MAC_Suppress(dids_pre,dids,application_type_value,suppress.constants.LinkTypes.DID,did);
+  Suppress.MAC_Suppress(dids_pre, dids, mod_access.application_type, suppress.constants.LinkTypes.DID, did);
 
   results_max := doxie_Raw.relative_raw
-	  (dids,dateVal,dppa_purpose,glb_purpose,ssn_mask_value,ln_branded_value,probation_override_value,
-	   include_relatives_val,include_associates_val,Relative_Depth,max_relatives,isCRS,max_associates);
+	  (dids, mod_access,
+	   include_relatives_val,include_associates_val,Relative_Depth,max_relatives,max_associates);
 
-  ut.PermissionTools.GLB.mac_FilterOutMinors(results_max,results_max_fil,person2)
+  results_max_fil := doxie.compliance.MAC_FilterOutMinors (results_max, person2, , mod_access.show_minors);
 
-  doxie_raw.mac_JoinHeader_Raw(results_max_fil, recs, person2, false,dateVal,dppa_purpose,glb_purpose,ssn_mask_value,ln_branded_value,probation_override_value)
+  doxie_raw.mac_JoinHeader_Raw(results_max_fil, recs, person2, false, mod_access);
 
   rr := sort(recs,p2_sort,p3_sort,p4_sort,-number_cohabits, - recent_cohabit, -isRelative, person1, person2, rid);
-  header.MAC_GLB_DPPA_Clean_RNA(rr,rr_rna)
+  header.MAC_GLB_DPPA_Clean_RNA(rr, rr_rna, mod_access)
 	ret_results := if (checkRNA, rr_rna, rr);
 
   return ret_results;
-END;	
+END;
+	

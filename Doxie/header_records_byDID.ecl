@@ -21,7 +21,7 @@ export header_records_byDID(
 
 FUNCTION
 
-doxie.mac_header_field_declare()
+doxie.mac_header_field_declare() //score_threshold_value, Dial_RecordMatch_value, and lots of others
 mod_access := $.compliance.GetGlobalDataAccessModule ();
 
 include_fun(unsigned2 penalt, string1 TNT, unsigned3 dt) := 
@@ -123,11 +123,11 @@ headerRecords_use := if(do_not_fill_blanks, headerRecords_noscore, headerRecords
 headerPretty := project(headerRecords_use, take(left));	
 header.MAC_GlbClean_Header(headerPretty,headerCleaned_1, , , mod_access);
 
-header.MAC_GLB_DPPA_Clean_RNA(headerCleaned_1, headerRNACleaned);
+header.MAC_GLB_DPPA_Clean_RNA(headerCleaned_1, headerRNACleaned, mod_access);
 headerCleaned_2 := IF(checkRNA, headerRNACleaned, headerCleaned_1);
 
 HeaderHouseHoldsOnly := headerCleaned_2(includedbyhhid);
-header.MAC_GLB_DPPA_Clean_RNA(HeaderHouseHoldsOnly, HeaderHouseHoldsCleaned);
+header.MAC_GLB_DPPA_Clean_RNA(HeaderHouseHoldsOnly, HeaderHouseHoldsCleaned, mod_access);
 headerCleaned := headerCleaned_2(~includedbyhhid) + HeaderHouseHoldsCleaned;
 //The commented out line below is for a future Experian Credit header restrictiuon change
 //header.MAC_GlbClean_Header(headerPretty,headerCleaned,,doxie.DataRestriction.ECH);
@@ -200,7 +200,7 @@ hh_checked := Fetch2(~includedByHHID) + good_hh_recs;
 Fetch3 := if (whole_house, hh_checked, Fetch2);
 
 // rollup dates in standard fashion
-doxie.mac_HeaderDates(Fetch3,Fetched_hd)
+doxie.mac_HeaderDates(Fetch3, Fetched_hd, mod_access);
 Fetched_hd2 := IF(mod_access.isConsumer (), Fetch3, Fetched_hd);
 
 // allow for an historical search

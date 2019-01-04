@@ -33,7 +33,8 @@ EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwners
 																,acctno,seq),acctno);
 	subjectDIDs := PROJECT(needREA,Doxie.layout_references);													
 	// *** Relatives and associates
-	dsRA := Doxie_Raw.relative_raw(DEDUP(subjectDIDs,ALL),,mod_access.dppa, mod_access.glb,,,,,,Constants.MAX_RelativeDept);
+	dsRA := Doxie_Raw.relative_raw(DEDUP(subjectDIDs,ALL), mod_access, , , Constants.MAX_RelativeDept);
+
 	dsUniqueRA := DEDUP(SORT(dsRA,srcdid,person2,-rel_dt_last_seen,rel_dt_first_seen,titleno),srcdid,person2);
 	deathParams := PROJECT(inMod, DeathV2_Services.IParam.DeathRestrictions, OPT);
 	
