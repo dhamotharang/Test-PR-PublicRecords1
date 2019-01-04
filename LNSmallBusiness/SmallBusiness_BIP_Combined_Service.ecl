@@ -509,6 +509,6 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
     // OUTPUT(ds_Results.CreditReportRecords[1].AdditionalInfo.CompanyNameVariations,  NAMED('CompanyNameVariations'));
 
     OUTPUT(ds_Results,   NAMED('Results')); 
-    OUTPUT(ds_Royalties, NAMED('ds_Royalties'));
+    OUTPUT(ds_Royalties, NAMED('RoyaltySet'));
     
 ENDMACRO;
