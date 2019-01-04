@@ -1,4 +1,4 @@
-import STRATA, BIPV2_Build,BIPV2,wk_ut,STD,ut;
+﻿import STRATA, BIPV2_Build,BIPV2,wk_ut,STD,ut;
 EXPORT CreateStrataForAllKeys(
 	string                       pversion        = bipv2.KeySuffix
 	,boolean                      pIsTesting      = false
@@ -45,7 +45,7 @@ P_count:=project(J1,transform({string name, string field, unsigned countval},
 									 self.field:='rowcount';
 									 self.countval:=left.rowcount));		
 P_Add:=P_size + P_count;
-P_final:=sort(P_Add, name, field); 
+P_final:=sort(P_Add, name, field) : independent; 
 	
 	//return output(P_final);
 	return Strata.macf_CreateXMLStats(P_final ,'BIPV2','FullBuild'	,pversion	,BIPV2_Build.mod_email.emailList	,'FullAndWeekly'  ,'Keys'    ,pIsTesting,pOverwrite); //group on name,field
