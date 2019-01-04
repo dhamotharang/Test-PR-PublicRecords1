@@ -15,8 +15,6 @@ export best_records(DATASET(doxie.layout_references) di,
 
 //Until macros are changed, need to declare these variables:
 boolean dl_mask_value := (modAccess.dl_mask = 1);
-glb_purpose := modAccess.glb;
-dppa_purpose := modAccess.dppa;
 
 mod_access := modAccess;
 d := modAccess.isValidDPPA (checkRNA);
@@ -48,7 +46,7 @@ hfat_1 := doxie.mod_header_records(
 	, //include_gong
 	modAccess := mod_access).results(project(di, doxie.layout_references_hh));
 
-Header.MAC_GLB_DPPA_Clean_RNA(hfat_1,hfat_rna)
+Header.MAC_GLB_DPPA_Clean_RNA(hfat_1, hfat_rna, mod_access)
 
 hfat := if (checkRNA,hfat_rna,hfat_1);
 
