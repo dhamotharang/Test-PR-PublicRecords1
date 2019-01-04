@@ -217,9 +217,9 @@ end;
 				
 #uniquename(outf4a)	
 #uniquename(outf4b)	
-header.MAC_GlbClean_Header(%dirty_outf4%,%outf4a%, , ,modAccess);
+header.MAC_GlbClean_Header(%dirty_outf4%, %outf4a%, , ,modAccess);
 #uniquename(outf4a1)	
-header.MAC_GLB_DPPA_Clean_RNA(%outf4a%,%outf4a1%);
+header.MAC_GLB_DPPA_Clean_RNA(%outf4a%, %outf4a1%, modAccess);
 #uniquename(outf4a2)	
 %outf4a2% := If (checkRNA=true,%outf4a1%,%outf4a%);
 

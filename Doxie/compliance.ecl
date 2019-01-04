@@ -61,14 +61,17 @@ EXPORT compliance := MODULE
 	shared RNA_GLB_Set := tools.RNA_GLB_Set; //[0, 1, 3, 12];  
 	shared RNA_DPPA_Set := tools.RNA_DPPA_Set;//[0, 2, 3, 5, 7];
 
+  // Restrictions set: if purpose is here, the data are restricted
+  EXPORT is_glb_RNA (unsigned1 purpose) := purpose in RNA_GLB_Set;
+  EXPORT is_dppa_RNA (unsigned1 purpose) := purpose in RNA_DPPA_Set;
+
   EXPORT boolean glb_ok  (unsigned1 purpose, boolean RNA=false) := 
            ((purpose >= minVal and purpose <= maxVal) or purpose in [11, 12, allow]) AND // glb is fine
-           ~(RNA AND purpose IN RNA_GLB_Set);                                            // glb is not in relative's restricted set 
+           ~(RNA AND is_glb_RNA(purpose));                                               // not restricted for relatives 
 
   EXPORT boolean dppa_ok (unsigned1 purpose, boolean RNA=false) := 
            ((purpose >= minVal and purpose <= maxVal) or purpose in [allow]) AND // dppa is fine 
-           ~(RNA AND purpose IN RNA_DPPA_Set);                                   // dppa is not in relative's restricted set 
-  // export restrictRNA is used in one attribute: MAC_ApplyRestrictions; can be accommodated somehow differently.
+           ~(RNA AND is_dppa_RNA(purpose));                                      // not restricted for relatives 
 
   EXPORT boolean dppa_state_ok (string2 st, unsigned1 d, string2 header_source='', string2 source_code='') := FUNCTION
     isExperian := (MDR.sourceTools.SourceIsExperianVehicle (header_source) OR // old *E, but not DE or FE

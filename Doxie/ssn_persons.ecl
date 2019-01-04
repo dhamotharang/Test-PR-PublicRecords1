@@ -1,8 +1,9 @@
 import ut, header;
 
 export ssn_persons ( boolean checkRNA = false ) := function
-doxie.MAC_Header_Field_Declare();
-mod_access := doxie.compliance.GetGlobalDataAccessModule ();
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
+glb_ok := mod_access.isValidGLB();
+dppa_ok := mod_access.isValidDPPA();
 
 keepOldSsns := doxie.keep_old_ssns_val;
 
@@ -124,7 +125,7 @@ daily_ssns := join(keep_trecs, jdirty, left.did=right.did and left.ssn = right.s
 									 left only);
 combined := jdirty+daily_ssns;
 header.MAC_GlbClean_Header(combined,j_preRNA, , ,mod_access);
-Header.MAC_GLB_DPPA_Clean_RNA(j_preRNA, j_postRNA);
+Header.MAC_GLB_DPPA_Clean_RNA(j_preRNA, j_postRNA, mod_access);
 j:= if(checkRNA,j_postRNA,j_preRNA);
 
 //back to original format

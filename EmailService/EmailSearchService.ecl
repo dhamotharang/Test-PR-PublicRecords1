@@ -38,11 +38,12 @@
 	<part name="SkipRecords"				type="xsd:unsignedInt"/>
 
 	<part name="AllowMultipleResults" 					type="xsd:boolean"/>
+	<part name="SearchType" 			  type="xsd:string"/>
 </message>
 */
 /*--INFO-- Returns Email records.*/
 
-import AutoStandardI, doxie, codes, Royalty;
+import AutoStandardI, doxie, codes, Royalty, STD;
 
 export EmailSearchService() := MACRO
 
@@ -54,18 +55,20 @@ export EmailSearchService() := MACRO
 	tempmod := module(project(input_params,EmailService.EmailSearch.params,opt))
 			export PenaltThreshold := 10 : stored('PenaltThreshold');
 			string120	email_raw0 := '' :stored('email');
-			string120 email_raw := if(stringlib.stringfind(email_raw0,'@',1) = 0,
+			string120 email_raw := if(STD.Str.Find(email_raw0,'@',1) = 0,
 				trim(email_raw0) + '@',email_raw0);
-			export email := trim(stringlib.stringtouppercase(email_raw),all);	
+			export email := trim(STD.Str.ToUppercase(email_raw),all);	
 			export useGlobalScope := false;
 			export mult_results := allow_mult_results;
 			export string32 applicationType	:= AutoStandardI.InterfaceTranslator.application_type_val.val(project(input_params,AutoStandardI.InterfaceTranslator.application_type_val.params));
+			string _search_type := '' : stored('SearchType');
+			export SearchType := trim(STD.Str.ToUppercase(_search_type),all);	
 	end;
 	
 	_output_rec := EmailService.EmailSearch.Search(tempmod);
 	
-	output_rec := project(_output_rec, transform(recordof(left), 
-		self.emails := project(left.emails, transform(recordof(left),
+	output_rec := project(_output_rec, transform(EmailService.Assorted_Layouts.layout_search_out, 
+		self.emails := project(left.emails, transform(EmailService.Assorted_Layouts.layout_emails,
 			self.orig_email := if(allow_mult_results, '', left.orig_email);
 			self := left;
 		));
