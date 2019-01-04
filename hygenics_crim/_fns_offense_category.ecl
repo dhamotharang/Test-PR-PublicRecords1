@@ -131,11 +131,17 @@ special_characters:= '~|=|!|%|\\^|\\+|:|\\(|\\)|,|;|_|-|#|@|\\*|<|>|"|`|\\[|]|\\
 poffense          := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 
 Obstruct_Resist   := 'FLEE|^HARB| HARBORING A RUNAWAY|OBSTR[UCTIONG]*|^OBS |RESIST|[/\\. ]OBST[/\\. ]|ROWOV ';
-Obst_Res_ecl      := 'PASSAGE|PASSAGEWA|WINDSH[IE]+LD|HIGHWAY| HWY |TRAFFIC|ROADWAY|STREET|STRT| WINDOW|PARK|VISIBILITY|TRANSIT|INTERSECTION|CROSSWALK|VIEW|LICENSE PLATE';
-
+Obst_Res_ecl      := 'PASSAGE|PASSAGEWA|WINDSH[IE]+LD|HIGHWAY| HWY |TRAFFIC|ROADWAY|STREET|STRT|WINDOW|PARK|VISIBILITY|TRANSIT|INTERSECTION|CROSSWALK|VIEW|LICENSE PLATE|'+
+                     'TRAFF LANE|RDWY|PLATES|PLATE|PANHANDLE|FIRE EXT[/\\. ]|SIDE[ ]*WALK|VISION|TINTING|WIPER|GLAZING|WALKWAY|WALKWAYS|RDWAY|ROADWAY|TELE|'+
+                     'WINDSHIEL|WINDSH|VISION|HANDICAP|PUBLIC WAY|PUBLIC WAYS|PUBLIC ROAD|RIGHT[- ]OF[- ]WAY|HIWAY|RWAY|SDWLK|INTERSECT|LIC PLTS|FIRE LANE|WINDSHI'; 
 
 leo_set           := 'POLIC|[/\\. ]LEO[/\\. ]|ENFORCEMENT|LAW ENF|OFFICER|[/\\. ]P[/]O[/\\. ]|PEACE';
+
+
 Is_it := MAP( 
+
+REGEXFIND('OBST',poffense)   AND 
+REGEXFIND('TRAF|BREATH|PLATE',poffense)   => 'N',
 
 stringlib.stringfind(poffense ,'LAW'    ,1) <> 0        and        
 stringlib.stringfind(poffense ,'COMMAN' ,1) <> 0                and                                                                                                                                                                                                      
@@ -176,7 +182,7 @@ REGEXFIND('CROSS |CROSSING|INTER W[/] |REFUSE|IMPEDE|IMPEDING|OBEDIENCE| FLENG |
 REGEXFIND('ARR\\.|ARREST|POLIC|[/\\. ]LEO[/\\. ]|ENFORCEMENT|LAW ENF|OFFICER|[/\\. ]P[/]O[/\\. ]|PEACE' ,poffense) and
 REGEXFIND('EVAD|RESIST|ELUDE|FLEE|ALLUDING|[/\\. ]RES\\.[/\\. ]'                                        ,poffense) => 'Y',     
 			
-REGEXFIND('FALAE|[/\\. ]FALS[/\\. ]|FICTITIOUS|[/\\. ]FAIL[/\\. ]|FAILURE'                                                          ,poffense)   AND 
+REGEXFIND('FALSE|[/\\. ]FALS[/\\. ]|FICTITIOUS|[/\\. ]FAIL[/\\. ]|FAILURE'                                                          ,poffense)   AND 
 REGEXFIND('INFORMATION|[/\\. ]INFO[/\\. ]|IDENTIFICATION|[/\\. ]ID[/\\. ]|LICENSE|[/\\. ]LIC[/\\. ]|[/\\. ]DL[/\\. ]|NAME|IDENTITY' ,poffense)   AND          
 REGEXFIND(leo_Set                                                                                                                   ,poffense)   => 'Y',
 
@@ -190,8 +196,8 @@ REGEXFIND(Obstruct_Resist                ,poffense)   AND
 ~REGEXFIND(Obst_Res_ecl                  ,poffense)   => 'Y',	   						 
 
 
-REGEXFIND('HARBOR|[/\\. ]AID[/\\. ]|AIDING|CONCEAL|[/\\. ]CONCL[/\\. ]'               ,poffense)   AND          
-REGEXFIND('RUNAWAY|CRIMINAL|FUGITIVE|[/\\. ]FUG[IT]*[/\\. ]|FELON'                    ,poffense)   AND
+REGEXFIND('HARBOR|[/\\. ]AID[/\\. ]|AIDING|CONCEAL|[/\\. ]CONCL[/\\. ]|FAIL (.*) ID|HARBOR| AID |AIDING'               ,poffense)   AND          
+REGEXFIND('RUNAWAY|CRIMINAL|FELON|FUG|FUGIT|ESCAP|PRISONER|CONVICT'                    ,poffense)   AND
 ~REGEXFIND('CONCEAL(.*)WEA|ABET'                                                      ,poffense)=> 'Y',
 
 REGEXFIND('[/\\. ]ID[ENT]*[/\\. ]|IDENTIFY'           ,poffense)   AND          
@@ -205,8 +211,10 @@ REGEXFIND('FALSE'                                       ,poffense)   AND
 REGEXFIND('REPORT|INFO|STATEMENT|STMT'                  ,poffense)   AND 
 REGEXFIND('LAW ENFORCE|[/\\. ]LEO[/\\. ]|POLICE|OFFICER',poffense)   => 'Y',
 
-REGEXFIND('FUG|FUGIT|ESCAP|PRISONER|CONVICT' ,poffense) and  
-REGEXFIND('FAIL (.*) ID|HARBOR| AID |AIDING|CONCEAL|CONCL' ,poffense) => 'Y',
+REGEXFIND('AVOID' ,poffense) and  
+REGEXFIND('ARRES|APPRENHEN' ,poffense) => 'Y',
+
+
 
 'N');
 return Is_it;
@@ -219,7 +227,7 @@ export Is_Warrant_Fugitive(string poffense_in) := function //done
 special_characters:= '~|=|!|%|\\^|\\+|:|\\(|\\)|,|;|_|-|#|@|\\*|<|>|"|`|\\[|]|\\{|\\}|\\\\|\'';
 poffense          := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 
-Warrant_Fugitive  := 'WARRANT|BENCH WRT |WAOJ| BWP | BW[/ ]| BW[I]* | V[ ]*O[ ]*C[ ]*C[/ ]| [SW]*VCC[/ ]|OUT OF CO WRNT|ESCAPE|'+
+Warrant_Fugitive  := 'WARRANT|BENCH WRT |WAOJ| BWP | BW[/ ]| BW[I]* | V[ ]*O[ ]*C[ ]*C[/ ]| [SW]*VCC[/ ]|OUT OF CO WRNT|ESCAPE|WARR[-/\\. ]|'+
                      '^ FUG|EXTRADITION|BENCH WARRANT|^ B[/]W[-/( ]|[/\\. ]WRNT[/\\. ]|[/\\. ]WRT[/\\. ]|WSP WRT|FUG WARR/OUT|FUGITIVE';
 WF_exc            := 'TAX';
 vio_set           := '[/\\. ]VIO[LATIONG]*[/\\. ]|[/\\. ]VIO[LATED]*[/\\. ]|VIOLATION';     
@@ -603,7 +611,7 @@ Battery         := '^[ ]*BATT[GERY/ ]+|BATTER| BAT |^[ ]*BAT | BAT$|DOM[\\.MESTI
 
 //Roger's comment 7/6 QA Updates for  Assault - Aggravated 
 aggravated      := 'AGG|AGGR[\\.]|AG[G]+R|AG[G]+RA[CV]ATED|AGGAVAT|AGG[TGV] |AGGVA|[/\\. ]FEL[/\\. ]|FELONY|FELONI[O]*US|DDLY[/ ]CONDUCT|' +
-                   'DANGEROUS W|[/\\. ]W/DE[/\\. ]|INTEN[T]*[\\.]* [TO ]*KILL|[^| ]WEAP| WPN|WEPON|MURD|ACT OF VIOLENCE|'+
+                   'DANGEROUS W|[/\\. ]W/DE[/\\. ]|INTEN[T]*[\\.]* [TO ]*KILL|[^| ]WEAP| WPN|WEPON|MURD|ACT OF VIOLENCE|1ST|'+
 									 'W[/]*I[NT]*[EN]*[T]* [TO ]*KILL|INTENT T/KILL|PISTOL[ |$]';   
 									 
 assault_exc     := 'SEX|RAPE|MOLEST|PORN|FOWL|[\\-|\\.|\\(| ]GAME|PETS|LIVESTOCK|NOISE|GOOSE|FRUIT|ELECTRICAL|HIGHWAY|TELEPHONE|SHELTER|ROSTER';                     										                                                                                                                      
@@ -1021,6 +1029,9 @@ stringlib.stringfind(poffense ,'ABUSE'  ,1) <> 0    and
 stringlib.stringfind(poffense ,'OBSCENE'   ,1) <> 0 and
 REGEXFIND('[/\\. ]TELE[/\\. ] |TELEPHONE'  ,poffense)   => 'Y',
 
+stringlib.stringfind(poffense ,'OBSTR'   ,1) <> 0   and
+stringlib.stringfind(poffense ,'BREATH'  ,1) <> 0   => 'Y',
+
 'N');
 		
 return Is_it;
@@ -1205,7 +1216,10 @@ REGEXFIND('^[ ]*BURG[L]* |[/\\. ]BREAK[ING]*[/\\. ]| BRK |[/\\. ]EN[T]{1,2}[E]{1
 REGEXFIND('WITH INTENT|W\\-INTENT|LAR[A]*C|THEFT',poffense)   AND							 
 REGEXFIND(comm                  		 	             ,poffense,0) =  '' => 'Y', 
 
-// REGEXFIND('^[ ]*BREAKING AND OR ENTERING[ ]*$'   ,poffense)   => 'Y',							 								
+// REGEXFIND('^[ ]*BREAKING AND OR ENTERING[ ]*$'   ,poffense)   => 'Y',	
+stringlib.stringfind(poffense ,'POSS',1) <> 0  and 
+stringlib.stringfind(poffense ,'CRIM',1) <> 0  and
+REGEXFIND('INSTRUMENT|TOOL',poffense)    =>    'Y', 						 								
 
 'N');
 							 
@@ -1937,17 +1951,17 @@ return Is_it;
 end;
 
 //--------------------------------------------------------------------------------------------------------------------------------------
-
+       
 export Is_Weapon_Law_Violations(string poffense_in) := function //done
-
+        
 special_characters    := '~|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|%|@|\\*|<|>|"|`|\\[|]|\\{|\\}|\\\\|\\\'';
 poffense              := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
                                              
-Weapon_Law_Violations          := 'CONCEALED| C[\\. ]*C[\\. ]*[FW][:\\.-/ ]+|CNCLD.WEAPN|CONCEALED PISTOL|CONCEALED WEAP|CONCEALING G|GUNPOIN|'+
-                                  'IRGUNS|[/\\. ][AIR ]*GUN[S0-9]*[/\\. ]|SELLINGUN|[0-9]GUN |SLINGSHOT|GUNSHOT|WE[A]*P[A]*ONS|STUNGUN|'+
-																	'H[A]*NDGUN|GUNNING|HAN[D]*GUN|GUNFIRE|MACHINE[ ]*GUN|GUNRUNNING|FIRIN(.*)GUN|STL[N]*GUN|MANS...GUN|CONGUN|CAR[ ]*CON[C]*GUN|'+
-                                  '[/\\. ]GUN[/\\. ]|[/\\. ][AIR ]*GUN[S0-9]*[/\\. ]|[/\\. ][SHOTSPEAR ]*GUN[S]*[/\\. ]|WEAP|FIREARM|WPN|'+  //SH[.]*TGUN|
-																	'F[IRE ]+ARM|F.ARM|BOMB|EXPLOS|[/\\.  ]U[U]+W|PISTOL| PC 4502 |PC 12280 |PC 30305 A ';		
+Weapon_Law_Violations := 'CONCEALED| C[\\. ]*C[\\. ]*[FW][:\\.-/ ]+|CNCLD.WEAPN|CONCEALED PISTOL|CONCEALED WEAP|CONCEALING G|GUNPOIN|'+
+                         'IRGUNS|[/\\. ][AIR ]*GUN[S0-9]*[/\\. ]|SELLINGUN|[0-9]GUN |SLINGSHOT|GUNSHOT|WE[A]*P[A]*ONS|STUNGUN|LIC CARRY(.*)EXHIBIT ON DEMAND|'+
+												 'H[A]*NDGUN|GUNNING|HAN[D]*GUN|GUNFIRE|MACHINE[ ]*GUN|GUNRUNNING|FIRIN(.*)GUN|STL[N]*GUN|MANS...GUN|CONGUN|CAR[ ]*CON[C]*GUN|'+
+                         '[/\\. ]GUN[/\\. ]|[/\\. ][AIR ]*GUN[S0-9]*[/\\. ]|[/\\. ][SHOTSPEAR ]*GUN[S]*[/\\. ]|WEAP|FIREARM|WPN|'+  //SH[.]*TGUN|
+												 'F[IRE ]+ARM|F.ARM|BOMB|EXPLOS|[/\\.  ]U[U]+W|PISTOL| PC 4502 |PC 12280 |PC 30305 A ';		
 																														
 //Roger's comment QA Updates - Weapons Law Violations 7/6
 //Roger's comment QA Updates - Weapons Law Violations Round 3 8/26
@@ -3192,7 +3206,11 @@ stringlib.stringfind(poffense ,'BATT'              ,1) = 0      => 'Y',
 
 REGEXFIND('POSS|DISPLAY'                           ,poffense)   and
 REGEXFIND('PHOTO|FILM|IMAGE'                       ,poffense)   and
-REGEXFIND('[/\\. ]SE[X]*[/\\. ]'                   ,poffense)   => 'Y',  							 
+REGEXFIND('[/\\. ]SE[X]*[/\\. ]'                   ,poffense)   => 'Y',  
+	
+stringlib.stringfind(poffense ,'DISSEMINATE'       ,1) <> 0     and
+stringlib.stringfind(poffense ,'VOYEUR'            ,1) <> 0     and					 
+stringlib.stringfind(poffense ,'MATERIAL'          ,1) <> 0     => 'Y',
 
 // OBSCENE or SEXUAL  or SEX and also contain MATERIAL or MATERIALS or PERFORMANCE  or  ‘PERFOR’ or ‘PERF’. 
 
@@ -3850,8 +3868,8 @@ REGEXFIND('ALCOHOL VIOLATION|ALCOHOL/PUB/|ALCOHOL/CURB|ALCOHOL/POSN/|ALCOHOL ORD
 
 REGEXFIND('[/\\. ]POSS[ESSION]*[/\\. ]|[/\\. ]PURCH[ASE]*[/\\. ]|[/\\. ]PUR*[/\\. ]|CONSUME'  ,poffense)  and
 REGEXFIND('MINOR|[/\\. ]<21 AG[/\\. ]|[/\\. ][<]21[YOA]*[/\\. ]'     		                      ,poffense)  and 
-~REGEXFIND('FIREARM|F/ARM|WEAPON|HANDGUN|GUN|DRUG|SEX|PORN|PORNO'    		                      ,poffense)  => 'Y',
-					       
+~REGEXFIND('FIREARM|F/ARM|WEAPON|HANDGUN|GUN|DRUG|SEX|PORN|PORNO|OBSCENE|NUDITY|MATERIAL'     ,poffense)  => 'Y',
+
 stringlib.stringfind(poffense ,'MALT'                            ,1) <> 0     and
 REGEXFIND('[/\\. ]BEV[AERAGES]*[/\\. ]'                          ,poffense)   and
 REGEXFIND('GIVE|MANUF|CONSUME|UNLAWFUL|FURNISH'                  ,poffense)   => 'Y',
@@ -4806,6 +4824,10 @@ stringlib.stringfind(poffense ,'EMERGENCY'               ,1) <> 0	  => 'Y',
 stringlib.stringfind(poffense ,'MOTOR'                   ,1) <> 0	  and
 stringlib.stringfind(poffense ,'CARRIER'                 ,1) <> 0	  and	
 stringlib.stringfind(poffense ,'FAIL'                    ,1) <> 0	  => 'Y',
+
+ 
+stringlib.stringfind(poffense ,'OBST'                    ,1) <> 0	  and  		
+REGEXFIND('TRAFF LANE|RDWY|PLATE|TRAF|WINDSH|VISION|HANDICAP|PUBLIC WAY|PUBLIC ROAD|RIGHT[ -]OF[ -]WAY|RDWAY|ROADWAY|HIWAY|RWAY|INTERSECT|LIC PLTS|FIRE LANE|TINTING|WIPER| GLAZING|WINDOW' ,poffense)    => 'Y',	
 						 'N');
 return Is_it;
 end;
@@ -5278,6 +5300,12 @@ REGEXFIND('ELIZABETH|BETH|LABET|HABET',poffense) => 'Y' ,
              
 REGEXFIND('AID(.*)ABET|ABETTING|AID & ABEDDING|ACCE[S]+ORY|ACCOMPLICE|CONSPIRE|CONSPIRACY|A[C]+ESS[ORY]* AFTER [THE ]*FACT ',poffense) => 'Y' ,  
              
+REGEXFIND('OBST',poffense) and
+REGEXFIND('TELE',poffense) and
+~REGEXFIND('EMER',poffense) => 'Y' ,  
+
+REGEXFIND('OBST',poffense) and
+REGEXFIND('FIRE EXT\\.|SIDE[ ]*WALK|SDWLK|WALKWAY',poffense) => 'Y' ,
  
 'N');
                               		 
