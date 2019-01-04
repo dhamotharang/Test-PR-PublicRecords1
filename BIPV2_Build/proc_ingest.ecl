@@ -521,19 +521,22 @@ function
 
     return SEQUENTIAL(
        email_alert
-      ,omittedSources.check
-      ,OUTPUT(ds_ingested,, f_ingest_out, COMPRESSED, OVERWRITE)
-      ,OUTPUT(TABLE(ds_ingested,{rcid, ingest_status}),, f_ingest_typ, COMPRESSED, OVERWRITE)
-      ,OUTPUT(dropped_rcids,, f_ingest_drcids, COMPRESSED, OVERWRITE)
-      ,doStats
-      ,do_runingest_strata()
+      ,parallel(
+         omittedSources.check
+        ,OUTPUT(ds_ingested,, f_ingest_out, COMPRESSED, OVERWRITE)
+        ,OUTPUT(TABLE(ds_ingested,{rcid, ingest_status}),, f_ingest_typ, COMPRESSED, OVERWRITE)
+        ,OUTPUT(dropped_rcids,, f_ingest_drcids, COMPRESSED, OVERWRITE)
+        ,doStats
+        ,do_runingest_strata()
+      )
       ,BIPV2_Files.files_ingest.updateSuperFiles(f_ingest_out)
       ,BIPV2_QA_Tool.mac_Ingest_Stats(workunit,pversion)
       ,copyempid2StorageThor_prepingestfile  
       ,copyempid2StorageThor_fathercommonbase
       // ,if(not wk_ut._constants.IsDev ,tools.Copy2_Storage_Thor(filename := f_ingest_in  ,pDeleteSourceFile  := true)) //copy prepingest file to storage thor after using it.
       // ,if(not wk_ut._constants.IsDev ,tools.Copy2_Storage_Thor(filename := '~' + nothor(std.file.superfilecontents(BIPV2.CommonBase.FILE_BASE)[1].name)  ,pDeleteSourceFile  := true))  //copy commonbase file to storage thor
-      ,Scrub_Strata_SummaryStats,Scrub_Strata_BadValues
+      ,Scrub_Strata_SummaryStats
+      ,Scrub_Strata_BadValues
     );
 	end;
   
