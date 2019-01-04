@@ -1,4 +1,4 @@
-// add new strata stat on source and file for source ingest, ingest, base, clean, xlink, contacts key
+﻿// add new strata stat on source and file for source ingest, ingest, base, clean, xlink, contacts key
 
 import bipv2_build,bipv2,strata,BIPV2_Files,bizlinkfull;
 
@@ -37,7 +37,8 @@ functionmacro
   + Xlink_Payload_Key        
   ;
                                                                                                                               
-  ds_count := sort(table(ds_concat ,{source,file, unsigned countgroup := count(group), unsigned cnt := count(group)},source,file,merge),source,file);
+  ds_count := sort(table(ds_concat ,{source,file, unsigned countgroup := count(group), unsigned cnt := count(group)},source,file,merge),source,file)
+  : independent;
 
   return Strata.macf_CreateXMLStats (ds_count ,'BIPV2','2.2'  ,pversion	,pEmail_List	,'CHECK' ,'SOURCE'	,pIsTesting,pOverwrite);
 
