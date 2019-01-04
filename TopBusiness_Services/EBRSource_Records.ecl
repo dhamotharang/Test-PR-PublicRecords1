@@ -1,4 +1,4 @@
-// ================================================================================
+﻿// ================================================================================
 // ======   RETURNS EBR DATA FOR A GIVEN FILE_NUMBER IN ESP-COMPLIANT WAY    ======
 // ================================================================================
 IMPORT EBR, EBR_Services, BIPV2, iesp, std, ut; 
@@ -344,7 +344,7 @@ EXPORT EBRSource_Records(
 	  self.YearsInBusiness       := L.YRS_IN_BUS_DESC;
 	  self.YearsInBusinessActual := (integer) L.YRS_IN_BUS_ACTUAL;
 	  self.Sales                 := L.SALES_DESC;
-	  self.SalesAcutal           := TopBusiness_Services.Functions.convert_EBR_sales(L.SALES_ACTUAL);
+	  self.SalesAcutal           := (integer6)L.SALES_ACTUAL;
 	  self.EmployeeSize          := L.EMPL_SIZE_DESC;
 	  self.EmployeeSizeActual    := (integer) L.EMPL_SIZE_ACTUAL;
 	  self.BusinessType          := L.BUS_TYPE_DESC;
