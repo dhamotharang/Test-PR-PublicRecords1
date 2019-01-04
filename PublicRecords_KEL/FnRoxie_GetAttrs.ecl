@@ -20,23 +20,26 @@ EXPORT FnRoxie_GetAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout) In
   withLexID := IF(Options.isFCRA, 
 		PublicRecords_KEL.ECL_Functions.Neutral_Lexid_Soapcall(cleanInput, Options), //FCRA uses soapcall
 		PublicRecords_KEL.ECL_Functions.Fn_AppendLexid_Roxie( cleanInput, Options ));
-
-  //Put in format for Attributes
-  InputAttrs := PROJECT(withLexID, TRANSFORM(PublicRecords_KEL.ECL_Functions.Attr_Layout,
-    SELF := LEFT,
-    SELF := []));
 		
-	FDCDataset := PublicRecords_KEL.Fn_MAS_FCRA_FDC( InputAttrs, Options );
+	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( withLexID, Options );
 
   // Get Attributes - cleans the attributes after KEL is done 
-  InputPII := KEL.Clean(PublicRecords_KEL.Q_Input_Attributes_V1(InputAttrs, (STRING) InputAttrs[1].InputArchiveDateClean[1..8]).res0, TRUE, TRUE, TRUE);
-	// Cast Attributes back to their string values
-  InputPII_Attrs := project(InputPII, transform(PublicRecords_KEL.ECL_Functions.Attr_Layout, 
-		SELF := LEFT)); 
-  InputPII_srtd := SORT( InputPII_Attrs, InputUIDAppend ); 
+  InputPIIAttributes := KEL.Clean(PublicRecords_KEL.Q_Input_Attributes_V1(withLexID, (STRING) withLexID[1].InputArchiveDateClean[1..8]).res0, TRUE, TRUE, TRUE);
 	
-  RETURN InputPII_srtd;
+	PersonAttributes := PublicRecords_KEL.FnRoxie_GetPersonAttributes(withLexID, FDCDataset, Options); 
 
+	withPersonAttributes := JOIN(InputPIIAttributes, PersonAttributes, LEFT.InputUIDAppend = RIGHT.InputUIDAppend,
+		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster,
+			SELF := RIGHT,
+			SELF := LEFT,
+			SELF := []),
+		LEFT OUTER, KEEP(1), ATMOST(100));
+
+	MasterResults := SORT(withPersonAttributes, InputUIDAppend);
+	
+	IF(Options.OutputMasterResults, OUTPUT(MasterResults, NAMED('MasterResults')));
+
+  RETURN MasterResults;
  END;
 
  

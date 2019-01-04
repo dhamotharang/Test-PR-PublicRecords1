@@ -1,13 +1,15 @@
 ﻿IMPORT PublicRecords_KEL, STD;
 
-EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_ALL_Layout) ds_input = DATASET([],PublicRecords_KEL.ECL_Functions.Input_ALL_Layout)) := 
+EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) ds_input = DATASET([],PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII)) := 
   FUNCTION
     IsBlank := PublicRecords_KEL.ECL_Functions.SetConstants.IsBlank;
     IsBlank2Fields := PublicRecords_KEL.ECL_Functions.SetConstants.IsBlank2Fields;
     Constants := PublicRecords_KEL.ECL_Functions.Constants;     
 
-    PublicRecords_KEL.ECL_Functions.Input_ALL_Layout GetInputCleaned(PublicRecords_KEL.ECL_Functions.Input_ALL_Layout le, INTEGER C) := transform
+    PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII GetInputCleaned(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII le, INTEGER C) := transform
 		//Input Echo perserved
+		SELF.InputUIDAppend := le.InputUIDAppend;
+		SELF.BusInputUIDAppend := le.BusInputUIDAppend;
 		SELF.InputAccountEcho := le.InputAccountEcho;
 		SELF.InputLexIDEcho := le.InputLexIDEcho;
 		SELF.InputFirstNameEcho := le.InputFirstNameEcho;
@@ -22,20 +24,19 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_ALL_La
 		SELF.InputEmailEcho := le.InputEmailEcho; 
 		SELF.InputArchiveDateEcho := le.InputArchiveDateEcho;
 		SELF.InputArchiveDateClean := le.InputArchiveDateEcho; 
-		SELF.InputUIDAppend := le.InputUIDAppend;
 		SELF.InputSSNEcho := le.InputSSNEcho;
-		SELF.InputDateOfBirthEcho := le.InputDateOfBirthEcho;
-		SELF.InputDLNumberEcho := le.InputDLNumberEcho;
+		SELF.InputDOBEcho := le.InputDOBEcho;
+		SELF.InputDLEcho := le.InputDLEcho;
 		SELF.InputDLStateEcho := le.InputDLStateEcho;
 		// Clean input
 		cleaned_zip       := PublicRecords_KEL.ECL_Functions.Fn_Clean_Zip(le.InputZipEcho);
 		cleaned_Addr      := PublicRecords_KEL.ECL_Functions.Fn_Clean_Address_Roxie(le.InputStreetEcho, le.InputCityEcho, le.InputStateEcho, cleaned_zip);
-		cleaned_DL        := PublicRecords_KEL.ECL_Functions.Fn_Clean_DLNumber(le.InputDLNumberEcho);
+		cleaned_DL        := PublicRecords_KEL.ECL_Functions.Fn_Clean_DLNumber(le.InputDLEcho);
 		cleaned_email     := PublicRecords_KEL.ECL_Functions.Fn_Clean_Email(le.InputEmailEcho);
 		cleaned_phone10   := PublicRecords_KEL.ECL_Functions.Fn_Clean_Phone(le.InputHomePhoneEcho);
 		cleaned_workphone := PublicRecords_KEL.ECL_Functions.Fn_Clean_Phone(le.InputWorkPhoneEcho);
 		cleaned_SSN       := PublicRecords_KEL.ECL_Functions.Fn_Clean_SSN(le.InputSSNEcho);
-		DOB_dates         := PublicRecords_KEL.ECL_Functions.Fn_Clean_Date(le.InputDateOfBirthEcho);
+		DOB_dates         := PublicRecords_KEL.ECL_Functions.Fn_Clean_Date(le.InputDOBEcho);
 		cleaned_DOB       := DOB_dates[1];
 		cleaned_name      := PublicRecords_KEL.ECL_Functions.Fn_Clean_Name_Roxie(le.InputFirstNameEcho, le.InputMiddleNameEcho, le.InputLastNameEcho);
 
@@ -72,15 +73,16 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_ALL_La
 		SELF.InputWorkPhoneClean := cleaned_workphone;
 		SELF.InputSSNClean := cleaned_SSN;
 		SELF.InputDOBClean := cleaned_DOB.ValidPortion_00; 
-		SELF.InputDLNumberClean := cleaned_DL;  
+		SELF.InputDLClean := cleaned_DL;  
 		SELF.InputDLStateClean := le.InputDLStateEcho;  
-
+		
+		// Cleaned DOB metadata
 		SELF.DateAsNumsOnly := cleaned_DOB.DateAsNumsOnly; 
 		SELF.result := cleaned_DOB.result;  
 		SELF.Populated := cleaned_DOB.Populated; 
 		SELF.YearFilled := cleaned_DOB.YearFilled; 
 		SELF.MonthFilled := cleaned_DOB.MonthFilled; 
-		SELF.DayFilled := cleaned_DOB.MonthFilled;  
+		SELF.DayFilled := cleaned_DOB.DayFilled;  
 		SELF.YearNonZero := cleaned_DOB.YearNonZero; 
 		SELF.MonthNonZero := cleaned_DOB.MonthNonZero; 
 		SELF.DayNonZero := cleaned_DOB.DayNonZero;  
@@ -93,7 +95,9 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_ALL_La
 		SELF.DateValid := cleaned_DOB.DateValid;  
 		SELF.ValidPortion_00 := cleaned_DOB.ValidPortion_00; 
 		SELF.ValidPortion_01 := cleaned_DOB.ValidPortion_01; 
-
+		
+		SELF.RepNumber := le.RepNumber;
+		SELF := le;
 		SELF := [];
     END;
 
