@@ -187,7 +187,9 @@ EXPORT Layouts := MODULE
 			string		reason_cleared_code;
 			string100 source_input := 'Contributory';
 		END;
-
+		EXPORT SafeList	:= RECORD
+			KnownFraud;
+		END;
 		EXPORT Deltabase := RECORD
 			unsigned6	InqLog_ID;
 			string20	customer_account_number;
@@ -239,7 +241,14 @@ EXPORT Layouts := MODULE
 			string25	Drivers_License_Number;
 			string10	geo_lat;
 			string11	geo_long;
-			string14	reported_date;			
+			string75	reported_date;			
+			unsigned3	file_type;
+			string10	deceitful_confidence;
+			string30	user_added;
+			string250	reason_description;
+			string30	event_type_1;
+			string30	event_entity_1;
+			string100 	source_input := 'Deltabase';
 		END;
 	
 		EXPORT validate_record := record
@@ -333,9 +342,43 @@ EXPORT Layouts := MODULE
 			unsigned1		Deltabase := 0;
 			Provenance;
 		END;
-
+		EXPORT Deltabase := RECORD
+			Sprayed.Deltabase;
+			unsigned8		Unique_Id ;
+			Address.Layout_Clean_Name				cleaned_name;
+			unsigned8		address_id;			
+			string100		address_1 := '';   
+			string50		address_2 := '';				
+			Address.Layout_Clean182_fips			clean_address;
+			unsigned8		mailing_address_id;	
+			string100		mailing_address_1 := '';   
+			string50		mailing_address_2 := '';				
+			Address.Layout_Clean182_fips			additional_address;
+			clean_phones	clean_phones;
+			string10		clean_SSN;
+			string10		clean_Zip;
+			string25		clean_IP_Address;
+			string10		clean_dob;
+			unsigned6 		did; 
+			unsigned1		did_score;
+			unsigned6		ind_type;
+			unsigned1		Deltabase := 1;
+			Provenance;
+			string12		cell_phone := '';
+		END;
 		EXPORT SourcesToAnonymize := RECORD
 			unsigned6			fdn_file_info_id;
+		END;
+		
+		EXPORT ConfigRiskLevel	:= RECORD
+		  STRING entitytype;
+			STRING field;
+			STRING value;
+			STRING low;
+			STRING high;
+			STRING risklevel;
+			STRING weight;
+			STRING uidescription;
 		END;
 		
 	END;
@@ -406,6 +449,38 @@ EXPORT Layouts := MODULE
 			unsigned3		file_type;
 			unsigned6		ind_type;				
 			unsigned1		Deltabase := 0;
+		END;
+		EXPORT Deltabase	:= 
+			record 
+			Sprayed.Deltabase ;
+			unsigned8		Unique_Id ;
+			Address.Layout_Clean_Name		cleaned_name;
+			string100		address_1 := '';
+			string50		address_2 := '';
+			Address.Layout_Clean182_fips	clean_address;
+			string100		mailing_address_1 := '';
+			string50		mailing_address_2 := '';
+			Address.Layout_Clean182_fips	additional_address;
+			clean_phones	clean_phones;
+			string10		clean_SSN;
+			string10		clean_Zip;
+			string25		clean_IP_Address;
+			string10		clean_dob;
+			unsigned6		did ; 
+			unsigned1		did_score;
+			string			current ;
+			unsigned4		dt_first_seen;
+			unsigned4		dt_last_seen;
+			unsigned4		dt_vendor_first_reported;
+			unsigned4		dt_vendor_last_reported;
+			unsigned2		name_ind:=0;
+			unsigned8		NID:=0;
+			unsigned4		process_date;
+			string100		Source;
+			unsigned8		source_rec_id;
+			unsigned6		ind_type;
+			string12		cell_phone := '';	
+			unsigned1		Deltabase := 1;
 		END;
 
 		EXPORT AddressCache := record
@@ -487,6 +562,8 @@ Export PII	:=RECORD
   string10 home_phone;
   string10 work_phone_;
   string25 ip_address;
+	unsigned8 Record_ID;
+	unsigned6 fdn_file_info_id;
 
 END;
 
@@ -668,17 +745,23 @@ Export CIID := RECORD
 	boolean addresscmra;
 	string3 cvicustomscore;
 	string1 instantidversion;
-	STRING errorcode
+	STRING errorcode;
+	unsigned8 Record_ID;
+	unsigned6 fdn_file_info_id;
  END;
  
  Export Crim	:= RECORD
  CriminalRecords_BatchService.Layouts.batch_out;
  string errorcode;
+ unsigned8 Record_ID;
+ unsigned6 fdn_file_info_id;
  END;
  
  Export Death	:= RECORD
  DeathV2_Services.Layouts.BatchOut;
  string errorcode;
+ unsigned8 Record_ID;
+ unsigned6 fdn_file_info_id;
  END;
  
  Export FraudPoint	:= RECORD
@@ -695,6 +778,68 @@ Export CIID := RECORD
 	string2 v2_InputAddrDwellType;
 	string3 v2_divssnidentitycountnew;
   string errorcode;
+	unsigned8 Record_ID;
+	unsigned6 fdn_file_info_id;
  END;
  
+ Export IPMetaData	:= RECORD
+  unsigned6 did;
+  string25 ip_address;
+	unsigned8 Record_ID;
+	unsigned6 fdn_file_info_id;
+  string20 iprngbeg;
+  string20 iprngend;
+  string5 edgecountry;
+  string10 edgeregion;
+  string60 edgecity;
+  string10 edgeconnspeed;
+  unsigned8 edgemetrocode;
+  string10 edgelatitude;
+  string10 edgelongitude;
+  string10 edgepostalcode;
+  unsigned8 edgecountrycode;
+  unsigned8 edgeregioncode;
+  unsigned8 edgecitycode;
+  unsigned8 edgecontinentcode;
+  string5 edgetwolettercountry;
+  unsigned8 edgeinternalcode;
+  string20 edgeareacodes;
+  unsigned8 edgecountryconf;
+  unsigned8 edgeregionconf;
+  unsigned8 edgecitycong;
+  unsigned8 edgepostalconf;
+  integer8 edgegmtoffset;
+  string5 edgeindst;
+  string10 siccode;
+  string70 domainname;
+  string200 ispname;
+  string10 homebiztype;
+  unsigned8 asn;
+  string200 asnname;
+  string40 primarylang;
+  string105 secondarylang;
+  string15 proxytype;
+  string15 proxydescription;
+  string5 isanisp;
+  string70 companyname;
+  string10 ranks;
+  string10 households;
+  string10 women;
+  string10 women18to34;
+  string10 women35to49;
+  string10 men;
+  string10 men18to34;
+  string10 men35to49;
+  string10 teens;
+  string10 kids;
+  unsigned8 naicscode;
+  unsigned8 cbsacode;
+  string55 cbsatitle;
+  string10 cbsatype;
+  unsigned8 csacode;
+  string55 csatitle;
+  unsigned8 mdcode;
+  string55 mdtitle;
+  string100 organizationname;
+ END;
 END;

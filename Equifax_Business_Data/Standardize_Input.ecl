@@ -42,18 +42,36 @@ EXPORT fPreProcess(DATASET(Equifax_Business_Data.Layouts.Sprayed_Input) pRawInpu
 																							,'M'
 																							,if(isPoBox,'M','P')
 																							,'M');
+																							
 				SELF.Norm_City	  := choose(cnt ,ut.CleanSpacesAndUpper(L.EFX_CITY)    
 																				,ut.CleanSpacesAndUpper(L.EFX_SECCTY)
 																				,ut.CleanSpacesAndUpper(L.EFX_CITY)    
-																				,ut.CleanSpacesAndUpper(L.EFX_SECCTY));
-				SELF.Norm_State  := choose(cnt ,ut.CleanSpacesAndUpper(L.EFX_STATE)    
+																				,ut.CleanSpacesAndUpper(L.EFX_SECCTY));																					
+																				
+				SELF.Norm_Ctryisocd    := choose(cnt ,ut.CleanSpacesAndUpper(L.EFX_CTRYISOCD) 
+																						 ,ut.CleanSpacesAndUpper(L.EFX_SECCTRYISOCD)
+																						 ,ut.CleanSpacesAndUpper(L.EFX_CTRYISOCD) 
+																						 ,ut.CleanSpacesAndUpper(L.EFX_SECCTRYISOCD));
+																																							
+				tempState  := choose(cnt ,ut.CleanSpacesAndUpper(L.EFX_STATE)    
 																			 ,ut.CleanSpacesAndUpper(L.EFX_SECSTAT)
 																			 ,ut.CleanSpacesAndUpper(L.EFX_STATE)    
-																			 ,ut.CleanSpacesAndUpper(L.EFX_SECSTAT));
+																			 ,ut.CleanSpacesAndUpper(L.EFX_SECSTAT));		
+		
 				SELF.Norm_StateC2  := choose(cnt ,ut.CleanSpacesAndUpper(L.EFX_STATEC)    
 																				 ,ut.CleanSpacesAndUpper(L.EFX_STATEC2)
 																				 ,ut.CleanSpacesAndUpper(L.EFX_STATEC)    
 																				 ,ut.CleanSpacesAndUpper(L.EFX_STATEC2));
+        		
+			  tempCorrectedState := IF(SELF.NORM_CTRYISOCD = 'USA' 
+			                                and EFX_STATE_TABLE.STATE(tempState) != ' '
+			                                and EFX_STATE_TABLE.STATE(tempState) != 'INVALID', tempState,
+																			EFX_STATEC_TABLE.STATEC(SELF.norm_StateC2));
+				
+				correctedState := IF(tempCorrectedState != '' AND tempCorrectedState != 'INVALID', tempCorrectedState, '');
+	  
+        SELF.Norm_State := correctedState;
+				
 				SELF.Norm_Zip    := choose(cnt ,ut.CleanSpacesAndUpper(L.EFX_ZIPCODE) 
 																			 ,ut.CleanSpacesAndUpper(L.EFX_SECZIP)
 																			 ,ut.CleanSpacesAndUpper(L.EFX_ZIPCODE) 
@@ -78,10 +96,6 @@ EXPORT fPreProcess(DATASET(Equifax_Business_Data.Layouts.Sprayed_Input) pRawInpu
 																				,ut.CleanSpacesAndUpper(L.EFX_SECREGION)
 																				,ut.CleanSpacesAndUpper(L.EFX_REGION)    
 																				,ut.CleanSpacesAndUpper(L.EFX_SECREGION));
-				SELF.Norm_Ctryisocd    := choose(cnt ,ut.CleanSpacesAndUpper(L.EFX_CTRYISOCD) 
-																						 ,ut.CleanSpacesAndUpper(L.EFX_SECCTRYISOCD)
-																						 ,ut.CleanSpacesAndUpper(L.EFX_CTRYISOCD) 
-																						 ,ut.CleanSpacesAndUpper(L.EFX_SECCTRYISOCD));
 				SELF.Norm_Ctrynum  := choose(cnt ,ut.CleanSpacesAndUpper(L.EFX_CTRYNUM) 
 																				 ,ut.CleanSpacesAndUpper(L.EFX_SECCTRYNUM)
 																				 ,ut.CleanSpacesAndUpper(L.EFX_CTRYNUM) 

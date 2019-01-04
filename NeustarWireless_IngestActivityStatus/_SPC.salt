@@ -1,0 +1,16 @@
+﻿//If a change is made to this file, modify the ingest.ecl generated as follows to avoid output name conflict
+//replace NAMED('UpdateStats') with NAMED('ActivityStatusUpdateStats')
+//replace NAMED('ValidityStatistics') with NAMED('ActivityStatusValidityStatistics')
+OPTIONS:-gn
+MODULE:NeustarWireless_IngestActivityStatus
+RIDFIELD:RCID:GENERATE
+FILENAME:Activity_Status
+
+FIELD:phone:TYPE(STRING10):0,0
+FIELD:activity_status:TYPE(STRING2):0,0
+FIELD:date_vendor_first_reported:TYPE(STRING8):RECORDDATE(FIRST):0,0
+FIELD:date_vendor_last_reported:TYPE(STRING8):RECORDDATE(LAST):0,0
+
+SOURCERIDFIELD:phone
+
+INGESTFILE:NeustarWireless:NAMED(Prep_Activity_Status_Ingest)

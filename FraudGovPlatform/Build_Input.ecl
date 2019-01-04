@@ -3,6 +3,7 @@ EXPORT Build_Input (
 	 string			pversion
 	,boolean		PSkipIdentityDataBase	= false 
 	,boolean		PSkipKnownFraudBase		= false 
+	,boolean		PSkipDeltabaseBase		= false
 	) :=
 module
 
@@ -13,12 +14,8 @@ module
 				,Build_Input_IdentityData(pversion).All)
 			,if(PSkipKnownFraudBase , output('KnownFraud input skipped')
 				,Build_Input_KnownFraud(pversion).All)	
-			//Clear Individual Sprayed Files			
-			,Promote(pVersion).inputfiles.Sprayed2Using
-			,Promote(pVersion).inputfiles.Using2Used
-			,Promote(pVersion).inputfiles.New2Sprayed			
-			,Promote(pversion).sprayedfiles.Passed2Delete
-			,Promote(pversion).sprayedfiles.Rejected2Delete
+			,if(PSkipDeltabaseBase , output('Deltabase input skipped')
+				,Build_Input_Deltabase(pversion).All)					
 		 )
 		,output('No Valid version parameter passed, skipping FraudGovPlatform.Build_Input atribute')
 	 );

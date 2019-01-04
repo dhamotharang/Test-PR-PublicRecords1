@@ -1,10 +1,10 @@
 ﻿import _Control,tools,STD,FraudGovPlatform;
 
-EXPORT SprayAndQualifyInput(string version,
-	string ip = FraudGovPlatform_Validation.Constants.LandingZoneServer,
-	string rootDir = FraudGovPlatform_Validation.Constants.LandingZonePathBase, 
-	string destinationGroup = if(_Control.ThisEnvironment.Name<> 'Prod_Thor','thor400_dev','thor400_44')) := function
-
+EXPORT SprayAndQualifyInput(
+	STRING version,
+	STRING ip 		= IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		Constants.LandingZoneServer_dev, Constants.LandingZoneServer_prod),
+	STRING rootDir = IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		Constants.LandingZonePathBase_dev,	Constants.LandingZonePathBase_prod)
+) := FUNCTION
 
 ready    := rootDir+'ready/';
 done     := rootDir+'done/';
@@ -14,10 +14,11 @@ spraying := rootDir+'spraying/';
 dsFileList:=nothor(FileServices.RemoteDirectory(ip, ready, '*.dat')):independent;
 dsFileListSorted := sort(dsFileList,modified);
 fname	:=dsFileListSorted[1].Name:independent;
-UpSt:=stringlib.stringtouppercase(fname[1..2]);
+UpSt:=stringlib.stringtouppercase(STD.STr.SplitWords(fname,'_')[1]);
 UpType := map(
 						 STD.Str.Contains( fname, 'IdentityData'	, true	) => 'IDENTITYDATA'
 						,STD.Str.Contains( fname, 'KnownFraud'		, true	)	=> 'KNOWNFRAUD'
+						,STD.Str.Contains( fname, 'SafeList'			, true	)	=> 'SAFELIST'
 						,'UNKNOWN'
 				 );
 
@@ -37,8 +38,10 @@ IsEmptyFile:=dsFileListSorted[1].size = 0;
 FileSprayed 					:= FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+ fname;
 IdentityData_Passed 	:= FraudGovPlatform.Filenames().Sprayed._IdentityDataPassed;
 KnownFraud_Passed			:= FraudGovPlatform.Filenames().Sprayed._KnownFraudPassed;
+Safelist_Passed			:= FraudGovPlatform.Filenames().Sprayed._SafelistPassed;
 IdentityData_Rejected	:= FraudGovPlatform.Filenames().Sprayed._IdentityDataRejected;
 KnownFraud_Rejected		:= FraudGovPlatform.Filenames().Sprayed._KnownFraudRejected;	
+Safelist_Rejected			:= FraudGovPlatform.Filenames().Sprayed._SafelistRejected;
 
 SprayIt:=sequential(
 						output('Spraying: '+ ip + spraying + fname + ' -> ' + FileSprayed) 
@@ -49,7 +52,7 @@ SprayIt:=sequential(
 							,//srcCSVseparator 
 							,'~<EOL>~,\n'//srcCSVterminator 
 							,//srcCSVquote 
-							,destinationGroup //destinationgroup
+							,thorlib.group() //destinationgroup
 							,FileSprayed //destinationlogicalname 
 							, //timeout 
 							,//espserverIPport 
@@ -81,7 +84,8 @@ MoveToPass:=sequential(
 										,MoveSprayingToDone
 										,map(
 													 UpType = 'IDENTITYDATA' 	=> fileservices.AddSuperfile(IdentityData_Passed,FileSprayed)
-													,UpType = 'KNOWNFRAUD'		=> fileservices.AddSuperfile(KnownFraud_Passed,FileSprayed)
+													,UpType = 'KNOWNFRAUD'			=> fileservices.AddSuperfile(KnownFraud_Passed,FileSprayed)
+													,UpType = 'SAFELIST'			=> fileservices.AddSuperfile(Safelist_Passed,FileSprayed)
 										 )
 										,Send_Email(st:=UpSt,fn:=fname,ut:=UpType).FileValidationReport(mod_sets.validDelimiter, mod_sets.validTerminators)
 						);
@@ -91,7 +95,8 @@ MoveToReject:=sequential(
 											,MoveSprayingToError
 											,map(
 														 UpType = 'IDENTITYDATA' 	=> fileservices.AddSuperfile(IdentityData_Rejected,FileSprayed) 
-														,UpType = 'KNOWNFRAUD'		=> fileservices.AddSuperfile(KnownFraud_Rejected,FileSprayed)
+														,UpType = 'KNOWNFRAUD'			=> fileservices.AddSuperfile(KnownFraud_Rejected,FileSprayed)
+														,UpType = 'SAFELIST'			=> fileservices.AddSuperfile(Safelist_Rejected,FileSprayed)
 											 ));	
 											 
 							

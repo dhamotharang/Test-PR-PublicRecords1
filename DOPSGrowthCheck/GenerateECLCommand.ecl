@@ -12,21 +12,24 @@ export GenerateECLCommand:= function
         string FullCommand;
     END;
     
-
-    GenerateIndividualCommands:=PROJECT(IdentifyAttributes, transform(CommandLayout,
-            Self.command:='DOPSGrowthCheck.CalculateStats(\''+
-                            Left.PackageName        +'\',\''+
-                            Left.KeyAttribute       +'\',\''+
-                            Left.KeyNickName        +'\',\''+
-                            Left.KeyFileNew         +'\',\''+
-                            Left.indexfields        +'\',\''+
-							Left.PersistRecIDField  +'\',\''+
-							Left.EmailField         +'\',\''+
-							Left.PhoneField         +'\',\''+
-							Left.SSNField           +'\',\''+
-							Left.FeinField          +'\',\''+
-                            Left.CertVersion        +'\',\''+
-                            Left.ProdVersion        +'\')';
+		GenerateIndividualCommands:=PROJECT(IdentifyAttributes, transform(CommandLayout,
+            Self.command:='DOPSGrowthCheck.fnAlertTests(\''+
+                            Left.PackageName        				+'\',\''+
+                            Left.KeyNickName        				+'\',\''+
+                            Left.version	          				+'\','+
+                            Left.NumRecsThresholdMin        +','+
+														Left.NumRecsThresholdMax  			+','+
+														Left.UniqueThresholdMin         +','+
+														Left.UniqueThresholdMax         +','+
+														Left.PIDThresholdMax           	+','+
+														Left.AddedThresholdMin          +','+
+                            Left.AddedThresholdMax        	+','+
+														Left.ModifiedThresholdMin       +','+
+														Left.ModifiedThresholdMax       +','+
+														Left.RemovedThresholdMin        +','+
+														Left.RemovedThresholdMax        +','+
+														Left.PersistThresholdMax        +',\''+
+                            Left.emailList        					+'\')';
             Self.FullCommand:=Self.command;
             ));
 
@@ -36,5 +39,6 @@ export GenerateECLCommand:= function
     END;
 
     dCombineCommands:=rollup(GenerateIndividualCommands,true,tCombineCommands(left,right));
-    return dCombineCommands;
+		finalcommand:=if(dCombineCommands[1].FullCommand<>'',dCombineCommands[1].FullCommand,'output(No Tests performed)');
+    return finalcommand;
 end;

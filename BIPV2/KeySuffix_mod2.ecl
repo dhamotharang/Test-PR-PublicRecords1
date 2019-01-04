@@ -67,7 +67,12 @@ end;
 // export constant_ThisBuild_versionDate := '20180801'; // S61
 // export constant_ThisBuild_versionDate := '20180901'; // S62
 // export constant_ThisBuild_versionDate := '20180901a'; // S62a
-export constant_ThisBuild_versionDate := '20181002'; // S63
+// export constant_ThisBuild_versionDate := '20181002'; // S63
+// export constant_ThisBuild_versionDate := '20181002a'; // S63a
+// export constant_ThisBuild_versionDate := '20181101'; // S64
+// export constant_ThisBuild_versionDate := '20181101a'; // S64a
+// export constant_ThisBuild_versionDate := '20181203'; // S65
+export constant_ThisBuild_versionDate := '20190104'; // S66
 
 
 
@@ -143,6 +148,11 @@ dataset([
 ,{  62, '',   '20180901' ,  '20180901', '', '',         '',         'Ingested S61 base + BH-524 patch. BH-480 -- BIP Build 62 - September 2018'}
 ,{  62, 'a',  '20180901a',  '20180901', '', '',         '',         'Ingested S62 base + no ingest/same data,BH-502 phase 2 probationary sources upgrade. BH-534 -- BIP Build 62a - September 2018'}
 ,{  63, '' ,  '20181002',  '20181002', '', '',         '',         'Ingested S62a base + BH-538, BH-539 & BH-529 patches. BH-430 & BH-528. BH-481 -- BIP Build 63 - October 2018'}
+,{  63, 'a',  '20181002a',  '20181002', '', '',         '',         'Ingested S63 base  + no ingest/same data, start at proxid, BH-541, BH-439. BH-544 -- BIP Build 63a - October 2018'}
+,{  64, '' ,  '20181101' ,  '20181101', '', '',         '',         'Ingested S63a base, BH-542, BH-503. BH-482 -- BIP Build 64 - November 2018'}
+,{  64, 'a',  '20181101a',  '20181101', '', '',         '',         'Ingested S64 base, BH-354. BH-580 -- BIP Build 64a - November 2018'}
+,{  65, '' ,  '20181203',  '20181203', '', '',         '',         'Ingested S64a base, BH-520, BH-578,BH-584,BH-581. BH-483 -- BIP Build 65 - December 2018'}
+,{  66, '' ,  '20190104',  '20190104', '', '',         '',         'Ingested S65 base, BH-590, BH-278,LBP-166. BH-553 -- BIP Build 66 - January 2019'}
 
 
 //						version,			ingest			ToThor			ToCertRox		ToProdRox		//these are not exact field names.  they just help w read and update.

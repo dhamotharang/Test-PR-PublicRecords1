@@ -1,43 +1,56 @@
-﻿import lib_fileservices, _control, orbit_report, RoxieKeybuild, Scrubs, Scrubs_DNB_FEIN, std, tools, dops;
+﻿IMPORT STD, orbit_report, RoxieKeybuild, Scrubs, Scrubs_DNB_FEIN, tools, dops;
 
-export proc_Spray_Build_all(string filedate) := function
+EXPORT proc_Spray_Build_all(
+	STRING  hostname,
+	STRING  absolutePath,
+	STRING  glob,
+	INTEGER recordsize,
+	STRING  version,
+	STRING  addresses,
+	STRING  cluster = 'Thor400_44'
+) := FUNCTION
 
-sprayFile := FileServices.SprayFixed(_control.IPAddress.bctlpedata12,								
-								'/data/prod_data_build_10/production_data/dnb_feinv2/data_files/'+filedate+'/*FEIN*TXT',
-								732,
-								'thor400_44','~thor_data400::in::dnbfeinv2::'+filedate+'::raw',
-								-1,,,true,true);	  
+	CreateSuperIfNotExist := IF(NOT STD.File.SuperFileExists('~thor_data400::in::dnbfeinv2::fein'), STD.File.CreateSuperFile('~thor_data400::in::dnbfeinv2::fein'));
+	
+	CheckLogical := IF(
+		NOT STD.File.FileExists('~thor_data400::in::dnbfeinv2::'+version+'::raw'),
+		SEQUENTIAL(
+			STD.File.SprayFixed(
+				hostname,
+				IF(REGEXFIND('/$', absolutePath), absolutePath, absolutePath + '/') + glob,
+				recordsize,
+				cluster,
+				'~thor_data400::in::dnbfeinv2::'+version+'::raw',
+				-1,,,
+				true,
+				true
+			),
+			IF(
+				STD.File.FindSuperFileSubName('~thor_data400::in::dnbfeinv2::fein', '~thor_data400::in::dnbfeinv2::'+version+'::raw') = 0,
+				SEQUENTIAL(
+					STD.File.StartSuperFileTransaction(),
+					STD.File.ClearSuperFile('~thor_data400::in::dnbfeinv2::fein',true),
+					STD.File.AddSuperFile('~thor_data400::in::dnbfeinv2::fein', '~thor_data400::in::dnbfeinv2::'+version+'::raw'),
+					STD.File.FinishSuperFileTransaction()
+				)
+			)
+		)
+	) : 
+		FAILURE(Send_Email(version, addresses, 'The DNB_FEINV2.proc_Spray_Build_all failed in the checkLogical:14 process.').build_failure);
 
-CreateSuperfiles :=FileServices.CreateSuperFile('~thor_data400::in::dnbfeinv2::fein',false);
-								
-CreateSuperIfNotExist := if(NOT FileServices.SuperFileExists('~thor_data400::in::dnbfeinv2::fein'),CreateSuperfiles); 
+	// Thor Build
+	dnb_feinv2.proc_build_all(version, addresses, doBuild); 
 
-super_main :=sequential(FileServices.StartSuperFileTransaction()
-		        ,FileServices.clearsuperfile('~thor_data400::in::dnbfeinv2::fein',true)
-				,FileServices.AddSuperFile('~thor_data400::in::dnbfeinv2::fein', 
-				                          '~thor_data400::in::dnbfeinv2::'+filedate+'::raw'), 
-				FileServices.FinishSuperFileTransaction());
+	// generate XML report.
+	orbit_report.FEIN_Stats(getretval);
 
-add_super := if(FileServices.FindSuperFileSubName('~thor_data400::in::dnbfeinv2::fein', '~thor_data400::in::dnbfeinv2::'+fileDate+'::raw') = 0,super_main); 
+	doAll := SEQUENTIAL(
+		CreateSuperIfNotExist,
+		checkLogical,
+		dobuild,
+		getretval
+	) : SUCCESS(Send_Email(version, addresses).Build_Success), FAILURE(Send_Email(version, addresses).Build_Failure);
 
-checkLogical :=if(FileServices.FileExists('~thor_data400::in::dnbfeinv2::' + filedate + '::raw'),
-				  if(FileServices.FindSuperFileSubName('~thor_data400::in::dnbfeinv2::fein', '~thor_data400::in::dnbfeinv2::'+filedate+'::raw') = 0,
-													    sequential(FileServices.clearsuperfile('~thor_data400::in::dnbfeinv2::fein',false),
-																   FileServices.AddSuperFile('~thor_data400::in::dnbfeinv2::fein', 
-																							 '~thor_data400::in::dnbfeinv2::'+filedate+'::raw'))),																	 				
-				  sequential(sprayFile,add_super));
-				
-// Thor Build
-dnb_feinv2.proc_build_all(filedate,doBuild);
+	RETURN doAll;
 
-
-// generate XML report.
-orbit_report.FEIN_Stats(getretval);				
-				
-do_all := sequential(CreateSuperIfNotExist,checkLogical,dobuild,getretval) :
-					 success(Send_Email(filedate).Build_Success), failure(Send_Email(filedate).Build_Failure);
-
-return do_all;
-
-end;
-
+END;

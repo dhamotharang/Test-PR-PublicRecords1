@@ -50,7 +50,7 @@ EXPORT Constants := module
 		export clusterset := if (dops.constants.ThorEnvironment = 'prod'
 														,map(
 															environment = 'yogurt-thor' => ['thor40_31_yogurt'],
-															environment = 'boca-prod-thor' => ['thor400_30','thor400_20','thor400_60','thor400_44','thor400_66'],
+															environment = 'boca-prod-thor' => ['thor400_30','thor400_20','thor400_60','thor400_44','thor400_66','thor400_36'],
 															['NA'])
 														,map(
 															environment = 'boca-dev-thor' => ['thor400_dev','thor400_sta','thor50_dev','thor50_dev02'],

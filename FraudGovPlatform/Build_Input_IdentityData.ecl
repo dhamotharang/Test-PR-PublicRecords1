@@ -22,10 +22,6 @@ module
 													Files(pversion).Sprayed.IdentityData, 
 													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
 											)   
-											+ if ( nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.Deltabase)) > 0  and PSkipDeltabase = false,
-													Build_Prepped_Deltabase(pversion),
-													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
-											)	
 											+ if (nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.NAC)) > 0 and PSkipNAC = false, 
 													Build_Prepped_NAC(pversion).NACIDDTUpdate,
 													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})

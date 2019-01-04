@@ -1,6 +1,8 @@
 import ut,did_add,mdr,idl_header;
 
-inf := distribute(header.fn_with_tnt(true),hash(did));
+export FCRA_Last_Rollup(string filedate):= FUNCTION
+
+inf := distribute(header.fn_with_tnt(true,filedate),hash(did));
 
 //-- Slim record to ease the join burdone
 sm_rec := record
@@ -267,8 +269,10 @@ dSetJFlagForPropertyFragments := join(merged_dist,did_counts,
 									  left outer, local
 									 );
 									 
-fix_dates  := header.fn_fix_dates(dSetJFlagForPropertyFragments);
+fix_dates  := header.fn_fix_dates(dSetJFlagForPropertyFragments,,filedate);
 set_titles := header.fn_apply_title(fix_dates);
 append_PID := header.fn_persistent_record_ID(set_titles);
  
-export FCRA_Last_Rollup := (append_PID + Dummy_records.FCRAseed) : persist('persist::fcra_last_rollup');
+_FCRA_Last_Rollup := (append_PID + Dummy_records.FCRAseed) : persist('persist::fcra_last_rollup');
+return _FCRA_Last_Rollup;
+end;

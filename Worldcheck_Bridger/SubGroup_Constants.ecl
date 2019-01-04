@@ -1083,6 +1083,20 @@
 		export string KEYWORD_FRCNIL								:= '771';
 		export string KEYWORD_PECG									:= '772';
 		export string KEYWORD_INFIU									:= '773';		
+		export string KEYWORD_GHBOG									:= '774';		
+		export string KEYWORD_EUEIB									:= '775';		
+		export string KEYWORD_CNCBRC								:= '776';		
+		export string KEYWORD_OFAC_IFCA							:= '777';		
+		export string KEYWORD_RUUSEM								:= '778';		
+		export string KEYWORD_IMOJ									:= '779';		
+		export string KEYWORD_USSS									:= '780';		
+		export string KEYWORD_USSGE									:= '781';		
+		export string KEYWORD_OFAC_NIC							:= '782';		
+		export string KEYWORD_JPJFTC								:= '783';		
+		export string KEYWORD_TNCNLT								:= '784';		
+		export string KEYWORD_RUUSEM_50_WC					:= '785';		
+		export string KEYWORD_SECO_MAL							:= '786';		
+		export string KEYWORD_UN_MAL								:= '787';		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
 	

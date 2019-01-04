@@ -1,4 +1,4 @@
-import BIPV2_DOTID,tools;
+﻿import BIPV2_DOTID,tools;
 EXPORT _fun_CompareService(
    unsigned6  pDotID1
   ,unsigned6  pDotID2

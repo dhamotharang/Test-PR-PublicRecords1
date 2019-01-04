@@ -37,6 +37,7 @@ EXPORT	proc_Build_All(
 		BuildLogger.BaseEnd(FALSE),
 		BuildLogger.PostStart(FALSE),
 		LiensV2_SrcInfoRpt.QA_Records(),
+  LiensV2_SrcInfoRpt.QA_Stats(pversion);
 		// LiensV2_SrcInfoRpt.Strata_Population_Stats(	pversion,
 																								// pIsTesting).All,
 		BuildLogger.PostEnd(FALSE),

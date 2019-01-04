@@ -1,9 +1,9 @@
-import Versioncontrol, Liquor_Licenses, _control;
+﻿import Versioncontrol, Liquor_Licenses, _control;
 
 export macSprayFiles(
 
-	//pServerIP		= _control.IPAddress.bctlpedata11
-	 pServerIP 		= 'bctlpedata11.risk.regn.net'
+	 pServerIP		= _control.IPAddress.bctlpedata11
+	 //pServerIP 		= 'bctlpedata11.risk.regn.net'
 	,pDirectory		= ''
 	,pFilename		= ''
 	,pState

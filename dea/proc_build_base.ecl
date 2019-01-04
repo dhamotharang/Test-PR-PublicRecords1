@@ -1,4 +1,4 @@
-Import fieldstats, business_header, business_header_ss, did_add, didville, ut, census_data, 
+﻿Import fieldstats, business_header, business_header_ss, did_add, didville, ut, census_data, 
 STRATA, header, MDR, BIPV2,Health_Provider_Services, DEA, std, promotesupers;
 
 Export proc_build_base(String filedate) := Function
@@ -146,7 +146,7 @@ business_header_ss.MAC_Add_BDID_FLEX(
 								,mname								// mname
 								,lname								// lname
 								,											// Contact_SSN
-								,source								// Source Â– MDR.sourceTools
+								,source								// Source  MDR.sourceTools
 								,source_rec_id					// Source_Reccord_Id
 								,true									// Src_Matching_is_priorty
 );						

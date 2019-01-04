@@ -1,6 +1,6 @@
 ﻿import _Control,Std,FraudGovPlatform_Validation;
 
-ThorName	:= if(_Control.ThisEnvironment.Name='Dataland','thor400_dev','thor400_30');
+ThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_Validation.Constants.ThorName_Dev,	FraudGovPlatform_Validation.Constants.ThorName_Prod);
 
 lECL1 :=
  'import ut;\n'
@@ -10,7 +10,7 @@ lECL1 :=
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
 +'email(string msg):=fileservices.sendemail(\n'
-+'   \'sesha.nookala@lexisnexis.com\'\n'
++'   FraudGovPlatform_Validation.Mailing_List().Alert\n'
 +' 	 ,\'FraudGov PII SOAP Appends\'\n'
 +' 	 ,msg\n'
 +' 	 +\'Build wuid \'+workunit\n'
@@ -28,11 +28,11 @@ lECL1 :=
 ;
 
 #WORKUNIT('protect',true);
-#WORKUNIT('name', 'FraudGov PII SOAP Appends Schedule');
+#WORKUNIT('name', 'FraudGov PII SOAP Appends Controller');
 
 _Control.fSubmitNewWorkunit(lECL1, ThorName )	: WHEN('Build_FraudGov_PII_SOAP_Appends')
 																								,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
-																								,'FraudGov Input Prep SCHEDULE failure'
+																								,'FraudGov PII SOAP Appends Controller failure'
 																								,FraudGovPlatform_Validation.Constants.NOC_MSG
 																								));
 																			

@@ -30,7 +30,7 @@ end;
 util_dups := project(d_convert,asSrc(left, false)) + 
 			 project(d_convert((integer)work_phone > 1000000),asSrc(LEFT, true));
 
-util_dis := distribute(util_dups,hash(id))(~header.IsOldUtil(header.version_build,false,record_date));
+util_dis := distribute(util_dups,hash(id))(~header.IsOldUtil(header.version_build,false,record_date,,7));
 util_noID := dedup(util_dis, all,local);
 
 header.Mac_Set_Header_Source(util_noID(src='UW'),src_rec,src_rec,'UW',withID1);

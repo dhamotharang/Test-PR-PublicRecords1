@@ -1,4 +1,4 @@
-pversion   := '20130717a';
+﻿pversion   := '20130717a';
 piteration := '36';
 checked    := 105;
 bads       := 2;

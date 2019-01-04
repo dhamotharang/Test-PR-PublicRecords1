@@ -1,4 +1,4 @@
-IMPORT AID,address,BIPV2;
+﻿IMPORT AID,address,BIPV2;
 
 EXPORT Layouts :=
 MODULE
@@ -43,8 +43,13 @@ MODULE
 		Address.Layout_Clean_Name						clean_name									;
 		Address.Layout_Clean182_fips				clean_address								;
 	END;
+	
+	EXPORT base_new := RECORD
+		base;
+		boolean															current_rec									;
+	END;
 
-	export keybuild := base - BIPV2.IDlayouts.l_xlink_ids;
+	EXPORT keybuild := base - BIPV2.IDlayouts.l_xlink_ids;
 
 	EXPORT strata_base :=
 	RECORD
