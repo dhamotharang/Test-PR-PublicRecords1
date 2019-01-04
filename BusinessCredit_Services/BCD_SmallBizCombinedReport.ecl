@@ -147,6 +147,7 @@ EXPORT BCD_SmallBizCombinedReport :=
                                           search.AuthorizedRep3.Address.StreetAddress1);
 
     // Option Fields
+	#STORED('LimitPaymentHistory24Months',Option.LimitPaymentHistory24Months); //  busines credit	report w SBFE data project additions
     BOOLEAN LimitPaymentHistory24MonthsVal := FALSE : STORED('LimitPaymentHistory24Months');   // bus credit report w SBFE additions.
     STRING  ContributorIds := '' : STORED('SBFEContributorIds');  	  // bus credit report w SBFE additions.	
     UNSIGNED3 HistoryDateYYYYMM		    := (INTEGER)Business_Risk_BIP.Constants.NinesDate     : STORED('HistoryDateYYYYMM');
