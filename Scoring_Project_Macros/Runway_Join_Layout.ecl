@@ -1321,6 +1321,11 @@ EXPORT Runway_Join_Layout := RECORD
   // string2 wwn604_1_0_reason2;
   // string2 wwn604_1_0_reason3;
   // string2 wwn604_1_0_reason4;
+ //  string3 rva1811_1_0_score;
+  // string3 rva1811_1_0_reason1;
+  // string3 rva1811_1_0_reason2;
+  // string3 rva1811_1_0_reason3;
+  // string3 rva1811_1_0_reason4
  // END;
 
 

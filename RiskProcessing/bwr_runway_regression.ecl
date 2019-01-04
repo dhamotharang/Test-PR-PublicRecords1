@@ -16,8 +16,11 @@ END;
 // basefilename := data_services.foreign_prod + 'nmontpetit::out::bs_41_cert_tracking_full_fcra_150804_999999'; 
 // testfilename := data_services.foreign_prod + 'nmontpetit::out::bs_41_cert_tracking_full_fcra_150803_999999';
   
-basefilename := '~dvstemp::out::audit::nonfcrashell_test_w20170309-140509'; 
-testfilename := '~dvstemp::out::audit::nonfcrashell_test_w20170309-140509';  
+// basefilename := '~dvstemp::out::audit::nonfcrashell_test_w20170309-140509'; 
+// testfilename := '~dvstemp::out::audit::nonfcrashell_test_w20170309-140509';  
+
+basefilename := '~khuls::out::nonfcrashell_addr_occupancy_base_51_current_w20181228-114552';
+testfilename := '~khuls::out::nonfcrashell_addr_occupancy_test_51_current_w20181228-122249';
 
 output_logical_files := false;  // if you're just testing an eyeball sample, don't need to output the logical files
 runwaybaseline := '~dvstemp::out::baseline_runway_' + thorlib.wuid();
@@ -26,13 +29,14 @@ runwaytestfile := '~dvstemp::out::testfile_runway_' + thorlib.wuid();
 // roxieIP := riskwise.shortcuts.p3;
 // roxieIP := riskwise.shortcuts.dev192;
 // roxieIP := riskwise.shortcuts.dev194;
+// roxieIP := 'http://roxiecertossvip.sc.seisint.com:9876';//cert
 roxieIP := riskwise.shortcuts.staging_neutral_roxieIP;
-// roxieIP := riskwise.shortcuts.prod_batch_neutral;
+// roxieIP := riskwise.shortcuts.prod_batch_analytics_roxie;
 
-// baseline := distribute(dataset(basefilename, ox, csv(quote('"'), maxlength(20000)))(errorcode=''), random());
-// testfile := distribute(dataset(testfilename, ox, csv(quote('"'), maxlength(20000)))(errorcode=''), random());
-baseline := choosen(dataset(basefilename, ox, csv(quote('"'), maxlength(20000)))(errorcode=''), eyeball);
-testfile := choosen(dataset(testfilename, ox, csv(quote('"'), maxlength(20000)))(errorcode=''), eyeball);
+baseline := distribute(dataset(basefilename, ox, csv(quote('"'), maxlength(20000)))(errorcode=''), random());
+testfile := distribute(dataset(testfilename, ox, csv(quote('"'), maxlength(20000)))(errorcode=''), random());
+// baseline := choosen(dataset(basefilename, ox, csv(quote('"'), maxlength(20000)))(errorcode=''), eyeball);
+// testfile := choosen(dataset(testfilename, ox, csv(quote('"'), maxlength(20000)))(errorcode=''), eyeball);
 
 layout_soap_in := record
 	dataset(risk_indicators.Layout_Boca_Shell) shell;
@@ -42,16 +46,16 @@ end;
 
 layout_soap_in create_soap_in(ox le) := transform
 	self.shell := project(le, transform(risk_indicators.Layout_Boca_Shell, self := left, self := []));
-	// self.model_environment := 3;  // nonfcra only
+	//self.model_environment := 3;  // nonfcra only
 	// self.model_environment := 2;  // fcra only
 	self.model_environment := 1;  // run all models
 	self.excludeReasons := false;
 end;
 
 soap_in_baseline := project(baseline, create_soap_in(left));
-output(choosen(soap_in_baseline, eyeball), named('soap_in_baseline'));
+ output(choosen(soap_in_baseline, eyeball), named('soap_in_baseline'));
 soap_in_testfile := project(testfile, create_soap_in(left));
-output(choosen(soap_in_testfile, eyeball), named('soap_in_testfile'));
+ output(choosen(soap_in_testfile, eyeball), named('soap_in_testfile'));
 
 xlayout := RECORD
   models.Layout_Runway;
@@ -72,7 +76,7 @@ runway_results_baseline := SOAPCALL(soap_in_baseline,
 				PARALLEL(parallel_count),  
 				onFail(myFail(LEFT)));
 
-output(CHOOSEN(runway_results_baseline, eyeball), named('runway_results_baseline'));
+ output(CHOOSEN(runway_results_baseline, eyeball), named('runway_results_baseline'));
 
 // only output the result to logical file if specifically requested
 if(output_logical_files, 
@@ -86,7 +90,7 @@ runway_results_testfile := SOAPCALL(soap_in_testfile,
 				PARALLEL(parallel_count),
 				onFail(myFail(LEFT)));
 
-output(CHOOSEN(runway_results_testfile, eyeball), named('runway_results_testfile'));
+ output(CHOOSEN(runway_results_testfile, eyeball), named('runway_results_testfile'));
 
 // only output the result to logical file if specifically requested
 if(output_logical_files, 
@@ -119,12 +123,12 @@ cmpr := record
 real	NAP_baseline;	real	NAP_new;	real	NAP_diff;
 real	NAS_baseline;	real	NAS_new;	real	NAS_diff;
 real	CVI_score_baseline;	real	CVI_score_new;	real	CVI_score_diff;
-real	AID605_1_0_score_baseline;	real	AID605_1_0_score_new;	real	AID605_1_0_score_diff;
-real	AID606_0_0_score_baseline;	real	AID606_0_0_score_new;	real	AID606_0_0_score_diff;
-real	AID606_1_0_score_baseline;	real	AID606_1_0_score_new;	real	AID606_1_0_score_diff;
-real	AID607_0_0_score_baseline;	real	AID607_0_0_score_new;	real	AID607_0_0_score_diff;
-real	AID607_1_0_score_baseline;	real	AID607_1_0_score_new;	real	AID607_1_0_score_diff;
-real	AID607_2_0_score_baseline;	real	AID607_2_0_score_new;	real	AID607_2_0_score_diff;
+// real	AID605_1_0_score_baseline;	real	AID605_1_0_score_new;	real	AID605_1_0_score_diff;
+// real	AID606_0_0_score_baseline;	real	AID606_0_0_score_new;	real	AID606_0_0_score_diff;
+// real	AID606_1_0_score_baseline;	real	AID606_1_0_score_new;	real	AID606_1_0_score_diff;
+// real	AID607_0_0_score_baseline;	real	AID607_0_0_score_new;	real	AID607_0_0_score_diff;
+// real	AID607_1_0_score_baseline;	real	AID607_1_0_score_new;	real	AID607_1_0_score_diff;
+// real	AID607_2_0_score_baseline;	real	AID607_2_0_score_new;	real	AID607_2_0_score_diff;
 real	AIN509_0_0_score_baseline;	real	AIN509_0_0_score_new;	real	AIN509_0_0_score_diff;
 real	AIN602_1_0_score_baseline;	real	AIN602_1_0_score_new;	real	AIN602_1_0_score_diff;
 real	AIN605_1_0_score_baseline;	real	AIN605_1_0_score_new;	real	AIN605_1_0_score_diff;
@@ -132,19 +136,19 @@ real	AIN605_2_0_score_baseline;	real	AIN605_2_0_score_new;	real	AIN605_2_0_score
 real	AIN605_3_0_score_baseline;	real	AIN605_3_0_score_new;	real	AIN605_3_0_score_diff;
 real	AIN801_1_0_score_baseline;	real	AIN801_1_0_score_new;	real	AIN801_1_0_score_diff;
 real	ANMK909_0_1_score_baseline;	real	ANMK909_0_1_score_new;	real	ANMK909_0_1_score_diff;
-real	AWD605_0_0_score_baseline;	real	AWD605_0_0_score_new;	real	AWD605_0_0_score_diff;
-real	AWD605_2_0_score_baseline;	real	AWD605_2_0_score_new;	real	AWD605_2_0_score_diff;
-real	AWD606_10_0_score_baseline;	real	AWD606_10_0_score_new;	real	AWD606_10_0_score_diff;
-real	AWD606_11_0_score_baseline;	real	AWD606_11_0_score_new;	real	AWD606_11_0_score_diff;
-real	AWD606_1_0_score_baseline;	real	AWD606_1_0_score_new;	real	AWD606_1_0_score_diff;
-real	AWD606_2_0_score_baseline;	real	AWD606_2_0_score_new;	real	AWD606_2_0_score_diff;
-real	AWD606_3_0_score_baseline;	real	AWD606_3_0_score_new;	real	AWD606_3_0_score_diff;
-real	AWD606_4_0_score_baseline;	real	AWD606_4_0_score_new;	real	AWD606_4_0_score_diff;
-real	AWD606_6_0_score_baseline;	real	AWD606_6_0_score_new;	real	AWD606_6_0_score_diff;
-real	AWD606_7_0_score_baseline;	real	AWD606_7_0_score_new;	real	AWD606_7_0_score_diff;
-real	AWD606_8_0_score_baseline;	real	AWD606_8_0_score_new;	real	AWD606_8_0_score_diff;
-real	AWD606_9_0_score_baseline;	real	AWD606_9_0_score_new;	real	AWD606_9_0_score_diff;
-real	AWD710_1_0_score_baseline;	real	AWD710_1_0_score_new;	real	AWD710_1_0_score_diff;
+// real	AWD605_0_0_score_baseline;	real	AWD605_0_0_score_new;	real	AWD605_0_0_score_diff;
+// real	AWD605_2_0_score_baseline;	real	AWD605_2_0_score_new;	real	AWD605_2_0_score_diff;
+// real	AWD606_10_0_score_baseline;	real	AWD606_10_0_score_new;	real	AWD606_10_0_score_diff;
+// real	AWD606_11_0_score_baseline;	real	AWD606_11_0_score_new;	real	AWD606_11_0_score_diff;
+// real	AWD606_1_0_score_baseline;	real	AWD606_1_0_score_new;	real	AWD606_1_0_score_diff;
+// real	AWD606_2_0_score_baseline;	real	AWD606_2_0_score_new;	real	AWD606_2_0_score_diff;
+// real	AWD606_3_0_score_baseline;	real	AWD606_3_0_score_new;	real	AWD606_3_0_score_diff;
+// real	AWD606_4_0_score_baseline;	real	AWD606_4_0_score_new;	real	AWD606_4_0_score_diff;
+// real	AWD606_6_0_score_baseline;	real	AWD606_6_0_score_new;	real	AWD606_6_0_score_diff;
+// real	AWD606_7_0_score_baseline;	real	AWD606_7_0_score_new;	real	AWD606_7_0_score_diff;
+// real	AWD606_8_0_score_baseline;	real	AWD606_8_0_score_new;	real	AWD606_8_0_score_diff;
+// real	AWD606_9_0_score_baseline;	real	AWD606_9_0_score_new;	real	AWD606_9_0_score_diff;
+// real	AWD710_1_0_score_baseline;	real	AWD710_1_0_score_new;	real	AWD710_1_0_score_diff;
 real	AWN510_0_0_score_baseline;	real	AWN510_0_0_score_new;	real	AWN510_0_0_score_diff;
 real	AWN603_1_0_score_baseline;	real	AWN603_1_0_score_new;	real	AWN603_1_0_score_diff;
 real	BD3605_0_0_score_baseline;	real	BD3605_0_0_score_new;	real	BD3605_0_0_score_diff;
@@ -218,12 +222,11 @@ real	FP1710_1_0_score_baseline;	real	FP1710_1_0_score_new;	real	FP1710_1_0_score
 real	FP1806_1_0_score_baseline;	real	FP1806_1_0_score_new;	real	FP1806_1_0_score_diff;
 real	FP1803_1_0_score_baseline;	real	FP1803_1_0_score_new;	real	FP1803_1_0_score_diff;
 real	FP1609_2_0_score_baseline;	real	FP1609_2_0_score_new;	real	FP1609_2_0_score_diff;
-real	FP1607_1_0_score_baseline;	real	FP1607_1_0_score_new;	real	FP1607_1_0_score_diff;
 real	FP1606_1_0_score_baseline;	real	FP1606_1_0_score_new;	real	FP1606_1_0_score_diff;
 real	HCP1206_0_0_score_baseline;	real	HCP1206_0_0_score_new;	real	HCP1206_0_0_score_diff;
 real	IDN605_1_0_score_baseline;	real	IDN605_1_0_score_new;	real	IDN605_1_0_score_diff;
-real	IE912_0_0_score_baseline;	real	IE912_0_0_score_new;	real	IE912_0_0_score_diff;
-real	IE912_1_0_score_baseline;	real	IE912_1_0_score_new;	real	IE912_1_0_score_diff;
+// real	IE912_0_0_score_baseline;	real	IE912_0_0_score_new;	real	IE912_0_0_score_diff;
+// real	IE912_1_0_score_baseline;	real	IE912_1_0_score_new;	real	IE912_1_0_score_diff;
 real	IED1106_1_0_score_baseline;	real	IED1106_1_0_score_new;	real	IED1106_1_0_score_diff;
 real	IEN1006_0_1_score_baseline;	real	IEN1006_0_1_score_new;	real	IEN1006_0_1_score_diff;
 real	MNC21106_0_0_score_baseline;	real	MNC21106_0_0_score_new;	real	MNC21106_0_0_score_diff;
@@ -277,7 +280,7 @@ real	RVA611_0_0_score_baseline;	real	RVA611_0_0_score_new;	real	RVA611_0_0_score
 real	RVA707_0_0_score_baseline;	real	RVA707_0_0_score_new;	real	RVA707_0_0_score_diff;
 real	RVA707_1_0_score_baseline;	real	RVA707_1_0_score_new;	real	RVA707_1_0_score_diff;
 real	RVA709_1_0_score_baseline;	real	RVA709_1_0_score_new;	real	RVA709_1_0_score_diff;
-real	RVA711_0_0_score_baseline;	real	RVA711_0_0_score_new;	real	RVA711_0_0_score_diff;
+// real	RVA711_0_0_score_baseline;	real	RVA711_0_0_score_new;	real	RVA711_0_0_score_diff;
 real	RVA1611_1_0_score_baseline;	real	RVA1611_1_0_score_new;	real	RVA1611_1_0_score_diff;
 real	RVA1611_2_0_score_baseline;	real	RVA1611_2_0_score_new;	real	RVA1611_2_0_score_diff;
 real	RVB1003_0_0_score_baseline;	real	RVB1003_0_0_score_new;	real	RVB1003_0_0_score_diff;
@@ -286,9 +289,9 @@ real	RVB1104_1_0_score_baseline;	real	RVB1104_1_0_score_new;	real	RVB1104_1_0_sc
 real	RVB1310_1_0_score_baseline;	real	RVB1310_1_0_score_new;	real	RVB1310_1_0_score_diff;
 real	RVB1402_1_0_score_baseline;	real	RVB1402_1_0_score_new;	real	RVB1402_1_0_score_diff;
 real	RVB609_0_0_score_baseline;	real	RVB609_0_0_score_new;	real	RVB609_0_0_score_diff;
-real	RVB703_1_0_score_baseline;	real	RVB703_1_0_score_new;	real	RVB703_1_0_score_diff;
+// real	RVB703_1_0_score_baseline;	real	RVB703_1_0_score_new;	real	RVB703_1_0_score_diff;
 real	RVB705_1_0_score_baseline;	real	RVB705_1_0_score_new;	real	RVB705_1_0_score_diff;
-real	RVB711_0_0_score_baseline;	real	RVB711_0_0_score_new;	real	RVB711_0_0_score_diff;
+// real	RVB711_0_0_score_baseline;	real	RVB711_0_0_score_new;	real	RVB711_0_0_score_diff;
 real	RVB1610_1_0_score_baseline;	real	RVB1610_1_0_score_new;	real	RVB1610_1_0_score_diff;
 real	RVC1110_1_0_score_baseline;	real	RVC1110_1_0_score_new;	real	RVC1110_1_0_score_diff;
 real	RVC1110_2_0_score_baseline;	real	RVC1110_2_0_score_new;	real	RVC1110_2_0_score_diff;
@@ -309,53 +312,53 @@ real	RVG1304_1_0_score_baseline;	real	RVG1304_1_0_score_new;	real	RVG1304_1_0_sc
 real	RVG1304_2_0_score_baseline;	real	RVG1304_2_0_score_new;	real	RVG1304_2_0_score_diff;
 real	RVG812_0_0_score_baseline;	real	RVG812_0_0_score_new;	real	RVG812_0_0_score_diff;
 real	RVG903_1_0_score_baseline;	real	RVG903_1_0_score_new;	real	RVG903_1_0_score_diff;
-real	RVG904_1_0_score_baseline;	real	RVG904_1_0_score_new;	real	RVG904_1_0_score_diff;
-real	RVP1003_0_0_score_baseline;	real	RVP1003_0_0_score_new;	real	RVP1003_0_0_score_diff;
+// real	RVG904_1_0_score_baseline;	real	RVG904_1_0_score_new;	real	RVG904_1_0_score_diff;
+// real	RVP1003_0_0_score_baseline;	real	RVP1003_0_0_score_new;	real	RVP1003_0_0_score_diff;
 real	RVP1012_1_0_score_baseline;	real	RVP1012_1_0_score_new;	real	RVP1012_1_0_score_diff;
-real	RVP1104_0_0_score_baseline;	real	RVP1104_0_0_score_new;	real	RVP1104_0_0_score_diff;
+// real	RVP1104_0_0_score_baseline;	real	RVP1104_0_0_score_new;	real	RVP1104_0_0_score_diff;
 real	RVP1208_1_0_score_baseline;	real	RVP1208_1_0_score_new;	real	RVP1208_1_0_score_diff;
 real	RVP1401_1_0_score_baseline;	real	RVP1401_1_0_score_new;	real	RVP1401_1_0_score_diff;
 real	RVP1401_2_0_score_baseline;	real	RVP1401_2_0_score_new;	real	RVP1401_2_0_score_diff;
 real	RVP1503_1_0_score_baseline;	real	RVP1503_1_0_score_new;	real	RVP1503_1_0_score_diff;
-real	RVP804_0_0_score_baseline;	real	RVP804_0_0_score_new;	real	RVP804_0_0_score_diff;
+// real	RVP804_0_0_score_baseline;	real	RVP804_0_0_score_new;	real	RVP804_0_0_score_diff;
 real	RVP1702_1_0_score_baseline;	real	RVP1702_1_0_score_new;	real	RVP1702_1_0_score_diff;
-real	RVR1003_0_0_score_baseline;	real	RVR1003_0_0_score_new;	real	RVR1003_0_0_score_diff;
+// real	RVR1003_0_0_score_baseline;	real	RVR1003_0_0_score_new;	real	RVR1003_0_0_score_diff;
 real	RVR1008_1_0_score_baseline;	real	RVR1008_1_0_score_new;	real	RVR1008_1_0_score_diff;
 real	RVR1103_0_0_score_baseline;	real	RVR1103_0_0_score_new;	real	RVR1103_0_0_score_diff;
 real	RVR1104_2_0_score_baseline;	real	RVR1104_2_0_score_new;	real	RVR1104_2_0_score_diff;
 //real	RVR1104_3_0_score_baseline;	real	RVR1104_3_0_score_new;	real	RVR1104_3_0_score_diff;
 real	RVR1210_1_0_score_baseline;	real	RVR1210_1_0_score_new;	real	RVR1210_1_0_score_diff;
 real	RVR1303_1_0_score_baseline;	real	RVR1303_1_0_score_new;	real	RVR1303_1_0_score_diff;
-real	RVR611_0_0_score_baseline;	real	RVR611_0_0_score_new;	real	RVR611_0_0_score_diff;
+// real	RVR611_0_0_score_baseline;	real	RVR611_0_0_score_new;	real	RVR611_0_0_score_diff;
 real	RVR704_1_0_score_baseline;	real	RVR704_1_0_score_new;	real	RVR704_1_0_score_diff;
-real	RVR711_0_0_score_baseline;	real	RVR711_0_0_score_new;	real	RVR711_0_0_score_diff;
+// real	RVR711_0_0_score_baseline;	real	RVR711_0_0_score_new;	real	RVR711_0_0_score_diff;
 real	RVR803_1_0_score_baseline;	real	RVR803_1_0_score_new;	real	RVR803_1_0_score_diff;
 real	RVS811_0_0_score_baseline;	real	RVS811_0_0_score_new;	real	RVS811_0_0_score_diff;
 real	RVS1706_0_score_baseline;	real	RVS1706_0_score_new;	real	RVS1706_0_score_diff;
 real	RVT1003_0_0_score_baseline;	real	RVT1003_0_0_score_new;	real	RVT1003_0_0_score_diff;
-real	RVT1006_1_0_score_baseline;	real	RVT1006_1_0_score_new;	real	RVT1006_1_0_score_diff;
+// real	RVT1006_1_0_score_baseline;	real	RVT1006_1_0_score_new;	real	RVT1006_1_0_score_diff;
 real	RVT1104_0_0_score_baseline;	real	RVT1104_0_0_score_new;	real	RVT1104_0_0_score_diff;
 real	RVT1104_1_0_score_baseline;	real	RVT1104_1_0_score_new;	real	RVT1104_1_0_score_diff;
 real	RVT1204_1_score_baseline;	real	RVT1204_1_score_new;	real	RVT1204_1_score_diff;
 real	RVT1210_1_0_score_baseline;	real	RVT1210_1_0_score_new;	real	RVT1210_1_0_score_diff;
 real	RVT1212_1_0_score_baseline;	real	RVT1212_1_0_score_new;	real	RVT1212_1_0_score_diff;
-real	RVT612_0_score_baseline;	real	RVT612_0_score_new;	real	RVT612_0_score_diff;
-real	RVT711_0_0_score_baseline;	real	RVT711_0_0_score_new;	real	RVT711_0_0_score_diff;
+// real	RVT612_0_score_baseline;	real	RVT612_0_score_new;	real	RVT612_0_score_diff;
+// real	RVT711_0_0_score_baseline;	real	RVT711_0_0_score_new;	real	RVT711_0_0_score_diff;
 real	RVT711_1_0_score_baseline;	real	RVT711_1_0_score_new;	real	RVT711_1_0_score_diff;
-real	RVT803_1_0_score_baseline;	real	RVT803_1_0_score_new;	real	RVT803_1_0_score_diff;
-real	RVT809_1_0_score_baseline;	real	RVT809_1_0_score_new;	real	RVT809_1_0_score_diff;
+// real	RVT803_1_0_score_baseline;	real	RVT803_1_0_score_new;	real	RVT803_1_0_score_diff;
+// real	RVT809_1_0_score_baseline;	real	RVT809_1_0_score_new;	real	RVT809_1_0_score_diff;
 real	RVT1605_1_0_score_baseline;	real	RVT1605_1_0_score_new;	real	RVT1605_1_0_score_diff;
 real	RVT1605_2_0_score_baseline;	real	RVT1605_2_0_score_new;	real	RVT1605_2_0_score_diff;
 real	RVT1608_1_0_score_baseline;	real	RVT1608_1_0_score_new;	real	RVT1608_1_0_score_diff;
 real  RVT1608_2_score_baseline;   real  RVT1608_2_score_new;    real  RVT1608_2_score_diff;
 real	RVT1705_1_0_score_baseline;	real	RVT1705_1_0_score_new;	real	RVT1705_1_0_score_diff;
-real	TBD605_0_0_score_baseline;	real	TBD605_0_0_score_new;	real	TBD605_0_0_score_diff;
-real	TBD609_1_0_score_baseline;	real	TBD609_1_0_score_new;	real	TBD609_1_0_score_diff;
-real	TBD609_2_0_score_baseline;	real	TBD609_2_0_score_new;	real	TBD609_2_0_score_diff;
+// real	TBD605_0_0_score_baseline;	real	TBD605_0_0_score_new;	real	TBD605_0_0_score_diff;
+// real	TBD609_1_0_score_baseline;	real	TBD609_1_0_score_new;	real	TBD609_1_0_score_diff;
+// real	TBD609_2_0_score_baseline;	real	TBD609_2_0_score_new;	real	TBD609_2_0_score_diff;
 real	TBN509_0_0_score_baseline;	real	TBN509_0_0_score_new;	real	TBN509_0_0_score_diff;
 real	TBN604_1_0_score_baseline;	real	TBN604_1_0_score_new;	real	TBN604_1_0_score_diff;
-real	TRD605_0_0_score_baseline;	real	TRD605_0_0_score_new;	real	TRD605_0_0_score_diff;
-real	TRD609_1_0_score_baseline;	real	TRD609_1_0_score_new;	real	TRD609_1_0_score_diff;
+// real	TRD605_0_0_score_baseline;	real	TRD605_0_0_score_new;	real	TRD605_0_0_score_diff;
+// real	TRD609_1_0_score_baseline;	real	TRD609_1_0_score_new;	real	TRD609_1_0_score_diff;
 real	WIN704_0_0_score_baseline;	real	WIN704_0_0_score_new;	real	WIN704_0_0_score_diff;
 real	WOMV002_0_0_score_baseline;	real	WOMV002_0_0_score_new;	real	WOMV002_0_0_score_diff;
 real	WWN604_1_0_score_baseline;	real	WWN604_1_0_score_new;	real	WWN604_1_0_score_diff;
@@ -388,7 +391,7 @@ real	RVA1311_2_0_score_baseline;	real	RVA1311_2_0_score_new;	real	RVA1311_2_0_sc
 real	RVA1311_3_0_score_baseline;	real	RVA1311_3_0_score_new;	real	RVA1311_3_0_score_diff;
 real	RVG1401_1_0_score_baseline;	real	RVG1401_1_0_score_new;	real	RVG1401_1_0_score_diff;
 real	RVG1401_2_0_score_baseline;	real	RVG1401_2_0_score_new;	real	RVG1401_2_0_score_diff;
-real	RVR1311_1_0_score_baseline;	real	RVR1311_1_0_score_new;	real	RVR1311_1_0_score_diff;
+// real	RVR1311_1_0_score_baseline;	real	RVR1311_1_0_score_new;	real	RVR1311_1_0_score_diff;
 real	RVR1410_1_0_score_baseline;	real	RVR1410_1_0_score_new;	real	RVR1410_1_0_score_diff;
 real	FP1307_1_0_score_baseline;	real	FP1307_1_0_score_new;	real	FP1307_1_0_score_diff;
 real	FP31310_2_0_score_baseline;	real	FP31310_2_0_score_new;	real	FP31310_2_0_score_diff;
@@ -428,6 +431,7 @@ real	FP1801_1_0_score_baseline;	real	FP1801_1_0_score_new;	real	FP1801_1_0_score
 
 real	FP31505_0_0_score_baseline;	real	FP31505_0_0_score_new;	real	FP31505_0_0_score_diff;
 real	FP3FDN1505_0_0_score_baseline;	real	FP3FDN1505_0_0_score_new;	real	FP3FDN1505_0_0_score_diff;
+real	RVA1811_1_0_score_baseline;	real	RVA1811_1_0_score_new;	real	RVA1811_1_0_score_diff;
 end;
 
 j := join(runway_results_baseline, runway_results_testfile, left.seq=right.seq, 
@@ -438,12 +442,12 @@ self.any_difference := left<>right;
 self.NAP_baseline 	:= (real)left.NAP	;		self.NAP_new := (real)right.NAP	;		self.NAP_diff := (real)right.NAP	-(real)left.NAP	;
 self.NAS_baseline 	:= (real)left.NAS	;		self.NAS_new := (real)right.NAS	;		self.NAS_diff := (real)right.NAS	-(real)left.NAS	;
 self.CVI_score_baseline 	:= (real)left.CVI_score	;		self.CVI_score_new := (real)right.CVI_score	;		self.CVI_score_diff := (real)right.CVI_score	-(real)left.CVI_score	;
-self.AID605_1_0_score_baseline 	:= (real)left.AID605_1_0_score	;		self.AID605_1_0_score_new := (real)right.AID605_1_0_score	;		self.AID605_1_0_score_diff := (real)right.AID605_1_0_score	-(real)left.AID605_1_0_score	;
-self.AID606_0_0_score_baseline 	:= (real)left.AID606_0_0_score	;		self.AID606_0_0_score_new := (real)right.AID606_0_0_score	;		self.AID606_0_0_score_diff := (real)right.AID606_0_0_score	-(real)left.AID606_0_0_score	;
-self.AID606_1_0_score_baseline 	:= (real)left.AID606_1_0_score	;		self.AID606_1_0_score_new := (real)right.AID606_1_0_score	;		self.AID606_1_0_score_diff := (real)right.AID606_1_0_score	-(real)left.AID606_1_0_score	;
-self.AID607_0_0_score_baseline 	:= (real)left.AID607_0_0_score	;		self.AID607_0_0_score_new := (real)right.AID607_0_0_score	;		self.AID607_0_0_score_diff := (real)right.AID607_0_0_score	-(real)left.AID607_0_0_score	;
-self.AID607_1_0_score_baseline 	:= (real)left.AID607_1_0_score	;		self.AID607_1_0_score_new := (real)right.AID607_1_0_score	;		self.AID607_1_0_score_diff := (real)right.AID607_1_0_score	-(real)left.AID607_1_0_score	;
-self.AID607_2_0_score_baseline 	:= (real)left.AID607_2_0_score	;		self.AID607_2_0_score_new := (real)right.AID607_2_0_score	;		self.AID607_2_0_score_diff := (real)right.AID607_2_0_score	-(real)left.AID607_2_0_score	;
+// self.AID605_1_0_score_baseline 	:= (real)left.AID605_1_0_score	;		self.AID605_1_0_score_new := (real)right.AID605_1_0_score	;		self.AID605_1_0_score_diff := (real)right.AID605_1_0_score	-(real)left.AID605_1_0_score	;
+// self.AID606_0_0_score_baseline 	:= (real)left.AID606_0_0_score	;		self.AID606_0_0_score_new := (real)right.AID606_0_0_score	;		self.AID606_0_0_score_diff := (real)right.AID606_0_0_score	-(real)left.AID606_0_0_score	;
+// self.AID606_1_0_score_baseline 	:= (real)left.AID606_1_0_score	;		self.AID606_1_0_score_new := (real)right.AID606_1_0_score	;		self.AID606_1_0_score_diff := (real)right.AID606_1_0_score	-(real)left.AID606_1_0_score	;
+// self.AID607_0_0_score_baseline 	:= (real)left.AID607_0_0_score	;		self.AID607_0_0_score_new := (real)right.AID607_0_0_score	;		self.AID607_0_0_score_diff := (real)right.AID607_0_0_score	-(real)left.AID607_0_0_score	;
+// self.AID607_1_0_score_baseline 	:= (real)left.AID607_1_0_score	;		self.AID607_1_0_score_new := (real)right.AID607_1_0_score	;		self.AID607_1_0_score_diff := (real)right.AID607_1_0_score	-(real)left.AID607_1_0_score	;
+// self.AID607_2_0_score_baseline 	:= (real)left.AID607_2_0_score	;		self.AID607_2_0_score_new := (real)right.AID607_2_0_score	;		self.AID607_2_0_score_diff := (real)right.AID607_2_0_score	-(real)left.AID607_2_0_score	;
 self.AIN509_0_0_score_baseline 	:= (real)left.AIN509_0_0_score	;		self.AIN509_0_0_score_new := (real)right.AIN509_0_0_score	;		self.AIN509_0_0_score_diff := (real)right.AIN509_0_0_score	-(real)left.AIN509_0_0_score	;
 self.AIN602_1_0_score_baseline 	:= (real)left.AIN602_1_0_score	;		self.AIN602_1_0_score_new := (real)right.AIN602_1_0_score	;		self.AIN602_1_0_score_diff := (real)right.AIN602_1_0_score	-(real)left.AIN602_1_0_score	;
 self.AIN605_1_0_score_baseline 	:= (real)left.AIN605_1_0_score	;		self.AIN605_1_0_score_new := (real)right.AIN605_1_0_score	;		self.AIN605_1_0_score_diff := (real)right.AIN605_1_0_score	-(real)left.AIN605_1_0_score	;
@@ -451,19 +455,19 @@ self.AIN605_2_0_score_baseline 	:= (real)left.AIN605_2_0_score	;		self.AIN605_2_
 self.AIN605_3_0_score_baseline 	:= (real)left.AIN605_3_0_score	;		self.AIN605_3_0_score_new := (real)right.AIN605_3_0_score	;		self.AIN605_3_0_score_diff := (real)right.AIN605_3_0_score	-(real)left.AIN605_3_0_score	;
 self.AIN801_1_0_score_baseline 	:= (real)left.AIN801_1_0_score	;		self.AIN801_1_0_score_new := (real)right.AIN801_1_0_score	;		self.AIN801_1_0_score_diff := (real)right.AIN801_1_0_score	-(real)left.AIN801_1_0_score	;
 self.ANMK909_0_1_score_baseline := (real)left.ANMK909_0_1_score	;		self.ANMK909_0_1_score_new := (real)right.ANMK909_0_1_score	;		self.ANMK909_0_1_score_diff := (real)right.ANMK909_0_1_score	-(real)left.ANMK909_0_1_score	;
-self.AWD605_0_0_score_baseline 	:= (real)left.AWD605_0_0_score	;		self.AWD605_0_0_score_new := (real)right.AWD605_0_0_score	;		self.AWD605_0_0_score_diff := (real)right.AWD605_0_0_score	-(real)left.AWD605_0_0_score	;
-self.AWD605_2_0_score_baseline 	:= (real)left.AWD605_2_0_score	;		self.AWD605_2_0_score_new := (real)right.AWD605_2_0_score	;		self.AWD605_2_0_score_diff := (real)right.AWD605_2_0_score	-(real)left.AWD605_2_0_score	;
-self.AWD606_10_0_score_baseline := (real)left.AWD606_10_0_score	;		self.AWD606_10_0_score_new := (real)right.AWD606_10_0_score	;		self.AWD606_10_0_score_diff := (real)right.AWD606_10_0_score	-(real)left.AWD606_10_0_score	;
-self.AWD606_11_0_score_baseline := (real)left.AWD606_11_0_score	;		self.AWD606_11_0_score_new := (real)right.AWD606_11_0_score	;		self.AWD606_11_0_score_diff := (real)right.AWD606_11_0_score	-(real)left.AWD606_11_0_score	;
-self.AWD606_1_0_score_baseline 	:= (real)left.AWD606_1_0_score	;		self.AWD606_1_0_score_new := (real)right.AWD606_1_0_score	;		self.AWD606_1_0_score_diff := (real)right.AWD606_1_0_score	-(real)left.AWD606_1_0_score	;
-self.AWD606_2_0_score_baseline 	:= (real)left.AWD606_2_0_score	;		self.AWD606_2_0_score_new := (real)right.AWD606_2_0_score	;		self.AWD606_2_0_score_diff := (real)right.AWD606_2_0_score	-(real)left.AWD606_2_0_score	;
-self.AWD606_3_0_score_baseline 	:= (real)left.AWD606_3_0_score	;		self.AWD606_3_0_score_new := (real)right.AWD606_3_0_score	;		self.AWD606_3_0_score_diff := (real)right.AWD606_3_0_score	-(real)left.AWD606_3_0_score	;
-self.AWD606_4_0_score_baseline 	:= (real)left.AWD606_4_0_score	;		self.AWD606_4_0_score_new := (real)right.AWD606_4_0_score	;		self.AWD606_4_0_score_diff := (real)right.AWD606_4_0_score	-(real)left.AWD606_4_0_score	;
-self.AWD606_6_0_score_baseline 	:= (real)left.AWD606_6_0_score	;		self.AWD606_6_0_score_new := (real)right.AWD606_6_0_score	;		self.AWD606_6_0_score_diff := (real)right.AWD606_6_0_score	-(real)left.AWD606_6_0_score	;
-self.AWD606_7_0_score_baseline 	:= (real)left.AWD606_7_0_score	;		self.AWD606_7_0_score_new := (real)right.AWD606_7_0_score	;		self.AWD606_7_0_score_diff := (real)right.AWD606_7_0_score	-(real)left.AWD606_7_0_score	;
-self.AWD606_8_0_score_baseline 	:= (real)left.AWD606_8_0_score	;		self.AWD606_8_0_score_new := (real)right.AWD606_8_0_score	;		self.AWD606_8_0_score_diff := (real)right.AWD606_8_0_score	-(real)left.AWD606_8_0_score	;
-self.AWD606_9_0_score_baseline 	:= (real)left.AWD606_9_0_score	;		self.AWD606_9_0_score_new := (real)right.AWD606_9_0_score	;		self.AWD606_9_0_score_diff := (real)right.AWD606_9_0_score	-(real)left.AWD606_9_0_score	;
-self.AWD710_1_0_score_baseline 	:= (real)left.AWD710_1_0_score	;		self.AWD710_1_0_score_new := (real)right.AWD710_1_0_score	;		self.AWD710_1_0_score_diff := (real)right.AWD710_1_0_score	-(real)left.AWD710_1_0_score	;
+// self.AWD605_0_0_score_baseline 	:= (real)left.AWD605_0_0_score	;		self.AWD605_0_0_score_new := (real)right.AWD605_0_0_score	;		self.AWD605_0_0_score_diff := (real)right.AWD605_0_0_score	-(real)left.AWD605_0_0_score	;
+// self.AWD605_2_0_score_baseline 	:= (real)left.AWD605_2_0_score	;		self.AWD605_2_0_score_new := (real)right.AWD605_2_0_score	;		self.AWD605_2_0_score_diff := (real)right.AWD605_2_0_score	-(real)left.AWD605_2_0_score	;
+// self.AWD606_10_0_score_baseline := (real)left.AWD606_10_0_score	;		self.AWD606_10_0_score_new := (real)right.AWD606_10_0_score	;		self.AWD606_10_0_score_diff := (real)right.AWD606_10_0_score	-(real)left.AWD606_10_0_score	;
+// self.AWD606_11_0_score_baseline := (real)left.AWD606_11_0_score	;		self.AWD606_11_0_score_new := (real)right.AWD606_11_0_score	;		self.AWD606_11_0_score_diff := (real)right.AWD606_11_0_score	-(real)left.AWD606_11_0_score	;
+// self.AWD606_1_0_score_baseline 	:= (real)left.AWD606_1_0_score	;		self.AWD606_1_0_score_new := (real)right.AWD606_1_0_score	;		self.AWD606_1_0_score_diff := (real)right.AWD606_1_0_score	-(real)left.AWD606_1_0_score	;
+// self.AWD606_2_0_score_baseline 	:= (real)left.AWD606_2_0_score	;		self.AWD606_2_0_score_new := (real)right.AWD606_2_0_score	;		self.AWD606_2_0_score_diff := (real)right.AWD606_2_0_score	-(real)left.AWD606_2_0_score	;
+// self.AWD606_3_0_score_baseline 	:= (real)left.AWD606_3_0_score	;		self.AWD606_3_0_score_new := (real)right.AWD606_3_0_score	;		self.AWD606_3_0_score_diff := (real)right.AWD606_3_0_score	-(real)left.AWD606_3_0_score	;
+// self.AWD606_4_0_score_baseline 	:= (real)left.AWD606_4_0_score	;		self.AWD606_4_0_score_new := (real)right.AWD606_4_0_score	;		self.AWD606_4_0_score_diff := (real)right.AWD606_4_0_score	-(real)left.AWD606_4_0_score	;
+// self.AWD606_6_0_score_baseline 	:= (real)left.AWD606_6_0_score	;		self.AWD606_6_0_score_new := (real)right.AWD606_6_0_score	;		self.AWD606_6_0_score_diff := (real)right.AWD606_6_0_score	-(real)left.AWD606_6_0_score	;
+// self.AWD606_7_0_score_baseline 	:= (real)left.AWD606_7_0_score	;		self.AWD606_7_0_score_new := (real)right.AWD606_7_0_score	;		self.AWD606_7_0_score_diff := (real)right.AWD606_7_0_score	-(real)left.AWD606_7_0_score	;
+// self.AWD606_8_0_score_baseline 	:= (real)left.AWD606_8_0_score	;		self.AWD606_8_0_score_new := (real)right.AWD606_8_0_score	;		self.AWD606_8_0_score_diff := (real)right.AWD606_8_0_score	-(real)left.AWD606_8_0_score	;
+// self.AWD606_9_0_score_baseline 	:= (real)left.AWD606_9_0_score	;		self.AWD606_9_0_score_new := (real)right.AWD606_9_0_score	;		self.AWD606_9_0_score_diff := (real)right.AWD606_9_0_score	-(real)left.AWD606_9_0_score	;
+// self.AWD710_1_0_score_baseline 	:= (real)left.AWD710_1_0_score	;		self.AWD710_1_0_score_new := (real)right.AWD710_1_0_score	;		self.AWD710_1_0_score_diff := (real)right.AWD710_1_0_score	-(real)left.AWD710_1_0_score	;
 self.AWN510_0_0_score_baseline 	:= (real)left.AWN510_0_0_score	;		self.AWN510_0_0_score_new := (real)right.AWN510_0_0_score	;		self.AWN510_0_0_score_diff := (real)right.AWN510_0_0_score	-(real)left.AWN510_0_0_score	;
 self.AWN603_1_0_score_baseline 	:= (real)left.AWN603_1_0_score	;		self.AWN603_1_0_score_new := (real)right.AWN603_1_0_score	;		self.AWN603_1_0_score_diff := (real)right.AWN603_1_0_score	-(real)left.AWN603_1_0_score	;
 self.BD3605_0_0_score_baseline 	:= (real)left.BD3605_0_0_score	;		self.BD3605_0_0_score_new := (real)right.BD3605_0_0_score	;		self.BD3605_0_0_score_diff := (real)right.BD3605_0_0_score	-(real)left.BD3605_0_0_score	;
@@ -537,12 +541,11 @@ self.FP1710_1_0_score_baseline 	:= (real)left.FP1710_1_0_score	;		self.FP1710_1_
 self.FP1806_1_0_score_baseline 	:= (real)left.FP1806_1_0_score	;		self.FP1806_1_0_score_new := (real)right.FP1806_1_0_score	;		self.FP1806_1_0_score_diff := (real)right.FP1806_1_0_score	-(real)left.FP1806_1_0_score	;
 self.FP1803_1_0_score_baseline 	:= (real)left.FP1803_1_0_score	;		self.FP1803_1_0_score_new := (real)right.FP1803_1_0_score	;		self.FP1803_1_0_score_diff := (real)right.FP1803_1_0_score	-(real)left.FP1803_1_0_score	;
 self.FP1609_2_0_score_baseline 	:= (real)left.FP1609_2_0_score	;		self.FP1609_2_0_score_new := (real)right.FP1609_2_0_score	;		self.FP1609_2_0_score_diff := (real)right.FP1609_2_0_score	-(real)left.FP1609_2_0_score	;
-self.FP1607_1_0_score_baseline 	:= (real)left.FP1607_1_0_score	;		self.FP1607_1_0_score_new := (real)right.FP1607_1_0_score	;		self.FP1607_1_0_score_diff := (real)right.FP1607_1_0_score	-(real)left.FP1607_1_0_score	;
 self.FP1606_1_0_score_baseline 	:= (real)left.FP1606_1_0_score	;		self.FP1606_1_0_score_new := (real)right.FP1606_1_0_score	;		self.FP1606_1_0_score_diff := (real)right.FP1606_1_0_score	-(real)left.FP1606_1_0_score	;
 self.HCP1206_0_0_score_baseline := (real)left.HCP1206_0_0_score	;		self.HCP1206_0_0_score_new := (real)right.HCP1206_0_0_score	;		self.HCP1206_0_0_score_diff := (real)right.HCP1206_0_0_score	-(real)left.HCP1206_0_0_score	;
 self.IDN605_1_0_score_baseline 	:= (real)left.IDN605_1_0_score	;		self.IDN605_1_0_score_new := (real)right.IDN605_1_0_score	;		self.IDN605_1_0_score_diff := (real)right.IDN605_1_0_score	-(real)left.IDN605_1_0_score	;
-self.IE912_0_0_score_baseline 	:= (real)left.IE912_0_0_score	;		self.IE912_0_0_score_new := (real)right.IE912_0_0_score	;		self.IE912_0_0_score_diff := (real)right.IE912_0_0_score	-(real)left.IE912_0_0_score	;
-self.IE912_1_0_score_baseline   := (real)left.IE912_1_0_score	;		self.IE912_1_0_score_new := (real)right.IE912_1_0_score	;		self.IE912_1_0_score_diff := (real)right.IE912_1_0_score	-(real)left.IE912_1_0_score	;
+// self.IE912_0_0_score_baseline 	:= (real)left.IE912_0_0_score	;		self.IE912_0_0_score_new := (real)right.IE912_0_0_score	;		self.IE912_0_0_score_diff := (real)right.IE912_0_0_score	-(real)left.IE912_0_0_score	;
+// self.IE912_1_0_score_baseline   := (real)left.IE912_1_0_score	;		self.IE912_1_0_score_new := (real)right.IE912_1_0_score	;		self.IE912_1_0_score_diff := (real)right.IE912_1_0_score	-(real)left.IE912_1_0_score	;
 self.IED1106_1_0_score_baseline := (real)left.IED1106_1_0_score	;		self.IED1106_1_0_score_new := (real)right.IED1106_1_0_score	;		self.IED1106_1_0_score_diff := (real)right.IED1106_1_0_score	-(real)left.IED1106_1_0_score	;
 self.IEN1006_0_1_score_baseline := (real)left.IEN1006_0_1_score	;		self.IEN1006_0_1_score_new := (real)right.IEN1006_0_1_score	;		self.IEN1006_0_1_score_diff := (real)right.IEN1006_0_1_score	-(real)left.IEN1006_0_1_score	;
 self.MNC21106_0_0_score_baseline := (real)left.MNC21106_0_0_score	;		self.MNC21106_0_0_score_new := (real)right.MNC21106_0_0_score	;		self.MNC21106_0_0_score_diff := (real)right.MNC21106_0_0_score	-(real)left.MNC21106_0_0_score	;
@@ -596,7 +599,7 @@ self.RVA611_0_0_score_baseline 	:= (real)left.RVA611_0_0_score	;		self.RVA611_0_
 self.RVA707_0_0_score_baseline 	:= (real)left.RVA707_0_0_score	;		self.RVA707_0_0_score_new := (real)right.RVA707_0_0_score	;		self.RVA707_0_0_score_diff := (real)right.RVA707_0_0_score	-(real)left.RVA707_0_0_score	;
 self.RVA707_1_0_score_baseline 	:= (real)left.RVA707_1_0_score	;		self.RVA707_1_0_score_new := (real)right.RVA707_1_0_score	;		self.RVA707_1_0_score_diff := (real)right.RVA707_1_0_score	-(real)left.RVA707_1_0_score	;
 self.RVA709_1_0_score_baseline 	:= (real)left.RVA709_1_0_score	;		self.RVA709_1_0_score_new := (real)right.RVA709_1_0_score	;		self.RVA709_1_0_score_diff := (real)right.RVA709_1_0_score	-(real)left.RVA709_1_0_score	;
-self.RVA711_0_0_score_baseline 	:= (real)left.RVA711_0_0_score	;		self.RVA711_0_0_score_new := (real)right.RVA711_0_0_score	;		self.RVA711_0_0_score_diff := (real)right.RVA711_0_0_score	-(real)left.RVA711_0_0_score	;
+// self.RVA711_0_0_score_baseline 	:= (real)left.RVA711_0_0_score	;		self.RVA711_0_0_score_new := (real)right.RVA711_0_0_score	;		self.RVA711_0_0_score_diff := (real)right.RVA711_0_0_score	-(real)left.RVA711_0_0_score	;
 self.RVA1611_1_0_score_baseline := (real)left.RVA1611_1_0_score	;		self.RVA1611_1_0_score_new := (real)right.RVA1611_1_0_score	;		self.RVA1611_1_0_score_diff := (real)right.RVA1611_1_0_score	-(real)left.RVA1611_1_0_score	;
 self.RVA1611_2_0_score_baseline := (real)left.RVA1611_2_0_score	;		self.RVA1611_2_0_score_new := (real)right.RVA1611_2_0_score	;		self.RVA1611_2_0_score_diff := (real)right.RVA1611_2_0_score	-(real)left.RVA1611_2_0_score	;
 self.RVB1003_0_0_score_baseline := (real)left.RVB1003_0_0_score	;		self.RVB1003_0_0_score_new := (real)right.RVB1003_0_0_score	;		self.RVB1003_0_0_score_diff := (real)right.RVB1003_0_0_score	-(real)left.RVB1003_0_0_score	;
@@ -605,9 +608,9 @@ self.RVB1104_1_0_score_baseline := (real)left.RVB1104_1_0_score	;		self.RVB1104_
 self.RVB1310_1_0_score_baseline := (real)left.RVB1310_1_0_score	;		self.RVB1310_1_0_score_new := (real)right.RVB1310_1_0_score	;		self.RVB1310_1_0_score_diff := (real)right.RVB1310_1_0_score	-(real)left.RVB1310_1_0_score	;
 self.RVB1402_1_0_score_baseline := (real)left.RVB1402_1_0_score	;		self.RVB1402_1_0_score_new := (real)right.RVB1402_1_0_score	;		self.RVB1402_1_0_score_diff := (real)right.RVB1402_1_0_score	-(real)left.RVB1402_1_0_score	;
 self.RVB609_0_0_score_baseline 	:= (real)left.RVB609_0_0_score	;		self.RVB609_0_0_score_new := (real)right.RVB609_0_0_score	;		self.RVB609_0_0_score_diff := (real)right.RVB609_0_0_score	-(real)left.RVB609_0_0_score	;
-self.RVB703_1_0_score_baseline 	:= (real)left.RVB703_1_0_score	;		self.RVB703_1_0_score_new := (real)right.RVB703_1_0_score	;		self.RVB703_1_0_score_diff := (real)right.RVB703_1_0_score	-(real)left.RVB703_1_0_score	;
+// self.RVB703_1_0_score_baseline 	:= (real)left.RVB703_1_0_score	;		self.RVB703_1_0_score_new := (real)right.RVB703_1_0_score	;		self.RVB703_1_0_score_diff := (real)right.RVB703_1_0_score	-(real)left.RVB703_1_0_score	;
 self.RVB705_1_0_score_baseline 	:= (real)left.RVB705_1_0_score	;		self.RVB705_1_0_score_new := (real)right.RVB705_1_0_score	;		self.RVB705_1_0_score_diff := (real)right.RVB705_1_0_score	-(real)left.RVB705_1_0_score	;
-self.RVB711_0_0_score_baseline 	:= (real)left.RVB711_0_0_score	;		self.RVB711_0_0_score_new := (real)right.RVB711_0_0_score	;		self.RVB711_0_0_score_diff := (real)right.RVB711_0_0_score	-(real)left.RVB711_0_0_score	;
+// self.RVB711_0_0_score_baseline 	:= (real)left.RVB711_0_0_score	;		self.RVB711_0_0_score_new := (real)right.RVB711_0_0_score	;		self.RVB711_0_0_score_diff := (real)right.RVB711_0_0_score	-(real)left.RVB711_0_0_score	;
 self.RVB1610_1_0_score_baseline := (real)left.RVB1610_1_0_score	;		self.RVB1610_1_0_score_new := (real)right.RVB1610_1_0_score	;		self.RVB1610_1_0_score_diff := (real)right.RVB1610_1_0_score	-(real)left.RVB1610_1_0_score	;
 self.RVC1110_1_0_score_baseline := (real)left.RVC1110_1_0_score	;		self.RVC1110_1_0_score_new := (real)right.RVC1110_1_0_score	;		self.RVC1110_1_0_score_diff := (real)right.RVC1110_1_0_score	-(real)left.RVC1110_1_0_score	;
 self.RVC1110_2_0_score_baseline := (real)left.RVC1110_2_0_score	;		self.RVC1110_2_0_score_new := (real)right.RVC1110_2_0_score	;		self.RVC1110_2_0_score_diff := (real)right.RVC1110_2_0_score	-(real)left.RVC1110_2_0_score	;
@@ -628,53 +631,53 @@ self.RVG1304_1_0_score_baseline := (real)left.RVG1304_1_0_score	;		self.RVG1304_
 self.RVG1304_2_0_score_baseline := (real)left.RVG1304_2_0_score	;		self.RVG1304_2_0_score_new := (real)right.RVG1304_2_0_score	;		self.RVG1304_2_0_score_diff := (real)right.RVG1304_2_0_score	-(real)left.RVG1304_2_0_score	;
 self.RVG812_0_0_score_baseline 	:= (real)left.RVG812_0_0_score	;		self.RVG812_0_0_score_new := (real)right.RVG812_0_0_score	;		self.RVG812_0_0_score_diff := (real)right.RVG812_0_0_score	-(real)left.RVG812_0_0_score	;
 self.RVG903_1_0_score_baseline 	:= (real)left.RVG903_1_0_score	;		self.RVG903_1_0_score_new := (real)right.RVG903_1_0_score	;		self.RVG903_1_0_score_diff := (real)right.RVG903_1_0_score	-(real)left.RVG903_1_0_score	;
-self.RVG904_1_0_score_baseline 	:= (real)left.RVG904_1_0_score	;		self.RVG904_1_0_score_new := (real)right.RVG904_1_0_score	;		self.RVG904_1_0_score_diff := (real)right.RVG904_1_0_score	-(real)left.RVG904_1_0_score	;
-self.RVP1003_0_0_score_baseline := (real)left.RVP1003_0_0_score	;		self.RVP1003_0_0_score_new := (real)right.RVP1003_0_0_score	;		self.RVP1003_0_0_score_diff := (real)right.RVP1003_0_0_score	-(real)left.RVP1003_0_0_score	;
+// self.RVG904_1_0_score_baseline 	:= (real)left.RVG904_1_0_score	;		self.RVG904_1_0_score_new := (real)right.RVG904_1_0_score	;		self.RVG904_1_0_score_diff := (real)right.RVG904_1_0_score	-(real)left.RVG904_1_0_score	;
+// self.RVP1003_0_0_score_baseline := (real)left.RVP1003_0_0_score	;		self.RVP1003_0_0_score_new := (real)right.RVP1003_0_0_score	;		self.RVP1003_0_0_score_diff := (real)right.RVP1003_0_0_score	-(real)left.RVP1003_0_0_score	;
 self.RVP1012_1_0_score_baseline := (real)left.RVP1012_1_0_score	;		self.RVP1012_1_0_score_new := (real)right.RVP1012_1_0_score	;		self.RVP1012_1_0_score_diff := (real)right.RVP1012_1_0_score	-(real)left.RVP1012_1_0_score	;
-self.RVP1104_0_0_score_baseline := (real)left.RVP1104_0_0_score	;		self.RVP1104_0_0_score_new := (real)right.RVP1104_0_0_score	;		self.RVP1104_0_0_score_diff := (real)right.RVP1104_0_0_score	-(real)left.RVP1104_0_0_score	;
+// self.RVP1104_0_0_score_baseline := (real)left.RVP1104_0_0_score	;		self.RVP1104_0_0_score_new := (real)right.RVP1104_0_0_score	;		self.RVP1104_0_0_score_diff := (real)right.RVP1104_0_0_score	-(real)left.RVP1104_0_0_score	;
 self.RVP1208_1_0_score_baseline := (real)left.RVP1208_1_0_score	;		self.RVP1208_1_0_score_new := (real)right.RVP1208_1_0_score	;		self.RVP1208_1_0_score_diff := (real)right.RVP1208_1_0_score	-(real)left.RVP1208_1_0_score	;
 self.RVP1401_1_0_score_baseline := (real)left.RVP1401_1_0_score	;		self.RVP1401_1_0_score_new := (real)right.RVP1401_1_0_score	;		self.RVP1401_1_0_score_diff := (real)right.RVP1401_1_0_score	-(real)left.RVP1401_1_0_score	;
 self.RVP1401_2_0_score_baseline := (real)left.RVP1401_2_0_score	;		self.RVP1401_2_0_score_new := (real)right.RVP1401_2_0_score	;		self.RVP1401_2_0_score_diff := (real)right.RVP1401_2_0_score	-(real)left.RVP1401_2_0_score	;
 self.RVP1503_1_0_score_baseline := (real)left.RVP1503_1_0_score	;		self.RVP1503_1_0_score_new := (real)right.RVP1503_1_0_score	;		self.RVP1503_1_0_score_diff := (real)right.RVP1503_1_0_score	-(real)left.RVP1503_1_0_score	;
-self.RVP804_0_0_score_baseline 	:= (real)left.RVP804_0_0_score	;		self.RVP804_0_0_score_new := (real)right.RVP804_0_0_score	;		self.RVP804_0_0_score_diff := (real)right.RVP804_0_0_score	-(real)left.RVP804_0_0_score	;
+// self.RVP804_0_0_score_baseline 	:= (real)left.RVP804_0_0_score	;		self.RVP804_0_0_score_new := (real)right.RVP804_0_0_score	;		self.RVP804_0_0_score_diff := (real)right.RVP804_0_0_score	-(real)left.RVP804_0_0_score	;
 self.RVP1702_1_0_score_baseline := (real)left.RVP1702_1_0_score	;		self.RVP1702_1_0_score_new := (real)right.RVP1702_1_0_score	;		self.RVP1702_1_0_score_diff := (real)right.RVP1702_1_0_score	-(real)left.RVP1702_1_0_score	;
-self.RVR1003_0_0_score_baseline := (real)left.RVR1003_0_0_score	;		self.RVR1003_0_0_score_new := (real)right.RVR1003_0_0_score	;		self.RVR1003_0_0_score_diff := (real)right.RVR1003_0_0_score	-(real)left.RVR1003_0_0_score	;
+// self.RVR1003_0_0_score_baseline := (real)left.RVR1003_0_0_score	;		self.RVR1003_0_0_score_new := (real)right.RVR1003_0_0_score	;		self.RVR1003_0_0_score_diff := (real)right.RVR1003_0_0_score	-(real)left.RVR1003_0_0_score	;
 self.RVR1008_1_0_score_baseline := (real)left.RVR1008_1_0_score	;		self.RVR1008_1_0_score_new := (real)right.RVR1008_1_0_score	;		self.RVR1008_1_0_score_diff := (real)right.RVR1008_1_0_score	-(real)left.RVR1008_1_0_score	;
 self.RVR1103_0_0_score_baseline := (real)left.RVR1103_0_0_score	;		self.RVR1103_0_0_score_new := (real)right.RVR1103_0_0_score	;		self.RVR1103_0_0_score_diff := (real)right.RVR1103_0_0_score	-(real)left.RVR1103_0_0_score	;
 self.RVR1104_2_0_score_baseline := (real)left.RVR1104_2_0_score	;		self.RVR1104_2_0_score_new := (real)right.RVR1104_2_0_score	;		self.RVR1104_2_0_score_diff := (real)right.RVR1104_2_0_score	-(real)left.RVR1104_2_0_score	;
 //self.RVR1104_3_0_score_baseline 	:= (real)left.RVR1104_3_0_score	;		self.RVR1104_3_0_score_new := (real)right.RVR1104_3_0_score	;		self.RVR1104_3_0_score_diff := (real)right.RVR1104_3_0_score	-(real)left.RVR1104_3_0_score	;
 self.RVR1210_1_0_score_baseline := (real)left.RVR1210_1_0_score	;		self.RVR1210_1_0_score_new := (real)right.RVR1210_1_0_score	;		self.RVR1210_1_0_score_diff := (real)right.RVR1210_1_0_score	-(real)left.RVR1210_1_0_score	;
 self.RVR1303_1_0_score_baseline := (real)left.RVR1303_1_0_score	;		self.RVR1303_1_0_score_new := (real)right.RVR1303_1_0_score	;		self.RVR1303_1_0_score_diff := (real)right.RVR1303_1_0_score	-(real)left.RVR1303_1_0_score	;
-self.RVR611_0_0_score_baseline 	:= (real)left.RVR611_0_0_score	;		self.RVR611_0_0_score_new := (real)right.RVR611_0_0_score	;		self.RVR611_0_0_score_diff := (real)right.RVR611_0_0_score	-(real)left.RVR611_0_0_score	;
+// self.RVR611_0_0_score_baseline 	:= (real)left.RVR611_0_0_score	;		self.RVR611_0_0_score_new := (real)right.RVR611_0_0_score	;		self.RVR611_0_0_score_diff := (real)right.RVR611_0_0_score	-(real)left.RVR611_0_0_score	;
 self.RVR704_1_0_score_baseline 	:= (real)left.RVR704_1_0_score	;		self.RVR704_1_0_score_new := (real)right.RVR704_1_0_score	;		self.RVR704_1_0_score_diff := (real)right.RVR704_1_0_score	-(real)left.RVR704_1_0_score	;
-self.RVR711_0_0_score_baseline 	:= (real)left.RVR711_0_0_score	;		self.RVR711_0_0_score_new := (real)right.RVR711_0_0_score	;		self.RVR711_0_0_score_diff := (real)right.RVR711_0_0_score	-(real)left.RVR711_0_0_score	;
+// self.RVR711_0_0_score_baseline 	:= (real)left.RVR711_0_0_score	;		self.RVR711_0_0_score_new := (real)right.RVR711_0_0_score	;		self.RVR711_0_0_score_diff := (real)right.RVR711_0_0_score	-(real)left.RVR711_0_0_score	;
 self.RVR803_1_0_score_baseline 	:= (real)left.RVR803_1_0_score	;		self.RVR803_1_0_score_new := (real)right.RVR803_1_0_score	;		self.RVR803_1_0_score_diff := (real)right.RVR803_1_0_score	-(real)left.RVR803_1_0_score	;
 self.RVS811_0_0_score_baseline 	:= (real)left.RVS811_0_0_score	;		self.RVS811_0_0_score_new := (real)right.RVS811_0_0_score	;		self.RVS811_0_0_score_diff := (real)right.RVS811_0_0_score	-(real)left.RVS811_0_0_score	;
 self.RVS1706_0_score_baseline 	:= (real)left.RVS1706_0_score	;		self.RVS1706_0_score_new := (real)right.RVS1706_0_score	;		self.RVS1706_0_score_diff := (real)right.RVS1706_0_score	-(real)left.RVS1706_0_score	;
 self.RVT1003_0_0_score_baseline := (real)left.RVT1003_0_0_score	;		self.RVT1003_0_0_score_new := (real)right.RVT1003_0_0_score	;		self.RVT1003_0_0_score_diff := (real)right.RVT1003_0_0_score	-(real)left.RVT1003_0_0_score	;
-self.RVT1006_1_0_score_baseline := (real)left.RVT1006_1_0_score	;		self.RVT1006_1_0_score_new := (real)right.RVT1006_1_0_score	;		self.RVT1006_1_0_score_diff := (real)right.RVT1006_1_0_score	-(real)left.RVT1006_1_0_score	;
+// self.RVT1006_1_0_score_baseline := (real)left.RVT1006_1_0_score	;		self.RVT1006_1_0_score_new := (real)right.RVT1006_1_0_score	;		self.RVT1006_1_0_score_diff := (real)right.RVT1006_1_0_score	-(real)left.RVT1006_1_0_score	;
 self.RVT1104_0_0_score_baseline := (real)left.RVT1104_0_0_score	;		self.RVT1104_0_0_score_new := (real)right.RVT1104_0_0_score	;		self.RVT1104_0_0_score_diff := (real)right.RVT1104_0_0_score	-(real)left.RVT1104_0_0_score	;
 self.RVT1104_1_0_score_baseline := (real)left.RVT1104_1_0_score	;		self.RVT1104_1_0_score_new := (real)right.RVT1104_1_0_score	;		self.RVT1104_1_0_score_diff := (real)right.RVT1104_1_0_score	-(real)left.RVT1104_1_0_score	;
 self.RVT1204_1_score_baseline 	:= (real)left.RVT1204_1_score	;		self.RVT1204_1_score_new := (real)right.RVT1204_1_score	;		self.RVT1204_1_score_diff := (real)right.RVT1204_1_score	-(real)left.RVT1204_1_score	;
 self.RVT1210_1_0_score_baseline := (real)left.RVT1210_1_0_score	;		self.RVT1210_1_0_score_new := (real)right.RVT1210_1_0_score	;		self.RVT1210_1_0_score_diff := (real)right.RVT1210_1_0_score	-(real)left.RVT1210_1_0_score	;
 self.RVT1212_1_0_score_baseline := (real)left.RVT1212_1_0_score	;		self.RVT1212_1_0_score_new := (real)right.RVT1212_1_0_score	;		self.RVT1212_1_0_score_diff := (real)right.RVT1212_1_0_score	-(real)left.RVT1212_1_0_score	;
-self.RVT612_0_score_baseline 	:= (real)left.RVT612_0_score	;		self.RVT612_0_score_new := (real)right.RVT612_0_score	;		self.RVT612_0_score_diff := (real)right.RVT612_0_score	-(real)left.RVT612_0_score	;
-self.RVT711_0_0_score_baseline 	:= (real)left.RVT711_0_0_score	;		self.RVT711_0_0_score_new := (real)right.RVT711_0_0_score	;		self.RVT711_0_0_score_diff := (real)right.RVT711_0_0_score	-(real)left.RVT711_0_0_score	;
+// self.RVT612_0_score_baseline 	:= (real)left.RVT612_0_score	;		self.RVT612_0_score_new := (real)right.RVT612_0_score	;		self.RVT612_0_score_diff := (real)right.RVT612_0_score	-(real)left.RVT612_0_score	;
+// self.RVT711_0_0_score_baseline 	:= (real)left.RVT711_0_0_score	;		self.RVT711_0_0_score_new := (real)right.RVT711_0_0_score	;		self.RVT711_0_0_score_diff := (real)right.RVT711_0_0_score	-(real)left.RVT711_0_0_score	;
 self.RVT711_1_0_score_baseline 	:= (real)left.RVT711_1_0_score	;		self.RVT711_1_0_score_new := (real)right.RVT711_1_0_score	;		self.RVT711_1_0_score_diff := (real)right.RVT711_1_0_score	-(real)left.RVT711_1_0_score	;
-self.RVT803_1_0_score_baseline 	:= (real)left.RVT803_1_0_score	;		self.RVT803_1_0_score_new := (real)right.RVT803_1_0_score	;		self.RVT803_1_0_score_diff := (real)right.RVT803_1_0_score	-(real)left.RVT803_1_0_score	;
-self.RVT809_1_0_score_baseline 	:= (real)left.RVT809_1_0_score	;		self.RVT809_1_0_score_new := (real)right.RVT809_1_0_score	;		self.RVT809_1_0_score_diff := (real)right.RVT809_1_0_score	-(real)left.RVT809_1_0_score	;
+// self.RVT803_1_0_score_baseline 	:= (real)left.RVT803_1_0_score	;		self.RVT803_1_0_score_new := (real)right.RVT803_1_0_score	;		self.RVT803_1_0_score_diff := (real)right.RVT803_1_0_score	-(real)left.RVT803_1_0_score	;
+// self.RVT809_1_0_score_baseline 	:= (real)left.RVT809_1_0_score	;		self.RVT809_1_0_score_new := (real)right.RVT809_1_0_score	;		self.RVT809_1_0_score_diff := (real)right.RVT809_1_0_score	-(real)left.RVT809_1_0_score	;
 self.RVT1605_1_0_score_baseline 	:= (real)left.RVT1605_1_0_score	;		self.RVT1605_1_0_score_new := (real)right.RVT1605_1_0_score	;		self.RVT1605_1_0_score_diff := (real)right.RVT1605_1_0_score	-(real)left.RVT1605_1_0_score	;
 self.RVT1605_2_0_score_baseline 	:= (real)left.RVT1605_2_0_score	;		self.RVT1605_2_0_score_new := (real)right.RVT1605_2_0_score	;		self.RVT1605_2_0_score_diff := (real)right.RVT1605_2_0_score	-(real)left.RVT1605_2_0_score	;
 self.RVT1608_1_0_score_baseline 	:= (real)left.RVT1608_1_0_score	;		self.RVT1608_1_0_score_new := (real)right.RVT1608_1_0_score	;		self.RVT1608_1_0_score_diff := (real)right.RVT1608_1_0_score	-(real)left.RVT1608_1_0_score	;
 self.RVT1608_2_score_baseline 	  := (real)left.RVT1608_2_score	;		  self.RVT1608_2_score_new   := (real)right.RVT1608_2_score	;		  self.RVT1608_2_score_diff   := (real)right.RVT1608_2_score	  -(real)left.RVT1608_2_score	;
 self.RVT1705_1_0_score_baseline 	:= (real)left.RVT1705_1_0_score	;		self.RVT1705_1_0_score_new := (real)right.RVT1705_1_0_score	;		self.RVT1705_1_0_score_diff := (real)right.RVT1705_1_0_score	-(real)left.RVT1705_1_0_score	;
-self.TBD605_0_0_score_baseline 	:= (real)left.TBD605_0_0_score	;		self.TBD605_0_0_score_new := (real)right.TBD605_0_0_score	;		self.TBD605_0_0_score_diff := (real)right.TBD605_0_0_score	-(real)left.TBD605_0_0_score	;
-self.TBD609_1_0_score_baseline 	:= (real)left.TBD609_1_0_score	;		self.TBD609_1_0_score_new := (real)right.TBD609_1_0_score	;		self.TBD609_1_0_score_diff := (real)right.TBD609_1_0_score	-(real)left.TBD609_1_0_score	;
-self.TBD609_2_0_score_baseline 	:= (real)left.TBD609_2_0_score	;		self.TBD609_2_0_score_new := (real)right.TBD609_2_0_score	;		self.TBD609_2_0_score_diff := (real)right.TBD609_2_0_score	-(real)left.TBD609_2_0_score	;
+// self.TBD605_0_0_score_baseline 	:= (real)left.TBD605_0_0_score	;		self.TBD605_0_0_score_new := (real)right.TBD605_0_0_score	;		self.TBD605_0_0_score_diff := (real)right.TBD605_0_0_score	-(real)left.TBD605_0_0_score	;
+// self.TBD609_1_0_score_baseline 	:= (real)left.TBD609_1_0_score	;		self.TBD609_1_0_score_new := (real)right.TBD609_1_0_score	;		self.TBD609_1_0_score_diff := (real)right.TBD609_1_0_score	-(real)left.TBD609_1_0_score	;
+// self.TBD609_2_0_score_baseline 	:= (real)left.TBD609_2_0_score	;		self.TBD609_2_0_score_new := (real)right.TBD609_2_0_score	;		self.TBD609_2_0_score_diff := (real)right.TBD609_2_0_score	-(real)left.TBD609_2_0_score	;
 self.TBN509_0_0_score_baseline 	:= (real)left.TBN509_0_0_score	;		self.TBN509_0_0_score_new := (real)right.TBN509_0_0_score	;		self.TBN509_0_0_score_diff := (real)right.TBN509_0_0_score	-(real)left.TBN509_0_0_score	;
 self.TBN604_1_0_score_baseline 	:= (real)left.TBN604_1_0_score	;		self.TBN604_1_0_score_new := (real)right.TBN604_1_0_score	;		self.TBN604_1_0_score_diff := (real)right.TBN604_1_0_score	-(real)left.TBN604_1_0_score	;
-self.TRD605_0_0_score_baseline 	:= (real)left.TRD605_0_0_score	;		self.TRD605_0_0_score_new := (real)right.TRD605_0_0_score	;		self.TRD605_0_0_score_diff := (real)right.TRD605_0_0_score	-(real)left.TRD605_0_0_score	;
-self.TRD609_1_0_score_baseline 	:= (real)left.TRD609_1_0_score	;		self.TRD609_1_0_score_new := (real)right.TRD609_1_0_score	;		self.TRD609_1_0_score_diff := (real)right.TRD609_1_0_score	-(real)left.TRD609_1_0_score	;
+// self.TRD605_0_0_score_baseline 	:= (real)left.TRD605_0_0_score	;		self.TRD605_0_0_score_new := (real)right.TRD605_0_0_score	;		self.TRD605_0_0_score_diff := (real)right.TRD605_0_0_score	-(real)left.TRD605_0_0_score	;
+// self.TRD609_1_0_score_baseline 	:= (real)left.TRD609_1_0_score	;		self.TRD609_1_0_score_new := (real)right.TRD609_1_0_score	;		self.TRD609_1_0_score_diff := (real)right.TRD609_1_0_score	-(real)left.TRD609_1_0_score	;
 self.WIN704_0_0_score_baseline 	:= (real)left.WIN704_0_0_score	;		self.WIN704_0_0_score_new := (real)right.WIN704_0_0_score	;		self.WIN704_0_0_score_diff := (real)right.WIN704_0_0_score	-(real)left.WIN704_0_0_score	;
 self.WOMV002_0_0_score_baseline := (real)left.WOMV002_0_0_score	;		self.WOMV002_0_0_score_new := (real)right.WOMV002_0_0_score	;		self.WOMV002_0_0_score_diff := (real)right.WOMV002_0_0_score	-(real)left.WOMV002_0_0_score	;
 self.WWN604_1_0_score_baseline 	:= (real)left.WWN604_1_0_score	;		self.WWN604_1_0_score_new := (real)right.WWN604_1_0_score	;		self.WWN604_1_0_score_diff := (real)right.WWN604_1_0_score	-(real)left.WWN604_1_0_score	;
@@ -707,7 +710,7 @@ self.RVA1504_1_0_score_baseline := (real)left.RVA1504_1_0_score	;		self.RVA1504_
 self.RVA1504_2_0_score_baseline := (real)left.RVA1504_2_0_score	;		self.RVA1504_2_0_score_new := (real)right.RVA1504_2_0_score	;		self.RVA1504_2_0_score_diff := (real)right.RVA1504_2_0_score	-(real)left.RVA1504_2_0_score	;
 self.RVG1401_1_0_score_baseline := (real)left.RVG1401_1_0_score	;		self.RVG1401_1_0_score_new := (real)right.RVG1401_1_0_score	;		self.RVG1401_1_0_score_diff := (real)right.RVG1401_1_0_score	-(real)left.RVG1401_1_0_score	;
 self.RVG1401_2_0_score_baseline := (real)left.RVG1401_2_0_score	;		self.RVG1401_2_0_score_new := (real)right.RVG1401_2_0_score	;		self.RVG1401_2_0_score_diff := (real)right.RVG1401_2_0_score	-(real)left.RVG1401_2_0_score	;
-self.RVR1311_1_0_score_baseline := (real)left.RVR1311_1_0_score	;		self.RVR1311_1_0_score_new := (real)right.RVR1311_1_0_score	;		self.RVR1311_1_0_score_diff := (real)right.RVR1311_1_0_score	-(real)left.RVR1311_1_0_score	;
+// self.RVR1311_1_0_score_baseline := (real)left.RVR1311_1_0_score	;		self.RVR1311_1_0_score_new := (real)right.RVR1311_1_0_score	;		self.RVR1311_1_0_score_diff := (real)right.RVR1311_1_0_score	-(real)left.RVR1311_1_0_score	;
 self.RVR1410_1_0_score_baseline := (real)left.RVR1410_1_0_score	;		self.RVR1410_1_0_score_new := (real)right.RVR1410_1_0_score	;		self.RVR1410_1_0_score_diff := (real)right.RVR1410_1_0_score	-(real)left.RVR1410_1_0_score	;
 self.FP1307_1_0_score_baseline	:= (real)left.FP1307_1_0_score	;		self.FP1307_1_0_score_new := (real)right.FP1307_1_0_score	;		self.FP1307_1_0_score_diff := (real)right.FP1307_1_0_score	-(real)left.FP1307_1_0_score	;
 self.FP31310_2_0_score_baseline := (real)left.FP31310_2_0_score	;		self.FP31310_2_0_score_new := (real)right.FP31310_2_0_score	;		self.FP31310_2_0_score_diff := (real)right.FP31310_2_0_score	-(real)left.FP31310_2_0_score	;
@@ -748,7 +751,7 @@ self.FP1801_1_0_score_baseline := (real)left.FP1801_1_0_score	;		self.FP1801_1_0
 
 self.FP31505_0_0_score_baseline	:= (real)left.FP31505_0_0_score	;		self.FP31505_0_0_score_new := (real)right.FP31505_0_0_score	;		self.FP31505_0_0_score_diff := (real)right.FP31505_0_0_score	-(real)left.FP31505_0_0_score	;
 self.FP3FDN1505_0_0_score_baseline	:= (real)left.FP3FDN1505_0_0_score	;		self.FP3FDN1505_0_0_score_new := (real)right.FP3FDN1505_0_0_score	;		self.FP3FDN1505_0_0_score_diff := (real)right.FP3FDN1505_0_0_score	-(real)left.FP3FDN1505_0_0_score	;
-
+self.RVA1811_1_0_score_baseline	:= (real)left.RVA1811_1_0_score	;		self.RVA1811_1_0_score_new := (real)right.RVA1811_1_0_score	;		self.RVA1811_1_0_score_diff := (real)right.RVA1811_1_0_score	-(real)left.RVA1811_1_0_score	;
 		));
 
 normed_rec := record
@@ -1069,6 +1072,7 @@ C= 	307 => 'RVC1805_2_0_score ',
 C= 	308 => 'OSN1803_1_0_score ',
 C= 	309 => 'MSN1803_1_0_score	',
 C= 	310 => 'FP1803_1_0_score ',
+C= 	311 => 'RVA1811_1_0_score ',
 ''
 );
 
@@ -1076,12 +1080,12 @@ self.difference := map(
 C= 	1 => le.NAP_diff, 
 C= 	2 => le.NAS_diff, 
 C= 	3 => le.CVI_score_diff, 
-C= 	4 => le.AID605_1_0_score_diff, 
-C= 	5 => le.AID606_0_0_score_diff, 
-C= 	6 => le.AID606_1_0_score_diff, 
-C= 	7 => le.AID607_0_0_score_diff, 
-C= 	8 => le.AID607_1_0_score_diff, 
-C= 	9 => le.AID607_2_0_score_diff, 
+// C= 	4 => le.AID605_1_0_score_diff, 
+// C= 	5 => le.AID606_0_0_score_diff, 
+// C= 	6 => le.AID606_1_0_score_diff, 
+// C= 	7 => le.AID607_0_0_score_diff, 
+// C= 	8 => le.AID607_1_0_score_diff, 
+// C= 	9 => le.AID607_2_0_score_diff, 
 C= 	10 => le.AIN509_0_0_score_diff, 
 C= 	11 => le.AIN602_1_0_score_diff, 
 C= 	12 => le.AIN605_1_0_score_diff, 
@@ -1089,19 +1093,19 @@ C= 	13 => le.AIN605_2_0_score_diff,
 C= 	14 => le.AIN605_3_0_score_diff, 
 C= 	15 => le.AIN801_1_0_score_diff, 
 C= 	16 => le.ANMK909_0_1_score_diff, 
-C= 	17 => le.AWD605_0_0_score_diff, 
-C= 	18 => le.AWD605_2_0_score_diff, 
-C= 	19 => le.AWD606_10_0_score_diff, 
-C= 	20 => le.AWD606_11_0_score_diff, 
-C= 	21 => le.AWD606_1_0_score_diff, 
-C= 	22 => le.AWD606_2_0_score_diff, 
-C= 	23 => le.AWD606_3_0_score_diff, 
-C= 	24 => le.AWD606_4_0_score_diff, 
-C= 	25 => le.AWD606_6_0_score_diff, 
-C= 	26 => le.AWD606_7_0_score_diff, 
-C= 	27 => le.AWD606_8_0_score_diff, 
-C= 	28 => le.AWD606_9_0_score_diff, 
-C= 	29 => le.AWD710_1_0_score_diff, 
+// C= 	17 => le.AWD605_0_0_score_diff, 
+// C= 	18 => le.AWD605_2_0_score_diff, 
+// C= 	19 => le.AWD606_10_0_score_diff, 
+// C= 	20 => le.AWD606_11_0_score_diff, 
+// C= 	21 => le.AWD606_1_0_score_diff, 
+// C= 	22 => le.AWD606_2_0_score_diff, 
+// C= 	23 => le.AWD606_3_0_score_diff, 
+// C= 	24 => le.AWD606_4_0_score_diff, 
+// C= 	25 => le.AWD606_6_0_score_diff, 
+// C= 	26 => le.AWD606_7_0_score_diff, 
+// C= 	27 => le.AWD606_8_0_score_diff, 
+// C= 	28 => le.AWD606_9_0_score_diff, 
+// C= 	29 => le.AWD710_1_0_score_diff, 
 C= 	30 => le.AWN510_0_0_score_diff, 
 C= 	31 => le.AWN603_1_0_score_diff, 
 C= 	32 => le.BD3605_0_0_score_diff, 
@@ -1159,8 +1163,8 @@ C= 	82 => le.FP3905_1_0_score_diff,
 C= 	83 => le.FP5812_1_0_score_diff, 
 C= 	84 => le.HCP1206_0_0_score_diff, 
 C= 	85 => le.IDN605_1_0_score_diff, 
-C= 	86 => le.IE912_0_0_score_diff, 
-C= 	87 => le.IE912_1_0_score_diff, 
+// C= 	86 => le.IE912_0_0_score_diff, 
+// C= 	87 => le.IE912_1_0_score_diff, 
 C= 	88 => le.IED1106_1_0_score_diff, 
 C= 	89 => le.IEN1006_0_1_score_diff, 
 C= 	90 => le.MNC21106_0_0_score_diff, 
@@ -1213,13 +1217,13 @@ C= 	136 => le.RVA611_0_0_score_diff,
 C= 	137 => le.RVA707_0_0_score_diff, 
 C= 	138 => le.RVA707_1_0_score_diff, 
 C= 	139 => le.RVA709_1_0_score_diff, 
-C= 	140 => le.RVA711_0_0_score_diff, 
+// C= 	140 => le.RVA711_0_0_score_diff, 
 C= 	141 => le.RVB1003_0_0_score_diff, 
 C= 	142 => le.RVB1104_0_0_score_diff, 
 C= 	143 => le.RVB609_0_0_score_diff, 
-C= 	144 => le.RVB703_1_0_score_diff, 
+// C= 	144 => le.RVB703_1_0_score_diff, 
 C= 	145 => le.RVB705_1_0_score_diff, 
-C= 	146 => le.RVB711_0_0_score_diff, 
+// C= 	146 => le.RVB711_0_0_score_diff, 
 C= 	147 => le.RVC1110_1_0_score_diff, 
 C= 	148 => le.RVC1110_2_0_score_diff, 
 C= 	149 => le.RVC1112_0_0_score_diff, 
@@ -1239,43 +1243,43 @@ C= 	162 => le.RVG1304_1_0_score_diff,
 C= 	163 => le.RVG1304_2_0_score_diff, 
 C= 	164 => le.RVG812_0_0_score_diff, 
 C= 	165 => le.RVG903_1_0_score_diff, 
-C= 	166 => le.RVG904_1_0_score_diff, 
-C= 	167 => le.RVP1003_0_0_score_diff, 
+// C= 	166 => le.RVG904_1_0_score_diff, 
+// C= 	167 => le.RVP1003_0_0_score_diff, 
 C= 	168 => le.RVP1012_1_0_score_diff, 
-C= 	169 => le.RVP1104_0_0_score_diff, 
+// C= 	169 => le.RVP1104_0_0_score_diff, 
 C= 	170 => le.RVP1208_1_0_score_diff, 
-C= 	171 => le.RVP804_0_0_score_diff, 
-C= 	172 => le.RVR1003_0_0_score_diff, 
+// C= 	171 => le.RVP804_0_0_score_diff, 
+// C= 	172 => le.RVR1003_0_0_score_diff, 
 C= 	173 => le.RVR1008_1_0_score_diff, 
 C= 	174 => le.RVR1103_0_0_score_diff, 
 C= 	175 => le.RVR1104_2_0_score_diff, 
 //C= 	176 => le.RVR1104_3_0_score_diff, 
 C= 	177 => le.RVR1210_1_0_score_diff, 
 C= 	178 => le.RVR1303_1_0_score_diff, 
-C= 	179 => le.RVR611_0_0_score_diff, 
+// C= 	179 => le.RVR611_0_0_score_diff, 
 C= 	180 => le.RVR704_1_0_score_diff, 
-C= 	181 => le.RVR711_0_0_score_diff, 
+// C= 	181 => le.RVR711_0_0_score_diff, 
 C= 	182 => le.RVR803_1_0_score_diff, 
 C= 	183 => le.RVS811_0_0_score_diff, 
 C= 	184 => le.RVT1003_0_0_score_diff, 
-C= 	185 => le.RVT1006_1_0_score_diff, 
+// C= 	185 => le.RVT1006_1_0_score_diff, 
 C= 	186 => le.RVT1104_0_0_score_diff, 
 C= 	187 => le.RVT1104_1_0_score_diff, 
 C= 	188 => le.RVT1204_1_score_diff, 
 C= 	189 => le.RVT1210_1_0_score_diff, 
 C= 	190 => le.RVT1212_1_0_score_diff, 
-C= 	191 => le.RVT612_0_score_diff, 
-C= 	192 => le.RVT711_0_0_score_diff, 
+// C= 	191 => le.RVT612_0_score_diff, 
+// C= 	192 => le.RVT711_0_0_score_diff, 
 C= 	193 => le.RVT711_1_0_score_diff, 
-C= 	194 => le.RVT803_1_0_score_diff, 
-C= 	195 => le.RVT809_1_0_score_diff, 
-C= 	196 => le.TBD605_0_0_score_diff, 
-C= 	197 => le.TBD609_1_0_score_diff, 
-C= 	198 => le.TBD609_2_0_score_diff, 
+// C= 	194 => le.RVT803_1_0_score_diff, 
+// C= 	195 => le.RVT809_1_0_score_diff, 
+// C= 	196 => le.TBD605_0_0_score_diff, 
+// C= 	197 => le.TBD609_1_0_score_diff, 
+// C= 	198 => le.TBD609_2_0_score_diff, 
 C= 	199 => le.TBN509_0_0_score_diff, 
 C= 	200 => le.TBN604_1_0_score_diff, 
-C= 	201 => le.TRD605_0_0_score_diff, 
-C= 	202 => le.TRD609_1_0_score_diff, 
+// C= 	201 => le.TRD605_0_0_score_diff, 
+// C= 	202 => le.TRD609_1_0_score_diff, 
 C= 	203 => le.WIN704_0_0_score_diff, 
 C= 	204 => le.WOMV002_0_0_score_diff, 
 C= 	205 => le.WWN604_1_0_score_diff, 
@@ -1292,7 +1296,7 @@ C= 	215 => le.RVA1311_2_0_score_diff,
 C= 	216 => le.RVA1311_3_0_score_diff,
 C= 	217 => le.RVG1401_1_0_score_diff,
 C= 	218 => le.RVG1401_2_0_score_diff,
-C= 	219 => le.RVR1311_1_0_score_diff,
+// C= 	219 => le.RVR1311_1_0_score_diff,
 C= 	220 => le.FP1307_1_0_score_diff,
 C= 	221 => le.FP31310_2_0_score_diff,
 C= 	222 => le.RVP1401_1_0_score_diff,
@@ -1366,7 +1370,7 @@ C= 	289 => le.FP1702_1_0_score_diff,
 C= 	290 => le.FP1706_1_0_score_diff,
 C= 	291 => le.FP1609_2_0_score_diff,
 C= 	292 => le.RVS1706_0_score_diff,
-C= 	293 => le.FP1607_1_0_score_diff,
+// C= 	293 => le.FP1607_1_0_score_diff,
 C= 	294 => le.RVG1610_1_0_score_diff,
 C= 	295 => le.FP1508_1_0_score_diff,
 C= 	296 => le.RVC1801_1_0_score_diff,
@@ -1384,10 +1388,11 @@ C= 	307 => le.RVC1805_2_0_score_diff,
 C= 	308 => le.OSN1803_1_0_score_diff,
 C= 	309 => le.MSN1803_1_0_score_diff,
 C= 	310 => le.FP1803_1_0_score_diff,
+C= 	311 => le.RVA1811_1_0_score_diff,
 0);										
 end;
 
-name_pairs :=  normalize(j, 310, norm(left, counter));
+name_pairs :=  normalize(j, 311, norm(left, counter));
 
 
 // get an overall picture of impact
