@@ -21,6 +21,8 @@ EXPORT fn_Generated_Data_Merge(BOOLEAN UseProdData=TRUE) := FUNCTION
 															SELF := [])
 														);
 			// do this after all the fields got populated as well as possible, and the file is in the "IN" layout.
+			// TMP CALC ALL - if we activate these, have to change the existing gen_MainData1 above to gen_MainData1a
+			// gen_MainData1 := gen_MainData1a+existingMain;		//TMP CALC ALL
 			gen_MainData := PROJECT(gen_MainData1,
 															TRANSFORM({gen_MainData1},
 															SELF.persistent_record_id := 	HASH64(trim(LEFT.tmsid,left,right)+ ','+
@@ -66,9 +68,10 @@ EXPORT fn_Generated_Data_Merge(BOOLEAN UseProdData=TRUE) := FUNCTION
 																		trim(LEFT.certificate_number ,left,right)+ ','+
 																		trim(LEFT.filing_status ,left,right)+trim(LEFT.filing_status_desc,left,right)),
 															SELF := LEFT));
+			// ALL_MainData := gen_MainData;				//TMP CALC ALL if activate this, then comment the line below
 			ALL_MainData := gen_MainData+existingMain;
 	//***********************************************************************************************
-	// Linda's Party generated - I'm trusting she filled in bug_num and cust_name
+	// Linda's Party generated - I'm trusting she filled in bug_num and cust_name, and DID
 	//***********************************************************************************************
 			newpartyData := Files.TmpGeneratedPARTY_DS;
 			existingParty := IF(UseProdData, Files.Party_IN_DS_Prod, Files.Party_IN_DS);
@@ -132,6 +135,8 @@ EXPORT fn_Generated_Data_Merge(BOOLEAN UseProdData=TRUE) := FUNCTION
 																	)
 																);
 			// do this after all the fields got populated as well as possible, and the file is in the "IN" layout.
+			// TMP CALC ALL - if we activate these, have to change the existing gen_PartyData1 above to gen_PartyData1a
+			// gen_PartyData1 := gen_PartyData1a+existingParty;				//TMP CALC ALL
 			gen_PartyData := PROJECT(gen_PartyData1,TRANSFORM({gen_PartyData1},
 												self.persistent_record_id := hash64(trim(LEFT.tmsid,left,right)+','+
 																trim(LEFT.rmsid,left,right)+','+
@@ -157,6 +162,7 @@ EXPORT fn_Generated_Data_Merge(BOOLEAN UseProdData=TRUE) := FUNCTION
 																+trim(LEFT.fname,left,right)+','+trim(LEFT.lname,left,right)+','+trim(LEFT.mname,left,right)+','+trim(LEFT.name_suffix,left,right) +','+ trim(LEFT.zip4,left,right)); // orig name has multiple names 
 												self := LEFT;
 												));
+			// ALL_PartyData := gen_PartyData;				//TMP CALC ALL if activate this, then comment the line below
 			ALL_PartyData := gen_PartyData+existingParty;
 
 																
