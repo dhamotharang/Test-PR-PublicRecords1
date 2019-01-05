@@ -1,4 +1,4 @@
-EXPORT get_Workunits_ds(
+﻿EXPORT get_Workunits_ds(
 
    string pWuid
   ,string pversion
@@ -20,7 +20,7 @@ function
   Run_Total_Thor_Time := wk_ut.ConvertSecs2ReadableTime((real8)Run_Total_Time_secs);
 
   //name, wuid, iteration#, version, thor time, etc
-  dWUDetails := dataset([{jobname ,pWuid ,pesp,wk_ut._Constants.Esp2Name(pesp),getstate ,piteration ,pversion ,thor_time,thor_time_secs,Run_Total_Thor_Time,Run_Total_Time_secs,'',0.0,'',Errors}] ,layouts.wks_slim);
+  dWUDetails := dataset([{jobname ,'',pWuid ,'',pesp,wk_ut._Constants.Esp2Name(pesp),getstate ,piteration ,pversion ,thor_time,thor_time_secs,Run_Total_Thor_Time,Run_Total_Time_secs,'',0.0,'',Errors}] ,layouts.wks_slim);
 
   return thiswuid + dWUDetails;
   

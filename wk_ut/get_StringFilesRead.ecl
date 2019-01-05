@@ -1,4 +1,4 @@
-EXPORT get_StringFilesRead(
+﻿EXPORT get_StringFilesRead(
 
    string   pWuid       = workunit
   ,string   pFileRegex  = ''
@@ -7,7 +7,7 @@ EXPORT get_StringFilesRead(
 ) := 
 function
 
-  getwuids    := global(iff((unsigned)wk_ut.get_DS_Count(pWuid,'Workunits') > 0 ,wk_ut.get_DS_Result(pWuid,'Workunits',wk_ut.layouts.wks_slim)  ,dataset([{'',pWuid,'','','','','','',0}],wk_ut.layouts.wks_slim)));
+  getwuids    := global(iff((unsigned)wk_ut.get_DS_Count(pWuid,'Workunits') > 0 ,wk_ut.get_DS_Result(pWuid,'Workunits',wk_ut.layouts.wks_slim)  ,dataset([{'','',pWuid,'','','','','','','',0}],wk_ut.layouts.wks_slim)));
   countwuids  := count(getwuids);
   recindex    := if(pIndex  = 0 ,countwuids ,pIndex);
   wuid        := getwuids[recindex].wuid;
