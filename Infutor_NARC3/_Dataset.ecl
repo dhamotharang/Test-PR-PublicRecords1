@@ -1,8 +1,9 @@
 ﻿
-IMPORT Tools;
+IMPORT Tools,VersionControl;
 EXPORT _Dataset(BOOLEAN	pUseOtherEnvironment = FALSE) :=
 	tools.Constants(pDatasetName				 := 'infutor_narc3',
 									pUseOtherEnvironment := pUseOtherEnvironment,
-									pGroupname					 := '36',
+									pGroupname					 := '02',
 									pMaxRecordSize			 := 40000,
-									pIsTesting					 := Tools._Constants.IsDataland);
+									pIsTesting					 := Tools._Constants.IsDataland,
+									pAdd_Eclcc           := true);

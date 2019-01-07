@@ -6,7 +6,7 @@ EXPORT	fSprayFiles(
 	STRING			pServerIP				= Infutor_NARC3.Constants(pVersionDate).serverIP,	
 	STRING			pDirectory			= Infutor_NARC3.Constants(pVersionDate).Directory,
 	STRING			pFilename				=	'NARC3_*.txt',
-	STRING			pGroupName			=	_Dataset().groupname,
+	STRING			pGroupName			=	_Dataset().groupname, 
 	BOOLEAN		  pIsTesting			=	FALSE,
 	BOOLEAN		  pOverwrite			=	TRUE,
 	STRING			pNameOutput		=	'Infutor_narc3 Spray Info' 

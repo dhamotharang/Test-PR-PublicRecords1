@@ -2,7 +2,8 @@
 import address,AID;
 
 EXPORT Layout_Basefile := record
-	integer8  recordid;
+  integer8  rcid;
+  string100 persistent_record_id;	
 	string2 	src;
 	string8	  process_date;
 	string8 	date_first_seen  	:='0';

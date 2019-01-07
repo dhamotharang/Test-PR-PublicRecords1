@@ -21,6 +21,7 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
   SHARED Base0 := PROJECT(dsBase,TRANSFORM(WithRT,SELF.__Tpe:=RecordType.Old,SELF:=LEFT));
  
   SHARED WithRT MergeData(WithRT le, WithRT ri) := TRANSFORM // Pick the data for the new record
+    SELF.persistent_record_id := ri.persistent_record_id; // Derived(NEW)
     SELF.src := ri.src; // Derived(NEW)
     SELF.process_date := MAP ( le.__Tpe = 0 => ri.process_date,
                      ri.__Tpe = 0 => le.process_date,
@@ -227,36 +228,26 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
   END;
  
   // Ingest Files: Rollup to get unique new records
-  DistIngest0 := DISTRIBUTE(FilesToIngest0, HASH32(orig_fname
-             ,orig_mname,orig_lname,orig_suffix,orig_gender,orig_dob,orig_address,orig_city,orig_state,orig_zip
-             ,orig_dpc,orig_telephone_number_1));
-  SortIngest0 := SORT(DistIngest0,orig_fname
-             ,orig_mname,orig_lname,orig_suffix,orig_gender,orig_dob,orig_address,orig_city,orig_state,orig_zip
-             ,orig_dpc,orig_telephone_number_1, __Tpe, recordid, LOCAL);
-  GroupIngest0 := GROUP(SortIngest0,orig_fname
-             ,orig_mname,orig_lname,orig_suffix,orig_gender,orig_dob,orig_address,orig_city,orig_state,orig_zip
-             ,orig_dpc,orig_telephone_number_1, LOCAL, ORDERED, STABLE);
+  DistIngest0 := DISTRIBUTE(FilesToIngest0, HASH32(orig_fname,orig_mname,orig_lname,orig_suffix,orig_gender,orig_dob,orig_address,orig_city,orig_state,orig_zip,orig_dpc,orig_telephone_number_1));
+  SortIngest0 := SORT(DistIngest0
+             ,orig_fname,orig_mname,orig_lname,orig_suffix,orig_gender,orig_dob,orig_address,orig_city,orig_state,orig_zip,orig_dpc,orig_telephone_number_1, __Tpe, rcid, LOCAL);
+  GroupIngest0 := GROUP(SortIngest0
+             ,orig_fname,orig_mname,orig_lname,orig_suffix,orig_gender,orig_dob,orig_address,orig_city,orig_state,orig_zip,orig_dpc,orig_telephone_number_1, LOCAL, ORDERED, STABLE);
   SHARED AllIngestRecs0 := UNGROUP(ROLLUP(GroupIngest0,TRUE,MergeData(LEFT,RIGHT)));
  
   // Existing Base: combine delta with base file
-  DistBase0 := DISTRIBUTE(Base0+Delta0, HASH32(orig_fname
-             ,orig_mname,orig_lname,orig_suffix,orig_gender,orig_dob,orig_address,orig_city,orig_state,orig_zip
-             ,orig_dpc,orig_telephone_number_1));
-  SortBase0 := SORT(DistBase0,orig_fname
-             ,orig_mname,orig_lname,orig_suffix,orig_gender,orig_dob,orig_address,orig_city,orig_state,orig_zip
-             ,orig_dpc,orig_telephone_number_1, __Tpe, recordid, LOCAL);
-  GroupBase0 := GROUP(SortBase0,orig_fname
-             ,orig_mname,orig_lname,orig_suffix,orig_gender,orig_dob,orig_address,orig_city,orig_state,orig_zip
-             ,orig_dpc,orig_telephone_number_1, LOCAL, ORDERED, STABLE);
+  DistBase0 := DISTRIBUTE(Base0+Delta0, HASH32(orig_fname,orig_mname,orig_lname,orig_suffix,orig_gender,orig_dob,orig_address,orig_city,orig_state,orig_zip,orig_dpc,orig_telephone_number_1));
+  SortBase0 := SORT(DistBase0
+             ,orig_fname,orig_mname,orig_lname,orig_suffix,orig_gender,orig_dob,orig_address,orig_city,orig_state,orig_zip,orig_dpc,orig_telephone_number_1, __Tpe, rcid, LOCAL);
+  GroupBase0 := GROUP(SortBase0
+             ,orig_fname,orig_mname,orig_lname,orig_suffix,orig_gender,orig_dob,orig_address,orig_city,orig_state,orig_zip,orig_dpc,orig_telephone_number_1, LOCAL, ORDERED, STABLE);
   SHARED AllBaseRecs0 := UNGROUP(ROLLUP(GroupBase0,TRUE,MergeData(LEFT,RIGHT)));
  
   // Everything: combine ingest and base recs
-  Sort0 := SORT(AllBaseRecs0+AllIngestRecs0,orig_fname
-             ,orig_mname,orig_lname,orig_suffix,orig_gender,orig_dob,orig_address,orig_city,orig_state,orig_zip
-             ,orig_dpc,orig_telephone_number_1, __Tpe,recordid,LOCAL);
-  Group0 := GROUP(Sort0,orig_fname
-             ,orig_mname,orig_lname,orig_suffix,orig_gender,orig_dob,orig_address,orig_city,orig_state,orig_zip
-             ,orig_dpc,orig_telephone_number_1,LOCAL, ORDERED, STABLE);
+  Sort0 := SORT(AllBaseRecs0+AllIngestRecs0
+             ,orig_fname,orig_mname,orig_lname,orig_suffix,orig_gender,orig_dob,orig_address,orig_city,orig_state,orig_zip,orig_dpc,orig_telephone_number_1, __Tpe,rcid,LOCAL);
+  Group0 := GROUP(Sort0
+             ,orig_fname,orig_mname,orig_lname,orig_suffix,orig_gender,orig_dob,orig_address,orig_city,orig_state,orig_zip,orig_dpc,orig_telephone_number_1,LOCAL, ORDERED, STABLE);
   SHARED AllRecs0 := UNGROUP(ROLLUP(Group0,TRUE,MergeData(LEFT,RIGHT)));
  
   //Now need to update 'rid' numbers on new records
@@ -264,13 +255,13 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
   // Do not use PROJECT,COUNTER because it is very slow if any of the fields are not fixed length
   NR := AllRecs0(__Tpe=RecordType.New);
   ORe := AllRecs0(__Tpe<>RecordType.New);
-  PrevBase := MAX(ORe,recordid);
+  PrevBase := MAX(ORe,rcid);
   WithRT AddNewRid(WithRT le, WithRT ri) := TRANSFORM
-    SELF.recordid := IF ( le.recordid=0, PrevBase+1+thorlib.node(), le.recordid+thorlib.nodes() );
+    SELF.rcid := IF ( le.rcid=0, PrevBase+1+thorlib.node(), le.rcid+thorlib.nodes() );
     SELF := ri;
   END;
-  NR1 := ITERATE(NR(recordid=0),AddNewRid(LEFT,RIGHT),LOCAL);
-  SHARED AllRecs := ORe+NR1+NR(recordid<>0) : PERSIST('~temp::Infutor_NARC3::Ingest_Cache',EXPIRE(Infutor_NARC3.Config.PersistExpire));
+  NR1 := ITERATE(NR(rcid=0),AddNewRid(LEFT,RIGHT),LOCAL);
+  SHARED AllRecs := ORe+NR1+NR(rcid<>0) : PERSIST('~temp::Infutor_NARC3::Ingest_Cache',EXPIRE(Infutor_NARC3.Config.PersistExpire));
   SHARED UpdateStatsFull := SORT(TABLE(AllRecs, {__Tpe,SALT311.StrType INGESTSTATUS:=RTToText(AllRecs.__Tpe),UNSIGNED Cnt:=COUNT(GROUP)}, __Tpe, FEW),__Tpe, FEW);
   SHARED UpdateStatsInc := SORT(UpdateStatsFull(__Tpe = RecordType.New), __Tpe, INGESTSTATUS, FEW);
   EXPORT UpdateStats := IF(incremental, UpdateStatsInc, UpdateStatsFull);
@@ -287,8 +278,8 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
   EXPORT AllRecords := IF(incremental, NewRecords, PROJECT(AllRecs, NoFlagsRec));
   EXPORT AllRecords_NoTag := PROJECT(AllRecords,Layout_basefile); // Records in 'pure' format
  
-f := TABLE(dsBase,{recordid}) : GLOBAL;
-rcid_clusters := SALT311.MOD_ClusterStats.Counts(f,recordid);
+f := TABLE(dsBase,{rcid}) : GLOBAL;
+rcid_clusters := SALT311.MOD_ClusterStats.Counts(f,rcid);
 DuplicateRids0 := COUNT(dsBase) - SUM(rcid_clusters,NumberOfClusters); // Should be zero
 d := DATASET([{DuplicateRids0}],{UNSIGNED2 DuplicateRids0});
 EXPORT ValidityStats := OUTPUT(d,NAMED('ValidityStatistics'));
