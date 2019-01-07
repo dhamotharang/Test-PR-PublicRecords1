@@ -136,7 +136,7 @@ macro
 	
 ///////////SCRUBS REPORTS//////////////
 	  #uniquename(util_didScrubsReport)
-	  %util_didScrubsReport% := UtilFile.UtilDid_Scrubs(filedate,'wenhong.ma@lexisnexis.com,gabriel.marcan@lexisnexis.com');
+	  %util_didScrubsReport% := UtilFile.UtilDid_Scrubs(filedate,'michael.gould@lexisnexis.com,wenhong.ma@lexisnexis.com,gabriel.marcan@lexisnexis.com');
 	  
 ///////////SCRUBS REPORTS//////////////
 	
