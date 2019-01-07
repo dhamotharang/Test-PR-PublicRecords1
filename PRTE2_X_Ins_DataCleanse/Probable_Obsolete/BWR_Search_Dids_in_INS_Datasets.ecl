@@ -2,9 +2,9 @@
 PRTE2_X_Ins_DataCleanse.BWR_Search_Dids_in_INS_Datasets
 ****************************************************************** */
 
-IMPORT PRTE2_Common,PRTE2_Email_Data_Ins,PRTE2_Header_Ins,PRTE2_LNProperty_Ins,PRTE2_Phonesplus_Ins;
+IMPORT PRTE2_Common,PRTE2_Email_Data_Ins,PRTE2_Header_Ins,PRTE2_LNProperty_Ins,PRTE2_Phonesplus_Ins,PRTE2_Alpha_Data;
 
-MHDR363 := PRTE2_X_Ins_DataCleanse.Files_Alpha.Boca_HDR_Dup363_DS;
+MHDR363 := PRTE2_Alpha_Data.Files_Alpha.Boca_HDR_Dup363_DS;
 SetOfdids363 := SET(MHDR363,did);
 
 // The following have Insurance based dids ************************

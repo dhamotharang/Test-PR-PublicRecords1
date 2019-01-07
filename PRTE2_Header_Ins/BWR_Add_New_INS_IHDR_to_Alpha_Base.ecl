@@ -17,7 +17,7 @@ Feb 2018 - added all IHDR addr_ind=1 records this big load I jumped did to 88880
 note: Nancy's critical Farmers records begin with 888809439154
 ************************************************************************************ */
 
-IMPORT ut, PRTE2_Header_Ins, PRTE2_Common, PRTE2_X_Ins_DataCleanse, PRTE_CSV;
+IMPORT ut, PRTE2_Header_Ins, PRTE2_Common, PRTE2_Alpha_Data, PRTE_CSV;
 #WORKUNIT('name', 'PRCT Alpharetta-Adds BHDR File');
 #OPTION('multiplePersistInstances',FALSE);
 
@@ -26,7 +26,7 @@ fileVersion := PRTE2_Common.Constants.TodayString+'';
 DesprayProd := TRUE;
 BuildNewFile := FALSE;
  
-IHDR := PRTE2_X_Ins_DataCleanse.Files_Alpha.InsHead_Base_DS_PROD(fb_src='EXPERIAN' AND addr_ind='1');
+IHDR := PRTE2_Alpha_Data.Files_Alpha.InsHead_Base_DS_PROD(fb_src='EXPERIAN' AND addr_ind='1');
 BHDR_P := PRTE2_Header_Ins.files.HDR_BASE_ALPHA_DS_Prod;
 BHDR_D := PRTE2_Header_Ins.files.HDR_BASE_ALPHA_DS;
 BHDR := IF(DesprayProd,BHDR_P,BHDR_D);

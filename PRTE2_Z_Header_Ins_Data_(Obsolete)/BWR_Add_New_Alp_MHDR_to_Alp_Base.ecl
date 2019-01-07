@@ -27,7 +27,7 @@ Feb 2018 - added all IHDR addr_ind=1 records this big load I jumped did to 88880
 note: Nancy's critical Farmers records begin with 888809439154
 ************************************************************************************ */
 
-IMPORT ut, PRTE2_Header_Ins, PRTE2_Common, PRTE2_X_Ins_DataCleanse, PRTE_CSV;
+IMPORT ut, PRTE2_Header_Ins, PRTE2_Common, PRTE2_Alpha_Data, PRTE_CSV;
 #workunit('name', 'PRCT Alpharetta-Adds BHDR File');
 #OPTION('multiplePersistInstances',FALSE);
 
@@ -36,7 +36,7 @@ STRING SAVE_VIEW := 'V';
 fileVersion	:= PRTE2_Common.Constants.TodayString+'';
 
 // *******************************************************************************************************
-MRGD := PRTE2_X_Ins_DataCleanse.Files_Alpha.PS_Merged_Headers_DS(addr_ind='1');
+MRGD := PRTE2_Alpha_Data.Files_Alpha.PS_Merged_Headers_DS(addr_ind='1');
 BHDR := PRTE2_Header_Ins.files.HDR_BASE_ALPHA_DS;
 // *******************************************************************************************************
 

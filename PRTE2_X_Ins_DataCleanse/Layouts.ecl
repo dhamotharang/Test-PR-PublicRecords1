@@ -1,4 +1,7 @@
-﻿IMPORT PRTE2_Header_Ins;
+﻿/* ****************************************************************************************************
+Jan 2019 - commented out old MHDR references, s/b able to remove with some review to be sure.
+**************************************************************************************************** */
+IMPORT PRTE2_Header_Ins,PRTE2_Alpha_Data;
 
 EXPORT Layouts := MODULE
 
@@ -10,7 +13,7 @@ EXPORT Layouts := MODULE
 			STRING   Model;
 	END;
 
-// ?????????????? use the version in Layouts_Alpha ???
+// ?????????????? use the version in PRTE2_Alpha_Data.Layouts_Alpha ???
 	// EXPORT Layout_Merged_IHDR_BHDR := RECORD
 			// STRING1 Required_BC;
 			// Layouts_Alpha.Layout_InsHead;
@@ -19,22 +22,23 @@ EXPORT Layouts := MODULE
 	// END;
 
 
-	EXPORT Layout_XREF_MHDR := RECORD
-			Layouts_Alpha.Layout_Merged_IHDR_BHDR;
-			UNSIGNED6 eir_source_boca_did;			
-			UNSIGNED2 AM_cnt;
-			UNSIGNED2 AR_cnt;
-			UNSIGNED2 BK_cnt;
-			UNSIGNED2 E1_cnt;
-			UNSIGNED2 E2_cnt;
-			UNSIGNED2 E3_cnt;
-			UNSIGNED2 L2_cnt;
-			UNSIGNED2 LI_cnt;
-			UNSIGNED2 PL_cnt;	
-			UNSIGNED2 Criminal_cnt;	
-			UNSIGNED2 UCC_cnt;	
-			UNSIGNED2 SexOff_cnt;	
-	END;
+ 	// EXPORT Layout_XREF_MHDR := RECORD
+   			// PRTE2_Alpha_Data.Layouts_Alpha.Layout_Merged_IHDR_BHDR;
+   			// UNSIGNED6 eir_source_boca_did;			
+   			// UNSIGNED2 AM_cnt;
+   			// UNSIGNED2 AR_cnt;
+   			// UNSIGNED2 BK_cnt;
+   			// UNSIGNED2 E1_cnt;
+   			// UNSIGNED2 E2_cnt;
+   			// UNSIGNED2 E3_cnt;
+   			// UNSIGNED2 L2_cnt;
+   			// UNSIGNED2 LI_cnt;
+   			// UNSIGNED2 PL_cnt;	
+   			// UNSIGNED2 Criminal_cnt;	
+   			// UNSIGNED2 UCC_cnt;	
+   			// UNSIGNED2 SexOff_cnt;	
+   	// END;
+
 
 	EXPORT Layout_Experian_SSNs := RECORD
       STRING9  NEW_SSN  ;

@@ -6,11 +6,11 @@ These will be records that we couldn't spot a match in the IHDR and we
 matched MHDR simply on fname,mname,lname so not sure how we might find others.
 ************************************************************************************ */
 
-IMPORT ut, PRTE2_Header_Ins, PRTE2_Common,PRTE2_X_DataCleanse,PRTE_CSV;
+IMPORT ut, PRTE2_Header_Ins, PRTE2_Common,PRTE_CSV,PRTE2_Alpha_Data;
 #workunit('name', 'PRCT Alpha MHDR-BHDR Study');
 #OPTION('multiplePersistInstances',FALSE);
 
-MRGD := PRTE2_X_Ins_DataCleanse.Files_Alpha.Merged_Headers_DS;
+MRGD := PRTE2_Alpha_Data.Files_Alpha.Merged_Headers_DS;
 BHDR := PRTE2_Header_Ins.files.HDR_BASE_ALPHA_DS;
 
 HDR_BASE_Missing_MHDR := PRTE2_Header_Ins.Layouts.Header_Missing_MHDR_Layout;

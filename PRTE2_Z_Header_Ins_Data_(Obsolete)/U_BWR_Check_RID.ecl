@@ -2,9 +2,9 @@
 PRTE2_Header_Ins_Data_Work.U_BWR_Check_RID
 Quick view of the MERGED HDR file to spot any DUP RIDS.
 ************************************************************************************ */
-Import PRTE2_X_Ins_DataCleanse,PRTE2_Header_Ins;
+Import PRTE2_Alpha_Data,PRTE2_Header_Ins;
 
-// IHDR_Chosen := SORT(PRTE2_X_Ins_DataCleanse.Files_Alpha.PS_Merged_Headers_DS,did);
+// IHDR_Chosen := SORT(PRTE2_Alpha_Data.Files_Alpha.PS_Merged_Headers_DS,did);
 IHDR_Chosen := SORT(PRTE2_Header_Ins.Files.HDR_BASE_ALPHA_DS,did);
 IHDRSort    := SORT(IHDR_Chosen,rid);
 IHDRDedup  := DEDUP(IHDRSort,rid);
