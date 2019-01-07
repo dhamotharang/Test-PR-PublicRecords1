@@ -10,7 +10,14 @@ eyeball := 120;
 historyDate := 20181227; // Set to 0 to use ArchiveDate on input file. 
 
 Score_threshold := 80;
-Output_Master_Results := TRUE;
+
+// Output additional file in Master Layout
+// Master results are for R&D/QA purposes ONLY. This should only be set to TRUE for internal use.
+Output_Master_Results := FALSE;
+// Output_Master_Results := TRUE; 
+
+Exclude_Consumer_Shell := FALSE; //if TRUE, bypasses consumer logic and sets all consumer shell fields to blank/0.
+
 RoxieIP := RiskWise.shortcuts.Dev156;
 
 InputFile := '~temp::kel::ally_01_business_uat_sample_100k_20181015.csv'; //100k file
@@ -147,6 +154,7 @@ soapLayout := RECORD
 	DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout) input;
 	INTEGER ScoreThreshold;
 	BOOLEAN OutputMasterResults;
+	Boolean ExcludeConsumerShell;
 end;
 
 // Uncomment this code to run as test harness on Thor instead of SOAPCALL to Roxie
@@ -169,6 +177,7 @@ soapLayout trans (inDataReadyDist le):= TRANSFORM
 		SELF := []));
 	SELF.ScoreThreshold := Score_threshold;
 	SELF.OutputMasterResults := Output_Master_Results;
+	SELF.ExcludeConsumerShell := Exclude_Consumer_Shell;
 END;
 
 soap_in := PROJECT(inDataReadyDist, trans(LEFT));

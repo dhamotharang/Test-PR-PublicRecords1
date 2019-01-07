@@ -30,7 +30,12 @@ DataRestrictionMask := '0000000000000000000000000000000000000000000000000';
 
 Score_threshold := 80;
 // Score_threshold := 90;
-Output_Master_Results := TRUE;
+
+// Output additional file in Master Layout
+// Master results are for R&D/QA purposes ONLY. This should only be set to TRUE for internal use.
+Output_Master_Results := FALSE;
+// Output_Master_Results := TRUE; 
+
 RecordsToRun := 0;
 eyeball := 120;
 

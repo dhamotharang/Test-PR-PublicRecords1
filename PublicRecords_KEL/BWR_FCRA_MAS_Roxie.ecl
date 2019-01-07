@@ -27,7 +27,12 @@ DataRestrictionMask := '1000010000000100000000000000000000000000000000000';
 NeutralRoxieIP:= RiskWise.Shortcuts.Dev156;   
 Score_threshold := 80;
 // Score_threshold := 90;
-Output_Master_Results := TRUE;
+
+// Output additional file in Master Layout
+// Master results are for R&D/QA purposes ONLY. This should only be set to TRUE for internal use.
+Output_Master_Results := FALSE;
+// Output_Master_Results := TRUE; 
+
 RecordsToRun := 0;
 eyeball := 100;
 
@@ -36,7 +41,6 @@ eyeball := 100;
 histDate := '20181231';
 
 OutputFile := '~CDAL::Consumer_ArrestSpecialValue_Bug_100K_RoxieDev_current_12312018_FCRA'+ ThorLib.wuid() ;
-
 prii_layout := RECORD
     STRING Account             ;
     STRING FirstName           ;
