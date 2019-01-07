@@ -49,7 +49,7 @@ os(string i) := if (i='','',trim(i)+' ');
 
 // get appropriate best_records permission flag
 #uniquename(perm_flag)
-%perm_flag% := dx_BestRecords.fn_get_perm_type(glb_ok, UseNonBlankKey, %utility_flag%, %pre_glb_flag%, 
+%perm_flag% := dx_BestRecords.Functions.get_perm_type(glb_ok, UseNonBlankKey, %utility_flag%, %pre_glb_flag%, 
 	%filter_exp%, %filter_eq%, marketing, %cnsmr_flag%);
 
 #uniquename(add_flds_marketing)
