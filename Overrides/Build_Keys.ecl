@@ -28,7 +28,9 @@ EXPORT Build_Keys(string infiledate, boolean isprte = false) := function
 				);
 		
 	endmacro;
-	
+	Shared SearchPattern:='^dataopsowner:([^ ]*) ';
+	Shared PulledName:=regexfind(SearchPattern,STD.System.Job.Name(),0);
+
 	build_key(bankrupt_filing,'bankrupt_filing',infiledate,'fcra','ffid_v3',bankrupt_filingretval, flag_file_id);
 	build_key(bankrupt_search,'bankrupt_search',infiledate,'fcra','ffid_v3',bankrupt_searchretval, flag_file_id);
 	build_key(criminal_offender,'criminal_offender',infiledate,'fcra','ffid',criminal_offenderretval, flag_file_id);
@@ -189,7 +191,9 @@ EXPORT Build_Keys(string infiledate, boolean isprte = false) := function
 			,avm_mediansretval
 			,address_dataretval
 			,did_deathretval
-			)
+			),
+			_control.fSubmitNewWorkunit('#workunit(\'name\',\''+PulledName+' Scrubs Overrides\');\r\n'+
+			'Scrubs_Overrides.fnRunScrubs(\''+infiledate+'\',\'Darren.Knowles@lexisnexisrisk.com; Charlene.Ros@lexisnexisrisk.com\');\r\n',std.system.job.target())
 		);
 	
 end;
