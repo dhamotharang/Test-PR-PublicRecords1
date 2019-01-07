@@ -2,7 +2,7 @@
 EXPORT Ingest(BOOLEAN incremental=FALSE
 , DATASET(Layout_Basefile) Delta = DATASET([],Layout_Basefile)
 , DATASET(Layout_Basefile) dsBase = In_Basefile // Change IN_Basefile to change input to ingest process
-, DATASET(RECORDOF(Dunndata_Consumer.Files.Basefile))  infile = Dunndata_Consumer.Files.Basefile
+, DATASET(RECORDOF(Dunndata_Consumer.In_Basefile))  infile = Dunndata_Consumer.In_Basefile
 ) := MODULE
   SHARED NullFile := DATASET([],Layout_Basefile); // Use to replace files you wish to remove
 

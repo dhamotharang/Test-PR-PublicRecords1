@@ -4,7 +4,7 @@ File being processed :-
 OPTIONS:-gn
 MODULE:Dunndata_Consumer
 FILENAME:Basefile
-INGESTFILE:dunn_consumer_update:NAMED(Dunndata_Consumer.Files.Basefile)
+INGESTFILE:dunn_consumer_update:NAMED(Dunndata_Consumer.In_Basefile)
 RIDFIELD:rcid
 
 FIELD:dt_first_seen:TYPE(UNSIGNED4):RECORDDATE(FIRST):0,0

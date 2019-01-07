@@ -41,7 +41,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     'OPTIONS:-gn\n'
     + 'MODULE:Dunndata_Consumer\n'
     + 'FILENAME:Basefile\n'
-    + 'INGESTFILE:dunn_consumer_update:NAMED(Dunndata_Consumer.Files.Basefile)\n'
+    + 'INGESTFILE:dunn_consumer_update:NAMED(Dunndata_Consumer.In_Basefile)\n'
     + 'RIDFIELD:rcid\n'
     + '\n'
     + 'FIELD:dt_first_seen:TYPE(UNSIGNED4):RECORDDATE(FIRST):0,0\n'

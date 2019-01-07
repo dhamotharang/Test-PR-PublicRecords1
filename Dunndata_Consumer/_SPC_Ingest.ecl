@@ -1,7 +1,7 @@
 ﻿OPTIONS:-gn
 MODULE:Dunndata_Consumer
 FILENAME:Basefile
-INGESTFILE:dunn_consumer_update:NAMED(Dunndata_Consumer.Files.Basefile)
+INGESTFILE:dunn_consumer_update:NAMED(Dunndata_Consumer.In_Basefile)
 RIDFIELD:rcid
 
 FIELD:dt_first_seen:TYPE(UNSIGNED4):RECORDDATE(FIRST):0,0
@@ -763,4 +763,3 @@ FIELD:UltID:TYPE(UNSIGNED6):DERIVED:0,0
 FIELD:UltScore:TYPE(UNSIGNED2):DERIVED:0,0
 FIELD:UltWeight:TYPE(UNSIGNED2):DERIVED:0,0
 FIELD:persistent_record_id:TYPE(STRING100):DERIVED:0,0
-
