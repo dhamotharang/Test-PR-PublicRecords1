@@ -1,0 +1,1 @@
+﻿EXPORT In_Basefile := PROJECT(Files.Input_Raw,TRANSFORM(Layout_Basefile,SELF:=LEFT,SELF:=[]));

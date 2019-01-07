@@ -108,7 +108,8 @@ functionmacro
 
   clickableWatcher_wuid   := '<a href="/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=' + Child_watcher_Wuid + '">' + Child_watcher_Wuid + '</a>';
 
-  StartDataset          := dataset([{'',Child_Wuid,'','','',piteration,pversion,'',''}],wk_ut.layouts.wks_slim);
+  StartDataset          := dataset([{'','',Child_Wuid,'',''  ,'','',piteration,pversion,'',''}],wk_ut.layouts.wks_slim);
+  // StartDataset          := dataset([{'',Child_Wuid,'','','',piteration,pversion,'',''}],wk_ut.layouts.wks_slim);
   
   kick_Off_Child := sequential(
        output(try_Number                                        ,named('Try_Number'                                                           ),overwrite)
@@ -140,7 +141,8 @@ functionmacro
 
   //name, wuid, iteration#, version, thor time, etc
 
-  dWUDetails  := dataset([{jobname ,Child_Wuid ,localesp,wk_ut._Constants.LocalENV,getstate ,piteration ,pversion ,thor_time,thor_time_secs,Run_Total_Thor_Time,Run_Total_Time_secs,'',0.0,wk_ut.getTimeDate(),Errors}] ,wk_ut.layouts.wks_slim);
+  dWUDetails   := dataset([{jobname ,'',Child_Wuid ,'',localesp,wk_ut._Constants.LocalENV,getstate ,piteration ,pversion ,thor_time,thor_time_secs,Run_Total_Thor_Time,Run_Total_Time_secs,'',0.0,wk_ut.getTimeDate(),'','','','',false,dataset([],wk_ut.layouts.lay_results),'',Errors}] ,wk_ut.layouts.wks_slim);
+  // dWUDetails:= dataset([{jobname ,Child_Wuid ,localesp,wk_ut._Constants.LocalENV,getstate ,piteration ,pversion ,thor_time,thor_time_secs,Run_Total_Thor_Time,Run_Total_Time_secs,'',0.0,wk_ut.getTimeDate(),Errors}] ,wk_ut.layouts.wks_slim);
   jobname2    := if(jobname != '' ,jobname ,Child_Wuid);
   sendemail   := wk_ut.Send_Email(
                              pNotifyEmails

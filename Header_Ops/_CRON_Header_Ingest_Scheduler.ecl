@@ -9,11 +9,11 @@
 // Expected execution time -> Estimated 24-48 hrs
 	
 import ut,wk_ut,_control,STD, header;
-#WORKUNIT('name', 'Header Ingest Scheduler');
+#WORKUNIT('name', 'PersonHeader: Build_Header_Ingest');
 			
 ECL0:=  
 '// Header_ops._CRON_Header_Ingest_Scheduler\n\n'
-+'// scheduler job name -> Header Ingest Scheduler\n\n'
++'// scheduler job name -> PersonHeader: Build_Header_Ingest\n\n'
 +'// ON_NOTIFY: Header_Ops.hdr_bld_ingest\n\n'
 +'// ACTIONS:\n'
 +'// -------------\n'
@@ -51,6 +51,7 @@ status := Header.LogBuildStatus(sf_name).Read[1].status;
 build_version := if(status <> 0, ver, today); // 0 -> Completed
 
 incremental := if(isMonthly, 'false', 'true');
+ingestType := if(isMonthly, 'monthly', 'incremental');
 
 ECL1 := '\n'
 +'#WORKUNIT(\'protect\',true);\n'
@@ -66,7 +67,7 @@ ECL1 := '\n'
 +'#OPTION (\'implicitGroupSubSort\',FALSE);\n\n'
 
 +'#stored (\'versionBuild\',\''+ build_version + '\');\n'
-+'#WORKUNIT(\'name\',\'' + build_version + ' Header Ingest\');\n\n'
++'#WORKUNIT(\'name\',\'' + build_version + ' Header Ingest ' + ingestType + '\');\n\n'
 
 +'Header_Ops.hdr_bld_ingest(\'' + build_version + '\',' + incremental + ', ' + status + ');\n';
 
@@ -100,7 +101,7 @@ NOC_MSG
 	;
     
 #WORKUNIT('protect',true);
-wk_ut.CreateWuid(ECL,THOR,wk_ut._constants.ProdEsp) : when('Header Ingest Scheduler')
+wk_ut.CreateWuid(ECL,THOR,wk_ut._constants.ProdEsp) : when('Build_Header_Ingest')
                             ,FAILURE(fileservices.sendemail(Header.email_list.BocaDevelopersEx
                                 ,'*** ALERT **** Header Ingest Scheduler Failure'
                                 ,NOC_MSG

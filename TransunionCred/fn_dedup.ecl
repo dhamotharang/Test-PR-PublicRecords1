@@ -13,9 +13,9 @@ Header.Layout_header t_rollup(Header.Layout_header le, Header.Layout_header ri) 
  self.dob                      := max(le.dob,ri.dob);
  self.phone                    := max(le.phone,ri.phone);
  self.dt_first_seen            := ut.Min2(le.dt_first_seen,ri.dt_first_seen);
- self.dt_last_seen             := ut.Max2(le.dt_last_seen,ri.dt_last_seen);
+ self.dt_last_seen             := Max(le.dt_last_seen,ri.dt_last_seen);
  self.dt_vendor_first_reported := ut.Min2(le.dt_vendor_first_reported,ri.dt_vendor_first_reported);
- self.dt_vendor_last_reported  := ut.Max2(le.dt_vendor_last_reported,ri.dt_vendor_last_reported);
+ self.dt_vendor_last_reported  := Max(le.dt_vendor_last_reported,ri.dt_vendor_last_reported);
  self                          := le;
 end;
 
