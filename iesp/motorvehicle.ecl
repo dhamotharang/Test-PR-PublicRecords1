@@ -71,7 +71,7 @@ export t_MVSearchRecord := record
 	dataset(t_MVSearchPerson) Registrants {xpath('Registrants/Registrant'), MAXCOUNT(Constants.MV.MaxCountRegistrants)};
 	iesp.share.t_Date RegistrationDate {xpath('RegistrationDate')};
 	boolean IsAccurintData {xpath('IsAccurintData')};//hidden[internal]
-	iesp.share.t_Date DateLastSeen {xpath('DateLastSeen')} := ROW({0,0,0},iesp.share.t_Date);
+	iesp.share.t_Date DateLastSeen {xpath('DateLastSeen')};
 	boolean NonDMVSource {xpath('NonDMVSource')};
 end;
 		
@@ -113,11 +113,11 @@ export t_MotorVehicleSearch2Option := record (iesp.share.t_BaseSearchOption)
 	string RealTimePermissibleUse {xpath('RealTimePermissibleUse')}; //values['','Government','LawEnforcement','Parking','VerifyFraudOrDebt','Litigation','InsuranceClaims','InsuranceUnderwriting','TowedAndImpounded','PrivateToll','PrivateInvestigative','PrivateInvestigativeLitigation','EmployerVerify','']
 	boolean DoCombined {xpath('DoCombined')};//hidden[internal]
 	boolean IncludeCriminalIndicators {xpath('IncludeCriminalIndicators')};//hidden[internal]
+	boolean IncludeNonRegulatedVehicleSources {xpath('IncludeNonRegulatedVehicleSources')};
 	boolean UseExperian {xpath('UseExperian')};//hidden[internal]
 	boolean InsuranceUsage {xpath('InsuranceUsage')};//hidden[internal]
 	boolean IncludeDevelopedVehicles {xpath('IncludeDevelopedVehicles')};//hidden[internal]
 	boolean AuthenticationUsage {xpath('AuthenticationUsage')};//hidden[internal]
-	boolean IncludeNonRegulatedVehicleSources {xpath('IncludeNonRegulatedVehicleSources')};
 	boolean MultiFamilyDwelling {xpath('MultiFamilyDwelling')};
 	integer RegistrationType {xpath('RegistrationType')};
 end;
@@ -137,6 +137,7 @@ export t_MotorVehicleSearchPersonOrBusiness := record (iesp.share.t_CriminalIndi
 	boolean FullNameMatch {xpath('FullNameMatch')};//hidden[internal]
 	boolean AddressMatch {xpath('AddressMatch')};//hidden[internal]
 	string30 NameSource {xpath('NameSource')};
+	string30 ReportedName {xpath('ReportedName')};
 end;
 		
 export t_MotorVehicleSearchRegistrationInfo := record
@@ -169,6 +170,7 @@ export t_MotorVehicleSearchRegistrant := record
 	t_MotorVehicleSearchRegistrationInfo RegistrationInfo {xpath('RegistrationInfo')};
 	t_VendorInfo VendorInfo {xpath('VendorInfo')};
 	iesp.share.t_Date TitleIssueDate {xpath('TitleIssueDate')};
+	string17 TitleNumber {xpath('TitleNumber')};
 end;
 		
 export t_MotorVehicleSearchOwner := record
@@ -238,7 +240,7 @@ end;
 		
 export t_MotorVehicleSearch2Record := record
 	boolean AlsoFound {xpath('AlsoFound')};
-	iesp.share.t_Date DateLastSeen {xpath('DateLastSeen')} := ROW({0,0,0},iesp.share.t_Date);
+	iesp.share.t_Date DateLastSeen {xpath('DateLastSeen')};
 	string DataSource {xpath('DataSource')}; //values['All','Local','RealTime','']
 	boolean NonDMVSource {xpath('NonDMVSource')};
 	t_MotorVehicleSearchVehicleInfo VehicleInfo {xpath('VehicleInfo')};
@@ -366,12 +368,12 @@ export t_VINAData := record
 end;
 		
 export t_MVReportBrand := record
-	share.t_Date Date {xpath('Date')};
+	iesp.share.t_Date Date {xpath('Date')};
 	string State {xpath('State')};
 	string Code {xpath('Code')};
 	string _Type {xpath('Type')};
 end;
-
+		
 export t_MVReportRecord := record
 	string2 StateOfOrigin {xpath('StateOfOrigin')};
 	string20 VID {xpath('VID')};
@@ -404,6 +406,7 @@ export t_MVReportRecord := record
 	iesp.share.t_Date RegistrationEffectiveDate {xpath('RegistrationEffectiveDate')};
 	string25 SeriesName {xpath('SeriesName')};
 	string50 ExternalKey {xpath('ExternalKey')};
+	boolean IsAccurintData {xpath('IsAccurintData')};//hidden[internal]
 end;
 		
 export t_MVReportResponse := record
@@ -473,6 +476,7 @@ export t_MotorVehicleReportPersonOrBusiness := record
 	string70 BusinessName {xpath('BusinessName')};
 	string12 BusinessId {xpath('BusinessId')};
 	string30 NameSource {xpath('NameSource')};
+	string30 ReportedName {xpath('ReportedName')};
 end;
 		
 export t_MotorVehicleReportRegistrationInfo := record
@@ -507,6 +511,7 @@ export t_MotorVehicleReportRegistrant := record
 	t_MotorVehicleReportPersonOrBusiness RegistrantInfo {xpath('RegistrantInfo')};
 	t_MotorVehicleReportRegistrationInfo RegistrationInfo {xpath('RegistrationInfo')};
 	iesp.share.t_Date TitleIssueDate {xpath('TitleIssueDate')};
+	string17 TitleNumber {xpath('TitleNumber')};
 end;
 		
 export t_MotorVehicleReportOwner := record

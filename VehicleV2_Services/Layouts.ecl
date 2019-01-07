@@ -99,6 +99,8 @@ EXPORT Layouts := MODULE;
 		string8 title_issue_date;
 		string1 name_source_cd;
 		string30 name_source;
+		string17 title_number; 		// populated with data from ExperianVIN gateway	
+		string30 reported_name;		// populated with data from ExperianVIN gateway			
 	END;
 
 	export Layout_Report_Title_New := record
@@ -132,7 +134,7 @@ EXPORT Layouts := MODULE;
 	     VehicleV2.Layout_Base_Party.Append_BDID;
 		VehicleV2.Layout_Base_Party.Append_SSN;
 		VehicleV2.Layout_Base_Party.Append_Fein;
-		Layout_Report_Title;
+		VehicleV2_Services.Layout_Report_Title;
 		VehicleV2.Layout_Base_Party.Date_Vendor_first_Reported;
 		VehicleV2.Layout_Base_Party.Date_Vendor_Last_Reported;
 		VehicleV2.Layout_Base_Party.SRC_FIRST_DATE;
@@ -145,10 +147,11 @@ EXPORT Layouts := MODULE;
 		string12 append_bdid;
 		BIPV2.IDlayouts.l_header_ids;
 		layout_match_flags matchFlags;
-    boolean HasCriminalConviction;
-    boolean IsSexualOffender;
+    	boolean HasCriminalConviction;
+    	boolean IsSexualOffender;
 		string10   geo_lat := '';
 		string11   geo_long := '';
+		string30 reported_name;
 	END;
 
 	export Layout_Report_Vehicle_New := RECORD
@@ -305,15 +308,15 @@ EXPORT lic_plate_key_payload_fields_New := RECORD
 		VehicleV2.Layout_Base_Party.Reg_Status_Code;             // registration status code
 		VehicleV2.Layout_Base_Party.Reg_Status_Desc;             // registration status description
 	
-	Layout_Report_Plate;
-	Layout_Report_Title;
+	VehicleV2_Services.Layout_Report_Plate;
+	VehicleV2_Services.Layout_Report_Title;
 	VehicleV2.Layout_Base_Party.SRC_FIRST_DATE;
 	VehicleV2.Layout_Base_Party.SRC_LAST_DATE;
 END;
 
 	export Layout_Report_Batch_New := record
 		string20 acctno;
-		Layout_Report;
+		vehicleV2_Services.Layout_Report;
 	end;
 
 	EXPORT standard__addr := RECORD
