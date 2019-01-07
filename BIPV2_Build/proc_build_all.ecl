@@ -127,7 +127,7 @@ functionmacro
     sumsecondstotal            := sum(get_wuids_filttotal,Total_Time_secs);
     totalthortimetotal         := wk_ut.ConvertSecs2ReadableTime(sumsecondstotal);
     outputSumTimingstotal      := sequential(
-                                     tools.macf_WriteFile('~bipv2_build::' + pversion + '::workunit_history::Total',dataset([{'Total','','','',pversion,totalthortimetotal,sumsecondstotal,totalthortimetotal,sumsecondstotal}],wk_ut.layouts.wks_slim),false,false,true)
+                                     tools.macf_WriteFile('~bipv2_build::' + pversion + '::workunit_history::Total',dataset([{'Total','','','','','','','',pversion,totalthortimetotal,sumsecondstotal,totalthortimetotal,sumsecondstotal}],wk_ut.layouts.wks_slim),false,false,true)
                                     ,std.file.addsuperfile('~bipv2_build::qa::workunit_history','~bipv2_build::' + pversion + '::workunit_history::Total')
                                   );
 

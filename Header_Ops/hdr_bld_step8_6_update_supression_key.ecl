@@ -35,14 +35,3 @@ build_key(string filedatE) := sequential(
 filedate := '20180821'; // RUN ON THOR (NOT ON hthor)
 build_key(filedate);
 /* STEP 4 build key   see W:\Workspaces\BWR_PublicRecordsHdr\hdr_bld_step9_3_update_supression_key.ecl */ /* this needs to be run afterwards */
-// /* STEP 5 */ promote; // hthor /* this needs to be run afterwards */
-
-// DO NOT USE THIS FOR "promote_key;" USE THE FOLLOWING "OTHER BWR":
-// OTHER BWR: W:\Workspaces\BWR_PublicRecordsHdr\hdr_bld_step2_2_upd_suprsons.ecl
-// Previous runs (document in other BWR)
-// *** NOT HERE *** USE OTHER BWR *** NOT HERE *** USE OTHER BWR ***
-// |SEE OTHER BWR   | NOT IN THIS BWR|OTR BWR |
-
-//20180821 W20181003-100055
-//20180724 W20180907-103809
-//20180522 W20180629-114846

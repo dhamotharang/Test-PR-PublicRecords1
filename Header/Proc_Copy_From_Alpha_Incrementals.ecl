@@ -9,9 +9,9 @@ shared lastUpdatesFCRAqa_SF:='~thor_data400::key::fcra::header::address_rank_qa'
 shared lastUpdatesWklyQA_SF:='~thor_data400::key::header::qa::addr_unique_expanded';
 
 // Gets the version from the latest QA file on Thor
-export lastestIkbVersionOnThor  := regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatedLabQA_SF)[1].name, 0);
-export lastestFCRAversionOnThor := regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesFCRAqa_SF)[1].name, 0);
-export lastestWklyversionOnThor := regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesWklyQA_SF)[1].name, 0);
+export lastestIkbVersionOnThor  := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatedLabQA_SF)[1].name, 0));
+export lastestFCRAversionOnThor := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesFCRAqa_SF)[1].name, 0));
+export lastestWklyversionOnThor := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesWklyQA_SF)[1].name, 0));
 
 
 // generic function to get the FIRST subfie in the super
@@ -43,9 +43,6 @@ END;
 
 EXPORT  filedate := getFileVersion(ut.foreign_aprod+'thor_data400::key::insuranceheader_xlink::inc_boca::did::refs::relative',true):INDEPENDENT ;
 
-// check if we have a local copy already   
-EXPORT ok_to_copy(string filedt) := filedt<>'' and (~std.file.fileexists('~thor_data400::key::insuranceheader_xlink::'+filedt+'::did::refs::address'));
-
 SHARED fc(string f1, string f2):= sequential(
     output(dataset([{f1,'thor400_44',f2}],{string src,string clsr, string trg}),named('copy_report'),extend),
     if(~test_copy,if(~std.file.FileExists(f2),STD.File.Copy('~'+f1,'thor400_44',f2,,,,,true,true,,true))));
@@ -58,7 +55,7 @@ EXPORT copy_addr_uniq_keys_from_alpha(string filedt) := function
   
   aDali := _control.IPAddress.aprod_thor_dali;
   lc := '~foreign::' + aDali + '::';
-  get_alogical(string sf):=fileservices.GetSuperFileSubName(lc+sf,1);
+  get_alogical(string sf):=nothor(fileservices.GetSuperFileSubName(lc+sf,1));
     
   AddrSFKeyName(boolean fcra)  := '~thor_data400::key::' + if(fcra, 'fcra::', '') + 'header::qa::addr_unique_expanded';
   AddrDSFKeyName(boolean fcra) := '~thor_data400::key::' + if(fcra, 'fcra::', '') + 'header::delete::addr_unique_expanded';
@@ -71,8 +68,8 @@ EXPORT copy_addr_uniq_keys_from_alpha(string filedt) := function
     
   moveKeys := sequential(    
         STD.File.StartSuperFileTransaction( )
-       ,STD.file.PromoteSuperFileList([AddrSFKeyName(true), AddrDSFKeyName(true)], AddrLFKeyName(true)) //Fcra
-       ,STD.file.PromoteSuperFileList([AddrSFKeyName(false), AddrDSFKeyName(false)], AddrLFKeyName(false)) //NFcra
+       ,nothor(STD.file.PromoteSuperFileList([AddrSFKeyName(true), AddrDSFKeyName(true)], AddrLFKeyName(true))) //Fcra
+       ,nothor(STD.file.PromoteSuperFileList([AddrSFKeyName(false), AddrDSFKeyName(false)], AddrLFKeyName(false))) //NFcra
        ,STD.File.FinishSuperFileTransaction( )
        );
   
@@ -93,7 +90,7 @@ EXPORT copy_from_alpha(string filedt) := function
     aDali := _control.IPAddress.aprod_thor_dali;
 
     lc := '~foreign::' + aDali + '::';
-    get_alogical(string sf):=fileservices.GetSuperFileSubName(lc+sf,1);
+    get_alogical(string sf):=nothor(fileservices.GetSuperFileSubName(lc+sf,1));
     
     // incremental key prefix
     aPref := 'thor_data400::key::insuranceheader_xlink::inc_boca::';
@@ -143,38 +140,37 @@ SHARED updateSupers(string kNm,boolean skipIncSFupdate=false,string kNml=kNm, st
     output(dataset([{'remove',fName8('qa' ,kNm),currLgInc8(kNm)}],{string20 action, string f1, string f2}),named('action_report'),extend);
 
     output(dataset([{'remove',fName('inc',kNm),''}],{string20 action, string f1, string f2}),named('action_report'),extend);
-    output(dataset([{'clear ',fName('inc',kNm),''}],{string20 action, string f1, string f2}),named('action_report'),extend);
     output(dataset([{'add   ',fName('inc',kNm),fName(filedt,kNml)}],{string20 action, string f1, string f2}),named('action_report'),extend);
     output(dataset([{'add   ',fName('inc',kNm),fName8(filedt,kNml)}],{string20 action, string f1, string f2}),named('action_report'),extend);
 
     output(dataset([{'add   ',fName( 'qa' ,kNm),fName(filedt,kNml)}],{string20 action, string f1, string f2}),named('action_report'),extend);
     output(dataset([{'add   ',fName4('qa' ,kNm),fName(filedt,kNml)}],{string20 action, string f1, string f2}),named('action_report'),extend);
-    output(dataset([{'add   ',fName8( 'qa' ,kNm),fName8(filedt,kNml)}],{string20 action, string f1, string f2}),named('action_report'),extend);
+    output(dataset([{'add   ',fName8('qa' ,kNm),fName8(filedt,kNml)}],{string20 action, string f1, string f2}),named('action_report'),extend);
                   
     if(~test_copy, sequential(
        std.file.startsuperfiletransaction(),
                           
        // remove the previous incrementals from the monthly regular lab key qa superfiles
-       if(count(std.file.LogicalFileSuperOwners(currLgInc(kNm))('~'+name=fName('qa' ,kNm)))>0,
-          std.file.RemoveSuperFile          (fName('qa' ,kNm),currLgInc(kNm))          ),
+       nothor(if(count(std.file.LogicalFileSuperOwners(currLgInc(kNm))('~'+name=fName('qa' ,kNm)))>0,
+          std.file.RemoveSuperFile          (fName('qa' ,kNm),currLgInc(kNm))          )),
 
-       if(count(std.file.LogicalFileSuperOwners(currLgInc(kNm))('~'+name=fName4('qa' ,kNm)))>0,
-          std.file.RemoveSuperFile          (fName4('qa' ,kNm),currLgInc(kNm))          ),
+       nothor(if(count(std.file.LogicalFileSuperOwners(currLgInc(kNm))('~'+name=fName4('qa' ,kNm)))>0,
+          std.file.RemoveSuperFile          (fName4('qa' ,kNm),currLgInc(kNm))          )),
      
-       if(count(std.file.LogicalFileSuperOwners(currLgInc8(kNm))('~'+name=fName8('qa' ,kNm)))>0,
-          std.file.RemoveSuperFile          (fName8('qa' ,kNm),currLgInc8(kNm))          ),
+       nothor(if(count(std.file.LogicalFileSuperOwners(currLgInc8(kNm))('~'+name=fName8('qa' ,kNm)))>0,
+          std.file.RemoveSuperFile          (fName8('qa' ,kNm),currLgInc8(kNm))          )),
                   
        // We add both to make sure the monthly
        // std.file.RemoveOwnedSubFiles      (fName('inc',kNm)),
-       if(~skipIncSFupdate,std.file.RemoveOwnedSubFiles      (fName('inc',kNm),true)),
-       if(~skipIncSFupdate,std.file.clearsuperfile           (fName('inc',kNm))),
-       if(~skipIncSFupdate,std.file.addsuperfile             (fName('inc',kNm),fName(filedt,kNml))),
-       if(~skipIncSFupdate,std.file.addsuperfile             (fName('inc',kNm),fName8(filedt,kNml))),
+       nothor(if(~skipIncSFupdate,std.file.RemoveOwnedSubFiles      (fName('inc',kNm),true))),
+       nothor(if(~skipIncSFupdate,std.file.clearsuperfile           (fName('inc',kNm)))),
+       nothor(if(~skipIncSFupdate,std.file.addsuperfile             (fName('inc',kNm),fName(filedt,kNml)))),
+       nothor(if(~skipIncSFupdate,std.file.addsuperfile             (fName('inc',kNm),fName8(filedt,kNml)))),
                
        // Add the new incrementals to the monthly regular lab keys qa superfiles
-       std.file.AddSuperFile             (fName ('qa',kNm),fName (filedt,kNml)),
-       std.file.AddSuperFile             (fName4('qa',kNm),fName (filedt,kNml)),
-       std.file.AddSuperFile             (fName8('qa',kNm),fName8(filedt,kNml)),
+       nothor(std.file.AddSuperFile             (fName ('qa',kNm),fName (filedt,kNml))),
+       nothor(std.file.AddSuperFile             (fName4('qa',kNm),fName (filedt,kNml))),
+       nothor(std.file.AddSuperFile             (fName8('qa',kNm),fName8(filedt,kNml))),
        std.file.finishsuperfiletransaction()
     ))
   );
@@ -281,17 +277,26 @@ SHARED orbit_update_entries(string createORupdate, string skipPackage='000') := 
        );
 END;
 
+// check if we have a local copy already   
+EXPORT ok_to_copy(string filedt) := filedt<>'' and (~std.file.fileexists('~thor_data400::key::insuranceheader_xlink::'+filedt+'::did::refs::idl')) and (~std.file.fileexists('~thor400_36::key::insuranceheader_xlink::'+filedt+'::did::refs::idl'));
+SHARED ok_to_copy_UniqExKeys(string filedt) := filedt<>'' and (~std.file.fileexists('~thor_data400::key::header::' + filedt + '::addr_unique_expanded'));
+
 // run on hthor
 EXPORT Refresh_copy(string filedt) :=  FUNCTION
 
-    nocopy := ~test_copy AND ~ok_to_copy(filedt);
-
-    return if(nocopy
-         ,output('No copy. see outputs')
-         ,sequential(
-           copy_from_alpha(filedt)
-          ,copy_addr_uniq_keys_from_alpha(filedt)
-        ));
+    noLABcopy := ~test_copy AND ~ok_to_copy(filedt);
+    cpLab := if(noLABcopy
+             ,output('No LAB copy. see outputs')
+             ,copy_from_alpha(filedt)
+             );
+             
+    noUniqExcopy := ~test_copy AND ~ok_to_copy_UniqExKeys(filedt);
+    cpUniqEx := if(noUniqExcopy
+             ,output('No Address Unique Expanded copy. see outputs')
+             ,copy_addr_uniq_keys_from_alpha(filedt)
+             );
+             
+    return sequential(cpLab, cpUniqEx);
 END;
 
 EXPORT movetoQA(string filedt) := sequential(

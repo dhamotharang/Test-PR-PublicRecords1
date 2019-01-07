@@ -1,7 +1,7 @@
 ﻿IMPORT FraudShared;
 EXPORT Mac_TestRecordID(   
 	string pversion
-	,dataset(FraudShared.Layouts.Base.Main)	pBaseMainFile	=	FraudShared.Files().Base.Main.QA
+	,dataset(FraudShared.Layouts.Base.Main)	pBaseMainFile	=	FraudShared.Files().Base.Main.Built
 ) := 
 FUNCTION
 	main := table(pBaseMainFile, {record_id; cnt := count(group)}, record_id );

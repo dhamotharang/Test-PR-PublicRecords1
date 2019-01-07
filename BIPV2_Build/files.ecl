@@ -20,5 +20,6 @@ module
 
 	export workunit_history   := tools.macf_FilesBase	(fnames.workunit_history ,wk_ut.Layouts.wks_slim          ,pOpt := true);
 	export workunit_history_  := tools.macf_FilesBase	(fnames.workunit_history ,wk_ut.Layouts.wks_slim_filename ,pOpt := true);
+	export workunit_history_old  := tools.macf_FilesBase	(fnames.workunit_history ,wk_ut.Layouts.wks_slim_filename_old ,pOpt := true);
 	
 end;
