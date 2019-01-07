@@ -271,6 +271,7 @@ EXPORT Layouts := MODULE
     STRING8 code;
     STRING highestIndustryOrRiskLevel;
     STRING1 sicNAICSIndicator;
+		STRING2 industryCategory;
   END;
 	
 	EXPORT SicNaicRiskLayout := RECORD

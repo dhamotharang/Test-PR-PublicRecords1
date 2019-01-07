@@ -43,8 +43,12 @@ EXPORT LayoutsInternalReport := MODULE
 	END;
 
 
-
-
+	EXPORT IndivBusAssociationLayout := RECORD
+	 DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout;
+	 UNSIGNED6 inputSeq;
+	 UNSIGNED6 inquiredDID;
+   iesp.duediligencepersonreport.t_DDRBusinessAssocationDetails association;
+	END;
  
 // ------                                                                             ------
 // ------    define an intermediate layout to hold information about these executives ------ 

@@ -8,26 +8,26 @@ EXPORT reportBusRegisteredAgents(DATASET(DueDiligence.layouts.Busn_Internal) inD
     
     getCleanAgents(DATASET(DueDiligence.LayoutsInternal.Agent) agents, BOOLEAN agentsAreBusiness) := FUNCTION
       cleanedAgent := PROJECT(agents, TRANSFORM({RECORDOF(LEFT), UNSIGNED6 agentID, DATASET(DueDiligence.Layouts.CleanedData) clean},
-                                                    SELF.clean := PROJECT(LEFT, TRANSFORM(DueDiligence.Layouts.CleanedData,
-                                                                                          SELF.cleanedInput.business.accountNumber := IF(agentsAreBusiness, (STRING)COUNTER, DueDiligence.Constants.EMPTY);
-                                                                                          SELF.cleanedInput.business.companyName := IF(agentsAreBusiness, LEFT.agent.fullname, DueDiligence.Constants.EMPTY);
-                                                                                          SELF.cleanedInput.business.address := IF(agentsAreBusiness, LEFT.agent);
-                                                                                          SELF.inputEcho.business.accountNumber := IF(agentsAreBusiness, (STRING)COUNTER, DueDiligence.Constants.EMPTY);
-                                                                                          
-                                                                                          
-                                                                                          SELF.cleanedInput.fullAddressProvided := TRUE;
-                                                                                          SELF.cleanedInput.individual.name := IF(agentsAreBusiness = FALSE, LEFT.agent);
-                                                                                          SELF.cleanedInput.individual.address := IF(agentsAreBusiness = FALSE, LEFT.agent);
-                                                                                          
-                                                                                          SELF.cleanedInput.historyDateYYYYMMDD := LEFT.historyDate;
-                                                                                          SELF.cleanedInput.seq := COUNTER;
-                                                                                          SELF.inputEcho.seq := COUNTER;
-                                                                                          
-                                                                                          
-                                                                                          SELF := [];));
-                                                                                                      
-                                                    SELF := LEFT;
-                                                    SELF := [];));
+																									SELF.clean := PROJECT(LEFT, TRANSFORM(DueDiligence.Layouts.CleanedData,
+																																												SELF.cleanedInput.business.accountNumber := IF(agentsAreBusiness, (STRING)COUNTER, DueDiligence.Constants.EMPTY);
+																																												SELF.cleanedInput.business.companyName := IF(agentsAreBusiness, LEFT.agent.fullname, DueDiligence.Constants.EMPTY);
+																																												SELF.cleanedInput.business.address := IF(agentsAreBusiness, LEFT.agent);
+																																												SELF.inputEcho.business.accountNumber := IF(agentsAreBusiness, (STRING)COUNTER, DueDiligence.Constants.EMPTY);
+																																												
+																																												
+																																												SELF.cleanedInput.fullAddressProvided := TRUE;
+																																												SELF.cleanedInput.individual.name := IF(agentsAreBusiness = FALSE, LEFT.agent);
+																																												SELF.cleanedInput.individual.address := IF(agentsAreBusiness = FALSE, LEFT.agent);
+																																												
+																																												SELF.cleanedInput.historyDateYYYYMMDD := LEFT.historyDate;
+																																												SELF.cleanedInput.seq := COUNTER;
+																																												SELF.inputEcho.seq := COUNTER;
+																																												
+																																												
+																																												SELF := [];));
+																																																		
+																									SELF := LEFT;
+																									SELF := [];));
                                                     
       RETURN cleanedAgent;
     
@@ -61,7 +61,7 @@ EXPORT reportBusRegisteredAgents(DATASET(DueDiligence.layouts.Busn_Internal) inD
     
     
     //get LexIDs
-    busLexIDs := DueDiligence.getBusBIPId(cleanBusAgent.clean, options, linkingOptions, FALSE);
+    busLexIDs := DueDiligence.getBusInfo(cleanBusAgent.clean);
     indLexIDs := DueDiligence.getIndDID(cleanIndAgent.clean, options.DataRestrictionMask, options.DPPA_Purpose, options.GLBA_Purpose,
                                         DueDiligence.CitDDShared.DEFAULT_BS_VERSION, DueDiligence.CitDDShared.DEFAULT_BS_OPTIONS);
    
