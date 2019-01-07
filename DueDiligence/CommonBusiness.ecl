@@ -737,4 +737,57 @@ EXPORT CommonBusiness := MODULE
 		RETURN rollSources;
 	ENDMACRO;  
 	
+	
+	//calculate best sic and naics - taken from Business_Risk_BIP.Business_Shell_Function
+  EXPORT getBestSicOrNaic(ds, sicNaicFieldName) := FUNCTIONMACRO
+    
+    sortSources := SORT(ds, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), source, sicNaicFieldName, -isPrimary, -dateLastSeen, -dateFirstSeen);
+    rollCodes := ROLLUP(sortSources,
+                        #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
+                        LEFT.source = RIGHT.source AND
+                        LEFT.sicNaicFieldName = RIGHT.sicNaicFieldName,
+                        TRANSFORM(RECORDOF(LEFT),
+                                  SELF.dateFirstSeen := IF(LEFT.dateFirstSeen > 0 AND RIGHT.dateFirstSeen > 0, MIN(LEFT.dateFirstSeen, RIGHT.dateFirstSeen), MAX(LEFT.dateFirstSeen, RIGHT.dateFirstSeen));
+                                  SELF.dateLastSeen := MAX(LEFT.dateLastSeen, RIGHT.dateLastSeen);
+                                  SELF := LEFT;));
+                                
+    prepBestSicNaic := SORT(rollCodes(isPrimary), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), -(source = 'DF'), -(source = 'ER'), -(source = 'Y'), -(source = 'OS'), -(source = 'BR'), -(source = 'FH'), -(source = 'C#'), -(source = 'DN'), -dateLastSeen, -dateFirstSeen);
+    
+    //grab the 1st row for each inquired business - for which we determined best sic/naic
+    bestSicNaic := DEDUP(prepBestSicNaic, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
+    
+    RETURN bestSicNaic;
+  ENDMACRO;  
+  
+  EXPORT getRiskiestSicOrNaic(ds, sicNaicFieldName, sicNaicIndustryFieldName, sicNaicRiskLevelFieldName) := FUNCTIONMACRO
+    
+    sortSources := SORT(ds, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), source, sicNaicFieldName, -isPrimary, -dateLastSeen, -dateFirstSeen);
+    rollCodes := ROLLUP(sortSources,
+                        #EXPAND(DueDiligence.Constants.mac_JOINLinkids_Results()) AND
+                        LEFT.source = RIGHT.source AND
+                        LEFT.sicNaicFieldName = RIGHT.sicNaicFieldName,
+                        TRANSFORM(RECORDOF(LEFT),
+                                  SELF.dateFirstSeen := IF(LEFT.dateFirstSeen > 0 AND RIGHT.dateFirstSeen > 0, MIN(LEFT.dateFirstSeen, RIGHT.dateFirstSeen), MAX(LEFT.dateFirstSeen, RIGHT.dateFirstSeen));
+                                  SELF.dateLastSeen := MAX(LEFT.dateLastSeen, RIGHT.dateLastSeen);
+                                  SELF := LEFT;));
+                                
+    prepRiskySicNaic := SORT(rollCodes(isPrimary), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), 
+                              -(sicNaicIndustryFieldName = DueDiligence.Constants.INDUSTRY_CASH_INTENSIVE_BUSINESS_RETAIL), 
+                              -(sicNaicIndustryFieldName = DueDiligence.Constants.INDUSTRY_CASH_INTENSIVE_BUSINESS_NON_RETAIL), 
+                              -(sicNaicIndustryFieldName = DueDiligence.Constants.INDUSTRY_MONEY_SERVICE_BUSINESS), 
+                              -(sicNaicIndustryFieldName = DueDiligence.Constants.INDUSTRY_NON_BANK_FINANCIAL_INSTITUTIONS), 
+                              -(sicNaicIndustryFieldName = DueDiligence.Constants.INDUSTRY_CASINO_AND_GAMING),
+                              -(sicNaicIndustryFieldName = DueDiligence.Constants.INDUSTRY_LEGAL_ACCOUNTANT_TELEMARKETER_FLIGHT_TRAVEL), 
+                              -(sicNaicIndustryFieldName = DueDiligence.Constants.INDUSTRY_AUTOMOTIVE), 
+                              -(sicNaicRiskLevelFieldName = DueDiligence.Constants.RISK_LEVEL_HIGH), 
+                              -(sicNaicRiskLevelFieldName = DueDiligence.Constants.RISK_LEVEL_MEDIUM), 
+                              -(sicNaicRiskLevelFieldName = DueDiligence.Constants.RISK_LEVEL_LOW), 
+                              -sicNaicFieldName, -dateLastSeen, -dateFirstSeen);
+    
+    //grab the 1st row for each inquired business - for which we determined best sic/naic
+    riskySicNaic := DEDUP(prepRiskySicNaic, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
+    
+    RETURN riskySicNaic;
+  ENDMACRO; 
+	
 END;

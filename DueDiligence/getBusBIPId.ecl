@@ -73,7 +73,6 @@ EXPORT getBusBIPId(DATASET(DueDiligence.Layouts.CleanedData) indata,
 																			SELF.busn_info.BIP_IDs.SeleID.LinkID := RIGHT.SeleID.LinkID;
 																			SELF.busn_info.BIP_IDs.ProxID.LinkID := RIGHT.ProxID.LinkID;
 																			SELF.busn_info.BIP_IDs.PowID.LinkID := RIGHT.PowID.LinkID;
-																			SELF.weight := RIGHT.weight;
 																			
 																			SELF.busn_info.lexID := (STRING)RIGHT.SeleID.LinkID;
 																			SELF.historyDate := LEFT.cleanedInput.historyDateYYYYMMDD;

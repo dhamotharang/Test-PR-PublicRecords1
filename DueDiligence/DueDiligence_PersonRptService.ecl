@@ -21,7 +21,9 @@ EXPORT DueDiligence_PersonRptService := MACRO
 			
 
 		//********************************************************PERSON ATTRIBUTES STARTS HERE**********************************************************
-			consumerResults := DueDiligence.getIndAttributes(cleanData, DPPA, glba, drm, DD_SSNMask, includeReport, displayAttributeText, debugIndicator);
+      DueDiligence.CommonQuery.mac_GetBusinessOptionSettings(dppa, glba, drm, dpm, userIn.IndustryClass);
+      
+			consumerResults := DueDiligence.getIndAttributes(cleanData, DPPA, glba, drm, DD_SSNMask, includeReport, displayAttributeText, debugIndicator, busOptions, busLinkingOptions);
 		 
 			indIndex := DueDiligence.CommonQuery.GetIndividualAttributes(consumerResults);
 			indIndexHits := DueDiligence.CommonQuery.GetIndividualAttributeFlags(consumerResults);

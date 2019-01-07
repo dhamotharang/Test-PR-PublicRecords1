@@ -7,8 +7,11 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 																								BOOLEAN includeReport = FALSE,
 																								BOOLEAN displayAttributeText = FALSE,
                                                 string6 DD_SSNMask = '',
-                                                BOOLEAN debugMode = FALSE
-                                                ) := FUNCTION
+                                                BOOLEAN debugMode = FALSE) := FUNCTION
+
+
+
+	BOOLEAN includeAllBusinessData := TRUE;
 
 
 	// ------                                                                                     ------
@@ -17,8 +20,7 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	// ------ Essentially this routine will either search by LEXID if it was input                ------
 	// ------   OR                                                                                ------
 	// ------ this routine will call the BIP Linking Process using the input address              ------
-	// ------ and return the results back in the Busn_Internal layout for further processing      ------
-	 
+	// ------ and return the results back in the Busn_Internal layout for further processing      ------	 
 	inquiredBus := DueDiligence.getBusBIPId(cleanedInput, options, linkingOptions, includeReport);
 	
 	//seperate those with BIP IDs and those without/not found
@@ -33,7 +35,7 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	linkedBus := DueDiligence.getBusLinkedBus(busBestData, options, linkingOptions, DD_SSNMask);
 	
 	//Get executives from inquired businesses
-	busExecs := DueDiligence.getBusExec(linkedBus, options, linkingOptions, includeReport);
+	busExecs := DueDiligence.getBusExec(linkedBus, options, linkingOptions);
   
 	//Get related businesses
 	relatedBus := DATASET([], DueDiligence.Layouts.Busn_Internal);
@@ -52,14 +54,14 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	
 	busVehicle := DueDiligence.getBusVehicle(busAircraft, options, linkingOptions);
 
-	busReg := DueDiligence.getBusRegistration(busVehicle, options, linkingOptions);
+	busReg := DueDiligence.getBusRegistration(busVehicle, options, includeAllBusinessData);
 	
 	busGeoRisk := DueDiligence.getBusGeographicRisk(busReg, options);   
 
 	//attributes taking in inquired and linked businesses
-	busHeader := DueDiligence.getBusHeader(busGeoRisk, options, linkingOptions, includeReport);
+	busHeader := DueDiligence.getBusHeader(busGeoRisk, options, linkingOptions, includeAllBusinessData, includeReport);
 	
-	busSOS := DueDiligence.getBusSOSDetail(busHeader, options, linkingOptions, includeReport);
+	busSOS := DueDiligence.getBusSOSDetail(busHeader, options, includeAllBusinessData, includeReport);
 
 	//attributes that must be called after other attributes
 	addrRisk := DueDiligence.getBusAddrData(busSOS, options, includeReport);  //must be called after getBusSOSDetail & getBusRegistration
@@ -98,7 +100,7 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	IF(debugMode, OUTPUT(busProperty, NAMED('busProperty')));
 	IF(debugMode, OUTPUT(busWatercraft, NAMED('busWatercraft')));
 	IF(debugMode, OUTPUT(busAircraft, NAMED('busAircraft')));	
-  IF(debugMode, OUTPUT(busVehicle, NAMED('busVehicle')));	
+	IF(debugMode, OUTPUT(busVehicle, NAMED('busVehicle')));	
 	IF(debugMode, OUTPUT(busReg, NAMED('busReg')));	
 	IF(debugMode, OUTPUT(busGeoRisk, NAMED('busGeoRisk')));	
 	
