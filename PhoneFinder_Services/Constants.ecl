@@ -146,6 +146,7 @@ EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFil
 		EXPORT STRING10 optInType   := 'Whitelist';
 		EXPORT STRING5 	optInMethod := 'TCO';
 		EXPORT STRING3 	optinDuration := 'ONG';
+    EXPORT UNSIGNED1 IdentityDateThreshold := 61;
 	END;
 	
 	EXPORT ConsentLevels := MODULE
