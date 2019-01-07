@@ -1,5 +1,5 @@
 ﻿
-import RoxieKeyBuild,FCRA;
+import RoxieKeyBuild,FCRA,STD,_control;
 EXPORT Build_Keys(string infiledate, boolean isprte = false) := function
 	build_key(keydatasetname,datasetname,infiledate,environment,suffix,retval,keyedfield,legacy='false') := macro
 	
