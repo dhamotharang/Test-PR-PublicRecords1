@@ -221,7 +221,7 @@
 																											{'cl_element_count_', (STRING)LEFT.cl_element_count_},
 																											{'license_state_', (STRING)LEFT.license_state_},
 																											{'event_count_', (STRING)LEFT.event_count_}
-																											], FlagsRec);
+																											], FlagsRec)(Value <> '');
 															 SELF := LEFT));// : PERSIST('~temp::deleteme65');
 				
 
