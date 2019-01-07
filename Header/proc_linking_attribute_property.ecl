@@ -1,11 +1,10 @@
-IMPORT std,PromoteSupers,data_services;
+﻿IMPORT std,PromoteSupers,data_services;
 IMPORT $;
 
 EXPORT proc_linking_attribute_property:= FUNCTION
 
 lc := data_services.Data_location.person_header;
 iversion:=regexfind('[0-9]{8,8}',nothor(std.file.SuperFileContents(lc+'thor_data400::in::seqdheadersrc_fat')[1].name),0);
-#stored('versionBuild',iversion);
 
 all_prop_attribute_candidates:=$.fn_Linking_Attribute_Property:persist('~thor_data400::persist::header::linking_attribute::property');
 
