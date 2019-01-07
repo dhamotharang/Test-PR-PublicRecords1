@@ -196,6 +196,7 @@ MODULE
 	export src_Daily_Utilities           := 'DU';    
 	export src_Dunn_Bradstreet           := 'D ';  // aka D&B DMI
 	export src_Dunn_Bradstreet_Fein      := 'DN';
+	export src_Dunndata_Consumer		      	 := 'A3';  //DF-23679 Dunndata Consumer Masterfile
 	export src_EBR                       := 'ER';  // Experian Business Reports	
 	export src_Edgar                     := 'E ';  // US Securities and Exchange Commission, "Edgar" system data
 	export src_Emdeon                    := '7U';  // Emdeon Healthcare Claims
@@ -1680,6 +1681,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_Dummy_Records2            := [src_Dummy_Records2            ];
 	export set_Dunn_Bradstreet           := [src_Dunn_Bradstreet           ];
 	export set_Dunn_Bradstreet_Fein      := [src_Dunn_Bradstreet_Fein      ];
+	export set_Dunndata_Consumer         := [src_Dunndata_Consumer         ];
 	export set_EBR                       := [src_EBR                       ];
 	export set_Edgar                     := [src_Edgar                     ];
 	export set_Emdeon                    := [src_Emdeon                    ];
@@ -2197,6 +2199,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsDummy_Records              (string  sr) := sr               in set_Dummy_Records              ;
 	export SourceIsDunn_Bradstreet            (string  sr) := sr               in set_Dunn_Bradstreet            ;
 	export SourceIsDunn_Bradstreet_Fein       (string  sr) := sr               in set_Dunn_Bradstreet_Fein       ;
+	export SourceIsDunndata_Consumer          (string  sr) := sr               in set_Dunndata_Consumer          ;
 	export SourceIsEBR                        (string  sr) := sr               in set_EBR                        ;
 	export SourceIsEdgar                      (string  sr) := sr               in set_Edgar                      ;
 	export SourceIsEmedon                     (string  sr) := sr               in set_Emdeon                     ;
@@ -2727,6 +2730,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_Daily_Utilities						,'Daily Utilities'																					 }
 		,{src_Dunn_Bradstreet           ,'Dunn & Bradstreet'                                         }
 		,{src_Dunn_Bradstreet_Fein      ,'Dunn & Bradstreet Fein'                                    }
+		,{src_Dunndata_Consumer         ,'Dunn Data Consumer Masterfile'                             }
 		,{src_EBR                       ,'Experian Business Reports'                                 }
 		,{src_Edgar                     ,'Edgar'                                                     }
 		,{src_Emdeon                    ,'Emdeon Healthcare Claims'                                  }
@@ -3236,6 +3240,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 //		,src_Daily_Utilities					 => 'Daily Utilities'																			
 		,src_Dunn_Bradstreet           => 'Dunn & Bradstreet'                                    
 		,src_Dunn_Bradstreet_Fein      => 'Dunn & Bradstreet Fein'                               
+		,src_Dunndata_Consumer         => 'Dunn Data Consumer Masterfile'                               
 		,src_EBR                       => 'Experian Business Reports'                            
 		,src_Edgar                     => 'Edgar'                                                
 		,src_Emdeon                    => 'Emdeon Healthcare Claims'                                                

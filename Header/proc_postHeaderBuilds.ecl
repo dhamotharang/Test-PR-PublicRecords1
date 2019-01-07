@@ -7,7 +7,7 @@ export proc_postHeaderBuilds := module
 
 		
 		shared elist_owners 				:=   'gabriel.marcan@lexisnexisrisk.com'
-											    +',Debendra.Kumar@lexisnexisrisk.com'
+                                                +',Debendra.Kumar@lexisnexisrisk.com'
 											    +',jose.bello@lexisnexisrisk.com'
                                                 ;
 
