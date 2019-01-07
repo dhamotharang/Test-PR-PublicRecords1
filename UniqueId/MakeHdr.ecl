@@ -46,6 +46,7 @@ shared string HdrSearchCriteria(string Watchlistname) := TRIM(
 				+	'<value id="7" name="Lebanon"/>\r\n'
 				+	'<value id="6" name="Liberia"/>\r\n'
 				+	'<value id="11" name="Libya"/>\r\n'
+				+	'<value id="22" name="Mali"/>\r\n'
 				+	'<value id="8" name="North Korea - Democratic People\'s Republic of Korea"/>\r\n'
 				+	'<value id="19" name="Resolution 1718 (2006) and Resolution 2270 (2016)"/>\r\n'
 				+	'<value id="17" name="Resolution 2270 (2016)-Annex III"/>\r\n'

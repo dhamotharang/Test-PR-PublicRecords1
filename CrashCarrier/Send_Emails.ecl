@@ -1,4 +1,4 @@
-import tools;
+﻿import tools;
 
 lay_builds 	:= tools.Layout_FilenameVersions.builds;
 
@@ -14,7 +14,7 @@ export Send_Emails(
 	,string								pPackageName						= 'CrashCarrierKeys'
 	,string								pBuildMessage						= 'Base Files Finished'
 	,string							  pUseVersion							= 'qa'
-	,string							  pEnvironment						= 'N|BN'		//	'B' - OSS Roxie, 'N' - nonfcra, 'F' - FCRA
+	,string							  pEnvironment						= 'N'		//	'B' - OSS Roxie, 'N' - nonfcra, 'F' - FCRA
 
 ) := 
 	tools.mod_SendEmails(

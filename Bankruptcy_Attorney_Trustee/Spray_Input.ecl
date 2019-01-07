@@ -3,7 +3,7 @@
 export Spray_Input(string filedate) := module
 
 export Attorney_file := DATASET([
- 	{'_Control.IPAddress.bctlpedata10'	                    //SourceIP			 Remote Server's IP address									
+ 	{_Control.IPAddress.bctlpedata10	                    //SourceIP			 Remote Server's IP address									
  	,'/data/hds_180/bankruptcy_attorney_trustee/data/'+filedate            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'Attorneys_*.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
  	,0                                                  //record_size	     record length of files to be sprayed(for fixed length files only)      
@@ -20,7 +20,7 @@ export Attorney_file := DATASET([
 
 
 export  Trustee_file := DATASET([
- 	{'_Control.IPAddress.bctlpedata10'	                    //SourceIP			 Remote Server's IP address									
+ 	{_Control.IPAddress.bctlpedata10	                    //SourceIP			 Remote Server's IP address									
  	,'/data/hds_180/bankruptcy_attorney_trustee/data/'+filedate            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'Trustees_*.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
  	,0                                                  //record_size	     record length of files to be sprayed(for fixed length files only)      
