@@ -1097,6 +1097,7 @@
 		export string KEYWORD_RUUSEM_50_WC					:= '785';		
 		export string KEYWORD_SECO_MAL							:= '786';		
 		export string KEYWORD_UN_MAL								:= '787';		
+		export string KEYWORD_INMHA_FCRA						:= '788';		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
 	
