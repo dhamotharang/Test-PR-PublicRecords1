@@ -13,7 +13,25 @@ EXPORT LayoutsInternal := MODULE
 	END; 
 	
 	
+	EXPORT BEOLayout := RECORD
+    InternalSeqAndIdentifiersLayout;
+    STRING title;
+    UNSIGNED4 partyFirstSeen;
+    UNSIGNED4 partyLastSeen;
+    BOOLEAN isExec;
+    BOOLEAN isOwnershipProng;
+    BOOLEAN isControlProng;
+    DueDiligence.Layouts.RelatedParty relatedParty;
+  END;
   
+  EXPORT IndBusAssociations := RECORD
+    UNSIGNED6 inputSeq;
+    InternalSeqAndIdentifiersLayout;
+    DueDiligence.Layouts.BusAsscoiations busAssociation;
+    STRING2 busAssocScore;
+    STRING10 busAssocFlags;
+  END;
+
 	
 //*** This is my simple/flat dataset - use this layout to call the getGeographic Risk ***
 	EXPORT GeographicLayout   := RECORD
@@ -335,7 +353,7 @@ END;
     STRING1 offenseDDChargeLevelCalculated;
     STRING offenseChargeLevelReported; //also used in source info
     STRING7 offenseConviction; //also used in source info
-    STRING15 offenseIncarcerationProbationParole;
+    STRING25 offenseIncarcerationProbationParole;
     STRING7 offenseTrafficRelated;
     
     //Additional details
