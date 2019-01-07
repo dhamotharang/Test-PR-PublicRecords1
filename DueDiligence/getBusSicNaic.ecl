@@ -317,6 +317,7 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
                       TRANSFORM(DueDiligence.Layouts.Busn_Internal,
                                 SELF.sicNaicRisk.bestSIC.code := RIGHT.sicCode;
                                 SELF.sicNaicRisk.bestSIC.sicNAICSIndicator := IF(RIGHT.sicCode <> DueDiligence.Constants.EMPTY, DueDiligence.Constants.INDUSTRY_INDICATOR_SIC, DueDiligence.Constants.EMPTY);
+                                SELF.sicNaicRisk.bestSIC.industryCategory := IF(RIGHT.sicCode <> DueDiligence.Constants.EMPTY, DueDiligence.Constants.INDUSTRY_GROUP_BEST_SIC, DueDiligence.Constants.EMPTY);
                                 SELF.sicNaicRisk.bestSIC.highestIndustryOrRiskLevel := IF(RIGHT.sicIndustry = DueDiligence.Constants.INDUSTRY_OTHER, RIGHT.sicRiskLevel, RIGHT.sicIndustry);
                                 SELF := LEFT;),
                       LEFT OUTER,
@@ -330,6 +331,7 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
                         TRANSFORM(DueDiligence.Layouts.Busn_Internal,
                                   SELF.sicNaicRisk.bestNAICS.code := RIGHT.naicCode;
 																	SELF.sicNaicRisk.bestNAICS.sicNAICSIndicator := IF(RIGHT.naicCode <> DueDiligence.Constants.EMPTY, DueDiligence.Constants.INDUSTRY_INDICATOR_NAICS, DueDiligence.Constants.EMPTY);
+																	SELF.sicNaicRisk.bestNAICS.industryCategory := IF(RIGHT.naicCode <> DueDiligence.Constants.EMPTY, DueDiligence.Constants.INDUSTRY_GROUP_BEST_NAICS, DueDiligence.Constants.EMPTY);
                                   SELF.sicNaicRisk.bestNAICS.highestIndustryOrRiskLevel := IF(RIGHT.naicIndustry = DueDiligence.Constants.INDUSTRY_OTHER, RIGHT.naicRiskLevel, RIGHT.naicIndustry);
                                   SELF := LEFT;),
                         LEFT OUTER,
@@ -338,7 +340,7 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
                                                                           
                                                                           
   //calculate the highest risk sic/naic
-  riskySICNAICS := PROJECT(sicOnly + naicsOnly, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, STRING code, STRING industry, STRING riskLevel, UNSIGNED4 dateFirstSeen, UNSIGNED4 dateLastSeen, BOOLEAN isPrimary, STRING3 source, STRING1 sicNAICIndicator},
+  riskySICNAICS := PROJECT(sicOnly + naicsOnly, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, STRING code, STRING industry, STRING riskLevel, UNSIGNED4 dateFirstSeen, UNSIGNED4 dateLastSeen, BOOLEAN isPrimary, STRING3 source, STRING1 sicNAICIndicator, STRING2 industryCat},
                                                         useSIC := LEFT.sicCode <> DueDiligence.Constants.EMPTY;
 																												useNAICS := LEFT.naicCode <> DueDiligence.Constants.EMPTY;
 																												
@@ -348,6 +350,7 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																																											DueDiligence.Constants.EMPTY);
                                                         SELF.industry := IF(useSIC, LEFT.sicIndustry, LEFT.naicIndustry);
                                                         SELF.riskLevel := IF(useSIC, LEFT.sicRiskLevel, LEFT.naicRiskLevel);
+																												SELF.industryCat := IF(useSIC or useNAICS, DueDiligence.Constants.INDUSTRY_GROUP_HIGHEST_RISK, DueDiligence.Constants.EMPTY);
                                                         SELF := LEFT;));
                                                         
   riskyCodes := DueDiligence.CommonBusiness.getRiskiestSicOrNaic(riskySICNAICS, code, industry, riskLevel);
@@ -360,6 +363,7 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
                               TRANSFORM(DueDiligence.Layouts.Busn_Internal,
                                         SELF.sicNaicRisk.highestRisk.code := RIGHT.code;
 																				SELF.sicNaicRisk.highestRisk.sicNAICSIndicator := RIGHT.sicNAICIndicator;
+																				SELF.sicNaicRisk.highestRisk.industryCategory := RIGHT.industryCat;
                                         SELF.sicNaicRisk.highestRisk.highestIndustryOrRiskLevel := IF(RIGHT.industry = DueDiligence.Constants.INDUSTRY_OTHER, RIGHT.riskLevel, RIGHT.industry);
                                         SELF := LEFT;),
                               LEFT OUTER,

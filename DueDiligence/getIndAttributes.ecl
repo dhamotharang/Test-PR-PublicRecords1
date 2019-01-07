@@ -66,7 +66,7 @@ EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
   indBusAssoc := DueDiligence.getIndBusAssoc(indCriminalData, options, linkingOptions);
   
   //if a person report is being requested, populate the report
-  indReportData :=  IF(includeReport, DueDiligence.getIndReport(indBusAssoc, ssnMask), indBusAssoc);
+  indReportData :=  IF(includeReport, DueDiligence.getIndReport(indBusAssoc, options, ssnMask), indBusAssoc);
 	
 	
 	//populate the attributes and flags
