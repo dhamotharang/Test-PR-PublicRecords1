@@ -1,9 +1,9 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','Scrubs_PhonesInfo.BaseFile_BWR_Scrubs - Checking field validity in a file - SALT V3.11.4');
-IMPORT Scrubs_PhonesInfo,SALT311;
-infile := Scrubs_PhonesInfo.BaseFile_In_PhonesInfo;
-mod_scrubs := Scrubs_PhonesInfo.BaseFile_Scrubs;
+#workunit('name','Scrubs_LN_PropertyV2_Search.BWR_Scrubs - Checking field validity in a file - SALT V3.11.4');
+IMPORT Scrubs_LN_PropertyV2_Search,SALT311;
+infile := Scrubs_LN_PropertyV2_Search.In_LN_PropertyV2_Search;
+mod_scrubs := Scrubs_LN_PropertyV2_Search.Scrubs;
 expandedfile := mod_scrubs.FromNone(infile).ExpandedInfile;
 fromexpandedGlobal := mod_scrubs.FromExpanded(expandedfile);
 // Summary of errors found across all sources
