@@ -11,10 +11,6 @@
 // LI           Liens
 // LP           LN_Propertyv2 Lexis Deeds and Mortgages
 // WT						Wither and Die
-// per Legal request, we removed the following sources (09/19/2018) as per 
-// JIRA# DF-23091 Removal of Spoke and Zoom records from PAW FCRA keys.
-// SP						Spoke
-// ZM						Zoom
 
 PAW_FCRA_sources := 
 ['!W','#W','[W','1W','2W','3W','4W','5W','6W','7W','9W',
@@ -26,8 +22,8 @@ PAW_FCRA_sources :=
 'DA','DS','DW','E1','E2','E3','EB','EM','EQ','EW',
 'FF','FK','FT','FW','GW','HW','IL','IN','IT','IW','JI','JW',
 'KW','LL','LW','MW','NW','OL','OW',
-'PI','PL','PW','QW','RW','SB','SK','SL','SW',
-'TL','TW','TX','V ','VW','WW','XF','XW','YW','ZW'];
+'PI','PL','PW','QW','RW','SB','SK','SL','SP','SW',
+'TL','TW','TX','V ','VW','WW','XF','XW','YW','ZM','ZW'];
 
 dBase_filtered 	      := paw.File_base_cleanAddr_keybuild(did>0 and source in PAW_FCRA_sources);
 
