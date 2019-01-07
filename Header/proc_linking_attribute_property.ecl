@@ -6,7 +6,7 @@ EXPORT proc_linking_attribute_property:= FUNCTION
 lc := data_services.Data_location.person_header;
 iversion:=regexfind('[0-9]{8,8}',nothor(std.file.SuperFileContents(lc+'thor_data400::in::seqdheadersrc_fat')[1].name),0);
 
-all_prop_attribute_candidates:=$.fn_Linking_Attribute_Property:persist('~thor_data400::persist::header::linking_attribute::property');
+all_prop_attribute_candidates:=$.fn_Linking_Attribute_Property(iversion):persist('~thor_data400::persist::header::linking_attribute::property');
 
 // only ones externally linked
 candidates_no_blank_dids:=all_prop_attribute_candidates(did>0):independent;
