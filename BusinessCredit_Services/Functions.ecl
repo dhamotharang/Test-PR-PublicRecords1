@@ -502,13 +502,13 @@ EXPORT Functions := MODULE
 						inp_city  := STD.Str.ToUpperCase(TRIM(le.City));
 						p_city    := STD.Str.ToUpperCase(TRIM(ri.p_city_name));
 						v_city    := STD.Str.ToUpperCase(TRIM(ri.v_city_name));
-	
-						// Company Name
+							
+					     // Company Name
 						NamePopulated      := le.CompanyName <> '' AND ri.Company_Name <> '';
-						NameMatchedExactly := NamePopulated AND (TRIM(le.CompanyName) = TRIM(ri.Company_Name));
-						NameScore_pre      := Business_Risk.CNameScore(le.CompanyName, ri.Company_Name);
-						NameMatched        := NamePopulated AND le.CompanyName[1] = ri.Company_Name[1] AND Risk_Indicators.iid_constants.g(NameScore_pre);
-						NameScore          := IF( NameMatchedExactly, 200, NameScore_pre );					
+						NameMatchedExactly := NamePopulated AND (STD.Str.ToUpperCase(TRIM(le.CompanyName)) = STD.Str.ToUpperCase(TRIM(ri.Company_Name)));
+						NameScore_pre      := Business_Risk.CNameScore(STD.Str.ToUpperCase(le.CompanyName), STD.Str.ToUpperCase(ri.Company_Name));
+						NameMatched        := NamePopulated AND (STD.Str.ToUpperCase(le.CompanyName[1]) = STD.Str.ToUpperCase( ri.Company_Name[1])) AND Risk_Indicators.iid_constants.g(NameScore_pre);
+						NameScore          := IF( NameMatchedExactly, 200, NameScore_pre );		
 						
 						// Company City, State, Zip5, Zip4, County, and Address.						
 						CityPopulated := inp_city != '' AND (p_city != '' OR v_city != '');
