@@ -1,12 +1,12 @@
 ﻿//---------------------------------------------------------------------
-// PRTE2_PropertyInfo_Ins_Data.U_Despray_RoofType
+// PRTE2_PropertyInfo_Ins_Dev.U_Despray_RoofType
 //  - despray the Property Info base file for editing.
 //---------------------------------------------------------------------
 // NOTE: The CSV name "PropertyInfo_V2" is to indicate we totally altered
 //  the main layouts removed gateway and editable_spreadsheet layouts
 //---------------------------------------------------------------------
 
-IMPORT PRTE2_Common, ut, PRTE2_PropertyInfo_Ins_Data, PRTE2_PropertyInfo_Ins;
+IMPORT PRTE2_Common, ut, PRTE2_PropertyInfo_Ins_Dev, PRTE2_PropertyInfo_Ins;
 #workunit('name', 'ALPHA CT PropInfo RoofType Gen');
 
 dateString := ut.GetDate;
@@ -28,7 +28,7 @@ GETSRC(STRING S1) := IF(S1='D','FARES','OKCTY');
 //--------------------------------------------
 DS_IN_GRP transfrmIN2( DS_IN_GRP L, INTEGER CNT ) := TRANSFORM
 			tempVendorSrc := L.vendor_source;
-			TempRoofType := IF(CNT=1,PRTE2_PropertyInfo_Ins_Data.U_Despray_RoofType_Sets.ROOF_TYPE_RANDOM(tempVendorSrc),'');
+			TempRoofType := IF(CNT=1,PRTE2_PropertyInfo_Ins_Dev.Despray_RoofType_Sets.ROOF_TYPE_RANDOM(tempVendorSrc),'');
 			SELF.roof_type:= TempRoofType;
 			SELF.src_roof_type:= IF(TempRoofType<>'',GETSRC(tempVendorSrc),'');
 			SELF := L;
@@ -53,7 +53,7 @@ W20170427-173454 – just a quick review on the base file.
 
 to review the key file data after spraying and building
 W20170427-173103 – reads the RID key and displays:
-	PRTE2_PropertyInfo_Ins_Data.U_Check_RID_Key
+	PRTE2_PropertyInfo_Ins_Dev.BWR_View_Address_In_Keys.ecl
 	1.	Has Roof_type and OKC only
 	2.	Has Roof_type and FARES ONLY
 	3.	All records to see blanks as well.

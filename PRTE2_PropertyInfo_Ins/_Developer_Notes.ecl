@@ -27,7 +27,7 @@ April 2017 - Bruce altered in PRTE2_PropertyInfo:
 
 April 2017 after testing that code to confirm it works with new layout, Bruce copied all active code into new
 code module (folder) - PRTE2_PropertyInfo_Ins
-April 2017 - also MOVED all U* attributes into a new  PRTE2_PropertyInfo_Ins_Data
+April 2017 - also MOVED all U* attributes into a new  PRTE2_PropertyInfo_Ins_Dev
 1. Fn_Spray - creates base file with base file layout same as before but with 3 new fields.
 2. Get_Payload - creates base file with new Boca Base layout but these are in MEMORY only during key build.
   TODO - need to after Fn_Spray do a new second key save with 3 generations which a new Boca build can use for Alpha data.
