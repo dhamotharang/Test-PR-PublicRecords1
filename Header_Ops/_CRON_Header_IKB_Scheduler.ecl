@@ -18,7 +18,7 @@ filedate := Header.Proc_Copy_From_Alpha_Incrementals().filedate;
 lastestIkbVersionOnThor  := header.Proc_Copy_From_Alpha_Incrementals().lastestIkbVersionOnThor;
 
 valid_state := ['blocked','running','wait','submitted','compiling','compiled'];
-ikb_wuname 	:= '*Update Incremental linking keys';
+ikb_wuname 	:= '*Update Incremental linking keys*';
 
 wks := sort(nothor(WorkunitServices.WorkunitList('',NAMED jobname:=ikb_wuname))(wuid <> thorlib.wuid() and state in valid_state)
 		 ,-wuid);
@@ -33,18 +33,18 @@ norun := if(filedate = lastestIkbVersionOnThor and status = 0, true, false);
 
 wuname1 := filedate + ' IKB - Running Right Now';
 wuname2 := filedate + ' IKB - Data Was Already Built';
-wuname3 := bldversion + if(status <> 0, ' IKB - RECOVER Update Incremental linking keys', ' IKB - Update Incremental linking keys');
+wuname3 := bldversion + if(status <> 0, ' IKB - Update Incremental linking keys RECOVER', ' IKB - Update Incremental linking keys');
 
 ECL1 := '\n'
-+'#WORKUNIT(\'name\',\'' + wuname1 + ' \');\n'
++'#WORKUNIT(\'name\',\'' + wuname1 + '\');\n'
 ;
 
 ECL2 := '\n'
-+'#WORKUNIT(\'name\',\'' + wuname2 + ' \');\n'
++'#WORKUNIT(\'name\',\'' + wuname2 + '\');\n'
 ;
 
 ECL3 := '\n'
-+'#WORKUNIT(\'name\',\'' + wuname3 + ' \');\n'
++'#WORKUNIT(\'name\',\'' + wuname3 + '\');\n'
 +'#stored (\'buildname\', \'header_incremental_keys\');\n'
 +'#WORKUNIT(\'protect\',true);\n\n'
 
