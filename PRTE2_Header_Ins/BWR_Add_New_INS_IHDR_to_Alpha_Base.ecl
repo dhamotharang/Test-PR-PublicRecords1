@@ -1,5 +1,5 @@
 ﻿/* ************************************************************************************
-PRTE2_Header_Ins.BWR_Add_New_INS_IHDR_to_Alpha_Base
+PRTE2_Header_Ins.BWR_Add_New_INS_IHDR_to_Alp_Base
 This will will be run to add new IHDR records to BHDR
 See also: fn_Save_BaseAndRels_Alpharetta_Base
 
