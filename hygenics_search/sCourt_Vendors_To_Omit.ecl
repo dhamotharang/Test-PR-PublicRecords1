@@ -89,6 +89,7 @@
 '9G', // OHIO_LAWRENCE_COUNTY_COMMON_PLEAS_COURT                                                             
 '9O', // OHIO_FRANKLIN_COUNTY_COMMON_PLEAS                                                                   
 '9P', // OHIO_SCIOTO_COUNTY_PORTSMOUTH_MUNICIPAL_COURT                                                       
+'9S', // OHIO_STARK_COUNTY_CANTON_MUNICIPAL_COURT                                                            
 '9T', // OHIO_OTTAWA_COUNTY_COMMON_PLEAS_COURT                                                               
 '9U', // OHIO_UNION_COUNTY_COMMON_PLEAS_COURT                                                                
 '9V', // OHIO_WYANDOT_COUNTY_COMMON_PLEAS_COURT                                                              
@@ -178,6 +179,7 @@
 'GR', // FLORIDA_VOLUSIA_COUNTY_ARRESTS                                                                      
 'GT', // GEORGIA_CHATHAM_COUNTY_ARRESTS                                                                      
 'GU', // GEORGIA_CLARKE_COUNTY_ARRESTS                                                                       
+'GV', // GEORGIA_DAWSON_COUNTY_ARRESTS                                                                       
 'GW', // GEORGIA_FULTON_COUNTY_ARRESTS                                                                       
 'GX', // GEORGIA_GWINNETT_COUNTY_ARRESTS                                                                     
 'GY', // IOWA_BUENA_VISTA_COUNTY_ARRESTS                                                                     
