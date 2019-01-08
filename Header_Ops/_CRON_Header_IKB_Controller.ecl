@@ -6,7 +6,7 @@ DAILY_AT_10AM_2PM_AND_5PM := '01 15,19,23 * * *';
 
 ecl:=
         'IMPORT header;\n'+
-        '#WORKUNIT(\'name\',\'Monitor Header IKB Scheduler\');\n'+
+        '#WORKUNIT(\'name\',\'PersonHeader: Monitor Header IKB Scheduler\');\n'+
         'notify(\'Build_Incremental_Keys\',\'*\');\n'
         ;
 
