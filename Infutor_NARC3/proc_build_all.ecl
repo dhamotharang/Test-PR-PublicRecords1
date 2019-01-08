@@ -11,7 +11,7 @@ EXPORT proc_build_all (string pVersion):= function
 														Keynames(,,TRUE).dAll_filenames  // create FCRA Superfiles
 															;
   //scrubs
-
+	scrubs := scrubs_infutor_narc3.fnRunScrubs(version,'tarun.patel@lexisnexis.com');
 
   //DOPS Entry Creation  
 	dops_update	:=	RoxieKeyBuild.updateversion('InfutorNARC3Keys', pVersion, _Control.MyInfo.EmailAddressNotify+';tarun.patel@lexisnexisrisk.com',,'N');														
