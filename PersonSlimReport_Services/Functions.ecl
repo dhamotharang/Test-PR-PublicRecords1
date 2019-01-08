@@ -62,13 +62,13 @@ EXPORT Functions := MODULE
 			self.workphone               := L.work_phone;
 			self.phone                   := L.phone;
 			self.addrdual                := L.addr_dual;
-			/** BEGIN_DATASET address **/
-				self.address := PROJECT(L.address_recs,
+			/** BEGIN_DATASET addresses **/
+				self.addresses := PROJECT(L.address_recs,
 													TRANSFORM(iesp.share.t_Address,
 														SELF := iesp.ECL2ESP.SetAddress(LEFT.prim_name,LEFT.prim_range,LEFT.predir,LEFT.postdir,
 																														LEFT.addr_suffix,LEFT.unit_desig,LEFT.sec_range,
 																														LEFT.city,LEFT.state,LEFT.zip,LEFT.zip4,LEFT.county_name)));
-			/** END_DATASET address **/
+			/** END_DATASET addresses **/
 		END;
 		
 		utilities := PROJECT(utils,transUtil(LEFT));

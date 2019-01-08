@@ -68,7 +68,7 @@ export t_PersonSlimReportUtility := record
 	string10 	WorkPhone {xpath('WorkPhone')};
 	string10 	Phone {xpath('Phone')};
 	string1  	AddrDual {xpath('AddrDual')};
-	dataset(iesp.share.t_Address) Address {xpath('Addresses/Address'), MAXCOUNT(iesp.Constants.PersonSlim.MaxAddresses)};
+	dataset(iesp.share.t_Address) Addresses {xpath('Addresses/Address'), MAXCOUNT(iesp.Constants.PersonSlim.MaxAddresses)};
 end;
 		
 export t_PersonSlimReportResponse := record
