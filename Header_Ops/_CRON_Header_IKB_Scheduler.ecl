@@ -33,7 +33,7 @@ norun := if(filedate = lastestIkbVersionOnThor and status = 0, true, false);
 
 wuname1 := filedate + ' IKB - Running Right Now';
 wuname2 := filedate + ' IKB - Data Was Already Built';
-wuname3 := bldversion + if(status <> 0, ' IKB - RECOVER Update Incremental linking keys', ' IKB - Update Incremental linking keys');
+wuname3 := bldversion + if(status <> 0, ' IKB - Update Incremental linking keys RECOVER', ' IKB - Update Incremental linking keys');
 
 ECL1 := '\n'
 +'#WORKUNIT(\'name\',\'' + wuname1 + '\');\n'

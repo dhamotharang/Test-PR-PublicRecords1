@@ -25,7 +25,7 @@ ECL0:=
 +'// Expected execution time -> Estimated 24-48 hrs\n'	
 +'\n'
 ;
-wuname := '*Header Ingest';
+wuname := '*Header Ingest*';
 valid_state := ['','unknown','submitted', 'compiling','compiled','blocked','running','wait'];
 d := sort(nothor(WorkunitServices.WorkunitList('',NAMED jobname:=wuname))(wuid <> thorlib.wuid() and state in valid_state), -wuid):independent;
 active_workunit :=  exists(d);
@@ -74,7 +74,7 @@ ECL1 := '\n'
 ECL := ECL0
      + if(run_build='true'
          ,ECL1
-	     ,'wuname := \'Header Ingest is RUNNING Right now, Please try to run once the current build completes\';\n'
+	     ,'wuname := \'Header Ingest is RUNNING Right now\';\n'
 	       + '#WORKUNIT(\'name\', wuname);\n'
 	 );
 
