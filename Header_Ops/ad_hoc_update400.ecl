@@ -1,3 +1,4 @@
+IMPORT std;
 old:='20171121';
 new:='20180221';
 
@@ -14,6 +15,8 @@ rm('~thor_data400::key::insuranceheader_xlink::qa::did::refs::dln',
 '~thor_data400::key::insuranceheader_xlink::'+old+'::did::refs::dln'),
 rm('~thor_data400::key::insuranceheader_xlink::qa::did::refs::dob',
 '~thor_data400::key::insuranceheader_xlink::'+old+'::did::refs::dob'),
+rm('~thor_data400::key::insuranceheader_xlink::qa::did::refs::dobf',
+'~thor_data400::key::insuranceheader_xlink::'+old+'::did::refs::dobf'),
 rm('~thor_data400::key::insuranceheader_xlink::qa::did::refs::lfz',
 '~thor_data400::key::insuranceheader_xlink::'+old+'::did::refs::lfz'),
 rm('~thor_data400::key::insuranceheader_xlink::qa::did::refs::name',
@@ -37,6 +40,8 @@ ad('~thor_data400::key::insuranceheader_xlink::qa::did::refs::dln',
 '~thor_data400::key::insuranceheader_xlink::'+new+'::did::refs::dln'),
 ad('~thor_data400::key::insuranceheader_xlink::qa::did::refs::dob',
 '~thor_data400::key::insuranceheader_xlink::'+new+'::did::refs::dob'),
+ad('~thor_data400::key::insuranceheader_xlink::qa::did::refs::dobf',
+'~thor_data400::key::insuranceheader_xlink::'+new+'::did::refs::dobf'),
 ad('~thor_data400::key::insuranceheader_xlink::qa::did::refs::lfz',
 '~thor_data400::key::insuranceheader_xlink::'+new+'::did::refs::lfz'),
 ad('~thor_data400::key::insuranceheader_xlink::qa::did::refs::name',
@@ -54,4 +59,4 @@ ad('~thor_data400::key::insuranceheader_xlink::qa::did::refs::zip_pr',
 std.file.finishsuperfiletransaction()
 );
 
-http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180321-120224#/stub/Summary
+// http://prod_esp.br.seisint.com:8010/?Widget=WUDetailsWidget&Wuid=W20180321-120224#/stub/Summary

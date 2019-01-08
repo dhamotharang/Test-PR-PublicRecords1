@@ -51,6 +51,7 @@ status := Header.LogBuildStatus(sf_name).Read[1].status;
 build_version := if(status <> 0, ver, today); // 0 -> Completed
 
 incremental := if(isMonthly, 'false', 'true');
+ingestType := if(isMonthly, 'monthly', 'incremental');
 
 ECL1 := '\n'
 +'#WORKUNIT(\'protect\',true);\n'
@@ -66,7 +67,7 @@ ECL1 := '\n'
 +'#OPTION (\'implicitGroupSubSort\',FALSE);\n\n'
 
 +'#stored (\'versionBuild\',\''+ build_version + '\');\n'
-+'#WORKUNIT(\'name\',\'' + build_version + ' Header Ingest\');\n\n'
++'#WORKUNIT(\'name\',\'' + build_version + ' Header Ingest ' + ingestType + if(status <> 0, ' RECOVER ', '') + '\');\n\n'
 
 +'Header_Ops.hdr_bld_ingest(\'' + build_version + '\',' + incremental + ', ' + status + ');\n';
 

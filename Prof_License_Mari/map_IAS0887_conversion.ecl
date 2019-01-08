@@ -126,13 +126,16 @@ EXPORT map_IAS0887_conversion(STRING pVersion) := FUNCTION
 		rmvSufxMName    := StringLib.StringCleanSpaces(REGEXREPLACE(SUFFIX_PATTERN,stripNickMName,''));
 		rmvSufxName     := StringLib.StringCleanSpaces(REGEXREPLACE(SUFFIX_PATTERN,stripNickName,''));
 		tmp_Suffix				 	:= StringLib.StringCleanSpaces(REGEXREPLACE(',',REGEXFIND(SUFFIX_PATTERN,stripNickName,0),''));
-			
-		ConcatNAME_FULL 			:= StringLib.StringCleanSpaces(rmvSufxLName +' '+rmvSufxFName);
-
+		
+    ParsedName := Prof_License_Mari.mod_clean_name_addr.cleanFMLName(rmvSufxName);
 		// ConcatNAME_FULL 			:= StringLib.StringCleanSpaces(GoodLastName +' '+GoodFirstName);
-  
     StdNAME_ORG			:= Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(TrimFullName);	
-	
+   	SELF.NAME_FIRST				:= IF(rmvSufxFName = '',TRIM(ParsedName[6..25],LEFT,RIGHT),rmvSufxFName);
+   	SELF.NAME_MID					:= IF(rmvSufxMName = '',TRIM(ParsedName[26..45],LEFT,RIGHT),rmvSufxMName);
+   	SELF.NAME_LAST				:= IF(rmvSufxLName = '',TRIM(ParsedName[46..65],LEFT,RIGHT),rmvSufxLName);
+   	SELF.NAME_SUFX				:= IF(tmp_Suffix = '',TRIM(ParsedName[66..70],LEFT,RIGHT),tmp_Suffix);
+		SELF.NAME_Nick  := tempNick;	
+	  ConcatNAME_FULL 			:= StringLib.StringCleanSpaces(SELF.NAME_LAST +' '+SELF.NAME_FIRST);
 		SELF.NAME_ORG_PREFX		:= '';
 		SELF.NAME_ORG				   	:= IF(ConcatNAME_FULL <> ' ', ConcatNAME_FULL,
 		                           Prof_License_Mari.mod_clean_name_addr.cleanFName(REGEXREPLACE(' COMPANY',TrimFullName,' CO')));
@@ -140,13 +143,9 @@ EXPORT map_IAS0887_conversion(STRING pVersion) := FUNCTION
 		SELF.NAME_ORG_ORIG    := IF(TrimFullName!= '',TrimFullName,TrimFirstName + ' ' + TrimMidName + ' ' +TrimLastName);	
 		SELF.NAME_FORMAT  := 'F';
 		
-		SELF.NAME_FIRST := rmvSufxFName;
-		SELF.NAME_MID   := rmvSufxMName;
-		SELF.NAME_LAST  := rmvSufxLName;
-		SELF.NAME_Nick  := tempNick;
-		SELF.NAME_SUFX  := tmp_Suffix;	
 		// assign officename and office parse field : GR if company, MD if individual 
-		TrimOffice          := REGEXFIND('^(.*) ((.*))$',ut.CleanSpacesAndUpper(pInput.FIRM_NAME),1);
+		// TrimOffice          := REGEXFIND('^(.*) ((.*))$',ut.CleanSpacesAndUpper(pInput.FIRM_NAME),1);
+		TrimOffice          := ut.CleanSpacesAndUpper(pInput.FIRM_NAME);
 		OffieName         	:= IF(Prof_License_Mari.mod_clean_name_addr.GetCorpName(TrimOffice)<>'',
 		               TRIM(Prof_License_Mari.mod_clean_name_addr.GetCorpName(TrimOffice),LEFT,RIGHT),
 															 	TRIM(TrimOffice,LEFT,RIGHT));

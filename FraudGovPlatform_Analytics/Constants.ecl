@@ -57,7 +57,7 @@
 		EXPORT KeepEcl						:= 'FALSE';	
 		EXPORT CustomerDashboard 	:= MODULE
 			EXPORT CompositionUuid									:= '92db8d0a-075f-4dad-a9bd-65b7633f06ce'; 	//Customer Dashboard Composition ID
-			EXPORT InputLogicalGraphFilename 				:= fileScope + 'customerdashtopclusters';
+			EXPORT InputLogicalGraphFilename 				:= fileScope + 'customerdashtopclustersandelements';
 			EXPORT InputLogicalEntityStatsFilename	:= fileScope + 'customerdashtopentitystats';
 		END;
 		EXPORT ClusterDetailsDashboard := MODULE
