@@ -82,6 +82,12 @@ export IdAppendLayouts := module
 	// Error code and message added to capture soapcall errors.
 	export AppendOutput := {
 		svcAppendOut,
+	  typeof(baseLayout.dba_name) dba_name,
+	  typeof(baseLayout.cnp_btype) company_btype,
+	  typeof(baseLayout.fname) contact_fname,
+	  typeof(baseLayout.mname) contact_mname,
+	  typeof(baseLayout.lname) contact_lname,
+	  typeof(baseLayout.contact_job_title_derived) contact_job_title,
 		integer error_code := 0,
 		string error_msg := '',
 	};
