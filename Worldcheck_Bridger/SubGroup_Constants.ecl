@@ -1098,6 +1098,8 @@
 		export string KEYWORD_SECO_MAL							:= '786';		
 		export string KEYWORD_UN_MAL								:= '787';		
 		export string KEYWORD_INMHA_FCRA						:= '788';		
+		export string KEYWORD_FFMS_WMD							:= '789';		
+		export string KEYWORD_OFAC_VE13850					:= '790';		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
 	
