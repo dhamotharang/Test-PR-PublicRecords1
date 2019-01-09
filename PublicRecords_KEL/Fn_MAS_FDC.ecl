@@ -1,4 +1,4 @@
-﻿IMPORT Doxie, Doxie_Files, Header_Quick;
+﻿IMPORT BankruptcyV3, Doxie, Doxie_Files, Header_Quick;
 
 EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) Input,
 									PublicRecords_KEL.Interface_Options Options,
@@ -64,7 +64,9 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 						SELF.Dataset_Header_Quick__Key_Did := ROWS(RIGHT),
 						SELF := LEFT,
 						SELF := []));
-						
+
+	// --------------------[ Criminal records ]--------------------
+	
 	// Doxie_Files.Key_BocaShell_Crim_FCRA -- FCRA only
 	Doxie_Files__Key_BocaShell_Crim_FCRA_Records := IF(Common.DoFDCJoin_Doxie_Files__Key_BocaShell_Crim_FCRA, 
 		JOIN(Input_FDC_Filtered, Doxie_Files.Key_BocaShell_Crim_FCRA,
@@ -190,6 +192,97 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 						SELF := LEFT,
 						SELF := []));		
 						
-	RETURN With_Doxie_Files__Key_Punishment;
+
+	// --------------------[ Bankruptcy records ]--------------------
+	
+	// BankruptcyV3.key_bankruptcyV3_did has a parameter to say if FCRA or nonFCRA - same file layout
+	Bankruptcy_Files__Key_bankruptcy_did_Records := IF( Common.DoFDCJoin_Bankruptcy_Files__Key_bankruptcy_did, 
+			JOIN(Input_FDC_Filtered, BankruptcyV3.key_bankruptcyV3_did(Options.isFCRA),
+				KEYED(LEFT.LexIDAppend = RIGHT.did),
+				TRANSFORM(Layouts_FDC.Layout_Bankruptcy__Key_did,
+					SELF.InputUIDAppend := LEFT.InputUIDAppend,
+					SELF.LexIDAppend := LEFT.LexIDAppend,
+					SELF := RIGHT, 
+					SELF := []), 
+				LIMIT(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
+			DATASET([], Layouts_FDC.Layout_Bankruptcy__Key_did));
+
+	// BankruptcyV3.key_bankruptcyv3_search_full_bip has a parameter to say if FCRA or nonFCRA - same file layout		
+	Bankruptcy_Files__Key_Search_Records_pre := IF( Common.DoFDCJoin_Bankruptcy_Files__Bankruptcy__Key_Search,
+		JOIN(Bankruptcy_Files__Key_bankruptcy_did_Records, BankruptcyV3.key_bankruptcyv3_search_full_bip(Options.isFCRA),
+				KEYED(LEFT.TmsID != '' AND 
+				LEFT.TmsID = RIGHT.TmsID) AND
+				LEFT.court_code = RIGHT.court_code AND
+				LEFT.case_number = RIGHT.case_number,
+				TRANSFORM(Layouts_FDC.Layout_BankruptcyV3__key_bankruptcyv3_search,
+					SELF.InputUIDAppend := LEFT.InputUIDAppend,
+					SELF.LexIDAppend := LEFT.LexIDAppend,
+					SELF := RIGHT,
+					SELF := []), 
+				LIMIT(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
+			DATASET([], Layouts_FDC.Layout_BankruptcyV3__key_bankruptcyv3_search));
+
+	// Left Outer join to the Bankruptcy Withdrawn key and keep all its columns; and set FCRAWithdrawn.
+	Bankruptcy_Files__Key_Search_Records := IF( Common.DoFDCJoin_Bankruptcy_Files__Bankruptcy__Key_Search,
+		JOIN(Bankruptcy_Files__Key_Search_Records_pre, BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus(,,Options.IsFCRA),
+				KEYED(LEFT.TmsID = RIGHT.TmsID),
+				TRANSFORM(Layouts_FDC.Layout_BankruptcyV3__key_bankruptcyv3_search,
+					SELF.InputUIDAppend := LEFT.InputUIDAppend,
+					SELF.LexIDAppend := LEFT.LexIDAppend,
+					SELF.FCRAWithdrawn := LEFT.TmsID = RIGHT.TmsID,
+					SELF := LEFT, 
+					SELF := RIGHT,
+					SELF := []), 
+				LIMIT(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT),
+				LEFT OUTER),
+			DATASET([], Layouts_FDC.Layout_BankruptcyV3__key_bankruptcyv3_search));
+		
+	With_Doxie_Files_and_Bankruptcy_Search := 
+		DENORMALIZE(With_Doxie_Files__Key_Punishment,Bankruptcy_Files__Key_Search_Records,
+				LEFT.InputUIDAppend = RIGHT.InputUIDAppend AND LEFT.LexIDAppend = RIGHT.LexIDAppend, GROUP,
+				TRANSFORM(Layouts_FDC.Layout_FDC,
+						SELF.Dataset_Bankruptcy_Files__Key_Search := ROWS(RIGHT),
+						SELF := LEFT,
+						SELF := []));	
+
+	// BankruptcyV3.key_bankruptcyv3_main has a parameter to say if FCRA or nonFCRA - same file layout.
+	// INFO: Bankruptcy Main records each have a unique tmsid. No duplicate tmsids in this key (FCRA/nonFCRA).
+	Bankruptcy_Files__Key_Main_Records := IF( Common.DoFDCJoin_Bankruptcy_Files__Bankruptcy__Key_Main,
+		JOIN(Bankruptcy_Files__Key_bankruptcy_did_Records, BankruptcyV3.key_bankruptcyV3_main_full(Options.isFCRA),
+				KEYED(LEFT.TmsID = RIGHT.TmsID) AND
+				LEFT.court_code = RIGHT.court_code AND
+				LEFT.case_number = RIGHT.case_number,
+				TRANSFORM(Layouts_FDC.Layout_Bankruptcy__Key_bankruptcy_main_denorm,
+					SELF.InputUIDAppend := LEFT.InputUIDAppend,
+					SELF.LexIDAppend := LEFT.LexIDAppend,
+					SELF := RIGHT,
+					SELF := []), 
+				LIMIT(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
+			DATASET([], Layouts_FDC.Layout_Bankruptcy__Key_bankruptcy_main_denorm));
+
+	// BankruptcyV3.key_bankruptcyV3_main_full contains two child datasets so we need to add an extra 
+	// step and NORMALIZE them before adding to the FDC bundle. 
+	Layouts_FDC.Layout_Bankruptcy__Key_bankruptcy_main_full normThem( Bankruptcy_Files__Key_Main_Records le, INTEGER c ) := 
+		TRANSFORM
+			SELF.status_date := le.Status[c].status_date;
+			SELF.status_type := le.Status[c].status_type;
+			SELF.comment_filing_date := le.Comments[c].filing_date;
+			SELF.comment_description := le.Comments[c].description;
+			SELF := le;
+			SELF := [];
+		END;
+	
+	Bankruptcy_Files__Key_Main_Records_Norm := 
+		NORMALIZE( Bankruptcy_Files__Key_Main_Records, MAX( COUNT(LEFT.Status), COUNT(LEFT.Comments) ), normThem(LEFT,COUNTER) );
+
+	With_Bankruptcy := 
+		DENORMALIZE(With_Doxie_Files_and_Bankruptcy_Search,Bankruptcy_Files__Key_Main_Records_Norm,
+				LEFT.InputUIDAppend = RIGHT.InputUIDAppend AND LEFT.LexIDAppend = RIGHT.LexIDAppend, GROUP,
+				TRANSFORM(Layouts_FDC.Layout_FDC,
+						SELF.Dataset_Bankruptcy_Files__Key_Main_Full := ROWS(RIGHT),
+						SELF := LEFT,
+						SELF := []));	
+
+	RETURN With_Bankruptcy;
 
 END;
