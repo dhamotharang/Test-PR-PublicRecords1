@@ -1200,6 +1200,8 @@
 				trim(kword, left, right) = 'SECO-MAL' =>SubGroup_Constants.numKeywordsID.KEYWORD_SECO_MAL,
 				trim(kword, left, right) = 'UN-MAL' =>SubGroup_Constants.numKeywordsID.KEYWORD_UN_MAL,
 				trim(kword, left, right) = 'INMHA-FCRA' =>SubGroup_Constants.numKeywordsID.KEYWORD_INMHA_FCRA,
+				trim(kword, left, right) = 'FFMS-WMD' =>SubGroup_Constants.numKeywordsID.KEYWORD_FFMS_WMD,
+				trim(kword, left, right) = 'OFAC-VE13850' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_VE13850,
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);
