@@ -1,4 +1,4 @@
-import ut,header_slimsort,doxie_build,roxiekeybuild,utilfile,personlinkingADL2V3;
+﻿import ut,header_slimsort,doxie_build,roxiekeybuild,utilfile,personlinkingADL2V3;
 
 export Proc_AcceptSK_toQA(string filedate, boolean pFastHeader=false) := function
 
@@ -114,7 +114,7 @@ ut.mac_SF_Move('~thor_data400::base::file_header_building','P',mv_fhb2prod);
 ut.mac_SF_Move('~thor_data400::base::gong_did','P',mv_gong2prod);
 
 e_mail_success := fileservices.sendemail(
-'roxiedeployment@seisint.com;jose.bello@lexisnexis.com;gabriel.marcan@lexisnexis.com',
+'roxiedeployment@seisint.com,' + Header.email_list.BocaDevelopers,
 'Header Roxie Build Succeeded ' + filedate,
 'keys:  1)   thor_data400::key::did_hhid_qa(thor_data400::key::header::HHID::'+filedate+'::did.ver),\n' + 
 '       2)   thor_data400::key::hhid_did_qa(thor_data400::key::header::HHID::'+filedate+'::hhid.ver),\n' + 

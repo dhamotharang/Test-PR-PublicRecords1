@@ -87,7 +87,7 @@ header.mac_mod_sup(j3_prep, j3) ;
 //   doxie.Key_Header_DTS_FnameSmall
 //   doxie.Key_Header_DTS_StreetZipName
 #IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
-export Prepped_For_Keys := prte2_header.files.header_prep_for_keys;
+export Prepped_For_Keys := prte2_header.pre_keys.header_prep_for_keys;
 #ELSE
 export Prepped_For_Keys := j3 : persist('Prepped_For_Keys');
 #END

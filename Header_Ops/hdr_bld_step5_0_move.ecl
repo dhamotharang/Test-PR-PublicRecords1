@@ -28,5 +28,9 @@ sequential(dlog,Header.proc_postHeaderBuilds.finalize);
 // over five years old utility records as per vendor agreement
 // Estimated THOR time: 1hrs
 
+//20180926 W20181024-123434
+//20180724 W20180822-090448
+//20180626 W20180716-091407
+//20180522 W20180619-085633
 //W20180619-085633
 // 0130 W20180302-134423, W20180302-140235

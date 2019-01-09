@@ -31,11 +31,17 @@ export Build_All(
 ) :=
 module
 
+	shared yesterday_date := (unsigned)pVersion[1..8] - 1;
+
 	export Spray_MBS := sequential(
 					FraudShared.Promote().Inputfiles.Sprayed2Using,
 					FraudShared.Promote().Inputfiles.Using2Used,
 					FraudShared.SprayMBSFiles(pversion := pVersion[1..8], pServerIP := pMBSServerIP,pDirectory := pMBSFraudGovDirectory),
-					FraudGovPlatform_Validation.SprayMBSFiles(pversion := pVersion[1..8], pServerIP := pMBSFDNServerIP, pDirectory := pMBSFDNDirectory),
+					FraudGovPlatform_Validation.SprayMBSFiles(		pversion := pVersion[1..8], 
+																							pServerIP := pMBSFDNServerIP, 
+																							pDirectory := pMBSFDNDirectory,
+																							pFilenameMBSFdnCCID := 'mbsi_fdn_accounts_' + (string)yesterday_date + '*'
+																						),
 					If(_Flags.UseDemoData,FraudGovPlatform.Append_MBSDemoData(pversion).MbsIncl),
 					FraudgovInfo(pversion,'MBS_Completed').postNewStatus,
 					Scrubs_MBS.BuildSCRUBSReport(pversion, FraudGovPlatform.Email_Notification_Lists().BuildSuccess)				

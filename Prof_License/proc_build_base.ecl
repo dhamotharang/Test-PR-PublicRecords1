@@ -1,4 +1,4 @@
-/* ************************************************************************************************************ */	
+﻿/* ************************************************************************************************************ */	
 //
 // set version number (date of run) for proper input file handling.
 //
@@ -37,6 +37,13 @@ import Prof_License,fieldstats,did_add,ut,header_slimsort,watchdog,didville,cens
 			  unsigned6	bdid := 0;
         unsigned8	source_rec_id  :=  0;
 			  BIPV2.IDlayouts.l_xlink_ids;
+				INTEGER2  xadl2_weight := 0;
+				UNSIGNED2 xadl2_score := 0;
+				INTEGER1  xadl2_distance := 0;
+				UNSIGNED4 xadl2_keys_used := 0;
+				STRING    xadl2_keys_desc := '';
+				STRING60  xadl2_matches := '';
+				STRING    xadl2_matches_desc := '';
 			end;
 	
 			rec addtemp(dAID l) := transform	

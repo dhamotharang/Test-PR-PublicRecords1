@@ -1,6 +1,6 @@
 ﻿EXPORT layout_gpssi := RECORD
 	STRING1		Update_Flag 										:= '';
-	STRING8		Primary_Key											:= '';
+	INTEGER8	Primary_Key											;
 	STRING8		Accuity_Location_ID							:= '';
 	STRING20	Correspondent_Type							:= '';
 	STRING300	Filler1													:= '';
@@ -32,5 +32,5 @@
 	STRING35	Filler5                         := '';
 	STRING35	Filler6                         := '';
 	STRING35	Filler7                         := '';
-	
+	String2 crlf := '\r\n'; 
 END;

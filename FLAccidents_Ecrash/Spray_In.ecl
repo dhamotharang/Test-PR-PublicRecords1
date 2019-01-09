@@ -18,9 +18,11 @@ function
 																						,0 ,lfile('agency'				  ),[{sfile('agency'			  )}],Constants.DestinationCluster,'','[0-9]{8}','VARIABLE'}
 		 	], VersionControl.Layout_Sprays.Info);
 	
-	Agency_sp :=  if( EXISTS(FileServices.RemoteDirectory(Constants.LandingZone,'/data/super_credit/ecrash/agency/','*ecrash_v_agency*'+(string)((unsigned)ut.getDateOffset(-1,ut.GetDate))+'.txt')),
-                  sequential(fileservices.clearsuperfile('~thor_data400::in::ecrash::agency'),VersionControl.fSprayInputFiles(spry_raw,pIsTesting := pIsTesting)), 
-                  output('NO Agency Files Recieved')); 
+verify_agency := FileServices.RemoteDirectory(FLAccidents_Ecrash.Constants.LandingZone,'/data/super_credit/ecrash/agency/','*ecrash_v_agency*'+(string)((unsigned)ut.getDateOffset(-1,ut.GetDate))+'.txt');
+
+Agency_sp :=  if( ( EXISTS(verify_agency) and verify_agency[1].size <> 0 )  ,                  
+                                                                                                              sequential(fileservices.clearsuperfile('~thor_data400::in::ecrash::agency'),VersionControl.fSprayInputFiles(spry_raw,pIsTesting := pIsTesting)), 
+                                                                                                              output('NO Agency Files Recieved')); 
 
 //Incident Spray
 

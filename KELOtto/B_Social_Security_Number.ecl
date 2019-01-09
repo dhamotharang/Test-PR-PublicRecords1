@@ -7,12 +7,12 @@ EXPORT B_Social_Security_Number := MODULE
   SHARED VIRTUAL TYPEOF(B_Event_1.__ENH_Event_1) __ENH_Event_1 := B_Event_1.__ENH_Event_1;
   SHARED VIRTUAL TYPEOF(E_Person_Event.__Result) __E_Person_Event := E_Person_Event.__Result;
   SHARED VIRTUAL TYPEOF(B_Social_Security_Number_1.__ENH_Social_Security_Number_1) __ENH_Social_Security_Number_1 := B_Social_Security_Number_1.__ENH_Social_Security_Number_1;
-  SHARED __EE370795 := __ENH_Social_Security_Number_1;
-  SHARED __EE378425 := __ENH_Event_1;
-  SHARED __EE378364 := __E_Person_Event;
-  SHARED __EE379693 := __EE378364;
-  SHARED __EE379706 := __EE379693(__NN(__EE379693.Social_) AND __NN(__EE379693.Transaction_));
-  SHARED __ST374761_Layout := RECORD
+  SHARED __EE380196 := __ENH_Social_Security_Number_1;
+  SHARED __EE387838 := __ENH_Event_1;
+  SHARED __EE387777 := __E_Person_Event;
+  SHARED __EE389112 := __EE387777;
+  SHARED __EE389125 := __EE389112(__NN(__EE389112.Social_) AND __NN(__EE389112.Transaction_));
+  SHARED __ST384162_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Event.Source_Customers_Layout) Source_Customers_;
@@ -82,6 +82,7 @@ EXPORT B_Social_Security_Number := MODULE
     KEL.typ.nint Age_;
     KEL.typ.int Deceased_Prior_To_Event_ := 0;
     KEL.typ.nint Deceased_To_Event_Year_Diff_;
+    KEL.typ.nbool Demo_Customer_;
     KEL.typ.int In_Customer_Population_ := 0;
     KEL.typ.int Kr_High_Risk_Address_Flag_ := 0;
     KEL.typ.int Kr_High_Risk_Identity_Flag_ := 0;
@@ -105,8 +106,8 @@ EXPORT B_Social_Security_Number := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC379712(B_Event_1.__ST11803_Layout __EE378425, E_Person_Event.Layout __EE379706) := __EEQP(__EE379706.Transaction_,__EE378425.UID);
-  __ST374761_Layout __JT379712(B_Event_1.__ST11803_Layout __l, E_Person_Event.Layout __r) := TRANSFORM
+  __JC389131(B_Event_1.__ST11960_Layout __EE387838, E_Person_Event.Layout __EE389125) := __EEQP(__EE389125.Transaction_,__EE387838.UID);
+  __ST384162_Layout __JT389131(B_Event_1.__ST11960_Layout __l, E_Person_Event.Layout __r) := TRANSFORM
     SELF._r_Customer__1_ := __r._r_Customer_;
     SELF.Subject__1_ := __r.Subject_;
     SELF.Location__1_ := __r.Location_;
@@ -114,8 +115,8 @@ EXPORT B_Social_Security_Number := MODULE
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE379713 := JOIN(__EE379706,__EE378425,__JC379712(RIGHT,LEFT),__JT379712(RIGHT,LEFT),INNER,HASH);
-  SHARED __ST374159_Layout := RECORD
+  SHARED __EE389132 := JOIN(__EE389125,__EE387838,__JC389131(RIGHT,LEFT),__JT389131(RIGHT,LEFT),INNER,HASH);
+  SHARED __ST383560_Layout := RECORD
     KEL.typ.ntyp(E_Social_Security_Number.Typ) UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ntyp(E_Person.Typ) Subject_;
@@ -137,17 +138,17 @@ EXPORT B_Social_Security_Number := MODULE
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __ST374159_Layout __ND379821__Project(__ST374761_Layout __PP379714) := TRANSFORM
-    SELF.UID := __PP379714.Social_;
-    SELF._r_Customer_ := __PP379714._r_Customer__1_;
-    SELF.Subject_ := __PP379714.Subject__1_;
-    SELF.Location_ := __PP379714.Location__1_;
-    SELF.Event_Date_ := __PP379714.Event_Date__1_;
-    SELF.U_I_D__1_ := __PP379714.UID;
-    SELF := __PP379714;
+  SHARED __ST383560_Layout __ND389241__Project(__ST384162_Layout __PP389133) := TRANSFORM
+    SELF.UID := __PP389133.Social_;
+    SELF._r_Customer_ := __PP389133._r_Customer__1_;
+    SELF.Subject_ := __PP389133.Subject__1_;
+    SELF.Location_ := __PP389133.Location__1_;
+    SELF.Event_Date_ := __PP389133.Event_Date__1_;
+    SELF.U_I_D__1_ := __PP389133.UID;
+    SELF := __PP389133;
   END;
-  SHARED __EE379894 := PROJECT(__EE379713,__ND379821__Project(LEFT));
-  SHARED __ST374230_Layout := RECORD
+  SHARED __EE389314 := PROJECT(__EE389132,__ND389241__Project(LEFT));
+  SHARED __ST383631_Layout := RECORD
     KEL.typ.ntyp(E_Social_Security_Number.Typ) UID;
     KEL.typ.bool Exp1_ := FALSE;
     KEL.typ.bool Exp2_ := FALSE;
@@ -158,17 +159,17 @@ EXPORT B_Social_Security_Number := MODULE
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __ST374230_Layout __ND380649__Project(__ST374159_Layout __PP379895) := TRANSFORM
-    SELF.Exp1_ := __PP379895.Kr_High_Risk_Identity_Flag_ = 1;
-    SELF.Exp2_ := __PP379895.Kr_Medium_Risk_Identity_Flag_ = 1;
-    SELF.Exp3_ := __OP2(__PP379895.Age_,<,__CN(2));
-    SELF.Exp4_ := __AND(__OP2(__PP379895.Age_,<,__CN(2)),__CN(__PP379895.In_Customer_Population_ = 1));
-    SELF.Exp5_ := __OP2(__PP379895.Age_,<,__CN(366));
-    SELF.Exp6_ := __AND(__OP2(__PP379895.Age_,<,__CN(366)),__CN(__PP379895.In_Customer_Population_ = 1));
-    SELF := __PP379895;
+  SHARED __ST383631_Layout __ND390074__Project(__ST383560_Layout __PP389315) := TRANSFORM
+    SELF.Exp1_ := __PP389315.Kr_High_Risk_Identity_Flag_ = 1;
+    SELF.Exp2_ := __PP389315.Kr_Medium_Risk_Identity_Flag_ = 1;
+    SELF.Exp3_ := __OP2(__PP389315.Age_,<,__CN(2));
+    SELF.Exp4_ := __AND(__OP2(__PP389315.Age_,<,__CN(2)),__CN(__PP389315.In_Customer_Population_ = 1));
+    SELF.Exp5_ := __OP2(__PP389315.Age_,<,__CN(366));
+    SELF.Exp6_ := __AND(__OP2(__PP389315.Age_,<,__CN(366)),__CN(__PP389315.In_Customer_Population_ = 1));
+    SELF := __PP389315;
   END;
-  SHARED __EE380668 := PROJECT(__EE379894,__ND380649__Project(LEFT));
-  SHARED __ST374270_Layout := RECORD
+  SHARED __EE390093 := PROJECT(__EE389314,__ND390074__Project(LEFT));
+  SHARED __ST383671_Layout := RECORD
     KEL.typ.int C_O_U_N_T___Exp1_ := 0;
     KEL.typ.int C_O_U_N_T___Exp1__1_ := 0;
     KEL.typ.int C_O_U_N_T___Exp1__2_ := 0;
@@ -179,8 +180,8 @@ EXPORT B_Social_Security_Number := MODULE
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __EE380713 := PROJECT(__CLEANANDDO(__EE380668,TABLE(__EE380668,{KEL.typ.int C_O_U_N_T___Exp1_ := COUNT(GROUP,__EE380668.Exp1_),KEL.typ.int C_O_U_N_T___Exp1__1_ := COUNT(GROUP,__EE380668.Exp2_),KEL.typ.int C_O_U_N_T___Exp1__2_ := COUNT(GROUP,__T(__EE380668.Exp3_)),KEL.typ.int C_O_U_N_T___Exp1__3_ := COUNT(GROUP,__T(__EE380668.Exp4_)),KEL.typ.int C_O_U_N_T___Exp1__4_ := COUNT(GROUP,__T(__EE380668.Exp5_)),KEL.typ.int C_O_U_N_T___Exp1__5_ := COUNT(GROUP,__T(__EE380668.Exp6_)),UID},UID,MERGE)),__ST374270_Layout);
-  SHARED __ST374960_Layout := RECORD
+  SHARED __EE390138 := PROJECT(__CLEANANDDO(__EE390093,TABLE(__EE390093,{KEL.typ.int C_O_U_N_T___Exp1_ := COUNT(GROUP,__EE390093.Exp1_),KEL.typ.int C_O_U_N_T___Exp1__1_ := COUNT(GROUP,__EE390093.Exp2_),KEL.typ.int C_O_U_N_T___Exp1__2_ := COUNT(GROUP,__T(__EE390093.Exp3_)),KEL.typ.int C_O_U_N_T___Exp1__3_ := COUNT(GROUP,__T(__EE390093.Exp4_)),KEL.typ.int C_O_U_N_T___Exp1__4_ := COUNT(GROUP,__T(__EE390093.Exp5_)),KEL.typ.int C_O_U_N_T___Exp1__5_ := COUNT(GROUP,__T(__EE390093.Exp6_)),UID},UID,MERGE)),__ST383671_Layout);
+  SHARED __ST384362_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Social_Security_Number.Source_Customers_Layout) Source_Customers_;
@@ -225,15 +226,15 @@ EXPORT B_Social_Security_Number := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC380719(B_Social_Security_Number_1.__ST12189_Layout __EE370795, __ST374270_Layout __EE380713) := __EEQP(__EE370795.UID,__EE380713.UID);
-  __ST374960_Layout __JT380719(B_Social_Security_Number_1.__ST12189_Layout __l, __ST374270_Layout __r) := TRANSFORM
+  __JC390144(B_Social_Security_Number_1.__ST12357_Layout __EE380196, __ST383671_Layout __EE390138) := __EEQP(__EE380196.UID,__EE390138.UID);
+  __ST384362_Layout __JT390144(B_Social_Security_Number_1.__ST12357_Layout __l, __ST383671_Layout __r) := TRANSFORM
     SELF.U_I_D__1_ := __r.UID;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE380767 := JOIN(__EE370795,__EE380713,__JC380719(LEFT,RIGHT),__JT380719(LEFT,RIGHT),LEFT OUTER,HASH);
-  SHARED __EE378387 := __EE370795;
-  SHARED __ST374690_Layout := RECORD
+  SHARED __EE390192 := JOIN(__EE380196,__EE390138,__JC390144(LEFT,RIGHT),__JT390144(LEFT,RIGHT),LEFT OUTER,HASH);
+  SHARED __EE387800 := __EE380196;
+  SHARED __ST384091_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Social_Security_Number.Source_Customers_Layout) Source_Customers_;
@@ -272,21 +273,21 @@ EXPORT B_Social_Security_Number := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __ST374690_Layout __JT378398(B_Social_Security_Number_1.__ST12189_Layout __l, E_Social_Security_Number.Hri_List_Layout __r) := TRANSFORM
+  __ST384091_Layout __JT387811(B_Social_Security_Number_1.__ST12357_Layout __l, E_Social_Security_Number.Hri_List_Layout __r) := TRANSFORM
     SELF.__RecordCount := __r.__RecordCount;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE378399 := NORMALIZE(__EE378387,__T(LEFT.Hri_List_),__JT378398(LEFT,RIGHT));
-  SHARED __ST373400_Layout := RECORD
+  SHARED __EE387812 := NORMALIZE(__EE387800,__T(LEFT.Hri_List_),__JT387811(LEFT,RIGHT));
+  SHARED __ST382801_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Hri_;
     KEL.typ.ndataset(E_Social_Security_Number.Hri_List_Layout) Hri_List_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __EE378421 := PROJECT(__EE378399,__ST373400_Layout);
-  SHARED __ST373441_Layout := RECORD
+  SHARED __EE387834 := PROJECT(__EE387812,__ST382801_Layout);
+  SHARED __ST382842_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nbool Exp1_;
     KEL.typ.nbool Exp2_;
@@ -298,18 +299,18 @@ EXPORT B_Social_Security_Number := MODULE
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __ST373441_Layout __ND380771__Project(__ST373400_Layout __PP378258) := TRANSFORM
-    SELF.Exp1_ := __FN2(KEL.Routines.Contains,__PP378258.Hri_,__CN('06'));
-    SELF.Exp2_ := __FN2(KEL.Routines.Contains,__PP378258.Hri_,__CN('26'));
-    SELF.Exp3_ := __FN2(KEL.Routines.Contains,__PP378258.Hri_,__CN('29'));
-    SELF.Exp4_ := __FN2(KEL.Routines.Contains,__PP378258.Hri_,__CN('38'));
-    SELF.Exp5_ := __FN2(KEL.Routines.Contains,__PP378258.Hri_,__CN('71'));
-    SELF.Exp6_ := __FN2(KEL.Routines.Contains,__PP378258.Hri_,__CN('It'));
-    SELF.Exp7_ := __FN2(KEL.Routines.Contains,__PP378258.Hri_,__CN('Mi'));
-    SELF := __PP378258;
+  SHARED __ST382842_Layout __ND390196__Project(__ST382801_Layout __PP387671) := TRANSFORM
+    SELF.Exp1_ := __FN2(KEL.Routines.Contains,__PP387671.Hri_,__CN('06'));
+    SELF.Exp2_ := __FN2(KEL.Routines.Contains,__PP387671.Hri_,__CN('26'));
+    SELF.Exp3_ := __FN2(KEL.Routines.Contains,__PP387671.Hri_,__CN('29'));
+    SELF.Exp4_ := __FN2(KEL.Routines.Contains,__PP387671.Hri_,__CN('38'));
+    SELF.Exp5_ := __FN2(KEL.Routines.Contains,__PP387671.Hri_,__CN('71'));
+    SELF.Exp6_ := __FN2(KEL.Routines.Contains,__PP387671.Hri_,__CN('It'));
+    SELF.Exp7_ := __FN2(KEL.Routines.Contains,__PP387671.Hri_,__CN('Mi'));
+    SELF := __PP387671;
   END;
-  SHARED __EE380793 := PROJECT(__EE378421,__ND380771__Project(LEFT));
-  SHARED __ST373486_Layout := RECORD
+  SHARED __EE390218 := PROJECT(__EE387834,__ND390196__Project(LEFT));
+  SHARED __ST382887_Layout := RECORD
     KEL.typ.int C_O_U_N_T___Hri_List_ := 0;
     KEL.typ.int C_O_U_N_T___Hri_List__1_ := 0;
     KEL.typ.int C_O_U_N_T___Hri_List__2_ := 0;
@@ -321,8 +322,8 @@ EXPORT B_Social_Security_Number := MODULE
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __EE380846 := PROJECT(__CLEANANDDO(__EE380793,TABLE(__EE380793,{KEL.typ.int C_O_U_N_T___Hri_List_ := COUNT(GROUP,__T(__EE380793.Exp1_)),KEL.typ.int C_O_U_N_T___Hri_List__1_ := COUNT(GROUP,__T(__EE380793.Exp2_)),KEL.typ.int C_O_U_N_T___Hri_List__2_ := COUNT(GROUP,__T(__EE380793.Exp3_)),KEL.typ.int C_O_U_N_T___Hri_List__3_ := COUNT(GROUP,__T(__EE380793.Exp4_)),KEL.typ.int C_O_U_N_T___Hri_List__4_ := COUNT(GROUP,__T(__EE380793.Exp5_)),KEL.typ.int C_O_U_N_T___Hri_List__5_ := COUNT(GROUP,__T(__EE380793.Exp6_)),KEL.typ.int C_O_U_N_T___Hri_List__6_ := COUNT(GROUP,__T(__EE380793.Exp7_)),UID},UID,MERGE)),__ST373486_Layout);
-  SHARED __ST375312_Layout := RECORD
+  SHARED __EE390271 := PROJECT(__CLEANANDDO(__EE390218,TABLE(__EE390218,{KEL.typ.int C_O_U_N_T___Hri_List_ := COUNT(GROUP,__T(__EE390218.Exp1_)),KEL.typ.int C_O_U_N_T___Hri_List__1_ := COUNT(GROUP,__T(__EE390218.Exp2_)),KEL.typ.int C_O_U_N_T___Hri_List__2_ := COUNT(GROUP,__T(__EE390218.Exp3_)),KEL.typ.int C_O_U_N_T___Hri_List__3_ := COUNT(GROUP,__T(__EE390218.Exp4_)),KEL.typ.int C_O_U_N_T___Hri_List__4_ := COUNT(GROUP,__T(__EE390218.Exp5_)),KEL.typ.int C_O_U_N_T___Hri_List__5_ := COUNT(GROUP,__T(__EE390218.Exp6_)),KEL.typ.int C_O_U_N_T___Hri_List__6_ := COUNT(GROUP,__T(__EE390218.Exp7_)),UID},UID,MERGE)),__ST382887_Layout);
+  SHARED __ST384714_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Social_Security_Number.Source_Customers_Layout) Source_Customers_;
@@ -375,29 +376,29 @@ EXPORT B_Social_Security_Number := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC380854(__ST374960_Layout __EE380767, __ST373486_Layout __EE380846) := __EEQP(__EE380767.UID,__EE380846.UID);
-  __ST375312_Layout __JT380854(__ST374960_Layout __l, __ST373486_Layout __r) := TRANSFORM
+  __JC390279(__ST384362_Layout __EE390192, __ST382887_Layout __EE390271) := __EEQP(__EE390192.UID,__EE390271.UID);
+  __ST384714_Layout __JT390279(__ST384362_Layout __l, __ST382887_Layout __r) := TRANSFORM
     SELF.U_I_D__2_ := __r.UID;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE380910 := JOIN(__EE380767,__EE380846,__JC380854(LEFT,RIGHT),__JT380854(LEFT,RIGHT),LEFT OUTER,HASH);
-  SHARED __EE378371 := __EE378364(__NN(__EE378364.Social_));
-  SHARED __ST372702_Layout := RECORD
+  SHARED __EE390335 := JOIN(__EE390192,__EE390271,__JC390279(LEFT,RIGHT),__JT390279(LEFT,RIGHT),LEFT OUTER,HASH);
+  SHARED __EE387784 := __EE387777(__NN(__EE387777.Social_));
+  SHARED __ST382103_Layout := RECORD
     KEL.typ.ntyp(E_Social_Security_Number.Typ) UID;
     KEL.typ.ntyp(E_Event.Typ) Transaction_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __EE378385 := DEDUP(PROJECT(__EE378371,TRANSFORM(__ST372702_Layout,SELF.UID := LEFT.Social_,SELF := LEFT)),ALL);
-  SHARED __ST372720_Layout := RECORD
+  SHARED __EE387798 := DEDUP(PROJECT(__EE387784,TRANSFORM(__ST382103_Layout,SELF.UID := LEFT.Social_,SELF := LEFT)),ALL);
+  SHARED __ST382121_Layout := RECORD
     KEL.typ.int C_O_U_N_T___Person_Event_ := 0;
     KEL.typ.ntyp(E_Social_Security_Number.Typ) UID;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __EE378257 := PROJECT(__CLEANANDDO(__EE378385,TABLE(__EE378385,{KEL.typ.int C_O_U_N_T___Person_Event_ := COUNT(GROUP),UID},UID,MERGE)),__ST372720_Layout);
-  SHARED __ST375695_Layout := RECORD
+  SHARED __EE387670 := PROJECT(__CLEANANDDO(__EE387798,TABLE(__EE387798,{KEL.typ.int C_O_U_N_T___Person_Event_ := COUNT(GROUP),UID},UID,MERGE)),__ST382121_Layout);
+  SHARED __ST385097_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Social_Security_Number.Source_Customers_Layout) Source_Customers_;
@@ -452,16 +453,16 @@ EXPORT B_Social_Security_Number := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC380916(__ST375312_Layout __EE380910, __ST372720_Layout __EE378257) := __EEQP(__EE380910.UID,__EE378257.UID);
-  __ST375695_Layout __JT380916(__ST375312_Layout __l, __ST372720_Layout __r) := TRANSFORM
+  __JC390341(__ST384714_Layout __EE390335, __ST382121_Layout __EE387670) := __EEQP(__EE390335.UID,__EE387670.UID);
+  __ST385097_Layout __JT390341(__ST384714_Layout __l, __ST382121_Layout __r) := TRANSFORM
     SELF.U_I_D__3_ := __r.UID;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE380974 := JOIN(__EE380910,__EE378257,__JC380916(LEFT,RIGHT),__JT380916(LEFT,RIGHT),LEFT OUTER,HASH);
-  SHARED __EE371017 := __ENH_Customer_1;
-  SHARED __EE379690 := __EE371017;
-  SHARED __ST376077_Layout := RECORD
+  SHARED __EE390399 := JOIN(__EE390335,__EE387670,__JC390341(LEFT,RIGHT),__JT390341(LEFT,RIGHT),LEFT OUTER,HASH);
+  SHARED __EE380418 := __ENH_Customer_1;
+  SHARED __EE389109 := __EE380418;
+  SHARED __ST385479_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Social_Security_Number.Source_Customers_Layout) Source_Customers_;
@@ -522,20 +523,21 @@ EXPORT B_Social_Security_Number := MODULE
     KEL.typ.int All_High_Frequency_Address_Count_ := 0;
     KEL.typ.int All_Person_Count_ := 0;
     KEL.typ.int Deceased_Person_Count_ := 0;
+    KEL.typ.nkdate Event_Date_Max_;
     KEL.typ.int High_Frequency_Address_Count_ := 0;
     KEL.typ.int Person_Count_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC380980(__ST375695_Layout __EE380974, B_Customer_1.__ST11654_Layout __EE379690) := __EEQP(__EE380974._r_Customer_,__EE379690.UID);
-  __ST376077_Layout __JT380980(__ST375695_Layout __l, B_Customer_1.__ST11654_Layout __r) := TRANSFORM
+  __JC390405(__ST385097_Layout __EE390399, B_Customer_1.__ST11810_Layout __EE389109) := __EEQP(__EE390399._r_Customer_,__EE389109.UID);
+  __ST385479_Layout __JT390405(__ST385097_Layout __l, B_Customer_1.__ST11810_Layout __r) := TRANSFORM
     SELF.U_I_D__4_ := __r.UID;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE381050 := JOIN(__EE380974,__EE379690,__JC380980(LEFT,RIGHT),__JT380980(LEFT,RIGHT),LEFT OUTER,HASH);
-  SHARED __ST376468_Layout := RECORD
+  SHARED __EE390476 := JOIN(__EE390399,__EE389109,__JC390405(LEFT,RIGHT),__JT390405(LEFT,RIGHT),LEFT OUTER,LOOKUP);
+  SHARED __ST385871_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Social_Security_Number.Source_Customers_Layout) Source_Customers_;
@@ -596,6 +598,7 @@ EXPORT B_Social_Security_Number := MODULE
     KEL.typ.int All_High_Frequency_Address_Count_ := 0;
     KEL.typ.int All_Person_Count_ := 0;
     KEL.typ.int Deceased_Person_Count_ := 0;
+    KEL.typ.nkdate Event_Date_Max_;
     KEL.typ.int High_Frequency_Address_Count_ := 0;
     KEL.typ.int Person_Count_ := 0;
     KEL.typ.nuid U_I_D__5_;
@@ -608,14 +611,15 @@ EXPORT B_Social_Security_Number := MODULE
     KEL.typ.int All_High_Frequency_Address_Count__1_ := 0;
     KEL.typ.int All_Person_Count__1_ := 0;
     KEL.typ.int Deceased_Person_Count__1_ := 0;
+    KEL.typ.nkdate Event_Date_Max__1_;
     KEL.typ.int High_Frequency_Address_Count__1_ := 0;
     KEL.typ.int Person_Count__1_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC381056(__ST376077_Layout __EE381050, B_Customer_1.__ST11654_Layout __EE371017) := __EEQP(__EE381050._r_Customer_,__EE371017.UID);
-  __ST376468_Layout __JT381056(__ST376077_Layout __l, B_Customer_1.__ST11654_Layout __r) := TRANSFORM
+  __JC390482(__ST385479_Layout __EE390476, B_Customer_1.__ST11810_Layout __EE380418) := __EEQP(__EE390476._r_Customer_,__EE380418.UID);
+  __ST385871_Layout __JT390482(__ST385479_Layout __l, B_Customer_1.__ST11810_Layout __r) := TRANSFORM
     SELF.U_I_D__5_ := __r.UID;
     SELF.Customer_Id__1_ := __r.Customer_Id_;
     SELF.Industry_Type__1_ := __r.Industry_Type_;
@@ -626,13 +630,14 @@ EXPORT B_Social_Security_Number := MODULE
     SELF.All_High_Frequency_Address_Count__1_ := __r.All_High_Frequency_Address_Count_;
     SELF.All_Person_Count__1_ := __r.All_Person_Count_;
     SELF.Deceased_Person_Count__1_ := __r.Deceased_Person_Count_;
+    SELF.Event_Date_Max__1_ := __r.Event_Date_Max_;
     SELF.High_Frequency_Address_Count__1_ := __r.High_Frequency_Address_Count_;
     SELF.Person_Count__1_ := __r.Person_Count_;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE381160 := JOIN(__EE381050,__EE371017,__JC381056(LEFT,RIGHT),__JT381056(LEFT,RIGHT),LEFT OUTER,HASH);
-  EXPORT __ST11445_Layout := RECORD
+  SHARED __EE390590 := JOIN(__EE390476,__EE380418,__JC390482(LEFT,RIGHT),__JT390482(LEFT,RIGHT),LEFT OUTER,LOOKUP);
+  EXPORT __ST11601_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Social_Security_Number.Source_Customers_Layout) Source_Customers_;
@@ -698,108 +703,108 @@ EXPORT B_Social_Security_Number := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST11445_Layout __ND381165__Project(__ST376468_Layout __PP381161) := TRANSFORM
+  SHARED __ST11601_Layout __ND390595__Project(__ST385871_Layout __PP390591) := TRANSFORM
     SELF.Cl_Element_Count_ := 0;
-    SELF.Cl_Impact_Weight_ := __OP2(__OP2(__OP2(__OP2(__PP381161.Cl_Identity_Count_Percentile_,*,__CN(0.3)),+,__OP2(__PP381161.Cl_Event_Count_Percentile_,*,__CN(0.3))),+,__OP2(__PP381161.Cl_Active30_Identity_Count_Percentile_,*,__CN(0.2))),+,__OP2(__PP381161.Cl_Active7_Identity_Count_Percentile_,*,__CN(0.2)));
+    SELF.Cl_Impact_Weight_ := __OP2(__OP2(__OP2(__OP2(__PP390591.Cl_Identity_Count_Percentile_,*,__CN(0.3)),+,__OP2(__PP390591.Cl_Event_Count_Percentile_,*,__CN(0.3))),+,__OP2(__PP390591.Cl_Active30_Identity_Count_Percentile_,*,__CN(0.2))),+,__OP2(__PP390591.Cl_Active7_Identity_Count_Percentile_,*,__CN(0.2)));
     SELF.Cluster_Score_ := 0;
-    SELF.Customer_Id_ := __PP381161.Customer_Id__1_;
-    SELF.Entity_Context_Uid_ := __OP2(__CN('_15'),+,__PP381161.Ssn_);
+    SELF.Customer_Id_ := __PP390591.Customer_Id__1_;
+    SELF.Entity_Context_Uid_ := __OP2(__CN('_15'),+,__PP390591.Ssn_);
     SELF.Entity_Type_ := 15;
-    SELF.Event_Count_ := __PP381161.C_O_U_N_T___Person_Event_;
-    SELF.Hri06_Flag_ := MAP(__T(__OP2(__CN(__PP381161.C_O_U_N_T___Hri_List_),<>,__CN(0)))=>1,0);
-    SELF.Hri26_Flag_ := MAP(__T(__OP2(__CN(__PP381161.C_O_U_N_T___Hri_List__1_),<>,__CN(0)))=>1,0);
-    SELF.Hri29_Flag_ := MAP(__T(__OP2(__CN(__PP381161.C_O_U_N_T___Hri_List__2_),<>,__CN(0)))=>1,0);
-    SELF.Hri38_Flag_ := MAP(__T(__OP2(__CN(__PP381161.C_O_U_N_T___Hri_List__3_),<>,__CN(0)))=>1,0);
-    SELF.Hri71_Flag_ := MAP(__T(__OP2(__CN(__PP381161.C_O_U_N_T___Hri_List__4_),<>,__CN(0)))=>1,0);
-    SELF.Hri_It_Flag_ := MAP(__T(__OP2(__CN(__PP381161.C_O_U_N_T___Hri_List__5_),<>,__CN(0)))=>1,0);
-    SELF.Hri_Mi_Flag_ := MAP(__T(__OP2(__CN(__PP381161.C_O_U_N_T___Hri_List__6_),<>,__CN(0)))=>1,0);
-    SELF.Kr_High_Risk_Flag_ := MAP(__PP381161.C_O_U_N_T___Exp1_ <> 0=>1,0);
-    SELF.Kr_Medium_Risk_Flag_ := MAP(__PP381161.C_O_U_N_T___Exp1__1_ <> 0=>1,0);
-    SELF.Label_ := __PP381161.Ssn_Formatted_;
-    SELF.Score_ := __OP2(__PP381161.UID,%,__CN(100));
-    SELF.Source_Customer_Count_ := KEL.Aggregates.CountN(__PP381161.Source_Customers_);
-    SELF.Vl_Event1_All_Count_ := __PP381161.C_O_U_N_T___Exp1__2_;
-    SELF.Vl_Event1_Count_ := __PP381161.C_O_U_N_T___Exp1__3_;
-    SELF.Vl_Event30_Active_Flag_ := MAP(__PP381161.Vl_Event30_Count_ > 0=>1,0);
-    SELF.Vl_Event30_All_Active_Flag_ := MAP(__PP381161.Vl_Event30_All_Day_Count_ > 0=>1,0);
-    SELF.Vl_Event365_All_Day_Count_ := __PP381161.C_O_U_N_T___Exp1__4_;
-    SELF.Vl_Event365_Count_ := __PP381161.C_O_U_N_T___Exp1__5_;
-    SELF.Vl_Event7_Active_Flag_ := MAP(__PP381161.Vl_Event7_Count_ > 0=>1,0);
-    SELF.Vl_Event7_All_Active_Flag_ := MAP(__PP381161.Vl_Event7_All_Count_ > 0=>1,0);
-    SELF := __PP381161;
+    SELF.Event_Count_ := __PP390591.C_O_U_N_T___Person_Event_;
+    SELF.Hri06_Flag_ := MAP(__T(__OP2(__CN(__PP390591.C_O_U_N_T___Hri_List_),<>,__CN(0)))=>1,0);
+    SELF.Hri26_Flag_ := MAP(__T(__OP2(__CN(__PP390591.C_O_U_N_T___Hri_List__1_),<>,__CN(0)))=>1,0);
+    SELF.Hri29_Flag_ := MAP(__T(__OP2(__CN(__PP390591.C_O_U_N_T___Hri_List__2_),<>,__CN(0)))=>1,0);
+    SELF.Hri38_Flag_ := MAP(__T(__OP2(__CN(__PP390591.C_O_U_N_T___Hri_List__3_),<>,__CN(0)))=>1,0);
+    SELF.Hri71_Flag_ := MAP(__T(__OP2(__CN(__PP390591.C_O_U_N_T___Hri_List__4_),<>,__CN(0)))=>1,0);
+    SELF.Hri_It_Flag_ := MAP(__T(__OP2(__CN(__PP390591.C_O_U_N_T___Hri_List__5_),<>,__CN(0)))=>1,0);
+    SELF.Hri_Mi_Flag_ := MAP(__T(__OP2(__CN(__PP390591.C_O_U_N_T___Hri_List__6_),<>,__CN(0)))=>1,0);
+    SELF.Kr_High_Risk_Flag_ := MAP(__PP390591.C_O_U_N_T___Exp1_ <> 0=>1,0);
+    SELF.Kr_Medium_Risk_Flag_ := MAP(__PP390591.C_O_U_N_T___Exp1__1_ <> 0=>1,0);
+    SELF.Label_ := __PP390591.Ssn_Formatted_;
+    SELF.Score_ := __OP2(__PP390591.UID,%,__CN(100));
+    SELF.Source_Customer_Count_ := KEL.Aggregates.CountN(__PP390591.Source_Customers_);
+    SELF.Vl_Event1_All_Count_ := __PP390591.C_O_U_N_T___Exp1__2_;
+    SELF.Vl_Event1_Count_ := __PP390591.C_O_U_N_T___Exp1__3_;
+    SELF.Vl_Event30_Active_Flag_ := MAP(__PP390591.Vl_Event30_Count_ > 0=>1,0);
+    SELF.Vl_Event30_All_Active_Flag_ := MAP(__PP390591.Vl_Event30_All_Day_Count_ > 0=>1,0);
+    SELF.Vl_Event365_All_Day_Count_ := __PP390591.C_O_U_N_T___Exp1__4_;
+    SELF.Vl_Event365_Count_ := __PP390591.C_O_U_N_T___Exp1__5_;
+    SELF.Vl_Event7_Active_Flag_ := MAP(__PP390591.Vl_Event7_Count_ > 0=>1,0);
+    SELF.Vl_Event7_All_Active_Flag_ := MAP(__PP390591.Vl_Event7_All_Count_ > 0=>1,0);
+    SELF := __PP390591;
   END;
-  EXPORT __ENH_Social_Security_Number := PROJECT(__EE381160,__ND381165__Project(LEFT)) : PERSIST('~temp::KEL::KELOtto::Social_Security_Number::Annotated',EXPIRE(30));
-  SHARED __EE489862 := __ENH_Social_Security_Number;
+  EXPORT __ENH_Social_Security_Number := PROJECT(__EE390590,__ND390595__Project(LEFT)) : PERSIST('~temp::KEL::KELOtto::Social_Security_Number::Annotated',EXPIRE(30));
+  SHARED __EE502962 := __ENH_Social_Security_Number;
   SHARED IDX_Social_Security_Number_UID_Layout := RECORD
     KEL.typ.uid UID;
-    __EE489862._r_Customer_;
-    __EE489862.Source_Customers_;
-    __EE489862.Ssn_;
-    __EE489862.Otto_S_S_N_Id_;
-    __EE489862.Ssn_Formatted_;
-    __EE489862._v2__divssnidentitycountnew_;
-    __EE489862.Deceased_Date_;
-    __EE489862.Deceased_Date_Of_Birth_;
-    __EE489862.Deceased_First_;
-    __EE489862.Deceased_Middle_;
-    __EE489862.Deceased_Last_;
-    __EE489862.Deceased_Match_Code_;
-    __EE489862._isdeepdive_;
-    __EE489862._county__death_;
-    __EE489862.Deceased_Ssn_;
-    __EE489862._state__death__flag_;
-    __EE489862._death__rec__src_;
-    __EE489862._state__death__id_;
-    __EE489862.Hri_List_;
-    __EE489862.Customer_Id_;
-    __EE489862.Industry_Type_;
-    __EE489862.Source_Customer_Count_;
-    __EE489862.Entity_Context_Uid_;
-    __EE489862.Entity_Type_;
-    __EE489862.Label_;
-    __EE489862.Identity_Count_;
-    __EE489862.Event_Count_;
-    __EE489862.Hri06_Flag_;
-    __EE489862.Hri26_Flag_;
-    __EE489862.Hri29_Flag_;
-    __EE489862.Hri38_Flag_;
-    __EE489862.Hri71_Flag_;
-    __EE489862.Hri_It_Flag_;
-    __EE489862.Hri_Mi_Flag_;
-    __EE489862.Kr_High_Risk_Flag_;
-    __EE489862.Kr_Medium_Risk_Flag_;
-    __EE489862.Vl_Event1_All_Count_;
-    __EE489862.Vl_Event7_All_Count_;
-    __EE489862.Vl_Event30_All_Day_Count_;
-    __EE489862.Vl_Event365_All_Day_Count_;
-    __EE489862.Vl_Event7_All_Active_Flag_;
-    __EE489862.Vl_Event30_All_Active_Flag_;
-    __EE489862.Vl_Event1_Count_;
-    __EE489862.Vl_Event7_Count_;
-    __EE489862.Vl_Event30_Count_;
-    __EE489862.Vl_Event365_Count_;
-    __EE489862.Vl_Event7_Active_Flag_;
-    __EE489862.Vl_Event30_Active_Flag_;
-    __EE489862.Cl_Identity_Count_;
-    __EE489862.Cl_Active7_Identity_Count_;
-    __EE489862.Cl_Active30_Identity_Count_;
-    __EE489862.Cl_Element_Count_;
-    __EE489862.Cl_Event_Count_;
-    __EE489862.Cl_Identity_Count_Percentile_;
-    __EE489862.Cl_Event_Count_Percentile_;
-    __EE489862.Cl_Active30_Identity_Count_Percentile_;
-    __EE489862.Cl_Active7_Identity_Count_Percentile_;
-    __EE489862.Cl_Impact_Weight_;
-    __EE489862.Score_;
-    __EE489862.Cluster_Score_;
-    __EE489862.Date_First_Seen_;
-    __EE489862.Date_Last_Seen_;
-    __EE489862.__RecordCount;
+    __EE502962._r_Customer_;
+    __EE502962.Source_Customers_;
+    __EE502962.Ssn_;
+    __EE502962.Otto_S_S_N_Id_;
+    __EE502962.Ssn_Formatted_;
+    __EE502962._v2__divssnidentitycountnew_;
+    __EE502962.Deceased_Date_;
+    __EE502962.Deceased_Date_Of_Birth_;
+    __EE502962.Deceased_First_;
+    __EE502962.Deceased_Middle_;
+    __EE502962.Deceased_Last_;
+    __EE502962.Deceased_Match_Code_;
+    __EE502962._isdeepdive_;
+    __EE502962._county__death_;
+    __EE502962.Deceased_Ssn_;
+    __EE502962._state__death__flag_;
+    __EE502962._death__rec__src_;
+    __EE502962._state__death__id_;
+    __EE502962.Hri_List_;
+    __EE502962.Customer_Id_;
+    __EE502962.Industry_Type_;
+    __EE502962.Source_Customer_Count_;
+    __EE502962.Entity_Context_Uid_;
+    __EE502962.Entity_Type_;
+    __EE502962.Label_;
+    __EE502962.Identity_Count_;
+    __EE502962.Event_Count_;
+    __EE502962.Hri06_Flag_;
+    __EE502962.Hri26_Flag_;
+    __EE502962.Hri29_Flag_;
+    __EE502962.Hri38_Flag_;
+    __EE502962.Hri71_Flag_;
+    __EE502962.Hri_It_Flag_;
+    __EE502962.Hri_Mi_Flag_;
+    __EE502962.Kr_High_Risk_Flag_;
+    __EE502962.Kr_Medium_Risk_Flag_;
+    __EE502962.Vl_Event1_All_Count_;
+    __EE502962.Vl_Event7_All_Count_;
+    __EE502962.Vl_Event30_All_Day_Count_;
+    __EE502962.Vl_Event365_All_Day_Count_;
+    __EE502962.Vl_Event7_All_Active_Flag_;
+    __EE502962.Vl_Event30_All_Active_Flag_;
+    __EE502962.Vl_Event1_Count_;
+    __EE502962.Vl_Event7_Count_;
+    __EE502962.Vl_Event30_Count_;
+    __EE502962.Vl_Event365_Count_;
+    __EE502962.Vl_Event7_Active_Flag_;
+    __EE502962.Vl_Event30_Active_Flag_;
+    __EE502962.Cl_Identity_Count_;
+    __EE502962.Cl_Active7_Identity_Count_;
+    __EE502962.Cl_Active30_Identity_Count_;
+    __EE502962.Cl_Element_Count_;
+    __EE502962.Cl_Event_Count_;
+    __EE502962.Cl_Identity_Count_Percentile_;
+    __EE502962.Cl_Event_Count_Percentile_;
+    __EE502962.Cl_Active30_Identity_Count_Percentile_;
+    __EE502962.Cl_Active7_Identity_Count_Percentile_;
+    __EE502962.Cl_Impact_Weight_;
+    __EE502962.Score_;
+    __EE502962.Cluster_Score_;
+    __EE502962.Date_First_Seen_;
+    __EE502962.Date_Last_Seen_;
+    __EE502962.__RecordCount;
   END;
-  SHARED IDX_Social_Security_Number_UID_Projected := PROJECT(__EE489862,TRANSFORM(IDX_Social_Security_Number_UID_Layout,SELF.UID:=__T(LEFT.UID),SELF:=LEFT));
+  SHARED IDX_Social_Security_Number_UID_Projected := PROJECT(__EE502962,TRANSFORM(IDX_Social_Security_Number_UID_Layout,SELF.UID:=__T(LEFT.UID),SELF:=LEFT));
   EXPORT IDX_Social_Security_Number_UID := INDEX(IDX_Social_Security_Number_UID_Projected,{UID},{IDX_Social_Security_Number_UID_Projected},'~key::KEL::KELOtto::Social_Security_Number::UID');
   EXPORT IDX_Social_Security_Number_UID_Build := BUILD(IDX_Social_Security_Number_UID,OVERWRITE);
-  EXPORT __ST489864_Layout := RECORDOF(IDX_Social_Security_Number_UID);
-  EXPORT IDX_Social_Security_Number_UID_Wrapped := PROJECT(IDX_Social_Security_Number_UID,TRANSFORM(__ST11445_Layout,SELF.UID := __CN(LEFT.UID),SELF:=LEFT));
+  EXPORT __ST502964_Layout := RECORDOF(IDX_Social_Security_Number_UID);
+  EXPORT IDX_Social_Security_Number_UID_Wrapped := PROJECT(IDX_Social_Security_Number_UID,TRANSFORM(__ST11601_Layout,SELF.UID := __CN(LEFT.UID),SELF:=LEFT));
   EXPORT BuildAll := PARALLEL(IDX_Social_Security_Number_UID_Build);
 END;

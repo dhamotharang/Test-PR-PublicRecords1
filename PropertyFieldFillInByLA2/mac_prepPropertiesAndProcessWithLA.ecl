@@ -1,4 +1,4 @@
-import PropertyFieldFillInByLA2;
+﻿import PropertyFieldFillInByLA2;
 
 /* 
   EXAMPLE EXECUTION OF LA.
@@ -121,6 +121,6 @@ PropertyFieldFillInByLA2.mac_fillinPropertyVariables(pversion
 // */
 
 LAFilledIn_Filename := '~thor_data400::base::PropertyFieldFillinByLA2::'+in_version+'::FilledInVars_ADVO_BASE_with_Hedonics';
-output(FilledInVars_ADVO_BASE_with_Hedonics,,LAFilledIn_Filename,OVERWRITE);
+output(FilledInVars_ADVO_BASE_with_Hedonics,,LAFilledIn_Filename,compressed,OVERWRITE);
 
 ENDMACRO;
