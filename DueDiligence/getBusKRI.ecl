@@ -405,7 +405,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
                       le.inputaddressprovided = FALSE;
 		
     BusMatchLevel_Flag9 := IF(le.score < 50 AND inputLexIDOnly = FALSE, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
-		BusMatchLevel_Flag8 := IF(le.score BETWEEN 51 AND 74, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
+		BusMatchLevel_Flag8 := IF(le.score BETWEEN 50 AND 74, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
 		BusMatchLevel_Flag7 := IF(le.score BETWEEN 75 AND 84, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
 		BusMatchLevel_Flag6 := IF(le.score BETWEEN 85 AND 95, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
 		BusMatchLevel_Flag5 := IF(le.score = 96, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);
