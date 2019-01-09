@@ -224,23 +224,34 @@ patw roll_paw(patw le, patw rt) := transform
 	
 	new_phone := le.phone<>'' and stringlib.stringfind(le.active_phones, le.phone, 1)=0 ;
 	self.Business_active_phone_ct := if(new_phone, le.business_active_phone_ct + 1, le.Business_active_phone_ct);
-	self.active_phones := if(new_phone, trim(le.active_phones) + ',' + le.phone, le.active_phones);
+	self.active_phones := if(new_phone, trim(le.active_phones) + ',' + rt.phone, le.active_phones);
 	self := rt;
 end;
 
-grouped_pawfile_full := group(sort(pawfile_full, seq, -(unsigned)bdid, -last_seen_date, -first_seen_date), seq);
+grouped_pawfile_full_sort_all := group(sort(pawfile_full, seq, -(unsigned)bdid, -last_seen_date, -first_seen_date), seq);
+grouped_pawfile_full_sort_date := group(sort(pawfile_full,-last_seen_date), seq);
+rolled_paw_sort_all := rollup(grouped_pawfile_full_sort_all, true, roll_paw(left, right));
+rolled_paw_sort_date:= rollup(grouped_pawfile_full_sort_date, true, roll_paw(left, right));
 
-rolled_paw := rollup(grouped_pawfile_full, true, roll_paw(left, right));
+//transform to join two sorted data
+grouped_pawfile_full_sort_all join_sort(grouped_pawfile_full_sort_all le,grouped_pawfile_full_sort_date ri):=TRANSFORM
+self.dead_business_ct:= ri.dead_business_ct;
+self:=le;
+end
+;
+
+rolled_paw:= join(rolled_paw_sort_all,rolled_paw_sort_date,left.seq=right.seq,join_sort(left,right));
 
 with_paw := group(join(clam_pre_employment, rolled_paw, left.seq=right.seq,
 									transform(risk_indicators.Layout_Boca_Shell, self.employment := right, self := left), 
-									left outer, keep(1)), seq);						
-
-// output(pawfile_full, named('pawfile_full'));
-// output(grouped_pawfile_full, named('grouped_pawfile_full'));
-// output(choosen(rolled_paw, eyeball), named('rolled_paw_raw'));
+									left outer, keep(1)), seq);
+                  
+// output(grouped_pawfile_full_sort_all);               
+// output(grouped_pawfile_full_sort_date);
+// output(rolled_paw_sort_all);
+// output(rolled_paw_sort_date);
+// output(rolled_paw);
 
 return with_paw;
 
 end;
-

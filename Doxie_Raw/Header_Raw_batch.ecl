@@ -58,7 +58,7 @@ header.MAC_GlbClean_Header(Fetch1,Fetched10,true, , mod_access_local);
 fetched := fetched10(dateVal = 0 OR dt_first_seen <= dateVal);
 
 suppress.MAC_Mask(fetched,out_mskd,ssn,blank,true,false,true,true);
-doxie.mac_HeaderDates(out_mskd,out_hd,true)
+doxie.mac_HeaderDates(out_mskd, out_hd, mod_access, , true);
 
 ut.MAC_Slim_Back(out_hd, outrec, outf);
 

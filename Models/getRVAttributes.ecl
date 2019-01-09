@@ -1,4 +1,4 @@
-﻿import address, fcra_opt_out, Models, Risk_Indicators, ut, riskview;
+﻿import Models, Risk_Indicators, ut, riskview, Std;
 
 export getRVAttributes(grouped DATASET(risk_indicators.Layout_Boca_Shell) clam, string30 account_value, boolean isPreScreen = false, boolean opt_out_hit = false, 
 	string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction, UNSIGNED8 BSOptions = 0) := FUNCTION
@@ -19,7 +19,7 @@ Models.Layout_RVAttributes.Layout_rvAttrSeqWithAddrAppend intoAttributes(clam le
 	fulldate := (unsigned4)risk_indicators.iid_constants.myGetDate(le.historydate);	// full history date
 
 	getPreviousMonth(unsigned histdate) := FUNCTION
-			rollBack := trim((string)(histdate)[5..6])='01';
+			rollBack := trim(((string)histdate)[5..6])='01';
 			histYear := if(rollBack, (unsigned)((trim((string)histdate)[1..4]))-1, (unsigned)(trim((string)histdate)[1..4]));
 			histMonth := if(rollBack, 12, (unsigned)((trim((string)histdate)[5..6]))-1);
 			return (unsigned)(intformat(histYear,4,1) + intformat(histMonth,2,1));
@@ -83,14 +83,14 @@ Models.Layout_RVAttributes.Layout_rvAttrSeqWithAddrAppend intoAttributes(clam le
 	crim_flag := le.bjl.criminal_count > 0;
 	liens_historical_unrel_flag := le.bjl.liens_historical_unreleased_count > 0;// should this be recent as well?
 	num_derog_sources := (integer)crim_flag + (integer)le.bjl.bankrupt + (integer)liens_historical_unrel_flag;
-	max_source_count1 := ut.max2(le.name_verification.source_count, le.address_verification.input_address_information.source_count);
-	max_source_count := ut.max2(max_source_count1, le.ssn_verification.header_count);
-	num_nonderogs := ut.max2(max_source_count-num_derog_sources, 0);
+	max_source_count1 := Max(le.name_verification.source_count, le.address_verification.input_address_information.source_count);
+	max_source_count := Max(max_source_count1, le.ssn_verification.header_count);
+	num_nonderogs := Max(max_source_count-num_derog_sources, 0);
 	self.lifestyle.number_nonderogs :=(string)add1U(num_nonderogs);
 	
-	last_seen := ut.max2(le.ssn_verification.header_last_seen, le.ssn_verification.credit_last_seen);
+	last_seen := Max(le.ssn_verification.header_last_seen, le.ssn_verification.credit_last_seen);
 	self.lifestyle.date_last_seen := checkDate6(last_seen);
-	sysdate := if(le.historydate <> 999999, (integer)((string)le.historydate[1..6]), (integer)(ut.GetDate[1..6]));
+	sysdate := if(le.historydate <> 999999, (integer)(((string)le.historydate)[1..6]), (integer)(((string)Std.Date.Today())[1..6]));
 	self.lifestyle.recent_update := (sysdate - last_seen) < 100;
 	//self.lifestyle.license_type := '';//le.professional_license.license_type;
 
@@ -563,7 +563,7 @@ Models.Layout_RVAttributes.Layout_rvAttrSeqWithAddrAppend intoAttributes(clam le
 	
 	// Derogatory Public Records
 	self.version2.total_number_derogs := capU(le.bjl.felony_count + le.bjl.filing_count + le.bjl.liens_historical_unreleased_count + le.bjl.liens_recent_unreleased_count, capZero, cap255);
-	date_last_derog := ut.max2(ut.max2(le.bjl.last_felony_date, (integer)le.bjl.last_liens_unreleased_date),le.bjl.date_last_seen);
+	date_last_derog := Max(Max(le.bjl.last_felony_date, (integer)le.bjl.last_liens_unreleased_date),le.bjl.date_last_seen);
 	self.version2.date_last_derog := if(date_last_derog>fullDate, 0, date_last_derog);
 	self.version2.felonies := capU(le.bjl.felony_count, capZero, cap255);
 	self.version2.date_last_conviction := if(le.bjl.last_felony_date>fullDate, 0, le.bjl.last_felony_date);
@@ -628,7 +628,7 @@ Models.Layout_RVAttributes.Layout_rvAttrSeqWithAddrAppend intoAttributes(clam le
 	self.version2.num_proflic := capU(le.professional_license.proflic_count, capZero, cap255);
 	self.version2.date_last_proflic := if(le.professional_license.date_most_recent>fullDate, 0, le.professional_license.date_most_recent);
 	self.version2.proflic_type := le.professional_license.license_type;
-	self.version2.expire_date_last_proflic := IF((UNSIGNED)le.professional_license.expiration_date[1..4] > 2100 OR (UNSIGNED)le.professional_license.expiration_date[1..4] < 1989, 999999, le.professional_license.expiration_date); // 999999 indicates this attribute should be blanked out
+	self.version2.expire_date_last_proflic := IF((UNSIGNED)((string)le.professional_license.expiration_date)[1..4] > 2100 OR (UNSIGNED)((string)le.professional_license.expiration_date)[1..4] < 1989, 999999, le.professional_license.expiration_date); // 999999 indicates this attribute should be blanked out
 	self.version2.num_proflic30 := capU(le.professional_license.proflic_count30, capZero, cap255);
 	self.version2.num_proflic90 := capU(le.professional_license.proflic_count90, capZero, cap255);
 	self.version2.num_proflic180 := capU(le.professional_license.proflic_count180, capZero, cap255);
@@ -673,24 +673,24 @@ Models.Layout_RVAttributes.Layout_rvAttrSeqWithAddrAppend intoAttributes(clam le
 	cap150 := '150';
 	cap960 := '960';
 	getMin(string input, string lowerBound, string upperBound) := IF((unsigned)input < (unsigned)upperBound, IF((UNSIGNED)input < (UNSIGNED)lowerBound and input <> '', lowerBound, input), upperBound);	// get smaller number and make sure the lower bounds is not exceeded
-  sysdateV3 := if(le.historydate <> 999999, (integer)((string)le.historydate[1..6]), (integer)le.header_summary.header_build_date);
+  sysdateV3 := if(le.historydate <> 999999, (integer)(((string)le.historydate)[1..6]), (integer)le.header_summary.header_build_date);
   checkHdrBldDate(unsigned FoundDate, unsigned HdrBldDate) := FUNCTION
 			outDate := if(foundDate >= HdrBldDate, HdrBldDate, foundDate);
 			return outDate;
 	END;
 	
 	// per mike woodberry 4-13-10, if first seen months are 00, set them to 01 
-	IAdateFirstSeen := if((string)le.address_verification.input_address_information.date_first_seen[5..6]='00', (unsigned)((string)le.address_verification.input_address_information.date_first_seen[1..4]+'01'),
+	IAdateFirstSeen := if(((string)le.address_verification.input_address_information.date_first_seen)[5..6]='00', (unsigned)(((string)le.address_verification.input_address_information.date_first_seen)[1..4]+'01'),
 																																																							le.address_verification.input_address_information.date_first_seen);
-	AH1dateFirstSeen := if((string)le.address_verification.address_history_1.date_first_seen[5..6]='00', 	(unsigned)((string)le.address_verification.address_history_1.date_first_seen[1..4]+'01'),
+	AH1dateFirstSeen := if(((string)le.address_verification.address_history_1.date_first_seen)[5..6]='00', 	(unsigned)(((string)le.address_verification.address_history_1.date_first_seen)[1..4]+'01'),
 																																																				le.address_verification.address_history_1.date_first_seen);
-	AH2dateFirstSeen := if((string)le.address_verification.address_history_2.date_first_seen[5..6]='00', 	(unsigned)((string)le.address_verification.address_history_2.date_first_seen[1..4]+'01'),
+	AH2dateFirstSeen := if(((string)le.address_verification.address_history_2.date_first_seen)[5..6]='00', 	(unsigned)(((string)le.address_verification.address_history_2.date_first_seen)[1..4]+'01'),
 																																																				le.address_verification.address_history_2.date_first_seen);
 																																																
 
 	// Identity Authentication Attributes
 	subjectFirstSeen := fixYYYY00(ut.Min2(le.ssn_verification.header_first_seen, le.ssn_verification.credit_first_seen));
-	subjectLastSeen := checkHdrBldDate(fixYYYY00(ut.Max2(le.ssn_verification.header_last_seen, le.ssn_verification.credit_last_seen)), le.header_summary.header_build_date);
+	subjectLastSeen := checkHdrBldDate(fixYYYY00(Max(le.ssn_verification.header_last_seen, le.ssn_verification.credit_last_seen)), le.header_summary.header_build_date);
 	self.version3.AgeOldestRecord := getMin(if(subjectFirstSeen=0, '', (string)round((ut.DaysApart((string)subjectFirstSeen, (string)sysdateV3)) / 30)), (STRING)capAtOne, cap960);
 	self.version3.AgeNewestRecord := getMin(if(subjectLastSeen=0, '', (string)round((ut.DaysApart((string)subjectLastSeen, (string)sysdateV3)) / 30)), (STRING)capAtOne, cap960);
 	self.version3.isRecentUpdate := (sysdateV3 - last_seen) < 100;
@@ -975,12 +975,12 @@ Models.Layout_RVAttributes.Layout_rvAttrSeqWithAddrAppend intoAttributes(clam le
 	self.version3.property_historically_owned := capU((le.address_verification.owned.property_total + le.address_verification.sold.property_total + le.address_verification.ambiguous.property_total), capZero, cap255);
 	
 	dfp := if(le.other_address_info.date_first_purchase>fullDate, 0, 
-																																if((string)le.other_address_info.date_first_purchase[5..6]='00',(unsigned)((string)le.other_address_info.date_first_purchase[1..4]+'01'+(string)le.other_address_info.date_first_purchase[7..8]),
+																																if(((string)le.other_address_info.date_first_purchase)[5..6]='00',(unsigned)(((string)le.other_address_info.date_first_purchase)[1..4]+'01'+((string)le.other_address_info.date_first_purchase)[7..8]),
 																																																																le.other_address_info.date_first_purchase));
 	self.version3.PropAgeOldestPurchase := getMin(if(dfp=0, '', (string)round((ut.DaysApart((string)le.other_address_info.date_first_purchase,	(string)sysdate)) / 30)), (STRING)capZero, cap960);
 	
 	dmrp := if(le.other_address_info.date_most_recent_purchase>fullDate, 0, 
-																																				if((string)le.other_address_info.date_most_recent_purchase[5..6]='00',(unsigned)((string)le.other_address_info.date_most_recent_purchase[1..4]+'01'+(string)le.other_address_info.date_most_recent_purchase[7..8]),
+																																				if(((string)le.other_address_info.date_most_recent_purchase)[5..6]='00',(unsigned)(((string)le.other_address_info.date_most_recent_purchase)[1..4]+'01'+((string)le.other_address_info.date_most_recent_purchase)[7..8]),
 																																																																							le.other_address_info.date_most_recent_purchase));
 	self.version3.PropAgeNewestPurchase := getMin(if(dmrp=0, '', (string)round((ut.DaysApart((string)le.other_address_info.date_most_recent_purchase,	(string)sysdate)) / 30)), (STRING)capZero, cap960);
 	
@@ -1022,9 +1022,9 @@ Models.Layout_RVAttributes.Layout_rvAttrSeqWithAddrAppend intoAttributes(clam le
 	// Derogatory Public Records
 	eviction_count := le.BJL.eviction_historical_unreleased_count + le.BJL.eviction_recent_unreleased_count;	// get only unreleased evictions, just like liens
 	self.version3.total_number_derogs := capU((le.bjl.felony_count + le.bjl.filing_count + le.bjl.liens_historical_unreleased_count + le.bjl.liens_recent_unreleased_count + eviction_count), capZero, cap255);
-	date_last_derogv31 := ut.max2(le.bjl.last_felony_date, (integer)le.bjl.last_liens_unreleased_date);
-	date_last_derogv32 := ut.max2(le.bjl.date_last_seen, if(eviction_count>0, le.bjl.last_eviction_date, 0));	// only use the eviction date if there is an unreleased eviction
-	date_last_derogv3 := ut.max2(date_last_derogv31, date_last_derogv32);
+	date_last_derogv31 := Max(le.bjl.last_felony_date, (integer)le.bjl.last_liens_unreleased_date);
+	date_last_derogv32 := Max(le.bjl.date_last_seen, if(eviction_count>0, le.bjl.last_eviction_date, 0));	// only use the eviction date if there is an unreleased eviction
+	date_last_derogv3 := Max(date_last_derogv31, date_last_derogv32);
 	
 	self.version3.felonies := capU(le.bjl.felony_count, capZero, cap255);
 	lfd := if(le.bjl.last_felony_date>fullDate, 0, le.bjl.last_felony_date);
@@ -1109,7 +1109,7 @@ Models.Layout_RVAttributes.Layout_rvAttrSeqWithAddrAppend intoAttributes(clam le
 	self.version3.ProfLicAge := getMin(if(plmrd=0, '', (string)round((ut.DaysApart((string)le.professional_license.date_most_recent, (string)sysdate)) / 30)), (STRING)capZero, cap960);
 
 	self.version3.proflic_type := if(le.professional_license.proflic_count=0, '', le.professional_license.license_type);
-	self.version3.expire_date_last_proflic := if(le.professional_license.expiration_date=0 OR (UNSIGNED)le.professional_license.expiration_date[1..4] > 2100 OR (UNSIGNED)le.professional_license.expiration_date[1..4] < 1989, '', TRIM((string)le.professional_license.expiration_date));
+	self.version3.expire_date_last_proflic := if(le.professional_license.expiration_date=0 OR (UNSIGNED)((string)le.professional_license.expiration_date)[1..4] > 2100 OR (UNSIGNED)((String)le.professional_license.expiration_date)[1..4] < 1989, '', TRIM((string)le.professional_license.expiration_date));
 	self.version3.num_proflic := capU(le.professional_license.proflic_count, capZero, cap255);
 	self.version3.num_proflic30 := capU(le.professional_license.proflic_count30, capZero, cap255);
 	self.version3.num_proflic90 := capU(le.professional_license.proflic_count90, capZero, cap255);
@@ -1179,8 +1179,8 @@ Models.Layout_RVAttributes.Layout_rvAttrSeqWithAddrAppend intoAttributes(clam le
 	
 
 	ageDate := Risk_Indicators.iid_constants.myGetDate(le.historydate);
-	self.version3.InferredMinimumAge := getMin(if(le.inferred_age=0 OR (isPrescreen AND (le.inferred_age < 21 OR (ut.GetAgeI_asOf(le.reported_dob, (unsigned)ageDate)) < 21)), '', (string)le.inferred_age), (STRING)capZero, cap150);
-	self.version3.BestReportedAge := getMin(if(le.reported_dob=0 OR (isPrescreen AND (le.inferred_age < 21 OR (ut.GetAgeI_asOf(le.reported_dob, (unsigned)ageDate)) < 21)), '', (string)ut.GetAgeI_asOf(le.reported_dob, (unsigned)ageDate)), (STRING)capZero, cap150);
+	self.version3.InferredMinimumAge := getMin(if(le.inferred_age=0 OR (isPrescreen AND (le.inferred_age < 21 OR (ut.Age(le.reported_dob, (unsigned)ageDate)) < 21)), '', (string)le.inferred_age), (STRING)capZero, cap150);
+	self.version3.BestReportedAge := getMin(if(le.reported_dob=0 OR (isPrescreen AND (le.inferred_age < 21 OR (ut.Age(le.reported_dob, (unsigned)ageDate)) < 21)), '', (string)ut.Age(le.reported_dob, (unsigned)ageDate)), (STRING)capZero, cap150);
 
 	self.version3.SubjectSSNCount := capU(le.velocity_counters.ssns_per_adl, capZero, cap255);
 	self.version3.SubjectAddrCount := capU(le.velocity_counters.addrs_per_adl, capZero, cap255);

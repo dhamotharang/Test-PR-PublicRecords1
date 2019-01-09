@@ -13,8 +13,7 @@ EXPORT fetch_SALT (dataset (AutoHeaderV2.layouts.search) ds_search, integer sear
 				transform(inLayout, 
 			self.did := 0;
 			self.new_score := 0;			
-			self.ssn := if(left.tssn.ssn in ut.Set_BadSSN, '', left.tssn.ssn) ;	 // remove from inquiry bad ssn searches
-			boolean fullssn  := length(trim(self.ssn))=9 and STD.Str.FindCount(self.ssn, '00000')=0;
+			self.ssn := if(left.tssn.ssn in ut.Set_BadSSN, '', left.tssn.ssn) ;	 // remove from inquiry bad ssn searches			
 			self.dob := (STRING)IF(left.tdob.dob=0, LEFT.tdob.dob_low, left.tdob.dob) ; // left.tdob.agehigh
 			self.fname := left.tname.fname;
 			self.mname := left.tname.mname;
@@ -27,7 +26,9 @@ EXPORT fetch_SALT (dataset (AutoHeaderV2.layouts.search) ds_search, integer sear
 			self.sec_range := left.taddress.sec_range; 
 			String5 theZip := left.taddress.zip5;		
 			unsigned1 zip_radius := left.taddress.zip_radius;			 			
-			zipDs := IF(left.taddress.zip_set=[], dataset([{left.taddress.zip5}],{Integer4 zip}), dataset(left.taddress.zip_set,{Integer4 zip}));
+			zipDs := MAP(left.taddress.zip_set<>[] => dataset(left.taddress.zip_set,{Integer4 zip}), 
+                left.taddress.zip5<>'' => dataset([{left.taddress.zip5}],{Integer4 zip}),
+                dataset([], {Integer4 zip}));
 			self.zips := project(zipDs, transform(InsuranceHeader_xLink.Process_xIDL_Layouts().layout_ZIP_cases,
 						 self.zip := INTFORMAT(left.zip, 5, 1);
 						 integer dist := ut.zip_Dist(theZip, (string5)left.zip)+1;			
@@ -50,21 +51,27 @@ EXPORT fetch_SALT (dataset (AutoHeaderV2.layouts.search) ds_search, integer sear
 			self.state := IF(ds_search[1].taddress.state='', ds_search[1].taddress.state_prev_1, ds_search[1].taddress.state);
 			self.UniqueID := ds_search[1].seq;
 			 self := []));
-	inData := IF(ds_search[1].tssn.fuzzy_ssn and count(ds_search[1].tssn.ssn_set) >1,  inDataSSn, inDataOne);
-
-	
+    inDataNickname := project(inDataOne, transform(inLayout, 
+        self.fname := InsuranceHeader_xlink.fn_preferredName(left.fname), 
+        self := left));
+	 // Releavant options
+	boolean isStrict := ds_search[1].options.strict_match;
+	boolean isEditDistance := ~isStrict and ds_search[1].tname.check_name_variants;
+	boolean isNickName := ~isStrict and ds_search[1].tname.nicknames;
+  boolean isFullssn  := length(trim(inDataOne[1].ssn))=9 and STD.Str.FindCount(inDataOne[1].ssn, '00000')=0;
+  boolean isCompleteAddr := inDataOne[1].prim_range<>'' and inDataOne[1].prim_name<>'' and ((inDataOne[1].city<>'' and inDataOne[1].state<>'') or inDataOne[1].zip<>'');
+  boolean isNickNameLink := isNickName and inDataOne[1].dob='0' and not isFullSsn and not isCompleteAddr;
+	boolean isPhonetic := ~isStrict and ds_search[1].tname.phonetic;
+	boolean isWildcard := search_code & AutoHeaderV2.Constants.SearchCode.ALLOW_WILDCARD;
+  
+  inData := IF(ds_search[1].tssn.fuzzy_ssn and count(ds_search[1].tssn.ssn_set) >1,  inDataSSn, 
+              inDataOne + IF(isNickNameLink, inDataNickname, dataset([],inLayout)));
+  
 	IDLExternalLinking.mac_xLinking_PS(inData, UniqueID, name_suffix , fname , mname , lname ,, 
 								 ,PRIM_NAME ,PRIM_RANGE ,SEC_RANGE ,city ,
 												 state , zips ,SSN ,DOB, PHONE,  , , 
 														rel_fname, rel_lname,outfile);
-																												
-		// ToDo: filter candidates for accurint based on phonetic, checkvariantes and strictMatches
-		boolean isStrict := ds_search[1].options.strict_match;
-		boolean isEditDistance := ~isStrict and ds_search[1].tname.check_name_variants;
-		boolean isNickName := ~isStrict and ds_search[1].tname.nicknames;
-		boolean isPhonetic := ~isStrict and ds_search[1].tname.phonetic;
-		boolean isWildcard := search_code & AutoHeaderV2.Constants.SearchCode.ALLOW_WILDCARD;
-		
+				
 		// build filtering condition
 		result1 := IF(isEditDistance, outfile, outfile(fname_match_code <> SALT37.MatchCode.EditdistanceMatch or (ssn5weight>0 and ssn4weight>0)));
 		result2 := IF(isEditDistance, result1, result1(lname_match_code <> SALT37.MatchCode.EditdistanceMatch or (ssn5weight>0 and ssn4weight>0)));
@@ -80,7 +87,7 @@ EXPORT fetch_SALT (dataset (AutoHeaderV2.layouts.search) ds_search, integer sear
 		result9 := IF(isWildcard, result8, result8(prim_range_match_code<>SALT37.MatchCode.WildMatch or (ssn5weight>0 and ssn4weight>0)));
 		
 		// remove insurance LexIDs
-		result := result9(DID<IDLExternalLinking.Constants.INSURANCE_LEXID);
+		result := result9(DID<IDLExternalLinking.Constants.INSURANCE_LEXID and DID>0);
 		
 		// transform in search output		
 		resultfinal := project(result, 
@@ -93,7 +100,7 @@ EXPORT fetch_SALT (dataset (AutoHeaderV2.layouts.search) ds_search, integer sear
 					self.status := 0, 
 					self.err_code := 0));										
  
-	integer errorCode := 203;			
+	integer errorCode := 203;
 	RETURN MAP(resultfinal[1].did>0 => resultfinal,
 							no_fail => dataset([], AutoheaderV2.layouts.search_out), 
 							FAIL(resultfinal, 203, doxie.ErrorCodes(errorCode) + ' - SALT'));	

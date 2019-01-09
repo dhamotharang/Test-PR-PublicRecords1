@@ -3,7 +3,8 @@ onThor := _Control.Environment.OnThor;
 
 EXPORT getAllBocaShellModels(grouped dataset(risk_indicators.Layout_Boca_Shell) bsData_pre, 
 	boolean isFCRA, 
-	dataset(easi.layout_census) easi_census) := function
+	dataset(easi.layout_census) easi_census,
+  boolean adl_based_shell= false) := function
 
 #IF(onThor)
 	bsData := group(sort(distribute(bsData_pre, hash64(seq)), seq, local), seq, local);
@@ -163,7 +164,7 @@ Layout_Boca_Shell doModels(Layout_Boca_Shell le, Models.Layout_ModelOut ri, inte
 	self.rv_scores.prescreenv4 := if( i=25, ri.score, le.rv_scores.prescreenv4 );
 	
 		//	In the event that the minimum input requirements mentioned in Req 1.2.1 are not met, a Roxie exception should be returned that indicates the minimum input requirements were not met and therefore a valid response was not returned
-input_ok := if(( 
+input_ok_Normal := if(( 
 							((trim(le.Shell_Input.fname)<>'' and trim(le.Shell_Input.lname)<>'') ) and  	// name check
 							(trim(le.Shell_Input.ssn)<>'' or   																																																		// ssn check
 								( trim(le.Shell_Input.in_streetAddress)<>'' and 																																													// address check
@@ -173,7 +174,20 @@ input_ok := if((
 							true,
 							false
 						);
-		
+input_Adl_based_shell:=if(( 
+							((trim(le.Shell_Input.fname)<>'' and trim(le.Shell_Input.lname)<>'') ) and  	// name check
+							(le.ADL_Shell_Flags.in_addrpop=1) or   																																																		
+								(le.ADL_Shell_Flags.in_ssnpop=1									// check flagships for V5
+							)
+								),
+							true,
+							false
+						);
+            
+input_ok:= If(adl_based_shell,input_Adl_based_shell,input_ok_normal);
+
+						
+
 
 		// flagship v5
 	self.rv_scores.bankcardv5  := if( i=26 and input_ok, ri.score, le.rv_scores.bankcardv5 );

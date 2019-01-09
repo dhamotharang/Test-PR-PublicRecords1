@@ -34,10 +34,20 @@ EXPORT IDataAccess := INTERFACE
   EXPORT boolean isValidGLB (boolean RNA=false) := $.compliance.glb_ok (glb, RNA); 
   EXPORT boolean isValidDPPA (boolean RNA=false) := $.compliance.dppa_ok (dppa, RNA);
 
+  // export restrictRNA is used only in MAC_ApplyRestrictions;
+  EXPORT boolean isRnaRestrictedGLB () := $.compliance.is_glb_RNA (glb);
+  EXPORT boolean isRnaRestrictedDPPA () := $.compliance.is_dppa_RNA (dppa);
+
   EXPORT boolean isValidDPPAState (string2 st, string2 header_source='', string2 source_code='') :=
            $.compliance.dppa_state_ok (st, dppa, header_source, source_code);
   EXPORT boolean isHeaderPreGLB (unsigned3 nonglb_last_seen, unsigned3 first_seen, string2 src) := 
            $.compliance.HeaderIsPreGLB (nonglb_last_seen, first_seen, src, DataRestrictionMask);
 
   EXPORT boolean isConsumer () := industry_class = 'CNSMR';
+  EXPORT boolean isUtility () := industry_class = 'UTILI';
+
+  // restrictions based on data restriction mask flags
+  EXPORT boolean isPreGLBRestricted () := $.compliance.isPreGLBRestricted (DataRestrictionMask);
+  EXPORT boolean isECHRestricted () := $.compliance.isECHRestricted (DataRestrictionMask);
+  EXPORT boolean isEQCHRestricted () := $.compliance.isEQCHRestricted (DataRestrictionMask);
 END;

@@ -1,4 +1,5 @@
 ﻿/*--SOAP--
+
 <message name="BCD_SmallBizCombinedReport" wuTimeout="300000">
 	<part name="SmallBizCombinedReportRequest" type="tns:XmlDataSet" cols="110" rows="75"/>
   <!-- Option Fields --> 
@@ -146,6 +147,7 @@ EXPORT BCD_SmallBizCombinedReport :=
                                           search.AuthorizedRep3.Address.StreetAddress1);
 
     // Option Fields
+	#STORED('LimitPaymentHistory24Months',Option.LimitPaymentHistory24Months); //  busines credit	report w SBFE data project additions
     BOOLEAN LimitPaymentHistory24MonthsVal := FALSE : STORED('LimitPaymentHistory24Months');   // bus credit report w SBFE additions.
     STRING  ContributorIds := '' : STORED('SBFEContributorIds');  	  // bus credit report w SBFE additions.	
     UNSIGNED3 HistoryDateYYYYMM		    := (INTEGER)Business_Risk_BIP.Constants.NinesDate     : STORED('HistoryDateYYYYMM');
@@ -485,6 +487,6 @@ EXPORT BCD_SmallBizCombinedReport :=
     // OUTPUT(ds_Results.CreditReportRecords[1].AdditionalInfo.CompanyNameVariations,  NAMED('CompanyNameVariations'));
 
     OUTPUT(ds_Results,   NAMED('Results')); 
-    OUTPUT(ds_Royalties, NAMED('ds_Royalties'));
+    OUTPUT(ds_Royalties, NAMED('RoyaltySet'));
     
 ENDMACRO;

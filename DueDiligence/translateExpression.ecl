@@ -14,7 +14,8 @@ EXPORT translateExpression := MODULE
     SHARED LEVEL_0 := 0;  //not actual level - used to catch if it doesn't fall into a level hit (ie UNCATEGORIZED)
     
     //Enums - unique identifier for expressions, used as weight. When weight changes, just need to change order of the enum list here
-    EXPORT ExpressionEnum := ENUM(UNCATEGORIZED = 0, NO_OFFENSE_PROVIDED, INFRACTIONS_AND_ORDINANCES, HUNTING_AND_FISHING, ZONING, COURT_CHARGES, ALCOHOL_RELATED, 
+    //list in ascending order from least important to highest - largest offense will have highest weight
+    EXPORT ExpressionEnum := ENUM(UNCATEGORIZED = 0, NO_OFFENSE_PROVIDED, INFRACTIONS_AND_ORDINANCES, LIVESTOCK_AND_ANIMAL, HUNTING_AND_FISHING, ZONING, COURT_CHARGES, ALCOHOL_RELATED, 
                                   TRAFFIC_OFFENSES, DUI, CHILD_SUPPORT, ALIEN_AND_IMMIGRATION, DISORDERLY_CONDUCT, TRESPASSING,
                                   SHOPLIFTING, ORGANIZED_RETAIL_THEFT, GAMBLING_BITCOIN, COMPUTER, FALSE_STATEMENTS_IMPERSONATION_IDENTIFICATION, TAMPERING, OBSTRUCTION,
                                   PERJURY, VANDALISM, DESTRUCTION_OF_PROPERTY, RESISTING_ARREST_ESCAPE_ELUDE, VIOLATING_ORDERS, FUGITIVE_OR_WARRANT, CYBER_STALKING,
@@ -23,8 +24,8 @@ EXPORT translateExpression := MODULE
                                   LARCENY, THEFT, FELONY_OR_AGGRAVATED_THEFT, CAR_JACK, ROBBERY, ARMED_ROBBERY, BANK_ROBBERY, GRAND_LARCENY, OBTAIN_PROPERTY_BY_FALSE_PRETENSES,
                                   CONCEALMENT_OF_FUNDS_OR_PROPERTY, TAX_OFFENSES, MISAPPROPRIATION_OF_FUNDS, EMBEZZLEMENT, FRAUD, CHECK_FRAUD_BAD_CHECK, IDENTITY_FRAUD_AND_THEFT,
                                   ORGANIZED_FRAUD, INSURANCE_FRAUD, HEALTHCARE_FRAUD, MORTGAGE_FRAUD, TAX_FRAUD, CREDIT_CARD_FRAUD, BANK_FRAUD, WIRE_FRAUD, SECURITIES_FRAUD, 
-                                  FORGERY_AND_DEVICES, DRUGS, WEAPONS, DISTRIBUTION_DRUGS_OR_WEAPONS, EXPLOSIVES_DESTRUCTION_DEVICES, TRAFFICKING_SMUGGLING, CHOP_SHOP, GANG, 
-                                  EXTORTION_BLACKMAIL, TREASON_ESPIONAGE, INSIDER_TRADING_MANIPULATION, INTERCEPTION_OF_COMMUNICATION_WIRETAPPING, TRANSPORTATION_VIOLATIONS, 
+                                  FORGERY_AND_DEVICES, DRUGS, WEAPONS, DISTRIBUTION_DRUGS_OR_WEAPONS, EXPLOSIVES_DESTRUCTION_DEVICES, TRAFFICKING_SMUGGLING_NONHUMAN, TRAFFICKING_SMUGGLING_HUMAN, 
+                                  CHOP_SHOP, GANG, EXTORTION_BLACKMAIL_RANSOM, TREASON_ESPIONAGE, INSIDER_TRADING_MANIPULATION, INTERCEPTION_OF_COMMUNICATION_WIRETAPPING, TRANSPORTATION_VIOLATIONS, 
                                   IMPORT_EXPORT, CRIMINAL_PROCEEDS, TERRORISM, RACKETEERING_OR_LOAN_SHARKING, ORGANIZED_CRIME, STRUCTURING, MONEY_TRANSMITTER, 
                                   MONEY_LAUNDERING_TAX_EVASION, MONEY_OR_CREDIT_CARD_LAUNDERING, CORRUPTION_OR_BRIBERY);
     
@@ -42,6 +43,7 @@ EXPORT translateExpression := MODULE
     SHARED expressionDS := DATASET([{ExpressionEnum.UNCATEGORIZED, 				        DueDiligence.Constants.EMPTY,		                                        LEVEL_0, 	 'Uncategorized'},
                                     {ExpressionEnum.NO_OFFENSE_PROVIDED,		      DueDiligence.Constants.EMPTY,		                                        LEVEL_2,	 'No Offense Provided'},
                                     {ExpressionEnum.INFRACTIONS_AND_ORDINANCES,	  DueDiligence.RegularExpressions.EXPRESSION_INFRACTIONS_AND_ORDINANCES,	LEVEL_2,	 'Infractions and Ordinances'},
+                                    {ExpressionEnum.LIVESTOCK_AND_ANIMAL,	        DueDiligence.RegularExpressions.EXPRESSION_LIVESTOCK_AND_ANIMAL,	      LEVEL_2,	 'Livestock and Animal Related'},
                                     {ExpressionEnum.HUNTING_AND_FISHING,	        DueDiligence.RegularExpressions.EXPRESSION_HUNTING_AND_FISHING,	        LEVEL_2,	 'Hunting and Fishing'},
                                     {ExpressionEnum.ZONING,	                      DueDiligence.RegularExpressions.EXPRESSION_ZONING,	                    LEVEL_2,	 'Zoning'},
                                     {ExpressionEnum.COURT_CHARGES,	              DueDiligence.RegularExpressions.EXPRESSION_COURT_CHARGES,	              LEVEL_2,	 'Court Charges'},
@@ -49,7 +51,7 @@ EXPORT translateExpression := MODULE
                                     {ExpressionEnum.TRAFFIC_OFFENSES,	            DueDiligence.RegularExpressions.EXPRESSION_TRAFFIC_OFFENSES,	          LEVEL_2,	 'Traffic Offense'},
                                     {ExpressionEnum.DUI,	                        DueDiligence.RegularExpressions.EXPRESSION_DUI,	                        LEVEL_2,	 'DUI'},
                                     {ExpressionEnum.CHILD_SUPPORT,	              DueDiligence.RegularExpressions.EXPRESSION_CHILD_SUPPORT,	              LEVEL_2,	 'Child Support'},
-                                    {ExpressionEnum.ALIEN_AND_IMMIGRATION,	      DueDiligence.RegularExpressions.EXPRESSION_ALIEN_AND_IMMIGRATION,	      LEVEL_2,	 'Alien Offenses'},
+                                    {ExpressionEnum.ALIEN_AND_IMMIGRATION,	      DueDiligence.RegularExpressions.EXPRESSION_ALIEN_AND_IMMIGRATION,	      LEVEL_2,	 'Alien and Immigration'},
                                     {ExpressionEnum.DISORDERLY_CONDUCT,	          DueDiligence.RegularExpressions.EXPRESSION_DISORDERLY_CONDUCT,	        LEVEL_2,	 'Disorderly Conduct'},
                                     {ExpressionEnum.TRESPASSING,	                DueDiligence.RegularExpressions.EXPRESSION_TRESPASSING,	                LEVEL_2,	 'Trespassing'},
                                     {ExpressionEnum.SHOPLIFTING,	                DueDiligence.RegularExpressions.EXPRESSION_SHOPLIFTING,	                LEVEL_2,	 'Shoplifting'},
@@ -73,7 +75,7 @@ EXPORT translateExpression := MODULE
                                     {ExpressionEnum.BREAKING_AND_ENTERING,	      DueDiligence.RegularExpressions.EXPRESSION_BREAKING_AND_ENTERING,	      LEVEL_4,	 'Breaking and Entering'},
                                     {ExpressionEnum.BURGLARY,	                    DueDiligence.RegularExpressions.EXPRESSION_BURGLARY,	                  LEVEL_4,	 'Burglary'},
                                     {ExpressionEnum.ARSON,	                      DueDiligence.RegularExpressions.EXPRESSION_ARSON,	                      LEVEL_4,	 'Arson'},
-                                    {ExpressionEnum.KIDNAPPING_ABDUCTION,	        DueDiligence.RegularExpressions.EXPRESSION_KIDNAPPING_ABDUCTION,	      LEVEL_4,	 'Kidnapping / Abduction'},
+                                    {ExpressionEnum.KIDNAPPING_ABDUCTION,	        DueDiligence.RegularExpressions.EXPRESSION_KIDNAPPING_ABDUCTION,	      LEVEL_4,	 'Kidnapping / False Imprisonment'},
                                     {ExpressionEnum.MURDER_MANSLAUGHTER,	        DueDiligence.RegularExpressions.EXPRESSION_MURDER_MANSLAUGHTER,	        LEVEL_4,	 'Murder / Homicide'},
                                     {ExpressionEnum.RAPE,	                        DueDiligence.RegularExpressions.EXPRESSION_RAPE,	                      LEVEL_5,	 'Rape'},
                                     {ExpressionEnum.STATUTORY_RAPE,	              DueDiligence.RegularExpressions.EXPRESSION_STATUTORY_RAPE,	            LEVEL_5,	 'Statutory Rape'},
@@ -90,7 +92,7 @@ EXPORT translateExpression := MODULE
                                     {ExpressionEnum.BANK_ROBBERY,	                DueDiligence.RegularExpressions.EXPRESSION_BANK_ROBBERY,	              LEVEL_6,	 'Bank Robbery'},
                                     {ExpressionEnum.GRAND_LARCENY,	              DueDiligence.RegularExpressions.EXPRESSION_GRAND_LARCENY,	              LEVEL_6,	 'Grand Larceny'},
                                     {ExpressionEnum.OBTAIN_PROPERTY_BY_FALSE_PRETENSES,	  DueDiligence.RegularExpressions.EXPRESSION_OBTAIN_PROPERTY_BY_FALSE_PRETENSES,	 LEVEL_7,	 'Obtaining Property by False Pretenses'},
-                                    {ExpressionEnum.CONCEALMENT_OF_FUNDS_OR_PROPERTY,	    DueDiligence.RegularExpressions.EXPRESSION_CONCEALMENT_OF_FUNDS_OR_PROPERTY,	 LEVEL_7,	 'Concealment of Funds'},
+                                    {ExpressionEnum.CONCEALMENT_OF_FUNDS_OR_PROPERTY,	    DueDiligence.RegularExpressions.EXPRESSION_CONCEALMENT_OF_FUNDS_OR_PROPERTY,	 LEVEL_7,	 'Concealment of Funds or Property'},
                                     {ExpressionEnum.TAX_OFFENSES,	                DueDiligence.RegularExpressions.EXPRESSION_TAX_OFFENSES,	              LEVEL_7,	 'Tax Offenses'},
                                     {ExpressionEnum.MISAPPROPRIATION_OF_FUNDS,	  DueDiligence.RegularExpressions.EXPRESSION_MISAPPROPRIATION_OF_FUNDS,	  LEVEL_7,	 'Misappropriation of Funds'},
                                     {ExpressionEnum.EMBEZZLEMENT,	                DueDiligence.RegularExpressions.EXPRESSION_EMBEZZLEMENT,	              LEVEL_7,	 'Embezzlement'},
@@ -106,15 +108,16 @@ EXPORT translateExpression := MODULE
                                     {ExpressionEnum.BANK_FRAUD,	                  DueDiligence.RegularExpressions.EXPRESSION_BANK_FRAUD,	                LEVEL_7,	 'Bank Fraud'},
                                     {ExpressionEnum.WIRE_FRAUD,                   DueDiligence.RegularExpressions.EXPRESSION_WIRE_FRAUD,	                LEVEL_7,	 'Wire Fraud'},
                                     {ExpressionEnum.SECURITIES_FRAUD,	            DueDiligence.RegularExpressions.EXPRESSION_SECURITIES_FRAUD,	          LEVEL_7,	 'Securities Fraud'},
-                                    {ExpressionEnum.FORGERY_AND_DEVICES,	        DueDiligence.RegularExpressions.EXPRESSION_FORGERY_AND_DEVICES,	        LEVEL_7,	 'Forgery'},
+                                    {ExpressionEnum.FORGERY_AND_DEVICES,	        DueDiligence.RegularExpressions.EXPRESSION_FORGERY_AND_DEVICES,	        LEVEL_7,	 'Forgery & Devices'},
                                     {ExpressionEnum.DRUGS,	                      DueDiligence.RegularExpressions.EXPRESSION_DRUGS,	                      LEVEL_8,	 'Drugs'},
                                     {ExpressionEnum.WEAPONS,	                    DueDiligence.RegularExpressions.EXPRESSION_WEAPONS,	                    LEVEL_8,	 'Weapons'},
                                     {ExpressionEnum.DISTRIBUTION_DRUGS_OR_WEAPONS,	 DueDiligence.RegularExpressions.EXPRESSION_DISTRIBUTION_DRUGS_OR_WEAPONS,	  LEVEL_8,	 'Distribution or Manufacturing of Drugs or Weapons'},
                                     {ExpressionEnum.EXPLOSIVES_DESTRUCTION_DEVICES,	 DueDiligence.RegularExpressions.EXPRESSION_EXPLOSIVES_DESTRUCTION_DEVICES,	  LEVEL_8,	 'Explosives / Destruction Devices'},
-                                    {ExpressionEnum.TRAFFICKING_SMUGGLING,	      DueDiligence.RegularExpressions.EXPRESSION_TRAFFICKING_SMUGGLING,	      LEVEL_8,	 'Trafficking / Smuggling'},
+                                    {ExpressionEnum.TRAFFICKING_SMUGGLING_NONHUMAN,  DueDiligence.RegularExpressions.EXPRESSION_TRAFFICKING_SMUGGLING_NONHUMAN,	  LEVEL_8,	 'Trafficking / Smuggling - Non-Human'},
+                                    {ExpressionEnum.TRAFFICKING_SMUGGLING_HUMAN,	   DueDiligence.RegularExpressions.EXPRESSION_TRAFFICKING_SMUGGLING_HUMAN,	    LEVEL_8,	 'Trafficking / Smuggling - Human'},
                                     {ExpressionEnum.CHOP_SHOP,	                  DueDiligence.RegularExpressions.EXPRESSION_CHOP_SHOP,	                  LEVEL_9,	 'Chop Shop'},
                                     {ExpressionEnum.GANG,	                        DueDiligence.RegularExpressions.EXPRESSION_GANG,	                      LEVEL_9,	 'Gang'},
-                                    {ExpressionEnum.EXTORTION_BLACKMAIL,	        DueDiligence.RegularExpressions.EXPRESSION_EXTORTION_BLACKMAIL,	        LEVEL_9,	 'Extortion / Blackmail'},
+                                    {ExpressionEnum.EXTORTION_BLACKMAIL_RANSOM,   DueDiligence.RegularExpressions.EXPRESSION_EXTORTION_BLACKMAIL_RANSOM,	LEVEL_9,	 'Extortion / Blackmail / Ransom'},
                                     {ExpressionEnum.TREASON_ESPIONAGE,	          DueDiligence.RegularExpressions.EXPRESSION_TREASON_ESPIONAGE,	          LEVEL_9,	 'Treason /  Espionage'},
                                     {ExpressionEnum.INSIDER_TRADING_MANIPULATION,	DueDiligence.RegularExpressions.EXPRESSION_INSIDER_TRADING_MANIPULATION,LEVEL_9,	 'Insider Trading / Manipulation'},
                                     {ExpressionEnum.INTERCEPTION_OF_COMMUNICATION_WIRETAPPING,	 DueDiligence.RegularExpressions.EXPRESSION_INTERCEPTION_OF_COMMUNICATION_WIRETAPPING,	 LEVEL_9,	 'Interception of Communication / Wiretapping'},
@@ -135,28 +138,25 @@ EXPORT translateExpression := MODULE
     SHARED expressionDCT := DICTIONARY(expressionDS, {expressionWeight => expressionDS}); 
     
     
-    SHARED additionalChecksToExpression(UNSIGNED4 enumReference, STRING1 offenseScore, UNSIGNED offenseCategory, STRING1 trafficFlag, BOOLEAN foundUsingExpression) := FUNCTION
+    SHARED additionalChecksToExpression(UNSIGNED4 enumReference, STRING1 offenseScore, UNSIGNED offenseCategory, STRING1 trafficFlag) := FUNCTION
                          
-       additionalChecks := CASE(enumReference,
-                                  ExpressionEnum.THEFT => MAP(offenseScore = DueDiligence.Constants.FELONY AND foundUsingExpression => ExpressionEnum.FELONY_OR_AGGRAVATED_THEFT,
-                                                              foundUsingExpression => enumReference,
-                                                              ExpressionEnum.UNCATEGORIZED),
-                                  
-                                  ExpressionEnum.TRAFFIC_OFFENSES => IF(offenseScore = DueDiligence.Constants.TRAFFIC OR 
-                                                                        trafficFlag = DueDiligence.Constants.YES OR
-                                                                        offenseCategory = 1073741824 OR
-                                                                        foundUsingExpression, enumReference, ExpressionEnum.UNCATEGORIZED),
-                                  
-                                  ExpressionEnum.TRAFFICKING_SMUGGLING => IF(foundUsingExpression AND 
-                                                                              offenseScore <> DueDiligence.Constants.TRAFFIC AND
-                                                                              trafficFlag <> DueDiligence.Constants.YES, enumReference, ExpressionEnum.UNCATEGORIZED),
-                                  
-                                  ExpressionEnum.ALCOHOL_RELATED => IF(offenseCategory = 137438953472 OR foundUsingExpression, enumReference, ExpressionEnum.UNCATEGORIZED),
-                                  
-                                  ExpressionEnum.INFRACTIONS_AND_ORDINANCES => IF(offenseScore = DueDiligence.Constants.INFRACTION or foundUsingExpression, enumReference, ExpressionEnum.UNCATEGORIZED),
-                                  
-                                  ExpressionEnum.UNCATEGORIZED);            
+       //Check if the offense category has a specific number 
+       offenseCategoryResult := CASE(offenseCategory,
+                                        1073741824 => ExpressionEnum.TRAFFIC_OFFENSES,
+                                        137438953472 => ExpressionEnum.ALCOHOL_RELATED,
+                                        ExpressionEnum.UNCATEGORIZED);
+                                        
+       //check if the traffic flag is set 
+       trafficResult := IF(trafficFlag = DueDiligence.Constants.YES, ExpressionEnum.TRAFFIC_OFFENSES, ExpressionEnum.UNCATEGORIZED);
+       
+       //check offense score
+       offenseScoreResult := MAP(offenseScore = DueDiligence.Constants.TRAFFIC => ExpressionEnum.TRAFFIC_OFFENSES,
+                                  offenseScore = DueDiligence.Constants.INFRACTION => ExpressionEnum.INFRACTIONS_AND_ORDINANCES,
+                                  offenseScore = DueDiligence.Constants.FELONY AND enumReference = ExpressionEnum.THEFT => ExpressionEnum.FELONY_OR_AGGRAVATED_THEFT,
+                                  ExpressionEnum.UNCATEGORIZED);
+       
 
+        additionalChecks := MAX(offenseCategoryResult, trafficResult, offenseScoreResult);
 
         RETURN additionalChecks;
     END;
@@ -164,32 +164,19 @@ EXPORT translateExpression := MODULE
     
     
     //Common routine to determine if the text contains the definition of the expression
-		SHARED doesTextContainExpression(UNSIGNED4 enumReference, STRING textToSearch, STRING1 offenseScore, UNSIGNED offenseCategory, STRING1 trafficFlag) := FUNCTION
+		SHARED doesTextContainExpression(UNSIGNED4 enumReference, STRING textToSearch) := FUNCTION
     
         trimTextToSearch := TRIM(textToSearch, LEFT, RIGHT);
         
         expressionDetails := expressionDCT[enumReference];
         
-        expressionResults := IF(REGEXFIND(expressionDetails.expressionToUse, textToSearch, NOCASE), expressionDetails.expressionWeight, ExpressionEnum.UNCATEGORIZED);
-                                 
-                                 
-        expressionFound := expressionResults NOT IN [ExpressionEnum.UNCATEGORIZED];
+        expressionResults := MAP(trimTextToSearch = DueDiligence.Constants.EMPTY => ExpressionEnum.NO_OFFENSE_PROVIDED,
+                                 STD.str.ToUpperCase(trimTextToSearch) = 'NOT SPECIFIED' => ExpressionEnum.NO_OFFENSE_PROVIDED,
+                                 expressionDetails.expressionToUse = DueDiligence.Constants.EMPTY => ExpressionEnum.UNCATEGORIZED,
+                                 IF(REGEXFIND(expressionDetails.expressionToUse, textToSearch, NOCASE), expressionDetails.expressionWeight, ExpressionEnum.UNCATEGORIZED));                        
                                
-                               
-        //if the enum passed in is in the following group, there are additional checks to make prior to just using the expression itself
-        additionalChecks := IF(enumReference IN [ExpressionEnum.ALCOHOL_RELATED, ExpressionEnum.TRAFFIC_OFFENSES, ExpressionEnum.THEFT, ExpressionEnum.TRAFFICKING_SMUGGLING, ExpressionEnum.INFRACTIONS_AND_ORDINANCES],
-                                additionalChecksToExpression(enumReference, offenseScore, offenseCategory, trafficFlag, expressionFound),
-                                expressionResults);
-        
-        //If we haven't categorized the offense, and in level 2 accounting for empty and 'Not Specified' offenses so they don't falsely hit in other levels (level 2 is lowest)
-        levelMatch := IF(additionalChecks = ExpressionEnum.UNCATEGORIZED,
-                          MAP(expressionDetails.expressionCategory = LEVEL_2 AND trimTextToSearch = DueDiligence.Constants.EMPTY => ExpressionEnum.NO_OFFENSE_PROVIDED,
-                              expressionDetails.expressionCategory = LEVEL_2 AND STD.str.ToUpperCase(trimTextToSearch) = 'NOT SPECIFIED' => ExpressionEnum.NO_OFFENSE_PROVIDED,
-                              expressionDetails.expressionCategory = LEVEL_2 AND expressionDetails.expressionToUse = DueDiligence.Constants.EMPTY => ExpressionEnum.UNCATEGORIZED,
-                              additionalChecks),
-                          additionalChecks);
-        
-        RETURN levelMatch;
+       
+        RETURN expressionResults;
 		END;
     
     
@@ -207,12 +194,10 @@ EXPORT translateExpression := MODULE
           
         allInLevel := expressionDS(expressionCategory = level);
         
-        determineMaxLevel := PROJECT(allInLevel, 
-                                      TRANSFORM({RECORDOF(LEFT), UNSIGNED levelResult},
-                                                resultedWeight := doesTextContainExpression(LEFT.expressionWeight, tempCharge, offenseScore, offenseCategory, trafficFlag);
-                                                
-                                                SELF.levelResult := resultedWeight;
-                                                SELF := LEFT;));
+        determineMaxLevel := PROJECT(allInLevel, TRANSFORM({RECORDOF(LEFT), UNSIGNED levelResult},
+																														resultedWeight := doesTextContainExpression(LEFT.expressionWeight, tempCharge);
+																														SELF.levelResult := resultedWeight;
+																														SELF := LEFT;));
         
         getMaxLevelByLevel := DEDUP(SORT(determineMaxLevel, -levelResult, -expressionWeight), expressionCategory);
 

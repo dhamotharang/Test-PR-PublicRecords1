@@ -3,6 +3,7 @@
 /*===================================================*/
 
 import iesp;
+
 export experian_vin := MODULE
 			
 export t_ExperianVinOptions := record (iesp.share.t_BaseOption)
@@ -78,6 +79,7 @@ export t_RegisteredOwnerStruct := record
 	string orgName {xpath('orgName')};
 	string surnameFlag {xpath('surnameFlag')};
 	string nameSourceCd {xpath('nameSourceCd')};
+	string reportedName {xpath('reportedName')};
 end;
 		
 export t_VehicleStruct := record
@@ -121,6 +123,7 @@ export t_VehicleStruct := record
 	string vin {xpath('vin')};
 	string TOD {xpath('TOD')};
 	string titleIssueDate {xpath('titleIssueDate')};
+	string titleNumber {xpath('titleNumber')};
 end;
 		
 export t_getVinVerifyPlusResponse := record

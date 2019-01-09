@@ -73,7 +73,7 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
       'RunTargusGatewayAnywayForTesting',
       'TestDataEnabled',
       'TestDataTableName',
-	 'LimitPaymentHistory24Months',
+	 //'LimitPaymentHistory24Months',
 	 'SBFEContributorIds'
       ));
 		
@@ -167,6 +167,7 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
 
     // Option Fields
 		
+    #STORED('LimitPaymentHistory24Months',Option.LimitPaymentHistory24Months); //  busines credit	report w SBFE data project additions	
     BOOLEAN LimitPaymentHistory24MonthsVal := FALSE : STORED('LimitPaymentHistory24Months');
     STRING  ContributorIds := '' : STORED('SBFEContributorIds');
     UNSIGNED3 HistoryDateYYYYMM		    := (INTEGER)Business_Risk_BIP.Constants.NinesDate     : STORED('HistoryDateYYYYMM');
@@ -509,6 +510,6 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
     // OUTPUT(ds_Results.CreditReportRecords[1].AdditionalInfo.CompanyNameVariations,  NAMED('CompanyNameVariations'));
 
     OUTPUT(ds_Results,   NAMED('Results')); 
-    OUTPUT(ds_Royalties, NAMED('ds_Royalties'));
+    OUTPUT(ds_Royalties, NAMED('RoyaltySet'));
     
 ENDMACRO;

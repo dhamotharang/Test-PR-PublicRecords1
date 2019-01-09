@@ -146,9 +146,7 @@ EXPORT IdentityFraudReport (
   // Now imposters: get header records, apply RNA permissions
   header_all_rna := header_obj.Results (project (best_imposter, doxie.layout_references_hh));
 
-  GLB_Purpose := mod_access.glb;
-  dppa_Purpose := mod_access.dppa;
-  Header.MAC_GLB_DPPA_Clean_RNA(header_all_rna,headerRNA);	
+  Header.MAC_GLB_DPPA_Clean_RNA(header_all_rna, headerRNA, mod_access);	
 
 
 	// Combine subject and imposters, and filter out Z utility records
@@ -465,15 +463,12 @@ EXPORT IdentityFraudReport (
   // ========================================================================
   //     Get detailed relatives description (compare to ContactCard)
   // ========================================================================
-            probation := false;
             Relative_Depth := 3;
             max_relatives := 0; //means all;
-            isCRS := false; //not used
             max_associates := 0;
-
-  rel := Doxie_Raw.relative_raw (dids, mod_access.date_threshold, mod_access.dppa, mod_access.glb, mod_access.ssn_mask, 
-                                            mod_access.ln_branded, probation, true, true,
-                                            Relative_Depth, max_relatives, isCRS, max_associates);
+  // Note: "probation" used to be hardcoded to FALSE, now I'm using the value from the input.  
+  rel := Doxie_Raw.relative_raw (dids, mod_access, true, true,
+                                            Relative_Depth, max_relatives, max_associates);
 
   rel_det := choosen(rel(isRelative and depth = 1), 100);
 

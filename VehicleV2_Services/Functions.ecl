@@ -5,7 +5,7 @@ import VehicleV2, VehicleCodes, suppress, Census_Data, doxie_raw, MDR,Driversv2;
 
 export Functions := MODULE;
 
-	EXPORT get_state(IParam.polkParams in_mod) := FUNCTION
+	EXPORT get_state(VehicleV2_Services.IParam.polkParams in_mod) := FUNCTION
 		tmp_state := AutoStandardI.InterfaceTranslator.state_value.val(PROJECT(in_mod,AutoStandardI.InterfaceTranslator.state_value.params));
 		state_val := IF(in_mod.state='', tmp_state, in_mod.state);
 		RETURN TRIM(stringlib.stringtouppercase(state_val));
@@ -33,7 +33,7 @@ export Functions := MODULE;
 	END;
 	
 /* Need to change this lic_plate_filter to FUNCTION instead of MODULE */
-export 	lic_plate_filter_New(dataset(Layouts.lic_plate_key_payload_fields_New) pre_dedup,unsigned return_count,unsigned starting_record,
+export 	lic_plate_filter_New(dataset(VehicleV2_Services.Layouts.lic_plate_key_payload_fields_New) pre_dedup,unsigned return_count,unsigned starting_record,
 		unsigned penalt_threshold,unsigned max_results, unsigned in_limit,unsigned dppa_purpose,string1 state_type_val)
 	:= MODULE
 	
@@ -47,7 +47,7 @@ export 	lic_plate_filter_New(dataset(Layouts.lic_plate_key_payload_fields_New) p
 		string1 state_type;
 		end;
 		
-		sort_fields_rec get_penalt(Layouts.lic_plate_key_payload_fields_New l):=transform
+		sort_fields_rec get_penalt(VehicleV2_Services.Layouts.lic_plate_key_payload_fields_New l):=transform
 			self.party_penalty :=	doxie.FN_Tra_Penalty_SSN(l.use_ssn) +
 							doxie.FN_Tra_Penalty_Name(l.fname, 
 								l.mname, l.lname)+ 
@@ -129,7 +129,7 @@ export 	lic_plate_filter_New(dataset(Layouts.lic_plate_key_payload_fields_New) p
 
   shared Layout_Report_out_veh := record
     Layout_Report_Vehicle;
-    Layout_Vehicle_Key.Sequence_Key;
+    VehicleV2_Services.Layout_Vehicle_Key.Sequence_Key;
     Autokey_batch.Layouts.rec_inBatchMaster.acctno;
     BOOLEAN cnp_entered;
   END;
@@ -200,7 +200,7 @@ export 	lic_plate_filter_New(dataset(Layouts.lic_plate_key_payload_fields_New) p
 		SELF := [];
 	END;
 	
-  SHARED Layout_Report_Out_Veh makeVehSearch(Layout_VKeysWithInput l, VehicleV2.Key_Vehicle_Main_Key r, IParam.searchParams aInputData) := transform
+  SHARED Layout_Report_Out_Veh makeVehSearch(Layout_VKeysWithInput l, VehicleV2.Key_Vehicle_Main_Key r, VehicleV2_Services.IParam.searchParams aInputData) := transform
     
 		make_description := IF(r.vina_make_desc != '',r.vina_make_desc,r.orig_make_desc);
     model_description := IF(r.vina_model_desc != '',r.vina_model_desc,r.orig_model_desc);  
@@ -226,7 +226,7 @@ export 	lic_plate_filter_New(dataset(Layouts.lic_plate_key_payload_fields_New) p
   shared keyCd3 := Codes.Key_Codes_V3;
 
   shared rec_party := record
-    Layouts.Layout_Report_Party_New;
+    VehicleV2_Services.Layouts.Layout_Report_Party_New;
     keyVParty.orig_lien_date;
     keyVParty.orig_name_type;
     keyVParty.vehicle_key;
@@ -238,6 +238,8 @@ export 	lic_plate_filter_New(dataset(Layouts.lic_plate_key_payload_fields_New) p
 		string1 name_source_cd;
 		string30 name_source;
 		string8 title_issue_date;
+    string17 title_number;
+    string30 reported_name;
   end;
 
     // Constant
@@ -247,28 +249,28 @@ export 	lic_plate_filter_New(dataset(Layouts.lic_plate_key_payload_fields_New) p
   shared STRING SP := ' ';
 
   ///// ======================== penalty functions ======================== /////
-  shared penaltyCName(IParam.searchParams aInputData, STRING cnameFld) := FUNCTION
+  shared penaltyCName(VehicleV2_Services.IParam.searchParams aInputData, STRING cnameFld) := FUNCTION
     tm := MODULE(PROJECT(aInputData, AutoStandardI.LIBIN.PenaltyI_Biz_Name.full, OPT))
       EXPORT cname_field := cnameFld;
     END;
     RETURN AutoStandardI.LIBCALL_PenaltyI_Biz_Name.val(tm);
   END;
 
-  shared penaltyDID(IParam.searchParams aInputData, STRING didFld) := FUNCTION
+  shared penaltyDID(VehicleV2_Services.IParam.searchParams aInputData, STRING didFld) := FUNCTION
     tm := MODULE(PROJECT(aInputData, AutoStandardI.LIBIN.PenaltyI_DID.full, OPT))
       EXPORT did_field := didFld;
     END;
     RETURN AutoStandardI.LIBCALL_PenaltyI_DID.val(tm);
   END;
 
-  shared penaltySSN(IParam.searchParams aInputData, STRING ssnFld) := FUNCTION
+  shared penaltySSN(VehicleV2_Services.IParam.searchParams aInputData, STRING ssnFld) := FUNCTION
     tm := MODULE(PROJECT(aInputData, AutoStandardI.LIBIN.PenaltyI_SSN.full, OPT))
       EXPORT ssn_field := ssnFld;
     END;
     RETURN AutoStandardI.LIBCALL_PenaltyI_SSN.val(tm);
   END;
 
-  shared penaltyName(IParam.searchParams aInputData, STRING fnameFld, STRING mnameFld, STRING lnameFld, BOOLEAN allowWld = FALSE) := FUNCTION
+  shared penaltyName(VehicleV2_Services.IParam.searchParams aInputData, STRING fnameFld, STRING mnameFld, STRING lnameFld, BOOLEAN allowWld = FALSE) := FUNCTION
     tm := MODULE(PROJECT(aInputData, AutoStandardI.LIBIN.PenaltyI_Indv_Name.full, OPT))
       EXPORT fname_field := fnameFld;
       EXPORT mname_field := mnameFld;
@@ -278,7 +280,7 @@ export 	lic_plate_filter_New(dataset(Layouts.lic_plate_key_payload_fields_New) p
     RETURN AutoStandardI.LIBCALL_PenaltyI_Indv_Name.val(tm);
   END;
 
-  shared penaltyAddr(IParam.searchParams aInputData,
+  shared penaltyAddr(VehicleV2_Services.IParam.searchParams aInputData,
                 STRING predirFld, STRING prangeFld, STRING pnameFld, STRING suffixFld,
                 STRING postdirFld, STRING secRangeFld, STRING cityFld, STRING stateFld,
                 STRING zipFld, BOOLEAN allowWld = FALSE, STRING city2Fld = BLNK) := FUNCTION
@@ -468,11 +470,11 @@ export 	lic_plate_filter_New(dataset(Layouts.lic_plate_key_payload_fields_New) p
     return mTransform;
   END;
 
-  shared Layout_Report_Batch_Extra := RECORD(Layouts.Layout_Report_Batch_New)
+  shared Layout_Report_Batch_Extra := RECORD(VehicleV2_Services.Layouts.Layout_Report_Batch_New)
     Layout_Report_Out_Veh.cnp_entered;    
   END;
 	
-  shared Layouts.Layout_Report_Batch_New GetRolledView (
+  shared VehicleV2_Services.Layouts.Layout_Report_Batch_New GetRolledView (
     GROUPED dataset (Layout_Report_Out_Veh) pre_veh_recs1,
     dataset (rec_party) pre_party_recs0,
     IParam.reportParams aInputData,
@@ -587,7 +589,7 @@ export 	lic_plate_filter_New(dataset(Layouts.lic_plate_key_payload_fields_New) p
         getDecode_body(LEFT,RIGHT),left outer, keep(1), limit(1000,skip));
     
 
-    Layouts.Layout_Report_Batch_New rollIt (Layout_Report_Batch_Extra l, dataset(rec_party) r, boolean report_mode) := transform
+    VehicleV2_Services.Layouts.Layout_Report_Batch_New rollIt (Layout_Report_Batch_Extra l, dataset(rec_party) r, boolean report_mode) := transform
 
       party_r := r;
 	   
@@ -671,15 +673,15 @@ export 	lic_plate_filter_New(dataset(Layouts.lic_plate_key_payload_fields_New) p
 		
       self.registrants := 
             choosen(sort(PROJECT(party_roller(registrants), TRANSFORM(VehicleV2_Services.assorted_layouts.layout_registrant,SELF.matchFlags:=[],SELF:=LEFT)),
-          sequence_key, if(report_mode,0,party_penalty), lname,fname, mname,name_suffix,orig_name),Constant.max_child_count);
+          sequence_key, if(report_mode,0,party_penalty), lname,fname, mname,name_suffix,orig_name),VehicleV2_Services.Constant.max_child_count);
                               
-      self.owners      := choosen(sort(PROJECT(party_roller(owners), TRANSFORM(Layouts.Layout_owner,SELF.matchFlags:=[],SELF:=LEFT)),
+      self.owners      := choosen(sort(PROJECT(party_roller(owners), TRANSFORM(VehicleV2_Services.Layouts.Layout_owner,SELF.matchFlags:=[],SELF:=LEFT)),
                               sequence_key, if(report_mode,0,party_penalty), lname,fname, mname,name_suffix,orig_name),Constant.max_child_count);
-      self.lienholders :=  sort(project(lienholders,TRANSFORM(assorted_Layouts.Layout_lienholder,SELF.matchFlags:=[],SELF:=LEFT)),
+      self.lienholders :=  sort(project(lienholders,TRANSFORM(VehicleV2_Services.Assorted_Layouts.Layout_lienholder,SELF.matchFlags:=[],SELF:=LEFT)),
                               sequence_key, if(report_mode,0,party_penalty), lname,fname, mname,name_suffix,orig_name);
-      self.lessees :=  choosen(sort(project(party_roller(lessees), TRANSFORM(Assorted_Layouts.layout_lessee,SELF.matchFlags:=[],SELF:=LEFT)),
+      self.lessees :=  choosen(sort(project(party_roller(lessees), TRANSFORM(VehicleV2_Services.Assorted_Layouts.layout_lessee,SELF.matchFlags:=[],SELF:=LEFT)),
                               sequence_key, if(report_mode,0,party_penalty), lname,fname, mname,name_suffix,orig_name),Constant.max_child_count);
-      self.lessors := sort(project(lessors,TRANSFORM(assorted_Layouts.layout_lessee_or_lessor,SELF.matchFlags:=[],SELF:=LEFT)),
+      self.lessors := sort(project(lessors,TRANSFORM(VehicleV2_Services.Assorted_Layouts.layout_lessee_or_lessor,SELF.matchFlags:=[],SELF:=LEFT)),
                             sequence_key, if(report_mode,0,party_penalty), lname,fname, mname,name_suffix,orig_name);       										
         // self.plate   := r_recs[1];
       // self.title   := o_recs[1];
@@ -733,7 +735,7 @@ export 	lic_plate_filter_New(dataset(Layouts.lic_plate_key_payload_fields_New) p
 									LEFT OUTER,KEEP(1));
 	ENDMACRO;
 
-  EXPORT GetVehicleReport (IParam.reportParams aInputData, GROUPED dataset(Layout_Vehicle_Key) in_veh_keys,
+  EXPORT GetVehicleReport (VehicleV2_Services.IParam.reportParams aInputData, GROUPED dataset(Layout_Vehicle_Key) in_veh_keys,
                      STRING in_ssn_mask_type = '') := FUNCTION
 										 
 		boolean isCNSMR := aInputData.IndustryClass = 'CNSMR';
@@ -745,7 +747,7 @@ export 	lic_plate_filter_New(dataset(Layouts.lic_plate_key_payload_fields_New) p
                           keyed((left.Iteration_Key = '') OR left.Iteration_Key = right.Iteration_Key) and
 													(include_non_regulated_data or right.source_code not in MDR.sourceTools.set_infutor_all_veh),
                           makeVehReport(left, right),
-                          limit(Constant.VEHICLE_PER_KEY,skip));
+                          limit(VehicleV2_Services.Constant.VEHICLE_PER_KEY,skip));
 
 			pre_veh_recs0 := if(~isCNSMR, pre_veh_recs0_info);
 
@@ -758,7 +760,7 @@ export 	lic_plate_filter_New(dataset(Layouts.lic_plate_key_payload_fields_New) p
                 KEYED(LEFT.Sequence_key = RIGHT.Sequence_key) and
 								(include_non_regulated_data or right.source_code not in MDR.sourceTools.set_infutor_all_veh),
                 get_parties_report (RIGHT),
-                KEEP(Constant.PARTIES_PER_VEHICLE),
+                KEEP(VehicleV2_Services.Constant.PARTIES_PER_VEHICLE),
 								LIMIT(0));
 													
   
@@ -769,7 +771,7 @@ export 	lic_plate_filter_New(dataset(Layouts.lic_plate_key_payload_fields_New) p
     return GetRolledView (_pre_veh_recs1, outputPrePartyRecs, aInputData, true);
   END;
 
-  EXPORT Get_VehicleSearch (IParam.searchParams aInputData, GROUPED dataset(Layout_VKeysWithInput) in_veh_keys,                      
+  EXPORT Get_VehicleSearch (VehicleV2_Services.IParam.searchParams aInputData, GROUPED dataset(VehicleV2_Services.Layout_VKeysWithInput) in_veh_keys,                      
                       STRING in_ssn_mask_type = '', BOOLEAN penalize_by_party = FALSE) := FUNCTION
 											
 		boolean isCNSMR := aInputData.IndustryClass = 'CNSMR';									
@@ -782,7 +784,7 @@ export 	lic_plate_filter_New(dataset(Layouts.lic_plate_key_payload_fields_New) p
                           keyed(left.Iteration_Key = right.Iteration_Key) and
 													(include_non_regulated_data or right.source_code not in MDR.sourceTools.set_infutor_all_veh),
                           makeVehSearch(left, right, aInputData),
-                          limit(Constant.VEHICLE_PER_KEY,skip));
+                          limit(VehicleV2_Services.Constant.VEHICLE_PER_KEY,skip));
 														
 			pre_veh_recs0 := if(~isCNSMR, pre_veh_recs0_info);
 
@@ -810,7 +812,7 @@ export 	lic_plate_filter_New(dataset(Layouts.lic_plate_key_payload_fields_New) p
     CriminalRecords_Services.MAC_Indicators(recsIn,recsOut);
     pre_party_recs1 := IF(aInputData.IncludeCriminalIndicators,PROJECT(recsOut,rec_party),outputPrePartyRecs);
 
-		commonParam := MODULE(PROJECT(aInputData, IParam.reportParams,opt)) END;
+		commonParam := MODULE(PROJECT(aInputData, VehicleV2_Services.IParam.reportParams,opt)) END;
 		
 		return GetRolledView (pre_veh_recs1, pre_party_recs1, commonParam, false);
   END;
@@ -834,14 +836,14 @@ MAC_SetPersonOrBusiness(childRecord):= MACRO
 	childRecord.IsSexualOffender := L.IsSexualOffender;
 ENDMACRO;
 
-export transform_vehicles (dataset (Layout_Report) vehi) := function
+export transform_vehicles (dataset (VehicleV2_Services.Layout_Report) vehi) := function
 
 
-	iesp.motorvehicle.t_MotorVehicleSearchRegistrant SetRecordRegistrants (Layouts.Layout_registrant_New L) := TRANSFORM		
+	iesp.motorvehicle.t_MotorVehicleSearchRegistrant SetRecordRegistrants (VehicleV2_Services.Layouts.Layout_registrant_New L) := TRANSFORM		
 		SELF.HistoryDescription := L.history_desc;
 		MAC_SetPersonOrBusiness(SELF.RegistrantInfo);		
 		SELF.RegistrantInfo.NameSource := L.name_source;
-		
+    SELF.RegistrantInfo.ReportedName := L.reported_name;
 		SELF.RegistrationInfo.TrueLicensePlate := L.reg_true_license_plate;
 		SELF.RegistrationInfo.LicenseState := L.reg_license_state;
 		SELF.RegistrationInfo.FirstDate := iesp.ECL2ESP.toDatestring8(L.reg_first_date);
@@ -857,14 +859,15 @@ export transform_vehicles (dataset (Layout_Report) vehi) := function
 		SELF.VendorInfo.FirstReportedDate := iesp.ECL2ESP.toDateYM(L.date_vendor_first_reported);
 		SELF.VendorInfo.LastReportedDate := iesp.ECL2ESP.toDateYM(L.date_vendor_last_reported);
 		SELF.TitleIssueDate := iesp.ECL2ESP.toDatestring8(L.title_issue_date);
+    SELF.TitleNumber := L.title_number;
 	END;
 
-	iesp.motorvehicle.t_MotorVehicleSearchOwner SetRecordOwners (Layouts.Layout_owner L) := TRANSFORM
+	iesp.motorvehicle.t_MotorVehicleSearchOwner SetRecordOwners (VehicleV2_Services.Layouts.Layout_owner L) := TRANSFORM
 		SELF.HistoryDescription := L.history_desc;
 		
 		MAC_SetPersonOrBusiness(SELF.OwnerInfo);
 		SELF.OwnerInfo.NameSource := '';
-	
+    SELF.OwnerInfo.ReportedName := L.reported_name;
 		SELF.TitleInfo.Number := L.Ttl_Number;
 		SELF.TitleInfo.EarliestIssueDate := iesp.ECL2ESP.toDatestring8(L.ttl_earliest_issue_date) ;
 		SELF.VendorInfo.FirstReportedDate := iesp.ECL2ESP.toDateYM(L.date_vendor_first_reported);
@@ -873,34 +876,37 @@ export transform_vehicles (dataset (Layout_Report) vehi) := function
 		SELF.SourceDateLastSeen := iesp.ECL2ESP.toDatestring8(L.SRC_LAST_DATE) ;
 	END;
 	
-	iesp.motorvehicle.t_MotorVehicleSearchLienHolder setRecordLienHolders(Assorted_Layouts.Layout_lienholder L) := TRANSFORM
+	iesp.motorvehicle.t_MotorVehicleSearchLienHolder setRecordLienHolders(VehicleV2_Services.Assorted_Layouts.Layout_lienholder L) := TRANSFORM
 		SELF.HistoryDescription := L.history_desc;
 		MAC_SetPersonOrBusiness(SELF.LienHolderInfo);
+    SELF.LienHolderInfo.ReportedName := '';
 		SELF.LienHolderInfo.NameSource := L.name_source;
 		SELF.LienDate := iesp.ECL2ESP.toDatestring8(L.orig_lien_date);
-		self.StandardizedName := L.std_lienholder_name;
+		SELF.StandardizedName := L.std_lienholder_name;
 	END;
 	
-	iesp.motorvehicle.t_MotorVehicleSearchLessee SetRecordLessees(Assorted_Layouts.Layout_lessee L) := TRANSFORM
+	iesp.motorvehicle.t_MotorVehicleSearchLessee SetRecordLessees(VehicleV2_Services.Assorted_Layouts.Layout_lessee L) := TRANSFORM
 	  SELF.HistoryDescription := L.History_desc;
 		MAC_SetPersonOrBusiness(SELF.LesseeInfo);
 		SELF.LesseeInfo.NameSource := '';
+    SELF.LesseeInfo.ReportedName := '';
 	END;
 	
-	iesp.motorvehicle.t_MotorVehicleSearchLessor SetRecordLessors(Assorted_Layouts.layout_lessee_or_lessor L) := TRANSFORM
+	iesp.motorvehicle.t_MotorVehicleSearchLessor SetRecordLessors(VehicleV2_Services.Assorted_Layouts.layout_lessee_or_lessor L) := TRANSFORM
 		SELF.HistoryDescription := L.History_desc;
 		MAC_SetPersonOrBusiness(SELF.LessorInfo);
 		SELF.LessorInfo.NameSource := L.name_source;
+    SELF.LessorInfo.ReportedName := '';
 	END;
 	
-	iesp.motorvehicle.t_MotorVehicleSearchBrand SetRecordBrand(Assorted_Layouts.layout_brand L) := TRANSFORM
+	iesp.motorvehicle.t_MotorVehicleSearchBrand SetRecordBrand(VehicleV2_Services.Assorted_Layouts.layout_brand L) := TRANSFORM
 		SELF.Date := iesp.ECL2ESP.toDatestring8(L.Brand_Date);			
 		SELF.State := L.Brand_State;		
 		SELF.Code := L.Brand_Code;
 		SELF._Type := L.Brand_Type;		
 	END;
 	
-	iesp.motorvehicle.t_MotorVehicleSearch2Record toOutRecord (Layout_Report L) := TRANSFORM
+	iesp.motorvehicle.t_MotorVehicleSearch2Record toOutRecord (VehicleV2_Services.Layout_Report L) := TRANSFORM
 	
 		SELF.DataSource := L.DataSource;
 		SELF.ExternalKey := (String)l.Vehicle_Key+l.Iteration_Key+l.Sequence_Key;
@@ -941,7 +947,7 @@ export transform_vehicles (dataset (Layout_Report) vehi) := function
 			//SELF.BusinessId := ;
 			self := [];			
 		));
-		 self.registrants := project (choosen (L.registrants, iesp.Constants.MV.MaxCountRegistrants), SetRecordRegistrants (Left));		
+		 self.registrants := project (choosen (L.registrants, iesp.Constants.MV.MaxCountRegistrants), SetRecordRegistrants(Left));		
 		
 		 self.owners := project (choosen (L.owners, iesp.Constants.MV.MaxCountOwners), setRecordOwners(Left));
 		 self.lienHolders := project (choosen (L.LienHolders, iesp.Constants.MV.MaxCountLienHolders), setRecordLienHolders(Left));

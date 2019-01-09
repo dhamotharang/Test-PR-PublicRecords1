@@ -20,14 +20,16 @@ AccountStatusInfo: Returns ServiceStatus - active/cancelled/suspended
 
 After obtaining Zumigo, we process results to populate what we are legally allowed to store.
 */
-IMPORT Address,Codes, Doxie,DidVille,Email_Data, Gateway, iesp, Phones,Risk_Indicators,STD, ut;
+IMPORT Address,Codes, Doxie,DidVille,Email_Data, Gateway, iesp, Phones, PhoneFinder_Services, Risk_Indicators,STD, ut;
 EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificationRequest) inRecs,
 						Phones.IParam.inZumigoParams inMod,
 						UNSIGNED1 GLBPurpose = 0,
 						UNSIGNED1 DPPAPurpose = 0,
 						STRING DataRestrictionMask = '',
 						STRING IndustryClass = '',
-						STRING32 ApplicationType='') := FUNCTION
+						STRING32 ApplicationType='',
+            BOOLEAN IncludeEmailInfo = TRUE,
+            BOOLEAN IncludeCallForwardedPhonesInfo = TRUE) := FUNCTION
 													
 	//Note that Zumigo does not permit NameAddressInfo without NameAddressValidation
 	nameAddrRequested := inMod.NameAddressValidation OR inMod.NameAddressInfo;		
@@ -76,8 +78,10 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 	
 	//***Preserve populated emails with Email_rec_key - using TransactionID to establish link since the actual email address will not be saved
 	setRoyaltyEmailSources := SET(codes.Key_Codes_V3(file_name	=	'EMAIL_SOURCES',field_name	=	'ROYALTY'),code);
-	zEmails := zumOut(response.LineIdentityResponse.Subscriber.FirstName<>'' AND response.LineIdentityResponse.Subscriber.LastName<>'' AND response.LineIdentityResponse.Subscriber.Email<>'');
-	zEmailMatch := JOIN(zEmails, Email_Data.Key_Email_Address,
+	zEmails := zumOut(response.LineIdentityResponse.Subscriber.FirstName<>'' AND 
+          response.LineIdentityResponse.Subscriber.LastName<>'' AND 
+          response.LineIdentityResponse.Subscriber.Email<>'');
+	zEmailMatch := IF(IncludeEmailInfo, JOIN(zEmails, Email_Data.Key_Email_Address,
 						KEYED(LEFT.response.LineIdentityResponse.Subscriber.Email = RIGHT.Clean_email) AND
 						RIGHT.email_src NOT in	setRoyaltyEmailSources AND
 						ut.NameMatch(LEFT.response.LineIdentityResponse.Subscriber.FirstName,'',
@@ -90,7 +94,7 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 									SELF.LastName := LEFT.response.LineIdentityResponse.Subscriber.LastName,
 									SELF.Email := LEFT.response.LineIdentityResponse.Subscriber.Email,
 									SELF:=[]),
-						KEEP(1), LIMIT(0));											
+						KEEP(1), LIMIT(0)));											
 																						
 	//***Preserve forwarding info	- getLNIdentity_byPhone dedups phone 
 	// being discussed in email. Zumigo is not returning forwarded phone numbers.
@@ -98,7 +102,8 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 	// No harm since code is based on filtered records by forwarded phone #s.
 	zForwardedPhones := zumOut(response.LineIdentityResponse.Subscriber.CallHandlingInfo.CallForwarding AND response.LineIdentityResponse.Subscriber.CallHandlingInfo.CallForwardedNumber<>'');
 	dsForwardedPhones := PROJECT(zForwardedPhones,TRANSFORM(Phones.Layouts.PhoneIdentity,SELF.phone:=LEFT.response.LineIdentityResponse.Subscriber.CallHandlingInfo.CallForwardedNumber, SELF:=[]));
-	dsForwardedPhoneswIdentity := Phones.getLNIdentity_byPhone(dsForwardedPhones,GLBPurpose,DPPAPurpose,DataRestrictionMask);
+	dsForwardedPhoneswIdentity := IF(IncludeCallForwardedPhonesInfo,
+                                  Phones.getLNIdentity_byPhone(dsForwardedPhones,GLBPurpose,DPPAPurpose,DataRestrictionMask));
 
 	//***flatten by creating a record for each name/address validation pair	
 	iesp.zumigo_identity.t_ZumigoIdentityResponseEx normZumigo (iesp.zumigo_identity.t_ZumigoIdentityResponseEx l,  INTEGER c) := TRANSFORM
@@ -319,12 +324,12 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 																SELF := LEFT,
 																SELF := [])),
 			DATASET([],Didville.Layout_Did_OutBatch));
-
- zPhoneOwners_wDIDs := Phones.Functions.GetDIDs(zPhoneOwners,ApplicationType,GLBPurpose,DPPAPurpose);			
+  zPhoneOwners_wDIDs := Phones.Functions.GetDIDs(zPhoneOwners,ApplicationType,GLBPurpose,DPPAPurpose);			
 	zHistoryRecs_wDIDs := JOIN(zHistoryRecs,zPhoneOwners_wDIDs,
 								LEFT.submitted_phonenumber = RIGHT.phone10,
 								TRANSFORM(Phones.Layouts.ZumigoIdentity.zOut,SELF.lexid:=RIGHT.did,SELF:=LEFT,SELF:=[]),
 								LEFT OUTER,LIMIT(Phones.Constants.MAX_RECORDS,SKIP));
+ 
 	//***For NameAddressInfo - now that we have a DID populate output dataset from matching request data.
 	// legally we are not allowed to store Zumigo data																								
 	Phones.Layouts.ZumigoIdentity.zOut matchSubmittedData(Phones.Layouts.ZumigoIdentity.zOut l, Phones.Layouts.ZumigoIdentity.subjectVerificationRequest r) := TRANSFORM			
@@ -338,12 +343,23 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 																					Risk_Indicators.AddrScore.zip_score(l.zip,r.z5),
 																					Risk_Indicators.AddrScore.citystate_score(l.city,l.state,r.p_city_name,r.st,''))),'A','');
 		// if we cannot match Zumigo data names will be blank.
+    SELF.lexid       := r.lexid;
 		SELF.first_name := r.first_name;
 		SELF.middle_name := r.middle_name;
 		SELF.last_name := r.last_name;
 		SELF.full_name := IF(r.last_name<>'' AND r.first_name<>'', 
 									TRIM(r.last_name) + ', ' + TRIM(r.first_name) + ' ' + TRIM(r.middle_name),
 									r.last_name);
+    SELF.prim_range  :=r.prim_range;
+    SELF.predir      :=r.predir;
+    SELF.prim_name   :=r.prim_name;
+    SELF.addr_suffix :=r.addr_suffix;
+    SELF.postdir     :=r.postdir;
+    SELF.unit_desig  :=r.unit_desig;
+    SELF.sec_range   :=r.sec_range;
+    SELF.city        :=r.p_city_name;
+    SELF.state       :=r.st;
+    SELF.zip         :=r.z5;
 		SELF.busUlt_id := r.busUlt_id;
 		SELF.busOrg_id := r.busOrg_id;
 		SELF.busSELE_id := r.busSELE_id;
@@ -355,62 +371,62 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 		SELF.ln_match_code := FirstNameMatch + 	MiddleNameMatch + LastNameMatch + BusinessNameMatch + AddressMatch;	
 		SELF := l;
 		SELF := [];	
-	END;																									
- zHistoryRecs_wInputMatch	:= JOIN(zHistoryRecs_wDIDs,dsNameAddrRequest,
-									LEFT.submitted_phonenumber = RIGHT.phone AND
-									((LEFT.lexid  > 0 AND LEFT.lexid = RIGHT.lexid) OR 
-									(LEFT.first_name<>'' AND LEFT.last_name<>'' AND
-									ut.NameMatch(LEFT.first_name,LEFT.middle_name,LEFT.last_name,RIGHT.first_name,RIGHT.middle_name,RIGHT.last_name)<=Phones.Constants.STRING_MATCH_THRESHOLD) OR 
-									(LEFT.business_name<>'' AND ut.StringSimilar(LEFT.business_name,RIGHT.business_name)<=Phones.Constants.STRING_MATCH_THRESHOLD)),
-									matchSubmittedData(LEFT,RIGHT),
-									LEFT OUTER,LIMIT(Phones.Constants.MAX_RECORDS,SKIP));		
-	//***For NameAddressInfo - now that we have a DID populate output dataset with inhouse data.
-	LNPhoneOwnership := Phones.GetLNIdentity_byPhone(PROJECT(zPhoneOwners,TRANSFORM(Phones.Layouts.PhoneIdentity, //processes unique phones and reported owner
-																					SELF.acctno := (STRING)LEFT.seq,
-																					SELF.did := LEFT.did,
-																					SELF.phone := LEFT.phone10,
-																					SELF.suffix := LEFT.addr_suffix,
-																					SELF.city_name := LEFT.p_city_name,
-																					SELF.listed_name := LEFT.fname + ' ' + LEFT.lname,
-																					SELF.zip := LEFT.z5,
-																					SELF:=LEFT,SELF:=[])),
-														GLBPurpose,DPPAPurpose,DataRestrictionMask,Industryclass);
-	Phones.Layouts.ZumigoIdentity.zOut matchSubscriber(Phones.Layouts.ZumigoIdentity.zOut l, Phones.Layouts.PhoneIdentity r) := TRANSFORM					
-				FirstNameMatch := IF(l.first_name<>'' AND ut.StringSimilar(l.first_name,r.fname)<=Phones.Constants.STRING_MATCH_THRESHOLD,'F','');
-				MiddleNameMatch := IF(l.middle_name<>'' AND ut.StringSimilar(l.middle_name,r.mname)<=Phones.Constants.STRING_MATCH_THRESHOLD,'M','');
-				LastNameMatch := IF(l.last_name<>'' AND ut.StringSimilar(l.last_name,r.lname)<=Phones.Constants.STRING_MATCH_THRESHOLD,'L','');
-				BusinessNameMatch := IF(l.business_name<>'' AND ut.StringSimilar(l.business_name,r.companyname)<=Phones.Constants.STRING_MATCH_THRESHOLD,'B','');
-				AddressMatch := IF(l.prim_range <>'' AND Risk_Indicators.iid_constants.ga(Risk_Indicators.AddrScore.AddressScore( //matching address
-																						l.prim_range,l.prim_name,l.sec_range,
-																						r.prim_range,r.prim_name,r.sec_range,
-																						Risk_Indicators.AddrScore.zip_score(l.zip,r.zip),
-																						Risk_Indicators.AddrScore.citystate_score(l.city,l.state,r.city_name,r.st,''))),'A','');
-					// if we cannot match Zumigo data names will be blank.
-				SELF.first_name := r.fname;
-				SELF.middle_name := r.mname;
-				SELF.last_name := r.lname;
-				SELF.busUlt_id := r.UltID;
-				SELF.busOrg_id := r.OrgID;
-				SELF.busSELE_id := r.SELEID;
-				SELF.busProx_id := r.ProxID;
-				SELF.busPow_id := r.PowID;
-				SELF.business_name := r.companyname;						
-				SELF.ln_match_code := FirstNameMatch + MiddleNameMatch + LastNameMatch + BusinessNameMatch + AddressMatch;						
-				SELF := l;
-				SELF := [];			
-	END;
-	zHistoryRecs_wLNIdentityMatch := JOIN(zHistoryRecs_wDIDs,LNPhoneOwnership,
-											LEFT.submitted_phonenumber = RIGHT.phone AND
-											(LEFT.lexid = RIGHT.did OR 
-											(LEFT.first_name<>'' AND LEFT.last_name<>'' AND
-											(ut.NameMatch(LEFT.first_name,LEFT.middle_name,LEFT.last_name,RIGHT.fname,RIGHT.mname,RIGHT.lname)<=Phones.Constants.STRING_MATCH_THRESHOLD OR
-											ut.StringSimilar(LEFT.first_name + ' ' + LEFT.last_name,RIGHT.listed_name)<=Phones.Constants.STRING_MATCH_THRESHOLD)) OR 
-											(LEFT.business_name<>'' AND ut.StringSimilar(LEFT.business_name,RIGHT.companyname)<=Phones.Constants.STRING_MATCH_THRESHOLD)),
-											matchSubscriber(LEFT,RIGHT),
-											LEFT OUTER, KEEP(1), LIMIT(0));	
-	// keep records with populated names
-	zHistoryRecs_wMatchedSubscriber := DEDUP(SORT(zHistoryRecs_wInputMatch + zHistoryRecs_wLNIdentityMatch,
-													acctno,sequence_number,first_name='',last_name='',business_name='',RECORD),acctno,sequence_number);
+	END;	
+  // if not resolved to a lexid, drop the zumigo name addr info
+  // (phone and lexid >0) and (lexid or ((name or business name) and addr))
+ 
+  zHistoryRecs_wInputMatch	:= JOIN(zHistoryRecs_wDIDs,dsNameAddrRequest,
+   									LEFT.submitted_phonenumber = RIGHT.phone AND  LEFT.lexid  > 0 AND
+   									((LEFT.lexid = RIGHT.lexid) OR 
+   									(((LEFT.first_name<>'' AND LEFT.last_name<>'' AND
+   									ut.NameMatch(LEFT.first_name,LEFT.middle_name,LEFT.last_name,RIGHT.first_name,RIGHT.middle_name,RIGHT.last_name)<=Phones.Constants.STRING_MATCH_THRESHOLD) OR 
+   									(LEFT.business_name<>'' AND ut.StringSimilar(LEFT.business_name,RIGHT.business_name)<=Phones.Constants.STRING_MATCH_THRESHOLD)) AND
+                     (LEFT.prim_name <> '' AND LEFT.city <> ''AND LEFT.state <> '' AND LEFT.zip <>'' AND 
+                              LEFT.prim_name = RIGHT.prim_name AND LEFT.city = RIGHT.p_city_name AND LEFT.state = RIGHT.st AND LEFT.zip = RIGHT.z5)
+                     )),
+   									matchSubmittedData(LEFT,RIGHT),
+   									LEFT OUTER,LIMIT(Phones.Constants.MAX_RECORDS,SKIP));		
+
+	
+  // get the best name/addr for zumigo name/addr lexid 
+  zPhoneOwners_bestInfo := PhoneFinder_Services.Functions.GetBestInfo(PROJECT(zPhoneOwners_wDIDs(did  > 0), 
+                                                                     TRANSFORM(PhoneFinder_Services.Layouts.BatchInAppendDID,
+                                                                             SELF.seq := LEFT.seq,
+                                                                             SELF.did := LEFT.did,
+                                                                             SELF.homephone := LEFT.phone10,
+                                                                             SELF := []))); 
+                                                                             
+  Phones.Layouts.ZumigoIdentity.zOut addBestInfo(Phones.Layouts.ZumigoIdentity.zOut l, PhoneFinder_Services.Layouts.BatchInAppendDID r)
+                                          := TRANSFORM
+         
+       
+               SELF.lexid       :=r.did;
+               SELF.first_name  :=r.name_first;
+               SELF.middle_name :=r.name_middle;
+               SELF.last_name   :=r.name_last;
+               SELF.prim_range  :=r.prim_range;
+               SELF.predir      :=r.predir;
+               SELF.prim_name   :=r.prim_name;
+               SELF.addr_suffix :=r.addr_suffix;
+               SELF.postdir     :=r.postdir;
+               SELF.unit_desig  :=r.unit_desig;
+               SELF.sec_range   :=r.sec_range;
+               SELF.city        :=r.p_city_name;
+               SELF.state       :=r.st;
+               SELF.zip         :=r.z5;
+               SELF             :=l;
+               SELF             :=[];                                   
+       
+       
+  END;
+
+ zHistoryRecs_wBestInfo := JOIN(zHistoryRecs_wDIDs,zPhoneOwners_bestInfo,
+								LEFT.lexid = RIGHT.did,
+								addBestInfo(LEFT,RIGHT),
+								LEFT OUTER,LIMIT(Phones.Constants.MAX_RECORDS,SKIP));
+                 
+  zHistoryRecs_wMatchedSubscriber := DEDUP(SORT(zHistoryRecs_wInputMatch + zHistoryRecs_wBestInfo,
+   													acctno,sequence_number,first_name='',last_name='',business_name='',RECORD),acctno,sequence_number);
 
 	zHistoryRecs_wEmailMatched := JOIN(zHistoryRecs_wMatchedSubscriber,zEmailMatch,
 										LEFT.Transaction_ID = RIGHT.TransactionID,
@@ -436,29 +452,27 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 																						
 	dsZumigoHistory	:= IF(EXISTS(dsForwardedPhoneswIdentity),zHistoryRecs_wForwardMatched,zHistoryRecs_wEmailMatched);
 
-										
-													
-													
-	#IF(Phones.Constants.Debug.Zumigo)		
-		//OUTPUT(zumIn,NAMED('zumIn'));
+																																			
+#IF(Phones.Constants.Debug.Zumigo)		
+		OUTPUT(zumIn,NAMED('zumIn'));
 		OUTPUT(zumOut,NAMED('zumOut'));
 		OUTPUT(zEmailMatch,NAMED('zEmailMatch'));
-		//OUTPUT(zForwardedPhones,NAMED('zForwardedPhones'));
-		//OUTPUT(normzResults,NAMED('normzResults'));
-		//OUTPUT(dsZResults_wErrors,NAMED('dsZResults_wErrors'));
-		//OUTPUT(dsRepopulateAcctnoNSeq,NAMED('dsRepopulateAcctnoNSeq'));
-		//OUTPUT(zProcessedOutput,NAMED('zProcessedOutput'));	
-		//OUTPUT(zHistoryRecs,NAMED('zHistoryRecs'));
-		//OUTPUT(zPhoneOwners,NAMED('zPhoneOwners'));
-		//OUTPUT(zPhoneOwners_wDIDs,NAMED('zPhoneOwners_wDIDs'));
-		//OUTPUT(zHistoryRecs_wDIDs,NAMED('zHistoryRecs_wDIDs'));
-		//OUTPUT(LNPhoneOwnership,NAMED('LNPhoneOwnership'));
-		//OUTPUT(zHistoryRecs_wInputMatch,NAMED('zHistoryRecs_wInputMatch'));
-		//OUTPUT(zHistoryRecs_wLNIdentityMatch,NAMED('zHistoryRecs_wLNIdentityMatch'));
-		//OUTPUT(zHistoryRecs_wMatchedSubscriber,NAMED('zHistoryRecs_wMatchedSubscriber'));
-		//OUTPUT(zHistoryRecs_wEmailMatched,NAMED('zHistoryRecs_wEmailMatched'));
-		//OUTPUT(zHistoryRecs_wForwardMatched,NAMED('zHistoryRecs_wForwardMatched'));
-		// OUTPUT(dsZumigoHistory,NAMED('dsZumigoHistory'));
-	#END;
+		OUTPUT(zForwardedPhones,NAMED('zForwardedPhones'));
+		OUTPUT(normzResults,NAMED('normzResults'));
+		OUTPUT(dsZResults_wErrors,NAMED('dsZResults_wErrors'));
+		OUTPUT(dsRepopulateAcctnoNSeq,NAMED('dsRepopulateAcctnoNSeq'));
+		OUTPUT(zProcessedOutput,NAMED('zProcessedOutput'));	
+		OUTPUT(zHistoryRecs,NAMED('zHistoryRecs'));
+		OUTPUT(zPhoneOwners,NAMED('zPhoneOwners'));
+		OUTPUT(zPhoneOwners_wDIDs,NAMED('zPhoneOwners_wDIDs'));
+		OUTPUT(zHistoryRecs_wDIDs,NAMED('zHistoryRecs_wDIDs'));
+		OUTPUT(zHistoryRecs_wInputMatch,NAMED('zHistoryRecs_wInputMatch'));
+		OUTPUT(zHistoryRecs_wBestInfo,NAMED('zHistoryRecs_wBestInfo'));
+		OUTPUT(zHistoryRecs_wMatchedSubscriber,NAMED('zHistoryRecs_wMatchedSubscriber'));
+		OUTPUT(zHistoryRecs_wEmailMatched,NAMED('zHistoryRecs_wEmailMatched'));
+		OUTPUT(zHistoryRecs_wForwardMatched,NAMED('zHistoryRecs_wForwardMatched'));
+		OUTPUT(dsZumigoHistory,NAMED('dsZumigoHistory'));
+#END;
+
 	RETURN dsZumigoHistory;
 END;
