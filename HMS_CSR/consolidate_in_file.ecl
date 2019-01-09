@@ -1,4 +1,4 @@
-IMPORT HMS_CSR, ut;
+﻿IMPORT HMS_CSR, ut;
 
 EXPORT Consolidate_In_File (string pVersion, boolean pUseProd):= FUNCTION
 
@@ -325,14 +325,13 @@ EXPORT Consolidate_In_File (string pVersion, boolean pUseProd):= FUNCTION
 		
 		new_con_taxonomy_file := IF(NOTHOR(FileServices.GetSuperFileSubCount(HMS_CSR.Filenames(pversion,pUseProd).taxonomy_lInputHistTemplate)) = 0
 												 ,tr_raw_taxonomy_file
-												 ,tr_raw_taxonomy_file + con_taxonomy_file);
+												 ,tr_raw_taxonomy_file);// + con_taxonomy_file);
 		
 				
 		ouput_taxonomy_file :=  OUTPUT(new_con_taxonomy_file,,'~thor400_data::in::hms_csr::hms_taxonomy::' + pVersion, 
 									 THOR,OVERWRITE,compressed);
 		
 		write	:= sequential(
-					parallel(
 									ouput_addr_file,
 									ouput_lic_file,
 									ouput_ent_file,
@@ -344,16 +343,11 @@ EXPORT Consolidate_In_File (string pVersion, boolean pUseProd):= FUNCTION
 									ouput_language_file,
 									ouput_specialty_file,
 									ouput_disciplinaryact_file,
-									ouput_medicaid_file,
-									ouput_taxonomy_file
-					)
+									ouput_medicaid_file
 					
 				);
 					
 		return write;
 				
-		/* 		ut.MAC_SF_BuildProcess(new_con_addr_file,'~thor400_data::in::hms_csr::hms_address::history', build_it,2,,true);
-   		return build_it;
-		*/
 END;
 
