@@ -76,10 +76,8 @@ shared earliest_company_filing_date := dedup(sort(distribute(project(pHrchyBase(
 shared flags_earliest_company_filing_date := join(distribute(all_phone_scored, hash(seleid)),
 										      earliest_company_filing_date,
 													left.seleid = right.seleid and
-													//left.company_name = right.company_name,
 													left.company_filing_date = right.company_filing_date and left.company_filing_date<>0,
 													transform(BIPV2_Best.Layouts.In_Base_with_flags,
-																		//SELF.source_for_votes := if(left.seleid = right.seleid and left.company_name = right.company_name, (string45) left.source_for_votes + '1' + left.source_for_votes[47..48],(string45) left.source_for_votes +'0' + left.source_for_votes[47..48]),
 																		SELF.source_for_votes := if(left.seleid = right.seleid and left.company_filing_date = right.company_filing_date and left.company_filing_date<>0, (string45) left.source_for_votes + '1' + left.source_for_votes[47..48],(string45) left.source_for_votes +'0' + left.source_for_votes[47..48]),self := left),
 													left outer,
 													local);
