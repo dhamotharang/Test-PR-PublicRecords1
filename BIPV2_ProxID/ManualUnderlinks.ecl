@@ -6,7 +6,7 @@ export ManualUnderLinks := module
 		integer   underLinkId;
 	end;
 
-	export file_prefix := '~thor_data400::bip::proxid::underlink::';
+	export file_prefix := '~thor_data400::bipv2_proxid::underlink:';
 
 	shared superfile 						:= file_prefix + 'qa';
 	shared superfile_father 			:= file_prefix + 'father';
