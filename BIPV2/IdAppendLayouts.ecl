@@ -88,6 +88,7 @@ export IdAppendLayouts := module
 	  typeof(baseLayout.mname) contact_mname,
 	  typeof(baseLayout.lname) contact_lname,
 	  typeof(baseLayout.contact_job_title_derived) contact_job_title,
+		baselayout.contact_did,
 		integer error_code := 0,
 		string error_msg := '',
 	};
