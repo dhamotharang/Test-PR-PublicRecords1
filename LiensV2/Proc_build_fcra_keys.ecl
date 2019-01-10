@@ -75,9 +75,9 @@ build_fcra_keys := sequential(
 					  qmv_fcra_did_key,qmv_fcra_main_trid_key,
 						qmv_fcra_party_trid_key,qmv_fcra_rmsid_key,mv_bdid_qa,mv_case_nbr_qa,mv_cert_nbr_qa,mv_filing_nbr_qa,mv_serial_nbr_qa),bld_autokeys,
 						DeltaCommands,
-						cnt_fcra_main_id,cnt_fcra_party_id, cnt_fcra_autokey_payload/*,
+						cnt_fcra_main_id,cnt_fcra_party_id, cnt_fcra_autokey_payload,
 						RoxieKeybuild.updateversion('FCRA_LiensV2Keys',filedate,'skasavajjala@seisint.coml,michael.gould@lexisnexisrisk.com',,'F'),
-						create_build*/);
+						create_build);
 
 return build_fcra_keys;
 
