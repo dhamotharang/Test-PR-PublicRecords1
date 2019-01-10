@@ -1709,5 +1709,6 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2018/2054 Myanmar/Burma List','1696'},
 {'EC 2018/2053  Myanmar/Burma List','1697'},
 {'SECO (Switzerland) Mali List','1698'},
-{'UN Security Council Resolution 2374 (2017) Mali List','1699'}
+{'UN Security Council Resolution 2374 (2017) Mali List','1699'},
+{'Federal Financial Monitoring Services (Russia) WMD List','1700'}
 ],r);
