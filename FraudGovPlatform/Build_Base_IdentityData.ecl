@@ -10,48 +10,34 @@ module
 
 		Layouts.Base.IdentityData	tPrep(inIdentityDataUpdate	l)	:=
 	transform
-			self.process_date							:= (unsigned) l.ProcessDate, 
-			self.dt_first_seen						:= (unsigned) l.ProcessDate; 
-			self.dt_last_seen							:= (unsigned) l.ProcessDate;
+			self.process_date				:= (unsigned) l.ProcessDate, 
+			self.dt_first_seen				:= (unsigned) l.ProcessDate; 
+			self.dt_last_seen				:= (unsigned) l.ProcessDate;
 			self.dt_vendor_last_reported		:= (unsigned) l.ProcessDate; 
 			self.dt_vendor_first_reported		:= (unsigned) l.ProcessDate; 
-			self.source_rec_id						:= l.unique_id;																
-			self.current									:= 'C' ; 
-			self												:= l; 			
-			self												:= []; 
+			self.source_rec_id				:= l.unique_id;																
+			self.current					:= 'C' ; 
+			self							:= l; 			
+			self							:= []; 
    end; 
 		
 	IdentityDataUpdate	:=	project(inIdentityDataUpdate,tPrep(left));
 	
-	MBS_Layout := Record
-		FraudShared.Layouts.Input.MBS;
-		unsigned1 Deltabase := 0;
-	end;
-	MBS	:= project(FraudShared.Files().Input.MBS.sprayed(status = 1), transform(MBS_Layout, self.Deltabase := If(regexfind('DELTA', left.fdn_file_code, nocase),1,0); self := left));
-
 	IdentityDataSource := join(	IdentityDataUpdate,
-									MBS, 
-									(unsigned6) left.Customer_Account_Number = right.gc_id AND 
-									left.file_type = right.file_type  AND
-									left.ind_type = right.ind_type AND 
-									left.Deltabase = right.Deltabase AND
-									( 
-											left.Deltabase = 1											
-											OR 
-											(	left.Deltabase = 0 AND
-												left.customer_State = right.Customer_State AND
-												left.Customer_County = right.Customer_County AND 	
-												left.Customer_Agency_Vertical_Type = right.Customer_Vertical
-											)
-									)
-									,TRANSFORM(FraudGovPlatform.Layouts.Base.IdentityData,SELF.Source := RIGHT.fdn_file_code; SELF := LEFT) ,lookup); 
+							FraudShared.Files().Input.MBS.sprayed(status = 1), 
+							(unsigned6) left.Customer_Account_Number = right.gc_id AND 
+							left.file_type = right.file_type  AND
+							left.ind_type = right.ind_type AND 
+							left.customer_State = right.Customer_State AND
+							left.Customer_County = right.Customer_County AND 	
+							left.Customer_Agency_Vertical_Type = right.Customer_Vertical
+							,TRANSFORM(Layouts.Base.IdentityData,SELF.Source := RIGHT.fdn_file_code; SELF := LEFT) ,lookup); 
 
   // Rollup Update and previous base 
   
 	Pcombined     := If(UpdateIdentityData , inBaseIdentityData + IdentityDataSource , inBaseIdentityData); 
 	pDataset_Dist := distribute(Pcombined, source_rec_id);
 	pDataset_sort := sort(pDataset_Dist , source_rec_id, -process_date, -did, -clean_address.err_stat,local);
-
 	
 	Layouts.Base.IdentityData RollupUpdate(Layouts.Base.IdentityData l, Layouts.Base.IdentityData r) := 
 	transform
