@@ -1,15 +1,16 @@
-﻿IMPORT STRATA, Email_DataV2;
+﻿IMPORT STRATA;
 
-EXPORT Strata_Stat_Vendor(
+EXPORT Strata_Stat_Email(
 
 	 pversion
 	,DATASET(Email_dataV2.Layouts.base_BIP) pemail_base	= Email_dataV2.Files.Email_Base
+	,string emailList=''
 
 ) :=	FUNCTION
 
 rPopulationStats_email_base :=  RECORD
 	CountGroup									 									:= COUNT(GROUP);
-	pemail_base.email_src;
+	pemail_base.clean_address.st;
 	clean_email_CountNonBlank				 							:= SUM(GROUP,IF(pemail_base.clean_email <>'',1,0));
 	append_email_username_CountNonBlank				 		:= SUM(GROUP,IF(pemail_base.append_email_username <>'',1,0));
 	append_domain_CountNonBlank				 						:= SUM(GROUP,IF(pemail_base.append_domain <>'',1,0));
@@ -91,21 +92,21 @@ rPopulationStats_email_base :=  RECORD
 	cln_CompanyName_CountNonBlank								 	:= SUM(GROUP,IF(pemail_base.cln_CompanyName <>'',1,0));
 	CompanyTitle_CountNonBlank								 	 	:= SUM(GROUP,IF(pemail_base.CompanyTitle <>'',1,0));
 	rules_CountNonZero														:= SUM(GROUP,IF(pemail_base.rules > 0,1,0));
-  end;
+END;
 
 
 dPopulationStats_email_base := TABLE(pemail_base (current_rec)
 																		,rPopulationStats_email_base
-																		,email_src
+																		,clean_address.st
 																		,FEW);
 									
-Srt_dPopulationStats_email_base := SORT(dPopulationStats_email_base,email_src);
+Srt_dPopulationStats_email_base := SORT(dPopulationStats_email_base,st);
 
 STRATA.createXMLStats(Srt_dPopulationStats_email_base
 											,'EmailV2'
-											,'Vendor'
+											,'Email'
 											,(string)pVersion
-											,'shannon.skumanich@lexisnexisrisk.com'
+											,emailList
 											,zemail_base);
 
 RETURN zemail_base;
