@@ -1,15 +1,15 @@
 ﻿EXPORT Constants := 
   MODULE
-  
+
     EXPORT EQUIFAX_GATEWAY_USAGE := ENUM(UNSIGNED1, GATEWAY_NOT_REQUESTED, GATEWAY_NOT_CALLED, RESULTS_RETURNED, NO_DID_MATCH, NO_GATEWAY_ATTRIBUTES_RETURNED, GATEWAY_ERROR_RETURNED ); 
     
     EXPORT STRING GATEWAY_END_USER_COMPANY_NAME := 'LexisNexis';
     EXPORT STRING GATEWAY_END_USER_PERMISABLE_PURPOSE := '04';
     EXPORT STRING GATEWAY_MODEL_NUMBER := '05391';
     EXPORT STRING GATEWAY_XPATH := 'EquifaxAttributesResponseEx';
-    EXPORT STRING GATEWAY_ERROR_NO_HIT_NO_CHG := 'NO HIT/NO CHARGE- Service to Equifax is currently disconnected.  If you continue to receive this message after 24 hours have elapsed, please contact LN Customer Service or your Sales Rep. with the error code';
-    EXPORT STRING GATEWAY_EQFX_ERROR_NO_HIT_NO_CHG := 'NO HIT/NO CHARGE- Equifax returned an error.  If you receive an error repeatedly, please contact LN Customer Service or your Sales Rep. with the Equifax ';
-    
+    EXPORT STRING GATEWAY_ERROR_NO_HIT_NO_CHG := 'NO HIT/NO CHARGE- Service to Equifax is currently disconnected.  If you continue to receive this message after 24 hours have elapsed, please contact LN Customer Service or your Sales Rep. with the following:';
+    EXPORT STRING GATEWAY_EQFX_ERROR_NO_HIT_NO_CHG := 'NO HIT/NO CHARGE- Service to Equifax is currently generating an error. If you receive an error repeatedly, please contact LN Customer Service or your Sales Rep. with the following:';
+
     EXPORT  ATTRIBUTE_TYPES :=
       MODULE
         EXPORT STRING4 BAL_OPEN_AUTO_3MONTHS := '3160';
