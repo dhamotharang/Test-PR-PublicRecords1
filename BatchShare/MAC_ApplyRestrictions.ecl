@@ -23,7 +23,7 @@ EXPORT MAC_ApplyRestrictions(in_ds,in_params,_pSSN = 'ssn',_pDID = 'did',_pDateF
 	is_DRM_safe := ~NO_GM_DR.isHeaderSourceRestricted(in_ds.src, in_params.DataRestrictionMask);
 	
 	is_industry_class_safe := ~(in_ds.src in MDR.sourceTools.set_Utilities 
-	                             AND in_params.industry_class = ut.IndustryClass.UTILI_IC); //'UTILI'
+	                             AND in_params.industryclass = ut.IndustryClass.UTILI_IC); //'UTILI'
 
 	// apply restrictions for GLB,DPPA,RNA,DRM,INDUSTRY_CLASS
 	glb_dppa_DRM_IC_safe_ds := in_ds(is_glb_preGlb_safe AND is_dppa_safe
