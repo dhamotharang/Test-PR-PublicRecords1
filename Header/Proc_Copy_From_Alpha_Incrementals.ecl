@@ -299,13 +299,14 @@ EXPORT Refresh_copy(string filedt) :=  FUNCTION
     return sequential(cpLab, cpUniqEx);
 END;
 
+copy_to_dataland:= _control.fSubmitNewWorkunit('Header.Proc_Copy_Keys_To_Dataland.Incrementals','hthor_sta','Dataland');
+
 EXPORT movetoQA(string filedt) := sequential(
     // The following can only copy after the key is built in Boca
     fc8(fName(filedt, '::did'), fName8(filedt, '::did')),
-    update_inc_superfiles(,filedt)
+    update_inc_superfiles(,filedt),
+    copy_to_dataland
     );
-
-copy_to_dataland:= _control.fSubmitNewWorkunit('Header.Proc_Copy_Keys_To_Dataland.Incrementals','hthor_sta','Dataland');
         
 EXPORT deploy(string emailList,string rpt_qa_email_list,string skipPackage='000') := sequential(               
     udops(skipPackage),
@@ -328,7 +329,6 @@ EXPORT deploy(string emailList,string rpt_qa_email_list,string skipPackage='000'
         +'If you have any question or concerns please contact:\n'
         +'Debendra.Kumar@lexisnexisrisk.com\n'
         +'gabriel.marcan@lexisnexisrisk.com\n'
-        +'\nThank you,'),
-    copy_to_dataland;
+        +'\nThank you,');    
 );
 END;
