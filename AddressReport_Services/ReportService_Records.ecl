@@ -12,7 +12,6 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 	AI					:=AutoStandardI.InterfaceTranslator;
 	clean_addr	:=ai.clean_address.val (project (param, AI.clean_address.params));
 	split_addr	:=Address.CleanFields(clean_addr);
-	isCNSMR := param.IndustryClass = D2C.Constants.CNSMR;
 
 	AddressReport_Services.Layouts.slim_address into_srch() := transform
 		self.prim_range 	:= split_addr.prim_range;
@@ -74,6 +73,7 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
     EXPORT unsigned3 date_threshold := param.dateval;
     EXPORT string ssn_mask := param.ssn_mask;
   END;
+	isCNSMR := mod_access.isConsumer();
 
   glb_ok :=  mod_access.isValidGLB ();
   dppa_ok := mod_access.isValidDPPA ();
@@ -150,18 +150,11 @@ EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 																					if(param.LocationReport, AddressReport_Services.constants.NPA, AddressReport_Services.constants.MaxNeighbors),
 																					if(param.LocationReport, AddressReport_Services.constants.Neighbors_Per_NA, AddressReport_Services.constants.MaxNeighbors),
 																					if(param.LocationReport, AddressReport_Services.constants.NeighborRecency, AddressReport_Services.constants.MaxNeighbors),
-																					'',
-																					mod_access.glb,
-																					mod_access.dppa,
-																					false,
-																					true,
-																					glb_ok,
-																					dppa_ok,
-																					mod_access.ssn_mask,
 																					true,
 																					true,
 																					AddressReport_Services.constants.MaxProximity,
-																					false);  // there is no subject in this report
+																					false, // there is no subject in this report
+                                          mod_access);
 
 	ut.PermissionTools.GLB.mac_FilterOutMinors(Neighbors_recs_all,Neighbors_recs_fil,,,dob)
 	Neighbors_recs :=Neighbors_recs_fil;
