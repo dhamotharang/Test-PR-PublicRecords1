@@ -4,10 +4,10 @@ export Create_Supers :=
 	tools.mod_Utilities.createallsupers(
 		filenames().Input.dAll_filenames +
 		FraudShared.filenames().Input.dAll_filenames,
-		filenames().dAll_filenames //+
-//		keynames().dAll_filenames +
-//		FraudShared.filenames().dAll_filenames +
-//		FraudShared.keynames().dAll_filenames
+		filenames().dAll_filenames +
+		keynames().dAll_filenames +
+		FraudShared.filenames().dAll_filenames +
+		FraudShared.keynames().dAll_filenames
 		)
 		;
 
@@ -37,10 +37,6 @@ export Create_Supers :=
 	// Std.File.CreateSuperFile('~fraudgov::in::sprayed::sourcestoanonymize');
 	// Std.File.CreateSuperFile('~fraudgov::out::NewFraudgov_flag');
 	// Std.File.CreateSuperFile('~fraudgov::out::NewFraudgov_flag_father');
-	
-	
-	
-
 	// Std.File.CreateSuperFile('~fraudgov::Scrubs_FraudGov::Log');
 	
 // tools.mod_Utilities.createallsupers(FraudGovPlatform.filenames().Input.DemoData.dAll_filenames);
