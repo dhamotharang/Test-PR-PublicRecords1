@@ -5,7 +5,7 @@ C:\Users\goulmi01\AppData\Roaming\HPCC Systems\eclide\mgould_prod\Boca_Prod\Corp
 C:\Users\goulmi01\AppData\Roaming\HPCC Systems\eclide\mgould_prod\Boca_Prod\Corp2_Mapping\Filenames\2013-12-06T19_54_44Z.ecl
 */
 import VersionControl; 
-string landing_zone := 'uspr-edata10.risk.regn.net ';
+string landing_zone := 'uspr-edata10.risk.regn.net';
 export Filenames(
 
 	 string 	pversion							= ''
