@@ -271,7 +271,7 @@ SHARED orbit_update_entries(string createORupdate, string skipPackage='000') := 
                 ),
                 sequential(
                         if(skipPackage[1]='0',output(update_entry('PersonXLAB_Inc' ,lastestIkbVersionOnThor,'N'))),
-                        if(skipPackage[2]='0',output(update_entry('FCRA_Header'    ,lastestFCRAversionOnThor,'N'))),
+                        if(skipPackage[2]='0',output(update_entry('FCRA_Header'    ,lastestFCRAversionOnThor,'F'))),
                         if(skipPackage[3]='0',output(update_entry('Header_IKB'     ,lastestWklyversionOnThor,'N')))
                 )
        );
@@ -319,11 +319,10 @@ EXPORT deploy(string emailList,string rpt_qa_email_list,string skipPackage='000'
         +if(skipPackage[1]='0','PersonXLAB_Inc\n','')
         +if(skipPackage[2]='0','FCRA_Header\n','')
         +if(skipPackage[3]='0','PersonHeaderWeeklyKeys\n','')
-        +'\n'
-        +if(skipPackage[1]='0','PersonXLAB_Inc Deployment version: \n' + lastestIkbVersionOnThor,'')
-        +if(skipPackage[2]='0','FCRA_Header Deployment version: \n' + lastestFCRAversionOnThor,'')
-        +if(skipPackage[3]='0','PersonHeaderWeeklyKeys Deployment version: \n' + lastestWklyversionOnThor,'')
-        +'\n'
+        +if(skipPackage[1]='0','\nPersonXLAB_Inc Deployment version: \n' + lastestIkbVersionOnThor,'')
+        +if(skipPackage[2]='0','\nFCRA_Header Deployment version: \n' + lastestFCRAversionOnThor,'')
+        +if(skipPackage[3]='0','\nPersonHeaderWeeklyKeys Deployment version: \n' + lastestWklyversionOnThor,'')
+        +'\n\n'
         +'Corespondiong Orbit entries have been created and updated.\n'
         +'\n'
         +'If you have any question or concerns please contact:\n'
