@@ -1,4 +1,4 @@
-﻿IMPORT PersonSlimReport_Services, BatchShare, ut, PersonReports, iesp;
+﻿IMPORT PersonSlimReport_Services, BatchShare, ut, iesp;
 EXPORT IParams := MODULE
 
 	EXPORT PersonSlimReportOptions := INTERFACE
@@ -17,10 +17,8 @@ EXPORT IParams := MODULE
 		EXPORT BOOLEAN   EnableNationalAccidents := FALSE;
 		EXPORT BOOLEAN   EnableExtraAccidents    := FALSE;
 		EXPORT BOOLEAN   IncludeBlankDOD         := FALSE;
-
-		EXPORT BOOLEAN Include_NonRegulated_WatercraftSources := TRUE;  // per vlad, return these until product says something
-		EXPORT STRING1 ucc_party_type := 'D'; //ask Bryce if this is fine for UCC. ie to return only debtors
-		EXPORT STRING14 did := ''; //for firearms
+		EXPORT STRING1 ucc_party_type            := 'D'; //return only debtors
+		EXPORT STRING14 did                      := ''; //for firearms
 
 		EXPORT BOOLEAN IncludeAddresses            := FALSE;
 		EXPORT BOOLEAN IncludePhones               := FALSE;
@@ -112,7 +110,7 @@ EXPORT IParams := MODULE
 				 SELF:=[])));
 		STRING RealTimePermissibleUse := trim(global(inIesp.Options).RealTimePermissibleUse);
 		#STORED('RealTimePermissibleUse', RealTimePermissibleUse);
-		BOOLEAN IncludePriorProperties         := global(inIesp.Options).IncludePriorProperties;
+		BOOLEAN IncludePriorProperties:= global(inIesp.Options).IncludePriorProperties;
 		#STORED('IncludePriorProperties', IncludePriorProperties);
 		BOOLEAN IncludeNonRegulatedVehicleSources := global(inIesp.Options).IncludeNonRegulatedVehicleSources;
 		#STORED('IncludeNonRegulatedVehicleSources', IncludeNonRegulatedVehicleSources);
@@ -124,6 +122,7 @@ EXPORT IParams := MODULE
 		#STORED('EnableExtraAccidents', EnableExtraAccidents);
 		BOOLEAN IncludeBlankDOD := global(inIesp.Options).IncludeBlankDOD;
 		#STORED('IncludeBlankDOD', IncludeBlankDOD);
+		//return bogus output to avoid any errors - this is done in iesp.ECL2ESP
 		RETURN OUTPUT (dataset ([],{integer x}), named('__internal__'), extend);
 	END;
 

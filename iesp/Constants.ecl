@@ -2116,34 +2116,34 @@ EXPORT Constants := MODULE
 	end;
 	
 	//Person Slim alerting query
-	export PersonSlim := module
-		/*01*/export UNSIGNED2 MaxAddresses   := 100;
-		/*02*/export UNSIGNED2 MaxPhones      := 50;
-		/*03*/export UNSIGNED2 MaxProfLic     := 50;
-	  /*04*/export UNSIGNED2 MaxPeopleAtWork:= 50;
-		/*05*/export UNSIGNED2 MaxAircrafts   := 25;
-		/*06*/export UNSIGNED2 MaxFaaCerts    := 50;
-		/*07*/export UNSIGNED2 MaxWatercrafts := 25;
-		/*08*/export UNSIGNED2 MaxUCCs      	:= 100;
-	  /*09*/export UNSIGNED2 MaxSexOffenses := 50;
-		/*10*/export UNSIGNED2 MaxCrimRecords := 100;
-		/*11*/export UNSIGNED2 MaxWeapons 	  := 50;
-		/*12*/export UNSIGNED2 MaxHuntFish		:= 50;
-		/*13*/export UNSIGNED2 MaxFirearms    := 50;
-		/*14*/export UNSIGNED2 MaxDEA         := 50;
-		/*15*/export UNSIGNED2 MaxVoter 			:= 50;
-		/*16*/export UNSIGNED2 MaxDLs 			  := 50;
-		/*17*/export UNSIGNED2 MaxAccidents   := 50;
-		/*18*/export UNSIGNED2 MaxBankruptcies:= 100;
-		/*19*/export UNSIGNED2 MaxLiens 		  := 100;
-		/*20*/export UNSIGNED2 MaxProperties 	:= 50;
-		/*21*/export UNSIGNED2 MaxMarriageDiv := 25;
-		/*22*/export UNSIGNED2 MaxStudent     := 100;
-		/*23*/export UNSIGNED2 MaxVehicles 		:= 50;
-		/*24*/export UNSIGNED2 MaxAKA	 		    := 50;
-		/*25*/export UNSIGNED2 MaxImposters   := 50;
-		/*26*/export UNSIGNED2 MaxDeaths      := 50;
-		/*27*/export UNSIGNED2 MaxUtilities   := 100;
-	end;
+  export PersonSlim := module
+    export UNSIGNED2 MaxAddresses    := 100;
+    export UNSIGNED2 MaxPhones       := 50;
+    export UNSIGNED2 MaxProfLic      := 50;
+    export UNSIGNED2 MaxPeopleAtWork := 50;
+    export UNSIGNED2 MaxAircrafts    := 25;
+    export UNSIGNED2 MaxFaaCerts     := 50;
+    export UNSIGNED2 MaxWatercrafts  := 25;
+    export UNSIGNED2 MaxUCCs         := 100;
+    export UNSIGNED2 MaxSexOffenses  := 50;
+    export UNSIGNED2 MaxCrimRecords  := 100;
+    export UNSIGNED2 MaxWeapons      := 50;
+    export UNSIGNED2 MaxHuntFish     := 50;
+    export UNSIGNED2 MaxFirearms     := 50;
+    export UNSIGNED2 MaxDEA          := 50;
+    export UNSIGNED2 MaxVoter        := 50;
+    export UNSIGNED2 MaxDLs          := 50;
+    export UNSIGNED2 MaxAccidents    := 50;
+    export UNSIGNED2 MaxBankruptcies := 100;
+    export UNSIGNED2 MaxLiens        := 100;
+    export UNSIGNED2 MaxProperties   := 50;
+    export UNSIGNED2 MaxMarriageDiv  := 25;
+    export UNSIGNED2 MaxStudent      := 100;
+    export UNSIGNED2 MaxVehicles     := 50;
+    export UNSIGNED2 MaxAKA          := 50;
+    export UNSIGNED2 MaxImposters    := 50;
+    export UNSIGNED2 MaxDeaths       := 50;
+    export UNSIGNED2 MaxUtilities    := 100;
+  end;
 	
 END;
