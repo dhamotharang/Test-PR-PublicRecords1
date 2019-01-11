@@ -17,7 +17,7 @@ EXPORT IParams := MODULE
 		EXPORT BOOLEAN   EnableNationalAccidents := FALSE;
 		EXPORT BOOLEAN   EnableExtraAccidents    := FALSE;
 		EXPORT BOOLEAN   IncludeBlankDOD         := FALSE;
-		EXPORT STRING1 ucc_party_type            := 'D'; //return only debtors
+		EXPORT STRING1 ucc_party_type            := PersonSlimReport_Services.Constants.DEBTOR;
 		EXPORT STRING14 did                      := ''; //for firearms
 
 		EXPORT BOOLEAN IncludeAddresses            := FALSE;

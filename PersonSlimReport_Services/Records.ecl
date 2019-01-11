@@ -118,7 +118,7 @@ EXPORT Records(DATASET(doxie.layout_references_hh) in_did,
  	
  //***LIEN RECS***\\ // DATASET([],iesp.lienjudgement.t_LienJudgmentReportRecord);
  liens_mod := MODULE (project(in_mod, PersonReports.input.liens, opt))
-                EXPORT string1 leins_party_type := 'D'; //debtor
+                EXPORT string1 leins_party_type := PersonSlimReport_Services.Constants.DEBTOR;
               END;
  liens := if(in_mod.IncludeLiens,
             CHOOSEN(SmartRollup.fn_smart_rollup_liens(project(PersonReports.lienjudgment_records(in_did, liens_mod).liensjudgment_v2,
@@ -136,10 +136,10 @@ EXPORT Records(DATASET(doxie.layout_references_hh) in_did,
                          iesp.Constants.PersonSlim.MaxMarriageDiv));
  													
  //***STUDENT EDUCATION RECS***\\ // DATASET([],iesp.student.t_StudentRecord);
- student_mod := module(project(globalMod, American_Student_Services.IParam.reportParams,opt)) end;
- onlyCurrent := true; //request only current student records									
+ student_mod := module(project(globalMod, American_Student_Services.IParam.reportParams,opt)) end;							
  eduStudentV2:= if(in_mod.IncludeEducation,
-                   CHOOSEN(American_Student_Services.Functions.get_report_recs(in_did,student_mod,onlyCurrent),
+                   CHOOSEN(American_Student_Services.Functions.get_report_recs(in_did,
+									         student_mod,PersonSlimReport_Services.Constants.onlyCurrentStudentRecs),
                            iesp.Constants.PersonSlim.MaxStudent));
  
  // this get's generic person records by DID that will be used below 
