@@ -45,4 +45,9 @@
 		EXPORT STRING DRIVER_LICENSE := 'Driver License';
 		EXPORT STRING UNK := 'unk';
 	END;	
+	EXPORT KelScorePopulationType := MODULE
+		EXPORT STRING ELEMENT := 'Element';
+		EXPORT STRING AVERAGE := 'Average';
+	END;
+	EXPORT RealtimeScoringAverage := 15;
 END;
