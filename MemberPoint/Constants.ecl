@@ -157,7 +157,7 @@
 				{'SAD',14},{'SA',13},{'SZD',12},{'SZ',11},{'SCD',10},{'SC',9},{'ANZD',8},{'ANZ',7},{'ANCD',6},
 				{'ANC',5},{'SD',4},{'S',3},{'AND',2},{'AN',1}],MemberPoint.Layouts.sortRec);
 																				
-		export PhoneScore 				 := ENUM(UNSIGNED, LowMin = 306,LowMax = 396 ,MidMin = 397,MidMax = 544 ,HighMin = 545);
+		export PhoneScore         := ENUM(UNSIGNED, LowMin = 187,LowMax = 310 ,MidMin = 311,MidMax = 579 ,HighMin = 580);
 		export AdlBestAddressScore := ENUM(LowMin = 1,LowMax = 59 ,MidMin = 60,MidMax = 79 ,HighMin = 80, HighMax = 100 ,MidAverage = 65);
 		export BestAddressScore 	 := ENUM(LowMin = 1,LowMax = 39 ,MidMin = 40,MidMax = 79 ,HighMin = 80, HighMax = 100 );
 
