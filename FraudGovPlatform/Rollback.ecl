@@ -1,7 +1,10 @@
-﻿import tools, STD, FraudShared;
+﻿import tools, STD, FraudShared, FraudGovPlatform_Validation;
 
 export Rollback(
-	string	pversion	= 	''
+	string	pversion	= 	'',
+	string 	Test_Build,
+	string	Test_RecordID,
+	string	Test_RinID
 )  :=
 module
 
@@ -124,6 +127,13 @@ module
 		STD.File.FinishSuperFileTransaction()
 	);
 	
-	Export All := 	sequential( All_Files , 	Send_Emails(pversion).BuildFailure );
+	Export All := 	
+		sequential( 
+			All_Files , 	
+			FraudGovPlatform_Validation.Send_Email
+			(	pversion, 
+				build_status := Test_Build, 
+				rid_status := Test_RecordID, 
+				rinid_status := Test_RinID	).build_rollback	);
 end;
 
