@@ -29,7 +29,7 @@ create_build := map (
 									ut.Weekday(orbit_date)  in [ 'MONDAY','TUESDAY','WEDNESDAY','THURSDAY']  =>  Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'Accident Reports - ECrashV2 National',filedate), 
 									
 
-									'No_Orbit_Entry_needed'
+									Output('No_Orbit_Entry_needed')
 								);
 
 create_build_ins := if ( ut.Weekday(orbit_date) not in ['SATURDAY','SUNDAY'] and   morning = 'no' , FLAccidents_Ecrash.Proc_Orbit3I_CreateBuild ('eCrashCRUAcidentsDelta', filedate ) ,Output('No_Orbit_Entry_needed') );
