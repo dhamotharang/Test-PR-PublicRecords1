@@ -1,4 +1,4 @@
-﻿export Send_Email(string filedate='',string st='',string fn='', string ut='', string build_status, string rid_status, string rinid_status):= module
+﻿export Send_Email(string filedate='',string st='',string fn='', string ut='', string build_status='', string rid_status='', string rinid_status=''):= module
 
 	shared UpSt:=stringlib.stringtouppercase(st);
 	shared UpType:=stringlib.stringtouppercase(ut);

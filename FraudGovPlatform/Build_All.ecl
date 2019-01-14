@@ -130,9 +130,9 @@ module
 			,FraudgovInfo(pversion[1..8],'Keys_Completed').SetPreviousVersion			
 		) : success(Send_Emails(pversion).Roxie), failure(Send_Emails(pversion).BuildFailure);	
 
-	Test_Build := Mac_TestBuild(pversion) := 'Passed';
-	Test_RecordID := Mac_TestRecordID(pversion) := 'Passed';
-	Test_RinID := Mac_TestRinID(pversion) := 'Passed';
+	Test_Build := Mac_TestBuild(pversion);
+	Test_RecordID := Mac_TestRecordID(pversion);
+	Test_RinID := Mac_TestRinID(pversion);
 	
 	export keys_portion := 
 		if( Test_Build = 'Passed' and 
