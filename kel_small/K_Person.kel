@@ -1,0 +1,73 @@
+Person := ENTITY(FLAT(UID=did,Name,INTEGER Age),MODEL(*));
+Vehicle := ENTITY(FLAT(UID,Make,Colour=Color),MODEL(*));
+
+CoTransacts := ASSOCIATION(FLAT(Person who,Person whoelse, DATE whence=when)
+                           ,MODEL(who,whoelse,{whence}));
+PerVeh := ASSOCIATION(FLAT(STRING Type,Person Per,Vehicle Veh, DATE whence=when)
+                           ,MODEL(Per,Veh,Transaction{Type,whence}));
+
+
+USE KEL_Small.File_Buys(FLAT,Person(UID=owner1_did,Name=owner1_name,Age=owner1_age),
+                   Person(owner2_*),
+									 Person(seller1_*),
+									 Person(seller2_*));
+
+USE KEL_Small.File_Buys(FLAT,Vehicle(UID=veh_uid));
+
+USE KEL_Small.File_Buys(FLAT,CoTransacts(who=owner1_did,whoelse=owner2_did),
+                   CoTransacts(who=owner2_did,whoelse=owner1_did),
+									 CoTransacts(who=seller1_did,whoelse=seller2_did),
+									 CoTransacts(who=seller2_did,whoelse=seller1_did));
+									 
+USE KEL_Small.File_Buys(FLAT,PerVeh(Type='BUYS',Per=owner1_did,Veh=veh_uid),
+									 PerVeh(Type='BUYS',Per=owner2_did,Veh=veh_uid),
+									 PerVeh(Type='SELLS',Per=seller1_did,Veh=veh_uid),
+									 PerVeh(Type='SELLS',Per=seller2_did,Veh=veh_uid));
+
+QUERY:Dump <= PerVeh,CoTransacts,Person{UID,Name,CoTransacts.whoelse{UID,Name}};
+
+//,Vehicle, CoTransacts, PerVeh;
+									 
+									 /*
+									 PerVeh(Type='BUYS',Per=owner1_did,Veh=veh_uid),
+									 PerVeh(Type='BUYS',Per=owner2_did,Veh=veh_uid),
+									 PerVeh(Type='SELLS',Per=seller1_did,Veh=veh_uid),
+									 PerVeh(Type='SELLS',Per=seller2_did,Veh=veh_uid),
+									 CoTransacts(who=owner1_did,whoelse=owner2_did),CoTransacts(who=owner2_did,whoelse=owner1_did),
+									 CoTransacts(who=seller1_did,whoelse=seller2_did),CoTransacts(who=seller2_did,whoelse=seller1_did)
+									 );*/
+
+//QUERY:Dump <= Person,Vehicle,PerVeh,Person{UID,Name,Age,PerVeh.Veh{Person.PerVeh.Type,Colour,Make},CoTransacts.whoelse{UID,Name}};
+
+/*USE File_Person(FLAT,Person);
+USE File_Relat(FLAT,Relationship(who=person1,whoelse=person2)
+                             ,Relationship(who=person2,whoelse=person1));
+USE File_Veh(FLAT,Vehicle);
+USE File_PerVeh(FLAT,PerVeh);
+
+Person: => passenger := Relationship.whoelse.PerVeh{Veh};
+Person: => passenger_only := passenger(NOT EXISTS(Person.PerVeh(Veh=Person.passenger.Veh)));
+
+
+QUERY:Dump <= Person{UID,Name,PerVeh.Veh},Vehicle,PerVeh;
+*/
+//QUERY:Dump <= Person{UID,Name,Age,nRels,nVehs,nVehs1,passenger},Vehicle{UID,Make,Colour,nIn,nOwners};
+
+//QUERY:Dump <= Person{UID,{Name},Age,{in_age}},Person{Age,COUNT(GROUP)};
+
+//
+
+//Person: => Youngest := COUNT(Relationship(whoelse.Age<Person.Age))=0;
+//Person: => YoungRels := COUNT(Relationship.whoelse(Youngest));
+
+//QUERY:Dump1 <= Person{UID,Name,Age,Youngest,YoungRels
+//                             ,Relationship.whoelse{Name,Age,Youngest}};
+														 
+
+//QUERY:Dump <= Person{UID,Name,in_age,Age,nRels,nVehs,nVehs1},Vehicle{UID,Make,Colour,nIn,nOwners};
+/* Vehicle: => nIn := COUNT(PerVeh.Per);
+Vehicle: => nOwners := COUNT(PerVeh.Per(Vehicle.PerVeh.Type='OWNS'));
+Person: => nRels := COUNT(Relationship.whoelse);
+Person: => nVehs := COUNT(PerVeh.Veh);
+Person: => nVehs1 := COUNT(PerVeh{Veh}); */
+

@@ -1,0 +1,45 @@
+EXPORT Layouts := MODULE
+	EXPORT Layout_best := RECORD
+		UNSIGNED8 LNPID;
+		STRING1	  EntityType;
+		STRING120 CNAME;
+		STRING10  PrimaryRange;
+		STRING2   PreDirectional;
+		STRING28  PrimaryName;
+		STRING4   AddressSuffix;
+		STRING2   PostDirectional;
+		STRING8   SecondaryRange;
+		STRING25  CityName;
+		STRING2   State;
+		STRING5   Zip5;
+		STRING25  LicenseNumber;
+		STRING25  CleanedLicenseNumber;
+		STRING2	  LicenseState;
+		STRING60  LicenseType;
+		STRING60  LicenseStatus;
+		UNSIGNED4 TaxID;
+		UNSIGNED4 Fein;
+		STRING10  Phone;
+		STRING10  Fax;
+		STRING10  NPINUMBER;
+		STRING8   NPIEnumerationDate;
+		STRING8   NPIDeactivationDate;
+		STRING8 	NPIReactivationDate;
+		STRING1		NPIFlag;
+		STRING1	  DEABusinessActivityIndicator;		
+		STRING10  DEANumber;
+		UNSIGNED4 DateDEAExpired;
+		STRING1	  isStateSanction;
+		STRING1	  isOIGSanction;
+		STRING1	  isOPMSanction;
+		STRING10  Taxonomy;
+		STRING50  TaxonomyDescription;		
+		STRING3	  SpecialityCode;	
+		STRING40  GroupKey;
+		STRING10	CliaNumber;
+		STRING10	MedicareNumber;
+		STRING15	MedicaidNumber;
+		STRING7		NCPDPNumber;
+	END;
+END;
+

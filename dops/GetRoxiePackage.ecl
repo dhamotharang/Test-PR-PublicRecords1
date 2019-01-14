@@ -1,4 +1,4 @@
-EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget) := module
+﻿EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget) := module
 
 	export rSubFile := record
 		string subfile {xpath('@value')};
@@ -54,11 +54,12 @@ EXPORT GetRoxiePackage(string roxieesp, string roxieport, string roxietarget) :=
 	
 		xmlds := dataset([{soapresults[1].Info}],xmlout_rec);
 
-		
-	
 		dFromXML := fromxml(rPackageMap,soapresults[1].Info);
 
-		dFromXMLtoDataset := dataset([dFromXML],recordof(dFromXML));
+		dFromXMLtoDataset := if (count(soapresults(info <> '')) > 0
+															,dataset([dFromXML],recordof(dFromXML))
+															,dataset([],rPackageMap)
+															);
 		
 		return dFromXMLtoDataset;
 		

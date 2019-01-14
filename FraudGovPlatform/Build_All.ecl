@@ -153,5 +153,14 @@ module
 		 sequential(base_portion,keys_portion)
 		,output('No Valid version parameter passed, skipping FraudGovPlatform.All')
 	);
-		
+
+	//	Scrubs (Which require ORBIT)
+	EXPORT	ScrubsReports	:=	
+	IF(tools.fun_IsValidVersion(pversion)
+		,Scrubs_MBS.BuildSCRUBSReport(pversion, emailList := Email_Notification_Lists().Stats)
+		,Scrubs_FraudGov.BuildSCRUBSReport(pversion, emailList := Email_Notification_Lists().Stats)
+		,OUTPUT('No Valid version parameter passed, skipping FraudGovPlatform.Build_All().ScrubsReports')
+	) : SUCCESS(Send_Emails(pversion,pBuildMessage:='MBS Scrubs are complete').BuildMessage),
+			FAILURE(Send_Emails(pversion).BuildFailure);
+			
 end;
