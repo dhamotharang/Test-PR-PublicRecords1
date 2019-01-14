@@ -57,6 +57,7 @@ send_email:= fileservices.SendEmail(
 																		'jose.bello@lexisnexisrisk.com'
 																			+',Brian.knowles@lexisnexisrisk.com'
 																			+',Christopher.Brodeur@lexisnexisrisk.com'
+                                                                            +'Andrew.Frederickson@lexisnexisrisk.com'
 																			+',gabriel.marcan@lexisnexisrisk.com'
 																		,'Header hash and vina files available'
 																		,'Header hash and vina files available at:\n'
