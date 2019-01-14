@@ -56,7 +56,6 @@ fvb  := despray(Basefilev      , DestinationIP_PA,punixPA+'vinashrunk.d00');
 send_email:= fileservices.SendEmail(
 																		'jose.bello@lexisnexisrisk.com'
 																			+',Brian.knowles@lexisnexisrisk.com'
-																			+',Roger.Smith@lexisnexisrisk.com'
 																			+',Christopher.Brodeur@lexisnexisrisk.com'
 																			+',gabriel.marcan@lexisnexisrisk.com'
 																		,'Header hash and vina files available'
