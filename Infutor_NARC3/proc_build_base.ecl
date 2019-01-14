@@ -100,6 +100,7 @@ std_input := project(dedup_FileLogical_in, tMapping(LEFT));
 	//Add record type
   add_record_type	:= Project(new_base, TRANSFORM(Infutor_NARC3.Layout_Basefile, 
 																								   self.record_type := left.__Tpe;
+																									 self.history_flag := if(left.__Tpe=Ingest().RecordType.Old,'H','');
 																								   self := left;
 																									 self:= [];));
 
@@ -123,8 +124,8 @@ cleanNames_t := project(cleanNames, transform({recordof(cleanNames), string orig
 																							self := left));			
 
 																		
-//unsigned4	lFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;		
-unsigned4	lFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords | AID.Common.eReturnValues.NoNewCacheFiles;
+unsigned4	lFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;		
+//unsigned4	lFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords | AID.Common.eReturnValues.NoNewCacheFiles;
 AID.MacAppendFromRaw_2Line(cleanNames_t,orig_addr1,orig_addr2,RawAID,cleanAddr, lFlags);
 
 Infutor_NARC3.Layout_Basefile 		tr(cleanAddr l) := TRANSFORM

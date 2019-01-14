@@ -195,6 +195,7 @@ EXPORT Layout_Basefile := record
 	string9	   ssn_append := '';
 	string10   clean_Phone;
 	string8	   clean_DOB;	
-	unsigned1  record_type;	
+	unsigned1  record_type;
+	string1		history_flag:='';
 	AID.Common.xAID		RawAID;
 end;
