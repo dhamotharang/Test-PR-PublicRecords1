@@ -57,7 +57,7 @@ RoxieKeyBuild.MAC_SK_Move_v2('~thor_200::key::email_dataV2::@version@::did', 'Q'
 RoxieKeyBuild.MAC_SK_Move_v2('~thor_200::key::email_dataV2::@version@::email_addresses', 'Q', mv_email_data_email_address_key_qa);
 RoxieKeyBuild.MAC_SK_Move_v2('~thor_200::key::email_dataV2::@version@::payload', 'Q', mv_email_data_payload_key_qa);
 RoxieKeyBuild.MAC_SK_Move_v2('~thor_200::key::email_dataV2::fcra::@version@::did', 'Q', mv_email_data_fcra_did_key_qa);
-RoxieKeyBuild.MAC_SK_Move_v2('~thor_200::key::email_dataV2::fcra::@version@::linkids', 'Q', mv_fcra_payload_key_qa);
+RoxieKeyBuild.MAC_SK_Move_v2('~thor_200::key::email_dataV2::fcra::@version@::payload', 'Q', mv_fcra_payload_key_qa);
 
 build_keys := sequential(email_data_did_key,
 												 email_data_email_address_key,
