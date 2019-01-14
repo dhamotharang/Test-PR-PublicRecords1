@@ -1,6 +1,7 @@
 ﻿import versioncontrol,tools;
 
 export Filenames(string pversion, boolean pUseProd = false) := module
+
   export lBaseTemplate_built := _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '::built';
   export lBaseTemplate	     := _Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name+ '::@version@';
   export lKeyTemplate	     :=	_Dataset(pUseProd).thor_cluster_files + 'base::' + _Dataset().name + '_keybuild' + '::@version@';		
@@ -8,8 +9,4 @@ export Filenames(string pversion, boolean pUseProd = false) := module
   export lInputHistTemplate  := _Dataset(pUseProd).thor_cluster_files + 'in::' + _Dataset().name + '::history';
   export Base_AsSrc		     := tools.mod_FilenamesBuild(lBaseTemplate, pversion);
   
-  
-  export lBaseAHTemplate_built := _Dataset(pUseProd).thor_cluster_files + 'asheader::' + _Dataset().name + '::built';
-  export lBaseAHTemplate	   := _Dataset(pUseProd).thor_cluster_files + 'asheader::' + _Dataset().name+ '::@version@';
-  export Base_AsHeader         := tools.mod_FilenamesBuild(lBaseAHTemplate, pversion);
 end;

@@ -163,6 +163,7 @@ report2 := project(report,transform({string pk, boolean update},SELF.pk:=LEFT.pk
                      {'transunion'    ,true}, // Always on
                      {'eq_hist'       ,true}, // Stale (always on)
                      {'alloymedia'    ,true}  // Stale (always on)
+                     {'cd_seed'       ,true}  // Stale (always on)
                      
                     ],{string pk, boolean update});
 

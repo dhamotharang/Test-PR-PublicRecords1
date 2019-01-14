@@ -7,7 +7,5 @@ EXPORT Files(STRING pversion = '', boolean pUseProd = false) := MODULE
    
    /* Base File Versions */
    tools.mac_FilesBase(Filenames(pversion,pUseProd).Base_AsSrc, Layouts.Base, Base_AsSrc);
-   
-   tools.mac_FilesBase(Filenames(pversion,pUseProd).Base_AsHeader, Header.Layout_New_Records, BaseSeed_AsHeader);
-	 
+   	 
 END;
