@@ -1,15 +1,19 @@
-import corp2, doxie, doxie_cbrs, doxie_raw, gong, AutoStandardI, DeathV2_Services, ut,
+import corp2, doxie, doxie_cbrs, doxie_raw, gong, AutoStandardI, DeathV2_Services,
  Address, Risk_Indicators, WorkPlace_Services, Business_Header, Header;
 
 export WorkPlace_Functions := module
 shared	deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
 shared  glb_ok := ut.glb_ok(deathparams.glbpurpose);
 
+// using shared data-access module until it is passed in
+shared mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
+
 	// This function returns the spouse did  
 	export getSpouseDID(dataset(doxie.layout_references) dids) := FUNCTION
 		
 		// get did for all possible relatives.
-		relativesDid := Doxie_Raw.relative_raw(dids);
+    // Note: now this call is using input permission values; before, defaults were used (dppa=glb=date_threshold=0, ln_branded=false)
+		relativesDid := Doxie_Raw.relative_raw(dids, mod_access);
 		
 		// this just removes the deceased
 		liveRelDids := join(relativesDid(depth=1), doxie.key_death_masterV2_ssa_DID,

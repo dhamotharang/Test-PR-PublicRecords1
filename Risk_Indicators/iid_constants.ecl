@@ -1140,4 +1140,11 @@ EXPORT doesFreezeApply(string personContext_content, string100 IntendedPurpose) 
 
 end;
 
+EXPORT FP3_FDN_Min_Input(string in_first, string in_last, string in_ssn, string in_streetaddress, string in_zip5) := Function
+
+input_ok_fp3 := (in_first<>''and in_last<>''and in_ssn<>'') or (in_streetaddress<>'' and in_zip5<>''); 
+						
+return input_ok_fp3;						
+end;
+
 end;

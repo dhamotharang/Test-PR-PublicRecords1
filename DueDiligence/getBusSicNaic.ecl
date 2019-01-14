@@ -50,7 +50,8 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 													TRANSFORM(DueDiligence.Layouts.Busn_Internal,
 																		SELF.SicNaicSources := RIGHT.sources;
 																		SELF := LEFT;),
-													LEFT OUTER);		
+													LEFT OUTER,
+													ATMOST(1));		
 
 
 
@@ -89,7 +90,8 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 													TRANSFORM(DueDiligence.Layouts.Busn_Internal,
 																		SELF.SicNaicSources := RIGHT.sources;
 																		SELF := LEFT;),
-													LEFT OUTER);	
+													LEFT OUTER,
+													ATMOST(1));	
 													
 													
 													
@@ -149,7 +151,8 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 													TRANSFORM(DueDiligence.Layouts.Busn_Internal,
 																		SELF.SicNaicSources := RIGHT.sources;
 																		SELF := LEFT;),
-													LEFT OUTER);			
+													LEFT OUTER,
+													ATMOST(1));			
 													
 													
 													
@@ -182,7 +185,8 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 													TRANSFORM(DueDiligence.Layouts.Busn_Internal,
 																		SELF.SicNaicSources := RIGHT.sources;
 																		SELF := LEFT;),
-													LEFT OUTER);	
+													LEFT OUTER,
+													ATMOST(1));	
 													
 												
 													
@@ -228,7 +232,8 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 													TRANSFORM(DueDiligence.Layouts.Busn_Internal,
 																		SELF.SicNaicSources := RIGHT.sources;
 																		SELF := LEFT;),
-													LEFT OUTER);
+													LEFT OUTER,
+													ATMOST(1));
 												
 										
 	// ---------------- CALBUS - California Business ---------------------
@@ -259,7 +264,8 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 													TRANSFORM(DueDiligence.Layouts.Busn_Internal,
 																		SELF.SicNaicSources := RIGHT.sources;
 																		SELF := LEFT;),
-													LEFT OUTER);
+													LEFT OUTER,
+													ATMOST(1));
 
 
 
@@ -294,6 +300,81 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																																					SELF.naicCodes := RIGHT.naicCode;
 																																					SELF := RIGHT;
 																																					SELF := []));
+                                                              
+  //filter out sic and naics to determine the best for a business
+  sicOnly := allCodes(sicCode <> DueDiligence.Constants.EMPTY);
+  naicsOnly := allCodes(naicCode <> DueDiligence.Constants.EMPTY); 
+  
+  bestSic := DueDiligence.CommonBusiness.getBestSicOrNaic(sicOnly, sicCode);
+  bestNaic := DueDiligence.CommonBusiness.getBestSicOrNaic(naicsOnly, naicCode);
+                                                                          
+                                                                          
+  addBestSIC := JOIN(addCalBusSicNaic, bestSic,
+                      LEFT.seq = RIGHT.seq AND
+                      LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
+                      LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
+                      LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
+                      TRANSFORM(DueDiligence.Layouts.Busn_Internal,
+                                SELF.sicNaicRisk.bestSIC.code := RIGHT.sicCode;
+                                SELF.sicNaicRisk.bestSIC.sicNAICSIndicator := IF(RIGHT.sicCode <> DueDiligence.Constants.EMPTY, DueDiligence.Constants.INDUSTRY_INDICATOR_SIC, DueDiligence.Constants.EMPTY);
+                                SELF.sicNaicRisk.bestSIC.industryCategory := IF(RIGHT.sicCode <> DueDiligence.Constants.EMPTY, DueDiligence.Constants.INDUSTRY_GROUP_BEST_SIC, DueDiligence.Constants.EMPTY);
+                                SELF.sicNaicRisk.bestSIC.highestIndustryOrRiskLevel := IF(RIGHT.sicIndustry = DueDiligence.Constants.INDUSTRY_OTHER, RIGHT.sicRiskLevel, RIGHT.sicIndustry);
+                                SELF := LEFT;),
+                      LEFT OUTER,
+                      ATMOST(1));    
+                            
+  addBestNAICS := JOIN(addBestSIC, bestNaic,
+                        LEFT.seq = RIGHT.seq AND
+                        LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
+                        LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
+                        LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
+                        TRANSFORM(DueDiligence.Layouts.Busn_Internal,
+                                  SELF.sicNaicRisk.bestNAICS.code := RIGHT.naicCode;
+																	SELF.sicNaicRisk.bestNAICS.sicNAICSIndicator := IF(RIGHT.naicCode <> DueDiligence.Constants.EMPTY, DueDiligence.Constants.INDUSTRY_INDICATOR_NAICS, DueDiligence.Constants.EMPTY);
+																	SELF.sicNaicRisk.bestNAICS.industryCategory := IF(RIGHT.naicCode <> DueDiligence.Constants.EMPTY, DueDiligence.Constants.INDUSTRY_GROUP_BEST_NAICS, DueDiligence.Constants.EMPTY);
+                                  SELF.sicNaicRisk.bestNAICS.highestIndustryOrRiskLevel := IF(RIGHT.naicIndustry = DueDiligence.Constants.INDUSTRY_OTHER, RIGHT.naicRiskLevel, RIGHT.naicIndustry);
+                                  SELF := LEFT;),
+                        LEFT OUTER,
+                        ATMOST(1));
+                                                                          
+                                                                          
+                                                                          
+  //calculate the highest risk sic/naic
+  riskySICNAICS := PROJECT(sicOnly + naicsOnly, TRANSFORM({DueDiligence.LayoutsInternal.InternalSeqAndIdentifiersLayout, STRING code, STRING industry, STRING riskLevel, UNSIGNED4 dateFirstSeen, UNSIGNED4 dateLastSeen, BOOLEAN isPrimary, STRING3 source, STRING1 sicNAICIndicator, STRING2 industryCat},
+                                                        useSIC := LEFT.sicCode <> DueDiligence.Constants.EMPTY;
+																												useNAICS := LEFT.naicCode <> DueDiligence.Constants.EMPTY;
+																												
+																												SELF.code := IF(useSIC, LEFT.sicCode, LEFT.naicCode);
+                                                        SELF.sicNAICIndicator := MAP(useSIC => DueDiligence.Constants.INDUSTRY_INDICATOR_SIC,
+																																											useNAICS => DueDiligence.Constants.INDUSTRY_INDICATOR_NAICS,
+																																											DueDiligence.Constants.EMPTY);
+                                                        SELF.industry := IF(useSIC, LEFT.sicIndustry, LEFT.naicIndustry);
+                                                        SELF.riskLevel := IF(useSIC, LEFT.sicRiskLevel, LEFT.naicRiskLevel);
+																												SELF.industryCat := IF(useSIC or useNAICS, DueDiligence.Constants.INDUSTRY_GROUP_HIGHEST_RISK, DueDiligence.Constants.EMPTY);
+                                                        SELF := LEFT;));
+                                                        
+  riskyCodes := DueDiligence.CommonBusiness.getRiskiestSicOrNaic(riskySICNAICS, code, industry, riskLevel);
+  
+  addRiskiestSICNAICS := JOIN(addBestNAICS, riskyCodes,
+                              LEFT.seq = RIGHT.seq AND
+                              LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
+                              LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
+                              LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
+                              TRANSFORM(DueDiligence.Layouts.Busn_Internal,
+                                        SELF.sicNaicRisk.highestRisk.code := RIGHT.code;
+																				SELF.sicNaicRisk.highestRisk.sicNAICSIndicator := RIGHT.sicNAICIndicator;
+																				SELF.sicNaicRisk.highestRisk.industryCategory := RIGHT.industryCat;
+                                        SELF.sicNaicRisk.highestRisk.highestIndustryOrRiskLevel := IF(RIGHT.industry = DueDiligence.Constants.INDUSTRY_OTHER, RIGHT.riskLevel, RIGHT.industry);
+                                        SELF := LEFT;),
+                              LEFT OUTER,
+                              ATMOST(1));
+                                                                          
+                                                                          
+                                                                          
+                                                                          
+                                                                          
+                                                                          
+                                                                          
 	//Determine if industry level or risk was hit	
 	uniqueIndustriesSort := SORT(allCodes, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), sicCode, naicCode);
 	
@@ -315,7 +396,7 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																				SELF.lowRiskIndustExists := LEFT.lowRiskIndustExists OR RIGHT.lowRiskIndustExists;
 																				SELF := LEFT;));
 																				
-	addIndustry := JOIN(addYpSicNaic, uniqueIndustries,
+	addIndustry := JOIN(addRiskiestSICNAICS, uniqueIndustries,
 											LEFT.seq = RIGHT.seq AND
 											LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
 											LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
@@ -331,8 +412,6 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																SELF.sicNaicRisk.otherHighRiskIndustExists := RIGHT.otherHighRiskIndustExists;
 																SELF.sicNaicRisk.moderateRiskIndustExists := RIGHT.moderateRiskIndustExists;
 																SELF.sicNaicRisk.lowRiskIndustExists := RIGHT.lowRiskIndustExists;
-																// SELF.sicNaicRisk.sicCodes := RIGHT.sicCodes;
-																// SELF.sicNaicRisk.naicCodes := RIGHT.naicCodes;
 																SELF := LEFT;),
 											LEFT OUTER);
 	
@@ -365,12 +444,21 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 
 
 
+
+
 	// OUTPUT(indata, NAMED('indata'));
 	// OUTPUT(ebr5600Raw, NAMED('ebr5600Raw'));
 	// OUTPUT(ebr5600RawSeq, NAMED('ebr5600RawSeq'));
 	// OUTPUT(allYpSicNaic, NAMED('allYpSicNaic'));
 	// OUTPUT(sortYpRollSicNaic, NAMED('sortYpRollSicNaic'));
+	// OUTPUT(addCalBusSicNaic, NAMED('addCalBusSicNaic'));
 	// OUTPUT(allCodes, NAMED('sn_allCodes'));
+	// OUTPUT(bestSic, NAMED('bestSic'));
+	// OUTPUT(addBestSIC, NAMED('addBestSIC'));
+	// OUTPUT(bestNaic, NAMED('bestNaic'));
+	// OUTPUT(addBestNAICS, NAMED('addBestNAICS'));
+	// OUTPUT(riskySICNAICS, NAMED('riskySICNAICS'));
+	// OUTPUT(riskyCodes, NAMED('riskyCodes'));
 	// OUTPUT(uniqueIndustriesSort, NAMED('sn_uniqueIndustriesSort'));
 	// OUTPUT(uniqueIndustries, NAMED('sn_uniqueIndustries'));
 	// OUTPUT(addIndustry, NAMED('addIndustry'));
@@ -378,8 +466,8 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	// OUTPUT(rollUniqueCodes, NAMED('sn_rollUniqueCodes'));
 	// OUTPUT(addUniqueSicNaics, NAMED('sn_addUniqueSicNaics'));
 	// OUTPUT(addReport, NAMED('sn_addReport'));
-	
-	
+  
+  
 
 	RETURN addReport;
 END;

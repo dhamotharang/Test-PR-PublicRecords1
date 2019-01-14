@@ -1,13 +1,14 @@
-export mac_HeaderDates(infile, outfile, batch = false, checkRNA = false) := macro
+export mac_HeaderDates(infile, outfile, modAccess, checkRNA = false, batch = false) := macro
 #uniquename(tra_mac_HeaderDates)
 infile %tra_mac_HeaderDates%(infile le) := transform
 	Ldls := if(
-  						ut.PermissionTools.glb.SrcNeverRestricted(le.src) or
-							ut.glb_ok(
+  						doxie.compliance.SrcNeverRestricted (le.src) or
 		#if(batch)
-			le.
+			doxie.compliance.glb_ok (le.glb_purpose, checkRNA),
+    #else
+      modAccess.isValidGLB (checkRNA),
 		#end
-		glb_purpose,checkRNA), le.dt_last_seen, le.dt_nonglb_last_seen); //or ~(le.src in mdr.sourceTools.set_GLB) above 90984
+		le.dt_last_seen, le.dt_nonglb_last_seen); //or ~(le.src in mdr.sourceTools.set_GLB) above 90984
 	Ldfs := le.dt_first_seen;  
   
 	self.dt_first_seen := if(Ldfs > 0, Ldfs, Ldls);

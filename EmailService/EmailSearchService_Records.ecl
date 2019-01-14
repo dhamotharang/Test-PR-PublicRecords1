@@ -5,8 +5,10 @@ export EmailSearchService_Records := MODULE
   // export recs(Grouped dataset(Assorted_Layouts.did_w_input) in_dids =dataset([],Assorted_Layouts.did_w_input),
 //For deployment to dev64, comment out line above and uncoment the line below:
 export recs(Grouped dataset(Assorted_Layouts.did_w_input) in_dids,
-			boolean by_email_key=FALSE, string32 appType=Suppress.Constants.ApplicationTypes.Default,boolean multipleRoyalties=FALSE,
-			string5 industry_class = '' ) := FUNCTION
+			boolean by_email_key=FALSE, 
+			string32 appType=Suppress.Constants.ApplicationTypes.Default,
+			boolean multipleRoyalties=FALSE,
+			string5 industry_class = '') := FUNCTION
 		
 		Assorted_Layouts.layout_entiera_rollup_w_seq get_penalt(Assorted_Layouts.did_w_input l,Email_Data.Key_Did r):=transform
 		
@@ -157,23 +159,27 @@ export recs(Grouped dataset(Assorted_Layouts.did_w_input) in_dids,
 		royal_recs_rolled := 
 						group(ungroup(rollup(royal_recs_sorted, group,get_all(left,rows(left)))),seq);
 						
-		recs := nonroyal_recs & royal_recs_rolled;
+		all_recs := nonroyal_recs & royal_recs_rolled;
 		
-		recs_chkd := recs(if(by_email_key,penalt=0,TRUE));
+		recs_chkd := all_recs(if(by_email_key,penalt=0,TRUE));
 		
 		RETURN ungroup(sort(recs_chkd(penalt <= penalt_Threshold),seq,if(isDeepDive,1,0),penalt,-latest_orig_login_date,record));
 	END;
 
 
-  // export val(Grouped dataset(Assorted_Layouts.did_w_input) in_dids =dataset([],Assorted_Layouts.did_w_input),
-//For deployment to dev64, comment out line above and uncoment the line below:
+ //the in_dids actually contains email Ids which uses either LexIds or fake ids:
 export val(Grouped dataset(Assorted_Layouts.did_w_input) in_dids =group(dataset([],Assorted_Layouts.did_w_input),seq,did),
-			boolean by_email_key=FALSE,
+			string search_type='',
 			boolean mult_results=false,
-			string32 appType)
+			string32 appType,
+			string5 industry_class = '')
 			:= function
-	
-		recs_sort := recs(in_dids,by_email_key,appType)(did<>0);
+
+		isEICsearch := search_type = EmailService.Constants.SearchType.EIC;  // email identity check
+		isEIAsearch := search_type = EmailService.Constants.SearchType.EIA;  //email identity append - by_email_key=true
+		isEAAsearch := search_type = EmailService.Constants.SearchType.EAA;  //email address append
+		
+		recs_sort := recs(in_dids,isEIAsearch,appType,,industry_class)(did<>0);  //did here might be fake Id
 		
 		recs_grp_pen := group(sort(recs_sort, penalt), penalt);
 		recs_dep_did := dedup(sort(recs_grp_pen, did), did);
@@ -190,7 +196,8 @@ export val(Grouped dataset(Assorted_Layouts.did_w_input) in_dids =group(dataset(
 	  
 		// if(more_than_one and ~first_one_good,ut.outputMessage(ut.constants_MessageCodes.SUBJECT_NOT_UNIQUE));
 		if(more_than_one and ~first_one_good and ~mult_results,
-			if(by_email_key,ut.outputMessage(ut.constants_MessageCodes.EMAIL_NOT_UNIQUE),ut.outputMessage(ut.constants_MessageCodes.SUBJECT_NOT_UNIQUE))
+			map(isEIAsearch => ut.outputMessage(ut.constants_MessageCodes.EMAIL_NOT_UNIQUE),
+			isEAAsearch => ut.outputMessage(ut.constants_MessageCodes.SUBJECT_NOT_UNIQUE))
 		   );
 
 		lowest_pen := temp_table[1].penalt;
@@ -204,6 +211,6 @@ export val(Grouped dataset(Assorted_Layouts.did_w_input) in_dids =group(dataset(
 		// output(first_one_good,named('essrecs_first_one_good'));
 		// output(more_than_one,named('essrecs_more_than_one'));
 
-		return if(mult_results, recs_sort, recs_returned);
+		return if(mult_results or isEICsearch, recs_sort, recs_returned);
 	END;
 END;	

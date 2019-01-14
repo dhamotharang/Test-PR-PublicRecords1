@@ -3,7 +3,7 @@ IMPORT PublicRecords_KEL, STD;
 
 EXPORT Fn_InputEcho_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout_Slim) ds_input) := FUNCTION
 
-	PublicRecords_KEL.ECL_Functions.Input_ALL_Layout GetInputEcho1( PublicRecords_KEL.ECL_Functions.Input_Layout_Slim le ) := 
+	PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII GetInputEcho1( PublicRecords_KEL.ECL_Functions.Input_Layout_Slim le ) := 
       TRANSFORM
 		SELF.InputUIDAppend := le.InputUIDAppend;
 		SELF.InputAccountEcho := le.Account;
@@ -20,8 +20,8 @@ EXPORT Fn_InputEcho_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout_
 		SELF.InputEmailEcho := le.Email; 
 		SELF.InputArchiveDateEcho := le.historydate;
 		SELF.InputSSNEcho := le.SSN;
-		SELF.InputDateOfBirthEcho := le.DateOfBirth;
-		SELF.InputDLNumberEcho := le.DLNumber;
+		SELF.InputDOBEcho := le.DateOfBirth;
+		SELF.InputDLEcho := le.DLNumber;
 		SELF.InputDLStateEcho := le.DLState;	
 		//
 		SELF.InputIncomeEcho := le.Income;

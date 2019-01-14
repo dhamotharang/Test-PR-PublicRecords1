@@ -1,13 +1,17 @@
-﻿IMPORT DueDiligence, Risk_Indicators, Business_Risk, Models, iesp, doxie, ut, Address, AutoStandardI;
+﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence;
+
 
 EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
                         UNSIGNED1 dppa,
                         UNSIGNED1 glba,
                         STRING dataRestrictionMask,
                         STRING6 ssnMask,
-                        BOOLEAN includeReport = FALSE,
-                        BOOLEAN displayAttributeText = FALSE,
-                        BOOLEAN debugMode = FALSE) := FUNCTION
+                        BOOLEAN includeReport,
+                        BOOLEAN displayAttributeText,
+                        BOOLEAN debugMode,
+                        Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
+                        BIPV2.mod_sources.iParams linkingOptions) := FUNCTION
+
 																						 
 
 	INTEGER bsVersion := DueDiligence.CitDDShared.DEFAULT_BS_VERSION;
@@ -57,9 +61,12 @@ EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
   
   //get legal information
   indCriminalData := DueDiligence.getIndLegalEvents(indAircraft);
+	
+	//get business associations
+  indBusAssoc := DueDiligence.getIndBusAssoc(indCriminalData, options, linkingOptions);
   
   //if a person report is being requested, populate the report
-  indReportData :=  IF(includeReport, DueDiligence.getIndReport(indCriminalData, ssnMask), indCriminalData);
+  indReportData :=  IF(includeReport, DueDiligence.getIndReport(indBusAssoc, options, ssnMask), indBusAssoc);
 	
 	
 	//populate the attributes and flags
@@ -84,6 +91,7 @@ EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	IF(debugMode, OUTPUT(indVehicle, NAMED('indVehicle')));
 	IF(debugMode, OUTPUT(indAircraft, NAMED('indAircraft')));
 	IF(debugMode, OUTPUT(indCriminalData, NAMED('indCriminalData')));
+	IF(debugMode, OUTPUT(indBusAssoc, NAMED('indBusAssoc')));
 	IF(debugMode, OUTPUT(indReportData, NAMED('indReportData')));
 	IF(debugMode, OUTPUT(indKRI, NAMED('indKRI')));
 

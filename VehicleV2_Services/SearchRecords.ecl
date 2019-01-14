@@ -1,4 +1,4 @@
-IMPORT ut, AutoStandardI, AutoHeaderI, doxie, Address, Vehiclev2_services, Codes;
+﻿IMPORT ut, AutoStandardI, AutoHeaderI, doxie, Address, Vehiclev2_services, Codes;
 
 export SearchRecords := MODULE
 
@@ -155,10 +155,10 @@ export SearchRecords := MODULE
 
 
 		aPolkInputMod := MODULE(PROJECT(aGatewayInputData,IParam.polkParams,OPT))
-			EXPORT BOOLEAN noFail := aGatewayInputData.noFail or useExperian;
+			EXPORT BOOLEAN noFail := useAll or aGatewayInputData.noFail or useExperian;
 		END;
 		aExperianInputMod := MODULE(PROJECT(aGatewayInputData,IParam.polkParams,OPT))
-			EXPORT BOOLEAN noFail := aGatewayInputData.noFail or ~useExperian;
+			EXPORT BOOLEAN noFail := useAll or aGatewayInputData.noFail or ~useExperian;
 			EXPORT STRING clnAddr182 := addr182;
 		END;
 
@@ -169,20 +169,40 @@ export SearchRecords := MODULE
 					Get_Experian_Data.val(aExperianInputMod,aInputData.doCombinedSearch),
 					DATASET([],Layout_Report_RealTime));
 
-//  Projected the Layout back to old layout.					
-		Gateway_Data :=Project(Gateway_Data_,Layout_Report);
-
+  // Projected the Layout back to old layout.					
+     Gateway_Data :=Project(Gateway_Data_,Layout_Report);
+  //The 520 error code goes into the VIN field when gateway is restricted    
+     Gateway_Data_unrestricted := Gateway_Data(vin <> VehicleV2_Services.Polk_Code_Translations.ErrorCodes('520')); 
+  // What failed 
+     boolean isLocalEmpty := ~exists(Local_Data);
+     boolean isGatewayFailed := isLocalEmpty and exists(Gateway_Data(vin = VehicleV2_Services.Polk_Code_Translations.ErrorCodes('520')));
+     boolean isAllEmpty      := isLocalEmpty and ~exists(Gateway_Data);
+    
+    
 		//*************************
 		// Call for Gateway Data - End
 		//*************************
 		
-		final_result:=
-		MAP(gatewayONLY => Gateway_Data,
-				useALL => Gateway_Data & Local_Data,
-				realTime => Gateway_Data,
+		final_result_pre :=
+		MAP(gatewayONLY => Gateway_Data_unrestricted,
+				useALL =>  Gateway_Data_unrestricted & Local_Data,
+				realTime => Gateway_Data_unrestricted,
 				Local_Data); // LOCAL
-		//Bug 132024 - apply new sorting rules to results (adding comment)
-		//RETURN final_result;	
+		
+   
+    // We are doing a deffered gateway fail+ message. The fail should happen only if the noFail is false.        
+      final_result := 
+      map(
+           aGatewayInputData.noFail => final_result_pre, 
+           isGatewayFailed => fail(final_result_pre,1208,doxie.ErrorCodes(10)+'.'+
+                                VehicleV2_Services.Polk_Code_Translations.ErrorCodes('1208')),
+           isAllEmpty  => fail(final_result_pre,10,doxie.ErrorCodes(10)),
+           final_result_pre
+          );
+
+ 
+   //Bug 132024 - apply new sorting rules to results (adding comment)
+		//RETURN final_result; 
 		RETURN sort(final_result, -MAX( MAX(owners,(unsigned4)ttl_latest_issue_date), MAX(registrants,(unsigned4)reg_latest_effective_date), 
 																		MAX(owners, if((unsigned4)src_last_date = 0, (unsigned4)src_first_date, (unsigned4)src_last_date))), 
 															nonDMVSource,

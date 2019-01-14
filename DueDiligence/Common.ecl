@@ -21,6 +21,16 @@ EXPORT Common := MODULE
 			
 			RETURN ROW(createPair(name, val));			
 	END;
+	
+	EXPORT calcFinalFlagField(STRING1 flag9, STRING1 flag8, STRING1 flag7, STRING1 flag6, STRING1 flag5, STRING1 flag4, STRING1 flag3, STRING1 flag2, STRING1 flag1) := FUNCTION
+     
+     concatFlags := flag9 + flag8 + flag7 + flag6 + flag5 + flag4 + flag3 + flag2 + flag1;
+                                            
+     calcFlag_0 := IF(STD.Str.Find(concatFlags, DueDiligence.Constants.T_INDICATOR, 1) = 0, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);     
+		 cancatFinalFlag := concatFlags + calcFlag_0; 
+     
+     RETURN cancatFinalFlag;
+  END;
 
 	EXPORT getNameFromList(UNSIGNED fieldNumber, CONST STRING fieldList, UNSIGNED numberOfFields) := FUNCTION
 		//determine the location of the commas in the list
@@ -530,7 +540,7 @@ EXPORT Common := MODULE
 
 	
 	
-  EXPORT LookAtOther(STRING5 courtOffenseLevel, STRING75 charge, STRING40 courtDispDesc1, STRING40 courtDispDesc2, STRING35 offenseChargeLevelReported, STRING1 trafficFlag) := FUNCTION
+  EXPORT LookAtOther(STRING1 offenseScore, STRING5 courtOffenseLevel, STRING75 charge, STRING40 courtDispDesc1, STRING40 courtDispDesc2, STRING35 offenseChargeLevelReported, STRING1 trafficFlag) := FUNCTION
 		
 		//Does the field "courtOffenseLevel" map to any of the listed FELONY, MISDEMEANOR, TRAFFIC, or INFRACCTION codes 
 		BOOLEAN MapsToFelony := STD.Str.ToUpperCase(TRIM(courtOffenseLevel, LEFT, RIGHT)) IN DueDiligence.Constants.setFELONY; 
@@ -548,7 +558,7 @@ EXPORT Common := MODULE
     
 		
     
-		returnValue := MAP(MapsToFelony => DueDiligence.Constants.FELONY,
+		waterfallValue  := MAP(MapsToFelony => DueDiligence.Constants.FELONY,
                         foundFelonyKeyWord => DueDiligence.Constants.FELONY,
                         MapsToMisdemeanor => DueDiligence.Constants.MISDEMEANOR,    
                         MapsToTraffic => DueDiligence.Constants.TRAFFIC,
@@ -558,6 +568,13 @@ EXPORT Common := MODULE
                         foundTrafficKeyWord => DueDiligence.Constants.TRAFFIC,
                         foundInfractionKeyWord => DueDiligence.Constants.INFRACTION,
                         DueDiligence.Constants.UNKNOWN);
+												
+		returnValue := MAP(waterfallValue = DueDiligence.Constants.FELONY OR offenseScore = DueDiligence.Constants.FELONY => DueDiligence.Constants.FELONY,
+                        waterfallValue = DueDiligence.Constants.MISDEMEANOR OR offenseScore = DueDiligence.Constants.MISDEMEANOR => DueDiligence.Constants.MISDEMEANOR,
+                        waterfallValue = DueDiligence.Constants.TRAFFIC OR offenseScore = DueDiligence.Constants.TRAFFIC => DueDiligence.Constants.TRAFFIC,
+                        waterfallValue = DueDiligence.Constants.INFRACTION OR offenseScore = DueDiligence.Constants.INFRACTION => DueDiligence.Constants.TRAFFIC,
+                        DueDiligence.Constants.UNKNOWN);
+
 		
 		RETURN returnValue;
 	END;	

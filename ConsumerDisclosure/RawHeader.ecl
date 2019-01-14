@@ -805,7 +805,7 @@ no_correction_needed := project(header_combined_ddp, transform(layout_header_int
 header_recs_temp := IF(EXISTS(header_corr), header_recs_with_correction, no_correction_needed);
 
 layout_header_internal xfmarksuppressed (layout_header_internal le, recordof(doxie.Key_fcra_Header) ri) := transform
-	is_suppressed	:= le.head.did=ri.did and
+	is_suppressed_by_propagation	:= ~le.compliance_flags.isOverwritten and le.head.did=ri.did and
 						le.head.fname=ri.fname and
 						le.head.mname=ri.mname and
 						le.head.lname=ri.lname and
@@ -819,8 +819,8 @@ layout_header_internal xfmarksuppressed (layout_header_internal le, recordof(dox
 						le.head.sec_range=ri.sec_range and
 						(le.head.ssn=ri.ssn OR (le.head.ssn='' and le.head.valid_ssn='M') OR (ri.ssn='' and ri.valid_ssn='M')) and
 						(le.head.dob=ri.dob  OR (le.head.dob=0 and le.head.valid_dob='M') OR (ri.dob=0 and ri.valid_dob='M'));
-	self.compliance_flags.isSuppressed := is_suppressed;
-	self.isPropagatedCorrection := is_suppressed or le.isPropagatedCorrection;
+	self.compliance_flags.isSuppressed := is_suppressed_by_propagation or le.compliance_flags.isSuppressed;
+	self.isPropagatedCorrection := is_suppressed_by_propagation or le.isPropagatedCorrection;
 	self := le;
 	self := [];
 end;

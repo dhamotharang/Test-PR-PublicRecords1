@@ -1,7 +1,8 @@
-﻿IMPORT DueDiligence;
+﻿IMPORT Business_Risk_BIP, DueDiligence;
 
 EXPORT getIndReport(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
-                    STRING6 ssnMask) := FUNCTION
+                    Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
+										STRING6 ssnMask) := FUNCTION
 
 
 
@@ -19,6 +20,8 @@ EXPORT getIndReport(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
   getVehicleData := DueDiligence.reportIndVehicle(getProfessionalLicenseData);  
   
   getAircraftData := DueDiligence.reportIndAircraft(getVehicleData);
+	
+	getBusinessAssociationReportData := DueDiligence.reportIndBusAssoc(getAircraftData, options);
   
   
   
@@ -28,8 +31,9 @@ EXPORT getIndReport(DATASET(DueDiligence.Layouts.Indv_Internal) inData,
   // OUTPUT(getWatercraftReportData, NAMED('getWatercraftReportData'));
   // OUTPUT(getCriminalReportData, NAMED('getCriminalReportData'));
   // OUTPUT(getProfessionalLicenseData, NAMED('getProfessionalLicenseData'));
-  //OUTPUT(getVehicleData, NAMED('getVehicleData'));
+  // OUTPUT(getVehicleData, NAMED('getVehicleData'));
+  // OUTPUT(getBusinessAssociationReportData, NAMED('getBusinessAssociationReportData'));
   
   
-  RETURN getAircraftData;     
+  RETURN getBusinessAssociationReportData;     
 END;

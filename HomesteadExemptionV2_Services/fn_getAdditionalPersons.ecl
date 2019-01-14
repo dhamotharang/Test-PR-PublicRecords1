@@ -15,8 +15,6 @@ EXPORT fn_getAdditionalPersons(DATASET(HomesteadExemptionV2_Services.Layouts.pro
 
 	// REQUIRED FOR MAC_GlbClean_Header()
 	BOOLEAN checkRNA:=TRUE;
-	UNSIGNED1 GLB_Purpose:=mod_access.glb; //MAC_GLB_DPPA_Clean_RNA
-	UNSIGNED1	DPPA_Purpose:=mod_access.dppa; //MAC_GLB_DPPA_Clean_RNA
 	BOOLEAN glb_ok:=mod_access.isValidGLB(checkRNA);
 	BOOLEAN dppa_ok:=mod_access.isValidDPPA(checkRNA);
 
@@ -55,7 +53,7 @@ EXPORT fn_getAdditionalPersons(DATASET(HomesteadExemptionV2_Services.Layouts.pro
 
 		// APPLY DPPA AND GLB RESTRICTIONS AND DID SUPPRESSION
 		header.MAC_GlbClean_Header(ds_hdr_addr_dt,ds_hdr_glb_cln, , , mod_access);
-		header.MAC_GLB_DPPA_Clean_RNA(ds_hdr_glb_cln,ds_hdr_rna_cln);
+		header.MAC_GLB_DPPA_Clean_RNA(ds_hdr_glb_cln,ds_hdr_rna_cln, mod_access);
 
 		ds_hdr_sort:=SORT(ds_hdr_rna_cln,did,-dt_last_seen,-dt_first_seen);
 		ds_addl_per:=PROJECT(DEDUP(ds_hdr_sort,did),TRANSFORM(HomesteadExemptionV2_Services.Layouts.addlPerRec,

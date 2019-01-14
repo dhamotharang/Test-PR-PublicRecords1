@@ -1,8 +1,9 @@
 IMPORT $;
 
 EXPORT historic_nbr_records_crs(boolean checkRNA=true) := FUNCTION
-doxie.MAC_Header_Field_Declare(); //dppa_ok, glb_ok, GLB_Purpose, DPPA_Purpose
-mod_access := $.compliance.GetGlobalDataAccessModule();
+mod_access := $.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+glb_ok := mod_access.isValidGLB();
+dppa_ok := mod_access.isValidDPPA();
 doxie.MAC_Selection_Declare();
 
 doxie.historic_nbr_records(doxie.header_records(), hist_nbr, checkRNA, mod_access);
