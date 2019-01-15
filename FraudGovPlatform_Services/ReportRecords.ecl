@@ -57,9 +57,11 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 
 		ds_delta_recentActivity := FraudGovPlatform_Services.mod_Deltabase_Functions(batch_params).getDeltabaseReportRecords(ds_batch_in_extended);
 
-		ds_recentTransactions_sorted := SORT(ds_delta_recentActivity,-eventDate.year, -eventDate.Month, -eventDate.day);
+		ds_recentTransactions_sorted := IF(batch_params.IsOnline AND batch_params.UseAllSearchFields,
+																	SORT(ds_delta_recentActivity(UniqueId = (STRING)ds_in[1].did),-eventDate.year, -eventDate.Month, -eventDate.day),
+																	SORT(ds_delta_recentActivity,-eventDate.year, -eventDate.Month, -eventDate.day));
 
-		numOfDeltabaseTransactions := COUNT(ds_delta_recentActivity);	
+		numOfDeltabaseTransactions := COUNT(ds_recentTransactions_sorted);	
 
 		/* Returning Element or Identity Score and related clusters and related identities. */
 		ds_raw_cluster_recs := FraudGovPlatform_Services.Functions.getClusterDetails(ds_entityNameUID, batch_params, FALSE);
@@ -192,7 +194,7 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 																				SELF := []));
 		
 		/* Returning the Timeline Data */
-		ds_timeline := PROJECT(ds_payload, FraudGovPlatform_Services.Transforms.xform_timeline_details(LEFT)) + ds_delta_recentActivity;
+		ds_timeline := PROJECT(ds_payload, FraudGovPlatform_Services.Transforms.xform_timeline_details(LEFT)) + ds_recentTransactions_sorted;
 		ds_timeline_sorted := SORT(ds_timeline, -IsRecentActivity, FileType, -ReportedDateTime.Year,-ReportedDateTime.Month, 
 																-ReportedDateTime.Day,-ReportedDateTime.Hour24,-ReportedDateTime.Minute,-ReportedDateTime.Second,
 																-EventDate.Year, -EventDate.Month, -EventDate.Day,
@@ -301,10 +303,10 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 			SELF := [];
 		END;
 		
-		// output(useAllSearchFields,named('useAllSearchFields'));
-		// output(ds_batch_w_ExternalServices,named('ds_batch_w_ExternalServices'));
-		// output(ds_scoreBreakdown_realtime_raw,named('ds_scoreBreakdown_realtime'));
-		// output(ds_indicatorAttributes_realtime_raw,named('ds_indicatorAttributes_realtime'));
+		// output(batch_params,named('batch_params'));
+		// output(ds_in,named('ds_in'));
+		// output(ds_delta_recentActivity,named('ds_delta_recentActivity'));
+		// output(ds_recentTransactions_sorted,named('ds_recentTransactions_sorted'));
 		// output(ds_realtimeEventScore,named('ds_realtimeEventScore'));
 		// output(ds_realtimeScore_raw,named('ds_realtimeScore'));
 		// output(ds_realtime,named('ds_realtime'));
