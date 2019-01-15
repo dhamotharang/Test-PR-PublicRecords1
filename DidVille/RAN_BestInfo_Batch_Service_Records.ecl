@@ -259,8 +259,8 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 	doxie.mac_best_records(f_rel_for_best,
 													person2,
 													f_rel_best,
-													mod_access.isValidDPPA(checkRNA),
-													mod_access.isValidGLB(checkRNA),
+													dppaOk,
+													glbOk,
 													,
 													mod_access.DataRestrictionMask,
 													include_dod :=true);
@@ -339,8 +339,8 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 	doxie.mac_best_records(f_roommie_for_best,
 												  person2,
 													f_roommie_best,
-													mod_access.isValidDPPA(checkRNA),
-													mod_access.isValidGLB(checkRNA),
+													dppaOk,
+													glbOk,
 													,
 													fixed_DRM,	
 													include_dod := true);

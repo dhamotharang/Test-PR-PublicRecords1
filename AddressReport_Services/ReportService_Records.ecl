@@ -1,7 +1,7 @@
 ﻿IMPORT census_data,location_services,AddressReport_Services,doxie_cbrs,ut, suppress,
 			 DriversV2_Services,VehicleV2_Services,Doxie_Raw,LiensV2_Services,header,Gong,
 			 BankruptcyV2_Services,doxie, iesp, AutoStandardI,Address,LN_PropertyV2_Services,
-			 BIPV2, hunting_fishing_services, STD, VehicleV2, D2C;
+			 BIPV2, hunting_fishing_services, STD, VehicleV2;
 
 EXPORT ReportService_Records (AddressReport_Services.input._addressreport param,
 															boolean IsFCRA = false):=function

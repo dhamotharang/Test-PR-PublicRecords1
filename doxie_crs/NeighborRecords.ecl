@@ -24,7 +24,7 @@
 	//		dids := dataset([{123456789},{987654321}], doxie.layout_references);
 	// ///////////////////////////////////////////////
 	// and setting these values which are used below.
-	// more documentation is found in this attr:  doxie_crs/nbr_records
+	// more documentation is found in this attr:  doxie_crs.nbr_records
 	///////////////////////////////////////////////////
   // #stored('Include_Neighbors',TRUE); // only get current neighbors.
 	// #stored('Include_HistoricalNeighbors',TRUE); // only get current neighbors.
