@@ -1,8 +1,9 @@
-﻿import Header, mdr;
+﻿import Header, mdr, $;
+r := $.layouts;
 
-EXPORT as_header(dataset(layouts.base) pFile = dataset([],layouts.base), boolean pForHeaderBuild=false, boolean pFastHeader= false) := function
+EXPORT CD_Seed_as_header(dataset(r.base) pFile = dataset([],r.base), boolean pForHeaderBuild=false) := function
 	
-    withUID := cd_seed.As_source(,true);
+    withUID := cd_seed.cd_seed_As_source(,true);
     
     Header.Layout_New_Records tr2(withUID l) := transform
 		self.src:=MDR.sourceTools.src_Consumer_Disclosure_feed;

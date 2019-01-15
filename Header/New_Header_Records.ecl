@@ -106,7 +106,7 @@ Exprn_ph_in :=  ExperianIRSG_Build.ExperianIRSG_asHeader(,true)(use_Experian_pho
 
 AlloyMedia_in :=  AlloyMedia_student_list.alloy_as_header(,true)(use_AlloyMedia_SL); 
 
-cd_seed_in := cd_seed.as_header(,true);
+cd_seed_in := cd_seed.cd_seed_as_header(,true);
 
 //Sources that can be added to Fast Header or Full Header depending on the pFastHeader parameter
 concat0 := if(~pFastHeader, 
