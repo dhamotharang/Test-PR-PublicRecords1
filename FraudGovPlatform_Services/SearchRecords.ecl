@@ -7,23 +7,12 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	//Defining the constants to be used later.
 	SHARED Fragment_Types_const := FraudGovPlatform_Services.Constants.Fragment_Types;
 	SHARED File_Type_Const := FraudGovPlatform_Services.Constants.PayloadFileTypeEnum;
-	
-	// **************************************************************************************
-	// Getting the payload records from FraudGov Payload key.
-	// **************************************************************************************
-	SHARED ds_allPayloadRecs := FraudGovPlatform_Services.fn_getadvsearch_raw_recs( ds_batch_in,
-																																									batch_params.GlobalCompanyId,
-																																									batch_params.IndustryType,
-																																									batch_params.ProductCode,
-																																									IsOnline := batch_params.IsOnline);
 
 	// **************************************************************************************
 	// Append DID for Input PII
 	// **************************************************************************************	  
 	SHARED ds_input_with_adl_did := BatchShare.MAC_Get_Scored_DIDs(ds_batch_in, batch_params, usePhone:=TRUE);
 	
-	EXPORT BOOLEAN adlDIDFound := EXISTS(ds_input_with_adl_did(did > 0));
-
 	EXPORT ds_adl_in := PROJECT(ds_input_with_adl_did, 
 												TRANSFORM(DidVille.Layout_Did_OutBatch,
 													SELF.fname	:= LEFT.name_first,
@@ -33,6 +22,29 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 													SELF.phone10:= LEFT.phoneno,
 													SELF	:= LEFT,
 													SELF	:= []));
+													
+	//Getting the public records best to fill identity Detail card.
+	SHARED ds_GovBest := FraudGovPlatform_Services.Functions.getGovernmentBest(ds_adl_in, batch_params);
+	
+	adl_did_best := JOIN(ds_GovBest(Name.Last <> '' OR ssn <> ''), ds_input_with_adl_did, LEFT.UniqueId = (STRING)RIGHT.did);
+	
+	EXPORT BOOLEAN adlDIDFound := EXISTS(adl_did_best);
+	// EXPORT BOOLEAN adlDIDFound := EXISTS(ds_GovBest(Name.Last <> '' OR ssn <> '')) AND EXISTS(ds_input_with_adl_did(did > 0));
+	
+	ds_batch_in_without_did := PROJECT(ds_batch_in,TRANSFORM(FraudShared_Services.Layouts.BatchInExtended_rec,
+																														SELF.did := 0,
+																														SELF := LEFT));
+	
+	SHARED ds_batch_in_for_payload := IF(adlDIDFound, ds_batch_in, ds_batch_in_without_did);
+	
+	// **************************************************************************************
+	// Getting the payload records from FraudGov Payload key.
+	// **************************************************************************************
+	SHARED ds_allPayloadRecs := FraudGovPlatform_Services.fn_getadvsearch_raw_recs( ds_batch_in_for_payload,
+																																									batch_params.GlobalCompanyId,
+																																									batch_params.IndustryType,
+																																									batch_params.ProductCode,
+																																									IsOnline := batch_params.IsOnline);
 	
 	ds_contributory_in := PROJECT(ds_allPayloadRecs , 
 													TRANSFORM(DidVille.Layout_Did_OutBatch,
@@ -64,7 +76,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 													SELF.did := LEFT.did,
 													SELF := []));
 	
-	ds_combinedfreg_recs := IF(adlDIDFound, ds_batch_in, ds_batch_in + ds_elements_dids);
+	ds_combinedfreg_recs := IF(adlDIDFound, ds_batch_in_for_payload, ds_batch_in_for_payload + ds_elements_dids);
 
 	ds_fragment_recs_w_value := FraudGovPlatform_Services.Functions.GetFragmentRecs(ds_combinedfreg_recs, ds_allPayloadRecs, batch_params, TRUE);
 	
@@ -146,9 +158,6 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	
 	// getting the records from deltabase database.
 	ds_delta_recentTransactions := FraudGovPlatform_Services.mod_Deltabase_Functions(batch_params).getDeltabaseSearchRecords();
-	
-	//Getting the public records best to fill identity Detail card.
-	ds_GovBest := FraudGovPlatform_Services.Functions.getGovernmentBest(ds_dids_to_use, batch_params);
 	
 	//Getting the Contributory best to fill identity Detail card.
 	ds_contributoryBest := FraudGovPlatform_Services.Functions.getContributedBest(ds_dids_to_use, FraudGovPlatform_Services.Constants.FRAUD_PLATFORM);
