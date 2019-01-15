@@ -271,7 +271,7 @@ SHARED orbit_update_entries(string createORupdate, string skipPackage='000') := 
                 ),
                 sequential(
                         if(skipPackage[1]='0',output(update_entry('PersonXLAB_Inc' ,lastestIkbVersionOnThor,'N'))),
-                        if(skipPackage[2]='0',output(update_entry('FCRA_Header'    ,lastestFCRAversionOnThor,'N'))),
+                        if(skipPackage[2]='0',output(update_entry('FCRA_Header'    ,lastestFCRAversionOnThor,'F'))),
                         if(skipPackage[3]='0',output(update_entry('Header_IKB'     ,lastestWklyversionOnThor,'N')))
                 )
        );
@@ -299,13 +299,14 @@ EXPORT Refresh_copy(string filedt) :=  FUNCTION
     return sequential(cpLab, cpUniqEx);
 END;
 
+copy_to_dataland:= _control.fSubmitNewWorkunit('Header.Proc_Copy_Keys_To_Dataland.Incrementals','hthor_sta','Dataland');
+
 EXPORT movetoQA(string filedt) := sequential(
     // The following can only copy after the key is built in Boca
     fc8(fName(filedt, '::did'), fName8(filedt, '::did')),
-    update_inc_superfiles(,filedt)
+    update_inc_superfiles(,filedt),
+    copy_to_dataland
     );
-
-copy_to_dataland:= _control.fSubmitNewWorkunit('Header.Proc_Copy_Keys_To_Dataland.Incrementals','hthor_sta','Dataland');
         
 EXPORT deploy(string emailList,string rpt_qa_email_list,string skipPackage='000') := sequential(               
     udops(skipPackage),
@@ -318,17 +319,15 @@ EXPORT deploy(string emailList,string rpt_qa_email_list,string skipPackage='000'
         +if(skipPackage[1]='0','PersonXLAB_Inc\n','')
         +if(skipPackage[2]='0','FCRA_Header\n','')
         +if(skipPackage[3]='0','PersonHeaderWeeklyKeys\n','')
-        +'\n'
-        +if(skipPackage[1]='0','PersonXLAB_Inc Deployment version: \n' + lastestIkbVersionOnThor,'')
-        +if(skipPackage[2]='0','FCRA_Header Deployment version: \n' + lastestFCRAversionOnThor,'')
-        +if(skipPackage[3]='0','PersonHeaderWeeklyKeys Deployment version: \n' + lastestWklyversionOnThor,'')
-        +'\n'
+        +if(skipPackage[1]='0','\nPersonXLAB_Inc Deployment version: \n' + lastestIkbVersionOnThor,'')
+        +if(skipPackage[2]='0','\nFCRA_Header Deployment version: \n' + lastestFCRAversionOnThor,'')
+        +if(skipPackage[3]='0','\nPersonHeaderWeeklyKeys Deployment version: \n' + lastestWklyversionOnThor,'')
+        +'\n\n'
         +'Corespondiong Orbit entries have been created and updated.\n'
         +'\n'
         +'If you have any question or concerns please contact:\n'
         +'Debendra.Kumar@lexisnexisrisk.com\n'
         +'gabriel.marcan@lexisnexisrisk.com\n'
-        +'\nThank you,'),
-    copy_to_dataland;
+        +'\nThank you,');    
 );
 END;

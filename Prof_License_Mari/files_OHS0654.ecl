@@ -1,4 +1,4 @@
-//Ohio Department of Commerce / Multiple Professions //
+﻿//Ohio Department of Commerce / Multiple Professions //
 IMPORT _control, Prof_License_Mari;
 
 EXPORT files_OHS0654 := MODULE
@@ -7,9 +7,9 @@ EXPORT files_OHS0654 := MODULE
 															 Prof_License_Mari.layout_OHS0654.layout_profession,
 															 CSV(SEPARATOR(','),heading(1),quote('"')));
 	
-	EXPORT mortgage_file	:= dataset(Common_Prof_Lic_Mari.SourcesFolder + 'OHS0654' + '::' + 'using' + '::' + 'dfi', 
-															 Prof_License_Mari.layout_OHS0654.layout_mortgage,
-															 CSV(SEPARATOR(','),heading(1),quote('"')));
+	// EXPORT mortgage_file	:= dataset(Common_Prof_Lic_Mari.SourcesFolder + 'OHS0654' + '::' + 'using' + '::' + 'dfi', 
+															 // Prof_License_Mari.layout_OHS0654.layout_mortgage,
+															 // CSV(SEPARATOR(','),heading(1),quote('"')));
 	
 END;
 

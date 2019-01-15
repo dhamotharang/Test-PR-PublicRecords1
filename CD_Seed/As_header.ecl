@@ -1,9 +1,11 @@
-as_header(dataset(base) pFile = dataset([],base), boolean pForHeaderBuild=false, boolean pFastHeader= false)
- :=
-  function
-	ds:=as_Source(pFile,pForHeaderBuild,pFastHeader);
+﻿import Header, mdr;
 
-	Header.Layout_New_Records tr2(ds l) := transform
+EXPORT as_header(dataset(layouts.base) pFile = dataset([],layouts.base), boolean pForHeaderBuild=false, boolean pFastHeader= false) := function
+	
+    src_rec := {header.Layout_Source_ID, layouts.base};    
+    header.Mac_Set_Header_Source(pFile,layouts.Base,src_rec,'2R',withUID);
+    
+    Header.Layout_New_Records tr2(withUID l) := transform
 		self.src:=MDR.sourceTools.src_Consumer_Disclosure_feed;
 		self.rid:=0;
 		self.did:=0;
@@ -14,25 +16,26 @@ as_header(dataset(base) pFile = dataset([],base), boolean pForHeaderBuild=false,
 		self.dt_nonglb_last_seen      := 0;
 		self.rec_type                 := '1';
 		self.vendor_id                := if(l.orig_vendor_id<>''
-																	,l.orig_vendor_id
-																	,(string)hash(
-																		trim(l.fname)+','+
-																		trim(l.mname)+','+
-																		trim(l.lname)+','+
-																		trim(l.orig_ssn)+','+
-																		trim(l.orig_dob)
-																				)
-																	);
-		self.ssn                := l.orig_ssn;
-		SELF.dob                      := (integer)l.orig_dob;
-		self.phone                    := l.orig_phone;
-		self.city_name                := l.v_city_name;
-		self.suffix                   := l.addr_suffix;
-		self.county                   := l.fips_county;
+                                            ,l.orig_vendor_id
+                                            ,(string)hash(
+                                                trim(l.fname)+','+
+                                                trim(l.mname)+','+
+                                                trim(l.lname)+','+
+                                                trim(l.orig_ssn)+','+
+                                                trim(l.orig_dob)
+                                                )
+                                          );
+		self.ssn       := l.orig_ssn;
+		SELF.dob       := (integer)l.orig_dob;
+		self.phone     := l.orig_phone;
+		self.city_name := l.v_city_name;
+		self.suffix    := l.addr_suffix;
+		self.county    := l.fips_county;
 		self := l;
 	end;
 
-	ah := project(ds,tr2(left));
+	ah := project(withUID, tr2(left));
 
-	return ah;;
+	return ah;
+    
 end;
