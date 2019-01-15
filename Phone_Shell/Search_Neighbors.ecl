@@ -5,7 +5,7 @@
  * This code is directly adapted from progressive_phone.mac_get_type_h    *
  ************************************************************************ */
 
-IMPORT Address, Doxie, Gong, NID, Phone_Shell, Progressive_Phone, RiskWise, UT;
+IMPORT Address, Doxie, Gong, NID, Phone_Shell, Progressive_Phone, RiskWise;
 
 EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Neighbors (
     DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, 
@@ -36,8 +36,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Neighbors (
 		Doxie.Layout_Best;
 	END;
 	
-	glb_ok := ut.glb_ok(GLBPurpose);
-	dppa_ok := ut.dppa_ok(DPPAPurpose);
+	glb_ok := mod_access.isValidGLB();
+	dppa_ok := mod_access.isValidDPPA();
 	
 	ds_InputFiltered := Input(Clean_Input.DID <> 0);
 	doxie.mac_best_records(ds_InputFiltered,
