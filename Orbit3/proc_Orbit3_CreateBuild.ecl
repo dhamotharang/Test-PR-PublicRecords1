@@ -1,13 +1,52 @@
-﻿import std,ut,Orbit3,_Control;
-export Proc_Orbit3_CreateBuild(string buildname,string Buildvs,string Envmt = 'N', string email_list = '', boolean skipcreatebuild = false,boolean skipupdatebuild = false,boolean runcreatebuild = true) := function
+﻿import ut,Orbit3,_Control;
+export Proc_Orbit3_CreateBuild(string buildname,string Buildvs,string Envmt = 'N', boolean skipcreatebuild = false,boolean skipupdatebuild = false,boolean runcreatebuild = true) := function
 
-ECL1 := '#workunit(\'name\',\'Orbit Create Build Instance'+ buildname + '-- '+Buildvs+'\');\r\n'+
-		 'Orbit3.proc_Orbit3_CreateBuild_sp( \''+buildname+'\',  \''+Buildvs+'\', \''+Envmt+'\', \''+email_list+'\', '+skipcreatebuild+', '+skipupdatebuild+', '+runcreatebuild+') \n' 
-		+'	  : success(Orbit3.Send_Email(\''+Buildvs+'\', \''+email_list+'\').build_success)\n'
-          +'	, failure(Orbit3.Send_Email(\''+Buildvs+'\', \''+email_list+'\').build_failure)\n'
-           +'	;\n';
+	tokenval := orbit3.GetToken();
 
-	tgtcluster := STD.System.Job.Target();
+	create_build := orbit3.CreateBuild(buildname,
+									Buildvs,
+									tokenval,		
+									).retcode;
+									
+	
+									
+	Update_build := Orbit3.UpdateBuildInstance(buildname,
+									Buildvs,
+									tokenval,
+									'BUILD_AVAILABLE_FOR_USE',
+									Orbit3.Constants(Envmt).platform_upd
+						                                  
+									).retcode;
+																
+sendemail(string keyword = '',string status = '') := function 
+		
+		error_description := map ( keyword = 'CREATE' and status in ['FAIL','SKIP'] => create_build.Message,
+		                     keyword = 'UPDATE' and status in ['FAIL','SKIP'] => Update_build.Message,
+												 keyword = 'NO_ITEMS_FOUND' and status = 'FAIL' => 'No Build Components found to Add in Orbit',
+												 'N/A'
+												 );
+	   	 emailtoall :=  fileservices.sendemail(
+												_Control.MyInfo.EmailAddressNotify +'; sudhir.kasavajjala@lexisnexis.com',
+												' Orbit for Build : '+buildname+',version: '+Buildvs+',Env : '+Orbit3.Constants(Envmt).which_env,
+												'BuildName:'+buildname+'\n'+
+												'---------------------'+'\n'+
+												'Buildversion:'+Buildvs+'\n'+
+ 										  	'---------------------'+'\n'+
+												'Reason:'+keyword+'\n'+
+												'---------------------'+'\n'+
+												'Status:'+status+'\n'+
+												'---------------------'+'\n'+
+												'Error Description:'+error_description+'\n'+
+												'---------------------'+'\n'+
+												'Workunit:'+workunit);
+												
+		verifystatus := if ( status <> 'FAIL' , emailtoall , Sequential ( emailtoall,
+									                                                                             FAIL( 'Orbit Build Instance Update Aborted .Build Name :'+buildname+ ' Build Version: '+Buildvs+' Reason:'+error_description )
+																					          )
+							);
+							
+		return verifystatus;
+	   end;
 
 spcluster := if ( regexfind('_eclcc',tgtcluster) , 'hthor_dev_eclcc','hthor_dev');
 
