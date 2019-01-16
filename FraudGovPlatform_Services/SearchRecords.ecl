@@ -28,7 +28,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	
 	adl_did_best := JOIN(ds_GovBest(Name.Last <> '' OR ssn <> ''), ds_input_with_adl_did, LEFT.UniqueId = (STRING)RIGHT.did);
 	
-	EXPORT BOOLEAN adlDIDFound := EXISTS(adl_did_best);
+	EXPORT BOOLEAN adlDIDFound := EXISTS(adl_did_best(UniqueId <> ''));
 	// EXPORT BOOLEAN adlDIDFound := EXISTS(ds_GovBest(Name.Last <> '' OR ssn <> '')) AND EXISTS(ds_input_with_adl_did(did > 0));
 	
 	ds_batch_in_without_did := PROJECT(ds_batch_in,TRANSFORM(FraudShared_Services.Layouts.BatchInExtended_rec,
@@ -259,7 +259,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 														SELF.RecordType := FraudGovPlatform_Services.Constants.RecordType.IDENTITY,
 														SELF.RecordSource := 'REALTIME',
 														SELF.ElementType := Fragment_Types_const.PERSON_FRAGMENT,
-														SELF.ElementValue := (string)LEFT.LexID,
+														SELF.ElementValue := (string)LEFT.batchin_rec.did,
 														SELF.Score := LEFT.risk_score,
 														SELF.GovernmentBest := ds_GovBest[1],
 														SELF.NoOfRecentTransactions := COUNT(ds_delta_recentTransactions(UniqueId = (string)LEFT.LexID)),
