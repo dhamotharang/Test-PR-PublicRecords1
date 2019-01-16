@@ -1,4 +1,5 @@
 ﻿/* *********************************************************************************************************************************
+PRTE2_PropertyInfo_Ins_Dev.BWR_View_Address_In_Keys
 Put in an address and it will go into the address key to find the RIDs
 then it will pull the payload records from the RID key using those RIDs found.
 will have to run these in PROD Thor ... Or below create a Key definition with the Add_Foreign_Prod for the name 
