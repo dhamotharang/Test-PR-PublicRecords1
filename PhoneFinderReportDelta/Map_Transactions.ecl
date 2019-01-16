@@ -6,6 +6,8 @@ EXPORT Map_Transactions(string8 version) := FUNCTION
 	
 	//DF-23251: Add 'dx_' Prefix to Index Definitions
 	//DF-23286: Update Keys
+	//DF-23827: Update Transaction Key Layout 
+	
 	dx_PhoneFinderReportDelta.Layout_PhoneFinder.Transactions_Main trT(inFile l):= transform
 		self.date_file_loaded 				:= version;
 		self.transaction_date					:= if(Std.Date.IsValidDate((unsigned)(PhoneFinderReportDelta._Functions.keepNum(l.transaction_date)[1..8])),
@@ -19,6 +21,9 @@ EXPORT Map_Transactions(string8 version) := FUNCTION
 		self.batch_job_id							:= PhoneFinderReportDelta._Functions.rmNull(l.batch_job_id);
 		self.reference_code						:= PhoneFinderReportDelta._Functions.rmNull(l.reference_code);
 		self.phonefinder_type					:= PhoneFinderReportDelta._Functions.rmNull(l.phonefinder_type);
+		self.data_source							:= PhoneFinderReportDelta._Functions.rmNull(l.data_source);
+		self.royalty_used							:= PhoneFinderReportDelta._Functions.rmNull(l.royalty_used);
+		self.carrier									:= PhoneFinderReportDelta._Functions.rmNull(l.carrier);
 		self.submitted_lexid					:= (unsigned)l.submitted_lexid;
 		self.submitted_phonenumber		:= PhoneFinderReportDelta._Functions.rmNull(l.submitted_phonenumber);
 		self.submitted_firstname			:= PhoneFinderReportDelta._Functions.rmNull(l.submitted_firstname);
