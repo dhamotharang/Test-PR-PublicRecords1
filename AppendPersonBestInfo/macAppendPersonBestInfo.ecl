@@ -2,7 +2,7 @@
   inUseNonBlank = 'false', inMarketing = 'false', inIncludeDod = 'false', inIncludeMinors= FALSE,
   appendPrefix = '\'\'', UseIndexThreshold=10000000) := FUNCTIONMACRO
   
-  IMPORT dx_BestRecords, doxie_files, doxie, ut, hipie_ecl, Suppress;
+  IMPORT dx_BestRecords, doxie_files, doxie, ut, Suppress;
    
   LOCAL rSearch := {RECORDOF(dIn) OR {INTEGER _searchDid}};
   LOCAL dSearch := PROJECT(dIn, TRANSFORM(rSearch,
