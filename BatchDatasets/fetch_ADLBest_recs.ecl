@@ -17,7 +17,7 @@ EXPORT fetch_ADLBest_recs(ds_batch_in,in_mod) := FUNCTIONMACRO
 					include_minors     := in_mod.IncludeMinors,
 					appType            := in_mod.ApplicationType,
 					dppa_purpose_value := in_mod.DPPAPurpose,
-					IndustryClass_val  := in_mod.industry_class,
+					IndustryClass_val  := in_mod.industryclass,
 					DRM_val            := in_mod.DataRestrictionMask,
 					GetSSNBest         := in_mod.GetSSNBest
         );

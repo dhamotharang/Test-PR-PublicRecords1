@@ -1,10 +1,7 @@
 IMPORT BatchDatasets, doxie, Residency_Services, ut;
 
 EXPORT fn_getVoters(DATASET(doxie.layout_references_acctno) ds_in_acctnos_dids,
-                    Residency_Services.IParam.BatchParams mod_params_in) := FUNCTION
-
-	in_mod := MODULE(PROJECT(mod_params_in, BatchDatasets.IParams.BatchParams,OPT)) 
-	          END;
+                    Residency_Services.IParam.BatchParams in_mod) := FUNCTION
 
   // Project input onto layout needed by BatchDatasets.fetch_Voter_recs
 	Voterbatch_In := PROJECT(ds_in_acctnos_dids, TRANSFORM(BatchDatasets.Layouts.batch_in,
