@@ -29,8 +29,6 @@ EXPORT Person_records_functions := Module
 	EXPORT nbr_records(dataset (doxie.layout_references) dids=dataset ([],doxie.layout_references)) := function
 		// snag header records
 		doxie.MAC_Selection_Declare();
-    glb_ok := mod_access.isValidGLB();
-    dppa_ok := mod_access.isValidDPPA();
 
 		headerRecs := Comp_Subject_Addresses_wrap(dids).addresses;
 
@@ -52,16 +50,10 @@ EXPORT Person_records_functions := Module
 			Neighbors_PerAddress,
 			Neighbors_Per_NA,
 			Neighbor_Recency,
-			mod_access.industry_class,
-			mod_access.glb,
-			mod_access.dppa,
-			mod_access.probation_override,
-			mod_access.no_scrub,
-			glb_ok,
-			dppa_ok,
-			// attrs declared in doxie.MAC_Header_Field_Declare
-			mod_access.ssn_mask,,,
-			neighbors_proximity // generally, the radius of neighbors' units: houses, or appartments or etc.
+			,,
+			neighbors_proximity, // generally, the radius of neighbors' units: houses, or appartments or etc.
+      ,
+      mod_access
 		);
 
 		// generate current/historic neighbors as specified

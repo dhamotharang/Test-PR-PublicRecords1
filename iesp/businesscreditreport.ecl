@@ -14,9 +14,9 @@ export t_BusinessCreditReportCompany := record
 	string10 Phone10 {xpath('Phone10')};
 	string11 TIN {xpath('TIN')};
 	string100 URL {xpath('URL')};
-	string100 Email {xpath('Email')};	
+	string100 Email {xpath('Email')};
 end;
-
+		
 export t_BusinessCreditReportAuthRep := record
 	string12 UniqueId {xpath('UniqueId')};
 	string11 SSN {xpath('SSN')};
@@ -116,7 +116,7 @@ export t_BusinessCreditAccountPaymentHistory := record
 	boolean IsExtendedOverdue {xpath('IsExtendedOverdue')};
 end;
 		
-export t_BusinessCreditAccountDetail := record    
+export t_BusinessCreditAccountDetail := record
 	string30 BusinessContributorNumber {xpath('BusinessContributorNumber')};//hidden[internal]
 	string50 BusinessAccountNumber {xpath('BusinessAccountNumber')};//hidden[internal]
 	string30 AccountStatus {xpath('AccountStatus')};
@@ -145,14 +145,14 @@ export t_BusinessCreditAccountDetail := record
 	string2 NumberOfGuarantors {xpath('NumberOfGuarantors')};
 	dataset(t_BusinessYearlyCreditUtilized) YearlyCreditUtils {xpath('YearlyCreditUtils/BusinessYearlyCreditUtilized'), MAXCOUNT(iesp.constants.BusinessCredit.MaxSection)};
 	dataset(t_BusinessCreditAccountPaymentHistory) AccountPaymentHistory {xpath('AccountPaymentHistory/BusinessCreditAccountPaymentHistory'), MAXCOUNT(iesp.constants.BusinessCredit.MaxPaymentHistory)};
-	unsigned8 UniqueAccountDetailNumber {xpath('UniqueAccountDetailNumber')};   
+	unsigned8 UniqueAccountDetailNumber {xpath('UniqueAccountDetailNumber')};
 	string1 ChargedOff {xpath('ChargedOff')};
-     string25 PaymentStatus {xpath('PaymentStatus')}; 
-     iesp.share.t_Date  ChargedOffDate {xpath('ChargedOffDate')};
-	string12  ChargedOffAmount  {xpath('ChargedOffAmount')}; 		
-	iesp.share.t_CodeMap ChargedOffType  {xpath('ChargedOffType')};
-	 string12  TotalChargedOffRecoveries {xpath('TotalChargedOffRecoveries')}; 
-	string1  ContributedByInquirer {xpath('ContributedByInquirer')};
+	string25 PaymentStatus {xpath('PaymentStatus')};
+	iesp.share.t_Date ChargedOffDate {xpath('ChargedOffDate')};
+	string12 ChargedOffAmount {xpath('ChargedOffAmount')};
+	iesp.share.t_CodeMap ChargedOffType {xpath('ChargedOffType')};
+	string12 TotalChargedOffRecoveries {xpath('TotalChargedOffRecoveries')};
+	string1 ContributedByInquirer {xpath('ContributedByInquirer')};
 end;
 		
 export t_BusinessCreditUtilized := record
@@ -297,13 +297,13 @@ export t_BusinessCreditPhoneSources := record
 	iesp.share.t_Date DateLastSeen {xpath('DateLastSeen')};
 	unsigned4 RecordCount {xpath('RecordCount')};
 end;
-
-export t_BusinessCreditMatch  := Record 
-     string120 CompanyName {xpath('CompanyName')};  
-     string9  Tin {xpath('Tin')}; 
-     string10 CompanyPhone {xpath('CompanyPhone')};  
+		
+export t_BusinessCreditMatch := record
+	string120 CompanyName {xpath('CompanyName')};
+	string9 TIN {xpath('TIN')};
+	string10 CompanyPhone {xpath('CompanyPhone')};
 	iesp.share.t_Address Address {xpath('Address')};
-end;	
+end;
 		
 export t_BusinessCreditReportRecord := record
 	t_BusinessCreditBestInformation BestInformation {xpath('BestInformation')};
@@ -311,7 +311,7 @@ export t_BusinessCreditReportRecord := record
 	t_BusinessCreditTradeSummary TradeSummary {xpath('TradeSummary')};
 	t_BusinessCreditPaymentSummary PaymentSummary {xpath('PaymentSummary')};
 	dataset(t_BusinessCreditAccountDetail) AccountDetail {xpath('AccountDetail/BusinessCreditAccountDetail'), MAXCOUNT(iesp.constants.BusinessCredit.MaxSection)};
-	unsigned2    TotalAccountDetailCount {xpath('TotalAccountDetailCount')};
+	unsigned2 TotalAccountDetailCount {xpath('TotalAccountDetailCount')};
 	dataset(t_BusinessCreditUtilized) CreditUtils {xpath('CreditUtils/BusinessCreditUtilized'), MAXCOUNT(iesp.constants.BusinessCredit.MaxSection)};
 	dataset(t_BusinessCreditDBT) DBTs {xpath('DBTs/BusinessCreditDBT'), MAXCOUNT(iesp.constants.BusinessCredit.MaxSection)};
 	dataset(t_BusinessCreditInquiry) Inquiries {xpath('Inquiries/BusinessCreditInquiry'), MAXCOUNT(iesp.constants.BusinessCredit.MaxSection)};
@@ -321,7 +321,7 @@ export t_BusinessCreditReportRecord := record
 	t_BusinessCreditActivity Activity {xpath('Activity')};
 	t_BusinessCreditAdditionalInfo AdditionalInfo {xpath('AdditionalInfo')};
 	dataset(t_BusinessCreditPhoneSources) PhoneSources {xpath('PhoneSources/BusinessCreditPhoneSources'), MAXCOUNT(iesp.constants.BusinessCredit.MaxSection)};
-	 t_BusinessCreditMatch MatchReason {xpath('MatchReason')};  
+	t_BusinessCreditMatch MatchReason {xpath('MatchReason')};
 end;
 		
 export t_BusinessCreditReportOption := record (iesp.share.t_BaseReportOption)
@@ -334,10 +334,10 @@ export t_BusinessCreditReportBy := record
 	t_BusinessCreditReportCompany Company {xpath('Company')};
 	t_BusinessCreditReportAuthRep AuthorizedRep {xpath('AuthorizedRep')};
 end;
-
+		
 export t_BusinessCreditReportResponse := record
 	iesp.share.t_ResponseHeader _Header {xpath('Header')};
-	t_BusinessCreditReportBy InputEcho {xpath('InputEcho')};	
+	t_BusinessCreditReportBy InputEcho {xpath('InputEcho')};
 	dataset(t_BusinessCreditReportRecord) Records {xpath('Records/Record'), MAXCOUNT(iesp.Constants.TOPBUSINESS.MAX_COUNT_REPORT_RESPONSE_RECORDS)};
 end;
 		
