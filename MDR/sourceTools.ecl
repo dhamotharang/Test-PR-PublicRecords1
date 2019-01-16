@@ -128,6 +128,7 @@ MODULE
 	export src_Cortera                   := 'RR';
 	export src_Cortera_Tradeline         := '7K';
 	export src_CrashCarrier							 := 'KC';  // aka US DOT "Safer Census" data for BIP
+	export src_infutor_narc3             := 'KP';  // infutor_narc3 consumer
 	export src_Credit_Unions             := 'CU';
 	export src_Datagence								 := 'DG';
 	export src_DCA                       := 'DF';  // Directory of Corporate Affiliations; aka LNCA
@@ -1617,6 +1618,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_WV_Hist_Corporations      := [src_WV_Hist_Corporations      ];
 	export set_WY_Corporations           := [src_WY_Corporations           ];
 	export set_CrashCarrier              := [src_CrashCarrier              ];	
+	export set_infutor_narc3             := [src_infutor_narc3             ];
 	export set_Credit_Unions             := [src_Credit_Unions             ];
 	export set_Datagence                 := [src_Datagence                 ];
 	export set_DCA                       := [src_DCA                       ];
@@ -2284,6 +2286,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsInfutor_NARB               (string  sr) := sr               in set_Infutor_NARB               ;
 	export SourceIsInfutorCID                 (string  sr) := sr               in set_InfutorCID 								 ;
 	export SourceIsInfutorNARC                (string  sr) := sr               in set_InfutorNarc								 ;
+  export SourceIsInfutorNARC3               (string  sr) := sr               in set_infutor_narc3              ;
 	export SourceIsInfutorNARE								(string	 sr) := sr							 in set_InfutorNare                ;
 	export SourceIsIngenix_Sanctions          (string  sr) := sr               in set_Ingenix_Sanctions          ;
 	export SourceIsInquiryAcclogs             (string  sr) := sr               in set_InquiryAcclogs             ;
@@ -2807,6 +2810,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_InfutorCID	 							,'Infutor CID - Phones'                                      }		
 	  ,{src_InfutorTRK	 							,'Infutor TRK - Name and Address Resource'                   }		
 		,{src_InfutorNarc	 							,'Infutor Narc  - Consumer Name and Address Resource'        }
+		,{src_infutor_narc3             ,'Infutor Narc3 Consumer'                                    }
 		,{src_InfutorNare								,'Infutor Nare	- Consumer Name and Email Resource'					 }
 		,{src_Ingenix_Sanctions         ,'Ingenix National Provider Sanctions'                       }
 		,{src_InquiryAcclogs            ,'Inquiry Tracking Account Logs'                             }
@@ -3319,6 +3323,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_InfutorCID	 							 => 'Infutor CID - Phones'                                 
 		,src_InfutorTRK	 							 => 'Infutor TRK - Name and Address Resource'              
 		,src_InfutorNarc	 						 => 'Infutor  Narc - Consumer Name and Address Resource'
+		,src_infutor_narc3             => 'Infutor Narc3 Consumer'
 		,src_InfutorNare							 => 'Infutor Nare - Consumer Name and Email Resource'
 		,src_Ingenix_Sanctions         => 'Ingenix National Provider Sanctions'                  
 		,src_InquiryAcclogs            => 'Inquiry Tracking Account Logs'                        
