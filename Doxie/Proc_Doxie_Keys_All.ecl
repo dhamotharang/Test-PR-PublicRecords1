@@ -16,7 +16,7 @@ export proc_doxie_keys_all(boolean pFastHeader=false) := function
  chk_build := output('Checking Base::HeaderKey_Building...') : success(add_super);
  g := Watchdog.DID_Gong;
  fhb := doxie_build.Proc_file_header_building;
- i := doxie.proc_header_keys(filedate,pFastHeader);
+ i := doxie.proc_Header_keys_dx(filedate,pFastHeader);
  v := doxie.proc_relatives_keys(filedate);
  w := doxie.proc_troy_keys(filedate);
  s := Header_SlimSort.Proc_BuildKeys(filedate);
