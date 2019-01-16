@@ -2,42 +2,40 @@
   inUseNonBlank = 'false', inMarketing = 'false', inIncludeDod = 'false', inIncludeMinors= FALSE,
   appendPrefix = '\'\'', UseIndexThreshold=10000000) := FUNCTIONMACRO
   
-  IMPORT Watchdog, doxie_files, doxie, ut, hipie_ecl, Suppress;
+  IMPORT dx_BestRecords, doxie_files, doxie, ut, hipie_ecl, Suppress;
    
   LOCAL rSearch := {RECORDOF(dIn) OR {INTEGER _searchDid}};
   LOCAL dSearch := PROJECT(dIn, TRANSFORM(rSearch,
     SELF._searchDid := (INTEGER)LEFT.inLexid,
     SELF := LEFT));
-  LOCAL dDistributed  := DISTRIBUTE(dSearch((UNSIGNED)inLexid <> 0), HASH32(inLexid));
+  LOCAL dDistributed  := DISTRIBUTE(dSearch((UNSIGNED)inLexid <> 0), HASH(inLexid));
   LOCAL dupLexid      := DEDUP(SORT(dDistributed, inLexid, LOCAL), inLexid, LOCAL);
+
+  // best records restriction flags
+  LOCAL glb_flag      := Doxie.compliance.glb_ok(inGlb);
+  LOCAL pre_flag      := Doxie.compliance.isPreGLBRestricted(inDrm);
+  LOCAL filter_exp    := Doxie.compliance.isECHRestricted(inDrm);
+  LOCAL filter_eq     := Doxie.compliance.isEQCHRestricted(inDrm);
+
+  LOCAL bestRecsPerm := dx_BestRecords.Functions.get_perm_type(glb_flag, inUseNonBlank, false, 
+    pre_flag, filter_exp, filter_eq, inMarketing);
+
+  LOCAL dBest_small := dx_BestRecords.append(dupLexid, inLexid, bestRecsPerm, left_outer := false);
+  LOCAL dBest_large := dx_BestRecords.append(dupLexid, inLexid, bestRecsPerm, left_outer := false, 
+    use_distributed := true);
+
+  // use the distributed option for large (batch) input sets
+  LOCAL dBestApp := IF (COUNT(dupLexid) > (INTEGER)UseIndexThreshold, dBest_large, dBest_small);
+  LOCAL dWatchdog := PROJECT(dBestApp, 
+    TRANSFORM({dx_BestRecords.layout_best, RECORDOF(dupLexid)}, 
+      SELF := LEFT._best, 
+      SELF := LEFT));
   
-  LOCAL dWatchdogNonGlbNonBlankV2 := hipie_ecl.macJoinKey(dupLexid, Watchdog.key_watchdog_nonglb_nonblank_V2,
-    'KEYED((UNSIGNED)LEFT._searchDid=RIGHT.did)',
-    'LEFT.did = (UNSIGNED)RIGHT._searchDid',
-    UseIndexThreshold,,TRUE,1,,,,TRUE);
-  LOCAL dWatchdogNonGlbNonBlank := hipie_ecl.macJoinKey(dupLexid, Watchdog.key_watchdog_nonglb_nonblank,
-    'KEYED((UNSIGNED)LEFT._searchDid=RIGHT.did)',
-    'LEFT.did = (UNSIGNED)RIGHT._searchDid',
-    UseIndexThreshold,,TRUE,1,,,,TRUE);
-  LOCAL dWatchdogNonGlbV2 := hipie_ecl.macJoinKey(dupLexid, Watchdog.Key_Watchdog_nonglb_V2,
-    'KEYED((UNSIGNED)LEFT._searchDid=RIGHT.did)',
-    'LEFT.did = (UNSIGNED)RIGHT._searchDid',
-    UseIndexThreshold,,TRUE,1,,,,TRUE);
-  LOCAL dWatchdogNonGlb := hipie_ecl.macJoinKey(dupLexid, Watchdog.Key_Watchdog_nonglb,
-    'KEYED((UNSIGNED)LEFT._searchDid=RIGHT.did)',
-    'LEFT.did = (UNSIGNED)RIGHT._searchDid',
-    UseIndexThreshold,,TRUE,1,,,,TRUE);
-  
-  LOCAL dWatchdog := IF((BOOLEAN)inUseNonBlank,
-    IF(doxie.DataRestriction.restrictPreGLB, dWatchdogNonGlbNonBlankV2, dWatchdogNonGlbNonBlank),
-    IF(doxie.DataRestriction.restrictPreGLB, dWatchdogNonGlbV2, dWatchdogNonGlb));
-  
+	// Filter out minors
   LOCAL dWatchdogNoMinors := JOIN(dWatchdog, doxie_files.key_minors_hash, 
       LEFT.did != 0 AND KEYED(HASH32((UNSIGNED6)LEFT.did)=RIGHT.hash32_did) 
       AND KEYED(LEFT.did=RIGHT.did) AND ut.Age(RIGHT.dob) < 18,
-      TRANSFORM({RECORDOF(LEFT), RECORDOF(RIGHT)}, 
-        SELF := RIGHT,
-        SELF := LEFT), 
+      TRANSFORM({RECORDOF(LEFT)}, SELF := LEFT), 
       LEFT ONLY, LOOKUP);
     
   //For now No Minors no matter what
