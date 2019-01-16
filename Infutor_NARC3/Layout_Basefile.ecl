@@ -8,8 +8,8 @@ EXPORT Layout_Basefile := record
 	string8	  process_date;
 	string8 	date_first_seen  	:='0';
 	string8 	date_last_seen 		:='0';
-	UNSIGNED6 Date_vendor_first_reported;
-	UNSIGNED6 Date_vendor_last_reported;
+	string8  Date_vendor_first_reported;
+	string8  Date_vendor_last_reported;
 	string20	orig_HHID;
 	string20	orig_PID;
 	string15	orig_FNAME;
@@ -37,7 +37,7 @@ EXPORT Layout_Basefile := record
 	string1	  orig_Z4TYPE;
 	string4	  orig_CRTE;
 	string4	  orig_DPV;
-	string	  orig_VACANT;
+	string4	  orig_VACANT;
 	string4	  orig_MSA;
 	string5	  orig_CBSA;
 	string5	  orig_DMA;

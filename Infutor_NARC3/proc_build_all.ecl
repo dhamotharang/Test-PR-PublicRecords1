@@ -3,8 +3,8 @@ import versioncontrol,Orbit3,Roxiekeybuild,_Control,scrubs_infutor_narc3;
 
 EXPORT proc_build_all (string pVersion):= function
 
- //spray_raw := Infutor_NARC3.fSprayFiles(pVersion,,,,'thor400_sta01'); 
- spray_raw := Infutor_NARC3.fSprayFiles(pVersion); 
+  //spray_raw := Infutor_NARC3.fSprayFiles(pVersion,,,,'thor400_sta01'); 
+  spray_raw := Infutor_NARC3.fSprayFiles(pVersion); 
  
   dAll_filenames	:=	Filenames().dAll_filenames +	
 														Keynames().dAll_filenames		+    // create non FCRA Superfiles 
@@ -40,8 +40,8 @@ EXPORT proc_build_all (string pVersion):= function
 	) : SUCCESS(Send_Emails(pVersion,pBuildMessage:='Infutor Narc3 Basefile Build is complete').BuildMessage),
 			FAILURE(Send_Emails(pVersion).BuildFailure);	
 	
-	return build_infutor_narc3;
+  return build_infutor_narc3;
 	
-	end;
+end;
 	
 	

@@ -216,7 +216,6 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
     SELF.did_score := ri.did_score; // Derived(NEW)
     SELF.clean_phone := ri.clean_phone; // Derived(NEW)
     SELF.clean_dob := ri.clean_dob; // Derived(NEW)
-    SELF.record_type := ri.record_type; // Derived(NEW)
     SELF.rawaid := ri.rawaid; // Derived(NEW)
     __Tpe0 := MAP (
       le.__Tpe = 0 => ri.__Tpe,

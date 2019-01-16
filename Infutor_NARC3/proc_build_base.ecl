@@ -1,5 +1,5 @@
 ﻿
-import ut, _validate, NID, AID, address, std, did_add, VersionControl,didville;
+import ut, _validate, NID, AID, address, std, did_add, VersionControl,didville,mdr;
 
 EXPORT proc_build_base(string	pVersion,BOOLEAN	pUseProd	=	FALSE) := function
 
@@ -9,7 +9,7 @@ EXPORT proc_build_base(string	pVersion,BOOLEAN	pUseProd	=	FALSE) := function
   
   dedup_FileLogical_in := dedup(sort(FileLogical_in,record),record);
 
-Infutor_NARC3.Layout_Basefile		tMapping(dedup_FileLogical_in L) := TRANSFORM
+  Infutor_NARC3.Layout_Basefile		tMapping(dedup_FileLogical_in L) := TRANSFORM
     //lkp fields
     SELF.orig_Time_Zone_descr := Infutor_NARC3.get_decr.TimeZone(l.orig_Time_Zone);	//code descr
     SELF.orig_Homeowner_Renter_descr := Infutor_NARC3.get_decr.Homeowner_Renter(l.orig_Homeowner_Renter);	//code descr
@@ -57,9 +57,9 @@ Infutor_NARC3.Layout_Basefile		tMapping(dedup_FileLogical_in L) := TRANSFORM
 	  SELF.orig_DEMOLEVEL_descr := Infutor_NARC3.get_decr.DEMOLEVEL(l.orig_DEMOLEVEL);	//code descr
 
     //other fields
-    SELF.src := 'XX';// get directly from attribute
+    SELF.src := mdr.sourceTools.src_infutor_narc3;
 		
-    SELF.persistent_record_id := 'XX' + hash64(l.orig_fname+
+    SELF.persistent_record_id := SELF.src + hash64(l.orig_fname+
 																							 l.orig_mname+
 																							 l.orig_lname+
 																							 l.orig_suffix+
@@ -69,12 +69,13 @@ Infutor_NARC3.Layout_Basefile		tMapping(dedup_FileLogical_in L) := TRANSFORM
 																							 l.orig_city+
 																							 l.orig_state+
 																							 l.orig_zip+
-																							 l.orig_dpc);		
+																							 l.orig_dpc+
+																							 l.orig_telephone_number_1);		
 		
 		
 		SELF.process_date := (String8)Std.Date.Today();
-		SELF.Date_vendor_first_reported := (unsigned)pVersion;
-		SELF.Date_vendor_last_reported 	:= (unsigned)pVersion;
+		SELF.Date_vendor_first_reported := pVersion;
+		SELF.Date_vendor_last_reported 	:= pVersion;
 		SELF.date_first_seen := '0';  //Blank dates are acceptable since raw data does not 
     SELF.date_last_seen := '0';   //present any supporting evidence of first and last seen dates
 		SELF.clean_phone 								:= if(ut.CleanPhone(L.orig_Telephone_Number_1) [1] not in ['0','1'],ut.CleanPhone(L.orig_Telephone_Number_1), '') ;
@@ -83,35 +84,35 @@ Infutor_NARC3.Layout_Basefile		tMapping(dedup_FileLogical_in L) := TRANSFORM
 
 		SELF  :=  L;
 		SELF 	:= [];
-	END;
+   END;
 
 
-std_input := project(dedup_FileLogical_in, tMapping(LEFT));
+   std_input := project(dedup_FileLogical_in, tMapping(LEFT));
 
-//set up ingest file attibutes
-  todays_processed_file := std_input; 
-	current_base := Infutor_NARC3.Files.base;
+   //set up ingest file attibutes
+   todays_processed_file := std_input; 
+	 current_base := Infutor_NARC3.Files.base;
 	
-	//Ingest todays_processed_file into current_base to get new_base
-	base_with_tag := Infutor_NARC3.Ingest(false,,current_base,todays_processed_file);
+	 //Ingest todays_processed_file into current_base to get new_base
+	 base_with_tag := Infutor_NARC3.Ingest(false,,current_base,todays_processed_file);
 	
-	new_base :=  base_with_tag.AllRecords;	
+	 new_base :=  base_with_tag.AllRecords;	
 	
-	//Add record type
-  add_record_type	:= Project(new_base, TRANSFORM(Infutor_NARC3.Layout_Basefile, 
+	 //Add record type
+   add_record_type	:= Project(new_base, TRANSFORM(Infutor_NARC3.Layout_Basefile, 
 																								   self.record_type := left.__Tpe;
 																									 self.history_flag := if(left.__Tpe=Ingest().RecordType.Old,'H','');
 																								   self := left;
 																									 self:= [];));
 
-//Clean Name 
-NID.Mac_CleanParsedNames(add_record_type, cleanNames0
+   //Clean Name 
+   NID.Mac_CleanParsedNames(add_record_type, cleanNames0
 		, firstname:=orig_FNAME,middlename:=orig_mname,lastname:=orig_LNAME,namesuffix:=orig_SUFFIX,useV2:=true
 		);
 		
-cleanNames := cleanNames0;
+   cleanNames := cleanNames0;
 
-cleanNames_t := project(cleanNames, transform({recordof(cleanNames), string orig_addr1, string orig_addr2},
+   cleanNames_t := project(cleanNames, transform({recordof(cleanNames), string orig_addr1, string orig_addr2},
 
 																							self.orig_addr1 := regexreplace('GENERAL DELIVERY',trim(stringlib.stringfilterout(left.orig_ADDRESS,'.^!$+<>@=%?*\''), left, right),''),			
 																							self.orig_addr2 := trim(StringLib.StringCleanSpaces(
@@ -124,11 +125,11 @@ cleanNames_t := project(cleanNames, transform({recordof(cleanNames), string orig
 																							self := left));			
 
 																		
-unsigned4	lFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;		
-//unsigned4	lFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords | AID.Common.eReturnValues.NoNewCacheFiles;
-AID.MacAppendFromRaw_2Line(cleanNames_t,orig_addr1,orig_addr2,RawAID,cleanAddr, lFlags);
+   unsigned4	lFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;		
+   //unsigned4	lFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords | AID.Common.eReturnValues.NoNewCacheFiles;
+   AID.MacAppendFromRaw_2Line(cleanNames_t,orig_addr1,orig_addr2,RawAID,cleanAddr, lFlags);
 
-Infutor_NARC3.Layout_Basefile 		tr(cleanAddr l) := TRANSFORM
+   Infutor_NARC3.Layout_Basefile 		tr(cleanAddr l) := TRANSFORM
 		self.title 				:= IF(l.cln_title IN ['MR', 'MS'], l.cln_title, '');
 		self.fname 				:= l.cln_fname;
 		self.mname 				:= l.cln_mname;
@@ -163,27 +164,27 @@ Infutor_NARC3.Layout_Basefile 		tr(cleanAddr l) := TRANSFORM
     SELF.Zip         	:= L.aidwork_acecache.zip5;
     SELF.dbpc       	:= l.aidwork_acecache.dbpc;
 		self:=l;
-		END;
+   END;
 
-cleanAdd_t := project(cleanAddr,tr(left));
+   cleanAdd_t := project(cleanAddr,tr(left));
 
-//Append DID
-	matchset := ['A','Z','D','P'];
+   //Append DID
+   matchset := ['A','Z','D','P'];
 	
-	did_add.MAC_Match_Flex(cleanAdd_t, matchset,					
+   did_add.MAC_Match_Flex(cleanAdd_t, matchset,					
 													'',clean_dob, fname, mname, lname, name_suffix, 
 													prim_range, prim_name, sec_range, zip, st,clean_phone, 
 													DID, Infutor_NARC3.Layout_Basefile, true, did_score,
 													75, d_did
 												  );	
 													
-//Append SSN by DID													
-	did_add.MAC_Add_SSN_By_DID(d_did, did, ssn_append, out_with_ssn);												
+   //Append SSN by DID													
+   did_add.MAC_Add_SSN_By_DID(d_did, did, ssn_append, out_with_ssn);												
  
-	//Need to output new base before base_with_tag.Dostats can be called. 
-  VersionControl.macBuildNewLogicalFile(Filenames(pVersion).Base.consumer.new	,out_with_ssn, build_logical_file,true);									 	
+   //Need to output new base before base_with_tag.Dostats can be called. 
+   VersionControl.macBuildNewLogicalFile(Filenames(pVersion).Base.consumer.new	,out_with_ssn, build_logical_file,true);									 	
 	
-  return sequential(build_logical_file,
+   return sequential(build_logical_file,
 	                  base_with_tag.Dostats										
 				           );		
 									 

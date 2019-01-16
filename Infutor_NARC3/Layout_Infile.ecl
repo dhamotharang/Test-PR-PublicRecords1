@@ -27,7 +27,7 @@ EXPORT Layout_Infile := record
 	string1	  orig_Z4TYPE;
 	string4	  orig_CRTE;
 	string4	  orig_DPV;
-	string	  orig_VACANT;
+	string4	  orig_VACANT;
 	string4	  orig_MSA;
 	string5	  orig_CBSA;
 	string5	  orig_DMA;
