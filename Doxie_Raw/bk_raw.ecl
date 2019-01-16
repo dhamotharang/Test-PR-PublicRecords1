@@ -1,4 +1,4 @@
-//============================================================================
+﻿//============================================================================
 // Attribute: bk_raw.  Used by view source service and comp-report.
 // Function to get bankruptcy records by did, bdid, or case number and court code.
 // Return value: Dataset with layout Doxie/layout_bk_output.
@@ -91,7 +91,7 @@ f_main0 := if(cnum != '', f_main_byn, f_main_byd);
 //to be in Bkv2 main but are now only available in Bkv3 search
 f_main1 := join(f_main0, bankruptcyv3.key_bankruptcyv3_search_full_bip(),
                     keyed(left.tmsid = right.tmsid),
-										transform({rec_main_int, recordof(bankruptcyv3.key_bankruptcyv3_search_full_bip())},
+										transform({recordof(rec_main_int) AND NOT[chapter, filing_type, corp_flag, disposition, pro_se_ind, converted_date, record_type], recordof(bankruptcyv3.key_bankruptcyv3_search_full_bip()) AND NOT[TMSID, seq_number, court_code, case_number, orig_case_number, date_filed]},
 											self.chapter 					:= right.chapter,
 											self.orig_filing_type := right.filing_type,
 											self.corp_flag 				:= right.corp_flag,
@@ -104,6 +104,7 @@ f_main1 := join(f_main0, bankruptcyv3.key_bankruptcyv3_search_full_bip(),
 											self 									:= left,
 											self 									:= right),
 										atmost(ut.limits.BANKRUPT_MAX));
+																														
 f_main2 := rollup(project(f_main1(name_type[1] = 'A'), recordof(bankruptcyv3.key_bankruptcyv3_search_full_bip())),
 										left.tmsid = right.tmsid and
 										left.name_type = right.name_type,
@@ -162,6 +163,5 @@ raw_search := join(raw_search0,bankruptcyv3.key_bankruptcyv3_search_full_bip(),
 Suppress.MAC_Mask(raw_search, raw_search_masked, debtor_ssn, null, true, false, maskVal:=ssn_mask_value);
 
 srtout := Bankrupt.GetCRSOutput (f_main, raw_search_masked);
-
 return project(srtout(penalt < 10 OR isReport), doxie.Layout_BK_Output);
 END;
