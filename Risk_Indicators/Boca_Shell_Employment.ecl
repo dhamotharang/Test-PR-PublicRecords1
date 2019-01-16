@@ -220,27 +220,41 @@ patw roll_paw(patw le, patw rt) := transform
 	self.source_ct := if(source_seen or le.sources='', le.source_ct, le.source_ct + rt.source_ct);
 	
 	self.business_ct := if(le.bdid=rt.bdid, le.business_ct, le.business_ct + rt.business_ct);
-	self.dead_business_ct := if(le.bdid=rt.bdid, le.dead_business_ct, le.dead_business_ct + rt.dead_business_ct);
+	// self.dead_business_ct := if(le.bdid=rt.bdid, le.dead_business_ct, le.dead_business_ct + rt.dead_business_ct);  // don't count these here because we need a seperate table for that
 	
 	new_phone := le.phone<>'' and stringlib.stringfind(le.active_phones, le.phone, 1)=0 ;
 	self.Business_active_phone_ct := if(new_phone, le.business_active_phone_ct + 1, le.Business_active_phone_ct);
 	self.active_phones := if(new_phone, trim(le.active_phones) + ',' + le.phone, le.active_phones);
+
 	self := rt;
 end;
 
-grouped_pawfile_full := group(sort(pawfile_full, seq, -(unsigned)bdid, -last_seen_date, -first_seen_date), seq);
+grouped_pawfile := group(pawfile_full, seq);
+sorted_pawfile_full := sort(grouped_pawfile, seq, -(unsigned)bdid, -last_seen_date, -first_seen_date);
 
-rolled_paw := rollup(grouped_pawfile_full, true, roll_paw(left, right));
+rolled_paw := rollup(sorted_pawfile_full, true, roll_paw(left, right));
 
-with_paw := group(join(clam_pre_employment, rolled_paw, left.seq=right.seq,
+dead_business_ct_per_bdid := table(grouped_pawfile, {seq, bdid, dead_business_count := count(group, dead_business_ct=1)}, 
+											seq, bdid);
+
+dead_business_ct_per_seq := table(dead_business_ct_per_bdid, {seq, dead_business_ct := count(group, dead_business_count>0)}, 
+											seq);
+
+with_dead_business_counts := join(rolled_paw, dead_business_ct_per_seq, left.seq=right.seq, 
+	transform(patw,
+	self.dead_business_ct:= right.dead_business_ct;
+	self := left));
+	
+with_paw := group(join(clam_pre_employment, with_dead_business_counts, left.seq=right.seq,
 									transform(risk_indicators.Layout_Boca_Shell, self.employment := right, self := left), 
-									left outer, keep(1)), seq);						
-
-// output(pawfile_full, named('pawfile_full'));
-// output(grouped_pawfile_full, named('grouped_pawfile_full'));
-// output(choosen(rolled_paw, eyeball), named('rolled_paw_raw'));
+									left outer, keep(1)), seq);			
+												
+// output(sorted_pawfile_full, named('sorted_pawfile_full'));               
+// output(dead_business_ct_per_bdid, named('dead_business_ct_per_bdid'));
+// output(dead_business_ct_per_seq, named('dead_business_ct_per_seq'));
+// output(rolled_paw, named('rolled_paw'));
+// output(with_dead_business_counts, named('with_dead_business_counts'));
 
 return with_paw;
 
 end;
-

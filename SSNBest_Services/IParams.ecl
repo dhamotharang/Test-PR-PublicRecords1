@@ -1,4 +1,5 @@
-IMPORT SSNBest_Services, BatchDatasets, doxie;
+IMPORT SSNBest_Services, BatchShare, doxie;
+
 EXPORT IParams := MODULE
 
 	EXPORT HardCodedFlags := INTERFACE
@@ -6,19 +7,19 @@ EXPORT IParams := MODULE
 		EXPORT BOOLEAN   check_RNA_         := FALSE;
 	END;
 
-	EXPORT BatchParams := INTERFACE(BatchDatasets.IParams.BatchParams,HardCodedFlags)
+	EXPORT BatchParams := INTERFACE(BatchShare.IParam.BatchParams,HardCodedFlags)
 		EXPORT BOOLEAN   Display_HRI        := FALSE;
 	  EXPORT UNSIGNED3 DIDScoreThreshold  := SSNBest_Services.Constants.DIDScoreThreshold;
 		EXPORT BOOLEAN   IsGlbRequired      := FALSE;
 	END;
 
 	EXPORT getBatchParams() := FUNCTION
-		base_params := BatchDatasets.IParams.getBatchParams();
+		base_params := BatchShare.IParam.getBatchParams();
 		in_mod := MODULE(PROJECT(base_params, BatchParams, OPT))
 			EXPORT BOOLEAN   Display_HRI        := FALSE : STORED('Display_HRI');
 			EXPORT UNSIGNED3 DIDScoreThreshold  := SSNBest_Services.Constants.DIDScoreThreshold : STORED('DIDScoreThreshold'); //internal
 			EXPORT BOOLEAN   IsGlbRequired      := FALSE : STORED('IsGlbRequired');
-			EXPORT TYPEOF(BatchDatasets.IParams.BatchParams.IncludeMinors) IncludeMinors:= FALSE : STORED('IncludeMinors'); 
+			EXPORT TYPEOF(BatchShare.IParam.BatchParams.IncludeMinors) IncludeMinors:= FALSE : STORED('IncludeMinors'); 
 		END;
 		RETURN in_mod;
 	END;
@@ -29,7 +30,6 @@ EXPORT IParams := MODULE
 
 	//this function is called to set the interface parameters before calling SSNBest_Services.Functions.fetchSSNs_generic
 	//NOTE that you can also call the fetchSSN's functions via your default stored batch params as is done in the SSNBest
-	//batch service
 	EXPORT setSSNBestParams(doxie.IDataAccess mod_access, boolean suppress_and_mask_ = TRUE, boolean checkRNA_ = FALSE) := FUNCTION
 
 		in_mod := MODULE (PROJECT (mod_access, SSNBestParams, OPT))
@@ -46,7 +46,7 @@ EXPORT IParams := MODULE
       EXPORT unsigned1 dppa := mod_batch.DPPAPurpose;
       EXPORT string DataPermissionMask := mod_batch.DataPermissionMask;
       EXPORT string DataRestrictionMask := mod_batch.DataRestrictionMask;
-      EXPORT string5 industry_class := mod_batch.industry_class;
+      EXPORT string5 industry_class := mod_batch.IndustryClass;
       EXPORT string32 application_type := mod_batch.ApplicationType;
       EXPORT boolean show_minors := mod_batch.IncludeMinors;
       EXPORT string ssn_mask :=  mod_batch.ssn_mask;

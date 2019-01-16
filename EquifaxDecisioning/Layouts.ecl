@@ -20,16 +20,7 @@
       STRING   PercentBalToTotalLoanAmtAutoWithin3MonthsVal :=  '';
       STRING   PercentBalToTotalLoanAmtMortgageWithin3MonthsVal :=  '';
       STRING   NumberOfThirdPartyCollectionsVal :=  '';
-      INTEGER  EqfxGatewayErrorStatus := 0;
-      STRING   EqfxGatewayMessage := '';
-      STRING1  EqfxGwNumProcessingErrors := '';
-      STRING   EqfxGwProcessingErrorCodes := '';
-      STRING1  EqfxGwNumFormatErrors := '';
-      STRING   EqfxGwFormatErrorCodes := '';
-      STRING1  EqfxGwNumValidityErrors := '';
-      STRING   EqfxGwValidityErrorCodes := '';
-      STRING6  EqfxGatewayModelErrorCode := '';
-      STRING   EqfxGatewayModelMessage := '';
+      STRING   Equifax_gateway_usage_Status := '';
     END;
-  
+
   END;

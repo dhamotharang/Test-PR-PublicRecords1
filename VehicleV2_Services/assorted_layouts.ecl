@@ -85,11 +85,11 @@ export assorted_layouts := MODULE
   END;
   
 	export matched_party_rec := RECORD
-   string1 orig_name_type;	
+   		string1 orig_name_type;	
 	 // vehiclev2_services.Layout_Report_Party;
-	 string70		Orig_Name;
-	 layout_vehicle_party_out.layout_standard_name;
-   layout_vehicle_party_out.layout_standard_address;
+	 	string70		Orig_Name;
+		VehicleV2_Services.layout_vehicle_party_out.layout_standard_name;
+   		VehicleV2_Services.layout_vehicle_party_out.layout_standard_address;
 	END;
 	
   export layout_match_flags := RECORD
@@ -104,22 +104,24 @@ export assorted_layouts := MODULE
   END;
 
 	export layout_registrant := RECORD
-		Layout_vehicle_party_out.layout_vehicle_party_registrant and not [append_did, append_bdid];
+		VehicleV2_Services.Layout_vehicle_party_out.layout_vehicle_party_registrant and not [append_did, append_bdid];
 		string3 age;
 		string12 append_did;
 		string12 append_bdid;
 		BIPV2.IDlayouts.l_header_ids;
 		layout_match_flags matchFlags;
-    layout_crim_indicators;
+    	layout_crim_indicators;
 		string10   geo_lat := '';
 		string11   geo_long := '';
 		string8 title_issue_date;
 		string1 name_source_cd;
 		string30 name_source;
+		string17 title_number; 		// populated with data from ExperianVIN gateway	
+		string30 reported_name;		// populated with data from ExperianVIN gateway	
 	END;
 
 	export layout_owner := RECORD
-		Layout_vehicle_party_out.layout_vehicle_party_owner and not [append_did, append_bdid];
+		VehicleV2_Services.Layout_vehicle_party_out.layout_vehicle_party_owner and not [append_did, append_bdid];
 		string3 age;
 		string12 append_did;
 		string12 append_bdid;
@@ -128,10 +130,11 @@ export assorted_layouts := MODULE
     layout_crim_indicators;
 		string10   geo_lat := '';
 		string11   geo_long := '';
+		string30 reported_name;
 	END;
 	
 	export layout_lienholder := RECORD
-		Layout_vehicle_party_out.layout_vehicle_party_lienholder and not [append_did, append_bdid];
+		VehicleV2_Services.Layout_vehicle_party_out.layout_vehicle_party_lienholder and not [append_did, append_bdid];
 		string3 age;
 		string12 append_did;
 		string12 append_bdid;
@@ -146,7 +149,7 @@ export assorted_layouts := MODULE
 	END;
 	
 	export layout_lessee_or_lessor := RECORD
-		Layout_vehicle_party_out.layout_vehicle_party_lessor and not [append_did, append_bdid];
+		VehicleV2_Services.Layout_vehicle_party_out.layout_vehicle_party_lessor and not [append_did, append_bdid];
 		string3 age;
 		string12 append_did;
 		string12 append_bdid;
@@ -160,7 +163,7 @@ export assorted_layouts := MODULE
 	END;
 
 	export layout_lessee := RECORD
-		Layout_vehicle_party_out.layout_vehicle_party_lessee and not [append_did, append_bdid];
+		VehicleV2_Services.Layout_vehicle_party_out.layout_vehicle_party_lessee and not [append_did, append_bdid];
 		string3 age;
 		string12 append_did;
 		string12 append_bdid;

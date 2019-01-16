@@ -139,9 +139,10 @@ EXPORT Functions:= MODULE
 	EXPORT fn_getOwnedProp(DATASET($.Layouts.borrower_layout) subject_info):= FUNCTION
 
     voo_shell_in := PROJECT(subject_info, $.Transforms.xform_vooShellIn(LEFT));
-    prop_ownership:= VerificationOfOccupancy.getPropOwnership(voo_shell_in);
+    deduped_voo_shell_in:= DEDUP(SORT(voo_shell_in, z5, prim_name, prim_range, sec_range), z5, prim_name, prim_range, sec_range);
+    prop_ownership:= VerificationOfOccupancy.getPropOwnership(deduped_voo_shell_in);
     owned_properties:= prop_ownership(property_owned='1' AND property_sold<>'1');
-    Owned_Addr := PROJECT(owned_properties, $.Transforms.xform_vooOwnedAddr(LEFT));
+    Owned_Addr := PROJECT(owned_properties, $.Transforms.xform_vooOwnedAddr(LEFT, COUNTER));
     deduped_owned_addr:= DEDUP(SORT(Owned_Addr, Zip, PrimName, PrimRange, SecRange), Zip, PrimName, PrimRange, SecRange);
 		
 	RETURN deduped_owned_addr;

@@ -1,4 +1,4 @@
-﻿IMPORT autoHeaderV2,AutoStandardI,doxie,EquifaxDecisioning,
+﻿IMPORT $,autoHeaderV2,AutoStandardI,doxie,EquifaxDecisioning,
        Gateway,iesp,riskwisefcra,Suppress; 
 
 EXPORT getAttributes (DATASET(doxie.layout_best) infile, 
@@ -49,9 +49,9 @@ EXPORT getAttributes (DATASET(doxie.layout_best) infile,
             SELF.SearchBy.Address.Zip := _rowInf.zip;
             SELF.SearchBy.SSN := ssn2send;
             SELF.SearchBy.DOB := iesp.ECL2ESP.toTDate2((UNSIGNED4)_rowInf.dob);
-            SELF.SearchBy.EndUser.CompanyName := EquifaxDecisioning.Constants.GATEWAY_END_USER_COMPANY_NAME;
-            SELF.SearchBy.EndUser.PermisablePurpose := EquifaxDecisioning.Constants.GATEWAY_END_USER_PERMISABLE_PURPOSE;
-            SELF.SearchBy.Models := DATASET([{EquifaxDecisioning.Constants.GATEWAY_MODEL_NUMBER,'',''}],iesp.equifax_sts.t_EqSTSModel);
+            SELF.SearchBy.EndUser.CompanyName := $.Constants.GATEWAY_END_USER_COMPANY_NAME;
+            SELF.SearchBy.EndUser.PermisablePurpose := $.Constants.GATEWAY_END_USER_PERMISABLE_PURPOSE;
+            SELF.SearchBy.Models := DATASET([{$.Constants.GATEWAY_MODEL_NUMBER,'',''}],iesp.equifax_sts.t_EqSTSModel);
             SELF := [];  // gateway params
           END;																
         
@@ -59,8 +59,8 @@ EXPORT getAttributes (DATASET(doxie.layout_best) infile,
         
         ds_gatewayConfig := gateways(Gateway.Configuration.IsEquifaxAcctDecisioning(serviceName))[1];
         gatewayOutput := Gateway.SoapCall_EquifaxDecisioning(gatewayInput,ds_gatewayConfig,pMakeGatewayCall):INDEPENDENT; 
-        _rowGw := gatewayOutput[1].Response.Report;
-        _rowGwHeader := gatewayOutput[1].Response._Header;
+        gatewayResp := gatewayOutput[1].Response;
+        _rowGw := gatewayResp.Report;
         
         // FCRA URL needed for the remote header search
         gateway_check := gateways (servicename IN riskwisefcra.Neutral_Service_Name)[1].url;
@@ -92,17 +92,17 @@ EXPORT getAttributes (DATASET(doxie.layout_best) infile,
         
         useGatewayResults := ds_gatewayRecDid[1].DID = _rowInf.DID;
 
-       EquifaxDecisioning.Layouts.Eq_DecisioningAttr xfm_getValidOutput (iesp.equifax_attributes.t_EquifaxAttributes gw_attributes) := 
+       $.Layouts.Eq_DecisioningAttr xfm_getValidOutput (iesp.equifax_attributes.t_EquifaxAttributes gw_attributes) := 
           TRANSFORM
-            SELF.EQUIFAX_GATEWAY_USAGE :=  EquifaxDecisioning.Constants.EQUIFAX_GATEWAY_USAGE.RESULTS_RETURNED;  
-            BalOpenAutoAcctsWithin3MonthsRaw :=  EquifaxDecisioning.Functions.getAttributeValue(gw_attributes, EquifaxDecisioning.Constants.ATTRIBUTE_TYPES.BAL_OPEN_AUTO_3MONTHS);
-            BalOpenMortgageAcctsWithin3MonthsRaw := EquifaxDecisioning.Functions.getAttributeValue(gw_attributes, EquifaxDecisioning.Constants.ATTRIBUTE_TYPES.BAL_OPEN_MORT_3MONTHS);
-            BalOpenHomeEquityLineAcctsWithin3MonthsRaw :=  EquifaxDecisioning.Functions.getAttributeValue(gw_attributes, EquifaxDecisioning.Constants.ATTRIBUTE_TYPES.BAL_OPEN_HOME_EQ_3MONTHS);
-            NumberUnpaidThirdPartyCollectionsRaw := EquifaxDecisioning.Functions.getAttributeValue(gw_attributes, EquifaxDecisioning.Constants.ATTRIBUTE_TYPES.NUM_UNPAID_3RD_PARTY_COL);
-            PercentBalToHighCredBankcardsWithin3MonthsRaw := EquifaxDecisioning.Functions.getAttributeValue(gw_attributes, EquifaxDecisioning.Constants.ATTRIBUTE_TYPES.PERCENT_BAL_TO_HIGH_CRED_BANKCARD_3MONTHS);
-            PercentBalToTotalLoanAmtAutoWithin3MonthsRaw :=  EquifaxDecisioning.Functions.getAttributeValue(gw_attributes, EquifaxDecisioning.Constants.ATTRIBUTE_TYPES.PERCENT_BAL_TO_TOTAL_AUTO_LOAN_3MONTHS);
-            PercentBalToTotalLoanAmtMortgageWithin3MonthsRaw := EquifaxDecisioning.Functions.getAttributeValue(gw_attributes, EquifaxDecisioning.Constants.ATTRIBUTE_TYPES.PERCENT_BAL_TO_TOTAL_MORT_LOAN_3MONTHS);
-            NumberOfThirdPartyCollectionsRaw := EquifaxDecisioning.Functions.getAttributeValue(gw_attributes, EquifaxDecisioning.Constants.ATTRIBUTE_TYPES.NUM_3RD_PARTY_COLLECTIONS);
+            SELF.EQUIFAX_GATEWAY_USAGE :=  $.Constants.EQUIFAX_GATEWAY_USAGE.RESULTS_RETURNED;  
+            BalOpenAutoAcctsWithin3MonthsRaw :=  $.Functions.getAttributeValue(gw_attributes, $.Constants.ATTRIBUTE_TYPES.BAL_OPEN_AUTO_3MONTHS);
+            BalOpenMortgageAcctsWithin3MonthsRaw := $.Functions.getAttributeValue(gw_attributes, $.Constants.ATTRIBUTE_TYPES.BAL_OPEN_MORT_3MONTHS);
+            BalOpenHomeEquityLineAcctsWithin3MonthsRaw :=  $.Functions.getAttributeValue(gw_attributes, $.Constants.ATTRIBUTE_TYPES.BAL_OPEN_HOME_EQ_3MONTHS);
+            NumberUnpaidThirdPartyCollectionsRaw := $.Functions.getAttributeValue(gw_attributes, $.Constants.ATTRIBUTE_TYPES.NUM_UNPAID_3RD_PARTY_COL);
+            PercentBalToHighCredBankcardsWithin3MonthsRaw := $.Functions.getAttributeValue(gw_attributes, $.Constants.ATTRIBUTE_TYPES.PERCENT_BAL_TO_HIGH_CRED_BANKCARD_3MONTHS);
+            PercentBalToTotalLoanAmtAutoWithin3MonthsRaw :=  $.Functions.getAttributeValue(gw_attributes, $.Constants.ATTRIBUTE_TYPES.PERCENT_BAL_TO_TOTAL_AUTO_LOAN_3MONTHS);
+            PercentBalToTotalLoanAmtMortgageWithin3MonthsRaw := $.Functions.getAttributeValue(gw_attributes, $.Constants.ATTRIBUTE_TYPES.PERCENT_BAL_TO_TOTAL_MORT_LOAN_3MONTHS);
+            NumberOfThirdPartyCollectionsRaw := $.Functions.getAttributeValue(gw_attributes, $.Constants.ATTRIBUTE_TYPES.NUM_3RD_PARTY_COLLECTIONS);
             SELF.BalOpenAutoAcctsWithin3Months :=  BalOpenAutoAcctsWithin3MonthsRaw;
             SELF.BalOpenMortgageAcctsWithin3Months := BalOpenMortgageAcctsWithin3MonthsRaw;
             SELF.BalOpenHomeEquityLineAcctsWithin3Months :=  BalOpenHomeEquityLineAcctsWithin3MonthsRaw;
@@ -111,39 +111,32 @@ EXPORT getAttributes (DATASET(doxie.layout_best) infile,
             SELF.PercentBalToTotalLoanAmtAutoWithin3Months :=  PercentBalToTotalLoanAmtAutoWithin3MonthsRaw;
             SELF.PercentBalToTotalLoanAmtMortgageWithin3Months := PercentBalToTotalLoanAmtMortgageWithin3MonthsRaw;
             SELF.NumberOfThirdPartyCollections := NumberOfThirdPartyCollectionsRaw;
-            SELF.BalOpenAutoAcctsWithin3MonthsVal :=  EquifaxDecisioning.Functions.fn_processTotalOpenAuto(BalOpenAutoAcctsWithin3MonthsRaw);
-            SELF.BalOpenMortgageAcctsWithin3MonthsVal := EquifaxDecisioning.Functions.fn_processTotalOpenMortgage(BalOpenMortgageAcctsWithin3MonthsRaw);
-            SELF.BalOpenHomeEquityLineAcctsWithin3MonthsVal :=  EquifaxDecisioning.Functions.fn_processTotalOpenHomeEquity(BalOpenHomeEquityLineAcctsWithin3MonthsRaw);
-            SELF.NumberUnpaidThirdPartyCollectionsVal := EquifaxDecisioning.Functions.fn_processUnpaid3rdParty(NumberUnpaidThirdPartyCollectionsRaw);
-            SELF.PercentBalToHighCredBankcardsWithin3MonthsVal := EquifaxDecisioning.Functions.fn_processPercentBankcards(PercentBalToHighCredBankcardsWithin3MonthsRaw);
-            SELF.PercentBalToTotalLoanAmtAutoWithin3MonthsVal :=  EquifaxDecisioning.Functions.fn_processPercentAuto(PercentBalToTotalLoanAmtAutoWithin3MonthsRaw);
-            SELF.PercentBalToTotalLoanAmtMortgageWithin3MonthsVal := EquifaxDecisioning.Functions.fn_processPercentMortgage(PercentBalToTotalLoanAmtMortgageWithin3MonthsRaw);
-            SELF.NumberOfThirdPartyCollectionsVal := EquifaxDecisioning.Functions.fn_processNum3rdParty(NumberOfThirdPartyCollectionsRaw);
-            SELF.EqfxGatewayErrorStatus := 0;
-            SELF.EqfxGatewayMessage := '';
+            SELF.BalOpenAutoAcctsWithin3MonthsVal :=  $.Functions.fn_processTotalOpenAuto(BalOpenAutoAcctsWithin3MonthsRaw);
+            SELF.BalOpenMortgageAcctsWithin3MonthsVal := $.Functions.fn_processTotalOpenMortgage(BalOpenMortgageAcctsWithin3MonthsRaw);
+            SELF.BalOpenHomeEquityLineAcctsWithin3MonthsVal :=  $.Functions.fn_processTotalOpenHomeEquity(BalOpenHomeEquityLineAcctsWithin3MonthsRaw);
+            SELF.NumberUnpaidThirdPartyCollectionsVal := $.Functions.fn_processUnpaid3rdParty(NumberUnpaidThirdPartyCollectionsRaw);
+            SELF.PercentBalToHighCredBankcardsWithin3MonthsVal := $.Functions.fn_processPercentBankcards(PercentBalToHighCredBankcardsWithin3MonthsRaw);
+            SELF.PercentBalToTotalLoanAmtAutoWithin3MonthsVal :=  $.Functions.fn_processPercentAuto(PercentBalToTotalLoanAmtAutoWithin3MonthsRaw);
+            SELF.PercentBalToTotalLoanAmtMortgageWithin3MonthsVal := $.Functions.fn_processPercentMortgage(PercentBalToTotalLoanAmtMortgageWithin3MonthsRaw);
+            SELF.NumberOfThirdPartyCollectionsVal := $.Functions.fn_processNum3rdParty(NumberOfThirdPartyCollectionsRaw);
+            SELF.Equifax_gateway_usage_Status := '';
           END;
         
         ds_resultsToReturn := DATASET([xfm_getValidOutput(_rowGw.Attributes[1])]);
         
         ds_GatewayResultsToReturn := 
           MAP(~gw_Requested =>
-                 EquifaxDecisioning.Functions.fn_formatGatewayUsageOutput(EquifaxDecisioning.Constants.EQUIFAX_GATEWAY_USAGE.GATEWAY_NOT_REQUESTED),
+                 $.Functions.fn_formatGatewayUsageOutput($.Constants.EQUIFAX_GATEWAY_USAGE.GATEWAY_NOT_REQUESTED),
               ~pMakeGatewayCall OR ~hasEquifaxAccess OR suppress_due_alerts => 
-                 EquifaxDecisioning.Functions.fn_formatGatewayUsageOutput(EquifaxDecisioning.Constants.EQUIFAX_GATEWAY_USAGE.GATEWAY_NOT_CALLED),
-              _rowGwHeader.Status != 0  OR _rowGW.ERROR.NumberOfFormatErrors != '' OR _rowGW.ERROR.NumberOfValidityErrors != '' OR _rowGW.ERROR.NumberOfProcessingErrors != '' OR _rowGW.ModelError.ErrorCode != '' =>
-                 EquifaxDecisioning.Functions.fn_formatGatewayUsageOutput(EquifaxDecisioning.Constants.EQUIFAX_GATEWAY_USAGE.GATEWAY_ERROR_RETURNED,_rowGwHeader.Status,_rowGW.ERROR,_rowGW.ModelError),
+                 $.Functions.fn_formatGatewayUsageOutput($.Constants.EQUIFAX_GATEWAY_USAGE.GATEWAY_NOT_CALLED),
+              $.Functions.fn_checkGwError(gatewayResp) =>
+                 $.Functions.fn_formatGatewayUsageOutput($.Constants.EQUIFAX_GATEWAY_USAGE.GATEWAY_ERROR_RETURNED, gatewayResp),
               ~EXISTS(_rowGw.Attributes) => 
-                 EquifaxDecisioning.Functions.fn_formatGatewayUsageOutput(EquifaxDecisioning.Constants.EQUIFAX_GATEWAY_USAGE.NO_GATEWAY_ATTRIBUTES_RETURNED),
+                 $.Functions.fn_formatGatewayUsageOutput($.Constants.EQUIFAX_GATEWAY_USAGE.NO_GATEWAY_ATTRIBUTES_RETURNED),
               ~useGatewayResults =>
-                 EquifaxDecisioning.Functions.fn_formatGatewayUsageOutput(EquifaxDecisioning.Constants.EQUIFAX_GATEWAY_USAGE.NO_DID_MATCH),
+                 $.Functions.fn_formatGatewayUsageOutput($.Constants.EQUIFAX_GATEWAY_USAGE.NO_DID_MATCH),
                  ds_resultsToReturn
               );
-OUTPUT(gatewayInput, NAMED('gatewayInput'));
-OUTPUT(gatewayOutput, NAMED('gatewayOutput'));
-OUTPUT(ds_gatewayRecToGetDid, NAMED('ds_gatewayRecToGetDid'));
-OUTPUT(ds_gatewayRecDid, NAMED('ds_gatewayRecDid'));
-OUTPUT(useGatewayResults, NAMED('useGatewayResults'));
-
+              
        RETURN ds_GatewayResultsToReturn; 
-     END;    
-  
+     END; 

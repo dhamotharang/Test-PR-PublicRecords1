@@ -1,7 +1,7 @@
 IMPORT VehicleV2_Services;
 export transform_vehiclesV2 (dataset (VehicleV2_Services.Layout_Report) vehi) := function
 
-Mac_set_PersonOrBusiness(name_source) :=	macro
+Mac_set_PersonOrBusiness(name_source,reported_name) :=	macro
 			Self.UniqueId := L.Append_DID,
 			Self.Name := row(L,transform(iesp.share.t_name,self.full := '',
 														self.First := left.fname,
@@ -46,20 +46,21 @@ Mac_set_PersonOrBusiness(name_source) :=	macro
 			self.BusinessIDs.powid := l.powid;
 			self.IdValue := '';
 			self.NameSource := name_source;
+			self.ReportedName := reported_name;
 endmacro;
 
 
 iesp.motorvehicle.t_MotorVehicleReportLessee SetLesseesV2 (VehicleV2_Services.assorted_layouts.Layout_Lessee L) := TRANSFORM
 		Self.HistoryDescription := L.history_desc,
 		Self.LesseeInfo := row(L, transform (iesp.motorvehicle.t_MotorVehicleReportPersonOrBusiness,
-			Mac_set_PersonOrBusiness('')
+			Mac_set_PersonOrBusiness('','')
 		));
 END;		
 
 iesp.motorvehicle.t_MotorVehicleReportLessor SetLessorsV2 (VehicleV2_Services.assorted_layouts.layout_lessee_or_lessor L) := TRANSFORM
 		Self.HistoryDescription := L.history_desc,
 		Self.LessorInfo := row(L, transform (iesp.motorvehicle.t_MotorVehicleReportPersonOrBusiness,
-			Mac_set_PersonOrBusiness(L.name_source)
+			Mac_set_PersonOrBusiness(L.name_source,'')
 		));
 END;		
 
@@ -73,7 +74,7 @@ END;
 iesp.motorvehicle.t_MotorVehicleReportLienHolder SetLienHoldersV2 (VehicleV2_Services.assorted_layouts.Layout_lienholder L) := TRANSFORM
 	Self.HistoryDescription := L.history_desc,
 	Self.LienHolderInfo := row(L, transform (iesp.motorvehicle.t_MotorVehicleReportPersonOrBusiness,
-			Mac_set_PersonOrBusiness(L.name_source)
+			Mac_set_PersonOrBusiness(L.name_source,'')
 	));
   Self.LienDate := iesp.ECL2ESP.toDate ((integer4) L.Orig_Lien_Date);
 	Self.StandardizedName := L.std_lienholder_name;
@@ -93,7 +94,7 @@ end;
 iesp.motorvehicle.t_MotorVehicleReportOwner SetOwnersV2 (VehicleV2_Services.assorted_layouts.Layout_owner L) := TRANSFORM
 		Self.HistoryDescription := L.history_desc,
 		Self.OwnerInfo := row(L, transform (iesp.motorvehicle.t_MotorVehicleReportPersonOrBusiness,
-			Mac_set_PersonOrBusiness('')
+			Mac_set_PersonOrBusiness('','')
 		));
 		Self.TitleInfo := row(TitleInfo_trans(L));
 		Self.SourceDateFirstSeen := iesp.ECL2ESP.toDatestring8(L.SRC_FIRST_DATE);
@@ -120,11 +121,12 @@ end;
 iesp.motorvehicle.t_MotorVehicleReportRegistrant SetRegistrantsV2 (VehicleV2_Services.assorted_layouts.Layout_registrant L) := TRANSFORM
 		Self.HistoryDescription := L.history_desc,
 		Self.RegistrantInfo := row(L, transform (iesp.motorvehicle.t_MotorVehicleReportPersonOrBusiness,
-			Mac_set_PersonOrBusiness(L.name_source)
+			Mac_set_PersonOrBusiness(L.name_source,l.reported_name)
 		));
 	
 		Self.RegistrationInfo := row(RegistrationInfo_trans(L));
 		Self.TitleIssueDate := iesp.ECL2ESP.toDatestring8(L.title_issue_date);
+		Self.TitleNumber := L.title_number;		
 END;
 
 iesp.motorvehicle.t_MotorVehicleReportVehicleInfo VehicleInfo_trans(VehicleV2_Services.Layout_Report L) := transform
