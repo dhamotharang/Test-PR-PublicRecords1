@@ -5,6 +5,11 @@ IMPORT _control, std, header;
 #workunit('name', 'PersonHeader: _CRON_Header_Ingest_Controller');
 EVERY_2_HR_ON_SUN_MON_TUE := '0 */2 * * 0,1,2';
 
+wuname := '*Header Ingest*';
+valid_state := ['','unknown','submitted', 'compiling','compiled','blocked','running','wait'];
+d := sort(nothor(WorkunitServices.WorkunitList('',NAMED jobname:=wuname))(wuid <> thorlib.wuid() and state in valid_state), -wuid):independent;
+active_workunit :=  exists(d);
+
 today := (STRING8)Std.Date.Today() : independent;
 
 file_version(string super) := function        
@@ -26,7 +31,7 @@ run := if(status <> 0, true, false);
 
 ecl:=    'IMPORT header;\n'
        + '#WORKUNIT(\'name\',\'PersonHeader: Monitor Header Ingest Scheduler\');\n'
-       + if(run, 'notify(\'Build_Header_Ingest\',\'*\');\n', 'output(\'NO Ingest Build to be Recovered\');\n')
+       + if(active_workunit,'fileservices.sendemail(Header.email_list.BocaDevelopers,\'Monitoring Header Ingest\',\'Header Ingest is RUNNING Right now\');\n',if(run, 'notify(\'Build_Header_Ingest\',\'*\');\n', 'output(\'NO Ingest Build to be Recovered\');\n'))
         ;
 
 _control.fSubmitNewWorkunit(ecl,'hthor_eclcc'):WHEN( CRON(EVERY_2_HR_ON_SUN_MON_TUE));

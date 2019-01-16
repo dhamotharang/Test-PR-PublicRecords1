@@ -25,11 +25,6 @@ ECL0:=
 +'// Expected execution time -> Estimated 24-48 hrs\n'	
 +'\n'
 ;
-wuname := '*Header Ingest*';
-valid_state := ['','unknown','submitted', 'compiling','compiled','blocked','running','wait'];
-d := sort(nothor(WorkunitServices.WorkunitList('',NAMED jobname:=wuname))(wuid <> thorlib.wuid() and state in valid_state), -wuid):independent;
-active_workunit :=  exists(d);
-run_build          := if(active_workunit, 'false', 'true');
 
 today := (STRING8)Std.Date.Today() : independent;
 
@@ -53,7 +48,7 @@ build_version := if(status <> 0, ver, today); // 0 -> Completed
 incremental := if(isMonthly, 'false', 'true');
 ingestType := if(isMonthly, 'monthly', 'incremental');
 
-ECL1 := '\n'
+ECL := '\n'
 +'#WORKUNIT(\'protect\',true);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
@@ -71,14 +66,7 @@ ECL1 := '\n'
 
 +'Header_Ops.hdr_bld_ingest(\'' + build_version + '\',' + incremental + ', ' + status + ');\n';
 
-ECL := ECL0
-     + if(run_build='true'
-         ,ECL1
-	     ,'wuname := \'Header Ingest is RUNNING Right now\';\n'
-	       + '#WORKUNIT(\'name\', wuname);\n'
-	 );
-
-THOR := if (active_workunit,'hthor_eclcc','thor400_44_eclcc');
+THOR := 'thor400_44_eclcc';
 
 NOC_MSG
 	:=

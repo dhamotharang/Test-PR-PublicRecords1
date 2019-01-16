@@ -15,7 +15,7 @@ EXPORT map_RIS0811_conversion(STRING pVersion) := FUNCTION
 	oCMV 								:= OUTPUT(Cmvtranslation);
 	AddrExceptions 			:= '(DRIVE|CENTER|BUILDING|CENTRE|PLANTATION|MAIN &|BUSINESS PARK| WAY|APTS|SQUARE|PLAZA|PLACE|TWO )';
 	C_O_Ind 						:= '(C/O |ATTN: |ATTN )';
-	DBA_Ind 						:= '(.DBA| DBA |D/B/A |/DBA )';
+	DBA_Ind 						:= '(.DBA| DBA |D/B/A |/DBA | AKA)';
   Addr_Pattern        := '( AVENUE$| DRIVE$| STREET$| STE | RD$)';
 	RemovePattern	  := '(^.* LLC$|^.* LLC\\.$|,LLC$|^.* INC$|^.* INC\\.$|^.* COMPANY$|^.* CORP$|^.*APPRAISAL$|^.*APPRAISALS$|' +
 					 '^.* APPR\\.$|^.* APPRAISAL SERVICE$|^.* APPRAISAL GROUP$|^.* APPRAISAL CO$|^.* FINANCIAL$|' +

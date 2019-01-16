@@ -13,10 +13,5 @@ module
        dataset(lay_builds) pBuildFilenames := Filenames(pversion,pUseProd).Base_AsSrc.dAll_filenames;
        export buildfiles := tools.mod_PromoteBuild(pversion,pBuildFilenames,pFilter,pDelete,pisTesting);
     end;
-    
-    export Promote_Seed_AsHeader := module
-       dataset(lay_builds)	pBuildFilenames := Filenames(pversion,pUseProd).Base_AsHeader.dAll_filenames;
-       export buildfiles := tools.mod_PromoteBuild(pversion,pBuildFilenames,pFilter,pDelete,pisTesting);
-    end; 
 	
 end;
