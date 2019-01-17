@@ -130,17 +130,22 @@ module
 			,FraudgovInfo(pversion[1..8],'Keys_Completed').SetPreviousVersion			
 		) : success(Send_Emails(pversion).Roxie), failure(Send_Emails(pversion).BuildFailure);	
 
-	export keys_portion := if(	Mac_TestBuild(pversion) 			= 'Passed' and 
-												Mac_TestRecordID(pversion) 		= 'Passed' and 
-												Mac_TestRinID(pversion) 			= 'Passed', 
-												Build_FraudShared_Keys, 
-												Rollback().All);
+	Test_Build := Mac_TestBuild(pversion);
+	Test_RecordID := Mac_TestRecordID(pversion);
+	Test_RinID := Mac_TestRinID(pversion);
+	
+	export keys_portion := 
+		if( Test_Build = 'Passed' and 
+			Test_RecordID = 'Passed' and 
+			Test_RinID = 'Passed', 
+			Build_FraudShared_Keys, 
+			Rollback('',Test_Build,Test_RecordID,Test_RinID).All);
 	
 	export Build_FraudGov_Base := 
 	if(tools.fun_IsValidVersion(pversion)
 		,base_portion 
 		,output('No Valid version parameter passed, skipping FraudGovPlatform.Build_Base')
-	): success(Send_Emails(pversion).BuildSuccess), failure(Send_Emails(pversion).BuildFailure);
+	);
 
 	export Build_Fraudgov_Keys :=
 	if(tools.fun_IsValidVersion(pversion)
