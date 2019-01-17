@@ -53,14 +53,15 @@ export STR_Functions := MODULE
 	EXPORT fn_get_best_recs(dataset(doxie.layout_references) dids, 
 	                        BatchServices.Interfaces.str_config in_mod) := FUNCTION
 
-		doxie.MAC_Header_Field_Declare();
+    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
+    glb_ok :=  mod_access.isValidGLB ();
+    dppa_ok := mod_access.isValidDPPA ();
 		
 		ds_best_recs_raw := doxie.best_records(dids
-																					 ,DPPA_override := DPPA_Purpose
-																					 ,GLB_override  := GLB_Purpose
 																					 ,doSuppress    := false
 																					 ,include_minors:= in_mod.IncludeMinors
-																					 ,getSSNBest    := in_mod.GetSSNBest
+																					 ,getSSNBest    := in_mod.GetSSNBest,
+																					 modAccess      := mod_access
 							                            );
 		// additional join to header so we can find a dt_first_seen (not available in best).
 		addr_hdr_recs := 
@@ -76,7 +77,7 @@ export STR_Functions := MODULE
 						transform(header.Layout_Header, self := right, self := []),
 						limit(ut.limits.HEADER_PER_DID, skip));
 						
-		Header.MAC_GlbClean_Header(addr_hdr_recs,addr_hdr_recs_clean);
+		Header.MAC_GlbClean_Header(addr_hdr_recs,addr_hdr_recs_clean, , , mod_access);
 
     addr_hrd_recs_by_did := dedup(sort(addr_hdr_recs_clean, did, dt_first_seen=0, dt_first_seen), did);
 		//*********************Get address history rank**********************/

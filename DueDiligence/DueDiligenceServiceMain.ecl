@@ -2,8 +2,8 @@
       
       
       //********************************************************PERSON ATTRIBUTES HERE**********************************************************
-      SHARED mac_getPersonAttributes(cleaned, rawPlusSeq) := FUNCTIONMACRO
-          consumerResults := DueDiligence.getIndAttributes(cleaned, dppa, glba, drm, DD_SSNMask, includeReport, displayAttributeText, debugIndicator);
+      SHARED mac_getPersonAttributes(cleaned, rawPlusSeq, busOptions, busLinkingOptions) := FUNCTIONMACRO
+          consumerResults := DueDiligence.getIndAttributes(cleaned, dppa, glba, drm, DD_SSNMask, includeReport, displayAttributeText, debugIndicator, busOptions, busLinkingOptions);
 		 
           indIndex := DueDiligence.CommonQuery.GetIndividualAttributes(consumerResults);
           indIndexHits := DueDiligence.CommonQuery.GetIndividualAttributeFlags(consumerResults);
@@ -19,9 +19,7 @@
       
       
       //********************************************************BUSINESS ATTRIBUTES HERE********************************************************
-      SHARED mac_getBusinessAttributes(cleaned, rawPlusSeq) := FUNCTIONMACRO
-          DueDiligence.CommonQuery.mac_GetBusinessOptionSettings(dppa, glba, drm, dpm, userIn.IndustryClass);
-
+      SHARED mac_getBusinessAttributes(cleaned, rawPlusSeq, busOptions, busLinkingOptions) := FUNCTIONMACRO
           businessResults := DueDiligence.getBusAttributes(cleaned, busOptions, busLinkingOptions, includeReport, displayAttributeText, DD_SSNMask, debugIndicator);
 
           busIndex := DueDiligence.CommonQuery.GetBusinessAttributes(businessResults);
@@ -45,8 +43,10 @@
       
       cleanData := DueDiligence.CommonQuery.GetCleanData(validRequests);
       
+      DueDiligence.CommonQuery.mac_GetBusinessOptionSettings(dppa, glba, drm, dpm, userIn.IndustryClass);
+      
       //based on what was requested, call the appropriate attributes  
-      ddFinal := IF(requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, mac_getPersonAttributes(cleanData, rawWithSeq), mac_getBusinessAttributes(cleanData, rawWithSeq));
+      ddFinal := IF(requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, mac_getPersonAttributes(cleanData, rawWithSeq, busOptions, busLinkingOptions), mac_getBusinessAttributes(cleanData, rawWithSeq, busOptions, busLinkingOptions));
       
 
 

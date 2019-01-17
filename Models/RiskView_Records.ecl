@@ -374,7 +374,7 @@ VALIDATING := false;
 		suppressNearDups, fromBIID, excludeWatchlists, fromIT1O,
 		ofacVersion, includeOfac, includeAddWatchlists, watchlistThreshold,
 			bsVersion, isPreScreen, doScore, ADL_Based_Shell:=false, datarestriction:=datarestriction, BSOptions:=BSOptions,
-			datapermission:=datapermission,IN_isDirectToConsumer:=isDirectToConsumerPurpose	
+			datapermission:=datapermission,IN_isDirectToConsumer:=isDirectToConsumerPurpose, IntendedPurpose:=purpose_value	
 	);
 	adl_clam := Risk_Indicators.Boca_Shell_Function_FCRA(
 		bsprep, gateways, dppa, glba, isUtility, isLN,
@@ -382,7 +382,7 @@ VALIDATING := false;
 		suppressNearDups, fromBIID, excludeWatchlists, fromIT1O,
 		ofacVersion, includeOfac, includeAddWatchlists, watchlistThreshold,
 		bsVersion, isPreScreen, doScore, ADL_Based_Shell:=true, datarestriction:=datarestriction, BSOptions:=BSOptions,
-		datapermission:=datapermission,IN_isDirectToConsumer:=isDirectToConsumerPurpose	
+		datapermission:=datapermission,IN_isDirectToConsumer:=isDirectToConsumerPurpose, IntendedPurpose:=purpose_value	
 	);
 
 	Models.Layout_Reason_Codes form_rc(Models.Layout_ModelOut le) := TRANSFORM
@@ -1799,6 +1799,7 @@ ExperianTransaction := DataRestriction[risk_indicators.iid_constants.posExperian
 	self.value := map( (c < 322 OR c > 322) and le.version3.PrescreenOptOut = '1' => '', // opt out applies, blank all return values
 										 c <= 327 AND c <> 207 AND le.version3.SecurityFreeze => '', // Security Freeze Found - Mask all attributes except Security Freeze
 										 c <= 327 and c <> 11 and ExperianTransaction and le.version3.isnover => '',  // blank out all attributes for Experian transactions if VerificationFailure
+                     c <= 327 and c <> 11 and le.v4_ConsumerStatement='1' => '', // blank out all attributes for someone with consumer statement.  Riskview Dempsey req 4.5, https://jira.rsi.lexisnexis.com/browse/RQ-14829
 										 c=1 => le.version3.AgeOldestRecord,
 										 c=2 => le.version3.AgeNewestRecord,
 										 c=3 => checkBoolean(le.version3.isRecentUpdate),

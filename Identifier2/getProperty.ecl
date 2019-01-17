@@ -7,6 +7,8 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 								integer Ever_Owned_Input_Property_InPastNumberOfYears=0,
 								boolean IncludePropDetails=false) := function
 
+  boolean ExactAddrMatch := false 				: stored('ExactAddrMatch');
+
 	kp := ln_propertyv2.key_prop_address_v4;
   key_did := LN_PropertyV2.key_Property_did(false);
   key_search := LN_PropertyV2.key_search_fid(false);
@@ -27,7 +29,7 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 			and left.z5 != ''
 			and keyed(left.prim_range = right.prim_range)
 			and keyed(left.prim_name = right.prim_name)
-			and keyed(right.sec_range in ['',left.sec_range])
+			and keyed(right.sec_range in if(ExactAddrMatch, [left.sec_range], [left.sec_range,'']))
 			and keyed(left.z5 = right.zip)
 			and keyed(left.addr_suffix = right.suffix) 
 			and keyed(left.predir = right.predir or left.predir = '' or right.predir = '')       //September, 2018 - tighten up the match logic by address 
@@ -39,7 +41,7 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
 			and left.z5 != ''
 			and keyed(left.prim_range = right.prim_range)
 			and keyed(left.prim_name = right.prim_name)
-			and keyed(right.sec_range in ['',left.sec_range])
+			and keyed(right.sec_range in if(ExactAddrMatch, [left.sec_range], [left.sec_range,'']))
 			and keyed(left.z5 = right.zip)
 			and keyed(left.addr_suffix = right.suffix)
 			and keyed(left.predir = right.predir or left.predir = '' or right.predir = '')     //September, 2018 - tighten up the match logic by address 
@@ -359,6 +361,6 @@ export getProperty(dataset(identifier2.layout_Identifier2) indata,
   // output(deeds_rolled, named('deeds_rolled'));  
   // output(assessors_sorted, named('assessors_sorted'));
   // output(assessors_rolled, named('assessors_rolled'));
-  
+
 	return slimmed;
 end;

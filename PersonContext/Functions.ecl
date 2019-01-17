@@ -179,8 +179,8 @@ EXPORT FUNCTIONS := MODULE
 
     //combine the results from the two joins and then sort and dedup on the key fields. 
     //We will have duplicates in the two joins we need to get rid of.
-    dsSrtRoxieKeyRecs := SORT(dsResultLexID + dsResultRecID,LexID,RecID1,RecID2,RecID3,RecID4,StatementId);
-    dsDDRoxieKeyRecs  := DEDUP(dsSrtRoxieKeyRecs,LexID,RecID1,RecID2,RecID3,RecID4,StatementId);
+    dsSrtRoxieKeyRecs := dsResultLexID + dsResultRecID;
+    dsDDRoxieKeyRecs  := DEDUP(dsSrtRoxieKeyRecs,RECORD,ALL);
 
     //put the results in the response rec layout to make it a common structure with the other searches.
     PCL.Layout_PCResponseRec ReFormat(dsDDRoxieKeyRecs RK) := TRANSFORM

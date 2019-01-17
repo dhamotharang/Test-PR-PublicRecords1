@@ -68,12 +68,13 @@ OFAC_Set := ['np21', 'np25', 'np27', 'np50', 'np60', 'np90', 'np91', 'np92'];
 
 ofac_version := map( tribcode in OFAC_Set and OFACversion = 4 => OFACversion,
 					tribcode in ['np90','np91','np92'] and OFACversion != 4 => 3, 
-																			   1);
-include_ofac := map(	tribcode in OFAC_Set and OFACversion = 4 => true,
-						tribcode in ['np90','np91','np92'] and OFACversion != 4 => true, 
+																			   OFACversion);
+include_ofac := map(	tribcode in OFAC_Set and ofac_version >= 4 => true,
+						tribcode in ['np90','np91','np92'] and ofac_version != 4 => true,
+                      tribcode in OFAC_Set and ofac_version >= 2 =>   true,
 																				   false);
-watchlist_threshold := map( tribcode in OFAC_Set and OFACversion = 4 => 0.85, 
-							tribcode in ['np90','np91','np92'] and OFACversion != 4 => 0.85, 
+watchlist_threshold := map( tribcode in OFAC_Set and ofac_version = 4 => 0.85, 
+							tribcode in ['np90','np91','np92'] and ofac_version != 4 => 0.85, 
 																					   0.84);
 
 //options for target model fp1403 to get cvi from np31

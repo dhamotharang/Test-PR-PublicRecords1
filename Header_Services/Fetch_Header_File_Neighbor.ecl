@@ -1,7 +1,8 @@
 import header, doxie, ut, AutoHeaderI, AutoStandardI, AutoheaderV2;
-doxie.MAC_Header_Field_Declare()
+doxie.MAC_Header_Field_Declare() //PII
 doxie.MAC_Selection_Declare()
 
+mod_access := doxie.compliance.GetGlobalDataAccessModule ();
 // search header by address
 tempmod := module(project(AutoStandardI.GlobalModule(),AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full,opt))
   // I can blank some specific fields here to ease up a cleaning a little, if needed.
@@ -24,7 +25,7 @@ UncleanSearchRecs := JOIN(addr_matches_d,doxie.Key_Header,
                         transform (header.Layout_Header, Self := Right),
                         limit (ut.limits.HEADER_PER_DID, skip)); // formality, to avoid a warning
 
-header.MAC_GlbClean_Header(UncleanSearchRecs,SearchRecs);
+header.MAC_GlbClean_Header(UncleanSearchRecs,SearchRecs, , , mod_access);
 SortedSearchRecs := SORT(SearchRecs	
 												,prim_range
 												,predir
@@ -83,15 +84,9 @@ nbrs := doxie.nbr_records(
 	Neighbors_PerAddress,
 	Neighbors_Per_NA,
 	Neighbor_Recency,
-	industry_class_value,
-	GLB_Purpose,
-	DPPA_Purpose,
-	probation_override_value,
-	no_scrub,
-	glb_ok,
-	dppa_ok,
-	ssn_mask_value,,,,
-	false  // this service does not need to apply RNA glb restrictions because the neighbors are the subject
+	,,,
+	false,  // this service does not need to apply RNA glb restrictions because the neighbors are the subject
+  mod_access
 );
 
 // expand to include fields required (but ignored) below

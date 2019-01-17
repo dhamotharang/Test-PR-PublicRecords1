@@ -50,8 +50,8 @@ export fn_fcra_ffd_batch(dataset(BatchServices.layout_BankruptcyV3_Batch_out) ds
 
     recs_main := join(recs_deb, slim_pc_recs,
                       left.tmsid = right.RecID1 and
-                      ((unsigned6)left.debtor_did  =  (unsigned6) right.lexid) and
-                      (left.acctno  =  right.acctno) and
+                      ((unsigned6)left.inquiry_lexID = (unsigned6)right.lexid) and
+                      (left.acctno = right.acctno) and
                       right.DataGroup = FFD.Constants.DataGroups.BANKRUPTCY_MAIN,
                       xmainStatements(left,right),
                       left outer,
@@ -73,7 +73,7 @@ export fn_fcra_ffd_batch(dataset(BatchServices.layout_BankruptcyV3_Batch_out) ds
     // we create statements here disregarding ShowConsumerStatements option. The decision on whether to report statements/alerts/disputes is made later when preparing final output
     recs_out := PROJECT(recs_main, formstatements(left));
     // records maybe suppressed due to alerts
-    ds_out := FFD.Mac.ApplyConsumerAlertsBatch(recs_out, alert_flags, Statements, BatchServices.layout_BankruptcyV3_Batch_FCRA.out_pre, inFFDOptionsMask, debtor_did, alert_data_under_dispute);
+    ds_out := FFD.Mac.ApplyConsumerAlertsBatch(recs_out, alert_flags, Statements, BatchServices.layout_BankruptcyV3_Batch_FCRA.out_pre, inFFDOptionsMask, inquiry_lexID, alert_data_under_dispute);
 
     // Sequencing for FCRA FFD. Also remove legal flag alert per project requirements.
     ds_out_seq := PROJECT(ds_out, TRANSFORM(BatchServices.layout_BankruptcyV3_Batch_FCRA.out_pre, SELF.SequenceNumber := COUNTER,

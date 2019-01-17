@@ -1,4 +1,4 @@
-﻿import FCRA, Riskwise, _control, Gateway;
+﻿import FCRA, Risk_Indicators, _control, Gateway;
 onThor := _Control.Environment.OnThor;
 
 USE_BOCA_SHELL_LIBRARY := not _Control.LibraryUse.ForceOff_Risk_Indicators__LIB_Boca_Shell_Function;
@@ -36,7 +36,8 @@ export Boca_Shell_Function_FCRA (	DATASET (risk_indicators.Layout_input) pre_iid
 																	string50 DataPermission=risk_indicators.iid_constants.default_DataPermission,
 																	BOOLEAN	IN_isDirectToConsumer = false,
 																	BOOLEAN IncludeLnJ = false,
-                 integer2 ReportingPeriod = 84 
+                 integer2 ReportingPeriod = 84,
+                 string100 IntendedPurpose = ''
                  ) := FUNCTION
 
 // for batch queries, dedup the input to reduce searching
@@ -99,7 +100,8 @@ seq_map := join( pre_iid1, pre_iid,
 			export real bs_Global_watchlist_threshold       := IN_Global_watchlist_threshold;
 			export boolean bs_IsDirectToConsumer						:= IN_isDirectToConsumer;
 			export boolean bs_IncludeLnJ										:= IncludeLnJ;
-   export integer2 bs_ReportingPeriod := ReportingPeriod; 
+      export integer2 bs_ReportingPeriod := ReportingPeriod; 
+      export string100 bs_IntendedPurpose := IntendedPurpose;
 	END;
 
 	fcra_shell_results := library('Risk_Indicators.LIB_Boca_Shell_Function_FCRA', Risk_Indicators.IBoca_Shell_Function_FCRA(pre_iid, gateways, args)).results;
@@ -117,7 +119,7 @@ seq_map := join( pre_iid1, pre_iid,
 									 isUtility, isLN, includeRelativeInfo, require2Ele,
 									 IN_OFAC_Only, IN_SuppressNearDups, IN_From_BIID, IN_ExcludeWatchLists, IN_From_IT1O,
 									 IN_OFAC_Version, IN_Include_OFAC, IN_Include_additional_watchlists, IN_Global_watchlist_threshold,
-									 IN_BSversion, nugen, ADL_Based_Shell, DataRestriction, append_best, BSOptions, DataPermission
+									 IN_BSversion, nugen, ADL_Based_Shell, DataRestriction, append_best, BSOptions, DataPermission, IntendedPurpose
 									 );
 		ids_wide_roxie := group(sort(ids_result, seq), seq);
 		ids_wide_thor := group(sort(distribute(ids_result, hash64(seq)), seq, LOCAL), seq, LOCAL);
@@ -150,7 +152,8 @@ seq_map := join( pre_iid1, pre_iid,
 							true,  // filter out fares always true in FCRA
 							DataRestriction,
 							BSOptions, glb, gateways, DataPermission, IN_isDirectToConsumer, 
-							IncludeLnJ, ReportingPeriod := ReportingPeriod 
+							IncludeLnJ, ReportingPeriod, adl_based_shell
+
        );
 
 

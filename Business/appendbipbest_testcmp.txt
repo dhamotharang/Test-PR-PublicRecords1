@@ -1,0 +1,128 @@
+﻿ID "HIPIE_Plugins.Business.AppendBIPBest_cmp";
+NAME AppendBIPBest_testcmp;
+LABEL "Test composition for Append BIP Best";
+DESCRIPTION "Auto-generated test composition for plugin AppendBIPBest";
+VERSION "1.0.0";
+AUTHOR "CarmigJX";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING CompareWUID: DEFAULT("W20171214-092829");
+END
+INSTANCE OutDataset.OutDataset(Ins004): LABEL("Output Dataset"),VERSION("1.0.0")
+	dsInput="^Ins003|dsOutput"
+	name="~qa::business::appendbipbest::output" 
+	Method="THOR"
+END
+INSTANCE Business.AppendBIPBest(Ins003): LABEL("Append BIP Best"),VERSION("1.0.0")
+	Prefix="Test" 
+	dsInput="^Ins002|dsOutput"
+	UltID="ultid"
+	SeleID="seleid" 
+	ProxID="proxid"
+  	DPPAPURPOSE="1"
+  	GLBPURPOSE="1"
+  	DATARESTRICTIONMASK="001"
+END
+INSTANCE Business.AppendBIPBest(Ins002): LABEL("Append BIP Best"),VERSION("1.0.0")
+	Prefix="_" 
+	dsInput="^Ins001|dsOutput"
+	UltID="ultid"
+	SeleID="seleid" 
+	ProxID="proxid"
+  	DPPAPURPOSE="1"
+  	GLBPURPOSE="1"
+  	DATARESTRICTIONMASK="001"
+END
+
+
+INSTANCE UseDataset.UseDataset(Ins001): LABEL("Use Dataset"),VERSION("1.1")
+	LogicalFilename="~qa::business::appendbipbest::input"
+	Structure="RECORD
+  string idtype;
+  string suffix;
+  string bip;
+  integer8 ultid;
+  integer8 seleid;
+  integer8 proxid;
+  string recordid;
+  string accountno;
+  string taxtypecode;
+  string taxtypedescription;
+  string feinssn;
+  string permitactiveind;
+  string statusdate;
+  string permitnmbr;
+  string permitstartdate;
+  string legalname;
+  string tradename;
+  string locaddr1;
+  string locaddr2;
+  string loccity;
+  string locstate;
+  string loczip;
+  string mailaddr1;
+  string mailaddr2;
+  string mailcity;
+  string mailstate;
+  string mailzip;
+  string poaaddr1;
+  string poaaddr2;
+  string poacity;
+  string poastate;
+  string poazip;
+  string auditaddr1;
+  string auditaddr2;
+  string auditcity;
+  string auditstate;
+  string auditzip;
+  string refundaddr1;
+  string refundaddr2;
+  string refundcity;
+  string refundstate;
+  string refundzip;
+  string electcredaddr1;
+  string electcredaddr2;
+  string electcredcity;
+  string electcredstate;
+  string electcredzip;
+  string electdebitaddr1;
+  string electdebitaddr2;
+  string electdebitcity;
+  string electdebitstate;
+  string electdebitzip;
+  string phone1;
+  string phone2;
+  string entitytypecode;
+  string entitytypedesc;
+  string10 locaddrscleanprimaryrange;
+  string2 locaddrscleanpredirectional;
+  string28 locaddrscleanprimaryname;
+  string4 locaddrscleanaddresssuffix;
+  string2 locaddrscleanpostdirectional;
+  string10 locaddrscleanunitdesignation;
+  string8 locaddrscleansecondaryrange;
+  string25 locaddrscleanpostalcity;
+  string25 locaddrscleanvanitycity;
+  string2 locaddrscleanstate;
+  string5 locaddrscleanzip;
+  string4 locaddrscleanzip4;
+  string2 locaddrscleandbpc;
+  string1 locaddrscleancheckdigit;
+  string2 locaddrscleanrecordtype;
+  string5 locaddrscleancounty;
+  real8 locaddrscleanlatitude;
+  real8 locaddrscleanlongitude;
+  string4 locaddrscleanmsa;
+  string7 locaddrscleangeoblock;
+  string1 locaddrscleangeomatchcode;
+  string4 locaddrscleanerrorstatus;
+  boolean locaddrscleancachehit;
+  boolean locaddrscleancleanerhit;
+ END;"
+	Method="THOR"
+END

@@ -1,14 +1,11 @@
 //replicates person_models.FN_Clean_Rel_Names for the data layer
 
-import doxie,doxie_raw,watchdog,ut;
+import doxie,doxie_raw,dx_BestRecords,ut;
 // relrec := recordof(doxie.Relative_Records);
 
 export FN_Clean_Rel_Names(d) := functionmacro 
 
 d_d := distribute(d, hash(did));
-
-// GET RECS FROM THE BEST KEY
-br_raw := distribute(watchdog.Key_watchdog_glb, hash(did));
 
 // PATCH LOOSELY WHERE THE BEST KEY MISSES
 fnr := record
@@ -41,13 +38,15 @@ end;
 
 na := join(distribute(fna, hash(did)), distribute(lna, hash(did)), left.did = right.did, natra(left, right), local);
 
-br_raw patchit(br_raw l, na r) := transform
+dx_BestRecords.layout_best patchit(dx_BestRecords.layout_best l, na r) := transform
 	self.fname := if(l.fname = '', r.fname, l.fname);
 	self.lname := if(l.lname = '', r.lname, l.lname);
 	self := l;
 end;
 
-br := join(br_raw, na, left.did = right.did, patchit(left, right), left outer, keep(1), local);
+// GET RECS FROM THE BEST KEY
+bna := dx_BestRecords.append(na, did, dx_BestRecords.Constants.perm_type.glb, use_distributed := true);
+br := project(bna, patchit(left._best, left), local);
 
 // JOIN TO MY REL RECORDS TO CLEAN THEM UP
 pb(string30 n, string30 bestn, string30 othern) := 

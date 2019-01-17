@@ -28,6 +28,8 @@
     EXPORT TRANSACTION   := 3; // 3 = Transactions
     EXPORT RELATIONSHIP_ANALYTICS := 4; // 4 = Rel. Analytics
   END;
+	
+	EXPORT IDENTITY_RESOLVED_REALTIME := 'R';
 
   // GOV FDN id key classification_entity.entity_type field possible data values
   EXPORT Entity_Types := MODULE
@@ -58,6 +60,7 @@
 			EXPORT PHONE_FRAGMENT := 'PHONENO';
 			EXPORT PHYSICAL_ADDRESS_FRAGMENT := 'PHYSICAL_ADDRESS';
 			EXPORT SSN_FRAGMENT := 'FULL_SSN';
+			EXPORT EMAIL_FRAGMENT := 'EMAIL';
   END;
 	
 	EXPORT RECORD_TYPE_ELEMENT_SET := [	Fragment_Types.SSN_FRAGMENT, 
@@ -68,7 +71,9 @@
 																			Fragment_Types.IP_ADDRESS_FRAGMENT,
 																			Fragment_Types.DRIVERS_LICENSE_NUMBER_FRAGMENT,
 																			Fragment_Types.BANK_ACCOUNT_NUMBER_FRAGMENT,
-																			Fragment_Types.DEVICE_ID_FRAGMENT
+																			Fragment_Types.DEVICE_ID_FRAGMENT,
+																			Fragment_Types.EMAIL_FRAGMENT,
+																			Fragment_Types.GEOLOCATION_FRAGMENT
 																		];
 	
 	EXPORT Contribution_Types := MODULE
@@ -249,7 +254,10 @@
 		EXPORT ENTITY_TYPE_PHYSICAL_ADDRESS := 9;
 		EXPORT ENTITY_TYPE_SSN := 15;
 		EXPORT ENTITY_TYPE_PHONENO := 16;
+		EXPORT ENTITY_TYPE_EMAIL := 17;
 		EXPORT ENTITY_TYPE_IPADDRESS := 18;
+		EXPORT ENTITY_TYPE_BANKACCOUNT := 19;
+		EXPORT ENTITY_TYPE_DLNUMBER := 20;
 	END;
 	
 	EXPORT PHONE_TYPE := MODULE
@@ -263,6 +271,9 @@
 		EXPORT STRING _PHYSICAL_ADDRESS := '_09';
 		EXPORT STRING _SSN := '_15';
 		EXPORT STRING _PHONENO := '_16';
+		EXPORT STRING _EMAIL := '_17';
 		EXPORT STRING _IPADDRESS := '_18';
+		EXPORT STRING _BANKACCOUNT := '_19';
+		EXPORT STRING _DLNUMBER := '_20';
 	END;	
 END;

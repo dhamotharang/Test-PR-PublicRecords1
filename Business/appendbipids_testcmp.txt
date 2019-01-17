@@ -1,0 +1,63 @@
+ID "HIPIE_Plugins.Business.appendbipids_cmp";
+NAME appendbipids_testcmp;
+LABEL "Test composition for Append BIP Ids";
+DESCRIPTION "Auto-generated test composition for plugin AppendBIPIds";
+VERSION "1.0.0";
+AUTHOR "CarmigJX";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING CompareWUID: DEFAULT("W20171214-093928");
+END
+
+INSTANCE OutDataset.OutDataset(Ins004): LABEL("Output Dataset"),VERSION("2.0")
+	dsInput="^Ins003|dsOutput"
+	name="~qa::business::appendbusinessids::output"
+	Method="THOR"
+END
+
+INSTANCE Business.AppendBIPIds(Ins003): LABEL("Append BIP Ids"),VERSION("1.0.0")
+	dsInput="^Ins002|dsOutput"
+	CompanyName="companyname"
+	PrimaryRange="primrange"
+	PrimaryName="primname"
+	SecondaryRange="secrange"
+	City="city"
+	State="state"
+	Zip5="zip"
+	Fein="fein"
+	Prefix="Test"
+END
+
+INSTANCE Business.AppendBIPIds(Ins002): LABEL("Append BIP Ids"),VERSION("1.0.0")
+	dsInput="^Ins001|dsOutput"
+	CompanyName="companyname"
+	PrimaryRange="primrange"
+	PrimaryName="primname"
+	SecondaryRange="secrange"
+	City="city"
+	State="state"
+	Zip5="zip"
+	Fein="fein" 
+	Prefix="business"
+END
+
+INSTANCE UseDataset.UseDataset(Ins001): LABEL("Use Dataset"),VERSION("1.1")
+	LogicalFilename="~qa::appendbusiness::appendbusiness::input"
+	Structure="RECORD
+		unsigned6 rid;
+		string companyname;
+		string primrange;
+		string primname;
+		string secrange;
+		string city;
+		string state;
+		string zip;
+		string fein;
+	 END;"
+	Method="THOR"
+END

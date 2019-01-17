@@ -1,0 +1,730 @@
+ID "HIPIE_Plugins.ComputeSuspectProviderAddressScore.ComputeSuspectProviderAddressScore_testcmp";
+NAME ComputeSuspectProviderAddressScore;
+LABEL "Compute Suspect Provider Address Score";
+DESCRIPTION "Compute Suspect Provider Address Score";
+VERSION "1.0.0";
+AUTHOR "sasisa01";
+
+PERMISSIONS
+   VIEW:PUBLIC;
+   EDIT:PRIVATE;
+   RUN:PUBLIC;
+END
+
+INPUTS
+	STRING CompareWUID: DEFAULT("W20161109-090441"); 
+END
+
+INPUTS
+	STRING SHAREDADDRESSSWITCH:LABEL("Shared Address Switch"),DEFAULT("Y");
+	STRING DMESWITCH:LABEL("DME Switch"),DEFAULT("Y");
+	STRING LABSWITCH:LABEL("LAB Switch"),DEFAULT("Y");
+	STRING SINGLEADDRESSSWITCH:LABEL("Single Address Switch"),DEFAULT("Y");
+	STRING RECENTNPISWITCH:LABEL("Recent NPI Switch"),DEFAULT("Y");
+	STRING STUDENTNPISWITCH:LABEL("Student NPI Switch"),DEFAULT("Y");
+	STRING DNDSWITCH:LABEL("DND Switch"),DEFAULT("Y");
+	STRING VACANTSWITCH:LABEL("Vacant Switch"),DEFAULT("Y");
+	STRING MAILDROPSWITCH:LABEL("Mail Drop Switch"),DEFAULT("Y");
+	STRING POBOXSWITCH:LABEL("PO Box Switch"),DEFAULT("Y");
+	STRING PRISONSWITCH:LABEL("Prison Switch"),DEFAULT("Y");
+	STRING RESIDENTIALSWITCH:LABEL("Residential Switch"),DEFAULT("Y");
+	STRING ACTIVESTATEEXCLUSIONSWITCH:LABEL("Active State Exclusion Switch"),DEFAULT("Y");
+	STRING ACTIVEOIGEXCLUSIONSWITCH:LABEL("Active OIG Exclusion Switch"),DEFAULT("Y");
+	STRING ACTIVEOPMEXCLUSIONSWITCH:LABEL("Active OPM Exclusion Switch"),DEFAULT("Y");
+	STRING ACTIVELICENSEREVOCATIONSWITCH:LABEL("Active License Revocation Switch"),DEFAULT("Y");
+	STRING PASTSTATEEXCLUSIONSWITCH:LABEL("Past State Exclusion Switch"),DEFAULT("Y");
+	STRING PASTOIGEXCLUSIONSWITCH:LABEL("Past OIG Exclusion Switch"),DEFAULT("Y");
+	STRING PASTOPMEXCLUSIONSWITCH:LABEL("Past OPM Exclusion Switch"),DEFAULT("Y");
+	STRING PASTLICENSEREVOCATIONSWITCH:LABEL("Past License Revocation Switch"),DEFAULT("Y");
+	STRING LICENSEEXPIREDSWITCH:LABEL("License Expired Switch"),DEFAULT("Y");
+	STRING DEAEXPIREDSWITCH:LABEL("DEA Expired Switch"),DEFAULT("Y");
+	STRING DECEASEDSWITCH:LABEL("Deceased Switch"),DEFAULT("Y");
+	STRING BANKRUPTCYSWITCH:LABEL("Bankruptcy Switch"),DEFAULT("Y");
+	STRING CRIMINALHISTORYSWITCH:LABEL("Criminal History Switch"),DEFAULT("Y");
+	STRING DECEASEDPATIENTSSWITCH:LABEL("Deceased Patients Switch"),DEFAULT("Y");
+	STRING LARGEPATIENTGROUPSWITCH:LABEL("Large Patient Group Switch"),DEFAULT("Y");
+	STRING LICENSEINACTIVESWITCH:LABEL("License Inactive Switch"),DEFAULT("Y");
+	STRING NPIDEACTIVATEDSWITCH:LABEL("NPI Deactivated Switch"),DEFAULT("Y");
+	STRING LONGPATIENTDRIVINGDISTANCESWITCH:LABEL("Long Patient Driving Distance Switch"),DEFAULT("Y");
+	STRING HIGHPAIDDOLLARSPERPATIENTSWITCH:LABEL("High Paid Dollars Per Patient Switch"),DEFAULT("Y");
+	STRING HIGHPAIDDOLLARSPERCLAIMSWITCH:LABEL("High Paid Dollars Per Claim Switch"),DEFAULT("Y");
+	STRING HIGHNUMBEROFPATIENTSSWITCH:LABEL("High Number Of Patients Switch"),DEFAULT("Y");
+	STRING HIGHNUMBEROFCLAIMSSWITCH:LABEL("High Number Of Claims Switch"),DEFAULT("Y");
+	STRING HIGHPAIDDOLLARSSWITCH:LABEL("High Paid Dollars Switch"),DEFAULT("Y");
+	STRING INNETWORKCURRENTEXCLUSIONSWITCH:LABEL("InNetwork Current Exclusion Switch"),DEFAULT("Y");
+	STRING INNETWORKCURRENTREVOCATIONSWITCH:LABEL("InNetwork Current Revocation Switch"),DEFAULT("Y");
+	STRING INNETWORKPASTEXCLUSIONSWITCH:LABEL("InNetwork Past Exclusion Switch"),DEFAULT("Y");
+	STRING INNETWORKPASTREVOCATIONSWITCH:LABEL("InNetwork Past Revocation Switch"),DEFAULT("Y");
+	STRING INNETWORKHASBANKRUPTCYSWITCH:LABEL("InNetwork has Bankruptcy Switch"),DEFAULT("Y");
+	STRING INNETWORKHASCRIMINALHISTORYSWITCH:LABEL("InNetwork has Criminal History Switch"),DEFAULT("Y");
+	STRING OUTNETWORKCURRENTEXCLUSIONSWITCH:LABEL("OutNetwork Current Exclusion Switch"),DEFAULT("Y");
+	STRING OUTNETWORKCURRENTREVOCATIONSWITCH:LABEL("OutNetwork Current Revocation Switch"),DEFAULT("Y");
+	STRING OUTNETWORKPASTEXCLUSIONSWITCH:LABEL("OutNetwork Past Exclusion Switch"),DEFAULT("Y");
+	STRING OUTNETWORKPASTREVOCATIONSWITCH:LABEL("OutNetwork Past Revocation Switch"),DEFAULT("Y");
+	STRING OUTNETWORKHASBANKRUPTCYSWITCH:LABEL("OutNetwork has Bankruptcy Switch"),DEFAULT("Y");
+	STRING OUTNETWORKHASCRIMINALHISTORYSWITCH:LABEL("OutNetwork has Criminal History Switch"),DEFAULT("Y");
+	STRING RELATIVEASSOCCRIMINALSWITCH:LABEL("Relative Associate Criminal Switch"),DEFAULT("Y");
+	STRING RELATIVEASSOCBANKRUPTCYSWITCH:LABEL("Relative Associate Bankruptcy Switch"),DEFAULT("Y");
+	INT SHAREDADDRESSSCORE:LABEL("Shared AddressScore"),DEFAULT("10");
+	INT DMESCORE:LABEL("DME Score"),DEFAULT("10");
+	INT LABSCORE:LABEL("LAB Score"),DEFAULT("10");
+	INT SINGLEADDRESSSCORE:LABEL("Single Address Score"),DEFAULT("2");
+	INT RECENTNPISCORE:LABEL("Recent NPI Score"),DEFAULT("2");
+	INT STUDENTNPISCORE:LABEL("Student NPI Score"),DEFAULT("2");
+	INT DNDSCORE:LABEL("DND Score"),DEFAULT("2");
+	INT VACANTSCORE:LABEL("Vacant Score"),DEFAULT("2");
+	INT MAILDROPSCORE:LABEL("Mail Drop Score"),DEFAULT("2");
+	INT POBOXSCORE:LABEL("PO Box Score"),DEFAULT("2");
+	INT PRISONSCORE:LABEL("Prison Score"),DEFAULT("2");
+	INT RESIDENTIALSCORE:LABEL("Residential Score"),DEFAULT("2");
+	INT ACTIVESTATEEXCLUSIONSCORE:LABEL("Active State Exclusion Score"),DEFAULT("2");
+	INT ACTIVEOIGEXCLUSIONSCORE:LABEL("Active OIG Exclusion Score"),DEFAULT("2");
+	INT ACTIVEOPMEXCLUSIONSCORE:LABEL("Active OPM Exclusion Score"),DEFAULT("2");
+	INT ACTIVELICENSEREVOCATIONSCORE:LABEL("Active License Revocation Score"),DEFAULT("2");
+	INT PASTSTATEEXCLUSIONSCORE:LABEL("Past State Exclusion Score"),DEFAULT("2");
+	INT PASTOIGEXCLUSIONSCORE:LABEL("Past OIG Exclusion Score"),DEFAULT("2");
+	INT PASTOPMEXCLUSIONSCORE:LABEL("Past OPM Exclusion Score"),DEFAULT("2");
+	INT PASTLICENSEREVOCATIONSCORE:LABEL("Past License Revocation Score"),DEFAULT("2");
+	INT EXPIREDLICENSESCORE:LABEL("Expired License Score"),DEFAULT("2");
+	INT DEAEXPIREDSCORE:LABEL("DEA Expired Score"),DEFAULT("2");
+	INT DECEASEDSCORE:LABEL("Deceased Score"),DEFAULT("2");
+	INT BANKRUPTCYSCORE:LABEL("Bankruptcy Score"),DEFAULT("2");
+	INT CRIMINALHISTORYSCORE:LABEL("Criminal History Score"),DEFAULT("2");
+	INT DECEASEDPATIENTSSCORE:LABEL("Deceased Patients Score"),DEFAULT("2");
+	INT LARGEPATIENTGROUPSCORE:LABEL("Large Patient Group Score"),DEFAULT("2");
+	INT LICENSEINACTIVESCORE:LABEL("License Inactive Score"),DEFAULT("2");
+	INT NPIDEACTIVATEDSCORE:LABEL("NPI Deactivated Score"),DEFAULT("2");
+	INT LONGPATIENTDRIVINGDISTANCESCORE:LABEL("Long Patient Driving Distance Score"),DEFAULT("2");
+	INT HIGHPAIDDOLLARSPERPATIENTSCORE:LABEL("High Paid Dollars Per Patient Score"),DEFAULT("2");
+	INT HIGHPAIDDOLLARSPERCLAIMSCORE:LABEL("High Paid Dollars Per Claim Score"),DEFAULT("2");
+	INT HIGHNUMBEROFPATIENTSSCORE:LABEL("High Number Of Patients Score"),DEFAULT("2");
+	INT HIGHNUMBEROFCLAIMSSCORE:LABEL("High Number Of Claims Score"),DEFAULT("2");
+	INT HIGHPAIDDOLLARSSCORE:LABEL("High Paid Dollars Score"),DEFAULT("2");
+	INT INNETWORKCURRENTEXCLUSIONSCORE:LABEL("In Network Current Exclusion Score"),DEFAULT("2");
+	INT INNETWORKCURRENTREVOCATIONSCORE:LABEL("In Network Current Revocation Score"),DEFAULT("2");
+	INT INNETWORKPASTEXCLUSIONSCORE:LABEL("In Network Past Exclusion Score"),DEFAULT("2");
+	INT INNETWORKPASTREVOCATIONSCORE:LABEL("In Network Past Revocation Score"),DEFAULT("2");
+	INT INNETWORKHASBANKRUPTCYSCORE:LABEL("In Network has Bankruptcy Score"),DEFAULT("2");
+	INT INNETWORKHASCRIMINALHISTORYSCORE:LABEL("In Network has Criminal History Score"),DEFAULT("2");
+	INT OUTNETWORKCURRENTEXCLUSIONSCORE:LABEL("Out Network Current Exclusion Score"),DEFAULT("2");
+	INT OUTNETWORKCURRENTREVOCATIONSCORE:LABEL("Out Network Current Revocation Score"),DEFAULT("2");
+	INT OUTNETWORKPASTEXCLUSIONSCORE:LABEL("Out Network Past Exclusion Score"),DEFAULT("2");
+	INT OUTNETWORKPASTREVOCATIONSCORE:LABEL("Out Network Past Revocation Score"),DEFAULT("2");
+	INT OUTNETWORKHASBANKRUPTCYSCORE:LABEL("Out Network has Bankruptcy Score"),DEFAULT("2");
+	INT OUTNETWORKHASCRIMINALHISTORYSCORE:LABEL("Out Network has Criminal History Score"),DEFAULT("2");
+	INT RELATIVEASSOCCRIMINALSCORE:LABEL("Relative Associate Criminal Score"),DEFAULT("2");
+	INT RELATIVEASSOCBANKRUPTCYSCORE:LABEL("Relative Associate Bankruptcy Score"),DEFAULT("2");
+END
+
+INSTANCE UseDataset.UseDataset(Ins001): LABEL("Use Dataset"),VERSION("1.1")
+	LogicalFilename="~qa::computesuspectprovideraddressscore::computesuspectprovideraddressscore::input"
+	Method=THOR
+	Structure="RECORD
+  string50 provider_key;
+  string10 provider_npi;
+  string12 provider_dea;
+  string10 provider_taxonomy;
+  string10 provider_tax_id;
+  string5 provider_tax_id_suffix;
+  string12 provider_num;
+  string5 provider_num_suffix;
+  string2 provider_num_qualifier;
+  string2 provider_security_code;
+  string3 network_code;
+  string50 provider_facility_name;
+  string12 provider_facility_num;
+  string30 provider_first_name;
+  string36 provider_last_name;
+  string36 provider_address_1;
+  string36 provider_address_2;
+  string24 provider_city;
+  string2 provider_state;
+  string9 provider_zip_cd;
+  string30 provider_county;
+  string2 provider_country;
+  string4 provider_region;
+  string9 prov_specialty_cd_1;
+  string9 prov_specialty_cd_2;
+  string2 provider_type;
+  string1 watch_cd;
+  string8 provider_latest_update_date;
+  string50 prov_user_def_01;
+  string50 prov_user_def_02;
+  string50 prov_user_def_03;
+  string50 prov_user_def_04;
+  string50 prov_user_def_05;
+  string50 prov_user_def_06;
+  string50 prov_user_def_07;
+  string50 prov_user_def_08;
+  string50 prov_user_def_09;
+  string50 prov_user_def_10;
+  string50 provproviderkey;
+  string20 provfirstname;
+  string20 provmiddlename;
+  string20 provlastname;
+  string5 provnamesuffix;
+  string10 provprimaryrange;
+  string2 provpredirectional;
+  string28 provprimaryname;
+  string4 provaddresssuffix;
+  string2 provpostdirectional;
+  string10 provunitdesignation;
+  string8 provsecondaryrange;
+  string25 provpostalcity;
+  string25 provvanitycity;
+  string2 provstate;
+  string5 provzip5;
+  string4 provzip4;
+  string2 provdbpc;
+  string1 provcheckdigit;
+  string2 provrecordtype;
+  string2 provfipsstate;
+  string3 provcounty;
+  string10 provlatitude;
+  string11 provlongitude;
+  string4 provmsa;
+  string7 provgeoblock;
+  string1 provgeomatchcode;
+  string4 proverrorstatus;
+  string1 advoadvohitflag;
+  string1 advovacancyindicator;
+  string1 advothrowbackindicator;
+  string1 advoseasonaldeliveryindicator;
+  string5 advoseasonalsuppressionstartdate;
+  string5 advoseasonalsuppressionenddate;
+  string1 advodonotdeliverindicator;
+  string1 advocollegeindicator;
+  string10 advocollegesuppressionstartdate;
+  string10 advocollegesuppressionenddate;
+  string1 advoaddressstyle;
+  string5 advosimplifyaddresscount;
+  string1 advodropindicator;
+  string1 advoresidentialorbusinessindicator;
+  string1 advoonlywaytogetmailindicator;
+  string1 advorecordtypecode;
+  string1 advoadvoaddresstype;
+  string1 advoaddressusagetype;
+  string8 advofirstseendate;
+  string8 advolastseendate;
+  string8 advovendorfirstreporteddate;
+  string8 advovendorlastreporteddate;
+  string8 advovacationbegindate;
+  string8 advovacationenddate;
+  string8 advonumberofcurrentvacationmonths;
+  string8 advomaxvacationmonths;
+  string8 advovacationperiodscount;
+  string1 advoacahitflag;
+  string200 advoinstitution;
+  string2 advoinstitutiontype;
+  string10 advoinstitutiontypeexp;
+  string1 advoacaaddresstype;
+  unsigned8 providerlnpid;
+  unsigned2 providerpidweight;
+  unsigned2 providerpiddistance;
+  unsigned8 providerattrlexid;
+  string1 providerattrentitytype;
+  string20 providerattrfname;
+  string20 providerattrmname;
+  string28 providerattrlname;
+  string5 providerattrsname;
+  string9 providerattrssn;
+  string9 providerattrconsumerssn;
+  unsigned4 providerattrdateofbirth;
+  unsigned4 providerattrconsumerdateofbirth;
+  string25 providerattrlicensenumber;
+  string25 providerattrcleanedlicensenumber;
+  string2 providerattrlicensestate;
+  string60 providerattrlicensetype;
+  string60 providerattrlicensestatus;
+  unsigned4 providerattrdatelicenseexpired;
+  unsigned4 providerattrlicensecount;
+  unsigned4 providerattrlicensestatecount;
+  unsigned4 providerattractivelicensecount;
+  unsigned4 providerattrinactivelicensecount;
+  unsigned4 providerattrrevokedlicensecount;
+  string2 providerattrinactivelicensestate;
+  string1 providerattrinactivelicenseflag;
+  string1 providerattrrevokedlicenseflag;
+  string1 providerattrexpiredlicenseflag;
+  string1 providerattrdeathindicator;
+  unsigned4 providerattrdateofdeath;
+  unsigned4 providerattrbillingtaxid;
+  string10 providerattrphone;
+  string10 providerattrfax;
+  string6 providerattrupin;
+  string10 providerattrnpinumber;
+  string8 providerattrnpienumerationdate;
+  string8 providerattrnpideactivationdate;
+  string8 providerattrnpireactivationdate;
+  string1 providerattrnpiflag;
+  unsigned4 providerattrdeactivednpicount;
+  string1 providerattrdeabusinessactivityindicator;
+  string10 providerattrdeanumber;
+  unsigned4 providerattrdatedeaexpired;
+  unsigned4 providerattrdeacount;
+  unsigned4 providerattractivedeacount;
+  unsigned4 providerattrexpireddeacount;
+  string1 providerattrdeaexpiredflag;
+  string1 providerattrisstatesanction;
+  string1 providerattrisoigsanction;
+  string1 providerattrisopmsanction;
+  string10 providerattrtaxonomy;
+  string50 providerattrtaxonomydescription;
+  string3 providerattrspecialitycode;
+  string1 providerattrproviderstatus;
+  string40 providerattrgroupkey;
+  string1 providerattrhasactivelicenserevocation;
+  string2 providerattractivelicenserevocationstate;
+  string8 providerattractivelicenserevocationdate;
+  string1 providerattrhasactivestateexclusion;
+  string2 providerattractivelicenseexclusionstate;
+  string8 providerattractivestateexclusiondate;
+  string1 providerattrhasactiveoigexclusion;
+  string8 providerattractiveoigexclusiondate;
+  string1 providerattrhasactiveopmexclusion;
+  string8 providerattractiveopmexclusiondate;
+  string8 providerattractivestatesanctionexclusiondate;
+  string8 providerattractiveoigsanctionexclusiondate;
+  string8 providerattractiveopmsanctionexclusiondate;
+  string1 providerattrhaslicenserevocationreinstated;
+  string2 providerattrlicenserevocationreinstatedstate;
+  string1 providerattrhasstateexclusioinreinstated;
+  string2 providerattrstateexclusionreinstatedstate;
+  string8 providerattrstateexclusionreinstateddate;
+  string1 providerattrhasoigexclusioinreinstated;
+  string8 providerattroigexclusionreinstateddate;
+  string1 providerattrhasopmexclusioinreinstated;
+  string8 providerattropmexclusionreinstateddate;
+  string10 providerattrresidentialprimaryrange;
+  string2 providerattrresidentialpredirectional;
+  string28 providerattrresidentialprimaryname;
+  string4 providerattrresidentialaddresssuffix;
+  string2 providerattrresidentialpostdirectional;
+  string8 providerattrresidentialsecondaryrange;
+  string25 providerattrresidentialcityname;
+  string2 providerattrresidentialstate;
+  string5 providerattrresidentialzip5;
+  unsigned3 providerattrresidentialaddresslastseen;
+  string1 providerattrproviderwithsingleaddress;
+  unsigned3 providerattrsingleaddressprovidercount;
+  string10 providerattrpractiseprimaryrange;
+  string2 providerattrpractisepredirectional;
+  string28 providerattrpractiseprimaryname;
+  string4 providerattrpractiseaddresssuffix;
+  string2 providerattrpractisepostdirectional;
+  string8 providerattrpractisesecondaryrange;
+  string25 providerattrpractisecityname;
+  string2 providerattrpractisestate;
+  string5 providerattrpractisezip5;
+  string1 providerattrhasbankruptcy;
+  string8 providerattrbankruptcylastseen;
+  string1 providerattrhascriminalhistory;
+  string8 providerattrlastarresteddate;
+  string1 providerattrhasrelativeconvictions;
+  string1 providerattrhasrelativebankruptcy;
+  string3 providerattrrelativecount;
+  string3 providerattrrelativebankruptcycount;
+  string3 providerattrrelativefelonycount;
+  string1 providerattrhasassocactivestateexclusion;
+  string1 providerattrhasassocactivelicenserevocation;
+  string1 providerattrhasassocstateexclusionreinstated;
+  string1 providerattrhasassoclicenserevocationreinstated;
+  string1 providerattrhasassocbankruptcy;
+  string1 providerattrhasassoccriminalhistory;
+  string1 providerattrhasdeceased;
+  string8 providerattrdeceaseddate;
+  string1 consumerproviderhasbankruptcy;
+  string1 consumerproviderhasconvictions;
+  string1 consumerproviderhasdeceased;
+  string8 consumerproviderdateofdeaceased;
+  string1 consumerproviderhasrelativebankruptcy;
+  string1 consumerproviderhasrelativeconvictions;
+  string8 consumerproviderbankruptcydate;
+  string8 consumerproviderconvictiondate;
+  string3 consumerproviderrelativecount;
+  string3 consumerproviderrelativesbankruptcycount;
+  string3 consumerproviderrelativesfelonycount;
+  integer8 claimoutlierproviderclaimcount;
+  integer8 claimoutlierlnpidclaimcount;
+  integer8 claimoutlierproviderpatientcount;
+  integer8 claimoutlierpatientdeceasedcount;
+  integer8 claimoutlierproviderhighchargeamount;
+  real8 claimoutlierproviderhighpaidamount;
+  real8 claimoutlierlnpidhighpaidamount;
+  real8 claimoutlierproviderhighpaidamountperclaim;
+  real8 claimoutlierproviderhighpaidamountperpatient;
+  string8 claimoutlierproviderservicedatemin;
+  string8 claimoutlierproviderservicedatemax;
+  string1 claimoutlierexcludeaddressflag;
+  string1 claimoutlierpatientdeceasedflag;
+  string1 claimoutlierprovidernpideactivatedflag;
+  string1 claimoutlierproviderdeadeactivatedflag;
+  string1 claimoutlierproviderpatientaddressflag;
+  integer8 claimoutlieraddressprovidercount;
+  integer8 claimoutlieraddresspatientcount;
+  integer8 claimoutlieraddressclaimcount;
+  real8 claimoutlieraddresshighchargeamount;
+  real8 claimoutlieraddresshighpaidamount;
+  string8 claimoutlieraddressservicedatemin;
+  string8 claimoutlieraddressservicedatemax;
+  integer8 claimoutliertotalnpicount;
+  integer8 claimoutlierrecentnpicount;
+  integer8 claimoutlierstudentnpicount;
+  string1 claimoutlierrecentnpiflag;
+  string1 claimoutlierstudentnpiflag;
+  string1 claimoutlierlargepatientgroupflag;
+  string1 claimoutliervacantaddressactivityflag;
+  unsigned4 claimoutliernoofaddress;
+  real8 claimoutlierdistance;
+  string1 claimoutlierclaimcountflag;
+  string1 claimoutlierpatientcountflag;
+  string1 claimoutlierhighpaidamountflag;
+  string1 claimoutlierhighpaidamountperclaimflag;
+  string1 claimoutlierhighpaidamountperpatientflag;
+  string1 claimoutlierlongdistanceflag;
+  string1 claimoutlierdmeflag;
+  string1 claimoutlierlabflag;
+  unsigned2 claimoutlierclaimcountrank;
+  unsigned2 claimoutlierpatientcountrank;
+  unsigned2 claimoutlierhighpaidamountrank;
+  unsigned2 claimoutlierhighpaidamountperclaimrank;
+  unsigned2 claimoutlierhighpaidamountperpatientrank;
+  unsigned2 claimoutlierlongdistancerank;
+  unsigned2 claimoutlierdmerank;
+  unsigned2 claimoutlierlabrank;
+  unsigned8 claimoutlierclaimcountmedian;
+  unsigned8 claimoutlierpatientcountmedian;
+  unsigned8 claimoutlierhighpaidamountmedian;
+  unsigned8 claimoutlierhighpaidamountperclaimmedian;
+  unsigned8 claimoutlierhighpaidamountperpatientmedian;
+  unsigned8 claimoutlierlongdistancemedian;
+  unsigned8 claimoutlierdmemedian;
+  unsigned8 claimoutlierlabmedian;
+  unsigned8 claimoutlierdmepatientmedian;
+  unsigned8 claimoutlierlabpatientmedian;
+  unsigned8 claimoutlierdmeclaimmedian;
+  unsigned8 claimoutlierlabclaimmedian;
+  string2 claimoutlierclaimcountoutliertype;
+  string2 claimoutlierpatientcountoutliertype;
+  string2 claimoutlierhighpaidamountoutliertype;
+  string2 claimoutlierhighpaidamountperclaimoutliertype;
+  string2 claimoutlierhighpaidamountperpatientoutliertype;
+  string2 claimoutlierlongdistanceoutliertype;
+  string2 claimoutlierdmeoutliertype;
+  string2 claimoutlierlaboutliertype;
+  real4 claimoutlierclaimcountoutlierdiff;
+  real4 claimoutlierpatientcountoutlierdiff;
+  real4 claimoutlierhighpaidamountoutlierdiff;
+  real4 claimoutlierhighpaidamountperclaimoutlierdiff;
+  real4 claimoutlierhighpaidamountperpatientoutlierdiff;
+  real4 claimoutlierlongdistanceoutlierdiff;
+  real4 claimoutlierdmeoutlierdiff;
+  real4 claimoutlierlaboutlierdiff;
+  integer8 claimoutliernoofpatientdrivinglongdistance;
+  real8 claimoutlieravedistancetravelled;
+  integer8 claimoutlierpatientdod;
+  string50 claimoutlierproviderpatientsharedaddress;
+  string50 claimoutlierlargepatientgroupaddress;
+  string1 claimoutlierproviderdeceasedflag;
+  string1 claimoutlierproviderlicenseexpiredflag;
+  string1 provtoprovinnetworkactiveexclusionflag;
+  string1 provtoprovinnetworkactiverevocationflag;
+  string1 provtoprovinnetworkreinstatedexclusionflag;
+  string1 provtoprovinnetworkreinstatedrevocationflag;
+  string1 provtoprovinnetworkbankruptcyflag;
+  string1 provtoprovinnetworkcriminalhistoryflag;
+  string1 provtoprovoutnetworkactiveexclusionflag;
+  string1 provtoprovoutnetworkactiverevocationflag;
+  string1 provtoprovoutnetworkreinstatedexclusionflag;
+  string1 provtoprovoutnetworkreinstatedrevocationflag;
+  string1 provtoprovoutnetworkbankruptcyflag;
+  string1 provtoprovoutnetworkcriminalhistoryflag;
+  string1 provtoprovrelativecriminalhistoryflag;
+  string1 provtoprovrelativebankruptcyflag;
+  string1 provtoprovassociatescriminalhistoryflag;
+  string1 provtoprovassociatesbankruptcyflag;
+ END;"
+END
+
+
+INSTANCE ComputeSuspectProviderAddressScore.ComputeSuspectProviderAddressScore(Ins002): LABEL("ComputeSuspectProviderAddressScore"),VERSION("1.0.0")
+	dsInput="^Ins001|dsOutput"
+	Prefix="scoring1"
+	LNPID			= providerlnpid
+	PrimaryRange		= provprimaryrange
+	PreDirectional		= provpredirectional
+	PrimaryName		= provprimaryname
+	AddressSuffix		= provaddresssuffix
+	PostDirectional		= provpostdirectional
+	SecondaryRange		= provsecondaryrange
+	CityName_Vanity		= provvanitycity
+	State			= provstate
+	Zip5			= provzip5
+	AddressPaidAmount		= claimoutlieraddresshighpaidamount
+	AddressExclusionFlag	= claimoutlierexcludeaddressflag
+	SharedAddressIndicator	= claimoutlierproviderpatientaddressflag
+	DMEIndicator		= claimoutlierdmeflag
+	DMEOutlierRank		= claimoutlierdmerank
+	LABIndicator		= claimoutlierlabflag
+	LABOutlierRank		= claimoutlierlabrank 
+	SingleAddressIndicator	= providerattrproviderwithsingleaddress 
+	TotalNPICount		= claimoutliertotalnpicount 
+	RecentNPICount		= claimoutlierrecentnpicount 
+	StudentNPICount		= claimoutlierstudentnpicount 
+	DNDIndicator		= advodonotdeliverindicator 
+	TotalChargeAmount		= claimoutlierproviderhighchargeamount 
+	TotalPaidAmount		= claimoutlierproviderhighpaidamount 
+	TotalClaimCount		= claimoutlierproviderclaimcount 
+	VacantAddressActivityIndicator= claimoutliervacantaddressactivityflag 
+	MailDropIndicator			= advodropindicator 
+	AddressType			= advoadvoaddresstype 
+	UsageType				= advoaddressusagetype 
+	PrisonIndicator			= advoacahitflag 
+	ResidentialAddressIndicator	= advoresidentialorbusinessindicator 
+	ActiveStateExclusion		= providerattrhasactivestateexclusion 
+	ActiveOIGExclusion		= providerattrhasactiveoigexclusion 
+	ActiveOPMExclusion		= providerattrhasactiveopmexclusion 
+	ActiveLicenseRevocation	= providerattrhasactivelicenserevocation 
+	PastStateExclusion	= providerattrhasstateexclusioinreinstated 
+	PastOIGExclusion		= providerattrhasoigexclusioinreinstated 
+	PastOPMExclusion		= providerattrhasopmexclusioinreinstated 
+	PastLicenseRevocation	= providerattrhaslicenserevocationreinstated 
+	LicenseExpiredFlag	= claimoutlierproviderlicenseexpiredflag 
+	DEAExpiredFlag		= claimoutlierproviderdeadeactivatedflag 
+	DeceasedFlag		= claimoutlierproviderdeceasedflag 
+	DateofDeath		= consumerproviderdateofdeaceased 
+	BankruptcyFlag		= consumerproviderhasbankruptcy 
+	CriminalHistoryFlag	= consumerproviderhasconvictions 
+	DeceasedPatientsFlag	= claimoutlierpatientdeceasedflag 
+	LargePatientGroupFlag	= claimoutlierlargepatientgroupflag 
+	LicenseInactiveFlag	= providerattrinactivelicenseflag 
+	NPIDeactivatedFlag			= providerattrnpiflag 
+	LongPatientDrivingDistanceIndicator	= claimoutlierlongdistanceflag 
+	LongPatientDrivingDistanceOutlierRank	= claimoutlierlongdistancerank 
+	HighPaidDollarsPerPatientIndicator	= claimoutlierhighpaidamountperpatientflag 
+	HighPaidDollarsPerPatientOutlierRank	= claimoutlierhighpaidamountperpatientrank 						
+	HighPaidDollarsPerClaimIndicator		= claimoutlierhighpaidamountperclaimflag 
+	HighPaidDollarsPerClaimOutlierRank	= claimoutlierhighpaidamountperclaimrank 						
+	HighNumberOfPatientsIndicator		= claimoutlierpatientcountflag 
+	HighNumberOfPatientsOutlierRank		= claimoutlierpatientcountrank 								
+	HighNumberOfClaimsIndicator		= claimoutlierclaimcountflag 
+	HighNumberOfClaimsOutlierRank		= claimoutlierclaimcountrank 								
+	HighPaidDollarsIndicator			= claimoutlierhighpaidamountflag 
+	HighPaidDollarsOutlierRank		= claimoutlierhighpaidamountrank 							
+	InNetworkCurrentExclusionFlag		= provtoprovinnetworkactiveexclusionflag 
+	InNetworkCurrentRevocationFlag		= provtoprovinnetworkactiverevocationflag 
+	InNetworkPastExclusionFlag	= provtoprovinnetworkreinstatedexclusionflag 
+	InNetworkPastRevocationFlag	= provtoprovinnetworkreinstatedrevocationflag 							
+	InNetworkhasBankruptcy		= provtoprovinnetworkbankruptcyflag 								
+	InNetworkhasCriminalHistory	= provtoprovinnetworkcriminalhistoryflag 							
+	OutNetworkCurrentExclusionFlag	= provtoprovoutnetworkactiveexclusionflag 
+	OutNetworkCurrentRevocationFlag	= provtoprovoutnetworkactiverevocationflag 
+	OutNetworkPastExclusionFlag	= provtoprovoutnetworkreinstatedexclusionflag 
+	OutNetworkPastRevocationFlag	= provtoprovoutnetworkreinstatedrevocationflag 							
+	OutNetworkhasBankruptcy		= provtoprovoutnetworkbankruptcyflag 								
+	OutNetworkhasCriminalHistory	= provtoprovoutnetworkcriminalhistoryflag 
+	RelativeCriminalFlag		= provtoprovrelativecriminalhistoryflag
+	RelativeBankruptcyFlag		= provtoprovrelativebankruptcyflag 
+	AssociateCriminalFlag		= providerattrhasrelativeconvictions 
+	AssociateBankruptcyFlag		= providerattrhasrelativebankruptcy 
+	NoOfProviderAtAddress		= claimoutlieraddressprovidercount 
+	NoOfPatientAtAddress		= claimoutlieraddresspatientcount 
+	HighPaidAmountPerPatient		= claimoutlierproviderhighpaidamountperpatient 
+	HighPaidAmountPerClaim		= claimoutlierproviderhighpaidamountperclaim 
+	ClaimMedian			= claimoutlierclaimcountmedian 
+	PatientMedian			= claimoutlierpatientcountmedian 
+	HighPaidAmountMedian		= claimoutlierhighpaidamountmedian 
+	HighPaidAmountPerClaimMedian	= claimoutlierhighpaidamountperclaimmedian 
+	HighPaidAmountPerPatientMedian	= claimoutlierhighpaidamountperpatientmedian 
+	DMEPatientMedian			= claimoutlierdmepatientmedian 
+	DMEClaimMedian			= claimoutlierdmeclaimmedian 
+	LABPatientMedian			= claimoutlierlabpatientmedian
+	LABClaimMedian			= claimoutlierlabclaimmedian
+	ActiveLicenseRevocationState	= providerattractivelicenserevocationstate
+	ActiveLicenseRevocationDate	= providerattractivelicenserevocationdate 
+	ActiveLicenseExclusionState	= providerattractivelicenseexclusionstate 
+	ActiveLicenseExclusionDate	= providerattractivestateexclusiondate 
+	ActiveOIGExclusionDate		= providerattractiveoigexclusiondate 
+	ActiveOPMExclusionDate		= providerattractiveopmexclusiondate 
+	ActiveStateSanctionExclusionDate	= providerattractivestatesanctionexclusiondate 
+	ActiveOIGSanctionExclusionDate	= providerattractiveoigsanctionexclusiondate 
+	ActiveOPMSanctionExclusionDate	= providerattractiveopmsanctionexclusiondate 
+	LicenseRevocationReinstatedState	= providerattrlicenserevocationreinstatedstate 
+	StateExclusionReinstatedState	= providerattrstateexclusionreinstatedstate 
+	StateExclusionReinstatedDate	= providerattrstateexclusionreinstateddate 
+	OIGExclusionReinstatedDate	= providerattroigexclusionreinstateddate 
+	OPMExclusionReinstatedDate	= providerattropmexclusionreinstateddate 							
+	ExpiredDEANumber			= providerattrdeanumber 
+	ExpiredDEADate			= providerattrdatedeaexpired 
+	ExpiredLicenseNumber		= providerattrlicensenumber 
+	ExpiredLicenseState		= providerattrlicensestate 
+	ExpiredLicenseNumberDate		= providerattrdatelicenseexpired 
+	BankruptcyFiledDate		= consumerproviderbankruptcydate 
+	ConvictionDate			= consumerproviderconvictiondate 
+	DeceasedPatientCount		= claimoutlierpatientdeceasedcount 
+	PatientCount			= claimoutlierproviderpatientcount 
+	PatientDOD			= claimoutlierpatientdod 
+	NPIDeactivatedDate		= providerattrnpideactivationdate 
+	ProviderPatientAddress		= claimoutlierproviderpatientsharedaddress 
+	LargePatientAddress		= claimoutlierlargepatientgroupaddress 
+	InactiveLicenseState		= providerattrinactivelicensestate 
+	NoOfPatientsDrivingLongDistance	= claimoutliernoofpatientdrivinglongdistance 
+	AveDistance			= claimoutlieravedistancetravelled 
+	PractisePrimaryrange		= providerattrpractiseprimaryrange 
+	PractisePredirectional		= providerattrpractisepredirectional 
+	PractisePrimaryname		= providerattrpractiseprimaryname 
+	PractiseAddresssuffix		= providerattrpractiseaddresssuffix 
+	PractisePostdirectional		= providerattrpractisepostdirectional 
+	PractiseSecondaryrange		= providerattrpractisesecondaryrange 
+	PractiseCityname		= providerattrpractisecityname 
+	PractiseState			= providerattrpractisestate 
+	PractiseZip5			= providerattrpractisezip5 
+END 
+  	
+INSTANCE OutDataset.OutDataset(Ins003): LABEL("Output Dataset"),VERSION("1.0.0")
+	dsInput="^Ins002|dsOutput"
+	name="~qa::ComputeSuspectAddressScore::ComputeSuspectAddressScore::output"
+	Method="THOR"
+	UniqueIdentifier = "1"
+END
+
+INSTANCE ComputeSuspectProviderAddressScore.ComputeSuspectProviderAddressScore(Ins004): LABEL("ComputeSuspectProviderAddressScore"),VERSION("1.0.0")
+	dsInput="^Ins001|dsOutput"
+	Prefix="scoring2"
+	LNPID			= providerlnpid
+	PrimaryRange		= provprimaryrange
+	PreDirectional		= provpredirectional
+	PrimaryName		= provprimaryname
+	AddressSuffix		= provaddresssuffix
+	PostDirectional		= provpostdirectional
+	SecondaryRange		= provsecondaryrange
+	CityName_Vanity		= provvanitycity
+	State			= provstate
+	Zip5			= provzip5
+	AddressPaidAmount		= claimoutlieraddresshighpaidamount
+	AddressExclusionFlag	= claimoutlierexcludeaddressflag
+	SharedAddressIndicator	= claimoutlierproviderpatientaddressflag
+	DMEIndicator		= claimoutlierdmeflag
+	DMEOutlierRank		= claimoutlierdmerank
+	LABIndicator		= claimoutlierlabflag
+	LABOutlierRank		= claimoutlierlabrank 
+	SingleAddressIndicator	= providerattrproviderwithsingleaddress 
+	TotalNPICount		= claimoutliertotalnpicount 
+	RecentNPICount		= claimoutlierrecentnpicount 
+	StudentNPICount		= claimoutlierstudentnpicount 
+	DNDIndicator		= advodonotdeliverindicator 
+	TotalChargeAmount		= claimoutlierproviderhighchargeamount 
+	TotalPaidAmount		= claimoutlierproviderhighpaidamount 
+	TotalClaimCount		= claimoutlierproviderclaimcount 
+	VacantAddressActivityIndicator= claimoutliervacantaddressactivityflag 
+	MailDropIndicator			= advodropindicator 
+	AddressType			= advoadvoaddresstype 
+	UsageType				= advoaddressusagetype 
+	PrisonIndicator			= advoacahitflag 
+	ResidentialAddressIndicator	= advoresidentialorbusinessindicator 
+	ActiveStateExclusion		= providerattrhasactivestateexclusion 
+	ActiveOIGExclusion		= providerattrhasactiveoigexclusion 
+	ActiveOPMExclusion		= providerattrhasactiveopmexclusion 
+	ActiveLicenseRevocation	= providerattrhasactivelicenserevocation 
+	PastStateExclusion	= providerattrhasstateexclusioinreinstated 
+	PastOIGExclusion		= providerattrhasoigexclusioinreinstated 
+	PastOPMExclusion		= providerattrhasopmexclusioinreinstated 
+	PastLicenseRevocation	= providerattrhaslicenserevocationreinstated 
+	LicenseExpiredFlag	= claimoutlierproviderlicenseexpiredflag 
+	DEAExpiredFlag		= claimoutlierproviderdeadeactivatedflag 
+	DeceasedFlag		= claimoutlierproviderdeceasedflag 
+	DateofDeath		= consumerproviderdateofdeaceased 
+	BankruptcyFlag		= consumerproviderhasbankruptcy 
+	CriminalHistoryFlag	= consumerproviderhasconvictions 
+	DeceasedPatientsFlag	= claimoutlierpatientdeceasedflag 
+	LargePatientGroupFlag	= claimoutlierlargepatientgroupflag 
+	LicenseInactiveFlag	= providerattrinactivelicenseflag 
+	NPIDeactivatedFlag			= providerattrnpiflag 
+	LongPatientDrivingDistanceIndicator	= claimoutlierlongdistanceflag 
+	LongPatientDrivingDistanceOutlierRank	= claimoutlierlongdistancerank 
+	HighPaidDollarsPerPatientIndicator	= claimoutlierhighpaidamountperpatientflag 
+	HighPaidDollarsPerPatientOutlierRank	= claimoutlierhighpaidamountperpatientrank 						
+	HighPaidDollarsPerClaimIndicator		= claimoutlierhighpaidamountperclaimflag 
+	HighPaidDollarsPerClaimOutlierRank	= claimoutlierhighpaidamountperclaimrank 						
+	HighNumberOfPatientsIndicator		= claimoutlierpatientcountflag 
+	HighNumberOfPatientsOutlierRank		= claimoutlierpatientcountrank 								
+	HighNumberOfClaimsIndicator		= claimoutlierclaimcountflag 
+	HighNumberOfClaimsOutlierRank		= claimoutlierclaimcountrank 								
+	HighPaidDollarsIndicator			= claimoutlierhighpaidamountflag 
+	HighPaidDollarsOutlierRank		= claimoutlierhighpaidamountrank 							
+	InNetworkCurrentExclusionFlag		= provtoprovinnetworkactiveexclusionflag 
+	InNetworkCurrentRevocationFlag		= provtoprovinnetworkactiverevocationflag 
+	InNetworkPastExclusionFlag	= provtoprovinnetworkreinstatedexclusionflag 
+	InNetworkPastRevocationFlag	= provtoprovinnetworkreinstatedrevocationflag 							
+	InNetworkhasBankruptcy		= provtoprovinnetworkbankruptcyflag 								
+	InNetworkhasCriminalHistory	= provtoprovinnetworkcriminalhistoryflag 							
+	OutNetworkCurrentExclusionFlag	= provtoprovoutnetworkactiveexclusionflag 
+	OutNetworkCurrentRevocationFlag	= provtoprovoutnetworkactiverevocationflag 
+	OutNetworkPastExclusionFlag	= provtoprovoutnetworkreinstatedexclusionflag 
+	OutNetworkPastRevocationFlag	= provtoprovoutnetworkreinstatedrevocationflag 							
+	OutNetworkhasBankruptcy		= provtoprovoutnetworkbankruptcyflag 								
+	OutNetworkhasCriminalHistory	= provtoprovoutnetworkcriminalhistoryflag 
+	RelativeCriminalFlag		= provtoprovrelativecriminalhistoryflag
+	RelativeBankruptcyFlag		= provtoprovrelativebankruptcyflag 
+	AssociateCriminalFlag		= providerattrhasrelativeconvictions 
+	AssociateBankruptcyFlag		= providerattrhasrelativebankruptcy 
+	NoOfProviderAtAddress		= claimoutlieraddressprovidercount 
+	NoOfPatientAtAddress		= claimoutlieraddresspatientcount 
+	HighPaidAmountPerPatient		= claimoutlierproviderhighpaidamountperpatient 
+	HighPaidAmountPerClaim		= claimoutlierproviderhighpaidamountperclaim 
+	ClaimMedian			= claimoutlierclaimcountmedian 
+	PatientMedian			= claimoutlierpatientcountmedian 
+	HighPaidAmountMedian		= claimoutlierhighpaidamountmedian 
+	HighPaidAmountPerClaimMedian	= claimoutlierhighpaidamountperclaimmedian 
+	HighPaidAmountPerPatientMedian	= claimoutlierhighpaidamountperpatientmedian 
+	DMEPatientMedian			= claimoutlierdmepatientmedian 
+	DMEClaimMedian			= claimoutlierdmeclaimmedian 
+	LABPatientMedian			= claimoutlierlabpatientmedian
+	LABClaimMedian			= claimoutlierlabclaimmedian
+	ActiveLicenseRevocationState	= providerattractivelicenserevocationstate
+	ActiveLicenseRevocationDate	= providerattractivelicenserevocationdate 
+	ActiveLicenseExclusionState	= providerattractivelicenseexclusionstate 
+	ActiveLicenseExclusionDate	= providerattractivestateexclusiondate 
+	ActiveOIGExclusionDate		= providerattractiveoigexclusiondate 
+	ActiveOPMExclusionDate		= providerattractiveopmexclusiondate 
+	ActiveStateSanctionExclusionDate	= providerattractivestatesanctionexclusiondate 
+	ActiveOIGSanctionExclusionDate	= providerattractiveoigsanctionexclusiondate 
+	ActiveOPMSanctionExclusionDate	= providerattractiveopmsanctionexclusiondate 
+	LicenseRevocationReinstatedState	= providerattrlicenserevocationreinstatedstate 
+	StateExclusionReinstatedState	= providerattrstateexclusionreinstatedstate 
+	StateExclusionReinstatedDate	= providerattrstateexclusionreinstateddate 
+	OIGExclusionReinstatedDate	= providerattroigexclusionreinstateddate 
+	OPMExclusionReinstatedDate	= providerattropmexclusionreinstateddate 							
+	ExpiredDEANumber			= providerattrdeanumber 
+	ExpiredDEADate			= providerattrdatedeaexpired 
+	ExpiredLicenseNumber		= providerattrlicensenumber 
+	ExpiredLicenseState		= providerattrlicensestate 
+	ExpiredLicenseNumberDate		= providerattrdatelicenseexpired 
+	BankruptcyFiledDate		= consumerproviderbankruptcydate 
+	ConvictionDate			= consumerproviderconvictiondate 
+	DeceasedPatientCount		= claimoutlierpatientdeceasedcount 
+	PatientCount			= claimoutlierproviderpatientcount 
+	PatientDOD			= claimoutlierpatientdod 
+	NPIDeactivatedDate		= providerattrnpideactivationdate 
+	ProviderPatientAddress		= claimoutlierproviderpatientsharedaddress 
+	LargePatientAddress		= claimoutlierlargepatientgroupaddress 
+	InactiveLicenseState		= providerattrinactivelicensestate 
+	NoOfPatientsDrivingLongDistance	= claimoutliernoofpatientdrivinglongdistance 
+	AveDistance			= claimoutlieravedistancetravelled 
+	PractisePrimaryrange		= providerattrpractiseprimaryrange 
+	PractisePredirectional		= providerattrpractisepredirectional 
+	PractisePrimaryname		= providerattrpractiseprimaryname 
+	PractiseAddresssuffix		= providerattrpractiseaddresssuffix 
+	PractisePostdirectional		= providerattrpractisepostdirectional 
+	PractiseSecondaryrange		= providerattrpractisesecondaryrange 
+	PractiseCityname		= providerattrpractisecityname 
+	PractiseState			= providerattrpractisestate 
+	PractiseZip5			= providerattrpractisezip5 
+END 
+  	
+INSTANCE OutDataset.OutDataset(Ins005): LABEL("Output Dataset"),VERSION("1.0.0")
+	dsInput="^Ins004|dsOutput"
+	name="~qa::ComputeSuspectAddressScore::ComputeSuspectAddressScore::output"
+	Method="THOR"
+	UniqueIdentifier = "2"
+END

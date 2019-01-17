@@ -6,14 +6,17 @@ export location_report(DATASET(Doxie_Raw.Layout_address_input) addr_in,
 											 boolean royaltyout = FALSE, 
 											 boolean useBusinessIds = FALSE) :=  FUNCTION
 
-doxie.MAC_Header_Field_Declare();
 doxie.MAC_Selection_Declare();
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
+glb_ok := mod_access.isValidGLB();
+dppa_ok := mod_access.isValidDPPA();
 
-addrDidsWithInputs := location_services.getDids(addr_in,application_type_value);
+
+addrDidsWithInputs := location_services.getDids(addr_in, mod_access.application_type);
 
 didsOnly := PROJECT(addrDidsWithInputs, doxie.layout_references);
 
-doxie.mac_best_records(didsOnly,did,bestrec,dppa_ok,glb_ok,false,doxie.DataRestriction.fixed_DRM,include_DOD:=true);
+doxie.mac_best_records(didsOnly,did,bestrec,dppa_ok,glb_ok,false, mod_access.DataRestrictionMask,include_DOD:=true);
 
 propk := LN_PropertyV2.key_Property_did();
 
@@ -60,7 +63,7 @@ addrs := join(addrDidsWithInputs,doxie.key_header,
               transform (header.Layout_Header, Self := RIGHT),
               LIMIT (ut.limits.DID_PER_PERSON, SKIP));
 // eliminate any header records with sensitive DIDs or SSNs
-header.MAC_GlbClean_Header(addrs, addrs2);
+header.MAC_GlbClean_Header(addrs, addrs2, , , mod_access);
 
 bestnames := JOIN(withPropD,addrs2,
 									 LEFT.did = RIGHT.did and LEFT.fname = RIGHT.fname and 
@@ -92,7 +95,7 @@ addrVars := dedup(sort(joinedAddrs, RECORD), EXCEPT zip4);
 
 addrVarsAsInput := PROJECT(addrVars, doxie_raw.Layout_address_input);
 
-busMod := GetByBDID(addr_in, application_type_value);
+busMod := GetByBDID(addr_in, mod_access.application_type);
 
 busFids := IF(useBusinessIds, GetByBusinessIds(addr_in).GetPropFids(), 
 													    busMod.GetPropFids());
@@ -159,14 +162,8 @@ neighbors := doxie.nbr_records(
 	Neighbors_PerAddress,
 	Neighbors_Per_NA,
 	Neighbor_Recency,
-	industry_class_value,
-	GLB_Purpose,
-	DPPA_Purpose,
-	probation_override_value,
-	no_scrub,
-	glb_ok,
-	dppa_ok,
-	ssn_mask_value,,,,false
+	,,,false,
+	mod_access
 );
 
 Layout_report.Location_info getLocInfo(withPropD L, Doxie_Raw.Layout_address_input R) := TRANSFORM
@@ -379,7 +376,7 @@ prevOwnCombined := dedup(sort(prevOwn + deadOwnRes + deadOwn, did), did);
 prevOwnBest := sort(prevOwnCombined, lname, fname);
 		
 // eliminate any header records with sensitive DIDs or SSNs
-header.MAC_GlbClean_Header(headerRecs, headerRecs2);
+header.MAC_GlbClean_Header(headerRecs, headerRecs2, , , mod_access);
 		
 Layout_report.Assoc getPrevRes(headerRecs2 R) := TRANSFORM
 	SELF := R;

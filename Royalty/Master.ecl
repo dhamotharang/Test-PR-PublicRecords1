@@ -74,6 +74,7 @@ export Master := dataset(
 			{'ROYALTY', 'TEASERSCHAPPDATA', '240', 'I', ''			, ''},
 			{'ROYALTY', 'FDN_DL_DATA'			, '250', 'I', ''			, 'Fraud Defense Network/DL Data'},
 			{'ROYALTY', 'SBFE'						, '260', 'I', ''			, 'SBFE Data'},
+			{'ROYALTY', 'SBFE_PDF'						, '261', 'I', ''			, 'SBFE PDF Data'},
 			{'ROYALTY', 'EMAIL'						, '300', 'I', 'ET'		, 'Email: Entiera/Virtual DBS'},
 			{'ROYALTY', 'EMAIL_AW'				, '301', 'I', 'AW'		, 'Email: Accquire Web'},
 			{'ROYALTY', 'EMAIL_M1'				, '302', 'I', 'M1'		, 'Email: Media One'},

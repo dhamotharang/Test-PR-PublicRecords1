@@ -1,4 +1,4 @@
-import doxie, autokey, ut, header, Doxie_Raw, gong_Services, header_quick, AutoStandardI, infutor, Std;
+﻿import doxie, autokey, ut, header, Doxie_Raw, gong_Services, header_quick, AutoStandardI, infutor, Std;
 
 Did_Type_Mask_value:= AutoStandardI.InterfaceTranslator.Did_Type_mask_val.val(project(AutoStandardI.GlobalModule(),
 																												AutoStandardI.InterfaceTranslator.Did_Type_mask_val.params));
@@ -9,25 +9,25 @@ export mod_header_records(
 																						// or just use the input DIDs
 	boolean include_dailies = false, 					//these two parms from doxie.header_records
 	boolean allow_wildcard = false,
-	// dataset(Doxie.layout_references_hh) d,		//these from doxie.Comp_Subject_Addresses
-	unsigned3 dateVal = 0,
-	unsigned1 dppa_purpose = 0,
-	unsigned1 glb_purpose = 0,
-	boolean ln_branded_value = false,
 	boolean include_gong = true,
-	boolean probation_override_value,
-	string5 industry_class_value='UTILI',
-	boolean no_scrub = false, //this is required for glb cleaning macro; safest default is false
 	boolean suppress_gong_noncurrent = false,
 	set of STRING1 daily_autokey_skipset=[],
 	boolean AllowGongFallBack = true,
 	boolean ApplyBpsFilter = false,
-	boolean GongByDidOnly = false             // this serves as an override to gong searching, needed separate control for M2R
+	boolean GongByDidOnly = false,             // this serves as an override to gong searching, needed separate control for M2R
+  doxie.IDataAccess modAccess = MODULE (doxie.IDataAccess) END
 ) := MODULE
 
-shared dppa_ok := ut.dppa_ok(dppa_purpose); //mac_glbClean_header
-shared glb_ok := ut.glb_ok(glb_purpose);
-shared boolean is_knowx := (industry_class_value ='CNSMR');
+// have to declare these for now, since they are used in a macro below
+shared string5 industry_class_value := modAccess.industry_class;
+shared unsigned1 dppa_purpose := modAccess.dppa;
+shared unsigned1 glb_purpose := modAccess.glb;
+shared boolean probation_override_value := modAccess.probation_override;
+shared boolean no_scrub := modAccess.no_scrub;
+
+shared dppa_ok := modAccess.isValidDPPA ();
+shared glb_ok := modAccess.isValidGLB ();
+shared boolean is_knowx := modAccess.isConsumer ();
 
 //***** GET THE DAILIES EITHER BY SEARCH OR FETCH
 export mod_Daily(dataset(Doxie.layout_references_hh) d):=
@@ -39,7 +39,7 @@ MODULE
 																				AllowLeadingLnameMatch := AutoKey.skipSetTools(daily_autokey_skipset).AddZipL, 
 																				AllowFallBack := AllowGongFallBack, AllowLooseSuffixMatch:=false));
 	shared DailyUtil := 
-		IF(include_dailies AND industry_class_value<>'UTILI' and ~is_knowx and glb_ok /* glb_ok is redundant here, because the underlying attributes apply glb. But it should perform better, since we avoid an additional call. */,
+		IF(include_dailies AND modAccess.industry_class<>'UTILI' and ~is_knowx and glb_ok /* glb_ok is redundant here, because the underlying attributes apply glb. But it should perform better, since we avoid an additional call. */,
 			 IF(DoSearch, 
 					doxie.Fetch_Utility_Daily(d,dppa_purpose,glb_purpose,industry_class_value,allow_wildcard,daily_autokey_skipset,ApplyBpsFilter),
 					Doxie_Raw.Util_Daily_Raw(d,0,dppa_purpose,glb_purpose,industry_class_value)));
@@ -47,7 +47,7 @@ MODULE
 		IF(include_dailies AND ~is_knowx, 
 			 IF(DoSearch, 
 					header_quick.fetch_records(d, include_dailies, allow_wildcard,daily_autokey_skipset,ApplyBpsFilter),
-					doxie_Raw.QuickHeader_raw(d,dateVal,dppa_purpose,glb_purpose,,ln_branded_value,probation_override_value, maskSSN:=false)));
+doxie_Raw.QuickHeader_raw(d,modAccess.date_threshold,dppa_purpose,glb_purpose,,modAccess.ln_branded,probation_override_value, maskSSN:=false)));
 
 	//***** FOR THOSE SEARCHING, EXPORT THE DIDS WE FOUND
 
@@ -128,7 +128,7 @@ MODULE
 	// instead of checking DIDType for dailies, just only allow the dailies if allowing all DIDTypes
 	shared dailies_uncleaned := IF (did_bitmask = doxie.DidType.ALL_TYPES, dailies_uncleaned0);
 
-	header.MAC_GlbClean_Header(dailies_uncleaned,dailies_pre);
+	header.MAC_GlbClean_Header(dailies_uncleaned,dailies_pre, , ,modAccess);
 
 	// need to populate valid_ssn values for any daily records that have an SSN (since they are not populated
 	// in the QuickHeader or Util builds)
@@ -147,7 +147,7 @@ MODULE
 	
 	dailies := dailies_pre(ssn = '') + dailies_w_validssn;
 
-	// output(industry_class_value);
+	// output(industry_class);
 	// output(include_dailies);
 	// output(dosearch);
   // output(DailyUtil);
@@ -185,7 +185,7 @@ MODULE
 
   export HeaderRecords_Unclean := headerPretty;
 
-	header.MAC_GlbClean_Header(HeaderRecords_Unclean,headerCleaned);
+	header.MAC_GlbClean_Header(HeaderRecords_Unclean,headerCleaned, , ,modAccess);
 	export Records := project(headerCleaned, doxie.layout_presentation);  //is already in this layout, but compiler doesn't know that
 END;
 

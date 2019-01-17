@@ -1,0 +1,9 @@
+testcompositionrun_info
+C:\Users\carmigjx\git\HIPIE_Plugins\AppendSequenceId\appendsequenceid_testcmp.cmp(0,0):error H101:Discarding invalid composition HIPIE_Plugins.AppendSequenceId.AppendSequenceId_testcmp:(14,38):error H101:mismatched input '-' expecting {',', ')'}
+C:\Users\carmigjx\git\HIPIE_Plugins\CleanStringColumn\cleanstringcolumn_testcmp.cmp(23,0):error H501:No contract found HIPIE_Plugins.CleanStringColumn.CleanStringColumn with version 1.0.0
+Monitoring WU W20160919-140309(HIPIE_BCTLWXCARMIGJX_JoinDataset_testcmp_CarmigJX) to completion.
+
+testcompositionrun_err
+Plugin JoinDataset passed compliance check
+
+

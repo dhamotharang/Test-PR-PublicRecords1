@@ -1,7 +1,13 @@
-export historic_nbr_records_crs(boolean checkRNA=true) := FUNCTION
+IMPORT $;
+
+EXPORT historic_nbr_records_crs(boolean checkRNA=true) := FUNCTION
+mod_access := $.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+glb_ok := mod_access.isValidGLB();
+dppa_ok := mod_access.isValidDPPA();
 doxie.MAC_Selection_Declare();
-doxie.MAC_Header_Field_Declare();
-historic_nbr_records(doxie.header_records(),a,checkRNA)
-ut.PermissionTools.GLB.mac_FilterOutMinors(a,afil,,,dob)
+
+doxie.historic_nbr_records(doxie.header_records(), hist_nbr, checkRNA, mod_access);
+
+afil := $.compliance.MAC_FilterOutMinors (hist_nbr, , dob, mod_access.show_minors);
 RETURN afil;
 END;

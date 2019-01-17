@@ -1,4 +1,4 @@
-import census_data,doxie_cbrs,ebr,gong, risk_indicators,ut;
+﻿import census_data,doxie_cbrs,ebr,gong,risk_indicators,TopBusiness_Services,ut;
 
 export ebr_raw := MODULE
 
@@ -139,7 +139,10 @@ export ebr_raw := MODULE
 						SELF.trade_quarterly_average_recs := m(PROJECT(ebr.Key_2025_Trade_Quarterly_Averages_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_2025_Trade_Quarterly_Averages_Base),constants.maxcounts.Trade_Payment_Trends,-(unsigned)(quarter_yy+quarter));
 						SELF.collateral_account_recs := m(PROJECT(ebr.Key_4500_Collateral_Accounts_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_4500_Collateral_Accounts_In),constants.maxcounts.Collateral_Accounts);
 						self.bank_detail_recs := m(PROJECT(ebr.Key_5000_Bank_Details_FILE_NUMBER(keyed(file_number=le.file_number)),add_bank_details_county(LEFT)),constants.maxcounts.Bank_Details);
-						SELF.demographic_data_5600_recs := m(PROJECT(ebr.Key_5600_Demographic_Data_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_5600_demographic_data_In),constants.maxcounts.Demographic_Data);			
+						SELF.demographic_data_5600_recs := m(PROJECT(ebr.Key_5600_Demographic_Data_FILE_NUMBER(keyed(file_number=le.file_number)),
+                                                   TRANSFORM(EBR_Services.Layouts.demographic_5600_output_rec,
+                                                             SELF.SALES_ACTUAL := (STRING20)TopBusiness_Services.Functions.convert_EBR_sales(left.sales_actual),
+                                                             SELF := LEFT)),constants.maxcounts.Demographic_Data);			
 						SELF.demographic_data_5610_recs := IF(current_demo5610,m(PROJECT(ebr.Key_5610_Demographic_Data_FILE_NUMBER(keyed(file_number=le.file_number)),add_demographic_5610(left)),constants.maxcounts.Demographic_Data),
 																																	m_all(PROJECT(ebr.Key_5610_Demographic_Data_FILE_NUMBER(keyed(file_number=le.file_number)),add_demographic_5610(left)),constants.maxcounts.Demographic_Data));
 						SELF.government_trade_recs := m(PROJECT(ebr.Key_6500_Government_Trade_FILE_NUMBER(keyed(file_number=le.file_number)),ebr.Layout_6500_Government_Trade_In),constants.maxcounts.Government_Trade);

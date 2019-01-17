@@ -181,6 +181,7 @@ string DataPermission := Risk_Indicators.iid_constants.default_DataPermission : 
     export boolean include_summary := false : stored('IncludeSummary');
     export unsigned1 indicators_per_imposter := 3 : stored('MaxIndicatorsPerImposter');
     export boolean probation_override := false : stored ('ProbationOverride');
+    export string DataRestrictionMask := AutoStandardI.Constants.DataRestrictionMask_default : STORED('DataRestrictionMask');
   end;
 
   // dids from input

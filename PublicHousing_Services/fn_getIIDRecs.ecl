@@ -1,5 +1,5 @@
 
-IMPORT BatchDatasets, BatchShare, Doxie_Regression, Risk_Indicators, Riskwise;
+IMPORT BatchDatasets, Risk_Indicators, Riskwise;
 
 EXPORT fn_getIIDRecs(DATASET(Layouts.batch_in) ds_batch_in, IParams.BatchParams in_mod) :=
 	FUNCTION

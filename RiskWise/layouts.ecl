@@ -215,6 +215,11 @@ export reasoncode_settings := RECORD
 	unsigned1 IIDVersion := 0;
 	boolean EnableEmergingID := false;
 	boolean IsIdentifier2 := false;
+	boolean ischase := False;// reason codes for chase custom model
+	boolean verfirst_chase := False;// reason codes for chase custom model
+	boolean verlast_chase := False;// reason codes for chase custom model
+	boolean veraddr_chase := False;// reason codes for chase custom model
+
 end;
 
 export actioncode_settings := RECORD

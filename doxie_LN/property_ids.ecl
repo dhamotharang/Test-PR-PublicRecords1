@@ -1,5 +1,7 @@
 import doxie, ut, suppress, doxie_ln;
 
+rec := doxie_ln.layout_property_ids;
+
 export property_ids (
     dataset(Doxie.layout_references) dids,
 		dataset(Doxie.Layout_ref_bdid) bdids,
@@ -20,7 +22,16 @@ export property_ids (
 		string32 appType
 ) := FUNCTION
 
-rec := doxie_ln.layout_property_ids;
+// In the future {mod_access} should be provided in the input
+mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule (IsFCRA)))
+  EXPORT unsigned1 glb := glb_purpose;
+  EXPORT unsigned1 dppa := dppa_purpose;
+  EXPORT boolean ln_branded := ln_branded_value;
+  EXPORT boolean probation_override := probation_override_value;
+  EXPORT unsigned3 date_threshold := ^.dateVal;
+  EXPORT string32 application_type := appType;
+  EXPORT boolean no_scrub := FALSE;	
+END;
 
 //***** BY DID (previously 'current')******
 ids := doxie_ln.Fetch_Property_Did (dids, IsFCRA);
@@ -32,7 +43,7 @@ rec current_tor(ids l) := transform
 	self.did := L.did;
 	self.bdid := L.bdid;
 end;
-bydid := project(ids(ln_branded_value or ln_fares_id[1] <> 'D'), current_tor(left));
+bydid := project(ids(mod_access.ln_branded or ln_fares_id[1] <> 'D'), current_tor(left));
 
 
 //***** BY ADDRESS (previously 'prior'..now prior and new currently owned option) ******
@@ -65,14 +76,7 @@ if(
 	iterate(Main_Dn,tra(left,right))
 );
 
-
-STRING5 industry_class_val := '' : STORED('IndustryClass');
-industry_class_value := StringLib.StringToUpperCase (industry_class_val) : global;
-
-get_csa0 := doxie.Comp_Subject_Addresses(dids, dateVal,
-	dppa_purpose, glb_purpose,
-	ln_branded_value, , 
-	probation_override_value, industry_class_value);
+get_csa0 := doxie.Comp_Subject_Addresses(dids, , , , mod_access);
 
 // enforce using [addresses] for FCRA-side queries
 get_csa := IF (IsFCRA, ds_addresses, IF (EXISTS (addresses), ds_addresses, get_csa0.addresses));
@@ -83,11 +87,11 @@ addr := project (get_csa, doxie.layout_propertySearch);
 byaddr0 := doxie_ln.fn_PropIDsByAddr(
   addr, 
   get_csn, 
-  dateVal,
-  dppa_purpose,
-  glb_purpose,
-  ln_branded_value,
-  probation_override_value,
+  mod_access.date_threshold,
+  mod_access.dppa,
+  mod_access.glb,
+  mod_access.ln_branded,
+  mod_access.probation_override,
   true, //when Include_PriorProperties=false, i am going to go ahead and fetch them, use them to set the address_seq_no, and then filter them out at the bottom
 	Use_CurrentlyOwnedProperty_value, ,
   IsFCRA,
@@ -103,7 +107,7 @@ currents := if(Use_CurrentlyOwnedProperty_value, cor, bydid);
   
 
 cp := dedup(currents + priors, all);
-Suppress.MAC_Suppress(cp,cp_filter,appType,,,Suppress.Constants.DocTypes.FaresID,fid);
+Suppress.MAC_Suppress(cp,cp_filter,mod_access.application_type,,,Suppress.Constants.DocTypes.FaresID,fid);
 
 // cannot use pullSSN in fcra-side:
 cpclean := IF (IsFCRA, cp, cp_filter);

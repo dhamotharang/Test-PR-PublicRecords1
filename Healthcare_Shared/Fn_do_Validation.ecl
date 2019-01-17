@@ -1,4 +1,6 @@
-import iesp,ut,Business_Header,Business_Header_SS,Risk_Indicators,doxie,watchdog,suppress,enclarity,Healthcare_Shared,STD;
+import iesp,ut,Business_Header,Business_Header_SS,Risk_Indicators,doxie,suppress,enclarity,
+	Healthcare_Shared,STD,dx_BestRecords;
+
 export Fn_do_Validation := Module
 		shared currentDate := (string)ut.GetDate;
 		EXPORT checkCurrentLicense(iesp.share.t_Date inputValue) := FUNCTION
@@ -144,14 +146,15 @@ export Fn_do_Validation := Module
 																	keep(50), limit(0)),record),record);
 			// output(checkDidFromSSN,named('checkDidFromSSN'));
 			//Check the SSN against the watchdog file to get the full name and see if it is close to what the user supplied if so get the watch dog name and compare it to the real names collected
-			bestInfo:=join(checkDidFromSSN, watchdog.Key_watchdog_glb,
-																	(keyed(right.did=left.did) and 
-																	((right.fname[1..2]=STD.Str.ToUpperCase(left.name_first[1..2]) and right.lname = STD.Str.ToUpperCase(left.name_last)) or 
-																	 (right.fname[1..2]=STD.Str.ToUpperCase(left.name_last[1..2]) and right.lname = STD.Str.ToUpperCase(left.name_first)))),
+			bestRecs := dx_BestRecords.append(checkDidFromSSN, did, dx_BestRecords.Constants.perm_type.glb, left_outer := false);
+			bestInfo:=project(bestRecs(((_best.fname[1..2]=STD.Str.ToUpperCase(name_first[1..2]) and _best.lname = STD.Str.ToUpperCase(name_last)) or 
+																	(_best.fname[1..2]=STD.Str.ToUpperCase(name_last[1..2]) and _best.lname = STD.Str.ToUpperCase(name_first)))),
 																	Transform(Healthcare_Shared.Layouts.layout_lookup_DID, 
-																			self.acctno := left.acctno; self.lnpid := left.lnpid; self.did:= (integer)right.ssn;
-																			self.name_first := right.fname, self.name_last := right.lname;),
-																	keep(50), limit(0));
+																			self.acctno := left.acctno; 
+																			self.lnpid := left.lnpid; 
+																			self.did:= (integer)left._best.ssn;
+																			self.name_first := left._best.fname, 
+																			self.name_last := left._best.lname));
 			// output(bestInfo,named('bestInfo'));
 			//Compare the best Info to the Names we are about to return to see if it matches any of the variations
 			bestInfo_match := Join(BestInfo,nameRecs, left.acctno=right.acctno and left.lnpid=right.lnpid and left.did=(integer)right.ssn,

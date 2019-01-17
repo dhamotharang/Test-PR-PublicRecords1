@@ -1,4 +1,4 @@
-IMPORT AutoStandardI, BIPV2, Business_Risk_BIP, Gateway, iesp, LNSmallBusiness, Suppress;
+﻿IMPORT AutoStandardI, BIPV2, Business_Risk_BIP, Gateway, iesp, LNSmallBusiness, Suppress;
 
 // The variables defined below match AutoStandardI.GlobalModule default values 
 //   -- because iesp.ECL2ESP.SetInputBaseRequest is called at the service level
@@ -44,6 +44,8 @@ EXPORT IParam :=
 	      EXPORT STRING   TestDataTableName	              := '';
         EXPORT STRING1  FetchLevel 						          := BIPV2.IDconstants.Fetch_Level_SELEID;
         EXPORT BOOLEAN  IncludeCreditReport             := FALSE; 
+	   EXPORT BOOLEAN  LimitPaymentHistory24Months                   := FALSE; 
+	  EXPORT STRING       SBFEContributorIds         :=  ''; 
         EXPORT BOOLEAN  MinInputMetForAuthRepPopulated  := FALSE; 
 				EXPORT BOOLEAN UseInputDataAsIs                 := FALSE;
 	    END;

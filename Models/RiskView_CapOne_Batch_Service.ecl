@@ -172,7 +172,7 @@ clam := Risk_Indicators.Boca_Shell_Function_FCRA(cleanIn, gateways, dppa, glba, 
 																								 suppressNearDups, fromBIID, excludeWatchlists, fromIT1O,
 																								 ofacVersion, includeOfac, includeAddWatchlists, watchlistThreshold,
 																								 bsVersion, isPreScreen, doScore, nugen, ADL_Based_Shell, datarestriction:=DataRestriction,
-																								 BSOptions:=BSOptions, datapermission:=DataPermission);
+																								 BSOptions:=BSOptions, datapermission:=DataPermission,IntendedPurpose:='PRESCREEN');
 
 
 
@@ -190,6 +190,7 @@ Layout_working := RECORD
 	unsigned DID;
 	boolean suppress;
 	models.Layout_CapOne_RiskView_Batch_Out;
+  string1 consumerstatement;
 END;
 
 Layout_working intoAttributes(attr le, clam rt) := TRANSFORM
@@ -568,6 +569,7 @@ Layout_working intoAttributes(attr le, clam rt) := TRANSFORM
 	self.PhoneOtherAgeNewestRecord := le.version3.PhoneOtherAgeNewestRecord;
 	
 	self.PrescreenOptOut := le.version3.PrescreenOptOut;
+  self.ConsumerStatement := le.v4_consumerstatement;
 
 	self := [];
 END;
@@ -579,12 +581,13 @@ Layout_working blankAttributes(attributes_temp le) := TRANSFORM
 	SELF.acctno := le.acctno;
 	SELF.SecurityFreeze := le.SecurityFreeze; 
 	SELF.PrescreenOptOut := le.PrescreenOptOut;
+  SELF.isNoVer := le.isNoVer;
 	self.did := le.did;
 	SELF := [];
 END;
-blank_attributes := PROJECT(attributes_temp (SecurityFreeze = '1'), blankAttributes(LEFT));
+blank_attributes := PROJECT(attributes_temp (SecurityFreeze = '1' or ConsumerStatement = '1'), blankAttributes(LEFT));
 
-attributes := attributes_temp (SecurityFreeze <> '1') + blank_attributes;
+attributes := attributes_temp (SecurityFreeze <> '1' and ConsumerStatement <> '1') + blank_attributes;
 
 
 // no prescreen score needed

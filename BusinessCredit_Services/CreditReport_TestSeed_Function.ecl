@@ -1,4 +1,4 @@
-import iesp, Seed_Files, Address, risk_indicators, RiskWise;
+﻿import iesp, Seed_Files, Address, risk_indicators, RiskWise;
 
 EXPORT CreditReport_TestSeed_Function(DATASET(BusinessCredit_Services.Layouts.in_key) inData,
 																STRING32 TestDataTableName_in) := FUNCTION
@@ -296,6 +296,7 @@ EXPORT CreditReport_TestSeed_Function(DATASET(BusinessCredit_Services.Layouts.in
 						self.PastDueAmount              := rt.AcctDet1_Pay_Hist_PastDueAmount      ;
 						self.IsExtendedOverdue          := rt.AcctDet1_Pay_Hist_IsExtendedOverdue  ;
 					));
+				self := [];   // Blank out fields that don't have testseed value.
 		));
 		
 		AccountDetail2 :=
@@ -360,6 +361,7 @@ EXPORT CreditReport_TestSeed_Function(DATASET(BusinessCredit_Services.Layouts.in
 						self.PastDueAmount              := rt.AcctDet2_Pay_Hist_PastDueAmount                 ;
 						self.IsExtendedOverdue          := rt.AcctDet2_Pay_Hist_IsExtendedOverdue             ;
 					));
+				self := [];  // Blank out fields that don't have testseed value.
 		));
 		
 		self.AccountDetail := AccountDetail1 + AccountDetail2;

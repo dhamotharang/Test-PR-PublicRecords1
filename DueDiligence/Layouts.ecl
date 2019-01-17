@@ -13,8 +13,7 @@ EXPORT Layouts := MODULE
 		STRING120 Name := '';
 		UNSIGNED4	LinkCount := 0;                       // Number of times that particular Name is returned from the BIP Append Process
 	END;
-	
-/* Output of DueDiligence.getBusBIPId */  
+	 
 	EXPORT LinkID_Results := RECORD
 		UNSIGNED6 Seq       := 0;
 		BOOLEAN BIPIDSourceInput;                       // Indicates if the BIP IDs were returned from the append process or input
@@ -268,7 +267,17 @@ EXPORT Layouts := MODULE
 		STRING3 source;
 	END;
 	
+	EXPORT SICNAICRating := RECORD
+    STRING8 code;
+    STRING highestIndustryOrRiskLevel;
+    STRING1 sicNAICSIndicator;
+		STRING2 industryCategory;
+  END;
+	
 	EXPORT SicNaicRiskLayout := RECORD
+		SICNAICRating bestSIC;
+    SICNAICRating bestNAICS;
+    SICNAICRating highestRisk;
 		BOOLEAN cibRetailExists;
 		BOOLEAN cibNonRetailExists;
 		BOOLEAN msbExists;
@@ -451,7 +460,7 @@ EXPORT Layouts := MODULE
     STRING1 offenseDDChargeLevelCalculated;
     STRING35 offenseChargeLevelReported; 
     STRING1 offenseConviction;
-    STRING13 offenseIncarcerationProbationParole;
+    STRING25 offenseIncarcerationProbationParole;
     STRING1 offenseTrafficRelated;
     
     //Additional details
@@ -472,6 +481,10 @@ EXPORT Layouts := MODULE
   
   EXPORT RelatedParty := RECORD
 		SlimIndividual;
+		BOOLEAN isOwnershipProng;
+    BOOLEAN isControlProng;
+    STRING2 busAssociationScore;
+    STRING10 busAssociationFlags;
 		STRING2 usResidencyScore;
 		STRING10 usResidencyFlags;
 		STRING2 legalEventTypeScore;
@@ -487,6 +500,26 @@ EXPORT Layouts := MODULE
     DATASET(CriminalOffenses) indOffenses;   //{MAXCOUNT(DueDiligence.Constants.MAX_OFFENSES)};
 	END;
   
+	EXPORT Associates := RECORD
+    DIDAndName;
+    BOOLEAN isBEO;
+    BOOLEAN isOwnershipProng;
+    BOOLEAN isControlProng;
+    UNSIGNED3 numOfPositions;
+		DATASET(Positions) positions;// {MAXCOUNT(DueDiligence.Constants.MAX_POSITIONS)};
+  END;
+  
+  EXPORT BusAsscoiations := RECORD
+    UNSIGNED6 ultID;
+    UNSIGNED6 orgID;
+    UNSIGNED6 seleID;
+    //busines info
+    STRING structure;
+    SicNaicRiskLayout sicNaicRisk;
+    DATASET(Associates) beos;
+    DATASET(SlimIndividual) registeredAgents;
+  END;
+
   EXPORT PropertyDataLayout := RECORD
     Address;
     STRING50 addressType;
@@ -564,31 +597,13 @@ EXPORT Layouts := MODULE
     STRING8 titleDate;
     STRING2 registeredState;
     STRING8 registeredDate;
-    
-    /* data that describes the vehicle */
-    string25		Orig_VIN;                        
-		string4			Orig_Year;
-    string36		Orig_Make_Desc; 
-    string30		Orig_Model_Desc;
-    string30    license_Plate_Type; 
-    string50    Class_Type;
-    unsigned6   Vina_Price; 
-    /* title  */  
-    string2     Title_State;                   
-	  integer2    Title_Year;                      
-		integer2    Title_Month;                     
-		integer2    Title_Day;                    
-    /* registration */  
-    string2     Registered_State;                    
-	  integer2    Registered_Year;                    
-		integer2    Registered_Month;                  
-		integer2    Registered_Day; 
 	END;
   
 	EXPORT BusReportDetails := RECORD
     DATASET(BusPropertyDataLayout) busProperties {MAXCOUNT(DueDiligence.Constants.MAX_PROPERTIES)};
     DATASET(WatercraftDataLayout) busWatercraft {MAXCOUNT(DueDiligence.Constants.MAX_WATERCRAFT)};
     DATASET(AircraftDataLayout) busAircraft {MAXCOUNT(DueDiligence.Constants.MAX_AIRCRAFT)};
+    DATASET(VehicleDataLayout) busVehicle {MAXCOUNT(DueDiligence.Constants.MAX_VEHICLE)}; 
     DATASET(CommonGeographicLayout) operatingLocations {MAXCOUNT(DueDiligence.Constants.MAX_OPERATING_LOCATIONS)};
     BOOLEAN FEINSourceContainsE5;
     STRING9 FEIN_Masked_For_Report;
@@ -620,7 +635,8 @@ EXPORT Layouts := MODULE
     DATASET(IndPropertyDataLayout) perProperties {MAXCOUNT(DueDiligence.Constants.MAX_PROPERTIES)};
     DATASET(WatercraftDataLayout) perWatercraft {MAXCOUNT(DueDiligence.Constants.MAX_WATERCRAFT)};
     DATASET(VehicleDataLayout) perVehicle {MAXCOUNT(DueDiligence.Constants.MAX_VEHICLE)};  
-    DATASET(AircraftDataLayout) perAircraft {MAXCOUNT(DueDiligence.Constants.MAX_AIRCRAFT)};  
+    DATASET(AircraftDataLayout) perAircraft {MAXCOUNT(DueDiligence.Constants.MAX_AIRCRAFT)};
+		DATASET(BusAsscoiations) perBusinessAssociations;// {MAXCOUNT(DueDiligence.Constants.MAX_BUS_ASSOCIATIONS)}; 
   END;
 	
 	
@@ -678,10 +694,6 @@ EXPORT Layouts := MODULE
 		
     UNSIGNED3		numOfRegAgents;
 		DATASET(LayoutAgent) registeredAgents {MAXCOUNT(DueDiligence.Constants.MAX_REGISTERED_AGENTS)};		//populated in DueDiligence.getBusRegistration, DueDiligence.getBusSOSDetail
-		
-		/* BusMatchLevel  */ 
-		INTEGER2		weight;                                             //populated in -------------------------- 
-		
 											
 		UNSIGNED4	  BusnHdrDtLastSeen;										        	    //populated in DueDiligence.getBusHeader		
 		STRING5     FIPsCode;

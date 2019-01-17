@@ -6,7 +6,9 @@ export rollup_presentation(DATASET(layout_presentation) presRecs,
 													 boolean addressOnlySort = false,
 													 boolean skipRelativePhoneAppend = false) := FUNCTION
 
-	MAC_Header_Field_Declare()
+	doxie.MAC_Header_Field_Declare();
+	mod_access := doxie.compliance.GetGlobalDataAccessModule ();
+	
 	high_valid_ssn := 100; // default high value; lowest is best
 	high_tnt := 100; // default high value; lowest is best
 	high_penalt := 100; // default high value; lowest is best
@@ -166,7 +168,7 @@ export rollup_presentation(DATASET(layout_presentation) presRecs,
 		self.dls := project(r(did=l.did),PersonSearch_Services.layouts.DlRec);
 	end;
 	MyDLDataset := rollup(group(MyDLResultsSlim,did),group,makechildDs(left, rows(left)));
-	rna_ok := ut.dppa_ok(dppa_purpose,header.constants.checkRNA);
+	rna_ok := mod_access.isValidDPPA (header.constants.checkRNA);
 	doxie.Layout_Rollup.KeyRec MyDLTransform(doxie.Layout_Rollup.KeyRec inRec, PersonSearch_Services.Layouts.DlRecDataset dlInfoDetail) := TRANSFORM
 		SELF.dlrecs := if(~inRec.includedbyhhid or rna_ok,dlInfoDetail.dls);
 		SELF := inRec;
@@ -252,7 +254,7 @@ export rollup_presentation(DATASET(layout_presentation) presRecs,
 		EXPORT STRING14  DID := '';
 		EXPORT STRING11  SSN := '';
 		EXPORT BOOLEAN	 IncludeDeadContacts := true; //We wanted Deceased Subjects when returning additional data from the PhonesPlus database
-	  EXPORT STRING  DataPermissionMask := AutoStandardI.Constants.DataPermissionMask_default : STORED('DataPermissionMask'); // Chgd for FDN Project
+	  EXPORT STRING  DataPermissionMask := mod_access.DataPermissionMask; // Chgd for FDN Project
 		EXPORT BOOLEAN   IncludeLastResort := false : STORED('IncludeLastResort');		
 		EXPORT STRING    _TransactionId := '' : STORED('_TransactionId');
 	end;
@@ -543,7 +545,7 @@ export rollup_presentation(DATASET(layout_presentation) presRecs,
 												-first_seen, -hasListing(phoneRecs), prim_range);
 		addCnsmr := sort(j, tnt_score(tnt),-last_seen, -dt_vendor_last_reported, 
 												-dt_vendor_first_reported, -hasListing(phoneRecs), prim_range);
-		SELF.addrRecs := IF(ut.IndustryClass.is_knowx, addCnsmr, addrNotCnsmr);
+		SELF.addrRecs := IF(mod_access.isConsumer(), addCnsmr, addrNotCnsmr);
 							
 		SELF := L;
 	END;
@@ -559,7 +561,12 @@ export rollup_presentation(DATASET(layout_presentation) presRecs,
 	whichRids := join(tagrp, ta2, LEFT.did = RIGHT.did, getRids(LEFT));
 	srcRids := doxie.lookup_rid_src(dedup(sort(whichRids,record),record));
 
-	best_recs := doxie.best_records(PROJECT(ta2,TRANSFORM(doxie.layout_references,SELF.did:=(unsigned)LEFT.did)),false,1,1,includeDOD:=true);
+  mod_access_local := MODULE (mod_access)
+	  EXPORT unsigned1 glb := 1;
+	  EXPORT unsigned1 dppa := 1;
+	END;
+	best_recs := doxie.best_records(PROJECT(ta2,TRANSFORM(doxie.layout_references,SELF.did:=(unsigned)LEFT.did)),
+	                                includeDOD:=true, modAccess := mod_access_local);
 
    
 
@@ -637,7 +644,7 @@ export rollup_presentation(DATASET(layout_presentation) presRecs,
 			bounce_orig);
 			
 
-	doxie.MAC_Add_WeAlsoFound(bounce,bounce_waf,glb_purpose,dppa_purpose)
+	doxie.MAC_Add_WeAlsoFound(bounce,bounce_waf,mod_access.glb,mod_access.dppa)
 	outt1 := IF (include_wealsofound, bounce_waf, bounce);
 				
 	doxie.Mac_Bk_Count(outt1, outt2, did, bk_count, doxie_crs.str_typeDebtor);			
@@ -668,7 +675,7 @@ export rollup_presentation(DATASET(layout_presentation) presRecs,
 		self := le;
 	END;
 	
-	result := if(ut.IndustryClass.is_knowx, project(final, fixAddrDates(LEFT)), final);
+	result := if(mod_access.isConsumer(), project(final, fixAddrDates(LEFT)), final);
 	
 	Royalty.MAC_RoyaltyLastResort(phonePlusRawRecs,lastresort_royalties);
 	FDN_check     := ds_denorm_addr_with_fdninds(fdn_results_found = true);

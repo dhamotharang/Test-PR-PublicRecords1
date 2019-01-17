@@ -40,12 +40,11 @@ IMPORT ut, dx_BestRecords, doxie_files, DeathV2_Services, AutoStandardI;
 
 // get appropriate best_records permission flag
 #uniquename(perm_flag)
-%perm_flag% := dx_BestRecords.fn_get_perm_type(glb_per, useNonBlankKey, %utility_flag%, %pre_glb_flag%, 
+%perm_flag% := dx_BestRecords.Functions.get_perm_type(glb_per, useNonBlankKey, %utility_flag%, %pre_glb_flag%, 
 	%filter_exp%, %filter_eq%, marketing, %cnsmr_flag%);
 
 #uniquename(outf)
-%outf% := project(dx_BestRecords.fn_get_best_records(did_stream, did_field, %perm_flag%), 
-	transform(bestlayout, self := left));
+%outf% := dx_BestRecords.get(did_stream, did_field, %perm_flag%, bestlayout);
 	
 #uniquename(outfile_nominors)
 %outfile_nominors% := join(%outf%, doxie_files.key_minors_hash,

@@ -1,0 +1,124 @@
+ID "0f225d90-9d44-4bb0-8eb9-a84bd8f29e43";
+NAME CleanPatientData_testcmp;
+LABEL "Clean Patient Data";
+DESCRIPTION "Clean Patient Data";
+VERSION "1.0.0";
+AUTHOR "periassx";
+
+PERMISSIONS
+   VIEW:PUBLIC;
+   EDIT:PUBLIC;
+   RUN:PUBLIC;
+END
+
+INPUTS
+    STRING CompareWUID : DEFAULT("W20180213-124900");
+END
+
+INSTANCE UseDataset.UseDataset(Ins001)
+	LogicalFilename ="~qa::cleanpatientdata::cleanpatientdata::input1"
+	Method=THOR
+	Structure=STRING50|PatientKey,STRING12|PatientNumber,STRING2|PatientSequenceNumber,STRING2|PatientSecurityCode,STRING2|PatientRelation,STRING9|PatientSocialSecurityNumber,STRING30|PatientFirstName,STRING1|PatientMiddleName,STRING36|PatientLastName,STRING36|PatientAddressLine1,STRING36|PatientAddressLine2,STRING24|PatientCityName,STRING2|PatientState,STRING9|PatientZip5,STRING30|PatientCounty,STRING2|PatientCountry,STRING8|PatientDateOfBirth,STRING1|PatientGender,STRING8|PatientDeathOfDeath,STRING8|InsuredEligibleEffectiveDate,STRING8|InsuredEligibleExpirationDate,STRING6|InsuredEligibleCoverageType,STRING4|InsuredEligibleStatus,STRING50|PrimaryMemberKey,STRING9|PrimaryInsuredSocialSecurityNumber,STRING12|PrimaryInsuredNumber,STRING12|PrimaryInsuredPolicyNumber,STRING15|PrimaryInsuredGroupNumber,STRING11|PrimaryInsuredDivisionNumber,STRING8|PatientLatestUpdateDate,STRING50|UserDefinedField01,STRING50|UserDefinedField02,STRING50|UserDefinedField03,STRING50|UserDefinedField04,STRING50|UserDefinedField05,STRING50|UserDefinedField06,STRING50|UserDefinedField07,STRING50|UserDefinedField08,STRING50|UserDefinedField09,STRING50|UserDefinedField10
+END
+
+INSTANCE CleanPatientData.CleanPatientData(Ins002)
+	Prefix="clean"
+	dsInput=^Ins001|dsOutput
+	PatientKey= PatientKey				
+	PatientNumber= PatientNumber				
+	PatientSequenceNumber= PatientSequenceNumber			
+	SecurityCode= PatientSecurityCode			
+	PatientRelation= PatientRelation				
+	SSN= PatientSocialSecurityNumber		
+	FirstName= PatientFirstName			
+	MiddleName= PatientMiddleName			
+	LastName= PatientLastName				
+	AddressLine1= PatientAddressLine1			
+	AddressLine2= PatientAddressLine2			
+	City= PatientCityName				
+	State= PatientState				
+	Zip5= PatientZip5				
+	County= PatientCounty				
+	Country= PatientCountry				
+	DateOfBirth= PatientDateOfBirth			
+	Gender= PatientGender				
+	DateOfDeath= PatientDeathOfDeath			
+	InsuredEligibleEffectiveDate= InsuredEligibleEffectiveDate		
+	InsuredEligibleExpirationDate= InsuredEligibleExpirationDate		
+	InsuredEligibleCoverageType= InsuredEligibleCoverageType		
+	InsuredEligibleStatus= InsuredEligibleStatus			
+	PrimaryMemberKey= PrimaryMemberKey			
+	PrimaryInsuredSSN= PrimaryInsuredSocialSecurityNumber	
+	PrimaryInsuredNumber= PrimaryInsuredNumber			
+	PrimaryInsuredPolicyNumber= PrimaryInsuredPolicyNumber		
+	PrimaryInsuredGroupNumber= PrimaryInsuredGroupNumber		
+	PrimaryInsuredDivisionNumber= PrimaryInsuredDivisionNumber		
+	PatientLatestUpdateDate= PatientLatestUpdateDate			
+	UserDefinedField01= UserDefinedField01			
+	UserDefinedField02= UserDefinedField02			
+	UserDefinedField03= UserDefinedField03			
+	UserDefinedField04= UserDefinedField04			
+	UserDefinedField05= UserDefinedField05			
+	UserDefinedField06= UserDefinedField06			
+	UserDefinedField07= UserDefinedField07			
+	UserDefinedField08= UserDefinedField08			
+	UserDefinedField09= UserDefinedField09			
+	UserDefinedField10= UserDefinedField10			
+END
+
+INSTANCE CleanPatientData.CleanPatientData(Ins004)
+	Prefix="clean2"
+	dsInput=^Ins001|dsOutput
+	PatientKey= PatientKey				
+	PatientNumber= PatientNumber				
+	PatientSequenceNumber= PatientSequenceNumber			
+	SecurityCode= PatientSecurityCode			
+	PatientRelation= PatientRelation				
+	SSN= PatientSocialSecurityNumber		
+	FirstName= PatientFirstName			
+	MiddleName= PatientMiddleName			
+	LastName= PatientLastName				
+	AddressLine1= PatientAddressLine1			
+	AddressLine2= PatientAddressLine2			
+	City= PatientCityName				
+	State= PatientState				
+	Zip5= PatientZip5				
+	County= PatientCounty				
+	Country= PatientCountry				
+	DateOfBirth= PatientDateOfBirth			
+	Gender= PatientGender				
+	DateOfDeath= PatientDeathOfDeath			
+	InsuredEligibleEffectiveDate= InsuredEligibleEffectiveDate		
+	InsuredEligibleExpirationDate= InsuredEligibleExpirationDate		
+	InsuredEligibleCoverageType= InsuredEligibleCoverageType		
+	InsuredEligibleStatus= InsuredEligibleStatus			
+	PrimaryMemberKey= PrimaryMemberKey			
+	PrimaryInsuredSSN= PrimaryInsuredSocialSecurityNumber	
+	PrimaryInsuredNumber= PrimaryInsuredNumber			
+	PrimaryInsuredPolicyNumber= PrimaryInsuredPolicyNumber		
+	PrimaryInsuredGroupNumber= PrimaryInsuredGroupNumber		
+	PrimaryInsuredDivisionNumber= PrimaryInsuredDivisionNumber		
+	PatientLatestUpdateDate= PatientLatestUpdateDate			
+	UserDefinedField01= UserDefinedField01			
+	UserDefinedField02= UserDefinedField02			
+	UserDefinedField03= UserDefinedField03			
+	UserDefinedField04= UserDefinedField04			
+	UserDefinedField05= UserDefinedField05			
+	UserDefinedField06= UserDefinedField06			
+	UserDefinedField07= UserDefinedField07			
+	UserDefinedField08= UserDefinedField08			
+	UserDefinedField09= UserDefinedField09			
+	UserDefinedField10= UserDefinedField10			
+END
+
+INSTANCE OutDataset.OutDataset(Ins003)
+	dsInput=^Ins002|dsOutput
+	name="~qa::cleanpatientdata::cleanpatientdata::output"
+	Method=THOR
+END
+
+INSTANCE OutDataset.OutDataset(Ins005)
+	dsInput=^Ins004|dsOutput
+	name="~qa::cleanpatientdata::cleanpatientdata::output2"
+	Method=THOR
+END

@@ -1,0 +1,12 @@
+Control workunit W20180730-111327 and this test workunit W20180730-111956 had th
+e same number of results
+Control workunit W20180730-111327has no outputs that are missing from test worku
+nit W20180730-111956
+No results were found in test workunit W20180730-111956 that weren't in the cont
+rol workunit W20180730-111327
+All workunit results had the same number of records in the control workunit W201
+80730-111327 and this test workunit W20180730-111956
+The content of all workunit results was the same in the control workunit W201807
+30-111327 and the current test workunit W20180730-111956
+Plugin AppendLNFID passed compliance check
+Plugin AppendLNFID passed compliance check

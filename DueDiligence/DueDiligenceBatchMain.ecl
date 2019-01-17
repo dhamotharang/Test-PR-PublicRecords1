@@ -25,10 +25,12 @@
 	//Keep track of individual vs business requests
 	indRecs :=  cleanData(inputEcho.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS);
   busRecs :=  cleanData(inputEcho.requestedVersion IN DueDiligence.Constants.VALID_BUS_ATTRIBUTE_VERSIONS);
+  
+  DueDiligence.CommonQuery.mac_GetBusinessOptionSettings(inDPPA, inGLBA, dataRestriction, dataPermission, Business_Risk_BIP.Constants.Default_IndustryClass);
 
 
 	//********************************************************PERSON ATTRIBUTES STARTS HERE**********************************************************
-	consumerResults := DueDiligence.getIndAttributes(indRecs, inDPPA, inGLBA, dataRestriction, DueDiligence.Constants.EMPTY);
+	consumerResults := DueDiligence.getIndAttributes(indRecs, inDPPA, inGLBA, dataRestriction, DueDiligence.Constants.EMPTY, FALSE, FALSE, FALSE, busOptions, busLinkingOptions);
 																				 
   indIndex := JOIN(indRecs, consumerResults, 
 										LEFT.inputEcho.seq = RIGHT.seq, 
@@ -84,9 +86,7 @@
 
 
 //********************************************************BUSINESS ATTRIBUTES STARTS HERE********************************************************
-  DueDiligence.CommonQuery.mac_GetBusinessOptionSettings(inDPPA, inGLBA, dataRestriction, dataPermission, Business_Risk_BIP.Constants.Default_IndustryClass);
-
-
+ 
 	businessResults := DueDiligence.getBusAttributes(busRecs, busOptions, busLinkingOptions);
 														 
   busIndex := JOIN(busRecs, businessResults,
@@ -146,7 +146,6 @@
 	final :=  UNGROUP(indIndex) + UNGROUP(busIndex);
   
 
-  
   RETURN final;
   
 ENDMACRO;

@@ -146,6 +146,7 @@ EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFil
 		EXPORT STRING10 optInType   := 'Whitelist';
 		EXPORT STRING5 	optInMethod := 'TCO';
 		EXPORT STRING3 	optinDuration := 'ONG';
+    EXPORT UNSIGNED1 IdentityDateThreshold := 61;
 	END;
 	
 	EXPORT ConsentLevels := MODULE
@@ -157,7 +158,23 @@ EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFil
 	  EXPORT UNSIGNED1 SimCardInfo  := 35;
 	  EXPORT UNSIGNED1 DeviceInfo   := 36;
 	END;
+   
+   EXPORT PfResSnapshotErrorMessages := module
+		 EXPORT STRING50 Companyid := 'Too Many Transactions by CompanyId';
+		 EXPORT STRING50 UserId := 'Too Many Transactions by UserId';
+		 EXPORT STRING50 ReferenceCode := 'Too Many Transactions by ReferenceCode';
+		 EXPORT STRING50 PhoneNumber := 'Too Many Transactions by PhoneNumber';
+		 EXPORT STRING50 LexId := 'Too Many Transactions by LexId';
+		 EXPORT STRING50 CmpId_Refrcode := 'Too Many Transactions by Companyid and Reference Code';
+    END;
 	
+    EXPORT PfResSnapshot := module
+		 EXPORT UNSIGNED2 MaxSearchRecords := 10000;
+		 EXPORT UNSIGNED2 MaxRecords := 50000;
+		 EXPORT UNSIGNED2 MaxRIs := 100;
+		 EXPORT UNSIGNED2 MaxIdentities := 100;
+		 EXPORT UNSIGNED2 MaxOtherPhones := 100;
+    END;
 	// Batch only
 	EXPORT BatchRestrictedDirectMarketingSourcesSet :=  
 	                                    [MDR.sourceTools.src_AL_Experian_Veh,                                    

@@ -98,6 +98,7 @@ Boolean VALIDATION := False; //True for validation mode, false for production mo
 					export string    DataPermission    := risk_indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
           //This would correspond to requestedattributegroups = 'fraudpointattrvparo' in XML
           export boolean   doParo_attrs      := false : stored('IncludeParoAttrs'); 
+          export string    requestedattributegroups   := ''	  : stored('RequestedAttributeGroups');
 		END;
 
 gateways_in := Gateway.Configuration.Get();

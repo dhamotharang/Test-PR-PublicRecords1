@@ -75,7 +75,7 @@
 /*--INFO-- InView Business Report */	
 	
 export InViewReportService := MACRO
-#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 #onwarning(4207, ignore);
 
 #option ('globalAutoHoist', false);

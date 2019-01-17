@@ -1,12 +1,10 @@
-// doxie_crs.nbr_records
-//
 // This receives a batch of header records for a given person, and
 // turns them into an ordered list of neighbors.
 
  
 // To test this code, see doxie_crs.nbr_records
 
-import doxie, header, suppress;
+import doxie, suppress;
 
 export DATASET(doxie.layout_nbr_records) nbr_records(
 	DATASET(doxie.layout_nbr_targets) targetHR,
@@ -15,39 +13,32 @@ export DATASET(doxie.layout_nbr_records) nbr_records(
 	unsigned1	NPA,
 	unsigned1	Neighbors_Per_NA,
 	unsigned1	Neighbor_Recency,
-	string5		industry_class_value, // for MAC_GlbClean_Header
-	unsigned1 GLB_Purpose,
-	unsigned1	DPPA_Purpose,
-	boolean		probation_override_value, // for MAC_GlbClean_Header
-	boolean		no_scrub, // for MAC_GlbClean_Header
-	boolean		glb_ok,
-	boolean		dppa_ok,
-	string6		ssn_mask,
+	// string5		industry_class_value, // for MAC_GlbClean_Header
+	// unsigned1 GLB_Purpose,
+	// unsigned1	DPPA_Purpose,
+	// boolean		probation_override_value, // for MAC_GlbClean_Header
+	// boolean		no_scrub, // for MAC_GlbClean_Header
+	// boolean		glb_ok, //not used, delete, if refactoring
+	// boolean		dppa_ok,  //not used, delete, if refactoring
+	// string6		ssn_mask,
 	boolean   use_Max_Nbrhoods = true,
 	boolean   switch_Targetseq = true,
   unsigned1 proximity_radius = 10, // defines proximity in terms of "unitrs": houses, appartments, and alike
-	boolean checkRNA = true
+	boolean checkRNA = true,
+  doxie.IDataAccess mod_access
 ) := FUNCTION
 
-	// ================================================= generate candidate neighbors
+  	// ================================================= generate candidate neighbors
 	cn_raw := doxie.nbr_records_cn(targetHR, proximity_radius, 
-	industry_class_value, // for MAC_GlbClean_Header
-	GLB_Purpose,
-	DPPA_Purpose,
-	probation_override_value, // for MAC_GlbClean_Header
-	no_scrub, 								// for MAC_GlbC
-	glb_OK,
-	dppa_ok,
 	checkRNA,
 	mode,
-	Neighbor_Recency);
+	Neighbor_Recency,
+	mod_access);
 	// OUTPUT(cn_raw, named('cn_raw')); // DEBUG
 	
 	// process candidates for privacy -- this may SKIP records so it needs
 	// to be done before we get into selection and sequencing down below
-	//header.MAC_GlbClean_Header(cn_raw, cn_glb);
-	ssn_mask_value := ssn_mask;
-	suppress.MAC_Mask(cn_raw, cn, ssn, foo, true, false,, true);
+	suppress.MAC_Mask(cn_raw, cn, ssn, foo, true, false,, true, , mod_access.ssn_mask);
 	// OUTPUT(cn, named('cn')); // DEBUG
 
 

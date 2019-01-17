@@ -1,0 +1,74 @@
+﻿ID "946658c0-c69d-4204-9d08-26be0667c80a";
+NAME AppendLnpidToLnpidAssociations;
+LABEL "Append LNPID to LNPID Assocations";
+VERSION "1.0.0";
+AUTHOR "CarmigJX";
+CATEGORY COMPUTE;
+DESCRIPTION "Append LNPID to LNPID associations";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING Prefix: LABEL("Append Column Prefix"),DEFAULT("ProviderAssociate");
+	DATASET dsInput: MAPBYNAME
+    FIELD LNPID: LABEL("Provider ID"),DESCRIPTION("Lexis Nexis Professional ID");
+    FIELD LexID: LABEL("LexID"),DESCRIPTION("Lexis Nexis ID"), OPTIONAL, NULL("");
+    FIELD Name: LABEL("Provider Name"),DESCRIPTION("Provider Name"), OPTIONAL, NULL("");
+  END
+	INT AssociateThreshold: LABEL("Associate Threshold"),DESCRIPTION("Threshold for LNPID association. Default is 10"),DEFAULT("10");
+END
+
+OUTPUTS
+	DATASET dsOutput(dsInput): PREFIX(INPUTS.Prefix)
+		UNSIGNED8 PersonLnpid;
+    UNSIGNED8 PersonLexid;
+    STRING PersonName;
+    UNSIGNED8 AssociateLnpid;
+    UNSIGNED8 AssociateLexid;
+    STRING AssociateName;
+    STRING Relationship;
+    STRING10 PrimaryRange;
+    STRING2 PreDirection;
+    STRING28 PrimaryName;
+    STRING4 AddressSuffix;
+    STRING2 PostDirection;
+    STRING8 SecondaryRange;
+    STRING25 City;
+    STRING2 State;
+    STRING5 Zip;
+    STRING20 AddressKey;
+    INTEGER1 HasActiveExclusion;
+    INTEGER1 HasActiveRevocation;
+    INTEGER1 HasReinstatedExclusion;
+    INTEGER1 HasReinstatedRevocation;
+    INTEGER1 HasBankruptcy;
+    INTEGER1 HasCriminalHistory;
+    INTEGER1 HasRelativeConvictions;
+    INTEGER1 HasRelativeBankruptcy;
+    INTEGER1 IsDeceased;
+    UNSIGNED2 Score;
+    UNSIGNED4 AssociationCount;
+    UNSIGNED4 BadAssociationCount;
+  END
+END
+
+GENERATES INLINE
+	IMPORT AppendLnpidToLnpidAssociations;
+  
+  %^edsOutput% := AppendLnpidToLnpidAssociations.macAppendLnpidToLnpidAssociations(%dsInput%, %LNPID%, %AssociateThreshold%, %^qPrefix%, %LexID%, %Name%) %^p%;
+ENDGENERATES
+
+
+RESOURCES
+	INDEX LnpidToLnpidAssocKey: FILENAME("~thor::key::healthcareprovider::qa::lnpid::to::lnpid::association"),URL("http://10.241.100.159:8010"),DALIIP("10.241.100.159"),CLUSTER("thor100_100dev");
+	FILE readme: FILENAME("AppendLnpidToLnpidAssociations_ReadMe.txt"),LABEL("Plugin Readme File");
+	ECL AppendLnpidToLnpidAssociations: FILENAME("AppendLnpidToLnpidAssociations"),URL("http://10.241.100.153:8010");
+	FILE ReadMe: FILENAME("AppendLnpidToLnpidAssociations_ReadMe.txt"),LABEL("Plugin Readme File");
+	FILE appendlnpidtolnpidassociations_testcmp: FILENAME("appendlnpidtolnpidassociations_testcmp.txt"),LABEL("Plugin Test Composition");
+	FILE AppendLnpidToLnpidAssociations_BuildTestDataset: FILENAME("AppendLnpidToLnpidAssociations_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+	FILE checklist: FILENAME("AppendLnpidToLnpidAssociationsChecklist.xlsx"),LABEL("Plugin Checklist");
+  LOGICALFILE test: FILENAME("~qa::appendlnpidtolnpidassociations::appendlnpidtolnpidassociations::input"),URL("http://10.241.100.159:8010"),DALIIP("10.241.100.159"),CLUSTER("thor100_100dev");
+END

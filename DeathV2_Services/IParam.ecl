@@ -44,7 +44,7 @@ EXPORT IParam := MODULE
 		EXPORT BOOLEAN UseDeathMasterSSAUpdates := FALSE;
 		EXPORT BOOLEAN IsConsumer := FALSE;
 		EXPORT BOOLEAN SuppressNonMarketingDeathSources := FALSE;
-		EXPORT Integer DeathMasterPurpose := DeathV2_Services.Constants.DeathMasterPurpose.NoPermissibleUse;		
+		EXPORT Integer DeathMasterPurpose := DeathV2_Services.Constants.DeathMasterPurpose.NoValue;		
 	END;
 	
 	EXPORT GetDeathRestrictions(inmod) := 
@@ -57,8 +57,9 @@ EXPORT IParam := MODULE
 			EXPORT BOOLEAN UseDeathMasterSSAUpdates := AutoStandardI.DataPermissionI.val(dmod).use_DeathMasterSSAUpdates;
 			EXPORT BOOLEAN IsConsumer := AutoStandardI.InterfaceTranslator.industry_class_value.val(dmod) = ut.IndustryClass.Knowx_IC;
 			EXPORT BOOLEAN SuppressNonMarketingDeathSources := FALSE : stored('SuppressNonMarketingDeathSources');	
-			string5 input_DeathMasterPurpose := '0' : stored('DeathMasterPurpose');	
-			EXPORT Integer DeathMasterPurpose := (Integer)input_DeathMasterPurpose;	
+			STRING10 input_DeathMasterPurpose := '' : stored('DeathMasterPurpose');	
+   // converting to integer as we only restrict if it is 0
+			EXPORT Integer DeathMasterPurpose := IF(input_DeathMasterPurpose= '', DeathV2_Services.Constants.DeathMasterPurpose.NoValue,ut.BinaryStringToInteger(input_DeathMasterPurpose));	
 		END;		
 		
 	RETURN death_mod;

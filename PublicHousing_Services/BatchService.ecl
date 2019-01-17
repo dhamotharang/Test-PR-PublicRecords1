@@ -23,12 +23,12 @@
 </message>
 */
 
-IMPORT BatchDatasets, BatchShare, Doxie, doxie_regression, Suppress, ut, AutoheaderV2;
+IMPORT BatchDatasets, BatchShare, Doxie, Suppress, ut, AutoheaderV2;
 
 EXPORT BatchService() := FUNCTION
   
 		batch_params := PublicHousing_Services.IParams.getBatchParams();				
-		#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+		#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 		in_ssn_mask := batch_params.ssn_mask; // 'NONE'
 		is_GLB_fail := NOT ut.glb_ok(batch_params.GLBpurpose);
 		is_DRM_fail := Doxie.DataRestriction.isECHRestricted(batch_params.DataRestrictionMask); // i.e. if pos #6 = '1'

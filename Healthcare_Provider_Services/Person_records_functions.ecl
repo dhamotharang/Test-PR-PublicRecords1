@@ -1,6 +1,8 @@
-import doxie_crs, ut, header, doxie,doxie_raw,lib_date,codes,PhonesFeedback_Services,PhonesFeedback,Address;
+﻿import doxie_crs, ut, header, doxie, doxie_raw, lib_date, PhonesFeedback_Services, PhonesFeedback, Address;
 
 EXPORT Person_records_functions := Module
+
+  shared mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 
 	shared header_records(boolean include_dailies = false, boolean allow_wildcard = false, set of STRING1 daily_autokey_skipset=[],
 												boolean noFail = false, boolean isrollup = false,	dataset (doxie.layout_references) dids=dataset ([],doxie.layout_references)) :=	FUNCTION
@@ -10,22 +12,24 @@ EXPORT Person_records_functions := Module
 	END;	
 	shared historic_nbr_records_crs(boolean checkRNA=true,dataset (doxie.layout_references) dids=dataset ([],doxie.layout_references)) := FUNCTION
 		doxie.MAC_Selection_Declare();
-		doxie.MAC_Header_Field_Declare();
-		doxie.historic_nbr_records(header_records(,,,,,dids),a,checkRNA);
-		ut.PermissionTools.GLB.mac_FilterOutMinors(a,afil,,,dob)
+    glb_ok := mod_access.isValidGLB();
+    dppa_ok := mod_access.isValidDPPA();
+
+		doxie.historic_nbr_records(header_records(,,,,,dids),a,checkRNA, mod_access);
+    afil := doxie.compliance.MAC_FilterOutMinors (a, , , mod_access.show_minors);
 		RETURN afil;
 	END;
 	export Comp_Subject_Addresses_wrap(dataset (doxie.layout_references) dids=dataset([],doxie.layout_references)) := function
 		doxie.MAC_Selection_Declare();
-		doxie.MAC_Header_Field_Declare();
-		csa := Doxie.Comp_Subject_Addresses(dids,dateVal,dppa_purpose,glb_purpose,ln_branded_value,,probation_override_value,industry_class_value,
-																							 no_scrub,dial_contactprecision_value, Addresses_PerSubject);
+		doxie.MAC_Header_Field_Declare(); //Addresses_PerSubject, dial_contactprecision_value
+
+		csa := Doxie.Comp_Subject_Addresses(dids,, dial_contactprecision_value, Addresses_PerSubject, mod_access);
 		return csa;
 	END;
 	EXPORT nbr_records(dataset (doxie.layout_references) dids=dataset ([],doxie.layout_references)) := function
 		// snag header records
 		doxie.MAC_Selection_Declare();
-		doxie.MAC_Header_Field_Declare();
+
 		headerRecs := Comp_Subject_Addresses_wrap(dids).addresses;
 
 		// convert to target record type
@@ -46,16 +50,10 @@ EXPORT Person_records_functions := Module
 			Neighbors_PerAddress,
 			Neighbors_Per_NA,
 			Neighbor_Recency,
-			industry_class_value,
-			GLB_Purpose,
-			DPPA_Purpose,
-			probation_override_value,
-			no_scrub,
-			glb_ok,
-			dppa_ok,
-			// attrs declared in doxie.MAC_Header_Field_Declare
-			ssn_mask_value,,,
-			neighbors_proximity // generally, the radius of neighbors' units: houses, or appartments or etc.
+			,,
+			neighbors_proximity, // generally, the radius of neighbors' units: houses, or appartments or etc.
+      ,
+      mod_access
 		);
 
 		// generate current/historic neighbors as specified
@@ -72,34 +70,37 @@ EXPORT Person_records_functions := Module
 		);
 
 		both := nbr_records_curr + nbr_records_hist;
-		ut.PermissionTools.GLB.mac_FilterOutMinors(both,bothfil,,,dob)
+    bothfil := doxie.compliance.MAC_FilterOutMinors (both, , , mod_access.show_minors);
 
 		return bothfil;
 	end;
 	export Relative_Records(boolean checkRNA=true,dataset (doxie.layout_references) inputdids=dataset([],doxie.layout_references)) := FUNCTION
 		doxie.MAC_Selection_Declare();
-		doxie.MAC_Header_Field_Declare();
+
 		dids_pick :=inputdids(Include_relatives_val or include_associates_val);
-		Suppress.MAC_Suppress(dids_pick,dids,application_type_value,suppress.constants.LinkTypes.DID,did);
+		Suppress.MAC_Suppress(dids_pick, dids, mod_access.application_type, suppress.constants.LinkTypes.DID, did);
 
 		results_max := doxie_Raw.relative_raw
-			(dids,dateVal,dppa_purpose,glb_purpose,ssn_mask_value,ln_branded_value,probation_override_value,
-			 include_relatives_val,include_associates_val,Relative_Depth,max_relatives,isCRS,max_associates);
+			(dids, mod_access,
+			 include_relatives_val,include_associates_val,Relative_Depth,max_relatives,max_associates);
 
-		ut.PermissionTools.GLB.mac_FilterOutMinors(results_max,results_max_fil,person2)
+    results_max_fil := doxie.compliance.MAC_FilterOutMinors (results_max, person2, , mod_access.show_minors);
 
-		doxie_raw.mac_JoinHeader_Raw(results_max_fil, recs, person2, false,dateVal,dppa_purpose,glb_purpose,ssn_mask_value,ln_branded_value,probation_override_value)
+
+		doxie_raw.mac_JoinHeader_Raw(results_max_fil, recs, person2, false, mod_access);
 
 		rr := sort(recs,p2_sort,p3_sort,p4_sort,-number_cohabits, - recent_cohabit, -isRelative, person1, person2, rid);
-		header.MAC_GLB_DPPA_Clean_RNA(rr,rr_rna)
+		header.MAC_GLB_DPPA_Clean_RNA(rr, rr_rna, mod_access)
 		ret_results := if (checkRNA, rr_rna, rr);
 		return ret_results;
 	END;	
 	EXPORT Comp_Addresses(dataset (doxie.layout_references) dids=dataset ([],doxie.layout_references)) := function
 		doxie.MAC_Selection_Declare();
-		doxie.MAC_Header_Field_Declare();
+    glb_ok := mod_access.isValidGLB();
+    dppa_ok := mod_access.isValidDPPA();
+
 		Address_Format := doxie.Layout_Comp_Addresses;
-		isKnowx := ut.IndustryClass.is_knowx;
+		isKnowx := mod_access.isConsumer();
 		Nbrs := historic_nbr_records_crs(,dids);
 
 		Address_Format fn(NBrs  le) := transform
@@ -280,7 +281,9 @@ EXPORT Person_records_functions := Module
 	end;
 	EXPORT Resident_Records(dataset (doxie.layout_references) dids=dataset ([],doxie.layout_references)) := function
 		doxie.MAC_Selection_Declare();
-		doxie.MAC_Header_Field_Declare();
+    glb_ok := mod_access.isValidGLB();
+    dppa_ok := mod_access.isValidDPPA();
+
 
 		//use all comp address, but if Exclude_ResidentsForAssociatesAddresses_val then exclude those by DID
 		all_addrs:= Comp_Addresses(dids)((not Exclude_ResidentsForAssociatesAddresses_val) or (did not in set(associate_summary(dids), person2)));
@@ -299,14 +302,14 @@ EXPORT Person_records_functions := Module
 		ca_slim := project(ca, makelas(left));
 		r := doxie_raw.residents_raw
 			(ca_slim,
-			dateVal,
-			dppa_purpose,
-			glb_purpose,
-			ssn_mask_value,
-			ln_branded_value,
-			probation_override_value);
+			mod_access.date_threshold,
+			mod_access.dppa,
+			mod_access.glb,
+			mod_access.ssn_mask,
+			mod_access.ln_branded,
+			mod_access.probation_override);
 			
-		ut.PermissionTools.GLB.mac_FilterOutMinors(r,rfil,,,dob)
+    rfil := doxie.compliance.MAC_FilterOutMinors (r, , , mod_access.show_minors);
 
 		return rfil;
 	end;
@@ -384,7 +387,9 @@ EXPORT Person_records_functions := Module
 	end;
 
 	export ssn_persons ( boolean checkRNA = false,dataset (doxie.layout_references) dids=dataset ([],doxie.layout_references) ) := function
-		doxie.MAC_Header_Field_Declare();
+    glb_ok := mod_access.isValidGLB();
+    dppa_ok := mod_access.isValidDPPA();
+
 		keepOldSsns := doxie.keep_old_ssns_val;
 
 		dids_ssns := record
@@ -503,8 +508,8 @@ EXPORT Person_records_functions := Module
 																 self := left), 
 											 left only);
 		combined := jdirty+daily_ssns;
-		header.MAC_GlbClean_Header(combined,j_preRNA);
-		Header.MAC_GLB_DPPA_Clean_RNA(j_preRNA, j_postRNA)
+		header.MAC_GlbClean_Header(combined,j_preRNA, , , mod_access);
+		Header.MAC_GLB_DPPA_Clean_RNA(j_preRNA, j_postRNA, mod_access)
 		j:= if(checkRNA,j_postRNA,j_preRNA);
 
 		//back to original format
@@ -678,7 +683,7 @@ EXPORT Person_records_functions := Module
 
 		out_f := sort(result,did,-cnt,ssn,-length(trim(fname)));
 
-		suppress.MAC_Mask(out_f, out_mskd, ssn, blank, true, false,,true);
+		suppress.MAC_Mask(out_f, out_mskd, ssn, blank, true, false,,true,, mod_access.ssn_mask);
 
 		//***** COMPARE RECORDS TO THE BEST INFO FOR THE SUBJECT
 		str_yes 	:= 'YES';
@@ -775,7 +780,6 @@ EXPORT Person_records_functions := Module
 	end;
 	
 	EXPORT SSN_Lookups(dataset (doxie.layout_references) dids=dataset ([],doxie.layout_references)) := function
-		doxie.MAC_Header_Field_Declare();
 		ssns := dedup(comp_ssns(dids)((unsigned)ssn_unmasked > 0),ssn_unmasked,all);
 		// Fetch the SSN information for all extent ssns
 		ssn_info := doxie_crs.layout_SSN_Lookups;
@@ -822,7 +826,7 @@ EXPORT Person_records_functions := Module
 
 		result mask_ssn5(result l) := transform
 			self.ssn5_unmasked := l.ssn5;
-			self.ssn5 := if(ssn_mask_value='ALL' or ssn_mask_value='FIRST5', 'xxxxx', l.ssn5);
+			self.ssn5 := if(mod_access.ssn_mask='ALL' or mod_access.ssn_mask='FIRST5', 'xxxxx', l.ssn5);
 			self := l;
 		end;
 

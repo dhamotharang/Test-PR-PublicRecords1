@@ -1,0 +1,211 @@
+﻿ID "5a326a24-ea9c-45ba-803d-6782ccc9ea71";
+NAME ComputeBizUnknownBusinessAttributes;
+LABEL "Compute BIS Unknown Business Attributes";
+VERSION "1.1.0";
+AUTHOR "CarmigJX";
+CATEGORY COMPUTE;
+DESCRIPTION "Computes BIS unknown business attributes for dashboarding";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+  DATASET dsInput: MAPBYNAME
+    FIELD ProxID: LABEL("Prox ID"),DESCRIPTION("The physical location of the business BIP Id");
+    FIELD ProxEntityContextUID: LABEL("Prox Entity Context UID"),DESCRIPTION("The entity context UID of the business ProxID");
+    FIELD GeoDistance: LABEL("Geo Distance"),DESCRIPTION("The geo distance between the two business locations");
+    FIELD AltProxEntityContextUID: LABEL("Aternate Prox Entity Context UID"),DESCRIPTION("The entity context UID of the potentially matching business ProxID");
+    FIELD AltIsProxInput: LABEL("Alternate Business Is Prox Input"),DESCRIPTION("Whether the potentially matching business physical location is from the input");
+    FIELD MatchingUlt: LABEL("Matching Ult"),DESCRIPTION("Whether the two potentially matching businesses UltID match");
+    FIELD ExactCompanyNameMatch: LABEL("Exact Company Name Match"),DESCRIPTION("Whether the two potentially matching businesses have the same business names");
+    FIELD EditDistanceMatch: LABEL("Edit Distance Match"),DESCRIPTION("Whether the two potentially matching businesses have similar business names");
+    FIELD PhoneNumberMatch: LABEL("Phone Number Match"),DESCRIPTION("Whether the two potentially matching businesses have the same phone number");
+    FIELD DifferentLocationMailingAddressMatch: LABEL("Different Location Mailing Address Match"),DESCRIPTION("Whether the two potentially matching businesses have different location but matching mailing address"),OPTIONAL,NULL("");
+    FIELD AdvoLocationIndicator: LABEL("Advo Residential or Business Indicator"), DESCRIPTION("The ADVO Plugin Residential or Business Indicator");
+    FIELD AppendFields: MANY,LABEL("Append Fields"),DESCRIPTION("Fields to add to the output generated");
+  END
+END
+
+OUTPUTS
+	DATASET dsOutput
+		INTEGER BusinessCount;
+    INTEGER InputBusinessCount;
+    INTEGER UnlinkedBusinessCount;
+    INTEGER BusinessAtLocationCount;
+    INTEGER InputBusinessAtLocationCount;
+    INTEGER UnlinkedBusinessAtLocationCount;
+    INTEGER UltBusinessCount;
+    INTEGER UltBusinessAtLocationCount;
+    INTEGER SameBusinessNameAtLocationCount;
+    INTEGER SameBusinessNameNotAtLocationCount;
+    INTEGER SimilarBusinessNameAtLocationCount;
+    INTEGER SimilarBusinessNameNotAtLocationCount;
+    INTEGER PhoneNumberMatchCount;
+    INTEGER PhoneNumberMatchAtLocationCount;
+    INTEGER PhoneNumberMatchNotAtLocationCount;
+    INTEGER MailingAddressMatchNotAtLocationCount;
+    INTEGER AdvoResidentialIndicatorCount;
+    INTEGER AdvoBusinessIndicatorCount;
+    REAL    BusinessIndicatorRatio;
+    INPUTS.AppendFields;
+  END
+  DATASET BusinessCountStat: SIDE,WUID
+    STRING BusinessCount;
+    INTEGER NumberOfBusinessCount: FEW;
+  END
+  DATASET InputBusinessCountStat: SIDE,WUID
+    STRING InputBusinessCount;
+    INTEGER NumberOfInputBusinessCount: FEW;
+  END
+  DATASET UnlinkedBusinessCountStat: SIDE,WUID
+    STRING UnlinkedBusinessCount;
+    INTEGER NumberOfUnlinkedBusinessCount: FEW;
+  END
+  DATASET BusinessAtLocationCountStat: SIDE,WUID
+    STRING BusinessAtLocationCount;
+    INTEGER NumberOfBusinessAtLocationCount: FEW;
+  END
+  DATASET InputBusinessAtLocationCountStat: SIDE,WUID
+    STRING InputBusinessAtLocationCount;
+    INTEGER NumberOfInputBusinessAtLocationCount: FEW;
+  END
+  DATASET UnlinkedBusinessAtLocationCountStat: SIDE,WUID
+    STRING UnlinkedBusinessAtLocationCount;
+    INTEGER NumberOfUnlinkedBusinessAtLocationCount: FEW;
+  END
+  DATASET UltBusinessCountStat: SIDE,WUID
+    STRING UltBusinessCount;
+    INTEGER NumberOfUltBusinessCount: FEW;
+  END
+  DATASET UltBusinessAtLocationCountStat: SIDE,WUID
+    STRING UltBusinessAtLocationCount;
+    INTEGER NumberOfUltBusinessAtLocationCount: FEW;
+  END
+  DATASET SameBusinessNameAtLocationCountStat: SIDE,WUID
+    STRING SameBusinessNameAtLocationCount;
+    INTEGER NumberOfSameBusinessNameAtLocationCount: FEW;
+  END
+  DATASET SameBusinessNameNotAtLocationCountStat: SIDE,WUID
+    STRING SameBusinessNameNotAtLocationCount;
+    INTEGER NumberOfSameBusinessNameNotAtLocationCount: FEW;
+  END
+  DATASET SimilarBusinessNameAtLocationCountStat: SIDE,WUID
+    STRING SimilarBusinessNameAtLocationCount;
+    INTEGER NumberOfSimilarBusinessNameAtLocationCount: FEW;
+  END
+  DATASET SimilarBusinessNameNotAtLocationCountStat: SIDE,WUID
+    STRING SimilarBusinessNameNotAtLocationCount;
+    INTEGER NumberOfSimilarBusinessNameNotAtLocationCount: FEW;
+  END
+  DATASET PhoneNumberMatchCountStat: SIDE,WUID
+    STRING PhoneNumberMatchCount;
+    INTEGER NumberOfPhoneNumberMatchCount: FEW;
+  END
+  DATASET PhoneNumberMatchAtLocationCountStat: SIDE,WUID
+    STRING PhoneNumberMatchAtLocationCount;
+    INTEGER NumberOfPhoneNumberMatchAtLocationCount: FEW;
+  END
+  DATASET PhoneNumberMatchNotAtLocationCountStat: SIDE,WUID
+    STRING PhoneNumberMatchNotAtLocationCount;
+    INTEGER NumberOfPhoneNumberMatchNotAtLocationCount: FEW;
+  END
+END
+
+VISUALIZE ComputeBizUnknownBusinessAttributesStats: LABEL("Compute BIS Unknown Business Attributes Stats")
+  BAR DistributionOfBusinessCount(BusinessCountStat): TITLE("Distribution of Business Count"), LABEL(BusinessCount), WEIGHT(NumberOfBusinessCount), SORT(-NumberOfBusinessCount);
+  BAR DistributionOfInputBusinessCount(InputBusinessCountStat): TITLE("Distribution of Input Business Count"), LABEL(InputBusinessCount), WEIGHT(NumberOfInputBusinessCount), SORT(-NumberOfInputBusinessCount);
+  BAR DistributionOfUnlinkedBusinessCount(UnlinkedBusinessCountStat): TITLE("Distribution of Unlinked Business Count"), LABEL(UnlinkedBusinessCount), WEIGHT(NumberOfUnlinkedBusinessCount), SORT(-NumberOfUnlinkedBusinessCount);
+  BAR DistributionOfBusinessAtLocationCount(BusinessAtLocationCountStat): TITLE("Distribution of Business at Location Count"), LABEL(BusinessAtLocationCount), WEIGHT(NumberOfBusinessAtLocationCount), SORT(-NumberOfBusinessAtLocationCount);
+  BAR DistributionOfInputBusinessAtLocationCount(InputBusinessAtLocationCountStat): TITLE("Distribution of Input Business at Location Count"), LABEL(InputBusinessAtLocationCount), WEIGHT(NumberOfInputBusinessAtLocationCount), SORT(-NumberOfInputBusinessAtLocationCount);
+  BAR DistributionOfUnlinkedBusinessAtLocationCount(UnlinkedBusinessAtLocationCountStat): TITLE("Distribution of Unlinked Business at Location Count"), LABEL(UnlinkedBusinessAtLocationCount), WEIGHT(NumberOfUnlinkedBusinessAtLocationCount), SORT(-NumberOfUnlinkedBusinessAtLocationCount);
+  BAR DistributionOfUltBusinessCount(UltBusinessCountStat): TITLE("Distribution of Ult Business Count"), LABEL(UltBusinessCount), WEIGHT(NumberOfUltBusinessCount), SORT(-NumberOfUltBusinessCount);
+  BAR DistributionOfUltBusinessAtLocationCount(UltBusinessAtLocationCountStat): TITLE("Distribution of Ult Business at Location Count"), LABEL(UltBusinessAtLocationCount), WEIGHT(NumberOfUltBusinessAtLocationCount), SORT(-NumberOfUltBusinessAtLocationCount);
+  BAR DistributionOfSameBusinessNameAtLocationCount(SameBusinessNameAtLocationCountStat): TITLE("Distribution of Same Business Name at Location Count"), LABEL(SameBusinessNameAtLocationCount), WEIGHT(NumberOfSameBusinessNameAtLocationCount), SORT(-NumberOfSameBusinessNameAtLocationCount);
+  BAR DistributionOfSameBusinessNameNotAtLocationCount(SameBusinessNameNotAtLocationCountStat): TITLE("Distribution of Same Business Name not at Location Count"), LABEL(SameBusinessNameNotAtLocationCount), WEIGHT(NumberOfSameBusinessNameNotAtLocationCount), SORT(-NumberOfSameBusinessNameNotAtLocationCount);
+  BAR DistributionOfSimilarBusinessNameAtLocationCount(SimilarBusinessNameAtLocationCountStat): TITLE("Distribution of Similar Business Name at Location Count"), LABEL(SimilarBusinessNameAtLocationCount), WEIGHT(NumberOfSimilarBusinessNameAtLocationCount), SORT(-NumberOfSimilarBusinessNameAtLocationCount);
+  BAR DistributionOfSimilarBusinessNameNotAtLocationCount(SimilarBusinessNameNotAtLocationCountStat): TITLE("Distribution of Similar Business Name not at Location Count"), LABEL(SimilarBusinessNameNotAtLocationCount), WEIGHT(NumberOfSimilarBusinessNameNotAtLocationCount), SORT(-NumberOfSimilarBusinessNameNotAtLocationCount);
+  BAR DistributionOfPhoneNumberMatchCount(PhoneNumberMatchCountStat): TITLE("Distribution of Phone Number Match Count"), LABEL(PhoneNumberMatchCount), WEIGHT(NumberOfPhoneNumberMatchCount), SORT(-NumberOfPhoneNumberMatchCount);
+  BAR DistributionOfPhoneNumberMatchAtLocationCount(PhoneNumberMatchAtLocationCountStat): TITLE("Distribution of Phone Number Match at Location Count"), LABEL(PhoneNumberMatchAtLocationCount), WEIGHT(NumberOfPhoneNumberMatchAtLocationCount), SORT(-NumberOfPhoneNumberMatchAtLocationCount);
+  BAR DistributionOfPhoneNumberMatchNotAtLocationCount(PhoneNumberMatchNotAtLocationCountStat): TITLE("Distribution of Phone Number Match not at Location Count"), LABEL(PhoneNumberMatchNotAtLocationCount), WEIGHT(NumberOfPhoneNumberMatchNotAtLocationCount), SORT(-NumberOfPhoneNumberMatchNotAtLocationCount);
+END
+
+GENERATES INLINE  
+  IMPORT hipie_ecl;
+  LOCAL inAppendFields := '%#foreach(INPUTS.AppendFields,",")% %INPUTS.AppendFields% %#end%';
+  LOCAL outFields := 'BusinessCount,InputBusinessCount,UnlinkedBusinessCount,BusinessAtLocationCount,InputBusinessAtLocationCount,UnlinkedBusinessAtLocationCount,UltBusinessCount,UltBusinessAtLocationCount,SameBusinessNameAtLocationCount,SameBusinessNameNotAtLocationCount,SimilarBusinessNameAtLocationCount,SimilarBusinessNameNotAtLocationCount,PhoneNumberMatchCount,PhoneNumberMatchAtLocationCount,PhoneNumberMatchNotAtLocationCount,AdvoResidentialIndicatorCount,AdvoBusinessIndicatorCount,BusinessIndicatorRatio,'+inAppendFields;
+  dsRadiusAssociations := hipie_ecl.macProjectToLayout(%RadiusAssociations%, outFields);
+  %^edsOutput% := dsRadiusAssociations;
+  %^eBusinessCountStat% := TOPN(TABLE(%dsOutput%,{BusinessCount, NumberOfBusinessCount := COUNT(GROUP)},BusinessCount, MERGE), 100, -NumberOfBusinessCount);
+  %^eInputBusinessCountStat% := TOPN(TABLE(%dsOutput%,{InputBusinessCount, NumberOfInputBusinessCount := COUNT(GROUP)},InputBusinessCount, MERGE), 100, -NumberOfInputBusinessCount);
+  %^eUnlinkedBusinessCountStat% := TOPN(TABLE(%dsOutput%,{UnlinkedBusinessCount, NumberOfUnlinkedBusinessCount := COUNT(GROUP)},UnlinkedBusinessCount, MERGE), 100, -NumberOfUnlinkedBusinessCount);
+  %^eBusinessAtLocationCountStat% := TOPN(TABLE(%dsOutput%,{BusinessAtLocationCount, NumberOfBusinessAtLocationCount := COUNT(GROUP)},BusinessAtLocationCount, MERGE), 100, -NumberOfBusinessAtLocationCount);
+  %^eInputBusinessAtLocationCountStat% := TOPN(TABLE(%dsOutput%,{InputBusinessAtLocationCount, NumberOfInputBusinessAtLocationCount := COUNT(GROUP)},InputBusinessAtLocationCount, MERGE), 100, -NumberOfInputBusinessAtLocationCount);
+  %^eUnlinkedBusinessAtLocationCountStat% := TOPN(TABLE(%dsOutput%,{UnlinkedBusinessAtLocationCount, NumberOfUnlinkedBusinessAtLocationCount := COUNT(GROUP)},UnlinkedBusinessAtLocationCount, MERGE), 100, -NumberOfUnlinkedBusinessAtLocationCount);
+  %^eUltBusinessCountStat% := TOPN(TABLE(%dsOutput%,{UltBusinessCount, NumberOfUltBusinessCount:= COUNT(GROUP)},UltBusinessCount, MERGE), 100, -NumberOfUltBusinessCount);
+  %^eUltBusinessAtLocationCountStat% := TOPN(TABLE(%dsOutput%,{UltBusinessAtLocationCount, NumberOfUltBusinessAtLocationCount:= COUNT(GROUP)},UltBusinessAtLocationCount, MERGE), 100, -NumberOfUltBusinessAtLocationCount);
+  %^eSameBusinessNameAtLocationCountStat% := TOPN(TABLE(%dsOutput%,{SameBusinessNameAtLocationCount, NumberOfSameBusinessNameAtLocationCount:= COUNT(GROUP)},SameBusinessNameAtLocationCount, MERGE), 100, -NumberOfSameBusinessNameAtLocationCount);
+  %^eSameBusinessNameNotAtLocationCountStat% := TOPN(TABLE(%dsOutput%,{SameBusinessNameNotAtLocationCount, NumberOfSameBusinessNameNotAtLocationCount:= COUNT(GROUP)},SameBusinessNameNotAtLocationCount, MERGE), 100, -NumberOfSameBusinessNameNotAtLocationCount);
+  %^eSimilarBusinessNameAtLocationCountStat% := TOPN(TABLE(%dsOutput%,{SimilarBusinessNameAtLocationCount, NumberOfSimilarBusinessNameAtLocationCount:= COUNT(GROUP)},SimilarBusinessNameAtLocationCount, MERGE), 100, -NumberOfSimilarBusinessNameAtLocationCount);
+  %^eSimilarBusinessNameNotAtLocationCountStat% := TOPN(TABLE(%dsOutput%,{SimilarBusinessNameNotAtLocationCount, NumberOfSimilarBusinessNameNotAtLocationCount:= COUNT(GROUP)},SimilarBusinessNameNotAtLocationCount, MERGE), 100, -NumberOfSimilarBusinessNameNotAtLocationCount);
+  %^ePhoneNumberMatchCountStat% := TOPN(TABLE(%dsOutput%,{PhoneNumberMatchCount, NumberOfPhoneNumberMatchCount:= COUNT(GROUP)},PhoneNumberMatchCount, MERGE), 100, -NumberOfPhoneNumberMatchCount);
+  %^ePhoneNumberMatchAtLocationCountStat% := TOPN(TABLE(%dsOutput%,{PhoneNumberMatchAtLocationCount, NumberOfPhoneNumberMatchAtLocationCount:= COUNT(GROUP)},PhoneNumberMatchAtLocationCount, MERGE), 100, -NumberOfPhoneNumberMatchAtLocationCount);
+  %^ePhoneNumberMatchNotAtLocationCountStat% := TOPN(TABLE(%dsOutput%,{PhoneNumberMatchNotAtLocationCount, NumberOfPhoneNumberMatchNotAtLocationCount:= COUNT(GROUP)},PhoneNumberMatchNotAtLocationCount, MERGE), 100, -NumberOfPhoneNumberMatchNotAtLocationCount);
+ENDGENERATES
+
+GENERATES KEL
+  Business := ENTITY(FLAT(UID(%ProxEntityContextUID%),%INPUTS.AppendFields%),MODEL(*));
+
+  RadiusAssociation := ASSOCIATION(FLAT(
+                                      Business business=UID(%ProxEntityContextUID%), 
+                                      Business associatedbusiness=UID(%AltProxEntityContextUID%), 
+                                      %ProxEntityContextUID%,
+                                      %AltProxEntityContextUID%,
+                                      INTEGER %ProxID%=NULL(),
+                                      INTEGER %AltIsProxInput%=NULL(),
+                                      INTEGER %MatchingUlt%=NULL(),
+                                      REAL %GeoDistance%=NULL(),
+                                      INTEGER %ExactCompanyNameMatch%=NULL(),
+                                      INTEGER %EditDistanceMatch%=NULL(),
+                                      INTEGER %PhoneNumberMatch%=NULL(), 
+                                      INTEGER %DifferentLocationMailingAddressMatch%=NULL(),
+                                      STRING %AdvoLocationIndicator%
+                                   ));
+
+  USE %dsInput%(FLAT,Business, RadiusAssociation);
+
+  Business: => AssociatesBusinessesNotSelf := RadiusAssociation(%ProxEntityContextUID% != %AltProxEntityContextUID%);
+  Business: => BusinessCount := COUNT(AssociatesBusinessesNotSelf);
+  Business: => InputBusinessCount := COUNT(AssociatesBusinessesNotSelf(%AltIsProxInput%=1));
+  Business: => UnlinkedBusinessCount := COUNT(AssociatesBusinessesNotSelf(%ProxID%=0));
+  Business: => UltBusinessCount := AssociatesBusinessesNotSelf.%MatchingUlt%$Sum;
+  Business: => UltBusinessAtLocationCount := COUNT(AssociatesBusinessesNotSelf(%MatchingUlt%=1 AND %GeoDistance% = 0));
+  Business: => BusinessNotAtLocationCount := COUNT(AssociatesBusinessesNotSelf(%GeoDistance%>0));
+  Business: => BusinessAtLocationCount := COUNT(AssociatesBusinessesNotSelf(%GeoDistance%=0));
+  Business: => InputBusinessAtLocationCount := COUNT(AssociatesBusinessesNotSelf(%GeoDistance%=0 AND %AltIsProxInput%=1));
+  Business: => UnlinkedBusinessAtLocationCount := COUNT(AssociatesBusinessesNotSelf(%GeoDistance%=0 AND %ProxID%=0));
+  Business: => SameBusinessNameAtLocationCount := COUNT(AssociatesBusinessesNotSelf(%ExactCompanyNameMatch%=1 AND %GeoDistance%=0));
+  Business: => SameBusinessNameNotAtLocationCount := COUNT(AssociatesBusinessesNotSelf(%ExactCompanyNameMatch%=1 AND %GeoDistance%>0));
+  Business: => SimilarBusinessNameAtLocationCount := COUNT(AssociatesBusinessesNotSelf(%EditDistanceMatch%=1 AND %GeoDistance%=0));
+  Business: => SimilarBusinessNameNotAtLocationCount := COUNT(AssociatesBusinessesNotSelf(%EditDistanceMatch%=1 AND %GeoDistance%>0));
+  Business: => PhoneNumberMatchCount := AssociatesBusinessesNotSelf.%PhoneNumberMatch%$Sum;
+  Business: => PhoneNumberMatchAtLocationCount := COUNT(AssociatesBusinessesNotSelf(%PhoneNumberMatch%=1 AND %GeoDistance%=0));
+  Business: => PhoneNumberMatchNotAtLocationCount := COUNT(AssociatesBusinessesNotSelf(%PhoneNumberMatch%=1 AND %GeoDistance%>0));
+  Business: => MailingAddressMatchNotAtLocationCount := AssociatesBusinessesNotSelf.%DifferentLocationMailingAddressMatch%$Sum;
+  Business: => AdvoResidentialIndicatorCount := COUNT(AssociatesBusinessesNotSelf(%AdvoLocationIndicator%='A' AND %GeoDistance% <= 0.1));
+  Business: => AdvoBusinessIndicatorCount := COUNT(AssociatesBusinessesNotSelf(%AdvoLocationIndicator% IN ['B', 'C', 'D'] AND %GeoDistance% <= 0.1));
+  Business: => BusinessIndicatorRatio := AdvoBusinessIndicatorCount/(AdvoResidentialIndicatorCount+AdvoBusinessIndicatorCount);
+
+  QUERY: RadiusAssociations <= Business{BusinessCount,InputBusinessCount,UnlinkedBusinessCount,UltBusinessCount,UltBusinessAtLocationCount,BusinessNotAtLocationCount,BusinessAtLocationCount,InputBusinessAtLocationCount,UnlinkedBusinessAtLocationCount,SameBusinessNameAtLocationCount,SameBusinessNameNotAtLocationCount,SimilarBusinessNameAtLocationCount,SimilarBusinessNameNotAtLocationCount,PhoneNumberMatchCount,PhoneNumberMatchAtLocationCount,PhoneNumberMatchNotAtLocationCount,MailingAddressMatchNotAtLocationCount,AdvoResidentialIndicatorCount,AdvoBusinessIndicatorCount,BusinessIndicatorRatio,%INPUTS.AppendFields%};
+
+ENDGENERATES
+
+RESOURCES
+  ECL hipie_ecl:FILENAME("hipie_ecl"), URL("http://10.241.100.153:8010");
+	FILE readme: FILENAME("ComputeBizUnknownBusinessAttributes_1.1_ReadMe.txt"),LABEL("Plugin Readme File");
+	FILE computebizunknownbusinessattributes_testcmp: FILENAME("computebizunknownbusinessattributes_1.1_testcmp.txt"),LABEL("Plugin Test Composition");
+	FILE ComputeBizUnknownBusinessAttributes_BuildTestDataset: FILENAME("ComputeBizUnknownBusinessAttributes_1.1_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+	FILE checklist: FILENAME("ComputeBizUnknownBusinessAttributesChecklist.xlsx"),LABEL("Plugin Checklist");
+  LOGICALFILE test: FILENAME("~qa::computebizunknownbusinessattributes::computebizunknownbusinessattributes::input"),URL("http://10.241.100.159:8010"),DALIIP("10.241.100.159"),CLUSTER("thor100_100dev");
+END

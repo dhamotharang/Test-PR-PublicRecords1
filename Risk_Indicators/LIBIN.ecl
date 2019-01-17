@@ -1,4 +1,4 @@
-	export LIBIN := INTERFACE
+﻿	export LIBIN := INTERFACE
 		export unsigned1 dppa;
 		export unsigned1 glb; 
 		export boolean isUtility:=false; 
@@ -33,5 +33,6 @@
 		export string20 companyID := '';
 		export string50 DataPermission:=iid_constants.default_DataPermission;
 		export boolean IncludeNAPData := false;
+		export string100 IntendedPurpose := '';
 	END;
 	

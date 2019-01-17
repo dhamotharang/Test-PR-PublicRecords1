@@ -1,4 +1,4 @@
-import AutoStandardI,iesp,watchdog,doxie,suppress,deathv2_Services,STD,ut;
+import AutoStandardI,iesp,doxie,suppress,deathv2_Services,STD,ut,dx_BestRecords;
 
 EXPORT Functions := MODULE
 	shared gm := AutoStandardI.GlobalModule();
@@ -982,13 +982,14 @@ EXPORT Functions := MODULE
 	Export getSSN(dataset(Healthcare_Shared.Layouts.CombinedHeaderResults) input) := Function
 		ssn_mask_val := AutoStandardI.InterfaceTranslator.ssn_mask_val.val(project(gm,AutoStandardI.InterfaceTranslator.ssn_mask_val.params)); 
 		byDids := dedup(normalize(input,left.dids,transform(Healthcare_Shared.Layouts.layout_sanc_DID,self.acctno := left.acctno;self.InternalID:=left.InternalID;self.did:=right.did;self.freq:=right.freq;self:=[])),all);
-		Healthcare_Shared.Layouts.layout_ssns_freq get_provider_ssns(Healthcare_Shared.Layouts.layout_sanc_DID l, recordof(watchdog.Key_watchdog_glb) r) := transform
-			self.ssn := r.ssn;
+		Healthcare_Shared.Layouts.layout_ssns_freq get_provider_ssns(Healthcare_Shared.Layouts.layout_sanc_DID l, dx_BestRecords.layout_best r) := transform
+			self.ssn := if (r.did <> 0 and (r.valid_ssn = 'G' or r.valid_ssn = ' ' or r.valid_ssn = ''), r.ssn, '');
 			self := l;
 		end;
 
-		f_ssns := join(byDids, watchdog.Key_watchdog_glb, 
-										keyed(left.did=right.did) AND (RIGHT.Valid_SSN = 'G' or RIGHT.Valid_SSN = ' ' or RIGHT.Valid_SSN = ''),get_provider_ssns(left, right),keep(Healthcare_Shared.Constants.MAX_RECS_ON_JOIN),limit(0),left outer,keep(Healthcare_Shared.Constants.IDS_PER_DID), limit(0))(ssn<>'');
+		best_recs := dx_BestRecords.append(byDids, did, dx_BestRecords.Constants.perm_type.glb);
+		f_ssns := project(best_recs, get_provider_ssns(left, left._best))(ssn <> '');
+
 		//Check to see if we have a match to user criteria
 		f_ssns_best := join(input,f_ssns,left.acctno=right.acctno and left.InternalID= right.InternalID,
 																			transform(Healthcare_Shared.Layouts.layout_ssns_bestHit,self.besthit:=if(trim(left.userinput.ssn,all)=trim(right.ssn,all) and left.userinput.ssn<>'',true,false);self:=left;self:=right),keep(Healthcare_Shared.Constants.MAX_RECS_ON_JOIN),limit(0));

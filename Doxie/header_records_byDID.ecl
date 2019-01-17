@@ -16,11 +16,13 @@ export header_records_byDID(
 	unsigned ReturnLimit = Header.constants.ReturnLimit,
 	boolean checkRNA = false,
 	boolean isrollup = false,
-	boolean DoSearch = true) :=   // controls whether to search dailies or jsut fetch by DID right away 
+	boolean DoSearch = true
+	) :=   // controls whether to search dailies or jsut fetch by DID right away 
 
 FUNCTION
 
-doxie.mac_header_field_declare()
+doxie.mac_header_field_declare() //score_threshold_value, Dial_RecordMatch_value, and lots of others
+mod_access := $.compliance.GetGlobalDataAccessModule ();
 
 include_fun(unsigned2 penalt, string1 TNT, unsigned3 dt) := 
 											// because we have different defaults today
@@ -39,19 +41,13 @@ bothMod := doxie.mod_header_records(
 	DoSearch,
 	include_dailies, 				
 	allow_wildcard,	
-	dateVal,
-	dppa_purpose,
-	glb_purpose,
-	ln_branded_value,
 	true,
-	probation_override_value,
-	industry_class_value,
-	no_scrub,
 	suppress_gong_noncurrent,
 	daily_autokey_skipset,
 	AllowGongFallBack,
 	ApplyBpsFilter,
-	GongByDidOnly);
+	GongByDidOnly,
+  mod_access);
 dailyMod := bothMod.mod_Daily(dids);
 
 justd := dailyMod.AddDIDs; // layout header_references_hh
@@ -59,7 +55,7 @@ justd := dailyMod.AddDIDs; // layout header_references_hh
 // "advanced" check is narrowing down subjects by additional names, their relatives' names, etc.
 doxie.MAC_Check_Advanced(justd,did,didsChecked_1,Infutor.Key_Header_Infutor_Knowx);
 doxie.MAC_Check_Advanced(justd,did,didsChecked_2,doxie.key_header);
-didsChecked := IF(isAdvanced,IF(ut.IndustryClass.is_knowx,didsChecked_1,didsChecked_2)
+didsChecked := IF(isAdvanced,IF(mod_access.isConsumer(),didsChecked_1,didsChecked_2)
                             ,justd);
 
 dailies := dailyMod.Records;
@@ -125,13 +121,13 @@ headerRecords_validSSN_all := headerRecords_validSSN + headerRecords_noscore(val
 headerRecords_use := if(do_not_fill_blanks, headerRecords_noscore, headerRecords_validSSN_all);
 
 headerPretty := project(headerRecords_use, take(left));	
-header.MAC_GlbClean_Header(headerPretty,headerCleaned_1);
+header.MAC_GlbClean_Header(headerPretty,headerCleaned_1, , , mod_access);
 
-header.MAC_GLB_DPPA_Clean_RNA(headerCleaned_1, headerRNACleaned);
+header.MAC_GLB_DPPA_Clean_RNA(headerCleaned_1, headerRNACleaned, mod_access);
 headerCleaned_2 := IF(checkRNA, headerRNACleaned, headerCleaned_1);
 
 HeaderHouseHoldsOnly := headerCleaned_2(includedbyhhid);
-header.MAC_GLB_DPPA_Clean_RNA(HeaderHouseHoldsOnly, HeaderHouseHoldsCleaned);
+header.MAC_GLB_DPPA_Clean_RNA(HeaderHouseHoldsOnly, HeaderHouseHoldsCleaned, mod_access);
 headerCleaned := headerCleaned_2(~includedbyhhid) + HeaderHouseHoldsCleaned;
 //The commented out line below is for a future Experian Credit header restrictiuon change
 //header.MAC_GlbClean_Header(headerPretty,headerCleaned,,doxie.DataRestriction.ECH);
@@ -141,7 +137,7 @@ headerCleaned := headerCleaned_2(~includedbyhhid) + HeaderHouseHoldsCleaned;
 phones := f(src='PH' AND did<>0); // just phones
 phones_dids := PROJECT(DEDUP(phones,did,all),TRANSFORM(doxie.layout_references, SELF.did := (unsigned)LEFT.did));
 
-phones_bests := doxie.best_records(phones_dids,doSuppress:=false);
+phones_bests := doxie.best_records(phones_dids,doSuppress:=false, modAccess := mod_access);
 
 phones append_ssn(phones le, phones_bests ri) :=
 TRANSFORM
@@ -204,11 +200,11 @@ hh_checked := Fetch2(~includedByHHID) + good_hh_recs;
 Fetch3 := if (whole_house, hh_checked, Fetch2);
 
 // rollup dates in standard fashion
-doxie.mac_HeaderDates(Fetch3,Fetched_hd)
-Fetched_hd2 := IF(ut.IndustryClass.is_knowx, Fetch3, Fetched_hd);
+doxie.mac_HeaderDates(Fetch3, Fetched_hd, mod_access);
+Fetched_hd2 := IF(mod_access.isConsumer (), Fetch3, Fetched_hd);
 
 // allow for an historical search
-fetched := Fetched_hd2(dateVal = 0 OR dt_first_seen <= dateVal);
+fetched := Fetched_hd2(mod_access.date_threshold = 0 OR dt_first_seen <= mod_access.date_threshold);
 
 // check we don't have too many records
 // apply a lower limit for bpssearch variants

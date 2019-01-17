@@ -16,7 +16,7 @@ IMPORT Autokey_batch, DriversV2, DriversV2_Services, UT, WSInput,AutoheaderV2;
 
 EXPORT Batch_Service() := FUNCTION
 
- #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+ #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	//The following macro defines the field sequence on WsECL page of query. 
 	WSInput.MAC_DriversV2_Services_Batch_Service();
 	

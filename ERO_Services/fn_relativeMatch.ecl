@@ -1,13 +1,21 @@
-import doxie,doxie_Raw,ut;
-EXPORT fn_relativeMatch(ERO_Services.Layouts.layout_extra_penalty   input_rec, unsigned1 inGLBPurpose =0,unsigned1 inDPPAPurpose=0) :=
+﻿import doxie,doxie_Raw,ut;
+
+EXPORT fn_relativeMatch(ERO_Services.Layouts.layout_extra_penalty input_rec, doxie.IDataAccess modAccess) :=
 	function
+
+  // Note: functions in this code are now use permissions from the query's input;
+  // before, default values were mostly used (glb=dppa=0, industry='UTIL', etc.).
+  // There are no reasons why we cannot use values provided in the input.
+
 	// lookup first degree relatives and if last first match input relfirst and rellast then return true.
 	dids := dataset([input_rec.did], doxie.layout_references);
-	relsFound := doxie_Raw.relative_raw(dids,,inDPPAPurpose,inGLBPurpose,/*ssn_mask_value*/,/*ln_branded_value*/,	/*probation_override_value*/,
+	relsFound := doxie_Raw.relative_raw(dids,modAccess,
 																				/*include_relatives_val*/,/*include_associates_val*/,	
 																				/*Relative_Depth*/1,/*max_relatives*/,/*isCRS*/,/*max_associates*/);
-   relDids := project(relsFound(same_lname=true),transform(doxie.layout_references, self.did := left.person2));																				
-   relNames := doxie.Comp_Subject_Addresses(RelDids,,,,,,true,,,).names;
+
+   relDids := project(relsFound(same_lname=true),transform(doxie.layout_references, self.did := left.person2));
+
+   relNames := doxie.Comp_Subject_Addresses(RelDids,,,,modAccess).names;
    
 	 inputLast := trim(input_rec.Relative_Last_Name,all) <>'';
    inputFirst := trim(input_rec.Relative_First_Name,all) <>'';

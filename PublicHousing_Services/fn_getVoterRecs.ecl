@@ -1,5 +1,5 @@
 
-IMPORT Address, BatchDatasets, Doxie_Regression, VotersV2_Services;
+IMPORT Address, BatchDatasets;
 
 EXPORT fn_getVoterRecs(DATASET(Layouts.batch_in) ds_batch_in, IParams.BatchParams in_mod) :=
 	FUNCTION

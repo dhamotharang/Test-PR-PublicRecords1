@@ -37,7 +37,7 @@ BridgerGateway := gateways_in(servicename='bridgerwlc')[1].url!='';
 
 OFACversion := map(BridgerGateway and tribcode_value = '' => 4, // this won't hit fail message on line 59 as it was determined that can't be done without changing current prod logic
                    BridgerGateway and tribcode_value in ['pb01', 'pb02'] and ofac_version = 4 => 4,
-                                                                                                     1);
+                                                                                                     ofac_version);
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := le.servicename;

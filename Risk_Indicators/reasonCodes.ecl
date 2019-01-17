@@ -1,6 +1,8 @@
-﻿export reasonCodes(layout, cnt, rc_settings) := 
+﻿   export reasonCodes(layout, cnt, rc_settings) := 
+
 
 MACRO
+
 
 CHOOSEN(
 	IF(Risk_Indicators.rcSet.isCode32(layout.watchlist_table, layout.watchlist_record_number),DATASET([{'32',risk_indicators.getHRIDesc('32')}],risk_indicators.Layout_Desc)) &
@@ -30,8 +32,19 @@ CHOOSEN(
 	IF(Risk_Indicators.rcSet.IsCodeMS(layout.ssns_per_adl_seen_18months), DATASET([{'MS',risk_indicators.getHRIDesc('MS')}],risk_indicators.Layout_Desc)) &
 	IF(Risk_Indicators.rcSet.isCodeCL(layout.ssn, layout.bestssn, layout.socsverlevel, layout.combo_ssn), DATASET([{'CL',risk_indicators.getHRIDesc('CL')}],risk_indicators.Layout_Desc)) &
 	IF(Risk_Indicators.rcSet.isCode38(layout.altlast, layout.socscount, layout.lastcount, layout.altlast2, layout.correctlast<>''),DATASET([{'38',risk_indicators.getHRIDesc('38')}],risk_indicators.Layout_Desc)) &
-	IF(Risk_Indicators.rcSet.isCode37(layout.lname, layout.combo_lastcount, layout.combo_addrcount, layout.combo_hphonecount, layout.combo_ssncount),DATASET([{'37',risk_indicators.getHRIDesc('37')}],risk_indicators.Layout_Desc)) &
-	IF(Risk_Indicators.rcSet.isCode25(layout.in_streetAddress, layout.combo_lastcount, layout.combo_addrcount, layout.combo_hphonecount, layout.combo_ssncount),DATASET([{'25',risk_indicators.getHRIDesc('25')}],risk_indicators.Layout_Desc)) &	   
+	// reason codes for chase custom model
+	If((rc_settings[1].ischase and Risk_Indicators.rcSet.isCod37Chase(layout.lname, rc_settings[1].verlast_chase, layout.combo_lastcount, layout.combo_addrcount, layout.combo_hphonecount, layout.combo_ssncount))// chase verlast blank and not #19
+			or (rc_settings[1].ischase and Risk_Indicators.rcSet.isCode37(layout.lname, layout.combo_lastcount, layout.combo_addrcount, layout.combo_hphonecount, layout.combo_ssncount)),
+				DATASET([{'37',risk_indicators.getHRIDesc('37')}],risk_indicators.Layout_Desc),
+					IF(Risk_Indicators.rcSet.isCode37(layout.lname, layout.combo_lastcount, layout.combo_addrcount, layout.combo_hphonecount, layout.combo_ssncount),
+						DATASET([{'37',risk_indicators.getHRIDesc('37')}],risk_indicators.Layout_Desc))) &
+	// reason codes for chase custom model
+	If((rc_settings[1].ischase and Risk_Indicators.rcSet.isCode25Chase(layout.in_streetAddress, layout.combo_lastcount, rc_settings[1].veraddr_chase,layout.combo_addrcount, layout.combo_hphonecount, layout.combo_ssncount))// chase veraddr blank and not #19
+			or (rc_settings[1].ischase and Risk_Indicators.rcSet.isCode25(layout.in_streetAddress, layout.combo_lastcount, layout.combo_addrcount, layout.combo_hphonecount, layout.combo_ssncount)),
+				DATASET([{'25',risk_indicators.getHRIDesc('25')}],risk_indicators.Layout_Desc),
+					IF(Risk_Indicators.rcSet.isCode25(layout.in_streetAddress, layout.combo_lastcount, layout.combo_addrcount, layout.combo_hphonecount, layout.combo_ssncount),
+						DATASET([{'25',risk_indicators.getHRIDesc('25')}],risk_indicators.Layout_Desc))) &
+						
 	IF(Risk_Indicators.rcSet.isCode26(layout.ssn, layout.combo_lastcount, layout.combo_addrcount, layout.combo_ssncount, false, true, layout.combo_hphonecount),DATASET([{'26',risk_indicators.getHRIDesc('26')}],risk_indicators.Layout_Desc)) &			   
 	IF(Risk_Indicators.rcSet.isCode29(layout.socsmiskeyflag),DATASET([{'29',risk_indicators.getHRIDesc('29')}],risk_indicators.Layout_Desc)) &	
 	IF(Risk_Indicators.rcSet.isCode27(layout.phone10, layout.combo_lastcount, layout.combo_hphonecount),DATASET([{'27',risk_indicators.getHRIDesc('27')}],risk_indicators.Layout_Desc)) &			   
@@ -51,7 +64,11 @@ CHOOSEN(
 																																											 layout.bestState)) AND 
 		 rc_settings[1].IIDVersion>=1,DATASET([{'SD',risk_indicators.getHRIDesc('SD')}],risk_indicators.Layout_Desc)) &
 	IF(Risk_Indicators.rcSet.isCode74(layout.phonelastcount, layout.phoneaddrcount, layout.phonephonecount, layout.phonevalflag),DATASET([{'74',risk_indicators.getHRIDesc('74')}],risk_indicators.Layout_Desc)) &
-	IF(Risk_Indicators.rcSet.isCode48(layout.fname, layout.combo_firstcount, layout.combo_lastcount),DATASET([{'48',risk_indicators.getHRIDesc('48')}],risk_indicators.Layout_Desc)) &
+// reason codes for chase custom model
+		If((rc_settings[1].ischase  and Risk_Indicators.rcSet.isCode48Chase(layout.fname, rc_settings[1].verfirst_chase, rc_settings[1].verlast_chase, layout.combo_lastcount,layout.combo_firstcount )), 
+				DATASET([{'48',risk_indicators.getHRIDesc('48')}],risk_indicators.Layout_Desc),
+					IF(~rc_settings[1].ischase and Risk_Indicators.rcSet.isCode48(layout.fname, layout.combo_firstcount, layout.combo_lastcount),
+						DATASET([{'48',risk_indicators.getHRIDesc('48')}],risk_indicators.Layout_Desc))) &							
 	IF(Risk_Indicators.rcSet.isCode28(layout.combo_dobcount, layout.dob),DATASET([{'28',risk_indicators.getHRIDesc('28')}],risk_indicators.Layout_Desc)) &
 	IF(Risk_Indicators.rcSet.isCodeNB(layout.dob, layout.combo_DOB) AND rc_settings[1].IIDVersion>=1,DATASET([{'NB',risk_indicators.getHRIDesc('NB')}],risk_indicators.Layout_Desc)) &
 	IF(Risk_Indicators.rcSet.isCode52(layout.fname, layout.ssn, layout.firstssnmatch, layout.socsverlevel, layout.ssnExists),DATASET([{'52',risk_indicators.getHRIDesc('52')}],risk_indicators.Layout_Desc)) &

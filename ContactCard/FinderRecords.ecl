@@ -1,10 +1,12 @@
-﻿import person_models,moxie_phonesplus_server,doxie_raw,header,Relocations,doxie,address,PhonesFeedback_Services,
+import person_models,moxie_phonesplus_server,doxie_raw,header,Relocations,doxie,address,PhonesFeedback_Services,
        PhonesFeedback,AutoStandardI,DeathV2_Services,suppress, ContactCard, std;
 
 deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
 
-doxie.MAC_Header_Field_Declare()
-doxie.MAC_Selection_Declare()
+doxie.MAC_Header_Field_Declare(); // dial_contactprecision_value, score_threshold_value, glb_ok, dppa_ok
+mod_access := doxie.compliance.GetGlobalDataAccessModule ();
+
+doxie.MAC_Selection_Declare();
 
 con := ContactCard.constants;
 rec := ContactCard.layouts;
@@ -23,9 +25,9 @@ shared newEnough(unsigned2 yr) := yr + con.max_AgeOfData >= (unsigned2)(((STRING
 //***** GET THE RELATIVES 
 //	depth is input to service and defaults to 1 by #stored('RelativeDepth',con.default_RelativeDepth) in ContactCard.ReportService,
 //	so we can have depth beyond 1 in allrel
-shared allrel := Doxie_Raw.relative_raw(dids,dateVal,dppa_purpose,glb_purpose,ssn_mask_value,ln_branded_value,
-							                                     probation_override_value,true,true,
-							                                     Relative_Depth,max_relatives,isCRS);
+shared allrel := Doxie_Raw.relative_raw(dids, mod_access,
+                                              true, true,
+                                              Relative_Depth, max_relatives);
 
 // rel is the group that i will actually consider relatives in the final output
 // there are some refs to allrel because we use them to figure out some of the relationships						
@@ -42,18 +44,18 @@ shared relassocdids := join(rel, doxie.key_death_masterv2_ssa_did,
 
 //***** GET ALL THE HEADER RECORDS
 
-shared csa := doxie.Comp_Subject_Addresses(dids + relassocdids,dateVal,dppa_purpose,glb_purpose,ln_branded_value,,probation_override_value,industry_class_value,no_scrub,dial_contactprecision_value);
+shared csa := doxie.Comp_Subject_Addresses(dids + relassocdids, , dial_contactprecision_value, , mod_access);
 
 shared head_nopull := csa.raw;
 
 
 	
 //***** PULL IDS
-Suppress.MAC_Suppress(head_nopull,head_pull1,application_type_value,Suppress.Constants.LinkTypes.DID,did);
-Suppress.MAC_Suppress(head_pull1,head_pull2,application_type_value,Suppress.Constants.LinkTypes.SSN,ssn);
+Suppress.MAC_Suppress(head_nopull,head_pull1,mod_access.application_type,Suppress.Constants.LinkTypes.DID,did);
+Suppress.MAC_Suppress(head_pull1,head_pull2,mod_access.application_type,Suppress.Constants.LinkTypes.SSN,ssn);
 
 rna_IN := head_pull2(did<>subjectDID);
-header.MAC_GLB_DPPA_Clean_RNA(rna_in,head_pull2_rna);
+header.MAC_GLB_DPPA_Clean_RNA(rna_in,head_pull2_rna,mod_access);
 
 export head := head_pull2_rna + head_pull2(did = subjectDID);
 
@@ -194,16 +196,7 @@ nbr := choosen(doxie.nbr_records(
 	Neighbors_PerAddress,
 	Neighbors_Per_NA,
 	Neighbor_Recency,
-	industry_class_value,
-	GLB_Purpose,
-	DPPA_Purpose,
-	probation_override_value,
-	no_scrub,
-	glb_ok,
-	dppa_ok,
-	
-	// attrs declared in doxie.MAC_Header_Field_Declare
-	ssn_mask_value
+  mod_access := mod_access
 )(did <> subjectDID), con.max_neighbors);
 
 nbrAddrDIDs := 	dedup(sort(nbr, did,-dt_last_seen), did);
@@ -332,13 +325,15 @@ ipp := Include_PhonesPlus_val;
 ipprna := storeds.IncludePhonesPlus_for_RNA;
 
 //get PP data for input subject only:
-ophones := if(ipp, moxie_phonesplus_server.phonesplus_did_records(dids(ipp), con.max_phonesplus, score_threshold_value,glb_purpose,dppa_purpose,con.min_PhonesPlusConfidencescore,true).w_timezoneSeenDt);
+ophones := if(ipp, moxie_phonesplus_server.phonesplus_did_records(dids(ipp),
+                       con.max_phonesplus, score_threshold_value, mod_access.glb, mod_access.dppa, con.min_PhonesPlusConfidencescore, true).w_timezoneSeenDt);
 
 ophones_chsn := choosen(sort(dedup(sort(ophones,phoneno,-last_seen),phoneno),-last_seen),con.max_phonesplus);
 
 //get Phones+ for RNA separately since GLB restrictions are different for RNA vs. subject 
 // and we need to skip calculating penalties for relatives,associates,neighbors' dids as they are based on global module input:
-ophones_rna := if(ipprna, moxie_phonesplus_server.phonesplus_did_records(project(allDIDs(did<>subjectDID),doxie.layout_references)(ipprna), con.max_phonesplus, score_threshold_value,glb_purpose,dppa_purpose,con.min_PhonesPlusConfidencescore,false,false,checkRNA).w_timezoneSeenDt);
+ophones_rna := if(ipprna, moxie_phonesplus_server.phonesplus_did_records(project(allDIDs(did<>subjectDID),doxie.layout_references)(ipprna),
+                               con.max_phonesplus, score_threshold_value, mod_access.glb, mod_access.dppa, con.min_PhonesPlusConfidencescore, false, false, checkRNA).w_timezoneSeenDt);
 
 // we will keep only one record per phone/did combination similar to pa_ddp above and upto 10 Phones+ per did
 ophones_rna_grpd := group(dedup(sort(ophones_rna,did,phoneno,-last_seen,-first_seen),did,phoneno),did);
@@ -376,7 +371,8 @@ oph_rna := join(ungroup(ophones_rna_chsn),nbrAddrDIDs, (unsigned6)left.did=right
 pa_pp := pa_srt + if(ipprna,oph_rna);
 
 //***** WORK PHONES
-wphones_chsn1 := choosen(sort(doxie.Fn_PhonesAtWork((dids+spouseDIDs)(not SubjectIsDeceased),dateval,dppa_purpose,glb_purpose,con.min_PAWRecencyInDays,con.min_PAWConfidencescore), 
+wphones_chsn1 := choosen(sort(doxie.Fn_PhonesAtWork((dids+spouseDIDs)(not SubjectIsDeceased),
+                                  mod_access.date_threshold, mod_access.dppa, mod_access.glb, con.min_PAWRecencyInDays,con.min_PAWConfidencescore), 
 															ut.StringSimilar100(contact.lname, phone.listing_name)),
 												con.max_workphones);
 
@@ -497,8 +493,8 @@ rph := project(relo_chsn,
 												 self := left,
 												 self := []));
 //***** ADD BEST NAME AND THROW OUT ONE IF TWO ASSOCIATES WITH SAME NAME
-rna_dppa_ok := ut.glb_ok(dppa_purpose,checkRNA);
-rna_glb_ok := ut.glb_ok(glb_Purpose,checkRNA);
+rna_dppa_ok := mod_access.isValidDPPA(checkRNA);
+rna_glb_ok :=mod_access.isValidGLB(checkRNA);
 rna_dids := alldids(did != subjectDID);
 doxie.mac_best_records(rna_dids, did, rnabest, rna_dppa_ok, rna_glb_ok, false, doxie.DataRestriction.fixed_DRM)
 doxie.mac_best_records(SubjectDids, did, sbest, dppa_ok, glb_ok, false, doxie.DataRestriction.fixed_DRM)

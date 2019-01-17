@@ -29,7 +29,8 @@ EXPORT MAC_BusinessCredit_Services_BCD_SmallBizCombinedReport := MACRO
       'IncludeTargusGateway',
       'RunTargusGatewayAnywayForTesting',
       'TestDataEnabled',
-      'TestDataTableName'
+      'TestDataTableName',	 
+	 'SBFEContributorIds'
       ));
 
 ENDMACRO;

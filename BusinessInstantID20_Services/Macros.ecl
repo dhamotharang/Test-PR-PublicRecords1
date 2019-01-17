@@ -159,6 +159,14 @@
 		STRING DataRestrictionMask_stored := Business_Risk_BIP.Constants.Default_DataRestrictionMask : STORED('DataRestrictionMask');
 		STRING DataPermissionMask_stored  := Business_Risk_BIP.Constants.Default_DataPermissionMask  : STORED('DataPermissionMask');
 		UNSIGNED BIID20ProductType_stored := BusinessInstantID20_Services.Types.productTypeEnum.BASE : STORED('BIID20ProductType');
+    gateways_in := Gateway.Configuration.Get();
+    
+    iesp.businessinstantid20.t_BIID20Gateway gw_switch(gateways_in le) := transform
+    self.servicename := le.servicename;
+    self.url := le.url;
+    end;
+    
+    gateways_root := project(gateways_in, gw_switch(left));
 		
 		// Read from either the root (as Stored) or the User section in the XML Request.
 		UNSIGNED1	_DPPA_Purpose        := IF(TRIM(users.DLPurpose) != ''     , (INTEGER)users.DLPurpose , DPPAPurpose_stored);
@@ -184,7 +192,7 @@
 		BOOLEAN   _include_ofac                    := TRUE; // Always run OFAC
 		BOOLEAN   _include_additional_watchlists   := _BIID20ProductType IN [BusinessInstantID20_Services.Types.productTypeEnum.COMPLIANCE, BusinessInstantID20_Services.Types.productTypeEnum.COMPLIANCE_PLUS_SBFE]; 
 		DATASET(iesp.share.t_StringArrayItem) _Watchlists_Requested := option.WatchlistsRequested;
-		DATASET(iesp.businessinstantid20.t_BIID20Gateway) _Gateways  := option.Gateways;
+		DATASET(iesp.businessinstantid20.t_BIID20Gateway) _Gateways  := if(exists(option.Gateways), option.Gateways, gateways_root);
     
     STRING    _DataPermissionMask := BusinessInstantID20_Services.fn_setSBFEBitInDataPermissionMask(__DataPermissionMask, _BIID20ProductType); 
 				

@@ -1,0 +1,94 @@
+﻿ID "b50026be-1a87-46e9-b055-b2f79393256e";
+NAME AppendCleanAddress;
+LABEL "Clean Addresses";
+VERSION "1.0.0";
+DESCRIPTION "Clean a file";
+AUTHOR "prichajx";
+CATEGORY CLEAN;
+
+PERMISSIONS
+ VIEW:PUBLIC;
+ EDIT:PRIVATE;
+ RUN:PUBLIC;
+END
+    
+INPUTS
+    STRING Prefix:LABEL("Append Column Prefix"),DEFAULT("Address");
+    DATASET dsInput:MAPBYNAME
+        FIELD AddressLine1:LABEL("Address Line 1"), DESCRIPTION("Address Line 1 field with number, street etc.");
+        FIELD AddressLine2:LABEL("Address Line 2"), DESCRIPTION("Address Line 2 with Apartment, Suite number"),OPTIONAL,NULL("");
+        FIELD AddressLine2WithCity:LABEL("Address Line 2, City, St, Zip"), DESCRIPTION("Address Line 2 with City, State, Zip"),OPTIONAL,NULL("");
+        FIELD City:LABEL("City"),OPTIONAL,NULL("");
+        FIELD State:LABEL("State"),OPTIONAL,NULL("");
+        FIELD Zip:LABEL("Zip Code"),OPTIONAL,NULL("");
+    END
+END
+
+OUTPUTS
+    DATASET dsOutput(dsInput):PREFIX(INPUTS.Prefix),APPEND
+	  STRING PrimaryRange; 	
+	  STRING PreDirectional;	
+	  STRING PrimaryName;
+	  STRING AddressSuffix; 
+	  STRING PostDirectional;
+	  STRING UnitDesignation;
+	  STRING SecondaryRange;
+	  STRING PostalCity;
+	  STRING VanityCity;
+	  STRING State;
+	  STRING Zip;
+	  STRING Zip4;
+	  STRING DBPC;
+	  STRING CheckDigit;
+	  STRING RecordType;
+	  STRING County;
+	  STRING Latitude;
+	  STRING Longitude;
+	  STRING Msa;
+	  STRING GeoBlock;
+	  STRING GeoMatchCode;
+	  STRING ErrorStatus;
+	  STRING CacheHit;
+	  STRING CleanerHit;
+    END
+    
+    DATASET CleanStats:PREFIX(INPUTS.Prefix), WUID, SIDE
+      STRING State : FEW;
+      STRING ErrorStatus : FEW;
+      BOOLEAN CacheHit : FEW;
+      STRING GeoMatchCode : FEW;
+      INTEGER Cnt;     
+    END
+	
+END
+
+VISUALIZE ErrorsAndGeo : LABEL("Address Clean")
+    CHORO RecordDensity(CleanStats{State, SUM(Cnt) }) : STATE(State),WEIGHT(SUM(Cnt)),COLOR("Red_Yellow_Blue"),SELECTS(State->SelectedStateStats);
+    BAR SelectedStateStats(CleanStats{State, ErrorStatus, SUM(Cnt)}) : FILTER(State),LABEL(ErrorStatus),WEIGHT(SUM(Cnt));
+    BAR ErrorTypes(CleanStats{ErrorStatus, SUM(Cnt)}) : LABEL(ErrorStatus),WEIGHT(SUM(Cnt)),SELECTS(ErrorStatus->ErrorDensity);
+    CHORO ErrorDensity(CleanStats{ErrorStatus, State, SUM(Cnt)}) : FILTER(ErrorStatus), STATE(State), WEIGHT(SUM(Cnt)), COLOR("Red_Yellow_Blue");
+    BAR CacheHits(CleanStats{CacheHit, SUM(Cnt)}) : LABEL(CacheHit),WEIGHT(SUM(Cnt));
+    BAR GeoMatchStats(CleanStats{GeoMatchCode, SUM(Cnt)}) : LABEL(GeoMatchCode),WEIGHT(SUM(Cnt));
+END
+
+GENERATES INLINE
+   IMPORT AppendCleanAddress, Address;
+
+   CleanedAddresses  := AppendCleanAddress.mac_CleanAddress(%dsInput%, 20000000, %AddressLine1%, %AddressLine2WithCity%, %AddressLine2%, %City%, %State%, %Zip%, '%Prefix%');
+
+   %^edsOutput% := CleanedAddresses %^p%;
+   %^eCleanStats% := TABLE(%dsOutput%, {%Prefix%State, %Prefix%ErrorStatus, %Prefix%CacheHit, %Prefix%GeoMatchCode, %Prefix%Cnt := COUNT(GROUP)}, %Prefix%State, %Prefix%ErrorStatus, %Prefix%CacheHit, %Prefix%GeoMatchCode, MERGE);
+    
+ENDGENERATES
+
+RESOURCES
+	INDEX Key_RawACE:FILENAME("~thor_data400::key::address_clean::clean_qa"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100dev");    
+	LOGICALFILE testinput:FILENAME("~qa::appendcleanaddress::appendcleanaddress::input"), URL("http://10.241.100.157:8010"), DALIIP("10.241.100.157"), CLUSTER("thor100_100cert");
+	ECL AppendCleanAddress:FILENAME("AppendCleanAddress"), URL("http:// 10.241.100.153:8010");
+	ECL Address:FILENAME("Address"), URL("http:// 10.241.100.153:8010");    
+	ECL BO_Address:FILENAME("BO_Address"), URL("http:// 10.241.100.153:8010");    
+	ECL UT:FILENAME("ut"), URL("http:// 10.241.100.153:8010");
+	FILE readme: FILENAME("AppendCleanAddress_ReadMe.txt"),LABEL("Plugin Readme File");
+	FILE AppendCleanAddress_BuildTestDataset: FILENAME("AppendCleanAddress_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+	FILE AppendCleanAddress_testcmp: FILENAME("AppendCleanAddress_testcmp.txt"),LABEL("Plugin Test Composition");
+END

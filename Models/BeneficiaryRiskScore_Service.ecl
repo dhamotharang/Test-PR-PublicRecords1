@@ -88,7 +88,7 @@
 
 IMPORT Address, Gateway, Risk_Indicators, RiskWise, ut, doxie, gateway,AutoheaderV2;
 
-#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 
 EXPORT BeneficiaryRiskScore_Service() := FUNCTION
   UCase := StringLib.StringToUpperCase;

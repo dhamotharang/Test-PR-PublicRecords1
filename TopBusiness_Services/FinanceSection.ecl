@@ -1,4 +1,4 @@
-IMPORT AutoStandardI, BIPV2, iesp, MDR, TopBusiness_Services;
+﻿IMPORT AutoStandardI, BIPV2, iesp, MDR, TopBusiness_Services;
 
 EXPORT FinanceSection := MODULE;
 
@@ -31,8 +31,8 @@ EXPORT FinanceSection := MODULE;
 	   transform(FinanceSection_Layouts.rec_ids_withdata_slimmed,
 	     self.source       := MDR.sourceTools.src_DCA,
 			 self.source_docid := trim(left.rawfields.enterprise_num), 
-			 self.annual_sales_amount:= (integer) left.rawfields.sales,
-			 // Convert 6 char fye/fiscal year end in mmddyy format to yyyymmdd
+			 self.annual_sales_amount:= (integer) left.rawfields.sales,			 
+       // Convert 6 char fye/fiscal year end in mmddyy format to yyyymmdd
 			 // If length=5 (i.e. 92411 ), add leading zero.
 		   string6 temp_fye := if(length(left.rawfields.fye)=5,
 			                        '0' + left.rawfields.fye,

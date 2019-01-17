@@ -1,4 +1,4 @@
-import progressive_phone,doxie,header,AddrBest;
+﻿import progressive_phone, doxie, header, AddrBest;
 export fn_addSSN(dataset(progressive_phone.layout_progressive_batch_out_with_did) f_out) := function
 
 set of STRING1 daily_autokey_skipset:=[];
@@ -7,7 +7,8 @@ ssn_rec := record
 		doxie.Layout_presentation.ssn;
 end;
 
-doxie.MAC_Header_Field_Declare();
+// Note: using factual permissions, instead of hardcoded used in doxie.mod_header_records before.
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
 
 rec_acct_rna := record
 		progressive_phone.layout_progressive_batch_out_with_did.acctno;
@@ -39,8 +40,10 @@ p_dids := dedup(sort(project(p_dids_extended, transform(doxie.layout_references_
 																	self.includedByHHID := false)), did), did);
 
 header_recs := doxie.mod_header_records(true, 
-																				daily_autokey_skipset := daily_autokey_skipset, 
-																				probation_override_value:= false).results(p_dids);
+																				daily_autokey_skipset := daily_autokey_skipset,
+                                        modAccess := mod_access 
+																				).results(p_dids);
+
 
 /*--- Determine and Clean RNA record ---*/
 header_rnaCheck := record
@@ -62,7 +65,7 @@ header_recs_checkRNA := header_recs_RNA(checkRNA = true);
  // output(header_recs_CheckRNA, named('header_recs_CheckRNA'));
 
 // doxie.MAC_Header_Field_Declare();
-header.MAC_GLB_DPPA_Clean_RNA(header_recs_checkRNA, CheckRNA_rec_applied);
+header.MAC_GLB_DPPA_Clean_RNA(header_recs_checkRNA, CheckRNA_rec_applied, mod_access);
  // output(CheckRNA_rec_applied, named('CheckRNA_rec_applied'));
 cleaned_header_recs := dedup(sort(header_recs_RNA(checkRna = false) + CheckRNA_rec_applied, acctno, did, ssn), acctno, did, ssn);
 // output(cleaned_header_recs, named('cleaned_header_recs'));

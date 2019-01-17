@@ -71,9 +71,12 @@ MODULE
 	// Best info
 	EXPORT GetBestInfo(DATASET(lBatchInDID) dIn) :=
 	FUNCTION
+
+	  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ());
+
 		dids := DEDUP(SORT(PROJECT(dIn,doxie.layout_references),did),did);
 		
-		dBestRecs := Doxie.best_records(dids,includeDOD:=true);
+		dBestRecs := Doxie.best_records(dids, includeDOD:=true, modAccess := mod_access);
 		
 		lBatchInDID tGetBestInfo(dIn le,dBestRecs ri) :=
 		TRANSFORM
@@ -671,10 +674,10 @@ MODULE
 			SELF               := le;
 		END;
 		
-		dIdentityDIDSort   := SORT(dIdentitySlim(did != 0),acctno,did, -dt_last_seen,dt_first_seen);
+		dIdentityDIDSort   := SORT(dIdentitySlim(did != 0),acctno,did, IF(PhoneOwnershipIndicator,0,1), -dt_last_seen,dt_first_seen);
 		dIdentityDIDRollUp := ROLLUP(dIdentityDIDSort,tIdentityRollup(LEFT,RIGHT),acctno,did);
 		
-		dIdentityNoDIDSort   := SORT(dIdentitySlim(did = 0),acctno, -dt_last_seen,dt_first_seen,RECORD);
+		dIdentityNoDIDSort   := SORT(dIdentitySlim(did = 0),acctno, IF(PhoneOwnershipIndicator,0,1), -dt_last_seen,dt_first_seen,RECORD);
 		dIdentityNoDIDRollup := ROLLUP(dIdentityNoDIDSort,tIdentityRollup(LEFT,RIGHT),EXCEPT phone_source,penalt,dt_first_seen,dt_last_seen);
 		
 		// Combine and dedup the data
@@ -683,7 +686,7 @@ MODULE
 		// Depending on the type of search, restrict the number of records to the max counts
 		vMaxCount := IF(isPhoneSearch,iesp.Constants.Phone_Finder.MaxIdentities,iesp.Constants.Phone_Finder.MaxPhoneHistory);
 		
-		dIdentityTopn := DEDUP(SORT(dIdentityCombined,acctno,did=0,penalt,-dt_last_seen,dt_first_seen,phone_source),acctno,KEEP(vMaxCount));
+		dIdentityTopn := DEDUP(SORT(dIdentityCombined,acctno,did=0,penalt,IF(PhoneOwnershipIndicator,0,1),-dt_last_seen,dt_first_seen,phone_source),acctno,KEEP(vMaxCount));
 		
 		// Format to iesp
 		lIdentityIesp tFormat2IespIdentity(lIdentitySlim pInput) :=
@@ -844,7 +847,7 @@ MODULE
    		iesp.phonefinder.t_PhoneFinderSearchRecord tFormat2PhoneFinderSearch() :=
    		TRANSFORM
    			SELF.Identities          := IF(isPhoneSearch,
-   																			SORT(PROJECT(dIdentitiesInfo2,iesp.phonefinder.t_PhoneIdentityInfo),-iesp.ECL2ESP.DateToInteger(LastSeenWithPrimaryPhone)),
+   																			SORT(PROJECT(dIdentitiesInfo2,iesp.phonefinder.t_PhoneIdentityInfo),IF(PhoneOwnershipIndicator,0,1),-iesp.ECL2ESP.DateToInteger(LastSeenWithPrimaryPhone)),
    																			dPrimaryIdentity);
    			SELF.PrimaryPhoneDetails := PROJECT(dPrimaryPhoneInfo2,iesp.phonefinder.t_PhoneFinderDetailedInfo)[1];	
    			SELF.PhonesHistory       := IF(~isPhoneSearch,
@@ -1024,7 +1027,7 @@ MODULE
 		pf.PhoneFinder.TempOut tPhoneInfo(pf.PhoneFinder.TempOut le,pf.PhoneFinder.PhoneIesp ri) :=
 		TRANSFORM
 
-			SELF.identity_info := SORT(le.identity_info, -iesp.ECL2ESP.DateToInteger(LastSeenWithPrimaryPhone));
+			SELF.identity_info := SORT(le.identity_info, IF(PhoneOwnershipIndicator,0,1), -iesp.ECL2ESP.DateToInteger(LastSeenWithPrimaryPhone));
 			SELF.phone_info    := ri;
 			SELF               := le;
 		END;

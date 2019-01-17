@@ -1,11 +1,11 @@
-Import autostandardI, ut, doxie, doxie_crs;
+﻿Import autostandardI, doxie, doxie_crs;
   // updated Feb 2017.
 	// *****************************************************************************
 	// *** PLS NOTE DO NOT USE THIS FUNCTION to find neighbors for Relationship    *
 	// Identifier service if count of the                                          *
 	// input ds of input dids is more than 2                                       *
 	// *****************************************************************************
-	// This function attribute is very similar to doxie_crs.nbr_records
+	// This function attribute is very similar to doxie_crs/nbr_records
 	// except that it allows as input a Dataset of did's (ONLY 2 at max) to be passed
 	// as input param to find particular neighbors for
 	//
@@ -40,7 +40,7 @@ Import autostandardI, ut, doxie, doxie_crs;
 	                       unsigned1 InModDPPAPurpose,
 												 unsigned1 InmodGLBPurpose,
 												 string InModDRM,
-												 string6 SSN_Mask_Value,												 
+												 string6 SSN_Mask,												 
 												 isFCRA=false) := FUNCTION
 	
 		boolean include_gong := true; //true,			
@@ -54,38 +54,16 @@ Import autostandardI, ut, doxie, doxie_crs;
 		unsigned1 Neighbors_Per_NA := 6 : stored('NeighborsPerNA');
 		unsigned1 Neighbor_Recency := 3 : stored('NeighborRecency');								
 
-    tempmod := module(AutoStandardI.DataRestrictionI.params)
-		  export boolean AllowAll := false;
-		  export boolean AllowDPPA := false;
-		  export boolean AllowGLB := false;		  
-			export string DataRestrictionMask := InmodDRM;
-		  export unsigned1 DPPAPurpose := inmodDPPAPurpose;
-		  export unsigned1 GLBPurpose := inmodGLBPurpose;
-		  export boolean ignoreFares := false;
-		  export boolean ignoreFidelity := false;
-		  export boolean includeMinors := false;
-	  end;		
-				
-	  unsigned1 dppa_purpose := tempmod.DPPAPurpose; 
-		unsigned1 glb_purpose := tempmod.GLBPurpose; 
-		
-		dppa_ok := AutoStandardI.PermissionI_Tools.val(tempmod).DPPA.ok(tempmod.DPPAPurpose);
-		glb_ok :=  AutoStandardI.PermissionI_Tools.val(tempmod).GLB.ok(tempmod.GLBPurpose);
-    
-		GM := AutoStandardI.GlobalModule(isFCRA);	    														 
+    gmod := AutoStandardI.GlobalModule (isFCRA);
+    mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (gmod))
+      EXPORT unsigned1 glb := inmodGLBPurpose;
+      EXPORT unsigned1 dppa := inmodDPPAPurpose;
+      EXPORT string DataRestrictionMask := InmodDRM;
+      EXPORT string ssn_mask := ^.SSN_Mask; 
+    END;
 
-    string5 industry_class_value := AutoStandardI.InterfaceTranslator.industry_class_val.val(project(GM,
-		             AutoStandardI.InterfaceTranslator.industry_class_val.params));    													 		
-    unsigned1 dial_contactprecision_value := AutoStandardI.InterfaceTranslator.dial_contactprecision_value.val(project(GM,
-		             AutoStandardI.InterfaceTranslator.dial_contactprecision_value.params)); 								 
-    boolean probation_override_value := AutoStandardI.InterfaceTranslator.probation_override_value.val(project(GM,
-		             AutoStandardI.InterfaceTranslator.probation_override_value.params));
-    boolean ln_branded_value := AutoStandardI.InterfaceTranslator.ln_branded_value.val(project(GM,
-		             AutoStandardI.InterfaceTranslator.ln_branded_value.params)); 									 
-    boolean no_scrub := AutoStandardI.InterfaceTranslator.no_scrub.val(project(GM,
-		             AutoStandardI.InterfaceTranslator.no_scrub.params)); 								 
-    unsigned3 dateVal := AutoStandardI.InterfaceTranslator.dateVal.val(project(GM,
-		             AutoStandardI.InterfaceTranslator.dateVal.params)); 								 
+    unsigned1 dial_contactprecision_value := AutoStandardI.InterfaceTranslator.dial_contactprecision_value.val(project(gmod,
+		              AutoStandardI.InterfaceTranslator.dial_contactprecision_value.params)); 
  								 
 		boolean Include_Neighbors := false : stored('Include_Neighbors');
 		boolean Include_Neighbors_val := include_neighbors;
@@ -96,12 +74,9 @@ Import autostandardI, ut, doxie, doxie_crs;
 		unsigned1 neighbors_proximity := 15 : stored('NeighborsProximityRadius');
 		////////////////		
 
-		// step #1  -> do equivalent to doxie_crs.nbr_records;
-		// call this :  doxie.Comp_Subject_Addresses
-		// and use results to then call equivalent of this : doxie_crs.nbr_records
-		//
-	  csa := doxie.Comp_Subject_Addresses(dids,dateVal,dppa_purpose,glb_purpose,ln_branded_value,,probation_override_value,industry_class_value,
-                                             no_scrub,dial_contactprecision_value, Addresses_PerSubject);
+		// step #1  -> do equivalent to doxie_crs/nbr_records;
+		// and use results to then call equivalent of this : doxie_crs/nbr_records
+	  csa := doxie.Comp_Subject_Addresses(dids,, dial_contactprecision_value, Addresses_PerSubject, mod_access);
     // 
 	  headerRecs := csa.addresses;
 	  // convert to target record type
@@ -123,17 +98,10 @@ Import autostandardI, ut, doxie, doxie_crs;
 		  Max_Neighborhoods,
 		  Neighbors_PerAddress,
 		  Neighbors_Per_NA,
-		  Neighbor_Recency,
-		  industry_class_value,
-		  GLB_Purpose,
-		  DPPA_Purpose,
-		  probation_override_value,
-		  no_scrub,
-		  glb_ok,
-		  dppa_ok,
-	  // attrs declared in doxie.MAC_Header_Field_Declare
-		  ssn_mask_value,,,
-		  neighbors_proximity // generally, the radius of neighbors' units: houses, or appartments or etc.
+		  Neighbor_Recency,,,
+		  neighbors_proximity, // generally, the radius of neighbors' units: houses, or appartments or etc.
+      ,
+      mod_access
     );
 
 // generate current/historic neighbors as specified
@@ -150,8 +118,9 @@ nbr_records_hist := IF(
 );
 
 both := nbr_records_curr + nbr_records_hist;
-ut.PermissionTools.GLB.mac_FilterOutMinors(both,bothfil,,,dob)
+bothfil := doxie.compliance.mac_FilterOutMinors(both,,dob,mod_access.show_minors);
+
 ds_neighborsMultDidInput := bothfil;
 //output(	Max_Neighborhoods, named('Max_Neighborhoods'));
-return(ds_neighborsMultDidInput);
+return ds_neighborsMultDidInput;
 END;																						 	

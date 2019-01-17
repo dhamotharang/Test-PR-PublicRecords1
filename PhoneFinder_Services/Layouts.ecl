@@ -772,6 +772,20 @@ MODULE
 		STRING10     phone;
 	  UNSIGNED RecordsReturned;
 	END;
+    
+  EXPORT Input_CompanyId := RECORD
+		STRING16  CompanyId;
+	END;
+
+	EXPORT PFResSnapShotSearch := RECORD
+    STRING8 StartDate;
+    STRING8 EndDate;
+    STRING60 UserId;
+    DATASET(Input_CompanyId) CompanyIds {MAXCOUNT(iesp.Constants.PfResSnapshot.MaxCompanyIds)};
+    STRING15 PhoneNumber; 		
+    STRING60 ReferenceCode;
+    UNSIGNED8 UniqueId;
+	END;
 	
 	//	DeltaPhones
 	EXPORT delta_phones_rpt_transaction := record
@@ -783,6 +797,9 @@ MODULE
 		STRING8 source_code; 		
    		STRING60 reference_code;
    		STRING32 phonefinder_type;
+   		STRING30 data_source;
+   		STRING30 royalty_used;  
+   		STRING30 carrier;  
 		//SearchTerms
 		STRING32 submitted_lexid;
 		STRING15 submitted_phonenumber;

@@ -50,7 +50,10 @@ shared	capR(REAL input, REAL lower, REAL upper) := IF(input <= lower, lower, IF(
 shared	capS(string input, string lowerBound, string upperBound) := trim(IF((unsigned)input < (unsigned)upperBound, 
 										IF((UNSIGNED)input < (UNSIGNED)lowerBound, lowerBound, input), 
 										upperBound));	// get smaller number and make sure the lower bounds is not exceeded
-
+// to be used by fp202 attributes										
+shared	capSnew(string input, string lowerBound, string upperBound) := trim(IF((integer)input < (integer)upperBound, 
+										IF((integer)input < (integer)lowerBound, lowerBound, input), 
+										upperBound));	// get smaller number and make sure the lower bounds is not exceeded
 // this function is for correcting months of 00 in header dates.  
 // header dates are unsigned3 values, even though layout_address_informationv3 allows unsigned4, the values are still YYYYMM 										
 shared unsigned3 fixYYYY00( unsigned YYYYMM ) := if( YYYYMM > 0 and YYYYMM % 100 = 0, YYYYMM + 1, YYYYMM );
@@ -69,7 +72,7 @@ shared	noDOBinput     := not clam.input_validation.dateofbirth;
 shared	noNAMEinput     := not (clam.input_validation.firstname and clam.input_validation.lastname);
 shared	noLASTNAMEinput     := not clam.input_validation.lastname;
 
-shared	sysdate := if(clam.historydate <> 999999, (integer)(((string)clam.historydate)[1..6]), (integer)(((STRING)Std.Date.Today())[1..6]));
+export	sysdate := if(clam.historydate <> 999999, (integer)(((string)clam.historydate)[1..6]), (integer)(((STRING)Risk_Indicators.iid_constants.TodayDate)[1..6]));
 shared 	ageDate := (unsigned4)Risk_Indicators.iid_constants.myGetDate(clam.historydate);  
 shared 	under21 := clam.inferred_age < 21 OR (ut.Age(clam.reported_dob, (unsigned)ageDate)) < 21;	
 shared	subjectFirstSeen := fixYYYY00(ut.Min2(clam.ssn_verification.header_first_seen, clam.ssn_verification.credit_first_seen));
@@ -2198,7 +2201,7 @@ export string1 InputProvidedSSN := map(
 		in_ssn<>'' and length(in_ssn)=9 => '3', 
 		'0');
 
-shared	string in_dob := clam.shell_input.dob;
+export	string in_dob := clam.shell_input.dob;
 shared	yearofbirth := (unsigned)in_dob[1..4];
 shared	monthofbirth := (unsigned)in_dob[5..6];
 shared	dayofbirth := (unsigned)in_dob[7..8];
@@ -3074,4 +3077,1253 @@ export	string3	LnJJudgmentTimeNewest := if(not clam.truedid or last_lien_date_jg
 export string7	LnJJudgmentDollarTotal	:= if(not clam.truedid, '-1', capS((string)
 			(clam.LnJ_attributes.lnj_jgmt_total
 			), capZero, cap7Byte) );
+      
+// VERSION 2.02
+  shared integer ssnlength := (integer)clam.input_validation.ssn_length;
+  shared boolean dobpop := clam.input_validation.dateofbirth;
+  shared boolean lnamepop := clam.input_validation.lastname;
+  shared boolean addrpop := clam.input_validation.address;
+  shared boolean hphnpop := clam.input_validation.homephone;
+  shared boolean emailpop := clam.input_validation.email;
+export string2 input_fname_isbestmatch := clam.best_flags.input_fname_isbestmatch;
+export string2 input_lname_isbestmatch := clam.best_flags.input_lname_isbestmatch;
+export string2 input_ssn_isbestmatch := clam.best_flags.input_ssn_isbestmatch;
+export string3 srch_ssnsperid_count_day := capSnew( (string)(clam.acc_logs.inq_ssnsperadl_count_day), capZero, cap255);
+export string3 srch_ssnsperid_count_wk := capSnew( (string)(clam.acc_logs.inq_ssnsperadl_count_week), capZero, cap255);
+export string3 srch_ssnsperid_count01 := capSnew( (string)(clam.acc_logs.inq_ssnsperadl_count01), capZero, cap255);
+export string3 srch_ssnsperid_count03 := capSnew( (string)(clam.acc_logs.inq_ssnsperadl_count03), capZero, cap255);
+export string3 srch_ssnsperid_count06 := capSnew( (string)(clam.acc_logs.inq_ssnsperadl_count06), capZero, cap255);
+export string3 srch_addrsperid_count_day := capSnew( (string)(clam.acc_logs.inq_addrsperadl_count_day), capZero, cap255);
+export string3 srch_addrsperid_count_wk := capSnew( (string)(clam.acc_logs.inq_addrsperadl_count_week), capZero, cap255);
+export string3 srch_addrsperid_count01 := capSnew( (string)(clam.acc_logs.inq_addrsperadl_count01), capZero, cap255);
+export string3 srch_addrsperid_count03 := capSnew( (string)(clam.acc_logs.inq_addrsperadl_count03), capZero, cap255);
+export string3 srch_addrsperid_count06 := capSnew( (string)(clam.acc_logs.inq_addrsperadl_count06), capZero, cap255);
+export string3 srch_phonesperid_count_day := capSnew( (string)(clam.acc_logs.inq_phonesperadl_count_day), capZero, cap255);
+export string3 srch_phonesperid_count_wk := capSnew( (string)(clam.acc_logs.inq_phonesperadl_count_week), capZero, cap255);
+export string3 srch_phonesperid_count01 := capSnew( (string)(clam.acc_logs.inq_phonesperadl_count01), capZero, cap255);
+export string3 srch_phonesperid_count03 := capSnew( (string)(clam.acc_logs.inq_phonesperadl_count03), capZero, cap255);
+export string3 srch_lnamesperid_count_day := capSnew( (string)(clam.acc_logs.inq_lnamesperadl_count_day), capZero, cap255);
+export string3 srch_lnamesperid_count_wk := capSnew( (string)(clam.acc_logs.inq_lnamesperadl_count_week), capZero, cap255);
+export string3 srch_lnamesperid_count01 := capSnew( (string)(clam.acc_logs.inq_lnamesperadl_count01), capZero, cap255);
+export string3 srch_lnamesperid_count03 := capSnew( (string)(clam.acc_logs.inq_lnamesperadl_count03), capZero, cap255);
+export string3 srch_fnamesperid_count_day := capSnew( (string)(clam.acc_logs.inq_fnamesperadl_count_day), capZero, cap255);
+export string3 srch_fnamesperid_count_wk := capSnew( (string)(clam.acc_logs.inq_fnamesperadl_count_week), capZero, cap255);
+export string3 srch_fnamesperid_count01 := capSnew( (string)(clam.acc_logs.inq_fnamesperadl_count01), capZero, cap255);
+export string3 srch_fnamesperid_count03 := capSnew( (string)(clam.acc_logs.inq_fnamesperadl_count03), capZero, cap255);
+export string3 srch_fnamesperid_count06 := capSnew( (string)(clam.acc_logs.inq_fnamesperadl_count06), capZero, cap255);
+export string3 srch_dobsperid_count_day := capSnew( (string)(clam.acc_logs.inq_dobsperadl_count_day), capZero, cap255);
+export string3 srch_dobsperid_count_wk := capSnew( (string)(clam.acc_logs.inq_dobsperadl_count_week), capZero, cap255);
+export string3 srch_dobsperid_count01 := capSnew( (string)(clam.acc_logs.inq_dobsperadl_count01), capZero, cap255);
+export string3 srch_dobsperid_count03 := capSnew( (string)(clam.acc_logs.inq_dobsperadl_count03), capZero, cap255);
+export string3 srch_dobsperid_count06 := capSnew( (string)(clam.acc_logs.inq_dobsperadl_count06), capZero, cap255);
+export string3 srch_email_per_id := capSnew( (string)(clam.acc_logs.inquiryemailsperADL), capZero, cap255);
+export string3 srch_emailsperid_count_day := capSnew( (string)(clam.acc_logs.inq_emailsperadl_count_day), capZero, cap255);
+export string3 srch_emailsperid_count_wk := capSnew( (string)(clam.acc_logs.inq_emailsperadl_count_week), capZero, cap255);
+export string3 srch_emailsperid_count01 := capSnew( (string)(clam.acc_logs.inq_emailsperadl_count01), capZero, cap255);
+export string3 srch_emailsperid_count03 := capSnew( (string)(clam.acc_logs.inq_emailsperadl_count03), capZero, cap255);
+export string3 srch_emailsperid_count06 := capSnew( (string)(clam.acc_logs.inq_emailsperadl_count06), capZero, cap255);
+export string3 srch_ssnsperid_1subs := capSnew( (string)(clam.acc_logs.inq_ssnsperadl_1subs), '-3', cap255);
+export string3 srch_phnsperid_1subs := capSnew( (string)(clam.acc_logs.inq_phnsperadl_1subs), '-3', cap255);
+export string3 srch_primrangesperid_1subs := capSnew( (string)(clam.acc_logs.inq_primrangesperadl_1subs), '-3', cap255);
+export string3 srch_dobsperid_1subs := capSnew( (string)(clam.acc_logs.inq_dobsperadl_1subs), '-3', cap255);
+export string3 srch_fnamesperid_1subs := capSnew( (string)(clam.acc_logs.inq_fnamesperadl_1subs), '-3', cap255);
+export string3 srch_lnamesperid_1subs := capSnew( (string)(clam.acc_logs.inq_lnamesperadl_1subs), '-3', cap255);
+export string3 srch_dobsperid_daysubs := capSnew( (string)(clam.acc_logs.inq_dobsperadl_daysubs), '-3', cap255);
+export string3 srch_dobsperid_mosubs := capSnew( (string)(clam.acc_logs.inq_dobsperadl_mosubs), '-3', cap255);
+export string3 srch_dobsperid_yrsubs := capSnew( (string)(clam.acc_logs.inq_dobsperadl_yrsubs), '-3', cap255);
+export string3 srch_ssnsperid_1dig := capSnew( (string)(clam.acc_logs.inq_ssnsperadl_1dig), '-3', cap255);
+export string3 srch_phnsperid_1dig := capSnew( (string)(clam.acc_logs.inq_phnsperadl_1dig), '-3', cap255);
+export string3 srch_primrangesperid_1dig := capSnew( (string)(clam.acc_logs.inq_primrangesperadl_1dig), '-3', cap255);
+export string3 srch_dobsperid_1dig := capSnew( (string)(clam.acc_logs.inq_dobsperadl_1dig), '-3', cap255);
+export string3 srch_perbestssn := capSnew( (string)(clam.best_flags.inq_perbestssn), capZero, cap255);
+export string3 srch_idsperbestssn := capSnew( (string)(clam.best_flags.inq_adlsperbestssn), capZero, cap255);
+export string3 srch_lnamesperbestssn := capSnew( (string)(clam.best_flags.inq_lnamesperbestssn), capZero, cap255);
+export string3 srch_addrsperbestssn := capSnew( (string)(clam.best_flags.inq_addrsperbestssn), capZero, cap255);
+export string3 srch_dobsperbestssn := capSnew( (string)(clam.best_flags.inq_dobsperbestssn), capZero, cap255);
+  shared corrnamedob_sources := clam.header_summary.corrnamedob_sources;
+  shared corrnamedob_src_AK_pos := Models.Common.findw_cpp(corrnamedob_sources, 'AK' , '  ,', 'ie');
+  shared corrnamedob_src_AK := corrnamedob_src_AK_pos > 0;
+  shared corrnamedob_src_AM_pos := Models.Common.findw_cpp(corrnamedob_sources, 'AM' , '  ,', 'ie');
+  shared corrnamedob_src_AM := corrnamedob_src_AM_pos > 0;
+  shared corrnamedob_src_AR_pos := Models.Common.findw_cpp(corrnamedob_sources, 'AR' , '  ,', 'ie');
+  shared corrnamedob_src_AR := corrnamedob_src_AR_pos > 0;
+  shared corrnamedob_src_BA_pos := Models.Common.findw_cpp(corrnamedob_sources, 'BA' , '  ,', 'ie');
+  shared corrnamedob_src_BA := corrnamedob_src_BA_pos > 0;
+  shared corrnamedob_src_CG_pos := Models.Common.findw_cpp(corrnamedob_sources, 'CG' , '  ,', 'ie');
+  shared corrnamedob_src_CG := corrnamedob_src_CG_pos > 0;
+  shared corrnamedob_src_CO_pos := Models.Common.findw_cpp(corrnamedob_sources, 'CO' , '  ,', 'ie');
+  shared corrnamedob_src_CO := corrnamedob_src_CO_pos > 0;
+  shared corrnamedob_src_CY_pos := Models.Common.findw_cpp(corrnamedob_sources, 'CY' , '  ,', 'ie');
+  shared corrnamedob_src_CY := corrnamedob_src_CY_pos > 0;
+  shared corrnamedob_src_D_pos := Models.Common.findw_cpp(corrnamedob_sources, 'D' , '  ,', 'ie');
+  shared corrnamedob_src_D := corrnamedob_src_D_pos > 0;
+  shared corrnamedob_src_DA_pos := Models.Common.findw_cpp(corrnamedob_sources, 'DA' , '  ,', 'ie');
+  shared corrnamedob_src_DA := corrnamedob_src_DA_pos > 0;
+  shared corrnamedob_src_DE_pos := Models.Common.findw_cpp(corrnamedob_sources, 'DE' , '  ,', 'ie');
+  shared corrnamedob_src_DE := corrnamedob_src_DE_pos > 0;
+  shared corrnamedob_src_DL_pos := Models.Common.findw_cpp(corrnamedob_sources, 'DL' , '  ,', 'ie');
+  shared corrnamedob_src_DL := corrnamedob_src_DL_pos > 0;
+  shared corrnamedob_src_DS_pos := Models.Common.findw_cpp(corrnamedob_sources, 'DS' , '  ,', 'ie');
+  shared corrnamedob_src_DS := corrnamedob_src_DS_pos > 0;
+  shared corrnamedob_src_E1_pos := Models.Common.findw_cpp(corrnamedob_sources, 'E1' , '  ,', 'ie');
+  shared corrnamedob_src_E1 := corrnamedob_src_E1_pos > 0;
+  shared corrnamedob_src_E2_pos := Models.Common.findw_cpp(corrnamedob_sources, 'E2' , '  ,', 'ie');
+  shared corrnamedob_src_E2 := corrnamedob_src_E2_pos > 0;
+  shared corrnamedob_src_E3_pos := Models.Common.findw_cpp(corrnamedob_sources, 'E3' , '  ,', 'ie');
+  shared corrnamedob_src_E3 := corrnamedob_src_E3_pos > 0;
+  shared corrnamedob_src_E4_pos := Models.Common.findw_cpp(corrnamedob_sources, 'E4' , '  ,', 'ie');
+  shared corrnamedob_src_E4 := corrnamedob_src_E4_pos > 0;
+  shared corrnamedob_src_EB_pos := Models.Common.findw_cpp(corrnamedob_sources, 'EB' , '  ,', 'ie');
+  shared corrnamedob_src_EB := corrnamedob_src_EB_pos > 0;
+  shared corrnamedob_src_EM_pos := Models.Common.findw_cpp(corrnamedob_sources, 'EM' , '  ,', 'ie');
+  shared corrnamedob_src_EM := corrnamedob_src_EM_pos > 0;
+  shared corrnamedob_src_EN_pos := Models.Common.findw_cpp(corrnamedob_sources, 'EN' , '  ,', 'ie');
+  shared corrnamedob_src_EN := corrnamedob_src_EN_pos > 0;
+  shared corrnamedob_src_EQ_pos := Models.Common.findw_cpp(corrnamedob_sources, 'EQ' , '  ,', 'ie');
+  shared corrnamedob_src_EQ := corrnamedob_src_EQ_pos > 0;
+  shared corrnamedob_src_FE_pos := Models.Common.findw_cpp(corrnamedob_sources, 'FE' , '  ,', 'ie');
+  shared corrnamedob_src_FE := corrnamedob_src_FE_pos > 0;
+  shared corrnamedob_src_FF_pos := Models.Common.findw_cpp(corrnamedob_sources, 'FF' , '  ,', 'ie');
+  shared corrnamedob_src_FF := corrnamedob_src_FF_pos > 0;
+  shared corrnamedob_src_FR_pos := Models.Common.findw_cpp(corrnamedob_sources, 'FR' , '  ,', 'ie');
+  shared corrnamedob_src_FR := corrnamedob_src_FR_pos > 0;
+  shared corrnamedob_src_L2_pos := Models.Common.findw_cpp(corrnamedob_sources, 'L2' , '  ,', 'ie');
+  shared corrnamedob_src_L2 := corrnamedob_src_L2_pos > 0;
+  shared corrnamedob_src_LI_pos := Models.Common.findw_cpp(corrnamedob_sources, 'LI' , '  ,', 'ie');
+  shared corrnamedob_src_LI := corrnamedob_src_LI_pos > 0;
+  shared corrnamedob_src_MW_pos := Models.Common.findw_cpp(corrnamedob_sources, 'MW' , '  ,', 'ie');
+  shared corrnamedob_src_MW := corrnamedob_src_MW_pos > 0;
+  shared corrnamedob_src_NT_pos := Models.Common.findw_cpp(corrnamedob_sources, 'NT' , '  ,', 'ie');
+  shared corrnamedob_src_NT := corrnamedob_src_NT_pos > 0;
+  shared corrnamedob_src_P_pos := Models.Common.findw_cpp(corrnamedob_sources, 'P' , '  ,', 'ie');
+  shared corrnamedob_src_P := corrnamedob_src_P_pos > 0;
+  shared corrnamedob_src_PL_pos := Models.Common.findw_cpp(corrnamedob_sources, 'PL' , '  ,', 'ie');
+  shared corrnamedob_src_PL := corrnamedob_src_PL_pos > 0;
+  shared corrnamedob_src_SL_pos := Models.Common.findw_cpp(corrnamedob_sources, 'SL' , '  ,', 'ie');
+  shared corrnamedob_src_SL := corrnamedob_src_SL_pos > 0;
+  shared corrnamedob_src_TN_pos := Models.Common.findw_cpp(corrnamedob_sources, 'TN' , '  ,', 'ie');
+  shared corrnamedob_src_TN := corrnamedob_src_TN_pos > 0;
+  shared corrnamedob_src_TS_pos := Models.Common.findw_cpp(corrnamedob_sources, 'TS' , '  ,', 'ie');
+  shared corrnamedob_src_TS := corrnamedob_src_TS_pos > 0;
+  shared corrnamedob_src_TU_pos := Models.Common.findw_cpp(corrnamedob_sources, 'TU' , '  ,', 'ie');
+  shared corrnamedob_src_TU := corrnamedob_src_TU_pos > 0;
+  shared corrnamedob_src_V_pos := Models.Common.findw_cpp(corrnamedob_sources, 'V' , '  ,', 'ie');
+  shared corrnamedob_src_V := corrnamedob_src_V_pos > 0;
+  shared corrnamedob_src_VO_pos := Models.Common.findw_cpp(corrnamedob_sources, 'VO' , '  ,', 'ie');
+  shared corrnamedob_src_VO := corrnamedob_src_VO_pos > 0;
+  shared corrnamedob_src_W_pos := Models.Common.findw_cpp(corrnamedob_sources, 'W' , '  ,', 'ie');
+  shared corrnamedob_src_W := corrnamedob_src_W_pos > 0;
+  shared corrnamedob_src_WP_pos := Models.Common.findw_cpp(corrnamedob_sources, 'WP' , '  ,', 'ie');
+  shared corrnamedob_src_WP := corrnamedob_src_WP_pos > 0;
+  shared corrnamedob_ct := sum((integer)corrnamedob_src_AK, (integer)corrnamedob_src_AM, (integer)corrnamedob_src_AR, (integer)corrnamedob_src_BA, (integer)corrnamedob_src_CG, (integer)corrnamedob_src_CO, (integer)corrnamedob_src_CY,
+                         (integer)corrnamedob_src_D , (integer)corrnamedob_src_DA, (integer)corrnamedob_src_DE, (integer)corrnamedob_src_DL, (integer)corrnamedob_src_DS, (integer)corrnamedob_src_E1, (integer)corrnamedob_src_E2,
+                         (integer)corrnamedob_src_E3, (integer)corrnamedob_src_E4, (integer)corrnamedob_src_EB, (integer)corrnamedob_src_EM, (integer)corrnamedob_src_EN, (integer)corrnamedob_src_EQ, (integer)corrnamedob_src_FE,
+                         (integer)corrnamedob_src_FF, (integer)corrnamedob_src_FR, (integer)corrnamedob_src_L2, (integer)corrnamedob_src_LI, (integer)corrnamedob_src_MW,
+                         (integer)corrnamedob_src_NT, (integer)corrnamedob_src_P , (integer)corrnamedob_src_PL, (integer)corrnamedob_src_SL, (integer)corrnamedob_src_TN, (integer)corrnamedob_src_TS, (integer)corrnamedob_src_TU,
+                         (integer)corrnamedob_src_V , (integer)corrnamedob_src_VO, (integer)corrnamedob_src_W , (integer)corrnamedob_src_WP); 
+export string3 corrnamedob := map(not dobpop or not lnamepop                      => '-1',
+                                  capSnew( (string)(corrnamedob_ct), '-1', cap255));
+  shared corraddrdob_sources := clam.header_summary.corraddrdob_sources;
+  shared corraddrdob_src_AK_pos := Models.Common.findw_cpp(corraddrdob_sources, 'AK' , '  ,', 'ie');
+  shared corraddrdob_src_AK := corraddrdob_src_AK_pos > 0;
+  shared corraddrdob_src_AM_pos := Models.Common.findw_cpp(corraddrdob_sources, 'AM' , '  ,', 'ie');
+  shared corraddrdob_src_AM := corraddrdob_src_AM_pos > 0;
+  shared corraddrdob_src_AR_pos := Models.Common.findw_cpp(corraddrdob_sources, 'AR' , '  ,', 'ie');
+  shared corraddrdob_src_AR := corraddrdob_src_AR_pos > 0;
+  shared corraddrdob_src_BA_pos := Models.Common.findw_cpp(corraddrdob_sources, 'BA' , '  ,', 'ie');
+  shared corraddrdob_src_BA := corraddrdob_src_BA_pos > 0;
+  shared corraddrdob_src_CG_pos := Models.Common.findw_cpp(corraddrdob_sources, 'CG' , '  ,', 'ie');
+  shared corraddrdob_src_CG := corraddrdob_src_CG_pos > 0;
+  shared corraddrdob_src_CO_pos := Models.Common.findw_cpp(corraddrdob_sources, 'CO' , '  ,', 'ie');
+  shared corraddrdob_src_CO := corraddrdob_src_CO_pos > 0;
+  shared corraddrdob_src_CY_pos := Models.Common.findw_cpp(corraddrdob_sources, 'CY' , '  ,', 'ie');
+  shared corraddrdob_src_CY := corraddrdob_src_CY_pos > 0;
+  shared corraddrdob_src_D_pos := Models.Common.findw_cpp(corraddrdob_sources, 'D' , '  ,', 'ie');
+  shared corraddrdob_src_D := corraddrdob_src_D_pos > 0;
+  shared corraddrdob_src_DA_pos := Models.Common.findw_cpp(corraddrdob_sources, 'DA' , '  ,', 'ie');
+  shared corraddrdob_src_DA := corraddrdob_src_DA_pos > 0;
+  shared corraddrdob_src_DE_pos := Models.Common.findw_cpp(corraddrdob_sources, 'DE' , '  ,', 'ie');
+  shared corraddrdob_src_DE := corraddrdob_src_DE_pos > 0;
+  shared corraddrdob_src_DL_pos := Models.Common.findw_cpp(corraddrdob_sources, 'DL' , '  ,', 'ie');
+  shared corraddrdob_src_DL := corraddrdob_src_DL_pos > 0;
+  shared corraddrdob_src_DS_pos := Models.Common.findw_cpp(corraddrdob_sources, 'DS' , '  ,', 'ie');
+  shared corraddrdob_src_DS := corraddrdob_src_DS_pos > 0;
+  shared corraddrdob_src_E1_pos := Models.Common.findw_cpp(corraddrdob_sources, 'E1' , '  ,', 'ie');
+  shared corraddrdob_src_E1 := corraddrdob_src_E1_pos > 0;
+  shared corraddrdob_src_E2_pos := Models.Common.findw_cpp(corraddrdob_sources, 'E2' , '  ,', 'ie');
+  shared corraddrdob_src_E2 := corraddrdob_src_E2_pos > 0;
+  shared corraddrdob_src_E3_pos := Models.Common.findw_cpp(corraddrdob_sources, 'E3' , '  ,', 'ie');
+  shared corraddrdob_src_E3 := corraddrdob_src_E3_pos > 0;
+  shared corraddrdob_src_E4_pos := Models.Common.findw_cpp(corraddrdob_sources, 'E4' , '  ,', 'ie');
+  shared corraddrdob_src_E4 := corraddrdob_src_E4_pos > 0;
+  shared corraddrdob_src_EB_pos := Models.Common.findw_cpp(corraddrdob_sources, 'EB' , '  ,', 'ie');
+  shared corraddrdob_src_EB := corraddrdob_src_EB_pos > 0;
+  shared corraddrdob_src_EM_pos := Models.Common.findw_cpp(corraddrdob_sources, 'EM' , '  ,', 'ie');
+  shared corraddrdob_src_EM := corraddrdob_src_EM_pos > 0;
+  shared corraddrdob_src_EN_pos := Models.Common.findw_cpp(corraddrdob_sources, 'EN' , '  ,', 'ie');
+  shared corraddrdob_src_EN := corraddrdob_src_EN_pos > 0;
+  shared corraddrdob_src_EQ_pos := Models.Common.findw_cpp(corraddrdob_sources, 'EQ' , '  ,', 'ie');
+  shared corraddrdob_src_EQ := corraddrdob_src_EQ_pos > 0;
+  shared corraddrdob_src_FE_pos := Models.Common.findw_cpp(corraddrdob_sources, 'FE' , '  ,', 'ie');
+  shared corraddrdob_src_FE := corraddrdob_src_FE_pos > 0;
+  shared corraddrdob_src_FF_pos := Models.Common.findw_cpp(corraddrdob_sources, 'FF' , '  ,', 'ie');
+  shared corraddrdob_src_FF := corraddrdob_src_FF_pos > 0;
+  shared corraddrdob_src_FR_pos := Models.Common.findw_cpp(corraddrdob_sources, 'FR' , '  ,', 'ie');
+  shared corraddrdob_src_FR := corraddrdob_src_FR_pos > 0;
+  shared corraddrdob_src_L2_pos := Models.Common.findw_cpp(corraddrdob_sources, 'L2' , '  ,', 'ie');
+  shared corraddrdob_src_L2 := corraddrdob_src_L2_pos > 0;
+  shared corraddrdob_src_LI_pos := Models.Common.findw_cpp(corraddrdob_sources, 'LI' , '  ,', 'ie');
+  shared corraddrdob_src_LI := corraddrdob_src_LI_pos > 0;
+  shared corraddrdob_src_MW_pos := Models.Common.findw_cpp(corraddrdob_sources, 'MW' , '  ,', 'ie');
+  shared corraddrdob_src_MW := corraddrdob_src_MW_pos > 0;
+  shared corraddrdob_src_NT_pos := Models.Common.findw_cpp(corraddrdob_sources, 'NT' , '  ,', 'ie');
+  shared corraddrdob_src_NT := corraddrdob_src_NT_pos > 0;
+  shared corraddrdob_src_P_pos := Models.Common.findw_cpp(corraddrdob_sources, 'P' , '  ,', 'ie');
+  shared corraddrdob_src_P := corraddrdob_src_P_pos > 0;
+  shared corraddrdob_src_PL_pos := Models.Common.findw_cpp(corraddrdob_sources, 'PL' , '  ,', 'ie');
+  shared corraddrdob_src_PL := corraddrdob_src_PL_pos > 0;
+  shared corraddrdob_src_SL_pos := Models.Common.findw_cpp(corraddrdob_sources, 'SL' , '  ,', 'ie');
+  shared corraddrdob_src_SL := corraddrdob_src_SL_pos > 0;
+  shared corraddrdob_src_TN_pos := Models.Common.findw_cpp(corraddrdob_sources, 'TN' , '  ,', 'ie');
+  shared corraddrdob_src_TN := corraddrdob_src_TN_pos > 0;
+  shared corraddrdob_src_TS_pos := Models.Common.findw_cpp(corraddrdob_sources, 'TS' , '  ,', 'ie');
+  shared corraddrdob_src_TS := corraddrdob_src_TS_pos > 0;
+  shared corraddrdob_src_TU_pos := Models.Common.findw_cpp(corraddrdob_sources, 'TU' , '  ,', 'ie');
+  shared corraddrdob_src_TU := corraddrdob_src_TU_pos > 0;
+  shared corraddrdob_src_V_pos := Models.Common.findw_cpp(corraddrdob_sources, 'V' , '  ,', 'ie');
+  shared corraddrdob_src_V := corraddrdob_src_V_pos > 0;
+  shared corraddrdob_src_VO_pos := Models.Common.findw_cpp(corraddrdob_sources, 'VO' , '  ,', 'ie');
+  shared corraddrdob_src_VO := corraddrdob_src_VO_pos > 0;
+  shared corraddrdob_src_W_pos := Models.Common.findw_cpp(corraddrdob_sources, 'W' , '  ,', 'ie');
+  shared corraddrdob_src_W := corraddrdob_src_W_pos > 0;
+  shared corraddrdob_src_WP_pos := Models.Common.findw_cpp(corraddrdob_sources, 'WP' , '  ,', 'ie');
+  shared corraddrdob_src_WP := corraddrdob_src_WP_pos > 0;
+  shared corraddrdob_ct := sum((integer)corraddrdob_src_AK, (integer)corraddrdob_src_AM, (integer)corraddrdob_src_AR, (integer)corraddrdob_src_BA, (integer)corraddrdob_src_CG, (integer)corraddrdob_src_CO, (integer)corraddrdob_src_CY,
+                         (integer)corraddrdob_src_D , (integer)corraddrdob_src_DA, (integer)corraddrdob_src_DE, (integer)corraddrdob_src_DL, (integer)corraddrdob_src_DS, (integer)corraddrdob_src_E1, (integer)corraddrdob_src_E2,
+                         (integer)corraddrdob_src_E3, (integer)corraddrdob_src_E4, (integer)corraddrdob_src_EB, (integer)corraddrdob_src_EM, (integer)corraddrdob_src_EN, (integer)corraddrdob_src_EQ, (integer)corraddrdob_src_FE,
+                         (integer)corraddrdob_src_FF, (integer)corraddrdob_src_FR, (integer)corraddrdob_src_L2, (integer)corraddrdob_src_LI, (integer)corraddrdob_src_MW,
+                         (integer)corraddrdob_src_NT, (integer)corraddrdob_src_P , (integer)corraddrdob_src_PL, (integer)corraddrdob_src_SL, (integer)corraddrdob_src_TN, (integer)corraddrdob_src_TS, (integer)corraddrdob_src_TU,
+                         (integer)corraddrdob_src_V , (integer)corraddrdob_src_VO, (integer)corraddrdob_src_W , (integer)corraddrdob_src_WP); 
+export string3 corraddrdob := map(not dobpop or not addrpop                      => '-1',
+                                  capSnew( (string)(corraddrdob_ct), '-1', '999'));
+  shared corrssndob_sources := clam.header_summary.corrssndob_sources;
+  shared corrssndob_src_AK_pos := Models.Common.findw_cpp(corrssndob_sources, 'AK' , '  ,', 'ie');
+  shared corrssndob_src_AK := corrssndob_src_AK_pos > 0;
+  shared corrssndob_src_AM_pos := Models.Common.findw_cpp(corrssndob_sources, 'AM' , '  ,', 'ie');
+  shared corrssndob_src_AM := corrssndob_src_AM_pos > 0;
+  shared corrssndob_src_AR_pos := Models.Common.findw_cpp(corrssndob_sources, 'AR' , '  ,', 'ie');
+  shared corrssndob_src_AR := corrssndob_src_AR_pos > 0;
+  shared corrssndob_src_BA_pos := Models.Common.findw_cpp(corrssndob_sources, 'BA' , '  ,', 'ie');
+  shared corrssndob_src_BA := corrssndob_src_BA_pos > 0;
+  shared corrssndob_src_CG_pos := Models.Common.findw_cpp(corrssndob_sources, 'CG' , '  ,', 'ie');
+  shared corrssndob_src_CG := corrssndob_src_CG_pos > 0;
+  shared corrssndob_src_CO_pos := Models.Common.findw_cpp(corrssndob_sources, 'CO' , '  ,', 'ie');
+  shared corrssndob_src_CO := corrssndob_src_CO_pos > 0;
+  shared corrssndob_src_CY_pos := Models.Common.findw_cpp(corrssndob_sources, 'CY' , '  ,', 'ie');
+  shared corrssndob_src_CY := corrssndob_src_CY_pos > 0;
+  shared corrssndob_src_D_pos := Models.Common.findw_cpp(corrssndob_sources, 'D' , '  ,', 'ie');
+  shared corrssndob_src_D := corrssndob_src_D_pos > 0;
+  shared corrssndob_src_DA_pos := Models.Common.findw_cpp(corrssndob_sources, 'DA' , '  ,', 'ie');
+  shared corrssndob_src_DA := corrssndob_src_DA_pos > 0;
+  shared corrssndob_src_DE_pos := Models.Common.findw_cpp(corrssndob_sources, 'DE' , '  ,', 'ie');
+  shared corrssndob_src_DE := corrssndob_src_DE_pos > 0;
+  shared corrssndob_src_DL_pos := Models.Common.findw_cpp(corrssndob_sources, 'DL' , '  ,', 'ie');
+  shared corrssndob_src_DL := corrssndob_src_DL_pos > 0;
+  shared corrssndob_src_DS_pos := Models.Common.findw_cpp(corrssndob_sources, 'DS' , '  ,', 'ie');
+  shared corrssndob_src_DS := corrssndob_src_DS_pos > 0;
+  shared corrssndob_src_E1_pos := Models.Common.findw_cpp(corrssndob_sources, 'E1' , '  ,', 'ie');
+  shared corrssndob_src_E1 := corrssndob_src_E1_pos > 0;
+  shared corrssndob_src_E2_pos := Models.Common.findw_cpp(corrssndob_sources, 'E2' , '  ,', 'ie');
+  shared corrssndob_src_E2 := corrssndob_src_E2_pos > 0;
+  shared corrssndob_src_E3_pos := Models.Common.findw_cpp(corrssndob_sources, 'E3' , '  ,', 'ie');
+  shared corrssndob_src_E3 := corrssndob_src_E3_pos > 0;
+  shared corrssndob_src_E4_pos := Models.Common.findw_cpp(corrssndob_sources, 'E4' , '  ,', 'ie');
+  shared corrssndob_src_E4 := corrssndob_src_E4_pos > 0;
+  shared corrssndob_src_EB_pos := Models.Common.findw_cpp(corrssndob_sources, 'EB' , '  ,', 'ie');
+  shared corrssndob_src_EB := corrssndob_src_EB_pos > 0;
+  shared corrssndob_src_EM_pos := Models.Common.findw_cpp(corrssndob_sources, 'EM' , '  ,', 'ie');
+  shared corrssndob_src_EM := corrssndob_src_EM_pos > 0;
+  shared corrssndob_src_EN_pos := Models.Common.findw_cpp(corrssndob_sources, 'EN' , '  ,', 'ie');
+  shared corrssndob_src_EN := corrssndob_src_EN_pos > 0;
+  shared corrssndob_src_EQ_pos := Models.Common.findw_cpp(corrssndob_sources, 'EQ' , '  ,', 'ie');
+  shared corrssndob_src_EQ := corrssndob_src_EQ_pos > 0;
+  shared corrssndob_src_FE_pos := Models.Common.findw_cpp(corrssndob_sources, 'FE' , '  ,', 'ie');
+  shared corrssndob_src_FE := corrssndob_src_FE_pos > 0;
+  shared corrssndob_src_FF_pos := Models.Common.findw_cpp(corrssndob_sources, 'FF' , '  ,', 'ie');
+  shared corrssndob_src_FF := corrssndob_src_FF_pos > 0;
+  shared corrssndob_src_FR_pos := Models.Common.findw_cpp(corrssndob_sources, 'FR' , '  ,', 'ie');
+  shared corrssndob_src_FR := corrssndob_src_FR_pos > 0;
+  shared corrssndob_src_L2_pos := Models.Common.findw_cpp(corrssndob_sources, 'L2' , '  ,', 'ie');
+  shared corrssndob_src_L2 := corrssndob_src_L2_pos > 0;
+  shared corrssndob_src_LI_pos := Models.Common.findw_cpp(corrssndob_sources, 'LI' , '  ,', 'ie');
+  shared corrssndob_src_LI := corrssndob_src_LI_pos > 0;
+  shared corrssndob_src_MW_pos := Models.Common.findw_cpp(corrssndob_sources, 'MW' , '  ,', 'ie');
+  shared corrssndob_src_MW := corrssndob_src_MW_pos > 0;
+  shared corrssndob_src_NT_pos := Models.Common.findw_cpp(corrssndob_sources, 'NT' , '  ,', 'ie');
+  shared corrssndob_src_NT := corrssndob_src_NT_pos > 0;
+  shared corrssndob_src_P_pos := Models.Common.findw_cpp(corrssndob_sources, 'P' , '  ,', 'ie');
+  shared corrssndob_src_P := corrssndob_src_P_pos > 0;
+  shared corrssndob_src_PL_pos := Models.Common.findw_cpp(corrssndob_sources, 'PL' , '  ,', 'ie');
+  shared corrssndob_src_PL := corrssndob_src_PL_pos > 0;
+  shared corrssndob_src_SL_pos := Models.Common.findw_cpp(corrssndob_sources, 'SL' , '  ,', 'ie');
+  shared corrssndob_src_SL := corrssndob_src_SL_pos > 0;
+  shared corrssndob_src_TN_pos := Models.Common.findw_cpp(corrssndob_sources, 'TN' , '  ,', 'ie');
+  shared corrssndob_src_TN := corrssndob_src_TN_pos > 0;
+  shared corrssndob_src_TS_pos := Models.Common.findw_cpp(corrssndob_sources, 'TS' , '  ,', 'ie');
+  shared corrssndob_src_TS := corrssndob_src_TS_pos > 0;
+  shared corrssndob_src_TU_pos := Models.Common.findw_cpp(corrssndob_sources, 'TU' , '  ,', 'ie');
+  shared corrssndob_src_TU := corrssndob_src_TU_pos > 0;
+  shared corrssndob_src_V_pos := Models.Common.findw_cpp(corrssndob_sources, 'V' , '  ,', 'ie');
+  shared corrssndob_src_V := corrssndob_src_V_pos > 0;
+  shared corrssndob_src_VO_pos := Models.Common.findw_cpp(corrssndob_sources, 'VO' , '  ,', 'ie');
+  shared corrssndob_src_VO := corrssndob_src_VO_pos > 0;
+  shared corrssndob_src_W_pos := Models.Common.findw_cpp(corrssndob_sources, 'W' , '  ,', 'ie');
+  shared corrssndob_src_W := corrssndob_src_W_pos > 0;
+  shared corrssndob_src_WP_pos := Models.Common.findw_cpp(corrssndob_sources, 'WP' , '  ,', 'ie');
+  shared corrssndob_src_WP := corrssndob_src_WP_pos > 0;
+  shared corrssndob_ct := sum((integer)corrssndob_src_AK, (integer)corrssndob_src_AM, (integer)corrssndob_src_AR, (integer)corrssndob_src_BA, (integer)corrssndob_src_CG, (integer)corrssndob_src_CO, (integer)corrssndob_src_CY,
+                         (integer)corrssndob_src_D , (integer)corrssndob_src_DA, (integer)corrssndob_src_DE, (integer)corrssndob_src_DL, (integer)corrssndob_src_DS, (integer)corrssndob_src_E1, (integer)corrssndob_src_E2,
+                         (integer)corrssndob_src_E3, (integer)corrssndob_src_E4, (integer)corrssndob_src_EB, (integer)corrssndob_src_EM, (integer)corrssndob_src_EN, (integer)corrssndob_src_EQ, (integer)corrssndob_src_FE,
+                         (integer)corrssndob_src_FF, (integer)corrssndob_src_FR, (integer)corrssndob_src_L2, (integer)corrssndob_src_LI, (integer)corrssndob_src_MW,
+                         (integer)corrssndob_src_NT, (integer)corrssndob_src_P , (integer)corrssndob_src_PL, (integer)corrssndob_src_SL, (integer)corrssndob_src_TN, (integer)corrssndob_src_TS, (integer)corrssndob_src_TU,
+                         (integer)corrssndob_src_V , (integer)corrssndob_src_VO, (integer)corrssndob_src_W , (integer)corrssndob_src_WP); 
+export string3 corrssndob := map(not dobpop or ssnlength<9                      => '-1',
+                                 capSnew( (string)(corrssndob_ct), '-1', '999'));
+export string3 srch_corrnamessn := capSnew( (string)(clam.acc_logs.inq_corrnamessn), '-3', cap255);
+export string3 srch_corrnamessn_id := capSnew( (string)(clam.acc_logs.inq_corrnamessn_adl), '-3', cap255);
+export string3 srch_corrnamephone := capSnew( (string)(clam.acc_logs.inq_corrnamephone), '-3', cap255);
+export string3 srch_corrnamephone_id := capSnew( (string)(clam.acc_logs.inq_corrnamephone_adl), '-3', cap255);
+export string3 srch_corraddrssn := capSnew( (string)(clam.acc_logs.inq_corraddrssn), '-3', cap255);
+export string3 srch_corraddrssn_id := capSnew( (string)(clam.acc_logs.inq_corraddrssn_adl), '-3', cap255);
+export string3 srch_corrdobaddr := capSnew( (string)(clam.acc_logs.inq_corrdobaddr), '-3', cap255);
+export string3 srch_corrdobaddr_id := capSnew( (string)(clam.acc_logs.inq_corrdobaddr_adl), '-3', cap255);
+export string3 srch_corraddrphone := capSnew( (string)(clam.acc_logs.inq_corraddrphone), '-3', cap255);
+export string3 srch_corraddrphone_id := capSnew( (string)(clam.acc_logs.inq_corraddrphone_adl), '-3', cap255);
+export string3 srch_corrdobssn := capSnew( (string)(clam.acc_logs.inq_corrdobssn), '-3', cap255);
+export string3 srch_corrdobssn_id := capSnew( (string)(clam.acc_logs.inq_corrdobssn_adl), '-3', cap255);
+export string3 srch_corrphonessn := capSnew( (string)(clam.acc_logs.inq_corrphonessn), '-3', cap255);
+export string3 srch_corrphonessn_id := capSnew( (string)(clam.acc_logs.inq_corrphonessn_adl), '-3', cap255);
+export string3 srch_corrdobphone := capSnew( (string)(clam.acc_logs.inq_corrdobphone), '-3', cap255);
+export string3 srch_corrdobphone_id := capSnew( (string)(clam.acc_logs.inq_corrdobphone_adl), '-3', cap255);
+export string3 srch_corrnameaddrssn := capSnew( (string)(clam.acc_logs.inq_corrnameaddrssn), '-3', cap255);
+export string3 srch_corrnameaddrssn_id := capSnew( (string)(clam.acc_logs.inq_corrnameaddrssn_adl), '-3', cap255);
+export string3 srch_corrnamephonessn := capSnew( (string)(clam.acc_logs.inq_corrnamephonessn), '-3', cap255);
+export string3 srch_corrnamephonessn_id := capSnew( (string)(clam.acc_logs.inq_corrnamephonessn_adl), '-3', cap255);
+export string3 srch_corrnameaddrphnssn := capSnew( (string)(clam.acc_logs.inq_corrnameaddrphnssn), '-3', cap255);
+export string3 srch_corrnameaddrphnssn_id := capSnew( (string)(clam.acc_logs.inq_corrnameaddrphnssn_adl), '-3', cap255);
+export string3 srch_ssnsperaddr_count_day := if(not addrpop, '-1',capSnew( (string)(clam.acc_logs.inq_ssnsperaddr_count_day), '-1', cap255) );
+export string3 srch_ssnsperaddr_count_wk := if(not addrpop, '-1',capSnew( (string)(clam.acc_logs.inq_ssnsperaddr_count_week), '-1', cap255) );
+export string3 srch_ssnsperaddr_count01 := if(not addrpop, '-1',capSnew( (string)(clam.acc_logs.inq_ssnsperaddr_count01), '-1', cap255) );
+export string3 srch_ssnsperaddr_count03 := if(not addrpop, '-1',capSnew( (string)(clam.acc_logs.inq_ssnsperaddr_count03), '-1', cap255) );
+export string3 srch_ssnsperaddr_count06 := if(not addrpop, '-1',capSnew( (string)(clam.acc_logs.inq_ssnsperaddr_count06), '-1', cap255) );
+export string3 srch_idsperssn_count_day := if(not (ssnlength > 0), '-1',capSnew( (string)(clam.acc_logs.inq_adlsperssn_count_day), '-1', cap255) );
+export string3 srch_idsperssn_count_wk := if(not (ssnlength > 0), '-1',capSnew( (string)(clam.acc_logs.inq_adlsperssn_count_week), '-1', cap255) );
+export string3 srch_idsperssn_count01 := if(not (ssnlength > 0), '-1',capSnew( (string)(clam.acc_logs.inq_adlsperssn_count01), '-1', cap255) );
+export string3 srch_idsperssn_count03 := if(not (ssnlength > 0), '-1',capSnew( (string)(clam.acc_logs.inq_adlsperssn_count03), '-1', cap255) );
+export string3 srch_idsperssn_count06 := if(not (ssnlength > 0), '-1',capSnew( (string)(clam.acc_logs.inq_adlsperssn_count06), '-1', cap255) );
+export string3 srch_idsperaddr_count_day := if(not addrpop, '-1',capSnew( (string)(clam.acc_logs.inq_adlsperaddr_count_day), '-1', cap255) );
+export string3 srch_idsperaddr_count_wk := if(not addrpop, '-1',capSnew( (string)(clam.acc_logs.inq_adlsperaddr_count_week), '-1', cap255) );
+export string3 srch_idsperaddr_count01 := if(not addrpop, '-1',capSnew( (string)(clam.acc_logs.inq_adlsperaddr_count01), '-1', cap255) );
+export string3 srch_idsperaddr_count03 := if(not addrpop, '-1',capSnew( (string)(clam.acc_logs.inq_adlsperaddr_count03), '-1', cap255) );
+export string3 srch_idsperaddr_count06 := if(not addrpop, '-1',capSnew( (string)(clam.acc_logs.inq_adlsperaddr_count06), '-1', cap255) );
+export string3 srch_idsperphone := if(not hphnpop, '-1',capSnew( (string)(clam.acc_logs.inquiryadlsperphone), '-1', cap255) );
+export string3 srch_idsperphone_count_day := if(not hphnpop, '-1',capSnew( (string)(clam.acc_logs.inq_adlsperphone_count_day), '-1', cap255) );
+export string3 srch_idsperphone_count_wk := if(not hphnpop, '-1',capSnew( (string)(clam.acc_logs.inq_adlsperphone_count_week), '-1', cap255) );
+export string3 srch_idsperphone_count01 := if(not hphnpop, '-1',capSnew( (string)(clam.acc_logs.inq_adlsperphone_count01), '-1', cap255) );
+export string3 srch_idsperphone_count03 := if(not hphnpop, '-1',capSnew( (string)(clam.acc_logs.inq_adlsperphone_count03), '-1', cap255) );
+export string3 srch_idsperphone_count06 := if(not hphnpop, '-1',capSnew( (string)(clam.acc_logs.inq_adlsperphone_count06), '-1', cap255) );
+export string3 srch_lnamesperssn_count_day := if(not (ssnlength > 0), '-1',capSnew( (string)(clam.acc_logs.inq_lnamesperssn_count_day), '-1', cap255) );
+export string3 srch_lnamesperssn_count_wk := if(not (ssnlength > 0), '-1',capSnew( (string)(clam.acc_logs.inq_lnamesperssn_count_week), '-1', cap255) );
+export string3 srch_lnamesperssn_count01 := if(not (ssnlength > 0), '-1',capSnew( (string)(clam.acc_logs.inq_lnamesperssn_count01), '-1', cap255) );
+export string3 srch_lnamesperssn_count03 := if(not (ssnlength > 0), '-1',capSnew( (string)(clam.acc_logs.inq_lnamesperssn_count03), '-1', cap255) );
+export string3 srch_lnamesperssn_count06 := if(not (ssnlength > 0), '-1',capSnew( (string)(clam.acc_logs.inq_lnamesperssn_count06), '-1', cap255) );
+export string3 srch_addrsperssn_count_day := if(not (ssnlength > 0), '-1',capSnew( (string)(clam.acc_logs.inq_addrsperssn_count_day), '-1', cap255) );
+export string3 srch_addrsperssn_count_wk := if(not (ssnlength > 0), '-1',capSnew( (string)(clam.acc_logs.inq_addrsperssn_count_week), '-1', cap255) );
+export string3 srch_addrsperssn_count01 := if(not (ssnlength > 0), '-1',capSnew( (string)(clam.acc_logs.inq_addrsperssn_count01), '-1', cap255) );
+export string3 srch_addrsperssn_count03 := if(not (ssnlength > 0), '-1',capSnew( (string)(clam.acc_logs.inq_addrsperssn_count03), '-1', cap255) );
+export string3 srch_addrsperssn_count06 := if(not (ssnlength > 0), '-1',capSnew( (string)(clam.acc_logs.inq_addrsperssn_count06), '-1', cap255) );
+export string3 srch_dobsperssn_count_day := if(not (ssnlength > 0), '-1',capSnew( (string)(clam.acc_logs.inq_dobsperssn_count_day), '-1', cap255) );
+export string3 srch_dobsperssn_count_wk := if(not (ssnlength > 0), '-1',capSnew( (string)(clam.acc_logs.inq_dobsperssn_count_week), '-1', cap255) );
+export string3 srch_dobsperssn_count01 := if(not (ssnlength > 0), '-1',capSnew( (string)(clam.acc_logs.inq_dobsperssn_count01), '-1', cap255) );
+export string3 srch_dobsperssn_count03 := if(not (ssnlength > 0), '-1',capSnew( (string)(clam.acc_logs.inq_dobsperssn_count03), '-1', cap255) );
+export string3 srch_dobsperssn_count06 := if(not (ssnlength > 0), '-1',capSnew( (string)(clam.acc_logs.inq_dobsperssn_count06), '-1', cap255) );
+export string3 srch_lnamesperaddr_ct_day := if(not addrpop, '-1',capSnew( (string)(clam.acc_logs.inq_lnamesperaddr_count_day), '-1', cap255) );
+export string3 srch_lnamesperaddr_count_wk := if(not addrpop, '-1',capSnew( (string)(clam.acc_logs.inq_lnamesperaddr_count_week), '-1', cap255) );
+export string3 srch_lnamesperaddr_count01 := if(not addrpop, '-1',capSnew( (string)(clam.acc_logs.inq_lnamesperaddr_count01), '-1', cap255) );
+export string3 srch_lnamesperaddr_count03 := if(not addrpop, '-1',capSnew( (string)(clam.acc_logs.inq_lnamesperaddr_count03), '-1', cap255) );
+export string3 srch_lnamesperaddr_count06 := if(not addrpop, '-1',capSnew( (string)(clam.acc_logs.inq_lnamesperaddr_count06), '-1', cap255) );
+export string3 srch_ids_per_email := if(not emailpop, '-1',capSnew( (string)(clam.acc_logs.inquiryADLsperEmail), '-1', cap255) );
+export string3 srch_idsperemail_count_day := if(not emailpop, '-1',capSnew( (string)(clam.acc_logs.inq_adlsperemail_count_day), '-1', cap255) );
+export string3 srch_idsperemail_count_wk := if(not emailpop, '-1',capSnew( (string)(clam.acc_logs.inq_adlsperemail_count_week), '-1', cap255) );
+export string3 srch_idsperemail_count01 := if(not emailpop, '-1',capSnew( (string)(clam.acc_logs.inq_adlsperemail_count01), '-1', cap255) );
+export string3 srch_idsperemail_count03 := if(not emailpop, '-1',capSnew( (string)(clam.acc_logs.inq_adlsperemail_count03), '-1', cap255) );
+export string3 srch_idsperemail_count06 := if(not emailpop, '-1',capSnew( (string)(clam.acc_logs.inq_adlsperemail_count06), '-1', cap255) );
+export string3 srch_perphone_count_day := if(not hphnpop, '-1',capSnew( (string)(clam.acc_logs.inq_perphone_count_day), '-1', cap255) );
+export string3 srch_perphone_count_wk := if(not hphnpop, '-1',capSnew( (string)(clam.acc_logs.inq_perphone_count_week), '-1', cap255) );
+export string3 srch_perphone_count01 := if(not hphnpop, '-1',capSnew( (string)(clam.acc_logs.inq_perphone_count01), '-1', cap255) );
+export string3 srch_perphone_count03 := if(not hphnpop, '-1',capSnew( (string)(clam.acc_logs.inq_perphone_count03), '-1', cap255) );
+export string3 srch_perphone_count06 := if(not hphnpop, '-1',capSnew( (string)(clam.acc_logs.inq_perphone_count06), '-1', cap255) );
+  shared NULL := -999999999;
+  shared ver_sources := clam.header_summary.ver_sources;
+  shared ver_ssn_sources := clam.header_summary.ver_ssn_sources;
+  shared ver_fname_sources := clam.header_summary.ver_fname_sources;
+  shared ver_lname_sources := clam.header_summary.ver_lname_sources;
+  shared ver_addr_sources := clam.header_summary.ver_addr_sources;
+  shared ver_dob_sources := clam.header_summary.ver_dob_sources;
+  shared ver_sources_first_seen := clam.header_summary.ver_sources_first_seen_date;
+ export nas_summary := clam.iid.nas_summary; 
+  shared ver_src_EQ := Models.Common.findw_cpp(ver_sources, 'EQ' , ', ', 'E') > 0;
+  shared ver_src_eq_pos := Models.Common.findw_cpp(ver_sources, 'EQ' , '  ,', 'ie');    
+  shared _ver_src_fdate_eq := if((integer)ver_src_eq_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_eq_pos), '0');
+ export ver_src_fdate_eq := common.sas_date((string)(_ver_src_fdate_eq));  
+  shared ver_src_en := Models.Common.findw_cpp(ver_sources, 'EN' , ', ', 'E') > 0;
+  shared ver_src_en_pos := Models.Common.findw_cpp(ver_sources, 'EN' , '  ,', 'ie');    
+  shared _ver_src_fdate_en := if((integer)ver_src_en_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_en_pos), '0');
+ export ver_src_fdate_en := common.sas_date((string)(_ver_src_fdate_en));
+  shared ver_src_tn := Models.Common.findw_cpp(ver_sources, 'TN' , ', ', 'E') > 0;
+  shared ver_src_tn_pos := Models.Common.findw_cpp(ver_sources, 'TN' , '  ,', 'ie');    
+  shared _ver_src_fdate_tn := if((integer)ver_src_tn_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_tn_pos), '0');
+ export ver_src_fdate_tn := common.sas_date((string)(_ver_src_fdate_tn));
+  shared ver_src_ar := Models.Common.findw_cpp(ver_sources, 'AR' , ', ', 'E') > 0;  
+  shared ver_src_ar_pos := Models.Common.findw_cpp(ver_sources, 'AR' , '  ,', 'ie');    
+  shared _ver_src_fdate_ar := if((integer)ver_src_ar_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_ar_pos), '0');
+  shared ver_src_fdate_ar := common.sas_date((string)(_ver_src_fdate_ar));
+  shared ver_src_am := Models.Common.findw_cpp(ver_sources, 'AM' , ', ', 'E') > 0;  
+  shared ver_src_am_pos := Models.Common.findw_cpp(ver_sources, 'AM' , '  ,', 'ie');    
+  shared _ver_src_fdate_am := if((integer)ver_src_am_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_am_pos), '0');
+  shared ver_src_fdate_am := common.sas_date((string)(_ver_src_fdate_am));
+  shared ver_src_ak := Models.Common.findw_cpp(ver_sources, 'AK' , ', ', 'E') > 0;  
+  shared ver_src_ak_pos := Models.Common.findw_cpp(ver_sources, 'AK' , '  ,', 'ie');    
+  shared _ver_src_fdate_ak := if((integer)ver_src_ak_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_ak_pos), '0');
+ export ver_src_fdate_ak := common.sas_date((string)(_ver_src_fdate_ak));
+  shared ver_src_ba := Models.Common.findw_cpp(ver_sources, 'BA' , ', ', 'E') > 0;  
+  shared ver_src_ba_pos := Models.Common.findw_cpp(ver_sources, 'BA' , '  ,', 'ie');    
+  shared _ver_src_fdate_ba := if((integer)ver_src_ba_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_ba_pos), '0');
+  shared ver_src_fdate_ba := common.sas_date((string)(_ver_src_fdate_ba));
+  shared ver_src_cy := Models.Common.findw_cpp(ver_sources, 'CY' , ', ', 'E') > 0;  
+  shared ver_src_cy_pos := Models.Common.findw_cpp(ver_sources, 'CY' , '  ,', 'ie');    
+  shared _ver_src_fdate_cy := if((integer)ver_src_cy_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_cy_pos), '0');
+ export ver_src_fdate_cy := common.sas_date((string)(_ver_src_fdate_cy));
+  shared ver_src_cg := Models.Common.findw_cpp(ver_sources, 'CG' , ', ', 'E') > 0;  
+  shared ver_src_cg_pos := Models.Common.findw_cpp(ver_sources, 'CG' , '  ,', 'ie');    
+  shared _ver_src_fdate_cg := if((integer)ver_src_cg_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_cg_pos), '0');
+  shared ver_src_fdate_cg := common.sas_date((string)(_ver_src_fdate_cg));
+  shared ver_src_E4 := Models.Common.findw_cpp(ver_sources, 'E4' , ', ', 'E') > 0;  
+  shared ver_src_e4_pos := Models.Common.findw_cpp(ver_sources, 'E4' , '  ,', 'ie');    
+  shared _ver_src_fdate_e4 := if((integer)ver_src_e4_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_e4_pos), '0');
+ export ver_src_fdate_e4 := common.sas_date((string)(_ver_src_fdate_e4));
+  shared ver_src_da := Models.Common.findw_cpp(ver_sources, 'DA' , ', ', 'E') > 0;  
+  shared ver_src_da_pos := Models.Common.findw_cpp(ver_sources, 'DA' , '  ,', 'ie');    
+  shared _ver_src_fdate_da := if((integer)ver_src_da_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_da_pos), '0');
+  shared ver_src_fdate_da := common.sas_date((string)(_ver_src_fdate_da));
+  shared ver_src_em := Models.Common.findw_cpp(ver_sources, 'EM' , ', ', 'E') > 0;  
+  shared ver_src_em_pos := Models.Common.findw_cpp(ver_sources, 'EM' , '  ,', 'ie');    
+  shared _ver_src_fdate_em := if((integer)ver_src_em_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_em_pos), '0');
+  shared ver_src_fdate_em := common.sas_date((string)(_ver_src_fdate_em));
+  shared ver_src_d := Models.Common.findw_cpp(ver_sources, 'D' , ', ', 'E') > 0;  
+  shared ver_src_d_pos := Models.Common.findw_cpp(ver_sources, 'D' , '  ,', 'ie');    
+  shared _ver_src_fdate_d := if((integer)ver_src_d_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_d_pos), '0');
+  shared ver_src_fdate_d := common.sas_date((string)(_ver_src_fdate_d));
+  shared ver_src_fr := Models.Common.findw_cpp(ver_sources, 'FR' , ', ', 'E') > 0;  
+  shared ver_src_fr_pos := Models.Common.findw_cpp(ver_sources, 'FR' , '  ,', 'ie');    
+  shared _ver_src_fdate_fr := if((integer)ver_src_fr_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_fr_pos), '0');
+ export ver_src_fdate_fr := common.sas_date((string)(_ver_src_fdate_fr));
+  shared ver_src_dl := Models.Common.findw_cpp(ver_sources, 'DL' , ', ', 'E') > 0;  
+  shared ver_src_dl_pos := Models.Common.findw_cpp(ver_sources, 'DL' , '  ,', 'ie');    
+  shared _ver_src_fdate_dl := if((integer)ver_src_dl_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_dl_pos), '0');
+  shared ver_src_fdate_dl := common.sas_date((string)(_ver_src_fdate_dl));
+  shared ver_src_l2 := Models.Common.findw_cpp(ver_sources, 'L2' , ', ', 'E') > 0;  
+  shared ver_src_l2_pos := Models.Common.findw_cpp(ver_sources, 'L2' , '  ,', 'ie');    
+  shared _ver_src_fdate_l2 := if((integer)ver_src_l2_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_l2_pos), '0');
+ export ver_src_fdate_l2 := common.sas_date((string)(_ver_src_fdate_l2));
+  shared ver_src_eb := Models.Common.findw_cpp(ver_sources, 'EB' , ', ', 'E') > 0;  
+  shared ver_src_eb_pos := Models.Common.findw_cpp(ver_sources, 'EB' , '  ,', 'ie');    
+  shared _ver_src_fdate_eb := if((integer)ver_src_eb_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_eb_pos), '0');
+  shared ver_src_fdate_eb := common.sas_date((string)(_ver_src_fdate_eb));
+  shared ver_src_li := Models.Common.findw_cpp(ver_sources, 'LI' , ', ', 'E') > 0;  
+  shared ver_src_li_pos := Models.Common.findw_cpp(ver_sources, 'LI' , '  ,', 'ie');    
+  shared _ver_src_fdate_li := if((integer)ver_src_li_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_li_pos), '0');
+ export ver_src_fdate_li := common.sas_date((string)(_ver_src_fdate_li));
+  shared ver_src_e1 := Models.Common.findw_cpp(ver_sources, 'E1' , ', ', 'E') > 0;  
+  shared ver_src_e1_pos := Models.Common.findw_cpp(ver_sources, 'E1' , '  ,', 'ie');    
+  shared _ver_src_fdate_e1 := if((integer)ver_src_e1_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_e1_pos), '0');
+  shared ver_src_fdate_e1 := common.sas_date((string)(_ver_src_fdate_e1));
+  shared ver_src_mw := Models.Common.findw_cpp(ver_sources, 'MW' , ', ', 'E') > 0;  
+  shared ver_src_mw_pos := Models.Common.findw_cpp(ver_sources, 'MW' , '  ,', 'ie');    
+  shared _ver_src_fdate_mw := if((integer)ver_src_mw_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_mw_pos), '0');
+ export ver_src_fdate_mw := common.sas_date((string)(_ver_src_fdate_mw));
+  shared ver_src_e2 := Models.Common.findw_cpp(ver_sources, 'E2' , ', ', 'E') > 0;  
+  shared ver_src_e2_pos := Models.Common.findw_cpp(ver_sources, 'E2' , '  ,', 'ie');    
+  shared _ver_src_fdate_e2 := if((integer)ver_src_e2_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_e2_pos), '0');
+  shared ver_src_fdate_e2 := common.sas_date((string)(_ver_src_fdate_e2));
+  shared ver_src_nt := Models.Common.findw_cpp(ver_sources, 'NT' , ', ', 'E') > 0;  
+  shared ver_src_nt_pos := Models.Common.findw_cpp(ver_sources, 'NT' , '  ,', 'ie');    
+  shared _ver_src_fdate_nt := if((integer)ver_src_nt_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_nt_pos), '0');
+ export ver_src_fdate_nt := common.sas_date((string)(_ver_src_fdate_nt));
+  shared ver_src_e3 := Models.Common.findw_cpp(ver_sources, 'E3' , ', ', 'E') > 0;  
+  shared ver_src_e3_pos := Models.Common.findw_cpp(ver_sources, 'E3' , '  ,', 'ie');    
+  shared _ver_src_fdate_e3 := if((integer)ver_src_e3_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_e3_pos), '0');
+  shared ver_src_fdate_e3 := common.sas_date((string)(_ver_src_fdate_e3));
+  shared ver_src_wp := Models.Common.findw_cpp(ver_sources, 'WP' , ', ', 'E') > 0;  
+  shared ver_src_wp_pos := Models.Common.findw_cpp(ver_sources, 'WP' , '  ,', 'ie');    
+  shared _ver_src_fdate_wp := if((integer)ver_src_wp_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_wp_pos), '0');
+ export ver_src_fdate_wp := common.sas_date((string)(_ver_src_fdate_wp));
+  shared ver_src_fe := Models.Common.findw_cpp(ver_sources, 'FE' , ', ', 'E') > 0;  
+  shared ver_src_fe_pos := Models.Common.findw_cpp(ver_sources, 'FE' , '  ,', 'ie');    
+  shared _ver_src_fdate_fe := if((integer)ver_src_fe_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_fe_pos), '0');
+  shared ver_src_fdate_fe := common.sas_date((string)(_ver_src_fdate_fe));
+  shared ver_src_ff := Models.Common.findw_cpp(ver_sources, 'FF' , ', ', 'E') > 0;  
+  shared ver_src_ff_pos := Models.Common.findw_cpp(ver_sources, 'FF' , '  ,', 'ie');    
+  shared _ver_src_fdate_ff := if((integer)ver_src_ff_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_ff_pos), '0');
+  shared ver_src_fdate_ff := common.sas_date((string)(_ver_src_fdate_ff));
+  shared ver_src_p := Models.Common.findw_cpp(ver_sources, 'P' , ', ', 'E') > 0;  
+  shared ver_src_p_pos := Models.Common.findw_cpp(ver_sources, 'P' , '  ,', 'ie');    
+  shared _ver_src_fdate_p := if((integer)ver_src_p_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_p_pos), '0');
+  shared ver_src_fdate_p := common.sas_date((string)(_ver_src_fdate_p));
+  shared ver_src_pl := Models.Common.findw_cpp(ver_sources, 'PL' , ', ', 'E') > 0;  
+  shared ver_src_pl_pos := Models.Common.findw_cpp(ver_sources, 'PL' , '  ,', 'ie');    
+  shared _ver_src_fdate_pl := if((integer)ver_src_pl_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_pl_pos), '0');
+  shared ver_src_fdate_pl := common.sas_date((string)(_ver_src_fdate_pl));
+  shared ver_src_sl := Models.Common.findw_cpp(ver_sources, 'SL' , ', ', 'E') > 0;  
+  shared ver_src_sl_pos := Models.Common.findw_cpp(ver_sources, 'SL' , '  ,', 'ie');    
+  shared _ver_src_fdate_sl := if((integer)ver_src_sl_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_sl_pos), '0');
+  shared ver_src_fdate_sl := common.sas_date((string)(_ver_src_fdate_sl));
+  shared ver_src_v := Models.Common.findw_cpp(ver_sources, 'V' , ', ', 'E') > 0;  
+  shared ver_src_v_pos := Models.Common.findw_cpp(ver_sources, 'V' , '  ,', 'ie');    
+  shared _ver_src_fdate_v := if((integer)ver_src_v_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_v_pos), '0');
+  shared ver_src_fdate_v := common.sas_date((string)(_ver_src_fdate_v));
+  shared ver_src_vo := Models.Common.findw_cpp(ver_sources, 'VO' , ', ', 'E') > 0;  
+  shared ver_src_vo_pos := Models.Common.findw_cpp(ver_sources, 'VO' , '  ,', 'ie');    
+  shared _ver_src_fdate_vo := if((integer)ver_src_vo_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_vo_pos), '0');
+  shared ver_src_fdate_vo := common.sas_date((string)(_ver_src_fdate_vo));
+  shared ver_src_w := Models.Common.findw_cpp(ver_sources, 'W' , ', ', 'E') > 0;  
+  shared ver_src_w_pos := Models.Common.findw_cpp(ver_sources, 'W' , '  ,', 'ie');    
+  shared _ver_src_fdate_w := if((integer)ver_src_w_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_w_pos), '0');
+  shared ver_src_fdate_w := common.sas_date((string)(_ver_src_fdate_w));
+  shared src_bureau := sum((integer)ver_src_EQ, (integer)ver_src_EN, (integer)ver_src_TN)>0;
+  shared src_credentialed := sum((integer)ver_src_AR, (integer)ver_src_AM, (integer)ver_src_BA, (integer)ver_src_CG, 
+    (integer)ver_src_DA, (integer)ver_src_D,  (integer)ver_src_DL, (integer)ver_src_EB,
+    (integer)ver_src_E1, (integer)ver_src_E2, (integer)ver_src_E3, (integer)ver_src_FE,
+    (integer)ver_src_FF, (integer)ver_src_P,  (integer)ver_src_PL, (integer)ver_src_SL,
+    (integer)ver_src_V,  (integer)ver_src_VO, (integer)ver_src_W) > 0;
+  shared src_other := sum((integer)ver_src_AK, (integer)ver_src_CY, (integer)ver_src_E4, (integer)ver_src_EM,
+    (integer)ver_src_FR, (integer)ver_src_LI, (integer)ver_src_L2, (integer)ver_src_MW, 
+    (integer)ver_src_NT, (integer)ver_src_WP) > 0;
+export string2 source_type := map(
+    not(clam.truedid)                                                                                     => '-1',
+    (boolean)(integer)src_bureau and (boolean)(integer)src_credentialed and (boolean)(integer)src_other   => '7',
+    (boolean)(integer)src_credentialed and (boolean)(integer)src_other                                    => '6',
+    (boolean)(integer)src_bureau and (boolean)(integer)src_credentialed                                   => '5',
+    (boolean)(integer)src_bureau and (boolean)(integer)src_other                                          => '4',
+    (boolean)(integer)src_credentialed                                                                   	=> '3',
+    (boolean)(integer)src_other                                                                           => '2',
+    (boolean)(integer)src_bureau                                                             			        => '1',
+                                                                                                             '0');
+  shared null_sas_date := common.sas_date((string)('0'));
+  shared earliest_bureau_date :=   if(ver_src_fdate_tn = null_sas_date and ver_src_fdate_en = null_sas_date and ver_src_fdate_eq = null_sas_date, NULL, 
+                                            if(max(ver_src_fdate_tn, ver_src_fdate_en, ver_src_fdate_eq) = null_sas_date, NULL, 
+                                                min(if(ver_src_fdate_tn = null_sas_date, -NULL, ver_src_fdate_tn), 
+                                                    if(ver_src_fdate_en = null_sas_date, -NULL, ver_src_fdate_en), 
+                                                    if(ver_src_fdate_eq = null_sas_date, -NULL, ver_src_fdate_eq))));
+  export earliest_credentialed_date :=   if(ver_src_fdate_ar = null_sas_date and ver_src_fdate_am = null_sas_date and ver_src_fdate_ba = null_sas_date and ver_src_fdate_cg = null_sas_date and ver_src_fdate_da = null_sas_date and ver_src_fdate_d = null_sas_date and ver_src_fdate_dl = null_sas_date and ver_src_fdate_eb = null_sas_date and ver_src_fdate_e1 = null_sas_date and ver_src_fdate_e2 = null_sas_date and ver_src_fdate_e3 = null_sas_date and ver_src_fdate_fe = null_sas_date and ver_src_fdate_ff = null_sas_date and ver_src_fdate_p = null_sas_date and ver_src_fdate_pl = null_sas_date and ver_src_fdate_sl = null_sas_date and ver_src_fdate_v = null_sas_date and ver_src_fdate_vo = null_sas_date and ver_src_fdate_w = null_sas_date, NULL, if(max(ver_src_fdate_ar, ver_src_fdate_am, ver_src_fdate_ba, ver_src_fdate_cg, ver_src_fdate_da, ver_src_fdate_d, ver_src_fdate_dl, ver_src_fdate_eb, ver_src_fdate_e1, ver_src_fdate_e2, ver_src_fdate_e3, ver_src_fdate_fe, ver_src_fdate_ff, ver_src_fdate_p, ver_src_fdate_pl, ver_src_fdate_sl, ver_src_fdate_v, ver_src_fdate_vo, ver_src_fdate_w) = null_sas_date, NULL, 
+          min(if(ver_src_fdate_ar = null_sas_date, -NULL, ver_src_fdate_ar), if(ver_src_fdate_am = null_sas_date, -NULL, ver_src_fdate_am), if(ver_src_fdate_ba = null_sas_date, -NULL, ver_src_fdate_ba), if(ver_src_fdate_cg = null_sas_date, -NULL, ver_src_fdate_cg), if(ver_src_fdate_da = null_sas_date, -NULL, ver_src_fdate_da), if(ver_src_fdate_d = null_sas_date, -NULL, ver_src_fdate_d), if(ver_src_fdate_dl = null_sas_date, -NULL, ver_src_fdate_dl), if(ver_src_fdate_eb = null_sas_date, -NULL, ver_src_fdate_eb), if(ver_src_fdate_e1 = null_sas_date, -NULL, ver_src_fdate_e1), if(ver_src_fdate_e2 = null_sas_date, -NULL, ver_src_fdate_e2), if(ver_src_fdate_e3 = null_sas_date, -NULL, ver_src_fdate_e3), if(ver_src_fdate_fe = null_sas_date, -NULL, ver_src_fdate_fe), if(ver_src_fdate_ff = null_sas_date, -NULL, ver_src_fdate_ff), if(ver_src_fdate_p = null_sas_date, -NULL, ver_src_fdate_p), if(ver_src_fdate_pl = null_sas_date, -NULL, ver_src_fdate_pl), if(ver_src_fdate_sl = null_sas_date, -NULL, ver_src_fdate_sl), if(ver_src_fdate_v = null_sas_date, -NULL, ver_src_fdate_v), if(ver_src_fdate_vo = null_sas_date, -NULL, ver_src_fdate_vo), if(ver_src_fdate_w = null_sas_date, -NULL, ver_src_fdate_w))));  
+  shared earliest_other_date :=   if(ver_src_fdate_ak = null_sas_date and ver_src_fdate_cy = null_sas_date 
+        and ver_src_fdate_e4 = null_sas_date and ver_src_fdate_em = null_sas_date and ver_src_fdate_fr = null_sas_date and ver_src_fdate_l2 = null_sas_date 
+        and ver_src_fdate_li = null_sas_date and ver_src_fdate_mw = null_sas_date and ver_src_fdate_nt = null_sas_date and ver_src_fdate_wp = null_sas_date, NULL, 
+        if(max(ver_src_fdate_ak, ver_src_fdate_cy, ver_src_fdate_e4, ver_src_fdate_em, ver_src_fdate_fr, ver_src_fdate_l2, ver_src_fdate_li, ver_src_fdate_mw, ver_src_fdate_nt, ver_src_fdate_wp)
+         = null_sas_date, NULL, min(if(ver_src_fdate_ak = null_sas_date, -NULL, ver_src_fdate_ak), 
+         if(ver_src_fdate_cy = null_sas_date, -NULL, ver_src_fdate_cy), 
+         if(ver_src_fdate_e4 = null_sas_date, -NULL, ver_src_fdate_e4), if(ver_src_fdate_em = null_sas_date, -NULL, ver_src_fdate_em), 
+         if(ver_src_fdate_fr = null_sas_date, -NULL, ver_src_fdate_fr), if(ver_src_fdate_l2 = null_sas_date, -NULL, ver_src_fdate_l2), 
+         if(ver_src_fdate_li = null_sas_date, -NULL, ver_src_fdate_li), if(ver_src_fdate_mw = null_sas_date, -NULL, ver_src_fdate_mw), 
+         if(ver_src_fdate_nt = null_sas_date, -NULL, ver_src_fdate_nt), if(ver_src_fdate_wp = null_sas_date, -NULL, ver_src_fdate_wp))));
+  shared earliest_source_date :=   if(max(earliest_bureau_date, earliest_credentialed_date, earliest_other_date) = NULL, NULL, 
+                                      min(if(earliest_bureau_date = NULL, -NULL, earliest_bureau_date), if(earliest_credentialed_date = NULL, -NULL, earliest_credentialed_date), if(earliest_other_date = NULL, -NULL, earliest_other_date)));
+export string2 emergence_source_type := map(
+    not(clam.truedid) or earliest_source_date = NULL                                                                        => '-1',
+    (integer)earliest_source_date = (integer)earliest_bureau_date                                                           => '1',
+    (integer)earliest_source_date = (integer)earliest_credentialed_date                                                     => '2',
+    (integer)earliest_source_date = (integer)earliest_other_date                                                       			=> '3',
+                                                                                                                               '0');
+export string3 sum_src_credentialed := if(not(clam.truedid), '-1', if(max((integer)ver_src_ar, (integer)ver_src_am, (integer)ver_src_ba, (integer)ver_src_cg, (integer)ver_src_da, 
+(integer)ver_src_d, (integer)ver_src_dl, (integer)ver_src_eb, (integer)ver_src_e1, (integer)ver_src_e2, (integer)ver_src_e3, (integer)ver_src_fe, (integer)ver_src_ff, 
+(integer)ver_src_p, (integer)ver_src_pl, (integer)ver_src_sl, (integer)ver_src_v, (integer)ver_src_vo, (integer)ver_src_w) = 0, 
+                                                                      '0', 
+                                                                      (string)sum((integer)ver_src_ar, (integer)ver_src_am, (integer)ver_src_ba, (integer)ver_src_cg, 
+                                                                      (integer)ver_src_da, (integer)ver_src_d, (integer)ver_src_dl, (integer)ver_src_eb, (integer)ver_src_e1, 
+                                                                      (integer)ver_src_e2, (integer)ver_src_e3, (integer)ver_src_fe, (integer)ver_src_ff, (integer)ver_src_p, 
+                                                                      (integer)ver_src_pl, (integer)ver_src_sl, (integer)ver_src_v, (integer)ver_src_vo, (integer)ver_src_w)));
+  export earliest_cred_date_all_days := (integer)(earliest_credentialed_date);
+ export sas_sysdate := common.sas_date((STRING)Risk_Indicators.iid_constants.TodayDate);
+  export _in_dob_2 :=   common.sas_date((string)(in_dob));
+  export earliest_bureau_date_2 :=   if(ver_src_fdate_tn = NULL and ver_src_fdate_en = NULL and ver_src_fdate_eq = NULL, 
+                                        NULL, 
+                                        if(max(ver_src_fdate_tn, ver_src_fdate_en, ver_src_fdate_eq) = NULL, 
+                                          NULL, 
+                                          min(if(ver_src_fdate_tn = NULL, -NULL, ver_src_fdate_tn), 
+                                              if(ver_src_fdate_en = NULL, -NULL, ver_src_fdate_en), 
+                                              if(ver_src_fdate_eq = NULL, -NULL, ver_src_fdate_eq)
+                                              )
+                                           )
+                                        );
+  export earliest_bureau_yrs_2 :=   if(earliest_bureau_date_2 = NULL or sas_sysdate = NULL, 
+                                       NULL, 
+                                       if ((sas_sysdate - earliest_bureau_date_2) / 365.25 >= 0, 
+                                          roundup((sas_sysdate - earliest_bureau_date_2) / 365.25), 
+                                          truncate((sas_sysdate - earliest_bureau_date_2) / 365.25)
+                                          )
+                                       );
+  export calc_dob_2 :=   if(_in_dob_2 = NULL, 
+                            NULL, 
+                            if ((sas_sysdate - _in_dob_2) / 365.25 >= 0, 
+                              roundup((sas_sysdate - _in_dob_2) / 365.25), 
+                              truncate((sas_sysdate - _in_dob_2) / 365.25)
+                             )
+                           );
+  export inferred_age := clam.inferred_age;
+export string3 m_src_credentialed_fs := map(
+            not clam.truedid                                                  => '-1',
+            earliest_credentialed_date IN [NULL,-NULL]                        => '-2',
+                                                                                 (string)MIN(truncate((sas_sysdate - earliest_credentialed_date) / (365.25 / 12)),960)
+                                            );
+export string3 sum_src_other := if(not(clam.truedid), '-1', 
+            (string)sum((integer)ver_src_AK,(integer)ver_src_CY,(integer)ver_src_E4,(integer)ver_src_EM,(integer)ver_src_FR, 
+                (integer)ver_src_L2,(integer)ver_src_LI,(integer)ver_src_MW,(integer)ver_src_NT,(integer)ver_src_WP ));
+  export earliest_other_date_all :=   if(ver_src_fdate_ak = null_sas_date and ver_src_fdate_em = null_sas_date
+                                     and ver_src_fdate_cy = null_sas_date and ver_src_fdate_e4 = null_sas_date 
+                                     and ver_src_fdate_fr = null_sas_date and ver_src_fdate_l2 = null_sas_date 
+                                     and ver_src_fdate_li = null_sas_date and ver_src_fdate_mw = null_sas_date 
+                                     and ver_src_fdate_nt = null_sas_date and ver_src_fdate_wp = null_sas_date, NULL, 
+                                     if(max(ver_src_fdate_ak, 
+                                            ver_src_fdate_cy, 
+                                            ver_src_fdate_em, 
+                                            ver_src_fdate_e4, 
+                                            ver_src_fdate_fr, 
+                                            ver_src_fdate_l2, 
+                                            ver_src_fdate_li, 
+                                            ver_src_fdate_mw, 
+                                            ver_src_fdate_nt, 
+                                            ver_src_fdate_wp) = null_sas_date, NULL, 
+                                      min(if(ver_src_fdate_ak = null_sas_date, -NULL, ver_src_fdate_ak), 
+                                      if(ver_src_fdate_cy = null_sas_date, -NULL, ver_src_fdate_cy), 
+                                      if(ver_src_fdate_em = null_sas_date, -NULL, ver_src_fdate_em), 
+                                      if(ver_src_fdate_e4 = null_sas_date, -NULL, ver_src_fdate_e4), 
+                                      if(ver_src_fdate_fr = null_sas_date, -NULL, ver_src_fdate_fr), 
+                                      if(ver_src_fdate_l2 = null_sas_date, -NULL, ver_src_fdate_l2), 
+                                      if(ver_src_fdate_li = null_sas_date, -NULL, ver_src_fdate_li), 
+                                      if(ver_src_fdate_mw = null_sas_date, -NULL, ver_src_fdate_mw), 
+                                      if(ver_src_fdate_nt = null_sas_date, -NULL, ver_src_fdate_nt), 
+                                      if(ver_src_fdate_wp = null_sas_date, -NULL, ver_src_fdate_wp))));   
+  export earliest_other_date_all_days := (integer)(earliest_other_date_all);
+export string3 m_src_other_fs := map(
+          not clam.truedid                     => '-1',
+          earliest_other_date_all=NULL         => '-2',
+                (string)min(
+                                if (
+                                  (sas_sysdate - earliest_other_date_all_days) / (365.25 / 12) >= 0, 
+                                truncate((sas_sysdate - earliest_other_date_all_days) / (365.25 / 12)), 
+                                roundup((sas_sysdate - earliest_other_date_all_days) / (365.25 / 12))
+                                ), 960 ) );                
+  export integer _sum_bureau := sum((integer)ver_src_EQ, (integer)ver_src_EN, (integer)ver_src_TN);  
+  export integer _sum_credentialed := sum((integer)ver_src_AR, (integer)ver_src_AM, (integer)ver_src_BA, (integer)ver_src_CG, 
+    (integer)ver_src_DA, (integer)ver_src_D,  (integer)ver_src_DL, (integer)ver_src_EB,
+    (integer)ver_src_E1, (integer)ver_src_E2, (integer)ver_src_E3, (integer)ver_src_FE,
+    (integer)ver_src_FF, (integer)ver_src_P,  (integer)ver_src_PL, (integer)ver_src_SL,
+    (integer)ver_src_V,  (integer)ver_src_VO, (integer)ver_src_W);
+  export integer _sum_other := sum((integer)ver_src_AK, (integer)ver_src_CY, (integer)ver_src_E4, (integer)ver_src_EM,
+    (integer)ver_src_FR, (integer)ver_src_LI, (integer)ver_src_L2, (integer)ver_src_MW, 
+    (integer)ver_src_NT, (integer)ver_src_WP);  
+  export integer num_sources := sum((integer)_sum_bureau,(integer)_sum_credentialed,(integer)_sum_other);
+export string2 bureau_only_index := if(not clam.truedid, '-1',if((num_sources > _sum_bureau or _sum_bureau = 0),'-2',(string)_sum_bureau));
+  shared ver_ssn_src_EQ_pos := Models.Common.findw_cpp(ver_ssn_sources, 'EQ' , '  ,', 'ie');
+  shared ver_ssn_src_EQ := ver_ssn_src_EQ_pos > 0;
+  shared ver_ssn_src_EN_pos := Models.Common.findw_cpp(ver_ssn_sources, 'EN' , '  ,', 'ie');
+  shared ver_ssn_src_EN := ver_ssn_src_EN_pos > 0;
+  shared ver_ssn_src_TN_pos := Models.Common.findw_cpp(ver_ssn_sources, 'TN' , '  ,', 'ie');
+  shared ver_ssn_src_TN := ver_ssn_src_TN_pos > 0;
+  shared ver_ssn_src_AR_pos := Models.Common.findw_cpp(ver_ssn_sources, 'AR' , '  ,', 'ie');
+  shared ver_ssn_src_AR := ver_ssn_src_AR_pos > 0;
+  shared ver_ssn_src_AM_pos := Models.Common.findw_cpp(ver_ssn_sources, 'AM' , '  ,', 'ie');
+  shared ver_ssn_src_AM := ver_ssn_src_AM_pos > 0;
+  shared ver_ssn_src_BA_pos := Models.Common.findw_cpp(ver_ssn_sources, 'BA' , '  ,', 'ie');
+  shared ver_ssn_src_BA := ver_ssn_src_BA_pos > 0;
+  shared ver_ssn_src_CG_pos := Models.Common.findw_cpp(ver_ssn_sources, 'CG' , '  ,', 'ie');
+  shared ver_ssn_src_CG := ver_ssn_src_CG_pos > 0;
+  shared ver_ssn_src_DA_pos := Models.Common.findw_cpp(ver_ssn_sources, 'DA' , '  ,', 'ie');
+  shared ver_ssn_src_DA := ver_ssn_src_DA_pos > 0;
+  shared ver_ssn_src_D_pos := Models.Common.findw_cpp(ver_ssn_sources, 'D' , '  ,', 'ie');
+  shared ver_ssn_src_D := ver_ssn_src_D_pos > 0;
+  shared ver_ssn_src_DL_pos := Models.Common.findw_cpp(ver_ssn_sources, 'DL' , '  ,', 'ie');
+  shared ver_ssn_src_DL := ver_ssn_src_DL_pos > 0;
+  shared ver_ssn_src_EB_pos := Models.Common.findw_cpp(ver_ssn_sources, 'EB' , '  ,', 'ie');
+  shared ver_ssn_src_EB := ver_ssn_src_EB_pos > 0;
+  shared ver_ssn_src_E1_pos := Models.Common.findw_cpp(ver_ssn_sources, 'E1' , '  ,', 'ie');
+  shared ver_ssn_src_E1 := ver_ssn_src_E1_pos > 0;
+  shared ver_ssn_src_E2_pos := Models.Common.findw_cpp(ver_ssn_sources, 'E2' , '  ,', 'ie');
+  shared ver_ssn_src_E2 := ver_ssn_src_E2_pos > 0;
+  shared ver_ssn_src_E3_pos := Models.Common.findw_cpp(ver_ssn_sources, 'E3' , '  ,', 'ie');
+  shared ver_ssn_src_E3 := ver_ssn_src_E3_pos > 0;
+  shared ver_ssn_src_FE_pos := Models.Common.findw_cpp(ver_ssn_sources, 'FE' , '  ,', 'ie');
+  shared ver_ssn_src_FE := ver_ssn_src_FE_pos > 0;
+  shared ver_ssn_src_FF_pos := Models.Common.findw_cpp(ver_ssn_sources, 'FF' , '  ,', 'ie');
+  shared ver_ssn_src_FF := ver_ssn_src_FF_pos > 0;
+  shared ver_ssn_src_P_pos := Models.Common.findw_cpp(ver_ssn_sources, 'P' , '  ,', 'ie');
+  shared ver_ssn_src_P := ver_ssn_src_P_pos > 0;
+  shared ver_ssn_src_PL_pos := Models.Common.findw_cpp(ver_ssn_sources, 'PL' , '  ,', 'ie');
+  shared ver_ssn_src_PL := ver_ssn_src_PL_pos > 0;
+  shared ver_ssn_src_SL_pos := Models.Common.findw_cpp(ver_ssn_sources, 'SL' , '  ,', 'ie');
+  shared ver_ssn_src_SL := ver_ssn_src_SL_pos > 0;
+  shared ver_ssn_src_V_pos := Models.Common.findw_cpp(ver_ssn_sources, 'V' , '  ,', 'ie');
+  shared ver_ssn_src_V := ver_ssn_src_V_pos > 0;
+  shared ver_ssn_src_VO_pos := Models.Common.findw_cpp(ver_ssn_sources, 'VO' , '  ,', 'ie');
+  shared ver_ssn_src_VO := ver_ssn_src_VO_pos > 0;
+  shared ver_ssn_src_W_pos := Models.Common.findw_cpp(ver_ssn_sources, 'W' , '  ,', 'ie');
+  shared ver_ssn_src_W := ver_ssn_src_W_pos > 0;
+  shared ver_ssn_src_AK_pos := Models.Common.findw_cpp(ver_ssn_sources, 'AK' , '  ,', 'ie');
+  shared ver_ssn_src_AK := ver_ssn_src_AK_pos > 0;
+  shared ver_ssn_src_CY_pos := Models.Common.findw_cpp(ver_ssn_sources, 'CY' , '  ,', 'ie');
+  shared ver_ssn_src_CY := ver_ssn_src_CY_pos > 0;
+  shared ver_ssn_src_E4_pos := Models.Common.findw_cpp(ver_ssn_sources, 'E4' , '  ,', 'ie');
+  shared ver_ssn_src_E4 := ver_ssn_src_E4_pos > 0;
+  shared ver_ssn_src_EM_pos := Models.Common.findw_cpp(ver_ssn_sources, 'EM' , '  ,', 'ie');
+  shared ver_ssn_src_EM := ver_ssn_src_EM_pos > 0;
+  shared ver_ssn_src_FR_pos := Models.Common.findw_cpp(ver_ssn_sources, 'FR' , '  ,', 'ie');
+  shared ver_ssn_src_FR := ver_ssn_src_FR_pos > 0;
+  shared ver_ssn_src_LI_pos := Models.Common.findw_cpp(ver_ssn_sources, 'LI' , '  ,', 'ie');
+  shared ver_ssn_src_LI := ver_ssn_src_LI_pos > 0;
+  shared ver_ssn_src_L2_pos := Models.Common.findw_cpp(ver_ssn_sources, 'L2' , '  ,', 'ie');
+  shared ver_ssn_src_L2 := ver_ssn_src_L2_pos > 0;
+  shared ver_ssn_src_MW_pos := Models.Common.findw_cpp(ver_ssn_sources, 'MW' , '  ,', 'ie');
+  shared ver_ssn_src_MW := ver_ssn_src_MW_pos > 0;
+  shared ver_ssn_src_NT_pos := Models.Common.findw_cpp(ver_ssn_sources, 'NT' , '  ,', 'ie');
+  shared ver_ssn_src_NT := ver_ssn_src_NT_pos > 0;
+  shared ver_ssn_src_WP_pos := Models.Common.findw_cpp(ver_ssn_sources, 'WP' , '  ,', 'ie');
+  shared ver_ssn_src_WP := ver_ssn_src_WP_pos > 0;
+  shared ver_ssn_src_TS_pos := Models.Common.findw_cpp(ver_ssn_sources, 'TS' , '  ,', 'ie');
+  shared ver_ssn_src_TS := ver_ssn_src_TS_pos > 0;
+  shared ver_ssn_src_TU_pos := Models.Common.findw_cpp(ver_ssn_sources, 'TU' , '  ,', 'ie');
+  shared ver_ssn_src_TU := ver_ssn_src_TU_pos > 0;
+  shared integer _sum_ssn_bureau := sum((integer)ver_ssn_src_EQ, (integer)ver_ssn_src_EN, (integer)ver_ssn_src_TN);
+  shared integer _sum_ssn_credentialed := sum((integer)ver_ssn_src_AR, (integer)ver_ssn_src_AM, (integer)ver_ssn_src_BA, (integer)ver_ssn_src_CG, 
+                                 (integer)ver_ssn_src_DA, (integer)ver_ssn_src_D,  (integer)ver_ssn_src_DL, (integer)ver_ssn_src_EB,
+                                 (integer)ver_ssn_src_E1, (integer)ver_ssn_src_E2, (integer)ver_ssn_src_E3, (integer)ver_ssn_src_FE,
+                                 (integer)ver_ssn_src_FF, (integer)ver_ssn_src_P,  (integer)ver_ssn_src_PL, (integer)ver_ssn_src_SL,
+                                 (integer)ver_ssn_src_V,  (integer)ver_ssn_src_VO, (integer)ver_ssn_src_W);
+  shared integer _sum_ssn_other := sum((integer)ver_ssn_src_AK, (integer)ver_ssn_src_CY, (integer)ver_ssn_src_E4, (integer)ver_ssn_src_EM,
+                          (integer)ver_ssn_src_FR, (integer)ver_ssn_src_LI, (integer)ver_ssn_src_L2, (integer)ver_ssn_src_MW, 
+                          (integer)ver_ssn_src_NT, (integer)ver_ssn_src_WP); 
+  shared integer _num_ssn_sources := sum((integer)_sum_ssn_bureau,(integer)_sum_ssn_credentialed,(integer)_sum_ssn_other);                        
+export string2 ssn_bureau_only := trim(if((not ssnlength>0),'-1',
+    if((_num_ssn_sources > _sum_ssn_bureau) or _sum_ssn_bureau = 0,'0',(string)(_sum_ssn_bureau > 0))));
+  shared integer ver_addr_src_EQ_pos := Models.Common.findw_cpp(ver_addr_sources, 'EQ' , '  ,', 'ie');
+  shared boolean ver_addr_src_EQ := ver_addr_src_EQ_pos > 0;
+  shared integer ver_addr_src_EN_pos := Models.Common.findw_cpp(ver_addr_sources, 'EN' , '  ,', 'ie');
+  shared boolean ver_addr_src_EN := ver_addr_src_EN_pos > 0;
+  shared integer ver_addr_src_TN_pos := Models.Common.findw_cpp(ver_addr_sources, 'TN' , '  ,', 'ie');
+  shared boolean ver_addr_src_TN := ver_addr_src_TN_pos > 0;
+  shared integer ver_addr_src_AR_pos := Models.Common.findw_cpp(ver_addr_sources, 'AR' , '  ,', 'ie');
+  shared boolean ver_addr_src_AR := ver_addr_src_AR_pos > 0;
+  shared integer ver_addr_src_AM_pos := Models.Common.findw_cpp(ver_addr_sources, 'AM' , '  ,', 'ie');
+  shared boolean ver_addr_src_AM := ver_addr_src_AM_pos > 0;
+  shared integer ver_addr_src_BA_pos := Models.Common.findw_cpp(ver_addr_sources, 'BA' , '  ,', 'ie');
+  shared boolean ver_addr_src_BA := ver_addr_src_BA_pos > 0;
+  shared integer ver_addr_src_CG_pos := Models.Common.findw_cpp(ver_addr_sources, 'CG' , '  ,', 'ie');
+  shared boolean ver_addr_src_CG := ver_addr_src_CG_pos > 0;
+  shared integer ver_addr_src_DA_pos := Models.Common.findw_cpp(ver_addr_sources, 'DA' , '  ,', 'ie');
+  shared boolean ver_addr_src_DA := ver_addr_src_DA_pos > 0;
+  shared integer ver_addr_src_D_pos := Models.Common.findw_cpp(ver_addr_sources, 'D' , '  ,', 'ie');
+  shared boolean ver_addr_src_D := ver_addr_src_D_pos > 0;
+  shared integer ver_addr_src_DL_pos := Models.Common.findw_cpp(ver_addr_sources, 'DL' , '  ,', 'ie');
+  shared boolean ver_addr_src_DL := ver_addr_src_DL_pos > 0;
+  shared integer ver_addr_src_EB_pos := Models.Common.findw_cpp(ver_addr_sources, 'EB' , '  ,', 'ie');
+  shared boolean ver_addr_src_EB := ver_addr_src_EB_pos > 0;
+  shared integer ver_addr_src_E1_pos := Models.Common.findw_cpp(ver_addr_sources, 'E1' , '  ,', 'ie');
+  shared boolean ver_addr_src_E1 := ver_addr_src_E1_pos > 0;
+  shared integer ver_addr_src_E2_pos := Models.Common.findw_cpp(ver_addr_sources, 'E2' , '  ,', 'ie');
+  shared boolean ver_addr_src_E2 := ver_addr_src_E2_pos > 0;
+  shared integer ver_addr_src_E3_pos := Models.Common.findw_cpp(ver_addr_sources, 'E3' , '  ,', 'ie');
+  shared boolean ver_addr_src_E3 := ver_addr_src_E3_pos > 0;
+  shared integer ver_addr_src_FE_pos := Models.Common.findw_cpp(ver_addr_sources, 'FE' , '  ,', 'ie');
+  shared boolean ver_addr_src_FE := ver_addr_src_FE_pos > 0;
+  shared integer ver_addr_src_FF_pos := Models.Common.findw_cpp(ver_addr_sources, 'FF' , '  ,', 'ie');
+  shared boolean ver_addr_src_FF := ver_addr_src_FF_pos > 0;
+  shared integer ver_addr_src_P_pos := Models.Common.findw_cpp(ver_addr_sources, 'P' , '  ,', 'ie');
+  shared boolean ver_addr_src_P := ver_addr_src_P_pos > 0;
+  shared integer ver_addr_src_PL_pos := Models.Common.findw_cpp(ver_addr_sources, 'PL' , '  ,', 'ie');
+  shared boolean ver_addr_src_PL := ver_addr_src_PL_pos > 0;
+  shared integer ver_addr_src_SL_pos := Models.Common.findw_cpp(ver_addr_sources, 'SL' , '  ,', 'ie');
+  shared boolean ver_addr_src_SL := ver_addr_src_SL_pos > 0;
+  shared integer ver_addr_src_V_pos := Models.Common.findw_cpp(ver_addr_sources, 'V' , '  ,', 'ie');
+  shared boolean ver_addr_src_V := ver_addr_src_V_pos > 0;
+  shared integer ver_addr_src_VO_pos := Models.Common.findw_cpp(ver_addr_sources, 'VO' , '  ,', 'ie');
+  shared boolean ver_addr_src_VO := ver_addr_src_VO_pos > 0;
+  shared integer ver_addr_src_W_pos := Models.Common.findw_cpp(ver_addr_sources, 'W' , '  ,', 'ie');
+  shared boolean ver_addr_src_W := ver_addr_src_W_pos > 0;
+  shared integer ver_addr_src_AK_pos := Models.Common.findw_cpp(ver_addr_sources, 'AK' , '  ,', 'ie');
+  shared boolean ver_addr_src_AK := ver_addr_src_AK_pos > 0;
+  shared integer ver_addr_src_CY_pos := Models.Common.findw_cpp(ver_addr_sources, 'CY' , '  ,', 'ie');
+  shared boolean ver_addr_src_CY := ver_addr_src_CY_pos > 0;
+  shared integer ver_addr_src_E4_pos := Models.Common.findw_cpp(ver_addr_sources, 'E4' , '  ,', 'ie');
+  shared boolean ver_addr_src_E4 := ver_addr_src_E4_pos > 0;
+  shared integer ver_addr_src_EM_pos := Models.Common.findw_cpp(ver_addr_sources, 'EM' , '  ,', 'ie');
+  shared boolean ver_addr_src_EM := ver_addr_src_EM_pos > 0;
+  shared integer ver_addr_src_FR_pos := Models.Common.findw_cpp(ver_addr_sources, 'FR' , '  ,', 'ie');
+  shared boolean ver_addr_src_FR := ver_addr_src_FR_pos > 0;
+  shared integer ver_addr_src_LI_pos := Models.Common.findw_cpp(ver_addr_sources, 'LI' , '  ,', 'ie');
+  shared boolean ver_addr_src_LI := ver_addr_src_LI_pos > 0;
+  shared integer ver_addr_src_L2_pos := Models.Common.findw_cpp(ver_addr_sources, 'L2' , '  ,', 'ie');
+  shared boolean ver_addr_src_L2 := ver_addr_src_L2_pos > 0;
+  shared integer ver_addr_src_MW_pos := Models.Common.findw_cpp(ver_addr_sources, 'MW' , '  ,', 'ie');
+  shared boolean ver_addr_src_MW := ver_addr_src_MW_pos > 0;
+  shared integer ver_addr_src_NT_pos := Models.Common.findw_cpp(ver_addr_sources, 'NT' , '  ,', 'ie');
+  shared boolean ver_addr_src_NT := ver_addr_src_NT_pos > 0;
+  shared integer ver_addr_src_WP_pos := Models.Common.findw_cpp(ver_addr_sources, 'WP' , '  ,', 'ie');
+  shared boolean ver_addr_src_WP := ver_addr_src_WP_pos > 0;
+  shared integer ver_addr_src_TS_pos := Models.Common.findw_cpp(ver_addr_sources, 'TS' , '  ,', 'ie');
+  shared boolean ver_addr_src_TS := ver_addr_src_TS_pos > 0;
+  shared integer ver_addr_src_TU_pos := Models.Common.findw_cpp(ver_addr_sources, 'TU' , '  ,', 'ie');
+  shared boolean ver_addr_src_TU := ver_addr_src_TU_pos > 0;
+  shared integer _sum_addr_bureau := sum((integer)ver_addr_src_EQ, (integer)ver_addr_src_EN, (integer)ver_addr_src_TN);
+  shared integer _sum_addr_credentialed := sum((integer)ver_addr_src_AR, (integer)ver_addr_src_AM, (integer)ver_addr_src_BA, (integer)ver_addr_src_CG, 
+                                  (integer)ver_addr_src_DA, (integer)ver_addr_src_D,  (integer)ver_addr_src_DL, (integer)ver_addr_src_EB,
+                                  (integer)ver_addr_src_E1, (integer)ver_addr_src_E2, (integer)ver_addr_src_E3, (integer)ver_addr_src_FE,
+                                  (integer)ver_addr_src_FF, (integer)ver_addr_src_P,  (integer)ver_addr_src_PL, (integer)ver_addr_src_SL,
+                                  (integer)ver_addr_src_V,  (integer)ver_addr_src_VO, (integer)ver_addr_src_W);
+  shared integer _sum_addr_other := sum((integer)ver_addr_src_AK, (integer)ver_addr_src_CY, (integer)ver_addr_src_E4, (integer)ver_addr_src_EM,
+                           (integer)ver_addr_src_FR, (integer)ver_addr_src_LI, (integer)ver_addr_src_L2, (integer)ver_addr_src_MW, 
+                           (integer)ver_addr_src_NT, (integer)ver_addr_src_WP);
+  shared integer _num_addr_sources := sum(_sum_addr_bureau,_sum_addr_credentialed,_sum_addr_other);
+export string2 addr_bureau_only := trim(if((not addrpop),'-1',
+    if((_num_addr_sources > _sum_addr_bureau) or _sum_addr_bureau = 0,'0',(string)(_sum_addr_bureau > 0))));
+  shared integer ver_dob_src_EQ_pos := Models.Common.findw_cpp(ver_dob_sources, 'EQ' , '  ,', 'ie');
+  shared boolean ver_dob_src_EQ := ver_dob_src_EQ_pos > 0;
+  shared integer ver_dob_src_EN_pos := Models.Common.findw_cpp(ver_dob_sources, 'EN' , '  ,', 'ie');
+  shared boolean ver_dob_src_EN := ver_dob_src_EN_pos > 0;
+  shared integer ver_dob_src_TN_pos := Models.Common.findw_cpp(ver_dob_sources, 'TN' , '  ,', 'ie');
+  shared boolean ver_dob_src_TN := ver_dob_src_TN_pos > 0;
+  shared integer ver_dob_src_AR_pos := Models.Common.findw_cpp(ver_dob_sources, 'AR' , '  ,', 'ie');
+  shared boolean ver_dob_src_AR := ver_dob_src_AR_pos > 0;
+  shared integer ver_dob_src_AM_pos := Models.Common.findw_cpp(ver_dob_sources, 'AM' , '  ,', 'ie');
+  shared boolean ver_dob_src_AM := ver_dob_src_AM_pos > 0;
+  shared integer ver_dob_src_BA_pos := Models.Common.findw_cpp(ver_dob_sources, 'BA' , '  ,', 'ie');
+  shared boolean ver_dob_src_BA := ver_dob_src_BA_pos > 0;
+  shared integer ver_dob_src_CG_pos := Models.Common.findw_cpp(ver_dob_sources, 'CG' , '  ,', 'ie');
+  shared boolean ver_dob_src_CG := ver_dob_src_CG_pos > 0;
+  shared integer ver_dob_src_DA_pos := Models.Common.findw_cpp(ver_dob_sources, 'DA' , '  ,', 'ie');
+  shared boolean ver_dob_src_DA := ver_dob_src_DA_pos > 0;
+  shared integer ver_dob_src_D_pos := Models.Common.findw_cpp(ver_dob_sources, 'D' , '  ,', 'ie');
+  shared boolean ver_dob_src_D := ver_dob_src_D_pos > 0;
+  shared integer ver_dob_src_DL_pos := Models.Common.findw_cpp(ver_dob_sources, 'DL' , '  ,', 'ie');
+  shared boolean ver_dob_src_DL := ver_dob_src_DL_pos > 0;
+  shared integer ver_dob_src_EB_pos := Models.Common.findw_cpp(ver_dob_sources, 'EB' , '  ,', 'ie');
+  shared boolean ver_dob_src_EB := ver_dob_src_EB_pos > 0;
+  shared integer ver_dob_src_E1_pos := Models.Common.findw_cpp(ver_dob_sources, 'E1' , '  ,', 'ie');
+  shared boolean ver_dob_src_E1 := ver_dob_src_E1_pos > 0;
+  shared integer ver_dob_src_E2_pos := Models.Common.findw_cpp(ver_dob_sources, 'E2' , '  ,', 'ie');
+  shared boolean ver_dob_src_E2 := ver_dob_src_E2_pos > 0;
+  shared integer ver_dob_src_E3_pos := Models.Common.findw_cpp(ver_dob_sources, 'E3' , '  ,', 'ie');
+  shared boolean ver_dob_src_E3 := ver_dob_src_E3_pos > 0;
+  shared integer ver_dob_src_FE_pos := Models.Common.findw_cpp(ver_dob_sources, 'FE' , '  ,', 'ie');
+  shared boolean ver_dob_src_FE := ver_dob_src_FE_pos > 0;
+  shared integer ver_dob_src_FF_pos := Models.Common.findw_cpp(ver_dob_sources, 'FF' , '  ,', 'ie');
+  shared boolean ver_dob_src_FF := ver_dob_src_FF_pos > 0;
+  shared integer ver_dob_src_P_pos := Models.Common.findw_cpp(ver_dob_sources, 'P' , '  ,', 'ie');
+  shared boolean ver_dob_src_P := ver_dob_src_P_pos > 0;
+  shared integer ver_dob_src_PL_pos := Models.Common.findw_cpp(ver_dob_sources, 'PL' , '  ,', 'ie');
+  shared boolean ver_dob_src_PL := ver_dob_src_PL_pos > 0;
+  shared integer ver_dob_src_SL_pos := Models.Common.findw_cpp(ver_dob_sources, 'SL' , '  ,', 'ie');
+  shared boolean ver_dob_src_SL := ver_dob_src_SL_pos > 0;
+  shared integer ver_dob_src_V_pos := Models.Common.findw_cpp(ver_dob_sources, 'V' , '  ,', 'ie');
+  shared boolean ver_dob_src_V := ver_dob_src_V_pos > 0;
+  shared integer ver_dob_src_VO_pos := Models.Common.findw_cpp(ver_dob_sources, 'VO' , '  ,', 'ie');
+  shared boolean ver_dob_src_VO := ver_dob_src_VO_pos > 0;
+  shared integer ver_dob_src_W_pos := Models.Common.findw_cpp(ver_dob_sources, 'W' , '  ,', 'ie');
+  shared boolean ver_dob_src_W := ver_dob_src_W_pos > 0;
+  shared integer ver_dob_src_AK_pos := Models.Common.findw_cpp(ver_dob_sources, 'AK' , '  ,', 'ie');
+  shared boolean ver_dob_src_AK := ver_dob_src_AK_pos > 0;
+  shared integer ver_dob_src_CY_pos := Models.Common.findw_cpp(ver_dob_sources, 'CY' , '  ,', 'ie');
+  shared boolean ver_dob_src_CY := ver_dob_src_CY_pos > 0;
+  shared integer ver_dob_src_E4_pos := Models.Common.findw_cpp(ver_dob_sources, 'E4' , '  ,', 'ie');
+  shared boolean ver_dob_src_E4 := ver_dob_src_E4_pos > 0;
+  shared integer ver_dob_src_EM_pos := Models.Common.findw_cpp(ver_dob_sources, 'EM' , '  ,', 'ie');
+  shared boolean ver_dob_src_EM := ver_dob_src_EM_pos > 0;
+  shared integer ver_dob_src_FR_pos := Models.Common.findw_cpp(ver_dob_sources, 'FR' , '  ,', 'ie');
+  shared boolean ver_dob_src_FR := ver_dob_src_FR_pos > 0;
+  shared integer ver_dob_src_LI_pos := Models.Common.findw_cpp(ver_dob_sources, 'LI' , '  ,', 'ie');
+  shared boolean ver_dob_src_LI := ver_dob_src_LI_pos > 0;
+  shared integer ver_dob_src_L2_pos := Models.Common.findw_cpp(ver_dob_sources, 'L2' , '  ,', 'ie');
+  shared boolean ver_dob_src_L2 := ver_dob_src_L2_pos > 0;
+  shared integer ver_dob_src_MW_pos := Models.Common.findw_cpp(ver_dob_sources, 'MW' , '  ,', 'ie');
+  shared boolean ver_dob_src_MW := ver_dob_src_MW_pos > 0;
+  shared integer ver_dob_src_NT_pos := Models.Common.findw_cpp(ver_dob_sources, 'NT' , '  ,', 'ie');
+  shared boolean ver_dob_src_NT := ver_dob_src_NT_pos > 0;
+  shared integer ver_dob_src_WP_pos := Models.Common.findw_cpp(ver_dob_sources, 'WP' , '  ,', 'ie');
+  shared boolean ver_dob_src_WP := ver_dob_src_WP_pos > 0;
+  shared integer ver_dob_src_TS_pos := Models.Common.findw_cpp(ver_dob_sources, 'TS' , '  ,', 'ie');
+  shared boolean ver_dob_src_TS := ver_dob_src_TS_pos > 0;
+  shared integer ver_dob_src_TU_pos := Models.Common.findw_cpp(ver_dob_sources, 'TU' , '  ,', 'ie');
+  shared boolean ver_dob_src_TU := ver_dob_src_TU_pos > 0;
+  shared integer _sum_dob_bureau := sum((integer)ver_dob_src_EQ, (integer)ver_dob_src_EN, (integer)ver_dob_src_TN);
+  shared integer _sum_dob_credentialed := sum((integer)ver_dob_src_AR, (integer)ver_dob_src_AM, (integer)ver_dob_src_BA, (integer)ver_dob_src_CG, 
+                                 (integer)ver_dob_src_DA, (integer)ver_dob_src_D,  (integer)ver_dob_src_DL, (integer)ver_dob_src_EB,
+                                 (integer)ver_dob_src_E1, (integer)ver_dob_src_E2, (integer)ver_dob_src_E3, (integer)ver_dob_src_FE,
+                                 (integer)ver_dob_src_FF, (integer)ver_dob_src_P,  (integer)ver_dob_src_PL, (integer)ver_dob_src_SL,
+                                 (integer)ver_dob_src_V,  (integer)ver_dob_src_VO, (integer)ver_dob_src_W);
+  shared integer _sum_dob_other := sum((integer)ver_dob_src_AK, (integer)ver_dob_src_CY, (integer)ver_dob_src_E4, (integer)ver_dob_src_EM,
+                          (integer)ver_dob_src_FR, (integer)ver_dob_src_LI, (integer)ver_dob_src_L2, (integer)ver_dob_src_MW, 
+                          (integer)ver_dob_src_NT, (integer)ver_dob_src_WP);
+  shared integer _num_dob_sources := sum(_sum_dob_bureau,_sum_dob_credentialed,_sum_dob_other);
+  shared boolean add_input_isbestmatch := clam.address_verification.input_address_information.isbestmatch;
+  shared boolean add_input_pop := clam.addrpop;
+  shared boolean add_curr_isbestmatch := clam.address_verification.address_history_1.isbestmatch;
+  shared boolean add_curr_pop := clam.addrpop2;
+export string2 dob_bureau_only := trim(if((not dobpop),'-1',
+    if((_num_dob_sources > _sum_dob_bureau) or _sum_dob_bureau = 0,'0',(string)(_sum_dob_bureau > 0))));
+export string2 address_match := map(not clam.truedid                  => '-1',
+											add_input_isbestmatch                           => '4',
+											not add_input_pop and add_curr_isbestmatch      => '3',
+                      add_input_pop and add_curr_isbestmatch          => '2',
+                      add_curr_pop                                    => '1',
+                      add_input_pop                                   => '0',
+                                                                         '-1');
+  export integer inq_perssn := clam.acc_logs.inquiryperssn;
+export string3 srch_perssn_addrunver := map(not (clam.truedid and ssnlength>0)    => '-1',
+                      nas_summary in [0,1]                                        => '-2',
+                      nas_summary in [0,1,3,5,6,8,10,11,12]                       => '-3',
+                                                                      (string3)MIN(inq_perssn,255));
+  shared integer inq_perssn_count01 := clam.acc_logs.inq_perssn_count01;
+  shared integer inq_count01 := clam.acc_logs.inquiries.count01;
+export string4 srch_ssn_id_diff01 := if ((inq_perssn_count01 - inq_count01) < -255,'-255',(string4)min((inq_perssn_count01 - inq_count01),255));
+  shared integer inq_communications_count_week := clam.acc_logs.communications.countweek;
+export string3 srch_nonbank_count_wk := (string3)min(inq_communications_count_week, 255);;
+  shared integer inq_communications_count12 := clam.acc_logs.communications.count12;
+export string3 srch_nonbank_count12 := (string3)min(inq_communications_count12, 255);
+  shared integer inq_communications_count01 := clam.acc_logs.communications.count01;
+  shared integer inq_communications_count03 := clam.acc_logs.communications.count03;
+  shared integer inq_communications_count06 := clam.acc_logs.communications.count06;
+  shared integer inq_communications_count24 := clam.acc_logs.communications.count24;
+  shared integer inq_communications_count := clam.acc_logs.communications.counttotal;
+export string2 srch_nonbank_recency := map((boolean)inq_communications_count01           => '1',
+                                           (boolean)inq_communications_count03           => '3',
+                                           (boolean)inq_communications_count06           => '6',
+                                           (boolean)inq_communications_count12           => '12',
+                                           (boolean)inq_communications_count24           => '24',
+                                           (boolean)inq_communications_count             => '99',
+                                                                                            '0');
+  shared rel_count := clam.relatives.relative_count;
+export string3 rel_count_for_bureau_only := map(not clam.truedid                            => '-1',
+                                                (num_sources>_sum_bureau) or _sum_bureau=0  => '-2',
+                                                                                               (string3)min(rel_count, 255));
+  shared hh_members_ct := clam.hhid_summary.hh_members_ct;
+export string3 hh_members_for_bureau_only := map(not clam.truedid                           => '-1',
+                                                (num_sources>_sum_bureau) or _sum_bureau=0  => '-2',
+                                                                                               (string3)min(hh_members_ct, 255));
+export string3 bureau_emergence_age := map(
+    not(clam.truedid) or earliest_bureau_yrs_2 = NULL       => '-1',
+    not(calc_dob_2 = NULL)                                  => (string)max(((integer)calc_dob_2 - (integer)earliest_bureau_yrs_2),0),
+    inferred_age = 0                                        => '-1',
+    inferred_age - earliest_bureau_yrs_2 < 0                => '0',
+                                                               (string)min(((integer)inferred_age - (integer)earliest_bureau_yrs_2),120));
+export string2 bureau_emergence_age_25_59 := map(bureau_emergence_age = '-1'                                              => '-1',
+                                                 (integer)bureau_emergence_age>=25 AND (integer)bureau_emergence_age<=59  => '1',
+                                                                                                                             '0');
+export string3 bureau_only_emergence_age := map(not clam.truedid or earliest_bureau_yrs_2=NULL                  => '-1',
+                                                num_sources > _sum_bureau or _sum_bureau = 0                    => '-2',
+                                                not(calc_dob_2 = NULL)                                          => (string3)max(((integer)calc_dob_2 - (integer)earliest_bureau_yrs_2),0),
+                                                inferred_age = 0                                                => '-1',
+                                                ((integer)inferred_age - (integer)earliest_bureau_yrs_2) < 0    => '0',
+                                                                                                (string3)min(((integer)inferred_age - (integer)earliest_bureau_yrs_2),120));
+  
+  shared integer ver_fname_src_EQ_pos := Models.Common.findw_cpp(ver_fname_sources, 'EQ' , '  ,', 'ie');
+  shared boolean ver_fname_src_EQ := ver_fname_src_EQ_pos > 0;
+  shared integer ver_fname_src_EN_pos := Models.Common.findw_cpp(ver_fname_sources, 'EN' , '  ,', 'ie');
+  shared boolean ver_fname_src_EN := ver_fname_src_EN_pos > 0;
+  shared integer ver_fname_src_TN_pos := Models.Common.findw_cpp(ver_fname_sources, 'TN' , '  ,', 'ie');
+  shared boolean ver_fname_src_TN := ver_fname_src_TN_pos > 0;
+  shared integer ver_fname_src_TS_pos := Models.Common.findw_cpp(ver_fname_sources, 'TS' , '  ,', 'ie');
+  shared boolean ver_fname_src_TS := ver_fname_src_TS_pos > 0;
+  shared integer ver_fname_src_TU_pos := Models.Common.findw_cpp(ver_fname_sources, 'TU' , '  ,', 'ie');
+  shared boolean ver_fname_src_TU := ver_fname_src_TU_pos > 0;
+  shared integer ver_lname_src_EQ_pos := Models.Common.findw_cpp(ver_lname_sources, 'EQ' , '  ,', 'ie');
+  shared boolean ver_lname_src_EQ := ver_lname_src_EQ_pos > 0;
+  shared integer ver_lname_src_EN_pos := Models.Common.findw_cpp(ver_lname_sources, 'EN' , '  ,', 'ie');
+  shared boolean ver_lname_src_EN := ver_lname_src_EN_pos > 0;
+  shared integer ver_lname_src_TN_pos := Models.Common.findw_cpp(ver_lname_sources, 'TN' , '  ,', 'ie');
+  shared boolean ver_lname_src_TN := ver_lname_src_TN_pos > 0;
+  shared integer ver_lname_src_TS_pos := Models.Common.findw_cpp(ver_lname_sources, 'TS' , '  ,', 'ie');
+  shared boolean ver_lname_src_TS := ver_lname_src_TS_pos > 0;
+  shared integer ver_lname_src_TU_pos := Models.Common.findw_cpp(ver_lname_sources, 'TU' , '  ,', 'ie');
+  shared boolean ver_lname_src_TU := ver_lname_src_TU_pos > 0;
+  shared integer num_bureau_fname := (integer)ver_fname_src_EQ + (integer)ver_fname_src_EN + (integer)ver_fname_src_TN;
+  shared integer num_bureau_lname := (integer)ver_lname_src_EQ + (integer)ver_lname_src_EN + (integer)ver_lname_src_TN;
+  shared integer num_bureau_addr := (integer)ver_addr_src_EQ + (integer)ver_addr_src_EN + (integer)ver_addr_src_TN;
+  shared integer num_bureau_ssn := (integer)ver_ssn_src_EQ + (integer)ver_ssn_src_EN + (integer)ver_ssn_src_TN;
+  shared integer num_bureau_dob := (integer)ver_dob_src_EQ + (integer)ver_dob_src_EN + (integer)ver_dob_src_TN;
+  shared integer _bureau_verification_index := sum(
+    1 * (integer)(max(num_bureau_fname, num_bureau_lname) > 0),
+    2 * (integer)(num_bureau_addr > 0),
+    4 * (integer)(num_bureau_dob > 0),
+    8 * (integer)(num_bureau_ssn > 0));
+export string2 fla_fld_bureau_no_ssn_flag := map(not clam.truedid        => '-1',
+                                                 (_bureau_verification_index in [3,5,7])  => '1',
+                                                                                             '0');
+  export _br_first_seen := (string)clam.employment.first_seen_date;
+  shared _br_first_seen_sas := common.sas_date(_br_first_seen);
+  export string3 rv_mos_since_br_first_seen := map(not clam.truedid      => '',
+                                                   _br_first_seen='0'     => '-1',
+                                                                            (string)min(truncate((sas_sysdate - _br_first_seen_sas)/(365.25/12)),999));
+  shared string3 nf_inq_ssn_all_inq_diff01 := map(not clam.truedid       => '',
+                                                                            (string)(inq_perssn_count01 - inq_count01));
+  shared fp_varrisktype := clam.fdattributesv2.variationrisklevel;  
+  shared string3 nf_fp_varrisktype := map(not clam.truedid               => '',
+                                                                            (string)fp_varrisktype);
+  shared add_input_occ_index := clam.address_verification.inputaddr_occupancy_index;
+  shared string3 rv_C22_inp_addr_occ_index := map(not (clam.truedid and add_input_pop)  => '', (string3)add_input_occ_index);
+  export unverified_addr_count := clam.address_verification.unverified_addr_count;
+  export string3 iv_unverified_addr_count := map(not clam.truedid        => '', (string3)min((integer)unverified_addr_count, 999));
+  shared link_candidate_cnt := clam.pii_stability.link_candidate_cnt; 
+  shared string3 nf_link_candidate_cnt := map(not clam.truedid           => '', (string3)link_candidate_cnt);
+  shared fp_srchfraudsrchcountyr := clam.fdattributesv2.searchfraudsearchcountyear;
+  shared string3 nf_fp_srchfraudsrchcountyr := map(not clam.truedid      => '', (string3)min((integer)fp_srchfraudsrchcountyr, 999));
+  shared inq_adlsperaddr := clam.acc_logs.inquiryadlsperaddr;
+  shared string3 nf_inq_adls_per_addr := map(not addrpop                 => '', (string3)min(inq_adlsperaddr, 999));
+  shared string3 rv_I60_inq_comm_recency := map(not clam.truedid                            => '',
+                                                (boolean)inq_communications_count01         => '1',
+                                                (boolean)inq_communications_count03         => '3',
+                                                (boolean)inq_communications_count06         => '6',
+                                                (boolean)inq_communications_count12         => '12',
+                                                (boolean)inq_communications_count24         => '24',
+                                                (boolean)inq_communications_count           => '99',
+                                                                                               '0');
+  export syn2_V01_w := map(rv_mos_since_br_first_seen=''                                    => '0',
+                           rv_mos_since_br_first_seen='-1'                                  => '0.372369290834258',
+                                                                                               '-0.28088801558372');
+  export syn2_V02_w := map(nf_inq_ssn_all_inq_diff01 = ''                                   => '0',
+                           nf_inq_ssn_all_inq_diff01 = '-9999'                              => '0',
+                           (integer)nf_inq_ssn_all_inq_diff01 <= -1                         => '-0.283040200707818',
+                           (integer)nf_inq_ssn_all_inq_diff01 <= 0.5                        => '0.0847808272770633',
+                           (integer)nf_inq_ssn_all_inq_diff01 <= 1.5                        => '0.198151927224724',
+                           (integer)nf_inq_ssn_all_inq_diff01 <= 6.5                        => '0.71908702665578',
+                                                                                               '1.54479300561969');
+  export syn2_V03_w := map(nf_fp_varrisktype = ''                                           => '0',
+                           (integer)nf_fp_varrisktype = -1                                  => '0.143404243933704',
+                           (integer)nf_fp_varrisktype <= 2.5                                => '-0.096137482159095',
+                           (integer)nf_fp_varrisktype <= 5.5                                => '-0.00847996482846668',
+                           (integer)nf_fp_varrisktype <= 6.5                                => '0.287090398881397',
+                           (integer)nf_fp_varrisktype <= 8.5                                => '0.502950586655807',
+                                                                                               '0.853098064772909');
+  export syn2_V04_w := map(rv_C22_inp_addr_occ_index = ''                                   => '0',
+                           rv_C22_inp_addr_occ_index in ['0']                               => '0.201079778445082',
+                           rv_C22_inp_addr_occ_index in ['1']                               => '-0.166520498751859',
+                           rv_C22_inp_addr_occ_index in ['3']                               => '-0.010476620651672',                           
+                           rv_C22_inp_addr_occ_index in ['4']                               => '0.441481915750923',
+                           rv_C22_inp_addr_occ_index in ['5','6','7','8']                   => '0.281055140742489',
+                                                                                               '0');
+  export syn2_V05_w := map(iv_unverified_addr_count = ''                                    => '0',
+                           (integer)iv_unverified_addr_count = -1                           => '0',
+                           (integer)iv_unverified_addr_count <= 0.5                         => '-0.223797913208136',
+                           (integer)iv_unverified_addr_count <= 1.5                         => '-0.00638266328485155',
+                           (integer)iv_unverified_addr_count <= 4.5                         => '0.259877571190811',
+                           (integer)iv_unverified_addr_count <= 10.5                        => '0.298753351100764',
+                                                                                               '0.493528861335728');
+  export syn2_V06_w := map(nf_link_candidate_cnt = ''                                       => '0',
+                           (integer)nf_link_candidate_cnt = -1                              => '0',
+                           (integer)nf_link_candidate_cnt <= 1.5                            => '-0.197096815116765',
+                           (integer)nf_link_candidate_cnt <= 2.5                            => '0.0238675197256575',
+                           (integer)nf_link_candidate_cnt <= 3                              => '0.144599679372005', 
+                                                                                               '0.19963851120958'); 
+  export syn2_V07_w := map(nf_fp_srchfraudsrchcountyr = ''                                  => '0',
+                           (integer)nf_fp_srchfraudsrchcountyr = -1                         => '0',
+                           (integer)nf_fp_srchfraudsrchcountyr <= 0.5                       => '-0.128026332346314',
+                           (integer)nf_fp_srchfraudsrchcountyr <= 1.5                       => '0.0432915560506505',
+                           (integer)nf_fp_srchfraudsrchcountyr <= 2.5                       => '0.119850902335273',
+                           (integer)nf_fp_srchfraudsrchcountyr <= 7.5                       => '0.156708499598535',
+                           (integer)nf_fp_srchfraudsrchcountyr <= 10.5                      => '0.568810285326134',
+                                                                                               '0.732175426662606');
+  export syn2_V08_w := map(nf_inq_adls_per_addr = ''                                        => '0',
+                           (integer)nf_inq_adls_per_addr = -1                               => '0',
+                           (integer)nf_inq_adls_per_addr <= 2.5                             => '-0.158546907056559',
+                           (integer)nf_inq_adls_per_addr <= 3.5                             => '0.0561893765735488',
+                                                                                               '0.293820691642');
+  export syn2_V09_w := map(rv_I60_inq_comm_recency = ''                                     => '0',
+                           (integer)rv_I60_inq_comm_recency in [0,99]                       => '-0.0924399709290566',
+                           (integer)rv_I60_inq_comm_recency in [1,12,24,3,6]                => '0.258481823674334',
+                                                                                               '0');
+  export syn2_lgt := -3.33411044933915 + sum((real)syn2_V01_w,(real)syn2_V02_w,(real)syn2_V03_w,(real)syn2_V04_w,(real)syn2_V05_w,(real)syn2_V06_w,(real)syn2_V07_w,(real)syn2_V08_w,(real)syn2_V09_w);
+  export syn2_score := round(min(max(600 + -50 * (((real)syn2_lgt - ln(0.0494502576087534)) / ln(2)), 300), 999));
+  shared add_input_naprop := clam.address_verification.input_address_information.naprop; 
+  shared add_curr_naprop := clam.address_verification.address_history_1.naprop;
+  shared property_owned_total := clam.address_verification.owned.property_total;
+  shared add_prev_naprop := clam.address_verification.address_history_2.naprop;
+  shared rv_A41_A42_prop_owner_history := map(not clam.truedid                                                   => '',
+                                              (add_input_naprop = 4 or
+                                              add_curr_naprop  = 4 or
+                                              property_owned_total > 0)                                          => '2',
+                                              (add_prev_naprop  = 4 or
+                                              Models.Common.findw_cpp(ver_sources, 'P' , '  ,', 'E') > 0)        => '1',
+                                                                                                                    '0');
+  shared beta_synthid_trigger2 := (((integer)_sum_credentialed = 0  and (integer)_sum_bureau > 0  and (integer)rv_A41_A42_prop_owner_history = 0) OR 
+                             not clam.truedid ); 
+export string2 synthidindex := map((integer)beta_synthid_trigger2 = 0                                            => '1',
+                                   syn2_score >= 300 AND syn2_score <= 490                                       => '9',
+                                   syn2_score >= 491 AND syn2_score <= 521                                       => '8',
+                                   syn2_score >= 522 AND syn2_score <= 552                                       => '7',
+                                   syn2_score >= 553 AND syn2_score <= 571                                       => '6',
+                                   syn2_score >= 572 AND syn2_score <= 596                                       => '5',
+                                   syn2_score >= 597 AND syn2_score <= 627                                       => '4',
+                                   syn2_score >= 628 AND syn2_score <= 659                                       => '3',
+                                   syn2_score >= 660 AND syn2_score <= 999                                       => '2','');
+                                   
+export string2 synthid_trigger := map(
+                                  (string2)(((integer)_sum_credentialed = 0  and (integer)_sum_bureau > 0  and (integer)rv_A41_A42_prop_owner_history = 0) OR not clam.truedid)='1' => '1',
+                                                                                                                                                                                       '0');
+  shared num_bureau_fname2 := (integer)ver_fname_src_EQ + (integer)ver_fname_src_EN + ((integer)ver_fname_src_TN + (integer)ver_fname_src_TS + (integer)ver_fname_src_TU);
+  shared num_bureau_lname2 := (integer)ver_lname_src_EQ + (integer)ver_lname_src_EN + ((integer)ver_lname_src_TN + (integer)ver_lname_src_TS + (integer)ver_lname_src_TU);
+  shared num_bureau_addr2 := (integer)ver_addr_src_EQ + (integer)ver_addr_src_EN + ((integer)ver_addr_src_TN + (integer)ver_addr_src_TS + (integer)ver_addr_src_TU);
+  shared num_bureau_ssn2 := (integer)ver_ssn_src_EQ + (integer)ver_ssn_src_EN + ((integer)ver_ssn_src_TN + (integer)ver_ssn_src_TS + (integer)ver_ssn_src_TU);
+  shared num_bureau_dob2 := (integer)ver_dob_src_EQ + (integer)ver_dob_src_EN + ((integer)ver_dob_src_TN + (integer)ver_dob_src_TS + (integer)ver_dob_src_TU);
+ 
+  shared iv_bureau_verification_index := map(
+                                             not clam.truedid           => NULL,
+                                             SUM(1*(integer)(max((integer)num_bureau_fname2,(integer)num_bureau_lname2) > 0),
+                                                 2*(integer)(num_bureau_addr2 > 0),
+                                                 4*(integer)(num_bureau_dob2 > 0),
+                                                 8*(integer)(num_bureau_ssn2 > 0)
+                                                )
+                                             );
+  shared integer ssns_per_adl_c6 := clam.velocity_counters.ssns_per_adl_created_6months;
+  shared rv_C15_ssns_per_adl_c6_v2 := if(not clam.truedid,'',(string)min((integer)ssns_per_adl_c6, 999));
+  shared rc_ssndobflag := clam.iid.socsdobflag;  
+  shared rc_pwssndobflag := clam.iid.pwsocsdobflag;
+  shared rv_S65_SSN_Prior_DoB := map(not (ssnlength>0) AND dobpop                                               => '',
+                                     (integer)rc_ssndobflag = 1 or (integer)rc_pwssndobflag = 1                                   => '1',
+                                     (integer)rc_ssndobflag = 0 or (integer)rc_pwssndobflag = 0                                   => '0',
+                                     (integer)rc_ssndobflag in [2,3] or (integer)rc_pwssndobflag = 2                              => '','');
+  export boolean co_tgr_FLA_bureau_no_SSN := ( (integer)iv_bureau_verification_index in [3,5,7] );
+  export boolean sc_tgr_ssn_FS_6mo := ( (integer)rv_C15_ssns_per_adl_c6_v2 > 0 );
+  export boolean sc_tgr_SSN_input_not_best := ( (integer)input_ssn_isbestmatch = 0 );
+  export boolean sc_tgr_SSN_Prior_DoB := ( (integer)rv_S65_SSN_Prior_DoB = 1 );
+  shared ssns_per_adl := clam.velocity_counters.ssns_per_adl;  
+  shared rv_C15_ssns_per_adl := map(not clam.truedid              => '',
+                                    (integer)ssns_per_adl = 0     => '1',
+                                                                     (string)min((integer)ssns_per_adl, 999));
+  export boolean co_tgr_ssns_per_adl := ( (integer)rv_C15_ssns_per_adl > 4 );
+  shared did_count := clam.iid.didcount;
+  export boolean co_did_count := ( (integer)did_count > 14 );
+  export _rc_ssnhighissue := common.sas_date((string)clam.iid.soclhighissue);
+  export ca_M_Snc_SSN_high_Issue := map(not ssnlength>0                             => '-999999999',
+                                        (string)_rc_ssnhighissue='-999999999'       => '-1',
+                                                                             (string)min(truncate((sas_sysdate - _rc_ssnhighissue)/(365.25/12)),999));
+  export boolean co_ssn_high_issue := ((integer)ca_M_Snc_SSN_high_Issue>=0 AND (integer)ca_M_Snc_SSN_high_Issue<= 181);
+  export _beta_cpn_trigger := map((integer)co_tgr_FLA_bureau_no_SSN = 1                                          => '1',
+                               (integer)sc_tgr_ssn_FS_6mo = 1                                                    => '1',
+                               (integer)sc_tgr_SSN_input_not_best = 1                                            => '1',
+                               (integer)sc_tgr_SSN_Prior_DoB = 1                                                 => '1',
+                               (integer)co_tgr_ssns_per_adl = 1                                                  => '1',
+                               (integer)co_did_count = 1                                                         => '1',
+                               (integer)co_ssn_high_issue = 1                                                    => '1',
+                                                                                                                    '0');
+  shared add_input_lres := clam.lres;
+  shared rv_C13_inp_addr_lres := if(not (add_input_pop and clam.truedid), '',(string3)min(add_input_lres,999));
+  shared iv_ssns_per_adl_c6 := if(not clam.truedid,'',(string3)min(ssns_per_adl_c6,999));
+  shared iv_invbest_ssn_ver_lvl := map(not clam.truedid or (integer)input_ssn_isbestmatch in [-3,-1]              => '',
+                                       (integer)input_ssn_isbestmatch = -2                                        => '-1',
+                                       (integer)input_ssn_isbestmatch = 1                                         => '0',
+                                       nas_summary in [4,6,7,9,10,11,12]                                          => '1',
+                                       nas_summary in [0,1,2,3,5,8]                                               => '2','');
+  export addrs_per_adl_c6 := clam.velocity_counters.addrs_per_adl_created_6months;
+  export rv_C14_addrs_per_adl_c6 := if(not clam.truedid,'',(string)min(addrs_per_adl_c6, 999));
+  export attr_total_number_derogs := clam.total_number_derogs;
+  export rv_D30_Derog_Count := if(not clam.truedid,'',(string)min(attr_total_number_derogs, 999));
+  export ssns_per_curraddr_curr := clam.best_flags.ssns_per_curraddr_curr;
+  export nf_ssns_per_curraddr_curr := if(not add_curr_pop or not clam.truedid,'',(string)min(ssns_per_curraddr_curr, 999));
+  export cpn_V01_w := map(nf_fp_varrisktype = ''                  => '0',
+                          (integer)nf_fp_varrisktype = -1         => '0',
+                          (integer)nf_fp_varrisktype <= 2.5       => '-0.1610297463726',
+                          (integer)nf_fp_varrisktype <= 4.5       => '-0.0169779276889365',
+                          (integer)nf_fp_varrisktype <= 6.5       => '0.124913704425163',
+                          (integer)nf_fp_varrisktype <= 7.5       => '0.313619858104828',
+                          (integer)nf_fp_varrisktype <= 8.5       => '0.514956367405795',
+                                                                     '0.978920649449746');
+  export cpn_V02_w := map(nf_inq_ssn_all_inq_diff01 = ''              => '0',
+                          (integer)nf_inq_ssn_all_inq_diff01 = -1     => '-0.182943859631574',
+                          (integer)nf_inq_ssn_all_inq_diff01 <= 0.5   => '-0.0518311019068199',
+                          (integer)nf_inq_ssn_all_inq_diff01 <= 1.5   => '0.00109030800519555',
+                          (integer)nf_inq_ssn_all_inq_diff01 <= 8.5   => '0.586950402063766',
+                                                                         '1.80014636603266');
+  export cpn_V03_w := map(rv_D30_derog_count = ''                 => '0',
+                          (integer)rv_D30_derog_count = -1        => '0',
+                          (integer)rv_D30_derog_count <= 0.5      => '-0.215262384339022',
+                          (integer)rv_D30_derog_count <= 2.5      => '0.125114538371889',
+                          (integer)rv_D30_derog_count <= 3.5      => '0.201291987943776',
+                          (integer)rv_D30_derog_count <= 5.5      => '0.267075622597476',
+                                                                     '0.387392638460348');
+  export cpn_V04_w := map(rv_C13_inp_addr_lres = ''               => '0',
+                          (integer)rv_C13_inp_addr_lres = -1      => '0',
+                          (integer)rv_C13_inp_addr_lres <= 0      => '0.356841031036081',
+                          (integer)rv_C13_inp_addr_lres <= 1.5    => '0.0811055679333489',
+                          (integer)rv_C13_inp_addr_lres <= 5.5    => '0.0551395377705543',
+                          (integer)rv_C13_inp_addr_lres <= 41.5   => '0.0175617099958703',
+                                                                     '-0.226272718187654');
+  export cpn_V05_w := map(nf_fp_srchfraudsrchcountyr = ''             => '0',
+                          (integer)nf_fp_srchfraudsrchcountyr = -1    => '0',
+                          (integer)nf_fp_srchfraudsrchcountyr <= 0.5  => '-0.125206134183123',
+                          (integer)nf_fp_srchfraudsrchcountyr <= 1.5  => '-0.0671428349161602',
+                          (integer)nf_fp_srchfraudsrchcountyr <= 3.5  => '0.0682933225580231',
+                          (integer)nf_fp_srchfraudsrchcountyr <= 5.5  => '0.277396933594686',
+                          (integer)nf_fp_srchfraudsrchcountyr <= 8.5  => '0.344151614729489',
+                          (integer)nf_fp_srchfraudsrchcountyr <= 14.5 => '0.465138525274812',
+                                                                         '0.99525027296505');
+  export cpn_V06_w := map(nf_ssns_per_curraddr_curr = ''              => '0',
+                          (integer)nf_ssns_per_curraddr_curr = -1     => '0',
+                          (integer)nf_ssns_per_curraddr_curr <= 2.5   => '-0.191759621106716',
+                          (integer)nf_ssns_per_curraddr_curr <= 4.5   => '0.0189311295436465',
+                          (integer)nf_ssns_per_curraddr_curr <= 11.5  => '0.213170831484719',
+                                                                         '0.609594116375686');
+  export cpn_V07_w := map(iv_ssns_per_adl_c6 = ''                     => '0',
+                          (integer)iv_ssns_per_adl_c6 = -1            => '0',
+                          (integer)iv_ssns_per_adl_c6 <= 0.5          => '-0.178270392410128',
+                                                                         '0.21121941157594');
+  export cpn_V08_w := map(nf_link_candidate_cnt = ''                  => '0',
+                          (integer)nf_link_candidate_cnt = -1         => '0',
+                          (integer)nf_link_candidate_cnt <= 1.5       => '-0.17838358767407',
+                          (integer)nf_link_candidate_cnt <= 2.5       => '-0.0555551992586311',
+                          (integer)nf_link_candidate_cnt <= 3.5       => '0.094732779184005',
+                          (integer)nf_link_candidate_cnt <= 12.5      => '0.173711678356423',
+                                                                         '0.224678536234458');
+  export cpn_V09_w := map(iv_invbest_ssn_ver_lvl = ''                 => '0',
+                          (integer)iv_invbest_ssn_ver_lvl = -1        => '0',
+                          (integer)iv_invbest_ssn_ver_lvl <= 0.5      => '-0.109729636830036',
+                          (integer)iv_invbest_ssn_ver_lvl <= 1.5      => '0.159738327173047',
+                                                                         '0.465439046604982');
+  export cpn_V10_w := map(rv_C14_addrs_per_adl_c6 = ''                => '0',
+                          (integer)rv_C14_addrs_per_adl_c6 = -1       => '0',
+                          (integer)rv_C14_addrs_per_adl_c6 <= 0.5     => '-0.0401961782555193',
+                          (integer)rv_C14_addrs_per_adl_c6 <= 1.5     => '0.0175681531169292',
+                          (integer)rv_C14_addrs_per_adl_c6 <= 2.5     => '0.0806337254904368',
+                                                                         '1.01393531686476');
+  export cpn_lgt := -3.31991613722728 + sum((real)cpn_V01_w,(real)cpn_V02_w,(real)cpn_V03_w,(real)cpn_V04_w,(real)cpn_V05_w,(real)cpn_V06_w,(real)cpn_V07_w,(real)cpn_V08_w,(real)cpn_V09_w,(real)cpn_V10_w);
+  export cpn_score := round(min(max(700 + -50 * (((real)cpn_lgt - ln(0.0263372805226623)) / ln(2)), 300), 999));
+export string2 cpnindex := map(_beta_cpn_trigger = '0'                => '1',
+                               cpn_score >= 300 AND cpn_score <= 505  => '9',
+                               cpn_score >= 506 AND cpn_score <= 534  => '8',
+                               cpn_score >= 535 AND cpn_score <= 611  => '7',
+                               cpn_score >= 612 AND cpn_score <= 653  => '6',
+                               cpn_score >= 654 AND cpn_score <= 684  => '5',
+                               cpn_score >= 685 AND cpn_score <= 728  => '4',
+                               cpn_score >= 729 AND cpn_score <= 757  => '3',
+                               cpn_score >= 758 AND cpn_score <= 999  => '2','');
+export string2 cpn_trigger := map((integer)co_tgr_FLA_bureau_no_SSN = 1                   => '1',
+                                  (integer)sc_tgr_ssn_FS_6mo = 1                          => '1',
+                                  (integer)sc_tgr_SSN_input_not_best = 1                  => '1',
+                                  (integer)sc_tgr_SSN_Prior_DoB = 1                       => '1',
+                                  (integer)co_tgr_ssns_per_adl = 1                        => '1',
+                                  (integer)co_did_count = 1                               => '1',
+                                  (integer)co_ssn_high_issue = 1                          => '1',
+                                                                                             '0');
+// VERSION 2.03
+// export attr_clam := clam;
+// WAITING ON SAS CODE FOR 203 ATTRIBUTES
+export string3 ver_ssn_sources_first_seen := '';
+export string3 adls_per_ssn_and_first_seen_date := '';
 END;

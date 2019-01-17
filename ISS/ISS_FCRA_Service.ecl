@@ -309,7 +309,8 @@ export ISS_FCRA_Service := MACRO
 																		datarestriction,
 																		AppendBest,
 																		BSOptions,
-																		datapermission
+																		datapermission,
+                                    IntendedPurpose := optionsIn.IntendedPurpose
 																	);
 	
 	

@@ -1,4 +1,4 @@
-import lib_ziplib,ut,header,mdr,drivers,suppress, Doxie,doxie_crs,AutoStandardI,Infutor;
+import doxie_raw, ut, header, suppress, Doxie, Infutor;
 
 inrec := doxie_raw.Layout_HeaderRawBatchInput;
 outrec := inrec;
@@ -8,7 +8,10 @@ export Header_Raw_batch(
 	) := 
 FUNCTION
 
-is_knowx := ut.IndustryClass.is_knowx;
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
+
+is_knowx := mod_access.isConsumer ();
+
 kh := IF(is_knowx,Infutor.Key_Header_Infutor_Knowx,Doxie.Key_Header);
 
 
@@ -29,8 +32,8 @@ Fetch1_MACRO(key,fetch_out) := MACRO
 #uniquename(getHeader)
 midrec %getHeader%(inputs l, key fileR) := TRANSFORM
   self := fileR;
-	self.glb_ok := ut.glb_ok(l.input.glb_purpose);
-	self.dppa_ok := ut.dppa_ok(l.input.dppa_purpose);
+	self.glb_ok := doxie.compliance.glb_ok(l.input.glb_purpose);
+	self.dppa_ok := doxie.compliance.dppa_ok(l.input.dppa_purpose);
 	self.input := l.input;
 	self := l.input;
 	self := [];
@@ -45,16 +48,17 @@ Fetch1_MACRO(Infutor.Key_Header_Infutor_Knowx,infr_out)
 Fetch1_MACRO(doxie.Key_Header,hdr_out)
 fetch1 := if(is_knowx,infr_out,hdr_out);
 
-//used in MAC_GLbClean		
-string5 industry_class_value := '';
-boolean no_scrub := false;
+mod_access_local := MODULE (mod_access)
+  EXPORT string5 industry_class := '';
+  EXPORT boolean no_scrub := FALSE;
+END;  
 
-header.MAC_GlbClean_Header(Fetch1,Fetched10,true);
+header.MAC_GlbClean_Header(Fetch1,Fetched10,true, , mod_access_local);
 
 fetched := fetched10(dateVal = 0 OR dt_first_seen <= dateVal);
 
 suppress.MAC_Mask(fetched,out_mskd,ssn,blank,true,false,true,true);
-doxie.mac_HeaderDates(out_mskd,out_hd,true)
+doxie.mac_HeaderDates(out_mskd, out_hd, mod_access, , true);
 
 ut.MAC_Slim_Back(out_hd, outrec, outf);
 

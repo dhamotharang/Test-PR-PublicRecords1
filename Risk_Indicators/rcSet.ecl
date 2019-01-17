@@ -45,6 +45,9 @@ export isCode24(STRING inAddr, STRING inSSN, UNSIGNED1 combolastcount, UNSIGNED1
 																									combolastcount>0 AND comboaddrcount=0 AND combossncount=0;
 export isCode25(STRING inAddr, UNSIGNED1 combolastcount, UNSIGNED1 comboaddrcount, UNSIGNED1 combohphonecount, UNSIGNED1 combossncount) := inAddr<>'' and comboaddrcount=0 and 
 																					~(combolastcount=0 and comboaddrcount=0 and combohphonecount=0 and combossncount=0);// not rc19
+// reason codes for chase custom model
+export isCode25Chase(STRING inAddr, UNSIGNED1 combolastcount, boolean veraddr, UNSIGNED1 comboaddrcount, UNSIGNED1 combohphonecount, UNSIGNED1 combossncount) := inAddr<>'' and  veraddr = TRUE and 
+																					~(combolastcount=0 and comboaddrcount=0 and combohphonecount=0 and combossncount=0);// not rc19
 
 // legacy products which had 23, 24 and 26 in the same set, so this was coded to not return 26 if 23 or 24 were already returned in that set
 // in a new set which doesn't include 23 and 24, trigger 26 based on just the unverified SSN by itself
@@ -70,6 +73,11 @@ export isCode35 := false;
 export isCode36(STRING2 rc) := rc='00';
 export isCode37(STRING inLast, UNSIGNED1 combolastcount, UNSIGNED1 comboaddrcount, UNSIGNED1 combohphonecount, UNSIGNED1 combossncount) := inLast<>'' and combolastcount=0 and 
 																				~(combolastcount=0 AND comboaddrcount=0 AND combohphonecount=0 AND combossncount=0);// not rc19
+// reason codes for chase custom model
+EXPORT isCod37Chase (STRING inLast, boolean verlast,  UNSIGNED1 combolastcount,  UNSIGNED1 comboaddrcount, UNSIGNED1 combohphonecount, UNSIGNED1 combossncount) := inLast<>'' and verlast = TRUE and 
+																						~(combolastcount=0 AND comboaddrcount=0 AND combohphonecount=0 AND combossncount=0);// not rc19;
+
+
 export isCode38(STRING altlast, UNSIGNED1 socscount, UNSIGNED1 lastcount, STRING altlast2, boolean miskeylast) := (altlast<>'' and socscount>0 and lastcount>0 and ~miskeylast) OR (altlast2<>'');
 export isCode39(string lowissue, unsigned3 historydate) := ((integer)(risk_indicators.iid_constants.myGetDate(historydate)[1..6]) - (INTEGER)(lowissue[1..6])) < 100;
 export isCode40(STRING zipclass) := zipclass = 'U' or zipclass = 'M';
@@ -89,6 +97,9 @@ export isCode47(string phoneaddr, string veraddr, string phonecmpy, string vercm
 																		 phoneaddr<>'' and veraddr<>'' and 100-MAX(ut.StringSimilar100(phoneaddr, veraddr),ut.StringSimilar100(veraddr, phoneaddr))<80 => true,
 																		 false);// input phone assoc with different business name or address 
 export isCode48(string inFirst, unsigned1 combofirstcount, unsigned1 combolastcount) := combolastcount >= 1 AND combofirstcount = 0 AND inFirst <> '';
+// reason codes for chase custom model
+EXPORT isCode48Chase (string inFirst, boolean verfirst, boolean verlast, unsigned1 combolastcount,  unsigned1 combofirstcount):= verlast = FALSE AND combolastcount >= 1 AND ( verfirst = TRUE or combofirstcount = 0) AND inFirst <> '';   
+
 export isCode49(unsigned3 disthphoneaddr) := disthphoneaddr > 10 AND disthphoneaddr <> 9999;
 export isCode50(STRING hriskaddrflag, STRING hrisksic, STRING hriskphoneflag, STRING hrisksicphone) := (hriskaddrflag='4' AND hrisksic = '2225') /*OR (hriskphoneflag='6' AND hrisksicphone = '2225')*/;													  
 export isCode51(string inLast, string inSSN, boolean lastssnmatch2, unsigned1 socslevel, boolean ssnExists) := inLast <> '' and LENGTH(Stringlib.StringFilter(inSSN,'0123456789'))=9 and ~lastssnmatch2 and socslevel in [1,2,3,4,5,6,8,10] and ssnexists;
@@ -465,5 +476,6 @@ EXPORT isCodeOS_O5(unsigned2 btst_did_summary) := btst_did_summary = 0;
 EXPORT isCodeOS_O6(unsigned2 btst_did_summary) := btst_did_summary = 1;
 //WC7 = btst_did_summary = 2;	
 EXPORT isCodeOS_O7(unsigned2 btst_did_summary) := btst_did_summary = 2;
+
 
 END;

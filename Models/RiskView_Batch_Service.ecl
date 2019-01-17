@@ -26,6 +26,7 @@
 	<part name="DataRestrictionMask" type="xsd:string"/>
 	<part name="DataPermissionMask" type="xsd:string"/>
 	<part name="FFDOptionsMask"	type="xsd:string"/>	
+	<part name="IntendedPurpose"	type="xsd:string"/>	
 </message>
 */
 /*--INFO-- Contains RiskView Scores AirWaves, Auto, Bankcard, Retail, Money and Pre-Screen and Attributes Versions 1 and 2*/
@@ -107,7 +108,8 @@ export RiskView_Batch_Service := MACRO
 		'IncludeVersion3',
 		'IncludeVersion4',
 		'IsPreScreen',
-		'FFDOptionsMask'
+		'FFDOptionsMask',
+    'IntendedPurpose'
 	));
 
 VALIDATING := False;
@@ -148,7 +150,7 @@ boolean	IsPreScreenTemp := false					: stored('IsPreScreen');
 integer FlagshipVersion := 1            	: stored('FlagshipVersion');
 string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 string50 DataPermission  := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
-
+string IntendedPurpose := ''					: stored('IntendedPurpose');
 STRING  strFFDOptionsMask_in	 :=  '0' : STORED('FFDOptionsMask');
 boolean OutputConsumerStatements := strFFDOptionsMask_in[1] = '1';	
 
@@ -379,14 +381,14 @@ clam := Risk_Indicators.Boca_Shell_Function_FCRA(cleanIn, gateways, dppa, glba, 
 																								 suppressNearDups, fromBIID, excludeWatchlists, fromIT1O,
 																								 ofacVersion, includeOfac, includeAddWatchlists, watchlistThreshold,
 																								 bsVersion, isPreScreen, doScore, nugen, ADL_Based_Shell:=false,datarestriction:=DataRestriction,
-																								 BSOptions:=BSOptions, datapermission:=DataPermission);
+																								 BSOptions:=BSOptions, datapermission:=DataPermission, IntendedPurpose:=IntendedPurpose	);
 
 adl_clam := Risk_Indicators.Boca_Shell_Function_FCRA(cleanIn, gateways, dppa, glba, isUtility, isLN, 
 																								 require2ele, doRelatives, doDL, doVehicle, doDerogs, ofacOnly,
 																								 suppressNearDups, fromBIID, excludeWatchlists, fromIT1O,
 																								 ofacVersion, includeOfac, includeAddWatchlists, watchlistThreshold,
 																								 bsVersion, isPreScreen, doScore, nugen, ADL_Based_Shell:=true,datarestriction:=DataRestriction,
-																								 BSOptions:=BSOptions, datapermission:=DataPermission);
+																								 BSOptions:=BSOptions, datapermission:=DataPermission, IntendedPurpose:=IntendedPurpose	);
 
 
 Risk_Indicators.Layout_Bocashell_with_Custom getcustom(Risk_Indicators.Layout_Boca_Shell le, risk_indicators.Layout_Batch_In_Plus_Custom ri) := Transform
@@ -1560,7 +1562,7 @@ Layout_working intoAttributes(attr le) := TRANSFORM
 	self.v4_SecurityFreeze	:= if(doVersion4, le.v4_SecurityFreeze	, '');
 	self.v4_SecurityAlert	:= if(doVersion4, le.v4_SecurityAlert	, '');
 	self.v4_IDTheftFlag	:= if(doVersion4, le.v4_IDTheftFlag	, '');
-	self.v4_ConsumerStatement	:= if(doVersion4, le.v4_ConsumerStatement	, '');
+	self.v4_ConsumerStatement	:= if(doVersion4 OR le.v4_ConsumerStatement='1', le.v4_ConsumerStatement	, '');  // version 3 doesn't have consumer statement attribute, so re-use the version4 attribute to suppress version 3 attributes if consumer statement=1
 	self.v4_PrescreenOptOut	:= if(doVersion4, le.v4_PrescreenOptOut	, '');
 
 	self := [];
@@ -1597,7 +1599,7 @@ Layout_working blankAttributes(attributes_temp le) := TRANSFORM
 	self.index4 := le.index4;
 	self.index5 := le.index5;
 	
-	self.isNoVer := if(doVersion3 and ExperianTransaction, le.isNoVer, '');
+	self.isNoVer := if(doVersion3, le.isNoVer, '');
 	self.v4_VerificationFailure := if(doVersion4 and ExperianTransaction, le.v4_VerificationFailure, '');
 	
 	SELF := [];

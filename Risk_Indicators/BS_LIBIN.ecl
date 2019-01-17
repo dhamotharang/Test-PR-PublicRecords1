@@ -34,5 +34,6 @@
 	export string50 bs_DataPermission := risk_indicators.iid_constants.default_DataPermission;
 	export boolean IN_isDirectToConsumer := false;
 	export boolean bs_IncludeLnJ := false;
- export integer2 bs_ReportingPeriod := 84;
+  export integer2 bs_ReportingPeriod := 84;
+  export string100 bs_IntendedPurpose := '';
 END;
