@@ -55,13 +55,13 @@ built := sequential(
 									build_email_base
 									,build_email_base_fcra
 									,Build_all_keys
-									// ,zDoPopulationStats
-									// ,zDoPopulationVendorStats
-									// ,output(SampleRecs)
-									// ,dops_update
-									// ,orbit_update
-									);	//:success(Email_Datav2.Send_Email(Version).Build_Success)
-										//,failure(Email_Datav2.Send_Email(Version).Build_Failure);
+									,zDoPopulationStats
+									,zDoPopulationVendorStats
+									,output(SampleRecs)
+									,dops_update
+									,orbit_update
+									) :success(Email_Datav2.Send_Email(Version).Build_Success)
+										,failure(Email_Datav2.Send_Email(Version).Build_Failure);
 
 RETURN built;
 

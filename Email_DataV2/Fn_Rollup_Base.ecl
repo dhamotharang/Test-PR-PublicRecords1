@@ -69,29 +69,5 @@ Rollup_file   := ROLLUP(current_and_prev_s, tRollup(LEFT, RIGHT),
 												
 pBaseOut	:= PROJECT(Rollup_file, TRANSFORM(Email_DataV2.Layouts.Base_BIP, SELF := LEFT));
 												
-//No longer required as records are no longer rolled up across sources
-/*
-//*****append num dids per email and num emails per did (including did = 0)
-dids_email_dedp   := DEDUP(SORT(DISTRIBUTE(Rollup_file,HASH(clean_email)), did, clean_email, did, LOCAL), did, clean_email, LOCAL);
-
-
-append_emails_per_did  := JOIN(DISTRIBUTE(Rollup_file(did > 0), HASH(did)),
-                               DISTRIBUTE(num_emails_per_did, HASH(did)),
-															 LEFT.did = RIGHT.did,
-															 TRANSFORM(RECORDOF(email_in),
-																				 SELF.num_email_per_did := RIGHT.cnt,
-																				 SELF := LEFT),
-															LEFT OUTER,
-															LOCAL);
-
-append_dids_per_email  := JOIN(DISTRIBUTE(Rollup_file(did = 0) + append_emails_per_did, HASH(clean_email)),
-                               DISTRIBUTE(num_dids_per_email , HASH(clean_email)),
-															 LEFT.clean_email = RIGHT.clean_email,
-															 TRANSFORM(RECORDOF(email_in),
-																				 SELF.num_did_per_email  := RIGHT.cnt,
-																				 SELF := LEFT),
-															LEFT OUTER,
-															LOCAL);
-*/															 		
 RETURN pBaseOut;
 END;

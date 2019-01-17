@@ -28,7 +28,7 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_email.Key_Did(TRUE),
 																					 fcra_did_key);
 
 RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_email.Key_email_payload(TRUE),
-																					 Email_DataV2.Files.DID_FCRA,
+																					 Email_DataV2.Files.Payload_FCRA,
 																					 '~thor_200::key::email_dataV2::fcra::@version@::payload',
 																					 '~thor_200::key::email_dataV2::fcra::'+(string)filedate + '::payload',
 																					 fcra_payload_key);

@@ -11,6 +11,7 @@ EXPORT rules_bitmap_code(string rules = '')  := MAP(
 																										rules = 'missing_username'										=> ut.bit_set(0,4),
 																										rules = 'missing_@_symbol'										=> ut.bit_set(0,5),
 																										rules = 'dod_b4_email'												=> ut.bit_set(0,6),
+																										rules = 'invalid_account'											=> ut.bit_set(0,7),
 																										0);
 
 //Testing if bitmap is set
@@ -22,13 +23,14 @@ END;
 EXPORT	STRING	fGet_rules_from_bitmap(unsigned bitmap_rules) := FUNCTION
 		STRING		translated_value	:=	IF(bitmap_rules = 0,
 																			'',											   
-																		IF(fFlagIsOn(bitmap_rules, rules_bitmap_code('invalid_domain_ext')),			' ' + 'Invalid_Domain_ext','')
-																+	  IF(fFlagIsOn(bitmap_rules, rules_bitmap_code('missing_domain_ext')),			' ' + 'Missing_Domain_ext','')
-																+	  IF(fFlagIsOn(bitmap_rules, rules_bitmap_code('invalid_domain')),					' ' + 'Invalid_Domain','')
-																+	  IF(fFlagIsOn(bitmap_rules, rules_bitmap_code('invalid_email')),						' ' + 'Invalid_email','')
-																+	  IF(fFlagIsOn(bitmap_rules, rules_bitmap_code('missing_username')),				' ' + 'Missing_username','')
-																+	  IF(fFlagIsOn(bitmap_rules, rules_bitmap_code('missing_@_symbol')),				' ' + 'Missing_@_symbol','')
-																+	  IF(fFlagIsOn(bitmap_rules, rules_bitmap_code('dod_b4_email')),						' ' + 'DOD_b4_email','')
+																		IF(fFlagIsOn(bitmap_rules, rules_bitmap_code('invalid_domain_ext')),			' ' + 'invalid_domain_ext','')
+																+	  IF(fFlagIsOn(bitmap_rules, rules_bitmap_code('missing_domain_ext')),			' ' + 'missing_domain_ext','')
+																+	  IF(fFlagIsOn(bitmap_rules, rules_bitmap_code('invalid_domain')),					' ' + 'invalid_domain','')
+																+	  IF(fFlagIsOn(bitmap_rules, rules_bitmap_code('invalid_email')),						' ' + 'invalid_email','')
+																+	  IF(fFlagIsOn(bitmap_rules, rules_bitmap_code('missing_username')),				' ' + 'missing_username','')
+																+	  IF(fFlagIsOn(bitmap_rules, rules_bitmap_code('missing_@_symbol')),				' ' + 'missing_@_symbol','')
+																+	  IF(fFlagIsOn(bitmap_rules, rules_bitmap_code('dod_b4_email')),						' ' + 'dod_b4_email','')
+																+	  IF(fFlagIsOn(bitmap_rules, rules_bitmap_code('invalid_account')),					' ' + 'invalid_account','')
 																			);
 RETURN		lib_stringlib.stringlib.stringfindreplace(trim(lib_stringlib.stringlib.stringcleanspaces(translated_value),left,right),'  ',' ');
 END;
