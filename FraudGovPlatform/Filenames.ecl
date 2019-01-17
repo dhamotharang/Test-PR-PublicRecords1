@@ -8,13 +8,13 @@ export Filenames(
 ) :=
 module
 
-	Shared FraudGov_Prefix (string pType):= FraudGovPlatform._Dataset(false).thor_cluster_Files + pType +'::' + FraudGovPlatform._Dataset(false).name + '::' ;
+	Shared FraudGov_Prefix (string pType):= FraudGovPlatform._Dataset(false).thor_cluster_Files + pType +'::';
 
 	//////////////////////////////////////////////////////////////////
 	// -- Sprayed Filename Versions
 	//////////////////////////////////////////////////////////////////
 	export Sprayed := module
-		export FileSprayed 	:= 	_Dataset().thor_cluster_Files +'in::'+_Dataset().Name;
+		export FileSprayed 	:= 	_Dataset().thor_cluster_Files +'in';
 		
 		export _IdentityDataPassed := FileSprayed+'::Passed::IdentityData';
 		export _IdentityDataRejected := FileSprayed+'::Rejected::IdentityData';
