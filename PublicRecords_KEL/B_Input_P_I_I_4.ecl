@@ -1,11 +1,11 @@
 ﻿//HPCC Systems KEL Compiler Version 0.11.6
 IMPORT KEL011 AS KEL;
-IMPORT B_Input_P_I_I_5,CFG_Compile,E_Person,FN_Compile FROM PublicRecords_KEL;
+IMPORT CFG_Compile,E_Input_P_I_I,E_Person,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Input_P_I_I_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
-  SHARED VIRTUAL TYPEOF(B_Input_P_I_I_5(__in,__cfg).__ENH_Input_P_I_I_5) __ENH_Input_P_I_I_5 := B_Input_P_I_I_5(__in,__cfg).__ENH_Input_P_I_I_5;
-  SHARED __EE26921 := __ENH_Input_P_I_I_5;
-  EXPORT __ST23449_Layout := RECORD
+  SHARED VIRTUAL TYPEOF(E_Input_P_I_I(__in,__cfg).__Result) __E_Input_P_I_I := E_Input_P_I_I(__in,__cfg).__Result;
+  SHARED __EE23348 := __E_Input_P_I_I;
+  EXPORT __ST21093_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nstr Input_Account_Echo_;
@@ -65,28 +65,13 @@ EXPORT B_Input_P_I_I_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nint Bus_Input_U_I_D_Append_;
     KEL.typ.nint Rep_Number_;
     KEL.typ.bool Addr_Not_Populated_ := FALSE;
-    KEL.typ.nstr Input_Address_Suffix_Clean_Value_;
-    KEL.typ.nstr Input_Post_Direction_Clean_Value_;
-    KEL.typ.nstr Input_Pre_Direction_Clean_Value_;
-    KEL.typ.nstr Input_Primary_Name_Clean_Value_;
-    KEL.typ.nstr Input_Primary_Range_Clean_Value_;
-    KEL.typ.nstr Input_Secondary_Range_Clean_Value_;
-    KEL.typ.nstr Input_Unit_Desig_Clean_Value_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST23449_Layout __ND26994__Project(B_Input_P_I_I_5(__in,__cfg).__ST23585_Layout __PP26555) := TRANSFORM
-    __CC2993 := '-99999';
-    __CC2998 := '-99998';
-    SELF.Input_Address_Suffix_Clean_Value_ := IF(__PP26555.Addr_Not_Populated_,__ECAST(KEL.typ.nstr,__CN(__CC2993)),__ECAST(KEL.typ.nstr,FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP26555.Input_Address_Suffix_Clean_),__ECAST(KEL.typ.nstr,__CN(__CC2998)))));
-    SELF.Input_Post_Direction_Clean_Value_ := IF(__PP26555.Addr_Not_Populated_,__ECAST(KEL.typ.nstr,__CN(__CC2993)),__ECAST(KEL.typ.nstr,FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP26555.Input_Post_Direction_Clean_),__ECAST(KEL.typ.nstr,__CN(__CC2998)))));
-    SELF.Input_Pre_Direction_Clean_Value_ := IF(__PP26555.Addr_Not_Populated_,__ECAST(KEL.typ.nstr,__CN(__CC2993)),__ECAST(KEL.typ.nstr,FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP26555.Input_Pre_Direction_Clean_),__ECAST(KEL.typ.nstr,__CN(__CC2998)))));
-    SELF.Input_Primary_Name_Clean_Value_ := IF(__PP26555.Addr_Not_Populated_,__ECAST(KEL.typ.nstr,__CN(__CC2993)),__ECAST(KEL.typ.nstr,FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP26555.Input_Primary_Name_Clean_),__ECAST(KEL.typ.nstr,__CN(__CC2998)))));
-    SELF.Input_Primary_Range_Clean_Value_ := IF(__PP26555.Addr_Not_Populated_,__ECAST(KEL.typ.nstr,__CN(__CC2993)),__ECAST(KEL.typ.nstr,FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP26555.Input_Primary_Range_Clean_),__ECAST(KEL.typ.nstr,__CN(__CC2998)))));
-    SELF.Input_Secondary_Range_Clean_Value_ := IF(__PP26555.Addr_Not_Populated_,__ECAST(KEL.typ.nstr,__CN(__CC2993)),__ECAST(KEL.typ.nstr,FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP26555.Input_Secondary_Range_Clean_),__ECAST(KEL.typ.nstr,__CN(__CC2998)))));
-    SELF.Input_Unit_Desig_Clean_Value_ := IF(__PP26555.Addr_Not_Populated_,__ECAST(KEL.typ.nstr,__CN(__CC2993)),__ECAST(KEL.typ.nstr,FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP26555.Input_Unit_Desig_Clean_),__ECAST(KEL.typ.nstr,__CN(__CC2998)))));
-    SELF := __PP26555;
+  SHARED __ST21093_Layout __ND23346__Project(E_Input_P_I_I(__in,__cfg).Layout __PP23037) := TRANSFORM
+    SELF.Addr_Not_Populated_ := IF(FN_Compile.FN_Addr_Not_Populated_Check(__ECAST(KEL.typ.nstr,__PP23037.Input_Street_Echo_),__ECAST(KEL.typ.nstr,__PP23037.Input_City_Echo_),__ECAST(KEL.typ.nstr,__PP23037.Input_State_Echo_),__ECAST(KEL.typ.nstr,__PP23037.Input_Zip_Echo_)),TRUE,FALSE);
+    SELF := __PP23037;
   END;
-  EXPORT __ENH_Input_P_I_I_4 := PROJECT(__EE26921,__ND26994__Project(LEFT));
+  EXPORT __ENH_Input_P_I_I_4 := PROJECT(__EE23348,__ND23346__Project(LEFT));
 END;
