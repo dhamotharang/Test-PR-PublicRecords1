@@ -98,7 +98,7 @@ EXPORT Functions := MODULE
 
 		slim_knownrisk_rec := RECORD
 			STRING20 acctno;
-			STRING250 known_risk_reason;
+			STRING100 known_risk_reason;
 			STRING8 event_date;
 			STRING30 event_type;
 		END;

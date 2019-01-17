@@ -39,11 +39,11 @@ EXPORT Layouts := MODULE
     STRING100 velocity_exceeded_reason3;
     
 		 unsigned4 known_risks_cnt := 0;            
-    string250 known_risk_reason1 := '';
-    string250 known_risk_reason2 := '';
-    string250 known_risk_reason3 := '';
-    string250 Known_risk_reason4 := '';
-    string250 Known_risk_reason5 := '';				
+    string100 known_risk_reason1 := '';
+    string100 known_risk_reason2 := '';
+    string100 known_risk_reason3 := '';
+    string100 Known_risk_reason4 := '';
+    string100 Known_risk_reason5 := '';				
   END;
 	
 	EXPORT Layout_InstandID_NuGenExt := record

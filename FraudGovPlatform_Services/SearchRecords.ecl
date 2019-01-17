@@ -29,7 +29,6 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	adl_did_best := JOIN(ds_GovBest(Name.Last <> '' OR ssn <> ''), ds_input_with_adl_did, LEFT.UniqueId = (STRING)RIGHT.did);
 	
 	EXPORT BOOLEAN adlDIDFound := EXISTS(adl_did_best(UniqueId <> ''));
-	// EXPORT BOOLEAN adlDIDFound := EXISTS(ds_GovBest(Name.Last <> '' OR ssn <> '')) AND EXISTS(ds_input_with_adl_did(did > 0));
 	
 	ds_batch_in_without_did := PROJECT(ds_batch_in,TRANSFORM(FraudShared_Services.Layouts.BatchInExtended_rec,
 																														SELF.did := 0,
