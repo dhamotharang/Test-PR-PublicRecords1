@@ -1,4 +1,4 @@
-
+﻿
 // Verifies that spray data exists and then sprays the ecm (Enterprise Company Management) 
 // file to the specified pseudo environment then rolls the exisitng files
 // (deletes the grandfather version then moves father version to grandfather,
@@ -42,7 +42,8 @@ EXPORT fn_update_ecm_file(UNSIGNED1 pseudo_environment,
 					'|',                                // srcCSVseparator
 					,                                   // srcCSVterminator
 					',',                                // srcCSVquote
-					constants.spray_groupname,          // destinationgroup
+					if(AccountMonitoring.constants.spray_groupname = 'thor400_dev' or 
+					   AccountMonitoring.constants.spray_groupname = 'thor400_dev_eclcc', 'thor400_dev01', AccountMonitoring.constants.spray_groupname),            // destinationgroup
 					logical_file_name,                  // destinationlogicalfilename
 					,,,ALLOW_OVERWRITE,,COMPRESS)));
 			END;
