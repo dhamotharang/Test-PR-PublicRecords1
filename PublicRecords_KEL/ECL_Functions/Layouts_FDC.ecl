@@ -49,10 +49,6 @@ EXPORT Layouts_FDC(PublicRecords_KEL.Interface_Options Options = PublicRecords_K
 		RECORDOF(Doxie_Files.Key_Offenses);
 	END;	
 	
-	// EXPORT Layout_Doxie_Files__Key_BocaShell_Crim2 := RECORD
-		// LayoutIDs;
-		// RECORDOF(Doxie_Files.Key_BocaShell_Crim2);
-	// END;
 	EXPORT Layout_Doxie_Files__Key_Offenders_Risk := RECORD
 		LayoutIDs;
 		RECORDOF(Doxie_Files.Key_Offenders_Risk);
@@ -79,19 +75,6 @@ EXPORT Layouts_FDC(PublicRecords_KEL.Interface_Options Options = PublicRecords_K
 		BOOLEAN FCRAWithdrawn := FALSE;
 	END;	
 
-	SHARED BankruptcyV3__key_bankruptcyV3_main_full := BankruptcyV3.key_bankruptcyV3_main_full(Options.IsFCRA);
-	EXPORT Layout_Bankruptcy__Key_bankruptcy_main_denorm := RECORD
-		LayoutIDs;
-		RECORDOF(BankruptcyV3__key_bankruptcyV3_main_full);
-	END;		
-	
-	EXPORT Layout_Bankruptcy__Key_bankruptcy_main_full := RECORD
-		LayoutIDs;
-		RECORDOF(BankruptcyV3__key_bankruptcyV3_main_full) AND NOT [Status,Comments]; // Changing layout to normalize child dataset Criminal_Count
-		RECORDOF(BankruptcyV3__key_bankruptcyV3_main_full.Status);
-		STRING8  comment_filing_date := '';
-		STRING30 comment_description := ''; 
-	END;
 
 	EXPORT Layout_FDC := RECORD
 		LayoutIDs;
@@ -102,12 +85,10 @@ EXPORT Layouts_FDC(PublicRecords_KEL.Interface_Options Options = PublicRecords_K
 		DATASET(Layout_Doxie_Files__Key_Offenders) Dataset_Doxie_Files__Key_Offenders;
 		DATASET(Layout_Doxie_files__Key_Court_Offenses) Dataset_Doxie_files__Key_Court_Offenses;
 		DATASET(Layout_Doxie_Files__Key_Offenses) Dataset_Doxie_Files__Key_Offenses;
-		// DATASET(Layout_Doxie_Files__Key_BocaShell_Crim2) Dataset_Doxie_Files__Key_BocaShell_Crim2;
 		DATASET(Layout_Doxie_Files__Key_Offenders_Risk) Dataset_Doxie_Files__Key_Offenders_Risk;
 		DATASET(Layout_Doxie_Files__Key_Punishment) Dataset_Doxie_Files__Key_Punishment;
 		// Bankruptcy
 		DATASET(Layout_BankruptcyV3__key_bankruptcyv3_search) Dataset_Bankruptcy_Files__Key_Search;
-		DATASET(Layout_Bankruptcy__Key_bankruptcy_main_full) Dataset_Bankruptcy_Files__Key_Main_Full;
 	END;
 	
 END;
