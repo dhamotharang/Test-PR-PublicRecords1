@@ -1,35 +1,35 @@
 ﻿IMPORT tools,STD, FraudGovPlatform_Validation, FraudShared, ut;
 EXPORT Build_Input_IdentityData(
 	 string			pversion
-	,boolean		PSkipIdentityData	= false 
-	,boolean		PSkipNAC			= false	 
-	,boolean		PSkipDeltabase		= false	 
-	,boolean		PSkipInquiryLogs	= false	 
-	,boolean		PSkipValidations	= false
+	,dataset(Layouts.OutputF.SkipModules) pSkipModules = FraudGovPlatform.Files().OutputF.SkipModules
+	,boolean		PSkipValidations = false	 
 ) :=
 module
+
+	shared SkipNACBuild := pSkipModules[1].SkipNACBuild;
+	shared SkipInquiryLogsBuild := pSkipModules[1].SkipInquiryLogsBuild;
 
 	SHARED fn_dedup(inputs):=FUNCTIONMACRO
 		in_srt:=sort(inputs, RECORD, EXCEPT processdate);
 		in_ddp:=rollup(in_srt,
-								TRANSFORM(Layouts.Input.IdentityData,SELF := LEFT; SELF := []),
-								RECORD,
-								EXCEPT ProcessDate);	
+		TRANSFORM(Layouts.Input.IdentityData,SELF := LEFT; SELF := []),
+			RECORD,
+			EXCEPT ProcessDate);	
 		return in_ddp;
 	ENDMACRO;	
 	
-	inIdentityDataUpdate :=	  if( nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.IdentityData)) > 0 and PSkipIdentityData = false, 
-													Files(pversion).Sprayed.IdentityData, 
-													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
-											)   
-											+ if (nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.NAC)) > 0 and PSkipNAC = false, 
-													Build_Prepped_NAC(pversion).NACIDDTUpdate,
-													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
-											)
-											+ if (nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.InquiryLogs)) > 0 and PSkipInquiryLogs = false, 
-													Build_Prepped_InquiryLogs(pversion),
-													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
-											);
+	inIdentityDataUpdate :=	  if( nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.IdentityData)) > 0, 
+		Files(pversion).Sprayed.IdentityData, 
+		dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
+		)   
+		+ if (nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.NAC)) > 0 and SkipNACBuild = false, 
+				Build_Prepped_NAC(pversion).NACIDDTUpdate,
+				dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
+		)
+		+ if (nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.InquiryLogs)) > 0 and SkipInquiryLogsBuild = false, 
+				Build_Prepped_InquiryLogs(pversion),
+				dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
+		);
 
 	Functions.CleanFields(inIdentityDataUpdate ,inIdentityDataUpdateUpper); 
 

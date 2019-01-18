@@ -494,11 +494,26 @@ EXPORT Layouts := MODULE
 	END;
 
 	export OutputF := module
-		export FraudgovInfoRec			:= RECORD
+
+		export FraudgovInfoRec := RECORD
 			string PreviousVersion;
 			string NewVersion;
 			string Status;
 		END;
+
+		export SkipModules := RECORD
+			//General Processes
+			boolean SkipBaseBuild;
+			boolean SkipBaseRollback;
+			boolean SkipKeysBuild;
+			//Sub-processes
+			boolean SkipNACBuild;
+			boolean SkipInquiryLogsBuild;
+			boolean SkipPiiBuild;		
+			boolean	SkipKelBuild;
+			boolean SkipOrbitBuild;
+			boolean SkipDashboardsBuild;
+		END;		
 	end;
 
 export temp := module 

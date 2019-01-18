@@ -1,7 +1,6 @@
 ﻿IMPORT tools,STD, FraudGovPlatform_Validation, FraudShared, ut;
 EXPORT Build_Input_Deltabase(
 	 string			pversion
-	,boolean		PSkipDeltabase		= false	 
 	,boolean		PSkipValidations	= false
 ) :=
 module
@@ -15,7 +14,7 @@ module
 		return in_ddp;
 	ENDMACRO;	
 	
-	deltabaseUpdate :=	  if ( nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.Deltabase)) > 0  and PSkipDeltabase = false,
+	deltabaseUpdate :=	  if ( nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.Deltabase)) > 0,
 													Files(pversion).Sprayed.Deltabase, 
 													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.Deltabase})
 											);

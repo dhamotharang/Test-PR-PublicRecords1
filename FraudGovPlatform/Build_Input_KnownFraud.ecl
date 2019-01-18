@@ -1,11 +1,12 @@
 ﻿IMPORT tools,STD, FraudGovPlatform_Validation, FraudShared,ut;
 EXPORT Build_Input_KnownFraud(
-	  string		pversion
-	 ,boolean		PSkipKnownFraud	= false 
-	 ,boolean		PSkipNAC				= false	
-	 ,boolean		PSkipValidations	= false
+	 string		pversion
+	,dataset(Layouts.OutputF.SkipModules) pSkipModules = FraudGovPlatform.Files().OutputF.SkipModules
+	,boolean	PSkipValidations = false
 ) :=
 module
+
+	shared SkipNACBuild := pSkipModules[1].SkipNACBuild;
 
 	SHARED fn_dedup(inputs):=FUNCTIONMACRO
 		in_srt:=sort(inputs, RECORD, EXCEPT processdate);
@@ -17,11 +18,11 @@ module
 		return in_ddp;
 	ENDMACRO;
 	
-	inKnownFraudUpdate := 	if	(nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.KnownFraud)) > 0 and PSkipKnownFraud = false, 
+	inKnownFraudUpdate := 	if	(nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.KnownFraud)) > 0, 
 													Files(pversion).Sprayed.KnownFraud, 
 													dataset([],{string75 fn { virtual(logicalfilename)},		FraudGovPlatform.Layouts.Sprayed.KnownFraud})
 										)    											
-									+ 	if	(nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.NAC)) > 0 and PSkipNAC = false, 
+									+ 	if	(nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.NAC)) > 0 and SkipNACBuild = false, 
 													Build_Prepped_NAC(pversion).NACKNFDUpdate,
 													dataset([],{string75 fn { virtual(logicalfilename)}, 	FraudGovPlatform.Layouts.Sprayed.KnownFraud})
 										);
