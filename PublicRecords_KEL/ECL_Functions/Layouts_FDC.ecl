@@ -1,6 +1,6 @@
 ﻿IMPORT Doxie, Doxie_Files, Header_Quick, PublicRecords_KEL;
 
-EXPORT Layouts_FDC(PublicRecords_KEL.Interface_Options Options) := MODULE
+EXPORT Layouts_FDC(PublicRecords_KEL.Interface_Options Options = PublicRecords_KEL.Interface_Options) := MODULE
 	
 	SHARED LayoutIDs := RECORD
 		INTEGER InputUIDAppend;

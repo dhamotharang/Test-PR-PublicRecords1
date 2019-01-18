@@ -2,31 +2,33 @@
 
   //These are used stricly to calculate the attribute values in getBusKRI
   EXPORT BusinessAttributeValues := RECORD
-    /* BusAssetOwnProperty */
+		//BusMatchLevel
+    UNSIGNED1   score;                                                //populated in DueDiligence.getBusBestInfo
+		//BusAssetOwnProperty 
 		UNSIGNED6 	PropTaxValue;                                       //populated in DueDiligence.getBusProperty
 		UNSIGNED2 	CurrPropOwnedCount;                                 //populated in DueDiligence.getBusProperty
 		UNSIGNED2 	CountSoldProp;                                      //populated in DueDiligence.getBusProperty
-    /* BusAssetOwnWatercraft */ 
+    //BusAssetOwnWatercraft  
 		UNSIGNED2 	WatercraftCount;                                    //populated in DueDiligence.getSharedWatercraft 
 		UNSIGNED2  	Watercraftlength;                                   //populated in DueDiligence.getSharedWatercraft 
-    /* BusAssetOwnAircraft */
+    //BusAssetOwnAircraft 
 		UNSIGNED2 	AircraftCount;                                      //populated in DueDiligence.getBusAircraft
-    /* BusAssetOwnVehicle */
+    //BusAssetOwnVehicle 
 		UNSIGNED3 	VehicleCount;                                       //populated in DueDiligence.getBusVehicle
 		UNSIGNED6  	VehicleBaseValue;
-    /*BusSOSAgeRange*/  
+    //BusSOSAgeRange  
 		UNSIGNED4  	sosIncorporationDate;										            //populated in DueDiligence.getBusSOSDetail
 		BOOLEAN   	noSOSFilingEver;												            //populated in DueDiligence.getBusSOSDetail
-    /*BusPublicRecordAgeRange*/ 	
+    //BusPublicRecordAgeRange 	
 		UNSIGNED4 	busnHdrDtFirstSeen;											            //populated in DueDiligence.getBusHeader
 		UNSIGNED3 	srcCount;																            //populated in DueDiligence.getBusHeader  This is a count of ALL Sources
-    /*BusValidityRisk*/
+    //BusValidityRisk
 		UNSIGNED2 	sosAddrLocationCount;										            //populated in DueDiligence.getBusSOSDetail
 		UNSIGNED2 	hdAddrCount;														            //populated in DueDiligence.getBusHeader 
 		UNSIGNED2 	creditSrcCnt;														            //populated in DueDiligence.getBusHeader  This is a count of Credit Bureaus
 		BOOLEAN     noFein;																	            //populated in DueDiligence.getBusHeader			
 		BOOLEAN     busRegHit;															            //populated in DueDiligence.getBusRegistration
-    /*BusStabilityRisk*/
+    //BusStabilityRisk
     BOOLEAN			sosAllDissolveInactiveSuspend;					            //populated in DueDiligence.getBusSOSDetail
     BOOLEAN			sosHasAtleastOneDissolvedFiling;				            //populated in DueDiligence.getBusSOSDetail					
 		BOOLEAN			sosHasAtleastOneInactiveFiling;					            //populated in DueDiligence.getBusSOSDetail			
@@ -41,10 +43,10 @@
     BOOLEAN			cmra;																		            //populated in DueDiligence.getBusAddrData
 		BOOLEAN			vacant;																	            //populated in DueDiligence.getBusAddrData
 		BOOLEAN			notFoundInHeader;												            //populated in DueDiligence.getBusHeader
-    /*BusStructureType*/
+    //BusStructureType
 		STRING60    hdBusnType;															            //populated in DueDiligence.getBusHeader
 		STRING60    adrBusnType;														            //populated in DueDiligence.getBusAddrData
-    /*BusShellShelfRisk*/
+    //BusShellShelfRisk
 		UNSIGNED3 	numOfBusFoundAtAddr;										            //populated in DueDiligence.getBusAddrData
 		UNSIGNED3		numOfBusIncInStateLooseLaws;						            //populated in DueDiligence.getBusAddrData
 		UNSIGNED3		numOfBusNoReportedFein;									            //populated in DueDiligence.getBusAddrData
@@ -60,7 +62,7 @@
 		BOOLEAN 		atleastOneAgentSameAddrAsBus;						            //populated in DueDiligence.getBusRegistration, DueDiligence.getBusSOSDetail
 		BOOLEAN     agentShelfBusn;													            //populated in DueDiligence.getBusAddrData
 		BOOLEAN		  agentPotentialNIS;											            //populated in DueDiligence.getBusAddrData
-    /*BusExecutiveOfficersRisk*/
+    //BusExecutiveOfficersRisk
 		UNSIGNED3		numOfBusExecs;												            	//populated in DueDiligence.getBusExec
 		BOOLEAN			atleastOneActiveLawAcctExec;					            	//populated in DueDiligence.getBusProfLic
 		BOOLEAN			atleastOneActiveFinRealEstateExec;		            	//populated in DueDiligence.getBusProfLic
@@ -70,7 +72,7 @@
 		BOOLEAN			atleastOneInactiveFinRealEstateExec;		            //populated in DueDiligence.getBusProfLic
 		BOOLEAN			atleastOneInactiveMedicalExec;					            //populated in DueDiligence.getBusProfLic
 		BOOLEAN			atleastOneInactiveBlastPilotExec;				            //populated in DueDiligence.getBusProfLic
-    /*BusLegalEventType*/
+    //BusLegalEventType
 		BOOLEAN			atleastOneBEOInCategory9;                           //populated in DueDiligence.getBusLegalEvents
 		BOOLEAN			atleastOneBEOInCategory8;                           //populated in DueDiligence.getBusLegalEvents
 		BOOLEAN			atleastOneBEOInCategory7;                           //populated in DueDiligence.getBusLegalEvents
@@ -80,7 +82,7 @@
 		BOOLEAN			atleastOneBEOInCategory3;                           //populated in DueDiligence.getBusLegalEvents
 		BOOLEAN			atleastOneBEOInCategory2;                           //populated in DueDiligence.getBusLegalEvents
 		BOOLEAN			BEOsHaveNoConvictionsOrCategoryHits;                //populated in DueDiligence.getBusLegalEvents
-    /*BusUSResidency*/
+    //BusUSResidency
 		BOOLEAN		  atleastOneBEOInvalidSSN;
 		BOOLEAN		  atleastOneBEOAssocITINOrImmigrantSSN;
 		BOOLEAN		  atleastOneBEODOBPriorToParentSSN;
@@ -90,7 +92,7 @@
 		BOOLEAN		  atleastOneBEOPublicRecordsBetween3And10YrsWithNoVote;
 		BOOLEAN		  atleastOneBEOPublicRecordsMoreThan10YrsWithNoVote;
 		BOOLEAN		  atleastOneBEOOrParentRegisteredVoter;
-    /* Criminal Evidence flags*/                                    
+    //Criminal Evidence flags                                    
 		BOOLEAN     BEOevidenceOfCurrentIncarcerationOrParole;        // Level 9
 		BOOLEAN     BEOevidenceOfFelonyConvictionInLastNYR;           // Level 8 
 		BOOLEAN     BEOevidenceOfFelonyConvictionOlderNYR;            // Level 7
@@ -105,12 +107,12 @@
   
   //These are used stricly to calculate the attribute values in getIndKRI
   EXPORT PersonAttributeValues := RECORD
-    /*PerAssetOwnWatercraft*/ 
+    //PerAssetOwnWatercraft 
 		UNSIGNED2 	watercraftCount;                                  //populated in DueDiligence.getSharedWatercraft 
 		UNSIGNED2  	watercraftLength;                                 //populated in DueDiligence.getSharedWatercraft 
-    /*PerAssetOwnAircraft*/
+    //PerAssetOwnAircraft
     UNSIGNED2   aircraftCount;
-    /*PerUSResidency*/
+    //PerUSResidency
 		UNSIGNED4 	firstReportedDate;															  //populated in DueDiligence.getIndHeader
 		BOOLEAN		  registeredVoter;															    //populated in DueDiligence.getIndHeader
 		BOOLEAN			stateVotingSourceAvailable;										    //populated in DueDiligence.getIndHeader
@@ -124,7 +126,7 @@
 		BOOLEAN			atleastOneParentHasImmigrantSSN;							    //populated in DueDiligecne.getIndSSNData
 		BOOLEAN			atleastOneParentIsRegisteredVoter;					      //populated in DueDiligence.getIndHeader
 		UNSIGNED4		mostRecentParentSSNIssuanceDate;							    //populated in DueDiligecne.getIndSSNData
-    /*PerLegalEventType*/
+    //PerLegalEventType
 		BOOLEAN			atleastOneCategory9;
 		BOOLEAN			atleastOneCategory8;
 		BOOLEAN			atleastOneCategory7;
@@ -133,7 +135,7 @@
 		BOOLEAN			atleastOneCategory4;
 		BOOLEAN			atleastOneCategory3;
 		BOOLEAN			atleastOneCategory2;
-    /*PerCivilLegalEvent*/
+    //PerCivilLegalEvent
     BOOLEAN     tenPlusLiensJudgementsEvictionsPast3Yrs;
     BOOLEAN     five2NineLiensJudgementsEvictionsPast3Yrs;
     BOOLEAN     three2FourLiensJudgementsEvictionsPast3Yrs;
@@ -142,7 +144,7 @@
     BOOLEAN     five2NineLiensJudgementsEvictionsOver3Yrs;
     BOOLEAN     three2FourLiensJudgementsEvictionsOver3Yrs;
     BOOLEAN     one2TwoLiensJudgementsEvictionsOver3Yrs;
-    /*PerStateLegalEvent*/
+    //PerStateLegalEvent
     BOOLEAN     currentIncarcerationOrParole;
     BOOLEAN     felonyPast3Yrs;
     BOOLEAN     felonyOver3Yrs;
@@ -151,12 +153,12 @@
     BOOLEAN     misdemeanorConvictionPast3Yrs;
     BOOLEAN     uncategorizedConvictionOver3Yrs;
     BOOLEAN     misdemeanorConvictionOver3Years;
-    /*PerAssetOwnProperty*/
+    //PerAssetOwnProperty
     UNSIGNED2   ownedPropCount;                                 //populated in DueDiligence.getIndProperty
-    /*PerAccessToFundsProperty*/
+    //PerAccessToFundsProperty
     UNSIGNED6   totalAssesedValue;                              //populated in DueDiligence.getIndProperty
     UNSIGNED2   previouslyOwnedPropCount;                       //populated in DueDiligence.getIndProperty
-    /*PerProfessional License*/
+    //PerProfessional License
     BOOLEAN			atleastOneActiveLawAcct;					            	//populated in DueDiligence.getIndProfessionalData
 		BOOLEAN			atleastOneActiveFinRealEstate;		            	//populated in DueDiligence.getIndProfessionalData
 		BOOLEAN			atleastOneActiveMedical;						            //populated in DueDiligence.getIndProfessionalData
@@ -165,13 +167,13 @@
 		BOOLEAN			atleastOneInactiveFinRealEstate;		            //populated in DueDiligence.getIndProfessionalData
 		BOOLEAN			atleastOneInactiveMedical;					            //populated in DueDiligence.getIndProfessionalData
 		BOOLEAN			atleastOneInactiveBlastPilot;				            //populated in DueDiligence.getIndProfessionalData
-    /*PerAccessToFundsIncome*/
+    //PerAccessToFundsIncome
     UNSIGNED3   estimatedIncome;                                //populated in DueDiligence.getIndEstimatedIncome
-    /*PerAssetOwnVehicle*/
+    //PerAssetOwnVehicle
 		UNSIGNED2 	VehicleCount;                                   //populated in DueDiligence.getIndVehicle
 		UNSIGNED6  	VehicleBaseValue;
-    /*PerAgeRange*/
-    INTEGER1   estimatedAge;
+    //PerAgeRange
+    INTEGER1    estimatedAge;
   END;
 
 END;

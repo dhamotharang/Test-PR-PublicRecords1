@@ -77,7 +77,8 @@ eq_act_dec_rec :=
                                    gateways,
                                    EquifaxDecisioningRequested, 
                                    input_params.DataPermissionMask,
-                                   suppress_results_due_alerts OR suppress_reseller_data_due_alerts //if suppressed - no gateway call is made, only gateway usage code is repoted than
+                                   suppress_results_due_alerts OR suppress_reseller_data_due_alerts, //if suppressed - no gateway call is made, only gateway usage code is repoted than
+                                   application_type_value
                                   );
 
 tempmod := module(project(AutoStandardI.GlobalModule(IsFCRA),CriminalRecords_Services.IParam.report,opt))

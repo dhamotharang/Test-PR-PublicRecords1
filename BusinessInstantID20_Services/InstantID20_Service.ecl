@@ -6,6 +6,7 @@
 	<part name="DataRestrictionMask" type="xsd:string"/>
 	<part name="DataPermissionMask" type="xsd:string"/>
 	<part name="BIID20ProductType" type="xsd:integer"/> <!-- 1,2,3 -->
+  <part name="Gateways" type="tns:XmlDataSet" cols="100" rows="8"/>
 </message>
 */
 /*--INFO-- This Service is the interface into the Business InstantID ECL service, version 2.0. */
@@ -25,7 +26,8 @@ EXPORT InstantID20_Service() := MACRO
 		'GLBPurpose',
 		'DataRestrictionMask',
 		'DataPermissionMask',
-		'BIID20ProductType'
+		'BIID20ProductType',
+    'Gateways'
 		));
 
 		/* ************************************************************************

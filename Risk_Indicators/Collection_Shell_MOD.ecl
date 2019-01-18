@@ -254,7 +254,7 @@ export getBestCleaned(dataset(doxie.layout_references) deduped_dids,string50 Dat
 		self := r;
 	END;
 
-	wdog_perm := dx_BestRecords.fn_get_perm_type(glb_flag := ut.glb_ok(GLB_Purpose), 
+	wdog_perm := dx_BestRecords.Functions.get_perm_type(glb_flag := ut.glb_ok(GLB_Purpose), 
 		utility_flag := false, 
 		filter_exp_flag := ~experian_permitted, 
 		pre_glb_flag := (DataRestriction[23] = '1'));

@@ -40,7 +40,7 @@ IMPORT ut, dx_BestRecords, doxie_files, DeathV2_Services, AutoStandardI;
 
 // get appropriate best_records permission flag
 #uniquename(perm_flag)
-%perm_flag% := dx_BestRecords.fn_get_perm_type(glb_per, useNonBlankKey, %utility_flag%, %pre_glb_flag%, 
+%perm_flag% := dx_BestRecords.Functions.get_perm_type(glb_per, useNonBlankKey, %utility_flag%, %pre_glb_flag%, 
 	%filter_exp%, %filter_eq%, marketing, %cnsmr_flag%);
 
 #uniquename(outf)

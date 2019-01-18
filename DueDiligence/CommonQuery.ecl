@@ -269,6 +269,7 @@ EXPORT CommonQuery := MODULE
 																																																	SELF.address := addressClean;
 																																																	SELF.phone := IF(Business_Risk_BIP.Common.validPhone(phoneToClean), phoneToClean, DueDiligence.Constants.EMPTY);
 																																																	SELF.fein := validTaxID;
+                                                                                                  SELF.BIP_IDs.SeleID.LinkID := (UNSIGNED6)validLexID;
 																																																	SELF := LEFT.business;
 																																																	SELF := [];)]),
 																																							DATASET([], DueDiligence.Layouts.Busn_Input));

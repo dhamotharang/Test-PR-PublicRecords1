@@ -1,4 +1,4 @@
-﻿import FCRA, Riskwise, _control, Gateway;
+﻿import FCRA, Risk_Indicators, _control, Gateway;
 onThor := _Control.Environment.OnThor;
 
 USE_BOCA_SHELL_LIBRARY := not _Control.LibraryUse.ForceOff_Risk_Indicators__LIB_Boca_Shell_Function;
@@ -152,7 +152,8 @@ seq_map := join( pre_iid1, pre_iid,
 							true,  // filter out fares always true in FCRA
 							DataRestriction,
 							BSOptions, glb, gateways, DataPermission, IN_isDirectToConsumer, 
-							IncludeLnJ, ReportingPeriod := ReportingPeriod 
+							IncludeLnJ, ReportingPeriod, adl_based_shell
+
        );
 
 

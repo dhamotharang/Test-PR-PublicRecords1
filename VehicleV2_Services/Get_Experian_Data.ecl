@@ -1,4 +1,4 @@
-IMPORT iesp,AutoStandardI,Address,doxie,Gateway;
+IMPORT iesp,AutoStandardI,Address,doxie,Gateway,VehicleV2_Services;
 
 EXPORT Get_Experian_Data := MODULE
 
@@ -119,7 +119,7 @@ EXPORT Get_Experian_Data := MODULE
 						
 		vinResp  := PROJECT(vinRespEx,TRANSFORM(iesp.experian_vin.t_getVinVerifyPlusResponse,SELF:=LEFT.Response.Response));
 		vehicles := NORMALIZE(vinResp,LEFT.Vehicles,TRANSFORM(iesp.experian_vin.t_VehicleStruct,SELF:=RIGHT));
-		vinSrcSt := PROJECT(vehicles,TRANSFORM(Layout_Vehicle_Vin,SELF.VIN:=LEFT.VIN,SELF.state_origin:=LEFT.sourceState));
+		vinSrcSt := PROJECT(vehicles,TRANSFORM(VehicleV2_Services.Layout_Vehicle_Vin,SELF.VIN:=LEFT.VIN,SELF.state_origin:=LEFT.sourceState));
 		vinaData := VehicleV2_Services.Get_Polk_Vina_Data(vinSrcSt);
 
 		vinaLayout := RECORD
@@ -141,7 +141,7 @@ EXPORT Get_Experian_Data := MODULE
 		END;
 
 		joinData := JOIN(vehicles,vinaData,LEFT.VIN=RIGHT.VIN,addVinaData(LEFT,RIGHT),
-			LEFT OUTER,KEEP(1),LIMIT(Constant.MAX_VEHS_PER_SRCH,SKIP));
+			LEFT OUTER,KEEP(1),LIMIT(VehicleV2_Services.Constant.MAX_VEHS_PER_SRCH,SKIP));
 
 		VehicleV2_Services.assorted_layouts.Layout_registrant xformRegistrants(vinaLayout L,INTEGER C) := TRANSFORM
 			SELF.fname := IF(TRIM(L.RegisteredOwners[C].nameRole)='OWNER',L.RegisteredOwners[C].firstName,SKIP);
@@ -176,6 +176,8 @@ EXPORT Get_Experian_Data := MODULE
 			SELF.name_source_cd := L.RegisteredOwners[C].nameSourceCd;
 			SELF.name_source := Exp_Code_Translations.name_source_cd_description(L.RegisteredOwners[C].nameSourceCd);
 			SELF.title_issue_date := stringlib.StringFilter(TRIM(L.titleIssueDate),'0123456789');
+			SELF.title_number := L.titleNumber;
+			SELF.reported_name := L.RegisteredOwners[C].ReportedName;
 			SELF:=[];
 		END;
 

@@ -1,20 +1,20 @@
 ﻿IMPORT PublicRecords_KEL, Gateway, risk_indicators, riskwisefcra, Doxie;
 
-EXPORT Neutral_Lexid_Soapcall(DATASET(PublicRecords_KEL.ECL_Functions.Input_ALL_Layout) inputNoLexid,
+EXPORT Neutral_Lexid_Soapcall(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) inputNoLexid,
 		PublicRecords_KEL.Interface_Options Options) := FUNCTION
 								
 inrec := RECORD, MAXLENGTH(500000)
-	DATASET(PublicRecords_KEL.ECL_Functions.Input_ALL_Layout) In_Layout;
+	DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) In_Layout;
 	INTEGER	Score_Threshold;
 	INTEGER InputUIDAppend := 0;
 END;
 		
 LexidInput := DATASET([{PROJECT(inputNoLexid, 
-	TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_ALL_Layout, SELF := LEFT)), 
+	TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII, SELF := LEFT)), 
 		Options.ScoreThreshold
 		}], inrec);
 
-PublicRecords_KEL.ECL_Functions.Input_ALL_Layout errX(LexidInput L) := TRANSFORM
+PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII errX(LexidInput L) := TRANSFORM
 //	self.errmsg := ERROR (FAILCODE, 'Neutral Lexid Service: ' + FAILMESSAGE);
 	SELF.InputUIDAppend := L.InputUIDAppend; 
 	SELF := [];
@@ -28,7 +28,7 @@ soap_response := SOAPCALL(LexidInput,
 		 'PublicRecords_KEL.Neutral_Lexid_Service',
 		 //inrec, //TRANSFORM(inrec, SELF := LEFT), 
 		 {LexidInput},
-		 DATASET(PublicRecords_KEL.ECL_Functions.Input_ALL_Layout),
+		 DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII),
 		 PARALLEL(3), MERGE(33), // pass multiple records at 1 time
 		 ONFAIL(errX(LEFT)),
 		 TIMEOUT(600));	// changed the timeout		
@@ -39,7 +39,7 @@ soap_response := SOAPCALL(LexidInput,
 // this error on the neutral roxie "EXCEPTION: Too many active queries" is not returning in the soapcall as a roxie exception
 // comes through as a dropped record  from the soapcall instead
 test_layout := record
-	PublicRecords_KEL.ECL_Functions.Input_ALL_Layout;
+	PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII;
 	STRING120 errmsg := '';
 END;
 bad_soapcall := project(foo, transform(test_layout), 

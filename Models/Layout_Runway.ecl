@@ -1024,6 +1024,12 @@ string3 RVA1611_2_0_reason2 := '';
 string3 RVA1611_2_0_reason3 := '';
 string3 RVA1611_2_0_reason4 := '';
 
+String3 RVA1811_1_0_score := '';
+string3 RVA1811_1_0_reason1 := '';
+string3 RVA1811_1_0_reason2 := '';
+string3 RVA1811_1_0_reason3 := '';
+string3 RVA1811_1_0_reason4 := '';
+
 String3 RVB1003_0_0_score := '';
 string2 RVB1003_0_0_reason1 := '';
 string2 RVB1003_0_0_reason2 := '';

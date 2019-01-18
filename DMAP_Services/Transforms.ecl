@@ -142,7 +142,7 @@ EXPORT Transforms := MODULE
 		SELF:= L;
 	END;
 		
-  EXPORT $.Layouts.addr_layout xform_vooOwnedAddr(VerificationOfOccupancy.Layouts.Layout_property L) := TRANSFORM
+  EXPORT $.Layouts.addr_layout xform_vooOwnedAddr(VerificationOfOccupancy.Layouts.Layout_property L, INTEGER C) := TRANSFORM
     SELF.PrimRange:= L.property_prim_range;
     SELF.PreDir:= L.property_predir;
     SELF.PrimName:= L.property_prim_name;
@@ -154,7 +154,7 @@ EXPORT Transforms := MODULE
     SELF.St:= L.property_st;
     SELF.Zip:= L.property_zip;
     SELF.is_input_property:= FALSE;
-    SELF.AddrSeq := L.Seq;
+    SELF.AddrSeq := C;
     SELF:= [];
   END;
 		

@@ -10,7 +10,7 @@ IMPORT PublicRecords_KEL;
 
 EXPORT Neutral_Lexid_Service() := MACRO
 	//Score_threshold := 80 : stored('Score_threshold');
-	indata := dataset([], PublicRecords_KEL.ECL_Functions.Input_ALL_Layout) : stored('In_Layout', FEW);
+	indata := dataset([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) : stored('In_Layout', FEW);
 	Options := MODULE(PublicRecords_KEL.Interface_Options)
 		EXPORT INTEGER Score_threshold := 80 : STORED('ScoreThreshold');
 	END;

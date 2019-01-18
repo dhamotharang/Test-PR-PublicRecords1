@@ -269,7 +269,10 @@ risk_indicators.layout_output countadd(risk_indicators.layout_output l,risk_indi
 											 r.ssn_from_did=l.ssn_from_did => r.socsvalid,
 											 socsvalid ='' and r.socsvalid<>'' and r.ssn_from_did=l.ssn_from_did => r.socsvalid,
 											 socsvalid);
-  self.ssn       := IF(foundbetterssn, r.ssn, l.ssn);
+  // when the input SSN is only 4 bytes, we want to replace it with a full 9 for searching purposes
+  self.ssn := if( (length(trim(l.ssn)) = 4 and length(trim(r.ssn)) = 9) or
+                  foundbetterssn, 
+                  r.ssn, l.ssn); 
 	self.ssnLookupFlag       := IF(foundbetterssn, r.ssnLookupFlag, l.ssnLookupFlag);
 		
 	addr_lpicker := iid_constants.tscore(l.addrscore)>=iid_constants.tscore(r.addrscore) or (l.verprim_name<>'' and r.addrcount=0);

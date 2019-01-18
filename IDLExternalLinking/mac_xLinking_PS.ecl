@@ -113,7 +113,7 @@ end;
   %pr% := project(infile,%into%(left)); // Into roxie input format
 #uniquename(res_out)
 // Call with 10K Limit - specific for Person Search queries
-	%res_out% := InsuranceHeader_xLink.MEOW_xIDL(%pr%, , , 10000).Raw_Results;
+	%res_out% := InsuranceHeader_xLink.MEOW_xIDL(%pr%, true, , 10000).Raw_Results;
 	
 	// InsuranceHeader_xLink.MAC_MEOW_xIDL_Batch(%pr%, UniqueId,SNAME, fname, mname, lname, derived_gender, 
 																// prim_range, prim_name, SEC_RANGE, CITY, ST, ZIP,																

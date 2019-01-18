@@ -1162,7 +1162,8 @@ wc21p := inq_perssn >= 10;
 
 wc22p := fp_varrisktype >= '5';
 
-wc23b := pop_bus_phone = '1' and hphnpop  and in_bus_phone10 != in_phone10 and inq_consumer_phone >= '6';
+// wc23b := pop_bus_phone = '1' and hphnpop  and in_bus_phone10 != in_phone10 and inq_consumer_phone >= '6';/.44
+wc23b := (integer)pop_bus_phone = 1 and hphnpop  and in_bus_phone10 != in_phone10 and (integer)inq_consumer_phone >= 6;//
 
 //wc24b := pop_bus_addr = '1' and addrpop  and in_bus_streetaddress1 != in_streetaddress and inq_consumer_addr >= '6';
 wc24b := (integer)pop_bus_addr = 1 and addrpop  and in_bus_streetaddress1 != in_streetaddress and (integer)inq_consumer_addr >= 6;
@@ -1332,7 +1333,7 @@ ds_WCCodes :=
 			'40P' => 31, '41P' => 32, '42P' => 33, '43B' => 34, '44P' => 35, '45B' => 36, '46B' => 37, '47P' => 38, '48P' => 39, '49B' => 40, 
 			'50P' => 41, '51B' => 42, '52B' => 43, '53B' => 44, '54B' => 45, '55P' => 46, '56B' => 47, '57P' => 48, '58B' => 49, '59B' => 50, 
       '60B' => 51, '61B' => 52, '62B' => 53, '63B' => 54, '64P' => 55, '65B' => 56, '66P' => 57, '67P' => 58, '68P' => 59, '69B' => 60, 
-      '70B' => 61, '71B' => 62, '72B' => 63, '73P' => 64, '74P' => 65, '75B' => 66, '76B' => 67, '77B' => 68, '78B' => 69, '79B' => 70, 
+      '70B' => 61, '71B' => 62, '72B' => 63, '73P' => 64, '74P' => 65, '75B' => 66, '76B' => 67, '77B' => 68, '78B' => 69, '79P' => 70, 
       '80P' => 71, '81P' => 72, '82P' => 73, '83P' => 74,  /* default => */ 99);
 
 	getWaterfallGroup(STRING4 wc) := 
@@ -1343,7 +1344,7 @@ ds_WCCodes :=
 			'40P' => 'H', '41P' => 'H', '42P' => 'N', '43B' => 'N', '44P' => 'N', '45B' => 'I', '46B' => 'I', '47P' => 'J', '48P' => 'J', '49B' => 'N', 
 			'50P' => 'N', '51B' => 'K', '52B' => 'K', '53B' => 'N', '54B' => 'N', '55P' => 'N', '56B' => 'N', '57P' => 'N', '58B' => 'N', '59B' => 'N', 
       '60B' => 'N', '61B' => 'L', '62B' => 'L', '63B' => 'N', '64P' => 'N', '65B' => 'N', '66P' => 'N', '67P' => 'N', '68P' => 'N', '69B' => 'N', 
-      '70B' => 'N', '71B' => 'N', '72B' => 'N', '73P' => 'M', '74P' => 'M', '75B' => 'N', '76B' => 'N', '77B' => 'N', '78B' => 'N', '79B' => 'N', 
+      '70B' => 'N', '71B' => 'N', '72B' => 'N', '73P' => 'M', '74P' => 'M', '75B' => 'N', '76B' => 'N', '77B' => 'N', '78B' => 'N', '79P' => 'N', 
       '80P' => 'N', '81P' => 'N', '82P' => 'N', '83P' => 'N', /* default => */ 'A');
 
    
@@ -1404,7 +1405,7 @@ ds_WCCodes :=
 					'61B' => wc61B ,
 					'62B' => wc62B ,
 					'63B' => wc63B ,
-					'64B' => wc64P ,
+					'64P' => wc64P ,
 					'65B' => wc65B ,
 					'66P' => wc66P ,
 					'67P' => wc67P ,
