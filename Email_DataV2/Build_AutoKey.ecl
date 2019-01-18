@@ -1,13 +1,13 @@
-﻿import AutoKeyB2; 
+﻿import AutoKeyB2, dx_email; 
 
 
 export Build_AutoKey(string filedate) := function
 
-ak_keyname	:= constants(filedate).ak_keyname;
-ak_logical	:= constants(filedate).ak_logical;
-ak_dataset	:= constants(filedate).ak_dataset;
-ak_skipSet	:= constants(filedate).ak_skipSet;
-ak_typeStr	:= constants(filedate).ak_typeStr;
+ak_keyname	:= dx_email.constants(filedate).ak_keyname;
+ak_logical	:= dx_email.constants(filedate).ak_logical;
+ak_dataset	:= dx_email.constants(filedate).ak_dataset;
+ak_skipSet	:= dx_email.constants(filedate).ak_skipSet;
+ak_typeStr	:= dx_email.constants(filedate).ak_typeStr;
 
 
 AutoKeyB2.MAC_Build (ak_dataset,clean_name.fname,clean_name.mname,clean_name.lname,

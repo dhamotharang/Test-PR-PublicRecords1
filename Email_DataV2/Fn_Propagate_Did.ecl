@@ -6,7 +6,8 @@ with_did :=    email_in(did > 0);
 without_did := email_in(did = 0);
 
 recordof(email_in) t_propagate_did (without_did le, with_did ri) := transform
-	self.did := if(ri.clean_email <> '' , ri.did, le.did);
+	self.did 			 := if(ri.clean_email <> '' , ri.did, le.did);
+	self.did_score := if(ri.clean_email <> '' , ri.did_score, le.did_score);
 	self := le;
 end;
 
