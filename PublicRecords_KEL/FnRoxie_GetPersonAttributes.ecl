@@ -7,6 +7,18 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 
 	RecordsWithLexID := InputData(LexidAppend > 0);
 	RecordsWithoutLexID := InputData(LexidAppend <= 0);
+
+	roll_list(dataset_to_roll, field_to_roll, delimiter) := FUNCTIONMACRO
+	// cast the field we need to concatenate to a STRING so that it can be rolled up and preserve the same RECORD format.
+	clean_dataset := PROJECT(dataset_to_roll, TRANSFORM({STRING roll_field},
+		SELF.roll_field := (STRING)LEFT.field_to_roll));
+	
+	// Use ROLLUP to concatenate the dataset into a list	
+	result := ROLLUP(clean_dataset, TRUE, TRANSFORM({string roll_field},
+		SELF.roll_field := LEFT.roll_field + delimiter + RIGHT.roll_field));
+		
+	RETURN result[1].roll_field;
+ENDMACRO;
 	
 	LayoutFCRAPersonAttributes := RECORDOF(PublicRecords_KEL.Q_F_C_R_A_Person_Attributes_V1([], 0, 0).res0);
 	LayoutNonFCRAPersonAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Person_Attributes_V1([], 0, 0).res0);
@@ -93,7 +105,26 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 			SELF.MonSinceOldestCrimCnt7Y := IF(ResultsFound, (INTEGER)RIGHT.MonSinceOldestCrimCnt7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
 			SELF.CrimSeverityIndex7Y := IF(ResultsFound, (STRING)RIGHT.CrimSeverityIndex7Y,'0 - 0');
 			SELF.CrimBehaviorIndex7Y := IF(ResultsFound, (STRING)RIGHT.CrimBehaviorIndex7Y,'0');
-      SELF.BkHistoryBuild := Risk_Indicators.get_Build_date('bankruptcy_daily');
+			//Bankruptcy	
+			SELF.BkHistoryBuild := Risk_Indicators.get_Build_date('bankruptcy_daily'); 		
+			SELF.BkCnt1Y := RIGHT.BkCnt1Y;
+			SELF.BkCnt7Y := RIGHT.BkCnt7Y;
+			SELF.BkCnt10Y := RIGHT.BkCnt10Y;
+			SELF.DtOfBksList1Y := IF(RIGHT.BkCnt1Y > 0,roll_list(RIGHT.DtOfBksList1Y, BankruptcyDate, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.DtOfBksList7Y := IF(RIGHT.BkCnt7Y > 0,roll_list(RIGHT.DtOfBksList7Y, BankruptcyDate, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.DtOfBksList10Y := IF(RIGHT.BkCnt10Y > 0,roll_list(RIGHT.DtOfBksList10Y, BankruptcyDate, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.BkNew1Y := IF(ResultsFound, (STRING)RIGHT.BkNew1Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.BkNew7Y := IF(ResultsFound, (STRING)RIGHT.BkNew7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.BkNew10Y := IF(ResultsFound, (STRING)RIGHT.BkNew10Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.BkOld1Y := IF(ResultsFound, (STRING)RIGHT.BkOld1Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.BkOld7Y := IF(ResultsFound, (STRING)RIGHT.BkOld7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.BkOld10Y := IF(ResultsFound, (STRING)RIGHT.BkOld10Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.MonSinceNewestBkCnt1Y := IF(ResultsFound, (INTEGER)RIGHT.MonSinceNewestBkCnt1Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
+			SELF.MonSinceNewestBkCnt7Y := IF(ResultsFound, (INTEGER)RIGHT.MonSinceNewestBkCnt7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
+			SELF.MonSinceNewestBkCnt10Y := IF(ResultsFound, (INTEGER)RIGHT.MonSinceNewestBkCnt10Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
+			SELF.MonSinceOldestBkCnt1Y := IF(ResultsFound, (INTEGER)RIGHT.MonSinceOldestBkCnt1Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
+			SELF.MonSinceOldestBkCnt7Y := IF(ResultsFound, (INTEGER)RIGHT.MonSinceOldestBkCnt7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
+			SELF.MonSinceOldestBkCnt10Y := IF(ResultsFound, (INTEGER)RIGHT.MonSinceOldestBkCnt10Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
 			SELF := LEFT;
 		),LEFT OUTER, KEEP(1)); 
 	
@@ -143,7 +174,26 @@ EXPORT FnRoxie_GetPersonAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layou
 			SELF.MonSinceOldestCrimCnt7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.CrimSeverityIndex7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF.CrimBehaviorIndex7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
-      SELF.BkHistoryBuild := Risk_Indicators.get_Build_date('bankruptcy_daily');
+			//Bankruptcy			
+			SELF.BkHistoryBuild := Risk_Indicators.get_Build_date('bankruptcy_daily');
+			SELF.BkCnt1Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BkCnt7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BkCnt10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.DtOfBksList1Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.DtOfBksList7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.DtOfBksList10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.BkNew1Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.BkNew7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.BkNew10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.BkOld1Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.BkOld7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.BkOld10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.MonSinceNewestBkCnt1Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.MonSinceNewestBkCnt7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.MonSinceNewestBkCnt10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.MonSinceOldestBkCnt1Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.MonSinceOldestBkCnt7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.MonSinceOldestBkCnt10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF := LEFT)); 	
 			
 	PersonAttributes := SORT( PersonAttributesWithLexID + PersonAttributesWithoutLexID, InputUIDAppend ); 

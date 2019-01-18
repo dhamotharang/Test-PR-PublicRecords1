@@ -33,14 +33,13 @@ EXPORT E_Bankruptcy(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
     KEL.typ.nint Case_I_D_;
     KEL.typ.nint Defendant_I_D_;
     KEL.typ.nstr Source_;
-    KEL.typ.nbool F_C_R_A_Withdrawn_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     UNSIGNED1 __Permits;
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
-  SHARED __Mapping := 'UID(UID),tmsid(T_M_S_I_D_),courtcode(Court_Code_),casenumber(Case_Number_),originalcasenumber(Original_Case_Number_:\'\'),sourcedescription(Source_Description_:\'\'),originalchapter(Original_Chapter_:\'\'),filingtype(Filing_Type_:\'\'),businessflag(Business_Flag_:\'\'),corporateflag(Corporate_Flag_:\'\'),dischargeddate(Discharged_Date_:DATE),disposition(Disposition_:\'\'),debtortype(Debtor_Type_:\'\'),debtorsequence(Debtor_Sequence_:0),dispositiontype(Disposition_Type_:0),dispositionreason(Disposition_Reason_:0),dispositiontypedescription(Disposition_Type_Description_:\'\'),nametype(Name_Type_:\'\'),screendescription(Screen_Description_:\'\'),decodeddescription(Decoded_Description_:\'\'),datefiled(Date_Filed_:DATE),recordtype(Record_Type_:\'\'),datevendorfirstreported(Date_Vendor_First_Reported_:DATE),datevendorlastreported(Date_Vendor_Last_Reported_:DATE),caseid(Case_I_D_:0),defendantid(Defendant_I_D_:0),source(Source_:\'\'),fcrawithdrawn(F_C_R_A_Withdrawn_),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping := 'UID(UID),tmsid(T_M_S_I_D_),courtcode(Court_Code_),casenumber(Case_Number_),originalcasenumber(Original_Case_Number_:\'\'),sourcedescription(Source_Description_:\'\'),originalchapter(Original_Chapter_:\'\'),filingtype(Filing_Type_:\'\'),businessflag(Business_Flag_:\'\'),corporateflag(Corporate_Flag_:\'\'),dischargeddate(Discharged_Date_:DATE),disposition(Disposition_:\'\'),debtortype(Debtor_Type_:\'\'),debtorsequence(Debtor_Sequence_:0),dispositiontype(Disposition_Type_:0),dispositionreason(Disposition_Reason_:0),dispositiontypedescription(Disposition_Type_Description_:\'\'),nametype(Name_Type_:\'\'),screendescription(Screen_Description_:\'\'),decodeddescription(Decoded_Description_:\'\'),datefiled(Date_Filed_:DATE),recordtype(Record_Type_:\'\'),datevendorfirstreported(Date_Vendor_First_Reported_:DATE),datevendorlastreported(Date_Vendor_Last_Reported_:DATE),caseid(Case_I_D_:0),defendantid(Defendant_I_D_:0),source(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   SHARED __Trimmed := RECORD, MAXLENGTH(5000)
     STRING KeyVal;
   END;
@@ -55,7 +54,7 @@ EXPORT E_Bankruptcy(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
   SHARED __Table := TABLE(__All_Trim,__TabRec,KeyVal,MERGE);
   SHARED __SortedTable := SORT(__Table,KeyVal);
   EXPORT Lookup := PROJECT(__SortedTable,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT));
-  SHARED __Mapping0 := 'UID(UID),tmsid(T_M_S_I_D_),court_code(Court_Code_),case_number(Case_Number_),orig_case_number(Original_Case_Number_:\'\'),srcdesc(Source_Description_:\'\'),chapter(Original_Chapter_:\'\'),filing_type(Filing_Type_:\'\'),business_flag(Business_Flag_:\'\'),corp_flag(Corporate_Flag_:\'\'),discharged(Discharged_Date_:DATE),disposition(Disposition_:\'\'),debtor_type(Debtor_Type_:\'\'),debtor_seq(Debtor_Sequence_:0),disptype(Disposition_Type_:0),dispreason(Disposition_Reason_:0),disptypedesc(Disposition_Type_Description_:\'\'),name_type(Name_Type_:\'\'),screendesc(Screen_Description_:\'\'),dcodedesc(Decoded_Description_:\'\'),date_filed(Date_Filed_:DATE),record_type(Record_Type_:\'\'),date_vendor_first_reported(Date_Vendor_First_Reported_:DATE),date_vendor_last_reported(Date_Vendor_Last_Reported_:DATE),caseid(Case_I_D_:0),defendantid(Defendant_I_D_:0),fcrawithdrawn(F_C_R_A_Withdrawn_),date_first_seen(Date_First_Seen_:EPOCH),date_last_seen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping0 := 'UID(UID),tmsid(T_M_S_I_D_),court_code(Court_Code_),case_number(Case_Number_),orig_case_number(Original_Case_Number_:\'\'),srcdesc(Source_Description_:\'\'),chapter(Original_Chapter_:\'\'),filing_type(Filing_Type_:\'\'),business_flag(Business_Flag_:\'\'),corp_flag(Corporate_Flag_:\'\'),discharged(Discharged_Date_:DATE),disposition(Disposition_:\'\'),debtor_type(Debtor_Type_:\'\'),debtor_seq(Debtor_Sequence_:0),disptype(Disposition_Type_:0),dispreason(Disposition_Reason_:0),disptypedesc(Disposition_Type_Description_:\'\'),name_type(Name_Type_:\'\'),screendesc(Screen_Description_:\'\'),dcodedesc(Decoded_Description_:\'\'),date_filed(Date_Filed_:DATE),record_type(Record_Type_:\'\'),date_vendor_first_reported(Date_Vendor_First_Reported_:DATE),date_vendor_last_reported(Date_Vendor_Last_Reported_:DATE),caseid(Case_I_D_:0),defendantid(Defendant_I_D_:0),date_first_seen(Date_First_Seen_:EPOCH),date_last_seen(Date_Last_Seen_:EPOCH)';
   SHARED InLayout __Mapping0_Transform(InLayout __r) := TRANSFORM
     SELF.Source_ := __CN('BA');
     SELF.__Permits := CFG_Compile.Permit_FCRA;
@@ -70,7 +69,7 @@ EXPORT E_Bankruptcy(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
   EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Bankruptcy_Files__Key_Search_1_Invalid := __d0_UID_Mapped(UID = 0);
   SHARED __d0_Prefiltered := __d0_UID_Mapped(UID <> 0);
   SHARED __d0 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0),__Mapping0_Transform(LEFT)));
-  SHARED __Mapping1 := 'UID(UID),tmsid(T_M_S_I_D_),court_code(Court_Code_),case_number(Case_Number_),orig_case_number(Original_Case_Number_:\'\'),srcdesc(Source_Description_:\'\'),chapter(Original_Chapter_:\'\'),filing_type(Filing_Type_:\'\'),business_flag(Business_Flag_:\'\'),corp_flag(Corporate_Flag_:\'\'),discharged(Discharged_Date_:DATE),disposition(Disposition_:\'\'),debtor_type(Debtor_Type_:\'\'),debtor_seq(Debtor_Sequence_:0),disptype(Disposition_Type_:0),dispreason(Disposition_Reason_:0),disptypedesc(Disposition_Type_Description_:\'\'),name_type(Name_Type_:\'\'),screendesc(Screen_Description_:\'\'),dcodedesc(Decoded_Description_:\'\'),date_filed(Date_Filed_:DATE),record_type(Record_Type_:\'\'),date_vendor_first_reported(Date_Vendor_First_Reported_:DATE),date_vendor_last_reported(Date_Vendor_Last_Reported_:DATE),caseid(Case_I_D_:0),defendantid(Defendant_I_D_:0),fcrawithdrawn(F_C_R_A_Withdrawn_),date_first_seen(Date_First_Seen_:EPOCH),date_last_seen(Date_Last_Seen_:EPOCH)';
+  SHARED __Mapping1 := 'UID(UID),tmsid(T_M_S_I_D_),court_code(Court_Code_),case_number(Case_Number_),orig_case_number(Original_Case_Number_:\'\'),srcdesc(Source_Description_:\'\'),chapter(Original_Chapter_:\'\'),filing_type(Filing_Type_:\'\'),business_flag(Business_Flag_:\'\'),corp_flag(Corporate_Flag_:\'\'),discharged(Discharged_Date_:DATE),disposition(Disposition_:\'\'),debtor_type(Debtor_Type_:\'\'),debtor_seq(Debtor_Sequence_:0),disptype(Disposition_Type_:0),dispreason(Disposition_Reason_:0),disptypedesc(Disposition_Type_Description_:\'\'),name_type(Name_Type_:\'\'),screendesc(Screen_Description_:\'\'),dcodedesc(Decoded_Description_:\'\'),date_filed(Date_Filed_:DATE),record_type(Record_Type_:\'\'),date_vendor_first_reported(Date_Vendor_First_Reported_:DATE),date_vendor_last_reported(Date_Vendor_Last_Reported_:DATE),caseid(Case_I_D_:0),defendantid(Defendant_I_D_:0),date_first_seen(Date_First_Seen_:EPOCH),date_last_seen(Date_Last_Seen_:EPOCH)';
   SHARED InLayout __Mapping1_Transform(InLayout __r) := TRANSFORM
     SELF.Source_ := __CN('BA');
     SELF.__Permits := CFG_Compile.Permit_nonFCRA;
@@ -142,7 +141,6 @@ EXPORT E_Bankruptcy(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
     KEL.typ.ndataset(Deadlines_Layout) Deadlines_;
     KEL.typ.ndataset(Case_Details_Layout) Case_Details_;
     KEL.typ.ndataset(Data_Sources_Layout) Data_Sources_;
-    KEL.typ.nbool F_C_R_A_Withdrawn_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
@@ -158,7 +156,6 @@ EXPORT E_Bankruptcy(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
     SELF.Deadlines_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Date_Vendor_First_Reported_,Date_Vendor_Last_Reported_},Date_Vendor_First_Reported_,Date_Vendor_Last_Reported_),Deadlines_Layout)(__NN(Date_Vendor_First_Reported_) OR __NN(Date_Vendor_Last_Reported_)));
     SELF.Case_Details_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Case_I_D_,Defendant_I_D_,Date_Vendor_First_Reported_,Date_Vendor_Last_Reported_},Case_I_D_,Defendant_I_D_,Date_Vendor_First_Reported_,Date_Vendor_Last_Reported_),Case_Details_Layout)(__NN(Case_I_D_) OR __NN(Defendant_I_D_) OR __NN(Date_Vendor_First_Reported_) OR __NN(Date_Vendor_Last_Reported_)));
     SELF.Data_Sources_ := __CN(PROJECT(TABLE(__recs,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Source_},Source_),Data_Sources_Layout)(__NN(Source_)));
-    SELF.F_C_R_A_Withdrawn_ := KEL.Intake.SingleValue(__recs,F_C_R_A_Withdrawn_);
     SELF.__RecordCount := COUNT(__recs);
     SELF.Date_First_Seen_ := KEL.era.SimpleRoll(__recs,Date_First_Seen_,MIN,TRUE);
     SELF.Date_Last_Seen_ := KEL.era.SimpleRoll(__recs,Date_Last_Seen_,MAX,FALSE);
@@ -179,8 +176,7 @@ EXPORT E_Bankruptcy(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
   EXPORT Court_Code__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Court_Code_);
   EXPORT Case_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Case_Number_);
   EXPORT Original_Case_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Original_Case_Number_);
-  EXPORT F_C_R_A_Withdrawn__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,F_C_R_A_Withdrawn_);
-  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Bankruptcy_Files__Key_Search_1_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Bankruptcy_Files__Key_Search_2_Invalid),COUNT(T_M_S_I_D__SingleValue_Invalid),COUNT(Court_Code__SingleValue_Invalid),COUNT(Case_Number__SingleValue_Invalid),COUNT(Original_Case_Number__SingleValue_Invalid),COUNT(F_C_R_A_Withdrawn__SingleValue_Invalid)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Bankruptcy_Files__Key_Search_1_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Bankruptcy_Files__Key_Search_2_Invalid,KEL.typ.int T_M_S_I_D__SingleValue_Invalid,KEL.typ.int Court_Code__SingleValue_Invalid,KEL.typ.int Case_Number__SingleValue_Invalid,KEL.typ.int Original_Case_Number__SingleValue_Invalid,KEL.typ.int F_C_R_A_Withdrawn__SingleValue_Invalid});
+  EXPORT SanityCheck := DATASET([{COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Bankruptcy_Files__Key_Search_1_Invalid),COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Bankruptcy_Files__Key_Search_2_Invalid),COUNT(T_M_S_I_D__SingleValue_Invalid),COUNT(Court_Code__SingleValue_Invalid),COUNT(Case_Number__SingleValue_Invalid),COUNT(Original_Case_Number__SingleValue_Invalid)}],{KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Bankruptcy_Files__Key_Search_1_Invalid,KEL.typ.int PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Bankruptcy_Files__Key_Search_2_Invalid,KEL.typ.int T_M_S_I_D__SingleValue_Invalid,KEL.typ.int Court_Code__SingleValue_Invalid,KEL.typ.int Case_Number__SingleValue_Invalid,KEL.typ.int Original_Case_Number__SingleValue_Invalid});
   EXPORT NullCounts := DATASET([
     {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Bankruptcy_Files__Key_Search_1_Invalid),COUNT(__d0)},
     {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','TMSID',COUNT(__d0(__NL(T_M_S_I_D_))),COUNT(__d0(__NN(T_M_S_I_D_)))},
@@ -208,7 +204,6 @@ EXPORT E_Bankruptcy(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
     {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','date_vendor_last_reported',COUNT(__d0(__NL(Date_Vendor_Last_Reported_))),COUNT(__d0(__NN(Date_Vendor_Last_Reported_)))},
     {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','caseid',COUNT(__d0(__NL(Case_I_D_))),COUNT(__d0(__NN(Case_I_D_)))},
     {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','defendantid',COUNT(__d0(__NL(Defendant_I_D_))),COUNT(__d0(__NN(Defendant_I_D_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','FCRAWithdrawn',COUNT(__d0(__NL(F_C_R_A_Withdrawn_))),COUNT(__d0(__NN(F_C_R_A_Withdrawn_)))},
     {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d0(Date_First_Seen_=0)),COUNT(__d0(Date_First_Seen_!=0))},
     {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d0(Date_Last_Seen_=0)),COUNT(__d0(Date_Last_Seen_!=0))},
     {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','UID',COUNT(PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Bankruptcy_Files__Key_Search_2_Invalid),COUNT(__d1)},
@@ -237,7 +232,6 @@ EXPORT E_Bankruptcy(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
     {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','date_vendor_last_reported',COUNT(__d1(__NL(Date_Vendor_Last_Reported_))),COUNT(__d1(__NN(Date_Vendor_Last_Reported_)))},
     {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','caseid',COUNT(__d1(__NL(Case_I_D_))),COUNT(__d1(__NN(Case_I_D_)))},
     {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','defendantid',COUNT(__d1(__NL(Defendant_I_D_))),COUNT(__d1(__NN(Defendant_I_D_)))},
-    {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','FCRAWithdrawn',COUNT(__d1(__NL(F_C_R_A_Withdrawn_))),COUNT(__d1(__NN(F_C_R_A_Withdrawn_)))},
     {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateFirstSeen',COUNT(__d1(Date_First_Seen_=0)),COUNT(__d1(Date_First_Seen_!=0))},
     {'Bankruptcy','PublicRecords_KEL.ECL_Functions.Dataset_FDC','DateLastSeen',COUNT(__d1(Date_Last_Seen_=0)),COUNT(__d1(Date_Last_Seen_!=0))}]
   ,{KEL.typ.str entity,KEL.typ.str fileName,KEL.typ.str fieldName,KEL.typ.int nullCount,KEL.typ.int notNullCount});
