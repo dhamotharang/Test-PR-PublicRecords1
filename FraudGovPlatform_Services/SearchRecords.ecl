@@ -1,4 +1,4 @@
-﻿•IMPORT Address, BatchShare, FraudGovPlatform_Services, FraudShared_Services, iesp, std;
+IMPORT Address, BatchShare, FraudGovPlatform_Services, FraudShared_Services, iesp, std;
 
 EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_batch_in,
                      FraudGovPlatform_Services.IParam.BatchParams batch_params,
