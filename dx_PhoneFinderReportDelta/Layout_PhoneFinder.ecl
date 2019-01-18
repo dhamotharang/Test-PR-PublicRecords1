@@ -1,6 +1,7 @@
 ﻿EXPORT Layout_PhoneFinder := MODULE
 
 	//DF-23251: Add 'dx_' Prefix to Index Definitions
+	//DF-23827: Update Transaction Key Layout 
 	
 	///////////////////////////////////
 	//Transactions/////////////////////
@@ -20,6 +21,9 @@
 			integer5 	response_time;
 			string60 	reference_code;
 			string32 	phonefinder_type;
+			string30	data_source;
+			string30  royalty_used;
+			string30  carrier;
 			unsigned8 submitted_lexid;
 			string15 	submitted_phonenumber;
 			string20 	submitted_firstname;
