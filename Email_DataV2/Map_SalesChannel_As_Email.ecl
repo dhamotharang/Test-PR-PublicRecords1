@@ -1,7 +1,7 @@
 ﻿IMPORT SalesChannel, address, ut,emailservice, mdr, _validate, Entiera, STD, Email_Data;
 EXPORT Map_SalesChannel_As_Email(version) := FUNCTION
 
-with_email := SalesChannel.Files(,TRUE).base.qa(TRIM(rawfields.email) <> '');
+with_email := SalesChannel.Files().base.qa(TRIM(rawfields.email) <> '');
 
 //apply macro to obtain email domain fields
 emailservice.mac_append_domain_flags(with_email,domain_d,rawfields.email);
