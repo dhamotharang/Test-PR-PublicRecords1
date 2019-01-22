@@ -57,13 +57,28 @@
   EXPORT MacScoreBreakdownAggregate(inData, fieldString = '', groupByFieldString = FALSE) := FUNCTIONMACRO
     LOCAL ScoreBreakdownAggregate := TABLE(inData(customer_id_>0), 
 		{customer_id_, industry_type_, entity_context_uid_, INTEGER entity_type_ := (INTEGER)entity_context_uid_[2..3], indicatortype, indicatordescription, 
-			INTEGER RiskLevel := 0 , populationtype := 'Element', 
-			INTEGER Value := SUM(GROUP, Weight), ValueCurved := (SUM(GROUP, Weight) * 100000) + RANDOM() % 10000
+			INTEGER RiskLevel := 0 , 
+			STRING populationtype := FraudGovPlatform_Analytics.Constants.KelScorePopulationType.ELEMENT, 
+			INTEGER Value := SUM(GROUP, Weight), 
+			INTEGER ValueCurved := (SUM(GROUP, Weight) * 100000) + RANDOM() % 10000
 			#IF(#TEXT(fieldString) != '') ,#EXPAND(fieldString) #END}, 
 			customer_id_, industry_type_, entity_context_uid_, entity_context_uid_[2..3], indicatortype, indicatordescription, 
 			#IF(groupByFieldString AND #TEXT(fieldString) != '') #EXPAND(fieldString), #END
 		MERGE);
-    RETURN ScoreBreakdownAggregate;    
+		
+		//HardCoded until we implement a more robust average
+		LOCAL AverageScoreBreakdown := TABLE(inData(customer_id_>0), 
+		{customer_id_, industry_type_, entity_context_uid_, INTEGER entity_type_ := (INTEGER)entity_context_uid_[2..3], indicatortype, indicatordescription, 
+			INTEGER RiskLevel := 0 , 
+			STRING populationtype := FraudGovPlatform_Analytics.Constants.KelScorePopulationType.AVERAGE, 
+			INTEGER Value := FraudGovPlatform_Analytics.Constants.RealtimeScoringAverage, 
+			INTEGER ValueCurved := (FraudGovPlatform_Analytics.Constants.RealtimeScoringAverage * 100000) + RANDOM() % 10000
+			#IF(#TEXT(fieldString) != '') ,#EXPAND(fieldString) #END}, 
+			customer_id_, industry_type_, entity_context_uid_, entity_context_uid_[2..3], indicatortype, indicatordescription, 
+			#IF(groupByFieldString AND #TEXT(fieldString) != '') #EXPAND(fieldString), #END
+		MERGE); 
+		
+    RETURN ScoreBreakdownAggregate + AverageScoreBreakdown;    
   ENDMACRO;
 	
 	EXPORT ScaleRange(Number, TargetMin, TargetMax, SourceMin, SourceMax) := FUNCTION

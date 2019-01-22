@@ -2,7 +2,8 @@
 
 EXPORT InstantID20_Records( DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo) ds_input,
                              BusinessInstantID20_Services.iOptions Options,
-														 BIPV2.mod_sources.iParams linkingOptions) := 
+														 BIPV2.mod_sources.iParams linkingOptions,
+                             Boolean ExcludeWatchlists) := 
 	FUNCTION
 
 		AllowedSourcesSet := BusinessInstantID20_Services.set_AllowedSources( Options );
@@ -39,7 +40,7 @@ EXPORT InstantID20_Records( DATASET(BusinessInstantID20_Services.layouts.InputCo
 		ds_BestBusinessInfo := BusinessInstantID20_Services.fn_GetBestBusinessInfo(ds_BIPIDsFound, Options, linkingOptions);
 
 		// 6. Get Business Header records.
-		ds_BusinessHeaderRecs := BusinessInstantID20_Services.fn_GetHeaderRecords(ds_CleanedInput, ds_BIPIDsFound, Options, linkingOptions, AllowedSourcesSet) : INDEPENDENT;
+		ds_BusinessHeaderRecs := BusinessInstantID20_Services.fn_GetHeaderRecords(ds_CleanedInput, ds_BIPIDsFound, Options, linkingOptions, AllowedSourcesSet);
 		
 		// 7. Get Verification info.
 		ds_VerificationInfo := BusinessInstantID20_Services.fn_GetVerificationInfo(ds_CleanedInput, ds_BusinessHeaderRecs, ds_Shell_Results, Options);
@@ -182,9 +183,19 @@ EXPORT InstantID20_Records( DATASET(BusinessInstantID20_Services.layouts.InputCo
 				LEFT OUTER, KEEP(1), PARALLEL, FEW );
 		
 		// Add data from the business shell.
+    		 		ds_Shell_Results_WatchlistVerfication := // This part supresses reason code 10 when watchlists aren't wanted since the fields it looks at comes from the business shell
+			PROJECT( 
+				ds_Shell_Results,
+				TRANSFORM( Business_Risk_BIP.Layouts.Shell,
+					SELF.Verification.VerWatchlistNameMatch := if(ExcludeWatchLists = true, '0', left.Verification.VerWatchlistNameMatch),
+					SELF.Verification.VerWatchlistAltNameMatch := if(ExcludeWatchLists = true, '0', left.Verification.VerWatchlistAltNameMatch),
+          SELF := LEFT
+				)
+			);
+    
 		ds_OutputWithScoresAndBusinessShellData := 
 			JOIN( 
-				ds_OutputWithPersonRoles, ds_Shell_Results, 
+				ds_OutputWithPersonRoles, ds_Shell_Results_WatchlistVerfication, 
 				LEFT.InputEcho.Seq = RIGHT.Seq, 
 				_transforms.xfm_AddScoresAndBusinessShellData(LEFT,RIGHT), 
 				LEFT OUTER, KEEP(1), PARALLEL, FEW );		

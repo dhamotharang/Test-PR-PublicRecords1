@@ -21,22 +21,26 @@ doxie.MAC_Selection_Declare();
 // non-FCRA header data
 idid := max(dids(did > 0, did < header.constants.QH_start_rid), did);//dids has no more than 1 record here.  this is just a technique for turning it into an integer value.  see #stored('useOnlyBestDID',true) in doxie.Comprehensive_Report_Service
 boolean IncludeBlankDOD := false : stored('IncludeBlankDOD');
-dear0 := doxie.Deathfile_Records(IncludeBlankDOD or (unsigned)dod8 != 0); 
 
+dear0 := doxie.Deathfile_Records(IncludeBlankDOD or (unsigned)dod8 != 0); 
+death_filtered := dear0((unsigned)did = idid);//creating a common filter
 best_full := doxie.best_records (dids, FALSE, useNonBlankKey := true, getSSNBest := in_getSSNBest, modAccess := mod_access);
 
 ssnr_pre := doxie.fn_ssn_records(best_full);
 
 besr_pre := project(best_full, 
-    transform (doxie_crs.layout_best_information, 
+    transform (doxie_crs.layout_best_information,
+      max_dod := max(death_filtered, dod8);
       self.phones := doxie_crs.verifiedPhones(Legacy_Verified_Value).records, 
-      self.dod := max(dear0((unsigned)did = idid),dod8),
-			self.deceased := if(exists(dear0((unsigned)did = idid)),'Y','N'),
+      self.dod := max_dod,
+      self.deceased := if(exists(death_filtered),'Y','N'),
+      self.IsLimitedAccessDMF := not exists(death_filtered(dod8 = max_dod and ~IsLimitedAccessDMF)),
       self.ssn := if (left.ssn <> '',
                       left.ssn, 
                       if(exists(ssnr_pre(did = idid and ssn = ssn_value)), ssn_value, ''));
       self := left)
 );
+
 
 // TODO: It looks like there's no reliable way to fetch flag records by SSN in the FCRA context:
 //   consider just taking it from the input, if any.

@@ -1,4 +1,4 @@
-﻿IMPORT BatchShare, FraudShared, Gateway, risk_indicators, riskwise, UT;
+﻿IMPORT BatchShare, FraudShared, Gateway, iesp, risk_indicators, riskwise, UT;
 
 EXPORT IParam := MODULE
   
@@ -19,6 +19,15 @@ EXPORT IParam := MODULE
 		EXPORT DATASET	(Gateway.Layouts.Config)	Gateways := dataset ([], Gateway.Layouts.Config);
 		EXPORT integer 	 MaxVelocities;
 		EXPORT integer 	 MaxKnownFrauds;
+		EXPORT integer 	 MaxTimelineDetails;
+		EXPORT integer 	 MaxCriminals;
+		EXPORT integer 	 MaxRedFlags;
+		EXPORT integer 	 MaxGlobalWatchlists;
+		EXPORT integer 	 MaxAssociatedAddresses;
+		EXPORT integer 	 MaxScoreBreakdown;
+		EXPORT integer 	 MaxIndicatorAttributes;
+		EXPORT integer 	 MaxRelatedClusters;
+		EXPORT integer 	 MaxAssociatedIdentities;
 		EXPORT string		 FraudPlatform;
 		EXPORT boolean   ReturnDetailedRoyalties;
 		EXPORT string6 	 DOBMask := 'NONE';
@@ -79,10 +88,19 @@ EXPORT IParam := MODULE
 			EXPORT string 	 AgencyVerticalType := ''		: STORED('AgencyVerticalType');
 			EXPORT string18  AgencyCounty       := ''		: STORED('AgencyCounty');
 			EXPORT string2   AgencyState        := ''		: STORED('AgencyState');
-			EXPORT integer   MaxVelocities      := FraudGovPlatform_Services.Constants.MAX_VELOCITIES : STORED('MaxVelocities');
-			EXPORT integer   MaxKnownFrauds     := FraudGovPlatform_Services.Constants.MAX_KNOWN_FRAUDS : STORED('MaxKnownFrauds');
-			EXPORT string    FraudPlatform			:= FraudGovPlatform_Services.Constants.FRAUD_PLATFORM : STORED('FraudPlatform');
-			EXPORT BOOLEAN   ReturnDetailedRoyalties := false : STORED('ReturnDetailedRoyalties');
+			EXPORT integer   MaxVelocities      := FraudGovPlatform_Services.Constants.MAX_VELOCITIES 										: STORED('MaxVelocities');
+			EXPORT integer   MaxKnownFrauds     := FraudGovPlatform_Services.Constants.MAX_KNOWN_FRAUDS 									: STORED('MaxKnownFrauds');
+			EXPORT integer 	 MaxTimelineDetails	:= iesp.constants.FraudGov.MAX_COUNT_TIMELINE_DETAILS 				: STORED('MaxTimelineDetails');
+			EXPORT integer 	 MaxCriminals				:= iesp.constants.FraudGov.MAX_COUNT_CRIMINAL 								: STORED('MaxCriminals');
+			EXPORT integer 	 MaxRedFlags				:= iesp.constants.FraudGov.MAX_COUNT_RED_FLAG 								: STORED('MaxRedFlags');
+			EXPORT integer 	 MaxGlobalWatchlists			:= iesp.constants.FraudGov.MAX_COUNT_GLOBAL_WATCHLIST 	: STORED('MaxGlobalWatchlists');
+			EXPORT integer 	 MaxAssociatedAddresses		:= iesp.constants.FraudGov.MAX_COUNT_ASSOCIATED_ADDRESS : STORED('MaxAssociatedAddresses');
+			EXPORT integer 	 MaxScoreBreakdown				:= iesp.constants.FraudGov.MAX_COUNT_SCORE_BREAKDOWN 		: STORED('MaxScoreBreakdown');
+			EXPORT integer 	 MaxIndicatorAttributes		:= iesp.constants.FraudGov.MAX_COUNT_INDICATOR_ATTRIBUTE: STORED('MaxIndicatorAttributes');
+			EXPORT integer 	 MaxRelatedClusters				:= iesp.constants.FraudGov.MAX_COUNT_CLUSTER 						: STORED('MaxRelatedClusters');
+			EXPORT integer 	 MaxAssociatedIdentities	:= iesp.constants.FraudGov.MAX_COUNT_ASSOCIATED_IDENTITY: STORED('MaxAssociatedIdentities');
+			EXPORT string    FraudPlatform						:= FraudGovPlatform_Services.Constants.FRAUD_PLATFORM 							: STORED('FraudPlatform');
+			EXPORT BOOLEAN   ReturnDetailedRoyalties 	:= false : STORED('ReturnDetailedRoyalties');
 			EXPORT DATASET(Gateway.Layouts.Config) Gateways	:= 	dataset ([], Gateway.Layouts.Config) : STORED('Gateways');
 			EXPORT string6 	 DOBMask := 'NONE' : STORED('DOBMask');
 

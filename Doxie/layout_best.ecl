@@ -1,4 +1,4 @@
-import watchdog;
+﻿import watchdog;
 
 export layout_best := record
   unsigned6    did := 0;
@@ -25,6 +25,7 @@ export layout_best := record
 	qstring4     zip4 := '';
 	unsigned3    addr_dt_last_seen := 0;
 	qstring8	 DOD := '';
+	boolean IsLimitedAccessDMF:= false;
 	qstring17    Prpty_deed_id := '';
 	qstring22    Vehicle_vehnum := '';
 	qstring22  	 Bkrupt_CrtCode_CaseNo := '';

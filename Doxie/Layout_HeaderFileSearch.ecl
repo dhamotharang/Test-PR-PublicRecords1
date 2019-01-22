@@ -1,4 +1,4 @@
-import Risk_Indicators, advo;
+﻿import Risk_Indicators, advo;
 
 //Replace maxlength with maxcount...this is a big one b/c of the variable strings
 
@@ -26,6 +26,7 @@ RECORD
   integer4 dob;
   unsigned1 age;
   unsigned4 dod;
+  boolean IsLimitedAccessDMF := FALSE;
 	string1 deceased := 'U';
   unsigned1 dead_age;
   STRING1 death_code;
