@@ -23,7 +23,7 @@ EXPORT E_Person_Bankruptcy(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     SELF := __r;
   END;
   SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_Bankruptcy_Files__Key_Search,TRANSFORM(RECORDOF(__in.Dataset_Bankruptcy_Files__Key_Search),SELF:=RIGHT));
-  EXPORT __d0_KELfiltered := __d0_Norm((UNSIGNED)did != 0);
+  EXPORT __d0_KELfiltered := __d0_Norm((UNSIGNED)did != 0 AND name_type = 'D');
   SHARED __d0_Bankrupt__Layout := RECORD
     RECORDOF(__d0_KELfiltered);
     KEL.typ.uid Bankrupt_;
@@ -38,7 +38,7 @@ EXPORT E_Person_Bankruptcy(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     SELF := __r;
   END;
   SHARED __d1_Norm := NORMALIZE(__in,LEFT.Dataset_Bankruptcy_Files__Key_Search,TRANSFORM(RECORDOF(__in.Dataset_Bankruptcy_Files__Key_Search),SELF:=RIGHT));
-  EXPORT __d1_KELfiltered := __d1_Norm((UNSIGNED)did != 0);
+  EXPORT __d1_KELfiltered := __d1_Norm((UNSIGNED)did != 0 AND name_type = 'D');
   SHARED __d1_Bankrupt__Layout := RECORD
     RECORDOF(__d1_KELfiltered);
     KEL.typ.uid Bankrupt_;
