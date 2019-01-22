@@ -215,9 +215,10 @@ END;
 																	gateways);
 
  // want is to fail immediately as we don't want customers to think there was no hit on OFAC
- if(exists(XG5_ptys(errorMessage <> '')), FAIL('Bridger Gateway Error'));
-																	 
- XG5Parsed := OFAC_XG5.OFACXG5_Watchlist2_Response(XG5_ptys);
+ // if(exists(XG5_ptys(errorMessage <> '')), FAIL('Bridger Gateway Error'));
+ validXG5_ptys := XG5_ptys(IF(errorMessage <> '',ERROR('Bridger Gateway Error'), true));
+
+ XG5Parsed := OFAC_XG5.OFACXG5_Watchlist2_Response(validXG5_ptys);
  
  XG5Formatted	:= OFAC_XG5.FormatXG5_BIIDWatchlist2(XG5Parsed);
  
