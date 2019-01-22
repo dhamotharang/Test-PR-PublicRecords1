@@ -162,7 +162,7 @@ report2 := project(report,transform({string pk, boolean update},SELF.pk:=LEFT.pk
                      {'tucs'          ,true}, // Always on
                      {'transunion'    ,true}, // Always on
                      {'eq_hist'       ,true}, // Stale (always on)
-                     {'alloymedia'    ,true}  // Stale (always on)
+                     {'alloymedia'    ,true},  // Stale (always on)
                      {'cd_seed'       ,true}  // Stale (always on)
                      
                     ],{string pk, boolean update});
@@ -267,7 +267,8 @@ action_setup := sequential(
                 );
 return
 sequential(
-             restore
+             // if(~skip_action, output(SFContents, named('SuperFiles Contents Before Setup Run'))
+            restore
             ,report_condition_status
             ,STD.System.Debug.Sleep (10000)
             ,output(report,named(ingest_action + 'auto_report'))
