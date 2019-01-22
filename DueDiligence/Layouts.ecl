@@ -598,8 +598,16 @@ EXPORT Layouts := MODULE
     STRING2 registeredState;
     STRING8 registeredDate;
 	END;
+	
+  EXPORT SlimBusiness := RECORD
+    STRING120 companyName;
+    Address address;
+    STRING14 phone;
+    STRING11 fein;
+  END;
   
 	EXPORT BusReportDetails := RECORD
+    SlimBusiness bestBusInfo;
     DATASET(BusPropertyDataLayout) busProperties {MAXCOUNT(DueDiligence.Constants.MAX_PROPERTIES)};
     DATASET(WatercraftDataLayout) busWatercraft {MAXCOUNT(DueDiligence.Constants.MAX_WATERCRAFT)};
     DATASET(AircraftDataLayout) busAircraft {MAXCOUNT(DueDiligence.Constants.MAX_AIRCRAFT)};
