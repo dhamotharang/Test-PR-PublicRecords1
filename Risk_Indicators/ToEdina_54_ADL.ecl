@@ -1,17 +1,6 @@
-﻿// ==============================================================================
-// convert from layout_boca_shell to the flat layout minneapolis expects.  For now the FDN and FP3 data are being placed at
-// the end of the layout until the real BS 5.1 layout is established.  At which time this function will need to be updated.
-// ==============================================================================
-
-includeADLFields := FALSE; // If you set this to TRUE, make sure you set it to TRUE in Risk_Indicators.Layout_Boca_Shell_Edina_v51!
-multiple_file_test := false;  // only set this to true in development environment when testing multiple shell files at the same time
+﻿multiple_file_test := false;  // only set this to true in development environment when testing multiple shell files at the same time
 
 import risk_indicators, riskprocessing, riskview;
-
-layout_with_FDN_attributes :=	RECORD
-	risk_indicators.Layout_Boca_Shell_Edina_v54;
-	
-END;
 
 #if(multiple_file_test)
 
@@ -20,20 +9,26 @@ END;
 		riskprocessing.layouts.layout_internal_shell
 	END;
 
-	temp := record
+	edina_plus_bob_v54 := record
 			 string20 file_ind;
+			 risk_indicators.iid_constants.adl_based_modeling_flags ADL_Shell_Flags;
 			 risk_indicators.Layout_Boca_Shell_Edina_v54;
 	end;
 
-export ToEdina_54( dataset(layout_internal) bs, boolean isFCRA=false, string dataRestrictionMask, string Intended_Purpose ) := FUNCTION
+export ToEdina_54_ADL( dataset(layout_internal) bs, boolean isFCRA=false, string dataRestrictionMask, string Intended_Purpose ) := FUNCTION
 
-		temp convertToEdina_v54(bs le) := transform
+		edina_plus_bob_v54 convertToEdina_v54(bs le) := transform
 			self.file_ind := le.file_ind;
 	
 #else
 
-export ToEdina_54( dataset(riskprocessing.layouts.layout_internal_shell) bs, boolean isFCRA=false, string dataRestrictionMask, string Intended_Purpose ) := FUNCTION
-	risk_indicators.Layout_Boca_Shell_Edina_v54 convertToEdina_v54(bs le) := transform
+export ToEdina_54_ADL( dataset(riskprocessing.layouts.layout_internal_shell) bs, boolean isFCRA=false, string dataRestrictionMask, string Intended_Purpose ) := FUNCTION
+
+	edina_plus_bob_v54 := record
+		risk_indicators.iid_constants.adl_based_modeling_flags ADL_Shell_Flags;
+		risk_indicators.Layout_Boca_Shell_Edina_v54;
+	end;
+	edina_plus_bob_v54 convertToEdina_v54(bs le) := transform
 	
 #end
 		
@@ -349,19 +344,6 @@ export ToEdina_54( dataset(riskprocessing.layouts.layout_internal_shell) bs, boo
 	self.Address_Verification.Address_History_1.N_ave_no_of_baths_count := le.addr_risk_summary2.N_ave_no_of_baths_count ;	
 	
 	
-	#if(includeADLFields)
-		SELF.in_addrpop := le.ADL_Shell_Flags.in_addrpop;  // was address populated on input from consumer
-		SELF.in_hphnpop := le.ADL_Shell_Flags.in_hphnpop;	// was hphone populated on input from consumer
-		SELF.in_ssnpop := le.ADL_Shell_Flags.in_ssnpop;		// was ssn populated on input from consumer
-		SELF.in_dobpop := le.ADL_Shell_Flags.in_dobpop;		// was dob populated on input from consumer
-		SELF.adl_addr := le.ADL_Shell_Flags.adl_addr;  	// what do we know from the ADL search
-		SELF.adl_hphn := le.ADL_Shell_Flags.adl_hphn;		// what do we know from the ADL search
-		SELF.adl_ssn := le.ADL_Shell_Flags.adl_ssn;			// what do we know from the ADL search
-		SELF.adl_dob := le.ADL_Shell_Flags.adl_dob;			// what do we know from the ADL search
-		SELF.in_addrpop_found := le.ADL_Shell_Flags.in_addrpop_found;	// was ssn populated on input from consumer and matched one of our database addresses
-		SELF.in_hphnpop_found := le.ADL_Shell_Flags.in_hphnpop_found; // was hphone populated on input from consumer and matched one of our database phones
-	#end
-	
 // blank these out for 5.0 FCRA shell	
 		self.iid.areacodesplitdate := if(isFCRA, 0, (unsigned)le.iid.areacodesplitdate);
 		self.iid.areacodesplitflag := if(isFCRA, '', le.iid.areacodesplitflag);		
@@ -658,7 +640,7 @@ export ToEdina_54( dataset(riskprocessing.layouts.layout_internal_shell) bs, boo
 	rv5_attributes := riskview.get_attributes_v5(group(clam,seq), false);
 		
 	with_riskview_attributes := join(edina_v54, rv5_attributes, left.seq=right.seq,
-		transform(risk_indicators.Layout_Boca_Shell_Edina_v54, 
+		transform(edina_plus_bob_v54, 
 							self.AssetValueIndex := right.assetIndex;  
 							self.AssetIndexPrimaryFactor := right.AssetIndexPrimaryFactor;  
 							self.StabilityIndex := right.SubjectStabilityIndex;  
