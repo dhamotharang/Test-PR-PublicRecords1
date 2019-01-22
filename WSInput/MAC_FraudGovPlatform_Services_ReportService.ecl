@@ -14,14 +14,6 @@
 										'GlobalCompanyId',
 										'IndustryTypeName',
 										'ProductCode',
-										/*---- Other Fields .----*/
-										'AgencyCounty',
-										'AgencyState',
-										'AgencyVerticalType',
-										'AppendBest',
-										'DIDScoreThreshold',
-										'FraudPlatform',
-										'MaxVelocities',
 										/*---- ESDL Request Field ----*/
 										'FraudGovReportRequest',
 										/*-----Gateway info -----*/
