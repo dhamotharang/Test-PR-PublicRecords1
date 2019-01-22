@@ -1,4 +1,4 @@
-IMPORT AutoStandardI,Address,ut, std;
+﻿IMPORT AutoStandardI,Address,ut, std;
 
 EXPORT RealTime_Batch_Service_Records(DATASET(Batch_Layout.RealTime_InLayout) inputData,UNSIGNED1 Operation,Boolean GatewayNameMatch = False,Boolean Is_UseDate = False) := FUNCTION
 
@@ -124,13 +124,22 @@ EXPORT RealTime_Batch_Service_Records(DATASET(Batch_Layout.RealTime_InLayout) in
 		SELF.reg_2_state := reg_2.st;
 		SELF.reg_2_zip := reg_2.zip5+reg_2.zip4;
 		SELF.reg_2_company_name := reg_2.append_clean_cname;
-		LE_1 := R.lessors[1];
+		LE_1 := R.lessees[1]; // <--- coding revised for RQ-14898 fix. Store "Lessee" data in LE fields.
 		SELF.le_1_orig_name:=LE_1.Orig_Name;
 		SELF.le_1_company_name:=LE_1.append_clean_cname;
 		SELF.le_1_fname:=LE_1.fname;
 		SELF.le_1_mname:=LE_1.mname;
 		SELF.le_1_lname:=LE_1.lname;
 		SELF.le_1_name_suffix:=LE_1.name_suffix;
+		// v--- "Lessor"(lo_1_***) coding added for RQ-14898 fix.
+		// Per Julie Gardner on 01/10/19, Experian GW only returns "Lessor" info, not "Lessee".
+		LO_1 := R.lessors[1];
+		SELF.lo_1_orig_name:=LO_1.Orig_Name;
+		SELF.lo_1_company_name:=LO_1.append_clean_cname;
+		SELF.lo_1_fname:=LO_1.fname;
+		SELF.lo_1_mname:=LO_1.mname;
+		SELF.lo_1_lname:=LO_1.lname;
+		SELF.lo_1_name_suffix:=LO_1.name_suffix;
 		LH_1 := R.lienholders[1];
 		SELF.lh_1_orig_name:=LH_1.Orig_Name;
 		SELF.lh_1_company_name:=LH_1.append_clean_cname;
