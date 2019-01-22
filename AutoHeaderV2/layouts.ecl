@@ -1,4 +1,4 @@
-import doxie, AutoStandardI, Address, Suppress;
+﻿import doxie, AutoStandardI, Address, Suppress;
 
 export layouts := module
 
@@ -94,6 +94,7 @@ export layouts := module
   // Easy to do, if needed.
   export directives := record
     unsigned1 score_threshold := 10;           // 'ScoreThreshold' ('StrictMatch')
+    unsigned1 saltLeadThreshold := AutoHeaderV2.Constants.SaltLeadThreshold;
     boolean isCRS := false;                    // 'IsCRS' // TODO: needs renaming
     boolean only_best_did := false;            // 'useOnlyBestDID'
     boolean household := false;                // 'Household' or set up by caller 
@@ -232,6 +233,7 @@ export layouts := module
   export lib_search := record
     //Note: allow_wildcard, currentResidentsOnly are passed to the library as a search-code
     unprocessed_input and not [seisintadlservice, DemoCustomerName, glb, allow_wildcard, currentResidentsOnly];
+    unsigned1 saltLeadThreshold := AutoHeaderV2.Constants.SaltLeadThreshold ;
     // here we also can redefine the values which have different type;
     // for instance, ssn can be a good candidate (string9 for the search purpose).
     // I'm not doing it now, only because it is trimmed inside the lib anyway (to account for first5/last4)
