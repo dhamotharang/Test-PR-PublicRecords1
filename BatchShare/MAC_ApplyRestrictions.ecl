@@ -12,7 +12,7 @@ EXPORT MAC_ApplyRestrictions(in_ds,in_params,_pSSN = 'ssn',_pDID = 'did',_pDateF
 							    OR (in_params.isValidDPPA(in_params.check_RNA_)
 									    AND in_params.isValidDPPAState(mdr.sourceTools.DPPAOriginState(in_ds.src), in_ds.src));
 											
-	is_DRM_safe := in_params.isHeaderSourceRestricted(in_ds.src);
+	is_DRM_safe := ~in_params.isHeaderSourceRestricted(in_ds.src);
 	
 	is_industry_class_safe := ~(in_ds.src in MDR.sourceTools.set_Utilities 
 	                             AND in_params.isUtility()); //'UTILI'
