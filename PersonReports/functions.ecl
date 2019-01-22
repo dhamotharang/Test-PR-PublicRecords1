@@ -216,6 +216,7 @@ EXPORT functions := MODULE
 			export boolean   relationship_highConfidenceAssociates := tag.relationshipOption.HighConfidenceAssociates;
 			export unsigned2 relationship_relLookbackMonths        := tag.relationshipOption.RelativeLookBackMonths;
 			export string24  relationship_transAssocMask           := tag.relationshipOption.TransactionalAssociatesMask;
+			
     end;
 
     // unfortunately, I can't take immutable -- for CRS -- defaults in a manner like this:
@@ -625,6 +626,7 @@ HISTORICAL addresses (so far subject's only, no last name)
         Self.DeathCounty := R.county_name;
         Self.DeathState := R.state;
         self.Deceased := if ( r.did != '', 'Y','N');
+        self.IsLimitedAccessDMF := R.IsLimitedAccessDMF;
         // make a copy of SSNInfoEx: this must go away eventually when ESDL will be fixed
         Self.SSNInfo := project (L.SSNInfoEx, transform (iesp.share.t_SSNInfo, Self := Left,Self:=[];));
         Self := L;
