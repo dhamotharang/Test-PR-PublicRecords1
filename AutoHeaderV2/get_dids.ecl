@@ -11,8 +11,10 @@ EXPORT get_dids (dataset(AutoHeaderV2.layouts.unprocessed_input) ds_search_in, i
                  if (_row.currentResidentsOnly, AutoHeaderV2.Constants.SearchCode.CURRENT_RESIDENTS, 0);
 
   // pre-processing, transforming to a real library interface
+  unsigned1 saltLeadThresholdOverwrite := AutoHeaderV2.Constants.SaltLeadThreshold : STORED('SaltLeadThreshold');
   AutoHeaderV2.layouts.lib_search Preprocess (AutoHeaderV2.layouts.unprocessed_input L) := transform
     Self.ssn := AutoHeaderV2.translate.GetCleanedSSN (L.ssn, L.ApplicationType);
+    Self.saltLeadThreshold := saltLeadThresholdOverwrite;
     Self := L;
   end;
 	ds_search := project(ds_search_in, Preprocess (Left));
