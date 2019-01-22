@@ -188,18 +188,14 @@ export SearchRecords := MODULE
 				useALL =>  Gateway_Data_unrestricted & Local_Data,
 				realTime => Gateway_Data_unrestricted,
 				Local_Data); // LOCAL
-		
-   
-    // We are doing a deffered gateway fail+ message. The fail should happen only if the noFail is false.        
-      final_result := 
-      map(
+      
+    
+    final_result :=  map(
            aGatewayInputData.noFail => final_result_pre, 
-           isGatewayFailed => fail(final_result_pre,1208,doxie.ErrorCodes(10)+'.'+
-                                VehicleV2_Services.Polk_Code_Translations.ErrorCodes('1208')),
-           isAllEmpty  => fail(final_result_pre,10,doxie.ErrorCodes(10)),
-           final_result_pre
-          );
-
+           isGatewayFailed          => fail(final_result_pre,1208,VehicleV2_Services.Polk_Code_Translations.ErrorCodes('1208')),
+         //isAllEmpty               => fail(final_result_pre,10,Doxie.ErrorCodes(10)), /* */ 
+                                       final_result_pre);
+                                                            
  
    //Bug 132024 - apply new sorting rules to results (adding comment)
 		//RETURN final_result; 
