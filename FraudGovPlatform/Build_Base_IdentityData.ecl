@@ -1,31 +1,32 @@
 ﻿Import ut,tools,FraudShared; 
 
 EXPORT Build_Base_IdentityData (
-   string pversion
-	,dataset(Layouts.Base.IdentityData)  inBaseIdentityData   = Files().Base.IdentityData.Built
+	 string pversion
+	,dataset(FraudShared.Layouts.Input.mbs) MBS_Sprayed = FraudShared.Files().Input.MBS.sprayed
+	,dataset(Layouts.Base.IdentityData) inBaseIdentityData = IF(_Flags.Update.IdentityData, Files().Base.IdentityData.Built, DATASET([], Layouts.Base.IdentityData))
 	,dataset(Layouts.Input.IdentityData) inIdentityDataUpdate = Files().Input.IdentityData.Sprayed
-	,boolean	UpdateIdentityData   = _Flags.Update.IdentityData
+	,boolean UpdateIdentityData  = _Flags.Update.IdentityData
 ) := 
 module 
 
-		Layouts.Base.IdentityData	tPrep(inIdentityDataUpdate	l)	:=
+	Layouts.Base.IdentityData	tPrep(inIdentityDataUpdate	l)	:=
 	transform
-			self.process_date				:= (unsigned) l.ProcessDate, 
-			self.dt_first_seen				:= (unsigned) l.ProcessDate; 
-			self.dt_last_seen				:= (unsigned) l.ProcessDate;
-			self.dt_vendor_last_reported		:= (unsigned) l.ProcessDate; 
-			self.dt_vendor_first_reported		:= (unsigned) l.ProcessDate; 
-			self.source_rec_id				:= l.unique_id;																
-			self.current					:= 'C' ; 
-			self							:= l; 			
-			self							:= []; 
+		self.process_date := (unsigned) l.ProcessDate, 
+		self.dt_first_seen := (unsigned) l.ProcessDate; 
+		self.dt_last_seen := (unsigned) l.ProcessDate;
+		self.dt_vendor_last_reported := (unsigned) l.ProcessDate; 
+		self.dt_vendor_first_reported := (unsigned) l.ProcessDate; 
+		self.source_rec_id := l.unique_id;																
+		self.current := 'C' ; 
+		self := l; 			
+		self := []; 
    end; 
 		
 	IdentityDataUpdate	:=	project(inIdentityDataUpdate,tPrep(left));
 	
 	IdentityDataSource := join(	IdentityDataUpdate,
-							FraudShared.Files().Input.MBS.sprayed(status = 1), 
-							(unsigned6) left.Customer_Account_Number = right.gc_id AND 
+							MBS_Sprayed(status = 1), 
+							left.Customer_Account_Number = (string)right.gc_id AND 
 							left.file_type = right.file_type  AND
 							left.ind_type = right.ind_type AND 
 							left.customer_State = right.Customer_State AND
@@ -52,9 +53,8 @@ module
 	end;
 
 	pDataset_rollup := rollup( pDataset_sort
-														,RollupUpdate(left, right)
-														,source_rec_id ,local
-										);
+		,RollupUpdate(left, right)
+		,source_rec_id ,local);
 	
 	tools.mac_WriteFile(Filenames(pversion).Base.IdentityData.New,pDataset_rollup,Build_Base_File);
 

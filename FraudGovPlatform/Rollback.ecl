@@ -1,4 +1,4 @@
-﻿import tools, STD, FraudShared, FraudGovPlatform_Validation;
+﻿import STD, FraudShared, FraudGovPlatform_Validation;
 
 export Rollback(
 	string	pversion	= 	'',
