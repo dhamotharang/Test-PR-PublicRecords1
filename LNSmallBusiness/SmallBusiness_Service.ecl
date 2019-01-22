@@ -129,7 +129,7 @@ SmallBusinessRiskRequest XML:
 </pre>
 */
 
-import iesp, Risk_Indicators, Risk_Reporting, Address, Inquiry_AccLogs;
+import iesp, Risk_Indicators, Risk_Reporting, Address,Inquiry_AccLogs;
 export SmallBusiness_Service := macro
  #onwarning(4207, ignore);
 	// Can't have duplicate definitions of Stored with different default values, 
@@ -169,7 +169,11 @@ export SmallBusiness_Service := macro
 /* ************* End Scout Fields **************/
 	
 	unsigned history_date         := 999999 : stored('HistoryDateYYYYMM');
-	boolean  Test_Data_Enabled    := FALSE  : stored('TestDataEnabled');
+ 
+  boolean Test_Data_Enabled_Stored := FALSE : STORED('TestDataEnabled');
+  boolean Test_Data_Enabled_UserIn := userIn.TestDataEnabled;
+  boolean Test_Data_Enabled := Test_Data_Enabled_Stored OR Test_Data_Enabled_UserIn;
+	
 	string20 Test_Data_Table_Name := ''     : stored('TestDataTableName');
 	string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 	string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');

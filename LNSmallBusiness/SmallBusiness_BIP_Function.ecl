@@ -1,6 +1,6 @@
 ﻿IMPORT Address, BIPv2, Business_Risk_BIP, BusinessCredit_Services, Cortera, Gateway, IESP, 
-       Models, Risk_Indicators, Risk_Reporting, RiskWise, Suspicious_Fraud_LN, 
-       UT, Royalty, Address;
+       Models, Risk_Indicators, Risk_Reporting,RiskWise,  
+       UT,LNSmallBusiness;
 
 EXPORT SmallBusiness_BIP_Function (
 											DATASET(LNSmallBusiness.BIP_Layouts.Input) Input,
@@ -88,8 +88,10 @@ EXPORT SmallBusiness_BIP_Function (
 	Business_Risk_BIP.Layouts.Input convertToBusinessShellInput(SeqInput le) := TRANSFORM
 		SELF.Seq := le.Seq;
 		SELF.AcctNo := le.AcctNo;
-		SELF.HistoryDate := IF(le.HistoryDateYYYYMM > 0, le.HistoryDateYYYYMM, le.HistoryDate);
-		SELF.HistoryDateTime := IF(le.HistoryDate > 0, le.HistoryDate, le.HistoryDateYYYYMM);
+		//SELF.HistoryDate := IF(le.HistoryDateYYYYMM > 0, le.HistoryDateYYYYMM, le.HistoryDate);
+		SELF.HistoryDate := MAP(le.HistoryDateYYYYMM > 0 => le.HistoryDateYYYYMM, le.HistoryDate >0 =>le.HistoryDate,(INTEGER)Business_Risk_BIP.Constants.NinesDate);
+		// SELF.HistoryDateTime := IF(le.HistoryDate > 0, le.HistoryDate, le.HistoryDateYYYYMM);
+		SELF.HistoryDateTime := MAP(le.HistoryDate > 0 => le.HistoryDate, le.HistoryDateYYYYMM >0 =>le.HistoryDateYYYYMM,(INTEGER)Business_Risk_BIP.Constants.NinesDateTime);
 		SELF.CompanyName := le.Bus_Company_Name;
 		SELF.AltCompanyName := le.Bus_Doing_Business_As;
 		SELF.StreetAddress1 := le.Bus_Street_Address1;

@@ -1,4 +1,4 @@
-import doxie,Autokey_batch,AutokeyB2_batch,VehicleV2;
+﻿import doxie,Autokey_batch,AutokeyB2_batch,VehicleV2;
 
 export Batch_Layout := MODULE
 
@@ -711,6 +711,13 @@ export Brand_Layout := RECORD
 		le_1_Layout.le_1_mname;
 		le_1_Layout.le_1_lname;
 		le_1_Layout.le_1_name_suffix;
+		// v--- lo_1_*** ("Lessor" l) fields added for RQ-14898 bug fix.
+		lo_1_layout.lo_1_Orig_Name;
+		lo_1_layout.lo_1_company_name;
+		lo_1_Layout.lo_1_fname;
+		lo_1_Layout.lo_1_mname;
+		lo_1_Layout.lo_1_lname;
+		lo_1_Layout.lo_1_name_suffix;
 		lh_1_layout.lh_1_Orig_Name;
 		lh_1_layout.lh_1_company_name;
 		lh_1_Layout.lh_1_fname;

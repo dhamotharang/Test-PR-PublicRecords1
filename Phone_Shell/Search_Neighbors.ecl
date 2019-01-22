@@ -5,16 +5,39 @@
  * This code is directly adapted from progressive_phone.mac_get_type_h    *
  ************************************************************************ */
 
-IMPORT Address, Doxie, Gong, NID, Phone_Shell, Progressive_Phone, RiskWise, UT;
+IMPORT Address, Doxie, Gong, NID, Phone_Shell, Progressive_Phone, RiskWise;
 
-EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Neighbors (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, UNSIGNED1 PhoneRestrictionMask, STRING50 DataRestrictionMask, UNSIGNED1 GLBPurpose, UNSIGNED1 DPPAPurpose, UNSIGNED3 Max_Neighborhoods = 0, Neighbors_Per_NA = 6, Neighbor_Recency = 3, BOOLEAN probation_override_value = FALSE, BOOLEAN no_scrub = FALSE, STRING ssn_mask_value = '', STRING industry_class_value = '') := FUNCTION
+EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Neighbors (
+    DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, 
+    UNSIGNED1 PhoneRestrictionMask, STRING50 DataRestrictionMask, UNSIGNED1 GLBPurpose, UNSIGNED1 DPPAPurpose, 
+    UNSIGNED3 Max_Neighborhoods = 0, Neighbors_Per_NA = 6, Neighbor_Recency = 3, BOOLEAN probation_override_value = FALSE, 
+    BOOLEAN no_scrub = FALSE, STRING ssn_mask_value = '', STRING industry_class_value = '') := FUNCTION
+
+  mod_access := MODULE (doxie.IDataAccess)
+    EXPORT unsigned1 glb := GLBPurpose;
+    EXPORT unsigned1 dppa := DPPAPurpose;
+    // EXPORT string DataPermissionMask := '';
+    EXPORT string DataRestrictionMask := ^.DataRestrictionMask;
+    // EXPORT boolean ln_branded := FALSE;
+    EXPORT boolean probation_override := probation_override_value;
+    EXPORT string5 industry_class := industry_class_value;
+    // EXPORT string32 application_type := '';
+    EXPORT boolean no_scrub := ^.no_scrub;
+    // EXPORT unsigned3 date_threshold := 0;
+    // EXPORT boolean suppress_dmv := TRUE;
+    // EXPORT boolean show_minors := FALSE;
+    EXPORT string ssn_mask := ssn_mask_value;
+    // EXPORT unsigned1 dl_mask := 1;
+    // EXPORT unsigned1 dob_mask := suppress.constants.dateMask.ALL;
+  END;
+
 	Subj_Best_Rec := RECORD
 		UNSIGNED4 seq := 0;
 		Doxie.Layout_Best;
 	END;
 	
-	glb_ok := ut.glb_ok(GLBPurpose);
-	dppa_ok := ut.dppa_ok(DPPAPurpose);
+	glb_ok := mod_access.isValidGLB();
+	dppa_ok := mod_access.isValidDPPA();
 	
 	ds_InputFiltered := Input(Clean_Input.DID <> 0);
 	doxie.mac_best_records(ds_InputFiltered,
@@ -74,18 +97,11 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_Neighbors (
 																			10, // NPA
 																			Neighbors_Per_NA,
 																			Neighbor_Recency,
-																			Industry_Class_Value,
-																			GLBPurpose,
-																			DPPAPurpose,
-																			Probation_Override_Value,
-																			no_scrub,
-																			glb_ok,
-																			dppa_ok,
-																			SSN_Mask_Value,
 																			FALSE, // Use_Max_Neighborhoods
 																			FALSE, // Switch_TargetSeq
 																			10, // Proximity_Radius
-																			FALSE); // Check RNA
+																			FALSE, // Check RNA
+                                      mod_access);
 																			// Treat as subject because the header rows are only being used to look up phone rows and it will not be returned otherwise
 
 	neighbor_with_rank_rec := RECORD

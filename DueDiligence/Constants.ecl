@@ -55,6 +55,7 @@ EXPORT LAST_POS  := 5;
 
 EXPORT MAX_KEEP        := 1000;             /* The maximum number of records we KEEP */
 EXPORT MAX_ATMOST      := 1000;             /* The maximum number of records we care to use in an ATMOST within a JOIN. */
+EXPORT MAX_ATMOST_1    := 1;
 EXPORT MAX_ATMOST_100  := 100;
 EXPORT MAX_ATMOST_150	 := 150;
 EXPORT MAX_ATMOST_500  := 500;

@@ -49,7 +49,7 @@ EXPORT Healthcare_SocioEconomic_Functions_Core := Module
 		finalAge := ( STD.Date.FromGregorianYMD(AgeRefYear,AgeRefMonth,AgeRefDay)-STD.Date.FromGregorianYMD(inDOBYear,inDOBMonth,inDOBDay) )/365.24;
 		return if(inDOB='',0,ROUND(finalAge,2));
 	end;
-	/*
+	
 	export SeMAcalcAgeInYears(STRING8 inDOB, STRING8 AgeRefYYYYMMDD) := function
 		inDOBYear := (INTEGER2)inDOB[1..4];
 		inDOBMonth := (UNSIGNED1)inDOB[5..6];
@@ -58,8 +58,9 @@ EXPORT Healthcare_SocioEconomic_Functions_Core := Module
 		AgeRefMonth := (UNSIGNED1)AgeRefYYYYMMDD[5..6];
 		AgeRefDay := (UNSIGNED1)AgeRefYYYYMMDD[7..8];
 		finalAge := ( STD.Date.FromGregorianYMD(AgeRefYear,AgeRefMonth,AgeRefDay)-STD.Date.FromGregorianYMD(inDOBYear,inDOBMonth,inDOBDay) )/365.24;
-		outAge := ROUND(finalAge,3);
-		return if(inDOB='',0,outAge);
+		outAge := ROUND(finalAge,2);
+		outAge_trunc := TRUNCATE(outAge*100)/100;
+		return if(inDOB='',0,(DECIMAL5_2)outAge_trunc);
 	end;
 	export calc_Age_Gender_PDC_Rate(REAL8 age_in, STRING1 gender_in) := function
 	age := if(age_in > 80, 80, age_in);
@@ -68,7 +69,7 @@ EXPORT Healthcare_SocioEconomic_Functions_Core := Module
 	((-0.00000092 * POWER(age,3)) + (0.00005444 * POWER(age,2)) + (0.00173714 * age) + 0.68144918));
 	return Age_Gender_PDC_Rate;
 	end;
-	*/
+	
 	export crosswalkState(String inState) := function
 		clnState := trim(STD.Str.ToUpperCase(inState),left,right);
 		return map(clnState = 'AK' => 1,

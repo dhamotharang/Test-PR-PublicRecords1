@@ -555,6 +555,7 @@ EXPORT Functions := MODULE
 			SELF.gc_id := (STRING)L.FraudGovUser.GlobalCompanyId;
 			SELF.program_name := L.FraudGovUser.IndustryTypeName;
 			SELF.inquiry_reason := InquiryReason;
+			SELF.reason_description := InquiryReason;
 			SELF.inquiry_source := FraudGovPlatform_Services.Constants.INQUIRY_SOURCE;
 			SELF.file_type := FraudGovPlatform_Services.Constants.PayloadFileTypeEnum.IdentityActivity;
 			

@@ -5217,7 +5217,7 @@ EXPORT SeRs_M1_doMapping(ds, outRecord) := FUNCTIONMACRO
 				RETURN result;
 ENDMACRO;
 
-/*
+
 EXPORT SeMA_M0_Xwalk_PreProc_Mapping(ds, outRecord) := FUNCTIONMACRO
             outRecord doXform(Models.Layouts_Healthcare_Core.layout_SocioEconomic_LI_PB_flat_typed L) := TRANSFORM 
                self.seq := L.seq;
@@ -5227,7 +5227,7 @@ EXPORT SeMA_M0_Xwalk_PreProc_Mapping(ds, outRecord) := FUNCTIONMACRO
                self.HistorydateYYYYMM := L.HistorydateYYYYMM;
                ageRefYYYYMMDD := if((string)L.HistorydateYYYYMM = '999999' OR (string)L.HistorydateYYYYMM='0', (string)Std.Date.Today(), 
                                            (string)L.HistorydateYYYYMM+(string2)Models.Healthcare_SocioEconomic_Functions_Core.calcDaysInMonth((string)L.HistorydateYYYYMM));
-               SeMA_Age_In_Years := (REAL8)Models.Healthcare_SocioEconomic_Functions_Core.SeMAcalcAgeInYears(L.DOB,(string)ageRefYYYYMMDD);
+               DECIMAL5_2 SeMA_Age_In_Years := (DECIMAL5_2) Models.Healthcare_SocioEconomic_Functions_Core.SeMAcalcAgeInYears(L.DOB,(string)ageRefYYYYMMDD);
                self.age_in_years :=(REAL8) SeMA_Age_In_Years;
                SELF.Gender := (integer)CASE(L.GenderStr,'F' => 1, 'M' => 2, 1);
                SELF.accidentage :=  (INTEGER4) L.accidentage;
@@ -5373,7 +5373,7 @@ EXPORT SeMA_M0_Xwalk_PreProc_Mapping(ds, outRecord) := FUNCTIONMACRO
                result := PROJECT(ds, doXform(LEFT));
             RETURN result;
 ENDMACRO;
-*/
+
 
 Export Models.Layouts_Healthcare_Core.Final_Output_Layout OPTION_1_SE_A(Models.Layouts_Healthcare_Core.layout_SocioEconomic_LI_PB_combined_flat Le) := TRANSFORM
    self.acctno                          := (string)Le.acctno;
@@ -5839,6 +5839,12 @@ Export Models.Layouts_Healthcare_Core.Final_Output_Layout OPTION_2_SE_RS(Models.
 			SELF.isSeRsInvalidDiag                  := (String) Le.isSeRsInvalidDiag;
 			SELF.isSeRsInvalidPatientType           := (String) Le.isSeRsInvalidPatientType;
 			SELF.isSeRsInvalidFinancialClass        := (String) Le.isSeRsInvalidFinancialClass;
+      SELF.RAR_Driver_Hi1 := (string) IF(Le.RAR_Driver_Hi1 <>'', Le.RAR_Driver_Hi1,'N/A');
+      SELF.RAR_Driver_Hi2 := (string) IF(Le.RAR_Driver_Hi2 <>'', Le.RAR_Driver_Hi2,'N/A');
+      SELF.RAR_Driver_Hi3 := (string) IF(Le.RAR_Driver_Hi3 <>'', Le.RAR_Driver_Hi3,'N/A');
+      SELF.RAR_Driver_Lo1 := (string) IF(Le.RAR_Driver_Lo1 <>'', Le.RAR_Driver_Lo1,'N/A');
+      SELF.RAR_Driver_Lo2 := (string) IF(Le.RAR_Driver_Lo2 <>'', Le.RAR_Driver_Lo2,'N/A');
+      SELF.RAR_Driver_Lo3 := (string) IF(Le.RAR_Driver_Lo3 <>'', Le.RAR_Driver_Lo3,'N/A');       
 			SELF := [];
 END;
 
@@ -6301,7 +6307,13 @@ Export Models.Layouts_Healthcare_Core.Final_Output_Layout OPTION_5_SE_A_RS(Model
    SELF.SourceOrderSourceCount  								:= (String) Le.SourceOrderSourceCount;
 			SELF.SeRs_Score                      := (String) IF(Ri.SeRs_Score<>'',Ri.SeRs_Score, 'N/A');
 			SELF.SeRs_Raw_Score                  := (String) IF(Ri.SeRs_Raw_Score<>'',Ri.SeRs_Raw_Score, 'N/A');
-			SELF.isSeRsInvalidDiag            			:= (String) Ri.isSeRsInvalidDiag;
+			SELF.RAR_Driver_Hi1 := (string) IF(Ri.RAR_Driver_Hi1 <>'', Ri.RAR_Driver_Hi1,'N/A');
+      SELF.RAR_Driver_Hi2 := (string) IF(Ri.RAR_Driver_Hi2 <>'', Ri.RAR_Driver_Hi2,'N/A');
+      SELF.RAR_Driver_Hi3 := (string) IF(Ri.RAR_Driver_Hi3 <>'', Ri.RAR_Driver_Hi3,'N/A');
+      SELF.RAR_Driver_Lo1 := (string) IF(Ri.RAR_Driver_Lo1 <>'', Ri.RAR_Driver_Lo1,'N/A');
+      SELF.RAR_Driver_Lo2 := (string) IF(Ri.RAR_Driver_Lo2 <>'', Ri.RAR_Driver_Lo2,'N/A');
+      SELF.RAR_Driver_Lo3 := (string) IF(Ri.RAR_Driver_Lo3 <>'', Ri.RAR_Driver_Lo3,'N/A'); 
+      SELF.isSeRsInvalidDiag            			:= (String) Ri.isSeRsInvalidDiag;
 			SELF.isSeRsInvalidPatientType     			:= (String) Ri.isSeRsInvalidPatientType;
 			SELF.isSeRsInvalidFinancialClass  			:= (String) Ri.isSeRsInvalidFinancialClass;
 			SELF.Score                        			:= 'N/A';
@@ -7208,16 +7220,22 @@ Export Models.Layouts_Healthcare_Core.Final_Output_Layout OPTION_7_SE_A_HS_RS(Mo
    SELF.ProspectMaritalStatus           := (String) Le.v1_ProspectMaritalStatus;
    SELF.ProspectBankingExperience       := (String) Le.v1_ProspectBankingExperience;
    SELF.InterestSportPerson             := (String) Le.v1_InterestSportPerson;
-   SELF.DoNotMail               								:= (String) Le.DoNotMail;
-   SELF.SourceOrderActivity     								:= (String) Le.SourceOrderActivity;
-   SELF.SourceOrderAgeLastOrder 								:= (String) Le.SourceOrderAgeLastOrder;
-   SELF.SourceOrderSourceCount  								:= (String) Le.SourceOrderSourceCount;
-   SELF.SeRs_Score                   			:= (String) Ri.SeRs_Score;
-			SELF.SeRs_Raw_Score               			:= (String) Ri.SeRs_Raw_Score;
-			SELF.isSeRsInvalidDiag            			:= (String) Ri.isSeRsInvalidDiag;
-			SELF.isSeRsInvalidPatientType     			:= (String) Ri.isSeRsInvalidPatientType;
-			SELF.isSeRsInvalidFinancialClass  			:= (String) Ri.isSeRsInvalidFinancialClass;
-			SELF.Score                        			:= (String) Ri.Score;
+   SELF.DoNotMail               			  := (String) Le.DoNotMail;
+   SELF.SourceOrderActivity     			  := (String) Le.SourceOrderActivity;
+   SELF.SourceOrderAgeLastOrder 			  := (String) Le.SourceOrderAgeLastOrder;
+   SELF.SourceOrderSourceCount  			  := (String) Le.SourceOrderSourceCount;
+   SELF.SeRs_Score                   	  := (String) Ri.SeRs_Score;
+	 SELF.SeRs_Raw_Score               	  := (String) Ri.SeRs_Raw_Score;
+   SELF.RAR_Driver_Hi1 := (string) IF(Ri.RAR_Driver_Hi1 <>'', Ri.RAR_Driver_Hi1,'N/A');
+   SELF.RAR_Driver_Hi2 := (string) IF(Ri.RAR_Driver_Hi2 <>'', Ri.RAR_Driver_Hi2,'N/A');
+   SELF.RAR_Driver_Hi3 := (string) IF(Ri.RAR_Driver_Hi3 <>'', Ri.RAR_Driver_Hi3,'N/A');
+   SELF.RAR_Driver_Lo1 := (string) IF(Ri.RAR_Driver_Lo1 <>'', Ri.RAR_Driver_Lo1,'N/A');
+   SELF.RAR_Driver_Lo2 := (string) IF(Ri.RAR_Driver_Lo2 <>'', Ri.RAR_Driver_Lo2,'N/A');
+   SELF.RAR_Driver_Lo3 := (string) IF(Ri.RAR_Driver_Lo3 <>'', Ri.RAR_Driver_Lo3,'N/A');
+   SELF.isSeRsInvalidDiag := (String) Ri.isSeRsInvalidDiag;
+   SELF.isSeRsInvalidPatientType := (String) Ri.isSeRsInvalidPatientType;
+   SELF.isSeRsInvalidFinancialClass := (String) Ri.isSeRsInvalidFinancialClass;
+   SELF.Score := (String) Ri.Score;
    SELF := [];
 END;
 
@@ -7702,8 +7720,14 @@ Export Models.Layouts_Healthcare_Core.Final_Output_Layout OPTION_8_SE_DEBUG(Mode
 			SELF.isSeRsExcludedDiag              := (String) Ri.isSeRsExcludedDiag;
 			SELF.isSeRsMinor                     := (String) Ri.isSeRsMinor;
 			SELF.isSeRsM1ModelUsed               := (String) Ri.isSeRsM1ModelUsed;
-   SELF.SeRs_Score                   			:= (String) Ri.SeRs_Score;
+      SELF.SeRs_Score                   			:= (String) Ri.SeRs_Score;
 			SELF.SeRs_Raw_Score               			:= (String) Ri.SeRs_Raw_Score;
+      SELF.RAR_Driver_Hi1 := (string) IF(Ri.RAR_Driver_Hi1 <>'', Ri.RAR_Driver_Hi1,'N/A');
+      SELF.RAR_Driver_Hi2 := (string) IF(Ri.RAR_Driver_Hi2 <>'', Ri.RAR_Driver_Hi2,'N/A');
+      SELF.RAR_Driver_Hi3 := (string) IF(Ri.RAR_Driver_Hi3 <>'', Ri.RAR_Driver_Hi3,'N/A');
+      SELF.RAR_Driver_Lo1 := (string) IF(Ri.RAR_Driver_Lo1 <>'', Ri.RAR_Driver_Lo1,'N/A');
+      SELF.RAR_Driver_Lo2 := (string) IF(Ri.RAR_Driver_Lo2 <>'', Ri.RAR_Driver_Lo2,'N/A');
+      SELF.RAR_Driver_Lo3 := (string) IF(Ri.RAR_Driver_Lo3 <>'', Ri.RAR_Driver_Lo3,'N/A');
 			SELF.isSeRsInvalidDiag            			:= (String) Ri.isSeRsInvalidDiag;
 			SELF.isSeRsInvalidPatientType     			:= (String) Ri.isSeRsInvalidPatientType;
 			SELF.isSeRsInvalidFinancialClass  			:= (String) Ri.isSeRsInvalidFinancialClass;
@@ -7711,24 +7735,1127 @@ Export Models.Layouts_Healthcare_Core.Final_Output_Layout OPTION_8_SE_DEBUG(Mode
    SELF := [];
 END;
 
-/*
-EXPORT Add_SEMA_Score(DS_LEFT, DS_RIGHT, outRecord) := FUNCTIONMACRO
-   result := Join(DS_LEFT, DS_RIGHT, left.seq=(string)right.seq, 
-                  transform(outRecord,
-                  self.SeMA_Raw_Score := (string) IF(right.SeMA_Raw_Score <>'', right.SeMA_Raw_Score,'N/A');
-                  self.SeMA_Score := (string) IF(right.SeMA_Score <>'', right.SeMA_Score,'N/A');
-                  self := left;),left outer, keep(1000), atmost(1));
-   RETURN result;
-ENDMACRO;
 EXPORT Add_LexID_ADLScore(DS_LEFT, DS_RIGHT, outRecord) := FUNCTIONMACRO
    result := Join(DS_LEFT, DS_RIGHT, left.seq=(string)right.seq, 
                   transform(outRecord,
                   self.Lexid := (string) right.did;
                   self.ADLScore := (string) right.score;
-                  self := left;
-                  self := []),left outer, keep(1000), atmost(1));
+                  self := left),left outer, keep(1000), atmost(1));
    RETURN result;
 ENDMACRO;
-*/
+
+EXPORT Add_ADLScore(DS_LEFT, DS_RIGHT, outRecord) := FUNCTIONMACRO
+   result := Join(DS_LEFT, DS_RIGHT, left.seq=(string)right.seq, 
+                  transform(outRecord,
+                  self.ADLScore := (string) right.score;
+                  self := left),left outer, keep(1000), atmost(1));
+   RETURN result;
+ENDMACRO;
+
+EXPORT Add_SERS_Score_RD(DS_LEFT, DS_RIGHT, outRecord) := FUNCTIONMACRO
+   result := Join(DS_LEFT, DS_RIGHT, left.seq=(string)right.seq, 
+                  transform(outRecord,
+                  SELF.SeRs_Score                   := (String) IF(right.SeRs_Score<>'',right.SeRs_Score, 'N/A');
+                  SELF.SeRs_Raw_Score               := (String) IF(right.SeRs_Raw_Score<>'',right.SeRs_Raw_Score, 'N/A');
+                  SELF.isSeRsInvalidDiag            := (String) right.isSeRsInvalidDiag;
+                  SELF.isSeRsInvalidPatientType     := (String) right.isSeRsInvalidPatientType;
+                  SELF.isSeRsInvalidFinancialClass  := (String) right.isSeRsInvalidFinancialClass;
+                  self.LexID               := (string) right.LexID;
+                  self.seq                 := (string) left.seq;
+                  self.acctno              := (string) left.acctno;
+                  SELF.Score               := (String) left.Score;
+                  self.RAR_Driver_Hi1 := (string) IF(right.RAR_Driver_Hi1 <>'', right.RAR_Driver_Hi1,'N/A');
+                  self.RAR_Driver_Hi2 := (string) IF(right.RAR_Driver_Hi2 <>'', right.RAR_Driver_Hi2,'N/A');
+                  self.RAR_Driver_Hi3 := (string) IF(right.RAR_Driver_Hi3 <>'', right.RAR_Driver_Hi3,'N/A');
+                  self.RAR_Driver_Lo1 := (string) IF(right.RAR_Driver_Lo1 <>'', right.RAR_Driver_Lo1,'N/A');
+                  self.RAR_Driver_Lo2 := (string) IF(right.RAR_Driver_Lo2 <>'', right.RAR_Driver_Lo2,'N/A');
+                  self.RAR_Driver_Lo3 := (string) IF(right.RAR_Driver_Lo3 <>'', right.RAR_Driver_Lo3,'N/A');  
+                  self := [];),left outer, keep(1000), atmost(1));
+   RETURN result;
+ENDMACRO;
+
+EXPORT Add_SERS_Score_RD_DEBUG(DS_LEFT, DS_RIGHT, outRecord) := FUNCTIONMACRO
+   result := Join(DS_LEFT, DS_RIGHT, (string)left.seq=(string)right.seq, 
+                  transform(outRecord,
+                  SELF.SeRs_Score                   := (String) IF(right.SeRs_Score<>'',right.SeRs_Score, 'N/A');
+                  SELF.SeRs_Raw_Score               := (String) IF(right.SeRs_Raw_Score<>'',right.SeRs_Raw_Score, 'N/A');
+                  SELF.isSeRsInvalidDiag            := (String) right.isSeRsInvalidDiag;
+                  SELF.isSeRsInvalidPatientType     := (String) right.isSeRsInvalidPatientType;
+                  SELF.isSeRsInvalidFinancialClass  := (String) right.isSeRsInvalidFinancialClass;
+                  self.LexID               := (string) right.LexID;
+                  self.seq                 := (string) left.seq;
+                  self.acctno              := (string) left.acctno;
+                  SELF.Score               := (String) left.Score;
+                  self.RAR_Driver_Hi1 := (string) IF(right.RAR_Driver_Hi1 <>'', right.RAR_Driver_Hi1,'N/A');
+                  self.RAR_Driver_Hi2 := (string) IF(right.RAR_Driver_Hi2 <>'', right.RAR_Driver_Hi2,'N/A');
+                  self.RAR_Driver_Hi3 := (string) IF(right.RAR_Driver_Hi3 <>'', right.RAR_Driver_Hi3,'N/A');
+                  self.RAR_Driver_Lo1 := (string) IF(right.RAR_Driver_Lo1 <>'', right.RAR_Driver_Lo1,'N/A');
+                  self.RAR_Driver_Lo2 := (string) IF(right.RAR_Driver_Lo2 <>'', right.RAR_Driver_Lo2,'N/A');
+                  self.RAR_Driver_Lo3 := (string) IF(right.RAR_Driver_Lo3 <>'', right.RAR_Driver_Lo3,'N/A');  
+                  SELF.FINANCIAL_CLASS              := (String) Right.FINANCIAL_CLASS;
+                  SELF.PATIENT_TYPE                 := (String) Right.PATIENT_TYPE;
+                  SELF.GENDER                       := (String) Right.GENDERstr;
+                  SELF.RSMemberAge                  := (String) Right.RSMemberAge;
+                  SELF.AGE_GROUP                    := (String) Right.AGE_GROUP;
+                  SELF.ADMIT_DIAG                   := (String) Right.ADMIT_DIAG;
+                  SELF.READMIT_DIAG                 := (String) Right.READMIT_DIAG;
+                  SELF.READMIT_LIFT                 := (String) Right.READMIT_LIFT;
+                  SELF.isSeRsExcludedDiag           := (String) Right.isSeRsExcludedDiag;
+                  SELF.isSeRsMinor                  := (String) Right.isSeRsMinor;
+                  SELF.isSeRsM1ModelUsed            := (String) Right.isSeRsM1ModelUsed;
+                  self := [];),left outer, keep(1000), atmost(1));
+   RETURN result;
+ENDMACRO;
+
+EXPORT Add_SEMA_RD(DS_LEFT, DS_RIGHT, outRecord) := FUNCTIONMACRO
+   result := Join(DS_LEFT, DS_RIGHT, left.seq=(string)right.seq, 
+                  transform(outRecord,
+                     self.MA_Driver_Hi1 := right.MA_Driver_Hi1;
+                     self.MA_Driver_Hi2 := right.MA_Driver_Hi2;
+                     self.MA_Driver_Hi3 := right.MA_Driver_Hi3;
+                     self.MA_Driver_Lo1 := right.MA_Driver_Lo1;
+                     self.MA_Driver_Lo2 := right.MA_Driver_Lo2;
+                     self.MA_Driver_Lo3 := right.MA_Driver_Lo3;
+                     self := left;),left outer, keep(1000), atmost(1));
+   RETURN result;
+ENDMACRO;
+
+EXPORT Add_SEMA_Score_RD(DS_LEFT, DS_RIGHT, outRecord) := FUNCTIONMACRO
+   result := Join(DS_LEFT, DS_RIGHT, left.seq=(string)right.seq, 
+                  transform(outRecord,
+                  self.SeMA_Raw_Score := (string) IF(right.SeMA_Raw_Score <>'', right.SeMA_Raw_Score,'N/A');
+                  self.SeMA_Score     := (string) IF(right.SeMA_Score <>'', right.SeMA_Score,'N/A');
+                  self.MA_Driver_Hi1 := (string) IF(right.MA_Driver_Hi1 <>'', right.MA_Driver_Hi1,'N/A');
+                  self.MA_Driver_Hi2 := (string) IF(right.MA_Driver_Hi2 <>'', right.MA_Driver_Hi2,'N/A');
+                  self.MA_Driver_Hi3 := (string) IF(right.MA_Driver_Hi3 <>'', right.MA_Driver_Hi3,'N/A');
+                  self.MA_Driver_Lo1 := (string) IF(right.MA_Driver_Lo1 <>'', right.MA_Driver_Lo1,'N/A');
+                  self.MA_Driver_Lo2 := (string) IF(right.MA_Driver_Lo2 <>'', right.MA_Driver_Lo2,'N/A');
+                  self.MA_Driver_Lo3 := (string) IF(right.MA_Driver_Lo3 <>'', right.MA_Driver_Lo3,'N/A');
+                  self := left;),left outer, keep(1000), atmost(1));
+   RETURN result;
+ENDMACRO;
+
+
+EXPORT getSeRS_M0_M1_RiskDrivers(ds) := FUNCTIONMACRO 
+   Models.Layouts_Healthcare_Core.RiskDrivers_Normalized_Attributes_Layout NormIt(TYPEOF(RECORDOF(ds)) L, INTEGER C) := TRANSFORM
+      SELF := L;
+      SELF.Raw_Score := L.SeRs_Raw_Score;
+      //Using the model input with raw score ds layout.
+      SELF.AttributeValue := CHOOSE(C,
+      (REAL8) L.SEQ,
+      (REAL8) L.AcctNo,
+      (REAL8) L.LexID,
+      (REAL8) L.isSeRsM1ModelUsed,
+      (REAL8) L.ACCIDENTAGE,
+      (REAL8) L.ACCIDENTCOUNT,
+      (REAL8) L.ADDRCHANGECOUNT03,
+      (REAL8) L.ADDRCHANGECOUNT06,
+      (REAL8) L.ADDRCHANGECOUNT12,
+      (REAL8) L.ADDRCHANGECOUNT24,
+      (REAL8) L.ADDRCHANGECOUNT60,
+      (REAL8) L.ADDRSTABILITY,
+      (REAL8) L.AGE_IN_YEARS,
+      (REAL8) L.AGEOLDESTRECORD,
+      (REAL8) L.ARRESTCOUNT03,
+      (REAL8) L.ARRESTCOUNT24,
+      (REAL8) L.ASSETOWNER,
+      (REAL8) L.ASSOCHIGHRISKTOPOLOGYCOUNT,
+      (REAL8) L.ASSOCRISKLEVEL,
+      (REAL8) L.ASSOCSUSPICOUSIDENTITIESCOUNT,
+      (REAL8) L.BANKRUPTCYAGE,
+      (REAL8) L.BANKRUPTCYCOUNT,
+      (REAL8) L.BANKRUPTCYCOUNT01,
+      (REAL8) L.BANKRUPTCYCOUNT24,
+      (REAL8) L.BANKRUPTCYSTATUS,
+      (REAL8) L.BANKRUPTCYTYPE,
+      (REAL8) L.BUSINESSASSOCIATIONAGE,
+      (REAL8) L.BUSINESSINACTIVEASSOCIATION,
+      (REAL8) L.COMPONENTCHARRISKLEVEL,
+      (REAL8) L.CURRADDRAGELASTSALE,
+      (REAL8) L.CURRADDRAGENEWESTRECORD,
+      (REAL8) L.CURRADDRAGEOLDESTRECORD,
+      (REAL8) L.CURRADDRAVMVALUE,
+      (REAL8) L.CURRADDRAVMVALUE12,
+      (REAL8) L.CURRADDRAVMVALUE60,
+      (REAL8) L.CURRADDRBLOCKINDEX,
+      (REAL8) L.CURRADDRBURGLARYINDEX,
+      (REAL8) L.CURRADDRCARTHEFTINDEX,
+      (REAL8) L.CURRADDRCOUNTYINDEX,
+      (REAL8) L.CURRADDRCRIMEINDEX,
+      (REAL8) L.CURRADDRDWELLTYPE,
+      (REAL8) L.CURRADDRLASTSALESPRICE,
+      (REAL8) L.CURRADDRLENOFRES,
+      (REAL8) L.CURRADDRMEDIANINCOME,
+      (REAL8) L.CURRADDRMEDIANVALUE,
+      (REAL8) L.CURRADDRMURDERINDEX,
+      (REAL8) L.CURRADDRTAXMARKETVALUE,
+      (REAL8) L.CURRADDRTAXVALUE,
+      (REAL8) L.CURRADDRTAXYR,
+      (REAL8) L.CURRADDRTRACTINDEX,
+      (REAL8) L.DEROGAGE,
+      (REAL8) L.DEROGCOUNT,
+      (REAL8) L.DEROGSEVERITYINDEX,
+      (REAL8) L.DIVSSNADDRMSOURCECOUNT,
+      (REAL8) L.DIVSSNIDENTITYMSOURCECOUNT,
+      (REAL8) L.DIVSSNIDENTITYMSOURCEURELCOUNT,
+      (REAL8) L.EDUCATIONFIELDOFSTUDYTYPE,
+      (REAL8) L.EDUCATIONINSTITUTIONRATING,
+      (REAL8) L.EDUCATIONPROGRAM2YR,
+      (REAL8) L.ESTIMATEDANNUALINCOME,
+      (REAL8) L.EVICTIONAGE,
+      (REAL8) L.EVICTIONCOUNT,
+      (REAL8) L.EVICTIONCOUNT60,
+      (REAL8) L.FELONYAGE,
+      (REAL8) L.FELONYCOUNT,
+      (REAL8) L.FELONYCOUNT01,
+      (REAL8) L.FELONYCOUNT60,
+      (REAL8) L.HISTORICALADDRCORRECTIONAL,
+      (REAL8) L.IDENTITYRISKLEVEL,
+      (REAL8) L.IDVERSSNCREDITBUREAUCOUNT,
+      (REAL8) L.INPUTADDRHISTORICALMATCH,
+      (REAL8) L.LASTNAMECHANGEAGE,
+      (REAL8) L.LASTNAMECHANGECOUNT24,
+      (REAL8) L.LASTNAMECHANGECOUNT60,
+      (REAL8) L.LIENCOUNT,
+      (REAL8) L.LIENFILEDAGE,
+      (REAL8) L.LIENFILEDCOUNT,
+      (REAL8) L.LIENFILEDCOUNT60,
+      (REAL8) L.LIENFILEDTOTAL,
+      (REAL8) L.LIENRELEASEDAGE,
+      (REAL8) L.LIENRELEASEDCOUNT06,
+      (REAL8) L.NONDEROGCOUNT,
+      (REAL8) L.NONDEROGCOUNT01,
+      (REAL8) L.NONDEROGCOUNT03,
+      (REAL8) L.NONDEROGCOUNT06,
+      (REAL8) L.NONDEROGCOUNT12,
+      (REAL8) L.NONDEROGCOUNT24,
+      (REAL8) L.NONDEROGCOUNT60,
+      (REAL8) L.P_ESTIMATEDHHINCOMEPERCAPITA,
+      (REAL8) L.PHONEEDAAGENEWESTRECORD,
+      (REAL8) L.PHONEEDAAGEOLDESTRECORD,
+      (REAL8) L.PHONEOTHERAGENEWESTRECORD,
+      (REAL8) L.PHONEOTHERAGEOLDESTRECORD,
+      (REAL8) L.PREVADDRAGELASTSALE,
+      (REAL8) L.PREVADDRAGENEWESTRECORD,
+      (REAL8) L.PREVADDRAGEOLDESTRECORD,
+      (REAL8) L.PREVADDRBURGLARYINDEX,
+      (REAL8) L.PREVADDRCARTHEFTINDEX,
+      (REAL8) L.PREVADDRCRIMEINDEX,
+      (REAL8) L.PREVADDRDWELLTYPE,
+      (REAL8) L.PREVADDRFAMILYOWNED,
+      (REAL8) L.PREVADDRLASTSALESPRICE,
+      (REAL8) L.PREVADDRLENOFRES,
+      (REAL8) L.PREVADDRMEDIANINCOME,
+      (REAL8) L.PREVADDRMEDIANVALUE,
+      (REAL8) L.PREVADDRMURDERINDEX,
+      (REAL8) L.PREVADDRTAXMARKETVALUE,
+      (REAL8) L.PREVADDRTAXVALUE,
+      (REAL8) L.PREVADDRTRACTINDEX,
+      (REAL8) L.PROFLICCOUNT60,
+      (REAL8) L.PROFLICTYPECATEGORY,
+      (REAL8) L.PROPAGENEWESTPURCHASE,
+      (REAL8) L.PROPAGENEWESTSALE,
+      (REAL8) L.PROPAGEOLDESTPURCHASE,
+      (REAL8) L.PROPNEWESTSALEPRICE,
+      (REAL8) L.PROPOWNEDCOUNT,
+      (REAL8) L.PROPOWNEDHISTORICALCOUNT,
+      (REAL8) L.PROPPURCHASEDCOUNT01,
+      (REAL8) L.PROPPURCHASEDCOUNT24,
+      (REAL8) L.PROPSOLDCOUNT24,
+      (REAL8) L.PRSEARCHLOCATECOUNT,
+      (REAL8) L.PRSEARCHLOCATECOUNT24,
+      (REAL8) L.PRSEARCHOTHERCOUNT,
+      (REAL8) L.PRSEARCHOTHERCOUNT03,
+      (REAL8) L.PRSEARCHOTHERCOUNT06,
+      (REAL8) L.PRSEARCHOTHERCOUNT24,
+      (REAL8) L.PRSEARCHPERSONALFINANCECOUNT,
+      (REAL8) L.PRSEARCHPERSONALFINANCECOUNT06,
+      (REAL8) L.PRSEARCHPERSONALFINANCECOUNT24,
+      (REAL8) L.RECENTACTIVITYINDEX,
+      (REAL8) L.RELATIVESBANKRUPTCYCOUNT,
+      (REAL8) L.RELATIVESCOUNT,
+      (REAL8) L.RELATIVESFELONYCOUNT,
+      (REAL8) L.RELATIVESPROPOWNEDCOUNT,
+      (REAL8) L.RELATIVESPROPOWNEDTAXTOTAL,
+      (REAL8) L.SEARCHSSNSEARCHCOUNT,
+      (REAL8) L.SEARCHUNVERIFIEDADDRCOUNTYEAR,
+      (REAL8) L.SEARCHUNVERIFIEDDOBCOUNTYEAR,
+      (REAL8) L.SEARCHUNVERIFIEDPHONECOUNTYEAR,
+      (REAL8) L.SEARCHUNVERIFIEDSSNCOUNTYEAR,
+      (REAL8) L.SEARCHVELOCITYRISKLEVEL,
+      (REAL8) L.SOURCERISKLEVEL,
+      (REAL8) L.SRCSCONFIRMIDADDRCOUNT,
+      (REAL8) L.SSNADDRCOUNT,
+      (REAL8) L.SSNADDRRECENTCOUNT,
+      (REAL8) L.SSNHIGHISSUEAGE,
+      (REAL8) L.SSNIDENTITIESCOUNT,
+      (REAL8) L.SSNISSUESTATE,
+      (REAL8) L.SSNLOWISSUEAGE,
+      (REAL8) L.STATUSMOSTRECENT,
+      (REAL8) L.STATUSPREVIOUS,
+      (REAL8) L.SUBJECTADDRCOUNT,
+      (REAL8) L.SUBJECTADDRRECENTCOUNT,
+      (REAL8) L.SUBJECTLASTNAMECOUNT,
+      (REAL8) L.SUBJECTPHONECOUNT,
+      (REAL8) L.SUBJECTPHONERECENTCOUNT,
+      (REAL8) L.SUBJECTSSNCOUNT,
+      (REAL8) L.SUBPRIMEOFFERREQUESTCOUNT,
+      (REAL8) L.V1_ASSETCURROWNER,
+      (REAL8) L.V1_CRTRECBKRPTCNT,
+      (REAL8) L.V1_CRTRECBKRPTTIMENEWEST,
+      (REAL8) L.V1_CRTRECCNT,
+      (REAL8) L.V1_CRTRECCNT12MO,
+      (REAL8) L.V1_CRTRECEVICTIONTIMENEWEST,
+      (REAL8) L.V1_CRTRECFELONYCNT,
+      (REAL8) L.V1_CRTRECFELONYTIMENEWEST,
+      (REAL8) L.V1_CRTRECLIENJUDGAMTTTL,
+      (REAL8) L.V1_CRTRECLIENJUDGCNT,
+      (REAL8) L.V1_CRTRECLIENJUDGTIMENEWEST,
+      (REAL8) L.V1_CRTRECMSDMEANCNT,
+      (REAL8) L.V1_CRTRECMSDMEANCNT12MO,
+      (REAL8) L.V1_CRTRECMSDMEANTIMENEWEST,
+      (REAL8) L.V1_CRTRECTIMENEWEST,
+      (REAL8) L.V1_HHCNT,
+      (REAL8) L.V1_HHCOLLEGEATTENDEDMMBRCNT,
+      (REAL8) L.V1_HHCOLLEGEPRIVATEMMBRCNT,
+      (REAL8) L.V1_HHCOLLEGETIERMMBRHIGHEST,
+      (REAL8) L.V1_HHCRTRECBKRPTMMBRCNT,
+      (REAL8) L.V1_HHCRTRECEVICTIONMMBRCNT,
+      (REAL8) L.V1_HHCRTRECFELONYMMBRCNT,
+      (REAL8) L.V1_HHCRTRECLIENJUDGAMTTTL,
+      (REAL8) L.V1_HHCRTRECLIENJUDGMMBRCNT,
+      (REAL8) L.V1_HHCRTRECMMBRCNT,
+      (REAL8) L.V1_HHCRTRECMSDMEANMMBRCNT,
+      (REAL8) L.V1_HHCRTRECMSDMEANMMBRCNT12MO,
+      (REAL8) L.V1_HHESTIMATEDINCOMERANGE,
+      (REAL8) L.V1_HHMIDDLEAGEMMBRCNT,
+      (REAL8) L.V1_HHPPCURROWNEDAUTOCNT,
+      (REAL8) L.V1_HHPPCURROWNEDCNT,
+      (REAL8) L.V1_HHPROPCURRAVMHIGHEST,
+      (REAL8) L.V1_HHPROPCURROWNEDCNT,
+      (REAL8) L.V1_HHSENIORMMBRCNT,
+      (REAL8) L.V1_HHYOUNGADULTMMBRCNT,
+      (REAL8) L.V1_LIFEEVEVERRESIDEDCNT,
+      (REAL8) L.V1_LIFEEVNAMECHANGE,
+      (REAL8) L.V1_LIFEEVTIMEFIRSTASSETPURCHASE,
+      (REAL8) L.V1_LIFEEVTIMELASTASSETPURCHASE,
+      (REAL8) L.V1_PPCURROWNEDAUTOCNT,
+      (REAL8) L.V1_PROPCURROWNEDASSESSEDTTL,
+      (REAL8) L.V1_PROPCURROWNEDAVMTTL,
+      (REAL8) L.V1_PROPCURROWNEDCNT,
+      (REAL8) L.V1_PROPSOLDCNT12MO,
+      (REAL8) L.V1_PROPSOLDRATIO,
+      (REAL8) L.V1_PROPTIMELASTSALE,
+      (REAL8) L.V1_PROSPECTAGE,
+      (REAL8) L.V1_PROSPECTCOLLEGETIER,
+      (REAL8) L.V1_PROSPECTESTIMATEDINCOMERANGE,
+      (REAL8) L.V1_PROSPECTMARITALSTATUS,
+      (REAL8) L.V1_PROSPECTTIMELASTUPDATE,
+      (REAL8) L.V1_PROSPECTTIMEONRECORD,
+      (REAL8) L.V1_RAACOLLEGE2YRATTENDEDMMBRCNT,
+      (REAL8) L.V1_RAACOLLEGEATTENDEDMMBRCNT,
+      (REAL8) L.V1_RAACOLLEGELOWTIERMMBRCNT,
+      (REAL8) L.V1_RAACRTRECEVICTIONMMBRCNT,
+      (REAL8) L.V1_RAACRTRECEVICTIONMMBRCNT12MO,
+      (REAL8) L.V1_RAACRTRECFELONYMMBRCNT,
+      (REAL8) L.V1_RAACRTRECLIENJUDGAMTMAX,
+      (REAL8) L.V1_RAACRTRECLIENJUDGMMBRCNT,
+      (REAL8) L.V1_RAACRTRECMMBRCNT,
+      (REAL8) L.V1_RAACRTRECMMBRCNT12MO,
+      (REAL8) L.V1_RAACRTRECMSDMEANMMBRCNT,
+      (REAL8) L.V1_RAACRTRECMSDMEANMMBRCNT12MO,
+      (REAL8) L.V1_RAAELDERLYMMBRCNT,
+      (REAL8) L.V1_RAAHHCNT,
+      (REAL8) L.V1_RAAMEDINCOMERANGE,
+      (REAL8) L.V1_RAAMIDDLEAGEMMBRCNT,
+      (REAL8) L.V1_RAAMMBRCNT,
+      (REAL8) L.V1_RAAOCCBUSINESSASSOCMMBRCNT,
+      (REAL8) L.V1_RAAPPCURROWNERAUTOMMBRCNT,
+      (REAL8) L.V1_RAAPPCURROWNERMMBRCNT,
+      (REAL8) L.V1_RAAPPCURROWNERMTRCYCLEMMBRCNT,
+      (REAL8) L.V1_RAAPPCURROWNERWTRCRFTMMBRCNT,
+      (REAL8) L.V1_RAAPROPCURROWNERMMBRCNT,
+      (REAL8) L.V1_RAAPROPOWNERAVMHIGHEST,
+      (REAL8) L.V1_RAAPROPOWNERAVMMED,
+      (REAL8) L.V1_RAASENIORMMBRCNT,
+      (REAL8) L.V1_RAAYOUNGADULTMMBRCNT,
+      (REAL8) L.V1_VERIFIEDNAME,
+      (REAL8) L.V1_VERIFIEDPROSPECTFOUND,
+      (REAL8) L.V1_VERIFIEDSSN,
+      (REAL8) L.VALIDATIONRISKLEVEL,
+      (REAL8) L.VARIATIONDOBCOUNT,
+      (REAL8) L.VARIATIONDOBCOUNTNEW,
+      (REAL8) L.VARIATIONIDENTITYCOUNT,
+      (REAL8) L.VARIATIONMSOURCESSSNCOUNT,
+      (REAL8) L.VARIATIONMSOURCESSSNUNRELCOUNT,
+      (REAL8) L.VERIFIEDDOB,
+      (REAL8) L.VERIFIEDNAME,
+      (REAL8) L.VOTERREGISTRATIONRECORD,
+      (REAL8) L.WEALTHINDEX,
+      (REAL8) L.BP_1,
+      (REAL8) L.BP_2,
+      (REAL8) L.BP_3,
+      (REAL8) L.BP_4,
+      (REAL8) L.BPV_1,
+      (REAL8) L.BPV_2,
+      (REAL8) L.BPV_3,
+      (REAL8) L.BPV_4,
+      (REAL8) L.PATIENT_TYPE,
+      (REAL8) L.GENDER,
+      (REAL8) L.FINANCIAL_CLASS,
+      (REAL8) L.ADMIT_DIAG,
+      (REAL8) L.READMIT_DIAG,
+      (REAL8) L.READMIT_LIFT,
+      (REAL8) L.SeRs_Raw_Score
+      );
+      SELF.AttributeName := CHOOSE(C,
+      'SEQ',
+      'AcctNo',
+      'LexID',
+      'isSeRsM1ModelUsed',
+      'ACCIDENTAGE',
+      'ACCIDENTCOUNT',
+      'ADDRCHANGECOUNT03',
+      'ADDRCHANGECOUNT06',
+      'ADDRCHANGECOUNT12',
+      'ADDRCHANGECOUNT24',
+      'ADDRCHANGECOUNT60',
+      'ADDRSTABILITY',
+      'AGE_IN_YEARS',
+      'AGEOLDESTRECORD',
+      'ARRESTCOUNT03',
+      'ARRESTCOUNT24',
+      'ASSETOWNER',
+      'ASSOCHIGHRISKTOPOLOGYCOUNT',
+      'ASSOCRISKLEVEL',
+      'ASSOCSUSPICOUSIDENTITIESCOUNT',
+      'BANKRUPTCYAGE',
+      'BANKRUPTCYCOUNT',
+      'BANKRUPTCYCOUNT01',
+      'BANKRUPTCYCOUNT24',
+      'BANKRUPTCYSTATUS',
+      'BANKRUPTCYTYPE',
+      'BUSINESSASSOCIATIONAGE',
+      'BUSINESSINACTIVEASSOCIATION',
+      'COMPONENTCHARRISKLEVEL',
+      'CURRADDRAGELASTSALE',
+      'CURRADDRAGENEWESTRECORD',
+      'CURRADDRAGEOLDESTRECORD',
+      'CURRADDRAVMVALUE',
+      'CURRADDRAVMVALUE12',
+      'CURRADDRAVMVALUE60',
+      'CURRADDRBLOCKINDEX',
+      'CURRADDRBURGLARYINDEX',
+      'CURRADDRCARTHEFTINDEX',
+      'CURRADDRCOUNTYINDEX',
+      'CURRADDRCRIMEINDEX',
+      'CURRADDRDWELLTYPE',
+      'CURRADDRLASTSALESPRICE',
+      'CURRADDRLENOFRES',
+      'CURRADDRMEDIANINCOME',
+      'CURRADDRMEDIANVALUE',
+      'CURRADDRMURDERINDEX',
+      'CURRADDRTAXMARKETVALUE',
+      'CURRADDRTAXVALUE',
+      'CURRADDRTAXYR',
+      'CURRADDRTRACTINDEX',
+      'DEROGAGE',
+      'DEROGCOUNT',
+      'DEROGSEVERITYINDEX',
+      'DIVSSNADDRMSOURCECOUNT',
+      'DIVSSNIDENTITYMSOURCECOUNT',
+      'DIVSSNIDENTITYMSOURCEURELCOUNT',
+      'EDUCATIONFIELDOFSTUDYTYPE',
+      'EDUCATIONINSTITUTIONRATING',
+      'EDUCATIONPROGRAM2YR',
+      'ESTIMATEDANNUALINCOME',
+      'EVICTIONAGE',
+      'EVICTIONCOUNT',
+      'EVICTIONCOUNT60',
+      'FELONYAGE',
+      'FELONYCOUNT',
+      'FELONYCOUNT01',
+      'FELONYCOUNT60',
+      'HISTORICALADDRCORRECTIONAL',
+      'IDENTITYRISKLEVEL',
+      'IDVERSSNCREDITBUREAUCOUNT',
+      'INPUTADDRHISTORICALMATCH',
+      'LASTNAMECHANGEAGE',
+      'LASTNAMECHANGECOUNT24',
+      'LASTNAMECHANGECOUNT60',
+      'LIENCOUNT',
+      'LIENFILEDAGE',
+      'LIENFILEDCOUNT',
+      'LIENFILEDCOUNT60',
+      'LIENFILEDTOTAL',
+      'LIENRELEASEDAGE',
+      'LIENRELEASEDCOUNT06',
+      'NONDEROGCOUNT',
+      'NONDEROGCOUNT01',
+      'NONDEROGCOUNT03',
+      'NONDEROGCOUNT06',
+      'NONDEROGCOUNT12',
+      'NONDEROGCOUNT24',
+      'NONDEROGCOUNT60',
+      'P_ESTIMATEDHHINCOMEPERCAPITA',
+      'PHONEEDAAGENEWESTRECORD',
+      'PHONEEDAAGEOLDESTRECORD',
+      'PHONEOTHERAGENEWESTRECORD',
+      'PHONEOTHERAGEOLDESTRECORD',
+      'PREVADDRAGELASTSALE',
+      'PREVADDRAGENEWESTRECORD',
+      'PREVADDRAGEOLDESTRECORD',
+      'PREVADDRBURGLARYINDEX',
+      'PREVADDRCARTHEFTINDEX',
+      'PREVADDRCRIMEINDEX',
+      'PREVADDRDWELLTYPE',
+      'PREVADDRFAMILYOWNED',
+      'PREVADDRLASTSALESPRICE',
+      'PREVADDRLENOFRES',
+      'PREVADDRMEDIANINCOME',
+      'PREVADDRMEDIANVALUE',
+      'PREVADDRMURDERINDEX',
+      'PREVADDRTAXMARKETVALUE',
+      'PREVADDRTAXVALUE',
+      'PREVADDRTRACTINDEX',
+      'PROFLICCOUNT60',
+      'PROFLICTYPECATEGORY',
+      'PROPAGENEWESTPURCHASE',
+      'PROPAGENEWESTSALE',
+      'PROPAGEOLDESTPURCHASE',
+      'PROPNEWESTSALEPRICE',
+      'PROPOWNEDCOUNT',
+      'PROPOWNEDHISTORICALCOUNT',
+      'PROPPURCHASEDCOUNT01',
+      'PROPPURCHASEDCOUNT24',
+      'PROPSOLDCOUNT24',
+      'PRSEARCHLOCATECOUNT',
+      'PRSEARCHLOCATECOUNT24',
+      'PRSEARCHOTHERCOUNT',
+      'PRSEARCHOTHERCOUNT03',
+      'PRSEARCHOTHERCOUNT06',
+      'PRSEARCHOTHERCOUNT24',
+      'PRSEARCHPERSONALFINANCECOUNT',
+      'PRSEARCHPERSONALFINANCECOUNT06',
+      'PRSEARCHPERSONALFINANCECOUNT24',
+      'RECENTACTIVITYINDEX',
+      'RELATIVESBANKRUPTCYCOUNT',
+      'RELATIVESCOUNT',
+      'RELATIVESFELONYCOUNT',
+      'RELATIVESPROPOWNEDCOUNT',
+      'RELATIVESPROPOWNEDTAXTOTAL',
+      'SEARCHSSNSEARCHCOUNT',
+      'SEARCHUNVERIFIEDADDRCOUNTYEAR',
+      'SEARCHUNVERIFIEDDOBCOUNTYEAR',
+      'SEARCHUNVERIFIEDPHONECOUNTYEAR',
+      'SEARCHUNVERIFIEDSSNCOUNTYEAR',
+      'SEARCHVELOCITYRISKLEVEL',
+      'SOURCERISKLEVEL',
+      'SRCSCONFIRMIDADDRCOUNT',
+      'SSNADDRCOUNT',
+      'SSNADDRRECENTCOUNT',
+      'SSNHIGHISSUEAGE',
+      'SSNIDENTITIESCOUNT',
+      'SSNISSUESTATE',
+      'SSNLOWISSUEAGE',
+      'STATUSMOSTRECENT',
+      'STATUSPREVIOUS',
+      'SUBJECTADDRCOUNT',
+      'SUBJECTADDRRECENTCOUNT',
+      'SUBJECTLASTNAMECOUNT',
+      'SUBJECTPHONECOUNT',
+      'SUBJECTPHONERECENTCOUNT',
+      'SUBJECTSSNCOUNT',
+      'SUBPRIMEOFFERREQUESTCOUNT',
+      'V1_ASSETCURROWNER',
+      'V1_CRTRECBKRPTCNT',
+      'V1_CRTRECBKRPTTIMENEWEST',
+      'V1_CRTRECCNT',
+      'V1_CRTRECCNT12MO',
+      'V1_CRTRECEVICTIONTIMENEWEST',
+      'V1_CRTRECFELONYCNT',
+      'V1_CRTRECFELONYTIMENEWEST',
+      'V1_CRTRECLIENJUDGAMTTTL',
+      'V1_CRTRECLIENJUDGCNT',
+      'V1_CRTRECLIENJUDGTIMENEWEST',
+      'V1_CRTRECMSDMEANCNT',
+      'V1_CRTRECMSDMEANCNT12MO',
+      'V1_CRTRECMSDMEANTIMENEWEST',
+      'V1_CRTRECTIMENEWEST',
+      'V1_HHCNT',
+      'V1_HHCOLLEGEATTENDEDMMBRCNT',
+      'V1_HHCOLLEGEPRIVATEMMBRCNT',
+      'V1_HHCOLLEGETIERMMBRHIGHEST',
+      'V1_HHCRTRECBKRPTMMBRCNT',
+      'V1_HHCRTRECEVICTIONMMBRCNT',
+      'V1_HHCRTRECFELONYMMBRCNT',
+      'V1_HHCRTRECLIENJUDGAMTTTL',
+      'V1_HHCRTRECLIENJUDGMMBRCNT',
+      'V1_HHCRTRECMMBRCNT',
+      'V1_HHCRTRECMSDMEANMMBRCNT',
+      'V1_HHCRTRECMSDMEANMMBRCNT12MO',
+      'V1_HHESTIMATEDINCOMERANGE',
+      'V1_HHMIDDLEAGEMMBRCNT',
+      'V1_HHPPCURROWNEDAUTOCNT',
+      'V1_HHPPCURROWNEDCNT',
+      'V1_HHPROPCURRAVMHIGHEST',
+      'V1_HHPROPCURROWNEDCNT',
+      'V1_HHSENIORMMBRCNT',
+      'V1_HHYOUNGADULTMMBRCNT',
+      'V1_LIFEEVEVERRESIDEDCNT',
+      'V1_LIFEEVNAMECHANGE',
+      'V1_LIFEEVTIMEFIRSTASSETPURCHASE',
+      'V1_LIFEEVTIMELASTASSETPURCHASE',
+      'V1_PPCURROWNEDAUTOCNT',
+      'V1_PROPCURROWNEDASSESSEDTTL',
+      'V1_PROPCURROWNEDAVMTTL',
+      'V1_PROPCURROWNEDCNT',
+      'V1_PROPSOLDCNT12MO',
+      'V1_PROPSOLDRATIO',
+      'V1_PROPTIMELASTSALE',
+      'V1_PROSPECTAGE',
+      'V1_PROSPECTCOLLEGETIER',
+      'V1_PROSPECTESTIMATEDINCOMERANGE',
+      'V1_PROSPECTMARITALSTATUS',
+      'V1_PROSPECTTIMELASTUPDATE',
+      'V1_PROSPECTTIMEONRECORD',
+      'V1_RAACOLLEGE2YRATTENDEDMMBRCNT',
+      'V1_RAACOLLEGEATTENDEDMMBRCNT',
+      'V1_RAACOLLEGELOWTIERMMBRCNT',
+      'V1_RAACRTRECEVICTIONMMBRCNT',
+      'V1_RAACRTRECEVICTIONMMBRCNT12MO',
+      'V1_RAACRTRECFELONYMMBRCNT',
+      'V1_RAACRTRECLIENJUDGAMTMAX',
+      'V1_RAACRTRECLIENJUDGMMBRCNT',
+      'V1_RAACRTRECMMBRCNT',
+      'V1_RAACRTRECMMBRCNT12MO',
+      'V1_RAACRTRECMSDMEANMMBRCNT',
+      'V1_RAACRTRECMSDMEANMMBRCNT12MO',
+      'V1_RAAELDERLYMMBRCNT',
+      'V1_RAAHHCNT',
+      'V1_RAAMEDINCOMERANGE',
+      'V1_RAAMIDDLEAGEMMBRCNT',
+      'V1_RAAMMBRCNT',
+      'V1_RAAOCCBUSINESSASSOCMMBRCNT',
+      'V1_RAAPPCURROWNERAUTOMMBRCNT',
+      'V1_RAAPPCURROWNERMMBRCNT',
+      'V1_RAAPPCURROWNERMTRCYCLEMMBRCNT',
+      'V1_RAAPPCURROWNERWTRCRFTMMBRCNT',
+      'V1_RAAPROPCURROWNERMMBRCNT',
+      'V1_RAAPROPOWNERAVMHIGHEST',
+      'V1_RAAPROPOWNERAVMMED',
+      'V1_RAASENIORMMBRCNT',
+      'V1_RAAYOUNGADULTMMBRCNT',
+      'V1_VERIFIEDNAME',
+      'V1_VERIFIEDPROSPECTFOUND',
+      'V1_VERIFIEDSSN',
+      'VALIDATIONRISKLEVEL',
+      'VARIATIONDOBCOUNT',
+      'VARIATIONDOBCOUNTNEW',
+      'VARIATIONIDENTITYCOUNT',
+      'VARIATIONMSOURCESSSNCOUNT',
+      'VARIATIONMSOURCESSSNUNRELCOUNT',
+      'VERIFIEDDOB',
+      'VERIFIEDNAME',
+      'VOTERREGISTRATIONRECORD',
+      'WEALTHINDEX',
+      'BP_1',
+      'BP_2',
+      'BP_3',
+      'BP_4',
+      'BPV_1',
+      'BPV_2',
+      'BPV_3',
+      'BPV_4',
+      'PATIENT_TYPE',
+      'GENDER',
+      'FINANCIAL_CLASS',
+      'ADMIT_DIAG',
+      'READMIT_DIAG',
+      'READMIT_LIFT',
+      'SeRs_Raw_Score'
+      );
+   END;
+   SeRS_M0_Normalized_Attributes := NORMALIZE(ds(isSeRsM1ModelUsed < 1), 264,NormIt(LEFT, COUNTER));
+   // OUTPUT(SeRS_M0_Normalized_Attributes, NAMED('SeRS_M0_Normalized_Attributes'));
+   SeRS_M1_Normalized_Attributes := NORMALIZE(ds(isSeRsM1ModelUsed = 1), 264,NormIt(LEFT, COUNTER));
+   // OUTPUT(SeRS_M1_Normalized_Attributes, NAMED('SeRS_M1_Normalized_Attributes'));
+
+
+   Models.Layouts_Healthcare_Core.RiskDrivers_Attributes_Weight_Layout ComputeAttributeWeights(SeRS_M0_Normalized_Attributes L, Models.Healthcare_SocioEconomic_RD_Coefficients_Core.SERS_M0_RD_COEFFICIENTS_DS R) := TRANSFORM
+         SELF.seq := L.seq;
+         SELF.Raw_Score := L.Raw_Score;
+         SELF.CATEGORY := R.CATEGORY; 
+         SELF.RD_CATEGORY := R.RD_CATEGORY;
+         SELF.AttributeWeight := If(L.Raw_Score>= R.START_GT_EQ AND L.Raw_Score< R.STOP_LT,  (REAL8)L.AttributeValue * R.COEFFICIENT,0);
+         SELF := L;
+         SELF := R;
+   END;
+
+   SeRS_M0_AttributeWeight_DS := JOIN(SeRS_M0_Normalized_Attributes, Models.Healthcare_SocioEconomic_RD_Coefficients_Core.SERS_M0_RD_COEFFICIENTS_DS, STD.Str.ToUpperCase(LEFT.AttributeName)=RIGHT.ATTRIBUTE_NAME, ComputeAttributeWeights(LEFT, RIGHT));
+   // OUTPUT(SeRS_M0_AttributeWeight_DS, NAMED('SeRS_M0_AttributeWeight_DS'));
+   SeRS_M1_AttributeWeight_DS := JOIN(SeRS_M1_Normalized_Attributes, Models.Healthcare_SocioEconomic_RD_Coefficients_Core.SERS_M1_RD_COEFFICIENTS_DS, STD.Str.ToUpperCase(LEFT.AttributeName)=RIGHT.ATTRIBUTE_NAME, ComputeAttributeWeights(LEFT, RIGHT));
+   // OUTPUT(SeRS_M1_AttributeWeight_DS, NAMED('SeRS_M1_AttributeWeight_DS'));
+
+
+   SeRS_M0_TABLE_DS := TABLE(SeRS_M0_AttributeWeight_DS, {seq, RD_CATEGORY, SumOfWeights := SUM(GROUP, AttributeWeight)}, seq, RD_CATEGORY);
+
+   SeRS_M0_SORTED_HI := SORT(GROUP(SORT(SeRS_M0_TABLE_DS, seq), seq), -SumOfWeights);
+
+   SeRS_M0_SORTED_LO := SORT(GROUP(SORT(SeRS_M0_TABLE_DS, seq), seq), SumOfWeights);
+
+   SeRS_M1_TABLE_DS := TABLE(SeRS_M1_AttributeWeight_DS, {seq, RD_CATEGORY, SumOfWeights := SUM(GROUP, AttributeWeight)}, seq, RD_CATEGORY);
+
+   SeRS_M1_SORTED_HI := SORT(GROUP(SORT(SeRS_M1_TABLE_DS, seq), seq), -SumOfWeights);
+
+   SeRS_M1_SORTED_LO := SORT(GROUP(SORT(SeRS_M1_TABLE_DS, seq), seq), SumOfWeights);
+
+   //**********Compute Ranks*********//
+   Sorted_Ranked_layout:= RECORD
+      SeRS_M0_TABLE_DS;
+      Integer _Rank;
+   END;
+
+   Sorted_Ranked_layout AddRank(SeRS_M0_SORTED_HI L, INTEGER C=1):= TRANSFORM
+      SELF._Rank:= C;
+      SELF:= L;
+   END;
+
+   SeRS_M0_HI_Rank_Added:= PROJECT(SeRS_M0_SORTED_HI, AddRank(LEFT, COUNTER));
+   // OUTPUT(HI_Rank_Added, NAMED('HI_Rank_Added'));
+   SeRS_M0_LO_Rank_Added:= PROJECT(SeRS_M0_SORTED_LO, AddRank(LEFT, COUNTER));
+   // OUTPUT(LO_Rank_Added, NAMED('LO_Rank_Added'));
+   SeRS_M1_HI_Rank_Added:= PROJECT(SeRS_M1_SORTED_HI, AddRank(LEFT, COUNTER));
+   // OUTPUT(HI_Rank_Added, NAMED('HI_Rank_Added'));
+   SeRS_M1_LO_Rank_Added:= PROJECT(SeRS_M1_SORTED_LO, AddRank(LEFT, COUNTER));
+   // OUTPUT(LO_Rank_Added, NAMED('LO_Rank_Added'));
+
+   SeRS_M0_HI_Ranked_Filtered := SeRS_M0_HI_Rank_Added(_Rank < 4);
+   SeRS_M0_LO_Ranked_Filtered := SeRS_M0_LO_Rank_Added(_Rank < 4);
+   SeRS_M1_HI_Ranked_Filtered := SeRS_M1_HI_Rank_Added(_Rank < 4);
+   SeRS_M1_LO_Ranked_Filtered := SeRS_M1_LO_Rank_Added(_Rank < 4);
+
+   Models.Layouts_Healthcare_Core.SeRS_Risk_Drivers_Only_Layout CreateEmpty_SeRS_Risk_Drivers(ds L):=  TRANSFORM
+      SELF.RAR_Driver_Hi1 := 'N/A';
+      SELF.RAR_Driver_Hi2 := 'N/A';
+      SELF.RAR_Driver_Hi3 := 'N/A';
+      SELF.RAR_Driver_Lo1 := 'N/A';
+      SELF.RAR_Driver_Lo2 := 'N/A';
+      SELF.RAR_Driver_Lo3 := 'N/A';
+      SELF.seq := L.seq;
+      SELF := L;
+   END;
+
+   Risk_Drivers_DS := PROJECT(ds, CreateEmpty_SeRS_Risk_Drivers(LEFT));
+
+   Models.Layouts_Healthcare_Core.SeRS_Risk_Drivers_Only_Layout Denorm_RD_HI(Risk_Drivers_DS L, SeRS_M0_HI_Ranked_Filtered R) := TRANSFORM
+      SELF.RAR_Driver_Hi1 := IF(R._Rank = 1, R.RD_CATEGORY, L.RAR_Driver_Hi1);
+      SELF.RAR_Driver_Hi2 := IF(R._Rank = 2, R.RD_CATEGORY, L.RAR_Driver_Hi2);
+      SELF.RAR_Driver_Hi3 := IF(R._Rank = 3, R.RD_CATEGORY, L.RAR_Driver_Hi3);
+      SELF := L;
+   END;
+
+   Models.Layouts_Healthcare_Core.SeRS_Risk_Drivers_Only_Layout Denorm_RD_LO(Risk_Drivers_DS L, SeRS_M0_LO_Ranked_Filtered R) := TRANSFORM
+      SELF.RAR_Driver_Lo1 := IF(R._Rank = 1, R.RD_CATEGORY, L.RAR_Driver_Lo1);
+      SELF.RAR_Driver_Lo2 := IF(R._Rank = 2, R.RD_CATEGORY, L.RAR_Driver_Lo2);
+      SELF.RAR_Driver_Lo3 := IF(R._Rank = 3, R.RD_CATEGORY, L.RAR_Driver_Lo3);
+      SELF := L;
+   END;
+
+   SeRS_M0_Risk_Drivers_DS_HI := DENORMALIZE(Risk_Drivers_DS, SeRS_M0_HI_Ranked_Filtered,
+                                       LEFT.seq = RIGHT.seq,
+                                       Denorm_RD_HI(LEFT, RIGHT));
+
+   SeRS_M0_Risk_Drivers_DS_HI_LO := DENORMALIZE(SeRS_M0_Risk_Drivers_DS_HI, SeRS_M0_LO_Ranked_Filtered,
+                                       LEFT.seq = RIGHT.seq,
+                                       Denorm_RD_LO(LEFT, RIGHT));
+   SeRS_M0_M1_Risk_Drivers_DS_HI := DENORMALIZE(SeRS_M0_Risk_Drivers_DS_HI_LO, SeRS_M1_HI_Ranked_Filtered,
+                                       LEFT.seq = RIGHT.seq,
+                                       Denorm_RD_HI(LEFT, RIGHT));
+
+   SeRS_M0_M1_Risk_Drivers_DS_HI_LO := DENORMALIZE(SeRS_M0_M1_Risk_Drivers_DS_HI, SeRS_M1_LO_Ranked_Filtered,
+                                       LEFT.seq = RIGHT.seq,
+                                       Denorm_RD_LO(LEFT, RIGHT));
+   RETURN SeRS_M0_M1_Risk_Drivers_DS_HI_LO;
+ENDMACRO;
+
+EXPORT getSeMA_RiskDrivers(ds) := FUNCTIONMACRO 
+   Models.Layouts_Healthcare_Core.RiskDrivers_Normalized_Attributes_Layout NormIt(TYPEOF(RECORDOF(ds)) L, INTEGER C) := TRANSFORM
+      SELF := L;
+      SELF.Raw_Score := L.SeMA_Raw_Score;
+      //Using the model input with raw score ds layout.
+      SELF.AttributeValue := CHOOSE(C,
+      (REAL8) L.seq,
+      (REAL8) L.AcctNo,
+      (REAL8) L.DOB,
+      (REAL8) L.HistorydateYYYYMM,
+      (REAL8) L.LexID,
+      (REAL8) L.age_in_years,
+      (REAL8) L.gender,
+      (REAL8) L.accidentage,
+      (REAL8) L.accidentcount,
+      (REAL8) L.addrchangecount12,
+      (REAL8) L.addrchangecount60,
+      (REAL8) L.addrmostrecentcrimediff,
+      (REAL8) L.addrmostrecentincomediff,
+      (REAL8) L.addrmostrecentmoveage,
+      (REAL8) L.addrmostrecentvaluediff,
+      (REAL8) L.addrrecentecontrajectory,
+      (REAL8) L.agenewestrecord,
+      (REAL8) L.ageoldestrecord,
+      (REAL8) L.arrestage,
+      (REAL8) L.assoccreditbureauonlycount,
+      (REAL8) L.assocrisklevel,
+      (REAL8) L.assocsuspicousidentitiescount,
+      (REAL8) L.businessinputaddrcount,
+      (REAL8) L.correlationrisklevel,
+      (REAL8) L.crtrecbkrpttimenewest,
+      (REAL8) L.crtrecmsdmeantimenewest,
+      (REAL8) L.crtrecseverityindex,
+      (REAL8) L.curraddragelastsale,
+      (REAL8) L.curraddrageoldestrecord,
+      (REAL8) L.curraddrburglaryindex,
+      (REAL8) L.curraddrburglaryindex_12,
+      (REAL8) L.curraddrburglaryindex_24,
+      (REAL8) L.curraddrcartheftindex,
+      (REAL8) L.curraddrcrimeindex,
+      (REAL8) L.curraddrmedianincome,
+      (REAL8) L.curraddrmedianvalue,
+      (REAL8) L.curraddrmurderindex,
+      (REAL8) L.divaddridentitycount,
+      (REAL8) L.divaddridentitymsourcecount,
+      (REAL8) L.divssnaddrmsourcecount,
+      (REAL8) L.educationprogram4yr,
+      (REAL8) L.estimatedannualincome,
+      (REAL8) L.estimatedannualincome_12,
+      (REAL8) L.estimatedannualincome_24,
+      (REAL8) L.hhcnt,
+      (REAL8) L.hhcrtreclienjudgmmbrcnt,
+      (REAL8) L.hhcrtrecmsdmeanmmbrcnt,
+      (REAL8) L.hhestimatedincomerange,
+      (REAL8) L.hhppcurrownedautocnt,
+      (REAL8) L.idveraddressassoccount,
+      (REAL8) L.inputaddragelastsale,
+      (REAL8) L.inputaddrageoldestrecord,
+      (REAL8) L.inputaddravmvalue60,
+      (REAL8) L.inputaddrburglaryindex,
+      (REAL8) L.inputaddrbusinesscount,
+      (REAL8) L.inputaddrcartheftindex,
+      (REAL8) L.inputaddrcrimeindex,
+      (REAL8) L.inputaddrdwelltype,
+      (REAL8) L.inputaddrerrorcode,
+      (REAL8) L.inputaddrmedianincome,
+      (REAL8) L.inputaddrmedianvalue,
+      (REAL8) L.inputaddrmobilityindex,
+      (REAL8) L.inputaddrmultifamilycount,
+      (REAL8) L.inputaddrmurderindex,
+      (REAL8) L.inputaddrphonecount,
+      (REAL8) L.inputaddrsinglefamilycount,
+      (REAL8) L.inputaddrvacantpropcount,
+      (REAL8) L.inputphoneservicetype,
+      (REAL8) L.inputphonetype,
+      (REAL8) L.lastnamechangeage,
+      (REAL8) L.lienfiledage,
+      (REAL8) L.lifeevtimefirstassetpurchase,
+      (REAL8) L.lifeevtimelastassetpurchase,
+      (REAL8) L.nonderogcount,
+      (REAL8) L.nonderogcount01,
+      (REAL8) L.occproflicensecategory,
+      (REAL8) L.phoneedaagenewestrecord,
+      (REAL8) L.phoneedaageoldestrecord,
+      (REAL8) L.phoneidentitiescount,
+      (REAL8) L.phoneotheragenewestrecord,
+      (REAL8) L.phoneotherageoldestrecord,
+      (REAL8) L.prevaddragelastsale,
+      (REAL8) L.prevaddragenewestrecord,
+      (REAL8) L.prevaddravmvalue,
+      (REAL8) L.prevaddrburglaryindex,
+      (REAL8) L.prevaddrcartheftindex,
+      (REAL8) L.prevaddrcrimeindex,
+      (REAL8) L.prevaddrlenofres,
+      (REAL8) L.prevaddrmedianincome,
+      (REAL8) L.prevaddrmedianvalue,
+      (REAL8) L.propagenewestpurchase,
+      (REAL8) L.propageoldestpurchase,
+      (REAL8) L.prospectage,
+      (REAL8) L.prospectbankingexperience,
+      (REAL8) L.prospectestimatedincomerange,
+      (REAL8) L.prospecttimelastupdate,
+      (REAL8) L.prospecttimeonrecord,
+      (REAL8) L.prsearchlocatecount,
+      (REAL8) L.prsearchothercount,
+      (REAL8) L.prsearchothercount24,
+      (REAL8) L.prsearchpersonalfinancecount,
+      (REAL8) L.raacollegeattendedmmbrcnt,
+      (REAL8) L.raacrtrecevictionmmbrcnt,
+      (REAL8) L.raacrtreclienjudgmmbrcnt,
+      (REAL8) L.raacrtrecmmbrcnt,
+      (REAL8) L.raacrtrecmsdmeanmmbrcnt,
+      (REAL8) L.raaelderlymmbrcnt,
+      (REAL8) L.raamedincomerange,
+      (REAL8) L.raamiddleagemmbrcnt,
+      (REAL8) L.raammbrcnt,
+      (REAL8) L.raappcurrownermmbrcnt,
+      (REAL8) L.raappcurrownerwtrcrftmmbrcnt,
+      (REAL8) L.raapropcurrownermmbrcnt,
+      (REAL8) L.raapropowneravmhighest,
+      (REAL8) L.raapropowneravmmed,
+      (REAL8) L.raaseniormmbrcnt,
+      (REAL8) L.raayoungadultmmbrcnt,
+      (REAL8) L.recentactivityindex,
+      (REAL8) L.relativesbankruptcycount,
+      (REAL8) L.relativescount,
+      (REAL8) L.relativesdistanceclosest,
+      (REAL8) L.relativespropownedcount,
+      (REAL8) L.resinputownershipindex,
+      (REAL8) L.searchaddrsearchcount,
+      (REAL8) L.searchssnsearchcount,
+      (REAL8) L.searchvelocityrisklevel,
+      (REAL8) L.sourcerisklevel,
+      (REAL8) L.srcsconfirmidaddrcount,
+      (REAL8) L.ssnaddrcount,
+      (REAL8) L.ssnhighissueage,
+      (REAL8) L.ssnlowissueage,
+      (REAL8) L.subjectaddrcount,
+      (REAL8) L.subjectlastnamecount,
+      (REAL8) L.subjectssncount,
+      (REAL8) L.variationdobcount,
+      (REAL8) L.variationmsourcesssnunrelcount,
+      (REAL8) L.variationrisklevel,
+      (REAL8) L.verifieddob,
+      (REAL8) L.voterregistrationrecord,
+      (REAL8) L.avgstatecost,
+      (REAL8) L.ag_pdc_rate,
+      (REAL8) L.isSEMA_Minor,
+      (REAL8) L.TransactionID, 
+      (REAL8) L.do_Model1,
+      (REAL8) L.SeMA_Raw_Score
+      );
+      SELF.AttributeName := CHOOSE(C,
+      'seq',
+      'AcctNo',
+      'DOB',
+      'HistorydateYYYYMM',
+      'LexID',
+      'age_in_years',
+      'gender',
+      'accidentage',
+      'accidentcount',
+      'addrchangecount12',
+      'addrchangecount60',
+      'addrmostrecentcrimediff',
+      'addrmostrecentincomediff',
+      'addrmostrecentmoveage',
+      'addrmostrecentvaluediff',
+      'addrrecentecontrajectory',
+      'agenewestrecord',
+      'ageoldestrecord',
+      'arrestage',
+      'assoccreditbureauonlycount',
+      'assocrisklevel',
+      'assocsuspicousidentitiescount',
+      'businessinputaddrcount',
+      'correlationrisklevel',
+      'crtrecbkrpttimenewest',
+      'crtrecmsdmeantimenewest',
+      'crtrecseverityindex',
+      'curraddragelastsale',
+      'curraddrageoldestrecord',
+      'curraddrburglaryindex',
+      'curraddrburglaryindex_12',
+      'curraddrburglaryindex_24',
+      'curraddrcartheftindex',
+      'curraddrcrimeindex',
+      'curraddrmedianincome',
+      'curraddrmedianvalue',
+      'curraddrmurderindex',
+      'divaddridentitycount',
+      'divaddridentitymsourcecount',
+      'divssnaddrmsourcecount',
+      'educationprogram4yr',
+      'estimatedannualincome',
+      'estimatedannualincome_12',
+      'estimatedannualincome_24',
+      'hhcnt',
+      'hhcrtreclienjudgmmbrcnt',
+      'hhcrtrecmsdmeanmmbrcnt',
+      'hhestimatedincomerange',
+      'hhppcurrownedautocnt',
+      'idveraddressassoccount',
+      'inputaddragelastsale',
+      'inputaddrageoldestrecord',
+      'inputaddravmvalue60',
+      'inputaddrburglaryindex',
+      'inputaddrbusinesscount',
+      'inputaddrcartheftindex',
+      'inputaddrcrimeindex',
+      'inputaddrdwelltype',
+      'inputaddrerrorcode',
+      'inputaddrmedianincome',
+      'inputaddrmedianvalue',
+      'inputaddrmobilityindex',
+      'inputaddrmultifamilycount',
+      'inputaddrmurderindex',
+      'inputaddrphonecount',
+      'inputaddrsinglefamilycount',
+      'inputaddrvacantpropcount',
+      'inputphoneservicetype',
+      'inputphonetype',
+      'lastnamechangeage',
+      'lienfiledage',
+      'lifeevtimefirstassetpurchase',
+      'lifeevtimelastassetpurchase',
+      'nonderogcount',
+      'nonderogcount01',
+      'occproflicensecategory',
+      'phoneedaagenewestrecord',
+      'phoneedaageoldestrecord',
+      'phoneidentitiescount',
+      'phoneotheragenewestrecord',
+      'phoneotherageoldestrecord',
+      'prevaddragelastsale',
+      'prevaddragenewestrecord',
+      'prevaddravmvalue',
+      'prevaddrburglaryindex',
+      'prevaddrcartheftindex',
+      'prevaddrcrimeindex',
+      'prevaddrlenofres',
+      'prevaddrmedianincome',
+      'prevaddrmedianvalue',
+      'propagenewestpurchase',
+      'propageoldestpurchase',
+      'prospectage',
+      'prospectbankingexperience',
+      'prospectestimatedincomerange',
+      'prospecttimelastupdate',
+      'prospecttimeonrecord',
+      'prsearchlocatecount',
+      'prsearchothercount',
+      'prsearchothercount24',
+      'prsearchpersonalfinancecount',
+      'raacollegeattendedmmbrcnt',
+      'raacrtrecevictionmmbrcnt',
+      'raacrtreclienjudgmmbrcnt',
+      'raacrtrecmmbrcnt',
+      'raacrtrecmsdmeanmmbrcnt',
+      'raaelderlymmbrcnt',
+      'raamedincomerange',
+      'raamiddleagemmbrcnt',
+      'raammbrcnt',
+      'raappcurrownermmbrcnt',
+      'raappcurrownerwtrcrftmmbrcnt',
+      'raapropcurrownermmbrcnt',
+      'raapropowneravmhighest',
+      'raapropowneravmmed',
+      'raaseniormmbrcnt',
+      'raayoungadultmmbrcnt',
+      'recentactivityindex',
+      'relativesbankruptcycount',
+      'relativescount',
+      'relativesdistanceclosest',
+      'relativespropownedcount',
+      'resinputownershipindex',
+      'searchaddrsearchcount',
+      'searchssnsearchcount',
+      'searchvelocityrisklevel',
+      'sourcerisklevel',
+      'srcsconfirmidaddrcount',
+      'ssnaddrcount',
+      'ssnhighissueage',
+      'ssnlowissueage',
+      'subjectaddrcount',
+      'subjectlastnamecount',
+      'subjectssncount',
+      'variationdobcount',
+      'variationmsourcesssnunrelcount',
+      'variationrisklevel',
+      'verifieddob',
+      'voterregistrationrecord',
+      'avgstatecost',
+      'ag_pdc_rate',
+      'isSEMA_Minor',
+      'TransactionID', 
+      'do_Model1',
+      'SeMA_Raw_Score'
+      );
+   END;
+      Normalized_SeMA_Attributes := NORMALIZE(ds, 145,NormIt(LEFT, COUNTER));
+   // OUTPUT(Normalized_SeMA_Attributes, NAMED('Normalized_SeMA_Attributes'));
+
+   Models.Layouts_Healthcare_Core.RiskDrivers_Attributes_Weight_Layout ComputeAttributeWeights(Normalized_SeMA_Attributes L, Models.Healthcare_SocioEconomic_RD_Coefficients_Core.SEMA_RD_COEFFICIENTS_DS R) := TRANSFORM
+         SELF.seq := L.seq;
+         SELF.Raw_Score := L.Raw_Score;
+         SELF.CATEGORY := R.CATEGORY; // TODO: Do I need to output this? or will the report do a lookup later. Lookup seems to be better to save space. 
+         SELF.RD_CATEGORY := R.RD_CATEGORY;
+         SELF.AttributeWeight := If(L.Raw_Score>= R.START_GT_EQ AND L.Raw_Score< R.STOP_LT,  (REAL8)L.AttributeValue * R.COEFFICIENT,0);
+         SELF := L;
+         SELF := R;
+   END;
+
+   AttributeWeight_DS := JOIN(Normalized_SeMA_Attributes, Models.Healthcare_SocioEconomic_RD_Coefficients_Core.SEMA_RD_COEFFICIENTS_DS, STD.Str.ToUpperCase(LEFT.AttributeName)=RIGHT.ATTRIBUTE_NAME, ComputeAttributeWeights(LEFT, RIGHT));
+   // OUTPUT(AttributeWeight_DS, NAMED('AttributeWeight_DS'));
+
+   TABLE_DS := TABLE(AttributeWeight_DS, {seq, RD_CATEGORY, SumOfWeights := SUM(GROUP, AttributeWeight)}, seq, RD_CATEGORY);
+
+   SORTED_HI := SORT(GROUP(SORT(TABLE_DS, seq), seq), -SumOfWeights);
+
+   SORTED_LO := SORT(GROUP(SORT(TABLE_DS, seq), seq), SumOfWeights);
+
+   Sorted_Ranked_layout:= RECORD
+      TABLE_DS;
+      Integer _Rank;
+   END;
+
+   Sorted_Ranked_layout AddRank(SORTED_HI L, INTEGER C=1):= TRANSFORM
+      SELF._Rank:= C;
+      SELF:= L;
+   END;
+
+   HI_Rank_Added:= PROJECT(SORTED_HI, AddRank(LEFT, COUNTER));
+   // OUTPUT(HI_Rank_Added, NAMED('HI_Rank_Added'));
+   LO_Rank_Added:= PROJECT(SORTED_LO, AddRank(LEFT, COUNTER));
+   // OUTPUT(LO_Rank_Added, NAMED('LO_Rank_Added'));
+
+   HI_Ranked_Filtered := HI_Rank_Added(_Rank < 4);
+
+   LO_Ranked_Filtered := LO_Rank_Added(_Rank < 4);
+
+   Models.Layouts_Healthcare_Core.SeMA_Risk_Drivers_Only_Layout CreateEmpty_SeMA_Risk_Drivers(ds L):=  TRANSFORM
+      SELF.MA_Driver_Hi1 := 'N/A';
+      SELF.MA_Driver_Hi2 := 'N/A';
+      SELF.MA_Driver_Hi3 := 'N/A';
+      SELF.MA_Driver_Lo1 := 'N/A';
+      SELF.MA_Driver_Lo2 := 'N/A';
+      SELF.MA_Driver_Lo3 := 'N/A';
+      SELF.seq := L.seq;
+      SELF := L;
+   END;
+
+   Risk_Drivers_DS := PROJECT(ds, CreateEmpty_SeMA_Risk_Drivers(LEFT));
+
+   Models.Layouts_Healthcare_Core.SeMA_Risk_Drivers_Only_Layout Denorm_RD_HI(Risk_Drivers_DS L, HI_Ranked_Filtered R) := TRANSFORM
+      SELF.MA_Driver_Hi1 := IF(R._Rank = 1, R.RD_CATEGORY, L.MA_Driver_Hi1);
+      SELF.MA_Driver_Hi2 := IF(R._Rank = 2, R.RD_CATEGORY, L.MA_Driver_Hi2);
+      SELF.MA_Driver_Hi3 := IF(R._Rank = 3, R.RD_CATEGORY, L.MA_Driver_Hi3);
+      SELF := L;
+   END;
+
+   Models.Layouts_Healthcare_Core.SeMA_Risk_Drivers_Only_Layout Denorm_RD_LO(Risk_Drivers_DS L, LO_Ranked_Filtered R) := TRANSFORM
+      SELF.MA_Driver_Lo1 := IF(R._Rank = 1, R.RD_CATEGORY, L.MA_Driver_Lo1);
+      SELF.MA_Driver_Lo2 := IF(R._Rank = 2, R.RD_CATEGORY, L.MA_Driver_Lo2);
+      SELF.MA_Driver_Lo3 := IF(R._Rank = 3, R.RD_CATEGORY, L.MA_Driver_Lo3);
+      SELF := L;
+   END;
+
+   Risk_Drivers_DS_HI := DENORMALIZE(Risk_Drivers_DS, HI_Ranked_Filtered,
+                                       LEFT.seq = RIGHT.seq,
+                                       Denorm_RD_HI(LEFT, RIGHT));
+
+   Risk_Drivers_DS_HI_LO := DENORMALIZE(Risk_Drivers_DS_HI, LO_Ranked_Filtered,
+                                       LEFT.seq = RIGHT.seq,
+                                       Denorm_RD_LO(LEFT, RIGHT));
+   RETURN Risk_Drivers_DS_HI_LO;
+ENDMACRO;
+
 
 End;
