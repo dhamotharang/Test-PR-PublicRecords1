@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk, Business_Risk_BIP, Gateway, ut, OFAC_XG5, Patriot, iesp, GlobalWatchLists, Risk_Indicators, STD;
+﻿IMPORT BIPV2, Business_Risk, Business_Risk_BIP, BusinessInstantID20_Services, Gateway, ut, OFAC_XG5, Patriot, iesp, GlobalWatchLists, Risk_Indicators, STD;
 
 EXPORT fn_GetGlobalWatchlistInfo( DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo) ds_input,
                                   Business_Risk_BIP.LIB_Business_Shell_LIBIN Options
@@ -218,9 +218,10 @@ EXPORT fn_GetGlobalWatchlistInfo( DATASET(BusinessInstantID20_Services.layouts.I
                                      gateways_param);
 																	
     // Fail immediately as we don't want customers to think there was no hit on OFAC.
-    if(exists(XG5_ptys(errorMessage <> '')), FAIL('Bridger Gateway Error'));
-                                     
-    XG5Parsed := OFAC_XG5.OFACXG5_Watchlist2_Response(XG5_ptys);
+    // if(exists(XG5_ptys(errorMessage <> '')), FAIL('Bridger Gateway Error'));
+    validXG5_ptys := XG5_ptys(IF(errorMessage <> '',ERROR('Bridger Gateway Error'), true));
+    
+    XG5Parsed := OFAC_XG5.OFACXG5_Watchlist2_Response(validXG5_ptys);
 
     NonErrorRecsXG5 := XG5Parsed(errormessage = '');
 
