@@ -16,9 +16,9 @@ EXPORT E_Business(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
-  SHARED __Mapping := 'bdid(UID),companyname(Company_Name_:\'\'),taxid(Tax_I_D_:0),source(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
-  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Invalid := __in((KEL.typ.uid)BDID = 0);
-  SHARED __d0_Prefiltered := __in((KEL.typ.uid)BDID <> 0);
+  SHARED __Mapping := 'businputuidappend(UID),companyname(Company_Name_:\'\'),taxid(Tax_I_D_:0),source(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
+  EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Invalid := __in((KEL.typ.uid)BusInputUIDAppend = 0);
+  SHARED __d0_Prefiltered := __in((KEL.typ.uid)BusInputUIDAppend <> 0);
   SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping));
   EXPORT InData := __d0;
   EXPORT Data_Sources_Layout := RECORD

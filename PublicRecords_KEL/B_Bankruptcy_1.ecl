@@ -4,7 +4,7 @@ IMPORT B_Bankruptcy_2,CFG_Compile,E_Bankruptcy FROM PublicRecords_KEL;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Bankruptcy_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Bankruptcy_2(__in,__cfg).__ENH_Bankruptcy_2) __ENH_Bankruptcy_2 := B_Bankruptcy_2(__in,__cfg).__ENH_Bankruptcy_2;
-  SHARED __EE44164 := __ENH_Bankruptcy_2;
+  SHARED __EE45789 := __ENH_Bankruptcy_2;
   EXPORT __ST21381_Layout := RECORD
     KEL.typ.nstr Source_Description_;
     KEL.typ.nstr Original_Chapter_;
@@ -47,10 +47,10 @@ EXPORT B_Bankruptcy_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST21374_Layout __ND44400__Project(B_Bankruptcy_2(__in,__cfg).__ST23622_Layout __PP43928) := TRANSFORM
-    __EE43985 := __PP43928.Records_;
-    SELF.Records_ := __PROJECT(__EE43985,__ST21381_Layout);
-    SELF := __PP43928;
+  SHARED __ST21374_Layout __ND46025__Project(B_Bankruptcy_2(__in,__cfg).__ST23638_Layout __PP45553) := TRANSFORM
+    __EE45610 := __PP45553.Records_;
+    SELF.Records_ := __PROJECT(__EE45610,__ST21381_Layout);
+    SELF := __PP45553;
   END;
-  EXPORT __ENH_Bankruptcy_1 := PROJECT(__EE44164,__ND44400__Project(LEFT));
+  EXPORT __ENH_Bankruptcy_1 := PROJECT(__EE45789,__ND46025__Project(LEFT));
 END;
