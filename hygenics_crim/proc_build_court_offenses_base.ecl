@@ -670,8 +670,15 @@ Layout_Common_Court_Offenses_orig to_court_offenses(j_final l) := transform
 																																				trim(l.casetype)='VIOLATION' => 'V',
 																																				trim(l.casetype) IN ['FELONY DISTRICT COURT','FELONY'] => 'F',																																				
 																																				trim(l.casetype) IN ['CITATION - DNR','CRIMINAL - JTP - MOTOR VEHICLE','CRIMINAL - JTP - MOTOR VEHICLE',
-																																				                     'CITATION - CRIMINAL','CITATION - CIVIL','MASS TRANSIT CITATION','TRAFFIC']=> 'T',
-																																		  	trim(l.offenseclass[1..1]))),
+																																				                     'CITATION - CRIMINAL','CITATION - CIVIL','CITATION - MASS TRANSIT','MASS TRANSIT CITATION','TRAFFIC']=> 'T',
+																																		  	trim(l.offensetype)='INFRACTION' => 'I',
+																				                                trim(l.offensetype)='MISDEMEANOR' => 'M',
+																																				trim(l.offensetype)='VIOLATION' => 'V',
+																																				trim(l.offensetype) IN ['FELONY DISTRICT COURT','FELONY'] => 'F',																																				
+																																				trim(l.offensetype) IN ['CITATION - DNR','CRIMINAL - JTP - MOTOR VEHICLE','CRIMINAL - JTP - MOTOR VEHICLE',
+																																				                     'CITATION - CRIMINAL','CITATION - CIVIL','CITATION - MASS TRANSIT','MASS TRANSIT CITATION','TRAFFIC']=> 'T',																																														 
+																																		  	 
+																																				trim(l.offenseclass[1..1]))),
 																				                                                                                                    
 																				vVendor = 'W0002'  => map(
 																				                             l.offenseclass = 'GROSS MISDEMEANOR'    => 'GM'+ temp_offense_lev_W0002,
@@ -782,9 +789,9 @@ Layout_Common_Court_Offenses_orig to_court_offenses(j_final l) := transform
 																																				 //l.casetype = 'MISDEMEANOR' => 'M', 
 																																				 l.casetype = 'ORDINANCE' => 'ORD',
 																				                             '')),
-																				l.statecode in ['RI'] 	=> (if(trim(l.offensetype, left, right)[1] in ['F','M','O','T','V'] ,
-																																		trim(l.offensetype, left, right)[1],
-																																		'')),	
+																				l.statecode in ['RI'] 	=> (MAP(trim(l.offensetype, left, right) ='ORDER OF THE COURT' => '',
+																				                                trim(l.offensetype, left, right)[1] in ['F','M','O','T','V'] => trim(l.offensetype, left, right)[1],
+																						                            '')),
                                         l.statecode in ['SC'] 	=> MAP(l.offensetype ='TRAFFIC' => trim(l.offenseclass, left, right)[1] + trim(l.offensedegree, left, right)+'T',
 																																			 l.offensetype ='MINOR' => trim(l.offenseclass, left, right)[1] + trim(l.offensedegree, left, right)+'M',
 																																			 l.offensetype ='MUNICIPAL' => trim(l.offenseclass, left, right)[1] + trim(l.offensedegree, left, right)+'MUN',
@@ -1070,7 +1077,9 @@ Layout_Common_Court_Offenses_orig to_court_offenses(j_final l) := transform
 													temp_offense[stringlib.stringfind(temp_offense, '|', 1)+1..stringlib.stringfind(temp_offense, '|', 2)-1],
 													'')))))));
   self.court_disp_desc_2		    := Map(l.ln_vendor = 'NF' => l.dispositionstatus,
-	                                     l.trialtype);
+	                                     l.trialtype <> '' =>l.trialtype,
+																			 l.casestatus <> '' and stringlib.stringfind(l.casestatus,':',1) = 0 => trim('Status:'+ trim(l.casestatus) + ' '+ l.casestatusdate), 
+                                       '');
   self.sent_date				    := MAP(l.SentenceDate <> '' => l.SentenceDate,
 											// l.SentenceBeginDate <> '' and l.SentenceEndDate <> '' => 'Start Date: '+ trim(l.SentenceBeginDate) + ' End Date: '+trim(l.SentenceEndDate),
 											             l.SentenceBeginDate <> '' =>/*'Start Date: '+*/ trim(l.SentenceBeginDate),
@@ -1157,7 +1166,7 @@ Layout_Common_Court_Offenses_orig to_court_offenses(j_final l) := transform
 											
   self.sent_addl_prov_code	     := '';                                                                                                                                      
 
-	self.sent_addl_prov_desc_1 		 := MAP(trim(l.ln_vendor) ='I0002' and regexfind('JAIL|FINE|PRISON|PROBATION',l.casecomments) => regexreplace('(ADDITIONAL INFORMATION: )(.*)',l.casecomments,'$2'),
+	self.sent_addl_prov_desc_1 		 := MAP(trim(l.ln_vendor) ='I0002' and regexfind('JAIL|FINE|PRISON|PROBATION',l.sentenceadditionalinfo) => regexreplace('(ADDITIONAL INFORMATION: )(.*)',l.sentenceadditionalinfo,'$2'),
                                       	trim(l.ln_vendor) IN ['I0001','I0003'] => l.casestatus,
 	                                      l.ln_vendor = 'RB' and Maxsent <> '' and Minsent <> '' => trim(trim(l.sentencetype) + ' Max: '+Maxsent+ ' Min: '+Minsent,left,right),
 																				l.ln_vendor = 'RB' and Maxsent <> '' => trim(trim(l.sentencetype) + ' Max: '+Maxsent,left,right),
@@ -1167,7 +1176,7 @@ Layout_Common_Court_Offenses_orig to_court_offenses(j_final l) := transform
 																				l.ln_vendor = 'TA' => l.sentencestatus,
 																				trim(l.ln_vendor) ='I0008' =>l.sentenceadditionalinfo,
 																				'');
-  self.sent_addl_prov_desc_2	    := MAP(trim(l.ln_vendor) ='I0002' and regexfind('JAIL|FINE|PRISON|PROBATION',l.casecomments) => regexreplace('(ADDITIONAL INFORMATION: )(.*)',l.casecomments[41..],'$2'),
+  self.sent_addl_prov_desc_2	    := MAP(trim(l.ln_vendor) ='I0002' and regexfind('JAIL|FINE|PRISON|PROBATION',l.sentenceadditionalinfo) => regexreplace('(ADDITIONAL INFORMATION: )(.*)',l.sentenceadditionalinfo,'$2')[41..],
                                       	
 	                                      '');
   self.sent_consec				        := MAP(trim(l.sentenceadditionalinfo) = 'CONSECUTIVE' => 'CS',

@@ -25,7 +25,8 @@ Line item 76 where the status is parole but because of the ctrl_date was greater
 //vendor_list :=  ['AR','AL','AZ',     'CO','CT','DC','FL','GA',     'HI','IA',     'ID','IL','IN','KS','KY','LA','MD','ME','MI',     'MN','MO','MS','MT','NC','NE','ND','NH','NJ','NM','NV','NY','OH','OK','OR','PA','RI','SC','TN','TX','UT','VA',     'WA','WI','WV'];
 
 	vendor_list :=  ['DB','DA','DD','DF','DH','DG','EQ','DI','DJ','DK','DL','DO','DP','DM','DQ','DN','SB','DR','DS','DU','DT','DV','DW','DZ','EU','DY','DX','EV','EX','EW','EY','EA','EB','EC','ED','EE','EF','EG','EH','EI','EJ','EK','EL','EM','EN','EO','EP','ER','ES','ET',
-	                 'WL','WC','WD','WE','WF','WG','WH','WJ','WK','NC','WA','OR','EV','EG','VE','6H','6X','6Z','ZB','6W','10G' ];                                    
+	                 'WL','WC','WD','WE','WF','WG','WH','WJ','WK','NC','WA','OR','EV','EG','VE','6H','6X','6Z','ZB','6W','10G',
+								   'I0042','I0043','I0044','I0045','I0046','I0047','I0048','I0049','I0050','I0051','I0052'];                                    
 
 						 
 //remove the persists before moving the code to prod.
@@ -841,7 +842,7 @@ self.curr_incar_flag	   :=IF(L.vendor not in vendor_list,'',
 															      L.vendor = 'DJ' => 'U', //remove this once GA data becomes current
 																		//L.vendor = 'DO' => 'U', //remove this once DO data becomes current. Need to research with hygenics
 																		L.vendor = 'DW' => 'U', //remove this once MI ALT data becomes current
-                                    L.vendor IN [ 'DL','DT','EP','EN','DR','ES'] => 'U',															      
+                                    L.vendor IN [ 'DL','DT','EP','EN','DR','ES','I0050'] => 'U',															      
 																		L.vendor = 'DH' and curr_incar_flag ='Y' and Parole_flag = 'Y' and  //checked the website sch_release_dt = Est. Sentence end date, not necessarily the date he was released from prison.
 															      R.cur_stat_inm_desc = '' => 'N',
 																		
@@ -921,7 +922,7 @@ self.curr_parole_flag    := IF(L.vendor not in vendor_list,'',
 															      L.vendor = 'DJ' => 'U', //remove this once GA data becomes current
 																		//L.vendor = 'DO' => 'U', //remove this once DO data becomes current. Need to research with hygenics
                                     L.vendor = 'DW' => 'U', //remove this once MI ALT data becomes current															 
-                                    L.vendor IN [ 'DL','DT','EP','EN','DR','ES'] => 'U',															     
+                                    L.vendor IN [ 'DL','DT','EP','EN','DR','ES','I0050'] => 'U',															     
 																	  L.vendor = 'DH' and curr_incar_flag ='Y' and Parole_flag = 'Y' and  //checked the website sch_release_dt = Est. Sentence end date, not necessarily the date he was released from prison.
 															      R.cur_stat_inm_desc = '' => 'Y',
 
@@ -1014,7 +1015,7 @@ self.curr_probation_flag := IF(L.vendor not in vendor_list,'',
 															      L.vendor = 'DJ' => 'U', //remove this once GA data becomes current
 																		//L.vendor = 'DO' => 'U', //remove this once DO data becomes current. Need to research with hygenics
 																		L.vendor = 'DW' => 'U', //remove this once MI ALT data becomes current
-                                    L.vendor IN [ 'DL','DT','EP','EN','DR','ES'] => 'U',															      
+                                    L.vendor IN [ 'DL','DT','EP','EN','DR','ES','I0050'] => 'U',															      
 																		L.vendor = 'DP'	and LIB_Date.DaysApart( _functions.GetDate ,check_dt) < 91 => 'Y',
 																	
                                     //GA DOC WEB Only party status is useful

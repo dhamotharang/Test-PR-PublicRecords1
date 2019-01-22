@@ -784,6 +784,7 @@ hygenics_crim.Layout_Common_DOC_Offenses_orig to_court_offenses(j_final l) := tr
 	                               '');
 	
 	self.stc_desc_4        := MAP(l.statecode ='KY' => trim(l.sentencestatus),
+	                              l.ln_vendor 'I0046' =  l.sentencetype,
 	                              //l.institutionname <> '' and trim(l.institutionname) <> 'UNKNOWN'  => 'Institution Name: '+trim(l.institutionname) + trim(l.institutiondetails),
 														    '');
 																	

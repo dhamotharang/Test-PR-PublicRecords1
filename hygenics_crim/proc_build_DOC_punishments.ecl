@@ -1,4 +1,4 @@
-import crim_common, hygenics_crim, STD;
+﻿import crim_common, hygenics_crim, STD;
 
 
 Printable := ' abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789~`!@#$%^&*()_-+={[}]|:;",<.>/?\'\\'; 
@@ -649,8 +649,8 @@ self.offender_key		:= MAP(vVendor in [
 																	l.sourcename = 'WEST_VIRGINIA_DEPARTMENT_OF_CORRECTIONS'  => Trim(l.defendantstatus),
 																	l.sourcename = 'LOUISIANA_JAIL_ROSTERS'  => Trim(l.sentencestatus)                                                                         
 
-                                              
-																										 //WVDOC, LN Crim miss mapping, hygenics no mapping.  		
+                                  l.ln_vendor = 'I0046' and  regexfind('(SPECIAL PROVISIONS: )(.*)',l.sentenceadditionalinfo ) => regexreplace('(SPECIAL PROVISIONS: )(.*)',l.sentenceadditionalinfo,'$2' ),
+                                                                                   
 																	,''); 																										                           
 																								 
 	self.cur_loc_inm_cd 		:= '';

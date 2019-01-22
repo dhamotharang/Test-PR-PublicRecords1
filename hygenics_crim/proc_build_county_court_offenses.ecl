@@ -407,7 +407,8 @@ hygenics_crim.Layout_Common_Court_Offenses_orig to_court_offenses(j_final l) := 
   self.pros_act_filed         := '';    
   self.court_case_number      := temp_case_number;
   self.court_cd               := '';
-  self.court_desc             := trim(stringlib.stringtouppercase(l.courtname));
+  self.court_desc             := MAP(vVendor = 'I0018' and trim(stringlib.stringtouppercase(l.courtname))='CIRCUIT' => '',
+	                                   trim(stringlib.stringtouppercase(l.courtname)));
   self.court_appeal_flag      := '';
   self.court_final_plea       := MAP(regexfind('[0-9]+/[0-9]+/',l.InitialPlea) => '',
 	                                   l.InitialPlea ='&NBSP;' => '',                        
@@ -786,6 +787,7 @@ self.court_off_desc_1         := trim(MAP(vVendor ='TS' and regexfind('[0-9.]+[ 
                             regexfind('^INFRACTION',offensetype) => 'I',
                             regexfind('^COUNTY',offensetype) => 'COR',
                             trim(offensetype) ='TRAFFIC INFRACTION' => 'TI', 
+														trim(offensetype) ='ORDINANCE' => 'ORD', 
                             regexfind('MISD[.]*|MISDE',offenseclass) and regexfind('TRAFFIC',offenseclass)            => 'MT' ,
                             regexfind('MISD[.]*|MISDE',offensetype) and regexfind('TRAFFIC',offensetype)            => 'MT' ,
                             regexfind('MISD[.]*|MISDE',offensedegree) and            regexfind('TRAFFIC',offensedegree)      => 'MT' ,
@@ -1376,7 +1378,7 @@ self.court_off_desc_1         := trim(MAP(vVendor ='TS' and regexfind('[0-9.]+[ 
 																	 
                                    regexfind('(SUSPENDED) (SENTENCE:|LENGTH:) ([0-9]+ [A-Z]), (.*)', l.sentencestatus) => regexreplace('(SUSPENDED) (SENTENCE:|LENGTH:) ([0-9]+ [A-Z]), (.*)', l.sentencestatus,'$4'),
                                    sentstat_susp_time <> '' => '',
-																	 vVendor IN ['I0022'] => l.sentenceadditionalinfo[41..],
+																	 vVendor IN ['I0022','I0020'] => l.sentenceadditionalinfo[41..],
 
                                    l.sentencestatus                                                                                                                                                                                                                                                                             
                                    );
@@ -1629,8 +1631,8 @@ rollupCrimOut := ROLLUP(sorted_rcommon,  left.offender_key = right.offender_key 
 							
 							rollupCrim(LEFT,RIGHT),local) : persist ('~thor200_144::persist::hygenics::crimtemp::HD::county::offenses');
 							
-Set_offender_key:=[//'FM4884167878826446502372013CF002543A0010020130808',             
-                     'FE330909699634058488800014069CF10A20000811'        ];
+Set_offender_key:=['FM4884167878826446502372013CF002543A0010020130808',             
+                   'FE330909699634058488800014069CF10A20000811'        ];
 
 // output(sorted_rcommon(offender_key in Set_offender_key));
 // output(rollupCrimOut(offender_key in Set_offender_key));

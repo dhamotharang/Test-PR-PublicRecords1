@@ -2745,32 +2745,33 @@ map(
 	psourcename = 'KS BUREAU OF INVESTIGATION - VIOLENT AND DRUG_IE'                        => 'I0004',
 	psourcename = 'MD ADMINISTRATIVE OFFICE OF COURTS DISTRICT COURTS_IE   '                => 'I0005',
 	psourcename = 'ND DISTRICT AND MUNICIPAL COURTS_IE'                                     => 'I0006',
-	psourcename = 'RI DISTRICT AND SUPERIOR COURTS_IE'                                      => 'I0008',  //IE fix
-  // psourcename = 'WI ADMINISTRATIVE OFFICE OF COURTS(CM)_IE'                               => 'I0009',  //IE fix compare with hygenics
-	// psourcename = 'WI ADMINISTRATIVE OFFICE OF COURTS(CF)_IE'                               => 'I0010',  //IE fix compare with hygenics
-	// psourcename = 'WI ADMINISTRATIVE OFFICE OF COURTS(CT)_IE'                               => 'I0011',  //IE fix			
+  psourcename = 'OK VIOLENT CRIME OFFENDER REGISTRY_IE'                                   => 'I0007',  
+	psourcename = 'RI DISTRICT AND SUPERIOR COURTS_IE'                                      => 'I0008',  
+	// psourcename = 'WI ADMINISTRATIVE OFFICE OF COURTS(CF)_IE'                            => '',  //IE fix compare with hygenics
+	// psourcename = 'WI ADMINISTRATIVE OFFICE OF COURTS(CT)_IE'                            => '',  //IE fix			
 	
 //-------------------------------IE County Batch 1 20181005 ---------------------------------------------------
   psourcename 	=	 'CA KERN SUPERIOR COURT_IE'                                            => 'I0013',
   psourcename 	=	 'CA SAN BERNARDINO SUPERIOR COURT_IE'                                  => 'I0014',
-  psourcename 	=	 'CO DENVER COUNTY COURT_IE'                                            => 'I0015',//
+  psourcename 	=	 'CO DENVER COUNTY COURT_IE'                                            => 'I0015',
+	psourcename 	=	 'GA DEKALB COUNTY JUDICIAL SYSTEM_IE'                                  => 'I0010',
   psourcename 	=	 'GA CARROLL SUPERIOR CLERK OF COURTS_IE '                              => 'I0016',
   psourcename 	=	 'GA GWINNETT LAWRENCEVILLE - SUPERIOR COURT_IE'                        => 'I0017',
-  psourcename 	=	 'IL KANE CIRCUIT COURT_IE'                                           	=> 'I0018',//
+  psourcename 	=	 'IL KANE CIRCUIT COURT_IE'                                           	=> 'I0018',
   psourcename 	=	 'LA ORLEANS PARISH DISTRICT COURT_IE'                                	=> 'I0019',
-  psourcename 	=	 'NE LANCASTER COUNTY AND DISTRICT COURTS_IE'                         	=> 'I0020',//
+  psourcename 	=	 'NE LANCASTER COUNTY AND DISTRICT COURTS_IE'                         	=> 'I0020',
   psourcename 	=	 'OH CUYAHOGA CLERK OF COURTS_IE'                                       => 'I0021',
   psourcename 	=	 'OH FAIRFIELD MUNICIPAL COURT_IE'                                      => 'I0022',
-  psourcename 	=	 'OH FRANKLIN COURT OF COMMON PLEAS_IE'                               	=> 'I0023',//
-  psourcename 	=	 'OH PORTAGE RAVENNA MUNICIPAL COURT_IE'                              	=> 'I0024',//
+  psourcename 	=	 'OH FRANKLIN COURT OF COMMON PLEAS_IE'                               	=> 'I0023',
+  psourcename 	=	 'OH PORTAGE RAVENNA MUNICIPAL COURT_IE'                              	=> 'I0024',
   psourcename 	=	 'OK CLEVELAND DISTRICT COURT_IE'                                       => 'I0025',
   psourcename 	=	 'OK COMANCHE DISTRICT COURT_IE'                                        => 'I0026',
   psourcename 	=	 'OK OKLAHOMA DISTRICT COURT_IE'                                        => 'I0027',
   psourcename 	=	 'OK PAYNE DISTRICT COURT_IE'                                           => 'I0028',
   psourcename 	=	 'OK ROGERS DISTRICT COURT_IE'                                          => 'I0029',
   psourcename 	=	 'OK TULSA DISTRICT COURT_IE'                                           => 'I0030',
-  psourcename 	=	 'SC JASPER SUMMARY COURT_IE'                                           => 'I0031',
-  psourcename 	=	 'TN DAVIDSON GENERAL SESSIONS COURT (LEGACY)_IE'                     	=> 'I0032',//
+  psourcename 	=	 'SC JASPER SUMMARY COURT_IE'                                           => 'I0031', 
+  psourcename 	=	 'TN DAVIDSON GENERAL SESSIONS COURT (LEGACY)_IE'                     	=> 'I0032',
   psourcename 	=	 'TN DAVIDSON GENERAL SESSIONS COURT_IE'                                => 'I0033',         
   psourcename 	=	 'TN HAMILTON GENERAL SESSIONS COURT_IE'                                => 'I0034',
   psourcename 	=	 'TX BOWIE DISTRICT AND COUNTY COURTS_IE'                               => 'I0035',
@@ -2778,22 +2779,22 @@ map(
   psourcename 	=	 'TX HARRIS COUNTY COURTS DISPOSITION_IE'                             	=> 'I0037',
   psourcename 	=	 'TX TAYLOR COUNTY COURTS_IE'                                           => 'I0038',
   psourcename 	=	 'TX TAYLOR JUSTICE OF THE PEACE_IE'                                    => 'I0039',
-  psourcename 	=	 'NV CLARK JUSTICE COURTS_IE'  	                                        => '10040',//
-  psourcename 	=	 'FL SARASOTA CIRCUIT COURT_IE'                                         => '10041',// 
+  psourcename 	=	 'NV CLARK LAS VEGAS JUSTICE COURT_IE'  	                              => '10040',
+	psourcename 	=	 'NV CLARK DISTRICT COURT_IE'  	                                        => '10009',
+  psourcename 	=	 'FL SARASOTA CIRCUIT COURT_IE'                                         => '10041', 
   psourcename   =  'WV CIRCUIT COURTS_IE'                                                 => 'I0012',
 //-------------------------------IE DOC Batch 1 20181005 ---------------------------------------------------
-  // psourcename = 'CO DEPARTMENT OF CORRECTIONS_IE'                                         => 'I0042',
-  // psourcename = 'FL DEPARTMENT OF CORRECTIONS - INMATE_IE'                                => 'I0043',
-  // psourcename = 'FL DEPARTMENT OF CORRECTIONS - RELEASE_IE'                               => 'I0044',
-  // psourcename = 'FL DEPARTMENT OF CORRECTIONS - SUPERVISED_IE'                            => 'I0045',
-  // psourcename = 'NC DEPARTMENT OF CORRECTIONS (SUPERVISION)_IE'                           => 'I0046',
-	// psourcename = 'NY DEPARTMENT OF CORRECTIONS RELEASED_IE'                                => 'I0047',
-  // psourcename = 'OK VIOLENT CRIME OFFENDER REGISTRY_IE'                                   => 'I0007',  //IE fix DOC?
-  // psourcename = 'TX DEPARTMENT OF CORRECTIONS (PAROLE)_IE'                                => 'I0048',
-  // psourcename = 'TX DEPARTMENT OF CORRECTIONS (PROBATION)_IE'                             => 'I0049',   
+  psourcename = 'CO DEPARTMENT OF CORRECTIONS_IE'                                         => 'I0042',
+  psourcename = 'FL DEPARTMENT OF CORRECTIONS - INMATE_IE'                                => 'I0043',
+  psourcename = 'FL DEPARTMENT OF CORRECTIONS - RELEASE_IE'                               => 'I0044',
+  psourcename = 'FL DEPARTMENT OF CORRECTIONS - SUPERVISED_IE'                            => 'I0045',
+  psourcename = 'NC DEPARTMENT OF CORRECTIONS (SUPERVISION)_IE'                           => 'I0046',
+	psourcename = 'NY DEPARTMENT OF CORRECTIONS RELEASED_IE'                                => 'I0047',
+  psourcename = 'TX DEPARTMENT OF CORRECTIONS (PAROLE)_IE'                                => 'I0048',
+  psourcename = 'TX DEPARTMENT OF CORRECTIONS (PROBATION)_IE'                             => 'I0049',   
 	psourcename = 'SD DEPARTMENT OF CORRECTIONS ABSCONDERS_IE'                              => 'I0050',
-  // psourcename = 'US FEDERAL BUREAU OF PRISONS FEDERAL INMATE REGISTRY_IE'                 => 'I0051',
-  // psourcename = 'UT DEPARTMENT OF CORRECTIONS_IE'                                         => 'I0052',
+  psourcename = 'US FEDERAL BUREAU OF PRISONS FEDERAL INMATE REGISTRY_IE'                 => 'I0051',
+  psourcename = 'UT DEPARTMENT OF CORRECTIONS_IE'                                         => 'I0052',
 	
 //-------------------------------IE ARREST Batch 1 20181005 ---------------------------------------------------	
   psourcename = 'NV CLARK ARREST_IE'                                                      => 'I0053',  
