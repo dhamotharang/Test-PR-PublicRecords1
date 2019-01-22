@@ -89,10 +89,20 @@ lgn(string sp_name) := '~'+nothor(fileservices.SuperFileContents(sp_name)[1].nam
 _wuid(string sp_name) := nothor(STD.File.GetLogicalFileAttribute(lgn(sp_name),'workunit'));
 restoreWuid(string sp_name) := output(wk_ut.Restore_Workunit(_wuid(sp_name)),named(ingest_action + 'wuids_restore'),extend);
 
+isHeaderBuildingSFEmpty(string buildingSuperfilename) := function
+
+    hdr_ingst_building_content := nothor(fileservices.SuperFileContents(buildingSuperfilename)[1].name);
+    val := if(hdr_ingst_building_content <> '', false, true);
+    return val;
+ 
+end;
+
 // Reusable call to check packages vs. base file dates
-ck(string pk, string buildingSuperfilename, string sp_name, string clstr='N') := dataset([{pk,sp_name,
-                            if(isNewerOrProdCertDeployAFTERfileWuidBuildEnd(pk,sp_name,buildingSuperfilename,clstr),true,false)}],
-                                        {string pk, string sp_name, boolean input_will_update});
+ck(string pk, string buildingSuperfilename, string sp_name, string clstr='N') := dataset([{
+                            pk,
+                            sp_name,
+                            if(isHeaderBuildingSFEmpty(buildingSuperfilename), false, if(isNewerOrProdCertDeployAFTERfileWuidBuildEnd(pk,sp_name,buildingSuperfilename,clstr),true,false))
+                            }],{string pk, string sp_name, boolean input_will_update});
 
 restore := 
 sequential(
