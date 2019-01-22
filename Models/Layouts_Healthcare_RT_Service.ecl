@@ -63,6 +63,7 @@ EXPORT Layouts_Healthcare_RT_Service := module
 			//Subscription Settings
 			Boolean SubscribedToReadmissionScore := Healthcare_Constants_RT_Service.CFG_False;
 			Boolean SubscribedToHealthAttributesV3 := Healthcare_Constants_RT_Service.CFG_False;
+			Boolean SubscribedToMedicationAdherenceScore := Healthcare_Constants_RT_Service.CFG_False;
 			//Attribute group suppression settings
 			Boolean SuppressAccident := Healthcare_Constants_RT_Service.CFG_False;
 			Boolean SuppressAddressStability := Healthcare_Constants_RT_Service.CFG_False;
@@ -91,40 +92,29 @@ EXPORT Layouts_Healthcare_RT_Service := module
 			Boolean SuppressSubprimeRequests := Healthcare_Constants_RT_Service.CFG_False;
 
 			//The thresholds for Socio Readmission Category Calculation are set to default values here
-			DECIMAL5_2 ReadmissionScore_Category_5_High	:= 100 ;
-			DECIMAL5_2 ReadmissionScore_Category_5_Low	:= 34.81 ;
-			DECIMAL5_2 ReadmissionScore_Category_4_High	:= 34.80 ;
-			DECIMAL5_2 ReadmissionScore_Category_4_Low	:= 16.33 ;
-			DECIMAL5_2 ReadmissionScore_Category_3_High	:= 16.32 ;
-			DECIMAL5_2 ReadmissionScore_Category_3_Low	:= 12.23 ;
-			DECIMAL5_2 ReadmissionScore_Category_2_High	:= 12.22 ;
-			DECIMAL5_2 ReadmissionScore_Category_2_Low	:= 8.53 ;
-			DECIMAL5_2 ReadmissionScore_Category_1_High	:= 8.52 ;
-			DECIMAL5_2 ReadmissionScore_Category_1_Low	:= 0 ;
+			//TODO: Cange it to 4 decimal places
+			DECIMAL7_4 ReadmissionScore_Category_5_High	:= 100 ;
+			DECIMAL7_4 ReadmissionScore_Category_5_Low	:= 34.8015 ;
+			DECIMAL7_4 ReadmissionScore_Category_4_High	:= 34.8014 ;
+			DECIMAL7_4 ReadmissionScore_Category_4_Low	:= 16.3241 ;
+			DECIMAL7_4 ReadmissionScore_Category_3_High	:= 16.3240 ;
+			DECIMAL7_4 ReadmissionScore_Category_3_Low	:= 12.2211 ;
+			DECIMAL7_4 ReadmissionScore_Category_2_High	:= 12.2210 ;
+			DECIMAL7_4 ReadmissionScore_Category_2_Low	:= 8.5245 ;
+			DECIMAL7_4 ReadmissionScore_Category_1_High	:= 8.5244 ;
+			DECIMAL7_4 ReadmissionScore_Category_1_Low	:= 0 ;
+
+			DECIMAL7_4 MedicationAdherenceScore_Category_5_High	:= 37.5323 ;
+			DECIMAL7_4 MedicationAdherenceScore_Category_5_Low	:= 0 ;
+			DECIMAL7_4 MedicationAdherenceScore_Category_4_High	:= 64.3456 ;
+			DECIMAL7_4 MedicationAdherenceScore_Category_4_Low	:= 37.5324 ;
+			DECIMAL7_4 MedicationAdherenceScore_Category_3_High	:= 74.2270 ;
+			DECIMAL7_4 MedicationAdherenceScore_Category_3_Low	:= 64.3457 ;
+			DECIMAL7_4 MedicationAdherenceScore_Category_2_High	:= 79.9234 ;
+			DECIMAL7_4 MedicationAdherenceScore_Category_2_Low	:= 74.2271 ;
+			DECIMAL7_4 MedicationAdherenceScore_Category_1_High	:= 100 ;
+			DECIMAL7_4 MedicationAdherenceScore_Category_1_Low	:= 79.9235 ;
 	end;
-
-/*	export EndUserInfo := record
-		string120 CompanyName := '';
-		string200 StreetAddress1 := '';
-		string25 City := '';
-		string2 State := '';
-		string5 Zip5 := '';
-		string10 Phone := '';
-	end;*/
-
-/*	export UserInfo := record
-		string50 ReferenceCode {xpath('ReferenceCode')};
-		string20 BillingCode {xpath('BillingCode')};
-		string20 BillingId {xpath('BillingId')};//hidden[internal]
-		string2 GLBPurpose {xpath('GLBPurpose')};//hidden[!_uk_]
-		string2 DLPurpose {xpath('DLPurpose')};//hidden[!_uk_]
-		string15 IP {xpath('IP')};//hidden[internal]
-		string DataRestrictionMask {xpath('DataRestrictionMask')};//hidden[internal]
-		string50 DataPermissionMask {xpath('DataPermissionMask')};//hidden[internal]
-		// EndUserInfo EndUser;
-		string16 RelatedTransactionId {xpath('RelatedTransactionId')};//hidden[internal]
-		string ProductCode {xpath('ProductCode')};//hidden[internal]
-	end;*/
 
 	EXPORT transactionLog := RECORD			
 		STRING20 transaction_id ; 				// ID of the transaction. This ID will be associated with all logging entries.
@@ -138,6 +128,12 @@ EXPORT Layouts_Healthcare_RT_Service := module
 		INTEGER  gc_id ; 						// Gc id of the company running the search
 		INTEGER  billing_id ; 					// Billing id of the company running the search
 		STRING32 customer_reference_code; 		// Pass through VALUE BY the customer TO ID the transaction. IN the current insurance world referred AS "full quote back" AND IN accurint "reference number"
+		STRING120 end_user_name ; 				// EndUser Company name
+		STRING200 end_user_address_1 ;			// EndUser address suppled in request
+		STRING25 end_user_city ;
+		STRING2 end_user_state ;
+		STRING5 end_user_zip ;
+		STRING10 end_user_phone ;
 		STRING32 i_unique_id ; 					// UNIQUE ID provided aka LexID
 		STRING15 i_tax_id ; 					// Input TaxId
 		STRING15 i_fein ; 						// Input FEIN
@@ -184,7 +180,7 @@ EXPORT Layouts_Healthcare_RT_Service := module
 		INTEGER  login_history_id ; 			// Optional. Possibly NULL in this case for non WEB transactions
 		STRING20 ip_address ; 					// IP where the request was made for the search
 		STRING8  response_time ; 				// Response time taken to fullfil the request, from request to result
-		STRING40 esp_method ; 					// ESP method tied to this transaction id	
+		STRING40 esp_method ; 					// ESP method tied to this transaction id
 	END; // RECORD
 	
 	EXPORT transactionLogWrap := RECORD
