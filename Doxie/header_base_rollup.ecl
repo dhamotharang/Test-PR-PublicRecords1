@@ -1,4 +1,4 @@
-﻿import ut, doxie, address;
+import ut, doxie, address;
 
 doxie.MAC_Header_Field_Declare();
 
@@ -59,7 +59,6 @@ l_out rol_it(l_out le,l_out ri) := transform
   self.mname := IF( length(trim(le.mname)) > length(trim(ri.mname)), le.mname, ri.mname );
   self.dob := 			IF( le.dob>ri.dob,le.dob, ri.dob ); // Slight hack for 'best' date
   self.age := 			IF( le.dob>ri.dob,le.age, ri.age ); // Not a typo, taking age from 'best' dsob
-	self.IsLimitedAccessDMF := 	ri.IsLimitedAccessDMF; 
 	self.dead_age := 	IF( le.dob>ri.dob,le.dead_age, ri.dead_age ); // Not a typo, taking age from 'best' dob
 	self.deceased := map(le.deceased = 'Y' or ri.deceased = 'Y' => 'Y',
 										   le.deceased = 'N' or ri.deceased = 'N' => 'N',

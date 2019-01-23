@@ -111,7 +111,6 @@ export Functions := MODULE
 			 self.DOB := iesp.ECL2ESP.toDate(l.dob);
 			 self.DOD := iesp.ECL2ESP.toDate(l.dod);
 			 self.Deceased := l.deceased;
-			 self.IsLimitedAccessDMF := l.IsLimitedAccessDMF;
        self.Name := iesp.ECL2ESP.setNameFields(l.fname, l.mname, l.lname, '', l.name_suffix, l.title);
 																									 
 			 self.AddressEx := iesp.ECL2ESP.setAddressFields(l.prim_name, l.prim_range, l.predir, 

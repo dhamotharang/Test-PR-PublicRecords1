@@ -1,4 +1,4 @@
-﻿import iesp, seed_files;
+import iesp, seed_files;
 
 // returns sample output by hash based on the user input
 ifr := iesp.identityfraudreport;
@@ -94,7 +94,6 @@ EXPORT out_rec IdentityFraudReportTest (dataset (ts.rec_in_slim) ds_match) := FU
     Self.AddressInfo := project (L.AI, SetAddress (Left));
     Self.PhoneInfo := project (L.PI, SetPrimaryPhone (Left));
     Self.DOBInfo := project (L.DI, SetDOB (Left));
-    Self.IsLimitedAccessDMF := False;
     Self := L;
   end;
     
