@@ -102,8 +102,6 @@ EXPORT InstantID20_Service() := MACRO
 
   IF( Options.OFAC_Version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(Options.Watchlists_Requested, value),
       FAIL( OFAC_XG5.Constants.ErrorMsg_OFACversion ) );
-      
-  ExcludeWatchLists := option.ExcludeWatchLists;
 
 		// Generate the linking parameters to be used in BIP's kFetch (Key Fetch) - These parameters should be global so figure them out here and pass around appropriately
 		linkingOptions := MODULE(BIPV2.mod_sources.iParams)
@@ -128,12 +126,11 @@ EXPORT InstantID20_Service() := MACRO
 		IF( NOT MinimumInputMet,
 			FAIL('Error - Minimum input fields required: please refer to your product manual for guidance.'));
 
-		IF( Options.OFAC_Version = 4 AND ExcludeWatchlists = FALSE AND NOT EXISTS(Options.Gateways(servicename = 'bridgerwlc')), 
-			FAIL(Risk_Indicators.iid_constants.OFAC4_NoGateway)); // Due to this RQ-14881 ExcludeWatchlists works with other versions of OFAC in this query. 
-                                                            // Please refer to the ticket if needing further details.
+		IF( Options.OFAC_Version = 4 AND NOT EXISTS(Options.Gateways(servicename = 'bridgerwlc')), 
+			FAIL(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 		// 4. Pass input to BIID 2.0 logic.
-		ds_BIID_results := BusinessInstantID20_Services.InstantID20_Records(ds_Input, Options, linkingOptions, ExcludeWatchlists);
+		ds_BIID_results := BusinessInstantID20_Services.InstantID20_Records(ds_Input, Options, linkingOptions);
 
 		//4.5 Call Testseeds Function
 		TestSeed_Results := BusinessInstantID20_Services.BIIDv2_TestSeed_Function(ds_Input, _TestData_TableName, , Options);
