@@ -1,4 +1,4 @@
-﻿import iesp,_Control,Gateway, Risk_Indicators;
+﻿import iesp,_Control,Gateway;
 
 USE_LIBRARY := not _Control.LibraryUse.ForceOff_Risk_Indicators__LIB_InstantID_Function;
 
@@ -127,8 +127,8 @@ seq_map := join( indata1, indata,
 	// join the results back to the original input so that every record on input has a response populated
 	full_response := join( seq_map, iid_results, left.deduped_seq=right.seq, transform( layout_output, self.seq := left.input_seq, self := right ), keep(1) );
   
-  // if(not in_isFCRA and exists(full_response(watchlist_table = 'ERR')), FAIL('Bridger Gateway Error'));
-valid_full_response := IF(in_isFCRA, full_response, full_response(IF(watchlist_table = 'ERR', ERROR('Bridger Gateway Error'), true)));
+  if(not in_isFCRA and exists(full_response(watchlist_table = 'ERR')), FAIL('Bridger Gateway Error'));
+
 
 // output(	indata1	, named('indata1')	);
 // output(	gateways	, named('gateways')	);
@@ -167,5 +167,5 @@ valid_full_response := IF(in_isFCRA, full_response, full_response(IF(watchlist_t
 // output(	in_CompanyID	, named('in_CompanyID')	);
 // output(	in_DataPermission	, named('in_DataPermission')	);//35
 
-	return group(valid_full_response, seq);
+	return group(full_response, seq);
 END;
