@@ -6,8 +6,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 																					boolean UseBlankPhoneNumberRecords = false) := FUNCTION
 
 	//get input
-  mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ());
-
+	doxie.MAC_Header_Field_Declare()
 	doxie.MAC_Selection_Declare()
 
 	boolean exclude_relatives := false	: stored('ExcludeRelatives');
@@ -74,9 +73,8 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 		doxie.layout_best;
 	end;
 
-	dppaOk := mod_access.isValidDPPA(checkRNA);
-  glbOk := mod_access.isValidGLB(checkRNA);
- 	fixed_DRM := mod_access.DataRestrictionMask;
+	dppaOk := ut.dppa_ok(DPPA_Purpose,checkRNA);
+  glbOk := ut.glb_ok(GLB_Purpose,checkRNA);
 	
 	doxie.mac_best_records(f_with_did,	
 												 did,
@@ -84,7 +82,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 												 dppaOk,
 												 glbOk,
 												 ,
-												 fixed_DRM,
+												 doxie.DataRestriction.fixed_DRM,
 												 include_dod := true);
 
 	subj_best_rec get_subj_best(f_with_did l, outfile r) := transform
@@ -119,8 +117,14 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 								Neighbors_PerAddress,
 								Neighbors_Per_NA,
 								Neighbor_Recency,
-								false, false,,,
-                mod_access);
+								industry_class_value,
+								GLB_Purpose,
+								DPPA_Purpose,
+								probation_override_value,
+								no_scrub,
+								glb_ok,
+								dppa_ok,
+								ssn_mask_value, false, false);
 								
 	nbr_with_rank_rec := record
 		doxie.layout_nbr_records;
@@ -133,10 +137,11 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 	end;
 
 	f_in_nbrs_rank := project(f_in_nbrs_raw, get_nbr_in_rank(left, counter));
+	fixed_DRM := doxie.DataRestriction.fixed_DRM;
 
 	/* Append phone numbers to each Neighbor.
 	*/
-	didville.Mac_RAN_phone_append(f_in_nbrs_rank, f_in_nbrs_app, fixed_DRM, mod_access.glb, mod_access.industry_class, checkRNA, mod_access.dppa)
+	didville.Mac_RAN_phone_append(f_in_nbrs_rank, f_in_nbrs_app, fixed_DRM,GLB_Purpose, industry_class_value, checkRNA, DPPA_Purpose)
 
 	f_in_nbrs_dep := dedup(sort(f_in_nbrs_app(phone<>''),
 															seqTarget, prim_name, prim_range, zip, sec_range, nbr_rank),
@@ -166,8 +171,14 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 								Neighbors_PerAddress,
 								Neighbors_Per_NA,
 								Neighbor_Recency,
-								false, false,,,
-                mod_access);
+								industry_class_value,
+								GLB_Purpose,
+								DPPA_Purpose,
+								probation_override_value,
+								no_scrub,
+								glb_ok,
+								dppa_ok,
+								ssn_mask_value, false, false);
 															
 	nbr_with_rank_rec get_nbr_best_rank(f_best_nbrs_raw l, unsigned cnt) := transform
 		self.nbr_rank := cnt;
@@ -178,7 +189,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 
 	/* Append phone numbers to each Neighbor.
 	*/
-	didville.Mac_RAN_phone_append(f_best_nbrs_rank, f_best_nbrs_app,fixed_DRM,mod_access.glb, mod_access.industry_class, checkRNA, mod_access.dppa)
+	didville.Mac_RAN_phone_append(f_best_nbrs_rank, f_best_nbrs_app,fixed_DRM,GLB_Purpose, industry_class_value, checkRNA, DPPA_Purpose)
 
 	f_best_nbrs_dep := dedup(sort(f_best_nbrs_app(phone<>''),
 																seqTarget, prim_name, prim_range, zip, sec_range, nbr_rank),
@@ -197,8 +208,8 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 	doxie_Raw.Layout_RelativeRawBatchInput get_rel(f_with_did l, unsigned cnt) := transform
 		self.input.seq := l.seq;
 		self.input.did := l.did;
-		self.input.glb_purpose := mod_access.glb;
-		self.input.dppa_purpose := mod_access.dppa;
+		self.input.glb_purpose := GLB_Purpose;
+		self.input.dppa_purpose := DPPA_Purpose;
 		self.input.ln_branded_value := true;
 		self.input.include_relatives_val := true;
 		self.input.include_associates_val := true;
@@ -259,10 +270,10 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 	doxie.mac_best_records(f_rel_for_best,
 													person2,
 													f_rel_best,
-													dppaOk,
-													glbOk,
+													ut.dppa_ok(DPPA_Purpose,checkRNA),
+													ut.glb_ok(GLB_Purpose,checkRNA),
 													,
-													mod_access.DataRestrictionMask,
+													doxie.DataRestriction.fixed_DRM,
 													include_dod :=true);
 													
 	f_rel_best_valid := f_rel_best(prim_name <> '' or phone<>'');
@@ -294,7 +305,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 																 left.person2 = right.did,
 																 get_back_rel_rank(left, right), left outer, keep(1))(lname<>'' and prim_name<>'');
 
-	didville.Mac_RAN_phone_append(f_rel_best_final_ready, f_rel_best_final_app_raw,fixed_DRM, mod_access.glb, mod_access.industry_class, checkRNA, mod_access.dppa)
+	didville.Mac_RAN_phone_append(f_rel_best_final_ready, f_rel_best_final_app_raw,fixed_DRM, GLB_Purpose, industry_class_value, checkRNA, DPPA_Purpose)
 	f_rel_best_final_app_flted := f_rel_best_final_app_raw(phone<>'');
 	f_rel_best_final_app_to_use := if(UseBlankPhoneNumberRecords, f_rel_best_final_app_raw, f_rel_best_final_app_flted);
 	f_rel_best_final_app := if(dedup_with_same_phone, 
@@ -339,10 +350,10 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 	doxie.mac_best_records(f_roommie_for_best,
 												  person2,
 													f_roommie_best,
-													dppaOk,
-													glbOk,
+													ut.dppa_ok(DPPA_Purpose,checkRNA),
+													ut.glb_ok(GLB_Purpose,checkRNA),
 													,
-													fixed_DRM,	
+													doxie.DataRestriction.fixed_DRM,	
 													include_dod := true);
 													
 	f_roommie_best_valid := f_roommie_best(prim_name <> '' or phone<>'');
@@ -353,7 +364,7 @@ EXPORT RAN_BestInfo_Batch_Service_Records(DATASET(DidVille.Layout_RAN_BestInfo_B
 																		left.person2 = right.did,
 																		get_back_rel_rank(left, right), left outer, keep(1))(lname<>'' and prim_name<>'');
 
-	didville.Mac_RAN_phone_append(f_roomie_best_final_ready, f_roomie_best_final_app_raw,fixed_DRM,mod_access.glb, mod_access.industry_class, checkRNA, mod_access.DPPA)
+	didville.Mac_RAN_phone_append(f_roomie_best_final_ready, f_roomie_best_final_app_raw,fixed_DRM,GLB_Purpose, industry_class_value, checkRNA, DPPA_Purpose)
 	f_roomie_best_final_app_flted := f_roomie_best_final_app_raw(phone<>'');
 	f_roomie_best_final_app := if(dedup_with_same_phone, 
 																dedup(sort(f_roomie_best_final_app_flted, seqTarget, phone, rel_rank), seqTarget, phone),

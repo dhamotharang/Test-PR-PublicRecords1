@@ -1,4 +1,4 @@
-﻿	import BatchDatasets, BatchShare, risk_indicators, riskwise, Std;
+﻿	import BatchDatasets,risk_indicators,riskwise, Std;
 
 	export trisv31_get_hri(
      dataset(BatchServices.TaxRefundISv3_BatchService_Layouts.rec_batch_in_wdid) ds_withDid,
@@ -7,7 +7,7 @@
   )  := function
 
 
-	 in_mod := module(project(args_in,BatchShare.IParam.BatchParams,opt))
+	 in_mod := module(project(args_in,BatchDatasets.IParams.BatchParams,opt))
 					export unsigned1 DPPA_Purpose := args_in.DPPAPurpose;
 					export unsigned1 GLB_Purpose := args_in.GLBPurpose;
 					export string DataRestriction := args_in.DataRestriction;

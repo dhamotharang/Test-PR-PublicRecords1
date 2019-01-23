@@ -1,11 +1,11 @@
-﻿Import autostandardI, doxie, doxie_crs;
+﻿Import autostandardI, ut, doxie, doxie_crs;
   // updated Feb 2017.
 	// *****************************************************************************
 	// *** PLS NOTE DO NOT USE THIS FUNCTION to find neighbors for Relationship    *
 	// Identifier service if count of the                                          *
 	// input ds of input dids is more than 2                                       *
 	// *****************************************************************************
-	// This function attribute is very similar to doxie_crs/nbr_records
+	// This function attribute is very similar to doxie_crs.nbr_records
 	// except that it allows as input a Dataset of did's (ONLY 2 at max) to be passed
 	// as input param to find particular neighbors for
 	//
@@ -61,6 +61,8 @@
       EXPORT string DataRestrictionMask := InmodDRM;
       EXPORT string ssn_mask := ^.SSN_Mask; 
     END;
+    glb_ok := mod_access.isValidGLB ();
+    dppa_ok := mod_access.isValidDPPA ();
 
     unsigned1 dial_contactprecision_value := AutoStandardI.InterfaceTranslator.dial_contactprecision_value.val(project(gmod,
 		              AutoStandardI.InterfaceTranslator.dial_contactprecision_value.params)); 
@@ -74,8 +76,8 @@
 		unsigned1 neighbors_proximity := 15 : stored('NeighborsProximityRadius');
 		////////////////		
 
-		// step #1  -> do equivalent to doxie_crs/nbr_records;
-		// and use results to then call equivalent of this : doxie_crs/nbr_records
+		// step #1  -> do equivalent to doxie_crs.nbr_records;
+		// and use results to then call equivalent of this : doxie_crs.nbr_records
 	  csa := doxie.Comp_Subject_Addresses(dids,, dial_contactprecision_value, Addresses_PerSubject, mod_access);
     // 
 	  headerRecs := csa.addresses;
@@ -98,10 +100,17 @@
 		  Max_Neighborhoods,
 		  Neighbors_PerAddress,
 		  Neighbors_Per_NA,
-		  Neighbor_Recency,,,
-		  neighbors_proximity, // generally, the radius of neighbors' units: houses, or appartments or etc.
-      ,
-      mod_access
+		  Neighbor_Recency,
+		  mod_access.industry_class,
+		  mod_access.glb,
+		  mod_access.dppa,
+		  mod_access.probation_override,
+		  mod_access.no_scrub,
+		  glb_ok,
+		  dppa_ok,
+	  // attrs declared in doxie.MAC_Header_Field_Declare
+		  mod_access.ssn_mask,,,
+		  neighbors_proximity // generally, the radius of neighbors' units: houses, or appartments or etc.
     );
 
 // generate current/historic neighbors as specified
@@ -118,9 +127,8 @@ nbr_records_hist := IF(
 );
 
 both := nbr_records_curr + nbr_records_hist;
-bothfil := doxie.compliance.mac_FilterOutMinors(both,,dob,mod_access.show_minors);
-
+ut.PermissionTools.GLB.mac_FilterOutMinors(both,bothfil,,,dob)
 ds_neighborsMultDidInput := bothfil;
 //output(	Max_Neighborhoods, named('Max_Neighborhoods'));
-return ds_neighborsMultDidInput;
+return(ds_neighborsMultDidInput);
 END;																						 	

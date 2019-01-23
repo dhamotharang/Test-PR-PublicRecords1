@@ -64,6 +64,7 @@
 
 export LiensSearchService() := macro
  #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+ #CONSTANT ('SaltLeadThreshold', 15); // lead threshold set here according to Linking Team's recommendation.
 	#constant('getBdidsbyExecutive',FALSE);
 	#constant('SearchGoodSSNOnly',true);
 	#constant('SearchIgnoresAddressOnly',true);

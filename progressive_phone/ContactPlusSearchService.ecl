@@ -160,7 +160,7 @@ EXPORT ContactPlusSearchService := MACRO
 		boolean ShowPhoneScore := false : STORED('ReturnScore');
 		
 		boolean IncludeLastResort := false : STORED('IncludeLastResort');
-	 boolean ReturnAddressesSeenInLast24Mos := first_row.options.ReturnAddressesSeenInLast24Mos;
+	  boolean ReturnAddressesSeenInLast24Mos := first_row.options.ReturnAddressesSeenInLast24Mos;
 
 		
 		boolean UsePremiumSource_A:= false : STORED ('UsePremiumSource_A'); //equifax
@@ -204,7 +204,6 @@ EXPORT ContactPlusSearchService := MACRO
   	best_pen_rec := record(doxie.layout_best)
 	  	unsigned pen;
 	  end;
-	  
 	  doxie.mac_best_records(dids_fetched, did, ds_phone_match, ut.dppa_ok(g_mod.DPPApurpose), isGLB_Ok, false, doxie.DataRestriction.fixed_DRM)	
 	  best_pen_rec bp_tran(ds_phone_match l) := transform
 	    self := l;
@@ -268,7 +267,6 @@ EXPORT ContactPlusSearchService := MACRO
 				self := iesp.ECL2ESP.toDate(ld.dod);
 				self.deadage := ld.dead_age;
 				self.deceased := ld.deceased;
-				self.IsLimitedAccessDMF := ld.IsLimitedAccessDMF;
 			end;
 			
 			iesp.contactplus.t_ContactPlusAddress tran_addr(progressive_phone.layout_addr_connect_date la) := transform

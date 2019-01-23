@@ -1,4 +1,4 @@
-﻿import ut, Census_Data, codes, CourtSearch_services, iesp, doxie,
+import ut, Census_Data, codes, CourtSearch_services, iesp, doxie,
           Doxie_Raw, autostandardI, deathv2_services, header, courtSearch, ut, Risk_Indicators, suppress, lib_date;
 					
 export Functions := module
@@ -488,7 +488,6 @@ export Functions := module
 							self.DeathCounty := r.county_name,
 							self.DeathVerificationCode := '', 
          			self.Deceased := if (r.did != '' , 'Y','N');
-							SELF.islimitedaccessdmf := r.islimitedaccessdmf;
   				end;		
 									
 					did_set_dod := project(recs_in, doxie.layout_references);					
