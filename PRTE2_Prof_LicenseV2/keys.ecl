@@ -1,4 +1,4 @@
- Import doxie, PRTE2_Prof_LicenseV2, BIPV2,  Prof_LicenseV2;
+﻿ Import doxie, PRTE2_Prof_LicenseV2, BIPV2,  Prof_LicenseV2, ut;
  export keys :=Module
 
 //bdid											
@@ -8,10 +8,17 @@
 				 constants.KeyName_prolicv2 + doxie.Version_SuperKey +'::proflic_bdid');
 
  //did
- Export key_proflic_did (boolean isFCRA = false) := index (files.DS_prolicv2_did, {did}, {files.DS_prolicv2_did}, 
+ Export key_proflic_did (boolean isFCRA = false) := function
+
+ //DF-22706: FCRA Consusmer Data Field Depreciation
+ ut.MAC_CLEAR_FIELDS(files.DS_prolicv2_did, ds_did_cleaned, constants.fields_to_clear);
+ dsFiles := if(isFCRA, ds_did_cleaned, files.DS_prolicv2_did);
+ 
+ return index (dsFiles, {did}, {dsFiles}, 
         constants.KeyName_prolicv2 + 
         if (isFCRA,	'fcra::','') +			
 				doxie.Version_SuperKey +'::prolicense_did');
+end;
  
   //licensenum
  Export key_proflic_licensenum :=index (files.DS_prolicv2 (license_number !=''),
