@@ -21,10 +21,31 @@ zVerifyTXData	:=	if (count(zTXData(length(trim(dl_number)) = 10 and trim(dl_numb
 											);
 
 // Split the restricted DL information out of the data.
-dl_patched    := Driversv2.DL(source_code != MDR.sourceTools.src_MN_RESTRICTED_DL);
-dl_restricted := Driversv2.DL(source_code = MDR.sourceTools.src_MN_RESTRICTED_DL);
+dl_nonRestricted	:= Driversv2.DL(source_code != MDR.sourceTools.src_MN_RESTRICTED_DL);
+dl_restricted 		:= Driversv2.DL(source_code = MDR.sourceTools.src_MN_RESTRICTED_DL);
 
 // The restricted DL information has already been removed at this point
+dl_WIOnly	:=	distribute(dl_nonRestricted(orig_state='WI' and source_code = 'AD'),hash(dl_number));
+dl_Rest		:=	dl_nonRestricted(orig_state<>'WI' or (orig_state = 'WI' and source_code <> 'AD'));
+
+dl_WIOptOut		:=	dedup(sort(dl_WIOnly(Opt_Out	=	'S'),dl_number,-dateReceived,local),dl_number,local);
+
+recordof(dl_WIOnly) tremoveOptOut(dl_WIOnly le, dl_WIOptOut ri) :=
+transform
+	self := le;
+end;
+
+dWIFinal := join( dl_WIOnly,
+									dl_WIOptOut,
+									left.dl_number = right.dl_number and 
+									left.dateReceived<=right.dateReceived,
+									tremoveoptout(left,right),
+									left only,
+									local
+								);
+								
+dl_patched		:=	dWIFinal + dl_rest;
+
 d := dl_patched;
 
 //** general check

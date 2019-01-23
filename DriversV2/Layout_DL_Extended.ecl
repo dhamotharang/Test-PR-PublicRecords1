@@ -24,5 +24,6 @@
 	string2   Permit_Class4			:=	'';
 	string8   Permit_Exp_Date4	:=	'';
 	string2   Permit_Class5			:=	'';
-	string8   Permit_Exp_Date5	:=	'';			
+	string8   Permit_Exp_Date5	:=	'';		
+	string1 	opt_out						:=	'';
 end;
