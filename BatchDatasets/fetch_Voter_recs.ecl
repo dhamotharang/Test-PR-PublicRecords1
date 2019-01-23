@@ -1,7 +1,7 @@
 
-IMPORT BatchShare, Doxie, votersV2_services;
+IMPORT Doxie, votersV2_services;
 			 
-EXPORT fetch_Voter_recs( DATASET(Layouts.batch_in) ds_batch_in, BatchShare.IParam.BatchParams in_mod ) :=
+EXPORT fetch_Voter_recs( DATASET(Layouts.batch_in) ds_batch_in, IParams.BatchParams in_mod ) :=
 	FUNCTION
 		
 		ds_acctno_refs := PROJECT( ds_batch_in, doxie.layout_references_acctno );

@@ -1,4 +1,4 @@
-IMPORT Address, Residency_Services, VerificationOfOccupancy;
+IMPORT Address, Residency_Services, STD, VerificationOfOccupancy;
 
 EXPORT fn_getVOO(DATASET(Residency_Services.Layouts.IntermediateData) ds_input, 
                  Residency_Services.IParam.BatchParams mod_params_in) := FUNCTION
@@ -29,7 +29,8 @@ EXPORT fn_getVOO(DATASET(Residency_Services.Layouts.IntermediateData) ds_input,
 	ds_VOO_In := PROJECT(ds_input, tf_input(LEFT));
 
   // Check a certain input param so the appropriate boolean value isUtility can be passed in below
-  BOOLEAN isUtility :=  mod_params_in.industryclass = 'UTILI';
+	IndustryClassIn   := mod_params_in.industry_class;
+  BOOLEAN isUtility := STD.STR.ToUpperCase(IndustryClassIn) = 'UTILI';
 
 	ds_VOO_recs := VerificationOfOccupancy.Search_Function(
 	                  ds_VOO_In, 

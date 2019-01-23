@@ -35,7 +35,7 @@ EXPORT batchIds := MODULE
 			ak_typestr := Criminal_Records.Constants('').ak_typeStr;
 			
 			// 2. Configure the autokey search	
-			ak_config_data := MODULE(BatchServices.Interfaces.i_AK_Config)
+			shared ak_config_data := MODULE(BatchServices.Interfaces.i_AK_Config)
 				EXPORT skip_set 		 := auto_skip + Criminal_Records.Constants('').skip_set;
 				EXPORT useAllLookups := TRUE; // for Autokey_batch.Fetch_SSN_Batch to run SSN2 key. SSN key is empty.
 			END;
@@ -156,7 +156,7 @@ EXPORT batchIds := MODULE
 			ak_typestr := Criminal_Records.Constants('').ak_typeStr;
 			
 			// 2. Configure the autokey search	
-			ak_config_data := MODULE(BatchServices.Interfaces.i_AK_Config)
+			shared ak_config_data := MODULE(BatchServices.Interfaces.i_AK_Config)
 				EXPORT skip_set 		 := auto_skip + Criminal_Records.Constants('').skip_set;
 				EXPORT useAllLookups := TRUE; // for Autokey_batch.Fetch_SSN_Batch to run SSN2 key. SSN key is empty.
 			END;

@@ -1,8 +1,8 @@
-﻿IMPORT BatchShare, FraudShared, Gateway, iesp, risk_indicators, riskwise, UT;
+IMPORT BatchDatasets, FraudShared, Gateway, iesp, risk_indicators, riskwise, UT;
 
 EXPORT IParam := MODULE
   
-  EXPORT BatchParams := INTERFACE (BatchShare.IParam.BatchParams)
+  EXPORT BatchParams := INTERFACE (BatchDatasets.IParams.BatchParams)
 		EXPORT boolean   AppendBest := true;
 		EXPORT boolean   TestVelocityRules := false;
 		EXPORT boolean   IsOnline := false;
@@ -73,7 +73,7 @@ EXPORT IParam := MODULE
 		IndustryTypeCode := FraudShared.Key_MbsFdnIndType(FraudGovPlatform_Services.Constants.FRAUD_PLATFORM)
 																			(keyed(description = ut.CleanSpacesAndUpper(IndustryType_Name)))[1].ind_type;
 		
-		base_params := BatchShare.IParam.getBatchParams();
+		base_params := BatchDatasets.IParams.getBatchParams();
 		in_mod := MODULE(PROJECT(base_params, BatchParams, OPT))
 			EXPORT boolean   TestVelocityRules	:= false: STORED('TestVelocityRules'); // this option is internal to roxie. added to toggle between test/actual velocity rules. 
 			EXPORT boolean   AppendBest 				:= true	: STORED('AppendBest');

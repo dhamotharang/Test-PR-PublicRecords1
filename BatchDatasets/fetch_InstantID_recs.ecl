@@ -1,7 +1,7 @@
 
-IMPORT BatchShare, address, iesp, risk_indicators, riskwise, ut, gateway;
+IMPORT address, iesp, risk_indicators, riskwise, ut, gateway;
 
-EXPORT fetch_InstantID_recs( DATASET(BatchDatasets.Layouts.layout_batch_in_waddr_status) ds_batch_in, BatchShare.IParam.BatchParams in_mod ) :=
+EXPORT fetch_InstantID_recs( DATASET(BatchDatasets.Layouts.layout_batch_in_waddr_status) ds_batch_in, IParams.BatchParams in_mod ) :=
 	FUNCTION	
 		// Constants to run CIID process
 		boolean Ofac_Only                 := false;
@@ -73,7 +73,7 @@ EXPORT fetch_InstantID_recs( DATASET(BatchDatasets.Layouts.layout_batch_in_waddr
 		
 		ciid_recs := 
 				risk_indicators.InstantID_Function(prep, gateways_in, in_mod.DPPAPurpose, in_mod.GLBPurpose, 
-				in_mod.industryclass='UTILI', ln_branded_value, ofac_only, suppressNearDups, require2ele, 
+				in_mod.industry_class='UTILI', ln_branded_value, ofac_only, suppressNearDups, require2ele, 
 				fromBiid, isFCRA, ExclWatchLists, in_from_IT1O, ofac_version, incl_ofac, incl_addl_watchlists, 
 				Global_WatchList_Threshold, dob_radius_use, bsversion, runSSNCodes, runBestAddrCheck, 
 				runChronoPhoneLookup, runAreaCodeSplitSearch, allowCellPhones, ExactMatchLevel, 

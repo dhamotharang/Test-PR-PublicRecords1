@@ -1,8 +1,8 @@
-import BatchShare;
+import Address, BatchDatasets, BatchShare;
 
 export IParams := module
 	
-	export BatchParams := interface (BatchShare.IParam.BatchParams)
+	export BatchParams := interface (BatchDatasets.IParams.BatchParams)
 		export boolean ViewDebugs    := FALSE;
 		export boolean NoRestriction := FALSE; 
 	end;
@@ -20,6 +20,7 @@ export IParams := module
 			// redefine default values for common parameters and/or define default values for domain-
 			// specific parameters.
 			in_mod := module(project(base_params, BatchParams, opt))				
+				export string5   industry_class    := ''    : STORED('IndustryClass');
 				export boolean   ReturnCurrentOnly := FALSE : STORED('ReturnCurrentOnly');
 				export unsigned8 MaxResultsPerAcct := 1000  : STORED('MaxResultsPerAcct');
 				export unsigned2 PenaltThreshold   := 5     : STORED('PenaltThreshold');

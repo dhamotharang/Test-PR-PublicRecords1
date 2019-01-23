@@ -1,4 +1,4 @@
-IMPORT doxie, doxie_raw, Residency_Services, ut;
+IMPORT AutoStandardI, doxie, doxie_raw, Residency_Services, STD, ut;
 
 EXPORT fn_getUtil(DATASET(doxie.layout_references_acctno) ds_in_acctnos_dids,
 					                Residency_Services.IParam.BatchParams mod_params_in):= FUNCTION
@@ -11,7 +11,7 @@ EXPORT fn_getUtil(DATASET(doxie.layout_references_acctno) ds_in_acctnos_dids,
 	ds_util_recs := doxie_raw.Util_Daily_Raw(ds_util_in_dd,
 	                                         dppa_purpose         := mod_params_in.DPPAPurpose,
 																				   glb_purpose          := mod_params_in.GLBPurpose,
-																				   industry_class_value := mod_params_in.industryclass);
+																				   industry_class_value := mod_params_in.industry_class);
 	
 	TodaysDate := Residency_Services.Constants.TodaysDate;
 
