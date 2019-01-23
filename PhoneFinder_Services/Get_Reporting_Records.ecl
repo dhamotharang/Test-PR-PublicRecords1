@@ -1,30 +1,20 @@
 ﻿IMPORT iesp, Std;
 
 EXPORT Get_Reporting_Records(DATASET(iesp.phonefinder.t_PhoneFinderSearchRecord) pF_Records,
-								     PhoneFinder_Services.iParam.ReportParams    inMod,
-									 iesp.phonefinder.t_PhoneFinderSearchBy      pSearchBy
-									 ) := FUNCTION
+											           PhoneFinder_Services.iParam.ReportParams      								inMod,
+																						iesp.phonefinder.t_PhoneFinderSearchBy 															pSearchBy
+																					) := FUNCTION
 																 
 	 transaction_rec_with_alerts := RECORD
-        PhoneFinder_Services.Layouts.delta_phones_rpt_transaction;
-        DATASET(iesp.phonefinder.t_PhoneFinderAlertIndicator) alerts;
+			PhoneFinder_Services.Layouts.delta_phones_rpt_transaction;
+			DATASET(iesp.phonefinder.t_PhoneFinderAlertIndicator) alerts;
 	 END;
-       
+	 
 	 CurrentDate := (STRING)Std.Date.Today();
 	 Timestamp := (STRING)STD.Date.CurrentTime();
 	 Date := STD.date.ConvertDateFormat(CurrentDate, '%Y%m%d','%Y-%m-%d');
 	 Time :=STD.date.ConvertTimeFormat(Timestamp, '%H%M%S', '%H:%M:%S');
 	 TransactionType := inMod.TransactionType;
-           
-  STRING30 DataSource := (STRING1)(INTEGER)inMod.IncludeEquifax + (STRING1)(INTEGER)inMod.IncludeTargus +
-                         (STRING1)(INTEGER)inMod.IncludeInhousePhones + (STRING1)(INTEGER)inMod.IncludeAccudataOCN +
-                         (STRING1)(INTEGER)inMod.IncludeTransUnionPVS +  (STRING1)(INTEGER)inMod.IncludeTransUnionIQ411 + 
-                         (STRING1)(INTEGER)inMod.UseInHousePhoneMetadata + (STRING1)(INTEGER)inMod.IncludeOTP + 
-                         (STRING1)(INTEGER)inMod.IncludePorting + (STRING1)(INTEGER)inMod.IncludeSpoofing + 
-                         (STRING1)(INTEGER)inMod.IncludeZumigoOptions + (STRING1)(INTEGER)inMod.NameAddressValidation +
-                         (STRING1)(INTEGER)inMod.NameAddressInfo + (STRING1)(INTEGER)inMod.AccountInfo + (STRING1)(INTEGER)inMod.CallHandlingInfo +
-                         (STRING1)(INTEGER)inMod.DeviceHistory + (STRING1)(INTEGER)inMod.DeviceInfo + (STRING1)(INTEGER)inMod.DeviceChangeInfo;
-     
   transaction_rec_with_alerts xfm_Transaction(iesp.phonefinder.t_PhoneFinderSearchRecord R, INTEGER C) := TRANSFORM
 	 SELF.transaction_id    	  := inMod.TransactionId;
 	 SELF.transaction_date        := (STRING)Date +' '+ (STRING)Time;
@@ -34,9 +24,6 @@ EXPORT Get_Reporting_Records(DATASET(iesp.phonefinder.t_PhoneFinderSearchRecord)
 	 SELF.source_code             := inMod.SourceCode;  
 	 SELF.reference_code      	  := inMod.ReferenceCode;
 	 SELF.phonefinder_type     	  := PhoneFinder_Services.Constants.MapTransCode2Type(TransactionType);
-	 SELF.data_source     	      := DataSource;
-	 SELF.carrier                 := R.PrimaryPhoneDetails.Carrier;
-	 SELF.royalty_used            := ''; //TODO  PHPR-165
 	 //SearchTerms
 	 SELF.submitted_lexid   	 := pSearchBy.UniqueId;
 	 SELF.submitted_phonenumber  := pSearchBy.PhoneNumber;
