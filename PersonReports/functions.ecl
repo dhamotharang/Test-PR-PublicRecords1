@@ -1012,34 +1012,6 @@ END;
     return all_recs;
   end;
 
-  // Temporarily: only until person reports switched to use IDataAccess module.
-  // Unfortunately, I can't put this function to doxie.compliance due to some weird syntax errors
-  EXPORT GetDataAccessModulePersonReports (PersonReports.input._report in_mod) := FUNCTION
-    // in_mod is missing some of the values
-    glob := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
-    mod_access := MODULE (PROJECT (glob, doxie.IDataAccess))
-      EXPORT unsigned1 glb := in_mod.GLBPurpose;
-      EXPORT unsigned1 dppa := in_mod.DPPAPurpose;
-      EXPORT string DataRestrictionMask := in_mod.DataRestrictionMask;
-      EXPORT boolean ln_branded := in_mod.ln_branded;
-      EXPORT string32 application_type := in_mod.ApplicationType;
-      EXPORT unsigned3 date_threshold := in_mod.dateval;
-      //TODO: try rid of it completely, or at least of "include" part
-      EXPORT boolean show_minors := in_mod.IncludeMinors OR (in_mod.GLBPurpose = 2);  //a.k.a. OKtoShowMinors
-      EXPORT string ssn_mask := in_mod.ssn_mask;
-      EXPORT unsigned1 dl_mask := IF (in_mod.mask_dl, 1, 0);
-      EXPORT unsigned1 dob_mask := in_mod.dob_mask;
-        // may need in the future: 
-          // export boolean AllowAll := false;
-          // export boolean AllowGLB := false;
-          // export boolean AllowDPPA := false;
-          // boolean in_mod.ignoreFares := false;
-          // boolean in_mod.ignoreFidelity:= false;
-          // restrictPreGLB
-    END;
-    RETURN mod_access;
-  END;  
-
 END;
 
 

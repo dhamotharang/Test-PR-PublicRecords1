@@ -196,7 +196,14 @@ nbr := choosen(doxie.nbr_records(
 	Neighbors_PerAddress,
 	Neighbors_Per_NA,
 	Neighbor_Recency,
-  mod_access := mod_access
+	mod_access.industry_class,
+	mod_access.glb,
+	mod_access.dppa,
+	mod_access.probation_override,
+	mod_access.no_scrub,
+	glb_ok,
+	dppa_ok,
+	mod_access.ssn_mask
 )(did <> subjectDID), con.max_neighbors);
 
 nbrAddrDIDs := 	dedup(sort(nbr, did,-dt_last_seen), did);
