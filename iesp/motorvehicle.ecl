@@ -406,6 +406,7 @@ export t_MVReportRecord := record
 	iesp.share.t_Date RegistrationEffectiveDate {xpath('RegistrationEffectiveDate')};
 	string25 SeriesName {xpath('SeriesName')};
 	string50 ExternalKey {xpath('ExternalKey')};
+	boolean IsAccurintData {xpath('IsAccurintData')};//hidden[internal]
 end;
 		
 export t_MVReportResponse := record
