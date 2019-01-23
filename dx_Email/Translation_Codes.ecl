@@ -3,30 +3,36 @@
 EXPORT Translation_Codes := MODULE
 
 //Setting bit map for the validation rules
-export rules_bitmap_code(string rules = '')  := map(
-																										rules = 'Invalid_Domain_ext'			  					=> ut.bit_set(0,0),
-																										rules = 'Missing_Domain_ext'									=> ut.bit_set(0,1),
-																										rules = 'Invalid_Domain'											=> ut.bit_set(0,2),
-																										rules = 'Invalid_email'												=> ut.bit_set(0,3),
-																										rules = 'Missing_username'										=> ut.bit_set(0,4),
-																										rules = 'Missing_@_symbol'										=> ut.bit_set(0,5),
-																										rules = 'DOD_b4_email'												=> ut.bit_set(0,6),
+EXPORT rules_bitmap_code(string rules = '')  := MAP(
+																										rules = 'invalid_domain_ext'			  					=> ut.bit_set(0,0),
+																										rules = 'missing_domain_ext'									=> ut.bit_set(0,1),
+																										rules = 'invalid_domain'											=> ut.bit_set(0,2),
+																										rules = 'invalid_email'												=> ut.bit_set(0,3),
+																										rules = 'missing_username'										=> ut.bit_set(0,4),
+																										rules = 'missing_@_symbol'										=> ut.bit_set(0,5),
+																										rules = 'dod_b4_email'												=> ut.bit_set(0,6),
+																										rules = 'invalid_account'											=> ut.bit_set(0,7),
 																										0);
 
-//Function to obtain the validation rules that are set
-export	string	fGet_rules_from_bitmap(unsigned bitmap_rules) := function
-		boolean		fFlagIsOn(unsigned pValue, unsigned bitmap_rules)	:=	pValue & bitmap_rules = bitmap_rules;
-		string		translated_value	:=	if(bitmap_rules = 0,
-																			'',											   
-																		if(fFlagIsOn(bitmap_rules, rules_bitmap_code('Invalid_Domain_ext')),			' ' + 'Invalid_Domain_ext','')
-																+	  if(fFlagIsOn(bitmap_rules, rules_bitmap_code('Missing_Domain_ext')),			' ' + 'Missing_Domain_ext','')
-																+	  if(fFlagIsOn(bitmap_rules, rules_bitmap_code('Invalid_Domain')),					' ' + 'Invalid_Domain','')
-																+	  if(fFlagIsOn(bitmap_rules, rules_bitmap_code('Invalid_email')),						' ' + 'Invalid_email','')
-																+	  if(fFlagIsOn(bitmap_rules, rules_bitmap_code('Missing_username')),				' ' + 'Missing_username','')
-																+	  if(fFlagIsOn(bitmap_rules, rules_bitmap_code('Missing_@_symbol')),				' ' + 'Missing_@_symbol','')
-																+	  if(fFlagIsOn(bitmap_rules, rules_bitmap_code('DOD_b4_email')),						' ' + 'DOD_b4_email','')
-																			);
-return		lib_stringlib.stringlib.stringfindreplace(trim(lib_stringlib.stringlib.stringcleanspaces(translated_value),left,right),'  ',' ');
-end;
+//Testing if bitmap is set
+EXPORT fFlagIsOn(unsigned bitmap, unsigned bitmap_rules)	:=	FUNCTION
+	RETURN bitmap & bitmap_rules = bitmap_rules;
+END;
 
-end;
+//Function to obtain the validation rules that are set
+EXPORT	STRING	fGet_rules_from_bitmap(unsigned bitmap_rules) := FUNCTION
+		STRING		translated_value	:=	IF(bitmap_rules = 0,
+																			'',											   
+																		IF(fFlagIsOn(bitmap_rules, rules_bitmap_code('invalid_domain_ext')),			' ' + 'invalid_domain_ext','')
+																+	  IF(fFlagIsOn(bitmap_rules, rules_bitmap_code('missing_domain_ext')),			' ' + 'missing_domain_ext','')
+																+	  IF(fFlagIsOn(bitmap_rules, rules_bitmap_code('invalid_domain')),					' ' + 'invalid_domain','')
+																+	  IF(fFlagIsOn(bitmap_rules, rules_bitmap_code('invalid_email')),						' ' + 'invalid_email','')
+																+	  IF(fFlagIsOn(bitmap_rules, rules_bitmap_code('missing_username')),				' ' + 'missing_username','')
+																+	  IF(fFlagIsOn(bitmap_rules, rules_bitmap_code('missing_@_symbol')),				' ' + 'missing_@_symbol','')
+																+	  IF(fFlagIsOn(bitmap_rules, rules_bitmap_code('dod_b4_email')),						' ' + 'dod_b4_email','')
+																+	  IF(fFlagIsOn(bitmap_rules, rules_bitmap_code('invalid_account')),					' ' + 'invalid_account','')
+																			);
+RETURN		lib_stringlib.stringlib.stringfindreplace(trim(lib_stringlib.stringlib.stringcleanspaces(translated_value),left,right),'  ',' ');
+END;
+
+END;

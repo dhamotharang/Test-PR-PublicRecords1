@@ -1,4 +1,4 @@
-IMPORT ut,RoxieKeyBuild,AutoKeyB2,PRTE2_Prof_LicenseV2;
+﻿IMPORT ut,RoxieKeyBuild,AutoKeyB2,PRTE2_Prof_LicenseV2,PRTE,_control,strata,PRTE2_Common;
 
  EXPORT proc_build_keys(string filedate) := FUNCTION
 
@@ -84,7 +84,6 @@ RoxieKeyBuild.MAC_SK_Move_v2(constants.KeyName_prolicv2 + '@version@::prolicense
 	
 	
 	//Id
-	
 	RoxieKeyBuild.MAC_SK_BuildProcess_v2_local(keys.key_proflic_Id,
 					 	    constants.KeyName_prolicv2 + '@version@::Prolic_Id',
 					      constants.KeyName_prolicv2 + filedate +'::Prolic_Id',
@@ -161,8 +160,29 @@ RoxieKeyBuild.MAC_SK_Move_v2(constants.KeyName_prolicv2 + '@version@::prolicense
 	AutoKeyB2.MAC_AcceptSK_to_QA(constants.ak_keyname, mymove,, constants.skip_set)
 
 	retval := 	sequential(bld_auto_keys,mymove);
-		
-	RETURN 		sequential(build_bdid,
+
+//DF-22706: FCRA Consusmer Data Field Depreciation-- Blanking FCRA fields
+cnt_proflic_did_fcra := OUTPUT(strata.macf_pops(prte2_prof_licensev2.keys.key_proflic_did(true),,,,,,FALSE,
+																				['ace_fips_st','action_case_number','action_cds','action_complaint_violation_cds','action_complaint_violation_desc','action_complaint_violation_dt',
+																				'action_desc','action_effective_dt','action_final_order_no','action_original_filename_or_url','action_posting_status_dt','action_record_type',
+																				'action_status','additional_licensing_specifics','additional_name_addr_type','additional_orig_additional_1','additional_orig_additional_2',
+																				'additional_orig_additional_3','additional_orig_additional_4','additional_orig_city','additional_orig_name,additional_orig_st','additional_orig_zip',
+																				'additional_phone','business_flag,company_name','country_str,county_str','education_1_curriculum','education_2_curriculum,education_2_dates_attended',
+																				'education_2_degree','education_2_school_attended','education_3_curriculum','education_3_dates_attended','education_3_degree','education_3_school_attended',
+																				'education_continuing_education','former_name_order','license_obtained_by','misc_email,misc_fax','misc_occupation,misc_other_id','misc_other_id_type',
+																				'misc_practice_hours','misc_practice_type','misc_web_site','orig_former_name','personal_pob_cd','personal_pob_desc','personal_race_cd','personal_race_desc',
+																				'previous_license_number','previous_license_type','record_type','sex','status_other_agency','status_renewal_desc','status_status_cds','title']),
+																				named('cnt_proflic_did_fcra')); 
+	
+
+//---------- making DOPS optional and only in PROD build -------------------------------
+	is_running_in_prod 	:= PRTE2_Common.Constants.is_running_in_prod;
+	NoUpdate 						:= OUTPUT('Skipping DOPS update because we are not in PROD'); 
+  updatedops          := PRTE.UpdateVersion('ProfLicKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','N','N');
+  updatedops_fcra     := PRTE.UpdateVersion('FCRA_ProfLicKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','F','N');
+	PerformUpdateOrNot	:= IF(is_running_in_prod,parallel(updatedops,updatedops_fcra),NoUpdate);
+
+	RETURN 	sequential(build_bdid,
 		                   move_bdid,
 											 move_bdid_qa,
 		                   build_did,
@@ -193,6 +213,9 @@ RoxieKeyBuild.MAC_SK_Move_v2(constants.KeyName_prolicv2 + '@version@::prolicense
 											 move_fcra_lookup,
 											 move_fcra_lookup_qa,
 											 bld_auto_keys,
-											 mymove);
+											 mymove,
+											 cnt_proflic_did_fcra, 
+											 PerformUpdateOrNot
+											 );
 	 
 END;

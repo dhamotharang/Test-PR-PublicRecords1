@@ -1,4 +1,4 @@
-IMPORT ut,RoxieKeyBuild,AutoKeyB2,PRTE,_control, PRTE2_PAW, paw;
+﻿IMPORT ut,RoxieKeyBuild,AutoKeyB2,PRTE,_control, PRTE2_PAW, paw, strata,PRTE2_Common;
 
 EXPORT proc_build_keys(string filedate) := FUNCTION
 
@@ -101,12 +101,22 @@ EXPORT proc_build_keys(string filedate) := FUNCTION
 	AutoKeyB2.MAC_AcceptSK_to_QA(constants.ak_keyname, mymove,, constants.skip_set) 
 
 	retval := 	sequential(outaction,mymove); 
+	
+	
+	cnt_paw_did_fcra := OUTPUT(strata.macf_pops(PRTE2_paw.keys.key_did_fcra,,,,,,FALSE,
+														['company_department','company_fein','dead_flag','dppa_state','title']),
+														 named('cnt_paw_did_fcra'));
+
+
+//---------- making DOPS optional and only in PROD build -------------------------------
+	is_running_in_prod 	:= PRTE2_Common.Constants.is_running_in_prod;
+	NoUpdate 						:= OUTPUT('Skipping DOPS update because we are not in PROD'); 
+	updatedops   		 		:= PRTE.UpdateVersion('PAWV2Keys', filedate,_control.MyInfo.EmailAddressNormal,'B','N','N'); 
+	updatedops_fcra  		:= PRTE.UpdateVersion('FCRA_PAWV2Keys',filedate,_control.MyInfo.EmailAddressNormal,'B','F','N');
+	PerformUpdateOrNot	:= IF(is_running_in_prod,parallel(updatedops,updatedops_fcra),NoUpdate);
 
 	// -- EMAIL ROXIE KEY COMPLETION NOTIFICATION  
 
-	//updatedops   		 := PRTE.UpdateVersion('PAWV2Keys', filedate,_control.MyInfo.EmailAddressNormal,'B','N','N'); 
-
-	//updatedops_fcra  := PRTE.UpdateVersion('FCRA_PAWV2Keys',filedate,_control.MyInfo.EmailAddressNormal,'B','F','N');
 
 	RETURN 		sequential(			build_key_paw_bdid, 
 			build_key_paw_companyname_domain, 
@@ -125,8 +135,9 @@ EXPORT proc_build_keys(string filedate) := FUNCTION
 			move_qa_key_paw_contactid, 
 			move_qa_key_paw_did, 
 			move_qa_key_paw_linkids, 
-			move_qa_key_paw_did_fcra, retval 
-		// ,parallel(updatedops,updatedops_fcra) 
+			move_qa_key_paw_did_fcra, retval,
+			cnt_paw_did_fcra,
+			PerformUpdateOrNot
 		);
 
 END;

@@ -342,7 +342,13 @@ shared Crim_recid_map	:= Join(Pii_Base_norm, P, left.record_id = right.record_id
 //Assign fdn_file_info_ids
 
 shared Crim_base_map	:= Join(pii_input , Crim_recid_map, left.record_id=right.record_id,Transform(Layouts.Crim
-																	,self.fdn_file_info_id	:= left.fdn_file_info_id,self:=right));
+																	,self.fdn_file_info_id	:= left.fdn_file_info_id
+																	,self.fname_orig	:= left.fname
+																	,self.mname_orig	:= left.mname
+																	,self.lname_orig	:= left.lname
+																	,self.ssn_orig		:= left.ssn
+																	,self.dob_orig		:= left.dob
+																	,self:=right));
 
 shared Crim_anon	:= Anonymize.Crim(Crim_base_map).all;
 

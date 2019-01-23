@@ -1,6 +1,26 @@
 ﻿IMPORT dops,std;
 EXPORT proc_deploy_ikb(string emailList, string rpt_qa_email_list) := FUNCTION
 
+// Get versions for packages from DOPS waiting to be deployed
+ver_lab_TBD := Dops.GetBuildVersion('PersonLabKeys'//'PersonLABKeys' // DOPS package name  20190111
+                    ,'B' // B - Boca, A - Alpharetta
+                    ,'N' // N - Nonfcra, F - FCRA, S - Customer Supp, T - Customer Test, FS - FCRA Cust Support
+                    ,'T' // C - Cert, P - Prod, T - Thor
+                    ,dops.constants.dopsenvironment
+                    );
+ver_fcra_TBD := Dops.GetBuildVersion('FCRA_PersonHeaderKeys'//'PersonLABKeys' // DOPS package name  20190111
+                    ,'B' // B - Boca, A - Alpharetta
+                    ,'F' // N - Nonfcra, F - FCRA, S - Customer Supp, T - Customer Test, FS - FCRA Cust Support
+                    ,'T' // C - Cert, P - Prod, T - Thor
+                    ,dops.constants.dopsenvironment
+                    );
+ver_wkly_TBD := Dops.GetBuildVersion('PersonHeaderWeeklyKeys'//'PersonLABKeys' // DOPS package name  20190111
+                    ,'B' // B - Boca, A - Alpharetta
+                    ,'N' // N - Nonfcra, F - FCRA, S - Customer Supp, T - Customer Test, FS - FCRA Cust Support
+                    ,'T' // C - Cert, P - Prod, T - Thor
+                    ,dops.constants.dopsenvironment
+                    );
+                    
 // Get versions for packages from DOPS
 ver_lab_cert_ver := dops.GetBuildVersion('PersonLabKeys','B','N','C')[1..8];
 ver_lab_prod_ver := dops.GetBuildVersion('PersonLabKeys','B','N','P')[1..8];
@@ -20,9 +40,9 @@ dontskip_fcra:=~std.file.fileexists('~thor_data400::header::ikb::skip_dops_fcra'
 dontskip_wkly:=~std.file.fileexists('~thor_data400::header::ikb::skip_dops_weekly');
 
 // Check each package for skips or availability of CERT for deployment
-ikbShouldUpdate := ( dontskip_ikb  AND lastestIkbVersionOnThor  > ver_lab_cert_ver  AND ver_lab_cert_ver  = ver_lab_prod_ver );
-fcraShouldUpdate:= ( dontskip_fcra AND lastestFCRAversionOnThor > ver_fcra_cert_ver AND ver_fcra_cert_ver = ver_fcra_prod_ver);
-wklyShouldUpdate:= ( dontskip_wkly AND lastestWklyversionOnThor > ver_wkly_cert_ver AND ver_wkly_cert_ver = ver_wkly_prod_ver);
+ikbShouldUpdate := ( dontskip_ikb  AND lastestIkbVersionOnThor  > ver_lab_cert_ver  AND ver_lab_cert_ver  = ver_lab_prod_ver  AND lastestIkbVersionOnThor  <> ver_lab_TBD);
+fcraShouldUpdate:= ( dontskip_fcra AND lastestFCRAversionOnThor > ver_fcra_cert_ver AND ver_fcra_cert_ver = ver_fcra_prod_ver AND lastestFCRAversionOnThor <> ver_fcra_TBD);
+wklyShouldUpdate:= ( dontskip_wkly AND lastestWklyversionOnThor > ver_wkly_cert_ver AND ver_wkly_cert_ver = ver_wkly_prod_ver AND lastestWklyversionOnThor <> ver_wkly_TBD);
 
 // Generates a report prior to deployment
 rpt := output(dataset([
