@@ -402,6 +402,11 @@ rPersonCrim := RECORD
   string errorcode;
   unsigned8 record_id;
   unsigned6 fdn_file_info_id;
+  string20 fname_orig;
+  string20 mname_orig;
+  string20 lname_orig;
+  string10 ssn_orig;
+  string10 dob_orig;
  END;
  
 
