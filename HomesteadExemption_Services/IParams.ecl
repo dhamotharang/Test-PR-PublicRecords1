@@ -1,9 +1,9 @@
-import BatchShare;
+import Address, BatchDatasets, BatchShare;
 
 export IParams := module
 	
-	export BatchParams := interface (BatchShare.IParam.BatchParams)
-//		export string5 industry_class      := '';
+	export BatchParams := interface (BatchDatasets.IParams.BatchParams)
+		export string5 industry_class      := '';
 		export unsigned3 DIDScoreThreshold := 0;
 		export string4 taxyear             := '';
 		export boolean ViewDebugs          := false;
@@ -23,7 +23,7 @@ export IParams := module
 			// redefine default values for common parameters and/or define default values for domain-
 			// specific parameters
 			in_mod := module(project(base_params, BatchParams, opt))				
-//				export string5 industry_class      := '' : STORED('IndustryClass');
+				export string5 industry_class      := '' : STORED('IndustryClass');
 				export unsigned3 DIDScoreThreshold := Constants.Defaults.DIDScoreThreshold : STORED('DIDScoreThreshold');
 				export string4 taxyear             := '' : STORED('TaxYear');
 				export boolean ViewDebugs          := FALSE : STORED('ViewDebugs');

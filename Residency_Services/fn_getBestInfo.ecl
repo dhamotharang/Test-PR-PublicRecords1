@@ -1,10 +1,10 @@
-IMPORT Address_Rank, AutoStandardI, Didville, Residency_Services, ut;
+IMPORT Address, Address_Rank, AutoStandardI, Didville, Residency_Services, ut;
 			 
 EXPORT fn_getBestInfo(DATASET(Residency_Services.Layouts.Batch_in) ds_batch_in,
                       Residency_Services.IParam.BatchParams        mod_params_in
                      ) := FUNCTION
 
-	rec_layout_intermed_ext := Residency_Services.Layouts.IntermediateData_ext;
+	SHARED rec_layout_intermed_ext := Residency_Services.Layouts.IntermediateData_ext;
 
   // Use input data to get the did (& score) and the "Best" address & ssn, etc.
 	DidVille.Layout_Did_OutBatch tf_input(ds_batch_In l) := TRANSFORM
@@ -35,7 +35,7 @@ EXPORT fn_getBestInfo(DATASET(Residency_Services.Layouts.Batch_in) ds_batch_in,
 																									    glb_purpose_value  := mod_params_in.GLBPurpose,
 																									    appType            := mod_params_in.ApplicationType,
 																									    dppa_purpose_value := mod_params_in.DPPAPurpose,
-																									    IndustryClass_val  := mod_params_in.industryclass,
+																									    IndustryClass_val  := mod_params_in.industry_class,
 																									    DRM_val            := mod_params_in.DataRestrictionMask
 																										 );
 

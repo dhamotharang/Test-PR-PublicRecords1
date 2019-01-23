@@ -31,7 +31,7 @@ EXPORT MAC_Get_Scored_DIDs(ds_in_batch,in_mod,usePhone=false,phone_Field='phonen
 	                                                          ,glb_flag:=glb
 	                                                          ,glb_purpose_value:=in_mod.GLBPurpose
 																														,appType:=in_mod.ApplicationType
-																														,IndustryClass_val := in_mod.industryclass);
+																														,IndustryClass_val := in_mod.industry_class);
 	 //we only keep the did's that were found via PII if the did score > 80
 	recsWithScoredDIDs_filtered := recsWithScoredDIDs(score >= in_mod.DIDScoreThreshold);
 

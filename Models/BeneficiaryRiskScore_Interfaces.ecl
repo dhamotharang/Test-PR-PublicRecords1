@@ -1,9 +1,9 @@
 ﻿
-IMPORT BatchShare;
+IMPORT Address, BatchDatasets, BatchShare;
 
 EXPORT BeneficiaryRiskScore_Interfaces := MODULE
 	
-	EXPORT IRestrictionParams := INTERFACE (BatchShare.IParam.BatchParams)
+	EXPORT IRestrictionParams := INTERFACE (BatchDatasets.IParams.BatchParams)
 		EXPORT BOOLEAN dppa_ok        := false;
 		EXPORT BOOLEAN ViewDebugs     := false;
 	END;	
@@ -35,7 +35,7 @@ EXPORT BeneficiaryRiskScore_Interfaces := MODULE
 	EXPORT modInstantIDConfigDefault(IRestrictionParams	restrictions, unsigned1 ofac_version_ = 1, boolean include_ofac_ = false, real global_watchlist_threshold_ = 0.84) := MODULE(IInstantIDConfig)
 		EXPORT BOOLEAN isFCRA              := FALSE;
 		EXPORT BOOLEAN ln_branded          := FALSE;
-		EXPORT BOOLEAN isUtility           := restrictions.industryclass = 'UTILI';
+		EXPORT BOOLEAN isUtility           := StringLib.StringToUpperCase(restrictions.industry_class) = 'UTILI';
 		EXPORT BOOLEAN ofac_only           := TRUE;
 		EXPORT BOOLEAN suppressNearDups    := FALSE;
 		EXPORT BOOLEAN require2ele         := FALSE;
