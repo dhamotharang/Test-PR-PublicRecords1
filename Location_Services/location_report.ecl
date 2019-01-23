@@ -162,8 +162,14 @@ neighbors := doxie.nbr_records(
 	Neighbors_PerAddress,
 	Neighbors_Per_NA,
 	Neighbor_Recency,
-	,,,false,
-	mod_access
+	mod_access.industry_class,
+	mod_access.glb,
+	mod_access.dppa,
+	mod_access.probation_override,
+	mod_access.no_scrub,
+	glb_ok,
+	dppa_ok,
+	mod_access.ssn_mask,,,,false
 );
 
 Layout_report.Location_info getLocInfo(withPropD L, Doxie_Raw.Layout_address_input R) := TRANSFORM

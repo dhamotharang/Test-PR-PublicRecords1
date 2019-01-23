@@ -1,5 +1,5 @@
 import header, doxie, ut, AutoHeaderI, AutoStandardI, AutoheaderV2;
-doxie.MAC_Header_Field_Declare() //PII
+doxie.MAC_Header_Field_Declare()
 doxie.MAC_Selection_Declare()
 
 mod_access := doxie.compliance.GetGlobalDataAccessModule ();
@@ -84,9 +84,15 @@ nbrs := doxie.nbr_records(
 	Neighbors_PerAddress,
 	Neighbors_Per_NA,
 	Neighbor_Recency,
-	,,,
-	false,  // this service does not need to apply RNA glb restrictions because the neighbors are the subject
-  mod_access
+	industry_class_value,
+	GLB_Purpose,
+	DPPA_Purpose,
+	probation_override_value,
+	no_scrub,
+	glb_ok,
+	dppa_ok,
+	ssn_mask_value,,,,
+	false  // this service does not need to apply RNA glb restrictions because the neighbors are the subject
 );
 
 // expand to include fields required (but ignored) below

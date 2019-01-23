@@ -1,4 +1,4 @@
-IMPORT doxie, iesp, AutoStandardI,address,AddressReport_Services;
+IMPORT doxie, iesp, AutoStandardI,address,AddressReport_Services,ut;
 
 out_rec := iesp.rnareport.t_RNAReport;
 
@@ -6,8 +6,6 @@ EXPORT out_rec RNAReport (
   dataset (doxie.layout_references) dids,
   PersonReports.input._rnareport param,
   boolean IsFCRA = false) := FUNCTION
-
-  mod_access := $.functions.GetDataAccessModulePersonReports (param);
 
   // DID should be atmost one (do we keep layout_references for legacyt reasons?)
   did := dids[1].did;
@@ -45,8 +43,8 @@ EXPORT out_rec RNAReport (
 		end;
 
 		nbr_input:=dataset([into_srch()]);
-		boolean glb_ok_val  := mod_access.isValidGLB();
-		boolean dppa_ok_val := mod_access.isValidDPPA();
+		boolean glb_ok_val  := AutoStandardI.InterfaceTranslator.glb_ok.val(project(param,AutoStandardI.InterfaceTranslator.glb_ok.params));
+		boolean dppa_ok_val := AutoStandardI.InterfaceTranslator.dppa_ok.val(project(param,AutoStandardI.InterfaceTranslator.dppa_ok.params)); 
 		
 		Neighbors_recs_all:=doxie.nbr_records(
 										nbr_input,
@@ -55,13 +53,19 @@ EXPORT out_rec RNAReport (
 										iesp.constants.BR.RNANbrProximityRadius,
 										iesp.constants.BR.RNANbrProximityRadius,
 										iesp.constants.BR.RNANbrProximityRadius,
+										'',
+										param.GLBPurpose,
+										param.DPPAPurpose,
+										false,
+										true,
+										glb_ok_val,
+										dppa_ok_val,
+										param.ssn_mask,
 										true,
 										true,
-										iesp.constants.BR.RNANbrProximityRadius,
-                    ,
-                    mod_access);
+										iesp.constants.BR.RNANbrProximityRadius);
 	
-	p_neighbors := doxie.compliance.MAC_FilterOutMinors (Neighbors_recs_all, , dob, mod_access.show_minors);
+	ut.PermissionTools.GLB.mac_FilterOutMinors(Neighbors_recs_all,p_neighbors,,,dob)
 	nbr_mod := 	module(project(AutoStandardI.GlobalModule(), AddressReport_Services.input._addressreport, opt))
 								export glb_ok := glb_ok_val;
 								export dppa_ok := dppa_ok_val;

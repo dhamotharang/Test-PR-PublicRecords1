@@ -76,7 +76,14 @@ end;
 							                    10,
 							                    Neighbors_Per_NA,
 							                    Neighbor_Recency,
-							                    false, false,,false, modAccess);  
+							                    modAccess.industry_class,
+																	modAccess.glb,
+							                    modAccess.dppa,
+							                    modAccess.probation_override,
+							                    modAccess.no_scrub,
+							                    glb_ok,
+							                    dppa_ok,
+							                    modAccess.ssn_mask, false, false,,false);  
 																	// treat as subject because the header rows are only being used to look up phone rows and it will not be returned otherwise
 																	
 #uniquename(nbr_with_rank_rec)																	
