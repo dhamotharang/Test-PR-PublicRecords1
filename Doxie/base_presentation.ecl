@@ -1,4 +1,4 @@
-﻿import suppress, mdr, doxie_raw, DriversV2_Services, ut, CriminalRecords_Services;
+import suppress, mdr, doxie_raw, DriversV2_Services, ut, CriminalRecords_Services;
 
 export base_presentation(DATASET(doxie.layout_presentation) pre_outf, 
 												 string phoneToMatch = '',
@@ -176,7 +176,6 @@ TRANSFORM
 	SELF.dead_age := ut.age (le.dob,SELF.dod);
 	SELF.death_code := IF(SELF.dod<>0,ri.VorP_code,'');
 	SELF.deceased := if ((integer)ri.did > 0 , 'Y','N');
-	SELF.IsLimitedAccessDMF := ri.IsLimitedAccessDMF;
 	SELF := le;
 END;
 death_checked := JOIN(ta4, dd, (INTEGER)LEFT.did=(INTEGER)RIGHT.did, check_death1(LEFT,RIGHT), LEFT OUTER);

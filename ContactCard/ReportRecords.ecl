@@ -76,7 +76,6 @@ SubjectIsMinor := (integer)si[1].age > 0 and (integer)si[1].age < 18;
 
 //****** SUBJECT AND DEATH INFO
 dr := contactcard.FinderRecords(dids).SubjectDeathRecords;
-
 // attach death indicators, using "best" death record; note, 'si' has no more than 1 row
 rec.subject_rec dodWork(si l) := transform
 	r := dr[1];
@@ -87,11 +86,13 @@ rec.subject_rec dodWork(si l) := transform
 	self.dod.day := (unsigned)r.dod8[7..8];
 	self.age_at_death := if(iDOB < 18000000 or iDOD < 18000000, 0, ut.Age(iDOB, iDOD));
 	self.deceased := if ((integer)r.did > 0 ,'Y','N');
-	self.IsLimitedAccessDMF := r.IsLimitedAccessDMF;
 	self := l;
 END;
 sdi := project (si, dodWork (Left));
+
+
 //****** PROJECT TO FINAL LAYOUT AND PICK UP THE OTHER SECTIONS
+
 // attach same death indicator to each of subject's AKAs 
 akas :=project(Addrs_Imposters_Rels_Assocs(dids, false).akas, rec.aka_rec);
 akas t_akas(akas l) := transform
@@ -100,7 +101,6 @@ akas t_akas(akas l) := transform
   self.age_at_death := r.age_at_death;
   self.death_verification_code := r.death_verification_code;
   self.deceased := r.deceased;
-	 self.IsLimitedAccessDMF := r.IsLimitedAccessDMF;
 	self:=l;
 end;
 l_akas := project(akas,t_akas(left));

@@ -1,4 +1,4 @@
-﻿export mac_best_records(
+export mac_best_records(
 												did_stream,
 												did_field,
 												outfile,
@@ -12,8 +12,7 @@
 												include_dod = false
 												) := macro
 
-
-IMPORT ut, dx_BestRecords, doxie_files, DeathV2_Services, AutoStandardI, MDR;
+IMPORT ut, dx_BestRecords, doxie_files, DeathV2_Services, AutoStandardI;
 #uniquename(deathparams)
 %deathparams% := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
 //If no minors_field value is set, use glb permission to determine if minors should be kept in record set.
@@ -44,10 +43,8 @@ IMPORT ut, dx_BestRecords, doxie_files, DeathV2_Services, AutoStandardI, MDR;
 %perm_flag% := dx_BestRecords.Functions.get_perm_type(glb_per, useNonBlankKey, %utility_flag%, %pre_glb_flag%, 
 	%filter_exp%, %filter_eq%, marketing, %cnsmr_flag%);
 
-
 #uniquename(outf)
 %outf% := dx_BestRecords.get(did_stream, did_field, %perm_flag%, bestlayout);
-
 	
 #uniquename(outfile_nominors)
 %outfile_nominors% := join(%outf%, doxie_files.key_minors_hash,
@@ -70,7 +67,6 @@ end;
 #uniquename(fillDOD)			
 %outfile_noDeath% %fillDOD%(%outfile_noDeath% l, doxie.key_death_masterV2_ssa_DID r) := transform
    self.dod := r.dod8;
-   self.IsLimitedAccessDMF := (r.src = MDR.sourceTools.src_Death_Restricted);
 	 self := L;
 end;
 #uniquename(outfile_Death)
@@ -81,4 +77,5 @@ end;
 															%fillDOD%(LEFT,RIGHT),left outer, KEEP(1), LIMIT (0));
 
 outfile := IF (include_dod, %outfile_death%, %outfile_noDeath%); 
+
 endmacro;

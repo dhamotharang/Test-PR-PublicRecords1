@@ -1,4 +1,4 @@
-﻿export layout_deathfile_records := record
+export layout_deathfile_records := record
 string12 did,
 unsigned1 did_score,
 string1                        rec_type;
@@ -19,7 +19,6 @@ string2                        crlf;
 string18 county_name,
 unsigned1 age_at_death,
 string9	ssn_unmasked := '';
-boolean IsLimitedAccessDMF := FALSE;
 unsigned2 fdn_did_ind   := 0; // Added for the FDN project.
 unsigned2 fdn_ssn_ind   := 0; // Added for the FDN project.
 end;
