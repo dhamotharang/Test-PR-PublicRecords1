@@ -1103,6 +1103,7 @@
 		export string KEYWORD_SECO_MALTB						:= '791';		
 		export string KEYWORD_UNTB_MAL							:= '792';		
 		export string KEYWORD_EUTB_MAL							:= '793';		
+		export string KEYWORD_EU_PCW								:= '794';		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
 	
