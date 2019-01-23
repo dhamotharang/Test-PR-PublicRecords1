@@ -77,29 +77,16 @@ dAppendDIDs_ := JOIN(dFormat2BatchCommonInput,
  	SHARED dSearchRecs_pre		:= UNGROUP(dPhoneSearchResults + dWaterfallResults);
   dSearchRecs_pre_a		 := dSearchRecs_pre(((did <> 0 AND fname <> ''AND lname <> '') OR typeflag = Phones.Constants.TypeFlag.DataSource_PV) OR listed_name <> '');
 	
-  dInputPhone := PROJECT(dInPhone, TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.Final, SELF.batch_in := LEFT, SELF := []));
-
-
-  PhoneFinder_Services.Layouts.PhoneFinder.Final withInputphone(PhoneFinder_Services.Layouts.PhoneFinder.Final L) := TRANSFORM
-   SELF.acctno               := L.batch_in.acctno;
-	 SELF.seq                  := L.batch_in.seq;
-   SELF.phone                := L.batch_in.homephone;
-	 SELF.batch_in.homephone   := L.batch_in.homephone;
-	 SELF.phonestatus          := PhoneFinder_Services.Constants.PhoneStatus.NotAvailable;
-   BOOLEAN UseInternal_pvs    := L.typeflag = 'P';
-   SELF.coc_description      := IF(UseInternal_pvs, L.coc_description, '');
-   SELF.carrier_name         := IF(UseInternal_pvs, L.carrier_name, '');
-   SELF.phone_region_city    := IF(UseInternal_pvs, L.phone_region_city, '');
-   SELF.phone_region_st      := IF(UseInternal_pvs, L.phone_region_st, '');
-   SELF.RealTimePhone_Ext    := IF(UseInternal_pvs, L.RealTimePhone_Ext);
-   SELF.typeflag             := IF(UseInternal_pvs, L.typeflag, '');
-	SELF                      := [];
+	 PhoneFinder_Services.Layouts.PhoneFinder.Final withInputphone(PhoneFinder_Services.Layouts.BatchInAppendDID L) := TRANSFORM
+  SELF.acctno               := L.acctno;
+	 SELF.seq                  := L.seq;
+	 SELF.phone                := L.homephone;
+	 SELF.batch_in.homephone   := L.homephone;
+		SELF                      := [];
   END;
- 
- 
- SHARED dSearchRecs := IF(IsPhoneRiskAssessment, 
-                          PROJECT(IF(EXISTS(dSearchRecs_pre), dSearchRecs_pre, dInputPhone), withInputphone(LEFT)),
-                          dSearchRecs_pre_a);
+
+ SHARED dSearchRecs := IF(IsPhoneRiskAssessment,
+                     PROJECT(dInPhone, withInputphone(LEFT)), dSearchRecs_pre_a);
 	
  SHARED dSubjectInfo := PhoneFinder_Services.Functions.GetSubjectInfo(dSearchRecs, inMod);
  
@@ -121,12 +108,10 @@ dAppendDIDs_ := JOIN(dFormat2BatchCommonInput,
 
 	SHARED dZum_final := if(inMod.UseZumigoIdentity, dZumigo_recs, dPorted_phones);
 
-
 	dSearchResultsUnfiltered := IF(inMod.IsGetMetaData
 																																	,PhoneFinder_Services.GetPhonesMetadata(dZum_final,inMod,dGateways,dinBestInfo,dSubjectInfo)
 																																	,dZum_final);
-
-                                                                
+                                                                  
     // restriction added here if plugin from batch is set to true ....
 		//  if not then don't do any restrictions.											
 
