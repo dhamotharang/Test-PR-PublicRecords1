@@ -456,7 +456,8 @@ module
       ,self.pct_sameProxIDs  := (unsigned)(left.pct_sameProxIDs  * 100)
       ,self.pct_samePOWIDs   := (unsigned)(left.pct_samePOWIDs   * 100)
       ,self.pct_sameEmpIDs   := (unsigned)(left.pct_sameEmpIDs   * 100)
-      ,self := left));
+      ,self := left))
+       : independent;
     
     lay_id_counts := record
       string    BIP_ID                        ;
@@ -480,7 +481,8 @@ module
       unsigned6 count_1000000_plus        ;
     end;   
     
-    ds_idcounts := project(pIDCountBuckets  ,transform(lay_id_counts,self.average_count := (unsigned)(left.average_count * 100.0),self.countGroup := left.total_count,self.BIP_ID := left.id,self := left));
+    ds_idcounts := project(pIDCountBuckets  ,transform(lay_id_counts,self.average_count := (unsigned)(left.average_count * 100.0),self.countGroup := left.total_count,self.BIP_ID := left.id,self := left))
+     : independent;
     
     // ----- prox seg v2 stats
     joinProxV2 := sort(join(pProxStatsV2  ,pProxStatsV2P  ,left.segtype = right.segtype and left.segsubtype = right.segsubtype  ,transform({string segtype,string segsubtype,unsigned countGroup,unsigned Regular,unsigned Probation}
@@ -489,7 +491,8 @@ module
       ,self.Probation     := right.total
       ,self.segtype       := trim(left.segtype    ,all)
       ,self.segsubtype    := trim(left.segsubtype ,all)
-    ),full outer),segtype,segsubtype);
+    ),full outer),segtype,segsubtype)
+     : independent;
           
     // ----- Sele seg v2 stats
     joinSeleV2 := sort(join(pSeleStatsV2  ,pSeleStatsV2P  ,left.segtype = right.segtype and left.segsubtype = right.segsubtype  ,transform({string segtype,string segsubtype,unsigned countGroup,unsigned Regular,unsigned Probation}
@@ -498,7 +501,8 @@ module
       ,self.Probation     := right.total
       ,self.segtype       := trim(left.segtype    ,all)
       ,self.segsubtype    := trim(left.segsubtype ,all)
-    ),full outer),segtype,segsubtype);
+    ),full outer),segtype,segsubtype)
+     : independent;
     
     
     // -- BIP 2.2 stats, status per ID of businesses with residential addresses
@@ -510,7 +514,7 @@ module
       table(bip_22_status_per_id     ,{status,BIP_ID,string address_type := 'All'         ,countgroup,cnt})
     + table(bip_22_status_per_id_res ,{status,BIP_ID,string address_type := 'Residential' ,countgroup,cnt})
     + table(bip_22_status_per_id_biz ,{status,BIP_ID,string address_type := 'Business'    ,countgroup,cnt})
-    ,status,bip_id,address_type);
+    ,status,bip_id,address_type) : independent;
     return parallel(
     
        Strata.macf_CreateXMLStats(ds_IDChange   ,'BIPV2','Segmentation' ,pversion ,BIPV2_Build.mod_email.emailList  ,'Change'           ,'ID'             ,pIsTesting,pOverwrite) //group on idtype

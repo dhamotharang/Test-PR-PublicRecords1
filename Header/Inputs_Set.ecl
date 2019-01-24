@@ -166,6 +166,10 @@ targus := if(fileservices.getsuperfilesubcount('~thor_data400::base::consumer_ta
 output('Nothing added to Base::consumer_targusHeader_Building'),
 fileservices.addsuperfile('~thor_data400::base::consumer_targusHeader_Building','~thor_data400::base::consumer_targus',,true));
 
+cd_seed := if(fileservices.getsuperfilesubcount('~thor_data::base::cd_seed_building')>0,
+output('Nothing added to Base::cd_seed_Building'),
+fileservices.addsuperfile('~thor_data::base::cd_seed_building','~thor_data::base::CD_Seed::built',,true));
+
 add_super := sequential(
                             parallel(
                                              dLv2_file
@@ -208,6 +212,7 @@ add_super := sequential(
                                             ,targus
                                             )
                     ,liensv2_file
+                    ,cd_seed
                     );
 
 return add_super;

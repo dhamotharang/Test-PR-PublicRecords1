@@ -73,6 +73,7 @@
 '7O', // TEXAS_LAMAR_COUNTY_JUSTICE_OF_THE_PEACE_COURTS                                                      
 '7R', // FLORIDA_PASCO_COUNTY                                                                                
 '7S', // FLORIDA_PASCO_COUNTY_TRAFFIC                                                                        
+'7U', // DISTRICT_OF_COLUMBIA_SUPERIOR_COURT                                                                 
 '7W', // FLORIDA_FLAGLER_COUNTY_CIRCUIT_COURT                                                                
 '7X', // FLORIDA_MANATEE_CIRCUIT_AND_COUNTY_COURTS                                                           
 '7Z', // ILLINOIS_PEORIA_COUNTY                                                                              
@@ -88,6 +89,7 @@
 '9G', // OHIO_LAWRENCE_COUNTY_COMMON_PLEAS_COURT                                                             
 '9O', // OHIO_FRANKLIN_COUNTY_COMMON_PLEAS                                                                   
 '9P', // OHIO_SCIOTO_COUNTY_PORTSMOUTH_MUNICIPAL_COURT                                                       
+'9S', // OHIO_STARK_COUNTY_CANTON_MUNICIPAL_COURT                                                            
 '9T', // OHIO_OTTAWA_COUNTY_COMMON_PLEAS_COURT                                                               
 '9U', // OHIO_UNION_COUNTY_COMMON_PLEAS_COURT                                                                
 '9V', // OHIO_WYANDOT_COUNTY_COMMON_PLEAS_COURT                                                              
@@ -177,6 +179,7 @@
 'GR', // FLORIDA_VOLUSIA_COUNTY_ARRESTS                                                                      
 'GT', // GEORGIA_CHATHAM_COUNTY_ARRESTS                                                                      
 'GU', // GEORGIA_CLARKE_COUNTY_ARRESTS                                                                       
+'GV', // GEORGIA_DAWSON_COUNTY_ARRESTS                                                                       
 'GW', // GEORGIA_FULTON_COUNTY_ARRESTS                                                                       
 'GX', // GEORGIA_GWINNETT_COUNTY_ARRESTS                                                                     
 'GY', // IOWA_BUENA_VISTA_COUNTY_ARRESTS                                                                     
@@ -345,7 +348,6 @@
 'RK', // OHIO_PICKAWAY_COUNTY_COMMON_PLEAS_COURT                                                             
 'RL', // OHIO_RICHLAND_COUNTY                                                                                
 'RM', // OHIO_RICHLAND_COUNTY_MANSFIELD_MUNICIPAL_COURT                                                      
-'RN', // OHIO_WAYNE_COUNTY                                                                                   
 'RP', // TENNESSEE_HAMILTON_COUNTY                                                                           
 'RQ', // TENNESSEE_RUTHERFORD_COUNTY                                                                         
 'RR', // SOUTH_CAROLINA_GREENVILLE_COUNTY                                                                    
@@ -463,7 +465,6 @@
 'W0024', // CALIFORNIA_TUOLUMNE_COUNTY_CW                                                                       
 'W0025', // CALIFORNIA_YOLO_COUNTY_CW                                                                           
 'W0027', // NORTH_CAROLINA_MECKLENBURG_COUNTY_CW                                                                
-'W0037', // OHIO_WOOD_COUNTY_PERRYSBURG_MUNICIPAL_COURT_CW                                                      
 'W0039', // TEXAS_KAUFMAN_COUNTY_DISTRICT_COURT_CW                                                              
 'W0041', // FLORIDA_HIGHLANDS_COUNTY_TRAFFIC_CW                                                                 
 'W0042', // CALIFORNIA_YUBA_COUNTY_BOOKINGS_CW                                                                  
@@ -539,6 +540,7 @@
 'W0171', // CALIFORNIA_SAN_BERNARDINO_POLICE_DEPARTMENT_CW                                                      
 'W0172', // COLORADO_WELD_COUNTY_SHERIFF_CW                                                                     
 'W0175', // FLORIDA_HILLSBOROUGH_COUNTY_SHERIFFS_OFFICE_CW                                                      
+'W0176', // FLORIDA_INDIAN_RIVER_COUNTY_SHERIFFS_OFFICE_CW                                                      
 'W0179', // FLORIDA_PALM_BEACH_COUNTY_SHERIFFS_OFFICE_CW                                                        
 'W0184', // MASSACHUSETTS_WALTHAM_ARRESTS_CW                                                                    
 'W0185', // MICHIGAN_KENT_COUNTY_SHERIFFS_DEPARTMENT_CW                                                         

@@ -462,8 +462,12 @@ module
 				or  (pInput.phone in [3126169600,2122511234,3126162628] and trim(pInput.lname) = 'JOHNSON' and trim(pInput.fname) = 'JEFF' and trim(pInput.prim_range) = '225' and regexfind('CRAMER-KRASSELT', pInput.company_name, nocase))
 				// -- JIRA - DF-22787 - Consumer Dispute - PAW record to be removed
 				or  (pInput.phone = 3013803000 and trim(pInput.lname) = 'SMITH' and trim(pInput.fname) = 'BRIAN' and trim(pInput.mname) in ['','W'])
-				// -- JIRA - DF-22950 - Paw data from zoom incorrectly conntected to consumer				
+				// -- JIRA - DF-22950 - Paw data from zoom incorrectly conntected to consumer
 				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and pInput.phone = 5864658018 and trim(pInput.lname) = 'ADAMASZEK' and trim(pInput.fname) = 'EARL' and trim(pInput.mname) = 'PHILIP')
+				// -- JIRA - DF-22015 - Consumer Advocacy - Overlinked PAW LexID 2209391182 Rowland
+				or  (trim(pInput.company_source_group) in ['20051035184CAPITAL RESOURCE OF THE','CP2489375217655639462','CP404623158'] and trim(pInput.lname) = 'ROWLAND' and trim(pInput.fname) = 'JAMES')
+				// -- JIRA - DF-22416 - Consumer Dispute - PAW record to be removed
+				or  ((trim(pInput.company_source_group) = '070131000296CLIPS TAX SOLUTION INC' or trim(pInput.vendor_id) in ['36-3470129','829879378']) and regexfind('CLIPS TAX SOLUTION',pInput.company_name, nocase))
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -689,17 +693,7 @@ module
 			///////////////////////////////////////////////////////////////////
 			Layout_Business_Header_Base tblankoutphone(Layout_Business_Header_Base l) :=
 			transform
-				// JIRA - DF-20838 Incorrect Date Last Seen in FL FBN Record in old Business Header BDID 48554866
-				// One time THOR PATCH Code, had to Remove this code after the next build run.
-				str_dt_first_seen 				:= if(mdr.sourceTools.sourceIsFL_Non_Profit(l.source),(string8)l.dt_first_seen,'');
-				str_dt_last_seen 					:= if(mdr.sourceTools.sourceIsFL_Non_Profit(l.source),(string8)l.dt_last_seen,'');
-				str_dt_first_reported 		:= if(mdr.sourceTools.sourceIsFL_Non_Profit(l.source),(string8)l.dt_vendor_first_reported,'');
-				str_dt_last_reported 			:= if(mdr.sourceTools.sourceIsFL_Non_Profit(l.source),(string8)l.dt_vendor_last_reported,'');
-				temp_dt_first_seen				:= if(mdr.sourceTools.sourceIsFL_Non_Profit(l.source), str_dt_first_seen[1..4] + str_dt_first_seen[7..8] + str_dt_first_seen[5..6],'');
-				temp_dt_last_seen					:= if(mdr.sourceTools.sourceIsFL_Non_Profit(l.source), str_dt_last_seen[1..4] + str_dt_last_seen[7..8] + str_dt_last_seen[5..6],'');
-				temp_dt_first_reported		:= if(mdr.sourceTools.sourceIsFL_Non_Profit(l.source), str_dt_first_reported[1..4] + str_dt_first_reported[7..8] + str_dt_first_reported[5..6],'');
-				temp_dt_last_reported			:= if(mdr.sourceTools.sourceIsFL_Non_Profit(l.source), str_dt_last_reported[1..4] + str_dt_last_reported[7..8] + str_dt_last_reported[5..6],'');
-							
+								
 				filterbug24219 :=		(l.bdid				= 942461905
 												or	l.company_name	= 'WASTE MANAGEMENT') 
 												and l.prim_range	= '6521' 
@@ -770,12 +764,10 @@ module
 				self.vendor_id		:= if(blankbug48348,'',trimids(l.vendor_id));
 				self.source_group	:= if(blankbug48348,'',trimids(l.source_group));
 				//for bug 30494 & 30519.  20080424
-				// JIRA - DF-20838 Incorrect Date Last Seen in FL FBN Record in old Business Header BDID 48554866
-				// One time THOR PATCH Code, had to Remove this code after the next build run.
-				self.dt_first_seen						:= if(mdr.sourceTools.sourceIsFL_Non_Profit(l.source),(unsigned4)temp_dt_first_seen,(unsigned4)validatedate((string8)l.dt_first_seen								,if(length(trim((string8)l.dt_first_seen						)) = 8,0,1)));
-				self.dt_last_seen							:= if(mdr.sourceTools.sourceIsFL_Non_Profit(l.source),(unsigned4)temp_dt_last_seen,(unsigned4)validatedate((string8)l.dt_last_seen									,if(length(trim((string8)l.dt_last_seen							)) = 8,0,1)));
-				self.dt_vendor_first_reported	:= if(mdr.sourceTools.sourceIsFL_Non_Profit(l.source),(unsigned4)temp_dt_first_reported,(unsigned4)validatedate((string8)l.dt_vendor_first_reported	,if(length(trim((string8)l.dt_vendor_first_reported	)) = 8,0,1)));
-				self.dt_vendor_last_reported	:= if(mdr.sourceTools.sourceIsFL_Non_Profit(l.source),(unsigned4)temp_dt_last_reported,(unsigned4)validatedate((string8)l.dt_vendor_last_reported		,if(length(trim((string8)l.dt_vendor_last_reported	)) = 8,0,1)));
+				self.dt_first_seen						:= (unsigned4)validatedate((string8)l.dt_first_seen						,if(length(trim((string8)l.dt_first_seen						)) = 8,0,1));
+				self.dt_last_seen							:= (unsigned4)validatedate((string8)l.dt_last_seen						,if(length(trim((string8)l.dt_last_seen							)) = 8,0,1));
+				self.dt_vendor_first_reported	:= (unsigned4)validatedate((string8)l.dt_vendor_first_reported,if(length(trim((string8)l.dt_vendor_first_reported	)) = 8,0,1));
+				self.dt_vendor_last_reported	:= (unsigned4)validatedate((string8)l.dt_vendor_last_reported	,if(length(trim((string8)l.dt_vendor_last_reported	)) = 8,0,1));
 				self							:= l																							;                              
 			end;
 			
@@ -1057,6 +1049,12 @@ module
 				or  (pInput.phone = 3013803000 and trim(pInput.lname) = 'SMITH' and trim(pInput.fname) = 'BRIAN' and trim(pInput.mname) in ['','W'])
 				// -- JIRA - DF-22950 - Paw data from zoom incorrectly conntected to consumer				
 				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and pInput.phone = 5864658018 and trim(pInput.lname) = 'ADAMASZEK' and trim(pInput.fname) = 'EARL' and trim(pInput.mname) = 'PHILIP')
+				// -- JIRA - DF-22015 - Consumer Advocacy - Overlinked PAW LexID 2209391182 Rowland
+				or  (trim(pInput.company_source_group) in ['20051035184CAPITAL RESOURCE OF THE','CP2489375217655639462','CP404623158'] and trim(pInput.lname) = 'ROWLAND' and trim(pInput.fname) = 'JAMES')
+				// -- JIRA - DF-23549 - FCRA Overlinking of PAW Record to LexID 591453905 - Day
+				or  (mdr.sourceTools.sourceIsAK_Corporations(pInput.source) and regexfind('DAY AND GULLIFORD PROPERTIES|J.E.B. CINCINNATI',pInput.company_name,nocase) and trim(pInput.lname)='DAY' and trim(pInput.prim_name)='7TH')
+				// -- JIRA - DF-22416 - Consumer Dispute - PAW record to be removed
+				or  ((trim(pInput.company_source_group) = '070131000296CLIPS TAX SOLUTION INC' or trim(pInput.vendor_id) in ['36-3470129','829879378']) and regexfind('CLIPS TAX SOLUTION',pInput.company_name, nocase))
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -1070,13 +1068,7 @@ module
 			///////////////////////////////////////////////////////////////////
 			Layout_Business_Contact_Full_new tblankoutphone(Layout_Business_Contact_Full_new l) :=
 			transform
-				// JIRA - DF-20838 Incorrect Date Last Seen in FL FBN Record in old Business Header BDID 48554866
-				// One time THOR PATCH Code, had to Remove this code after the next build run.
-				str_dt_first_seen 		:= if(mdr.sourceTools.sourceIsFL_Non_Profit(l.source),(string8)l.dt_first_seen,'');
-				str_dt_last_seen 			:= if(mdr.sourceTools.sourceIsFL_Non_Profit(l.source),(string8)l.dt_last_seen,'');
-				temp_dt_first_seen		:= if(mdr.sourceTools.sourceIsFL_Non_Profit(l.source), str_dt_first_seen[1..4] + str_dt_first_seen[7..8] + str_dt_first_seen[5..6],'');
-				temp_dt_last_seen			:= if(mdr.sourceTools.sourceIsFL_Non_Profit(l.source), str_dt_last_seen[1..4] + str_dt_last_seen[7..8] + str_dt_last_seen[5..6],'');
-				
+						
 				filterbug71237 :=			regexfind('DEL TACO',l.company_name,nocase)
 													and (			l.phone					= 5619994400
 																or	l.company_phone = 5619994400
@@ -1191,12 +1183,8 @@ module
 				self.ssn									:= if(filterbug30402 or filterbugLNK563 or filterbugLNK1267 or filterbugDF22318 or 
 																				filterbugDF23078 or filterbugLNK1501, 0, l.ssn);
 				//for bug 30494 & 30519.  20080424
-				// JIRA - DF-20838 Incorrect Date Last Seen in FL FBN Record in old Business Header BDID 48554866
-				// One time THOR PATCH Code, had to Remove this code after the next build run.
-				self.dt_first_seen				:= if(mdr.sourceTools.sourceIsFL_Non_Profit(l.source),(unsigned4)temp_dt_first_seen,(unsigned4)validatedate((string8)l.dt_first_seen								,if(length(trim((string8)l.dt_first_seen						)) = 8,0,1)));
-				self.dt_last_seen					:= if(mdr.sourceTools.sourceIsFL_Non_Profit(l.source),(unsigned4)temp_dt_last_seen,(unsigned4)validatedate((string8)l.dt_last_seen									,if(length(trim((string8)l.dt_last_seen							)) = 8,0,1)));
-				//self.dt_first_seen				:= (unsigned4)validatedate((string8)l.dt_first_seen						,if(length(trim((string8)l.dt_first_seen						)) = 8,0,1));
-				//self.dt_last_seen					:= (unsigned4)validatedate((string8)l.dt_last_seen						,if(length(trim((string8)l.dt_last_seen							)) = 8,0,1));
+				self.dt_first_seen				:= (unsigned4)validatedate((string8)l.dt_first_seen						,if(length(trim((string8)l.dt_first_seen						)) = 8,0,1));
+				self.dt_last_seen					:= (unsigned4)validatedate((string8)l.dt_last_seen						,if(length(trim((string8)l.dt_last_seen							)) = 8,0,1));
 				//Bug 30987 -- remove site powered by                                              
 				self.company_title := map( stringlib.stringtolowercase(l.company_title) = 'site powered by:'	=> ''
 																	,filterbug37562																											=> '' 

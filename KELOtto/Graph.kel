@@ -338,7 +338,7 @@ Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id),
     v2_inputaddrdwelltype,
 		v2_divssnidentitycountnew,
     
-		  HriList { Hri }
+		HriList { Hri }
           ));
 
 Address := ENTITY(FLAT(UID(AssociatedCustomerFileInfo, PrimaryRange, Predirectional, PrimaryName, Suffix, Postdirectional, Zip, SecondaryRange),
@@ -471,10 +471,12 @@ BankAccount := ENTITY(FLAT(UID(AssociatedCustomerFileInfo, RoutingNumber, Accoun
     Customer rSourceCustomer=SourceCustomerFileInfo,
     Bank rBank=UID(AssociatedCustomerFileInfo, RoutingNumber),
     STRING AccountNumber,
-    INTEGER OttoBankAccountId
+    INTEGER OttoBankAccountId,
+    STRING Hri
+
 		),
 	MODEL(UID,
-    rCustomer, SourceCustomers{rSourceCustomer}, rBank, AccountNumber, OttoBankAccountId));
+    rCustomer, SourceCustomers{rSourceCustomer}, rBank, AccountNumber, OttoBankAccountId, HriList { Hri }));
 
 
 //DL – New – let’s make it 20
@@ -484,10 +486,11 @@ DriversLicense := ENTITY(FLAT(UID(AssociatedCustomerFileInfo, drivers_license),
     Customer rSourceCustomer=SourceCustomerFileInfo,
     STRING LicenseNumber,
     STRING State,
-    INTEGER OttoDriversLicenseId    
+    INTEGER OttoDriversLicenseId,   
+    STRING Hri
 		),
 	MODEL(UID,
-    rCustomer, SourceCustomers{rSourceCustomer}, LicenseNumber, State, OttoDriversLicenseId));
+    rCustomer, SourceCustomers{rSourceCustomer}, LicenseNumber, State, OttoDriversLicenseId, HriList { Hri }));
     
 /*
   ASSOCIATIONS
@@ -810,22 +813,7 @@ USE KELOtto.PersonCIID(FLAT,
   Person(FILTER((UNSIGNED)did>0),
     LexId = did,
     SubjectSsnCount = subjectssncount
-    ),
-	Address(FILTER((STRING10)prim_range <> '' AND (STRING28)prim_name <> '' AND (UNSIGNED3)z5 <> 0),
-		PrimaryRange = prim_range,
-		Predirectional = predir,
-		PrimaryName = prim_name,
-		Suffix =addr_suffix,
-		Postdirectional = postdir,
-		UnitDesignation = unit_desig,
-		SecondaryRange = sec_range,
-		PostalCity = p_city_name,
-		State = st,
-		Zip = z5,
-		Zip4 = zip4,
-		Latitude = lat,
-		Longitude = long),
-	SocialSecurityNumber(FILTER((UNSIGNED)ssn <> 0))
+    )
 );
 
 USE KELOtto.PersonFraudPoint(FLAT,
@@ -869,10 +857,20 @@ Event: => FullAddress := Location.FullAddress;
 Event: => Latitude := Location.Latitude;
 Event: => Longitude := Location.Longitude;
 Event: => LatLongId := STRING(Latitude) + ' ' + STRING(Longitude);
+Event: => EventTypeCount := COUNT(EventTypes);
 Event: => KrHighRiskIdentityFlag := MAP(COUNT(EventTypes(EventType IN ['10000','10001','10002','10004','10005','10006','10007','11000','11001','11002','11003','11004','11005','11006','11007','11008','11009','11010','11011','11012','11013','11014','11015','11016','11017','11018','11019','12000','12001','12002','12003','12004','12005','12006','12007','13000','13001','13002','13003','13004','13005','13006','13007','1400']))>0 => 1, 0);
 Event: => KrMediumRiskIdentityFlag := MAP(COUNT(EventTypes(EventType IN ['10003','14001']))>0 => 1, 0);
 Event: => KrHighRiskAddressFlag := MAP(COUNT(EventTypes(EventType IN ['301','302']))>0 => 1, 0);
 Event: => KrMediumRiskAddressFlag := MAP(COUNT(EventTypes(EventType IN ['300']))>0 => 1, 0);
+
+Event: => KrHighRiskDlFlag := MAP(COUNT(EventTypes(EventType IN ['203','291']))>0 => 1, 0);
+Event: => KrMediumRiskDlFlag := MAP(COUNT(EventTypes(EventType IN ['202','204','292']))>0 => 1, 0);
+Event: => KrLowRiskDlFlag := MAP(COUNT(EventTypes(EventType IN ['200','201','293']))>0 => 1, 0);
+
+Event: => KrHighRiskBankFlag := MAP(COUNT(EventTypes(EventType IN ['800','891']))>0 => 1, 0);
+Event: => KrMediumRiskBankFlag := MAP(COUNT(EventTypes(EventType IN ['801','802','892']))>0 => 1, 0);
+Event: => KrLowRiskBankFlag := MAP(COUNT(EventTypes(EventType IN ['893','890']))>0 => 1, 0);
+
 Event: => DemoCustomer := rCustomer.CustomerId IN ['248283691','248283681','248283671'];
 Event: => Age := IF(DemoCustomer, DAYSBETWEEN(EventDate, DATEFROMPARTS(2018, 4, 7)), DAYSBETWEEN(EventDate, rCustomer.EventDateMax));
 Event: => Hri03Flag := MAP(COUNT(HriList(CONTAINS(Hri,'03'))) > 0 => 1, 0);
@@ -918,8 +916,25 @@ Event: => HriVaFlag := MAP(COUNT(HriList(CONTAINS(Hri,'VA'))) > 0 => 1, 0);
 Event: => IdNas9Flag := MAP(nas_summary = '9' => 1, 0); // SSN and Last Name not associated with identity per public records
 Event: => IdNap3Flag := MAP(nap_summary = '3' => 1, 0); // Phone and Lastname not associated with identity per public records
 
-Event: => IdAge := YEARSBETWEEN(DateOfBirth, DATEFROMPARTS(2018, 4, 7));
+Event: => KrDl200Flag := MAP(COUNT(EventTypes(EventType IN ['200']))>0 => 1, 0);
+Event: => KrDl201Flag := MAP(COUNT(EventTypes(EventType IN ['201']))>0 => 1, 0);
+Event: => KrDl202Flag := MAP(COUNT(EventTypes(EventType IN ['202']))>0 => 1, 0);
+Event: => KrDl203Flag := MAP(COUNT(EventTypes(EventType IN ['203']))>0 => 1, 0);
+Event: => KrDl204Flag := MAP(COUNT(EventTypes(EventType IN ['204']))>0 => 1, 0);
+Event: => KrDl290Flag := MAP(COUNT(EventTypes(EventType IN ['290']))>0 => 1, 0);
+Event: => KrDl291Flag := MAP(COUNT(EventTypes(EventType IN ['291']))>0 => 1, 0);
+Event: => KrDl292Flag := MAP(COUNT(EventTypes(EventType IN ['292']))>0 => 1, 0);
+Event: => KrDl293Flag := MAP(COUNT(EventTypes(EventType IN ['293']))>0 => 1, 0);
 
+Event: => KrBnk800Flag := MAP(COUNT(EventTypes(EventType IN ['800']))>0 => 1, 0);
+Event: => KrBnk801Flag := MAP(COUNT(EventTypes(EventType IN ['801']))>0 => 1, 0);
+Event: => KrBnk802Flag := MAP(COUNT(EventTypes(EventType IN ['802']))>0 => 1, 0);
+Event: => KrBnk890Flag := MAP(COUNT(EventTypes(EventType IN ['890']))>0 => 1, 0);
+Event: => KrBnk891Flag := MAP(COUNT(EventTypes(EventType IN ['891']))>0 => 1, 0);
+Event: => KrBnk892Flag := MAP(COUNT(EventTypes(EventType IN ['892']))>0 => 1, 0);
+Event: => KrBnk893Flag := MAP(COUNT(EventTypes(EventType IN ['893']))>0 => 1, 0);
+
+Event: => IdAge := YEARSBETWEEN(DateOfBirth, DATEFROMPARTS(2018, 4, 7));
 
 Event: => SsnHri06Flag := MAP(COUNT(HriList(CONTAINS(Hri,'06'))) > 0 => 1, 0);
 Event: => SsnHri26Flag := MAP(COUNT(HriList(CONTAINS(Hri,'26'))) > 0 => 1, 0);
@@ -945,6 +960,9 @@ Event: => PhHri08Flag := MAP(COUNT(HriList(CONTAINS(Hri,'08'))) > 0 => 1, 0);
 Event: => PhHri15Flag := MAP(COUNT(HriList(CONTAINS(Hri,'15'))) > 0 => 1, 0);
 Event: => PhHri27Flag := MAP(COUNT(HriList(CONTAINS(Hri,'27'))) > 0 => 1, 0);
 Event: => PhHri31Flag := MAP(COUNT(HriList(CONTAINS(Hri,'31'))) > 0 => 1, 0);
+Event: => DlHri41Flag := MAP(COUNT(HriList(CONTAINS(Hri,'41'))) > 0 => 1, 0);
+Event: => DlHriDfFlag := MAP(COUNT(HriList(CONTAINS(Hri,'DF'))) > 0 => 1, 0);
+
 
 
 Person: => CustomerId := rCustomer.CustomerId;
@@ -1276,8 +1294,17 @@ BankAccount: => IdentityCount := COUNT(PersonEvent{Subject});
 BankAccount: => EventCount := COUNT(PersonEvent{Transaction});
 
 // Known Risk 
-BankAccount: => KrHighRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrHighRiskIdentityFlag=1)) > 0 => 1, 0);
-BankAccount: => KrMediumRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrMediumRiskIdentityFlag=1))>0 => 1, 0);
+BankAccount: => KrHighRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrHighRiskBankFlag=1)) > 0 => 1, 0);
+BankAccount: => KrMediumRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrMediumRiskBankFlag=1))>0 => 1, 0);
+BankAccount: => KrLowRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrLowRiskBankFlag=1))>0 => 1, 0);
+
+BankAccount: => KrBnk800Flag := MAP(COUNT(PersonEvent.Transaction(KrBnk800Flag=1))>0 => 1, 0);
+BankAccount: => KrBnk801Flag := MAP(COUNT(PersonEvent.Transaction(KrBnk801Flag=1))>0 => 1, 0);
+BankAccount: => KrBnk802Flag := MAP(COUNT(PersonEvent.Transaction(KrBnk802Flag=1))>0 => 1, 0);
+BankAccount: => KrBnk890Flag := MAP(COUNT(PersonEvent.Transaction(KrBnk890Flag=1))>0 => 1, 0);
+BankAccount: => KrBnk891Flag := MAP(COUNT(PersonEvent.Transaction(KrBnk891Flag=1))>0 => 1, 0);
+BankAccount: => KrBnk892Flag := MAP(COUNT(PersonEvent.Transaction(KrBnk892Flag=1))>0 => 1, 0);
+BankAccount: => KrBnk893Flag := MAP(COUNT(PersonEvent.Transaction(KrBnk893Flag=1))>0 => 1, 0);
 
 // Velocity
 BankAccount: => VlEvent1AllCount := COUNT(PersonEvent.Transaction(Age<2));
@@ -1315,10 +1342,6 @@ BankAccount: => ClusterScore := 0;
 
 /* DRIVERS LICENCE */
 
-//OttoDriversLicenseId
-
- 
-
 DriversLicense: => CustomerId := rCustomer.CustomerId;
 DriversLicense: => IndustryType := rCustomer.IndustryType;
 DriversLicense: => SourceCustomerCount := COUNT(SourceCustomers);
@@ -1329,9 +1352,25 @@ DriversLicense: => Label := LicenseNumber;
 DriversLicense: => IdentityCount := COUNT(PersonEvent{Subject});
 DriversLicense: => EventCount := COUNT(PersonEvent{Transaction});
 
+// Hri Risk 
+
+DriversLicense: => Hri41Flag := MAP(COUNT(HriList(CONTAINS(Hri,'41'))) > 0 => 1, 0);
+DriversLicense: => HriDfFlag := MAP(COUNT(HriList(CONTAINS(Hri,'DF'))) > 0 => 1, 0);
+
 // Known Risk 
-DriversLicense: => KrHighRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrHighRiskIdentityFlag=1)) > 0 => 1, 0);
-DriversLicense: => KrMediumRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrMediumRiskIdentityFlag=1))>0 => 1, 0);
+DriversLicense: => KrHighRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrHighRiskDlFlag=1)) > 0 => 1, 0);
+DriversLicense: => KrMediumRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrMediumRiskDlFlag=1))>0 => 1, 0);
+DriversLicense: => KrLowRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrLowRiskDlFlag=1))>0 => 1, 0);
+
+DriversLicense: => KrDl200Flag := MAP(COUNT(PersonEvent.Transaction(KrDl200Flag=1)) > 0 => 1, 0);
+DriversLicense: => KrDl201Flag := MAP(COUNT(PersonEvent.Transaction(KrDl201Flag=1)) > 0 => 1, 0);
+DriversLicense: => KrDl202Flag := MAP(COUNT(PersonEvent.Transaction(KrDl202Flag=1)) > 0 => 1, 0);
+DriversLicense: => KrDl203Flag := MAP(COUNT(PersonEvent.Transaction(KrDl203Flag=1)) > 0 => 1, 0);
+DriversLicense: => KrDl204Flag := MAP(COUNT(PersonEvent.Transaction(KrDl204Flag=1)) > 0 => 1, 0);
+DriversLicense: => KrDl290Flag := MAP(COUNT(PersonEvent.Transaction(KrDl290Flag=1)) > 0 => 1, 0);
+DriversLicense: => KrDl291Flag := MAP(COUNT(PersonEvent.Transaction(KrDl291Flag=1)) > 0 => 1, 0);
+DriversLicense: => KrDl292Flag := MAP(COUNT(PersonEvent.Transaction(KrDl292Flag=1)) > 0 => 1, 0);
+DriversLicense: => KrDl293Flag := MAP(COUNT(PersonEvent.Transaction(KrDl293Flag=1)) > 0 => 1, 0);
 
 // Velocity
 DriversLicense: => VlEvent1AllCount := COUNT(PersonEvent.Transaction(Age<2));
@@ -1529,7 +1568,7 @@ Customer: => HighFrequencyAddressCount := SUM(PersonAddress(Location.InCustomerP
 Customer: => AllHighFrequencyAddressCount := SUM(PersonAddress{Location}, Location.HighFrequencyFlag);
 Customer: => HighFrequencyAddressPercent := HighFrequencyAddressCount / AddressCount;
 Customer: => AllHighFrequencyAddressPercent := AllHighFrequencyAddressCount / AllAddressCount;
-Customer: => EventDateMax := MAX(PersonEvent, EventDate);
+Customer: => EventDateMax := MAX(PersonEvent(Transaction.EventTypeCount=0), EventDate); // only count non-performance data rows. The reason is that after the fact people will be validating and that will move the max date.
 
 
 QUERY: Temp <= PersonBankAccount;
@@ -1821,11 +1860,14 @@ QUERY: showCustomerBankAccountEntities <= BankAccount
 															ClElementCount,
                               ClIdentityCountPercentile,
                               ClEventCountPercentile,
-                              ClImpactWeight
-/*
+                              ClImpactWeight,
+                              
                               KrHighRiskFlag,
                               KrMediumRiskFlag,
+                              KrLowRiskFlag
                               
+                              
+/*
                               PersonCount := IdentityCount,
                               HighFrequencyFlag,
                               HighRiskDeathPriorToAllEventsPercentFlag,
@@ -1855,11 +1897,12 @@ QUERY: showCustomerDriversLicenseEntities <= DriversLicense
                               ClEventCountPercentile,
                               ClImpactWeight,
                               
-                              LicenseState := State
-/*
+                              LicenseState := State,
                               KrHighRiskFlag,
                               KrMediumRiskFlag,
+                              KrLowRiskFlag
                               
+/*
                               PersonCount := IdentityCount,
                               HighFrequencyFlag,
                               HighRiskDeathPriorToAllEventsPercentFlag,

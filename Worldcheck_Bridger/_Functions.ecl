@@ -1197,6 +1197,15 @@
 				trim(kword, left, right) = 'JPJFTC' =>SubGroup_Constants.numKeywordsID.KEYWORD_JPJFTC,
 				trim(kword, left, right) = 'TNCNLT' =>SubGroup_Constants.numKeywordsID.KEYWORD_TNCNLT,
 				trim(kword, left, right) = 'RUUSEM-50-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_RUUSEM_50_WC,
+				trim(kword, left, right) = 'SECO-MAL' =>SubGroup_Constants.numKeywordsID.KEYWORD_SECO_MAL,
+				trim(kword, left, right) = 'UN-MAL' =>SubGroup_Constants.numKeywordsID.KEYWORD_UN_MAL,
+				trim(kword, left, right) = 'INMHA-FCRA' =>SubGroup_Constants.numKeywordsID.KEYWORD_INMHA_FCRA,
+				trim(kword, left, right) = 'FFMS-WMD' =>SubGroup_Constants.numKeywordsID.KEYWORD_FFMS_WMD,
+				trim(kword, left, right) = 'OFAC-VE13850' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_VE13850,
+				trim(kword, left, right) = 'SECO-MALTB' =>SubGroup_Constants.numKeywordsID.KEYWORD_SECO_MALTB,
+				trim(kword, left, right) = 'UNTB-MAL' =>SubGroup_Constants.numKeywordsID.KEYWORD_UNTB_MAL,
+				trim(kword, left, right) = 'EUTB-MAL' =>SubGroup_Constants.numKeywordsID.KEYWORD_EUTB_MAL,								
+				trim(kword, left, right) = 'EU-PCW' =>SubGroup_Constants.numKeywordsID.KEYWORD_EU_PCW,								
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);

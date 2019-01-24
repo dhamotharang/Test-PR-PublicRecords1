@@ -322,9 +322,8 @@ fraudgov_layout := RECORD,maxlength(60000)
   string10 investigator_id;
  END;
 
-//fraudgov_dataset_base_prep := PULL(DATASET('~foreign::10.173.14.201::thor_data400::base::fraudgov::20180529_anonymized::main',fraudgov_layout,THOR));
-//fraudgov_dataset_base_prep := PULL(DATASET('~foreign::10.173.14.201::thor_data400::base::nookse01::qa::main',fraudgov_layout,THOR));
-fraudgov_dataset_base_prep := PULL(DATASET('~thor_data400::base::fraudgov::qa::main',fraudgov_layout,THOR));
+//fraudgov_dataset_base_prep := PULL(DATASET('~foreign::10.173.44.105::thor_data400::base::fraudgov::built::main',fraudgov_layout,THOR));
+fraudgov_dataset_base_prep := PULL(DATASET('~thor_data400::base::fraudgov::built::main',fraudgov_layout,THOR));
 // fraudgov_dataset_base_prep := PULL(DATASET('~foreign::10.173.14.201::thor_data400::base::nookse01::qa::main',fraudgov_layout,THOR));
  
 
@@ -358,13 +357,19 @@ fraudgov_dataset_base := PROJECT(fraudgov_dataset_base_prep,
                        SELF.OttoBankAccountId := HASH32(TRIM(LEFT.bank_routing_number_1, LEFT, RIGHT) + '|' + TRIM(LEFT.bank_account_number_1, LEFT, RIGHT)),
                        SELF.OttoBankAccountId2 := HASH32(TRIM(LEFT.bank_routing_number_2, LEFT, RIGHT) + '|' + TRIM(LEFT.bank_account_number_2, LEFT, RIGHT)),
                        SELF.OttoDriversLicenseId := HASH32(LEFT.drivers_license),
+                       // fake bank account and dl risk stuff for testing JP
+                       /*
+                       SELF.event_type_1 := MAP(LEFT.bank_account_number_1 != '' => CHOOSE((HASH32(LEFT.record_id) % 8)+1, '203','291','202','204','292','200','201','293'), ''),
+                       SELF.event_type_2 := MAP(LEFT.drivers_license != '' => CHOOSE((HASH32(LEFT.record_id) % 7)+1, '800','891','801','802','892','893','890'),''),
+                       */
+                       // end of test code.
 											 SELF := LEFT));
 
 // trim the data down for R&D speed.
 
 Set_did:=[1488418290,8389852385,1921409109,2435345412,1834342568,1589581232];
 
-fraudgov_dataset := fraudgov_dataset_base((UNSIGNED)event_date <= Std.Date.Today());// and (did % 10 in [0] OR did = 899999999550 or ssn = '294287743' or event_type_1 = '10000' or bank_account_number_1 != '' or drivers_license != '' or did in set_did));
+fraudgov_dataset := fraudgov_dataset_base((UNSIGNED)event_date <= Std.Date.Today());// and (did % 3 in [0] OR did = 899999999550 or ssn = '294287743' or event_type_1 = '10000' or bank_account_number_1 != '' or drivers_license != '' or did in set_did));
 
 
 // Lets FAKE SOME CUSTOMERS!!!!!

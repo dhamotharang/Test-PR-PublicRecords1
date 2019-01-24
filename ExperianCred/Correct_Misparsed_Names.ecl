@@ -3,10 +3,6 @@
 input_files := Files.File_In ;
 
 corrected_misparsed_names := experiancred.fn_correct_misparsed_names(input_files);
-SEQUENTIAL(OUTPUT(corrected_misparsed_names,,Superfile_List.Source_File_After_Name_Flip + ver ,overwrite,__compressed__);
-		   FileServices.StartSuperFileTransaction(),				
-		   FileServices.AddSuperFile(Superfile_List.Source_File_After_Name_Flip,Superfile_List.Source_File_After_Name_Flip + ver),
-		   FileServices.FinishSuperFileTransaction());
 
 Layouts.Layout_In t_reset_orig_names (corrected_misparsed_names le) := transform
 	self.Surname          := le.reparsed_surname;
