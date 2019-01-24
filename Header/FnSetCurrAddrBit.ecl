@@ -1,5 +1,5 @@
 EXPORT FnSetCurrAddrBit (pInDs) := functionmacro
-import watchdog,ut;
+import watchdog, ut, doxie;
 
 	InDs:=distribute(pInDs,hash(prim_name,prim_range,st,zip,did));
 
