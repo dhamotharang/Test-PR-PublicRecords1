@@ -1,11 +1,8 @@
-IMPORT AutoStandardI, BatchDatasets, iesp, Residency_Services, Risk_Indicators, RiskWise;
+IMPORT BatchDatasets, iesp, Residency_Services, Risk_Indicators, RiskWise;
 
 EXPORT fn_getIID(DATASET(Residency_Services.Layouts.IntermediateData) ds_input,
-                 Residency_Services.IParam.BatchParams mod_params_in) := FUNCTION
+                 Residency_Services.IParam.BatchParams mod_params) := FUNCTION
 
-	mod_params := MODULE(PROJECT(mod_params_in, BatchDatasets.IParams.BatchParams,OPT))
-	END;
-			
 	ds_input_projtd := PROJECT(ds_input, 
 	                           TRANSFORM(BatchDatasets.Layouts.layout_batch_in_waddr_status,
 													     SELF.AcctNo			:= (STRING8)LEFT.seq, // TO ensure we can join back properly
