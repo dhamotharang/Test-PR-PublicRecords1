@@ -1,27 +1,54 @@
 ﻿/* PublicRecords_KEL.BWR_Business_MAS_Roxie */
-IMPORT RiskWise, STD;
-
-
+IMPORT PublicRecords_KEL, RiskWise, SALT38, SALTRoutines, STD;
 Threads := 1;
-RecordsToRun := 0; // 100;
-eyeball := 120;
 
-// historyDate := 0; // Set to 0 to use ArchiveDate on input file. 
-historyDate := 20181227; // Set to 0 to use ArchiveDate on input file. 
+RoxieIP := RiskWise.shortcuts.Dev156;
+
+InputFile := '~temp::kel::ally_01_business_uat_sample_100k_20181015.csv'; //100k file
+// InputFile := '~temp::kel::ally_01_business_uat_sample_1m_20181015.csv'; //1m file
+
+/* Data Setting 	FCRA 	
+DRMFares = 1 //FARES - bit 1
+DRMExperian =	1 - //FARES bit 6
+DRMTransUnion =	0 //TCH - bit 10
+DRMADVO =	0 //ADVO bit 12
+DRMExperianFCRA =	1 //ECHF bit 14
+DPMSSN =	0 //use_DeathMasterSSAUpdates - bit 10
+DPMFDN =	0 //use_FDNContributoryData - bit 11
+DPMDL =	0 //use_InsuranceDLData - bit 13
+GLBA 	= 0 
+DPPA 	= 0 
+*/
+GLBA := 0; //not used
+DPPA := 0; //not used 
+DataPermission := '0000000000000'; 
+DataRestrictionMask := '1000010000000100000000000000000000000000000000000'; 
+
+// Universally Set the History Date YYYYMMDD for ALL records. Set to 0 to use the History Date located on each record of the input file
+historyDate := '0';
+// historyDate := '20190118';
+// historyDate := (STRING)STD.Date.Today(); // Run with today's date
 
 Score_threshold := 80;
+// Score_threshold := 90;
+BIPID_Score_threshold := 0; // Stubbing this out for use in settings output for now. To be used to set score threshold for BIP ID Append.
 
 // Output additional file in Master Layout
 // Master results are for R&D/QA purposes ONLY. This should only be set to TRUE for internal use.
 Output_Master_Results := FALSE;
 // Output_Master_Results := TRUE; 
 
+// Toggle to include/exclude SALT profile of results file
+// Output_SALT_Profile := FALSE;
+Output_SALT_Profile := TRUE;
+
 Exclude_Consumer_Shell := FALSE; //if TRUE, bypasses consumer logic and sets all consumer shell fields to blank/0.
 
-RoxieIP := RiskWise.shortcuts.Dev156;
+RecordsToRun := 0;
+eyeball := 120;
 
-InputFile := '~temp::kel::ally_01_business_uat_sample_100k_20181015.csv'; //100k file
-// InputFile := '~temp::kel::ally_01_business_uat_sample_1m_20181015.csv'; //1m file
+AllowedSources := ''; // Stubbing this out for use in settings output for now. To be used to turn on DNBDMI by setting to 'DNBDMI'
+OverrideExperianRestriction := FALSE; // Stubbing this out for use in settings output for now. To be used to control whether Experian Business Data (EBR and CRDB) is returned.
 
 OutputFile := '~cdal::BusinessPop_PublicRecs_SpecialVaules_BankruptcyBuildDate_12272018'+ ThorLib.wuid() ;
 
@@ -142,7 +169,7 @@ inData := DATASET(InputFile, prii_layout, CSV(QUOTE('"')));
 OUTPUT(CHOOSEN(inData, eyeball), NAMED('inData'));
 inDataRecs := IF (RecordsToRun = 0, inData, CHOOSEN (inData, RecordsToRun));
 inDataReady := PROJECT(inDataRecs(AccountNumber != 'AccountNumber'), TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout, 
-	SELF.ArchiveDate := IF(historyDate = 0, LEFT.ArchiveDate, (STRING)HistoryDate);
+	SELF.ArchiveDate := IF(historyDate = '0', LEFT.ArchiveDate, (STRING)HistoryDate);
 	SELF := LEFT, 
 	// SELF := [] 
 	));
@@ -254,3 +281,24 @@ OUTPUT(CHOOSEN(Passed_Business, eyeball), NAMED('Sample_NonFCRA_Layout'));
 
 IF(Output_Master_Results, OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout', CSV(HEADING(single), QUOTE('"'))));
 OUTPUT(Passed_Business,,OutputFile, CSV(HEADING(single), QUOTE('"')));
+Settings_Dataset := PublicRecords_KEL.ECL_Functions.fn_make_settings_dataset(
+		AttributeSetName := 'Development KEL Attributes',
+		VersionName := 'Version 1.0',
+		isFCRA := FALSE,
+		ArchiveDate := historyDate,
+		InputFileName := InputFile,
+		PermissiblePurpose := '', // FCRA only
+		DataRestrictionMask := DataRestrictionMask,
+		DataPermissionMask := DataPermission,
+		GLBA := GLBA,
+		DPPA := DPPA,
+		OverrideExperianRestriction := OverrideExperianRestriction,
+		AllowedSources := AllowedSources, // Controls inclusion of DNBDMI data
+		LexIDThreshold := Score_threshold,
+		BusinessLexIDThreshold := BIPID_Score_threshold);
+		
+OUTPUT(Settings_Dataset, NAMED('Attributes_Settings'));
+
+SALT_AttributeResults := SALTRoutines.SALT_Profile_Run_Everything(Passed_Business, 'SALT_Results');
+
+IF(Output_SALT_Profile, OUTPUT(SALT_AttributeResults, NAMED('Total_Fields_Profiled')));

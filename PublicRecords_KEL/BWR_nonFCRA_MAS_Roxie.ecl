@@ -1,13 +1,12 @@
 ﻿/* PublicRecords_KEL.BWR_nonFCRA_MAS_Roxie */
-IMPORT RiskWise, STD;
-IMPORT KEL011 AS KEL;
+IMPORT PublicRecords_KEL, RiskWise, SALT38, SALTRoutines, STD;
+
 threads := 1;
 
 RoxieIP := RiskWise.shortcuts.Dev156;
 
 InputFile := '~temp::kel::consumer_nonfcra_100k.csv';
 // InputFile := '~temp::kel::consumer_nonfcra_1mm.csv'; //1 million
-
 
 /*
 Data Setting 		NonFCRA
@@ -22,26 +21,34 @@ DPMDL =	1 //use_InsuranceDLData - bit 13
 GLBA 	= 1 
 DPPA 	= 1 
 */ 
-
 GLBA := 1;
 DPPA := 1;
 DataPermission := '0000000001101';  
 DataRestrictionMask := '0000000000000000000000000000000000000000000000000'; 
 
+// Universally Set the History Date YYYYMMDD for ALL records. Set to 0 to use the History Date located on each record of the input file
+histDate := '0';
+// histDate := '20190116';
+// histDate := (STRING)STD.Date.Today(); // Run with today's date
+
 Score_threshold := 80;
 // Score_threshold := 90;
+BIPID_Score_threshold := 0; // Stubbing this out for use in settings output for now. To be used to set score threshold for BIP ID Append.
 
 // Output additional file in Master Layout
 // Master results are for R&D/QA purposes ONLY. This should only be set to TRUE for internal use.
 Output_Master_Results := FALSE;
 // Output_Master_Results := TRUE; 
 
+// Toggle to include/exclude SALT profile of results file
+// Output_SALT_Profile := FALSE;
+Output_SALT_Profile := TRUE;
+
 RecordsToRun := 0;
 eyeball := 120;
 
-// Universally Set the History Date YYYYMMDD for ALL records. Set to 0 to use the History Date located on each record of the input file
-// histDate := '0';
-histDate := '20181231';
+AllowedSources := ''; // Stubbing this out for use in settings output for now. To be used to turn on DNBDMI by setting to 'DNBDMI'
+OverrideExperianRestriction := FALSE; // Stubbing this out for use in settings output for now. To be used to control whether Experian Business Data (EBR and CRDB) is returned.
 
 OutputFile := '~CDAL::Consumer_ArrestSpecialValue_Bug_100K_RoxieDev_current_12312018_NonFCRA'+ ThorLib.wuid() ;
 
@@ -186,3 +193,26 @@ OUTPUT(CHOOSEN(Passed_Person, eyeball), NAMED('Sample_NonFCRA_Layout'));
 
 IF(Output_Master_Results, OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout', CSV(HEADING(single), QUOTE('"'))));
 OUTPUT(Passed_Person,,OutputFile, CSV(HEADING(single), QUOTE('"')));
+
+
+Settings_Dataset := PublicRecords_KEL.ECL_Functions.fn_make_settings_dataset(
+		AttributeSetName := 'Development KEL Attributes',
+		VersionName := 'Version 1.0',
+		isFCRA := FALSE,
+		ArchiveDate := histDate,
+		InputFileName := InputFile,
+		PermissiblePurpose := '', // FCRA only
+		DataRestrictionMask := DataRestrictionMask,
+		DataPermissionMask := DataPermission,
+		GLBA := GLBA,
+		DPPA := DPPA,
+		OverrideExperianRestriction := OverrideExperianRestriction,
+		AllowedSources := AllowedSources, // Controls inclusion of DNBDMI data
+		LexIDThreshold := Score_threshold,
+		BusinessLexIDThreshold := BIPID_Score_threshold);
+		
+OUTPUT(Settings_Dataset, NAMED('Attributes_Settings'));
+
+SALT_AttributeResults := SALTRoutines.SALT_Profile_Run_Everything(Passed_Person, 'SALT_Results');
+
+IF(Output_SALT_Profile, OUTPUT(SALT_AttributeResults, NAMED('Total_Fields_Profiled')));
