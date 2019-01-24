@@ -266,17 +266,12 @@ AutoKey.MAC_Build_Version(files.file_corrections_keys,fname,mname,lname,
 						[]); 
 autokey.MAC_AcceptSK_to_QA(constants.corrections_keys_root,autokeymove);
 
-
-
-// -- EMAIL ROXIE KEY COMPLETION NOTIFICATION 
-is_running_in_prod 	:= PRTE2_Common.Constants.is_running_in_prod;
-DOPS_Comment		 					:= OUTPUT('Skipping DOPS process');
-updatedops   		 				:= PRTE.UpdateVersion('DOCKeys', filedate,_control.MyInfo.EmailAddressNormal,'B','N','N'); 
-updatedops_fcra  			:= PRTE.UpdateVersion('FCRA_DOCKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','F','N');
-//--------------------------------------------------------------
-
-
-
+//---------- making DOPS optional and only in PROD build -------------------------------
+	is_running_in_prod 	:= PRTE2_Common.Constants.is_running_in_prod;
+	NoUpdate 						:= OUTPUT('Skipping DOPS update because we are not in PROD'); 
+	updatedops   		 		:= PRTE.UpdateVersion('DOCKeys', filedate,_control.MyInfo.EmailAddressNormal,'B','N','N'); 
+	updatedops_fcra  		:= PRTE.UpdateVersion('FCRA_DOCKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','F','N');
+	PerformUpdateOrNot	:= IF(is_running_in_prod,parallel(updatedops,updatedops_fcra),NoUpdate);
 
 RETURN 		sequential(			build_key_criminal_offendersfcra_did, 
 			build_key_criminal_offensesfcra_offender_key, 
@@ -331,12 +326,10 @@ RETURN 		sequential(			build_key_criminal_offendersfcra_did,
 			move_qa_key_corrections_offenders_riskbocashell_did, 
 			move_qa_key_corrections_offenders_riskdid_public, 
 			move_qa_key_corrections_offenses_public, 
-
-			move_qa_key_corrections_punishment_public, 
-			retval,
-			corrections_keys_outaction,
-			autokeymove,
-			if(is_running_in_prod, parallel(updatedops,updatedops_fcra),DOPS_Comment) 
-							);
+			move_qa_key_corrections_punishment_public, retval ,
+			corrections_keys_outaction,autokeymove,
+			proc_fcra_field_depreciation_stats,
+			PerformUpdateOrNot 
+			);
 
 END;

@@ -5,7 +5,7 @@ export Build_AutoKey(string filedate) := function
 
 ak_keyname	:= dx_email.constants(filedate).ak_keyname;
 ak_logical	:= dx_email.constants(filedate).ak_logical;
-ak_dataset	:= dx_email.constants(filedate).ak_dataset;
+ak_dataset	:= Email_Datav2.constants(filedate).ak_dataset;
 ak_skipSet	:= dx_email.constants(filedate).ak_skipSet;
 ak_typeStr	:= dx_email.constants(filedate).ak_typeStr;
 

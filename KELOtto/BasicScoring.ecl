@@ -52,13 +52,16 @@
   EXPORT BankAccountStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Bank_Account.Res0, 'industry_type_,customer_id_,entity_context_uid_',
                         'cluster_score_,event_count_,identity_count_,score_,source_customer_count_,cl_event_count_,cl_identity_count_,kr_high_risk_flag_,kr_medium_risk_flag_,' + 
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
-												'cl_active30_identity_count_,cl_active7_identity_count_'
+												'cl_active30_identity_count_,cl_active7_identity_count_,' +
+                        'kr_bnk800_flag_,kr_bnk801_flag_,kr_bnk802_flag_,kr_bnk890_flag_,kr_bnk891_flag_,kr_bnk892_flag_,kr_bnk893_flag_'                        
 												) : PERSIST('~temp::deleteme50');
 
   EXPORT DriversLicenseStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Drivers_License.Res0, 'industry_type_,customer_id_,entity_context_uid_',
                         'cluster_score_,event_count_,identity_count_,score_,source_customer_count_,cl_event_count_,cl_identity_count_,kr_high_risk_flag_,kr_medium_risk_flag_,' + 
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
-												'cl_active30_identity_count_,cl_active7_identity_count_'
+												'cl_active30_identity_count_,cl_active7_identity_count_,' + 
+                        'hri41_flag_,hri_df_flag_,' + 
+                        'kr_dl200_flag_,kr_dl201_flag_,kr_dl202_flag_,kr_dl203_flag_,kr_dl204_flag_,kr_dl290_flag_,kr_dl291_flag_,kr_dl292_flag_,kr_dl293_flag_'
 												) : PERSIST('~temp::deleteme51');
                         
   EXPORT EventStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Person_Event.Res0, 'industry_type_,customer_id_,entity_context_uid_', 

@@ -12,6 +12,7 @@ EXPORT rules_bitmap_code(string rules = '')  := MAP(
 																										rules = 'missing_@_symbol'										=> ut.bit_set(0,5),
 																										rules = 'dod_b4_email'												=> ut.bit_set(0,6),
 																										rules = 'invalid_account'											=> ut.bit_set(0,7),
+																										rules = 'includes_profanity'									=> ut.bit_set(0,8),
 																										0);
 
 //Testing if bitmap is set
@@ -31,6 +32,7 @@ EXPORT	STRING	fGet_rules_from_bitmap(unsigned bitmap_rules) := FUNCTION
 																+	  IF(fFlagIsOn(bitmap_rules, rules_bitmap_code('missing_@_symbol')),				' ' + 'missing_@_symbol','')
 																+	  IF(fFlagIsOn(bitmap_rules, rules_bitmap_code('dod_b4_email')),						' ' + 'dod_b4_email','')
 																+	  IF(fFlagIsOn(bitmap_rules, rules_bitmap_code('invalid_account')),					' ' + 'invalid_account','')
+																+	  IF(fFlagIsOn(bitmap_rules, rules_bitmap_code('includes_profanity')),			' ' + 'includes_profanity','')
 																			);
 RETURN		lib_stringlib.stringlib.stringfindreplace(trim(lib_stringlib.stringlib.stringcleanspaces(translated_value),left,right),'  ',' ');
 END;
