@@ -191,8 +191,8 @@ Passed_Person :=
 IF(Output_Master_Results, OUTPUT(CHOOSEN(Passed_with_Extras, eyeball), NAMED('Sample_Master_Layout')));
 OUTPUT(CHOOSEN(Passed_Person, eyeball), NAMED('Sample_NonFCRA_Layout'));
 
-IF(Output_Master_Results, OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout', CSV(HEADING(single), QUOTE('"'))));
-OUTPUT(Passed_Person,,OutputFile, CSV(HEADING(single), QUOTE('"')));
+IF(Output_Master_Results, OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout.csv', CSV(HEADING(single), QUOTE('"'))));
+OUTPUT(Passed_Person,,OutputFile + '.csv', CSV(HEADING(single), QUOTE('"')));
 
 
 Settings_Dataset := PublicRecords_KEL.ECL_Functions.fn_make_settings_dataset(
@@ -213,6 +213,6 @@ Settings_Dataset := PublicRecords_KEL.ECL_Functions.fn_make_settings_dataset(
 		
 OUTPUT(Settings_Dataset, NAMED('Attributes_Settings'));
 
-SALT_AttributeResults := SALTRoutines.SALT_Profile_Run_Everything(Passed_Person, 'SALT_Results');
+SALT_AttributeResults := IF(Output_SALT_Profile, SALTRoutines.SALT_Profile_Run_Everything(Passed_Person, 'SALT_Results'), 0);
 
 IF(Output_SALT_Profile, OUTPUT(SALT_AttributeResults, NAMED('Total_Fields_Profiled')));

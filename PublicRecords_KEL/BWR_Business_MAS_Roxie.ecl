@@ -279,8 +279,8 @@ Passed_Business :=
 IF(Output_Master_Results, OUTPUT(CHOOSEN(Passed_with_Extras, eyeball), NAMED('Sample_Master_Layout')));
 OUTPUT(CHOOSEN(Passed_Business, eyeball), NAMED('Sample_NonFCRA_Layout'));
 
-IF(Output_Master_Results, OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout', CSV(HEADING(single), QUOTE('"'))));
-OUTPUT(Passed_Business,,OutputFile, CSV(HEADING(single), QUOTE('"')));
+IF(Output_Master_Results, OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout.csv', CSV(HEADING(single), QUOTE('"'))));
+OUTPUT(Passed_Business,,OutputFile + '.csv', CSV(HEADING(single), QUOTE('"')));
 Settings_Dataset := PublicRecords_KEL.ECL_Functions.fn_make_settings_dataset(
 		AttributeSetName := 'Development KEL Attributes',
 		VersionName := 'Version 1.0',
@@ -299,6 +299,6 @@ Settings_Dataset := PublicRecords_KEL.ECL_Functions.fn_make_settings_dataset(
 		
 OUTPUT(Settings_Dataset, NAMED('Attributes_Settings'));
 
-SALT_AttributeResults := SALTRoutines.SALT_Profile_Run_Everything(Passed_Business, 'SALT_Results');
+SALT_AttributeResults := IF(Output_SALT_Profile, SALTRoutines.SALT_Profile_Run_Everything(Passed_Business, 'SALT_Results'), 0);
 
 IF(Output_SALT_Profile, OUTPUT(SALT_AttributeResults, NAMED('Total_Fields_Profiled')));
