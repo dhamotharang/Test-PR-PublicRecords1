@@ -1,6 +1,6 @@
 ﻿//HPCC Systems KEL Compiler Version 0.11.6
 IMPORT KEL011 AS KEL;
-IMPORT B_Bankruptcy_1,B_Bankruptcy_2,B_Bankruptcy_3,B_Criminal_Offense_1,B_Criminal_Offense_2,B_Criminal_Offense_3,B_Criminal_Offense_4,B_Person,B_Person_1,B_Person_2,CFG_Compile,E_Bankruptcy,E_Criminal_Offense,E_Person,E_Person_Bankruptcy,E_Person_Offenses FROM PublicRecords_KEL;
+IMPORT B_Bankruptcy_1,B_Bankruptcy_2,B_Bankruptcy_3,B_Bankruptcy_4,B_Criminal_Offense_1,B_Criminal_Offense_2,B_Criminal_Offense_3,B_Criminal_Offense_4,B_Person,B_Person_1,B_Person_2,CFG_Compile,E_Bankruptcy,E_Criminal_Offense,E_Person,E_Person_Bankruptcy,E_Person_Offenses FROM PublicRecords_KEL;
 IMPORT * FROM KEL011.Null;
 EXPORT Q_Non_F_C_R_A_Person_Attributes_V1(SET OF KEL.typ.uid __PLexIDs, KEL.typ.kdate __PArchiveDate, UNSIGNED1 __PDPM, CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault) := MODULE
   SHARED __cfg_Local := MODULE(CFG_Compile)
@@ -41,11 +41,14 @@ EXPORT Q_Non_F_C_R_A_Person_Attributes_V1(SET OF KEL.typ.uid __PLexIDs, KEL.typ.
   SHARED E_Person_Filtered := E_Person_Filtered_2;
   SHARED E_Person_Bankruptcy_Filtered := E_Person_Bankruptcy_Filtered_1;
   SHARED E_Person_Offenses_Filtered := E_Person_Offenses_Filtered_1;
+  SHARED B_Bankruptcy_4_Local(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE(B_Bankruptcy_4(__in,__cfg))
+    SHARED TYPEOF(E_Bankruptcy(__in,__cfg).__Result) __E_Bankruptcy := E_Bankruptcy_Filtered(__in,__cfg).__Result;
+  END;
   SHARED B_Criminal_Offense_4_Local(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE(B_Criminal_Offense_4(__in,__cfg))
     SHARED TYPEOF(E_Criminal_Offense(__in,__cfg).__Result) __E_Criminal_Offense := E_Criminal_Offense_Filtered(__in,__cfg).__Result;
   END;
   SHARED B_Bankruptcy_3_Local(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE(B_Bankruptcy_3(__in,__cfg))
-    SHARED TYPEOF(E_Bankruptcy(__in,__cfg).__Result) __E_Bankruptcy := E_Bankruptcy_Filtered(__in,__cfg).__Result;
+    SHARED TYPEOF(B_Bankruptcy_4(__in,__cfg).__ENH_Bankruptcy_4) __ENH_Bankruptcy_4 := B_Bankruptcy_4_Local(__in,__cfg).__ENH_Bankruptcy_4;
   END;
   SHARED B_Criminal_Offense_3_Local(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE(B_Criminal_Offense_3(__in,__cfg))
     SHARED TYPEOF(B_Criminal_Offense_4(__in,__cfg).__ENH_Criminal_Offense_4) __ENH_Criminal_Offense_4 := B_Criminal_Offense_4_Local(__in,__cfg).__ENH_Criminal_Offense_4;
@@ -57,8 +60,10 @@ EXPORT Q_Non_F_C_R_A_Person_Attributes_V1(SET OF KEL.typ.uid __PLexIDs, KEL.typ.
     SHARED TYPEOF(B_Criminal_Offense_3(__in,__cfg).__ENH_Criminal_Offense_3) __ENH_Criminal_Offense_3 := B_Criminal_Offense_3_Local(__in,__cfg).__ENH_Criminal_Offense_3;
   END;
   SHARED B_Person_2_Local(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE(B_Person_2(__in,__cfg))
+    SHARED TYPEOF(B_Bankruptcy_3(__in,__cfg).__ENH_Bankruptcy_3) __ENH_Bankruptcy_3 := B_Bankruptcy_3_Local(__in,__cfg).__ENH_Bankruptcy_3;
     SHARED TYPEOF(B_Criminal_Offense_3(__in,__cfg).__ENH_Criminal_Offense_3) __ENH_Criminal_Offense_3 := B_Criminal_Offense_3_Local(__in,__cfg).__ENH_Criminal_Offense_3;
     SHARED TYPEOF(E_Person(__in,__cfg).__Result) __E_Person := E_Person_Filtered(__in,__cfg).__Result;
+    SHARED TYPEOF(E_Person_Bankruptcy(__in,__cfg).__Result) __E_Person_Bankruptcy := E_Person_Bankruptcy_Filtered(__in,__cfg).__Result;
     SHARED TYPEOF(E_Person_Offenses(__in,__cfg).__Result) __E_Person_Offenses := E_Person_Offenses_Filtered(__in,__cfg).__Result;
   END;
   SHARED B_Bankruptcy_1_Local(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE(B_Bankruptcy_1(__in,__cfg))
@@ -82,9 +87,9 @@ EXPORT Q_Non_F_C_R_A_Person_Attributes_V1(SET OF KEL.typ.uid __PLexIDs, KEL.typ.
     SHARED TYPEOF(E_Person_Offenses(__in,__cfg).__Result) __E_Person_Offenses := E_Person_Offenses_Filtered(__in,__cfg).__Result;
   END;
   SHARED TYPEOF(B_Person(__in,__cfg_Local).__ENH_Person) __ENH_Person := B_Person_Local(__in,__cfg_Local).__ENH_Person;
-  SHARED __EE194658 := __ENH_Person;
-  SHARED __EE195770 := __EE194658(__T(__OP2(__EE194658.UID,IN,__CN(__PLexIDs))));
-  SHARED __ST14414_Layout := RECORD
+  SHARED __EE246494 := __ENH_Person;
+  SHARED __EE248194 := __EE246494(__T(__OP2(__EE246494.UID,IN,__CN(__PLexIDs))));
+  SHARED __ST15430_Layout := RECORD
     KEL.typ.nuid Lex_I_D_;
     KEL.typ.int Felony_Cnt1_Y_ := 0;
     KEL.typ.int Felony_Cnt7_Y_ := 0;
@@ -131,9 +136,9 @@ EXPORT Q_Non_F_C_R_A_Person_Attributes_V1(SET OF KEL.typ.uid __PLexIDs, KEL.typ.
     KEL.typ.int Bk_Cnt1_Y_ := 0;
     KEL.typ.int Bk_Cnt7_Y_ := 0;
     KEL.typ.int Bk_Cnt10_Y_ := 0;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST14121_Layout) Dt_Of_Bks_List1_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST14147_Layout) Dt_Of_Bks_List7_Y_;
-    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST14173_Layout) Dt_Of_Bks_List10_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST14568_Layout) Dt_Of_Bks_List1_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST14594_Layout) Dt_Of_Bks_List7_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST14620_Layout) Dt_Of_Bks_List10_Y_;
     KEL.typ.nstr Bk_New1_Y_;
     KEL.typ.nstr Bk_New7_Y_;
     KEL.typ.nstr Bk_New10_Y_;
@@ -146,9 +151,21 @@ EXPORT Q_Non_F_C_R_A_Person_Attributes_V1(SET OF KEL.typ.uid __PLexIDs, KEL.typ.
     KEL.typ.nint Mon_Since_Oldest_Bk_Cnt1_Y_;
     KEL.typ.nint Mon_Since_Oldest_Bk_Cnt7_Y_;
     KEL.typ.nint Mon_Since_Oldest_Bk_Cnt10_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST14888_Layout) Ch_For_Bks_List1_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST14922_Layout) Ch_For_Bks_List7_Y_;
+    KEL.typ.ndataset(B_Person(__in,__cfg_Local).__ST14956_Layout) Ch_For_Bks_List10_Y_;
+    KEL.typ.nstr Bk_With_Newest_Date_Ch1_Y_;
+    KEL.typ.nstr Bk_With_Newest_Date_Ch7_Y_;
+    KEL.typ.nstr Bk_With_Newest_Date_Ch10_Y_;
+    KEL.typ.int Bk_Under_Ch7_Cnt1_Y_ := 0;
+    KEL.typ.int Bk_Under_Ch7_Cnt7_Y_ := 0;
+    KEL.typ.int Bk_Under_Ch7_Cnt10_Y_ := 0;
+    KEL.typ.int Bk_Under_Ch13_Cnt1_Y_ := 0;
+    KEL.typ.int Bk_Under_Ch13_Cnt7_Y_ := 0;
+    KEL.typ.int Bk_Under_Ch13_Cnt10_Y_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(__EE195770,TRANSFORM(__ST14414_Layout,SELF.Lex_I_D_ := LEFT.UID,SELF := LEFT)));
+  EXPORT Res0 := __UNWRAP(PROJECT(__EE248194,TRANSFORM(__ST15430_Layout,SELF.Lex_I_D_ := LEFT.UID,SELF := LEFT)));
 END;

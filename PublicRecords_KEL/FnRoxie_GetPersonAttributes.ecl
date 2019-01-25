@@ -107,7 +107,7 @@ ENDMACRO;
 			SELF.CrimBehaviorIndex7Y := IF(ResultsFound, (STRING)RIGHT.CrimBehaviorIndex7Y,'0');
 			//Bankruptcy	
 			SELF.BkHistoryBuild := Risk_Indicators.get_Build_date('bankruptcy_daily'); 		
-			SELF.BkCnt1Y := RIGHT.BkCnt1Y;
+			SELF.BkCnt1Y := RIGHT.BkCnt1Y; 
 			SELF.BkCnt7Y := RIGHT.BkCnt7Y;
 			SELF.BkCnt10Y := RIGHT.BkCnt10Y;
 			SELF.DtOfBksList1Y := IF(RIGHT.BkCnt1Y > 0,roll_list(RIGHT.DtOfBksList1Y, BankruptcyDate, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
@@ -125,6 +125,18 @@ ENDMACRO;
 			SELF.MonSinceOldestBkCnt1Y := IF(ResultsFound, (INTEGER)RIGHT.MonSinceOldestBkCnt1Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
 			SELF.MonSinceOldestBkCnt7Y := IF(ResultsFound, (INTEGER)RIGHT.MonSinceOldestBkCnt7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
 			SELF.MonSinceOldestBkCnt10Y := IF(ResultsFound, (INTEGER)RIGHT.MonSinceOldestBkCnt10Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
+			SELF.ChForBksList1Y := IF(RIGHT.BkCnt1Y > 0,roll_list(RIGHT.ChForBksList1Y, OriginalChapter, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.ChForBksList7Y := IF(RIGHT.BkCnt7Y > 0,roll_list(RIGHT.ChForBksList7Y, OriginalChapter, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.ChForBksList10Y := IF(RIGHT.BkCnt10Y > 0,roll_list(RIGHT.ChForBksList10Y, OriginalChapter, '|'), PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.BkWithNewestDateCh1Y := IF(ResultsFound,(STRING)RIGHT.BkWithNewestDateCh1Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.BkWithNewestDateCh7Y := IF(ResultsFound,(STRING)RIGHT.BkWithNewestDateCh7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.BkWithNewestDateCh10Y := IF(ResultsFound,(STRING)RIGHT.BkWithNewestDateCh10Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);
+			SELF.BkUnderCh7Cnt1Y := IF(ResultsFound,(INTEGER)RIGHT.BkUnderCh7Cnt1Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
+			SELF.BkUnderCh7Cnt7Y := IF(ResultsFound,(INTEGER)RIGHT.BkUnderCh7Cnt7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
+			SELF.BkUnderCh7Cnt10Y := IF(ResultsFound,(INTEGER)RIGHT.BkUnderCh7Cnt10Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
+			SELF.BkUnderCh13Cnt1Y := IF(ResultsFound,(INTEGER)RIGHT.BkUnderCh13Cnt1Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
+			SELF.BkUnderCh13Cnt7Y := IF(ResultsFound,(INTEGER)RIGHT.BkUnderCh13Cnt7Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);
+			SELF.BkUnderCh13Cnt10Y := IF(ResultsFound,(INTEGER)RIGHT.BkUnderCh13Cnt10Y, PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND_INT);			
 			SELF := LEFT;
 		),LEFT OUTER, KEEP(1)); 
 	
@@ -194,7 +206,19 @@ ENDMACRO;
 			SELF.MonSinceOldestBkCnt1Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.MonSinceOldestBkCnt7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
 			SELF.MonSinceOldestBkCnt10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
-			SELF := LEFT)); 	
+			SELF.ChForBksList1Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.ChForBksList7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.ChForBksList10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.BkWithNewestDateCh1Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.BkWithNewestDateCh7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.BkWithNewestDateCh10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			SELF.BkUnderCh7Cnt1Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BkUnderCh7Cnt7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BkUnderCh7Cnt10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BkUnderCh13Cnt1Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BkUnderCh13Cnt7Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF.BkUnderCh13Cnt10Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;
+			SELF := LEFT)); 
 			
 	PersonAttributes := SORT( PersonAttributesWithLexID + PersonAttributesWithoutLexID, InputUIDAppend ); 
 	
