@@ -106,7 +106,6 @@ export t_IFRIdentity := record
 	dataset(t_IFRPhone) PhoneInfo {xpath('PhoneInfo/Item'), MAXCOUNT(iesp.constants.IFR.MaxBestPhones)};
 	t_IFRDOB DOBInfo {xpath('DOBInfo')};
 	iesp.share.t_Date DOD {xpath('DOD')};
-	boolean IsLimitedAccessDMF {xpath('IsLimitedAccessDMF')};//hidden[internal]
 	string7 Gender {xpath('Gender')}; //values['Male','Female','Unknown','']
 end;
 		

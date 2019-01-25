@@ -139,6 +139,14 @@ export ToEdina_54( dataset(riskprocessing.layouts.layout_internal_shell) bs, boo
 		// new shell 2.5 fields
 		self.isFCRA := if(isFCRA,'1','0');
 		
+		//blank out new Cross Industry score and reason codes until fixes to the model are in - 12/6/2017
+		self.rv_scores.crossindv5 := '';
+		self.rv_scores.reason1cv5 := '';
+		self.rv_scores.reason2cv5 := '';
+		self.rv_scores.reason3cv5 := '';
+		self.rv_scores.reason4cv5 := '';
+		self.rv_scores.reason5cv5 := '';
+
 		self.rv_scores := if( isFCRA, le.rv_scores); // riskview not populated in non-fcra
 		self.fd_scores := if(~isFCRA, le.fd_scores); // fraud defender not populated in fcra
 		////////////
@@ -543,13 +551,13 @@ export ToEdina_54( dataset(riskprocessing.layouts.layout_internal_shell) bs, boo
 	self.velocity_counters.adls_per_curraddr_current := le.best_flags.adls_per_curraddr_curr; 
 	self.velocity_counters.ssns_per_curraddr_current := le.best_flags.ssns_per_curraddr_curr;  
 	self.velocity_counters.phones_per_curraddr_current := le.best_flags.phones_per_curraddr_curr; 
-	// self.velocity_counters.adls_per_bestphone_current := le.best_flags.adls_per_bestphone_curr; 
+	self.velocity_counters.adls_per_bestphone_current := le.best_flags.adls_per_bestphone_curr; 
 	self.velocity_counters.adls_per_bestssn_created_6months := le.best_flags.adls_per_bestssn_c6;	
 	self.velocity_counters.addrs_per_bestssn_created_6months := le.best_flags.addrs_per_bestssn_c6; 
 	self.velocity_counters.adls_per_curraddr_created_6months := le.best_flags.adls_per_curraddr_c6;
 	self.velocity_counters.ssns_per_curraddr_created_6months := le.best_flags.ssns_per_curraddr_c6; 
 	self.velocity_counters.phones_per_curraddr_created_6months := le.best_flags.phones_per_curraddr_c6;  
-	// self.velocity_counters.adls_per_bestphone_created_6months := le.best_flags.adls_per_bestphone_c6;
+	self.velocity_counters.adls_per_bestphone_created_6months := le.best_flags.adls_per_bestphone_c6;
 	self.acc_logs := le.best_flags; // transfer the rest of the best_flags into the acc_logs section, everything in risk_indicators.layouts.layout_best_pii_inquiries
 
 	//New for 5.3
@@ -630,22 +638,13 @@ export ToEdina_54( dataset(riskprocessing.layouts.layout_internal_shell) bs, boo
 	self.bus_addr_only_curr										:= le.Address_Verification.bus_addr_only_curr;
 	self.bus_addr_only												:= le.Address_Verification.bus_addr_only;
 	
-	self.Address_Verification.bus_property_owned_total						:= le.Address_Verification.bus_owned.property_total;
-	self.Address_Verification.bus_property_owned_assess_total			:= le.Address_Verification.bus_owned.property_owned_assessed_total;
-	self.Address_Verification.bus_property_owned_assess_count			:= le.Address_Verification.bus_owned.property_owned_assessed_count;
-	self.Address_Verification.bus_property_sold_total							:= le.Address_Verification.bus_sold.property_total;
-	self.Address_Verification.bus_property_sold_assess_total			:= le.Address_Verification.bus_sold.property_owned_assessed_total;
-	self.Address_Verification.bus_property_sold_assess_count			:= le.Address_Verification.bus_sold.property_owned_assessed_count;
+	self.bus_property_owned_total							:= le.Address_Verification.bus_owned.property_total;
+	self.bus_property_owned_assess_total			:= le.Address_Verification.bus_owned.property_owned_assessed_total;
+	self.bus_property_owned_assess_count			:= le.Address_Verification.bus_owned.property_owned_assessed_count;
+	self.bus_property_sold_total							:= le.Address_Verification.bus_sold.property_total;
+	self.bus_property_sold_assess_total				:= le.Address_Verification.bus_sold.property_owned_assessed_total;
+	self.bus_property_sold_assess_count				:= le.Address_Verification.bus_sold.property_owned_assessed_count;
 
-  self.bus_SOS_filings_peradl                   := le.BIP_Header.bus_SOS_filings_peradl;
-  self.bus_active_SOS_filings_peradl            := le.BIP_Header.bus_active_SOS_filings_peradl;
-  self.bus_sos_filings_not_instate              := le.BIP_Header54.bus_sos_filings_not_instate;
-  self.bus_ucc_count                            := le.BIP_Header54.bus_ucc_count;
-  self.bus_ucc_active_count                     := le.BIP_Header54.bus_ucc_active_count;
-  self.acc_logs.bus_inq_count12                 := le.BIP_Header54.bus_inq_count12;
-  self.acc_logs.bus_inq_credit_count12          := le.BIP_Header54.bus_inq_credit_count12;
-  self.acc_logs.bus_inq_highriskcredit_count12  := le.BIP_Header54.bus_inq_highriskcredit_count12;
-  self.acc_logs.bus_inq_other_count12           := le.BIP_Header54.bus_inq_other_count12;
 	self := le;
 
 	end;

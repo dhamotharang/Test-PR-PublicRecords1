@@ -379,11 +379,7 @@ MODULE
 			                                   le.CallForwardingIndicator , 
 			                                   ri.CallForwardingIndicator);
 			SELF.PhoneStatus	            := IF(le.phonestatus = PhoneFinder_Services.Constants.PhoneStatus.NotAvailable,ri.phonestatus,le.phonestatus);
-      SELF.carrier_name                := IF(le.carrier_name != '', le.carrier_name, ri.carrier_name);
-      SELF.phone_region_city           := IF(le.phone_region_city != '', le.phone_region_city, ri.phone_region_city);
-      SELF.phone_region_st             := IF(le.phone_region_st != '', le.phone_region_st, ri.phone_region_st);   
-    
-			SELF                 		         := le;
+			SELF                 		       := le;
 		END;		
 		dPhoneRollup := ROLLUP(dPhoneSort,
 														LEFT.acctno = RIGHT.acctno and
@@ -430,15 +426,9 @@ MODULE
 				SELF.coc_description   := IF(ri.ServiceClass != '',
 																			PhoneFinder_Services.Functions.ServiceClassDesc(ri.ServiceClass),
 																			le.coc_description);
-				SELF.carrier_name      := MAP(ri.operatingcompany.name != ''=> ri.operatingcompany.name,
-                                      ri.carrier_name != ''=> ri.carrier_name,
-                                      le.carrier_name);
-				SELF.phone_region_city := MAP(ri.operatingcompany.address.city != '' => ri.operatingcompany.address.city,
-                                      ri.phone_region_city != ''=> ri.phone_region_city,
-                                      le.phone_region_city);
-				SELF.phone_region_st   := MAP(ri.operatingcompany.address.state != '' => ri.operatingcompany.address.state,
-                                      ri.phone_region_st != ''=> ri.phone_region_st,
-                                      le.phone_region_st);
+				SELF.carrier_name      := IF(ri.operatingcompany.name != '',ri.operatingcompany.name,le.carrier_name);
+				SELF.phone_region_city := IF(ri.operatingcompany.address.city != '',ri.operatingcompany.address.city,le.phone_region_city);
+				SELF.phone_region_st   := IF(ri.operatingcompany.address.state != '',ri.operatingcompany.address.state,le.phone_region_st);
 				SELF.CallForwardingIndicator                   :=  le.CallForwardingIndicator;
 				SELF                   := ri;
 			END;
@@ -565,11 +555,11 @@ MODULE
    			OUTPUT(dPhoneRollup,NAMED('dPhoneRollup_Primary'),EXTEND);			
    			OUTPUT(dPrimaryPhoneDetail,NAMED('dPrimaryPhoneDetail_Primary'),EXTEND);
    			OUTPUT(dPhoneDetail_,NAMED('dPhoneDetail_'),EXTEND);		
-			  OUTPUT(dTUPhonesOnly,NAMED('dTUPhonesOnly'),EXTEND);				
-   		  OUTPUT(dAllPhonesDetail_,NAMED('dAllPhonesDetail_'),EXTEND);			
-   		  OUTPUT(dPhoneDetail,NAMED('dPhoneDetail_Primary'),EXTEND);
-        OUTPUT(dPhoneIesp,NAMED('dPhoneIesp_Primary'),EXTEND);
-			  OUTPUT(dPhoneIesp_Final,NAMED('dPhoneIesp_Final'),EXTEND);
+					 OUTPUT(dTUPhonesOnly,NAMED('dTUPhonesOnly'),EXTEND);				
+   			OUTPUT(dAllPhonesDetail_,NAMED('dAllPhonesDetail_'),EXTEND);			
+   			OUTPUT(dPhoneDetail,NAMED('dPhoneDetail_Primary'),EXTEND);
+      OUTPUT(dPhoneIesp,NAMED('dPhoneIesp_Primary'),EXTEND);
+			   OUTPUT(dPhoneIesp_Final,NAMED('dPhoneIesp_Final'),EXTEND);
 		 #END
 
 		RETURN dPhoneIesp_Final;

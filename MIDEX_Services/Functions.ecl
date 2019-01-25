@@ -531,7 +531,6 @@ EXPORT Functions :=
                           SELF.Gender     := ds_Person_in.BestInfo.Gender;
                           SELF.Address    := ds_Person_in.BestInfo.Address;
                           SELF.DOD        := ds_Person_in.BestInfo.DOD;
-                          SELF.IsLimitedAccessDMF        := ds_Person_in.BestInfo.IsLimitedAccessDMF;
                           SELF.Deceased   := ds_Person_in.BestInfo.Deceased;     //values['U','Y','N','']
                           SELF.AgeAtDeath := ds_Person_in.BestInfo.AgeAtDeath;
                           SELF.Age        := ds_Person_in.BestInfo.Age;
