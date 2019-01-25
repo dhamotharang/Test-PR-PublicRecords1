@@ -1,9 +1,11 @@
 ﻿IMPORT Header, FraudShared, ut;
 //1.Send main dataset to append lexid
-EXPORT Append_RinID(DATASET(FraudShared.Layouts.Base.Main) FileBase) := FUNCTION
+EXPORT Append_RinID(
+	 dataset(FraudShared.Layouts.Base.Main) FileBase
+	,dataset(FraudShared.Layouts.Base.Main) Previous_Build = FraudShared.Files().Base.Main.Built
+) := FUNCTION
 	
 	// 2.Take new records w/o a lexid and join them to previous main file (AKA rinid, flexid, no match id)
-	Previous_Build := FraudShared.Files().Base.Main.built;
 	
 	previous_base 	:= distribute(pull(Previous_Build), hash32(record_id)) ;
 	building_base := distribute(pull(FileBase), hash32(record_id));

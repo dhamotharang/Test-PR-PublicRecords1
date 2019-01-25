@@ -8,8 +8,12 @@ module
 	nodes				:= thorlib.nodes();	
 
 	Sources_To_Anonymize := Files().Input.SourcesToAnonymize.Sprayed;
-	Father_Data := FraudShared.Files().Base.Main.Father;
-	Demo_Data	:= Files().Input.DemoData.Sprayed;
+
+	empty := dataset([], FraudShared.Layouts.Base.Main);
+
+	Father_Data := if(nothor(STD.File.GetSuperFileSubCount( FraudShared.Filenames().Base.Main.Father )) > 0, FraudShared.Files().Base.Main.Father,empty);
+	Demo_Data	:= if(nothor(STD.File.GetSuperFileSubCount( Filenames().Input.DemoData.Sprayed )) > 0, Files().Input.DemoData.Sprayed,empty);
+
 	FatherBaseAndDemo := if(_Flags.UseDemoData, Father_Data + Demo_Data, Father_Data);
 	
 	anonymize_Records_Never_Anonymized_Before := join ( distribute(pBaseFile,hash32(record_id)),
