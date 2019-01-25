@@ -33,7 +33,9 @@ module
 	
 	Functions.CleanFields(inKnownFraudUpdate ,inKnownFraudUpdateUpper); 
 	
-	Layouts.Input.knownfraud tr(inKnownFraudUpdateUpper l) := transform
+	max_uid := max(KnownFraud_Sprayed, KnownFraud_Sprayed.unique_id) :	global;
+
+	Layouts.Input.knownfraud tr(inKnownFraudUpdateUpper l, integer cnt) := transform
 		sub:=stringlib.stringfind(l.fn,'20',1);
 		sub2:=stringlib.stringfind(l.fn,'.dat',1)-6;
 		FileDate := (unsigned)l.fn[sub..sub+7];
@@ -60,13 +62,13 @@ module
 			,STD.Str.Contains( l.fn, 'SafeList', true) => 'SAFELIST'
 			,'UNKNOWN');
 		self.source_input := source_input;
-		SELF.unique_id := 0;	
+		SELF.unique_id := max_uid + cnt; 	
 		self.Deltabase := 0;
 		self:=l;
 		self:=[];
 	end;
 
-	shared f1:=project(inKnownFraudUpdateUpper, tr(left));
+	shared f1:=project(inKnownFraudUpdateUpper, tr(left, counter));
 	
 
 	f1_errors:=f1

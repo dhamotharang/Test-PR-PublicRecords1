@@ -37,7 +37,9 @@ module
 
 	Functions.CleanFields(inIdentityDataUpdate ,inIdentityDataUpdateUpper); 
 
-	Layouts.Input.IdentityData tr(inIdentityDataUpdateUpper l) := transform
+	max_uid := max(IdentityData_Sprayed, IdentityData_Sprayed.unique_id) :	global;
+
+	Layouts.Input.IdentityData tr(inIdentityDataUpdateUpper l, integer cnt) := transform
 		sub:=stringlib.stringfind(l.fn,'20',1);
 		sub2:=stringlib.stringfind(l.fn,'.dat',1)-6;
 		FileDate := (unsigned)l.fn[sub..sub+7];
@@ -61,13 +63,13 @@ module
 		self.file_type := 3 ;
 		source_input := if (l.source_input = '', 'IDDT',l.source_input);
 		self.source_input := source_input;
-		SELF.unique_id := 0; 
+		SELF.unique_id := max_uid + cnt; 
 		self.Deltabase := 0;
 		self:=l;
 		self:=[];
 	end;
 
-	shared f1:=project(inIdentityDataUpdateUpper,tr(left));
+	shared f1:=project(inIdentityDataUpdateUpper,tr(left, counter));
 	
 	f1_errors:=f1
 		((	 
