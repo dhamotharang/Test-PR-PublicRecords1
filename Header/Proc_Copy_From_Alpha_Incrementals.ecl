@@ -275,6 +275,7 @@ SHARED orbit_update_entries(string createORupdate, string skipPackage='000') := 
                         if(skipPackage[3]='0',output(update_entry('Header_IKB'     ,lastestWklyversionOnThor,'N')))
                 )
        );
+
 END;
 
 // check if we have a local copy already   
@@ -308,11 +309,10 @@ EXPORT movetoQA(string filedt) := sequential(
     copy_to_dataland
     );
         
-EXPORT deploy(string emailList,string rpt_qa_email_list,string skipPackage='000') := sequential(               
-    udops(skipPackage),
-    orbit_update_entries('create',skipPackage),
-    orbit_update_entries('update',skipPackage),
-    std.system.Email.SendEmail(rpt_qa_email_list+','+emailList,'New boca Header IKB deployment',
+EXPORT deploy(string emailList,string rpt_qa_email_list,string skipPackage='000') := sequential(  
+
+         // std.system.Email.SendEmail(rpt_qa_email_list+','+emailList,'New boca Header IKB deployment',
+         std.system.Email.SendEmail(emailList,'New boca Header IKB deployment',
          
          'Hello,\n\nPlease note that the following datasets have been updated for CERT deployment:'
         +'\n\n'
@@ -328,6 +328,10 @@ EXPORT deploy(string emailList,string rpt_qa_email_list,string skipPackage='000'
         +'If you have any question or concerns please contact:\n'
         +'Debendra.Kumar@lexisnexisrisk.com\n'
         +'gabriel.marcan@lexisnexisrisk.com\n'
-        +'\nThank you,');    
+        +'\nThank you,'),
+            
+    udops(skipPackage),
+    orbit_update_entries('create',skipPackage),
+    orbit_update_entries('update',skipPackage)
 );
 END;
