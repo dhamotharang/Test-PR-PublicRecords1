@@ -139,6 +139,14 @@ export ToEdina_53( dataset(riskprocessing.layouts.layout_internal_shell) bs, boo
 		// new shell 2.5 fields
 		self.isFCRA := if(isFCRA,'1','0');
 		
+		//blank out new Cross Industry score and reason codes until fixes to the model are in - 12/6/2017
+		self.rv_scores.crossindv5 := '';
+		self.rv_scores.reason1cv5 := '';
+		self.rv_scores.reason2cv5 := '';
+		self.rv_scores.reason3cv5 := '';
+		self.rv_scores.reason4cv5 := '';
+		self.rv_scores.reason5cv5 := '';
+
 		self.rv_scores := if( isFCRA, le.rv_scores); // riskview not populated in non-fcra
 		self.fd_scores := if(~isFCRA, le.fd_scores); // fraud defender not populated in fcra
 		////////////
