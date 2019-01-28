@@ -4,7 +4,7 @@ config := Header.SprayConfigFileContents('CD_SEED').Read;
 
 export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
  	{config.lz_ip   //SourceIP
- 	,config.lz_dir + '/spraying/'             //SourceDirectory
+ 	,config.lz_dir + 'spraying/'             //SourceDirectory
  	,'*.csv'                           //directory_filter
  	,0                                 //record_size	     record length of files to be sprayed(for fixed length files only)      
  	,_Dataset(pUseProd).thor_cluster_Files+ 'in::' + _Dataset().Name + '::@version@'
