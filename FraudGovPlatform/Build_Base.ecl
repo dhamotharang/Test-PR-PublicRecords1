@@ -6,20 +6,27 @@ EXPORT Build_Base(
 ) :=
 module
 
+	// Modules
+	export Run_IdentityData := Build_Base_IdentityData(pversion,MBS_Sprayed).All;
+	export Run_KnownFraud := Build_Base_KnownFraud(pversion,MBS_Sprayed).All;
+	export Run_Deltabase := Build_Base_Deltabase(pversion,MBS_Sprayed).All;
+	export Run_AddressCache := Build_Base_AddressCache(pversion).All;
+	export Run_Main := MapToCommon(pversion).Build_Main.All;
+	export Run_Anonymize := Build_Base_Anonymized(pversion).All;
+	export Run_Demo := Append_DemoData(pversion);
+	export Promote_Base := Promote(pversion).promote_base;
+
 	export All :=
 	if(tools.fun_IsValidVersion(pversion)
 		,sequential(
-			 parallel(
-				 Build_Base_IdentityData(pversion,MBS_Sprayed).All
-				,Build_Base_KnownFraud(pversion,MBS_Sprayed).All	 
-				,Build_Base_Deltabase(pversion,MBS_Sprayed).All
-			 )
-			 , Build_Base_AddressCache(pversion).All
-			 , Promote(pversion).buildfiles.New2Built
-			 , MapToCommon(pversion).Build_Base_Main_File.All
-			 , Build_Base_Anonymized(pversion).All
-			 , Append_DemoData(pversion)
-			 , FraudgovInfo(pversion,'Base_Completed').postNewStatus
+			  Run_IdentityData
+			, Run_KnownFraud
+			, Run_Deltabase
+			, Run_AddressCache
+			, Run_Main
+			, Run_Anonymize
+			, Run_Demo
+			, Promote_Base
 		) 
 		,output('No Valid version parameter passed, skipping FraudGovPlatform.Build_Base atribute')
 	 );

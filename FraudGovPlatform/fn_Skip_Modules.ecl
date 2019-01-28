@@ -1,8 +1,8 @@
 ﻿import FraudGovPlatform,PromoteSupers;
 EXPORT fn_Skip_Modules (
-	boolean SkipBaseBuild = false,
-	boolean SkipBaseRollback = false,
-	boolean SkipKeysBuild = false,
+	boolean SkipBaseBuild = true,
+	boolean SkipBaseRollback = true,
+	boolean SkipKeysBuild = true,
 	boolean SkipNACBuild = true,
 	boolean SkipInquiryLogsBuild = true,
 	boolean SkipPiiBuild = true,

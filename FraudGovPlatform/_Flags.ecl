@@ -1,4 +1,4 @@
-﻿import tools, FraudShared;
+﻿import ut, tools, FraudShared;
 
 export _Flags :=
 module
@@ -22,6 +22,7 @@ module
 			export KnownFraud := count(nothor(FileServices.SuperFileContents(Filenames().Base.KnownFraud.Built))) > 0;
 			export Deltabase := count(nothor(FileServices.SuperFileContents(Filenames().Base.Deltabase.Built))) > 0;
 			export Main := count(nothor(FileServices.SuperFileContents(FraudShared.Filenames().Base.Main.Built))) > 0;
+			export MainFather := count(nothor(FileServices.SuperFileContents(FraudShared.Filenames().Base.Main.Father))) > 0;
 			export Pii := count(nothor(FileServices.SuperFileContents(Filenames().Base.Pii.Built))) > 0;
 		end;
 	end;
@@ -29,11 +30,11 @@ module
 // put the conditions when to update individual Base files. 
 
 	export Update := module
-		export IdentityData := FileExists.Input.IdentityData and FileExists.Base.IdentityData;
-		export KnownFraud := FileExists.Input.KnownFraud and FileExists.Base.KnownFraud;
-		export Deltabase := FileExists.Input.Deltabase and FileExists.Base.Deltabase;
-		export Main := FileExists.Input.IdentityData and FileExists.Base.Main;
-		export Pii := FileExists.Base.Main and FileExists.Base.Pii;
+		export IdentityData := FileExists.Base.IdentityData;
+		export KnownFraud := FileExists.Base.KnownFraud;
+		export Deltabase := FileExists.Base.Deltabase;
+		export Main := FileExists.Base.Main;
+		export Pii := FileExists.Base.Pii;
 	end;
 	export Skipped := module
 		export IdentityData := ~FileExists.Input.IdentityData ;

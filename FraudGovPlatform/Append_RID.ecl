@@ -1,7 +1,7 @@
 ﻿IMPORT Header, FraudShared, ut;
 EXPORT Append_RID(
 	 dataset(FraudShared.Layouts.Base.Main) FileBase
-	,dataset(FraudShared.Layouts.Base.Main) Previous_Build = FraudShared.Files().Base.Main.Built
+	,dataset(FraudShared.Layouts.Base.Main) Previous_Build = IF(_Flags.FileExists.Base.Main, FraudShared.Files().Base.Main.Built, DATASET([], FraudShared.Layouts.Base.Main))
 ) := FUNCTION
     
     max_rid := max(Previous_Build, Previous_Build.Record_ID) :	global;

@@ -49,12 +49,17 @@ module
 	export buildfiles	:= tools.mod_PromoteBuild(pversion,pBuildFilenames,pFilter,pDelete,pIsTesting);
 
 	export promote_inputs := sequential(
-			 inputfiles.Sprayed2Using
-			,inputfiles.Using2Used
-			,inputfiles.New2Sprayed
+			  inputfiles.Sprayed2Using
+			, inputfiles.Using2Used
+			, inputfiles.New2Sprayed
+			, HeaderInfo.Post
+			, AddressesInfo(pversion).Post
 	);
 	export promote_base := sequential(
-			 buildfiles.Built2QA			
+			  buildfiles.Built2QA
+ 			, FraudgovInfo(pversion,'Base_Completed').postNewStatus
+			, notify('Base_Completed','*')
+
 	);
 
 	export promote_keys := sequential(
