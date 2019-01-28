@@ -19,7 +19,6 @@ export proc_header(string operatorEmailList, string extraNotifyEmailList) := mod
     SHARED INGEST(boolean incremental=FALSE,string versionBuild)
        := sequential(
             #stored ('version'  , versionBuild); 
-            #WORKUNIT('name', versionBuild + ' Header Ingest');         
             if(~incremental and versionBuild[5..6]<>fn[sub+4..sub+5],fail('Current month Equifax missing'))
            ,check_eq_monthly_file_version
            ,Header.Inputs_Sequence(incremental,versionBuild)
