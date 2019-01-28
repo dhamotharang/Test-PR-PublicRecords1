@@ -393,6 +393,7 @@ export t_Identity := record
 	string18 DeathCounty {xpath('DeathCounty')};
 	string2 DeathState {xpath('DeathState')};
 	string1 DeathVerificationCode {xpath('DeathVerificationCode')};
+	boolean IsLimitedAccessDMF {xpath('IsLimitedAccessDMF')};
 end;
 		
 export t_DocumentSource := record

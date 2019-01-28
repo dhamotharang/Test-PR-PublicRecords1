@@ -1,4 +1,4 @@
-// In this first pass, we're trying to replicate the structure and even the
+﻿// In this first pass, we're trying to replicate the structure and even the
 // fieldnames of the existing asset services.  The next pass needs to change
 // all those fieldnames and their types to reflect those of the data -- the
 // existing structure should be preserved, however.
@@ -107,6 +107,7 @@ export layouts := module
 		DATASET(risk_indicators.layout_desc) hri_ssn {maxcount(max_hri)};
 		date.ymd		dob;	
 		date.ymd		dod;
+		boolean IsLimitedAccessDMF { xpath('IsLimitedAccessDMF')	};
 		unsigned1		age_at_death						{ xpath('age-at-death')	};
 		string1			death_verification_code	{ xpath('death-verification-code')	};
 		string3			age;
