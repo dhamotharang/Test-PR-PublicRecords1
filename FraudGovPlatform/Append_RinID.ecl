@@ -2,7 +2,7 @@
 //1.Send main dataset to append lexid
 EXPORT Append_RinID(
 	 dataset(FraudShared.Layouts.Base.Main) FileBase
-	,dataset(FraudShared.Layouts.Base.Main) Previous_Build = FraudShared.Files().Base.Main.Built
+	,dataset(FraudShared.Layouts.Base.Main) Previous_Build = IF(_Flags.FileExists.Base.Main, FraudShared.Files().Base.Main.Built, DATASET([], FraudShared.Layouts.Base.Main))
 ) := FUNCTION
 	
 	// 2.Take new records w/o a lexid and join them to previous main file (AKA rinid, flexid, no match id)

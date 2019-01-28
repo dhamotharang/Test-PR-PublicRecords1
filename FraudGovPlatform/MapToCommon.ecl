@@ -1,7 +1,7 @@
 ﻿import FraudShared, STD; 
 EXPORT MapToCommon  (
 	 string pversion
-	,dataset(FraudShared.Layouts.Base.Main) pBaseMainFile = FraudShared.Files().Base.Main.Built
+	,dataset(FraudShared.Layouts.Base.Main) pBaseMainFile = IF(_Flags.Update.Main, FraudShared.Files().Base.Main.Built, DATASET([], FraudShared.Layouts.Base.Main))
 	,dataset(Layouts.Base.IdentityData) inBaseIdentityData = Files().Base.IdentityData.Built
 	,dataset(Layouts.Base.KnownFraud) inBaseKnownFraud = Files().Base.KnownFraud.Built
 	,dataset(Layouts.Base.Deltabase) inBaseDeltabase = Files().Base.Deltabase.Built
@@ -120,14 +120,14 @@ module
 	CombinedClassification := Functions.Classification(IdentityData + KnownFraud + Deltabase); 
 		 
 	// Filter header records
-	NewBaseCombined := CombinedClassification (Customer_event_id not in ['CUST_ID_NUM','CUSTOMERID']);
+	EXPORT NewBaseCombined := CombinedClassification (Customer_event_id not in ['CUST_ID_NUM','CUSTOMERID']);
 
  	// Append rid
-	NewBaseRID := Append_RID (NewBaseCombined,pBaseMainFile); 
+	EXPORT NewBaseRID := Append_RID (NewBaseCombined,pBaseMainFile); 
 
 	// Append RinID
-	NewBaseRinID := Append_RinID (NewBaseRID,pBaseMainFile);
+	EXPORT NewBaseRinID := Append_RinID (NewBaseRID,pBaseMainFile);
 
-	EXPORT Build_Base_Main_File := FraudShared.Build_Base_Main(pversion,NewBaseRinID);
+	EXPORT Build_Main := FraudShared.Build_Base_Main(pversion,NewBaseRinID);
 
 END;
