@@ -149,6 +149,7 @@ export DodRec := RECORD
 	doxie.Layout_HeaderFileSearch.dod;
 	doxie.Layout_HeaderFileSearch.dead_age;
 	string1 deceased := 'U';
+	boolean IsLimitedAccessDMF := False;
 END;
 
 export DIDRec := RECORD

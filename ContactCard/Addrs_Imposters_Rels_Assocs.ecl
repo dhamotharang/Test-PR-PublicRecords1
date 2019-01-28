@@ -2,7 +2,7 @@
 // Attribute Information: Fetches Imposters, AKAs, and Subject_Information for ContactCard ReportService.
 
 import ut, doxie, suppress, codes, driversv2_services, watchdog, risk_indicators, DeathV2_Services,
-       header, PersonReports, AutoStandardI;
+       header, PersonReports, AutoStandardI, MDR;
 
 t_yesNo	:= PersonReports.layouts.t_yesNo; // string3
 yesNo		:= PersonReports.layouts.yesNo;
@@ -97,6 +97,7 @@ shared roll_dlsr := rollup(dlsr_formatted,group,roll_drivers(left,rows(left)));
 shared with_ssn_info := record
 	PersonReports.layouts.comp_names;
 	unsigned4 dod;
+	boolean IsLimitedAccessDMF := false;
 	unsigned1 age_at_death;
 	string1 death_verification_code;
 	string1 deceased;
@@ -196,10 +197,12 @@ names_imposters := join(pre_names_imposters,bestrecs,left.ssn=right.ssn_unmasked
 
 with_issuance_info_imposters := join(ssn_info,names_imposters,left.ssn_unmasked=right.ssn and left.did <> right.did,add_issuance_imposters(left),keep(1));
 
+
 with_ssn_info get_dead(with_ssn_info l,doxie.key_death_masterv2_ssa_did r):=transform
 	self.dod := (unsigned4)r.dod8;
 	self.death_verification_code := r.VorP_code; //r.death_code;
 	self.deceased := 'Y';
+	self.IsLimitedAccessDMF := (r.src = MDR.sourceTools.src_Death_Restricted);
 	self := l;
 	self := [];
 END;
@@ -207,13 +210,14 @@ END;
 is_glb_ok := mod_access.isValidGLB (checkrna);
 deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
 
-imposters_w_d_info := dedup(sort(
+imposters_w_d_info  := dedup(sort(
 														join(with_issuance_info_imposters,doxie.key_death_masterv2_ssa_did, 
 																keyed(left.did =right.l_did) and right.dod8!='' and 
 																not DeathV2_Services.Functions.Restricted(right.src, right.glb_flag, is_glb_ok, deathparams),
 																get_dead(left,right),left outer,limit(1000)),
 													did,record,if(death_verification_code<>'',0,1)),
 											did,record,except dod, death_verification_code);
+
 
 with_did := record
 	dataset(personReports.Layouts.identity) akas {maxcount(20)};
@@ -222,6 +226,7 @@ with_did := record
 END;
 
 personReports.Layouts.identity identity_flat(with_ssn_info l):=transform
+ self.IsLimitedAccessDMF := l.IsLimitedAccessDMF;
 	get_id()
 END;
 
