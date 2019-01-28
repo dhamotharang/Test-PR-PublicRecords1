@@ -1,4 +1,5 @@
-﻿MODULE:Scrubs_OKC_Student_List_V2
+﻿OPTIONS:-gh
+MODULE:Scrubs_OKC_Student_List_V2
 FILENAME:OKC_Student_List
 //Uncomment up to NINES for internal or external adl
 //IDFIELD:EXISTS:<NameOfIDField>
@@ -19,8 +20,7 @@ FIELDTYPE:alphasandnums:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwx
 FIELDTYPE:allupper:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZÅÉÑÕÚÜÍáãñóöé)
 // FIELDTYPE:allupperandnums:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZÅÉÑÕÚÜÍáãñóöé0123456789)
 // FIELDTYPE:allalphaandnums:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZÅÉÑÕÚÜÍáãñóöéabcdefghijklmnopqrstuvwxyz0123456789)
-FIELDTYPE:blank:LENGTHS(0)
-FIELDTYPE:invalid_blank:LIKE(blank)
+FIELDTYPE:invalid_blank:LENGTHS(0)
 // FIELDTYPE:invalid_alpha:SPACES( ):ALLOW( &(),-/.'#:;*;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz)
 FIELDTYPE:invalid_date:LIKE(nums):SPACES( ):LENGTHS(0,8)
 FIELDTYPE:invalid_AttendanceDate:ALLOW( /;0123456789SPRINGUMEFALTW)
@@ -36,6 +36,8 @@ FIELDTYPE:invalid_semester:ENUM(SPRING|SUMMER|FALL|AUTUMN|WINTER|):LENGTHS(0,4,6
 // FIELDTYPE:invalid_csz:SPACES( ):ALLOW( ,-ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789)
 FIELDTYPE:invalid_email:LIKE(alphasandnums):SPACES(.@-_)
 FIELDTYPE:invalid_addresstype:ENUM(CURRENT|Permanent|DORM|HOME|)
+FIELDTYPE:invalid_MajorCode:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ)
+FIELDTYPE:invalid_NewMajorCode:CUSTOM(Scrubs_OKC_Student_List_V2.validNewMajorCode>0)
 FIELD:cleanaddr1:TYPE(STRING100):LIKE(invalid_address):0,0
 FIELD:cleanaddr2:TYPE(STRING100):LIKE(invalid_address):0,0
 FIELD:cleanattendancedte:0,0
@@ -84,15 +86,15 @@ FIELD:middlename:0,0
 FIELD:lastname:0,0
 FIELD:suffix:0,0
 FIELD:major:0,0
-FIELD:COLLEGE_MAJOR:LIKE():0,0
-FIELD:NEW_COLLEGE_MAJOR:LIKE():0,0
+FIELD:COLLEGE_MAJOR:LIKE(invalid_MajorCode):0,0
+FIELD:NEW_COLLEGE_MAJOR:LIKE(invalid_NewMajorCode):0,0
 FIELD:grade:0,0
 FIELD:email:0,0
 FIELD:dateofbirth:TYPE(STRING8):LIKE(invalid_date):0,0
 FIELD:dob_formatted:TYPE(STRING8):LIKE(invalid_date):0,0
 FIELD:attendancedate:0,0
 FIELD:enrollmentstatus:0,0
-FIELD:addresstype:TYPE(STRING5):LIKE(invalid_addressType):0,0
+FIELD:addresstype:TYPE(STRING5):LIKE(invalid_addresstype):0,0
 FIELD:address1:0,0
 FIELD:address2:0,0
 FIELD:city:0,0

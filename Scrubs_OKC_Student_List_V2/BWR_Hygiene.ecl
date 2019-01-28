@@ -1,0 +1,130 @@
+﻿//This is the code to execute in a builder window
+#OPTION('multiplePersistInstances', FALSE);
+#workunit('name','Scrubs_OKC_Student_List_V2.BWR_Hygiene - Hygiene & Stats - SALT V3.11.4');
+IMPORT Scrubs_OKC_Student_List_V2,SALT311;
+// First create an instantiated hygiene module
+  infile := Scrubs_OKC_Student_List_V2.In_OKC_Student_List;
+  ip := DISTRIBUTE(infile, SKEW(0.1));
+  h := Scrubs_OKC_Student_List_V2.hygiene(ip);
+  p := h.AllProfiles; // Detailed profile of every field
+  OUTPUT(h.Summary('SummaryReport'),ALL,NAMED('Summary'));
+  OUTPUT(h.SourceCounts,ALL,NAMED('SourceCounts'));
+  OUTPUT(h.CrossLinkingPotential,ALL,NAMED('CrossLinkingPotential'));
+  OUTPUT(h.invSummary,NAMED('InvertedSummary'),ALL);
+  OUTPUT(p,NAMED('AllProfiles'),ALL); // Detailed profile of every field
+  OUTPUT(h.Correlations,NAMED('Correlations'),ALL); // Which fields are related to which other fields
+  OUTPUT(h.ValidityErrors,NAMED('ValidityErrors'),ALL); // Violations of FieldType statements
+  OUTPUT(SALT311.MAC_Character_Counts.EclRecord(p,'Layout_OKC_Student_List'),NAMED('OptimizedLayout'));// File layout suggested by data
+  // Produces field types that match the most common 99.9% of your data. Change to 100 to match all your data
+  OUTPUT(SALT311.MAC_Character_Counts.FieldTypes(p,99.9),NAMED('Types'));
+  // ****** Cross Tabs *******
+  // It is possible to create a cross table between any two fields, see documentation on SALT311.MAC_CrossTab
+  // These commented out lines will create crosstabs from the sourcefield to each individual field
+  // IF you find yourself using ALL of these a LOT - let me know, I can make the 'all' case faster
+   Examples := 10;
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,cleanaddr1,Examples),NAMED('cleanaddr1Bycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,cleanaddr2,Examples),NAMED('cleanaddr2Bycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,cleanattendancedte,Examples),NAMED('cleanattendancedteBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,cleancity,Examples),NAMED('cleancityBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,cleanstate,Examples),NAMED('cleanstateBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,cleandob,Examples),NAMED('cleandobBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,cleanupdatedte,Examples),NAMED('cleanupdatedteBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,cleanemail,Examples),NAMED('cleanemailBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,append_email_username,Examples),NAMED('append_email_usernameBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,append_domain,Examples),NAMED('append_domainBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,append_domain_type,Examples),NAMED('append_domain_typeBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,append_domain_root,Examples),NAMED('append_domain_rootBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,append_domain_ext,Examples),NAMED('append_domain_extBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,append_is_tld_state,Examples),NAMED('append_is_tld_stateBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,append_is_tld_generic,Examples),NAMED('append_is_tld_genericBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,append_is_tld_country,Examples),NAMED('append_is_tld_countryBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,append_is_valid_domain_ext,Examples),NAMED('append_is_valid_domain_extBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,cleancollegeId,Examples),NAMED('cleancollegeIdBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,cleantitle,Examples),NAMED('cleantitleBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,cleanfirstname,Examples),NAMED('cleanfirstnameBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,cleanmidname,Examples),NAMED('cleanmidnameBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,cleanlastname,Examples),NAMED('cleanlastnameBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,cleansuffixname,Examples),NAMED('cleansuffixnameBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,cleanzip,Examples),NAMED('cleanzipBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,cleanzip4,Examples),NAMED('cleanzip4Bycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,cleanmajor,Examples),NAMED('cleanmajorBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,cleanphone,Examples),NAMED('cleanphoneBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,rcid,Examples),NAMED('rcidBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,did,Examples),NAMED('didBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,process_date,Examples),NAMED('process_dateBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,date_first_seen,Examples),NAMED('date_first_seenBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,date_last_seen,Examples),NAMED('date_last_seenBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,vendor_first_reported,Examples),NAMED('vendor_first_reportedBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,vendor_last_reported,Examples),NAMED('vendor_last_reportedBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,dateupdated,Examples),NAMED('dateupdatedBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,studentid,Examples),NAMED('studentidBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,dartid,Examples),NAMED('dartidBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,collegeid,Examples),NAMED('collegeidBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,projectsource,Examples),NAMED('projectsourceBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,collegestate,Examples),NAMED('collegestateBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,college,Examples),NAMED('collegeBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,semester,Examples),NAMED('semesterBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,year,Examples),NAMED('yearBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,firstname,Examples),NAMED('firstnameBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,middlename,Examples),NAMED('middlenameBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,lastname,Examples),NAMED('lastnameBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,suffix,Examples),NAMED('suffixBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,major,Examples),NAMED('majorBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,COLLEGE_MAJOR,Examples),NAMED('COLLEGE_MAJORBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,NEW_COLLEGE_MAJOR,Examples),NAMED('NEW_COLLEGE_MAJORBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,grade,Examples),NAMED('gradeBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,email,Examples),NAMED('emailBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,dateofbirth,Examples),NAMED('dateofbirthBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,dob_formatted,Examples),NAMED('dob_formattedBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,attendancedate,Examples),NAMED('attendancedateBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,enrollmentstatus,Examples),NAMED('enrollmentstatusBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,addresstype,Examples),NAMED('addresstypeBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,address1,Examples),NAMED('address1Bycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,address2,Examples),NAMED('address2Bycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,city,Examples),NAMED('cityBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,state,Examples),NAMED('stateBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,zip,Examples),NAMED('zipBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,zip4,Examples),NAMED('zip4Bycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,phonetyp,Examples),NAMED('phonetypBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,phonenumber,Examples),NAMED('phonenumberBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,tier,Examples),NAMED('tierBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,school_size_code,Examples),NAMED('school_size_codeBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,competitive_code,Examples),NAMED('competitive_codeBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,tuition_code,Examples),NAMED('tuition_codeBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,title,Examples),NAMED('titleBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,fname,Examples),NAMED('fnameBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,mname,Examples),NAMED('mnameBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,lname,Examples),NAMED('lnameBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,name_suffix,Examples),NAMED('name_suffixBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,name_score,Examples),NAMED('name_scoreBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,prim_range,Examples),NAMED('prim_rangeBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,predir,Examples),NAMED('predirBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,prim_name,Examples),NAMED('prim_nameBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,addr_suffix,Examples),NAMED('addr_suffixBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,postdir,Examples),NAMED('postdirBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,unit_desig,Examples),NAMED('unit_desigBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,sec_range,Examples),NAMED('sec_rangeBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,p_city_name,Examples),NAMED('p_city_nameBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,v_city_name,Examples),NAMED('v_city_nameBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,st,Examples),NAMED('stBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,z5,Examples),NAMED('z5Bycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,z4,Examples),NAMED('z4Bycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,cart,Examples),NAMED('cartBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,cr_sort_sz,Examples),NAMED('cr_sort_szBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,lot,Examples),NAMED('lotBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,lot_order,Examples),NAMED('lot_orderBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,dbpc,Examples),NAMED('dbpcBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,chk_digit,Examples),NAMED('chk_digitBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,rec_type,Examples),NAMED('rec_typeBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,county,Examples),NAMED('countyBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,fips_state,Examples),NAMED('fips_stateBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,fips_county,Examples),NAMED('fips_countyBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,geo_lat,Examples),NAMED('geo_latBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,geo_long,Examples),NAMED('geo_longBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,msa,Examples),NAMED('msaBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,geo_blk,Examples),NAMED('geo_blkBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,geo_match,Examples),NAMED('geo_matchBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,err_stat,Examples),NAMED('err_statBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,telephone,Examples),NAMED('telephoneBycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,tier2,Examples),NAMED('tier2Bycleancollegeid'));
+  //  OUTPUT(SALT311.MAC_CrossTab(infile,cleancollegeid,source,Examples),NAMED('sourceBycleancollegeid'));
