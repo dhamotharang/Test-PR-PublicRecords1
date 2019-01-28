@@ -2,7 +2,7 @@
 /**************************************************************************************************************************************************/
 /* PROJECT: RISK INTELLIGENCE NETWORK - AKA: RIN, OTTO, FraudGov
 /* DOCUMENTATION: https://confluence.rsi.lexisnexis.com/display/GTG/OTTO+-+Data+Build
-/* AUTHORS: DATA ENGINEERING (JOSE BELLO, SESHA NOOKALA, OSCAR BARRIENTOS)
+/* AUTHORS: DATA ENGINEERING (SESHA NOOKALA, OSCAR BARRIENTOS)
 /**************************************************************************************************************************************************/
 import tools, _control, FraudShared, Orbit3, FraudGovPlatform_Validation, STD, FraudGovPlatform_Analytics;
 
@@ -17,9 +17,9 @@ module
 	shared Main_Built := FraudShared.Files().Base.Main.Built;
 	
 	// Vars
-	shared Test_Build := Mac_TestBuild(pversion);
-	shared Test_RecordID := Mac_TestRecordID(pversion);
-	shared Test_RinID := Mac_TestRinID(pversion);	
+	export Test_Build := Mac_TestBuild(pversion);
+	export Test_RecordID := Mac_TestRecordID(pversion);
+	export Test_RinID := Mac_TestRinID(pversion);	
 	shared pBaseMainBuilt := File_keybuild(Main_Built);	
 	shared pRunProd := False; // Default to Cert. Refreshs the RIN Analytics Dashboard in CERT/PROD 
 	shared pUseProdData := True; // Default to prod data. The data used to refresh the RIN Analytics Dashboard
@@ -34,20 +34,22 @@ module
 	shared SkipDashboardsBuild := SkipModules[1].SkipDashboardsBuild; 
 
 	// Modules
-	shared Run_MBS := FraudGovPlatform_Validation.SprayMBSFiles( pversion := pVersion[1..8] );
-	shared Run_Scrubs := Build_Scrubs(pversion,SkipModules);
-	shared Run_Deltabase := FraudGovPlatform_Validation.SprayAndQualifyDeltabase(pversion);
-	shared Run_Inputs := Build_Input(pversion, MBS_File, SkipModules).All;
-	shared Add_Demo := if(_Flags.UseDemoData, STD.File.AddSuperFile(FraudShared.Filenames().Base.Main.Built, Filenames().Input.DemoData.Sprayed));
-	shared Run_Base := Build_Base(pversion, MBS_File).All;
-	shared Run_Rollback := if(SkipBaseRollback=false,Rollback('',Test_Build,Test_RecordID,Test_RinID).All);
-	shared Run_Autokeys := FraudShared.Build_AutoKeys(pversion, pBaseMainBuilt);
-	shared Run_Keys := sequential(FraudShared.Build_Keys( pversion, pBaseMainBuilt).All, Add_Demo, Run_Autokeys);
-	shared Run_SoapAppends := if(SkipPiiBuild=false,FraudGovPlatform.Build_Base_Pii(pversion).All);
-	shared Run_Kel := if(SkipKelBuild=false,FraudGovPlatform.Build_Kel(pversion).All);
-	shared Run_Orbit := if(SkipOrbitBuild=false, Orbit3.proc_Orbit3_CreateBuild_AddItem('FraudGov',pversion)); //Create Orbit Builds
-	shared Run_Dashboards := if(SkipDashboardsBuild=false,FraudGovPlatform_Analytics.GenerateDashboards(pRunProd,pUseProdData));
-	shared Set_Version := FraudgovInfo(pversion,'Keys_Completed').SetPreviousVersion;
+	export Run_MBS := FraudGovPlatform_Validation.SprayMBSFiles( pversion := pVersion[1..8] );
+	export Run_Scrubs := Build_Scrubs(pversion,SkipModules);
+	export Run_Deltabase := FraudGovPlatform_Validation.SprayAndQualifyDeltabase(pversion);
+	export Run_Inputs := Build_Input(pversion, MBS_File, SkipModules).All;	
+	export Run_Base := Build_Base(pversion, MBS_File).All;
+	// --
+	export Run_Rollback := if(SkipBaseRollback=false,Rollback('',Test_Build,Test_RecordID,Test_RinID).All);
+	// --
+	export Run_Autokeys := FraudShared.Build_AutoKeys(pversion, pBaseMainBuilt);
+	export Add_Demo := if(_Flags.UseDemoData, STD.File.AddSuperFile(FraudShared.Filenames().Base.Main.Built, Filenames().Input.DemoData.Sprayed));
+	export Run_Keys := sequential(FraudShared.Build_Keys( pversion, pBaseMainBuilt).All, Add_Demo, Run_Autokeys);
+	export Run_SoapAppends := if(SkipPiiBuild=false,FraudGovPlatform.Build_Base_Pii(pversion).All);
+	export Run_Kel := if(SkipKelBuild=false,FraudGovPlatform.Build_Kel(pversion).All);
+	export Run_Orbit := if(SkipOrbitBuild=false, Orbit3.proc_Orbit3_CreateBuild_AddItem('FraudGov',pversion)); //Create Orbit Builds
+	export Run_Dashboards := if(SkipDashboardsBuild=false,FraudGovPlatform_Analytics.GenerateDashboards(pRunProd,pUseProdData));
+	export Set_Version := FraudgovInfo(pversion,'Keys_Completed').SetPreviousVersion;
 	
 //	export dops_update := RoxieKeyBuild.updateversion('IdentityDataKeys', pversion, _Control.MyInfo.EmailAddressNotify,,'N'); 															
 	
@@ -59,16 +61,10 @@ module
 		,Run_Deltabase
 		// Clean Inputs
 		,Run_Inputs
-		// Promote Input Files
-		,Promote(pversion).promote_inputs
 		// RUn MBS Scrubs
 		,Run_Scrubs	
 		// Build Base
 		,Run_Base
-		// Promote Fraudgov Base
-		,Promote(pversion).promote_base
-
-		,notify('Base_Completed','*')		
 	);
 	
 	export keys_portion := sequential(

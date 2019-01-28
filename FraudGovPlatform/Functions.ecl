@@ -419,7 +419,7 @@ EXPORT Functions :=  MODULE
 
 	ENDMACRO;
 
-	Current_Build := FraudShared.Files().Base.Main.Built;
+	Current_Build := IF(_Flags.FileExists.Base.Main, FraudShared.Files().Base.Main.Built, DATASET([], FraudShared.Layouts.Base.Main));
 	
 	EXPORT LastRinID := MAX(Current_Build(DID >= FraudGovPlatform.Constants().FirstRinID), DID):independent;
 

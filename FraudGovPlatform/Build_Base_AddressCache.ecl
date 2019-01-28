@@ -16,7 +16,9 @@ module
 // Return
 	export full_build :=
 		 sequential(
-			 Build_Base_File
+			  Build_Base_File
+			, Promote(pversion).buildfiles.New2Built
+ 
 		);
 		
 	export All :=

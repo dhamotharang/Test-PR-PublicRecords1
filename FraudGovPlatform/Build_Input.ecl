@@ -6,15 +6,21 @@ EXPORT Build_Input (
 	) :=
 module
 
+	// Modules
+	export Run_Spray := FraudGovPlatform_Validation.SprayAndQualifyInput(pversion);
+	export Run_IdentityData := Build_Input_IdentityData(pversion, MBS_Sprayed, pSkipModules ).All;
+	export Run_KnownFraud :=  Build_Input_KnownFraud(pversion, MBS_Sprayed, pSkipModules).All;
+	export Run_Deltabase := Build_Input_Deltabase(pversion, MBS_Sprayed).All;
+	export Promote_Inputs := Promote(pversion).promote_inputs;
+
 	export All :=
 	if(tools.fun_IsValidVersion(pversion)
 		,sequential(
-			 FraudGovPlatform_Validation.SprayAndQualifyInput(pversion)
-			,Build_Input_IdentityData(pversion, MBS_Sprayed, pSkipModules ).All		
-			,Build_Input_KnownFraud(pversion, MBS_Sprayed, pSkipModules).All			
-			,Build_Input_Deltabase(pversion, MBS_Sprayed).All
-			,HeaderInfo.Post
-			,AddressesInfo(pversion).Post						
+			  Run_Spray
+			, Run_IdentityData
+			, Run_KnownFraud
+			, Run_Deltabase
+			, Promote_Inputs
 		 )
 		,output('No Valid version parameter passed, skipping FraudGovPlatform.Build_Input atribute')
 	 );
