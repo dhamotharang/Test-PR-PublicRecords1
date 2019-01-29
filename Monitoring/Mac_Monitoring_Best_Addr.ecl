@@ -1,4 +1,4 @@
-﻿IMPORT AddrBest,didville,batchServices;
+IMPORT AddrBest,didville,batchServices;
 export Mac_Monitoring_Best_Addr
 (
 	infile, 
@@ -25,8 +25,7 @@ export Mac_Monitoring_Best_Addr
 	dob_match = false,
 	did_match = false,
 	rank_in = 'dataset([],AddrBest.layout_header_ext)',
-	Max_records = 1,
-	did_append_in
+	Max_records = 1
 ) := MACRO
 
 import Advo, NID, batchservices, ut;
@@ -151,8 +150,7 @@ END;
 	
 	#uniquename(partial_addr_matches)
 	%partial_addr_matches% := denormalize(%slim_h0%(is_input),%slim_h0%(~is_input),
-		left.did_field = right.did_field and // This contains Account number
-		left.rid = right.rid and  // This contains actual did
+		left.did_field = right.did_field and
 		left.prim_range = right.prim_range 
 		and stringlib.stringfind(trim(left.prim_name)+' ',trim(right.prim_name)+' ',1)>0
 		and (left.st=right.st or left.st='')
@@ -162,8 +160,7 @@ END;
 
 	#uniquename(no_addr_matches)
 	%no_addr_matches% :=join(%slim_h0%(~is_input),%partial_addr_matches%,
-		left.did_field = right.did_field and	// This contains Account number
-		left.rid = right.rid and	// This contains actual did
+		left.did_field = right.did_field and
 		left.prim_name = right.prim_name and 
 		left.prim_range = right.prim_range 
 		and (left.st=right.st or right.st='')
@@ -183,13 +180,13 @@ END;
 		%fill_src% := project(%slim_h%,transform(recordof(%slim_h%),self.srcs := dataset([{left.src}],AddrBest.Layout_BestAddr.rec_src),self := left));
 
 		%srt_h_pre% := if(%Ranking_Requested%,
-		                  sort(%fill_src%,did_field,rid,prim_range,predir,prim_name,suffix,postdir, 
+		                  sort(%fill_src%,did_field,prim_range,predir,prim_name,suffix,postdir, 
 											                zip, sec_range, lname,
 																			-is_input, -%d_lseen%(%fill_src%),
 		                                  -dt_first_seen, -%street_addr%(%fill_src%),-%tnt_gd%(%fill_src%),
 																	    -dt_vendor_first_reported,-%add_score%(%fill_src%),
 																	    -%st_zip%(%fill_src%) ,local),
-		                  sort(%fill_src%,did_field,rid,prim_range,prim_name,
+		                  sort(%fill_src%,did_field,prim_range,prim_name,
 											                zip, sec_range, lname,
 																			-is_input, -%d_lseen%(%fill_src%),
 		                                  -dt_first_seen, -%street_addr%(%fill_src%),-%tnt_gd%(%fill_src%),
@@ -198,13 +195,13 @@ END;
 
 	#ELSE
 		%srt_h_pre% := if(%Ranking_Requested%,
-		                  sort(%slim_h%,did_field,rid,prim_range,predir,prim_name,suffix,postdir, 
+		                  sort(%slim_h%,did_field,prim_range,predir,prim_name,suffix,postdir, 
 											              zip, sec_range, lname, 
 																		-is_input, -%d_lseen%(%slim_h%),
 		                                -dt_first_seen, -%street_addr%(%slim_h%),-%tnt_gd%(%slim_h%),
 																	  -dt_vendor_first_reported,-%add_score%(%slim_h%),
 																	  -%st_zip%(%slim_h%) ,local),
-		                  sort(%slim_h%,did_field,rid,prim_range,prim_name,
+		                  sort(%slim_h%,did_field,prim_range,prim_name,
 											              zip, sec_range, lname, 
 																		-is_input, -%d_lseen%(%slim_h%),
 		                                -dt_first_seen, -%street_addr%(%slim_h%),-%tnt_gd%(%slim_h%),
@@ -245,7 +242,6 @@ END;
 	#uniquename(noranking_rollup)
 	%noranking_rollup% := rollup(%srt_h_pre%,
 	           left.did_field  = right.did_field  and
-						 left.rid  = right.rid  and
 						 left.prim_range = right.prim_range and
 						 left.prim_name  = right.prim_name  and
 						 left.zip        = right.zip        and
@@ -256,7 +252,6 @@ END;
 	#uniquename(ranking_rollup)
 	%ranking_rollup% := rollup(%srt_h_pre%,
 	           left.did_field  = right.did_field  and
-						 left.rid  = right.rid  and
 						 left.prim_range = right.prim_range and
 					   left.predir	   = right.predir	    and
 						 left.prim_name  = right.prim_name  and
@@ -370,7 +365,7 @@ END;
 	%dep_h% := IF(return_unserviceable_flag or unserviceable_dedup_option>0, %dep_h_pre_w_serv%, %dep_h_pre%);	
 		
 	#uniquename(srt_h)
-	%srt_h% := sort(%dep_h%,did_field,rid,-%d_lseen%(%dep_h%),-dt_first_seen,-%street_addr%(%dep_h%),-%tnt_gd%(%dep_h%),
+	%srt_h% := sort(%dep_h%,did_field,-%d_lseen%(%dep_h%),-dt_first_seen,-%street_addr%(%dep_h%),-%tnt_gd%(%dep_h%),
 					-dt_vendor_first_reported,-%add_score%(%dep_h%),-prim_range,-predir,-prim_name,
 					-suffix,-postdir,-unit_desig,-sec_range,-city_name,-zip,-zip4,-%st_zip%(%dep_h%),st,local);
 	#uniquename(grp0)
@@ -424,7 +419,7 @@ END;
 
 	// Check for dedup address because if there is none all found addresses should be returned 
 	
-	%pre_grp2% := iterate(sort(%grp00%,did_field,rid,if(is_input,0,1)),%test_for_input%(left,right,counter));
+	%pre_grp2% := iterate(sort(%grp00%,did_field,if(is_input,0,1)),%test_for_input%(left,right,counter));
 	
 	%srt_pre_grp2% :=sort(%pre_grp2%,seq);
 	
@@ -501,7 +496,6 @@ END;
 	end;
 	%rank_seq% := join(%dep_grp%, rank_in,
 											left.did		 		= right.did		 			and //account number
-											left.rid 				= right.rid   			and   // actual did
 											left.zip 				= right.zip					and
 											left.prim_range = right.prim_range	and
 											left.predir		 	= right.predir			and
@@ -512,50 +506,17 @@ END;
 											%getUpdateRankSeq%(left, right),
 											inner, limit(0), keep(1));
 	#uniquename(best_recs)
-	%best_recs% := if(%Ranking_Requested%,sort(%rank_seq%,did,best_address_number),ungroup(%dep_grp%));	
-	
-	// Additional checks with didappend to return matching did 
-	// In rare cases where top most did from bestrecs does not match did from didappend, we try to bring matching input didappend did records  to the top
-	
-	
-	#uniquename(rfields_exp_didappend)
-
-	%rfields_exp_didappend% := record
-		%rfields% ;
-		boolean isdidappend;
-	end;
-	
-	#uniquename(best_recs_didappend)
-	#uniquename(getUpdatebestdid)
-	
-	%rfields_exp_didappend% %getUpdatebestdid%(%best_recs% l,did_append_in  r) := TRANSFORM
-				self.isdidappend := l.rid = r.did;
-				self := l;
-				self := [];
-	end;
-	
-		
-	
-	%best_recs_didappend% :=  join(%best_recs% ,did_append_in,
-																	(STRING)left.did = right.acctno and
-																	left.rid = right.did,
-											%getUpdatebestdid%(left, right),
-											left outer, keep(1),limit(0));
-											
-	#uniquename(sortbest_recs_didappend)									
-												
-	%sortbest_recs_didappend% := group(sort(%best_recs_didappend%,did,if(isdidappend,0,1)),did,local); 
-	
+	%best_recs% := if(%Ranking_Requested%,group(sort(%rank_seq%,did,best_address_number), did, local),%dep_grp%);	
 	
 	#uniquename(get_top_best)
-	%rfields_exp% %get_top_best%(%sortbest_recs_didappend% l, unsigned cnt) := transform,skip( cnt>l.best_address_number or cnt > Max_records)
+	%rfields_exp% %get_top_best%(%rfields% l, unsigned cnt) := transform,skip( cnt>l.best_address_number or cnt > Max_records)
 		self.keep_these := true;
 		self.best_address_count := cnt;
 		self := l;
 	end;
 	
 	#uniquename(k2)
-	%k2% := project(%sortbest_recs_didappend%,%get_top_best%(left, counter));
+	%k2% := project(%best_recs%,%get_top_best%(left, counter));
 	outfile := project(group(%k2%), %rfields_slim%);
 
   // OUTPUT(infile,          NAMED('infile'));
