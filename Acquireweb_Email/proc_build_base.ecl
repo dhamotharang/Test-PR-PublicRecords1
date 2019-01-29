@@ -122,7 +122,7 @@ EXPORT proc_build_base(STRING version) := FUNCTION
   new_acquireweb_data:=	JOIN(ind_with_did_2,email_file_in,LEFT.awid=RIGHT.AWID_Email,jointhem(LEFT,RIGHT),INNER,LOCAL);
 
   // Final dedup
-  Deddata:=DEDUP(SORT(new_acquireweb_data,email,clean_fname,clean_mname,clean_lname,-date_vendor_last_reported),email,clean_fname,clean_mname,clean_lname);
+ Deddata:=DEDUP(SORT(new_acquireweb_data,email,FirstName,LastName,city,state,zip,-date_vendor_last_reported),email,FirstName,LastName,city,state,zip);
 
   RETURN Deddata(trim(AWID,left,right)<>'AWID');
 END;
