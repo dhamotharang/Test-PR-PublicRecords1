@@ -1,4 +1,4 @@
-﻿
+﻿IMPORT KELOtto, FraudGovPlatform;
 PersonFraudPointRec := RECORD
   unsigned6 did;
   string2 v2_sourcerisklevel;
@@ -17,6 +17,6 @@ PersonFraudPointRec := RECORD
   unsigned6 fdn_file_info_id;
  END;
 
-EXPORT PersonFraudPointPrep := PULL(DATASET('~thor_data400::base::fraudgov::qa::fraudpoint', PersonFraudPointRec, THOR));
+EXPORT PersonFraudPointPrep := PULL(DATASET(KELOtto.Constants.fileLocation+'base::fraudgov::qa::fraudpoint', PersonFraudPointRec, THOR));
 
 EXPORT PersonFraudPoint := JOIN(KELOtto.CustomerLexId, PersonFraudPointPrep, LEFT.did=(INTEGER)RIGHT.did, TRANSFORM({LEFT.AssociatedCustomerFileInfo, RECORDOF(RIGHT)}, SELF := RIGHT, SELF := LEFT), HASH, KEEP(1));

@@ -1,4 +1,5 @@
-﻿PersonDeceasedLayout := RECORD
+﻿IMPORT KELOtto;
+PersonDeceasedLayout := RECORD
   string30 acctno;
   string30 matchcode;
   boolean isdeepdive;
@@ -92,6 +93,6 @@ rPersonDeceasedLayout := RECORD
  END;
 
  
-PersonDeceasedFile := PROJECT(PULL(DATASET('~thor_data400::base::fraudgov::qa::death', PersonDeceasedLayout, THOR)), TRANSFORM(rPersonDeceasedLayout, SELF.did := (UNSIGNED)LEFT.did, SELF := LEFT));
+PersonDeceasedFile := PROJECT(PULL(DATASET(KELOtto.Constants.fileLocation+'base::fraudgov::qa::death', PersonDeceasedLayout, THOR)), TRANSFORM(rPersonDeceasedLayout, SELF.did := (UNSIGNED)LEFT.did, SELF := LEFT));
 
 EXPORT PersonDeceased := JOIN(KELOtto.CustomerLexId, PersonDeceasedFile, LEFT.did=(INTEGER)RIGHT.did, TRANSFORM({LEFT.AssociatedCustomerFileInfo, RECORDOF(RIGHT)}, SELF := RIGHT, SELF := LEFT), HASH,KEEP(1));
