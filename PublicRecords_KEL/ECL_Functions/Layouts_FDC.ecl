@@ -5,7 +5,7 @@ EXPORT Layouts_FDC(PublicRecords_KEL.Interface_Options Options = PublicRecords_K
 	SHARED LayoutIDs := RECORD
 		INTEGER InputUIDAppend;
 		INTEGER7 LexIDAppend;
-		INTEGER BDID_UIDAppend;
+		INTEGER BusInputUIDAppend;
 	END;
 	
 	SHARED Doxie__Key_Header := IF(Options.IsFCRA, Doxie.Key_FCRA_Header, Doxie.Key_Header);
