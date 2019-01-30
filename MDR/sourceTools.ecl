@@ -1317,7 +1317,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	];
 
 	export set_scoring_FCRA := [
-			src_Aircrafts,                src_Airmen,                     src_AK_Perm_Fund,        src_AK_Watercraft,
+			src_Aircrafts,                src_Airmen,                     /*src_AK_Perm_Fund,*/    src_AK_Watercraft,
 			src_AL_Watercraft,            src_American_Students_List,     src_AR_Watercraft,       src_AZ_Watercraft,
 			src_Bankruptcy,               src_CO_Watercraft,              src_CT_Watercraft,       src_DEA,
       src_Death_Master,             src_Death_State,                src_EMerge_Boat,         src_EMerge_CCW,
