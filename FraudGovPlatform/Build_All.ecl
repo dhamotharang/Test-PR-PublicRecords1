@@ -31,7 +31,7 @@ module
 	shared SkipPiiBuild := SkipModules[1].SkipPiiBuild;
 	shared SkipKelBuild := SkipModules[1].SkipKelBuild;
 	shared SkipOrbitBuild := SkipModules[1].SkipOrbitBuild;
-	shared SkipDashboardsBuild := SkipModules[1].SkipDashboardsBuild; 
+	shared SkipDashboardsBuild := SkipModules[1].SkipDashboardsBuild;
 
 	// Modules
 	export Run_MBS := FraudGovPlatform_Validation.SprayMBSFiles( pversion := pVersion[1..8] );
@@ -39,6 +39,7 @@ module
 	export Run_Deltabase := FraudGovPlatform_Validation.SprayAndQualifyDeltabase(pversion);
 	export Run_Inputs := Build_Input(pversion, MBS_File, SkipModules).All;	
 	export Run_Base := Build_Base(pversion, MBS_File).All;
+	export Run_GarbageCollector := Garbage_Collector.Run;
 	// --
 	export Run_Rollback := if(SkipBaseRollback=false,Rollback('',Test_Build,Test_RecordID,Test_RinID).All);
 	// --
@@ -80,6 +81,8 @@ module
 		,Run_Orbit
 		// Build Dashboards
 		,Run_Dashboards
+		// Delete / Archive temp & unused files.
+		,Run_GarbageCollector		
 		// Complete and set version
 		,Set_Version	
 					
