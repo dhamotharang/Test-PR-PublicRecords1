@@ -2,7 +2,7 @@
 EXPORT mac_xLinking_PS (infile, uID ='', Input_SNAME = '', Input_FNAME = '',Input_MNAME = '',Input_LNAME = '',Input_Gender = '', Input_Derived_Gender = '',
 														Input_PRIM_NAME = '',Input_PRIM_RANGE = '',Input_SEC_RANGE = '',Input_CITY = '',Input_ST = '',Input_ZIP = '',Input_SSN = '',
 														Input_DOB = '', Input_Phone = '', Input_DL_STATE = '',Input_DL_NBR = '', 
-														Input_RelFname = '', Input_RelLname = '', outfile, weight_score= 30, distance= 3, segmentation=true) := MACRO
+														Input_RelFname = '', Input_RelLname = '', Input_LeadThreshold = '', outfile, weight_score= 30, distance= 3, segmentation=true) := MACRO
 
 	IMPORT InsuranceHeader_xLink;
 
@@ -103,9 +103,14 @@ EXPORT mac_xLinking_PS (infile, uID ='', Input_SNAME = '', Input_FNAME = '',Inpu
   #ELSE
     SELF.lname2 := (TYPEOF(SELF.lname2))'';
   #END		
+  #IF ( #TEXT(Input_LeadThreshold) <> '' )
+		SELF.leadThreshold := (TYPEOF(SELF.leadThreshold))le.Input_LeadThreshold;
+  #ELSE
+    SELF.leadThreshold := (TYPEOF(SELF.leadThreshold))'';
+  #END		  
   SELF.SRC := (TYPEOF(SELF.SRC))'';
   SELF.SOURCE_RID := (TYPEOF(SELF.SOURCE_RID))'';  
-	SELF.disableForce := true;  //Person Search requires no DobForce for higher recall
+	SELF.disableForce := true;  //Person Search requires no DobForce for higher recall  
 	SELF.MaxIDs := 200,	
 	SELF := [];
 end;

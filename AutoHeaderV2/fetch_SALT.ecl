@@ -8,7 +8,8 @@ EXPORT fetch_SALT (dataset (AutoHeaderV2.layouts.search) ds_search, integer sear
 	boolean no_fail := search_code & AutoheaderV2.Constants.SearchCode.NOFAIL > 0;		
 	
 	// flat layout for salt		
-	inLayout := {Insuranceheader_xLink.Layout_Person_xLink, dataset(InsuranceHeader_xLink.Process_xIDL_layouts().layout_ZIP_cases) zips, string rel_fname, string rel_lname};
+	inLayout := {Insuranceheader_xLink.Layout_Person_xLink, dataset(InsuranceHeader_xLink.Process_xIDL_layouts().layout_ZIP_cases) zips, 
+            string rel_fname, string rel_lname, unsigned1 saltLeadThreshold};
 	inDataOne :=  project(ds_search, 
 				transform(inLayout, 
 			self.did := 0;
@@ -37,8 +38,8 @@ EXPORT fetch_SALT (dataset (AutoHeaderV2.layouts.search) ds_search, integer sear
 			self.phone := left.tphone.phone10;
 			self.UniqueID := left.seq;
 			self.rel_fname := left.tname.fname_rel_1;
-			self.rel_lname := left.tname.lname, 
-			self := []));
+			self.rel_lname := left.tname.lname,       
+			self.saltLeadThreshold := left.options.saltLeadThreshold, self := []));
 		ssnDs := dataset(ds_search[1].tssn.ssn_set, {string9 ssn});
 		inDataSSn := project(ssnDs, transform (inLayout, 
 			self.did := 0;
@@ -50,9 +51,10 @@ EXPORT fetch_SALT (dataset (AutoHeaderV2.layouts.search) ds_search, integer sear
 			self.city := IF(ds_search[1].taddress.city='', ds_search[1].taddress.city_other, ds_search[1].taddress.city);
 			self.state := IF(ds_search[1].taddress.state='', ds_search[1].taddress.state_prev_1, ds_search[1].taddress.state);
 			self.UniqueID := ds_search[1].seq;
+      self.saltLeadThreshold :=  ds_search[1].options.saltLeadThreshold;
 			 self := []));
     inDataNickname := project(inDataOne, transform(inLayout, 
-        self.fname := InsuranceHeader_xlink.fn_preferredName(left.fname), 
+        self.fname := InsuranceHeader_xlink.fn_preferredName(left.fname),         
         self := left));
 	 // Releavant options
 	boolean isStrict := ds_search[1].options.strict_match;
@@ -70,7 +72,7 @@ EXPORT fetch_SALT (dataset (AutoHeaderV2.layouts.search) ds_search, integer sear
 	IDLExternalLinking.mac_xLinking_PS(inData, UniqueID, name_suffix , fname , mname , lname ,, 
 								 ,PRIM_NAME ,PRIM_RANGE ,SEC_RANGE ,city ,
 												 state , zips ,SSN ,DOB, PHONE,  , , 
-														rel_fname, rel_lname,outfile);
+														rel_fname, rel_lname, saltleadthreshold, outfile);
 				
 		// build filtering condition
 		result1 := IF(isEditDistance, outfile, outfile(fname_match_code <> SALT37.MatchCode.EditdistanceMatch or (ssn5weight>0 and ssn4weight>0)));

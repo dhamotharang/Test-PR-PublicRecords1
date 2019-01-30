@@ -296,6 +296,19 @@ EXPORT CreditReport_TestSeed_Function(DATASET(BusinessCredit_Services.Layouts.in
 						self.PastDueAmount              := rt.AcctDet1_Pay_Hist_PastDueAmount      ;
 						self.IsExtendedOverdue          := rt.AcctDet1_Pay_Hist_IsExtendedOverdue  ;
 					));
+					
+					self.UniqueAccountDetailNumber := rt.AcctDet1_UniqueAccountDetailNumber;
+					self.ChargedOff := rt.AcctDet1_ChargedOff;
+					self.PaymentStatus := rt.AcctDet1_PaymentStatus;
+					self.ChargedOffDate.Year := rt.AcctDet1_ChargedOffDate_year;
+					self.ChargedOffDate.Month := rt.AcctDet1_ChargedOffDate_month;
+					self.ChargedOffDate.Day :=  rt.AcctDet1_ChargedOffDate_day;
+					self.ChargedOffAmount := rt.AcctDet1_ChargedOffAmount;
+					self.ChargedOffType.code := rt.AcctDet1_ChargedOffType_code;
+					self.ChargedOffType.description := rt.AcctDet1_ChargedOffType_description;
+					self.TotalChargedOffRecoveries :=  rt.AcctDet1_TotalChargedOffRecoveries;                                                                
+					self.ContributedByInquirer              := rt.AcctDet1_ContributedByInquirer;
+
 				self := [];   // Blank out fields that don't have testseed value.
 		));
 		
@@ -361,6 +374,19 @@ EXPORT CreditReport_TestSeed_Function(DATASET(BusinessCredit_Services.Layouts.in
 						self.PastDueAmount              := rt.AcctDet2_Pay_Hist_PastDueAmount                 ;
 						self.IsExtendedOverdue          := rt.AcctDet2_Pay_Hist_IsExtendedOverdue             ;
 					));
+					
+					self.UniqueAccountDetailNumber := rt.AcctDet2_UniqueAccountDetailNumber;
+					self.ChargedOff := rt.AcctDet2_ChargedOff;
+					self.PaymentStatus := rt.AcctDet2_PaymentStatus;
+					self.ChargedOffDate.Year := rt.AcctDet2_ChargedOffDate_year;
+					self.ChargedOffDate.Month := rt.AcctDet2_ChargedOffDate_month;
+					self.ChargedOffDate.Day :=  rt.AcctDet2_ChargedOffDate_day;
+					self.ChargedOffAmount := rt.AcctDet2_ChargedOffAmount;
+					self.ChargedOffType.code := rt.AcctDet2_ChargedOffType_code;
+					self.ChargedOffType.description := rt.AcctDet2_ChargedOffType_description;
+					self.TotalChargedOffRecoveries :=  rt.AcctDet2_TotalChargedOffRecoveries;                                                                
+					self.ContributedByInquirer              := rt.AcctDet2_ContributedByInquirer;
+
 				self := [];  // Blank out fields that don't have testseed value.
 		));
 		
@@ -4658,8 +4684,46 @@ EXPORT CreditReport_TestSeed_Function(DATASET(BusinessCredit_Services.Layouts.in
 		append_Final(left, right),
 		LEFT OUTER, KEEP(2), ATMOST(RiskWise.max_atmost)
 	);
+
+   working_layout append_FinalMatchInfo (working_layout le, Seed_Files.BusinessCreditReport_keys.MatchInfo rt) := transform			
+		
+				// match info
+		self.matchReason :=
+			project(rt, transform(iesp.businesscreditreport.t_BusinessCreditMatch,		
+                                           self.CompanyName := rt.CompanyName ;   
+								self.tin := rt.tin;
+								self.companyPhone := rt.companyPhone;
+								// self.Address.StreetNumber := rt.AddInfo_NameVar_Docs_StreetNumber ;
+								// self.Address.StreetPreDirection := rt.AddInfo_NameVar_Docs_StreetPreDirection ;
+								// self.Address.StreetName := rt.AddInfo_NameVar_Docs_StreetName ;
+								// self.Address.StreetSuffix := rt.AddInfo_NameVar_Docs_StreetSuffix ;
+								// self.Address.StreetPostDirection := rt.AddInfo_NameVar_Docs_StreetPostDirection ;
+								// self.Address.UnitDesignation := rt.AddInfo_NameVar_Docs_UnitDesignation ;
+								// self.Address.UnitNumber := rt.AddInfo_NameVar_Docs_UnitNumber ;
+								self.Address.StreetAddress1 := rt.StreetAddress;
+								// self.Address.StreetAddress2 := rt.AddInfo_NameVar_Docs_StreetAddress2 ;
+								self.Address.City := rt.City ;
+								self.Address.State := rt.State;
+								self.Address.Zip5 := rt.Zip;
+								// self.Address.Zip4 := rt.AddInfo_NameVar_Docs_Zip4 ;
+								// self.Address.County := rt.AddInfo_NameVar_Docs_County ;
+								// self.Address.PostalCode := rt.AddInfo_NameVar_Docs_PostalCode ;
+								// self.Address.StateCityZip := rt.AddInfo_NameVar_Docs_StateCityZip ;	
+							  self := le; // everything else from the left
+								self := [];
+						));			
+                    self := le; // everything else from the left
+								self := [];						
+	END;
 	
-	FinalSeed := project(CR_Final, Transform(iesp.businesscreditreport.t_BusinessCreditReportRecord, self := left, self := []));
+	CR_FinalMatchInfo := join(CR_Final, Seed_Files.BusinessCreditReport_keys.MatchInfo,
+		keyed(right.dataset_name=left.dataset_name) and keyed(right.hashvalue=left.hashkey),
+		append_FinalMatchInfo(left, right),
+		LEFT OUTER, KEEP(2), ATMOST(RiskWise.max_atmost)
+	);
+	
+	FinalSeed := project(CR_FinalMatchInfo, 	                                      
+						Transform(iesp.businesscreditreport.t_BusinessCreditReportRecord, self := left, self := []));
 	
 	return FinalSeed;
 END;

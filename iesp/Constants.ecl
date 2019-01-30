@@ -2115,4 +2115,35 @@ EXPORT Constants := MODULE
 		export UNSIGNED2 MaxCompanyIds := 100;
 	end;
 	
+	//Person Slim alerting query
+  export PersonSlim := module
+    export UNSIGNED2 MaxAddresses    := 100;
+    export UNSIGNED2 MaxPhones       := 50;
+    export UNSIGNED2 MaxProfLic      := 50;
+    export UNSIGNED2 MaxPeopleAtWork := 50;
+    export UNSIGNED2 MaxAircrafts    := 25;
+    export UNSIGNED2 MaxFaaCerts     := 50;
+    export UNSIGNED2 MaxWatercrafts  := 25;
+    export UNSIGNED2 MaxUCCs         := 100;
+    export UNSIGNED2 MaxSexOffenses  := 50;
+    export UNSIGNED2 MaxCrimRecords  := 100;
+    export UNSIGNED2 MaxWeapons      := 50;
+    export UNSIGNED2 MaxHuntFish     := 50;
+    export UNSIGNED2 MaxFirearms     := 50;
+    export UNSIGNED2 MaxDEA          := 50;
+    export UNSIGNED2 MaxVoter        := 50;
+    export UNSIGNED2 MaxDLs          := 50;
+    export UNSIGNED2 MaxAccidents    := 50;
+    export UNSIGNED2 MaxBankruptcies := 100;
+    export UNSIGNED2 MaxLiens        := 100;
+    export UNSIGNED2 MaxProperties   := 50;
+    export UNSIGNED2 MaxMarriageDiv  := 25;
+    export UNSIGNED2 MaxStudent      := 100;
+    export UNSIGNED2 MaxVehicles     := 50;
+    export UNSIGNED2 MaxAKA          := 50;
+    export UNSIGNED2 MaxImposters    := 50;
+    export UNSIGNED2 MaxDeaths       := 50;
+    export UNSIGNED2 MaxUtilities    := 100;
+  end;
+	
 END;

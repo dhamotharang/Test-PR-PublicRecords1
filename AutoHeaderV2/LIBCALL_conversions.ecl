@@ -120,6 +120,7 @@ EXPORT LIBCALL_conversions := MODULE
       Self.options.score_threshold := if (first_row.StrictMatch,
 				                                  1, // for some reason, header_records (at least) uses < rather than <=
 				                                  first_row.scorethreshold);
+      Self.options.saltLeadThreshold := IF(first_row.saltLeadThreshold=0, AutoHeaderV2.Constants.saltLeadThreshold, first_row.saltLeadThreshold);
       Self.options.strict_match := first_row.StrictMatch;
       Self.options.isCRS := first_row.isCRS;
       Self.options.only_best_did := first_row.useonlybestdid;
