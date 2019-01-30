@@ -1,4 +1,4 @@
-IMPORT RoxiekeyBuild;
+﻿IMPORT RoxiekeyBuild;
 
 EXPORT Proc_Build_BusinessCreditReport_Keys(STRING filedate) := MODULE
 
@@ -41,7 +41,8 @@ EXPORT Proc_Build_BusinessCreditReport_Keys(STRING filedate) := MODULE
 			mac_build_key(filedate, 'TopBusParent', 'TopBusParent'),
 			mac_build_key(filedate, 'TopBusConnected', 'TopBusConnect'),
 			mac_build_key(filedate, 'TopBusContacts', 'TopBusContact'),
-			mac_build_key(filedate, 'FinalSect', 'TopBusActivity')
+			mac_build_key(filedate, 'FinalSect', 'TopBusActivity'),
+			mac_build_key(filedate, 'MatchInfo', 'MatchInfo')
 			);
 	END;
 

@@ -1,4 +1,4 @@
-﻿IMPORT PromoteSupers,FraudGovPlatform;
+﻿IMPORT PromoteSupers;
 EXPORT fraudgovInfo(
 		string pVersion = '', 
 		string pStatus  = ''

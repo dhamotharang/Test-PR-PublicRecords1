@@ -1,4 +1,4 @@
-﻿
+﻿IMPORT KELOtto;
 rPersonCrim := RECORD
   string20 acctno;
   string1 match_type;
@@ -402,10 +402,15 @@ rPersonCrim := RECORD
   string errorcode;
   unsigned8 record_id;
   unsigned6 fdn_file_info_id;
+	string20	fname_orig;
+	string20	mname_orig;
+	string20	lname_orig;
+	string10	ssn_orig;
+	string10	dob_orig;
  END;
  
 
-PersonCrimPrep1 := PROJECT(DATASET('~thor_data400::base::fraudgov::qa::crim', rPersonCrim, THOR), 
+PersonCrimPrep1 := PROJECT(DATASET(KELOtto.Constants.fileLocation+'base::fraudgov::qa::crim', rPersonCrim, THOR), 
        TRANSFORM({RECORDOF(LEFT), STRING off_cat_list}, 
                  SELF.off_cat_list :=                  
                     TRIM(LEFT.off_cat_1_1) + '|' + TRIM(LEFT.off_cat_2_1) + '|' + TRIM(LEFT.off_cat_3_1) + '|' + TRIM(LEFT.off_cat_4_1) + '|' + TRIM(LEFT.off_cat_5_1) + '|' + TRIM(LEFT.off_cat_1_2) + '|' + TRIM(LEFT.off_cat_2_2) + '|' + TRIM(LEFT.off_cat_3_2) + '|' + 

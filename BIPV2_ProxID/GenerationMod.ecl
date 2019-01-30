@@ -3,7 +3,7 @@ IMPORT SALT311;
 EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.11.3';
+  EXPORT salt_VERSION := 'V3.11.4';
   EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
   EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
  
@@ -38,7 +38,8 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
  
   // The entire spec file
   EXPORT spcString :=
-    'OPTIONS:-gh -ga -gs2\n'
+    '//SALTVERSION:311\n'
+    + 'OPTIONS:-gh -ga -gs2\n'
     + '\n'
     + 'MODULE:BIPV2_ProxID\n'
     + 'FILENAME:DOT_Base\n'
@@ -80,7 +81,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:ebr_file_number:PROP:20,427\n'
     + 'FIELD:company_fein:PROP:EDIT1:17,227\n'
     + 'FIELD:company_name:CARRY:0,0\n'
-    + 'FIELD:cnp_name:TYPE(STRING250):LIKE(Noblanks):BAGOFWORDS(MOST):EDIT1:FORCE(+6,OR(active_domestic_corp_key),OR(active_duns_number),OR(company_fein)):ABBR(ACRONYM,INITIAL,MAXSPC(13)):HYPHEN1:TYPE(string250):12,334\n'
+    + 'FIELD:cnp_name:TYPE(STRING250):LIKE(Noblanks):BAGOFWORDS(MOST):EDIT1:FORCE(+6,OR(active_domestic_corp_key),OR(active_duns_number),OR(company_fein)):ABBR(ACRONYM,INITIAL,MAXSPC(13)):HYPHEN1:12,334\n'
     + '// FIELD:cnp_name:BAGOFWORDS(MOST):EDIT1:FORCE(+13,OR(active_domestic_corp_key),OR(active_duns_number)):ABBR(FIRST):HYPHEN1:TYPE(string250):15,137\n'
     + '//FIELD:source:CARRY:0,0\n'
     + 'FIELD:company_name_type_raw:CARRY:0,0\n'
@@ -155,6 +156,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'ATTRIBUTEFILE:ForeignCorpkey:NAMED(file_Foreign_Corpkey):VALUES(company_charter_number<company_inc_state):FORCE(--,ALL):IDFIELD(Proxid):19,321\n'
     + 'ATTRIBUTEFILE:RAAddresses:NAMED(file_RA_Addresses):VALUES(cname):FORCE:IDFIELD(Proxid):18,196\n'
     + 'ATTRIBUTEFILE:FilterPrimNames:NAMED(file_filter_Prim_names):VALUES(pname_digits):FORCE:IDFIELD(Proxid):12,5\n'
+    + 'ATTRIBUTEFILE:UnderLinks:NAMED(file_underLink):VALUES(UnderLinkId):SUPPORTS(cnp_name):IDFIELD(ProxID):20,0\n'
     + '// ------------------------------------\n'
     + '//  ID Parents\n'
     + '// ------------------------------------\n'

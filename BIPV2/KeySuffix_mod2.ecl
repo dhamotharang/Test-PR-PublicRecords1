@@ -72,8 +72,8 @@ end;
 // export constant_ThisBuild_versionDate := '20181101'; // S64
 // export constant_ThisBuild_versionDate := '20181101a'; // S64a
 // export constant_ThisBuild_versionDate := '20181203'; // S65
-export constant_ThisBuild_versionDate := '20190104'; // S66
-
+// export constant_ThisBuild_versionDate := '20190104'; // S66
+export constant_ThisBuild_versionDate := '20190104a'; // S66a BH-429
 
 
 export ds :=

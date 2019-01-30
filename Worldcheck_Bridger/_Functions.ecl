@@ -1205,6 +1205,7 @@
 				trim(kword, left, right) = 'SECO-MALTB' =>SubGroup_Constants.numKeywordsID.KEYWORD_SECO_MALTB,
 				trim(kword, left, right) = 'UNTB-MAL' =>SubGroup_Constants.numKeywordsID.KEYWORD_UNTB_MAL,
 				trim(kword, left, right) = 'EUTB-MAL' =>SubGroup_Constants.numKeywordsID.KEYWORD_EUTB_MAL,								
+				trim(kword, left, right) = 'EU-PCW' =>SubGroup_Constants.numKeywordsID.KEYWORD_EU_PCW,								
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);

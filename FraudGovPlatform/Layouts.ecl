@@ -494,11 +494,26 @@ EXPORT Layouts := MODULE
 	END;
 
 	export OutputF := module
-		export FraudgovInfoRec			:= RECORD
+
+		export FraudgovInfoRec := RECORD
 			string PreviousVersion;
 			string NewVersion;
 			string Status;
 		END;
+
+		export SkipModules := RECORD
+			//General Processes
+			boolean SkipBaseBuild;
+			boolean SkipBaseRollback;
+			boolean SkipKeysBuild;
+			//Sub-processes
+			boolean SkipNACBuild;
+			boolean SkipInquiryLogsBuild;
+			boolean SkipPiiBuild;		
+			boolean	SkipKelBuild;
+			boolean SkipOrbitBuild;
+			boolean SkipDashboardsBuild;
+		END;		
 	end;
 
 export temp := module 
@@ -755,6 +770,11 @@ Export CIID := RECORD
  string errorcode;
  unsigned8 Record_ID;
  unsigned6 fdn_file_info_id;
+ string20	fname_orig;
+ string20	mname_orig;
+ string20	lname_orig;
+ string10	ssn_orig;
+ string10	dob_orig;
  END;
  
  Export Death	:= RECORD

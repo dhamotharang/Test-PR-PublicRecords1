@@ -1,4 +1,4 @@
-﻿export Send_Email(string filedate='',string st='',string fn='', string ut=''):= module
+﻿export Send_Email(string filedate='',string st='',string fn='', string ut='', string build_status='', string rid_status='', string rinid_status=''):= module
 
 	shared UpSt:=stringlib.stringtouppercase(st);
 	shared UpType:=stringlib.stringtouppercase(ut);
@@ -24,6 +24,20 @@
 								,FraudGovfilesupport
 								);
 
+	export build_rollback
+						:= fileservices.sendemail(
+								Mailing_List(UpSt,UpType).BocaOps
+								,'FraudGov '+filedate+' Build ROLLBACK'
+								,workunit+ ' ' + FAILMESSAGE + '\n'
+								+'Build failed due one of the following reasons:\n\n'
+								+'Validate Build: ' + build_status + '\n'
+								+'Validate RIDs: ' + rid_status + '\n'
+								+'Validate RIN IDs: ' + rinid_status
+								,
+								,
+								,FraudGovfilesupport
+								);
+								
 	export FraudGov_Input_Prep_failure
 						:= fileservices.sendemail(
 								Mailing_List(UpSt,UpType).Alert

@@ -1710,5 +1710,14 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2018/2053  Myanmar/Burma List','1697'},
 {'SECO (Switzerland) Mali List','1698'},
 {'UN Security Council Resolution 2374 (2017) Mali List','1699'},
-{'Federal Financial Monitoring Services (Russia) WMD List','1700'}
+{'Federal Financial Monitoring Services (Russia) WMD List','1700'},
+{'EC (CFSP) 2019/25 EU Terrorism List','1701'},
+{'EC (CFSP) 2019/29 Mali List','1702'},
+{'EC 2019/24 Terrorism List','1703'},
+{'Vietnamese Public Security Ministry Special Wanted List','1704'},
+{'DFAT (Australia) Autonomous Sanctions (Sanctioned Vessels - Democratic People\'s Republic of Korea)','1705'},
+{'EC (CFSP) 2019/86 Proliferation and Use of Chemical Weapons List','1706'},
+{'EC (CFSP) 2019/87 Syria List','1707'},
+{'EC 2019/84 Proliferation and Use of Chemical Weapons List','1708'},
+{'EC 2019/85 Syria List','1709'}
 ],r);
