@@ -29,6 +29,8 @@
 ) :=
 functionmacro
 
+  lPollingFrequency := if(pCompileOnly = true ,'1'  ,pPollingFrequency);
+
   #IF(count(pECL) = 1)
     return_result := 
     WorkMan.mac_Work(
@@ -48,7 +50,7 @@ functionmacro
       ,pNotifyEmails    
       ,pFailureEmails    
       ,pShouldEmail     
-      ,pPollingFrequency
+      ,lPollingFrequency
       ,pForceRun        
       ,pForceSkip       
       ,pCleanupSuper    
@@ -112,7 +114,7 @@ functionmacro
       + '  ,\'' + pNotifyEmails                 + '\'\n'
       + '  ,\'' + pFailureEmails                + '\'\n'
       + '  ,' + if(pShouldEmail = true, 'true','false') + '\n'
-      + '  ,\'' + pPollingFrequency + '\'\n'
+      + '  ,\'' + if(self.compile_only = true ,'1' ,pPollingFrequency) + '\'\n'
       + '  ,' + if(left.forcerun  = true or pForceRun  = true,'true'           ,'false'           ) + '\n'
       + '  ,' + if(left.forceskip = true or pForceSkip = true,'true'           ,'false'           ) + '\n'
       + '  ,' + if(pCleanupSuper = true, 'true','false') + '\n'
@@ -134,7 +136,7 @@ functionmacro
 
   set_parallel_wuids := set(ds_return,wuid);
 
-  return_result := WorkMan.mac_WorkMan_Multi(set_parallel_wuids,ds_return,pStartIteration,pversion,pBuildName,pOutputSuperfile,pESP,pNotifyEmails,pFailureEmails,pshouldemail, pPollingFrequency);
+  return_result := WorkMan.mac_WorkMan_Multi(set_parallel_wuids,ds_return,pStartIteration,pversion,pBuildName,pOutputSuperfile,pESP,pNotifyEmails,pFailureEmails,pshouldemail, lPollingFrequency);
 
   #END
 
