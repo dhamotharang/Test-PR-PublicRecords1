@@ -1,5 +1,5 @@
 ﻿ 
-EXPORT MAC_PopulationStatistics(infile,Ref='',cleancollegeid='',Input_cleanaddr1 = '',Input_cleanaddr2 = '',Input_cleanattendancedte = '',Input_cleancity = '',Input_cleanstate = '',Input_cleandob = '',Input_cleanupdatedte = '',Input_cleanemail = '',Input_append_email_username = '',Input_append_domain = '',Input_append_domain_type = '',Input_append_domain_root = '',Input_append_domain_ext = '',Input_append_is_tld_state = '',Input_append_is_tld_generic = '',Input_append_is_tld_country = '',Input_append_is_valid_domain_ext = '',Input_cleancollegeId = '',Input_cleantitle = '',Input_cleanfirstname = '',Input_cleanmidname = '',Input_cleanlastname = '',Input_cleansuffixname = '',Input_cleanzip = '',Input_cleanzip4 = '',Input_cleanmajor = '',Input_cleanphone = '',Input_rcid = '',Input_did = '',Input_process_date = '',Input_date_first_seen = '',Input_date_last_seen = '',Input_vendor_first_reported = '',Input_vendor_last_reported = '',Input_dateupdated = '',Input_studentid = '',Input_dartid = '',Input_collegeid = '',Input_projectsource = '',Input_collegestate = '',Input_college = '',Input_semester = '',Input_year = '',Input_firstname = '',Input_middlename = '',Input_lastname = '',Input_suffix = '',Input_major = '',Input_COLLEGE_MAJOR = '',Input_NEW_COLLEGE_MAJOR = '',Input_grade = '',Input_email = '',Input_dateofbirth = '',Input_dob_formatted = '',Input_attendancedate = '',Input_enrollmentstatus = '',Input_addresstype = '',Input_address1 = '',Input_address2 = '',Input_city = '',Input_state = '',Input_zip = '',Input_zip4 = '',Input_phonetyp = '',Input_phonenumber = '',Input_tier = '',Input_school_size_code = '',Input_competitive_code = '',Input_tuition_code = '',Input_title = '',Input_fname = '',Input_mname = '',Input_lname = '',Input_name_suffix = '',Input_name_score = '',Input_prim_range = '',Input_predir = '',Input_prim_name = '',Input_addr_suffix = '',Input_postdir = '',Input_unit_desig = '',Input_sec_range = '',Input_p_city_name = '',Input_v_city_name = '',Input_st = '',Input_z5 = '',Input_z4 = '',Input_cart = '',Input_cr_sort_sz = '',Input_lot = '',Input_lot_order = '',Input_dbpc = '',Input_chk_digit = '',Input_rec_type = '',Input_county = '',Input_fips_state = '',Input_fips_county = '',Input_geo_lat = '',Input_geo_long = '',Input_msa = '',Input_geo_blk = '',Input_geo_match = '',Input_err_stat = '',Input_telephone = '',Input_tier2 = '',Input_source = '',OutFile) := MACRO
+EXPORT MAC_PopulationStatistics(infile,Ref='',cleancollegeid='',Input_cleanaddr1 = '',Input_cleanaddr2 = '',Input_cleanattendancedte = '',Input_cleancity = '',Input_cleanstate = '',Input_cleanzip = '',Input_cleanzip4 = '',Input_cleanfulladdr = '',Input_cleandob = '',Input_cleanupdatedte = '',Input_cleanemail = '',Input_append_email_username = '',Input_append_domain = '',Input_append_domain_type = '',Input_append_domain_root = '',Input_append_domain_ext = '',Input_append_is_tld_state = '',Input_append_is_tld_generic = '',Input_append_is_tld_country = '',Input_append_is_valid_domain_ext = '',Input_cleantitle = '',Input_cleanfirstname = '',Input_cleanmidname = '',Input_cleanlastname = '',Input_cleansuffixname = '',Input_cleanmajor = '',Input_cleanphone = '',Input_did = '',Input_process_date = '',Input_date_first_seen = '',Input_date_last_seen = '',Input_date_vendor_first_reported = '',Input_date_vendor_last_reported = '',Input_dateadded = '',Input_dateupdated = '',Input_studentid = '',Input_dartid = '',Input_collegeid = '',Input_projectsource = '',Input_collegestate = '',Input_college = '',Input_semester = '',Input_year = '',Input_firstname = '',Input_middlename = '',Input_lastname = '',Input_suffix = '',Input_major = '',Input_grade = '',Input_email = '',Input_dateofbirth = '',Input_dob_formatted = '',Input_attendancedate = '',Input_enrollmentstatus = '',Input_addresstype = '',Input_address_1 = '',Input_address_2 = '',Input_city = '',Input_state = '',Input_z5 = '',Input_z4 = '',Input_phonetyp = '',Input_phonenumber = '',Input_tier = '',Input_school_size_code = '',Input_competitive_code = '',Input_tuition_code = '',Input_title = '',Input_fname = '',Input_mname = '',Input_lname = '',Input_name_suffix = '',Input_name_score = '',Input_rawaid = '',Input_prim_range = '',Input_predir = '',Input_prim_name = '',Input_addr_suffix = '',Input_postdir = '',Input_unit_desig = '',Input_sec_range = '',Input_p_city_name = '',Input_v_city_name = '',Input_st = '',Input_zip = '',Input_zip4 = '',Input_cart = '',Input_cr_sort_sz = '',Input_lot = '',Input_lot_order = '',Input_dpbc = '',Input_chk_digit = '',Input_rec_type = '',Input_county = '',Input_fips_state = '',Input_fips_county = '',Input_geo_lat = '',Input_geo_long = '',Input_msa = '',Input_geo_blk = '',Input_geo_match = '',Input_err_stat = '',Input_telephone = '',Input_tier2 = '',Input_source = '',Input_key = '',Input_ssn = '',Input_historical_flag = '',Input_full_name = '',Input_college_class = '',Input_college_name = '',Input_ln_college_name = '',Input_college_major = '',Input_new_college_major = '',Input_college_code = '',Input_college_code_exploded = '',Input_college_type = '',Input_college_type_exploded = '',Input_file_type = '',Input_collegeupdate = '',OutFile) := MACRO
   IMPORT SALT311,Scrubs_OKC_Student_List_V2;
   #uniquename(of)
   %of% := RECORD
@@ -39,6 +39,24 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',cleancollegeid='',Input_cleanaddr1
       '' 
     #ELSE
         IF( le.Input_cleanstate = (TYPEOF(le.Input_cleanstate))'','',':cleanstate')
+    #END
+ 
++    #IF( #TEXT(Input_cleanzip)='' )
+      '' 
+    #ELSE
+        IF( le.Input_cleanzip = (TYPEOF(le.Input_cleanzip))'','',':cleanzip')
+    #END
+ 
++    #IF( #TEXT(Input_cleanzip4)='' )
+      '' 
+    #ELSE
+        IF( le.Input_cleanzip4 = (TYPEOF(le.Input_cleanzip4))'','',':cleanzip4')
+    #END
+ 
++    #IF( #TEXT(Input_cleanfulladdr)='' )
+      '' 
+    #ELSE
+        IF( le.Input_cleanfulladdr = (TYPEOF(le.Input_cleanfulladdr))'','',':cleanfulladdr')
     #END
  
 +    #IF( #TEXT(Input_cleandob)='' )
@@ -113,12 +131,6 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',cleancollegeid='',Input_cleanaddr1
         IF( le.Input_append_is_valid_domain_ext = (TYPEOF(le.Input_append_is_valid_domain_ext))'','',':append_is_valid_domain_ext')
     #END
  
-+    #IF( #TEXT(Input_cleancollegeId)='' )
-      '' 
-    #ELSE
-        IF( le.Input_cleancollegeId = (TYPEOF(le.Input_cleancollegeId))'','',':cleancollegeId')
-    #END
- 
 +    #IF( #TEXT(Input_cleantitle)='' )
       '' 
     #ELSE
@@ -149,18 +161,6 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',cleancollegeid='',Input_cleanaddr1
         IF( le.Input_cleansuffixname = (TYPEOF(le.Input_cleansuffixname))'','',':cleansuffixname')
     #END
  
-+    #IF( #TEXT(Input_cleanzip)='' )
-      '' 
-    #ELSE
-        IF( le.Input_cleanzip = (TYPEOF(le.Input_cleanzip))'','',':cleanzip')
-    #END
- 
-+    #IF( #TEXT(Input_cleanzip4)='' )
-      '' 
-    #ELSE
-        IF( le.Input_cleanzip4 = (TYPEOF(le.Input_cleanzip4))'','',':cleanzip4')
-    #END
- 
 +    #IF( #TEXT(Input_cleanmajor)='' )
       '' 
     #ELSE
@@ -171,12 +171,6 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',cleancollegeid='',Input_cleanaddr1
       '' 
     #ELSE
         IF( le.Input_cleanphone = (TYPEOF(le.Input_cleanphone))'','',':cleanphone')
-    #END
- 
-+    #IF( #TEXT(Input_rcid)='' )
-      '' 
-    #ELSE
-        IF( le.Input_rcid = (TYPEOF(le.Input_rcid))'','',':rcid')
     #END
  
 +    #IF( #TEXT(Input_did)='' )
@@ -203,16 +197,22 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',cleancollegeid='',Input_cleanaddr1
         IF( le.Input_date_last_seen = (TYPEOF(le.Input_date_last_seen))'','',':date_last_seen')
     #END
  
-+    #IF( #TEXT(Input_vendor_first_reported)='' )
++    #IF( #TEXT(Input_date_vendor_first_reported)='' )
       '' 
     #ELSE
-        IF( le.Input_vendor_first_reported = (TYPEOF(le.Input_vendor_first_reported))'','',':vendor_first_reported')
+        IF( le.Input_date_vendor_first_reported = (TYPEOF(le.Input_date_vendor_first_reported))'','',':date_vendor_first_reported')
     #END
  
-+    #IF( #TEXT(Input_vendor_last_reported)='' )
++    #IF( #TEXT(Input_date_vendor_last_reported)='' )
       '' 
     #ELSE
-        IF( le.Input_vendor_last_reported = (TYPEOF(le.Input_vendor_last_reported))'','',':vendor_last_reported')
+        IF( le.Input_date_vendor_last_reported = (TYPEOF(le.Input_date_vendor_last_reported))'','',':date_vendor_last_reported')
+    #END
+ 
++    #IF( #TEXT(Input_dateadded)='' )
+      '' 
+    #ELSE
+        IF( le.Input_dateadded = (TYPEOF(le.Input_dateadded))'','',':dateadded')
     #END
  
 +    #IF( #TEXT(Input_dateupdated)='' )
@@ -299,18 +299,6 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',cleancollegeid='',Input_cleanaddr1
         IF( le.Input_major = (TYPEOF(le.Input_major))'','',':major')
     #END
  
-+    #IF( #TEXT(Input_COLLEGE_MAJOR)='' )
-      '' 
-    #ELSE
-        IF( le.Input_COLLEGE_MAJOR = (TYPEOF(le.Input_COLLEGE_MAJOR))'','',':COLLEGE_MAJOR')
-    #END
- 
-+    #IF( #TEXT(Input_NEW_COLLEGE_MAJOR)='' )
-      '' 
-    #ELSE
-        IF( le.Input_NEW_COLLEGE_MAJOR = (TYPEOF(le.Input_NEW_COLLEGE_MAJOR))'','',':NEW_COLLEGE_MAJOR')
-    #END
- 
 +    #IF( #TEXT(Input_grade)='' )
       '' 
     #ELSE
@@ -353,16 +341,16 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',cleancollegeid='',Input_cleanaddr1
         IF( le.Input_addresstype = (TYPEOF(le.Input_addresstype))'','',':addresstype')
     #END
  
-+    #IF( #TEXT(Input_address1)='' )
++    #IF( #TEXT(Input_address_1)='' )
       '' 
     #ELSE
-        IF( le.Input_address1 = (TYPEOF(le.Input_address1))'','',':address1')
+        IF( le.Input_address_1 = (TYPEOF(le.Input_address_1))'','',':address_1')
     #END
  
-+    #IF( #TEXT(Input_address2)='' )
++    #IF( #TEXT(Input_address_2)='' )
       '' 
     #ELSE
-        IF( le.Input_address2 = (TYPEOF(le.Input_address2))'','',':address2')
+        IF( le.Input_address_2 = (TYPEOF(le.Input_address_2))'','',':address_2')
     #END
  
 +    #IF( #TEXT(Input_city)='' )
@@ -377,16 +365,16 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',cleancollegeid='',Input_cleanaddr1
         IF( le.Input_state = (TYPEOF(le.Input_state))'','',':state')
     #END
  
-+    #IF( #TEXT(Input_zip)='' )
++    #IF( #TEXT(Input_z5)='' )
       '' 
     #ELSE
-        IF( le.Input_zip = (TYPEOF(le.Input_zip))'','',':zip')
+        IF( le.Input_z5 = (TYPEOF(le.Input_z5))'','',':z5')
     #END
  
-+    #IF( #TEXT(Input_zip4)='' )
++    #IF( #TEXT(Input_z4)='' )
       '' 
     #ELSE
-        IF( le.Input_zip4 = (TYPEOF(le.Input_zip4))'','',':zip4')
+        IF( le.Input_z4 = (TYPEOF(le.Input_z4))'','',':z4')
     #END
  
 +    #IF( #TEXT(Input_phonetyp)='' )
@@ -461,6 +449,12 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',cleancollegeid='',Input_cleanaddr1
         IF( le.Input_name_score = (TYPEOF(le.Input_name_score))'','',':name_score')
     #END
  
++    #IF( #TEXT(Input_rawaid)='' )
+      '' 
+    #ELSE
+        IF( le.Input_rawaid = (TYPEOF(le.Input_rawaid))'','',':rawaid')
+    #END
+ 
 +    #IF( #TEXT(Input_prim_range)='' )
       '' 
     #ELSE
@@ -521,16 +515,16 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',cleancollegeid='',Input_cleanaddr1
         IF( le.Input_st = (TYPEOF(le.Input_st))'','',':st')
     #END
  
-+    #IF( #TEXT(Input_z5)='' )
++    #IF( #TEXT(Input_zip)='' )
       '' 
     #ELSE
-        IF( le.Input_z5 = (TYPEOF(le.Input_z5))'','',':z5')
+        IF( le.Input_zip = (TYPEOF(le.Input_zip))'','',':zip')
     #END
  
-+    #IF( #TEXT(Input_z4)='' )
++    #IF( #TEXT(Input_zip4)='' )
       '' 
     #ELSE
-        IF( le.Input_z4 = (TYPEOF(le.Input_z4))'','',':z4')
+        IF( le.Input_zip4 = (TYPEOF(le.Input_zip4))'','',':zip4')
     #END
  
 +    #IF( #TEXT(Input_cart)='' )
@@ -557,10 +551,10 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',cleancollegeid='',Input_cleanaddr1
         IF( le.Input_lot_order = (TYPEOF(le.Input_lot_order))'','',':lot_order')
     #END
  
-+    #IF( #TEXT(Input_dbpc)='' )
++    #IF( #TEXT(Input_dpbc)='' )
       '' 
     #ELSE
-        IF( le.Input_dbpc = (TYPEOF(le.Input_dbpc))'','',':dbpc')
+        IF( le.Input_dpbc = (TYPEOF(le.Input_dpbc))'','',':dpbc')
     #END
  
 +    #IF( #TEXT(Input_chk_digit)='' )
@@ -645,6 +639,96 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',cleancollegeid='',Input_cleanaddr1
       '' 
     #ELSE
         IF( le.Input_source = (TYPEOF(le.Input_source))'','',':source')
+    #END
+ 
++    #IF( #TEXT(Input_key)='' )
+      '' 
+    #ELSE
+        IF( le.Input_key = (TYPEOF(le.Input_key))'','',':key')
+    #END
+ 
++    #IF( #TEXT(Input_ssn)='' )
+      '' 
+    #ELSE
+        IF( le.Input_ssn = (TYPEOF(le.Input_ssn))'','',':ssn')
+    #END
+ 
++    #IF( #TEXT(Input_historical_flag)='' )
+      '' 
+    #ELSE
+        IF( le.Input_historical_flag = (TYPEOF(le.Input_historical_flag))'','',':historical_flag')
+    #END
+ 
++    #IF( #TEXT(Input_full_name)='' )
+      '' 
+    #ELSE
+        IF( le.Input_full_name = (TYPEOF(le.Input_full_name))'','',':full_name')
+    #END
+ 
++    #IF( #TEXT(Input_college_class)='' )
+      '' 
+    #ELSE
+        IF( le.Input_college_class = (TYPEOF(le.Input_college_class))'','',':college_class')
+    #END
+ 
++    #IF( #TEXT(Input_college_name)='' )
+      '' 
+    #ELSE
+        IF( le.Input_college_name = (TYPEOF(le.Input_college_name))'','',':college_name')
+    #END
+ 
++    #IF( #TEXT(Input_ln_college_name)='' )
+      '' 
+    #ELSE
+        IF( le.Input_ln_college_name = (TYPEOF(le.Input_ln_college_name))'','',':ln_college_name')
+    #END
+ 
++    #IF( #TEXT(Input_college_major)='' )
+      '' 
+    #ELSE
+        IF( le.Input_college_major = (TYPEOF(le.Input_college_major))'','',':college_major')
+    #END
+ 
++    #IF( #TEXT(Input_new_college_major)='' )
+      '' 
+    #ELSE
+        IF( le.Input_new_college_major = (TYPEOF(le.Input_new_college_major))'','',':new_college_major')
+    #END
+ 
++    #IF( #TEXT(Input_college_code)='' )
+      '' 
+    #ELSE
+        IF( le.Input_college_code = (TYPEOF(le.Input_college_code))'','',':college_code')
+    #END
+ 
++    #IF( #TEXT(Input_college_code_exploded)='' )
+      '' 
+    #ELSE
+        IF( le.Input_college_code_exploded = (TYPEOF(le.Input_college_code_exploded))'','',':college_code_exploded')
+    #END
+ 
++    #IF( #TEXT(Input_college_type)='' )
+      '' 
+    #ELSE
+        IF( le.Input_college_type = (TYPEOF(le.Input_college_type))'','',':college_type')
+    #END
+ 
++    #IF( #TEXT(Input_college_type_exploded)='' )
+      '' 
+    #ELSE
+        IF( le.Input_college_type_exploded = (TYPEOF(le.Input_college_type_exploded))'','',':college_type_exploded')
+    #END
+ 
++    #IF( #TEXT(Input_file_type)='' )
+      '' 
+    #ELSE
+        IF( le.Input_file_type = (TYPEOF(le.Input_file_type))'','',':file_type')
+    #END
+ 
++    #IF( #TEXT(Input_collegeupdate)='' )
+      '' 
+    #ELSE
+        IF( le.Input_collegeupdate = (TYPEOF(le.Input_collegeupdate))'','',':collegeupdate')
     #END
 ;
     #IF (#TEXT(cleancollegeid)<>'')
