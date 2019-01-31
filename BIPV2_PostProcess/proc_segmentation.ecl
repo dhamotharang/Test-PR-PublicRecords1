@@ -205,6 +205,7 @@ module
     BIPV2_PostProcess.macPartition(pInput, SELEID, SeleFree, SeleProb)
     BIPV2_PostProcess.macPartition(pInput, OrgID,  OrgFree,  OrgProb)
     BIPV2_PostProcess.macPartition(pInput, UltID,  UltFree,  UltProb)
+    BIPV2_PostProcess.macPartition(pInput, Empid,  EmpFree,  EmpProb)
     
     // Gold Segmentation
     export modgoldSELEV2      := BIPV2_PostProcess.segmentation_gold(SeleFree,  'SELEID',pToday, 'V2'          + pGoldOutputModifier);
@@ -221,6 +222,9 @@ module
     shared modPowV2P          := BIPv2_PostProcess.segmentation(PowProb,  'POWID',pToday);
     export modSeleV2          := BIPv2_PostProcess.segmentation(SeleFree, 'SELEID',pToday);
     export modSeleV2P         := BIPv2_PostProcess.segmentation(SeleProb, 'SELEID',pToday);
+
+    export modEmpV2           := BIPv2_PostProcess.segmentation(EmpFree , 'EMPID',pToday);
+    shared modEmpV2P          := BIPv2_PostProcess.segmentation(EmpProb , 'EMPID',pToday);
     
     shared modorgV2           := BIPv2_PostProcess.segmentation(OrgFree, 'ORGID',pToday);
     shared modorgV2P          := BIPv2_PostProcess.segmentation(OrgProb, 'ORGID',pToday);
@@ -245,16 +249,19 @@ module
     // shared createOrgFile     := tools.macf_writefile(fnames.OrgidSegs.logical  ,modOrg.result  ,,,pOverwrite);
     // shared createUltFile     := tools.macf_writefile(fnames.UltidSegs.logical  ,modUlt.result  ,,,pOverwrite);
     // Output to workunit Seg Stats
-    shared outputProxStatsV2  := output(modProxV2.stats ,named('ProxSegmentationStatsV2'));
-    shared outputProxStatsV2P := output(modProxV2P.stats ,named('ProxSegmentationStatsV2Probation'));
+    export outputProxStatsV2  := output(modProxV2.stats ,named('ProxSegmentationStatsV2'));
+    export outputProxStatsV2P := output(modProxV2P.stats ,named('ProxSegmentationStatsV2Probation'));
     
-    shared outputPowStatsV2   := output(modPowV2.stats  ,named('PowSegmentationStatsV2'));
-    shared outputPowStatsV2P  := output(modPowV2P.stats ,named('PowSegmentationStatsV2Probation'));
-    shared outputSeleStatsV2  := output(modSeleV2.stats  ,named('SeleSegmentationStatsV2'));
-    shared outputSeleStatsV2P := output(modSeleV2P.stats ,named('SeleSegmentationStatsV2Probation'));
+    export outputPowStatsV2   := output(modPowV2.stats  ,named('PowSegmentationStatsV2'));
+    export outputPowStatsV2P  := output(modPowV2P.stats ,named('PowSegmentationStatsV2Probation'));
+    export outputSeleStatsV2  := output(modSeleV2.stats  ,named('SeleSegmentationStatsV2'));
+    export outputSeleStatsV2P := output(modSeleV2P.stats ,named('SeleSegmentationStatsV2Probation'));
+
+    export outputEmpStatsV2   := output(modEmpV2.stats  ,named('EmpSegmentationStatsV2'));
+    export outputEmpStatsV2P  := output(modEmpV2P.stats ,named('EmpSegmentationStatsV2Probation'));
     
-    shared outputOrgStatsV2   := output(modOrgV2.stats  ,named('OrgSegmentationStatsV2' ));
-    shared outputOrgStatsV2P  := output(modOrgV2P.stats  ,named('OrgSegmentationStatsV2Probation' ));
+    export outputOrgStatsV2   := output(modOrgV2.stats  ,named('OrgSegmentationStatsV2' ));
+    export outputOrgStatsV2P  := output(modOrgV2P.stats  ,named('OrgSegmentationStatsV2Probation' ));
     
     // shared outputUltStats    := output(modUlt.stats  ,named('UltSegmentationStats' ));
     // setup field stats and counts
@@ -584,6 +591,8 @@ module
         , outputPowStatsV2P
         , outputSeleStatsV2 
         , outputSeleStatsV2P
+        , outputEmpStatsV2 
+        , outputEmpStatsV2P
         
         , outputOrgStatsV2 
         , outputOrgStatsV2P
