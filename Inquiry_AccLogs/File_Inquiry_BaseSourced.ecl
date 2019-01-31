@@ -15,7 +15,7 @@ shared Blank_IDs(infile, outfile) := macro
 											self := left));
 endmacro;
 
-USABase := Inquiry_AccLogs.fn_NonFCRABaseUSAfilter;
+USABase := Inquiry_AccLogs.fn_NonFCRABaseUSAfilter();
 
 Updates_Only :=	USABase
 								(~inquiry_acclogs.fnTranslations.is_SubMarketFilter(allow_flags.allowflags) and

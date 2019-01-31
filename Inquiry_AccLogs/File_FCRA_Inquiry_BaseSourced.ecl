@@ -4,7 +4,7 @@ modify vertical filter
 /*2014-05-09T22:37:47Z (Wendy Ma)
 additional healthcare account detection
 */
-import ut;
+import ut, data_services, inql_v2;
 export File_FCRA_Inquiry_BaseSourced :=  module
 
 Blank_IDs(infile, outfile) := macro 
@@ -19,13 +19,15 @@ Blank_IDs(infile, outfile) := macro
 											self := left));
 endmacro;
 
+v2_base_files := dataset(Data_Services.foreign_prod + 'uspr::inql::fcra::base::weekly::building_keys', INQL_v2.Layouts.Common_ThorAdditions, thor);
 
-base_files :=	distribute((fnAddSource(inquiry_acclogs.File_FCRA_Riskwise_Logs_Common, 'RISKWISE') +
-													fnAddSource(inquiry_acclogs.File_FCRA_Accurint_Logs_Common, 'COLLECTION') + 
-												  fnAddSource(Inquiry_AccLogs.File_FCRA_BankoBatch_Logs_Common, 'BANKO BATCH') +
-													fnAddSource(Inquiry_AccLogs.File_FCRA_Batch_Logs_Common, 'BATCH') + 
-													fnAddSource(Inquiry_AccLogs.File_FCRA_ProdR3_Logs_Common, 'PROD R3') + 
-													fnAddSource(Inquiry_AccLogs.File_FCRA_Banko_Logs_Common, 'BANKO'))
+base_files :=	distribute(v2_base_files
+													// (fnAddSource(inquiry_acclogs.File_FCRA_Riskwise_Logs_Common, 'RISKWISE') +
+													// fnAddSource(inquiry_acclogs.File_FCRA_Accurint_Logs_Common, 'COLLECTION') + 
+												  // fnAddSource(Inquiry_AccLogs.File_FCRA_BankoBatch_Logs_Common, 'BANKO BATCH') +
+													// fnAddSource(Inquiry_AccLogs.File_FCRA_Batch_Logs_Common, 'BATCH') + 
+													// fnAddSource(Inquiry_AccLogs.File_FCRA_ProdR3_Logs_Common, 'PROD R3') + 
+													// fnAddSource(Inquiry_AccLogs.File_FCRA_Banko_Logs_Common, 'BANKO'))
 														// (bus_intel.vertical not in inquiry_acclogs.fnCleanFunctions.filtercds and
 														// ~regexfind(inquiry_acclogs.fnCleanFunctions.FilterCds_extra,bus_intel.vertical) and  
 														 // bus_intel.industry not in inquiry_acclogs.fnCleanFunctions.industry_filtercds and
