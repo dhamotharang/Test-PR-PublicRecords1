@@ -101,6 +101,9 @@ END;
 EXPORT Base_BIP	:= RECORD
 		Base;
 		bipv2.IDlayouts.l_xlink_ids;
+//New fields added for California Consumer Protection Project
+		unsigned4 GlobalSourceId;
+		unsigned8 SourceSpecificRecordId;
 END;
 	
 //Base layout with temp Validation fields
@@ -154,8 +157,8 @@ END;
   unsigned6 did;
   unsigned8 did_score;
 	string10  did_type := '';
-	unsigned hhid := 0;
-  string5 title;
+	unsigned 	hhid := 0;
+  string5 	title;
   string20 fname;
   string20 mname;
   string20 lname;
@@ -203,6 +206,8 @@ END;
 	string	CompanyTitle;
 	unsigned	rules;						//Bitmap of email validation rules
 	bipv2.IDlayouts.l_xlink_ids;
+	unsigned4 GlobalSourceId;
+	unsigned8 SourceSpecificRecordId;
 END;
  
  //Appended SCRUBS bits field in flat layout
