@@ -28,6 +28,7 @@ def dCompanyNameScore():
 			+'    , SKIP );/*HACKCompanyNameScore*/','company name replacement')
 	]
 
+
 ##---------------------------------------------------------------------------
 ##dPrimNameExactMatch
 ##debug and matches
@@ -38,7 +39,7 @@ def dPrimNameExactMatch():
 		('matches', '(INTEGER2 prim_name_derived_score := IF \( )([^;]*?)(;)', 'HACKPrimName','\g<1>le.prim_name_derived = ri.prim_name_derived/*HACKPrimName*/ or \g<2>\g<3>', 'Hack prim_name_derived exact match')
 	]
 
-	
+
 ##---------------------------------------------------------------------------
 ##dCompanyNumberEquality
 ##matches
@@ -47,8 +48,7 @@ def dCompanyNumberEquality():
 	return [
 		('matches', '(INTEGER2 cnp_number_score := IF \( )([^;]*?)(;)', 'HACKCompanyNumber','\g<1>le.cnp_number = ri.cnp_number /*HACKCompanyNumber*/ /* cnp_number_score_temp >= Config.cnp_number_Force * 100 */ , cnp_number_score_temp, SKIP );', 'Add cnp_number equality condition')
 	]
-
-		
+			
 ##---------------------------------------------------------------------------
 ##dScoreAssignment
 ##debug and matches
@@ -168,27 +168,29 @@ def dMatches():
             + '  );\n','Hack Adding Rules for extra mjs'),
 		('matches', 'LEFT\.cnp_number = RIGHT\.cnp_number'  ,'HACKMatches02'  ,'LEFT.cnp_number = RIGHT.cnp_number AND LEFT.prim_name_derived = RIGHT.prim_name_derived/*HACKMatches02*/' ,'Hack adding prim_name_derived equality condition to mj0'),
 		('matches', ',trans\(LEFT,RIGHT,0\)'  ,'HACKMatches03'  ,'/*HACKMatches03*/ AND ~(( left.cnp_name = right.cnp_name ) AND ( left.company_address = right.company_address )),trans(LEFT,RIGHT,0)' ,'Hack removing perfect cnp name, address matches from mj0'),
-		('matches','AllAttrMatches := SORT\(MOD_Attr_SrcRidVlid\(ih\)\.Match\+MOD_Attr_ForeignCorpkey\(ih\)\.Match\+MOD_Attr_RAAddresses\(ih\)\.Match\+MOD_Attr_FilterPrimNames\(ih\)\.Match,Proxid1','HACKMatches04','AllAttrMatches := SORT(Mod_Attr_SrcRidVlid(ih).Match/*HACKMatches04*/ /* +Mod_Attr_ForeignCorpkey(ih).Match+Mod_Attr_RAAddresses(ih).Match+Mod_Attr_FilterPrimNames(ih).Match*/,Proxid1','only use srcridvlid att matches for speedup'),
+		('matches','AllAttrMatches := SORT\(MOD_Attr_SrcRidVlid\(ih\)\.Match\+MOD_Attr_ForeignCorpkey\(ih\)\.Match\+MOD_Attr_RAAddresses\(ih\)\.Match\+MOD_Attr_FilterPrimNames\(ih\)\.Match\+MOD_Attr_UnderLinks\(ih\)\.Match,Proxid1','HACKMatches04','AllAttrMatches := SORT(Mod_Attr_SrcRidVlid(ih).Match+MOD_Attr_UnderLinks(ih).Match/*HACKMatches04*/ /* +Mod_Attr_ForeignCorpkey(ih).Match+Mod_Attr_RAAddresses(ih).Match+Mod_Attr_FilterPrimNames(ih).Match*/,Proxid1','only use srcridvlid att matches for speedup'),
 		('matches','(SALT311\.mac_avoid_transitives\(All_Matches,Proxid1,Proxid2,Conf,DateOverlap,Rule,o\);)'  ,'HACKMatches05','// \g<1> /*HACKMatches05 - disable default salt mac_avoid_transitives*/\n'
             + 'import BIPV2_Tools;\n /*HACKMatches05, import module for new transitives macro*/\n'
-            + 'o := SALT_Reg_BIP_ProxID2.mac_avoid_transitives_scalene(All_Matches,Proxid1,Proxid2,Conf,DateOverlap,Rule,MatchThreshold,10); // HACKMatches05 - Use new transitives macro, bucket size 5*/\n','Hack replacing transitives macro'),
+            + 'o := BIPV2_ProxID.mac_avoid_transitives_scalene(All_Matches,Proxid1,Proxid2,Conf,DateOverlap,Rule,MatchThreshold,10); // HACKMatches05 - Use new transitives macro, bucket size 5*/\n','Hack replacing transitives macro'),
 		('matches','(Patch)(lgid3|orgid|ultid|dotid)( := SALT311)(.*?$)'  ,'HACKMatches06', '\g<1>\g<2> := BIPV2_Tools\g<4>/*HACKMatches06*/','replacing parentid and childid patch call'),
 		('matches','SALT311\.MAC_Reassign_UID\(ihbp,Cleave\(ih\)\.patch_file,Proxid,rcid,ih1\);'  ,'HACKMatches07a','SALT311.MAC_Reassign_UID(ihbp,Cleave(ih).patch_file,Proxid,rcid,ihbp01/*HACKMatches07a*/);','github 3140 issue'),
 		('matches','SALT311\.MAC_SliceOut_ByRID\(ih1,rcid,Proxid,ToSlice,rcid,sliced0\);'  ,'HACKMatches07b','SALT311.MAC_SliceOut_ByRID(ihbp01/*HACKMatches07b*/,rcid,Proxid,ToSlice,rcid,sliced0);','github 3140 issue'),
-		('matches','sliced := IF\( Config\.DoSliceouts, sliced0, ih1\)'  ,'HACKMatches07c','sliced := IF( Config.DoSliceouts, sliced0, ihbp01/*HACKMatches07c*/)','github 3140 issue')			
-('matches','attr_match := JOIN[(]DISTRIBUTE[(]j1,HASH[(]Proxid1[)][)],hd,LEFT[.]Proxid1 = RIGHT[.]Proxid AND [(] LEFT[.]SALT_Partition = RIGHT[.]SALT_Partition OR LEFT[.]SALT_Partition=\'\' OR RIGHT[.]SALT_Partition = \'\' )'  ,'HACKMatches08'  
-    , 'attr_match := JOIN(DISTRIBUTE(j1,HASH(Proxid1)),hd,LEFT.Proxid1 = RIGHT.Proxid AND ( LEFT.SALT_Partition = RIGHT.SALT_Partition OR LEFT.SALT_Partition='' OR RIGHT.SALT_Partition = '' )\n'
-    + 'AND LEFT.cnp_number = RIGHT.cnp_number AND LEFT.prim_name_derived = RIGHT.prim_name_derived/*HACKMatches02*/\n'
+		('matches','sliced := IF\( Config\.DoSliceouts, sliced0, ih1\)'  ,'HACKMatches07c','sliced := IF( Config.DoSliceouts, sliced0, ihbp01/*HACKMatches07c*/)','github 3140 issue'),
+		('matches','attr_match := JOIN\(DISTRIBUTE\(j1,HASH\(Proxid1\)\),hd,LEFT\.Proxid1 = RIGHT\.Proxid AND \( LEFT\.SALT_Partition = RIGHT\.SALT_Partition OR LEFT\.SALT_Partition=\'\' OR RIGHT\.SALT_Partition = \'\' \)'  ,'HACKMatches08'  		
+    , 'attr_match := JOIN(DISTRIBUTE(j1,HASH(Proxid1)),hd,LEFT.Proxid1 = RIGHT.Proxid AND ( LEFT.SALT_Partition = RIGHT.SALT_Partition OR LEFT.SALT_Partition=\'\' OR RIGHT.SALT_Partition = \'\' )\n'                    
+	+ 'AND LEFT.cnp_number = RIGHT.cnp_number AND LEFT.prim_name_derived = RIGHT.prim_name_derived/*HACKMatches02*/\n'
     + 'AND LEFT.st = RIGHT.st\n'
     + 'AND LEFT.prim_range_derived = RIGHT.prim_range_derived\n'
     + 'AND ( ~left.st_isnull AND ~right.st_isnull )\n'
     + 'AND ( left.active_enterprise_number = right.active_enterprise_number OR left.active_enterprise_number_isnull OR right.active_enterprise_number_isnull )\n'
     + 'AND ( left.active_domestic_corp_key = right.active_domestic_corp_key OR left.active_domestic_corp_key_isnull OR right.active_domestic_corp_key_isnull )\n'
     + 'AND (( ~left.cnp_name_isnull AND ~right.cnp_name_isnull ) OR LEFT.support_cnp_name > 0 or (left.active_domestic_corp_key = right.active_domestic_corp_key OR left.active_domestic_corp_key_isnull OR right.active_domestic_corp_key_isnull ) OR ( ~left.active_duns_number_isnull AND ~right.active_duns_number_isnull ) OR ( ~left.company_fein_isnull AND ~right.company_fein_isnull ))\n'
-    + 'AND ( ~left.prim_name_derived_isnull AND ~right.prim_name_derived_isnull ) AND (~left.company_address_isnull AND ~right.company_address_isnull )\n'                      
-    ,'BH-578 -- add hack to proxid to speed up attribute matches')
-	]
+    + 'AND ( ~left.prim_name_derived_isnull AND ~right.prim_name_derived_isnull ) AND (~left.company_address_isnull AND ~right.company_address_isnull )\n'		     
 
+     ,'BH-578 -- add hack to proxid to speed up attribute matches')
+	 ]
+
+	
 ##---------------------------------------------------------------------------
 ##Keys
 ##Key hacks
@@ -212,13 +214,13 @@ def dKeys():
     		+ 'EXPORT InData             := INDEX(ih,{Proxid},{ih},keynames(liter,pUseOtherEnvironment).in_data.logical);\n'
     		+ '\n'
     		+ '// Create logic to manage the match history key\n'
-    		+ '//EXPORT MatchHistoryName := \'~keep::SALT_Reg_BIP_ProxID2::Proxid::MatchHistory\';\n'
+    		+ '//EXPORT MatchHistoryName := \'~keep::BIPV2_ProxID::Proxid::MatchHistory\';\n'
     		+ '//EXPORT MatchHistoryFile := DATASET(MatchHistoryName,Matches(In_DOT_Base).id_shift_r,THOR); // Read in all the change history\n'
-    		+ '//EXPORT MatchHistoryKeyName := \'~\'+\'key::SALT_Reg_BIP_ProxID2::Proxid::History::Match\';\n'
+    		+ '//EXPORT MatchHistoryKeyName := \'~\'+\'key::BIPV2_ProxID::Proxid::History::Match\';\n'
     		+ '//  MH := MatchHistoryFile;\n'
     		+ '//EXPORT MatchHistoryKey := INDEX(MH,{Proxid_after},{MH},MatchHistoryKeyName);\n'
     		+ '// Build enough to support the data services such as cleave/best\n'
-    		+ '// EXPORT InDataKeyName := \'~\'+\'key::SALT_Reg_BIP_ProxID2::Proxid::Datafile::in_data\';\n'
+    		+ '// EXPORT InDataKeyName := \'~\'+\'key::BIPV2_ProxID::Proxid::Datafile::in_data\';\n'
     		+ '// EXPORT InData := INDEX(ih,{Proxid},{ih},InDataKeyName);\n'
     		+ '// SHARED Build_InData := BUILDINDEX(InData, OVERWRITE);\n'
     		+ '// EXPORT BuildData := PARALLEL(Build_Specificities_Key,Build_InData);\n'
@@ -243,8 +245,8 @@ def dModAttrForeignCorpKey():
       		+ '// Construct a function to filter matches to those that obey the force criteria on this attribute file.\n'
       		+ 'EXPORT ForceFilter(inhead,infile,id1,id2) := FUNCTIONMACRO\n'
       		+ '// Every attribute value must match to a value in the other attribute IF they have the same context\n'
-      		+ '//  Cands0 := SALT_Reg_BIP_ProxID2.match_candidates(inhead).ForeignCorpkey_candidates;\n'
-      		+ '  Cands0 := SALT_Reg_BIP_ProxID2.file_Foreign_Corpkey;/*HACK*/\n'
+      		+ '//  Cands0 := BIPV2_ProxID.match_candidates(inhead).ForeignCorpkey_candidates;\n'
+      		+ '  Cands0 := BIPV2_ProxID.file_Foreign_Corpkey;/*HACK*/\n'
       		+ '// We are going to create a record for each candidate pair; this record will have a child dataset for the attribute values of each side\n'
       		+ 'childrec1 := \n'
       		+ 'record\n'
@@ -331,7 +333,7 @@ def dMODAttrRAAddresses():
       		+ '// Construct a function to filter matches to those that obey the force criteria on this attribute file.\n'
       		+ 'EXPORT ForceFilter(inhead,infile,id1,id2) := FUNCTIONMACRO\n'
       		+ '// Every attribute value has to exactly match every attribute value of the corresponding identifier or both have no values\n'
-      		+ '  Cands0 := SALT_Reg_BIP_ProxID2.file_RA_Addresses;/*HACK*/\n'
+      		+ '  Cands0 := BIPV2_ProxID.file_RA_Addresses;/*HACK*/\n'
       		+ '// We are going to create a record for each candidate pair; this record will have a child dataset for the attribute values of each side\n'
       		+ '////\n'
       		+ 'childrec1 := \n'
@@ -418,7 +420,7 @@ def dMODAttrFilterPrimNames():
       		+ '// Construct a function to filter matches to those that obey the force criteria on this attribute file.\n'
       		+ 'EXPORT ForceFilter(inhead,infile,id1,id2) := FUNCTIONMACRO\n'
       		+ '// Every attribute value has to exactly match every attribute value of the corresponding identifier or both have no values\n'
-      		+ '  Cands0 := SALT_Reg_BIP_ProxID2.file_filter_Prim_names;/*HACK*/\n'
+      		+ '  Cands0 := BIPV2_ProxID.file_filter_Prim_names;/*HACK*/\n'
       		+ '// We are going to create a record for each candidate pair; this record will have a child dataset for the attribute values of each side\n'
       		+ '////\n'
       		+ 'childrec1 := \n'
@@ -501,7 +503,7 @@ def dBasicMatch():
 		('BasicMatch','SHARED PickOne := DEDUP\( SORT\( DISTRIBUTE\( Match,HASH\(Proxid1\) \), Proxid1, Proxid2, LOCAL\), Proxid1, LOCAL\);','HACKBasicMatch02', 'SHARED PickOne := table( Match  ,{Proxid1  ,unsigned6 Proxid2 := min(group,Proxid2)}, Proxid1, merge);/*HACKBasicMatch02*/','speed up pickone'),
 		('BasicMatch','(AND LEFT\.company_csz = RIGHT\.company_csz AND LEFT\.company_addr1 = RIGHT\.company_addr1 AND LEFT\.company_address = RIGHT\.company_address)','HACKBasicMatch03', '/*HACKBasicMatch03*/ /*\g<1>*/','comment out the code')
 	]	
-	
+
 ##---------------------------------------------------------------------------
 ##ProxidCompareService
 ##ProxidCompareService hacks
@@ -517,12 +519,12 @@ def dCompareService():
       		+ '*/\n'
       		+ '/*--INFO-- Compare two IDs to see if they should be joined.<p>If it is easier you may place the two IDs on the first line and they will be parsed into first and second.</p>*/\n'
       		+ 'EXPORT ProxidCompareService := MACRO\n'
-      		+ 'IMPORT SALT24,SALT_Reg_BIP_ProxID2,ut,tools;\n'
+      		+ 'IMPORT SALT24,BIPV2_ProxID2,ut,tools;\n'
       		+ 'STRING50 Proxidonestr := \'1234\'  : STORED(\'ProxidOne\');\n'
       		+ 'STRING20 Proxidtwostr := \'12345\'  : STORED(\'Proxidtwo\');\n'
       		+ 'combo := \'qa\';\n'
       		+ '\n'
-      		+ 'SALT_Reg_BIP_ProxID2._fun_CompareService((unsigned6)Proxidonestr,(unsigned6)Proxidtwostr,combo);\n'
+      		+ 'BIPV2_ProxID._fun_CompareService((unsigned6)Proxidonestr,(unsigned6)Proxidtwostr,combo);\n'
       		+ 'ENDMACRO;\n'
       		+ '\n','Hack ProxidCompareService to call the function.')
 	]
@@ -547,6 +549,7 @@ def dProcIterate():
     	('Proc_Iterate','changes_it\'\+iter;'               ,'HACKProcIterate03' ,'changes_it\'+keyversion;/* HACKProcIterate03 use keyversion for changes file*/'  ,'change to keyversion for changes file' )
 	]
 
+
 ##---------------------------------------------------------------------------
 ##ds_MatchCandidates
 ##match_candidates hacks
@@ -555,8 +558,6 @@ def dMatchCandidates():
 	return [
 		('match_candidates','(,HINT\(parallel_match\))'  ,'HACKMatchCand'  ,'/*\g<1>*//*HACKMatchCand to prevent memory limit exceeded error*/' ,'remove hint(parallel_match)')
 	]
-
-	
 
 getHacks = 	dCompanyNameScore() + \
 			dPrimNameExactMatch() + \
@@ -568,9 +569,11 @@ getHacks = 	dCompanyNameScore() + \
 			dModAttrForeignCorpKey() + \
 			dMODAttrRAAddresses() + \
 			dMODAttrFilterPrimNames() + \
-			dBasicMatch() + \
+			dBasicMatch()+ \
 			dCompareService() + \
-			dConfig() + \
+			dConfig()  + \
 			dProcIterate() + \
 			dMatchCandidates()
+			
+					
 

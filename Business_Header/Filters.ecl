@@ -466,6 +466,8 @@ module
 				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and pInput.phone = 5864658018 and trim(pInput.lname) = 'ADAMASZEK' and trim(pInput.fname) = 'EARL' and trim(pInput.mname) = 'PHILIP')
 				// -- JIRA - DF-22015 - Consumer Advocacy - Overlinked PAW LexID 2209391182 Rowland
 				or  (trim(pInput.company_source_group) in ['20051035184CAPITAL RESOURCE OF THE','CP2489375217655639462','CP404623158'] and trim(pInput.lname) = 'ROWLAND' and trim(pInput.fname) = 'JAMES')
+				// -- JIRA - DF-22416 - Consumer Dispute - PAW record to be removed
+				or  ((trim(pInput.company_source_group) = '070131000296CLIPS TAX SOLUTION INC' or trim(pInput.vendor_id) in ['36-3470129','829879378']) and regexfind('CLIPS TAX SOLUTION',pInput.company_name, nocase))
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -1051,6 +1053,8 @@ module
 				or  (trim(pInput.company_source_group) in ['20051035184CAPITAL RESOURCE OF THE','CP2489375217655639462','CP404623158'] and trim(pInput.lname) = 'ROWLAND' and trim(pInput.fname) = 'JAMES')
 				// -- JIRA - DF-23549 - FCRA Overlinking of PAW Record to LexID 591453905 - Day
 				or  (mdr.sourceTools.sourceIsAK_Corporations(pInput.source) and regexfind('DAY AND GULLIFORD PROPERTIES|J.E.B. CINCINNATI',pInput.company_name,nocase) and trim(pInput.lname)='DAY' and trim(pInput.prim_name)='7TH')
+				// -- JIRA - DF-22416 - Consumer Dispute - PAW record to be removed
+				or  ((trim(pInput.company_source_group) = '070131000296CLIPS TAX SOLUTION INC' or trim(pInput.vendor_id) in ['36-3470129','829879378']) and regexfind('CLIPS TAX SOLUTION',pInput.company_name, nocase))
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut

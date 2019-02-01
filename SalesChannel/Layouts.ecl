@@ -120,7 +120,7 @@ MODULE
 	  export UniqueId := 
 		record
  		  unsigned8		unique_id	;
-		  Base									;
+		  Base_new							;
 		end;
 
 		export aid_prep :=
@@ -128,7 +128,7 @@ MODULE
 		
 			string			address1				;
 			string			address2				;
-			Base												;
+			Base_new										;
 		
 		end;
 		

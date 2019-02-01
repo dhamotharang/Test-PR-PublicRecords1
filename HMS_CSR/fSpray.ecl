@@ -1,4 +1,4 @@
-import lib_fileservices,_control,lib_stringlib,Versioncontrol,tools,HMS_CSR;
+﻿import lib_fileservices,_control,lib_stringlib,Versioncontrol,tools,HMS_CSR;
 
 export fSpray(
 								//string version, boolean pUseProd = false
@@ -41,7 +41,7 @@ export fSpray(
   */	                                                            
  	{
 		pServerIP	            //SourceIP			 Remote Server's IP address									
-		,pDirectory + pVersion + '/'          //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
+		,pDirectory + pVersion[1..8] + '/'          //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
 		,pAddressFilename    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
 		,0                  //record_size	     record length of files to be sprayed(for fixed length files only)      
 		,_Dataset(pUseProd).thor_cluster_Files+ 'in::' + _Dataset().Name + '::hms_address_' + pVersion       //Thor_filename_template	-- template filename for files to be sprayed, ex. '~thor_data400::in::corp2::@version@::cont'
@@ -53,7 +53,7 @@ export fSpray(
  	},
 	{
 		pServerIP	                    
-		,pDirectory + pVersion + '/'             
+		,pDirectory + pVersion[1..8] + '/'             
 		,pCSRFilename          
 		,0                     
 		,_Dataset(pUseProd).thor_cluster_Files+ 'in::' + _Dataset().Name + '::hms_csr_' + pVersion  
@@ -65,7 +65,7 @@ export fSpray(
  	},
 	{
 		pServerIP	             
-		,pDirectory + pVersion + '/'             
+		,pDirectory + pVersion[1..8] + '/'             
 		,pDEAFilename          
 		,0                     
 		,_Dataset(pUseProd).thor_cluster_Files+ 'in::' + _Dataset().Name + '::hms_dea_' + pVersion 
@@ -77,7 +77,7 @@ export fSpray(
  	},
 	{
 		pServerIP	                    							
-		,pDirectory + pVersion + '/'             
+		,pDirectory + pVersion[1..8] + '/'             
 		,pDisciplinaryActFileName          
 		,0                                               
 		,_Dataset(pUseProd).thor_cluster_Files+ 'in::' + _Dataset().Name + '::hms_disciplinaryact_' + pVersion    
@@ -89,7 +89,7 @@ export fSpray(
  	},
 	{
 		pServerIP	                
-		,pDirectory + pVersion + '/'             
+		,pDirectory + pVersion[1..8] + '/'             
 		,pEducationFilename                       
 		,0                                             
 		,_Dataset(pUseProd).thor_cluster_Files+ 'in::' + _Dataset().Name + '::hms_education_' + pVersion  
@@ -101,7 +101,7 @@ export fSpray(
  	},
 	{
 		pServerIP	                
-		,pDirectory + pVersion + '/'             
+		,pDirectory + pVersion[1..8] + '/'             
 		,pEntityFilename                       
 		,0                                             
 		,_Dataset(pUseProd).thor_cluster_Files+ 'in::' + _Dataset().Name + '::hms_entity_' + pVersion  
@@ -113,7 +113,7 @@ export fSpray(
  	},
 	{
 		pServerIP	             
-		,pDirectory + pVersion + '/'             
+		,pDirectory + pVersion[1..8] + '/'             
 		,pLanguageFilename     
 		,0                     
 		,_Dataset(pUseProd).thor_cluster_Files+ 'in::' + _Dataset().Name + '::hms_language_' + pVersion  
@@ -125,7 +125,7 @@ export fSpray(
  	},
 	{
 		pServerIP	                
-		,pDirectory + pVersion + '/'             
+		,pDirectory + pVersion[1..8] + '/'             
 		,pLicenseFilename      
 		,0                     
 		,_Dataset(pUseProd).thor_cluster_Files+ 'in::' + _Dataset().Name + '::hms_license_' + pVersion 
@@ -137,7 +137,7 @@ export fSpray(
  	},
 	{
 		pServerIP	               
-		,pDirectory + pVersion + '/'             
+		,pDirectory + pVersion[1..8] + '/'             
 		,pNPIFilename          
 		,0                     
 		,_Dataset(pUseProd).thor_cluster_Files+ 'in::' + _Dataset().Name + '::hms_npi_' + pVersion  
@@ -149,7 +149,7 @@ export fSpray(
  	},
 	{
 		pServerIP	               
-		,pDirectory + pVersion + '/'             
+		,pDirectory + pVersion[1..8] + '/'             
 		,pPhoneFilename        
 		,0                     
 		,_Dataset(pUseProd).thor_cluster_Files+ 'in::' + _Dataset().Name + '::hms_phone_' + pVersion  
@@ -161,7 +161,7 @@ export fSpray(
  	},
 	{
 		pServerIP	                   
-		,pDirectory + pVersion + '/'             
+		,pDirectory + pVersion[1..8] + '/'             
 		,pSpecialtyFilename    
 		,0                     
 		,_Dataset(pUseProd).thor_cluster_Files+ 'in::' + _Dataset().Name + '::hms_specialty_' + pVersion   
@@ -173,7 +173,7 @@ export fSpray(
  	},
 	{
 		pServerIP	                   
-		,pDirectory + pVersion + '/'             
+		,pDirectory + pVersion[1..8] + '/'             
 		,pMedicaidFilename    
 		,0                     
 		,_Dataset(pUseProd).thor_cluster_Files+ 'in::' + _Dataset().Name + '::hms_medicaid_' + pVersion   
@@ -182,18 +182,6 @@ export fSpray(
 		,pVersion                                          
 		,'[0-9]{8}'                                               
 		,'VARIABLE'                                         
- 	},
-	{
-		pServerIP	                   
-		,pDirectory + pVersion + '/'             
-		,pTaxonomyFilename    
-		,0                     
-		,_Dataset(pUseProd).thor_cluster_Files+ 'in::' + _Dataset().Name + '::hms_taxonomy_' + pVersion   
-		,[{_Dataset(pUseProd).thor_cluster_Files+'in::' + _Dataset().Name + '::hms_taxonomy' }]           
-		,pGroupName                                       
-		,pVersion                                          
-		,'[0-9]{8}'                                               
-		,'VARIABLE'                                         
- 	}
+  	}
 ], VersionControl.Layout_Sprays.Info);
 

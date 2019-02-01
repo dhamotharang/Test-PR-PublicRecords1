@@ -1,4 +1,4 @@
-import ut,header,dops;
+﻿import ut,header,dops;
 build_version:= header.version_build;
 
 dops_datasetname:=header._info.dops_datasetname;
@@ -17,7 +17,11 @@ step7:=Header.proc_postHeaderBuilds.booleanSrch;
 
 sequential(
             header._config.setup_build,
-            if(status<5,sequential(dlog('KEY BUILD:MOVE'   ),step5,update_status(5))),
-            if(status<6,sequential(dlog('KEY BUILD:FCRA'   ),step6,update_status(6))),
-            if(status<7,sequential(dlog('KEY BUILD:BOOLEAN'),step7,update_status(7))),
+            dlog('KEY BUILD:POST MOVE'),
+            if(status<5,sequential(step5,update_status(5))),
+            if(status<6,sequential(step6,update_status(6))),
+            if(status<7,sequential(step7,update_status(7))),
           );
+          
+//WorkUnits History
+// 20181224 W20190120-135405
