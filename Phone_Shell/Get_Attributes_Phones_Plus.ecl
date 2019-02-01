@@ -1,8 +1,10 @@
-/* ************************************************************************
+﻿/* ************************************************************************
  * This function gathers the Phonesplus_Characteristics attributes.				*
  ************************************************************************ */
 
 IMPORT AutoKey, Data_Services, Phone_Shell, Phones, Phonesplus_v2, RiskWise, UT, STD;
+
+DEBUG_IGNORE_ALLOW_LIST := FALSE; // Set to TRUE if you do NOT want to filter by allow list
 
 todays_date := STD.Date.Today();
 
@@ -112,8 +114,24 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Pho
 		SELF.PhonesPlus_Characteristics.PhonesPlus_Date_NonGLB_LastSeen := Phone_Shell.Common.parseDate((STRING)ri.dt_nonglb_last_seen, TRUE);
 		SELF.PhonesPlus_Characteristics.PhonesPlus_GLB_DPPA_Flag := TRIM(ri.glb_dppa_flag);
 		SELF.PhonesPlus_Characteristics.PhonesPlus_GLB_DPPA_All := TRIM(ri.glb_dppa_all);
-		SELF.PhonesPlus_Characteristics.PhonesPlus_Src := TRIM(ri.src);
-		Src_All := STD.Str.Reverse(ut.IntegerToBinaryString(ri.src_all, FALSE));
+  #if(not DEBUG_IGNORE_ALLOW_LIST)
+  // 'mask' the key src_all field to only have a 1 in the allowed sources, use bitwise AND with the allowed mask
+  Src_All_Masked := ri.src_all & ut.BinaryStringToInteger(Phone_Shell.Constants.PhonesPlus_AllowedSourcesMask);
+  // now we need to check and see if our filtered src_all actually changed from the original
+  src_chgd := not(src_all_masked = ri.src_all);
+  // and if it did, we need to update what we use for Vendor and Src to match the new src_all
+  // vendor was updated (in PhonesPlus_Characteristics.PhonesPlus_Source) in the Search_PhonesPlus function
+  // so now we just need to update Src here.
+  first_src := Phone_Shell.Common.PhonePlusFirstSource(src_all_masked);
+  adjusted_src := if(src_chgd,
+                     if(le.PhonesPlus_Characteristics.PhonesPlus_Source = 'HD', phonesplus_v2.translation_codes.fGet_all_sources(first_src), ''),
+                     ri.src);
+  #else
+  Src_All_Masked := ri.src_all;
+  adjusted_src := ri.src;
+  #end
+		SELF.PhonesPlus_Characteristics.PhonesPlus_Src := TRIM(adjusted_src);
+		Src_All := STD.Str.Reverse(ut.IntegerToBinaryString(Src_All_Masked, FALSE));
 		SELF.PhonesPlus_Characteristics.PhonesPlus_Src_All := Src_All;
 		SELF.PhonesPlus_Characteristics.PhonesPlus_Src_Cnt := StringLib.StringFindCount(Src_All, '1');
 		SELF.PhonesPlus_Characteristics.PhonesPlus_Src_Rule := STD.Str.Reverse(ut.IntegerToBinaryString(ri.src_rule, FALSE));
@@ -220,7 +238,11 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Pho
 																																														 RIGHT.rules,
 																																														 RIGHT.src_all,
 																																														 DataRestrictionMask
-																																														 ) = FALSE, 
+																																														 ) = FALSE
+                             #if(not DEBUG_IGNORE_ALLOW_LIST)                          
+                                 AND Phone_Shell.Common.PhonesPlusSourceAllowed(RIGHT.src_all)
+                             #end
+                                               , 
 																										getPhonesPlusAttributes(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost));
 	
 	// Keep the most confident/recent phones plus data possible
@@ -399,6 +421,11 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Pho
 		SELF := le;
 	END;
 	cleanedPhonesPlus := PROJECT(rolledPhonesPlus, cleanPhonesPlusAttributes(LEFT));
-															
+									
+ // output(getPhoneFDID,named('gatr_FDID'));
+ // output(withPhonesPlus,named('gatr_wPP'));
+ // output(rolledPhonesPlus,named('gatr_rolledPP'));
+ // output(withPhonesPlus(gathered_phone = '5598270214'),named('gatr_Filter'));
+ // output(rolledPhonesPlus(gathered_phone = '5598270214'),named('gatr_rollFilter'));
 	RETURN(cleanedPhonesPlus);
 END;

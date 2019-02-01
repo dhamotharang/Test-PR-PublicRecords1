@@ -32,7 +32,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout Phone_Shell_Function (D
 																																							 BOOLEAN require2ele = FALSE,
 																																							 INTEGER AppendBest = 1, // Append the best SSN for Subject Level attribute
 																																							 INTEGER ofac_version = 1,
-																																							 REAL4 watchlist_threshold = 0.84,
+																																							 REAL watchlist_threshold = 0.84,
 																																							 INTEGER dob_radius = -1,
 																																						 	BOOLEAN TestAccount = FALSE, // Indicates if TestAccounts should be enforced for Gateways
 																																						 	BOOLEAN Batch = FALSE, // Indicates if this is a Batch transaction (FALSE = realtime)
@@ -197,13 +197,14 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout Phone_Shell_Function (D
  BocaShellVersion := if(PhoneShellVersion >= 20, // PhoneShell V2 (2.0, 2.1, etc)
                         54, // If PhoneShell V2 then Boca Shell 5.4
                         41); // Else use Boca Shell 4.1
-  
+ 
 	/* ************************************************************************
 	 *  Get IID and Boca Shell Data - This will also perform our DID append   *
 	 ************************************************************************ */
 	InstantID := Risk_Indicators.InstantID_Function(iid_prep, BocaShellGateways, DPPAPurpose, GLBPurpose, isUtility, ln_branded, ofac_only, suppressNearDups, require2ele, isFCRA, from_biid, 
 																						ExcludeWatchLists, from_IT1O, ofac_version, include_ofac, addtl_watchlists, watchlist_threshold, dob_radius, BocaShellVersion, 
-																						in_DataRestriction := DataRestrictionMask, in_append_best := AppendBest, in_DataPermission := DataPermissionMask);
+																						in_DataRestriction := DataRestrictionMask, in_append_best := AppendBest,                                             
+                      in_DataPermission := DataPermissionMask);
 	
 	BocaShell := Risk_Indicators.Boca_Shell_Function(InstantID, BocaShellGateways, DPPAPurpose, GLBPurpose, isUtility, ln_branded, includeRel, includeDL, includeVeh, includeDerog, BocaShellVersion, 
 																						doScore, nugen, DataRestriction := DataRestrictionMask, DataPermission := DataPermissionMask);
@@ -265,8 +266,10 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout Phone_Shell_Function (D
 	// OUTPUT(InstantID, NAMED('InstantID'));
 	// OUTPUT(BocaShell, NAMED('BocaShell'));
 	// OUTPUT(withBocaShell, NAMED('withBocaShell'));
-	// OUTPUT(withPhones, NAMED('With_Phones'));
-	//	 OUTPUT(withAttributes, NAMED('With_Attributes'));
+ // OUTPUT(glbpurpose, named('glbpurpose'));
+	// OUTPUT(withPhones, NAMED('fnc_WithPhones'));
+	// OUTPUT(withAttributes, NAMED('fnc_WithAttributes'));
+ // output(withAttributes(gathered_phone = '5598270214'),named('fnc_Attr'));
 
 	RETURN(final);
 END;
