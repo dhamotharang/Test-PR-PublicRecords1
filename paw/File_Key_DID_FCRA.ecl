@@ -11,7 +11,7 @@
 // LI           Liens
 // LP           LN_Propertyv2 Lexis Deeds and Mortgages
 // WT						Wither and Die
-// per Legal request, we removed the following sources (09/19/2018) as per 
+// per Legal request, we removed the following sources (01/17/2019) as per 
 // JIRA# DF-23091 Removal of Spoke and Zoom records from PAW FCRA keys.
 // SP						Spoke
 // ZM						Zoom

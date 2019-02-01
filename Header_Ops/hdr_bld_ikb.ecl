@@ -2,6 +2,7 @@
 
 EXPORT hdr_bld_ikb(string filedate, unsigned1 status) := module
 
+   #OPTION ('multiplePersistInstances',FALSE);
    #stored ('emailList', Header.email_list.BocaDevelopers + ',Isabel.Ma@lexisnexisrisk.com');
    string  emailList := ''  :stored('emailList');
 

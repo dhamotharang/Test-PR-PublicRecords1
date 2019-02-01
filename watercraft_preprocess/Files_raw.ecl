@@ -1,4 +1,4 @@
-import watercraft,Data_Services, ut; 
+﻿import watercraft,Data_Services, ut; 
 
 export Files_raw := module
 
@@ -7,7 +7,8 @@ export AZ := dataset('~thor_data400::in::watercraft_raw_az', Watercraft.layout_A
 export IA := dataset('~thor_data400::in::watercraft_raw_ia', Watercraft.Layout_IA_new, flat); 
 export KS := dataset('~thor_data400::in::watercraft_raw_ks', Watercraft.layout_KS, flat);
 export ND := dataset('~thor_data400::in::watercraft_raw_nd', Watercraft.layout_ND_new14Q2, flat);
-export TX := dataset('~thor_data400::in::watercraft_raw_tx', Watercraft.layout_TX_new, flat);
+export TX := dataset('~thor_data400::in::watercraft_raw_tx', Watercraft.layout_TX_new_18q3, flat);
+//export TX := dataset('~thor_data400::in::watercraft_raw_tx', Watercraft.layout_TX_new, flat);
 //export WY := dataset('~thor_data400::in::watercraft_raw_wy', Watercraft.Layout_WY_new_2014, flat);
 export WY := dataset('~thor_data400::in::watercraft_raw_wy', Watercraft.Layout_WY_2015_Q1, flat);
 

@@ -85,6 +85,7 @@ module
 
 	export OutputF := module
 		export FraudgovInfoFile	:= dataset(Filenames().OutputF.FraudgovInfoFn,Layouts.OutputF.FraudgovInfoRec,thor,opt);
+		export SkipModules	:= dataset(Filenames().OutputF.SkipModules,Layouts.OutputF.SkipModules,thor,opt);
 	end;
 	
 end;

@@ -34,7 +34,7 @@ EXPORT E_Person_Event := MODULE
     RECORDOF(__d0_Subject__Mapped);
     KEL.typ.uid Social_;
   END;
-  SHARED __d0_Social__Mapped := JOIN(__d0_Subject__Mapped,E_Social_Security_Number.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.Ssn) = RIGHT.KeyVal,TRANSFORM(__d0_Social__Layout,SELF.Social_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,LOOKUP);
+  SHARED __d0_Social__Mapped := JOIN(__d0_Subject__Mapped,E_Social_Security_Number.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.Ssn) = RIGHT.KeyVal,TRANSFORM(__d0_Social__Layout,SELF.Social_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
   SHARED __d0_Phone_Number__Layout := RECORD
     RECORDOF(__d0_Social__Mapped);
     KEL.typ.uid Phone_Number_;
@@ -49,7 +49,7 @@ EXPORT E_Person_Event := MODULE
     RECORDOF(__d0_Emailof__Mapped);
     KEL.typ.uid Location_;
   END;
-  SHARED __d0_Location__Mapped := JOIN(__d0_Emailof__Mapped,E_Address.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.clean_address.prim_range) + '|' + TRIM((STRING)LEFT.clean_address.predir) + '|' + TRIM((STRING)LEFT.clean_address.prim_name) + '|' + TRIM((STRING)LEFT.clean_address.addr_suffix) + '|' + TRIM((STRING)LEFT.clean_address.postdir) + '|' + TRIM((STRING)LEFT.clean_address.zip) + '|' + TRIM((STRING)LEFT.clean_address.sec_range) = RIGHT.KeyVal,TRANSFORM(__d0_Location__Layout,SELF.Location_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,LOOKUP);
+  SHARED __d0_Location__Mapped := JOIN(__d0_Emailof__Mapped,E_Address.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.clean_address.prim_range) + '|' + TRIM((STRING)LEFT.clean_address.predir) + '|' + TRIM((STRING)LEFT.clean_address.prim_name) + '|' + TRIM((STRING)LEFT.clean_address.addr_suffix) + '|' + TRIM((STRING)LEFT.clean_address.postdir) + '|' + TRIM((STRING)LEFT.clean_address.zip) + '|' + TRIM((STRING)LEFT.clean_address.sec_range) = RIGHT.KeyVal,TRANSFORM(__d0_Location__Layout,SELF.Location_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
   SHARED __d0_Ip__Layout := RECORD
     RECORDOF(__d0_Location__Mapped);
     KEL.typ.uid Ip_;
@@ -98,7 +98,7 @@ EXPORT E_Person_Event := MODULE
     RECORDOF(__d1_Phone_Number__Mapped);
     KEL.typ.uid Emailof_;
   END;
-  SHARED __d1_Emailof__Mapped := JOIN(__d1_Phone_Number__Mapped,E_Email.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.Email_Address) = RIGHT.KeyVal,TRANSFORM(__d1_Emailof__Layout,SELF.Emailof_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d1_Emailof__Mapped := JOIN(__d1_Phone_Number__Mapped,E_Email.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.Email_Address) = RIGHT.KeyVal,TRANSFORM(__d1_Emailof__Layout,SELF.Emailof_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,LOOKUP);
   SHARED __d1_Location__Layout := RECORD
     RECORDOF(__d1_Emailof__Mapped);
     KEL.typ.uid Location_;
@@ -118,12 +118,12 @@ EXPORT E_Person_Event := MODULE
     RECORDOF(__d1_Routing_Bank__Mapped);
     KEL.typ.uid Account_;
   END;
-  SHARED __d1_Account__Mapped := JOIN(__d1_Routing_Bank__Mapped,E_Bank_Account.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.bank_routing_number_1) + '|' + TRIM((STRING)LEFT.bank_account_number_1) = RIGHT.KeyVal,TRANSFORM(__d1_Account__Layout,SELF.Account_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d1_Account__Mapped := JOIN(__d1_Routing_Bank__Mapped,E_Bank_Account.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.bank_routing_number_1) + '|' + TRIM((STRING)LEFT.bank_account_number_1) = RIGHT.KeyVal,TRANSFORM(__d1_Account__Layout,SELF.Account_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,LOOKUP);
   SHARED __d1_Licence__Layout := RECORD
     RECORDOF(__d1_Account__Mapped);
     KEL.typ.uid Licence_;
   END;
-  SHARED __d1_Licence__Mapped := JOIN(__d1_Account__Mapped,E_Drivers_License.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.drivers_license) = RIGHT.KeyVal,TRANSFORM(__d1_Licence__Layout,SELF.Licence_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d1_Licence__Mapped := JOIN(__d1_Account__Mapped,E_Drivers_License.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.drivers_license) = RIGHT.KeyVal,TRANSFORM(__d1_Licence__Layout,SELF.Licence_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,LOOKUP);
   SHARED __d1_Transaction__Layout := RECORD
     RECORDOF(__d1_Licence__Mapped);
     KEL.typ.uid Transaction_;
@@ -152,16 +152,16 @@ EXPORT E_Person_Event := MODULE
   EXPORT __PreResult := PROJECT(TABLE(InData,{KEL.typ.int __RecordCount := COUNT(GROUP),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),_r_Customer_,Subject_,Social_,Phone_Number_,Emailof_,Location_,Ip_,Routing_Bank_,Account_,Licence_,Event_Date_,Transaction_},_r_Customer_,Subject_,Social_,Phone_Number_,Emailof_,Location_,Ip_,Routing_Bank_,Account_,Licence_,Event_Date_,Transaction_,MERGE),Layout);
   EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::KELOtto::Person_Event::Result',EXPIRE(30));
   EXPORT Result := __UNWRAP(__Result);
-  EXPORT _r_Customer__Orphan := JOIN(InData(__NN(_r_Customer_)),E_Customer.__Result,__EEQP(LEFT._r_Customer_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
+  EXPORT _r_Customer__Orphan := JOIN(InData(__NN(_r_Customer_)),E_Customer.__Result,__EEQP(LEFT._r_Customer_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, LOOKUP);
   EXPORT Subject__Orphan := JOIN(InData(__NN(Subject_)),E_Person.__Result,__EEQP(LEFT.Subject_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT Social__Orphan := JOIN(InData(__NN(Social_)),E_Social_Security_Number.__Result,__EEQP(LEFT.Social_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
-  EXPORT Phone_Number__Orphan := JOIN(InData(__NN(Phone_Number_)),E_Phone.__Result,__EEQP(LEFT.Phone_Number_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
-  EXPORT Emailof__Orphan := JOIN(InData(__NN(Emailof_)),E_Email.__Result,__EEQP(LEFT.Emailof_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
+  EXPORT Phone_Number__Orphan := JOIN(InData(__NN(Phone_Number_)),E_Phone.__Result,__EEQP(LEFT.Phone_Number_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, LOOKUP);
+  EXPORT Emailof__Orphan := JOIN(InData(__NN(Emailof_)),E_Email.__Result,__EEQP(LEFT.Emailof_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, LOOKUP);
   EXPORT Location__Orphan := JOIN(InData(__NN(Location_)),E_Address.__Result,__EEQP(LEFT.Location_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
-  EXPORT Ip__Orphan := JOIN(InData(__NN(Ip_)),E_Internet_Protocol.__Result,__EEQP(LEFT.Ip_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
-  EXPORT Routing_Bank__Orphan := JOIN(InData(__NN(Routing_Bank_)),E_Bank.__Result,__EEQP(LEFT.Routing_Bank_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
-  EXPORT Account__Orphan := JOIN(InData(__NN(Account_)),E_Bank_Account.__Result,__EEQP(LEFT.Account_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
-  EXPORT Licence__Orphan := JOIN(InData(__NN(Licence_)),E_Drivers_License.__Result,__EEQP(LEFT.Licence_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
+  EXPORT Ip__Orphan := JOIN(InData(__NN(Ip_)),E_Internet_Protocol.__Result,__EEQP(LEFT.Ip_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, LOOKUP);
+  EXPORT Routing_Bank__Orphan := JOIN(InData(__NN(Routing_Bank_)),E_Bank.__Result,__EEQP(LEFT.Routing_Bank_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, LOOKUP);
+  EXPORT Account__Orphan := JOIN(InData(__NN(Account_)),E_Bank_Account.__Result,__EEQP(LEFT.Account_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, LOOKUP);
+  EXPORT Licence__Orphan := JOIN(InData(__NN(Licence_)),E_Drivers_License.__Result,__EEQP(LEFT.Licence_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, LOOKUP);
   EXPORT Transaction__Orphan := JOIN(InData(__NN(Transaction_)),E_Event.__Result,__EEQP(LEFT.Transaction_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT SanityCheck := DATASET([{COUNT(_r_Customer__Orphan),COUNT(Subject__Orphan),COUNT(Social__Orphan),COUNT(Phone_Number__Orphan),COUNT(Emailof__Orphan),COUNT(Location__Orphan),COUNT(Ip__Orphan),COUNT(Routing_Bank__Orphan),COUNT(Account__Orphan),COUNT(Licence__Orphan),COUNT(Transaction__Orphan)}],{KEL.typ.int _r_Customer__Orphan,KEL.typ.int Subject__Orphan,KEL.typ.int Social__Orphan,KEL.typ.int Phone_Number__Orphan,KEL.typ.int Emailof__Orphan,KEL.typ.int Location__Orphan,KEL.typ.int Ip__Orphan,KEL.typ.int Routing_Bank__Orphan,KEL.typ.int Account__Orphan,KEL.typ.int Licence__Orphan,KEL.typ.int Transaction__Orphan});
   EXPORT NullCounts := DATASET([
