@@ -3516,12 +3516,10 @@ self := left), keep(1), left outer);
 /* ================ */
 
 
-
-/* ================ */
 RVG1610_1_0_score := Models.RVG1610_1_0(clam);
 // output(RVG1610_1_0_score, named('RVG1610_1_0_score'));
                              
-with_RVG1610_1_0 := join(with_RVG1808_1_0, RVG1610_1_0_score,
+with_RVG1610_1_0 := join(with_RVG1808_3_0, RVG1610_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
 self.RVG1610_1_0_score := right.score;

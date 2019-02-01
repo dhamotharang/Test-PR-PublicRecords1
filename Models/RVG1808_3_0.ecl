@@ -944,8 +944,8 @@ pts := -40;
 odds := 0.0275895808933628;
 
 rvg1808_3_0 := map(
-    SSNDeceased = 1 or SubjectDeceased = 1 => 200,
     confirmationsubjectfound < 1           => 222,
+    SSNDeceased = 1 or SubjectDeceased = 1 => 200,
                                               min(if(max(round(pts * (onyx_rv5attr_nc_lgt - ln(odds)) / ln(2) + base), 501) = NULL, -NULL, max(round(pts * (onyx_rv5attr_nc_lgt - ln(odds)) / ln(2) + base), 501)), 900));
 
 rc1_1 := if(500 < rvg1808_3_0 AND rvg1808_3_0 < 900 and rc1_2 = '', 'C12', rc1_2);
