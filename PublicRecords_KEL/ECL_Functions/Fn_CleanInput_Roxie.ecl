@@ -58,7 +58,7 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.Layo
 		SELF.InputPostDirectionClean := cleaned_Addr.postdir;
 		SELF.InputUnitDesigClean := cleaned_Addr.unit_desig;
 		SELF.InputSecondaryRangeClean :=cleaned_Addr.sec_range;
-		SELF.InputCityClean := cleaned_Addr.p_city_name;
+		SELF.InputCityClean := cleaned_Addr.v_city_name;
 		SELF.InputStateClean := cleaned_Addr.st;
 		SELF.InputZip5Clean := cleaned_Addr.zip;
 		SELF.InputZip4Clean := cleaned_Addr.zip4;
@@ -66,7 +66,7 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.Layo
 		SELF.InputLongitudeClean :=	cleaned_Addr.geo_long;
 		SELF.InputAddressTypeClean := cleaned_Addr.rec_type;
 		SELF.InputAddressStatusClean :=	cleaned_Addr.err_stat;
-		SELF.InputCountyClean := cleaned_Addr.county;
+		SELF.InputCountyClean := cleaned_Addr.county[3..5];
 		SELF.InputGeoblockClean := cleaned_Addr.geo_blk;
 		SELF.InputEmailClean :=cleaned_email;
 		SELF.InputHomePhoneClean := cleaned_phone10;
