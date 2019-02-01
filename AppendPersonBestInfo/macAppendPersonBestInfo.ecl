@@ -1,4 +1,4 @@
-﻿EXPORT macAppendPersonBestInfo(dIn, inLexid, inGlb, inDrm,
+EXPORT macAppendPersonBestInfo(dIn, inLexid, inGlb, inDrm,
   inUseNonBlank = 'false', inMarketing = 'false', inIncludeDod = 'false', inIncludeMinors= FALSE,
   appendPrefix = '\'\'', UseIndexThreshold=10000000) := FUNCTIONMACRO
   
