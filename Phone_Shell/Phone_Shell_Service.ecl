@@ -132,12 +132,13 @@
 */
 
 
-IMPORT Address, Gateway, Phone_Shell, Relocations, Risk_Indicators, RiskWise, UT;
+IMPORT Gateway, Phone_Shell, Relocations, Risk_Indicators;
 
 EXPORT Phone_Shell_Service() := FUNCTION
-		#stored('GLBPurpose',0);
-		#stored('DataRestrictionMask', Phone_Shell.constants.default_DataRestriction);
-		#stored('DataPermissionMask', Phone_Shell.constants.Default_DataPermission);
+// comment out these top 3 if running locally
+	#stored('GLBPurpose',0);
+	#stored('DataRestrictionMask', Phone_Shell.constants.default_DataRestriction);
+	#stored('DataPermissionMask', Phone_Shell.constants.Default_DataPermission);
     #WEBSERVICE(FIELDS(
                 'AcctNo',
                 'DID',
@@ -250,8 +251,8 @@ EXPORT Phone_Shell_Service() := FUNCTION
 	BOOLEAN EnableInsuranceGateway 									:= FALSE : STORED('EnableInsuranceGateway');
 	DATASET(Phone_Shell.Layout_Phone_Shell.Input) Batch_In := DATASET([], Phone_Shell.Layout_Phone_Shell.Input) : STORED('Batch_Input');
 	Gateways 																				:= Gateway.Configuration.Get();
-	UNSIGNED1 GLBPurpose                            := 0 : STORED('GLBPurpose');
-	UNSIGNED1 DPPAPurpose 													:= 0 : STORED('DPPAPurpose');
+	UNSIGNED1 GLBPurpose                            := 0 : STORED('GLBPurpose');	
+ UNSIGNED1 DPPAPurpose 													:= 0 : STORED('DPPAPurpose');
 	STRING DataRestrictionMask 										  := Phone_Shell.constants.default_DataRestriction : STORED('DataRestrictionMask');
 	STRING DataPermissionMask 										  := Phone_Shell.Constants.Default_DataPermission : STORED('DataPermissionMask');
 	UNSIGNED1 PhoneRestrictionMask 									:= Phone_Shell.Constants.PRM.AllPhones : STORED('Phone_Restriction_Mask');
@@ -288,7 +289,7 @@ EXPORT Phone_Shell_Service() := FUNCTION
 	INTEGER BocaShell_AppendBest 										:= 1 : STORED('BocaShell_AppendBest');
 	INTEGER BocaShell_OFAC_Version 									:= 1 : STORED('BocaShell_OFAC_Version');
 	INTEGER BocaShell_DOB_Radius 										:= -1 : STORED('BocaShell_DOB_Radius');
-	REAL4 BocaShell_Watchlist_Threshold 						:= 0.84 : STORED('BocaShell_Watchlist_Threshold');
+	REAL BocaShell_Watchlist_Threshold 						:= 0.84 : STORED('BocaShell_Watchlist_Threshold');
 	STRING25 Phone_Score_Model_Temp									:= '' : STORED('Phone_Score_Model');
  STRING2 ModelVersion_Temp               := '' : STORED('ModelVersion');
 	BOOLEAN BlankOutDuplicatePhones									:= FALSE :STORED('BlankOutDuplicatePhones');
@@ -387,7 +388,7 @@ EXPORT Phone_Shell_Service() := FUNCTION
                      ); 
 
 // for debug, pick model
-//model_results := Phone_Shell.PhoneScore_cp3_v3(results, Score_Threshold); 
+// model_results := Phone_Shell.PhoneScore_cp3_v3(results, Score_Threshold); 
 // model_results := Phone_Shell.PhoneScore_wf8_v3(results, Score_Threshold); 
 
 // for debug, comment out the rest (start comment-out section)
@@ -410,12 +411,20 @@ EXPORT Phone_Shell_Service() := FUNCTION
 			-LENGTH(TRIM(Phone_Shell.Sources.Source_List)), Phone_Shell.Gathered_Phone);
 
 	final_results := final_results_sorted;
-	//output(model_results, named('model_results'));
 	
-	RETURN OUTPUT(final_results, NAMED('Results'));
+	//RETURN OUTPUT(final_results, NAMED('Results'));
+ 
+  
 // end debug comment-out section
 
 // debug return
-// RETURN OUTPUT(model_results, NAMED('Results'));
+// output(glbpurpose,named('svc_glbpurpose'));
+// output(results,named('svc_shell_results'));
+// output(model_results, named('svc_model_results'));
+// RETURN OUTPUT(model_results, NAMED('Results')); // debug if you want just the model
+
+ RETURN OUTPUT(final_results, NAMED('Results'));
+// final for running locally below. Prod uses RETURN OUTPUT final results above
+ //return final_results;
 
 END;
