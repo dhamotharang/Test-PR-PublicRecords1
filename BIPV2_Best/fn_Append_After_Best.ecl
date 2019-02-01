@@ -15,6 +15,10 @@ best_company_name_l := RECORD
   unsigned8 name_source_record_id := 0;
   string34 name_vl_id := '';
 END;
+best_dba_name_l := RECORD
+  unsigned6 linkid;
+  BIPV2_Best.Layouts.dba_name;
+END;
 best_company_address_l := RECORD
   unsigned6 linkid;
   BIPV2_Best.Layouts.company_address;
@@ -68,6 +72,7 @@ best_child_ds := best_file;
 //dedup datasets
 best_child_ds_ded:=PROJECT(best_child_ds,TRANSFORM(RECORDOF(LEFT),
   SELF.company_name_cases        := DEDUP(SORT(LEFT.company_name_cases,company_name_data_permits,company_name_method,company_name),company_name_data_permits);
+	 SELF.dba_name_cases            := DEDUP(SORT(LEFT.dba_name_cases,dba_name_data_permits,dba_name_method,dba_name),dba_name_data_permits);
   SELF.address_cases             := DEDUP(SORT(LEFT.address_cases,address_data_permits,address_method),address_data_permits);
   SELF.company_phone_cases       := DEDUP(SORT(LEFT.company_phone_cases,company_phone_data_permits,company_phone_method,company_phone),company_phone_data_permits);
   SELF.company_fein_cases        := DEDUP(SORT(LEFT.company_fein_cases,company_fein_data_permits,company_fein_method,company_fein),company_fein_data_permits);
@@ -78,6 +83,7 @@ best_child_ds_ded:=PROJECT(best_child_ds,TRANSFORM(RECORDOF(LEFT),
   SELF := LEFT;
 ));
 norm_name    := BIPV2_Best.MAC_Normalize_Child(best_child_ds_ded,company_name_cases,best_company_name_l);
+norm_dba     := BIPV2_Best.MAC_Normalize_Child(best_child_ds_ded,dba_name_cases,best_dba_name_l);
 norm_address := BIPV2_Best.MAC_Normalize_Child(best_child_ds_ded,address_cases,best_company_address_l);
 norm_phone   := BIPV2_Best.MAC_Normalize_Child(best_child_ds_ded,company_phone_cases,best_company_phone_l);
 norm_fein    := BIPV2_Best.MAC_Normalize_Child(best_child_ds_ded,company_fein_cases,best_company_fein_l);
@@ -293,6 +299,7 @@ company_incorporation_date_base := {UNSIGNED6 linkid;DATASET(BIPV2_Best.Layouts.
 company_duns_number_base        := {UNSIGNED6 linkid;DATASET(BIPV2_Best.Layouts.duns_number_case_layout) duns_number;};
 sic_code_base                   := {UNSIGNED6 linkid;DATASET(BIPV2_Best.Layouts.sic_code_case_layout) sic_code;};
 naics_code_base                 := {UNSIGNED6 linkid;DATASET(BIPV2_Best.Layouts.naics_code_case_layout) naics_code;};
+dba_base                        := {UNSIGNED6 linkid;DATASET(BIPV2_Best.Layouts.dba_name_case_layout) dba_name;};
 //****************Denormalize name
 company_name_flat_ded := DEDUP(SORT(DISTRIBUTE(company_name_flat,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
 company_name_grp      := GROUP(SORT(DISTRIBUTE(company_name_flat,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
@@ -310,6 +317,17 @@ company_name_base t_name_denorm(company_name_grp le,DATASET(RECORDOF(company_nam
   SELF := le;
 end;
 name_denorm := DENORMALIZE(company_name_flat_ded,company_name_grp,LEFT.linkid=RIGHT.linkid,GROUP,t_name_denorm(LEFT,ROWS(RIGHT)),LOCAL);
+//****************Denormalize DBA
+dba_flat_ded := DEDUP(SORT(DISTRIBUTE(norm_dba,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
+dba_grp      := GROUP(SORT(DISTRIBUTE(norm_dba,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
+dba_base t_dba_denorm(dba_grp le,DATASET(RECORDOF(dba_grp)) ri) := TRANSFORM
+  BIPV2_Best.Layouts.dba_name_case_layout t_dba(dba_grp le,DATASET(RECORDOF(dba_grp)) ri) := TRANSFORM 
+    SELF := le;
+  END;
+  SELF.dba_name := SORT(DEDUP(SORT(DENORMALIZE(ri,ri,LEFT.dba_name=RIGHT.dba_name,GROUP,t_dba(LEFT, ROWS(RIGHT))),RECORD),ALL),dba_name_method)(dba_name_method>0);
+  SELF := le;
+end;
+dba_denorm := DENORMALIZE(dba_flat_ded,dba_grp,LEFT.linkid=RIGHT.linkid,GROUP,t_dba_denorm(LEFT,ROWS(RIGHT)),LOCAL);
 //****************Denormalize Address
 company_address_flat_ded := DEDUP(SORT(DISTRIBUTE(company_address_flat,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
 company_address_grp      := GROUP(SORT(DISTRIBUTE(company_address_flat,HASH(linkid)),linkid,LOCAL),linkid,LOCAL);
@@ -445,6 +463,14 @@ nm_addr_ph_fein_url:= join(nm_addr_ph_fein, url_denorm,left.linkid = right.linki
 nm_addr_ph_fein_url_dunn:= join(nm_addr_ph_fein_url, duns_denorm,left.linkid = right.linkid,left outer,local);
 nm_with_sic:=JOIN(nm_addr_ph_fein_url_dunn,sic_denorm,left.linkid = right.linkid,left outer,local);
 nm_with_naics:=JOIN(nm_with_sic,naics_denorm,left.linkid = right.linkid,left outer,local);
-final_base := join(nm_with_naics, inc_date_denorm,left.linkid = right.linkid,transform(BIPV2_Best.Layouts.base,self := left,self := right;SELF:=[];),left outer,local);
+nm_with_dba:=join(nm_with_naics,dba_denorm,left.linkid = right.linkid,left outer,local);
+final_base := join(nm_with_dba, inc_date_denorm,left.linkid = right.linkid,transform(BIPV2_Best.Layouts.base,self := left,self := right;SELF:=[];),left outer,local);
+
+// output(norm_dba, named('norm_dba'));
+// output(dba_flat_ded, named('dba_flat_ded'));
+// output(dba_grp, named('dba_grp'));
+// output(dba_denorm, named('dba_denorm'));
+// output(nm_with_dba, named('nm_with_dba'));
+
 return final_base;
 endmacro;
