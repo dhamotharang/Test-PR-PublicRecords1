@@ -326,7 +326,7 @@ FullGraphPrep7 := JOIN(FullGraphPrep6, DISTRIBUTE(KELOtto.Q__show_Customer_Bank_
                             LEFT OUTER, LOCAL);	
 
 // Drivers License DETAILS                           
-FullGraphPrep8 := JOIN(FullGraphPrep7, DISTRIBUTE(KELOtto.Q__show_Customer_Drivers_License_Entities.Res0, HASH32(entity_context_uid_)), 
+FullGraphPrep8_1 := JOIN(FullGraphPrep7, DISTRIBUTE(KELOtto.Q__show_Customer_Drivers_License_Entities.Res0, HASH32(entity_context_uid_)), 
                         LEFT.source_customer_=RIGHT.source_customer_ AND LEFT.entity_context_uid_=RIGHT.entity_context_uid_,
                         TRANSFORM({RECORDOF(LEFT), RECORDOF(RIGHT)}, 
                           SELF.Label_ := MAP(RIGHT.Label_ != '' => RIGHT.Label_, LEFT.Label_), 
@@ -363,7 +363,10 @@ FullGraphPrep8 := JOIN(FullGraphPrep7, DISTRIBUTE(KELOtto.Q__show_Customer_Drive
 
                           ),
                             LEFT OUTER, LOCAL);	
-                            
+                  
+temprec := RECORDOF(FullGraphPrep8_1) AND NOT [kr_low_risk_flag_]; 
+                 
+FullGraphPrep8 := PROJECT(FullGraphPrep8_1, TRANSFORM(temprec, SELF := LEFT));
 /* HACK to get the Element Count per tree in.... will need to be removed once it is computed in KEL */
 // Per Tree Compute how many non-Identity elements 
 ElementCountAggregation := DISTRIBUTE(TABLE(FullGraphPrep8(entity_type_ != 1), {source_customer_, tree_uid_, UNSIGNED cl_element_count_ := COUNT(GROUP)}, source_customer_, tree_uid_, MERGE), HASH32(tree_uid_)); 
