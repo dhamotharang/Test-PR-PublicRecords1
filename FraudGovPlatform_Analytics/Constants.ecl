@@ -47,7 +47,7 @@
 		EXPORT STRING UNK := 'unk';
 	END;	
 	EXPORT RampsWebServices := MODULE
-		isProd := TRUE;	//~Tools._Constants.IsDataland; //For some reason I can't get this to work in Dataland environment, so manually set this to FALSE in Dataland
+		isProd := ~Tools._Constants.IsDataland;
 		useOtherEnvironmentDali(BOOLEAN useProdData) := NOT((isProd AND useProdData) OR (~isProd AND ~useProdData));
 		EXPORT fileLocation(BOOLEAN useProdData)	:= FraudGovPlatform._Dataset(useOtherEnvironmentDali(useProdData)).thor_cluster_Files;
 		EXPORT fileScope						:= 'base::fraudgov::qa::kel::';
