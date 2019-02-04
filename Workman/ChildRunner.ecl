@@ -172,11 +172,12 @@ functionmacro
   
   
   // -- Iteration #
-  Iteration            := map((unsigned)WorkMan.get_Scalar_Result(workunit,'Current_Iteration') !=  0 => WorkMan.get_Scalar_Result(workunit,'Current_Iteration')
-                             ,child_iteration1                                          != '' => child_iteration1
-                             ,latest_completed_iteration                                != '' => latest_completed_iteration
-                             ,                                                                   (string)StartIteration
-                          );
+  Iteration            := map(
+     (unsigned)WorkMan.get_Scalar_Result(workunit,'Current_Iteration')  !=  0                                                                       => WorkMan.get_Scalar_Result(workunit,'Current_Iteration')
+    ,child_iteration1                                                   != ''  and (unsigned)StartIteration < (unsigned)child_iteration1            => child_iteration1             //if start iteration is more than what you find in a file, use the start iteration
+    ,latest_completed_iteration                                         != ''  and (unsigned)StartIteration < (unsigned)latest_completed_iteration  => latest_completed_iteration
+  ,                                                                                                                                                    (string)StartIteration
+  );
                           
   ECL := regexreplace('@iteration@',regexreplace('@version@' ,regexreplace('\\n',pECL,'\n')  ,pversion),Iteration);
 
@@ -193,10 +194,12 @@ functionmacro
   // -- added output of wuid instead of just returning the string wuid because
   // -- platform was executing both the "then" and "else" results each time, creating a new iteration wuid even when 
   // -- it returned the old one(child_wuid).  changing this to the output stopped that.
-  iteration_wuid := iff((     DoesFileExist 
+  iteration_wuid := iff((     DoesFileExist //start file exists(a temp file, so this is a rerun)
                           or  (unsigned)latest_completed_iteration  >= ((unsigned)StartIteration + (unsigned)pNumMaxIterations - 1) 
                           or  (unsigned)Iteration                   >  ((unsigned)StartIteration + (unsigned)pNumMaxIterations - 1)
                         ) 
+                        and (unsigned)StartIteration < (unsigned)latest_completed_iteration 
+                        and (unsigned)StartIteration < (unsigned)child_iteration1
                         and trim(child_wuid1) != '' 
                         and pOnlyCompile = false
                             ,output(Child_Wuid                                     ,named('Iteration_Wuid'                                      ),overwrite)
