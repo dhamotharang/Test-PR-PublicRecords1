@@ -1,4 +1,5 @@
-IMPORT SSNBest_Services,BatchShare,ut;
+IMPORT SSNBest_Services, BatchShare, doxie;
+
 EXPORT IParams := MODULE
 
 	EXPORT HardCodedFlags := INTERFACE
@@ -24,43 +25,36 @@ EXPORT IParams := MODULE
 	END;
 
 	//used to call SSNBest_Services.Functions.fetchSSNs_generic - currently used in ADL_Best - DidVille.MAC_BestAppend & doxie.best_records
-	EXPORT SSNBestParams := INTERFACE(HardCodedFlags)
-		EXPORT TYPEOF(BatchShare.IParam.BatchParams.GLBPurpose)          GLBPurpose          := BatchShare.Constants.Defaults.GLBPurpose;
-	  EXPORT TYPEOF(BatchShare.IParam.BatchParams.DPPAPurpose)         DPPAPurpose         := BatchShare.Constants.Defaults.DPPAPurpose;
-	  EXPORT TYPEOF(BatchShare.IParam.BatchParams.DataRestrictionMask) DataRestrictionMask := BatchShare.Constants.Defaults.DataRestrictionMask;
-	  EXPORT TYPEOF(BatchShare.IParam.BatchParams.ApplicationType)     ApplicationType     := BatchShare.Constants.Defaults.ApplicationType;
-	  EXPORT TYPEOF(BatchShare.IParam.BatchParams.industryclass)       industryclass       := ut.IndustryClass.UTILI_IC; //we restrict it by default 'UTILI'
-	  EXPORT TYPEOF(BatchShare.IParam.BatchParams.ssn_mask)            ssn_mask            := BatchShare.Constants.Defaults.SSNMask; //'NONE'
-	  EXPORT TYPEOF(BatchShare.IParam.BatchParams.IncludeMinors)       IncludeMinors       := FALSE;
+	EXPORT SSNBestParams := INTERFACE(HardCodedFlags, doxie.IDataAccess)
 	END;
 
 	//this function is called to set the interface parameters before calling SSNBest_Services.Functions.fetchSSNs_generic
 	//NOTE that you can also call the fetchSSN's functions via your default stored batch params as is done in the SSNBest
-	//batch service or call setSSNBestParams_byInMod below
-	EXPORT setSSNBestParams(mod_access,IncludeMinors_,suppress_and_mask_ = TRUE,checkRNA_ = FALSE) := FUNCTIONMACRO
-    IMPORT BatchShare;  
+	EXPORT setSSNBestParams(doxie.IDataAccess mod_access, boolean suppress_and_mask_ = TRUE, boolean checkRNA_ = FALSE) := FUNCTION
 
-	 in_mod :=
-		MODULE(SSNBest_Services.IParams.SSNBestParams)
-			EXPORT TYPEOF(BatchShare.IParam.BatchParams.GLBPurpose)          GLBPurpose          := mod_access.glb;//glb_;
-			EXPORT TYPEOF(BatchShare.IParam.BatchParams.DPPAPurpose)         DPPAPurpose         := mod_access.dppa;//dppa_;
-			EXPORT TYPEOF(BatchShare.IParam.BatchParams.DataRestrictionMask) DataRestrictionMask := mod_access.DataRestrictionMask;//DRM_;
-			EXPORT TYPEOF(BatchShare.IParam.BatchParams.ApplicationType)     ApplicationType     := mod_access.application_type;//appType_;
-			EXPORT TYPEOF(BatchShare.IParam.BatchParams.industryclass)       industry_class      := mod_access.industry_class;//indClass_;
-			EXPORT TYPEOF(BatchShare.IParam.BatchParams.ssn_mask)            ssn_mask            := mod_access.ssn_mask;//ssnMask_;
-			EXPORT TYPEOF(BatchShare.IParam.BatchParams.IncludeMinors)       IncludeMinors       := IncludeMinors_;
+		in_mod := MODULE (PROJECT (mod_access, SSNBestParams, OPT))
 			EXPORT BOOLEAN suppress_and_mask := suppress_and_mask_;
 		  EXPORT BOOLEAN check_RNA_        := checkRNA_;
 		END;
 		RETURN in_mod;
-	ENDMACRO;
+	END;
 
-	EXPORT setSSNBestParams_byInMod(in_params,suppress_and_mask_ = TRUE,checkRNA_ = FALSE) := FUNCTIONMACRO
-		in_mod := MODULE(PROJECT(in_params, SSNBest_Services.IParams.SSNBestParams, OPT))
-			EXPORT BOOLEAN suppress_and_mask := suppress_and_mask_;
-		  EXPORT BOOLEAN check_RNA_        := checkRNA_;
-		END;	
-		RETURN in_mod;
-	ENDMACRO;
-	
+  // This function will likely become obsolete when BatchShare.IParam will be made compatible with IDataAccess.
+  EXPORT setFromBatch (BatchParams mod_batch) := FUNCTION
+    mod_access := MODULE (SSNBestParams)
+      EXPORT unsigned1 glb := mod_batch.GLBPurpose;
+      EXPORT unsigned1 dppa := mod_batch.DPPAPurpose;
+      EXPORT string DataPermissionMask := mod_batch.DataPermissionMask;
+      EXPORT string DataRestrictionMask := mod_batch.DataRestrictionMask;
+      EXPORT string5 industry_class := mod_batch.IndustryClass;
+      EXPORT string32 application_type := mod_batch.ApplicationType;
+      EXPORT boolean show_minors := mod_batch.IncludeMinors;
+      EXPORT string ssn_mask :=  mod_batch.ssn_mask;
+
+		  EXPORT BOOLEAN suppress_and_mask  := mod_batch.suppress_and_mask;
+		  EXPORT BOOLEAN check_RNA_         := mod_batch.check_RNA_;    
+    END; 
+    RETURN mod_access;
+  END;
+
 END;

@@ -25,7 +25,6 @@ DRM := modAccess.DataRestrictionMask;
 doxie.mac_best_records(di,did,o,d,g,useNonBlankKey,DRM,,,,includeDOD);
 
 ssnBestParams := SSNBest_Services.IParams.setSSNBestParams(modAccess,
-																													 include_minors,
 																													 suppress_and_mask_:=FALSE, //since suppression is done later by all services that currently call getSSNBest
 																									         checkRNA_:= checkRNA);
 																													 
