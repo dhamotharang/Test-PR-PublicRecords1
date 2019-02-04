@@ -4,7 +4,7 @@ string30   FIRST_NAME;        //Changed from length of 15
 string1    MIDDLE;
 string30   LAST_NAME;         //Changed from length of 15
 string31   T1;                //Formerly COMPANY_TITLE
-string3    DO;                //Changed from length of 15
+string3    DO;                //Changed from length of 1
 string3    DEPTCODE;          //Formerly KEY_CODE
 string31   DEPT_EXPL;         //Formerly KEY_TITLE
 string40   KEY_FILE;

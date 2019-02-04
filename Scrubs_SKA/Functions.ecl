@@ -131,7 +131,7 @@ EXPORT Functions := MODULE
   //                  a valid phone number.
   //****************************************************************************
   EXPORT fn_verify_phone(STRING phone) := function
-    cleaned_phone := Stringlib.StringFilterOut(phone, '-'); 
+    cleaned_phone := ut.CleanPhone(phone); 
     RETURN IF(LENGTH(cleaned_phone) = 10 AND Stringlib.StringFilterOut(cleaned_phone, '0123456789') = '', 1, 0);
   END;  
   

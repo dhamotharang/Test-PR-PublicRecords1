@@ -32,7 +32,7 @@ groupname := std.system.Thorlib.group();
 
 Mainfile_b := '/data/prod_data_build_10/production_data/business_headers/ska/data/' + filedate + '/om370133b_' + filedate_name + '_final_Final.txt' ;
 
-spray_file_b := FileServices.SprayVariable(sourceIP, Mainfile_b, 512, , , , 'thor50_dev05', '~thor_data400::in::' + filedate + '::ska_b', -1, , , true, , true);
+spray_file_b := FileServices.SprayVariable(sourceIP, Mainfile_b, 512, , , , groupname, '~thor_data400::in::' + filedate + '::ska_b', -1, , , true, , true);
 
 super_file_b := sequential(
 							FileServices.ClearSuperFile('~thor_data400::in::ska::ska_b'),
