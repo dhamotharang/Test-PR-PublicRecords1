@@ -93,6 +93,6 @@ rPersonDeceasedLayout := RECORD
  END;
 
  
-PersonDeceasedFile := PROJECT(PULL(DATASET(KELOtto.Constants.fileLocation+'base::fraudgov::qa::death', PersonDeceasedLayout, THOR)), TRANSFORM(rPersonDeceasedLayout, SELF.did := (UNSIGNED)LEFT.did, SELF := LEFT));
+PersonDeceasedFile := PROJECT(PULL(DATASET(KELOtto.Constants.fileLocation+'base::qa::death', PersonDeceasedLayout, THOR)), TRANSFORM(rPersonDeceasedLayout, SELF.did := (UNSIGNED)LEFT.did, SELF := LEFT));
 
 EXPORT PersonDeceased := JOIN(KELOtto.CustomerLexId, PersonDeceasedFile, LEFT.did=(INTEGER)RIGHT.did, TRANSFORM({LEFT.AssociatedCustomerFileInfo, RECORDOF(RIGHT)}, SELF := RIGHT, SELF := LEFT), HASH,KEEP(1));

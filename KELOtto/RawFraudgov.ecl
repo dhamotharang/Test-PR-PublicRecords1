@@ -316,4 +316,4 @@ raw_input_layout := RECORD,maxlength(60000)
 
 TestCustomer := [272, 990, 991, 992];
 
-EXPORT RawFraudgov := DATASET(KELOtto.Constants.fileLocation+'base::fraudgov::20180129d::main',raw_input_layout,THOR)(classification_permissible_use_access.fdn_file_info_id in TestCustomer);
+EXPORT RawFraudgov := DATASET(KELOtto.Constants.fileLocation+'base::20180129d::main',raw_input_layout,THOR)(classification_permissible_use_access.fdn_file_info_id in TestCustomer);
