@@ -43,7 +43,7 @@ IMPORT AutokeyB2_batch, BatchServices,LN_PropertyV2_Services,LN_PropertyV2, batc
 
 EXPORT Accurint_Property_BatchService(useCannedRecs = 'false') := 
 	MACRO
-	   #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+	   #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
     	//non-subject suppression
     nss := ut.getNonSubjectSuppression (Suppress.Constants.NonSubjectSuppression.doNothing);
 

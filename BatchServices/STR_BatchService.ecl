@@ -74,7 +74,7 @@ Hit Flags:
 IMPORT BatchServices;
 
 EXPORT STR_BatchService := MACRO
- #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 in_mod := module (BatchServices.Interfaces.str_config)
 	export string32 	ApplicationType 		:= '' : stored('ApplicationType');
 	export unsigned2 	PenaltThreshold 		:= 10 : stored('PenaltThreshold');

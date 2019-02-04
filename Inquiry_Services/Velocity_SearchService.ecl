@@ -17,7 +17,7 @@ import	Address,AutoStandardI,Doxie,iesp,ut;
 
 export	Velocity_SearchService	:=
 macro
- #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	#constant('useonlybestdid',true);
 	
   rec_in     := iesp.SearchAlert.t_SearchAlertRequest;
