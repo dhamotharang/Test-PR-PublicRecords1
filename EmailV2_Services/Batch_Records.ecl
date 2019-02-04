@@ -1,18 +1,18 @@
-﻿IMPORT Email_Services, Royalty, BatchServices, BatchShare;
+﻿IMPORT $, Royalty, BatchServices, BatchShare;
 
 EXPORT Batch_Records(
-                      DATASET(Email_Services.Layouts.batch_email_input) batch_in,
-                      Email_Services.IParams.BatchParams batch_params,
+                      DATASET($.Layouts.batch_email_input) batch_in,
+                      $.IParams.BatchParams batch_params,
                       BOOLEAN useCannedRecs = FALSE) := FUNCTION
 
       
     sample_email_set := BatchServices._Sample_inBatchMaster('EMAIL');
-    test_email_recs := PROJECT(sample_email_set, TRANSFORM(Email_Services.Layouts.batch_in_rec,
+    test_email_recs := PROJECT(sample_email_set, TRANSFORM($.Layouts.batch_in_rec,
                                                             SELF.email := LEFT.sic_code,
                                                             SELF.phone10 := IF(LEFT.homephone<>'',LEFT.homephone,LEFT.workphone),
                                                             SELF := LEFT));
   
-    batch_in_recs := PROJECT(batch_in, TRANSFORM(Email_Services.Layouts.batch_in_rec,
+    batch_in_recs := PROJECT(batch_in, TRANSFORM($.Layouts.batch_in_rec,
                             SELF.phone10 := IF(LEFT.homephone<>'',LEFT.homephone,LEFT.workphone),
                             SELF := LEFT));
   
@@ -21,11 +21,12 @@ EXPORT Batch_Records(
 
     BatchShare.MAC_CapitalizeInput(ds_batch_in_email, ds_batch_in);
     
-    email_params := MODULE(PROJECT(batch_params, Email_Services.IParams.EmailParams)) END;
+    email_params := MODULE(PROJECT(batch_params, $.IParams.EmailParams)) END;
     
-    _recs := MAP(
-                 Email_Services.Constants.SearchType.isEIA(batch_params.SearchType) => Email_Services.EmailIdentityAppendSearch(ds_batch_in,email_params),
-                 DATASET([],Email_Services.Layouts.email_final_rec) 
+    _recs := CASE(batch_params.SearchType,
+                 $.Constants.SearchType.EIA => $.EmailIdentityAppendSearch(ds_batch_in,email_params),
+                 $.Constants.SearchType.EAA => $.EmailAddressAppendSearch(ds_batch_in,email_params),
+                 DATASET([],$.Layouts.email_final_rec) 
                  );
     
     
@@ -34,6 +35,6 @@ EXPORT Batch_Records(
     dRoyalties := Royalty.RoyaltyEmail.GetBatchRoyaltySet(srtd_recs, email_src, batch_params.MaxResultsPerAcct, batch_params.ReturnDetailedRoyalties);
     
     // Now combine results for output 
-    res := ROW({_recs, dRoyalties}, Email_Services.Layouts.email_combined_rec);
+    res := ROW({_recs, dRoyalties}, $.Layouts.email_combined_rec);
     RETURN res;
 END;
