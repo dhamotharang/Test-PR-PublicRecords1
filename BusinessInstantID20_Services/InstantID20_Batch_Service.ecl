@@ -265,6 +265,8 @@ EXPORT InstantID20_Batch_Service() := MACRO
 				if(Include_PMLJ_Watchlist, dataset([{patriot.constants.wlPMLJ}], iesp.share.t_StringArrayItem));
 
 		_Watchlists_Requested := dWL(value<>'');
+    
+    Boolean ExcludeWatchLists := BusinessInstantID20_Services.Constants.EXCLUDEWATCHLISTS        : stored('ExcludeWatchLists');
 
 		// 2. Define DOB options.
 		STRING  DOBMatchType := ''								: stored('DOBMatchType');
@@ -296,9 +298,9 @@ EXPORT InstantID20_Batch_Service() := MACRO
 			EXPORT REAL				Global_Watchlist_Threshold	     := MAX(MIN(_Global_Watchlist_Threshold, 1), 0);
 			EXPORT BOOLEAN    OverRideExperianRestriction      := MAP( _OverRideExperianRestriction = TRUE => TRUE, _DataPermissionMask[12] IN BusinessInstantID20_Services.Constants.RESTRICTED_SET => TRUE, FALSE );
 			EXPORT BOOLEAN    RunTargusGatewayAnywayForTesting := _RunTargusGateway;
-			EXPORT DATASET(Gateway.Layouts.Config) Gateways    := _Gateways;
-			EXPORT BOOLEAN		include_ofac                     := _include_ofac;
-		  EXPORT BOOLEAN		include_additional_watchlists    := _include_additional_watchlists;
+      EXPORT DATASET   (Gateway.Layouts.Config) Gateways := PROJECT( _Gateways, TRANSFORM( Gateway.Layouts.Config, SELF := LEFT, SELF := [] ) );
+			EXPORT BOOLEAN		include_ofac                     := if(ExcludeWatchLists = TRUE, FALSE, _include_ofac);
+		  EXPORT BOOLEAN		include_additional_watchlists    := if(ExcludeWatchLists = TRUE, FALSE, _include_additional_watchlists);
 			EXPORT BOOLEAN    DisableIntermediateShellLogging  := TRUE; // We never intermediate-log batch jobs.
 			EXPORT DATASET(iesp.Share.t_StringArrayItem) Watchlists_Requested := _Watchlists_Requested;
 			EXPORT BusinessInstantID20_Services.Types.productTypeEnum BIID20_productType := _BIID20ProductType;
@@ -342,13 +344,14 @@ EXPORT InstantID20_Batch_Service() := MACRO
 		IF( _ForRetroTesting AND NOT MinimumInputMet,
 			FAIL('Error - Minimum input fields required: please refer to your product manual for guidance.'));
 
-		IF( Options.OFAC_Version = 4 AND NOT EXISTS(Options.Gateways(servicename = 'bridgerwlc')), 
-			FAIL(Risk_Indicators.iid_constants.OFAC4_NoGateway));
+    IF( Options.OFAC_Version = 4 AND ExcludeWatchlists = FALSE AND NOT EXISTS(Options.Gateways(servicename = 'bridgerwlc')), 
+			FAIL(Risk_Indicators.iid_constants.OFAC4_NoGateway)); // Due to this RQ-14881 ExcludeWatchlists works with other versions of OFAC in this query. 
+                                                            // Please refer to the ticket if needing further details.
     
 		ds_Input := PROJECT( ds_Input_pre, BusinessInstantID20_Services.Transforms(Options).xfm_LoadInput(LEFT,COUNTER) );
 	
 		// 8. Pass all input to BIID 2.0 logic.
-		ds_BIID_results := BusinessInstantID20_Services.InstantID20_Records(ds_Input, Options, linkingOptions);
+		ds_BIID_results := BusinessInstantID20_Services.InstantID20_Records(ds_Input, Options, linkingOptions, ExcludeWatchlists);
 				
 		// 9. Product output:
 		results_batch := PROJECT( ds_BIID_results, BusinessInstantID20_Services.xfm_ToBatchLayout(LEFT, Options) );
