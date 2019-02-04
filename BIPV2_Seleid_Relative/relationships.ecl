@@ -1,10 +1,9 @@
 ﻿IMPORT SALT31,ut;
 import mdr;//HACK
-EXPORT Relationships(DATASET(layout_Base) ih,DATASET(match_candidates(ih).layout_candidates) mc = Match_Candidates(ih).candidates, layout_specificities.R s = Specificities(ih).specificities[1]) := INLINE MODULE/*HACK INLINE FOR ROXIE*/
+EXPORT Relationships(DATASET(layout_Base) ih,DATASET(match_candidates(ih).layout_candidates) mc = Match_Candidates(ih).candidates, layout_specificities.R s = Specificities(ih).specificities[1]) := MODULE
 SHARED h := Scaled_Candidates(ih,mc);
 // Create code to find relationships between clusters based upon multiple records
- 
-// Code for NAMEST relationship 
+// Code for NAMEST relationship
   BaseFile := h;
   SlimRec := RECORD
     BaseFile.Seleid;
@@ -18,13 +17,11 @@ SHARED h := Scaled_Candidates(ih,mc);
 /*HACK FOLLOWS*/
 /******* To filter any franchise from name st relationship *****/
 CandidatesNAMEST1 := BaseFile (cnp_name_weight100 + st_weight100>=2000);
-
 // select the franchise seleids in the basefile.
-frandxSeleId := DEDUP(TABLE(basefile(MDR.sourceTools.SourceIsFrandx(source)), 
+frandxSeleId := DEDUP(TABLE(basefile(MDR.sourceTools.SourceIsFrandx(source)),
 									{basefile.seleId}), ALL);
-
 // left only here to eliminate all the franchise seleids from name relationship.
-noFrandxCandidates := JOIN(DISTRIBUTE(CandidatesNAMEST1, HASH(seleid)), 
+noFrandxCandidates := JOIN(DISTRIBUTE(CandidatesNAMEST1, HASH(seleid)),
 														DISTRIBUTE(frandxSeleId, HASH(seleid)),
 														left.seleid = right.seleid, left only, local);
 SlimRec1 := RECORD
@@ -47,7 +44,7 @@ SHARED CandidatesNAMEST := TABLE(noFrandxCandidates,SlimRec1);
     UNSIGNED4 dt_first_seen_track; // Computed date for this particular field
     UNSIGNED4 dt_last_seen_track; // Computed date for this particular field
   END;
-  CombinationRecord NoteLink(CandidatesNAMEST le,CandidatesNAMEST ri) := TRANSFORM
+  CombinationRecord NoteLink(CandidatesNAMEST le,CandidatesNAMEST ri) := INLINE TRANSFORM
     SELF.Seleid1 := le.Seleid;
     SELF.Seleid2 := ri.Seleid;
     SELF.Cnt := 1;
@@ -77,7 +74,7 @@ SHARED SortedCandNAMEST := SORT(DISTRIBUTE(CandidatesNAMEST,HASH(cnp_name,st)),c
   SHARED RelJoinNAMEST0 := RelJoinNAMEST0_np : PERSIST('~temp::Seleid::BIPV2_Seleid_Relative::RLink::NAMEST0',EXPIRE(Config.PersistExpire));
 EXPORT NAMEST_Links_np := RelJoinNAMEST0_np;
 EXPORT NAMEST_Links := RelJoinNAMEST0;
-// Code for CHARTER relationship 
+// Code for CHARTER relationship
   BaseFile := h;
   SlimRec := RECORD
     BaseFile.Seleid;
@@ -98,7 +95,7 @@ SHARED CandidatesCHARTER := TABLE(BaseFile(company_charter_number_weight100 + co
     UNSIGNED4 dt_first_seen_track; // Computed date for this particular field
     UNSIGNED4 dt_last_seen_track; // Computed date for this particular field
   END;
-  CombinationRecord NoteLink(CandidatesCHARTER le,CandidatesCHARTER ri) := TRANSFORM
+  CombinationRecord NoteLink(CandidatesCHARTER le,CandidatesCHARTER ri) := INLINE TRANSFORM
     SELF.Seleid1 := le.Seleid;
     SELF.Seleid2 := ri.Seleid;
     SELF.Cnt := 1;
@@ -128,7 +125,7 @@ SHARED SortedCandCHARTER := SORT(DISTRIBUTE(CandidatesCHARTER,HASH(company_chart
   SHARED RelJoinCHARTER0 := RelJoinCHARTER0_np : PERSIST('~temp::Seleid::BIPV2_Seleid_Relative::RLink::CHARTER0',EXPIRE(Config.PersistExpire));
 EXPORT CHARTER_Links_np := RelJoinCHARTER0_np;
 EXPORT CHARTER_Links := RelJoinCHARTER0;
-// Code for FEIN relationship 
+// Code for FEIN relationship
   BaseFile := h;
   SlimRec := RECORD
     BaseFile.Seleid;
@@ -147,7 +144,7 @@ SHARED CandidatesFEIN := TABLE(BaseFile(company_fein_weight100>=2000),SlimRec); 
     UNSIGNED4 dt_first_seen_track; // Computed date for this particular field
     UNSIGNED4 dt_last_seen_track; // Computed date for this particular field
   END;
-  CombinationRecord NoteLink(CandidatesFEIN le,CandidatesFEIN ri) := TRANSFORM
+  CombinationRecord NoteLink(CandidatesFEIN le,CandidatesFEIN ri) := INLINE TRANSFORM
     SELF.Seleid1 := le.Seleid;
     SELF.Seleid2 := ri.Seleid;
     SELF.Cnt := 1;
@@ -177,7 +174,7 @@ SHARED SortedCandFEIN := SORT(DISTRIBUTE(CandidatesFEIN,HASH(company_fein)),comp
   SHARED RelJoinFEIN0 := RelJoinFEIN0_np : PERSIST('~temp::Seleid::BIPV2_Seleid_Relative::RLink::FEIN0',EXPIRE(Config.PersistExpire));
 EXPORT FEIN_Links_np := RelJoinFEIN0_np;
 EXPORT FEIN_Links := RelJoinFEIN0;
-// Code for CONTACT relationship 
+// Code for CONTACT relationship
   BaseFile := h;
   SlimRec := RECORD
     BaseFile.Seleid;
@@ -218,7 +215,7 @@ SHARED CandidatesCONTACT := TABLE(BaseFile(fname_weight100 + lname_weight100>=20
     UNSIGNED4 dt_first_seen_contact_track; // Computed date for this particular field
     UNSIGNED4 dt_last_seen_contact_track; // Computed date for this particular field
   END;
-  CombinationRecord NoteLink(CandidatesCONTACT le,CandidatesCONTACT ri) := TRANSFORM
+  CombinationRecord NoteLink(CandidatesCONTACT le,CandidatesCONTACT ri) := INLINE TRANSFORM
     SELF.Seleid1 := le.Seleid;
     SELF.Seleid2 := ri.Seleid;
     SELF.Cnt := 1;
@@ -280,7 +277,7 @@ SHARED SortedCandCONTACT := SORT(DISTRIBUTE(CandidatesCONTACT,HASH(fname,lname))
   SHARED RelJoinCONTACT0 := RelJoinCONTACT0_np : PERSIST('~temp::Seleid::BIPV2_Seleid_Relative::RLink::CONTACT0',EXPIRE(Config.PersistExpire));
 EXPORT CONTACT_Links_np := RelJoinCONTACT0_np;
 EXPORT CONTACT_Links := RelJoinCONTACT0;
-// Code for ADDRESS relationship 
+// Code for ADDRESS relationship
   BaseFile := h;
   SlimRec := RECORD
     BaseFile.Seleid;
@@ -308,7 +305,7 @@ SHARED CandidatesADDRESS := TABLE(BaseFile(prim_name_weight100 + prim_range_weig
     UNSIGNED4 dt_first_seen_track; // Computed date for this particular field
     UNSIGNED4 dt_last_seen_track; // Computed date for this particular field
   END;
-  CombinationRecord NoteLink(CandidatesADDRESS le,CandidatesADDRESS ri) := TRANSFORM
+  CombinationRecord NoteLink(CandidatesADDRESS le,CandidatesADDRESS ri) := INLINE TRANSFORM
     SELF.Seleid1 := le.Seleid;
     SELF.Seleid2 := ri.Seleid;
     SELF.Cnt := 1;
@@ -372,7 +369,7 @@ SHARED SortedCandADDRESS := SORT(DISTRIBUTE(CandidatesADDRESS,HASH(prim_name,pri
   SHARED RelJoinADDRESS15 := RelJoinADDRESS15_np : PERSIST('~temp::Seleid::BIPV2_Seleid_Relative::RLink::ADDRESS15',EXPIRE(Config.PersistExpire));
 EXPORT ADDRESS_Links_np := RelJoinADDRESS0_np + RelJoinADDRESS1_np + RelJoinADDRESS2_np + RelJoinADDRESS3_np + RelJoinADDRESS4_np + RelJoinADDRESS5_np + RelJoinADDRESS6_np + RelJoinADDRESS7_np + RelJoinADDRESS8_np + RelJoinADDRESS9_np + RelJoinADDRESS10_np + RelJoinADDRESS11_np + RelJoinADDRESS12_np + RelJoinADDRESS13_np + RelJoinADDRESS14_np + RelJoinADDRESS15_np;
 EXPORT ADDRESS_Links := RelJoinADDRESS0 + RelJoinADDRESS1 + RelJoinADDRESS2 + RelJoinADDRESS3 + RelJoinADDRESS4 + RelJoinADDRESS5 + RelJoinADDRESS6 + RelJoinADDRESS7 + RelJoinADDRESS8 + RelJoinADDRESS9 + RelJoinADDRESS10 + RelJoinADDRESS11 + RelJoinADDRESS12 + RelJoinADDRESS13 + RelJoinADDRESS14 + RelJoinADDRESS15;
-// Code for DUNS_NUMBER relationship 
+// Code for DUNS_NUMBER relationship
   BaseFile := h;
   SlimRec := RECORD
     BaseFile.Seleid;
@@ -391,7 +388,7 @@ SHARED CandidatesDUNS_NUMBER := TABLE(BaseFile(active_duns_number_weight100>=200
     UNSIGNED4 dt_first_seen_track; // Computed date for this particular field
     UNSIGNED4 dt_last_seen_track; // Computed date for this particular field
   END;
-  CombinationRecord NoteLink(CandidatesDUNS_NUMBER le,CandidatesDUNS_NUMBER ri) := TRANSFORM
+  CombinationRecord NoteLink(CandidatesDUNS_NUMBER le,CandidatesDUNS_NUMBER ri) := INLINE TRANSFORM
     SELF.Seleid1 := le.Seleid;
     SELF.Seleid2 := ri.Seleid;
     SELF.Cnt := 1;
@@ -421,7 +418,7 @@ SHARED SortedCandDUNS_NUMBER := SORT(DISTRIBUTE(CandidatesDUNS_NUMBER,HASH(activ
   SHARED RelJoinDUNS_NUMBER0 := RelJoinDUNS_NUMBER0_np : PERSIST('~temp::Seleid::BIPV2_Seleid_Relative::RLink::DUNS_NUMBER0',EXPIRE(Config.PersistExpire));
 EXPORT DUNS_NUMBER_Links_np := RelJoinDUNS_NUMBER0_np;
 EXPORT DUNS_NUMBER_Links := RelJoinDUNS_NUMBER0;
-// Code for ENTERPRISE_NUMBER relationship 
+// Code for ENTERPRISE_NUMBER relationship
   BaseFile := h;
   SlimRec := RECORD
     BaseFile.Seleid;
@@ -440,7 +437,7 @@ SHARED CandidatesENTERPRISE_NUMBER := TABLE(BaseFile(active_enterprise_number_we
     UNSIGNED4 dt_first_seen_track; // Computed date for this particular field
     UNSIGNED4 dt_last_seen_track; // Computed date for this particular field
   END;
-  CombinationRecord NoteLink(CandidatesENTERPRISE_NUMBER le,CandidatesENTERPRISE_NUMBER ri) := TRANSFORM
+  CombinationRecord NoteLink(CandidatesENTERPRISE_NUMBER le,CandidatesENTERPRISE_NUMBER ri) := INLINE TRANSFORM
     SELF.Seleid1 := le.Seleid;
     SELF.Seleid2 := ri.Seleid;
     SELF.Cnt := 1;
@@ -470,7 +467,7 @@ SHARED SortedCandENTERPRISE_NUMBER := SORT(DISTRIBUTE(CandidatesENTERPRISE_NUMBE
   SHARED RelJoinENTERPRISE_NUMBER0 := RelJoinENTERPRISE_NUMBER0_np : PERSIST('~temp::Seleid::BIPV2_Seleid_Relative::RLink::ENTERPRISE_NUMBER0',EXPIRE(Config.PersistExpire));
 EXPORT ENTERPRISE_NUMBER_Links_np := RelJoinENTERPRISE_NUMBER0_np;
 EXPORT ENTERPRISE_NUMBER_Links := RelJoinENTERPRISE_NUMBER0;
-// Code for SOURCE relationship 
+// Code for SOURCE relationship
   BaseFile := h;
   SlimRec := RECORD
     BaseFile.Seleid;
@@ -491,7 +488,7 @@ SHARED CandidatesSOURCE := TABLE(BaseFile(source_weight100 + source_record_id_we
     UNSIGNED4 dt_first_seen_track; // Computed date for this particular field
     UNSIGNED4 dt_last_seen_track; // Computed date for this particular field
   END;
-  CombinationRecord NoteLink(CandidatesSOURCE le,CandidatesSOURCE ri) := TRANSFORM
+  CombinationRecord NoteLink(CandidatesSOURCE le,CandidatesSOURCE ri) := INLINE TRANSFORM
     SELF.Seleid1 := le.Seleid;
     SELF.Seleid2 := ri.Seleid;
     SELF.Cnt := 1;
@@ -521,7 +518,7 @@ SHARED SortedCandSOURCE := SORT(DISTRIBUTE(CandidatesSOURCE,HASH(source,source_r
   SHARED RelJoinSOURCE0 := RelJoinSOURCE0_np : PERSIST('~temp::Seleid::BIPV2_Seleid_Relative::RLink::SOURCE0',EXPIRE(Config.PersistExpire));
 EXPORT SOURCE_Links_np := RelJoinSOURCE0_np;
 EXPORT SOURCE_Links := RelJoinSOURCE0;
-// Code for ASSOC relationship 
+// Code for ASSOC relationship
 SHARED ASSOCCRec := RECORD
     SALT31.UIDType Seleid1;
     SALT31.UIDType Seleid2;
