@@ -1,4 +1,4 @@
-﻿IMPORT doxie, dx_Email, Royalty;
+﻿IMPORT $, doxie, dx_Email, DidVille, Royalty;
 EXPORT Layouts := MODULE
 
     EXPORT batch_email_input := RECORD
@@ -7,7 +7,7 @@ EXPORT Layouts := MODULE
     END;
 
   EXPORT batch_in_rec := RECORD
-    STRING20     acctno := '';
+    STRING20    acctno := '';
     UNSIGNED    seq := 0; //to be used for internal search on multiple inputs for same acctno
     UNSIGNED    DID := 0;
     UNSIGNED    subject_lexid := 0;  // for Lexid resolved from input PII or DID provided from input  
@@ -15,9 +15,9 @@ EXPORT Layouts := MODULE
     STRING20    name_first := '';
     STRING20    name_middle := '';
     STRING20    name_last := '';
-    STRING5      name_suffix := '';
+    STRING5     name_suffix := '';
     STRING12    ssn := '';
-    STRING8      dob := '';
+    STRING8     dob := '';
     STRING10    phone10 := '';
     STRING      email := '';
     STRING      email_username := '';  // user name from cleaned email
@@ -34,6 +34,7 @@ EXPORT Layouts := MODULE
     STRING2     st := '';
     STRING5     z5 := '';
     STRING4     zip4 := '';
+    BOOLEAN     isdeepdive := FALSE; 
   END;
   
   EXPORT batch_in_ext_rec := RECORD(batch_in_rec)
@@ -41,12 +42,48 @@ EXPORT Layouts := MODULE
     BOOLEAN    is_rejected_rec := FALSE;
   END;
   
-  EXPORT email_ids_rec := RECORD
+  EXPORT batch_in_didvile_rec := RECORD(DidVille.Layout_did_inbatch)
+    UNSIGNED    DID := 0;
+  END;
+  
+  EXPORT batch_in_bv_rec := RECORD
+    STRING      email := '';
+  END;
+  
+  EXPORT bv_history_rec := RECORD
+    STRING   email := '';
+    STRING   email_status := '';
+    STRING   email_status_reason := '';
+    STRING   email_username := '';  
+    STRING   email_domain := '';    
+  END;
+  
+  EXPORT bv_history_gateway_rec := RECORD
+    STRING   date_added := '';
+    STRING   email_address := '';
+    STRING   source := '';
+    STRING   status := '';
+    STRING   disposable := '';
+    STRING   role_address := '';
+    STRING   error_code := '';
+    STRING   error := '';
+    STRING   account := '';  // email user name
+    STRING   domain := '';    
+  END;
+  
+   EXPORT bv_history_response_rec := RECORD
+    DATASET (bv_history_gateway_rec) Records  {XPATH('Records/Rec'), MAXCOUNT($.Constants.GatewayValues.SQLSelectLimit)};
+    STRING  RecsReturned {XPATH('RecsReturned')};
+    STRING  Latency {XPATH('Latency')};
+    STRING  ExceptionMessage {XPATH('Exceptions/Exception/Message')};
+  END;
+
+ EXPORT email_ids_rec := RECORD
     STRING20  acctno := '';
     UNSIGNED  seq := 0; 
-//    batch_in_rec -[acctno] input;
     UNSIGNED  email_rec_key := 0;
     BOOLEAN   isdeepdive := FALSE; 
+    UNSIGNED  subject_lexid := 0;  // keeping Lexid resolved from input PII or DID provided from input  
   END;
   
   EXPORT orig_email_rec := RECORD
@@ -97,6 +134,7 @@ EXPORT Layouts := MODULE
     orig_email_rec original;
     clean_email_rec cleaned;
     BOOLEAN   isdeepdive := FALSE; 
+    UNSIGNED  subject_lexid := 0;  // keeping Lexid resolved from input PII or DID provided from input  
   END;
 
   EXPORT email_internal_rec := RECORD
@@ -139,6 +177,8 @@ EXPORT Layouts := MODULE
     best_rec bestinfo;
     STRING   email_status := '';
     STRING   email_status_reason := '';
+    STRING   additional_status_info := '';
+    STRING   relationship  := '';
     STRING   record_err_msg  := '';
     BOOLEAN  is_rejected_rec := FALSE;
   END;
