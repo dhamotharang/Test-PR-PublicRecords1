@@ -3,7 +3,7 @@
 #OPTION('multiplePersistInstances',FALSE);
 
 export BWR_Build_Email(version, string emailList='') := function
-#workunit('name','Email Data ' + version);
+// #workunit('name','Email Data ' + version);
 
 //email_base := Build_base(version).rollup_with_history_misc; --Replaced by SCRUBS process which incorporates the base build + output
 email_fcra_base := Build_base(version).rollup_email_orig;
