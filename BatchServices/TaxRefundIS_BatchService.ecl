@@ -56,7 +56,7 @@
 import BatchServices;
 	
 export TaxRefundIS_BatchService := MACRO
- #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);	
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);	
 	in_layout := BatchServices.Layouts.TaxRefundIS.batch_in;
 	
 	

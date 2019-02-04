@@ -38,7 +38,7 @@ acctno is required and must be unique for each row
 
 import Gateway,   AutoStandardI,  BatchServices, address, Royalty, Phones;
 export RealTimePhones_BatchService := macro
- #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);  
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);  
 	max_results := BatchServices.Constants.RealTime.REALTIME_PHONE_LIMIT : stored('max_results_per_acct');
 	store_max := if (max_results > BatchServices.Constants.RealTime.REALTIME_PHONE_LIMIT or max_results = 0,BatchServices.Constants.RealTime.REALTIME_PHONE_LIMIT,max_results);
 	#stored('MaxResults', store_max);

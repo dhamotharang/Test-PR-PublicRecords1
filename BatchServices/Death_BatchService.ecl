@@ -27,7 +27,7 @@ IMPORT DeathV2_Services,BatchShare;
 
 EXPORT Death_BatchService(useCannedRecs = 'false') := 
 	MACRO
-		#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);		
+		#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);		
 		batch_params		:= DeathV2_Services.IParam.getBatchParams();				
 		// Grab the input XML and throw into a dataset.	
 		ds_xml_in_raw  	:= DATASET([], DeathV2_Services.Layouts.BatchIn) : STORED('batch_in', FEW);
