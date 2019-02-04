@@ -12,10 +12,10 @@ EXPORT macAppendPersonBestInfo(dIn, inLexid, inGlb, inDrm,
   LOCAL dupLexid      := DEDUP(SORT(dDistributed, inLexid, LOCAL), inLexid, LOCAL);
 
   // best records restriction flags
-  LOCAL glb_flag      := Doxie.compliance.glb_ok(inGlb);
-  LOCAL pre_flag      := Doxie.compliance.isPreGLBRestricted(inDrm);
-  LOCAL filter_exp    := Doxie.compliance.isECHRestricted(inDrm);
-  LOCAL filter_eq     := Doxie.compliance.isEQCHRestricted(inDrm);
+  LOCAL glb_flag      := Doxie.compliance.glb_ok((UNSIGNED1)inGlb);
+  LOCAL pre_flag      := Doxie.compliance.isPreGLBRestricted((STRING)inDrm);
+  LOCAL filter_exp    := Doxie.compliance.isECHRestricted((STRING)inDrm);
+  LOCAL filter_eq     := Doxie.compliance.isEQCHRestricted((STRING)inDrm);
 
   LOCAL bestRecsPerm := dx_BestRecords.Functions.get_perm_type(glb_flag, inUseNonBlank, false, 
     pre_flag, filter_exp, filter_eq, inMarketing);

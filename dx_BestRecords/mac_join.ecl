@@ -6,7 +6,7 @@ EXPORT mac_join (ds, d_field, key, use_distributed, left_outer) := FUNCTIONMACRO
 
 #IF (use_distributed)
 	LOCAL ds_res := JOIN (DISTRIBUTE (ds, hash(d_field)), DISTRIBUTE(PULL(key), hash(did)),
-		(LEFT.d_field = RIGHT.did),           
+		((unsigned)LEFT.d_field = RIGHT.did),           
 		TRANSFORM (out_rec,
 			SELF._best.age := if (RIGHT.dob = 0, 0, ut.age(RIGHT.dob)),
 			SELF._best := RIGHT,
@@ -17,7 +17,7 @@ EXPORT mac_join (ds, d_field, key, use_distributed, left_outer) := FUNCTIONMACRO
 		KEEP(1), LIMIT(0), LOCAL);
 #ELSE
 	LOCAL ds_res := JOIN (ds, key,
-		KEYED(LEFT.d_field = RIGHT.did),
+		KEYED((unsigned)LEFT.d_field = RIGHT.did),
 		TRANSFORM (out_rec,
 			SELF._best.age := if (RIGHT.dob = 0, 0, ut.age(RIGHT.dob)),
 			SELF._best := RIGHT,
