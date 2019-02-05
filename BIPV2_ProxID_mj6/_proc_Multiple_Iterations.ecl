@@ -68,7 +68,7 @@ functionmacro
       ,pSetNameCalculations := SetNameCalculations
       ,pBuildName           := pUniqueOut + 'Iters'
       ,pNotifyEmails        := BIPV2_Build.mod_email.emailList
-      ,pOutputFilename      := '~bipv2_build::@version@_@iteration@::workunit_history::proc_proxid_mj6.iterations'
+      ,pOutputFilename      := '~bipv2_build::@version@::workunit_history::proc_proxid_mj6.iterations'
       ,pOutputSuperfile     := '~bipv2_build::qa::workunit_history' 
       ,pCompileOnly         := pCompileTest
   );

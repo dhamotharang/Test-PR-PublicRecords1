@@ -409,8 +409,8 @@ rPersonCrim := RECORD
 	string10	dob_orig;
  END;
  
-
-PersonCrimPrep1 := PROJECT(DATASET(KELOtto.Constants.fileLocation+'base::qa::crim', rPersonCrim, THOR), 
+PersonCrimPrep1 := PROJECT(DATASET('~foreign::10.173.44.105::thor_data400::base::fraudgov::built::crim', rPersonCrim, THOR),
+//PersonCrimPrep1 := PROJECT(DATASET(KELOtto.Constants.fileLocation+'base::qa::crim', rPersonCrim, THOR), 
        TRANSFORM({RECORDOF(LEFT), STRING off_cat_list}, 
                  SELF.off_cat_list :=                  
                     TRIM(LEFT.off_cat_1_1) + '|' + TRIM(LEFT.off_cat_2_1) + '|' + TRIM(LEFT.off_cat_3_1) + '|' + TRIM(LEFT.off_cat_4_1) + '|' + TRIM(LEFT.off_cat_5_1) + '|' + TRIM(LEFT.off_cat_1_2) + '|' + TRIM(LEFT.off_cat_2_2) + '|' + TRIM(LEFT.off_cat_3_2) + '|' + 
@@ -420,14 +420,14 @@ PersonCrimPrep1 := PROJECT(DATASET(KELOtto.Constants.fileLocation+'base::qa::cri
                     TRIM(LEFT.off_cat_2_6) + '|' + TRIM(LEFT.off_cat_3_6) + '|' + TRIM(LEFT.off_cat_4_6) + '|' + TRIM(LEFT.off_cat_5_6) + '|';
                  SELF := LEFT));
 
-PersonCrimPrep := JOIN(PersonCrimPrep1, KELOtto.fraudgov, LEFT.record_id=RIGHT.record_id, 
-       TRANSFORM({RECORDOF(LEFT), INTEGER1 name_ssn_dob_match, INTEGER1 new_name_ssn_dob_match, string debug_fname, string debug_mname, string debug_lname, string debug_ssn}, 
-       // putting the debug values from fraudgov in here because product are almost certainly going to complain that there are no fullname matches and it is because of the mname (obviously).
-       self.debug_fname := RIGHT.cleaned_name.fname, self.debug_lname := right.cleaned_name.lname, self.debug_mname := RIGHT.cleaned_name.mname, self.debug_ssn := RIGHT.ssn,
-       self.name_ssn_dob_match := MAP(LEFT.ssn=RIGHT.ssn AND LEFT.lname=RIGHT.cleaned_name.lname AND LEFT.fname=RIGHT.cleaned_name.fname AND LEFT.mname=RIGHT.cleaned_name.mname AND LEFT.dob=RIGHT.dob => 1, 0),
-       self.new_name_ssn_dob_match := MAP(LEFT.ssn=RIGHT.ssn AND LEFT.lname=RIGHT.cleaned_name.lname AND LEFT.fname=RIGHT.cleaned_name.fname AND LEFT.mname !=RIGHT.cleaned_name.mname AND
-         (LEFT.mname[1]=RIGHT.cleaned_name.mname[1] OR LEFT.mname = '' OR RIGHT.cleaned_name.mname = '')  AND LEFT.dob=RIGHT.dob => 1, 0),
-       SELF := LEFT), KEEP(1), LEFT OUTER, HASH);
+PersonCrimPrep := PROJECT(PersonCrimPrep1,
+       TRANSFORM({RECORDOF(LEFT), INTEGER1 name_ssn_dob_match, INTEGER1 old_name_ssn_dob_match}, 
+       self.old_name_ssn_dob_match := MAP(LEFT.ssn=LEFT.ssn_orig AND LEFT.lname=LEFT.lname_orig AND LEFT.fname=LEFT.fname_orig AND LEFT.mname=LEFT.mname_orig AND LEFT.dob=LEFT.dob_orig => 1, 0),
+       self.name_ssn_dob_match := MAP(LEFT.ssn=LEFT.ssn_orig AND LEFT.lname=LEFT.lname_orig AND LEFT.fname=LEFT.fname_orig AND LEFT.dob=LEFT.dob_orig AND 
+          (LEFT.mname = LEFT.mname_orig OR
+         (LEFT.mname != LEFT.mname_orig AND
+         (LEFT.mname[1]=LEFT.mname_orig[1] OR LEFT.mname = '' OR LEFT.mname_orig = '')))
+          => 1, 0), 
+          SELF := LEFT));
 
 EXPORT PersonCrim  := JOIN(KELOtto.CustomerLexId, PersonCrimPrep, LEFT.did=(INTEGER)RIGHT.did, TRANSFORM({LEFT.AssociatedCustomerFileInfo, RECORDOF(RIGHT)}, SELF := RIGHT, SELF := LEFT), HASH, KEEP(1));
-//EXPORT PersonCrim  := JOIN(KELOtto.CustomerLexId, PersonCrimPrep, LEFT.did=(INTEGER)RIGHT.did, TRANSFORM({LEFT.AssociatedCustomerFileInfo, RECORDOF(RIGHT)}, SELF := RIGHT, SELF := LEFT), HASH, KEEP(1));
