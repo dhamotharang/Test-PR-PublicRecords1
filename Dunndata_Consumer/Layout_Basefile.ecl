@@ -40,5 +40,8 @@ EXPORT Layout_Basefile := RECORD
 		BIPV2.IDlayouts.l_xlink_ids;	//	Added for BIP project
 		STRING100	persistent_record_id;
 		UNSIGNED8 rcid;
+		//New fields added for CCPA
+		unsigned4 GlobalSourceId;
+		unsigned8 SourceSpecificRecordId;
 
 END;
