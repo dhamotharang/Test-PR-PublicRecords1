@@ -15,6 +15,8 @@ module
 	export Run_Anonymize := Build_Base_Anonymized(pversion).All;
 	export Run_Demo := Append_DemoData(pversion);
 	export Promote_Base := Promote(pversion).promote_base;
+	export postNewStatus := FraudgovInfo(pversion,'Base_Completed').postNewStatus;
+	export notify_Base_Completed := notify('Base_Completed','*');
 
 	export All :=
 	if(tools.fun_IsValidVersion(pversion)
@@ -27,6 +29,9 @@ module
 			, Run_Anonymize
 			, Run_Demo
 			, Promote_Base
+ 			, postNewStatus
+			, notify_Base_Completed	
+
 		) 
 		,output('No Valid version parameter passed, skipping FraudGovPlatform.Build_Base atribute')
 	 );
