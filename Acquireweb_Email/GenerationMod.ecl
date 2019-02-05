@@ -22,7 +22,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
   EXPORT spc_FILENAME := 'Acquireweb';
   EXPORT spc_INGESTSTATUS := '';
   EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:RCID';
-  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,awid,firstname,lastname,address1,address2,city,state,zip,zip4,emailid,email,activecode,did,did_score,aid,clean_title,clean_fname,clean_mname,clean_lname,clean_name_suffix,clean_prim_range,clean_predir,clean_prim_name,clean_addr_suffix,clean_postdir,clean_unit_desig,clean_sec_range,clean_p_city_name,clean_v_city_name,clean_st,clean_zip,clean_zip4,clean_cart,clean_cr_sort_sz,clean_lot,clean_lot_order,clean_dbpc,clean_chk_digit,clean_rec_type,clean_county,clean_geo_lat,clean_geo_long,clean_msa,clean_geo_blk,clean_geo_match,clean_err_stat,date_first_seen,date_last_seen,date_vendor_first_reported,date_vendor_last_reported,current_rec';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,awid,firstname,lastname,address1,address2,city,state,zip,zip4,Phone,DOB,emailid,email,activecode,did,did_score,aid,clean_title,clean_fname,clean_mname,clean_lname,clean_name_suffix,clean_prim_range,clean_predir,clean_prim_name,clean_addr_suffix,clean_postdir,clean_unit_desig,clean_sec_range,clean_p_city_name,clean_v_city_name,clean_st,clean_zip,clean_zip4,clean_cart,clean_cr_sort_sz,clean_lot,clean_lot_order,clean_dbpc,clean_chk_digit,clean_rec_type,clean_county,clean_geo_lat,clean_geo_long,clean_msa,clean_geo_blk,clean_geo_match,clean_err_stat,date_first_seen,date_last_seen,date_vendor_first_reported,date_vendor_last_reported,current_rec';
   EXPORT spc_HAS_TWOSTEP := FALSE;
   EXPORT spc_HAS_PARTITION := FALSE;
   EXPORT spc_HAS_FIELDTYPES := FALSE;
@@ -50,15 +50,17 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:awid:TYPE(STRING):0,0\n'
     + 'FIELD:firstname:TYPE(STRING):0,0\n'
     + 'FIELD:lastname:TYPE(STRING):0,0\n'
-    + 'FIELD:address1:DERIVED:TYPE(STRING):0,0\n'
+    + 'FIELD:address1:TYPE(STRING):0,0\n'
     + 'FIELD:address2:DERIVED:TYPE(STRING):0,0\n'
     + 'FIELD:city:TYPE(STRING):0,0\n'
     + 'FIELD:state:TYPE(STRING):0,0\n'
     + 'FIELD:zip:TYPE(STRING):0,0\n'
     + 'FIELD:zip4:TYPE(STRING):0,0\n'
-    + 'FIELD:emailid:DERIVED:TYPE(STRING):0,0\n'
+    + 'FIELD:Phone:TYPE(STRING):0,0\n'
+    + 'FIELD:DOB:TYPE(STRING):0,0\n'
+    + 'FIELD:emailid:TYPE(STRING):0,0\n'
     + 'FIELD:email:TYPE(STRING):0,0\n'
-    + 'FIELD:activecode:DERIVED:TYPE(STRING):0,0\n'
+    + 'FIELD:activecode:TYPE(STRING):0,0\n'
     + 'FIELD:did:DERIVED:TYPE(UNSIGNED8):0,0\n'
     + 'FIELD:did_score:DERIVED:TYPE(UNSIGNED8):0,0\n'
     + 'FIELD:aid:DERIVED:TYPE(UNSIGNED8):0,0\n'
