@@ -4,6 +4,8 @@ EXPORT mac_join (ds, d_field, key, use_distributed, left_outer) := FUNCTIONMACRO
 		dx_BestRecords.layout_best _best;
 	END;
 
+  // RR-14697: Cast the d_field to unsigned to accomodate services outside of Roxie which can potentially 
+  //   use a string for the did field
 #IF (use_distributed)
 	LOCAL ds_res := JOIN (DISTRIBUTE (ds, hash(d_field)), DISTRIBUTE(PULL(key), hash(did)),
 		((unsigned)LEFT.d_field = RIGHT.did),           
