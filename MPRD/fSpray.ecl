@@ -1,7 +1,7 @@
-import lib_fileservices,_control,lib_stringlib,Versioncontrol;
-
+﻿import lib_fileservices,_Control,lib_stringlib,Versioncontrol;
+string landing_zone := _Control.IPAddress.bctlpedata10;
 export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
- 	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+ 	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_basc_name.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -14,7 +14,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},
 	
-  {'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+  {landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_basc_facility.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -27,7 +27,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},
 
-  {'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+  {landing_zone	                    //SourceIP			 Remote Server's IP address									
   ,'/data/enclarity/MPRD/infiles/'+version
   //+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
   ,'t_basc_cp.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -40,7 +40,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
   ,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
   },
    
-	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_basc_claim.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -53,7 +53,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},
 	
-	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_npi_extension.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -66,7 +66,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},
 	
-	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'	+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_npi_extension_facility.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -79,7 +79,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},
 
-	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'	+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_claims_addr_master.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -92,7 +92,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},
 	
-	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_claims_by_month.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -105,7 +105,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},
 
-	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_npi_tin_xref.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -118,7 +118,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},
 	
-	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_taxonomy_equiv.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -131,7 +131,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},
 	
-	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_basc_deceased.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -144,7 +144,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},
 	
-	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_basc_addr.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -157,7 +157,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},	
 	
-	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_client_data.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -170,7 +170,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},	
 	
-	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_office_attributes.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -183,7 +183,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},	
 	
-	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_office_attributes_facility.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -196,7 +196,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},	
 
-	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_std_terms_lu.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -209,7 +209,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},
 	
-	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'taxonomy_full_lu.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -222,7 +222,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},	
 
-	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_dir_confidence_2010_lu.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -235,7 +235,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},	
 	
-	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_specialty_lu.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -248,7 +248,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},
 	
-  {'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+  {landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_group_lu.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -261,7 +261,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},
 	
-	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_hospital_lu.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -274,7 +274,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},	
 	
-	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_dea_xref.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -287,7 +287,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},	
 	
-  {'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+  {landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_lic_xref.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -300,7 +300,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},	
 	
-	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_facility_name_xref.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -313,7 +313,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},	
 	
-	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_addr_name_xref.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -326,7 +326,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},	
 	
-	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_basc_facility_mme.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -339,7 +339,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},	
 	
-	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_lic_filedate.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -352,7 +352,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},	
 	
-	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_nanpa.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -365,7 +365,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},	
 	
-	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_best_hospital.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -378,7 +378,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},	
 	
-	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_last_name_stats.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -391,7 +391,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},	
 	
-	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_source_confidence_lu.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -404,7 +404,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},	
 	
-	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_ignore_terms_lu.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -417,7 +417,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},	
 	
-	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_taxon_lu.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -430,7 +430,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},	
 	
-	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'t_abbr_lu.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -443,7 +443,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},	
 	
-	{'bctlpedata10.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+	{landing_zone	                    //SourceIP			 Remote Server's IP address									
  	,'/data/enclarity/MPRD/infiles/'+version
 	//+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'call_queue_bad.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
@@ -456,7 +456,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'                                         //file_type				-- Type of file format.  Possible types are 'FIXED', 'VARIABLE', OR 'XML'.  Default = 'FIXED'
  	},
 	
-	{'bctlpedata10.risk.regn.net'
+	{landing_zone
 	,'/data/enclarity/MPRD/infiles/'+ version
 	//+ '/'
 	,'t_group_practice.txt'
@@ -469,7 +469,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'
 	},
 
-	{'bctlpedata10.risk.regn.net'
+	{landing_zone
 	,'/data/enclarity/MPRD/infiles/'+ version
 	//+ '/'
 	,'t_ACI_schedule.txt'
@@ -482,7 +482,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'
 	},
 	
-	{'bctlpedata10.risk.regn.net'
+	{landing_zone
 	,'/data/enclarity/MPRD/infiles/' + version
 	//+ '/'
 	,'t_business_activities_lu.txt'
@@ -495,7 +495,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'
 	},
 	
-	{'bctlpedata10.risk.regn.net'
+	{landing_zone
 	,'/data/enclarity/MPRD/infiles/' + version
 	//+ '/'
 	,'t_cms_ecp.txt'
@@ -508,7 +508,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'
 	},
 	
-	{'bctlpedata10.risk.regn.net'
+	{landing_zone
 	,'/data/enclarity/MPRD/infiles/' + version
 	//+ '/'
 	,'t_opi.txt'
@@ -521,7 +521,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'
 	},
 	
-	{'bctlpedata10.risk.regn.net'
+	{landing_zone
 	,'/data/enclarity/MPRD/infiles/' + version
 	//+ '/'
 	,'t_opi_facility.txt'
@@ -534,7 +534,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'
 	},
 	
-	{'bctlpedata10.risk.regn.net'
+	{landing_zone
 	,'/data/enclarity/MPRD/infiles/' + version
 	//+ '/'
 	,'t_abms_cert_lu.txt'
@@ -547,7 +547,7 @@ export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
 	,'VARIABLE'
 	},
 	
-	{'bctlpedata10.risk.regn.net'
+	{landing_zone
 	,'/data/enclarity/MPRD/infiles/' + version
 	//+ '/'
 	,'t_abms_cooked.txt'
