@@ -1,5 +1,5 @@
 ﻿// Begin code to perform the matching itself
- 
+
 IMPORT SALT311,std;
 EXPORT matches(DATASET(layout_DOT_Base) ih, UNSIGNED MatchThreshold = Config.MatchThreshold) := MODULE
 SHARED LowerMatchThreshold := MatchThreshold-3; // Keep extra 'borderlines' for debug purposes
@@ -182,12 +182,12 @@ END;
 //Allow rule numbers to be converted to readable text.
 EXPORT RuleText(UNSIGNED n) :=  MAP (
      n = 0 => ':cnp_number:st:prim_range_derived'
-  ,n = 101 => ':cnp_number:prim_range_derived:cnp_name:st:pname_digits'                      /* HACKMatches01 */
-  ,n = 102 => ':cnp_number:prim_range_derived:prim_name_derived:st:cnp_name[1..4]'                   /* HACKMatches01 */
-  ,n = 103 => ':prim_range_derived:prim_name_derived:st:sec_range'                                   /* HACKMatches01 */
-  ,n = 104 => ':cnp_number:prim_range_derived:v_city_name:st:pname_digits:cnp_name_raw[1..4]'/* HACKMatches01 */
+  ,n = 101 => ':cnp_number:prim_range_derived:cnp_name:st:pname_digits'      /* HACKMatches01 */
+  ,n = 102 => ':cnp_number:prim_range_derived:prim_name_derived:st:cnp_name[1..4]'     /* HACKMatches01 */
+  ,n = 103 => ':prim_range_derived:prim_name_derived:st:sec_range'         /* HACKMatches01 */
+  ,n = 104 => ':cnp_number:prim_range_derived:v_city_name:st:pname_digits:cnp_name_raw[1..4]'	/* HACKMatches01 */
   ,n = 105 => ':cnp_number:prim_range_derived:zip:st:pname_digits:cnp_name_raw[1..4]'        /* HACKMatches01 */
-  ,n = 106 => ':cnp_number:cnp_name:company_address'                                 /* HACKMatches01 */
+  ,n = 106 => ':cnp_number:cnp_name:company_address'   /* HACKMatches01 */
   ,'AttributeFile:'+(STRING)(n-10000)
   );
 
@@ -221,7 +221,7 @@ SHARED all_mjs := MAC_DoJoins(h,match_join);
  
 //Now construct candidates based upon attribute & relationship files
  
-AllAttrMatches := SORT(Mod_Attr_SrcRidVlid(ih).Match/*HACKMatches04*/ /* +Mod_Attr_ForeignCorpkey(ih).Match+Mod_Attr_RAAddresses(ih).Match+Mod_Attr_FilterPrimNames(ih).Match*/,Proxid1,Proxid2,Rule,-(Conf+Conf_Prop+support_cnp_name),LOCAL);
+AllAttrMatches := SORT(Mod_Attr_SrcRidVlid(ih).Match+MOD_Attr_UnderLinks(ih).Match/*HACKMatches04*/ /* +Mod_Attr_ForeignCorpkey(ih).Match+Mod_Attr_RAAddresses(ih).Match+Mod_Attr_FilterPrimNames(ih).Match*/,Proxid1,Proxid2,Rule,-(Conf+Conf_Prop+support_cnp_name),LOCAL);
 match_candidates(ih).Layout_Attribute_Matches CombineResults(match_candidates(ih).Layout_Attribute_Matches le,match_candidates(ih).Layout_Attribute_Matches ri) := TRANSFORM
   SELF.Conf := le.Conf+ri.Conf;
   SELF.support_cnp_name := le.support_cnp_name+ri.support_cnp_name;
@@ -234,7 +234,16 @@ j1 := JOIN(DISTRIBUTE(All_Attribute_Matches,HASH(Proxid2)),hd,LEFT.Proxid2=RIGHT
 match_candidates(ih).layout_candidates strim(j1 le) := TRANSFORM
   SELF := le;
 END;
-attr_match := JOIN(DISTRIBUTE(j1,HASH(Proxid1)),hd,LEFT.Proxid1 = RIGHT.Proxid AND ( LEFT.SALT_Partition = RIGHT.SALT_Partition OR LEFT.SALT_Partition='' OR RIGHT.SALT_Partition = '' ),match_join( RIGHT,PROJECT(LEFT,strim(LEFT)),LEFT.Rule, LEFT.Conf,LEFT.support_cnp_name),LOCAL); // Will be distributed by DID1
+attr_match := JOIN(DISTRIBUTE(j1,HASH(Proxid1)),hd,LEFT.Proxid1 = RIGHT.Proxid AND ( LEFT.SALT_Partition = RIGHT.SALT_Partition OR LEFT.SALT_Partition='' OR RIGHT.SALT_Partition = '' )
+AND LEFT.cnp_number = RIGHT.cnp_number AND LEFT.prim_name_derived = RIGHT.prim_name_derived/*HACKMatches02*/
+AND LEFT.st = RIGHT.st
+AND LEFT.prim_range_derived = RIGHT.prim_range_derived
+AND ( ~left.st_isnull AND ~right.st_isnull )
+AND ( left.active_enterprise_number = right.active_enterprise_number OR left.active_enterprise_number_isnull OR right.active_enterprise_number_isnull )
+AND ( left.active_domestic_corp_key = right.active_domestic_corp_key OR left.active_domestic_corp_key_isnull OR right.active_domestic_corp_key_isnull )
+AND (( ~left.cnp_name_isnull AND ~right.cnp_name_isnull ) OR LEFT.support_cnp_name > 0 or (left.active_domestic_corp_key = right.active_domestic_corp_key OR left.active_domestic_corp_key_isnull OR right.active_domestic_corp_key_isnull ) OR ( ~left.active_duns_number_isnull AND ~right.active_duns_number_isnull ) OR ( ~left.company_fein_isnull AND ~right.company_fein_isnull ))
+AND ( ~left.prim_name_derived_isnull AND ~right.prim_name_derived_isnull ) AND (~left.company_address_isnull AND ~right.company_address_isnull )
+,match_join( RIGHT,PROJECT(LEFT,strim(LEFT)),LEFT.Rule, LEFT.Conf,LEFT.support_cnp_name),LOCAL); // Will be distributed by DID1
 with_attr := attr_match + all_mjs;
 all_matches1 := MOD_Attr_ForeignCorpkey(ih).ForceFilter(ih,with_attr,Proxid1,Proxid2); // Restrict to those matches obeying force upon ForeignCorpkey
 all_matches2 := MOD_Attr_RAAddresses(ih).ForceFilter(ih,all_matches1,Proxid1,Proxid2); // Restrict to those matches obeying force upon RAAddresses

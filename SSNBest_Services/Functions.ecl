@@ -30,7 +30,8 @@ EXPORT Functions := MODULE
 	EXPORT fetchSSNs(in_ds, in_mod, pSSN = 'ssn',pDID = 'did') := FUNCTIONMACRO
 	IMPORT SSNBest_Services,MDR,AutoKeyI;
 
-		Subj_SSNs := SSNBest_Services.Raw.Get_Subj_Best(in_ds,in_mod,pSSN,pDID);
+    mod_ssn := SSNBest_Services.IParams.setFromBatch (in_mod);
+		Subj_SSNs := SSNBest_Services.Raw.Get_Subj_Best(in_ds,mod_ssn,pSSN,pDID);
 
 		rollupRec := RECORD(SSNBest_Services.Layouts.KEY_subjSrcNorm)
      string1 bureau_only_ssn := '';

@@ -1,8 +1,8 @@
-// ESP-compliant code. If you need to add new sections, they should comply
+﻿// ESP-compliant code. If you need to add new sections, they should comply
 // to ESP output layouts as well (some sections' implementation can be found
 // in the history of PersonReports.Addrs_Imposters_Rels_Assocs)
 
-IMPORT ut, DeathV2_Services, doxie_crs, doxie, suppress, DriversV2_Services, iesp, header, CriminalRecords_Services, FCRA, FFD;
+IMPORT ut, DeathV2_Services, doxie_crs, doxie, suppress, DriversV2_Services, iesp, header, CriminalRecords_Services, FCRA, FFD, MDR;
 
 EXPORT Person_records (
   dataset (doxie.layout_references) dids,
@@ -86,24 +86,31 @@ all_dids_pre_fcra := project (dids, transform (rec_did_owner, Self.did := Left.d
 all_dids_pre :=  if(IsFCRA ,all_dids_pre_fcra ,all_dids_pre_reg );
 dids_owners := dedup (sort (all_dids_pre, did, ~is_subject), did);
 
+
 doxie_crs.layout_deathfile_records GetDeadRecords (rec_did_owner L, doxie.key_death_masterV2_ssa_DID R) := transform
   self.age_at_death := ut.Age((unsigned8)R.dob8,(unsigned8)R.dod8);
   self.did := (string)((integer)(R.did));
+  self.IsLimitedAccessDMF := (R.src = MDR.sourceTools.src_Death_Restricted);
   self := R;
 end;
+
 dear  := if(~IsFCRA,JOIN (dids_owners, doxie.key_death_masterV2_ssa_DID, 
                keyed (Left.did = Right.l_did) 
                and not DeathV2_Services.Functions.Restricted (right.src, right.glb_flag,if (Left.is_subject, glb_ok, rna_glb_ok), death_params),
                GetDeadRecords (Left, Right),
-               left outer, limit (ut.limits.HEADER_PER_DID), keep (ut.limits.DEATH_PER_DID))); 
+               left outer, limit (ut.limits.HEADER_PER_DID), keep (ut.limits.DEATH_PER_DID)));
+
+							 
 // dear := doxie.deathfile_records (in_params.include_BlankDOD or (unsigned)dod8 != 0);
 
-//============================                                                                                                       
+
+//============================  
 
 // for the purpose of deceased indicator we need only one record per person, preferrably with a county
-shared src_deceased := dedup (sort (dear, did, -dod8, trim (county_name) = ''), did, dod8);
 
-  besr_choice := IF(EXISTS(bestrecs), bestrecs, project (dids, transform (doxie.layout_best , 
+shared src_deceased := dedup (sort (dear, did, -dod8, trim (county_name) = ''), did, dod8);	  
+ 
+besr_choice := IF(EXISTS(bestrecs), bestrecs, project (dids, transform (doxie.layout_best , 
                                                                             Self.did := Left.did, Self := [])));
 
   iesp.bpsreport.t_BpsReportBestInfo transform_best (doxie.layout_best L) := transform
@@ -120,6 +127,7 @@ shared src_deceased := dedup (sort (dear, did, -dod8, trim (county_name) = ''), 
     Self.DOB := iesp.ECL2ESP.toDate (L.dob);
     Self.SSN := if (L.ssn <> '', L.ssn, src_ssn_main (did = idid and ssn = in_params._ssn)[1].ssn);
     Self.Deceased := if (exists (src_deceased ((unsigned6)did = idid)), 'Y', 'N');
+    Self.IsLimitedAccessDMF := src_deceased((unsigned6)did = idid)[1].IsLimitedAccessDMF;
   end;
 //self.deceased := if(exists(dear((unsigned)did = idid)),'Y','N'),
   export bestrecs_esdl := project (besr_choice, transform_best (Left));
@@ -211,7 +219,6 @@ shared ssn_lookups := doxie.SSN_Lookups; // doxie_crs/layout_SSN_Lookups
 // contains DID and address sequence, which can be used for linking.
 // Residents are effectively CURRENT RESIDENTS (i.e. those who reside recently). 
 shared residents_base := Functions.GetPersonBase (src_residents, ssn_lookups, src_deceased, in_params);
-
 
 // ------------------------- expanded residents -------------------------
 // a serious of transformations to produce most complete identity
@@ -307,6 +314,7 @@ EXPORT Imposters := if(~IsFCRA,Functions.GetImposters (all_persons (did NOT IN i
 //--------------------------------------------------------------------------------------------------------------
 aka_best := Functions.GetSubjectBestAKA (bestrecs_ffd, src_deceased, in_params ,IsFCRA);
 
+
 // append DL: only "best" record will have DLs, all other AKAs won't (ESP defect, actually)
 //shared iesp.bps_share.t_BpsReportIdentity AppendDL (layouts.identity_slim L) := transform
 PersonReports.layouts.CommonPreLitigationReportIdentity AppendDL (PersonReports.layouts.identity_slim L) := transform
@@ -368,7 +376,6 @@ aka_src := if (in_params.use_bestaka_ra,
 
 // attach SSN and death information; this is in effect AKAs
 shared relassoc_base := Functions.GetPersonBase (aka_src, ssn_lookups, src_deceased, in_params);
-
 
 // ------------------------- expanded relatives/associates -------------------------
 // choose appropriate rel/assoc addresses

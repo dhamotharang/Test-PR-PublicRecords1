@@ -46,7 +46,7 @@
 &lt;/dataset&gt;
 </pre>
 */
-import address, riskwise, ut, Gateway, AutoStandardi;
+import address, riskwise, ut, Gateway, AutoStandardi, risk_indicators;
 
 export BocaShell50_Batch_Service := MACRO
 
@@ -130,9 +130,10 @@ if(ofac_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(
 		self.historyDateTimeStamp := risk_indicators.iid_constants.mygetdateTimeStamp(le.historydateTimeStamp, historydate);							
 		self.ssn := le.ssn;
 		self.dob := le.dob;
-		self.age := if ((integer)le.age = 0 and (integer)le.dob != 0,
-						(STRING3)ut.GetAgeI_asOf((unsigned)le.dob, (unsigned)risk_indicators.iid_constants.myGetDate(historydate)), 
+				temp_age := if ((integer)le.age = 0 and (integer)le.dob != 0,
+						(STRING)ut.GetAgeI_asOf((unsigned)le.dob, (unsigned)risk_indicators.iid_constants.myGetDate(historydate)), 
 						(string)((integer)le.age));
+		self.age := if((integer)temp_age > 99, '99',temp_age);
 		self.phone10  := le.home_phone;
 		self.wphone10 := le.work_phone;
 

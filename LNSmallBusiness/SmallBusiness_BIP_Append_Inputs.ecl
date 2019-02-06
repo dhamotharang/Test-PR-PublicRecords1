@@ -10,6 +10,7 @@ EXPORT SmallBusiness_BIP_Append_Inputs (DATASET(LNSmallBusiness.BIP_Layouts.Inpu
       EXPORT unsigned1 dppa := linkingOptions.dppapurpose;
       EXPORT string DataRestrictionMask := linkingOptions.DataRestrictionMask;
       EXPORT boolean ln_branded := linkingOptions.lnbranded;
+      EXPORT boolean show_minors := FALSE; //can be hardcoded, if needed.
     END;
 
     ds_SearchInput := PROJECT(Input(SeleID <> 0), TRANSFORM(BIPV2.IDFunctions.rec_SearchInput, 

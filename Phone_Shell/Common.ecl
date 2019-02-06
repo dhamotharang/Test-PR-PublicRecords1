@@ -1,4 +1,4 @@
-IMPORT Models, Phone_Shell, Risk_Indicators, UT, STD;
+﻿IMPORT Models, Phone_Shell, Risk_Indicators, UT, STD;
 
 EXPORT Common := MODULE
 	EXPORT STRING30 generateMatchcode (STRING20 in_FirstName, STRING20 in_LastName,
@@ -93,4 +93,37 @@ EXPORT Common := MODULE
 							isGatewayResult = TRUE;
 		RETURN(maskOK);
 	END;
+  
+ // returns TRUE if the src_all of the phonesplus key contains at least one allowed source, FALSE if not. 
+ EXPORT BOOLEAN PhonesPlusSourceAllowed(UNSIGNED8 src_all = 0) := FUNCTION
+    // bitwise AND with the allowed list mask to get only allowed sources
+    src_all_masked := src_all & ut.BinaryStringToInteger(Phone_Shell.Constants.PhonesPlus_AllowedSourcesMask);
+		  src_all_good := ut.IntegerToBinaryString(src_all_masked, FALSE);
+    allowed_src_cnt := StringLib.StringFindCount(src_all_good, '1');
+    boolean record_allowed := allowed_src_cnt > 0; 
+ 
+    RETURN (record_allowed);
+ END;
+ 
+ // Given the unsigned8 version of a src_all string, returns the unsigned8 bitmap of only the first 'on' bit
+ // we expect the src_all here to be the filtered one of allowed sources only, but it doesn't have to be
+ EXPORT UNSIGNED8 PhonePlusFirstSource(UNSIGNED8 src_all = 0) := FUNCTION
+    src_all_string := std.str.reverse(ut.IntegerToBinaryString(src_all,false));
+    pos_first_src := StringLib.StringFind(src_all_string,'1',1);
+    unsigned8 first_src_bitmap := if(pos_first_src = 0,0,ut.bit_set(0,pos_first_src-1)); 
+    RETURN (first_src_bitmap);
+ END;
+ 
+ // expects a bitmap of ONLY one source to be passed in (output from PhonesPlusFirstSource above)
+ // returns whether that one source is a header source or not, per the header mask constant
+ // if you pass in a bitmap of multiple sources, this will return true if at least 1 of ANY of the sources are header
+ EXPORT BOOLEAN PhonesPlusSrcIsHeader(UNSIGNED8 first_src = 0) := FUNCTION
+    first_src_headermasked := first_src & ut.BinaryStringToInteger(Phone_Shell.Constants.PhonesPlus_HeaderSourceMask);
+    first_src_headercheck := ut.IntegerToBinaryString(first_src_headermasked,false);
+    first_src_headercnt := stringLib.stringfindcount(first_src_headercheck,'1');
+    boolean is_header := first_src_headercnt > 0;
+    
+    return (is_header); 
+ END;    
+    
 END;

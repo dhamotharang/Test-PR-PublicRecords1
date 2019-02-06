@@ -1,4 +1,4 @@
-import iesp,BatchServices,DidVille,AutoStandardI,Business_Header,Healthcare_Provider_Services,Healthcare_Header_Services,NPPES, address,doxie,Business_Header_SS,ut,BizLinkFull,Relationship;
+﻿import iesp,BatchServices,DidVille,AutoStandardI,Business_Header,Healthcare_Provider_Services,Healthcare_Header_Services,NPPES, address,doxie,Business_Header_SS,ut,BizLinkFull,Relationship;
 export DisclosedEntity_Records := module
 	shared defaults := BatchServices.RollupBusiness_BatchService_Constants.Defaults;
 
@@ -132,9 +132,12 @@ export DisclosedEntity_Records := module
 																					// self.closematchNPICNameAKA := closematch3;
 																					bestmatch := min(dataset([{closematch},{closematch2},{closematch3},{closematch4}],DisclosedEntity_Layouts.minSet),score);
 																					self.FEINVerified:=if(left.FEINVerified,left.FEINVerified,if(bestmatch<=Healthcare_Services.DisclosedEntity_Constants.BUS_NAME_MATCH_THRESHOLD,true,false)),
-																					self:=left; self := []),left outer,
+																				self.fein:=	if(left.FEINVerified,left.fein,'');	
+                                        self:=left; self := []),left outer,
 																keep(Healthcare_Services.DisclosedEntity_Constants.MAX_RECS_ON_JOIN),limit(0)),acctno),group,doFlagsRollup(LEFT,ROWS(LEFT)));
-			return parentFlags_Final;
+			
+	
+						return parentFlags_Final;
 	end;
 	Export findBusinessHeaderRecords(dataset(DisclosedEntity_Layouts.entityIds) inputData, dataset(DisclosedEntity_Layouts.parentLevelFlags) parentFlags_CheckFEIN_Results,unsigned1 glb=8, unsigned1 dppa=0) := function
 		BusRollupArgs := MODULE(BatchServices.RollupBusiness_BatchService_Interfaces.Input)
@@ -582,23 +585,24 @@ export DisclosedEntity_Records := module
 																					self:=right,
 																					self:=left),
 																left outer);
-			// output(npiDs,named('npiDs'));
-			// output(npiRecs,named('npiRecs'));
+			//output(inputData,named('inputData'));
+			//output(npiRecs,named('npiRecs'));
 			// output(AdditionalNPISearchCriteria,named('AdditionalNPISearchCriteria'));
 			// output(finalBusinessInput,named('finalBusinessInput'));
 			// output(convertedInput,named('convertedInput'));
 			// output(getBaseRecords,named('getBaseRecords'));
-			// output(parentFlags_npi,named('parentFlags_npi'));
-			// output(parentFlags_npiExists,named('parentFlags_npiExists'));
-			// output(getBaseRecords,named('getBaseRecords'));
-			// output(parentFlags_FEIN,named('parentFlags_FEIN'));
-			// output(parentFlags_CheckFEIN_Results,named('parentFlags_CheckFEIN_Results'));
+			 // output(parentFlags_npi,named('parentFlags_npi'));
+			 // output(parentFlags_npiExists,named('parentFlags_npiExists'));
+			 // output(getBaseRecords,named('getBaseRecords'));
+			 // output(parentFlags_FEIN,named('parentFlags_FEIN'));
+			 // output(parentFlags_CheckFEIN_Results,named('parentFlags_CheckFEIN_Results'));
 			// output(recordsWithHits,named('recordsWithHits'));
 			// output(recordsWithNoHits,named('recordsWithNoHits'));
 			// output(headerRecs,named('headerRecs'));
 			// output(finalHitRecs,named('finalHitRecs'));
 			// output(secondAttempt,named('secondAttempt'));
 			// output(finalRecs,named('finalRecs'));
+			// output(finalRecs_w_Flags,named('finalRecs_w_Flags'));
 			return finalRecs_w_Flags;
 	end;
 	Export getRecordsBatch(dataset(DisclosedEntity_Layouts.flatInput) inputData,unsigned1 glb=8, unsigned1 dppa=0, string DRM='0000000000000000000') := function

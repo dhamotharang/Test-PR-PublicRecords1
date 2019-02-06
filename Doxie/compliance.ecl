@@ -115,14 +115,14 @@ EXPORT compliance := MODULE
       local j0 := inrec ((unsigned6)didfield = 0);
     #END
         
-    local j := JOIN (inrec((unsigned6)didfield > 0), doxie_files.key_minors_hash,
+    local jj := JOIN (inrec((unsigned6)didfield > 0), doxie_files.key_minors_hash,
                      KEYED (hash32((unsigned6)LEFT.didfield)=RIGHT.hash32_did) AND
                      KEYED ((unsigned6)LEFT.didfield = RIGHT.did) AND  //at build time, key contains only minors
                      ut.age (RIGHT.dob) < 18,            //check age since a few will turn 18 between builds
                      TRANSFORM (RECORDOF(inrec), SELF := LEFT),
                      LEFT ONLY);
         
-    RETURN IF (ok_to_show_minors, inrec, j + j0);
+    RETURN IF (ok_to_show_minors, inrec, jj + j0);
   ENDMACRO;
 
   //TODO: temporarily: I don't know if it should be passed into the functions below,

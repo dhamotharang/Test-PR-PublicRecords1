@@ -141,7 +141,6 @@ iesp.motorvehicle.t_MVReportRecord toOut (VehicleV2_Services.Layout_Report L) :=
   self.LienHolders := project (choosen (L.lienholders, iesp.Constants.MV.MaxCountLienHolders), SetLienHolders (Left));
 	self.Brands      := project (choosen (L.Brands, iesp.Constants.MV.MaxCountBrands), SetBrands (Left));
 	self.ExternalKey := '';
-  self.isAccurintData := false;
 end;
 
 RETURN PROJECT (vehi, toOut (Left));

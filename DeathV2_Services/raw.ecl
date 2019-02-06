@@ -1,4 +1,4 @@
-import doxie, ut, suppress, death_master, census_data, _validate, codes, AutoStandardI, STD;
+﻿import doxie, ut, suppress, death_master, census_data, _validate, codes, AutoStandardI, STD, MDR;
 
 export raw := 
 MODULE
@@ -125,6 +125,7 @@ MODULE
 																						 if(right.decedent_age = '' and left.dead_age > 0,
 																								'YEARS',
 																								DeathV2_Services.splitAge(right.decedent_age).unit);
+														SELF.IsLimitedAccessDMF := (left.src = MDR.sourceTools.src_Death_Restricted);
 														self.supp.state_death_flag := if(right.source_state in death_master.Constants('').set_EmptySuppStates,
 																													   '', 
 																														 right.state_death_flag);
@@ -199,7 +200,7 @@ MODULE
 		//*** MASK																						 
 		suppress.MAC_Mask(pen,  msk1, base.ssn, '', true, false);
 		suppress.MAC_Mask(msk1, msk2, supp.ssn, '', true, false);
-	
+
 		return msk2;
 	END;
 END;
@@ -218,8 +219,11 @@ MODULE
 																	self.state_death_flag := left.supp.state_death_flag,
 																	self := left.base,
 																	self := left.supp,
+																	self.IsLimitedAccessDMF_supp := (left.supp.dod != '') and left.IsLimitedAccessDMF,
 																	self.st := left.base.state,
-																	self := left));
+		               self.IsLimitedAccessDMF := left.IsLimitedAccessDMF;  
+																self := left));
+													
 		return ext;
 	END;
 	

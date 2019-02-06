@@ -1,4 +1,4 @@
-/* ************************************************************************
+﻿/* ************************************************************************
  * This function searches Phones Plus by:																	*
  * - Address, Same First Name:: Source: PPFA															*
  * - Address, Same Last Name:: Source: PPLA																*
@@ -10,6 +10,8 @@
  ************************************************************************ */
 
 IMPORT Autokey, Data_Services, Doxie, Phone_Shell, Phones, PhonesPlus_V2, RiskWise, UT, STD;
+
+DEBUG_IGNORE_ALLOW_LIST := FALSE; // Set to TRUE if you do NOT want to filter by allow list
 
 EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PhonesPlus (
        DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input, 
@@ -73,7 +75,26 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PhonesPlus 
 																														listType = 'RB' 										=> 'B',
 																														listType = 'M' 											=> 'M',
 																																																	 'U');
-		SELF.PhonesPlus_Characteristics.PhonesPlus_Source := TRIM(ri.Vendor);
+                                                                                                   
+		#if(not DEBUG_IGNORE_ALLOW_LIST)
+  // 'mask' the key src_all field to only have a 1 in the allowed sources, use bitwise AND with the allowed mask
+  Src_All_Masked := ri.src_all & ut.BinaryStringToInteger(Phone_Shell.Constants.PhonesPlus_AllowedSourcesMask);
+  // now we need to check and see if our filtered src_all actually changed from the original
+  src_chgd := not(src_all_masked = ri.src_all);
+  // and if it did, we need to update what we use for Vendor to match the new src_all (Src will be updated in Get_Attributes_Phones_Plus)
+  first_src := Phone_Shell.Common.PhonePlusFirstSource(src_all_masked);
+  adjusted_vendor := if(src_chgd,
+                        if(Phone_Shell.Common.PhonesPlusSrcIsHeader(first_src),'HD',phonesplus_v2.translation_codes.fGet_all_sources(first_src)),
+                        ri.Vendor);
+  #else
+  adjusted_vendor := ri.Vendor;
+  //src_all_masked := ri.src_all; // only needed for debug below
+  #end
+  // just adding this here for testing/debug
+  // self.phonesplus_characteristics.phonesplus_src_all := trim(STD.Str.Reverse(ut.IntegerToBinaryString(src_all_masked,false)));
+  // self.phonesplus_characteristics.phonesplus_src := ri.src;
+  //
+  SELF.PhonesPlus_Characteristics.PhonesPlus_Source := TRIM(adjusted_vendor);
 		SELF.PhonesPlus_Characteristics.PhonesPlus_Carrier := TRIM(ri.append_ocn);
 		SELF.PhonesPlus_Characteristics.PhonesPlus_City := TRIM(ri.append_place_name);
 		SELF.PhonesPlus_Characteristics.PhonesPlus_State := TRIM(ri.state);
@@ -93,7 +114,11 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PhonesPlus 
 																																														 RIGHT.src_all,
 																																														 DataRestrictionMask
 																																														) = FALSE AND
-																													(INTEGER)RIGHT.cellphone <> 0,
+																													(INTEGER)RIGHT.cellphone <> 0 
+                       #if(not DEBUG_IGNORE_ALLOW_LIST)                                   
+                             AND Phone_Shell.Common.PhonesPlusSourceAllowed(RIGHT.src_all)
+                       #end
+                              ,
 																			searchByDID(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost)) (TRIM(Sources.Source_List) <> '');
 
 	 /* ***************************************************************
@@ -149,7 +174,26 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PhonesPlus 
 																														listType = 'RB' 										=> 'B',
 																														listType = 'M' 											=> 'M',
 																																																	 'U');
-		SELF.PhonesPlus_Characteristics.PhonesPlus_Source := TRIM(ri.Vendor);
+                                                                                                   
+  #if(not DEBUG_IGNORE_ALLOW_LIST)
+  // 'mask' the key src_all field to only have a 1 in the allowed sources, use bitwise AND with the allowed mask
+  Src_All_Masked := ri.src_all & ut.BinaryStringToInteger(Phone_Shell.Constants.PhonesPlus_AllowedSourcesMask);
+  // now we need to check and see if our filtered src_all actually changed from the original
+  src_chgd := not(src_all_masked = ri.src_all);
+  // and if it did, we need to update what we use for Vendor to match the new src_all
+  first_src := Phone_Shell.Common.PhonePlusFirstSource(src_all_masked);
+  adjusted_vendor := if(src_chgd,
+                        if(Phone_Shell.Common.PhonesPlusSrcIsHeader(first_src),'HD',phonesplus_v2.translation_codes.fGet_all_sources(first_src)),
+                        ri.Vendor);
+  #else
+  adjusted_vendor := ri.Vendor;
+  //src_all_masked := ri.src_all; // only needed for debug below
+  #end     
+  // just adding this here for testing/debug 
+  // self.phonesplus_characteristics.phonesplus_src_all := trim(STD.Str.Reverse(ut.IntegerToBinaryString(src_all_masked,false)));
+  // self.phonesplus_characteristics.phonesplus_src := ri.src;
+  //
+		SELF.PhonesPlus_Characteristics.PhonesPlus_Source := TRIM(adjusted_vendor);
 		SELF.PhonesPlus_Characteristics.PhonesPlus_Carrier := TRIM(ri.append_ocn);
 		SELF.PhonesPlus_Characteristics.PhonesPlus_City := TRIM(ri.append_place_name);
 		SELF.PhonesPlus_Characteristics.PhonesPlus_State := TRIM(ri.state);
@@ -169,7 +213,11 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PhonesPlus 
 																																														 RIGHT.src_all,
 																																														 DataRestrictionMask
                                                                                             ) = FALSE AND
-																													(INTEGER)RIGHT.cellphone <> 0 AND (INTEGER)RIGHT.confidencescore >= 11,
+																													(INTEGER)RIGHT.cellphone <> 0 AND (INTEGER)RIGHT.confidencescore >= 11 
+                     #if(not DEBUG_IGNORE_ALLOW_LIST)
+                          AND Phone_Shell.Common.PhonesPlusSourceAllowed(RIGHT.src_all)
+                     #end
+                             ,
 																			searchByDIDRoyalty(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost)) (TRIM(Sources.Source_List) <> '');
 	
 	// Only use Royalty Phones if Include Last Resort is turned on and the Data Permission Mask has the LastResort bit set to TRUE
@@ -240,7 +288,26 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PhonesPlus 
 																														listType = 'RB' 										=> 'B',
 																														listType = 'M' 											=> 'M',
 																																																	 'U');
-		SELF.PhonesPlus_Characteristics.PhonesPlus_Source := TRIM(ri.Vendor);
+                                                                                                   
+  #if(not DEBUG_IGNORE_ALLOW_LIST)
+  // 'mask' the key src_all field to only have a 1 in the allowed sources, use bitwise AND with the allowed mask
+  Src_All_Masked := ri.src_all & ut.BinaryStringToInteger(Phone_Shell.Constants.PhonesPlus_AllowedSourcesMask);
+  // now we need to check and see if our filtered src_all actually changed from the original
+  src_chgd := not(src_all_masked = ri.src_all);
+  // and if it did, we need to update what we use for Vendor to match the new src_all
+  first_src := Phone_Shell.Common.PhonePlusFirstSource(src_all_masked);
+  adjusted_vendor := if(src_chgd,
+                        if(Phone_Shell.Common.PhonesPlusSrcIsHeader(first_src),'HD',phonesplus_v2.translation_codes.fGet_all_sources(first_src)),
+                        ri.Vendor);
+  #else
+  adjusted_vendor := ri.Vendor;
+  //src_all_masked := ri.src_all; // only needed for debug below
+  #end 
+  // just adding this here for testing/debug
+  // self.phonesplus_characteristics.phonesplus_src_all := trim(STD.Str.Reverse(ut.IntegerToBinaryString(src_all_masked,false)));
+  // self.phonesplus_characteristics.phonesplus_src := ri.src;
+  //
+		SELF.PhonesPlus_Characteristics.PhonesPlus_Source := TRIM(adjusted_vendor);
 		SELF.PhonesPlus_Characteristics.PhonesPlus_Carrier := TRIM(ri.append_ocn);
 		SELF.PhonesPlus_Characteristics.PhonesPlus_City := TRIM(ri.append_place_name);
 		SELF.PhonesPlus_Characteristics.PhonesPlus_State := TRIM(ri.state);
@@ -260,8 +327,12 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PhonesPlus 
 																																														 RIGHT.src_all,
 																																														 DataRestrictionMask
 																																														) = FALSE AND
-																																												(INTEGER)RIGHT.cellphone <> 0 AND (INTEGER)RIGHT.confidencescore >= 11,
-																																									searchByUniqueAddresses(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost)) (TRIM(Sources.Source_List) <> '');
+																														(INTEGER)RIGHT.cellphone <> 0 AND (INTEGER)RIGHT.confidencescore >= 11 
+                      #if(not DEBUG_IGNORE_ALLOW_LIST)                          
+                          AND Phone_Shell.Common.PhonesPlusSourceAllowed(RIGHT.src_all)
+                      #end
+                              ,
+																																				searchByUniqueAddresses(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost)) (TRIM(Sources.Source_List) <> '');
 	
 	Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus combineInputAndUnique(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus le, Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus ri) := TRANSFORM
 		
@@ -347,7 +418,26 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PhonesPlus 
 																														listType = 'RB' 										=> 'B',
 																														listType = 'M' 											=> 'M',
 																																																	 'U');
-		SELF.PhonesPlus_Characteristics.PhonesPlus_Source := TRIM(ri.Vendor);
+                                                                                                   
+  #if(not DEBUG_IGNORE_ALLOW_LIST)
+  // 'mask' the key src_all field to only have a 1 in the allowed sources, use bitwise AND with the allowed mask
+  Src_All_Masked := ri.src_all & ut.BinaryStringToInteger(Phone_Shell.Constants.PhonesPlus_AllowedSourcesMask);
+  // now we need to check and see if our filtered src_all actually changed from the original
+  src_chgd := not(src_all_masked = ri.src_all);
+  // and if it did, we need to update what we use for Vendor to match the new src_all
+  first_src := Phone_Shell.Common.PhonePlusFirstSource(src_all_masked);
+  adjusted_vendor := if(src_chgd,
+                        if(Phone_Shell.Common.PhonesPlusSrcIsHeader(first_src),'HD',phonesplus_v2.translation_codes.fGet_all_sources(first_src)),
+                        ri.Vendor);
+  #else
+  adjusted_vendor := ri.Vendor;
+  //src_all_masked := ri.src_all; // only needed for debug below
+  #end             
+  // just adding this here for testing/debug
+  // self.phonesplus_characteristics.phonesplus_src_all := trim(STD.Str.Reverse(ut.IntegerToBinaryString(src_all_masked,false)));
+  // self.phonesplus_characteristics.phonesplus_src := ri.src;
+  //
+		SELF.PhonesPlus_Characteristics.PhonesPlus_Source := TRIM(adjusted_vendor);
 		SELF.PhonesPlus_Characteristics.PhonesPlus_Carrier := TRIM(ri.append_ocn);
 		SELF.PhonesPlus_Characteristics.PhonesPlus_City := TRIM(ri.append_place_name);
 		SELF.PhonesPlus_Characteristics.PhonesPlus_State := TRIM(ri.state);
@@ -367,7 +457,11 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PhonesPlus 
 																																												 RIGHT.src_all,
 																																												 DataRestrictionMask
 																																												) = FALSE AND
-																											(INTEGER)RIGHT.cellphone <> 0,
+																											(INTEGER)RIGHT.cellphone <> 0 
+                  #if(not DEBUG_IGNORE_ALLOW_LIST)
+                       AND Phone_Shell.Common.PhonesPlusSourceAllowed(RIGHT.src_all)
+                  #end
+                           ,
 																											searchByInputAddress(LEFT, RIGHT), KEEP(RiskWise.max_atmost), ATMOST(2 * RiskWise.max_atmost));
 																											
 	// Don't keep the phones which didn't match on some part of the name
@@ -375,5 +469,14 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Search_PhonesPlus 
 	
 	final := DEDUP(SORT((byDID + byDIDRoyalty + byUniqueAddresses + byAddress), Clean_Input.seq, Gathered_Phone, Royalties.LastResortPhones_Royalty, Sources.Source_List, -Sources.Source_List_Last_Seen, -Sources.Source_List_First_Seen, -LENGTH(TRIM(Raw_Phone_Characteristics.Phone_Match_Code))), Clean_Input.seq, Gathered_Phone, Sources.Source_List);
 	
-	RETURN(final);
+ // debug outputs
+ //output(byDID,named('searchPP_byDID'));
+ //output(byDIDRoyalty,named('searchPP_byDIDRoyalty'));
+ //output(byUniqueAddresses,named('searchPP_byUniqueAddresses'));
+ //output(byAddress,named('searchPP_byAddress'));
+ //output(SORT((byDID + byDIDRoyalty + byUniqueAddresses + byAddress), Clean_Input.seq, Gathered_Phone, Royalties.LastResortPhones_Royalty, Sources.Source_List, -Sources.Source_List_Last_Seen, -Sources.Source_List_First_Seen, -LENGTH(TRIM(Raw_Phone_Characteristics.Phone_Match_Code))),named('srchPP_beforeDeDup'));
+ //output(final,named('searchPP_final'));
+	//
+ 
+ RETURN(final);
 END;
