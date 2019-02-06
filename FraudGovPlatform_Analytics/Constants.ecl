@@ -50,7 +50,7 @@
 		isProd := ~Tools._Constants.IsDataland;
 		useOtherEnvironmentDali(BOOLEAN useProdData) := NOT((isProd AND useProdData) OR (~isProd AND ~useProdData));
 		EXPORT fileLocation(BOOLEAN useProdData)	:= FraudGovPlatform._Dataset(useOtherEnvironmentDali(useProdData)).thor_cluster_Files;
-		EXPORT fileScope						:= 'base::fraudgov::qa::kel::';
+		EXPORT fileScope						:= 'base::built::kel::';
 		EXPORT EncodedCredentials		:= 'Y2FybWlnang6TmV3WWVhcjIwMTkh';
 		EXPORT reqSource						:= 'batch';		
 		EXPORT DspProd							:= 'dsp';

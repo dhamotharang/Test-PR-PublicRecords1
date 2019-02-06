@@ -51,6 +51,8 @@ module
 	export Run_Orbit := if(SkipOrbitBuild=false, Orbit3.proc_Orbit3_CreateBuild_AddItem('FraudGov',pversion)); //Create Orbit Builds
 	export Run_Dashboards := if(SkipDashboardsBuild=false,FraudGovPlatform_Analytics.GenerateDashboards(pRunProd,pUseProdData));
 	export Set_Version := FraudgovInfo(pversion,'Keys_Completed').SetPreviousVersion;
+
+	export promote_sprayed_files := promote(pversion).promote_sprayed_files;
 	
 //	export dops_update := RoxieKeyBuild.updateversion('IdentityDataKeys', pversion, _Control.MyInfo.EmailAddressNotify,,'N'); 															
 	
@@ -97,9 +99,12 @@ module
 	export Build_Fraudgov_Keys :=
 	if(tools.fun_IsValidVersion(pversion),
 		if( Test_Build = 'Passed' and  Test_RecordID = 'Passed' and Test_RinID = 'Passed',
-			// If Base is valid then Build Keys
-			if(SkipKeysPortion=false, 
-				keys_portion), 
+			sequential(
+				// If Base is valid then Build Keys
+				  if(SkipKeysPortion=false, 
+					keys_portion)
+				, promote_sprayed_files
+			),
 			// else Rollback Base file
 			Run_Rollback)
 		,output('No Valid version parameter passed, skipping FraudGovPlatform.Build_Keys')
