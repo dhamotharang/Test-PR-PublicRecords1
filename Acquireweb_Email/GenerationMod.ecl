@@ -58,7 +58,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:zip4:TYPE(STRING):0,0\n'
     + 'FIELD:Phone:TYPE(STRING):0,0\n'
     + 'FIELD:DOB:TYPE(STRING):0,0\n'
-    + 'FIELD:emailid:TYPE(STRING):0,0\n'
+    + 'FIELD:emailid:DERIVED:TYPE(STRING):0,0\n'
     + 'FIELD:email:TYPE(STRING):0,0\n'
     + 'FIELD:activecode:TYPE(STRING):0,0\n'
     + 'FIELD:did:DERIVED:TYPE(UNSIGNED8):0,0\n'

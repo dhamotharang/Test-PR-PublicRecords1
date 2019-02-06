@@ -47,6 +47,6 @@ EXPORT prep_ingest := FUNCTION
   END;
   new_acquireweb_data:=	JOIN(dist_ind,dist_email,LEFT.awid=RIGHT.AWID_Email,jointhem(LEFT,RIGHT),INNER,LOCAL);
 	
-	RETURN pAppendInput;
+	RETURN new_acquireweb_data;
 	
 END;
