@@ -95,8 +95,8 @@ EXPORT base := RECORD
 	string	CompanyTitle;
 	unsigned	rules;
 	bipv2.IDlayouts.l_xlink_ids;
-	unsigned4 GlobalSourceId;
-	unsigned8 SourceSpecificRecordId;
+	unsigned4 global_sid;
+	unsigned8 record_sid;
 END;
 
 EXPORT i_DID	:= RECORD
