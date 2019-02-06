@@ -25,7 +25,7 @@ DataPermission := '0000000000000';
 DataRestrictionMask := '1000010000000100000000000000000000000000000000000'; 
 
 // Universally Set the History Date YYYYMMDD for ALL records. Set to 0 to use the History Date located on each record of the input file
-historyDate := '20190206';
+historyDate := '0';
 // historyDate := '20190118';
 // historyDate := (STRING)STD.Date.Today(); // Run with today's date
 
@@ -44,13 +44,13 @@ Output_SALT_Profile := TRUE;
 
 Exclude_Consumer_Shell := FALSE; //if TRUE, bypasses consumer logic and sets all consumer shell fields to blank/0.
 
-RecordsToRun := 100;
+RecordsToRun := 0;
 eyeball := 120;
 
 AllowedSources := ''; // Stubbing this out for use in settings output for now. To be used to turn on DNBDMI by setting to 'DNBDMI'
 OverrideExperianRestriction := FALSE; // Stubbing this out for use in settings output for now. To be used to control whether Experian Business Data (EBR and CRDB) is returned.
 
-OutputFile := '~AFA::BusinessPop_KS1687'+ ThorLib.wuid() ;
+OutputFile := '~AFA::BusinessPop_KS1832'+ ThorLib.wuid() ;
 
 prii_layout := RECORD
 	STRING AccountNumber         ;  
