@@ -1,8 +1,6 @@
-IMPORT Watchdog;
-
 EXPORT mac_AlertListFull(AlertInputFile, in_did, OutputAppends, BasicOutGraph) := FUNCTIONMACRO 
 
-WatchDogBestIndex := Watchdog.Key_watchdog_glb;
+IMPORT dx_BestRecords, RAMPS;
 
 OutputAppendsFull := OutputAppends;
 
@@ -11,16 +9,19 @@ BiDirectionalGraph := BasicOutGraph + PROJECT(BasicOutGraph(cluster_id != associ
 															self.cluster_id := LEFT.associated_did, self.associated_did := LEFT.cluster_id, 
 															SELF := LEFT));
 
-// This needs to be replaced with the Best Macro that takes GLB, DPPA etc..
-// Patch in names for all the nodes so they can appear in the child dataset. 
+// This needs to be replaced with the a full permission value that takes GLB, DPPA etc..
+LOCAL BestRecsPerm := dx_BestRecords.Constants.perm_type.glb;
 
-AllDidNames := JOIN(DEDUP(SORT(BiDirectionalGraph, associated_did), associated_did), WatchDogBestIndex, 
-                        LEFT.associated_did=RIGHT.did, 
-											  TRANSFORM(
-											   {RIGHT.did, STRING Name}, 
-												 SELF.Name := TRIM((TRIM(RIGHT.fname) + TRIM(' ' + TRIM(RIGHT.mname)) + ' ' + TRIM(RIGHT.lname))[1..100]),
-												 SELF := RIGHT), 
-												KEYED);
+// Append best records data to get associated Name fields
+LOCAL BiDeduped := DEDUP(SORT(BiDirectionalGraph, associated_did), associated_did);
+LOCAL BestAppended := dx_BestRecords.append(BiDeduped, associated_did, BestRecsPerm, left_outer := false);
+
+// Patch in names for all the nodes so they can appear in the child dataset. 
+AllDidNames := PROJECT(BestAppended, 
+  TRANSFORM(
+    {LEFT._best.did, STRING Name}, 
+    SELF.Name := TRIM((TRIM(LEFT._best.fname) + TRIM(' ' + TRIM(LEFT._best.mname)) + ' ' + TRIM(LEFT._best.lname))[1..100]),
+    SELF.did := LEFT._best.did));
 
 FullGraphWithNames := JOIN(BiDirectionalGraph, AllDidNames, 
                         LEFT.associated_did=RIGHT.did, 
