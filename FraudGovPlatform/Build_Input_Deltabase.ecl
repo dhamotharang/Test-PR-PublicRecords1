@@ -25,9 +25,7 @@ module
 
 	Functions.CleanFields(deltabaseUpdate ,deltabaseUpdateUpper); 
 
-	max_uid := max(Deltabase_Sprayed, Deltabase_Sprayed.unique_id) :	global;
-
-	Layouts.Input.Deltabase tr(deltabaseUpdateUpper l, integer cnt) := transform
+	Layouts.Input.Deltabase tr(deltabaseUpdateUpper l) := transform
 		sub:=stringlib.stringfind(l.fn,'20',1);
 		sub2:=stringlib.stringfind(l.fn,'.dat',1)-6;
 		FileDate := (unsigned)l.fn[sub..sub+7];
@@ -51,13 +49,13 @@ module
 		self.ind_type 	:= functions.ind_type_fn(l.Customer_Program);
 		source_input := if (l.inquiry_source = '', 'Deltabase','Deltabase-' + l.inquiry_source);
 		self.source_input := source_input;
-		SELF.unique_id := max_uid + cnt;
+		SELF.unique_id := l.inqlog_id;
 		self.Deltabase := 1;					 
 		self:=l;
 		self:=[];
 	end;
 
-	shared f1:=project(deltabaseUpdateUpper,tr(left, counter));
+	shared f1:=project(deltabaseUpdateUpper,tr(left));
 	
 	f1_errors:=f1
 		((Customer_Account_Number = '' or reported_date = '' or file_type = 0
