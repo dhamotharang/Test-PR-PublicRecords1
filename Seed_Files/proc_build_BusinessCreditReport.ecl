@@ -1,4 +1,4 @@
-IMPORT _CONTROL, RoxieKeyBuild;
+﻿IMPORT _CONTROL, RoxieKeyBuild;
 EXPORT proc_build_BusinessCreditReport(string filedate) := FUNCTION
 
 	//Spray input files
@@ -18,11 +18,11 @@ EXPORT proc_build_BusinessCreditReport(string filedate) := FUNCTION
 	SuccessBody		:=  'Business Credit Report Test Seed  Build ' + filedate + ' Completed and is ready for Cert Roxie deployment.';
 
 	build_all := Sequential(
-									// spray_infiles,
+									spray_infiles,
 									build_keys,
 									update_dops) : success(fileservices.sendemail(email_list,SucessSubject,SuccessBody)),
-																 failure(fileservices.sendemail(email_list,FailureSubject,workunit + '\n' + failmessage));
-													
+																failure(fileservices.sendemail(email_list,FailureSubject,workunit + '\n' + failmessage));
+												
 	RETURN build_all;
 	
 END;	

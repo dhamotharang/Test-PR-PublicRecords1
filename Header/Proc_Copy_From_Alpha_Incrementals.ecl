@@ -9,9 +9,9 @@ shared lastUpdatesFCRAqa_SF:='~thor_data400::key::fcra::header::address_rank_qa'
 shared lastUpdatesWklyQA_SF:='~thor_data400::key::header::qa::addr_unique_expanded';
 
 // Gets the version from the latest QA file on Thor
-export lastestIkbVersionOnThor  := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatedLabQA_SF)[1].name, 0));
-export lastestFCRAversionOnThor := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesFCRAqa_SF)[1].name, 0));
-export lastestWklyversionOnThor := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesWklyQA_SF)[1].name, 0));
+export lastestIkbVersionOnThor  := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatedLabQA_SF)[1].name, 0)) : independent;
+export lastestFCRAversionOnThor := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesFCRAqa_SF)[1].name, 0)) : independent;
+export lastestWklyversionOnThor := nothor(regexfind('[0-9]{8}', std.file.superfilecontents(lastUpdatesWklyQA_SF)[1].name, 0)) : independent;
 
 
 // generic function to get the FIRST subfie in the super
@@ -271,10 +271,11 @@ SHARED orbit_update_entries(string createORupdate, string skipPackage='000') := 
                 ),
                 sequential(
                         if(skipPackage[1]='0',output(update_entry('PersonXLAB_Inc' ,lastestIkbVersionOnThor,'N'))),
-                        if(skipPackage[2]='0',output(update_entry('FCRA_Header'    ,lastestFCRAversionOnThor,'N'))),
+                        if(skipPackage[2]='0',output(update_entry('FCRA_Header'    ,lastestFCRAversionOnThor,'F'))),
                         if(skipPackage[3]='0',output(update_entry('Header_IKB'     ,lastestWklyversionOnThor,'N')))
                 )
        );
+
 END;
 
 // check if we have a local copy already   
@@ -308,27 +309,27 @@ EXPORT movetoQA(string filedt) := sequential(
     copy_to_dataland
     );
         
-EXPORT deploy(string emailList,string rpt_qa_email_list,string skipPackage='000') := sequential(               
-    udops(skipPackage),
+EXPORT deploy(string emailList,string rpt_qa_email_list,string skipPackage='000') := sequential(  
+
+   std.system.Email.SendEmail(rpt_qa_email_list+','+emailList,'New boca Header IKB deployment',
+     'Hello,\n\nPlease note that the following datasets have been updated for CERT deployment:'
+    +'\n\n'
+    +if(skipPackage[1]='0','PersonXLAB_Inc\n','')
+    +if(skipPackage[2]='0','FCRA_Header\n','')
+    +if(skipPackage[3]='0','PersonHeaderWeeklyKeys\n','')
+    +if(skipPackage[1]='0','\nPersonXLAB_Inc Deployment version: \n' + lastestIkbVersionOnThor,'')
+    +if(skipPackage[2]='0','\nFCRA_Header Deployment version: \n' + lastestFCRAversionOnThor,'')
+    +if(skipPackage[3]='0','\nPersonHeaderWeeklyKeys Deployment version: \n' + lastestWklyversionOnThor,'')
+    +'\n\n'
+    +'Corespondiong Orbit entries have been created and updated.\n'
+    +'\n'
+    +'If you have any question or concerns please contact:\n'
+    +'Debendra.Kumar@lexisnexisrisk.com\n'
+    +'gabriel.marcan@lexisnexisrisk.com\n'
+    +'\nThank you,'),          
+    
     orbit_update_entries('create',skipPackage),
     orbit_update_entries('update',skipPackage),
-    std.system.Email.SendEmail(rpt_qa_email_list+','+emailList,'New boca Header IKB deployment',
-         
-         'Hello,\n\nPlease note that the following datasets have been updated for CERT deployment:'
-        +'\n\n'
-        +if(skipPackage[1]='0','PersonXLAB_Inc\n','')
-        +if(skipPackage[2]='0','FCRA_Header\n','')
-        +if(skipPackage[3]='0','PersonHeaderWeeklyKeys\n','')
-        +'\n'
-        +if(skipPackage[1]='0','PersonXLAB_Inc Deployment version: \n' + lastestIkbVersionOnThor,'')
-        +if(skipPackage[2]='0','FCRA_Header Deployment version: \n' + lastestFCRAversionOnThor,'')
-        +if(skipPackage[3]='0','PersonHeaderWeeklyKeys Deployment version: \n' + lastestWklyversionOnThor,'')
-        +'\n'
-        +'Corespondiong Orbit entries have been created and updated.\n'
-        +'\n'
-        +'If you have any question or concerns please contact:\n'
-        +'Debendra.Kumar@lexisnexisrisk.com\n'
-        +'gabriel.marcan@lexisnexisrisk.com\n'
-        +'\nThank you,');    
+    udops(skipPackage)
 );
 END;

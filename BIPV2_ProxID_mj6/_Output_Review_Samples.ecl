@@ -1,7 +1,8 @@
+﻿import BIPV2;
 EXPORT _Output_Review_Samples(
    pMatchThreshold      = '0'
   ,pInfile              = 'BIPV2_ProxID_mj6.In_DOT_Base'
-  ,pSetReviewers        = '[\'CM\',\'LB\',\'TL\',\'JL\',\'FN\',\'DW\',\'SS\']'
+  ,pSetReviewers        = 'BIPV2._Config.Set_Sample_Reviewers'
   ,pSamplesPerReviewer  = '15'
   ,pKeyversions         = '\'built\''
   ,pFractionAtThreshold = '.667'    //by default, 2/3 at threshold, 1/3 above

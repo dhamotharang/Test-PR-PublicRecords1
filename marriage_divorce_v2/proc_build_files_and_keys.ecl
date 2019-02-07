@@ -1,4 +1,4 @@
-import ut,RoxieKeybuild,orbit_report,PromoteSupers,Orbit3;
+﻿import ut,RoxieKeybuild,orbit_report,PromoteSupers,Orbit3,Scrubs_marriage_divorce_v2;
 
 //Modified filedate as ut.getdate is failing to create version
 export proc_build_files_and_keys(string filedate) := function
@@ -77,6 +77,7 @@ orbit_update := sequential(Orbit3.proc_Orbit3_CreateBuild ('Marriages & Divorces
 									marriage_divorce_v2.proc_move_to_qa,
 									marriage_divorce_V2.coverage,
 									marriage_divorce_v2.Out_Base_Dev_Stats(filedate),
+									Scrubs_marriage_divorce_v2.PostBuildScrubs(filedate),
 									sample_records_for_qa,
 									updatedops,
 									fcraupdatedops,

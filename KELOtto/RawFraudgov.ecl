@@ -1,4 +1,5 @@
-﻿source := RECORD
+﻿IMPORT KELOtto;
+source := RECORD
    unsigned2 source_type_id;
    string25 source_type;
    unsigned2 primary_source_entity_id;
@@ -315,4 +316,4 @@ raw_input_layout := RECORD,maxlength(60000)
 
 TestCustomer := [272, 990, 991, 992];
 
-EXPORT RawFraudgov := DATASET('~thor_data400::base::fraudgov::20180129d::main',raw_input_layout,THOR)(permissible_use_access classification_permissible_use_access.fdn_file_info_id in TestCustomer);
+EXPORT RawFraudgov := DATASET(KELOtto.Constants.fileLocation+'base::20180129d::main',raw_input_layout,THOR)(classification_permissible_use_access.fdn_file_info_id in TestCustomer);
