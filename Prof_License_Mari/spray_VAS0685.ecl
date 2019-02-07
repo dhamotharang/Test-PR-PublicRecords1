@@ -1,4 +1,4 @@
-// spray Virginia Bureau of Financial Institutions / Mortgage Lenders // Professional Licenses Files for MARI	   
+﻿// spray Virginia Bureau of Financial Institutions / Mortgage Lenders // Professional Licenses Files for MARI	   
 import ut
 	   ,_control
      ,Prof_License_Mari
@@ -13,7 +13,7 @@ shared filepath		  :=	'/data/data_build_5_2/MARI/in/VAS0685/';
 // shared sourcepath		:=	'/data_build_5_2/MARI/';
 
 shared maxRecordSize	:=	8192;
-shared group_name	:=	'thor40_241';
+shared group_name	:=	Common_Prof_Lic_Mari.group_name;
 
 shared destination := Common_Prof_Lic_Mari.SourcesFolder + 'VAS0685::';
 
