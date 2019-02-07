@@ -1,9 +1,9 @@
-//FEMA report should be run twice a year. 
+﻿//FEMA report should be run twice a year. 
 //per Julie Gardner, runs should occur beginning of May (in time for hurricane season) and then again beginning of November
 //This code was initally created by Tony Kirk in 2010. Modified Jan 2015 to account for new PropertyFast base files.
 //20150224 - code modified to incorporate the Fast Property Base file (Bug 173837).
 
-IMPORT LN_PropertyV2_Fast, LN_PropertyV2, Property, ut, lib_FileServices;
+IMPORT LN_PropertyV2_Fast, LN_PropertyV2, Property, ut, lib_FileServices, lib_Stringlib,_Control;
 
 // #option('freezePersists',true);
 #WORKUNIT('name','FEMA Coverage Reports');
@@ -25,13 +25,13 @@ BOOLEAN	gDebugOnly		:=	FALSE;
 // 		BB   Borrower Mailing Address
 
 // Specs received in pseudocode email on 02/19/10
-// Â•	The FIPS Code cannot be null
-// Â•	County name cannot be null
-// Â•	City Name not like Â“IRS%Â” or Â“I R S%Â”
-// Â•	All states except for 'AA','AE','AP','GU','FM','MH','MP','PR','PW','AS'. (I added 'VI')
+// 	The FIPS Code cannot be null
+// 	County name cannot be null
+// 	City Name not like IRS% or I R S%
+// 	All states except for 'AA','AE','AP','GU','FM','MH','MP','PR','PW','AS'. (I added 'VI')
 
 SET OF STRING25	sOmitCities	:=	['IRS','I R S'];
-SET OF STRING2	sOmitStates	:=	['AA','AE','AP','GU','FM','MH','MP','PR','PW','AS','VI'];
+SET OF STRING2	sOmitStates	:=	['AA','AE','AP','GU','FM','MH','MP','PR','PW','AS'];
 
 gToday	:=	ut.getDate : GLOBAL;
 
@@ -284,7 +284,7 @@ ENDMACRO;
 //
 MAC_DesprayState(pState, pOutRef) :=
 MACRO
-	pOutRef	:=	lib_FileServices.FileServices.Despray('~thor::out::fema_property::results::' + TRIM(pState,LEFT,RIGHT) + '::' + WORKUNIT + '.csv','bctlpedata11.risk.regn.net','/data/load01/fema_property_despray/' + WORKUNIT[2..9] + '/' + lib_StringLib.StringLib.StringToLowerCase(TRIM(pState,LEFT,RIGHT)) + '_' + WORKUNIT[2..9] + '.csv');
+	pOutRef	:=	lib_FileServices.FileServices.Despray('~thor::out::fema_property::results::' + TRIM(pState,LEFT,RIGHT) + '::' + WORKUNIT + '.csv',_Control.IPAddress.bctlpedata11,'/data/load01/fema_property_despray/' + WORKUNIT[2..9] + '/' + lib_StringLib.StringLib.StringToLowerCase(TRIM(pState,LEFT,RIGHT)) + '_' + WORKUNIT[2..9] + '.csv');
 ENDMACRO;
 //
 
@@ -300,7 +300,7 @@ ENDMACRO;
 //
 MAC_DesprayDebugState(pState, pOutRef) :=
 MACRO
-	pOutRef	:=	lib_FileServices.FileServices.Despray('~thor::out::fema_property::debug_counts::' + TRIM(pState,LEFT,RIGHT) + '::' + WORKUNIT + '.csv','bctlpedata11.risk.regn.net','/data/load01/fema_property_despray/' + WORKUNIT[2..9] + '/' + lib_StringLib.StringLib.StringToLowerCase(TRIM(pState,LEFT,RIGHT)) + '_debug_counts_' + WORKUNIT[2..9] + '.csv');
+	pOutRef	:=	lib_FileServices.FileServices.Despray('~thor::out::fema_property::debug_counts::' + TRIM(pState,LEFT,RIGHT) + '::' + WORKUNIT + '.csv',_Control.IPAddress.bctlpedata11,'/data/load01/fema_property_despray/' + WORKUNIT[2..9] + '/' + lib_StringLib.StringLib.StringToLowerCase(TRIM(pState,LEFT,RIGHT)) + '_debug_counts_' + WORKUNIT[2..9] + '.csv');
 ENDMACRO;
 //
 
@@ -315,7 +315,7 @@ MAC_OutputState('ND',zOutputND);	MAC_OutputState('NE',zOutputNE);	MAC_OutputStat
 MAC_OutputState('NM',zOutputNM);	MAC_OutputState('NV',zOutputNV);	MAC_OutputState('NY',zOutputNY);	MAC_OutputState('OH',zOutputOH);
 MAC_OutputState('OK',zOutputOK);	MAC_OutputState('OR',zOutputOR);	MAC_OutputState('PA',zOutputPA);	MAC_OutputState('RI',zOutputRI);
 MAC_OutputState('SC',zOutputSC);	MAC_OutputState('SD',zOutputSD);	MAC_OutputState('TN',zOutputTN);	MAC_OutputState('TX',zOutputTX);
-MAC_OutputState('UT',zOutputUT);	MAC_OutputState('VA',zOutputVA);	MAC_OutputState('VT',zOutputVT);	MAC_OutputState('WA',zOutputWA);
+MAC_OutputState('UT',zOutputUT);	MAC_OutputState('VA',zOutputVA);	MAC_OutputState('VI',zOutputVI); MAC_OutputState('VT',zOutputVT);	MAC_OutputState('WA',zOutputWA);
 MAC_OutputState('WI',zOutputWI);	MAC_OutputState('WV',zOutputWV);	MAC_OutputState('WY',zOutputWY);
 
 MAC_DesprayState('AK',zDesprayAK);	MAC_DesprayState('AL',zDesprayAL);	MAC_DesprayState('AR',zDesprayAR);	MAC_DesprayState('AZ',zDesprayAZ);
@@ -329,7 +329,7 @@ MAC_DesprayState('ND',zDesprayND);	MAC_DesprayState('NE',zDesprayNE);	MAC_Despra
 MAC_DesprayState('NM',zDesprayNM);	MAC_DesprayState('NV',zDesprayNV);	MAC_DesprayState('NY',zDesprayNY);	MAC_DesprayState('OH',zDesprayOH);
 MAC_DesprayState('OK',zDesprayOK);	MAC_DesprayState('OR',zDesprayOR);	MAC_DesprayState('PA',zDesprayPA);	MAC_DesprayState('RI',zDesprayRI);
 MAC_DesprayState('SC',zDespraySC);	MAC_DesprayState('SD',zDespraySD);	MAC_DesprayState('TN',zDesprayTN);	MAC_DesprayState('TX',zDesprayTX);
-MAC_DesprayState('UT',zDesprayUT);	MAC_DesprayState('VA',zDesprayVA);	MAC_DesprayState('VT',zDesprayVT);	MAC_DesprayState('WA',zDesprayWA);
+MAC_DesprayState('UT',zDesprayUT);	MAC_DesprayState('VA',zDesprayVA);	MAC_DesprayState('VI',zDesprayVI); MAC_DesprayState('VT',zDesprayVT);	MAC_DesprayState('WA',zDesprayWA);
 MAC_DesprayState('WI',zDesprayWI);	MAC_DesprayState('WV',zDesprayWV);	MAC_DesprayState('WY',zDesprayWY);	
 
 MAC_OutputDebugCounts('AK',zDebugAK);	MAC_OutputDebugCounts('AL',zDebugAL);	MAC_OutputDebugCounts('AR',zDebugAR);	MAC_OutputDebugCounts('AZ',zDebugAZ);
@@ -343,7 +343,7 @@ MAC_OutputDebugCounts('ND',zDebugND);	MAC_OutputDebugCounts('NE',zDebugNE);	MAC_
 MAC_OutputDebugCounts('NM',zDebugNM);	MAC_OutputDebugCounts('NV',zDebugNV);	MAC_OutputDebugCounts('NY',zDebugNY);	MAC_OutputDebugCounts('OH',zDebugOH);
 MAC_OutputDebugCounts('OK',zDebugOK);	MAC_OutputDebugCounts('OR',zDebugOR);	MAC_OutputDebugCounts('PA',zDebugPA);	MAC_OutputDebugCounts('RI',zDebugRI);
 MAC_OutputDebugCounts('SC',zDebugSC);	MAC_OutputDebugCounts('SD',zDebugSD);	MAC_OutputDebugCounts('TN',zDebugTN);	MAC_OutputDebugCounts('TX',zDebugTX);
-MAC_OutputDebugCounts('UT',zDebugUT);	MAC_OutputDebugCounts('VA',zDebugVA);	MAC_OutputDebugCounts('VT',zDebugVT);	MAC_OutputDebugCounts('WA',zDebugWA);
+MAC_OutputDebugCounts('UT',zDebugUT);	MAC_OutputDebugCounts('VA',zDebugVA);	MAC_OutputDebugCounts('VI',zDebugVI); MAC_OutputDebugCounts('VT',zDebugVT);	MAC_OutputDebugCounts('WA',zDebugWA);
 MAC_OutputDebugCounts('WI',zDebugWI);	MAC_OutputDebugCounts('WV',zDebugWV);	MAC_OutputDebugCounts('WY',zDebugWY);
 
 MAC_DesprayDebugState('AK',zDesprayDebugAK);	MAC_DesprayDebugState('AL',zDesprayDebugAL);	MAC_DesprayDebugState('AR',zDesprayDebugAR);	MAC_DesprayDebugState('AZ',zDesprayDebugAZ);
@@ -357,7 +357,7 @@ MAC_DesprayDebugState('ND',zDesprayDebugND);	MAC_DesprayDebugState('NE',zDespray
 MAC_DesprayDebugState('NM',zDesprayDebugNM);	MAC_DesprayDebugState('NV',zDesprayDebugNV);	MAC_DesprayDebugState('NY',zDesprayDebugNY);	MAC_DesprayDebugState('OH',zDesprayDebugOH);
 MAC_DesprayDebugState('OK',zDesprayDebugOK);	MAC_DesprayDebugState('OR',zDesprayDebugOR);	MAC_DesprayDebugState('PA',zDesprayDebugPA);	MAC_DesprayDebugState('RI',zDesprayDebugRI);
 MAC_DesprayDebugState('SC',zDesprayDebugSC);	MAC_DesprayDebugState('SD',zDesprayDebugSD);	MAC_DesprayDebugState('TN',zDesprayDebugTN);	MAC_DesprayDebugState('TX',zDesprayDebugTX);
-MAC_DesprayDebugState('UT',zDesprayDebugUT);	MAC_DesprayDebugState('VA',zDesprayDebugVA);	MAC_DesprayDebugState('VT',zDesprayDebugVT);	MAC_DesprayDebugState('WA',zDesprayDebugWA);
+MAC_DesprayDebugState('UT',zDesprayDebugUT);	MAC_DesprayDebugState('VA',zDesprayDebugVA);	MAC_DesprayDebugState('VI',zDesprayDebugVI); MAC_DesprayDebugState('VT',zDesprayDebugVT);	MAC_DesprayDebugState('WA',zDesprayDebugWA);
 MAC_DesprayDebugState('WI',zDesprayDebugWI);	MAC_DesprayDebugState('WV',zDesprayDebugWV);	MAC_DesprayDebugState('WY',zDesprayDebugWY);	
 
 SEQUENTIAL(OUTPUT(gDebugOnly,NAMED('Debug_Only_Flag')),
@@ -370,7 +370,7 @@ SEQUENTIAL(OUTPUT(gDebugOnly,NAMED('Debug_Only_Flag')),
 																,zOutputME,zOutputMI,zOutputMN,zOutputMO,zOutputMS,zOutputMT,zOutputNC
 																,zOutputND,zOutputNE,zOutputNH,zOutputNJ,zOutputNM,zOutputNV,zOutputNY
 																,zOutputOH,zOutputOK,zOutputOR,zOutputPA,zOutputRI,zOutputSC,zOutputSD
-																,zOutputTN,zOutputTX,zOutputUT,zOutputVA,zOutputVT,zOutputWA,zOutputWI
+																,zOutputTN,zOutputTX,zOutputUT,zOutputVA,zOutputVI,zOutputVT,zOutputWA,zOutputWI
 																,zOutputWV,zOutputWY
 																),
 #END // #IF(NOT gDebugOnly)
@@ -381,7 +381,7 @@ SEQUENTIAL(OUTPUT(gDebugOnly,NAMED('Debug_Only_Flag')),
 											,zDebugME,zDebugMI,zDebugMN,zDebugMO,zDebugMS,zDebugMT,zDebugNC
 											,zDebugND,zDebugNE,zDebugNH,zDebugNJ,zDebugNM,zDebugNV,zDebugNY
 											,zDebugOH,zDebugOK,zDebugOR,zDebugPA,zDebugRI,zDebugSC,zDebugSD
-											,zDebugTN,zDebugTX,zDebugUT,zDebugVA,zDebugVT,zDebugWA,zDebugWI
+											,zDebugTN,zDebugTX,zDebugUT,zDebugVA,zDebugVI,zDebugVT,zDebugWA,zDebugWI
 											,zDebugWV,zDebugWY
 											),
 #END // #IF(gIncludeDebug)
@@ -394,7 +394,7 @@ SEQUENTIAL(OUTPUT(gDebugOnly,NAMED('Debug_Only_Flag')),
 											,zDesprayME,zDesprayMI,zDesprayMN,zDesprayMO,zDesprayMS,zDesprayMT,zDesprayNC
 											,zDesprayND,zDesprayNE,zDesprayNH,zDesprayNJ,zDesprayNM,zDesprayNV,zDesprayNY
 											,zDesprayOH,zDesprayOK,zDesprayOR,zDesprayPA,zDesprayRI,zDespraySC,zDespraySD
-											,zDesprayTN,zDesprayTX,zDesprayUT,zDesprayVA,zDesprayVT,zDesprayWA,zDesprayWI
+											,zDesprayTN,zDesprayTX,zDesprayUT,zDesprayVA,zDesprayVI,zDesprayVT,zDesprayWA,zDesprayWI
 											,zDesprayWV,zDesprayWY
 											),
 #END // #IF(NOT gDebugOnly)
@@ -405,7 +405,7 @@ SEQUENTIAL(OUTPUT(gDebugOnly,NAMED('Debug_Only_Flag')),
 											,zDesprayDebugME,zDesprayDebugMI,zDesprayDebugMN,zDesprayDebugMO,zDesprayDebugMS,zDesprayDebugMT,zDesprayDebugNC
 											,zDesprayDebugND,zDesprayDebugNE,zDesprayDebugNH,zDesprayDebugNJ,zDesprayDebugNM,zDesprayDebugNV,zDesprayDebugNY
 											,zDesprayDebugOH,zDesprayDebugOK,zDesprayDebugOR,zDesprayDebugPA,zDesprayDebugRI,zDesprayDebugSC,zDesprayDebugSD
-											,zDesprayDebugTN,zDesprayDebugTX,zDesprayDebugUT,zDesprayDebugVA,zDesprayDebugVT,zDesprayDebugWA,zDesprayDebugWI
+											,zDesprayDebugTN,zDesprayDebugTX,zDesprayDebugUT,zDesprayDebugVA,zDesprayDebugVI,zDesprayDebugVT,zDesprayDebugWA,zDesprayDebugWI
 											,zDesprayDebugWV,zDesprayDebugWY
 											),
 #END // #IF(gIncludeDebug)

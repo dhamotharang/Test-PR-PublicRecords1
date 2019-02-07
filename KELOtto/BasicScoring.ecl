@@ -1,8 +1,8 @@
 ﻿EXPORT BasicScoring := MODULE
-  IMPORT KELOtto, FraudGovPlatform_Analytics;
+  IMPORT KELOtto, FraudGovPlatform_Analytics, FraudGovPlatform;
 
-	EXPORT WeightingChart := DATASET('~thor_data400::key::fraudgov::built::configrisklevel', {INTEGER EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING UiDescription}, THOR);
-       
+	EXPORT WeightingChart := DATASET('~thor_data400::in::fraudgov::sprayed::configrisklevel', {INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING UiDescription}, CSV(HEADING(1)));
+	
   EXPORT PersonStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Person.Res0, 'industry_type_,customer_id_,entity_context_uid_', 
                         'score_,cluster_score_,event_count_,' + 
                         '_nas__summary_,_nap__summary_,_subjectssncount_,_ssnfoundforlexid_,subject_ssn_count_,stolen_identity_index_,synthetic_identity_index_,manipulated_identity_index_,vulnerable_victim_index_,friendlyfraud_index_,suspicious_activity_index_,all_high_risk_death_prior_to_all_events_,all_max_deceased_to_event_diff_,death_prior_to_all_events_,deceased_,deceased_event_percent_,deceased_match_,high_risk_death_prior_to_all_events_,in_customer_population_,max_deceased_to_event_diff_,no_lex_id_,id_ssn_identity_count_max_,no_lex_id_gt22_,' + 
@@ -52,13 +52,16 @@
   EXPORT BankAccountStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Bank_Account.Res0, 'industry_type_,customer_id_,entity_context_uid_',
                         'cluster_score_,event_count_,identity_count_,score_,source_customer_count_,cl_event_count_,cl_identity_count_,kr_high_risk_flag_,kr_medium_risk_flag_,' + 
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
-												'cl_active30_identity_count_,cl_active7_identity_count_'
+												'cl_active30_identity_count_,cl_active7_identity_count_,' +
+                        'kr_bnk800_flag_,kr_bnk801_flag_,kr_bnk802_flag_,kr_bnk890_flag_,kr_bnk891_flag_,kr_bnk892_flag_,kr_bnk893_flag_'                        
 												) : PERSIST('~temp::deleteme50');
 
   EXPORT DriversLicenseStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Drivers_License.Res0, 'industry_type_,customer_id_,entity_context_uid_',
                         'cluster_score_,event_count_,identity_count_,score_,source_customer_count_,cl_event_count_,cl_identity_count_,kr_high_risk_flag_,kr_medium_risk_flag_,' + 
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
-												'cl_active30_identity_count_,cl_active7_identity_count_'
+												'cl_active30_identity_count_,cl_active7_identity_count_,' + 
+                        'hri41_flag_,hri_df_flag_,' + 
+                        'kr_dl200_flag_,kr_dl201_flag_,kr_dl202_flag_,kr_dl203_flag_,kr_dl204_flag_,kr_dl290_flag_,kr_dl291_flag_,kr_dl292_flag_,kr_dl293_flag_'
 												) : PERSIST('~temp::deleteme51');
                         
   EXPORT EventStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Person_Event.Res0, 'industry_type_,customer_id_,entity_context_uid_', 
@@ -107,13 +110,17 @@
 										
   // This is the list of attributes per entity type, indicatortype
   EXPORT FullIndicatorListPrep := TABLE(FullEntityStatsPrep, {customer_id_, industry_type_, entitytype, indicatordescription, Field, ElementCount := COUNT(GROUP) }, customer_id_, industry_type_, entitytype, indicatordescription, Field, MERGE);
-  EXPORT FullIndicatorList := JOIN(FullIndicatorListPrep, WeightingChart, 
-                         LEFT.Field=RIGHT.Field AND LEFT.EntityType = RIGHT.EntityType, 
+  EXPORT FullIndicatorList := JOIN(FullIndicatorListPrep, FraudGovPlatform.Key_WeightingChart, 
+												 KEYED(LEFT.Field=RIGHT.Field AND (INTEGER)LEFT.EntityType = RIGHT.EntityType),  
+	// EXPORT FullIndicatorList := JOIN(FullIndicatorListPrep, WeightingChart, 
+												 // LEFT.Field=RIGHT.Field AND (INTEGER)LEFT.EntityType = RIGHT.EntityType,
 												 TRANSFORM({RECORDOF(LEFT), INTEGER1 IsConfigured}, SELF.IsConfigured := MAP(RIGHT.field != '' => 1, 0), SELF := LEFT, SELF := RIGHT), LEFT OUTER, KEEP(1)); 
 	
   // This is the final result for entity stats after w
-  EXPORT WeightedResult := JOIN(FullEntityStatsPrep(Value != ''), WeightingChart, 
-                         LEFT.Field=RIGHT.Field AND (INTEGER)LEFT.entity_context_uid_[2..3] = RIGHT.EntityType AND
+  // EXPORT WeightedResult := JOIN(FullEntityStatsPrep(Value != ''), WeightingChart, 
+                         // LEFT.Field=RIGHT.Field AND (INTEGER)LEFT.entity_context_uid_[2..3] = RIGHT.EntityType AND
+  EXPORT WeightedResult := JOIN(FullEntityStatsPrep(Value != ''), FraudGovPlatform.Key_WeightingChart, 
+                         KEYED(LEFT.Field=RIGHT.Field AND (INTEGER)LEFT.entity_context_uid_[2..3] = RIGHT.EntityType) AND
                          (
                            (
                              RIGHT.Value != '' AND LEFT.Value = RIGHT.Value

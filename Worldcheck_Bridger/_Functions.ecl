@@ -247,7 +247,7 @@
 				trim(cname, left, right) in ['Sudan','SUDAN'] =>SubGroup_Constants.numCountryID.SUDAN ,
 				trim(cname, left, right) in ['Suriname','SURINAME'] =>SubGroup_Constants.numCountryID.SURINAME ,
 				trim(cname, left, right) in ['Svalbard','SVALBARD'] =>SubGroup_Constants.numCountryID.SVALBARD ,
-				trim(cname, left, right) in ['Swaziland','SWAZILAND'] =>SubGroup_Constants.numCountryID.SWAZILAND ,
+				trim(cname, left, right) in ['Eswatini','ESWATINI'] =>SubGroup_Constants.numCountryID.ESWATINI ,
 				trim(cname, left, right) in ['Sweden','SWEDEN'] =>SubGroup_Constants.numCountryID.SWEDEN ,
 				trim(cname, left, right) in ['Switzerland','SWITZERLAND'] =>SubGroup_Constants.numCountryID.SWITZERLAND ,
 				trim(cname, left, right) in ['Syria','SYRIA'] =>SubGroup_Constants.numCountryID.SYRIA ,
@@ -1200,6 +1200,14 @@
 				trim(kword, left, right) = 'SECO-MAL' =>SubGroup_Constants.numKeywordsID.KEYWORD_SECO_MAL,
 				trim(kword, left, right) = 'UN-MAL' =>SubGroup_Constants.numKeywordsID.KEYWORD_UN_MAL,
 				trim(kword, left, right) = 'INMHA-FCRA' =>SubGroup_Constants.numKeywordsID.KEYWORD_INMHA_FCRA,
+				trim(kword, left, right) = 'FFMS-WMD' =>SubGroup_Constants.numKeywordsID.KEYWORD_FFMS_WMD,
+				trim(kword, left, right) = 'OFAC-VE13850' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_VE13850,
+				trim(kword, left, right) = 'SECO-MALTB' =>SubGroup_Constants.numKeywordsID.KEYWORD_SECO_MALTB,
+				trim(kword, left, right) = 'UNTB-MAL' =>SubGroup_Constants.numKeywordsID.KEYWORD_UNTB_MAL,
+				trim(kword, left, right) = 'EUTB-MAL' =>SubGroup_Constants.numKeywordsID.KEYWORD_EUTB_MAL,								
+				trim(kword, left, right) = 'EU-PCW' =>SubGroup_Constants.numKeywordsID.KEYWORD_EU_PCW,								
+				trim(kword, left, right) = 'DKFSAPEP' =>SubGroup_Constants.numKeywordsID.KEYWORD_DKFSAPEP,
+				trim(kword, left, right) = 'RUFTS-GA' =>SubGroup_Constants.numKeywordsID.KEYWORD_RUFTS_GA,
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);

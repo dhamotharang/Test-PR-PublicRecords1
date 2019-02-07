@@ -1,24 +1,25 @@
 ﻿Import ut,tools,FraudShared; 
 
 EXPORT Build_Base_Deltabase (
-   string pversion
-	,dataset(Layouts.Base.Deltabase)  inBaseDeltabase   = Files().Base.Deltabase.Built
+	 string pversion
+	,dataset(FraudShared.Layouts.Input.mbs) MBS_Sprayed = FraudShared.Files().Input.MBS.sprayed   
+	,dataset(Layouts.Base.Deltabase) inBaseDeltabase = IF(_Flags.Update.Deltabase, Files().Base.Deltabase.Built, DATASET([], Layouts.Base.Deltabase))
 	,dataset(Layouts.Input.Deltabase) inDeltabaseUpdate = Files().Input.Deltabase.Sprayed
-	,boolean	UpdateDeltabase   = _Flags.Update.Deltabase
+	,boolean UpdateDeltabase = _Flags.Update.Deltabase
 ) := 
 module 
-
-		Layouts.Base.Deltabase	tPrep(inDeltabaseUpdate	l)	:=
+					
+	Layouts.Base.Deltabase	tPrep(inDeltabaseUpdate	l)	:=
 	transform
-			self.process_date							:= (unsigned) l.ProcessDate, 
-			self.dt_first_seen						:= (unsigned) l.ProcessDate; 
-			self.dt_last_seen							:= (unsigned) l.ProcessDate;
-			self.dt_vendor_last_reported		:= (unsigned) l.ProcessDate; 
-			self.dt_vendor_first_reported		:= (unsigned) l.ProcessDate; 
-			self.source_rec_id						:= l.unique_id;																
-			self.current									:= 'C' ; 
-			self												:= l; 			
-			self												:= []; 
+		self.process_date := (unsigned) l.ProcessDate, 
+		self.dt_first_seen := (unsigned) l.ProcessDate; 
+		self.dt_last_seen := (unsigned) l.ProcessDate;
+		self.dt_vendor_last_reported := (unsigned) l.FileDate; 
+		self.dt_vendor_first_reported := (unsigned) l.FileDate; 
+		self.source_rec_id := l.unique_id;																
+		self.current := 'C' ; 
+		self := l; 			
+		self := []; 
    end; 
 		
 	DeltabaseUpdate	:=	project(inDeltabaseUpdate,tPrep(left));
@@ -27,17 +28,16 @@ module
 		FraudShared.Layouts.Input.MBS;
 		unsigned1 Deltabase := 0;
 	end;
-	MBS	:= project(FraudShared.Files().Input.MBS.sprayed(status = 1), transform(MBS_Layout, self.Deltabase := If(regexfind('DELTA', left.fdn_file_code, nocase),1,0); self := left))(Deltabase = 1);
+	MBS_Deltabase	:= project(MBS_Sprayed(status = 1), transform(MBS_Layout, self.Deltabase := If(regexfind('DELTA', left.fdn_file_code, nocase),1,0); self := left))(Deltabase = 1);
 
 	DeltabaseSource := join(	DeltabaseUpdate,
-									MBS, 
-									(unsigned6) left.Customer_Account_Number = right.gc_id AND 
-									left.Deltabase = right.Deltabase
-									,TRANSFORM(FraudGovPlatform.Layouts.Base.Deltabase,SELF.Source := RIGHT.fdn_file_code; SELF := LEFT) ,lookup); 
+						MBS_Deltabase, 
+						left.Customer_Account_Number = (string)right.gc_id
+						,TRANSFORM(FraudGovPlatform.Layouts.Base.Deltabase,SELF.Source := RIGHT.fdn_file_code; SELF := LEFT) ,lookup); 
 
   // Rollup Update and previous base 
   
-	Pcombined     := If(UpdateDeltabase , inBaseDeltabase + DeltabaseSource , inBaseDeltabase); 
+	Pcombined := If(UpdateDeltabase , inBaseDeltabase + DeltabaseSource , inBaseDeltabase); 
 	pDataset_Dist := distribute(Pcombined, source_rec_id);
 	pDataset_sort := sort(pDataset_Dist , source_rec_id, -process_date, -did, -clean_address.err_stat,local);
 
@@ -55,16 +55,17 @@ module
 	end;
 
 	pDataset_rollup := rollup( pDataset_sort
-														,RollupUpdate(left, right)
-														,source_rec_id ,local
-										);
+		,RollupUpdate(left, right)
+		,source_rec_id ,local);
 	
 	tools.mac_WriteFile(Filenames(pversion).Base.Deltabase.New,pDataset_rollup,Build_Base_File);
 
 // Return
 	export full_build :=
 		 sequential(
-			 Build_Base_File
+			  Build_Base_File
+ 			, Promote(pversion).buildfiles.New2Built
+
 		);
 		
 	export All :=

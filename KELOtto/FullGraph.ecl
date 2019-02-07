@@ -124,8 +124,8 @@ FullGraphPrep2 := JOIN(FullGraphPrep1, DISTRIBUTE(KELOtto.Q__show_Customer_Addre
                        //   SELF.cl_high_risk_pattern3_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern3_flag_ , LEFT.cl_high_risk_pattern3_flag_),
                        //   SELF.cl_high_risk_pattern4_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern4_flag_ , LEFT.cl_high_risk_pattern4_flag_),
                        //   SELF.cl_high_risk_pattern5_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern5_flag_ , LEFT.cl_high_risk_pattern5_flag_),
-                       //   SELF.kr_high_risk_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.kr_high_risk_flag_ , LEFT.kr_high_risk_flag_),
-                       //   SELF.kr_medium_risk_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.kr_medium_risk_flag_ , LEFT.kr_medium_risk_flag_),
+                          SELF.kr_high_risk_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.kr_high_risk_flag_ , LEFT.kr_high_risk_flag_),
+                          SELF.kr_medium_risk_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.kr_medium_risk_flag_ , LEFT.kr_medium_risk_flag_),
                        //   SELF.deceased_match_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.deceased_match_ , LEFT.deceased_match_),
                        //   SELF.death_prior_to_all_events_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.death_prior_to_all_events_ , LEFT.death_prior_to_all_events_),
                        //   SELF.nas9_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.nas9_flag_ , LEFT.nas9_flag_),
@@ -311,8 +311,9 @@ FullGraphPrep7 := JOIN(FullGraphPrep6, DISTRIBUTE(KELOtto.Q__show_Customer_Bank_
                        //   SELF.cl_high_risk_pattern3_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern3_flag_ , LEFT.cl_high_risk_pattern3_flag_),
                        //   SELF.cl_high_risk_pattern4_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern4_flag_ , LEFT.cl_high_risk_pattern4_flag_),
                        //   SELF.cl_high_risk_pattern5_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern5_flag_ , LEFT.cl_high_risk_pattern5_flag_),
-                       //   SELF.kr_high_risk_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.kr_high_risk_flag_ , LEFT.kr_high_risk_flag_),
-                       //   SELF.kr_medium_risk_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.kr_medium_risk_flag_ , LEFT.kr_medium_risk_flag_),
+                          SELF.kr_high_risk_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.kr_high_risk_flag_ , LEFT.kr_high_risk_flag_),
+                          SELF.kr_medium_risk_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.kr_medium_risk_flag_ , LEFT.kr_medium_risk_flag_),
+                       //   SELF.kr_low_risk_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.kr_low_risk_flag_ , LEFT.kr_low_risk_flag_),
                        //   SELF.deceased_match_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.deceased_match_ , LEFT.deceased_match_),
                        //   SELF.death_prior_to_all_events_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.death_prior_to_all_events_ , LEFT.death_prior_to_all_events_),
                        //   SELF.nas9_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.nas9_flag_ , LEFT.nas9_flag_),
@@ -325,7 +326,7 @@ FullGraphPrep7 := JOIN(FullGraphPrep6, DISTRIBUTE(KELOtto.Q__show_Customer_Bank_
                             LEFT OUTER, LOCAL);	
 
 // Drivers License DETAILS                           
-FullGraphPrep8 := JOIN(FullGraphPrep7, DISTRIBUTE(KELOtto.Q__show_Customer_Drivers_License_Entities.Res0, HASH32(entity_context_uid_)), 
+FullGraphPrep8_1 := JOIN(FullGraphPrep7, DISTRIBUTE(KELOtto.Q__show_Customer_Drivers_License_Entities.Res0, HASH32(entity_context_uid_)), 
                         LEFT.source_customer_=RIGHT.source_customer_ AND LEFT.entity_context_uid_=RIGHT.entity_context_uid_,
                         TRANSFORM({RECORDOF(LEFT), RECORDOF(RIGHT)}, 
                           SELF.Label_ := MAP(RIGHT.Label_ != '' => RIGHT.Label_, LEFT.Label_), 
@@ -348,8 +349,10 @@ FullGraphPrep8 := JOIN(FullGraphPrep7, DISTRIBUTE(KELOtto.Q__show_Customer_Drive
                        //   SELF.cl_high_risk_pattern3_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern3_flag_ , LEFT.cl_high_risk_pattern3_flag_),
                        //   SELF.cl_high_risk_pattern4_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern4_flag_ , LEFT.cl_high_risk_pattern4_flag_),
                        //   SELF.cl_high_risk_pattern5_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern5_flag_ , LEFT.cl_high_risk_pattern5_flag_),
-                       //   SELF.kr_high_risk_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.kr_high_risk_flag_ , LEFT.kr_high_risk_flag_),
-                       //   SELF.kr_medium_risk_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.kr_medium_risk_flag_ , LEFT.kr_medium_risk_flag_),
+                          SELF.kr_high_risk_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.kr_high_risk_flag_ , LEFT.kr_high_risk_flag_),
+                          SELF.kr_medium_risk_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.kr_medium_risk_flag_ , LEFT.kr_medium_risk_flag_),
+                          SELF.kr_low_risk_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.kr_low_risk_flag_ , LEFT.kr_low_risk_flag_),
+
                        //   SELF.deceased_match_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.deceased_match_ , LEFT.deceased_match_),
                        //   SELF.death_prior_to_all_events_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.death_prior_to_all_events_ , LEFT.death_prior_to_all_events_),
                        //   SELF.nas9_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.nas9_flag_ , LEFT.nas9_flag_),
@@ -360,7 +363,10 @@ FullGraphPrep8 := JOIN(FullGraphPrep7, DISTRIBUTE(KELOtto.Q__show_Customer_Drive
 
                           ),
                             LEFT OUTER, LOCAL);	
-                            
+                  
+temprec := RECORDOF(FullGraphPrep8_1) AND NOT [kr_low_risk_flag_]; 
+                 
+FullGraphPrep8 := PROJECT(FullGraphPrep8_1, TRANSFORM(temprec, SELF := LEFT));
 /* HACK to get the Element Count per tree in.... will need to be removed once it is computed in KEL */
 // Per Tree Compute how many non-Identity elements 
 ElementCountAggregation := DISTRIBUTE(TABLE(FullGraphPrep8(entity_type_ != 1), {source_customer_, tree_uid_, UNSIGNED cl_element_count_ := COUNT(GROUP)}, source_customer_, tree_uid_, MERGE), HASH32(tree_uid_)); 

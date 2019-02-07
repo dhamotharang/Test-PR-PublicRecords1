@@ -19,7 +19,6 @@ export proc_header(string operatorEmailList, string extraNotifyEmailList) := mod
     SHARED INGEST(boolean incremental=FALSE,string versionBuild)
        := sequential(
             #stored ('version'  , versionBuild); 
-            #WORKUNIT('name', versionBuild + ' Header Ingest');         
             if(~incremental and versionBuild[5..6]<>fn[sub+4..sub+5],fail('Current month Equifax missing'))
            ,check_eq_monthly_file_version
            ,Header.Inputs_Sequence(incremental,versionBuild)
@@ -27,6 +26,7 @@ export proc_header(string operatorEmailList, string extraNotifyEmailList) := mod
            ,if(~incremental,header.build_source_key(versionBuild))
            ,Header.build_header_raw(versionBuild,incremental)
            ,header.proc_linking_attribute_property
+           ,header.Out_Base_Dev_Stats_Header_Relatives(versionBuild, operatorEmailList).ingest_report
            ,if(exists(file_header_raw(src='')),fail('Blank source codes found - please review header_raw'))
         )
         :success(header.msg(if(incremental,'Incremental:','') + versionBuild + ' Header Ingest Completed',operatorEmailList).good)

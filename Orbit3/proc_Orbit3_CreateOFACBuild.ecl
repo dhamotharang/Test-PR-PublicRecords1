@@ -1,4 +1,4 @@
-
+﻿
 import ut,Orbit3,_Control;
 export proc_Orbit3_CreateOFACBuild(string buildname,string Buildvs,string Envmt = 'N', boolean skipcreatebuild = false,boolean skipupdatebuild = false, boolean skipaddcomponents = false, boolean runcreatebuild = true, boolean runaddcomponentsonly = false) := function
 
@@ -54,7 +54,7 @@ export proc_Orbit3_CreateOFACBuild(string buildname,string Buildvs,string Envmt 
 		
 		
 		
-		send_email(string keyword,string status) := function 
+		sendemail(string keyword,string status) := function 
 		
 		error_description := map ( keyword = 'CREATE' and status in ['FAIL','SKIP'] => 'Build Instance Already Exists in Orbit',
 		                     keyword = 'UPDATE' and status = 'FAIL' => 'Build Instance Already Exists and Updated to On Develelopment in Orbit',
@@ -83,7 +83,7 @@ export proc_Orbit3_CreateOFACBuild(string buildname,string Buildvs,string Envmt 
 	
 	run_additem :=  sequential( 
 												       output(choosen(get_new_build_candidates,all) , named('List_of_Build_Items_to_add'),EXTEND),
-															 if ( count( get_new_build_candidates) > 0 ,Sequential(add_components,send_email('ADD_ITEMS','SUCCESS')),send_email('NO_ITEMS_FOUND','FAIL'))
+															 if ( count( get_new_build_candidates) > 0 ,Sequential(add_components,sendemail('ADD_ITEMS','SUCCESS')),sendemail('NO_ITEMS_FOUND','FAIL'))
 										 
 									      );
 												
@@ -98,24 +98,24 @@ export proc_Orbit3_CreateOFACBuild(string buildname,string Buildvs,string Envmt 
 	                      Sequential
 								         (
 									        if ( skipcreatebuild , 
-											                send_email('CREATE','SKIP'),
+											                sendemail('CREATE','SKIP'),
 														 
 													           if( create_build.Status = 'Success',
-															        send_email('CREATE','SUCCESS'),
-																			send_email('CREATE','FAIL')
+															        sendemail('CREATE','SUCCESS'),
+																			sendemail('CREATE','FAIL')
 																			)
 															),
 														
 													if ( skipupdatebuild ,
-																				Sequential(send_email('UPDATE','SKIP'),Update_build_1.Status)	,
+																				Sequential(sendemail('UPDATE','SKIP'),Update_build_1.Status)	,
 												
 													              if ( Update_build.Status = 'Success', 
-													                 send_email('UPDATE','SUCCESS'),
-																					 send_email('UPDATE','FAIL')
+													                 sendemail('UPDATE','SUCCESS'),
+																					 sendemail('UPDATE','FAIL')
 																					 )
 														),
 													 if ( skipaddcomponents,	
-										                        Sequential( Output('Skipping_Add_Components'),output(choosen(get_new_build_candidates,all) , named('List_of_Build_Items_to_add')),send_email('SKIP_ADD_ITEMS','SUCCESS')),
+										                        Sequential( Output('Skipping_Add_Components'),output(choosen(get_new_build_candidates,all) , named('List_of_Build_Items_to_add')),sendemail('SKIP_ADD_ITEMS','SUCCESS')),
 														     
 										                                   run_additem
 																																

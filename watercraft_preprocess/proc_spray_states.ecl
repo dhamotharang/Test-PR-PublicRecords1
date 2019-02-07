@@ -491,7 +491,7 @@ function
 			pServerIP 															// SourceIP
 			,pDirectory + pFolderDate 							// SourceDirectory
 			,'TX*'+pInfolinkQtr+'.txt' 							// directory_filter
-			,2371 																	// record_size
+			,2375 																	// record_size
 			,'~thor_data400::in::watercraft_tx_'+pFolderDate+'_raw' // Thor_filename_template
 			,[ {'~thor_data400::in::watercraft_raw_tx'}	]	// dSuperfilenames
 			,pGroupName 														// fun_Groupname

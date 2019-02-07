@@ -3,7 +3,6 @@
 export SO_By_Key := 
 ['C2CA', // Do Not Remove This Entry
 'C2NV',  // Do Not Remove This Entry
-'C2HI',
 'C2VA'
 ];
 

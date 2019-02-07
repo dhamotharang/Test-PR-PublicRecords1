@@ -1,0 +1,1 @@
+﻿EXPORT in_input := Infutor_NARC3.Files.input;

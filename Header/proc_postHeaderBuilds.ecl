@@ -80,12 +80,12 @@ export proc_postHeaderBuilds := module
 		export XADLkeys := sequential(
                                          header.LogBuild.single('Started :'+step)
                                         ,if(Header.version_build<>fn[sub..sub+7],fail('Header base does not match version'))
-                                        ,nothor(Header.Proc_Copy_From_Alpha.Copy)
+                                        ,Header.Proc_Copy_From_Alpha.Copy
                                         ,checkLinkingVersion(header.version_build)
                                         ,bld_Transunion_LN
                                         ,bld_Transunion_Ptrak
                                         ,build_slimsorts
-                                        ,nothor(Header.Proc_Copy_From_Alpha.CopyOthers)
+                                        ,Header.Proc_Copy_From_Alpha.CopyOthers
                                         ,Header.Proc_Copy_RemoteLinkingKeys_From_Alpha(header.version_build)
                                         ,header.LogBuild.single('Completed :'+step)
                                         )
@@ -156,7 +156,7 @@ export proc_postHeaderBuilds := module
                                             header.LogBuild.single('Started :'+step)
                                             ,if(Header.version_build<>fn[sub..sub+7],fail('Header base does not match version'))
                                             ,checkLinkingVersion(header.version_build)
-                                            ,Doxie.Proc_Doxie_Keys_All()
+                                            ,Doxie.Proc_Doxie_Keys_All(,elist_owners)
                                             ,Header.Proc_Copy_To_Alpha(header.version_build)
                                             ,if(isQuarterly, misc.header_hash_split, output('Hash files are not created in this build'))
                                             ,header.LogBuild.single('Completed :'+step)

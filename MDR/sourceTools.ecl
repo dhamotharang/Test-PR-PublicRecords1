@@ -126,7 +126,9 @@ MODULE
 	export src_WY_Corporations           := 'CZ';
 	export src_Correctional_Facilities	 := '14';  // Correctional Facilities - Internal
 	export src_Cortera                   := 'RR';
+	export src_Cortera_Tradeline         := '7K';
 	export src_CrashCarrier							 := 'KC';  // aka US DOT "Safer Census" data for BIP
+	export src_infutor_narc3             := 'KP';  // infutor_narc3 consumer
 	export src_Credit_Unions             := 'CU';
 	export src_Datagence								 := 'DG';
 	export src_DCA                       := 'DF';  // Directory of Corporate Affiliations; aka LNCA
@@ -197,6 +199,7 @@ MODULE
 	export src_Dunn_Bradstreet           := 'D ';  // aka D&B DMI
 	export src_Dunn_Bradstreet_Fein      := 'DN';
 	export src_Dunndata_Consumer		      	 := 'A3';  //DF-23679 Dunndata Consumer Masterfile
+	export src_Dunn_Data_Email					 := 'DX';	 //EMAIL-103
 	export src_EBR                       := 'ER';  // Experian Business Reports	
 	export src_Edgar                     := 'E ';  // US Securities and Exchange Commission, "Edgar" system data
 	export src_Emdeon                    := '7U';  // Emdeon Healthcare Claims
@@ -808,19 +811,19 @@ MODULE
 	export set_email	:= [
 		src_Acquiredweb								,src_Entiera										, src_Impulse									,src_Wired_Assets_Email, 	 src_MediaOne, 	src_OutwardMedia
 		,src_thrive_lt								, src_thrive_pd									,src_Ibehavior               , src_AlloyMedia_consumer,  src_SalesChannel, src_Datagence
-		,src_InfutorNare					,src_Anchor													,src_RealSource								,src_Acquiredweb_plus];
+		,src_InfutorNare					,src_Anchor													,src_RealSource								,src_Acquiredweb_plus			,src_Dunn_Data_Email];
 		
 	export set_email_poe	:= [
 		src_Acquiredweb								,src_Entiera										, src_Impulse									,src_Wired_Assets_Email, 	 src_MediaOne, 	src_OutwardMedia
 		,src_thrive_lt_poe_email								, src_thrive_pd_poe_email									,src_Ibehavior               , src_AlloyMedia_consumer
-		,src_InfutorNare			,src_Anchor											,src_RealSource							,src_Acquiredweb_plus];
+		,src_InfutorNare			,src_Anchor											,src_RealSource							,src_Acquiredweb_plus					,src_Dunn_Data_Email];
 		
 	export set_digital_email_cookie_matching := [
 		src_Impulse										,src_Wired_Assets_Email					,src_Ibehavior               , src_AlloyMedia_consumer										, src_InfutorNare];		
 
 	export set_email_flat := [
 		src_Wired_Assets_Email				,src_Impulse										,src_thrive_lt								, src_thrive_pd		
-		,src_Ibehavior								,src_AlloyMedia_consumer	 ,src_InfutorNare	,src_Anchor		,src_RealSource];
+		,src_Ibehavior								,src_AlloyMedia_consumer	 ,src_InfutorNare	,src_Anchor		,src_RealSource			,src_Dunn_Data_Email];
 		
 	export set_Emerges                    := [
 		 src_EMerge_Boat               ,src_EMerge_CCW                           ,src_EMerge_CCW_NY     ,src_EMerge_Cens               ,src_EMerge_Fish               
@@ -1314,7 +1317,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	];
 
 	export set_scoring_FCRA := [
-			src_Aircrafts,                src_Airmen,                     src_AK_Perm_Fund,        src_AK_Watercraft,
+			src_Aircrafts,                src_Airmen,                     /*src_AK_Perm_Fund,*/    src_AK_Watercraft,
 			src_AL_Watercraft,            src_American_Students_List,     src_AR_Watercraft,       src_AZ_Watercraft,
 			src_Bankruptcy,               src_CO_Watercraft,              src_CT_Watercraft,       src_DEA,
       src_Death_Master,             src_Death_State,                src_EMerge_Boat,         src_EMerge_CCW,
@@ -1615,6 +1618,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_WV_Hist_Corporations      := [src_WV_Hist_Corporations      ];
 	export set_WY_Corporations           := [src_WY_Corporations           ];
 	export set_CrashCarrier              := [src_CrashCarrier              ];	
+	export set_infutor_narc3             := [src_infutor_narc3             ];
 	export set_Credit_Unions             := [src_Credit_Unions             ];
 	export set_Datagence                 := [src_Datagence                 ];
 	export set_DCA                       := [src_DCA                       ];
@@ -1682,6 +1686,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_Dunn_Bradstreet           := [src_Dunn_Bradstreet           ];
 	export set_Dunn_Bradstreet_Fein      := [src_Dunn_Bradstreet_Fein      ];
 	export set_Dunndata_Consumer         := [src_Dunndata_Consumer         ];
+	export set_Dunn_Data_Email					 := [src_Dunn_Data_Email					 ];
 	export set_EBR                       := [src_EBR                       ];
 	export set_Edgar                     := [src_Edgar                     ];
 	export set_Emdeon                    := [src_Emdeon                    ];
@@ -2067,6 +2072,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsCClue	                    (string  sr) := sr               in set_CClue 	                   ;
 	export SourceIsCorrectional_Facilities    (string  sr) := sr               in set_Correctional_Facilities    ;
 	export SourceIsCortera                    (string  sr) := sr               in set_Cortera                    ;
+	export SourceIsCortera_Tradeline          (string  sr) := sr               = src_Cortera_Tradeline           ;
 	export SourceIsFL_CH                      (string  sr) := sr               in set_FL_CH                      ;
 	export SourceIsGA_CH                      (string  sr) := sr               in set_GA_CH                      ;
 	export SourceIsPA_CH                      (string  sr) := sr               in set_PA_CH                      ;
@@ -2200,6 +2206,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsDunn_Bradstreet            (string  sr) := sr               in set_Dunn_Bradstreet            ;
 	export SourceIsDunn_Bradstreet_Fein       (string  sr) := sr               in set_Dunn_Bradstreet_Fein       ;
 	export SourceIsDunndata_Consumer          (string  sr) := sr               in set_Dunndata_Consumer          ;
+	export SourceIsDunn_Data_Email			      (string  sr) := sr               in set_Dunn_Data_Email			       ;
 	export SourceIsEBR                        (string  sr) := sr               in set_EBR                        ;
 	export SourceIsEdgar                      (string  sr) := sr               in set_Edgar                      ;
 	export SourceIsEmedon                     (string  sr) := sr               in set_Emdeon                     ;
@@ -2279,6 +2286,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsInfutor_NARB               (string  sr) := sr               in set_Infutor_NARB               ;
 	export SourceIsInfutorCID                 (string  sr) := sr               in set_InfutorCID 								 ;
 	export SourceIsInfutorNARC                (string  sr) := sr               in set_InfutorNarc								 ;
+  export SourceIsInfutorNARC3               (string  sr) := sr               in set_infutor_narc3              ;
 	export SourceIsInfutorNARE								(string	 sr) := sr							 in set_InfutorNare                ;
 	export SourceIsIngenix_Sanctions          (string  sr) := sr               in set_Ingenix_Sanctions          ;
 	export SourceIsInquiryAcclogs             (string  sr) := sr               in set_InquiryAcclogs             ;
@@ -2606,6 +2614,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_CNLD_Practitioner         ,'CNLD Practitioner'                                         }
 		,{src_Correctional_Facilities   ,'Correctional Facilities - Internal'					               }
 		,{src_Cortera		                ,'Cortera'                                                   }
+		,{src_Cortera_Tradeline         ,'Cortera Tradeline'                                         }
 		,{src_FL_CH                     ,'FL CH'                                                     }
 		,{src_GA_CH                     ,'GA CH'                                                     }
 		,{src_PA_CH                     ,'PA CH'                                                     }
@@ -2731,6 +2740,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_Dunn_Bradstreet           ,'Dunn & Bradstreet'                                         }
 		,{src_Dunn_Bradstreet_Fein      ,'Dunn & Bradstreet Fein'                                    }
 		,{src_Dunndata_Consumer         ,'Dunn Data Consumer Masterfile'                             }
+		,{src_Dunn_Data_Email						,'Dunn Data Email Addresses'																 }
 		,{src_EBR                       ,'Experian Business Reports'                                 }
 		,{src_Edgar                     ,'Edgar'                                                     }
 		,{src_Emdeon                    ,'Emdeon Healthcare Claims'                                  }
@@ -2800,6 +2810,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_InfutorCID	 							,'Infutor CID - Phones'                                      }		
 	  ,{src_InfutorTRK	 							,'Infutor TRK - Name and Address Resource'                   }		
 		,{src_InfutorNarc	 							,'Infutor Narc  - Consumer Name and Address Resource'        }
+		,{src_infutor_narc3             ,'Infutor Narc3 Consumer'                                    }
 		,{src_InfutorNare								,'Infutor Nare	- Consumer Name and Email Resource'					 }
 		,{src_Ingenix_Sanctions         ,'Ingenix National Provider Sanctions'                       }
 		,{src_InquiryAcclogs            ,'Inquiry Tracking Account Logs'                             }
@@ -3114,6 +3125,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_CLIA		                   => 'Clinical Laboratory Improvement Amendments'
 		,src_Correctional_Facilities   => 'Correctional Facilities - Internal'
 		,src_Cortera                   => 'Cortera'
+		,src_Cortera_Tradeline         => 'Cortera Tradeline'
 		,src_FL_CH                     => 'FL CH'                                                
 		,src_GA_CH                     => 'GA CH'                                                
 		,src_PA_CH                     => 'PA CH'                                                
@@ -3240,7 +3252,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 //		,src_Daily_Utilities					 => 'Daily Utilities'																			
 		,src_Dunn_Bradstreet           => 'Dunn & Bradstreet'                                    
 		,src_Dunn_Bradstreet_Fein      => 'Dunn & Bradstreet Fein'                               
-		,src_Dunndata_Consumer         => 'Dunn Data Consumer Masterfile'                               
+		,src_Dunndata_Consumer         => 'Dunn Data Consumer Masterfile'
+		,src_Dunn_Data_Email					 => 'Dunn Data Email Addresses'
 		,src_EBR                       => 'Experian Business Reports'                            
 		,src_Edgar                     => 'Edgar'                                                
 		,src_Emdeon                    => 'Emdeon Healthcare Claims'                                                
@@ -3310,6 +3323,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_InfutorCID	 							 => 'Infutor CID - Phones'                                 
 		,src_InfutorTRK	 							 => 'Infutor TRK - Name and Address Resource'              
 		,src_InfutorNarc	 						 => 'Infutor  Narc - Consumer Name and Address Resource'
+		,src_infutor_narc3             => 'Infutor Narc3 Consumer'
 		,src_InfutorNare							 => 'Infutor Nare - Consumer Name and Email Resource'
 		,src_Ingenix_Sanctions         => 'Ingenix National Provider Sanctions'                  
 		,src_InquiryAcclogs            => 'Inquiry Tracking Account Logs'                        

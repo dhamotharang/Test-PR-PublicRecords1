@@ -4,7 +4,7 @@
 IMPORT _control;
 
 //UTC is 5 hours ahead, so UTC: 17:01 = EST: 12:01
-DAILY_AT_NOON := '01 17 * * *';
+DAILY_AT_8AM_AND_NOON := '01 13,17 * * *';
 
 ecl:=
         'IMPORT header;\n'+
@@ -14,6 +14,6 @@ ecl:=
         'header.proc_deploy_ikb(emailList,rpt_qa_email_list)';
 
 
-_control.fSubmitNewWorkunit(ecl,'hthor_eclcc'):WHEN( CRON(DAILY_AT_NOON));  
+_control.fSubmitNewWorkunit(ecl,'hthor_eclcc'):WHEN( CRON(DAILY_AT_8AM_AND_NOON));  
 
 

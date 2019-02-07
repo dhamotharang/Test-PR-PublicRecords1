@@ -4,8 +4,8 @@ IMPORT B_Person_4,E_Customer,E_Person FROM KELOtto;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Person_3 := MODULE
   SHARED VIRTUAL TYPEOF(B_Person_4.__ENH_Person_4) __ENH_Person_4 := B_Person_4.__ENH_Person_4;
-  SHARED __EE42671 := __ENH_Person_4;
-  EXPORT __ST13340_Layout := RECORD
+  SHARED __EE43948 := __ENH_Person_4;
+  EXPORT __ST14617_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.nint Lex_Id_;
@@ -88,15 +88,15 @@ EXPORT B_Person_3 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST13340_Layout __ND42514__Project(B_Person_4.__ST13669_Layout __PP40949) := TRANSFORM
-    __BS42500 := __T(__PP40949.Reported_Date_Of_Birth_);
-    SELF.Deceased_Dob_Match_ := MAP(EXISTS(__BS42500(__T(__OP2(__PP40949.Deceased_Date_Of_Birth_,=,__T(__PP40949.Reported_Date_Of_Birth_).Date_Of_Birth_))))=>1,0);
-    __BS42518 := __T(__PP40949.Full_Name_);
-    SELF.Deceased_Name_Match_ := MAP(EXISTS(__BS42518(__T(__AND(__OP2(__T(__PP40949.Full_Name_).First_Name_,=,__PP40949.Deceased_First_),__OP2(__T(__PP40949.Full_Name_).Last_Name_,=,__PP40949.Deceased_Last_)))))=>1,0);
-    SELF.High_Risk_Death_Prior_To_All_Events_ := MAP(__T(__AND(__CN(__PP40949.Death_Prior_To_All_Events_ = 1),__OP2(__PP40949.Max_Deceased_To_Event_Diff_,<,__CN(-4))))=>1,0);
-    SELF.Vl_Event30_Active_Flag_ := MAP(__PP40949.Vl_Event30_Count_ > 0=>1,0);
-    SELF.Vl_Event7_Active_Flag_ := MAP(__PP40949.Vl_Event7_Count_ > 0=>1,0);
-    SELF := __PP40949;
+  SHARED __ST14617_Layout __ND43791__Project(B_Person_4.__ST14946_Layout __PP42226) := TRANSFORM
+    __BS43777 := __T(__PP42226.Reported_Date_Of_Birth_);
+    SELF.Deceased_Dob_Match_ := MAP(EXISTS(__BS43777(__T(__OP2(__PP42226.Deceased_Date_Of_Birth_,=,__T(__PP42226.Reported_Date_Of_Birth_).Date_Of_Birth_))))=>1,0);
+    __BS43795 := __T(__PP42226.Full_Name_);
+    SELF.Deceased_Name_Match_ := MAP(EXISTS(__BS43795(__T(__AND(__OP2(__T(__PP42226.Full_Name_).First_Name_,=,__PP42226.Deceased_First_),__OP2(__T(__PP42226.Full_Name_).Last_Name_,=,__PP42226.Deceased_Last_)))))=>1,0);
+    SELF.High_Risk_Death_Prior_To_All_Events_ := MAP(__T(__AND(__CN(__PP42226.Death_Prior_To_All_Events_ = 1),__OP2(__PP42226.Max_Deceased_To_Event_Diff_,<,__CN(-4))))=>1,0);
+    SELF.Vl_Event30_Active_Flag_ := MAP(__PP42226.Vl_Event30_Count_ > 0=>1,0);
+    SELF.Vl_Event7_Active_Flag_ := MAP(__PP42226.Vl_Event7_Count_ > 0=>1,0);
+    SELF := __PP42226;
   END;
-  EXPORT __ENH_Person_3 := PROJECT(__EE42671,__ND42514__Project(LEFT));
+  EXPORT __ENH_Person_3 := PROJECT(__EE43948,__ND43791__Project(LEFT));
 END;

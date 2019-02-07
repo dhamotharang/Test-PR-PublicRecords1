@@ -1,5 +1,5 @@
-//Executable code
-EXPORT Proc_Iterate(STRING iter,DATASET(Layout_Base) InFile0 = BIPV2_Seleid_Relative.In_Base,STRING OutFileNameP = '~temp::Seleid::BIPV2_Seleid_Relative::it',UNSIGNED MatchThreshold = Config.MatchThreshold,BOOLEAN Debugging = true) := MODULE
+﻿//Executable code
+EXPORT Proc_Iterate(STRING iter,DATASET(Layout_Base) InFile0 = BIPV2_Seleid_Relative.In_Base,string pversion = BIPV2_Seleid_Relative.KeyInfix/*HACK TO ADD PVERSION*/,STRING OutFileNameP = '~temp::Seleid::BIPV2_Seleid_Relative::it',UNSIGNED MatchThreshold = Config.MatchThreshold,BOOLEAN Debugging = true) := MODULE
 SHARED InFile := InFile0;
 SHARED MM := BIPV2_Seleid_Relative.matches(InFile,MatchThreshold); // Get the matching module
 OSR := OUTPUT(CHOOSEN(MM.MatchSampleRecords,10000),NAMED('MatchSampleRecords'));
@@ -29,15 +29,13 @@ EXPORT ExecutionStats := PARALLEL(OS,SpcS,PRPP,PPP,PRPPS,PPPS,MP,SP,RE,CB,MPPA,M
 d := DATASET([{MM.PatchingError0,MM.DuplicateRids0,COUNT(BIPV2_Seleid_Relative.match_candidates(InFile).Unlinkables)}],{INTEGER PatchingError0, INTEGER DuplicateRids0, UNSIGNED UnlinkableRecords0});
 EXPORT ValidityStats := PARALLEL( OUTPUT(d,NAMED('ValidityStatistics')), OUTPUT(MM.PostIds.Advanced0,NAMED('IdConsistency0')));
 EXPORT InputValidityStats := OUTPUT(MM.PreIds.Advanced0,NAMED('InputIdConsistency0'));
-EXPORT DebugKeys := Keys(InFile).BuildAll;
-Rel8 := BUILDINDEX(keys(InFile).ASSOC ,BIPV2_Seleid_Relative.keynames(BIPV2_Seleid_Relative.KeyInfix).assoc.logical,OVERWRITE);
-EXPORT RelationshipKeys := PARALLEL(Rel8); // Build the relationship keys
+EXPORT DebugKeys := Keys(InFile,pversion/*HACK PASS IN PVERSION TO KEYS*/).BuildAll;
 EXPORT OutputFileName := OutFileNameP+iter;
 EXPORT OutputFile := OUTPUT(MM.patched_infile,,OutputFileName,COMPRESSED);// Change file for each iteration
 EXPORT OutputFileA := OUTPUT(MM.patched_infile,,OutputFileName,OVERWRITE,COMPRESSED);// Change file for each iteration
 SHARED ChangeName := '~temp::Seleid::BIPV2_Seleid_Relative::changes_it'+iter;
-EXPORT OutputChanges := SEQUENTIAL( OUTPUT(MM.IdChanges,,ChangeName,OVERWRITE,COMPRESSED),FileServices.AddSuperFile(Keys(InFile).MatchHistoryName,ChangeName));
-EXPORT OutputChangesA := SEQUENTIAL( FileServices.RemoveSuperFile(BIPV2_Seleid_Relative.Keys(InFile).MatchHistoryName,ChangeName),OUTPUT(MM.IdChanges,,ChangeName,OVERWRITE,COMPRESSED),FileServices.AddSuperFile(BIPV2_Seleid_Relative.Keys(InFile).MatchHistoryName,ChangeName));
+EXPORT OutputChanges := SEQUENTIAL( OUTPUT(MM.IdChanges,,ChangeName,OVERWRITE,COMPRESSED),FileServices.AddSuperFile(Keys(InFile,pversion/*HACK PASS IN PVERSION TO KEYS*/).MatchHistoryName,ChangeName));
+EXPORT OutputChangesA := SEQUENTIAL( FileServices.RemoveSuperFile(BIPV2_Seleid_Relative.Keys(InFile,pversion/*HACK PASS IN PVERSION TO KEYS*/).MatchHistoryName,ChangeName),OUTPUT(MM.IdChanges,,ChangeName,OVERWRITE,COMPRESSED),FileServices.AddSuperFile(BIPV2_Seleid_Relative.Keys(InFile,pversion/*HACK PASS IN PVERSION TO KEYS*/).MatchHistoryName,ChangeName));
 //EXPORT LoopN(UNSIGNED N,UNSIGNED mt=Config.MatchThreshold) := LOOP(InFile,N,BIPV2_Seleid_Relative.matches(ROWS(LEFT),mt).patched_infile); // Loop N times
 //EXPORT LoopThisN(d,N,mt=Config.MatchThreshold,ThinLoop=FALSE) := FUNCTIONMACRO
 //	IMPORT BIPV2_Seleid_Relative;
@@ -55,8 +53,7 @@ EXPORT OutputChangesA := SEQUENTIAL( FileServices.RemoveSuperFile(BIPV2_Seleid_R
 //		RETURN JOIN(d, LOOP(PROJECT(d,BIPV2_Seleid_Relative.Layout_Base),COUNTER<=NMax AND COUNT(DEDUP(ROWS(LEFT),Seleid,ALL))>K,BIPV2_Seleid_Relative.matches(ROWS(LEFT),0).patched_infile), LEFT.rcid=RIGHT.rcid, TRANSFORM(RECORDOF(LEFT),SELF:=RIGHT,SELF:=LEFT), KEEP(1), SMART);
 //	#END
 //ENDMACRO;
-SHARED LinkPhase(BOOLEAN again) := SEQUENTIAL(PARALLEL(RelationshipKeys,OutputSamples,ExecutionStats,ValidityStats/*,IF(again,OutputFileA,OutputFile),IF(again,OutputChangesA,OutputChanges)*//*HACK*/ ),IF(Debugging,DebugKeys));
-
+SHARED LinkPhase(BOOLEAN again) := SEQUENTIAL(PARALLEL(Keys(InFile,pversion/*HACK PASS IN PVERSION TO KEYS*/).RelationshipKeys,OutputSamples,ExecutionStats,ValidityStats/*,IF(again,OutputFileA,OutputFile),IF(again,OutputChangesA,OutputChanges)*//*HACK*/ ),IF(Debugging,DebugKeys));
 EXPORT DoAll := LinkPhase(FALSE);
 EXPORT DoAllAgain := LinkPhase(TRUE);
 END;
