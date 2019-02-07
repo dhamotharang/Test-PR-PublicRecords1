@@ -130,7 +130,7 @@ Suppress.MAC_Suppress(%Fetch3a%,%Fetch3b%,%appType%,Suppress.Constants.LinkTypes
 #uniquename(Fetch3e0)
 #uniquename(Fetch3e)
 %Fetch3e0% := Header.FilterDMVInfo(%Fetch3d%);
-%Fetch3e% := if(%suppressDMVInfo% and modAccess.isConsumer () and ~isFCRA, %Fetch3e0%, %Fetch3d%);
+%Fetch3e% := if(%suppressDMVInfo% and ~modAccess.isConsumer () and ~isFCRA, %Fetch3e0%, %Fetch3d%);
 
 outfile := %Fetch3e%(glb_ok or ~glb);
 

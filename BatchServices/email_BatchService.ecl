@@ -14,7 +14,7 @@
 IMPORT BatchShare, BatchServices, Royalty, ut;
 
 EXPORT Email_BatchService(useCannedRecs = 'false') := MACRO
-	#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+	#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	#WEBSERVICE(FIELDS('DPPAPurpose', 'GLBPurpose', 'ApplicationType', 'batch_in', 'IndustryClass' , 'MaxResults', 'max_results_per_acct', 'ReturnDetailedRoyalties', 'UseDMEmailSourcesOnly'));
 	
 	ds_xml_in := DATASET([], BatchServices.Layouts.Email.rec_batch_email_input) : STORED('batch_in', FEW);

@@ -38,7 +38,8 @@ EXPORT PhoneFinderBatchService :=
 MACRO
 
 	IMPORT AutoStandardI,Gateway,PhoneFinder_Services;
-	 #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+	 #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+   #stored('useOnlyBestDID',true); // used to determine the 1 "best" did for the input criteria
 	// Batch input request
 	dBatchReq := DATASET([],PhoneFinder_Services.Layouts.BatchIn) : STORED('BatchRequest');
 
