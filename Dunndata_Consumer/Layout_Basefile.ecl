@@ -41,7 +41,7 @@ EXPORT Layout_Basefile := RECORD
 		STRING100	persistent_record_id;
 		UNSIGNED8 rcid;
 		//New fields added for CCPA
-		unsigned4 GlobalSourceId;
-		unsigned8 SourceSpecificRecordId;
+		unsigned4 global_sid;
+		unsigned8 record_sid;
 
 END;

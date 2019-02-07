@@ -1,4 +1,4 @@
-export File_In_Country := Dataset([
+﻿export File_In_Country := Dataset([
 	{'1','Afghanistan','4','','1'},
 	{'2','Aland Islands','3','','1'},
 	{'3','Albania','3','','1'},
@@ -66,6 +66,7 @@ export File_In_Country := Dataset([
 	{'64','Equatorial Guinea','1','','1'},
 	{'65','Eritrea','1','','1'},
 	{'66','Estonia','3','','1'},
+	{'204','Eswatini','1','','1'},
 	{'67','Ethiopia','1','','1'},
 	{'68','Falkland Islands','6','','1'},
 	{'69','Faroe Islands','3','','1'},
@@ -203,7 +204,7 @@ export File_In_Country := Dataset([
 	{'201','Sudan','1','','1'},
 	{'202','Suriname','6','','1'},
 	{'203','Svalbard','3','','1'},
-	{'204','Swaziland','1','','1'},
+	
 	{'205','Sweden','3','','1'},
 	{'206','Switzerland','3','','1'},
 	{'207','Syria','4','','1'},
@@ -241,6 +242,6 @@ export File_In_Country := Dataset([
 	{'239','Zimbabwe','1','','1'},
 	{'240','Cocos (Keeling) Island','2','','1'},
 	{'241','Sint Maarten','5','','1'},
-	{'242','CuraÃ§ao','5','','1'},
+	{'242','Curaçao','5','','1'},
 	{'243','South Sudan','1','','1'}],
 	{string5 Country_id, String50 Country, String1 Region_id, String1 x, String5 Group_id});
