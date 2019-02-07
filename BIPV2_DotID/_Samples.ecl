@@ -1,4 +1,4 @@
-import BIPV2_DOTID, SALTTOOLS30;
+﻿import BIPV2_DOTID, tools,bipv2;
 export _Samples(dataset(BIPV2_DOTID.Layout_DOT)ih=BIPV2_DOTID.In_DOT) := module
 		
 	export BasicSamp := module
@@ -10,14 +10,14 @@ export _Samples(dataset(BIPV2_DOTID.Layout_DOT)ih=BIPV2_DOTID.In_DOT) := module
 		export out := OUTPUT(BasicMatchSampleRecords,NAMED('BasicMatchSampleRecords'),ALL);
 	end;
 	export ReviewSamples := module
-		shared psetReviewers					:= ['CM','LB','DW','AL','HS'];
+		shared psetReviewers					:= BIPV2._Config.Set_Sample_Reviewers;
 		shared pNumSamplesPerReviewer	:= 20;
 		// shared ConfThreshold					:= '39';
 		shared ConfThreshold					:= BIPV2_DOTID.Config.MatchThreshold;
 		shared kmtch									:= BIPV2_DOTID.Keys(ih).MatchSample;
 		shared kcand									:= BIPV2_DOTID.Keys(ih).Candidates;
 		// export out										:= BIPV2_DOTID.mac_GetSALTReviewSamples(kmtch,kcand,BIPV2_DOTID.In_DOT,dotid,ConfThreshold,pNumSamplesPerReviewer,psetReviewers);
-		export out										:= SALTTOOLS30.MAC_GetSALTReviewSamples(kmtch,kcand,BIPV2_DOTID.In_DOT,dotid,ConfThreshold,pNumSamplesPerReviewer,psetReviewers);
+		export out										:= Tools.mac_GetSALTReviewSamples(kmtch,kcand,BIPV2_DOTID.In_DOT,dotid,ConfThreshold,pNumSamplesPerReviewer,psetReviewers);
 	end;
 	export out := parallel(ReviewSamples.out, BasicSamp.out);
 	

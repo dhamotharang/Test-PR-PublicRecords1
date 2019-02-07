@@ -820,7 +820,34 @@ SALT311.MAC_Choose_JoinType(non_null_atts,FilterPrimNames_nulls,FilterPrimNames_
 EXPORT FilterPrimNames_values_index := INDEX(FilterPrimNames_v,{Basis},{FilterPrimNames_v},FilterPrimNamesValuesIndexKeyName);
 EXPORT FilterPrimNames_values_persisted := FilterPrimNames_values_index;
  
-EXPORT BuildAttributes := PARALLEL(BUILDINDEX(SrcRidVlid_values_index, OVERWRITE),BUILDINDEX(ForeignCorpkey_values_index, OVERWRITE),BUILDINDEX(RAAddresses_values_index, OVERWRITE),BUILDINDEX(FilterPrimNames_values_index, OVERWRITE));
+  infile := file_underLink;
+ r := RECORD
+    Config.AttrValueType Basis := TRIM((SALT311.StrType)infile.UnderLinkId);
+    infile.UnderLinkId; // Easy way to get component values
+    INTEGER2 UnderLinkId_weight100 := 0; // Easy place to store weight
+    SALT311.UIDType Proxid := infile.ProxID;
+    UNSIGNED Basis_cnt := 0;
+    INTEGER2 Basis_weight100 := 0;
+  END;
+  t := TABLE(infile,r);
+SHARED UnderLinks_attributes := DEDUP( SORT( DISTRIBUTE( t, Proxid ), Proxid, Basis, LOCAL), Proxid, Basis, LOCAL) : PERSIST('~temp::Proxid::BIPV2_ProxID::values::UnderLinks',EXPIRE(BIPV2_ProxID.Config.PersistExpire));
+  SALT311.Mac_Specificity_Local(UnderLinks_attributes,Basis,Proxid,UnderLinks_nulls,Layout_Specificities.UnderLinks_ChildRec,UnderLinks_specificity,UnderLinks_switch,UnderLinks_values);
+EXPORT UnderLinks_max := MAX(UnderLinks_values,field_specificity);
+ 
+EXPORT UnderLinksValuesIndexKeyName := '~'+'key::BIPV2_ProxID::Proxid::Word::UnderLinks';
+  TYPEOF(UnderLinks_attributes) take(UnderLinks_attributes le,UnderLinks_values ri,BOOLEAN patch_default) := TRANSFORM
+    SELF.Basis_cnt := ri.cnt;
+    SELF.Basis_weight100 := ri.field_specificity*100;
+    SELF.UnderLinkId_weight100 := SELF.Basis_weight100 / 1;
+    SELF := le;
+  END;
+  non_null_atts := UnderLinks_attributes(Basis NOT IN SET(UnderLinks_nulls,Basis));
+SALT311.MAC_Choose_JoinType(non_null_atts,UnderLinks_nulls,UnderLinks_values,Basis,Basis_weight100,take,UnderLinks_v);
+ 
+EXPORT UnderLinks_values_index := INDEX(UnderLinks_v,{Basis},{UnderLinks_v},UnderLinksValuesIndexKeyName);
+EXPORT UnderLinks_values_persisted := UnderLinks_values_index;
+ 
+EXPORT BuildAttributes := PARALLEL(BUILDINDEX(SrcRidVlid_values_index, OVERWRITE),BUILDINDEX(ForeignCorpkey_values_index, OVERWRITE),BUILDINDEX(RAAddresses_values_index, OVERWRITE),BUILDINDEX(FilterPrimNames_values_index, OVERWRITE),BUILDINDEX(UnderLinks_values_index, OVERWRITE));
 EXPORT Layout_Uber_Plus := RECORD(SALT311.Layout_Uber_Record0)
   SALT311.Str30Type word;
 END;
@@ -891,7 +918,16 @@ Layout_Uber_Plus IntoInversion6(infileFilterPrimNames le,UNSIGNED2 c,UNSIGNED el
   SELF := le;
 END;
 afields6 := NORMALIZE(infileFilterPrimNames,1,IntoInversion6(LEFT,COUNTER))(word<>'');
-SHARED invert_records := nfields_r + nfields12 + nfields25 + afields0 + afields3 + afields5 + afields6;
+ 
+infileUnderLinks := file_underLink;
+Layout_Uber_Plus IntoInversion7(infileUnderLinks le,UNSIGNED2 c,UNSIGNED el=1) := TRANSFORM
+  SELF.word := CHOOSE(c,(SALT311.StrType)le.UnderLinkId,SKIP);
+  SELF.field := c+7+NumberBaseFields; // Field number is attr file + Fields from attr files + BaseFields
+  SELF.uid := le.ProxID;
+  SELF := le;
+END;
+afields7 := NORMALIZE(infileUnderLinks,1,IntoInversion7(LEFT,COUNTER))(word<>'');
+SHARED invert_records := nfields_r + nfields12 + nfields25 + afields0 + afields3 + afields5 + afields6 + afields7;
 uber_values_deduped0 := Fn_Reduce_UBER_Local( DISTRIBUTE(invert_records,HASH(uid)));
 // minimize otherwise required changes to the macros used by uber and specificities!
 Layout_Uber_Plus_Spec := RECORD(Layout_Uber_Plus AND NOT uid)
@@ -915,7 +951,7 @@ EXPORT uber_specificity := ol;
 EXPORT BuildAll := PARALLEL(BuildFields, BuildAttributes, BuildUber);
  
 EXPORT SpecIndexKeyName := '~'+'key::BIPV2_ProxID::Proxid::Specificities';
-iSpecificities := DATASET([{0,active_duns_number_specificity,active_duns_number_switch,active_duns_number_max,active_duns_number_nulls,active_enterprise_number_specificity,active_enterprise_number_switch,active_enterprise_number_max,active_enterprise_number_nulls,active_domestic_corp_key_specificity,active_domestic_corp_key_switch,active_domestic_corp_key_max,active_domestic_corp_key_nulls,hist_enterprise_number_specificity,hist_enterprise_number_switch,hist_enterprise_number_max,hist_enterprise_number_nulls,hist_duns_number_specificity,hist_duns_number_switch,hist_duns_number_max,hist_duns_number_nulls,hist_domestic_corp_key_specificity,hist_domestic_corp_key_switch,hist_domestic_corp_key_max,hist_domestic_corp_key_nulls,foreign_corp_key_specificity,foreign_corp_key_switch,foreign_corp_key_max,foreign_corp_key_nulls,unk_corp_key_specificity,unk_corp_key_switch,unk_corp_key_max,unk_corp_key_nulls,ebr_file_number_specificity,ebr_file_number_switch,ebr_file_number_max,ebr_file_number_nulls,company_fein_specificity,company_fein_switch,company_fein_max,company_fein_nulls,cnp_name_specificity,cnp_name_switch,cnp_name_max,cnp_name_nulls,company_name_type_derived_specificity,company_name_type_derived_switch,company_name_type_derived_max,company_name_type_derived_nulls,cnp_number_specificity,cnp_number_switch,cnp_number_max,cnp_number_nulls,cnp_btype_specificity,cnp_btype_switch,cnp_btype_max,cnp_btype_nulls,company_phone_specificity,company_phone_switch,company_phone_max,company_phone_nulls,prim_name_derived_specificity,prim_name_derived_switch,prim_name_derived_max,prim_name_derived_nulls,sec_range_specificity,sec_range_switch,sec_range_max,sec_range_nulls,v_city_name_specificity,v_city_name_switch,v_city_name_max,v_city_name_nulls,st_specificity,st_switch,st_max,st_nulls,zip_specificity,zip_switch,zip_max,zip_nulls,prim_range_derived_specificity,prim_range_derived_switch,prim_range_derived_max,prim_range_derived_nulls,company_csz_specificity,company_csz_switch,company_csz_max,company_csz_nulls,company_addr1_specificity,company_addr1_switch,company_addr1_max,company_addr1_nulls,company_address_specificity,company_address_switch,company_address_max,company_address_nulls,dt_first_seen_specificity,dt_first_seen_switch,dt_first_seen_max,dt_first_seen_nulls,dt_last_seen_specificity,dt_last_seen_switch,dt_last_seen_max,dt_last_seen_nulls,SrcRidVlid_specificity,SrcRidVlid_switch,SrcRidVlid_max,SrcRidVlid_nulls,ForeignCorpkey_specificity,ForeignCorpkey_switch,ForeignCorpkey_max,ForeignCorpkey_nulls,RAAddresses_specificity,RAAddresses_switch,RAAddresses_max,RAAddresses_nulls,FilterPrimNames_specificity,FilterPrimNames_switch,FilterPrimNames_max,FilterPrimNames_nulls,uber_specificity,uber_switch,uber_max,uber_nulls}],Layout_Specificities.R);
+iSpecificities := DATASET([{0,active_duns_number_specificity,active_duns_number_switch,active_duns_number_max,active_duns_number_nulls,active_enterprise_number_specificity,active_enterprise_number_switch,active_enterprise_number_max,active_enterprise_number_nulls,active_domestic_corp_key_specificity,active_domestic_corp_key_switch,active_domestic_corp_key_max,active_domestic_corp_key_nulls,hist_enterprise_number_specificity,hist_enterprise_number_switch,hist_enterprise_number_max,hist_enterprise_number_nulls,hist_duns_number_specificity,hist_duns_number_switch,hist_duns_number_max,hist_duns_number_nulls,hist_domestic_corp_key_specificity,hist_domestic_corp_key_switch,hist_domestic_corp_key_max,hist_domestic_corp_key_nulls,foreign_corp_key_specificity,foreign_corp_key_switch,foreign_corp_key_max,foreign_corp_key_nulls,unk_corp_key_specificity,unk_corp_key_switch,unk_corp_key_max,unk_corp_key_nulls,ebr_file_number_specificity,ebr_file_number_switch,ebr_file_number_max,ebr_file_number_nulls,company_fein_specificity,company_fein_switch,company_fein_max,company_fein_nulls,cnp_name_specificity,cnp_name_switch,cnp_name_max,cnp_name_nulls,company_name_type_derived_specificity,company_name_type_derived_switch,company_name_type_derived_max,company_name_type_derived_nulls,cnp_number_specificity,cnp_number_switch,cnp_number_max,cnp_number_nulls,cnp_btype_specificity,cnp_btype_switch,cnp_btype_max,cnp_btype_nulls,company_phone_specificity,company_phone_switch,company_phone_max,company_phone_nulls,prim_name_derived_specificity,prim_name_derived_switch,prim_name_derived_max,prim_name_derived_nulls,sec_range_specificity,sec_range_switch,sec_range_max,sec_range_nulls,v_city_name_specificity,v_city_name_switch,v_city_name_max,v_city_name_nulls,st_specificity,st_switch,st_max,st_nulls,zip_specificity,zip_switch,zip_max,zip_nulls,prim_range_derived_specificity,prim_range_derived_switch,prim_range_derived_max,prim_range_derived_nulls,company_csz_specificity,company_csz_switch,company_csz_max,company_csz_nulls,company_addr1_specificity,company_addr1_switch,company_addr1_max,company_addr1_nulls,company_address_specificity,company_address_switch,company_address_max,company_address_nulls,dt_first_seen_specificity,dt_first_seen_switch,dt_first_seen_max,dt_first_seen_nulls,dt_last_seen_specificity,dt_last_seen_switch,dt_last_seen_max,dt_last_seen_nulls,SrcRidVlid_specificity,SrcRidVlid_switch,SrcRidVlid_max,SrcRidVlid_nulls,ForeignCorpkey_specificity,ForeignCorpkey_switch,ForeignCorpkey_max,ForeignCorpkey_nulls,RAAddresses_specificity,RAAddresses_switch,RAAddresses_max,RAAddresses_nulls,FilterPrimNames_specificity,FilterPrimNames_switch,FilterPrimNames_max,FilterPrimNames_nulls,UnderLinks_specificity,UnderLinks_switch,UnderLinks_max,UnderLinks_nulls,uber_specificity,uber_switch,uber_max,uber_nulls}],Layout_Specificities.R);
  
 EXPORT Specificities_Index := INDEX(iSpecificities,{1},{iSpecificities},SpecIndexKeyName);
 EXPORT BuildSpec := BUILDINDEX(Specificities_Index, OVERWRITE, FEW);
@@ -987,6 +1023,8 @@ SpcShiftR := RECORD
   INTEGER2 RAAddresses_switch_shift0 := ROUND(1000*Specificities[1].RAAddresses_switch - 196);
   INTEGER1 FilterPrimNames_shift0 := ROUND(Specificities[1].FilterPrimNames_specificity - 12);
   INTEGER2 FilterPrimNames_switch_shift0 := ROUND(1000*Specificities[1].FilterPrimNames_switch - 5);
+  INTEGER1 UnderLinks_shift0 := ROUND(Specificities[1].UnderLinks_specificity - 20);
+  INTEGER2 UnderLinks_switch_shift0 := ROUND(1000*Specificities[1].UnderLinks_switch - 0);
   END;
  
 EXPORT SpcShift := TABLE(Specificities,SpcShiftR);

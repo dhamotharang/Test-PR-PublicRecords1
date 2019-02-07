@@ -33,16 +33,24 @@ module
 	export Proxid_Persistence_Cluster_Stats     := tools.mod_FilenamesBuild(lfileprefix             + 'Proxid_Persistence_Cluster_Stats'  ,pversion);
 	export Seleid_Persistence_Record_Stats      := tools.mod_FilenamesBuild(lfileprefix             + 'Seleid_Persistence_Record_Stats'   ,pversion);
 	export Seleid_Persistence_Cluster_Stats     := tools.mod_FilenamesBuild(lfileprefix             + 'Seleid_Persistence_Cluster_Stats'  ,pversion);
+	export Powid_Persistence_Record_Stats       := tools.mod_FilenamesBuild(lfileprefix             + 'Powid_Persistence_Record_Stats'    ,pversion);
+	export Powid_Persistence_Cluster_Stats      := tools.mod_FilenamesBuild(lfileprefix             + 'Powid_Persistence_Cluster_Stats'   ,pversion);
+	export Empid_Persistence_Record_Stats       := tools.mod_FilenamesBuild(lfileprefix             + 'Empid_Persistence_Record_Stats'    ,pversion);
+	export Empid_Persistence_Cluster_Stats      := tools.mod_FilenamesBuild(lfileprefix             + 'Empid_Persistence_Cluster_Stats'   ,pversion);
 
   // -- Entity Stats
 	export Entity_Stats           := tools.mod_FilenamesBuild(lfileprefix + trim(pID) +       '_Entity_Stats'   ,pversion);
 	export Seleid_Entity_Stats    := tools.mod_FilenamesBuild(lfileprefix             + 'Seleid_Entity_Stats'   ,pversion);
 	export Proxid_Entity_Stats    := tools.mod_FilenamesBuild(lfileprefix             + 'Proxid_Entity_Stats'   ,pversion);
+	export Powid_Entity_Stats     := tools.mod_FilenamesBuild(lfileprefix             + 'Powid_Entity_Stats'    ,pversion);
+	export Empid_Entity_Stats     := tools.mod_FilenamesBuild(lfileprefix             + 'Empid_Entity_Stats'    ,pversion);
 
   // -- PostLink Stats
 	export PostLink_Stats           := tools.mod_FilenamesBuild(lfileprefix + trim(pID) +       '_PostLink_Stats'    ,pversion);
 	export Seleid_PostLink_Stats    := tools.mod_FilenamesBuild(lfileprefix             + 'Seleid_PostLink_Stats'    ,pversion);
 	export Proxid_PostLink_Stats    := tools.mod_FilenamesBuild(lfileprefix             + 'Proxid_PostLink_Stats'    ,pversion);
+	export Powid_PostLink_Stats     := tools.mod_FilenamesBuild(lfileprefix             + 'Powid_PostLink_Stats'     ,pversion);
+	export Empid_PostLink_Stats     := tools.mod_FilenamesBuild(lfileprefix             + 'Empid_PostLink_Stats'     ,pversion);
 
   export dall_filenames := 
       IngestStatsBySource               .dall_filenames
@@ -63,10 +71,18 @@ module
     + Proxid_Persistence_Cluster_Stats  .dall_filenames
     + Seleid_Persistence_Record_Stats   .dall_filenames
     + Seleid_Persistence_Cluster_Stats  .dall_filenames
+    + Powid_Persistence_Record_Stats    .dall_filenames
+    + Powid_Persistence_Cluster_Stats   .dall_filenames
+    + Empid_Persistence_Record_Stats    .dall_filenames
+    + Empid_Persistence_Cluster_Stats   .dall_filenames
     + Seleid_Entity_Stats               .dall_filenames
     + Proxid_Entity_Stats               .dall_filenames
+    + Powid_Entity_Stats                .dall_filenames
+    + Empid_Entity_Stats                .dall_filenames
     + Seleid_PostLink_Stats             .dall_filenames
     + Proxid_PostLink_Stats             .dall_filenames
+    + Powid_PostLink_Stats             .dall_filenames
+    + Empid_PostLink_Stats             .dall_filenames
     ;   
 
 end;

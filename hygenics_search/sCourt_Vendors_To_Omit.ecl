@@ -68,6 +68,7 @@
 '6R', // TEXAS_CHAMBERS_COUNTY                                                                               
 '6T', // OHIO_CLARK_COUNTY_COMMON_PLEAS_COURT                                                                
 '6Y', // OHIO_CUYAHOGA_COMMON_PLEAS_COURT                                                                    
+'7A', // SOUTH_CAROLINA_ADMINISTRATOR_OF_THE_COURTS                                                          
 '7J', // OHIO_MORROW_COUNTY_MUNICIPAL_COURT                                                                  
 '7N', // TEXAS_LAMAR_COUNTY                                                                                  
 '7O', // TEXAS_LAMAR_COUNTY_JUSTICE_OF_THE_PEACE_COURTS                                                      
@@ -107,6 +108,7 @@
 'BK', // ARKANSAS_WASHINGTON_COUNTY_ARRESTS                                                                  
 'BL', // ARIZONA_MARICOPA_COUNTY_ARRESTS                                                                     
 'BM', // ARIZONA_PIMA_COUNTY_ARRESTS                                                                         
+'BN', // CALIFORNIA_FRESNO_COUNTY_ARRESTS                                                                    
 'BO', // CALIFORNIA_KERN_COUNTY_ARRESTS                                                                      
 'BP', // CALIFORNIA_KINGS_COUNTY_ARRESTS                                                                     
 'BQ', // CALIFORNIA_LOS_ANGELES_COUNTY_ARRESTS                                                               
@@ -139,7 +141,6 @@
 'DT', // MAINE_DEPARTMENT_OF_CORRECTIONS                                                                     
 'DV', // MICHIGAN_DEPARTMENT_OF_CORRECTIONS                                                                  
 'DW', // MICHIGAN_DEPARTMENT_OF_CORRECTIONS_ALTERNATE_FILE                                                   
-'EA', // NEW_JERSEY_DEPARTMENT_OF_CORRECTIONS                                                                
 'EB', // NEW_MEXICO_DEPARTMENT_OF_CORRECTIONS                                                                
 'EC', // NEVADA_DEPARTMENT_OF_CORRECTIONS                                                                    
 'ED', // NEW_YORK_DEPARTMENT_OF_CORRECTIONS                                                                  
@@ -208,12 +209,15 @@
 'HY', // MICHIGAN_KENT_COUNTY_ARRESTS                                                                        
 'HZ', // MICHIGAN_WAYNE_COUNTY_ARRESTS                                                                       
 'IC', // IOWA_ADMINISTRATOR_OF_THE_COURTS                                                                    
+'IE', // MINNESOTA_DAKOTA_COUNTY_ARRESTS                                                                     
+'IF', // MINNESOTA_HENNEPIN_COUNTY_ARRESTS                                                                   
 'IG', // MINNESOTA_OLMSTED_COUNTY_ARRESTS                                                                    
 'IH', // MISSOURI_CLAY_COUNTY_ARRESTS                                                                        
 'II', // MISSOURI_ST_FRANCOIS_COUNTY_ARRESTS                                                                 
 'IJ', // MISSISSIPPI_HARRISON_COUNTY_ARRESTS                                                                 
 'IO', // MONTANA_MISSOULA_COUNTY_ARRESTS                                                                     
 'IP', // MONTANA_YELLOWSTONE_COUNTY_ARRESTS                                                                  
+'IQ', // NORTH_CAROLINA_CABARRUS_COUNTY_ARRESTS                                                              
 'IS', // NORTH_CAROLINA_DURHAM_COUNTY_ARRESTS                                                                
 'IT', // NORTH_CAROLINA_GUILFORD_COUNTY_ARRESTS                                                              
 'IU', // NORTH_CAROLINA_LINCOLN_COUNTY_ARRESTS                                                               
@@ -232,6 +236,7 @@
 'KH', // NEW_YORK_ONEIDA_COUNTY_ARRESTS                                                                      
 'KI', // NEW_YORK_ONONDAGA_COUNTY_ARRESTS                                                                    
 'KJ', // OHIO_FAYETTE_COUNTY_ARRESTS                                                                         
+'KK', // OHIO_GALLIA_COUNTY_ARRESTS                                                                          
 'KL', // OHIO_HAMILTON_COUNTY_ARRESTS                                                                        
 'KM', // OHIO_HIGHLAND_COUNTY_ARRESTS                                                                        
 'KN', // OHIO_LICKING_COUNTY_ARRESTS                                                                         
@@ -295,6 +300,7 @@
 'NU', // VIRGINIA_DANVILLE_POLICE_ARRESTS                                                                    
 'NW', // VIRGINIA_FAIRFAX_COUNTY_ARRESTS                                                                     
 'NZ', // WASHINGTON_COWLITZ_COUNTY_ARRESTS                                                                   
+'OB', // OHIO_SUMMIT_COUNTY_CUYAHOGA_FALLS_MUNICIPAL_COURT                                                   
 'OE', // OHIO_FRANKLIN_COUNTY_MUNICIPAL_COURT                                                                
 'OF', // OHIO_WARREN_COUNTY                                                                                  
 'OI', // OHIO_COLUMBIANA_COUNTY                                                                              
@@ -351,6 +357,7 @@
 'RP', // TENNESSEE_HAMILTON_COUNTY                                                                           
 'RQ', // TENNESSEE_RUTHERFORD_COUNTY                                                                         
 'RR', // SOUTH_CAROLINA_GREENVILLE_COUNTY                                                                    
+'RS', // SOUTH_CAROLINA_GREENVILLE_COUNTY_CURCUIT_COURTS                                                     
 'RT', // SOUTH_CAROLINA_GREENVILLE_COUNTY_SUMMARY_COURTS                                                     
 'RU', // SOUTH_CAROLINA_YORK_COUNTY                                                                          
 'SA', // SOUTH_CAROLINA_RICHLAND_COUNTY_CIRCUIT_COURTS                                                       
@@ -386,6 +393,7 @@
 'UZ', // MICHIGAN_OAKLAND_COUNTY                                                                             
 'VB', // VIRGINIA_ADMINISTRATOR_OF_THE_COURTS                                                                
 'VC', // MICHIGAN_SAGINAW_COUNTY                                                                             
+'VF', // NEVADA_CLARK_COUNTY_JUSTICE_COURTS                                                                  
 'VG', // NEW_MEXICO_BERNALILLO_COUNTY                                                                        
 'VI', // OHIO_ASHLAND_COUNTY                                                                                 
 'VJ', // OHIO_ASHTABULA_COUNTY                                                                               

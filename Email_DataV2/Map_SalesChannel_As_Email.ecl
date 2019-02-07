@@ -101,5 +101,5 @@ END;
 t_mappend_f := PROJECT(domain_d, t_map_to_common(left));
 
 
-RETURN t_mappend_f(~Entiera.fn_profanity(clean_email));
+RETURN t_mappend_f;//(~Entiera.fn_profanity(clean_email));
 END;

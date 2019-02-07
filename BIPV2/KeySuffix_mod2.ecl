@@ -72,8 +72,9 @@ end;
 // export constant_ThisBuild_versionDate := '20181101'; // S64
 // export constant_ThisBuild_versionDate := '20181101a'; // S64a
 // export constant_ThisBuild_versionDate := '20181203'; // S65
-export constant_ThisBuild_versionDate := '20190104'; // S66
-
+// export constant_ThisBuild_versionDate := '20190104'; // S66
+// export constant_ThisBuild_versionDate := '20190104a'; // S66a BH-429
+export constant_ThisBuild_versionDate := '20190201'; // S67 BH-554
 
 
 export ds :=
@@ -153,6 +154,8 @@ dataset([
 ,{  64, 'a',  '20181101a',  '20181101', '', '',         '',         'Ingested S64 base, BH-354. BH-580 -- BIP Build 64a - November 2018'}
 ,{  65, '' ,  '20181203',  '20181203', '', '',         '',         'Ingested S64a base, BH-520, BH-578,BH-584,BH-581. BH-483 -- BIP Build 65 - December 2018'}
 ,{  66, '' ,  '20190104',  '20190104', '', '',         '',         'Ingested S65 base, BH-590, BH-278,LBP-166. BH-553 -- BIP Build 66 - January 2019'}
+,{  66, 'a' , '20190104a',  '20190104', '', '',         '',        'no ingest, just adding keys and key layout change + new service. BH-591,BH-429, RR-14704 & RR-14739, BH-609 -- BIP Build 66 - January 2019a '}
+,{  67, '' ,  '20190201',  '20190201', '', '',         '',         'Ingested S66 base, BH-599,BH-586,BH-594,BH-606,BH-607,BH-597,BH-602,BH-605,BH-592. BH-554 -- BIP Build 67 - February 2019'}
 
 
 //						version,			ingest			ToThor			ToCertRox		ToProdRox		//these are not exact field names.  they just help w read and update.
