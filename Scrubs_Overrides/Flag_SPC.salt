@@ -1,0 +1,38 @@
+﻿OPTIONS:-gh 
+MODULE:Scrubs_Overrides
+FILENAME:Overrides
+NAMESCOPE:Flag
+
+FIELDTYPE:Invalid_FlagID:ALLOW(0123456789):LENGTHS(6..)
+FIELDTYPE:Invalid_Num:ALLOW(0123456789 )
+FIELDTYPE:Invalid_Letters:ALLOW(abcdefghijklmnopqrstuvwxyz_):LENGTHS(1..)
+FIELDTYPE:Invalid_OverrideFlag:ENUM(1|2|)
+FIELDTYPE:Invalid_Char:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz '.-)
+FIELDTYPE:Invalid_SSN:ALLOW(0123456789):LENGTHS(0,9)
+FIELDTYPE:Invalid_DOB:ALLOW(0123456789):LENGTHS(0,8)
+FIELDTYPE:Invalid_Date:CUSTOM(Scrubs.fn_valid_date>0)
+
+FIELD:flag_file_id:LIKE(Invalid_FlagID):TYPE(STRING20):0,0
+FIELD:did:LIKE(Invalid_Num):TYPE(STRING12):0,0
+FIELD:file_id:LIKE(Invalid_Letters):TYPE(STRING20):0,0
+FIELD:record_id:TYPE(STRING100):0,0
+FIELD:override_flag:LIKE(Invalid_OverrideFlag):TYPE(STRING1):0,0
+FIELD:in_dispute_flag:TYPE(STRING1):0,0
+FIELD:consumer_statement_flag:TYPE(STRING1):0,0
+FIELD:fname:LIKE(Invalid_Char):TYPE(STRING30):0,0
+FIELD:mname:LIKE(Invalid_Char):TYPE(STRING30):0,0
+FIELD:lname:LIKE(Invalid_Char):TYPE(STRING30):0,0
+FIELD:name_suffix:LIKE(Invalid_Char):TYPE(STRING10):0,0
+FIELD:ssn:LIKE(Invalid_SSN):TYPE(STRING9):0,0
+FIELD:dob:LIKE(Invalid_DOB):TYPE(STRING8):0,0
+FIELD:riskwise_uid:LIKE(Invalid_Num):TYPE(STRING20):0,0
+FIELD:user_added:TYPE(STRING30):0,0
+FIELD:date_added:LIKE(Invalid_Date):TYPE(STRING8):0,0
+FIELD:known_missing:TYPE(STRING1):0,0
+FIELD:user_changed:TYPE(STRING30):0,0
+FIELD:date_changed:TYPE(STRING8):0,0
+FIELD:lf:TYPE(STRING1):0,0
+// CONCEPT statements should be used to group together interellated fields; such as address
+// RELATIONSHIP is used to find non-obvious relationships between the clusters
+// SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+// LINKPATH is used to define access paths for external linking

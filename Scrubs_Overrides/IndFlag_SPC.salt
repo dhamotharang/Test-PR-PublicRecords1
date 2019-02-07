@@ -1,0 +1,10 @@
+﻿OPTIONS:-gh 
+MODULE:Scrubs_Overrides
+FILENAME:Overrides
+NAMESCOPE:IndFlag
+SOURCEFIELD:Key_Ind
+
+FIELDTYPE:Invalid_FlagID:ALLOW(0123456789):LENGTHS(6..)
+
+FIELD:Key_Ind:TYPE(STRING50):0,0
+FIELD:flag_file_id:LIKE(Invalid_FlagID):TYPE(STRING20):0,0
