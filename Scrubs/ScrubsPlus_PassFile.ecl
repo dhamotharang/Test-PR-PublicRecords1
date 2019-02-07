@@ -19,8 +19,6 @@ IMPORT tools,std,ut,SALT311;
 	EyeballSomeErrors	:=	OUTPUT(CHOOSEN(U.AllErrors, 1000), NAMED(Prefix+'_EyeballSomeErrors'));		//	Just eyeball some errors
 	SomeErrorValues		:=	OUTPUT(CHOOSEN(U.BadValues, 1000), NAMED(Prefix+'_SomeErrorValues'));			//	See my error field values
 	
-	if(count(infile)=0,sequential(output('No Records Found in '+Prefix,named('No_Record_Alert_'+Prefix)),
-																if(EmailList<>'',fileservices.sendEmail(emailList,'No Records Found in '+Prefix,'No Records Found in '+Prefix))));
 	
 	
 	LoadStats					:=	U.OrbitStats(); 
@@ -120,7 +118,9 @@ IMPORT tools,std,ut,SALT311;
 	new_entry:=dataset([{DatasetName,ProfileName,scopename,filedate,TotalRecs,NumRules,NumFailedRules,NumExceedThreshold,NumExceedSevere,ErroredRecords,TotalRemovedRecs,PcntErroredRec,workunit}],Scrubs.Layouts.LogRecord);
 	outnew:=output(new_entry);
 
-	EmailReport:=if(emailList <>'' , fileservices.sendEmail(emailList,
+	EmailReport:=if(count(infile)=0,sequential(output('No Records Found in '+profilename,named('No_Record_Alert_'+Prefix)),
+																			if(emailList <>'' ,fileservices.sendEmail(emailList,'No Records Found in '+profilename,'No Records Found in '+profilename)))
+																			,if(emailList <>'' ,fileservices.sendEmail(emailList,
 																			'Scrubs Plus Reporting '+ProfileName,
 																			'Scrubs Plus Reporting\n\n'+
 																			'DatasetName:'+DatasetName+'\n'+
@@ -135,7 +135,7 @@ IMPORT tools,std,ut,SALT311;
 																			'Total Number of Errored Records:'+ErroredRecords+'\n'+
 																			'Percent Errored Records:'+PcntErroredRec+'\n'+
 																			'Total Number of Removed Recs:'+TotalRemovedRecs+'\n'+
-																			'Workunit:'+tools.fun_GetWUBrowserString()+'\n'));
+																			'Workunit:'+tools.fun_GetWUBrowserString()+'\n')));
 																			
 	#IF(SubmitInWu = true)
 	SubmitStats						:=	Scrubs.OrbitProfileStatsPost310(profilename,'ScrubsAlerts',Orbit_stats,filedate,profilename).SubmitStatsInWU;
