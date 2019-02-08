@@ -66,12 +66,13 @@
 IMPORT AutoStandardI, Autokey_batch, BatchShare, BatchServices, Doxie, header, Suppress;
 
 EXPORT EROBatchService := MACRO
-  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 		boolean useCannedRecs := false;
 	 
 	  //Defaults to use
 		#stored('SSNTypos',TRUE);
 		#stored('IncludeNonDMVSources',TRUE);
+    #stored('useOnlyBestDID',true); // used to determine the 1 "best" did for the input criteria
 		boolean GetSSNBest := TRUE  : STORED('GetSSNBest');
 		
   	ds_xml_in_raw  	:= DATASET([], ERO_Services.Layouts.BatchIn) : STORED('batch_in', FEW);

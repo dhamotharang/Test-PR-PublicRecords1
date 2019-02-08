@@ -12,7 +12,7 @@
 */
 
 EXPORT BusinessLocationConfirmation_BatchService := MACRO
- #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	// Layout of input data
 	in_layout := BatchServices.BusinessLocationConfirmation_BatchService_Layouts.Input;
 	

@@ -57,7 +57,7 @@
 import address, autokey_batch, doxie, DidVille, ut, risk_indicators, AutoStandardI, Royalty, VehicleV2_Services;
 
 export RealTime_Batch_Service_V2 := macro
- #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	inputData := DATASET([], VehicleV2_Services.Batch_Layout.RealTime_InLayout_V2) : STORED('batch_in',FEW);
 	
 	STRING1 sBIPFetchLevel := BIPV2.IDconstants.Fetch_Level_SELEID	 : STORED('BIPFetchLevel');

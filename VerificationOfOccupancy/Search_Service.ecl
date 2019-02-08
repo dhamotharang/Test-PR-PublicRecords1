@@ -11,7 +11,7 @@
 IMPORT Address, AutoStandardI, iesp, Risk_indicators, Riskwise, ut, STD, Inquiry_AccLogs, Risk_Reporting;
 
 EXPORT Search_Service() := MACRO
- #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	#constant('OnlyReturnSuccessfullyCleanedAddresses',true);
 
 	/* Force layout of WsECL page */

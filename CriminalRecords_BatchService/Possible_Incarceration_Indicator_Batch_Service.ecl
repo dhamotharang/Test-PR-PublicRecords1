@@ -24,7 +24,7 @@
 IMPORT AutoStandardI, BatchShare, CriminalRecords_BatchService,ut;
 
 EXPORT Possible_Incarceration_Indicator_Batch_Service() := MACRO
-	#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+	#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	gm := AutoStandardI.GlobalModule();
 	BOOLEAN match_name     			:= FALSE : STORED('Match_Name');
 	BOOLEAN match_addr  				:= FALSE : STORED('Match_Street_Address');     
