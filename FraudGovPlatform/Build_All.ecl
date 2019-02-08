@@ -31,7 +31,7 @@ module
 	shared SkipPiiBuild := SkipModules[1].SkipPiiBuild;
 	shared SkipKelBuild := SkipModules[1].SkipKelBuild;
 	shared SkipOrbitBuild := SkipModules[1].SkipOrbitBuild;
-	shared SkipDashboardsBuild := SkipModules[1].SkipDashboardsBuild; 
+	shared SkipDashboardsBuild := SkipModules[1].SkipDashboardsBuild;
 
 	// Modules
 	export Run_MBS := FraudGovPlatform_Validation.SprayMBSFiles( pversion := pVersion[1..8] );
@@ -39,6 +39,7 @@ module
 	export Run_Deltabase := FraudGovPlatform_Validation.SprayAndQualifyDeltabase(pversion);
 	export Run_Inputs := Build_Input(pversion, MBS_File, SkipModules).All;	
 	export Run_Base := Build_Base(pversion, MBS_File).All;
+	export Run_GarbageCollector := Garbage_Collector.Run;
 	// --
 	export Run_Rollback := if(SkipBaseRollback=false,Rollback('',Test_Build,Test_RecordID,Test_RinID).All);
 	// --
@@ -50,6 +51,8 @@ module
 	export Run_Orbit := if(SkipOrbitBuild=false, Orbit3.proc_Orbit3_CreateBuild_AddItem('FraudGov',pversion)); //Create Orbit Builds
 	export Run_Dashboards := if(SkipDashboardsBuild=false,FraudGovPlatform_Analytics.GenerateDashboards(pRunProd,pUseProdData));
 	export Set_Version := FraudgovInfo(pversion,'Keys_Completed').SetPreviousVersion;
+
+	export promote_sprayed_files := promote(pversion).promote_sprayed_files;
 	
 //	export dops_update := RoxieKeyBuild.updateversion('IdentityDataKeys', pversion, _Control.MyInfo.EmailAddressNotify,,'N'); 															
 	
@@ -80,6 +83,8 @@ module
 		,Run_Orbit
 		// Build Dashboards
 		,Run_Dashboards
+		// Delete / Archive temp & unused files.
+		,Run_GarbageCollector		
 		// Complete and set version
 		,Set_Version	
 					
@@ -94,9 +99,12 @@ module
 	export Build_Fraudgov_Keys :=
 	if(tools.fun_IsValidVersion(pversion),
 		if( Test_Build = 'Passed' and  Test_RecordID = 'Passed' and Test_RinID = 'Passed',
-			// If Base is valid then Build Keys
-			if(SkipKeysPortion=false, 
-				keys_portion), 
+			sequential(
+				// If Base is valid then Build Keys
+				  if(SkipKeysPortion=false, 
+					keys_portion)
+				, promote_sprayed_files
+			),
 			// else Rollback Base file
 			Run_Rollback)
 		,output('No Valid version parameter passed, skipping FraudGovPlatform.Build_Keys')

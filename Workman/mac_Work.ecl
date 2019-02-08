@@ -340,11 +340,14 @@ childrunner_ecl_code :=
   
   // -- check for failures
   check_for_failures := 
-    iff(
+    iff((
           (   get_child_wuid_state not in ['completed'] 
           and get_child_wuid_state not in ['completed']
-          ) 
+          )
        and not regexfind('(skip|move on)',get_Advice,nocase)
+       )
+       and pCompileOnly = false
+
           ,fail('Fail workunit because wuid ' + get_child_wuid + ' has/is ' + get_child_wuid_state + ' with the following error(s):\n' + get_child_wuid_errors)
     );
 

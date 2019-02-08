@@ -9,15 +9,15 @@ EXPORT proc_build_base_ingest(STRING pversion) := FUNCTION
 	//Populate ASL fields, and map major
 	new_data 							:= OKC_Student_List.Map_to_OKC_Base(new_candidates);
 	new_data_base					:= PROJECT(new_data, OKC_Student_List.Layout_Base.base);			//remove intermediate fields
-	new_data_base_major		:= OKC_Student_List.fnStandardizeMajor(new_data_base);
+	//new_data_base_major		:= OKC_Student_List.fnStandardizeMajor(new_data_base);
 	
 	//Remap college_major. The major lookup table is being updated continuously, thus we remap it every build.
 	current_base					:= File_OKC_Base;
-	current_base_major		:= OKC_Student_List.fnStandardizeMajor(current_base);
+	//current_base_major		:= OKC_Student_List.fnStandardizeMajor(current_base);
 	
 	//Use Machine generated INGEST function to populate rcid and rollup on raw data fields
 	// new_base							:= new_data_final + current_base;
-	ingestMod							:= OKC_Student_List.Ingest(FALSE,,current_base_major,new_data_base_major);
+	ingestMod							:= OKC_Student_List.Ingest(FALSE,,current_base,new_data_base);
 	new_base							:= ingestMod.AllRecords_NoTag;
 
 	//Map OKC major to ASL college_major and new_college_major
