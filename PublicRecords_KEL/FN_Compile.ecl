@@ -1,6 +1,6 @@
 ﻿//HPCC Systems KEL Compiler Version 0.11.6
 IMPORT KEL011 AS KEL;
-IMPORT Risk_Indicators;
+IMPORT Risk_Indicators,STD;
 IMPORT CFG_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL011.Null;
 EXPORT FN_Compile := MODULE
@@ -33,5 +33,12 @@ EXPORT FN_Compile := MODULE
     __IsNull := __NL(__PvariableName);
     __Value := (UNSIGNED8)Risk_Indicators.get_Build_date(variableName);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nkdate);
+  END;
+  EXPORT KEL.typ.nint FN_Edit_Distance(KEL.typ.nstr __Pfield1, KEL.typ.nstr __Pfield2) := FUNCTION
+    field1 := __T(__Pfield1);
+    field2 := __T(__Pfield2);
+    __IsNull := __NL(__Pfield1) OR __NL(__Pfield2);
+    __Value := STD.Str.EditDistance(field1,field2);
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nint);
   END;
 END;
