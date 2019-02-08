@@ -5,7 +5,7 @@ EXPORT Build_Input_KnownFraud(
 	,dataset(Layouts.OutputF.SkipModules) pSkipModules = FraudGovPlatform.Files().OutputF.SkipModules
 	,dataset(Layouts.Input.KnownFraud) KnownFraud_Sprayed =  files().Input.KnownFraud.sprayed	
 	,dataset(Layouts.Input.KnownFraud) ByPassed_KnownFraud_Sprayed = files().Input.ByPassed_KnownFraud.sprayed	
-	,boolean PSkipValidations = false
+	,boolean PSkipValidations = true
 ) :=
 module
 
@@ -33,9 +33,7 @@ module
 	
 	Functions.CleanFields(inKnownFraudUpdate ,inKnownFraudUpdateUpper); 
 	
-	max_uid := max(KnownFraud_Sprayed, KnownFraud_Sprayed.unique_id) :	global;
-
-	Layouts.Input.knownfraud tr(inKnownFraudUpdateUpper l, integer cnt) := transform
+	Layouts.Input.knownfraud tr(inKnownFraudUpdateUpper l) := transform
 		sub:=stringlib.stringfind(l.fn,'20',1);
 		sub2:=stringlib.stringfind(l.fn,'.dat',1)-6;
 		FileDate := (unsigned)l.fn[sub..sub+7];
@@ -62,13 +60,13 @@ module
 			,STD.Str.Contains( l.fn, 'SafeList', true) => 'SAFELIST'
 			,'UNKNOWN');
 		self.source_input := source_input;
-		SELF.unique_id := max_uid + cnt; 	
+		SELF.unique_id := (unsigned)l.customer_event_id; 	
 		self.Deltabase := 0;
 		self:=l;
 		self:=[];
 	end;
 
-	shared f1:=project(inKnownFraudUpdateUpper, tr(left, counter));
+	shared f1:=project(inKnownFraudUpdateUpper, tr(left));
 	
 
 	f1_errors:=f1
@@ -115,6 +113,7 @@ module
 	//Move only Valid Records
 	shared f1_dedup :=	join (	f1,
 							ByPassed_records,
+							left.Customer_Account_Number = right.Customer_Account_Number and
 							left.Unique_Id = right.Unique_Id,
 							TRANSFORM(Layouts.Input.knownfraud,SELF := LEFT),
 							left only);	

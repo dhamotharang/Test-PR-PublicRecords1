@@ -6,16 +6,16 @@ EXPORT Append_RID(
     
     max_rid := max(Previous_Build, Previous_Build.Record_ID) :	global;
 
-    Current_Build_Dist := distribute(FileBase,hash32(source + source_rec_id));
-    Previous_Build_Dist := distribute(Previous_Build,hash32(source + source_rec_id));
+    Current_Build_Dist := distribute(FileBase,hash32(Customer_ID + source_rec_id));
+    Previous_Build_Dist := distribute(Previous_Build,hash32(Customer_ID + source_rec_id));
     
     previous_RIDs  := 
         join(   Current_Build_Dist,
                 Previous_Build_Dist,
-                left.source = right.source
+                left.Customer_ID = right.Customer_ID
                 and left.source_rec_id = right.source_rec_id,
                 transform(	FraudShared.Layouts.Base.Main, 
-					self.record_id := if(	Left.source = Right.source and Left.source_rec_id = Right.source_rec_id, Right.record_id, 0); self := Left)	,
+					self.record_id := if(	Left.Customer_ID = Right.Customer_ID and Left.source_rec_id = Right.source_rec_id, Right.record_id, 0); self := Left)	,
                 left outer,
                 local);
 

@@ -5,7 +5,7 @@ EXPORT Build_Input_IdentityData(
 	,dataset(Layouts.OutputF.SkipModules) pSkipModules = FraudGovPlatform.Files().OutputF.SkipModules
 	,dataset(Layouts.Input.IdentityData) IdentityData_Sprayed =  files().Input.IdentityData.sprayed	
 	,dataset(Layouts.Input.IdentityData) ByPassed_IdentityData_Sprayed = files().Input.ByPassed_IdentityData.sprayed
-	,boolean PSkipValidations = false	 
+	,boolean PSkipValidations = true	 
 ) :=
 module
 
@@ -39,7 +39,7 @@ module
 
 	max_uid := max(IdentityData_Sprayed, IdentityData_Sprayed.unique_id) :	global;
 
-	Layouts.Input.IdentityData tr(inIdentityDataUpdateUpper l, integer cnt) := transform
+	Layouts.Input.IdentityData tr(inIdentityDataUpdateUpper l) := transform
 		sub:=stringlib.stringfind(l.fn,'20',1);
 		sub2:=stringlib.stringfind(l.fn,'.dat',1)-6;
 		FileDate := (unsigned)l.fn[sub..sub+7];
@@ -63,13 +63,13 @@ module
 		self.file_type := 3 ;
 		source_input := if (l.source_input = '', 'IDDT',l.source_input);
 		self.source_input := source_input;
-		SELF.unique_id := max_uid + cnt; 
+		SELF.unique_id := (unsigned)l.Transaction_ID_Number; 
 		self.Deltabase := 0;
 		self:=l;
 		self:=[];
 	end;
 
-	shared f1:=project(inIdentityDataUpdateUpper,tr(left, counter));
+	shared f1:=project(inIdentityDataUpdateUpper,tr(left));
 	
 	f1_errors:=f1
 		((	 
@@ -111,6 +111,7 @@ module
 	//Move only Valid Records
 	shared f1_dedup :=	join (	f1,
 							ByPassed_records,
+							left.Customer_Account_Number = right.Customer_Account_Number and
 							left.Unique_Id = right.Unique_Id,
 							TRANSFORM(Layouts.Input.IdentityData,SELF := LEFT),
 							left only);

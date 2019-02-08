@@ -14,8 +14,8 @@ module
 		self.process_date := (unsigned) l.ProcessDate, 
 		self.dt_first_seen := (unsigned) l.ProcessDate; 
 		self.dt_last_seen := (unsigned) l.ProcessDate;
-		self.dt_vendor_last_reported := (unsigned) l.ProcessDate; 
-		self.dt_vendor_first_reported := (unsigned) l.ProcessDate; 
+		self.dt_vendor_last_reported := (unsigned) l.FileDate; 
+		self.dt_vendor_first_reported := (unsigned) l.FileDate; 
 		self.source_rec_id := l.unique_id;
 		self.current := 'C' ; 
 		self := l; 
@@ -55,7 +55,7 @@ module
 
 	pDataset_rollup := rollup( pDataset_sort
 		,RollupUpdate(left, right)
-		,source_rec_id, local);
+		,Customer_Account_Number,source_rec_id, local);
 
 	tools.mac_WriteFile(Filenames(pversion).Base.KnownFraud.New,pDataset_rollup,Build_Base_File);
 
