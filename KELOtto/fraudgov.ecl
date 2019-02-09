@@ -1,7 +1,8 @@
-﻿IMPORT Std, KELOtto, FraudShared;
+﻿IMPORT Std, KELOtto, FraudShared, Data_Services;
 #CONSTANT ('Platform','FraudGov');
 
 fraudgov_dataset_base_prep := PULL(FraudShared.files(,KELOtto.Constants.useOtherEnvironmentDali).base.Main.built);
+// fraudgov_dataset_base_prep := PULL(DATASET(IF(KELOtto.Constants.useProdData, Data_services.foreign_prod, data_services.foreign_dataland)+'fraudgov::base::built::Main', FraudShared.Layouts.Base.Main, thor));
  
 
 // Prep!!!
