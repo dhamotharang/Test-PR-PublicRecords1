@@ -293,7 +293,7 @@ function
 			pServerIP 															// SourceIP
 			,pDirectory + pFolderDate 							// SourceDirectory
 			,'ME*'+pInfolinkQtr+'.txt' 							// directory_filter
-			,980 																		// record_size
+			,1283 																		// record_size
 			,'~thor_data400::in::watercraft_me_'+pFolderDate+'_raw' // Thor_filename_template
 			,[ {'~thor_data400::in::watercraft_raw_me'}	]	// dSuperfilenames
 			,pGroupName 														// fun_Groupname
