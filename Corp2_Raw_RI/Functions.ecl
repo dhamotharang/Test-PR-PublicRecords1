@@ -1,4 +1,4 @@
-IMPORT corp2;
+﻿IMPORT corp2, lib_stringlib;
 
 EXPORT Functions := Module
 
@@ -379,5 +379,19 @@ EXPORT Functions := Module
 		return Country;
 		
 	End;
-	
-END;
+		
+  EXPORT GetNaicCode(string code) :=function
+
+		val        := corp2.t2u(code);
+		pos        := lib_stringlib.StringLib.StringFind(val,'-',1);
+
+		clean_val  := map(stringlib.stringfilterout(val,'ABCDEFGHIJKLMNOPQRSTUVWXYZ')      =''  =>'',		             //Blank all alpha char Ex:LLC
+											stringlib.stringfilterout(val,'09-')  										       =''  =>'',	              //Blank all 9's or all zero's  Ex:99999 ,00000	& won't be mapped from[9999-99,0000-0]		  
+											pos<>0 and stringlib.stringfilterout(val[1..pos-1],'0123456789') =''  =>val[1..pos-1],   //According to CI Ex: "2345-89", valid code is "2345" & dropping out "-89" 
+											stringlib.stringfilterout(val,'0123456789') 							       =''  =>val,	          // Map valid code 	       Ex:45673, 5632...etc	
+											'');
+		return clean_val;
+		
+	END;
+		
+End;

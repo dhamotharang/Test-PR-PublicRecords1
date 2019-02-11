@@ -1,4 +1,4 @@
-import ut, tools, Corp2_Mapping;
+﻿import ut, tools, Corp2_Mapping;
 
 EXPORT Files(STRING  pversion = '',
              BOOLEAN pUseOtherEnvironment = FALSE) := MODULE
@@ -27,7 +27,7 @@ EXPORT Files(STRING  pversion = '',
 		                     'CSV', , pQuote := '"', pTerminator := ['\r\n', '\n'], pSeparator := '\t', pHeading := 1);												 
 		
 		tools.mac_FilesInput(Filenames(pversion, pUseOtherEnvironment).Input.Inactive_Entities, Corp2_Raw_RI.Layouts.InActEntitiesIN, Inactive_Entities,
-   		                   'CSV', , pQuote := '"', pTerminator := ['\r\n', '\n'], pSeparator := '\t', pHeading := 1);	
+   		                   'CSV', , pQuote := '"', pTerminator := ['\r\n', '\n'], pSeparator := ',', pHeading := 1);	 //format change from vendor staring from 20181204
   
 		tools.mac_FilesInput(Filenames(pversion, pUseOtherEnvironment).Input.Inactive_amendments,	Corp2_Raw_RI.Layouts.amendmentsIn, Inactive_amendments,
 		                     'CSV', , pQuote := '"', pTerminator := ['\r\n', '\n'], pSeparator := '\t', pHeading := 1);

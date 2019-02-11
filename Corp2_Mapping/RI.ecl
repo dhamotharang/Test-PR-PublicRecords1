@@ -127,6 +127,7 @@ export RI := module
 																								 '');
 			self.corp_ra_addl_info              := if(corp2.t2u(l.IsAgentResigned) = 'Y', 'RESIGNED', '');
 			self.Corp_Agent_Status_Desc					:= if(corp2.t2u(l.IsAgentResigned) = 'Y', 'REGISTERED AGENT RESIGNED','');
+			self.corp_naic_code                 := Corp2_Raw_RI.Functions.GetNaicCode(l.NaicsCode);
 			//new vendor Country codes will be caught through scrubs!!
 			self.InternalField1									:= Corp2_Raw_RI.Functions.ForgnCountryDesc(l.CountryOfIncorp);
 			self.InternalField2									:= Corp2_Raw_RI.Functions.ForgnCountryDesc(l.BusinessCountry);
@@ -627,7 +628,8 @@ export RI := module
 						
 		//Validating the filedate entered is within 30 days					
 		isFileDateValid := if((string)std.date.today() between ut.date_math(filedate,-30) and ut.date_math(filedate,30),true,false);
-		result		 			:= if( isFileDateValid 
+		result		 			:= if(//isFileDateValid 
+		                       true
 													 ,mapRI
 													 ,sequential (corp2_mapping.Send_Email(state_origin,filedate).InvalidFileDateParm
 																				,FAIL('corp2_mapping.'+state_origin+' failed. An invalid filedate was passed in as a parameter.')
