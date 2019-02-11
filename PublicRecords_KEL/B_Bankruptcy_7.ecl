@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Bankruptcy FROM PublicRecords_KEL;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Bankruptcy_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Bankruptcy(__in,__cfg).__Result) __E_Bankruptcy := E_Bankruptcy(__in,__cfg).__Result;
-  SHARED __EE31801 := __E_Bankruptcy;
-  EXPORT __ST31316_Layout := RECORD
+  SHARED __EE32845 := __E_Bankruptcy;
+  EXPORT __ST32360_Layout := RECORD
     KEL.typ.nstr Source_Description_;
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr Filing_Type_;
@@ -31,13 +31,13 @@ EXPORT B_Bankruptcy_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST31309_Layout := RECORD
+  EXPORT __ST32353_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Court_Code_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Original_Case_Number_;
-    KEL.typ.ndataset(__ST31316_Layout) Records_;
+    KEL.typ.ndataset(__ST32360_Layout) Records_;
     KEL.typ.ndataset(E_Bankruptcy(__in,__cfg).Deadlines_Layout) Deadlines_;
     KEL.typ.ndataset(E_Bankruptcy(__in,__cfg).Case_Details_Layout) Case_Details_;
     KEL.typ.ndataset(E_Bankruptcy(__in,__cfg).Data_Sources_Layout) Data_Sources_;
@@ -45,14 +45,14 @@ EXPORT B_Bankruptcy_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST31309_Layout __ND32048__Project(E_Bankruptcy(__in,__cfg).Layout __PP31575) := TRANSFORM
-    __EE31630 := __PP31575.Records_;
-    __ST31316_Layout __ND31959__Project(E_Bankruptcy(__in,__cfg).Records_Layout __PP31958) := TRANSFORM
-      SELF.Case_Number_ := __PP31575.Case_Number_;
-      SELF := __PP31958;
+  SHARED __ST32353_Layout __ND33092__Project(E_Bankruptcy(__in,__cfg).Layout __PP32619) := TRANSFORM
+    __EE32674 := __PP32619.Records_;
+    __ST32360_Layout __ND33003__Project(E_Bankruptcy(__in,__cfg).Records_Layout __PP33002) := TRANSFORM
+      SELF.Case_Number_ := __PP32619.Case_Number_;
+      SELF := __PP33002;
     END;
-    SELF.Records_ := __PROJECT(__EE31630,__ND31959__Project(LEFT));
-    SELF := __PP31575;
+    SELF.Records_ := __PROJECT(__EE32674,__ND33003__Project(LEFT));
+    SELF := __PP32619;
   END;
-  EXPORT __ENH_Bankruptcy_7 := PROJECT(__EE31801,__ND32048__Project(LEFT));
+  EXPORT __ENH_Bankruptcy_7 := PROJECT(__EE32845,__ND33092__Project(LEFT));
 END;
