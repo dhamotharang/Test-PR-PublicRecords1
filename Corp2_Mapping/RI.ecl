@@ -628,8 +628,7 @@ export RI := module
 						
 		//Validating the filedate entered is within 30 days					
 		isFileDateValid := if((string)std.date.today() between ut.date_math(filedate,-30) and ut.date_math(filedate,30),true,false);
-		result		 			:= if(//isFileDateValid 
-		                       true
+		result		 			:= if(isFileDateValid
 													 ,mapRI
 													 ,sequential (corp2_mapping.Send_Email(state_origin,filedate).InvalidFileDateParm
 																				,FAIL('corp2_mapping.'+state_origin+' failed. An invalid filedate was passed in as a parameter.')
