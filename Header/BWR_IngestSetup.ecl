@@ -151,7 +151,7 @@ ck('VehicleV2Keys'      ,'~thor_data400::base::vehicles_v2_party_header_building
 ck('VehicleV2Keys_F'    ,'~thor_data400::base::vehicles_v2_party_header_building','~thor_data400::base::vehiclev2::party_father')+
 // ck('VehicleV2Keys_D'    ,'~thor_data400::base::vehicles_v2_party_header_building','~thor_data400::base::vehiclev2::party_delete')+
 ck('CertegyKeys'        ,'~thor_data400::base::certegyheader_building'           ,'~thor_data400::base::certegy')+
-ck('SexOffenderKeys'    ,'~thor_data400::base::sex_offender_mainpublic_building' ,'~thor_data400::base::sex_offender_mainpublic')+
+// ck('SexOffenderKeys'    ,'~thor_data400::base::sex_offender_mainpublic_building' ,'~thor_data400::base::sex_offender_mainpublic')+
 ck('TargusKeys'         ,'~thor_data400::base::consumer_targusHeader_Building'   ,'~thor_data400::base::consumer_targus') +
 ck('TargusKeys_F'       ,'~thor_data400::base::consumer_targusHeader_Building'   ,'~thor_data400::base::consumer_targus_father') :independent;
 
@@ -173,7 +173,8 @@ report2 := project(report,transform({string pk, boolean update},SELF.pk:=LEFT.pk
                      {'transunion'    ,true}, // Always on
                      {'eq_hist'       ,true}, // Stale (always on)
                      {'alloymedia'    ,true},  // Stale (always on)
-                     {'cd_seed'       ,true}  // Stale (always on)
+                     {'cd_seed'       ,true},  // Stale (always on)
+                     {'SexOffenderKeys' ,true}  // Stale (always on)
                      
                     ],{string pk, boolean update});
 

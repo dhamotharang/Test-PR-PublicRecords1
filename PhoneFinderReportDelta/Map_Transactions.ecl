@@ -6,6 +6,8 @@ EXPORT Map_Transactions(string8 version) := FUNCTION
 	
 	//DF-23251: Add 'dx_' Prefix to Index Definitions
 	//DF-23286: Update Keys
+	//DF-23827: Update Transaction File
+	
 	dx_PhoneFinderReportDelta.Layout_PhoneFinder.Transactions_Main trT(inFile l):= transform
 		self.date_file_loaded 				:= version;
 		self.transaction_date					:= if(Std.Date.IsValidDate((unsigned)(PhoneFinderReportDelta._Functions.keepNum(l.transaction_date)[1..8])),
@@ -29,7 +31,10 @@ EXPORT Map_Transactions(string8 version) := FUNCTION
 		self.submitted_state					:= PhoneFinderReportDelta._Functions.rmNull(l.submitted_state);
 		self.submitted_zip						:= PhoneFinderReportDelta._Functions.rmNull(l.submitted_zip);
 		self.orig_phonenumber					:= PhoneFinderReportDelta._Functions.rmNull(l.phonenumber);	
-		self.phonenumber							:= PhoneFinderReportDelta._Functions.keepNum(l.phonenumber); //Filtered Phonenumber
+		self.phonenumber							:= PhoneFinderReportDelta._Functions.keepNum(l.phonenumber); 	//Filtered Phonenumber
+		self.data_source							:= PhoneFinderReportDelta._Functions.rmNull(l.data_source);		//DF-23827
+		self.royalty_used							:= PhoneFinderReportDelta._Functions.rmNull(l.royalty_used);	//DF-23827
+		self.carrier									:= PhoneFinderReportDelta._Functions.rmNull(l.carrier);				//DF-23827
 		self.risk_indicator						:= PhoneFinderReportDelta._Functions.rmNull(l.risk_indicator);
 		self.phone_type								:= PhoneFinderReportDelta._Functions.rmNull(l.phone_type);
 		self.phone_status							:= PhoneFinderReportDelta._Functions.rmNull(l.phone_status);		
@@ -47,7 +52,7 @@ EXPORT Map_Transactions(string8 version) := FUNCTION
 	
 	mapTranMain 		:= project(inFile, trT(left));
 	concatFile			:= mapTranMain + PhoneFinderReportDelta.File_PhoneFinder.Transactions_Main;		//DF-23286
-	ddConcat 				:= dedup(sort(distribute(concatFile, hash(transaction_id)), transaction_id, company_id, -(date_added+time_added), local), transaction_id, company_id, local);
+	ddConcat 				:= dedup(sort(distribute(concatFile(transaction_date<>''), hash(transaction_id)), transaction_id, company_id, -(date_added+time_added), local), transaction_id, company_id, local); //Dedup Records & Filter for Transaction_Date<>''
 	
 	return ddConcat;  
 	

@@ -1,7 +1,9 @@
-﻿IMPORT Std, KELOtto, FraudShared;
+﻿IMPORT Std, KELOtto, FraudShared, data_services;
 #CONSTANT ('Platform','FraudGov');
 
-fraudgov_dataset_base_prep := PULL(FraudShared.files(,KELOtto.Constants.useOtherEnvironmentDali).base.Main.built);
+fraudgov_dataset_base_prep := dataset(data_services.foreign_prod+'fraudgov::base::built::Main', FraudShared.Layouts.Base.Main, thor); 
+
+//PULL(FraudShared.files(,KELOtto.Constants.useOtherEnvironmentDali).base.Main.built);
  
 
 // Prep!!!
@@ -46,21 +48,9 @@ fraudgov_dataset_base := PROJECT(fraudgov_dataset_base_prep,
 
 Set_did:=[1488418290,8389852385,1921409109,2435345412,1834342568,1589581232];
 
+// filter out spurious transactions in the future.
 fraudgov_dataset := fraudgov_dataset_base((UNSIGNED)event_date <= Std.Date.Today());// and (did % 3 in [0] OR did = 899999999550 or ssn = '294287743' or event_type_1 = '10000' or bank_account_number_1 != '' or drivers_license != '' or did in set_did));
 
+final := DISTRIBUTE(fraudgov_dataset);
 
-// Lets FAKE SOME CUSTOMERS!!!!!
-fakedata1 := fraudgov_dataset(classification_permissible_use_access.fdn_file_info_id=272);
-fakecustomers := DATASET([{1, 990},{2,991},{3,992}], {integer1 joinid, unsigned6 fdn_file_info_id});
-fakedata2 := JOIN(fakedata1, fakecustomers, (LEFT.did % 3) + 1 = RIGHT.joinid, TRANSFORM(RECORDOF(LEFT), SELF.classification_permissible_use_access.fdn_file_info_id := RIGHT.fdn_file_info_id, SELF := LEFT), LOOKUP);
-
-final1 := DISTRIBUTE(fraudgov_dataset/* + fakedata2*/);
-
-// Remove massively high frequency addresses.
-
-HighFreqAddr := TABLE(final1, {clean_address.prim_range, clean_address.prim_name, clean_address.zip, recs := count(group)}, clean_address.prim_range, clean_address.prim_name, clean_address.zip, MERGE)(recs > 4000);
-
-final := JOIN(final1, HighFreqAddr, LEFT.clean_address.prim_range = RIGHT.prim_range AND LEFT.clean_address.prim_name = RIGHT.prim_name AND LEFT.clean_address.zip = RIGHT.zip, LEFT ONLY, LOOKUP)
-   : PERSIST('~temp::deleteme22');
-   
-EXPORT fraudgov := PROJECT(final, TRANSFORM({RECORDOF(LEFT) - UID}, SELF := LEFT));
+EXPORT fraudgov := final;
