@@ -51,7 +51,8 @@ s_pun := sort(pun(event_dt <> '' or cur_stat_inm_desc <> '' or sch_rel_dt<> '' o
   I_Eventdt_vendors := ['DI','DJ','DM','DQ','DN','DR','DY','EY','EA','ED','EM','DO','EI','EJ','ER','EK','EU','VE','6Z','ZB'] ;
 
 //P_Eventdt_vendors := ['FL','GA','ID','IL','IN','KY','MS'     ,'NJ','NY','UT','VA','RI','SC','WI','TN','MO'] ;
-  P_Eventdt_vendors := ['DI','DJ','DM','DQ','DN','DR','DY'     ,'EA','ED','WF'   ,'WJ'   ,'EM','EN','EI','EJ','ER','EK','EU','WD','6H','6X','6Z'] ;
+  P_Eventdt_vendors := ['DI','DJ','DM','DQ','DN','DR','DY'     ,'EA','ED','WF'   ,'WJ'   ,'EM','EN','EI','EJ','ER','EK','EU','WD','6H','6X','6Z',
+	                      'I0048','I0049'] ;
 	
 
 // output(s_pun(offender_key IN ['1078976657589810636708R2293WF','10184887529913839336WJ']));
@@ -389,9 +390,7 @@ R_pun := ROLLUP(s_pun ,
                   RollupXform(LEFT,RIGHT),local) : persist ('~persist::corrections_punishment_rolledup');
 
                                       
-//output(r_pun(offender_key in ['EM0000530490','EM000481091']));
-//output(r_pun(offender_key ='10448522296201701763DV'));
-//output(r_pun(offender_key ='DI001158'));
+// output(r_pun(offender_key in ['I00491000000917464529878719930410']));
 
 //=====states with an ORBIT update type of "full-replace"==============================================================
 // set_ffStates := ['AL','AZ','CO','CT','FL','GA','ID','IL','KS','MD','MI','MN','MO','MS','MT',
@@ -400,9 +399,9 @@ R_pun := ROLLUP(s_pun ,
 //---------------------------------------------------------------
 //For some states we need to look at the party_status_desc field. 
 //Set_UsePrtyStat_state := ['AZ','MI','MI_ALT,'MN','ND','NYWEB','OHWEB','WA','OR','SC','TN','WVALT'];
-  Set_UsePrtyStat_state := ['DD','DV','DW'   ,'DZ','EW','WF'   ,'WJ'   ,'EP','EG','EJ','EK','ET','6Z','ZB','6W'];
+  Set_UsePrtyStat_state := ['DD','DV','DW'   ,'DZ','EW','WF'   ,'WJ'   ,'EP','EG','EJ','EK','ET','6Z','ZB','6W','I0047'];
 //Set_UsePartyStat_for_Supervision := ['AZ','CT','MI','MI_ALT,'MN','ND','NYWEB','OHWEB','WA','OR','SC','TN','WVALT'];
-  Set_UsePartyStat_for_Supervision := ['DD','DG','DV','DW'   ,'DZ','EW','WF'   ,'WJ'   ,'EP','EG','EJ','EK','ET','DQ','6Z','6W'];
+  Set_UsePartyStat_for_Supervision := ['DD','DG','DV','DW'   ,'DZ','EW','WF'   ,'WJ'   ,'EP','EG','EJ','EK','ET','DQ','6Z','6W','I0048'];
 offnd trecs(offnd L, R_pun R) := transform
 
 //replaced all process_date logic with check_dt
@@ -731,6 +730,9 @@ prob_StatusRule1 	:=  MAP( L.offender_key = R.offender_key and
 												  //L.vendor in set_ffStates and //all sources are full replace
 								          LIB_Date.DaysApart( _functions.GetDate ,check_dt)< 91 => '1', 
 				
+				                  L.offender_key <> '' and R.offender_key <>'' and 
+				                  R.vendor IN ['I0049'] and stringlib.stringfilterout(R.pro_end_dt,' 0') <> ''  and
+													(unsigned) stringlib.stringfilterout(R.pro_end_dt,' ')[1..8] > (unsigned)_functions.GetDate =>'1',
 							            '0');
 													
 Prob_No_Rule      :=  MAP( L.offender_key = R.offender_key and 
@@ -1072,7 +1074,7 @@ flaggedRecs := join(offnd,R_pun,
 				            trecs(left,right),left outer,local):persist('~thor400_20::persist::offenders_flagged');
 										//ut.MAC_SF_BuildProcess(flaggedRecs,'~thor_Data400::base::corrections_offenders_' + buildstate,outOffnd,2);
 										//ut.MAC_SF_BuildProcess(pun,'~thor_data400::base::corrections_punishment_' + buildstate,outPun,2);
-
+// output(flaggedRecs(offender_key in ['I00491000000917464529878719930410']));
 export proc_build_DOC_offenders_flagged:= flaggedRecs;
                     //sequential(outOffnd
 										//,outPun);

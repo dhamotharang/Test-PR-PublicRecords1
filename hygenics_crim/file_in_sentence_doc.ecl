@@ -14,7 +14,7 @@ proj_sent_cw  := Project(sentence_cw,transform(hygenics_crim.layout_in_sentence,
 sentence_ie   := dataset(data_services.foreign_prod+'thor_200::in::crim::HD::doc_sentence_ie',
 								        layout_in_sentence,
 								        CSV(SEPARATOR('|'), TERMINATOR(['\n', '\r\n']), QUOTE('"'), MAXLENGTH(6000)))  (stringlib.StringToUpperCase(recordid[1..8])<>'RECORDID');// and StateCode in _include_states);
-sentence_ie_filtered := sentence_ie(
+sentence_ie_filtered := sentence_ie(StringLib.StringFilter(StringLib.StringToUpperCase(
                                      trim(SentenceDate)+
                                      trim(SentenceBeginDate)+
                                      trim(SentenceEndDate)+
@@ -58,9 +58,9 @@ sentence_ie_filtered := sentence_ie(
                                      trim(ProbationMinYears)+
                                      trim(ProbationMinMonths)+
                                      trim(ProbationMinDays)+
-                                     trim(ProbationStatus) <> ''
-                                  );
+                                     trim(ProbationStatus)
+                                  ),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ')<>'');
 
-proj_sent_ie  := Project(sentence_ie,transform(hygenics_crim.layout_in_sentence,self.sourcename := trim(left.sourcename)+'_IE'; self := left;));
+proj_sent_ie  := Project(sentence_ie_filtered,transform(hygenics_crim.layout_in_sentence,self.sourcename := trim(left.sourcename)+'_IE'; self := left;));
 
 export file_in_sentence_doc := sentence    +proj_sent_cw+proj_sent_ie;

@@ -372,7 +372,7 @@ export fTraffic_Flag_From_Vendor_and_Offense_Level(string5 pVendor, string5 pOff
 	pVendor IN ['W0027','8R',	'W0271','W0272','W0273','W0274','W0275','W0277','W0278','W0279','W0280',
 	            'W0281','W0282','W0283','W0284','W0285','W0286','W0287','W0288','W0289','W0292','W0294',
 							'W0295','W0296','W0297','W0298','W0299','W0301','W0302','W0304','W0306','W0307','W0309',
-							'I0002','I0010','I0031','I0015','I0016','I0032','I0005','I0006' ] => if(trim(pOffenseLevel,right) in ['T'],'Y','N'),
+							'I0002','I0010','I0031','I0015','I0016','I0032','I0005','I0006' ,'I0041'] => if(trim(pOffenseLevel,right) in ['T'],'Y','N'),
 						 
 
 	pVendor IN ['W0037','10B','10C'] => if(trim(pOffenseLevel,right) in ['T'],'Y','N'),

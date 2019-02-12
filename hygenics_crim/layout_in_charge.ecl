@@ -1,7 +1,7 @@
 ﻿export layout_in_charge := record
 	string40	RecordID;
 	string2		StateCode;
-	string40	CaseID;
+	string100	CaseID;
 	string20	WarrantNumber;
 	string8		WarrantDate;
 	string200	WarrantDesc;

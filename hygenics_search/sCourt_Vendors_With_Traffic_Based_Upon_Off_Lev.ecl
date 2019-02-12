@@ -359,8 +359,8 @@
 											'I0016', //	GA CARROLL SPC 
 											'I0018', //	IL KANE CRC         
 											'I0031', //	SC JASPER SC
-											'I0032'  //	TN DAVIDSON GSC (LEG
-
+											'I0032', //	TN DAVIDSON GSC (LEG
+                      'I0041'  // FL_SARASOTA_COC
 
 											];
 										

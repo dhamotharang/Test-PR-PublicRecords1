@@ -80,7 +80,7 @@ sen 		:= distribute(slim_sen,hash(recordid,statecode));
 		// string100SexOffenderRegistryNumber;
 
 		// from charge
-		string40	CaseID						:= '';
+		string100	CaseID						:= '';
 		// string20	WarrantNumber				:= '';
 		// string8	WarrantDate					:= '';
 		// string200WarrantDesc					:= '';
@@ -420,21 +420,18 @@ hygenics_crim.Layout_Common_DOC_Offenses_orig to_court_offenses(j_final l) := tr
 		v_inm_num               := IF(v_inm_num1  in _functions.Filterlist,'',v_inm_num1);
 		v_stid_num              := IF(v_stid_num1 in _functions.Filterlist,'',v_stid_num1);
 	self.offender_key		:= MAP(vVendor in [
-																	'DA','DB','DH','DJ','DI',
-																	'DP','DM','DQ','DN','SB',
-																	'DS','DU','EU','DY','DV',
-																	'DX','EV','WG','EW','EX',
-																	'EF','WH','WK','EP','ER',
-																	'ET','DF','6X','ZB','6W'] and v_doc_num <> ''  => trim(vVendor) + v_doc_num, 
+																	'DA','DB','DH','DJ','DI','DP','DM','DQ','DN','SB',
+																	'DS','DU','EU','DY','DV','DX','EV','WG','EW','EX',
+																	'EF','WH','WK','EP','ER','ET','DF','6X','ZB','6W',
+																	'I0050','I0052'] and v_doc_num <> ''  => trim(vVendor) + v_doc_num, 
 																	
 																vVendor in [
-																	'DD','DG','WL','DD','VE',
-																	'WD','EA','WC','ED','WF',
-																	'EE','EG','EI','EJ','EO',
-																	'EQ'] and v_inm_num <> ''	=> trim(vVendor) + v_inm_num,
+																	'DD','DG','WL','DD','VE','WD','EA','WC','ED','WF',
+																	'EE','EG','EI','EJ','EO','EQ',
+																	'I0046','I0047','I0051'] and v_inm_num <> ''	=> trim(vVendor) + v_inm_num,	
 																	
 																vVendor in [
-																	'EL','DW','6H','6Z'] and v_stid_num <> ''	=> trim(vVendor) + v_stid_num +trim(l.dob, all),
+																	'EL','DW','6H','6Z','I0048','I0049'] and v_stid_num <> ''	=> trim(vVendor) + v_stid_num +trim(l.dob, all),
 																	
 																vVendor in [
 																	'DR','DZ','WE','EK','ES','EM'] and v_stid_num <> ''	=> trim(vVendor) + v_stid_num,
@@ -784,7 +781,7 @@ hygenics_crim.Layout_Common_DOC_Offenses_orig to_court_offenses(j_final l) := tr
 	                               '');
 	
 	self.stc_desc_4        := MAP(l.statecode ='KY' => trim(l.sentencestatus),
-	                              l.ln_vendor 'I0046' =  l.sentencetype,
+	                              l.ln_vendor ='I0046' =>  l.sentencetype,
 	                              //l.institutionname <> '' and trim(l.institutionname) <> 'UNKNOWN'  => 'Institution Name: '+trim(l.institutionname) + trim(l.institutiondetails),
 														    '');
 																	
