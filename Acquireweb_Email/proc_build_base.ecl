@@ -10,7 +10,6 @@ IMPORT Acquireweb_Email, ut, address, DID_Add, NID, AID, AID_Support,std, Promot
 EXPORT proc_build_base(STRING version) := FUNCTION
   //ind_file_in   :=  Acquireweb_Email.files.file_acquireweb_email_ind_dedup;
 	dsBase				:= Acquireweb_Email.Files.file_Acquireweb_Base;
-  email_file_in :=  DISTRIBUTE(Acquireweb_Email.files.file_Acquireweb_Email_Emails,HASH32(AWID_Email));
 	
 	IngestPrep	:= Acquireweb_Email.prep_ingest;
 
@@ -106,23 +105,9 @@ EXPORT proc_build_base(STRING version) := FUNCTION
     clean_mname,clean_lname,clean_name_suffix,clean_prim_range,
     clean_prim_name,clean_sec_range,clean_zip,
     clean_st,phone,DID,Acquireweb_Email.layouts.layout_Acquireweb_Base,true,DID_Score,75,ind_with_did);
-  ind_with_did_2:=DISTRIBUTE(ind_with_did,HASH32(awid));
-
-  // Join the cleaned IND file contianing AID and DID information to the e-mail file
-  Acquireweb_Email.layouts.layout_Acquireweb_Base jointhem(ind_with_did_2 L,email_file_in R):=TRANSFORM
-    SELF.emailid:=R.emailid;
-    SELF.email:=R.email;
-    SELF.activecode:=map(trim(R.activecode,left,right)='Y'=>'A',
-												 trim(R.activecode,left,right)='N'=>'I',
-												 trim(R.activecode,left,right)='A'=>'A',
-												 trim(R.activecode,left,right)='I'=>'I','');
-    SELF:=L;
-    SELF:=[];
-  END;
-  new_acquireweb_data:=	JOIN(ind_with_did_2,email_file_in,LEFT.awid=RIGHT.AWID_Email,jointhem(LEFT,RIGHT),INNER,LOCAL);
 
   // Final dedup
- Deddata:=DEDUP(SORT(new_acquireweb_data,email,FirstName,LastName,city,state,zip,-date_vendor_last_reported),email,FirstName,LastName,city,state,zip);
+ Deddata:=DEDUP(SORT(ind_with_did,email,FirstName,LastName,city,state,zip,-date_vendor_last_reported),email,FirstName,LastName,city,state,zip);
 
   RETURN Deddata(trim(AWID,left,right)<>'AWID');
 END;
