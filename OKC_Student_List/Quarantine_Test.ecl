@@ -33,7 +33,7 @@ EXPORT Quarantine_Test(string pversion='') := FUNCTION
 	//Filter out records that have less errors than defined threshold
 	orbit_summary_rulepcnt_gt_threshold := OrbitReportSummary(rulepcnt>orbit_threshold_min);	
 	//Select records that have invalid values (ALLOW and ENUM)
-	orbit_summary_not_allowed := orbit_summary_rulepcnt_gt_threshold(regexfind(':ALLOW|:ENUM',ruledesc));	
+	orbit_summary_not_allowed := orbit_summary_rulepcnt_gt_threshold(regexfind(':ALLOW|:ENUM|:CUSTOM',ruledesc));	
 	output(orbit_summary_not_allowed,,named('Orbit_Summary_Not_Allowed_'+pversion));
 	//Select records that have significant % rulepcnt
 	orbit_summary_missing 	:= orbit_summary_rulepcnt_gt_threshold(rulepcnt>=orbit_threshold_missing);

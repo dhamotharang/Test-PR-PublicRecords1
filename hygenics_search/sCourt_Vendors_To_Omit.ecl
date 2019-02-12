@@ -79,7 +79,7 @@
 '7X', // FLORIDA_MANATEE_CIRCUIT_AND_COUNTY_COURTS                                                           
 '7Z', // ILLINOIS_PEORIA_COUNTY                                                                              
 '8A', // NEVADA_CLARK_COUNTY_DISTRICT_COURTS                                                                 
-'8F', // ILLINOIS_VIOLENT_OFFENDER_AGAINST_YOUTH                                                             
+'8D', // OHIO_SHELBY_COUNTY_COMMON_PLEAS_COURT                                                               
 '8M', // OHIO_FAYETTE_COUNTY_COMMON_PLEAS_COURT                                                              
 '8P', // OHIO_CUYAHOGA_COUNTY_CLEVELAND_MUNICIPAL_COURT                                                      
 '8Q', // OHIO_CUYAHOGA_COUNTY_CLEVELANDHEIGHTS_MUNICIPAL_COURT                                               
@@ -90,6 +90,7 @@
 '9G', // OHIO_LAWRENCE_COUNTY_COMMON_PLEAS_COURT                                                             
 '9O', // OHIO_FRANKLIN_COUNTY_COMMON_PLEAS                                                                   
 '9P', // OHIO_SCIOTO_COUNTY_PORTSMOUTH_MUNICIPAL_COURT                                                       
+'9R', // OHIO_STARK_COUNTY_MASSILLON_MUNICIPAL_COURT                                                         
 '9S', // OHIO_STARK_COUNTY_CANTON_MUNICIPAL_COURT                                                            
 '9T', // OHIO_OTTAWA_COUNTY_COMMON_PLEAS_COURT                                                               
 '9U', // OHIO_UNION_COUNTY_COMMON_PLEAS_COURT                                                                
@@ -135,7 +136,6 @@
 'DD', // ARIZONA_DEPARTMENT_OF_CORRECTIONS                                                                   
 'DJ', // GEORGIA_DEPARTMENT_OF_CORRECTIONS                                                                   
 'DL', // HAWAII_DEPARTMENT_OF_CORRECTIONS                                                                    
-'DO', // IOWA_DEPARTMENT_OF_CORRECTIONS                                                                      
 'DP', // IOWA_DEPARTMENT_OF_CORRECTIONS_PROBATION                                                            
 'DR', // KENTUCKY_DEPARTMENT_OF_CORRECTIONS                                                                  
 'DT', // MAINE_DEPARTMENT_OF_CORRECTIONS                                                                     
