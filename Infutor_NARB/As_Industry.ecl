@@ -1,6 +1,6 @@
 ﻿IMPORT Infutor_NARB, TopBusiness_BIPV2, MDR, ut, _Validate; 
 
-Base := Infutor_NARB.Files(,true).base.qa;
+Base := Infutor_NARB.Files().base.qa;
 
 Industry_Layout := TopBusiness_BIPV2.Layouts.rec_industry_combined_layout;
 
