@@ -7,7 +7,7 @@ export Stats_Coverage(
 	,string																			pDesprayDirectory = '/data/data_build_4/corporate_filings/logs/base_file_coverages'
 	,boolean																		pOverwrite				= false
 	,boolean																		pIsTesting				= false
-	,string																			landing_zone			:= _Control.IPAddress.bctlpedata10
+	,string																			landing_zone			= _Control.IPAddress.bctlpedata10
 
 ) :=
 function
