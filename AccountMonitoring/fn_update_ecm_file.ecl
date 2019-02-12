@@ -42,8 +42,7 @@ EXPORT fn_update_ecm_file(UNSIGNED1 pseudo_environment,
 					'|',                                // srcCSVseparator
 					,                                   // srcCSVterminator
 					',',                                // srcCSVquote
-					if(AccountMonitoring.constants.spray_groupname = 'thor400_dev' or 
-					   AccountMonitoring.constants.spray_groupname = 'thor400_dev_eclcc', 'thor400_dev01', AccountMonitoring.constants.spray_groupname),            // destinationgroup
+					AccountMonitoring.constants.spray_groupname,  // destinationgroup
 					logical_file_name,                  // destinationlogicalfilename
 					,,,ALLOW_OVERWRITE,,COMPRESS)));
 			END;
