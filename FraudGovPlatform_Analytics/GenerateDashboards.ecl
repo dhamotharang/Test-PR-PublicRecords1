@@ -1,16 +1,18 @@
 ﻿
 EXPORT GenerateDashboards(
-	BOOLEAN runProd = FALSE,																	//set to TRUE it will run against DSP Prod on the RAMPS Prod cluster. Set to FALSE it will run against DSP QA on the RAMPS Cert cluster
-	BOOLEAN useProdData = FALSE																//set to TRUE it will use the files generated in Thor Prod, else it will use the files generated in Dataland
+	BOOLEAN runProd = FALSE,			//set to TRUE it will run against DSP Prod on the RAMPS Prod cluster. Set to FALSE it will run against DSP QA on the RAMPS Cert cluster
+	BOOLEAN useProdData = FALSE,	//set to TRUE it will use the files generated in Thor Prod, else it will use the files generated in Dataland
+	STRING 	vizVersion = '3',			//dashboard roxie services version
+	BOOLEAN newVersion = FALSE		//set to FALSE it will create the new indexes but not automatically update the existing dashboard service to use them
 	) := FUNCTION
 	#OPTION('soapTraceLevel',10);
 
 	IMPORT FraudGovPlatform_Analytics, STD;
-	vizVersion 			:= '3';	
 	fileName 				:= '~' + FraudGovPlatform_Analytics.Constants.RampsWebServices.fileScope + 'dashboardruns';
 	custLogicalfilename := filename+'::customer::'+vizVersion+'::'+(STRING8)STD.Date.Today();
 	clusterLogicalfilename := filename+'::clusterdetails::'+vizVersion+'::'+(STRING8)STD.Date.Today();
 
+/*
 	//Currently we need to run this in thor in order to create the log file
 	//In the future we will be wrapping the HTTPCALL in a NOTHOR action because we don't want to 
 	//risk this running multiple times
@@ -28,4 +30,11 @@ EXPORT GenerateDashboards(
 		
 	//We want to run the Customer Dashboard first because it runs much faster than the Cluster dashboard	
 	RETURN SEQUENTIAL(CreateSuper, RunCustDashboard, RunClusDetailsDashboard, AddFileToSuper);
+*/
+
+	dRunCustDashboard					:= FraudGovPlatform_Analytics.fnRunCustomerDashboard(vizVersion, runProd, useProdData, newVersion);
+	dRunClusDetailsDashboard	:= FraudGovPlatform_Analytics.fnRunClusterDetailsDashboard(vizVersion, runProd, useProdData, newVersion);
+	RunCustDashboard 					:= OUTPUT(dRunCustDashboard);
+	RunClusDetailsDashboard 	:= OUTPUT(dRunClusDetailsDashboard);
+	RETURN SEQUENTIAL(RunCustDashboard, RunClusDetailsDashboard);
 END;

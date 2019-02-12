@@ -59,8 +59,9 @@ functionmacro
                       ,'BasicMatchesPerformed'
                       ,'SlicesPerformed'
                       ,'ProxidsCreatedByCleave'
+                      ,'LinkBlockSplits'
                      ];
-  StopCondition       := '(PostClusterCount / PreClusterCount * 100.0) > (99.9)';
+  StopCondition   := '(PostClusterCount / PreClusterCount * 100.0) > (99.9)';
   SetNameCalculations := ['Convergence_PCT','Convergence_Threshold'];
 
   ecltextPost    := '#workunit(\'name\',\'BIPV2_ProxID._PostProcess @version@\');\n\n' + '#workunit(\'priority\',\'high\');\n' 
@@ -82,9 +83,9 @@ functionmacro
       ,pSetNameCalculations := SetNameCalculations
       ,pBuildName           := pUniqueOut + 'Iters'
       ,pNotifyEmails        := BIPV2_ProxID._Constants().EmailList
-      ,pOutputFilename      := '~bipv2_build::@version@_@iteration@::workunit_history::proc_proxid.iterations'
+      ,pOutputFilename      := '~bipv2_build::@version@::workunit_history::proc_proxid.iterations.' + trim(pUniqueOut)
       ,pOutputSuperfile     := '~bipv2_build::qa::workunit_history' 
-      ,pCompileOnly      := pCompileTest
+      ,pCompileOnly         := pCompileTest
   );
  
   kickPost  := Workman.mac_WorkMan(ecltextPost,version ,cluster  ,1         ,1        ,pBuildName := pUniqueOut + 'PostProcess',pNotifyEmails := BIPV2_ProxID._Constants().EmailList
