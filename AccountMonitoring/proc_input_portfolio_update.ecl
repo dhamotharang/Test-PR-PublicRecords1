@@ -37,8 +37,7 @@ EXPORT proc_input_portfolio_update( UNSIGNED1 pseudo_environment,
 					'|',                                  // srcCSVseparator
 					,                                     // srcCSVterminator
 					',',                                  // srcCSVquote
-					if(AccountMonitoring.constants.spray_groupname = 'thor400_dev' or 
-					   AccountMonitoring.constants.spray_groupname = 'thor400_dev_eclcc', 'thor400_dev01', AccountMonitoring.constants.spray_groupname),            // destinationgroup
+					AccountMonitoring.constants.spray_groupname,   // destinationgroup
 					logical_file_name,                    // destination logical filename
 					,,,,,COMPRESS)));
 			END;
