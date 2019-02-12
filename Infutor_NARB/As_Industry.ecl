@@ -1,4 +1,4 @@
-﻿IMPORT Infutor_NARB, TopBusiness_BIPV2, MDR, ut, _Validate;
+﻿IMPORT Infutor_NARB, TopBusiness_BIPV2, MDR, ut, _Validate; 
 
 Base := Infutor_NARB.Files(,true).base.qa;
 
