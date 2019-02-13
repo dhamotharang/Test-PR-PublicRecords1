@@ -1,5 +1,7 @@
 ﻿IMPORT KELOtto;
 IMPORT Std;
+IMPORT AppendLexidToLexidAssociation;
+   
 
 // Take the sharing, join to customer people
 
@@ -159,9 +161,9 @@ EXPORT AddressPersonAssociations := MODULE
 																			SELF := LEFT, SELF := []));
 
 
-	SHARED PersonAddressMatchStatsPrep := PersonAddressMatchStatsPrep1 + PersonAddressMatchStatsPrep2 : PERSIST('~temp::deleteme31');
-														 
-	EXPORT PersonAddressMatchStats := PersonAddressMatchStatsPrep(
+	SHARED PersonAddressMatchStatsPrep3 := PersonAddressMatchStatsPrep1 + PersonAddressMatchStatsPrep2 : PERSIST('~temp::deleteme31');
+										
+  SHARED PersonAddressMatchStatsPrep4 := PersonAddressMatchStatsPrep3(
 			// Rules for a valid association
 			SelfMatch = 1 OR
 			sameaddressemailmatch = 1 OR 
@@ -170,7 +172,12 @@ EXPORT AddressPersonAssociations := MODULE
 			NonHighFrequencyAddressCount > 2 OR 
 			NonHighFrequencySameAddressSameDayCount > 0 OR
 			HighFrequencySameAddressSameDayCount > 5
-			 );                          	
+			 );          
+
+	EXPORT PersonAddressMatchStats := PersonAddressMatchStatsPrep4;                	
+       
+  //SHARED LexidAssociationsPrep := AppendLexidToLexidAssociation.MacAppendLexidToLexidAssociations(PersonAddressMatchStatsPrep2, FromPersonLexId, ToPersonLexId, 'VerifiedPublicRecords', 1, 2000000);
+	//EXPORT PersonAddressMatchStats := LexidAssociationsPrep;                	
 												 
 	//   Same Day or within 7 days?
 	//   Multiple Distinct addresses (non-high fequency, within time threshold?)
