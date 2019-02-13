@@ -36,7 +36,7 @@
 		string AgentCity;
 		string AgentState;
 		string AgentZip;
-		string NaicsCode; //This field has been added to the layout starting from 20181105 vendor data
+		string NaicsCode; //JIRA:DF-24000--This field has been added to the layout starting from 20181105 vendor data
 			
 	end;
 
@@ -85,7 +85,7 @@
 		string AgentCity;
 		string AgentState;
 		string AgentZip;		
-		string NaicsCode; // This field has been added to the layout starting from 20181105 vendor data
+		string NaicsCode; // JIRA:DF-24000--This field has been added to the layout starting from 20181105 vendor data
 			
 	end;
 	

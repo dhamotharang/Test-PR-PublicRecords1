@@ -379,19 +379,21 @@ EXPORT Functions := Module
 		return Country;
 		
 	End;
-		
+	
+	//JIRA (DF-24000)	: According RI CI, we are allowing any numeric code with any length as “NAIC” code!
   EXPORT GetNaicCode(string code) :=function
 
-		val        := corp2.t2u(code);
-		pos        := lib_stringlib.StringLib.StringFind(val,'-',1);
+		cd         := corp2.t2u(code);
+		pos        := lib_stringlib.StringLib.StringFind(cd,'-',1);
+		val 			 := if(pos > 0, cd[1..pos-1], cd);
 
-		clean_val  := map(stringlib.stringfilterout(val,'ABCDEFGHIJKLMNOPQRSTUVWXYZ')      =''  =>'',		             //Blank all alpha char Ex:LLC
-											stringlib.stringfilterout(val,'09-')  										       =''  =>'',	              //Blank all 9's or all zero's  Ex:99999 ,00000	& won't be mapped from[9999-99,0000-0]		  
-											pos<>0 and stringlib.stringfilterout(val[1..pos-1],'0123456789') =''  =>val[1..pos-1],   //According to CI Ex: "2345-89", valid code is "2345" & dropping out "-89" 
-											stringlib.stringfilterout(val,'0123456789') 							       =''  =>val,	          // Map valid code 	       Ex:45673, 5632...etc	
+		clean_val  := map(stringlib.stringfilterout(val,'ABCDEFGHIJKLMNOPQRSTUVWXYZ')      =''  =>'',		     //Blank all alpha char Ex:LLC
+											stringlib.stringfilterout(val,'0')  										         =''  =>'',	      //Blank all zero's  Ex:00000	& won't be mapped from[000-00,0000-0,etc]	
+											stringlib.stringfilterout(val,'9')  										         =''  =>'',	     //Blank all 9's Ex:99999 ,00000	& won't be mapped from[9999-99,999-9,etc]		  
+											stringlib.stringfilterout(val,'0123456789') 							       =''  =>val,	  //Map valid code  Ex:45673	
 											'');
 		return clean_val;
 		
-	END;
-		
-End;
+  End;
+	
+END;
