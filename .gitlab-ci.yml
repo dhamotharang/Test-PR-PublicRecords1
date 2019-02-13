@@ -16,5 +16,4 @@ test:
     stage: test
     script:
         - echo "Testing"
-        - mkdir build
         - test -f "build/info.txt"
