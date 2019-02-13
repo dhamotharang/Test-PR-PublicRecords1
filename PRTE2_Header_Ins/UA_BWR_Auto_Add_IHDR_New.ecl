@@ -10,7 +10,7 @@ If no new records, then it should skip the save process and the despray process 
 Not building keys just a base file so no reason to do DOPS or ORBIT
 ************************************************************************************ */
 
-IMPORT ut, PRTE2_Header_Ins, PRTE2_Common, PRTE_CSV;
+IMPORT ut, PRTE2_Header_Ins, PRTE2_Common;
 #WORKUNIT('name', 'PRCT Alpharetta-Adds BHDR File');
 #OPTION('multiplePersistInstances',FALSE);
 // #CONSTANT('SubstituteEmail','Bruce.Petro@lexisnexis.com, Clayton.Demirtas@lexisnexisrisk.com');

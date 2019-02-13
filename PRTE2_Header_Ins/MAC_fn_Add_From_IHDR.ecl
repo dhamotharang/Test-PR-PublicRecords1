@@ -6,7 +6,7 @@ Probably could have been just a function ... but works so no big deal
 ******************************************************************************************** */
 EXPORT MAC_fn_Add_From_IHDR(IHDRDS) := FUNCTIONMACRO
 
-	IMPORT PRTE_CSV, Address, PRTE2_Common, doxie, NID;
+	IMPORT Address, PRTE2_Common, doxie, NID;
 
 	#uniquename(BHDRLayout)
 	%BHDRLayout% := PRTE2_Header_Ins.Layouts.Base_Layout;

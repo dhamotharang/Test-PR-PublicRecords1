@@ -10,7 +10,7 @@ Search for:
 prct::BASE::ct::alpharetta*peopleheader_Base*
 ************************************************************************************ */
 IMPORT ut, PRTE;
-IMPORT PRTE_CSV, PRTE2_Common;
+IMPORT PRTE2_Common;
 
 EXPORT Files := MODULE
 		EXPORT Add_Foreign_prod				:= PRTE2_Common.Constants.Add_Foreign_prod;	// a function
@@ -23,19 +23,16 @@ EXPORT Files := MODULE
 		EXPORT IN_PREFIX_NAME					:= '~prct::IN::ct::header::';
 		EXPORT KEY_PREFIX_NAME				:= '~prte::key::header::';
 		EXPORT HDR_CSV_FILE						:= IN_PREFIX_NAME + 'CSV::' + Base_Name;
-
-		EXPORT Base_Layout 						:= prte_csv.ge_header_base.layout_payload;
-		EXPORT Relative_Layout 				:= prte_csv.ge_header_base.layout_payload-rtitle;
 		// ----------------------------------------------------------------------------------------------------------------------------------
 		EXPORT FILE_SPRAY_NAME	:= SPRAYED_PREFIX_NAME + Base_Name+ '_' + ThorLib.Wuid();
-		EXPORT SPRAYED_DS				:= DATASET(FILE_SPRAY_NAME, Base_Layout,
+		EXPORT SPRAYED_DS				:= DATASET(FILE_SPRAY_NAME, Layouts.Base_Layout,
 	                                CSV(HEADING(1), SEPARATOR(','), TERMINATOR(['\n','\r\n']), QUOTE('"')));	
 
 		// NOTE: we never modify or adjust the Boca Person Header base except via the IHDR base, so just save the base in the Boca layout.
 		// ----------------------------------------------------------------------------------------------------------------------------------
 		// Feb 2015, this now should be the new Alpharetta Spreadsheet base - built from XREF_Enhanced by PRTE2_Header_Ins.U_BWR_CreateInitialFile
 		EXPORT HDR_BASE_ALPHA_NAME 		:= Base_Prefix+'::qa::'+base_name;
-		EXPORT HDR_BASE_ALPHA_DS			:= DATASET(HDR_BASE_ALPHA_NAME,Base_Layout,THOR);
+		EXPORT HDR_BASE_ALPHA_DS			:= DATASET(HDR_BASE_ALPHA_NAME,Layouts.Base_Layout,THOR);
 		// ----------------------------------------------------------------------------------------------------------------------------------
 
 		// ----------------------------------------------------------------------------------------------------------------------------------
@@ -45,7 +42,7 @@ EXPORT Files := MODULE
 		// FEB 2018 - Gabriel says in the new build, they re-generate relations with all combined (legacy+Boca+our data) so this seems to
 		// 							be obsolete unless at this time. Gabriel says look at this WU W20180213-102027 in prod thor.		
 		EXPORT HDR_BASE_ALPHA_RELATES_Name	:= Base_Prefix+'::qa::'+Relationship_Suffix;
-		EXPORT HDR_BASE_ALPHA_RELATES_DS		:= DATASET(HDR_BASE_ALPHA_RELATES_Name,Relative_Layout,THOR);
+		EXPORT HDR_BASE_ALPHA_RELATES_DS		:= DATASET(HDR_BASE_ALPHA_RELATES_Name,Layouts.Relative_Layout,THOR);
 
 /*
 Boca header keys are prefixed as follows:
@@ -60,9 +57,9 @@ prte::key::fcra::header*
 
 		// ------- Prod names are solely for the purpose of doing CT desprays from Dev, but getting the prod file. --------------------------
 		EXPORT HDR_BASE_ALPHA_Prod_NAME 		:= Add_Foreign_prod(HDR_BASE_ALPHA_NAME);
-		EXPORT HDR_BASE_ALPHA_DS_Prod				:= DATASET(HDR_BASE_ALPHA_Prod_NAME,Base_Layout,THOR);
+		EXPORT HDR_BASE_ALPHA_DS_Prod				:= DATASET(HDR_BASE_ALPHA_Prod_NAME,Layouts.Base_Layout,THOR);
 		EXPORT HDR_BASE_ALPHA_REL_Prod_Name	:= Add_Foreign_prod(HDR_BASE_ALPHA_RELATES_Name);
-		EXPORT HDR_BASE_ALPHA_DS_RELS_Prod	:= DATASET(HDR_BASE_ALPHA_REL_Prod_Name,Relative_Layout,THOR);
+		EXPORT HDR_BASE_ALPHA_DS_RELS_Prod	:= DATASET(HDR_BASE_ALPHA_REL_Prod_Name,Layouts.Relative_Layout,THOR);
 		// ----------------------------------------------------------------------------------------------------------------------------------
 
 END;
