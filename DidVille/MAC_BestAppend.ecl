@@ -290,13 +290,13 @@ typeof(infile) strip_minors(infile le, doxie_files.key_minors_hash re) := transf
     EXPORT string DataRestrictionMask := fixed_DRM;
     EXPORT string5 industry_class := IndustryClass_val;
 		EXPORT string32 application_type := appType;
+    EXPORT boolean show_minors := include_minors; //TODO: or glb=2?
 		EXPORT string ssn_mask := ssn_mask_value;
     EXPORT dl_mask := dl_mask_val;
 		// input include_minors -- is it include only or dppa as well?
   END;
 
 	ssnBestParams := SSNBest_Services.IParams.setSSNBestParams(mod_access
-																														 ,include_minors
 																														 ,suppress_and_mask_:=FALSE); //since suppression and masking is done below
 																										
 	//we hit the BestSSN key to get the 'best ssn' - this will return the same SSN 'most' of the time

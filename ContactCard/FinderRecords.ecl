@@ -1,5 +1,5 @@
-import person_models,moxie_phonesplus_server,doxie_raw,header,Relocations,doxie,address,PhonesFeedback_Services,
-       PhonesFeedback,AutoStandardI,DeathV2_Services,suppress, ContactCard, std;
+﻿import person_models,moxie_phonesplus_server,doxie_raw,header,Relocations,doxie,address,PhonesFeedback_Services,
+       PhonesFeedback,AutoStandardI,DeathV2_Services,suppress, ContactCard, std, MDR;
 
 deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
 
@@ -97,11 +97,21 @@ shared allDIDs_noNeibhors	:= 	dedup(sort(project(subjectDIDs, transform(rec.prid
 														did);
 
 //***** SEE IF DECEASED
-export SubjectDeathRecords := sort(choosen(doxie.key_death_masterv2_ssa_did(keyed(l_did = subjectDID) and not DeathV2_Services.Functions.Restricted(src, glb_flag, glb_ok, deathparams)),con.max_subject),-dod8);
+shared SubjectDeathRecords_info := sort(choosen(doxie.key_death_masterv2_ssa_did(keyed(l_did = subjectDID) and not DeathV2_Services.Functions.Restricted(src, glb_flag, glb_ok, deathparams)),con.max_subject),-dod8);
+
 shared boolean SubjectIsDeceased := 
-	exists(SubjectDeathRecords) or
+	exists(SubjectDeathRecords_info) or
 	exists(head(did = subjectDID and address.isDeathRecord(prim_name)));
-	
+
+dodpadlock_rec := RECORD
+	recordof(SubjectDeathRecords_info);
+	boolean IsLimitedAccessDMF:= false;
+END;
+
+
+
+export SubjectDeathRecords :=  project(SubjectDeathRecords_info, transform(dodpadlock_rec, self.IsLimitedAccessDMF := (left.src = MDR.sourceTools.src_Death_Restricted);
+																																																																																											self := left));
 
 //***** PREPARE HEADER FOR GONG APPEND
 shared head_slim := sort(join(head, 
@@ -196,14 +206,7 @@ nbr := choosen(doxie.nbr_records(
 	Neighbors_PerAddress,
 	Neighbors_Per_NA,
 	Neighbor_Recency,
-	mod_access.industry_class,
-	mod_access.glb,
-	mod_access.dppa,
-	mod_access.probation_override,
-	mod_access.no_scrub,
-	glb_ok,
-	dppa_ok,
-	mod_access.ssn_mask
+  mod_access := mod_access
 )(did <> subjectDID), con.max_neighbors);
 
 nbrAddrDIDs := 	dedup(sort(nbr, did,-dt_last_seen), did);

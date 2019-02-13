@@ -162,11 +162,19 @@
     gateways_in := Gateway.Configuration.Get();
     
     iesp.businessinstantid20.t_BIID20Gateway gw_switch(gateways_in le) := transform
-    self.servicename := le.servicename;
-    self.url := le.url;
+    self.servicename := if( option.OFACVersion = 4 and option.ExcludeWatchLists = TRUE and le.servicename = 'bridgerwlc', '', le.servicename);
+    self.url := if( option.OFACVersion = 4 and option.ExcludeWatchLists = TRUE and le.servicename = 'bridgerwlc', '', le.url);
     end;
     
     gateways_root := project(gateways_in, gw_switch(left));
+    
+    iesp.businessinstantid20.t_BIID20Gateway Options_gw_switch(iesp.businessinstantid20.t_BIID20Gateway le) := transform
+    self.servicename := if( option.OFACVersion = 4 and option.ExcludeWatchLists = TRUE and le.servicename = 'bridgerwlc', '', le.servicename);
+    self.url := if( option.OFACVersion = 4 and option.ExcludeWatchLists = TRUE and le.servicename = 'bridgerwlc', '', le.url);
+    end;
+    
+    Options_Gateway := project(option.Gateways, Options_gw_switch(left));
+
 		
 		// Read from either the root (as Stored) or the User section in the XML Request.
 		UNSIGNED1	_DPPA_Purpose        := IF(TRIM(users.DLPurpose) != ''     , (INTEGER)users.DLPurpose , DPPAPurpose_stored);
@@ -189,10 +197,11 @@
 		UNSIGNED  _BIID20ProductType               := IF( option.BIID20ProductType = 0       , BIID20ProductType_stored, option.BIID20ProductType );
 		UNSIGNED1 _BIPBestAppend                   := option.BIPBestAppend;
 		BOOLEAN   _DisableIntermediateShellLogging := option.OutcomeTrackingOptOut;
-		BOOLEAN   _include_ofac                    := TRUE; // Always run OFAC
-		BOOLEAN   _include_additional_watchlists   := _BIID20ProductType IN [BusinessInstantID20_Services.Types.productTypeEnum.COMPLIANCE, BusinessInstantID20_Services.Types.productTypeEnum.COMPLIANCE_PLUS_SBFE]; 
+	  BOOLEAN   _ExcludeWatchlists               := option.ExcludeWatchlists;
+		BOOLEAN   _include_ofac                    := if(_ExcludeWatchlists = TRUE, FALSE, TRUE); // Always run OFAC unless excludewatchlists is true
+		BOOLEAN   _include_additional_watchlists   := if(_ExcludeWatchlists = TRUE, FALSE, _BIID20ProductType IN [BusinessInstantID20_Services.Types.productTypeEnum.COMPLIANCE, BusinessInstantID20_Services.Types.productTypeEnum.COMPLIANCE_PLUS_SBFE]);  
 		DATASET(iesp.share.t_StringArrayItem) _Watchlists_Requested := option.WatchlistsRequested;
-		DATASET(iesp.businessinstantid20.t_BIID20Gateway) _Gateways  := if(exists(option.Gateways), option.Gateways, gateways_root);
+		DATASET(iesp.businessinstantid20.t_BIID20Gateway) _Gateways  := if(exists(Options_Gateway), Options_Gateway, gateways_root);
     
     STRING    _DataPermissionMask := BusinessInstantID20_Services.fn_setSBFEBitInDataPermissionMask(__DataPermissionMask, _BIID20ProductType); 
 				
@@ -265,11 +274,19 @@
 		UNSIGNED1 GLBPurpose_stored       := Business_Risk_BIP.Constants.Default_GLBA                : STORED('GLBPurpose');
 		STRING DataRestrictionMask_stored := Business_Risk_BIP.Constants.Default_DataRestrictionMask : STORED('DataRestrictionMask');
 		STRING DataPermissionMask_stored  := Business_Risk_BIP.Constants.Default_DataPermissionMask  : STORED('DataPermissionMask');
-		STRING5 IndustryClass_stored      := Business_Risk_BIP.Constants.Default_IndustryClass       : STORED('IndustryClass');
+		STRING5 IndustryClass_stored      := Business_Risk_BIP.Constants.Default_IndustryClass       : STORED('IndustryClass');   
+		BOOLEAN ExcludeWatchLists_stored  := BusinessInstantID20_Services.Constants.EXCLUDEWATCHLISTS: STORED('ExcludeWatchLists');
 		UNSIGNED1 OFAC_Version_stored     := Business_Risk_BIP.Constants.Default_OFAC_Version        : STORED('OFAC_Version');
 		REAL Global_Watchlist_Threshold_stored := Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold : STORED('Global_Watchlist_Threshold');
 
-		_Gateways := Gateway.Configuration.Get();	// Gateways Coded in this Product: Targus
+		gateways_in := Gateway.Configuration.Get();	// Gateways Coded in this Product: Targus and Bridger
+    
+    iesp.businessinstantid20.t_BIID20Gateway gw_switch(gateways_in le) := transform
+    self.servicename := if( OFAC_Version_stored = 4 and ExcludeWatchLists_stored = TRUE and le.servicename = 'bridgerwlc', '', le.servicename);
+    self.url := if( OFAC_Version_stored = 4 and ExcludeWatchLists_stored = TRUE and le.servicename = 'bridgerwlc', '', le.url);
+    end;
+    
+    Gateways := project(gateways_in, gw_switch(left));
 
 		BusinessInstantID20_Services.Types.productTypeEnum  _BIID20ProductType := BusinessInstantID20_Services.Types.productTypeEnum.BASE : STORED('BIID20ProductType');
 		UNSIGNED1	_DPPA_Purpose        := DPPAPurpose_stored;
@@ -289,10 +306,12 @@
 		BOOLEAN   _RunTargusGateway              := FALSE : STORED('RunTargusGatewayAnywayForTesting');
 		BOOLEAN   _OverRideExperianRestriction   := FALSE : STORED('OverRideExperianRestriction');
 		REAL      _Global_Watchlist_Threshold    := Global_Watchlist_Threshold_stored;
-		BOOLEAN		_include_ofac                  := TRUE; // Always run OFAC
+		BOOLEAN		_include_ofac                  := TRUE; // Always run OFAC unless excludewatchlists is true
 		BOOLEAN   _DisableIntermediateShellLogging := TRUE;
 		BOOLEAN   _include_additional_watchlists := _BIID20ProductType IN [BusinessInstantID20_Services.Types.productTypeEnum.COMPLIANCE, BusinessInstantID20_Services.Types.productTypeEnum.COMPLIANCE_PLUS_SBFE];
 		BOOLEAN   _ReturnDetailedRoyalties := FALSE : STORED('ReturnDetailedRoyalties');
+    DATASET(iesp.businessinstantid20.t_BIID20Gateway) _Gateways := Gateways;
+
 		
 		// The following attributes are included in the service interface by requirement, but aren't used yet.
 		BOOLEAN   _IncludeBridgerXG5Gateway := FALSE : STORED('IncludeBridgerXG5Gateway');

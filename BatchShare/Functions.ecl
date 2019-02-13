@@ -1,4 +1,4 @@
-import Address, AutoStandardI, BatchServices, doxie, iesp, NID, Standard, STD;
+﻿import Address, AutoStandardI, BatchServices, doxie, iesp, NID, Standard, STD;
 
 export Functions := module
 	
@@ -23,6 +23,26 @@ export Functions := module
 		SET OF UNSIGNED1 best_group_nums := [];
 		BOOLEAN is_match := FALSE;
 	END;
+	
+	export penalize_ssn_dob(BatchServices.Layouts.layout_batch_in_for_penalties l, 
+													 BatchShare.Layouts.SharePII r) :=
+		function				
+			ssns_to_compare :=  
+				module(project(AutoStandardI.GlobalModule(), AutoStandardI.LIBIN.PenaltyI_SSN.full, opt))	
+					// The 'input' ssn:
+					export ssn := l._ssn;   
+					// The ssn in the matching record:
+					export ssn_field := r.ssn; 
+				end;			
+			dobs_to_compare :=  
+				module(project(AutoStandardI.GlobalModule(), AutoStandardI.LIBIN.PenaltyI_DOB.full, opt))	
+					// The 'input' dob:
+					export dob := (unsigned8) l._dob;   
+					// The ssn in the matching record:
+					export dob_field := r.dob; 
+				end;			
+				return AutoStandardI.LIBCALL_PenaltyI_SSN.val(ssns_to_compare) + AutoStandardI.LIBCALL_PenaltyI_DOB.val(dobs_to_compare);
+		end;
 	
 	export penalize_fullname(BatchServices.Layouts.layout_batch_in_for_penalties l, 
 													 BatchShare.Layouts.ShareName r) :=

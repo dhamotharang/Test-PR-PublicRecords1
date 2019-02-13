@@ -38,11 +38,11 @@
 //		An "historic neighbor" has an overlap >0 with the subject.  In other
 //		words, they are or were living near eachother at some point in time.
 
-import doxie_crs, doxie, ut;
+import doxie_crs, doxie;
 
 // snag header records
 doxie.MAC_Selection_Declare();
-doxie.MAC_Header_Field_Declare();
+mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
 headerRecs := doxie.Comp_Subject_Addresses_wrap.addresses;
 
 // convert to target record type
@@ -66,17 +66,10 @@ nbr_records_mode(string1 mode) := doxie.nbr_records(
 	Neighbors_PerAddress,
 	Neighbors_Per_NA,
 	Neighbor_Recency,
-	industry_class_value,
-	GLB_Purpose,
-	DPPA_Purpose,
-	probation_override_value,
-	no_scrub,
-	glb_ok,
-	dppa_ok,
-	
-	// attrs declared in doxie.MAC_Header_Field_Declare
-	ssn_mask_value,,,
-  neighbors_proximity // generally, the radius of neighbors' units: houses, or appartments or etc.
+	,,
+  neighbors_proximity, // generally, the radius of neighbors' units: houses, or appartments or etc.
+  ,
+  mod_access
 );
 
 // generate current/historic neighbors as specified
@@ -93,6 +86,6 @@ nbr_records_hist := IF(
 );
 
 both := nbr_records_curr + nbr_records_hist;
-ut.PermissionTools.GLB.mac_FilterOutMinors(both,bothfil,,,dob)
+bothfil := doxie.compliance.mac_FilterOutMinors(both,,dob,mod_access.show_minors);
 
 export nbr_records := bothfil;

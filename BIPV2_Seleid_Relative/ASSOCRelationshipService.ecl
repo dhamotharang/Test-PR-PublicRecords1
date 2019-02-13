@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="ASSOCRelationshipService">
 <part name="Seleid" type="xsd:unsignedInt"/>
 <part name="Depth" type="xsd:unsignedInt"/>
@@ -6,7 +6,7 @@
 */
 /*--INFO-- Will follow ASSOC links up to N levels deep. Warning: High N could be slow and produce large datasets!*/
 EXPORT ASSOCRelationshipService := MACRO
-  IMPORT SALT30,BIPV2_Seleid_Relative;
+  IMPORT SALT31,BIPV2_Seleid_Relative;
   UNSIGNED Seleid_val := 0 : stored('Seleid');
   UNSIGNED1 Depth := 1 : stored('Depth');
   BFile := BIPV2_Seleid_Relative.In_Base;
@@ -24,4 +24,3 @@ EXPORT ASSOCRelationshipService := MACRO
   Add_Linkage := JOIN(AllTree, Rolled, left.Seleid2=right.Seleid);
 OUTPUT( CHOOSEN(Add_Linkage,1000),NAMED('Relative_Records'));
 ENDMACRO;
- 

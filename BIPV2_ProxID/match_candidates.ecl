@@ -68,6 +68,7 @@ SHARED SrcRidVlid_prop0 := DISTRIBUTE( Specificities(ih).SrcRidVlid_values_persi
 SHARED ForeignCorpkey_prop0 := DISTRIBUTE( Specificities(ih).ForeignCorpkey_values_persisted(Basis_cnt<20000), HASH(Proxid)); // Not guaranteed distributed by Proxid :(
 SHARED RAAddresses_prop0 := DISTRIBUTE( Specificities(ih).RAAddresses_values_persisted(Basis_cnt<20000), HASH(Proxid)); // Not guaranteed distributed by Proxid :(
 SHARED FilterPrimNames_prop0 := DISTRIBUTE( Specificities(ih).FilterPrimNames_values_persisted(Basis_cnt<20000), HASH(Proxid)); // Not guaranteed distributed by Proxid :(
+SHARED UnderLinks_prop0 := DISTRIBUTE( Specificities(ih).UnderLinks_values_persisted(Basis_cnt<20000), HASH(Proxid)); // Not guaranteed distributed by Proxid :(
 SHARED BestM := MAC_CreateBest(ih, , );
 // Now generate code for basis :cnp_name,prim_name_derived,v_city_name,st,zip
 // There are 1 best types that we can propogate from this basis which means we will not need to use this basis again
@@ -78,7 +79,7 @@ SHARED BestM := MAC_CreateBest(ih, , );
     SELF.prim_range_derived_prop := IF ( le.prim_range_derived = SELF.prim_range_derived, le.prim_range_derived_prop,1); // Flag the propagation for sliceouts
     SELF := le;
   END;
-SHARED P_SINGLEPRIMRANGE_1_0 := JOIN(with_props((cnp_name NOT IN SET(s.nulls_cnp_name,cnp_name) AND cnp_name <> (TYPEOF(cnp_name))''),(prim_name_derived NOT IN SET(s.nulls_prim_name_derived,prim_name_derived) AND prim_name_derived <> (TYPEOF(prim_name_derived))''),(v_city_name NOT IN SET(s.nulls_v_city_name,v_city_name) AND v_city_name <> (TYPEOF(v_city_name))''),(st NOT IN SET(s.nulls_st,st) AND st <> (TYPEOF(st))''),(zip NOT IN SET(s.nulls_zip,zip) AND zip <> (TYPEOF(zip))'')),BestM.BestBy_cnp_name_prim_name_derived_v_city_name_st_zip_best,LEFT.cnp_name = RIGHT.cnp_name AND LEFT.prim_name_derived = RIGHT.prim_name_derived AND LEFT.v_city_name = RIGHT.v_city_name AND LEFT.st = RIGHT.st AND LEFT.zip = RIGHT.zip,T_SINGLEPRIMRANGE_1_0(LEFT,RIGHT),LEFT OUTER,HASH)
+SHARED P_SINGLEPRIMRANGE_1_0 := JOIN(with_props((cnp_name NOT IN SET(s.nulls_cnp_name,cnp_name) AND cnp_name <> (TYPEOF(cnp_name))''),(prim_name_derived NOT IN SET(s.nulls_prim_name_derived,prim_name_derived) AND prim_name_derived <> (TYPEOF(prim_name_derived))''),(v_city_name NOT IN SET(s.nulls_v_city_name,v_city_name) AND v_city_name <> (TYPEOF(v_city_name))''),(st NOT IN SET(s.nulls_st,st) AND st <> (TYPEOF(st))''),(zip NOT IN SET(s.nulls_zip,zip) AND zip <> (TYPEOF(zip))'')),PULL(BestM.BestBy_cnp_name_prim_name_derived_v_city_name_st_zip_best),LEFT.cnp_name = RIGHT.cnp_name AND LEFT.prim_name_derived = RIGHT.prim_name_derived AND LEFT.v_city_name = RIGHT.v_city_name AND LEFT.st = RIGHT.st AND LEFT.zip = RIGHT.zip,T_SINGLEPRIMRANGE_1_0(LEFT,RIGHT),LEFT OUTER,HASH)
                  + with_props((cnp_name  IN SET(s.nulls_cnp_name,cnp_name) OR cnp_name = (TYPEOF(cnp_name))'') OR (prim_name_derived  IN SET(s.nulls_prim_name_derived,prim_name_derived) OR prim_name_derived = (TYPEOF(prim_name_derived))'') OR (v_city_name  IN SET(s.nulls_v_city_name,v_city_name) OR v_city_name = (TYPEOF(v_city_name))'') OR (st  IN SET(s.nulls_st,st) OR st = (TYPEOF(st))'') OR (zip  IN SET(s.nulls_zip,zip) OR zip = (TYPEOF(zip))''));
  
 SALT311.mac_prop_field(thin_table(active_duns_number NOT IN SET(s.nulls_active_duns_number,active_duns_number)),active_duns_number,Proxid,active_duns_number_props); // For every DID find the best FULL active_duns_number
@@ -92,6 +93,7 @@ SHARED SrcRidVlid_prop1 := JOIN(SrcRidVlid_prop0,active_duns_number_props,left.P
 SHARED ForeignCorpkey_prop1 := JOIN(ForeignCorpkey_prop0,active_duns_number_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
 SHARED RAAddresses_prop1 := JOIN(RAAddresses_prop0,active_duns_number_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
 SHARED FilterPrimNames_prop1 := JOIN(FilterPrimNames_prop0,active_duns_number_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
+SHARED UnderLinks_prop1 := JOIN(UnderLinks_prop0,active_duns_number_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
  
 SALT311.mac_prop_field(thin_table(active_enterprise_number NOT IN SET(s.nulls_active_enterprise_number,active_enterprise_number)),active_enterprise_number,Proxid,active_enterprise_number_props); // For every DID find the best FULL active_enterprise_number
 layout_withpropvars take_active_enterprise_number(with_props le,active_enterprise_number_props ri) := TRANSFORM
@@ -104,6 +106,7 @@ SHARED SrcRidVlid_prop2 := JOIN(SrcRidVlid_prop1,active_enterprise_number_props,
 SHARED ForeignCorpkey_prop2 := JOIN(ForeignCorpkey_prop1,active_enterprise_number_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
 SHARED RAAddresses_prop2 := JOIN(RAAddresses_prop1,active_enterprise_number_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
 SHARED FilterPrimNames_prop2 := JOIN(FilterPrimNames_prop1,active_enterprise_number_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
+SHARED UnderLinks_prop2 := JOIN(UnderLinks_prop1,active_enterprise_number_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
  
 SALT311.mac_prop_field(thin_table(active_domestic_corp_key NOT IN SET(s.nulls_active_domestic_corp_key,active_domestic_corp_key)),active_domestic_corp_key,Proxid,active_domestic_corp_key_props); // For every DID find the best FULL active_domestic_corp_key
 layout_withpropvars take_active_domestic_corp_key(with_props le,active_domestic_corp_key_props ri) := TRANSFORM
@@ -116,6 +119,7 @@ SHARED SrcRidVlid_prop3 := JOIN(SrcRidVlid_prop2,active_domestic_corp_key_props,
 SHARED ForeignCorpkey_prop3 := JOIN(ForeignCorpkey_prop2,active_domestic_corp_key_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
 SHARED RAAddresses_prop3 := JOIN(RAAddresses_prop2,active_domestic_corp_key_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
 SHARED FilterPrimNames_prop3 := JOIN(FilterPrimNames_prop2,active_domestic_corp_key_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
+SHARED UnderLinks_prop3 := JOIN(UnderLinks_prop2,active_domestic_corp_key_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
  
 SALT311.mac_prop_field(thin_table(hist_enterprise_number NOT IN SET(s.nulls_hist_enterprise_number,hist_enterprise_number)),hist_enterprise_number,Proxid,hist_enterprise_number_props); // For every DID find the best FULL hist_enterprise_number
 layout_withpropvars take_hist_enterprise_number(with_props le,hist_enterprise_number_props ri) := TRANSFORM
@@ -177,12 +181,14 @@ SHARED SrcRidVlid_prop4 := JOIN(SrcRidVlid_prop3,company_fein_props,left.Proxid=
 SHARED ForeignCorpkey_prop4 := JOIN(ForeignCorpkey_prop3,company_fein_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
 SHARED RAAddresses_prop4 := JOIN(RAAddresses_prop3,company_fein_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
 SHARED FilterPrimNames_prop4 := JOIN(FilterPrimNames_prop3,company_fein_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
+SHARED UnderLinks_prop4 := JOIN(UnderLinks_prop3,company_fein_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
  
 SALT311.mac_prop_field(thin_table(cnp_name NOT IN SET(s.nulls_cnp_name,cnp_name)),cnp_name,Proxid,cnp_name_props); // For every DID find the best FULL cnp_name
 SHARED SrcRidVlid_prop5 := JOIN(SrcRidVlid_prop4,cnp_name_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
 SHARED ForeignCorpkey_prop5 := JOIN(ForeignCorpkey_prop4,cnp_name_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
 SHARED RAAddresses_prop5 := JOIN(RAAddresses_prop4,cnp_name_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
 SHARED FilterPrimNames_prop5 := JOIN(FilterPrimNames_prop4,cnp_name_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
+SHARED UnderLinks_prop5 := JOIN(UnderLinks_prop4,cnp_name_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
  
 SALT311.mac_prop_field(thin_table(company_name_type_derived NOT IN SET(s.nulls_company_name_type_derived,company_name_type_derived)),company_name_type_derived,Proxid,company_name_type_derived_props); // For every DID find the best FULL company_name_type_derived
 layout_withpropvars take_company_name_type_derived(with_props le,company_name_type_derived_props ri) := TRANSFORM
@@ -203,6 +209,7 @@ SHARED SrcRidVlid_prop6 := JOIN(SrcRidVlid_prop5,cnp_number_props,left.Proxid=ri
 SHARED ForeignCorpkey_prop6 := JOIN(ForeignCorpkey_prop5,cnp_number_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
 SHARED RAAddresses_prop6 := JOIN(RAAddresses_prop5,cnp_number_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
 SHARED FilterPrimNames_prop6 := JOIN(FilterPrimNames_prop5,cnp_number_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
+SHARED UnderLinks_prop6 := JOIN(UnderLinks_prop5,cnp_number_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
  
 SALT311.mac_prop_field(thin_table(company_phone NOT IN SET(s.nulls_company_phone,company_phone)),company_phone,Proxid,company_phone_props); // For every DID find the best FULL company_phone
 layout_withpropvars take_company_phone(with_props le,company_phone_props ri) := TRANSFORM
@@ -217,6 +224,7 @@ SHARED SrcRidVlid_prop7 := JOIN(SrcRidVlid_prop6,prim_name_derived_props,left.Pr
 SHARED ForeignCorpkey_prop7 := JOIN(ForeignCorpkey_prop6,prim_name_derived_props,left.Proxid=right.Proxid,LOCAL);
 SHARED RAAddresses_prop7 := JOIN(RAAddresses_prop6,prim_name_derived_props,left.Proxid=right.Proxid,LOCAL);
 SHARED FilterPrimNames_prop7 := JOIN(FilterPrimNames_prop6,prim_name_derived_props,left.Proxid=right.Proxid,LOCAL);
+SHARED UnderLinks_prop7 := JOIN(UnderLinks_prop6,prim_name_derived_props,left.Proxid=right.Proxid,LOCAL);
  
 SALT311.mac_prop_field(thin_table(sec_range NOT IN SET(s.nulls_sec_range,sec_range)),sec_range,Proxid,sec_range_props); // For every DID find the best FULL sec_range
 layout_withpropvars take_sec_range(with_props le,sec_range_props ri) := TRANSFORM
@@ -231,6 +239,7 @@ SHARED SrcRidVlid_prop8 := JOIN(SrcRidVlid_prop7,st_props,left.Proxid=right.Prox
 SHARED ForeignCorpkey_prop8 := JOIN(ForeignCorpkey_prop7,st_props,left.Proxid=right.Proxid,LOCAL);
 SHARED RAAddresses_prop8 := JOIN(RAAddresses_prop7,st_props,left.Proxid=right.Proxid,LOCAL);
 SHARED FilterPrimNames_prop8 := JOIN(FilterPrimNames_prop7,st_props,left.Proxid=right.Proxid,LOCAL);
+SHARED UnderLinks_prop8 := JOIN(UnderLinks_prop7,st_props,left.Proxid=right.Proxid,LOCAL);
  
 SALT311.mac_prop_field(thin_table(prim_range_derived NOT IN SET(s.nulls_prim_range_derived,prim_range_derived)),prim_range_derived,Proxid,prim_range_derived_props); // For every DID find the best FULL prim_range_derived
 layout_withpropvars take_prim_range_derived(with_props le,prim_range_derived_props ri) := TRANSFORM
@@ -243,10 +252,12 @@ SHARED SrcRidVlid_prop9 := JOIN(SrcRidVlid_prop8,prim_range_derived_props,left.P
 SHARED ForeignCorpkey_prop9 := JOIN(ForeignCorpkey_prop8,prim_range_derived_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
 SHARED RAAddresses_prop9 := JOIN(RAAddresses_prop8,prim_range_derived_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
 SHARED FilterPrimNames_prop9 := JOIN(FilterPrimNames_prop8,prim_range_derived_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
+SHARED UnderLinks_prop9 := JOIN(UnderLinks_prop8,prim_range_derived_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
 SHARED SrcRidVlid_prp := SrcRidVlid_prop9;
 SHARED ForeignCorpkey_prp := ForeignCorpkey_prop9;
 SHARED RAAddresses_prp := RAAddresses_prop9;
 SHARED FilterPrimNames_prp := FilterPrimNames_prop9;
+SHARED UnderLinks_prp := UnderLinks_prop9;
  
 pj30 do_computes(pj30 le) := TRANSFORM
   SELF.company_csz := IF (Fields.InValid_company_csz((SALT311.StrType)le.v_city_name,(SALT311.StrType)le.st,(SALT311.StrType)le.zip)>0,0,HASH32((SALT311.StrType)le.v_city_name,(SALT311.StrType)le.st,(SALT311.StrType)le.zip)); // Combine child fields into 1 for specificity counting
@@ -424,6 +435,33 @@ EXPORT Layout_FilterPrimNames_Candidates := RECORD
   BOOLEAN prim_range_derived_isnull := (FilterPrimNames_prp.prim_range_derived  IN SET(s.nulls_prim_range_derived,prim_range_derived) OR FilterPrimNames_prp.prim_range_derived = (TYPEOF(FilterPrimNames_prp.prim_range_derived))''); // Simplify later processing 
 END;
 SHARED FilterPrimNames_pp := TABLE(FilterPrimNames_prp,Layout_FilterPrimNames_Candidates)(~prim_name_derived_isnull,~st_isnull);
+EXPORT Layout_UnderLinks_Candidates := RECORD
+  {UnderLinks_prp} AND NOT [cnp_name,prim_name_derived];
+  INTEGER2 active_duns_number_weight100 := 0; // Contains 100x the specificity
+  BOOLEAN active_duns_number_isnull := (UnderLinks_prp.active_duns_number  IN SET(s.nulls_active_duns_number,active_duns_number) OR UnderLinks_prp.active_duns_number = (TYPEOF(UnderLinks_prp.active_duns_number))''); // Simplify later processing 
+  INTEGER2 active_enterprise_number_weight100 := 0; // Contains 100x the specificity
+  BOOLEAN active_enterprise_number_isnull := (UnderLinks_prp.active_enterprise_number  IN SET(s.nulls_active_enterprise_number,active_enterprise_number) OR UnderLinks_prp.active_enterprise_number = (TYPEOF(UnderLinks_prp.active_enterprise_number))''); // Simplify later processing 
+  INTEGER2 active_domestic_corp_key_weight100 := 0; // Contains 100x the specificity
+  BOOLEAN active_domestic_corp_key_isnull := (UnderLinks_prp.active_domestic_corp_key  IN SET(s.nulls_active_domestic_corp_key,active_domestic_corp_key) OR UnderLinks_prp.active_domestic_corp_key = (TYPEOF(UnderLinks_prp.active_domestic_corp_key))''); // Simplify later processing 
+  INTEGER2 company_fein_weight100 := 0; // Contains 100x the specificity
+  BOOLEAN company_fein_isnull := (UnderLinks_prp.company_fein  IN SET(s.nulls_company_fein,company_fein) OR UnderLinks_prp.company_fein = (TYPEOF(UnderLinks_prp.company_fein))''); // Simplify later processing 
+  UNSIGNED company_fein_cnt := 0; // Number of instances with this particular field value
+  UNSIGNED company_fein_e1_cnt := 0; // Number of names instances matching this one by edit distance
+  UNSIGNED1 company_fein_len := LENGTH(TRIM(UnderLinks_prp.company_fein));
+  STRING500 cnp_name := UnderLinks_prp.cnp_name; // Expanded wordbag field
+  INTEGER2 cnp_name_weight100 := 0; // Contains 100x the specificity
+  BOOLEAN cnp_name_isnull := (UnderLinks_prp.cnp_name  IN SET(s.nulls_cnp_name,cnp_name) OR UnderLinks_prp.cnp_name = (TYPEOF(UnderLinks_prp.cnp_name))''); // Simplify later processing 
+  INTEGER2 cnp_number_weight100 := 0; // Contains 100x the specificity
+  BOOLEAN cnp_number_isnull := (UnderLinks_prp.cnp_number  IN SET(s.nulls_cnp_number,cnp_number) OR UnderLinks_prp.cnp_number = (TYPEOF(UnderLinks_prp.cnp_number))''); // Simplify later processing 
+  STRING500 prim_name_derived := UnderLinks_prp.prim_name_derived; // Expanded wordbag field
+  INTEGER2 prim_name_derived_weight100 := 0; // Contains 100x the specificity
+  BOOLEAN prim_name_derived_isnull := (UnderLinks_prp.prim_name_derived  IN SET(s.nulls_prim_name_derived,prim_name_derived) OR UnderLinks_prp.prim_name_derived = (TYPEOF(UnderLinks_prp.prim_name_derived))''); // Simplify later processing 
+  INTEGER2 st_weight100 := 0; // Contains 100x the specificity
+  BOOLEAN st_isnull := (UnderLinks_prp.st  IN SET(s.nulls_st,st) OR UnderLinks_prp.st = (TYPEOF(UnderLinks_prp.st))''); // Simplify later processing 
+  INTEGER2 prim_range_derived_weight100 := 0; // Contains 100x the specificity
+  BOOLEAN prim_range_derived_isnull := (UnderLinks_prp.prim_range_derived  IN SET(s.nulls_prim_range_derived,prim_range_derived) OR UnderLinks_prp.prim_range_derived = (TYPEOF(UnderLinks_prp.prim_range_derived))''); // Simplify later processing 
+END;
+SHARED UnderLinks_pp := TABLE(UnderLinks_prp,Layout_UnderLinks_Candidates)(~prim_name_derived_isnull,~st_isnull);
 EXPORT Layout_Candidates := RECORD // A record to hold weights of each field value
   {h0} AND NOT [cnp_name,prim_name_derived]; // remove wordbag fields which need to be expanded
   INTEGER2 active_duns_number_weight100 := 0; // Contains 100x the specificity
@@ -612,7 +650,7 @@ SALT311.MAC_Choose_JoinType(j1,s.nulls_active_enterprise_number,Specificities(ih
 SHARED j0_dist := DISTRIBUTE(j0, HASH(Proxid));
 SHARED Annotated_NoDedup := j0_dist : PERSIST('~temp::Proxid::BIPV2_ProxID::mc_nodedup',EXPIRE(BIPV2_ProxID.Config.PersistExpire)); // No dedup- for aggressive slicing
 SHARED Annotated_Dedup := IF(Config.FastSlice, j0_dist, MAC_RollupCandidates(Annotated_NoDedup, fieldListWithPropFlags, fieldList, FALSE));
-SHARED Annotated := Annotated_Dedup : PERSIST('~temp::Proxid::BIPV2_ProxID::mc',EXPIRE(BIPV2_ProxID.Config.PersistExpire)); // Distributed for keybuild case
+export Annotated := Annotated_Dedup : PERSIST('~temp::Proxid::BIPV2_ProxID::mc',EXPIRE(BIPV2_ProxID.Config.PersistExpire)); // Distributed for keybuild case
  
 //Now prepare candidate file for SrcRidVlid attribute file
 layout_SrcRidVlid_candidates add_SrcRidVlid_active_enterprise_number(layout_SrcRidVlid_candidates le,Specificities(ih).active_enterprise_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
@@ -821,6 +859,58 @@ layout_FilterPrimNames_candidates add_FilterPrimNames_st(layout_FilterPrimNames_
 END;
 jFilterPrimNames_21 := JOIN(jFilterPrimNames_18,PULL(Specificities(ih).st_values_persisted),LEFT.st=RIGHT.st,add_FilterPrimNames_st(LEFT,RIGHT,TRUE),LOOKUP,FEW,LEFT OUTER);
 EXPORT FilterPrimNames_candidates := jFilterPrimNames_21 : PERSIST('~temp::Proxid::BIPV2_ProxID::mc::FilterPrimNames',EXPIRE(BIPV2_ProxID.Config.PersistExpire));
+ 
+//Now prepare candidate file for UnderLinks attribute file
+layout_UnderLinks_candidates add_UnderLinks_active_enterprise_number(layout_UnderLinks_candidates le,Specificities(ih).active_enterprise_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.active_enterprise_number_weight100 := MAP (le.active_enterprise_number_isnull => 0, patch_default and ri.field_specificity=0 => s.active_enterprise_number_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT311.MAC_Choose_JoinType(UnderLinks_pp,s.nulls_active_enterprise_number,Specificities(ih).active_enterprise_number_values_persisted,active_enterprise_number,active_enterprise_number_weight100,add_UnderLinks_active_enterprise_number,jUnderLinks_0);
+layout_UnderLinks_candidates add_UnderLinks_active_domestic_corp_key(layout_UnderLinks_candidates le,Specificities(ih).active_domestic_corp_key_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.active_domestic_corp_key_weight100 := MAP (le.active_domestic_corp_key_isnull => 0, patch_default and ri.field_specificity=0 => s.active_domestic_corp_key_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT311.MAC_Choose_JoinType(jUnderLinks_0,s.nulls_active_domestic_corp_key,Specificities(ih).active_domestic_corp_key_values_persisted,active_domestic_corp_key,active_domestic_corp_key_weight100,add_UnderLinks_active_domestic_corp_key,jUnderLinks_3);
+layout_UnderLinks_candidates add_UnderLinks_active_duns_number(layout_UnderLinks_candidates le,Specificities(ih).active_duns_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.active_duns_number_weight100 := MAP (le.active_duns_number_isnull => 0, patch_default and ri.field_specificity=0 => s.active_duns_number_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT311.MAC_Choose_JoinType(jUnderLinks_3,s.nulls_active_duns_number,Specificities(ih).active_duns_number_values_persisted,active_duns_number,active_duns_number_weight100,add_UnderLinks_active_duns_number,jUnderLinks_7);
+layout_UnderLinks_candidates add_UnderLinks_company_fein(layout_UnderLinks_candidates le,Specificities(ih).company_fein_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.company_fein_cnt := ri.cnt;
+  SELF.company_fein_e1_cnt := ri.e1_cnt;
+  SELF.company_fein_weight100 := MAP (le.company_fein_isnull => 0, patch_default and ri.field_specificity=0 => s.company_fein_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT311.MAC_Choose_JoinType(jUnderLinks_7,s.nulls_company_fein,Specificities(ih).company_fein_values_persisted,company_fein,company_fein_weight100,add_UnderLinks_company_fein,jUnderLinks_11);
+layout_UnderLinks_candidates add_UnderLinks_cnp_number(layout_UnderLinks_candidates le,Specificities(ih).cnp_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.cnp_number_weight100 := MAP (le.cnp_number_isnull => 0, patch_default and ri.field_specificity=0 => s.cnp_number_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT311.MAC_Choose_JoinType(jUnderLinks_11,s.nulls_cnp_number,Specificities(ih).cnp_number_values_persisted,cnp_number,cnp_number_weight100,add_UnderLinks_cnp_number,jUnderLinks_13);
+layout_UnderLinks_candidates add_UnderLinks_cnp_name(layout_UnderLinks_candidates le,Specificities(ih).cnp_name_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.cnp_name_weight100 := MAP (le.cnp_name_isnull => 0, patch_default and ri.field_specificity=0 => s.cnp_name_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF.cnp_name := IF( ri.field_specificity<>0 or ri.word<>'',SELF.cnp_name_weight100+' '+ri.word,SALT311.Fn_WordBag_AppendSpecs_Fake(le.cnp_name, s.cnp_name_specificity) );// Copy in annotated wordstring
+  SELF := le;
+END;
+SALT311.MAC_Choose_JoinType(jUnderLinks_13,s.nulls_cnp_name,Specificities(ih).cnp_name_values_persisted,cnp_name,cnp_name_weight100,add_UnderLinks_cnp_name,jUnderLinks_16);
+layout_UnderLinks_candidates add_UnderLinks_prim_range_derived(layout_UnderLinks_candidates le,Specificities(ih).prim_range_derived_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.prim_range_derived_weight100 := MAP (le.prim_range_derived_isnull => 0, patch_default and ri.field_specificity=0 => s.prim_range_derived_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT311.MAC_Choose_JoinType(jUnderLinks_16,s.nulls_prim_range_derived,Specificities(ih).prim_range_derived_values_persisted,prim_range_derived,prim_range_derived_weight100,add_UnderLinks_prim_range_derived,jUnderLinks_17);
+layout_UnderLinks_candidates add_UnderLinks_prim_name_derived(layout_UnderLinks_candidates le,Specificities(ih).prim_name_derived_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.prim_name_derived_weight100 := MAP (le.prim_name_derived_isnull => 0, patch_default and ri.field_specificity=0 => s.prim_name_derived_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF.prim_name_derived := IF( ri.field_specificity<>0 or ri.word<>'',SELF.prim_name_derived_weight100+' '+ri.word,SALT311.Fn_WordBag_AppendSpecs_Fake(le.prim_name_derived, s.prim_name_derived_specificity) );// Copy in annotated wordstring
+  SELF := le;
+END;
+SALT311.MAC_Choose_JoinType(jUnderLinks_17,s.nulls_prim_name_derived,Specificities(ih).prim_name_derived_values_persisted,prim_name_derived,prim_name_derived_weight100,add_UnderLinks_prim_name_derived,jUnderLinks_18);
+layout_UnderLinks_candidates add_UnderLinks_st(layout_UnderLinks_candidates le,Specificities(ih).st_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.st_weight100 := MAP (le.st_isnull => 0, patch_default and ri.field_specificity=0 => s.st_maximum, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+jUnderLinks_21 := JOIN(jUnderLinks_18,PULL(Specificities(ih).st_values_persisted),LEFT.st=RIGHT.st,add_UnderLinks_st(LEFT,RIGHT,TRUE),LOOKUP,FEW,LEFT OUTER);
+EXPORT UnderLinks_candidates := jUnderLinks_21 : PERSIST('~temp::Proxid::BIPV2_ProxID::mc::UnderLinks',EXPIRE(BIPV2_ProxID.Config.PersistExpire));
 //Now see if these records are actually linkable
 TotalWeight := Annotated.active_enterprise_number_weight100 + Annotated.hist_enterprise_number_weight100 + Annotated.ebr_file_number_weight100 + Annotated.active_domestic_corp_key_weight100 + Annotated.hist_domestic_corp_key_weight100 + Annotated.foreign_corp_key_weight100 + Annotated.unk_corp_key_weight100 + Annotated.active_duns_number_weight100 + Annotated.hist_duns_number_weight100 + Annotated.company_phone_weight100 + Annotated.company_address_weight100 + Annotated.company_fein_weight100 + Annotated.cnp_number_weight100 + Annotated.cnp_name_weight100 + Annotated.cnp_btype_weight100 + Annotated.company_name_type_derived_weight100;
 SHARED Linkable := TotalWeight >= Config.MatchThreshold;

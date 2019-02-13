@@ -41,7 +41,7 @@ EXPORT Batch_Service() := FUNCTION
 		batch_params := Govt_Collections_Services.IParams.getBatchParams();	
 
   // batch_params is a module, so this couldn't be declared before it (side effect)
-  #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+  #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 		
 		
 		/* ************************************************************************

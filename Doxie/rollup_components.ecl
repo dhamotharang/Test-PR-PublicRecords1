@@ -1,4 +1,4 @@
-IMPORT doxie, ut, mdr, advo, header;
+﻿IMPORT doxie, ut, mdr, advo, header;
 
 EXPORT rollup_components(GROUPED DATASET(doxie.Layout_HeaderFileSearch) indata,boolean allow_wildcard = false) :=
 MODULE
@@ -358,6 +358,7 @@ MODULE
 			SELF.d.dod := l.dod;
 			SELF.d.dead_age := l.dead_age;
 			SELF.d.deceased := l.deceased;
+			SELF.d.IsLimitedAccessDMF := l.IsLimitedAccessDMF;
 		END;
 
 		dodtbl := PROJECT(indata(deceased = 'Y'), extendDods(LEFT));
@@ -370,6 +371,7 @@ MODULE
 			// list is sorted, so most complete dod variation is on the right
 			SELF.d.dod := ri.d.dod;
 			SELF.d.dead_age := IF(ri.d.dead_age <> 0, ri.d.dead_age, le.d.dead_age);
+			SELF.d.IsLimitedAccessDMF := le.d.IsLimitedAccessDMF;
 			SELF.d.deceased := map(le.d.deceased = 'Y' or ri.d.deceased = 'Y' => 'Y',
 				le.d.deceased = 'N' or ri.d.deceased = 'N' => 'N',
 				'U');

@@ -1,4 +1,4 @@
-IMPORT SALT31,ut;
+﻿IMPORT SALT31,ut;
 import mdr;//HACK
 EXPORT Relationships(DATASET(layout_Base) ih,DATASET(match_candidates(ih).layout_candidates) mc = Match_Candidates(ih).candidates, layout_specificities.R s = Specificities(ih).specificities[1]) := MODULE
 SHARED h := Scaled_Candidates(ih,mc);

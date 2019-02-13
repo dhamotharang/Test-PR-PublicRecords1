@@ -6,7 +6,7 @@
 IMPORT Address, AutoStandardI, Gateway, iesp, govt_collections_services, ut, Doxie, Suppress, STD, WSInput;
 
 EXPORT Report_Service() := MACRO
-    #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+    #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
     // Setup the field that shall be displayed on the WsECL page.
     WSInput.MAC_Govt_Collections_Report_Service();
     
@@ -41,7 +41,7 @@ EXPORT Report_Service() := MACRO
    // Attempt to derive an SSN from the given DID value that may be provided on input to this service
    // interface Use the unmasked SSN regardless of SSN mask setting because we are using this SSN 
    // internally in our search criteria.
-   rec := SSNBest_Services.Raw.Get_All(DATASET([{'', icrReportBy.uniqueid}], {STRING best_ssn, INTEGER did}), dataset([{}]));
+   rec := SSNBest_Services.Raw.Get_All(DATASET([{'', icrReportBy.uniqueid}],{STRING best_ssn, INTEGER did}));
    ssn_by_did := rec.subject[1].ssn;
 
    // Setup some values that will be passed into the Records attribute call later.

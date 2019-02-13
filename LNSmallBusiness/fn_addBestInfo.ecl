@@ -14,6 +14,7 @@ EXPORT fn_addBestInfo (LNSmallBusiness.IParam.LNSmallBiz_BIP_CombinedReport_IPar
       EXPORT string5 industry_class := SmallBizCombined_inmod.industryclass; 
       EXPORT string32 application_type := SmallBizCombined_inmod.applicationtype;
       EXPORT string ssn_mask := SmallBizCombined_inmod.ssnmask; 
+      EXPORT boolean show_minors := FALSE; //can be hardcoded, if needed.
     END;
 
     // When the search input does not contain an company phone number, we need to 

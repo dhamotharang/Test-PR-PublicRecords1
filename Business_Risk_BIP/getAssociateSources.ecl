@@ -270,10 +270,11 @@ EXPORT getAssociateSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// Don't attempt to grab watchlists unless we actually have some in the list...
 	watchlistResults := IF(COUNT(Options.Watchlists_Requested) <= 0, watchlistInputPrep,
 																																	 UNGROUP(Risk_Indicators.getWatchLists2(watchlistInput, OFAC_Only, Skip_Company_Search, Options.OFAC_Version, Include_OFAC, Include_Additional_Watchlists, Options.Global_Watchlist_Threshold, DOB_Radius, Options.Watchlists_Requested, options.gateways)));
-  if(exists(watchlistResults(watchlist_table = 'ERR')), FAIL('Bridger Gateway Error'));
+
+  validWatchlistResults := watchlistResults(IF(watchlist_table = 'ERR', ERROR('Bridger Gateway Error'), true));
 
   // Count the number of unique Associates per Seq, and count the number that have a watchlist hit
-	watchlistStats := TABLE(watchlistResults, 
+	watchlistStats := TABLE(validWatchlistResults, 
 		{Seq,
 		UNSIGNED8 Associates := COUNT(GROUP),
 		UNSIGNED8 WatchlistAssociates := COUNT(GROUP, watchlist_record_number <> '')
