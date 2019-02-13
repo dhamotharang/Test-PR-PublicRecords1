@@ -5,6 +5,9 @@ NOTE: We only need file info here for
 a) Spray/DeSpray and the data preparation we used to do during the build before the append.
 b) Our Base file and 
 c) any research/maintenance
+
+Search for:
+prct::BASE::ct::alpharetta*peopleheader_Base*
 ************************************************************************************ */
 IMPORT ut, PRTE;
 IMPORT PRTE_CSV, PRTE2_Common;
@@ -28,21 +31,19 @@ EXPORT Files := MODULE
 		EXPORT SPRAYED_DS				:= DATASET(FILE_SPRAY_NAME, Base_Layout,
 	                                CSV(HEADING(1), SEPARATOR(','), TERMINATOR(['\n','\r\n']), QUOTE('"')));	
 
-		// ----------------------------------------------------------------------------------------------------------------------------------
-		// Originally base file built from processing the XREF data ... we can comment this out once we're sure all is good.
-		EXPORT HDR_BASE_ALPHA_NAME0		:= Base_Prefix+'::'+base_name;
-		EXPORT HDR_BASE_ALPHA_DS0			:= DATASET(HDR_BASE_ALPHA_NAME0,Base_Layout,THOR);
-
+		// NOTE: we never modify or adjust the Boca Person Header base except via the IHDR base, so just save the base in the Boca layout.
 		// ----------------------------------------------------------------------------------------------------------------------------------
 		// Feb 2015, this now should be the new Alpharetta Spreadsheet base - built from XREF_Enhanced by PRTE2_Header_Ins.U_BWR_CreateInitialFile
 		EXPORT HDR_BASE_ALPHA_NAME 		:= Base_Prefix+'::qa::'+base_name;
 		EXPORT HDR_BASE_ALPHA_DS			:= DATASET(HDR_BASE_ALPHA_NAME,Base_Layout,THOR);
 		// ----------------------------------------------------------------------------------------------------------------------------------
 
-
+		// ----------------------------------------------------------------------------------------------------------------------------------
+		// *** Not certain which base layout the new Boca build uses so save both just in case ***************	BUT WE MAY NOT NEED THIS
 		// ----------------------------------------------------------------------------------------------------------------------------------
 		// Feb 2015, this should be the Alpharetta PRTE Boca Header build base file ... the above PLUS the relationship join expansion.
-		// During the build, the Boca code references PRTE2_
+		// FEB 2018 - Gabriel says in the new build, they re-generate relations with all combined (legacy+Boca+our data) so this seems to
+		// 							be obsolete unless at this time. Gabriel says look at this WU W20180213-102027 in prod thor.		
 		EXPORT HDR_BASE_ALPHA_RELATES_Name	:= Base_Prefix+'::qa::'+Relationship_Suffix;
 		EXPORT HDR_BASE_ALPHA_RELATES_DS		:= DATASET(HDR_BASE_ALPHA_RELATES_Name,Relative_Layout,THOR);
 
@@ -51,11 +52,11 @@ Boca header keys are prefixed as follows:
 prte::key::header*
 and 
 prte::key::fcra::header*
-*/
 		// Boca has one main payload + about 4 smaller files that makes up it's entire header data.
 		//  This reference is mainly just here for reference to find where this is referenced.
 		EXPORT BOCA_MAIN_PAYLOAD_NAME	:=	'~prte::in::header::payload';
 		EXPORT BOCA_MAIN_PAYLOAD_DS		:=	PRTE_CSV.Header.dthor_data400__key__header__data;
+*/
 
 		// ------- Prod names are solely for the purpose of doing CT desprays from Dev, but getting the prod file. --------------------------
 		EXPORT HDR_BASE_ALPHA_Prod_NAME 		:= Add_Foreign_prod(HDR_BASE_ALPHA_NAME);
