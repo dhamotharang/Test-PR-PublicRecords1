@@ -579,10 +579,16 @@ InternetProtocol := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,ip_address),
 Bank := ENTITY(FLAT(UID(AssociatedCustomerFileInfo, RoutingNumber),
     Customer rCustomer=AssociatedCustomerFileInfo,
     Customer rSourceCustomer=SourceCustomerFileInfo,
-    STRING RoutingNumber
+    STRING RoutingNumber,
+    STRING FullBankname,
+    STRING AbbreviatedBankname,
+    STRING FractionalRoutingnumber,
+    STRING HeadofficeRoutingnumber,
+    STRING HeadofficeBranchcodes,
+    STRING hit
 		),
 	MODEL(UID,
-    rCustomer, SourceCustomers{rSourceCustomer}, RoutingNumber));
+    rCustomer, SourceCustomers{rSourceCustomer},RoutingNumber,FullBankname,AbbreviatedBankname,FractionalRoutingnumber,HeadofficeRoutingnumber,HeadofficeBranchcodes,hit));
 
 BankAccount := ENTITY(FLAT(UID(AssociatedCustomerFileInfo, RoutingNumber, AccountNumber),
     Customer rCustomer=AssociatedCustomerFileInfo,
@@ -889,12 +895,35 @@ USE KELOtto.fraudgovshared(FLAT,
     LexId = did),
 
   Bank(FILTER(bank_routing_number_1 != '' AND bank_account_number_1 != ''),
-    RoutingNumber = bank_routing_number_1
+    RoutingNumber = bank_routing_number_1,
+    FullBankname = bank1FullBankname,
+    AbbreviatedBankname = bank1AbbreviatedBankname,
+    FractionalRoutingnumber = bank1FractionalRoutingnumber,
+    HeadofficeRoutingnumber = bank1HeadofficeRoutingnumber,
+    HeadofficeBranchcodes = bank1HeadofficeBranchcodes,
+    hit = bank1hit 
+		),
+
+  Bank(FILTER(bank_routing_number_2 != '' AND bank_account_number_2 != ''),
+    RoutingNumber = bank_routing_number_2,
+    FullBankname = bank2FullBankname,
+    AbbreviatedBankname = bank2AbbreviatedBankname,
+    FractionalRoutingnumber = bank2FractionalRoutingnumber,
+    HeadofficeRoutingnumber = bank2HeadofficeRoutingnumber,
+    HeadofficeBranchcodes = bank2HeadofficeBranchcodes,
+    hit = bank2hit 
 		),
 
   BankAccount(FILTER((UNSIGNED)did <> 0 AND TRIM(bank_account_number_1) != ''),
+    OttoBankAccountId = OttoBankAccountId,
     RoutingNumber = bank_routing_number_1,
     AccountNumber = bank_account_number_1
+		),
+
+  BankAccount(FILTER((UNSIGNED)did <> 0 AND TRIM(bank_account_number_2) != ''),
+    OttoBankAccountId = OttoBankAccountId2,
+    RoutingNumber = bank_routing_number_2,
+    AccountNumber = bank_account_number_2
 		),
 
   DriversLicense(FILTER((UNSIGNED)did <> 0 AND TRIM(drivers_license) != ''),
@@ -906,6 +935,11 @@ USE KELOtto.fraudgovshared(FLAT,
     LexId = did,
     RoutingNumber = bank_routing_number_1,
     AccountNumber = bank_account_number_1
+		),
+  PersonBankAccount(FILTER((UNSIGNED)did <> 0 AND TRIM(bank_account_number_2) != ''),
+    LexId = did,
+    RoutingNumber = bank_routing_number_2,
+    AccountNumber = bank_account_number_2
 		),
 
   PersonDriversLicense(FILTER((UNSIGNED)did <> 0 AND TRIM(drivers_license) != ''),
@@ -1182,9 +1216,11 @@ Person: => HriVaFlag := MAP(COUNT(HriList(CONTAINS(Hri,'VA'))) > 0 => 1, 0);
 Person: => Nas9Flag := MAP(nas_summary = '9' => 1, 0); // SSN and Last Name not associated with identity per public records
 Person: => Nap3Flag := MAP(nap_summary = '3' => 1, 0); // Phone and Lastname not associated with identity per public records
 
+
 // Known Risk 
 Person: => KrHighRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrHighRiskIdentityFlag=1)) > 0 => 1, 0);
 Person: => KrMediumRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrMediumRiskIdentityFlag=1))>0 => 1, 0);
+Person: => KrHighRiskRouting := MAP(COUNT(PersonBankAccount.Account(HighRiskRouting=1))>0 => 1, 0);
 
 // Velocity
 
@@ -1206,6 +1242,8 @@ Person: => VlEvent30ActiveFlag := MAP(VlEvent30Count > 0 => 1, 0);
 
 // Cluster Attributes 
 
+Person: => ClHighRiskRoutingCount := SUM(PersonPerson.ToPerson, KrHighRiskRouting); // Count of Identities with high risk bank account routing.
+
 Person: => ClNoLexIdGt22Count := SUM(PersonPerson.ToPerson, NoLexIdGt22); // Count within cluster of identities with no lexid and older than 22.
 Person: => ClDeathPriorToAllEventsIdentityCount := SUM(PersonPerson.ToPerson, DeathPriorToAllEvents); // Count within cluster of identities that were deceased prior to all input. 
 Person: => ClHighRiskDeathPriorToAllEventsIdentityCount := SUM(PersonPerson.ToPerson, HighRiskDeathPriorToAllEvents);  // Count within cluster of death 5+ years prior to all input
@@ -1218,6 +1256,7 @@ Person: => ClNap3IdentityCount := SUM(PersonPerson.ToPerson, Nap3Flag);  // Coun
 
 Person: => ClActive7IdentityCount := COUNT(PersonPerson.ToPerson(VlEvent7ActiveFlag=1));  // Count within cluster of active identities in the last 7 days.
 Person: => ClActive30IdentityCount := COUNT(PersonPerson.ToPerson(VlEvent30ActiveFlag=1));  // Count within cluster of active identities in the last 30 days.
+
 
 
 Person: => ClAddressCount := COUNT(PersonAddress.Subject(InCustomerPopulation=1));  // Count within cluster of distict addresses within customer population
@@ -1406,6 +1445,10 @@ Email: => ClImpactWeight := ((ClIdentityCountPercentile * 0.3) + (ClEventCountPe
 Email: => Score := UID % 100;
 Email: => ClusterScore := 0;
 
+/* Bank */ 
+// take the last two out they are there for testing!
+Bank: => HighRiskRouting := MAP(RoutingNumber IN ['031101169','124071889','124303120','073972181','084003997','114924742','031101169','063115194','061210237','081501340'] => 1, 0);
+
 /* Bank Account */ 
 
 BankAccount: => CustomerId := rCustomer.CustomerId;
@@ -1414,11 +1457,14 @@ BankAccount: => SourceCustomerCount := COUNT(SourceCustomers);
 BankAccount: => EntityContextUid := '_19' + OttoBankAccountId;
 BankAccount: => EntityType := 19;
 BankAccount: => Label := AccountNumber;
+BankAccount: => AbbreviatedBankname := rBank.AbbreviatedBankname;
 
 BankAccount: => IdentityCount := COUNT(PersonEvent{Subject});
 BankAccount: => EventCount := COUNT(PersonEvent{Transaction});
 
 // Known Risk 
+
+BankAccount: => HighRiskRouting := rBank.HighRiskRouting;
 BankAccount: => KrHighRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrHighRiskBankFlag=1)) > 0 => 1, 0);
 BankAccount: => KrMediumRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrMediumRiskBankFlag=1))>0 => 1, 0);
 BankAccount: => KrLowRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrLowRiskBankFlag=1))>0 => 1, 0);
