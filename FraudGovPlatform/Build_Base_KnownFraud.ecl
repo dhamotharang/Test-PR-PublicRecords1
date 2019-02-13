@@ -55,7 +55,7 @@ module
 
 	pDataset_rollup := rollup( pDataset_sort
 		,RollupUpdate(left, right)
-		,Customer_Account_Number,source_rec_id, local);
+		,Source,source_rec_id, local);
 
 	tools.mac_WriteFile(Filenames(pversion).Base.KnownFraud.New,pDataset_rollup,Build_Base_File);
 

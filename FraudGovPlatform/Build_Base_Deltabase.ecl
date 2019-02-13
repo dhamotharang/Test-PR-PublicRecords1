@@ -56,7 +56,7 @@ module
 
 	pDataset_rollup := rollup( pDataset_sort
 		,RollupUpdate(left, right)
-		,source_rec_id ,local);
+		,source, source_rec_id ,local);
 	
 	tools.mac_WriteFile(Filenames(pversion).Base.Deltabase.New,pDataset_rollup,Build_Base_File);
 
