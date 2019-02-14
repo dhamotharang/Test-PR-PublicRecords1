@@ -1,4 +1,4 @@
-﻿IMPORT AID, ut, NID, codes, Address, _validate;
+﻿IMPORT AID, ut, NID, codes, Address, _validate, std;
 
 EXPORT Standardize_NameAddr := MODULE	
 
@@ -57,9 +57,15 @@ EXPORT Standardize_NameAddr := MODULE
 																		              0);
 			SELF.clean_certexp10_date := IF(_validate.date.fIsValid(ut.date_slashed_MMDDYYYY_to_YYYYMMDD(L.AT_CERTEXP10)),
 			                                            (UNSIGNED4)ut.date_slashed_MMDDYYYY_to_YYYYMMDD(L.AT_CERTEXP10),
-																		              0);
-			//dt_last_seen under discussion
-			// SELF.dt_last_seen					:= IF(L.EFX_DEAD = 'Y', SELF.clean_dead_date, SELF.clean_record_update_refresh_date);
+																		              0);			
+			SELF.EFX_COUNTYNM := IF(STD.STR.FilterOut(L.EFX_COUNTYNM, '0123456789') = '',
+			                        EFX_COUNTYNUM_TABLE.COUNTYNUM(ut.CleanSpacesAndUpper(L.EFX_COUNTYNM), ut.CleanSpacesAndUpper(L.EFX_STATE)),L.EFX_COUNTYNM);
+			SELF.EFX_COUNTY := IF(
+			                      STD.STR.FilterOut(L.EFX_COUNTYNM, '0123456789') = '',L.EFX_COUNTYNM
+														,EFX_COUNTYNAME_TABLE.COUNTYNAME(ut.CleanSpacesAndUpper(L.EFX_STATE), ut.CleanSpacesAndUpper(L.EFX_COUNTYNM), ut.CleanSpacesAndUpper(L.EFX_COUNTY)));	
+			date_first_seen := ut.date_slashed_MMDDYYYY_to_YYYYMMDD(L.Record_Update_Refresh_Date);
+ 		 	SELF.dt_first_seen											:= IF(_validate.date.fIsValid(date_first_seen) and _validate.date.fIsValid(date_first_seen,_validate.date.rules.DateInPast)	,(UNSIGNED4)date_first_seen, 0);
+			SELF.dt_last_seen												:= IF(_validate.date.fIsValid(date_first_seen) and _validate.date.fIsValid(date_first_seen,_validate.date.rules.DateInPast)	,(UNSIGNED4)date_first_seen, 0);
 			SELF								  := L;			
 		END;
 	
