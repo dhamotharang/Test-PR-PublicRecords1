@@ -1,5 +1,6 @@
 ﻿import BIPV2;
 import BIPV2_Best;
+import BIPV2_Company_Names;
 
 export IdAppendLocal := module
 
@@ -46,11 +47,28 @@ export IdAppendLocal := module
 					self.duns_number := right.duns_number[1].duns_number,
 					self.company_sic_code1 := right.sic_code[1].company_sic_code1,
 					self.company_naics_code1 := right.naics_code[1].company_naics_code1,
+// get new best fields for dba_name, contact_fname, contact_mname, contact_lname, contact_job_title, contact_did
+					self.dba_name := '',
+					self.company_btype := '',
+					self.contact_fname := '',
+					self.contact_mname := '',
+					self.contact_lname := '',
+					self.contact_job_title := '',
+					self.contact_did := 0,
 					self := left,
 					self := right),
 				left outer);
 
-		return postBest;
+		BIPV2_Company_Names.functions.mac_go(postBest, outBtype, request_id, company_name);
+		withBType :=
+			join(postBest, outBtype,
+				left.request_id = right.request_id,
+				transform(recordof(left),
+					self.company_btype := right.cnp_btype,
+					self := left),
+				keep(1), left outer);
+
+		return withBType;
 
 	end;
 

@@ -3,7 +3,7 @@
 export IdAppendRoxie(
 		dataset(BIPV2.IdAppendLayouts.AppendInput) inputDs
 		,unsigned scoreThreshold = 75
-		,unsigned weightThreshold = 44
+		,unsigned weightThreshold = IdConstants.APPEND_WEIGHT_THRESHOLD_ROXIE
 		,boolean primForce = false
 		,boolean reAppend = true
 		,boolean allowInvalidResults = false
