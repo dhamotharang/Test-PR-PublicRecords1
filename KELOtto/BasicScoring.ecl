@@ -226,7 +226,8 @@
 																											{'cl_element_count_', (STRING)LEFT.cl_element_count_},
 																											{'license_state_', (STRING)LEFT.license_state_},
 																											{'event_count_', (STRING)LEFT.event_count_},
-                                                      {'abbreviated_bankname_', (STRING)LEFT.abbreviated_bankname_}
+                                                      {'abbreviated_bankname_', (STRING)LEFT.abbreviated_bankname_},
+                                                      {'in_customer_population_', (STRING)LEFT.in_customer_population_}
 																											], FlagsRec)(Value <> '');
 															 SELF := LEFT));// : PERSIST('~temp::deleteme65');
 				

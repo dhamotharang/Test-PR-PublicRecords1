@@ -49,7 +49,7 @@ fraudgov_dataset_base := PROJECT(fraudgov_dataset_base_prep,
 Set_did:=[1488418290,8389852385,1921409109,2435345412,1834342568,1589581232];
 
 // filter out spurious transactions in the future.
-fraudgov_dataset := fraudgov_dataset_base((UNSIGNED)event_date <= Std.Date.Today());// and (did % 3 in [0] OR did = 899999999550 or ssn = '294287743' or event_type_1 = '10000' or bank_account_number_1 != '' or drivers_license != '' or did in set_did));
+fraudgov_dataset := fraudgov_dataset_base((UNSIGNED)event_date <= Std.Date.Today() and (did % 100000 in [0] OR did = 899999999550 or ssn = '294287743' or event_type_1 = '10000' or bank_account_number_1 != '' or drivers_license != '' or did in set_did));
 
 final := DISTRIBUTE(fraudgov_dataset);
 
