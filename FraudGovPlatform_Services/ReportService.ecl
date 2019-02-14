@@ -8,6 +8,7 @@ IMPORT BatchShare,doxie, FraudShared_Services, iesp, WSInput;
 
 EXPORT ReportService() := MACRO
   #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+	#CONSTANT ('FraudPlatform', 'FraudGov');
 
 	//The following macro defines the field sequence on WsECL page of query.
 	WSInput.MAC_FraudGovPlatform_Services_ReportService();
@@ -79,7 +80,6 @@ EXPORT ReportService() := MACRO
 	#STORED('AgencyVerticalType', Options.AgencyVerticalType);
 	#STORED('AgencyCounty',  Options.AgencyCounty);
 	#STORED('AgencyState',  Options.AgencyState);
-	#STORED('FraudPlatform',	Options.Platform);
 	#STORED('IsOnline',	Options.IsOnline);
 	#STORED('useAllSearchFields',	Options.useAllSearchFields);
 	#STORED('MaxVelocities', MaxVelocities);
