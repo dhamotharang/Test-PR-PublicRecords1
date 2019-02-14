@@ -1,0 +1,45 @@
+﻿
+
+
+OPTIONS:-gn
+MODULE:Fed_Bureau_Prisons
+FILENAME:federal_bureau_base
+NAMESCOPE:federal
+RIDFIELD:rcid
+INGESTFILE:Fed_Bureau_Prisons_Update:NAMED(Fed_Bureau_Prisons.file_federal_bureau_base)
+
+FIELD:persistent_record_id:DERIVED:TYPE(string100):0,0
+FIELD:offender_key:DERIVED:TYPE(STRING80):0,0
+FIELD:src:DERIVED:TYPE(string2):0,0
+FIELD:process_date:TYPE(STRING8):RECORDDATE(LAST):0,0   //data tracking
+FIELD:date_first_seen:TYPE(STRING8):RECORDDATE(FIRST):0,0   //data tracking
+FIELD:date_last_seen:TYPE(STRING8):RECORDDATE(LAST):0,0   //data tracking
+FIELD:date_vendor_first_reported:TYPE(STRING8):RECORDDATE(FIRST):0,0   //data tracking
+FIELD:date_vendor_last_reported:TYPE(STRING8):RECORDDATE(LAST):0,0   //data tracking
+FIELD:record_upload_date:DERIVED:TYPE(STRING8):0,0
+FIELD:category:DERIVED:TYPE(STRING40):0,0
+FIELD:source:DERIVED:TYPE(STRING100):0,0
+FIELD:orig_name:TYPE(STRING115):0,0    //used for upsert      
+FIELD:orig_lastname:DERIVED:TYPE(STRING50):0,0
+FIELD:orig_firstname:DERIVED:TYPE(STRING50):0,0
+FIELD:orig_middlename:DERIVED:TYPE(STRING40):0,0
+FIELD:orig_suffix:DERIVED:TYPE(STRING15):0,0
+FIELD:dob:DERIVED:TYPE(STRING8):0,0
+FIELD:sex:TYPE(STRING10):0,0    //used for upsert 
+FIELD:race:TYPE(STRING50):0,0    //used for upsert
+FIELD:age:DERIVED:TYPE(STRING3):0,0
+FIELD:registery_number:TYPE(STRING20):0,0    //used for upsert
+FIELD:defendant_status:DERIVED:TYPE(STRING100):0,0
+FIELD:offense_description:TYPE(STRING100):0,0    //used for upsert
+FIELD:disposition:TYPE(STRING150):0,0    //used for upsert
+FIELD:scheduled_release_date:DERIVED:TYPE(STRING8):0,0
+FIELD:nametype:DERIVED:TYPE(STRING1):0,0
+FIELD:nid:DERIVED:TYPE(UNSIGNED8):0,0
+FIELD:title:DERIVED:TYPE(STRING5):0,0
+FIELD:fname:DERIVED:TYPE(STRING50):0,0
+FIELD:mname:DERIVED:TYPE(STRING50):0,0
+FIELD:lname:DERIVED:TYPE(STRING50):0,0
+FIELD:suffix:DERIVED:TYPE(STRING50):0,0
+FIELD:name_ind:DERIVED:TYPE(UNSIGNED2):0,0
+
+//
