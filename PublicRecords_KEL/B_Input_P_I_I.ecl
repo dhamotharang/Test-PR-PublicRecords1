@@ -4,8 +4,8 @@ IMPORT B_Input_P_I_I_1,CFG_Compile,E_Person,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Input_P_I_I(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Input_P_I_I_1(__in,__cfg).__ENH_Input_P_I_I_1) __ENH_Input_P_I_I_1 := B_Input_P_I_I_1(__in,__cfg).__ENH_Input_P_I_I_1;
-  SHARED __EE263814 := __ENH_Input_P_I_I_1;
-  EXPORT __ST22978_Layout := RECORD
+  SHARED __EE265328 := __ENH_Input_P_I_I_1;
+  EXPORT __ST23114_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nstr Input_Account_Echo_;
@@ -166,18 +166,18 @@ EXPORT B_Input_P_I_I(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST22978_Layout __ND263976__Project(B_Input_P_I_I_1(__in,__cfg).__ST26887_Layout __PP263019) := TRANSFORM
-    SELF.I_Rep_Number_Value_ := __PP263019.Rep_Number_;
-    SELF.Input_Account_Echo_Pop_Value_ := FN_Compile.FN_Is_Echo_Populated(__ECAST(KEL.typ.nstr,__PP263019.Input_Account_Echo_));
-    __CC3161 := '-99999';
-    __CC3166 := '-99998';
-    SELF.Input_Archive_Date_Clean_Pop_Value_ := FN_Compile.FN_Is_Clean_Populated(__ECAST(KEL.typ.nstr,__PP263019.Input_Archive_Date_Clean_Value_),__ECAST(KEL.typ.nstr,__CN(__CC3161)),__ECAST(KEL.typ.nstr,__CN(__CC3166)));
-    SELF.Input_Archive_Date_Echo_Pop_Value_ := FN_Compile.FN_Is_Echo_Populated(__ECAST(KEL.typ.nstr,__PP263019.Input_Archive_Date_Echo_));
-    SELF.Input_Archive_Date_Value_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP263019.Input_Archive_Date_Echo_),__ECAST(KEL.typ.nstr,__CN(__CC3161)));
-    SELF.Input_Work_Phone_Clean_Pop_Value_ := FN_Compile.FN_Is_Clean_Populated(__ECAST(KEL.typ.nstr,__PP263019.Input_Work_Phone_Clean_Value_),__ECAST(KEL.typ.nstr,__CN(__CC3161)),__ECAST(KEL.typ.nstr,__CN(__CC3166)));
-    SELF.Input_Work_Phone_Echo_Pop_Value_ := FN_Compile.FN_Is_Echo_Populated(__ECAST(KEL.typ.nstr,__PP263019.Input_Work_Phone_Echo_));
-    SELF.Input_Work_Phone_Value_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP263019.Input_Work_Phone_Echo_),__ECAST(KEL.typ.nstr,__CN(__CC3161)));
-    SELF := __PP263019;
+  SHARED __ST23114_Layout __ND265490__Project(B_Input_P_I_I_1(__in,__cfg).__ST27037_Layout __PP264533) := TRANSFORM
+    SELF.I_Rep_Number_Value_ := __PP264533.Rep_Number_;
+    SELF.Input_Account_Echo_Pop_Value_ := FN_Compile.FN_Is_Echo_Populated(__ECAST(KEL.typ.nstr,__PP264533.Input_Account_Echo_));
+    __CC3160 := '-99999';
+    __CC3165 := '-99998';
+    SELF.Input_Archive_Date_Clean_Pop_Value_ := FN_Compile.FN_Is_Clean_Populated(__ECAST(KEL.typ.nstr,__PP264533.Input_Archive_Date_Clean_Value_),__ECAST(KEL.typ.nstr,__CN(__CC3160)),__ECAST(KEL.typ.nstr,__CN(__CC3165)));
+    SELF.Input_Archive_Date_Echo_Pop_Value_ := FN_Compile.FN_Is_Echo_Populated(__ECAST(KEL.typ.nstr,__PP264533.Input_Archive_Date_Echo_));
+    SELF.Input_Archive_Date_Value_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP264533.Input_Archive_Date_Echo_),__ECAST(KEL.typ.nstr,__CN(__CC3160)));
+    SELF.Input_Work_Phone_Clean_Pop_Value_ := FN_Compile.FN_Is_Clean_Populated(__ECAST(KEL.typ.nstr,__PP264533.Input_Work_Phone_Clean_Value_),__ECAST(KEL.typ.nstr,__CN(__CC3160)),__ECAST(KEL.typ.nstr,__CN(__CC3165)));
+    SELF.Input_Work_Phone_Echo_Pop_Value_ := FN_Compile.FN_Is_Echo_Populated(__ECAST(KEL.typ.nstr,__PP264533.Input_Work_Phone_Echo_));
+    SELF.Input_Work_Phone_Value_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP264533.Input_Work_Phone_Echo_),__ECAST(KEL.typ.nstr,__CN(__CC3160)));
+    SELF := __PP264533;
   END;
-  EXPORT __ENH_Input_P_I_I := PROJECT(__EE263814,__ND263976__Project(LEFT));
+  EXPORT __ENH_Input_P_I_I := PROJECT(__EE265328,__ND265490__Project(LEFT));
 END;

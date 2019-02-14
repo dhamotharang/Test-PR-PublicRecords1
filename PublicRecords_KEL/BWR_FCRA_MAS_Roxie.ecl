@@ -36,7 +36,6 @@ histDate := '0';
 
 Score_threshold := 80;
 // Score_threshold := 90;
-BIPID_Score_threshold := 0; // Stubbing this out for use in settings output for now. To be used to set score threshold for BIP ID Append.
 
 // Output additional file in Master Layout
 // Master results are for R&D/QA purposes ONLY. This should only be set to TRUE for internal use.
@@ -49,9 +48,6 @@ Output_SALT_Profile := TRUE;
 
 RecordsToRun := 0;
 eyeball := 100;
-
-AllowedSources := ''; // Stubbing this out for use in settings output for now. To be used to turn on DNBDMI by setting to 'DNBDMI'
-OverrideExperianRestriction := FALSE; // Stubbing this out for use in settings output for now. To be used to control whether Experian Business Data (EBR and CRDB) is returned.
 
 OutputFile := '~AFA::Consumer_KAS1832_100K_RoxieDev_current_12312018_FCRA'+ ThorLib.wuid() ;
 prii_layout := RECORD
@@ -197,21 +193,21 @@ OUTPUT(CHOOSEN(Passed_Person, eyeball), NAMED('Sample_FCRA_Layout'));
 IF(Output_Master_Results, OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout.csv', CSV(HEADING(single), QUOTE('"'))));
 OUTPUT(Passed_Person,,OutputFile + '.csv', CSV(HEADING(single), QUOTE('"')));
 
-Settings_Dataset := PublicRecords_KEL.ECL_Functions.fn_make_settings_dataset(
-		AttributeSetName := 'Development KEL Attributes',
-		VersionName := 'Version 1.0',
-		isFCRA := TRUE,
-		ArchiveDate := histDate,
-		InputFileName := InputFile,
-		PermissiblePurpose := Intended_Purpose, // FCRA only
-		DataRestrictionMask := DataRestrictionMask,
-		DataPermissionMask := DataPermission,
-		GLBA := GLBA,
-		DPPA := DPPA,
-		OverrideExperianRestriction := OverrideExperianRestriction,
-		AllowedSources := AllowedSources, // Controls inclusion of DNBDMI data
-		LexIDThreshold := Score_threshold,
-		BusinessLexIDThreshold := BIPID_Score_threshold);
+Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
+	EXPORT STRING AttributeSetName := 'Development KEL Attributes';
+	EXPORT STRING VersionName := 'Version 1.0';
+	EXPORT BOOLEAN isFCRA := TRUE;
+	EXPORT STRING ArchiveDate := histDate;
+	EXPORT STRING InputFileName := InputFile;
+	EXPORT STRING PermissiblePurpose := Intended_Purpose; // FCRA only
+	EXPORT STRING Data_Restriction_Mask := DataRestrictionMask;
+	EXPORT STRING Data_Permission_Mask := DataPermission;
+	EXPORT UNSIGNED GLBAPurpose := GLBA;
+	EXPORT UNSIGNED DPPAPurpose := DPPA;
+	EXPORT UNSIGNED LexIDThreshold := Score_threshold;
+END;
+	
+Settings_Dataset := PublicRecords_KEL.ECL_Functions.fn_make_settings_dataset(Settings);
 		
 OUTPUT(Settings_Dataset, NAMED('Attributes_Settings'));
 

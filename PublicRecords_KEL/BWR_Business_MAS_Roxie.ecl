@@ -31,7 +31,13 @@ historyDate := '0';
 
 Score_threshold := 80;
 // Score_threshold := 90;
-BIPID_Score_threshold := 0; // Stubbing this out for use in settings output for now. To be used to set score threshold for BIP ID Append.
+
+// BIP Append options
+BIPAppend_Score_Threshold := 75; // Default score threshold for BIP Append. Valid values are 51-100.
+BIPAppend_Weight_Threshold := 0;
+BIPAppend_PrimForce := FALSE; // Set to TRUE to require an exact match on prim range in the BIP Append.
+BIPAppend_ReAppend := TRUE; // Set to FALSE to avoid re-appending BIP IDs if BIP IDs are populated on the input file.
+BIPAppend_Include_AuthRep := FALSE; // Determines whether Auth Rep data is used in BIP Append
 
 // Output additional file in Master Layout
 // Master results are for R&D/QA purposes ONLY. This should only be set to TRUE for internal use.
@@ -181,7 +187,13 @@ soapLayout := RECORD
 	DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout) input;
 	INTEGER ScoreThreshold;
 	BOOLEAN OutputMasterResults;
-	Boolean ExcludeConsumerShell;
+	BOOLEAN ExcludeConsumerShell;
+	
+	UNSIGNED BIPAppendScoreThreshold;
+	UNSIGNED BIPAppendWeightThreshold;
+	BOOLEAN BIPAppendPrimForce;
+	BOOLEAN BIPAppendReAppend;
+	BOOLEAN BIPAppendIncludeAuthRep;
 end;
 
 // Uncomment this code to run as test harness on Thor instead of SOAPCALL to Roxie
@@ -205,6 +217,11 @@ soapLayout trans (inDataReadyDist le):= TRANSFORM
 	SELF.ScoreThreshold := Score_threshold;
 	SELF.OutputMasterResults := Output_Master_Results;
 	SELF.ExcludeConsumerShell := Exclude_Consumer_Shell;
+	SELF.BIPAppendScoreThreshold := BIPAppend_Score_Threshold;
+	SELF.BIPAppendWeightThreshold := BIPAppend_Weight_Threshold;
+	SELF.BIPAppendPrimForce := BIPAppend_PrimForce;
+	SELF.BIPAppendReAppend := BIPAppend_ReAppend;
+	SELF.BIPAppendIncludeAuthRep := BIPAppend_Include_AuthRep;
 END;
 
 soap_in := PROJECT(inDataReadyDist, trans(LEFT));
@@ -281,21 +298,28 @@ OUTPUT(CHOOSEN(Passed_Business, eyeball), NAMED('Sample_NonFCRA_Layout'));
 
 IF(Output_Master_Results, OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout.csv', CSV(HEADING(single), QUOTE('"'))));
 OUTPUT(Passed_Business,,OutputFile + '.csv', CSV(HEADING(single), QUOTE('"')));
-Settings_Dataset := PublicRecords_KEL.ECL_Functions.fn_make_settings_dataset(
-		AttributeSetName := 'Development KEL Attributes',
-		VersionName := 'Version 1.0',
-		isFCRA := FALSE,
-		ArchiveDate := historyDate,
-		InputFileName := InputFile,
-		PermissiblePurpose := '', // FCRA only
-		DataRestrictionMask := DataRestrictionMask,
-		DataPermissionMask := DataPermission,
-		GLBA := GLBA,
-		DPPA := DPPA,
-		OverrideExperianRestriction := OverrideExperianRestriction,
-		AllowedSources := AllowedSources, // Controls inclusion of DNBDMI data
-		LexIDThreshold := Score_threshold,
-		BusinessLexIDThreshold := BIPID_Score_threshold);
+
+Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
+	EXPORT STRING AttributeSetName := 'Development KEL Attributes';
+	EXPORT STRING VersionName := 'Version 1.0';
+	EXPORT BOOLEAN isFCRA := FALSE;
+	EXPORT STRING ArchiveDate := historyDate;
+	EXPORT STRING InputFileName := InputFile;
+	EXPORT STRING Data_Restriction_Mask := DataRestrictionMask;
+	EXPORT STRING Data_Permission_Mask := DataPermission;
+	EXPORT UNSIGNED GLBAPurpose := GLBA;
+	EXPORT UNSIGNED DPPAPurpose := DPPA;
+	EXPORT BOOLEAN Override_Experian_Restriction := OverrideExperianRestriction;
+	EXPORT STRING Allowed_Sources := AllowedSources; // Controls inclusion of DNBDMI data
+	EXPORT UNSIGNED LexIDThreshold := Score_threshold;
+	EXPORT UNSIGNED BusinessLexIDThreshold := BIPAppend_Score_Threshold;
+	EXPORT UNSIGNED BusinessLexIDWeightThreshold := BIPAppend_Weight_Threshold;
+	EXPORT BOOLEAN BusinessLexIDPrimForce := BIPAppend_PrimForce;
+	EXPORT BOOLEAN BusinessLexIDReAppend := BIPAppend_ReAppend;
+	EXPORT BOOLEAN BusinessLexIDIncludeAuthRep := BIPAppend_Include_AuthRep;
+END;	
+
+Settings_Dataset := PublicRecords_KEL.ECL_Functions.fn_make_settings_dataset(Settings);
 		
 OUTPUT(Settings_Dataset, NAMED('Attributes_Settings'));
 
