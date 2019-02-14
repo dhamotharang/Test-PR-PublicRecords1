@@ -1,5 +1,6 @@
-IMPORT AutoStandardI, BIPV2, iesp, MIDEX_Services, TopBusiness_Services;
-EXPORT TopBusiness_Sections( dataset(BIPV2.IDlayouts.l_xlink_ids) in_linkid, MIDEX_Services.Iparam.reportrecords in_mod ) :=
+﻿IMPORT AutoStandardI, BIPV2, iesp, MIDEX_Services, TopBusiness_Services;
+EXPORT TopBusiness_Sections( dataset(BIPV2.IDlayouts.l_xlink_ids) in_linkid, 
+											MIDEX_Services.Iparam.reportrecords in_mod ) :=
 	FUNCTION
 	// set the FETCH LEVEL for join to main bus header key 
 	FETCH_LEVEL := in_mod.BusinessIDFetchLevel;
@@ -70,155 +71,94 @@ EXPORT TopBusiness_Sections( dataset(BIPV2.IDlayouts.l_xlink_ids) in_linkid, MID
 		transform(MIDEX_Services.Layouts.rec_TopBusiness,
 			self.acctno := '001',
 			self := []));
-			
-  add_best := 
-	  join(seed_results,
-			TopBusiness_Services.BestSection.fn_fullView(
+
+  	BestSection := TopBusiness_Services.BestSection.fn_fullView(
 				in_topbusiness_ds, // passing in full set of ids with dot/emp/pow possibly populated 
 											// will zero out as needed in best
 				project(dataset(in_topbusiness_options), 
 					transform(TopBusiness_Services.BestSection_Layouts.rec_OptionsLayout, self := left, self := []))[1],
 				in_topbusiness_mod,
 				ds_busheaderRecs
-				),
-		  left.acctno = right.acctno,
-		  transform(MIDEX_Services.Layouts.rec_TopBusiness,
-			  self.BestSection := right,
-			  self := left),
-		  left outer);		
+				);			
  
-  // save best cname and pass to property section below.
-  bestCname := add_best[1].BestSection.companyname;
+  // save best cname and pass to property section below. 
+ bestCname := BestSection[1].CompanyName;
 
-	add_parent :=	join(
-		add_best,
-		TopBusiness_Services.ParentSection.fn_fullView(
+		ParentSection := TopBusiness_Services.ParentSection.fn_fullView(
 			project(ds_input_data, transform(TopBusiness_Services.ParentSection_Layouts.rec_Input, self := left)),
 			project(dataset(in_topbusiness_options),TopBusiness_Services.ParentSection_Layouts.rec_OptionsLayout)[1],
 			in_topbusiness_mod,
-			ds_busHeaderRecs
-			),
-		left.acctno = right.acctno,
-		transform(MIDEX_Services.Layouts.rec_TopBusiness,
-			self.ParentSection := right,
-			self := left),
-		left outer);	
-	
-	add_associate := join(
-		add_parent,
-		TopBusiness_Services.AssociateSection.fn_fullView(
+			ds_busHeaderRecs);
+		
+		AssociateSection := TopBusiness_Services.AssociateSection.fn_fullView(
 			ds_input_data,
 			project(dataset(in_topbusiness_options),TopBusiness_Services.Layouts.rec_input_options)[1],
-			in_topbusiness_mod),
-		left.acctno = right.acctno,
-		transform(MIDEX_Services.Layouts.rec_TopBusiness,
-			self.AssociateSection := right,
-			self := left),
-		left outer);
+			in_topbusiness_mod);
 
-	add_contact := join(
-		add_associate,
-		TopBusiness_Services.ContactSection.fn_fullView(
+		ContactSection := TopBusiness_Services.ContactSection.fn_fullView(
 			project(ds_input_data, transform(TopBusiness_Services.ContactSection_Layouts.rec_Input, self := left))
 			,project(dataset(in_topbusiness_options),TopBusiness_Services.ContactSection_Layouts.rec_OptionsLayout)[1],
-			in_topbusiness_mod),											  
-		left.acctno = right.acctno,
-		transform(MIDEX_Services.Layouts.rec_TopBusiness,
-			self.ContactSection := right,
-			self := left),
-		left outer);
-		
-  add_incorporation := join(
-		add_contact,				
-		TopBusiness_Services.IncorporationSection.fn_fullView(
+			in_topbusiness_mod);
+			
+		IncorporationSection :=  TopBusiness_Services.IncorporationSection.fn_fullView(
 			ds_input_data,
 			project(dataset(in_topbusiness_options), TopBusiness_Services.Layouts.rec_input_options)[1],
-			in_topbusiness_mod),
-		left.acctno = right.acctno,
-		transform(MIDEX_Services.Layouts.rec_TopBusiness,
-			self.IncorporationSection := right,
-			self := left),
-		left outer);		
+			in_topbusiness_mod);
 	
-	add_property := join(
-		add_incorporation,
-		TopBusiness_Services.PropertySection.fn_fullView(			
+		PropertySection := TopBusiness_Services.PropertySection.fn_fullView(			
 			project(ds_input_data, 
 					transform(TopBusiness_Services.PropertySection_Layouts.rec_Input, self := left))
 			,project(dataset(in_topbusiness_options),TopBusiness_Services.PropertySection_Layouts.rec_OptionsLayout)[1]
 			,in_topbusiness_mod
-			,bestCname),
-		left.acctno = right.acctno,
-		transform(MIDEX_Services.Layouts.rec_TopBusiness,
-			self.PropertySection := right,
-			self := left), 	
-		left outer);
+			,bestCname);
 
   // Save off Property Section, "Properties" child dataset to pass into the Ops/Sites Section below.
-  ds_properties := add_property[1].PropertySection.PropertyRecords.Properties;
 
-	add_opssites := join(
-		add_property,
-		TopBusiness_Services.OperationsSitesSection.fn_fullView(
+	 ds_properties := PropertySection[1].PropertyRecords.Properties;
+
+		operationsSitesSection := TopBusiness_Services.OperationsSitesSection.fn_fullView(
 			ds_input_data,
 			project(dataset(in_topbusiness_options), TopBusiness_Services.Layouts.rec_input_options)[1],
 			in_topbusiness_mod,
 			ds_properties
-			,ds_busHeaderRecs
-			),
-		left.acctno = right.acctno,
-		transform(MIDEX_Services.Layouts.rec_TopBusiness,
-			self.OperationsSitesSection := right,
-			self := left),
-		left outer);
+			,ds_busHeaderRecs);
 	
-	add_bankruptcy := join(
-		add_opssites,
-		TopBusiness_Services.BankruptcySection.fn_fullView(
+		BankruptcySection := TopBusiness_Services.BankruptcySection.fn_fullView(
 			project(ds_input_data, transform(TopBusiness_Services.BankruptcySection_Layouts.rec_Input, self := left)),
 			project(dataset(in_topbusiness_options),TopBusiness_Services.BankruptcySection_Layouts.rec_OptionsLayout)[1],
-			in_topbusiness_mod),
-		left.acctno = right.acctno,
-		transform(MIDEX_Services.Layouts.rec_TopBusiness,
-			self.BankruptcySection := right,
-			self := left),
-		left outer);
+			in_topbusiness_mod);
 
-	add_liens := join(
-		add_bankruptcy,
-		TopBusiness_Services.LienSection.fn_fullView(
+		liensSection := TopBusiness_Services.LienSection.fn_fullView(
 			ds_input_data,
 			project(dataset(in_topbusiness_options),TopBusiness_Services.Layouts.rec_input_options)[1],
-			in_topbusiness_mod),
-		left.acctno = right.acctno,
-		transform(MIDEX_Services.Layouts.rec_TopBusiness,
-			self.LienSection := right,
-			self := left),
-		left outer);
+			in_topbusiness_mod);
 
-	add_RegisteredAgents := join(
-		add_liens,
-		TopBusiness_Services.RegisteredAgentSection.fn_fullView(
+		RegisteredAgentsSection := 	TopBusiness_Services.RegisteredAgentSection.fn_fullView(
 			project(ds_input_data, transform(TopBusiness_Services.RegisteredAgentSection_Layouts.rec_Input, self := left)),
 			project(dataset(in_topbusiness_options),TopBusiness_Services.RegisteredAgentSection_Layouts.rec_OptionsLayout)[1],
-			in_topbusiness_mod),
-		left.acctno = right.acctno,
-		transform(MIDEX_Services.Layouts.rec_TopBusiness,
-			self.RegisteredAgentSection := right,
-			self := left),
-		left outer);
+			in_topbusiness_mod);
 		
-	topBusinessRecs := join(
-		add_RegisteredAgents,
-		TopBusiness_Services.ConnectedBusinessSection.fn_fullView(
+		ConnectedBusinessSection := TopBusiness_Services.ConnectedBusinessSection.fn_fullView(
 			project(ds_input_data, transform(TopBusiness_Services.ConnectedBusinessSection_Layouts.rec_Input, self := left)),
 			project(dataset(in_topbusiness_options),TopBusiness_Services.ConnectedBusinessSection_Layouts.rec_OptionsLayout)[1],
-			in_topbusiness_mod),
-		left.acctno = right.acctno,
-		transform(MIDEX_Services.Layouts.rec_TopBusiness,
-			self.ConnectedBusinessSection := right,
-			self := left),
-		left outer);
+			in_topbusiness_mod);
+			
+	MIDEX_Services.Layouts.rec_TopBusiness topBusinessSections() := TRANSFORM
+	      SELF.acctno := '001';
+		 SELF.BestSection               := BestSection[1];
+		 SELF.ParentSection             := ParentSection[1];
+		 SELF.AssociateSection          := AssociateSection[1];
+		 SELF.ContactSection            := ContactSection[1];
+		 SELF.IncorporationSection      := IncorporationSection[1];
+		 SELF.PropertySection           := PropertySection[1];
+		 SELF.OperationsSitesSection    := operationsSitesSection[1];
+		 SELF.BankruptcySection         := BankruptcySection[1];
+		 SELF.LienSection               := liensSection[1];
+		 SELF.RegisteredAgentSection    := RegisteredAgentsSection[1];
+		 SELF.ConnectedBusinessSection := ConnectedBusinessSection[1];
+		 SELF  := [];
+   END;
+		topBusinessRecs := DATASET( [ topBusinessSections() ]);
 		
 	RETURN topBusinessRecs;
 END;
