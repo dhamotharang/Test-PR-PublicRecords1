@@ -1284,6 +1284,8 @@ SocialSecurityNumber: => SourceCustomerCount := COUNT(SourceCustomers);
 SocialSecurityNumber: => EntityContextUid := '_15' + Ssn;// OttoSSNId;
 SocialSecurityNumber: => EntityType := 15;
 SocialSecurityNumber: => Label := SsnFormatted;
+SocialSecurityNumber: => InCustomerPopulation := MAP(COUNT(SourceCustomers(rSourceCustomer=rCustomer))>0 => 1, 0);
+
 
 SocialSecurityNumber: => IdentityCount := COUNT(PersonEvent{Subject});
 SocialSecurityNumber: => EventCount := COUNT(PersonEvent{Transaction});
@@ -1342,6 +1344,7 @@ Phone: => SourceCustomerCount := COUNT(SourceCustomers);
 Phone: => EntityContextUid := '_16' + PhoneNumber;
 Phone: => EntityType := 16;
 Phone: => Label := PhoneFormatted;
+Phone: => InCustomerPopulation := MAP(COUNT(SourceCustomers(rSourceCustomer=rCustomer))>0 => 1, 0);
 
 Phone: => IdentityCount := COUNT(PersonEvent{Subject});
 Phone: => EventCount := COUNT(PersonEvent{Transaction});
@@ -1402,6 +1405,7 @@ Email: => SourceCustomerCount := COUNT(SourceCustomers);
 Email: => EntityContextUid := '_17' + OttoEmailId;
 Email: => EntityType := 17;
 Email: => Label := EmailAddress;
+Email: => InCustomerPopulation := MAP(COUNT(SourceCustomers(rSourceCustomer=rCustomer))>0 => 1, 0);
 
 Email: => IdentityCount := COUNT(PersonEvent{Subject});
 Email: => EventCount := COUNT(PersonEvent{Transaction});
@@ -1458,6 +1462,7 @@ BankAccount: => EntityContextUid := '_19' + OttoBankAccountId;
 BankAccount: => EntityType := 19;
 BankAccount: => Label := AccountNumber;
 BankAccount: => AbbreviatedBankname := rBank.AbbreviatedBankname;
+BankAccount: => InCustomerPopulation := MAP(COUNT(SourceCustomers(rSourceCustomer=rCustomer))>0 => 1, 0);
 
 BankAccount: => IdentityCount := COUNT(PersonEvent{Subject});
 BankAccount: => EventCount := COUNT(PersonEvent{Transaction});
@@ -1519,6 +1524,7 @@ DriversLicense: => SourceCustomerCount := COUNT(SourceCustomers);
 DriversLicense: => EntityContextUid := '_20' + OttoDriversLicenseId;
 DriversLicense: => EntityType := 20;
 DriversLicense: => Label := LicenseNumber;
+DriversLicense: => InCustomerPopulation := MAP(COUNT(SourceCustomers(rSourceCustomer=rCustomer))>0 => 1, 0);
 
 DriversLicense: => IdentityCount := COUNT(PersonEvent{Subject});
 DriversLicense: => EventCount := COUNT(PersonEvent{Transaction});
@@ -1578,12 +1584,15 @@ DriversLicense: => Score := UID % 100;
 DriversLicense: => ClusterScore := 0;
 
 
+/* IP ADDRESS */
+
 InternetProtocol: => CustomerId := rCustomer.CustomerId;
 InternetProtocol: => IndustryType := rCustomer.IndustryType;
 InternetProtocol: => SourceCustomerCount := COUNT(SourceCustomers);
 InternetProtocol: => EntityContextUid := '_18' + OttoIpAddressId;
 InternetProtocol: => Label := IpAddress;
 InternetProtocol: => EntityType := 18;
+InternetProtocol: => InCustomerPopulation := MAP(COUNT(SourceCustomers(rSourceCustomer=rCustomer))>0 => 1, 0);
 
 InternetProtocol: => IdentityCount := COUNT(PersonEvent{Subject});
 InternetProtocol: => EventCount := COUNT(PersonEvent{Transaction});
@@ -1780,6 +1789,7 @@ QUERY: showCustomerDriversLicense <= DriversLicense;
   // These need to be joined first before the entities are appended together.
 //QUERY: showCustomerPersonGraphEntities <= Person{Subject.EntityContextUid, Subject.Label, EntityType := 1}; 
 // edges are drawn ONLY FROM PERSON to other entities.
+
 QUERY: showCustomerPersonEntities <= Person
                             {
                               SourceCustomer := rCustomer,
@@ -1798,6 +1808,7 @@ QUERY: showCustomerPersonEntities <= Person
                               ClEventCountPercentile,
                               ClImpactWeight,
 
+                              InCustomerPopulation,
                               ClHighRiskPattern1Flag,
                               ClHighRiskPattern2Flag,
                               ClHighRiskPattern3Flag,
@@ -1869,6 +1880,9 @@ QUERY: showCustomerAddressEntities <= Address
                               ClIdentityCountPercentile,
                               ClEventCountPercentile,
                               ClImpactWeight,
+
+                              InCustomerPopulation,
+                              
                               KrHighRiskFlag,
                               KrMediumRiskFlag,
                               
@@ -1899,7 +1913,9 @@ QUERY: showCustomerIpAddressEntities <= InternetProtocol
 															ClElementCount,
                               ClIdentityCountPercentile,
                               ClEventCountPercentile,
-                              ClImpactWeight
+                              ClImpactWeight,
+                              InCustomerPopulation
+                              
 /*
                               KrHighRiskFlag,
                               KrMediumRiskFlag,
@@ -1931,7 +1947,9 @@ QUERY: showCustomerSsnEntities <= SocialSecurityNumber
 															ClElementCount,
                               ClIdentityCountPercentile,
                               ClEventCountPercentile,
-                              ClImpactWeight
+                              ClImpactWeight,
+
+                              InCustomerPopulation
 /*
 
                               KrHighRiskFlag,
@@ -1964,7 +1982,9 @@ QUERY: showCustomerPhoneEntities <= Phone
 															ClElementCount,
                               ClIdentityCountPercentile,
                               ClEventCountPercentile,
-                              ClImpactWeight
+                              ClImpactWeight,
+                              
+                              InCustomerPopulation
 /*
                               KrHighRiskFlag,
                               KrMediumRiskFlag,
@@ -1996,7 +2016,8 @@ QUERY: showCustomerEmailEntities <= Email
 															ClElementCount,
                               ClIdentityCountPercentile,
                               ClEventCountPercentile,
-                              ClImpactWeight
+                              ClImpactWeight,
+                              InCustomerPopulation                              
 /*
                               KrHighRiskFlag,
                               KrMediumRiskFlag,
@@ -2023,7 +2044,7 @@ QUERY: showCustomerBankAccountEntities <= BankAccount
                               EntityType,
                               rBank.RoutingNumber,
                               AccountNumber,
-
+                              AbbreviatedBankname,
                               PersonCount := IdentityCount,
 															
 															ClEventCount,
@@ -2032,7 +2053,8 @@ QUERY: showCustomerBankAccountEntities <= BankAccount
                               ClIdentityCountPercentile,
                               ClEventCountPercentile,
                               ClImpactWeight,
-                              
+
+                              InCustomerPopulation,                              
                               KrHighRiskFlag,
                               KrMediumRiskFlag,
                               KrLowRiskFlag
@@ -2069,6 +2091,7 @@ QUERY: showCustomerDriversLicenseEntities <= DriversLicense
                               ClImpactWeight,
                               
                               LicenseState := State,
+                              InCustomerPopulation,
                               KrHighRiskFlag,
                               KrMediumRiskFlag,
                               KrLowRiskFlag
