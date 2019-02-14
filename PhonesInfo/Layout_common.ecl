@@ -1,50 +1,35 @@
-import Phonesplus_v2;
+ï»¿IMPORT Phonesplus_v2;
 
 EXPORT Layout_common := module
 
-	export sourceRefIn := record
-		string 			Spid;
-		string 			Cc;					//Country Code
-		string 			Name;			//Operator Full Name
-		string 			Country;//ISO2
-		string    Code;			//Data Type: B = Both; R = Range; P = Port
-		string 			Date;			//Date/Time Entered in Table
-		string 			OCN;
+	//Source Reference Review	Layout
+	export sourceRefReview_in := record
+		string ocn;
+		string carrier_name;
+		string serv;
+		string line;
+		string spid;
+		string operator_full_name;
+		string country;
+		string override_file;
+		string is_new;
+	end;
+	
+	export sourceRefReview := record
+		sourceRefReview_in;
 		string255 filename{virtual (logicalfilename)};
 	end;
 	
-	export sourceRefInHist := record
-		string 			Spid;
-		string 			Cc;					//Country Code
-		string 			Name;			//Operator Full Name
-		string 			Country;//ISO2
-		string    Code;			//Data Type: B = Both; R = Range; P = Port
-		string 			Date;			//Date/Time Entered in Table
-		string 			OCN;
-		string				filename;
-	end;	
-	
-	export sourceRefBase_temp := record
-		string8 dt_first_reported;
-		string8 dt_last_reported;
-		string8 dt_start;
-		string8 dt_end;
-		string  ocn;
-		string  carrier_name;
-		string  name;
-		string1 serv;
-		string1 line;
-		string2 prepaid;
-		string2 high_risk_indicator;
-		string  spid;
-		string  operator_full_name;
-		boolean is_current;
+	export sourceRefReviewHist := record
+		sourceRefReview_in;
+		string255 filename;
 	end;
-
+	
+	//Source Reference Base Layout
 	export sourceRefBase := record
 		string8 dt_first_reported;
 		string8 dt_last_reported;
-		string8 dt_start;
+		string8 dt_start;						//LERG file received
 		string8 dt_end;
 		string8 ocn;
 		string60 carrier_name;
@@ -120,8 +105,10 @@ EXPORT Layout_common := module
 		unsigned8 append_rawaid;
 		string5 address_type;
 		string5 privacy_indicator;
+		//string2 country;
 	end;
-		
+	
+	//Ported Base File
 	export portedMain := record
 		string5			source;
 		string2 		phoneType;
@@ -149,10 +136,6 @@ EXPORT Layout_common := module
 	
 	export inFile := record
 		string   		reference_id;
-	/*unsigned6 	did 							:= 0;
-		string20  	lname;
-		unsigned6		bdid							:= 0;
-		string120 	listed_name;*/
 	  string10 		phone;
 	end;
 	
@@ -179,13 +162,12 @@ EXPORT Layout_common := module
 		string5 		local_area_transport_area;
 		string9 		point_code; 									//3 digits - network; 3 digits - cluster; 3 digits = member
 	end;
-		
+	
+	//LIDB Base Layout
 	export lidbRespProcess := record
 		string 			reference_id;
 		unsigned8 	dt_first_reported;
 		unsigned8		dt_last_reported;
-		//unsigned8		dt_start;	
-		//unsigned8		dt_end;
 		string10 		phone;
 		string3 		reply_code;
 		string10 		local_routing_number;
@@ -202,9 +184,9 @@ EXPORT Layout_common := module
 		string5			number_in_service					:= '';
 		string2			high_risk_indicator				:= '';
 		string2			prepaid										:= '';
-		//boolean		is_current 					:= false;
 	end;
 	
+	//Phones Metadata Base Layout
 	export portedMetadata_Main := record
 		string30 		reference_id							:= '';
 		string5			source										:= '';
@@ -221,7 +203,6 @@ EXPORT Layout_common := module
 		string10 		point_code								:= ''; 
 		string3			country_code							:= '';
 		string1			dial_type									:= '';
-		//string1   	service_type
 		string10 		routing_code							:= '';
 		unsigned8		porting_dt								:= 0;
 		string6			porting_time							:= '';
@@ -261,6 +242,56 @@ EXPORT Layout_common := module
 		string2			is_react									:= '';
 		unsigned8		call_forward_dt						:= 0;
 		string15		caller_id									:= '';
-end;
+	end;
+	
+	//DF-23525: Phones Metadata - Split Key into Transaction & Phone Type
+	
+	//Phones Transaction Base Layout
+	export Phones_Transaction_Main := record
+		string10 		phone;
+		string5			source;
+		string2			transaction_code;
+		unsigned8		transaction_dt;
+		string6			transaction_time;
+		unsigned8		vendor_first_reported_dt;
+		string6			vendor_first_reported_time;
+		unsigned8		vendor_last_reported_dt;
+		string6			vendor_last_reported_time;
+		string3			country_code;
+		string2			country_abbr;
+		string10 		routing_code;
+		string1			dial_type;
+		string10 		spid;
+		string60 		carrier_name;
+		string10 		phone_swap;
+		unsigned4   global_sid;		//CCPA Requirement
+		unsigned8   record_sid;		//CCPA Requirement
+	end;
+	
+	//Phones Type Base Layout
+	export Phones_Type_Main := record
+		string10 		phone;
+		string5			source;
+		unsigned8		vendor_first_reported_dt;
+		string6			vendor_first_reported_time;
+		unsigned8		vendor_last_reported_dt;
+		string6			vendor_last_reported_time;
+		string30 		reference_id;
+		string3 		reply_code;
+		string10 		local_routing_number;
+		string6			account_owner;
+		string60 		carrier_name;
+		string10 		carrier_category;
+		string5 		local_area_transport_area;
+		string10 		point_code; 
+		string1 		serv;
+		string1 		line;
+		string10 		spid;
+		string60		operator_fullname;
+		string2			high_risk_indicator;
+		string2			prepaid;
+		unsigned4   global_sid;		//CCPA Requirement
+		unsigned8   record_sid;		//CCPA Requirement
+	end;
 
 end;
