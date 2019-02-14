@@ -15,6 +15,13 @@ EXPORT Interface_Options := INTERFACE
 
 	EXPORT DATASET(Gateway.Layouts.Config) Gateways := PROJECT(gateways_in, gw_switch(LEFT));
 	
+	// BIP Append Options
+	EXPORT UNSIGNED BIPAppendScoreThreshold := 75;
+	EXPORT UNSIGNED BIPAppendWeightThreshold := 0;
+	EXPORT BOOLEAN BIPAppendPrimForce := FALSE;
+	EXPORT BOOLEAN BIPAppendReAppend := TRUE;
+	EXPORT BOOLEAN BIPAppendIncludeAuthRep := FALSE;
+	
 	// Performance options to turn ON/OFF ENTITIES in during FDC build.
 	// By default, all ENTITIES are ON.
 	EXPORT BOOLEAN IncludeAccident := TRUE;

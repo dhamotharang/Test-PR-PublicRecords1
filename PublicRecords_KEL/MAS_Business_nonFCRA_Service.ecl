@@ -14,7 +14,12 @@ EXPORT MAS_Business_nonFCRA_Service() := MACRO
     'input',
     'ScoreThreshold',
 		'ExcludeConsumerShell',
-		'OutputMasterResults'
+		'OutputMasterResults',
+		'BIPAppendScoreThreshold',
+		'BIPAppendWeightThreshold',
+		'BIPAppendPrimForce',
+		'BIPAppendIncludeAuthRep',
+		'BIPAppendNoReAppend'
   ));
 
   // Read interface params
@@ -22,12 +27,24 @@ EXPORT MAS_Business_nonFCRA_Service() := MACRO
   INTEGER Score_threshold := 80 : STORED('ScoreThreshold');
 	BOOLEAN Exclude_Consumer_Shell := FALSE : STORED('ExcludeConsumerShell');
 	BOOLEAN Output_Master_Results := FALSE : STORED('OutputMasterResults');
+	UNSIGNED BIPAppend_Score_Threshold := 75 : STORED('BIPAppendScoreThreshold');
+	UNSIGNED BIPAppend_Weight_Threshold := 0 : STORED('BIPAppendWeightThreshold');
+	BOOLEAN BIPAppend_PrimForce := FALSE : STORED('BIPAppendPrimForce');
+	BOOLEAN BIPAppend_Include_AuthRep := FALSE : STORED('BIPAppendIncludeAuthRep');
+	BOOLEAN BIPAppend_No_ReAppend := FALSE : STORED('BIPAppendNoReAppend');
 	
 	Options := MODULE(PublicRecords_KEL.Interface_Options)
 		EXPORT INTEGER ScoreThreshold := Score_threshold;
 		EXPORT BOOLEAN IsFCRA := FALSE;
 		EXPORT BOOLEAN ExcludeConsumerShell := Exclude_Consumer_Shell;
 		EXPORT BOOLEAN OutputMasterResults := Output_Master_Results;
+		
+		// BIP Append Options
+		EXPORT UNSIGNED BIPAppendScoreThreshold := IF(BIPAppend_Score_Threshold = 0, 75, MIN(MAX(51,BIPAppend_Score_Threshold), 100)); // Score threshold must be between 51 and 100 -- default is 75.
+		EXPORT UNSIGNED BIPAppendWeightThreshold := BIPAppend_Weight_Threshold;
+		EXPORT BOOLEAN BIPAppendPrimForce := BIPAppend_PrimForce;
+		EXPORT BOOLEAN BIPAppendReAppend := NOT BIPAppend_No_ReAppend;
+		EXPORT BOOLEAN BIPAppendIncludeAuthRep := BIPAppend_Include_AuthRep;
 		
 		// Override Include* Entity/Association options here if certain entities can be turned off to speed up processing.
 		// This will bypass uneccesary key JOINS in PublicRecords_KEL.Fn_MAS_FCRA_FDC if the keys don't contribute to any 

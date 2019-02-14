@@ -225,6 +225,13 @@ EXPORT Layouts := MODULE
 	END;
 	
 	SHARED LayoutInputBIIBusinessCleanInternal := RECORD
+		INTEGER7 LexIDBusExtendedFamilyAppend;
+		INTEGER7 LexIDBusLegalFamilyAppend;
+		INTEGER7 LexIDBusLegalEntityAppend;
+		INTEGER7 LexIDBusPlaceGroupAppend;
+		INTEGER7 LexIDBusPlaceAppend;
+		INTEGER3 BusLexIDScoreAppend;
+		INTEGER3 BusLexIDWeightAppend;
 		STRING20 BusInputArchiveDateClean;
 		// STRING20 BusInputArchiveDateTimeClean;
 		STRING120 BusInputNameClean;

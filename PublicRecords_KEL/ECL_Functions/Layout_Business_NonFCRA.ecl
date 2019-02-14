@@ -340,6 +340,13 @@
 	STRING1	BusInputRep5EmailEchoPop;
 	STRING1	BusInputRep5DLEchoPop;
 	STRING1	BusInputRep5DLStateEchoPop;	
+	INTEGER7 LexIDBusExtendedFamilyAppend;
+	INTEGER7 LexIDBusLegalFamilyAppend;
+	INTEGER7 LexIDBusLegalEntityAppend;
+	INTEGER7 LexIDBusPlaceGroupAppend;
+	INTEGER7 LexIDBusPlaceAppend;
+	INTEGER3 BusLexIDScoreAppend;
+	INTEGER3 BusLexIDWeightAppend;
 	STRING20 BusInputArchiveDateClean;
 	// STRING20 BusInputArchiveDateTimeClean;
 	STRING120 BusInputNameClean;
