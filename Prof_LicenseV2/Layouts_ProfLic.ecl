@@ -1,4 +1,4 @@
-import standard, Prof_License;
+﻿import standard, Prof_License;
 
 export Layouts_ProfLic := module
 
@@ -309,6 +309,10 @@ export Layouts_ProfLic := module
 	export Layout_Base := record
 	   unsigned6 prolic_seq_id := 0;
 	   prof_license.layout_proflic_out;
+		 //DF-24056 CCPA new fields
+			unsigned4 global_sid;
+			unsigned8 record_sid;
+
 	end;
 	
 	export Layout_Base_With_Tiers := record
@@ -331,6 +335,8 @@ export Layouts_ProfLic := module
 	   string10   Phone;
 	   unsigned6  zero  := 0;
 	   string1    blank := '';
-	end;
+			 //DF-24056 CCPA new fields
+			unsigned4 global_sid;
+			unsigned8 record_sid;end;
 
 end;
