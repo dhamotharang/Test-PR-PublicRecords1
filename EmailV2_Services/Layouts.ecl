@@ -3,7 +3,7 @@ EXPORT Layouts := MODULE
 
     EXPORT batch_email_input := RECORD
       STRING email;
-      doxie.layout_inBatchMaster;                
+      doxie.layout_inBatchMaster - [dl,dlstate,vin,Plate,PlateState,MatchCode,searchType,score,max_results];                
     END;
 
   EXPORT batch_in_rec := RECORD
@@ -35,9 +35,13 @@ EXPORT Layouts := MODULE
     STRING5     z5 := '';
     STRING4     zip4 := '';
     BOOLEAN     isdeepdive := FALSE; 
+    BOOLEAN     has_full_address := FALSE; 
+    BOOLEAN     has_full_name := FALSE; 
+    BOOLEAN     has_full_ssn := FALSE; 
   END;
   
   EXPORT batch_in_ext_rec := RECORD(batch_in_rec)
+    UNSIGNED2  record_err_code := 0;
     STRING     record_err_msg  := '';
     BOOLEAN    is_rejected_rec := FALSE;
   END;
@@ -46,38 +50,6 @@ EXPORT Layouts := MODULE
     UNSIGNED    DID := 0;
   END;
   
-  EXPORT batch_in_bv_rec := RECORD
-    STRING      email := '';
-  END;
-  
-  EXPORT bv_history_rec := RECORD
-    STRING   email := '';
-    STRING   email_status := '';
-    STRING   email_status_reason := '';
-    STRING   email_username := '';  
-    STRING   email_domain := '';    
-  END;
-  
-  EXPORT bv_history_gateway_rec := RECORD
-    STRING   date_added := '';
-    STRING   email_address := '';
-    STRING   source := '';
-    STRING   status := '';
-    STRING   disposable := '';
-    STRING   role_address := '';
-    STRING   error_code := '';
-    STRING   error := '';
-    STRING   account := '';  // email user name
-    STRING   domain := '';    
-  END;
-  
-   EXPORT bv_history_response_rec := RECORD
-    DATASET (bv_history_gateway_rec) Records  {XPATH('Records/Rec'), MAXCOUNT($.Constants.GatewayValues.SQLSelectLimit)};
-    STRING  RecsReturned {XPATH('RecsReturned')};
-    STRING  Latency {XPATH('Latency')};
-    STRING  ExceptionMessage {XPATH('Exceptions/Exception/Message')};
-  END;
-
  EXPORT email_ids_rec := RECORD
     STRING20  acctno := '';
     UNSIGNED  seq := 0; 
@@ -135,11 +107,14 @@ EXPORT Layouts := MODULE
     clean_email_rec cleaned;
     BOOLEAN   isdeepdive := FALSE; 
     UNSIGNED  subject_lexid := 0;  // keeping Lexid resolved from input PII or DID provided from input  
+    UNSIGNED4 global_sid := 0;  //  GlobalSourceId  
+    UNSIGNED8 record_sid := 0;  //  SourceSpecificRecordId  
+   // UNSIGNED8 gdp_rules_mask := 0;  //  global data protection mask - to indicate which rules apply  
   END;
 
   EXPORT email_internal_rec := RECORD
-    email_raw_rec -[is_Current,activecode, rules];
-    UNSIGNED email_quality_mask;
+    email_raw_rec -[is_Current,activecode, rules, global_sid, record_sid];
+    UNSIGNED email_quality_mask := 0;
     UNSIGNED penalt := 0;
     UNSIGNED penalt_addr := 0;
     UNSIGNED penalt_name := 0;
@@ -180,6 +155,7 @@ EXPORT Layouts := MODULE
     STRING   additional_status_info := '';
     STRING   relationship  := '';
     STRING   record_err_msg  := '';
+    UNSIGNED2 record_err_code := 0;
     BOOLEAN  is_rejected_rec := FALSE;
   END;
 
@@ -188,4 +164,39 @@ EXPORT Layouts := MODULE
     DATASET(Royalty.Layouts.RoyaltyForBatch) Royalties;
   END;
   
+  EXPORT GatewayData := MODULE
+    EXPORT batch_in_bv_rec := RECORD
+      STRING      email := '';
+    END;
+    
+    EXPORT bv_history_rec := RECORD
+      STRING   email := '';
+      STRING   email_status := '';
+      STRING   email_status_reason := '';
+      STRING   additional_status_info := '';
+      STRING   email_username := '';  
+      STRING   email_domain := '';    
+    END;
+    
+    EXPORT bv_history_deltabase_rec := RECORD
+      STRING   date_added := '';
+      STRING   email_address := '';
+      STRING   source := '';
+      STRING   status := '';
+      STRING   disposable := '';
+      STRING   role_address := '';
+      STRING   error_code := '';
+      STRING   error := '';
+      STRING   account := '';  // email user name
+      STRING   domain := '';    
+    END;
+    
+     EXPORT bv_history_response_rec := RECORD
+      DATASET (bv_history_deltabase_rec) Records  {XPATH('Records/Rec'), MAXCOUNT($.Constants.GatewayValues.SQLSelectLimit)};
+      STRING  RecsReturned {XPATH('RecsReturned')};
+      STRING  Latency {XPATH('Latency')};
+      STRING  ExceptionMessage {XPATH('Exceptions/Exception/Message')};
+    END;
+  END;
+
 END;
