@@ -57,8 +57,8 @@
 		EXPORT DspQa								:= 'dsp-qa';
 		EXPORT HpccConnectionProd		:= 'ramps';
 		EXPORT HpccConnectionProdQa	:= 'ramps_prodthor_certroxie';
-		EXPORT HpccConnectionQa			:= 'ramps_cert';
-		EXPORT HpccConnectionQaDev	:= 'ramps_certthor_devroxie';
+		EXPORT HpccConnectionQa			:= 'ramps_cert_fraudgov';
+		EXPORT HpccConnectionQaDev	:= 'ramps_certthor_devroxie_fraudgov';
 		EXPORT EclCompileStrategy		:= 'REMOTE';											
 		EXPORT KeepEcl							:= 'FALSE';	
 		EXPORT CustomerDashboard 		:= MODULE
