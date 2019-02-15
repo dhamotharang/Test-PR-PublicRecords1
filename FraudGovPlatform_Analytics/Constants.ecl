@@ -51,7 +51,7 @@
 		useOtherEnvironmentDali(BOOLEAN useProdData) := NOT((isProd AND useProdData) OR (~isProd AND ~useProdData));
 		EXPORT fileLocation(BOOLEAN useProdData)	:= IF(useProdData, data_services.foreign_prod, data_services.foreign_dataland);
 		EXPORT fileScope						:= 'fraudgov::base::built::kel::';
-		EXPORT EncodedCredentials		:= 'Y2FybWlnang6TmV3WWVhcjIwMTkh';
+		EXPORT EncodedCredentials		:= 'Y2FybWlnang6THVrYTIwMTk=';
 		EXPORT reqSource						:= 'batch';		
 		EXPORT DspProd							:= 'dsp';
 		EXPORT DspQa								:= 'dsp-qa';
