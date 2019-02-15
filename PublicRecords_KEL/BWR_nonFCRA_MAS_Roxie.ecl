@@ -1,13 +1,12 @@
 ﻿/* PublicRecords_KEL.BWR_nonFCRA_MAS_Roxie */
-IMPORT RiskWise, STD;
-IMPORT KEL011 AS KEL;
+IMPORT PublicRecords_KEL, RiskWise, SALT38, SALTRoutines, STD;
+
 threads := 1;
 
 RoxieIP := RiskWise.shortcuts.Dev156;
 
 InputFile := '~temp::kel::consumer_nonfcra_100k.csv';
 // InputFile := '~temp::kel::consumer_nonfcra_1mm.csv'; //1 million
-
 
 /*
 Data Setting 		NonFCRA
@@ -22,23 +21,32 @@ DPMDL =	1 //use_InsuranceDLData - bit 13
 GLBA 	= 1 
 DPPA 	= 1 
 */ 
-
 GLBA := 1;
 DPPA := 1;
 DataPermission := '0000000001101';  
 DataRestrictionMask := '0000000000000000000000000000000000000000000000000'; 
 
+// Universally Set the History Date YYYYMMDD for ALL records. Set to 0 to use the History Date located on each record of the input file
+histDate := '0';
+// histDate := '20190116';
+// histDate := (STRING)STD.Date.Today(); // Run with today's date
+
 Score_threshold := 80;
 // Score_threshold := 90;
-Output_Master_Results := TRUE;
+
+// Output additional file in Master Layout
+// Master results are for R&D/QA purposes ONLY. This should only be set to TRUE for internal use.
+Output_Master_Results := FALSE;
+// Output_Master_Results := TRUE; 
+
+// Toggle to include/exclude SALT profile of results file
+// Output_SALT_Profile := FALSE;
+Output_SALT_Profile := TRUE;
+
 RecordsToRun := 0;
 eyeball := 120;
 
-// Universally Set the History Date YYYYMMDD for ALL records. Set to 0 to use the History Date located on each record of the input file
-// histDate := '0';
-histDate := '20181218';
-
-OutputFile := '~CDAL::Consumer_Arrest_Bug_100K_RoxieDev_current_12182018_NonFCRA'+ ThorLib.wuid() ;
+OutputFile := '~AFA::Consumer_KS1832_100K_RoxieDev_current_12312018_NonFCRA'+ ThorLib.wuid() ;
 
 prii_layout := RECORD
     STRING Account             ;
@@ -158,28 +166,48 @@ Layout_Person := RECORD
 	STRING ErrorCode;
 END;
 
-Passed_with_Extras := SORT(
+Passed_with_Extras := 
 	JOIN(p, Passed, LEFT.Account = RIGHT.MasterResults.InputAccountEcho, 
 		TRANSFORM(LayoutMaster_With_Extras,
 			SELF := RIGHT.MasterResults, //fields from passed
 			SELF := LEFT, //input performance fields
 			SELF.ErrorCode := RIGHT.ErrorCode,
 			SELF := []),
-		INNER, KEEP(1)),
-	InputUIDAppend);
+		INNER, KEEP(1));
 	
-Passed_Person := SORT(
+Passed_Person := 
 	JOIN(p, Passed, LEFT.Account = RIGHT.Results.InputAccountEcho, 
 		TRANSFORM(Layout_Person,
 			SELF := RIGHT.Results, //fields from passed
 			SELF := LEFT, //input performance fields
 			SELF.ErrorCode := RIGHT.ErrorCode,
 			SELF := []),
-		INNER, KEEP(1)),
-	InputUIDAppend);
+		INNER, KEEP(1));
 	
 IF(Output_Master_Results, OUTPUT(CHOOSEN(Passed_with_Extras, eyeball), NAMED('Sample_Master_Layout')));
 OUTPUT(CHOOSEN(Passed_Person, eyeball), NAMED('Sample_NonFCRA_Layout'));
 
-IF(Output_Master_Results, OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout', CSV(HEADING(single), QUOTE('"'))));
-OUTPUT(Passed_Person,,OutputFile, CSV(HEADING(single), QUOTE('"')));
+IF(Output_Master_Results, OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout.csv', CSV(HEADING(single), QUOTE('"'))));
+OUTPUT(Passed_Person,,OutputFile + '.csv', CSV(HEADING(single), QUOTE('"')));
+
+
+Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
+	EXPORT STRING AttributeSetName := 'Development KEL Attributes';
+	EXPORT STRING VersionName := 'Version 1.0';
+	EXPORT BOOLEAN isFCRA := FALSE;
+	EXPORT STRING ArchiveDate := histDate;
+	EXPORT STRING InputFileName := InputFile;
+	EXPORT STRING Data_Restriction_Mask := DataRestrictionMask;
+	EXPORT STRING Data_Permission_Mask := DataPermission;
+	EXPORT UNSIGNED GLBAPurpose := GLBA;
+	EXPORT UNSIGNED DPPAPurpose := DPPA;
+	EXPORT UNSIGNED LexIDThreshold := Score_threshold;
+END;
+
+Settings_Dataset := PublicRecords_KEL.ECL_Functions.fn_make_settings_dataset(Settings);
+		
+OUTPUT(Settings_Dataset, NAMED('Attributes_Settings'));
+
+SALT_AttributeResults := IF(Output_SALT_Profile, SALTRoutines.SALT_Profile_Run_Everything(Passed_Person, 'SALT_Results'), 0);
+
+IF(Output_SALT_Profile, OUTPUT(SALT_AttributeResults, NAMED('Total_Fields_Profiled')));
