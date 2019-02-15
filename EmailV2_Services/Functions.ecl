@@ -1,4 +1,4 @@
-﻿IMPORT $, DidVille, doxie, dx_BestRecords, Codes, Royalty, Suppress, STD;
+﻿IMPORT $, DidVille, doxie, dx_BestRecords, Codes, Royalty, Suppress, STD,EmailService;
 
 EXPORT Functions := MODULE
 
@@ -255,5 +255,52 @@ EXPORT Functions := MODULE
     RETURN ds_batch_with_lexid;
   END;
 
+  EXPORT AddIdentityRelationship(DATASET($.Layouts.email_final_rec) in_email_recs,
+                                 DATASET($.Layouts.batch_in_rec) batch_input,
+                                 $.IParams.EmailParams in_mod
+ ) := FUNCTION 
+  
+    inrecs_for_fuzzy_rels := in_email_recs(DID=0 OR subject_LexId=0);
+    inrecs_for_lexid_rels := in_email_recs(DID>0 AND subject_LexId>0);    
+
+    rel_pairs_by_lexid := PROJECT(inrecs_for_lexid_rels, 
+                                  TRANSFORM(EmailService.Assorted_Layouts.layout_relationship,
+                                            SELF.identity_lexID := LEFT.DID, 
+                                            SELF.subject_lexId := LEFT.subject_LexId,
+                                            SELF.relationship := LEFT.relationship));
+
+
+
+    rels_by_lexid := IF(EXISTS(inrecs_for_lexid_rels), EmailService.Functions.GetRelationshipBySubjectLexId(rel_pairs_by_lexid, include_2ndDegree_relatives:=TRUE));
+    
+    recs_with_rels_by_lexid := JOIN(inrecs_for_lexid_rels, rels_by_lexid, 
+                                 LEFT.did = RIGHT.identity_LexID AND 
+                                 LEFT.subject_LexId = RIGHT.subject_LexId,
+                                 TRANSFORM($.Layouts.email_final_rec,
+                                   SELF.relationship := MAP( 
+                                                           LEFT.did>0 AND LEFT.did=LEFT.subject_LexId => $.Constants.Relationship.PossibleSubject,
+                                                           RIGHT.relationship<>''=> RIGHT.relationship,
+                                                           LEFT.relationship),
+                                   SELF := LEFT
+                                 ),
+                                 LEFT OUTER, KEEP(1), LIMIT(0));
+    
+    
+    // for cases where we cannot use lexid to identify relationship we will attempt to use fuzzy matching
+    recs_with_fuzzy_rels := JOIN(inrecs_for_fuzzy_rels, batch_input,
+                           LEFT.acctno = RIGHT.acctno,
+                           $.Transforms.AddFuzzyRelationship(LEFT, RIGHT, in_mod.PenaltThreshold),
+                           KEEP(1),LIMIT(0));
+    
+    // now combine all results 
+    all_email_rels := recs_with_rels_by_lexid + recs_with_fuzzy_rels;
+
+    email_rels_ready := PROJECT(all_email_rels, 
+                                TRANSFORM($.Layouts.email_final_rec, 
+                                  SELF.relationship := IF(LEFT.relationship='',$.Constants.Relationship.NotFound, LEFT.relationship),
+                                  SELF := LEFT));
+
+    RETURN email_rels_ready;
+  END;
 
 END;

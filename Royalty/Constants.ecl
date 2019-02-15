@@ -84,6 +84,7 @@ export Constants := module
 		export unsigned2 CORTERA_FILE := 701;
 		export unsigned2 ACCUDATA_CNAM_CNM2   := 711;
 		export unsigned2 ACCUDATA_OCN_LNP   := 712;
+		export unsigned2 BRITE_VERIFY_EMAIL := 720;
     
 	end;
 
@@ -170,6 +171,7 @@ export Constants := module
 		export CORTERA_FILE			:= _TYPE(RoyaltyCode.CORTERA_FILE);
 		export ACCUDATA_CNAM_CNM2				:= _TYPE(RoyaltyCode.ACCUDATA_CNAM_CNM2);
 		export ACCUDATA_OCN_LNP					:= _TYPE(RoyaltyCode.ACCUDATA_OCN_LNP);
+		export BRITE_VERIFY_EMAIL  			:= _TYPE(RoyaltyCode.BRITE_VERIFY_EMAIL);
 	end;
 
 	// *** DO NOT USE: TO BE DEPRECATED AND DELETED once batch can handle RoyaltySet dataset.

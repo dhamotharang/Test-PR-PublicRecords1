@@ -8,6 +8,7 @@ export Constants := module
 		export integer RETRIES 								:= 0;			// 0 is no retry, default if ommitted is (3)
 		export integer WAIT_TIMEOUT_POLK 			:= 20;
 		export integer WAIT_TIMEOUT_EXPERIAN 	:= 20;
+		export integer STATUS_SUCCESS 	      := 0;
 	end;
 
 	export ServiceName := module
@@ -67,6 +68,7 @@ export Constants := module
 		export String40 IsAccuDataCNAM := 'accudata_cnam';			//CallerID - Retrieve Calling Name for phone number
 		export String40 IsEquifaxEmsReport := 'equifax_ems';			//Equifax Tri-Merge report.
 		export String40 IsTuFraudAlert := 'tu_fraud_alert';			//Transunion Fraud Alert
+		export String40 BriteVerifyEmail := 'BriteVerifyEmail';			//Brite Verify Email validation
 	end;
 
 	export ConfigProperties := module
