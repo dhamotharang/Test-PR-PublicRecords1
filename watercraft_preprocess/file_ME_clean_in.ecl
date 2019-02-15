@@ -65,6 +65,7 @@ self.LEGAL_COUNTRY			:= ut.CleanSpacesAndUpper(L.LEGAL_COUNTRY);
 																							// REGEXREPLACE('[0-9]+',L.SECONDARY_OWNER,''),L.SECONDARY_OWNER));
 self.AGENT_NAME					:= ut.CleanSpacesAndUpper(L.AGENT_NAME);
 self	:= L;
+self	:= [];
 END;														
 
 EXPORT file_ME_clean_in := project(fIn_raw,CleanTrimRaw(left));
