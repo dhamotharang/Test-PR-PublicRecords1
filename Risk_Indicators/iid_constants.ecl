@@ -998,7 +998,7 @@ export set_permitted_bk_chapters(integer bsversion, boolean insurancemode) := if
 export poAddress_expression := '((P[\\s\\.]*O[\\.\\s]*)|(POST[\\s]*OFFICE[\\s]*))+BOX';  //find reference to po box or post office box
 export onlyContains_express := '^(([\\s]*CO[\\.]?)|([\\s]*ASSOCIATES))$';
 export endingInc_expression := '(INC[.]*)$';
-export endsWith_expression := '([\\s]*ASSOC|[\\s]*ASSOCIATES|(AND)?[\\s\\&]*COMPANY|[\\.\\s\\&]*CO[\\.]?|[\\s]*ACCT|[\\s\\&]*LLP[\\.]?|[\\s\\&]*LLC[\\.]?)$';
+export endsWith_expression :=  '([\\s]*ASSOC|[\\s]*ASSOCIATES|(AND)?[\\s\\&]*COMPANY|((\\.CO)|(CO\\.)|(\\sCO)|(\\&CO)|(\\&\\sCO\\.)|(\\&\\sCO)|(\\&CO\\.))|[\\s]*ACCT|[\\s\\&]*LLP[\\.]?|[\\s\\&]*LLC[\\.]?)$';
 export lastEndsWith_expression := '([\\s]*DDS[\\.]?)$';
 export contains_expression := '(ACCOUNT|BUSINESS|\\&)';
 
