@@ -24,7 +24,7 @@ string5	  FIPS;
 string8	  EXPIRATION_DATE;
 string1	  TOILET;
 string3	  HP;
-string6	  STATUS;
+string3	  STATUS;
 string8	  DOB;
 string2	  lf;
 end;

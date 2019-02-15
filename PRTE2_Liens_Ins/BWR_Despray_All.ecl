@@ -9,8 +9,8 @@ IMPORT PRTE2_Liens_Ins, PRTE2_Common;
 STRING dateString := PRTE2_Common.Constants.TodayString+'';
 
 // ----- DEV DESPRAY ---------------------------------------------------------
-// desprayNameMain	:= 'Liens_MainV2_DEV_'+dateString+'.csv';
-// desprayNameParty	:= 'Liens_PartyV2_DEV_'+dateString+'.csv';
+// desprayNameMain	:= 'Liens_MainV2_AfterAdd_DEV_'+dateString+'.csv';
+// desprayNameParty	:= 'Liens_PartyV2_AfterAdd_DEV_'+dateString+'.csv';
 // Export_Main		:=	SORT(PRTE2_Liens_Ins.Files.Main_IN_DS,tmsid);
 // Export_Party		:=	SORT(PRTE2_Liens_Ins.Files.Party_IN_DS,tmsid);
 // ---------------------------------------------------------------------------
