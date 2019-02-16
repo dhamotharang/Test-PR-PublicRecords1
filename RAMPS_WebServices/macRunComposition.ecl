@@ -24,7 +24,8 @@ EXPORT macRunComposition(cmpUuid, 		//Composition ID
 
 	LOCAL dRunComposition:=HTTPCALL( url, 'GET','application/json', 
 		RAMPS_WebServices.Layouts.rRunCompositionOut, XPATH('/'), 
-		HTTPHEADER('Authorization',authString));
+		HTTPHEADER('Authorization',authString),
+		TIMEOUT(3600));
 
 	RETURN dRunComposition;
 ENDMACRO;
