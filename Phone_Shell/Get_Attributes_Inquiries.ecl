@@ -1,10 +1,12 @@
-/* ************************************************************************
+﻿/* ************************************************************************
  * 			 This function gathers the Inquiries attributes.									*
  ************************************************************************ */
 
 IMPORT Inquiry_AccLogs, Phone_Shell, RiskWise, UT, STD;
 
-EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Inquiries (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input) := FUNCTION
+EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Inquiries (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input,
+                                                                                        UNSIGNED2 PhoneShellVersion = 10 // PhoneShell V1.0 default
+                                                                                       ) := FUNCTION
 	layoutInquiries := RECORD
 		Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus;
 		STRING description := '';
@@ -39,14 +41,23 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Inq
 		sameADL := le.Clean_Input.DID = ri.person_q.appended_adl;
 			
 		// If the DID discovered from input matches the inquiry DID count this inquiry
-		SELF.Inquiries.Inq_Num := IF(sameADL, '1', '');
-		SELF.Inquiries.Inq_Num_06 := IF(sameADL, '1', '');
+  // PhoneShell V2+ implement a fix here to ignore sameADL for non-ADL counts, and add 6-month limit to Inq_Num_06
+		SELF.Inquiries.Inq_Num := if(PhoneShellVersion >= 20, '1', IF(sameADL, '1', ''));
+		SELF.Inquiries.Inq_Num_06 := map(PhoneShellVersion < 20                    => IF(sameADL, '1', ''),
+                                   inquiryMonths >= 0 AND inquiryMonths <= 6 => '1',
+                                                                                '');
+  
 		SELF.Inquiries.Inq_Num_Addresses := '1';
 		// Only count if the date is populated (inquiryMonths >= 0) and is within 6 months
 		SELF.Inquiries.Inq_Num_Addresses_06 := IF(inquiryMonths >= 0 AND inquiryMonths <= 6, '1', '');
-		SELF.Inquiries.Inq_Num_ADLs := '1';
+    
+  // PhoneShell V2+ implement a fix here to include sameADL for ADL-based counts  
+		SELF.Inquiries.Inq_Num_ADLs := if(PhoneShellVersion >= 20, if(sameADL, '1',''), '1');
 		// Only count if the date is populated (inquiryMonths >= 0) and is within 6 months
-		SELF.Inquiries.Inq_Num_ADLs_06 := IF(inquiryMonths >= 0 AND inquiryMonths <= 6, '1', '');
+		SELF.Inquiries.Inq_Num_ADLs_06 := IF(inquiryMonths >= 0 AND inquiryMonths <= 6,
+                                        if(PhoneShellVersion >= 20, if(sameADL, '1',''), '1')
+                                      , '');
+    
 		SELF.Inquiries.Inq_FirstSeen := (STRING)inquiryMonths;
 		SELF.Inquiries.Inq_LastSeen := (STRING)inquiryMonths;
 		SELF.Inquiries.Inq_ADL_FirstSeen := IF(sameADL, (STRING)inquiryMonths, '');
@@ -104,7 +115,11 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Inq
 																								
 	layoutInquiries rollInquiries(layoutInquiries le, layoutInquiries ri) := TRANSFORM
 		SELF.Inquiries.Inq_Num := (STRING)((INTEGER)le.Inquiries.Inq_Num + (INTEGER)ri.Inquiries.Inq_Num);
-		SELF.Inquiries.Inq_Num_06 := (STRING)((INTEGER)le.Inquiries.Inq_Num + (INTEGER)ri.Inquiries.Inq_Num);
+  // For Phone Shell V2 fix this rollup to roll up the correct field
+		SELF.Inquiries.Inq_Num_06 := (STRING)(if(PhoneShellVersion >= 20,(integer)le.inquiries.inq_num_06 + (integer)ri.inquiries.inq_num_06,
+                                                                   (INTEGER)le.Inquiries.Inq_Num + (INTEGER)ri.Inquiries.Inq_Num));
+                                                                   
+                                                                   
 		SELF.Inquiries.Inq_FirstSeen := MAP((INTEGER)le.Inquiries.Inq_FirstSeen = 0 => ri.Inquiries.Inq_FirstSeen,
 																				(INTEGER)ri.Inquiries.Inq_FirstSeen = 0 => le.Inquiries.Inq_FirstSeen,
 																																									 (STRING)MAX((INTEGER)le.Inquiries.Inq_FirstSeen, (INTEGER)ri.Inquiries.Inq_FirstSeen));
@@ -121,9 +136,9 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Inq
 		leftInq := TRIM(le.Inquiries.Inq_ADL_Phone_Industry_List_12);
 		rightInq := TRIM(ri.Inquiries.Inq_ADL_Phone_Industry_List_12);
 		SELF.Inquiries.Inq_ADL_Phone_Industry_List_12 := MAP(leftInq = '' 																	=> rightInq,
-																												 rightInq = '' 																	=> leftInq,
-																												 StringLib.StringFind(leftInq, rightInq, 1) > 0 => leftInq,
-																																																					 leftInq + ',' + rightInq);
+																												                           rightInq = '' 																=> leftInq,
+																												          StringLib.StringFind(leftInq, rightInq, 1) > 0 => leftInq,
+																																																					                                   leftInq + ',' + rightInq);
 		
 		SELF := le;
 	END;
@@ -183,6 +198,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Inq
 	// OUTPUT(CHOOSEN(countedDID, 100), NAMED('countedDID'));
 	// OUTPUT(CHOOSEN(countedAddress, 100), NAMED('countedAddress'));
 	// OUTPUT(CHOOSEN(countedInquiries, 100), NAMED('countedInquiries'));
+ // output(choosen(sortedInquiryResults, 100), named('sortedInquiryResults'));
 	// OUTPUT(CHOOSEN(withDID, 100), NAMED('withDID'));
 	// OUTPUT(CHOOSEN(withAddress, 100), NAMED('withAddress'));
 	// OUTPUT(CHOOSEN(withInquiries, 100), NAMED('withInquiries'));

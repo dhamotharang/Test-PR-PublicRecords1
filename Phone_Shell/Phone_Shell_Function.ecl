@@ -250,7 +250,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Phone_Shell_Layout Phone_Shell_Function (D
 	/* ************************************************************************
 	 *  Gather attributes for the discovered phones                           *
 	 ************************************************************************ */
-	withAttributes := Phone_Shell.Gather_Attributes(withPhones, GLBPurpose, DPPAPurpose, DataRestrictionMask, InsuranceVerificationAgeLimit, IndustryClass);
+	withAttributes := Phone_Shell.Gather_Attributes(withPhones, GLBPurpose, DPPAPurpose, DataRestrictionMask, InsuranceVerificationAgeLimit, IndustryClass, PhoneShellVersion);
 
 	/* ************************************************************************
 	 *  Generate final output                                                 *
