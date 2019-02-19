@@ -1,4 +1,4 @@
-﻿IMPORT AutoHeaderI,AutoStandardI,BatchServices,Doxie,iesp;
+﻿IMPORT AutoHeaderI, AutoStandardI, BatchServices, Doxie, iesp, STD;
 
 EXPORT iParam :=
 MODULE
@@ -11,12 +11,12 @@ MODULE
 	INTERFACE(AutoStandardI.PermissionI_Tools.params,AutoStandardI.DataPermissionI.params,AutoStandardI.DataRestrictionI.params)
 		EXPORT UNSIGNED1 TransactionType     := 255;
 		EXPORT BOOLEAN   AllowAll            := FALSE;
-    EXPORT BOOLEAN   AllowGLB            := FALSE;
-    EXPORT BOOLEAN   AllowDPPA           := FALSE;
-    EXPORT UNSIGNED1 GLBPurpose          := 0;
-    EXPORT UNSIGNED1 DPPAPurpose         := 0;
-    EXPORT BOOLEAN   IncludeMinors       := FALSE;
-
+		EXPORT BOOLEAN   AllowGLB            := FALSE;
+		EXPORT BOOLEAN   AllowDPPA           := FALSE;
+		EXPORT UNSIGNED1 GLBPurpose          := 0;
+		EXPORT UNSIGNED1 DPPAPurpose         := 0;
+		EXPORT BOOLEAN   IncludeMinors       := FALSE;
+		EXPORT BOOLEAN   IsPrimarySearchPII  := FALSE;
 		EXPORT STRING    DataRestrictionMask := '00000000000000';
 		EXPORT BOOLEAN   ignoreFares         := FALSE;
 		EXPORT BOOLEAN   ignoreFidelity      := FALSE;
@@ -144,23 +144,26 @@ MODULE
 	 searchMod := PROJECT(globalMod,DIDParams,OPT);
 			
 		in_params := MODULE(ReportParams)			
-	    STRING vTransactionType              := pfOptions._Type : STORED('TransactionType');
-	   	EXPORT UNSIGNED1 TransactionType     := IF(vTransactionType <> '',PhoneFinder_Services.Constants.MapTransType2Code(vTransactionType), PhoneFinder_Services.Constants.TransType.Blank); // BASIC cannot be default
-		   EXPORT BOOLEAN   StrictMatch        	:= AutoStandardI.InterfaceTranslator.StrictMatch_value.val(searchMod);
- 		  EXPORT BOOLEAN   PhoneticMatch      	:= AutoStandardI.InterfaceTranslator.phonetics.val(searchMod);
-   		EXPORT STRING32  ApplicationType   		 := AutoStandardI.InterfaceTranslator.application_type_val.val(searchMod);
-   		EXPORT STRING5   IndustryClass      		:= AutoStandardI.InterfaceTranslator.industry_class_val.val(PROJECT(globalMod,AutoStandardI.InterfaceTranslator.industry_class_val.params));
-   		EXPORT UNSIGNED1 GLBPurpose         		:= AutoStandardI.InterfaceTranslator.glb_purpose.val(searchMod);
-   		EXPORT UNSIGNED1 DPPAPurpose        		:= AutoStandardI.InterfaceTranslator.dppa_purpose.val(searchMod);
-   		EXPORT UNSIGNED  ScoreThreshold     		:= AutoStandardI.InterfaceTranslator.score_threshold_value.val(searchMod);
-   		EXPORT UNSIGNED  PenaltyThreshold    	:= AutoStandardI.InterfaceTranslator.penalt_threshold_value.val(PROJECT(globalMod,AutoStandardI.InterfaceTranslator.penalt_threshold_value.params));
+	    STRING vTransactionType            := pfOptions._Type : STORED('TransactionType');
+	   	EXPORT UNSIGNED1 TransactionType   := IF(vTransactionType <> '',PhoneFinder_Services.Constants.MapTransType2Code(vTransactionType), PhoneFinder_Services.Constants.TransType.Blank); // BASIC cannot be default
+        STRING6 PrimarySearchCriteria      := pfOptions.PrimarySearchCriteria : STORED('PrimarySearchCriteria');
+      // RDP will be doing a PII search with phone input and primary search criteria as 'PII'   
+        EXPORT BOOLEAN   IsPrimarySearchPII  := STD.Str.ToUpperCase(PrimarySearchCriteria) = PhoneFinder_Services.Constants.PrimarySearchCriteria;    
+        EXPORT BOOLEAN   StrictMatch         := AutoStandardI.InterfaceTranslator.StrictMatch_value.val(searchMod);
+        EXPORT BOOLEAN   PhoneticMatch       := AutoStandardI.InterfaceTranslator.phonetics.val(searchMod);
+   		EXPORT STRING32  ApplicationType   := AutoStandardI.InterfaceTranslator.application_type_val.val(searchMod);
+   		EXPORT STRING5   IndustryClass     := AutoStandardI.InterfaceTranslator.industry_class_val.val(PROJECT(globalMod,AutoStandardI.InterfaceTranslator.industry_class_val.params));
+   		EXPORT UNSIGNED1 GLBPurpose        := AutoStandardI.InterfaceTranslator.glb_purpose.val(searchMod);
+   		EXPORT UNSIGNED1 DPPAPurpose       := AutoStandardI.InterfaceTranslator.dppa_purpose.val(searchMod);
+   		EXPORT UNSIGNED  ScoreThreshold    := AutoStandardI.InterfaceTranslator.score_threshold_value.val(searchMod);
+   		EXPORT UNSIGNED  PenaltyThreshold  := AutoStandardI.InterfaceTranslator.penalt_threshold_value.val(PROJECT(globalMod,AutoStandardI.InterfaceTranslator.penalt_threshold_value.params));
    		EXPORT STRING    DataRestrictionMask		:= globalMod.DataRestrictionMask;
    		EXPORT STRING    DataPermissionMask 		:= globalMod.DataPermissionMask;
-   		EXPORT STRING6   DOBMask             	:= AutoStandardI.InterfaceTranslator.dob_mask_val.val(PROJECT(globalMod,AutoStandardI.InterfaceTranslator.dob_mask_val.params));
-   		EXPORT STRING6   SSNMask            		:= AutoStandardI.InterfaceTranslator.ssn_mask_val.val(PROJECT(globalMod,AutoStandardI.InterfaceTranslator.ssn_mask_val.params));
-   		EXPORT BOOLEAN   useWaterfallv6					  := FALSE : STORED('useWaterfallv6');	// internal
+   		EXPORT STRING6   DOBMask           := AutoStandardI.InterfaceTranslator.dob_mask_val.val(PROJECT(globalMod,AutoStandardI.InterfaceTranslator.dob_mask_val.params));
+   		EXPORT STRING6   SSNMask           := AutoStandardI.InterfaceTranslator.ssn_mask_val.val(PROJECT(globalMod,AutoStandardI.InterfaceTranslator.ssn_mask_val.params));
+   		EXPORT BOOLEAN   useWaterfallv6	   := FALSE : STORED('useWaterfallv6');	// internal
    		EXPORT BOOLEAN   IncludePhoneMetadata		:= pfOptions.IncludePhoneMetadata : STORED('IncludePhoneMetadata');				 				 																			 
-   		BOOLEAN          SubjectMetadata 		 		 := pfOptions.SubjectMetadataOnly : STORED('SubjectMetadataOnly');
+   		BOOLEAN          SubjectMetadata   := pfOptions.SubjectMetadataOnly : STORED('SubjectMetadataOnly');
    		EXPORT BOOLEAN   SubjectMetadataOnly  	:= IF(IncludePhoneMetadata,SubjectMetadata,FALSE);
    		
    		// Options for phone verification	  

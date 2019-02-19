@@ -19,6 +19,7 @@
 	<part name="Phone" type="xsd:string"/>
 	<separator />
 	<part name="TransactionType" type="xsd:string" default="Basic" description="Basic, Premium, Ultimate"/>
+	<part name="PrimarySearchCriteria" type="xsd:string" default="" description="Phone, PII"/>
 	<separator />
 	<part name="DPPAPurpose" type="xsd:byte" default="1" size="2"/>
 	<part name="GLBPurpose" type="xsd:byte" default="1" size="2"/>
@@ -57,7 +58,7 @@
   <part name="usewaterfallv6" type="xsd:boolean" default="false"/>
 </message>
 */
-IMPORT Address,AutoStandardI,Gateway,iesp,PhoneFinder_Services,ut;
+IMPORT Address, AutoStandardI, Gateway, iesp, PhoneFinder_Services, ut;
 
 EXPORT PhoneFinderReportService() :=
 MACRO	
@@ -173,9 +174,9 @@ iesp.phonefinder.t_PhoneFinderSearchResponse tFormat2IespResponse() :=
  Zumigo_Log := modRecords.Zumigo_History_Recs; 
  PF_Reporting_Dataset := modRecords.ReportingDataset;
     
- OUTPUT(results,named('Results'));
- OUTPUT(royalties,named('RoyaltySet'));
- OUTPUT(Zumigo_Log,named('LOG_DELTA__PHONEFINDER_DELTA__PHONES__GATEWAY'));
+ OUTPUT(results, named('Results'));
+ OUTPUT(royalties, named('RoyaltySet'));
+ OUTPUT(Zumigo_Log, named('LOG_DELTA__PHONEFINDER_DELTA__PHONES__GATEWAY'));
  OUTPUT(PF_Reporting_Dataset, named('LOG_DELTABASE'));
 
 ENDMACRO;
