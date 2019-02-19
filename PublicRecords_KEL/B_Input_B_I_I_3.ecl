@@ -4,8 +4,8 @@ IMPORT B_Input_B_I_I_4,CFG_Compile,E_Business,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Input_B_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Input_B_I_I_4(__in,__cfg).__ENH_Input_B_I_I_4) __ENH_Input_B_I_I_4 := B_Input_B_I_I_4(__in,__cfg).__ENH_Input_B_I_I_4;
-  SHARED __EE43922 := __ENH_Input_B_I_I_4;
-  EXPORT __ST30476_Layout := RECORD
+  SHARED __EE41044 := __ENH_Input_B_I_I_4;
+  EXPORT __ST30016_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Business().Typ) Company_;
     KEL.typ.nint Bus_Input_U_I_D_Append_;
@@ -29,13 +29,6 @@ EXPORT B_Input_B_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr Bus_Input_N_A_I_C_S_Code_Echo_;
     KEL.typ.nstr Bus_Input_T_I_N_Echo_;
     KEL.typ.nstr Bus_Input_Archive_Date_Echo_;
-    KEL.typ.nint Lex_I_D_Bus_Extended_Family_Append_;
-    KEL.typ.nint Lex_I_D_Bus_Legal_Family_Append_;
-    KEL.typ.nint Lex_I_D_Bus_Legal_Entity_Append_;
-    KEL.typ.nint Lex_I_D_Bus_Place_Group_Append_;
-    KEL.typ.nint Lex_I_D_Bus_Place_Append_;
-    KEL.typ.nint Bus_Lex_I_D_Score_Append_;
-    KEL.typ.nint Bus_Lex_I_D_Weight_Append_;
     KEL.typ.nstr Bus_Input_Name_Clean_;
     KEL.typ.nstr Bus_Input_Alternate_Name_Clean_;
     KEL.typ.nstr Bus_Input_Prim_Range_Clean_;
@@ -62,29 +55,27 @@ EXPORT B_Input_B_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr Archive_Date_;
     KEL.typ.bool Addr_Not_Populated_ := FALSE;
     KEL.typ.nstr Bus_Input_Addr_Suffix_Clean_Value_;
-    KEL.typ.str Bus_Input_City_Echo_Pop_Value_ := '';
     KEL.typ.nstr Bus_Input_Post_Dir_Clean_Value_;
     KEL.typ.nstr Bus_Input_Pre_Dir_Clean_Value_;
     KEL.typ.nstr Bus_Input_Prim_Name_Clean_Value_;
     KEL.typ.nstr Bus_Input_Prim_Range_Clean_Value_;
     KEL.typ.nstr Bus_Input_Sec_Range_Clean_Value_;
-    KEL.typ.str Bus_Input_State_Echo_Pop_Value_ := '';
-    KEL.typ.nstr Bus_Input_Street_Clean_Value_;
     KEL.typ.nstr Bus_Input_Unit_Desig_Clean_Value_;
-    KEL.typ.str Bus_Input_Zip_Echo_Pop_Value_ := '';
-    KEL.typ.nbool City_State_Zip_Not_Populated_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST30476_Layout __ND44061__Project(B_Input_B_I_I_4(__in,__cfg).__ST31506_Layout __PP43487) := TRANSFORM
-    SELF.Bus_Input_City_Echo_Pop_Value_ := FN_Compile.FN_Is_Echo_Populated(__ECAST(KEL.typ.nstr,__PP43487.Bus_Input_City_Echo_));
-    SELF.Bus_Input_State_Echo_Pop_Value_ := FN_Compile.FN_Is_Echo_Populated(__ECAST(KEL.typ.nstr,__PP43487.Bus_Input_State_Echo_));
-    __CC3169 := '-99999';
-    __CC3174 := '-99998';
-    SELF.Bus_Input_Street_Clean_Value_ := MAP(__PP43487.Addr_Not_Populated_=>__ECAST(KEL.typ.nstr,__CN(__CC3169)),__T(__AND(__AND(__AND(__AND(__AND(__AND(__OP2(__PP43487.Bus_Input_Prim_Range_Clean_Value_,=,__CN(__CC3174)),__OP2(__PP43487.Bus_Input_Pre_Dir_Clean_Value_,=,__CN(__CC3174))),__OP2(__PP43487.Bus_Input_Prim_Name_Clean_Value_,=,__CN(__CC3174))),__OP2(__PP43487.Bus_Input_Addr_Suffix_Clean_Value_,=,__CN(__CC3174))),__OP2(__PP43487.Bus_Input_Post_Dir_Clean_Value_,=,__CN(__CC3174))),__OP2(__PP43487.Bus_Input_Unit_Desig_Clean_Value_,=,__CN(__CC3174))),__OP2(__PP43487.Bus_Input_Sec_Range_Clean_Value_,=,__CN(__CC3174))))=>__ECAST(KEL.typ.nstr,__CN(__CC3174)),__ECAST(KEL.typ.nstr,__OP2(__OP2(__OP2(__OP2(__OP2(__OP2(IF(__T(__OP2(__PP43487.Bus_Input_Prim_Range_Clean_Value_,=,__CN(__CC3174))),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__OP2(__FN1(TRIM,__PP43487.Bus_Input_Prim_Range_Clean_),+,__CN(' ')))),+,IF(__T(__OP2(__PP43487.Bus_Input_Pre_Dir_Clean_Value_,=,__CN(__CC3174))),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__OP2(__FN1(TRIM,__PP43487.Bus_Input_Pre_Dir_Clean_),+,__CN(' '))))),+,IF(__T(__OP2(__PP43487.Bus_Input_Prim_Name_Clean_Value_,=,__CN(__CC3174))),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__OP2(__FN1(TRIM,__PP43487.Bus_Input_Prim_Name_Clean_),+,__CN(' '))))),+,IF(__T(__OP2(__PP43487.Bus_Input_Addr_Suffix_Clean_Value_,=,__CN(__CC3174))),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__OP2(__FN1(TRIM,__PP43487.Bus_Input_Addr_Suffix_Clean_),+,__CN(' '))))),+,IF(__T(__OP2(__PP43487.Bus_Input_Post_Dir_Clean_Value_,=,__CN(__CC3174))),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__OP2(__FN1(TRIM,__PP43487.Bus_Input_Post_Dir_Clean_),+,__CN(' '))))),+,IF(__T(__OP2(__PP43487.Bus_Input_Unit_Desig_Clean_Value_,=,__CN(__CC3174))),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__OP2(__FN1(TRIM,__PP43487.Bus_Input_Unit_Desig_Clean_),+,__CN(' '))))),+,IF(__T(__OP2(__PP43487.Bus_Input_Sec_Range_Clean_Value_,=,__CN(__CC3174))),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__FN1(TRIM,__PP43487.Bus_Input_Sec_Range_Clean_))))));
-    SELF.Bus_Input_Zip_Echo_Pop_Value_ := FN_Compile.FN_Is_Echo_Populated(__ECAST(KEL.typ.nstr,__PP43487.Bus_Input_Zip_Echo_));
-    SELF := __PP43487;
+  SHARED __ST30016_Layout __ND41106__Project(B_Input_B_I_I_4(__in,__cfg).__ST30911_Layout __PP40733) := TRANSFORM
+    __CC3217 := '-99999';
+    __CC3222 := '-99998';
+    SELF.Bus_Input_Addr_Suffix_Clean_Value_ := IF(__PP40733.Addr_Not_Populated_,__ECAST(KEL.typ.nstr,__CN(__CC3217)),__ECAST(KEL.typ.nstr,FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP40733.Bus_Input_Addr_Suffix_Clean_),__ECAST(KEL.typ.nstr,__CN(__CC3222)))));
+    SELF.Bus_Input_Post_Dir_Clean_Value_ := IF(__PP40733.Addr_Not_Populated_,__ECAST(KEL.typ.nstr,__CN(__CC3217)),__ECAST(KEL.typ.nstr,FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP40733.Bus_Input_Post_Dir_Clean_),__ECAST(KEL.typ.nstr,__CN(__CC3222)))));
+    SELF.Bus_Input_Pre_Dir_Clean_Value_ := IF(__PP40733.Addr_Not_Populated_,__ECAST(KEL.typ.nstr,__CN(__CC3217)),__ECAST(KEL.typ.nstr,FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP40733.Bus_Input_Pre_Dir_Clean_),__ECAST(KEL.typ.nstr,__CN(__CC3222)))));
+    SELF.Bus_Input_Prim_Name_Clean_Value_ := IF(__PP40733.Addr_Not_Populated_,__ECAST(KEL.typ.nstr,__CN(__CC3217)),__ECAST(KEL.typ.nstr,FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP40733.Bus_Input_Prim_Name_Clean_),__ECAST(KEL.typ.nstr,__CN(__CC3222)))));
+    SELF.Bus_Input_Prim_Range_Clean_Value_ := IF(__PP40733.Addr_Not_Populated_,__ECAST(KEL.typ.nstr,__CN(__CC3217)),__ECAST(KEL.typ.nstr,FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP40733.Bus_Input_Prim_Range_Clean_),__ECAST(KEL.typ.nstr,__CN(__CC3222)))));
+    SELF.Bus_Input_Sec_Range_Clean_Value_ := IF(__PP40733.Addr_Not_Populated_,__ECAST(KEL.typ.nstr,__CN(__CC3217)),__ECAST(KEL.typ.nstr,FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP40733.Bus_Input_Sec_Range_Clean_),__ECAST(KEL.typ.nstr,__CN(__CC3222)))));
+    SELF.Bus_Input_Unit_Desig_Clean_Value_ := IF(__PP40733.Addr_Not_Populated_,__ECAST(KEL.typ.nstr,__CN(__CC3217)),__ECAST(KEL.typ.nstr,FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP40733.Bus_Input_Unit_Desig_Clean_),__ECAST(KEL.typ.nstr,__CN(__CC3222)))));
+    SELF := __PP40733;
   END;
-  EXPORT __ENH_Input_B_I_I_3 := PROJECT(__EE43922,__ND44061__Project(LEFT));
+  EXPORT __ENH_Input_B_I_I_3 := PROJECT(__EE41044,__ND41106__Project(LEFT));
 END;
