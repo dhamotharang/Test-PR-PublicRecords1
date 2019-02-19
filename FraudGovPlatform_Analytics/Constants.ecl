@@ -49,16 +49,16 @@
 	EXPORT RampsWebServices := MODULE
 		isProd := ~Tools._Constants.IsDataland;
 		useOtherEnvironmentDali(BOOLEAN useProdData) := NOT((isProd AND useProdData) OR (~isProd AND ~useProdData));
-		EXPORT fileLocation(BOOLEAN useProdData)	:= FraudGovPlatform._Dataset(useOtherEnvironmentDali(useProdData)).thor_cluster_Files;
-		EXPORT fileScope						:= 'base::fraudgov::qa::kel::';
-		EXPORT EncodedCredentials		:= 'Y2FybWlnang6TmV3WWVhcjIwMTkh';
+		EXPORT fileLocation(BOOLEAN useProdData)	:= IF(useProdData, data_services.foreign_prod, data_services.foreign_dataland);
+		EXPORT fileScope						:= 'fraudgov::base::built::kel::';
+		EXPORT EncodedCredentials		:= 'Y2FybWlnang6THVrYTIwMTk=';
 		EXPORT reqSource						:= 'batch';		
 		EXPORT DspProd							:= 'dsp';
 		EXPORT DspQa								:= 'dsp-qa';
 		EXPORT HpccConnectionProd		:= 'ramps';
 		EXPORT HpccConnectionProdQa	:= 'ramps_prodthor_certroxie';
-		EXPORT HpccConnectionQa			:= 'ramps_cert';
-		EXPORT HpccConnectionQaDev	:= 'ramps_certthor_devroxie';
+		EXPORT HpccConnectionQa			:= 'ramps_cert_fraudgov';
+		EXPORT HpccConnectionQaDev	:= 'ramps_certthor_devroxie_fraudgov';
 		EXPORT EclCompileStrategy		:= 'REMOTE';											
 		EXPORT KeepEcl							:= 'FALSE';	
 		EXPORT CustomerDashboard 		:= MODULE

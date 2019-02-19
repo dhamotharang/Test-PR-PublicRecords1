@@ -1,4 +1,4 @@
-import watercraft, watercraft_preprocess, ut, lib_StringLib;
+﻿import watercraft, watercraft_preprocess, ut, lib_StringLib;
 
 fIn_raw := watercraft_preprocess.Files_raw.ME;
 
@@ -33,11 +33,12 @@ self.STATE			:= ut.CleanSpacesAndUpper(L.STATE);
 self.VEH_TYPE2	:= ut.CleanSpacesAndUpper(L.VEH_TYPE2);
 self.TRANSACTION_TYPE	:= ut.CleanSpacesAndUpper(L.TRANSACTION_TYPE);
 tempVehStatus		:= ut.CleanSpacesAndUpper(L.VEHICLE_STATUS);
-self.VEHICLE_STATUS	:= MAP(tempVehStatus = 'DISCON' => 'DISCONTINUED',
-														tempVehStatus = 'DESTRO' => 'DESTROYED',
-														tempVehStatus = 'DOCUME' => 'DOCUMENTED',
-														tempVehStatus = 'LOST/S' => 'LOST/STOLEN',
-														tempVehStatus);
+// self.VEHICLE_STATUS	:= MAP(tempVehStatus = 'DISCON' => 'DISCONTINUED',
+														// tempVehStatus = 'DESTRO' => 'DESTROYED',
+														// tempVehStatus = 'DOCUME' => 'DOCUMENTED',
+														// tempVehStatus = 'LOST/S' => 'LOST/STOLEN',
+														// tempVehStatus);
+self.VEHICLE_STATUS	:= tempVehStatus;
 self.CLASS		:= ut.CleanSpacesAndUpper(L.CLASS);
 self.WATERS		:= ut.CleanSpacesAndUpper(L.WATERS);
 self.COLOR		:= ut.CleanSpacesAndUpper(L.COLOR);
@@ -60,10 +61,11 @@ self.LEGAL_TOWN					:= ut.CleanSpacesAndUpper(IF(REGEXFIND('^[^A-Z0-9_]',L.LEGAL
 																						L.LEGAL_TOWN));
 self.LEGAL_ST						:= ut.CleanSpacesAndUpper(L.LEGAL_ST);
 self.LEGAL_COUNTRY			:= ut.CleanSpacesAndUpper(L.LEGAL_COUNTRY);
-self.SECONDARY_OWNER		:= ut.CleanSpacesAndUpper(IF(REGEXFIND('^[0-9]+',L.SECONDARY_OWNER) AND NOT REGEXFIND('[A-Za-z]+',L.SECONDARY_OWNER),
-																							REGEXREPLACE('[0-9]+',L.SECONDARY_OWNER,''),L.SECONDARY_OWNER));
+// self.SECONDARY_OWNER		:= ut.CleanSpacesAndUpper(IF(REGEXFIND('^[0-9]+',L.SECONDARY_OWNER) AND NOT REGEXFIND('[A-Za-z]+',L.SECONDARY_OWNER),
+																							// REGEXREPLACE('[0-9]+',L.SECONDARY_OWNER,''),L.SECONDARY_OWNER));
 self.AGENT_NAME					:= ut.CleanSpacesAndUpper(L.AGENT_NAME);
 self	:= L;
+self	:= [];
 END;														
 
 EXPORT file_ME_clean_in := project(fIn_raw,CleanTrimRaw(left));

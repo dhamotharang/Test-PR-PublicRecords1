@@ -12,19 +12,20 @@ EXPORT macRunComposition(cmpUuid, 		//Composition ID
 	filenames = ''											//Files used to create the dashboard. These need to be URL encoded.
 	) := FUNCTIONMACRO
 	
-	LOCAL url := 'https://' + dsp + '.risk.regn.net/ws/wsCompositions/run/json?uuid='+cmpUuid
-		+'&reqsource='+reqSource
-		+'&hpccconnection='+hpccConnection
-		+'&ECL_COMPILE_STRATEGY='+eclCompileStrategy
-		+'&KeepECL='+keepEcl
-		+'&VIZSERVICEVERSION='+vizServiceVersion
-		+filenames;
+	LOCAL url := 'https://' + TRIM(dsp) + '.risk.regn.net/ws/wsCompositions/run/json?uuid='+cmpUuid
+		+'&reqsource='+TRIM(reqSource)
+		+'&hpccconnection='+TRIM(hpccConnection)
+		+'&ECL_COMPILE_STRATEGY='+TRIM(eclCompileStrategy)
+		+'&KeepECL='+TRIM(keepEcl)
+		+'&VIZSERVICEVERSION='+TRIM(vizServiceVersion)
+		+TRIM(filenames);
 
 	LOCAL authString := 'Basic ' + encodedCredentials;
 
 	LOCAL dRunComposition:=HTTPCALL( url, 'GET','application/json', 
 		RAMPS_WebServices.Layouts.rRunCompositionOut, XPATH('/'), 
-		HTTPHEADER('Authorization',authString));
+		HTTPHEADER('Authorization',authString),
+		TIMEOUT(3600));
 
 	RETURN dRunComposition;
 ENDMACRO;

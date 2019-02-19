@@ -1,4 +1,4 @@
-import watercraft, watercraft_preprocess, ut, lib_StringLib, STD;
+﻿import watercraft, watercraft_preprocess, ut, lib_StringLib, STD;
 
 // translates me_phase01.mp Ab intio graph into ECL to a common format for all raw files
 
@@ -50,7 +50,7 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(hull_clean_in L) := t
 	self.hull_number								:=	L.hull_id;
 	self.propulsion_description			:=	L.PROP;
 	self.vehicle_type_Description		:=	L.VEH_TYPE;
-	self.fuel_description						:=	L.FUEL;
+//	self.fuel_description						:=	L.FUEL;
 	self.hull_type_description			:=	L.HULL;
 	self.use_description						:=	L.USE_1;
 	self.watercraft_length					:=	L.TOTAL_INCH;
@@ -66,7 +66,7 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(hull_clean_in L) := t
 	self.registration_expiration_date			:=	If(IsValidExpireDate,L.EXPIRATION_DATE,'');
 	self.registration_status_description	:=	L.VEHICLE_STATUS;
 	self.transaction_type_description			:=	L.TRANSACTION_TYPE;
-	self.additional_owner_count						:=	IF(trim(L.SECONDARY_OWNER,left,right) <> '','1','');
+	self.additional_owner_count						:=	'';//IF(trim(L.SECONDARY_OWNER,left,right) <> '','1','');
 	self := L;
 	self := [];
 	end;

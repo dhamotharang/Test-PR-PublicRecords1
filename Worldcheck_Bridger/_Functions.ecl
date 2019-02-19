@@ -247,7 +247,7 @@
 				trim(cname, left, right) in ['Sudan','SUDAN'] =>SubGroup_Constants.numCountryID.SUDAN ,
 				trim(cname, left, right) in ['Suriname','SURINAME'] =>SubGroup_Constants.numCountryID.SURINAME ,
 				trim(cname, left, right) in ['Svalbard','SVALBARD'] =>SubGroup_Constants.numCountryID.SVALBARD ,
-				trim(cname, left, right) in ['Swaziland','SWAZILAND'] =>SubGroup_Constants.numCountryID.SWAZILAND ,
+				trim(cname, left, right) in ['Eswatini','ESWATINI'] =>SubGroup_Constants.numCountryID.ESWATINI ,
 				trim(cname, left, right) in ['Sweden','SWEDEN'] =>SubGroup_Constants.numCountryID.SWEDEN ,
 				trim(cname, left, right) in ['Switzerland','SWITZERLAND'] =>SubGroup_Constants.numCountryID.SWITZERLAND ,
 				trim(cname, left, right) in ['Syria','SYRIA'] =>SubGroup_Constants.numCountryID.SYRIA ,

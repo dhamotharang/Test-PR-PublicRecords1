@@ -205,7 +205,7 @@
 		export string SUDAN 						:= '201';
 		export string SURINAME 						:= '202';
 		export string SVALBARD 						:= '203';
-		export string SWAZILAND 					:= '204';
+		export string ESWATINI 					:= '204';
 		export string SWEDEN 						:= '205';
 		export string SWITZERLAND 					:= '206';
 		export string SYRIA 						:= '207';
