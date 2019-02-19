@@ -5,7 +5,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Attributes 
 																																									UNSIGNED1 DPPAPurpose,
 																																									STRING50 DataRestrictionMask,
 																																									UNSIGNED3 InsuranceVerificationAgeLimit,
-																																									STRING30 IndustryClass
+																																									STRING30 IndustryClass,
+                                         UNSIGNED2 PhoneShellVersion = 10 // default to PhoneShell V1.0, use 20 (for version 2.0) and so on for other versions
 																																								) := FUNCTION
 	/* ******************************************************************************
    ********************************************************************************
@@ -16,9 +17,9 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Gather_Attributes 
 	 /* ***************************************************************
 		* 			Gather all of the attributes for these phones						*
 	  *************************************************************** */
-	EDA := Phone_Shell.Get_Attributes_EDA(Input);
+	EDA := Phone_Shell.Get_Attributes_EDA(Input, PhoneShellVersion);
 		
-	Inquiries := Phone_Shell.Get_Attributes_Inquiries(Input);
+	Inquiries := Phone_Shell.Get_Attributes_Inquiries(Input, PhoneShellVersion);
 	
 	InternalCorroboration := Phone_Shell.Get_Attributes_Internal_Corroboration(Input, InsuranceVerificationAgeLimit);
 	
