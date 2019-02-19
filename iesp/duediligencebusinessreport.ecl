@@ -267,6 +267,8 @@ export t_DDRBusinessResult := record
 	t_DDRBusinessReportBy InputEcho {xpath('InputEcho')};
 	iesp.duediligenceshared.t_DDRAttributeGroup AttributeGroup {xpath('AttributeGroup')};
 	t_DDRBusinessReport BusinessReport {xpath('BusinessReport')};
+	iesp.duediligenceshared.t_DDRAttributesAdditionalInfo AdditionalInput {xpath('AdditionalInput')};
+	integer BusinessLexIDMatch {xpath('BusinessLexIDMatch')};
 end;
 		
 export t_DueDiligenceBusinessReportResponse := record

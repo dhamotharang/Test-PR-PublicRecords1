@@ -94,6 +94,18 @@ EXPORT reportSharedLegal := MODULE
                                                                                               SELF.DOCConvictionOverrideDate := iesp.ECL2ESP.toDate(LEFT.DOCConvictionOverrideDate);
                                                                                               SELF.DOCScheduledReleaseDate := iesp.ECL2ESP.toDate(LEFT.DOCScheduledReleaseDate);
                                                                                               SELF.DOCActualReleaseDate := iesp.ECL2ESP.toDate(LEFT.DOCActualReleaseDate);
+                                                                                              
+                                                                                              SELF.DOCParoleActualReleaseDate := iesp.ECL2ESP.toDate(LEFT.DOCParoleActualReleaseDate);
+                                                                                              SELF.DOCParolePresumptiveReleaseDate := iesp.ECL2ESP.toDate(LEFT.DOCParolePresumptiveReleaseDate);
+                                                                                              SELF.DOCParoleScheduledReleaseDate := iesp.ECL2ESP.toDate(LEFT.DOCParoleScheduledReleaseDate);
+                                                                                              
+                                                                                              SELF.DOCCurrentLocationSecurity := LEFT.DOCCurrentLocationSecurity;
+                                                                                              SELF.DOCParoleCurrentStatus := LEFT.DOCParoleCurrentStatus;
+                                                                                              SELF.DOCCurrentKnownInmateStatus := LEFT.DOCCurrentKnownInmateStatus;
+                                                                                              SELF.CurrentIncarcerationFlag := LEFT.currentlyIncarcerated;
+                                                                                              SELF.CurrentParoleFlag := LEFT.currentlyParoled;
+                                                                                              SELF.CurrentProbationFlag :=  LEFT.currentlyProbation;
+                                                                                              
                                                                                               SELF.DOCInmateStatus := LEFT.DOCInmateStatus;
                                                                                               SELF.DOCParoleStatus := LEFT.DOCParoleStatus;
                                                                                               SELF.OffenseMaxTerm := LEFT.offenseMaxTerm;

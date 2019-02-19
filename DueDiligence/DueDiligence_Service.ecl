@@ -79,13 +79,22 @@ EXPORT DueDiligence_Service := MACRO
                             DATASET([], requestResponseLayout));
       
       
-      allProducts := citResults + ddResults;
+      
+      //since we only process 1 record at a time via XML
+      //there could be a max of 2 records (Due Diligence + Citizenship)
+      //so they would be for the same request
+      allProducts := PROJECT(citResults + ddResults, TRANSFORM(requestResponseLayout,
+                                                                SELF.Result.AdditionalInput := optionsIn.AdditionalInput;
+                                                                SELF := LEFT;));
+                                                                
       sortProducts := SORT(allProducts, Result.UniqueID, Result.BusinessID);
       
+      
       final := ROLLUP(sortProducts,
-                      LEFT.Result.UniqueID = RIGHT.Result.UniqueID AND
-                      LEFT.Result.BusinessID = RIGHT.Result.BusinessID,
+                      LEFT.Result.inputEcho.productRequestType = RIGHT.Result.inputEcho.productRequestType,
                       TRANSFORM(requestResponseLayout,
+                                SELF.Result.PersonLexIDMatch := DueDiligence.Common.firstNonZeroNumber(Result.PersonLexIDMatch);
+                                SELF.Result.BusinessLexIDMatch := DueDiligence.Common.firstNonZeroNumber(Result.BusinessLexIDMatch);
                                 SELF.Result.AttributeGroup.Attributes :=  LEFT.Result.AttributeGroup.Attributes + RIGHT.Result.AttributeGroup.Attributes;
                                 SELF.Result.AttributeGroup.AttributeLevelHits := LEFT.Result.AttributeGroup.AttributeLevelHits + RIGHT.Result.AttributeGroup.AttributeLevelHits;
                                 SELF.Result.AttributeGroup.Name := DueDiligence.Common.firstPopulatedString(Result.AttributeGroup.Name);
@@ -97,8 +106,8 @@ EXPORT DueDiligence_Service := MACRO
       
  
       
-      IF(debugIndicator, output(citResults, NAMED('citResults')));
-      IF(debugIndicator, output(ddResults, NAMED('ddResults')));
+      IF(intermediates, output(citResults, NAMED('citResults')));
+      IF(intermediates, output(ddResults, NAMED('ddResults')));
       
       
       

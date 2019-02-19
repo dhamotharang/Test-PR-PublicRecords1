@@ -364,27 +364,28 @@ EXPORT CommonQuery := MODULE
 				
 				personAttributes := NORMALIZE(UNGROUP(results), DueDiligence.Constants.NUMBER_OF_INDIVIDUAL_ATTRIBUTES, TRANSFORM(iesp.share.t_NameValuePair,
 																																	SELF := CASE(COUNTER,
-																																								1  => DueDiligence.Common.createNVPair('PerAssetOwnProperty', LEFT.PerAssetOwnProperty),
-																																								2  => DueDiligence.Common.createNVPair('PerAssetOwnAircraft', LEFT.PerAssetOwnAircraft),
-																																								3  => DueDiligence.Common.createNVPair('PerAssetOwnWatercraft', LEFT.PerAssetOwnWatercraft),
-																																								4  => DueDiligence.Common.createNVPair('PerAssetOwnVehicle', LEFT.PerAssetOwnVehicle),
-																																								5  => DueDiligence.Common.createNVPair('PerAccessToFundsIncome', LEFT.PerAccessToFundsIncome),
+                                                                                1  => DueDiligence.Common.createNVPair('PerAssetOwnProperty', LEFT.PerAssetOwnProperty),
+                                                                                2  => DueDiligence.Common.createNVPair('PerAssetOwnAircraft', LEFT.PerAssetOwnAircraft),
+                                                                                3  => DueDiligence.Common.createNVPair('PerAssetOwnWatercraft', LEFT.PerAssetOwnWatercraft),
+                                                                                4  => DueDiligence.Common.createNVPair('PerAssetOwnVehicle', LEFT.PerAssetOwnVehicle),
+                                                                                5  => DueDiligence.Common.createNVPair('PerAccessToFundsIncome', LEFT.PerAccessToFundsIncome),
                                                                                 6  => DueDiligence.Common.createNVPair('PerAccessToFundsProperty', LEFT.PerAccessToFundsProperty),
-																																								7  => DueDiligence.Common.createNVPair('PerGeographic', LEFT.PerGeographic),
-																																								8  => DueDiligence.Common.createNVPair('PerMobility', LEFT.PerMobility),
-																																								9  => DueDiligence.Common.createNVPair('PerStateLegalEvent', LEFT.PerStateLegalEvent),
-																																								10 => DueDiligence.Common.createNVPair('PerFederalLegalEvent', LEFT.PerFederalLegalEvent),
-																																								11 => DueDiligence.Common.createNVPair('PerFederalLegalMatchLevel', LEFT.PerFederalLegalMatchLevel),
-																																								12 => DueDiligence.Common.createNVPair('PerCivilLegalEvent', LEFT.PerCivilLegalEvent),
-																																								13 => DueDiligence.Common.createNVPair('PerOffenseType', LEFT.PerOffenseType),
-																																								14 => DueDiligence.Common.createNVPair('PerAgeRange', LEFT.PerAgeRange),
-																																								15 => DueDiligence.Common.createNVPair('PerIdentityRisk', LEFT.PerIdentityRisk),
-																																								16 => DueDiligence.Common.createNVPair('PerUSResidency', LEFT.PerUSResidency),
-																																								17 => DueDiligence.Common.createNVPair('PerMatchLevel', LEFT.PerMatchLevel),
-																																								18 => DueDiligence.Common.createNVPair('PerAssociates', LEFT.PerAssociates),
-																																								19 => DueDiligence.Common.createNVPair('PerProfLicense', LEFT.PerProfLicense),
-																																								20 => DueDiligence.Common.createNVPair('PerBusAssociations', LEFT.PerBusAssociations),
-																																											DueDiligence.Common.createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID));));
+                                                                                7  => DueDiligence.Common.createNVPair('PerGeographic', LEFT.PerGeographic),
+                                                                                8  => DueDiligence.Common.createNVPair('PerMobility', LEFT.PerMobility),
+                                                                                9  => DueDiligence.Common.createNVPair('PerStateLegalEvent', LEFT.PerStateLegalEvent),
+                                                                                10 => DueDiligence.Common.createNVPair('PerFederalLegalEvent', LEFT.PerFederalLegalEvent),
+                                                                                11 => DueDiligence.Common.createNVPair('PerFederalLegalMatchLevel', LEFT.PerFederalLegalMatchLevel),
+                                                                                12 => DueDiligence.Common.createNVPair('PerCivilLegalEvent', LEFT.PerCivilLegalEvent),
+                                                                                13 => DueDiligence.Common.createNVPair('PerOffenseType', LEFT.PerOffenseType),
+                                                                                14 => DueDiligence.Common.createNVPair('PerAgeRange', LEFT.PerAgeRange),
+                                                                                15 => DueDiligence.Common.createNVPair('PerIdentityRisk', LEFT.PerIdentityRisk),
+                                                                                16 => DueDiligence.Common.createNVPair('PerUSResidency', LEFT.PerUSResidency),
+                                                                                17 => DueDiligence.Common.createNVPair('PerMatchLevel', LEFT.PerMatchLevel),
+                                                                                18 => DueDiligence.Common.createNVPair('PerAssociates', LEFT.PerAssociates),
+                                                                                19 => DueDiligence.Common.createNVPair('PerEmploymentIndustry', LEFT.PerEmploymentIndustry),
+                                                                                20 => DueDiligence.Common.createNVPair('PerProfLicense', LEFT.PerProfLicense),
+                                                                                21 => DueDiligence.Common.createNVPair('PerBusAssociations', LEFT.PerBusAssociations),
+                                                                                      DueDiligence.Common.createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID));));
 
 	
 	
@@ -396,27 +397,28 @@ EXPORT CommonQuery := MODULE
 		
 				personFlags := NORMALIZE(UNGROUP(results), DueDiligence.Constants.NUMBER_OF_INDIVIDUAL_ATTRIBUTES, TRANSFORM(iesp.share.t_NameValuePair,
 																												SELF := CASE(COUNTER,
-																																			1  => DueDiligence.Common.createNVPair('PerAssetOwnProperty_Flag', LEFT.PerAssetOwnProperty_Flag),
-																																			2  => DueDiligence.Common.createNVPair('PerAssetOwnAircraft_Flag', LEFT.PerAssetOwnAircraft_Flag),
-																																			3  => DueDiligence.Common.createNVPair('PerAssetOwnWatercraft_Flag', LEFT.PerAssetOwnWatercraft_Flag),
-																																			4  => DueDiligence.Common.createNVPair('PerAssetOwnVehicle_Flag', LEFT.PerAssetOwnVehicle_Flag),
+                                                                      1  => DueDiligence.Common.createNVPair('PerAssetOwnProperty_Flag', LEFT.PerAssetOwnProperty_Flag),
+                                                                      2  => DueDiligence.Common.createNVPair('PerAssetOwnAircraft_Flag', LEFT.PerAssetOwnAircraft_Flag),
+                                                                      3  => DueDiligence.Common.createNVPair('PerAssetOwnWatercraft_Flag', LEFT.PerAssetOwnWatercraft_Flag),
+                                                                      4  => DueDiligence.Common.createNVPair('PerAssetOwnVehicle_Flag', LEFT.PerAssetOwnVehicle_Flag),
                                                                       5  => DueDiligence.Common.createNVPair('PerAccessToFundsIncome_Flag', LEFT.PerAccessToFundsIncome_Flag),
-																																			6  => DueDiligence.Common.createNVPair('PerAccessToFundsProperty_Flag', LEFT.PerAccessToFundsProperty_Flag),
-																																			7  => DueDiligence.Common.createNVPair('PerGeographic_Flag', LEFT.PerGeographic_Flag),
-																																			8  => DueDiligence.Common.createNVPair('PerMobility_Flag', LEFT.PerMobility_Flag),
-																																			9  => DueDiligence.Common.createNVPair('PerStateLegalEvent_Flag', LEFT.PerStateLegalEvent_Flag),
-																																			10 => DueDiligence.Common.createNVPair('PerFederalLegalEvent_Flag', LEFT.PerFederalLegalEvent_Flag),
-																																			11 => DueDiligence.Common.createNVPair('PerFederalLegalMatchLevel_Flag', LEFT.PerFederalLegalMatchLevel_Flag),
-																																			12 => DueDiligence.Common.createNVPair('PerCivilLegalEvent_Flag', LEFT.PerCivilLegalEvent_Flag),
-																																			13 => DueDiligence.Common.createNVPair('PerOffenseType_Flag', LEFT.PerOffenseType_Flag),
-																																			14 => DueDiligence.Common.createNVPair('PerAgeRange_Flag', LEFT.PerAgeRange_Flag),
-																																			15 => DueDiligence.Common.createNVPair('PerIdentityRisk_Flag', LEFT.PerIdentityRisk_Flag),
-																																			16 => DueDiligence.Common.createNVPair('PerUSResidency_Flag', LEFT.PerUSResidency_Flag),
-																																			17 => DueDiligence.Common.createNVPair('PerMatchLevel_Flag', LEFT.PerMatchLevel_Flag),
-																																			18 => DueDiligence.Common.createNVPair('PerAssociates_Flag', LEFT.PerAssociates_Flag),
-																																			19 => DueDiligence.Common.createNVPair('PerProfLicense_Flag', LEFT.PerProfLicense_Flag),
-                                                                      20 => DueDiligence.Common.createNVPair('PerBusAssociations_Flag', LEFT.PerBusAssociations_Flag),
-																																						DueDiligence.Common.createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID));));
+                                                                      6  => DueDiligence.Common.createNVPair('PerAccessToFundsProperty_Flag', LEFT.PerAccessToFundsProperty_Flag),
+                                                                      7  => DueDiligence.Common.createNVPair('PerGeographic_Flag', LEFT.PerGeographic_Flag),
+                                                                      8  => DueDiligence.Common.createNVPair('PerMobility_Flag', LEFT.PerMobility_Flag),
+                                                                      9  => DueDiligence.Common.createNVPair('PerStateLegalEvent_Flag', LEFT.PerStateLegalEvent_Flag),
+                                                                      10 => DueDiligence.Common.createNVPair('PerFederalLegalEvent_Flag', LEFT.PerFederalLegalEvent_Flag),
+                                                                      11 => DueDiligence.Common.createNVPair('PerFederalLegalMatchLevel_Flag', LEFT.PerFederalLegalMatchLevel_Flag),
+                                                                      12 => DueDiligence.Common.createNVPair('PerCivilLegalEvent_Flag', LEFT.PerCivilLegalEvent_Flag),
+                                                                      13 => DueDiligence.Common.createNVPair('PerOffenseType_Flag', LEFT.PerOffenseType_Flag),
+                                                                      14 => DueDiligence.Common.createNVPair('PerAgeRange_Flag', LEFT.PerAgeRange_Flag),
+                                                                      15 => DueDiligence.Common.createNVPair('PerIdentityRisk_Flag', LEFT.PerIdentityRisk_Flag),
+                                                                      16 => DueDiligence.Common.createNVPair('PerUSResidency_Flag', LEFT.PerUSResidency_Flag),
+                                                                      17 => DueDiligence.Common.createNVPair('PerMatchLevel_Flag', LEFT.PerMatchLevel_Flag),
+                                                                      18 => DueDiligence.Common.createNVPair('PerAssociates_Flag', LEFT.PerAssociates_Flag),
+                                                                      19 => DueDiligence.Common.createNVPair('PerEmploymentIndustry_Flag', LEFT.PerEmploymentIndustry_Flag),
+                                                                      20 => DueDiligence.Common.createNVPair('PerProfLicense_Flag', LEFT.PerProfLicense_Flag),
+                                                                      21 => DueDiligence.Common.createNVPair('PerBusAssociations_Flag', LEFT.PerBusAssociations_Flag),
+                                                                            DueDiligence.Common.createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID));));
 		
 				RETURN personFlags;
 		END;
@@ -426,28 +428,31 @@ EXPORT CommonQuery := MODULE
         
         businessAttributes := NORMALIZE(UNGROUP(results), DueDiligence.Constants.NUMBER_OF_BUSINESS_ATTRIBUTES, TRANSFORM(iesp.share.t_NameValuePair,
 																																			SELF := CASE(COUNTER,
-																																										1  => DueDiligence.Common.createNVPair('BusAssetOwnProperty', LEFT.BusAssetOwnProperty),
-																																										2  => DueDiligence.Common.createNVPair('BusAssetOwnAircraft', LEFT.BusAssetOwnAircraft),
-																																										3  => DueDiligence.Common.createNVPair('BusAssetOwnWatercraft', LEFT.BusAssetOwnWatercraft),
-																																										4  => DueDiligence.Common.createNVPair('BusAssetOwnVehicle', LEFT.BusAssetOwnVehicle),
-																																										5  => DueDiligence.Common.createNVPair('BusAccessToFundsProperty', LEFT.BusAccessToFundsProperty),
-																																										6  => DueDiligence.Common.createNVPair('BusGeographic', LEFT.BusGeographic),
-																																										7  => DueDiligence.Common.createNVPair('BusValidity', LEFT.BusValidity),
-																																										8  => DueDiligence.Common.createNVPair('BusStability', LEFT.BusStability),
-																																										9  => DueDiligence.Common.createNVPair('BusIndustry', LEFT.BusIndustry),
-																																										10 => DueDiligence.Common.createNVPair('BusStructureType', LEFT.BusStructureType),
-																																										11 => DueDiligence.Common.createNVPair('BusSOSAgeRange', LEFT.BusSOSAgeRange),
-																																										12 => DueDiligence.Common.createNVPair('BusPublicRecordAgeRange', LEFT.BusPublicRecordAgeRange),
-																																										13 => DueDiligence.Common.createNVPair('BusShellShelf', LEFT.BusShellShelf),
-																																										14 => DueDiligence.Common.createNVPair('BusMatchLevel', LEFT.BusMatchLevel),
-																																										15 => DueDiligence.Common.createNVPair('BusStateLegalEvent', LEFT.BusStateLegalEvent),
-																																										16 => DueDiligence.Common.createNVPair('BusFederalLegalEvent', LEFT.BusFederalLegalEvent),
-																																										17 => DueDiligence.Common.createNVPair('BusFederalLegalMatchLevel', LEFT.BusFederalLegalMatchLevel),
-																																										18 => DueDiligence.Common.createNVPair('BusCivilLegalEvent', LEFT.BusCivilLegalEvent),
-																																										19 => DueDiligence.Common.createNVPair('BusOffenseType', LEFT.BusOffenseType),
-																																										20 => DueDiligence.Common.createNVPair('BusBEOProfLicense', LEFT.BusBEOProfLicense),
-																																										21 => DueDiligence.Common.createNVPair('BusBEOUSResidency', LEFT.BusBEOUSResidency),
-																																													DueDiligence.Common.createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID));));
+                                                                                    1  => DueDiligence.Common.createNVPair('BusAssetOwnProperty', LEFT.BusAssetOwnProperty),
+                                                                                    2  => DueDiligence.Common.createNVPair('BusAssetOwnAircraft', LEFT.BusAssetOwnAircraft),
+                                                                                    3  => DueDiligence.Common.createNVPair('BusAssetOwnWatercraft', LEFT.BusAssetOwnWatercraft),
+                                                                                    4  => DueDiligence.Common.createNVPair('BusAssetOwnVehicle', LEFT.BusAssetOwnVehicle),
+                                                                                    5  => DueDiligence.Common.createNVPair('BusAccessToFundSales', LEFT.BusAccessToFundSales),
+                                                                                    6  => DueDiligence.Common.createNVPair('BusAccessToFundsProperty', LEFT.BusAccessToFundsProperty),
+                                                                                    7  => DueDiligence.Common.createNVPair('BusGeographic', LEFT.BusGeographic),
+                                                                                    8  => DueDiligence.Common.createNVPair('BusValidity', LEFT.BusValidity),
+                                                                                    9  => DueDiligence.Common.createNVPair('BusStability', LEFT.BusStability),
+                                                                                    10 => DueDiligence.Common.createNVPair('BusIndustry', LEFT.BusIndustry),
+                                                                                    11 => DueDiligence.Common.createNVPair('BusStructureType', LEFT.BusStructureType),
+                                                                                    12 => DueDiligence.Common.createNVPair('BusSOSAgeRange', LEFT.BusSOSAgeRange),
+                                                                                    13 => DueDiligence.Common.createNVPair('BusPublicRecordAgeRange', LEFT.BusPublicRecordAgeRange),
+                                                                                    14 => DueDiligence.Common.createNVPair('BusShellShelf', LEFT.BusShellShelf),
+                                                                                    15 => DueDiligence.Common.createNVPair('BusMatchLevel', LEFT.BusMatchLevel),
+                                                                                    16 => DueDiligence.Common.createNVPair('BusStateLegalEvent', LEFT.BusStateLegalEvent),
+                                                                                    17 => DueDiligence.Common.createNVPair('BusFederalLegalEvent', LEFT.BusFederalLegalEvent),
+                                                                                    18 => DueDiligence.Common.createNVPair('BusFederalLegalMatchLevel', LEFT.BusFederalLegalMatchLevel),
+                                                                                    19 => DueDiligence.Common.createNVPair('BusCivilLegalEvent', LEFT.BusCivilLegalEvent),
+                                                                                    20 => DueDiligence.Common.createNVPair('BusOffenseType', LEFT.BusOffenseType),
+                                                                                    21 => DueDiligence.Common.createNVPair('BusBEOProfLicense', LEFT.BusBEOProfLicense),
+                                                                                    22 => DueDiligence.Common.createNVPair('BusBEOUSResidency', LEFT.BusBEOUSResidency),
+                                                                                    23 => DueDiligence.Common.createNVPair('BusBEOAccessToFundsProperty', LEFT.BusBEOAccessToFundsProperty),
+                                                                                    24 => DueDiligence.Common.createNVPair('BusLinkedBusinesses', LEFT.BusLinkedBusinesses),
+                                                                                          DueDiligence.Common.createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID));));
 																																																							
 				
 				RETURN businessAttributes;
@@ -458,62 +463,72 @@ EXPORT CommonQuery := MODULE
 			
       businessFlags := NORMALIZE(UNGROUP(results), DueDiligence.Constants.NUMBER_OF_BUSINESS_ATTRIBUTES, TRANSFORM(iesp.share.t_NameValuePair,
 																													SELF := CASE(COUNTER,
-																																				1  => DueDiligence.Common.createNVPair('BusAssetOwnProperty_Flag', LEFT.BusAssetOwnProperty_Flag),
-																																				2  => DueDiligence.Common.createNVPair('BusAssetOwnAircraft_Flag', LEFT.BusAssetOwnAircraft_Flag),
-																																				3  => DueDiligence.Common.createNVPair('BusAssetOwnWatercraft_Flag', LEFT.BusAssetOwnWatercraft_Flag),
-																																				4  => DueDiligence.Common.createNVPair('BusAssetOwnVehicle_Flag', LEFT.BusAssetOwnVehicle_Flag),
-																																				5  => DueDiligence.Common.createNVPair('BusAccessToFundsProperty_Flag', LEFT.BusAccessToFundsProperty_Flag),
-																																				6  => DueDiligence.Common.createNVPair('BusGeographic_Flag', LEFT.BusGeographic_Flag),
-																																				7  => DueDiligence.Common.createNVPair('BusValidity_Flag', LEFT.BusValidity_Flag),
-																																				8  => DueDiligence.Common.createNVPair('BusStability_Flag', LEFT.BusStability_Flag),
-																																				9  => DueDiligence.Common.createNVPair('BusIndustry_Flag', LEFT.BusIndustry_Flag),
-																																				10 => DueDiligence.Common.createNVPair('BusStructureType_Flag', LEFT.BusStructureType_Flag),
-																																				11 => DueDiligence.Common.createNVPair('BusSOSAgeRange_Flag', LEFT.BusSOSAgeRange_Flag),
-																																				12 => DueDiligence.Common.createNVPair('BusPublicRecordAgeRange_Flag', LEFT.BusPublicRecordAgeRange_Flag),
-																																				13 => DueDiligence.Common.createNVPair('BusShellShelf_Flag', LEFT.BusShellShelf_Flag),
-																																				14 => DueDiligence.Common.createNVPair('BusMatchLevel_Flag', LEFT.BusMatchLevel_Flag),
-																																				15 => DueDiligence.Common.createNVPair('BusStateLegalEvent_Flag', LEFT.BusStateLegalEvent_Flag),
-																																				16 => DueDiligence.Common.createNVPair('BusFederalLegalEvent_Flag', LEFT.BusFederalLegalEvent_Flag),
-																																				17 => DueDiligence.Common.createNVPair('BusFederalLegalMatchLevel_Flag', LEFT.BusFederalLegalMatchLevel_Flag),
-																																				18 => DueDiligence.Common.createNVPair('BusCivilLegalEvent_Flag', LEFT.BusCivilLegalEvent_Flag),
-																																				19 => DueDiligence.Common.createNVPair('BusOffenseType_Flag', LEFT.BusOffenseType_Flag),
-																																				20 => DueDiligence.Common.createNVPair('BusBEOProfLicense_Flag', LEFT.BusBEOProfLicense_Flag),
-																																				21 => DueDiligence.Common.createNVPair('BusBEOUSResidency_Flag', LEFT.BusBEOUSResidency_Flag),
-																																							DueDiligence.Common.createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID));));
+                                                                        1  => DueDiligence.Common.createNVPair('BusAssetOwnProperty_Flag', LEFT.BusAssetOwnProperty_Flag),
+                                                                        2  => DueDiligence.Common.createNVPair('BusAssetOwnAircraft_Flag', LEFT.BusAssetOwnAircraft_Flag),
+                                                                        3  => DueDiligence.Common.createNVPair('BusAssetOwnWatercraft_Flag', LEFT.BusAssetOwnWatercraft_Flag),
+                                                                        4  => DueDiligence.Common.createNVPair('BusAssetOwnVehicle_Flag', LEFT.BusAssetOwnVehicle_Flag),
+                                                                        5  => DueDiligence.Common.createNVPair('BusAccessToFundsSales_Flag', LEFT.BusAccessToFundsSales_Flag),
+                                                                        6  => DueDiligence.Common.createNVPair('BusAccessToFundsProperty_Flag', LEFT.BusAccessToFundsProperty_Flag),
+                                                                        7  => DueDiligence.Common.createNVPair('BusGeographic_Flag', LEFT.BusGeographic_Flag),
+                                                                        8  => DueDiligence.Common.createNVPair('BusValidity_Flag', LEFT.BusValidity_Flag),
+                                                                        9  => DueDiligence.Common.createNVPair('BusStability_Flag', LEFT.BusStability_Flag),
+                                                                        10 => DueDiligence.Common.createNVPair('BusIndustry_Flag', LEFT.BusIndustry_Flag),
+                                                                        11 => DueDiligence.Common.createNVPair('BusStructureType_Flag', LEFT.BusStructureType_Flag),
+                                                                        12 => DueDiligence.Common.createNVPair('BusSOSAgeRange_Flag', LEFT.BusSOSAgeRange_Flag),
+                                                                        13 => DueDiligence.Common.createNVPair('BusPublicRecordAgeRange_Flag', LEFT.BusPublicRecordAgeRange_Flag),
+                                                                        14 => DueDiligence.Common.createNVPair('BusShellShelf_Flag', LEFT.BusShellShelf_Flag),
+                                                                        15 => DueDiligence.Common.createNVPair('BusMatchLevel_Flag', LEFT.BusMatchLevel_Flag),
+                                                                        16 => DueDiligence.Common.createNVPair('BusStateLegalEvent_Flag', LEFT.BusStateLegalEvent_Flag),
+                                                                        17 => DueDiligence.Common.createNVPair('BusFederalLegalEvent_Flag', LEFT.BusFederalLegalEvent_Flag),
+                                                                        18 => DueDiligence.Common.createNVPair('BusFederalLegalMatchLevel_Flag', LEFT.BusFederalLegalMatchLevel_Flag),
+                                                                        19 => DueDiligence.Common.createNVPair('BusCivilLegalEvent_Flag', LEFT.BusCivilLegalEvent_Flag),
+                                                                        20 => DueDiligence.Common.createNVPair('BusOffenseType_Flag', LEFT.BusOffenseType_Flag),
+                                                                        21 => DueDiligence.Common.createNVPair('BusBEOProfLicense_Flag', LEFT.BusBEOProfLicense_Flag),
+                                                                        22 => DueDiligence.Common.createNVPair('BusBEOUSResidency_Flag', LEFT.BusBEOUSResidency_Flag),
+                                                                        23 => DueDiligence.Common.createNVPair('BusBEOAccessToFundsProperty_Flag', LEFT.BusBEOAccessToFundsProperty_Flag),
+                                                                        24 => DueDiligence.Common.createNVPair('BusLinkedBusinesses_Flag', LEFT.BusLinkedBusinesses_Flag),
+                                                                              DueDiligence.Common.createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID));));
 												
 				RETURN businessFlags;
 		END;
 
 
-		EXPORT mac_GetESPReturnData(inputWithSeq, results, iespLayout, indvOrBus, includeReport, attrs, attrsFlags, reqVersion) := FUNCTIONMACRO
-				
-				returnData := JOIN(inputWithSeq, results, 
-														LEFT.seq = RIGHT.seq,
-														TRANSFORM(iespLayout,
-																			SELF.result.inputecho := LEFT.reportBy;	
-																			SELF.result.AttributeGroup.attributes :=  attrs;
-																			SELF.result.AttributeGroup.AttributeLevelHits := attrsFlags;
-																			SELF.result.AttributeGroup.Name := reqVersion;
-																			
-																			#EXPAND(IF(indvOrBus = DueDiligence.Constants.BUSINESS,
-																															'SELF.result.businessID := (STRING)RIGHT.busn_info.BIP_IDs.SeleID.LinkID;',
-																															DueDiligence.Constants.EMPTY))
-																			#EXPAND(IF(indvOrBus = DueDiligence.Constants.BUSINESS AND includeReport = DueDiligence.Constants.STRING_TRUE,
-																															'SELF.result.BusinessReport := RIGHT.BusinessReport;',
-																															DueDiligence.Constants.EMPTY))
-																			
-																			#EXPAND(IF(indvOrBus = DueDiligence.Constants.INDIVIDUAL,
-																															'SELF.result.uniqueID := (STRING)RIGHT.individual.did;',
-																															DueDiligence.Constants.EMPTY))	
+		EXPORT mac_GetESPReturnData(inputWithSeq, results, iespLayout, indvOrBus, includeReport, attrs, attrsFlags, reqVersion, customerPassThruInput) := FUNCTIONMACRO
+			
+        returnData := JOIN(inputWithSeq, results, 
+                            LEFT.seq = RIGHT.seq,
+                            TRANSFORM(iespLayout,
+                                      SELF.result.inputecho := LEFT.reportBy;	
+                                      SELF.result.AttributeGroup.attributes :=  attrs;
+                                      SELF.result.AttributeGroup.AttributeLevelHits := attrsFlags;
+                                      SELF.result.AttributeGroup.Name := reqVersion;
+                                      SELF.result.AdditionalInput := customerPassThruInput;
+
+                                      #EXPAND(IF(indvOrBus = DueDiligence.Constants.BUSINESS,
+                                                              'SELF.result.businessID := (STRING)RIGHT.busn_info.BIP_IDs.SeleID.LinkID;',
+                                                              DueDiligence.Constants.EMPTY))
+                                      #EXPAND(IF(indvOrBus = DueDiligence.Constants.BUSINESS,
+                                                              'SELF.result.BusinessLexIDMatch := RIGHT.score;',
+                                                              DueDiligence.Constants.EMPTY))
+                                      #EXPAND(IF(indvOrBus = DueDiligence.Constants.BUSINESS AND includeReport = DueDiligence.Constants.STRING_TRUE,
+                                                              'SELF.result.BusinessReport := RIGHT.BusinessReport;',
+                                                              DueDiligence.Constants.EMPTY))
+
+                                      #EXPAND(IF(indvOrBus = DueDiligence.Constants.INDIVIDUAL,
+                                                              'SELF.result.uniqueID := (STRING)RIGHT.individual.did;',
+                                                              DueDiligence.Constants.EMPTY))	
+                                      #EXPAND(IF(indvOrBus = DueDiligence.Constants.INDIVIDUAL,
+                                                              'SELF.result.PersonLexIDMatch := RIGHT.individual.score;',
+                                                              DueDiligence.Constants.EMPTY))	
                                       #EXPAND(IF(indvOrBus = DueDiligence.Constants.INDIVIDUAL AND includeReport = DueDiligence.Constants.STRING_TRUE,
-																															'SELF.result.PersonReport := RIGHT.personReport;',
-																															DueDiligence.Constants.EMPTY))
-																															
-																															
-																															
-																															
-																			SELF := LEFT;
-																			SELF := [];));																																		
+                                                              'SELF.result.PersonReport := RIGHT.personReport;',
+                                                              DueDiligence.Constants.EMPTY))
+                                                              
+                                                              
+                                                              
+                                                              
+                                      SELF := LEFT;
+                                      SELF := [];));																																		
 				
 				RETURN returnData;
 		ENDMACRO;

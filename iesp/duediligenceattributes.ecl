@@ -29,6 +29,9 @@ export t_DDRAttributesResult := record
 	t_DDRAttributesReportBy InputEcho {xpath('InputEcho')};
 	iesp.duediligenceshared.t_DDRAttributeGroup AttributeGroup {xpath('AttributeGroup')};
 	t_DDRCitizenshipResults CitizenshipResults {xpath('CitizenshipResults')};
+	iesp.duediligenceshared.t_DDRAttributesAdditionalInfo AdditionalInput {xpath('AdditionalInput')};
+	integer2 PersonLexIDMatch {xpath('PersonLexIDMatch')};
+	integer2 BusinessLexIDMatch {xpath('BusinessLexIDMatch')};
 end;
 		
 export t_DueDiligenceAttributesResponse := record
