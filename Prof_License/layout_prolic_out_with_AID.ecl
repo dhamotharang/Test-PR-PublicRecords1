@@ -16,8 +16,4 @@ export layout_prolic_out_with_AID := record
   STRING    xadl2_keys_desc := '';
   STRING60  xadl2_matches := '';
   STRING    xadl2_matches_desc := '';
-	//DF-24056 CCPA new fields
-	unsigned4 global_sid := 0;
-	unsigned8 record_sid := 0;
-
 end;
