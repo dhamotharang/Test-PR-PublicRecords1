@@ -17,9 +17,9 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	//get the inquired business information - this includes BIP IDs and Best Data
   inquiredBus := DueDiligence.getBusInfo(cleanedInput, options, linkingOptions);
 	
-	//seperate those with BIP IDs and those without/not found
-	inquiredBusWithBIP := inquiredBus(Busn_Info.BIP_IDs.SeleID.LinkID <> DueDiligence.Constants.NUMERIC_ZERO AND Busn_Info.BIP_IDs.OrgID.LinkID <> DueDiligence.Constants.NUMERIC_ZERO AND Busn_Info.BIP_IDs.UltID.LinkID <> DueDiligence.Constants.NUMERIC_ZERO);
-	inquiredBusNoBIP := inquiredBus(Busn_Info.BIP_IDs.OrgID.LinkID = DueDiligence.Constants.NUMERIC_ZERO AND Busn_Info.BIP_IDs.UltID.LinkID = DueDiligence.Constants.NUMERIC_ZERO);
+	//seperate those with LexIDs and those without/not found
+	inquiredBusWithBIP := inquiredBus(Busn_Info.BIP_IDs.SeleID.LinkID <> DueDiligence.Constants.NUMERIC_ZERO);
+	inquiredBusNoBIP := inquiredBus(Busn_Info.BIP_IDs.SeleID.LinkID = DueDiligence.Constants.NUMERIC_ZERO);
 	
 	//get linked business to the business passed in
 	linkedBus := DueDiligence.getBusLinkedBus(inquiredBusWithBIP, options, linkingOptions, DD_SSNMask);

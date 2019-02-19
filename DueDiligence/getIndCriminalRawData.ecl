@@ -108,6 +108,11 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                                                                          RIGHT.curr_parole_flag = 'Y' => DueDiligence.Constants.PAROLE_TEXT,
                                                                                          RIGHT.curr_probation_flag = 'Y' => DueDiligence.Constants.PROBATION_TEXT,
                                                                                          DueDiligence.Constants.EMPTY);
+                                                                                         
+                                        SELF.currentlyIncarcerated := RIGHT.curr_incar_flag = 'Y';
+                                        SELF.currentlyParoled := RIGHT.curr_parole_flag = 'Y';
+                                        SELF.currentlyProbation := RIGHT.curr_probation_flag = 'Y';
+                                        
                                         SELF := [];),
                             ATMOST(DueDiligence.Constants.MAX_ATMOST_5000), 
                             KEEP(DueDiligence.Constants.MAX_KEEP));
@@ -277,10 +282,15 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                             //additional data
                                             SELF.docScheduledReleaseDate := (UNSIGNED)RIGHT.sch_rel_dt;
                                             SELF.docActualReleaseDate := (UNSIGNED)RIGHT.act_rel_dt;
-                                            SELF.docInmateStatus := inmateStatusDesc;
-                                            SELF.docParoleStatus := RIGHT.par_cur_stat_desc; 
-                                            
-                                            
+                                            SELF.docInmateStatus := inmateStatusDesc;                                            
+
+                                            SELF.docParoleActualReleaseDate := (UNSIGNED)RIGHT.par_act_end_dt;
+                                            SELF.docParolePresumptiveReleaseDate := (UNSIGNED)RIGHT.presump_par_rel_dt;
+                                            SELF.docParoleScheduledReleaseDate := (UNSIGNED)RIGHT.par_sch_end_dt;
+                                            SELF.docParoleCurrentStatus := RIGHT.par_cur_stat_desc;
+                                            SELF.docCurrentKnownInmateStatus := RIGHT.cur_stat_inm_desc;
+                                            SELF.docCurrentLocationSecurity := RIGHT.cur_loc_sec;
+                      
                                             previouslyIncarcerated := RIGHT.latest_adm_dt <> DueDiligence.Constants.EMPTY AND 
                                                                       RIGHT.latest_adm_dt < (STRING8)LEFT.historydate;
                                             
@@ -313,13 +323,19 @@ EXPORT getIndCriminalRawData(DATASET(DueDiligence.LayoutsInternal.RelatedParty) 
                                             
                                             SELF.offenseIncarcerationProbationParole := calcdTest;
                                             
+                                            SELF.docParoleStatus := paroleCurrentStatusDescription;
+                                            
+                                            SELF.currentlyIncarcerated := LEFT.currentlyIncarcerated OR calcdTest = DueDiligence.Constants.INCARCERATION_TEXT;
+                                            SELF.currentlyParoled := LEFT.currentlyParoled OR calcdTest = DueDiligence.Constants.PAROLE_TEXT;
+                                            SELF.currentlyProbation := LEFT.currentlyProbation OR calcdTest = DueDiligence.Constants.PROBATION_TEXT;;
+                                            
 																						SELF.temp_previouslyIncarcerated := LEFT.temp_previouslyIncarcerated OR
                                                                                 previouslyIncarcerated OR 
                                                                                 paroleEndDate = DueDiligence.Constants.PREVIOUSLY_INCARCERATED_TEXT OR
 																																								presumeParoleEndDate = DueDiligence.Constants.PREVIOUSLY_INCARCERATED_TEXT OR
 																																								paroleScheduleEndDate = DueDiligence.Constants.PREVIOUSLY_INCARCERATED_TEXT OR
 																																								paroleCurrentStatusDescription = DueDiligence.Constants.PREVIOUSLY_INCARCERATED_TEXT;
-                                            
+    
                                             
                                             SELF := LEFT;),
                                   ATMOST(DueDiligence.Constants.MAX_ATMOST_5000), 

@@ -340,50 +340,11 @@ END;
     BOOLEAN attr_legalEventCat2;
     
     //Top Level Data
-    STRING50 state;
-    STRING25 source; //also used in source info
-    STRING caseNumber;
-    STRING offenseStatute;
-    STRING8 offenseDDFirstReportedActivity;
-    UNSIGNED4 offenseDDLastReportedActivity;
-    UNSIGNED4 offenseDDLastCourtDispDate;
-    UNSIGNED offenseDDLegalEventTypeCode;
-    STRING offenseDDLegalEventTypeMapped;
-    STRING offenseCharge; //also used in source info
-    STRING1 offenseDDChargeLevelCalculated;
-    STRING offenseChargeLevelReported; //also used in source info
-    STRING7 offenseConviction; //also used in source info
-    STRING25 offenseIncarcerationProbationParole;
-    STRING7 offenseTrafficRelated;
-    
-    //Additional details
-    STRING30 county;
-    STRING40 countyCourt;
-    STRING40 city;
-    STRING50 agency;
-    STRING30 race;
-    STRING7 sex;
-    STRING15 hairColor;
-    STRING15 eyeColor;
-    STRING3 height;
-    STRING3 weight;
-    
-    //Source info
-    STRING1 offenseChargeLevelCalculated;
-    STRING courtDisposition1;
-    STRING courtDisposition2;
-    UNSIGNED4 offenseReportedDate;
-    UNSIGNED4 offenseArrestDate;
-    UNSIGNED4 offenseCourtDispDate;
-    UNSIGNED4 offenseAppealDate;
-    UNSIGNED4 offenseSentenceDate;
-    UNSIGNED4 offenseSentenceStartDate;
-    UNSIGNED4 DOCConvictionOverrideDate;
-    UNSIGNED4 DOCScheduledReleaseDate;
-    UNSIGNED4 DOCActualReleaseDate;
-    STRING DOCInmateStatus;
-    STRING DOCParoleStatus;
-    STRING offenseMaxTerm;
+    //Remove duplicate fields that are in the source detail - will be rolled up
+    DueDiligence.Layouts.CriminalTopLevel AND NOT [source, offenseCharge, offenseChargeLevelReported, offenseConviction];
+        
+    //Source/Detail info
+    DueDiligence.Layouts.CriminalSources AND NOT [partyNames, validate_trafficRelated, validate_category, validate_eventType];
     
     //Party Names
     STRING120 partyName;

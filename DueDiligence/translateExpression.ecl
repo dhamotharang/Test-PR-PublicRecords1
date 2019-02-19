@@ -170,8 +170,8 @@ EXPORT translateExpression := MODULE
         
         expressionDetails := expressionDCT[enumReference];
         
-        expressionResults := MAP(trimTextToSearch = DueDiligence.Constants.EMPTY => ExpressionEnum.NO_OFFENSE_PROVIDED,
-                                 STD.str.ToUpperCase(trimTextToSearch) = 'NOT SPECIFIED' => ExpressionEnum.NO_OFFENSE_PROVIDED,
+        expressionResults := MAP(trimTextToSearch = DueDiligence.Constants.EMPTY => IF(expressionDetails.expressionCategory = LEVEL_2, ExpressionEnum.NO_OFFENSE_PROVIDED, ExpressionEnum.UNCATEGORIZED),
+                                 STD.str.ToUpperCase(trimTextToSearch) = 'NOT SPECIFIED' => IF(expressionDetails.expressionCategory = LEVEL_2, ExpressionEnum.NO_OFFENSE_PROVIDED, ExpressionEnum.UNCATEGORIZED),
                                  expressionDetails.expressionToUse = DueDiligence.Constants.EMPTY => ExpressionEnum.UNCATEGORIZED,
                                  IF(REGEXFIND(expressionDetails.expressionToUse, textToSearch, NOCASE), expressionDetails.expressionWeight, ExpressionEnum.UNCATEGORIZED));                        
                                

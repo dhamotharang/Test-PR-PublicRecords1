@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, TopBusiness_Services, BIPV2_Best, iesp;
+﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, BIPV2_Best, iesp;
 
 /* 
 	Following Keys being used:
@@ -12,9 +12,9 @@ EXPORT getBusLinkedBus(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
                           string6 DD_SSNMask = '') := FUNCTION
 
 	
-	relatedBusRaw := BIPV2.Key_BH_Relationship_SELEID.kFetch(PROJECT(indata, TRANSFORM(BIPV2.Key_BH_Relationship_SELEID.l_kFetch_in, 
-																																											SELF.seleid := LEFT.Busn_info.BIP_IDS.SeleID.LinkID)),
-																														TopBusiness_Services.Constants.ConnectedBusinessesKfetchMaxLimit);
+  relatedBusRaw := BIPV2.Key_BH_Relationship_SELEID.kFetch(PROJECT(indata, TRANSFORM(BIPV2.Key_BH_Relationship_SELEID.l_kFetch_in, 
+                                                                                     SELF.seleid := LEFT.Busn_info.BIP_IDS.SeleID.LinkID)),
+                                                                   DueDiligence.Constants.MAX_ATMOST_5000);
 																														
 	//pull out the linkIDs - adding counter to give each row unique id																													
 	pullLinkIDs := PROJECT(relatedBusRaw, TRANSFORM({UNSIGNED id, UNSIGNED6 seleid1, UNSIGNED6 seleid2, UNSIGNED6 orgid, UNSIGNED6 ultid},
