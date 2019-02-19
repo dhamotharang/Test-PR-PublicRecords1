@@ -1,4 +1,4 @@
-import business_header, ut, address,mdr;
+﻿import business_header, ut, address,mdr;
 
 export fSKA_As_Business_Contact(
 
@@ -50,14 +50,14 @@ function
 	self.geo_long := choose(CTR, l.mail_geo_long, l.alt_geo_long);
 	self.phone := (unsigned6)address.CleanPhone(l.phone);
 	self.source := MDR.sourceTools.src_SKA;
-	self.company_title := Stringlib.StringToUpperCase(l.company_title);
+	self.company_title := Stringlib.StringToUpperCase(l.T1);
 	self.title := l.title;
 	self.fname := l.fname;
 	self.mname := l.mname;
 	self.lname := l.lname;
 	self.name_score := Business_Header.CleanName(l.fname, l.mname, l.lname, l.name_suffix)[142];
 	self.email_address := '';
-	self.company_name := Stringlib.StringToUpperCase(l.company_name);
+	self.company_name := Stringlib.StringToUpperCase(l.COMPANY1);
 	self.company_source_group := '';
 	self.company_prim_range := choose(CTR, l.mail_prim_range, l.alt_prim_range);
 	self.company_predir := choose(CTR, l.mail_predir, l.alt_predir);
@@ -128,16 +128,16 @@ function
 	self.msa := l.mail_msa;
 	self.geo_lat := l.mail_geo_lat;
 	self.geo_long := l.mail_geo_long;
-	self.phone := (unsigned6)address.CleanPhone(if(l.area_code <> '', l.area_code, '000') + l.phone);
+	self.phone := (unsigned6)address.CleanPhone(if(l.area_code <> '', l.area_code, '000') + l.NUMBER);
 	self.source := MDR.sourceTools.src_SKA;
-	self.company_title := Stringlib.StringToUpperCase(l.dept_title);
+	self.company_title := Stringlib.StringToUpperCase(l.T1);
 	self.title := l.title;
 	self.fname := l.fname;
 	self.mname := l.mname;
 	self.lname := l.lname;
 	self.name_score := Business_Header.CleanName(l.fname, l.mname, l.lname, l.name_suffix)[142];
 	self.email_address := '';
-	self.company_name := Stringlib.StringToUpperCase(l.company_name);
+	self.company_name := Stringlib.StringToUpperCase(l.COMPANY1);
 	self.company_source_group := '';
 	self.company_prim_range := l.mail_prim_range;
 	self.company_predir := l.mail_predir;
@@ -150,7 +150,7 @@ function
 	self.company_state := l.mail_st;
 	self.company_zip := (unsigned3)l.mail_zip;
 	self.company_zip4 := (unsigned2)l.mail_zip4;
-	self.company_phone := (unsigned6)address.CleanPhone(if(l.area_code <> '', l.area_code, '000') + l.phone);
+	self.company_phone := (unsigned6)address.CleanPhone(if(l.area_code <> '', l.area_code, '000') + l.NUMBER);
 	self.record_type := 'C';
 	self := l;
 	end;
