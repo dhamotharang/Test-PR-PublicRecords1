@@ -28,7 +28,7 @@ EXPORT BatchService := MACRO
 	WSInput.MAC_HomesteadExemption_BatchService();
 
 	in_mod:=HomesteadExemptionV2_Services.IParams.getParams();
-	IF(NOT in_mod.hasGlbPermissiblePurpose, FAIL(HomesteadExemptionV2_Services.Constants.GLB_REQUIRED_MSG));
+	IF(NOT in_mod.isValidGlb(), FAIL(HomesteadExemptionV2_Services.Constants.GLB_REQUIRED_MSG));
 
 	ds_batch_in:=DATASET([],HomesteadExemptionV2_Services.Layouts.inputRec) : STORED('batch_in',FEW);
 	ds_seq_input:=HomesteadExemptionV2_Services.Functions.seqLinkInput(ds_batch_in);

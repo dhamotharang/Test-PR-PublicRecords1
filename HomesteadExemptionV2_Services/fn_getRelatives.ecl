@@ -1,4 +1,4 @@
-﻿IMPORT Address, BatchShare, didville, Header, Relationship, ut;
+﻿IMPORT Address, BatchShare, didville, Header, Relationship;
 
 EXPORT fn_getRelatives(DATASET(HomesteadExemptionV2_Services.Layouts.propIdRec) ds_srch_recs,
 				HomesteadExemptionV2_Services.IParams.Params in_mod) := FUNCTION
@@ -24,8 +24,8 @@ EXPORT fn_getRelatives(DATASET(HomesteadExemptionV2_Services.Layouts.propIdRec) 
 		less_owner_recs:=R(did2 NOT IN SET(ownDids,did));
 		relative_recs:=CHOOSEN(SORT(less_owner_recs,-total_score),HomesteadExemptionV2_Services.Constants.MAX_RELATIVES);
 		best_in:=PROJECT(relative_recs,TRANSFORM(DidVille.Layout_Did_OutBatch,SELF.did:=LEFT.did2,SELF:=[]));
-		didville.MAC_BestAppend(best_in,'BEST_NAME BEST_ADDR','BEST_NAME BEST_ADDR',0,ut.PermissionTools.glb.ok(in_mod.GLBPurpose),
-			best_out,FALSE,in_mod.DataRestrictionMask,,,,,'',IndustryClass_val:=in_mod.industryclass);
+		didville.MAC_BestAppend(best_in,'BEST_NAME BEST_ADDR','BEST_NAME BEST_ADDR',0,in_mod.isValidGlb(),
+			best_out,FALSE,in_mod.DataRestrictionMask,,,,,'',IndustryClass_val:=in_mod.industry_class);
 		best_addr:=JOIN(best_out,relative_recs,LEFT.did=RIGHT.did2,
 			TRANSFORM(HomesteadExemptionV2_Services.Layouts.relativeRec,
 				CLN:=Address.CleanFields(Address.GetCleanAddress(LEFT.best_addr1,

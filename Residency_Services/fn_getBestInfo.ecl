@@ -24,18 +24,16 @@ EXPORT fn_getBestInfo(DATASET(Residency_Services.Layouts.Batch_in) ds_batch_in,
 	append_l  := 'BEST_ALL, BEST_EDA'; //Append_1 allows all Best Info to return
 	verify_l  := 'BEST_ALL';
 
-	// NO_GM = no global mod hits (Copied from BatchShare.MAC_Get_Scored_DIDs) 
-  NO_GM  := AutoStandardI.PermissionI_Tools.val(ut.PopulateDRI_Mod(mod_params_in));
-  glb_ok := NO_GM.glb.ok(mod_params_in.GLBPurpose);
+  glb_ok := mod_params_in.isValidGlb();
 
 	ds_bestrecs := didville.did_service_common_function(ds_batch_in_proj,
 																									    appends_value := append_l, 
 																									    verify_value  := verify_l,
 																									    glb_flag           := glb_ok, 
-																									    glb_purpose_value  := mod_params_in.GLBPurpose,
-																									    appType            := mod_params_in.ApplicationType,
-																									    dppa_purpose_value := mod_params_in.DPPAPurpose,
-																									    IndustryClass_val  := mod_params_in.industryclass,
+																									    glb_purpose_value  := mod_params_in.glb,
+																									    appType            := mod_params_in.application_type,
+																									    dppa_purpose_value := mod_params_in.dppa,
+																									    IndustryClass_val  := mod_params_in.industry_class,
 																									    DRM_val            := mod_params_in.DataRestrictionMask
 																										 );
 

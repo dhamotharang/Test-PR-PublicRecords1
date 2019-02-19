@@ -1,4 +1,4 @@
-IMPORT Address_Rank, AutoStandardI, DidVille;
+IMPORT Address_Rank, DidVille;
 EXPORT  fn_appendDids(DATASET(Address_Rank.Layouts.Batch_in) ds_in, Address_Rank.IParams.BatchParams in_mod) := FUNCTION
 
 	DidVille.Layout_Did_OutBatch getDIDs(ds_in l) := TRANSFORM
@@ -17,20 +17,12 @@ EXPORT  fn_appendDids(DATASET(Address_Rank.Layouts.Batch_in) ds_in, Address_Rank
 
 	inputRecs := PROJECT(ds_in,getDIDs(LEFT));
 	
-	p := MODULE(AutoStandardI.PermissionI_Tools.params)
-								EXPORT BOOLEAN 		AllowAll 			:= FALSE;
-								EXPORT BOOLEAN 		AllowGLB 			:= FALSE;
-								EXPORT BOOLEAN 		AllowDPPA 		:= FALSE;
-								EXPORT UNSIGNED1 	DPPAPurpose 	:= in_mod.DPPAPurpose;
-								EXPORT UNSIGNED1 	GLBPurpose 		:= in_mod.GLBPurpose;
-								EXPORT BOOLEAN 		IncludeMinors := FALSE;
-				END;
-	glb  := AutoStandardI.PermissionI_Tools.val(p).glb.ok(in_mod.GLBPurpose);
+	glb_ok  := in_mod.isValidGlb();
 	recs := didville.did_service_common_function(inputRecs,
-																							 glb_flag := glb, 
-																							 glb_purpose_value := in_mod.GLBPurpose, 
-																							 appType := in_mod.ApplicationType,
-																							 IndustryClass_val := in_mod.IndustryClass);	
+																							 glb_flag := glb_ok, 
+																							 glb_purpose_value := in_mod.glb, 
+																							 appType := in_mod.application_type,
+																							 IndustryClass_val := in_mod.industry_class);	
 																							 
 	RETURN recs;
 END;

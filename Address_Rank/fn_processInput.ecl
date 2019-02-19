@@ -3,6 +3,7 @@ EXPORT fn_processInput(ds_xml_in,
 											 skipAddressCleaning = FALSE)  := FUNCTIONMACRO
 											 
 	IMPORT Address_Rank, AutoKeyI, BatchServices, BatchShare, ut;	
+  IMPORT STD; // to cover for ut/hasSufficientInput
 	
 	batch_input := IF( NOT useCannedRecs, 
 										 ds_xml_in, 		 

@@ -147,7 +147,7 @@ EXPORT Functions := MODULE
 		ds_didville_out:=do_Didville(ds_didville_in,in_mod.didScoreThreshold);
 
 		Constants:=HomesteadExemptionV2_Services.Constants;
-		Suppress.MAC_Suppress(ds_didville_out,ds_dids,in_mod.applicationtype,Suppress.Constants.LinkTypes.DID,did);
+		Suppress.MAC_Suppress(ds_didville_out,ds_dids,in_mod.application_type,Suppress.Constants.LinkTypes.DID,did);
 
 		HomesteadExemptionV2_Services.Layouts.workRecSlim appendDids(ds_work_in L, ds_didville_out R) := TRANSFORM
 			lowLexIdScore:=R.score<in_mod.didScoreThreshold;
@@ -197,9 +197,9 @@ EXPORT Functions := MODULE
 
 		HomesteadExemptionV2_Services.Layouts.workRec addChildRecs(ds_work_in L, DATASET(AddrBest.Layout_BestAddr.batch_out_final) R) := TRANSFORM
 			SELF.Best_Records:=PROJECT(R,TRANSFORM(HomesteadExemptionV2_Services.Layouts.bestRec,
-				dobMasked:=Suppress.date_mask((UNSIGNED4)LEFT.DOB,Suppress.date_mask_math.MaskIndicator(in_mod.DOBMask));
+				dobMasked:=Suppress.date_mask((UNSIGNED4)LEFT.DOB,in_mod.dob_mask);
 				SELF.DOB_masked:=IF(LEFT.DOB!='',dobMasked.Year+dobMasked.Month+dobMasked.day,''),
-				SELF.SSN_masked:=Suppress.ssn_mask(LEFT.SSN,in_mod.SSNMask),
+				SELF.SSN_masked:=Suppress.ssn_mask(LEFT.SSN,in_mod.ssn_mask),
 				SELF.phoneno:=IF(LEFT.phone10!='',LEFT.phone10,LEFT.phone_address),
 				SELF.addr:=Address.Addr1FromComponents
 					(LEFT.prim_range,LEFT.predir,LEFT.prim_name,LEFT.suffix,LEFT.postdir,LEFT.unit_desig,LEFT.sec_range),
@@ -222,7 +222,8 @@ EXPORT Functions := MODULE
 	EXPORT append_deceased (DATASET(HomesteadExemptionV2_Services.Layouts.workRec) ds_work_in,
 					HomesteadExemptionV2_Services.IParams.Params in_mod) := FUNCTION
 
-		deceased_mod := MODULE(PROJECT(in_mod,DeathV2_Services.IParam.BatchParams,OPT))
+		mod_legacy := BatchShare.IParam.ConvertToLegacy(in_mod);
+		deceased_mod := MODULE(PROJECT(mod_legacy,DeathV2_Services.IParam.BatchParams,OPT))
 			EXPORT UNSIGNED3 DidScoreThreshold:=HomesteadExemptionV2_Services.Constants.SCORE_THRESHOLD;
 		END;
 
@@ -232,9 +233,9 @@ EXPORT Functions := MODULE
 
 		HomesteadExemptionV2_Services.Layouts.workRec addChildRecs(ds_work_in L, DATASET(DeathV2_Services.Layouts.BatchOut) R) := TRANSFORM
 			SELF.Deceased_Records:=PROJECT(R,TRANSFORM(HomesteadExemptionV2_Services.Layouts.deceasedRec,
-				dobMasked:=Suppress.date_mask((UNSIGNED4)LEFT.DOB8,Suppress.date_mask_math.MaskIndicator(in_mod.DOBMask));
+				dobMasked:=Suppress.date_mask((UNSIGNED4)LEFT.DOB8,in_mod.dob_mask);
 				SELF.DOB_masked:=IF(LEFT.DOB8!='',dobMasked.Year+dobMasked.Month+dobMasked.day,''),
-				SELF.SSN_masked:=Suppress.ssn_mask(LEFT.SSN,in_mod.SSNMask),
+				SELF.SSN_masked:=Suppress.ssn_mask(LEFT.SSN,in_mod.ssn_mask),
 				SELF.did:=(UNSIGNED)LEFT.did,
 				SELF.name_first:=LEFT.fname,
 				SELF.name_middle:=LEFT.mname,

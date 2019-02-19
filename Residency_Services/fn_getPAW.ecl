@@ -9,8 +9,8 @@ EXPORT fn_getPAW(DATASET(doxie.layout_references_acctno) ds_in_acctnos_dids,
 	Ded_PAW_In := DEDUP(SORT(PAW_In, did), did);
 													
 	PAW_recs := Doxie_Raw.paw_raw(Ded_PAW_In,
-	                              dppa_purpose := mod_params_in.DPPAPurpose,
-	                              glb_purpose  := mod_params_in.GLBPurpose);
+	                              dppa_purpose := mod_params_in.dppa,
+	                              glb_purpose  := mod_params_in.glb);
 
   TodaysDate := Residency_Services.Constants.TodaysDate;
 	

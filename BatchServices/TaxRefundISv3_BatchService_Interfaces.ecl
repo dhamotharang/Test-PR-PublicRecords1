@@ -1,17 +1,12 @@
-﻿EXPORT TaxRefundISv3_BatchService_Interfaces := MODULE
+﻿IMPORT doxie;
 
-	EXPORT Input := INTERFACE
+EXPORT TaxRefundISv3_BatchService_Interfaces := MODULE
+
+	EXPORT Input := INTERFACE (doxie.IDataAccess)
 		// common input options	
-		EXPORT string32 ApplicationType;  		
-		EXPORT unsigned1 DPPAPurpose;
-		EXPORT unsigned1 GLBPurpose;
-		EXPORT string DataPermission;
-		EXPORT string DataRestriction;
-		EXPORT string5  IndustryClass;
 		EXPORT boolean IncludeBlankDOD;
 		EXPORT boolean PhoneticMatch; 
 		EXPORT boolean AllowNickNames; 
-		EXPORT boolean IncludeMinors := false; 
 		// TRIS specific, v2 & v3 common input options ---v
 		EXPORT string120 append_l; //Append allows all Best Info to return
 		EXPORT string120 verify_l;
