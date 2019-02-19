@@ -79,7 +79,9 @@ EXPORT Proc_Build_BusinessCreditReport_Keys(STRING filedate) := MODULE
 			mac_build_prte_key(filedate, 'TopBusParent', 'Section16'),
 			mac_build_prte_key(filedate, 'TopBusConnect', 'Section17'),
 			mac_build_prte_key(filedate, 'TopBusContact', 'Section18'),
-			mac_build_prte_key(filedate, 'TopBusActivity', 'Section19')
+			mac_build_prte_key(filedate, 'TopBusActivity', 'Section19'),
+			mac_build_prte_key(filedate, 'MatchInfo', 'Section20')  
+			
 			);
 	END;
 
