@@ -1,4 +1,4 @@
-EXPORT Output_Overlinking_Samples(
+﻿EXPORT Output_Overlinking_Samples(
 
    pversion         = 'bipv2.KeySuffix'
   ,pID              = 'proxid'
@@ -17,7 +17,7 @@ functionmacro
   overlinking_info := BIPV2_Tools.mac_Compile_Overlinking_Info(pID,pDataset,pBOW_field,pBOW_Index,pBOW_Function,pBOW_Mode,pBOW_Score_Mode,pName_Force);
 
   ds_sample := pDataset;
-  ds_overlinking := dataset('~base::BIPV2_Tools::mac_Compile_Overlinking_Info::' + pversion  ,recordof(overlinking_info.result),flat);
+  ds_overlinking := dataset('~base::BIPV2_Tools::mac_Compile_Overlinking_Info::' + pversion  ,recordof(overlinking_info),flat);
 
   topn_cnt_salt_mismatches            := topn(ds_overlinking,100,-cnt_salt_mismatches                  );
   topn_cnt_substring_mismatch_lt3     := topn(ds_overlinking,100,-cnt_substring_mismatch_lt3           );
@@ -80,7 +80,7 @@ functionmacro
 
   ds_sample_filtered      := ds_sample(proxid in set(ds_all_sample_proxids,proxid)) : persist('~persist::lbentley::BH.221::ds_sample_filtered');
   ds_sample_filtered_agg  := BIPV2_Tools.AggregateProxidElements(ds_sample_filtered   );
-  ds_sample_filtered_agg_counts := join(ds_sample_filtered_agg  ,dedup(sort(ds_all_topns,proxid),proxid) ,left.proxid = right.proxid ,transform({recordof(ds_sample_filtered_agg) or recordof(ds_all_topns)},self := right,self := left),hash);
+  ds_sample_filtered_agg_counts := join(ds_sample_filtered_agg  ,dedup(sort(ds_all_topns,proxid),proxid) ,left.proxid = right.proxid ,transform({recordof(ds_sample_filtered_agg) or recordof(ds_all_topns) - sources},self := left,self := right),hash);
 
   topn_cnt_salt_mismatches_agg            := topn(ds_sample_filtered_agg_counts,100,-cnt_salt_mismatches                  );
   topn_cnt_substring_mismatch_lt3_agg     := topn(ds_sample_filtered_agg_counts,100,-cnt_substring_mismatch_lt3           );
@@ -122,7 +122,7 @@ functionmacro
     
   */
   return sequential(
-     output(overlinking_info.result ,,'~base::BIPV2_Tools::mac_Compile_Overlinking_Info::' + pversion,__compressed__,overwrite)
+     output(overlinking_info ,,'~base::BIPV2_Tools::mac_Compile_Overlinking_Info::' + pversion,__compressed__,overwrite)
     ,parallel(
        output('-------------------------------------------------------------'   ,named('___________________________'     ))
       ,output('Most Likely Overlinked Clusters(Aggregated) by Counts Of....'    ,named('___'))
@@ -172,7 +172,7 @@ functionmacro
 
       ,output('-------------------------------------------------------------'   ,named('____________________________'))
     
-      ,overlinking_info.output_debug
+      // ,overlinking_info.output_debug
   ));
 
 

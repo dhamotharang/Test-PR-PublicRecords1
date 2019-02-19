@@ -1,4 +1,4 @@
-import _control, TXBUS, orbit_report;
+﻿import _control, TXBUS, orbit_report,tools;
 
 #OPTION('multiplePersistInstances',FALSE);
 
@@ -13,8 +13,10 @@ Mac_Txbus_Spray(hostname
 								,thorName
 								,DoClean);
 
+
 //Start Build Process
-DoBuild := Proc_build_Txbus(filedate);
+pIsTesting := TXBUS._Flags.IsTesting;
+DoBuild    := Proc_build_Txbus(filedate,pIsTesting);
 
 //Do Orbit Report
 orbit_report.txbus_stats(doReport);
@@ -23,6 +25,7 @@ retval := sequential(DoClean
 										 ,DoBuild
 										 ,doReport
 										 ,SampleRecs
+										 ,Promote
 										 ) : success(Send_Email(filedate).Build_Success), failure(Send_Email(filedate).Build_Failure);
 return retval;
 end;

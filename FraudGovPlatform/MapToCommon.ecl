@@ -1,21 +1,23 @@
-﻿import tools, FraudShared,ut; 
+﻿import FraudShared, STD; 
 EXPORT MapToCommon  (
 	 string pversion
+	,dataset(FraudShared.Layouts.Base.Main) pBaseMainFile = IF(_Flags.Update.Main, FraudShared.Files().Base.Main.Built, DATASET([], FraudShared.Layouts.Base.Main))
 	,dataset(Layouts.Base.IdentityData) inBaseIdentityData = Files().Base.IdentityData.Built
 	,dataset(Layouts.Base.KnownFraud) inBaseKnownFraud = Files().Base.KnownFraud.Built
+	,dataset(Layouts.Base.Deltabase) inBaseDeltabase = Files().Base.Deltabase.Built
 ) :=
 module  
 	
-	MBS_CVD := RECORD
+	MBS_CVD_Rec := RECORD
 		string20 gc_id := inBaseIdentityData.Customer_Account_Number;
 		string100 file_code := inBaseIdentityData.Source;
 	END;
 
-	MBS_CVD_IDDT := DEDUP(TABLE(inBaseIdentityData,MBS_CVD),ALL);
+	MBS_CVD_IDDT := DEDUP(TABLE(inBaseIdentityData,MBS_CVD_Rec),ALL);
 	
  
-	Export	IdentityData := project (inBaseIdentityData , transform(FraudShared.Layouts.Base.Main , 
-		self.Record_ID := left.source_rec_id; 
+	Export IdentityData := project (inBaseIdentityData , transform(FraudShared.Layouts.Base.Main , 
+		self.Record_ID := 0; 
 		self.customer_id := left.Customer_Account_Number;
 		self.Sub_Customer_ID := ''; 
 		self.ln_report_date := left.Date_of_Transaction[1..8];
@@ -40,14 +42,14 @@ module
 		self.additional_address.Address_Type := 'Mailing';
 		self.additional_address.address_1 := left.mailing_address_1;
 		self.additional_address.address_2 := left.mailing_address_2;
-		self.Household_ID := (unsigned8) left.Case_ID;
-		self.Customer_Person_ID := (unsigned6) left.Client_ID;
+		self.Household_ID := left.Case_ID;
+		self.Customer_Person_ID := left.Client_ID;
 		self:= left; 
 		self:= [];
 	)); 
  
-	Export	KnownFraud := project (inBaseKnownFraud , transform(FraudShared.Layouts.Base.Main , 
-		self.Record_ID := left.source_rec_id;
+	Export KnownFraud := project (inBaseKnownFraud , transform(FraudShared.Layouts.Base.Main , 
+		self.Record_ID := 0;
 		self.customer_id := left.Customer_Account_Number;
 		self.Sub_Customer_ID := ''; 
 		self.ln_report_date := left.reported_date;
@@ -65,28 +67,67 @@ module
 		self.additional_address.Address_Type := 'Mailing';
 		self.additional_address.address_1 := left.mailing_address_1;
 		self.additional_address.address_2 := left.mailing_address_2;		
-		self.Household_ID := (unsigned8) left.Case_ID;
-		self.Customer_Person_ID := (unsigned6) left.Client_ID;
+		self.Household_ID := left.Case_ID;
+		self.Customer_Person_ID := left.Client_ID;
 		self:= left; 
 		self:= [];
 	)); 
-	
-// Append MBS classification attributes 
-		seed_In := FraudGovPlatform.testseed.test_lexid	+ FraudGovPlatform.testseed.test_ssn	+ FraudGovPlatform.testseed.test_ip ;
-		Fraudshared.layouts.base.main seedprep (seed_In l,integer c) := transform
-																		self.source_rec_id := max(inBaseIdentityData,source_rec_id) +c;
-																		self:=l;
-																		self:=[];
-																		end;
-		seed_Out := Project(seed_In,seedprep(left,counter));
-  CombinedClassification := Functions.Classification(IdentityData + KnownFraud + If(Fraudshared.Platform.Source = 'FraudGov'  ,seed_Out)) ; 
-	
-	// append rid 
-	
 
- // Filter header records
- NewBaseRid := CombinedClassification (Customer_event_id not in ['CUST_ID_NUM','CUSTOMERID']);
+	Export Deltabase := project (inBaseDeltabase , transform(FraudShared.Layouts.Base.Main , 
+		self.Record_ID := 0;
+		self.customer_id := left.Customer_Account_Number;
+		self.Sub_Customer_ID := ''; 
+		self.Fraud_Point_Score:= '';  
+		self.clean_business_name := ''; 
+		self.Rawlinkid := left.lexid;
+		v_datetime := STD.Str.FindReplace( STD.Str.FindReplace( left.reported_date,':',''),'-','');
+		v_date := v_datetime[1..8];
+		v_time := v_datetime[10..];
+		self.reported_date := v_date;
+		self.reported_time := v_time;
+		self.event_date := v_date;
+		self.ln_report_date := v_date;
+		self.LN_Report_Time := v_time;
+		self.reported_by := left.user_added;
+		self.ssn_risk_code := if(left.event_entity_1 = 'FULL_SSN', left.event_type_1, '') ;
+		self.identity_risk_code := if(left.event_entity_1 = 'LEXID', left.event_type_1, '') ;
+		self.physical_address_risk_code	:= if(left.event_entity_1 = 'PHYSICAL_ADDRESS'	, left.event_type_1, '') ;
+		self.phone_risk_code := if(left.event_entity_1 = 'PHONE', left.event_type_1, '') ;
+		self.ip_address_fraud_code := if(left.event_entity_1 = 'IP_ADDRESS', left.event_type_1, '') ;
+		self.transaction_id := left.Transaction_ID_Number;
+		self.investigation_referral_case_id  := left.Case_ID;
+		self.additional_address.Street_1 := left.mailing_street_1; 
+		self.additional_address.Street_2 := '';
+		self.additional_address.City := left.Mailing_City;
+		self.additional_address.State := left.Mailing_State;
+		self.additional_address.Zip := left.Mailing_Zip;
+		self.additional_address.Address_Type := 'Mailing';
+		self.additional_address.address_1 := left.mailing_address_1;
+		self.additional_address.address_2 := left.mailing_address_2;		
+		self.Household_ID := left.Case_ID;
+		self.Customer_Person_ID := (string)left.Client_uid;
+		self.classification_Activity.Confidence_that_activity_was_deceitful_id := (unsigned2)left.deceitful_confidence;
+		self.classification_Activity.Confidence_that_activity_was_deceitful	:= FraudShared.MBS_CVD(column_name = 'DECEITFUL_ACTIVITY' and status = 1 and desc_value = (unsigned2)left.deceitful_confidence )[1].description;;
+		self.classification_Permissible_use_access.file_type := left.file_type;
+		self.classification_source.Source_type_id := left.file_type;
+		self.classification_source.Source_type := FraudShared.MBS_CVD(column_name = 'FILE_TYPE' and status = 1 and desc_value = (unsigned2)left.file_type )[1].description;;
+		self:= left; 
+		self:= [];
+	)); 
 
- EXPORT Build_Base_Main := FraudShared.Build_Base_Main(pversion,NewBaseRid);
+
+	// Apply MBS classification and Sharing Rules
+	CombinedClassification := Functions.Classification(IdentityData + KnownFraud + Deltabase); 
+		 
+	// Filter header records
+	EXPORT NewBaseCombined := CombinedClassification (Customer_event_id not in ['CUST_ID_NUM','CUSTOMERID']);
+
+ 	// Append rid
+	EXPORT NewBaseRID := Append_RID (NewBaseCombined,pBaseMainFile); 
+
+	// Append RinID
+	EXPORT NewBaseRinID := Append_RinID (NewBaseRID,pBaseMainFile);
+
+	EXPORT Build_Main := FraudShared.Build_Base_Main(pversion,NewBaseRinID);
 
 END;

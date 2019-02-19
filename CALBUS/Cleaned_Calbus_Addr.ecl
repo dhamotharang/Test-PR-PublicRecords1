@@ -1,10 +1,8 @@
-import ut, address, idl_header, aid;
+﻿import ut, address, idl_header, aid;
 
-in_file1 := project(Calbus.File_Calbus_In.File_Cleaned_Super,transform(Calbus.Layouts_Calbus.Layout_Common,
-																	   self := LEFT, self.naics_code := ''));
-in_file2 := Calbus.File_Calbus_In.File_Cleaned_Super2;
-
-in_file := in_file1 + in_file2;
+Cleaned_Update := Calbus.File_Calbus_In.File_Cleaned_Super;
+Previous_base  := project(CALBUS.File_Calbus_Base,transform(Calbus.Layouts_Calbus.Layout_Common,self:=left;));
+in_file        := Cleaned_Update + Previous_base;
 
 Address.Mac_Is_Business(in_file(trim(Ownership_code) in Calbus.Constants.OwnerShip_Code_Check), Owner_Name, Clean_Owner_Name,name_flag,false,true );
 

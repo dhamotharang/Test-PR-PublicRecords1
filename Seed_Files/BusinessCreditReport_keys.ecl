@@ -1,4 +1,4 @@
-
+﻿
 IMPORT Data_Services, ut, doxie, risk_indicators;
 
  
@@ -467,7 +467,28 @@ EXPORT BusinessCreditReport_keys := MODULE
 								locat_Prod + 'TopBusActivity');			                                        //for Production	
 						#end 		
 
-
+//=====================================================
+//===  Other   Key - Section 20                     ===
+//=====================================================	
+	seed := Seed_Files.BusinessCreditReports_files.Section20;
+	newrec := record
+		data16 hashvalue := seed_files.Hash_InstantID(
+		                    StringLib.StringToUpperCase(trim(seed.authrep_first)),   // fname,
+		                    StringLib.StringToUpperCase(trim(seed.authrep_last)),    // lname,
+		                    risk_indicators.nullstring,                              // ssn -- not used in business products,
+		                    StringLib.StringToUpperCase(trim(seed.company_fein)),    // fein,
+		                    StringLib.StringToUpperCase(trim(seed.company_zip)),     // zip,
+		                    StringLib.StringToUpperCase(trim(seed.company_phone)),   // phone,
+		                    StringLib.StringToUpperCase(trim(seed.company_name)));   // company_name
+	  seed;
+	end;
+	newtable := table(seed, newrec);
+	export MatchInfo := index(newtable,{dataset_name,hashvalue}, {newtable}, 
+						#if(BUILD_KEY_TEST)
+								locat_Test + 'MatchInfo_' + thorlib.wuid());                           //for Testing 
+						#else
+								locat_Prod + 'MatchInfo');			                                        //for Production	
+						#end 								
 	
 	
 END;

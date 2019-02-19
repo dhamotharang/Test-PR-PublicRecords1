@@ -5,7 +5,7 @@
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib, NID;
 
 EXPORT map_MIS0298_conversion(STRING pVersion) := FUNCTION
-#workunit('name','map_MIS0298_conversion');
+#workunit('name','Yogurt: map_MIS0298_conversion');
 	code 								:= 'MIS0298';
 	src_cd							:= code[3..7];
 	src_st							:= code[1..2];	//License state
@@ -88,7 +88,7 @@ EXPORT map_MIS0298_conversion(STRING pVersion) := FUNCTION
 		
 			SELF.RAW_LICENSE_STATUS := IF(SELF.EXPIRE_DTE >= pVersion,
 																		'ACTIVE',
-																		'LICENSE EXPIRED');		
+																		'LAPSED');		
 		
 		TrimOrgType						:= ut.CleanSpacesAndUpper(L.ORG_TYPE);		
 		TmpOrgTypePerson		:= IF(TrimOrgType = 'N' OR TrimOrgType = 'I' OR TrimOrgType = 'SP',TRUE,FALSE);
@@ -112,7 +112,7 @@ EXPORT map_MIS0298_conversion(STRING pVersion) := FUNCTION
 		stripNickName  := Prof_License_Mari.fGetNickname(TrimFullName,'strip_nick');
 		
 		//Remove Suffix
-		SUFFIX_PATTERN  := '( JR.$| JR$| SR.$| SR$| III$| II$| IV$)';	
+		SUFFIX_PATTERN  := '( JR.$| JR$| SR.$| SR$| III$| II$| IV$| VI$)';	
 		rmvSufxLName    := StringLib.StringCleanSpaces(REGEXREPLACE(SUFFIX_PATTERN,stripNickLName,''));
 		rmvSufxFName    := StringLib.StringCleanSpaces(REGEXREPLACE(SUFFIX_PATTERN,stripNickFName,''));
 		rmvSufxMName    := StringLib.StringCleanSpaces(REGEXREPLACE(SUFFIX_PATTERN,stripNickMName,''));
@@ -230,16 +230,16 @@ EXPORT map_MIS0298_conversion(STRING pVersion) := FUNCTION
 	 tmpNAME_OFFICE			:= MAP(preNAME_OFFICE[1..4]='DBA ' => preNAME_OFFICE[5..],
 		                             preNAME_OFFICE[1..4]='AKA ' => preNAME_OFFICE[5..],
 		                             preNAME_OFFICE);
-		clnOfficeName				:= IF(REGEXFIND('(.COM|.NET|.ORG)',tmpNAME_OFFICE),Prof_License_Mari.mod_clean_name_addr.cleanInternetName(tmpNAME_OFFICE),
-		                            tmpNAME_OFFICE);
+ 	 clnOfficeName			:= IF(REGEXFIND('(.COM|.NET|.ORG)',tmpNAME_OFFICE),Prof_License_Mari.mod_clean_name_addr.cleanInternetName(tmpNAME_OFFICE),
+		                             tmpNAME_OFFICE);
 																
 		SELF.NAME_OFFICE	:= MAP(clnOfficeName = 'NA' => '',
-															           clnOfficeName = 'NONE' => '',
-															           TRIM(clnOfficeName,ALL) = TRIM(SELF.NAME_FIRST,ALL) + TRIM(SELF.NAME_LAST,ALL) => '',
-															           TRIM(clnOfficeName,ALL) = TRIM(SELF.NAME_FIRST,ALL) + TRIM(SELF.NAME_MID,ALL) + TRIM(SELF.NAME_LAST,ALL) => '',
+														 clnOfficeName = 'NONE' => '',
+														 TRIM(clnOfficeName,ALL) = TRIM(SELF.NAME_FIRST,ALL) + TRIM(SELF.NAME_LAST,ALL) => '',
+														 TRIM(clnOfficeName,ALL) = TRIM(SELF.NAME_FIRST,ALL) + TRIM(SELF.NAME_MID,ALL) + TRIM(SELF.NAME_LAST,ALL) => '',
 			                       clnOfficeName);
 														 
-	 SELF.OFFICE_PARSE		:= MAP(SELF.NAME_OFFICE = '' => '',
+	  SELF.OFFICE_PARSE		:= MAP(SELF.NAME_OFFICE = '' => '',
 														 		 SELF.NAME_OFFICE != '' AND StringLib.stringfind(TRIM(SELF.NAME_OFFICE,LEFT,RIGHT),' ',1)<1 => 'GR',
 																  SELF.NAME_OFFICE != '' AND Prof_License_Mari.func_is_company(SELF.NAME_OFFICE)=> 'GR','MD');
 																
@@ -374,7 +374,7 @@ EXPORT map_MIS0298_conversion(STRING pVersion) := FUNCTION
 	notify_invalid_address := Prof_License_Mari.fNotifyError.NameInAddressFields(code,src_cd,pVersion,
 	                            Prof_License_Mari.Email_Notification_Lists.BaseFileConversion);
 	
-	RETURN SEQUENTIAL(O_Cmvtranslation, oRE, d_final, add_super, notify_missing_codes, notify_invalid_address);
+	RETURN SEQUENTIAL(O_Cmvtranslation, oRE, d_final, add_super, move_to_used,notify_missing_codes, notify_invalid_address);
 		
 END;
 

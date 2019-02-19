@@ -1,4 +1,4 @@
-import didville, Gong_v2, watchdog, phonesplus, ut, mdr, Address, STD;
+﻿import didville, Gong_v2, watchdog, phonesplus, ut, mdr, Address, STD;
 
 export Proc_build_base(string pversion,string emailList=''):=function
 //-------Concatenate all Pplus sources in a common layout---------------------------------
@@ -96,7 +96,7 @@ Eliminate_duplications := Fn_Eliminate_Duplications(Propagate_rules2)
 :persist('~thor_data400::persist::Phonesplus::eliminate_duplications');
 
 //-------Verify with Insurance and File One 
-Verify_With_Ins_File1 := Fn_Phone_Verification(Eliminate_duplications);
+Verify_With_Ins_File1 := Fn_Phone_Verification(Eliminate_duplications, pversion);
 
 //-------Add other household members for landlines------------------------------------------
 Add_Header_Household := Fn_Add_Header_Household(Verify_With_Ins_File1);
@@ -130,15 +130,15 @@ split_Phonesplus := Map_v1_Fields(~(Translation_Codes.fFlagIsOn(src_all, Transla
 
 split_Royalty := Map_v1_Fields(Translation_Codes.fFlagIsOn(src_all, Translation_Codes.source_bitmap_code(mdr.sourceTools.src_wired_assets_royalty)));
 
-Rollup_base := Fn_Rollup_Base(split_Phonesplus, 'phonesplus_main');
+Rollup_base := Fn_Rollup_Base(split_Phonesplus, 'phonesplus_main', pversion);
 
-Rollup_royalty_base := Fn_Rollup_Base(split_Royalty, 'royalty');
+Rollup_royalty_base := Fn_Rollup_Base(split_Royalty, 'royalty', pversion);
 
 Transform_to_old_layout := Fn_Transform_to_Old_Layout(Rollup_base);
 
-ut.MAC_SF_BuildProcess(Rollup_base ,'~thor_data400::base::phonesplusv2',pplusv2_base,3,,true, Phonesplus_v2.version);
-ut.MAC_SF_BuildProcess(Rollup_royalty_base,'~thor_data400::base::phonesplusv2_royalty',pplus_royalty_v2_base,3,,true, Phonesplus_v2.version);
-ut.MAC_SF_BuildProcess(Transform_to_old_layout,'~thor_data400::base::phonesplus',pplus_base,3,,true, Phonesplus_v2.version);
+ut.MAC_SF_BuildProcess(Rollup_base ,'~thor_data400::base::phonesplusv2',pplusv2_base,3,,true, pversion);
+ut.MAC_SF_BuildProcess(Rollup_royalty_base,'~thor_data400::base::phonesplusv2_royalty',pplus_royalty_v2_base,3,,true, pversion);
+ut.MAC_SF_BuildProcess(Transform_to_old_layout,'~thor_data400::base::phonesplus',pplus_base,3,,true, pversion);
 
 return sequential(scrubscall,
                                      pplus_base,

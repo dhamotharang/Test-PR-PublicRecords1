@@ -1,12 +1,34 @@
 ﻿import _control;
 export	Constants	:=
 module
-	export	string		LandingZoneServer					:=	_control.IPAddress.bair_batchlz01;
-	export	string		LandingZonePathBase				:=	'/data/otto/';
-	export	string		LandingZoneFilePathRgx		:=	'^[0-9]+/ready';
-	export	string		InqLogLandingZonePathBase	:=	'/data/super_credit/fraudgov/in/deltabase/dev/';
+	export	string		LandingZoneServer_prod		:=	_control.IPAddress.bair_batchlz01;
+	export	string		LandingZonePathBase_prod	:=	'/data/otto/';
+
+	export	string		LandingZoneServer_dev		:=	_control.IPAddress.bair_batchlz01;
+	export	string		LandingZonePathBase_dev		:=	'/data/otto/';
+
+	export	string		LandingZoneFilePathRgx			:=	'^[0-9]+/ready';
+	
+	export	string		DeltaLandingZonePathBase_dev	:=	'/data/super_credit/fraudgov/in/deltabase/dev/';
+	export	string		DeltaLandingZonePathBase_prod	:=	'/data/super_credit/fraudgov/in/deltabase/prod/';
+
 	export	string		VRulesLandingZonePathBase	:=	'/data/otto/velocityrules/';
-	export	string 		MBSLandingZonePathBase			:='/data/super_credit/fraudgov/in/mbs/dev/';
+	
+	export	string 		MBSLandingZonePathBase_dev	:='/data/super_credit/fraudgov/in/mbs/dev';
+	export	string 		MBSLandingZonePathBase_prod	:='/data/super_credit/fraudgov/in/mbs/prod';
+	
+	export	string 		FDNMBSLandingZonePathBase_dev		:='/data/super_credit/fdn/in/mbs/dev';
+	export	string 		FDNMBSLandingZonePathBase_prod	:='/data/super_credit/fdn/in/mbs/prod';
+
+	export string		ThorName_Dev					:= 'thor400_dev_eclcc';
+	export string		ThorName_Prod				:= 'thor400_44_eclcc';
+
+	export string		hthor_Dev						:= 'hthor_dev_eclcc';
+	export string		hthor_Prod					:= 'hthor_eclcc';
+	
+	export string		ContributoryDirectory_dev	:= '/data/otto/in/';
+	export string		ContributoryDirectory_prod	:= '/data/otto/in/';
+	
 	export NOC_MSG
 		:=
 		'** NOC **\n\n'

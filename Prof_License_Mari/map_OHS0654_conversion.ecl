@@ -51,7 +51,7 @@ EXPORT map_OHS0654_conversion(STRING pVersion) := FUNCTION
 	
 	//Move to using
 	move_to_using				:= PARALLEL(Prof_License_Mari.func_move_file.MyMoveFile(code, 're','sprayed','using');	
-																	Prof_License_Mari.func_move_file.MyMoveFile(code, 'dfi','sprayed','using');
+																	// Prof_License_Mari.func_move_file.MyMoveFile(code, 'dfi','sprayed','using');
 												 );
 
 //The mortgage file has many records that are broken into 2 lines.
@@ -82,6 +82,7 @@ EXPORT map_OHS0654_conversion(STRING pVersion) := FUNCTION
 	
    inFile_prof:= PROJECT(pre_inFile_prof,correct_partial_records(LEFT));
 	 oPROF       := OUTPUT(inFile_prof);	
+/*
    pre_inFile_mtg := Prof_License_Mari.files_OHS0654.mortgage_file(CREDENTIAL_NUMBER[1..3]<>'EXH');
 	 oMTG			    	:= OUTPUT(pre_inFile_mtg);
 	
@@ -106,6 +107,7 @@ EXPORT map_OHS0654_conversion(STRING pVersion) := FUNCTION
    END;
    
    merged_mtg := ROLLUP(pre_inFile_mtg,LEFT.credential_number=' ',merge_partial_records(LEFT,RIGHT));
+	 
    // deb := OUTPUT(CHOOSEN(merged_mtg,1000));
 	 
 	 inFile_mtg := merged_mtg(CREDENTIAL_NUMBER[1..3]<>'PB.'	AND				//PAWN BROKER AND PAWN BROKER BRANCH
@@ -115,12 +117,12 @@ EXPORT map_OHS0654_conversion(STRING pVersion) := FUNCTION
 													   CREDENTIAL_NUMBER[1..3]<>'CS.'  AND				//CREDIT SERVICES ORGANIZATION
 													   CREDENTIAL_NUMBER[1..3]<>'CC.'						//CASH CHECKING and CASH CHECKING BRANCH
 													   );
-
+*/
 	rLayout_License	:= RECORD, maxsize(5000)
 		Prof_License_Mari.layout_OHS0654.layout_profession;
 		STRING20  PHONE;
-		STRING50	 COUNTY;
-		STRING5		 FILE_TYPE;
+		STRING50	COUNTY;
+		STRING5		FILE_TYPE;
 		STRING160	DBA;
 		STRING160 DBA1;
 		STRING160 DBA2;
@@ -156,12 +158,13 @@ EXPORT map_OHS0654_conversion(STRING pVersion) := FUNCTION
 	END;
 
 	FilePROF	 := PROJECT(inFile_prof,reToCommon(LEFT));
+	/*
 	FileMTG   := PROJECT(inFile_mtg,TRANSFORM(rLayout_License,
 																				 	SELF.FILE_TYPE:= 'MTG';
 																				 	SELF := LEFT;
-																					 SELF := []));
+																					 SELF := []));*/
 	// oFileMTG   := OUTPUT(CHOOSEN(FileMTG, 1000));
-	inFileComb := FilePROF + FileMTG;
+	inFileComb := FilePROF /*+ FileMTG*/;
 
 
 	//Filtering out BAD RECORDS
@@ -206,7 +209,7 @@ EXPORT map_OHS0654_conversion(STRING pVersion) := FUNCTION
 		//Construct full name
 		TrimNAME_ORG				 	:= ut.CleanSpacesAndUpper(pInput.FULL_NAME);
 		TempNAME_ORG			 		:= REGEXREPLACE('NONE SPECIFIED',TrimNAME_ORG,''); 
-		TrimNAME_FIRST 			:= ut.CleanSpacesAndUpper(pInput.FIRST_NAME);
+		TrimNAME_FIRST 			  := ut.CleanSpacesAndUpper(pInput.FIRST_NAME);
 		TrimNAME_MID 					:= ut.CleanSpacesAndUpper(pInput.MIDDLE_NAME);
 		TrimNAME_LAST 				:= StringLib.StringFilterOut(ut.CleanSpacesAndUpper(pInput.LAST_NAME),'=".');		
 		TrimNAME_SUFX					:= ut.CleanSpacesAndUpper(pInput.SUFFIX);
@@ -214,14 +217,14 @@ EXPORT map_OHS0654_conversion(STRING pVersion) := FUNCTION
 		TrimDBA1 							  := ut.CleanSpacesAndUpper(pInput.DBA1);
 		TrimDBA2 							  := ut.CleanSpacesAndUpper(pInput.DBA2);
 		TrimDBA3 							  := ut.CleanSpacesAndUpper(pInput.DBA3);
-		TrimNAME_OFFICE			:= ut.CleanSpacesAndUpper(pInput.OFFICENAME);
+		TrimNAME_OFFICE			    := ut.CleanSpacesAndUpper(pInput.OFFICENAME);
 		
 		TrimDBA_OFFICE 				:= StringLib.StringFilterOut(ut.CleanSpacesAndUpper(pInput.OFFICENAME_DBA),'="');
 		TrimBusAddress1				:= ut.CleanSpacesAndUpper(pInput.ADDRESS1);
 		TrimBusAddress2				:= StringLib.StringFilterOut(ut.CleanSpacesAndUpper(pInput.ADDRESS2),'="');
-		TrimBusCity 				  	:= ut.CleanSpacesAndUpper(pInput.CITY);
+		TrimBusCity 				 	:= ut.CleanSpacesAndUpper(pInput.CITY);
 		TrimLIC_TYPE 				 	:= ut.CleanSpacesAndUpper(pInput.CREDENTIAL_TYPE);
-	 TrimZip            := StringLib.StringFilterOut(trim(pInput.Zip,All),'="');
+	 TrimZip                := StringLib.StringFilterOut(trim(pInput.Zip,All),'="');
 		// License Information
 		SELF.LICENSE_NBR	   	:= ut.CleanSpacesAndUpper(pInput.CREDENTIAL_NUMBER);
 		SELF.OFF_LICENSE_NBR	:= ut.CleanSpacesAndUpper(pInput.OFF_SLNUM);
@@ -229,14 +232,14 @@ EXPORT map_OHS0654_conversion(STRING pVersion) := FUNCTION
 		
 		SELF.OFF_LICENSE_NBR_TYPE := MAP(tmpOfficeLicenseNbrType='SOLE' => 'SOLE PROPRIETOR',
 																     tmpOfficeLicenseNbrType='REC' => 'REAL ESTATE COMPANY',
-																		   tmpOfficeLicenseNbrType='BRK' => 'BROKER',
-																		   tmpOfficeLicenseNbrType='SMCU' => 'SECOND MORTGAGE CREDIT UNION',
-																		   tmpOfficeLicenseNbrType='SM' => 'SECOND MORTGAGE',
-																		   tmpOfficeLicenseNbrType='OM' => 'OPERATIONS MANAGER',
-																		   tmpOfficeLicenseNbrType='MBMB' => 'MORTGAGE BROKER MORTGAGE BANKER',
-																		   tmpOfficeLicenseNbrType='MBCU' => 'MORTGAGE BROKER CREDIT UNION',
-																		   tmpOfficeLicenseNbrType='MB' => 'MORTGAGE BROKER',
-																		   '');
+																		 tmpOfficeLicenseNbrType='BRK' => 'BROKER',
+																		 tmpOfficeLicenseNbrType='SMCU' => 'SECOND MORTGAGE CREDIT UNION',
+																		 tmpOfficeLicenseNbrType='SM' => 'SECOND MORTGAGE',
+																		 tmpOfficeLicenseNbrType='OM' => 'OPERATIONS MANAGER',
+																		 tmpOfficeLicenseNbrType='MBMB' => 'MORTGAGE BROKER MORTGAGE BANKER',
+																		 tmpOfficeLicenseNbrType='MBCU' => 'MORTGAGE BROKER CREDIT UNION',
+																		 tmpOfficeLicenseNbrType='MB' => 'MORTGAGE BROKER',
+																		 '');
 	  SELF.BRKR_LICENSE_NBR := IF(tmpOfficeLicenseNbrType='BRK',TRIM(SELF.OFF_LICENSE_NBR),'');
 		
 		SELF.RAW_LICENSE_TYPE	:= TrimLIC_TYPE;
@@ -286,7 +289,7 @@ EXPORT map_OHS0654_conversion(STRING pVersion) := FUNCTION
    																			'CERTIFIED RESIDENTIAL R E APPRAISER - OUT OF STA' => 'ACRO',
    																			'CERTIFIED RESIDENTIAL R E APPRAISER - OUT OF STATE' => 'ACRO',
 																		  	'TEMPORARY LOAN ORIGINATOR' => 'TLO',
-	                                      'TEMPORARY MORTGAGE LOAN ORIGINATOR' => 'TMLO', 																			  // Add new type 10/21/2014	
+	                                      'TEMPORARY MORTGAGE LOAN ORIGINATOR' => 'TMLO', // Add new type 10/21/2014	
                                         'LICENSED RESIDENTIAL R E APPRAISER - OUT OF STAT' => 'ALRO',  
 																			  'THIRD PARTY PROCESSER' => 'TP',
 																			  'NOT FOR PROFIT 501C3' => 'NP',
@@ -297,6 +300,15 @@ EXPORT map_OHS0654_conversion(STRING pVersion) := FUNCTION
 																  			'SECOND MORTGAGE CREDIT UNION SERVICE ORG EXEMPTION' => 'SMCU',
 																				'CONSUMER INSTALLMENT LOAN ACT' => 'CILA',
 																				'CONSUMER INSTALLMENT LOAN ACT BRANCH OFFICE' => 'CILAB',
+																				// new license type
+																				'CONSUMER INSTALLMENT LOAN ACT BRANCH' => 'CILAB',
+																				//test
+																				'GENERAL LOAN LAW' => 'GLL',                                                                                   
+																				'GENERAL LOAN LAW BRANCH'    => 'GLLB',                                                                         
+																				'NONPROFIT 501C3' => 'NPR',                                                                                    
+																				'RESIDENTIAL MORTGAGE LENDING ACT'  => 'RMLA',                                                                  
+																				'RESIDENTIAL MORTGAGE LENDING ACT BRANCH'  => 'RMLAB',                                                           
+																				'THIRD PARTY PROCESSING AND/OR UNDERWRITING COMPANY'  => 'TPPUC',                                               
   															 				''),LEFT,RIGHT);
     // SELF.std_license_desc := prepLIC_TYPE;
 	  //Use the first qualifier of license # as std license type
@@ -828,7 +840,7 @@ EXPORT map_OHS0654_conversion(STRING pVersion) := FUNCTION
 	d_final 						:= OUTPUT(ds_map_base, ,mari_dest+pVersion +'::'+src_cd,__COMPRESSED__,OVERWRITE);			
 	add_super := Prof_License_Mari.fAddNewUpdate(ds_map_base(NAME_ORG_ORIG != ''));				
 	move_to_used				:= PARALLEL(Prof_License_Mari.func_move_file.MyMoveFile(code, 're','using','used');	
-																	Prof_License_Mari.func_move_file.MyMoveFile(code, 'dfi','using','used');
+																	// Prof_License_Mari.func_move_file.MyMoveFile(code, 'dfi','using','used');
 												 );
 
 	//Add notify_missing_codes to email the user if there is missing codes
@@ -838,6 +850,6 @@ EXPORT map_OHS0654_conversion(STRING pVersion) := FUNCTION
 	notify_invalid_address := Prof_License_Mari.fNotifyError.NameInAddressFields(code,src_cd,pVersion,
 	                            Prof_License_Mari.Email_Notification_Lists.BaseFileConversion);
 	
-	RETURN SEQUENTIAL(move_to_using, oCMV, oRE, oPROF, oMTG, d_final, add_super, move_to_used, notify_missing_codes, notify_invalid_address);
+	RETURN SEQUENTIAL(move_to_using, oCMV, oRE, oPROF, d_final, add_super, move_to_used, notify_missing_codes, notify_invalid_address);
 
 END;

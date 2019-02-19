@@ -2,7 +2,7 @@
 
 EXPORT Layouts := MODULE
 
-	SHARED Inquiry := RECORD 
+	EXPORT Inquiry := RECORD 
 
 			STRING30	lex_id;
 			STRING30	product_id;
@@ -33,7 +33,7 @@ EXPORT Layouts := MODULE
 			STRING9	eu2_customer_account;
 	END; 
 
-	Inquiry_Extended :=   RECORD
+	EXPORT Inquiry_Extended :=   RECORD
 
 			STRING state_id_number;
 			STRING state_id_state;

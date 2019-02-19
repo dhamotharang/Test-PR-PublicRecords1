@@ -1,4 +1,4 @@
-EXPORT Mailing_List(string st) := module
+﻿EXPORT Mailing_List(string st) := module
 	shared Dev_list1a := 'Jose.Bello@lexisnexis.com'
 										+',Charles.Pettola@lexisnexis.com'
 										+',Tony.Kirk@lexisnexis.com'
@@ -27,10 +27,9 @@ EXPORT Mailing_List(string st) := module
 										+',Tony.Kirk@lexisnexis.com'
 										+',Charles.Salvo@lexisnexis.com'
 										+',Cesar.Gonzalez@lexisnexis.com'
-										+',Shawn.Adams@lnssi.com'
+										+',nacprojectsupport@lnssi.com'
 										+',seth.hall@lnssi.com'
 										+',Jennifer.paganacci@lexisnexis.com'
-										+',Bonita.Rakestraw@lnssi.com'
 										;
 	shared DOPS_list := 'Jose.Bello@lexisnexis.com'
 										+',Charles.Pettola@lexisnexis.com'
@@ -46,7 +45,6 @@ EXPORT Mailing_List(string st) := module
 										+',robert.allgood@dhr.alabama.gov'
 										+',aaron.biggers@dhr.alabama.gov'
 										+',brandon.early@dhr.alabama.gov'
-										+',ann.york@dhr.alabama.gov'
 										+',johnnie.cox@dhr.alabama.gov'
 										+',valerie.davis@dhr.alabama.gov'
 										+',madhu.pusarla@dhr.alabama.gov'

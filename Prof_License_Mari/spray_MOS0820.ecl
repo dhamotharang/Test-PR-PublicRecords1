@@ -1,10 +1,10 @@
-// spray MOS0820 Professional Licenses Files for MARI
+﻿// spray MOS0820 Professional Licenses Files for MARI
 //unzip files before running spray process	    
 IMPORT Prof_License_Mari, Lib_FileServices, lib_stringlib;
 
 EXPORT spray_MOS0820 := MODULE
 
-	#workunit('name','Spray MOS0820');
+	#workunit('name','Yogurt: Spray MOS0820');
 	SHARED STRING7 code						:= 'MOS0820';
 	//  Spray all raw files
 	EXPORT S0820_SprayFiles(string pVersion) := FUNCTION

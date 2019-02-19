@@ -1,4 +1,4 @@
-IMPORT SALT31;
+﻿IMPORT SALT31;
 EXPORT Config := MODULE,VIRTUAL
 // The wildcard match function currently being used
 EXPORT WildMatch(SALT31.StrType src,SALT31.StrType Pat,BOOLEAN _NoCase) := StringLib.StringWildMatch(src,pat,_nocase);
@@ -11,11 +11,11 @@ EXPORT AttrValueType := SALT31.AttrValueType;
 EXPORT MatchThreshold := 41;
 EXPORT BasicMatchThreshold := MatchThreshold; // Possibly reduce by a little to give yourself wriggle room in the rather less precise basic match
 EXPORT KeyInfix := KeyInfix;
-EXPORT KeyInfix_specificities := 'qa';
+EXPORT KeyInfix_specificities := 'qa';/*HACK*/;
 // Configuration of individual fields
-EXPORT prim_range_Force := 0;
-EXPORT sec_range_Force := 0;
-EXPORT active_duns_number_Force := 0;
-EXPORT active_enterprise_number_Force := 0;
+EXPORT prim_range_Force := 0; 
+EXPORT sec_range_Force := 0; 
+EXPORT active_duns_number_Force := 0; 
+EXPORT active_enterprise_number_Force := 0; 
 // Configuration of external files
 END;

@@ -1,5 +1,7 @@
-import ut,BIPV2,advo,tools,mdr;
+﻿import ut,BIPV2,advo,tools,mdr;
+import BIPV2_Lgid3;
 import lksd;
+
 EXPORT segmentation_gold(
    dataset(BIPV2.CommonBase.layout )  pInfile             = BIPV2.CommonBase.DS_CLEAN
   ,string                             idName              = 'PROXID'
@@ -21,6 +23,8 @@ EXPORT segmentation_gold(
 			string50 source_decoded_w_type := '';
 			
 			string addr_type := '';
+			pInfile.has_lgid;
+			boolean has_lgid3_cand := false;
 			// string fein;
 			// string duns;
 			// string lnca;
@@ -56,7 +60,22 @@ ds_slim_status := project(pInfile, transform({unsigned6 id,string1 inactive}, se
 																																										left.proxid_status_private)
                                                                                     ));
 shared ds_set_status_dedup := table(ds_slim_status  ,{id,inactive},id,inactive,merge);
-shared input := distribute(project(pinfile, transform(hrec, self.id := map(idName = 'PROXID' => left.proxid, 
+
+// The lgid candidates file hasn't been renamed or put into the built superfile at this point,
+// so need to use the original filename. But I also want it to work if this is rerun after the
+// rename so using the original filename if exists, otherwise use the built version.
+shared lgidCandKey := BIPV2_LGID3.Keys(BIPV2_LGID3.In_LGID3).Candidates;
+shared lgidCandOpt := index(lgidCandkey, BIPV2_LGID3.Keys(BIPV2_LGID3.In_LGID3).CandidatesKeyName, opt);
+shared lgidCandBuilt := BIPV2_LGID3.keys2(BIPV2_LGID3.In_LGID3).MatchCandidates.built;
+shared lgidCand := if(exists(lgidCandOpt), pull(lgidCandOpt), pull(lgidCandBuilt));
+
+shared infileWithLgid3Cand :=
+	join(pInfile, dedup(lgidCand, lgid3, all),
+		left.lgid3 = right.lgid3,
+		transform({pInfile, hrec.has_lgid3_cand},
+			self.has_lgid3_cand := right.lgid3 != 0;
+			self := left), hash, limit(1), left outer);
+shared input := distribute(project(infileWithLgid3Cand, transform(hrec, self.id := map(idName = 'PROXID' => left.proxid, 
 																																									 idName = 'SELEID' 	=> left.seleid, 
 																																									 idName = 'ORGID' 	=> left.orgid, 
 																																									 idName = 'ULTID' 	=> left.ultid, 
@@ -275,15 +294,17 @@ shared isNotJustBizReg := ~isJustBizReg;
 shared isJustCorpAndBizReg := hasBizRegSrc and hasCorpSrc and AddBackNew.cnt_Corp_sources + AddBackNew.cnt_BizReg_sources = AddBackNew.cnt_sources;
 //records
 shared hasMultipleRecords := AddBackNew.reccnts[1].reccnt > 1;
-		
+shared inHrchy := exists(AddBackNew.has_lgids(has_lgid));
+shared isLgid3Linkable := exists(AddBackNew.has_lgid3_cands(has_lgid3_cand));
 		
 shared isGold := 
 	isActive
 	AND isNotJustPOBox
+	AND (inHrchy OR isLgid3Linkable)
 	AND (
 		hasSuperCoreSrc 
 		OR 
-		((hasOtherCoreSrc or has2TSrc) and (hasMultipleSources or hasBizAddr))
+		((hasOtherCoreSrc or has2TSrc) and hasMultipleSources)
 	);			
 shared Gold := AddBackNew(isGold);
 shared NotGold := AddBackNew(~isGold);

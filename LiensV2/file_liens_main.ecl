@@ -8,6 +8,11 @@ TRANSFORM
 													l.rmsid[1..3]	=	'HGR',
 													'',l.release_date
 												);
+	// DF-21976 Populate Collection_Date when
+	SELF.collection_date	:=	IF(
+													l.collection_Date	=	''	AND	l.tmsid[1..2]	 =	'HG',
+													l.process_date,l.collection_Date
+												);
 	SELF							:=	l;
 END;
 
@@ -158,7 +163,7 @@ Main_puid := project(pre_file_liens_main_dedup , transform({liensv2.Layout_liens
 
 self := left)); 
 
-export file_liens_main := project(Main_puid, 
+export file_liens_main := project(Main_puid((integer)amount >= 0), 
 						transform(liensv2.Layout_liens_main_module.layout_liens_main, 
 						self.orig_filing_date := if(left.orig_filing_date <= stringlib.GetDateYYYYMMDD(),left.orig_filing_date, ''),
 						self := left)) :INDEPENDENT;

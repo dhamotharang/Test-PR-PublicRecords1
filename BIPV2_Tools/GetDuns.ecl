@@ -1,4 +1,4 @@
-/*
+﻿/*
   BIPV2_Tools.GetDuns()
     Creates a table of the latest duns_number, cnp_name & status.  Status is either 'Active','Historic' or 'Deleted'.
 */
@@ -10,8 +10,8 @@ EXPORT GetDuns(
 functionmacro
   import _control,ut,Data_Services,std;
   
-	Persistname := 'thor_data400::persist::BIPV2::file_current_Duns';
-	#IF(_Control.ThisEnvironment.Name='Prod_Thor')
+	Persistname := 'persist::BIPV2_Tools::GetDuns::ds_active_duns_new';
+//	#IF(_Control.ThisEnvironment.Name='Prod_Thor')
 		import dnb_dmi;
     import BIPV2_Company_Names,ut,Data_Services;
     
@@ -36,10 +36,10 @@ functionmacro
     ds_result := dedup( sort(  distribute(ds_result_prep ,hash64(duns_number,cnp_name)) ,duns_number,cnp_name,-date_last_seen,local) ,duns_number,cnp_name,local);
             
     ds_active_duns_new := ds_result : persist('~'+Persistname + '.new' + pPersist_Unique);
-	#ELSE
-		ds_active_duns      := dataset(Data_Services.foreign_prod+Persistname + pPersist_Unique, {string9 duns_number}, thor);
-		ds_active_duns_new  := dataset(Data_Services.foreign_prod+Persistname+ '.new' + pPersist_Unique, {string duns_number,string company_name,string cnp_name,unsigned4 date_last_seen,string status}, thor);
-	#END
+//	#ELSE
+//		ds_active_duns      := dataset(Data_Services.foreign_prod+Persistname + pPersist_Unique, {string9 duns_number}, thor);
+//		ds_active_duns_new  := dataset(Data_Services.foreign_prod+Persistname+ '.new' + pPersist_Unique, {string duns_number,string company_name,string cnp_name,unsigned4 date_last_seen,string status}, thor);
+//	#END
   
   return ds_active_duns_new;
 endmacro;

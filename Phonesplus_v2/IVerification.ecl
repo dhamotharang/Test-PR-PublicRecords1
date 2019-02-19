@@ -23,10 +23,11 @@ Implementation:
 4- Keep history of the data that has been verified
 */
 
-import gong_v2, doxie, ut,didville;
+import gong_v2, doxie, ut,didville,_Control,Relationship;
 shared reformat(ds, ds_source, record_type, did_field, orig_did_field, phone_field) := functionmacro
 #uniquename(t_reformat)
-File_Iverification.layout t_reformat(ds le) := transform
+
+Phonesplus_v2.File_Iverification.layout t_reformat(ds le) := transform
 	self.phone := le.phone_field;
 	self.did := le.did_field;
 	self.orig_did := le.orig_did_field;
@@ -65,7 +66,7 @@ pplus:= phonesplus_V2.Key_Phonesplus_Did(did >0 and cellphone <> '' and current_
 gong_r := sort(distribute(reformat(gong, 1, 0, did, did, phone10), hash(phone)), phone, did, local);																											
 pplus_r := sort(distribute(reformat(pplus, 2, 0, did, did, cellphone), hash(phone)), phone, did, local);
 
-File_Iverification.layout t_rollup_dts1 (File_Iverification.layout le, File_Iverification.layout ri) := transform
+Phonesplus_v2.File_Iverification.layout t_rollup_dts1 (Phonesplus_v2.File_Iverification.layout le, Phonesplus_v2.File_Iverification.layout ri) := transform
 self.dt_first_seen := ut.EarliestDate(le.dt_first_seen, ri.dt_first_seen);
 self.dt_last_seen :=  ut.LatestDate(le.dt_last_seen, ri.dt_last_seen);
 self := ri;
@@ -82,22 +83,23 @@ pplus_rollup := rollup(pplus_r, t_rollup_dts1(left, right),
 
 all_phones := dedup(sort(distribute((gong_rollup + pplus_rollup), hash(did)), did, phone, file_source, local), did, phone, local);
 //-----------------------get spouse
-rels_by_spouse := doxie.Key_Relatives(prim_range = -7);
+rels_by_spouse := //doxie.Key_Relatives(prim_range = -7); VC: //v2 key is being sunset. DF-22765
+                  Relationship.key_relatives_v3 (type in ['PERSONAL','TRANS CLOSURE'], confidence in ['MEDIUM','HIGH'], isanylnamematch, title in [2,3,4,8,9]);
 
-spouse_in_person1 := join(distribute(rels_by_spouse, hash(person1)),
+spouse_in_person1 := join(distribute(rels_by_spouse, hash(did1)),
 													distribute(all_phones, hash(did)),
-													left.person1 = right.did,
+													left.did1 = right.did,
 													local);
 													
-spouse1 := reformat(spouse_in_person1, 0, 1, person2, did, phone);		
+spouse1 := reformat(spouse_in_person1, 0, 1, did2, did, phone);		
 
-spouse_in_person2 := join(distribute(rels_by_spouse, hash(person2)),
+spouse_in_person2 := join(distribute(rels_by_spouse, hash(did2)),
 													distribute(all_phones, hash(did)),
-													left.person2 = right.did,
+													left.did2 = right.did,
 													local);
 													
 
-spouse2 := reformat(spouse_in_person2, 0, 1, person1, did, phone);
+spouse2 := reformat(spouse_in_person2, 0, 1, did1, did, phone);
 
 spouse1_rollup := rollup(spouse1, t_rollup_dts1(left, right),
 											left.did = right.did and 
@@ -135,7 +137,7 @@ all_others := dedup(sort(distribute((other_in_household_rollup), hash(did)), did
 all_records_s := sort(distribute((all_phones + all_spouses + all_others), hash(did)), did, phone, file_source, rec_type, local) ;
 all_records_grp := group(all_records_s, did, phone, local);
 
-File_Iverification.layout t_rollup (all_records_grp le, all_records_grp ri) := transform
+Phonesplus_v2.File_Iverification.layout t_rollup (all_records_grp le, all_records_grp ri) := transform
 self.rec_type := le.rec_type | ri.rec_type;
 self.dt_first_seen := ut.EarliestDate(le.dt_first_seen, ri.dt_first_seen);
 self.dt_last_seen :=  ut.LatestDate(le.dt_last_seen, ri.dt_last_seen);
@@ -159,13 +161,13 @@ iver_rec := RECORD
   boolean is_latest;
  END;
 
-remote_ds := dataset('~foreign::alpha_prod_thor_dali.risk.regn.net::thor400_64::persist::for_phone_verification', iver_rec , thor);
+remote_ds := dataset('~foreign::' + _Control.IPAddress.aprod_thor_dali + '::thor_data400::base::insuranceheader::for_phone_verification', iver_rec , thor);
 
 remote_ds_t := project(remote_ds, {iver_rec, unsigned hhid := 0});
 
 didville.MAC_HHID_Append(remote_ds_t, 'HHID_NAMES', Append_HHID, true);
 
-File_Iverification.layout t_did_ver (all_data_r le, remote_ds ri) := transform
+Phonesplus_v2.File_Iverification.layout t_did_ver (all_data_r le, remote_ds ri) := transform
 self.iver_indicator:= if(ri.did > 0 and ri.phone <> '', 
 															if(ri.is_latest, ut.bit_set(0,0),
 															   ut.bit_set(0,1)), 0);
@@ -182,7 +184,7 @@ iverify_did := join(distribute(all_data_r, hash(did)),
 								left outer,
 								local);
 
-File_Iverification.layout t_hhid_ver (all_data_r le, Append_HHID ri) := transform
+Phonesplus_v2.File_Iverification.layout t_hhid_ver (all_data_r le, Append_HHID ri) := transform
 self.iver_indicator:= if(ri.hhid > 0 and ri.phone <> '', 
 															if(ri.is_latest, le.iver_indicator | ut.bit_set(0,2),
 															   le.iver_indicator | ut.bit_set(0,3)), le.iver_indicator);
@@ -200,16 +202,16 @@ iverify_hhid := join(distribute(iverify_did, hash(hhid)),
 								local);
 
 //----------Rollup history;
-cur_plus_hist := if(nothor(FileServices.GetSuperFileSubCount(File_Iverification.name)) = 0,
+cur_plus_hist := if(nothor(FileServices.GetSuperFileSubCount(Phonesplus_v2.File_Iverification.name)) = 0,
 								 iverify_hhid,
-								 iverify_hhid +  project(File_Iverification.base, transform(File_Iverification.layout, self.current_rec := false, self := left)));
+								 iverify_hhid +  project(Phonesplus_v2.File_Iverification.base, transform(Phonesplus_v2.File_Iverification.layout, self.current_rec := false, self := left)));
 
 
 all_with_hist_s := sort(distribute(cur_plus_hist, hash(did)), did, phone, orig_did, hhid, file_source, rec_type,iver_indicator, local) ;
 all_with_hist_grp := group(all_with_hist_s, did, phone, orig_did, hhid, file_source, rec_type,iver_indicator, local);
 
 						 
-File_Iverification.layout t_rollup_history (all_with_hist_grp le, all_with_hist_grp ri) := transform
+Phonesplus_v2.File_Iverification.layout t_rollup_history (all_with_hist_grp le, all_with_hist_grp ri) := transform
 self.iver_dt_first_seen := ut.EarliestDate(le.iver_dt_first_seen , le.iver_dt_first_seen);
 self.iver_dt_last_seen := ut.LatestDate(le.iver_dt_last_seen, ri.iver_dt_last_seen);
 self.dt_first_ver := ut.EarliestDate(le.dt_first_ver, ri.dt_first_ver);

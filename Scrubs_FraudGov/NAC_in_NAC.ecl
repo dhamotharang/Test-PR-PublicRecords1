@@ -1,4 +1,8 @@
-﻿import FraudGovPlatform;
-f0 :=	FraudGovPlatform.Files().Input.IdentityData.Sprayed(regexfind('NAC',source_input,nocase)) +
-			FraudGovPlatform.Files().Input.ByPassed_IdentityData.Sprayed(regexfind('NAC',Source_input,nocase));
-export NAC_In_NAC := f0;
+﻿import FraudGovPlatform,NAC;
+Export NAC_In_NAC := Function 
+		
+   result := project( FraudGovPlatform.Files().Sprayed.NAC, 
+    transform(NAC.Layouts.MSH, SELF := LEFT;SELF := []));
+   
+	return (result);
+end;

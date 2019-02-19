@@ -1,4 +1,4 @@
-export layout_KS := record
+﻿export layout_KS := record
 string3	  STATEABREV;
 string22	REG_NUM;
 string23	HULL_ID;

@@ -1,7 +1,6 @@
 ﻿EXPORT MAC_GWLFile_Spray_new(filedate,OFAC_build = '\'N\'',group_name='\'thor400_44\'',email_target='\' \'') := 
 MACRO
 
-#workunit('name','Global Watch Lists')
 #uniquename(spray_first)
 #uniquename(pull_ofac_fse)
 #uniquename(build_super)
@@ -52,7 +51,7 @@ RoxieKeyBuild.Mac_Daily_Email_Local('GLOBAL WATCH LISTS','FAIL',filedate,%send_f
 
 #uniquename(update_version)
 
-%update_version% := DOPS.updateversion('GlobalWatchListKeys',filedate,'jtao@seisint.com, kgummadi@seisint.com, skasavajjala@seisint.com',,'N|BN');
+%update_version% := DOPS.updateversion('GlobalWatchListKeys',filedate,'jtao@seisint.com, kgummadi@seisint.com, skasavajjala@seisint.com',,'N');
 
 /******Comment out the dops update and orbit for GWL on  Insurance end -- DF - 21830
 #uniquename(update_alpha_version)

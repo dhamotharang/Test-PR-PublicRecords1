@@ -380,8 +380,9 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 	
 		 A:= dataset([transform(
 		Risk_Indicators.Layouts_Derog_Info.Liens,
-		self.seq 													:= ri.liens1_seq;
-	  self.DateFiled      							:= ri.liens1_DateFiled;
+		self.seq 												     	:= ri.liens1_seq;
+	 self.DateFiled      							:= ri.liens1_DateFiled;
+  self.LienTypeID            := ri.Liens1_LienTypeID;
 		self.LienType       							:= ri.Liens1_LienType;
 		self.Amount         							:= ri.Liens1_Amount;
 		self.ReleaseDate    							:= ri.Liens1_ReleaseDate;
@@ -392,13 +393,15 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 		self.Agency         							:= ri.Liens1_Agency;
 		self.AgencyCounty   							:= ri.Liens1_AgencyCounty;
 		self.AgencyState	   							:= ri.Liens1_AgencyState;
+  self.ConsumerStatementID   := ri.Liens1_ConsumerStatementID;
 		SELF := [];
 	)]);
 	
 	B:= dataset([transform(
 		Risk_Indicators.Layouts_Derog_Info.Liens,
-		self.seq 												:= ri.liens2_seq;
+		self.seq 										     		:= ri.liens2_seq;
 		self.DateFiled      						:= ri.Liens2_DateFiled;
+  self.LienTypeID           := ri.Liens2_LienTypeID;
 		self.LienType      							:= ri.Liens2_LienType;
 		self.Amount        							:= ri.Liens2_Amount;
 		self.ReleaseDate    						:= ri.Liens2_ReleaseDate;
@@ -409,6 +412,7 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 		self.Agency         						:= ri.Liens2_Agency;
 		self.AgencyCounty   						:= ri.Liens2_AgencyCounty;
 		self.AgencyState	   						:= ri.Liens2_AgencyState;
+  self.ConsumerStatementID  := ri.Liens2_ConsumerStatementID;
 		SELF := [];
 		)]);
 	
@@ -418,44 +422,48 @@ RiskView.Layouts.Layout_RiskView5_Search_Results getSeed(Risk_Indicators.Layout_
 	// Judgments 1&2
 	C:= dataset([transform(
 		Risk_Indicators.Layouts_Derog_Info.Judgments,
-		self.seq 												:= ri.Jgmts1_seq;
+		self.seq 							     					:= ri.Jgmts1_seq;
 		self.DateFiled      						:= ri.Jgmts1_DateFiled;
-		self.JudgmentType      					:= ri.Jgmts1_JudgmentType;
+  self.JudgmentTypeID       := ri.Jgmts1_JudgmentTypeID;
+		self.JudgmentType      			:= ri.Jgmts1_JudgmentType;
 		self.Amount        							:= ri.Jgmts1_Amount;
 		self.ReleaseDate    						:= ri.Jgmts1_ReleaseDate;
-		self.FilingDescription    			:= ri.Jgmts1_FilingDescription;
+		self.FilingDescription    := ri.Jgmts1_FilingDescription;
 		self.DateLastSeen   						:= ri.Jgmts1_DateLastSeen;
-		self.Defendant   			        	:= ri.Jgmts1_Defendant;
-		self.Plaintiff    			        := ri.Jgmts1_Plaintiff ;
+		self.Defendant   			      := ri.Jgmts1_Defendant;
+		self.Plaintiff    			     := ri.Jgmts1_Plaintiff ;
 		self.FilingNumber   						:= ri.Jgmts1_FilingNumber;
 		self.FilingBook     						:= ri.Jgmts1_FilingBook;
 		self.FilingPage     						:= ri.Jgmts1_FilingPage;
-		self.Eviction                   := ri.Jgmts1_Eviction;
+		self.Eviction             := ri.Jgmts1_Eviction;
 		self.Agency         						:= ri.Jgmts1_Agency;
 		self.AgencyCounty   						:= ri.Jgmts1_AgencyCounty;
 		self.AgencyState	   						:= ri.Jgmts1_AgencyState;
+  self.ConsumerStatementID  := ri.Jgmts1_ConsumerStatementID;
 		SELF := [];
 		)]);
 		
 		
 	D:= dataset([transform(
 		Risk_Indicators.Layouts_Derog_Info.Judgments,
-		self.seq 												:= ri.Jgmts2_seq;
+		self.seq 											     	:= ri.Jgmts2_seq;
 		self.DateFiled      						:= ri.Jgmts2_DateFiled;
-		self.JudgmentType       				:= ri.Jgmts2_JudgmentType;
+  self.JudgmentTypeID       := ri.Jgmts2_JudgmentTypeID;
+		self.JudgmentType       		:= ri.Jgmts2_JudgmentType;
 		self.Amount        							:= ri.Jgmts2_Amount;
 		self.ReleaseDate    						:= ri.Jgmts2_ReleaseDate;
-		self.FilingDescription    			:= ri.Jgmts2_FilingDescription;
+		self.FilingDescription    := ri.Jgmts2_FilingDescription;
 		self.DateLastSeen   						:= ri.Jgmts2_DateLastSeen;
-		self.Defendant   			        	:= ri.Jgmts2_Defendant;
-		self.Plaintiff    			        := ri.Jgmts2_Plaintiff ;
+		self.Defendant   			      := ri.Jgmts2_Defendant;
+		self.Plaintiff    			     := ri.Jgmts2_Plaintiff ;
 		self.FilingNumber   						:= ri.Jgmts2_FilingNumber;
 		self.FilingBook     						:= ri.Jgmts2_FilingBook;
 		self.FilingPage     						:= ri.Jgmts2_FilingPage;
-		self.Eviction                   := ri.Jgmts2_Eviction;
+		self.Eviction             := ri.Jgmts2_Eviction;
 		self.Agency         						:= ri.Jgmts2_Agency;
 		self.AgencyCounty   						:= ri.Jgmts2_AgencyCounty;
 		self.AgencyState	   						:= ri.Jgmts2_AgencyState;
+  self.ConsumerStatementID  := ri.Jgmts2_ConsumerStatementID;
 		SELF := [];
 		)]);	
 		

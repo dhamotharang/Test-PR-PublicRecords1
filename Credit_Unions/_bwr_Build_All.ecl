@@ -1,8 +1,8 @@
-IMPORT _control;
+﻿IMPORT _control;
 
 pversion				:= '20110303'													;
 pDirectory			:= '/data_build_5_2/credit_union/data';
-pServerIP				:= _control.IPAddress.edata10					;
+pServerIP				:= _control.IPAddress.bctlpedata10		;
 pFilename				:= '*txt'		                        	;
 pGroupName			:= Credit_Unions._Constants().groupname	;																
 pIsTesting			:= false															;

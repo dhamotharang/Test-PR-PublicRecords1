@@ -1,8 +1,8 @@
-//************************************************************************************************************* */	
+﻿//************************************************************************************************************* */	
 //  The purpose of this development is take IN Mortgage License raw file and convert it to a common
 //  professional license (MARIFLAT_out) layout to be used for MARI and PL_BASE development.
 //************************************************************************************************************* */	
-#workunit('name','map_INS0610_conversion');
+#workunit('name','Yogurt: map_INS0610_conversion');
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib;
 
 EXPORT map_INS0610_conversion(STRING pVersion) := FUNCTION

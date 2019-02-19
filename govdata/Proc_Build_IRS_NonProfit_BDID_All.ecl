@@ -1,9 +1,9 @@
-import ut, _control;
+﻿import ut, _control, Orbit3;
 
 export Proc_Build_IRS_NonProfit_BDID_All(string filedate) := function
 
 //Spray File
-sprayfile := FileServices.SprayVariable(_control.IPAddress.bctlpedata11
+sprayfile := FileServices.SprayVariable('uspr-edata11.risk.regn.net'
 							,'/data/prod_data_build_10/production_data/business_headers/irs/non-profit/in/'+filedate+'/eo*.csv'
 							,
 							,','
@@ -35,9 +35,12 @@ make_bdid := govdata.Make_IRS_NonProfit_BDID(filedate);
 //STRATA
 strata_counts := govdata.Strata_Population_Stats.IRS_Non_profit_pop;
 
+orbit_update := Orbit3.proc_Orbit3_CreateBuild_npf('IRS Non-profit Charitable Organizations',(filedate),'BUILD_AVAILABLE_FOR_USE',true);
+
 retval := sequential(sprayfile
 					  ,superfile_transac
 						,make_bdid
-					  ,strata_counts);
+					  ,strata_counts
+						,orbit_update);
 return retval;
 end;

@@ -40,7 +40,7 @@ end;
 o1 					:= normalize(df,5,normIt(LEFT,COUNTER));
 
 // Add offense_persistent_id
-
+// output(o1(seisint_primary_key ='C2COSOR6270924709894374124' ));
 	o1 addOPID(o1 l):= transform
 			
 		String 	filterField(String s) := FUNCTION
@@ -56,14 +56,23 @@ o1 					:= normalize(df,5,normIt(LEFT,COUNTER));
 		Voffense_description 				:= filterField(l.offense_description);
 		Vsentence_description 			:= filterField(l.sentence_description);
 		
-		self.offense_persistent_id 	:= hash64(trim(l.seisint_primary_key, left, right) + Vconviction_date + Voffense_date + Voffense_code_or_statute + Vcourt_case_number + Vvictim_gender + Vvictim_age + Voffense_description + Vsentence_description);	
+		Vconviction_jurisdiction    := filterField(l.conviction_jurisdiction);
+		VCourt                			:= filterField(l.Court);
+		VOffense_category           := filterField(l.Offense_category);
+		VArrest_date                := filterField(l.Arrest_date);
 		
-		//self.offense_persistent_id := hash64(trim(trim(trim(trim(trim(trim(trim(l.seisint_primary_key, left, right) + trim(l.conviction_date, left, right), left, right) + trim(l.offense_date, left, right), left, right) + trim(l.offense_code_or_statute, left, right), left, right) + trim(l.court_case_number, left, right), left, right) + trim(l.victim_gender, left, right), left, right) + trim(l.victim_age, left, right), left, right));
+		self.offense_persistent_id 	:= hash64(
+		                                      trim(l.seisint_primary_key, left, right) + Vconviction_date + Voffense_date + Voffense_code_or_statute + Vcourt_case_number +'X'+ Vvictim_gender + Vvictim_age + Voffense_description + Vsentence_description +
+		                                      Vconviction_jurisdiction + VCourt + VOffense_category + VArrest_date
+		                                     ); 
+		// self.offense_persistent_id 	:= hash64(trim(l.seisint_primary_key, left, right) + Vconviction_date + Voffense_date + Voffense_code_or_statute + Vcourt_case_number + Vvictim_gender + Vvictim_age + Voffense_description + Vsentence_description);	
+		
 		self := l;
 	end;
 
 oPId_Added := project(o1, addOPID(left));
 
+// output(oPId_Added(seisint_primary_key ='C2COSOR6270924709894374124' ));
 /*
 // Add offense_persistent_id
 
@@ -75,8 +84,9 @@ oPId_Added := project(o1, addOPID(left));
 oPId_Added := project(o1, addOPID(left));
 */
 // Added dedup to the enture record to get rid of duplicate records
+// output(count(oPId_Added),named('Before'));
 o2 := dedup(oPId_Added(offense_description != ''),hash):persist('~thor40_241::persist::sex_offender_offenses_dedup');
-
+// output(count(o2),named('after'));
 // Classify offense categories
 //Find First Offense
 o2 defCategory(o2 l):= transform
@@ -362,7 +372,8 @@ o2 defCategory(o2 l):= transform
 						'FALSE SWEARING|'+
 						'FALSE PRETENSES \\(ATTEMPT\\)|'+
 						'RESISTING ARREST|'+
-						
+						', FALSE PRETENSES|'+
+
 						
 						'WITHIN 500\'',
 						trim(l.offense_description, left, right),
@@ -1663,6 +1674,7 @@ o2 defCategory(o2 l):= transform
 						'MLESTATIN F A MINR|'+
 						'ATTEMPTED USE F MINRS FR BSENE PURPSES|'+
 						'INDESCENT LIBERTIES WITH A MINR|'+
+						'UNDER/16 MIAMI DADE FL;|'+
 
 						'WITH A 10, 13 AND 14 Y/O FEMALE' 											
 						,
@@ -2599,6 +2611,9 @@ o2 defCategory(o2 l):= transform
 						'SAC; 12CR2998|'+
 						'SAC; 05CR480|'+
 						'SAC; 2012CR809|'+
+            'RCW 9A 44 100 ATTEMPTED INCDECENT LIBERTIES|'+
+						'PRED CRM SX ASSL;|'+
+
 						
 						'SAC-ATTEMPT'
 						,				
@@ -3153,16 +3168,35 @@ o2 defCategory(o2 l):= transform
 						'DE1111110000FF\\(\\)|'+
 						'TIME.|'+
 						'D0222007CR000271|'+
-						'D0392016CR005553|'+
+						'D0392016CR005553|'+						
+					
+						'LCD_DS|'+		
+						'750.520E1|'+		
+						'18-3-405 CSA|'+		
+						'18-3-405 CSA|'+		
+						'INDECENT A&AMP;B|'+		
+						'DELETE|'+		
+						'16-6-3\\(B\\)|'+		
+						'CRG READS: 18-2-101 & 18-3-405 CRIM ATTE|'+		
+						'D0301996M 004635|'+		
+						'D0302005CR004409|'+		
+						'ART UCMJ 120B DIBRS 120BB3|'+		
+						'D0621999CR000953|'+		
+						'18-6-401\\(1\\),\\(7\\)\\(B\\)\\(I\\)|'+		
+						'D0622005CR001337|'+		
+            'T17-A 253\\(1\\) \\(B\\)|'+		
+            'TENN STING|'+		
 						
-						'18-6-401\\(1\\),\\(7\\)\\(B\\)\\(I\\)|'+
-						'A|'+
-						'CRG READS: 18-2-101 & 18-3-405 CRIM ATTE|'+
-						'ELUDING|'+
-						'LCD_DS|'+
-						'T17-A 253\\(1\\) \\(B\\)|'+
-						
-						
+            'NEW JERSEY;|'+
+						'ATTEMPT;|'+
+						'AGRAVETED;|'+
+						'38-12-14-A|'+
+						'NEW HAMPSHIRE|'+
+						'13A-6-64|'+
+						'22 021 A1 B\\(\\)|'+
+						'ATTEMPT;|'+
+						'632-A:2 II|'+
+						'INDICTMENT NUMBER CP870011443;|'+
 						
 						'16-6-4-\\(B\\)'						
 						,						
@@ -3204,6 +3238,7 @@ o2 defCategory(o2 l):= transform
 					trim(l.offense_description, left, right) = 'TRANSPORT OR SHIP' 				=> 'OTH',
 					trim(l.offense_description, left, right) = 'UNKNOWN' 									=> 'OTH',
 					trim(l.offense_description, left, right) = 'WYOMING' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'A'     => 'OTH',					
 					
 					trim(l.offense_description, left, right) in ['ARRALC196360022020121115','ATTEMPT 1ST DEGREE','BARKIM196660118920131111','BARSAM196851116020120808','BEADAN197550719520130828','BLADAV196750822320130712','BLADAV196750823020130712','BONALB198460015420130101','BONALB198460016420130101',
 						'BONALP197550716020130225','BROCHR199250917020121214','BROCHR199250917220121214','BROKEN196750916320121114','BROMAR197351015020000717',
@@ -3289,9 +3324,9 @@ o2 defCategory(o2 l):= transform
 						'USE OF COMMUNICATION SYSTEMS TO FACILITATE CERTAIN OFFENSES INVOLVING CHILDREN|'+
 						'W-CHILD|'+
 						'CALIFORNIA CONVICTION INVOLVING A 5 YR OLD FEMALE|'+
+            'UNDER/16 MIAMI DADE FL;|'+				
+						
 						'CONVICTED IN THE STATE OF IOWA FOR SEXUALLY ABUSING THREE MALE VICTIMS, AGES 5, 11, AND 15. SUBJECT'
-						
-						
 						
 						,
 						trim(l.offense_description, left, right),

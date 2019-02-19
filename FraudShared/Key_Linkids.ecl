@@ -125,7 +125,7 @@ address_cleaner := RECORD
    layout_clean182_fips clean_address;
   END;
 
-r:=RECORD,maxlength(60000)
+r :=RECORD,maxlength(60000)
   unsigned6 ultid;
   unsigned6 orgid;
   unsigned6 seleid;
@@ -170,7 +170,7 @@ r:=RECORD,maxlength(60000)
   string75 event_type_1;
   string75 event_type_2;
   string75 event_type_3;
-  unsigned8 household_id;
+  string20 household_id;
   string250 reason_description;
   string25 investigation_referral_case_id;
   string8 investigation_referral_date_opened;
@@ -184,7 +184,7 @@ r:=RECORD,maxlength(60000)
   string10 mitigated_amount;
   string20 external_referral_or_casenumber;
   string5 fraud_point_score;
-  unsigned6 customer_person_id;
+  string20 customer_person_id;
   string50 raw_title;
   string100 raw_first_name;
   string60 raw_middle_name;
@@ -230,7 +230,7 @@ r:=RECORD,maxlength(60000)
   string50 email_address;
   string10 email_address_type;
   string8 email_date;
-  string15 host;
+  string	 host;
   string25 alias;
   string25 location;
   string25 ip_address;
@@ -243,11 +243,11 @@ r:=RECORD,maxlength(60000)
   string50 device_id;
   string8 device_date;
   string20 unique_number;
-  string10 mac_address;
+  string25 mac_address;
   string20 serial_number;
   string25 device_type;
   string25 device_identification_provider;
-  string20 transaction_id;
+  string	 transaction_id;
   string10 transaction_type;
   string12 amount_of_loss;
   string12 professional_id;
@@ -306,7 +306,8 @@ r:=RECORD,maxlength(60000)
   string30 ip_address_fraud_code;
   string60 business_risk_code;
   string60 mailing_address_risk_code;
-	string60	device_risk_code;
+  string60 device_risk_code;
+	string60 identity_risk_code;
   string10 tax_preparer_id;
   string8 start_date;
   string8 end_date;
@@ -315,6 +316,7 @@ r:=RECORD,maxlength(60000)
   string10 investigator_id;
   integer1 fp;
  END;
+
  
 d	:=dataset([],r);
 

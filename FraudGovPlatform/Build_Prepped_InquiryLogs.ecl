@@ -4,7 +4,7 @@ EXPORT Build_Prepped_InquiryLogs (
 ) :=
 FUNCTION
 
-	Shared Sprayed_InquiryLogs := Files(pversion).Sprayed.InquiryLogs;
+	Sprayed_InquiryLogs := Files(pversion).Sprayed.InquiryLogs;
 			
 	IdentityData := RECORD 
 		string75 fn { virtual(logicalfilename) };
@@ -14,11 +14,11 @@ FUNCTION
 	IdentityData MapIDDT(Sprayed_InquiryLogs L) := TRANSFORM 
 	
 			SELF.Customer_Name	:= '';
-			SELF.Customer_Account_Number	:= '247949891'; 
+			SELF.Customer_Account_Number	:= '248283671'; 
 			SELF.Customer_State	:= 'FL';
-			SELF.Customer_County	:= '011'; 
+			SELF.Customer_County	:= '100'; 
 			SELF.Customer_Agency	:= ''; 														
-			SELF.Customer_Agency_Vertical_Type	:= 'H'; 
+			SELF.Customer_Agency_Vertical_Type	:= 'S'; 
 			SELF.Customer_Program	:= 'S'; 
 			SELF.Customer_Job_ID	:= ''; 
 			SELF.Batch_Record_ID	:= ''; 

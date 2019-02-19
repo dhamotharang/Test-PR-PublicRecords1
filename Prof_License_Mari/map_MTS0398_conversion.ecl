@@ -1,5 +1,6 @@
-// MTS0398 / Montana Department of Labor and Industry /	Multiple Professions / raw data to common layout for MARI and PL use
+﻿// MTS0398 / Montana Department of Labor and Industry /	Multiple Professions / raw data to common layout for MARI and PL use
 import Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib;
+#workunit('name','Yogurt: map_MTS0398_conversion'); 
 
 EXPORT map_MTS0398_conversion(STRING pVersion) := FUNCTION
 
@@ -222,13 +223,13 @@ EXPORT map_MTS0398_conversion(STRING pVersion) := FUNCTION
 														 'ROBERT STOLZENBACH BROKER| SKY PROPERTES$| STATE ACQUISITIONS$)';
 
 		//Use address cleaner to clean address
-		CoPattern								:= '(^.* LLC$|^.* LLC\\.$|^.* INC$|^.* INC\\.$|^.* COMPANY$|^.* CORP$|^.*APPRAISAL$|^.*APPRAISALS$|' +
+		CoPattern								:= '(^.* LLC$|^.* LLC\\.$|^.*,LLC$|^.* INC$|^.* INC\\.$|^.* COMPANY$|^.* CORP$|^.*APPRAISAL$|^.*APPRAISALS$|' +
 															 '^.* APPR\\.$|^.* APPRAISAL SERVICE$|^.* APPRAISAL GROUP$|^.* APPRAISAL CO$|^.* FINANCIAL$|' +
 															 '^.* APPRAISAL SV[C|S]$|^.* SERVICE[S]?$|^.* & ASSOCIATES$|^.* ADVISORS$|^CO .*$|^ATTN.*$|' +
 															 '^.* REALTY$|^.* REAL ESTATE$|^.* REAL ESTATE CO$|^.* MANAGEMENT$|^.* MGMT$|^.* COMPANIES|' +
 															 '^C-21 .*$|^PRUDENTIAL .*$|^.* REALTORS$|^.* PROPERTIES$' +
 															 ')';
-		RemovePattern						:= '(^.* LLC$|^.* LLC\\.$|^.* INC$|^.* INC\\.$|^.* COMPANY$|^.* CORP$|^.*APPRAISAL$|^.*APPRAISALS$|' +
+		RemovePattern						:= '(^.* LLC$|^.* LLC\\.$|^.*,LLC$|^.* INC$|^.* INC\\.$|^.* COMPANY$|^.* CORP$|^.*APPRAISAL$|^.*APPRAISALS$|' +
 															 '^.* APPR\\.$|^.* APPRAISAL SERVICE$|^.* APPRAISAL GROUP$|^.* APPRAISAL CO$|^.* FINANCIAL$|' +
 															 '^.* APPRAISAL SV[C|S]$|^.* SERVICE[S]?$|^.* & ASSOCIATES$|^.* ADVISORS$|^CO .*$|^ATTN.*$|' +
 															 '^.* REALTY$|^.* REAL ESTATE$|^.* REAL ESTATE CO$|^.* MANAGEMENT$|^.* MGMT$|^.* COMPANIES|' +

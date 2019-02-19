@@ -1,10 +1,10 @@
-/*
+﻿/*
 3.	VERSION 1 OF AN ALGORITHM TO MEASURE DEGREE OF VANITY BETWEEN A LEXID AND BIP ENTITY.
 The first version of this algorithm is complete, and pushed into production on  XX MM YYYY.   This algorithm delivers: 
-XXM LexID â€“ ProxID 
+XXM LexID Ã¢â‚¬â€œ ProxID 
 XXM LexID - POWID
-XXM LexID â€“ SELEID
-XXM LexID â€“ OrgID
+XXM LexID Ã¢â‚¬â€œ SELEID
+XXM LexID Ã¢â‚¬â€œ OrgID
 XXM LexID - UltID
 
 */
@@ -52,7 +52,7 @@ functionmacro
     ,{'Orgid'  ,count(Orgids_with_both_dids )  ,count(Orgids_with_vanity_Did )  ,count(Orgids_with_contact_Did )}
     ,{'Ultid'  ,count(Ultids_with_both_dids )  ,count(Ultids_with_vanity_Did )  ,count(Ultids_with_contact_Did )}
     
-  ],{string bip_id,unsigned countgroup,unsigned vanity_did,unsigned contact_did});  //countgroup is a count of both dids deduped per BIP ID
+  ],{string bip_id,unsigned countgroup,unsigned vanity_did,unsigned contact_did}) : independent;  //countgroup is a count of both dids deduped per BIP ID
 
   return Strata.macf_CreateXMLStats (ds_total ,'BIPV2','2.2'  ,pversion	,pEmail_List	,'VS_BIP_ID' ,'VANITY_LEXID'	,pIsTesting,pOverwrite);
 

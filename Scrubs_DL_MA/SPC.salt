@@ -1,4 +1,4 @@
-OPTIONS:-gh
+﻿OPTIONS:-gh
 MODULE:Scrubs_DL_MA
 FILENAME:In_MA
 // Uncomment up to NINES for internal or external adl
@@ -24,25 +24,25 @@ FIELDTYPE:invalid_numeric:ALLOW(0123456789)
 FIELDTYPE:invalid_alpha_num:ALLOW(0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ)
 FIELDTYPE:invalid_empty:LENGTHS(0)
 FIELDTYPE:invalid_wordbag:CAPS:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789):SPACES( <>{}[]()-^=!+&,./#*'\|")
-FIELDTYPE:invalid_8date:LENGTHS(8):CUSTOM(Scrubs.fn_valid_GeneralDate>0)
+FIELDTYPE:invalid_8date:LENGTHS(0,8):CUSTOM(Scrubs.fn_valid_GeneralDate>0)
 FIELDTYPE:invalid_8pastdate:LENGTHS(8):CUSTOM(Scrubs.fn_valid_pastDate>0)
 FIELDTYPE:invalid_08pastdate:LENGTHS(0,8):CUSTOM(Scrubs.fn_valid_pastDate>0)
 
-FIELDTYPE:invalid_pers_surrogate:LENGTHS(9):LIKE(invalid_numeric)
+FIELDTYPE:invalid_pers_surrogate:LENGTHS(9,10):LIKE(invalid_numeric)
 FIELDTYPE:invalid_license_licno:LENGTHS(9):CUSTOM(Scrubs_DL_MA.Functions.fn_verify_licno>0)
 FIELDTYPE:invalid_license_lic_class:LENGTHS(1,2):CUSTOM(Scrubs_DL_MA.Functions.fn_verify_lic_class>0)
 FIELDTYPE:invalid_license_height:CUSTOM(Scrubs_DL_MA.Functions.fn_verify_height>0)
 FIELDTYPE:invalid_license_sex:ENUM(F|M|U)
 FIELDTYPE:invalid_license_name:LIKE(invalid_wordbag):CUSTOM(Scrubs_DL_MA.Functions.fn_valid_name>0,license_first_name,license_middle_name)
 FIELDTYPE:invalid_licmail_state:LENGTHS(2):CUSTOM(Scrubs_DL_MA.Functions.fn_verify_state>0)
-FIELDTYPE:invalid_mailzip:LENGTHS(9):LIKE(invalid_numeric)
+FIELDTYPE:invalid_mailzip:LENGTHS(9):CUSTOM(Scrubs_DL_MA.Functions.fn_verify_zip>0,licmail_state)
 FIELDTYPE:invalid_licresi_state:LENGTHS(0,2):CUSTOM(Scrubs_DL_MA.Functions.fn_verify_state>0)
-FIELDTYPE:invalid_resizip:LENGTHS(0,9):LIKE(invalid_numeric)
+FIELDTYPE:invalid_resizip:LENGTHS(0,9):CUSTOM(Scrubs_DL_MA.Functions.fn_verify_zip>0,licresi_state)
 FIELDTYPE:invalid_license_status:ALLOW(/ACENPRSTUVX):LENGTHS(3,7)
 
 
 //FIELD DEFINITIONS
-FIELD:pers_surrogate:TYPE(STRING9):LIKE(invalid_pers_surrogate):0,0
+FIELD:pers_surrogate:TYPE(STRING10):LIKE(invalid_pers_surrogate):0,0
 FIELD:filler1:TYPE(STRING1):0,0
 FIELD:license_licno:TYPE(STRING9):LIKE(invalid_license_licno):0,0
 FIELD:filler2:TYPE(STRING1):0,0
@@ -66,7 +66,6 @@ FIELD:licresi_state:TYPE(STRING2):LIKE(invalid_licresi_state):0,0
 FIELD:licresi_zip:TYPE(STRING9):LIKE(invalid_resizip):0,0
 FIELD:issue_date_yyyymmdd:TYPE(STRING8):LIKE(invalid_08pastdate):0,0
 FIELD:license_status:TYPE(STRING7):LIKE(invalid_license_status):0,0
-FIELD:crlf:TYPE(STRING2):0,0
 FIELD:clean_status:TYPE(STRING3):0,0
 FIELD:process_date:TYPE(STRING8):LIKE(invalid_8pastdate):0,0
 // CONCEPT statements should be used to group together interellated fields; such as address

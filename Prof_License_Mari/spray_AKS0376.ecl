@@ -1,4 +1,4 @@
-// spray AKS0376 Professional Licenses Files for MARI	   
+﻿// spray AKS0376 Professional Licenses Files for MARI	   
 
 import ut
 	   ,_control
@@ -12,11 +12,11 @@ import ut
 //Files for S0376 are Located  //
 export spray_AKS0376 (string filedate) := MODULE
 
-#workunit('name','Spray AKS0376');
+#workunit('name','Yogurt:Spray AKS0376');
 
 shared filepath		    :=	'/data/data_build_5_2/MARI/in/AKS0376/' + filedate +'/';
 shared sourcepath		:=	'/data/data_build_5_2/MARI/';
-shared group_name	:=	'thor400_20';
+shared group_name	:=	Common_Prof_Lic_Mari.group_name;
 shared maxRecordSize	:=	8192;
 shared destination := Common_Prof_Lic_Mari.SourcesFolder + 'AKS0376::' + filedate + '::';
 shared superfile := '~thor_data400::in::proflic_mari::aks0376::using::occlic';

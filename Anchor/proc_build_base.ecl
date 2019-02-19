@@ -1,11 +1,11 @@
 ﻿IMPORT	ut, AID, AID_Support, DID_Add, address, NID, STD, PromoteSupers, PRTE2; //using a cleaning function in this repository;
-#WORKUNIT('name', 'Anchor Email Build');
-//#CONSTANT(AID_Support.Constants.StoredWhichAIDCache, AID_Support.Constants.eCache.ForNonHeader);
-//#STORED('did_add_force','thor');
+#WORKUNIT('name', 'Yogurt: Anchor Email Build');
+// #CONSTANT(AID_Support.Constants.StoredWhichAIDCache, AID_Support.Constants.eCache.ForNonHeader);
+// #STORED('did_add_force','thor');
 				
 EXPORT proc_build_base(STRING version) := FUNCTION
 	
-	dsBase			:= Anchor.Files.base_out;
+	dsBase			:= Anchor.Files.Base_BIP;
 	IngestPrep	:= Anchor.prep_ingest_file;
 
 	ingestMod		:= Anchor.Ingest(,,dsBase,IngestPrep);
@@ -13,7 +13,7 @@ EXPORT proc_build_base(STRING version) := FUNCTION
 	
 	//Populate current_rec based on whether or not record is in the new input file as this is a full replace
 	//Unknown = 1 Ancient = 2 Old = 3 Unchanged = 4 Updated = 5 New = 6
-	PopCurrentRec	:= Project(new_base, TRANSFORM(Anchor.Layouts.Base, self.current_rec := IF(LEFT.__Tpe in [2,3],FALSE,TRUE); self := LEFT; SELF:= [];));
+	PopCurrentRec	:= Project(new_base, TRANSFORM(Anchor.Layouts.Base_w_bip, self.current_rec := IF(LEFT.__Tpe in [2,3],FALSE,TRUE); self := LEFT; SELF:= [];));
 	
 	NID.Mac_CleanParsedNames(PopCurrentRec, FileClnName, 
 													firstname:=FirstName, lastname:=LastName, middlename := clean_mname, namesuffix := clean_name_suffix
@@ -30,7 +30,7 @@ EXPORT proc_build_base(STRING version) := FUNCTION
 	OUTPUT(pToRawLayout,,'~thor_data400::out::Anchor_invalid_names_'+version, OVERWRITE, __COMPRESSED__);
 	OUTPUT(COUNT(InvalidName),NAMED('TotalInvalidRecords_'+version));
 	
-	InputFileClnName	:= Project(FileClnName(nametype != 'I'), TRANSFORM(Anchor.Layouts.Base,
+	InputFileClnName	:= Project(FileClnName(nametype != 'I'), TRANSFORM(Anchor.Layouts.Base_w_bip,
 																																			BOOLEAN IsName	:=	LEFT.nametype IN person_flags OR
 																																													(LEFT.nametype = 'U' AND trim(LEFT.cln_fname) != '' AND TRIM(LEFT.cln_lname) != ''); 
 																																			SELF.clean_title				:=	IF(IsName, LEFT.cln_title, '');
@@ -45,7 +45,7 @@ EXPORT proc_build_base(STRING version) := FUNCTION
 		//AID process
 	unsigned4 lAIDFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;
 	
-	Anchor.Layouts.Base tProjectAIDClean_prep(Anchor.Layouts.Base pInput) := TRANSFORM
+	Anchor.Layouts.Base_w_bip tProjectAIDClean_prep(Anchor.Layouts.Base_w_bip pInput) := TRANSFORM
 	  clnFullAddr	:= STD.Str.CleanSpaces(pInput.address_1 +' '+ pInput.address_2);
 		self.Append_Prep_Address_Situs			:=	Address.fn_addr_clean_prep(clnFullAddr, 'first');
 		self.Append_Prep_Address_Last_Situs	:=	Address.fn_addr_clean_prep(pInput.city
@@ -56,14 +56,15 @@ EXPORT proc_build_base(STRING version) := FUNCTION
 
 	rsAIDCleanName	:= PROJECT(InputFileClnName ,tProjectAIDClean_prep(LEFT));
 	
-	rsAID_NoAddr		:=	rsAIDCleanName(TRIM(Append_Prep_Address_Situs) = '' OR TRIM(Append_Prep_Address_Last_Situs) = '' OR
-																																	STD.Str.Find(Append_Prep_Address_Situs, '@', 1) > 0);
-	rsAID_Addr			:=	rsAIDCleanName(TRIM(Append_Prep_Address_Situs) != '' AND TRIM(Append_Prep_Address_Last_Situs) != '');
+	rsAID_NoAddr		:=	rsAIDCleanName(TRIM(Append_Prep_Address_Situs) = '' OR TRIM(Append_Prep_Address_Last_Situs) = '' 
+																		 OR	STD.Str.Find(Append_Prep_Address_Situs, '@', 1) > 0);
+	rsAID_Addr			:=	rsAIDCleanName(TRIM(Append_Prep_Address_Situs) != '' AND TRIM(Append_Prep_Address_Last_Situs) != ''
+																			AND STD.Str.Find(Append_Prep_Address_Situs, '@', 1) = 0);
 	
-		AID.MacAppendFromRaw_2Line(rsAID_Addr,Append_Prep_Address_Situs, Append_Prep_Address_Last_Situs, RawAID,
+	AID.MacAppendFromRaw_2Line(rsAID_Addr,Append_Prep_Address_Situs, Append_Prep_Address_Last_Situs, RawAID,
 																											rsCleanAID, lAIDFlags);	
 	
-	Anchor.Layouts.Base tProjectClean(rsCleanAID pInput) := TRANSFORM
+	Anchor.Layouts.Base_w_bip tProjectClean(rsCleanAID pInput) := TRANSFORM
 	  SELF.prim_range           := pInput.aidwork_acecache.prim_range;
     SELF.predir               := pInput.aidwork_acecache.predir;
     SELF.prim_name            := pInput.aidwork_acecache.prim_name;
@@ -94,35 +95,35 @@ EXPORT proc_build_base(STRING version) := FUNCTION
     SELF  													:= pInput;		
 	END;
 
-	Anchor.Layouts.Base tProjectNoAddrClean(rsAID_NoAddr pInput) := TRANSFORM
+	Anchor.Layouts.Base_w_bip tProjectNoAddrClean(rsAID_NoAddr pInput) := TRANSFORM
 		cl_addr			:= Address.CleanAddress182(pInput.Append_Prep_Address_Situs, TRIM(pInput.city) + ' ' + TRIM(pInput.state) + ' ' + TRIM(pInput.ZipCode));
 		SELF.prim_range  	:=  cl_addr[1..10];
-		SELF.predir  					:=  cl_addr[11..12];
-		SELF.prim_name  		:=  cl_addr[13..40];
+		SELF.predir  			:=  cl_addr[11..12];
+		SELF.prim_name  	:=  cl_addr[13..40];
 		SELF.addr_suffix  :=  cl_addr[41..44];
-		SELF.postdir  				:=  cl_addr[45..46];
+		SELF.postdir  		:=  cl_addr[45..46];
 		SELF.unit_desig  	:=  cl_addr[47..56];
-		SELF.sec_range  		:=  cl_addr[57..64];
+		SELF.sec_range  	:=  cl_addr[57..64];
 		SELF.p_city_name  :=  cl_addr[65..89];
 		SELF.v_city_name  :=  cl_addr[90..114];
-		SELF.st  									:=  cl_addr[115..116];
-		SELF.zip  								:=  cl_addr[117..121];
-		SELF.zip4  							:=  cl_addr[122..125];
-		SELF.cart  							:=  cl_addr[126..129];
+		SELF.st  					:=  cl_addr[115..116];
+		SELF.zip  				:=  cl_addr[117..121];
+		SELF.zip4  				:=  cl_addr[122..125];
+		SELF.cart  				:=  cl_addr[126..129];
 		SELF.cr_sort_sz  	:=  cl_addr[130];
-		SELF.lot  								:=  cl_addr[131..134];
-		SELF.lot_order  		:=  cl_addr[135];
-		SELF.dbpc  							:=  cl_addr[136..137];
-		SELF.chk_digit  		:=  cl_addr[138];
-		SELF.rec_type  			:=  cl_addr[139..140];
-		SELF.county  					:=  cl_addr[141..145];
-		SELF.geo_lat  				:=  cl_addr[146..155];
-		SELF.geo_long  			:=  cl_addr[156..166];
-		SELF.msa  								:=  cl_addr[167..170];
-		SELF.geo_blk  				:=  cl_addr[171..177];
-		SELF.geo_match  		:=  cl_addr[178];
-		SELF.err_stat  			:=  cl_addr[179..182];
-		SELF  												:= pInput;		
+		SELF.lot  				:=  cl_addr[131..134];
+		SELF.lot_order  	:=  cl_addr[135];
+		SELF.dbpc  				:=  cl_addr[136..137];
+		SELF.chk_digit  	:=  cl_addr[138];
+		SELF.rec_type  		:=  cl_addr[139..140];
+		SELF.county  			:=  cl_addr[141..145];
+		SELF.geo_lat  		:=  cl_addr[146..155];
+		SELF.geo_long  		:=  cl_addr[156..166];
+		SELF.msa  				:=  cl_addr[167..170];
+		SELF.geo_blk  		:=  cl_addr[171..177];
+		SELF.geo_match  	:=  cl_addr[178];
+		SELF.err_stat  		:=  cl_addr[179..182];
+		SELF  						:= pInput;		
 	END;
 	
 	rsCleanAIDGoodAddr		:= PROJECT(rsCleanAID, tProjectClean(LEFT));
@@ -139,12 +140,46 @@ EXPORT proc_build_base(STRING version) := FUNCTION
 													foo, dob, clean_fname, clean_mname, clean_lname, clean_name_suffix, 
 													prim_range, prim_name, sec_range, zip, st, foo,
 													DID,   			
-													Anchor.Layouts.Base, 
+													Anchor.Layouts.Base_w_bip, 
 													true, DID_score,	//these should default to zero in definition
 													75,	  //dids with a score below here will be dropped 
 													rsCleanAID_DID);
 													
-		PromoteSupers.Mac_SF_BuildProcess(rsCleanAID_DID, Anchor.thor_cluster+'base::email::Anchor',build_base,3,,true);
+		//Add BIP fields
+	bdid_matchset	:= ['A'];
+	Business_Header_SS.MAC_Add_BDID_Flex(rsCleanAID_DID												// Input Dataset
+																			,bdid_matchset												// BDID Matchset what fields to match on
+																			,clean_cname													// company_name
+																			,prim_range       										// prim_range
+																			,prim_name	        									// prim_name
+																			,zip             											// zip5
+																			,sec_range         										// sec_range
+																			,st	              										// state
+																			,''																		// phone
+																			,''																		// fein
+																			,''																		// bdid
+																			,Anchor.Layouts.Base_w_bip						// output layout
+																			,FALSE 																// output layout has bdid score field?
+																			,''																		// bdid_score
+																			,dsBIP_out														// Output Dataset
+																			,																			// default threshold
+																			,																			// use prod version of superfiles
+																			,														 					// default is to hit prod from dataland, and on prod hit prod.	
+																			,[BIPV2.IDconstants.xlink_version_BIP]// create BIP keys only
+																			,URL																	// url
+																			,EmailAddress													// email 
+																			,v_city_name													// city
+																			,																			// fname
+																			,																			// mname
+																			,																			// lname
+																			,																			// contact ssn
+																			,																			// Source  MDR.sourceTools
+																			,rcid																	// Source_Record_Id
+																			,																			// Src_Matching_is_priorty
+																			);
+												
+													
+	PromoteSupers.Mac_SF_BuildProcess(dsBIP_out, Anchor.thor_cluster+'base::email::Anchor',build_base,3,,true);
 	
 	RETURN SEQUENTIAL(build_base, ingestMod.DoStats);
 

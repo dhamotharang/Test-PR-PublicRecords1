@@ -1,4 +1,4 @@
-import FAA; 
+﻿import FAA; 
 
 export FAA_Input_Layouts := module
 
@@ -213,4 +213,5 @@ export FAA_Input_Layouts := module
 	
 	end; //AutoKey
 
-end; //Layouts_FAA
+end: DEPRECATED('Use PRTE2_FAA.Layouts instead.');
+ //Layouts_FAA

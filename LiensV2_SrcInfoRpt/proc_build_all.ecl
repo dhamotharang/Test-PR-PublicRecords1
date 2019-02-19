@@ -3,9 +3,9 @@
 
 EXPORT	proc_Build_All(
 		STRING		pVersion			=	(STRING)STD.Date.Today()
-		,STRING		pServerIP			=	Constants().serverIP
-		,STRING		pDirectory		=	Constants().Directory
-		,STRING		pFilename			=	'*RiskView*'
+		,STRING		pServerIP			=	Constants(pVersion).serverIP
+		,STRING		pDirectory		=	Constants(pVersion).Directory
+		,STRING		pFilename			=	'*RiskView*csv'
 		,STRING		pGroupName		=	_Dataset().groupname
 		,BOOLEAN	pIsTesting		=	FALSE
 		,BOOLEAN	pOverwrite		=	FALSE
@@ -37,6 +37,7 @@ EXPORT	proc_Build_All(
 		BuildLogger.BaseEnd(FALSE),
 		BuildLogger.PostStart(FALSE),
 		LiensV2_SrcInfoRpt.QA_Records(),
+  LiensV2_SrcInfoRpt.QA_Stats(pversion);
 		// LiensV2_SrcInfoRpt.Strata_Population_Stats(	pversion,
 																								// pIsTesting).All,
 		BuildLogger.PostEnd(FALSE),

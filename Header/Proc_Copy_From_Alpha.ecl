@@ -1,330 +1,186 @@
-IMPORT ut;
+﻿IMPORT STD,header,ut,_control,wk_ut;
 
-EXPORT Proc_Copy_From_Alpha := MODULE // previously known as Header.Mod_XlabKeys
+EXPORT Proc_Copy_From_Alpha := module
 
-EXPORT getVname (string superfile, string v_end = ':') := FUNCTION
+SHARED filedate:=header.version_build;
 
-	FileName:=fileservices.GetSuperFileSubName(superfile,1);
-	v_strt  := stringlib.stringfind(FileName,'20',1);
-	v_endd	:= stringlib.stringfind(FileName[v_strt..],v_end,1);
-	v_name  := FileName[v_strt..v_strt+if(v_endd<1,length(FileName),v_endd)-2];
+SHARED linking_keys := dataset ( [ 
 
-	RETURN v_name;
+                            {'thor_data400::key::insuranceheader_segmentation::<<version>>::did_ind','thor_data400::key::insuranceheader_segmentation::did_ind_qa'},
+                            {'thor_data400::key::insuranceheader_xlink::<<version>>::did::refs::address',''},
+                            {'thor_data400::key::insuranceheader_xlink::<<version>>::did::refs::dln',''},
+                            {'thor_data400::key::insuranceheader_xlink::<<version>>::did::refs::dob',''},
+                            {'thor_data400::key::insuranceheader_xlink::<<version>>::did::refs::dobf',''},
+                            {'thor_data400::key::insuranceheader_xlink::<<version>>::did::refs::lfz',''},
+                            {'thor_data400::key::insuranceheader_xlink::<<version>>::did::refs::name',''},
+                            {'thor_data400::key::insuranceheader_xlink::<<version>>::did::refs::ph',''},
+                            {'thor_data400::key::insuranceheader_xlink::<<version>>::did::refs::ssn',''},
+                            {'thor_data400::key::insuranceheader_xlink::<<version>>::did::refs::ssn4',''},
+                            {'thor_data400::key::insuranceheader_xlink::<<version>>::did::refs::zip_pr',''},
+                            {'thor_data400::key::insuranceheader_xlink::<<version>>::did::refs::relative',''},
+                            {'thor_data400::key::insuranceheader_xlink::<<version>>::did::sup::rid',''}
+                            
+                         ] , {string nm,string src_name});
+                         
+SHARED base_relative := dataset ([
 
-END;
-EXPORT getWuidx (string superfile) := FUNCTION
-	FileName:=fileservices.GetSuperFileSubName(superfile,1);
-	wName := regexfind('[W|w]2[0-9]{7}-[0-9]{6}',FileName,0);
-	RETURN wName;
-END;
+                            {'thor_data400::base::insuranceheader::<<version>>::relatives_v3','thor_data400::base::insurance_header::relative'}
+                            
+                         ] , {string nm,string src_name});
 
-shared AlphaSegDate:=getVname(ut.foreign_aprod+'thor_data400::key::insuranceheader_segmentation::did_ind_qa');
-shared AlphaLabDate:=getVname(ut.foreign_aprod+'thor_data400::key::insuranceheader_xlink::qa::did::refs::name');
-shared AlphaLabRldt:=getVname(ut.foreign_aprod+'thor_data400::key::insuranceheader_xlink::qa::did::refs::relative');
-shared AlphaRelDate:=getVname(ut.foreign_aprod+'thor_data400::key::relatives_v3_qa');
-shared AlphaRelBsfx:=getVname(ut.foreign_aprod+'thor_data400::base::insurance_header::relative');
-shared AlphaDl_Date:=getVname(ut.foreign_aprod+'thor_data400::key::insuranceheader::qa::dln');
-shared AlphaPs_wuid:=getWuidx(ut.foreign_aprod+'thor_data400::key::insuranceheader::allpossiblessns::qa');
-shared AlphaUnqAddrDt:=getVname(ut.foreign_aprod+'thor_data400::key::insuranceheader::unique_addresses::expanded');
-shared AlphaUnqFcAddrDt:=getVname(ut.foreign_aprod+'thor_data400::key::insuranceheader::unique_addresses::expanded_fcra');
+SHARED additional_keys:= dataset ([
 
+                            {'thor_data400::key::header::<<version>>::relatives_v3','thor_data400::key::relatives_v3_qa'},
+                            {'thor_data400::key::insuranceheader::<<version>>::did',''},
+                            {'thor_data400::key::insuranceheader::<<version>>::dln',''},
+                            {'thor_data400::key::insuranceheader::<<version>>::allpossiblessns','thor_data400::key::insuranceheader::allpossiblessns::qa'}                            
+                         ] , {string nm,string src_name});
 
-EXPORT
- Copy
-	:=
-sequential
-(
+SHARED allAlphaFils := linking_keys + base_relative + additional_keys;
+// ************************************************************************************************************************************
 
- output(AlphaSegDate,named('AlphaSegDate'))
-,output(AlphaLabDate,named('AlphaLabDate'))
-,output(AlphaLabRldt,named('AlphaLabRldt'))
-,output(AlphaRelDate,named('AlphaRelDate'))
-,output(AlphaRelBsfx,named('AlphaRelBsfx'))
-,output(AlphaDl_Date,named('AlphaDl_Date'))
-,output(AlphaPs_wuid,named('AlphaPs_wuid'))
+SHARED ver(string nm,string new_ver, string clstr='') := 
+    
+    regexreplace('<<version>>',if(clstr=''
+                                 ,nm
+                                 ,regexreplace('thor_data400',nm,clstr)),new_ver);
 
-// copy from alpharetta to thor400_60
-,fileservices.fcopy(ut.foreign_aprod+'thor_data400::key::insuranceheader_segmentation::'+AlphaSegDate+'::did_ind','thor400_60','~thor_data400::key::insuranceheader_segmentation::'+header.version_build+'::did_ind',,,,,true,,true)
-,fileservices.fcopy(ut.foreign_aprod+'thor_data400::key::insuranceheader_xlink::'+AlphaLabDate+'::did::refs::address','thor400_60','~thor_data400::key::insuranceheader_xlink::'+header.version_build+'::did::refs::address',,,,,true,,true)
-,fileservices.fcopy(ut.foreign_aprod+'thor_data400::key::insuranceheader_xlink::'+AlphaLabDate+'::did::refs::dln','thor400_60','~thor_data400::key::insuranceheader_xlink::'+header.version_build+'::did::refs::dln',,,,,true,,true)
-,fileservices.fcopy(ut.foreign_aprod+'thor_data400::key::insuranceheader_xlink::'+AlphaLabDate+'::did::refs::dob','thor400_60','~thor_data400::key::insuranceheader_xlink::'+header.version_build+'::did::refs::dob',,,,,true,,true)
-,fileservices.fcopy(ut.foreign_aprod+'thor_data400::key::insuranceheader_xlink::'+AlphaLabDate+'::did::refs::lfz','thor400_60','~thor_data400::key::insuranceheader_xlink::'+header.version_build+'::did::refs::lfz',,,,,true,,true)
-,fileservices.fcopy(ut.foreign_aprod+'thor_data400::key::insuranceheader_xlink::'+AlphaLabDate+'::did::refs::name','thor400_60','~thor_data400::key::insuranceheader_xlink::'+header.version_build+'::did::refs::name',,,,,true,,true)
-,fileservices.fcopy(ut.foreign_aprod+'thor_data400::key::insuranceheader_xlink::'+AlphaLabDate+'::did::refs::ph','thor400_60','~thor_data400::key::insuranceheader_xlink::'+header.version_build+'::did::refs::ph',,,,,true,,true)
-,fileservices.fcopy(ut.foreign_aprod+'thor_data400::key::insuranceheader_xlink::'+AlphaLabDate+'::did::refs::ssn','thor400_60','~thor_data400::key::insuranceheader_xlink::'+header.version_build+'::did::refs::ssn',,,,,true,,true)
-,fileservices.fcopy(ut.foreign_aprod+'thor_data400::key::insuranceheader_xlink::'+AlphaLabDate+'::did::refs::ssn4','thor400_60','~thor_data400::key::insuranceheader_xlink::'+header.version_build+'::did::refs::ssn4',,,,,true,,true)
-,fileservices.fcopy(ut.foreign_aprod+'thor_data400::key::insuranceheader_xlink::'+AlphaLabDate+'::did::refs::zip_pr','thor400_60','~thor_data400::key::insuranceheader_xlink::'+header.version_build+'::did::refs::zip_pr',,,,,true,,true)
-,fileservices.fcopy(ut.foreign_aprod+'thor_data400::key::insuranceheader_xlink::'+AlphaLabRldt+'::did::refs::relative','thor400_60','~thor_data400::key::insuranceheader_xlink::'+header.version_build+'::did::refs::relative',,,,,true,,true)
-,fileservices.fcopy(ut.foreign_aprod+'thor_data400::base::insurance_header::relative'+AlphaRelBsfx+'','thor400_60',              '~thor_data400::base::insurance_header::'+header.version_build+'::relative',,,,,true,,true)
+// ************************************************************************************************************************************
+SHARED copy_files(string nm, string src_name, string dest_clstr,string src_alpha, string agmntName=dest_clstr) := function
 
-// clear BUILT content
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_segmentation::did_ind_built',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_xlink::built::did::refs::address',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_xlink::built::did::refs::dln',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_xlink::built::did::refs::dob',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_xlink::built::did::refs::lfz',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_xlink::built::did::refs::name',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_xlink::built::did::refs::ph',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_xlink::built::did::refs::ssn',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_xlink::built::did::refs::ssn4',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_xlink::built::did::refs::zip_pr',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_xlink::built::did::refs::relative',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::base::insuranceheader::built::relatives_v3',true)
-
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_segmentation::did_ind_built')
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_xlink::built::did::refs::address')
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_xlink::built::did::refs::dln')
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_xlink::built::did::refs::dob')
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_xlink::built::did::refs::lfz')
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_xlink::built::did::refs::name')
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_xlink::built::did::refs::ph')
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_xlink::built::did::refs::ssn')
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_xlink::built::did::refs::ssn4')
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_xlink::built::did::refs::zip_pr')
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_xlink::built::did::refs::relative')
-,fileservices.clearsuperfile('~thor_data400::base::insuranceheader::built::relatives_v3')
-
-// move new version in thor400_60 to thor400_60 BUILT
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_segmentation::did_ind_built','~thor_data400::key::insuranceheader_segmentation::'+header.version_build+'::did_ind')
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_xlink::built::did::refs::address','~thor_data400::key::insuranceheader_xlink::'+header.version_build+'::did::refs::address')
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_xlink::built::did::refs::dln','~thor_data400::key::insuranceheader_xlink::'+header.version_build+'::did::refs::dln')
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_xlink::built::did::refs::dob','~thor_data400::key::insuranceheader_xlink::'+header.version_build+'::did::refs::dob')
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_xlink::built::did::refs::lfz','~thor_data400::key::insuranceheader_xlink::'+header.version_build+'::did::refs::lfz')
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_xlink::built::did::refs::name','~thor_data400::key::insuranceheader_xlink::'+header.version_build+'::did::refs::name')
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_xlink::built::did::refs::ph','~thor_data400::key::insuranceheader_xlink::'+header.version_build+'::did::refs::ph')
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_xlink::built::did::refs::ssn','~thor_data400::key::insuranceheader_xlink::'+header.version_build+'::did::refs::ssn')
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_xlink::built::did::refs::ssn4','~thor_data400::key::insuranceheader_xlink::'+header.version_build+'::did::refs::ssn4')
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_xlink::built::did::refs::zip_pr','~thor_data400::key::insuranceheader_xlink::'+header.version_build+'::did::refs::zip_pr')
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_xlink::built::did::refs::relative','~thor_data400::key::insuranceheader_xlink::'+header.version_build+'::did::refs::relative')
-,fileservices.addsuperfile('~thor_data400::base::insuranceheader::built::relatives_v3','~thor_data400::base::insurance_header::'+header.version_build+'::relative')
-
-// copy to thor400_44
-,fileservices.fcopy('~thor_data400::key::insuranceheader_segmentation::'+header.version_build+'::did_ind','thor400_44','~thor400_44::key::insuranceheader_segmentation::'+header.version_build+'::did_ind',,,,,true,,true)
-,fileservices.fcopy('~thor_data400::key::insuranceheader_xlink::'+header.version_build+'::did::refs::address','thor400_44','~thor400_44::key::insuranceheader_xlink::'+header.version_build+'::did::refs::address',,,,,true,,true)
-,fileservices.fcopy('~thor_data400::key::insuranceheader_xlink::'+header.version_build+'::did::refs::dln','thor400_44','~thor400_44::key::insuranceheader_xlink::'+header.version_build+'::did::refs::dln',,,,,true,,true)
-,fileservices.fcopy('~thor_data400::key::insuranceheader_xlink::'+header.version_build+'::did::refs::dob','thor400_44','~thor400_44::key::insuranceheader_xlink::'+header.version_build+'::did::refs::dob',,,,,true,,true)
-,fileservices.fcopy('~thor_data400::key::insuranceheader_xlink::'+header.version_build+'::did::refs::lfz','thor400_44','~thor400_44::key::insuranceheader_xlink::'+header.version_build+'::did::refs::lfz',,,,,true,,true)
-,fileservices.fcopy('~thor_data400::key::insuranceheader_xlink::'+header.version_build+'::did::refs::name','thor400_44','~thor400_44::key::insuranceheader_xlink::'+header.version_build+'::did::refs::name',,,,,true,,true)
-,fileservices.fcopy('~thor_data400::key::insuranceheader_xlink::'+header.version_build+'::did::refs::ph','thor400_44','~thor400_44::key::insuranceheader_xlink::'+header.version_build+'::did::refs::ph',,,,,true,,true)
-,fileservices.fcopy('~thor_data400::key::insuranceheader_xlink::'+header.version_build+'::did::refs::ssn','thor400_44','~thor400_44::key::insuranceheader_xlink::'+header.version_build+'::did::refs::ssn',,,,,true,,true)
-,fileservices.fcopy('~thor_data400::key::insuranceheader_xlink::'+header.version_build+'::did::refs::ssn4','thor400_44','~thor400_44::key::insuranceheader_xlink::'+header.version_build+'::did::refs::ssn4',,,,,true,,true)
-,fileservices.fcopy('~thor_data400::key::insuranceheader_xlink::'+header.version_build+'::did::refs::zip_pr','thor400_44','~thor400_44::key::insuranceheader_xlink::'+header.version_build+'::did::refs::zip_pr',,,,,true,,true)
-,fileservices.fcopy('~thor_data400::key::insuranceheader_xlink::'+header.version_build+'::did::refs::relative','thor400_44','~thor400_44::key::insuranceheader_xlink::'+header.version_build+'::did::refs::relative',,,,,true,,true)
-
-);
-
-EXPORT copyOthers := sequential(
-
-// copy from alpharetta to thor400_60
-fileservices.fcopy(ut.foreign_aprod+'thor_data400::key::insurance_header::'     +AlphaRelDate+'::relatives_v3','thor400_60',     '~thor_data400::key::header::'+header.version_build+'::relatives_v3',,,,,true,,true)
-,fileservices.fcopy(ut.foreign_aprod+'thor_data400::key::insuranceheader::'+AlphaDl_Date+'::did','thor400_60',              '~thor_data400::key::insuranceheader::'+header.version_build+'::did',,,,,true,,true)
-,fileservices.fcopy(ut.foreign_aprod+'thor_data400::key::insuranceheader::'+AlphaDl_Date+'::dln','thor400_60',              '~thor_data400::key::insuranceheader::'+header.version_build+'::dln',,,,,true,,true)
-,fileservices.fcopy(ut.foreign_aprod+'thor_data400::key::insuranceheader::allpossiblessns::'+AlphaPs_wuid,'thor400_60','~thor_data400::key::insuranceheader::'+header.version_build+'::allpossiblessns',,,,,true,,true)
-,fileservices.fcopy(ut.foreign_aprod+'thor_data400::key::insuranceheader::unique_addresses::expanded_'+AlphaUnqAddrDt,'thor400_60','~thor_data400::key::header::'+header.version_build+'::addr_unique_expanded',,,,,true,,true)
-,fileservices.fcopy(ut.foreign_aprod+'thor_data400::key::insuranceheader::unique_addresses::expanded_fcra_'+AlphaUnqFcAddrDt,'thor400_60',              '~thor_data400::key::fcra::header::'+header.version_build+'::addr_unique_expanded',,,,,true,,true)
-
-// clear BUILT content
-,fileservices.RemoveOwnedSubFiles('~thor_data400::key::insuranceheader::built::relatives_v3',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::key::insuranceheader::built::did',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::key::insuranceheader::built::dln',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::key::insuranceheader::built::allpossiblessns',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::key::header::built::addr_unique_expanded',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::key::fcra::header::built::addr_unique_expanded',true)
-
-,fileservices.clearsuperfile('~thor_data400::key::insuranceheader::built::relatives_v3')
-,fileservices.clearsuperfile('~thor_data400::key::insuranceheader::built::did')
-,fileservices.clearsuperfile('~thor_data400::key::insuranceheader::built::dln')
-,fileservices.clearsuperfile('~thor_data400::key::insuranceheader::built::allpossiblessns')
-,fileservices.clearsuperfile('~thor_data400::key::header::built::addr_unique_expanded')
-,fileservices.clearsuperfile('~thor_data400::key::fcra::header::built::addr_unique_expanded')
-
-// move new version in thor400_60 to thor400_60 BUILT
-,fileservices.addsuperfile('~thor_data400::key::insuranceheader::built::relatives_v3','~thor_data400::key::header::'+header.version_build+'::relatives_v3')
-,fileservices.addsuperfile('~thor_data400::key::insuranceheader::built::did','~thor_data400::key::insuranceheader::'+header.version_build+'::did')
-,fileservices.addsuperfile('~thor_data400::key::insuranceheader::built::dln','~thor_data400::key::insuranceheader::'+header.version_build+'::dln')
-,fileservices.addsuperfile('~thor_data400::key::insuranceheader::built::allpossiblessns','~thor_data400::key::insuranceheader::'+header.version_build+'::allpossiblessns')
-,fileservices.addsuperfile('~thor_data400::key::header::built::addr_unique_expanded','~thor_data400::key::header::'+header.version_build+'::addr_unique_expanded')
-,fileservices.addsuperfile('~thor_data400::key::fcra::header::built::addr_unique_expanded','~thor_data400::key::fcra::header::'+header.version_build+'::addr_unique_expanded')
-
-);
-
-EXPORT
- MoveToQA
-	:=
-sequential
-(
-// clear thor400_60 FATHER content
-fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_segmentation::did_ind_father',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_xlink::father::did::refs::address',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_xlink::father::did::refs::dln',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_xlink::father::did::refs::dob',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_xlink::father::did::refs::lfz',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_xlink::father::did::refs::name',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_xlink::father::did::refs::ph',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_xlink::father::did::refs::ssn',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_xlink::father::did::refs::ssn4',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_xlink::father::did::refs::zip_pr',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_xlink::father::did::refs::relative',true)
-
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_segmentation::did_ind_father')
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_xlink::father::did::refs::address')
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_xlink::father::did::refs::dln')
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_xlink::father::did::refs::dob')
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_xlink::father::did::refs::lfz')
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_xlink::father::did::refs::name')
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_xlink::father::did::refs::ph')
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_xlink::father::did::refs::ssn')
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_xlink::father::did::refs::ssn4')
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_xlink::father::did::refs::zip_pr')
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_xlink::father::did::refs::relative')
-
-// move thor400_60 QA content to FATHER
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_segmentation::did_ind_father','~thor_data400::key::insuranceheader_segmentation::did_ind_qa',,true)
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_xlink::father::did::refs::address','~thor_data400::key::insuranceheader_xlink::qa::did::refs::address',,true)
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_xlink::father::did::refs::dln','~thor_data400::key::insuranceheader_xlink::qa::did::refs::dln',,true)
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_xlink::father::did::refs::dob','~thor_data400::key::insuranceheader_xlink::qa::did::refs::dob',,true)
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_xlink::father::did::refs::lfz','~thor_data400::key::insuranceheader_xlink::qa::did::refs::lfz',,true)
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_xlink::father::did::refs::name','~thor_data400::key::insuranceheader_xlink::qa::did::refs::name',,true)
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_xlink::father::did::refs::ph','~thor_data400::key::insuranceheader_xlink::qa::did::refs::ph',,true)
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_xlink::father::did::refs::ssn','~thor_data400::key::insuranceheader_xlink::qa::did::refs::ssn',,true)
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_xlink::father::did::refs::ssn4','~thor_data400::key::insuranceheader_xlink::qa::did::refs::ssn4',,true)
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_xlink::father::did::refs::zip_pr','~thor_data400::key::insuranceheader_xlink::qa::did::refs::zip_pr',,true)
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_xlink::father::did::refs::relative','~thor_data400::key::insuranceheader_xlink::qa::did::refs::relative',,true)
-
-// clear thor400_60 and thor_data400 QA content
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_segmentation::did_ind_qa',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_xlink::qa::did::refs::address',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_xlink::qa::did::refs::dln',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_xlink::qa::did::refs::dob',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_xlink::qa::did::refs::lfz',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_xlink::qa::did::refs::name',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_xlink::qa::did::refs::ph',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_xlink::qa::did::refs::ssn',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_xlink::qa::did::refs::ssn4',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_xlink::qa::did::refs::zip_pr',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_60::key::insuranceheader_xlink::qa::did::refs::relative',true)
-
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_segmentation::did_ind_qa')
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_xlink::qa::did::refs::address')
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_xlink::qa::did::refs::dln')
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_xlink::qa::did::refs::dob')
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_xlink::qa::did::refs::lfz')
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_xlink::qa::did::refs::name')
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_xlink::qa::did::refs::ph')
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_xlink::qa::did::refs::ssn')
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_xlink::qa::did::refs::ssn4')
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_xlink::qa::did::refs::zip_pr')
-,fileservices.clearsuperfile('~thor400_60::key::insuranceheader_xlink::qa::did::refs::relative')
-
-,fileservices.RemoveOwnedSubFiles('~thor_data400::key::insuranceheader_segmentation::did_ind_qa',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::key::insuranceheader_xlink::qa::did::refs::address',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::key::insuranceheader_xlink::qa::did::refs::dln',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::key::insuranceheader_xlink::qa::did::refs::dob',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::key::insuranceheader_xlink::qa::did::refs::lfz',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::key::insuranceheader_xlink::qa::did::refs::name',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::key::insuranceheader_xlink::qa::did::refs::ph',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::key::insuranceheader_xlink::qa::did::refs::ssn',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::key::insuranceheader_xlink::qa::did::refs::ssn4',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::key::insuranceheader_xlink::qa::did::refs::zip_pr',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::key::insuranceheader_xlink::qa::did::refs::relative',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::key::relatives_v3_qa',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::base::relatives_insurance::boca_copy',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::key::insuranceheader::qa::did',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::key::insuranceheader::qa::dln',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::key::insuranceheader::qa::allpossiblessns',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::key::header::qa::addr_unique_expanded',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::key::fcra::header::qa::addr_unique_expanded',true)
-
-,fileservices.clearsuperfile('~thor_data400::key::insuranceheader_segmentation::did_ind_qa')
-,fileservices.clearsuperfile('~thor_data400::key::insuranceheader_xlink::qa::did::refs::address')
-,fileservices.clearsuperfile('~thor_data400::key::insuranceheader_xlink::qa::did::refs::dln')
-,fileservices.clearsuperfile('~thor_data400::key::insuranceheader_xlink::qa::did::refs::dob')
-,fileservices.clearsuperfile('~thor_data400::key::insuranceheader_xlink::qa::did::refs::lfz')
-,fileservices.clearsuperfile('~thor_data400::key::insuranceheader_xlink::qa::did::refs::name')
-,fileservices.clearsuperfile('~thor_data400::key::insuranceheader_xlink::qa::did::refs::ph')
-,fileservices.clearsuperfile('~thor_data400::key::insuranceheader_xlink::qa::did::refs::ssn')
-,fileservices.clearsuperfile('~thor_data400::key::insuranceheader_xlink::qa::did::refs::ssn4')
-,fileservices.clearsuperfile('~thor_data400::key::insuranceheader_xlink::qa::did::refs::zip_pr')
-,fileservices.clearsuperfile('~thor_data400::key::insuranceheader_xlink::qa::did::refs::relative')
-,fileservices.clearsuperfile('~thor_data400::key::relatives_v3_qa')
-,fileservices.clearsuperfile('~thor_data400::base::relatives_insurance::boca_copy')
-,fileservices.clearsuperfile('~thor_data400::key::insuranceheader::qa::did')
-,fileservices.clearsuperfile('~thor_data400::key::insuranceheader::qa::dln')
-,fileservices.clearsuperfile('~thor_data400::key::insuranceheader::qa::allpossiblessns')
-,fileservices.clearsuperfile('~thor_data400::key::header::qa::addr_unique_expanded')
-,fileservices.clearsuperfile('~thor_data400::key::fcra::header::qa::addr_unique_expanded')
-
-// move thor400_60 BUILT content to thor400_60 and thor_data400 QA
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_segmentation::did_ind_qa','~thor400_60::key::insuranceheader_segmentation::did_ind_built',,true)
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_xlink::qa::did::refs::address','~thor400_60::key::insuranceheader_xlink::built::did::refs::address',,true)
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_xlink::qa::did::refs::dln','~thor400_60::key::insuranceheader_xlink::built::did::refs::dln',,true)
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_xlink::qa::did::refs::dob','~thor400_60::key::insuranceheader_xlink::built::did::refs::dob',,true)
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_xlink::qa::did::refs::lfz','~thor400_60::key::insuranceheader_xlink::built::did::refs::lfz',,true)
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_xlink::qa::did::refs::name','~thor400_60::key::insuranceheader_xlink::built::did::refs::name',,true)
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_xlink::qa::did::refs::ph','~thor400_60::key::insuranceheader_xlink::built::did::refs::ph',,true)
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_xlink::qa::did::refs::ssn','~thor400_60::key::insuranceheader_xlink::built::did::refs::ssn',,true)
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_xlink::qa::did::refs::ssn4','~thor400_60::key::insuranceheader_xlink::built::did::refs::ssn4',,true)
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_xlink::qa::did::refs::zip_pr','~thor400_60::key::insuranceheader_xlink::built::did::refs::zip_pr',,true)
-,fileservices.addsuperfile('~thor400_60::key::insuranceheader_xlink::qa::did::refs::relative','~thor400_60::key::insuranceheader_xlink::built::did::refs::relative',,true)
-
-,fileservices.addsuperfile('~thor_data400::key::insuranceheader_segmentation::did_ind_qa','~thor400_60::key::insuranceheader_segmentation::did_ind_built',,true)
-,fileservices.addsuperfile('~thor_data400::key::insuranceheader_xlink::qa::did::refs::address','~thor400_60::key::insuranceheader_xlink::built::did::refs::address',,true)
-,fileservices.addsuperfile('~thor_data400::key::insuranceheader_xlink::qa::did::refs::dln','~thor400_60::key::insuranceheader_xlink::built::did::refs::dln',,true)
-,fileservices.addsuperfile('~thor_data400::key::insuranceheader_xlink::qa::did::refs::dob','~thor400_60::key::insuranceheader_xlink::built::did::refs::dob',,true)
-,fileservices.addsuperfile('~thor_data400::key::insuranceheader_xlink::qa::did::refs::lfz','~thor400_60::key::insuranceheader_xlink::built::did::refs::lfz',,true)
-,fileservices.addsuperfile('~thor_data400::key::insuranceheader_xlink::qa::did::refs::name','~thor400_60::key::insuranceheader_xlink::built::did::refs::name',,true)
-,fileservices.addsuperfile('~thor_data400::key::insuranceheader_xlink::qa::did::refs::ph','~thor400_60::key::insuranceheader_xlink::built::did::refs::ph',,true)
-,fileservices.addsuperfile('~thor_data400::key::insuranceheader_xlink::qa::did::refs::ssn','~thor400_60::key::insuranceheader_xlink::built::did::refs::ssn',,true)
-,fileservices.addsuperfile('~thor_data400::key::insuranceheader_xlink::qa::did::refs::ssn4','~thor400_60::key::insuranceheader_xlink::built::did::refs::ssn4',,true)
-,fileservices.addsuperfile('~thor_data400::key::insuranceheader_xlink::qa::did::refs::zip_pr','~thor400_60::key::insuranceheader_xlink::built::did::refs::zip_pr',,true)
-,fileservices.addsuperfile('~thor_data400::key::insuranceheader_xlink::qa::did::refs::relative','~thor400_60::key::insuranceheader_xlink::built::did::refs::relative',,true)
-
-,fileservices.addsuperfile('~thor_data400::base::relatives_insurance::boca_copy','~thor_data400::base::insuranceheader::built::relatives_v3',,true)
-,fileservices.addsuperfile('~thor_data400::key::relatives_v3_qa','~thor_data400::key::insuranceheader::built::relatives_v3',,true)
-,fileservices.addsuperfile('~thor_data400::key::insuranceheader::qa::did','~thor_data400::key::insuranceheader::built::did',,true)
-,fileservices.addsuperfile('~thor_data400::key::insuranceheader::qa::dln','~thor_data400::key::insuranceheader::built::dln',,true)
-,fileservices.addsuperfile('~thor_data400::key::insuranceheader::qa::allpossiblessns','~thor_data400::key::insuranceheader::built::allpossiblessns',,true)
-,fileservices.addsuperfile('~thor_data400::key::header::qa::addr_unique_expanded','~thor_data400::key::header::built::addr_unique_expanded',,true)
-,fileservices.addsuperfile('~thor_data400::key::fcra::header::qa::addr_unique_expanded','~thor_data400::key::fcra::header::built::addr_unique_expanded',,true)
-
-// clear thor400_44 QA content
-,fileservices.RemoveOwnedSubFiles('~thor400_44::key::insuranceheader_segmentation::did_ind_qa',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_44::key::insuranceheader_xlink::qa::did::refs::address',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_44::key::insuranceheader_xlink::qa::did::refs::dln',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_44::key::insuranceheader_xlink::qa::did::refs::dob',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_44::key::insuranceheader_xlink::qa::did::refs::lfz',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_44::key::insuranceheader_xlink::qa::did::refs::name',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_44::key::insuranceheader_xlink::qa::did::refs::ph',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_44::key::insuranceheader_xlink::qa::did::refs::ssn',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_44::key::insuranceheader_xlink::qa::did::refs::ssn4',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_44::key::insuranceheader_xlink::qa::did::refs::zip_pr',true)
-,fileservices.RemoveOwnedSubFiles('~thor400_44::key::insuranceheader_xlink::qa::did::refs::relative',true)
-
-,fileservices.clearsuperfile('~thor400_44::key::insuranceheader_segmentation::did_ind_qa')
-,fileservices.clearsuperfile('~thor400_44::key::insuranceheader_xlink::qa::did::refs::address')
-,fileservices.clearsuperfile('~thor400_44::key::insuranceheader_xlink::qa::did::refs::dln')
-,fileservices.clearsuperfile('~thor400_44::key::insuranceheader_xlink::qa::did::refs::dob')
-,fileservices.clearsuperfile('~thor400_44::key::insuranceheader_xlink::qa::did::refs::lfz')
-,fileservices.clearsuperfile('~thor400_44::key::insuranceheader_xlink::qa::did::refs::name')
-,fileservices.clearsuperfile('~thor400_44::key::insuranceheader_xlink::qa::did::refs::ph')
-,fileservices.clearsuperfile('~thor400_44::key::insuranceheader_xlink::qa::did::refs::ssn')
-,fileservices.clearsuperfile('~thor400_44::key::insuranceheader_xlink::qa::did::refs::ssn4')
-,fileservices.clearsuperfile('~thor400_44::key::insuranceheader_xlink::qa::did::refs::zip_pr')
-,fileservices.clearsuperfile('~thor400_44::key::insuranceheader_xlink::qa::did::refs::relative')
-
-// move new version on thor400_44 to thor400_44 superfiles
-,fileservices.addsuperfile('~thor400_44::key::insuranceheader_segmentation::did_ind_qa','~thor400_44::key::insuranceheader_segmentation::'+header.version_build+'::did_ind')
-,fileservices.addsuperfile('~thor400_44::key::insuranceheader_xlink::qa::did::refs::address','~thor400_44::key::insuranceheader_xlink::'+header.version_build+'::did::refs::address')
-,fileservices.addsuperfile('~thor400_44::key::insuranceheader_xlink::qa::did::refs::dln','~thor400_44::key::insuranceheader_xlink::'+header.version_build+'::did::refs::dln')
-,fileservices.addsuperfile('~thor400_44::key::insuranceheader_xlink::qa::did::refs::dob','~thor400_44::key::insuranceheader_xlink::'+header.version_build+'::did::refs::dob')
-,fileservices.addsuperfile('~thor400_44::key::insuranceheader_xlink::qa::did::refs::lfz','~thor400_44::key::insuranceheader_xlink::'+header.version_build+'::did::refs::lfz')
-,fileservices.addsuperfile('~thor400_44::key::insuranceheader_xlink::qa::did::refs::name','~thor400_44::key::insuranceheader_xlink::'+header.version_build+'::did::refs::name')
-,fileservices.addsuperfile('~thor400_44::key::insuranceheader_xlink::qa::did::refs::ph','~thor400_44::key::insuranceheader_xlink::'+header.version_build+'::did::refs::ph')
-,fileservices.addsuperfile('~thor400_44::key::insuranceheader_xlink::qa::did::refs::ssn','~thor400_44::key::insuranceheader_xlink::'+header.version_build+'::did::refs::ssn')
-,fileservices.addsuperfile('~thor400_44::key::insuranceheader_xlink::qa::did::refs::ssn4','~thor400_44::key::insuranceheader_xlink::'+header.version_build+'::did::refs::ssn4')
-,fileservices.addsuperfile('~thor400_44::key::insuranceheader_xlink::qa::did::refs::zip_pr','~thor400_44::key::insuranceheader_xlink::'+header.version_build+'::did::refs::zip_pr')
-,fileservices.addsuperfile('~thor400_44::key::insuranceheader_xlink::qa::did::refs::relative','~thor400_44::key::insuranceheader_xlink::'+header.version_build+'::did::refs::relative')
-
-);
+    src_spr         := if(src_name='',nm,src_name); // if the source file has a different format it's in src_name
+    alpha_logical1   := STD.File.SuperFileContents(ut.foreign_aprod+ver(src_spr,'full'))[1].name;
+    alpha_logical2   := STD.File.SuperFileContents(ut.foreign_aprod+ver(src_spr,'qa'))[1].name;
+    source_filename := case(src_alpha, 'from_alpha1'=>alpha_logical1,
+                                       'from_alpha2'=>alpha_logical2,
+                                       ver(nm,filedate));
+    target_filename := ver(nm,filedate,agmntName); // update the version number
+    
+    return sequential(output(dataset([{'~'+source_filename,dest_clstr,'~'+target_filename}],{string src,string d_clstr, string trgt}),named('cp_copy'),extend)
+                      ,std.file.copy('~'+source_filename,dest_clstr,'~'+target_filename,replicate:=true,compress:=true,allowoverwrite:=true)
+                     );
 
 end;
+// ************************************************************************************************************************************
+
+SHARED update_supers(string spr0, string newLogical) := function
+
+    spr:='~'+ case( spr0, 'thor_data400::key::header::qa::relatives_v3'=>
+                         'thor_data400::key::relatives_v3_qa',
+                         'thor_data400::key::insuranceheader_segmentation::qa::did_ind'=>
+                         'thor_data400::key::insuranceheader_segmentation::did_ind_qa',
+                         'thor400_44::key::insuranceheader_segmentation::qa::did_ind'=>
+                         'thor400_44::key::insuranceheader_segmentation::did_ind_qa',
+                         'thor400_44::key::insuranceheader_segmentation::built::did_ind'=>
+                         'thor400_44::key::insuranceheader_segmentation::did_ind_built',
+                         'thor400_36::key::insuranceheader_segmentation::qa::did_ind'=>
+                         'thor400_36::key::insuranceheader_segmentation::did_ind_qa'
+                  ,spr0);
+    return sequential(
+        output(dataset([{spr,'~'+newLogical}],{string super, string new_logical}),named('cp_built_update'),extend)
+        ,std.file.RemoveOwnedSubFiles(spr,TRUE)
+        ,std.file.clearsuperfile     (spr)
+        ,if(std.file.SuperFileExists('~'+newLogical)
+             ,std.file.addsuperfile       (spr   , '~'+newLogical ,,true)
+             ,std.file.addsuperfile       (spr   , '~'+newLogical       ));
+    );
+end;
+// ************************************************************************************************************************************
+
+GetDFUWorkunit(string pWuid, string pesp = wk_ut._constants.LocalEsp) := FUNCTION
+
+              dfuLayout := RECORD
+                    STRING TimeStarted          {XPATH('TimeStarted')};
+                    STRING TimeStopped          {XPATH('TimeStopped')};
+                    STRING SourceLogicalName    {XPATH('SourceLogicalName')};
+              END;
+              OutRec1 := RECORD
+                    DATASET(dfuLayout) Fred{XPATH('/result')};
+              END;
+              raw := HTTPCALL('http://' + pesp + ':8010/FileSpray/GetDFUWorkunit.xml?wuid=' + pWuid , 'GET', 'text/xml', OutRec1,xpath('GetDFUWorkunitResponse')); 
+              return normalize(dataset(raw),left.Fred,transform({ string dfu, dfuLayout},self.dfu:=pWuid, self := right));
+        end;
+
+Get_DFUInfo(string filename, string pesp = wk_ut._constants.LocalEsp,string dfu_overwrite='') := FUNCTION
+        dfu := if(dfu_overwrite<>'', dfu_overwrite,wk_ut.get_DFUInfo(filename).DFUInfo[1].wuid);
+        return project(GetDFUWorkunit(dfu,pesp),TRANSFORM(
+                                                {string TargetLogicalName, recordof(LEFT), real4 duration_hours},
+                                                SELF.TargetLogicalName:=trim(filename),
+                                                
+                                                date_diff := ut.DaysApart(regexreplace('-',left.timeStopped,''),
+                                                                          regexreplace('-',left.timeStarted,'')  )*24;
+                                                             
+                                                time_diff := (   ((real8)(left.timeStopped[12..13])+
+                                                                  (real8)(left.timeStopped[15..16])/60+
+                                                                  (real8)(left.timeStopped[18..19])/60/60)
+                                                                 -
+                                                                 ((real8)(left.timeStarted[12..13])+
+                                                                  (real8)(left.timeStarted[15..16])/60+
+                                                                  (real8)(left.timeStarted[18..19])/60/60)
+                                                             );
+                                                self.dfu := trim(LEFT.dfu);
+                                                self.TimeStarted:=trim(LEFT.TimeStarted);
+                                                self.TimeStopped:=trim(LEFT.TimeStopped);
+                                                self.duration_hours:=date_diff+time_diff;
+                                                self:=LEFT));
+end;
+generateDFUinfo(string filedate):=
+sequential(
+output(Get_DFUInfo(   '~thor_data400::key::insuranceheader_segmentation::'+filedate+'::did_ind'),named('file_copy_log'),extend)
+,output(Get_DFUInfo(   '~thor_data400::key::insuranceheader_xlink::'+filedate+'::did::refs::address'),named('file_copy_log'),extend)
+,output(Get_DFUInfo(   '~thor_data400::key::insuranceheader_xlink::'+filedate+'::did::refs::dln'),named('file_copy_log'),extend)
+,output(Get_DFUInfo(   '~thor_data400::key::insuranceheader_xlink::'+filedate+'::did::refs::dob'),named('file_copy_log'),extend)
+,output(Get_DFUInfo(   '~thor_data400::key::insuranceheader_xlink::'+filedate+'::did::refs::lfz'),named('file_copy_log'),extend)
+,output(Get_DFUInfo('~thor_data400::key::insuranceheader_xlink::'+filedate+'::did::refs::name'),named('file_copy_log'),extend)
+,output(Get_DFUInfo(  '~thor_data400::key::insuranceheader_xlink::'+filedate+'::did::refs::ph'),named('file_copy_log'),extend)
+,output(Get_DFUInfo(   '~thor_data400::key::insuranceheader_xlink::'+filedate+'::did::refs::ssn'),named('file_copy_log'),extend)
+,output(Get_DFUInfo('~thor_data400::key::insuranceheader_xlink::'+filedate+'::did::refs::ssn4'),named('file_copy_log'),extend)
+,output(Get_DFUInfo(  '~thor_data400::key::insuranceheader_xlink::'+filedate+'::did::refs::zip_pr'),named('file_copy_log'),extend)
+,output(Get_DFUInfo('~thor_data400::key::insuranceheader_xlink::'+filedate+'::did::refs::relative'),named('file_copy_log'),extend)
+,output(Get_DFUInfo('~thor_data400::key::insuranceheader_xlink::'+filedate+'::did::sup::rid'),named('file_copy_log'),extend)
+
+,output(Get_DFUInfo(   '~thor_data400::key::header::'+filedate+'::relatives_v3'),named('file_copy_log'),extend)
+,output(Get_DFUInfo( '~thor_data400::base::insurance_header::'+filedate+'::relative',,'D20170901-061429'),named('file_copy_log'),extend)
+
+,output(Get_DFUInfo('~thor_data400::key::insuranceheader::'+filedate+'::did'),named('file_copy_log'),extend)
+,output(Get_DFUInfo('~thor_data400::key::insuranceheader::'+filedate+'::dln'),named('file_copy_log'),extend)
+,output(Get_DFUInfo('~thor_data400::key::insuranceheader::'+filedate+'::allpossiblessns'),named('file_copy_log'),extend)
+,output(Get_DFUInfo(   '~thor_data400::key::header::'+filedate+'::addr_unique_expanded'),named('file_copy_log'),extend)
+,output(Get_DFUInfo('~thor_data400::key::fcra::header::'+filedate+'::addr_unique_expanded'),named('file_copy_log'),extend)
+);
+
+
+
+EXPORT Copy := sequential(
+         nothor(apply(linking_keys+base_relative ,copy_files    (nm,src_name,'thor400_44','from_alpha1','thor_data400')))
+        ,nothor(apply(linking_keys               ,copy_files    (nm,src_name,'thor400_36','local'      ,'thor400_36'  )))
+        ,nothor(apply(linking_keys+base_relative ,update_supers (ver(nm,'built', 'thor400_44')         ,ver(nm,filedate))))
+        ,generateDFUinfo(filedate)
+);
+// ************************************************************************************************************************************
+
+EXPORT copyOthers := sequential(
+        nothor(apply(additional_keys    ,copy_files     (nm,src_name,'thor400_44','from_alpha2','thor_data400')  ))
+       ,nothor(apply(additional_keys    ,update_supers  (ver(nm,'built', 'thor_data400')   , ver(nm,filedate))    ))
+);
+// ************************************************************************************************************************************
+ld :='thor_data400::key::insuranceheader_xlink::<<version>>::did';
+reltv_n_othr:=base_relative + additional_keys;
+ikb_ver:=header._info.get_version_link_qa_inc:INDEPENDENT;
+EXPORT MoveToQA :=sequential(
+     output(ikb_ver,named('current_ikb_version')) // get the ikb version ahead of the update, so that we can ensure it is re-instated after the move of the full lab keys
+    ,nothor(apply(linking_keys, update_supers(  ver(nm,'father','thor400_44'  ), ver(nm,'qa'    ,'thor400_44'  )) ))
+    ,nothor(apply(linking_keys, update_supers(  ver(nm,'qa'    ,'thor400_44'), ver(nm,filedate,'thor_data400')) ))
+    ,nothor(apply(linking_keys, update_supers(  ver(nm,'qa'    ,'thor400_36'  ), ver(nm,filedate,'thor400_36'  )) ))
+    ,nothor(apply(linking_keys, update_supers(  ver(nm,'qa'    ,'thor_data400'  ), ver(nm,filedate,'thor_data400')) ))
+    ,nothor(apply(reltv_n_othr, update_supers(  ver(nm,'qa'    ,'thor_data400'), ver(nm,filedate,'thor_data400')) ))
+    // This keey is built in Doxie.Proc_Header_Keys (not copied like the rest)
+    ,                           update_supers(  ver(ld,'qa'    ,'thor_data400'), ver(ld,filedate,'thor_data400'))
+    ,                           update_supers(  ver(ld,'qa'    ,'thor400_44'  ), ver(ld,filedate,'thor_data400'))
+    ,                           update_supers(  ver(ld,'qa'    ,'thor400_36'  ), ver(ld,filedate,'thor_data400'))
+    ,nothor(Header.Proc_Copy_From_Alpha_Incrementals().update_inc_superfiles(true,ikb_ver)) // Restore the incremental keys into the qa superfiles
+    ,_control.fSubmitNewWorkunit('Header.Proc_Copy_Keys_To_Dataland.Full','hthor_sta_eclcc','Dataland') // Copy and update new full keys in dataland
+);
+// ************************************************************************************************************************************
+
+END;

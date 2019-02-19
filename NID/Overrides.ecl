@@ -1,4 +1,4 @@
-
+﻿
 layout_Override := RECORD
 			string1					nametype;
 			string75				name := '';
@@ -25,7 +25,13 @@ OverrideData := DATASET([
 	{'P','','CRYSTAL','','BALL','','MS','CRYSTAL','','BALL'},
 	{'B','VIRGINIA EASLEY JOHNSON PA','','','','','','','',''},
 	// from death master
-   {'P','SU IN LEI', 'SU', 'IN', 'LEI', '', '', 'SU', 'IN', 'LEI'}
+   {'P','SU IN LEI', 'SU', 'IN', 'LEI', '', '', 'SU', 'IN', 'LEI'},
+	 //
+   {'B','Terra Firma'},
+   {'B','TERRA FIRMA'},
+   {'P','CEDILLOS, JOSE FELIX DEL CID', '', '', '', '', 'MR', 'JOSE', 'FELIX DEL CID', 'CEDILLOS'},
+   {'P','ALEXANDER WILDERNESS, SR','', '', '', '', 'MR', 'ALEXANDER', '', 'WILDERNESS', 'SR'},
+   {'P','ALEXANDER WILDERNESS','', '', '', '', 'MR', 'ALEXANDER', '', 'WILDERNESS', ''}
 	], layout_Override);
 
 EXPORT Overrides(boolean fullname=true) := DISTRIBUTE(PROJECT(OverrideData, TRANSFORM(Layout_Repository,
@@ -38,5 +44,5 @@ EXPORT Overrides(boolean fullname=true) := DISTRIBUTE(PROJECT(OverrideData, TRAN
 											self.name := IF(left.name<>'', left.name,
 																	Nid.ReconstructName(left.fname,left.mname,left.lname, left.suffix));
 											self := LEFT;
-											self.derivation := 98;		// overridden name
-											self := [])), nid);
+											self.derivation := 98;		// overridden name for sorting
+											self := [])), nid) : GLOBAL(FEW);

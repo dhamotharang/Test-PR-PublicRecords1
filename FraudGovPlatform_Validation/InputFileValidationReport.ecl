@@ -4,13 +4,14 @@ EXPORT InputFileValidationReport(string fname, string pSeparator, string pTermin
 rCount:=count(dataset(FraudGovPlatform.Filenames().Sprayed.FileSprayed+'::'+fname,{string line},CSV(separator([pSeparator]),quote(''),terminator(pTerminator))));
 dAllRecords := Mod_Stats.ValidateInputFields(fname,pSeparator,pTerminator).ValidationResults:independent;
 RecWithErrors := Mod_Stats.ValidateInputFields(fname,pSeparator,pTerminator).RecordsRejected:independent;
-output(dAllRecords);
+
 treshld_:=Mod_Sets.threshld;
 
 CriticalFieldError := MAP (
 			 STD.Str.Contains( fname, 'IdentityData',	true )	=> Mod_Sets.CriticalFieldError_IdentityData
-			,STD.Str.Contains( fname, 'KnownFraud'	,	true )	=> Mod_Sets.CriticalFieldError_KnownFraud,
-			[]
+			,STD.Str.Contains( fname, 'KnownFraud'	,	true )	=> Mod_Sets.CriticalFieldError_KnownFraud
+			,STD.Str.Contains( fname, 'SafeList'		,	true )	=> Mod_Sets.CriticalFieldError_SafeList
+			,[]
 		);
 																		
 RecordsRejected  := count(dedup(sort(dAllRecords(err[1]='E',field in CriticalFieldError),seq),seq));
@@ -23,9 +24,9 @@ ExcessiveInvalidRecordsFound:=exists(dAllRecords(err[1]='E',RecWithErrors/Record
 
 		p1	:=	project(dAllRecords
 							,transform(rText
-								,self.TextLine	:=(string7)left.FileState
-															+ (string20)regexfind('([0-9])\\w+',fname, 0)
-															+ (string8)left.seq
+								,self.TextLine	:=(string15)left.FileState
+															+ (string16)(trim((string)left.FileDate)+'_'+trim((string)left.FileTime))
+															+ (string11)left.seq
 															+ Map(stringlib.stringtouppercase((string35)left.field[1..34]) ='SSN'	=>'SSN:LEXID:DRIVERSLICENSE'
 																	 ,stringlib.stringtouppercase((string35)left.field[1..34]) ='CITY' => 'ADDRESS'
 																	 ,(string35)left.field[1..34])
@@ -51,7 +52,7 @@ ExcessiveInvalidRecordsFound:=exists(dAllRecords(err[1]='E',RecWithErrors/Record
 										;
 		string130		HeaderLine2
 										:=	
-											(string8)'STATE'
+											(string15)'ACCOUNT'
 										+ (string16)'FILE DATE_TIME'
 										+ (string11)'SMP REC#'
 										+ (string35)'FIELD'
@@ -62,7 +63,7 @@ ExcessiveInvalidRecordsFound:=exists(dAllRecords(err[1]='E',RecWithErrors/Record
 										;
 		string130		HeaderLine2a
 										:=	
-											(string8)'STATE'
+											(string15)'ACCOUNT'
 										+ (string16)'FILE DATE_TIME'
 										+ (string11)'SMP REC#'
 										+ (string13)'FIELD'

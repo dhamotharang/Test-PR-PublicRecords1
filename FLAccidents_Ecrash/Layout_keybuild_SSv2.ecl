@@ -193,13 +193,15 @@
 		STRING   Report_Collision_Type;
 		STRING   Report_First_Harmful_Event;
 		STRING   Report_Light_Condition;
-		STRING   Report_Weather_Condition;
-		STRING   Report_Road_Condition;
-		STRING   Report_Injury_Status;
+	  //PRtcc datatyp update
+		STRING200 Report_Weather_Condition;
+		STRING200 Report_Road_Condition;
+		STRING100 Report_Injury_Status;
 		STRING   Report_Damage_Extent;
 		STRING   Report_Vehicle_Type;
 		STRING   Report_Traffic_Control_Device_Type;
-		STRING   Report_Contributing_Circumstances_v;
+		//PRtcc datatype update
+		STRING200 Report_Contributing_Circumstances_v;
 		STRING   Report_Vehicle_Maneuver_Action_Prior;
 		STRING   Report_Vehicle_Body_Type;
 		STRING1  CRU_inq_name_type := '' ; 
@@ -231,4 +233,25 @@
 		
 		//Appriss Integration
 		STRING1 Releasable;
+		
+		//BuyCrash Release 6
+    STRING10 Date_Report_Submitted;
+		
+		//PRtCC new fields
+		STRING40 Safety_Equipment_Restraint1;
+		STRING20 Ejection;
+		STRING40 Safety_Equipment_Helmet;
+		STRING60 Transported_To;
+		STRING7 Photographs_Taken;
+		STRING200 Citation_Detail1;
+		STRING200 Driver_Distracted_By;
+		STRING7 Posted_Satutory_Speed_Limit;
+		STRING60 Violation_Code1;
+		STRING60 Violation_Code2;
+		STRING60 Violation_Code3;
+		STRING60 Violation_Code4;
+		STRING20 Dispatch_Time;
+		STRING1 Additional_Keying;
+		STRING200 Dui_Suspected;
+		STRING200 Report_Contributing_Circumstances_p;
 END;

@@ -1,10 +1,10 @@
 import header,ut,did_add;
 
-export fn_Apt_Patch(boolean isEN=false) := function
+export fn_Apt_Patch(boolean isEN=false,string filedate) := function
 
-apts := header.fn_ApartmentBuildings(isEN)(apt_cnt > 1);
-dh := header.file_fcra_header_prep(if(isEN,true,src<>'EN'),prim_name != '', prim_range != '');
-dh_excl := header.file_fcra_header_prep(if(isEN,true,src<>'EN') and (prim_name = '' or prim_range = ''));
+apts := header.fn_ApartmentBuildings(isEN, filedate)(apt_cnt > 1);
+dh := header.file_fcra_header_prep(filedate)(if(isEN,true,src<>'EN'),prim_name != '', prim_range != '');
+dh_excl := header.file_fcra_header_prep(filedate)(if(isEN,true,src<>'EN') and (prim_name = '' or prim_range = ''));
 
 slimrec := record
 	dh.prim_name;
@@ -79,7 +79,7 @@ dw_final_1 := join(blank_dwellers,dw_singfull,
 
 /*------------------------- [ check relatives ]-----------*/
 
-dr := header.File_Relatives(recent_cohabit > 0);
+dr := header.File_Relatives_v3(recent_cohabit > 0);
 
 dr twisted(dr l) := transform
 	self.person1 := l.person2;

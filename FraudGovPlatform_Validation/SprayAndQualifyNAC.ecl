@@ -4,7 +4,7 @@ EXPORT SprayAndQualifyNAC(
 	string pversion,
 	string ip = NAC.Constants.LandingZoneServer,
 	string rootDir = NAC.Constants.LandingZonePathBase + '/msh/done/', 
-	string destinationGroup = if(_Control.ThisEnvironment.Name='Dataland','thor400_dev01_2','thor400_30'))
+	string destinationGroup = IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		Constants.ThorName_Dev,	Constants.ThorName_Prod))
 := FUNCTION	
 	dsFileList:=nothor(FileServices.RemoteDirectory(ip, rootDir, 'FL_MSH_' + pversion[1..8] + '*.dat')):independent;
 
@@ -15,8 +15,8 @@ EXPORT SprayAndQualifyNAC(
 	UpType := 'NAC';
 
 	ReportFileFound:=if(FileFound
-						,output('Found File To Spray',named('Found_File_To_Spray'))
-						,output('No File To Spray',named('No_File_To_Spray'))
+						,output('Found File To Spray',named('NAC_Found_File_To_Spray'))
+						,output('No File To Spray',named('NAC_No_File_To_Spray'))
 						);
 						
 						
@@ -39,7 +39,7 @@ EXPORT SprayAndQualifyNAC(
 							fileservices.AddSuperfile(NAC_Sprayed,FileSprayed));	
 
 	ReportEmptyFile := 
-			SEQUENTIAL (	OUTPUT('File '+ip+rootDir + pversion +'/'+ fname+' empty',NAMED('File_empty')),
+			SEQUENTIAL (	OUTPUT('File '+ip+rootDir + pversion +'/'+ fname+' empty',NAMED('NAC_File_empty')),
 								Send_Email(st:=UpSt,fn:=FileSprayed,ut:=UpType).FileEmptyErrorAlert);
 							
 	outputwork

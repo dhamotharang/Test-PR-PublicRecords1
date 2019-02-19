@@ -1,4 +1,4 @@
-IMPORT corp2;
+﻿IMPORT corp2;
 	
 EXPORT Functions := MODULE
 
@@ -50,11 +50,14 @@ EXPORT Functions := MODULE
 
 			uc_s 				:= corp2.t2u(s);
 
-			isValidDesc := map(uc_s in ['DOMESTIC NONPROFIT CORPORATION','DOMESTIC PROFIT CORPORATION'] 				=> true,
-												 uc_s in ['DOMESTIC LIMITED LIABILITY COMPANY','DOMESTIC LIMITED PARTNERSHIP']		=> true,
-												 uc_s in ['FOREIGN LIMITED LIABILITY COMPANY ','FOREIGN LIMITED PARTNERSHIP '] 		=> true,
-												 uc_s in ['FOREIGN NONPROFIT CORPORATION','FOREIGN PROFIT CORPORATION'] 					=> true,
-												 uc_s in ['']																																			=> true,
+			isValidDesc := map(uc_s in ['DOMESTIC NONPROFIT CORPORATION','DOMESTIC PROFIT CORPORATION'] 				                => true,
+												 uc_s in ['DOMESTIC LIMITED LIABILITY COMPANY','DOMESTIC LIMITED PARTNERSHIP']		                => true,
+												 uc_s in ['FOREIGN LIMITED LIABILITY COMPANY ','FOREIGN LIMITED PARTNERSHIP '] 		                => true,
+												 uc_s in ['FOREIGN NONPROFIT CORPORATION','FOREIGN PROFIT CORPORATION'] 				                	=> true,
+												 uc_s in ['DOMESTIC PROFESSIONAL LIMITED LIABILITY COMPANY','DOMESTIC PROFESSIONAL CORPORATION']  => true,
+												 uc_s in ['FOREIGN PROFESSIONAL LIMITED LIABILITY COMPANY','FOREIGN PROFESSIONAL CORPORATION']    => true,
+												 uc_s in ['PARTNERSHIP ASSOCIATIONS LIMITED','FOREIGN TRUST']                                     => true,
+												 uc_s in ['']																																			                => true,
 												 false
 												);
 										 

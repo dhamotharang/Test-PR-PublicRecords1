@@ -1,4 +1,4 @@
-//see also:  Business_Header_SS.MAC_Match_Flex_V2
+﻿//see also:  Business_Header_SS.MAC_Match_Flex_V2
 
 import ut;
 
@@ -127,11 +127,11 @@ MACRO
 
 	#uniquename(infileWithIDsLeveled2)
 	%infileWithIDsLeveled2% :=
-		dedup(sort(infileWithIDsLeveled, 
-		           ultid, orgid, seleid, proxid, powid, empid, uniqueId),
-		      ultid, orgid, seleid, proxid, powid, empid, uniqueId);
+		dedup(sort(distribute(infileWithIDsLeveled, hash32(ultid)), 
+		           ultid, orgid, seleid, proxid, powid, empid, uniqueId,local),
+		      ultid, orgid, seleid, proxid, powid, empid, uniqueId,local);
 
-	IDsReadyForKeyedJoin := dedup(%infileWithIDsLeveled2%, ultid, orgid, seleid, proxid, powid, empid);
+	IDsReadyForKeyedJoin := dedup(%infileWithIDsLeveled2%, ultid, orgid, seleid, proxid, powid, empid, local);
 
 	outrec := record	
 		unsigned2 fetch_error_code;
@@ -194,7 +194,7 @@ MACRO
 		       (left.ProxID = right.ProxID or left.ProxID = 0),
 		     transform(recordof(right),
 		       self.uniqueId := left.uniqueID,
-		       self := right));
+		       self := right), hash);
            
   outfile:=BIPV2_Suppression.macSuppress(%outfile1%);
 

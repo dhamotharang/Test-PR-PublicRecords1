@@ -1,0 +1,2200 @@
+﻿/*2018-05-25T15:50:30Z (jprichard)
+C:\Users\prichajx\AppData\Roaming\HPCC Systems\eclide\jprichard\Dataland\KELOtto\Graph\2018-05-25T15_50_30Z.ecl
+*/
+#OPTION(persistexpire, 30)
+#OPTION(codegen, 'nosmartjoins')
+#OPTION(codegen, 'nolookupjoins')
+
+// Defining the ERA to allow for ASOF functionality
+ERA reportedby BEFORE(DateFirstSeen=NULL(MIN));
+ERA reportedbetween BETWEEN(DateFirstSeen=NULL(MIN), DateLastSeen=NULL(MAX));
+
+//GLOBAL: => HighFrequencyAddressThreshold := 20;
+
+Customer := ENTITY(FLAT(UID=TargetCustomerHash,
+    INTEGER CustomerId,
+    INTEGER IndustryType),
+  MODEL(UID, CustomerId, IndustryType));
+
+// The UID should be off the associated customer
+// this ensure the customer can see all the people that are shared with them.
+
+Person := ENTITY(FLAT(UID(AssociatedCustomerFileInfo, LexId),
+    Customer rCustomer=AssociatedCustomerFileInfo,
+    Customer rSourceCustomer=SourceCustomerFileInfo,
+    INTEGER LexId,
+		DATE DateOfBirth,
+		STRING Title=NULL(),
+		STRING FirstName=NULL(),
+		STRING MiddleName=NULL(),
+		STRING LastName=NULL(),
+		STRING NameSuffix=NULL(),
+    
+    // CIID Columns
+
+    STRING verfirst,
+    STRING verlast,
+    STRING veraddr,
+    STRING vercity,
+    STRING verstate,
+    STRING verzip,
+    STRING verzip4,
+    STRING verssn,
+    STRING verdob,
+    STRING verhphone,
+    STRING verify_addr,
+    STRING verify_dob,
+    STRING valid_ssn,
+    INTEGER nas_summary,
+    INTEGER nap_summary,
+    STRING cvi,
+
+    STRING additional_fname_1,
+    STRING additional_lname_1,
+    STRING additional_lname_date_last_1,
+    STRING additional_fname_2,
+    STRING additional_lname_2,
+    STRING additional_lname_date_last_2,
+    STRING additional_fname_3,
+    STRING additional_lname_3,
+    STRING additional_lname_date_last_3,
+
+    INTEGER subjectssncount,
+    STRING dobmatchlevel,
+    STRING Hri,
+    BOOLEAN ssnfoundforlexid,
+    STRING cvicustomscore,
+
+    INTEGER SubjectSsnCount,
+    INTEGER DateOfBirthMatchLevel,
+    INTEGER StolenIdentityIndex,	//Likelihood an application may be an attempt to compromise a real identity
+    INTEGER SyntheticIdentityIndex,	//Likelihood application may be a manufactured identity
+    INTEGER ManipulatedIdentityIndex,	//Likelihood the identity has evidence of being intentionally manipulated
+    INTEGER VulnerableVictimIndex,	//Likelihood the identity is at risk for being a victim of identity fraud
+    INTEGER FriendlyfraudIndex,	//Likelihood the identity is at risk for being a victim of identity fraud perpetrated by a relative
+    INTEGER SuspiciousActivityIndex,	//Likelihood the identity has previous high risk activity
+
+    // Fraudpoint
+    
+    INTEGER v2_sourcerisklevel,
+    INTEGER v2_assocsuspicousidentitiescount,
+    INTEGER v2_assoccreditbureauonlycount,
+    INTEGER v2_validationaddrproblems,
+    INTEGER v2_inputaddrageoldest,
+    STRING v2_inputaddrdwelltype,
+    STRING v2_divssnidentitycountnew,
+    // Deceased
+    
+    DATE DeceasedDate,
+    DATE DeceasedDateOfBirth,
+    STRING DeceasedFirst,
+    STRING DeceasedMiddle,
+    STRING DeceasedLast,   
+
+    STRING DeceasedMatchCode,
+    BOOLEAN isdeepdive,
+
+    STRING county_death,
+    STRING DeceasedSsn,
+    STRING state_death_flag,
+    STRING death_rec_src,
+    STRING state_death_id,
+    
+    STRING curr_incar_flag,
+    STRING off_cat_list,
+    INTEGER name_ssn_dob_match
+    
+    
+    ),
+	MODEL(UID,
+    rCustomer,
+    LexId,
+    SourceCustomers{rSourceCustomer},
+		ReportedDateOfBirth{DateOfBirth},
+		FullName{Title,FirstName,MiddleName,LastName,NameSuffix},
+
+    DeceasedDate,
+    DeceasedDateOfBirth,
+    DeceasedFirst,
+    DeceasedMiddle,
+    DeceasedLast,   
+
+    DeceasedMatchCode,
+    isdeepdive,
+
+    county_death,
+    DeceasedSsn,
+    state_death_flag,
+    death_rec_src,
+    state_death_id,
+
+    verfirst,
+    verlast,
+    veraddr,
+    vercity,
+    verstate,
+    verzip,
+    verzip4,
+    verssn,
+    verdob,
+    verhphone,
+    verify_addr,
+    verify_dob,
+    valid_ssn,
+    nas_summary,
+    nap_summary,
+    cvi,
+    additional_fname_1,
+    additional_lname_1,
+    additional_lname_date_last_1,
+    additional_fname_2,
+    additional_lname_2,
+    additional_lname_date_last_2,
+    additional_fname_3,
+    additional_lname_3,
+    additional_lname_date_last_3,
+    subjectssncount,
+		HriList { Hri },
+
+    dobmatchlevel,
+    ssnfoundforlexid,
+    cvicustomscore,
+    
+    SubjectSsnCount,
+    DateOfBirthMatchLevel,
+    StolenIdentityIndex,
+    SyntheticIdentityIndex,
+    ManipulatedIdentityIndex,
+    VulnerableVictimIndex,
+    FriendlyfraudIndex,
+    SuspiciousActivityIndex,
+
+    v2_sourcerisklevel,
+    v2_assocsuspicousidentitiescount,
+    v2_assoccreditbureauonlycount,
+    v2_validationaddrproblems,
+    v2_inputaddrageoldest,
+    v2_inputaddrdwelltype,
+		v2_divssnidentitycountnew,
+    
+    curr_incar_flag,
+    name_ssn_dob_match,
+    Offenses {off_cat_list}
+    
+    ));	
+
+Event := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,record_id), 
+    Customer rCustomer=AssociatedCustomerFileInfo,
+    Customer rSourceCustomer=SourceCustomerFileInfo,
+    Person Subject=UID(AssociatedCustomerFileInfo, LexId),
+		Address Location=UID(AssociatedCustomerFileInfo,PrimaryRange, Predirectional, PrimaryName, Suffix, Postdirectional, Zip, SecondaryRange),    
+    INTEGER RecordId=record_id,
+    DATE EventDate,
+    STRING EventType, 
+
+		DATE DateOfBirth,
+
+    // CIID Columns
+
+    STRING verfirst,
+    STRING verlast,
+    STRING veraddr,
+    STRING vercity,
+    STRING verstate,
+    STRING verzip,
+    STRING verzip4,
+    STRING verssn,
+    STRING verdob,
+    STRING verhphone,
+    STRING verify_addr,
+    STRING verify_dob,
+    STRING valid_ssn,
+    INTEGER nas_summary,
+    INTEGER nap_summary,
+    STRING cvi,
+
+    STRING additional_fname_1,
+    STRING additional_lname_1,
+    STRING additional_lname_date_last_1,
+    STRING additional_fname_2,
+    STRING additional_lname_2,
+    STRING additional_lname_date_last_2,
+    STRING additional_fname_3,
+    STRING additional_lname_3,
+    STRING additional_lname_date_last_3,
+
+    INTEGER subjectssncount,
+    STRING dobmatchlevel,
+    STRING Hri,
+    BOOLEAN ssnfoundforlexid,
+    STRING cvicustomscore,
+
+    INTEGER SubjectSsnCount,
+    INTEGER DateOfBirthMatchLevel,
+    INTEGER StolenIdentityIndex,	//Likelihood an application may be an attempt to compromise a real identity
+    INTEGER SyntheticIdentityIndex,	//Likelihood application may be a manufactured identity
+    INTEGER ManipulatedIdentityIndex,	//Likelihood the identity has evidence of being intentionally manipulated
+    INTEGER VulnerableVictimIndex,	//Likelihood the identity is at risk for being a victim of identity fraud
+    INTEGER FriendlyfraudIndex,	//Likelihood the identity is at risk for being a victim of identity fraud perpetrated by a relative
+    INTEGER SuspiciousActivityIndex,	//Likelihood the identity has previous high risk activity
+
+    // Fraudpoint
+    
+    INTEGER v2_sourcerisklevel,
+    INTEGER v2_assocsuspicousidentitiescount,
+    INTEGER v2_assoccreditbureauonlycount,
+    INTEGER v2_validationaddrproblems,
+    INTEGER v2_inputaddrageoldest,
+    STRING v2_inputaddrdwelltype,
+    STRING v2_divssnidentitycountnew,
+    // Deceased
+    
+    DATE DeceasedDate,
+    DATE DeceasedDateOfBirth,
+    STRING DeceasedFirst,
+    STRING DeceasedMiddle,
+    STRING DeceasedLast,   
+
+    STRING DeceasedMatchCode,
+    BOOLEAN isdeepdive,
+
+    STRING county_death,
+    STRING DeceasedSsn,
+    STRING state_death_flag,
+    STRING death_rec_src,
+    STRING state_death_id,
+		STRING Hri,
+
+    STRING iprngbeg,
+    STRING iprngend,
+    STRING edgecountry,
+    STRING edgeregion,
+    STRING edgecity,
+    STRING edgeconnspeed,
+    STRING edgemetrocode,
+    STRING edgelatitude,
+    STRING edgelongitude,
+    STRING edgepostalcode,
+    STRING edgecountrycode,
+    STRING edgeregioncode,
+    STRING edgecitycode,
+    STRING edgecontinentcode,
+    STRING edgetwolettercountry,
+    STRING edgeinternalcode,
+    STRING edgeareacodes,
+    STRING edgecountryconf,
+    STRING edgeregionconf,
+    STRING edgecitycong,
+    STRING edgepostalconf,
+    STRING edgegmtoffset,
+    STRING edgeindst,
+    STRING siccode,
+    STRING domainname,
+    STRING ispname,
+    STRING homebiztype,
+    STRING asn,
+    STRING asnname,
+    STRING primarylang,
+    STRING secondarylang,
+    STRING proxytype,
+    STRING proxydescription,
+    STRING isanisp,
+    STRING companyname,
+    STRING ranks,
+    STRING households,
+    STRING women,
+    STRING women18to34,
+    STRING women35to49,
+    STRING men,
+    STRING men18to34,
+    STRING men35to49,
+    STRING teens,
+    STRING kids,
+    STRING naicscode,
+    STRING cbsacode,
+    STRING cbsatitle,
+    STRING cbsatype,
+    STRING csacode,
+    STRING csatitle,
+    STRING mdcode,
+    STRING mdtitle,
+    STRING organizationname
+    
+    ),
+    MODEL(
+      UID,
+      rCustomer,
+      SourceCustomers{rSourceCustomer},
+      Subject,
+      Location,
+      RecordId,
+      EventDate,
+      EventTypes{EventType},
+
+    DateOfBirth,
+    DeceasedDate,
+    DeceasedDateOfBirth,
+    DeceasedFirst,
+    DeceasedMiddle,
+    DeceasedLast,   
+
+    DeceasedMatchCode,
+    isdeepdive,
+
+    county_death,
+    DeceasedSsn,
+    state_death_flag,
+    death_rec_src,
+    state_death_id,
+
+    verfirst,
+    verlast,
+    veraddr,
+    vercity,
+    verstate,
+    verzip,
+    verzip4,
+    verssn,
+    verdob,
+    verhphone,
+    verify_addr,
+    verify_dob,
+    valid_ssn,
+    nas_summary,
+    nap_summary,
+    cvi,
+    additional_fname_1,
+    additional_lname_1,
+    additional_lname_date_last_1,
+    additional_fname_2,
+    additional_lname_2,
+    additional_lname_date_last_2,
+    additional_fname_3,
+    additional_lname_3,
+    additional_lname_date_last_3,
+    subjectssncount,
+
+    dobmatchlevel,
+    ssnfoundforlexid,
+    cvicustomscore,
+    
+    SubjectSsnCount,
+    DateOfBirthMatchLevel,
+    StolenIdentityIndex,
+    SyntheticIdentityIndex,
+    ManipulatedIdentityIndex,
+    VulnerableVictimIndex,
+    FriendlyfraudIndex,
+    SuspiciousActivityIndex,
+
+    v2_sourcerisklevel,
+    v2_assocsuspicousidentitiescount,
+    v2_assoccreditbureauonlycount,
+    v2_validationaddrproblems,
+    v2_inputaddrageoldest,
+    v2_inputaddrdwelltype,
+		v2_divssnidentitycountnew,
+    
+		HriList { Hri },
+
+    iprngbeg,iprngend,edgecountry,edgeregion,edgecity,edgeconnspeed,edgemetrocode,edgelatitude,edgelongitude,edgepostalcode,edgecountrycode,edgeregioncode,edgecitycode,edgecontinentcode,edgetwolettercountry,edgeinternalcode,edgeareacodes,edgecountryconf,edgeregionconf,edgecitycong,edgepostalconf,edgegmtoffset,edgeindst,siccode,domainname,ispname,homebiztype,asn,asnname,primarylang,secondarylang,proxytype,proxydescription,isanisp,companyname,ranks,households,women,women18to34,women35to49,men,men18to34,men35to49,teens,kids,naicscode,cbsacode,cbsatitle,cbsatype,csacode,csatitle,mdcode,mdtitle,organizationname
+
+    
+          ));
+
+Address := ENTITY(FLAT(UID(AssociatedCustomerFileInfo, PrimaryRange, Predirectional, PrimaryName, Suffix, Postdirectional, Zip, SecondaryRange),
+    Customer rCustomer=AssociatedCustomerFileInfo,
+    Customer rSourceCustomer=SourceCustomerFileInfo,
+    BOOLEAN addresspobox,
+    BOOLEAN addresscmra,
+    INTEGER OttoAddressId,
+		STRING PrimaryRange=NULL(),
+		STRING Predirectional=NULL(),
+		STRING PrimaryName=NULL(),
+		STRING Suffix=NULL(),
+		STRING Postdirectional=NULL(),
+		STRING UnitDesignation=NULL(),
+		STRING SecondaryRange=NULL(),
+		STRING PostalCity=NULL(),
+		STRING VanityCity=NULL(),
+		STRING State=NULL(),
+		STRING Zip=NULL(),
+		STRING Zip4=NULL(),
+		STRING CarrierRouteNumber=NULL(),
+		STRING CarrierRouteSortationAtZIP=NULL(),
+		INTEGER LineOfTravel=NULL(),
+		STRING LineOfTravelOrder=NULL(),
+		INTEGER DeliveryPointBarcode=NULL(),
+		INTEGER DeliveryPointBarcodeCheckDigit=NULL(),
+		STRING TypeCode=NULL(),
+		INTEGER County=NULL(),
+		REAL Latitude=NULL(),
+		REAL Longitude=NULL(),
+		INTEGER MetropolitanStatisticalArea=NULL(),
+		INTEGER GeoBlock=NULL(),
+		STRING GeoMatch=NULL(),
+		STRING ACECleanerErrorCode=NULL(),
+		BOOLEAN isAdditional,
+		STRING Hri),
+	MODEL(UID,
+    rCustomer, SourceCustomers{rSourceCustomer}, 
+    addresspobox, addresscmra, OttoAddressId, PrimaryRange, Predirectional, PrimaryName, Suffix, Postdirectional, UnitDesignation, SecondaryRange, PostalCity, VanityCity, State, 
+		Zip, Zip4, CarrierRouteNumber, CarrierRouteSortationAtZIP, LineOfTravel, LineOfTravelOrder, DeliveryPointBarcode, DeliveryPointBarcodeCheckDigit, 
+		TypeCode, County, Latitude, Longitude, MetropolitanStatisticalArea, GeoBlock, GeoMatch,ACECleanerErrorCode,isAdditional,HriList { Hri }));
+
+SocialSecurityNumber := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,ssn),
+    Customer rCustomer=AssociatedCustomerFileInfo,
+    Customer rSourceCustomer=SourceCustomerFileInfo,
+    Ssn,
+    INTEGER OttoSSNId,
+    STRING SsnFormatted,
+
+    v2_divssnidentitycountnew,
+    DATE DeceasedDate,
+    DATE DeceasedDateOfBirth,
+    STRING DeceasedFirst,
+    STRING DeceasedMiddle,
+    STRING DeceasedLast,   
+
+    STRING DeceasedMatchCode,
+    BOOLEAN isdeepdive,
+
+    STRING county_death,
+    STRING DeceasedSsn,
+    STRING state_death_flag,
+    STRING death_rec_src,
+    STRING state_death_id,
+		STRING Hri
+    ),
+  MODEL(
+    UID, rCustomer, SourceCustomers{rSourceCustomer}, Ssn, OttoSSNId, SsnFormatted, v2_divssnidentitycountnew,DeceasedDate,DeceasedDateOfBirth,DeceasedFirst,DeceasedMiddle,DeceasedLast,DeceasedMatchCode,isdeepdive,county_death,DeceasedSsn,state_death_flag,death_rec_src,state_death_id,HriList { Hri }
+    ));
+
+Phone := ENTITY(FLAT(UID(AssociatedCustomerFileInfo, PhoneNumber),
+    Customer rCustomer=AssociatedCustomerFileInfo,
+    Customer rSourceCustomer=SourceCustomerFileInfo,
+    STRING PhoneFormatted,
+    STRING PhoneNumber,
+		BOOLEAN isCellPhone,
+    STRING Hri
+		),
+	MODEL(UID,
+    rCustomer, SourceCustomers{rSourceCustomer}, PhoneFormatted, PhoneNumber, isCellPhone, HriList { Hri }));
+
+Email := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,email_address),
+    Customer rCustomer=AssociatedCustomerFileInfo,
+    Customer rSourceCustomer=SourceCustomerFileInfo,
+		STRING EmailAddress,
+		STRING Type,
+		INTEGER OttoEmailId,
+		DATE CreatedOn,
+		STRING Host),
+	MODEL(UID,
+    rCustomer, SourceCustomers{rSourceCustomer}, EmailAddress, OttoEmailId, Details{Type,CreatedOn,Host}));
+
+InternetProtocol := ENTITY(FLAT(UID(AssociatedCustomerFileInfo,ip_address),
+    Customer rCustomer=AssociatedCustomerFileInfo,
+    Customer rSourceCustomer=SourceCustomerFileInfo,
+    STRING IpAddress=ip_address,
+		INTEGER OttoIpAddressId,
+    STRING host,
+    STRING alias,
+    STRING location,
+    STRING ip_address,
+    STRING ip_address_date,
+    STRING version,
+    STRING class,
+    STRING subnet_mask,
+    STRING reserved,
+    STRING isp,
+    INTEGER v2_validationipproblems,
+    STRING v2_ipstate,
+    STRING v2_ipcountry,
+    STRING v2_ipcontinent,
+
+    STRING iprngbeg,
+    STRING iprngend,
+    STRING edgecountry,
+    STRING edgeregion,
+    STRING edgecity,
+    STRING edgeconnspeed,
+    STRING edgemetrocode,
+    STRING edgelatitude,
+    STRING edgelongitude,
+    STRING edgepostalcode,
+    STRING edgecountrycode,
+    STRING edgeregioncode,
+    STRING edgecitycode,
+    STRING edgecontinentcode,
+    STRING edgetwolettercountry,
+    STRING edgeinternalcode,
+    STRING edgeareacodes,
+    STRING edgecountryconf,
+    STRING edgeregionconf,
+    STRING edgecitycong,
+    STRING edgepostalconf,
+    STRING edgegmtoffset,
+    STRING edgeindst,
+    STRING siccode,
+    STRING domainname,
+    STRING ispname,
+    STRING homebiztype,
+    STRING asn,
+    STRING asnname,
+    STRING primarylang,
+    STRING secondarylang,
+    STRING proxytype,
+    STRING proxydescription,
+    STRING isanisp,
+    STRING companyname,
+    STRING ranks,
+    STRING households,
+    STRING women,
+    STRING women18to34,
+    STRING women35to49,
+    STRING men,
+    STRING men18to34,
+    STRING men35to49,
+    STRING teens,
+    STRING kids,
+    STRING naicscode,
+    STRING cbsacode,
+    STRING cbsatitle,
+    STRING cbsatype,
+    STRING csacode,
+    STRING csatitle,
+    STRING mdcode,
+    STRING mdtitle,
+    STRING organizationname
+    
+    ),
+  MODEL(
+    UID, rCustomer, SourceCustomers{rSourceCustomer},IpAddress, OttoIpAddressId, host,alias,location,ip_address,ip_address_date,version,class,subnet_mask,reserved,isp,v2_validationipproblems,v2_ipstate,v2_ipcountry,v2_ipcontinent,
+    iprngbeg,iprngend,edgecountry,edgeregion,edgecity,edgeconnspeed,edgemetrocode,edgelatitude,edgelongitude,edgepostalcode,edgecountrycode,edgeregioncode,edgecitycode,edgecontinentcode,edgetwolettercountry,edgeinternalcode,edgeareacodes,edgecountryconf,edgeregionconf,edgecitycong,edgepostalconf,edgegmtoffset,edgeindst,siccode,domainname,ispname,homebiztype,asn,asnname,primarylang,secondarylang,proxytype,proxydescription,isanisp,companyname,ranks,households,women,women18to34,women35to49,men,men18to34,men35to49,teens,kids,naicscode,cbsacode,cbsatitle,cbsatype,csacode,csatitle,mdcode,mdtitle,organizationname
+    ));
+    
+ 
+//Bank Account – New – let’s make it 19
+
+Bank := ENTITY(FLAT(UID(AssociatedCustomerFileInfo, RoutingNumber),
+    Customer rCustomer=AssociatedCustomerFileInfo,
+    Customer rSourceCustomer=SourceCustomerFileInfo,
+    STRING RoutingNumber,
+    STRING FullBankname,
+    STRING AbbreviatedBankname,
+    STRING FractionalRoutingnumber,
+    STRING HeadofficeRoutingnumber,
+    STRING HeadofficeBranchcodes,
+    STRING hit
+		),
+	MODEL(UID,
+    rCustomer, SourceCustomers{rSourceCustomer},RoutingNumber,FullBankname,AbbreviatedBankname,FractionalRoutingnumber,HeadofficeRoutingnumber,HeadofficeBranchcodes,hit));
+
+BankAccount := ENTITY(FLAT(UID(AssociatedCustomerFileInfo, RoutingNumber, AccountNumber),
+    Customer rCustomer=AssociatedCustomerFileInfo,
+    Customer rSourceCustomer=SourceCustomerFileInfo,
+    Bank rBank=UID(AssociatedCustomerFileInfo, RoutingNumber),
+    STRING AccountNumber,
+    INTEGER OttoBankAccountId,
+    STRING Hri
+
+		),
+	MODEL(UID,
+    rCustomer, SourceCustomers{rSourceCustomer}, rBank, AccountNumber, OttoBankAccountId, HriList { Hri }));
+
+
+//DL – New – let’s make it 20
+ 
+DriversLicense := ENTITY(FLAT(UID(AssociatedCustomerFileInfo, drivers_license),
+    Customer rCustomer=AssociatedCustomerFileInfo,
+    Customer rSourceCustomer=SourceCustomerFileInfo,
+    STRING LicenseNumber,
+    STRING State,
+    INTEGER OttoDriversLicenseId,   
+    STRING Hri
+		),
+	MODEL(UID,
+    rCustomer, SourceCustomers{rSourceCustomer}, LicenseNumber, State, OttoDriversLicenseId, HriList { Hri }));
+    
+/*
+  ASSOCIATIONS
+*/
+
+PersonAddress := ASSOCIATION(FLAT(
+    Customer rCustomer=AssociatedCustomerFileInfo,
+		Person Subject=UID(AssociatedCustomerFileInfo, LexId),
+		Address Location=UID(AssociatedCustomerFileInfo,PrimaryRange, Predirectional, PrimaryName, Suffix, Postdirectional, Zip, SecondaryRange)));	
+
+PersonSSN := ASSOCIATION(FLAT(
+    Customer rCustomer=AssociatedCustomerFileInfo,
+		Person Subject=UID(AssociatedCustomerFileInfo, LexId),
+		SocialSecurityNumber Social=UID(AssociatedCustomerFileInfo, Ssn)));
+
+
+PersonIpAddress := ASSOCIATION(FLAT(
+    Customer rCustomer=AssociatedCustomerFileInfo,
+		Person Subject=UID(AssociatedCustomerFileInfo, LexId),
+		InternetProtocol Ip=UID(AssociatedCustomerFileInfo, IpAddress)
+    ));
+
+AddressSSN := ASSOCIATION(FLAT(
+    Customer rCustomer=AssociatedCustomerFileInfo,
+		Address Location=UID(AssociatedCustomerFileInfo,PrimaryRange, Predirectional, PrimaryName, Suffix, Postdirectional, Zip, SecondaryRange),
+		SocialSecurityNumber Social=UID(AssociatedCustomerFileInfo, Ssn)));
+
+PersonPhone := ASSOCIATION(FLAT(
+    Customer rCustomer=AssociatedCustomerFileInfo,
+		Person Subject=UID(AssociatedCustomerFileInfo, LexId),
+		Phone PhoneNumber=UID(AssociatedCustomerFileInfo, PhoneNumber)
+    ));
+
+PersonBankAccount := ASSOCIATION(FLAT(
+    Customer rCustomer=AssociatedCustomerFileInfo,
+		Person Subject=UID(AssociatedCustomerFileInfo, LexId),
+		BankAccount Account=UID(AssociatedCustomerFileInfo, RoutingNumber, AccountNumber)
+    ));
+
+PersonDriversLicense := ASSOCIATION(FLAT(
+    Customer rCustomer=AssociatedCustomerFileInfo,
+		Person Subject=UID(AssociatedCustomerFileInfo, LexId),
+		DriversLicense License=UID(AssociatedCustomerFileInfo, LicenseNumber)
+    ));
+
+PersonEmail := ASSOCIATION(FLAT(
+    Customer rCustomer=AssociatedCustomerFileInfo,
+		Person Subject=UID(AssociatedCustomerFileInfo, LexId),
+		Email Emailof=UID(AssociatedCustomerFileInfo,Email_Address)));
+
+PersonEvent := ASSOCIATION(FLAT(
+    Customer rCustomer=AssociatedCustomerFileInfo,
+		Person Subject=UID(AssociatedCustomerFileInfo, LexId),
+		SocialSecurityNumber Social=UID(AssociatedCustomerFileInfo, Ssn),
+		Phone PhoneNumber=UID(AssociatedCustomerFileInfo, PhoneNumber),
+		Email Emailof=UID(AssociatedCustomerFileInfo,Email_Address),
+		Address Location=UID(AssociatedCustomerFileInfo,PrimaryRange, Predirectional, PrimaryName, Suffix, Postdirectional, Zip, SecondaryRange),
+		InternetProtocol Ip=UID(AssociatedCustomerFileInfo, IpAddress),
+    Bank RoutingBank=UID(AssociatedCustomerFileInfo, RoutingNumber),
+    BankAccount Account=UID(AssociatedCustomerFileInfo, RoutingNumber, AccountNumber),
+    DriversLicense Licence=UID(AssociatedCustomerFileInfo, drivers_license),
+    DATE EventDate,
+    Event Transaction=UID(AssociatedCustomerFileInfo, record_id)
+   ));
+   
+PersonPerson := ASSOCIATION(FLAT(
+    Customer rCustomer=AssociatedCustomerFileInfo,
+    Person FromPerson=UID(AssociatedCustomerFileInfo,frompersonlexid),
+    Person ToPerson=UID(AssociatedCustomerFileInfo,topersonlexid),
+		INTEGER SelfMatch,
+    INTEGER PublicRecords,
+    INTEGER ContributoryRecords,
+    INTEGER SameAddressEmailMatch,
+    INTEGER SameAddressSsnMatch,
+    INTEGER SameAddressPhoneNumberMatch,
+    INTEGER SameAddressSameDayCount,
+    INTEGER HighFrequencySameAddressSameDayCount,
+    INTEGER NonHighFrequencyAddressCount,
+    INTEGER NonHighFrequencySameAddressSameDayCount,
+    INTEGER SharedAddressCount
+    ));
+
+USE KELOtto.fraudgovshared(FLAT,
+  Event(FILTER((UNSIGNED)record_id > 0 and did > 0), 
+    LexId = did,
+    EventDate = event_date,
+		PrimaryRange = clean_address.prim_range,
+		Predirectional = clean_address.predir,
+		PrimaryName = clean_address.prim_name,
+		Suffix =clean_address.addr_suffix,
+		Postdirectional = clean_address.postdir,
+		Zip = clean_address.zip,
+		SecondaryRange = clean_address.sec_range
+    ),
+	Person(FILTER((UNSIGNED)did <> 0),
+    LexId = did,
+		DateOfBirth = dob,
+		Title = cleaned_name.title,
+		FirstName = cleaned_name.fname,
+		MiddleName =cleaned_name.mname,
+		LastName = cleaned_name.lname,
+		NameSuffix = cleaned_name.name_suffix,
+    SubjectSsnCount = subjectssncount,
+    DateOfBirthMatchLevel = dobmatchlevel,
+    StolenIdentityIndex = StolenIdentityIndex,
+    SyntheticIdentityIndex = SyntheticIdentityIndex, 
+    ManipulatedIdentityIndex = ManipulatedIdentityIndex,
+    VulnerableVictimIndex = VulnerableVictimIndex,
+    FriendlyfraudIndex = FriendlyfraudIndex,
+    SuspiciousActivityIndex = SuspiciousActivityIndex,
+		DateFirstSeen = dt_first_seen, // Contains information for ASOF
+		DateLastSeen = dt_last_seen),		// Contains information for ASOF
+	Address(FILTER((STRING10)clean_address.prim_range <> '' AND (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0),
+		PrimaryRange = clean_address.prim_range,
+		Predirectional = clean_address.predir,
+		PrimaryName = clean_address.prim_name,
+		Suffix =clean_address.addr_suffix,
+		Postdirectional = clean_address.postdir,
+		UnitDesignation = clean_address.unit_desig,
+		SecondaryRange = clean_address.sec_range,
+		PostalCity = clean_address.p_city_name,
+		VanityCity = clean_address.v_city_name,
+		State = clean_address.st,
+		Zip = clean_address.zip,
+		Zip4 = clean_address.zip4,
+		CarrierRouteNumber = clean_address.cart,
+		CarrierRouteSortationAtZIP = clean_address.cr_sort_sz,
+		LineOfTravel =clean_address.lot,
+		LineOfTravelOrder = clean_address.lot_order,
+		DeliveryPointBarcode = clean_address.dbpc,
+		DeliveryPointBarcodeCheckDigit = clean_address.chk_digit,
+		TypeCode = clean_address.rec_type,
+		County = clean_address.fips_county,
+		Latitude = clean_address.geo_lat,
+		Longitude = clean_address.geo_long,
+		MetropolitanStatisticalArea = clean_address.msa,
+		GeoBlock = clean_address.geo_blk,
+		GeoMatch = clean_address.geo_match,
+		ACECleanerErrorCode = clean_address.err_stat,
+		isAdditional=FALSE,
+		DateFirstSeen = dt_first_seen, 
+		DateLastSeen = dt_last_seen),
+    /*
+	Address(FILTER((STRING10)additional_address.clean_address.prim_range <> '' AND (STRING28)additional_address.clean_address.prim_name <> '' AND (UNSIGNED3)additional_address.clean_address.zip <> 0),
+		PrimaryRange = additional_address.clean_address.prim_range,
+		Predirectional = additional_address.clean_address.predir,
+		PrimaryName = additional_address.clean_address.prim_name,
+		Suffix = additional_address.clean_address.addr_suffix,
+		Postdirectional = additional_address.clean_address.postdir,
+		UnitDesignation = additional_address.clean_address.unit_desig,
+		SecondaryRange = additional_address.clean_address.sec_range,
+		PostalCity = additional_address.clean_address.p_city_name,
+		VanityCity = additional_address.clean_address.v_city_name,
+		State = additional_address.clean_address.st,
+		Zip = additional_address.clean_address.zip,
+		Zip4 = additional_address.clean_address.zip4,
+		CarrierRouteNumber = additional_address.clean_address.cart,
+		CarrierRouteSortationAtZIP = additional_address.clean_address.cr_sort_sz,
+		LineOfTravel = additional_address.clean_address.lot,
+		LineOfTravelOrder = additional_address.clean_address.lot_order,
+		DeliveryPointBarcode = additional_address.clean_address.dpbc,
+		DeliveryPointBarcodeCheckDigit = additional_address.clean_address.chk_digit,
+		TypeCode = additional_address.clean_address.rec_type,
+		County = additional_address.clean_address.ace_fips_county,
+		Latitude = additional_address.clean_address.geo_lat,
+		Longitude = additional_address.clean_address.geo_long,
+		MetropolitanStatisticalArea = additional_address.clean_address.msa,
+		GeoBlock = additional_address.clean_address.geo_blk,
+		GeoMatch = additional_address.clean_address.geo_match,
+		ACECleanerErrorCode = additional_address.clean_address.err_stat,
+		isAdditional=TRUE,
+		DateFirstSeen = dt_first_seen,
+		DateLastSeen = dt_last_seen),
+    */
+	SocialSecurityNumber(FILTER((UNSIGNED)ssn <> 0),
+		DateFirstSeen = dt_first_seen,
+		DateLastSeen = dt_last_seen),
+	Phone(FILTER(TRIM(clean_phones.cell_phone) != ''),
+    PhoneFormatted = cell_phone_formatted,
+		PhoneNumber = clean_phones.cell_phone,
+		isCellPhone = TRUE,
+		DateFirstSeen = dt_first_seen,
+		DateLastSeen = dt_last_seen),
+	Phone(FILTER(TRIM(clean_phones.phone_number) != ''),
+    PhoneFormatted = phone_number_formatted,
+		PhoneNumber = clean_phones.phone_number,
+		isCellPhone = FALSE,
+		DateFirstSeen = dt_first_seen,
+		DateLastSeen = dt_last_seen),
+	Email(FILTER((STRING50)email_address <> ''),
+		EmailAddress=email_address,
+		Type=email_address_type,
+		CreatedOn=email_address_date,
+		DateFirstSeen = dt_first_seen,
+		DateLastSeen = dt_last_seen),
+	PersonAddress(FILTER((UNSIGNED)did <> 0 AND (STRING10)clean_address.prim_range <> '' AND (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0 AND AssociatedCustomerFileInfo > 0),
+    LexId = did,
+		PrimaryRange = clean_address.prim_range,
+		Predirectional = clean_address.predir,
+		PrimaryName = clean_address.prim_name,
+		Suffix =clean_address.addr_suffix,
+		Postdirectional = clean_address.postdir,
+		Zip = clean_address.zip,
+		SecondaryRange = clean_address.sec_range,
+		DateLastSeen = dt_last_seen,
+		DateFirstSeen = dt_first_seen),
+	PersonSSN(FILTER((UNSIGNED)did<>0 AND (UNSIGNED)ssn<>0 AND AssociatedCustomerFileInfo > 0),
+    LexId = did,
+		DateLastSeen = dt_last_seen,
+		DateFirstSeen = dt_first_seen),
+	AddressSSN(FILTER((STRING10)clean_address.prim_range <> '' AND (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0 AND (UNSIGNED)ssn <>0 AND AssociatedCustomerFileInfo > 0),
+		PrimaryRange = clean_address.prim_range,
+		Predirectional = clean_address.predir,
+		PrimaryName = clean_address.prim_name,
+		Suffix =clean_address.addr_suffix,
+		Postdirectional = clean_address.postdir,
+		Zip = clean_address.zip,
+		SecondaryRange = clean_address.sec_range,
+		DateLastSeen = dt_last_seen,
+		DateFirstSeen = dt_first_seen),
+	PersonPhone(FILTER((UNSIGNED)did <> 0 AND clean_phones.cell_phone != '' AND (STRING10)clean_address.prim_range <> '' AND (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0),
+    LexId = did,
+		PhoneNumber = clean_phones.cell_phone,
+		DateLastSeen = dt_last_seen,
+		DateFirstSeen = dt_first_seen),
+	PersonPhone(FILTER((UNSIGNED)did <> 0 AND clean_phones.phone_number != '' AND (STRING10)clean_address.prim_range <> '' AND (STRING28)clean_address.prim_name <> '' AND (UNSIGNED3)clean_address.zip <> 0),
+    LexId = did,
+		PhoneNumber = clean_phones.phone_number,
+		DateLastSeen = dt_last_seen,
+		DateFirstSeen = dt_first_seen),
+	PersonEmail(FILTER((UNSIGNED)did <> 0 AND (STRING50)email_address <> '' AND AssociatedCustomerFileInfo > 0),
+    LexId = did
+  ),
+  PersonEvent(FILTER((UNSIGNED)did <> 0 AND AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0),
+    LexId = did,
+		PrimaryRange = clean_address.prim_range,
+		Predirectional = clean_address.predir,
+		PrimaryName = clean_address.prim_name,
+		Suffix =clean_address.addr_suffix,
+		Postdirectional = clean_address.postdir,
+		Zip = clean_address.zip,
+		SecondaryRange = clean_address.sec_range,
+    EventDate = event_date,
+		
+    IpAddress = ip_address, 
+		Emailof=email_address,  		
+		PhoneNumber = clean_phones.cell_phone,
+
+    RoutingNumber = bank_routing_number_1,
+    AccountNumber = bank_account_number_1,
+    Transaction = record_id    
+  ),
+  PersonEvent(FILTER((UNSIGNED)did <> 0 AND AssociatedCustomerFileInfo > 0 AND (UNSIGNED)record_id > 0),
+    LexId = did,
+		PrimaryRange = clean_address.prim_range,
+		Predirectional = clean_address.predir,
+		PrimaryName = clean_address.prim_name,
+		Suffix =clean_address.addr_suffix,
+		Postdirectional = clean_address.postdir,
+		Zip = clean_address.zip,
+		SecondaryRange = clean_address.sec_range,
+    EventDate = event_date,
+		
+    IpAddress = ip_address, 
+		Emailof=email_address,  		
+		PhoneNumber = clean_phones.phone_number,
+    RoutingNumber = bank_routing_number_1,
+    AccountNumber = bank_account_number_1,
+		
+    Transaction = record_id    
+  ),
+  InternetProtocol(FILTER((UNSIGNED)did <> 0 AND AssociatedCustomerFileInfo > 0 AND TRIM(ip_address) != '' AND ip_address NOT IN ['0.0.0.0','10.121.146.247','10.121.146.90','10.121.146.15','10.121.146.159','10.121.146.249','10.121.146.34','10.121.146.231','10.121.146.235','10.121.146.232']),
+    IpAddress = ip_address
+    ),
+	
+  PersonIpAddress(FILTER((UNSIGNED)did <> 0 AND AssociatedCustomerFileInfo > 0 AND TRIM(ip_address) != '' AND ip_address NOT IN ['0.0.0.0','10.121.146.247','10.121.146.90','10.121.146.15','10.121.146.159','10.121.146.249','10.121.146.34','10.121.146.231','10.121.146.235','10.121.146.232']),
+    IpAddress = ip_address, 
+    LexId = did),
+
+  Bank(FILTER(bank_routing_number_1 != '' AND bank_account_number_1 != ''),
+    RoutingNumber = bank_routing_number_1,
+    FullBankname = bank1FullBankname,
+    AbbreviatedBankname = bank1AbbreviatedBankname,
+    FractionalRoutingnumber = bank1FractionalRoutingnumber,
+    HeadofficeRoutingnumber = bank1HeadofficeRoutingnumber,
+    HeadofficeBranchcodes = bank1HeadofficeBranchcodes,
+    hit = bank1hit 
+		),
+
+  Bank(FILTER(bank_routing_number_2 != '' AND bank_account_number_2 != ''),
+    RoutingNumber = bank_routing_number_2,
+    FullBankname = bank2FullBankname,
+    AbbreviatedBankname = bank2AbbreviatedBankname,
+    FractionalRoutingnumber = bank2FractionalRoutingnumber,
+    HeadofficeRoutingnumber = bank2HeadofficeRoutingnumber,
+    HeadofficeBranchcodes = bank2HeadofficeBranchcodes,
+    hit = bank2hit 
+		),
+
+  BankAccount(FILTER((UNSIGNED)did <> 0 AND TRIM(bank_account_number_1) != ''),
+    OttoBankAccountId = OttoBankAccountId,
+    RoutingNumber = bank_routing_number_1,
+    AccountNumber = bank_account_number_1
+		),
+
+  BankAccount(FILTER((UNSIGNED)did <> 0 AND TRIM(bank_account_number_2) != ''),
+    OttoBankAccountId = OttoBankAccountId2,
+    RoutingNumber = bank_routing_number_2,
+    AccountNumber = bank_account_number_2
+		),
+
+  DriversLicense(FILTER((UNSIGNED)did <> 0 AND TRIM(drivers_license) != ''),
+    LicenseNumber = drivers_license,
+    State = drivers_license_state
+		),
+
+  PersonBankAccount(FILTER((UNSIGNED)did <> 0 AND TRIM(bank_account_number_1) != ''),
+    LexId = did,
+    RoutingNumber = bank_routing_number_1,
+    AccountNumber = bank_account_number_1
+		),
+  PersonBankAccount(FILTER((UNSIGNED)did <> 0 AND TRIM(bank_account_number_2) != ''),
+    LexId = did,
+    RoutingNumber = bank_routing_number_2,
+    AccountNumber = bank_account_number_2
+		),
+
+  PersonDriversLicense(FILTER((UNSIGNED)did <> 0 AND TRIM(drivers_license) != ''),
+    LexId = did,
+    LicenseNumber = drivers_license
+		)  
+        
+);
+
+USE KELOtto.PersonEventTypes(FLAT, 
+  Event(FILTER((UNSIGNED)record_id > 0),
+  EventType = event_type)
+);
+
+USE KELOtto.SharingRules(FLAT,
+  Customer(FILTER((UNSIGNED)fdn_ind_type_gc_id_inclusion>0),
+    CustomerId=inclusion_id,
+    IndustryType=Ind_type)
+);
+
+
+USE KELOtto.PersonCIID(FLAT,
+  Person(FILTER((UNSIGNED)did>0),
+    LexId = did,
+    SubjectSsnCount = subjectssncount
+    )
+);
+
+USE KELOtto.PersonFraudPoint(FLAT,
+  Person(FILTER((UNSIGNED)did>0),
+    LexId = did));
+
+USE KELOtto.PersonDeceased(FLAT,
+  Person(
+     LexId = did,
+     DeceasedDate = dod8,
+     DeceasedDateOfBirth = dob8,
+     DeceasedFirst = fname,
+     DeceasedMiddle = mname,
+     DeceasedLast = lname,
+     DeceasedSsn = ssn,
+     DeceasedMatchCode = matchcode)
+     );
+
+USE KELOtto.PersonCrim(FLAT,
+  Person(FILTER((UNSIGNED)did>0),
+    LexId = did
+    ));
+
+USE KELOtto.PersonIPMetadata(FLAT,
+  Event(FILTER((UNSIGNED)record_id > 0 and did > 0), 
+    LexId = did),
+  InternetProtocol(FILTER((UNSIGNED)did <> 0 AND AssociatedCustomerFileInfo > 0 AND ip_address NOT IN ['0.0.0.0','10.121.146.247','10.121.146.90','10.121.146.15','10.121.146.159','10.121.146.249','10.121.146.34','10.121.146.231','10.121.146.235','10.121.146.232']),
+    IpAddress = ip_address
+    )
+  );
+  
+USE KELOtto.AddressPersonAssociations.PersonAddressMatchStats(FLAT,
+  PersonPerson);
+
+/* LOGIC STATEMENTS - Attributes */
+     
+Event: => EntityContextUid := '_11' + RecordId;     
+Event: => InCustomerPopulation := MAP(COUNT(SourceCustomers(rSourceCustomer=rCustomer))>0 => 1, 0);
+Event: => PersonEntityContextUid := Subject.EntityContextUid;
+Event: => CustomerId := rCustomer.CustomerId;
+Event: => IndustryType := rCustomer.IndustryType;
+Event: => DeceasedPriorToEvent := MAP(Subject.Deceased = 1 AND Subject.DeceasedDate < EventDate => 1, 0);
+Event: => EventYearMonth := INTEGER(EventDate) DIV 100;
+Event: => DeceasedToEventYearDiff := YEARSBETWEEN(EventDate, Subject.DeceasedDate);
+Event: => AddressEntityContextUid := Location.EntityContextUid;
+Event: => PersonLabel := Subject.Label;
+Event: => FullAddress := Location.FullAddress;
+Event: => Latitude := Location.Latitude;
+Event: => Longitude := Location.Longitude;
+Event: => LatLongId := STRING(Latitude) + ' ' + STRING(Longitude);
+Event: => EventTypeCount := COUNT(EventTypes);
+Event: => KrHighRiskIdentityFlag := MAP(COUNT(EventTypes(EventType IN ['10000','10001','10002','10004','10005','10006','10007','11000','11001','11002','11003','11004','11005','11006','11007','11008','11009','11010','11011','11012','11013','11014','11015','11016','11017','11018','11019','12000','12001','12002','12003','12004','12005','12006','12007','13000','13001','13002','13003','13004','13005','13006','13007','1400']))>0 => 1, 0);
+Event: => KrMediumRiskIdentityFlag := MAP(COUNT(EventTypes(EventType IN ['10003','14001']))>0 => 1, 0);
+Event: => KrHighRiskAddressFlag := MAP(COUNT(EventTypes(EventType IN ['301','302']))>0 => 1, 0);
+Event: => KrMediumRiskAddressFlag := MAP(COUNT(EventTypes(EventType IN ['300']))>0 => 1, 0);
+
+Event: => KrHighRiskDlFlag := MAP(COUNT(EventTypes(EventType IN ['203','291']))>0 => 1, 0);
+Event: => KrMediumRiskDlFlag := MAP(COUNT(EventTypes(EventType IN ['202','204','292']))>0 => 1, 0);
+Event: => KrLowRiskDlFlag := MAP(COUNT(EventTypes(EventType IN ['200','201','293']))>0 => 1, 0);
+
+Event: => KrHighRiskBankFlag := MAP(COUNT(EventTypes(EventType IN ['800','891']))>0 => 1, 0);
+Event: => KrMediumRiskBankFlag := MAP(COUNT(EventTypes(EventType IN ['801','802','892']))>0 => 1, 0);
+Event: => KrLowRiskBankFlag := MAP(COUNT(EventTypes(EventType IN ['893','890']))>0 => 1, 0);
+
+Event: => DemoCustomer := rCustomer.CustomerId IN ['248283691','248283681','248283671'];
+Event: => Age := IF(DemoCustomer, DAYSBETWEEN(EventDate, DATEFROMPARTS(2018, 4, 7)), DAYSBETWEEN(EventDate, rCustomer.EventDateMax));
+Event: => Hri03Flag := MAP(COUNT(HriList(CONTAINS(Hri,'03'))) > 0 => 1, 0);
+Event: => Hri06Flag := MAP(COUNT(HriList(CONTAINS(Hri,'06'))) > 0 => 1, 0);
+Event: => Hri07Flag := MAP(COUNT(HriList(CONTAINS(Hri,'07'))) > 0 => 1, 0);
+Event: => Hri08Flag := MAP(COUNT(HriList(CONTAINS(Hri,'08'))) > 0 => 1, 0);
+Event: => Hri11Flag := MAP(COUNT(HriList(CONTAINS(Hri,'11'))) > 0 => 1, 0);
+Event: => Hri12Flag := MAP(COUNT(HriList(CONTAINS(Hri,'12'))) > 0 => 1, 0);
+Event: => Hri14Flag := MAP(COUNT(HriList(CONTAINS(Hri,'14'))) > 0 => 1, 0);
+Event: => Hri15Flag := MAP(COUNT(HriList(CONTAINS(Hri,'15'))) > 0 => 1, 0);
+Event: => Hri19Flag := MAP(COUNT(HriList(CONTAINS(Hri,'19'))) > 0 => 1, 0);
+Event: => Hri25Flag := MAP(COUNT(HriList(CONTAINS(Hri,'25'))) > 0 => 1, 0);
+Event: => Hri26Flag := MAP(COUNT(HriList(CONTAINS(Hri,'26'))) > 0 => 1, 0);
+Event: => Hri27Flag := MAP(COUNT(HriList(CONTAINS(Hri,'27'))) > 0 => 1, 0);
+Event: => Hri28Flag := MAP(COUNT(HriList(CONTAINS(Hri,'28'))) > 0 => 1, 0);
+Event: => Hri29Flag := MAP(COUNT(HriList(CONTAINS(Hri,'29'))) > 0 => 1, 0);
+Event: => Hri30Flag := MAP(COUNT(HriList(CONTAINS(Hri,'30'))) > 0 => 1, 0);
+Event: => Hri31Flag := MAP(COUNT(HriList(CONTAINS(Hri,'31'))) > 0 => 1, 0);
+Event: => Hri37Flag := MAP(COUNT(HriList(CONTAINS(Hri,'37'))) > 0 => 1, 0);
+Event: => Hri38Flag := MAP(COUNT(HriList(CONTAINS(Hri,'38'))) > 0 => 1, 0);
+Event: => Hri41Flag := MAP(COUNT(HriList(CONTAINS(Hri,'41'))) > 0 => 1, 0);
+Event: => Hri48Flag := MAP(COUNT(HriList(CONTAINS(Hri,'48'))) > 0 => 1, 0);
+Event: => Hri50Flag := MAP(COUNT(HriList(CONTAINS(Hri,'50'))) > 0 => 1, 0);
+Event: => Hri51Flag := MAP(COUNT(HriList(CONTAINS(Hri,'51'))) > 0 => 1, 0);
+Event: => Hri52Flag := MAP(COUNT(HriList(CONTAINS(Hri,'52'))) > 0 => 1, 0);
+Event: => Hri71Flag := MAP(COUNT(HriList(CONTAINS(Hri,'71'))) > 0 => 1, 0);
+Event: => Hri83Flag := MAP(COUNT(HriList(CONTAINS(Hri,'83'))) > 0 => 1, 0);
+Event: => Hri90Flag := MAP(COUNT(HriList(CONTAINS(Hri,'90'))) > 0 => 1, 0);
+Event: => HriClFlag := MAP(COUNT(HriList(CONTAINS(Hri,'CL'))) > 0 => 1, 0);
+Event: => HriCoFlag := MAP(COUNT(HriList(CONTAINS(Hri,'CO'))) > 0 => 1, 0);
+Event: => HriDdFlag := MAP(COUNT(HriList(CONTAINS(Hri,'DD'))) > 0 => 1, 0);
+Event: => HriDfFlag := MAP(COUNT(HriList(CONTAINS(Hri,'DF'))) > 0 => 1, 0);
+Event: => HriIvFlag := MAP(COUNT(HriList(CONTAINS(Hri,'IV'))) > 0 => 1, 0);
+Event: => HriItFlag := MAP(COUNT(HriList(CONTAINS(Hri,'IT'))) > 0 => 1, 0);
+Event: => HriMiFlag := MAP(COUNT(HriList(CONTAINS(Hri,'MI'))) > 0 => 1, 0);
+Event: => HriMoFlag := MAP(COUNT(HriList(CONTAINS(Hri,'MO'))) > 0 => 1, 0);
+Event: => HriMsFlag := MAP(COUNT(HriList(CONTAINS(Hri,'MS'))) > 0 => 1, 0);
+Event: => HriNfFlag := MAP(COUNT(HriList(CONTAINS(Hri,'NF'))) > 0 => 1, 0);
+Event: => HriPaFlag := MAP(COUNT(HriList(CONTAINS(Hri,'PA'))) > 0 => 1, 0);
+Event: => HriPoFlag := MAP(COUNT(HriList(CONTAINS(Hri,'PO'))) > 0 => 1, 0);
+Event: => HriVaFlag := MAP(COUNT(HriList(CONTAINS(Hri,'VA'))) > 0 => 1, 0);
+
+Event: => IdNas9Flag := MAP(nas_summary = '9' => 1, 0); // SSN and Last Name not associated with identity per public records
+Event: => IdNap3Flag := MAP(nap_summary = '3' => 1, 0); // Phone and Lastname not associated with identity per public records
+
+Event: => KrDl200Flag := MAP(COUNT(EventTypes(EventType IN ['200']))>0 => 1, 0);
+Event: => KrDl201Flag := MAP(COUNT(EventTypes(EventType IN ['201']))>0 => 1, 0);
+Event: => KrDl202Flag := MAP(COUNT(EventTypes(EventType IN ['202']))>0 => 1, 0);
+Event: => KrDl203Flag := MAP(COUNT(EventTypes(EventType IN ['203']))>0 => 1, 0);
+Event: => KrDl204Flag := MAP(COUNT(EventTypes(EventType IN ['204']))>0 => 1, 0);
+Event: => KrDl290Flag := MAP(COUNT(EventTypes(EventType IN ['290']))>0 => 1, 0);
+Event: => KrDl291Flag := MAP(COUNT(EventTypes(EventType IN ['291']))>0 => 1, 0);
+Event: => KrDl292Flag := MAP(COUNT(EventTypes(EventType IN ['292']))>0 => 1, 0);
+Event: => KrDl293Flag := MAP(COUNT(EventTypes(EventType IN ['293']))>0 => 1, 0);
+
+Event: => KrBnk800Flag := MAP(COUNT(EventTypes(EventType IN ['800']))>0 => 1, 0);
+Event: => KrBnk801Flag := MAP(COUNT(EventTypes(EventType IN ['801']))>0 => 1, 0);
+Event: => KrBnk802Flag := MAP(COUNT(EventTypes(EventType IN ['802']))>0 => 1, 0);
+Event: => KrBnk890Flag := MAP(COUNT(EventTypes(EventType IN ['890']))>0 => 1, 0);
+Event: => KrBnk891Flag := MAP(COUNT(EventTypes(EventType IN ['891']))>0 => 1, 0);
+Event: => KrBnk892Flag := MAP(COUNT(EventTypes(EventType IN ['892']))>0 => 1, 0);
+Event: => KrBnk893Flag := MAP(COUNT(EventTypes(EventType IN ['893']))>0 => 1, 0);
+
+Event: => IdAge := YEARSBETWEEN(DateOfBirth, DATEFROMPARTS(2018, 4, 7));
+
+Event: => SsnHri06Flag := MAP(COUNT(HriList(CONTAINS(Hri,'06'))) > 0 => 1, 0);
+Event: => SsnHri26Flag := MAP(COUNT(HriList(CONTAINS(Hri,'26'))) > 0 => 1, 0);
+Event: => SsnHri29Flag := MAP(COUNT(HriList(CONTAINS(Hri,'29'))) > 0 => 1, 0);
+Event: => SsnHri38Flag := MAP(COUNT(HriList(CONTAINS(Hri,'38'))) > 0 => 1, 0);
+Event: => SsnHri71Flag := MAP(COUNT(HriList(CONTAINS(Hri,'71'))) > 0 => 1, 0);
+Event: => SsnHriItFlag := MAP(COUNT(HriList(CONTAINS(Hri,'It'))) > 0 => 1, 0);
+Event: => SsnHriMiFlag := MAP(COUNT(HriList(CONTAINS(Hri,'Mi'))) > 0 => 1, 0);
+Event: => AddrHri11Flag := MAP(COUNT(HriList(CONTAINS(Hri,'11'))) > 0 => 1, 0);
+Event: => AddrHri12Flag := MAP(COUNT(HriList(CONTAINS(Hri,'12'))) > 0 => 1, 0);
+Event: => AddrHri14Flag := MAP(COUNT(HriList(CONTAINS(Hri,'14'))) > 0 => 1, 0);
+Event: => AddrHri25Flag := MAP(COUNT(HriList(CONTAINS(Hri,'25'))) > 0 => 1, 0);
+Event: => AddrHri30Flag := MAP(COUNT(HriList(CONTAINS(Hri,'30'))) > 0 => 1, 0);
+Event: => AddrHri50Flag := MAP(COUNT(HriList(CONTAINS(Hri,'50'))) > 0 => 1, 0);
+Event: => AddrHriCoFlag := MAP(COUNT(HriList(CONTAINS(Hri,'CO'))) > 0 => 1, 0);
+Event: => AddrHriMoFlag := MAP(COUNT(HriList(CONTAINS(Hri,'MO'))) > 0 => 1, 0);
+Event: => AddrHriPaFlag := MAP(COUNT(HriList(CONTAINS(Hri,'PA'))) > 0 => 1, 0);
+Event: => AddrHriPoFlag := MAP(COUNT(HriList(CONTAINS(Hri,'PO'))) > 0 => 1, 0);
+Event: => AddrHriVaFlag := MAP(COUNT(HriList(CONTAINS(Hri,'VA'))) > 0 => 1, 0);
+Event: => PhHriMiFlag := MAP(COUNT(HriList(CONTAINS(Hri,'Mi'))) > 0 => 1, 0);
+Event: => PhHri07Flag := MAP(COUNT(HriList(CONTAINS(Hri,'07'))) > 0 => 1, 0);
+Event: => PhHri08Flag := MAP(COUNT(HriList(CONTAINS(Hri,'08'))) > 0 => 1, 0);
+Event: => PhHri15Flag := MAP(COUNT(HriList(CONTAINS(Hri,'15'))) > 0 => 1, 0);
+Event: => PhHri27Flag := MAP(COUNT(HriList(CONTAINS(Hri,'27'))) > 0 => 1, 0);
+Event: => PhHri31Flag := MAP(COUNT(HriList(CONTAINS(Hri,'31'))) > 0 => 1, 0);
+Event: => DlHri41Flag := MAP(COUNT(HriList(CONTAINS(Hri,'41'))) > 0 => 1, 0);
+Event: => DlHriDfFlag := MAP(COUNT(HriList(CONTAINS(Hri,'DF'))) > 0 => 1, 0);
+
+
+
+Person: => CustomerId := rCustomer.CustomerId;
+Person: => IndustryType := rCustomer.IndustryType;
+Person: => SourceCustomerCount := COUNT(SourceCustomers);
+Person: => EntityContextUid := '_01' + LexId;
+Person: => EntityType := 1;
+
+Person: => NoLexId := MAP(LexId > 900000000000 => 1, 0);
+Person: => Age := YEARSBETWEEN(MAX(ReportedDateOfBirth, DateOfBirth), DATEFROMPARTS(2018, 4, 7));
+Person: => NoLexIdGt22 := MAP(NoLexId = 1 AND Age > 22 => 1, 0);
+Person: => EventCount := COUNT(PersonEvent{Transaction});
+Person: => Deceased := MAP(ISVALIDDATE(DeceasedDate) => 1, 0);
+Person: => DeceasedNameMatch := MAP(COUNT(FullName(FirstName=DeceasedFirst AND LastName=DeceasedLast))>0 => 1, 0);
+Person: => DeceasedDobMatch := MAP(COUNT(ReportedDateOfBirth(DeceasedDateOfBirth=DateOfBirth))>0 => 1, 0);
+Person: => DeceasedMatch := MAP(Deceased=1 AND DeceasedNameMatch=1 AND DeceasedDobMatch=1 => 1, 0);
+Person: => DeceasedMatchDescription := MAP(DeceasedMatch=1 => 'Full Matched Deceased Identity', '');
+
+Person: => CurrentlyIncarceratedFlag := MAP(name_ssn_dob_match = 1 AND curr_incar_flag='Y' => 1, 0);
+Person: => FraudOffenseCount := COUNT(Offenses(CONTAINS(off_cat_list,'FRAUD')));
+Person: => FraudOffensesFlag := MAP(name_ssn_dob_match = 1 AND FraudOffenseCount > 0 => 1, 0);
+Person: => AssociatedWithIncarceratedFlag := MAP(name_ssn_dob_match = 0 AND curr_incar_flag='Y' => 1, 0);
+Person: => AssociatedWithFraudOffensesFlag := MAP(name_ssn_dob_match = 0 AND FraudOffenseCount > 0 => 1, 0);
+
+// NOTE: This is "best" from the contributed not Best Best.
+Person: => BestFullName := ONLY(TOPN(FullName(NOT FirstName:Null AND NOT LastName:Null), 1, FirstName, LastName));
+Person: => Label := TRIM(BestFullName.FirstName) + ' ' + TRIM(BestFullName.LastName);
+
+Person: => InCustomerPopulation := MAP(COUNT(SourceCustomers(rSourceCustomer=rCustomer))>0 => 1, 0);
+Person: => OtherCustomerPersonCustomerCount := COUNT(SourceCustomers(rSourceCustomer != rCustomer));
+
+Person: => IdSsnIdentityCountMax := MAX(PersonSSN.Social, IdentityCount); 
+                                                   
+Person: => MaxDeceasedToEventDiff := MAX(PersonEvent.Transaction(InCustomerPopulation=1), DeceasedToEventYearDiff);
+Person: => AllMaxDeceasedToEventDiff := MAX(PersonEvent.Transaction, DeceasedToEventYearDiff);
+
+Person: => DeceasedEventCount := SUM(PersonEvent.Transaction(InCustomerPopulation=1), DeceasedPriorToEvent);
+Person: => DeceasedEventPercent := AVE(PersonEvent.Transaction(InCustomerPopulation=1), DeceasedPriorToEvent);
+
+Person: => AllDeceasedEventCount := SUM(PersonEvent.Transaction, DeceasedPriorToEvent);
+Person: => AllDeceasedEventPercent := AVE(PersonEvent.Transaction, DeceasedPriorToEvent);
+
+Person: => DeathPriorToAllEvents := MAP(DeceasedEventPercent = 1 => 1, 0);
+Person: => AllDeathPriorToAllEvents := MAP(AllDeceasedEventPercent = 1 => 1, 0);
+Person: => HighRiskDeathPriorToAllEvents := MAP(DeathPriorToAllEvents = 1 AND MaxDeceasedToEventDiff < -4 => 1, 0);
+Person: => AllHighRiskDeathPriorToAllEvents := MAP(AllDeathPriorToAllEvents = 1 AND AllMaxDeceasedToEventDiff < -4 => 1, 0);
+
+Person: => Score := (LexId % 10) * 10;
+
+// Second Order Features
+
+Person: => Hri03Flag := MAP(COUNT(HriList(CONTAINS(Hri,'03'))) > 0 => 1, 0);
+Person: => Hri06Flag := MAP(COUNT(HriList(CONTAINS(Hri,'06'))) > 0 => 1, 0);
+Person: => Hri07Flag := MAP(COUNT(HriList(CONTAINS(Hri,'07'))) > 0 => 1, 0);
+Person: => Hri08Flag := MAP(COUNT(HriList(CONTAINS(Hri,'08'))) > 0 => 1, 0);
+Person: => Hri11Flag := MAP(COUNT(HriList(CONTAINS(Hri,'11'))) > 0 => 1, 0);
+Person: => Hri12Flag := MAP(COUNT(HriList(CONTAINS(Hri,'12'))) > 0 => 1, 0);
+Person: => Hri14Flag := MAP(COUNT(HriList(CONTAINS(Hri,'14'))) > 0 => 1, 0);
+Person: => Hri15Flag := MAP(COUNT(HriList(CONTAINS(Hri,'15'))) > 0 => 1, 0);
+Person: => Hri19Flag := MAP(COUNT(HriList(CONTAINS(Hri,'19'))) > 0 => 1, 0);
+Person: => Hri25Flag := MAP(COUNT(HriList(CONTAINS(Hri,'25'))) > 0 => 1, 0);
+Person: => Hri26Flag := MAP(COUNT(HriList(CONTAINS(Hri,'26'))) > 0 => 1, 0);
+Person: => Hri27Flag := MAP(COUNT(HriList(CONTAINS(Hri,'27'))) > 0 => 1, 0);
+Person: => Hri28Flag := MAP(COUNT(HriList(CONTAINS(Hri,'28'))) > 0 => 1, 0);
+Person: => Hri29Flag := MAP(COUNT(HriList(CONTAINS(Hri,'29'))) > 0 => 1, 0);
+Person: => Hri30Flag := MAP(COUNT(HriList(CONTAINS(Hri,'30'))) > 0 => 1, 0);
+Person: => Hri31Flag := MAP(COUNT(HriList(CONTAINS(Hri,'31'))) > 0 => 1, 0);
+Person: => Hri37Flag := MAP(COUNT(HriList(CONTAINS(Hri,'37'))) > 0 => 1, 0);
+Person: => Hri38Flag := MAP(COUNT(HriList(CONTAINS(Hri,'38'))) > 0 => 1, 0);
+Person: => Hri41Flag := MAP(COUNT(HriList(CONTAINS(Hri,'41'))) > 0 => 1, 0);
+Person: => Hri48Flag := MAP(COUNT(HriList(CONTAINS(Hri,'48'))) > 0 => 1, 0);
+Person: => Hri50Flag := MAP(COUNT(HriList(CONTAINS(Hri,'50'))) > 0 => 1, 0);
+Person: => Hri51Flag := MAP(COUNT(HriList(CONTAINS(Hri,'51'))) > 0 => 1, 0);
+Person: => Hri52Flag := MAP(COUNT(HriList(CONTAINS(Hri,'52'))) > 0 => 1, 0);
+Person: => Hri71Flag := MAP(COUNT(HriList(CONTAINS(Hri,'71'))) > 0 => 1, 0);
+Person: => Hri83Flag := MAP(COUNT(HriList(CONTAINS(Hri,'83'))) > 0 => 1, 0);
+Person: => Hri90Flag := MAP(COUNT(HriList(CONTAINS(Hri,'90'))) > 0 => 1, 0);
+Person: => HriClFlag := MAP(COUNT(HriList(CONTAINS(Hri,'CL'))) > 0 => 1, 0);
+Person: => HriCoFlag := MAP(COUNT(HriList(CONTAINS(Hri,'CO'))) > 0 => 1, 0);
+Person: => HriDdFlag := MAP(COUNT(HriList(CONTAINS(Hri,'DD'))) > 0 => 1, 0);
+Person: => HriDfFlag := MAP(COUNT(HriList(CONTAINS(Hri,'DF'))) > 0 => 1, 0);
+Person: => HriIvFlag := MAP(COUNT(HriList(CONTAINS(Hri,'IV'))) > 0 => 1, 0);
+Person: => HriItFlag := MAP(COUNT(HriList(CONTAINS(Hri,'IT'))) > 0 => 1, 0);
+Person: => HriMiFlag := MAP(COUNT(HriList(CONTAINS(Hri,'MI'))) > 0 => 1, 0);
+Person: => HriMoFlag := MAP(COUNT(HriList(CONTAINS(Hri,'MO'))) > 0 => 1, 0);
+Person: => HriMsFlag := MAP(COUNT(HriList(CONTAINS(Hri,'MS'))) > 0 => 1, 0);
+Person: => HriNfFlag := MAP(COUNT(HriList(CONTAINS(Hri,'NF'))) > 0 => 1, 0);
+Person: => HriPaFlag := MAP(COUNT(HriList(CONTAINS(Hri,'PA'))) > 0 => 1, 0);
+Person: => HriPoFlag := MAP(COUNT(HriList(CONTAINS(Hri,'PO'))) > 0 => 1, 0);
+Person: => HriVaFlag := MAP(COUNT(HriList(CONTAINS(Hri,'VA'))) > 0 => 1, 0);
+
+Person: => Nas9Flag := MAP(nas_summary = '9' => 1, 0); // SSN and Last Name not associated with identity per public records
+Person: => Nap3Flag := MAP(nap_summary = '3' => 1, 0); // Phone and Lastname not associated with identity per public records
+
+
+// Known Risk 
+Person: => KrHighRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrHighRiskIdentityFlag=1)) > 0 => 1, 0);
+Person: => KrMediumRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrMediumRiskIdentityFlag=1))>0 => 1, 0);
+Person: => KrHighRiskRouting := MAP(COUNT(PersonBankAccount.Account(HighRiskRouting=1))>0 => 1, 0);
+
+// Velocity
+
+Person: => VlEvent1AllCount := COUNT(PersonEvent.Transaction(Age<2));
+Person: => VlEvent7AllCount := COUNT(PersonEvent.Transaction(Age<8));
+Person: => VlEvent30AllDayCount := COUNT(PersonEvent.Transaction(Age<31));
+Person: => VlEvent365AllDayCount := COUNT(PersonEvent.Transaction(Age<366));
+
+Person: => VlEvent7AllActiveFlag := MAP(VlEvent7AllCount > 0 => 1, 0);
+Person: => VlEvent30AllActiveFlag := MAP(VlEvent30AllDayCount > 0 => 1, 0);
+
+Person: => VlEvent1Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<2));
+Person: => VlEvent7Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<8));
+Person: => VlEvent30Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<31));
+Person: => VlEvent365Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<366));
+
+Person: => VlEvent7ActiveFlag := MAP(VlEvent7Count > 0 => 1, 0);
+Person: => VlEvent30ActiveFlag := MAP(VlEvent30Count > 0 => 1, 0);
+
+// Cluster Attributes 
+
+Person: => ClHighRiskRoutingCount := SUM(PersonPerson.ToPerson, KrHighRiskRouting); // Count of Identities with high risk bank account routing.
+
+Person: => ClNoLexIdGt22Count := SUM(PersonPerson.ToPerson, NoLexIdGt22); // Count within cluster of identities with no lexid and older than 22.
+Person: => ClDeathPriorToAllEventsIdentityCount := SUM(PersonPerson.ToPerson, DeathPriorToAllEvents); // Count within cluster of identities that were deceased prior to all input. 
+Person: => ClHighRiskDeathPriorToAllEventsIdentityCount := SUM(PersonPerson.ToPerson, HighRiskDeathPriorToAllEvents);  // Count within cluster of death 5+ years prior to all input
+Person: => ClEventCount := COUNT(PersonPerson.ToPerson.PersonEvent{Transaction}); //  // Count within cluster of all events/transactions
+Person: => ClElementCount := 0; 
+Person: => ClIdentityCount := COUNT(PersonPerson.ToPerson.PersonPerson.ToPerson{LexId});  // Count within cluster of Identities within 1 degree (temporarily putting 2nd degree for consistency in the UI) 20180807
+Person: => ClFullIdentityCount := COUNT(PersonPerson.ToPerson.PersonPerson.ToPerson{LexId});  // Count within cluster of within 2 degrees. Person -> Person -> Person
+Person: => ClNas9IdentityCount := SUM(PersonPerson.ToPerson, Nas9Flag);  // Count within cluster with SSN and Last Name not associated with identity per public records
+Person: => ClNap3IdentityCount := SUM(PersonPerson.ToPerson, Nap3Flag);  // Count within cluster of Identities with Phone and Lastname not associated with identity per public records
+
+Person: => ClActive7IdentityCount := COUNT(PersonPerson.ToPerson(VlEvent7ActiveFlag=1));  // Count within cluster of active identities in the last 7 days.
+Person: => ClActive30IdentityCount := COUNT(PersonPerson.ToPerson(VlEvent30ActiveFlag=1));  // Count within cluster of active identities in the last 30 days.
+
+
+
+Person: => ClAddressCount := COUNT(PersonAddress.Subject(InCustomerPopulation=1));  // Count within cluster of distict addresses within customer population
+Person: => ClIdentityEventAvg := ClEventCount / ClIdentityCount; // Average number of events/transactions per identity within cluster.
+Person: => ClHighRiskPattern1Flag := MAP(ClIdentityCount > 9 => 1, 0); // High Identity Count Cluster
+Person: => ClHighRiskPattern2Flag := MAP(ClNas9IdentityCount > 10 AND ClNap3IdentityCount > 0 => 1, 0); // Pattern of Phone and Addresses not being associated with identities. 
+Person: => ClHighRiskPattern3Flag := MAP( ClHighRiskDeathPriorToAllEventsIdentityCount >  0 => 1, 0); // Pattern of associated deceased identities within the cluster.
+Person: => ClHighRiskPattern4Flag := 0; // Velocity
+Person: => ClHighRiskPattern5Flag := 0; // Known Risk
+
+
+Person: => ClIdentityCountPercentile := ClIdentityCount$^Percentile;
+Person: => ClEventCountPercentile := ClEventCount$^Percentile;
+Person: => ClActive30IdentityCountPercentile := ClActive30IdentityCount$^Percentile;
+Person: => ClActive7IdentityCountPercentile  := ClActive7IdentityCount$^Percentile;
+
+Person: => ClImpactWeight := ((ClIdentityCountPercentile * 0.3) + (ClEventCountPercentile * 0.3) + (ClActive30IdentityCountPercentile * 0.20) + (ClActive7IdentityCountPercentile * 0.20));
+
+// This will be computed outside of KEL later along with the weighted score for known risk, velocity etc..
+Person: => ClusterScore := (LexId % 100); //MEDIAN(CustomerPersonPerson(SourceCustomer = CustomerPerson.SourceCustomer).ToPerson.CustomerPerson(SourceCustomer = CustomerPerson.SourceCustomer){Subject, Score}, Score);
+
+SocialSecurityNumber: => CustomerId := rCustomer.CustomerId;
+SocialSecurityNumber: => IndustryType := rCustomer.IndustryType;
+SocialSecurityNumber: => SourceCustomerCount := COUNT(SourceCustomers);
+SocialSecurityNumber: => EntityContextUid := '_15' + Ssn;// OttoSSNId;
+SocialSecurityNumber: => EntityType := 15;
+SocialSecurityNumber: => Label := SsnFormatted;
+SocialSecurityNumber: => InCustomerPopulation := MAP(COUNT(SourceCustomers(rSourceCustomer=rCustomer))>0 => 1, 0);
+
+
+SocialSecurityNumber: => IdentityCount := COUNT(PersonEvent{Subject});
+SocialSecurityNumber: => EventCount := COUNT(PersonEvent{Transaction});
+
+SocialSecurityNumber: => Hri06Flag := MAP(COUNT(HriList(CONTAINS(Hri,'06'))) > 0 => 1, 0);
+SocialSecurityNumber: => Hri26Flag := MAP(COUNT(HriList(CONTAINS(Hri,'26'))) > 0 => 1, 0);
+SocialSecurityNumber: => Hri29Flag := MAP(COUNT(HriList(CONTAINS(Hri,'29'))) > 0 => 1, 0);
+SocialSecurityNumber: => Hri38Flag := MAP(COUNT(HriList(CONTAINS(Hri,'38'))) > 0 => 1, 0);
+SocialSecurityNumber: => Hri71Flag := MAP(COUNT(HriList(CONTAINS(Hri,'71'))) > 0 => 1, 0);
+SocialSecurityNumber: => HriItFlag := MAP(COUNT(HriList(CONTAINS(Hri,'It'))) > 0 => 1, 0);
+SocialSecurityNumber: => HriMiFlag := MAP(COUNT(HriList(CONTAINS(Hri,'Mi'))) > 0 => 1, 0);
+
+// Known Risk 
+SocialSecurityNumber: => KrHighRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrHighRiskIdentityFlag=1)) > 0 => 1, 0);
+SocialSecurityNumber: => KrMediumRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrMediumRiskIdentityFlag=1))>0 => 1, 0);
+
+// Velocity
+
+SocialSecurityNumber: => VlEvent1AllCount := COUNT(PersonEvent.Transaction(Age<2));
+SocialSecurityNumber: => VlEvent7AllCount := COUNT(PersonEvent.Transaction(Age<8));
+SocialSecurityNumber: => VlEvent30AllDayCount := COUNT(PersonEvent.Transaction(Age<31));
+SocialSecurityNumber: => VlEvent365AllDayCount := COUNT(PersonEvent.Transaction(Age<366));
+
+SocialSecurityNumber: => VlEvent7AllActiveFlag := MAP(VlEvent7AllCount > 0 => 1, 0);
+SocialSecurityNumber: => VlEvent30AllActiveFlag := MAP(VlEvent30AllDayCount > 0 => 1, 0);
+
+SocialSecurityNumber: => VlEvent1Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<2));
+SocialSecurityNumber: => VlEvent7Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<8));
+SocialSecurityNumber: => VlEvent30Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<31));
+SocialSecurityNumber: => VlEvent365Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<366));
+
+SocialSecurityNumber: => VlEvent7ActiveFlag := MAP(VlEvent7Count > 0 => 1, 0);
+SocialSecurityNumber: => VlEvent30ActiveFlag := MAP(VlEvent30Count > 0 => 1, 0);
+
+
+// Cluster Attributes
+SocialSecurityNumber: => ClIdentityCount := COUNT(PersonSSN);
+SocialSecurityNumber: => ClActive7IdentityCount := COUNT(PersonSSN.Subject.PersonPerson(ToPerson.VlEvent7ActiveFlag=1){ToPerson});
+SocialSecurityNumber: => ClActive30IdentityCount := COUNT(PersonSSN.Subject.PersonPerson(ToPerson.VlEvent30ActiveFlag=1){ToPerson});
+
+SocialSecurityNumber: => ClElementCount := 0;
+SocialSecurityNumber: => ClEventCount := COUNT(PersonEvent.Subject{PersonEvent});
+SocialSecurityNumber: => ClIdentityCountPercentile := ClIdentityCount$^Decile;
+SocialSecurityNumber: => ClEventCountPercentile := ClEventCount$^Percentile;
+SocialSecurityNumber: => ClActive30IdentityCountPercentile := ClActive30IdentityCount$^Percentile;
+SocialSecurityNumber: => ClActive7IdentityCountPercentile  := ClActive7IdentityCount$^Percentile;
+
+SocialSecurityNumber: => ClImpactWeight := ((ClIdentityCountPercentile * 0.3) + (ClEventCountPercentile * 0.3) + (ClActive30IdentityCountPercentile * 0.20) + (ClActive7IdentityCountPercentile * 0.20));
+
+SocialSecurityNumber: => Score := UID % 100;
+SocialSecurityNumber: => ClusterScore := 0;
+
+Phone: => CustomerId := rCustomer.CustomerId;
+Phone: => IndustryType := rCustomer.IndustryType;
+Phone: => SourceCustomerCount := COUNT(SourceCustomers);
+Phone: => EntityContextUid := '_16' + PhoneNumber;
+Phone: => EntityType := 16;
+Phone: => Label := PhoneFormatted;
+Phone: => InCustomerPopulation := MAP(COUNT(SourceCustomers(rSourceCustomer=rCustomer))>0 => 1, 0);
+
+Phone: => IdentityCount := COUNT(PersonEvent{Subject});
+Phone: => EventCount := COUNT(PersonEvent{Transaction});
+
+
+Phone: => HriMiFlag := MAP(COUNT(HriList(CONTAINS(Hri,'Mi'))) > 0 => 1, 0);
+
+
+Phone: => Hri07Flag := MAP(COUNT(HriList(CONTAINS(Hri,'07'))) > 0 => 1, 0);
+Phone: => Hri08Flag := MAP(COUNT(HriList(CONTAINS(Hri,'08'))) > 0 => 1, 0);
+Phone: => Hri15Flag := MAP(COUNT(HriList(CONTAINS(Hri,'15'))) > 0 => 1, 0);
+Phone: => Hri27Flag := MAP(COUNT(HriList(CONTAINS(Hri,'27'))) > 0 => 1, 0);
+Phone: => Hri31Flag := MAP(COUNT(HriList(CONTAINS(Hri,'31'))) > 0 => 1, 0);
+
+// Known Risk 
+Phone: => KrHighRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrHighRiskIdentityFlag=1)) > 0 => 1, 0);
+Phone: => KrMediumRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrMediumRiskIdentityFlag=1))>0 => 1, 0);
+
+// Velocity
+
+Phone: => VlEvent1AllCount := COUNT(PersonEvent.Transaction(Age<2));
+Phone: => VlEvent7AllCount := COUNT(PersonEvent.Transaction(Age<8));
+Phone: => VlEvent30AllDayCount := COUNT(PersonEvent.Transaction(Age<31));
+Phone: => VlEvent365AllDayCount := COUNT(PersonEvent.Transaction(Age<366));
+
+Phone: => VlEvent7AllActiveFlag := MAP(VlEvent7AllCount > 0 => 1, 0);
+Phone: => VlEvent30AllActiveFlag := MAP(VlEvent30AllDayCount > 0 => 1, 0);
+
+Phone: => VlEvent1Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<2));
+Phone: => VlEvent7Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<8));
+Phone: => VlEvent30Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<31));
+Phone: => VlEvent365Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<366));
+
+Phone: => VlEvent7ActiveFlag := MAP(VlEvent7Count > 0 => 1, 0);
+Phone: => VlEvent30ActiveFlag := MAP(VlEvent30Count > 0 => 1, 0);
+
+// Cluster Attributes
+Phone: => ClIdentityCount := COUNT(PersonEvent{Subject}.Subject.PersonPerson.ToPerson{LexId});
+
+Phone: => ClActive7IdentityCount := COUNT(PersonPhone(Subject.VlEvent7ActiveFlag=1){Subject});
+Phone: => ClActive30IdentityCount := COUNT(PersonPhone(Subject.VlEvent30ActiveFlag=1){Subject});
+
+Phone: => ClEventCount := COUNT(PersonEvent.Subject{PersonEvent});
+Phone: => ClElementCount := 0;
+Phone: => ClIdentityCountPercentile := ClIdentityCount$^Decile;
+Phone: => ClEventCountPercentile := ClEventCount$^Percentile;
+Phone: => ClActive30IdentityCountPercentile := ClActive30IdentityCount$^Percentile;
+Phone: => ClActive7IdentityCountPercentile  := ClActive7IdentityCount$^Percentile;
+Phone: => ClImpactWeight := ((ClIdentityCountPercentile * 0.3) + (ClEventCountPercentile * 0.3) + (ClActive30IdentityCountPercentile * 0.20) + (ClActive7IdentityCountPercentile * 0.20));
+
+
+Phone: => Score := UID % 100;
+Phone: => ClusterScore := 0;
+
+Email: => CustomerId := rCustomer.CustomerId;
+Email: => IndustryType := rCustomer.IndustryType;
+Email: => SourceCustomerCount := COUNT(SourceCustomers);
+Email: => EntityContextUid := '_17' + OttoEmailId;
+Email: => EntityType := 17;
+Email: => Label := EmailAddress;
+Email: => InCustomerPopulation := MAP(COUNT(SourceCustomers(rSourceCustomer=rCustomer))>0 => 1, 0);
+
+Email: => IdentityCount := COUNT(PersonEvent{Subject});
+Email: => EventCount := COUNT(PersonEvent{Transaction});
+
+// Known Risk 
+Email: => KrHighRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrHighRiskIdentityFlag=1)) > 0 => 1, 0);
+Email: => KrMediumRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrMediumRiskIdentityFlag=1))>0 => 1, 0);
+
+// Velocity
+
+Email: => VlEvent1AllCount := COUNT(PersonEvent.Transaction(Age<2));
+Email: => VlEvent7AllCount := COUNT(PersonEvent.Transaction(Age<8));
+Email: => VlEvent30AllDayCount := COUNT(PersonEvent.Transaction(Age<31));
+Email: => VlEvent365AllDayCount := COUNT(PersonEvent.Transaction(Age<366));
+
+Email: => VlEvent7AllActiveFlag := MAP(VlEvent7AllCount > 0 => 1, 0);
+Email: => VlEvent30AllActiveFlag := MAP(VlEvent30AllDayCount > 0 => 1, 0);
+
+Email: => VlEvent1Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<2));
+Email: => VlEvent7Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<8));
+Email: => VlEvent30Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<31));
+Email: => VlEvent365Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<366));
+
+Email: => VlEvent7ActiveFlag := MAP(VlEvent7Count > 0 => 1, 0);
+Email: => VlEvent30ActiveFlag := MAP(VlEvent30Count > 0 => 1, 0);
+ 
+// Cluster Attributes
+Email: => ClIdentityCount := COUNT(PersonEmail.Subject.PersonPerson{ToPerson});
+
+Email: => ClActive7IdentityCount := COUNT(PersonEmail.Subject.PersonPerson(ToPerson.VlEvent7ActiveFlag=1){ToPerson});
+Email: => ClActive30IdentityCount := COUNT(PersonEmail.Subject.PersonPerson(ToPerson.VlEvent30ActiveFlag=1){ToPerson});
+
+Email: => ClEventCount := COUNT(PersonEvent.Subject.PersonPerson.ToPerson.PersonEvent{Transaction});
+Email: => ClElementCount := 0;
+Email: => ClIdentityCountPercentile := ClIdentityCount$^Decile;
+Email: => ClEventCountPercentile := ClEventCount$^Percentile;
+Email: => ClActive30IdentityCountPercentile := ClActive30IdentityCount$^Percentile;
+Email: => ClActive7IdentityCountPercentile  := ClActive7IdentityCount$^Percentile;
+Email: => ClImpactWeight := ((ClIdentityCountPercentile * 0.3) + (ClEventCountPercentile * 0.3) + (ClActive30IdentityCountPercentile * 0.20) + (ClActive7IdentityCountPercentile * 0.20));
+
+Email: => Score := UID % 100;
+Email: => ClusterScore := 0;
+
+/* Bank */ 
+// take the last two out they are there for testing!
+Bank: => HighRiskRouting := MAP(RoutingNumber IN ['031101169','124071889','124303120','073972181','084003997','114924742','031101169','063115194','061210237','081501340'] => 1, 0);
+
+/* Bank Account */ 
+
+BankAccount: => CustomerId := rCustomer.CustomerId;
+BankAccount: => IndustryType := rCustomer.IndustryType;
+BankAccount: => SourceCustomerCount := COUNT(SourceCustomers);
+BankAccount: => EntityContextUid := '_19' + OttoBankAccountId;
+BankAccount: => EntityType := 19;
+BankAccount: => Label := AccountNumber;
+BankAccount: => AbbreviatedBankname := rBank.AbbreviatedBankname;
+BankAccount: => InCustomerPopulation := MAP(COUNT(SourceCustomers(rSourceCustomer=rCustomer))>0 => 1, 0);
+
+BankAccount: => IdentityCount := COUNT(PersonEvent{Subject});
+BankAccount: => EventCount := COUNT(PersonEvent{Transaction});
+
+// Known Risk 
+
+BankAccount: => HighRiskRouting := rBank.HighRiskRouting;
+BankAccount: => KrHighRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrHighRiskBankFlag=1)) > 0 => 1, 0);
+BankAccount: => KrMediumRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrMediumRiskBankFlag=1))>0 => 1, 0);
+BankAccount: => KrLowRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrLowRiskBankFlag=1))>0 => 1, 0);
+
+BankAccount: => KrBnk800Flag := MAP(COUNT(PersonEvent.Transaction(KrBnk800Flag=1))>0 => 1, 0);
+BankAccount: => KrBnk801Flag := MAP(COUNT(PersonEvent.Transaction(KrBnk801Flag=1))>0 => 1, 0);
+BankAccount: => KrBnk802Flag := MAP(COUNT(PersonEvent.Transaction(KrBnk802Flag=1))>0 => 1, 0);
+BankAccount: => KrBnk890Flag := MAP(COUNT(PersonEvent.Transaction(KrBnk890Flag=1))>0 => 1, 0);
+BankAccount: => KrBnk891Flag := MAP(COUNT(PersonEvent.Transaction(KrBnk891Flag=1))>0 => 1, 0);
+BankAccount: => KrBnk892Flag := MAP(COUNT(PersonEvent.Transaction(KrBnk892Flag=1))>0 => 1, 0);
+BankAccount: => KrBnk893Flag := MAP(COUNT(PersonEvent.Transaction(KrBnk893Flag=1))>0 => 1, 0);
+
+// Velocity
+BankAccount: => VlEvent1AllCount := COUNT(PersonEvent.Transaction(Age<2));
+BankAccount: => VlEvent7AllCount := COUNT(PersonEvent.Transaction(Age<8));
+BankAccount: => VlEvent30AllDayCount := COUNT(PersonEvent.Transaction(Age<31));
+BankAccount: => VlEvent365AllDayCount := COUNT(PersonEvent.Transaction(Age<366));
+
+BankAccount: => VlEvent7AllActiveFlag := MAP(VlEvent7AllCount > 0 => 1, 0);
+BankAccount: => VlEvent30AllActiveFlag := MAP(VlEvent30AllDayCount > 0 => 1, 0);
+
+BankAccount: => VlEvent1Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<2));
+BankAccount: => VlEvent7Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<8));
+BankAccount: => VlEvent30Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<31));
+BankAccount: => VlEvent365Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<366));
+
+BankAccount: => VlEvent7ActiveFlag := MAP(VlEvent7Count > 0 => 1, 0);
+BankAccount: => VlEvent30ActiveFlag := MAP(VlEvent30Count > 0 => 1, 0);
+
+// Cluster Attributes
+BankAccount: => ClIdentityCount := COUNT(PersonEvent{Subject}.Subject.PersonPerson.ToPerson{LexId});
+
+BankAccount: => ClActive7IdentityCount := COUNT(PersonEvent(Subject.VlEvent7ActiveFlag=1){Subject});
+BankAccount: => ClActive30IdentityCount := COUNT(PersonEvent(Subject.VlEvent30ActiveFlag=1){Subject});
+
+BankAccount: => ClEventCount := COUNT(PersonEvent.Subject{PersonEvent});
+BankAccount: => ClElementCount := 0;
+BankAccount: => ClIdentityCountPercentile := ClIdentityCount$^Decile;
+BankAccount: => ClEventCountPercentile := ClEventCount$^Percentile;
+BankAccount: => ClActive30IdentityCountPercentile := ClActive30IdentityCount$^Percentile;
+BankAccount: => ClActive7IdentityCountPercentile  := ClActive7IdentityCount$^Percentile;
+BankAccount: => ClImpactWeight := ((ClIdentityCountPercentile * 0.3) + (ClEventCountPercentile * 0.3) + (ClActive30IdentityCountPercentile * 0.20) + (ClActive7IdentityCountPercentile * 0.20));
+
+BankAccount: => Score := UID % 100;
+BankAccount: => ClusterScore := 0;
+
+/* DRIVERS LICENCE */
+
+DriversLicense: => CustomerId := rCustomer.CustomerId;
+DriversLicense: => IndustryType := rCustomer.IndustryType;
+DriversLicense: => SourceCustomerCount := COUNT(SourceCustomers);
+DriversLicense: => EntityContextUid := '_20' + OttoDriversLicenseId;
+DriversLicense: => EntityType := 20;
+DriversLicense: => Label := LicenseNumber;
+DriversLicense: => InCustomerPopulation := MAP(COUNT(SourceCustomers(rSourceCustomer=rCustomer))>0 => 1, 0);
+
+DriversLicense: => IdentityCount := COUNT(PersonEvent{Subject});
+DriversLicense: => EventCount := COUNT(PersonEvent{Transaction});
+
+// Hri Risk 
+
+DriversLicense: => Hri41Flag := MAP(COUNT(HriList(CONTAINS(Hri,'41'))) > 0 => 1, 0);
+DriversLicense: => HriDfFlag := MAP(COUNT(HriList(CONTAINS(Hri,'DF'))) > 0 => 1, 0);
+
+// Known Risk 
+DriversLicense: => KrHighRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrHighRiskDlFlag=1)) > 0 => 1, 0);
+DriversLicense: => KrMediumRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrMediumRiskDlFlag=1))>0 => 1, 0);
+DriversLicense: => KrLowRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrLowRiskDlFlag=1))>0 => 1, 0);
+
+DriversLicense: => KrDl200Flag := MAP(COUNT(PersonEvent.Transaction(KrDl200Flag=1)) > 0 => 1, 0);
+DriversLicense: => KrDl201Flag := MAP(COUNT(PersonEvent.Transaction(KrDl201Flag=1)) > 0 => 1, 0);
+DriversLicense: => KrDl202Flag := MAP(COUNT(PersonEvent.Transaction(KrDl202Flag=1)) > 0 => 1, 0);
+DriversLicense: => KrDl203Flag := MAP(COUNT(PersonEvent.Transaction(KrDl203Flag=1)) > 0 => 1, 0);
+DriversLicense: => KrDl204Flag := MAP(COUNT(PersonEvent.Transaction(KrDl204Flag=1)) > 0 => 1, 0);
+DriversLicense: => KrDl290Flag := MAP(COUNT(PersonEvent.Transaction(KrDl290Flag=1)) > 0 => 1, 0);
+DriversLicense: => KrDl291Flag := MAP(COUNT(PersonEvent.Transaction(KrDl291Flag=1)) > 0 => 1, 0);
+DriversLicense: => KrDl292Flag := MAP(COUNT(PersonEvent.Transaction(KrDl292Flag=1)) > 0 => 1, 0);
+DriversLicense: => KrDl293Flag := MAP(COUNT(PersonEvent.Transaction(KrDl293Flag=1)) > 0 => 1, 0);
+
+// Velocity
+DriversLicense: => VlEvent1AllCount := COUNT(PersonEvent.Transaction(Age<2));
+DriversLicense: => VlEvent7AllCount := COUNT(PersonEvent.Transaction(Age<8));
+DriversLicense: => VlEvent30AllDayCount := COUNT(PersonEvent.Transaction(Age<31));
+DriversLicense: => VlEvent365AllDayCount := COUNT(PersonEvent.Transaction(Age<366));
+
+DriversLicense: => VlEvent7AllActiveFlag := MAP(VlEvent7AllCount > 0 => 1, 0);
+DriversLicense: => VlEvent30AllActiveFlag := MAP(VlEvent30AllDayCount > 0 => 1, 0);
+
+DriversLicense: => VlEvent1Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<2));
+DriversLicense: => VlEvent7Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<8));
+DriversLicense: => VlEvent30Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<31));
+DriversLicense: => VlEvent365Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<366));
+
+DriversLicense: => VlEvent7ActiveFlag := MAP(VlEvent7Count > 0 => 1, 0);
+DriversLicense: => VlEvent30ActiveFlag := MAP(VlEvent30Count > 0 => 1, 0);
+
+// Cluster Attributes
+DriversLicense: => ClIdentityCount := COUNT(PersonEvent{Subject}.Subject.PersonPerson.ToPerson{LexId});
+
+DriversLicense: => ClActive7IdentityCount := COUNT(PersonEvent(Subject.VlEvent7ActiveFlag=1){Subject});
+DriversLicense: => ClActive30IdentityCount := COUNT(PersonEvent(Subject.VlEvent30ActiveFlag=1){Subject});
+
+DriversLicense: => ClEventCount := COUNT(PersonEvent.Subject{PersonEvent});
+DriversLicense: => ClElementCount := 0;
+DriversLicense: => ClIdentityCountPercentile := ClIdentityCount$^Decile;
+DriversLicense: => ClEventCountPercentile := ClEventCount$^Percentile;
+DriversLicense: => ClActive30IdentityCountPercentile := ClActive30IdentityCount$^Percentile;
+DriversLicense: => ClActive7IdentityCountPercentile  := ClActive7IdentityCount$^Percentile;
+DriversLicense: => ClImpactWeight := ((ClIdentityCountPercentile * 0.3) + (ClEventCountPercentile * 0.3) + (ClActive30IdentityCountPercentile * 0.20) + (ClActive7IdentityCountPercentile * 0.20));
+
+DriversLicense: => Score := UID % 100;
+DriversLicense: => ClusterScore := 0;
+
+
+/* IP ADDRESS */
+
+InternetProtocol: => CustomerId := rCustomer.CustomerId;
+InternetProtocol: => IndustryType := rCustomer.IndustryType;
+InternetProtocol: => SourceCustomerCount := COUNT(SourceCustomers);
+InternetProtocol: => EntityContextUid := '_18' + OttoIpAddressId;
+InternetProtocol: => Label := IpAddress;
+InternetProtocol: => EntityType := 18;
+InternetProtocol: => InCustomerPopulation := MAP(COUNT(SourceCustomers(rSourceCustomer=rCustomer))>0 => 1, 0);
+
+InternetProtocol: => IdentityCount := COUNT(PersonEvent{Subject});
+InternetProtocol: => EventCount := COUNT(PersonEvent{Transaction});
+
+// Known Risk 
+InternetProtocol: => KrHighRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrHighRiskIdentityFlag=1)) > 0 => 1, 0);
+InternetProtocol: => KrMediumRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrMediumRiskIdentityFlag=1))>0 => 1, 0);
+
+// Velocity
+
+InternetProtocol: => VlEvent1AllCount := COUNT(PersonEvent.Transaction(Age<2));
+InternetProtocol: => VlEvent7AllCount := COUNT(PersonEvent.Transaction(Age<8));
+InternetProtocol: => VlEvent30AllDayCount := COUNT(PersonEvent.Transaction(Age<31));
+InternetProtocol: => VlEvent365AllDayCount := COUNT(PersonEvent.Transaction(Age<366));
+
+InternetProtocol: => VlEvent7AllActiveFlag := MAP(VlEvent7AllCount > 0 => 1, 0);
+InternetProtocol: => VlEvent30AllActiveFlag := MAP(VlEvent30AllDayCount > 0 => 1, 0);
+
+InternetProtocol: => VlEvent1Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<2));
+InternetProtocol: => VlEvent7Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<8));
+InternetProtocol: => VlEvent30Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<31));
+InternetProtocol: => VlEvent365Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<366));
+
+InternetProtocol: => VlEvent7ActiveFlag := MAP(VlEvent7Count > 0 => 1, 0);
+InternetProtocol: => VlEvent30ActiveFlag := MAP(VlEvent30Count > 0 => 1, 0);
+   
+
+// Cluster Attributes 
+InternetProtocol: => ClActive7IdentityCount := COUNT(PersonIpAddress.Subject.PersonPerson.ToPerson(VlEvent7ActiveFlag=1){LexId});
+InternetProtocol: => ClActive30IdentityCount := COUNT(PersonIpAddress.Subject.PersonPerson.ToPerson(VlEvent30ActiveFlag=1){LexId});
+InternetProtocol: => ClEventCount := COUNT(PersonIpAddress.Subject.PersonPerson.ToPerson.PersonEvent{Transaction});
+InternetProtocol: => ClIdentityCount := COUNT(PersonIpAddress.Subject.PersonPerson{ToPerson});
+InternetProtocol: => ClElementCount := 0;
+InternetProtocol: => ClIdentityCountPercentile := ClIdentityCount$^Decile;
+InternetProtocol: => ClEventCountPercentile := ClEventCount$^Percentile;
+InternetProtocol: => ClActive30IdentityCountPercentile := ClActive30IdentityCount$^Percentile;
+InternetProtocol: => ClActive7IdentityCountPercentile  := ClActive7IdentityCount$^Percentile;
+
+InternetProtocol: => ClImpactWeight := ((ClIdentityCountPercentile * 0.3) + (ClEventCountPercentile * 0.3) + (ClActive30IdentityCountPercentile * 0.20) + (ClActive7IdentityCountPercentile * 0.20));
+
+
+InternetProtocol: => Score := UID % 100;
+InternetProtocol: => ClusterScore := 0;
+
+
+Address: => CustomerId := rCustomer.CustomerId;
+Address: => IndustryType := rCustomer.IndustryType;
+Address: => InCustomerPopulation := MAP(COUNT(SourceCustomers(rSourceCustomer=rCustomer))>0 => 1, 0);
+Address: => SourceCustomerCount := COUNT(SourceCustomers);
+Address: => FullAddress := TRIM(TRIM(PrimaryRange) + ' ' + TRIM(TRIM(Predirectional) + ' ' + TRIM(TRIM(PrimaryName) + ' ' + TRIM(TRIM(Suffix) + ' ' + TRIM(TRIM(Postdirectional) + ' ' + TRIM(TRIM(UnitDesignation) + ' ' + TRIM(TRIM(SecondaryRange) + ' ' + TRIM(TRIM(VanityCity) + ' ' + TRIM(State)))))))));
+Address: => StreetAddress := TRIM(TRIM(PrimaryRange) + ' ' + TRIM(TRIM(Predirectional) + ' ' + TRIM(TRIM(PrimaryName) + ' ' + TRIM(TRIM(Suffix) + ' ' + TRIM(TRIM(Postdirectional) + ' ' + TRIM(TRIM(UnitDesignation) + ' ' + TRIM(TRIM(SecondaryRange))))))));
+Address: => EntityContextUid := '_09' + OttoAddressId;
+Address: => EntityType := 9;
+
+Address: => EventCount := COUNT(PersonEvent{Transaction});
+
+Address: => IdentityCount := COUNT(PersonAddress(Subject.InCustomerPopulation=1));
+Address: => HighFrequencyFlag := MAP(IdentityCount >= 20 => 1, 0);
+
+Address: => AllPersonCount := COUNT(PersonAddress);
+Address: => AllHighFrequencyFlag := MAP(AllPersonCount >= 20 => 1, 0);
+
+Address: => DeceasedPersonCount := COUNT(PersonAddress(Subject.Deceased = 1 AND Subject.InCustomerPopulation=1));
+Address: => DeceasedPersonPercent := DeceasedPersonCount / IdentityCount;
+
+Address: => AllDeceasedPersonCount := COUNT(PersonAddress(Subject.Deceased = 1));
+Address: => AllDeceasedPersonPercent := AllDeceasedPersonCount / AllPersonCount;
+
+Address: => DeceasedMatchPersonCount := COUNT(PersonAddress(Subject.Deceased = 1 AND Subject.InCustomerPopulation=1 AND Subject.DeceasedMatch = 1));
+Address: => DeceasedMatchPersonPercent := DeceasedMatchPersonCount / IdentityCount;               
+
+Address: => AllDeceasedMatchPersonCount := COUNT(PersonAddress(Subject.Deceased = 1 AND Subject.DeceasedMatch = 1));
+Address: => AllDeceasedMatchPersonPercent := AllDeceasedMatchPersonCount / AllPersonCount;               
+
+Address: => HighRiskDeathPriorToAllEventsPersonCount := SUM(PersonAddress(Subject.InCustomerPopulation=1), Subject.HighRiskDeathPriorToAllEvents); 
+Address: => HighRiskDeathPriorToAllEventsPersonPercent := HighRiskDeathPriorToAllEventsPersonCount / IdentityCount;
+
+Address: => HighRiskDeathPriorToAllEventsPercentFlag := MAP(HighRiskDeathPriorToAllEventsPersonPercent > 0.10 => 1, 0);
+
+Address: => AllHighRiskDeathPriorToAllEventsPersonCount := SUM(PersonAddress, Subject.HighRiskDeathPriorToAllEvents); 
+Address: => AllHighRiskDeathPriorToAllEventsPersonPercent := AllHighRiskDeathPriorToAllEventsPersonCount / IdentityCount;
+
+Address: => AllHighRiskDeathPriorToAllEventsPersonPercentFlag := MAP(AllHighRiskDeathPriorToAllEventsPersonPercent > 0.10 => 1, 0);
+
+Address: => Score := MAX(PersonAddress.Subject, Score);
+Address: => ClusterScore := MEDIAN(PersonAddress.Subject, Score);
+
+Address: => Hri11Flag := MAP(COUNT(HriList(CONTAINS(Hri,'11'))) > 0 => 1, 0);
+Address: => Hri12Flag := MAP(COUNT(HriList(CONTAINS(Hri,'12'))) > 0 => 1, 0);
+Address: => Hri14Flag := MAP(COUNT(HriList(CONTAINS(Hri,'14'))) > 0 => 1, 0);
+Address: => Hri25Flag := MAP(COUNT(HriList(CONTAINS(Hri,'25'))) > 0 => 1, 0);
+Address: => Hri30Flag := MAP(COUNT(HriList(CONTAINS(Hri,'30'))) > 0 => 1, 0);
+Address: => Hri50Flag := MAP(COUNT(HriList(CONTAINS(Hri,'50'))) > 0 => 1, 0);
+Address: => HriCoFlag := MAP(COUNT(HriList(CONTAINS(Hri,'CO'))) > 0 => 1, 0);
+Address: => HriMoFlag := MAP(COUNT(HriList(CONTAINS(Hri,'MO'))) > 0 => 1, 0);
+Address: => HriPaFlag := MAP(COUNT(HriList(CONTAINS(Hri,'PA'))) > 0 => 1, 0);
+Address: => HriPoFlag := MAP(COUNT(HriList(CONTAINS(Hri,'PO'))) > 0 => 1, 0);
+Address: => HriVaFlag := MAP(COUNT(HriList(CONTAINS(Hri,'VA'))) > 0 => 1, 0);
+
+
+// Velocity
+
+Address: => VlEvent1AllCount := COUNT(PersonEvent.Transaction(Age<2));
+Address: => VlEvent7AllCount := COUNT(PersonEvent.Transaction(Age<8));
+Address: => VlEvent30AllDayCount := COUNT(PersonEvent.Transaction(Age<31));
+Address: => VlEvent365AllDayCount := COUNT(PersonEvent.Transaction(Age<366));
+
+Address: => VlEvent7AllActiveFlag := MAP(VlEvent7AllCount > 0 => 1, 0);
+Address: => VlEvent30AllActiveFlag := MAP(VlEvent30AllDayCount > 0 => 1, 0);
+
+Address: => VlEvent1Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<2));
+Address: => VlEvent7Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<8));
+Address: => VlEvent30Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<31));
+Address: => VlEvent365Count := COUNT(PersonEvent.Transaction(InCustomerPopulation = 1 AND Age<366));
+
+Address: => VlEvent7ActiveFlag := MAP(VlEvent7Count > 0 => 1, 0);
+Address: => VlEvent30ActiveFlag := MAP(VlEvent30Count > 0 => 1, 0);
+
+
+// Known Risk  
+Address: => KrHighRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrHighRiskAddressFlag=1))>0 => 1, 0);
+Address: => KrMediumRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrMediumRiskAddressFlag=1))>0 => 1, 0);
+
+// Cluster Attributes
+
+Address: => ClEventCount := COUNT(PersonAddress.Subject.PersonPerson.ToPerson{PersonEvent});
+Address: => ClIdentityCount := COUNT(PersonAddress.Subject.PersonPerson.ToPerson{LexId});
+Address: => ClElementCount := 0;
+
+Address: => ClIdentityCountPercentile := ClIdentityCount$^Decile;
+Address: => ClEventCountPercentile := ClEventCount$^Percentile;
+Address: => ClActive30IdentityCountPercentile := ClActive30IdentityCount$^Percentile;
+Address: => ClActive7IdentityCountPercentile  := ClActive7IdentityCount$^Percentile;
+
+Address: => ClImpactWeight := ((ClIdentityCountPercentile * 0.3) + (ClEventCountPercentile * 0.3) + (ClActive30IdentityCountPercentile * 0.20) + (ClActive7IdentityCountPercentile * 0.20));
+
+Address: => ClActive7IdentityCount := COUNT(PersonAddress(Subject.VlEvent7ActiveFlag=1){Subject});
+Address: => ClActive30IdentityCount := COUNT(PersonAddress(Subject.VlEvent30ActiveFlag=1){Subject});
+
+Customer: => PersonCount := COUNT(PersonAddress(Subject.InCustomerPopulation=1){Subject});
+Customer: => AllPersonCount := COUNT(PersonAddress{Subject});
+Customer: => DeceasedPersonCount := COUNT(PersonAddress(Subject.InCustomerPopulation=1 AND Subject.Deceased=1){Subject});
+Customer: => DeceasedPersonPercent := DeceasedPersonCount / PersonCount;
+Customer: => AllDeceasedPersonCount := COUNT(PersonAddress(Subject.Deceased=1){Subject});
+Customer: => AllDeceasedPersonPercent := AllDeceasedPersonCount / AllPersonCount;
+
+Customer: => AllDeceasedMatchedPersonCount := COUNT(PersonAddress(Subject.DeceasedMatch=1));
+Customer: => AllDeceasedMatchedPercent := AllDeceasedMatchedPersonCount / AllPersonCount;
+
+Customer: => AddressCount := COUNT(PersonAddress(Location.InCustomerPopulation=1){Location});
+Customer: => AllAddressCount := COUNT(PersonAddress{Location});
+Customer: => HighFrequencyAddressCount := SUM(PersonAddress(Location.InCustomerPopulation=1){Location}, Location.HighFrequencyFlag);
+Customer: => AllHighFrequencyAddressCount := SUM(PersonAddress{Location}, Location.HighFrequencyFlag);
+Customer: => HighFrequencyAddressPercent := HighFrequencyAddressCount / AddressCount;
+Customer: => AllHighFrequencyAddressPercent := AllHighFrequencyAddressCount / AllAddressCount;
+Customer: => EventDateMax := MAX(PersonEvent(Transaction.EventTypeCount=0), EventDate); // only count non-performance data rows. The reason is that after the fact people will be validating and that will move the max date.
+
+
+QUERY: Temp <= PersonBankAccount;
+
+/*PersonPerson
+{rCustomer, FromPerson.LexId, ToPerson.LexId, PublicRecords,
+    ContributoryRecords,
+    SameAddressEmailMatch,
+    SameAddressSsnMatch,
+    SameAddressPhoneNumberMatch,
+    NonHighFrequencyAddressCount,
+    SameAddressSameDayCount,
+    HighFrequencySameAddressSameDayCount,
+    SharedAddressCount,
+		ToPerson.Deceased,
+    ToPerson.DeceasedEventCount,
+		ToPerson.DeathPriorToAllEvents
+		
+    }
+;	
+*/
+
+QUERY: showCustomerPersonEvent <= Event;
+QUERY: showCustomerPerson <= Person;
+QUERY: showCustomer <= Customer;
+QUERY: showCustomerAddress <= Address;
+QUERY: showCustomerAddressPerson <= PersonAddress;
+QUERY: showCustomerEmail <= Email;
+QUERY: showCustomerInternetProtocol <= InternetProtocol;
+QUERY: showCustomerPhone <= Phone;
+QUERY: showCustomerSocialSecurityNumber <= SocialSecurityNumber;
+QUERY: showCustomerBank <= Bank;
+QUERY: showCustomerBankAccount <= BankAccount;
+QUERY: showCustomerDriversLicense <= DriversLicense;
+
+
+// Entities in the correct shape with labels etc..
+  // These need to be joined first before the entities are appended together.
+//QUERY: showCustomerPersonGraphEntities <= Person{Subject.EntityContextUid, Subject.Label, EntityType := 1}; 
+// edges are drawn ONLY FROM PERSON to other entities.
+
+QUERY: showCustomerPersonEntities <= Person
+                            {
+                              SourceCustomer := rCustomer,
+                              rCustomer.CustomerId,
+                              rCustomer.IndustryType,
+                              EntityContextUid,
+                              EntityType,
+                              Label,
+                              Score,
+                              ClusterScore,
+                              ClEventCount,
+                              ClIdentityCount,
+															ClElementCount,
+                              ClAddressCount,
+                              ClIdentityCountPercentile,
+                              ClEventCountPercentile,
+                              ClImpactWeight,
+
+                              InCustomerPopulation,
+                              ClHighRiskPattern1Flag,
+                              ClHighRiskPattern2Flag,
+                              ClHighRiskPattern3Flag,
+                              ClHighRiskPattern4Flag,
+                              ClHighRiskPattern5Flag,
+
+                              KrHighRiskFlag,
+                              KrMediumRiskFlag,
+
+                              CurrentlyIncarceratedFlag,
+                              FraudOffensesFlag,
+                              AssociatedWithIncarceratedFlag,
+                              AssociatedWithFraudOffensesFlag,
+                              
+                              DeceasedMatch,
+                              DeathPriorToAllEvents,
+                              Nas9Flag,
+                              Nap3Flag,
+                              
+                              {
+                                // Make this unidirectional so we only draw one edge in the graph between people.
+                                PersonPerson(FromPerson < ToPerson).ToPerson.EntityContextUid
+                              },
+                              {
+                                PersonAddress.Location.EntityContextUid
+                              },
+															{
+															  PersonIpAddress.Ip.EntityContextUid
+															},
+                              {
+															  PersonSSN.Social.EntityContextUid
+															},
+															{
+															 PersonPhone.PhoneNumber.EntityContextUid
+															},
+                              {
+                               PersonEmail.Emailof.EntityContextUid
+                              },
+                              {
+                               PersonBankAccount.Account.EntityContextUid
+                              },
+                              {
+                               PersonDriversLicense.License.EntityContextUid
+                              }
+                              
+                              // need to exclude self here.
+                            };
+
+QUERY: showCustomerAddressEntities <= Address
+                            {
+                              SourceCustomer := rCustomer, 
+                              rCustomer.CustomerId,
+                              rCustomer.IndustryType,
+                              EntityContextUid,
+                              Label := StreetAddress,
+                              Score,
+                              ClusterScore,
+                              EntityType,
+                              Latitude,
+                              Longitude,
+															StreetAddress,
+															VanityCity,
+															State,
+															Zip,
+															
+															ClEventCount,
+															ClIdentityCount,
+															ClElementCount,
+                              ClIdentityCountPercentile,
+                              ClEventCountPercentile,
+                              ClImpactWeight,
+
+                              InCustomerPopulation,
+                              
+                              KrHighRiskFlag,
+                              KrMediumRiskFlag,
+                              
+                              
+                              PersonCount := IdentityCount,
+                              HighFrequencyFlag,
+                              HighRiskDeathPriorToAllEventsPercentFlag,
+                              AllHighRiskDeathPriorToAllEventsPersonPercentFlag,
+                              DeceasedPersonCount
+
+                            };
+
+QUERY: showCustomerIpAddressEntities <= InternetProtocol
+                            {
+                              SourceCustomer := rCustomer, 
+                              rCustomer.CustomerId,
+                              rCustomer.IndustryType,
+                              EntityContextUid,
+                              Label,
+                              Score,
+                              ClusterScore,
+                              EntityType,
+
+                              PersonCount := IdentityCount,
+															
+															ClEventCount,
+															ClIdentityCount,
+															ClElementCount,
+                              ClIdentityCountPercentile,
+                              ClEventCountPercentile,
+                              ClImpactWeight,
+                              InCustomerPopulation
+                              
+/*
+                              KrHighRiskFlag,
+                              KrMediumRiskFlag,
+                              
+                              PersonCount := IdentityCount,
+                              HighFrequencyFlag,
+                              HighRiskDeathPriorToAllEventsPercentFlag,
+                              AllHighRiskDeathPriorToAllEventsPersonPercentFlag,
+                              DeceasedPersonCount
+*/                              
+
+                            };
+
+QUERY: showCustomerSsnEntities <= SocialSecurityNumber 
+                            {
+                              SourceCustomer := rCustomer, 
+                              rCustomer.CustomerId,
+                              rCustomer.IndustryType,
+                              EntityContextUid,
+                              Label,
+                              Score,
+                              ClusterScore,
+                              EntityType,
+
+                              PersonCount := IdentityCount,
+															
+															ClEventCount,
+															ClIdentityCount,
+															ClElementCount,
+                              ClIdentityCountPercentile,
+                              ClEventCountPercentile,
+                              ClImpactWeight,
+
+                              InCustomerPopulation
+/*
+
+                              KrHighRiskFlag,
+                              KrMediumRiskFlag,
+                              
+                              PersonCount := IdentityCount,
+                              HighFrequencyFlag,
+                              HighRiskDeathPriorToAllEventsPercentFlag,
+                              AllHighRiskDeathPriorToAllEventsPersonPercentFlag,
+                              DeceasedPersonCount
+*/                              
+
+                            };
+
+QUERY: showCustomerPhoneEntities <= Phone 
+                            {
+                              SourceCustomer := rCustomer, 
+                              rCustomer.CustomerId,
+                              rCustomer.IndustryType,
+                              EntityContextUid,
+                              Label,
+                              Score,
+                              ClusterScore,
+                              EntityType,
+
+                              PersonCount := IdentityCount,
+															
+															ClEventCount,
+															ClIdentityCount,
+															ClElementCount,
+                              ClIdentityCountPercentile,
+                              ClEventCountPercentile,
+                              ClImpactWeight,
+                              
+                              InCustomerPopulation
+/*
+                              KrHighRiskFlag,
+                              KrMediumRiskFlag,
+                              
+                              PersonCount := IdentityCount,
+                              HighFrequencyFlag,
+                              HighRiskDeathPriorToAllEventsPercentFlag,
+                              AllHighRiskDeathPriorToAllEventsPersonPercentFlag,
+                              DeceasedPersonCount
+*/                              
+
+                            };
+
+QUERY: showCustomerEmailEntities <= Email 
+                            {
+                              SourceCustomer := rCustomer, 
+                              rCustomer.CustomerId,
+                              rCustomer.IndustryType,
+                              EntityContextUid,
+                              Label,
+                              Score,
+                              ClusterScore,
+                              EntityType,
+
+                              PersonCount := IdentityCount,
+															
+															ClEventCount,
+															ClIdentityCount,
+															ClElementCount,
+                              ClIdentityCountPercentile,
+                              ClEventCountPercentile,
+                              ClImpactWeight,
+                              InCustomerPopulation                              
+/*
+                              KrHighRiskFlag,
+                              KrMediumRiskFlag,
+                              
+                              PersonCount := IdentityCount,
+                              HighFrequencyFlag,
+                              HighRiskDeathPriorToAllEventsPercentFlag,
+                              AllHighRiskDeathPriorToAllEventsPersonPercentFlag,
+                              DeceasedPersonCount
+*/                              
+
+                            };
+                            
+                            
+QUERY: showCustomerBankAccountEntities <= BankAccount 
+                            {
+                              SourceCustomer := rCustomer, 
+                              rCustomer.CustomerId,
+                              rCustomer.IndustryType,
+                              EntityContextUid,
+                              Label,
+                              Score,
+                              ClusterScore,
+                              EntityType,
+                              rBank.RoutingNumber,
+                              AccountNumber,
+                              AbbreviatedBankname,
+                              PersonCount := IdentityCount,
+															
+															ClEventCount,
+															ClIdentityCount,
+															ClElementCount,
+                              ClIdentityCountPercentile,
+                              ClEventCountPercentile,
+                              ClImpactWeight,
+
+                              InCustomerPopulation,                              
+                              KrHighRiskFlag,
+                              KrMediumRiskFlag,
+                              KrLowRiskFlag
+                              
+                              
+/*
+                              PersonCount := IdentityCount,
+                              HighFrequencyFlag,
+                              HighRiskDeathPriorToAllEventsPercentFlag,
+                              AllHighRiskDeathPriorToAllEventsPersonPercentFlag,
+                              DeceasedPersonCount
+*/                              
+
+                            };
+                            
+QUERY: showCustomerDriversLicenseEntities <= DriversLicense 
+                            {
+                              SourceCustomer := rCustomer, 
+                              rCustomer.CustomerId,
+                              rCustomer.IndustryType,
+                              EntityContextUid,
+                              Label,
+                              Score,
+                              ClusterScore,
+                              EntityType,
+
+                              PersonCount := IdentityCount,
+															
+															ClEventCount,
+															ClIdentityCount,
+															ClElementCount,
+                              ClIdentityCountPercentile,
+                              ClEventCountPercentile,
+                              ClImpactWeight,
+                              
+                              LicenseState := State,
+                              InCustomerPopulation,
+                              KrHighRiskFlag,
+                              KrMediumRiskFlag,
+                              KrLowRiskFlag
+                              
+/*
+                              PersonCount := IdentityCount,
+                              HighFrequencyFlag,
+                              HighRiskDeathPriorToAllEventsPercentFlag,
+                              AllHighRiskDeathPriorToAllEventsPersonPercentFlag,
+                              DeceasedPersonCount
+*/                              
+
+                            };                            
+                                                        
+QUERY: showCustomerPersonTreeEntities <= PersonPerson
+                            {
+                              SourceCustomer := rCustomer,
+                              rCustomer.CustomerId,
+                              rCustomer.IndustryType,
+                              TreeUid := FromPerson.EntityContextUid,
+                              // need to exclude self here.
+                              ToPerson.EntityContextUid
+                            };
+
+QUERY: showCustomerAddressPersonTreeEntities <= PersonEvent
+                            {
+                              SourceCustomer := rCustomer,
+                              rCustomer.CustomerId,
+                              rCustomer.IndustryType,
+                              TreeUid := Location.EntityContextUid,
+                              // need to exclude self here.
+                              Subject.EntityContextUid
+                            };
+
+QUERY: showCustomerPersonAddressTreeEntities <= PersonEvent
+                            {
+                              SourceCustomer := rCustomer,
+                              rCustomer.CustomerId,
+                              rCustomer.IndustryType,
+                              TreeUid := Location.EntityContextUid,
+                              // need to exclude self here.
+                              Subject.EntityContextUid
+                            };                            
+
+
+
+QUERY: showCustomerPersonSSNTreeEntities <= PersonSSN 
+                            {
+                              SourceCustomer := rCustomer,
+                              rCustomer.CustomerId,
+                              rCustomer.IndustryType,
+                              TreeUid := Social.EntityContextUid,
+                              // need to exclude self here.
+                              Subject.EntityContextUid
+													  };
+
+QUERY: showCustomerPersonIpTreeEntities <= PersonIpAddress 
+                            {
+                              SourceCustomer := rCustomer,
+                              rCustomer.CustomerId,
+                              rCustomer.IndustryType,
+                              TreeUid := Ip.EntityContextUid,
+                              // need to exclude self here.
+                              Subject.EntityContextUid
+													  };
+
+QUERY: showCustomerPersonPhoneTreeEntities <= PersonPhone 
+                            {
+                              SourceCustomer := rCustomer,
+                              rCustomer.CustomerId,
+                              rCustomer.IndustryType,
+                              TreeUid := PhoneNumber.EntityContextUid,
+                              // need to exclude self here.
+                              Subject.EntityContextUid
+													  };
+
+// In Progress...
+QUERY: showCustomerPersonEmailTreeEntities <= PersonEmail 
+                            {
+                              SourceCustomer := rCustomer,
+                              rCustomer.CustomerId,
+                              rCustomer.IndustryType,
+                              TreeUid := Emailof.EntityContextUid,
+                              // need to exclude self here.
+                              Subject.EntityContextUid
+													  };
+
+QUERY: showCustomerPersonBankAccountTreeEntities <= PersonBankAccount 
+                            {
+                              SourceCustomer := rCustomer,
+                              rCustomer.CustomerId,
+                              rCustomer.IndustryType,
+                              TreeUid := Account.EntityContextUid,
+                              // need to exclude self here.
+                              Subject.EntityContextUid
+													  };
+
+QUERY: showCustomerPersonDriversLicenseTreeEntities <= PersonDriversLicense
+                            {
+                              SourceCustomer := rCustomer,
+                              rCustomer.CustomerId,
+                              rCustomer.IndustryType,
+                              TreeUid := License.EntityContextUid,
+                              // need to exclude self here.
+                              Subject.EntityContextUid
+													  };
