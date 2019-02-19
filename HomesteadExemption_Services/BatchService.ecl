@@ -33,7 +33,7 @@ EXPORT BatchService() := MACRO
 		batch_params := HomesteadExemption_Services.IParams.getBatchParams();				
 		
 		in_ssn_mask := batch_params.ssn_mask;
-		is_GLB_fail := NOT ut.glb_ok(batch_params.GLBpurpose);
+		is_GLB_fail := NOT batch_params.isValidGlb();
 		
 		// 0. Read the batch into a dataset.
 		ds_xml_in := DATASET( [], HomesteadExemption_Services.Layouts.batch_in_raw ) : STORED('batch_in', FEW);
@@ -94,10 +94,10 @@ EXPORT BatchService() := MACRO
 		BatchShare.MAC_RestoreAcctno(ds_batch_in_marked, ds_recs_out, ds_recs_ready)		
     
 		// 8. Restrictions/suppressions based on application type.
-		Suppress.MAC_Suppress(ds_recs_ready, ds_recs_sup_1, batch_params.ApplicationType,,,Suppress.Constants.LinkTypes.DID, did1);
-		Suppress.MAC_Suppress(ds_recs_sup_1, ds_recs_sup_2, batch_params.ApplicationType,,,Suppress.Constants.LinkTypes.DID, did2);
-		Suppress.MAC_Suppress(ds_recs_sup_2, ds_recs_sup_3, batch_params.ApplicationType,,,Suppress.Constants.LinkTypes.SSN, owner_1_SSN);
-		Suppress.MAC_Suppress(ds_recs_sup_3, ds_recs_sup_4, batch_params.ApplicationType,,,Suppress.Constants.LinkTypes.SSN, owner_2_SSN);
+		Suppress.MAC_Suppress(ds_recs_ready, ds_recs_sup_1, batch_params.application_type,,,Suppress.Constants.LinkTypes.DID, did1);
+		Suppress.MAC_Suppress(ds_recs_sup_1, ds_recs_sup_2, batch_params.application_type,,,Suppress.Constants.LinkTypes.DID, did2);
+		Suppress.MAC_Suppress(ds_recs_sup_2, ds_recs_sup_3, batch_params.application_type,,,Suppress.Constants.LinkTypes.SSN, owner_1_SSN);
+		Suppress.MAC_Suppress(ds_recs_sup_3, ds_recs_sup_4, batch_params.application_type,,,Suppress.Constants.LinkTypes.SSN, owner_2_SSN);
 
 		// 9. Provide for ssn masking. Return the input ssn as-is; mask best_ and expanded_ ssn.
 		Suppress.MAC_Mask(ds_recs_sup_4, ds_recs_masked_1, owner_1_SSN, '', true, false,,,,in_ssn_mask);	

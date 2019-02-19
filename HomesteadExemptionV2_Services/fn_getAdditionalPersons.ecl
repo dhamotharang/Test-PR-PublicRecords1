@@ -3,14 +3,7 @@
 EXPORT fn_getAdditionalPersons(DATASET(HomesteadExemptionV2_Services.Layouts.propIdRec) ds_srch_recs,
 				HomesteadExemptionV2_Services.IParams.Params in_mod) := FUNCTION
 
-  mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule ()))
-    EXPORT unsigned1 glb := in_mod.GLBPurpose;
-    EXPORT unsigned1 dppa := in_mod.DPPAPurpose;
-    EXPORT boolean ln_branded := in_mod.lnbranded;
-    EXPORT boolean probation_override := FALSE;
-    EXPORT string5 industry_class := in_mod.industryclass;
-    EXPORT boolean no_scrub := FALSE;
-    EXPORT string ssn_mask := in_mod.ssnmask;
+  mod_access := MODULE (PROJECT (in_mod, doxie.IDataAccess))
   END;
 
 	// REQUIRED FOR MAC_GlbClean_Header()

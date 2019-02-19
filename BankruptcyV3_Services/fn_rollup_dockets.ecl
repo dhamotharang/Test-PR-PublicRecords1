@@ -27,7 +27,7 @@ export fn_rollup_dockets(
 					in_records,
 					k_dock,
 					left.tmsid[3..7] = right.court_code and left.tmsid[8..] = right.casekey
-					and EnteredDateFilter() and right.casetype = BankruptcyV3_Services.consts.CASETYPE_BANKRUPTCY,
+					and EnteredDateFilter(),
 					transform(
 						bankruptcyv3_services.layouts.layout_docket_ext,
 						self.DocketText := clean_docket_text(right.DocketText);

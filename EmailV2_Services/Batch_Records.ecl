@@ -23,18 +23,21 @@ EXPORT Batch_Records(
     
     email_params := MODULE(PROJECT(batch_params, $.IParams.EmailParams)) END;
     
-    _recs := CASE(batch_params.SearchType,
+    res_row := CASE(batch_params.SearchType,
                  $.Constants.SearchType.EIA => $.EmailIdentityAppendSearch(ds_batch_in,email_params),
                  $.Constants.SearchType.EAA => $.EmailAddressAppendSearch(ds_batch_in,email_params),
-                 DATASET([],$.Layouts.email_final_rec) 
+                 $.Constants.SearchType.EIC => $.EmailIdentityCheckSearch(ds_batch_in,email_params),
+                 ROW({[],[]}, $.Layouts.email_combined_rec) 
                  );
+                 
+    _recs := res_row.Records;
+    gw_royalties:= res_row.Royalties;  // royalties for gateway sources are already counted
     
-    
-    // groupping records for royalty counts
+    // groupping records for royalty counts (in-house sources)
     srtd_recs := GROUP(SORT(_recs, acctno, -date_last_seen, date_first_seen, -original.login_date, -process_date, RECORD), acctno);
-    dRoyalties := Royalty.RoyaltyEmail.GetBatchRoyaltySet(srtd_recs, email_src, batch_params.MaxResultsPerAcct, batch_params.ReturnDetailedRoyalties);
+    inh_royalties := Royalty.RoyaltyEmail.GetBatchRoyaltySet(srtd_recs, email_src, batch_params.MaxResultsPerAcct, batch_params.ReturnDetailedRoyalties);
     
     // Now combine results for output 
-    res := ROW({_recs, dRoyalties}, $.Layouts.email_combined_rec);
+    res := ROW({_recs, inh_royalties + gw_royalties}, $.Layouts.email_combined_rec);
     RETURN res;
 END;

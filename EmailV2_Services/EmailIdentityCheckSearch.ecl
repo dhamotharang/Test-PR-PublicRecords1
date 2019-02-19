@@ -1,6 +1,6 @@
-﻿IMPORT $, email_data,Suppress;
+﻿IMPORT $, email_data, Suppress;
 
-EXPORT EmailIdentityAppendSearch(DATASET($.Layouts.batch_in_rec) batch_in,
+EXPORT EmailIdentityCheckSearch(DATASET($.Layouts.batch_in_rec) batch_in,
                                  $.IParams.EmailParams in_mod
 ) := FUNCTION
                       
@@ -8,13 +8,22 @@ EXPORT EmailIdentityAppendSearch(DATASET($.Layouts.batch_in_rec) batch_in,
   marked_input_Email_recs := PROJECT(batch_in, $.Transforms.cleanEmailAddress(LEFT));  
                                     
   clnd_input_email := PROJECT(marked_input_Email_recs(~is_rejected_rec),$.Layouts.batch_in_rec);
-  ds_rejected_input_email := PROJECT(marked_input_Email_recs(is_rejected_rec), 
+  
+  // now check PII input  
+  marked_input_recs := PROJECT(clnd_input_email, $.Transforms.checkIdentityInput(LEFT));  
+                                    
+  clnd_input_pii := PROJECT(marked_input_recs(~is_rejected_rec),$.Layouts.batch_in_rec);
+  
+  ds_rejected_input_email := PROJECT(marked_input_Email_recs(is_rejected_rec) + marked_input_recs(is_rejected_rec), 
                                   TRANSFORM($.Layouts.email_final_rec, 
                                             SELF := LEFT,
                                             SELF := []));
 
+  // attach resolved LexId as subject_lexId
+  clnd_input_with_lexids := $.Functions.AppendSubjectLexid(clnd_input_pii);
+  
   // get data from payload, apply filtering and rollup
-  email_ddpd_recs := $.Functions.getEmailData(clnd_input_email,in_mod, $.Constants.SearchBy.ByEmail);
+  email_ddpd_recs := $.Functions.getEmailData(clnd_input_with_lexids, in_mod, $.Constants.SearchBy.ByEmail);
   
   // calculate num_did_per_email and num_email_per_did
   email_with_num_did_recs := $.Functions.CalculateLexIdsPerEmail(email_ddpd_recs,in_mod);
@@ -33,16 +42,19 @@ EXPORT EmailIdentityAppendSearch(DATASET($.Layouts.batch_in_rec) batch_in,
   
   // keep max results requested
   ds_results_chsn := UNGROUP(TOPN(GROUP(email_recs_srtd, acctno), in_mod.MaxResultsPerAcct, acctno));
-    
+ 
+  // add relationship info
+  ds_results_with_relations := $.Functions.AddIdentityRelationship(ds_results_chsn, clnd_input_with_lexids, in_mod);
 
   // masking
-  Suppress.Mac_mask(ds_results_chsn, ds_results_best_ssnmasked, bestinfo.ssn, null, TRUE, FALSE, maskVal:=in_mod.ssn_mask);
+  Suppress.Mac_mask(ds_results_with_relations, ds_results_best_ssnmasked, bestinfo.ssn, null, TRUE, FALSE, maskVal:=in_mod.ssn_mask);
   Suppress.Mac_mask(ds_results_best_ssnmasked, ds_results_clean_ssnmasked,cleaned.clean_ssn, null, TRUE, FALSE, maskVal:=in_mod.ssn_mask);
   Suppress.Mac_mask(ds_results_clean_ssnmasked, ds_results_ssnmasked,original.ssn, null, TRUE, FALSE, maskVal:=in_mod.ssn_mask);
 
 
   // combine results and rejected input 
-  ds_results_ready := ds_results_ssnmasked + ds_rejected_input_email;
+  // final sorting for output
+  ds_results_ready := $.Functions.SortResults(ds_results_ssnmasked + ds_rejected_input_email, in_mod);
   
 
   //OUTPUT(email_ddpd_recs, NAMED('email_ddpd_recs'));

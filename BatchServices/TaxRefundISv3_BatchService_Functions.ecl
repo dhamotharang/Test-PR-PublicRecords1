@@ -134,15 +134,7 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 	export getAdlBestInfo(dataset(rec_in_batch) in_clean_batch,
 				 BatchServices.TaxRefundISv3_BatchService_Interfaces.Input args_in) := function
 
-			p := module(AutoStandardI.PermissionI_Tools.params)
-				export boolean AllowAll := false;
-				export boolean AllowGLB := false;
-				export boolean AllowDPPA := false;
-				export unsigned1 DPPAPurpose := args_in.DPPAPurpose;
-				export unsigned1 GLBPurpose := args_in.GLBPurpose;
-				export boolean IncludeMinors := false;
-			END;
-			GLB := AutoStandardI.PermissionI_Tools.val(p).glb.ok(args_in.GLBPurpose);
+			glb_ok := args_in.isValidGlb();
 			hhidplus := stringlib.stringfind(args_in.append_l,'HHID_PLUS',1)<>0;
       edabest := stringlib.stringfind(args_in.append_l,'BEST_EDA',1)<>0;
 
@@ -165,15 +157,15 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
                  := didville.did_service_common_function(recs,
 																												 appends_value      := args_in.append_l,
 																												 verify_value       := args_in.verify_l,
-																												 glb_flag           := GLB,
+																												 glb_flag           := glb_ok,
 																												 hhidplus_value     := hhidplus,
 																												 edabest_value      := edabest,
-																												 glb_purpose_value  := args_in.GLBPurpose,
-																												 appType            := args_in.ApplicationType,
-																												 include_minors     := args_in.IncludeMinors,
-																												 dppa_purpose_value := args_in.DPPAPurpose,
-																												 IndustryClass_val  := args_in.IndustryClass,
-																												 DRM_val            := args_in.DataRestriction,
+																												 glb_purpose_value  := args_in.glb,
+																												 appType            := args_in.application_type,
+																												 include_minors     := args_in.show_minors,
+																												 dppa_purpose_value := args_in.dppa,
+																												 IndustryClass_val  := args_in.industry_class,
+																												 DRM_val            := args_in.DataRestrictionMask,
 																												 GetSSNBest         := args_in.GetSSNBest);
 
       // *--- DEBUG ---* //

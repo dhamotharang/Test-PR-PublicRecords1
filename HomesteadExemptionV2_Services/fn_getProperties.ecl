@@ -35,7 +35,7 @@ EXPORT fn_getProperties(DATASET(HomesteadExemptionV2_Services.Layouts.workRec) d
 		LIMIT(LN_PropertyV2_Services.consts.MAX_RAW,SKIP));
 
 	dup_fid_recs:=DEDUP(SORT(raw_fid_recs,acctno,ln_fares_id),acctno,ln_fares_id);
-	Suppress.MAC_Suppress(dup_fid_recs,fid_recs,in_mod.ApplicationType,,,Suppress.Constants.DocTypes.FaresID,ln_fares_id);
+	Suppress.MAC_Suppress(dup_fid_recs,fid_recs,in_mod.application_type,,,Suppress.Constants.DocTypes.FaresID,ln_fares_id);
 
 	// APPLY DATA_RESTRICTION_MASK USING FIRST CHARACTER OF LN_FARES_ID
 	// 'R' = FARES = VENDOR_SOURCE_DESC IS 'FAR_F' AND 'FAR_S'

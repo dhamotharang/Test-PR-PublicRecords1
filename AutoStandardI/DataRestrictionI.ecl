@@ -129,7 +129,13 @@ export DataRestrictionI := module
 		
 		// AccuData - OCN (Carrier & Porting) & CNAM (CallerID Name)
 		export boolean isAccuDataRestricted(drm_type drm='') := ~allow and (fixed_DRM[44] not in ['0','']);
-		export boolean AccuData := isAccuDataRestricted(fixed_DRM);			
+		export boolean AccuData := isAccuDataRestricted(fixed_DRM);		
+    
+    // not sure where CSR is used
+    // CSR := ~allow and (fixed_DRM[45] not in ['0','']);
+
+		// BriteVerify gateway for Emails 
+		export boolean BriteVerifyData := ~allow and (fixed_DRM[46] not in ['0','']);
 
   end;
 

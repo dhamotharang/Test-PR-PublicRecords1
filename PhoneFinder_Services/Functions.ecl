@@ -780,8 +780,7 @@ MODULE
 			dOtherPhoneInfo   := PhoneFinder_Services.Functions.GetOtherInfo(dSearchResultsOtherPhones,inMod);
 		#END
 		// start phone verification
-		doVerify := inMod.VerifyPhoneIsActive OR inMod.VerifyPhoneName OR inMod.VerifyPhoneNameAddress;
-
+		doVerify := ~(inMod.IsPrimarySearchPII) and (inMod.VerifyPhoneIsActive OR inMod.VerifyPhoneName OR inMod.VerifyPhoneNameAddress);
 		phoneEntered := pSearchBy.PhoneNumber != ''; 
 		
 		vmod := PROJECT(inMod, $.IParam.PhoneVerificationParams, OPT);   

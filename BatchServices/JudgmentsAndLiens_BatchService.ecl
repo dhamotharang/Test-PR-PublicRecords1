@@ -31,7 +31,7 @@ IMPORT AutoStandardI, BatchServices, BatchShare, BIPV2, LiensV2_Services, STD;
 
 EXPORT JudgmentsAndLiens_BatchService(useCannedRecs = 'false') := 
 	MACRO
-	 #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+	 #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 		#OPTION('optimizeProjects', TRUE);
 		
 		#CONSTANT('getBdidsbyExecutive',FALSE);

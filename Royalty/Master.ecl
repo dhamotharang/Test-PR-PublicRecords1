@@ -245,6 +245,7 @@ export Master := dataset(
 			{'ROYALTY', 'CORTERA_FILE',                     '701', 'I', '' , 'Cortera inhouse business info'},
 			{'ROYALTY', 'ACCUDATA_DEFAULT',                 '710', 'G', '' , 'Accudata standard request'},
 			{'ROYALTY', 'ACCUDATA_CNAM_CNM2',               '711', 'G', '' , 'Accudata phone number calling name'},
-			{'ROYALTY', 'ACCUDATA_OCN_LNP',                 '712', 'G', '' , 'Accudata local number portability data'}
+			{'ROYALTY', 'ACCUDATA_OCN_LNP',                 '712', 'G', '' , 'Accudata local number portability data'},
+			{'ROYALTY', 'BRITE_VERIFY_EMAIL',               '720', 'G', '' , 'BRITE VERIFY realtime email'}
 		]
 		, MasterLayout);
