@@ -34,13 +34,12 @@ besr_pre := project(best_full,
       self.phones := doxie_crs.verifiedPhones(Legacy_Verified_Value).records, 
       self.dod := max_dod,
       self.deceased := if(exists(death_filtered),'Y','N'),
-      self.IsLimitedAccessDMF := not exists(death_filtered(dod8 = max_dod and ~IsLimitedAccessDMF)),
+      self.IsLimitedAccessDMF := max_dod != '' and not exists(death_filtered(dod8 = max_dod and ~IsLimitedAccessDMF)),
       self.ssn := if (left.ssn <> '',
                       left.ssn, 
                       if(exists(ssnr_pre(did = idid and ssn = ssn_value)), ssn_value, ''));
       self := left)
 );
-
 
 // TODO: It looks like there's no reliable way to fetch flag records by SSN in the FCRA context:
 //   consider just taking it from the input, if any.
