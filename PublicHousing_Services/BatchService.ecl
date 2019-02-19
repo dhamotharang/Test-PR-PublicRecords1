@@ -30,7 +30,7 @@ EXPORT BatchService() := FUNCTION
 		batch_params := PublicHousing_Services.IParams.getBatchParams();				
 		#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 		in_ssn_mask := batch_params.ssn_mask; // 'NONE'
-		is_GLB_fail := NOT ut.glb_ok(batch_params.GLBpurpose);
+		is_GLB_fail := NOT batch_params.isValidGlb();
 		is_DRM_fail := Doxie.DataRestriction.isECHRestricted(batch_params.DataRestrictionMask); // i.e. if pos #6 = '1'
 
 		_layouts := PublicHousing_Services.Layouts;
@@ -129,9 +129,9 @@ EXPORT BatchService() := FUNCTION
 		BatchShare.MAC_RestoreAcctno(ds_batch_in_marked, ds_recs_out, ds_recs_ready)		
     
 		// 7. Restrictions/suppressions based on application type.
-		Suppress.MAC_Suppress(ds_recs_ready, ds_recs_sup_1, batch_params.ApplicationType,,,Suppress.Constants.LinkTypes.DID, LexID);			
-		Suppress.MAC_Suppress(ds_recs_sup_1, ds_recs_sup_2, batch_params.ApplicationType,,,Suppress.Constants.LinkTypes.SSN, ssn);
-		Suppress.MAC_Suppress(ds_recs_sup_2, ds_recs_sup_3, batch_params.ApplicationType,,,Suppress.Constants.LinkTypes.SSN, best_ssn);
+		Suppress.MAC_Suppress(ds_recs_ready, ds_recs_sup_1, batch_params.application_type,,,Suppress.Constants.LinkTypes.DID, LexID);			
+		Suppress.MAC_Suppress(ds_recs_sup_1, ds_recs_sup_2, batch_params.application_type,,,Suppress.Constants.LinkTypes.SSN, ssn);
+		Suppress.MAC_Suppress(ds_recs_sup_2, ds_recs_sup_3, batch_params.application_type,,,Suppress.Constants.LinkTypes.SSN, best_ssn);
 
 		// 8. Provide for ssn masking. Here, 'ssn' is a field from Criminal records.
 		Suppress.MAC_Mask(ds_recs_sup_3   , ds_recs_masked_1, ssn     ,  '', true, false,,,,in_ssn_mask);	

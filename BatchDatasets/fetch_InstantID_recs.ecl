@@ -1,7 +1,7 @@
 
 IMPORT BatchShare, address, iesp, risk_indicators, riskwise, ut, gateway;
 
-EXPORT fetch_InstantID_recs( DATASET(BatchDatasets.Layouts.layout_batch_in_waddr_status) ds_batch_in, BatchShare.IParam.BatchParams in_mod ) :=
+EXPORT fetch_InstantID_recs( DATASET(BatchDatasets.Layouts.layout_batch_in_waddr_status) ds_batch_in, BatchShare.IParam.BatchParamsV2 in_mod ) :=
 	FUNCTION	
 		// Constants to run CIID process
 		boolean Ofac_Only                 := false;
@@ -13,7 +13,7 @@ EXPORT fetch_InstantID_recs( DATASET(BatchDatasets.Layouts.layout_batch_in_waddr
 		boolean incl_ofac                 := false;
 		real Global_WatchList_Threshold   := .84;
 		integer2 dob_radius_use           := -1; 
-		boolean ln_branded_value          := false;
+		boolean ln_branded_value          := false; //use value from input 'in_mod' instead?
 		boolean suppressNearDups          := false;
 		boolean require2ele               := false;
 		boolean fromBiid                  := false;
@@ -72,8 +72,8 @@ EXPORT fetch_InstantID_recs( DATASET(BatchDatasets.Layouts.layout_batch_in_waddr
 		prep := PROJECT(ds_batch_in,into(LEFT));
 		
 		ciid_recs := 
-				risk_indicators.InstantID_Function(prep, gateways_in, in_mod.DPPAPurpose, in_mod.GLBPurpose, 
-				in_mod.industryclass='UTILI', ln_branded_value, ofac_only, suppressNearDups, require2ele, 
+				risk_indicators.InstantID_Function(prep, gateways_in, in_mod.dppa, in_mod.glb, 
+				in_mod.industry_class='UTILI', ln_branded_value, ofac_only, suppressNearDups, require2ele, 
 				fromBiid, isFCRA, ExclWatchLists, in_from_IT1O, ofac_version, incl_ofac, incl_addl_watchlists, 
 				Global_WatchList_Threshold, dob_radius_use, bsversion, runSSNCodes, runBestAddrCheck, 
 				runChronoPhoneLookup, runAreaCodeSplitSearch, allowCellPhones, ExactMatchLevel, 
@@ -82,3 +82,4 @@ EXPORT fetch_InstantID_recs( DATASET(BatchDatasets.Layouts.layout_batch_in_waddr
 		
 		RETURN ciid_recs;
 	END;
+  

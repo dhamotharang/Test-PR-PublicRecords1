@@ -100,7 +100,7 @@ EXPORT Raw := MODULE
 				export BOOLEAN ReturnCurrent			 := false : stored('ReturnCurrent');
 				export BOOLEAN FullNameMatch 			 := false : stored('FullNameMatch');
 				export boolean Is_UseDate					 := use_date; 
-				export string32 ApplicationType 	 := in_mod.ApplicationType;
+				export string32 ApplicationType 	 := in_mod.application_type;
 			END;
 			
 			ds_mvr_recs_raw := 

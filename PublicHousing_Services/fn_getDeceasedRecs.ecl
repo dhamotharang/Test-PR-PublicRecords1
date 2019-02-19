@@ -1,11 +1,12 @@
 
-IMPORT DeathV2_Services, PublicHousing_Services;
+IMPORT DeathV2_Services, PublicHousing_Services, BatchShare;
 
 EXPORT fn_getDeceasedRecs(DATASET(PublicHousing_Services.Layouts.batch_in) ds_batch_in, PublicHousing_Services.IParams.BatchParams in_mod) :=
 	FUNCTION
 
-		// 1. Fetch records from the Deceased Batch service.		
-		deathInMod := MODULE(project(in_mod, DeathV2_Services.IParam.BatchParams, opt))							
+		// 1. Fetch records from the Deceased Batch service.
+    mod_legacy := BatchShare.IParam.ConvertToLegacy (in_mod);
+		deathInMod := MODULE(project(mod_legacy, DeathV2_Services.IParam.BatchParams, opt))							
 			EXPORT BOOLEAN AddSupplemental 						:= TRUE; // for joining on DID
 			EXPORT BOOLEAN PartialNameMatchCodes			:= TRUE;
 			EXPORT BOOLEAN ExtraMatchCodes 						:= TRUE;

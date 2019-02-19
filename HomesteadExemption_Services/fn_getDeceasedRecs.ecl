@@ -1,12 +1,13 @@
-IMPORT STD, DeathV2_Services, HomesteadExemption_Services;
+IMPORT STD, DeathV2_Services, HomesteadExemption_Services, BatchShare;
 
 EXPORT fn_getDeceasedRecs(DATASET(HomesteadExemption_Services.Layouts.batch_in) ds_batch_in, HomesteadExemption_Services.IParams.BatchParams in_mod) :=
 	FUNCTION
 		
 		c := HomesteadExemption_Services.Constants.Death;
 		
-		// 1. Fetch records from the Deceased Batch service.		
-		deathInMod := MODULE(project(in_mod, DeathV2_Services.IParam.BatchParams, opt))							
+		// 1. Fetch records from the Deceased Batch service.
+    mod_legacy := BatchShare.IParam.ConvertToLegacy(in_mod);
+		deathInMod := MODULE(project(mod_legacy, DeathV2_Services.IParam.BatchParams, opt))							
 			EXPORT BOOLEAN AddSupplemental 						:= TRUE;
 			EXPORT BOOLEAN PartialNameMatchCodes			:= TRUE;
 			EXPORT BOOLEAN ExtraMatchCodes 						:= TRUE;

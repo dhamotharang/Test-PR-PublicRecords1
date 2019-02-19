@@ -100,18 +100,12 @@ EXPORT TaxRefundISv3_BatchService := MACRO
 	BatchShare.MAC_SequenceInput(ds_batch, ds_sequenced);
 	BatchShare.MAC_CapitalizeInput(ds_sequenced, ds_batch_in);
 	
-	mod_args := MODULE (BatchServices.TaxRefundISv3_BatchService_Interfaces.Input)
+  mod_access := doxie.compliance.GetGlobalDataAccessModule();
+	mod_args := MODULE (PROJECT (mod_access, BatchServices.TaxRefundISv3_BatchService_Interfaces.Input, OPT))
 		// common input options
-		EXPORT string32  ApplicationType  	:= application_type_value;
-		EXPORT unsigned1 DPPAPurpose				:= DPPA_Purpose;
-		EXPORT unsigned1 GLBPurpose  				:= GLB_Purpose;
-		EXPORT string  	 DataPermission 		:= AutoStandardI.GlobalModule().DataPermissionMask;
-		EXPORT string    DataRestriction    := doxie.DataRestriction.fixed_DRM;
-		EXPORT string5   IndustryClass			:= industry_class_value;
 		EXPORT boolean   IncludeBlankDOD	  := 0 : stored('IncludeBlankDOD');
 		EXPORT boolean   PhoneticMatch	   	:= phonetics; 
 		EXPORT boolean   AllowNickNames		  := nicknames; 
-		EXPORT boolean   IncludeMinors		  := false : stored('IncludeMinors');
 		// TRIS specific, v2 & v3 shared input options
 		EXPORT string120 append_l           := 'BEST_ALL, BEST_EDA'; //Append allows all Best Info to return
 		EXPORT string120 verify_l           := 'BEST_ALL';

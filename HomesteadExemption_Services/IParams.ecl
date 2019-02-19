@@ -2,8 +2,7 @@ import BatchShare;
 
 export IParams := module
 	
-	export BatchParams := interface (BatchShare.IParam.BatchParams)
-//		export string5 industry_class      := '';
+	export BatchParams := interface (BatchShare.IParam.BatchParamsV2)
 		export unsigned3 DIDScoreThreshold := 0;
 		export string4 taxyear             := '';
 		export boolean ViewDebugs          := false;
@@ -17,13 +16,12 @@ export IParams := module
 	export getBatchParams() := 
 		function
 			
-			base_params := BatchShare.IParam.getBatchParams();
+			base_params := BatchShare.IParam.getBatchParamsV2();
 			
 			// Project the base params to read shared parameters from store. If necessary, you may 
 			// redefine default values for common parameters and/or define default values for domain-
 			// specific parameters
 			in_mod := module(project(base_params, BatchParams, opt))				
-//				export string5 industry_class      := '' : STORED('IndustryClass');
 				export unsigned3 DIDScoreThreshold := Constants.Defaults.DIDScoreThreshold : STORED('DIDScoreThreshold');
 				export string4 taxyear             := '' : STORED('TaxYear');
 				export boolean ViewDebugs          := FALSE : STORED('ViewDebugs');

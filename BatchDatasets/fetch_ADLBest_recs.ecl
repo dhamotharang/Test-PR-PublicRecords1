@@ -13,11 +13,11 @@ EXPORT fetch_ADLBest_recs(ds_batch_in,in_mod) := FUNCTIONMACRO
 					appends_value      := 'BEST_ALL,VERIFY_ALL',
 					verify_value       := 'BEST_ALL,VERIFY_ALL',
 					glb_flag           := TRUE,
-					glb_purpose_value  := in_mod.GLBPurpose,
-					include_minors     := in_mod.IncludeMinors,
-					appType            := in_mod.ApplicationType,
-					dppa_purpose_value := in_mod.DPPAPurpose,
-					IndustryClass_val  := in_mod.industryclass,
+					glb_purpose_value  := in_mod.glb,
+					include_minors     := in_mod.show_minors,
+					appType            := in_mod.application_type,
+					dppa_purpose_value := in_mod.dppa,
+					IndustryClass_val  := in_mod.industry_class,
 					DRM_val            := in_mod.DataRestrictionMask,
 					GetSSNBest         := in_mod.GetSSNBest
         );

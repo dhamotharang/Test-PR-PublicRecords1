@@ -1,4 +1,4 @@
-IMPORT AddrBest, Address, Address_Rank, BatchShare, doxie, Header;
+IMPORT Address_Rank;
 EXPORT fn_getRank_wMetadata(DATASET(Address_Rank.Layouts.Batch_in) ds_batch = DATASET([],Address_Rank.Layouts.Batch_in),
 											 Address_Rank.IParams.BatchParams in_mod) := FUNCTION
 											 
@@ -35,4 +35,4 @@ EXPORT fn_getRank_wMetadata(DATASET(Address_Rank.Layouts.Batch_in) ds_batch = DA
 								 
 	with_ADVO := Address_Rank.fn_getADVO_Values(bestjoin);				//append ADVO values to label best Addr												
 	RETURN with_ADVO;
-END;											 
+END;
