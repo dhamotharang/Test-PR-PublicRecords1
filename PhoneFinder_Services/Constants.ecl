@@ -42,6 +42,8 @@ EXPORT MapTransCode2Type(UNSIGNED1 t) := TransCodeTypeDCT[t].ttype;
 TransTypeCodeDCT := DICTIONARY(TransTypeCodes, {ttype => tcode}); 
 EXPORT MapTransType2Code(STRING t) := TransTypeCodeDCT[ut.CleanSpacesAndUpper(t)].tcode;
 
+EXPORT PrimarySearchCriteria := 'PII';
+
 EXPORT PhoneSource := ENUM(UNSIGNED1,Waterfall,QSentGateway,TargusGateway,ExpFileOne,Gong,PhonesPlus,InHouseQSent,LastResort);
 	
 	// Phone types
