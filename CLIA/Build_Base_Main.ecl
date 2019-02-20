@@ -1,4 +1,4 @@
-IMPORT tools, ut;
+﻿IMPORT tools, ut;
 
 EXPORT Build_Base_Main(STRING pversion,
 	                     DATASET(Layouts.Base) inMainBase,
@@ -72,7 +72,7 @@ EXPORT Build_Base_Main(STRING pversion,
 	                   rollupMain(LEFT, RIGHT),
 										 CLIA_number, RECORD,
 										    EXCEPT record_type, dt_vendor_last_reported, dt_vendor_first_reported,
-												   source_rec_id,
+												   source_rec_id,prov_cat_code,
 										 LOCAL);
 	
  	// Add source record id
