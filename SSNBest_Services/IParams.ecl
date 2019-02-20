@@ -48,7 +48,7 @@ EXPORT IParams := MODULE
       EXPORT string DataRestrictionMask := mod_batch.DataRestrictionMask;
       EXPORT string5 industry_class := mod_batch.IndustryClass;
       EXPORT string32 application_type := mod_batch.ApplicationType;
-      EXPORT boolean show_minors := mod_batch.IncludeMinors;
+      EXPORT boolean show_minors := mod_batch.IncludeMinors OR (mod_batch.GLBPurpose = 2);
       EXPORT string ssn_mask :=  mod_batch.ssn_mask;
 
 		  EXPORT BOOLEAN suppress_and_mask  := mod_batch.suppress_and_mask;
