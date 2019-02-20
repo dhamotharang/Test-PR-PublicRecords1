@@ -763,6 +763,7 @@ Export CIID := RECORD
 	STRING errorcode;
 	unsigned8 Record_ID;
 	unsigned6 fdn_file_info_id;
+	integer1 relativeaddressmatch;
  END;
  
  Export Crim	:= RECORD
