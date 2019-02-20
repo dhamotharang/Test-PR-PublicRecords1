@@ -16,7 +16,6 @@ export t_EmailV2SearchBy := record
 end;
 		
 export t_EmailV2SearchOption := record (iesp.share.t_BaseSearchOptionEx)
-	string3 SearchType {xpath('SearchType')};
 	string EmailQualityRulesMask {xpath('EmailQualityRulesMask')};
 	boolean IncludeNoLexIdMatch {xpath('IncludeNoLexIdMatch')};
 	boolean IncludeHistoricData {xpath('IncludeHistoricData')};
@@ -24,6 +23,7 @@ export t_EmailV2SearchOption := record (iesp.share.t_BaseSearchOptionEx)
 	boolean KeepUndeliverableEmail {xpath('KeepUndeliverableEmail')};
 	unsigned2 MaxEmailsForDeliveryCheck {xpath('MaxEmailsForDeliveryCheck')};
 	string BVAPIkey {xpath('BVAPIkey')};
+	string SearchType {xpath('SearchType')}; //values['EAA','EIA','EIC','']
 end;
 		
 export t_EmailV2OriginalData := record
@@ -79,14 +79,14 @@ export t_EmailV2SearchRecord := record
 	unsigned EmailId {xpath('EmailId')};//hidden[internal]
 end;
 		
-export t_EmailV2InputConsumer := record
+export t_EmailV2InputSubject := record
 	t_EmailV2SearchBy InputEcho {xpath('InputEcho')};
 	unsigned SubjectLexid {xpath('SubjectLexid')};
 end;
 		
 export t_EmailV2SearchResponse := record
 	iesp.share.t_ResponseHeader _Header {xpath('Header')};
-	t_EmailV2InputConsumer InputSubject {xpath('InputSubject')};
+	t_EmailV2InputSubject InputSubject {xpath('InputSubject')};
 	dataset(t_EmailV2SearchRecord) Records {xpath('Records/Record'), MAXCOUNT(iesp.Constants.Email.MAX_RECS)};
 end;
 		
