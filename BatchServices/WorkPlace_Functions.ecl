@@ -2,11 +2,11 @@ import corp2, doxie, doxie_cbrs, doxie_raw, gong, AutoStandardI, DeathV2_Service
  Address, Risk_Indicators, WorkPlace_Services, Business_Header, Header;
 
 export WorkPlace_Functions := module
-shared	deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
-shared  glb_ok := ut.glb_ok(deathparams.glbpurpose);
 
 // using shared data-access module until it is passed in
 shared mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
+shared deathparams := DeathV2_Services.IParam.GetFromDataAccess(mod_access);
+shared glb_ok := deathparams.isValidGlb();
 
 	// This function returns the spouse did  
 	export getSpouseDID(dataset(doxie.layout_references) dids) := FUNCTION

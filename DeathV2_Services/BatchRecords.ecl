@@ -5,8 +5,8 @@ EXPORT BatchRecords(DATASET(DeathV2_Services.Layouts.BatchIn) dBatchIn,
 FUNCTION
 
 	dBatchInCommon := PROJECT(dBatchIn, Autokey_batch.Layouts.rec_inBatchMaster);			
-	IsGLBOk		:= ut.glb_ok(inMod.GLBPurpose);	
-	deathRestrictions := DeathV2_Services.IParam.GetDeathRestrictions(inMod);
+	IsGLBOk		:= inMod.isValidGlb();
+	deathRestrictions := DeathV2_Services.IParam.GetFromDataAccess(inMod);
 	
 	dAKDids 	:= DeathV2_Services.BatchIds(inMod).AutoKeyIds(dBatchInCommon);
 	dDDDids 	:= DeathV2_Services.BatchIds(inMod).DeepDiveIds(dBatchInCommon, IsGLBOk, deathRestrictions);
@@ -60,8 +60,8 @@ FUNCTION
 		dOut := if(inMod.ExtraMatchCodes, ds_mc_filtered, ds_mc);		
 
 		//apply some restrictions
-	  Suppress.MAC_Suppress(dOut,pl1,inMod.ApplicationType,Suppress.Constants.LinkTypes.DID,DID);
-	  Suppress.MAC_Suppress(pl1,pl2,inMod.ApplicationType,Suppress.Constants.LinkTypes.SSN,ssn);
+	  Suppress.MAC_Suppress(dOut,pl1,inMod.application_type,Suppress.Constants.LinkTypes.DID,DID);
+	  Suppress.MAC_Suppress(pl1,pl2,inMod.application_type,Suppress.Constants.LinkTypes.SSN,ssn);
     
 	RETURN pl2;
 	

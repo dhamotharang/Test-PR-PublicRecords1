@@ -136,4 +136,32 @@ export IParam := module
 		RETURN batch_mod;
 	ENDMACRO;
 
+  //Create from a module compatible with legacy batch module;
+  //temporarily, until all batch services are moved to IDataAccess.
+  EXPORT GetFromLegacy (mod) := FUNCTIONMACRO
+    IMPORT Gateway;
+    RETURN MODULE (BatchShare.IParam.BatchParamsV2)
+      //data-access part:
+      EXPORT unsigned1 glb := mod.GLBPurpose;
+      EXPORT unsigned1 dppa := mod.DPPAPurpose;
+      EXPORT string DataPermissionMask := mod.DataRestrictionMask;
+      EXPORT string DataRestrictionMask := mod.DataPermissionMask;
+      EXPORT string5 industry_class := mod.IndustryClass;
+      EXPORT string32 application_type := mod.ApplicationType;
+      EXPORT boolean show_minors := mod.IncludeMinors OR (mod.GLBPurpose = 2);
+      EXPORT string ssn_mask := mod.ssn_mask;
+      EXPORT unsigned1 mask_dl := IF (mod.mask_dl, 1, 0);
+      EXPORT unsigned1 dob_mask := mod.dob_mask;
+
+      //batch part:
+      EXPORT unsigned2 PenaltThreshold      := mod.PenaltThreshold;
+      EXPORT unsigned8 MaxResults           := mod.MaxResults;
+      EXPORT unsigned8 MaxResultsPerAcct    := mod.MaxResultsPerAcct;
+      EXPORT boolean   ReturnCurrentOnly    := mod.ReturnCurrentOnly;
+      EXPORT boolean   RunDeepDive          := mod.RunDeepDive;
+      EXPORT boolean   ReturnDetailedRoyalties := mod.ReturnDetailedRoyalties;
+      EXPORT DATASET (Gateway.Layouts.Config) gateways := mod.gateways;
+    END;
+	ENDMACRO;
+
 END;

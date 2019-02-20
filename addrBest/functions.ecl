@@ -113,7 +113,7 @@ EXPORT functions := MODULE
 		end;
     OutRecs := join(ds_in, key_dead, keyed(left.did=right.l_did)
 											and	not DeathV2_Services.functions.Restricted(right.src, right.glb_flag, 
-											ut.glb_ok(deathparams.glbpurpose, (left.subj_phone_type_new in AddrBest.Constants.RNAset or left.did <> left.p_did)),	//true is not the subject, false is the subject 
+											deathparams.isValidGlb(left.subj_phone_type_new in AddrBest.Constants.RNAset or left.did <> left.p_did),	//true is not the subject, false is the subject 
 											deathparams),
 											loadDead(left, right), LEFT OUTER, LIMIT(0), KEEP(1));
     RETURN OutRecs;

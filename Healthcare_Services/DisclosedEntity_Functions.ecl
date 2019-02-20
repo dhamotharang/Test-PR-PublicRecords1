@@ -115,7 +115,7 @@ EXPORT DisclosedEntity_Functions := MODULE
 	Export appendDeath (dataset(DisclosedEntity_Layouts.entityIds) inputRecs) := function
 		gm := AutoStandardI.GlobalModule();
 		deathparams := DeathV2_Services.IParam.GetDeathRestrictions(gm);
-		glb_ok := AutoStandardI.InterfaceTranslator.glb_ok.val(project(gm,AutoStandardI.InterfaceTranslator.glb_ok.params));  
+		glb_ok := deathparams.isValidGlb();
 		deathRecs := join(inputRecs,doxie.Key_Death_MasterV2_ssa_Did,
 								keyed(left.did = right.l_did)
 								and	not DeathV2_Services.Functions.Restricted(right.src, right.glb_flag, glb_ok, deathparams),

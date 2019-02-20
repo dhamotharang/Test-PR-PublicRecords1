@@ -1,6 +1,8 @@
 import ut, autostandardi, batchservices, DeathV2_Services,Ingenix_NatlProf,
 Suppress, doxie_files, doxie, BankruptcyV3, LiensV2, dea, Codes, CNLD_Practitioner, CNLD_Facilities;
 
+string26 alphabet := 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
 string nameFromComponentsLFM(string fname,string mname,string lname,string name_suffix) :=
   IF(lname<>'',trim(lname)+', ','')+IF(fname<>'',trim(fname)+' ','')+IF(mname<>'',trim(mname)+' ','')+trim(name_suffix);
 
@@ -55,9 +57,9 @@ EXPORT Practitioner_Batch_Service_Records(BOOLEAN useCannedRecs = FALSE) := FUNC
     unsigned4 joinLimit := 5000;
 		gm := AutoStandardI.GlobalModule();
 		deathparams := DeathV2_Services.IParam.GetDeathRestrictions(gm);
-    glb_ok := ut.glb_ok(deathparams.glbpurpose);
+    glb_ok := deathparams.isValidGlb();
 		                                 
-		appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(gm,AutoStandardI.InterfaceTranslator.application_type_val.params));
+		appType := deathparams.application_type;
 		
 		sample_SearchPoint_set := BatchServices._Sample_inBatchMaster('SEARCHPOINT_PRACTITIONER');
 		
@@ -80,7 +82,7 @@ EXPORT Practitioner_Batch_Service_Records(BOOLEAN useCannedRecs = FALSE) := FUNC
 		                       transform(SearchPoint_Services.Layouts.practitioner.batchservice.layout_out_matchcodes,
 													   len := length(left.dea_number);
 														 tmplen :=  stringlib.StringFilterout(left.dea_number[3..len],'1234567890');																														
-													   self.isDeaValid := StringLib.StringFind(ut.alphabet, left.dea_number[1], 1) > 0
+													   self.isDeaValid := StringLib.StringFind(alphabet, left.dea_number[1], 1) > 0
 															                        and (tmplen = '') // meaning all numbers in the 3..end positions
 															                        and (len >= 9); 
                              self := left;																											

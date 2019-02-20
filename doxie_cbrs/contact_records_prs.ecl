@@ -2,11 +2,10 @@
 add reverse phone lookup and deathfile indicator to contacts
 */
 import doxie, business_header, ut, NID, DeathV2_Services, AutoStandardI;
-doxie_cbrs.mac_Selection_Declare()
 
 export contact_records_prs(dataset(doxie_cbrs.layout_references) bdids) := FUNCTION
 deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
-GLBPurpose  := deathparams.GLBPurpose;
+glb_ok := deathparams.isValidGlb();
 
 contacts := doxie_cbrs.contact_records(bdids);
 
@@ -81,7 +80,7 @@ pfr0 := //project(cr, addid(left));
 
 //** see about getting a bester name
 dids := dedup(sort(project(pfr0, doxie.layout_references), did), did);
-doxie.mac_best_records(dids, did, best_recs, true, ut.glb_ok(GLBPurpose),, doxie.DataRestriction.fixed_DRM);	
+doxie.mac_best_records(dids, did, best_recs, true, glb_ok,, doxie.DataRestriction.fixed_DRM);	
 
 pfr0 get_best_name(pfr0 l, best_recs r) := transform
 		isbest := r.fname <> '';

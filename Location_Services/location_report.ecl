@@ -1,5 +1,5 @@
 import location_services, doxie, doxie_ln, doxie_raw, header, ut, Census_Data,
-       LN_PropertyV2, AutoStandardI, DeathV2_Services;
+       LN_PropertyV2, DeathV2_Services;
 
 
 export location_report(DATASET(Doxie_Raw.Layout_address_input) addr_in, 
@@ -334,7 +334,7 @@ END;
 // need to eliminate deceased entities from any of the "current" groupings
 // and force them into their respective "previous" groups
 death_key := doxie.Key_Death_Masterv2_SSA_Did;
-deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
+deathparams := DeathV2_Services.IParam.GetFromDataAccess(mod_access);
 
 
 Layout_report.Assoc getOwn(propSrchFields L) := TRANSFORM

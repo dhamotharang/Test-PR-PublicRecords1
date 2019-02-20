@@ -51,7 +51,10 @@ EXPORT IDataAccess := INTERFACE
   EXPORT boolean isECHRestricted () := $.compliance.isECHRestricted (DataRestrictionMask);
   EXPORT boolean isEQCHRestricted () := $.compliance.isEQCHRestricted (DataRestrictionMask);
 
-    EXPORT boolean isHeaderSourceRestricted (string2 src) := 
+  EXPORT boolean isHeaderSourceRestricted (string2 src) := 
            $.compliance.isHeaderSourceRestricted (src, DataRestrictionMask);
 
+
+  EXPORT boolean useDeathMasterSSAUpdates := $.compliance.use_DM_SSA_updates (DataPermissionMask);
+  
 END;

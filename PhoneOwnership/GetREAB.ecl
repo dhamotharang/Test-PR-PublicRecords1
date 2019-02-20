@@ -3,7 +3,7 @@ This function gets Relatives, Employers, Associates, and Businesses (REAB) for a
 firstname, lastname, and (DID or SSN or full address or DOB).
 */
 IMPORT BatchServices,BIPV2,BIPV2_Build,Codes,DeathV2_Services,Doxie,Doxie_Raw,EmailService,Header,
-       MDR,PAW,PhoneOwnership,Phones,POE,STD,Suppress,ut;
+       PAW,PhoneOwnership,Phones,POE,STD,Suppress,ut;
 
 EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwnership.IParams.BatchParams inMod) :=FUNCTION //
 
@@ -36,7 +36,8 @@ EXPORT GetREAB(DATASET(PhoneOwnership.Layouts.PhonesCommon) dBatchIn,PhoneOwners
 	dsRA := Doxie_Raw.relative_raw(DEDUP(subjectDIDs,ALL), mod_access, , , Constants.MAX_RelativeDept);
 
 	dsUniqueRA := DEDUP(SORT(dsRA,srcdid,person2,-rel_dt_last_seen,rel_dt_first_seen,titleno),srcdid,person2);
-	deathParams := PROJECT(inMod, DeathV2_Services.IParam.DeathRestrictions, OPT);
+  //TODO: death-specific parameters like DeathMasterPurpose are not being read?
+	deathParams := PROJECT(mod_access, DeathV2_Services.IParam.DeathRestrictions, OPT);
 	
 	PhoneOwnership.Layouts.Phone_Relationship updateRelatives(doxie_Raw.Layout_RelativeRawOutput l,Doxie.key_death_masterV2_ssa_DID r) :=TRANSFORM
 		SELF.did := l.person2;

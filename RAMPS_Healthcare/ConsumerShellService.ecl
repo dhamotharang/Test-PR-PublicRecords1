@@ -48,7 +48,7 @@ export ConsumerShellService := MACRO
 	string DataRestriction := if(gm.DataRestrictionMask <> '',gm.DataRestrictionMask,RAMPS_Healthcare.Constants.default_DataRestriction);
 	String DataPermission := if(gm.DataPermissionMask <> '',gm.DataPermissionMask,RAMPS_Healthcare.Constants.default_DataPermission);
 	deathParams := DeathV2_Services.IParam.GetDeathRestrictions(gm);
-	glb_ok := AutoStandardI.InterfaceTranslator.glb_ok.val(project(gm,AutoStandardI.InterfaceTranslator.glb_ok.params)); 
+	glb_ok := deathParams.isValidGlb();
 
 	LeadIntegrityVersion := RAMPS_Healthcare.Constants.default_LeadIntegrity_Version;//We want version 4
 	bsVersion := RAMPS_Healthcare.Constants.default_BocaShell_Version; //We want version 4.1

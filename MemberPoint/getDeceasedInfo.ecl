@@ -1,4 +1,4 @@
-import DeathV2_Services;
+import DeathV2_Services, BatchShare;
 
 /*
 Deceased matching needs to be very tight â€“ The query should allow the passing of match codes, 
@@ -54,7 +54,8 @@ EXPORT dataset(MemberPoint.Layouts.DeceasedOut) getDeceasedInfo (dataset (Member
 				
 		BatchInCommon 	:= project(dsInterE,xformInterExToDec(left));
 			
-		deathBatchParams := module(project(BParams, DeathV2_Services.IParam.BatchParams, opt))
+		mod_batch := BatchShare.IParam.GetFromLegacy(BParams);
+		deathBatchParams := module(project(mod_batch, DeathV2_Services.IParam.BatchParams, opt))
 			EXPORT STRING MatchCodeIncludes:= BParams.DeceasedMatchCodes;
 		END;
 		dsDeathPre := DeathV2_Services.BatchRecords(BatchInCommon, deathBatchParams);

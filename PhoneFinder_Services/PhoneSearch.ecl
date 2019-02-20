@@ -1,4 +1,4 @@
-﻿IMPORT DeathV2_Services,Didville,Doxie,Doxie_Raw,Gateway,Suppress,ut;
+﻿IMPORT DeathV2_Services,Didville,Doxie,Doxie_Raw,Gateway,Suppress;
 
 lBatchIn       := PhoneFinder_Services.Layouts.BatchInAppendDID;
 lCommon        := PhoneFinder_Services.Layouts.PhoneFinder.Common;
@@ -136,7 +136,7 @@ FUNCTION
 		SELF          := le;
 	END;
 	
-	deathParams := DeathV2_Services.IParam.GetDeathRestrictions(inMod);
+	deathParams := DeathV2_Services.IParam.GetFromDataAccess(mod_access);
 	
 	dDeceased := JOIN(dAll_wDIDs,
 										Doxie.key_death_masterV2_ssa_DID,

@@ -177,8 +177,7 @@ EXPORT compliance := MODULE
       RETURN infile (NOT doxie.compliance.isHeaderSourceRestricted (src_field, drm));
     ENDMACRO;  
 
-		// BriteVerify gateway for Email verification 
-		EXPORT BOOLEAN isBriteVerifyRestricted(drm_type drm) := ~allowAll AND (drm[46] NOT IN ['0','']);
-
+    restrictedSet := ['0',''];
+    EXPORT use_DM_SSA_updates(string dpm) := dpm[10] NOT IN restrictedSet;
 
 END;

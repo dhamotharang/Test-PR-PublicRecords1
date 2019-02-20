@@ -1,14 +1,14 @@
-﻿IMPORT AutoStandardI, BatchShare, BatchServices, ut;
+﻿IMPORT $, BatchShare, BatchServices, doxie;
 
 EXPORT IParam := MODULE
 
-	EXPORT BatchParams := INTERFACE(BatchShare.IParam.BatchParams)
+	EXPORT BatchParams := INTERFACE(BatchShare.IParam.BatchParamsV2)
 		EXPORT BOOLEAN 		AddSupplemental 					:= FALSE;
 		EXPORT BOOLEAN 		ExtraMatchCodes 					:= FALSE;
 		EXPORT BOOLEAN 		IncludeBlankDOD 					:= FALSE;
 		EXPORT BOOLEAN 		NoDIDAppend 							:= FALSE;
 		/* did score thresholds as defined by interface */
-		EXPORT UNSIGNED3 	DidScoreThreshold 				:= Constants.DEFAULT_DID_SCORE_THRESHOLD;
+		EXPORT UNSIGNED3 	DidScoreThreshold 				:= $.Constants.DEFAULT_DID_SCORE_THRESHOLD;
 		/* enable/disable augmented ADL addr append - see Bug 51541 */
 		EXPORT BOOLEAN 		MatchCodeADLAppend 				:= TRUE;
 		/* match code filtering */			
@@ -20,14 +20,14 @@ EXPORT IParam := MODULE
 	EXPORT getBatchParams() := 
 	FUNCTION
 		
-		mBaseParams := BatchShare.IParam.getBatchParams();
+		mBaseParams := BatchShare.IParam.getBatchParamsV2();
 		
 		in_mod := module(project(mBaseParams, BatchParams, opt))							
 			EXPORT BOOLEAN 		AddSupplemental 				:= FALSE : STORED('AddSupplemental');
 			EXPORT BOOLEAN 		ExtraMatchCodes 				:= FALSE : STORED('ExtraMatchCodes');
 			EXPORT BOOLEAN 		IncludeBlankDOD 				:= FALSE : STORED('IncludeBlankDOD');
 			EXPORT BOOLEAN 		NoDIDAppend 						:= FALSE : STORED('NoDIDAppend');
-			EXPORT UNSIGNED3 DidScoreThreshold 			:= Constants.DEFAULT_DID_SCORE_THRESHOLD : STORED('DID_Score_Threshold');
+			EXPORT UNSIGNED3 DidScoreThreshold 			:= $.Constants.DEFAULT_DID_SCORE_THRESHOLD : STORED('DID_Score_Threshold');
 			EXPORT BOOLEAN 		MatchCodeADLAppend 			:= TRUE : STORED('MatchCode_ADL_Append');
 			EXPORT BOOLEAN 		PartialNameMatchCodes 	:= FALSE : STORED('PartialNameMatchCodes');
 			EXPORT STRING  		MatchCodeIncludes 			:= BatchServices.MatchCodes.default_includes : STORED('MatchCode_Includes');
@@ -39,23 +39,20 @@ EXPORT IParam := MODULE
 	
 	/* death data restrictions */
 	
-	EXPORT DeathRestrictions := 
-	INTERFACE(AutoStandardI.DataPermissionI.params, AutoStandardI.DataRestrictionI.params, AutoStandardI.InterfaceTranslator.industry_class_val.params)	
+	EXPORT DeathRestrictions := INTERFACE(doxie.IDataAccess)
 		EXPORT BOOLEAN UseDeathMasterSSAUpdates := FALSE;
-		EXPORT BOOLEAN IsConsumer := FALSE;
 		EXPORT BOOLEAN SuppressNonMarketingDeathSources := FALSE;
 		EXPORT Integer DeathMasterPurpose := DeathV2_Services.Constants.DeathMasterPurpose.NoValue;		
 	END;
 	
+  // Create from a module compatible with GlobalModule
 	EXPORT GetDeathRestrictions(inmod) := 
 	FUNCTIONMACRO				
 
-		IMPORT AutoStandardI, ut;
-		dmod := PROJECT(inmod, DeathV2_Services.IParam.DeathRestrictions, OPT);
+		IMPORT doxie, ut;
+    local mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(inmod);
 
-		death_mod := MODULE(dmod)	
-			EXPORT BOOLEAN UseDeathMasterSSAUpdates := AutoStandardI.DataPermissionI.val(dmod).use_DeathMasterSSAUpdates;
-			EXPORT BOOLEAN IsConsumer := AutoStandardI.InterfaceTranslator.industry_class_value.val(dmod) = ut.IndustryClass.Knowx_IC;
+		death_mod := MODULE(PROJECT (mod_access, DeathV2_Services.IParam.DeathRestrictions, OPT))
 			EXPORT BOOLEAN SuppressNonMarketingDeathSources := FALSE : stored('SuppressNonMarketingDeathSources');	
 			STRING10 input_DeathMasterPurpose := '' : stored('DeathMasterPurpose');	
    // converting to integer as we only restrict if it is 0
@@ -64,5 +61,17 @@ EXPORT IParam := MODULE
 		
 	RETURN death_mod;
 	ENDMACRO;	
+
+  // Create from a module compatible with IDataAccess
+  //TODO: call it from GetDeathRestrictions
+  EXPORT GetFromDataAccess (mod_access) := FUNCTIONMACRO
+    IMPORT ut;
+    RETURN MODULE(PROJECT (mod_access, DeathV2_Services.IParam.DeathRestrictions, OPT))
+      EXPORT boolean SuppressNonMarketingDeathSources := FALSE : STORED('SuppressNonMarketingDeathSources');
+      string10 input_DeathMasterPurpose := '' : STORED('DeathMasterPurpose');
+      // converting to integer as we only restrict if it is 0
+      EXPORT integer DeathMasterPurpose := IF(input_DeathMasterPurpose= '', DeathV2_Services.Constants.DeathMasterPurpose.NoValue,ut.BinaryStringToInteger(input_DeathMasterPurpose));
+    END;
+  ENDMACRO;
 
 END;
