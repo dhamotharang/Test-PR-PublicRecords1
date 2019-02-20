@@ -72,7 +72,6 @@ EXPORT Layouts_FDC(PublicRecords_KEL.Interface_Options Options = PublicRecords_K
 	EXPORT Layout_BankruptcyV3__key_bankruptcyv3_search := RECORD
 		LayoutIDs;
 		RECORDOF(BankruptcyV3__key_bankruptcyv3_search_full_bip);
-		BOOLEAN FCRAWithdrawn := FALSE;
 	END;	
 
 
