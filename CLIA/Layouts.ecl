@@ -1,4 +1,4 @@
-IMPORT Address, BIPV2;
+﻿IMPORT Address, BIPV2;
 
 EXPORT Layouts := MODULE
 
@@ -42,15 +42,14 @@ EXPORT Layouts := MODULE
 		STRING50 facility_name2;
 		STRING50 address1;
 		STRING50 address2;
-		STRING28 city;
-		STRING2  state;
+		STRING50 city;		
 		STRING5  zip;
-		STRING4  zip4;
-		STRING10 facility_phone;
+		STRING2  state;
+		STRING20 facility_phone;
 		STRING8  expiration_date;
 		STRING2  lab_type_code;
 		STRING2	 lab_term_code;			// added Aug 2013
-		STRING2  carriage_return;
+		STRING22 prov_cat_code;
 	END;
 	
 	EXPORT Miscellaneous := MODULE
@@ -63,7 +62,8 @@ EXPORT Layouts := MODULE
 
 	EXPORT Base := RECORD
 		BIPV2.IDlayouts.l_xlink_ids;
-		Input_From_CD - [carriage_return];
+		Input_From_CD;
+        STRING4   zip4;
 		STRING50  lab_type := '';
 		STRING50  certificate_type := '';
 		UNSIGNED4 dt_vendor_first_reported;
