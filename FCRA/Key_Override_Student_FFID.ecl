@@ -1,4 +1,4 @@
-import fcra, ut;
+﻿import fcra, ut, American_Student_List, data_services;
 // string_rec := record
  // string32 key;
  // string9 ssn;
@@ -90,5 +90,8 @@ end;
 
 kf := project(ds,proj_recs(left));
 
-export Key_Override_Student_FFID := index(kf,{flag_file_id}, {kf},
+//DF-2458 blank out specified fields in thor_data400::key::override::fcra::student::qa::ffid
+ut.MAC_CLEAR_FIELDS(kf, kf_cleared, American_Student_List.Constants.fields_to_clear);
+
+export Key_Override_Student_FFID := index(kf_cleared,{flag_file_id}, {kf_cleared},
   '~thor_data400::key::override::fcra::student::qa::ffid');

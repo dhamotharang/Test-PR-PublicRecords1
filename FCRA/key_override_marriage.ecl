@@ -1,4 +1,4 @@
-import data_services, marriage_divorce_v2, ut;
+﻿import data_services, marriage_divorce_v2, ut;
 
 // TODO: OPT options should be removed from basefile and index definitions;
 //       'temp' should be removed from index names
@@ -20,7 +20,9 @@ export key_override_marriage := MODULE
 	dailyds_marriage_main := dataset (daily_prefix + 'marriage_main', marriage_main_rec, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
   kf := dedup (sort (ds_marriage_main, -flag_file_id), except flag_file_id);
 	FCRA.Mac_Replace_Records(kf,dailyds_marriage_main,persistent_record_id,replaceds);
-  export marriage_main := index (replaceds, {flag_file_id}, {replaceds}, keyname_prefix + 'marriage_main::qa::ffid', OPT);
+	// DF-22458 Deprecate specified fields in thor_data400::key::override::fcra::marriage_main::qa::ffid
+	ut.MAC_CLEAR_FIELDS(replaceds, replaceds_cleared, marriage_divorce_v2.fn_FCRA_Field_Deprecation.fields_to_clear_id_main);
+  export marriage_main := index (replaceds_cleared, {flag_file_id}, {replaceds_cleared}, keyname_prefix + 'marriage_main::qa::ffid', OPT);
 
 
   // party records
@@ -33,6 +35,8 @@ export key_override_marriage := MODULE
 	dailyds_marriage_search := dataset (daily_prefix + 'marriage_search', marriage_search_rec, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
   kf := dedup (sort (ds_marriage_search, -flag_file_id), except flag_file_id);
 	FCRA.Mac_Replace_Records(kf,dailyds_marriage_search,persistent_record_id,replaceds);
-  export marriage_search := index (replaceds, {flag_file_id}, {replaceds}, keyname_prefix + 'marriage_search::qa::ffid', OPT);
+	// DF-22458 Deprecate specified fields in thor_data400::key::override::fcra::marriage_search::qa::ffid
+	ut.MAC_CLEAR_FIELDS(replaceds, replaceds_cleared, marriage_divorce_v2.fn_FCRA_Field_Deprecation.fields_to_clear_id_search);
+  export marriage_search := index (replaceds_cleared, {flag_file_id}, {replaceds_cleared}, keyname_prefix + 'marriage_search::qa::ffid', OPT);
 
 END;

@@ -1,4 +1,4 @@
-import watercraft, ut, data_services;
+﻿import watercraft, ut, data_services;
 
 export key_override_watercraft := MODULE
 
@@ -16,8 +16,10 @@ export key_override_watercraft := MODULE
 	dailyds_sid := dataset (daily_prefix + 'watercraft', sid_rec, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
   //TODO: why dedup? shouldn't it be done in the input dataset?
   kf := dedup (sort (ds_sid, -flag_file_id), except flag_file_id);
-	FCRA.Mac_Replace_Records(kf,dailyds_sid,persistent_record_id,replaceds);
-  export sid := index (replaceds, {flag_file_id}, {replaceds}, keyname_prefix + 'watercraft_sid');
+	FCRA.Mac_Replace_Records(kf,dailyds_sid,persistent_record_id,replaceds);	
+	// DF-22458 Deprecate specified fields in thor_data400::key::override::fcra::watercraft::qa::watercraft_sid
+	ut.MAC_CLEAR_FIELDS(replaceds, replaceds_cleared, Watercraft.Constants.fields_to_clear_sid);
+  export sid := index (replaceds_cleared, {flag_file_id}, {replaceds_cleared}, keyname_prefix + 'watercraft_sid');
 
   // CID (coast guard)
   cid_rec := record
@@ -29,7 +31,9 @@ export key_override_watercraft := MODULE
 	dailyds_cguard := dataset (daily_prefix + 'watercraft_cguard', cid_rec, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
   kf := dedup (sort (ds_cguard, -flag_file_id), except flag_file_id);
 	FCRA.Mac_Replace_Records(kf,dailyds_cguard,persistent_record_id,replaceds);
-  export cid := index (replaceds, {flag_file_id}, {replaceds}, keyname_prefix + 'watercraft_cid');
+	// DF-22458 Deprecate specified fields in thor_data400::key::override::fcra::watercraft::qa::watercraft_cid
+	ut.MAC_CLEAR_FIELDS(replaceds, replaceds_cleared, Watercraft.Constants.fields_to_clear_cid);
+  export cid := index (replaceds_cleared, {flag_file_id}, {replaceds_cleared}, keyname_prefix + 'watercraft_cid');
 
 
   wid_rec := record
@@ -41,6 +45,8 @@ export key_override_watercraft := MODULE
 	dailyds_wid := dataset (daily_prefix + 'watercraft_details', wid_rec, csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
   kf := dedup (sort (ds_wid, -flag_file_id), except flag_file_id);
 	FCRA.Mac_Replace_Records(kf,dailyds_wid,persistent_record_id,replaceds);
-  export wid := index (replaceds, {flag_file_id}, {replaceds}, keyname_prefix + 'watercraft_wid');
+	// DF-22458 Deprecate specified fields in thor_data400::key::override::fcra::watercraft::qa::watercraft_wid
+	ut.MAC_CLEAR_FIELDS(replaceds, replaceds_cleared, Watercraft.Constants.fields_to_clear_wid);
+  export wid := index (replaceds_cleared, {flag_file_id}, {replaceds_cleared}, keyname_prefix + 'watercraft_wid');
 
 END;
