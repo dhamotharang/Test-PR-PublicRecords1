@@ -122,7 +122,7 @@ EXPORT fSprays := MODULE
 			// see proc_build_base for persistent_record_id generation - those are the primary fields to start with
 			//***********************************************************************************************
 			newpartyData := PRTE2_Common.mac_ConvertToUpperCase(Files.party_TmpFile_DS , fname, mname, lname);
-			FinalPartyData := PROJECT(newpartyData,
+			FinalPartyData1 := PROJECT(newpartyData,
 																	TRANSFORM({newpartyData},
 																			// ------------------ clean / prepare name fields ----------------------
 																				TempPname					:= Address.CleanPersonFML73(LEFT.orig_full_debtorname);
@@ -177,6 +177,12 @@ EXPORT fSprays := MODULE
 																				self.msa						:= TempAddr[167..170];
 																				self.geo_match			:= TempAddr[178];
 																				self.err_stat				:= TempAddr[179..182];
+																				self := LEFT;																	
+																	)
+																);
+			// Jan 2019, moved this to a final PROJECT so all fields have been initialized prior to computing the persistent_record_id
+			FinalPartyData := PROJECT(FinalPartyData1,
+																	TRANSFORM({FinalPartyData1},
 																				self.persistent_record_id := hash64(trim(LEFT.tmsid,left,right)+','+
 																								trim(LEFT.rmsid,left,right)+','+
 																								trim(LEFT.orig_full_debtorname,left,right)+','+

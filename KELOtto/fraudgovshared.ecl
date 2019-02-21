@@ -5,7 +5,7 @@ This is specifically to work around the massive skews because of the input data.
 
 */
 
-CustomerAddressPersonPrep1 := JOIN(KELOtto.fraudgov(clean_address.prim_range != '' AND clean_address.prim_name != '' and clean_address.zip != '' and did > 0),
+CustomerAddressPersonPrep1 := JOIN(KELOtto.fraudgovprep(clean_address.prim_range != '' AND clean_address.prim_name != '' and clean_address.zip != '' and did > 0),
                                    KELOtto.SharingRules, 
                        //LEFT.classification_permissible_use_access.fdn_file_info_id=RIGHT.fdn_ind_type_gc_id_inclusion,
                        

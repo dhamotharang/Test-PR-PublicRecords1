@@ -1,4 +1,4 @@
-// see bottom for latest runs
+﻿// see bottom for latest runs
 // Run on: hthor p_svc_person_header
 
 import ut, std, dops, _control, header;
@@ -111,7 +111,7 @@ layout_report calcReport(dops_added L,dops_added R)     := TRANSFORM
 
     END;
 
-full_report  := sort(iterate(sort(dops_added,header_version),calcReport(LEFT,RIGHT)),-header_version);
+full_report  := dops_added[1] + sort(iterate(sort(dops_added[2..],header_version),calcReport(LEFT,RIGHT)),-header_version);
 
 latestVersion:= full_report[1].header_version;
 attachment   := STD.Str.FindReplace(
