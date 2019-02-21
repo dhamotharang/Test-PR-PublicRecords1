@@ -9,7 +9,8 @@
           indIndexHits := DueDiligence.CommonQuery.GetIndividualAttributeFlags(consumerResults);
           
           finalInd := DueDiligence.CommonQuery.mac_GetESPReturnData(rawPlusSeq, consumerResults, requestResponseLayout, DueDiligence.Constants.INDIVIDUAL,
-                                                                    DueDiligence.Constants.STRING_FALSE, indIndex, indIndexHits, requestedVersion);
+                                                                    DueDiligence.Constants.STRING_FALSE, indIndex, indIndexHits, requestedVersion,
+                                                                    optionsIn.AdditionalInput);
           
           
           IF(intermediates, OUTPUT(consumerResults, NAMED('indResults')));
@@ -26,7 +27,8 @@
           busIndexHits := DueDiligence.CommonQuery.GetBusinessAttributeFlags(businessResults);
           
           finalBus := DueDiligence.CommonQuery.mac_GetESPReturnData(rawPlusSeq, businessResults, requestResponseLayout, DueDiligence.Constants.BUSINESS,
-                                                                    DueDiligence.Constants.STRING_FALSE, busIndex, busIndexHits, requestedVersion);
+                                                                    DueDiligence.Constants.STRING_FALSE, busIndex, busIndexHits, requestedVersion,
+                                                                    optionsIn.AdditionalInput);
           
           
           IF(intermediates, OUTPUT(businessResults, NAMED('busResults'))); 

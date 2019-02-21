@@ -1,11 +1,11 @@
-﻿IMPORT _Control, Doxie, RiskWise, ut, risk_indicators, MDR, header_quick, easi;
+﻿IMPORT ProfileBooster, _Control, Doxie, RiskWise, ut, risk_indicators, MDR, header_quick, easi;
 onThor := _Control.Environment.OnThor;
 
 EXPORT getAge(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim) := FUNCTION
 
 //search header by DID to pick up DOB and calculate age and also append HHID to each rec	
 	ProfileBooster.Layouts.Layout_PB_Slim_header getHeader(PBslim le, Doxie.Key_Header ri) := transform
-		age									:= if(ri.dob = 0, 0, risk_indicators.years_apart((unsigned)risk_indicators.iid_constants.myGetDate(le.historydate), (unsigned)ri.dob));
+		age									:= if(ri.dob = 0 or ri.src=mdr.sourceTools.src_TUCS_Ptrack, 0, risk_indicators.years_apart((unsigned)risk_indicators.iid_constants.myGetDate(le.historydate), (unsigned)ri.dob));
 		self.age						:= age;		
 		self.HHID						:= ri.HHID;
 		self.dt_first_seen	:= ri.dt_first_seen;
@@ -17,12 +17,12 @@ EXPORT getAge(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim) := FUNCTION
 	
 	withHeader_ROXIE := join(PBslim, Doxie.Key_Header,	
 										left.DID2 <> 0 and
-										keyed(left.DID2 = right.s_DID) and
-										right.src in MDR.sourcetools.set_Marketing_header and
+										keyed(left.DID2 = right.s_DID) and										
+                    right.src in MDR.sourcetools.set_Marketing_Header and
 										right.dt_first_seen <> 0 and right.dt_first_seen < left.historydate,
 									getHeader(left, right), left outer, keep(ut.limits.HEADER_PER_DID), atmost(RiskWise.max_atmost));	
 	withHeader_THOR := join(distribute(PBslim(did2<>0), did2), 
-													distribute(pull(Doxie.Key_Header(dt_first_seen<>0 and src in MDR.sourcetools.set_Marketing_header)), s_did),	
+													distribute(pull(Doxie.Key_Header(dt_first_seen<>0 AND src IN MDR.sourcetools.set_Marketing_Header)), s_did),	
 										left.DID2 = right.s_DID and
 										right.dt_first_seen < left.historydate,
 									getHeader(left, right), left outer, keep(ut.limits.HEADER_PER_DID),  local);
@@ -34,8 +34,7 @@ EXPORT getAge(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim) := FUNCTION
   #END
 
 	ProfileBooster.Layouts.Layout_PB_Slim_header getQHeader(PBslim le, header_quick.key_DID ri) := transform
-		// age									:= if(ri.dob = 0, 0, risk_indicators.years_apart((unsigned)le.HistoryDate, (unsigned)ri.dob));
-		age									:= if(ri.dob = 0, 0, risk_indicators.years_apart((unsigned)risk_indicators.iid_constants.myGetDate(le.historydate), (unsigned)ri.dob));
+		age									:= if(ri.dob = 0 or ri.src=mdr.sourceTools.src_TUCS_Ptrack, 0, risk_indicators.years_apart((unsigned)risk_indicators.iid_constants.myGetDate(le.historydate), (unsigned)ri.dob));
 		self.age						:= age;				
 		self.HHID						:= 0;	//quick header does not have HHID so just default to 0	
 		self.dt_first_seen	:= ri.dt_first_seen;
@@ -48,12 +47,12 @@ EXPORT getAge(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim) := FUNCTION
 	withQHeader_roxie := join(PBslim, header_quick.key_DID,		
 										left.DID2 <> 0 and
 										keyed(left.DID2 = right.DID) and
-										right.src in MDR.sourcetools.set_Marketing_header and
+										right.src in MDR.sourcetools.set_Marketing_Header and
 										right.dt_first_seen <> 0 and right.dt_first_seen < left.historydate,
 										getQHeader(left, right), keep(200), ATMOST(RiskWise.max_atmost));
 
 	withQHeader_thor := join(distribute(PBslim(did2<>0), did2), 
-														distribute(pull(header_quick.key_DID(dt_first_seen<>0 and src in MDR.sourcetools.set_Marketing_header)), did),		
+														distribute(pull(header_quick.key_DID(dt_first_seen<>0 and src in MDR.sourcetools.set_Marketing_Header)), did),		
 										left.DID2 = right.DID and
 										right.dt_first_seen < left.historydate,
 										getQHeader(left, right), keep(200), local);

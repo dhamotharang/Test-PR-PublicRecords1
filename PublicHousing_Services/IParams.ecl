@@ -2,7 +2,7 @@ import BatchShare;
 
 export IParams := module
 	
-	export BatchParams := interface (BatchShare.IParam.BatchParams)
+	export BatchParams := interface (BatchShare.IParam.BatchParamsV2)
 		export boolean   AppendBest             := false; // We're calling another function to append Best.
 		export string2   InputState             := '';
 		export string20  PropertyValueThreshold := '';
@@ -19,7 +19,7 @@ export IParams := module
 	export getBatchParams() := 
 		function
 			
-			base_params := BatchShare.IParam.getBatchParams();
+			base_params := BatchShare.IParam.getBatchParamsV2();
 			
 			// Project the base params to read shared parameters from store. If necessary, you may 
 			// redefine default values for common parameters and/or define default values for domain-

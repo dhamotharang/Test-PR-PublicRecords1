@@ -1,7 +1,7 @@
 EXPORT Raw := MODULE
 
   //This function macro returns ALL raw data in the Best SSN Key per the input DIDs
-	EXPORT Get_All(in_ds, SSNBestParams, pSSN = 'best_ssn', pDID = 'did', fromADL=false) := FUNCTIONMACRO										
+	EXPORT Get_All(in_ds, pSSN = 'best_ssn', pDID = 'did', fromADL=false) := FUNCTIONMACRO										
 	IMPORT SSNBest_Services,Header;
 		in_ds_duped:= DEDUP(in_ds,pDID,pSSN);
 
@@ -19,7 +19,7 @@ EXPORT Raw := MODULE
 	EXPORT Get_Subj_Best(in_ds, SSNBestParams, pSSN = 'best_ssn', pDID = 'did', fromADL=false) := FUNCTIONMACRO			
 	IMPORT SSNBest_Services,BatchShare;
 
-		all_recs_raw := SSNBest_Services.Raw.Get_All(in_ds,SSNBestParams,pSSN,pDID,fromADL);
+		all_recs_raw := SSNBest_Services.Raw.Get_All(in_ds,pSSN,pDID,fromADL);
 										 
 		subjNorm := NORMALIZE(all_recs_raw,LEFT.subject, 
 													TRANSFORM(SSNBest_Services.Layouts.KEY_subjNorm

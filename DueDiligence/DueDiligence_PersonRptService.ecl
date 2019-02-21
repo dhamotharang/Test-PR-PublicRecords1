@@ -28,8 +28,9 @@ EXPORT DueDiligence_PersonRptService := MACRO
 			indIndex := DueDiligence.CommonQuery.GetIndividualAttributes(consumerResults);
 			indIndexHits := DueDiligence.CommonQuery.GetIndividualAttributeFlags(consumerResults);
 			
-			final := DueDiligence.CommonQuery.mac_GetESPReturnData(wseq, consumerResults, requestResponseLayout, DueDiligence.Constants.INDIVIDUAL,
-																																DueDiligence.Constants.STRING_TRUE, indIndex, indIndexHits, requestedVersion);
+      final := DueDiligence.CommonQuery.mac_GetESPReturnData(wseq, consumerResults, requestResponseLayout, DueDiligence.Constants.INDIVIDUAL,
+                                                              DueDiligence.Constants.STRING_TRUE, indIndex, indIndexHits, requestedVersion,
+                                                              optionsIn.AdditionalInput);
 
 
 			output(final, NAMED('Results')); //This is the customer facing output    

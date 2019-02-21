@@ -60,7 +60,7 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 	END;
 
 	//Modeled after HC Profile Search
-	EXPORT Models.Layouts_Healthcare_RT_Service.transactionLog SocioTransactionLog(iesp.healthcare_socio_indicators.t_SocioeconomicIndicatorsRequest L, Boolean isAttributesRequested, Boolean isReadmissionRequested) := TRANSFORM
+	EXPORT Models.Layouts_Healthcare_RT_Service.transactionLog SocioTransactionLog(iesp.healthcare_socio_indicators.t_SocioeconomicIndicatorsRequest L, Boolean isAttributesRequested, Boolean isReadmissionRequested, Boolean isMedicationAdherenceRequested) := TRANSFORM
 		SELF.transaction_id	:= L.AccountContext.Common.TransactionID;
 		SELF.billing_code	:= L.User.BillingCode;
 		SELF.gc_id	:= (integer) L.AccountContext.Common.GlobalCompanyId;
@@ -80,11 +80,18 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 		SELF.i_person_state	:= L.Member.Address.State;
 		SELF.i_person_zip	:= L.Member.Address.Zip5 + If(L.Member.Address.Zip4=_blank,_blank,'-') + L.Member.Address.Zip4;
 		SELF.i_person_country	:= _blank;
- 		report_options_1 := IF(isAttributesRequested, '1', '0');
- 		report_options_2 := IF(isReadmissionRequested, '1', '0');	
-		SELF.report_options	:= report_options_1 + report_options_2;
+ 		report_options_bit_1 := IF(isAttributesRequested, '1', '0');
+ 		report_options_bit_2 := IF(isReadmissionRequested, '1', '0');
+ 		report_options_bit_3 := IF(isMedicationAdherenceRequested, '1', '0');	
+		SELF.report_options	:= report_options_bit_1 + report_options_bit_2 + report_options_bit_3;
 		SELF.login_history_id	:= (integer)L.User.LoginHistoryId;
     	SELF.ip_address	:= L.User.IP;
+    	SELF.end_user_name := L.User.EndUser.CompanyName;
+    	SELF.end_user_address_1 := L.User.EndUser.StreetAddress1;
+    	SELF.end_user_city := L.User.EndUser.City;
+    	SELF.end_user_state := L.User.EndUser.State;
+    	SELF.end_user_zip := L.User.EndUser.Zip5;
+    	SELF.end_user_phone := L.User.EndUser.Phone;
 		SELF := [];	
 	END; // Transaction Log TRANSFORM
 
@@ -536,20 +543,49 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 		SELF := [];
 	END;
 
-	Export PopulateScoresDS(CoreResults, Config, isReadmissionRequested) := FUNCTIONMACRO
-		ReadmissionScoreName := IF(isReadmissionRequested, 'ReadmissionRiskScore', _blank);
-		ReadmissionScoreValue := IF(isReadmissionRequested, CoreResults[1].SeRs_Score, 'N/A');
-		SeRs_Score := (DECIMAL32_16)CoreResults[1].SeRs_Score;
-		ReadmissionScoreCategory := MAP(CoreResults[1].SeRs_Score = 'N/A' => 'N/A',
-   								SeRs_Score < Config[1].ReadmissionScore_Category_2_Low AND isReadmissionRequested => '1',
-   								SeRs_Score < Config[1].ReadmissionScore_Category_3_Low AND isReadmissionRequested => '2',
-   								SeRs_Score < Config[1].ReadmissionScore_Category_4_Low AND isReadmissionRequested => '3',
-   								SeRs_Score < Config[1].ReadmissionScore_Category_5_Low AND isReadmissionRequested => '4',
-   								SeRs_Score >= Config[1].ReadmissionScore_Category_5_Low AND isReadmissionRequested => '5',
-   								'N/A');
-		Seq := (UNSIGNED) CoreResults[1].Seq;
-		ScoresEmptyDS:= DATASET([], iesp.healthcare_socio_indicators.t_SocioScore);
-		ScoresDS := ScoresEmptyDS + ROW({ReadmissionScoreName, ReadmissionScoreValue, ReadmissionScoreCategory}, iesp.healthcare_socio_indicators.t_SocioScore);
+	Export PopulateScoresDS(CoreResults, Config, isReadmissionRequested, isMedicationAdherenceRequested) := FUNCTIONMACRO
+		
+		iesp.healthcare_socio_indicators.t_SocioScore formatRS() := TRANSFORM
+			SELF.Name := IF(isReadmissionRequested, 'ReadmissionRiskScore', _blank);
+			SELF.Value := IF(isReadmissionRequested, CoreResults[1].SeRs_Score, 'N/A');
+			SeRs_Score := (DECIMAL32_16)CoreResults[1].SeRs_Score;
+			SELF.Category := MAP(CoreResults[1].SeRs_Score = 'N/A' => 'N/A',
+	   								SeRs_Score < Config[1].ReadmissionScore_Category_2_Low AND isReadmissionRequested => '1',
+	   								SeRs_Score < Config[1].ReadmissionScore_Category_3_Low AND isReadmissionRequested => '2',
+	   								SeRs_Score < Config[1].ReadmissionScore_Category_4_Low AND isReadmissionRequested => '3',
+	   								SeRs_Score < Config[1].ReadmissionScore_Category_5_Low AND isReadmissionRequested => '4',
+	   								SeRs_Score >= Config[1].ReadmissionScore_Category_5_Low AND isReadmissionRequested => '5',
+	   								'N/A');
+			SELF.RiskDrivers.High1 := CoreResults[1].RAR_Driver_Hi1;
+			SELF.RiskDrivers.High2 := CoreResults[1].RAR_Driver_Hi2;
+			SELF.RiskDrivers.High3 := CoreResults[1].RAR_Driver_Hi3;
+			SELF.RiskDrivers.Low1  := CoreResults[1].RAR_Driver_Lo1;
+			SELF.RiskDrivers.Low2  := CoreResults[1].RAR_Driver_Lo2;
+			SELF.RiskDrivers.Low3  := CoreResults[1].RAR_Driver_Lo3;
+		END;
+		ReadmissionScoreDS := dataset([formatRS()]);
+
+		iesp.healthcare_socio_indicators.t_SocioScore formatMA() := TRANSFORM
+			SELF.Name := IF(isMedicationAdherenceRequested, 'MedicationAdherenceRate', _blank);
+			SELF.Value := IF(isMedicationAdherenceRequested, CoreResults[1].SeMA_Score, 'N/A');
+			SeMA_Score := (DECIMAL32_16)CoreResults[1].SeMA_Score;
+			SELF.Category := MAP(CoreResults[1].SeMA_Score = 'N/A' => 'N/A',
+	   								SeMA_Score < Config[1].MedicationAdherenceScore_category_4_Low AND isMedicationAdherenceRequested => '5',
+	   								SeMA_Score < Config[1].MedicationAdherenceScore_category_3_Low AND isMedicationAdherenceRequested => '4',
+	   								SeMA_Score < Config[1].MedicationAdherenceScore_category_2_Low AND isMedicationAdherenceRequested => '3',
+	   								SeMA_Score < Config[1].MedicationAdherenceScore_category_1_Low AND isMedicationAdherenceRequested => '2',
+	   								SeMA_Score >= Config[1].MedicationAdherenceScore_category_1_Low AND isMedicationAdherenceRequested => '1',
+	   								'N/A');
+			SELF.RiskDrivers.High1 := CoreResults[1].MA_Driver_Hi1;
+			SELF.RiskDrivers.High2 := CoreResults[1].MA_Driver_Hi2;
+			SELF.RiskDrivers.High3 := CoreResults[1].MA_Driver_Hi3;
+			SELF.RiskDrivers.Low1  := CoreResults[1].MA_Driver_Lo1;
+			SELF.RiskDrivers.Low2  := CoreResults[1].MA_Driver_Lo2;
+			SELF.RiskDrivers.Low3  := CoreResults[1].MA_Driver_Lo3;
+		END;
+		MedicationScoreDS := dataset([formatMA()]);
+		
+		ScoresDS := ReadmissionScoreDS + MedicationScoreDS;
 		return ScoresDS(Name<>_blank);
 	ENDMACRO;
 

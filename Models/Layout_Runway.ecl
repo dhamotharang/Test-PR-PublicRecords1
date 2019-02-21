@@ -626,6 +626,16 @@ string2 FP1607_1_0_reason6 := '';
 string3 FP1712_0_0_score := '';
 string2 FP1712_0_0_reason1 := '';
 
+String3 FP1704_1_0_score := '';
+string2 FP1704_1_0_reason1 := '';
+string2 FP1704_1_0_reason2 := '';
+string2 FP1704_1_0_reason3 := '';
+string2 FP1704_1_0_reason4 := '';
+string2 FP1704_1_0_reason5 := '';
+string2 FP1704_1_0_reason6 := '';
+
+
+
 String3 FP1705_1_0_score := '';
 string2 FP1705_1_0_reason1 := '';
 string2 FP1705_1_0_reason2 := '';
@@ -1360,6 +1370,30 @@ string3 RVG1802_1_0_reason2 := '';
 string3 RVG1802_1_0_reason3 := '';
 string3 RVG1802_1_0_reason4 := '';
 string3 RVG1802_1_0_reason5 := '';
+
+String3 RVG1808_3_0_score := '';
+string3 RVG1808_3_0_reason1 := '';
+string3 RVG1808_3_0_reason2 := '';
+string3 RVG1808_3_0_reason3 := '';
+string3 RVG1808_3_0_reason4 := '';
+string3 RVG1808_3_0_reason5 := '';
+
+String3 RVG1808_1_0_score := '';
+string3 RVG1808_1_0_reason1 := '';
+string3 RVG1808_1_0_reason2 := '';
+string3 RVG1808_1_0_reason3 := '';
+string3 RVG1808_1_0_reason4 := '';
+string3 RVG1808_1_0_reason5 := '';
+
+String3 RVG1808_2_0_score := '';
+string3 RVG1808_2_0_reason1 := '';
+string3 RVG1808_2_0_reason2 := '';
+string3 RVG1808_2_0_reason3 := '';
+string3 RVG1808_2_0_reason4 := '';
+string3 RVG1808_2_0_reason5 := '';
+
+
+
 
 String3 RVG1610_1_0_score := '';
 string3 RVG1610_1_0_reason1 := '';

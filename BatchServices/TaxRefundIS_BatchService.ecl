@@ -56,7 +56,7 @@
 import BatchServices;
 	
 export TaxRefundIS_BatchService := MACRO
- #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);	
+ #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);	
 	in_layout := BatchServices.Layouts.TaxRefundIS.batch_in;
 	
 	
@@ -66,15 +66,11 @@ export TaxRefundIS_BatchService := MACRO
 	
 	doxie.MAC_Header_Field_Declare();
 	
-  args := MODULE (BatchServices.TaxRefundIS_BatchService_Interfaces.Input)  
-		EXPORT string32 ApplicationType  		:= application_type_value;
-	  EXPORT unsigned1 DPPAPurpose 				:= DPPA_Purpose;
-	  EXPORT unsigned1 GLBPurpose  				:= GLB_Purpose;      
-    EXPORT string5 IndustryClass				:= industry_class_value;
+  mod_access := doxie.compliance.GetGlobalDataAccessModule();
+  args := MODULE (PROJECT (mod_access, BatchServices.TaxRefundIS_BatchService_Interfaces.Input, OPT))
 	  EXPORT boolean IncludeBlankDOD			:= 0 : stored('IncludeBlankDOD');
     EXPORT boolean PhoneticMatch		    := phonetics; 
     EXPORT boolean AllowNickNames				:= nicknames; 
-  	EXPORT string50 DataRestriction     := doxie.DataRestriction.fixed_DRM;
 		EXPORT string120 append_l           := 'BEST_ALL, BEST_EDA'; //Append allows all Best Info to return
 		EXPORT string120 verify_l           := 'BEST_ALL';
 		EXPORT string2 input_state          := '' : stored('IRSState');
@@ -85,8 +81,6 @@ export TaxRefundIS_BatchService := MACRO
 		EXPORT string20  ModelName          := '' : stored('ModelName');        
 		EXPORT string3   NPIThreshold       := '' : stored('NPIThreshold'); // 0 - 999 are valid values
 		EXPORT string30  FilterRule         := '' : stored('FilterRule');
-		// EXPORT string10 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
-		EXPORT string10	DataPermission 			:= AutoStandardI.GlobalModule().DataPermissionMask;
 	END;
 	
 	

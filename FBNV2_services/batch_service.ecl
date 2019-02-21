@@ -13,7 +13,7 @@
 IMPORT doxie, Autokey_batch, FBNV2_services, Address, FBNV2, BatchServices, AutokeyB2, AutoStandardI,AutoheaderV2;
 
 EXPORT Batch_Service() := FUNCTION
- #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+ #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 	// Key
 	keyIdDID := FBNV2.Key_DID;
 

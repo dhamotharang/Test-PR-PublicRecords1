@@ -1,4 +1,4 @@
-import header,standard,address,Autokey_batch,BatchServices,BatchShare;
+﻿import header,standard,address,Autokey_batch,BatchServices,BatchShare;
 
 export layouts := 
 MODULE
@@ -30,6 +30,7 @@ shared base_additional := record
 	string30 county_name;
 	string170 death_location; 
 	string2 src;              // to allow app to disambiguate SSA death records from other header death records
+	boolean IsLimitedAccessDMF:= false;
 end;
 
 export base_internal := record
@@ -55,6 +56,7 @@ end;
 export report_external := record
 	base_external;									
 	supp_additional - [state_death_id,ssn,fname,mname,lname,name_suffix,state,rec_type,state_death_flag];
+	boolean IsLimitedAccessDMF_supp:= false;
 	string2 st;	//this holds the 'state' field from the supplemental clean address
 end;
 

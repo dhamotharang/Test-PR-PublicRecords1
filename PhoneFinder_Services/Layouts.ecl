@@ -797,9 +797,6 @@ MODULE
 		STRING8 source_code; 		
    		STRING60 reference_code;
    		STRING32 phonefinder_type;
-   		STRING30 data_source;
-   		STRING30 royalty_used;  
-   		STRING30 carrier;  
 		//SearchTerms
 		STRING32 submitted_lexid;
 		STRING15 submitted_phonenumber;
@@ -810,7 +807,10 @@ MODULE
 		STRING64 submitted_city;
 		STRING16 submitted_state;
 		STRING10 submitted_zip;
-		//Primary Phone details 
+		//Primary Phone details
+        STRING30 data_source;
+   		STRING30 royalty_used;  
+   		STRING30 carrier;
    		STRING15 phonenumber;
    		STRING16 risk_indicator;
    		STRING32 phone_type;

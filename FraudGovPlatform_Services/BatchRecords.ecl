@@ -56,14 +56,14 @@ EXPORT BatchRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_i
 			SELF := [];
 		END;
 		
-		ds_results_w_velocities := DENORMALIZE(ds_w_known_frauds, ds_Velocities, 
+		SHARED ds_results_w_velocities := DENORMALIZE(ds_w_known_frauds, ds_Velocities, 
 																						LEFT.acctno = RIGHT.acctno,
 																						GROUP,
 																						xfm_w_velocities(LEFT, ROWS(RIGHT)),
 																						LEFT OUTER);
 
 		//Creating the tree_uid and entity_context_uid for fetching scores from kel keys. 
-		ds_entityNameUID := PROJECT(ds_results_w_velocities(identity_resolved = 'Y'), 
+		SHARED ds_entityNameUID := PROJECT(ds_results_w_velocities(identity_resolved = 'Y'), 
 													TRANSFORM(FraudGovPlatform_Services.Layouts.elementNidentity_uid_recs,
 														SELF.acctno := LEFT.acctno,
 														SELF.entity_name := FraudGovPlatform_Services.Constants.Fragment_Types.PERSON_FRAGMENT, 
@@ -74,11 +74,11 @@ EXPORT BatchRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_i
 														SELF := []));
 
 		/* Returning Score for records for which identity_resolved = Y*/
-		ds_raw_cluster_recs := FraudGovPlatform_Services.Functions.getClusterDetails(ds_entityNameUID, batch_params, FALSE);
-		ds_cluster_recs_scores := ds_raw_cluster_recs(entity_context_uid_ = tree_uid_);
+		SHARED ds_raw_cluster_recs := FraudGovPlatform_Services.Functions.getClusterDetails(ds_entityNameUID, batch_params, FALSE);
+		SHARED ds_cluster_recs_scores := ds_raw_cluster_recs(entity_context_uid_ = tree_uid_);
 
 																
-		ds_results_w_scores := JOIN(ds_results_w_velocities, ds_cluster_recs_scores, 
+		SHARED ds_results_w_scores := JOIN(ds_results_w_velocities, ds_cluster_recs_scores, 
 																LEFT.acctno = RIGHT.acctno,
 																	TRANSFORM(FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw, 
 																		SELF.risk_score := RIGHT.Score_,
@@ -87,23 +87,19 @@ EXPORT BatchRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_i
 																		LEFT OUTER
 																);
 																
-		ds_realtime_recs := JOIN(ds_results_w_velocities(identity_resolved = 'Y'), ds_cluster_recs_scores, 
+		SHARED ds_realtime_recs := JOIN(ds_results_w_velocities(identity_resolved = 'Y'), ds_cluster_recs_scores, 
 																LEFT.acctno = RIGHT.acctno,
 																	TRANSFORM(FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw, 
 																		SELF.identity_resolved := FraudGovPlatform_Services.Constants.IDENTITY_RESOLVED_REALTIME;
 																		SELF := LEFT),
 																		LEFT ONLY
 																);
-
 		
-		ds_realtime_w_score := mod_RealTimeScoring(ds_realtime_recs, batch_params).ds_w_realTimeScore;
+		SHARED ds_realtime_w_score := mod_RealTimeScoring(ds_realtime_recs, batch_params).ds_w_realTimeScore;
 		
-		// OUTPUT(ds_results_w_scores,named('ds_results_w_scores'));
-		// OUTPUT(ds_realtime_recs,named('ds_realtime_recs'));
-		// OUTPUT(ds_realtime_w_score,named('ds_realtime_w_score'));
+		EXPORT ds_results_report := ds_results_w_scores;
 		
-		
-		EXPORT ds_results := JOIN(ds_results_w_scores, ds_realtime_w_score,
+		EXPORT ds_results := JOIN(ds_results_report, ds_realtime_w_score,
 															LEFT.acctno = RIGHT.acctno,
 															TRANSFORM(FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw,
 																				SELF.risk_score := IF(RIGHT.identity_resolved = FraudGovPlatform_Services.Constants.IDENTITY_RESOLVED_REALTIME,
@@ -117,5 +113,15 @@ EXPORT BatchRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_i
 																																		 LEFT.identity_resolved),
 																				SELF := LEFT),
 															LEFT OUTER);
+															
+		// OUTPUT(ds_realtime_w_score,named('ds_realtime_w_score'));
+		// OUTPUT(ds_results_w_velocities,named('ds_results_w_velocities'));
+		// OUTPUT(ds_entityNameUID,named('ds_entityNameUID'));
+		
+		// OUTPUT(ds_raw_cluster_recs,named('ds_raw_cluster_recs'));
+		// OUTPUT(ds_cluster_recs_scores,named('ds_cluster_recs_scores'));
+		
+		// OUTPUT(ds_results_w_scores,named('ds_results_w_scores'));
+		// OUTPUT(ds_realtime_recs,named('ds_realtime_recs'));
 		
 END;

@@ -38,8 +38,8 @@ EXPORT PhoneAttributes_BatchRecords(
 		SELF.new_phone_number_from_swap	:= MAX(L.new_phone_number_from_swap, MAX(allrows_rec, allrows_rec.new_phone_number_from_swap));
 		SELF.suspended_date	:= MAX(L.suspended_date, MAX(allrows_rec, allrows_rec.suspended_date));
 		SELF.reactivated_date := MAX(L.reactivated_date, MAX(allrows_rec, allrows_rec.reactivated_date));
-		SELF.phone_line_type_desc := IF(SELF.phone_line_type = '', '', Phones.Functions.LineServiceTypeDesc((INTEGER)SELF.phone_line_type)[1]);
-		SELF.phone_serv_type_desc := IF(SELF.phone_serv_type = '', '', Phones.Functions.LineServiceTypeDesc((INTEGER)SELF.phone_serv_type)[1]);
+		SELF.phone_line_type_desc := IF(SELF.phone_line_type = '', Phones.Constants.PhoneServiceType.Other, Phones.Functions.LineServiceTypeDesc((INTEGER)SELF.phone_line_type))[1];
+		SELF.phone_serv_type_desc := IF(SELF.phone_serv_type = '', Phones.Constants.PhoneServiceType.Other, Phones.Functions.LineServiceTypeDesc((INTEGER)SELF.phone_serv_type))[1];
 		SELF := 	L;
 	END;
 

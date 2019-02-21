@@ -1,4 +1,4 @@
-﻿import _Control, Risk_Indicators, header, RiskWise, InfutorCID, Gong, Doxie, header_quick, MDR, ut, address, Watchdog, address, AID_Build;
+﻿import _Control, Risk_Indicators, header, RiskWise, InfutorCID, Gong, Doxie, header_quick, MDR, ut, address, Watchdog, AID_Build, ProfileBooster;
 onThor := _Control.Environment.OnThor;
 
 EXPORT getVerification(DATASET(ProfileBooster.Layouts.Layout_PB_Shell) PBShell) := FUNCTION
@@ -103,8 +103,8 @@ address_rank_key := header.key_addr_hist(isFCRA);
     fullhistorydate := risk_indicators.iid_constants.myGetDate(le.historydate);
     historydate := (unsigned)fullhistorydate[1..6];
 		self.dt_last_seen			:= if(ri.dt_last_seen > HistoryDate, HistoryDate, ri.dt_last_seen);
-		self.dob							:= (string)ri.dob;
-		self.ProspectAge 			:= risk_indicators.years_apart((unsigned)fullhistorydate, (unsigned)ri.dob);
+		self.dob							:= if(ri.src=mdr.sourceTools.src_TUCS_Ptrack, '', (string)ri.dob);
+		self.ProspectAge 			:= if(ri.src=mdr.sourceTools.src_TUCS_Ptrack, 0, risk_indicators.years_apart((unsigned)fullhistorydate, (unsigned)ri.dob));
 		self.title						:= ri.title;	
 		self.HHID							:= ri.HHID;
 		self.hdr_prim_range		:= ri.prim_range;
@@ -131,13 +131,13 @@ address_rank_key := header.key_addr_hist(isFCRA);
 	wHeader_roxie := join(PBShell, header_key,	
 										left.DID <> 0 and
 										keyed(left.DID = right.s_DID) and
-										right.src in MDR.sourcetools.set_Marketing_header and
+										right.src in MDR.sourcetools.set_Marketing_Header and
 										right.dt_first_seen <> 0 and right.dt_first_seen < left.historydate,
 									getHeader(left, right), left outer, keep(200), atmost(RiskWise.max_atmost));	
 	wHeader_thor := join(distribute(PBShell, did), distribute(pull(header_key), s_did),	
 										left.DID <> 0 and
 										left.DID = right.s_DID and
-										right.src in MDR.sourcetools.set_Marketing_header and
+										right.src in MDR.sourcetools.set_Marketing_Header and
 										right.dt_first_seen <> 0 and right.dt_first_seen < left.historydate,
 									getHeader(left, right), left outer, keep(200), local);
 
@@ -167,8 +167,8 @@ address_rank_key := header.key_addr_hist(isFCRA);
     fullhistorydate := risk_indicators.iid_constants.myGetDate(le.historydate);
     historydate := (unsigned)fullhistorydate[1..6];
 		self.dt_last_seen			:= if(ri.dt_last_seen > HistoryDate, HistoryDate, ri.dt_last_seen);
-		self.dob							:= (string)ri.dob;
-		self.ProspectAge 			:= risk_indicators.years_apart((unsigned)fullhistorydate, (unsigned)ri.dob);
+		self.dob							:= if(ri.src=mdr.sourceTools.src_TUCS_Ptrack, '', (string)ri.dob);
+		self.ProspectAge 			:= if(ri.src=mdr.sourceTools.src_TUCS_Ptrack, 0, risk_indicators.years_apart((unsigned)fullhistorydate, (unsigned)ri.dob));
    	self.title						:= ri.title;
 		self.hdr_prim_range		:= ri.prim_range;
 		self.hdr_predir				:= ri.predir;
@@ -194,13 +194,13 @@ address_rank_key := header.key_addr_hist(isFCRA);
 	wQHeader_roxie := join(PBShell, quickheader_key,		
 										left.DID <> 0 and
 										keyed(left.DID = right.DID) and
-										right.src in MDR.sourcetools.set_Marketing_header and
+										right.src in MDR.sourcetools.set_Marketing_Header and
 										right.dt_first_seen <> 0 and right.dt_first_seen < left.historydate,
 									getQHeader(left, right), keep(200), ATMOST(RiskWise.max_atmost));	
 	wQHeader_thor := join(distribute(PBShell, did), distribute(pull(quickheader_key), did),		
 										left.DID <> 0 and
 										left.DID = right.DID and
-										right.src in MDR.sourcetools.set_Marketing_header and
+										right.src in MDR.sourcetools.set_Marketing_Header and
 										right.dt_first_seen <> 0 and right.dt_first_seen < left.historydate,
 									getQHeader(left, right), keep(200), local);
 

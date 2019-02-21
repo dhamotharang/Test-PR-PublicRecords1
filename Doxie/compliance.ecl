@@ -4,6 +4,7 @@ EXPORT compliance := MODULE
  
   // from doxie.mac_header_field_declare() -- i.e. translated
   EXPORT GetGlobalDataAccessModule () := FUNCTIONMACRO
+    IMPORT STD;
     // a hack: DPM and DRM are not provided
     local gm := AutoStandardI.GlobalModule();
     local access := MODULE (doxie.IDataAccess)
@@ -13,7 +14,7 @@ EXPORT compliance := MODULE
       EXPORT string DataRestrictionMask := gm.DataRestrictionMask;
       EXPORT boolean ln_branded := ln_branded_value;
       EXPORT boolean probation_override := probation_override_value;
-      EXPORT string5 industry_class := industry_class_value;
+      EXPORT string5 industry_class := STD.Str.ToUpperCase(TRIM(industry_class_value, LEFT, RIGHT));
       EXPORT string32 application_type := application_type_value;
       EXPORT boolean no_scrub := ^.no_scrub;
       EXPORT unsigned3 date_threshold := dateVal;
@@ -28,7 +29,7 @@ EXPORT compliance := MODULE
 
   // from global module -- needs translations
   EXPORT GetGlobalDataAccessModuleTranslated (gm) := FUNCTIONMACRO
-    IMPORT doxie, AutoStandardI;
+    IMPORT doxie, AutoStandardI, STD;
     local glb_auto := AutoStandardI.InterfaceTranslator.GLB_Purpose.val(project(gm,AutoStandardI.InterfaceTranslator.GLB_Purpose.params));
     local access := MODULE (doxie.IDataAccess)
       EXPORT unsigned1 glb := glb_auto;
@@ -37,7 +38,7 @@ EXPORT compliance := MODULE
       EXPORT string DataRestrictionMask := gm.DataRestrictionMask;
       EXPORT boolean ln_branded := AutoStandardI.InterfaceTranslator.ln_branded_value.val(project(gm,AutoStandardI.InterfaceTranslator.ln_branded_value.params));
       EXPORT boolean probation_override := AutoStandardI.InterfaceTranslator.probation_override_value.val(project(gm,AutoStandardI.InterfaceTranslator.probation_override_value.params));
-      EXPORT string5 industry_class := AutoStandardI.InterfaceTranslator.industry_class_val.val(project(gm,AutoStandardI.InterfaceTranslator.industry_class_val.params));
+      EXPORT string5 industry_class := STD.Str.ToUpperCase(TRIM(gm.industryclass, LEFT, RIGHT));
       EXPORT string32 application_type := AutoStandardI.InterfaceTranslator.application_type_val.val(project(gm,AutoStandardI.InterfaceTranslator.application_type_val.params));
       EXPORT boolean no_scrub := AutoStandardI.InterfaceTranslator.no_scrub.val(project(gm,AutoStandardI.InterfaceTranslator.no_scrub.params));
       EXPORT unsigned3 date_threshold := AutoStandardI.InterfaceTranslator.dateVal.val(project(gm,AutoStandardI.InterfaceTranslator.dateVal.params));
@@ -115,14 +116,14 @@ EXPORT compliance := MODULE
       local j0 := inrec ((unsigned6)didfield = 0);
     #END
         
-    local j := JOIN (inrec((unsigned6)didfield > 0), doxie_files.key_minors_hash,
+    local jj := JOIN (inrec((unsigned6)didfield > 0), doxie_files.key_minors_hash,
                      KEYED (hash32((unsigned6)LEFT.didfield)=RIGHT.hash32_did) AND
                      KEYED ((unsigned6)LEFT.didfield = RIGHT.did) AND  //at build time, key contains only minors
                      ut.age (RIGHT.dob) < 18,            //check age since a few will turn 18 between builds
                      TRANSFORM (RECORDOF(inrec), SELF := LEFT),
                      LEFT ONLY);
         
-    RETURN IF (ok_to_show_minors, inrec, j + j0);
+    RETURN IF (ok_to_show_minors, inrec, jj + j0);
   ENDMACRO;
 
   //TODO: temporarily: I don't know if it should be passed into the functions below,
@@ -176,6 +177,8 @@ EXPORT compliance := MODULE
       RETURN infile (NOT doxie.compliance.isHeaderSourceRestricted (src_field, drm));
     ENDMACRO;  
 
+		// BriteVerify gateway for Email verification 
+		EXPORT BOOLEAN isBriteVerifyRestricted(drm_type drm) := ~allowAll AND (drm[46] NOT IN ['0','']);
 
 
 END;

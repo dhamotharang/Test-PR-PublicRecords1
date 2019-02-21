@@ -171,9 +171,10 @@ risk_indicators.layout_input into(rec l) := transform
 	
 	self.ssn := ssn_value;
 	self.dob := dob_value;
-	self.age := if (age_value = 0 and (integer)dob_value != 0, 
-														(STRING3)ut.GetAgeI_asOf((unsigned)dob_value, (unsigned)risk_indicators.iid_constants.myGetDate(history_date)), 
-														(STRING3)age_value);
+				temp_age :=  if (age_value = 0 and (integer)dob_value != 0, 
+														(STRING)ut.GetAgeI_asOf((unsigned)dob_value, (unsigned)risk_indicators.iid_constants.myGetDate(history_date)), 
+														(STRING)age_value);
+	self.age := if((integer)temp_age > 99, '99',temp_age);
 	
 	self.phone10 := phone_value;
 	self.wphone10 := wphone_value;

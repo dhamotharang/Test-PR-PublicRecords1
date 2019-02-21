@@ -7,11 +7,7 @@
   )  := function
 
 
-	 in_mod := module(project(args_in,BatchShare.IParam.BatchParams,opt))
-					export unsigned1 DPPA_Purpose := args_in.DPPAPurpose;
-					export unsigned1 GLB_Purpose := args_in.GLBPurpose;
-					export string DataRestriction := args_in.DataRestriction;
-					export string DataPermission := args_in.DataPermission;
+	 in_mod := module(project(args_in,BatchShare.IParam.BatchParamsV2,opt))
 			end;
 			
 			

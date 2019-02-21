@@ -11,13 +11,14 @@
 
 	Export CFG_MBS_SubscribedToReadmissionScore := 'SubscribedToReadmissionScore';
 	Export CFG_MBS_SubscribedToHealthAttributesV3 := 'SubscribedToHealthAttributesV3';
-	// Export CFG_MBS_SubscribedToMedicationAdherenceScore := 'SubscribedToMedicationAdherenceScore';
+	Export CFG_MBS_SubscribedToMedicationAdherenceScore := 'SubscribedToMedicationAdherenceScore';
 
 	// Error Messages Section
 	Export InvalidInput_Code := 303;
 	Export InvalidInput_Message := 'INVALID INPUT';
 	Export AttributesSubFailMessage := 'HEALTH ATTRIBUTESV3 IS NOT SUBSCRIBED. ';
 	Export ReadmissionSubFailMessage := 'READMISSION RISK SCORE IS NOT SUBSCRIBED. ';
+	Export MedicationAdherenceSubFailMessage := 'MEDICATION ADHERENCE SCORE IS NOT SUBSCRIBED. ';
 	Export SubInvalidRequest := 'INVALID REQUEST. ';
 	Export INTEGER Name_First_Rej_Code := 8;
 	Export Name_First_Rej_Message := 'INVALID OR BLANK FIRST NAME';
@@ -95,16 +96,38 @@
 	Export CFG_MBS_ReadmissionScore_Category_1_High := 'ReadmissionScore_Category_1_High';
 	Export CFG_MBS_ReadmissionScore_Category_1_Low := 'ReadmissionScore_Category_1_Low';
 
-	Export	DECIMAL5_2 val_ReadmissionScore_Category_5_High	:= 100 ;
-	Export	DECIMAL5_2 val_ReadmissionScore_Category_5_Low	:= 34.81 ;
-	Export	DECIMAL5_2 val_ReadmissionScore_Category_4_High	:= 34.80 ;
-	Export	DECIMAL5_2 val_ReadmissionScore_Category_4_Low	:= 16.33 ;
-	Export	DECIMAL5_2 val_ReadmissionScore_Category_3_High	:= 16.32 ;
-	Export	DECIMAL5_2 val_ReadmissionScore_Category_3_Low	:= 12.23 ;
-	Export	DECIMAL5_2 val_ReadmissionScore_Category_2_High	:= 12.22 ;
-	Export	DECIMAL5_2 val_ReadmissionScore_Category_2_Low	:= 8.53 ;
-	Export	DECIMAL5_2 val_ReadmissionScore_Category_1_High	:= 8.52 ;
-	Export	DECIMAL5_2 val_ReadmissionScore_Category_1_Low	:= 0 ;
+	Export	DECIMAL7_4 val_ReadmissionScore_Category_5_High	:= 100 ;
+	Export	DECIMAL7_4 val_ReadmissionScore_Category_5_Low	:= 34.8015 ;
+	Export	DECIMAL7_4 val_ReadmissionScore_Category_4_High	:= 34.8014 ;
+	Export	DECIMAL7_4 val_ReadmissionScore_Category_4_Low	:= 16.3241 ;
+	Export	DECIMAL7_4 val_ReadmissionScore_Category_3_High	:= 16.3240 ;
+	Export	DECIMAL7_4 val_ReadmissionScore_Category_3_Low	:= 12.2211 ;
+	Export	DECIMAL7_4 val_ReadmissionScore_Category_2_High	:= 12.2210 ;
+	Export	DECIMAL7_4 val_ReadmissionScore_Category_2_Low	:= 8.5245 ;
+	Export	DECIMAL7_4 val_ReadmissionScore_Category_1_High	:= 8.5244 ;
+	Export	DECIMAL7_4 val_ReadmissionScore_Category_1_Low	:= 0 ;
+
+	Export CFG_MBS_MedicationAdherenceScore_Category_5_High := 'MedicationAdherenceScore_Category_5_High';
+	Export CFG_MBS_MedicationAdherenceScore_Category_5_Low := 'MedicationAdherenceScore_Category_5_Low';
+	Export CFG_MBS_MedicationAdherenceScore_Category_4_High := 'MedicationAdherenceScore_Category_4_High';
+	Export CFG_MBS_MedicationAdherenceScore_Category_4_Low := 'MedicationAdherenceScore_Category_4_Low';
+	Export CFG_MBS_MedicationAdherenceScore_Category_3_High := 'MedicationAdherenceScore_Category_3_High';
+	Export CFG_MBS_MedicationAdherenceScore_Category_3_Low := 'MedicationAdherenceScore_Category_3_Low';
+	Export CFG_MBS_MedicationAdherenceScore_Category_2_High := 'MedicationAdherenceScore_Category_2_High';
+	Export CFG_MBS_MedicationAdherenceScore_Category_2_Low := 'MedicationAdherenceScore_Category_2_Low';
+	Export CFG_MBS_MedicationAdherenceScore_Category_1_High := 'MedicationAdherenceScore_Category_1_High';
+	Export CFG_MBS_MedicationAdherenceScore_Category_1_Low := 'MedicationAdherenceScore_Category_1_Low';
+
+	Export	DECIMAL7_4 val_MedicationAdherenceScore_Category_5_High	:= 37.5323 ;
+	Export	DECIMAL7_4 val_MedicationAdherenceScore_Category_5_Low	:= 0 ;
+	Export	DECIMAL7_4 val_MedicationAdherenceScore_Category_4_High	:= 64.3456 ;
+	Export	DECIMAL7_4 val_MedicationAdherenceScore_Category_4_Low	:= 37.5324 ;
+	Export	DECIMAL7_4 val_MedicationAdherenceScore_Category_3_High	:= 74.2270 ;
+	Export	DECIMAL7_4 val_MedicationAdherenceScore_Category_3_Low	:= 64.3457 ;
+	Export	DECIMAL7_4 val_MedicationAdherenceScore_Category_2_High	:= 79.9234 ;
+	Export	DECIMAL7_4 val_MedicationAdherenceScore_Category_2_Low	:= 74.2271 ;
+	Export	DECIMAL7_4 val_MedicationAdherenceScore_Category_1_High	:= 100 ;
+	Export	DECIMAL7_4 val_MedicationAdherenceScore_Category_1_Low	:= 79.9235 ;
 
 	Export usage_GLB_Value := '06';
 

@@ -121,7 +121,7 @@ EXPORT IdentityFraudReport (
 	
   // prevent imposters/associated identities to be fetched in case subject wasn't found:
   best_all_pre := if (subj_did != 0, best_subj + best_imposter);
-	
+
 	// Join to Header.key_ADL_segmentation to get the identity type with out using the Z utility records
 	best_all	:=	join(	best_all_pre,
 											Header.key_ADL_segmentation,
@@ -134,6 +134,7 @@ EXPORT IdentityFraudReport (
 	
   best_subj_lname := best_subj[1].lname;
   best_subj_ssn   := best_subj[1].ssn;
+
 
 	// Get the fraud point indices for the subject
 	dFraudRiskIndices	:=	IdentityFraud_Services.Functions.GetIdentityFraudRiskIndices(dids,best_all_pre,param,isFCRA,DataPermission);
@@ -425,6 +426,7 @@ EXPORT IdentityFraudReport (
     end;
     Self.PhoneInfo := project (this_phones_info.PhoneInfo, FilterByName (Left, L.lname));
     Self.DOD := iesp.ECL2ESP.toDatestring8 (L.dod);
+    Self.IsLimitedAccessDMF := L.IsLimitedAccessDMF;
     Self.Gender := iesp.ECL2ESP.GetGender (L.title);
 		Self := [];
   end;
@@ -518,8 +520,9 @@ EXPORT IdentityFraudReport (
 
     MAC_RollIndicators (a_dobs (did = subj_did), a_dobs_ready, ifr.t_IFRDOB);
     dob_best_removed := a_dobs_ready (DOB != iesp.ECL2ESP.toDate(best_subj[1].dob));
+    
     Self.AssociatedData.DOBs := CHOOSEN (sort (dob_best_removed, -DateLastSeen, -SourceCount, DOB), iesp.Constants.IFR.MaxDOBs);
-
+    
     MAC_RollIndicators (a_names (did = subj_did), a_names_ready, ifr.t_IFRName);
     names_best_removed := a_names_ready (
                                      (Name.Last != best_subj[1].lname) or
@@ -604,7 +607,6 @@ EXPORT IdentityFraudReport (
       Self := L;
     end;
     Self.PrimaryIdentity := project (primary_identity, AddAggregateIndicators (Left))[1];
-
     // Imposters; best identity-like data for those having same SSN as subject's.
     // this will limit number of indicators to return per each imposter (kind of teaser)
     imposters_identities_checked := Functions.LimitImpostersIndicators (imposters_associated, param.indicators_per_imposter);

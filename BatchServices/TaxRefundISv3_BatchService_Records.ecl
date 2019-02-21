@@ -65,8 +65,8 @@ EXPORT TaxRefundISv3_BatchService_Records(
 	 // Get phone info
   ds_phone_res := BatchServices.TaxRefundISv3_BatchService_Functions.getPhoneRecords(
    	                                                                   ds_clean_batch_w_did,
-   																																		 args_in.dppapurpose,
-   																																		 args_in.glbpurpose);
+   																																		 args_in.dppa,
+   																																		 args_in.glb);
    
 	// **** TRIS v3.2 Enhancement project : 
 	// As per Requirements # 3.1.3.14, 3.1.4, 3.1.5, NetAcuity Gateway call will be removed and 
@@ -300,13 +300,13 @@ EXPORT TaxRefundISv3_BatchService_Records(
 
 	// *----Call FraudPoint 2.0----* //
 	FraudPoint_result := BatchServices.TaxRefundISv3_BatchService_Functions.callFraudPoint2(
-	                                                                  args_in.glbpurpose,
-																																		args_in.dppapurpose,
-																																		args_in.DataRestriction, 
-		                                                                args_in.industryclass,
+	                                                                  args_in.glb,
+																																		args_in.dppa,
+																																		args_in.DataRestrictionMask,
+		                                                                args_in.industry_class,
 																																	  args_in.ModelName,
 																																	  ds_clean_batch_w_did,
-																																    args_in.DataPermission
+																																    args_in.DataPermissionMask
 																																		); 
 
   // *--- Second transform to combine 2nd set of info accumlated ---* //
@@ -490,7 +490,7 @@ EXPORT TaxRefundISv3_BatchService_Records(
 	
 	//TRIS v3.2 Enhancement : Adding contributory data for some states. 
 	ds_final_w_contrib := BatchServices.TaxRefundISv3_BatchService_Functions.getContribRecs(
-	                                    ds_final , args_in.DataPermission);
+	                                    ds_final , args_in.DataPermissionMask);
 
 	// Call function to apply the main filter and fill in output field named "output_status"
 	ds_final_mainfilt := BatchServices.TaxRefundISv3_BatchService_Functions.MainFilter(

@@ -35,10 +35,11 @@
   indIndex := JOIN(indRecs, consumerResults, 
 										LEFT.inputEcho.seq = RIGHT.seq, 
 										TRANSFORM(DueDiligence.Layouts.BatchOut,
-                              SELF.seq := IF(LEFT.inputEcho.inputSeq = DueDiligence.Constants.NUMERIC_ZERO, LEFT.inputEcho.seq, LEFT.inputEcho.inputSeq);
+                              SELF.seq := LEFT.inputEcho.seq;
                               SELF.acctNo := LEFT.inputEcho.individual.accountNumber;
                               
                               SELF.PerLexID := RIGHT.PerLexID;
+                              SELF.PerLexIDMatch := RIGHT.PerLexIDMatch;
                               SELF.PerAssetOwnProperty := RIGHT.PerAssetOwnProperty;
                               SELF.PerAssetOwnProperty_Flag := RIGHT.PerAssetOwnProperty_Flag;
                               SELF.PerAssetOwnAircraft := RIGHT.PerAssetOwnAircraft;
@@ -79,6 +80,8 @@
                               SELF.PerProfLicense_Flag := RIGHT.PerProfLicense_Flag;
                               SELF.PerBusAssociations := RIGHT.PerBusAssociations;
                               SELF.PerBusAssociations_Flag := RIGHT.PerBusAssociations_Flag;
+                              SELF.PerEmploymentIndustry := RIGHT.PerEmploymentIndustry;
+                              SELF.PerEmploymentIndustry_Flag := RIGHT.PerEmploymentIndustry_Flag;
                               
                               SELF := [];), 
                     LEFT OUTER);  	  
@@ -92,10 +95,11 @@
   busIndex := JOIN(busRecs, businessResults,
 										LEFT.inputEcho.seq = RIGHT.seq, 
 										TRANSFORM(DueDiligence.Layouts.BatchOut,
-                              SELF.seq := IF(RIGHT.busn_input.inputSeq = DueDiligence.Constants.NUMERIC_ZERO, RIGHT.seq, RIGHT.busn_input.inputSeq);
+                              SELF.seq := RIGHT.seq;
                               SELF.acctNo := RIGHT.busn_input.accountNumber;
                               
                               SELF.BusLexID := RIGHT.BusLexID;
+                              SELF.BusLexIDMatch := RIGHT.BusLexIDMatch;
                               SELF.BusAssetOwnProperty := RIGHT.BusAssetOwnProperty;
                               SELF.BusAssetOwnProperty_Flag := RIGHT.BusAssetOwnProperty_Flag;
                               SELF.BusAssetOwnAircraft := RIGHT.BusAssetOwnAircraft;
@@ -138,6 +142,12 @@
                               SELF.BusBEOProfLicense_Flag := RIGHT.BusBEOProfLicense_Flag;
                               SELF.BusBEOUSResidency := RIGHT.BusBEOUSResidency;
                               SELF.BusBEOUSResidency_Flag := RIGHT.BusBEOUSResidency_Flag;
+                              SELF.BusAccessToFundSales := RIGHT.BusAccessToFundSales;
+                              SELF.BusAccessToFundsSales_Flag := RIGHT.BusAccessToFundsSales_Flag;
+                              SELF.BusBEOAccessToFundsProperty := RIGHT.BusBEOAccessToFundsProperty;
+                              SELF.BusBEOAccessToFundsProperty_Flag := RIGHT.BusBEOAccessToFundsProperty_Flag;
+                              SELF.BusLinkedBusinesses := RIGHT.BusLinkedBusinesses;
+                              SELF.BusLinkedBusinesses_Flag := RIGHT.BusLinkedBusinesses_Flag;
                               
                               SELF := [];), 
                     LEFT OUTER); 

@@ -51,7 +51,7 @@
 <!--	<part name="Gateways" type = 'tns:XmlDataSet' cols = '70' rows = '10'/>-->
  </message>
 */ 
-import gateway;
+import gateway, risk_indicators;
 export Boca_Shell_FCRA := MACRO
 
 /* Force layout of WsECL page */
@@ -214,9 +214,10 @@ risk_indicators.Layout_Input into() := transform
 	
 	self.ssn := ssn_value;
 	self.dob := dob_value;
-	self.age := if (age_value = 0 and (integer)dob_value != 0, 
-														(STRING3)ut.GetAgeI_asOf((unsigned)dob_value, (unsigned)risk_indicators.iid_constants.myGetDate(history_date)), 
-														(STRING3)age_value);
+			Temp_age := if (age_value = 0 and (integer)dob_value != 0, 
+														(STRING)ut.GetAgeI_asOf((unsigned)dob_value, (unsigned)risk_indicators.iid_constants.myGetDate(history_date)), 
+														(STRING)age_value);
+	self.age := if((integer)Temp_age > 99, '99',Temp_age);
 
 	self.phone10 := phone_value;
 	self.wphone10 := wphone_value;

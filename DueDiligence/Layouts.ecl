@@ -67,7 +67,7 @@ EXPORT Layouts := MODULE
 		STRING5 suffix;	
 	END;
   
-  EXPORT Shared_Input := RECORD
+  SHARED Shared_Input := RECORD
     STRING15 lexID;
 		STRING30 accountNumber;
     Address address;
@@ -114,133 +114,155 @@ EXPORT Layouts := MODULE
 
   //ALSO USED BY BATCH - changing name will impact batch
 	EXPORT PerAttributes := RECORD
-		STRING15 PerLexID;
-		STRING2 PerAssetOwnProperty;
-		STRING10 PerAssetOwnProperty_Flag;
-		STRING2 PerAssetOwnAircraft;
-		STRING10 PerAssetOwnAircraft_Flag;
-		STRING2 PerAssetOwnWatercraft;
-		STRING10 PerAssetOwnWatercraft_Flag;
-		STRING2 PerAssetOwnVehicle;
-		STRING10 PerAssetOwnVehicle_Flag;
+    STRING15 PerLexID;
+    STRING3 PerLexIDMatch;
+    STRING2 PerAssetOwnProperty;
+    STRING10 PerAssetOwnProperty_Flag;
+    STRING2 PerAssetOwnAircraft;
+    STRING10 PerAssetOwnAircraft_Flag;
+    STRING2 PerAssetOwnWatercraft;
+    STRING10 PerAssetOwnWatercraft_Flag;
+    STRING2 PerAssetOwnVehicle;
+    STRING10 PerAssetOwnVehicle_Flag;
     STRING2 PerAccessToFundsIncome;
-		STRING10 PerAccessToFundsIncome_Flag;
-		STRING2 PerAccessToFundsProperty;
-		STRING10 PerAccessToFundsProperty_Flag;		
-		STRING2 PerGeographic;
-		STRING10 PerGeographic_Flag;
-		STRING2 PerMobility;
-		STRING10 PerMobility_Flag;
-		STRING2 PerStateLegalEvent;
-		STRING10 PerStateLegalEvent_Flag;
+    STRING10 PerAccessToFundsIncome_Flag;
+    STRING2 PerAccessToFundsProperty;
+    STRING10 PerAccessToFundsProperty_Flag;		
+    STRING2 PerGeographic;
+    STRING10 PerGeographic_Flag;
+    STRING2 PerMobility;
+    STRING10 PerMobility_Flag;
+    STRING2 PerStateLegalEvent;
+    STRING10 PerStateLegalEvent_Flag;
     STRING2 PerFederalLegalEvent;
-		STRING10 PerFederalLegalEvent_Flag;
+    STRING10 PerFederalLegalEvent_Flag;
     STRING2 PerFederalLegalMatchLevel;
     STRING10 PerFederalLegalMatchLevel_Flag;
-		STRING2 PerCivilLegalEvent;
-		STRING10 PerCivilLegalEvent_Flag;
-		STRING2 PerOffenseType;
-		STRING10 PerOffenseType_Flag;
-		STRING2 PerAgeRange;
-		STRING10 PerAgeRange_Flag;
-		STRING2 PerIdentityRisk;
-		STRING10 PerIdentityRisk_Flag;
-		STRING2 PerUSResidency;
-		STRING10 PerUSResidency_Flag;
-		STRING2 PerMatchLevel;
-		STRING10 PerMatchLevel_Flag;
-		STRING2 PerAssociates;
-		STRING10 PerAssociates_Flag;
-		STRING2 PerProfLicense;
-		STRING10 PerProfLicense_Flag;
+    STRING2 PerCivilLegalEvent;
+    STRING10 PerCivilLegalEvent_Flag;
+    STRING2 PerOffenseType;
+    STRING10 PerOffenseType_Flag;
+    STRING2 PerAgeRange;
+    STRING10 PerAgeRange_Flag;
+    STRING2 PerIdentityRisk;
+    STRING10 PerIdentityRisk_Flag;
+    STRING2 PerUSResidency;
+    STRING10 PerUSResidency_Flag;
+    STRING2 PerMatchLevel;
+    STRING10 PerMatchLevel_Flag;
+    STRING2 PerAssociates;
+    STRING10 PerAssociates_Flag;
+    STRING2 PerEmploymentIndustry;
+    STRING10 PerEmploymentIndustry_Flag;
+    STRING2 PerProfLicense;
+    STRING10 PerProfLicense_Flag;
     STRING2 PerBusAssociations;
     STRING10 PerBusAssociations_Flag;
 	END;
 
   //ALSO USED BY BATCH - changing name will impact batch
 	EXPORT BusAttributes := RECORD
-		STRING15 BusLexID;
-		STRING2 BusAssetOwnProperty;
-		STRING10 BusAssetOwnProperty_Flag;
-		STRING2 BusAssetOwnAircraft;
-		STRING10 BusAssetOwnAircraft_Flag;
-		STRING2 BusAssetOwnWatercraft;
-		STRING10 BusAssetOwnWatercraft_Flag;
-		STRING2 BusAssetOwnVehicle;
-		STRING10 BusAssetOwnVehicle_Flag;
-		STRING2 BusAccessToFundsProperty;
-		STRING10 BusAccessToFundsProperty_Flag;
-		STRING2 BusGeographic;
-		STRING10 BusGeographic_Flag;
-		STRING2 BusValidity;
-		STRING10 BusValidity_Flag;
-		STRING2 BusStability;
-		STRING10 BusStability_Flag;
-		STRING2 BusIndustry;
-		STRING10 BusIndustry_Flag;
-		STRING2 BusStructureType;
-		STRING10 BusStructureType_Flag;
-		STRING2 BusSOSAgeRange;
-		STRING10 BusSOSAgeRange_Flag;
-		STRING2 BusPublicRecordAgeRange;
-		STRING10 BusPublicRecordAgeRange_Flag;
-		STRING2 BusShellShelf;
-		STRING10 BusShellShelf_Flag;
-		STRING2 BusMatchLevel;
-		STRING10 BusMatchLevel_Flag;
-		STRING2 BusStateLegalEvent;
-		STRING10 BusStateLegalEvent_Flag;
+    STRING15 BusLexID;
+    STRING3 BusLexIDMatch;
+    STRING2 BusAssetOwnProperty;
+    STRING10 BusAssetOwnProperty_Flag;
+    STRING2 BusAssetOwnAircraft;
+    STRING10 BusAssetOwnAircraft_Flag;
+    STRING2 BusAssetOwnWatercraft;
+    STRING10 BusAssetOwnWatercraft_Flag;
+    STRING2 BusAssetOwnVehicle;
+    STRING10 BusAssetOwnVehicle_Flag;
+    STRING2 BusAccessToFundSales;
+    STRING10 BusAccessToFundsSales_Flag;
+    STRING2 BusAccessToFundsProperty;
+    STRING10 BusAccessToFundsProperty_Flag;
+    STRING2 BusGeographic;
+    STRING10 BusGeographic_Flag;
+    STRING2 BusValidity;
+    STRING10 BusValidity_Flag;
+    STRING2 BusStability;
+    STRING10 BusStability_Flag;
+    STRING2 BusIndustry;
+    STRING10 BusIndustry_Flag;
+    STRING2 BusStructureType;
+    STRING10 BusStructureType_Flag;
+    STRING2 BusSOSAgeRange;
+    STRING10 BusSOSAgeRange_Flag;
+    STRING2 BusPublicRecordAgeRange;
+    STRING10 BusPublicRecordAgeRange_Flag;
+    STRING2 BusShellShelf;
+    STRING10 BusShellShelf_Flag;
+    STRING2 BusMatchLevel;
+    STRING10 BusMatchLevel_Flag;
+    STRING2 BusStateLegalEvent;
+    STRING10 BusStateLegalEvent_Flag;
     STRING2 BusFederalLegalEvent;
     STRING10 BusFederalLegalEvent_Flag;
     STRING2 BusFederalLegalMatchLevel;
     STRING10 BusFederalLegalMatchLevel_Flag;
-		STRING2 BusCivilLegalEvent;
-		STRING10 BusCivilLegalEvent_Flag;
-		STRING2 BusOffenseType;
-		STRING10 BusOffenseType_Flag;
-		STRING2 BusBEOProfLicense;
-		STRING10 BusBEOProfLicense_Flag;
-		STRING2 BusBEOUSResidency;
-		STRING10 BusBEOUSResidency_Flag;
+    STRING2 BusCivilLegalEvent;
+    STRING10 BusCivilLegalEvent_Flag;
+    STRING2 BusOffenseType;
+    STRING10 BusOffenseType_Flag;
+    STRING2 BusBEOProfLicense;
+    STRING10 BusBEOProfLicense_Flag;
+    STRING2 BusBEOUSResidency;
+    STRING10 BusBEOUSResidency_Flag;
+    STRING2 BusBEOAccessToFundsProperty;
+    STRING10 BusBEOAccessToFundsProperty_Flag;
+    STRING2 BusLinkedBusinesses;
+    STRING10 BusLinkedBusinesses_Flag;
 	END;
+  
+  SHARED BatchFILayout := RECORD
+    STRING8 FIAcctOpenDate;
+    STRING100 FICRR;
+    STRING100 FIAdditionalCodes1;
+    STRING100 FIAdditionalCodes2;
+    STRING100 FIAdditionalCodes3;
+    STRING100 FIAdditionalCodes4;
+    STRING100 FIAdditionalCodes5;
+  END;
 
 	EXPORT BatchInLayout  := RECORD
 		UNSIGNED4 seq;
-		STRING30  acctNo;
-		STRING15  custType;
-		STRING15 	lexID;
+		STRING30 acctNo;
+		STRING15 custType;
+		STRING15 lexID;
     
 		STRING120 companyName;
 		STRING120 altCompanyName;
-		STRING11  taxID;
+		STRING11 taxID;
     
-		STRING3		nameInputOrder;	// sequence of name (FML = First/Middle/Last, LFM = Last/First/Middle) if not specified, uses default name parser
+		STRING3 nameInputOrder;	// sequence of name (FML = First/Middle/Last, LFM = Last/First/Middle) if not specified, uses default name parser
 		Name;
-		STRING9   ssn;
-		STRING8   dob;
+		STRING9 ssn;
+		STRING8 dob;
 		
-		STRING120   streetAddress1;
-		STRING120   streetAddress2;
-		STRING10 		prim_range;
-		STRING2  		predir;
-		STRING28 		prim_name;
-		STRING4  		addr_suffix;
-		STRING2  		postdir;
-		STRING10 		unit_desig;
-		STRING8  		sec_range;
-		STRING25 		city;
-		STRING2  		state;
-		STRING5  		zip5;
-		STRING4  		zip4;
+		STRING120 streetAddress1;
+		STRING120 streetAddress2;
+		STRING10 prim_range;
+		STRING2 predir;
+		STRING28 prim_name;
+		STRING4 addr_suffix;
+		STRING2 postdir;
+		STRING10 unit_desig;
+		STRING8 sec_range;
+		STRING25 city;
+		STRING2 state;
+		STRING5 zip5;
+		STRING4 zip4;
 
-		STRING10  phone;
-		STRING10  phone2;
+		STRING10 phone;
+		STRING10 phone2;
 		
     STRING25 dlNumber;
     STRING2 dlState;
     
     STRING100 emailAddress;
     UNSIGNED4	HistoryDateYYYYMMDD;
+    
+    BatchFILayout;
 	END;
 
   //***Coordinate these changes witht the batch team ***//
@@ -248,6 +270,7 @@ EXPORT Layouts := MODULE
 		UNSIGNED4 seq;
     STRING30 acctNo;
     BOOLEAN lexIDChanged;
+    BatchFILayout;
 		PerAttributes;
 		BusAttributes;
     Citizenship.Layouts.LayoutScoreAndIndicators;
@@ -399,6 +422,36 @@ EXPORT Layouts := MODULE
 		Address;
 	END;
   
+  EXPORT CriminalTopLevel := RECORD
+    //Top Level Data
+    STRING2 state;
+    STRING25 source;
+    STRING35 caseNumber;
+    STRING35 offenseStatute;
+    STRING8 offenseDDFirstReportedActivity;
+    UNSIGNED4 offenseDDLastReportedActivity;
+    UNSIGNED4 offenseDDLastCourtDispDate;
+    UNSIGNED1 offenseDDLegalEventTypeCode;
+    STRING75 offenseCharge;
+    STRING1 offenseDDChargeLevelCalculated;
+    STRING35 offenseChargeLevelReported; 
+    STRING1 offenseConviction;
+    STRING25 offenseIncarcerationProbationParole;
+    STRING1 offenseTrafficRelated;
+    
+    //Additional details
+    STRING county;
+    STRING50 countyCourt;
+    STRING25 city;
+    STRING50 agency;
+    STRING30 race;
+    STRING1 sex;
+    STRING15 hairColor;
+    STRING5 eyeColor;
+    STRING3 height;
+    STRING3 weight;
+  END;
+  
   EXPORT CriminalSources := RECORD
     STRING75 offenseCharge;
     STRING1 offenseConviction;
@@ -419,6 +472,15 @@ EXPORT Layouts := MODULE
     STRING50 DOCInmateStatus;
     STRING50 DOCParoleStatus;
     STRING30 offenseMaxTerm;
+    BOOLEAN currentlyIncarcerated;
+    BOOLEAN currentlyParoled;
+    BOOLEAN currentlyProbation;
+    UNSIGNED4 DOCParoleActualReleaseDate;
+    UNSIGNED4 DOCParolePresumptiveReleaseDate;
+    UNSIGNED4 DOCParoleScheduledReleaseDate;
+    STRING50 DOCParoleCurrentStatus;
+    STRING50 DOCCurrentKnownInmateStatus;
+    STRING25 DOCCurrentLocationSecurity;
     DATASET({STRING120 name}) partyNames;
     
     //used for file validation
@@ -448,32 +510,7 @@ EXPORT Layouts := MODULE
     BOOLEAN attr_legalEventCat2;
     
     //Top Level Data
-    STRING2 state;
-    STRING25 source;
-    STRING35 caseNumber;
-    STRING35 offenseStatute;
-    STRING8 offenseDDFirstReportedActivity;
-    UNSIGNED4 offenseDDLastReportedActivity;
-    UNSIGNED4 offenseDDLastCourtDispDate;
-    UNSIGNED1 offenseDDLegalEventTypeCode;
-    STRING75 offenseCharge;
-    STRING1 offenseDDChargeLevelCalculated;
-    STRING35 offenseChargeLevelReported; 
-    STRING1 offenseConviction;
-    STRING25 offenseIncarcerationProbationParole;
-    STRING1 offenseTrafficRelated;
-    
-    //Additional details
-    STRING county;
-    STRING50 countyCourt;
-    STRING25 city;
-    STRING50 agency;
-    STRING30 race;
-    STRING1 sex;
-    STRING15 hairColor;
-    STRING5 eyeColor;
-    STRING3 height;
-    STRING3 weight;
+    CriminalTopLevel;
     
     //Source info
     DATASET(CriminalSources) sources;
@@ -598,8 +635,16 @@ EXPORT Layouts := MODULE
     STRING2 registeredState;
     STRING8 registeredDate;
 	END;
+	
+  EXPORT SlimBusiness := RECORD
+    STRING120 companyName;
+    Address address;
+    STRING14 phone;
+    STRING11 fein;
+  END;
   
 	EXPORT BusReportDetails := RECORD
+    SlimBusiness bestBusInfo;
     DATASET(BusPropertyDataLayout) busProperties {MAXCOUNT(DueDiligence.Constants.MAX_PROPERTIES)};
     DATASET(WatercraftDataLayout) busWatercraft {MAXCOUNT(DueDiligence.Constants.MAX_WATERCRAFT)};
     DATASET(AircraftDataLayout) busAircraft {MAXCOUNT(DueDiligence.Constants.MAX_AIRCRAFT)};

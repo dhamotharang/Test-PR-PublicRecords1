@@ -9,12 +9,12 @@ EXPORT fn_getPL(DATASET(doxie.layout_references_acctno) ds_in_acctnos_dids,
 	Ded_PL_In := DEDUP(SORT(PL_In, did), did);
 
   // Save 2 passed in params values needed below.
-  dppa_purpose := mod_params_in.DPPAPurpose;
-	glb_purpose  := mod_params_in.GLBPurpose;
+  // dppa_purpose := mod_params_in.dppa;
+	// glb_purpose  := mod_params_in.glb;
 
 	PL_recs := Doxie_Raw.PL_Raw(Ded_PL_In, DATASET([],Doxie.Layout_ref_bdid),
-                              dppa_purpose := mod_params_in.DPPAPurpose,
-											        glb_purpose  := mod_params_in.GLBPurpose);
+                              dppa_purpose := mod_params_in.dppa,
+											        glb_purpose  := mod_params_in.glb);
 
   TodaysDate := Residency_Services.Constants.TodaysDate;
 

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BocaShell30_FCRA_Batch_Service" wuTimeout="300000">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="DataRestrictionMask" type="xsd:string"/>
@@ -114,9 +114,11 @@ gateways := PROJECT(gateways_in, gw_switch(LEFT));
 		self.historydate := historydate;
 		self.ssn := le.ssn;
 		self.dob := le.dob;
-		self.age := if ((integer)le.age = 0 and (integer)le.dob != 0,
-						(STRING3)ut.GetAgeI_asOf((unsigned)le.dob, (unsigned)risk_indicators.iid_constants.myGetDate(historydate)), 
+		
+			Temp_age := if ((integer)le.age = 0 and (integer)le.dob != 0,
+						(STRING)ut.GetAgeI_asOf((unsigned)le.dob, (unsigned)risk_indicators.iid_constants.myGetDate(historydate)), 
 						(string)((integer)le.age));
+		self.age := if((integer)temp_age > 99, '99',temp_age);
 		self.phone10  := le.home_phone;
 		self.wphone10 := le.work_phone;
 

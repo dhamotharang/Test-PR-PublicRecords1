@@ -67,7 +67,7 @@
  </message>
 */
 
-import AutoStandardI;
+import AutoStandardI, risk_indicators;
 
 export Boca_Shell_BtSt_Service := macro
 
@@ -258,9 +258,10 @@ risk_indicators.Layout_CIID_BtSt_In into_btst_in(d le) := transform
 	self.Bill_To_In.geo_blk := clean_a[171..177];
 	self.Bill_To_In.ssn		:= ssn_value;
 	self.Bill_To_In.dob		:= dob_value;
-	self.Bill_To_In.age := if (age_value = 0 and (integer)dob_value != 0, 
-														(STRING3)ut.GetAgeI_asOf((unsigned)dob_value, (unsigned)risk_indicators.iid_constants.myGetDate(history_date)), 
-														(STRING3)age_value);
+				Temp_age := if (age_value = 0 and (integer)dob_value != 0, 
+														(STRING)ut.GetAgeI_asOf((unsigned)dob_value, (unsigned)risk_indicators.iid_constants.myGetDate(history_date)), 
+														(STRING)age_value);
+	self.Bill_To_In.age := if((integer)temp_age > 99, '99',temp_age);
 	self.Bill_To_In.dl_number := stringlib.stringtouppercase(dl_num_clean);
 	self.Bill_To_In.dl_state := stringlib.stringtouppercase(dl_state_value);
 	self.Bill_To_In.email_address	:= stringlib.stringtouppercase(email_value);
@@ -306,9 +307,12 @@ risk_indicators.Layout_CIID_BtSt_In into_btst_in(d le) := transform
 	self.Ship_To_In.geo_blk := clean_a2[171..177];
 	self.Ship_To_In.ssn		:= ssn_value2;
 	self.Ship_To_In.dob		:= dob_value2;
-	self.Ship_To_In.age := if (age_value2 = 0 and (integer)dob_value2 != 0, 
-														(STRING3)ut.GetAgeI_asOf((unsigned)dob_value2, (unsigned)risk_indicators.iid_constants.myGetDate(history_date)), 
-														(STRING3)age_value2);
+	
+	Temp_age2 :=  if (age_value2 = 0 and (integer)dob_value2 != 0, 
+														(STRING)ut.GetAgeI_asOf((unsigned)dob_value2, (unsigned)risk_indicators.iid_constants.myGetDate(history_date)), 
+														(STRING)age_value2);
+						
+	self.Ship_To_In.age := if((integer)temp_age2 > 99, '99',temp_age2);
 	self.Ship_To_In.dl_number := stringlib.stringtouppercase(dl_num_clean2);
 	self.Ship_To_In.dl_state := stringlib.stringtouppercase(dl_state_value2);
 	self.Ship_To_In.email_address	:= stringlib.stringtouppercase(email_value2);

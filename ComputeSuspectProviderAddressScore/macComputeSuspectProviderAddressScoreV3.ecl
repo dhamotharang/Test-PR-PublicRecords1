@@ -1,4 +1,4 @@
-import ML;
+﻿import ML;
 EXPORT macComputeSuspectProviderAddressScoreV3 (Infile, 
 																									 LNPID = '',
 																									 PrimaryRange = '',
@@ -406,61 +406,161 @@ EXPORT macComputeSuspectProviderAddressScoreV3 (Infile,
         reasonDS := DATASET
             (
                 [
-								{evalSharedAddress.reason,'',evalSharedAddress.Value},			
-								{evalDMEOutlier.reason,'',evalDMEOutlier.Value},							
-								{evalLABOutlier.reason,'',evalLABOutlier.Value},							
-								{evalSingleAddress.reason,'',evalSingleAddress.Value},			 			
-								{evalRecentNPI.reason,'',evalRecentNPI.Value},			 				
-								{evalStudentNPI.reason,'',evalStudentNPI.Value},			 				
-								{evalDND.reason,'',evalDND.Value},			 				
-								{evalVacancy.reason,'',evalVacancy.Value},			 				
-								{evalMailDrop.reason,'',evalMailDrop.Value},							
-								{evalPOBox.reason,'',evalPOBox.Value},			 				
-								{evalPrison.reason,'',evalPrison.Value},			 				
-								{evalresidential.reason,'',evalresidential.Value},			 			
-								{evalActiveStateExclusion.reason,'',evalActiveStateExclusion.Value},			 		
-								{evalActiveOIGExclusion.reason,'',evalActiveOIGExclusion.Value},			 			
-								{evalActiveOPMExclusion.reason,'',evalActiveOPMExclusion.Value},			 			
-								{evalActiveSanctionRevocation.reason,'',evalActiveSanctionRevocation.Value},			 		
-								{evalPastStateExclusion.reason,'',evalPastStateExclusion.Value},			 			
-								{evalPastOIGExclusion.reason,'',evalPastOIGExclusion.Value},			 			
-								{evalPastOPMExclusion.reason,'',evalPastOPMExclusion.Value},			 			
-								{evalReinstatedSanctionRevocation.reason,'',evalReinstatedSanctionRevocation.Value},			 	
-								{evalLicenseExpired.reason,'',evalLicenseExpired.Value},			 			
-								{evalDeaExpired.reason,'',evalDeaExpired.Value},			 				
-								{evalDeceased.reason,'',evalDeceased.Value},			 				
-								{evalBankruptcy.reason,'',evalBankruptcy.Value},			 				
-								{evalCriminalHistory.reason,'',evalCriminalHistory.Value},						
-								{evalDeceasedPatients.reason,'',evalDeceasedPatients.Value},						
-								{evalLargePatientGroups.reason,'',evalLargePatientGroups.Value},						
-								{evalLicenseInactive.reason,'',evalLicenseInactive.Value},			 			
-								{evalNPIDeactivated.reason,'',evalNPIDeactivated.Value},				 		
-								{evalLongPatientDrivingDistance.reason,'',evalLongPatientDrivingDistance.Value},					
-								{evalHighPaidDollarsPerPatient.reason,'',evalHighPaidDollarsPerPatient.Value},					
-								{evalHighPaidDollarsPerClaim.reason,'',evalHighPaidDollarsPerClaim.Value},					
-								{evalHighNumberOfPatients.reason,'',evalHighNumberOfPatients.Value},					
-								{evalHighNumberOfClaims.reason,'',evalHighNumberOfClaims.Value},						
-								{evalHighPaidDollars.reason,'',evalHighPaidDollars.Value},						
-								{evalInNetworkCurrentExclusion.reason,'',evalInNetworkCurrentExclusion.Value},					
-								{evalInNetworkCurrentRevocation.reason,'',evalInNetworkCurrentRevocation.Value},					
-								{evalInNetworkPastExclusion.reason,'',evalInNetworkPastExclusion.Value},					
-								{evalInNetworkPastRevocation.reason,'',evalInNetworkPastRevocation.Value},					
-								{evalInNetworkCriminal.reason,'',evalInNetworkCriminal.Value},						
-								{evalInNetworkBankruptcy.reason,'',evalInNetworkBankruptcy.Value},						
-								{evalOutNetworkCurrentExclusion.reason,'',evalOutNetworkCurrentExclusion.Value},					
-								{evalOutNetworkCurrentRevocation.reason,'',evalOutNetworkCurrentRevocation.Value},					
-								{evalOutNetworkPastExclusion.reason,'',evalOutNetworkPastExclusion.Value},					
-								{evalOutNetworkPastRevocation.reason,'',evalOutNetworkPastRevocation.Value},					
-								{evalOutNetworkCriminal.reason,'',evalOutNetworkCriminal.Value},						
-								{evalOutNetworkBankruptcy.reason,'',evalOutNetworkBankruptcy.Value},					
-								{evalRelativeCriminal.reason,'',evalRelativeCriminal.Value},					
-								{evalRelativeBankruptcy.reason,'',evalRelativeBankruptcy.Value},
-								{evalAssocCriminal.reason,'',evalAssocCriminal.Value},					
-								{evalAssocBankruptcy.reason,'',evalAssocBankruptcy.Value}					
+								{evalSharedAddress.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalSharedAddress.reason),
+								  evalSharedAddress.Value},			
+								{evalDMEOutlier.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalDMEOutlier.reason),
+									evalDMEOutlier.Value},							
+								{evalLABOutlier.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalLABOutlier.reason),
+									evalLABOutlier.Value},							
+								{evalSingleAddress.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalSingleAddress.reason),
+								  evalSingleAddress.Value},			 			
+								{evalRecentNPI.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalRecentNPI.reason),
+									evalRecentNPI.Value},			 				
+								{evalStudentNPI.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalStudentNPI.reason),
+								  evalStudentNPI.Value},			 				
+								{evalDND.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalDND.reason),
+								  evalDND.Value},			 				
+								{evalVacancy.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalVacancy.reason),
+								  evalVacancy.Value},			 				
+								{evalMailDrop.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalMailDrop.reason),
+								  evalMailDrop.Value},							
+								{evalPOBox.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalPOBox.reason),
+								  evalPOBox.Value},			 				
+								{evalPrison.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalPrison.reason),
+								  evalPrison.Value},			 				
+								{evalresidential.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalresidential.reason),
+								  evalresidential.Value},			 			
+								{evalActiveStateExclusion.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalActiveStateExclusion.reason),
+								  evalActiveStateExclusion.Value},			 		
+								{evalActiveOIGExclusion.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalActiveOIGExclusion.reason),
+								  evalActiveOIGExclusion.Value},			 			
+								{evalActiveOPMExclusion.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalActiveOPMExclusion.reason),
+								  evalActiveOPMExclusion.Value},			 			
+								{evalActiveSanctionRevocation.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalActiveSanctionRevocation.reason),
+								  evalActiveSanctionRevocation.Value},			 		
+								{evalPastStateExclusion.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalPastStateExclusion.reason),
+								  evalPastStateExclusion.Value},			 			
+								{evalPastOIGExclusion.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalPastOIGExclusion.reason),
+								  evalPastOIGExclusion.Value},			 			
+								{evalPastOPMExclusion.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalPastOPMExclusion.reason),
+								  evalPastOPMExclusion.Value},			 			
+								{evalReinstatedSanctionRevocation.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalReinstatedSanctionRevocation.reason),
+								  evalReinstatedSanctionRevocation.Value},			 	
+								{evalLicenseExpired.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalLicenseExpired.reason),
+								  evalLicenseExpired.Value},			 			
+								{evalDeaExpired.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalDeaExpired.reason),
+								  evalDeaExpired.Value},			 				
+								{evalDeceased.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalDeceased.reason), 
+								  evalDeceased.Value},			 				
+								{evalBankruptcy.reason, ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalBankruptcy.reason),
+								  evalBankruptcy.Value},			 				
+								{evalCriminalHistory.reason, 
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalCriminalHistory.reason),
+								  evalCriminalHistory.Value},						
+								{evalDeceasedPatients.reason, 
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalDeceasedPatients.reason),
+								  evalDeceasedPatients.Value},						
+								{evalLargePatientGroups.reason, 
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalLargePatientGroups.reason),
+								  evalLargePatientGroups.Value},						
+								{evalLicenseInactive.reason, 
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalLicenseInactive.reason),
+								  evalLicenseInactive.Value},			 			
+								{evalNPIDeactivated.reason, 
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalNPIDeactivated.reason),
+								  evalNPIDeactivated.Value},				 		
+								{evalLongPatientDrivingDistance.reason, 
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalLongPatientDrivingDistance.reason), 
+								  evalLongPatientDrivingDistance.Value},					
+								{evalHighPaidDollarsPerPatient.reason, 
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalHighPaidDollarsPerPatient.reason), 
+								  evalHighPaidDollarsPerPatient.Value},					
+								{evalHighPaidDollarsPerClaim.reason, 
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalHighPaidDollarsPerClaim.reason),
+								  evalHighPaidDollarsPerClaim.Value},					
+								{evalHighNumberOfPatients.reason, 
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalHighNumberOfPatients.reason),
+								  evalHighNumberOfPatients.Value},					
+								{evalHighNumberOfClaims.reason, 
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalHighNumberOfClaims.reason),
+								  evalHighNumberOfClaims.Value},						
+								{evalHighPaidDollars.reason, 
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalHighPaidDollars.reason),
+								  evalHighPaidDollars.Value},						
+								{evalInNetworkCurrentExclusion.reason, 
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalInNetworkCurrentExclusion.reason),
+									evalInNetworkCurrentExclusion.Value},					
+								{evalInNetworkCurrentRevocation.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalInNetworkCurrentRevocation.reason),
+									evalInNetworkCurrentRevocation.Value},					
+								{evalInNetworkPastExclusion.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalInNetworkPastExclusion.reason),
+									evalInNetworkPastExclusion.Value},					
+								{evalInNetworkPastRevocation.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalInNetworkPastRevocation.reason),
+									evalInNetworkPastRevocation.Value},					
+								{evalInNetworkCriminal.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalInNetworkCriminal.reason),
+									evalInNetworkCriminal.Value},						
+								{evalInNetworkBankruptcy.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalInNetworkBankruptcy.reason),
+									evalInNetworkBankruptcy.Value},						
+								{evalOutNetworkCurrentExclusion.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalOutNetworkCurrentExclusion.reason),
+									evalOutNetworkCurrentExclusion.Value},					
+								{evalOutNetworkCurrentRevocation.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalOutNetworkCurrentRevocation.reason),
+									evalOutNetworkCurrentRevocation.Value},					
+								{evalOutNetworkPastExclusion.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalOutNetworkPastExclusion.reason),
+									evalOutNetworkPastExclusion.Value},					
+								{evalOutNetworkPastRevocation.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalOutNetworkPastRevocation.reason),
+									evalOutNetworkPastRevocation.Value},					
+								{evalOutNetworkCriminal.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalOutNetworkCriminal.reason),
+									evalOutNetworkCriminal.Value},						
+								{evalOutNetworkBankruptcy.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalOutNetworkBankruptcy.reason),
+									evalOutNetworkBankruptcy.Value},					
+								{evalRelativeCriminal.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalRelativeCriminal.reason),
+									evalRelativeCriminal.Value},					
+								{evalRelativeBankruptcy.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalRelativeBankruptcy.reason),
+									evalRelativeBankruptcy.Value},
+								{evalAssocCriminal.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalAssocCriminal.reason),
+									evalAssocCriminal.Value},					
+								{evalAssocBankruptcy.reason,
+								  ComputeSuspectProviderAddressScore.ScoringAlgorithmsV1.GetReasonDescription(evalAssocBankruptcy.reason),
+									evalAssocBankruptcy.Value}					
 								],
                 {ReasonLayout}
             );
-
 				
         // Assign individual scores
 				SELF.#EXPAND(appendPrefix + 'SharedAddressScore') 											:= evalSharedAddress.score;
@@ -530,11 +630,19 @@ EXPORT macComputeSuspectProviderAddressScoreV3 (Infile,
 																																						+  SELF.#EXPAND(appendPrefix + 'PrisonScore')					
 																																						+  SELF.#EXPAND(appendPrefix + 'ResidentialScore');																																											
 				ImpactScore																			 										:= 	25 * L.ImpactScoreRange;
-				ProfessionalScore																										:= SELF.#EXPAND(appendPrefix + 'PastExclusionScore')
+				ProfessionalScore																										:= SELF.#EXPAND(appendPrefix + 'CurrentExclusionScore') 
+																																						+  SELF.#EXPAND(appendPrefix + 'CurrentLicenseRevocationScore')  
+																																						+  SELF.#EXPAND(appendPrefix + 'PastExclusionScore')
 																																						+  SELF.#EXPAND(appendPrefix + 'PastRevocationScore')
+																																						+  SELF.#EXPAND(appendPrefix + 'LicenseExpiredScore')
 																																						+  SELF.#EXPAND(appendPrefix + 'DEAExpiredScore')
+																																						+  SELF.#EXPAND(appendPrefix + 'DeceasedScore')
+																																						+  SELF.#EXPAND(appendPrefix + 'BankruptcyScore')																												
+																																						+  SELF.#EXPAND(appendPrefix + 'CriminalHistoryScore')																												
+																																						+  SELF.#EXPAND(appendPrefix + 'DeceasedPatientsScore')
 																																						+  SELF.#EXPAND(appendPrefix + 'LargePatientGroupScore')
 																																						+  SELF.#EXPAND(appendPrefix + 'LicenseInactiveScore')
+																																						+  SELF.#EXPAND(appendPrefix + 'NPIDeactivatedScore')																																						
 																																						+  SELF.#EXPAND(appendPrefix + 'LongPatientDrivingDistanceScore')
 																																						+  SELF.#EXPAND(appendPrefix + 'HighPaidDollarsPerPatientScore')
 																																						+  SELF.#EXPAND(appendPrefix + 'HighPaidDollarsPerClaimScore')
@@ -548,7 +656,7 @@ EXPORT macComputeSuspectProviderAddressScoreV3 (Infile,
 																																						+	 SELF.#EXPAND(appendPrefix + 'InNetworkAssocBankruptcyScore')
 																																						+	 SELF.#EXPAND(appendPrefix + 'InNetworkAssocCriminalHistoryScore')
 																																						+	 SELF.#EXPAND(appendPrefix + 'OutNetworkAssocCurrentExclusionScore')
-																																						+	 SELF.#EXPAND(appendPrefix + 'OutNetworkAssocCurrentExclusionScore')
+																																						+	 SELF.#EXPAND(appendPrefix + 'OutNetworkAssocCurrentRevocationScore')
 																																						+	 SELF.#EXPAND(appendPrefix + 'OutNetworkAssocPastExclusionScore')
 																																						+	 SELF.#EXPAND(appendPrefix + 'OutNetworkAssocPastRevocationScore')
 																																						+	 SELF.#EXPAND(appendPrefix + 'OutNetworkAssocBankruptcyScore')
@@ -558,40 +666,6 @@ EXPORT macComputeSuspectProviderAddressScoreV3 (Infile,
 																																						+  ImpactScore;
 	
 				SELF.#EXPAND(appendPrefix + 'ProfessionalScore') 										:= ProfessionalScore;
-				// SELF.#EXPAND(appendPrefix + 'ProfessionalScore') 										:= SELF.#EXPAND(appendPrefix + 'CurrentExclusionScore') 
-																																						// +  SELF.#EXPAND(appendPrefix + 'CurrentLicenseRevocationScore')
-																																						// +  SELF.#EXPAND(appendPrefix + 'PastExclusionScore')
-																																						// +  SELF.#EXPAND(appendPrefix + 'PastRevocationScore')
-																																						// +  SELF.#EXPAND(appendPrefix + 'LicenseExpiredScore')
-																																						// +  SELF.#EXPAND(appendPrefix + 'DEAExpiredScore')
-																																						// +  SELF.#EXPAND(appendPrefix + 'DeceasedScore')
-																																						// +  SELF.#EXPAND(appendPrefix + 'BankruptcyScore')																												
-																																						// +  SELF.#EXPAND(appendPrefix + 'CriminalHistoryScore')																												
-																																						// +  SELF.#EXPAND(appendPrefix + 'DeceasedPatientsScore')
-																																						// +  SELF.#EXPAND(appendPrefix + 'LargePatientGroupScore')
-																																						// +  SELF.#EXPAND(appendPrefix + 'LicenseInactiveScore')
-																																						// +  SELF.#EXPAND(appendPrefix + 'NPIDeactivatedScore')
-																																						// +  SELF.#EXPAND(appendPrefix + 'LongPatientDrivingDistanceScore')
-																																						// +  SELF.#EXPAND(appendPrefix + 'HighPaidDollarsPerPatientScore')
-																																						// +  SELF.#EXPAND(appendPrefix + 'HighPaidDollarsPerClaimScore')
-																																						// +  SELF.#EXPAND(appendPrefix + 'HighNumberOfPatientsScore')
-																																						// +  SELF.#EXPAND(appendPrefix + 'HighNumberOfClaimsScore')
-																																						// +  SELF.#EXPAND(appendPrefix + 'HighPaidDollarsScore')
-																																						// +  SELF.#EXPAND(appendPrefix + 'InNetworkAssocCurrentExclusionScore') 
-																																						// +	 SELF.#EXPAND(appendPrefix + 'InNetworkAssocCurrentRevocationScore')
-																																						// +	 SELF.#EXPAND(appendPrefix + 'InNetworkAssocPastExclusionScore')
-																																						// +	 SELF.#EXPAND(appendPrefix + 'InNetworkAssocPastRevocationScore')
-																																						// +	 SELF.#EXPAND(appendPrefix + 'InNetworkAssocBankruptcyScore')
-																																						// +	 SELF.#EXPAND(appendPrefix + 'InNetworkAssocCriminalHistoryScore')
-																																						// +	 SELF.#EXPAND(appendPrefix + 'OutNetworkAssocCurrentExclusionScore')
-																																						// +	 SELF.#EXPAND(appendPrefix + 'OutNetworkAssocCurrentExclusionScore')
-																																						// +	 SELF.#EXPAND(appendPrefix + 'OutNetworkAssocPastExclusionScore')
-																																						// +	 SELF.#EXPAND(appendPrefix + 'OutNetworkAssocPastRevocationScore')
-																																						// +	 SELF.#EXPAND(appendPrefix + 'OutNetworkAssocBankruptcyScore')
-																																						// +	 SELF.#EXPAND(appendPrefix + 'OutNetworkAssocCriminalHistoryScore')
-																																						// +	 SELF.#EXPAND(appendPrefix + 'RelativeAssocCriminalScore')
-																																						// +  SELF.#EXPAND(appendPrefix + 'RelativeAssocBankruptcyScore')
-																																						// +  ImpactScore;
 
 				SELF.#EXPAND(appendPrefix + 'MedianAddressScore')										:=	0;
 				SELF.#EXPAND(appendPrefix + 'MedianProfessionalScore')							:=	0;
@@ -601,8 +675,8 @@ EXPORT macComputeSuspectProviderAddressScoreV3 (Infile,
 				
 				SELF.#EXPAND(appendPrefix + 'FinalAddressScore') 										:= 	0;
 				SELF.#EXPAND(appendPrefix + 'FinalProfessionalScore') 							:= 	0;
-			
-        SELF.#EXPAND(appendPrefix + 'reasons') := join(reasonDS(reason != ''),ComputeSuspectProviderAddressScore.ScoringAlgorithmsV3.reasonDescriptions,left.reason = right.reasonCode,transform(ReasonLayout, self.description := right.description, SELF.Value := left.Value; self := left;));
+				
+				SELF.#EXPAND(appendPrefix + 'reasons') := reasonDS(reason != '');
 
         SELF := L;
     END;
@@ -688,26 +762,11 @@ EXPORT macComputeSuspectProviderAddressScoreV3 (Infile,
 				// LocationExtraScore 																									:=  IF ((INTEGER)LEFT.#EXPAND(appendPrefix + 'AddressScore') > AveAddressScore, (LEFT.#EXPAND(appendPrefix + 'IncrementPaidAmountCount') * 5),0);
 				ExcludeProviderWithHighScore																						:= IF (LEFT.#EXPAND(appendPrefix + 'SuspectProviderAtLocationCount') > 0, LEFT.#EXPAND(appendPrefix + 'SuspectProviderAtLocationCount') - 1, LEFT.#EXPAND(appendPrefix + 'SuspectProviderAtLocationCount'));
 			  FinalAddressScore		:= LEFT.#EXPAND(appendPrefix + 'AddressScore') + LEFT.#EXPAND(appendPrefix + 'MaxProfScoreAtAddressScore');					
-/*
-				FinalAddressScore		:=	
-				  MAP
-					(
-					  (INTEGER) LEFT.#EXPAND(appendPrefix + 'SuspectProviderAtLocationCount') > 1 
-			      => LEFT.#EXPAND(appendPrefix + 'AddressScore') + LEFT.#EXPAND(appendPrefix + 'MaxProfScoreAtAddressScore'),
-																					// ExcludeProviderWithHighScore * 10,
-			      // => LEFT.#EXPAND(appendPrefix + 'AddressScore') + LEFT.#EXPAND(appendPrefix + 'MaxProfScoreAtAddressScore') + 
-																					// ExcludeProviderWithHighScore * 10,
-						   // (LEFT.#EXPAND(appendPrefix + 'SuspectProviderAtLocationCount') * 10),
- 						   // (LEFT.#EXPAND(appendPrefix + 'IncrementPaidAmountCount') * 5), 
-  					   // LocationExtraScore, 
-						LEFT.#EXPAND(appendPrefix + 'AddressScore') + LEFT.#EXPAND(appendPrefix + 'ProfessionalScore')
-					);
-	*/				
 				SELF.#EXPAND(appendPrefix + 'FinalAddressScore') 										:= FinalAddressScore; //IF (LEFT.#EXPAND(appendPrefix + 'AddressScore') > AveAddressScore, FinalAddressScore, 0);
 				SELF.#EXPAND(appendPrefix + 'FinalProfessionalScore') 							:= LEFT.#EXPAND(appendPrefix + 'ProfessionalScore');
 				SELF := LEFT;
 				));
 		
     RETURN FinalScoredFile;
-		// RETURN Addr_Tab;
+
 ENDMACRO;

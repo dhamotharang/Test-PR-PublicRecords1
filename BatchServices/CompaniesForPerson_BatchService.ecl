@@ -13,7 +13,7 @@
 IMPORT BatchServices;
 
 EXPORT CompaniesForPerson_BatchService(useCannedRecs = 'false') := MACRO
-  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+  #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
     Pre_result := BatchServices.CompaniesForPerson_BatchService_Records(useCannedRecs);
 		ut.mac_TrimFields(Pre_result, 'Pre_result', result);
 		OUTPUT(result, NAMED('Results'));	

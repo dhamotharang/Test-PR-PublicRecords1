@@ -40,10 +40,15 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
   requestedProducts := MAP(callCitizenship AND callDueDiligence => DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.BOTH,
                             callCitizenship => DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.CITIZENSHIP_ONLY,
                             DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.ATTRIBUTES_ONLY);
+                            
+
+  rawWithSeq := PROJECT(batch_in, TRANSFORM({UNSIGNED6 uniqueID, RECORDOF(LEFT)},
+                                            SELF.uniqueID := COUNTER;
+                                            SELF := LEFT;));
   
   
   //Transform data into a shared common input layout
-	wseq := PROJECT(batch_in, TRANSFORM(DueDiligence.Layouts.Input,
+	wseq := PROJECT(rawWithSeq, TRANSFORM(DueDiligence.Layouts.Input,
                                       customerType := STD.Str.ToUpperCase(LEFT.custType);
 	
                                       version := MAP(attributesVersion = DueDiligence.Constants.VERSION_3 AND customerType = DueDiligence.Constants.INDIVIDUAL => DueDiligence.Constants.IND_REQ_ATTRIBUTE_V3,
@@ -99,7 +104,7 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
                                                           DATASET([], DueDiligence.Layouts.Busn_Input));
                                                                     
                                                                       
-                                      SELF.seq := COUNTER;
+                                      SELF.seq := LEFT.uniqueID;
                                       SELF.inputSeq := LEFT.seq;
                                       SELF.individual := ind_in[1];
                                       SELF.business := bus_in[1];
@@ -121,131 +126,170 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
   ddResults := IF(requestedProducts IN DueDiligence.CitDDShared.DUEDILIGENCE_PRODUCTS, DueDiligence.DueDiligenceBatchMain(wseq, glba, dppa), DATASET([], DueDiligence.Layouts.BatchOut));
   
   allProducts := citResults + ddResults;
-  sortProducts := SORT(allProducts, seq, acctNo);
+
+  //add FI pass through fields to output
+  withFIFields := JOIN(rawWithSeq, allProducts,
+                        LEFT.uniqueID = RIGHT.seq AND
+                        LEFT.acctNo = RIGHT.acctNo,
+                        TRANSFORM({UNSIGNED6 inputSeq, DueDiligence.Layouts.BatchOut},
+                                   SELF.inputSeq := LEFT.seq;
+                                   SELF.FIAcctOpenDate := LEFT.FIAcctOpenDate;
+                                   SELF.FICRR := LEFT.FICRR;
+                                   SELF.FIAdditionalCodes1 := LEFT.FIAdditionalCodes1;
+                                   SELF.FIAdditionalCodes2 := LEFT.FIAdditionalCodes2;
+                                   SELF.FIAdditionalCodes3 := LEFT.FIAdditionalCodes3;
+                                   SELF.FIAdditionalCodes4 := LEFT.FIAdditionalCodes4;
+                                   SELF.FIAdditionalCodes5 := LEFT.FIAdditionalCodes5;
+                                   SELF := RIGHT;)); 
   
-  final := ROLLUP(sortProducts,
-                  LEFT.seq = RIGHT.seq AND
-                  LEFT.acctNo = RIGHT.acctNo,
-                  TRANSFORM(DueDiligence.Layouts.BatchOut,
-                            SELF.lexIDChanged := LEFT.lexIDChanged OR RIGHT.lexIDChanged;
-                            SELF.PerLexID := DueDiligence.Common.firstPopulatedString(PerLexID);
-                            SELF.PerAssetOwnProperty := DueDiligence.Common.firstPopulatedString(PerAssetOwnProperty);
-                            SELF.PerAssetOwnProperty_Flag := DueDiligence.Common.firstPopulatedString(PerAssetOwnProperty_Flag);
-                            SELF.PerAssetOwnAircraft := DueDiligence.Common.firstPopulatedString(PerAssetOwnAircraft);
-                            SELF.PerAssetOwnAircraft_Flag := DueDiligence.Common.firstPopulatedString(PerAssetOwnAircraft_Flag);
-                            SELF.PerAssetOwnWatercraft := DueDiligence.Common.firstPopulatedString(PerAssetOwnWatercraft);
-                            SELF.PerAssetOwnWatercraft_Flag := DueDiligence.Common.firstPopulatedString(PerAssetOwnWatercraft_Flag);
-                            SELF.PerAssetOwnVehicle := DueDiligence.Common.firstPopulatedString(PerAssetOwnVehicle);
-                            SELF.PerAssetOwnVehicle_Flag := DueDiligence.Common.firstPopulatedString(PerAssetOwnVehicle_Flag);
-                            SELF.PerAccessToFundsIncome := DueDiligence.Common.firstPopulatedString(PerAccessToFundsIncome);
-                            SELF.PerAccessToFundsIncome_Flag := DueDiligence.Common.firstPopulatedString(PerAccessToFundsIncome_Flag);
-                            SELF.PerAccessToFundsProperty := DueDiligence.Common.firstPopulatedString(PerAccessToFundsProperty);
-                            SELF.PerAccessToFundsProperty_Flag := DueDiligence.Common.firstPopulatedString(PerAccessToFundsProperty_Flag);		
-                            SELF.PerGeographic := DueDiligence.Common.firstPopulatedString(PerGeographic);
-                            SELF.PerGeographic_Flag := DueDiligence.Common.firstPopulatedString(PerGeographic_Flag);
-                            SELF.PerMobility := DueDiligence.Common.firstPopulatedString(PerMobility);
-                            SELF.PerMobility_Flag := DueDiligence.Common.firstPopulatedString(PerMobility_Flag);
-                            SELF.PerStateLegalEvent := DueDiligence.Common.firstPopulatedString(PerStateLegalEvent);
-                            SELF.PerStateLegalEvent_Flag := DueDiligence.Common.firstPopulatedString(PerStateLegalEvent_Flag);
-                            SELF.PerFederalLegalEvent := DueDiligence.Common.firstPopulatedString(PerFederalLegalEvent);
-                            SELF.PerFederalLegalEvent_Flag := DueDiligence.Common.firstPopulatedString(PerFederalLegalEvent_Flag);
-                            SELF.PerFederalLegalMatchLevel := DueDiligence.Common.firstPopulatedString(PerFederalLegalMatchLevel);
-                            SELF.PerFederalLegalMatchLevel_Flag := DueDiligence.Common.firstPopulatedString(PerFederalLegalMatchLevel_Flag);
-                            SELF.PerCivilLegalEvent := DueDiligence.Common.firstPopulatedString(PerCivilLegalEvent);
-                            SELF.PerCivilLegalEvent_Flag := DueDiligence.Common.firstPopulatedString(PerCivilLegalEvent_Flag);
-                            SELF.PerOffenseType := DueDiligence.Common.firstPopulatedString(PerOffenseType);
-                            SELF.PerOffenseType_Flag := DueDiligence.Common.firstPopulatedString(PerOffenseType_Flag);
-                            SELF.PerAgeRange := DueDiligence.Common.firstPopulatedString(PerAgeRange);
-                            SELF.PerAgeRange_Flag := DueDiligence.Common.firstPopulatedString(PerAgeRange_Flag);
-                            SELF.PerIdentityRisk := DueDiligence.Common.firstPopulatedString(PerIdentityRisk);
-                            SELF.PerIdentityRisk_Flag := DueDiligence.Common.firstPopulatedString(PerIdentityRisk_Flag);
-                            SELF.PerUSResidency := DueDiligence.Common.firstPopulatedString(PerUSResidency);
-                            SELF.PerUSResidency_Flag := DueDiligence.Common.firstPopulatedString(PerUSResidency_Flag);
-                            SELF.PerMatchLevel := DueDiligence.Common.firstPopulatedString(PerMatchLevel);
-                            SELF.PerMatchLevel_Flag := DueDiligence.Common.firstPopulatedString(PerMatchLevel_Flag);
-                            SELF.PerAssociates := DueDiligence.Common.firstPopulatedString(PerAssociates);
-                            SELF.PerAssociates_Flag := DueDiligence.Common.firstPopulatedString(PerAssociates_Flag);
-                            SELF.PerProfLicense := DueDiligence.Common.firstPopulatedString(PerProfLicense);
-                            SELF.PerProfLicense_Flag := DueDiligence.Common.firstPopulatedString(PerProfLicense_Flag);
-                            SELF.PerBusAssociations := DueDiligence.Common.firstPopulatedString(PerBusAssociations);
-                            SELF.PerBusAssociations_Flag := DueDiligence.Common.firstPopulatedString(PerBusAssociations_Flag);
+  sortProducts := SORT(withFIFields, seq, acctNo);
+  
+  rollProducts := ROLLUP(sortProducts,
+                          LEFT.seq = RIGHT.seq AND
+                          LEFT.acctNo = RIGHT.acctNo,
+                          TRANSFORM({UNSIGNED6 inputSeq, DueDiligence.Layouts.BatchOut},
+                                    SELF.inputSeq := DueDiligence.Common.firstNonZeroNumber(inputSeq);
+                                    SELF.lexIDChanged := LEFT.lexIDChanged OR RIGHT.lexIDChanged;
+                                    SELF.PerLexID := DueDiligence.Common.firstPopulatedString(PerLexID);
+                                    SELF.PerLexIDMatch := DueDiligence.Common.firstPopulatedString(PerLexIDMatch);
+                                    SELF.PerAssetOwnProperty := DueDiligence.Common.firstPopulatedString(PerAssetOwnProperty);
+                                    SELF.PerAssetOwnProperty_Flag := DueDiligence.Common.firstPopulatedString(PerAssetOwnProperty_Flag);
+                                    SELF.PerAssetOwnAircraft := DueDiligence.Common.firstPopulatedString(PerAssetOwnAircraft);
+                                    SELF.PerAssetOwnAircraft_Flag := DueDiligence.Common.firstPopulatedString(PerAssetOwnAircraft_Flag);
+                                    SELF.PerAssetOwnWatercraft := DueDiligence.Common.firstPopulatedString(PerAssetOwnWatercraft);
+                                    SELF.PerAssetOwnWatercraft_Flag := DueDiligence.Common.firstPopulatedString(PerAssetOwnWatercraft_Flag);
+                                    SELF.PerAssetOwnVehicle := DueDiligence.Common.firstPopulatedString(PerAssetOwnVehicle);
+                                    SELF.PerAssetOwnVehicle_Flag := DueDiligence.Common.firstPopulatedString(PerAssetOwnVehicle_Flag);
+                                    SELF.PerAccessToFundsIncome := DueDiligence.Common.firstPopulatedString(PerAccessToFundsIncome);
+                                    SELF.PerAccessToFundsIncome_Flag := DueDiligence.Common.firstPopulatedString(PerAccessToFundsIncome_Flag);
+                                    SELF.PerAccessToFundsProperty := DueDiligence.Common.firstPopulatedString(PerAccessToFundsProperty);
+                                    SELF.PerAccessToFundsProperty_Flag := DueDiligence.Common.firstPopulatedString(PerAccessToFundsProperty_Flag);		
+                                    SELF.PerGeographic := DueDiligence.Common.firstPopulatedString(PerGeographic);
+                                    SELF.PerGeographic_Flag := DueDiligence.Common.firstPopulatedString(PerGeographic_Flag);
+                                    SELF.PerMobility := DueDiligence.Common.firstPopulatedString(PerMobility);
+                                    SELF.PerMobility_Flag := DueDiligence.Common.firstPopulatedString(PerMobility_Flag);
+                                    SELF.PerStateLegalEvent := DueDiligence.Common.firstPopulatedString(PerStateLegalEvent);
+                                    SELF.PerStateLegalEvent_Flag := DueDiligence.Common.firstPopulatedString(PerStateLegalEvent_Flag);
+                                    SELF.PerFederalLegalEvent := DueDiligence.Common.firstPopulatedString(PerFederalLegalEvent);
+                                    SELF.PerFederalLegalEvent_Flag := DueDiligence.Common.firstPopulatedString(PerFederalLegalEvent_Flag);
+                                    SELF.PerFederalLegalMatchLevel := DueDiligence.Common.firstPopulatedString(PerFederalLegalMatchLevel);
+                                    SELF.PerFederalLegalMatchLevel_Flag := DueDiligence.Common.firstPopulatedString(PerFederalLegalMatchLevel_Flag);
+                                    SELF.PerCivilLegalEvent := DueDiligence.Common.firstPopulatedString(PerCivilLegalEvent);
+                                    SELF.PerCivilLegalEvent_Flag := DueDiligence.Common.firstPopulatedString(PerCivilLegalEvent_Flag);
+                                    SELF.PerOffenseType := DueDiligence.Common.firstPopulatedString(PerOffenseType);
+                                    SELF.PerOffenseType_Flag := DueDiligence.Common.firstPopulatedString(PerOffenseType_Flag);
+                                    SELF.PerAgeRange := DueDiligence.Common.firstPopulatedString(PerAgeRange);
+                                    SELF.PerAgeRange_Flag := DueDiligence.Common.firstPopulatedString(PerAgeRange_Flag);
+                                    SELF.PerIdentityRisk := DueDiligence.Common.firstPopulatedString(PerIdentityRisk);
+                                    SELF.PerIdentityRisk_Flag := DueDiligence.Common.firstPopulatedString(PerIdentityRisk_Flag);
+                                    SELF.PerUSResidency := DueDiligence.Common.firstPopulatedString(PerUSResidency);
+                                    SELF.PerUSResidency_Flag := DueDiligence.Common.firstPopulatedString(PerUSResidency_Flag);
+                                    SELF.PerMatchLevel := DueDiligence.Common.firstPopulatedString(PerMatchLevel);
+                                    SELF.PerMatchLevel_Flag := DueDiligence.Common.firstPopulatedString(PerMatchLevel_Flag);
+                                    SELF.PerAssociates := DueDiligence.Common.firstPopulatedString(PerAssociates);
+                                    SELF.PerAssociates_Flag := DueDiligence.Common.firstPopulatedString(PerAssociates_Flag);
+                                    SELF.PerProfLicense := DueDiligence.Common.firstPopulatedString(PerProfLicense);
+                                    SELF.PerProfLicense_Flag := DueDiligence.Common.firstPopulatedString(PerProfLicense_Flag);
+                                    SELF.PerBusAssociations := DueDiligence.Common.firstPopulatedString(PerBusAssociations);
+                                    SELF.PerBusAssociations_Flag := DueDiligence.Common.firstPopulatedString(PerBusAssociations_Flag);
+                                    SELF.PerEmploymentIndustry := DueDiligence.Common.firstPopulatedString(PerEmploymentIndustry);
+                                    SELF.PerEmploymentIndustry_Flag := DueDiligence.Common.firstPopulatedString(PerEmploymentIndustry_Flag);
+                                    
+                                    SELF.BusLexID := DueDiligence.Common.firstPopulatedString(BusLexID);
+                                    SELF.BusLexIDMatch := DueDiligence.Common.firstPopulatedString(BusLexIDMatch);
+                                    SELF.BusAssetOwnProperty := DueDiligence.Common.firstPopulatedString(BusAssetOwnProperty);
+                                    SELF.BusAssetOwnProperty_Flag := DueDiligence.Common.firstPopulatedString(BusAssetOwnProperty_Flag);
+                                    SELF.BusAssetOwnAircraft := DueDiligence.Common.firstPopulatedString(BusAssetOwnAircraft);
+                                    SELF.BusAssetOwnAircraft_Flag := DueDiligence.Common.firstPopulatedString(BusAssetOwnAircraft_Flag);
+                                    SELF.BusAssetOwnWatercraft := DueDiligence.Common.firstPopulatedString(BusAssetOwnWatercraft);
+                                    SELF.BusAssetOwnWatercraft_Flag := DueDiligence.Common.firstPopulatedString(BusAssetOwnWatercraft_Flag);
+                                    SELF.BusAssetOwnVehicle := DueDiligence.Common.firstPopulatedString(BusAssetOwnVehicle);
+                                    SELF.BusAssetOwnVehicle_Flag := DueDiligence.Common.firstPopulatedString(BusAssetOwnVehicle_Flag);
+                                    SELF.BusAccessToFundsProperty := DueDiligence.Common.firstPopulatedString(BusAccessToFundsProperty);
+                                    SELF.BusAccessToFundsProperty_Flag := DueDiligence.Common.firstPopulatedString(BusAccessToFundsProperty_Flag);
+                                    SELF.BusGeographic := DueDiligence.Common.firstPopulatedString(BusGeographic);
+                                    SELF.BusGeographic_Flag := DueDiligence.Common.firstPopulatedString(BusGeographic_Flag);
+                                    SELF.BusValidity := DueDiligence.Common.firstPopulatedString(BusValidity);
+                                    SELF.BusValidity_Flag := DueDiligence.Common.firstPopulatedString(BusValidity_Flag);
+                                    SELF.BusStability := DueDiligence.Common.firstPopulatedString(BusStability);
+                                    SELF.BusStability_Flag := DueDiligence.Common.firstPopulatedString(BusStability_Flag);
+                                    SELF.BusIndustry := DueDiligence.Common.firstPopulatedString(BusIndustry);
+                                    SELF.BusIndustry_Flag := DueDiligence.Common.firstPopulatedString(BusIndustry_Flag);
+                                    SELF.BusStructureType := DueDiligence.Common.firstPopulatedString(BusStructureType);
+                                    SELF.BusStructureType_Flag := DueDiligence.Common.firstPopulatedString(BusStructureType_Flag);
+                                    SELF.BusSOSAgeRange := DueDiligence.Common.firstPopulatedString(BusSOSAgeRange);
+                                    SELF.BusSOSAgeRange_Flag := DueDiligence.Common.firstPopulatedString(BusSOSAgeRange_Flag);
+                                    SELF.BusPublicRecordAgeRange := DueDiligence.Common.firstPopulatedString(BusPublicRecordAgeRange);
+                                    SELF.BusPublicRecordAgeRange_Flag := DueDiligence.Common.firstPopulatedString(BusPublicRecordAgeRange_Flag);
+                                    SELF.BusShellShelf := DueDiligence.Common.firstPopulatedString(BusShellShelf);
+                                    SELF.BusShellShelf_Flag := DueDiligence.Common.firstPopulatedString(BusShellShelf_Flag);
+                                    SELF.BusMatchLevel := DueDiligence.Common.firstPopulatedString(BusMatchLevel);
+                                    SELF.BusMatchLevel_Flag := DueDiligence.Common.firstPopulatedString(BusMatchLevel_Flag);
+                                    SELF.BusStateLegalEvent := DueDiligence.Common.firstPopulatedString(BusStateLegalEvent);
+                                    SELF.BusStateLegalEvent_Flag := DueDiligence.Common.firstPopulatedString(BusStateLegalEvent_Flag);
+                                    SELF.BusFederalLegalEvent := DueDiligence.Common.firstPopulatedString(BusFederalLegalEvent);
+                                    SELF.BusFederalLegalEvent_Flag := DueDiligence.Common.firstPopulatedString(BusFederalLegalEvent_Flag);
+                                    SELF.BusFederalLegalMatchLevel := DueDiligence.Common.firstPopulatedString(BusFederalLegalMatchLevel);
+                                    SELF.BusFederalLegalMatchLevel_Flag := DueDiligence.Common.firstPopulatedString(BusFederalLegalMatchLevel_Flag);
+                                    SELF.BusCivilLegalEvent := DueDiligence.Common.firstPopulatedString(BusCivilLegalEvent);
+                                    SELF.BusCivilLegalEvent_Flag := DueDiligence.Common.firstPopulatedString(BusCivilLegalEvent_Flag);
+                                    SELF.BusOffenseType := DueDiligence.Common.firstPopulatedString(BusOffenseType);
+                                    SELF.BusOffenseType_Flag := DueDiligence.Common.firstPopulatedString(BusOffenseType_Flag);
+                                    SELF.BusBEOProfLicense := DueDiligence.Common.firstPopulatedString(BusBEOProfLicense);
+                                    SELF.BusBEOProfLicense_Flag := DueDiligence.Common.firstPopulatedString(BusBEOProfLicense_Flag);
+                                    SELF.BusBEOUSResidency := DueDiligence.Common.firstPopulatedString(BusBEOUSResidency);
+                                    SELF.BusBEOUSResidency_Flag := DueDiligence.Common.firstPopulatedString(BusBEOUSResidency_Flag);
+                                    SELF.BusAccessToFundSales := DueDiligence.Common.firstPopulatedString(BusAccessToFundSales);
+                                    SELF.BusAccessToFundsSales_Flag := DueDiligence.Common.firstPopulatedString(BusAccessToFundsSales_Flag);
+                                    SELF.BusBEOAccessToFundsProperty := DueDiligence.Common.firstPopulatedString(BusBEOAccessToFundsProperty);
+                                    SELF.BusBEOAccessToFundsProperty_Flag := DueDiligence.Common.firstPopulatedString(BusBEOAccessToFundsProperty_Flag);
+                                    SELF.BusLinkedBusinesses := DueDiligence.Common.firstPopulatedString(BusLinkedBusinesses);
+                                    SELF.BusLinkedBusinesses_Flag := DueDiligence.Common.firstPopulatedString(BusLinkedBusinesses_Flag);
+                                    
+                                    SELF.citizenshipScore := DueDiligence.Common.firstPopulatedString(citizenshipScore);
+                                    SELF.lexID := DueDiligence.Common.firstNonZeroNumber(lexID);
+                                    SELF.identityAge := DueDiligence.Common.firstNonZeroNumber(identityAge);
+                                    SELF.emergenceAgeHeader := DueDiligence.Common.firstNonZeroNumber(emergenceAgeHeader);
+                                    SELF.emergenceAgeBureau := DueDiligence.Common.firstNonZeroNumber(emergenceAgeBureau);
+                                    SELF.ssnIssuanceAge := DueDiligence.Common.firstNonZeroNumber(ssnIssuanceAge);
+                                    SELF.ssnIssuanceYears := DueDiligence.Common.firstNonZeroNumber(ssnIssuanceYears);
+                                    SELF.relativeCount := DueDiligence.Common.firstNonZeroNumber(relativeCount);
+                                    SELF.ver_voterRecords := DueDiligence.Common.firstNonZeroNumber(ver_voterRecords);
+                                    SELF.ver_insuranceRecords := DueDiligence.Common.firstNonZeroNumber(ver_insuranceRecords);
+                                    SELF.ver_studentFile := DueDiligence.Common.firstNonZeroNumber(ver_studentFile);
+                                    SELF.firstSeenAddr10 := DueDiligence.Common.firstNonZeroNumber(firstSeenAddr10);
+                                    SELF.reportedCurAddressYears := DueDiligence.Common.firstNonZeroNumber(reportedCurAddressYears);
+                                    SELF.addressFirstReportedAge := DueDiligence.Common.firstNonZeroNumber(addressFirstReportedAge);
+                                    SELF.timeSinceLastReportedNonBureau := DueDiligence.Common.firstNonZeroNumber(timeSinceLastReportedNonBureau);
+                                    SELF.inputSSNRandomlyIssued := DueDiligence.Common.firstNonZeroNumber(inputSSNRandomlyIssued);
+                                    SELF.inputSSNRandomIssuedInvalid := DueDiligence.Common.firstNonZeroNumber(inputSSNRandomIssuedInvalid);
+                                    SELF.inputSSNIssuedToNonUS := DueDiligence.Common.firstNonZeroNumber(inputSSNIssuedToNonUS);
+                                    SELF.inputSSNITIN := DueDiligence.Common.firstNonZeroNumber(inputSSNITIN);
+                                    SELF.inputSSNInvalid := DueDiligence.Common.firstNonZeroNumber(inputSSNInvalid);
+                                    SELF.inputSSNIssuedPriorDOB := DueDiligence.Common.firstNonZeroNumber(inputSSNIssuedPriorDOB);
+                                    SELF.inputSSNAssociatedMultLexIDs := DueDiligence.Common.firstNonZeroNumber(inputSSNAssociatedMultLexIDs);
+                                    SELF.inputSSNReportedDeceased := DueDiligence.Common.firstNonZeroNumber(inputSSNReportedDeceased);
+                                    SELF.inputSSNNotPrimaryLexID := DueDiligence.Common.firstNonZeroNumber(inputSSNNotPrimaryLexID);
+                                    SELF.lexIDBestSSNInvalid := DueDiligence.Common.firstNonZeroNumber(lexIDBestSSNInvalid);
+                                    SELF.lexIDReportedDeceased := DueDiligence.Common.firstNonZeroNumber(lexIDReportedDeceased);
+                                    SELF.lexIDMultipleSSNs := DueDiligence.Common.firstNonZeroNumber(lexIDMultipleSSNs);
+                                    SELF.inputComponentDivRisk := DueDiligence.Common.firstNonZeroNumber(inputComponentDivRisk);
+                                    
+                                    //pass thru input
+                                    SELF.FIAcctOpenDate := DueDiligence.Common.firstPopulatedString(FIAcctOpenDate);
+                                    SELF.FICRR := DueDiligence.Common.firstPopulatedString(FICRR);
+                                    SELF.FIAdditionalCodes1 := DueDiligence.Common.firstPopulatedString(FIAdditionalCodes1);
+                                    SELF.FIAdditionalCodes2 := DueDiligence.Common.firstPopulatedString(FIAdditionalCodes2);
+                                    SELF.FIAdditionalCodes3 := DueDiligence.Common.firstPopulatedString(FIAdditionalCodes3);
+                                    SELF.FIAdditionalCodes4 := DueDiligence.Common.firstPopulatedString(FIAdditionalCodes4);
+                                    SELF.FIAdditionalCodes5 := DueDiligence.Common.firstPopulatedString(FIAdditionalCodes5);
+                                    
+                                    SELF := LEFT;));
                             
-                            SELF.BusLexID := DueDiligence.Common.firstPopulatedString(BusLexID);
-                            SELF.BusAssetOwnProperty := DueDiligence.Common.firstPopulatedString(BusAssetOwnProperty);
-                            SELF.BusAssetOwnProperty_Flag := DueDiligence.Common.firstPopulatedString(BusAssetOwnProperty_Flag);
-                            SELF.BusAssetOwnAircraft := DueDiligence.Common.firstPopulatedString(BusAssetOwnAircraft);
-                            SELF.BusAssetOwnAircraft_Flag := DueDiligence.Common.firstPopulatedString(BusAssetOwnAircraft_Flag);
-                            SELF.BusAssetOwnWatercraft := DueDiligence.Common.firstPopulatedString(BusAssetOwnWatercraft);
-                            SELF.BusAssetOwnWatercraft_Flag := DueDiligence.Common.firstPopulatedString(BusAssetOwnWatercraft_Flag);
-                            SELF.BusAssetOwnVehicle := DueDiligence.Common.firstPopulatedString(BusAssetOwnVehicle);
-                            SELF.BusAssetOwnVehicle_Flag := DueDiligence.Common.firstPopulatedString(BusAssetOwnVehicle_Flag);
-                            SELF.BusAccessToFundsProperty := DueDiligence.Common.firstPopulatedString(BusAccessToFundsProperty);
-                            SELF.BusAccessToFundsProperty_Flag := DueDiligence.Common.firstPopulatedString(BusAccessToFundsProperty_Flag);
-                            SELF.BusGeographic := DueDiligence.Common.firstPopulatedString(BusGeographic);
-                            SELF.BusGeographic_Flag := DueDiligence.Common.firstPopulatedString(BusGeographic_Flag);
-                            SELF.BusValidity := DueDiligence.Common.firstPopulatedString(BusValidity);
-                            SELF.BusValidity_Flag := DueDiligence.Common.firstPopulatedString(BusValidity_Flag);
-                            SELF.BusStability := DueDiligence.Common.firstPopulatedString(BusStability);
-                            SELF.BusStability_Flag := DueDiligence.Common.firstPopulatedString(BusStability_Flag);
-                            SELF.BusIndustry := DueDiligence.Common.firstPopulatedString(BusIndustry);
-                            SELF.BusIndustry_Flag := DueDiligence.Common.firstPopulatedString(BusIndustry_Flag);
-                            SELF.BusStructureType := DueDiligence.Common.firstPopulatedString(BusStructureType);
-                            SELF.BusStructureType_Flag := DueDiligence.Common.firstPopulatedString(BusStructureType_Flag);
-                            SELF.BusSOSAgeRange := DueDiligence.Common.firstPopulatedString(BusSOSAgeRange);
-                            SELF.BusSOSAgeRange_Flag := DueDiligence.Common.firstPopulatedString(BusSOSAgeRange_Flag);
-                            SELF.BusPublicRecordAgeRange := DueDiligence.Common.firstPopulatedString(BusPublicRecordAgeRange);
-                            SELF.BusPublicRecordAgeRange_Flag := DueDiligence.Common.firstPopulatedString(BusPublicRecordAgeRange_Flag);
-                            SELF.BusShellShelf := DueDiligence.Common.firstPopulatedString(BusShellShelf);
-                            SELF.BusShellShelf_Flag := DueDiligence.Common.firstPopulatedString(BusShellShelf_Flag);
-                            SELF.BusMatchLevel := DueDiligence.Common.firstPopulatedString(BusMatchLevel);
-                            SELF.BusMatchLevel_Flag := DueDiligence.Common.firstPopulatedString(BusMatchLevel_Flag);
-                            SELF.BusStateLegalEvent := DueDiligence.Common.firstPopulatedString(BusStateLegalEvent);
-                            SELF.BusStateLegalEvent_Flag := DueDiligence.Common.firstPopulatedString(BusStateLegalEvent_Flag);
-                            SELF.BusFederalLegalEvent := DueDiligence.Common.firstPopulatedString(BusFederalLegalEvent);
-                            SELF.BusFederalLegalEvent_Flag := DueDiligence.Common.firstPopulatedString(BusFederalLegalEvent_Flag);
-                            SELF.BusFederalLegalMatchLevel := DueDiligence.Common.firstPopulatedString(BusFederalLegalMatchLevel);
-                            SELF.BusFederalLegalMatchLevel_Flag := DueDiligence.Common.firstPopulatedString(BusFederalLegalMatchLevel_Flag);
-                            SELF.BusCivilLegalEvent := DueDiligence.Common.firstPopulatedString(BusCivilLegalEvent);
-                            SELF.BusCivilLegalEvent_Flag := DueDiligence.Common.firstPopulatedString(BusCivilLegalEvent_Flag);
-                            SELF.BusOffenseType := DueDiligence.Common.firstPopulatedString(BusOffenseType);
-                            SELF.BusOffenseType_Flag := DueDiligence.Common.firstPopulatedString(BusOffenseType_Flag);
-                            SELF.BusBEOProfLicense := DueDiligence.Common.firstPopulatedString(BusBEOProfLicense);
-                            SELF.BusBEOProfLicense_Flag := DueDiligence.Common.firstPopulatedString(BusBEOProfLicense_Flag);
-                            SELF.BusBEOUSResidency := DueDiligence.Common.firstPopulatedString(BusBEOUSResidency);
-                            SELF.BusBEOUSResidency_Flag := DueDiligence.Common.firstPopulatedString(BusBEOUSResidency_Flag);
                             
-                            SELF.citizenshipScore := DueDiligence.Common.firstPopulatedString(citizenshipScore);
-                            SELF.lexID := DueDiligence.Common.firstNonZeroNumber(lexID);
-                            SELF.identityAge := DueDiligence.Common.firstNonZeroNumber(identityAge);
-                            SELF.emergenceAgeHeader := DueDiligence.Common.firstNonZeroNumber(emergenceAgeHeader);
-                            SELF.emergenceAgeBureau := DueDiligence.Common.firstNonZeroNumber(emergenceAgeBureau);
-                            SELF.ssnIssuanceAge := DueDiligence.Common.firstNonZeroNumber(ssnIssuanceAge);
-                            SELF.ssnIssuanceYears := DueDiligence.Common.firstNonZeroNumber(ssnIssuanceYears);
-                            SELF.relativeCount := DueDiligence.Common.firstNonZeroNumber(relativeCount);
-                            SELF.ver_voterRecords := DueDiligence.Common.firstNonZeroNumber(ver_voterRecords);
-                            SELF.ver_insuranceRecords := DueDiligence.Common.firstNonZeroNumber(ver_insuranceRecords);
-                            SELF.ver_studentFile := DueDiligence.Common.firstNonZeroNumber(ver_studentFile);
-                            SELF.firstSeenAddr10 := DueDiligence.Common.firstNonZeroNumber(firstSeenAddr10);
-                            SELF.reportedCurAddressYears := DueDiligence.Common.firstNonZeroNumber(reportedCurAddressYears);
-                            SELF.addressFirstReportedAge := DueDiligence.Common.firstNonZeroNumber(addressFirstReportedAge);
-                            SELF.timeSinceLastReportedNonBureau := DueDiligence.Common.firstNonZeroNumber(timeSinceLastReportedNonBureau);
-                            SELF.inputSSNRandomlyIssued := DueDiligence.Common.firstNonZeroNumber(inputSSNRandomlyIssued);
-                            SELF.inputSSNRandomIssuedInvalid := DueDiligence.Common.firstNonZeroNumber(inputSSNRandomIssuedInvalid);
-                            SELF.inputSSNIssuedToNonUS := DueDiligence.Common.firstNonZeroNumber(inputSSNIssuedToNonUS);
-                            SELF.inputSSNITIN := DueDiligence.Common.firstNonZeroNumber(inputSSNITIN);
-                            SELF.inputSSNInvalid := DueDiligence.Common.firstNonZeroNumber(inputSSNInvalid);
-                            SELF.inputSSNIssuedPriorDOB := DueDiligence.Common.firstNonZeroNumber(inputSSNIssuedPriorDOB);
-                            SELF.inputSSNAssociatedMultLexIDs := DueDiligence.Common.firstNonZeroNumber(inputSSNAssociatedMultLexIDs);
-                            SELF.inputSSNReportedDeceased := DueDiligence.Common.firstNonZeroNumber(inputSSNReportedDeceased);
-                            SELF.inputSSNNotPrimaryLexID := DueDiligence.Common.firstNonZeroNumber(inputSSNNotPrimaryLexID);
-                            SELF.lexIDBestSSNInvalid := DueDiligence.Common.firstNonZeroNumber(lexIDBestSSNInvalid);
-                            SELF.lexIDReportedDeceased := DueDiligence.Common.firstNonZeroNumber(lexIDReportedDeceased);
-                            SELF.lexIDMultipleSSNs := DueDiligence.Common.firstNonZeroNumber(lexIDMultipleSSNs);
-                            SELF.inputComponentDivRisk := DueDiligence.Common.firstNonZeroNumber(inputComponentDivRisk);
-                            
-                            SELF := LEFT;));
-                            
-                            
+  final := PROJECT(rollProducts, TRANSFORM(DueDiligence.Layouts.BatchOut,
+                                            SELF.seq := LEFT.inputSeq;
+                                            SELF := LEFT;));
 
   
   IF(debugIndicator, output(citResults, NAMED('citizenshipResults')));

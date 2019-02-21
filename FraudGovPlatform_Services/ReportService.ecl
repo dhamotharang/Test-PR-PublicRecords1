@@ -8,6 +8,7 @@ IMPORT BatchShare,doxie, FraudShared_Services, iesp, WSInput;
 
 EXPORT ReportService() := MACRO
   #CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+	#CONSTANT ('FraudPlatform', 'FraudGov');
 
 	//The following macro defines the field sequence on WsECL page of query.
 	WSInput.MAC_FraudGovPlatform_Services_ReportService();
@@ -34,6 +35,42 @@ EXPORT ReportService() := MACRO
 	MaxKnownFrauds := MAP(~Options.IsOnline and Options.MaxKnownRisks > 0 => MIN(Options.MaxKnownRisks, iesp.Constants.FraudGov.MAX_COUNT_KNOWN_RISK),
 												~Options.IsOnline and Options.MaxKnownRisks = 0 => iesp.Constants.FraudGov.MAX_COUNT_KNOWN_RISK,
 												0);
+												
+	MaxCriminals := MAP(~Options.IsOnline and Options.MaxCriminals > 0 => MIN(Options.MaxCriminals, iesp.Constants.FraudGov.MAX_COUNT_CRIMINAL),
+												~Options.IsOnline and Options.MaxCriminals = 0 => iesp.Constants.FraudGov.MAX_COUNT_CRIMINAL,
+												0);
+												
+	MaxRedFlags := MAP(~Options.IsOnline and Options.MaxRedFlags > 0 => MIN(Options.MaxRedFlags, iesp.Constants.FraudGov.MAX_COUNT_RED_FLAG),
+												~Options.IsOnline and Options.MaxRedFlags = 0 => iesp.Constants.FraudGov.MAX_COUNT_RED_FLAG,
+												0);
+	
+	MaxGlobalWatchLists := MAP(~Options.IsOnline and Options.MaxGlobalWatchLists > 0 => MIN(Options.MaxGlobalWatchLists, iesp.Constants.FraudGov.MAX_COUNT_GLOBAL_WATCHLIST),
+												~Options.IsOnline and Options.MaxGlobalWatchLists = 0 => iesp.Constants.FraudGov.MAX_COUNT_GLOBAL_WATCHLIST,
+												0);
+												
+	MaxIndicatorAttributes := MAP(Options.IsOnline and Options.MaxIndicatorAttributes > 0 => MIN(Options.MaxIndicatorAttributes, iesp.Constants.FraudGov.MAX_COUNT_INDICATOR_ATTRIBUTE),
+												Options.IsOnline and Options.MaxIndicatorAttributes = 0 => iesp.Constants.FraudGov.MAX_COUNT_INDICATOR_ATTRIBUTE,
+												0);
+												
+	MaxScoreBreakdown := MAP(Options.IsOnline and Options.MaxScoreBreakdown > 0 => MIN(Options.MaxScoreBreakdown, iesp.Constants.FraudGov.MAX_COUNT_SCORE_BREAKDOWN),
+												Options.IsOnline and Options.MaxScoreBreakdown = 0 => iesp.Constants.FraudGov.MAX_COUNT_SCORE_BREAKDOWN,
+												0);
+												
+	MaxAssociatedIdentities := MAP(Options.IsOnline and Options.MaxAssociatedIdentities > 0 => MIN(Options.MaxAssociatedIdentities, iesp.Constants.FraudGov.MAX_COUNT_ASSOCIATED_IDENTITY),
+												Options.IsOnline and Options.MaxAssociatedIdentities = 0 => iesp.Constants.FraudGov.MAX_COUNT_ASSOCIATED_IDENTITY,
+												0);
+												
+  MaxAssociatedAddresses := MAP(Options.IsOnline and Options.MaxAssociatedAddresses > 0 => MIN(Options.MaxAssociatedAddresses, iesp.Constants.FraudGov.MAX_COUNT_ASSOCIATED_ADDRESS),
+												Options.IsOnline and Options.MaxAssociatedAddresses = 0 => iesp.Constants.FraudGov.MAX_COUNT_ASSOCIATED_ADDRESS,
+												0);
+												
+	MaxRelatedClusters := MAP(Options.IsOnline and Options.MaxRelatedClusters > 0 => MIN(Options.MaxRelatedClusters, iesp.Constants.FraudGov.MAX_COUNT_CLUSTER),
+												Options.IsOnline and Options.MaxRelatedClusters = 0 => iesp.Constants.FraudGov.MAX_COUNT_CLUSTER,
+												0);
+	
+	MaxTimelineDetails := MAP(Options.IsOnline and Options.MaxTimelineDetails > 0 => MIN(Options.MaxTimelineDetails, iesp.Constants.FraudGov.MAX_COUNT_TIMELINE_DETAILS),
+												Options.IsOnline and Options.MaxTimelineDetails = 0 => iesp.Constants.FraudGov.MAX_COUNT_TIMELINE_DETAILS,
+												0);
 
 	#STORED('AppendBest', Options.AppendBest);
 	#STORED('DIDScoreThreshold', Options.DIDScoreThreshold);
@@ -43,11 +80,19 @@ EXPORT ReportService() := MACRO
 	#STORED('AgencyVerticalType', Options.AgencyVerticalType);
 	#STORED('AgencyCounty',  Options.AgencyCounty);
 	#STORED('AgencyState',  Options.AgencyState);
-	#STORED('FraudPlatform',	Options.Platform);
 	#STORED('IsOnline',	Options.IsOnline);
 	#STORED('useAllSearchFields',	Options.useAllSearchFields);
 	#STORED('MaxVelocities', MaxVelocities);
 	#STORED('MaxKnownFrauds', MaxKnownFrauds);
+	#STORED('MaxCriminals', MaxCriminals);
+	#STORED('MaxRedFlags', MaxRedFlags);
+	#STORED('MaxGlobalWatchLists', MaxGlobalWatchLists);
+	#STORED('MaxIndicatorAttributes', MaxIndicatorAttributes);
+	#STORED('MaxScoreBreakdown', MaxScoreBreakdown);
+	#STORED('MaxAssociatedIdentities', MaxAssociatedIdentities);
+	#STORED('MaxAssociatedAddresses', MaxAssociatedAddresses);
+	#STORED('MaxRelatedClusters', MaxRelatedClusters);
+	#STORED('MaxTimelineDetails', MaxTimelineDetails);
 
 	GetReportModule(iesp.fraudgovreport.t_FraudGovReportBy reportBy) := FUNCTION
 		FraudShared_Services.Layouts.BatchIn_rec xform_batch_in() := TRANSFORM

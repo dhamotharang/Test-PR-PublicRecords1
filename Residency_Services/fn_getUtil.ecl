@@ -9,9 +9,9 @@ EXPORT fn_getUtil(DATASET(doxie.layout_references_acctno) ds_in_acctnos_dids,
 	ds_util_in_dd := DEDUP(SORT(ds_util_in, did), did);
 
 	ds_util_recs := doxie_raw.Util_Daily_Raw(ds_util_in_dd,
-	                                         dppa_purpose         := mod_params_in.DPPAPurpose,
-																				   glb_purpose          := mod_params_in.GLBPurpose,
-																				   industry_class_value := mod_params_in.industryclass);
+	                                         dppa_purpose         := mod_params_in.dppa,
+																				   glb_purpose          := mod_params_in.glb,
+																				   industry_class_value := mod_params_in.industry_class);
 	
 	TodaysDate := Residency_Services.Constants.TodaysDate;
 

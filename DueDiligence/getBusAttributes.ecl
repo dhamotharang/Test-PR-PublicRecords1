@@ -6,8 +6,8 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 												BIPV2.mod_sources.iParams linkingOptions,
 												BOOLEAN includeReport = FALSE,
 												BOOLEAN displayAttributeText = FALSE,
-												string6 DD_SSNMask = '',
-                                                BOOLEAN debugMode = FALSE) := FUNCTION
+												STRING6 DD_SSNMask = '',
+                        BOOLEAN debugMode = FALSE) := FUNCTION
 
   
 	
@@ -15,10 +15,11 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	
 
 	//get the inquired business information - this includes BIP IDs and Best Data
-  inquiredBus := DueDiligence.getBusInfo(cleanedInput);
-	//seperate those with BIP IDs and those without/not found
-	inquiredBusWithBIP := inquiredBus(Busn_Info.BIP_IDs.PowID.LinkID <> DueDiligence.Constants.NUMERIC_ZERO OR Busn_Info.BIP_IDs.ProxID.LinkID <> DueDiligence.Constants.NUMERIC_ZERO OR Busn_Info.BIP_IDs.SeleID.LinkID <> DueDiligence.Constants.NUMERIC_ZERO OR Busn_Info.BIP_IDs.OrgID.LinkID <> DueDiligence.Constants.NUMERIC_ZERO OR Busn_Info.BIP_IDs.UltID.LinkID <> DueDiligence.Constants.NUMERIC_ZERO);
-	inquiredBusNoBIP := inquiredBus(Busn_Info.BIP_IDs.PowID.LinkID = DueDiligence.Constants.NUMERIC_ZERO AND Busn_Info.BIP_IDs.ProxID.LinkID = DueDiligence.Constants.NUMERIC_ZERO AND Busn_Info.BIP_IDs.SeleID.LinkID = DueDiligence.Constants.NUMERIC_ZERO AND Busn_Info.BIP_IDs.OrgID.LinkID = DueDiligence.Constants.NUMERIC_ZERO AND Busn_Info.BIP_IDs.UltID.LinkID = DueDiligence.Constants.NUMERIC_ZERO);
+  inquiredBus := DueDiligence.getBusInfo(cleanedInput, options, linkingOptions);
+	
+	//seperate those with LexIDs and those without/not found
+	inquiredBusWithBIP := inquiredBus(Busn_Info.BIP_IDs.SeleID.LinkID <> DueDiligence.Constants.NUMERIC_ZERO);
+	inquiredBusNoBIP := inquiredBus(Busn_Info.BIP_IDs.SeleID.LinkID = DueDiligence.Constants.NUMERIC_ZERO);
 	
 	//get linked business to the business passed in
 	linkedBus := DueDiligence.getBusLinkedBus(inquiredBusWithBIP, options, linkingOptions, DD_SSNMask);

@@ -1,4 +1,4 @@
-IMPORT iesp, doxie, doxie_crs, AutoHeaderI,marriage_divorce_v2_Services;
+﻿IMPORT iesp, doxie, marriage_divorce_v2_Services;
 
 mardiv_layout    := iesp.marriagedivorce.t_MarriageSearch2Record;
 partyLayout      := iesp.marriagedivorce.t_MarriageSearch2Party ;
@@ -11,8 +11,8 @@ EXPORT mardiv_layout marriagedivorce_records (
   ) := FUNCTION
   //get marriage and divorce records for did
   mdDids := project(dids,marriage_divorce_v2_Services.layouts.l_did);
-  ds_mardiv := marriage_divorce_v2_Services.MDRaw.wide_view.by_did(mdDids);
-  
+  ds_mardiv_ids := marriage_divorce_v2_Services.MDRaw.get_id_from_did (mdDids);
+	ds_mardiv := marriage_divorce_v2_Services.MDRaw.wide_view.by_id(ds_mardiv_ids);
   
   partyLayout formatParty(partyRawLayout L) := transform
     self.UniqueId                     := INTFORMAT(L.did,12,1);   //left padded w/ zeros to 12 chars  
@@ -56,7 +56,10 @@ EXPORT mardiv_layout marriagedivorce_records (
   end;
  
   outRecs := project (ds_mardiv, formatMarDiv (Left));
+	
+	// output(mdDids,named('mdDids'));
+	// output(ds_mardiv_ids,named('ds_mardiv_ids'));
+	// output(ds_mardiv,named('ds_mardiv'));
   
   RETURN outRecs;
 END;
-

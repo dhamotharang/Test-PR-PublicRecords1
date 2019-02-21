@@ -1,4 +1,4 @@
-IMPORT Gateway, Inquiry_Deltabase, Inquiry_AccLogs, Risk_Indicators, RiskWise, Suspicious_Fraud_LN, UT;
+﻿IMPORT Gateway, Inquiry_Deltabase, Inquiry_AccLogs, Risk_Indicators, RiskWise, Suspicious_Fraud_LN, UT;
 
 EXPORT Inquiry_Deltabase.Layouts.Inquiry_Address Search_Address (DATASET(Inquiry_Deltabase.Layouts.Input_Deltabase_Address) SearchInput,
 																																SET OF STRING100 FunctionDescriptions, // Example: Inquiry_AccLogs.shell_constants.set_valid_nonfcra_functions
@@ -37,7 +37,7 @@ EXPORT Inquiry_Deltabase.Layouts.Inquiry_Address Search_Address (DATASET(Inquiry
 									// Select the Deltabase Table
 									'FROM delta_shell.inquiry_nonfcra i ' +
 									// Done Generating the Response Layout, now pick out the right address
-									'WHERE i.Clean_Zip5 = \'' + Zip5 + '\' AND i.Clean_Prim_Name = \'' + Prim_Name + '\' AND i.Clean_Prim_Range = \'' + Prim_Range + '\' AND i.Clean_Sec_Range = \'' + Sec_Range + '\' ' +
+									'WHERE ISNULL(i.Clean_Zip5, \'\') = \'' + Zip5 + '\' AND ISNULL(i.Clean_Prim_Name, \'\') = \'' + Prim_Name + '\' AND ISNULL(i.Clean_Prim_Range, \'\') = \'' + Prim_Range + '\' AND ISNULL(i.Clean_Sec_Range, \'\') = \'' + Sec_Range + '\' ' + 
 									// Now limit it to only the Function Descriptions that are allowed for this product
 									'AND i.Function_Description IN ' + FunctionDescriptionInSQL + ' ' +
 									// And make sure to LIMIT the response so the SQL server isn't overloaded
@@ -120,7 +120,8 @@ EXPORT Inquiry_Deltabase.Layouts.Inquiry_Address Search_Address (DATASET(Inquiry
 		SELF := le;
 		SELF := [];
 	END;
-	DeltabaseResults := PROJECT(DeltabaseResponse.Response, intoKeyLayout(LEFT)) (Zip <> '' AND Prim_Name <> ''); // Only return valid addresses (In case Deltabase Errors)
+	
+  DeltabaseResults := PROJECT(DeltabaseResponse.Response, intoKeyLayout(LEFT)) (Zip <> '' AND Prim_Name <> ''); // Only return valid addresses (In case Deltabase Errors)
 	
 	RETURN(DeltabaseResults);
 END;

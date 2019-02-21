@@ -61,7 +61,7 @@ EXPORT reportBusRegisteredAgents(DATASET(DueDiligence.layouts.Busn_Internal) inD
     
     
     //get LexIDs
-    busLexIDs := DueDiligence.getBusInfo(cleanBusAgent.clean);
+    busLexIDs := DueDiligence.getBusInfo(cleanBusAgent.clean, options, linkingOptions);
     indLexIDs := DueDiligence.getIndDID(cleanIndAgent.clean, options.DataRestrictionMask, options.DPPA_Purpose, options.GLBA_Purpose,
                                         DueDiligence.CitDDShared.DEFAULT_BS_VERSION, DueDiligence.CitDDShared.DEFAULT_BS_OPTIONS);
    

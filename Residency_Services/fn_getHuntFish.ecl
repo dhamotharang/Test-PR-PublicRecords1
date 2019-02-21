@@ -9,8 +9,8 @@ EXPORT fn_getHuntFish (DATASET(doxie.layout_references_acctno) ds_in_acctnos_did
 	Ded_HF_In := DEDUP(SORT(HF_In, did), did);
 
 	HuntFishRecs:= doxie_raw.hunt_raw(Ded_HF_In,
-															      glb_purpose  := mod_params_in.GLBPurpose,
-																		dppa_purpose := mod_params_in.DPPAPurpose);
+															      glb_purpose  := mod_params_in.glb,
+																		dppa_purpose := mod_params_in.dppa);
 
 	SlimHFrec := RECORD
 		Residency_Services.Layouts.Int_Service_output;
