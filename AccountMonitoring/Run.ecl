@@ -1,4 +1,4 @@
-﻿/* For notes, see the _Documentation_forAccountMonitoring attribute. */
+/* For notes, see the _Documentation_forAccountMonitoring attribute. */
 
 IMPORT AccountMonitoring;
 
@@ -204,7 +204,6 @@ EXPORT Run( AccountMonitoring.types.productMask product_mask = AccountMonitoring
 													 IF(product_config.watercraft.product_is_in_mask,update_history_file_watercraft)
 													);
 		
-		output('thordev repo');
 		RETURN SEQUENTIAL(
 			IF(pseudo_environment = AccountMonitoring.constants.pseudo.DEFAULT OR pseudo_environment NOT IN AccountMonitoring.constants.all_pseudo,
 				FAIL('Must provide valid pseudo-environment.')),

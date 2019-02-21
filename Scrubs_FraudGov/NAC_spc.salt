@@ -30,21 +30,21 @@ FIELDTYPE:invalid_name:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxy
 FIELD:SearchAddress1StreetAddress1:TYPE(string70):LIKE(invalid_alphanumeric):0,0
 FIELD:SearchAddress1StreetAddress2:TYPE(string70):LIKE(invalid_alphanumeric):0,0
 FIELD:SearchAddress1City:TYPE(string30):LIKE(invalid_alphanumeric):0,0
-FIELD:SearchAddress1State:TYPE(string2):LIKE(invalid_alphanumeric):0,0 
-FIELD:SearchAddress1Zip:TYPE(string9):LIKE(invalid_alphanumeric):0,0
+FIELD:SearchAddress1State:TYPE(string2):LIKE(invalid_state):0,0 
+FIELD:SearchAddress1Zip:TYPE(string9):LIKE(invalid_zip):0,0
 FIELD:SearchAddress2StreetAddress1:TYPE(string70):LIKE(invalid_alphanumeric):0,0
 FIELD:SearchAddress2StreetAddress2:TYPE(string70):LIKE(invalid_alphanumeric):0,0
 FIELD:SearchAddress2City:TYPE(string30):LIKE(invalid_alphanumeric):0,0
-FIELD:SearchAddress2State:TYPE(string2):LIKE(invalid_alphanumeric):0,0
-FIELD:SearchAddress2Zip:TYPE(string9):LIKE(invalid_alphanumeric):0,0
+FIELD:SearchAddress2State:TYPE(string2):LIKE(invalid_state):0,0
+FIELD:SearchAddress2Zip:TYPE(string9):LIKE(invalid_zip):0,0
 FIELD:SearchCaseId:TYPE(string20):LIKE(invalid_alphanumeric):0,0
-FIELD:enduserip:TYPE(string15):LIKE(invalid_alphanumeric):0,0
+FIELD:enduserip:TYPE(string15):LIKE(invalid_ip):0,0
 FIELD:CaseID:TYPE(string20):LIKE(invalid_alphanumeric):0,0
-FIELD:ClientFirstName:TYPE(string25):LIKE(invalid_alphanumeric):0,0
-FIELD:ClientMiddleName:TYPE(string25):LIKE(invalid_alphanumeric):0,0
-FIELD:ClientLastName:TYPE(string30):LIKE(invalid_alphanumeric):0,0
-FIELD:ClientPhone:TYPE(string10):LIKE(invalid_alphanumeric):0,0
-FIELD:ClientEmail:TYPE(string256):LIKE(invalid_alphanumeric):0,0
+FIELD:ClientFirstName:TYPE(string25):LIKE(invalid_name):0,0
+FIELD:ClientMiddleName:TYPE(string25):LIKE(invalid_name):0,0
+FIELD:ClientLastName:TYPE(string30):LIKE(invalid_name):0,0
+FIELD:ClientPhone:TYPE(string10):LIKE(invalid_phone):0,0
+FIELD:ClientEmail:TYPE(string256):LIKE(invalid_email):0,0
 // CONCEPT statements should be used to group together interellated fields; such as address
 // RELATIONSHIP is used to find non-obvious relationships between the clusters
 // SOURCEFIELD is used if a field of the file denotes a source of the records in that file

@@ -1,1 +1,0 @@
-EXPORT TempFactDataset := DATASET([ {1}, {2}, {3}, {4}, {5}], {INTEGER1 facttype});
