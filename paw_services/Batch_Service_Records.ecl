@@ -1,5 +1,5 @@
-
-IMPORT Autokey_batch, AutokeyB2, BatchServices, Doxie, PAW, paw_services, AutokeyB2_batch, NID;
+﻿
+IMPORT Autokey_batch, AutokeyB2, BatchServices, Doxie, PAW, paw_services, AutokeyB2_batch, NID, BatchShare, Suppress;
 
 EXPORT Batch_Service_Records( DATASET(Autokey_batch.Layouts.rec_inBatchMaster) ds_batch_in = DATASET([],Autokey_batch.Layouts.rec_inBatchMaster),
                               BOOLEAN return_current_only = FALSE ) := 
@@ -174,9 +174,15 @@ EXPORT Batch_Service_Records( DATASET(Autokey_batch.Layouts.rec_inBatchMaster) d
 																			 SELF := LEFT,
 																			 SELF := []
 																			 ));
-
-    all_recsTmp := DEDUP(GROUP(all_recs + too_many_w_error_code, acctno, did), true, keep(5));
-		
+				
+		to_suppress := all_recs + too_many_w_error_code;
+				
+		//Suppress by SSN and DID.
+		base_params := BatchShare.IParam.getBatchParams();
+		Suppress.MAC_Suppress(to_suppress, ssn_suppressed, base_params.applicationType, Suppress.Constants.LinkTypes.SSN, ssn);
+		Suppress.MAC_Suppress(ssn_suppressed, did_suppressed, base_params.applicationType, Suppress.Constants.LinkTypes.DID, did);
+			
+  all_recsTmp := DEDUP(GROUP(did_suppressed, acctno, did), true, keep(5));
 		all_recs_rolled := ROLLUP(all_recsTmp, GROUP, paw_services.Functions.Batch_view.format_batch_out(LEFT,rows(LEFT)));
 		
 		// 8. Business rule: the system must return only one matching row (having the lowest penalty) for  
