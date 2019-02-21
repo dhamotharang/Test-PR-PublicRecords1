@@ -1055,7 +1055,9 @@ end;
 	END;
 			
 	EXPORT Associate_Base := FUNCTION
-		hist_base	:= Mark_history(Enclarity.Files(filedate,pUseProd).associate_base.built, layouts.associate_base);
+		hist_base0	:= Mark_history(Enclarity.Files(filedate,pUseProd).associate_base.built, layouts.associate_base);
+		
+		hist_base		:= dedup(hist_base0, all):persist('thor_data400::persist::enclarity::associate_dedup_hist');
 
 		std_input := Enclarity.StandardizeInputFile(filedate, pUseProd).Associate;
 		
@@ -1064,7 +1066,9 @@ end;
 		
 		cleanNames := Clean_name(sort_std, Enclarity.Layouts.associate_base,true):persist('~thor_data400::persist::enclarity::associate_afternames');
 
-		cleanAdd_a	:= Clean_addr(cleanNames, Enclarity.layouts.associate_base):PERSIST('~thor_data400::persist::enclarity::associate_addr');
+		cleanAdd_a0	:= Clean_addr(cleanNames, Enclarity.layouts.associate_base):PERSIST('~thor_data400::persist::enclarity::associate_addr');
+		
+		cleanAdd_a	:= dedup(cleanAdd_a0, all);
 
 		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Filenames(filedate, pUseProd).associate_lBaseTemplate_built)) = 0
 												 ,cleanAdd_a
@@ -1116,8 +1120,8 @@ fn_rollup(dataset(enclarity.layouts.associate_base) d) := function
 										,t_rollup(LEFT,RIGHT),LOCAL);
 			return base_n;
 end;
-
-		new_base_d := DISTRIBUTE(base_and_update, HASH(group_key));
+		new_base_d0	:= dedup(base_and_update, all);
+		new_base_d := DISTRIBUTE(new_base_d0, HASH(group_key, addr_key, record_type));
 		
 		c_base_d	:= new_base_d(record_type <> 'H' or (record_type = 'H' and clean_dob =''));
 		h_base_d	:= new_base_d(record_type = 'H' and clean_dob <> '');
@@ -1146,7 +1150,8 @@ end;
 										);
 							
 		all_dob	:= c_dob_d + h_dob_d;
-		sort_dob	:= fn_rollup(all_dob);
+		dedup_all_dob	:= dedup(all_dob, all);
+		sort_dob	:= fn_rollup(dedup_all_dob);
 		c_all_dob	:= sort_dob(record_type <> 'H' or (record_type = 'H' and clean_ssn = ''));
 		h_all_dob	:= sort_dob(record_type = 'H' and clean_ssn <> '');
 
@@ -1172,7 +1177,8 @@ end;
 										);
 										
 		all_ssn := c_base_s + h_base_s;
-		sort_ssn	:= fn_rollup(all_ssn);
+		dedup_all_ssn := dedup(all_ssn, all);
+		sort_ssn	:= fn_rollup(dedup_all_ssn);
 	
 		fac_file	:= distribute(Enclarity.Files().facility_base.built, hash(group_key));
     fac_file_dedup	:= dedup(sort(fac_file, group_key,record_type,type1, local),group_key,record_type,type1, local);
@@ -1187,7 +1193,8 @@ end;
 										,LOCAL
 										);
 		
-		sort_sloc	:= fn_rollup(base_f);
+		dedup_base_f := dedup(base_f, all);
+		sort_sloc	:= fn_rollup(dedup_base_f);
 	
 		base_f1	:= JOIN(sort(distribute(sort_sloc, hash(billing_group_key)), billing_group_key, local), fac_file_dedup
 										,LEFT.billing_group_key = RIGHT.group_key
@@ -1198,8 +1205,9 @@ end;
 										,LEFT OUTER
 										,LOCAL
 										);
-								
-		sort_bill	:= fn_rollup(base_f1);
+		
+		dedup_base_f1 := dedup(base_f1, all);
+		sort_bill	:= fn_rollup(dedup_base_f1);
 		dist_bill	:= distribute(sort_bill, hash(group_key, prepped_name, addr_key, prepped_addr1, prepped_addr2, normed_name_rec_type, addr_phone, sloc_phone, sloc_group_key, billing_group_key));		
 		
 		Enclarity.Layouts.associate_base GetSourceRID(dist_bill L)	:= TRANSFORM
@@ -1235,7 +1243,8 @@ end;
 			
 		d_rid	:= PROJECT(dist_bill, GetSourceRID(left));
 		sort_rid	:= fn_rollup(d_rid);
-		needs_did	:= sort_rid;	// Product wants to re-append with each build
+		// needs_did	:= sort_rid;	// Product wants to re-append with each build
+		needs_did	:= dedup(sort_rid, all);	// Product wants to re-append with each build
 		dedup_needs_did	:= dedup(sort(distribute(needs_did, hash(clean_ssn, clean_dob, fname, mname, lname, name_suffix, prim_range,
 									prim_name, sec_range, zip, st, clean_phone)), clean_ssn, clean_dob, fname, mname, lname, name_suffix, prim_range,
 									prim_name, sec_range, zip, st, clean_phone, local), clean_ssn, clean_dob, fname, mname, lname, name_suffix, prim_range,
@@ -1290,14 +1299,16 @@ end;
 					,LOCAL);		
 
 		all_did	:= rejoin_did;
-		sort_did	:= fn_rollup(all_did);
+		dedup_all_did := dedup(all_did, all);
+		sort_did	:= fn_rollup(dedup_all_did);
 		has_best	:= sort_did(best_ssn <>'' and best_ssn <> '0');
 		needs_best	:= sort_did(best_ssn = '' or best_ssn = '0');
 		
 		did_add.MAC_Add_SSN_By_DID(needs_best,did,best_ssn,d_ssn);
 		all_best	:= has_best + d_ssn;
-		has_bestbd	:= all_best(best_dob > 0);
-		needs_bestbd	:= all_best(best_dob = 0);
+		dedup_all_best := dedup(all_best, all);
+		has_bestbd	:= dedup_all_best(best_dob > 0);
+		needs_bestbd	:= dedup_all_best(best_dob = 0);
 
 		did_add.MAC_Add_DOB_By_DID(needs_bestbd,did,best_dob,d_dob0);
 		all_bestbd	:= has_bestbd + d_dob0;
@@ -1456,7 +1467,8 @@ end;
 					,LOCAL);		
 
 		endfile	:= rejoin_lnpid;
-		rolled_end:=fn_rollup(endfile);
+		// rolled_end:=fn_rollup(endfile);
+		rolled_end:=dedup(endfile, all);
 		RETURN rolled_end;
 	END;
 	
