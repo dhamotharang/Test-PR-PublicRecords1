@@ -10,6 +10,7 @@ EXPORT Standardize_NameAddr := MODULE
 			
 		// -- Mapping Clean company name and clean phone numbers
 		Equifax_Business_Data.Layouts.Base tMapCleanCompanyName(pPreProcessInput L) := TRANSFORM   
+		  SElF.record_sid := L.rcid;
 			SELF.clean_company_name := L.normCompany_Name;
 			SELF.clean_phone := ut.CleanPhone(L.EFX_PHONE); 
 			SELF.clean_secondary_phone := ut.CleanPhone(L.EFX_FAXPHONE);

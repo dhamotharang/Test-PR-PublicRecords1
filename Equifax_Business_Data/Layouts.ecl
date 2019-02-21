@@ -272,6 +272,15 @@ END;
 		UNSIGNED4                     clean_certexp8_date               := 0;
 		UNSIGNED4                     clean_certexp9_date               := 0;
 		UNSIGNED4                     clean_certexp10_date              := 0;
+		unsigned4 global_sid := 0;   //this is a unique source ID that will be coming from Orbit.  
+																 // The Orbit infrastructure is not available yet.  
+																 // In the meantime, when adding the field leave it unpopulated.  
+																 // More information will come as the Orbit change moves along.
+    unsigned8 record_sid := 0; //this is a source specific unique and persistent record id.  
+															 // Same as the persistent record id we have in some datasets.  
+															 // In new development using the ingest process, it will be the record id from SALT.  
+															 // For CCPA, this field is not required to be populated.  
+
 END;		
 	
 	
