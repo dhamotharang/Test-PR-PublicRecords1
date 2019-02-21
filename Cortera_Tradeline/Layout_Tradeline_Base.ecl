@@ -10,10 +10,12 @@ EXPORT Layout_Tradeline_Base := RECORD
 	unsigned4	dt_vendor_first_reported;
 	unsigned4	dt_vendor_last_reported;
 	unsigned4	deletion_date;	// date the record was deleted
-	unsigned8	rid;		// record id
+	unsigned8	record_sid;		// record id
+	unsigned4 global_sid := 0;   //this is a unique source ID that will be coming from Orbit.
 	
 	unsigned6		bdid := 0;
 	unsigned1		bdid_score := 0;
 	BIPV2.IDlayouts.l_xlink_ids;	
 	
 END;
+

@@ -14,14 +14,14 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
   EXPORT spc_PROCLAYOUTS := 'Process__Layouts';
   EXPORT spc_IDNAME := ''; // cluster id (input)
   EXPORT spc_IDFIELD := ''; // cluster id (output)
-  EXPORT spc_RIDFIELD := 'rid'; // record id
+  EXPORT spc_RIDFIELD := 'record_sid'; // record id
   EXPORT spc_CONFIG := 'Config';
   EXPORT spc_CONFIGPARAM := FALSE;
   EXPORT spc_SOURCEFIELD := '';
   EXPORT spc_FILEPREFIX := 'In_';
   EXPORT spc_FILENAME := 'Tradeline_Base';
   EXPORT spc_INGESTSTATUS := '';
-  EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:rid';
+  EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:record_sid';
   EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,link_id,account_key,ar_date,total_ar,status,dt_vendor_first_reported,dt_vendor_last_reported';
   EXPORT spc_HAS_TWOSTEP := FALSE;
   EXPORT spc_HAS_PARTITION := FALSE;
@@ -43,7 +43,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FILENAME:Tradeline_Base\n'
     + '// Uncomment up to NINES for internal or external adl\n'
     + '// IDFIELD:EXISTS:<NameOfIDField>\n'
-    + 'RIDFIELD:rid:GENERATE\n'
+    + 'RIDFIELD:record_sid:GENERATE\n'
     + '// RECORDS:<NumberOfRecordsInDataFile>\n'
     + 'RECORDS:1000000\n'
     + '// POPULATION:<ExpectedNumberOfEntitiesInDataFile>\n'
