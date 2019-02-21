@@ -1,7 +1,7 @@
 ﻿IMPORT KELOtto, FraudGovPlatform;
 
 
-PersonIPMetadataPrep := FraudGovPlatform.files(,KELOtto.Constants.useOtherEnvironmentDali).base.IPMetaData.built;
+PersonIPMetadataPrep := FraudGovPlatform.files(,KELOtto.Constants.useOtherEnvironmentDali).base.IPMetaData.built(did % 100000 = 0);
 
 CustomerPersonIPMetadataPrep := JOIN(PersonIPMetadataPrep,
                                    KELOtto.SharingRules, 

@@ -1719,5 +1719,7 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2019/86 Proliferation and Use of Chemical Weapons List','1706'},
 {'EC (CFSP) 2019/87 Syria List','1707'},
 {'EC 2019/84 Proliferation and Use of Chemical Weapons List','1708'},
-{'EC 2019/85 Syria List','1709'}
+{'EC 2019/85 Syria List','1709'},
+{'EC (CFSP) 2019/271 ISIL (Da\'esh) and Al-Qaeda List','1710'},
+{'EC 2019/270 ISIL (Da\'esh) and Al-Qaeda List','1711'}
 ],r);
