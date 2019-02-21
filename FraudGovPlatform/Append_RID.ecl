@@ -20,7 +20,7 @@ EXPORT Append_RID(
                 local);
 
     FraudShared.Layouts.Base.Main Set_RID(FraudShared.Layouts.Base.Main L, integer cnt) := transform  
-        self.record_id := IF(L.record_id > 0, L.record_id, max_rid + cnt);            
+        self.record_id := max_rid + cnt;            
         self := L;
     end;
 			 

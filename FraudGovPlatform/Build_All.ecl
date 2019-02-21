@@ -68,9 +68,7 @@ module
 		,Run_Scrubs	
 		// Build Base
 		,Run_Base
-		,if( Test_Build = 'Passed' and  Test_RecordID = 'Passed' and Test_RinID = 'Passed',
-			promote_sprayed_files,
-			Run_Rollback)
+		,if( Test_Build = 'Passed' and  Test_RecordID = 'Passed' and Test_RinID = 'Passed', promote_sprayed_files)
 	);
 	
 	export keys_portion := sequential(
@@ -104,7 +102,7 @@ module
 	if(tools.fun_IsValidVersion(pversion),
 		 if(SkipKeysPortion=false and Test_Build = 'Passed' and  Test_RecordID = 'Passed' and Test_RinID = 'Passed',  
 			  keys_portion 
-			, output('Skipping FraudGovPlatform.Build_Keys')),
+			, Run_Rollback ),
 		output('No Valid version parameter passed, skipping FraudGovPlatform.Build_Keys'));
 	
 	

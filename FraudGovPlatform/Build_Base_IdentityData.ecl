@@ -36,7 +36,7 @@ module
 
   // Rollup Update and previous base 
   
-	Pcombined     := If(UpdateIdentityData , inBaseIdentityData + IdentityDataSource , inBaseIdentityData); 
+	Pcombined     := If(UpdateIdentityData , inBaseIdentityData + IdentityDataSource , IdentityDataSource); 
 	pDataset_Dist := distribute(Pcombined, source_rec_id);
 	pDataset_sort := sort(pDataset_Dist , source_rec_id, -process_date, -did, -clean_address.err_stat,local);
 	
@@ -53,9 +53,9 @@ module
 	end;
 
 	pDataset_rollup := rollup( pDataset_sort
-		,RollupUpdate(left, right)
-		,Source, source_rec_id ,local);
-	
+        ,RollupUpdate(left, right)
+        ,Source, source_rec_id ,local);
+
 	tools.mac_WriteFile(Filenames(pversion).Base.IdentityData.New,pDataset_rollup,Build_Base_File);
 
 // Return
