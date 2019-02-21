@@ -13,7 +13,6 @@ Validity_LIMIT a value that quantifies the minimum input. Here are possible valu
 
 ----------------------------------*/
 
-IMPORT ut;
 EXPORT hasSufficientInput(inputf, Validity_LIMIT=10, did='did', name_first='name_first', name_last='name_last', 
 												prim_range='prim_range', prim_name='prim_name', city='p_city_name', st='st', z5='z5', ssn='ssn', dob='dob') := FUNCTIONMACRO
 
@@ -29,7 +28,7 @@ EXPORT hasSufficientInput(inputf, Validity_LIMIT=10, did='did', name_first='name
 	hasAddr		 		:= (hasPrim_range AND hasPrim_name) OR ut.isPOBox(inputf.prim_name) or ut.isRR(inputf.prim_name);
 	hasAddr2		 	:= (hasCity AND hasState) OR  hasZip;
 		
-	hasDOB		 		:= ut.ValidDate(stringlib.stringfilter(inputf.dob,'0123456789'));		
+  hasDOB		 		:= STD.Date.IsValidDate((UNSIGNED4) STD.Str.Filter(inputf.dob,'0123456789'));
 	hasSSN		 		:= LENGTH(stringlib.stringfilter(inputf.SSN,'0123456789')) = 9;
 
 	nameScore 		:= MAP(hasLname AND hasFname => 2,

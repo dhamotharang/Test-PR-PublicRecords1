@@ -569,7 +569,7 @@ isUtility					:= IF(isWFS34 OR doIDAttributes, FALSE, inIsUtility);
 IncludeDLverification := if(doAttributesVersion2, true, false);
 bsVersion := map(
   model_name IN Models.FraudAdvisor_Constants.BS_Version53_List or doParoAttributes or doAttributesVersion203 or doAttributesVersion202 => 53,
-	model_name IN ['fp1706_1','fp1705_1'] => 52,
+	model_name IN ['fp1706_1','fp1705_1','fp1704_1'] => 52,
 	model_name IN ['fp1506_1', 'fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9','fp1509_1','fp1512_1',
 		'fp31604_0', 'fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1','fp1609_2','fp1607_1'] => 51, 
 	doAttributesVersion201 => 50,
@@ -643,7 +643,7 @@ clam_BtSt :=
 #if(Models.FraudAdvisor_Constants.VALIDATION_MODE)
 	
     /* This is for ROUND 2 Validation ONLY */
- 	  ModelValidationResults := Models.FP1803_1_0(ungroup(clam), 6);
+ 	  ModelValidationResults := Models.FP1704_1_0(ungroup(clam), 6);
  	  OUTPUT(ModelValidationResults, named('Results'));
     
 #ELSE
@@ -2252,6 +2252,7 @@ ret_custom := case( model_name,   //This set does not return risk indices
 	'fp1509_1' => Models.FP1509_1_0( ungroup(clam), 6),
 	'fp1510_2' => Models.FP1510_2_0( ungroup(clam), 6),
 	'fp1511_1' => Models.FP1511_1_0( ungroup(clam), 6),
+  // 'fp1704_1' => Models.FP1704_1_0( ungroup(clam), 6 ),
 	dataset( [], Models.Layout_ModelOut )
 );
 
@@ -2263,6 +2264,7 @@ model_fp31310_2  := Models.FP31310_2_0( ungroup(clam_ip), 6, cmRetailZipValue, c
 model_fp1509_2   := Models.FP1509_2_0( ungroup(clam_BtSt), cmLoadAmountValue);
 model_fp1512_1   := Models.FP1512_1_0( ungroup(clam), 6 );
 model_fp31604_0  := Models.FP31604_0_0( ungroup(clam), 6 );
+model_fp1704_1 := Models.FP1704_1_0( ungroup(clam), 6 );
 
 ret_fraudpoint2 := case( model_name,
 	'fp1109_0' => model_fp1109_0, 
@@ -2370,6 +2372,7 @@ ret_fraudpoint2 := case( model_name,
 											self.FriendlyFraudIndex := right.FriendlyFraudIndex,
 											self.SuspiciousActivityIndex := right.SuspiciousActivityIndex,
 											self := left)),
+
 													
 	dataset( [], Models.Layouts.layout_fp1109 )
 );
@@ -2399,8 +2402,23 @@ ret_fraudpoint3 := case( model_name,
   'fp1806_1' => Models.FP1806_1_0( ungroup(clam), 6),
 	'fp1710_1' => Models.FP1710_1_0( ungroup(clam), 6),
 	'fp1803_1' => Models.FP1803_1_0( ungroup(clam), 6),
-	dataset( [], Models.Layouts.layout_fp1109 )
+  'fp1704_1' => join(model_fp1704_1, Models.FP31505_0_Base( clam_ip, 6, false), //fp31505_0 returns the indices from fp1109_0 score
+									left.seq = right.seq,
+										transform(models.layouts.layout_fp1109, 
+											self.StolenIdentityIndex := right.StolenIdentityIndex,
+											self.SyntheticIdentityIndex := left.SyntheticIdentityIndex,// comming fromleft 
+											self.ManipulatedIdentityIndex := right.ManipulatedIdentityIndex,// comming from left 
+											self.VulnerableVictimIndex := right.VulnerableVictimIndex,
+											self.FriendlyFraudIndex := right.FriendlyFraudIndex,
+											self.SuspiciousActivityIndex := left.SuspiciousActivityIndex,
+                       self.ri := right.ri;
+                      self.score := right.score;
+                      self := right)),
+dataset( [], Models.Layouts.layout_fp1109 )
 );
+
+
+
 
 fp_test_seed := Risk_Indicators.FraudPoint_TestSeed_Function(test_prep, Test_Data_Table_Name);
 

@@ -229,12 +229,11 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 				TRANSFORM(Layouts_FDC.Layout_BankruptcyV3__key_bankruptcyv3_search,
 					SELF.InputUIDAppend := LEFT.InputUIDAppend,
 					SELF.LexIDAppend := LEFT.LexIDAppend,
-					SELF.FCRAWithdrawn := LEFT.TmsID = RIGHT.TmsID,
 					SELF := LEFT, 
 					SELF := RIGHT,
 					SELF := []), 
-				LIMIT(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT),
-				LEFT OUTER),
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT),
+				LEFT ONLY),
 			DATASET([], Layouts_FDC.Layout_BankruptcyV3__key_bankruptcyv3_search));
 		
 	With_Bankruptcy := 

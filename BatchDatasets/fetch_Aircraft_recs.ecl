@@ -1,7 +1,7 @@
 
 IMPORT BatchShare, Doxie, Doxie_Raw, FCRA;
 
-EXPORT fetch_Aircraft_recs( DATASET(doxie.layout_references_acctno) ds_acctno_refs, BatchShare.IParam.BatchParams in_mod ) :=
+EXPORT fetch_Aircraft_recs( DATASET(doxie.layout_references_acctno) ds_acctno_refs, BatchShare.IParam.BatchParamsV2 in_mod ) :=
 	FUNCTION
 		faa_dids_pre := PROJECT(ds_acctno_refs, doxie.layout_references);
 		faa_dids     := DEDUP(SORT(faa_dids_pre, did), did);
@@ -14,10 +14,10 @@ EXPORT fetch_Aircraft_recs( DATASET(doxie.layout_references_acctno) ds_acctno_re
 					faa_dids, 
 					faa_bdids, 
 					dateval, 
-					in_mod.DPPAPurpose, 
-					in_mod.GLBPurpose, 
+					in_mod.dppa, 
+					in_mod.glb, 
 					in_mod.ssn_mask, 
-					in_mod.ApplicationType,
+					in_mod.application_type,
 					FALSE, 
 					ds_flags);
 		
@@ -36,3 +36,4 @@ EXPORT fetch_Aircraft_recs( DATASET(doxie.layout_references_acctno) ds_acctno_re
 			
 		RETURN ds_aircraft;
 	END;
+  

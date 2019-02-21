@@ -21,6 +21,7 @@ EXPORT fn_indicators(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput, DAT
                                 SELF.inputSeq := IF(LEFT.inputEcho.inputSeq = DueDiligence.Constants.NUMERIC_ZERO, LEFT.inputEcho.seq, LEFT.inputEcho.inputSeq);
                                 SELF.acctNo   := LEFT.inputEcho.individual.accountNumber;
                                 SELF.lexID    := RIGHT.did;
+                                SELF.lexIDScore := RIGHT.Name_Verification.adl_score;
                                 sysdate       := Models.common.sas_date(if(RIGHT.historydate=999999, (STRING)std.date.today(), (STRING6)RIGHT.historydate+'01'));
                            
                            //*** identityAge (capped at 110 years)***

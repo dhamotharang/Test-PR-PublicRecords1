@@ -7,13 +7,15 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 	STRING2 INVALID_BUSINESS_SCORE := '-1';
 
 	//We have both companies with and without BIP IDs
-	withBIPs := BusnBIPIDs(Busn_Info.BIP_IDs.SeleID.LinkID <> DueDiligence.Constants.NUMERIC_ZERO AND Busn_Info.BIP_IDs.OrgID.LinkID <> DueDiligence.Constants.NUMERIC_ZERO AND Busn_Info.BIP_IDs.UltID.LinkID <> DueDiligence.Constants.NUMERIC_ZERO);
-	noBIPs := BusnBIPIDs(Busn_Info.BIP_IDs.OrgID.LinkID = DueDiligence.Constants.NUMERIC_ZERO AND Busn_Info.BIP_IDs.UltID.LinkID = DueDiligence.Constants.NUMERIC_ZERO);
+	withBIPs := BusnBIPIDs(Busn_Info.BIP_IDs.SeleID.LinkID <> DueDiligence.Constants.NUMERIC_ZERO);
+	noBIPs := BusnBIPIDs(Busn_Info.BIP_IDs.SeleID.LinkID = DueDiligence.Constants.NUMERIC_ZERO);
 	
 
 	DueDiligence.Layouts.Busn_Internal  BusnKRIs(BusnBIPIDs le)  := TRANSFORM
 		
     SELF.BusLexID := (STRING)le.Busn_info.BIP_IDS.SeleID.LinkID;
+    
+    SELF.BusLexIDMatch := (STRING)le.score;
 
     //BUSINESS ASSETS OWNED PROPERTY  																																																	 
     BusAssetOwnProperty_Flag9 := IF(le.CurrPropOwnedCount >= 15, DueDiligence.Constants.T_INDICATOR, DueDiligence.Constants.F_INDICATOR);            
@@ -545,49 +547,55 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 
 	KRIndexesBusn := project(sort(withBIPs, seq), BusnKRIs(left));
 	kriIndexesUnknownBus := PROJECT(noBIPs, TRANSFORM(DueDiligence.Layouts.Busn_Internal,				
-																										SELF.BusAssetOwnProperty := INVALID_BUSINESS_SCORE;
-																										SELF.BusAssetOwnProperty_Flag := INVALID_BUSINESS_FLAGS;
-																										SELF.BusAssetOwnAircraft := INVALID_BUSINESS_SCORE;
-																										SELF.BusAssetOwnAircraft_Flag := INVALID_BUSINESS_FLAGS;
-																										SELF.BusAssetOwnWatercraft := INVALID_BUSINESS_SCORE;
-																										SELF.BusAssetOwnWatercraft_Flag := INVALID_BUSINESS_FLAGS;
-																										SELF.BusAssetOwnVehicle := INVALID_BUSINESS_SCORE;
-																										SELF.BusAssetOwnVehicle_Flag := INVALID_BUSINESS_FLAGS;
-																										SELF.BusAccessToFundsProperty := INVALID_BUSINESS_SCORE;
-																										SELF.BusAccessToFundsProperty_Flag := INVALID_BUSINESS_FLAGS;
-																										SELF.BusGeographic := INVALID_BUSINESS_SCORE;
-																										SELF.BusGeographic_Flag := INVALID_BUSINESS_FLAGS;
-																										SELF.BusValidity := INVALID_BUSINESS_SCORE;
-																										SELF.BusValidity_Flag := INVALID_BUSINESS_FLAGS;
-																										SELF.BusStability := INVALID_BUSINESS_SCORE;
-																										SELF.BusStability_Flag := INVALID_BUSINESS_FLAGS;
-																										SELF.BusIndustry := INVALID_BUSINESS_SCORE;
-																										SELF.BusIndustry_Flag := INVALID_BUSINESS_FLAGS;
-																										SELF.BusStructureType := INVALID_BUSINESS_SCORE;
-																										SELF.BusStructureType_Flag := INVALID_BUSINESS_FLAGS;
-																										SELF.BusSOSAgeRange := INVALID_BUSINESS_SCORE;
-																										SELF.BusSOSAgeRange_Flag := INVALID_BUSINESS_FLAGS;
-																										SELF.BusPublicRecordAgeRange := INVALID_BUSINESS_SCORE;
-																										SELF.BusPublicRecordAgeRange_Flag := INVALID_BUSINESS_FLAGS;
-																										SELF.BusShellShelf := INVALID_BUSINESS_SCORE;
-																										SELF.BusShellShelf_Flag := INVALID_BUSINESS_FLAGS;
-																										SELF.BusMatchLevel := INVALID_BUSINESS_SCORE;
-																										SELF.BusMatchLevel_Flag := INVALID_BUSINESS_FLAGS;
-																										SELF.BusStateLegalEvent := INVALID_BUSINESS_SCORE;
-																										SELF.BusStateLegalEvent_Flag := INVALID_BUSINESS_FLAGS;
-																										// SELF.BusFederalLegalEvent := INVALID_BUSINESS_SCORE;
-																										// SELF.BusFederalLegalEvent_Flag := INVALID_BUSINESS_FLAGS;
-																										// SELF.BusFederalLegalMatchLevel := INVALID_BUSINESS_SCORE;
-																										// SELF.BusFederalLegalMatchLevel_Flag := INVALID_BUSINESS_FLAGS;
-																										SELF.BusCivilLegalEvent := INVALID_BUSINESS_SCORE;
-																										SELF.BusCivilLegalEvent_Flag := INVALID_BUSINESS_FLAGS;
-																										SELF.BusOffenseType := INVALID_BUSINESS_SCORE;
-																										SELF.BusOffenseType_Flag := INVALID_BUSINESS_FLAGS;
-																										SELF.BusBEOProfLicense := INVALID_BUSINESS_SCORE;
-																										SELF.BusBEOProfLicense_Flag := INVALID_BUSINESS_FLAGS;
-																										SELF.BusBEOUSResidency := INVALID_BUSINESS_SCORE;
-																										SELF.BusBEOUSResidency_Flag := INVALID_BUSINESS_FLAGS;
-																										SELF := LEFT;));
+                                                    SELF.BusAssetOwnProperty := INVALID_BUSINESS_SCORE;
+                                                    SELF.BusAssetOwnProperty_Flag := INVALID_BUSINESS_FLAGS;
+                                                    SELF.BusAssetOwnAircraft := INVALID_BUSINESS_SCORE;
+                                                    SELF.BusAssetOwnAircraft_Flag := INVALID_BUSINESS_FLAGS;
+                                                    SELF.BusAssetOwnWatercraft := INVALID_BUSINESS_SCORE;
+                                                    SELF.BusAssetOwnWatercraft_Flag := INVALID_BUSINESS_FLAGS;
+                                                    SELF.BusAssetOwnVehicle := INVALID_BUSINESS_SCORE;
+                                                    SELF.BusAssetOwnVehicle_Flag := INVALID_BUSINESS_FLAGS;
+                                                    SELF.BusAccessToFundsProperty := INVALID_BUSINESS_SCORE;
+                                                    SELF.BusAccessToFundsProperty_Flag := INVALID_BUSINESS_FLAGS;
+                                                    SELF.BusGeographic := INVALID_BUSINESS_SCORE;
+                                                    SELF.BusGeographic_Flag := INVALID_BUSINESS_FLAGS;
+                                                    SELF.BusValidity := INVALID_BUSINESS_SCORE;
+                                                    SELF.BusValidity_Flag := INVALID_BUSINESS_FLAGS;
+                                                    SELF.BusStability := INVALID_BUSINESS_SCORE;
+                                                    SELF.BusStability_Flag := INVALID_BUSINESS_FLAGS;
+                                                    SELF.BusIndustry := INVALID_BUSINESS_SCORE;
+                                                    SELF.BusIndustry_Flag := INVALID_BUSINESS_FLAGS;
+                                                    SELF.BusStructureType := INVALID_BUSINESS_SCORE;
+                                                    SELF.BusStructureType_Flag := INVALID_BUSINESS_FLAGS;
+                                                    SELF.BusSOSAgeRange := INVALID_BUSINESS_SCORE;
+                                                    SELF.BusSOSAgeRange_Flag := INVALID_BUSINESS_FLAGS;
+                                                    SELF.BusPublicRecordAgeRange := INVALID_BUSINESS_SCORE;
+                                                    SELF.BusPublicRecordAgeRange_Flag := INVALID_BUSINESS_FLAGS;
+                                                    SELF.BusShellShelf := INVALID_BUSINESS_SCORE;
+                                                    SELF.BusShellShelf_Flag := INVALID_BUSINESS_FLAGS;
+                                                    SELF.BusMatchLevel := INVALID_BUSINESS_SCORE;
+                                                    SELF.BusMatchLevel_Flag := INVALID_BUSINESS_FLAGS;
+                                                    SELF.BusStateLegalEvent := INVALID_BUSINESS_SCORE;
+                                                    SELF.BusStateLegalEvent_Flag := INVALID_BUSINESS_FLAGS;
+                                                    // SELF.BusFederalLegalEvent := INVALID_BUSINESS_SCORE;
+                                                    // SELF.BusFederalLegalEvent_Flag := INVALID_BUSINESS_FLAGS;
+                                                    // SELF.BusFederalLegalMatchLevel := INVALID_BUSINESS_SCORE;
+                                                    // SELF.BusFederalLegalMatchLevel_Flag := INVALID_BUSINESS_FLAGS;
+                                                    SELF.BusCivilLegalEvent := INVALID_BUSINESS_SCORE;
+                                                    SELF.BusCivilLegalEvent_Flag := INVALID_BUSINESS_FLAGS;
+                                                    SELF.BusOffenseType := INVALID_BUSINESS_SCORE;
+                                                    SELF.BusOffenseType_Flag := INVALID_BUSINESS_FLAGS;
+                                                    SELF.BusBEOProfLicense := INVALID_BUSINESS_SCORE;
+                                                    SELF.BusBEOProfLicense_Flag := INVALID_BUSINESS_FLAGS;
+                                                    SELF.BusBEOUSResidency := INVALID_BUSINESS_SCORE;
+                                                    SELF.BusBEOUSResidency_Flag := INVALID_BUSINESS_FLAGS;
+                                                    // SELF.BusAccessToFundSales := INVALID_BUSINESS_SCORE;
+                                                    // SELF.BusAccessToFundsSales_Flag := INVALID_BUSINESS_FLAGS;
+                                                    // SELF.BusBEOAccessToFundsProperty := INVALID_BUSINESS_SCORE;
+                                                    // SELF.BusBEOAccessToFundsProperty_Flag := INVALID_BUSINESS_FLAGS;
+                                                    // SELF.BusLinkedBusinesses := INVALID_BUSINESS_SCORE;
+                                                    // SELF.BusLinkedBusinesses_Flag := INVALID_BUSINESS_FLAGS;
+                                                    SELF := LEFT;));
 
 
 

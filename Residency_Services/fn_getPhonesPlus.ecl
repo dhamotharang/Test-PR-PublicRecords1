@@ -7,9 +7,9 @@ export fn_getPhonesPlus(DATASET(doxie.layout_references_acctno) ds_in_acctnos_di
 
   // params to be passed into doxie.MAC_Get_GLB_DPPA_PhonesPlus below
 	drm_value             := mod_params_in.DataRestrictionMask;
-  dppa_value            := mod_params_in.DPPAPurpose;
-	glb_value             := mod_params_in.GLBPurpose;
-	industry_class_value  := mod_params_in.industryclass;
+  dppa_value            := mod_params_in.dppa;
+	glb_value             := mod_params_in.glb;
+	industry_class_value  := mod_params_in.industry_class;
 
 	// NOTE: The first comment in doxie.MAC_Get_GLB_DPPA_PhonesPlus says it should be called after 
 	//       doxie.MAC_Header_Field_Declare.  However all it appears to need is the 

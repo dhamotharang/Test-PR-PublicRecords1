@@ -23,16 +23,18 @@ EXPORT EmailIdentityAppendSearch(DATASET($.Layouts.batch_in_rec) batch_in,
   // add best info
   email_with_best_recs := $.Functions.AddBestInfo(email_with_num_recs,in_mod);
   
+  // check email delivery status
+  email_recs_valdtd := $.EmailGatewayData.VerifyDeliveryStatus(email_with_best_recs, in_mod, clnd_input_email);
+  email_recs_ready := IF(in_mod.CheckEmailDeliverable, email_recs_valdtd.Records,
+                          email_with_best_recs);
+
   // sort results to push up best emails before applying maxresults
-  email_recs_srtd := $.Functions.SortResults(email_with_best_recs, in_mod);
+  email_recs_srtd := $.Functions.SortResults(email_recs_ready, in_mod);
   
   // keep max results requested
   ds_results_chsn := UNGROUP(TOPN(GROUP(email_recs_srtd, acctno), in_mod.MaxResultsPerAcct, acctno));
     
 
-  // check email delivery status
-  
-    
   // masking
   Suppress.Mac_mask(ds_results_chsn, ds_results_best_ssnmasked, bestinfo.ssn, null, TRUE, FALSE, maskVal:=in_mod.ssn_mask);
   Suppress.Mac_mask(ds_results_best_ssnmasked, ds_results_clean_ssnmasked,cleaned.clean_ssn, null, TRUE, FALSE, maskVal:=in_mod.ssn_mask);
@@ -42,11 +44,13 @@ EXPORT EmailIdentityAppendSearch(DATASET($.Layouts.batch_in_rec) batch_in,
   // combine results and rejected input 
   ds_results_ready := ds_results_ssnmasked + ds_rejected_input_email;
   
-  // final sorting for output
 
   //OUTPUT(email_ddpd_recs, NAMED('email_ddpd_recs'));
   //OUTPUT(email_recs_srtd, NAMED('email_recs_srtd'));
   //OUTPUT(ds_results_chsn, NAMED('ds_results_chsn'));
 
-  RETURN ds_results_ready;
+  email_gw_royalties := IF(in_mod.CheckEmailDeliverable, email_recs_valdtd.Royalties);
+  result_row := ROW({ds_results_ready, email_gw_royalties}, $.Layouts.email_combined_rec);
+
+  RETURN result_row;
 END;

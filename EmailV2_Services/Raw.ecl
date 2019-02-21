@@ -50,7 +50,7 @@ EXPORT Raw := MODULE
     autokey_lookup := AutokeyB2_batch.Get_IDs_Batch(ds_batch_prprd, autokey_file, ak_skipset, 
                                           workHard := TRUE, useAllLookups:= TRUE); 
                                             
-    autokey_ids := JOIN(autokey_lookup, ds_batch_in,
+    autokey_ids := JOIN(autokey_lookup(ID > 0), ds_batch_in,
                         LEFT.acctno = RIGHT.acctno,
                         TRANSFORM($.Layouts.email_ids_rec,
                               SELF.acctno        := LEFT.acctno;
@@ -108,6 +108,7 @@ EXPORT Raw := MODULE
     //output(search_by_email, named('search_by_email'),EXTEND);
     //output(search_by_lexid, named('search_by_lexid'),EXTEND);
     //output(deepdive_dids, named('deepdive_dids'),EXTEND);
+    //output(batch_in, named('batch_in_raw'),EXTEND);
     //output(batch_did_ids, named('batch_did_ids'),EXTEND);
     //output(batch_autokey_ids, named('batch_autokey_ids'),EXTEND);
     //output(search_by_input_pii, named('search_by_input_pii'),EXTEND);

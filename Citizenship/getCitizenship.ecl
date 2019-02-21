@@ -86,7 +86,6 @@ EXPORT getCitizenship(DATASET(DueDiligence.Layouts.Input) validInput,
     citizenshipResults := JOIN(indicators, modelResults, 
                                 LEFT.seq = RIGHT.seq, 
                                 TRANSFORM({UNSIGNED4 seq, STRING30 acctNo, Citizenship.Layouts.LayoutScoreAndIndicators},  
-                                          SELF.seq := LEFT.inputSeq;
                                           SELF.citizenshipScore := RIGHT.citizenshipScore;
                                           SELF := LEFT;
                                           SELF := [];));

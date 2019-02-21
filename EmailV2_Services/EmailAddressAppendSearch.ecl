@@ -1,4 +1,4 @@
-﻿IMPORT $, Suppress;
+﻿IMPORT $, AutoKeyI, Suppress;
 
 EXPORT EmailAddressAppendSearch(DATASET($.Layouts.batch_in_rec) batch_in,
                                  $.IParams.EmailParams in_mod
@@ -16,6 +16,14 @@ EXPORT EmailAddressAppendSearch(DATASET($.Layouts.batch_in_rec) batch_in,
                                             SELF := LEFT,
                                             SELF := []));
 
+  ds_rejected_nolexid := IF(in_mod.RequireLexidMatch,
+                            PROJECT(clnd_input_with_lexids(subject_lexid=0), 
+                                   TRANSFORM($.Layouts.email_final_rec, 
+                                            SELF.record_err_msg  := AutoKeyI.errorcodes._msgs(AutoKeyI.errorcodes._codes.LEXID_FAIL);
+                                            SELF.record_err_code := AutoKeyI.errorcodes._codes.LEXID_FAIL;
+                                            SELF := LEFT,
+                                            SELF := [])));
+
   // in case if RequireLexidMatch is requested we will use input/resolved lexid to pull email data (no deep dive or Autokeys)
   in_by_subject_lexid := PROJECT(clnd_input_with_lexids(subject_lexid>0), TRANSFORM($.Layouts.batch_in_rec, SELF.DID := LEFT.subject_lexid, SELF:=LEFT));
  
@@ -31,13 +39,15 @@ EXPORT EmailAddressAppendSearch(DATASET($.Layouts.batch_in_rec) batch_in,
   // add best info
   email_with_best_recs := $.Functions.AddBestInfo(email_with_num_recs,in_mod);
   
+  // check email delivery status
+  email_recs_valdtd := $.EmailGatewayData.VerifyDeliveryStatus(email_with_best_recs, in_mod);
+  email_recs_ready := IF(in_mod.CheckEmailDeliverable, email_recs_valdtd.Records,
+                          email_with_best_recs);
+    
   // sort results to push up best emails before applying maxresults
-  email_recs_srtd := $.Functions.SortResults(email_with_best_recs, in_mod);
+  email_recs_srtd := $.Functions.SortResults(email_recs_ready, in_mod);
   
 
-  // check email delivery status
-  
-    
   // keep max results requested
   ds_results_chsn := UNGROUP(TOPN(GROUP(email_recs_srtd, acctno), in_mod.MaxResultsPerAcct, acctno));
     
@@ -48,14 +58,16 @@ EXPORT EmailAddressAppendSearch(DATASET($.Layouts.batch_in_rec) batch_in,
 
 
   // combine results and rejected input 
-  ds_results_ready := ds_results_ssnmasked + ds_rejected_input;
+  ds_results_ready := ds_results_ssnmasked + ds_rejected_input + ds_rejected_nolexid;
   
-  // final sorting for output
-
   //OUTPUT(email_ddpd_recs, NAMED('email_ddpd_recs'));
   //OUTPUT(email_recs_srtd, NAMED('email_recs_srtd'));
   //OUTPUT(ds_results_chsn, NAMED('ds_results_chsn'));
+  
+  email_gw_royalties := IF(in_mod.CheckEmailDeliverable, email_recs_valdtd.Royalties);
+  
+  result_row := ROW({ds_results_ready, email_gw_royalties}, $.Layouts.email_combined_rec);
 
-  RETURN ds_results_ready;
+  RETURN result_row;
 END;
 

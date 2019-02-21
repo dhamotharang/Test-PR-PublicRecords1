@@ -3,7 +3,7 @@ IMPORT BatchShare, BatchDatasets, doxie, Residency_Services, ut;
 EXPORT fn_getAircraft(DATASET(doxie.layout_references_acctno) ds_in_acctnos_dids,
                       Residency_Services.IParam.BatchParams   mod_params_in) := FUNCTION
 
-	in_mod := MODULE(PROJECT(mod_params_in, BatchShare.IParam.BatchParams,OPT)) 
+	in_mod := MODULE(PROJECT(mod_params_in, BatchShare.IParam.BatchParamsV2)) 
 	          END;
 
 	ds_aircraft_recs := BatchDatasets.fetch_Aircraft_recs(ds_in_acctnos_dids, in_mod);

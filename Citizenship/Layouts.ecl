@@ -2,6 +2,7 @@
     
     EXPORT Indicators := RECORD
       INTEGER7 lexID;
+      INTEGER2 lexIDScore;
       INTEGER2 identityAge;
       INTEGER2 emergenceAgeHeader;
       INTEGER2 emergenceAgeBureau;
