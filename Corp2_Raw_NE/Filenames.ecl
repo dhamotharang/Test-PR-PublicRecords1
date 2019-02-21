@@ -1,4 +1,4 @@
-IMPORT tools;
+﻿IMPORT tools;
 
 EXPORT Filenames(STRING  pversion = '',
 	               BOOLEAN pUseOtherEnvironment = FALSE) := MODULE
@@ -7,32 +7,20 @@ EXPORT Filenames(STRING  pversion = '',
 	
 		SHARED Template(STRING tag) 	:= Corp2_Raw_NE._Dataset(pUseOtherEnvironment).InputTemplate + tag;
 			
-		EXPORT CorpAction          		:= tools.mod_FilenamesInput(Template('CorpAction::NE'), pversion);
-		EXPORT CorpOfficers        		:= tools.mod_FilenamesInput(Template('CorpOfficers::NE'), pversion);
-		EXPORT CorpEntity         		:= tools.mod_FilenamesInput(Template('CorpEntity::NE'), pversion);	
-		EXPORT RegisterAgent         	:= tools.mod_FilenamesInput(Template('RegisterAgent::NE'), pversion);	
+		EXPORT CorpActions          	:= tools.mod_FilenamesInput(Template('CorporateActions::NE'), pversion);
+		EXPORT CorpOfficers        		:= tools.mod_FilenamesInput(Template('CorporateOfficers::NE'), pversion);
+		EXPORT CorpEntity         		:= tools.mod_FilenamesInput(Template('CorporationEntity::NE'), pversion);	
+		EXPORT RegisteredAgent       	:= tools.mod_FilenamesInput(Template('RegisteredAgent::NE'), pversion);
 		
+		// Vendor Lookup Table files
+		EXPORT CorpTypeTable     	    := tools.mod_FilenamesInput(Template('CorporationType::NE'), pversion);
+		EXPORT CountryCodesTable   		:= tools.mod_FilenamesInput(Template('CountryCodes::NE'), pversion);
+		EXPORT ListOfStatesTable     	:= tools.mod_FilenamesInput(Template('ListOfStates::NE'), pversion);
+		
+		// Vendor files not currently being used, but leaving here for possible future use
+		// EXPORT PositionHeldTable    	:= tools.mod_FilenamesInput(Template('PositionHeld::NE'), pversion);
+		// EXPORT FilingTypeTable     		:= tools.mod_FilenamesInput(Template('FilingType::NE'), pversion);	
+				
 	END;
 
-	EXPORT Base := MODULE
-	
-		SHARED Template(STRING tag) 	:= Corp2_Raw_NE._Dataset(pUseOtherEnvironment).FileTemplate + tag;		
-			
-		EXPORT CorpAction         		:= tools.mod_FilenamesBuild(Template('CorpAction::NE'), pversion);	
-		EXPORT CorpOfficers    				:= tools.mod_FilenamesBuild(Template('CorpOfficers::NE'), pversion);	
-		EXPORT CorpEntity    			  	:= tools.mod_FilenamesBuild(Template('CorpEntity::NE'), pversion);
-		EXPORT RegisterAgent    			:= tools.mod_FilenamesBuild(Template('RegisterAgent::NE'), pversion);
-				
-		EXPORT dAll_CorpAction			  := CorpAction.dAll_filenames;
-		EXPORT dAll_CorpOfficers  		:= CorpOfficers.dAll_filenames;
-		EXPORT dAll_CorpEntity 			  := CorpEntity.dAll_filenames;
-		EXPORT dAll_RegisterAgent 		:= RegisterAgent.dAll_filenames;
-		
-	END;
-	
-	EXPORT dAll_filenames 					:= Base.dAll_CorpAction			+
-																		 Base.dAll_CorpOfficers   +
-																		 Base.dAll_CorpEntity 		+
-																		 Base.dAll_RegisterAgent;
-	
 END;
