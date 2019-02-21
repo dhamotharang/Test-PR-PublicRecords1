@@ -19,8 +19,11 @@ EXPORT FN_Compile := MODULE
   EXPORT KEL.typ.bool FN_Name_Not_Populated_Check(KEL.typ.nstr __PFnameToCheck, KEL.typ.nstr __PMnameToCheck, KEL.typ.nstr __PLnameToCheck) := FUNCTION
     RETURN IF(__T(__AND(__AND(__OR(__NT(__PFnameToCheck),__OP2(__PFnameToCheck,=,__CN(''))),__OR(__NT(__PMnameToCheck),__OP2(__PMnameToCheck,=,__CN('')))),__OR(__NT(__PLnameToCheck),__OP2(__PLnameToCheck,=,__CN(''))))),TRUE,FALSE);
   END;
-  EXPORT KEL.typ.bool FN_Addr_Not_Populated_Check(KEL.typ.nstr __PAddrToCheck, KEL.typ.nstr __PCityToCheck, KEL.typ.nstr __PStateToCheck, KEL.typ.nstr __PZipToCheck) := FUNCTION
-    RETURN MAP(__T(__AND(__AND(__AND(__OR(__NT(__PAddrToCheck),__OP2(__PAddrToCheck,=,__CN(''))),__OR(__NT(__PCityToCheck),__OP2(__PCityToCheck,=,__CN('')))),__OR(__NT(__PStateToCheck),__OP2(__PStateToCheck,=,__CN('')))),__OR(__NT(__PZipToCheck),__OP2(__PZipToCheck,=,__CN('')))))=>TRUE,__T(__AND(__AND(__AND(__OP2(__PAddrToCheck,<>,__CN('')),__OP2(__PCityToCheck,<>,__CN(''))),__OR(__NT(__PStateToCheck),__OP2(__PStateToCheck,=,__CN('')))),__OR(__NT(__PZipToCheck),__OP2(__PZipToCheck,=,__CN('')))))=>TRUE,__T(__AND(__AND(__AND(__OP2(__PAddrToCheck,<>,__CN('')),__OP2(__PStateToCheck,<>,__CN(''))),__OR(__NT(__PCityToCheck),__OP2(__PCityToCheck,=,__CN('')))),__OR(__NT(__PZipToCheck),__OP2(__PZipToCheck,=,__CN('')))))=>TRUE,FALSE);
+  EXPORT KEL.typ.bool FN_Is_Not_Enough_To_Clean(KEL.typ.nstr __PFieldToCheck) := FUNCTION
+    RETURN IF(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CN('')))),TRUE,FALSE);
+  END;
+  EXPORT KEL.typ.nbool FN_City_State_Zip_Not_Populated_Check(KEL.typ.nstr __PCity, KEL.typ.nstr __PState, KEL.typ.nstr __PZip) := FUNCTION
+    RETURN __AND(__OR(__NT(__PZip),__OP2(__PZip,=,__CN(''))),__OR(__OR(__NT(__PCity),__OP2(__PCity,=,__CN(''))),__OR(__NT(__PState),__OP2(__PState,=,__CN('')))));
   END;
   EXPORT KEL.typ.str FN_Is_Echo_Populated(KEL.typ.nstr __PFieldToCheck) := FUNCTION
     RETURN IF(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CN('')))),'0','1');

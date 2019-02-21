@@ -955,7 +955,7 @@ USE PublicRecords_KEL.ECL_Functions.Dataset_FDC(FDC,
 		PERMITS([nonFCRA])),
 
     Property,
-    Business, 
+		Business(UID = BusInputUIDAppend),
     Inquiry, 
     Aircraft,    
     Watercraft,
