@@ -65,7 +65,7 @@ EXPORT E_Address(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
     KEL.typ.nstr Source_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
-    UNSIGNED1 __Permits;
+    UNSIGNED8 __Permits;
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
@@ -88,8 +88,12 @@ EXPORT E_Address(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
     KEL.typ.uid UID := 0;
   END;
   SHARED __Table := TABLE(__All_Trim,__TabRec,KeyVal,MERGE);
-  SHARED __SortedTable := SORT(__Table,KeyVal);
-  EXPORT Lookup := PROJECT(__SortedTable,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT));
+  EXPORT Lookup := PROJECT(__Table,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT)) : PERSIST('~temp::KEL::PublicRecords_KEL::Address::UidLookup',EXPIRE(7));
+  EXPORT UID_IdToText := INDEX(Lookup,{UID},{Lookup},'~temp::KEL::IDtoT::PublicRecords_KEL::Address');
+  EXPORT UID_TextToId := INDEX(Lookup,{ht:=HASH32(KeyVal)},{Lookup},'~temp::KEL::TtoID::PublicRecords_KEL::Address');
+  EXPORT BuildAll := PARALLEL(BUILDINDEX(UID_IdToText,OVERWRITE),BUILDINDEX(UID_TextToId,OVERWRITE));
+  EXPORT GetText(KEL.typ.uid i) := UID_IdToText(UID=i)[1];
+  EXPORT GetId(STRING s) := UID_TextToId(ht=HASH32(s),KeyVal=s)[1];
   SHARED A_D_V_O_Date_First_Seen_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
   SHARED A_D_V_O_Date_Last_Seen_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
   SHARED A_D_V_O_Date_Vendor_First_Reported_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
@@ -138,7 +142,7 @@ EXPORT E_Address(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
   SHARED __d2 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d2_Prefiltered,InLayout,__Mapping2),__Mapping2_Transform(LEFT)));
   SHARED __Mapping3 := 'UID(UID),prim_range(Primary_Range_),predir(Predirectional_),prim_name(Primary_Name_),addr_suffix(Suffix_),postdir(Postdirectional_),unit_desig(Unit_Designation_),sec_range(Secondary_Range_),p_city_name(Postal_City_),v_city_name(Vanity_City_),st(State_),zip5(Z_I_P5_:0),zip4(Z_I_P4_),cart(Carrier_Route_Number_),cr_sort_sz(Carrier_Route_Sortation_At_Z_I_P_),lot(Line_Of_Travel_),lot_order(Line_Of_Travel_Order_),dpbc(Delivery_Point_Barcode_),chk_digit(Delivery_Point_Barcode_Check_Digit_),rec_type(Type_Code_),ace_fips_county(County_),geo_lat(Latitude_),geo_long(Longitude_),msa(Metropolitan_Statistical_Area_),geo_blk(Geo_Block_),geo_match(Geo_Match_),err_stat(A_C_E_Cleaner_Error_Code_),advodatefirstseen(A_D_V_O_Date_First_Seen_:DATE),advodatelastseen(A_D_V_O_Date_Last_Seen_:DATE),advodatevendorfirstreported(A_D_V_O_Date_Vendor_First_Reported_:DATE),advodatevendorlastreported(A_D_V_O_Date_Vendor_Last_Reported_:DATE),vacancyindicator(Vacancy_Indicator_),throwbackindicator(Throw_Back_Indicator_),seasonaldeliveryindicator(Seasonal_Delivery_Indicator_),seasonalstartsuppressiondate(Seasonal_Start_Suppression_Date_),seasonalendsuppressiondate(Seasonal_End_Suppression_Date_),donotdeliverindicator(Do_Not_Deliver_Indicator_),collegeindicator(College_Indicator_),collegestartsuppressiondate(College_Start_Suppression_Date_),collegeendsuppressiondate(College_End_Suppression_Date_),stylecode(Style_Code_),simplifycount(Simplify_Count_),dropindicator(Drop_Indicator_),residentialorbusinessindicator(Residential_Or_Business_Indicator_),onlywaytogetmailindicator(Only_Way_To_Get_Mail_Indicator_),recordtypecode(Record_Type_Code_),addresstypecode(Address_Type_Code_),mixedusagecode(Mixed_Usage_Code_),vacationbegindate(Vacation_Begin_Date_:DATE),vacationenddate(Vacation_End_Date_:DATE),numberofcurrentvacationmonths(Number_Of_Current_Vacation_Months_),maxvacationmonths(Max_Vacation_Months_),vacationperiodscount(Vacation_Periods_Count_),institutiontypecode(Institution_Type_Code_),institutiontypeexpanded(Institution_Type_Expanded_),institutionname(Institution_Name_),src(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   SHARED InLayout __Mapping3_Transform(InLayout __r) := TRANSFORM
-    SELF.__Permits := CFG_Compile.Permit_nonFCRA;
+    SELF.__Permits := CFG_Compile.Permit_NonFCRA;
     SELF := __r;
   END;
   SHARED __d3_Norm := NORMALIZE(__in,LEFT.Dataset_Doxie_Files__Key_Offenders,TRANSFORM(RECORDOF(__in.Dataset_Doxie_Files__Key_Offenders),SELF:=RIGHT));
@@ -388,7 +392,7 @@ EXPORT E_Address(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Address_Group,COUNT(ROWS(LEFT))=1),GROUP,Address__Single_Rollup(LEFT)) + ROLLUP(HAVING(Address_Group,COUNT(ROWS(LEFT))>1),GROUP,Address__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult);
+  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::PublicRecords_KEL::Address::Result' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
   EXPORT Result := __UNWRAP(__Result);
   EXPORT Primary_Range__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Primary_Range_);
   EXPORT Predirectional__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Predirectional_);

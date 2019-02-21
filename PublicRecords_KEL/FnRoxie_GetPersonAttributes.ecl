@@ -25,12 +25,12 @@ ENDMACRO;
 	
 	NonFCRAPersonAttributesRaw := PROJECT(InputData, TRANSFORM({INTEGER InputUIDAppend, LayoutNonFCRAPersonAttributes},
 		SELF.InputUIDAppend := LEFT.InputUIDAppend;
-		NonFCRAPersonResults := PublicRecords_KEL.Q_Non_F_C_R_A_Person_Attributes_V1([LEFT.LexIDAppend], (INTEGER)(LEFT.InputArchiveDateClean[1..8]), IF(Options.IsFCRA, PublicRecords_KEL.CFG_Uses.Permit_FCRA,PublicRecords_KEL.CFG_Uses.Permit_nonFCRA), FDCDataset).res0;	
+		NonFCRAPersonResults := PublicRecords_KEL.Q_Non_F_C_R_A_Person_Attributes_V1([LEFT.LexIDAppend], (INTEGER)(LEFT.InputArchiveDateClean[1..8]), Options.KEL_Permissions_Mask, FDCDataset).res0;	
 		SELF := NonFCRAPersonResults[1]));	
 
 	FCRAPersonAttributesRaw := PROJECT(InputData, TRANSFORM({INTEGER InputUIDAppend, LayoutNonFCRAPersonAttributes},
 		SELF.InputUIDAppend := LEFT.InputUIDAppend;
-		FCRAPersonResults := PublicRecords_KEL.Q_F_C_R_A_Person_Attributes_V1([LEFT.LexIDAppend], (INTEGER)(LEFT.InputArchiveDateClean[1..8]), IF(Options.IsFCRA, PublicRecords_KEL.CFG_Uses.Permit_FCRA,PublicRecords_KEL.CFG_Uses.Permit_nonFCRA), FDCDataset).res0;	
+		FCRAPersonResults := PublicRecords_KEL.Q_F_C_R_A_Person_Attributes_V1([LEFT.LexIDAppend], (INTEGER)(LEFT.InputArchiveDateClean[1..8]), Options.KEL_Permissions_Mask, FDCDataset).res0;	
 		SELF := FCRAPersonResults[1],
 		SELF := []));	
 		

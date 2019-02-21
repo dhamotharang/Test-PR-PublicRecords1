@@ -23,7 +23,7 @@ DPPA 	= 1
 */ 
 GLBA := 1;
 DPPA := 1;
-DataPermission := '0000000001101';  
+DataPermissionMask := '0000000001101';  
 DataRestrictionMask := '0000000000000000000000000000000000000000000000000'; 
 
 // Universally Set the History Date YYYYMMDD for ALL records. Set to 0 to use the History Date located on each record of the input file
@@ -86,10 +86,28 @@ SELF := LEFT;
 
 soapLayout := RECORD
   // STRING CustomerId; // This is used only for failed transactions here; it's ignored by the ECL service.
-  DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout) input;
-  INTEGER ScoreThreshold;
+	DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout) input;
+	INTEGER ScoreThreshold;
+	STRING DataRestrictionMask;
+	STRING DataPermissionMask;
+	UNSIGNED1 GLBA_Purpose;
+	UNSIGNED1 DPPA_Purpose;
 	BOOLEAN OutputMasterResults;
+	BOOLEAN IsMarketing;
 end;
+
+Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
+	EXPORT STRING AttributeSetName := 'Development KEL Attributes';
+	EXPORT STRING VersionName := 'Version 1.0';
+	EXPORT BOOLEAN isFCRA := FALSE;
+	EXPORT STRING ArchiveDate := histDate;
+	EXPORT STRING InputFileName := InputFile;
+	EXPORT STRING Data_Restriction_Mask := DataRestrictionMask;
+	EXPORT STRING Data_Permission_Mask := DataPermissionMask;
+	EXPORT UNSIGNED GLBAPurpose := GLBA;
+	EXPORT UNSIGNED DPPAPurpose := DPPA;
+	EXPORT UNSIGNED LexIDThreshold := Score_threshold;
+END;
 
 	// Options := MODULE(PublicRecords_KEL.Interface_Options)
 		// EXPORT INTEGER ScoreThreshold := 80;
@@ -110,11 +128,16 @@ layout_MAS_Test_Service_output := RECORD
 END;
 
 soapLayout trans (pp le):= TRANSFORM 
-  // SELF.CustomerId := le.CustomerId;
-  SELF.input := PROJECT(le, TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout,
-    SELF := LEFT;
-    SELF := []));
-	SELF.ScoreThreshold := Score_threshold;
+	// SELF.CustomerId := le.CustomerId;
+	SELF.input := PROJECT(le, TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout,
+		SELF := LEFT;
+		SELF := []));
+	SELF.ScoreThreshold := Settings.LexIDThreshold;
+	SELF.DataRestrictionMask := Settings.Data_Restriction_Mask;
+	SELF.DataPermissionMask := Settings.Data_Permission_Mask;
+	SELF.GLBA_Purpose := Settings.GLBAPurpose;
+	SELF.DPPA_Purpose := Settings.DPPAPurpose;
+	SELF.IsMarketing := FALSE;
 	SELF.OutputMasterResults := Output_Master_Results;
 END;
 
@@ -189,20 +212,6 @@ OUTPUT(CHOOSEN(Passed_Person, eyeball), NAMED('Sample_NonFCRA_Layout'));
 
 IF(Output_Master_Results, OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout.csv', CSV(HEADING(single), QUOTE('"'))));
 OUTPUT(Passed_Person,,OutputFile + '.csv', CSV(HEADING(single), QUOTE('"')));
-
-
-Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
-	EXPORT STRING AttributeSetName := 'Development KEL Attributes';
-	EXPORT STRING VersionName := 'Version 1.0';
-	EXPORT BOOLEAN isFCRA := FALSE;
-	EXPORT STRING ArchiveDate := histDate;
-	EXPORT STRING InputFileName := InputFile;
-	EXPORT STRING Data_Restriction_Mask := DataRestrictionMask;
-	EXPORT STRING Data_Permission_Mask := DataPermission;
-	EXPORT UNSIGNED GLBAPurpose := GLBA;
-	EXPORT UNSIGNED DPPAPurpose := DPPA;
-	EXPORT UNSIGNED LexIDThreshold := Score_threshold;
-END;
 
 Settings_Dataset := PublicRecords_KEL.ECL_Functions.fn_make_settings_dataset(Settings);
 		

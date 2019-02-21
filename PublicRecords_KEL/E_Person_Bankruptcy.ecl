@@ -11,7 +11,7 @@ EXPORT E_Person_Bankruptcy(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     KEL.typ.nstr Source_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
-    UNSIGNED1 __Permits;
+    UNSIGNED8 __Permits;
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
@@ -34,7 +34,7 @@ EXPORT E_Person_Bankruptcy(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
   SHARED __Mapping1 := 'did(Subject_:0),Bankrupt_(Bankrupt_:0),date_first_seen(Date_First_Seen_:EPOCH),date_last_seen(Date_Last_Seen_:EPOCH)';
   SHARED InLayout __Mapping1_Transform(InLayout __r) := TRANSFORM
     SELF.Source_ := __CN('BA');
-    SELF.__Permits := CFG_Compile.Permit_nonFCRA;
+    SELF.__Permits := CFG_Compile.Permit_NonFCRA;
     SELF := __r;
   END;
   SHARED __d1_Norm := NORMALIZE(__in,LEFT.Dataset_Bankruptcy_Files__Key_Search,TRANSFORM(RECORDOF(__in.Dataset_Bankruptcy_Files__Key_Search),SELF:=RIGHT));
@@ -76,7 +76,7 @@ EXPORT E_Person_Bankruptcy(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Person_Bankruptcy_Group,COUNT(ROWS(LEFT))=1),GROUP,Person_Bankruptcy__Single_Rollup(LEFT)) + ROLLUP(HAVING(Person_Bankruptcy_Group,COUNT(ROWS(LEFT))>1),GROUP,Person_Bankruptcy__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult);
+  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::PublicRecords_KEL::Person_Bankruptcy::Result' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
   EXPORT Result := __UNWRAP(__Result);
   EXPORT Subject__Orphan := JOIN(InData(__NN(Subject_)),E_Person(__in,__cfg).__Result,__EEQP(LEFT.Subject_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT Bankrupt__Orphan := JOIN(InData(__NN(Bankrupt_)),E_Bankruptcy(__in,__cfg).__Result,__EEQP(LEFT.Bankrupt_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);

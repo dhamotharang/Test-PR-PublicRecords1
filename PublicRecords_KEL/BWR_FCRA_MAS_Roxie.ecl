@@ -20,9 +20,9 @@ DPMDL =	0 //use_InsuranceDLData - bit 13
 GLBA 	= 0 
 DPPA 	= 0 
 */
-GLBA := 0; //not used
-DPPA := 0; //not used 
-DataPermission := '0000000000000';  
+GLBA := 0; // FCRA isn't GLBA restricted
+DPPA := 0; // FCRA isn't DPPA restricted
+DataPermissionMask := '0000000000000';  
 DataRestrictionMask := '1000010000000100000000000000000000000000000000000'; 
 
 // Inteded Purpose for FCRA. Stubbing this out for now so it can be used in the settings output for now.
@@ -88,24 +88,48 @@ SELF := LEFT));
 
 soapLayout := RECORD
 //  STRING CustomerId; // This is used only for failed transactions here; it's ignored by the ECL service.
-  DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout) input;
-  INTEGER ScoreThreshold;
+	DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout) input;
+	INTEGER ScoreThreshold;
+	STRING DataRestrictionMask;
+	STRING DataPermissionMask;
+	UNSIGNED1 GLBA_Purpose;
+	UNSIGNED1 DPPA_Purpose;
 	BOOLEAN OutputMasterResults;
+	BOOLEAN IsMarketing;
 	DATASET(Gateway.Layouts.Config) gateways := DATASET([], Gateway.Layouts.Config);
 end;
+
+Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
+	EXPORT STRING AttributeSetName := 'Development KEL Attributes';
+	EXPORT STRING VersionName := 'Version 1.0';
+	EXPORT BOOLEAN isFCRA := TRUE;
+	EXPORT STRING ArchiveDate := histDate;
+	EXPORT STRING InputFileName := InputFile;
+	EXPORT STRING PermissiblePurpose := Intended_Purpose; // FCRA only
+	EXPORT STRING Data_Restriction_Mask := DataRestrictionMask;
+	EXPORT STRING Data_Permission_Mask := DataPermissionMask;
+	EXPORT UNSIGNED GLBAPurpose := GLBA;
+	EXPORT UNSIGNED DPPAPurpose := DPPA;
+	EXPORT UNSIGNED LexIDThreshold := Score_threshold;
+END;
 
 
 soapLayout trans (pp le):= TRANSFORM 
   // SELF.CustomerId := le.CustomerId;
-  SELF.input := PROJECT(le, TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout,
-  SELF := LEFT;
-	SELF := []));
+	SELF.input := PROJECT(le, TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout,
+		SELF := LEFT;
+		SELF := []));
 	SELF.Gateways := PROJECT(ut.ds_oneRecord, 
 			TRANSFORM(Gateway.Layouts.Config, 
 				SELF.ServiceName := 'neutralroxie'; 
 				SELF.URL := NeutralRoxieIP; 
 				SELF := []));
-	SELF.ScoreThreshold := Score_threshold;
+	SELF.ScoreThreshold := Settings.LexIDThreshold;
+	SELF.DataRestrictionMask := Settings.Data_Restriction_Mask;
+	SELF.DataPermissionMask := Settings.Data_Permission_Mask;
+	SELF.GLBA_Purpose := Settings.GLBAPurpose;
+	SELF.DPPA_Purpose := Settings.DPPAPurpose;
+	SELF.IsMarketing := FALSE;
 	SELF.OutputMasterResults := Output_Master_Results;
 END;
 
@@ -192,20 +216,6 @@ OUTPUT(CHOOSEN(Passed_Person, eyeball), NAMED('Sample_FCRA_Layout'));
 
 IF(Output_Master_Results, OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout.csv', CSV(HEADING(single), QUOTE('"'))));
 OUTPUT(Passed_Person,,OutputFile + '.csv', CSV(HEADING(single), QUOTE('"')));
-
-Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
-	EXPORT STRING AttributeSetName := 'Development KEL Attributes';
-	EXPORT STRING VersionName := 'Version 1.0';
-	EXPORT BOOLEAN isFCRA := TRUE;
-	EXPORT STRING ArchiveDate := histDate;
-	EXPORT STRING InputFileName := InputFile;
-	EXPORT STRING PermissiblePurpose := Intended_Purpose; // FCRA only
-	EXPORT STRING Data_Restriction_Mask := DataRestrictionMask;
-	EXPORT STRING Data_Permission_Mask := DataPermission;
-	EXPORT UNSIGNED GLBAPurpose := GLBA;
-	EXPORT UNSIGNED DPPAPurpose := DPPA;
-	EXPORT UNSIGNED LexIDThreshold := Score_threshold;
-END;
 	
 Settings_Dataset := PublicRecords_KEL.ECL_Functions.fn_make_settings_dataset(Settings);
 		

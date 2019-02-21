@@ -26,7 +26,7 @@ EXPORT E_Criminal_Offender(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     KEL.typ.nstr Source_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
-    UNSIGNED1 __Permits;
+    UNSIGNED8 __Permits;
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
@@ -46,9 +46,13 @@ EXPORT E_Criminal_Offender(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
   END;
   EXPORT NullKeyVal := TRIM((STRING)'');
   SHARED __Table := TABLE(__All_Trim(KeyVal <> NullKeyVal),__TabRec,KeyVal,MERGE);
-  SHARED __SortedTable := SORT(__Table,KeyVal);
   SHARED NullLookupRec := DATASET([{NullKeyVal,1,0}],__TabRec);
-  EXPORT Lookup := NullLookupRec + PROJECT(__SortedTable,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT));
+  EXPORT Lookup := NullLookupRec + PROJECT(__Table,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT)) : PERSIST('~temp::KEL::PublicRecords_KEL::Criminal_Offender::UidLookup',EXPIRE(7));
+  EXPORT UID_IdToText := INDEX(Lookup,{UID},{Lookup},'~temp::KEL::IDtoT::PublicRecords_KEL::Criminal_Offender');
+  EXPORT UID_TextToId := INDEX(Lookup,{ht:=HASH32(KeyVal)},{Lookup},'~temp::KEL::TtoID::PublicRecords_KEL::Criminal_Offender');
+  EXPORT BuildAll := PARALLEL(BUILDINDEX(UID_IdToText,OVERWRITE),BUILDINDEX(UID_TextToId,OVERWRITE));
+  EXPORT GetText(KEL.typ.uid i) := UID_IdToText(UID=i)[1];
+  EXPORT GetId(STRING s) := UID_TextToId(ht=HASH32(s),KeyVal=s)[1];
   SHARED __Mapping0 := 'UID(UID),offender_key(Offender_Key_:\'\'),sourcefile(Source_File_:\'\'),sourcestate(Source_State_:\'\'),citizenship(Citizenship_:\'\'),haircolor(Hair_Color_:\'\'),eyecolor(Eye_Color_:\'\'),skincolor(Skin_Color_:\'\'),height(Height_:0),weight(Weight_:0),status(Status_:\'\'),currentincarceratedflag(Current_Incarcerated_Flag_:\'\'),currentparoleflag(Current_Parole_Flag_:\'\'),currentprobationflag(Current_Probation_Flag_:\'\'),datatype(Data_Type_:0),datasource(Data_Source_:\'\'),num_of_counts(Number_Of_Offense_Counts_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   SHARED InLayout __Mapping0_Transform(InLayout __r) := TRANSFORM
     SELF.Source_ := __CN('DC');
@@ -94,7 +98,7 @@ EXPORT E_Criminal_Offender(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
   SHARED __d2 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d2_Prefiltered,InLayout,__Mapping2),__Mapping2_Transform(LEFT)));
   SHARED __Mapping3 := 'UID(UID),offender_key(Offender_Key_:\'\'),source_file(Source_File_:\'\'),orig_state(Source_State_:\'\'),citizenship(Citizenship_:\'\'),hair_color_desc(Hair_Color_:\'\'),eye_color_desc(Eye_Color_:\'\'),skin_color_desc(Skin_Color_:\'\'),height(Height_:0),weight(Weight_:0),party_status_desc(Status_:\'\'),curr_incar_flag(Current_Incarcerated_Flag_:\'\'),curr_parole_flag(Current_Parole_Flag_:\'\'),curr_probation_flag(Current_Probation_Flag_:\'\'),data_type(Data_Type_:0),datasource(Data_Source_:\'\'),numberofoffensecounts(Number_Of_Offense_Counts_:0),src(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   SHARED InLayout __Mapping3_Transform(InLayout __r) := TRANSFORM
-    SELF.__Permits := CFG_Compile.Permit_nonFCRA;
+    SELF.__Permits := CFG_Compile.Permit_NonFCRA;
     SELF := __r;
   END;
   SHARED __d3_Norm := NORMALIZE(__in,LEFT.Dataset_Doxie_Files__Key_Offenders,TRANSFORM(RECORDOF(__in.Dataset_Doxie_Files__Key_Offenders),SELF:=RIGHT));
@@ -182,7 +186,7 @@ EXPORT E_Criminal_Offender(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Criminal_Offender_Group,COUNT(ROWS(LEFT))=1),GROUP,Criminal_Offender__Single_Rollup(LEFT)) + ROLLUP(HAVING(Criminal_Offender_Group,COUNT(ROWS(LEFT))>1),GROUP,Criminal_Offender__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult);
+  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::PublicRecords_KEL::Criminal_Offender::Result' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
   EXPORT Result := __UNWRAP(__Result);
   EXPORT Offender_Key__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Offender_Key_);
   EXPORT Citizenship__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Citizenship_);
