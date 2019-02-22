@@ -428,7 +428,7 @@ EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)
 		
    // when requested, perform PRI verification on other phones.		
 	// Other phones are only provided for PII searches
-	dOtherPhones  :=IF(inMod.IsPrimarySearchPII, dsortedPhoneswSubjectPRIs(PhoneRiskIndicator=''), dsortedPhoneswSubjectPRIs(PhoneRiskIndicator='' AND batch_in.homephone=''));
+	dOtherPhones := dsortedPhoneswSubjectPRIs(PhoneRiskIndicator='' AND batch_in.homephone='');
 	PhoneFinder_Services.Layouts.PhoneFinder.Final getOtherPRI(PhoneFinder_Services.Layouts.PhoneFinder.Final l):=TRANSFORM
 	otherPhonePRI := PhoneFinder_Services.GetPRIValue(l,inMod);
 			// PF CR#1: no longer processing otherphones based on prior phone failures
