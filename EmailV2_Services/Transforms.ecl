@@ -66,6 +66,7 @@ EXPORT Transforms := MODULE
                               SELF.acctno         := LE.acctno,
                               SELF.seq            := LE.seq,
                               SELF.subject_lexid  := LE.subject_lexid,
+                              SELF.isdeepdive     := LE.isdeepdive,
                               SELF.email_id       := RI.email_rec_key,
                               SELF.is_current     := RI.current_rec,
                               SELF.email_username := RI.append_email_username,
@@ -226,5 +227,131 @@ EXPORT Transforms := MODULE
     SELF:=[];
   END;
   
+  EXPORT $.Layouts.batch_in_rec xfSearchIn(iesp.emailfinder.t_EmailFinderSearchBy rec_in)
+  := TRANSFORM
+    SELF.acctno  := $.Constants.Defaults.SingleSearchAccountNo;
+    SELF.DID := rec_in.LexId;
+    SELF.name_first := rec_in.Name.first;
+    SELF.name_middle := rec_in.Name.Middle;
+    SELF.name_last := rec_in.Name.Last;
+    SELF.name_suffix := rec_in.Name.Suffix;
+    SELF.ssn := rec_in.SSN;
+    _dob := iesp.ECL2ESP.DateToString(rec_in.DOB);
+    SELF.dob := IF((UNSIGNED)_dob > 0, _dob, '');
+    SELF.prim_range := rec_in.Address.StreetNumber;
+    SELF.predir := rec_in.Address.StreetPreDirection;
+    SELF.prim_name := rec_in.Address.StreetName;
+    SELF.addr_suffix := rec_in.Address.StreetSuffix;
+    SELF.postdir := rec_in.Address.StreetPostDirection;
+    SELF.unit_desig := rec_in.Address.UnitDesignation;
+    SELF.sec_range := rec_in.Address.UnitNumber;
+    SELF.p_city_name := rec_in.Address.City;
+    SELF.st := rec_in.Address.State;
+    SELF.z5 := rec_in.Address.Zip5;
+    SELF.zip4 := rec_in.Address.Zip4;
+   
+    SELF := rec_in;
+    SELF := [];
+  END;
+  
+  EXPORT iesp.emailfinder.t_EmailFinderSearchRecord  xfSearchOut($.Layouts.email_final_rec le)
+  := TRANSFORM
+    SELF.Original.EmailAddress := le.Original.email;
+    SELF.Original.FirstName := le.Original.first_name;
+    SELF.Original.LastName := le.Original.last_name;
+    SELF.Original.StreetAddress := le.Original.address;
+    SELF.Original.IPAddress := le.Original.ip;
+    SELF.Original.LoginDate := le.Original.login_date;
+    SELF.Original.Website := le.Original.site;
+    SELF.Original := le.Original;
+    
+    SELF.Cleaned.EmailAddress := le.Cleaned.clean_email;
+    SELF.Cleaned.Name.first := le.Cleaned.Name.fname;
+    SELF.Cleaned.Name.Middle := le.Cleaned.Name.mname;
+    SELF.Cleaned.Name.last := le.Cleaned.Name.lname;
+    SELF.Cleaned.Name.Suffix := le.Cleaned.Name.name_suffix;
+    SELF.Cleaned.Name.Prefix := le.Cleaned.Name.title;
+    SELF.Cleaned.Address.StreetNumber := le.Cleaned.Address.prim_range;
+    SELF.Cleaned.Address.StreetPreDirection := le.Cleaned.Address.predir;
+    SELF.Cleaned.Address.StreetName := le.Cleaned.Address.prim_name;
+    SELF.Cleaned.Address.StreetSuffix := le.Cleaned.Address.addr_suffix;
+    SELF.Cleaned.Address.StreetPostDirection := le.Cleaned.Address.postdir;
+    SELF.Cleaned.Address.UnitDesignation := le.Cleaned.Address.unit_desig;
+    SELF.Cleaned.Address.UnitNumber := le.Cleaned.Address.sec_range;
+    SELF.Cleaned.Address.City := le.Cleaned.Address.p_city_name;
+    SELF.Cleaned.Address.State := le.Cleaned.Address.st;
+    SELF.Cleaned.Address.Zip5 := le.Cleaned.Address.zip;
+    SELF.Cleaned.Address.Zip4 := le.Cleaned.Address.zip4;
+		SELF.Cleaned.Address.StreetAddress1 := Address.Addr1FromComponents(le.Cleaned.Address.prim_range, le.Cleaned.Address.Predir, le.Cleaned.Address.prim_name, le.Cleaned.Address.addr_suffix, le.Cleaned.Address.Postdir, le.Cleaned.Address.unit_desig, le.Cleaned.Address.sec_range);								
+		SELF.Cleaned.Address.StateCityZip := Address.Addr2FromComponents(le.Cleaned.Address.p_city_name, le.Cleaned.Address.st, le.Cleaned.Address.zip);								
+
+    SELF.BestInfo.SSN := le.BestInfo.SSN;
+    SELF.BestInfo.DOB := iesp.ECL2ESP.toDate(le.BestInfo.dob);
+    SELF.BestInfo.Name.first := le.BestInfo.fname;
+    SELF.BestInfo.Name.Middle := le.BestInfo.mname;
+    SELF.BestInfo.Name.last := le.BestInfo.lname;
+    SELF.BestInfo.Name.Suffix := le.BestInfo.name_suffix;
+    SELF.BestInfo.Name.Prefix := le.BestInfo.title;
+    SELF.BestInfo.Address.StreetNumber := le.BestInfo.prim_range;
+    SELF.BestInfo.Address.StreetPreDirection := le.BestInfo.predir;
+    SELF.BestInfo.Address.StreetName := le.BestInfo.prim_name;
+    SELF.BestInfo.Address.StreetSuffix := le.BestInfo.suffix;
+    SELF.BestInfo.Address.StreetPostDirection := le.BestInfo.postdir;
+    SELF.BestInfo.Address.UnitDesignation := le.BestInfo.unit_desig;
+    SELF.BestInfo.Address.UnitNumber := le.BestInfo.sec_range;
+    SELF.BestInfo.Address.City := le.BestInfo.city_name;
+    SELF.BestInfo.Address.State := le.BestInfo.st;
+    SELF.BestInfo.Address.Zip5 := le.BestInfo.zip;
+    SELF.BestInfo.Address.Zip4 := le.BestInfo.zip4;
+		SELF.BestInfo.Address.StreetAddress1 := Address.Addr1FromComponents(le.BestInfo.prim_range, le.BestInfo.Predir, le.BestInfo.prim_name, le.BestInfo.suffix, le.BestInfo.Postdir, le.BestInfo.unit_desig, le.BestInfo.sec_range);								
+		SELF.BestInfo.Address.StateCityZip := Address.Addr2FromComponents(le.BestInfo.city_name, le.BestInfo.st, le.BestInfo.zip);								
+
+    SELF.LexId := le.DID;
+    SELF.ProcessDate := iesp.ECL2ESP.toDatestring8(le.process_date);
+    SELF.DateFirstSeen := iesp.ECL2ESP.toDatestring8(le.date_first_seen);
+    SELF.DateLastSeen := iesp.ECL2ESP.toDatestring8(le.date_last_seen);
+    SELF.DateVendorFirstReported := iesp.ECL2ESP.toDatestring8(le.date_vendor_first_reported);
+    SELF.DateVendorLastReported := iesp.ECL2ESP.toDatestring8(le.date_vendor_last_reported);
+    SELF.LatestOrigLoginDate := le.latest_orig_login_date;
+    SELF.Source := le.email_src;
+    SELF.NumEmailPerLexid := le.num_email_per_did;
+    SELF.NumLexIdPerEmail := le.num_did_per_email;
+    SELF.PenaltyAddress := le.penalt_addr;
+    SELF.PenaltyName := le.penalt_name;
+    SELF.PenaltyDidSsnDob := le.penalt_didssndob;
+    SELF.EmailStatus := le.email_status;
+    SELF.EmailStatusReason := le.email_status_reason;
+    SELF.AdditionalStatusInfo := le.additional_status_info;
+    SELF.EmailId := le.email_id;
+    SELF.Relationship := le.Relationship;
+    SELF.isDeepDive := le.isDeepDive;
+    SELF.Penalt := le.Penalt;
+
+    SELF := le;
+    SELF := [];
+  END;
+  
+  EXPORT iesp.share.t_ResponseHeader  xfAddHeader(INTEGER status, DATASET($.Layouts.email_final_rec) re)
+  := TRANSFORM
+  
+    service_header := iesp.ECL2ESP.GetHeaderRow();
+    
+    SELF.QueryId       := service_header.QueryId;
+    SELF.TransactionId := service_header.TransactionId;
+    SELF.Status        := status;
+    SELF.Message       := AutoKeyI.errorcodes._msgs(status);
+    SELF.Exceptions    := PROJECT(re, TRANSFORM(iesp.share.t_WsException, 
+                                                        SELF.Source :='Roxie',
+                                                        SELF.Code := LEFT.record_err_code,
+                                                        SELF.Message := LEFT.record_err_msg,
+                                                        SELF.Location := ''));
+  END;
+  
+  EXPORT iesp.emailfinder.t_EmailFinderInputSubject  xfInputEcho(iesp.emailfinder.t_EmailFinderSearchBy _in, UNSIGNED lexid)
+  := TRANSFORM
+  
+    SELF.InputEcho     := _in;
+    SELF.SubjectLexid  := lexid;
+  END;
   
 END;

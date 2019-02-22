@@ -20,6 +20,7 @@ EXPORT Constants := MODULE
     EXPORT UNSIGNED DID_SCORE_THRESHOLD  := 80;  // BatchShare.Constants.Defaults.didScoreThreshold
     EXPORT UNSIGNED SSN_SEARCH_PENALTY   := 999;  // will be used to prevent name only match in case of blank ssn for name/ssn search 
     EXPORT UNSIGNED RELATIONSHIP_PENALTY   := 100;  // will be used for fuzzy relations match where only input lexid is available
+    EXPORT STRING20 SingleSearchAccountNo := '0';
   END;
   
   EXPORT UNSIGNED EmailQualityRulesForBVCall := 0;
@@ -28,7 +29,7 @@ EXPORT Constants := MODULE
   EXPORT STRING EMAIL_SOURCES := 'EMAIL_SOURCES';
   EXPORT STRING STR_TRUE := 'true';
   
-  EXPORT IntendedPurpose := MODULE
+  EXPORT RestrictedUseCase := MODULE
     EXPORT STRING Standard           := 'STANDARD'; // or blank, no use case restrictions
     EXPORT STRING Reseller           := 'RESELLER';  
     EXPORT STRING DirectMarketing    := 'DIRECTMARKETING';  

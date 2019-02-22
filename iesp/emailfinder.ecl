@@ -10,12 +10,14 @@ export t_EmailFinderSearchBy := record
 	unsigned8 LexId {xpath('LexId')};
 	string110 Email {xpath('Email')};
 	string11 SSN {xpath('SSN')};
+	string10 Phone10 {xpath('Phone10')};
 	iesp.share.t_Name Name {xpath('Name')};
 	iesp.share.t_Address Address {xpath('Address')};
 	iesp.share.t_Date DOB {xpath('DOB')};
 end;
 		
 export t_EmailFinderSearchOption := record (iesp.share.t_BaseSearchOptionEx)
+	string SearchType {xpath('SearchType')}; //values['EAA','EIA','EIC','']
 	string EmailQualityRulesMask {xpath('EmailQualityRulesMask')};
 	boolean IncludeNoLexIdMatch {xpath('IncludeNoLexIdMatch')};
 	boolean IncludeHistoricData {xpath('IncludeHistoricData')};
@@ -23,7 +25,6 @@ export t_EmailFinderSearchOption := record (iesp.share.t_BaseSearchOptionEx)
 	boolean KeepUndeliverableEmail {xpath('KeepUndeliverableEmail')};
 	unsigned2 MaxEmailsForDeliveryCheck {xpath('MaxEmailsForDeliveryCheck')};
 	string BVAPIkey {xpath('BVAPIkey')};
-	string SearchType {xpath('SearchType')}; //values['EAA','EIA','EIC','']
 end;
 		
 export t_EmailFinderOriginalData := record
@@ -86,8 +87,8 @@ end;
 		
 export t_EmailFinderSearchResponse := record
 	iesp.share.t_ResponseHeader _Header {xpath('Header')};
-	t_EmailFinderInputSubject InputSubject {xpath('InputSubject')};
 	dataset(t_EmailFinderSearchRecord) Records {xpath('Records/Record'), MAXCOUNT(iesp.Constants.Email.MAX_RECS)};
+	t_EmailFinderInputSubject InputSubject {xpath('InputSubject')};
 end;
 		
 export t_EmailFinderSearchRequest := record (iesp.share.t_BaseRequest)
