@@ -1,4 +1,4 @@
-﻿IMPORT AID;
+IMPORT AID;
 
 //////////////////////////////////////////////////////////////////////////////////////
 // -- Apply AID process on the entire base recs for getting fresh address.
@@ -52,9 +52,8 @@ EXPORT Standardize_Addr(DATASET(Layouts.Base) pBaseFile) := FUNCTION
 			                       SELF.raw_aid                           := LEFT.aidwork_rawaid;
 			                       SELF.Clean_Company_address.fips_state  := LEFT.aidwork_acecache.county[1..2];
 			                       SELF.Clean_Company_address.fips_county := LEFT.aidwork_acecache.county[3..];
-			                       SELF.Clean_Company_address.zip		  := LEFT.aidwork_acecache.zip5;
-			                       SELF.Clean_Company_address			  := LEFT.aidwork_acecache;
-			                       SELF.zip4							  := LEFT.aidwork_acecache.zip4;
+			                       SELF.Clean_Company_address.zip					:= LEFT.aidwork_acecache.zip5;
+			                       SELF.Clean_Company_address							:= LEFT.aidwork_acecache;
 														 
 			                       SELF := LEFT;)) + PROJECT(dWithout_address, Layouts.Base);
 
