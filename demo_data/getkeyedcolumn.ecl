@@ -1,4 +1,5 @@
-export getkeyedcolumn(string filename) := function
+﻿import ut;
+export getkeyedcolumn(string filename,string esp) := function
 
 	checkoutAttributeInRecord := record
 		
@@ -54,10 +55,11 @@ export getkeyedcolumn(string filename) := function
 		dataset(string_rec1) nonkeycols20{xpath('DFUDataNonKeyedColumns20/DFUDataColumn')};*/
 	end;
 	
-	results := SOAPCALL('http://10.173.84.202:8010/Wsdfu/?ver_=1.22', 'DFUSearchData', 
+	results := SOAPCALL('http://'+esp+':8010/Wsdfu/?ver_=1.22', 'DFUSearchData', 
 											checkoutAttributeInRecord, dataset(checkoutAttributeOutRecord),
 											
 											xpath('DFUSearchDataResponse')
+											,HTTPHEADER('Authorization', 'Basic ' + ut.Credentials().fGetEncodedValues())
 										 );
 
 	return results;

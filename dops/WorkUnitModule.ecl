@@ -1,4 +1,4 @@
-﻿import _Control,STD,wk_ut;
+﻿import _Control,STD,wk_ut,ut;
 
 EXPORT WorkUnitModule(string lTargetESPAddress,string lTargetESPPort) := module
 	
@@ -44,6 +44,7 @@ EXPORT WorkUnitModule(string lTargetESPAddress,string lTargetESPPort) := module
 																						 rWUCreateAndUpdateRequest,
 																						 rWUCreateAndUpdateResponse,
 																						 xpath('WUUpdateResponse')
+																						 ,HTTPHEADER('Authorization', 'Basic ' + ut.Credentials().fGetEncodedValues())
 																						);
 
 			return	dWUCreateAndUpdateResult.WUID;
@@ -75,6 +76,7 @@ EXPORT WorkUnitModule(string lTargetESPAddress,string lTargetESPPort) := module
 																	 rWUSubmitRequest,
 																	 rWUSubmitResponse,
 																	 xpath('WUSubmitResponse/Exceptions/Exception')
+																	 ,HTTPHEADER('Authorization', 'Basic ' + ut.Credentials().fGetEncodedValues())
 																	);
 
 			return	dWUSubmitResult;
@@ -115,6 +117,7 @@ EXPORT WorkUnitModule(string lTargetESPAddress,string lTargetESPPort) := module
 		dSOAPResult := SOAPCALL('http://'+lTargetESPAddress+':'+lTargetESPPort+'/WsWorkunits', 'WUInfo', 
 											rWUInfoRequest, dataset(rWUInfoResponse),
 											xpath('WUInfoResponse/Workunit')
+											,HTTPHEADER('Authorization', 'Basic ' + ut.Credentials().fGetEncodedValues())
 										 );
 										 
 		rWUFilesFlat := record
