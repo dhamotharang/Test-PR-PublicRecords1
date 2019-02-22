@@ -93,6 +93,7 @@ MACRO
 	
 	// Search module
 	searchMod := PROJECT(globalMod,PhoneFinder_Services.iParam.DIDParams,OPT);
+	reportMod := PhoneFinder_Services.iParam.GetSearchParams(pfOptions,pfUser);
 	
 	// Create dataset from search request
 	Autokey_batch.Layouts.rec_inBatchMaster tFormat2Batch() :=
@@ -116,9 +117,10 @@ MACRO
 		SELF.ssn         := IF( AutoStandardI.InterfaceTranslator.ssn_value.val(searchMod) != '',
 														AutoStandardI.InterfaceTranslator.ssn_value.val(searchMod),
 														searchMod.SSN);
-		SELF.homephone   := IF( AutoStandardI.InterfaceTranslator.phone_value.val(searchMod) != '',
+		Input_PhoneNumber   := IF( AutoStandardI.InterfaceTranslator.phone_value.val(searchMod) != '',
 														AutoStandardI.InterfaceTranslator.phone_value.val(searchMod),
 														searchMod.Phone);
+		SELF.homephone  := IF(reportMod.IsPrimarySearchPII, '', Input_PhoneNumber);                                                    
 		SELF.DID         := IF( AutoStandardI.InterfaceTranslator.did_value.val(searchMod) != '',
 														(UNSIGNED6)AutoStandardI.InterfaceTranslator.did_value.val(searchMod),
 														(UNSIGNED6)searchMod.DID);
@@ -156,7 +158,7 @@ MACRO
 	cleanpSearchBy := PROJECT(dReqBatch, CleanupSearch(LEFT));
 	
 	formattedSearchBy := cleanpSearchBy[1];
-	reportMod := PhoneFinder_Services.iParam.GetSearchParams(pfOptions,pfUser);
+	
 	modRecords := PhoneFinder_Services.PhoneFinder_Records(dReqBatch, reportMod, IF(reportMod.TransactionType = PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT,
 															dGateways(servicename IN PhoneFinder_Services.Constants.PhoneRiskAssessmentGateways),dGateways),
  															formattedSearchBy, pfSearchBy);
