@@ -1,7 +1,7 @@
-﻿EXPORT BasicScoring := MODULE
-  IMPORT KELOtto, FraudGovPlatform_Analytics, FraudGovPlatform;
+﻿﻿EXPORT BasicScoring := MODULE
+  IMPORT KELOtto, FraudGovPlatform_Analytics, FraudGovPlatform, Data_services;
 
-	EXPORT WeightingChart := DATASET('~thor_data400::in::fraudgov::sprayed::configrisklevel', {INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING UiDescription}, CSV(HEADING(1)));
+	EXPORT WeightingChart := DATASET(IF(KELOtto.Constants.useProdData, Data_services.foreign_prod, data_services.foreign_dataland)+'fraudgov::in::sprayed::configrisklevel', {INTEGER8 EntityType, STRING200 Field, STRING Value, DECIMAL Low, DECIMAL High, INTEGER RiskLevel, INTEGER Weight, STRING UiDescription}, CSV(HEADING(1)));
 	
   EXPORT PersonStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Person.Res0, 'industry_type_,customer_id_,entity_context_uid_', 
                         'score_,cluster_score_,event_count_,' + 
