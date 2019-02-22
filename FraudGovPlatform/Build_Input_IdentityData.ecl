@@ -5,23 +5,13 @@ EXPORT Build_Input_IdentityData(
 	,dataset(Layouts.OutputF.SkipModules) pSkipModules = FraudGovPlatform.Files().OutputF.SkipModules
 	,dataset(Layouts.Input.IdentityData) IdentityData_Sprayed =  files().Input.IdentityData.sprayed	
 	,dataset(Layouts.Input.IdentityData) ByPassed_IdentityData_Sprayed = files().Input.ByPassed_IdentityData.sprayed
-	,boolean PSkipValidations = false	 
+	,boolean PSkipValidations = true	 
 ) :=
 module
 
 	shared SkipNACBuild := pSkipModules[1].SkipNACBuild;
 	shared SkipInquiryLogsBuild := pSkipModules[1].SkipInquiryLogsBuild;
 
-	SHARED fn_dedup(inputs):=FUNCTIONMACRO
-		in_srt:=sort(inputs, RECORD, EXCEPT processdate);
-		in_ddp:=rollup(in_srt,
-		TRANSFORM(Layouts.Input.IdentityData,SELF := LEFT; SELF := []),
-		RECORD,
-		EXCEPT ProcessDate,
-		LOCAL);	
-		return in_ddp;
-	ENDMACRO;
-	
 	inIdentityDataUpdate :=	  if( nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.IdentityData)) > 0, 
 		Files(pversion).Sprayed.IdentityData, 
 		dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
@@ -63,7 +53,7 @@ module
 		self.file_type := 3 ;
 		source_input := if (l.source_input = '', 'IDDT',l.source_input);
 		self.source_input := source_input;
-		SELF.unique_id := max_uid + cnt; 
+		SELF.unique_id := max_uid + cnt;
 		self.Deltabase := 0;
 		self:=l;
 		self:=[];
@@ -95,7 +85,7 @@ module
 
 	//Exclude Errors
 	shared ByPassed_records := f1_errors + NotInMbs;
-	f1_bypass_dedup := ByPassed_IdentityData_Sprayed + project(ByPassed_records,FraudGovPlatform.Layouts.Input.IdentityData);
+	f1_bypass_dedup := fn_dedup(ByPassed_IdentityData_Sprayed + project(ByPassed_records,FraudGovPlatform.Layouts.Input.IdentityData));
 	
 	tools.mac_WriteFile(Filenames().Input.ByPassed_IdentityData.New(pversion),
 		f1_bypass_dedup,
@@ -111,6 +101,7 @@ module
 	//Move only Valid Records
 	shared f1_dedup :=	join (	f1,
 							ByPassed_records,
+							left.Customer_Account_Number = right.Customer_Account_Number and
 							left.Unique_Id = right.Unique_Id,
 							TRANSFORM(Layouts.Input.IdentityData,SELF := LEFT),
 							left only);
@@ -135,7 +126,7 @@ module
 	dAppendLexid := Standardize_Entity.Append_Lexid (dAppendPhone);
 	dCleanInputFields := Standardize_Entity.Clean_InputFields (dAppendLexid);	
 	
-	input_file_1 := fn_dedup(IdentityData_Sprayed  + project(dCleanInputFields,Layouts.Input.IdentityData));
+	input_file_1 := fn_dedup(IdentityData_Sprayed  + project(dCleanInputFields,Layouts.Input.IdentityData)); 
 
 	// Refresh Addresses every 90 days
 	IsTimeForRefresh := AddressesInfo(pversion).IsTimeForRefresh;
