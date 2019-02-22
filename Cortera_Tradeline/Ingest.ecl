@@ -40,18 +40,18 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
 
   // Ingest Files: Rollup to get unique new records
   DistIngest0 := DISTRIBUTE(FilesToIngest0, HASH32(link_id,account_key,ar_date,total_ar,status));
-  SortIngest0 := SORT(DistIngest0,link_id,account_key,ar_date,total_ar,status, __Tpe, rid, LOCAL);
+  SortIngest0 := SORT(DistIngest0,link_id,account_key,ar_date,total_ar,status, __Tpe, record_sid, LOCAL);
   GroupIngest0 := GROUP(SortIngest0,link_id,account_key,ar_date,total_ar,status, LOCAL, ORDERED, STABLE);
   SHARED AllIngestRecs0 := UNGROUP(ROLLUP(GroupIngest0,TRUE,MergeData(LEFT,RIGHT)));
 
   // Existing Base: combine delta with base file
   DistBase0 := DISTRIBUTE(Base0+Delta0, HASH32(link_id,account_key,ar_date,total_ar,status));
-  SortBase0 := SORT(DistBase0,link_id,account_key,ar_date,total_ar,status, __Tpe, rid, LOCAL);
+  SortBase0 := SORT(DistBase0,link_id,account_key,ar_date,total_ar,status, __Tpe, record_sid, LOCAL);
   GroupBase0 := GROUP(SortBase0,link_id,account_key,ar_date,total_ar,status, LOCAL, ORDERED, STABLE);
   SHARED AllBaseRecs0 := UNGROUP(ROLLUP(GroupBase0,TRUE,MergeData(LEFT,RIGHT)));
 
   // Everything: combine ingest and base recs
-  Sort0 := SORT(AllBaseRecs0+AllIngestRecs0,link_id,account_key,ar_date,total_ar,status, __Tpe,rid,LOCAL);
+  Sort0 := SORT(AllBaseRecs0+AllIngestRecs0,link_id,account_key,ar_date,total_ar,status, __Tpe,record_sid,LOCAL);
   Group0 := GROUP(Sort0,link_id,account_key,ar_date,total_ar,status,LOCAL, ORDERED, STABLE);
   SHARED AllRecs0 := UNGROUP(ROLLUP(Group0,TRUE,MergeData(LEFT,RIGHT)));
 
@@ -60,13 +60,13 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
   // Do not use PROJECT,COUNTER because it is very slow if any of the fields are not fixed length
   NR := AllRecs0(__Tpe=RecordType.New);
   ORe := AllRecs0(__Tpe<>RecordType.New);
-  PrevBase := MAX(ORe,rid);
+  PrevBase := MAX(ORe,record_sid);
   WithRT AddNewRid(WithRT le, WithRT ri) := TRANSFORM
-    SELF.rid := IF ( le.rid=0, PrevBase+1+thorlib.node(), le.rid+thorlib.nodes() );
+    SELF.record_sid := IF ( le.record_sid=0, PrevBase+1+thorlib.node(), le.record_sid+thorlib.nodes() );
     SELF := ri;
   END;
-  NR1 := ITERATE(NR(rid=0),AddNewRid(LEFT,RIGHT),LOCAL);
-  SHARED AllRecs := ORe+NR1+NR(rid<>0) : PERSIST('~temp::Cortera_Tradeline::Ingest_Cache',EXPIRE(Cortera_Tradeline.Config.PersistExpire));
+  NR1 := ITERATE(NR(record_sid=0),AddNewRid(LEFT,RIGHT),LOCAL);
+  SHARED AllRecs := ORe+NR1+NR(record_sid<>0) : PERSIST('~temp::Cortera_Tradeline::Ingest_Cache',EXPIRE(Cortera_Tradeline.Config.PersistExpire));
   SHARED UpdateStatsFull := SORT(TABLE(AllRecs, {__Tpe,SALT311.StrType INGESTSTATUS:=RTToText(AllRecs.__Tpe),UNSIGNED Cnt:=COUNT(GROUP)}, __Tpe, FEW),__Tpe, FEW);
   SHARED UpdateStatsInc := SORT(UpdateStatsFull(__Tpe = RecordType.New), __Tpe, INGESTSTATUS, FEW);
   EXPORT UpdateStats := IF(incremental, UpdateStatsInc, UpdateStatsFull);
@@ -83,8 +83,8 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
   EXPORT AllRecords := IF(incremental, NewRecords, PROJECT(AllRecs, NoFlagsRec));
   EXPORT AllRecords_NoTag := PROJECT(AllRecords,Layout_Tradeline_Base); // Records in 'pure' format
 
-f := TABLE(dsBase,{rid}) : GLOBAL;
-rcid_clusters := SALT311.MOD_ClusterStats.Counts(f,rid);
+f := TABLE(dsBase,{record_sid}) : GLOBAL;
+rcid_clusters := SALT311.MOD_ClusterStats.Counts(f,record_sid);
 DuplicateRids0 := COUNT(dsBase) - SUM(rcid_clusters,NumberOfClusters); // Should be zero
 d := DATASET([{DuplicateRids0}],{UNSIGNED2 DuplicateRids0});
 EXPORT ValidityStats := OUTPUT(d,NAMED('ValidityStatistics'));
