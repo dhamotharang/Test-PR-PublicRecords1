@@ -2,7 +2,7 @@
 EXPORT Fn_Propagate_TMSIDRMSID_Party (DATASET(LiensV2.Layout_TMSIDRMSID_Mappingfile) dslimMain, 
                                       DATASET(liensv2.Layout_liens_party_SSN_for_hogan_BIPV2_with_LinkFlags) dParty) := FUNCTION
 /***********************************************************************************************
-DF-24044 - Phase 1 Juli 
+DF-24044 - Juli Data Enhancement
 This function propogates the oldest TMSID and RMSID to from the main to the party file
 
 LiensV2.file_Hogan_party

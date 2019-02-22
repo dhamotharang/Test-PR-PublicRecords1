@@ -18,15 +18,27 @@ END;
 
 HOGAN_main := project(LiensV2.file_Hogan_main, forkey(left));
 
-pre_file_liens_main := project((HOGAN_main(tmsid not in Liensv2.Suppress_TMSID())
-                        + LiensV2.file_ILFDLN_main(tmsid not in Liensv2.Suppress_TMSID())
+Other_Main := LiensV2.file_ILFDLN_main(tmsid not in Liensv2.Suppress_TMSID())
 												+ LiensV2.file_NYC_main(tmsid not in Liensv2.Suppress_TMSID())
 												+ LiensV2.file_NYFDLN_main(tmsid not in Liensv2.Suppress_TMSID())
 												+ LiensV2.file_SA_main(tmsid not in Liensv2.Suppress_TMSID())
 												+ LiensV2.file_chicago_law_main(tmsid not in Liensv2.Suppress_TMSID())
 												+ LiensV2.file_CA_federal_main(tmsid not in Liensv2.Suppress_TMSID())
 												+ LiensV2.file_Superior_main(tmsid not in Liensv2.Suppress_TMSID())
-												+ LiensV2.file_MA_main(tmsid not in Liensv2.Suppress_TMSID())), 
+												+ LiensV2.file_MA_main(tmsid not in Liensv2.Suppress_TMSID());
+/* DF-24044 - Populate the old tmsids in other sources*/												 
+liensv2.Layout_liens_main_module.layout_liens_main propagate_ids(liensv2.Layout_liens_main_module.layout_liens_main l) :=
+TRANSFORM							
+
+  self.TMSID_old  := l.tmsid;
+  self.RMSID_old  := l.rmsid;
+  SELF				    := l;
+end;
+
+Other_MainwithOldids := project(Other_Main, propagate_ids(left));
+												
+pre_file_liens_main := project((HOGAN_main(tmsid not in Liensv2.Suppress_TMSID())
+                              + Other_MainwithOldids) , 
 						transform({liensv2.Layout_liens_main_module.layout_liens_main }, 
  self.tmsid :=  ut.CleanSpacesAndUpper(left.tmsid ), 
  self.rmsid :=  ut.CleanSpacesAndUpper(left.rmsid ),
@@ -68,7 +80,10 @@ pre_file_liens_main := project((HOGAN_main(tmsid not in Liensv2.Suppress_TMSID()
  self.legal_lot :=  ut.CleanSpacesAndUpper(left.legal_lot ),
  self.legal_block:=  ut.CleanSpacesAndUpper(left.legal_block ) ,
  self.legal_borough:=  ut.CleanSpacesAndUpper(left.legal_borough ) ,
- self.certificate_number:=  ut.CleanSpacesAndUpper(left.certificate_number ), self := left)); 
+ self.certificate_number:=  ut.CleanSpacesAndUpper(left.certificate_number ), 
+ self.tmsid_old :=  ut.CleanSpacesAndUpper(left.tmsid_old ), 
+ self.rmsid_old :=  ut.CleanSpacesAndUpper(left.rmsid_old ), 
+ self := left)); 
  
 pre_file_liens_main_dedup := dedup(sort(distribute(pre_file_liens_main,hash(tmsid)), 
  tmsid,
@@ -113,13 +128,14 @@ pre_file_liens_main_dedup := dedup(sort(distribute(pre_file_liens_main,hash(tmsi
  legal_borough ,
  certificate_number ,
  bCBFlag,
- filing_status[1].filing_status,filing_status[1].filing_status_desc,-process_date,local),record, except process_date,local); 
+ filing_status[1].filing_status,filing_status[1].filing_status_desc,
+ tmsid_old,rmsid_old, -process_date,local),record, except process_date,local); 
 
 //Add persistent record id 
 Main_puid := project(pre_file_liens_main_dedup , transform({liensv2.Layout_liens_main_module.layout_liens_main} ,
-
-											self.persistent_record_id := 	hash64(  trim(left.tmsid,left,right)+ ','+
-																									  trim(left.rmsid,left,right)+  ','+
+ 
+											self.persistent_record_id := 	hash64(  trim(left.tmsid_old,left,right)+ ','+ //DF-24044 use the old ids to prevent the overrides from changing
+																									  trim(left.rmsid_old,left,right)+  ','+ //DF-24044 use the old ids to prevent the overrides from changing
 																									  trim(left.record_code,left,right)+  ','+
 																									  trim(left.date_vendor_removed ,left,right)+  ','+
 																									  trim(left.filing_jurisdiction,left,right)+  ','+
@@ -161,10 +177,10 @@ Main_puid := project(pre_file_liens_main_dedup , transform({liensv2.Layout_liens
 																										trim( left.certificate_number ,left,right)+
 																										trim(left.filing_status[1].filing_status ,left,right)+trim(left.filing_status[1].filing_status_desc,left,right)), 
 
-self := left)); 
+                                                    self := left)); 
 
 export file_liens_main := project(Main_puid((integer)amount >= 0), 
 						transform(liensv2.Layout_liens_main_module.layout_liens_main, 
 						self.orig_filing_date := if(left.orig_filing_date <= stringlib.GetDateYYYYMMDD(),left.orig_filing_date, ''),
-						self := left)) :INDEPENDENT;
+						self := left)) :persist('~persist::file_liens_main');//:INDEPENDENT;
 						

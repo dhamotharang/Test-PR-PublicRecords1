@@ -1,5 +1,12 @@
 ﻿import LiensV2,	LiensV2_preprocess, ut; 
-LiensV2.Layout_liens_party_SSN_BIPV2_with_LinkFlags refHGPTY(LiensV2.Layout_liens_party_SSN_for_hogan_BIPV2_with_LinkFlags l) :=
+
+rLayout_liens_party_temp := record
+LiensV2.Layout_liens_party_SSN_BIPV2_with_LinkFlags;
+string50 TMSID_old;
+string50 RMSID_old;
+end;
+
+rLayout_liens_party_temp refHGPTY(LiensV2.Layout_liens_party_SSN_for_hogan_BIPV2_with_LinkFlags l) :=
 TRANSFORM
 	//	Clear Date_Last_Seen for Hogan records with filing_type_desc=CORRECTED FEDERAL TAX LIEN
 	dHoganMain	:=	LiensV2.file_Hogan_main;
@@ -20,16 +27,28 @@ END;
 
 Hogan_party := project(LiensV2.file_Hogan_party, refHGPTY(left));
 
-file_liens := Hogan_party((cname <> ''or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID())
-              + LiensV2.file_ILFDLN_party((cname <> '' or lname <> '' or fname <> '' or mname <> '')and tmsid not in Liensv2.Suppress_TMSID())
+Other_Party := LiensV2.file_ILFDLN_party((cname <> '' or lname <> '' or fname <> '' or mname <> '')and tmsid not in Liensv2.Suppress_TMSID())
    						+ LiensV2.file_NYC_party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID())
    						+ LiensV2.file_NYFDLN_party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID())
    						+ LiensV2.file_SA_party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID())
    						+ LiensV2.file_chicago_law_party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID())
    						+ LiensV2.file_CA_federal_party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID())
    						+ LiensV2.file_Superior_Party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID())
-   						+ LiensV2.file_MA_Party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID())
-;
+   						+ LiensV2.file_MA_Party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID());
+						
+/* DF-24044 - Populate the old tmsids in other sources*/								
+rLayout_liens_party_temp propagate_ids(LiensV2.Layout_liens_party_SSN_BIPV2_with_LinkFlags l) :=
+TRANSFORM							
+
+  self.TMSID_old  := l.tmsid;
+  self.RMSID_old  := l.rmsid;
+  SELF				    := l;
+end;
+
+Other_Party_withIDS := project(Other_Party, propagate_ids(left));
+
+file_liens := Hogan_party((cname <> ''or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID())
+              + Other_Party_withIDS;
 
 file_liens_dist := distribute(project(file_liens, transform({file_liens},
 															self.tmsid := ut.CleanSpacesAndUpper(left.tmsid); 
@@ -55,11 +74,13 @@ file_liens_dist := distribute(project(file_liens, transform({file_liens},
 															self.name_type:= ut.CleanSpacesAndUpper(left.name_type );
 															self.did := if (trim(left.did,left,right)= '', '000000000000', left.did) ; 
 															self.bdid := if (trim(left.bdid,left,right)= '', '000000000000', left.bdid);
+															self.tmsid_old := ut.CleanSpacesAndUpper(left.TMSID_old); 
+															self.rmsid_old := ut.CleanSpacesAndUpper(left.RMSID_old);
 											self := left)) ,hash(tmsid));
 
 get_recs_sort  := sort(file_liens_dist,record,- Date_Last_Seen, local);
 
-LiensV2.Layout_liens_party_SSN_BIPV2_with_LinkFlags  rollupXform(LiensV2.Layout_liens_party_SSN_BIPV2_with_LinkFlags l, LiensV2.Layout_liens_party_SSN_BIPV2_with_LinkFlags  r) := transform
+rLayout_liens_party_temp  rollupXform(rLayout_liens_party_temp l, rLayout_liens_party_temp  r) := transform
 		self.Date_First_Seen := if(l.Date_First_Seen > r.Date_First_Seen, r.Date_First_Seen, l.Date_First_Seen);
 		self.Date_Last_Seen  := if(l.Date_Last_Seen  < r.Date_Last_Seen,  r.Date_Last_Seen,  l.Date_Last_Seen);
 		self.Date_Vendor_First_Reported := if(l.Date_Vendor_First_Reported > r.Date_Vendor_First_Reported, r.Date_Vendor_First_Reported, l.Date_Vendor_First_Reported);
@@ -71,10 +92,10 @@ get_recs_party := rollup(get_recs_sort,rollupXform(LEFT,RIGHT),RECORD,
                                 EXCEPT Date_First_Seen, Date_Last_Seen,
 																Date_Vendor_First_Reported, Date_Vendor_Last_Reported,lot,lot_order,geo_lat, geo_long,geo_match ,cart,msa,cr_sort_sz,dbpc,rec_type,err_stat,p_city_name,name_score, local); // All these are because of address cleaning issues once AID implemented this should be resloved
 
-LiensV2.Layout_liens_party_SSN_BIPV2_with_LinkFlags  tformat(get_recs_party L) := transform
+rLayout_liens_party_temp  tformat(get_recs_party L) := transform
 
-self.persistent_record_id := hash64(trim(l.tmsid,left,right)+','+
-																		trim(l.rmsid,left,right)+','+
+self.persistent_record_id := hash64(trim(l.tmsid_old,left,right)+','+ //DF-24044 use the old ids to prevent the overrides from changing
+																		trim(l.rmsid_old,left,right)+','+ //DF-24044 use the old ids to prevent the overrides from changing
 																		trim(l.orig_full_debtorname,left,right)+','+
 																		trim(l.orig_name ,left,right)+','+
 																		trim(l.orig_lname,left,right)+','+
@@ -101,4 +122,6 @@ end;
 Add_puid := project(get_recs_party, tformat(left));
 
 
-EXPORT File_Liens_Party_BIPV2_with_Linkflags := Add_puid;
+Allrecords := project(Add_puid, LiensV2.Layout_liens_party_SSN_BIPV2_with_LinkFlags); 
+
+EXPORT File_Liens_Party_BIPV2_with_Linkflags := Allrecords :persist('persist::File_Liens_Party_BIPV2_with_Linkflags');

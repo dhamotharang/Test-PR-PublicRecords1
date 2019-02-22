@@ -2,7 +2,7 @@
 EXPORT Fn_Propagate_TMSIDRMSID_Main (DATASET(LiensV2.Layout_liens_main_module_for_hogan.layout_liens_main) dMain) := FUNCTION
 
 /***********************************************************************************************
-DF-24044 - Phase 1 Juli 
+DF-24044 - Project Juli Data enhancement
 This function propogates the oldest TMSID to all the records with the same CaselinkID
 Then based on the new TMSID the new RMSID is calculated
 ***********************************************************************************************/
@@ -52,7 +52,7 @@ dHoganMainWCaselink    :=  Join(distribute(dHoganMainslim,HASH(TMSID)),distribut
                                 tLiensHoganMainWithCaseLinkID(LEFT,RIGHT),Right outer, local
                                 );
 
-//Group on Caselinkid and court to identify clusters that should have the same tmsid
+//Group on oldest propagated Caselinkid and court to identify clusters that should have the same tmsid
 dCaseLinkIDClusterGrp  :=  GROUP(SORT(DISTRIBUTE(dHoganMainWCaselink(TMSID<>'' AND CaseLinkID_temp<>'' AND CourtID<>''),
                                       HASH( CaseLinkID_temp,CourtID)),
                                  CaseLinkID_temp,CourtID,process_date,orig_filing_date,LOCAL),
@@ -71,7 +71,7 @@ dCaseLinkIDClusterGrp tPropagateTMSID(dCaseLinkIDClusterGrp l, dCaseLinkIDCluste
 dHoganMainwithNewTMSID := iterate(dCaseLinkIDClusterGrp,tPropagateTMSID(left,right));		
 All_records := dHoganMainWCaselink(~(TMSID<>'' AND CaseLinkID_temp<>'' AND CourtID<>'')) + dHoganMainwithNewTMSID;
 
-//////////////////////////////////////////////////////////////////////////////////////
+//Group on original Caselinkid and court to identify clusters that should have the same tmsid
 dCaseLinkIDClusterGrp2  :=  GROUP(SORT(DISTRIBUTE(All_records(TMSID<>'' AND CaseLinkID_temp2<>'' AND CourtID<>''),
                                       HASH( CaseLinkID_temp2,CourtID)),
                                  CaseLinkID_temp2,CourtID,process_date,orig_filing_date,LOCAL),
@@ -88,7 +88,7 @@ dCaseLinkIDClusterGrp tPropagateTMSID2(dCaseLinkIDClusterGrp2 l, dCaseLinkIDClus
   end;
 
 dHoganMainwithNewTMSID2 := iterate(dCaseLinkIDClusterGrp2,tPropagateTMSID2(left,right));	
-/////////////////////////////////////////////////////////////////////////////////////////
+
 
 //Derive the NEW RMSID for the records that got a new TMSID
 dCaseLinkIDClusterGrp tDeriveNewRMSID(dHoganMainwithNewTMSID2 l) := transform
