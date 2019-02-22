@@ -4,9 +4,6 @@
 /*2015-06-24T16:52:16Z (Sai Nagula)
 Open State search and Drivers exchange report grouping.
 */
-/*2019-02-20T19:00:00Z  (Mark Chambers)
-Modified to remove call to delta_ec.delta_report_data deltabase.  RR-14857
-*/
 /*--SOAP--
 <message name="eCrashAnalyticsService">
   <part name="ECrashRetrieveImageRequest" type="tns:XmlDataSet" cols="200" rows="20" />
@@ -152,7 +149,18 @@ EXPORT ImageSearchService() := FUNCTION
 	//We don't know which report_id was used to retreive image for TM that's why we are searching by all the possible report ids. ESP inserts report_id from the request.
 	AllReportIdSet := SET(ReportsAll, report_id) + SET(ReportHashKeysFromKeyFinal, report_id) + [RequestReportId]; 
 	
-	ImageRetrievalResponse := ImageService.GetImages(ImageRetrievalRequest);  // RR-14857
+	ImageDataFromDeltabase := IF(
+		isOnlyTm,
+		Functions.GetImageDataFromDeltabase(AllReportIdSet, InModuleDeltaBase)
+	);
+		
+	isTMExistsInDeltabase := ImageDataFromDeltabase[1].response.ImageData != '';
+		
+	ImageRetrievalResponse := IF(
+		isTMExistsInDeltabase,
+		ImageDataFromDeltabase, 
+		ImageService.GetImages(ImageRetrievalRequest)
+	);
 
 	IF (
 		ImageRetrievalResponse[1].response.ImageData = '' 
@@ -200,7 +208,7 @@ EXPORT ImageSearchService() := FUNCTION
 		);
 	END;
 	
-	InitialPurchase := FALSE; // RR-14857
+	InitialPurchase := IF(RequestRoyaltyType = 'N', false, isOnlyTm AND NOT(isTMExistsInDeltabase));
 	
 	Images := PROJECT(ImageRetrievalResponse, GenerateResponse(LEFT, ResponseHeader, InitialPurchase));
 	EmptyResponse := DATASET([TRANSFORM(iesp.retrieveimage.t_ECrashRetrieveImageResponse, SELF := [])]);
