@@ -39,11 +39,11 @@ EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Lay
 	// Get Business attributes
 	// When we get the cleaned attributes, then BusInputArchiveDateEcho will change to BusInputArchiveDateClean
 	InputPIIBIIAttributes := KEL.Clean(PublicRecords_KEL.Q_Input_Bus_Attributes_V1(withRepLexIDs, withBIPIDs, 
-		(STRING) withBIPIDs[1].BusInputArchiveDateEcho[1..8]).res0, TRUE, TRUE, TRUE);
+		(STRING) withBIPIDs[1].BusInputArchiveDateEcho[1..8], Options.KEL_Permissions_Mask).res0, TRUE, TRUE, TRUE);
 		
 		
 	// Get consumer attributes
-	Rep1InputPIIAttributes := KEL.Clean(PublicRecords_KEL.Q_Input_Attributes_V1(Rep1Input, Rep1Input[1].InputArchiveDateClean[1..8]).res0, TRUE, TRUE, TRUE);
+	Rep1InputPIIAttributes := KEL.Clean(PublicRecords_KEL.Q_Input_Attributes_V1(Rep1Input, Rep1Input[1].InputArchiveDateClean[1..8], Options.KEL_Permissions_Mask).res0, TRUE, TRUE, TRUE);
 
 	Rep1PersonAttributes := PublicRecords_KEL.FnRoxie_GetPersonAttributes(Rep1Input, FDCDataset, Options);
 

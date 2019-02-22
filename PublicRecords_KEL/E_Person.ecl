@@ -21,7 +21,7 @@ EXPORT E_Person(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compil
     KEL.typ.nstr Source_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
-    UNSIGNED1 __Permits;
+    UNSIGNED8 __Permits;
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
@@ -62,7 +62,7 @@ EXPORT E_Person(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compil
   SHARED __d3 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d3_Prefiltered,InLayout,__Mapping3),__Mapping3_Transform(LEFT)));
   SHARED __Mapping4 := 'did(UID),title(Title_),fname(First_Name_),mname(Middle_Name_),lname(Last_Name_),name_suffix(Name_Suffix_),lexidsegment(Lex_I_D_Segment_:\'\'),dob(Date_Of_Birth_:DATE),dateofdeath(Date_Of_Death_:DATE),gender(Gender_:\'\'),race(Race_:\'\'),race_desc(Race_Description_:\'\'),src(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   SHARED InLayout __Mapping4_Transform(InLayout __r) := TRANSFORM
-    SELF.__Permits := CFG_Compile.Permit_nonFCRA;
+    SELF.__Permits := CFG_Compile.Permit_NonFCRA;
     SELF := __r;
   END;
   SHARED __d4_Norm := NORMALIZE(__in,LEFT.Dataset_Doxie_Files__Key_Offenders,TRANSFORM(RECORDOF(__in.Dataset_Doxie_Files__Key_Offenders),SELF:=RIGHT));
@@ -71,7 +71,7 @@ EXPORT E_Person(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compil
   SHARED __d4 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d4_Prefiltered,InLayout,__Mapping4),__Mapping4_Transform(LEFT)));
   SHARED __Mapping5 := 'did(UID),title(Title_),firstname(First_Name_),middlename(Middle_Name_),lastname(Last_Name_),namesuffix(Name_Suffix_),lexidsegment(Lex_I_D_Segment_:\'\'),dob_alias(Date_Of_Birth_:DATE),dateofdeath(Date_Of_Death_:DATE),gender(Gender_:\'\'),race(Race_:\'\'),racedescription(Race_Description_:\'\'),src(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   SHARED InLayout __Mapping5_Transform(InLayout __r) := TRANSFORM
-    SELF.__Permits := CFG_Compile.Permit_nonFCRA;
+    SELF.__Permits := CFG_Compile.Permit_NonFCRA;
     SELF := __r;
   END;
   SHARED __d5_Norm := NORMALIZE(__in,LEFT.Dataset_Doxie_Files__Key_Offenders,TRANSFORM(RECORDOF(__in.Dataset_Doxie_Files__Key_Offenders),SELF:=RIGHT));
@@ -91,7 +91,7 @@ EXPORT E_Person(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compil
   SHARED __Mapping7 := 'did(UID),title(Title_),fname(First_Name_),mname(Middle_Name_),lname(Last_Name_),name_suffix(Name_Suffix_),lexidsegment(Lex_I_D_Segment_:\'\'),dateofbirth(Date_Of_Birth_:DATE),dateofdeath(Date_Of_Death_:DATE),gender(Gender_:\'\'),race(Race_:\'\'),racedescription(Race_Description_:\'\'),date_first_seen(Date_First_Seen_:EPOCH),date_last_seen(Date_Last_Seen_:EPOCH)';
   SHARED InLayout __Mapping7_Transform(InLayout __r) := TRANSFORM
     SELF.Source_ := __CN('BA');
-    SELF.__Permits := CFG_Compile.Permit_nonFCRA;
+    SELF.__Permits := CFG_Compile.Permit_NonFCRA;
     SELF := __r;
   END;
   SHARED __d7_Norm := NORMALIZE(__in,LEFT.Dataset_Bankruptcy_Files__Key_Search,TRANSFORM(RECORDOF(__in.Dataset_Bankruptcy_Files__Key_Search),SELF:=RIGHT));
@@ -166,7 +166,7 @@ EXPORT E_Person(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compil
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Person_Group,COUNT(ROWS(LEFT))=1),GROUP,Person__Single_Rollup(LEFT)) + ROLLUP(HAVING(Person_Group,COUNT(ROWS(LEFT))>1),GROUP,Person__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult);
+  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::PublicRecords_KEL::Person::Result' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
   EXPORT Result := __UNWRAP(__Result);
   EXPORT Gender__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Gender_);
   EXPORT Lex_I_D_Segment__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Lex_I_D_Segment_);

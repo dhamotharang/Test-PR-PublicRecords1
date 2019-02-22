@@ -16,12 +16,12 @@ DRMExperianFCRA =	1 //ECHF bit 14
 DPMSSN =	0 //use_DeathMasterSSAUpdates - bit 10
 DPMFDN =	0 //use_FDNContributoryData - bit 11
 DPMDL =	0 //use_InsuranceDLData - bit 13
-GLBA 	= 0 
-DPPA 	= 0 
+GLBA 	= 1 
+DPPA 	= 1 
 */
-GLBA := 0; //not used
-DPPA := 0; //not used 
-DataPermission := '0000000000000'; 
+GLBA := 1;
+DPPA := 1;
+DataPermissionMask := '0000000000000'; 
 DataRestrictionMask := '1000010000000100000000000000000000000000000000000'; 
 
 // Universally Set the History Date YYYYMMDD for ALL records. Set to 0 to use the History Date located on each record of the input file
@@ -186,8 +186,13 @@ soapLayout := RECORD
 	// STRING CustomerId; // This is used only for failed transactions here; it's ignored by the ECL service.
 	DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout) input;
 	INTEGER ScoreThreshold;
+	STRING DataRestrictionMask;
+	STRING DataPermissionMask;
+	UNSIGNED1 GLBA_Purpose;
+	UNSIGNED1 DPPA_Purpose;
 	BOOLEAN OutputMasterResults;
 	BOOLEAN ExcludeConsumerShell;
+	BOOLEAN IsMarketing;
 	
 	UNSIGNED BIPAppendScoreThreshold;
 	UNSIGNED BIPAppendWeightThreshold;
@@ -195,6 +200,26 @@ soapLayout := RECORD
 	BOOLEAN BIPAppendReAppend;
 	BOOLEAN BIPAppendIncludeAuthRep;
 end;
+
+Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
+	EXPORT STRING AttributeSetName := 'Development KEL Attributes';
+	EXPORT STRING VersionName := 'Version 1.0';
+	EXPORT BOOLEAN isFCRA := FALSE;
+	EXPORT STRING ArchiveDate := historyDate;
+	EXPORT STRING InputFileName := InputFile;
+	EXPORT STRING Data_Restriction_Mask := DataRestrictionMask;
+	EXPORT STRING Data_Permission_Mask := DataPermissionMask;
+	EXPORT UNSIGNED GLBAPurpose := GLBA;
+	EXPORT UNSIGNED DPPAPurpose := DPPA;
+	EXPORT BOOLEAN Override_Experian_Restriction := OverrideExperianRestriction;
+	EXPORT STRING Allowed_Sources := AllowedSources; // Controls inclusion of DNBDMI data
+	EXPORT UNSIGNED LexIDThreshold := Score_threshold;
+	EXPORT UNSIGNED BusinessLexIDThreshold := BIPAppend_Score_Threshold;
+	EXPORT UNSIGNED BusinessLexIDWeightThreshold := BIPAppend_Weight_Threshold;
+	EXPORT BOOLEAN BusinessLexIDPrimForce := BIPAppend_PrimForce;
+	EXPORT BOOLEAN BusinessLexIDReAppend := BIPAppend_ReAppend;
+	EXPORT BOOLEAN BusinessLexIDIncludeAuthRep := BIPAppend_Include_AuthRep;
+END;
 
 // Uncomment this code to run as test harness on Thor instead of SOAPCALL to Roxie
 // Options := MODULE(PublicRecords_KEL.Interface_Options)
@@ -214,14 +239,19 @@ soapLayout trans (inDataReadyDist le):= TRANSFORM
 	SELF.input := PROJECT(le, TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout,
 		SELF := LEFT;
 		SELF := []));
-	SELF.ScoreThreshold := Score_threshold;
+	SELF.ScoreThreshold := Settings.LexIDThreshold;
+	SELF.DataRestrictionMask := Settings.Data_Restriction_Mask;
+	SELF.DataPermissionMask := Settings.Data_Permission_Mask;
+	SELF.GLBA_Purpose := Settings.GLBAPurpose;
+	SELF.DPPA_Purpose := Settings.DPPAPurpose;
+	SELF.IsMarketing := FALSE;
 	SELF.OutputMasterResults := Output_Master_Results;
 	SELF.ExcludeConsumerShell := Exclude_Consumer_Shell;
-	SELF.BIPAppendScoreThreshold := BIPAppend_Score_Threshold;
-	SELF.BIPAppendWeightThreshold := BIPAppend_Weight_Threshold;
-	SELF.BIPAppendPrimForce := BIPAppend_PrimForce;
-	SELF.BIPAppendReAppend := BIPAppend_ReAppend;
-	SELF.BIPAppendIncludeAuthRep := BIPAppend_Include_AuthRep;
+	SELF.BIPAppendScoreThreshold := Settings.BusinessLexIDThreshold;
+	SELF.BIPAppendWeightThreshold := Settings.BusinessLexIDWeightThreshold;
+	SELF.BIPAppendPrimForce := Settings.BusinessLexIDPrimForce;
+	SELF.BIPAppendReAppend := Settings.BusinessLexIDReAppend;
+	SELF.BIPAppendIncludeAuthRep := Settings.BusinessLexIDIncludeAuthRep;
 END;
 
 soap_in := PROJECT(inDataReadyDist, trans(LEFT));
@@ -297,27 +327,7 @@ IF(Output_Master_Results, OUTPUT(CHOOSEN(Passed_with_Extras, eyeball), NAMED('Sa
 OUTPUT(CHOOSEN(Passed_Business, eyeball), NAMED('Sample_NonFCRA_Layout'));
 
 IF(Output_Master_Results, OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout.csv', CSV(HEADING(single), QUOTE('"'))));
-OUTPUT(Passed_Business,,OutputFile + '.csv', CSV(HEADING(single), QUOTE('"')));
-
-Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
-	EXPORT STRING AttributeSetName := 'Development KEL Attributes';
-	EXPORT STRING VersionName := 'Version 1.0';
-	EXPORT BOOLEAN isFCRA := FALSE;
-	EXPORT STRING ArchiveDate := historyDate;
-	EXPORT STRING InputFileName := InputFile;
-	EXPORT STRING Data_Restriction_Mask := DataRestrictionMask;
-	EXPORT STRING Data_Permission_Mask := DataPermission;
-	EXPORT UNSIGNED GLBAPurpose := GLBA;
-	EXPORT UNSIGNED DPPAPurpose := DPPA;
-	EXPORT BOOLEAN Override_Experian_Restriction := OverrideExperianRestriction;
-	EXPORT STRING Allowed_Sources := AllowedSources; // Controls inclusion of DNBDMI data
-	EXPORT UNSIGNED LexIDThreshold := Score_threshold;
-	EXPORT UNSIGNED BusinessLexIDThreshold := BIPAppend_Score_Threshold;
-	EXPORT UNSIGNED BusinessLexIDWeightThreshold := BIPAppend_Weight_Threshold;
-	EXPORT BOOLEAN BusinessLexIDPrimForce := BIPAppend_PrimForce;
-	EXPORT BOOLEAN BusinessLexIDReAppend := BIPAppend_ReAppend;
-	EXPORT BOOLEAN BusinessLexIDIncludeAuthRep := BIPAppend_Include_AuthRep;
-END;	
+OUTPUT(Passed_Business,,OutputFile + '.csv', CSV(HEADING(single), QUOTE('"')));	
 
 Settings_Dataset := PublicRecords_KEL.ECL_Functions.fn_make_settings_dataset(Settings);
 		

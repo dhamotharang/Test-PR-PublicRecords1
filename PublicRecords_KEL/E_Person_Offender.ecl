@@ -11,7 +11,7 @@ EXPORT E_Person_Offender(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     KEL.typ.nstr Source_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
-    UNSIGNED1 __Permits;
+    UNSIGNED8 __Permits;
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
@@ -44,7 +44,7 @@ EXPORT E_Person_Offender(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
   SHARED __d1 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1),__Mapping1_Transform(LEFT)));
   SHARED __Mapping2 := 'did(Subject_:0),Offender_(Offender_:0),src(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   SHARED InLayout __Mapping2_Transform(InLayout __r) := TRANSFORM
-    SELF.__Permits := CFG_Compile.Permit_nonFCRA;
+    SELF.__Permits := CFG_Compile.Permit_NonFCRA;
     SELF := __r;
   END;
   SHARED __d2_Norm := NORMALIZE(__in,LEFT.Dataset_Doxie_Files__Key_Offenders,TRANSFORM(RECORDOF(__in.Dataset_Doxie_Files__Key_Offenders),SELF:=RIGHT));
@@ -85,7 +85,7 @@ EXPORT E_Person_Offender(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Person_Offender_Group,COUNT(ROWS(LEFT))=1),GROUP,Person_Offender__Single_Rollup(LEFT)) + ROLLUP(HAVING(Person_Offender_Group,COUNT(ROWS(LEFT))>1),GROUP,Person_Offender__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult);
+  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::PublicRecords_KEL::Person_Offender::Result' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
   EXPORT Result := __UNWRAP(__Result);
   EXPORT Subject__Orphan := JOIN(InData(__NN(Subject_)),E_Person(__in,__cfg).__Result,__EEQP(LEFT.Subject_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT Offender__Orphan := JOIN(InData(__NN(Offender_)),E_Criminal_Offender(__in,__cfg).__Result,__EEQP(LEFT.Offender_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
