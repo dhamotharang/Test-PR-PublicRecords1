@@ -57,7 +57,7 @@ EXPORT proc_build_bv_lookup(STRING version) := FUNCTION
 	
 	// dops_update :=  DOPS.updateversion('EmailDataV2EventKeys',(string)version,emailList,,'N');
 
-	// orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem ('Email DataV2 Event',(string)version,'N');
+	// orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem ('Email Data V2 Events',(string)version,'N');
 													
 
 	RETURN SEQUENTIAL(Email_Event.SprayBVFile(version)
