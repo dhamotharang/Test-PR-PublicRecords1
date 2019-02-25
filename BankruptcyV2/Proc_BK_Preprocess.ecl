@@ -745,7 +745,7 @@ export Proc_BK_Preprocess(string filedate) := function
       IF(fname='' AND lname='','',INTFORMAT(score,3,0));
 		self.clean_name :=  IF(stringlib.stringtouppercase(l.orig_name) in infoset or l.orig_name = '',
                           '',
-                          IF(l.name_type='D',
+                          IF(l.name_type='D' AND TRIM(l.orig_fname+l.orig_mname+l.orig_lname+l.orig_name_suffix)<>'',
                             BuildName('',l.orig_fname,l.orig_mname,l.orig_lname,l.orig_name_suffix),
                             Address.CleanPersonFML73(l.orig_name)
                           )
