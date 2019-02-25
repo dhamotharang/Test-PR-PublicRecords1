@@ -109,7 +109,7 @@ export IParam := module
 
   // Temporarily, to assist the move to the new interface:
   // a service using IDataAccess compatible interface can easily convert it
-  // to call provedures expecting older 'BatchParam' module.
+  // to call procedures expecting older 'BatchParam' module.
   EXPORT ConvertToLegacy(mod) := FUNCTIONMACRO
     IMPORT Gateway;
     local batch_mod := MODULE (BatchShare.IParam.BatchParams)
