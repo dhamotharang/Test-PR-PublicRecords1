@@ -1106,6 +1106,7 @@
 		export string KEYWORD_EU_PCW								:= '794';
 		export string KEYWORD_DKFSAPEP							:= '795';
 		export string KEYWORD_RUFTS_GA							:= '796';
+		export string KEYWORD_MINEFI_TB							:= '797';
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
 	

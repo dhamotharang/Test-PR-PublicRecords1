@@ -6,7 +6,7 @@
 
 
 //rels_1sided := doxie.File_Relatives_Plus(current_relatives = true, person1>0, person2>0, number_cohabits>=6);
-rels_1sided := Relationship.file_relative;
+rels_1sided := Relationship.file_relative(confidence in ['MEDIUM','HIGH']);
 
 rels_lsided_rec := RECORDOF(rels_1sided);
 
