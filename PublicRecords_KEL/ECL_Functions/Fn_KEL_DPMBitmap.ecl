@@ -1,4 +1,4 @@
-﻿IMPORT $.^.^.MDR, $.^.^.PublicRecords_KEL, $.^.^.Risk_Indicators, $.^.^.UT, STD;
+﻿IMPORT MDR, PublicRecords_KEL, Risk_Indicators, UT, STD;
 
 EXPORT Fn_KEL_DPMBitmap := MODULE
 	/* Sets the DPMBitmapValue for a record of data */

@@ -1,4 +1,4 @@
-﻿IMPORT $.^.^.Business_Risk_BIP, $.^.^.MDR;
+﻿IMPORT Business_Risk_BIP, MDR;
 
 /*
 -99: No LexID or input needed is not populated
