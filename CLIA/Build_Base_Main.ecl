@@ -61,10 +61,10 @@ EXPORT Build_Base_Main(STRING pversion,
 				                    LOCAL);
 	
 	Layouts.Base rollupMain(Layouts.Base L, Layouts.Base R) := TRANSFORM
-    SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
-    SELF.dt_vendor_last_reported  := ut.LatestDate(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
-   	SELF.source_rec_id            := IF(L.source_rec_id = 0, R.source_rec_id, L.source_rec_id);
-																								 
+      SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
+      SELF.dt_vendor_last_reported  := ut.LatestDate(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+   	  SELF.source_rec_id            := IF(L.source_rec_id = 0, R.source_rec_id, L.source_rec_id);
+	  SELF.prov_cat_code            := if(L.dt_vendor_last_reported > R.dt_vendor_last_reported, L.prov_cat_code, R.prov_cat_code);																			 
 	  SELF := L;
 	END;
 	
