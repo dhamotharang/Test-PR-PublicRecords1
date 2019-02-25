@@ -254,7 +254,7 @@ EXPORT Transforms := MODULE
     SELF := [];
   END;
   
-  EXPORT iesp.emailfinder.t_EmailFinderSearchRecord  xfSearchOut($.Layouts.email_final_rec le)
+  EXPORT iesp.emailfinder.t_EmailFinderSearchRecord  xfSearchOut($.Layouts.email_final_rec le, UNSIGNED dob_mask = 0)
   := TRANSFORM
     SELF.Original.EmailAddress := le.Original.email;
     SELF.Original.FirstName := le.Original.first_name;
@@ -286,7 +286,7 @@ EXPORT Transforms := MODULE
 		SELF.Cleaned.Address.StateCityZip := Address.Addr2FromComponents(le.Cleaned.Address.p_city_name, le.Cleaned.Address.st, le.Cleaned.Address.zip);								
 
     SELF.BestInfo.SSN := le.BestInfo.SSN;
-    SELF.BestInfo.DOB := iesp.ECL2ESP.toDate(le.BestInfo.dob);
+    SELF.BestInfo.DOB := iesp.ECL2ESP.ApplyDateMask(iesp.ECL2ESP.toDate(le.BestInfo.dob), dob_mask);
     SELF.BestInfo.Name.first := le.BestInfo.fname;
     SELF.BestInfo.Name.Middle := le.BestInfo.mname;
     SELF.BestInfo.Name.last := le.BestInfo.lname;
