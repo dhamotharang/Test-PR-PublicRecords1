@@ -466,11 +466,5 @@ nm_with_naics:=JOIN(nm_with_sic,naics_denorm,left.linkid = right.linkid,left out
 nm_with_dba:=join(nm_with_naics,dba_denorm,left.linkid = right.linkid,left outer,local);
 final_base := join(nm_with_dba, inc_date_denorm,left.linkid = right.linkid,transform(BIPV2_Best.Layouts.base,self := left,self := right;SELF:=[];),left outer,local);
 
-// output(norm_dba, named('norm_dba'));
-// output(dba_flat_ded, named('dba_flat_ded'));
-// output(dba_grp, named('dba_grp'));
-// output(dba_denorm, named('dba_denorm'));
-// output(nm_with_dba, named('nm_with_dba'));
-
 return final_base;
 endmacro;
