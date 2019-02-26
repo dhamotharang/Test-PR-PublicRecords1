@@ -1,4 +1,4 @@
-﻿import did_add,STD;
+﻿import did_add,STD,ut;
 // Module: Get roxie cluster info 
 // Functions: ClustersAssociatedESP and LiveCluster
 // ClustersAssociatedESP - list of all clusters associated to ESP passed
@@ -23,6 +23,7 @@ EXPORT GetRoxieClusterInfo(string roxieesp = ''
 				,rTpClusterQueryRequest
 				,dataset(rTpClusterQueryResponse),
 				xpath('TpClusterQueryResponse/TpClusters/TpCluster')
+				,HTTPHEADER('Authorization', 'Basic ' + ut.Credentials().fGetEncodedValues())
 				,LOG);
 				
 		return dTpClusterQuery;

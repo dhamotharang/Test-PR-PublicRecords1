@@ -1,4 +1,4 @@
-﻿﻿import KELOtto;
+﻿import KELOtto;
 /*
 
 SHAPE output for interactive HIPIE Graph Visualization
@@ -112,7 +112,12 @@ FullGraphPrep2 := JOIN(FullGraphPrep1, DISTRIBUTE(KELOtto.Q__show_Customer_Addre
                           SELF.Vanity_City_ := RIGHT.Vanity_City_,
                           SELF.State_ := RIGHT.State_,
                           SELF.Zip_ := RIGHT.Zip_,
-															
+													
+                          SELF.In_Customer_Population_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.In_Customer_Population_ , LEFT.In_Customer_Population_),
+                          SELF.contributor_safe_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.contributor_safe_flag_ , LEFT.contributor_safe_flag_),
+                          SELF.safe_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.safe_flag_ , LEFT.safe_flag_),
+
+                          
                           SELF.cl_event_count_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_event_count_ , LEFT.cl_event_count_),
                           SELF.cl_identity_count_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_identity_count_ , LEFT.cl_identity_count_),
                           SELF.cl_element_count_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_element_count_ , LEFT.cl_element_count_),
@@ -155,6 +160,10 @@ FullGraphPrep3 := JOIN(FullGraphPrep2, DISTRIBUTE(KELOtto.Q__show_Customer_Ssn_E
                           SELF.cl_identity_count_percentile_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_identity_count_percentile_ , LEFT.cl_identity_count_percentile_),
                           SELF.cl_event_count_percentile_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_event_count_percentile_ , LEFT.cl_event_count_percentile_),
                           SELF.cl_impact_weight_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_impact_weight_ , LEFT.cl_impact_weight_),
+
+                          SELF.In_Customer_Population_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.In_Customer_Population_ , LEFT.In_Customer_Population_),
+                          SELF.contributor_safe_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.contributor_safe_flag_ , LEFT.contributor_safe_flag_),
+                          SELF.safe_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.safe_flag_ , LEFT.safe_flag_),
 													
                        //   SELF.cl_high_risk_pattern1_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern1_flag_ , LEFT.cl_high_risk_pattern1_flag_),
                        //   SELF.cl_high_risk_pattern2_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern2_flag_ , LEFT.cl_high_risk_pattern2_flag_),
@@ -193,6 +202,10 @@ FullGraphPrep4 := JOIN(FullGraphPrep3, DISTRIBUTE(KELOtto.Q__show_Customer_Ip_Ad
                           SELF.cl_identity_count_percentile_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_identity_count_percentile_ , LEFT.cl_identity_count_percentile_),
                           SELF.cl_event_count_percentile_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_event_count_percentile_ , LEFT.cl_event_count_percentile_),
                           SELF.cl_impact_weight_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_impact_weight_ , LEFT.cl_impact_weight_),
+
+                          SELF.In_Customer_Population_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.In_Customer_Population_ , LEFT.In_Customer_Population_),
+                          SELF.contributor_safe_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.contributor_safe_flag_ , LEFT.contributor_safe_flag_),
+                          SELF.safe_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.safe_flag_ , LEFT.safe_flag_),
 													
                        //   SELF.cl_high_risk_pattern1_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern1_flag_ , LEFT.cl_high_risk_pattern1_flag_),
                        //   SELF.cl_high_risk_pattern2_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern2_flag_ , LEFT.cl_high_risk_pattern2_flag_),
@@ -232,6 +245,10 @@ FullGraphPrep5 := JOIN(FullGraphPrep4, DISTRIBUTE(KELOtto.Q__show_Customer_Phone
                           SELF.cl_event_count_percentile_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_event_count_percentile_ , LEFT.cl_event_count_percentile_),
                           SELF.cl_impact_weight_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_impact_weight_ , LEFT.cl_impact_weight_),
 													
+                          SELF.In_Customer_Population_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.In_Customer_Population_ , LEFT.In_Customer_Population_),
+                          SELF.contributor_safe_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.contributor_safe_flag_ , LEFT.contributor_safe_flag_),
+                          SELF.safe_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.safe_flag_ , LEFT.safe_flag_),
+
                        //   SELF.cl_high_risk_pattern1_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern1_flag_ , LEFT.cl_high_risk_pattern1_flag_),
                        //   SELF.cl_high_risk_pattern2_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern2_flag_ , LEFT.cl_high_risk_pattern2_flag_),
                        //   SELF.cl_high_risk_pattern3_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern3_flag_ , LEFT.cl_high_risk_pattern3_flag_),
@@ -268,6 +285,10 @@ FullGraphPrep6 := JOIN(FullGraphPrep5, DISTRIBUTE(KELOtto.Q__show_Customer_Email
                           SELF.cl_identity_count_percentile_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_identity_count_percentile_ , LEFT.cl_identity_count_percentile_),
                           SELF.cl_event_count_percentile_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_event_count_percentile_ , LEFT.cl_event_count_percentile_),
                           SELF.cl_impact_weight_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_impact_weight_ , LEFT.cl_impact_weight_),
+
+                          SELF.In_Customer_Population_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.In_Customer_Population_ , LEFT.In_Customer_Population_),
+                          SELF.contributor_safe_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.contributor_safe_flag_ , LEFT.contributor_safe_flag_),
+                          SELF.safe_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.safe_flag_ , LEFT.safe_flag_),
 													
                        //   SELF.cl_high_risk_pattern1_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern1_flag_ , LEFT.cl_high_risk_pattern1_flag_),
                        //   SELF.cl_high_risk_pattern2_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern2_flag_ , LEFT.cl_high_risk_pattern2_flag_),
@@ -305,6 +326,10 @@ FullGraphPrep7 := JOIN(FullGraphPrep6, DISTRIBUTE(KELOtto.Q__show_Customer_Bank_
                           SELF.cl_identity_count_percentile_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_identity_count_percentile_ , LEFT.cl_identity_count_percentile_),
                           SELF.cl_event_count_percentile_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_event_count_percentile_ , LEFT.cl_event_count_percentile_),
                           SELF.cl_impact_weight_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_impact_weight_ , LEFT.cl_impact_weight_),
+
+                          SELF.In_Customer_Population_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.In_Customer_Population_ , LEFT.In_Customer_Population_),
+                          SELF.contributor_safe_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.contributor_safe_flag_ , LEFT.contributor_safe_flag_),
+                          SELF.safe_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.safe_flag_ , LEFT.safe_flag_),
 													
                        //   SELF.cl_high_risk_pattern1_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern1_flag_ , LEFT.cl_high_risk_pattern1_flag_),
                        //   SELF.cl_high_risk_pattern2_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern2_flag_ , LEFT.cl_high_risk_pattern2_flag_),
@@ -343,6 +368,10 @@ FullGraphPrep8_1 := JOIN(FullGraphPrep7, DISTRIBUTE(KELOtto.Q__show_Customer_Dri
                           SELF.cl_identity_count_percentile_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_identity_count_percentile_ , LEFT.cl_identity_count_percentile_),
                           SELF.cl_event_count_percentile_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_event_count_percentile_ , LEFT.cl_event_count_percentile_),
                           SELF.cl_impact_weight_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_impact_weight_ , LEFT.cl_impact_weight_),
+
+                          SELF.In_Customer_Population_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.In_Customer_Population_ , LEFT.In_Customer_Population_),
+                          SELF.contributor_safe_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.contributor_safe_flag_ , LEFT.contributor_safe_flag_),
+                          SELF.safe_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.safe_flag_ , LEFT.safe_flag_),
 													
                        //   SELF.cl_high_risk_pattern1_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern1_flag_ , LEFT.cl_high_risk_pattern1_flag_),
                        //   SELF.cl_high_risk_pattern2_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern2_flag_ , LEFT.cl_high_risk_pattern2_flag_),
