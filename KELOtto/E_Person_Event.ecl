@@ -39,12 +39,12 @@ EXPORT E_Person_Event := MODULE
     RECORDOF(__d0_Social__Mapped);
     KEL.typ.uid Phone_Number_;
   END;
-  SHARED __d0_Phone_Number__Mapped := JOIN(__d0_Social__Mapped,E_Phone.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.clean_phones.cell_phone) = RIGHT.KeyVal,TRANSFORM(__d0_Phone_Number__Layout,SELF.Phone_Number_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d0_Phone_Number__Mapped := JOIN(__d0_Social__Mapped,E_Phone.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.clean_phones.cell_phone) = RIGHT.KeyVal,TRANSFORM(__d0_Phone_Number__Layout,SELF.Phone_Number_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,LOOKUP);
   SHARED __d0_Emailof__Layout := RECORD
     RECORDOF(__d0_Phone_Number__Mapped);
     KEL.typ.uid Emailof_;
   END;
-  SHARED __d0_Emailof__Mapped := JOIN(__d0_Phone_Number__Mapped,E_Email.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.Email_Address) = RIGHT.KeyVal,TRANSFORM(__d0_Emailof__Layout,SELF.Emailof_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d0_Emailof__Mapped := JOIN(__d0_Phone_Number__Mapped,E_Email.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.Email_Address) = RIGHT.KeyVal,TRANSFORM(__d0_Emailof__Layout,SELF.Emailof_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,LOOKUP);
   SHARED __d0_Location__Layout := RECORD
     RECORDOF(__d0_Emailof__Mapped);
     KEL.typ.uid Location_;
@@ -54,22 +54,22 @@ EXPORT E_Person_Event := MODULE
     RECORDOF(__d0_Location__Mapped);
     KEL.typ.uid Ip_;
   END;
-  SHARED __d0_Ip__Mapped := JOIN(__d0_Location__Mapped,E_Internet_Protocol.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.ip_address) = RIGHT.KeyVal,TRANSFORM(__d0_Ip__Layout,SELF.Ip_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d0_Ip__Mapped := JOIN(__d0_Location__Mapped,E_Internet_Protocol.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.ip_address) = RIGHT.KeyVal,TRANSFORM(__d0_Ip__Layout,SELF.Ip_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,LOOKUP);
   SHARED __d0_Routing_Bank__Layout := RECORD
     RECORDOF(__d0_Ip__Mapped);
     KEL.typ.uid Routing_Bank_;
   END;
-  SHARED __d0_Routing_Bank__Mapped := JOIN(__d0_Ip__Mapped,E_Bank.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.bank_routing_number_1) = RIGHT.KeyVal,TRANSFORM(__d0_Routing_Bank__Layout,SELF.Routing_Bank_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d0_Routing_Bank__Mapped := JOIN(__d0_Ip__Mapped,E_Bank.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.bank_routing_number_1) = RIGHT.KeyVal,TRANSFORM(__d0_Routing_Bank__Layout,SELF.Routing_Bank_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART);
   SHARED __d0_Account__Layout := RECORD
     RECORDOF(__d0_Routing_Bank__Mapped);
     KEL.typ.uid Account_;
   END;
-  SHARED __d0_Account__Mapped := JOIN(__d0_Routing_Bank__Mapped,E_Bank_Account.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.bank_routing_number_1) + '|' + TRIM((STRING)LEFT.bank_account_number_1) = RIGHT.KeyVal,TRANSFORM(__d0_Account__Layout,SELF.Account_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d0_Account__Mapped := JOIN(__d0_Routing_Bank__Mapped,E_Bank_Account.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.bank_routing_number_1) + '|' + TRIM((STRING)LEFT.bank_account_number_1) = RIGHT.KeyVal,TRANSFORM(__d0_Account__Layout,SELF.Account_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART);
   SHARED __d0_Licence__Layout := RECORD
     RECORDOF(__d0_Account__Mapped);
     KEL.typ.uid Licence_;
   END;
-  SHARED __d0_Licence__Mapped := JOIN(__d0_Account__Mapped,E_Drivers_License.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.drivers_license) = RIGHT.KeyVal,TRANSFORM(__d0_Licence__Layout,SELF.Licence_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d0_Licence__Mapped := JOIN(__d0_Account__Mapped,E_Drivers_License.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.drivers_license) = RIGHT.KeyVal,TRANSFORM(__d0_Licence__Layout,SELF.Licence_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART);
   SHARED __d0_Transaction__Layout := RECORD
     RECORDOF(__d0_Licence__Mapped);
     KEL.typ.uid Transaction_;
@@ -93,12 +93,12 @@ EXPORT E_Person_Event := MODULE
     RECORDOF(__d1_Social__Mapped);
     KEL.typ.uid Phone_Number_;
   END;
-  SHARED __d1_Phone_Number__Mapped := JOIN(__d1_Social__Mapped,E_Phone.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.clean_phones.phone_number) = RIGHT.KeyVal,TRANSFORM(__d1_Phone_Number__Layout,SELF.Phone_Number_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d1_Phone_Number__Mapped := JOIN(__d1_Social__Mapped,E_Phone.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.clean_phones.phone_number) = RIGHT.KeyVal,TRANSFORM(__d1_Phone_Number__Layout,SELF.Phone_Number_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART);
   SHARED __d1_Emailof__Layout := RECORD
     RECORDOF(__d1_Phone_Number__Mapped);
     KEL.typ.uid Emailof_;
   END;
-  SHARED __d1_Emailof__Mapped := JOIN(__d1_Phone_Number__Mapped,E_Email.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.Email_Address) = RIGHT.KeyVal,TRANSFORM(__d1_Emailof__Layout,SELF.Emailof_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d1_Emailof__Mapped := JOIN(__d1_Phone_Number__Mapped,E_Email.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.Email_Address) = RIGHT.KeyVal,TRANSFORM(__d1_Emailof__Layout,SELF.Emailof_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART);
   SHARED __d1_Location__Layout := RECORD
     RECORDOF(__d1_Emailof__Mapped);
     KEL.typ.uid Location_;
@@ -108,22 +108,22 @@ EXPORT E_Person_Event := MODULE
     RECORDOF(__d1_Location__Mapped);
     KEL.typ.uid Ip_;
   END;
-  SHARED __d1_Ip__Mapped := JOIN(__d1_Location__Mapped,E_Internet_Protocol.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.ip_address) = RIGHT.KeyVal,TRANSFORM(__d1_Ip__Layout,SELF.Ip_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d1_Ip__Mapped := JOIN(__d1_Location__Mapped,E_Internet_Protocol.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.ip_address) = RIGHT.KeyVal,TRANSFORM(__d1_Ip__Layout,SELF.Ip_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART);
   SHARED __d1_Routing_Bank__Layout := RECORD
     RECORDOF(__d1_Ip__Mapped);
     KEL.typ.uid Routing_Bank_;
   END;
-  SHARED __d1_Routing_Bank__Mapped := JOIN(__d1_Ip__Mapped,E_Bank.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.bank_routing_number_1) = RIGHT.KeyVal,TRANSFORM(__d1_Routing_Bank__Layout,SELF.Routing_Bank_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d1_Routing_Bank__Mapped := JOIN(__d1_Ip__Mapped,E_Bank.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.bank_routing_number_1) = RIGHT.KeyVal,TRANSFORM(__d1_Routing_Bank__Layout,SELF.Routing_Bank_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART);
   SHARED __d1_Account__Layout := RECORD
     RECORDOF(__d1_Routing_Bank__Mapped);
     KEL.typ.uid Account_;
   END;
-  SHARED __d1_Account__Mapped := JOIN(__d1_Routing_Bank__Mapped,E_Bank_Account.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.bank_routing_number_1) + '|' + TRIM((STRING)LEFT.bank_account_number_1) = RIGHT.KeyVal,TRANSFORM(__d1_Account__Layout,SELF.Account_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d1_Account__Mapped := JOIN(__d1_Routing_Bank__Mapped,E_Bank_Account.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.bank_routing_number_1) + '|' + TRIM((STRING)LEFT.bank_account_number_1) = RIGHT.KeyVal,TRANSFORM(__d1_Account__Layout,SELF.Account_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART);
   SHARED __d1_Licence__Layout := RECORD
     RECORDOF(__d1_Account__Mapped);
     KEL.typ.uid Licence_;
   END;
-  SHARED __d1_Licence__Mapped := JOIN(__d1_Account__Mapped,E_Drivers_License.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.drivers_license) = RIGHT.KeyVal,TRANSFORM(__d1_Licence__Layout,SELF.Licence_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d1_Licence__Mapped := JOIN(__d1_Account__Mapped,E_Drivers_License.Lookup,TRIM((STRING)LEFT.AssociatedCustomerFileInfo) + '|' + TRIM((STRING)LEFT.drivers_license) = RIGHT.KeyVal,TRANSFORM(__d1_Licence__Layout,SELF.Licence_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,SMART);
   SHARED __d1_Transaction__Layout := RECORD
     RECORDOF(__d1_Licence__Mapped);
     KEL.typ.uid Transaction_;

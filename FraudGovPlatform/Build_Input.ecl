@@ -18,8 +18,7 @@ module
 	export All :=
 	if(tools.fun_IsValidVersion(pversion)
 		,sequential(
-			  Run_Spray
-			, Run_IdentityData
+			  Run_IdentityData
 			, Run_KnownFraud
 			, Run_Deltabase
 			, Promote_Inputs

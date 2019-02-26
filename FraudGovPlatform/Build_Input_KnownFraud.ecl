@@ -5,24 +5,14 @@ EXPORT Build_Input_KnownFraud(
 	,dataset(Layouts.OutputF.SkipModules) pSkipModules = FraudGovPlatform.Files().OutputF.SkipModules
 	,dataset(Layouts.Input.KnownFraud) KnownFraud_Sprayed =  files().Input.KnownFraud.sprayed	
 	,dataset(Layouts.Input.KnownFraud) ByPassed_KnownFraud_Sprayed = files().Input.ByPassed_KnownFraud.sprayed	
-	,boolean PSkipValidations = false
+	,boolean PSkipValidations = true
 ) :=
 module
 
 	shared SkipNACBuild := pSkipModules[1].SkipNACBuild;
-
-	SHARED fn_dedup(inputs):=FUNCTIONMACRO
-		in_srt:=sort(inputs, RECORD, EXCEPT processdate);
-		in_ddp:=rollup(in_srt,
-		TRANSFORM(Layouts.Input.KnownFraud,SELF := LEFT; SELF := []),
-		RECORD,
-		EXCEPT ProcessDate,
-		LOCAL);	
-		return in_ddp;
-	ENDMACRO;
 	
 	inKnownFraudUpdate := 	
-			if	(nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.KnownFraud)) > 0, 
+			if	(nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.KnownFraud)) > 0,
 				Files(pversion).Sprayed.KnownFraud, 
 				dataset([],{string75 fn { virtual(logicalfilename)}, FraudGovPlatform.Layouts.Sprayed.KnownFraud})
 			)    											
@@ -32,9 +22,9 @@ module
 			);
 	
 	Functions.CleanFields(inKnownFraudUpdate ,inKnownFraudUpdateUpper); 
-	
-	max_uid := max(KnownFraud_Sprayed, KnownFraud_Sprayed.unique_id) :	global;
 
+	max_uid := max(KnownFraud_Sprayed, KnownFraud_Sprayed.unique_id) :	global;
+	
 	Layouts.Input.knownfraud tr(inKnownFraudUpdateUpper l, integer cnt) := transform
 		sub:=stringlib.stringfind(l.fn,'20',1);
 		sub2:=stringlib.stringfind(l.fn,'.dat',1)-6;
@@ -60,9 +50,9 @@ module
 		source_input := map(
 			 STD.Str.Contains( l.fn, 'KnownFraud', true) => 'KNFD'
 			,STD.Str.Contains( l.fn, 'SafeList', true) => 'SAFELIST'
-			,'UNKNOWN');
+			,'KNFD');
 		self.source_input := source_input;
-		SELF.unique_id := max_uid + cnt; 	
+		SELF.unique_id := max_uid + cnt;
 		self.Deltabase := 0;
 		self:=l;
 		self:=[];
@@ -98,7 +88,7 @@ module
 					LOOKUP);
 	//Exclude Errors
 	shared ByPassed_records := f1_errors + NotInMbs;
-	f1_bypass_dedup := ByPassed_KnownFraud_Sprayed + project(ByPassed_records, FraudGovPlatform.Layouts.Input.knownfraud);
+	f1_bypass_dedup := fn_dedup(ByPassed_KnownFraud_Sprayed + project(ByPassed_records, FraudGovPlatform.Layouts.Input.knownfraud));
 
 	tools.mac_WriteFile(Filenames().Input.ByPassed_KnownFraud.New(pversion),
 		f1_bypass_dedup,
@@ -115,6 +105,7 @@ module
 	//Move only Valid Records
 	shared f1_dedup :=	join (	f1,
 							ByPassed_records,
+							left.Customer_Account_Number = right.Customer_Account_Number and
 							left.Unique_Id = right.Unique_Id,
 							TRANSFORM(Layouts.Input.knownfraud,SELF := LEFT),
 							left only);	
