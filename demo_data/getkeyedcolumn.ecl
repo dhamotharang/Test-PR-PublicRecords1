@@ -1,5 +1,5 @@
-﻿import ut;
-export getkeyedcolumn(string filename,string esp) := function
+﻿import ut,_Control;
+export getkeyedcolumn(string filename,string esp = _Control.IPAddress.prod_thor_esp) := function
 
 	checkoutAttributeInRecord := record
 		
