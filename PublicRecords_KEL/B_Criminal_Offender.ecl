@@ -27,5 +27,5 @@ EXPORT B_Criminal_Offender(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     SELF.Current_Date_ := KEL.Routines.MinN(FN_Compile.FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('doc_build_version'))),__CN(__cfg.CurrentDate));
     SELF := __PP222209;
   END;
-  EXPORT __ENH_Criminal_Offender := PROJECT(__EE222350,__ND222504__Project(LEFT)) : PERSIST('~temp::KEL::PublicRecords_KEL::Criminal_Offender::Annotated' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __ENH_Criminal_Offender := PROJECT(__EE222350,__ND222504__Project(LEFT));
 END;

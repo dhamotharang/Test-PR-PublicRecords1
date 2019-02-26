@@ -53,7 +53,7 @@ EXPORT E_Watercraft_Owner(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Watercraft_Owner_Group,COUNT(ROWS(LEFT))=1),GROUP,Watercraft_Owner__Single_Rollup(LEFT)) + ROLLUP(HAVING(Watercraft_Owner_Group,COUNT(ROWS(LEFT))>1),GROUP,Watercraft_Owner__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::PublicRecords_KEL::Watercraft_Owner::Result' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
   EXPORT W_Craft__Orphan := JOIN(InData(__NN(W_Craft_)),E_Watercraft(__in,__cfg).__Result,__EEQP(LEFT.W_Craft_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT Owner__Orphan := JOIN(InData(__NN(Owner_)),E_Person(__in,__cfg).__Result,__EEQP(LEFT.Owner_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);

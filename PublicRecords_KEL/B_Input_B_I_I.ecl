@@ -4539,5 +4539,5 @@ EXPORT B_Input_B_I_I(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
     SELF.Lex_I_D_Score_For_Rep5_Append_ := __PP264924.Lex_I_D_Score_Append_;
     SELF := __PP264924;
   END;
-  EXPORT __ENH_Input_B_I_I := PROJECT(__EE264923,__ND268521__Project(LEFT)) : PERSIST('~temp::KEL::PublicRecords_KEL::Input_B_I_I::Annotated' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __ENH_Input_B_I_I := PROJECT(__EE264923,__ND268521__Project(LEFT));
 END;

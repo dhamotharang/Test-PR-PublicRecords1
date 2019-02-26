@@ -192,7 +192,7 @@ EXPORT E_Input_B_I_I(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Input_B_I_I_Group,COUNT(ROWS(LEFT))=1),GROUP,Input_B_I_I__Single_Rollup(LEFT)) + ROLLUP(HAVING(Input_B_I_I_Group,COUNT(ROWS(LEFT))>1),GROUP,Input_B_I_I__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::PublicRecords_KEL::Input_B_I_I::Result' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
   EXPORT Company__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Company_);
   EXPORT Bus_Input_U_I_D_Append__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Bus_Input_U_I_D_Append_);

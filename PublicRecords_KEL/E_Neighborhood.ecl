@@ -286,7 +286,7 @@ EXPORT E_Neighborhood(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Neighborhood_Group,COUNT(ROWS(LEFT))=1),GROUP,Neighborhood__Single_Rollup(LEFT)) + ROLLUP(HAVING(Neighborhood_Group,COUNT(ROWS(LEFT))>1),GROUP,Neighborhood__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::PublicRecords_KEL::Neighborhood::Result' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
   EXPORT Some_Person__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Some_Person_);
   EXPORT Ave_Occupant_Owned__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Ave_Occupant_Owned_);

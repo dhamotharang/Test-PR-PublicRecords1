@@ -3270,5 +3270,5 @@ EXPORT B_Person(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compil
     SELF.Type_Of_Bks_List7_Y_ := __CN(__EE412863(__NN(Filing_Type_) OR __NN(Bankruptcy_Date_)));
     SELF := __PP411113;
   END;
-  EXPORT __ENH_Person := PROJECT(__EE411112,__ND411117__Project(LEFT)) : PERSIST('~temp::KEL::PublicRecords_KEL::Person::Annotated' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __ENH_Person := PROJECT(__EE411112,__ND411117__Project(LEFT));
 END;

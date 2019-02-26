@@ -85,7 +85,7 @@ EXPORT E_Person_Offender(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Person_Offender_Group,COUNT(ROWS(LEFT))=1),GROUP,Person_Offender__Single_Rollup(LEFT)) + ROLLUP(HAVING(Person_Offender_Group,COUNT(ROWS(LEFT))>1),GROUP,Person_Offender__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::PublicRecords_KEL::Person_Offender::Result' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
   EXPORT Subject__Orphan := JOIN(InData(__NN(Subject_)),E_Person(__in,__cfg).__Result,__EEQP(LEFT.Subject_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT Offender__Orphan := JOIN(InData(__NN(Offender_)),E_Criminal_Offender(__in,__cfg).__Result,__EEQP(LEFT.Offender_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);

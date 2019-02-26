@@ -65,7 +65,7 @@ EXPORT E_Zip_Code(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Zip_Code_Group,COUNT(ROWS(LEFT))=1),GROUP,Zip_Code__Single_Rollup(LEFT)) + ROLLUP(HAVING(Zip_Code_Group,COUNT(ROWS(LEFT))>1),GROUP,Zip_Code__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::PublicRecords_KEL::Zip_Code::Result' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
   EXPORT Zip_Class__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Zip_Class_);
   EXPORT City__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,City_);

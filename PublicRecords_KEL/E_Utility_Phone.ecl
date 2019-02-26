@@ -48,7 +48,7 @@ EXPORT E_Utility_Phone(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Utility_Phone_Group,COUNT(ROWS(LEFT))=1),GROUP,Utility_Phone__Single_Rollup(LEFT)) + ROLLUP(HAVING(Utility_Phone_Group,COUNT(ROWS(LEFT))>1),GROUP,Utility_Phone__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::PublicRecords_KEL::Utility_Phone::Result' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
   EXPORT Util__Orphan := JOIN(InData(__NN(Util_)),E_Utility(__in,__cfg).__Result,__EEQP(LEFT.Util_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT Phone_Number__Orphan := JOIN(InData(__NN(Phone_Number_)),E_Phone(__in,__cfg).__Result,__EEQP(LEFT.Phone_Number_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);

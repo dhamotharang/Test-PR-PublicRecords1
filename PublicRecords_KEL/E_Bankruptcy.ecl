@@ -54,12 +54,8 @@ EXPORT E_Bankruptcy(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
     KEL.typ.uid UID := 0;
   END;
   SHARED __Table := TABLE(__All_Trim,__TabRec,KeyVal,MERGE);
-  EXPORT Lookup := PROJECT(__Table,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT)) : PERSIST('~temp::KEL::PublicRecords_KEL::Bankruptcy::UidLookup',EXPIRE(7));
-  EXPORT UID_IdToText := INDEX(Lookup,{UID},{Lookup},'~temp::KEL::IDtoT::PublicRecords_KEL::Bankruptcy');
-  EXPORT UID_TextToId := INDEX(Lookup,{ht:=HASH32(KeyVal)},{Lookup},'~temp::KEL::TtoID::PublicRecords_KEL::Bankruptcy');
-  EXPORT BuildAll := PARALLEL(BUILDINDEX(UID_IdToText,OVERWRITE),BUILDINDEX(UID_TextToId,OVERWRITE));
-  EXPORT GetText(KEL.typ.uid i) := UID_IdToText(UID=i)[1];
-  EXPORT GetId(STRING s) := UID_TextToId(ht=HASH32(s),KeyVal=s)[1];
+  SHARED __SortedTable := SORT(__Table,KeyVal);
+  EXPORT Lookup := PROJECT(__SortedTable,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT));
   SHARED __Mapping0 := 'UID(UID),tmsid(T_M_S_I_D_),court_code(Court_Code_),case_number(Case_Number_),orig_case_number(Original_Case_Number_:\'\'),srcdesc(Source_Description_:\'\'),chapter(Original_Chapter_:\'\'),filing_type(Filing_Type_:\'\'),business_flag(Business_Flag_:\'\'),corp_flag(Corporate_Flag_:\'\'),discharged(Discharged_Date_:DATE),disposition(Disposition_:\'\'),debtor_type(Debtor_Type_:\'\'),debtor_seq(Debtor_Sequence_:0),disptype(Disposition_Type_:0),dispreason(Disposition_Reason_:0),disptypedesc(Disposition_Type_Description_:\'\'),name_type(Name_Type_:\'\'),screendesc(Screen_Description_:\'\'),dcodedesc(Decoded_Description_:\'\'),date_filed(Date_Filed_:DATE),record_type(Record_Type_:\'\'),date_vendor_first_reported(Date_Vendor_First_Reported_:DATE),date_vendor_last_reported(Date_Vendor_Last_Reported_:DATE),caseid(Case_I_D_:0),defendantid(Defendant_I_D_:0),statusdate(Last_Status_Update_:DATE),date_first_seen(Date_First_Seen_:EPOCH),date_last_seen(Date_Last_Seen_:EPOCH)';
   SHARED InLayout __Mapping0_Transform(InLayout __r) := TRANSFORM
     SELF.Source_ := __CN('BA');
@@ -177,7 +173,7 @@ EXPORT E_Bankruptcy(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Bankruptcy_Group,COUNT(ROWS(LEFT))=1),GROUP,Bankruptcy__Single_Rollup(LEFT)) + ROLLUP(HAVING(Bankruptcy_Group,COUNT(ROWS(LEFT))>1),GROUP,Bankruptcy__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::PublicRecords_KEL::Bankruptcy::Result' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
   EXPORT T_M_S_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,T_M_S_I_D_);
   EXPORT Court_Code__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Court_Code_);

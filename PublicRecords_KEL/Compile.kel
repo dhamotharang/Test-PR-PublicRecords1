@@ -1,2 +1,4 @@
 ﻿﻿﻿#OPTION(querytypes, 'normal') //this is only for FDC mode - RoxieDev or RoxieProd
+﻿#OPTION(persist, 0) // Set to 0 to disable PERSIST functionality
+
 IMPORT KnowledgeUniverse.PublicRecords_KEL.Graph;

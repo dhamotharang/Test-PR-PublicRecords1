@@ -58,7 +58,7 @@ EXPORT E_Drivers_License_Inquiry(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDe
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Drivers_License_Inquiry_Group,COUNT(ROWS(LEFT))=1),GROUP,Drivers_License_Inquiry__Single_Rollup(LEFT)) + ROLLUP(HAVING(Drivers_License_Inquiry_Group,COUNT(ROWS(LEFT))>1),GROUP,Drivers_License_Inquiry__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::PublicRecords_KEL::Drivers_License_Inquiry::Result' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
   EXPORT License_Information__Orphan := JOIN(InData(__NN(License_Information_)),E_Drivers_License(__in,__cfg).__Result,__EEQP(LEFT.License_Information_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT Inquiry__Orphan := JOIN(InData(__NN(Inquiry_)),E_Inquiry(__in,__cfg).__Result,__EEQP(LEFT.Inquiry_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);

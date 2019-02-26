@@ -62,7 +62,7 @@ EXPORT E_Employment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Employment_Group,COUNT(ROWS(LEFT))=1),GROUP,Employment__Single_Rollup(LEFT)) + ROLLUP(HAVING(Employment_Group,COUNT(ROWS(LEFT))>1),GROUP,Employment__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::PublicRecords_KEL::Employment::Result' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
   EXPORT Job_Title__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Job_Title_);
   EXPORT Internal_Source_Score__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Internal_Source_Score_);

@@ -19,5 +19,5 @@ EXPORT B_Person_S_S_N(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     SELF.Legacy_S_S_N_ := EXISTS(__T(__PP425013.Temp_Legacy_S_S_N_));
     SELF := __PP425013;
   END;
-  EXPORT __ENH_Person_S_S_N := PROJECT(__EE425088,__ND425153__Project(LEFT)) : PERSIST('~temp::KEL::PublicRecords_KEL::Person_S_S_N::Annotated' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __ENH_Person_S_S_N := PROJECT(__EE425088,__ND425153__Project(LEFT));
 END;

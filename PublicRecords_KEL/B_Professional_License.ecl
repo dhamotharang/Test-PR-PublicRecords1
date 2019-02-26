@@ -27,5 +27,5 @@ EXPORT B_Professional_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefau
     SELF.Current_Date_ := KEL.Routines.MinN(FN_Compile.FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('proflic_build_version'))),__CN(__cfg.CurrentDate));
     SELF := __PP425940;
   END;
-  EXPORT __ENH_Professional_License := PROJECT(__EE426124,__ND426380__Project(LEFT)) : PERSIST('~temp::KEL::PublicRecords_KEL::Professional_License::Annotated' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __ENH_Professional_License := PROJECT(__EE426124,__ND426380__Project(LEFT));
 END;

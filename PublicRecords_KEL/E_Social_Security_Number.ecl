@@ -137,7 +137,7 @@ EXPORT E_Social_Security_Number(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDef
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Social_Security_Number_Group,COUNT(ROWS(LEFT))=1),GROUP,Social_Security_Number__Single_Rollup(LEFT)) + ROLLUP(HAVING(Social_Security_Number_Group,COUNT(ROWS(LEFT))>1),GROUP,Social_Security_Number__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::PublicRecords_KEL::Social_Security_Number::Result' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
   EXPORT S_S_N__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,S_S_N_);
   EXPORT Official_First_Seen__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Official_First_Seen_);

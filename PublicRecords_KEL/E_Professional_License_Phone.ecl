@@ -53,7 +53,7 @@ EXPORT E_Professional_License_Phone(CFG_Compile.FDCDataset __in = CFG_Compile.FD
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Professional_License_Phone_Group,COUNT(ROWS(LEFT))=1),GROUP,Professional_License_Phone__Single_Rollup(LEFT)) + ROLLUP(HAVING(Professional_License_Phone_Group,COUNT(ROWS(LEFT))>1),GROUP,Professional_License_Phone__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::PublicRecords_KEL::Professional_License_Phone::Result' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
   EXPORT Prof_Lic__Orphan := JOIN(InData(__NN(Prof_Lic_)),E_Professional_License(__in,__cfg).__Result,__EEQP(LEFT.Prof_Lic_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT Phone_Number__Orphan := JOIN(InData(__NN(Phone_Number_)),E_Phone(__in,__cfg).__Result,__EEQP(LEFT.Phone_Number_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);

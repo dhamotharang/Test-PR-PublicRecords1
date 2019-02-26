@@ -58,7 +58,7 @@ EXPORT E_Address_Drivers_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDe
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Address_Drivers_License_Group,COUNT(ROWS(LEFT))=1),GROUP,Address_Drivers_License__Single_Rollup(LEFT)) + ROLLUP(HAVING(Address_Drivers_License_Group,COUNT(ROWS(LEFT))>1),GROUP,Address_Drivers_License__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::PublicRecords_KEL::Address_Drivers_License::Result' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
   EXPORT Location__Orphan := JOIN(InData(__NN(Location_)),E_Address(__in,__cfg).__Result,__EEQP(LEFT.Location_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT License__Orphan := JOIN(InData(__NN(License_)),E_Drivers_License(__in,__cfg).__Result,__EEQP(LEFT.License_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);

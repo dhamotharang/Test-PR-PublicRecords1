@@ -114,7 +114,7 @@ EXPORT E_S_S_N_Address(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(S_S_N_Address_Group,COUNT(ROWS(LEFT))=1),GROUP,S_S_N_Address__Single_Rollup(LEFT)) + ROLLUP(HAVING(S_S_N_Address_Group,COUNT(ROWS(LEFT))>1),GROUP,S_S_N_Address__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::PublicRecords_KEL::S_S_N_Address::Result' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
   EXPORT Social__Orphan := JOIN(InData(__NN(Social_)),E_Social_Security_Number(__in,__cfg).__Result,__EEQP(LEFT.Social_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT Location__Orphan := JOIN(InData(__NN(Location_)),E_Address(__in,__cfg).__Result,__EEQP(LEFT.Location_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);

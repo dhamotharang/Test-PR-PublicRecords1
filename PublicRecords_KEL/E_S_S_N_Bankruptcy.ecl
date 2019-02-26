@@ -76,7 +76,7 @@ EXPORT E_S_S_N_Bankruptcy(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(S_S_N_Bankruptcy_Group,COUNT(ROWS(LEFT))=1),GROUP,S_S_N_Bankruptcy__Single_Rollup(LEFT)) + ROLLUP(HAVING(S_S_N_Bankruptcy_Group,COUNT(ROWS(LEFT))>1),GROUP,S_S_N_Bankruptcy__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::PublicRecords_KEL::S_S_N_Bankruptcy::Result' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
   EXPORT Social__Orphan := JOIN(InData(__NN(Social_)),E_Social_Security_Number(__in,__cfg).__Result,__EEQP(LEFT.Social_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT Bankrupt__Orphan := JOIN(InData(__NN(Bankrupt_)),E_Bankruptcy(__in,__cfg).__Result,__EEQP(LEFT.Bankrupt_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);

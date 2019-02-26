@@ -71,13 +71,9 @@ EXPORT E_Criminal_Punishment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefaul
   END;
   EXPORT NullKeyVal := TRIM((STRING)'');
   SHARED __Table := TABLE(__All_Trim(KeyVal <> NullKeyVal),__TabRec,KeyVal,MERGE);
+  SHARED __SortedTable := SORT(__Table,KeyVal);
   SHARED NullLookupRec := DATASET([{NullKeyVal,1,0}],__TabRec);
-  EXPORT Lookup := NullLookupRec + PROJECT(__Table,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT)) : PERSIST('~temp::KEL::PublicRecords_KEL::Criminal_Punishment::UidLookup',EXPIRE(7));
-  EXPORT UID_IdToText := INDEX(Lookup,{UID},{Lookup},'~temp::KEL::IDtoT::PublicRecords_KEL::Criminal_Punishment');
-  EXPORT UID_TextToId := INDEX(Lookup,{ht:=HASH32(KeyVal)},{Lookup},'~temp::KEL::TtoID::PublicRecords_KEL::Criminal_Punishment');
-  EXPORT BuildAll := PARALLEL(BUILDINDEX(UID_IdToText,OVERWRITE),BUILDINDEX(UID_TextToId,OVERWRITE));
-  EXPORT GetText(KEL.typ.uid i) := UID_IdToText(UID=i)[1];
-  EXPORT GetId(STRING s) := UID_TextToId(ht=HASH32(s),KeyVal=s)[1];
+  EXPORT Lookup := NullLookupRec + PROJECT(__SortedTable,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT));
   SHARED __Mapping0 := 'UID(UID),offender_key(Offender_Key_:\'\'),source_file(Source_File_:\'\'),punishment_type(Punishment_Type_:\'\'),orig_state(Source_State_:\'\'),punishment_persistent_id(Punishment_Persistent_I_D_:\'\'),sent_date(Date_Of_Sentence_:DATE),sent_length(Sentence_Length_:0),sent_length_desc(Sentence_Length_Description_:\'\'),sentencedescription(Sentence_Description_:\'\'),sentencetype(Sentence_Type_:\'\'),sentencecounty(Sentence_County_:\'\'),cur_stat_inm_desc(Current_Known_Inmate_Status_:\'\'),cur_loc_inm(Current_Location_Of_Inmate_:\'\'),cur_loc_sec(Current_Location_Security_:\'\'),latest_adm_dt(Incarceration_Admission_Date_:DATE),minimumterm(Minimum_Term_:0),minimumtermdescription(Minimum_Term_Description_:\'\'),maximumterm(Maximum_Term_:0),maximumtermdescription(Maximum_Term_Description_:\'\'),sch_rel_dt(Scheduled_Release_Date_:DATE),act_rel_dt(Actual_Release_Date_:DATE),ctl_rel_dt(Control_Release_Date_:DATE),presump_par_rel_dt(Presumptive_Parole_Release_Date_:DATE),par_cur_stat(Parole_Current_Status_:0),par_cur_stat_desc(Parole_Current_Status_Description_:\'\'),par_st_dt(Parole_Start_Date_:DATE),par_sch_end_dt(Parole_Scheduled_Release_Date_:DATE),par_act_end_dt(Parole_Actual_Release_Date_:DATE),par_cty(Parole_County_:\'\'),probationstartdate(Probation_Start_Date_:DATE),probationenddate(Probation_End_Date_:DATE),probationstatus(Probation_Status_:\'\'),probationtimeperiod(Probation_Time_Period_:\'\'),additionalprovision1(Additional_Provision1_:\'\'),additionalprovision2(Additional_Provision2_:\'\'),probationdescription(Probation_Description_:\'\'),additionalsentencedates(Additional_Sentence_Dates_:\'\'),currentstatus(Current_Status_:\'\'),consecutiveandconcurrentinformation(Consecutive_And_Concurrent_Information_:\'\'),instituitonname(Instituiton_Name_:\'\'),restitution(Restitution_:0.0),communityservice(Community_Service_:\'\'),event_dt(Date_First_Seen_:EPOCH),process_date(Date_Last_Seen_:EPOCH)';
   SHARED InLayout __Mapping0_Transform(InLayout __r) := TRANSFORM
     SELF.Source_ := __CN('DC');
@@ -230,7 +226,7 @@ EXPORT E_Criminal_Punishment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefaul
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Criminal_Punishment_Group,COUNT(ROWS(LEFT))=1),GROUP,Criminal_Punishment__Single_Rollup(LEFT)) + ROLLUP(HAVING(Criminal_Punishment_Group,COUNT(ROWS(LEFT))>1),GROUP,Criminal_Punishment__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::PublicRecords_KEL::Criminal_Punishment::Result' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
   EXPORT Punishment_Type__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Punishment_Type_);
   EXPORT Source_State__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Source_State_);
