@@ -89,5 +89,5 @@ EXPORT B_Criminal_Offense(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     SELF.Offense_Charges_ := __BN(PROJECT(__T(__EE222910),__ST21125_Layout),__NL(__EE222910));
     SELF := __PP222675;
   END;
-  EXPORT __ENH_Criminal_Offense := PROJECT(__EE223132,__ND223794__Project(LEFT)) : PERSIST('~temp::KEL::PublicRecords_KEL::Criminal_Offense::Annotated' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __ENH_Criminal_Offense := PROJECT(__EE223132,__ND223794__Project(LEFT));
 END;

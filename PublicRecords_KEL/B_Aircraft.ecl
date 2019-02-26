@@ -29,5 +29,5 @@ EXPORT B_Aircraft(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     SELF.Current_Date_ := KEL.Routines.MinN(FN_Compile.FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('faa_build_version'))),__CN(__cfg.CurrentDate));
     SELF := __PP220757;
   END;
-  EXPORT __ENH_Aircraft := PROJECT(__EE220880,__ND220984__Project(LEFT)) : PERSIST('~temp::KEL::PublicRecords_KEL::Aircraft::Annotated' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __ENH_Aircraft := PROJECT(__EE220880,__ND220984__Project(LEFT));
 END;

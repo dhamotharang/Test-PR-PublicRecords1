@@ -76,5 +76,5 @@ EXPORT B_Bankruptcy(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
     SELF.Records_ := __PROJECT(__EE221160,__ND221785__Project(LEFT));
     SELF := __PP221101;
   END;
-  EXPORT __ENH_Bankruptcy := PROJECT(__EE221430,__ND221830__Project(LEFT)) : PERSIST('~temp::KEL::PublicRecords_KEL::Bankruptcy::Annotated' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __ENH_Bankruptcy := PROJECT(__EE221430,__ND221830__Project(LEFT));
 END;

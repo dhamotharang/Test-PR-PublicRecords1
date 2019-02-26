@@ -81,7 +81,7 @@ EXPORT E_Education(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Education_Group,COUNT(ROWS(LEFT))=1),GROUP,Education__Single_Rollup(LEFT)) + ROLLUP(HAVING(Education_Group,COUNT(ROWS(LEFT))>1),GROUP,Education__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::PublicRecords_KEL::Education::Result' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
   EXPORT College_Name__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,College_Name_);
   EXPORT Tier__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Tier_);

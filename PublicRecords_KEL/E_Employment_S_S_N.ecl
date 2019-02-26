@@ -48,7 +48,7 @@ EXPORT E_Employment_S_S_N(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Employment_S_S_N_Group,COUNT(ROWS(LEFT))=1),GROUP,Employment_S_S_N__Single_Rollup(LEFT)) + ROLLUP(HAVING(Employment_S_S_N_Group,COUNT(ROWS(LEFT))>1),GROUP,Employment_S_S_N__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::PublicRecords_KEL::Employment_S_S_N::Result' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
   EXPORT Social__Orphan := JOIN(InData(__NN(Social_)),E_Social_Security_Number(__in,__cfg).__Result,__EEQP(LEFT.Social_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT Emp__Orphan := JOIN(InData(__NN(Emp_)),E_Employment(__in,__cfg).__Result,__EEQP(LEFT.Emp_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);

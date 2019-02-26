@@ -53,7 +53,7 @@ EXPORT E_S_S_N_Inquiry(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(S_S_N_Inquiry_Group,COUNT(ROWS(LEFT))=1),GROUP,S_S_N_Inquiry__Single_Rollup(LEFT)) + ROLLUP(HAVING(S_S_N_Inquiry_Group,COUNT(ROWS(LEFT))>1),GROUP,S_S_N_Inquiry__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::PublicRecords_KEL::S_S_N_Inquiry::Result' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
   EXPORT S_S_N__Orphan := JOIN(InData(__NN(S_S_N_)),E_Social_Security_Number(__in,__cfg).__Result,__EEQP(LEFT.S_S_N_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT Inquiry__Orphan := JOIN(InData(__NN(Inquiry_)),E_Inquiry(__in,__cfg).__Result,__EEQP(LEFT.Inquiry_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);

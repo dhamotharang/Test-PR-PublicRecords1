@@ -32,5 +32,5 @@ EXPORT B_Inquiry(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
     SELF.Current_Date_ := KEL.Routines.MinN(FN_Compile.FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('inquiry_update_build_version'))),__CN(__cfg.CurrentDate));
     SELF := __PP276126;
   END;
-  EXPORT __ENH_Inquiry := PROJECT(__EE276235,__ND276285__Project(LEFT)) : PERSIST('~temp::KEL::PublicRecords_KEL::Inquiry::Annotated' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __ENH_Inquiry := PROJECT(__EE276235,__ND276285__Project(LEFT));
 END;

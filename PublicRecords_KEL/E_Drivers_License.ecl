@@ -75,13 +75,9 @@ EXPORT E_Drivers_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
   END;
   EXPORT NullKeyVal := TRIM((STRING)'') + '|' + TRIM((STRING)'');
   SHARED __Table := TABLE(__All_Trim(KeyVal <> NullKeyVal),__TabRec,KeyVal,MERGE);
+  SHARED __SortedTable := SORT(__Table,KeyVal);
   SHARED NullLookupRec := DATASET([{NullKeyVal,1,0}],__TabRec);
-  EXPORT Lookup := NullLookupRec + PROJECT(__Table,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT)) : PERSIST('~temp::KEL::PublicRecords_KEL::Drivers_License::UidLookup',EXPIRE(7));
-  EXPORT UID_IdToText := INDEX(Lookup,{UID},{Lookup},'~temp::KEL::IDtoT::PublicRecords_KEL::Drivers_License');
-  EXPORT UID_TextToId := INDEX(Lookup,{ht:=HASH32(KeyVal)},{Lookup},'~temp::KEL::TtoID::PublicRecords_KEL::Drivers_License');
-  EXPORT BuildAll := PARALLEL(BUILDINDEX(UID_IdToText,OVERWRITE),BUILDINDEX(UID_TextToId,OVERWRITE));
-  EXPORT GetText(KEL.typ.uid i) := UID_IdToText(UID=i)[1];
-  EXPORT GetId(STRING s) := UID_TextToId(ht=HASH32(s),KeyVal=s)[1];
+  EXPORT Lookup := NullLookupRec + PROJECT(__SortedTable,TRANSFORM(__TabRec,SELF.UID:=COUNTER,SELF:=LEFT));
   SHARED Active_Date_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
   SHARED Inactive_Date_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
   SHARED __Mapping0 := 'UID(UID),dl_num(Drivers_License_Number_:\'\'),dl_state(Issuing_State_:\'\'),dl_seq(Drivers_License_Sequence_:0),licenseclass(License_Class_:\'\'),licensetype(License_Type_:\'\'),moxielicensetype(Moxie_License_Type_:\'\'),attention(Attention_:\'\'),attentioncode(Attention_Code_:\'\'),restrictions(Restrictions_:\'\'),restrictionsdelimited(Restrictions_Delimited_:\'\'),originalexpirationdate(Original_Expiration_Date_:DATE),originalissuedate(Original_Issue_Date_:DATE),issuedate(Issue_Date_:DATE),expirationdate(Expiration_Date_:DATE),activedate(Active_Date_:DATE:Active_Date_0Rule),inactivedate(Inactive_Date_:DATE:Inactive_Date_0Rule),endorsement(Endorsement_:\'\'),motorcyclecode(Motorcycle_Code_:\'\'),drivereducationcode(Driver_Education_Code_:0),duplicatecount(Duplicate_Count_:0),rcdstat(R_C_D_Stat_:\'\'),oospreviousdriverslicensenumber(O_O_S_Previous_Drivers_License_Number_:\'\'),previousstate(Previous_State_:\'\'),previousdriverslicensenumber(Previous_Drivers_License_Number_:\'\'),driverslicensekeynumber(Drivers_License_Key_Number_:0),issuance(Issuance_:\'\'),cdlstatus(C_D_L_Status_:\'\'),county(County_:\'\'),addresschange(Address_Change_:\'\'),namechange(Name_Change_:\'\'),dateofbirthchange(Date_Of_Birth_Change_:\'\'),sexchange(Sex_Change_:\'\'),height(Height_:\'\'),weight(Weight_:0),race(Race_:\'\'),racecode(Race_Code_:\'\'),sex(Sex_:\'\'),sexcode(Sex_Code_:\'\'),haircolor(Hair_Color_:\'\'),haircolorcode(Hair_Color_Code_:\'\'),eyecolor(Eye_Color_:\'\'),eyecolorcode(Eye_Color_Code_:\'\'),statename(State_Name_:\'\'),historyname(History_Name_:\'\'),history(History_:\'\'),src(Source_:\'\'),earliest_offense_date(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
@@ -223,7 +219,7 @@ EXPORT E_Drivers_License(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Drivers_License_Group,COUNT(ROWS(LEFT))=1),GROUP,Drivers_License__Single_Rollup(LEFT)) + ROLLUP(HAVING(Drivers_License_Group,COUNT(ROWS(LEFT))>1),GROUP,Drivers_License__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::PublicRecords_KEL::Drivers_License::Result' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
   EXPORT Drivers_License_Number__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Drivers_License_Number_);
   EXPORT Issuing_State__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Issuing_State_);

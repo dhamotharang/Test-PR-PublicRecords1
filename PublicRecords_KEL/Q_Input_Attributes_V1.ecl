@@ -4,9 +4,6 @@ IMPORT PublicRecords_KEL;
 IMPORT B_Input_P_I_I,B_Input_P_I_I_1,B_Input_P_I_I_2,B_Input_P_I_I_3,B_Input_P_I_I_4,B_Input_P_I_I_5,B_Input_P_I_I_6,CFG_Compile,E_Input_P_I_I,E_Person FROM PublicRecords_KEL;
 IMPORT * FROM KEL011.Null;
 EXPORT Q_Input_Attributes_V1(DATASET(RECORDOF(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII)) __PInputPIIDataset, KEL.typ.unk __PInputArchiveDateClean, UNSIGNED8 __PDPM, CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault) := MODULE
-  SHARED __cfg_Local := MODULE(CFG_Compile)
-    EXPORT KEL.typ.str PersistId := (KEL.typ.str)HASH32(1477203201);
-  END;
   SHARED E_Input_P_I_I_Params(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE(E_Input_P_I_I(__in,__cfg))
     SHARED __Mapping0 := 'inputuidappend(UID),appendedlexid(Subject_:0),inputaccountecho(Input_Account_Echo_:\'\'),inputlexidecho(Input_Lex_I_D_Echo_:0),inputfirstnameecho(Input_First_Name_Echo_:\'\'),inputmiddlenameecho(Input_Middle_Name_Echo_:\'\'),inputlastnameecho(Input_Last_Name_Echo_:\'\'),inputstreetecho(Input_Street_Echo_:\'\'),inputcityecho(Input_City_Echo_:\'\'),inputstateecho(Input_State_Echo_:\'\'),inputzipecho(Input_Zip_Echo_:\'\'),inputhomephoneecho(Input_Home_Phone_Echo_:\'\'),inputssnecho(Input_S_S_N_Echo_:\'\'),inputdobecho(Input_D_O_B_Echo_:\'\'),inputworkphoneecho(Input_Work_Phone_Echo_:\'\'),inputincomeecho(Input_Income_Echo_:\'\'),inputdlecho(Input_D_L_Echo_:\'\'),inputdlstateecho(Input_D_L_State_Echo_:\'\'),inputbalanceecho(Input_Balance_Echo_:\'\'),inputchargeoffdecho(Input_Charge_Offd_Echo_:\'\'),inputformernameecho(Input_Former_Name_Echo_:\'\'),inputemailecho(Input_Email_Echo_:\'\'),inputemploymentecho(Input_Employment_Echo_:\'\'),inputarchivedateecho(Input_Archive_Date_Echo_:\'\'),lexidappend(Lex_I_D_Append_:0),lexidscoreappend(Lex_I_D_Score_Append_:0),inputprefixclean(Input_Prefix_Clean_:\'\'),inputfirstnameclean(Input_First_Name_Clean_:\'\'),inputmiddlenameclean(Input_Middle_Name_Clean_:\'\'),inputlastnameclean(Input_Last_Name_Clean_:\'\'),inputsuffixclean(Input_Suffix_Clean_:\'\'),inputprimaryrangeclean(Input_Primary_Range_Clean_:\'\'),inputpredirectionclean(Input_Pre_Direction_Clean_:\'\'),inputprimarynameclean(Input_Primary_Name_Clean_:\'\'),inputaddresssuffixclean(Input_Address_Suffix_Clean_:\'\'),inputpostdirectionclean(Input_Post_Direction_Clean_:\'\'),inputunitdesigclean(Input_Unit_Desig_Clean_:\'\'),inputsecondaryrangeclean(Input_Secondary_Range_Clean_:\'\'),inputcityclean(Input_City_Clean_:\'\'),inputstateclean(Input_State_Clean_:\'\'),inputzip5clean(Input_Zip5_Clean_:\'\'),inputzip4clean(Input_Zip4_Clean_:\'\'),inputlatitudeclean(Input_Latitude_Clean_:\'\'),inputlongitudeclean(Input_Longitude_Clean_:\'\'),inputcountyclean(Input_County_Clean_:\'\'),inputgeoblockclean(Input_Geoblock_Clean_:\'\'),inputaddresstypeclean(Input_Address_Type_Clean_:\'\'),inputaddressstatusclean(Input_Address_Status_Clean_:\'\'),inputemailclean(Input_Email_Clean_:\'\'),inputhomephoneclean(Input_Home_Phone_Clean_:\'\'),inputworkphoneclean(Input_Work_Phone_Clean_:\'\'),inputdlclean(Input_D_L_Clean_:\'\'),inputdlstateclean(Input_D_L_State_Clean_:\'\'),inputdobclean(Input_D_O_B_Clean_:DATE),inputssnclean(Input_S_S_N_Clean_:\'\'),inputarchivedateclean(Input_Archive_Date_Clean_:\'\'),businputuidappend(Bus_Input_U_I_D_Append_:0),repnumber(Rep_Number_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
     SHARED __d0_Prefiltered := __PInputPIIDataset((KEL.typ.uid)InputUIDAppend <> 0);
@@ -38,7 +35,7 @@ EXPORT Q_Input_Attributes_V1(DATASET(RECORDOF(PublicRecords_KEL.ECL_Functions.La
   SHARED B_Input_P_I_I_Local(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE(B_Input_P_I_I(__in,__cfg))
     SHARED TYPEOF(B_Input_P_I_I_1(__in,__cfg).__ENH_Input_P_I_I_1) __ENH_Input_P_I_I_1 := B_Input_P_I_I_1_Local(__in,__cfg).__ENH_Input_P_I_I_1;
   END;
-  SHARED TYPEOF(B_Input_P_I_I(__in,__cfg_Local).__ENH_Input_P_I_I) __ENH_Input_P_I_I := B_Input_P_I_I_Local(__in,__cfg_Local).__ENH_Input_P_I_I;
+  SHARED TYPEOF(B_Input_P_I_I(__in).__ENH_Input_P_I_I) __ENH_Input_P_I_I := B_Input_P_I_I_Local(__in).__ENH_Input_P_I_I;
   SHARED __EE433145 := __ENH_Input_P_I_I;
   SHARED __ST12211_Layout := RECORD
     KEL.typ.nuid Input_U_I_D_Append_;
@@ -148,7 +145,7 @@ EXPORT Q_Input_Attributes_V1(DATASET(RECORDOF(PublicRecords_KEL.ECL_Functions.La
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST12211_Layout __ND432731__Project(B_Input_P_I_I(__in,__cfg_Local).__ST24200_Layout __PP432623) := TRANSFORM
+  SHARED __ST12211_Layout __ND432731__Project(B_Input_P_I_I(__in).__ST24200_Layout __PP432623) := TRANSFORM
     SELF.Input_U_I_D_Append_ := __PP432623.UID;
     SELF.Input_Account_Echo_ := __PP432623.Input_Account_Value_;
     SELF.Input_Lex_I_D_Echo_ := __PP432623.Input_Lex_I_D_Value_;

@@ -33,5 +33,5 @@ EXPORT B_Criminal_Punishment(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefaul
     SELF.Current_Date_ := KEL.Routines.MinN(FN_Compile.FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('doc_build_version'))),__CN(__cfg.CurrentDate));
     SELF := __PP224097;
   END;
-  EXPORT __ENH_Criminal_Punishment := PROJECT(__EE224328,__ND224612__Project(LEFT)) : PERSIST('~temp::KEL::PublicRecords_KEL::Criminal_Punishment::Annotated' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __ENH_Criminal_Punishment := PROJECT(__EE224328,__ND224612__Project(LEFT));
 END;

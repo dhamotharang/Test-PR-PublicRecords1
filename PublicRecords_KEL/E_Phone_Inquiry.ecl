@@ -53,7 +53,7 @@ EXPORT E_Phone_Inquiry(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Phone_Inquiry_Group,COUNT(ROWS(LEFT))=1),GROUP,Phone_Inquiry__Single_Rollup(LEFT)) + ROLLUP(HAVING(Phone_Inquiry_Group,COUNT(ROWS(LEFT))>1),GROUP,Phone_Inquiry__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::PublicRecords_KEL::Phone_Inquiry::Result' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
   EXPORT Phone_Number__Orphan := JOIN(InData(__NN(Phone_Number_)),E_Phone(__in,__cfg).__Result,__EEQP(LEFT.Phone_Number_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT Inquiry__Orphan := JOIN(InData(__NN(Inquiry_)),E_Inquiry(__in,__cfg).__Result,__EEQP(LEFT.Inquiry_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);

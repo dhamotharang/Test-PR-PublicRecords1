@@ -46,5 +46,5 @@ EXPORT B_Phone(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile
     SELF.Current_Date_ := KEL.Routines.MinN(FN_Compile.FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('targus_build_version'))),__CN(__cfg.CurrentDate));
     SELF := __PP425235;
   END;
-  EXPORT __ENH_Phone := PROJECT(__EE425472,__ND425758__Project(LEFT)) : PERSIST('~temp::KEL::PublicRecords_KEL::Phone::Annotated' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __ENH_Phone := PROJECT(__EE425472,__ND425758__Project(LEFT));
 END;

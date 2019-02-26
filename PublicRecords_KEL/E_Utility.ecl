@@ -62,7 +62,7 @@ EXPORT E_Utility(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Utility_Group,COUNT(ROWS(LEFT))=1),GROUP,Utility__Single_Rollup(LEFT)) + ROLLUP(HAVING(Utility_Group,COUNT(ROWS(LEFT))>1),GROUP,Utility__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::PublicRecords_KEL::Utility::Result' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
   EXPORT Utility_I_D__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Utility_I_D_);
   EXPORT Date_Added_To_Exchange__SingleValue_Invalid := KEL.Intake.DetectMultipleValues(__PreResult,Date_Added_To_Exchange_);

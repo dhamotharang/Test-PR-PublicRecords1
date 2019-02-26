@@ -179,5 +179,5 @@ EXPORT B_Input_P_I_I(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
     SELF.Input_Work_Phone_Value_ := FN_Compile.FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP274663.Input_Work_Phone_Echo_),__ECAST(KEL.typ.nstr,__CN(__CC3256)));
     SELF := __PP274663;
   END;
-  EXPORT __ENH_Input_P_I_I := PROJECT(__EE275458,__ND275620__Project(LEFT)) : PERSIST('~temp::KEL::PublicRecords_KEL::Input_P_I_I::Annotated' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __ENH_Input_P_I_I := PROJECT(__EE275458,__ND275620__Project(LEFT));
 END;

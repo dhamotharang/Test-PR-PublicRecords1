@@ -194,5 +194,5 @@ EXPORT B_Property(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     SELF.Current_Date_F_C_R_A_ := KEL.Routines.MinN(FN_Compile.FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('fcra_property_build_version'))),__CN(__cfg.CurrentDate));
     SELF := __PP426717;
   END;
-  EXPORT __ENH_Property := PROJECT(__EE427769,__ND429893__Project(LEFT)) : PERSIST('~temp::KEL::PublicRecords_KEL::Property::Annotated' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __ENH_Property := PROJECT(__EE427769,__ND429893__Project(LEFT));
 END;

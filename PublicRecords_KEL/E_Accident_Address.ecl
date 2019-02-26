@@ -58,7 +58,7 @@ EXPORT E_Accident_Address(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Accident_Address_Group,COUNT(ROWS(LEFT))=1),GROUP,Accident_Address__Single_Rollup(LEFT)) + ROLLUP(HAVING(Accident_Address_Group,COUNT(ROWS(LEFT))>1),GROUP,Accident_Address__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::PublicRecords_KEL::Accident_Address::Result' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
   EXPORT Acc__Orphan := JOIN(InData(__NN(Acc_)),E_Accident(__in,__cfg).__Result,__EEQP(LEFT.Acc_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT Location__Orphan := JOIN(InData(__NN(Location_)),E_Address(__in,__cfg).__Result,__EEQP(LEFT.Location_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);

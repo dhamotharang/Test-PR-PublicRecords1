@@ -74,6 +74,4 @@ EXPORT CFG_Compile := MODULE, VIRTUAL
   // **** These definitions may be overridden as needed ****;
   // Override to set the date to use for CURRENTDATE;
   EXPORT KEL.typ.kdate CurrentDate := KEL.Routines.Today();
-  // Override to change the query specific persist name fragment;
-  EXPORT KEL.typ.str PersistId := '';
 END;

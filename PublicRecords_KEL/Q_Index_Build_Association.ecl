@@ -5,7 +5,6 @@ IMPORT * FROM KEL011.Null;
 EXPORT Q_Index_Build_Association(KEL.typ.kdate __PInputArchiveDateClean, UNSIGNED8 __PDPM, CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault) := MODULE
   SHARED __cfg_Local := MODULE(CFG_Compile)
     EXPORT KEL.typ.kdate CurrentDate := __PInputArchiveDateClean;
-    EXPORT KEL.typ.str PersistId := (KEL.typ.str)HASH32(4911992);
   END;
   SHARED E_Accident_Address_Filtered(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE(E_Accident_Address(__in,__cfg))
     SHARED __AsofFitler(DATASET(InLayout) __ds) := __ds(__T(__OP2(KEL.era.ToDateMinNull(__ds.Date_First_Seen_),<=,__CN(__PInputArchiveDateClean))));

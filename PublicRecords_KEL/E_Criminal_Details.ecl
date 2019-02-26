@@ -165,7 +165,7 @@ EXPORT E_Criminal_Details(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     SELF := __r;
   END;
   EXPORT __PreResult := ROLLUP(HAVING(Criminal_Details_Group,COUNT(ROWS(LEFT))=1),GROUP,Criminal_Details__Single_Rollup(LEFT)) + ROLLUP(HAVING(Criminal_Details_Group,COUNT(ROWS(LEFT))>1),GROUP,Criminal_Details__Rollup(LEFT, ROWS(LEFT)));
-  EXPORT __Result := __CLEARFLAGS(__PreResult) : PERSIST('~temp::KEL::PublicRecords_KEL::Criminal_Details::Result' + IF(__cfg.PersistId <> '','::' + __cfg.PersistId,''),EXPIRE(7));
+  EXPORT __Result := __CLEARFLAGS(__PreResult);
   EXPORT Result := __UNWRAP(__Result);
   EXPORT Offender__Orphan := JOIN(InData(__NN(Offender_)),E_Criminal_Offender(__in,__cfg).__Result,__EEQP(LEFT.Offender_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
   EXPORT Offense__Orphan := JOIN(InData(__NN(Offense_)),E_Criminal_Offense(__in,__cfg).__Result,__EEQP(LEFT.Offense_, RIGHT.UID),TRANSFORM(InLayout,SELF := LEFT,SELF:=[]),LEFT ONLY, HASH);
