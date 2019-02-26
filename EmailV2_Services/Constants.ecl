@@ -13,7 +13,7 @@ EXPORT Constants := MODULE
   END;
   
   EXPORT Defaults := MODULE
-    EXPORT UNSIGNED PenaltThreshold      := 20;
+    EXPORT UNSIGNED PenaltThreshold      := 10;
     EXPORT UNSIGNED MaxResults           := 10;  
     EXPORT UNSIGNED MaxResultsPerAcct    := 10;  
     EXPORT UNSIGNED MaxEmailsToCheckDeliverable := 10;  //max number of result email addresses per account to send to gateway for delivery check
