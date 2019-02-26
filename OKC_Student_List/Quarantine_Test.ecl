@@ -36,7 +36,7 @@ EXPORT Quarantine_Test(string pversion='') := FUNCTION
 	orbit_summary_not_allowed := orbit_summary_rulepcnt_gt_threshold(regexfind(':ALLOW|:ENUM|:CUSTOM',ruledesc));	
 	output(orbit_summary_not_allowed,,named('Orbit_Summary_Not_Allowed_'+pversion));
 	//Select records that have significant % rulepcnt
-	orbit_summary_missing 	:= orbit_summary_rulepcnt_gt_threshold(rulepcnt>=orbit_threshold_missing);
+	orbit_summary_missing 	:= orbit_summary_rulepcnt_gt_threshold(rulepcnt>=orbit_threshold_missing and STD.Str.find(left.name,':POP',1)=0);
 	output(orbit_summary_missing,,named('Orbit_Summary_Length_'+pversion));
 	orbit_exclusion_list 		:= PROJECT(orbit_summary_not_allowed+orbit_summary_missing, 
 																		 TRANSFORM(exclude_colleges_layout,
