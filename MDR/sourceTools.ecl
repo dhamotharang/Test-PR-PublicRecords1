@@ -56,6 +56,7 @@ MODULE
 	export src_Bankruptcy_Trustee        := 'BT';
 	export src_BBB_Member                := 'BM';  // Better Business Bureau members
 	export src_BBB_Non_Member            := 'BN';  // Better Business Bureau non-members
+	export src_BrightVerify_email				 :=	'BV';		//BrightVerify email deltabase
 	export src_Business_Credit					 := 'BC';  // SBFE Business Credit
 	export src_Business_Registration     := 'BR';
 	export src_Calbus										 := 'C#';  // California business locator/CA sales & use tax permit holders
@@ -1550,6 +1551,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_Bankruptcy_Trustee        := [src_Bankruptcy_Trustee        ];
 	export set_BBB_Member                := [src_BBB_Member                ];
 	export set_BBB_Non_Member            := [src_BBB_Non_Member            ];
+	export set_BrightVerify_email				 := [src_BrightVerify_email				 ];
 	export set_Business_Credit			     := [src_Business_Credit           ];
 	export set_Business_Registration     := [src_Business_Registration     ];
 	export set_Calbus                    := [src_Calbus	       	           ];
@@ -2064,6 +2066,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsBBB                        (string  sr) := sr               in set_BBB                        ;
 	export SourceIsBBB_Member                 (string  sr) := sr               in set_BBB_Member                 ;
 	export SourceIsBBB_Non_Member             (string  sr) := sr               in set_BBB_Non_Member             ;
+	export SourceIsBrightVerify_email					(string	 sr) := sr							 in set_BrightVerify_email				 ;
 	export SourceIsBusinessHeader             (string  sr) := sr               in set_business_header            ;
 	export SourceIsBusiness_contacts          (string  sr) := sr               in set_Business_contacts          ;
 	export SourceIsBusiness_Credit            (string  sr) := sr               in set_Business_Credit            ;
@@ -2604,6 +2607,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_Bankruptcy_Trustee        ,'Bankruptcy Trustees'                                       }
 		,{src_BBB_Member                ,'Better Business Bureau Member'                             }
 		,{src_BBB_Non_Member            ,'Better Business Bureau Non-Member'                         }
+		,{src_BrightVerify_email				,'BrightVerify Email Deltabase'															 }
 		,{src_Business_Credit           ,'Business Credit (SBFE)'                                    }
 		,{src_Business_Registration     ,'Business Registration'                                     }
 		,{src_Calbus	 				          ,'California Sales & Use Tax Businesses'                     }	
@@ -3116,7 +3120,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_Bankruptcy_Attorney       => 'Bankruptcy Attorneys'                                 
 		,src_Bankruptcy_Trustee        => 'Bankruptcy Trustees'                                  
 		,src_BBB_Member                => 'Better Business Bureau Member'                        
-		,src_BBB_Non_Member            => 'Better Business Bureau Non-Member'                    
+		,src_BBB_Non_Member            => 'Better Business Bureau Non-Member' 
+		,src_BrightVerify_email				 => 'BrightVerify Email Deltabase'
 		,src_Business_Credit           => 'Business Credit (SBFE)'
 		,src_Business_Registration     => 'Business Registration'                                
 		,src_Calbus	 				           => 'California Sales & Use Tax Businesses'                

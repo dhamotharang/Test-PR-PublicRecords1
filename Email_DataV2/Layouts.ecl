@@ -109,9 +109,12 @@ END;
 //Base layout with temp Validation fields
 EXPORT temp_Validate	:= RECORD
 		Base_BIP;
-		Boolean	ValidEmail	:= FALSE;
-		Boolean	ValidDomain	:= FALSE;
-		Boolean IsDeath			:= FALSE;
+		Boolean	InvalidEmail	:= FALSE;
+		Boolean	InvalidDomain	:= FALSE;
+		Boolean IsDeath				:= FALSE;
+		Boolean InvalidAccount := FALSE;
+		Boolean	disposable		:= FALSE;
+		Boolean role					:= FALSE;
 END;
 
 EXPORT Autokey_layout := RECORD
