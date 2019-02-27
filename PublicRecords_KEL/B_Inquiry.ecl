@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Inquiry,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Inquiry(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Inquiry(__in,__cfg).__Result) __E_Inquiry := E_Inquiry(__in,__cfg).__Result;
-  SHARED __EE276235 := __E_Inquiry;
-  EXPORT __ST24381_Layout := RECORD
+  SHARED __EE281738 := __E_Inquiry;
+  EXPORT __ST24807_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Transaction_I_D_;
     KEL.typ.nkdate Date_Of_Inquiry_;
@@ -28,9 +28,9 @@ EXPORT B_Inquiry(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST24381_Layout __ND276285__Project(E_Inquiry(__in,__cfg).Layout __PP276126) := TRANSFORM
+  SHARED __ST24807_Layout __ND281788__Project(E_Inquiry(__in,__cfg).Layout __PP281629) := TRANSFORM
     SELF.Current_Date_ := KEL.Routines.MinN(FN_Compile.FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('inquiry_update_build_version'))),__CN(__cfg.CurrentDate));
-    SELF := __PP276126;
+    SELF := __PP281629;
   END;
-  EXPORT __ENH_Inquiry := PROJECT(__EE276235,__ND276285__Project(LEFT));
+  EXPORT __ENH_Inquiry := PROJECT(__EE281738,__ND281788__Project(LEFT));
 END;

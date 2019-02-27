@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Phone,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Phone(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Phone(__in,__cfg).__Result) __E_Phone := E_Phone(__in,__cfg).__Result;
-  SHARED __EE425472 := __E_Phone;
-  EXPORT __ST26518_Layout := RECORD
+  SHARED __EE433629 := __E_Phone;
+  EXPORT __ST26974_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Phone10_;
     KEL.typ.nint Area_Code_;
@@ -42,9 +42,9 @@ EXPORT B_Phone(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST26518_Layout __ND425758__Project(E_Phone(__in,__cfg).Layout __PP425235) := TRANSFORM
+  SHARED __ST26974_Layout __ND433915__Project(E_Phone(__in,__cfg).Layout __PP433392) := TRANSFORM
     SELF.Current_Date_ := KEL.Routines.MinN(FN_Compile.FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('targus_build_version'))),__CN(__cfg.CurrentDate));
-    SELF := __PP425235;
+    SELF := __PP433392;
   END;
-  EXPORT __ENH_Phone := PROJECT(__EE425472,__ND425758__Project(LEFT));
+  EXPORT __ENH_Phone := PROJECT(__EE433629,__ND433915__Project(LEFT));
 END;

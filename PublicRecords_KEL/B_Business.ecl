@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Business,FN_Compile FROM PublicRecords_KEL;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Business(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Business(__in,__cfg).__Result) __E_Business := E_Business(__in,__cfg).__Result;
-  SHARED __EE222071 := __E_Business;
-  EXPORT __ST20884_Layout := RECORD
+  SHARED __EE227684 := __E_Business;
+  EXPORT __ST21314_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Sele_I_D_;
     KEL.typ.ndataset(E_Business(__in,__cfg).Company_Names_Layout) Company_Names_;
@@ -16,9 +16,9 @@ EXPORT B_Business(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST20884_Layout __ND222135__Project(E_Business(__in,__cfg).Layout __PP221996) := TRANSFORM
+  SHARED __ST21314_Layout __ND227748__Project(E_Business(__in,__cfg).Layout __PP227609) := TRANSFORM
     SELF.Current_Date_ := KEL.Routines.MinN(FN_Compile.FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('bheader_build_version'))),__CN(__cfg.CurrentDate));
-    SELF := __PP221996;
+    SELF := __PP227609;
   END;
-  EXPORT __ENH_Business := PROJECT(__EE222071,__ND222135__Project(LEFT));
+  EXPORT __ENH_Business := PROJECT(__EE227684,__ND227748__Project(LEFT));
 END;

@@ -28,7 +28,7 @@ EXPORT E_Person_Bankruptcy(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     RECORDOF(__d0_KELfiltered);
     KEL.typ.uid Bankrupt_;
   END;
-  SHARED __d0_Bankrupt__Mapped := JOIN(__d0_KELfiltered,E_Bankruptcy(__in,__cfg).Lookup,TRIM((STRING)LEFT.TMSID) + '|' + TRIM((STRING)LEFT.Court_Code) + '|' + TRIM((STRING)LEFT.Case_Number) = RIGHT.KeyVal,TRANSFORM(__d0_Bankrupt__Layout,SELF.Bankrupt_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d0_Bankrupt__Mapped := JOIN(__d0_KELfiltered,E_Bankruptcy(__in,__cfg).Lookup,TRIM((STRING)LEFT.TMSID) + '|' + TRIM((STRING)LEFT.Court_Code) + '|' + TRIM((STRING)LEFT.Case_Number) + '|' + TRIM((STRING)LEFT.did) = RIGHT.KeyVal,TRANSFORM(__d0_Bankrupt__Layout,SELF.Bankrupt_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
   SHARED __d0_Prefiltered := __d0_Bankrupt__Mapped;
   SHARED __d0 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0),__Mapping0_Transform(LEFT)));
   SHARED __Mapping1 := 'did(Subject_:0),Bankrupt_(Bankrupt_:0),date_first_seen(Date_First_Seen_:EPOCH),date_last_seen(Date_Last_Seen_:EPOCH)';
@@ -38,12 +38,12 @@ EXPORT E_Person_Bankruptcy(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     SELF := __r;
   END;
   SHARED __d1_Norm := NORMALIZE(__in,LEFT.Dataset_Bankruptcy_Files__Key_Search,TRANSFORM(RECORDOF(__in.Dataset_Bankruptcy_Files__Key_Search),SELF:=RIGHT));
-  EXPORT __d1_KELfiltered := __d1_Norm((UNSIGNED)did != 0);
+  EXPORT __d1_KELfiltered := __d1_Norm((UNSIGNED)did != 0 AND name_type = 'D');
   SHARED __d1_Bankrupt__Layout := RECORD
     RECORDOF(__d1_KELfiltered);
     KEL.typ.uid Bankrupt_;
   END;
-  SHARED __d1_Bankrupt__Mapped := JOIN(__d1_KELfiltered,E_Bankruptcy(__in,__cfg).Lookup,TRIM((STRING)LEFT.TMSID) + '|' + TRIM((STRING)LEFT.Court_Code) + '|' + TRIM((STRING)LEFT.Case_Number) = RIGHT.KeyVal,TRANSFORM(__d1_Bankrupt__Layout,SELF.Bankrupt_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
+  SHARED __d1_Bankrupt__Mapped := JOIN(__d1_KELfiltered,E_Bankruptcy(__in,__cfg).Lookup,TRIM((STRING)LEFT.TMSID) + '|' + TRIM((STRING)LEFT.Court_Code) + '|' + TRIM((STRING)LEFT.Case_Number) + '|' + TRIM((STRING)LEFT.did) = RIGHT.KeyVal,TRANSFORM(__d1_Bankrupt__Layout,SELF.Bankrupt_:=RIGHT.UID,SELF:=LEFT),LEFT OUTER,HASH);
   SHARED __d1_Prefiltered := __d1_Bankrupt__Mapped;
   SHARED __d1 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d1_Prefiltered,InLayout,__Mapping1),__Mapping1_Transform(LEFT)));
   EXPORT InData := __d0 + __d1;
