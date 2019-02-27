@@ -1,0 +1,106 @@
+﻿ID "54f49608-cb43-4a30-82ce-b62648e16bf1";
+NAME ComputeBusinessIntraGeoradiusAssociations;
+LABEL "Compute Business Intra Georadius Associations";
+VERSION "1.0.0";
+AUTHOR "CarmigJX";
+CATEGORY COMPUTE;
+DESCRIPTION "Calculates business location associations";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING Prefix: LABEL("Prefix"),DEFAULT(""),DESCRIPTION("Prefix to add to appended fields");
+	DATASET dsInput: MAPBYNAME
+    FIELD Geohash: LABEL("Geohash"),DESCRIPTION("Geohash location");
+    FIELD RecordID: LABEL("Record ID"),DESCRIPTION("The record ID. It must be unique for each record");
+    FIELD UltID: LABEL("Ult ID"),DESCRIPTION("The business ultimate owner BIP ID");
+    FIELD ProxID: LABEL("Prox ID"),DESCRIPTION("The business location BIP ID");
+    FIELD ProxEntityContextUID: LABEL("Prox Entity Context UID"),DESCRIPTION("The business location entity context UID used in Graph");
+    FIELD BusinessName: LABEL("Business Name"),DESCRIPTION("The name of the business");
+    FIELD BuildingAddress: LABEL("Business Building Address"),DESCRIPTION("The concatenated physical building address of the business");
+    FIELD PhysicalAddress: LABEL("Business Physical Address"),DESCRIPTION("The clean physical address of the business");
+    FIELD BusinessPhone: LABEL("Business Phone"),DESCRIPTION("The phone number of the business");
+    FIELD LegalName: LABEL("Legal Name"),DESCRIPTION("The legal name of the business"),OPTIONAL,NULL("");
+    FIELD DBAName: LABEL("Doing Business As Name"),DESCRIPTION("The DBA name of the business"),OPTIONAL,NULL("");
+    FIELD MailingAddress: LABEL("Business Mailing Address"),DESCRIPTION("The clean mailing address of the business"),OPTIONAL,NULL("");
+    FIELD AppendFields: MANY,LABEL("Append Fields"),DESCRIPTION("Matching location fields that should be added to the layout in the output"),OPTIONAL,NULL(""),DEFAULT("");
+  END
+	REAL ThresholdDistance: LABEL("Distance Threshold"),DEFAULT("0.5"),DESCRIPTION("Distance threshold to be considered an association");
+	INT MaxBusinessAtLocation: LABEL("Max Business at Location"),DEFAULT(50),DESCRIPTION("Maximum number of business at a single location. Default is 50.");
+	INT EditDistanceThreshold: LABEL("Name Distance Threshold"),DEFAULT(2),DESCRIPTION("The business name distance threshold to be considered an almost match");
+END
+
+OUTPUTS
+	DATASET dsOutput(dsInput): PREFIX(INPUTS.Prefix)
+		INPUTS.AppendFields;
+    STRING ProxEntityLocation;
+    REAL GeoDistance;
+    INTEGER EditDistanceMatch;
+    INTEGER ExactCompanyNameMatch;
+    INTEGER PhoneNumberMatch;
+    INTEGER MatchingUlt;
+    INTEGER DifferentLocationMailingAddressMatch: OPTIONAL;
+    STRING PinColor;
+  END
+END
+
+GENERATES INLINE
+	IMPORT #EXPAND(HIPIE.HIPIEConfig.SaltVersion) as SALT;
+  IMPORT ComputeBusinessIntraGeoradiusAssociations;
+  //Once HIPIE provides a way to return SET OF STRING in the OUTPUTS
+  //these steps will be moved out of this plugin into separate plugins
+  //1. Dedup Sort Data, 
+  //2. Append Geohash, 
+  //3. Append Geohash Radius (new) x2, 
+  //4. Join Dataset
+  
+  //Dedup Sort Data
+  LOCAL dDistribute := DISTRIBUTE(%dsInput%, HASH32(%PhysicalAddress%));
+  LOCAL DistinctPhysicalAddressGeo := DEDUP(SORT(dDistribute, %PhysicalAddress%, %Geohash%, LOCAL), %PhysicalAddress%, LOCAL);
+  
+  //Append Geohash Radius
+  LOCAL rGeoRadius := RECORD
+   RECORDOF(%dsInput%);
+   SET OF STRING RadiusBox;
+   SET OF STRING RadiusBoxSmall;
+  END;
+   
+  LOCAL _dWithGeoRadius := PROJECT(DistinctPhysicalAddressGeo, TRANSFORM(rGeoRadius,
+    GeoBox := SALT.MOD_LL.PointRadius(LEFT.%Geohash%, %ThresholdDistance%);
+    SELF.RadiusBox := (SET(GeoBox, Box));  
+    //Default the small box to 0.1 for now
+    SmallGeoBox := SALT.MOD_LL.PointRadius(LEFT.%Geohash%, 0.1);
+    SELF.RadiusBoxSmall := (SET(SmallGeoBox, Box));
+    SELF := LEFT));
+    
+  //Join Dataset
+  LOCAL dWithGeoRadius := JOIN(%dsInput%, _dWithGeoRadius, 
+    LEFT.%PhysicalAddress%=RIGHT.%PhysicalAddress%, 
+    TRANSFORM(rGeoRadius, 
+      SELF.%Geohash% := RIGHT.%Geohash%, 
+      SELF.RadiusBox := RIGHT.RadiusBox, 
+      SELF.RadiusBoxSmall := RIGHT.RadiusBoxSmall, 
+      SELF := LEFT), LEFT OUTER);
+  
+  strFields := '%#foreach(INPUTS.AppendFields,",")% %INPUTS.AppendFields% %#end%';
+  LOCAL dOut:= ComputeBusinessIntraGeoradiusAssociations.macComputeBusinessIntraGeoradiusAssociations(
+    dWithGeoRadius, %Geohash%, RadiusBox, RadiusBoxSmall, %BuildingAddress%, %PhysicalAddress%,
+    %UltID%, %ProxID%, %ProxEntityContextUID%, %RecordID%, %BusinessName%, %BusinessPhone%,
+    %^qPrefix%, %LegalName%, %DBAName%, %MailingAddress%, strFields,
+    %ThresholdDistance%, %MaxBusinessAtLocation%, %EditDistanceThreshold%);
+  %^edsOutput% := PROJECT(dOut, {RECORDOF(LEFT) AND NOT [RadiusBox, RadiusBoxSmall]})%^p%;
+ENDGENERATES
+
+
+RESOURCES
+	FILE readme: FILENAME("ComputeBusinessIntraGeoradiusAssociations_ReadMe.txt"),LABEL("Plugin Readme File");
+	FILE computebusinessintrageoradiusassociations_testcmp: FILENAME("computebusinessintrageoradiusassociations_testcmp.txt"),LABEL("Plugin Test Composition");
+	FILE ComputeBusinessIntraGeoradiusAssociations_BuildTestDataset: FILENAME("ComputeBusinessIntraGeoradiusAssociations_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+	FILE checklist: FILENAME("ComputeBusinessIntraGeoradiusAssociationsChecklist.xlsx"),LABEL("Plugin Checklist");
+  ECL ComputeBusinessIntraGeoradiusAssociations:FILENAME("ComputeBusinessIntraGeoradiusAssociations"), URL("http://10.241.100.153:8010");
+  ECL SALT38:FILENAME("SALT38"), URL("http://10.241.100.153:8010");
+  LOGICALFILE test: FILENAME("~qa::computebusinessintrageoradiusassociations::computebusinessintrageoradiusassociations::input"),URL("http://10.241.100.159:8010"),DALIIP("10.241.100.159"),CLUSTER("thor100_100dev");
+END
