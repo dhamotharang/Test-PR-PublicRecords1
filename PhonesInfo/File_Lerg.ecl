@@ -1,5 +1,8 @@
 ﻿IMPORT Data_Services;
 
+//DF-23660: Lerg6 Build Process
+//DF-24140: Lerg6 Layout Change
+
 EXPORT File_Lerg := MODULE
 
 	//Lerg6

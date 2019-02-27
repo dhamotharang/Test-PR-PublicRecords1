@@ -1,6 +1,7 @@
 ﻿EXPORT Layout_Lerg := MODULE
 
 	//DF-23660: Create Lerg6 Keybuild
+	//DF-24140: Lerg6 Layout Change
 
 	//Lerg6
 	EXPORT lerg6_in:= RECORD
@@ -60,6 +61,7 @@
 		string8 dt_last_reported;
 		string8 dt_start;						//Date/Time Entered in Table
 		string8 dt_end;
+		string2 source;
 		string10 lata;
 		string30 lata_name;
 		string2 status;
@@ -105,6 +107,32 @@
 		string6 last_modified_time;
 		string1 filler7;
 		boolean is_current;
+		string5 os1;
+		string5 os2;
+		string5 os3;
+		string5 os4;
+		string5 os5;
+		string5 os6;
+		string5 os7;
+		string5 os8;
+		string5 os9;
+		string5 os10;
+		string5 os11;
+		string5 os12;
+		string5 os13;
+		string5 os14;
+		string5 os15;
+		string5 os16;
+		string5 os17;
+		string5 os18;
+		string5 os19;
+		string5 os20;
+		string5 os21;
+		string5 os22;
+		string5 os23;
+		string5 os24;
+		string5 os25;
+		string80 notes;
 		unsigned4 global_sid;		//CCPA Requirement
 		unsigned8 record_sid;		//CCPA Requirement
 	end;
