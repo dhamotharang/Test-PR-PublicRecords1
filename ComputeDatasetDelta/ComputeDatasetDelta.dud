@@ -1,0 +1,99 @@
+﻿ID "4fbcff2f-0c4b-433b-be3e-1c45224b010b";
+NAME ComputeDatasetDelta;
+LABEL "Compute Dataset Delta";
+VERSION "1.0.0";
+AUTHOR "CarmigJX";
+CATEGORY COMPUTE;
+DESCRIPTION "Compares differences between two similar files";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	DATASET dsInput1
+    FIELD JoinFields1: MANY,LABEL("Join Columns from dsInput1"),DESCRIPTION("Fields to use for the comparison");
+    FIELD FieldsToIgnore1: MANY,LABEL("Columns to Ignore"),DESCRIPTION("Fields to NOT use for the comparison"),OPTIONAL,NULL("");
+  END
+	DATASET dsInput2
+    FIELD JoinFields2: MANY,LABEL("Join Columns from dsInput2"),DESCRIPTION("Fields to use for the comparison");
+  END
+END
+
+OUTPUTS
+	DATASET dsSkinny
+		INPUTS.JoinFields1;
+    STRING Field;
+    STRING OldValue;
+    STRING NewValue;
+    INTEGER IsDifferent;
+	END
+  
+  DATASET dsOutput
+		INPUTS.JoinFields1;
+    DATASET Differences
+      STRING Field;
+      STRING OldValue;
+      STRING NewValue;
+      INTEGER IsDifferent;
+    END
+  END
+  
+	DATASET TopRecordDeltaStats: SIDE,WUID,SMALL
+		STRING JoinColumnId;
+    INTEGER Cnt;
+  END
+	DATASET TopFieldsDeltaStats: SIDE,WUID,SMALL
+		STRING FieldName;
+    INTEGER Cnt;
+  END
+END
+
+VISUALIZE AppendNewDataIndicatorStats: LABEL("Compute Dataset Delta Stats")
+  TABLE TopDeltaRecords(TopRecordDeltaStats): TITLE("Top 100 records with most differences"),LABEL("Join Columns", "Count"), VALUE(JoinColumnId,Cnt);
+  TABLE TopDeltaFields(TopFieldsDeltaStats): TITLE("Top 100 fields with most differences"),LABEL("Field Name", "Count"), VALUE(FieldName,Cnt);
+END
+
+GENERATES INLINE
+	IMPORT ComputeDatasetDelta, hipie_ecl;
+  
+  strJoinFields1    := '%INPUTS.JoinFields1%';
+  strJoinFields2    := '%INPUTS.JoinFields2%';  
+  FieldsToIgnore    := ['%#foreach(INPUTS.FieldsToIgnore1,"','")%%INPUTS.FieldsToIgnore1%%#end%'];
+  
+  dDifferences := ComputeDatasetDelta.macComputeDatasetDelta(%dsInput1%, %dsInput2%, strJoinFields1, strJoinFields2, FieldsToIgnore)%^p%;
+  
+  %^edsOutput% := dDifferences;
+
+  InDataSet := %dsInput1%;
+  rDiffValues := RECORD
+    STRING Field;
+    STRING OldValue;
+    STRING NewValue;
+    INTEGER IsDifferent;
+  END;
+  rOut := RECORD
+	  InDataSet.%#foreach(INPUTS.JoinFields1,";InDataSet.")%%INPUTS.JoinFields1%%#end%;
+    rDiffValues;
+  END;
+  
+  %^edsSkinny% := NORMALIZE(%dsOutput%, LEFT.Differences, TRANSFORM(rOut, SELF := RIGHT, SELF := LEFT));
+  
+  %^eTopRecordDeltaStats% := TOPN(TABLE(%dsSkinny%((BOOLEAN)IsDifferent),{STRING JoinColumnId := %#foreach(INPUTS.JoinFields1,"+','+")%(STRING)%INPUTS.JoinFields1%%#end%, INTEGER Cnt := COUNT(GROUP)},%INPUTS.JoinFields1%), 100, -Cnt);
+  %^eTopFieldsDeltaStats% := TOPN(TABLE(%dsSkinny%((BOOLEAN)IsDifferent),{STRING FieldName := Field, INTEGER Cnt := COUNT(GROUP)},Field), 100, -Cnt);
+
+ENDGENERATES
+
+
+RESOURCES
+	FILE readme: FILENAME("ComputeDatasetDelta_ReadMe.txt"),LABEL("Plugin Readme File");
+	FILE ComputeDatasetDelta_testcmp: FILENAME("ComputeDatasetDelta_testcmp.txt"),LABEL("Plugin Test Composition");
+	FILE ComputeDatasetDelta_BuildTestDataset: FILENAME("ComputeDatasetDelta_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+  ECL ComputeDatasetDelta:FILENAME("ComputeDatasetDelta"), URL("http://10.173.10.155:8010");
+  ECL hipie_ecl:FILENAME("hipie_ecl"), URL("http://10.173.10.155:8010");
+	FILE ComputeDatasetDelta_TestHarness: FILENAME("ComputeDatasetDelta_TestHarness.txt"),LABEL("Plugin Test Harness");
+	FILE ComputeDatasetDeltaCheckList: FILENAME("ComputeDatasetDeltaCheckList.xlsx"),LABEL("Plugin checklist");
+	LOGICALFILE test: FILENAME("~qa::computedatasetdelta::computedatasetdelta::input"),URL("http://10.241.100.159:8010"),DALIIP("10.241.100.159"),CLUSTER("thor100_100dev");
+	LOGICALFILE test2: FILENAME("~qa::computedatasetdelta::computedatasetdelta::input2"),URL("http://10.241.100.159:8010"),DALIIP("10.241.100.159"),CLUSTER("thor100_100dev");
+END

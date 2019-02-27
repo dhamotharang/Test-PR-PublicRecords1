@@ -1,0 +1,161 @@
+ID "RoxieDev.ComputeDatasetDelta.ComputeDatasetDelta_testcmp";
+NAME ComputeDatasetDelta_testcmp;
+LABEL "Test composition for Compute Dataset Delta";
+DESCRIPTION "Auto-generated test composition for plugin ComputeDatasetDelta";
+VERSION "1.0.0";
+AUTHOR "CarmigJX";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING CompareWUID: DEFAULT("W20190227-135609"); 
+END
+
+INSTANCE UseDataset.UseDataset(Ins001)
+	LogicalFilename="~qa::computedatasetdelta::computedatasetdelta::input"
+	Structure="RECORD
+  integer8 industry_type_;
+  integer8 customer_id_;
+  string entity_context_uid_;
+  string label_;
+  unsigned8 _r_customer_;
+  integer8 age_;
+  integer8 _nas__summary_;
+  integer8 _nap__summary_;
+  integer8 _subjectssncount_;
+  string _dobmatchlevel_;
+  boolean _ssnfoundforlexid_;
+  integer8 subject_ssn_count_;
+  integer8 date_of_birth_match_level_;
+  integer8 stolen_identity_index_;
+  integer8 synthetic_identity_index_;
+  integer8 manipulated_identity_index_;
+  integer8 vulnerable_victim_index_;
+  integer8 friendlyfraud_index_;
+  integer8 suspicious_activity_index_;
+  integer8 all_death_prior_to_all_events_;
+  integer8 all_deceased_event_count_;
+  real8 all_deceased_event_percent_;
+  integer8 all_high_risk_death_prior_to_all_events_;
+  integer8 all_max_deceased_to_event_diff_;
+  integer8 death_prior_to_all_events_;
+  integer8 deceased_;
+  integer8 deceased_dob_match_;
+  integer8 deceased_event_count_;
+  real8 deceased_event_percent_;
+  integer8 deceased_match_;
+  string deceased_match_description_;
+  integer8 deceased_name_match_;
+  integer8 entity_type_;
+  integer8 high_risk_death_prior_to_all_events_;
+  integer8 in_customer_population_;
+  integer8 max_deceased_to_event_diff_;
+  integer8 no_lex_id_;
+  integer8 no_lex_id_gt22_;
+  integer8 id_ssn_identity_count_max_;
+  integer8 nas9_flag_;
+  integer8 nap3_flag_;
+  integer8 cl_no_lex_id_gt22_count_;
+  integer8 cl_death_prior_to_all_events_identity_count_;
+  integer8 cl_high_risk_death_prior_to_all_events_identity_count_;
+  integer8 cl_event_count_;
+  integer8 cl_identity_count_;
+  integer8 cl_full_identity_count_;
+  integer8 cl_nas9_identity_count_;
+  integer8 cl_nap3_identity_count_;
+  integer8 cl_address_count_;
+  real8 cl_identity_event_avg_;
+  integer8 cl_identity_count_percentile_;
+  integer8 cl_event_count_percentile_;
+  real8 cl_impact_weight_;
+  integer8 kr_high_risk_flag_;
+  integer8 kr_medium_risk_flag_;
+	END;"
+	Method="THOR"
+END
+
+INSTANCE UseDataset.UseDataset(Ins002)
+	LogicalFilename="~qa::computedatasetdelta::computedatasetdelta::input2"
+	Structure="RECORD
+  integer8 industry_type_;
+  integer8 customer_id_;
+  string entity_context_uid_;
+  string label_;
+  unsigned8 _r_customer_;
+  integer8 age_;
+  integer8 _nas__summary_;
+  integer8 _nap__summary_;
+  integer8 _subjectssncount_;
+  string _dobmatchlevel_;
+  boolean _ssnfoundforlexid_;
+  integer8 subject_ssn_count_;
+  integer8 date_of_birth_match_level_;
+  integer8 stolen_identity_index_;
+  integer8 synthetic_identity_index_;
+  integer8 manipulated_identity_index_;
+  integer8 vulnerable_victim_index_;
+  integer8 friendlyfraud_index_;
+  integer8 suspicious_activity_index_;
+  integer8 all_death_prior_to_all_events_;
+  integer8 all_deceased_event_count_;
+  real8 all_deceased_event_percent_;
+  integer8 all_high_risk_death_prior_to_all_events_;
+  integer8 all_max_deceased_to_event_diff_;
+  integer8 death_prior_to_all_events_;
+  integer8 deceased_;
+  integer8 deceased_dob_match_;
+  integer8 deceased_event_count_;
+  real8 deceased_event_percent_;
+  integer8 deceased_match_;
+  string deceased_match_description_;
+  integer8 deceased_name_match_;
+  integer8 entity_type_;
+  integer8 high_risk_death_prior_to_all_events_;
+  integer8 in_customer_population_;
+  integer8 max_deceased_to_event_diff_;
+  integer8 no_lex_id_;
+  integer8 no_lex_id_gt22_;
+  integer8 id_ssn_identity_count_max_;
+  integer8 nas9_flag_;
+  integer8 nap3_flag_;
+  integer8 cl_no_lex_id_gt22_count_; 
+  integer8 cl_death_prior_to_all_events_identity_count_;
+  integer8 cl_high_risk_death_prior_to_all_events_identity_count_;
+  integer8 cl_event_count_;
+  integer8 cl_identity_count_;
+  integer8 cl_full_identity_count_;
+  integer8 cl_nas9_identity_count_;
+  integer8 cl_nap3_identity_count_;
+  integer8 cl_address_count_; 
+  real8 cl_identity_event_avg_;
+  integer8 cl_identity_count_percentile_;
+  integer8 cl_event_count_percentile_;
+  real8 cl_impact_weight_; 
+  integer8 kr_high_risk_flag_; 
+  integer8 kr_medium_risk_flag_;
+	END;" 
+	Method="THOR" 
+END
+
+INSTANCE ComputeDatasetDelta.ComputeDatasetDelta(Ins003)
+	dsInput1="^Ins001|dsOutput"
+	dsInput2="^Ins002|dsOutput"
+	JoinFields1="industry_type_","customer_id_","entity_context_uid_"
+	JoinFields2="industry_type_","customer_id_","entity_context_uid_"
+	FieldsToIgnore1="cl_no_lex_id_gt22_count_","in_customer_population_" 
+END
+
+INSTANCE HIPIE_Plugins.OutDataset.OutDataset(Ins004)
+	dsInput="^Ins003|dsOutput"
+	name="~qa::computedatasetdelta::computedatasetdelta::output"
+	Method="THOR"
+END
+
+INSTANCE HIPIE_Plugins.OutDataset.OutDataset(Ins005)
+	dsInput="^Ins003|dsSkinny"
+	name="~qa::computedatasetdelta::computedatasetdelta::skinnyoutput"
+	Method="THOR"
+END
