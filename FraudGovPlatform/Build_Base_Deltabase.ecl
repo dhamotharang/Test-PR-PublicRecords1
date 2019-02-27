@@ -37,13 +37,13 @@ module
 
   // Rollup Update and previous base 
   
-	Pcombined := If(UpdateDeltabase , inBaseDeltabase + DeltabaseSource , inBaseDeltabase); 
+	Pcombined := If(UpdateDeltabase , inBaseDeltabase + DeltabaseSource , DeltabaseSource); 
 	pDataset_Dist := distribute(Pcombined, source_rec_id);
 	pDataset_sort := sort(pDataset_Dist , source_rec_id, -process_date, -did, -clean_address.err_stat,local);
 
 	
 	Layouts.Base.Deltabase RollupUpdate(Layouts.Base.Deltabase l, Layouts.Base.Deltabase r) := 
-	transform
+	transform 
 		SELF.dt_first_seen := ut.EarliestDate(l.dt_first_seen	,r.dt_first_seen); 
 		SELF.dt_last_seen := max(l.dt_last_seen,r.dt_last_seen);
 		SELF.dt_vendor_last_reported := max(l.dt_vendor_last_reported, r.dt_vendor_last_reported);
@@ -55,9 +55,9 @@ module
 	end;
 
 	pDataset_rollup := rollup( pDataset_sort
-		,RollupUpdate(left, right)
-		,source_rec_id ,local);
-	
+        ,RollupUpdate(left, right)
+        ,source, source_rec_id ,local);
+
 	tools.mac_WriteFile(Filenames(pversion).Base.Deltabase.New,pDataset_rollup,Build_Base_File);
 
 // Return

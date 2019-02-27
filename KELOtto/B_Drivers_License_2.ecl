@@ -7,52 +7,60 @@ EXPORT B_Drivers_License_2 := MODULE
   SHARED VIRTUAL TYPEOF(B_Person_3.__ENH_Person_3) __ENH_Person_3 := B_Person_3.__ENH_Person_3;
   SHARED VIRTUAL TYPEOF(E_Person_Event.__Result) __E_Person_Event := E_Person_Event.__Result;
   SHARED VIRTUAL TYPEOF(E_Person_Person.__Result) __E_Person_Person := E_Person_Person.__Result;
-  SHARED __EE67812 := __E_Drivers_License;
-  SHARED __EE67890 := __ENH_Person_3;
-  SHARED __EE71994 := __EE67890;
-  SHARED __EE68226 := __E_Person_Person;
-  SHARED __EE71295 := __EE68226(__NN(__EE68226.From_Person_) AND __NN(__EE68226.To_Person_));
-  SHARED __ST72539_Layout := RECORD
-    KEL.typ.ntyp(E_Person.Typ) From_Person_;
-    KEL.typ.ntyp(E_Person.Typ) To_Person_;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-    KEL.typ.int __RecordCount := 0;
-  END;
-  SHARED __EE72543 := PROJECT(TABLE(PROJECT(__EE71295,__ST72539_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),From_Person_,To_Person_},From_Person_,To_Person_,MERGE),__ST72539_Layout);
-  SHARED __EE67874 := __E_Person_Event;
-  SHARED __EE71830 := __EE67874(__NN(__EE67874.Licence_) AND __NN(__EE67874.Subject_));
-  SHARED __ST72551_Layout := RECORD
+  SHARED __EE86006 := __E_Drivers_License;
+  SHARED __EE86071 := __ENH_Person_3;
+  SHARED __EE90049 := __EE86071;
+  SHARED __EE86407 := __E_Person_Person;
+  SHARED __EE89351 := __EE86407(__NN(__EE86407.From_Person_) AND __NN(__EE86407.To_Person_));
+  SHARED __EE86055 := __E_Person_Event;
+  SHARED __EE89896 := __EE86055(__NN(__EE86055.Licence_) AND __NN(__EE86055.Subject_));
+  SHARED __ST90603_Layout := RECORD
     KEL.typ.ntyp(E_Person.Typ) Subject_;
     KEL.typ.ntyp(E_Drivers_License.Typ) Licence_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __EE72555 := PROJECT(TABLE(PROJECT(__EE71830,__ST72551_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Subject_,Licence_},Subject_,Licence_,MERGE),__ST72551_Layout);
-  SHARED __ST72577_Layout := RECORD
+  SHARED __EE90607 := PROJECT(TABLE(PROJECT(__EE89896,__ST90603_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,TRUE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),Subject_,Licence_},Subject_,Licence_,MERGE),__ST90603_Layout);
+  SHARED __ST90650_Layout := RECORD
+    KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ntyp(E_Person.Typ) From_Person_;
     KEL.typ.ntyp(E_Person.Typ) To_Person_;
+    KEL.typ.nint Self_Match_;
+    KEL.typ.nint Contributory_Records_;
+    KEL.typ.nint Same_Address_Email_Match_;
+    KEL.typ.nint Same_Address_Ssn_Match_;
+    KEL.typ.nint Same_Address_Phone_Number_Match_;
+    KEL.typ.nint Same_Address_Same_Day_Count_;
+    KEL.typ.nint High_Frequency_Same_Address_Same_Day_Count_;
+    KEL.typ.nint Non_High_Frequency_Address_Count_;
+    KEL.typ.nint Non_High_Frequency_Same_Address_Same_Day_Count_;
+    KEL.typ.nint Shared_Address_Count_;
+    KEL.typ.nstr Verified_P_R_Type_;
+    KEL.typ.nstr Verified_P_Rconfidence_;
+    KEL.typ.nbool Verified_P_R_Personal_;
+    KEL.typ.nbool Verified_P_R_Business_;
+    KEL.typ.nbool Verified_P_R_Other_;
+    KEL.typ.nbool Verified_P_R_Is_Relative_;
+    KEL.typ.nbool Verified_P_R_Is_Associate_;
+    KEL.typ.nbool Verified_P_R_Is_Business_;
+    KEL.typ.nfloat Verified_P_R_Degree_;
+    KEL.typ.nint Verified_P_R_Hit_;
+    KEL.typ.nint Verified_P_R_Relationship_Code_;
+    KEL.typ.nint Verified_P_R_Relationship_;
     KEL.typ.ntyp(E_Person.Typ) Subject_;
     KEL.typ.ntyp(E_Drivers_License.Typ) Licence_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC72568(__ST72539_Layout __EE72543, __ST72551_Layout __EE72555) := __EEQP(__EE72555.Subject_,__EE72543.From_Person_);
-  __ST72577_Layout __JT72568(__ST72539_Layout __l, __ST72551_Layout __r) := TRANSFORM
+  __JC90618(E_Person_Person.Layout __EE89351, __ST90603_Layout __EE90607) := __EEQP(__EE90607.Subject_,__EE89351.From_Person_);
+  __ST90650_Layout __JT90618(E_Person_Person.Layout __l, __ST90603_Layout __r) := TRANSFORM
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE72575 := JOIN(__EE72543,__EE72555,__JC72568(LEFT,RIGHT),__JT72568(LEFT,RIGHT),INNER,HASH);
-  SHARED __ST72691_Layout := RECORD
-    KEL.typ.ntyp(E_Person.Typ) To_Person_;
-    KEL.typ.ntyp(E_Drivers_License.Typ) Licence_;
-    KEL.typ.epoch Date_First_Seen_ := 0;
-    KEL.typ.epoch Date_Last_Seen_ := 0;
-  END;
-  SHARED __EE72695 := DEDUP(PROJECT(__EE72575,__ST72691_Layout),ALL);
-  SHARED __ST72810_Layout := RECORD
+  SHARED __EE90648 := JOIN(__EE89351,__EE90607,__JC90618(LEFT,RIGHT),__JT90618(LEFT,RIGHT),INNER,HASH);
+  SHARED __ST87745_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.nint Lex_Id_;
@@ -97,7 +105,6 @@ EXPORT B_Drivers_License_2 := MODULE
     KEL.typ.nstr _additional__lname__3_;
     KEL.typ.nstr _additional__lname__date__last__3_;
     KEL.typ.nint _subjectssncount_;
-    KEL.typ.ndataset(E_Person.Hri_List_Layout) Hri_List_;
     KEL.typ.nstr _dobmatchlevel_;
     KEL.typ.nbool _ssnfoundforlexid_;
     KEL.typ.nstr _cvicustomscore_;
@@ -131,56 +138,81 @@ EXPORT B_Drivers_License_2 := MODULE
     KEL.typ.int Vl_Event30_Count_ := 0;
     KEL.typ.int Vl_Event7_Active_Flag_ := 0;
     KEL.typ.int Vl_Event7_Count_ := 0;
+    KEL.typ.ntyp(E_Customer.Typ) _r_Customer__1_;
+    KEL.typ.ntyp(E_Person.Typ) From_Person_;
     KEL.typ.ntyp(E_Person.Typ) To_Person_;
+    KEL.typ.nint Self_Match_;
+    KEL.typ.nint Contributory_Records_;
+    KEL.typ.nint Same_Address_Email_Match_;
+    KEL.typ.nint Same_Address_Ssn_Match_;
+    KEL.typ.nint Same_Address_Phone_Number_Match_;
+    KEL.typ.nint Same_Address_Same_Day_Count_;
+    KEL.typ.nint High_Frequency_Same_Address_Same_Day_Count_;
+    KEL.typ.nint Non_High_Frequency_Address_Count_;
+    KEL.typ.nint Non_High_Frequency_Same_Address_Same_Day_Count_;
+    KEL.typ.nint Shared_Address_Count_;
+    KEL.typ.nstr Verified_P_R_Type_;
+    KEL.typ.nstr Verified_P_Rconfidence_;
+    KEL.typ.nbool Verified_P_R_Personal_;
+    KEL.typ.nbool Verified_P_R_Business_;
+    KEL.typ.nbool Verified_P_R_Other_;
+    KEL.typ.nbool Verified_P_R_Is_Relative_;
+    KEL.typ.nbool Verified_P_R_Is_Associate_;
+    KEL.typ.nbool Verified_P_R_Is_Business_;
+    KEL.typ.nfloat Verified_P_R_Degree_;
+    KEL.typ.nint Verified_P_R_Hit_;
+    KEL.typ.nint Verified_P_R_Relationship_Code_;
+    KEL.typ.nint Verified_P_R_Relationship_;
+    KEL.typ.ntyp(E_Person.Typ) Subject_;
     KEL.typ.ntyp(E_Drivers_License.Typ) Licence_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC72706(B_Person_3.__ST14617_Layout __EE71994, __ST72691_Layout __EE72695) := __EEQP(__EE72695.To_Person_,__EE71994.UID);
-  __ST72810_Layout __JT72706(B_Person_3.__ST14617_Layout __l, __ST72691_Layout __r) := TRANSFORM
+  __JC90683(B_Person_3.__ST17652_Layout __EE90049, __ST90650_Layout __EE90648) := __EEQP(__EE90648.To_Person_,__EE90049.UID);
+  __ST87745_Layout __JT90683(B_Person_3.__ST17652_Layout __l, __ST90650_Layout __r) := TRANSFORM
+    SELF._r_Customer__1_ := __r._r_Customer_;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE72808 := JOIN(__EE72695,__EE71994,__JC72706(RIGHT,LEFT),__JT72706(RIGHT,LEFT),INNER,HASH);
-  SHARED __ST69092_Layout := RECORD
+  SHARED __EE90813 := JOIN(__EE90648,__EE90049,__JC90683(RIGHT,LEFT),__JT90683(RIGHT,LEFT),INNER,HASH);
+  SHARED __ST87246_Layout := RECORD
     KEL.typ.ntyp(E_Drivers_License.Typ) UID;
     KEL.typ.nint Lex_Id_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __EE72923 := DEDUP(PROJECT(__EE72808,TRANSFORM(__ST69092_Layout,SELF.UID := LEFT.Licence_,SELF := LEFT)),ALL);
-  SHARED __ST69110_Layout := RECORD
+  SHARED __EE90946 := DEDUP(PROJECT(__EE90813,TRANSFORM(__ST87246_Layout,SELF.UID := LEFT.Licence_,SELF := LEFT)),ALL);
+  SHARED __ST87264_Layout := RECORD
     KEL.typ.int C_O_U_N_T___Person_ := 0;
     KEL.typ.ntyp(E_Drivers_License.Typ) UID;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __EE72936 := PROJECT(__CLEANANDDO(__EE72923,TABLE(__EE72923,{KEL.typ.int C_O_U_N_T___Person_ := COUNT(GROUP),UID},UID,MERGE)),__ST69110_Layout);
-  SHARED __ST69745_Layout := RECORD
+  SHARED __EE90959 := PROJECT(__CLEANANDDO(__EE90946,TABLE(__EE90946,{KEL.typ.int C_O_U_N_T___Person_ := COUNT(GROUP),UID},UID,MERGE)),__ST87264_Layout);
+  SHARED __ST87911_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Drivers_License.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nstr License_Number_;
     KEL.typ.nstr State_;
     KEL.typ.nint Otto_Drivers_License_Id_;
-    KEL.typ.ndataset(E_Drivers_License.Hri_List_Layout) Hri_List_;
     KEL.typ.int C_O_U_N_T___Person_ := 0;
     KEL.typ.ntyp(E_Drivers_License.Typ) U_I_D__1_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC72942(E_Drivers_License.Layout __EE67812, __ST69110_Layout __EE72936) := __EEQP(__EE67812.UID,__EE72936.UID);
-  __ST69745_Layout __JT72942(E_Drivers_License.Layout __l, __ST69110_Layout __r) := TRANSFORM
+  __JC90965(E_Drivers_License.Layout __EE86006, __ST87264_Layout __EE90959) := __EEQP(__EE86006.UID,__EE90959.UID);
+  __ST87911_Layout __JT90965(E_Drivers_License.Layout __l, __ST87264_Layout __r) := TRANSFORM
     SELF.U_I_D__1_ := __r.UID;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE72959 := JOIN(__EE67812,__EE72936,__JC72942(LEFT,RIGHT),__JT72942(LEFT,RIGHT),LEFT OUTER,HASH);
-  SHARED __EE71991 := __EE67874;
-  SHARED __EE72236 := __EE71991(__NN(__EE71991.Subject_));
-  SHARED __ST73011_Layout := RECORD
+  SHARED __EE90979 := JOIN(__EE86006,__EE90959,__JC90965(LEFT,RIGHT),__JT90965(LEFT,RIGHT),LEFT OUTER,HASH);
+  SHARED __EE90046 := __EE86055;
+  SHARED __EE90307 := __EE90046(__NN(__EE90046.Subject_));
+  SHARED __ST91028_Layout := RECORD
     KEL.typ.ntyp(E_Person.Typ) Subject_;
     KEL.typ.ntyp(E_Drivers_License.Typ) Licence_;
     KEL.typ.ndataset(E_Person_Event.Layout) Person_Event_;
@@ -188,38 +220,37 @@ EXPORT B_Drivers_License_2 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC73008(__ST72551_Layout __EE72555, E_Person_Event.Layout __EE72236) := __EEQP(__EE72555.Subject_,__EE72236.Subject_);
-  __ST73011_Layout __Join__ST73011_Layout(__ST72551_Layout __r, DATASET(E_Person_Event.Layout) __recs) := TRANSFORM
+  __JC91025(__ST90603_Layout __EE90607, E_Person_Event.Layout __EE90307) := __EEQP(__EE90607.Subject_,__EE90307.Subject_);
+  __ST91028_Layout __Join__ST91028_Layout(__ST90603_Layout __r, DATASET(E_Person_Event.Layout) __recs) := TRANSFORM
     SELF := __r;
     SELF.Person_Event_ := __CN(__recs);
   END;
-  SHARED __EE73009 := DENORMALIZE(DISTRIBUTE(__EE72555,HASH(Subject_)),DISTRIBUTE(__EE72236,HASH(Subject_)),__JC73008(LEFT,RIGHT),GROUP,__Join__ST73011_Layout(LEFT,ROWS(RIGHT)),LOCAL);
-  SHARED __ST68775_Layout := RECORD
+  SHARED __EE91026 := DENORMALIZE(DISTRIBUTE(__EE90607,HASH(Subject_)),DISTRIBUTE(__EE90307,HASH(Subject_)),__JC91025(LEFT,RIGHT),GROUP,__Join__ST91028_Layout(LEFT,ROWS(RIGHT)),LOCAL);
+  SHARED __ST86935_Layout := RECORD
     KEL.typ.ntyp(E_Drivers_License.Typ) UID;
     KEL.typ.ndataset(E_Person_Event.Layout) Person_Event_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __ST68775_Layout __ND73037__Project(__ST73011_Layout __PP73033) := TRANSFORM
-    SELF.UID := __PP73033.Licence_;
-    SELF := __PP73033;
+  SHARED __ST86935_Layout __ND91054__Project(__ST91028_Layout __PP91050) := TRANSFORM
+    SELF.UID := __PP91050.Licence_;
+    SELF := __PP91050;
   END;
-  SHARED __EE73073 := DEDUP(PROJECT(__EE73009,__ND73037__Project(LEFT)),ALL);
-  SHARED __ST68820_Layout := RECORD
+  SHARED __EE91090 := DEDUP(PROJECT(__EE91026,__ND91054__Project(LEFT)),ALL);
+  SHARED __ST86980_Layout := RECORD
     KEL.typ.int C_O_U_N_T___Person_ := 0;
     KEL.typ.ntyp(E_Drivers_License.Typ) UID;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __EE73086 := PROJECT(__CLEANANDDO(__EE73073,TABLE(__EE73073,{KEL.typ.int C_O_U_N_T___Person_ := COUNT(GROUP),UID},UID,MERGE)),__ST68820_Layout);
-  SHARED __ST69853_Layout := RECORD
+  SHARED __EE91103 := PROJECT(__CLEANANDDO(__EE91090,TABLE(__EE91090,{KEL.typ.int C_O_U_N_T___Person_ := COUNT(GROUP),UID},UID,MERGE)),__ST86980_Layout);
+  SHARED __ST87998_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Drivers_License.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nstr License_Number_;
     KEL.typ.nstr State_;
     KEL.typ.nint Otto_Drivers_License_Id_;
-    KEL.typ.ndataset(E_Drivers_License.Hri_List_Layout) Hri_List_;
     KEL.typ.int C_O_U_N_T___Person_ := 0;
     KEL.typ.ntyp(E_Drivers_License.Typ) U_I_D__1_;
     KEL.typ.int C_O_U_N_T___Person__1_ := 0;
@@ -228,41 +259,40 @@ EXPORT B_Drivers_License_2 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC73094(__ST69745_Layout __EE72959, __ST68820_Layout __EE73086) := __EEQP(__EE72959.UID,__EE73086.UID);
-  __ST69853_Layout __JT73094(__ST69745_Layout __l, __ST68820_Layout __r) := TRANSFORM
+  __JC91111(__ST87911_Layout __EE90979, __ST86980_Layout __EE91103) := __EEQP(__EE90979.UID,__EE91103.UID);
+  __ST87998_Layout __JT91111(__ST87911_Layout __l, __ST86980_Layout __r) := TRANSFORM
     SELF.C_O_U_N_T___Person__1_ := __r.C_O_U_N_T___Person_;
     SELF.U_I_D__2_ := __r.UID;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE73115 := JOIN(__EE72959,__EE73086,__JC73094(LEFT,RIGHT),__JT73094(LEFT,RIGHT),LEFT OUTER,HASH);
-  SHARED __EE72006 := __EE71830;
-  SHARED __EE71985 := __EE67890;
-  SHARED __EE72365 := __EE71985(__EE71985.Vl_Event7_Active_Flag_ = 1);
-  __JC72373(E_Person_Event.Layout __EE72006, B_Person_3.__ST14617_Layout __EE72365) := __EEQP(__EE72006.Subject_,__EE72365.UID);
-  SHARED __EE72374 := JOIN(__EE72006,__EE72365,__JC72373(LEFT,RIGHT),TRANSFORM(E_Person_Event.Layout,SELF:=LEFT),HASH,KEEP(1));
-  SHARED __ST68588_Layout := RECORD
+  SHARED __EE91129 := JOIN(__EE90979,__EE91103,__JC91111(LEFT,RIGHT),__JT91111(LEFT,RIGHT),LEFT OUTER,HASH);
+  SHARED __EE90061 := __EE89896;
+  SHARED __EE90040 := __EE86071;
+  SHARED __EE90433 := __EE90040(__EE90040.Vl_Event7_Active_Flag_ = 1);
+  __JC90441(E_Person_Event.Layout __EE90061, B_Person_3.__ST17652_Layout __EE90433) := __EEQP(__EE90061.Subject_,__EE90433.UID);
+  SHARED __EE90442 := JOIN(__EE90061,__EE90433,__JC90441(LEFT,RIGHT),TRANSFORM(E_Person_Event.Layout,SELF:=LEFT),HASH,KEEP(1));
+  SHARED __ST86754_Layout := RECORD
     KEL.typ.ntyp(E_Drivers_License.Typ) UID;
     KEL.typ.ntyp(E_Person.Typ) Subject_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __EE72401 := DEDUP(PROJECT(__EE72374,TRANSFORM(__ST68588_Layout,SELF.UID := LEFT.Licence_,SELF := LEFT)),ALL);
-  SHARED __ST68606_Layout := RECORD
+  SHARED __EE90469 := DEDUP(PROJECT(__EE90442,TRANSFORM(__ST86754_Layout,SELF.UID := LEFT.Licence_,SELF := LEFT)),ALL);
+  SHARED __ST86772_Layout := RECORD
     KEL.typ.int C_O_U_N_T___Person_Event_ := 0;
     KEL.typ.ntyp(E_Drivers_License.Typ) UID;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __EE72414 := PROJECT(__CLEANANDDO(__EE72401,TABLE(__EE72401,{KEL.typ.int C_O_U_N_T___Person_Event_ := COUNT(GROUP),UID},UID,MERGE)),__ST68606_Layout);
-  SHARED __ST69962_Layout := RECORD
+  SHARED __EE90482 := PROJECT(__CLEANANDDO(__EE90469,TABLE(__EE90469,{KEL.typ.int C_O_U_N_T___Person_Event_ := COUNT(GROUP),UID},UID,MERGE)),__ST86772_Layout);
+  SHARED __ST88086_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Drivers_License.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nstr License_Number_;
     KEL.typ.nstr State_;
     KEL.typ.nint Otto_Drivers_License_Id_;
-    KEL.typ.ndataset(E_Drivers_License.Hri_List_Layout) Hri_List_;
     KEL.typ.int C_O_U_N_T___Person_ := 0;
     KEL.typ.ntyp(E_Drivers_License.Typ) U_I_D__1_;
     KEL.typ.int C_O_U_N_T___Person__1_ := 0;
@@ -273,38 +303,37 @@ EXPORT B_Drivers_License_2 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC73141(__ST69853_Layout __EE73115, __ST68606_Layout __EE72414) := __EEQP(__EE73115.UID,__EE72414.UID);
-  __ST69962_Layout __JT73141(__ST69853_Layout __l, __ST68606_Layout __r) := TRANSFORM
+  __JC91152(__ST87998_Layout __EE91129, __ST86772_Layout __EE90482) := __EEQP(__EE91129.UID,__EE90482.UID);
+  __ST88086_Layout __JT91152(__ST87998_Layout __l, __ST86772_Layout __r) := TRANSFORM
     SELF.U_I_D__3_ := __r.UID;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE73162 := JOIN(__EE73115,__EE72414,__JC73141(LEFT,RIGHT),__JT73141(LEFT,RIGHT),LEFT OUTER,HASH);
-  SHARED __EE68456 := __EE67890(__EE67890.Vl_Event30_Active_Flag_ = 1);
-  __JC71848(E_Person_Event.Layout __EE71830, B_Person_3.__ST14617_Layout __EE68456) := __EEQP(__EE71830.Subject_,__EE68456.UID);
-  SHARED __EE71849 := JOIN(__EE71830,__EE68456,__JC71848(LEFT,RIGHT),TRANSFORM(E_Person_Event.Layout,SELF:=LEFT),HASH,KEEP(1));
-  SHARED __ST68385_Layout := RECORD
+  SHARED __EE91170 := JOIN(__EE91129,__EE90482,__JC91152(LEFT,RIGHT),__JT91152(LEFT,RIGHT),LEFT OUTER,HASH);
+  SHARED __EE86628 := __EE86071(__EE86071.Vl_Event30_Active_Flag_ = 1);
+  __JC89914(E_Person_Event.Layout __EE89896, B_Person_3.__ST17652_Layout __EE86628) := __EEQP(__EE89896.Subject_,__EE86628.UID);
+  SHARED __EE89915 := JOIN(__EE89896,__EE86628,__JC89914(LEFT,RIGHT),TRANSFORM(E_Person_Event.Layout,SELF:=LEFT),HASH,KEEP(1));
+  SHARED __ST86560_Layout := RECORD
     KEL.typ.ntyp(E_Drivers_License.Typ) UID;
     KEL.typ.ntyp(E_Person.Typ) Subject_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __EE71876 := DEDUP(PROJECT(__EE71849,TRANSFORM(__ST68385_Layout,SELF.UID := LEFT.Licence_,SELF := LEFT)),ALL);
-  SHARED __ST68403_Layout := RECORD
+  SHARED __EE89942 := DEDUP(PROJECT(__EE89915,TRANSFORM(__ST86560_Layout,SELF.UID := LEFT.Licence_,SELF := LEFT)),ALL);
+  SHARED __ST86578_Layout := RECORD
     KEL.typ.int C_O_U_N_T___Person_Event_ := 0;
     KEL.typ.ntyp(E_Drivers_License.Typ) UID;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
   END;
-  SHARED __EE71889 := PROJECT(__CLEANANDDO(__EE71876,TABLE(__EE71876,{KEL.typ.int C_O_U_N_T___Person_Event_ := COUNT(GROUP),UID},UID,MERGE)),__ST68403_Layout);
-  SHARED __ST70068_Layout := RECORD
+  SHARED __EE89955 := PROJECT(__CLEANANDDO(__EE89942,TABLE(__EE89942,{KEL.typ.int C_O_U_N_T___Person_Event_ := COUNT(GROUP),UID},UID,MERGE)),__ST86578_Layout);
+  SHARED __ST88171_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Drivers_License.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nstr License_Number_;
     KEL.typ.nstr State_;
     KEL.typ.nint Otto_Drivers_License_Id_;
-    KEL.typ.ndataset(E_Drivers_License.Hri_List_Layout) Hri_List_;
     KEL.typ.int C_O_U_N_T___Person_ := 0;
     KEL.typ.ntyp(E_Drivers_License.Typ) U_I_D__1_;
     KEL.typ.int C_O_U_N_T___Person__1_ := 0;
@@ -317,22 +346,21 @@ EXPORT B_Drivers_License_2 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC73188(__ST69962_Layout __EE73162, __ST68403_Layout __EE71889) := __EEQP(__EE73162.UID,__EE71889.UID);
-  __ST70068_Layout __JT73188(__ST69962_Layout __l, __ST68403_Layout __r) := TRANSFORM
+  __JC91193(__ST88086_Layout __EE91170, __ST86578_Layout __EE89955) := __EEQP(__EE91170.UID,__EE89955.UID);
+  __ST88171_Layout __JT91193(__ST88086_Layout __l, __ST86578_Layout __r) := TRANSFORM
     SELF.C_O_U_N_T___Person_Event__1_ := __r.C_O_U_N_T___Person_Event_;
     SELF.U_I_D__4_ := __r.UID;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE73213 := JOIN(__EE73162,__EE71889,__JC73188(LEFT,RIGHT),__JT73188(LEFT,RIGHT),LEFT OUTER,HASH);
-  EXPORT __ST13801_Layout := RECORD
+  SHARED __EE91215 := JOIN(__EE91170,__EE89955,__JC91193(LEFT,RIGHT),__JT91193(LEFT,RIGHT),LEFT OUTER,HASH);
+  EXPORT __ST16415_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Drivers_License.Source_Customers_Layout) Source_Customers_;
     KEL.typ.nstr License_Number_;
     KEL.typ.nstr State_;
     KEL.typ.nint Otto_Drivers_License_Id_;
-    KEL.typ.ndataset(E_Drivers_License.Hri_List_Layout) Hri_List_;
     KEL.typ.int Cl_Active30_Identity_Count_ := 0;
     KEL.typ.int Cl_Active7_Identity_Count_ := 0;
     KEL.typ.int Cl_Event_Count_ := 0;
@@ -341,12 +369,12 @@ EXPORT B_Drivers_License_2 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST13801_Layout __ND73242__Project(__ST70068_Layout __PP73214) := TRANSFORM
-    SELF.Cl_Active30_Identity_Count_ := __PP73214.C_O_U_N_T___Person_Event__1_;
-    SELF.Cl_Active7_Identity_Count_ := __PP73214.C_O_U_N_T___Person_Event_;
-    SELF.Cl_Event_Count_ := __PP73214.C_O_U_N_T___Person__1_;
-    SELF.Cl_Identity_Count_ := __PP73214.C_O_U_N_T___Person_;
-    SELF := __PP73214;
+  SHARED __ST16415_Layout __ND91241__Project(__ST88171_Layout __PP91216) := TRANSFORM
+    SELF.Cl_Active30_Identity_Count_ := __PP91216.C_O_U_N_T___Person_Event__1_;
+    SELF.Cl_Active7_Identity_Count_ := __PP91216.C_O_U_N_T___Person_Event_;
+    SELF.Cl_Event_Count_ := __PP91216.C_O_U_N_T___Person__1_;
+    SELF.Cl_Identity_Count_ := __PP91216.C_O_U_N_T___Person_;
+    SELF := __PP91216;
   END;
-  EXPORT __ENH_Drivers_License_2 := PROJECT(__EE73213,__ND73242__Project(LEFT));
+  EXPORT __ENH_Drivers_License_2 := PROJECT(__EE91215,__ND91241__Project(LEFT));
 END;

@@ -174,10 +174,12 @@ EXPORT AddressPersonAssociations := MODULE
 			HighFrequencySameAddressSameDayCount > 5
 			 );          
 
-	EXPORT PersonAddressMatchStats := PersonAddressMatchStatsPrep4;                	
+//	EXPORT PersonAddressMatchStats := PersonAddressMatchStatsPrep4;                	
        
-  //SHARED LexidAssociationsPrep := AppendLexidToLexidAssociation.MacAppendLexidToLexidAssociations(PersonAddressMatchStatsPrep2, FromPersonLexId, ToPersonLexId, 'VerifiedPublicRecords', 1, 2000000);
-	//EXPORT PersonAddressMatchStats := LexidAssociationsPrep;                	
+  SHARED LexidAssociationsPrep := AppendLexidToLexidAssociation.MacAppendLexidToLexidAssociations(PersonAddressMatchStatsPrep4, FromPersonLexId, ToPersonLexId, 'VerifiedPR', 2, 2000000) 
+         : PERSIST('~deletemefraudgov1');
+         
+	EXPORT PersonAddressMatchStats := LexidAssociationsPrep;                	
 												 
 	//   Same Day or within 7 days?
 	//   Multiple Distinct addresses (non-high fequency, within time threshold?)

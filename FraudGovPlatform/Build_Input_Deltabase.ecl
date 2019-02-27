@@ -9,23 +9,15 @@ EXPORT Build_Input_Deltabase(
 ) :=
 module
 
-	SHARED fn_dedup(inputs):=FUNCTIONMACRO
-		in_srt:=sort(inputs, RECORD, EXCEPT processdate);
-		in_ddp:=rollup(in_srt,
-		TRANSFORM(Layouts.Input.Deltabase,SELF := LEFT; SELF := []),
-		RECORD,
-		EXCEPT ProcessDate,
-		LOCAL);	
-		return in_ddp;
-	ENDMACRO;
-
 	deltabaseUpdate :=	if ( nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.Deltabase)) > 0,
 		Files(pversion).Sprayed.Deltabase, 
 		dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.Deltabase}));
 
 	Functions.CleanFields(deltabaseUpdate ,deltabaseUpdateUpper); 
 
-	Layouts.Input.Deltabase tr(deltabaseUpdateUpper l) := transform
+	max_uid := max(Deltabase_Sprayed, Deltabase_Sprayed.unique_id) :	global;
+
+	Layouts.Input.Deltabase tr(deltabaseUpdateUpper l, integer cnt) := transform
 		sub:=stringlib.stringfind(l.fn,'20',1);
 		sub2:=stringlib.stringfind(l.fn,'.dat',1)-6;
 		FileDate := (unsigned)l.fn[sub..sub+7];
@@ -49,13 +41,13 @@ module
 		self.ind_type 	:= functions.ind_type_fn(l.Customer_Program);
 		source_input := if (l.inquiry_source = '', 'Deltabase','Deltabase-' + l.inquiry_source);
 		self.source_input := source_input;
-		SELF.unique_id := l.inqlog_id;
+		SELF.unique_id := max_uid + cnt;
 		self.Deltabase := 1;					 
 		self:=l;
 		self:=[];
 	end;
 
-	shared f1:=project(deltabaseUpdateUpper,tr(left));
+	shared f1:=project(deltabaseUpdateUpper,tr(left,counter));
 	
 	f1_errors:=f1
 		((Customer_Account_Number = '' or reported_date = '' or file_type = 0
@@ -75,7 +67,7 @@ module
 					TRANSFORM(Layouts.Input.Deltabase,SELF := LEFT),LEFT ONLY, lookup);
 	//Exclude Errors
 	shared ByPassed_records := f1_errors + NotInMbs;
-	f1_bypass_dedup := files().Input.ByPassed_Deltabase.sprayed + project(ByPassed_records,FraudGovPlatform.Layouts.Input.Deltabase);
+	f1_bypass_dedup := fn_dedup(ByPassed_Deltabase_Sprayed + project(ByPassed_records,FraudGovPlatform.Layouts.Input.Deltabase)); 
 	
 	tools.mac_WriteFile(Filenames().Input.ByPassed_Deltabase.New(pversion),
 		f1_bypass_dedup,
@@ -116,7 +108,7 @@ module
 	dAppendLexid := Standardize_Entity.Append_Lexid (dAppendPhone);
 	dCleanInputFields := Standardize_Entity.Clean_InputFields (dAppendLexid);	
 	
-	input_file_1 := fn_dedup(files().Input.Deltabase.sprayed  + project(dCleanInputFields,Layouts.Input.Deltabase));
+	input_file_1 := fn_dedup(files().Input.Deltabase.sprayed  + project(dCleanInputFields,Layouts.Input.Deltabase)); 
 
 	// Refresh Addresses every 90 days
 	IsTimeForRefresh := AddressesInfo(pversion).IsTimeForRefresh;
