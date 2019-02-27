@@ -30,8 +30,9 @@ EXPORT DueDiligence_BusinessRptService := MACRO
 			busIndexHits := DueDiligence.CommonQuery.GetBusinessAttributeFlags(businessResults);
       
 			
-			final := DueDiligence.CommonQuery.mac_GetESPReturnData(wseq, businessResults, requestResponseLayout, DueDiligence.Constants.BUSINESS,
-																															DueDiligence.Constants.STRING_TRUE, busnIndex, busIndexHits, requestedVersion);
+      final := DueDiligence.CommonQuery.mac_GetESPReturnData(wseq, businessResults, requestResponseLayout, DueDiligence.Constants.BUSINESS,
+                                                              DueDiligence.Constants.STRING_TRUE, busnIndex, busIndexHits, requestedVersion,
+                                                              optionsIn.AdditionalInput);
 
 
 			output(final, NAMED('Results')); //This is the customer facing output    

@@ -19,6 +19,7 @@
 	<part name="Phone" type="xsd:string"/>
 	<separator />
 	<part name="TransactionType" type="xsd:string" default="Basic" description="Basic, Premium, Ultimate"/>
+	<part name="PrimarySearchCriteria" type="xsd:string" default="" description="Phone, PII"/>
 	<separator />
 	<part name="DPPAPurpose" type="xsd:byte" default="1" size="2"/>
 	<part name="GLBPurpose" type="xsd:byte" default="1" size="2"/>
@@ -57,7 +58,7 @@
   <part name="usewaterfallv6" type="xsd:boolean" default="false"/>
 </message>
 */
-IMPORT Address,AutoStandardI,Gateway,iesp,PhoneFinder_Services,ut;
+IMPORT Address, AutoStandardI, Gateway, iesp, PhoneFinder_Services, ut;
 
 EXPORT PhoneFinderReportService() :=
 MACRO	
@@ -92,6 +93,7 @@ MACRO
 	
 	// Search module
 	searchMod := PROJECT(globalMod,PhoneFinder_Services.iParam.DIDParams,OPT);
+	reportMod := PhoneFinder_Services.iParam.GetSearchParams(pfOptions,pfUser);
 	
 	// Create dataset from search request
 	Autokey_batch.Layouts.rec_inBatchMaster tFormat2Batch() :=
@@ -115,9 +117,10 @@ MACRO
 		SELF.ssn         := IF( AutoStandardI.InterfaceTranslator.ssn_value.val(searchMod) != '',
 														AutoStandardI.InterfaceTranslator.ssn_value.val(searchMod),
 														searchMod.SSN);
-		SELF.homephone   := IF( AutoStandardI.InterfaceTranslator.phone_value.val(searchMod) != '',
+		Input_PhoneNumber   := IF( AutoStandardI.InterfaceTranslator.phone_value.val(searchMod) != '',
 														AutoStandardI.InterfaceTranslator.phone_value.val(searchMod),
 														searchMod.Phone);
+		SELF.homephone  := IF(reportMod.IsPrimarySearchPII, '', Input_PhoneNumber);                                                    
 		SELF.DID         := IF( AutoStandardI.InterfaceTranslator.did_value.val(searchMod) != '',
 														(UNSIGNED6)AutoStandardI.InterfaceTranslator.did_value.val(searchMod),
 														(UNSIGNED6)searchMod.DID);
@@ -155,7 +158,7 @@ MACRO
 	cleanpSearchBy := PROJECT(dReqBatch, CleanupSearch(LEFT));
 	
 	formattedSearchBy := cleanpSearchBy[1];
-	reportMod := PhoneFinder_Services.iParam.GetSearchParams(pfOptions,pfUser);
+	
 	modRecords := PhoneFinder_Services.PhoneFinder_Records(dReqBatch, reportMod, IF(reportMod.TransactionType = PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT,
 															dGateways(servicename IN PhoneFinder_Services.Constants.PhoneRiskAssessmentGateways),dGateways),
  															formattedSearchBy, pfSearchBy);
@@ -173,9 +176,9 @@ iesp.phonefinder.t_PhoneFinderSearchResponse tFormat2IespResponse() :=
  Zumigo_Log := modRecords.Zumigo_History_Recs; 
  PF_Reporting_Dataset := modRecords.ReportingDataset;
     
- OUTPUT(results,named('Results'));
- OUTPUT(royalties,named('RoyaltySet'));
- OUTPUT(Zumigo_Log,named('LOG_DELTA__PHONEFINDER_DELTA__PHONES__GATEWAY'));
+ OUTPUT(results, named('Results'));
+ OUTPUT(royalties, named('RoyaltySet'));
+ OUTPUT(Zumigo_Log, named('LOG_DELTA__PHONEFINDER_DELTA__PHONES__GATEWAY'));
  OUTPUT(PF_Reporting_Dataset, named('LOG_DELTABASE'));
 
 ENDMACRO;

@@ -258,7 +258,7 @@ EXPORT Constants := MODULE
   
   //Citizenship
   export Citizenship := MODULE
-    export MaxAttributes := 27;
+    export MaxAttributes := 28;
   end;
 
   // Contact Plus
@@ -426,9 +426,10 @@ EXPORT Constants := MODULE
 		
 	//Due Diligence
 	export DDRAttributesConst := MODULE
-		export unsigned2 MaxAttributes      				:= 21;		
-    // export unsigned2 MaxMatchSummaries     		 	:= 20;
-    // export unsigned2 MaxNewsProfiles       		 	:= 20;
+    export unsigned2 MaxAttributes      				:= 24;		
+    export unsigned2 MaxReportedAKAs      			:= 500;		
+    export unsigned2 MaxReportedDOBs      			:= 500;		
+    export unsigned2 MaxSSNDeviations      			:= 500;		
     export unsigned2 MaxProperties         			:= 500;
     export unsigned2 MaxPropertyOwners   				:= 500;
     export unsigned2 MaxAircraft         				:= 500;
@@ -439,24 +440,22 @@ EXPORT Constants := MODULE
     export unsigned2 MaxReportingSources 				:= 500;
     export unsigned2 MaxSOSFilingStatuses 			:= 500;
     export unsigned2 MaxSICNAICs					 			:= 500;
-		export unsigned2 MaxActions         				:= 500;
-		export unsigned2 MaxDescriptions    				:= 210;
-		export unsigned2 MaxBusinesses      				:= 500;
-		export unsigned2 MaxSSNAssociations     		:= 500;
-		// export unsigned2 MaxPersonNames      				:= 500;
-		// export unsigned2 MaxAgents      						:= 500;
-		export unsigned2 MaxCreditors   						:= 500;
-		export unsigned2 MaxDebtors   							:= 500;
-		export unsigned2 MaxLienJudgementsEvictions	:= 500;
-		export unsigned2 MaxLegalEvents   					:= 500;
-		export unsigned2 MaxLegalPartyNames					:= 500;
-		export unsigned2 MaxLegalSources  					:= 500;
-		export unsigned2 MaxTitles   								:= 500;
-		export unsigned2 MaxLicenses   							:= 500;
-		export unsigned2 MaxBusinessExecs   				:= 500;
-		export unsigned2 MaxRegisteredAgents   			:= 500;
-		export unsigned2 MaxIndvAssociations   			:= 500;
-		export unsigned2 MaxBusAssociations   			:= 500;
+    export unsigned2 MaxActions         				:= 500;
+    export unsigned2 MaxDescriptions    				:= 210;
+    export unsigned2 MaxBusinesses      				:= 500;
+    export unsigned2 MaxSSNAssociations     		:= 500;
+    export unsigned2 MaxCreditors   						:= 500;
+    export unsigned2 MaxDebtors   							:= 500;
+    export unsigned2 MaxLienJudgementsEvictions	:= 500;
+    export unsigned2 MaxLegalEvents   					:= 500;
+    export unsigned2 MaxLegalPartyNames					:= 500;
+    export unsigned2 MaxLegalSources  					:= 500;
+    export unsigned2 MaxTitles   								:= 500;
+    export unsigned2 MaxLicenses   							:= 500;
+    export unsigned2 MaxBusinessExecs   				:= 500;
+    export unsigned2 MaxRegisteredAgents   			:= 500;
+    export unsigned2 MaxIndvAssociations   			:= 500;
+    export unsigned2 MaxBusAssociations   			:= 500;
 	end;
 	
 	//Digital Mortgage Application Prefill (DMAP)

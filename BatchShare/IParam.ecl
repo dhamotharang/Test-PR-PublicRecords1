@@ -1,4 +1,4 @@
-import suppress, Gateway, STD;
+import $, doxie, suppress, Gateway, STD;
 
 /*
 **************************************************************************************
@@ -72,5 +72,68 @@ export IParam := module
 		
 		return in_mod;
 	end;	
-		
-end;
+
+
+// =====================================================================================
+// This is a copy of the above, with the only exception of shared batch interface
+// being inherited from doxie.IDataAccess. All new batch services should be using 
+// this interface, all the existing ones will be gradually switched to it as well.
+// (Upon completion we may want to rename "batch" back to the "BatchParams", if desired.)
+// =====================================================================================
+
+  EXPORT BatchParamsV2 := INTERFACE (doxie.IDataAccess)
+    EXPORT unsigned2 PenaltThreshold      := $.Constants.Defaults.PenaltThreshold;
+    EXPORT unsigned8 MaxResults           := $.Constants.Defaults.MaxResults;
+    EXPORT unsigned8 MaxResultsPerAcct    := $.Constants.Defaults.MaxResultsPerAcctno;
+    EXPORT boolean   ReturnCurrentOnly    := FALSE;
+    EXPORT boolean   RunDeepDive          := FALSE;
+    EXPORT boolean   ReturnDetailedRoyalties := FALSE;
+    // FCRA queries need to make a remote call to append DIDs, if not provided in the input
+    EXPORT DATASET (Gateway.Layouts.Config) gateways := DATASET ([], Gateway.Layouts.Config);
+  END;
+
+  // an (optional) convenience method for initializing most common input criteria
+  EXPORT getBatchParamsV2() := FUNCTION
+    mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated (AutoStandardI.GlobalModule());
+    in_mod := MODULE(PROJECT (mod_access, BatchParamsV2, OPT))
+      EXPORT unsigned2 PenaltThreshold   := $.Constants.Defaults.PenaltThreshold     : stored('PenaltThreshold');
+      EXPORT unsigned8 MaxResults        := $.Constants.Defaults.MaxResults          : stored('MaxResults');
+      EXPORT unsigned8 MaxResultsPerAcct := $.Constants.Defaults.MaxResultsPerAcctno : stored('Max_Results_Per_Acct');
+      EXPORT boolean   ReturnCurrentOnly := FALSE                                  : stored('Return_Current_Only');
+      EXPORT boolean   RunDeepDive       := FALSE                                  : stored('Run_Deep_Dive');
+      EXPORT boolean   ReturnDetailedRoyalties := FALSE                            : stored('ReturnDetailedRoyalties');
+    END;
+
+    RETURN in_mod;
+  END;
+
+  // Temporarily, to assist the move to the new interface:
+  // a service using IDataAccess compatible interface can easily convert it
+  // to call provedures expecting older 'BatchParam' module.
+  EXPORT ConvertToLegacy(mod) := FUNCTIONMACRO
+    IMPORT Gateway;
+    local batch_mod := MODULE (BatchShare.IParam.BatchParams)
+      //data-access part:
+      EXPORT unsigned1 GLBPurpose := mod.glb;
+      EXPORT unsigned1 DPPAPurpose := mod.dppa;
+      EXPORT string DataPermissionMask := mod.DataRestrictionMask;
+      EXPORT string DataRestrictionMask := mod.DataPermissionMask;
+      EXPORT string5 IndustryClass := mod.industry_class;
+      EXPORT string32 ApplicationType := mod.application_type;
+      EXPORT boolean IncludeMinors := mod.show_minors;
+      EXPORT string6 ssn_mask := mod.ssn_mask;
+      EXPORT boolean mask_dl := mod.dl_mask = 1;
+      EXPORT unsigned1 dob_mask := mod.dob_mask;
+      //batch part:
+      EXPORT unsigned2 PenaltThreshold      := mod.PenaltThreshold;
+      EXPORT unsigned8 MaxResults           := mod.MaxResults;
+      EXPORT unsigned8 MaxResultsPerAcct    := mod.MaxResultsPerAcct;
+      EXPORT boolean   ReturnCurrentOnly    := mod.ReturnCurrentOnly;
+      EXPORT boolean   RunDeepDive          := mod.RunDeepDive;
+      EXPORT boolean   ReturnDetailedRoyalties := mod.ReturnDetailedRoyalties;
+      EXPORT DATASET (Gateway.Layouts.Config) gateways := mod.gateways;
+    END;
+		RETURN batch_mod;
+	ENDMACRO;
+
+END;

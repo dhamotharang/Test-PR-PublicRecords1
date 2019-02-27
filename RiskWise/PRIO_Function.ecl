@@ -1,4 +1,4 @@
-﻿import ut, Risk_Indicators, Risk_Reporting, Models, gateway;
+﻿import ut, Risk_Indicators, Risk_Reporting, Models, gateway, riskwise;
 
 export PRIO_Function(DATASET(Layout_PRII) indata, dataset(Gateway.Layouts.Config) gateways, unsigned1 glb, unsigned1 dppa, 
 	string4 tribCode, string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
@@ -86,7 +86,7 @@ string2 getSocsLevel(unsigned1 level) := map(level in [0,2,3,5,8] => '0',
 poAddress_expression := '((P[\\s\\.]*O[\\.\\s]*)|(POST[\\s]*OFFICE[\\s]*))+BOX';  //find reference to po box or post office box
 onlyContains_express := '^(([\\s]*CO[\\.]?)|([\\s]*ASSOCIATES))$';
 endingInc_expression := '(INC[.]*)$';
-endsWith_expression := '([\\s]*ASSOC|[\\s]*ASSOCIATES|(AND)?[\\s\\&]*COMPANY|[\\.\\s\\&]*CO[\\.]?|[\\s]*ACCT|[\\s\\&]*LLP[\\.]?|[\\s\\&]*LLC[\\.]?)$';
+endsWith_expression := '([\\s]*ASSOC|[\\s]*ASSOCIATES|(AND)?[\\s\\&]*COMPANY|((\\.CO)|(CO\\.)|(\\sCO)|(\\&CO)|(\\&\\sCO\\.)|(\\&\\sCO)|(\\&CO\\.))|[\\s]*ACCT|[\\s\\&]*LLP[\\.]?|[\\s\\&]*LLC[\\.]?)$';
 lastEndsWith_expression := '([\\s]*DDS[\\.]?)$';
 contains_expression := '(ACCOUNT|BUSINESS|\\&)';
 

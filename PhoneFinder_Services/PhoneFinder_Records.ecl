@@ -1,4 +1,4 @@
-﻿IMPORT Autokey_Batch,BatchShare,Doxie,Gateway,iesp,MDR,Phones,Royalty,Suppress;
+﻿IMPORT Autokey_Batch,BatchShare,Doxie,Gateway,iesp,MDR,Phones,Royalty,Suppress,STD;
 
 EXPORT PhoneFinder_Records( DATASET(Autokey_batch.Layouts.rec_inBatchMaster) dIn,
 														PhoneFinder_Services.iParam.ReportParams         inMod,
@@ -18,13 +18,12 @@ MODULE
   SHARED IsPhoneRiskAssessment	:= inMod.TransactionType = PhoneFinder_Services.Constants.TransType.PhoneRiskAssessment;
   SHARED IsValidTransactionType	:= inMod.TransactionType = PhoneFinder_Services.Constants.TransType.Blank;
   
-  dEmpty_dids := DATASET([],PhoneFinder_Services.Layouts.BatchInAppendDID);
+  SHARED dEmpty := DATASET([],PhoneFinder_Services.Layouts.BatchInAppendDID);
 	
-	 useADL := vPhoneBlank OR (vIsPhone10 AND (inMod.VerifyPhoneNameAddress OR inMod.VerifyPhoneName));	
+	useADL := inMod.IsPrimarySearchPII OR vPhoneBlank OR (vIsPhone10 AND (inMod.VerifyPhoneNameAddress OR inMod.VerifyPhoneName));	
 	
-	 SHARED dGetDIDs := IF(IsPhoneRiskAssessment, dEmpty_dids,
-	                    PhoneFinder_Services.GetDIDs(dProcessInput, useADL));						
-	
+	SHARED dGetDIDs := IF(IsPhoneRiskAssessment, dEmpty,
+	                    PhoneFinder_Services.GetDIDs(dProcessInput, useADL));
 																					
 	PhoneFinder_Services.Layouts.BatchInAppendDID tDIDs(Autokey_batch.Layouts.rec_inBatchMaster le,
 																											PhoneFinder_Services.Layouts.BatchInAppendDID ri) :=
@@ -45,13 +44,13 @@ MODULE
 														dInDIDs,
 														PROJECT(dProcessInput,
 																		TRANSFORM(PhoneFinder_Services.Layouts.BatchInAppendDID,SELF.orig_did := LEFT.did,SELF := LEFT)));
-	
+	 
 	// Split the input DATASET into two depending on the input criteria
 	SHARED dInPhone   := dAppendDIDs(homephone != '');
-	SHARED dInNoPhone := dAppendDIDs(homephone = '' and did != 0 and ~IsPhoneRiskAssessment);
+	SHARED dPIISearch := dAppendDIDs(homephone = '' and did != 0 and ~IsPhoneRiskAssessment);
 
 	// Best information
-	SHARED dInNoPhoneBestInfo := PhoneFinder_Services.Functions.GetBestInfo(dInNoPhone);
+	SHARED dInNoPhoneBestInfo := PhoneFinder_Services.Functions.GetBestInfo(dPIISearch);
 
 	// Primary identity		
 	Suppress.MAC_Suppress(dInNoPhoneBestInfo, SHARED dinBestInfo,
@@ -61,15 +60,14 @@ MODULE
 	dPhoneSearchResults := IF(EXISTS(dInPhone),PhoneFinder_Services.PhoneSearch(dInPhone,inMod,dGateways));
 
 	// Waterfall process when only PII is provided
-	dWaterfallResults := IF(EXISTS(dInNoPhone),PhoneFinder_Services.DIDSearch(dInNoPhone,inMod,dGateways,dInNoPhoneBestInfo));
+	dWaterfallResults := IF(EXISTS(dPIISearch),PhoneFinder_Services.DIDSearch(dPIISearch,inMod,dGateways,dInNoPhoneBestInfo));
 	
 
-	SHARED dSearchRecs_pre		     := IF(vPhoneBlank,dWaterfallResults,dPhoneSearchResults);
+	SHARED dSearchRecs_pre		     := IF(vPhoneBlank, dWaterfallResults, dPhoneSearchResults);
 	
 	dSearchRecs_pre_a		 := dSearchRecs_pre(((did <> 0 AND fname <> ''AND lname <> '') OR typeflag = Phones.Constants.TypeFlag.DataSource_PV) OR listed_name <> '');
 	
   dInputPhone := PROJECT(dInPhone, TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.Final, SELF.batch_in := LEFT, SELF := []));
-
 
   PhoneFinder_Services.Layouts.PhoneFinder.Final withInputphone(PhoneFinder_Services.Layouts.PhoneFinder.Final L) := TRANSFORM
    SELF.acctno               := L.batch_in.acctno;
@@ -126,7 +124,8 @@ MODULE
   verifyRequest := (INTEGER)inMod.VerifyPhoneIsActive + (INTEGER)inMod.VerifyPhoneName + (INTEGER)inMod.VerifyPhoneNameAddress;
          	
   // Fail the service if multiple DIDs are returned for the search criteria OR if the phone number is not 10 digits OR if no records are returned
-  MAP(~vPhoneBlank and ~vIsPhone10                    => FAIL(301,doxie.ErrorCodes(301)),
+  MAP(inMod.IsPrimarySearchPII and verifyRequest > 0 => FAIL(303, doxie.ErrorCodes(303)),
+     ~vPhoneBlank and ~vIsPhone10                    => FAIL(301,doxie.ErrorCodes(301)),
       vPhoneBlank and EXISTS(dGetDIDs(did_count > 1)) => FAIL(203,doxie.ErrorCodes(203)), //FAIL the service if no records exists
         // If phoneFinder were to run as a verification tool, only one type of verification should be selected.
        // If more than one type of verification is selected, fail the service.			
@@ -139,23 +138,21 @@ MODULE
       /*Phone verification is a "phone only" search, even if the phone is blank.  If the phone is blank, the 
       verification will fail and the appropriate status will be returned. */
   verifyInputDID := inMod.VerifyPhoneName OR inMod.VerifyPhoneNameAddress;
-  dinBestDID := 	if(verifyInputDID, dInDIDs,DATASET([],PhoneFinder_Services.Layouts.BatchInAppendDID));// for lexid verification
-  EXPORT dFormat2IESP := IF(~vPhoneBlank OR inMod.VerifyPhoneIsActive OR inMod.VerifyPhoneName OR inMod.VerifyPhoneNameAddress,
+  dinBestDID := 	IF(verifyInputDID, dInDIDs,DATASET([],PhoneFinder_Services.Layouts.BatchInAppendDID));// for lexid verification
+  
+  EXPORT dFormat2IESP := IF((~vPhoneBlank OR inMod.VerifyPhoneIsActive OR inMod.VerifyPhoneName OR inMod.VerifyPhoneNameAddress)AND ~inMod.IsPrimarySearchPII,
             														PhoneFinder_Services.Functions.FormatResults2IESP(pSearchBy, inMod, dinBestDID, dSearchResultsUnfiltered,TRUE),
             														PhoneFinder_Services.Functions.FormatResults2IESP(pSearchBy, inMod,dinBestInfo,dSearchResultsUnfiltered,FALSE));
-																				
-   																				
  //Deltabase Logging Dataset
  EXPORT	ReportingDataset := 	PhoneFinder_Services.Get_Reporting_Records(dFormat2IESP, inMod, InputEcho);																		
          	 
  // Royalties
  // filtering out inhouse phonmetadata records 
  dFilteringInHousePhoneData_typeflag := 	IF(inMod.UseInHousePhoneMetadata, PROJECT(dSearchRecs_pre, TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.Final, 
-   		                                                            SELF.typeflag :=  IF(LEFT.typeflag = 'P', '', LEFT.typeflag),
-   																																                              SELF.phone_source :=  IF(LEFT.phone_source = PhoneFinder_Services.Constants.PhoneSource.QSentGateway, 
-   																																                                                       0, LEFT.phone_source),
-   																																
-   																																    SELf := LEFT)),dSearchRecs_pre);
+   		                               			SELF.typeflag :=  IF(LEFT.typeflag = 'P', '', LEFT.typeflag),
+   												SELF.phone_source :=  IF(LEFT.phone_source = PhoneFinder_Services.Constants.PhoneSource.QSentGateway, 
+   												0, LEFT.phone_source),
+   												SELF := LEFT)),dSearchRecs_pre);
    
  // Counting royalties before filtering recs - RQ 13804
  dSearchResultsFilter := dFilteringInHousePhoneData_typeflag(typeflag != Phones.Constants.TypeFlag.DataSource_PV);

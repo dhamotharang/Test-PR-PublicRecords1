@@ -435,6 +435,7 @@ real	RVA1811_1_0_score_baseline;	real	RVA1811_1_0_score_new;	real	RVA1811_1_0_sc
 real	RVG1808_3_0_score_baseline;	real	RVG1808_3_0_score_new;	real	RVG1808_3_0_score_diff;
 real	RVG1808_1_0_score_baseline;	real	RVG1808_1_0_score_new;	real	RVG1808_1_0_score_diff;
 real	RVG1808_2_0_score_baseline;	real	RVG1808_2_0_score_new;	real	RVG1808_2_0_score_diff;
+real	FP1704_1_0_score_baseline;	real	FP1704_1_0_score_new;	real	FP1704_1_0_score_diff;
 end;
 
 j := join(runway_results_baseline, runway_results_testfile, left.seq=right.seq, 
@@ -758,6 +759,7 @@ self.RVA1811_1_0_score_baseline	:= (real)left.RVA1811_1_0_score	;		self.RVA1811_
 self.RVG1808_3_0_score_baseline	:= (real)left.RVG1808_3_0_score	;		self.RVG1808_3_0_score_new := (real)right.RVG1808_3_0_score	;		self.RVG1808_3_0_score_diff := (real)right.RVG1808_3_0_score	-(real)left.RVG1808_3_0_score	;
 self.RVG1808_1_0_score_baseline	:= (real)left.RVG1808_1_0_score	;		self.RVG1808_1_0_score_new := (real)right.RVG1808_1_0_score	;		self.RVG1808_1_0_score_diff := (real)right.RVG1808_1_0_score	-(real)left.RVG1808_1_0_score	;
 self.RVG1808_2_0_score_baseline	:= (real)left.RVG1808_2_0_score	;		self.RVG1808_2_0_score_new := (real)right.RVG1808_2_0_score	;		self.RVG1808_2_0_score_diff := (real)right.RVG1808_2_0_score	-(real)left.RVG1808_2_0_score	;
+self.FP1704_1_0_score_baseline	:= (real)left.FP1704_1_0_score	;		self.FP1704_1_0_score_new := (real)right.FP1704_1_0_score	;		self.FP1704_1_0_score_diff := (real)right.FP1704_1_0_score	-(real)left.FP1704_1_0_score	;
 		));
 
 normed_rec := record
@@ -1082,6 +1084,7 @@ C= 	311 => 'RVA1811_1_0_score ',
 C= 	312 => 'RVG1808_3_0_score ',
 C= 	313 => 'RVG1808_1_0_score ',
 C= 	314 => 'RVG1808_2_0_score ',
+C= 	315 => 'FP1704_1_0_score ',
 ''
 );
 
@@ -1401,10 +1404,11 @@ C= 	311 => le.RVA1811_1_0_score_diff,
 C= 	312 => le.RVG1808_3_0_score_diff,
 C= 	313 => le.RVG1808_1_0_score_diff,
 C= 	314 => le.RVG1808_2_0_score_diff,
+C= 	315 => le.FP1704_1_0_score_diff,
 0);										
 end;
 
-name_pairs :=  normalize(j, 314, norm(left, counter));
+name_pairs :=  normalize(j, 315, norm(left, counter));
 
 
 // get an overall picture of impact

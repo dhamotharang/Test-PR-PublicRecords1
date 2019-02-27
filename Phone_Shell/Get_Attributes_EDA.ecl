@@ -6,7 +6,9 @@ IMPORT Gong, Phone_Shell, RiskWise, UT, STD;
 
 todays_date := (string) STD.Date.Today();
 
-EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_EDA (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input) := FUNCTION
+EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_EDA (DATASET(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus) input,
+                                                                                  UNSIGNED2 PhoneShellVersion = 10 // default to PhoneShell V1.0, use 20 (for version 2.0) and so on for other versions
+                                                                                 ) := FUNCTION
 	layoutEDA := RECORD
 		Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus;
 		STRING8 dt_first_seen := '';
@@ -17,6 +19,9 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_EDA
 		STRING25 City := '';
 		STRING2 State := '';
 		STRING5 Zip := '';
+  UNSIGNED8 EDA_Total_Days_Connected_Indiv := 0;
+  UNSIGNED4 EDA_Total_Times_Connected_Indiv := 0;
+  UNSIGNED4 EDA_Avg_Days_Connected_Indiv_V2 := 0;
 	END;
 	
 	/* ************************************************************************
@@ -101,7 +106,9 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_EDA
 		SELF.EDA_Characteristics.EDA_Address_Match_Best := IF(TRIM(ri.prim_range) = TRIM(bestPrimRange) AND TRIM(ri.prim_name) = TRIM(bestPrimName) AND
 																											 TRIM(ri.suffix) = TRIM(bestSuffix) AND TRIM(ri.p_city_name) = TRIM(bestCity) AND TRIM(ri.st) = TRIM(bestState) AND
 																											 TRIM(ri.z5) = TRIM(bestZip[1..5]), TRUE, FALSE);
-		monthsLast := Std.Date.MonthsBetween((INTEGER)todays_date, (INTEGER)ri.dt_last_seen);
+  // For PhoneShell V2+ change order of dates passed in to avoid negative values being returned into an unsigned-type variable
+		monthsLast := if(PhoneShellVersion >= 20, Std.Date.MonthsBetween((integer)ri.dt_last_seen,(integer)todays_date),
+                                            Std.Date.MonthsBetween((INTEGER)todays_date, (INTEGER)ri.dt_last_seen));
 		SELF.EDA_Characteristics.EDA_Months_Addr_Last_Seen := IF(TRIM(ri.prim_range) = TRIM(le.Clean_Input.Prim_Range) AND TRIM(ri.prim_name) = TRIM(le.Clean_Input.Prim_Name) AND
 																											 TRIM(ri.suffix) = TRIM(le.Clean_Input.Addr_Suffix) AND TRIM(ri.p_city_name) = TRIM(le.Clean_Input.City) AND TRIM(ri.st) = TRIM(le.Clean_Input.State) AND
 																											 TRIM(ri.z5) = TRIM(le.Clean_Input.Zip5), monthsLast, 0); // Take the MIN in the rollup below
@@ -166,6 +173,10 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_EDA
 		SELF.EDA_Characteristics.EDA_Avg_Days_Connected_Indiv := IF(adlMatch, daysConnected, 0);
 		SELF.EDA_Characteristics.EDA_Min_Days_Connected_Indiv := IF(adlMatch, daysConnected, 0);
 		SELF.EDA_Characteristics.EDA_Max_Days_Connected_Indiv := IF(adlMatch, daysConnected, 0);
+
+  SELF.EDA_Total_Days_Connected_Indiv := if(adlMatch, daysConnected, 0);
+  SELF.EDA_Total_Times_Connected_Indiv := if(adlMatch, 1, 0);
+    
 		SELF.EDA_Characteristics.EDA_days_indiv_first_seen_with_phone := IF(adlMatch, days, 0);
 		SELF.EDA_Characteristics.EDA_Days_Indiv_First_Seen := IF(adlMatch, days, 0); // Take the MAX of this in the rollup below
 		SELF.EDA_Characteristics.EDA_Num_Phones_Discon_Addr := 1;
@@ -184,7 +195,9 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_EDA
 		SELF.EDA_Characteristics.EDA_Has_Cur_Discon_180_Days := IF(daysConnected >= 0 AND daysConnected <= 180, TRUE, FALSE);
 		SELF.EDA_Characteristics.EDA_Has_Cur_Discon_360_Days := IF(daysConnected >= 0 AND daysConnected <= 360, TRUE, FALSE);
 		SELF.EDA_Characteristics.EDA_Days_Phone_First_Seen := days; // Take the MAX in the rollup below
-		monthsLast := Std.Date.MonthsBetween((INTEGER)todays_date, (INTEGER)ri.dt_last_seen);
+		// For PhoneShell V2+ change order of dates passed in to avoid negative values being returned into an unsigned-type variable
+		monthsLast := if(PhoneShellVersion >= 20, Std.Date.MonthsBetween((integer)ri.dt_last_seen,(integer)todays_date),
+                                            Std.Date.MonthsBetween((INTEGER)todays_date, (INTEGER)ri.dt_last_seen));
 		SELF.EDA_Characteristics.EDA_Months_Addr_Last_Seen := IF(TRIM(ri.prim_range) = TRIM(le.Clean_Input.Prim_Range) AND TRIM(ri.prim_name) = TRIM(le.Clean_Input.Prim_Name) AND
 																											 TRIM(ri.suffix) = TRIM(le.Clean_Input.Addr_Suffix) AND TRIM(ri.p_city_name) = TRIM(le.Clean_Input.City) AND TRIM(ri.st) = TRIM(le.Clean_Input.State) AND
 																											 TRIM(ri.z5) = TRIM(le.Clean_Input.Zip5), monthsLast, 0); // Take the MIN in the rollup below
@@ -268,6 +281,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_EDA
 		UNSIGNED4 AverageDaysInterrupt := 0;
 		UNSIGNED4 MinDaysInterrupt := 0;
 		UNSIGNED4 MaxDaysInterrupt := 0;
+  UNSIGNED8 TotalDaysInterrupt := 0;
+  UNSIGNED4 AverageDaysInterrupt_V2 := 0;
 	END;
 	interrupts := PROJECT(sortedEDAAttributes, TRANSFORM(layoutInterrupts,
 																											SELF.Unique_Record_Sequence := LEFT.Unique_Record_Sequence;
@@ -279,7 +294,9 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_EDA
 																											SELF.NumberInterrupts := LEFT.EDA_Characteristics.EDA_Num_Interrupts_Cur;
 																											SELF.AverageDaysInterrupt := 999999999; // Set to 999999999 so we can distiguish initial values from true zeros
 																											SELF.MinDaysInterrupt := 999999999;
-																											SELF.MaxDaysInterrupt := 999999999));
+																											SELF.MaxDaysInterrupt := 999999999;
+                           SELF.TotalDaysInterrupt := 999999999;
+                           SELF.AverageDaysInterrupt_V2 := 999999999));
 																											
 	uniqueDateInterrupts := DEDUP(SORT(interrupts, Unique_Record_Sequence, Seq, Gathered_Phone, -DateLastSeen, DateFirstSeen, -DeletedDate), Unique_Record_Sequence, Seq, Gathered_Phone, DateLastSeen) ((INTEGER)DateLastSeen <> 0 AND (INTEGER)DateFirstSeen <> 0);
 	
@@ -290,6 +307,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_EDA
 		SELF.AverageDaysInterrupt := IF(le.AverageDaysInterrupt = 999999999, days, ABS(AVE(le.AverageDaysInterrupt, days)));
 		SELF.MinDaysInterrupt := IF(le.MinDaysInterrupt = 999999999, days, ABS(MIN(le.MinDaysInterrupt, days)));
 		SELF.MaxDaysInterrupt := IF(le.MaxDaysInterrupt = 999999999, days, ABS(MAX(le.MaxDaysInterrupt, days)));
+  SELF.TotalDaysInterrupt := if(le.TotalDaysInterrupt = 999999999, days, le.TotalDaysInterrupt + days);
 		
 		// Keep the dates from the next record so we can do the comparison again
 		SELF.DeletedDate := ri.DeletedDate;
@@ -304,6 +322,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_EDA
 		SELF.AverageDaysInterrupt := IF(le.AverageDaysInterrupt = 999999999, 0, le.AverageDaysInterrupt);
 		SELF.MinDaysInterrupt := IF(le.MinDaysInterrupt = 999999999, 0, le.MinDaysInterrupt);
 		SELF.MaxDaysInterrupt := IF(le.MaxDaysInterrupt = 999999999, 0, le.MaxDaysInterrupt);
+  SELF.TotalDaysInterrupt := if(le.TotalDaysInterrupt = 999999999, 0, le.TotalDaysInterrupt);
+  SELF.AverageDaysInterrupt_V2 := if(le.TotalDaysInterrupt = 999999999 or le.NumberInterrupts = 0, 0, truncate(le.TotalDaysInterrupt / le.NumberInterrupts));
 
 		SELF := le;
 	END;
@@ -333,9 +353,21 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_EDA
 		SELF.EDA_Characteristics.EDA_Num_Phones_Indiv := le.EDA_Characteristics.EDA_Num_Phones_Indiv + ri.EDA_Characteristics.EDA_Num_Phones_Indiv;
 		SELF.EDA_Characteristics.EDA_Num_Phones_Connected_Indiv := le.EDA_Characteristics.EDA_Num_Phones_Connected_Indiv + ri.EDA_Characteristics.EDA_Num_Phones_Connected_Indiv;
 		SELF.EDA_Characteristics.EDA_Num_Phones_Discon_Indiv := le.EDA_Characteristics.EDA_Num_Phones_Discon_Indiv + ri.EDA_Characteristics.EDA_Num_Phones_Discon_Indiv;
-		SELF.EDA_Characteristics.EDA_Avg_Days_Connected_Indiv := MAP(le.EDA_Characteristics.EDA_Avg_Days_Connected_Indiv <> 0 AND ri.EDA_Characteristics.EDA_Avg_Days_Connected_Indiv <> 0 => AVE(le.EDA_Characteristics.EDA_Avg_Days_Connected_Indiv, ri.EDA_Characteristics.EDA_Avg_Days_Connected_Indiv),
-																																 le.EDA_Characteristics.EDA_Avg_Days_Connected_Indiv <> 0																															 => le.EDA_Characteristics.EDA_Avg_Days_Connected_Indiv,
-																																																																																													ri.EDA_Characteristics.EDA_Avg_Days_Connected_Indiv);
+
+  totaldays := le.EDA_Total_Days_Connected_Indiv + ri.EDA_Total_Days_Connected_Indiv;
+  totaltimes := le.EDA_Total_Times_Connected_Indiv + ri.EDA_Total_Times_Connected_Indiv;
+  avgdays := if(totaltimes = 0, 0, truncate(totaldays / totaltimes));
+  SELF.EDA_Total_Days_Connected_Indiv := totaldays;
+  SELF.EDA_Total_Times_Connected_Indiv := totaltimes;
+  SELF.EDA_Avg_Days_Connected_Indiv_V2 := avgdays;
+  
+  // phone shell v2+ use the different average calculation
+  SELF.EDA_Characteristics.EDA_Avg_Days_Connected_Indiv := if(PhoneShellVersion >= 20, avgdays,
+                                                              MAP(le.EDA_Characteristics.EDA_Avg_Days_Connected_Indiv <> 0 AND ri.EDA_Characteristics.EDA_Avg_Days_Connected_Indiv <> 0 => AVE(le.EDA_Characteristics.EDA_Avg_Days_Connected_Indiv, ri.EDA_Characteristics.EDA_Avg_Days_Connected_Indiv),
+																																                                  le.EDA_Characteristics.EDA_Avg_Days_Connected_Indiv <> 0																										                              					 => le.EDA_Characteristics.EDA_Avg_Days_Connected_Indiv,
+																																																																																													                                                                                              ri.EDA_Characteristics.EDA_Avg_Days_Connected_Indiv)
+                                                             );
+                                                                                                                                                                                          
 		SELF.EDA_Characteristics.EDA_Min_Days_Connected_Indiv := MAP(le.EDA_Characteristics.EDA_Min_Days_Connected_Indiv <> 0 AND ri.EDA_Characteristics.EDA_Min_Days_Connected_Indiv <> 0 => MIN(le.EDA_Characteristics.EDA_Min_Days_Connected_Indiv, ri.EDA_Characteristics.EDA_Min_Days_Connected_Indiv),
 																																 le.EDA_Characteristics.EDA_Min_Days_Connected_Indiv <> 0																															 => le.EDA_Characteristics.EDA_Min_Days_Connected_Indiv,
 																																																																																													ri.EDA_Characteristics.EDA_Min_Days_Connected_Indiv);
@@ -427,7 +459,8 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_EDA
 																																																									
 	withInterrupts := JOIN(withcurrInHist, cleanedInterrupts, LEFT.Unique_Record_Sequence = RIGHT.Unique_Record_Sequence AND LEFT.Clean_Input.Seq = RIGHT.Seq AND LEFT.Gathered_Phone = RIGHT.Gathered_Phone,
 																								TRANSFORM(Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus, SELF.EDA_Characteristics.EDA_Num_Interrupts_Cur := RIGHT.NumberInterrupts;
-																																																									SELF.EDA_Characteristics.EDA_Avg_Days_Interrupt := RIGHT.AverageDaysInterrupt;
+                                                // for phone shell v2+, use the different average calculation
+																																																									SELF.EDA_Characteristics.EDA_Avg_Days_Interrupt := if(phoneshellversion >= 20, right.AverageDaysInterrupt_V2, RIGHT.AverageDaysInterrupt);
 																																																									SELF.EDA_Characteristics.EDA_Min_Days_Interrupt := RIGHT.MinDaysInterrupt;
 																																																									SELF.EDA_Characteristics.EDA_Max_Days_Interrupt := RIGHT.MaxDaysInterrupt;
 																																																									SELF := LEFT), LEFT OUTER, KEEP(1), ATMOST(RiskWise.max_atmost));
@@ -483,6 +516,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_EDA
 	// OUTPUT(CHOOSEN(withUniqueAddrHist, 100), NAMED('withUniqueAddrHist'));
 	// OUTPUT(CHOOSEN(withUniqueAddrCurr, 100), NAMED('withUniqueAddrCurr'));
 	// OUTPUT(CHOOSEN(withcurrInHist, 100), NAMED('withcurrInHist'));
+	// OUTPUT(CHOOSEN(withInterrupts, 100), NAMED('withInterrupts'));
 	// OUTPUT(CHOOSEN(cleanedEDA, 100), NAMED('cleanedEDA'));
 	
 	RETURN(cleanedEDA);

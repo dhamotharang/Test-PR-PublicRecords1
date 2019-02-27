@@ -1,4 +1,4 @@
-IMPORT iesp, Inquiry_AccLogs, Risk_Indicators, RiskWise, UT;
+﻿IMPORT iesp, Inquiry_AccLogs, Risk_Indicators, RiskWise, Inquiry_Deltabase;
 
 EXPORT Layouts := MODULE
 	// Deltabase Input Layouts
@@ -64,6 +64,7 @@ EXPORT Layouts := MODULE
 		STRING7 Clean_Geo_Blk {XPATH('Clean_Geo_Blk')};
 		STRING1 Clean_Geo_Match {XPATH('Clean_Geo_Match')};
 		STRING4 Clean_Err_Stat {XPATH('Clean_Err_Stat')};
+    STRING1 Search_Type {XPATH('Search_Type')};
 	END;
 	EXPORT Deltabase_Response := RECORD
 		DATASET(Deltabase_Record) Response {XPATH('Records/Rec')};
@@ -97,6 +98,17 @@ EXPORT Layouts := MODULE
 	EXPORT Inquiry_Transaction_ID := RECORD
 		RECORDOF(Inquiry_AccLogs.Key_Inquiry_Transaction_ID);
 	END;	
+  EXPORT Inquiry_All := RECORD
+    RECORDOF(Inquiry_AccLogs.Key_Inquiry_Address);
+    RECORDOF(Inquiry_AccLogs.Key_Inquiry_DID);
+    RECORDOF(Inquiry_AccLogs.Key_Inquiry_Email);
+    RECORDOF(Inquiry_AccLogs.Key_Inquiry_IPAddr);
+    RECORDOF(Inquiry_AccLogs.Key_Inquiry_Name);
+    RECORDOF(Inquiry_AccLogs.Key_Inquiry_Phone);
+    RECORDOF(Inquiry_AccLogs.Key_Inquiry_SSN);
+    RECORDOF(Inquiry_AccLogs.Key_Inquiry_Transaction_ID);
+    STRING1 Search_Type;
+  END;
 	// Deltabase Function Inputs
 	EXPORT Input_Deltabase_Address := RECORD
 		UNSIGNED8 Seq := 0;
@@ -135,7 +147,22 @@ EXPORT Layouts := MODULE
 		UNSIGNED8 Seq := 0;
 		STRING50 Transaction_ID := '';
 	END;
-	
+	EXPORT Input_Deltabase_All := RECORD
+		UNSIGNED8 Seq := 0;
+		STRING10 Prim_Range := '';
+		STRING28 Prim_Name := '';
+		STRING8 Sec_Range := '';
+		STRING5 Zip5 := '';
+		UNSIGNED8 DID := 0;
+		STRING100 Email := '';
+		STRING100 IPAddress := '';
+		STRING20 FirstName := '';
+		STRING20 MiddleName := '';
+		STRING20 LastName := '';
+		STRING10 Phone10 := '';
+		STRING9 SSN := '';
+		STRING50 Transaction_ID := '';
+	END;
 	EXPORT Function_Descriptions := RECORD
 		STRING100 FunctionName := '';
 	END;

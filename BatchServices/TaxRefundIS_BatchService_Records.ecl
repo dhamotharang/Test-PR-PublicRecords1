@@ -16,17 +16,17 @@ EXPORT TaxRefundIS_BatchService_Records(DATASET(in_rec) indata , BatchServices.T
 	
   /*----Call FraudPoint 2.0----*/
 	FraudPoint_result := if(isFraudPoint,
-	                         BatchServices.TaxRefundIS_BatchService_Functions.callFraudPoint2 (args.glbpurpose,
-																																														 args.dppapurpose,
-																																														 args.DataRestriction, 
-													                                                                   args.industryclass,
+	                         BatchServices.TaxRefundIS_BatchService_Functions.callFraudPoint2 (args.glb,
+																																														 args.dppa,
+																																														 args.DataRestrictionMask,
+													                                                                   args.industry_class,
 																																														 args.ModelName,
 																																														 clean_batch,
-																																														 args.DataPermission)); 
+																																														 args.DataPermissionMask)); 
 	
 	/*--- Run through AC Deceased batch service ---*/
 	deceased_match_codes := ['ANSZC', 'ANSZ', 'ANSC', 'ANS', 'SNCZ', 'SNC', 'SNZ', 'SN'];
-	death_in_mod := MODULE(project(DeathV2_Services.IParam.getBatchParams(), DeathV2_Services.IParam.BatchParams, opt))							
+	death_in_mod := MODULE(DeathV2_Services.IParam.getBatchParams())
 			EXPORT BOOLEAN ExtraMatchCodes 						:= TRUE;
 		END;			
 	//Have to translate the information into something the Death batch service can recognize.
@@ -39,20 +39,20 @@ EXPORT TaxRefundIS_BatchService_Records(DATASET(in_rec) indata , BatchServices.T
 
 	/*--- Take Input through ADL_Best -> DidVille.Did_Batch_Service_Raw ---*/
 	w_bestSsn_res := BatchServices.TaxRefundIS_BatchService_Functions.getBestSSNInfo(clean_batch, 
-																																									 args.glbpurpose, 
-																																									 args.dppapurpose, 
+																																									 args.glb, 
+																																									 args.dppa, 
 																																									 args.append_l, 
-																																									 args.ApplicationType,
-																																									 args.IndustryClass,
+																																									 args.application_type,
+																																									 args.industry_class,
 																																									 args.verify_l);
 	         
 	/*--- Run CIID process ---*/
   w_ciid_res := BatchServices.TaxRefundIS_BatchService_Functions.getIIDRecords(clean_batch,,
-                                                                              args.dppapurpose, 
-                                                                              args.glbpurpose, 
-                                                                              args.industryclass, 
-                                                                              args.DataRestriction,
-																																							args.DataPermission);
+                                                                              args.dppa, 
+                                                                              args.glb, 
+                                                                              args.industry_class, 
+                                                                              args.DataRestrictionMask,
+																																							args.DataPermissionMask);
   
   /*--- Run input subjects through the Criminal Batch Services ---*/
 	crim_res := BatchServices.TaxRefundIS_BatchService_Functions.getCriminalRecords(clean_batch);
