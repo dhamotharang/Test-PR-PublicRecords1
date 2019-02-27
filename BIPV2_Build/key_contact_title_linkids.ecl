@@ -23,14 +23,7 @@ EXPORT key_contact_title_linkids(string pVersion=(string) STD.Date.Today()) := m
   export keyQA          := keyvs().qa         ;
   export keyfather      := keyvs().father     ;
   export keygrandfather := keyvs().grandfather;
-  
-	 //export kfetch_layout :={Key};
-	 shared restrict(ds, in_mod, permits, ds_src='', dnbWillMask=false, isDateFirstSeenExists=false) := functionmacro
-		  ds_filt := ds(BIPV2.mod_sources.isPermitted(in_mod,dnbWillMask).byBmap(permits));
-    return ds_filt;
-  endmacro;
-	
-	
+
   export kFetch(
                 dataset(BIPV2.IDlayouts.l_xlink_ids) inputs 
                ,string1 Level = BIPV2.IDconstants.Fetch_Level_ProxID
@@ -49,4 +42,22 @@ EXPORT key_contact_title_linkids(string pVersion=(string) STD.Date.Today()) := m
     return ds_restricted;
   END;
   
-end;
+	 export kFetch2(
+                dataset(BIPV2.IDlayouts.l_xlink_ids2) inputs 
+               ,string1 Level = BIPV2.IDconstants.Fetch_Level_ProxID
+               ,unsigned2 ScoreThreshold = 0
+               ,BIPV2.mod_sources.iParams in_mod=PROJECT(AutoStandardI.GlobalModule(),BIPV2.mod_sources.iParams,opt)
+               ,boolean includeDMI=false
+							        ,JoinLimit=25000
+							        ,unsigned1 JoinType = BIPV2.IDconstants.JoinTypes.KeepJoin
+               ) := function							 
+    BIPV2.IDmacros.mac_IndexFetch2(inputs, Key, ds_fetched, Level, JoinLimit, JoinType);								 
+    {ds_fetched} apply_restrict(ds_fetched L) := transform
+                   self.contact_title		:= L.contact_title(BIPV2.mod_sources.isPermitted(in_mod,includeDMI).byBmap(data_permits));
+                  	self := L;
+	                end;
+	   ds_restricted := project(ds_fetched, apply_restrict(left));
+    return ds_restricted;
+  END;
+
+END;

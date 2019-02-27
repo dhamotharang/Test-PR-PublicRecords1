@@ -158,9 +158,9 @@ export BestContactTitle(typeof(key_contact_linkids.dkeybuild) contactKey = datas
         return map(seg='CORE'     => 1,
                    seg='DEAD'     => 2,
                    seg='NO_SSN'   => 3,
-                   seg='INACTIVE' => 4,
-                   seg='H_MERGE'  => 5,
-                   seg='C_MERGE'  => 6,
+                   seg='C_MERGE'  => 4,
+									          seg='INACTIVE' => 5,
+                   seg='H_MERGE'  => 6,
                    7);
     end;
 				
@@ -255,7 +255,7 @@ export BestContactTitle(typeof(key_contact_linkids.dkeybuild) contactKey = datas
 	  	AllBestUlt  := prox_flat + sele_flat + org_flat + ult_flat;
 			 AllBestSele := prox_flat + sele_flat;
 			 
-		  export contact_title  := sort(AllBestUlt,  ultid, orgid, seleid, proxid);
+		  export contact_title  := sort(AllBestSele,  ultid, orgid, seleid, proxid);
 			 export layout := recordof(contact_title);
 
 		end;
