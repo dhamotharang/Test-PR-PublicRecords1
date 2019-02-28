@@ -8,12 +8,12 @@
 
 EXPORT SearchService :=
 MACRO
-  IMPORT iesp,EmailV2_Services,WSInput;
+  IMPORT iesp,EmailV2_Services;
   
-	#WEBSERVICE(FIELDS(
-		'EmailFinderSearchRequest',
+  #WEBSERVICE(FIELDS(
+    'EmailFinderSearchRequest',
     'gateways'
-	));
+  ));
   
   // Input request
   in_req := DATASET([], iesp.emailfinder.t_EmailFinderSearchRequest) : STORED('EmailFinderSearchRequest');

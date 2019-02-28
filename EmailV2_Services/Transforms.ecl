@@ -282,8 +282,8 @@ EXPORT Transforms := MODULE
     SELF.Cleaned.Address.State := le.Cleaned.Address.st;
     SELF.Cleaned.Address.Zip5 := le.Cleaned.Address.zip;
     SELF.Cleaned.Address.Zip4 := le.Cleaned.Address.zip4;
-		SELF.Cleaned.Address.StreetAddress1 := Address.Addr1FromComponents(le.Cleaned.Address.prim_range, le.Cleaned.Address.Predir, le.Cleaned.Address.prim_name, le.Cleaned.Address.addr_suffix, le.Cleaned.Address.Postdir, le.Cleaned.Address.unit_desig, le.Cleaned.Address.sec_range);								
-		SELF.Cleaned.Address.StateCityZip := Address.Addr2FromComponents(le.Cleaned.Address.p_city_name, le.Cleaned.Address.st, le.Cleaned.Address.zip);								
+    SELF.Cleaned.Address.StreetAddress1 := Address.Addr1FromComponents(le.Cleaned.Address.prim_range, le.Cleaned.Address.Predir, le.Cleaned.Address.prim_name, le.Cleaned.Address.addr_suffix, le.Cleaned.Address.Postdir, le.Cleaned.Address.unit_desig, le.Cleaned.Address.sec_range);                
+    SELF.Cleaned.Address.StateCityZip := Address.Addr2FromComponents(le.Cleaned.Address.p_city_name, le.Cleaned.Address.st, le.Cleaned.Address.zip);                
 
     SELF.BestInfo.SSN := le.BestInfo.SSN;
     SELF.BestInfo.DOB := iesp.ECL2ESP.ApplyDateMask(iesp.ECL2ESP.toDate(le.BestInfo.dob), dob_mask);
@@ -303,8 +303,8 @@ EXPORT Transforms := MODULE
     SELF.BestInfo.Address.State := le.BestInfo.st;
     SELF.BestInfo.Address.Zip5 := le.BestInfo.zip;
     SELF.BestInfo.Address.Zip4 := le.BestInfo.zip4;
-		SELF.BestInfo.Address.StreetAddress1 := Address.Addr1FromComponents(le.BestInfo.prim_range, le.BestInfo.Predir, le.BestInfo.prim_name, le.BestInfo.suffix, le.BestInfo.Postdir, le.BestInfo.unit_desig, le.BestInfo.sec_range);								
-		SELF.BestInfo.Address.StateCityZip := Address.Addr2FromComponents(le.BestInfo.city_name, le.BestInfo.st, le.BestInfo.zip);								
+    SELF.BestInfo.Address.StreetAddress1 := Address.Addr1FromComponents(le.BestInfo.prim_range, le.BestInfo.Predir, le.BestInfo.prim_name, le.BestInfo.suffix, le.BestInfo.Postdir, le.BestInfo.unit_desig, le.BestInfo.sec_range);                
+    SELF.BestInfo.Address.StateCityZip := Address.Addr2FromComponents(le.BestInfo.city_name, le.BestInfo.st, le.BestInfo.zip);                
 
     SELF.LexId := le.DID;
     SELF.ProcessDate := iesp.ECL2ESP.toDatestring8(le.process_date);
