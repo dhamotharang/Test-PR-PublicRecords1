@@ -1,6 +1,6 @@
-﻿IMPORT address, AID;
+﻿IMPORT address, AID,Orbit3SOA;
 
-EXPORT Layout_VendorSrc := MODULE
+EXPORT layouts := MODULE
 		
 	EXPORT MasterList	:= RECORD
 		STRING LNfileCategory;
@@ -14,8 +14,9 @@ EXPORT Layout_VendorSrc := MODULE
 		STRING Phone;
 	END;
 	
+	
 	EXPORT Bank_Court	:= RECORD
-	  STRING    lncourt_code;    
+	  STRING    lncourtcode;
 		STRING		court_code;
 		STRING		court_name;
 		STRING		address1;
@@ -27,7 +28,7 @@ EXPORT Layout_VendorSrc := MODULE
 	END;
 	
 	EXPORT Lien_Court	:= RECORD
-	  STRING    lncourt_code;
+	  STRING    lncourtcode;
 		STRING 		court_code;
 		STRING		court_name;
 		STRING		address1;
@@ -89,56 +90,10 @@ EXPORT Layout_VendorSrc := MODULE
 		STRING		unused_contact_email;						// column W
 	END;
 	
-	EXPORT OldVendorSrc	:= RECORD
-		STRING		item_source;
-		STRING75	source_code;
-		STRING		display_name;
-		STRING		description;
-		STRING		status;
-		STRING		data_notes;
-		STRING		coverage_1;
-		STRING		coverage_2;
-		STRING		orbit_item_name;
-		STRING		orbit_source;
-		STRING		orbit_number;
-		STRING		website;
-		STRING		notes;
-		STRING		date_added;
-		STRING		input_file_id;
-		STRING10  clean_phone;
-		STRING10	clean_fax;
-		STRING65  Prepped_addr1;
-		STRING35  Prepped_addr2;
-		STRING28  v_prim_name;
-		STRING5   v_zip;
-		STRING4   v_zip4;
-		STRING		prim_range;
-		STRING		predir;
-		STRING		prim_name;
-		STRING		addr_suffix;
-		STRING		postdir;
-		STRING		unit_desig;
-		STRING		sec_range;
-		STRING		p_city_name;
-		STRING		v_city_name;
-		STRING		st;
-		STRING		zip;
-		STRING		zip4;
-		STRING		cart;
-		STRING		cr_sort_sz;
-		STRING		lot;
-		STRING		lot_order;
-		STRING		dbpc;
-		STRING		chk_digit;
-		STRING		rec_type;
-		STRING		county;
-		STRING		geo_lat;
-		STRING		geo_long;
-		STRING		msa;
-		STRING		geo_blk;
-		STRING		geo_match;
-		STRING		err_stat;
-	END;
+		// EXPORT Orbit	:= RECORD
+// Riskview_FFD ;
+// end;
+   
 
 	EXPORT MergedSrc_Base	:= RECORD
 																				// Bank/Lien Court Match				// Riskview/FFD
@@ -191,6 +146,49 @@ EXPORT Layout_VendorSrc := MODULE
 		STRING		geo_blk;
 		STRING		geo_match;
 		STRING		err_stat;
-	END;
 
+	END;
+	
+	EXPORT Base	:= RECORD
+MergedSrc_Base ;
+end;
+   
+	 
+EXPORT Orbit := RECORD
+	 
+		string    item_id                       {xpath('d[k="819"]/v')};       // Legacy Id 
+		string    item_name                     {xpath('d[k="21"]/v')};        // Dataset Name                   
+		string    item_description              {xpath('d[k="15"]/v')};        // Dataset Description                              
+		string    status_name                   {xpath('d[k="24"]/v')};        // Dataset Status                
+		string    item_source_code              {xpath('d[k="721"]/v')};       // Dataset Source Codes         
+		string    source_id                     {xpath('d[k="821"]/v')};       // Company Id - from Dataset Id - 18                  
+		string    source_name                   {xpath('d[k="709"]/v')};       // Company Name                    
+		string    source_address1               {xpath('d[k="701"]/v')};       // Company Address                  
+		string    source_address2               {xpath('d[k="703"]/v')};       // Company Address 2            
+		string    source_city                   {xpath('d[k="705"]/v')};       // Company City                  
+		string    source_state                  {xpath('d[k="715"]/v')};       // Company State            
+		string    source_zip                    {xpath('d[k="719"]/v')};       // Company Zip                     
+		string    source_phone                  {xpath('d[k="711"]/v')};       // Company Phone 
+		string    source_website                {xpath('d[k="717"]/v')};       // Company Website   
+		string    unused_source_sourceCodes     := ''; //{xpath('d[k="713"]/v')};       // Company Source Codes - 607?
+		// The following are blank fields but are necessary for the recordset 
+		string    unused_fcra                   := ''; // xpath('d[k="619"]/v')};       // Restriction FCRA Use Permitted  
+		string    unused_fcra_comments          := ''; // xpath('d[k="651"]/v')};       // Restriction Comment FCRA Use Permitted        
+		string    market_restrict_flag          {xpath('d[k="607"]/v')};                // Restriction Marketing Restrictions - 599     
+		string    unused_market_comments        := ''; // xpath('d[k="631"]/v')};       // Restriction Comment Marketing Restrictions    
+		string    unused_contact_category_name  := ''; // xpath('d[k="723"]/v')};       // Contact Info
+		string    unused_contact_name           := ''; // xpath('d[k="723"]/v')};       // Contact Info          
+		string    unused_contact_phone          := ''; // xpath('d[k="723"]/v')};       // Contact Info       
+		string    unused_contact_email          := ''; // xpath('d[k="723"]/v')};       // Contact Info 
+end;
+
+EXPORT InputRecord := record
+		string   token {xpath('token')}           := Orbit3SOA.GetToken('Prod');
+		integer  offset {xpath('offset')}         := 0;
+		integer  count {xpath('count')}           := 1000000; 
+		string   reportName {xpath('reportName')} := 'Dataset';
+		string   viewType {xpath('viewName')}     := 'FFD No Filters';
+		
+END;
+   			 
 END;
