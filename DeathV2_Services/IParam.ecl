@@ -42,7 +42,7 @@ EXPORT IParam := MODULE
 	EXPORT DeathRestrictions := INTERFACE(doxie.IDataAccess)
 		EXPORT BOOLEAN UseDeathMasterSSAUpdates := FALSE;
 		EXPORT BOOLEAN SuppressNonMarketingDeathSources := FALSE;
-		EXPORT Integer DeathMasterPurpose := DeathV2_Services.Constants.DeathMasterPurpose.NoValue;		
+		EXPORT Integer DeathMasterPurpose := DeathV2_Services.Constants.DeathMasterPurpose.NoValue;
 	END;
 	
   // Create from a module compatible with GlobalModule
@@ -53,6 +53,7 @@ EXPORT IParam := MODULE
     local mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(inmod);
 
 		death_mod := MODULE(PROJECT (mod_access, DeathV2_Services.IParam.DeathRestrictions, OPT))
+			EXPORT boolean UseDeathMasterSSAUpdates := doxie.compliance.use_DM_SSA_updates (DataPermissionMask);
 			EXPORT BOOLEAN SuppressNonMarketingDeathSources := FALSE : stored('SuppressNonMarketingDeathSources');	
 			STRING10 input_DeathMasterPurpose := '' : stored('DeathMasterPurpose');	
    // converting to integer as we only restrict if it is 0
@@ -64,9 +65,10 @@ EXPORT IParam := MODULE
 
   // Create from a module compatible with IDataAccess
   //TODO: call it from GetDeathRestrictions
-  EXPORT GetFromDataAccess (mod_access) := FUNCTIONMACRO
-    IMPORT ut;
+  EXPORT GetRestrictions (mod_access) := FUNCTIONMACRO
+    IMPORT doxie, ut;
     RETURN MODULE(PROJECT (mod_access, DeathV2_Services.IParam.DeathRestrictions, OPT))
+			EXPORT boolean UseDeathMasterSSAUpdates := doxie.compliance.use_DM_SSA_updates (DataPermissionMask);
       EXPORT boolean SuppressNonMarketingDeathSources := FALSE : STORED('SuppressNonMarketingDeathSources');
       string10 input_DeathMasterPurpose := '' : STORED('DeathMasterPurpose');
       // converting to integer as we only restrict if it is 0

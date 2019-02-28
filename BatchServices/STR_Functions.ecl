@@ -136,7 +136,7 @@ export STR_Functions := MODULE
 		
 		// TODO: revisit str_config
 		// using global mod below because Interfaces.str_config does not inherit permissions. 
-		deathparams := DeathV2_Services.IParam.GetFromDataAccess(mod_access);
+		deathparams := DeathV2_Services.IParam.GetRestrictions(mod_access);
 		
 		ds_best_recs_with_deceased_flag := 
 			join(ds_best_recs, doxie.key_death_masterV2_ssa_DID,

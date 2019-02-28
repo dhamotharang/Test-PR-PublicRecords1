@@ -6,7 +6,7 @@ FUNCTION
 
 	dBatchInCommon := PROJECT(dBatchIn, Autokey_batch.Layouts.rec_inBatchMaster);			
 	IsGLBOk		:= inMod.isValidGlb();
-	deathRestrictions := DeathV2_Services.IParam.GetFromDataAccess(inMod);
+	deathRestrictions := DeathV2_Services.IParam.GetRestrictions(inMod);
 	
 	dAKDids 	:= DeathV2_Services.BatchIds(inMod).AutoKeyIds(dBatchInCommon);
 	dDDDids 	:= DeathV2_Services.BatchIds(inMod).DeepDiveIds(dBatchInCommon, IsGLBOk, deathRestrictions);

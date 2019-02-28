@@ -334,7 +334,7 @@ END;
 // need to eliminate deceased entities from any of the "current" groupings
 // and force them into their respective "previous" groups
 death_key := doxie.Key_Death_Masterv2_SSA_Did;
-deathparams := DeathV2_Services.IParam.GetFromDataAccess(mod_access);
+deathparams := DeathV2_Services.IParam.GetRestrictions(mod_access);
 
 
 Layout_report.Assoc getOwn(propSrchFields L) := TRANSFORM

@@ -32,7 +32,7 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_SSN_Risk (DATASET(Su
   glb_ok := mod_access.isValidGLB();
   dppa_ok := mod_access.isValidDPPA();
 
-	deathparams := DeathV2_Services.IParam.GetFromDataAccess(mod_access);
+	deathparams := DeathV2_Services.IParam.GetRestrictions(mod_access);
 
 	// Temporary Header Layout - Used for Calculating Header Based Risk Codes
 	TempHeader := RECORD

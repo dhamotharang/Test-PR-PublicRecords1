@@ -208,7 +208,7 @@ with_ssn_info get_dead(with_ssn_info l,doxie.key_death_masterv2_ssa_did r):=tran
 END;
 
 is_glb_ok := mod_access.isValidGLB (checkrna);
-deathparams := DeathV2_Services.IParam.GetFromDataAccess(mod_access);
+deathparams := DeathV2_Services.IParam.GetRestrictions(mod_access);
 
 imposters_w_d_info  := dedup(sort(
 														join(with_issuance_info_imposters,doxie.key_death_masterv2_ssa_did, 

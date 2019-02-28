@@ -118,9 +118,9 @@ FUNCTION
 	BOOLEAN glb_ok := mod_access.isValidGLB ();
 	DIDsAdded := didville.did_service_common_function(file_in,
 																							 glb_flag := glb_ok, 
-																							 glb_purpose_value := inMod.GLBPurpose, 
-																							 appType := inMod.ApplicationType,
-																							 IndustryClass_val := inMod.IndustryClass);		
+																							 glb_purpose_value := mod_access.glb,
+																							 appType := mod_access.application_type,
+																							 IndustryClass_val := mod_access.industry_class);		
 																							 
 	dAll_wDIDs := JOIN(dAppendDIDs_w_new_seq,DIDsAdded,
 										LEFT.new_seq = RIGHT.seq,
@@ -136,7 +136,7 @@ FUNCTION
 		SELF          := le;
 	END;
 	
-	deathParams := DeathV2_Services.IParam.GetFromDataAccess(mod_access);
+	deathParams := DeathV2_Services.IParam.GetRestrictions(mod_access);
 	
 	dDeceased := JOIN(dAll_wDIDs,
 										Doxie.key_death_masterV2_ssa_DID,
@@ -146,7 +146,7 @@ FUNCTION
 										LEFT OUTER,
 										LIMIT(0),KEEP(1));
 	
-	Suppress.MAC_Suppress(dDeceased,dSuppress,inMod.ApplicationType,Suppress.Constants.LinkTypes.DID,did,'','',TRUE,'',TRUE);
+	Suppress.MAC_Suppress(dDeceased,dSuppress,mod_access.application_type,Suppress.Constants.LinkTypes.DID,did,'','',TRUE,'',TRUE);
 	
 	// Debug
 	#IF(PhoneFinder_Services.Constants.Debug.PhoneNoSearch)
