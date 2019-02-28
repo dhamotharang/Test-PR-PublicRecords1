@@ -1,0 +1,37 @@
+##,s
+1,OPTIONS:-gh
+2,MODULE:<EnterModuleNameHere>
+3,FILENAME:<FileName>
+4,
+5,// Uncomment up to NINES for internal or external adl
+6,// IDFIELD:EXISTS:<NameOfIDField>
+7,// RIDFIELD:<NameOfRidField>
+8,// RECORDS:<NumberOfRecordsInDataFile>
+9,// POPULATION:<ExpectedNumberOfEntitiesInDataFile>
+10,"// NINES:<Precision required 3 = 99.9%, 2 = 99% etc>"
+11,
+12,// Uncomment Process if doing external adl
+13,// PROCESS:<ProcessName>
+14,
+15,// FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields
+16,// BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking
+17,// FUZZY can be used to create new types of FUZZY linking
+18,
+19,"// Remember to generate specificities and update the 0,0 placeholders below before running any sort of linking."
+20,"// If the actual specificity for a field is <1, round it up to 1 rather than down to 0.  If your cluster is running"
+21,"// a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience."
+22,
+23,"FIELD:lnfilecategory:TYPE(STRING):0,0"
+24,"FIELD:lnsourcetcode:TYPE(STRING):0,0"
+25,"FIELD:vendorname:TYPE(STRING):0,0"
+26,"FIELD:address1:TYPE(STRING):0,0"
+27,"FIELD:address2:TYPE(STRING):0,0"
+28,"FIELD:city:TYPE(STRING):0,0"
+29,"FIELD:state:TYPE(STRING):0,0"
+30,"FIELD:zipcode:TYPE(STRING):0,0"
+31,"FIELD:phone:TYPE(STRING):0,0"
+32,
+33,// CONCEPT statements should be used to group together interellated fields; such as address
+34,// RELATIONSHIP is used to find non-obvious relationships between the clusters
+35,// SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+36,// LINKPATH is used to define access paths for external linking

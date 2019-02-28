@@ -1,0 +1,44 @@
+﻿OPTIONS:-gh
+MODULE:_Scrubs_VendorSrc_Orbit
+FILENAME:Orbit
+// Uncomment up to NINES for internal or external adl
+// IDFIELD:EXISTS:<NameOfIDField>
+// RIDFIELD:<NameOfRidField>
+// RECORDS:<NumberOfRecordsInDataFile>
+// POPULATION:<ExpectedNumberOfEntitiesInDataFile>
+// NINES:<Precision required 3 = 99.9%, 2 = 99% etc>
+// Uncomment Process if doing external adl
+// PROCESS:<ProcessName>
+// FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields
+// BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking
+// FUZZY can be used to create new types of FUZZY linking
+// Remember to generate specificities and update the 0,0 placeholders below before running any sort of linking.
+// If the actual specificity for a field is <1, round it up to 1 rather than down to 0.  If your cluster is running
+// a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience.
+FIELD:item_id:TYPE(STRING):0,0
+FIELD:item_name:TYPE(STRING):0,0
+FIELD:item_description:TYPE(STRING):0,0
+FIELD:status_name:TYPE(STRING):0,0
+FIELD:item_source_code:TYPE(STRING):0,0
+FIELD:source_id:TYPE(STRING):0,0
+FIELD:source_name:TYPE(STRING):0,0
+FIELD:source_address1:TYPE(STRING):0,0
+FIELD:source_address2:TYPE(STRING):0,0
+FIELD:source_city:TYPE(STRING):0,0
+FIELD:source_state:TYPE(STRING):0,0
+FIELD:source_zip:TYPE(STRING):0,0
+FIELD:source_phone:TYPE(STRING):0,0
+FIELD:source_website:TYPE(STRING):0,0
+FIELD:unused_source_sourcecodes:TYPE(STRING):0,0
+FIELD:unused_fcra:TYPE(STRING):0,0
+FIELD:unused_fcra_comments:TYPE(STRING):0,0
+FIELD:market_restrict_flag:TYPE(STRING):0,0
+FIELD:unused_market_comments:TYPE(STRING):0,0
+FIELD:unused_contact_category_name:TYPE(STRING):0,0
+FIELD:unused_contact_name:TYPE(STRING):0,0
+FIELD:unused_contact_phone:TYPE(STRING):0,0
+FIELD:unused_contact_email:TYPE(STRING):0,0
+// CONCEPT statements should be used to group together interellated fields; such as address
+// RELATIONSHIP is used to find non-obvious relationships between the clusters
+// SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+// LINKPATH is used to define access paths for external linking

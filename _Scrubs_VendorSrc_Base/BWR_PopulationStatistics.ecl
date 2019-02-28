@@ -1,0 +1,7 @@
+﻿//This is the code to execute in a builder window
+#OPTION('multiplePersistInstances', FALSE);
+#workunit('name','_Scrubs_VendorSrc_Base.BWR_PopulationStatistics - Population Statistics - SALT V3.11.6');
+IMPORT _Scrubs_VendorSrc_Base,SALT311;
+// In the line below substitute the file you want statistics for; and substitute any field names you can
+  _Scrubs_VendorSrc_Base.MAC_PopulationStatistics(YourFileName,/*Reference Field*/,/* item_source_field */,/* source_code_field */,/* display_name_field */,/* description_field */,/* status_field */,/* data_notes_field */,/* coverage_1_field */,/* coverage_2_field */,/* orbit_item_name_field */,/* orbit_source_field */,/* orbit_number_field */,/* website_field */,/* notes_field */,/* date_added_field */,/* input_file_id_field */,/* market_restrict_flag_field */,/* clean_phone_field */,/* clean_fax_field */,/* prepped_addr1_field */,/* prepped_addr2_field */,/* v_prim_name_field */,/* v_zip_field */,/* v_zip4_field */,/* prim_range_field */,/* predir_field */,/* prim_name_field */,/* addr_suffix_field */,/* postdir_field */,/* unit_desig_field */,/* sec_range_field */,/* p_city_name_field */,/* v_city_name_field */,/* st_field */,/* zip_field */,/* zip4_field */,/* cart_field */,/* cr_sort_sz_field */,/* lot_field */,/* lot_order_field */,/* dbpc_field */,/* chk_digit_field */,/* rec_type_field */,/* county_field */,/* geo_lat_field */,/* geo_long_field */,/* msa_field */,/* geo_blk_field */,/* geo_match_field */,/* err_stat_field */,outfile);
+  OUTPUT(outfile,NAMED('PopulationStatistics'));
