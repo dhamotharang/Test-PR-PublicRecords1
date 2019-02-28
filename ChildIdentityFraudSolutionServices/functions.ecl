@@ -31,8 +31,8 @@ shared BatchParams		:= IParam.getBatchParams();
 				self 							:= [])); 
 
 		// temporarily, double projection
-		batch_legacy := BatchShare.IParam.GetFromLegacy(inMod);
-		deathBatchParams := module(project(batch_legacy, DeathV2_Services.IParam.BatchParams, opt)) end;
+		mod_batch := BatchShare.IParam.GetFromLegacy(inMod);
+		deathBatchParams := module(project(mod_batch, DeathV2_Services.IParam.BatchParams, opt)) end;
 
 		dsDeath := DeathV2_Services.BatchRecords(BatchInCommon, deathBatchParams)															
 			(( matchcode in deceased_match_codes OR  ( matchcode ='S' and 	ut.Age((unsigned4)dob8)< 18 ) )  // Matchcode should be in constants

@@ -1,4 +1,4 @@
-﻿﻿IMPORT suppress;
+﻿IMPORT suppress;
 IMPORT $;
 
 EXPORT IDataAccess := INTERFACE

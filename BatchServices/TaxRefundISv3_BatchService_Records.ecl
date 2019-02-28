@@ -47,8 +47,7 @@ EXPORT TaxRefundISv3_BatchService_Records(
 	// *--- Run through Deceased batch service ---* //
   set_deceased_match_codes := ['ANSZC', 'ANSZ', 'ANSC', 'ANS', 'SNCZ', 'SNC', 'SNZ', 'SN', 'S'];
 
-  death_in_mod := MODULE(project(DeathV2_Services.IParam.getBatchParams(), 
-	                               DeathV2_Services.IParam.BatchParams, opt))
+  death_in_mod := MODULE(DeathV2_Services.IParam.getBatchParams())
    			EXPORT BOOLEAN ExtraMatchCodes := TRUE;
   END;			
 
