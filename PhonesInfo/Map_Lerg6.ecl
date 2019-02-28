@@ -1,6 +1,7 @@
 ﻿IMPORT Mdr, Std, Ut;
 
 	//DF-23660: Create Lerg6 Keybuild
+	//DF-24140: Lerg6 Layout Change
 
 	////////////////////////////////////////////////////////////////////////////////
 	//Input Files
@@ -12,6 +13,8 @@
 	//Reformat Monthly Files to Common Layout
 	////////////////////////////////////////////////////////////////////////////////
 	PhonesInfo.Layout_Lerg.lerg6Main ccTr(ds_monthly l):= transform
+		
+		self.source							:= mdr.sourceTools.src_Phones_Lerg6;
 		
 		//Pull Date From Filename
 			trFName			:= trim(l.filename, left, right);
@@ -248,6 +251,32 @@
 																	if(l.eff_date <>'' and l.status in ['D','M'], false,						//FALSE: Record has eff_date<>'' and status not 'D' or 'M'
 																	true)); 																												//TRUE:  Record found in the latest update; Record may have (eff_date='') or (eff_date<>'' and status='E' and eff_date < dt_last_reported)
 																																																			
+		self.os1								:= '';
+		self.os2								:= '';
+		self.os3								:= '';
+		self.os4								:= '';
+		self.os5								:= '';
+		self.os6								:= '';
+		self.os7								:= '';
+		self.os8								:= '';
+		self.os9								:= '';
+		self.os10								:= '';
+		self.os11								:= '';
+		self.os12								:= '';
+		self.os13								:= '';
+		self.os14								:= '';
+		self.os15								:= '';
+		self.os16								:= '';
+		self.os17								:= '';
+		self.os18								:= '';
+		self.os19								:= '';
+		self.os20								:= '';
+		self.os21								:= '';
+		self.os22								:= '';
+		self.os23								:= '';
+		self.os24								:= '';
+		self.os25								:= '';
+		self.notes							:= '';	
 		self.record_sid					:= 0;
 		self.global_sid					:= 0;
 		self										:= l;

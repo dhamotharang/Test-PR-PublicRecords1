@@ -24,8 +24,8 @@ EXPORT Fn_InvalidEmail (DATASET(RECORDOF(Layouts.temp_Validate)) email_in) := FU
 		string100 CleanName		:= STD.Str.CleanSpaces(STD.Str.ToUpperCase(L.clean_email));
 		string100 CleanDomain	:= STD.Str.CleanSpaces(STD.Str.ToUpperCase(L.append_domain));
 	//(REGEXFIND('^[0-9A-Z]{1}@',CleanName), TRUE, FALSE); //Removing this condition until further discussion	
-		SELF.ValidEmail		:= IF(CleanName in BadEmails, TRUE, FALSE);
-		SELF.ValidDomain	:= IF(CleanDomain in InvalidDomain, TRUE, FALSE);
+		SELF.InValidEmail		:= IF(CleanName in BadEmails, TRUE, FALSE);
+		SELF.InValidDomain	:= IF(CleanDomain in InvalidDomain, TRUE, FALSE);
 		SELF	:= L;
 	END;
 	

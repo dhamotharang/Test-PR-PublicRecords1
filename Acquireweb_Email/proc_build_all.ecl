@@ -31,6 +31,7 @@ EXPORT proc_build_all(STRING version,STRING torun='ALL') := FUNCTION
 		),
 		IF(torun IN ['ALL','AUTOKEY'],Acquireweb_Email.proc_build_autokey(version),OUTPUT('Autokey not generated',NAMED('Autokey'))),
 		IF(torun IN ['ALL','STRATA'],Acquireweb_Email.proc_build_strata(version),OUTPUT('Strata not generated',NAMED('Strata'))),
+		IF(torun IN ['ALL','STRATA'],Acquireweb_Plus.proc_build_strata(version),OUTPUT('Strata not generated',NAMED('Strata'))),
 		create_orbit_build
 	);
 

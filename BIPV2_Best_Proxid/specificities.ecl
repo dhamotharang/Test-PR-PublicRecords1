@@ -1,8 +1,9 @@
-IMPORT ut,SALT30;
+﻿IMPORT ut,SALT30;
 EXPORT specificities(DATASET(layout_Base) h) := MODULE
+ 
 EXPORT input_layout := RECORD // project out required fields
   SALT30.UIDType Proxid := h.Proxid; // using existing id field
-  h.rcid;//RIDfield
+  h.rcid;//RIDfield 
   UNSIGNED2 data_permits := fn_sources(h.source_for_votes); // Pre-compute permissions for every field
   h.dt_first_seen;
   h.dt_last_seen;
@@ -21,6 +22,8 @@ EXPORT input_layout := RECORD // project out required fields
   h.company_sic_code1_flag; // Flag to be filled in as part of Best processing
   h.company_naics_code1;
   h.company_naics_code1_flag; // Flag to be filled in as part of Best processing
+  TYPEOF(h.dba_name) dba_name := (TYPEOF(h.dba_name))Fields.Make_dba_name((SALT30.StrType)h.dba_name ); // Cleans before using
+  h.dba_name_flag; // Flag to be filled in as part of Best processing
   h.prim_range;
   h.predir;
   h.prim_name;
@@ -39,6 +42,7 @@ EXPORT input_layout := RECORD // project out required fields
   h.address_flag; // Flag to be filled in as part of Best processing
 END;
 r := input_layout;
+ 
 h01 := DISTRIBUTE(TABLE(h(Proxid<>0),r),HASH(Proxid)); // group for the specificity_local function
 input_layout do_computes(h01 le) := TRANSFORM
   SELF.address := IF (Fields.InValid_address((SALT30.StrType)le.prim_range,(SALT30.StrType)le.predir,(SALT30.StrType)le.prim_name,(SALT30.StrType)le.addr_suffix,(SALT30.StrType)le.postdir,(SALT30.StrType)le.unit_desig,(SALT30.StrType)le.sec_range,(SALT30.StrType)le.st,(SALT30.StrType)le.zip),0,HASH32((SALT30.StrType)le.prim_range,(SALT30.StrType)le.predir,(SALT30.StrType)le.prim_name,(SALT30.StrType)le.addr_suffix,(SALT30.StrType)le.postdir,(SALT30.StrType)le.unit_desig,(SALT30.StrType)le.sec_range,(SALT30.StrType)le.st,(SALT30.StrType)le.zip)); // Combine child fields into 1 for specificity counting
@@ -46,7 +50,9 @@ input_layout do_computes(h01 le) := TRANSFORM
 END;
 h02 := PROJECT(h01,do_computes(LEFT));
 SHARED h0 :=  h02;
+ 
 EXPORT input_file_np := h0; // No-persist version for remote_linking
+ 
 EXPORT input_file := h0 : PERSIST('~temp::Proxid::BIPV2_Best_Proxid::Specificities_Cache',EXPIRE(Config.PersistExpire));
 //We have Proxid specified - so we can compute statistics on the cluster counts
   r0 := RECORD
@@ -55,6 +61,7 @@ EXPORT input_file := h0 : PERSIST('~temp::Proxid::BIPV2_Best_Proxid::Specificiti
   end;
 EXPORT ClusterSizes := TABLE(input_file,r0,Proxid,LOCAL) : PERSIST('~temp::Proxid::BIPV2_Best_Proxid::Cluster_Sizes',EXPIRE(Config.PersistExpire));
 EXPORT TotalClusters := COUNT(ClusterSizes);
+ 
 EXPORT  company_name_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,company_name) : PERSIST('~temp::Proxid::BIPV2_Best_Proxid::dedups::company_name',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(company_name_deduped,company_name,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
@@ -65,6 +72,7 @@ EXPORT  company_name_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,compan
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT company_name_values_persisted := specs_added;
+ 
 EXPORT  company_fein_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,company_fein) : PERSIST('~temp::Proxid::BIPV2_Best_Proxid::dedups::company_fein',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(company_fein_deduped,company_fein,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
@@ -78,6 +86,7 @@ EXPORT  company_fein_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,compan
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
   SALT30.mac_edit_distance_pairs(specs_added,company_fein,cnt,1,false,distance_computed);//Computes specificities of fuzzy matches
 EXPORT company_fein_values_persisted := distance_computed;
+ 
 EXPORT  company_phone_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,company_phone) : PERSIST('~temp::Proxid::BIPV2_Best_Proxid::dedups::company_phone',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(company_phone_deduped,company_phone,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
@@ -89,6 +98,7 @@ EXPORT  company_phone_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,compa
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
   SALT30.mac_edit_distance_pairs(specs_added,company_phone,cnt,1,false,distance_computed);//Computes specificities of fuzzy matches
 EXPORT company_phone_values_persisted := distance_computed;
+ 
 EXPORT  company_url_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,company_url) : PERSIST('~temp::Proxid::BIPV2_Best_Proxid::dedups::company_url',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(company_url_deduped,company_url,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
@@ -99,6 +109,7 @@ EXPORT  company_url_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,company
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT company_url_values_persisted := specs_added;
+ 
 EXPORT  duns_number_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,duns_number) : PERSIST('~temp::Proxid::BIPV2_Best_Proxid::dedups::duns_number',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(duns_number_deduped,duns_number,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
@@ -110,6 +121,7 @@ EXPORT  duns_number_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,duns_nu
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
   SALT30.mac_edit_distance_pairs(specs_added,duns_number,cnt,1,false,distance_computed);//Computes specificities of fuzzy matches
 EXPORT duns_number_values_persisted := distance_computed;
+ 
 EXPORT  company_sic_code1_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,company_sic_code1) : PERSIST('~temp::Proxid::BIPV2_Best_Proxid::dedups::company_sic_code1',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(company_sic_code1_deduped,company_sic_code1,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
@@ -120,6 +132,7 @@ EXPORT  company_sic_code1_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,c
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT company_sic_code1_values_persisted := specs_added;
+ 
 EXPORT  company_naics_code1_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,company_naics_code1) : PERSIST('~temp::Proxid::BIPV2_Best_Proxid::dedups::company_naics_code1',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(company_naics_code1_deduped,company_naics_code1,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
@@ -130,6 +143,18 @@ EXPORT  company_naics_code1_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT company_naics_code1_values_persisted := specs_added;
+ 
+EXPORT  dba_name_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,dba_name) : PERSIST('~temp::Proxid::BIPV2_Best_Proxid::dedups::dba_name',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
+  SALT30.Mac_Field_Count_UID(dba_name_deduped,dba_name,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
+  r1 := RECORD
+    counted;
+    UNSIGNED4 id := 0; // Used to identify value later
+  end;
+  with_id := table(counted,r1);
+  ut.MAC_Sequence_Records(with_id,id,sequenced)
+  SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
+EXPORT dba_name_values_persisted := specs_added;
+ 
 EXPORT  prim_range_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,prim_range) : PERSIST('~temp::Proxid::BIPV2_Best_Proxid::dedups::prim_range',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(prim_range_deduped,prim_range,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
@@ -140,6 +165,7 @@ EXPORT  prim_range_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,prim_ran
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT prim_range_values_persisted := specs_added;
+ 
 EXPORT  predir_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,predir) : PERSIST('~temp::Proxid::BIPV2_Best_Proxid::dedups::predir',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(predir_deduped,predir,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
@@ -150,6 +176,7 @@ EXPORT  predir_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,predir) : PE
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT predir_values_persisted := specs_added;
+ 
 EXPORT  prim_name_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,prim_name) : PERSIST('~temp::Proxid::BIPV2_Best_Proxid::dedups::prim_name',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(prim_name_deduped,prim_name,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
@@ -160,6 +187,7 @@ EXPORT  prim_name_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,prim_name
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT prim_name_values_persisted := specs_added;
+ 
 EXPORT  addr_suffix_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,addr_suffix) : PERSIST('~temp::Proxid::BIPV2_Best_Proxid::dedups::addr_suffix',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(addr_suffix_deduped,addr_suffix,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
@@ -170,6 +198,7 @@ EXPORT  addr_suffix_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,addr_su
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT addr_suffix_values_persisted := specs_added;
+ 
 EXPORT  postdir_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,postdir) : PERSIST('~temp::Proxid::BIPV2_Best_Proxid::dedups::postdir',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(postdir_deduped,postdir,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
@@ -180,6 +209,7 @@ EXPORT  postdir_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,postdir) : 
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT postdir_values_persisted := specs_added;
+ 
 EXPORT  unit_desig_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,unit_desig) : PERSIST('~temp::Proxid::BIPV2_Best_Proxid::dedups::unit_desig',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(unit_desig_deduped,unit_desig,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
@@ -190,6 +220,7 @@ EXPORT  unit_desig_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,unit_des
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT unit_desig_values_persisted := specs_added;
+ 
 EXPORT  sec_range_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,sec_range) : PERSIST('~temp::Proxid::BIPV2_Best_Proxid::dedups::sec_range',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(sec_range_deduped,sec_range,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
@@ -200,6 +231,7 @@ EXPORT  sec_range_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,sec_range
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT sec_range_values_persisted := specs_added;
+ 
 EXPORT  p_city_name_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,p_city_name) : PERSIST('~temp::Proxid::BIPV2_Best_Proxid::dedups::p_city_name',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(p_city_name_deduped,p_city_name,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
@@ -210,6 +242,7 @@ EXPORT  p_city_name_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,p_city_
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT p_city_name_values_persisted := specs_added;
+ 
 EXPORT  v_city_name_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,v_city_name) : PERSIST('~temp::Proxid::BIPV2_Best_Proxid::dedups::v_city_name',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(v_city_name_deduped,v_city_name,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
@@ -220,6 +253,7 @@ EXPORT  v_city_name_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,v_city_
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT v_city_name_values_persisted := specs_added;
+ 
 EXPORT  st_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,st) : PERSIST('~temp::Proxid::BIPV2_Best_Proxid::dedups::st',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(st_deduped,st,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
@@ -230,6 +264,7 @@ EXPORT  st_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,st) : PERSIST('~
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT st_values_persisted := specs_added;
+ 
 EXPORT  zip_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,zip) : PERSIST('~temp::Proxid::BIPV2_Best_Proxid::dedups::zip',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(zip_deduped,zip,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
@@ -240,6 +275,7 @@ EXPORT  zip_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,zip) : PERSIST(
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT zip_values_persisted := specs_added;
+ 
 EXPORT  zip4_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,zip4) : PERSIST('~temp::Proxid::BIPV2_Best_Proxid::dedups::zip4',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(zip4_deduped,zip4,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
@@ -250,6 +286,7 @@ EXPORT  zip4_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,zip4) : PERSIS
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT zip4_values_persisted := specs_added;
+ 
 EXPORT  fips_state_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,fips_state) : PERSIST('~temp::Proxid::BIPV2_Best_Proxid::dedups::fips_state',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(fips_state_deduped,fips_state,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
@@ -260,6 +297,7 @@ EXPORT  fips_state_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,fips_sta
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT fips_state_values_persisted := specs_added;
+ 
 EXPORT  fips_county_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,fips_county) : PERSIST('~temp::Proxid::BIPV2_Best_Proxid::dedups::fips_county',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(fips_county_deduped,fips_county,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
@@ -270,6 +308,7 @@ EXPORT  fips_county_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,fips_co
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT fips_county_values_persisted := specs_added;
+ 
 EXPORT  address_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,address) : PERSIST('~temp::Proxid::BIPV2_Best_Proxid::dedups::address',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(address_deduped,address,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
@@ -329,6 +368,13 @@ EXPORT company_naics_code1_switch := bf;
 EXPORT company_naics_code1_max := MAX(company_naics_code1_values_persisted,field_specificity);
 SALT30.MAC_Field_Specificity(company_naics_code1_values_persisted,company_naics_code1,company_naics_code1_nulls,ol) // Compute column level specificity
 EXPORT company_naics_code1_specificity := ol;
+SALT30.MAC_Field_Nulls(dba_name_values_persisted,Layout_Specificities.dba_name_ChildRec,nv) // Use automated NULL spotting
+EXPORT dba_name_nulls := nv;
+SALT30.MAC_Field_Bfoul(dba_name_deduped,dba_name,Proxid,dba_name_nulls,ClusterSizes,false,false,bf) // Compute the chances of a field having 2 values for one entity
+EXPORT dba_name_switch := bf;
+EXPORT dba_name_max := MAX(dba_name_values_persisted,field_specificity);
+SALT30.MAC_Field_Specificity(dba_name_values_persisted,dba_name,dba_name_nulls,ol) // Compute column level specificity
+EXPORT dba_name_specificity := ol;
 SALT30.MAC_Field_Nulls(prim_range_values_persisted,Layout_Specificities.prim_range_ChildRec,nv) // Use automated NULL spotting
 EXPORT prim_range_nulls := nv;
 SALT30.MAC_Field_Bfoul(prim_range_deduped,prim_range,Proxid,prim_range_nulls,ClusterSizes,false,false,bf) // Compute the chances of a field having 2 values for one entity
@@ -434,7 +480,8 @@ EXPORT address_switch := bf;
 EXPORT address_max := MAX(address_values_persisted,field_specificity);
 SALT30.MAC_Field_Specificity(address_values_persisted,address,address_nulls,ol) // Compute column level specificity
 EXPORT address_specificity := ol;
-iSpecificities := DATASET([{0,company_name_specificity,company_name_switch,company_name_max,company_name_nulls,company_fein_specificity,company_fein_switch,company_fein_max,company_fein_nulls,company_phone_specificity,company_phone_switch,company_phone_max,company_phone_nulls,company_url_specificity,company_url_switch,company_url_max,company_url_nulls,duns_number_specificity,duns_number_switch,duns_number_max,duns_number_nulls,company_sic_code1_specificity,company_sic_code1_switch,company_sic_code1_max,company_sic_code1_nulls,company_naics_code1_specificity,company_naics_code1_switch,company_naics_code1_max,company_naics_code1_nulls,prim_range_specificity,prim_range_switch,prim_range_max,prim_range_nulls,predir_specificity,predir_switch,predir_max,predir_nulls,prim_name_specificity,prim_name_switch,prim_name_max,prim_name_nulls,addr_suffix_specificity,addr_suffix_switch,addr_suffix_max,addr_suffix_nulls,postdir_specificity,postdir_switch,postdir_max,postdir_nulls,unit_desig_specificity,unit_desig_switch,unit_desig_max,unit_desig_nulls,sec_range_specificity,sec_range_switch,sec_range_max,sec_range_nulls,p_city_name_specificity,p_city_name_switch,p_city_name_max,p_city_name_nulls,v_city_name_specificity,v_city_name_switch,v_city_name_max,v_city_name_nulls,st_specificity,st_switch,st_max,st_nulls,zip_specificity,zip_switch,zip_max,zip_nulls,zip4_specificity,zip4_switch,zip4_max,zip4_nulls,fips_state_specificity,fips_state_switch,fips_state_max,fips_state_nulls,fips_county_specificity,fips_county_switch,fips_county_max,fips_county_nulls,address_specificity,address_switch,address_max,address_nulls}],Layout_Specificities.R) : PERSIST('~temp::Proxid::BIPV2_Best_Proxid::Specificities',EXPIRE(Config.PersistExpire));
+ 
+iSpecificities := DATASET([{0,company_name_specificity,company_name_switch,company_name_max,company_name_nulls,company_fein_specificity,company_fein_switch,company_fein_max,company_fein_nulls,company_phone_specificity,company_phone_switch,company_phone_max,company_phone_nulls,company_url_specificity,company_url_switch,company_url_max,company_url_nulls,duns_number_specificity,duns_number_switch,duns_number_max,duns_number_nulls,company_sic_code1_specificity,company_sic_code1_switch,company_sic_code1_max,company_sic_code1_nulls,company_naics_code1_specificity,company_naics_code1_switch,company_naics_code1_max,company_naics_code1_nulls,dba_name_specificity,dba_name_switch,dba_name_max,dba_name_nulls,prim_range_specificity,prim_range_switch,prim_range_max,prim_range_nulls,predir_specificity,predir_switch,predir_max,predir_nulls,prim_name_specificity,prim_name_switch,prim_name_max,prim_name_nulls,addr_suffix_specificity,addr_suffix_switch,addr_suffix_max,addr_suffix_nulls,postdir_specificity,postdir_switch,postdir_max,postdir_nulls,unit_desig_specificity,unit_desig_switch,unit_desig_max,unit_desig_nulls,sec_range_specificity,sec_range_switch,sec_range_max,sec_range_nulls,p_city_name_specificity,p_city_name_switch,p_city_name_max,p_city_name_nulls,v_city_name_specificity,v_city_name_switch,v_city_name_max,v_city_name_nulls,st_specificity,st_switch,st_max,st_nulls,zip_specificity,zip_switch,zip_max,zip_nulls,zip4_specificity,zip4_switch,zip4_max,zip4_nulls,fips_state_specificity,fips_state_switch,fips_state_max,fips_state_nulls,fips_county_specificity,fips_county_switch,fips_county_max,fips_county_nulls,address_specificity,address_switch,address_max,address_nulls}],Layout_Specificities.R) : PERSIST('~temp::Proxid::BIPV2_Best_Proxid::Specificities',EXPIRE(Config.PersistExpire));
 EXPORT Specificities := iSpecificities;
 // Let us see how accurate the SPC file is:-
 SpcShiftR := RECORD
@@ -452,6 +499,8 @@ SpcShiftR := RECORD
   integer2 company_sic_code1_switch_shift0 := ROUND(1000*Specificities[1].company_sic_code1_switch - 324);
   integer1 company_naics_code1_shift0 := ROUND(Specificities[1].company_naics_code1_specificity - 11);
   integer2 company_naics_code1_switch_shift0 := ROUND(1000*Specificities[1].company_naics_code1_switch - 132);
+  integer1 dba_name_shift0 := ROUND(Specificities[1].dba_name_specificity - 26);
+  integer2 dba_name_switch_shift0 := ROUND(1000*Specificities[1].dba_name_switch - 373);
   integer1 prim_range_shift0 := ROUND(Specificities[1].prim_range_specificity - 13);
   integer2 prim_range_switch_shift0 := ROUND(1000*Specificities[1].prim_range_switch - 0);
   integer1 predir_shift0 := ROUND(Specificities[1].predir_specificity - 5);
@@ -483,6 +532,7 @@ SpcShiftR := RECORD
   integer1 address_shift0 := ROUND(Specificities[1].address_specificity - 25);
   integer2 address_switch_shift0 := ROUND(1000*Specificities[1].address_switch - 113);
   END;
+ 
 EXPORT SpcShift := TABLE(Specificities,SpcShiftR);
 // Service functions for specificity profiling
   SALT30.MAC_Specificity_Values(company_name_values_persisted,company_name,'company_name',company_name_specificity,company_name_specificity_profile);
@@ -492,6 +542,7 @@ EXPORT SpcShift := TABLE(Specificities,SpcShiftR);
   SALT30.MAC_Specificity_Values(duns_number_values_persisted,duns_number,'duns_number',duns_number_specificity,duns_number_specificity_profile);
   SALT30.MAC_Specificity_Values(company_sic_code1_values_persisted,company_sic_code1,'company_sic_code1',company_sic_code1_specificity,company_sic_code1_specificity_profile);
   SALT30.MAC_Specificity_Values(company_naics_code1_values_persisted,company_naics_code1,'company_naics_code1',company_naics_code1_specificity,company_naics_code1_specificity_profile);
+  SALT30.MAC_Specificity_Values(dba_name_values_persisted,dba_name,'dba_name',dba_name_specificity,dba_name_specificity_profile);
   SALT30.MAC_Specificity_Values(prim_range_values_persisted,prim_range,'prim_range',prim_range_specificity,prim_range_specificity_profile);
   SALT30.MAC_Specificity_Values(predir_values_persisted,predir,'predir',predir_specificity,predir_specificity_profile);
   SALT30.MAC_Specificity_Values(prim_name_values_persisted,prim_name,'prim_name',prim_name_specificity,prim_name_specificity_profile);
@@ -506,5 +557,6 @@ EXPORT SpcShift := TABLE(Specificities,SpcShiftR);
   SALT30.MAC_Specificity_Values(zip4_values_persisted,zip4,'zip4',zip4_specificity,zip4_specificity_profile);
   SALT30.MAC_Specificity_Values(fips_state_values_persisted,fips_state,'fips_state',fips_state_specificity,fips_state_specificity_profile);
   SALT30.MAC_Specificity_Values(fips_county_values_persisted,fips_county,'fips_county',fips_county_specificity,fips_county_specificity_profile);
-EXPORT AllProfiles := company_name_specificity_profile + company_fein_specificity_profile + company_phone_specificity_profile + company_url_specificity_profile + duns_number_specificity_profile + company_sic_code1_specificity_profile + company_naics_code1_specificity_profile + prim_range_specificity_profile + predir_specificity_profile + prim_name_specificity_profile + addr_suffix_specificity_profile + postdir_specificity_profile + unit_desig_specificity_profile + sec_range_specificity_profile + p_city_name_specificity_profile + v_city_name_specificity_profile + st_specificity_profile + zip_specificity_profile + zip4_specificity_profile + fips_state_specificity_profile + fips_county_specificity_profile;
+EXPORT AllProfiles := company_name_specificity_profile + company_fein_specificity_profile + company_phone_specificity_profile + company_url_specificity_profile + duns_number_specificity_profile + company_sic_code1_specificity_profile + company_naics_code1_specificity_profile + dba_name_specificity_profile + prim_range_specificity_profile + predir_specificity_profile + prim_name_specificity_profile + addr_suffix_specificity_profile + postdir_specificity_profile + unit_desig_specificity_profile + sec_range_specificity_profile + p_city_name_specificity_profile + v_city_name_specificity_profile + st_specificity_profile + zip_specificity_profile + zip4_specificity_profile + fips_state_specificity_profile + fips_county_specificity_profile;
 END;
+ 
