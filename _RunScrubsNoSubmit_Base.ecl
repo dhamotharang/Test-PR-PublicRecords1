@@ -5,7 +5,7 @@
 /* Folder Name = Scrubs_<Dataset>                      */
 /* In File Name = In_<Dataset>                         */
 /*******************************************************/
-datasetName := 'Base';
+datasetName := 'CollegeLocator';
 filedate    := '20190220';                             
 scopename   := ' ';                 
 

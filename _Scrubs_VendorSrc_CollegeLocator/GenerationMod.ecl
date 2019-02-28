@@ -25,7 +25,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
   EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,lnfilecategory,lnsourcetcode,vendorname,address1,address2,city,state,zipcode,phone';
   EXPORT spc_HAS_TWOSTEP := FALSE;
   EXPORT spc_HAS_PARTITION := FALSE;
-  EXPORT spc_HAS_FIELDTYPES := FALSE;
+  EXPORT spc_HAS_FIELDTYPES := TRUE;
   EXPORT spc_HAS_INCREMENTAL := FALSE;
   EXPORT spc_HAS_ASOF := FALSE;
   EXPORT spc_HAS_NONCONTIGUOUS := FALSE;
@@ -41,6 +41,21 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     'OPTIONS:-gh\n'
     + 'MODULE:_Scrubs_VendorSrc_CollegeLocator\n'
     + 'FILENAME:CollegeLocator\n'
+    + '\n'
+    + '\n'
+    + 'FIELDTYPE:Invalid_lnfilecategory:ALLOW( ()470DILSTaefost)\n'
+    + 'FIELDTYPE:Invalid_lnsourcetcode:ALLOW(0123456789O)              \n'
+    + 'FIELDTYPE:Invalid_vendorname:ALLOW( &-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz )\n'
+    + 'FIELDTYPE:Invalid_address1:ALLOW( &;#\',-.0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz )\n'
+    + 'FIELDTYPE:Invalid_address2:ALLOW(LNU)\n'
+    + 'FIELDTYPE:Invalid_city:ALLOW( .\',-3ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz )\n'
+    + 'FIELDTYPE:Invalid_state:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZar )\n'
+    + 'FIELDTYPE:Invalid_numbers:ALLOW(0123456789)\n'
+    + '\n'
+    + '\n'
+    + '\n'
+    + '\n'
+    + '\n'
     + '// Uncomment up to NINES for internal or external adl\n'
     + '// IDFIELD:EXISTS:<NameOfIDField>\n'
     + '// RIDFIELD:<NameOfRidField>\n'
@@ -55,15 +70,15 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + '// Remember to generate specificities and update the 0,0 placeholders below before running any sort of linking.\n'
     + '// If the actual specificity for a field is <1, round it up to 1 rather than down to 0.  If your cluster is running\n'
     + '// a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience.\n'
-    + 'FIELD:lnfilecategory:TYPE(STRING):0,0\n'
-    + 'FIELD:lnsourcetcode:TYPE(STRING):0,0\n'
-    + 'FIELD:vendorname:TYPE(STRING):0,0\n'
-    + 'FIELD:address1:TYPE(STRING):0,0\n'
-    + 'FIELD:address2:TYPE(STRING):0,0\n'
-    + 'FIELD:city:TYPE(STRING):0,0\n'
-    + 'FIELD:state:TYPE(STRING):0,0\n'
-    + 'FIELD:zipcode:TYPE(STRING):0,0\n'
-    + 'FIELD:phone:TYPE(STRING):0,0\n'
+    + 'FIELD:lnfilecategory:LIKE(Invalid_lnfilecategory):TYPE(STRING):0,0\n'
+    + 'FIELD:lnsourcetcode:LIKE(Invalid_lnsourcetcode):TYPE(STRING):0,0\n'
+    + 'FIELD:vendorname:LIKE(Invalid_vendorname):TYPE(STRING):0,0\n'
+    + 'FIELD:address1:LIKE(Invalid_address1):TYPE(STRING):0,0\n'
+    + 'FIELD:address2:LIKE(Invalid_address2):TYPE(STRING):0,0\n'
+    + 'FIELD:city:LIKE(Invalid_city):TYPE(STRING):0,0\n'
+    + 'FIELD:state:LIKE(Invalid_state):TYPE(STRING):0,0\n'
+    + 'FIELD:zipcode:LIKE(Invalid_numbers):TYPE(STRING):0,0\n'
+    + 'FIELD:phone:LIKE(Invalid_numbers):TYPE(STRING):0,0\n'
     + '// CONCEPT statements should be used to group together interellated fields; such as address\n'
     + '// RELATIONSHIP is used to find non-obvious relationships between the clusters\n'
     + '// SOURCEFIELD is used if a field of the file denotes a source of the records in that file\n'

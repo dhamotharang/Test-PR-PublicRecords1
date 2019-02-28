@@ -126,7 +126,7 @@ END;
 TotalErrors := TABLE(Errors,ErrorRecordsTotals,FieldNum,ErrorNum,FEW);
 PrettyErrorTotals := RECORD
   FieldNme := Fields.FieldName(TotalErrors.FieldNum);
-  FieldType := CHOOSE(TotalErrors.FieldNum,'Unknown','Unknown','Unknown','Unknown','Unknown','Unknown','Unknown','Unknown','Unknown');
+  FieldType := CHOOSE(TotalErrors.FieldNum,'Invalid_lnfilecategory','Invalid_lnsourcetcode','Invalid_vendorname','Invalid_address1','Invalid_address2','Invalid_city','Invalid_state','Invalid_numbers','Invalid_numbers');
   ErrorMessage := CHOOSE(TotalErrors.FieldNum,Fields.InValidMessage_lnfilecategory(TotalErrors.ErrorNum),Fields.InValidMessage_lnsourcetcode(TotalErrors.ErrorNum),Fields.InValidMessage_vendorname(TotalErrors.ErrorNum),Fields.InValidMessage_address1(TotalErrors.ErrorNum),Fields.InValidMessage_address2(TotalErrors.ErrorNum),Fields.InValidMessage_city(TotalErrors.ErrorNum),Fields.InValidMessage_state(TotalErrors.ErrorNum),Fields.InValidMessage_zipcode(TotalErrors.ErrorNum),Fields.InValidMessage_phone(TotalErrors.ErrorNum));
   TotalErrors.Cnt;
 END;

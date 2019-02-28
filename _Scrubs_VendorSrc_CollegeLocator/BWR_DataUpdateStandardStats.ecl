@@ -11,5 +11,7 @@ dsNew := DATASET(mynewfile, _Scrubs_VendorSrc_CollegeLocator.Layout_CollegeLocat
 dsPrev := DATASET(myprevfile, _Scrubs_VendorSrc_CollegeLocator.Layout_CollegeLocator, THOR);
  
 hygieneStats := _Scrubs_VendorSrc_CollegeLocator.hygiene(dsNew).StandardStats();
-allStats := hygieneStats;
+scrubsStats := _Scrubs_VendorSrc_CollegeLocator.Scrubs.StandardStats(dsNew);
+deltaStats := IF(TRIM(myprevfile) > '' AND EXISTS(dsPrev), _Scrubs_VendorSrc_CollegeLocator.Delta(dsPrev, dsNew).StandardStats());
+allStats := hygieneStats & scrubsStats & deltaStats;
 OUTPUT(allStats,, mystatsfile);
