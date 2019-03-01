@@ -18,7 +18,6 @@ string1 address_flag := '';
 string1 duns_number_flag := '';
 string1 company_sic_code1_flag := '';
 string1 company_naics_code1_flag := '';
-string1 dba_name_flag := '';
 end;
 EXPORT linkids := RECORD
   unsigned6 proxid;
@@ -43,15 +42,6 @@ EXPORT company_name_case_layout := RECORD
     unsigned1 score := 0 ;
     DATASET(Source) Sources;
   END;
-EXPORT dba_name := RECORD
-   string120 dba_name;
-   unsigned2 dba_name_data_permits;
-   unsigned1 dba_name_method;
-  END;	
-EXPORT dba_name_case_layout := RECORD
-    dba_name;
-    unsigned1 score := 0 ;
-  END;	
 EXPORT company_address := RECORD
    string10 address_prim_range;
    string2 address_predir;
@@ -166,7 +156,6 @@ export base := RECORD
     DATASET(duns_number_case_layout) duns_number;
     DATASET(sic_code_case_layout) sic_code;
     DATASET(naics_code_case_layout) naics_code;
-		  DATASET(dba_name_case_layout) dba_name;
   END;
 EXPORT key := RECORD
     BIPV2.IDlayouts.l_xlink_ids;
@@ -182,7 +171,6 @@ EXPORT key := RECORD
     DATASET(duns_number_case_layout and not score) duns_number;
     DATASET(sic_code_case_layout and not score) sic_code;
     DATASET(naics_code_case_layout and not score) naics_code;
-		  DATASET(dba_name_case_layout and not score) dba_name;
 END;
 EXPORT key_static := RECORD
     BIPV2.IDlayouts.l_xlink_ids;
@@ -198,6 +186,5 @@ EXPORT key_static := RECORD
     DATASET(duns_number_case_layout and not score) duns_number;
     DATASET(sic_code_case_layout and not score) sic_code;
     DATASET(naics_code_case_layout and not score) naics_code;
-	  	//DATASET(dba_name_case_layout and not score) dba_name;
 END;
 END;
