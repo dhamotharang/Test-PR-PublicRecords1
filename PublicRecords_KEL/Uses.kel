@@ -746,7 +746,7 @@ USE PublicRecords_KEL.ECL_Functions.Dataset_FDC(FDC,
 			TMSID = TMSID,
 			Court_Code = Court_Code,
 			Case_Number = Case_Number,
-      DID = did,
+			DID = did,
 			DateFirstSeen = date_first_seen, // Contains information for ASOF
 			DateLastSeen = date_last_seen, // Contains information for ASOF
 			Subject = did,
@@ -755,7 +755,7 @@ USE PublicRecords_KEL.ECL_Functions.Dataset_FDC(FDC,
 			TMSID = TMSID,
 			CourtCode = Court_Code,
 			CaseNumber = Case_Number,
-      DID = did,
+			DID = did,
 			DateFirstSeen = date_first_seen, // Contains information for ASOF
 			DateLastSeen = date_last_seen, // Contains information for ASOF
 			OriginalCaseNumber = orig_case_number,
@@ -860,7 +860,7 @@ USE PublicRecords_KEL.ECL_Functions.Dataset_FDC(FDC,
 			TMSID = TMSID,
 			Court_Code = Court_Code,
 			Case_Number = Case_Number,
-      DID = did,
+			DID = did,
 			DateFirstSeen = date_first_seen, // Contains information for ASOF
 			DateLastSeen = date_last_seen, // Contains information for ASOF
 			Subject = did,
@@ -869,7 +869,7 @@ USE PublicRecords_KEL.ECL_Functions.Dataset_FDC(FDC,
 			TMSID = TMSID,
 			CourtCode = Court_Code,
 			CaseNumber = Case_Number,
-      DID = did,
+			DID = did,
 			DateFirstSeen = date_first_seen, // Contains information for ASOF
 			DateLastSeen = date_last_seen, // Contains information for ASOF
 			OriginalCaseNumber = orig_case_number,
@@ -1012,5 +1012,4 @@ USE PublicRecords_KEL.ECL_Functions.Dataset_FDC(FDC,
     ProfessionalLicensePerson,
     PersonVehicle,
 		Employment
-    );
-    
+    );    
