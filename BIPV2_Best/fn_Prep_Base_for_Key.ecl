@@ -1,4 +1,4 @@
-﻿import BIPV2;
+import BIPV2;
 EXPORT fn_Prep_Base_for_Key 
 			(string pversion
 			 ,dataset(BIPV2_Best.Layouts.Base) pBestBase         = BIPV2_Best.Files(pversion).base.built
