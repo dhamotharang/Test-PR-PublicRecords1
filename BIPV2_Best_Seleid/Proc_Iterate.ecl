@@ -1,4 +1,4 @@
-﻿//Executable code
+//Executable code
 EXPORT Proc_Iterate(STRING iter,DATASET(Layout_Base) InFile0 = BIPV2_Best_Seleid.In_Base,STRING OutFileNameP = '~temp::Seleid::BIPV2_Best_Seleid::it',UNSIGNED MatchThreshold = Config.MatchThreshold,BOOLEAN Debugging = true) := MODULE
 SHARED InFile := InFile0;
 SHARED MM := BIPV2_Best_Seleid.matches(InFile,MatchThreshold); // Get the matching module
