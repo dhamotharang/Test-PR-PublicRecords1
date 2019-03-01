@@ -135,7 +135,6 @@ export STR_Functions := MODULE
 	  populate_deceasedFlag:= ~in_mod.ReturnDeceased;
 		
 		// TODO: revisit str_config
-		// using global mod below because Interfaces.str_config does not inherit permissions. 
 		deathparams := DeathV2_Services.IParam.GetRestrictions(mod_access);
 		
 		ds_best_recs_with_deceased_flag := 

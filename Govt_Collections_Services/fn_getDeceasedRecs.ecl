@@ -25,7 +25,8 @@ EXPORT fn_getDeceasedRecs(dataset(Govt_Collections_Services.Layouts.batch_workin
 		data_in := PROJECT(ds_batch_in, Govt_Collections_Services.Transforms.xfm_to_batchIn(LEFT) );
 		deathIn := PROJECT(data_in, DeathV2_Services.Layouts.BatchIn);
 		mod_batch := BatchShare.IParam.GetFromLegacy(in_mod);
-		deathInMod := MODULE(project(mod_batch, DeathV2_Services.IParam.BatchParams, opt))							
+		deathInMod := MODULE(project(mod_batch, DeathV2_Services.IParam.BatchParams, opt))
+			EXPORT unsigned3 DidScoreThreshold        := in_mod.DidScoreThreshold; 
 
 			EXPORT BOOLEAN AddSupplemental 						:= TRUE;
 			EXPORT BOOLEAN PartialNameMatchCodes			:= TRUE;
