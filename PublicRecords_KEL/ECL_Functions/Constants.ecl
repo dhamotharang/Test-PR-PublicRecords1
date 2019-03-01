@@ -1,9 +1,9 @@
 ﻿IMPORT Business_Risk_BIP, MDR;
 
 /*
--99: No LexID or input needed is not populated
--98: No data returned from search
--97: Records available but unable to calculate due to missing values or missing associated/child data
+-99999: No LexID or input needed is not populated
+-99998: No data returned from search
+-99997: Records available but unable to calculate due to missing values or missing associated/child data
 */
 EXPORT Constants := MODULE
   EXPORT STRING MISSING_INPUT_DATA := '-99999';

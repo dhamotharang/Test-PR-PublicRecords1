@@ -46,7 +46,7 @@ EXPORT MAS_FCRA_Service() := MACRO
 			DataPermissionMask, 
 			GLBA, 
 			DPPA, 
-			FALSE, /* IsFCRA */ 
+			TRUE, /* IsFCRA */
 			Is_Marketing, 
 			'' /* Allowed_Sources */ = Business_Risk_BIP.Constants.AllowDNBDMI, 
 			PublicRecords_KEL.CFG_Compile);

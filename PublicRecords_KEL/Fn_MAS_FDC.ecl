@@ -222,7 +222,7 @@ EXPORT Fn_MAS_FDC(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII
 				LIMIT(PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_JOIN_LIMIT)),
 			DATASET([], Layouts_FDC.Layout_BankruptcyV3__key_bankruptcyv3_search));
 
-	// Left Outer join to the Bankruptcy Withdrawn key and keep all its columns; and set FCRAWithdrawn.
+	// Left Only join to the Bankruptcy Withdrawn key to remove all Withdrawn records.
 	Bankruptcy_Files__Key_Search_Records := IF( Common.DoFDCJoin_Bankruptcy_Files__Bankruptcy__Key_Search,
 		JOIN(Bankruptcy_Files__Key_Search_Records_pre, BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus(,,Options.IsFCRA),
 				KEYED(LEFT.TmsID = RIGHT.TmsID),
