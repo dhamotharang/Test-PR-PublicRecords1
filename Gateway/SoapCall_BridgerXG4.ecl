@@ -5,7 +5,7 @@ import iesp;
 
 EXPORT SoapCall_BridgerXG4 (DATASET(iesp.gateway_bridgerxg5.t_SearchCoreRequest) searchReq, 
 												 Gateway.Layouts.Config gateway_cfg,
-												 integer waittime = Constants.Defaults.WAIT_TIMEOUT_EXPERIAN,   // 0 is wait forever, default if ommitted is 300 (s)
+												 integer waittime = Constants.Defaults.DEFAULT_TIMEOUT,   // 0 is wait forever, default if ommitted is 300 (s)
 												 integer retries	= Constants.Defaults.RETRIES) := FUNCTION     // 0 DEFAULT
 
 /*

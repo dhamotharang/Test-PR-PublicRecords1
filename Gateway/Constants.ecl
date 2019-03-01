@@ -4,10 +4,11 @@ export Constants := module
 	export void_gateway := dataset([], Gateway.layouts.config);
 
 	export Defaults := module
+		export integer DEFAULT_TIMEOUT 				:= 20; // Default timeout
 		export integer WAIT_TIMEOUT 					:= 300; // 0 is wait forever, default if ommitted is 300 (s)
 		export integer RETRIES 								:= 0;			// 0 is no retry, default if ommitted is (3)
 		export integer WAIT_TIMEOUT_POLK 			:= 20;
-		export integer WAIT_TIMEOUT_EXPERIAN 	:= 20;
+		export integer WAIT_TIMEOUT_EXPERIAN 	:= 5;
 		export integer STATUS_SUCCESS 	      := 0;
 	end;
 

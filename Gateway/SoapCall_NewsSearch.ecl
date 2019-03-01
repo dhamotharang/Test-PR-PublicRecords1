@@ -6,7 +6,7 @@ import iesp;
 
 EXPORT SoapCall_NewsSearch (DATASET(iesp.gateway_news.t_NewsSearchRequest) searchReq, 
 												 Layouts.Config gateway_cfg,
-												 integer waittime = Constants.Defaults.WAIT_TIMEOUT_EXPERIAN, 
+												 integer waittime = Constants.Defaults.DEFAULT_TIMEOUT, 
 												 integer retries	= Constants.Defaults.RETRIES) := FUNCTION
 
 
