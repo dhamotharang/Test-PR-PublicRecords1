@@ -23,6 +23,7 @@
      
   endmacro;
 
+  // this function is used for EmailV2 data. It is not same as Royalty/MAC_RoyaltyEmail which relies on V1 rolled email data and eventually be deprecated
   export GetRoyaltySet(dRecsIn, pSrcField='email_src', isFCRA = false) := functionmacro
 
     _royalty_set   := Royalty.Constants.EMAIL_ROYALTY_SET(isFCRA);
