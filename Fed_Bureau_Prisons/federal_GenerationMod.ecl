@@ -22,7 +22,7 @@ EXPORT federal_GenerationMod := MODULE(SALT311.iGenerationMod)
   EXPORT spc_FILENAME := 'federal_bureau_base';
   EXPORT spc_INGESTSTATUS := '';
   EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:rcid';
-  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,persistent_record_id,offender_key,src,process_date,date_first_seen,date_last_seen,date_vendor_first_reported,date_vendor_last_reported,record_upload_date,category,source,orig_name,orig_lastname,orig_firstname,orig_middlename,orig_suffix,dob,sex,race,age,registery_number,defendant_status,offense_description,disposition,scheduled_release_date,nametype,nid,title,fname,mname,lname,suffix,name_ind';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,persistent_record_id,offender_key,src,process_date,date_first_seen,date_last_seen,date_vendor_first_reported,date_vendor_last_reported,record_upload_date,category,source,orig_name,orig_lastname,orig_firstname,orig_middlename,orig_suffix,dob,sex,race,age,registery_number,defendant_status,offense_description,disposition,scheduled_release_date,nametype,nid,title,fname,mname,lname,suffix,name_ind,global_sid,record_sid';
   EXPORT spc_HAS_TWOSTEP := FALSE;
   EXPORT spc_HAS_PARTITION := FALSE;
   EXPORT spc_HAS_FIELDTYPES := FALSE;
@@ -81,6 +81,8 @@ EXPORT federal_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:lname:DERIVED:TYPE(STRING50):0,0\n'
     + 'FIELD:suffix:DERIVED:TYPE(STRING50):0,0\n'
     + 'FIELD:name_ind:DERIVED:TYPE(UNSIGNED2):0,0\n'
+    + 'FIELD:global_sid:DERIVED:TYPE(unsigned4):0,0\n'
+    + 'FIELD:record_sid:DERIVED:TYPE(unsigned8):0,0\n'
     + '\n'
     + '//'
     ;

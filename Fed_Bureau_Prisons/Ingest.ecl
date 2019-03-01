@@ -63,6 +63,8 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
     SELF.lname := ri.lname; // Derived(NEW)
     SELF.suffix := ri.suffix; // Derived(NEW)
     SELF.name_ind := ri.name_ind; // Derived(NEW)
+    SELF.global_sid := ri.global_sid; // Derived(NEW)
+    SELF.record_sid := ri.record_sid; // Derived(NEW)
     __Tpe0 := MAP (
       le.__Tpe = 0 => ri.__Tpe,
       le.__Tpe = RecordType.Updated OR ri.__Tpe = 0 OR ri.__Tpe = le.__Tpe => le.__Tpe,

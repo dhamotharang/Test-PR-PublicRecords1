@@ -37,6 +37,8 @@ EXPORT layout_federal_bureau_base := record
   unsigned2 name_ind;
 	unsigned1 rec_type;
 	string1		history_flag:='';
+	unsigned4 global_sid;
+  unsigned8 record_sid; 
 end;
 
   
