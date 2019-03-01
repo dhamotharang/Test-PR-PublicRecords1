@@ -1,4 +1,4 @@
-﻿/*--SOAP--
+/*--SOAP--
 <message name="SeleidCompareService">
 <part name="SeleidOne" type="xsd:string"/>
 <part name="SeleidTwo" type="xsd:string"/>
@@ -30,4 +30,3 @@ OUTPUT( SORT(mtch,-Conf),NAMED('RecordMatches'));
 OUTPUT( odl,NAMED('SeleidOneRecords'));
 OUTPUT( odr,NAMED('SeleidTwoRecords'));
 ENDMACRO;
- 

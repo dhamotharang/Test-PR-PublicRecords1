@@ -1,4 +1,4 @@
-﻿/*--SOAP--
+/*--SOAP--
 <message name="ProxidCompareService">
 <part name="ProxidOne" type="xsd:string"/>
 <part name="ProxidTwo" type="xsd:string"/>
@@ -30,4 +30,3 @@ OUTPUT( SORT(mtch,-Conf),NAMED('RecordMatches'));
 OUTPUT( odl,NAMED('ProxidOneRecords'));
 OUTPUT( odr,NAMED('ProxidTwoRecords'));
 ENDMACRO;
- 

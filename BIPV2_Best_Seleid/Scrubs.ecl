@@ -1,13 +1,11 @@
-﻿IMPORT ut,SALT30;
+IMPORT ut,SALT30;
 EXPORT Scrubs := MODULE
- 
 // The module to handle the case where no scrubs exist
   EXPORT  Expanded_Layout := RECORD(Layout_Base)
     UNSIGNED1 company_name_Invalid;
     UNSIGNED1 company_fein_Invalid;
     UNSIGNED1 company_phone_Invalid;
     UNSIGNED1 duns_number_Invalid;
-    UNSIGNED1 dba_name_Invalid;
     UNSIGNED1 st_Invalid;
     UNSIGNED1 zip_Invalid;
     UNSIGNED1 zip4_Invalid;
@@ -23,7 +21,6 @@ EXPORT FromNone(DATASET(Layout_Base) h) := MODULE
     SELF.company_fein_Invalid := Fields.InValid_company_fein((SALT30.StrType)le.company_fein);
     SELF.company_phone_Invalid := Fields.InValid_company_phone((SALT30.StrType)le.company_phone);
     SELF.duns_number_Invalid := Fields.InValid_duns_number((SALT30.StrType)le.duns_number);
-    SELF.dba_name_Invalid := Fields.InValid_dba_name((SALT30.StrType)le.dba_name);
     SELF.st_Invalid := Fields.InValid_st((SALT30.StrType)le.st);
     SELF.zip_Invalid := Fields.InValid_zip((SALT30.StrType)le.zip);
     SELF.zip4_Invalid := Fields.InValid_zip4((SALT30.StrType)le.zip4);
@@ -33,7 +30,7 @@ EXPORT FromNone(DATASET(Layout_Base) h) := MODULE
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
-    SELF.ScrubsBits1 := ( le.company_name_Invalid << 0 ) + ( le.company_fein_Invalid << 1 ) + ( le.company_phone_Invalid << 2 ) + ( le.duns_number_Invalid << 3 ) + ( le.dba_name_Invalid << 4 ) + ( le.st_Invalid << 5 ) + ( le.zip_Invalid << 7 ) + ( le.zip4_Invalid << 8 ) + ( le.fips_state_Invalid << 9 ) + ( le.fips_county_Invalid << 10 );
+    SELF.ScrubsBits1 := ( le.company_name_Invalid << 0 ) + ( le.company_fein_Invalid << 1 ) + ( le.company_phone_Invalid << 2 ) + ( le.duns_number_Invalid << 3 ) + ( le.st_Invalid << 4 ) + ( le.zip_Invalid << 6 ) + ( le.zip4_Invalid << 7 ) + ( le.fips_state_Invalid << 8 ) + ( le.fips_county_Invalid << 9 );
     SELF := le;
   END;
   EXPORT BitmapInfile := PROJECT(ExpandedInfile,Into(LEFT));
@@ -46,17 +43,16 @@ EXPORT FromBits(DATASET(Bitmap_Layout) h) := MODULE
     SELF.company_fein_Invalid := (le.ScrubsBits1 >> 1) & 1;
     SELF.company_phone_Invalid := (le.ScrubsBits1 >> 2) & 1;
     SELF.duns_number_Invalid := (le.ScrubsBits1 >> 3) & 1;
-    SELF.dba_name_Invalid := (le.ScrubsBits1 >> 4) & 1;
-    SELF.st_Invalid := (le.ScrubsBits1 >> 5) & 3;
-    SELF.zip_Invalid := (le.ScrubsBits1 >> 7) & 1;
-    SELF.zip4_Invalid := (le.ScrubsBits1 >> 8) & 1;
-    SELF.fips_state_Invalid := (le.ScrubsBits1 >> 9) & 1;
-    SELF.fips_county_Invalid := (le.ScrubsBits1 >> 10) & 1;
+    SELF.st_Invalid := (le.ScrubsBits1 >> 4) & 3;
+    SELF.zip_Invalid := (le.ScrubsBits1 >> 6) & 1;
+    SELF.zip4_Invalid := (le.ScrubsBits1 >> 7) & 1;
+    SELF.fips_state_Invalid := (le.ScrubsBits1 >> 8) & 1;
+    SELF.fips_county_Invalid := (le.ScrubsBits1 >> 9) & 1;
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
     FromNew := FromNone(InFile).ExpandedInfile;
-  EXPORT Changed := JOIN(ExpandedInfile,FromNew, LEFT.rcid=RIGHT.rcid AND (LEFT.company_name_Invalid <> RIGHT.company_name_Invalid OR LEFT.company_fein_Invalid <> RIGHT.company_fein_Invalid OR LEFT.company_phone_Invalid <> RIGHT.company_phone_Invalid OR LEFT.duns_number_Invalid <> RIGHT.duns_number_Invalid OR LEFT.dba_name_Invalid <> RIGHT.dba_name_Invalid OR LEFT.st_Invalid <> RIGHT.st_Invalid OR LEFT.zip_Invalid <> RIGHT.zip_Invalid OR LEFT.zip4_Invalid <> RIGHT.zip4_Invalid OR LEFT.fips_state_Invalid <> RIGHT.fips_state_Invalid OR LEFT.fips_county_Invalid <> RIGHT.fips_county_Invalid),TRANSFORM(RIGHT));
+  EXPORT Changed := JOIN(ExpandedInfile,FromNew, LEFT.rcid=RIGHT.rcid AND (LEFT.company_name_Invalid <> RIGHT.company_name_Invalid OR LEFT.company_fein_Invalid <> RIGHT.company_fein_Invalid OR LEFT.company_phone_Invalid <> RIGHT.company_phone_Invalid OR LEFT.duns_number_Invalid <> RIGHT.duns_number_Invalid OR LEFT.st_Invalid <> RIGHT.st_Invalid OR LEFT.zip_Invalid <> RIGHT.zip_Invalid OR LEFT.zip4_Invalid <> RIGHT.zip4_Invalid OR LEFT.fips_state_Invalid <> RIGHT.fips_state_Invalid OR LEFT.fips_county_Invalid <> RIGHT.fips_county_Invalid),TRANSFORM(RIGHT));
 END;
 // This can be thought of as the 'reporting module' - if you don't have an expanded; the other two modules create them ...
 EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
@@ -67,7 +63,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     company_fein_ALLOW_ErrorCount := COUNT(GROUP,h.company_fein_Invalid=1);
     company_phone_ALLOW_ErrorCount := COUNT(GROUP,h.company_phone_Invalid=1);
     duns_number_ALLOW_ErrorCount := COUNT(GROUP,h.duns_number_Invalid=1);
-    dba_name_CAPS_ErrorCount := COUNT(GROUP,h.dba_name_Invalid=1);
     st_CAPS_ErrorCount := COUNT(GROUP,h.st_Invalid=1);
     st_ALLOW_ErrorCount := COUNT(GROUP,h.st_Invalid=2);
     st_Total_ErrorCount := COUNT(GROUP,h.st_Invalid>0);
@@ -87,24 +82,23 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  le.source_for_votes;
-    UNSIGNED1 ErrNum := CHOOSE(c,le.company_name_Invalid,le.company_fein_Invalid,le.company_phone_Invalid,le.duns_number_Invalid,le.dba_name_Invalid,le.st_Invalid,le.zip_Invalid,le.zip4_Invalid,le.fips_state_Invalid,le.fips_county_Invalid,100);
-    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Fields.InvalidMessage_company_name(le.company_name_Invalid),Fields.InvalidMessage_company_fein(le.company_fein_Invalid),Fields.InvalidMessage_company_phone(le.company_phone_Invalid),Fields.InvalidMessage_duns_number(le.duns_number_Invalid),Fields.InvalidMessage_dba_name(le.dba_name_Invalid),Fields.InvalidMessage_st(le.st_Invalid),Fields.InvalidMessage_zip(le.zip_Invalid),Fields.InvalidMessage_zip4(le.zip4_Invalid),Fields.InvalidMessage_fips_state(le.fips_state_Invalid),Fields.InvalidMessage_fips_county(le.fips_county_Invalid),'UNKNOWN'));
+    UNSIGNED1 ErrNum := CHOOSE(c,le.company_name_Invalid,le.company_fein_Invalid,le.company_phone_Invalid,le.duns_number_Invalid,le.st_Invalid,le.zip_Invalid,le.zip4_Invalid,le.fips_state_Invalid,le.fips_county_Invalid,100);
+    SELF.ErrorMessage := IF ( ErrNum = 0, SKIP, CHOOSE(c,Fields.InvalidMessage_company_name(le.company_name_Invalid),Fields.InvalidMessage_company_fein(le.company_fein_Invalid),Fields.InvalidMessage_company_phone(le.company_phone_Invalid),Fields.InvalidMessage_duns_number(le.duns_number_Invalid),Fields.InvalidMessage_st(le.st_Invalid),Fields.InvalidMessage_zip(le.zip_Invalid),Fields.InvalidMessage_zip4(le.zip4_Invalid),Fields.InvalidMessage_fips_state(le.fips_state_Invalid),Fields.InvalidMessage_fips_county(le.fips_county_Invalid),'UNKNOWN'));
     SELF.ErrorType := IF ( ErrNum = 0, SKIP, CHOOSE(c
           ,CHOOSE(le.company_name_Invalid,'CAPS','UNKNOWN')
           ,CHOOSE(le.company_fein_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.company_phone_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.duns_number_Invalid,'ALLOW','UNKNOWN')
-          ,CHOOSE(le.dba_name_Invalid,'CAPS','UNKNOWN')
           ,CHOOSE(le.st_Invalid,'CAPS','ALLOW','UNKNOWN')
           ,CHOOSE(le.zip_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.zip4_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.fips_state_Invalid,'ALLOW','UNKNOWN')
           ,CHOOSE(le.fips_county_Invalid,'ALLOW','UNKNOWN'),'UNKNOWN'));
-    SELF.FieldName := CHOOSE(c,'company_name','company_fein','company_phone','duns_number','dba_name','st','zip','zip4','fips_state','fips_county','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'cname','number','number','number','cname','alpha','number','number','number','number','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT30.StrType)le.company_name,(SALT30.StrType)le.company_fein,(SALT30.StrType)le.company_phone,(SALT30.StrType)le.duns_number,(SALT30.StrType)le.dba_name,(SALT30.StrType)le.st,(SALT30.StrType)le.zip,(SALT30.StrType)le.zip4,(SALT30.StrType)le.fips_state,(SALT30.StrType)le.fips_county,'***SALTBUG***');
+    SELF.FieldName := CHOOSE(c,'company_name','company_fein','company_phone','duns_number','st','zip','zip4','fips_state','fips_county','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'cname','number','number','number','alpha','number','number','number','number','UNKNOWN');
+    SELF.FieldContents := CHOOSE(c,(SALT30.StrType)le.company_name,(SALT30.StrType)le.company_fein,(SALT30.StrType)le.company_phone,(SALT30.StrType)le.duns_number,(SALT30.StrType)le.st,(SALT30.StrType)le.zip,(SALT30.StrType)le.zip4,(SALT30.StrType)le.fips_state,(SALT30.StrType)le.fips_county,'***SALTBUG***');
   END;
-  EXPORT AllErrors := NORMALIZE(h,10,Into(LEFT,COUNTER));
+  EXPORT AllErrors := NORMALIZE(h,9,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
@@ -118,7 +112,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'company_fein:number:ALLOW'
           ,'company_phone:number:ALLOW'
           ,'duns_number:number:ALLOW'
-          ,'dba_name:cname:CAPS'
           ,'st:alpha:CAPS','st:alpha:ALLOW'
           ,'zip:number:ALLOW'
           ,'zip4:number:ALLOW'
@@ -130,7 +123,6 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.company_fein_ALLOW_ErrorCount
           ,le.company_phone_ALLOW_ErrorCount
           ,le.duns_number_ALLOW_ErrorCount
-          ,le.dba_name_CAPS_ErrorCount
           ,le.st_CAPS_ErrorCount,le.st_ALLOW_ErrorCount
           ,le.zip_ALLOW_ErrorCount
           ,le.zip4_ALLOW_ErrorCount
@@ -141,14 +133,13 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.company_fein_ALLOW_ErrorCount
           ,le.company_phone_ALLOW_ErrorCount
           ,le.duns_number_ALLOW_ErrorCount
-          ,le.dba_name_CAPS_ErrorCount
           ,le.st_CAPS_ErrorCount,le.st_ALLOW_ErrorCount
           ,le.zip_ALLOW_ErrorCount
           ,le.zip4_ALLOW_ErrorCount
           ,le.fips_state_ALLOW_ErrorCount
           ,le.fips_county_ALLOW_ErrorCount,0) / le.TotalCnt + 0.5;
     END;
-    SummaryInfo := NORMALIZE(SummaryStats,11,Into(LEFT,COUNTER));
+    SummaryInfo := NORMALIZE(SummaryStats,10,Into(LEFT,COUNTER));
     orb_r := RECORD
       AllErrors.Src;
       STRING RuleDesc := TRIM(AllErrors.FieldName)+':'+TRIM(AllErrors.FieldType)+':'+AllErrors.ErrorType;

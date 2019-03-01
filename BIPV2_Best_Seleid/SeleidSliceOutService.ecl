@@ -1,4 +1,4 @@
-﻿/*--SOAP--
+/*--SOAP--
 <message name="SeleidSliceOutService">
 <part name="BaseSeleid" type="xsd:string"/>
 <part name="Basercid" type="xsd:string"/>
@@ -37,4 +37,3 @@ output( odr,named('PreferredSeleidValues'));
 output( odl_noprop,named('SeleidValues_NoProp'));
 output( odr_noprop,named('PreferredSeleidValues_NoProp'));
 endmacro;
- 
