@@ -1,9 +1,8 @@
-﻿// Begin code to BEST data for each basis
+// Begin code to BEST data for each basis
 import SALT30,ut;
 EXPORT Best(DATASET(layout_Base) ih,layout_specificities.R s = Specificities(ih).specificities[1],BOOLEAN RoxieService=FALSE) := MODULE
   h00 := BasicMatch(ih).input_file;
 SHARED h := IF(RoxieService,Specificities(ih).input_file_np,h00);
- 
 //Create those fields with BestType: BestCompanyNameLegal
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestCompanyNameLegal_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,company_name,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,company_name,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -27,7 +26,6 @@ EXPORT BestCompanyNameLegal_vote_company_name := ROLLUP( SORT(Voted,EXCEPT Row_C
   srt := SORT( grp,-Row_Cnt);
   cmn := GROUP( DEDUP( srt, true ) ); // Find the commonest value for a given basis
 EXPORT BestCompanyNameLegal_method_company_name := cmn;
- 
 //Create those fields with BestType: BestCompanyNameCommon
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestCompanyNameCommon_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,company_name,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,company_name,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -43,7 +41,6 @@ EXPORT BestCompanyNameCommon_tab_company_name := ROLLUP( SORT(Slim,EXCEPT Row_Cn
   srt := SORT( grp,-Row_Cnt);
   cmn := GROUP( DEDUP( srt, true ) ); // Find the commonest value for a given basis
 EXPORT BestCompanyNameCommon_method_company_name := cmn(Row_Cnt >= 2);
- 
 //Create those fields with BestType: BestCompanyNameCurrent
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestCompanyNameCurrent_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,company_name,UNSIGNED Early_Date := MIN(GROUP,IF(dt_last_seen=0,99999999,dt_last_seen)),UNSIGNED Late_Date := MAX(GROUP,dt_last_seen),UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,company_name,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -58,7 +55,6 @@ EXPORT BestCompanyNameCurrent_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,so
 EXPORT BestCompanyNameCurrent_tab_company_name := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,source_for_votes,data_permits,Early_Date,Late_Date,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,source_for_votes,data_permits,Early_Date,Late_Date,LOCAL);
 //Now actually find the best value enforcing minimum
 EXPORT BestCompanyNameCurrent_method_company_name := DEDUP( SORT( BestCompanyNameCurrent_tab_company_name(Late_Date>0,Early_Date<99999999),Proxid,-Late_Date,-Early_Date,LOCAL)(Row_Cnt >= 2),Proxid,LOCAL);
- 
 //Create those fields with BestType: BestCompanyNameVoted
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestCompanyNameVoted_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,company_name,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,company_name,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -82,7 +78,6 @@ EXPORT BestCompanyNameVoted_vote_company_name := ROLLUP( SORT(Voted,EXCEPT Row_C
   srt := SORT( grp,-Row_Cnt);
   SALT30.MAC_Apply_Threshold(srt,200,o);
 EXPORT BestCompanyNameVoted_method_company_name := o;
- 
 //Create those fields with BestType: BestCompanyNameLength
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestCompanyNameLength_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,company_name,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,company_name,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -95,7 +90,6 @@ EXPORT BestCompanyNameLength_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,sou
 EXPORT BestCompanyNameLength_tab_company_name := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,source_for_votes,data_permits,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,source_for_votes,data_permits,LOCAL);
 //Now actually find the best value
 EXPORT BestCompanyNameLength_method_company_name := DEDUP( SORT( BestCompanyNameLength_tab_company_name,Proxid,-LENGTH(TRIM((SALT30.StrType)company_name)),-Row_Cnt,LOCAL),Proxid,LOCAL);
- 
 //Create those fields with BestType: BestCompanyNameStrong
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestCompanyNameStrong_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,company_name,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,company_name,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -113,7 +107,6 @@ EXPORT BestCompanyNameStrong_tab_company_name := ROLLUP( SORT(Slim,EXCEPT Row_Cn
 // A best solution is unique if its Row_Cnt is the same as the sum of the row_cnts.
   Totals := TABLE(GROUP(grp),{Proxid,Tot := SUM(GROUP,Row_Cnt)},Proxid);
 export BestCompanyNameStrong_method_company_name := JOIN( cmn,Totals,left.Proxid = right.Proxid AND LEFT.Row_Cnt = RIGHT.Tot,TRANSFORM(LEFT),LOCAL);
- 
 //Create those fields with BestType: BestCompanyNameCurrent2
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestCompanyNameCurrent2_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,company_name,UNSIGNED Early_Date := MIN(GROUP,IF(dt_last_seen=0,99999999,dt_last_seen)),UNSIGNED Late_Date := MAX(GROUP,dt_last_seen),UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,company_name,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -128,7 +121,6 @@ EXPORT BestCompanyNameCurrent2_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,s
 EXPORT BestCompanyNameCurrent2_tab_company_name := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,source_for_votes,data_permits,Early_Date,Late_Date,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,source_for_votes,data_permits,Early_Date,Late_Date,LOCAL);
 //Now actually find the best value
 EXPORT BestCompanyNameCurrent2_method_company_name := DEDUP( SORT( BestCompanyNameCurrent2_tab_company_name(Late_Date>0,Early_Date<99999999),Proxid,-Late_Date,-Early_Date,LOCAL),Proxid,LOCAL);
- 
 //Create those fields with BestType: BestCompanyNameVotedUnrestricted
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestCompanyNameVotedUnrestricted_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,company_name,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,company_name,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -152,7 +144,6 @@ EXPORT BestCompanyNameVotedUnrestricted_vote_company_name := ROLLUP( SORT(Voted,
   srt := SORT( grp,-Row_Cnt);
   SALT30.MAC_Apply_Threshold(srt,200,o);
 EXPORT BestCompanyNameVotedUnrestricted_method_company_name := o;
- 
 //Create those fields with BestType: BestCompanyAddressVoted
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestCompanyAddressVoted_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,st,zip,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,st,zip,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -176,7 +167,6 @@ EXPORT BestCompanyAddressVoted_vote_address := ROLLUP( SORT(Voted,EXCEPT Row_Cnt
   srt := SORT( grp,-Row_Cnt);
   SALT30.MAC_Apply_Threshold(srt,200,o);
 EXPORT BestCompanyAddressVoted_method_address := o;
- 
 //Create those fields with BestType: BestCompanyAddressCurrent
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestCompanyAddressCurrent_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,st,zip,UNSIGNED Early_Date := MIN(GROUP,IF(dt_last_seen=0,99999999,dt_last_seen)),UNSIGNED Late_Date := MAX(GROUP,dt_last_seen),UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,st,zip,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -189,7 +179,7 @@ EXPORT BestCompanyAddressCurrent_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid
     SELF := le;
   END;
 EXPORT BestCompanyAddressCurrent_tab_address := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,source_for_votes,data_permits,Early_Date,Late_Date,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,source_for_votes,data_permits,Early_Date,Late_Date,LOCAL);
-// Adjust scores for address using defined fuzzy logic 
+// Adjust scores for address using defined fuzzy logic
 Fuzzy_layout := RECORD
   BestCompanyAddressCurrent_tab_address.Proxid;
   BestCompanyAddressCurrent_tab_address.prim_range;
@@ -223,7 +213,6 @@ Supports := JOIN(BestCompanyAddressCurrent_tab_address,BestCompanyAddressCurrent
 EXPORT BestCompanyAddressCurrent_fuzz_address := ROLLUP( SORT(Supports,EXCEPT Row_Cnt,data_permits,Early_Date,Late_Date,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,data_permits,Early_Date,Late_Date,LOCAL);
 //Now actually find the best value enforcing minimum
 EXPORT BestCompanyAddressCurrent_method_address := DEDUP( SORT( BestCompanyAddressCurrent_fuzz_address(Late_Date>0,Early_Date<99999999),Proxid,-Late_Date,-Early_Date,LOCAL)(Row_Cnt >= 2),Proxid,LOCAL);
- 
 //Create those fields with BestType: BestCompanyAddressVotedSrc
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestCompanyAddressVotedSrc_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,st,zip,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,st,zip,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -247,7 +236,6 @@ EXPORT BestCompanyAddressVotedSrc_vote_address := ROLLUP( SORT(Voted,EXCEPT Row_
   srt := SORT( grp,-Row_Cnt);
   SALT30.MAC_Apply_Threshold(srt,200,o);
 EXPORT BestCompanyAddressVotedSrc_method_address := o;
- 
 //Create those fields with BestType: BestCompanyAddressCommon
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestCompanyAddressCommon_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,st,zip,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,st,zip,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -258,7 +246,7 @@ EXPORT BestCompanyAddressCommon_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,
     SELF := le;
   END;
 EXPORT BestCompanyAddressCommon_tab_address := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,source_for_votes,data_permits,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,source_for_votes,data_permits,LOCAL);
-// Adjust scores for address using defined fuzzy logic 
+// Adjust scores for address using defined fuzzy logic
 Fuzzy_layout := RECORD
   BestCompanyAddressCommon_tab_address.Proxid;
   BestCompanyAddressCommon_tab_address.prim_range;
@@ -291,7 +279,6 @@ EXPORT BestCompanyAddressCommon_fuzz_address := ROLLUP( SORT(Supports,EXCEPT Row
   srt := SORT( grp,-Row_Cnt,-Orig_Row_Cnt);
   cmn := GROUP( DEDUP( srt, true ) ); // Find the commonest value for a given basis
 EXPORT BestCompanyAddressCommon_method_address := cmn(Row_Cnt >= 2);
- 
 //Create those fields with BestType: BestCompanyAddressStrong
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestCompanyAddressStrong_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,st,zip,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,st,zip,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -302,7 +289,7 @@ EXPORT BestCompanyAddressStrong_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,
     SELF := le;
   END;
 EXPORT BestCompanyAddressStrong_tab_address := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,source_for_votes,data_permits,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,source_for_votes,data_permits,LOCAL);
-// Adjust scores for address using defined fuzzy logic 
+// Adjust scores for address using defined fuzzy logic
 Fuzzy_layout := RECORD
   BestCompanyAddressStrong_tab_address.Proxid;
   BestCompanyAddressStrong_tab_address.prim_range;
@@ -337,7 +324,6 @@ EXPORT BestCompanyAddressStrong_fuzz_address := ROLLUP( SORT(Supports,EXCEPT Row
 // A best solution is unique if its Row_Cnt is the same as the sum of the Orig_row_cnts.
   Totals := TABLE(GROUP(grp),{Proxid,Tot := SUM(GROUP,Orig_Row_Cnt)},Proxid);
 export BestCompanyAddressStrong_method_address := JOIN( cmn,Totals,left.Proxid = right.Proxid AND LEFT.Row_Cnt = RIGHT.Tot,TRANSFORM(LEFT),LOCAL);
- 
 //Create those fields with BestType: BestCompanyAddressCurrent2
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestCompanyAddressCurrent2_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,st,zip,UNSIGNED Early_Date := MIN(GROUP,IF(dt_last_seen=0,99999999,dt_last_seen)),UNSIGNED Late_Date := MAX(GROUP,dt_last_seen),UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,st,zip,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -352,7 +338,6 @@ EXPORT BestCompanyAddressCurrent2_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxi
 EXPORT BestCompanyAddressCurrent2_tab_address := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,source_for_votes,data_permits,Early_Date,Late_Date,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,source_for_votes,data_permits,Early_Date,Late_Date,LOCAL);
 //Now actually find the best value
 EXPORT BestCompanyAddressCurrent2_method_address := DEDUP( SORT( BestCompanyAddressCurrent2_tab_address(Late_Date>0,Early_Date<99999999),Proxid,-Late_Date,-Early_Date,LOCAL),Proxid,LOCAL);
- 
 //Create those fields with BestType: BestCompanyAddressVotedUnrestricted
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestCompanyAddressVotedUnrestricted_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,st,zip,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,st,zip,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -371,7 +356,7 @@ EXPORT BestCompanyAddressVotedUnrestricted_tab_address := ROLLUP( SORT(Slim,EXCE
     SELF := le;
   END;
 EXPORT BestCompanyAddressVotedUnrestricted_vote_address := ROLLUP( SORT(Voted,EXCEPT Row_Cnt,data_permits,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,data_permits,LOCAL);
-// Adjust scores for address using defined fuzzy logic 
+// Adjust scores for address using defined fuzzy logic
 Fuzzy_layout := RECORD
   BestCompanyAddressVotedUnrestricted_vote_address.Proxid;
   BestCompanyAddressVotedUnrestricted_vote_address.prim_range;
@@ -404,7 +389,6 @@ EXPORT BestCompanyAddressVotedUnrestricted_fuzz_address := ROLLUP( SORT(Supports
   srt := SORT( grp,-Row_Cnt,-Orig_Row_Cnt);
   SALT30.MAC_Apply_Threshold_Fuzzy(srt,200,o);
 EXPORT BestCompanyAddressVotedUnrestricted_method_address := o;
- 
 //Create those fields with BestType: BestPhoneCurrentWithNpa
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestPhoneCurrentWithNpa_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,company_phone,UNSIGNED Early_Date := MIN(GROUP,IF(dt_last_seen=0,99999999,dt_last_seen)),UNSIGNED Late_Date := MAX(GROUP,dt_last_seen),UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,company_phone,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -417,7 +401,7 @@ EXPORT BestPhoneCurrentWithNpa_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,s
     SELF := le;
   END;
 EXPORT BestPhoneCurrentWithNpa_tab_company_phone := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,source_for_votes,data_permits,Early_Date,Late_Date,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,source_for_votes,data_permits,Early_Date,Late_Date,LOCAL);
-// Adjust scores for company_phone using defined fuzzy logic 
+// Adjust scores for company_phone using defined fuzzy logic
 Fuzzy_layout := RECORD
   BestPhoneCurrentWithNpa_tab_company_phone.Proxid;
   BestPhoneCurrentWithNpa_tab_company_phone.company_phone;
@@ -443,7 +427,6 @@ Supports := JOIN(BestPhoneCurrentWithNpa_tab_company_phone,BestPhoneCurrentWithN
 EXPORT BestPhoneCurrentWithNpa_fuzz_company_phone := ROLLUP( SORT(Supports,EXCEPT Row_Cnt,data_permits,Early_Date,Late_Date,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,data_permits,Early_Date,Late_Date,LOCAL);
 //Now actually find the best value
 EXPORT BestPhoneCurrentWithNpa_method_company_phone := DEDUP( SORT( BestPhoneCurrentWithNpa_fuzz_company_phone(Late_Date>0,Early_Date<99999999),Proxid,-Late_Date,-Early_Date,LOCAL),Proxid,LOCAL);
- 
 //Create those fields with BestType: BestPhoneCurrent
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestPhoneCurrent_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,company_phone,UNSIGNED Early_Date := MIN(GROUP,IF(dt_last_seen=0,99999999,dt_last_seen)),UNSIGNED Late_Date := MAX(GROUP,dt_last_seen),UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,company_phone,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -456,7 +439,7 @@ EXPORT BestPhoneCurrent_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_f
     SELF := le;
   END;
 EXPORT BestPhoneCurrent_tab_company_phone := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,source_for_votes,data_permits,Early_Date,Late_Date,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,source_for_votes,data_permits,Early_Date,Late_Date,LOCAL);
-// Adjust scores for company_phone using defined fuzzy logic 
+// Adjust scores for company_phone using defined fuzzy logic
 Fuzzy_layout := RECORD
   BestPhoneCurrent_tab_company_phone.Proxid;
   BestPhoneCurrent_tab_company_phone.company_phone;
@@ -482,7 +465,6 @@ Supports := JOIN(BestPhoneCurrent_tab_company_phone,BestPhoneCurrent_tab_company
 EXPORT BestPhoneCurrent_fuzz_company_phone := ROLLUP( SORT(Supports,EXCEPT Row_Cnt,data_permits,Early_Date,Late_Date,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,data_permits,Early_Date,Late_Date,LOCAL);
 //Now actually find the best value
 EXPORT BestPhoneCurrent_method_company_phone := DEDUP( SORT( BestPhoneCurrent_fuzz_company_phone(Late_Date>0,Early_Date<99999999),Proxid,-Late_Date,-Early_Date,LOCAL),Proxid,LOCAL);
- 
 //Create those fields with BestType: BestPhoneVoted
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestPhoneVoted_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,company_phone,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,company_phone,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -501,7 +483,7 @@ EXPORT BestPhoneVoted_tab_company_phone := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,data
     SELF := le;
   END;
 EXPORT BestPhoneVoted_vote_company_phone := ROLLUP( SORT(Voted,EXCEPT Row_Cnt,data_permits,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,data_permits,LOCAL);
-// Adjust scores for company_phone using defined fuzzy logic 
+// Adjust scores for company_phone using defined fuzzy logic
 Fuzzy_layout := RECORD
   BestPhoneVoted_vote_company_phone.Proxid;
   BestPhoneVoted_vote_company_phone.company_phone;
@@ -526,7 +508,6 @@ EXPORT BestPhoneVoted_fuzz_company_phone := ROLLUP( SORT(Supports,EXCEPT Row_Cnt
   srt := SORT( grp,-Row_Cnt,-Orig_Row_Cnt);
   SALT30.MAC_Apply_Threshold_Fuzzy(srt,200,o);
 EXPORT BestPhoneVoted_method_company_phone := o;
- 
 //Create those fields with BestType: BestPhoneLongest
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestPhoneLongest_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,company_phone,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,company_phone,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -537,7 +518,7 @@ EXPORT BestPhoneLongest_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_f
     SELF := le;
   END;
 EXPORT BestPhoneLongest_tab_company_phone := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,source_for_votes,data_permits,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,source_for_votes,data_permits,LOCAL);
-// Adjust scores for company_phone using defined fuzzy logic 
+// Adjust scores for company_phone using defined fuzzy logic
 Fuzzy_layout := RECORD
   BestPhoneLongest_tab_company_phone.Proxid;
   BestPhoneLongest_tab_company_phone.company_phone;
@@ -559,7 +540,6 @@ Supports := JOIN(BestPhoneLongest_tab_company_phone,BestPhoneLongest_tab_company
 EXPORT BestPhoneLongest_fuzz_company_phone := ROLLUP( SORT(Supports,EXCEPT Row_Cnt,data_permits,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,data_permits,LOCAL);
 //Now actually find the best value
 EXPORT BestPhoneLongest_method_company_phone := DEDUP( SORT( BestPhoneLongest_fuzz_company_phone,Proxid,-LENGTH(TRIM((SALT30.StrType)company_phone)),-Row_Cnt,LOCAL),Proxid,LOCAL);
- 
 //Create those fields with BestType: BestPhoneStrong
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestPhoneStrong_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,company_phone,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,company_phone,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -570,7 +550,7 @@ EXPORT BestPhoneStrong_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_fo
     SELF := le;
   END;
 EXPORT BestPhoneStrong_tab_company_phone := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,source_for_votes,data_permits,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,source_for_votes,data_permits,LOCAL);
-// Adjust scores for company_phone using defined fuzzy logic 
+// Adjust scores for company_phone using defined fuzzy logic
 Fuzzy_layout := RECORD
   BestPhoneStrong_tab_company_phone.Proxid;
   BestPhoneStrong_tab_company_phone.company_phone;
@@ -597,7 +577,6 @@ EXPORT BestPhoneStrong_fuzz_company_phone := ROLLUP( SORT(Supports,EXCEPT Row_Cn
 // A best solution is unique if its Row_Cnt is the same as the sum of the Orig_row_cnts.
   Totals := TABLE(GROUP(grp),{Proxid,Tot := SUM(GROUP,Orig_Row_Cnt)},Proxid);
 export BestPhoneStrong_method_company_phone := JOIN( cmn,Totals,left.Proxid = right.Proxid AND LEFT.Row_Cnt = RIGHT.Tot,TRANSFORM(LEFT),LOCAL);
- 
 //Create those fields with BestType: BestPhoneVotedUnrestricted
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestPhoneVotedUnrestricted_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,company_phone,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,company_phone,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -616,7 +595,7 @@ EXPORT BestPhoneVotedUnrestricted_tab_company_phone := ROLLUP( SORT(Slim,EXCEPT 
     SELF := le;
   END;
 EXPORT BestPhoneVotedUnrestricted_vote_company_phone := ROLLUP( SORT(Voted,EXCEPT Row_Cnt,data_permits,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,data_permits,LOCAL);
-// Adjust scores for company_phone using defined fuzzy logic 
+// Adjust scores for company_phone using defined fuzzy logic
 Fuzzy_layout := RECORD
   BestPhoneVotedUnrestricted_vote_company_phone.Proxid;
   BestPhoneVotedUnrestricted_vote_company_phone.company_phone;
@@ -641,7 +620,6 @@ EXPORT BestPhoneVotedUnrestricted_fuzz_company_phone := ROLLUP( SORT(Supports,EX
   srt := SORT( grp,-Row_Cnt,-Orig_Row_Cnt);
   SALT30.MAC_Apply_Threshold_Fuzzy(srt,200,o);
 EXPORT BestPhoneVotedUnrestricted_method_company_phone := o;
- 
 //Create those fields with BestType: BestPhoneCommon
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestPhoneCommon_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,company_phone,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,company_phone,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -652,7 +630,7 @@ EXPORT BestPhoneCommon_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_fo
     SELF := le;
   END;
 EXPORT BestPhoneCommon_tab_company_phone := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,source_for_votes,data_permits,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,source_for_votes,data_permits,LOCAL);
-// Adjust scores for company_phone using defined fuzzy logic 
+// Adjust scores for company_phone using defined fuzzy logic
 Fuzzy_layout := RECORD
   BestPhoneCommon_tab_company_phone.Proxid;
   BestPhoneCommon_tab_company_phone.company_phone;
@@ -677,7 +655,6 @@ EXPORT BestPhoneCommon_fuzz_company_phone := ROLLUP( SORT(Supports,EXCEPT Row_Cn
   srt := SORT( grp,-Row_Cnt,-Orig_Row_Cnt);
   cmn := GROUP( DEDUP( srt, true ) ); // Find the commonest value for a given basis
 EXPORT BestPhoneCommon_method_company_phone := cmn(Row_Cnt >= 2);
- 
 //Create those fields with BestType: BestFeinStrong
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestFeinStrong_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,company_fein,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,company_fein,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -688,7 +665,7 @@ EXPORT BestFeinStrong_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for
     SELF := le;
   END;
 EXPORT BestFeinStrong_tab_company_fein := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,source_for_votes,data_permits,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,source_for_votes,data_permits,LOCAL);
-// Adjust scores for company_fein using defined fuzzy logic 
+// Adjust scores for company_fein using defined fuzzy logic
 Fuzzy_layout := RECORD
   BestFeinStrong_tab_company_fein.Proxid;
   BestFeinStrong_tab_company_fein.company_fein;
@@ -715,7 +692,6 @@ EXPORT BestFeinStrong_fuzz_company_fein := ROLLUP( SORT(Supports,EXCEPT Row_Cnt,
 // A best solution is unique if its Row_Cnt is the same as the sum of the Orig_row_cnts.
   Totals := TABLE(GROUP(grp),{Proxid,Tot := SUM(GROUP,Orig_Row_Cnt)},Proxid);
 export BestFeinStrong_method_company_fein := JOIN( cmn,Totals,left.Proxid = right.Proxid AND LEFT.Row_Cnt = RIGHT.Tot,TRANSFORM(LEFT),LOCAL);
- 
 //Create those fields with BestType: BestFeinCommon
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestFeinCommon_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,company_fein,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,company_fein,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -726,7 +702,7 @@ EXPORT BestFeinCommon_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for
     SELF := le;
   END;
 EXPORT BestFeinCommon_tab_company_fein := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,source_for_votes,data_permits,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,source_for_votes,data_permits,LOCAL);
-// Adjust scores for company_fein using defined fuzzy logic 
+// Adjust scores for company_fein using defined fuzzy logic
 Fuzzy_layout := RECORD
   BestFeinCommon_tab_company_fein.Proxid;
   BestFeinCommon_tab_company_fein.company_fein;
@@ -751,7 +727,6 @@ EXPORT BestFeinCommon_fuzz_company_fein := ROLLUP( SORT(Supports,EXCEPT Row_Cnt,
   srt := SORT( grp,-Row_Cnt,-Orig_Row_Cnt);
   cmn := GROUP( DEDUP( srt, true ) ); // Find the commonest value for a given basis
 EXPORT BestFeinCommon_method_company_fein := cmn(Row_Cnt >= 2);
- 
 //Create those fields with BestType: BestFeinCurrent
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestFeinCurrent_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,company_fein,UNSIGNED Early_Date := MIN(GROUP,IF(dt_last_seen=0,99999999,dt_last_seen)),UNSIGNED Late_Date := MAX(GROUP,dt_last_seen),UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,company_fein,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -764,7 +739,7 @@ EXPORT BestFeinCurrent_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_fo
     SELF := le;
   END;
 EXPORT BestFeinCurrent_tab_company_fein := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,source_for_votes,data_permits,Early_Date,Late_Date,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,source_for_votes,data_permits,Early_Date,Late_Date,LOCAL);
-// Adjust scores for company_fein using defined fuzzy logic 
+// Adjust scores for company_fein using defined fuzzy logic
 Fuzzy_layout := RECORD
   BestFeinCurrent_tab_company_fein.Proxid;
   BestFeinCurrent_tab_company_fein.company_fein;
@@ -790,7 +765,6 @@ Supports := JOIN(BestFeinCurrent_tab_company_fein,BestFeinCurrent_tab_company_fe
 EXPORT BestFeinCurrent_fuzz_company_fein := ROLLUP( SORT(Supports,EXCEPT Row_Cnt,data_permits,Early_Date,Late_Date,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,data_permits,Early_Date,Late_Date,LOCAL);
 //Now actually find the best value
 EXPORT BestFeinCurrent_method_company_fein := DEDUP( SORT( BestFeinCurrent_fuzz_company_fein(Late_Date>0,Early_Date<99999999),Proxid,-Late_Date,-Early_Date,LOCAL),Proxid,LOCAL);
- 
 //Create those fields with BestType: BestFeinVotedUnrestricted
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestFeinVotedUnrestricted_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,company_fein,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,company_fein,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -814,7 +788,6 @@ EXPORT BestFeinVotedUnrestricted_vote_company_fein := ROLLUP( SORT(Voted,EXCEPT 
   srt := SORT( grp,-Row_Cnt);
   SALT30.MAC_Apply_Threshold(srt,200,o);
 EXPORT BestFeinVotedUnrestricted_method_company_fein := o;
- 
 //Create those fields with BestType: BestFeinMin
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestFeinMin_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,company_fein,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,company_fein,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -833,7 +806,7 @@ EXPORT BestFeinMin_tab_company_fein := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,data_per
     SELF := le;
   END;
 EXPORT BestFeinMin_vote_company_fein := ROLLUP( SORT(Voted,EXCEPT Row_Cnt,data_permits,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,data_permits,LOCAL);
-// Adjust scores for company_fein using defined fuzzy logic 
+// Adjust scores for company_fein using defined fuzzy logic
 Fuzzy_layout := RECORD
   BestFeinMin_vote_company_fein.Proxid;
   BestFeinMin_vote_company_fein.company_fein;
@@ -858,7 +831,6 @@ EXPORT BestFeinMin_fuzz_company_fein := ROLLUP( SORT(Supports,EXCEPT Row_Cnt,dat
   srt := SORT( grp,-Row_Cnt,-Orig_Row_Cnt);
   SALT30.MAC_Apply_Threshold_Fuzzy(srt,200,o);
 EXPORT BestFeinMin_method_company_fein := o;
- 
 //Create those fields with BestType: BestFeinMax
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestFeinMax_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,company_fein,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,company_fein,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -877,7 +849,7 @@ EXPORT BestFeinMax_tab_company_fein := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,data_per
     SELF := le;
   END;
 EXPORT BestFeinMax_vote_company_fein := ROLLUP( SORT(Voted,EXCEPT Row_Cnt,data_permits,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,data_permits,LOCAL);
-// Adjust scores for company_fein using defined fuzzy logic 
+// Adjust scores for company_fein using defined fuzzy logic
 Fuzzy_layout := RECORD
   BestFeinMax_vote_company_fein.Proxid;
   BestFeinMax_vote_company_fein.company_fein;
@@ -902,7 +874,6 @@ EXPORT BestFeinMax_fuzz_company_fein := ROLLUP( SORT(Supports,EXCEPT Row_Cnt,dat
   srt := SORT( grp,-Row_Cnt,-Orig_Row_Cnt);
   SALT30.MAC_Apply_Threshold_Fuzzy(srt,200,o);
 EXPORT BestFeinMax_method_company_fein := o;
- 
 //Create those fields with BestType: BestUrlCommon
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestUrlCommon_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,company_url,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,company_url,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -918,7 +889,6 @@ EXPORT BestUrlCommon_tab_company_url := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,source_
   srt := SORT( grp,-Row_Cnt);
   cmn := GROUP( DEDUP( srt, true ) ); // Find the commonest value for a given basis
 EXPORT BestUrlCommon_method_company_url := cmn(Row_Cnt >= 2);
- 
 //Create those fields with BestType: BestUrlCurrent
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestUrlCurrent_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,company_url,UNSIGNED Early_Date := MIN(GROUP,IF(dt_last_seen=0,99999999,dt_last_seen)),UNSIGNED Late_Date := MAX(GROUP,dt_last_seen),UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,company_url,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -933,7 +903,6 @@ EXPORT BestUrlCurrent_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for
 EXPORT BestUrlCurrent_tab_company_url := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,source_for_votes,data_permits,Early_Date,Late_Date,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,source_for_votes,data_permits,Early_Date,Late_Date,LOCAL);
 //Now actually find the best value
 EXPORT BestUrlCurrent_method_company_url := DEDUP( SORT( BestUrlCurrent_tab_company_url(Late_Date>0,Early_Date<99999999),Proxid,-Late_Date,-Early_Date,LOCAL),Proxid,LOCAL);
- 
 //Create those fields with BestType: BestUrlLength
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestUrlLength_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,company_url,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,company_url,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -946,7 +915,6 @@ EXPORT BestUrlLength_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_
 EXPORT BestUrlLength_tab_company_url := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,source_for_votes,data_permits,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,source_for_votes,data_permits,LOCAL);
 //Now actually find the best value
 EXPORT BestUrlLength_method_company_url := DEDUP( SORT( BestUrlLength_tab_company_url,Proxid,-LENGTH(TRIM((SALT30.StrType)company_url)),-Row_Cnt,LOCAL),Proxid,LOCAL);
- 
 //Create those fields with BestType: BestUrlStrong
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestUrlStrong_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,company_url,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,company_url,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -964,7 +932,6 @@ EXPORT BestUrlStrong_tab_company_url := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,source_
 // A best solution is unique if its Row_Cnt is the same as the sum of the row_cnts.
   Totals := TABLE(GROUP(grp),{Proxid,Tot := SUM(GROUP,Row_Cnt)},Proxid);
 export BestUrlStrong_method_company_url := JOIN( cmn,Totals,left.Proxid = right.Proxid AND LEFT.Row_Cnt = RIGHT.Tot,TRANSFORM(LEFT),LOCAL);
- 
 //Create those fields with BestType: BestUrlVotedUnrestricted
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestUrlVotedUnrestricted_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,company_url,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,company_url,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -988,7 +955,6 @@ EXPORT BestUrlVotedUnrestricted_vote_company_url := ROLLUP( SORT(Voted,EXCEPT Ro
   srt := SORT( grp,-Row_Cnt);
   SALT30.MAC_Apply_Threshold(srt,200,o);
 EXPORT BestUrlVotedUnrestricted_method_company_url := o;
- 
 //Create those fields with BestType: BestDunsCommon
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestDunsCommon_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,duns_number,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,duns_number,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -999,7 +965,7 @@ EXPORT BestDunsCommon_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for
     SELF := le;
   END;
 EXPORT BestDunsCommon_tab_duns_number := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,source_for_votes,data_permits,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,source_for_votes,data_permits,LOCAL);
-// Adjust scores for duns_number using defined fuzzy logic 
+// Adjust scores for duns_number using defined fuzzy logic
 Fuzzy_layout := RECORD
   BestDunsCommon_tab_duns_number.Proxid;
   BestDunsCommon_tab_duns_number.duns_number;
@@ -1024,7 +990,6 @@ EXPORT BestDunsCommon_fuzz_duns_number := ROLLUP( SORT(Supports,EXCEPT Row_Cnt,d
   srt := SORT( grp,-Row_Cnt,-Orig_Row_Cnt);
   cmn := GROUP( DEDUP( srt, true ) ); // Find the commonest value for a given basis
 EXPORT BestDunsCommon_method_duns_number := cmn(Row_Cnt >= 2);
- 
 //Create those fields with BestType: BestDunsCurrent
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestDunsCurrent_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,duns_number,UNSIGNED Early_Date := MIN(GROUP,IF(dt_last_seen=0,99999999,dt_last_seen)),UNSIGNED Late_Date := MAX(GROUP,dt_last_seen),UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,duns_number,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -1037,7 +1002,7 @@ EXPORT BestDunsCurrent_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_fo
     SELF := le;
   END;
 EXPORT BestDunsCurrent_tab_duns_number := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,source_for_votes,data_permits,Early_Date,Late_Date,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,source_for_votes,data_permits,Early_Date,Late_Date,LOCAL);
-// Adjust scores for duns_number using defined fuzzy logic 
+// Adjust scores for duns_number using defined fuzzy logic
 Fuzzy_layout := RECORD
   BestDunsCurrent_tab_duns_number.Proxid;
   BestDunsCurrent_tab_duns_number.duns_number;
@@ -1063,7 +1028,6 @@ Supports := JOIN(BestDunsCurrent_tab_duns_number,BestDunsCurrent_tab_duns_number
 EXPORT BestDunsCurrent_fuzz_duns_number := ROLLUP( SORT(Supports,EXCEPT Row_Cnt,data_permits,Early_Date,Late_Date,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,data_permits,Early_Date,Late_Date,LOCAL);
 //Now actually find the best value enforcing minimum
 EXPORT BestDunsCurrent_method_duns_number := DEDUP( SORT( BestDunsCurrent_fuzz_duns_number(Late_Date>0,Early_Date<99999999),Proxid,-Late_Date,-Early_Date,LOCAL)(Row_Cnt >= 2),Proxid,LOCAL);
- 
 //Create those fields with BestType: BestDunsCurrent2
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestDunsCurrent2_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,duns_number,UNSIGNED Early_Date := MIN(GROUP,IF(dt_last_seen=0,99999999,dt_last_seen)),UNSIGNED Late_Date := MAX(GROUP,dt_last_seen),UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,duns_number,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -1078,7 +1042,6 @@ EXPORT BestDunsCurrent2_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_f
 EXPORT BestDunsCurrent2_tab_duns_number := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,source_for_votes,data_permits,Early_Date,Late_Date,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,source_for_votes,data_permits,Early_Date,Late_Date,LOCAL);
 //Now actually find the best value
 EXPORT BestDunsCurrent2_method_duns_number := DEDUP( SORT( BestDunsCurrent2_tab_duns_number(Late_Date>0,Early_Date<99999999),Proxid,-Late_Date,-Early_Date,LOCAL),Proxid,LOCAL);
- 
 //Create those fields with BestType: BestDunsVotedUnrestricted
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestDunsVotedUnrestricted_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,duns_number,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,duns_number,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -1102,7 +1065,6 @@ EXPORT BestDunsVotedUnrestricted_vote_duns_number := ROLLUP( SORT(Voted,EXCEPT R
   srt := SORT( grp,-Row_Cnt);
   SALT30.MAC_Apply_Threshold(srt,200,o);
 EXPORT BestDunsVotedUnrestricted_method_duns_number := o;
- 
 //Create those fields with BestType: BestSicCommon
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestSicCommon_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,data_permits,company_sic_code1,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,data_permits,company_sic_code1,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -1118,7 +1080,6 @@ EXPORT BestSicCommon_tab_company_sic_code1 := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,d
   srt := SORT( grp,-Row_Cnt);
   cmn := GROUP( DEDUP( srt, true ) ); // Find the commonest value for a given basis
 EXPORT BestSicCommon_method_company_sic_code1 := cmn(Row_Cnt >= 2);
- 
 //Create those fields with BestType: BestSicCurrent
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestSicCurrent_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,data_permits,company_sic_code1,UNSIGNED Early_Date := MIN(GROUP,IF(dt_last_seen=0,99999999,dt_last_seen)),UNSIGNED Late_Date := MAX(GROUP,dt_last_seen),UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,data_permits,company_sic_code1,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -1133,7 +1094,6 @@ EXPORT BestSicCurrent_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,data_permi
 EXPORT BestSicCurrent_tab_company_sic_code1 := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,data_permits,Early_Date,Late_Date,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,data_permits,Early_Date,Late_Date,LOCAL);
 //Now actually find the best value enforcing minimum
 EXPORT BestSicCurrent_method_company_sic_code1 := DEDUP( SORT( BestSicCurrent_tab_company_sic_code1(Late_Date>0,Early_Date<99999999),Proxid,-Late_Date,-Early_Date,LOCAL)(Row_Cnt >= 2),Proxid,LOCAL);
- 
 //Create those fields with BestType: BestNaicsCommon
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestNaicsCommon_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,data_permits,company_naics_code1,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,data_permits,company_naics_code1,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -1149,7 +1109,6 @@ EXPORT BestNaicsCommon_tab_company_naics_code1 := ROLLUP( SORT(Slim,EXCEPT Row_C
   srt := SORT( grp,-Row_Cnt);
   cmn := GROUP( DEDUP( srt, true ) ); // Find the commonest value for a given basis
 EXPORT BestNaicsCommon_method_company_naics_code1 := cmn(Row_Cnt >= 2);
- 
 //Create those fields with BestType: BestNaicsCurrent
 // First step is to get all of the data slimmed and row-reduced
 EXPORT BestNaicsCurrent_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,data_permits,company_naics_code1,UNSIGNED Early_Date := MIN(GROUP,IF(dt_last_seen=0,99999999,dt_last_seen)),UNSIGNED Late_Date := MAX(GROUP,dt_last_seen),UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,data_permits,company_naics_code1,MERGE),HASH(Proxid)); // Slim and reduce row-count
@@ -1164,155 +1123,6 @@ EXPORT BestNaicsCurrent_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,data_per
 EXPORT BestNaicsCurrent_tab_company_naics_code1 := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,data_permits,Early_Date,Late_Date,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,data_permits,Early_Date,Late_Date,LOCAL);
 //Now actually find the best value enforcing minimum
 EXPORT BestNaicsCurrent_method_company_naics_code1 := DEDUP( SORT( BestNaicsCurrent_tab_company_naics_code1(Late_Date>0,Early_Date<99999999),Proxid,-Late_Date,-Early_Date,LOCAL)(Row_Cnt >= 2),Proxid,LOCAL);
- 
-//Create those fields with BestType: BestDbaNameLegal
-// First step is to get all of the data slimmed and row-reduced
-EXPORT BestDbaNameLegal_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,dba_name,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,dba_name,MERGE),HASH(Proxid)); // Slim and reduce row-count
-  Slim := TABLE(BestDbaNameLegal_tab_(dba_name NOT IN SET(s.nulls_dba_name,dba_name),fn_valid_cname(TRIM((SALT30.StrType)dba_name),source_for_votes)),{Proxid,source_for_votes,data_permits,dba_name,Row_Cnt});
-  Slim TR(Slim le, Slim ri) := TRANSFORM
-    SELF.data_permits := le.data_permits|ri.data_permits;
-    SELF.Row_Cnt := le.Row_Cnt+ri.Row_Cnt;
-    SELF := le;
-  END;
-EXPORT BestDbaNameLegal_tab_dba_name := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,data_permits,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,data_permits,LOCAL);
-// Voting is supported by altering the Row Count to be 100 * the (real) vote returned from the attribute
-  Voted := TABLE( BestDbaNameLegal_tab_dba_name,{Proxid,data_permits,dba_name,UNSIGNED Row_Cnt := 100 * fn_Best_Name_Legal_Votes(source_for_votes,Row_Cnt)}); // Use fn_Best_Name_Legal_Votes to vote
-  Voted TR(Voted le, Voted ri) := TRANSFORM
-    SELF.data_permits := le.data_permits|ri.data_permits;
-    SELF.Row_Cnt := le.Row_Cnt+ri.Row_Cnt;
-    SELF := le;
-  END;
-EXPORT BestDbaNameLegal_vote_dba_name := ROLLUP( SORT(Voted,EXCEPT Row_Cnt,data_permits,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,data_permits,LOCAL);
-//Now actually find the best value
-  grp := GROUP( BestDbaNameLegal_vote_dba_name,Proxid,ALL,LOCAL);
-  srt := SORT( grp,-Row_Cnt);
-  cmn := GROUP( DEDUP( srt, true ) ); // Find the commonest value for a given basis
-EXPORT BestDbaNameLegal_method_dba_name := cmn;
- 
-//Create those fields with BestType: BestDbaNameCommon
-// First step is to get all of the data slimmed and row-reduced
-EXPORT BestDbaNameCommon_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,dba_name,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,dba_name,MERGE),HASH(Proxid)); // Slim and reduce row-count
-  Slim := TABLE(BestDbaNameCommon_tab_(dba_name NOT IN SET(s.nulls_dba_name,dba_name),fn_valid_cname(TRIM((SALT30.StrType)dba_name),source_for_votes)),{Proxid,source_for_votes,data_permits,dba_name,Row_Cnt});
-  Slim TR(Slim le, Slim ri) := TRANSFORM
-    SELF.data_permits := le.data_permits|ri.data_permits;
-    SELF.Row_Cnt := le.Row_Cnt+ri.Row_Cnt;
-    SELF := le;
-  END;
-EXPORT BestDbaNameCommon_tab_dba_name := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,source_for_votes,data_permits,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,source_for_votes,data_permits,LOCAL);
-//Now actually find the best value enforcing minimum
-  grp := GROUP( BestDbaNameCommon_tab_dba_name,Proxid,ALL,LOCAL);
-  srt := SORT( grp,-Row_Cnt);
-  cmn := GROUP( DEDUP( srt, true ) ); // Find the commonest value for a given basis
-EXPORT BestDbaNameCommon_method_dba_name := cmn(Row_Cnt >= 2);
- 
-//Create those fields with BestType: BestDbaNameCurrent
-// First step is to get all of the data slimmed and row-reduced
-EXPORT BestDbaNameCurrent_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,dba_name,UNSIGNED Early_Date := MIN(GROUP,IF(dt_last_seen=0,99999999,dt_last_seen)),UNSIGNED Late_Date := MAX(GROUP,dt_last_seen),UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,dba_name,MERGE),HASH(Proxid)); // Slim and reduce row-count
-  Slim := TABLE(BestDbaNameCurrent_tab_(dba_name NOT IN SET(s.nulls_dba_name,dba_name),fn_valid_cname(TRIM((SALT30.StrType)dba_name),source_for_votes)),{Proxid,source_for_votes,data_permits,dba_name,Early_Date,Late_Date,Row_Cnt});
-  Slim TR(Slim le, Slim ri) := TRANSFORM
-    SELF.Early_Date := MIN(le.Early_Date,ri.Early_Date);
-    SELF.Late_Date := MAX(le.Late_Date,ri.Late_Date);
-    SELF.data_permits := le.data_permits|ri.data_permits;
-    SELF.Row_Cnt := le.Row_Cnt+ri.Row_Cnt;
-    SELF := le;
-  END;
-EXPORT BestDbaNameCurrent_tab_dba_name := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,source_for_votes,data_permits,Early_Date,Late_Date,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,source_for_votes,data_permits,Early_Date,Late_Date,LOCAL);
-//Now actually find the best value enforcing minimum
-EXPORT BestDbaNameCurrent_method_dba_name := DEDUP( SORT( BestDbaNameCurrent_tab_dba_name(Late_Date>0,Early_Date<99999999),Proxid,-Late_Date,-Early_Date,LOCAL)(Row_Cnt >= 2),Proxid,LOCAL);
- 
-//Create those fields with BestType: BestDbaNameVoted
-// First step is to get all of the data slimmed and row-reduced
-EXPORT BestDbaNameVoted_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,dba_name,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,dba_name,MERGE),HASH(Proxid)); // Slim and reduce row-count
-  Slim := TABLE(BestDbaNameVoted_tab_(dba_name NOT IN SET(s.nulls_dba_name,dba_name),fn_valid_cname(TRIM((SALT30.StrType)dba_name),source_for_votes)),{Proxid,source_for_votes,data_permits,dba_name,Row_Cnt});
-  Slim TR(Slim le, Slim ri) := TRANSFORM
-    SELF.data_permits := le.data_permits|ri.data_permits;
-    SELF.Row_Cnt := le.Row_Cnt+ri.Row_Cnt;
-    SELF := le;
-  END;
-EXPORT BestDbaNameVoted_tab_dba_name := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,data_permits,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,data_permits,LOCAL);
-// Voting is supported by altering the Row Count to be 100 * the (real) vote returned from the attribute
-  Voted := TABLE( BestDbaNameVoted_tab_dba_name,{Proxid,data_permits,dba_name,UNSIGNED Row_Cnt := 100 * fn_Best_Name_Source_Votes(source_for_votes,Row_Cnt)}); // Use fn_Best_Name_Source_Votes to vote
-  Voted TR(Voted le, Voted ri) := TRANSFORM
-    SELF.data_permits := le.data_permits|ri.data_permits;
-    SELF.Row_Cnt := le.Row_Cnt+ri.Row_Cnt;
-    SELF := le;
-  END;
-EXPORT BestDbaNameVoted_vote_dba_name := ROLLUP( SORT(Voted,EXCEPT Row_Cnt,data_permits,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,data_permits,LOCAL);
-//Now actually find the best value
-  grp := GROUP( BestDbaNameVoted_vote_dba_name,Proxid,ALL,LOCAL);
-  srt := SORT( grp,-Row_Cnt);
-  SALT30.MAC_Apply_Threshold(srt,200,o);
-EXPORT BestDbaNameVoted_method_dba_name := o;
- 
-//Create those fields with BestType: BestDbaNameLength
-// First step is to get all of the data slimmed and row-reduced
-EXPORT BestDbaNameLength_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,dba_name,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,dba_name,MERGE),HASH(Proxid)); // Slim and reduce row-count
-  Slim := TABLE(BestDbaNameLength_tab_(dba_name NOT IN SET(s.nulls_dba_name,dba_name),fn_valid_cname(TRIM((SALT30.StrType)dba_name),source_for_votes)),{Proxid,source_for_votes,data_permits,dba_name,Row_Cnt});
-  Slim TR(Slim le, Slim ri) := TRANSFORM
-    SELF.data_permits := le.data_permits|ri.data_permits;
-    SELF.Row_Cnt := le.Row_Cnt+ri.Row_Cnt;
-    SELF := le;
-  END;
-EXPORT BestDbaNameLength_tab_dba_name := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,source_for_votes,data_permits,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,source_for_votes,data_permits,LOCAL);
-//Now actually find the best value
-EXPORT BestDbaNameLength_method_dba_name := DEDUP( SORT( BestDbaNameLength_tab_dba_name,Proxid,-LENGTH(TRIM((SALT30.StrType)dba_name)),-Row_Cnt,LOCAL),Proxid,LOCAL);
- 
-//Create those fields with BestType: BestDbaNameStrong
-// First step is to get all of the data slimmed and row-reduced
-EXPORT BestDbaNameStrong_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,dba_name,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,dba_name,MERGE),HASH(Proxid)); // Slim and reduce row-count
-  Slim := TABLE(BestDbaNameStrong_tab_(dba_name NOT IN SET(s.nulls_dba_name,dba_name),fn_valid_cname(TRIM((SALT30.StrType)dba_name),source_for_votes)),{Proxid,source_for_votes,data_permits,dba_name,Row_Cnt});
-  Slim TR(Slim le, Slim ri) := TRANSFORM
-    SELF.data_permits := le.data_permits|ri.data_permits;
-    SELF.Row_Cnt := le.Row_Cnt+ri.Row_Cnt;
-    SELF := le;
-  END;
-EXPORT BestDbaNameStrong_tab_dba_name := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,source_for_votes,data_permits,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,source_for_votes,data_permits,LOCAL);
-//Now actually find the best value
-  grp := GROUP( BestDbaNameStrong_tab_dba_name,Proxid,ALL,LOCAL);
-  srt := SORT( grp,-Row_Cnt);
-  cmn := GROUP( DEDUP( srt, true ) ); // Find the commonest value for a given basis
-// A best solution is unique if its Row_Cnt is the same as the sum of the row_cnts.
-  Totals := TABLE(GROUP(grp),{Proxid,Tot := SUM(GROUP,Row_Cnt)},Proxid);
-export BestDbaNameStrong_method_dba_name := JOIN( cmn,Totals,left.Proxid = right.Proxid AND LEFT.Row_Cnt = RIGHT.Tot,TRANSFORM(LEFT),LOCAL);
- 
-//Create those fields with BestType: BestDbaNameCurrent2
-// First step is to get all of the data slimmed and row-reduced
-EXPORT BestDbaNameCurrent2_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,dba_name,UNSIGNED Early_Date := MIN(GROUP,IF(dt_last_seen=0,99999999,dt_last_seen)),UNSIGNED Late_Date := MAX(GROUP,dt_last_seen),UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,dba_name,MERGE),HASH(Proxid)); // Slim and reduce row-count
-  Slim := TABLE(BestDbaNameCurrent2_tab_(dba_name NOT IN SET(s.nulls_dba_name,dba_name),fn_valid_cname(TRIM((SALT30.StrType)dba_name),source_for_votes)),{Proxid,source_for_votes,data_permits,dba_name,Early_Date,Late_Date,Row_Cnt});
-  Slim TR(Slim le, Slim ri) := TRANSFORM
-    SELF.Early_Date := MIN(le.Early_Date,ri.Early_Date);
-    SELF.Late_Date := MAX(le.Late_Date,ri.Late_Date);
-    SELF.data_permits := le.data_permits|ri.data_permits;
-    SELF.Row_Cnt := le.Row_Cnt+ri.Row_Cnt;
-    SELF := le;
-  END;
-EXPORT BestDbaNameCurrent2_tab_dba_name := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,source_for_votes,data_permits,Early_Date,Late_Date,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,source_for_votes,data_permits,Early_Date,Late_Date,LOCAL);
-//Now actually find the best value
-EXPORT BestDbaNameCurrent2_method_dba_name := DEDUP( SORT( BestDbaNameCurrent2_tab_dba_name(Late_Date>0,Early_Date<99999999),Proxid,-Late_Date,-Early_Date,LOCAL),Proxid,LOCAL);
- 
-//Create those fields with BestType: BestDbaNameVotedUnrestricted
-// First step is to get all of the data slimmed and row-reduced
-EXPORT BestDbaNameVotedUnrestricted_tab_ := DISTRIBUTE(TABLE(h(Proxid <> 0),{Proxid,source_for_votes,data_permits,dba_name,UNSIGNED Row_Cnt := COUNT(GROUP)},Proxid,source_for_votes,data_permits,dba_name,MERGE),HASH(Proxid)); // Slim and reduce row-count
-  Slim := TABLE(BestDbaNameVotedUnrestricted_tab_(dba_name NOT IN SET(s.nulls_dba_name,dba_name),fn_valid_cname(TRIM((SALT30.StrType)dba_name),source_for_votes)),{Proxid,source_for_votes,data_permits,dba_name,Row_Cnt});
-  Slim TR(Slim le, Slim ri) := TRANSFORM
-    SELF.data_permits := le.data_permits|ri.data_permits;
-    SELF.Row_Cnt := le.Row_Cnt+ri.Row_Cnt;
-    SELF := le;
-  END;
-EXPORT BestDbaNameVotedUnrestricted_tab_dba_name := ROLLUP( SORT(Slim,EXCEPT Row_Cnt,data_permits,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,data_permits,LOCAL);
-// Voting is supported by altering the Row Count to be 100 * the (real) vote returned from the attribute
-  Voted := TABLE( BestDbaNameVotedUnrestricted_tab_dba_name,{Proxid,data_permits,dba_name,UNSIGNED Row_Cnt := 100 * fn_Best_Source_Unrestricted_Votes(source_for_votes,Row_Cnt)}); // Use fn_Best_Source_Unrestricted_Votes to vote
-  Voted TR(Voted le, Voted ri) := TRANSFORM
-    SELF.data_permits := le.data_permits|ri.data_permits;
-    SELF.Row_Cnt := le.Row_Cnt+ri.Row_Cnt;
-    SELF := le;
-  END;
-EXPORT BestDbaNameVotedUnrestricted_vote_dba_name := ROLLUP( SORT(Voted,EXCEPT Row_Cnt,data_permits,LOCAL),TR(LEFT,RIGHT), EXCEPT Row_Cnt,data_permits,LOCAL);
-//Now actually find the best value
-  grp := GROUP( BestDbaNameVotedUnrestricted_vote_dba_name,Proxid,ALL,LOCAL);
-  srt := SORT( grp,-Row_Cnt);
-  SALT30.MAC_Apply_Threshold(srt,200,o);
-EXPORT BestDbaNameVotedUnrestricted_method_dba_name := o;
 // Start to gather together all records with basis:Proxid,source_for_votes,data_permits
 // 0 - Gathering type:BestCompanyNameLegal Entries:1
   R0 := RECORD
@@ -2116,135 +1926,7 @@ EXPORT BestDbaNameVotedUnrestricted_method_dba_name := o;
     SELF := le;
   END;
   J40 := JOIN(J39,BestNaicsCurrent_method_company_naics_code1,LEFT.Proxid = RIGHT.Proxid,T40(LEFT,RIGHT),FULL OUTER,LOCAL);
-// 41 - Gathering type:BestDbaNameLegal Entries:1
-  R41 := RECORD
-    J40; // The data so far
-    TYPEOF(BestDbaNameLegal_method_dba_name.dba_name) BestDbaNameLegal_dba_name;
-    UNSIGNED dba_name_BestDbaNameLegal_Row_Cnt;
-    UNSIGNED2 dba_name_BestDbaNameLegal_data_permits;
-  END;
-  R41 T41(J40 le,BestDbaNameLegal_method_dba_name ri) := TRANSFORM
-    SELF.BestDbaNameLegal_dba_name := ri.dba_name;
-    SELF.dba_name_BestDbaNameLegal_Row_Cnt := ri.Row_Cnt;
-    SELF.dba_name_BestDbaNameLegal_data_permits := ri.data_permits;
-    BOOLEAN has_left := le.Proxid <> (TYPEOF(le.Proxid))''; // See if LHS is null
-    SELF.Proxid := IF( has_left, le.Proxid, ri.Proxid );
-    SELF := le;
-  END;
-  J41 := JOIN(J40,BestDbaNameLegal_method_dba_name,LEFT.Proxid = RIGHT.Proxid,T41(LEFT,RIGHT),FULL OUTER,LOCAL);
-// 42 - Gathering type:BestDbaNameCommon Entries:1
-  R42 := RECORD
-    J41; // The data so far
-    TYPEOF(BestDbaNameCommon_method_dba_name.dba_name) BestDbaNameCommon_dba_name;
-    UNSIGNED dba_name_BestDbaNameCommon_Row_Cnt;
-    UNSIGNED2 dba_name_BestDbaNameCommon_data_permits;
-  END;
-  R42 T42(J41 le,BestDbaNameCommon_method_dba_name ri) := TRANSFORM
-    SELF.BestDbaNameCommon_dba_name := ri.dba_name;
-    SELF.dba_name_BestDbaNameCommon_Row_Cnt := ri.Row_Cnt;
-    SELF.dba_name_BestDbaNameCommon_data_permits := ri.data_permits;
-    BOOLEAN has_left := le.Proxid <> (TYPEOF(le.Proxid))''; // See if LHS is null
-    SELF.Proxid := IF( has_left, le.Proxid, ri.Proxid );
-    SELF := le;
-  END;
-  J42 := JOIN(J41,BestDbaNameCommon_method_dba_name,LEFT.Proxid = RIGHT.Proxid,T42(LEFT,RIGHT),FULL OUTER,LOCAL);
-// 43 - Gathering type:BestDbaNameCurrent Entries:1
-  R43 := RECORD
-    J42; // The data so far
-    TYPEOF(BestDbaNameCurrent_method_dba_name.dba_name) BestDbaNameCurrent_dba_name;
-    UNSIGNED dba_name_BestDbaNameCurrent_Row_Cnt;
-    UNSIGNED2 dba_name_BestDbaNameCurrent_data_permits;
-  END;
-  R43 T43(J42 le,BestDbaNameCurrent_method_dba_name ri) := TRANSFORM
-    SELF.BestDbaNameCurrent_dba_name := ri.dba_name;
-    SELF.dba_name_BestDbaNameCurrent_Row_Cnt := ri.Row_Cnt;
-    SELF.dba_name_BestDbaNameCurrent_data_permits := ri.data_permits;
-    BOOLEAN has_left := le.Proxid <> (TYPEOF(le.Proxid))''; // See if LHS is null
-    SELF.Proxid := IF( has_left, le.Proxid, ri.Proxid );
-    SELF := le;
-  END;
-  J43 := JOIN(J42,BestDbaNameCurrent_method_dba_name,LEFT.Proxid = RIGHT.Proxid,T43(LEFT,RIGHT),FULL OUTER,LOCAL);
-// 44 - Gathering type:BestDbaNameVoted Entries:1
-  R44 := RECORD
-    J43; // The data so far
-    TYPEOF(BestDbaNameVoted_method_dba_name.dba_name) BestDbaNameVoted_dba_name;
-    UNSIGNED dba_name_BestDbaNameVoted_Row_Cnt;
-    UNSIGNED2 dba_name_BestDbaNameVoted_data_permits;
-  END;
-  R44 T44(J43 le,BestDbaNameVoted_method_dba_name ri) := TRANSFORM
-    SELF.BestDbaNameVoted_dba_name := ri.dba_name;
-    SELF.dba_name_BestDbaNameVoted_Row_Cnt := ri.Row_Cnt;
-    SELF.dba_name_BestDbaNameVoted_data_permits := ri.data_permits;
-    BOOLEAN has_left := le.Proxid <> (TYPEOF(le.Proxid))''; // See if LHS is null
-    SELF.Proxid := IF( has_left, le.Proxid, ri.Proxid );
-    SELF := le;
-  END;
-  J44 := JOIN(J43,BestDbaNameVoted_method_dba_name,LEFT.Proxid = RIGHT.Proxid,T44(LEFT,RIGHT),FULL OUTER,LOCAL);
-// 45 - Gathering type:BestDbaNameLength Entries:1
-  R45 := RECORD
-    J44; // The data so far
-    TYPEOF(BestDbaNameLength_method_dba_name.dba_name) BestDbaNameLength_dba_name;
-    UNSIGNED dba_name_BestDbaNameLength_Row_Cnt;
-    UNSIGNED2 dba_name_BestDbaNameLength_data_permits;
-  END;
-  R45 T45(J44 le,BestDbaNameLength_method_dba_name ri) := TRANSFORM
-    SELF.BestDbaNameLength_dba_name := ri.dba_name;
-    SELF.dba_name_BestDbaNameLength_Row_Cnt := ri.Row_Cnt;
-    SELF.dba_name_BestDbaNameLength_data_permits := ri.data_permits;
-    BOOLEAN has_left := le.Proxid <> (TYPEOF(le.Proxid))''; // See if LHS is null
-    SELF.Proxid := IF( has_left, le.Proxid, ri.Proxid );
-    SELF := le;
-  END;
-  J45 := JOIN(J44,BestDbaNameLength_method_dba_name,LEFT.Proxid = RIGHT.Proxid,T45(LEFT,RIGHT),FULL OUTER,LOCAL);
-// 46 - Gathering type:BestDbaNameStrong Entries:1
-  R46 := RECORD
-    J45; // The data so far
-    TYPEOF(BestDbaNameStrong_method_dba_name.dba_name) BestDbaNameStrong_dba_name;
-    UNSIGNED dba_name_BestDbaNameStrong_Row_Cnt;
-    UNSIGNED2 dba_name_BestDbaNameStrong_data_permits;
-  END;
-  R46 T46(J45 le,BestDbaNameStrong_method_dba_name ri) := TRANSFORM
-    SELF.BestDbaNameStrong_dba_name := ri.dba_name;
-    SELF.dba_name_BestDbaNameStrong_Row_Cnt := ri.Row_Cnt;
-    SELF.dba_name_BestDbaNameStrong_data_permits := ri.data_permits;
-    BOOLEAN has_left := le.Proxid <> (TYPEOF(le.Proxid))''; // See if LHS is null
-    SELF.Proxid := IF( has_left, le.Proxid, ri.Proxid );
-    SELF := le;
-  END;
-  J46 := JOIN(J45,BestDbaNameStrong_method_dba_name,LEFT.Proxid = RIGHT.Proxid,T46(LEFT,RIGHT),FULL OUTER,LOCAL);
-// 47 - Gathering type:BestDbaNameCurrent2 Entries:1
-  R47 := RECORD
-    J46; // The data so far
-    TYPEOF(BestDbaNameCurrent2_method_dba_name.dba_name) BestDbaNameCurrent2_dba_name;
-    UNSIGNED dba_name_BestDbaNameCurrent2_Row_Cnt;
-    UNSIGNED2 dba_name_BestDbaNameCurrent2_data_permits;
-  END;
-  R47 T47(J46 le,BestDbaNameCurrent2_method_dba_name ri) := TRANSFORM
-    SELF.BestDbaNameCurrent2_dba_name := ri.dba_name;
-    SELF.dba_name_BestDbaNameCurrent2_Row_Cnt := ri.Row_Cnt;
-    SELF.dba_name_BestDbaNameCurrent2_data_permits := ri.data_permits;
-    BOOLEAN has_left := le.Proxid <> (TYPEOF(le.Proxid))''; // See if LHS is null
-    SELF.Proxid := IF( has_left, le.Proxid, ri.Proxid );
-    SELF := le;
-  END;
-  J47 := JOIN(J46,BestDbaNameCurrent2_method_dba_name,LEFT.Proxid = RIGHT.Proxid,T47(LEFT,RIGHT),FULL OUTER,LOCAL);
-// 48 - Gathering type:BestDbaNameVotedUnrestricted Entries:1
-  R48 := RECORD
-    J47; // The data so far
-    TYPEOF(BestDbaNameVotedUnrestricted_method_dba_name.dba_name) BestDbaNameVotedUnrestricted_dba_name;
-    UNSIGNED dba_name_BestDbaNameVotedUnrestricted_Row_Cnt;
-    UNSIGNED2 dba_name_BestDbaNameVotedUnrestricted_data_permits;
-  END;
-  R48 T48(J47 le,BestDbaNameVotedUnrestricted_method_dba_name ri) := TRANSFORM
-    SELF.BestDbaNameVotedUnrestricted_dba_name := ri.dba_name;
-    SELF.dba_name_BestDbaNameVotedUnrestricted_Row_Cnt := ri.Row_Cnt;
-    SELF.dba_name_BestDbaNameVotedUnrestricted_data_permits := ri.data_permits;
-    BOOLEAN has_left := le.Proxid <> (TYPEOF(le.Proxid))''; // See if LHS is null
-    SELF.Proxid := IF( has_left, le.Proxid, ri.Proxid );
-    SELF := le;
-  END;
-  J48 := JOIN(J47,BestDbaNameVotedUnrestricted_method_dba_name,LEFT.Proxid = RIGHT.Proxid,T48(LEFT,RIGHT),FULL OUTER,LOCAL);
-EXPORT BestBy_Proxid_np := J48;
+EXPORT BestBy_Proxid_np := J40;
 EXPORT BestBy_Proxid := BestBy_Proxid_np : PERSIST('~temp::Proxid::BIPV2_Best_Proxid::best::BestBy_Proxid',EXPIRE(Config.PersistExpire));
 // Now gather some statistics to see how we did
   R := RECORD
@@ -2756,94 +2438,6 @@ EXPORT BestBy_Proxid := BestBy_Proxid_np : PERSIST('~temp::Proxid::BIPV2_Best_Pr
     UNSIGNED BestNaicsCurrent_company_naics_code1_permit8_cnt := COUNT(GROUP,BestBy_Proxid.company_naics_code1_BestNaicsCurrent_data_permits&128<>0);
     UNSIGNED BestNaicsCurrent_company_naics_code1_permit9_cnt := COUNT(GROUP,BestBy_Proxid.company_naics_code1_BestNaicsCurrent_data_permits&256<>0);
     UNSIGNED BestNaicsCurrent_company_naics_code1_permit10_cnt := COUNT(GROUP,BestBy_Proxid.company_naics_code1_BestNaicsCurrent_data_permits&512<>0);
-    REAL8 BestDbaNameLegal_dba_name_pcnt := AVE(GROUP,IF(BestBy_Proxid.BestDbaNameLegal_dba_name=(typeof(BestBy_Proxid.BestDbaNameLegal_dba_name))'',0,100));
-    UNSIGNED BestDbaNameLegal_dba_name_permit1_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameLegal_data_permits&1<>0);
-    UNSIGNED BestDbaNameLegal_dba_name_permit2_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameLegal_data_permits&2<>0);
-    UNSIGNED BestDbaNameLegal_dba_name_permit3_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameLegal_data_permits&4<>0);
-    UNSIGNED BestDbaNameLegal_dba_name_permit4_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameLegal_data_permits&8<>0);
-    UNSIGNED BestDbaNameLegal_dba_name_permit5_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameLegal_data_permits&16<>0);
-    UNSIGNED BestDbaNameLegal_dba_name_permit6_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameLegal_data_permits&32<>0);
-    UNSIGNED BestDbaNameLegal_dba_name_permit7_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameLegal_data_permits&64<>0);
-    UNSIGNED BestDbaNameLegal_dba_name_permit8_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameLegal_data_permits&128<>0);
-    UNSIGNED BestDbaNameLegal_dba_name_permit9_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameLegal_data_permits&256<>0);
-    UNSIGNED BestDbaNameLegal_dba_name_permit10_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameLegal_data_permits&512<>0);
-    REAL8 BestDbaNameCommon_dba_name_pcnt := AVE(GROUP,IF(BestBy_Proxid.BestDbaNameCommon_dba_name=(typeof(BestBy_Proxid.BestDbaNameCommon_dba_name))'',0,100));
-    UNSIGNED BestDbaNameCommon_dba_name_permit1_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameCommon_data_permits&1<>0);
-    UNSIGNED BestDbaNameCommon_dba_name_permit2_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameCommon_data_permits&2<>0);
-    UNSIGNED BestDbaNameCommon_dba_name_permit3_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameCommon_data_permits&4<>0);
-    UNSIGNED BestDbaNameCommon_dba_name_permit4_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameCommon_data_permits&8<>0);
-    UNSIGNED BestDbaNameCommon_dba_name_permit5_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameCommon_data_permits&16<>0);
-    UNSIGNED BestDbaNameCommon_dba_name_permit6_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameCommon_data_permits&32<>0);
-    UNSIGNED BestDbaNameCommon_dba_name_permit7_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameCommon_data_permits&64<>0);
-    UNSIGNED BestDbaNameCommon_dba_name_permit8_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameCommon_data_permits&128<>0);
-    UNSIGNED BestDbaNameCommon_dba_name_permit9_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameCommon_data_permits&256<>0);
-    UNSIGNED BestDbaNameCommon_dba_name_permit10_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameCommon_data_permits&512<>0);
-    REAL8 BestDbaNameCurrent_dba_name_pcnt := AVE(GROUP,IF(BestBy_Proxid.BestDbaNameCurrent_dba_name=(typeof(BestBy_Proxid.BestDbaNameCurrent_dba_name))'',0,100));
-    UNSIGNED BestDbaNameCurrent_dba_name_permit1_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameCurrent_data_permits&1<>0);
-    UNSIGNED BestDbaNameCurrent_dba_name_permit2_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameCurrent_data_permits&2<>0);
-    UNSIGNED BestDbaNameCurrent_dba_name_permit3_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameCurrent_data_permits&4<>0);
-    UNSIGNED BestDbaNameCurrent_dba_name_permit4_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameCurrent_data_permits&8<>0);
-    UNSIGNED BestDbaNameCurrent_dba_name_permit5_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameCurrent_data_permits&16<>0);
-    UNSIGNED BestDbaNameCurrent_dba_name_permit6_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameCurrent_data_permits&32<>0);
-    UNSIGNED BestDbaNameCurrent_dba_name_permit7_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameCurrent_data_permits&64<>0);
-    UNSIGNED BestDbaNameCurrent_dba_name_permit8_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameCurrent_data_permits&128<>0);
-    UNSIGNED BestDbaNameCurrent_dba_name_permit9_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameCurrent_data_permits&256<>0);
-    UNSIGNED BestDbaNameCurrent_dba_name_permit10_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameCurrent_data_permits&512<>0);
-    REAL8 BestDbaNameVoted_dba_name_pcnt := AVE(GROUP,IF(BestBy_Proxid.BestDbaNameVoted_dba_name=(typeof(BestBy_Proxid.BestDbaNameVoted_dba_name))'',0,100));
-    UNSIGNED BestDbaNameVoted_dba_name_permit1_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameVoted_data_permits&1<>0);
-    UNSIGNED BestDbaNameVoted_dba_name_permit2_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameVoted_data_permits&2<>0);
-    UNSIGNED BestDbaNameVoted_dba_name_permit3_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameVoted_data_permits&4<>0);
-    UNSIGNED BestDbaNameVoted_dba_name_permit4_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameVoted_data_permits&8<>0);
-    UNSIGNED BestDbaNameVoted_dba_name_permit5_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameVoted_data_permits&16<>0);
-    UNSIGNED BestDbaNameVoted_dba_name_permit6_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameVoted_data_permits&32<>0);
-    UNSIGNED BestDbaNameVoted_dba_name_permit7_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameVoted_data_permits&64<>0);
-    UNSIGNED BestDbaNameVoted_dba_name_permit8_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameVoted_data_permits&128<>0);
-    UNSIGNED BestDbaNameVoted_dba_name_permit9_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameVoted_data_permits&256<>0);
-    UNSIGNED BestDbaNameVoted_dba_name_permit10_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameVoted_data_permits&512<>0);
-    REAL8 BestDbaNameLength_dba_name_pcnt := AVE(GROUP,IF(BestBy_Proxid.BestDbaNameLength_dba_name=(typeof(BestBy_Proxid.BestDbaNameLength_dba_name))'',0,100));
-    UNSIGNED BestDbaNameLength_dba_name_permit1_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameLength_data_permits&1<>0);
-    UNSIGNED BestDbaNameLength_dba_name_permit2_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameLength_data_permits&2<>0);
-    UNSIGNED BestDbaNameLength_dba_name_permit3_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameLength_data_permits&4<>0);
-    UNSIGNED BestDbaNameLength_dba_name_permit4_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameLength_data_permits&8<>0);
-    UNSIGNED BestDbaNameLength_dba_name_permit5_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameLength_data_permits&16<>0);
-    UNSIGNED BestDbaNameLength_dba_name_permit6_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameLength_data_permits&32<>0);
-    UNSIGNED BestDbaNameLength_dba_name_permit7_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameLength_data_permits&64<>0);
-    UNSIGNED BestDbaNameLength_dba_name_permit8_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameLength_data_permits&128<>0);
-    UNSIGNED BestDbaNameLength_dba_name_permit9_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameLength_data_permits&256<>0);
-    UNSIGNED BestDbaNameLength_dba_name_permit10_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameLength_data_permits&512<>0);
-    REAL8 BestDbaNameStrong_dba_name_pcnt := AVE(GROUP,IF(BestBy_Proxid.BestDbaNameStrong_dba_name=(typeof(BestBy_Proxid.BestDbaNameStrong_dba_name))'',0,100));
-    UNSIGNED BestDbaNameStrong_dba_name_permit1_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameStrong_data_permits&1<>0);
-    UNSIGNED BestDbaNameStrong_dba_name_permit2_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameStrong_data_permits&2<>0);
-    UNSIGNED BestDbaNameStrong_dba_name_permit3_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameStrong_data_permits&4<>0);
-    UNSIGNED BestDbaNameStrong_dba_name_permit4_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameStrong_data_permits&8<>0);
-    UNSIGNED BestDbaNameStrong_dba_name_permit5_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameStrong_data_permits&16<>0);
-    UNSIGNED BestDbaNameStrong_dba_name_permit6_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameStrong_data_permits&32<>0);
-    UNSIGNED BestDbaNameStrong_dba_name_permit7_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameStrong_data_permits&64<>0);
-    UNSIGNED BestDbaNameStrong_dba_name_permit8_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameStrong_data_permits&128<>0);
-    UNSIGNED BestDbaNameStrong_dba_name_permit9_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameStrong_data_permits&256<>0);
-    UNSIGNED BestDbaNameStrong_dba_name_permit10_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameStrong_data_permits&512<>0);
-    REAL8 BestDbaNameCurrent2_dba_name_pcnt := AVE(GROUP,IF(BestBy_Proxid.BestDbaNameCurrent2_dba_name=(typeof(BestBy_Proxid.BestDbaNameCurrent2_dba_name))'',0,100));
-    UNSIGNED BestDbaNameCurrent2_dba_name_permit1_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameCurrent2_data_permits&1<>0);
-    UNSIGNED BestDbaNameCurrent2_dba_name_permit2_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameCurrent2_data_permits&2<>0);
-    UNSIGNED BestDbaNameCurrent2_dba_name_permit3_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameCurrent2_data_permits&4<>0);
-    UNSIGNED BestDbaNameCurrent2_dba_name_permit4_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameCurrent2_data_permits&8<>0);
-    UNSIGNED BestDbaNameCurrent2_dba_name_permit5_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameCurrent2_data_permits&16<>0);
-    UNSIGNED BestDbaNameCurrent2_dba_name_permit6_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameCurrent2_data_permits&32<>0);
-    UNSIGNED BestDbaNameCurrent2_dba_name_permit7_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameCurrent2_data_permits&64<>0);
-    UNSIGNED BestDbaNameCurrent2_dba_name_permit8_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameCurrent2_data_permits&128<>0);
-    UNSIGNED BestDbaNameCurrent2_dba_name_permit9_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameCurrent2_data_permits&256<>0);
-    UNSIGNED BestDbaNameCurrent2_dba_name_permit10_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameCurrent2_data_permits&512<>0);
-    REAL8 BestDbaNameVotedUnrestricted_dba_name_pcnt := AVE(GROUP,IF(BestBy_Proxid.BestDbaNameVotedUnrestricted_dba_name=(typeof(BestBy_Proxid.BestDbaNameVotedUnrestricted_dba_name))'',0,100));
-    UNSIGNED BestDbaNameVotedUnrestricted_dba_name_permit1_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameVotedUnrestricted_data_permits&1<>0);
-    UNSIGNED BestDbaNameVotedUnrestricted_dba_name_permit2_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameVotedUnrestricted_data_permits&2<>0);
-    UNSIGNED BestDbaNameVotedUnrestricted_dba_name_permit3_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameVotedUnrestricted_data_permits&4<>0);
-    UNSIGNED BestDbaNameVotedUnrestricted_dba_name_permit4_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameVotedUnrestricted_data_permits&8<>0);
-    UNSIGNED BestDbaNameVotedUnrestricted_dba_name_permit5_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameVotedUnrestricted_data_permits&16<>0);
-    UNSIGNED BestDbaNameVotedUnrestricted_dba_name_permit6_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameVotedUnrestricted_data_permits&32<>0);
-    UNSIGNED BestDbaNameVotedUnrestricted_dba_name_permit7_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameVotedUnrestricted_data_permits&64<>0);
-    UNSIGNED BestDbaNameVotedUnrestricted_dba_name_permit8_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameVotedUnrestricted_data_permits&128<>0);
-    UNSIGNED BestDbaNameVotedUnrestricted_dba_name_permit9_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameVotedUnrestricted_data_permits&256<>0);
-    UNSIGNED BestDbaNameVotedUnrestricted_dba_name_permit10_cnt := COUNT(GROUP,BestBy_Proxid.dba_name_BestDbaNameVotedUnrestricted_data_permits&512<>0);
   END;
 EXPORT BestBy_Proxid_population := TABLE(BestBy_Proxid,R);
 // Take the wide table and turn it into a child-dataset version
@@ -2898,11 +2492,6 @@ SHARED F_BestBy_Proxid(DATASET({BestBy_Proxid}) d) := FUNCTION
     UNSIGNED2 company_naics_code1_data_permits;
     UNSIGNED1 company_naics_code1_method; // This value could come from multiple BESTTYPE; track which one
   END;
-  dba_name_case_layout := RECORD
-    TYPEOF(h.dba_name) dba_name;
-    UNSIGNED2 dba_name_data_permits;
-    UNSIGNED1 dba_name_method; // This value could come from multiple BESTTYPE; track which one
-  END;
   R := RECORD
     typeof(h.Proxid) Proxid := 0;
     DATASET(company_name_case_layout) company_name_cases;
@@ -2913,7 +2502,6 @@ SHARED F_BestBy_Proxid(DATASET({BestBy_Proxid}) d) := FUNCTION
     DATASET(duns_number_case_layout) duns_number_cases;
     DATASET(company_sic_code1_case_layout) company_sic_code1_cases;
     DATASET(company_naics_code1_case_layout) company_naics_code1_cases;
-    DATASET(dba_name_case_layout) dba_name_cases;
   END;
   R T(BestBy_Proxid le) := TRANSFORM
     SELF.company_name_cases := DATASET([
@@ -2973,16 +2561,6 @@ SHARED F_BestBy_Proxid(DATASET({BestBy_Proxid}) d) := FUNCTION
         {le.BestNaicsCommon_company_naics_code1,le.company_naics_code1_BestNaicsCommon_data_permits,1},
         {le.BestNaicsCurrent_company_naics_code1,le.company_naics_code1_BestNaicsCurrent_data_permits,2}
           ],company_naics_code1_case_layout)(company_naics_code1 NOT IN SET(s.nulls_company_naics_code1,company_naics_code1));
-    SELF.dba_name_cases := DATASET([
-        {le.BestDbaNameLegal_dba_name,le.dba_name_BestDbaNameLegal_data_permits,1},
-        {le.BestDbaNameCommon_dba_name,le.dba_name_BestDbaNameCommon_data_permits,2},
-        {le.BestDbaNameCurrent_dba_name,le.dba_name_BestDbaNameCurrent_data_permits,3},
-        {le.BestDbaNameVoted_dba_name,le.dba_name_BestDbaNameVoted_data_permits,4},
-        {le.BestDbaNameLength_dba_name,le.dba_name_BestDbaNameLength_data_permits,5},
-        {le.BestDbaNameStrong_dba_name,le.dba_name_BestDbaNameStrong_data_permits,6},
-        {le.BestDbaNameCurrent2_dba_name,le.dba_name_BestDbaNameCurrent2_data_permits,7},
-        {le.BestDbaNameVotedUnrestricted_dba_name,le.dba_name_BestDbaNameVotedUnrestricted_data_permits,8}
-          ],dba_name_case_layout)(dba_name NOT IN SET(s.nulls_dba_name,dba_name));
     SELF := le; // Copy BASIS
   END;
   P1 := PROJECT(d,T(LEFT));
@@ -3029,9 +2607,6 @@ SHARED Flatten_BestBy_Proxid(DATASET({BestBy_Proxid_child}) d) := FUNCTION
     TYPEOF(h.company_naics_code1) company_naics_code1;
     UNSIGNED2 company_naics_code1_data_permits;
     UNSIGNED1 company_naics_code1_method; // This value could come from multiple BESTTYPE; track which one
-    TYPEOF(h.dba_name) dba_name;
-    UNSIGNED2 dba_name_data_permits;
-    UNSIGNED1 dba_name_method; // This value could come from multiple BESTTYPE; track which one
   END;
   R T(BestBy_Proxid_child le) := TRANSFORM
     SELF := le.company_name_cases[1];
@@ -3042,7 +2617,6 @@ SHARED Flatten_BestBy_Proxid(DATASET({BestBy_Proxid_child}) d) := FUNCTION
     SELF := le.duns_number_cases[1];
     SELF := le.company_sic_code1_cases[1];
     SELF := le.company_naics_code1_cases[1];
-    SELF := le.dba_name_cases[1];
     SELF := le; // Copy all non-multi fields
   END;
   P1 := PROJECT(d,T(LEFT));

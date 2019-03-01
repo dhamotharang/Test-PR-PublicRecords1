@@ -1,4 +1,4 @@
-﻿/*--SOAP--
+/*--SOAP--
 <message name="ProxidSliceOutService">
 <part name="BaseProxid" type="xsd:string"/>
 <part name="Basercid" type="xsd:string"/>
@@ -37,4 +37,3 @@ output( odr,named('PreferredProxidValues'));
 output( odl_noprop,named('ProxidValues_NoProp'));
 output( odr_noprop,named('PreferredProxidValues_NoProp'));
 endmacro;
- 
