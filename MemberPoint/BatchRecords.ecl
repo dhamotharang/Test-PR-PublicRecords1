@@ -1,4 +1,4 @@
-IMPORT Address, ut, NID, AddrBest, BatchShare, DidVille, progressive_phone, BatchServices, Royalty,
+﻿IMPORT Address, ut, NID, AddrBest, BatchShare, DidVille, progressive_phone, BatchServices, Royalty,
        PhoneFinder_Services, Gateway, MemberPoint, iesp, Std;
 
 	export BatchRecords(dataset(MemberPoint.Layouts.batchIn) rawBatchIn, MemberPoint.IParam.BatchParams BParams) := function
@@ -179,6 +179,11 @@ IMPORT Address, ut, NID, AddrBest, BatchShare, DidVille, progressive_phone, Batc
 			SELF.Email3 := rowsEmails[3].orig_email;
 			SELF.Email4 := rowsEmails[4].orig_email;
 			SELF.Email5 := rowsEmails[5].orig_email;
+			SELF.Email6 :=rowsEmails[6].orig_email;
+		  SELF.Email7 :=rowsEmails[7].orig_email;
+		  SELF.Email8 :=rowsEmails[8].orig_email;  
+		  SELF.Email9 :=rowsEmails[9].orig_email;
+		  SELF.Email10 :=rowsEmails[10].orig_email;
 			SELF := [];
 		END;
 		//Waterfall BatchOut Transformation
@@ -309,16 +314,22 @@ IMPORT Address, ut, NID, AddrBest, BatchShare, DidVille, progressive_phone, Batc
    
    		finalRecords := dataset([{dsOutput ,dsEmailsWhole.Royalties}],finalRec);
 			/* DEBUG */
-			// OUTPUT(dsBestGood, named('dsBestGood'));
-			// output(dsEmailsWholePre, named('dsEmailsWholePre'));
-			// output(dsEmailsResults, named('dsEmailsResults'));
-			// OUTPUT(isIncludeEmail, NAMED('isIncludeEmail'));
-			// OUTPUT(dsEmailsWhole, NAMED('dsEmailsWhole'));
-			// OUTPUT(wfResult, NAMED('wfResult'));
-			// OUTPUT(dsPhonesPre, NAMED('wfCutoffFilter'));
+			//OUTPUT(batchIn, named('batchIn'));
+			//output(dsEmailsWholePre, named('dsEmailsWholePre'));
+			//output(dsEmailsWhole, named('dsEmailsWhole'));
+			//output(dsEmailsResults, named('dsEmailsResults'));
+			//OUTPUT(isIncludeEmail, NAMED('isIncludeEmail'));
+			//OUTPUT(commonBatchOut, NAMED('commonBatchOut'));
+			//OUTPUT(waterfallBatchOut, NAMED('waterfallBatchOut'));
+			//OUTPUT(phoneFinderBatchOut, NAMED('phoneFinderBatchOut'));
+			//OUTPUT(AdultsOrGuardiansBatchOut, NAMED('AdultsOrGuardiansBatchOut'));
+			//OUTPUT(dsEmailsWhole, NAMED('dsEmailsWhole'));
+			//OUTPUT(wfResult, NAMED('wfResult'));
+			// OUTPUT(dsPhonesPre, NAMED('dsPhonesPre'));
 			// OUTPUT(connectedWFPhones, NAMED('wfConnected'));
 			// OUTPUT(filteredWFPhones, NAMED('wfTypeFiltered'));
 			// OUTPUT(BParams);
+			//OUTPUT(dsPhonesPre);
 
 		return finalRecords;
 	end;
