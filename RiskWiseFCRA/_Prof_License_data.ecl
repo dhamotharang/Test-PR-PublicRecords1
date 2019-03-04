@@ -1,4 +1,4 @@
-IMPORT doxie, fcra, Prof_LicenseV2, ut, RiskView, riskwise;
+﻿IMPORT doxie, fcra, Prof_LicenseV2, ut, RiskView, riskwise;
 
 EXPORT _Prof_License_data(dataset (doxie.layout_references) dids, dataset (fcra.Layout_override_flag) flag_file,
 																						boolean isDirectToConsumerPurpose=false, unsigned1 year_limit = 0) := FUNCTION
@@ -22,7 +22,8 @@ EXPORT _Prof_License_data(dataset (doxie.layout_references) dids, dataset (fcra.
 				transform( Layout_Proflic,
 					self.did := (integer)left.did,
 					self.prolic_seq_id := 0,
-					self := LEFT
+					self := LEFT,
+					self:= [] 				//RR-14824 CCPA Changes
 				));
 				
 		prolic_grp := group( sort( proflic_all( prolic_key!=''), prolic_key, -date_last_seen ), prolic_key );
