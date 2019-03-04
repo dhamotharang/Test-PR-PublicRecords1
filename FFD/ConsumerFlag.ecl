@@ -33,8 +33,7 @@ EXPORT ConsumerFlag := MODULE
                              SELF.Message       := FFD.Constants.AlertMessage.CSMessage)),
                              FFD.Constants.BlankConsumerAlerts);
 
-   RETURN IF(returnBlank, FFD.Constants.BlankConsumerAlerts,
-		        consumer_alerts + has_statements_alert);
+   RETURN IF(returnBlank, FFD.Constants.BlankConsumerAlerts, consumer_alerts + has_statements_alert);
   END;
   
   EXPORT prepareAlertMessagesBatch (DATASET(FFD.Layouts.PersonContextBatch) PersonContext,
@@ -43,7 +42,7 @@ EXPORT ConsumerFlag := MODULE
 
     returnBlank := ~FFD.FFDMask.isShowConsumerStatements(inFFDOptionsMask); 
     
-		consumer_alerts := PROJECT (PersonContext(RecordType IN FFD.Constants.RecordType.AlertFlags),
+    consumer_alerts := PROJECT (PersonContext(RecordType IN FFD.Constants.RecordType.AlertFlags),
                            TRANSFORM (FFD.layouts.ConsumerStatementBatchFull,
                                   SELF.acctno := LEFT.acctno ,
                                   SELF.SequenceNumber := 0, // Consumer level alerts are for the whole DID, not specefic data rows. 
@@ -61,7 +60,7 @@ EXPORT ConsumerFlag := MODULE
                                  KEEP(1), LIMIT(0));
 
     RETURN IF(returnBlank, DATASET([],FFD.layouts.ConsumerStatementBatchFull),
-		          consumer_alerts_fltrd);
+              consumer_alerts_fltrd);
   END;
 
   STRING1 subject_has_alert := FFD.Constants.subject_has_alert;
@@ -70,7 +69,9 @@ EXPORT ConsumerFlag := MODULE
                                                     INTEGER purpose, BOOLEAN suppressIT, 
                                                     BOOLEAN isReseller) := TRANSFORM
       is_security_fraud_alert := re.RecordType = FFD.Constants.RecordType.FA;
-      is_security_freeze := ~isReseller AND re.RecordType = FFD.Constants.RecordType.SF AND purpose IN re.set_FCRA_purpose; // SF is not applicable to re-Sellers
+      is_security_freeze := ~isReseller // SF is not applicable to re-Sellers
+        AND re.RecordType = FFD.Constants.RecordType.SF AND 
+        (re.security_freeze_suppression.apply_to_all OR purpose IN re.security_freeze_suppression.set_FCRA_purpose);
       is_identity_theft := re.RecordType = FFD.Constants.RecordType.IT;
       
       SELF.acctno := re.acctno;

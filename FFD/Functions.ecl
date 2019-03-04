@@ -10,7 +10,7 @@ EXPORT Functions := MODULE
       total_words := COUNT(inl_set);
 
       inl_ds := DATASET(total_words,
-											TRANSFORM(int_rec, SELF.number := (INTEGER) inl_set[COUNTER]));
+                      TRANSFORM(int_rec, SELF.number := (INTEGER) inl_set[COUNTER]));
       set_out := SET(inl_ds, number);                
     RETURN set_out;
   END;
@@ -27,7 +27,8 @@ EXPORT Functions := MODULE
 
       suppress_for_LH := LH_flag = PersonContext.Constants.LegalFlag.SuppressProduct OR LH_flag = PersonContext.Constants.LegalFlag.SuppressAll;
       SELF.suppress_for_legal_hold := suppress_for_LH;
-      SELF.set_FCRA_purpose := CovertSetStr2Int(inl_set);
+      SELF.security_freeze_suppression.apply_to_all := le.RecordType = FFD.Constants.RecordType.SF AND TRIM(le.Content,LEFT,RIGHT) = '*';
+      SELF.security_freeze_suppression.set_FCRA_purpose := CovertSetStr2Int(inl_set);
       SELF.Content := CASE(le.RecordType, 
                             FFD.Constants.RecordType.IT => FFD.Constants.AlertMessage.IDTheftMessage,
                             FFD.Constants.RecordType.LH => IF(suppress_for_LH, FFD.Constants.AlertMessage.LegalHoldMessage, SKIP), // we should only return LH alert if we are suppressing results for it
