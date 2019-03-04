@@ -3446,7 +3446,21 @@ self := left), keep(1), left outer);
 /* ================ */
 
 
-
+/* ================ */
+RVA1809_1_0_score := Models.RVA1809_1_0(clam,xmlPrescreenOptOut);
+// output(RVA1809_1_0_score, named('RVA1809_1_0_score'));
+                             
+with_RVA1809_1_0 := join(with_RVG1702_1_0, RVA1809_1_0_score,
+left.seq=(unsigned)right.seq,
+transform(Models.layout_Runway,
+self.RVA1809_1_0_score := right.score;
+self.RVA1809_1_0_reason1 := if(exclude_reasons, '',  right.ri[1].hri);
+self.RVA1809_1_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
+self.RVA1809_1_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
+self.RVA1809_1_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
+self := left), keep(1), left outer);
+// output(with_RVA1809_1_0, named('with_RVA1809_1_0'));
+/* ================ */
 
 
 
@@ -3456,7 +3470,7 @@ self := left), keep(1), left outer);
 RVG1705_1_0_score := Models.RVG1705_1_0(clam);
 // output(RVG1702_1_0_score, named('RVG1702_1_0_score'));
                              
-with_RVG1705_1_0 := join(with_RVG1702_1_0, RVG1705_1_0_score,
+with_RVG1705_1_0 := join(with_RVA1809_1_0, RVG1705_1_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
 self.RVG1705_1_0_score := right.score;
@@ -5558,6 +5572,13 @@ self.RVG1808_2_0_reason2	:= if(model_environment in [1,2], left.RVG1808_2_0_reas
 self.RVG1808_2_0_reason3	:= if(model_environment in [1,2], left.RVG1808_2_0_reason3	, '');
 self.RVG1808_2_0_reason4	:= if(model_environment in [1,2], left.RVG1808_2_0_reason4	, '');
 self.RVG1808_2_0_reason5	:= if(model_environment in [1,2], left.RVG1808_2_0_reason5	, '');
+
+self.RVA1809_1_0_score	:= if(model_environment in [1,2], left.RVA1809_1_0_score	, '');
+self.RVA1809_1_0_reason1	:= if(model_environment in [1,2], left.RVA1809_1_0_reason1	, '');
+self.RVA1809_1_0_reason2	:= if(model_environment in [1,2], left.RVA1809_1_0_reason2	, '');
+self.RVA1809_1_0_reason3	:= if(model_environment in [1,2], left.RVA1809_1_0_reason3	, '');
+self.RVA1809_1_0_reason4	:= if(model_environment in [1,2], left.RVA1809_1_0_reason4	, '');
+self.RVA1809_1_0_reason5	:= if(model_environment in [1,2], left.RVA1809_1_0_reason5	, '');
 
 
 self.RVP1012_1_0_score	:= if(model_environment in [1,2], left.RVP1012_1_0_score	, '');
