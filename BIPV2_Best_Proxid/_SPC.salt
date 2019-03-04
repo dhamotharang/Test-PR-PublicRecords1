@@ -1,4 +1,4 @@
-﻿OPTIONS:-gh -ga 
+OPTIONS:-gh -ga
 MODULE:BIPV2_Best_Proxid
 FILENAME:Base
 // Uncomment up to NINES for internal or external adl
@@ -64,21 +64,6 @@ BESTTYPE:BestDunsCommon:BASIS(Proxid):COMMONEST:FUZZY:MINIMUM(2):VALID(fn_valid_
 BESTTYPE:BestDunsCurrent:BASIS(Proxid):RECENT(dt_last_seen):FUZZY:MINIMUM(2):VALID(fn_valid_duns):EXTEND
 BESTTYPE:BestDunsCurrent2:BASIS(Proxid):RECENT(dt_last_seen):VALID(fn_valid_duns):EXTEND
 BESTTYPE:BestDunsVotedUnrestricted:BASIS(Proxid):VOTED(fn_Best_Source_Unrestricted_Votes,2):VALID(fn_valid_duns):EXTEND
-//SIC
-BESTTYPE:BestSicCommon:BASIS(Proxid):COMMONEST:MINIMUM(2):EXTEND
-BESTTYPE:BestSicCurrent:BASIS(Proxid):RECENT(dt_last_seen):MINIMUM(2):EXTEND
-//NAICS
-BESTTYPE:BestNaicsCommon:BASIS(Proxid):COMMONEST:MINIMUM(2):EXTEND
-BESTTYPE:BestNaicsCurrent:BASIS(Proxid):RECENT(dt_last_seen):MINIMUM(2):EXTEND
-// DBA Name
-BESTTYPE:BestDbaNameLegal:BASIS(Proxid):VOTED(fn_Best_Name_Legal_Votes):FUZZY:VALID(fn_valid_cname):EXTEND
-BESTTYPE:BestDbaNameCommon:BASIS(Proxid):COMMONEST:FUZZY:MINIMUM(2):VALID(fn_valid_cname):EXTEND
-BESTTYPE:BestDbaNameCurrent:BASIS(Proxid):RECENT(dt_last_seen):FUZZY:MINIMUM(2):VALID(fn_valid_cname):EXTEND
-BESTTYPE:BestDbaNameVoted:BASIS(Proxid):VOTED(fn_Best_Name_Source_Votes,2):VALID(fn_valid_cname):EXTEND
-BESTTYPE:BestDbaNameLength:BASIS(Proxid):LONGEST:FUZZY:VALID(fn_valid_cname):EXTEND
-BESTTYPE:BestDbaNameStrong:BASIS(Proxid):UNIQUE:FUZZY:VALID(fn_valid_cname):EXTEND
-BESTTYPE:BestDbaNameCurrent2:BASIS(Proxid):RECENT(dt_last_seen):VALID(fn_valid_cname):EXTEND
-BESTTYPE:BestDbaNameVotedUnrestricted:BASIS(Proxid):VOTED(fn_Best_Source_Unrestricted_Votes,2):VALID(fn_valid_cname):EXTEND
 // FUZZY can be used to create new types of FUZZY linking
 FUZZY:Right4:RST:CUSTOM(fn_Right4):TYPE(STRING4)
 FUZZY:PreferredName:RST:CUSTOM(fn_PreferredName):TYPE(STRING20)
@@ -96,11 +81,6 @@ FIELD:company_name:LIKE(cname):BestCompanyNameLegal:BestCompanyNameCommon:BestCo
 FIELD:company_fein:LIKE(number):right4:EDIT1:BestFeinStrong:BestFeinCommon:BestFeinCurrent:BestFeinVotedUnrestricted:BestFeinMin:BestFeinMax:OWNED:FLAG:26,106
 FIELD:company_phone:LIKE(number):EDIT1:BestPhoneCurrentWithNpa:BestPhoneCurrent:BestPhoneVoted:BestPhoneLongest:BestPhoneStrong:BestPhoneVotedUnrestricted:BestPhoneCommon:FLAG:26,275
 FIELD:company_url:BestUrlCommon:BestUrlCurrent:BestUrlLength:BestUrlStrong:BestUrlVotedUnrestricted:FLAG:27,17
-FIELD:duns_number:EDIT1:LIKE(number):BestDunsCommon:BestDunsCurrent:BestDunsCurrent2:BestDunsVotedUnrestricted:FLAG:27,77
-FIELD:company_sic_code1:BestSicCommon:BestSicCurrent:FLAG:11,324
-FIELD:company_naics_code1:BestNaicsCommon:BestNaicsCurrent:FLAG:11,132
-FIELD:dba_name:LIKE(cname):BestDbaNameLegal:BestDbaNameCommon:BestDbaNameCurrent:BestDbaNameVoted:BestDbaNameLength:BestDbaNameStrong:BestDbaNameCurrent2:BestDbaNameVotedUnrestricted:FLAG:26,373
-
 // ------------------------------------
 //  2. company Address fields
 // ------------------------------------
@@ -119,6 +99,7 @@ FIELD:zip4:LIKE(number):13,62
 FIELD:fips_state:LIKE(number):5,0
 FIELD:fips_county:LIKE(number):7,44
 CONCEPT:address:prim_range:predir:prim_name:addr_suffix:postdir:unit_desig:sec_range:st:zip:BestCompanyAddressVoted:BestCompanyAddressCurrent:BestCompanyAddressVotedSrc:BestCompanyAddressCommon:BestCompanyAddressStrong:BestCompanyAddressCurrent2:BestCompanyAddressVotedUnrestricted:FLAG:25,113
+FIELD:duns_number:EDIT1:LIKE(number):BestDunsCommon:BestDunsCurrent:BestDunsCurrent2:BestDunsVotedUnrestricted:FLAG:0,0
 // BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking
 // CONCEPT statements should be used to group together interellated fields; such as address
 // RELATIONSHIP is used to find non-obvious relationships between the clusters
@@ -142,6 +123,6 @@ CONCEPT:address:prim_range:predir:prim_name:addr_suffix:postdir:unit_desig:sec_r
 // TBD, but essentially any other connection we come across in this process but do not feel is strong enough for ProxID linking.
 //SeleID
 // 1.   It is the Smallest Encapsulating Legal Entity.
-// 2.   Scenario 1: if I am a branch location of ArbyÃ¢??s, my SELE is the corporate office I report to.
+// 2.   Scenario 1: if I am a branch location of Arbyâ??s, my SELE is the corporate office I report to.
 // 3.   Scenario 2: if I am a Subsidiary of Reed Elsevier, I am my own SELE.
 // 4    The SELEID above ProxidID and below Org and Ult.

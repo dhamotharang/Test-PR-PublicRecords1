@@ -1,4 +1,4 @@
-﻿//Executable code
+//Executable code
 EXPORT Proc_Iterate(STRING iter,DATASET(Layout_Base) InFile0 = BIPV2_Best_Proxid.In_Base,STRING OutFileNameP = '~temp::Proxid::BIPV2_Best_Proxid::it',UNSIGNED MatchThreshold = Config.MatchThreshold,BOOLEAN Debugging = true) := MODULE
 SHARED InFile := InFile0;
 SHARED MM := BIPV2_Best_Proxid.matches(InFile,MatchThreshold); // Get the matching module
