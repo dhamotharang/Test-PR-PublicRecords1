@@ -3,7 +3,7 @@
 EXPORT SoapCall_EquifaxDecisioning(DATASET(iesp.equifax_attributes.t_EquifaxAttributesRequest) gatewayInput,		                                   
                                    Gateway.Layouts.Config gateway_cfg = Gateway.Constants.void_gateway,
                                    BOOLEAN EnableGatewayCall = FALSE,
-                                   INTEGER WaitTime = Gateway.Constants.Defaults.WAIT_TIMEOUT_EXPERIAN, 
+                                   INTEGER WaitTime = Gateway.Constants.Defaults.DEFAULT_TIMEOUT, 
                                    INTEGER numRetries	= Gateway.Constants.Defaults.RETRIES) := 
   FUNCTION
 

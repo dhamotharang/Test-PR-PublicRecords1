@@ -21,7 +21,7 @@ auth := Gateway.SoapCall_NewsAuthenticate(dataset([TRANSFORM(iesp.gateway_news.t
 
 EXPORT SoapCall_NewsAuthenticate (DATASET(iesp.gateway_news.t_NewsAuthenticateRequest) authReq, 
 												 Layouts.Config gateway_cfg,
-												 integer waittime = Constants.Defaults.WAIT_TIMEOUT_EXPERIAN, 
+												 integer waittime = Constants.Defaults.DEFAULT_TIMEOUT, 
 												 integer retries	= Constants.Defaults.RETRIES) := FUNCTION
 
 

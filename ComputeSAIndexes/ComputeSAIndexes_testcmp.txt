@@ -1,0 +1,662 @@
+ID "h7560a60-dfaa-438b-82e4-1cb7a0e2c91c"; 
+NAME ComputeSAIndexes_testcmp;
+LABEL "Composition for Compute SA Indexes";
+DESCRIPTION "Composition for Compute SA Indexes";
+VERSION "1.0.0";
+AUTHOR "gaoyon01";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+  STRING JOBID: DEFAULT("test");
+  STRING GCID: DEFAULT("8291831");
+  STRING CompareWUID : DEFAULT("W20180214-115700");
+  STRING InputLogicalProviderFilename: DEFAULT("~qa::computesaindexes::computesaindexes::input::provider"),
+    LABEL("Example: ~batchr3::34513179::suspectaddress::output::hnow-8291831-mrshnow5024::scoring::1");
+  STRING InputLogicalFacilityFilename: DEFAULT("~qa::computesaindexes::computesaindexes::input::facility"),
+    LABEL("Example: ~batchr3::160197018::facilities::facilities_clean_businesses");
+END
+
+INSTANCE HIPIE_Plugins.ComputeSAIndexes.ComputeSAIndexes(Ins003): LABEL("Compute SA Indexes"),VERSION("1.0.0")
+  JOBID="^GLOBAL|JOBID"
+  GCID="^GLOBAL|GCID"
+  
+  dsInputProvider="^Ins001|dsOutput"
+  
+  ProviderProviderKey="provider_key"
+  ProviderProviderNpi="provider_npi"
+  ProviderFacilityName="provider_facility_name"
+  ProviderSpecialty="providerattrtaxonomydescription"
+
+  ProviderChargedDollars="claimoutlierproviderhighchargeamount"
+  ProviderPaidDollars="claimoutlierproviderhighpaidamount"
+  ProviderClaims="claimoutlierproviderclaimcount"
+
+  FirstName="cleanproviderfirstname"
+  MiddleName="cleanprovidermiddlename"
+  LastName="cleanproviderlastname"
+  SuffixName="cleanprovidernamesuffix"
+  
+  PrimaryRange="cleanproviderprimaryrange"
+  PreDirectional="cleanproviderpredirectional"
+  PrimaryName="cleanproviderprimaryname"
+  AddressSuffix="cleanprovideraddresssuffix"
+  PostDirectional="cleanproviderpostdirectional"
+  SecondaryRange="cleanprovidersecondaryrange"
+  City="cleanprovidervanitycity"
+  State="cleanproviderstate"
+  Zip5="cleanproviderzip5"
+  FipsState="cleanproviderfipsstate"
+  County="cleanprovidercounty"
+  Latitude="cleanproviderlatitude"
+  Longitude="cleanproviderlongitude"
+  AddressKey="cleanprovideraddresskey"
+
+  LNPID="inplnpid"
+  LEXID="providerattrlexid"
+
+  dsInputFacility="^Ins002|dsOutput"
+
+  FacilityProviderKey="provider_id"
+  FacilityProviderNpi="npi"
+  FacilityFacilityName="facility_name"
+  FacilitySpecialty="speciality"
+
+  FacilityChargedDollars="chargeddollaramount"
+  FacilityPaidDollars="paiddollaramount"
+  FacilityClaims="totalclaims"
+
+  DateFirstSeen="facilitiesbestproxdatefirstseen"
+  ClaimStartDate="claimsstartdate"
+  ClaimEndDate="claimsenddate"
+
+  NetworkKey="proxentitycontextuid"
+  LegalBusinessName="legal_business_name"
+  DoingBusinessAs="doing_business_as"
+  BusinessAddress="facilityaddresssearchsearchstring"
+  InInputFile="additionalbusinessesisproxinput"
+  IncorporationDate="facilitiesbestproxincorporationdate"
+  LegalEntityIsActive="facilitiesbestseleisactive"
+  LegalEntityIsDefunct="facilitiesbestseleisdefunct"
+END
+
+INSTANCE HIPIE_Plugins.UseDataset.UseDataset(Ins001): LABEL("Use Dataset"),VERSION("1.1")
+  LogicalFilename="^GLOBAL|InputLogicalProviderFilename"
+  Structure="reasonlayout := RECORD
+   string4 reason;
+   string description;
+   string value;
+  END;
+
+RECORD
+  string50 provider_key;
+  string10 provider_npi;
+  string12 provider_dea;
+  string10 provider_taxonomy;
+  string10 provider_tax_id;
+  string5 provider_tax_id_suffix;
+  string12 provider_num;
+  string5 provider_num_suffix;
+  string2 provider_num_qualifier;
+  string2 provider_security_code;
+  string3 network_code;
+  string50 provider_facility_name;
+  string12 provider_facility_num;
+  string30 provider_first_name;
+  string36 provider_last_name;
+  string36 provider_address_1;
+  string36 provider_address_2;
+  string24 provider_city;
+  string2 provider_state;
+  string9 provider_zip_cd;
+  string30 provider_county;
+  string2 provider_country;
+  string4 provider_region;
+  string9 prov_specialty_cd_1;
+  string9 prov_specialty_cd_2;
+  string2 provider_type;
+  string1 watch_cd;
+  string8 provider_latest_update_date;
+  string50 prov_user_def_01;
+  string50 prov_user_def_02;
+  string50 prov_user_def_03;
+  string50 prov_user_def_04;
+  string50 prov_user_def_05;
+  string50 prov_user_def_06;
+  string50 prov_user_def_07;
+  string50 prov_user_def_08;
+  string50 prov_user_def_09;
+  string50 prov_user_def_10;
+  string50 cleanproviderproviderkey;
+  string20 cleanproviderfirstname;
+  string20 cleanprovidermiddlename;
+  string20 cleanproviderlastname;
+  string5 cleanprovidernamesuffix;
+  string10 cleanproviderprimaryrange;
+  string2 cleanproviderpredirectional;
+  string28 cleanproviderprimaryname;
+  string4 cleanprovideraddresssuffix;
+  string2 cleanproviderpostdirectional;
+  string10 cleanproviderunitdesignation;
+  string8 cleanprovidersecondaryrange;
+  string25 cleanproviderpostalcity;
+  string25 cleanprovidervanitycity;
+  string2 cleanproviderstate;
+  string5 cleanproviderzip5;
+  string4 cleanproviderzip4;
+  string2 cleanproviderdbpc;
+  string1 cleanprovidercheckdigit;
+  string2 cleanproviderrecordtype;
+  string2 cleanproviderfipsstate;
+  string3 cleanprovidercounty;
+  string10 cleanproviderlatitude;
+  string11 cleanproviderlongitude;
+  string4 cleanprovidermsa;
+  string7 cleanprovidergeoblock;
+  string1 cleanprovidergeomatchcode;
+  string4 cleanprovidererrorstatus;
+  string25 cleanprovideraddresskey;
+  string1 advohitflag;
+  string1 advovacancyindicator;
+  string1 advothrowbackindicator;
+  string1 advoseasonaldeliveryindicator;
+  string5 advoseasonalsuppressionstartdate;
+  string5 advoseasonalsuppressionenddate;
+  string1 advodonotdeliverindicator;
+  string1 advocollegeindicator;
+  string10 advocollegesuppressionstartdate;
+  string10 advocollegesuppressionenddate;
+  string1 advoaddressstyle;
+  string5 advosimplifyaddresscount;
+  string1 advodropindicator;
+  string1 advoresidentialorbusinessindicator;
+  string1 advoonlywaytogetmailindicator;
+  string1 advorecordtypecode;
+  string1 advoaddresstype;
+  string1 advoaddressusagetype;
+  string8 advofirstseendate;
+  string8 advolastseendate;
+  string8 advovendorfirstreporteddate;
+  string8 advovendorlastreporteddate;
+  string8 advovacationbegindate;
+  string8 advovacationenddate;
+  string8 advonumberofcurrentvacationmonths;
+  string8 advomaxvacationmonths;
+  string8 advovacationperiodscount;
+  string1 acahitfound;
+  string200 acainstitution;
+  string2 acainstitutiontype;
+  string10 acainstitutiontypeexp;
+  string1 acaaddresstype;
+  unsigned8 inplnpid;
+  unsigned2 inppidweight;
+  unsigned2 inppiddistance;
+  unsigned8 providerattrlexid;
+  string1 providerattrentitytype;
+  string20 providerattrfname;
+  string20 providerattrmname;
+  string28 providerattrlname;
+  string5 providerattrsname;
+  string9 providerattrssn;
+  string9 providerattrconsumerssn;
+  unsigned4 providerattrdateofbirth;
+  unsigned4 providerattrconsumerdateofbirth;
+  string25 providerattrlicensenumber;
+  string25 providerattrcleanedlicensenumber;
+  string2 providerattrlicensestate;
+  string60 providerattrlicensetype;
+  string60 providerattrlicensestatus;
+  unsigned4 providerattrdatelicenseexpired;
+  unsigned4 providerattrlicensecount;
+  unsigned4 providerattrlicensestatecount;
+  unsigned4 providerattractivelicensecount;
+  unsigned4 providerattrinactivelicensecount;
+  unsigned4 providerattrrevokedlicensecount;
+  string2 providerattrinactivelicensestate;
+  string1 providerattrinactivelicenseflag;
+  string1 providerattrrevokedlicenseflag;
+  string1 providerattrexpiredlicenseflag;
+  string1 providerattrdeathindicator;
+  unsigned4 providerattrdateofdeath;
+  unsigned4 providerattrbillingtaxid;
+  string10 providerattrphone;
+  string10 providerattrfax;
+  string6 providerattrupin;
+  string10 providerattrnpinumber;
+  string8 providerattrnpienumerationdate;
+  string8 providerattrnpideactivationdate;
+  string8 providerattrnpireactivationdate;
+  string1 providerattrnpiflag;
+  unsigned4 providerattrdeactivednpicount;
+  string1 providerattrdeabusinessactivityindicator;
+  string10 providerattrdeanumber;
+  unsigned4 providerattrdatedeaexpired;
+  unsigned4 providerattrdeacount;
+  unsigned4 providerattractivedeacount;
+  unsigned4 providerattrexpireddeacount;
+  string1 providerattrdeaexpiredflag;
+  string1 providerattrisstatesanction;
+  string1 providerattrisoigsanction;
+  string1 providerattrisopmsanction;
+  string10 providerattrtaxonomy;
+  string50 providerattrtaxonomydescription;
+  string3 providerattrspecialitycode;
+  string1 providerattrproviderstatus;
+  string40 providerattrgroupkey;
+  string1 providerattrhasactivelicenserevocation;
+  string2 providerattractivelicenserevocationstate;
+  string8 providerattractivelicenserevocationdate;
+  string1 providerattrhasactivestateexclusion;
+  string2 providerattractivelicenseexclusionstate;
+  string8 providerattractivestateexclusiondate;
+  string1 providerattrhasactiveoigexclusion;
+  string8 providerattractiveoigexclusiondate;
+  string1 providerattrhasactiveopmexclusion;
+  string8 providerattractiveopmexclusiondate;
+  string8 providerattractivestatesanctionexclusiondate;
+  string8 providerattractiveoigsanctionexclusiondate;
+  string8 providerattractiveopmsanctionexclusiondate;
+  string1 providerattrhaslicenserevocationreinstated;
+  string2 providerattrlicenserevocationreinstatedstate;
+  string8 providerattrlicenserevocationreinstateddate;
+  string1 providerattrhasstateexclusioinreinstated;
+  string2 providerattrstateexclusionreinstatedstate;
+  string8 providerattrstateexclusionreinstateddate;
+  string1 providerattrhasoigexclusioinreinstated;
+  string8 providerattroigexclusionreinstateddate;
+  string1 providerattrhasopmexclusioinreinstated;
+  string8 providerattropmexclusionreinstateddate;
+  string10 providerattrresidentialprimaryrange;
+  string2 providerattrresidentialpredirectional;
+  string28 providerattrresidentialprimaryname;
+  string4 providerattrresidentialaddresssuffix;
+  string2 providerattrresidentialpostdirectional;
+  string8 providerattrresidentialsecondaryrange;
+  string25 providerattrresidentialcityname;
+  string2 providerattrresidentialstate;
+  string5 providerattrresidentialzip5;
+  unsigned3 providerattrresidentialaddresslastseen;
+  string1 providerattrproviderwithsingleaddress;
+  unsigned3 providerattrsingleaddressprovidercount;
+  string10 providerattrpractiseprimaryrange;
+  string2 providerattrpractisepredirectional;
+  string28 providerattrpractiseprimaryname;
+  string4 providerattrpractiseaddresssuffix;
+  string2 providerattrpractisepostdirectional;
+  string8 providerattrpractisesecondaryrange;
+  string25 providerattrpractisecityname;
+  string2 providerattrpractisestate;
+  string5 providerattrpractisezip5;
+  string1 providerattrhasbankruptcy;
+  string8 providerattrbankruptcylastseen;
+  string1 providerattrhascriminalhistory;
+  string8 providerattrlastarresteddate;
+  string1 providerattrhasrelativeconvictions;
+  string1 providerattrhasrelativebankruptcy;
+  string3 providerattrrelativecount;
+  string3 providerattrrelativebankruptcycount;
+  string3 providerattrrelativefelonycount;
+  string1 providerattrhasassocactivestateexclusion;
+  string1 providerattrhasassocactivelicenserevocation;
+  string1 providerattrhasassocstateexclusionreinstated;
+  string1 providerattrhasassoclicenserevocationreinstated;
+  string1 providerattrhasassocbankruptcy;
+  string1 providerattrhasassoccriminalhistory;
+  string1 providerattrhasdeceased;
+  string8 providerattrdeceaseddate;
+  string1 consumerattrhasbankruptcy;
+  string1 consumerattrhasconvictions;
+  string1 consumerattrhasdeceased;
+  string8 consumerattrdateofdeaceased;
+  string1 consumerattrhasrelativebankruptcy;
+  string1 consumerattrhasrelativeconvictions;
+  string8 consumerattrbankruptcydate;
+  string8 consumerattrconvictiondate;
+  string3 consumerattrrelativecount;
+  string3 consumerattrrelativesbankruptcycount;
+  string3 consumerattrrelativesfelonycount;
+  integer8 claimoutlierproviderclaimcount;
+  integer8 claimoutlierlnpidclaimcount;
+  integer8 claimoutlierproviderpatientcount;
+  integer8 claimoutlierpatientdeceasedcount;
+  real8 claimoutlierproviderhighchargeamount;
+  real8 claimoutlierlnpidhighchargeamount;
+  real8 claimoutlierproviderhighpaidamount;
+  real8 claimoutlierlnpidhighpaidamount;
+  real8 claimoutlierproviderhighpaidamountperclaim;
+  real8 claimoutlierproviderhighpaidamountperpatient;
+  string8 claimoutlierproviderservicedatemin;
+  string8 claimoutlierproviderservicedatemax;
+  string1 claimoutlierexcludeaddressflag;
+  string1 claimoutlierpatientdeceasedflag;
+  string1 claimoutlierprovidernpideactivatedflag;
+  string1 claimoutlierproviderdeadeactivatedflag;
+  integer8 claimoutlierproviderpatientaddresscount;
+  string1 claimoutlierproviderpatientaddressflag;
+  integer8 claimoutlieraddressprovidercount;
+  integer8 claimoutlieraddresspatientcount;
+  integer8 claimoutlieraddressclaimcount;
+  real8 claimoutlieraddresshighchargeamount;
+  real8 claimoutlieraddresshighpaidamount;
+  string8 claimoutlieraddressservicedatemin;
+  string8 claimoutlieraddressservicedatemax;
+  integer8 claimoutliertotalnpicount;
+  integer8 claimoutlierrecentnpicount;
+  integer8 claimoutlierstudentnpicount;
+  string1 claimoutlierrecentnpiflag;
+  string1 claimoutlierstudentnpiflag;
+  integer8 claimoutlierlargepatientgroupcount;
+  string1 claimoutlierlargepatientgroupflag;
+  string1 claimoutliervacantaddressactivityflag;
+  unsigned4 claimoutliernoofaddress;
+  real8 claimoutlierdistance;
+  string1 claimoutlierclaimcountflag;
+  string1 claimoutlierpatientcountflag;
+  string1 claimoutlierhighpaidamountflag;
+  string1 claimoutlierhighpaidamountperclaimflag;
+  string1 claimoutlierhighpaidamountperpatientflag;
+  string1 claimoutlierlongdistanceflag;
+  string1 claimoutlierdmeflag;
+  string1 claimoutlierlabflag;
+  unsigned2 claimoutlierclaimcountrank;
+  unsigned2 claimoutlierpatientcountrank;
+  unsigned2 claimoutlierhighpaidamountrank;
+  unsigned2 claimoutlierhighpaidamountperclaimrank;
+  unsigned2 claimoutlierhighpaidamountperpatientrank;
+  unsigned2 claimoutlierlongdistancerank;
+  unsigned2 claimoutlierdmerank;
+  unsigned2 claimoutlierlabrank;
+  unsigned8 claimoutlierclaimcountmedian;
+  unsigned8 claimoutlierpatientcountmedian;
+  unsigned8 claimoutlierhighpaidamountmedian;
+  unsigned8 claimoutlierhighpaidamountperclaimmedian;
+  unsigned8 claimoutlierhighpaidamountperpatientmedian;
+  unsigned8 claimoutlierlongdistancemedian;
+  unsigned8 claimoutlierdmemedian;
+  unsigned8 claimoutlierlabmedian;
+  unsigned8 claimoutlierdmepatientmedian;
+  unsigned8 claimoutlierlabpatientmedian;
+  unsigned8 claimoutlierdmeclaimmedian;
+  unsigned8 claimoutlierlabclaimmedian;
+  string2 claimoutlierclaimcountoutliertype;
+  string2 claimoutlierpatientcountoutliertype;
+  string2 claimoutlierhighpaidamountoutliertype;
+  string2 claimoutlierhighpaidamountperclaimoutliertype;
+  string2 claimoutlierhighpaidamountperpatientoutliertype;
+  string2 claimoutlierlongdistanceoutliertype;
+  string2 claimoutlierdmeoutliertype;
+  string2 claimoutlierlaboutliertype;
+  real4 claimoutlierclaimcountoutlierdiff;
+  real4 claimoutlierpatientcountoutlierdiff;
+  real4 claimoutlierhighpaidamountoutlierdiff;
+  real4 claimoutlierhighpaidamountperclaimoutlierdiff;
+  real4 claimoutlierhighpaidamountperpatientoutlierdiff;
+  real4 claimoutlierlongdistanceoutlierdiff;
+  real4 claimoutlierdmeoutlierdiff;
+  real4 claimoutlierlaboutlierdiff;
+  integer8 claimoutliernoofpatientdrivinglongdistance;
+  real4 claimoutlieravedistancetravelled;
+  integer8 claimoutlierpatientdod;
+  string50 claimoutlierproviderpatientsharedaddress;
+  string50 claimoutlierlargepatientgroupaddress;
+  string1 claimoutlierproviderdeceasedflag;
+  string1 claimoutlierproviderlicenseexpiredflag;
+  integer8 innetworkactiveexclusionflag;
+  integer8 innetworkactiverevocationflag;
+  integer8 innetworkreinstatedexclusionflag;
+  integer8 innetworkreinstatedrevocationflag;
+  integer8 innetworkbankruptcyflag;
+  integer8 innetworkcriminalflag;
+  integer8 outnetworkactiveexclusionflag;
+  integer8 outnetworkactiverevocationflag;
+  integer8 outnetworkreinstatedexclusionflag;
+  integer8 outnetworkreinstatedrevocationflag;
+  integer8 outnetworkbankruptcyflag;
+  integer8 outnetworkcriminalflag;
+  integer8 hasassociatebankruptcy;
+  integer8 hasassociatecriminal;
+  integer8 hasrelativebankruptcy;
+  integer8 hasrelativecriminal;
+  string innetworkactiveexclusionflagdescription;
+  string innetworkactiverevocationflagdescription;
+  string innetworkreinstatedexclusionflagdescription;
+  string innetworkreinstatedrevocationflagdescription;
+  string innetworkbankruptcyflagdescription;
+  string innetworkcriminalflagdescription;
+  string outnetworkactiveexclusionflagdescription;
+  string outnetworkactiverevocationflagdescription;
+  string outnetworkreinstatedexclusionflagdescription;
+  string outnetworkreinstatedrevocationflagdescription;
+  string outnetworkbankruptcyflagdescription;
+  string outnetworkcriminalflagdescription;
+  string hasassociatebankruptcydescription;
+  string hasassociatecriminaldescription;
+  string hasrelativebankruptcydescription;
+  string hasrelativecriminaldescription;
+  unsigned1 scoringsharedaddressscore;
+  unsigned1 scoringdmescore;
+  unsigned1 scoringlabscore;
+  unsigned1 scoringsingleaddressscore;
+  unsigned1 scoringrecentnpiscore;
+  unsigned1 scoringstudentnpiscore;
+  unsigned1 scoringdndscore;
+  unsigned1 scoringvacantscore;
+  unsigned1 scoringmaildropscore;
+  unsigned1 scoringpoboxscore;
+  unsigned1 scoringprisonscore;
+  unsigned1 scoringresidentialscore;
+  unsigned1 scoringcurrentexclusionscore;
+  unsigned1 scoringcurrentlicenserevocationscore;
+  unsigned1 scoringpastexclusionscore;
+  unsigned1 scoringpastrevocationscore;
+  unsigned1 scoringlicenseexpiredscore;
+  unsigned1 scoringdeaexpiredscore;
+  unsigned1 scoringdeceasedscore;
+  unsigned1 scoringbankruptcyscore;
+  unsigned1 scoringcriminalhistoryscore;
+  unsigned1 scoringdeceasedpatientsscore;
+  unsigned1 scoringlargepatientgroupscore;
+  unsigned1 scoringlicenseinactivescore;
+  unsigned1 scoringnpideactivatedscore;
+  unsigned1 scoringlongpatientdrivingdistancescore;
+  unsigned1 scoringhighpaiddollarsperpatientscore;
+  unsigned1 scoringhighpaiddollarsperclaimscore;
+  unsigned1 scoringhighnumberofpatientsscore;
+  unsigned1 scoringhighnumberofclaimsscore;
+  unsigned1 scoringhighpaiddollarsscore;
+  unsigned1 scoringinnetworkassoccurrentexclusionscore;
+  unsigned1 scoringinnetworkassoccurrentrevocationscore;
+  unsigned1 scoringinnetworkassocpastexclusionscore;
+  unsigned1 scoringinnetworkassocpastrevocationscore;
+  unsigned1 scoringinnetworkassocbankruptcyscore;
+  unsigned1 scoringinnetworkassoccriminalhistoryscore;
+  unsigned1 scoringoutnetworkassoccurrentexclusionscore;
+  unsigned1 scoringoutnetworkassoccurrentrevocationscore;
+  unsigned1 scoringoutnetworkassocpastexclusionscore;
+  unsigned1 scoringoutnetworkassocpastrevocationscore;
+  unsigned1 scoringoutnetworkassocbankruptcyscore;
+  unsigned1 scoringoutnetworkassoccriminalhistoryscore;
+  unsigned1 scoringrelativeassoccriminalscore;
+  unsigned1 scoringrelativeassocbankruptcyscore;
+  unsigned4 scoringaddressscore;
+  unsigned4 scoringprofessionalscore;
+  unsigned4 scoringmedianaddressscore;
+  unsigned4 scoringmedianprofessionalscore;
+  unsigned4 scoringmaxprofscoreataddressscore;
+  unsigned4 scoringsuspectprovideratlocationcount;
+  unsigned4 scoringincrementpaidamountcount;
+  unsigned4 scoringfinaladdressscore;
+  unsigned4 scoringfinalprofessionalscore;
+  DATASET(reasonlayout) scoringreasons;
+END;"
+  Method="THOR"
+END
+
+INSTANCE HIPIE_Plugins.UseDataset.UseDataset(Ins002): LABEL("Use Dataset"),VERSION("1.1")
+  LogicalFilename="^GLOBAL|InputLogicalFacilityFilename"
+  Structure="RECORD
+  string provider_id;
+  string facility_name;
+  string legal_business_name;
+  string doing_business_as;
+  string primary_address;
+  string city;
+  string state;
+  string zip;
+  string facilitytype;
+  integer8 chargeddollaramount;
+  integer8 paiddollaramount;
+  string claimsstartdate;
+  string claimsenddate;
+  string npi;
+  string speciality;
+  unsigned8 totalclaims;
+  string10 facilitiesaddressprimaryrange;
+  string2 facilitiesaddresspredirectional;
+  string28 facilitiesaddressprimaryname;
+  string4 facilitiesaddressaddresssuffix;
+  string2 facilitiesaddresspostdirectional;
+  string10 facilitiesaddressunitdesignation;
+  string8 facilitiesaddresssecondaryrange;
+  string25 facilitiesaddresspostalcity;
+  string25 facilitiesaddressvanitycity;
+  string2 facilitiesaddressstate;
+  string5 facilitiesaddresszip;
+  string4 facilitiesaddresszip4;
+  string2 facilitiesaddressdbpc;
+  string1 facilitiesaddresscheckdigit;
+  string2 facilitiesaddressrecordtype;
+  string5 facilitiesaddresscounty;
+  string10 facilitiesaddresslatitude;
+  string11 facilitiesaddresslongitude;
+  string4 facilitiesaddressmsa;
+  string7 facilitiesaddressgeoblock;
+  string1 facilitiesaddressgeomatchcode;
+  string4 facilitiesaddresserrorstatus;
+  boolean facilitiesaddresscachehit;
+  boolean facilitiesaddresscleanerhit;
+  string facilitiesaddresscleanedaddress;
+  string facilitiesaddressinputaddress;
+  boolean facilitiesaddressnoaddressinput;
+  boolean facilitiesaddressnoaddresscleanererror;
+  string facilitiesaddresserrorcodedescription;
+  unsigned6 facilitiesrecid;
+  unsigned6 facilitieslegalultid;
+  unsigned6 facilitieslegalorgid;
+  unsigned6 facilitieslegalseleid;
+  unsigned6 facilitieslegalproxid;
+  unsigned6 facilitieslegalpowid;
+  unsigned6 facilitieslegaldotid;
+  unsigned6 facilitieslegalempid;
+  unsigned6 facilitieslegalscore;
+  unsigned6 facilitieslegalweight;
+  unsigned6 facilitiesdbaultid;
+  unsigned6 facilitiesdbaorgid;
+  unsigned6 facilitiesdbaseleid;
+  unsigned6 facilitiesdbaproxid;
+  unsigned6 facilitiesdbapowid;
+  unsigned6 facilitiesdbadotid;
+  unsigned6 facilitiesdbaempid;
+  unsigned6 facilitiesdbascore;
+  unsigned6 facilitiesdbaweight;
+  unsigned6 facilityultid;
+  unsigned6 facilityorgid;
+  unsigned6 facilityseleid;
+  unsigned6 facilityproxid;
+  unsigned6 facilitypowid;
+  unsigned6 facilitydotid;
+  unsigned6 facilityempid;
+  unsigned6 facilityscore;
+  unsigned6 facilityweight;
+  unsigned6 finalbipultid;
+  unsigned6 finalbiporgid;
+  unsigned6 finalbipseleid;
+  unsigned6 finalbipproxid;
+  unsigned6 finalbippowid;
+  unsigned6 finalbipempid;
+  unsigned6 finalbipdotid;
+  unsigned8 finalbipscore;
+  unsigned8 finalbipweight;
+  integer1 additionalbusinessesisultinput;
+  integer1 additionalbusinessesisseleinput;
+  integer1 additionalbusinessesisproxinput;
+  string facilitiesbestultcompanyname;
+  string9 facilitiesbestultfein;
+  string10 facilitiesbestultprimaryrange;
+  string2 facilitiesbestultpredirectional;
+  string28 facilitiesbestultprimaryname;
+  string4 facilitiesbestultaddresssuffix;
+  string2 facilitiesbestultpostdirectional;
+  string10 facilitiesbestultunitdesignation;
+  string8 facilitiesbestultsecondaryrange;
+  string25 facilitiesbestultpostalcity;
+  string25 facilitiesbestultvanitycity;
+  string2 facilitiesbestultstate;
+  string5 facilitiesbestultzip;
+  string4 facilitiesbestultzip4;
+  string18 facilitiesbestultcounty;
+  string10 facilitiesbestultphone;
+  integer4 facilitiesbestultdatefirstseen;
+  integer4 facilitiesbestultdatelastseen;
+  unsigned4 facilitiesbestultincorporationdate;
+  string8 facilitiesbestultsic;
+  string6 facilitiesbestultnaics;
+  string facilitiesbestselecompanyname;
+  string9 facilitiesbestselefein;
+  string10 facilitiesbestseleprimaryrange;
+  string2 facilitiesbestselepredirectional;
+  string28 facilitiesbestseleprimaryname;
+  string4 facilitiesbestseleaddresssuffix;
+  string2 facilitiesbestselepostdirectional;
+  string10 facilitiesbestseleunitdesignation;
+  string8 facilitiesbestselesecondaryrange;
+  string25 facilitiesbestselepostalcity;
+  string25 facilitiesbestselevanitycity;
+  string2 facilitiesbestselestate;
+  string5 facilitiesbestselezip;
+  string4 facilitiesbestselezip4;
+  string18 facilitiesbestselecounty;
+  string10 facilitiesbestselephone;
+  integer4 facilitiesbestseledatefirstseen;
+  integer4 facilitiesbestseledatelastseen;
+  unsigned4 facilitiesbestseleincorporationdate;
+  string8 facilitiesbestselesic;
+  string6 facilitiesbestselenaics;
+  boolean facilitiesbestseleisactive;
+  boolean facilitiesbestseleisdefunct;
+  string facilitiesbestproxcompanyname;
+  string9 facilitiesbestproxfein;
+  string10 facilitiesbestproxprimaryrange;
+  string2 facilitiesbestproxpredirectional;
+  string28 facilitiesbestproxprimaryname;
+  string4 facilitiesbestproxaddresssuffix;
+  string2 facilitiesbestproxpostdirectional;
+  string10 facilitiesbestproxunitdesignation;
+  string8 facilitiesbestproxsecondaryrange;
+  string25 facilitiesbestproxpostalcity;
+  string25 facilitiesbestproxvanitycity;
+  string2 facilitiesbestproxstate;
+  string5 facilitiesbestproxzip;
+  string4 facilitiesbestproxzip4;
+  string18 facilitiesbestproxcounty;
+  string10 facilitiesbestproxphone;
+  integer4 facilitiesbestproxdatefirstseen;
+  integer4 facilitiesbestproxdatelastseen;
+  unsigned4 facilitiesbestproxincorporationdate;
+  string8 facilitiesbestproxsic;
+  string6 facilitiesbestproxnaics;
+  string ultentitycontextuid;
+  string seleentitycontextuid;
+  string proxentitycontextuid;
+  string facilityaddresssearchsearchstring;
+  real8 facilitybestlatitude;
+  real8 facilitybestlongitude;
+  string facilitybestgeomatchcode;
+  string addresstooltipconcatenated;
+  END;"
+  Method="THOR"
+END
+

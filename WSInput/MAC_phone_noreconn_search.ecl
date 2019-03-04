@@ -4,6 +4,7 @@
 											'ApplicationType',
 											'DataPermissionMask',
 											'DataRestrictionMask',
+											'DeathMasterPurpose',
 											'DLMask',
 											'dobMask',
 											'DPPAPurpose',

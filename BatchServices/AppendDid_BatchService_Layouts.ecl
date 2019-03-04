@@ -1,4 +1,4 @@
-IMPORT DIDville, batchshare;
+﻿IMPORT DIDville, batchshare;
 EXPORT AppendDid_BatchService_Layouts := MODULE
   EXPORT layout_did_InbatchWithAcctno := RECORD
 		string20 acctno;
@@ -18,4 +18,9 @@ EXPORT AppendDid_BatchService_Layouts := MODULE
 	   string15 adl_Category := ''; // CDM ph1 R2		 		 
      Batchshare.Layouts.ShareErrors;
 	END;		
+  
+   EXPORT layout_did_InbatchWithAcctnoWithDID := RECORD(layout_did_InbatchWithAcctno)
+     Batchshare.Layouts.ShareDid;
+	END;	
+  
 END;

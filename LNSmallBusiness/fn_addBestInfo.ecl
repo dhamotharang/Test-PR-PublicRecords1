@@ -1,4 +1,4 @@
-IMPORT address, BIPV2, BIPV2_Best, doxie, LNSmallBusiness, TopBusiness_Services;
+﻿IMPORT address, BIPV2, BIPV2_Best, BIPV2_Best_SBFE, doxie, LNSmallBusiness, TopBusiness_Services;
 
 EXPORT fn_addBestInfo (LNSmallBusiness.IParam.LNSmallBiz_BIP_CombinedReport_IParams SmallBizCombined_inmod, 
                        INTEGER BestInfoNeeded
@@ -60,51 +60,98 @@ EXPORT fn_addBestInfo (LNSmallBusiness.IParam.LNSmallBiz_BIP_CombinedReport_IPar
                           
     ds_linkIDs := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(ds_SearchInput).Data2_;		
 
-    // Only keep the first record to get phone
-    ds_linkIDs_deduped := CHOOSEN(DEDUP(SORT(ds_linkIDs, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), -weight), #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids())),1);
-
-    ds_in_ids := PROJECT(ds_linkIDs_deduped, BIPV2.IDlayouts.l_xlink_ids);
-      
+    // Only keep the first record 
+    ds_linkIDs_deduped := CHOOSEN(DEDUP(SORT(ds_linkids(source <> 'D'), #EXPAND(BIPv2.IDmacros.mac_ListTop4Linkids()), -weight, -record_score), #EXPAND(BIPv2.IDmacros.mac_ListTop4Linkids()) ),1);
+		
+		
+     
+     ds_in_ids := PROJECT(ds_linkIDs_deduped, BIPV2.IDlayouts.l_xlink_ids);		
+ 
+		 
     // to ensure the restrictions are made and
     // so that we do not have another global mod fetch
     biz_kfetch_temp_mod := 
       MODULE(PROJECT(SmallBizCombined_inmod,BIPV2.mod_sources.iParams, OPT));
       END;
-       
-    ds_best := 
-      BIPV2_Best.Key_LinkIds.KFetch( ds_in_ids,
-                                     BIPV2.IDconstants.Fetch_Level_SELEID,
+		
+	// new way
+	    ds_bestkfetch := choosen(
+      BIPV2_Best.Key_LinkIds.KFetch(ds_in_ids,
+                                     BIPV2.IDconstants.Fetch_Level_PROXID,
                                      ,
                                      biz_kfetch_temp_mod,
                                      FALSE,
                                      TopBusiness_Services.Constants.BusHeaderKfetchMaxLimit
-                                    )(proxid = 0);	
-                  
+                                      ),1);	
+																			
+	dataPermissionTempMod := MODULE( AutoStandardI.DataPermissionI.params )
+		EXPORT dataPermissionMask := SmallBizCombined_inmod.datapermissionmask;
+	END;
+
+	// determine if the user has access to Commercial Credit / SBFE and verify that the SBFE work is requested.
+	SBFECreditAccess := AutoStandardI.DataPermissionI.val(dataPermissionTempMod).use_SBFEData AND SmallBizCombined_inmod.IncludeCreditReport;
+	   					         	 
+	ds_bestBIPInfo  := Join(ds_bestkfetch,  ds_in_ids,
+                                     LEFT.ULtid = RIGHT.ultid and
+						     LEFT.ORGID = RIGHT.ORGID and
+						      LEFT.seleid = RIGHT.seleid and
+							LEFT.proxid = right.proxid, transform(RECORDOF(LEFT),
+							SELF.POWID := if (LEFT.POWID = 0, RIGHT.POWID, LEFT.POWID);
+							SELF := LEFT));
+      // if BusCreditAccess and if ds_best not exists then use SBFE best 		
+	// add in logic here for the SBFE best call
+	
+	// add in SBFE stuff here to add logic that says if seleid used for input is not in BIp header 
+	// then check SBFE best and use that to populate the 'best' layout
+	
+	    bipv2.idlayouts.l_xlink_ids2  xfm_setSBFE_BIPLinkids  :=  TRANSFORM
+					SELF.seleid      := SmallBizCombined_inmod.ds_SBA_Input[1].SeleID,
+					SELF := [];
+		END;		 
+		sbfe_ds_biplinkids :=    DATASET([xfm_setSBFE_BIPLinkids]);
+	
+	  topBusiness_bestrecs_sbfe := IF(SBFECreditAccess,BIPV2_Best_SBFE.Key_LinkIds().kFetch2(
+		 sbfe_ds_biplinkids
+		,SmallBizCombined_inmod.FetchLevel
+		, 
+		,SmallBizCombined_inmod.datapermissionmask
+		,TopBusiness_Services.Constants.BusHeaderKfetchMaxLimit));
+	 
+	  // have to project to common layout in else part of IF
+	  // this logic added in case there is a seleid that is used and that is only input criteria
+	  // and that seleid only exists in  SBFE data and not in bip header so use best results from SBFE best recs
+	   ds_best := IF  (exists(ds_bestBIPInfo), ds_bestBIPInfo,
+		 project(topBusiness_bestrecs_sbfe, transform(bipv2_best.Key_LinkIds.kfetchoutrec, self := LEFT; self := []))
+		            );
+                        
       // there will always only be one input record
+			
       ds_SBA_InputPlusPhone := 
         PROJECT(SmallBizCombined_inmod.ds_SBA_Input,
-          TRANSFORM( LNSmallBusiness.BIP_Layouts.Input,
-                     SELF.Bus_Phone10 := (STRING10)ds_best[1].Company_phone[1].company_phone,
+          TRANSFORM( LNSmallBusiness.BIP_Layouts.Input,							 			 
+			     SELF.Bus_Phone10 := (STRING10)ds_best[1].Company_phone[1].company_phone;
                      SELF             := LEFT
                     ));
-
+										
       ds_SBA_InputFromSeleID := 
         PROJECT(SmallBizCombined_inmod.ds_SBA_Input,
-          TRANSFORM( LNSmallBusiness.BIP_Layouts.Input,
-                     SELF.Bus_Phone10         := (STRING10)ds_best[1].Company_phone[1].company_phone,
-                     SELF.Bus_Company_Name    := ds_best[1].Company_name[1].Company_Name,   
+          TRANSFORM( LNSmallBusiness.BIP_Layouts.Input,                  
+				SELF.Bus_Phone10 := (STRING10) ds_best[1].Company_phone[1].company_phone;                    
+				SELF.Bus_Company_Name    := ds_best[1].Company_Name[1].company_name,                       
                      SELF.Bus_Street_Address1 := (STRING120)Address.Addr1FromComponents(ds_best[1].company_address[1].company_prim_range, 
                                                                                         ds_best[1].company_address[1].company_predir, 
                                                                                         ds_best[1].company_address[1].company_prim_name,
                                                                                         ds_best[1].company_address[1].company_addr_suffix, 
-                                                                                        ds_best[1].company_address[1].company_postdir, '', ''),      
-                     SELF.Bus_City            := ds_best[1].company_address[1].company_p_city_name,  
+                                                                                        ds_best[1].company_address[1].company_postdir, '', ''), 
+				SELF.Bus_city             := ds_best[1].company_address[1].company_p_city_name,
                      SELF.Bus_State           := ds_best[1].company_address[1].company_st, 
                      SELF.Bus_Zip             := ds_best[1].company_address[1].company_zip5,  
-                     SELF.SeleID              := ds_best[1].SeleID,
-                     SELF.OrgID               := ds_best[1].OrgID,
-                     SELF.UltID               := ds_best[1].UltID,       
-                     SELF                     := LEFT
+				SELF.UltID               := ds_best[1].UltID,     
+				SELF.OrgID               := ds_best[1].OrgID,
+                     SELF.SeleID              := ds_best[1].SeleID,                                          										 
+				SELF.Proxid            := ds_best[1].proxid,
+				self.powid              := ds_best[1].powid,
+				SELF := LEFT;
                     ));
 
       ds_SBA_Company_withPhone :=  
@@ -238,8 +285,9 @@ EXPORT fn_addBestInfo (LNSmallBusiness.IParam.LNSmallBiz_BIP_CombinedReport_IPar
                           ds_SBA_Company_withPhone_add_Rep3Info,
                           ds_withAuthRep2 
                         );
-
-
+   
+   // output(topBusiness_bestrecs_sbfe, named('topBusiness_bestrecs_sbfe'));
+	 // output(ds_bestBIPInfo, named('ds_bestBIPInfo'));
     RETURN ds_SBA_Input;
 
   END;
