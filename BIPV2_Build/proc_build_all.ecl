@@ -2,7 +2,7 @@
 
 export proc_build_all(
 
-   pversion               
+   pversion               = 'BIPV2.KeySuffix'          
   ,pDotStartIteration   
   ,pProxStartIteration   
   ,pLgid3StartIteration   
@@ -71,6 +71,7 @@ export proc_build_all(
   ,pSkipBest              = 'false'
   ,pSkipIndustry          = 'false'
   ,pSkipMisckeys          = 'false'
+  ,pSkipQASamples         = 'false'
   ,pSkipSegStats          = 'false'
   ,pSkipStrata            = 'false'
   ,pSkipOverlinking       = 'false'
@@ -93,6 +94,7 @@ export proc_build_all(
   ,pDotFilenameForProx        = '\'\'' //'BIPV2_Files.files_dotid.FILE_BASE'  //default is to start where we left off
   ,pInputFilenameForProxMj6   = 'BIPV2_Proxid.filenames().out.built' //'BIPV2_Files.files_dotid.FILE_BASE'  //default is to start where we left off
   ,pInputFilenameForProxPost  = 'bipv2_proxid_mj6._filenames().out.built' //'BIPV2_Files.files_dotid.FILE_BASE'  //default is to start where we left off
+  ,pCompileTest               = 'false'
    
 ) := 
 functionmacro
@@ -113,10 +115,10 @@ functionmacro
     xlinkCondition  := pSkipXlink = false or pSkipCopyXlinkKeys = false or pSkipXlinkValidation = false or pSkipXlinkSample = false or pSkipWeeklyKeys = false;
     bestCondition   := pSkipBest  = false or pSkipIndustry      = false or pSkipMisckeys    = false;
     
-    XlinkStuffWuid  := if(xlinkCondition                                                                  ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,pSkipXlink,pSkipCopyXlinkKeys,pSkipXlinkValidation ,pSkipXlinkSample,pSkipWeeklyKeys  ,true               ,true         ,true          ,true         ,true         ,true             ,true                 ,'XlinkStuff'                      ),'');
-    BestWuid        := if(bestCondition                                                                   ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,true      ,true              ,true                 ,true            ,true             ,pSkipBest          ,pSkipIndustry,pSkipMisckeys ,true         ,true         ,true             ,true                 ,'BestAndMiscKeys'                 ),'');
-    StatsWuid       := if(pSkipSegStats       = false or pSkipStrata = false or pSkipOverlinking = false  ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,true      ,true              ,true                 ,true            ,true             ,true               ,true         ,true          ,pSkipSegStats,pSkipStrata  ,pSkipOverlinking ,true                 ,'Stats'                           ),'');
-    RelativesWuid   := if(pSkipSeleidRelative = false                                                     ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,true      ,true              ,true                 ,true            ,true             ,true               ,true         ,true          ,true         ,true         ,true             ,pSkipSeleidRelative  ,'SeleidRelative'                  ),'');
+    XlinkStuffWuid  := if(xlinkCondition                                                                  ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,pSkipXlink,pSkipCopyXlinkKeys,pSkipXlinkValidation ,pSkipXlinkSample,pSkipWeeklyKeys  ,true               ,true         ,true          ,true           ,true           ,true         ,true             ,true                 ,'XlinkStuff'                      ,,pCompileTest),'');
+    BestWuid        := if(bestCondition                                                                   ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,true      ,true              ,true                 ,true            ,true             ,pSkipBest          ,pSkipIndustry,pSkipMisckeys ,pSkipQASamples ,true           ,true         ,true             ,true                 ,'BestAndMiscKeys'                 ,,pCompileTest),'');
+    StatsWuid       := if(pSkipSegStats       = false or pSkipStrata = false or pSkipOverlinking = false  ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,true      ,true              ,true                 ,true            ,true             ,true               ,true         ,true          ,true           ,pSkipSegStats  ,pSkipStrata  ,pSkipOverlinking ,true                 ,'Stats'                           ,,pCompileTest),'');
+    RelativesWuid   := if(pSkipSeleidRelative = false                                                     ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,true      ,true              ,true                 ,true            ,true             ,true               ,true         ,true          ,true           ,true           ,true         ,true             ,pSkipSeleidRelative  ,'SeleidRelative'                  ,,pCompileTest),'');
 
     Wait4Threads    := if(XlinkStuffWuid != '' or BestWuid != '' or StatsWuid != '' or RelativesWuid != ''   ,wk_ut.Wait4Workunits([XlinkStuffWuid,BestWuid,StatsWuid,RelativesWuid],'1',pversion,'Wait4Wuids',,BIPV2_Build.mod_email.emailList));
     
