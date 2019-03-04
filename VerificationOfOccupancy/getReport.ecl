@@ -1,9 +1,9 @@
 // THIS REPORT IS XML ONLY - NOT BATCH  
 // Several assumptions are made to simplify the code that requires this function to only be called for XML transactions.
 
-IMPORT Address, ADVO, AutoKey, AutoStandardI, Codes, DeathV2_Services, Drivers, Doxie, Email_Data, Gong, Header, Header_Quick, 
-			 IESP, LN_PropertyV2, MDR, PersonReports, Risk_Indicators, RiskWise, SmartRollup, Targus, UT, Utilfile, 
-			 VerificationOfOccupancy, WatchDog, census_data, Relationship, std;
+IMPORT Address, ADVO, AutoStandardI, Codes, DeathV2_Services, Drivers, Doxie, Email_Data, Gong, Header, Header_Quick, 
+			 IESP, MDR, PersonReports, Risk_Indicators, RiskWise, SmartRollup, Targus, UT, Utilfile, 
+			 VerificationOfOccupancy, census_data, Relationship, std;
 
 EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) ShellResults,
 									DATASET(VerificationOfOccupancy.Layouts.Layout_VOOBatchOut) AttributesResults,
@@ -17,8 +17,8 @@ EXPORT getReport (DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) Shell
 	isFCRA := FALSE;
 	GLB_OK := Risk_Indicators.iid_constants.glb_ok(GLBPurpose, isFCRA);
 	DPPA_OK := Risk_Indicators.iid_constants.dppa_ok(DPPAPurpose, isFCRA);
-	deathparams := MODULE(PROJECT(DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule()), DeathV2_Services.IParam.DeathRestrictions, OPT))	
-		EXPORT STRING DataRestrictionMask := DataRestrictionMask;  
+	deathparams := MODULE(DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule()))
+		EXPORT STRING DataRestrictionMask := ^.DataRestrictionMask;
 	END;		
 	Experian_Permitted := DataRestrictionMask[Risk_Indicators.iid_constants.posExperianRestriction] <> Risk_Indicators.iid_constants.sTrue;
 	TodaysDate := IF(ShellResults[1].HistoryDate = 999999, (STRING)Std.Date.Today(), ((STRING)ShellResults[1].HistoryDate)[1..6] + '01');

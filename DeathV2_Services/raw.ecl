@@ -1,12 +1,12 @@
-﻿import doxie, ut, suppress, death_master, census_data, _validate, codes, AutoStandardI, STD, MDR;
+﻿import doxie, ut, suppress, death_master, census_data, _validate, codes, AutoStandardI, MDR;
 
 export raw := 
 MODULE
 
 shared rec := deathv2_services.layouts;
 shared deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
-shared glb_ok := ut.glb_ok(deathparams.glbpurpose);
-shared appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
+shared glb_ok := deathparams.isValidGlb();
+shared appType := deathparams.application_type;
 
 //****** GET DEATH IDS
 
@@ -16,7 +16,7 @@ MODULE
 		dataset(doxie.layout_references) dids,
 		boolean checkRNA=false) := 
 	FUNCTION
-	  loc_glb_ok := ut.glb_ok(deathparams.glbpurpose,checkRNA);
+	  loc_glb_ok := deathparams.isValidGlb(checkRNA);
 		key := doxie.key_death_masterV2_ssa_DID;
 		res := join(dedup(dids, all),key,
 									keyed(left.did = right.l_did)

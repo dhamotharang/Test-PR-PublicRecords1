@@ -31,7 +31,7 @@ subject_ssn_ds:= JOIN(dids, DidVille.key_did_ssn, KEYED(LEFT.did = RIGHT.did),
 subject_ssn_set := SET(subject_ssn_ds, ssn);
 aka_src := best_akas(~(ssn_unmasked IN subject_ssn_set) OR fname = '' OR lname = ''); // 28 vs 27 records for did = 189036092.
 
-UNSIGNED1 GetAge (INTEGER4 dob) := IF (dob<>0, ut.GetAge((STRING8) dob),0); //Quick function to get age
+UNSIGNED1 GetAge (INTEGER4 dob) := IF (dob<>0, ut.Age(dob), 0); //Quick function to get age
 
 iesp.identitymanagementreport.t_IdmIdentity resident_section (aka_src L) := TRANSFORM
 	SELF.UniqueId := (STRING)L.DID;
@@ -48,12 +48,12 @@ fill_identities := PROJECT(aka_src,resident_section(LEFT)); // Lets fill identit
 iesp.identitymanagementreport.t_IdmIdentity GetDead (iesp.identitymanagementreport.t_IdmIdentity L, RECORDOF(doxie.key_death_masterV2_ssa_DID) R):=transform
 	// there can be different DOB in key_death_masterV2_DID and best records, thus take DOB from the left side, if dead, get age at death
 	left_dob := (STRING4) L.DOB.year + INTFORMAT (L.DOB.month, 2, 1) + INTFORMAT (L.DOB.day, 2, 1);
-	SELF.Age := IF( r.l_did != 0,ut.GetAgeI_asOf((UNSIGNED8)left_dob, (UNSIGNED8)R.dod8), L.Age);
+	SELF.Age := IF( r.l_did != 0,ut.Age((UNSIGNED8)left_dob, (UNSIGNED8)R.dod8), L.Age);
 	SELF := L; // copy about 25 fields
 END;
 
 rna_glb_ok := mod_access.isValidGLB(header.constants.checkRNA);
-death_params := DeathV2_Services.IParam.GetDeathRestrictions(gmod);
+death_params := DeathV2_Services.IParam.GetRestrictions(mod_access);
 
 nbrs_correct_age := JOIN (fill_identities, doxie.key_death_masterV2_ssa_DID, 
 											KEYED ((INTEGER)LEFT.UniqueId = RIGHT.l_did)

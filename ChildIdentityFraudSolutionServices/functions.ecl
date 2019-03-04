@@ -1,7 +1,7 @@
 ﻿import BatchServices, BatchShare, ut, VehicleV2_Services, Autokey_batch, CriminalRecords_BatchService, 
        doxie, AddrBest, LiensV2_Services, paw_services, DidVille, prof_LicenseV2_Services, FaaV2_Services,
 			 SexOffender_Services, WatercraftV2_Services, Foreclosure_Services, LN_PropertyV2_Services, Suppress,
-			 risk_indicators, BatchDatasets, riskwise, BIPV2, Royalty, DeathV2_Services, STD;
+			 BIPV2, Royalty, DeathV2_Services, STD;
 
 export Functions := module
 
@@ -29,8 +29,11 @@ shared BatchParams		:= IParam.getBatchParams();
 				self.name_suffix 	:= left.name_suffix,
 				self.ssn 					:= left.ssn;
 				self 							:= [])); 
-		
-		deathBatchParams	:= module(project(inMod, DeathV2_Services.IParam.BatchParams, opt)) end;
+
+		// temporarily, double projection
+		mod_batch := BatchShare.IParam.GetFromLegacy(inMod);
+		deathBatchParams := module(project(mod_batch, DeathV2_Services.IParam.BatchParams, opt)) end;
+
 		dsDeath := DeathV2_Services.BatchRecords(BatchInCommon, deathBatchParams)															
 			(( matchcode in deceased_match_codes OR  ( matchcode ='S' and 	ut.Age((unsigned4)dob8)< 18 ) )  // Matchcode should be in constants
 			 and IsEnoughTimeSinceDeath((DOD8[1..4]))

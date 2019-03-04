@@ -27,7 +27,6 @@ shared mod_access := MODULE (doxie.compliance.GetGlobalDataAccessModuleTranslate
 END;
 
 shared input_dids_set := SET (dids, did);
-//shared string6 ssn_mask_value := in_params.ssn_mask; // unfortunate artefact: used in some macros
 
 
 shared fcra_csa_wrap :=FCRA.comp_subject (dids, 
@@ -69,7 +68,7 @@ shared idid := max(dids(did > 0), did);//dids has no more than 1 record here. se
 // so far these are needed to access deceased records:
 glb_ok := mod_access.isValidGLB ();
 rna_glb_ok := mod_access.isValidGLB (header.constants.checkRNA);
-death_params := DeathV2_Services.IParam.GetDeathRestrictions(in_params);
+death_params := DeathV2_Services.IParam.GetRestrictions(mod_access);
 //NB: FCRA does not have permission to use/return RNA  
 
 // Get all DIDs that will be used in the report; set "is subject" indicator for a subject

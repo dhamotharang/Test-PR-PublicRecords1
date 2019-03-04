@@ -1,9 +1,9 @@
-IMPORT Text_Search,Text_FragV1,doxie,DeathV2_Services,AutoStandardI,ut,suppress;
+IMPORT Text_Search,Text_FragV1,doxie,DeathV2_Services,AutoStandardI,suppress;
 
 EXPORT Records(IParam.searchParams stdSrchArgs) := FUNCTION
 
 	deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
-  glb_ok := ut.glb_ok(deathparams.glbpurpose);
+  glb_ok := deathparams.isValidGlb();
 	STRING stem := Constants.FILE_STEM;
 	STRING sourceType	:= Constants.FILE_SRC_TYPE;
 	STRING qual := Constants.FILE_QUAL;
