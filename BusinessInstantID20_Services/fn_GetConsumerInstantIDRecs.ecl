@@ -5,7 +5,8 @@
 // Logic is basically copied-n-pasted straight from Risk_Indicators.InstantID_records, but
 // modified a little to handle batch records.
 EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfoClean) ds_CleanedInput,
-	                                  Business_Risk_BIP.LIB_Business_Shell_LIBIN Options ) := 
+	                                  Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
+                                    BusinessInstantID20_Services.Layouts.OFACAndWatchlistLayoutFlat watchlists ) := 
 	FUNCTION
 
 			Risk_indicators.MAC_unparsedfullname(title_val,fname_val,mname_val,lname_val,suffix_val,'FirstName','MiddleName','LastName','NameSuffix')
@@ -95,8 +96,8 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 			unsigned1 OFAC_version_temp    := Options.OFAC_Version;
 				OFAC_version := if(trim(stringlib.stringtolowercase(LoginID)) in ['keyxml','keydevxml'], 4, OFAC_version_temp);	// temporary code for Key Bank
 			
-			boolean Include_Additional_watchlists := Options.include_additional_watchlists;
-			boolean Include_Ofac                  := Options.include_ofac;
+			boolean Include_Additional_watchlists := FALSE;//Options.include_additional_watchlists;
+			boolean Include_Ofac                  := FALSE;//Options.include_ofac;
 			real global_watchlist_threshold_temp  := Options.Global_Watchlist_Threshold;
 				global_watchlist_threshold          := if(OFAC_version=3 and global_watchlist_threshold_temp=0, 0.85, if(global_watchlist_threshold_temp=0, 0.84, global_watchlist_threshold_temp));
 			boolean use_dob_filter                := FALSE : stored('UseDobFilter');
@@ -173,7 +174,8 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 			// watchlist_options             := dataset([],temp) : stored('WatchlistsRequested', few);
 			// watchlist_options             := Options.Watchlists_Requested;
 			// watchlists_request            := watchlist_options[1].WatchList;
-			watchlists_request            := Options.Watchlists_Requested; // [1].value;
+			// watchlists_request            := Options.Watchlists_Requested; // [1].value;
+			watchlists_request            := DATASET([], iesp.Share.t_StringArrayItem);
 			boolean IncludeDLverification := false : stored('IncludeDLverification');
 			string44 PassportUpperLine    := '' : stored('PassportUpperLine');
 			string44 PassportLowerLine    := '' : stored('PassportLowerLine');
@@ -217,7 +219,8 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 
       // Allow Gateway info for Bridger XG5 gateway and ONLY the Bridger gateway. UNTIL we 
       // get clarification from Product, turn off all other Gateway calls here in CIID.
-      gateways := Options.Gateways; 
+      // gateways := Options.Gateways; 
+      gateways := DATASET( [], Gateway.Layouts.Config );
 			
 			rec := record
 				unsigned4 seq;
@@ -969,9 +972,10 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 				JOIN(
 					ds_Normed, post_dob_masking,
 					LEFT.Seq = RIGHT.seq,
-					TRANSFORM( { risk_indicators.Layout_InstantID_NuGenPlus, UNSIGNED4 OrigSeq },
+					TRANSFORM( { risk_indicators.Layout_InstantID_NuGenPlus, UNSIGNED4 OrigSeq, STRING Sequence },
 						SELF.OrigSeq := LEFT.OrigSeq,
-            SELF.seq := LEFT.seq,
+						SELF.seq := LEFT.seq,
+						SELF.Sequence := LEFT.Sequence,
 						SELF := RIGHT,
 						SELF := []
 					),
@@ -990,6 +994,7 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
           TRANSFORM( BusinessInstantID20_Services.Layouts.ConsumerInstantIDLayout, 
             SELF.seq := LEFT.OrigSeq,
             SELF.Rep_WhichOne := (STRING)(LEFT.seq % 10);
+            SELF.Sequence := LEFT.Sequence,
 						SELF := LEFT,
           )
         );

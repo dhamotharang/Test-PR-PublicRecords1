@@ -11,7 +11,7 @@
 */
 /*--INFO-- This Service is the interface into the Business InstantID ECL service, version 2.0. */
 
-IMPORT BIPV2, Business_Risk_BIP, Gateway, iesp, MDR, OFAC_XG5, Risk_Indicators, Risk_Reporting, Royalty, STD, Inquiry_AccLogs;
+IMPORT BIPV2, Business_Risk_BIP, Gateway, iesp, MDR, OFAC_XG5, Risk_Indicators, Risk_Reporting, Royalty, STD, Inquiry_AccLogs, LNSmallBusiness;
 
 EXPORT InstantID20_Service() := MACRO
 
@@ -98,6 +98,16 @@ EXPORT InstantID20_Service() := MACRO
 			EXPORT BOOLEAN    DisableIntermediateShellLogging := _DisableIntermediateShellLogging;
 			EXPORT BusinessInstantID20_Services.Types.productTypeEnum BIID20_productType := _BIID20ProductType;
 			EXPORT BOOLEAN    useSBFE := DataPermissionMask[12] NOT IN BusinessInstantID20_Services.Constants.RESTRICTED_SET;
+			EXPORT DATASET(LNSmallBusiness.Layouts.AttributeGroupRec) AttributesRequested := PROJECT(option.AttributesVersionRequest, TRANSFORM(LNSmallBusiness.Layouts.AttributeGroupRec, SELF.AttributeGroup := StringLib.StringToUpperCase(LEFT.Value)));
+			EXPORT DATASET(LNSmallBusiness.Layouts.ModelNameRec) ModelsRequested := 
+				PROJECT(option.IncludeModels.Names, 
+				TRANSFORM(LNSmallBusiness.Layouts.ModelNameRec, 
+					SELF.ModelName := StringLib.StringToUpperCase(LEFT.Value)));
+			EXPORT DATASET(LNSmallBusiness.Layouts.ModelOptionsRec) ModelOptions := 
+				PROJECT(option.IncludeModels.ModelOptions,
+				TRANSFORM(LNSmallBusiness.Layouts.ModelOptionsRec, 
+					SELF.OptionName := StringLib.StringToUpperCase(TRIM(LEFT.OptionName, LEFT, RIGHT)), 
+					SELF.OptionValue := StringLib.StringToUpperCase(TRIM(LEFT.OptionValue, LEFT, RIGHT))));
 		END;
 
   IF( Options.OFAC_Version != 4 AND OFAC_XG5.constants.wlALLV4 IN SET(Options.Watchlists_Requested, value),
@@ -143,6 +153,7 @@ EXPORT InstantID20_Service() := MACRO
 	
 		//5.5 Choose the correct result
 		results := IF(_TestData_Enabled, TestSeed_Results, results_pre);
+		// results := results_pre;
 		
 		results_iesp := 
 			PROJECT(
@@ -203,7 +214,7 @@ EXPORT InstantID20_Service() := MACRO
 																										 self.data_restriction_mask := _DataRestrictionMask,
 																										 self.data_permission_mask := __DataPermissionMask,
 																										 self.industry := Industry_Search[1].Industry,
-																										 // self.i_attributes_name := Attributes_Requested[1].AttributeGroup,
+																										 //self.i_attributes_name := Attributes_Requested[1].AttributeGroup,
 																										 self.i_ssn := search.AuthorizedRep1.SSN,
                                                      self.i_dob := _Rep1_DateOfBirth;
                                                      self.i_name_full := search.AuthorizedRep1.Name.Full,

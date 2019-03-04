@@ -1,5 +1,5 @@
-IMPORT Address, BIPV2, BIPV2_Best, Business_Risk, Business_Risk_BIP, BusinessCredit_Services, Census_data, 
-       Corp2, DCAV2, DID_Add, EBR, Gateway, MDR, Risk_Indicators, RiskWise, TopBusiness_Services, ut;
+﻿IMPORT Address, BIPV2, BIPV2_Best, Business_Risk, Business_Risk_BIP, BusinessCredit_Services, Census_data, 
+       Corp2, DCAV2, DID_Add, EBR, Gateway, MDR, Risk_Indicators, RiskWise, ut, BusinessInstantID20_Services;
 
 	// The following function appends the LexID to each of the Authorized Reps. Borrowed logic 
 	// from Business_Risk_BIP.Business_Shell_Function
@@ -15,9 +15,11 @@ IMPORT Address, BIPV2, BIPV2_Best, Business_Risk, Business_Risk_BIP, BusinessCre
 			
 			layout_temp xfm_NormAuthReps(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfoClean le, BusinessInstantID20_Services.layouts.InputAuthRepInfoClean ri) :=
 				TRANSFORM
-					SELF.Seq    := le.Seq * 10 + ri.Rep_WhichOne;
-					SELF.AcctNo := le.AcctNo;
-					SELF        := ri;
+					SELF.Seq        := le.Seq * 10 + ri.Rep_WhichOne;
+					SELF.AcctNo     := le.AcctNo;
+					SELF.SortOrder  := ri.SortOrder;
+					SELF.Sequence   := ri.Sequence;
+					SELF            := ri;
 				END;
 			
 			// Normalize the Auth Reps out of ds_CleanedInput.
