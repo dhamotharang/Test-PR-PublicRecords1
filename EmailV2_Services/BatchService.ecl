@@ -17,7 +17,6 @@
   <part name="IncludeHistoricData" type="xsd:boolean"/>
   <part name="RequireLexidMatch" type="xsd:boolean"/>
   <part name="EmailQualityRulesMask" type="xsd:string"/>
-  <part name="IntendedPurpose" type="xsd:string"/>
   <part name="SearchType" type="xsd:string"/>  
   <part name="BVAPIkey" type="xsd:string"/>  
   <part name="CheckEmailDeliverable" type="xsd:boolean"/>
@@ -49,7 +48,6 @@ IMPORT AutoheaderV2, AutoKeyI, BatchShare, EmailV2_Services, Royalty;
                      'RequireLexidMatch',
                      'IncludeHistoricData', 
                      'EmailQualityRulesMask', 
-                     'IntendedPurpose', 
                      'SearchType',
                      'CheckEmailDeliverable',
                      'KeepUndeliverableEmail',
