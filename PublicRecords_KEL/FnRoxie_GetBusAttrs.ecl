@@ -26,23 +26,24 @@ EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Lay
 	
   // Append Rep LexIDs
   withRepLexIDs := PublicRecords_KEL.ECL_Functions.Fn_AppendLexid_Roxie( cleanReps, Options );
-	
-	// Consumer shell is (optionally) run for rep1 inputs. 
 	Rep1Input := withRepLexIDs(RepNumber = 1);
 
+	// Append BIP IDs
+	withBIPIDs := PublicRecords_KEL.ECL_Functions.Fn_AppendBIPIDs_Roxie( cleanBusiness, Rep1Input, Options );
+	
 	// At this time, only need to collect data for rep1 and not other reps. 
 	// If/when this changes all records from withRepLexIDs will need to be passed to Fn_MAS_FDC.
 	// Just passing in Rep1 Inputs for now to avoid fetching too much data.
-	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( Rep1Input, Options, cleanBusiness );
+	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( Rep1Input, Options, withBIPIDs );
 
 	// Get Business attributes
 	// When we get the cleaned attributes, then BusInputArchiveDateEcho will change to BusInputArchiveDateClean
-	InputPIIBIIAttributes := KEL.Clean(PublicRecords_KEL.Q_Input_Bus_Attributes_V1(withRepLexIDs, cleanBusiness, 
-		(STRING) cleanBusiness[1].BusInputArchiveDateEcho[1..8]).res0, TRUE, TRUE, TRUE);
+	InputPIIBIIAttributes := KEL.Clean(PublicRecords_KEL.Q_Input_Bus_Attributes_V1(withRepLexIDs, withBIPIDs, 
+		(STRING) withBIPIDs[1].BusInputArchiveDateEcho[1..8], Options.KEL_Permissions_Mask).res0, TRUE, TRUE, TRUE);
 		
 		
 	// Get consumer attributes
-	Rep1InputPIIAttributes := KEL.Clean(PublicRecords_KEL.Q_Input_Attributes_V1(Rep1Input, Rep1Input[1].InputArchiveDateClean[1..8]).res0, TRUE, TRUE, TRUE);
+	Rep1InputPIIAttributes := KEL.Clean(PublicRecords_KEL.Q_Input_Attributes_V1(Rep1Input, Rep1Input[1].InputArchiveDateClean[1..8], Options.KEL_Permissions_Mask).res0, TRUE, TRUE, TRUE);
 
 	Rep1PersonAttributes := PublicRecords_KEL.FnRoxie_GetPersonAttributes(Rep1Input, FDCDataset, Options);
 

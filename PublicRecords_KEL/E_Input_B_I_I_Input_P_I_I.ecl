@@ -9,7 +9,7 @@ EXPORT E_Input_B_I_I_Input_P_I_I(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDe
     KEL.typ.ntyp(E_Input_B_I_I().Typ) B_I_I_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
-    UNSIGNED1 __Permits;
+    UNSIGNED8 __Permits;
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED __Mapping := 'pii(P_I_I_:0),bii(B_I_I_:0),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';

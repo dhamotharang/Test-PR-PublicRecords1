@@ -67,6 +67,12 @@ EXPORT Fn_AppendLexid_Roxie(
       SELF := LEFT))
       , InputUIDAppend, LexIDAppend), InputUIDAppend);
 
-RETURN dids_with_good_scores + dids_with_below_scores;
+	all_dids := dids_with_good_scores + dids_with_below_scores; 
+	
+	// On roxie, dedup dids to keep only the DID with the highest score.
+	// On thor, this code is not needed since thor append only returns one did.
+	dids_deduped := DEDUP(SORT(all_dids, InputUIDAppend, -LexIDScoreAppend, LexIDAppend), InputUIDAppend);
+	
+RETURN dids_deduped;
 
 END;

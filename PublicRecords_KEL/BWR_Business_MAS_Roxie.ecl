@@ -1,22 +1,62 @@
 ﻿/* PublicRecords_KEL.BWR_Business_MAS_Roxie */
-IMPORT RiskWise, STD;
-
-
+IMPORT PublicRecords_KEL, RiskWise, SALT38, SALTRoutines, STD;
 Threads := 1;
-RecordsToRun := 0; // 100;
-eyeball := 120;
 
-// historyDate := 0; // Set to 0 to use ArchiveDate on input file. 
-historyDate := 20181212; // Set to 0 to use ArchiveDate on input file. 
-
-Score_threshold := 80;
-Output_Master_Results := TRUE;
 RoxieIP := RiskWise.shortcuts.Dev156;
 
 InputFile := '~temp::kel::ally_01_business_uat_sample_100k_20181015.csv'; //100k file
 // InputFile := '~temp::kel::ally_01_business_uat_sample_1m_20181015.csv'; //1m file
 
-OutputFile := '~cdal::BusinessPop_PublicRecs_BusinessInputExtra_12122018'+ ThorLib.wuid() ;
+/* Data Setting 	FCRA 	
+DRMFares = 1 //FARES - bit 1
+DRMExperian =	1 - //FARES bit 6
+DRMTransUnion =	0 //TCH - bit 10
+DRMADVO =	0 //ADVO bit 12
+DRMExperianFCRA =	1 //ECHF bit 14
+DPMSSN =	0 //use_DeathMasterSSAUpdates - bit 10
+DPMFDN =	0 //use_FDNContributoryData - bit 11
+DPMDL =	0 //use_InsuranceDLData - bit 13
+GLBA 	= 1 
+DPPA 	= 1 
+*/
+GLBA := 1;
+DPPA := 1;
+DataPermissionMask := '0000000000000'; 
+DataRestrictionMask := '1000010000000100000000000000000000000000000000000'; 
+
+// Universally Set the History Date YYYYMMDD for ALL records. Set to 0 to use the History Date located on each record of the input file
+historyDate := '0';
+// historyDate := '20190118';
+// historyDate := (STRING)STD.Date.Today(); // Run with today's date
+
+Score_threshold := 80;
+// Score_threshold := 90;
+
+// BIP Append options
+BIPAppend_Score_Threshold := 75; // Default score threshold for BIP Append. Valid values are 51-100.
+BIPAppend_Weight_Threshold := 0;
+BIPAppend_PrimForce := FALSE; // Set to TRUE to require an exact match on prim range in the BIP Append.
+BIPAppend_ReAppend := TRUE; // Set to FALSE to avoid re-appending BIP IDs if BIP IDs are populated on the input file.
+BIPAppend_Include_AuthRep := FALSE; // Determines whether Auth Rep data is used in BIP Append
+
+// Output additional file in Master Layout
+// Master results are for R&D/QA purposes ONLY. This should only be set to TRUE for internal use.
+Output_Master_Results := FALSE;
+// Output_Master_Results := TRUE; 
+
+// Toggle to include/exclude SALT profile of results file
+// Output_SALT_Profile := FALSE;
+Output_SALT_Profile := TRUE;
+
+Exclude_Consumer_Shell := FALSE; //if TRUE, bypasses consumer logic and sets all consumer shell fields to blank/0.
+
+RecordsToRun := 0;
+eyeball := 120;
+
+AllowedSources := ''; // Stubbing this out for use in settings output for now. To be used to turn on DNBDMI by setting to 'DNBDMI'
+OverrideExperianRestriction := FALSE; // Stubbing this out for use in settings output for now. To be used to control whether Experian Business Data (EBR and CRDB) is returned.
+
+OutputFile := '~AFA::BusinessPop_KS1832'+ ThorLib.wuid() ;
 
 prii_layout := RECORD
 	STRING AccountNumber         ;  
@@ -135,7 +175,7 @@ inData := DATASET(InputFile, prii_layout, CSV(QUOTE('"')));
 OUTPUT(CHOOSEN(inData, eyeball), NAMED('inData'));
 inDataRecs := IF (RecordsToRun = 0, inData, CHOOSEN (inData, RecordsToRun));
 inDataReady := PROJECT(inDataRecs(AccountNumber != 'AccountNumber'), TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout, 
-	SELF.ArchiveDate := IF(historyDate = 0, LEFT.ArchiveDate, (STRING)HistoryDate);
+	SELF.ArchiveDate := IF(historyDate = '0', LEFT.ArchiveDate, (STRING)HistoryDate);
 	SELF := LEFT, 
 	// SELF := [] 
 	));
@@ -146,8 +186,40 @@ soapLayout := RECORD
 	// STRING CustomerId; // This is used only for failed transactions here; it's ignored by the ECL service.
 	DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout) input;
 	INTEGER ScoreThreshold;
+	STRING DataRestrictionMask;
+	STRING DataPermissionMask;
+	UNSIGNED1 GLBA_Purpose;
+	UNSIGNED1 DPPA_Purpose;
 	BOOLEAN OutputMasterResults;
+	BOOLEAN ExcludeConsumerShell;
+	BOOLEAN IsMarketing;
+	
+	UNSIGNED BIPAppendScoreThreshold;
+	UNSIGNED BIPAppendWeightThreshold;
+	BOOLEAN BIPAppendPrimForce;
+	BOOLEAN BIPAppendReAppend;
+	BOOLEAN BIPAppendIncludeAuthRep;
 end;
+
+Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
+	EXPORT STRING AttributeSetName := 'Development KEL Attributes';
+	EXPORT STRING VersionName := 'Version 1.0';
+	EXPORT BOOLEAN isFCRA := FALSE;
+	EXPORT STRING ArchiveDate := historyDate;
+	EXPORT STRING InputFileName := InputFile;
+	EXPORT STRING Data_Restriction_Mask := DataRestrictionMask;
+	EXPORT STRING Data_Permission_Mask := DataPermissionMask;
+	EXPORT UNSIGNED GLBAPurpose := GLBA;
+	EXPORT UNSIGNED DPPAPurpose := DPPA;
+	EXPORT BOOLEAN Override_Experian_Restriction := OverrideExperianRestriction;
+	EXPORT STRING Allowed_Sources := AllowedSources; // Controls inclusion of DNBDMI data
+	EXPORT UNSIGNED LexIDThreshold := Score_threshold;
+	EXPORT UNSIGNED BusinessLexIDThreshold := BIPAppend_Score_Threshold;
+	EXPORT UNSIGNED BusinessLexIDWeightThreshold := BIPAppend_Weight_Threshold;
+	EXPORT BOOLEAN BusinessLexIDPrimForce := BIPAppend_PrimForce;
+	EXPORT BOOLEAN BusinessLexIDReAppend := BIPAppend_ReAppend;
+	EXPORT BOOLEAN BusinessLexIDIncludeAuthRep := BIPAppend_Include_AuthRep;
+END;
 
 // Uncomment this code to run as test harness on Thor instead of SOAPCALL to Roxie
 // Options := MODULE(PublicRecords_KEL.Interface_Options)
@@ -167,8 +239,19 @@ soapLayout trans (inDataReadyDist le):= TRANSFORM
 	SELF.input := PROJECT(le, TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout,
 		SELF := LEFT;
 		SELF := []));
-	SELF.ScoreThreshold := Score_threshold;
+	SELF.ScoreThreshold := Settings.LexIDThreshold;
+	SELF.DataRestrictionMask := Settings.Data_Restriction_Mask;
+	SELF.DataPermissionMask := Settings.Data_Permission_Mask;
+	SELF.GLBA_Purpose := Settings.GLBAPurpose;
+	SELF.DPPA_Purpose := Settings.DPPAPurpose;
+	SELF.IsMarketing := FALSE;
 	SELF.OutputMasterResults := Output_Master_Results;
+	SELF.ExcludeConsumerShell := Exclude_Consumer_Shell;
+	SELF.BIPAppendScoreThreshold := Settings.BusinessLexIDThreshold;
+	SELF.BIPAppendWeightThreshold := Settings.BusinessLexIDWeightThreshold;
+	SELF.BIPAppendPrimForce := Settings.BusinessLexIDPrimForce;
+	SELF.BIPAppendReAppend := Settings.BusinessLexIDReAppend;
+	SELF.BIPAppendIncludeAuthRep := Settings.BusinessLexIDIncludeAuthRep;
 END;
 
 soap_in := PROJECT(inDataReadyDist, trans(LEFT));
@@ -222,28 +305,34 @@ Layout_Business := RECORD
 	STRING ErrorCode;
 END;
 
-Passed_with_Extras := SORT(
+Passed_with_Extras := 
 	JOIN(inDataRecs, Passed, LEFT.AccountNumber = RIGHT.MasterResults.BusInputAccountEcho, 
 		TRANSFORM(LayoutMaster_With_Extras,
 			SELF := RIGHT.MasterResults, //fields from passed
 			SELF := LEFT, //input performance fields
 			SELF.ErrorCode := RIGHT.ErrorCode,
 			SELF := []),
-		INNER, KEEP(1)),
-	BusInputUIDAppend);
+		INNER, KEEP(1));
 	
-Passed_Business := SORT(
+Passed_Business := 
 	JOIN(inDataRecs, Passed, LEFT.AccountNumber = RIGHT.Results.BusInputAccountEcho, 
 		TRANSFORM(Layout_Business,
 			SELF := RIGHT.Results, //fields from passed
 			SELF := LEFT, //input performance fields
 			SELF.Errorcode := RIGHT.ErrorCode,
 			SELF := []),
-		INNER, KEEP(1)),
-	BusInputUIDAppend);
+		INNER, KEEP(1));
 	
 IF(Output_Master_Results, OUTPUT(CHOOSEN(Passed_with_Extras, eyeball), NAMED('Sample_Master_Layout')));
 OUTPUT(CHOOSEN(Passed_Business, eyeball), NAMED('Sample_NonFCRA_Layout'));
 
-IF(Output_Master_Results, OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout', CSV(HEADING(single), QUOTE('"'))));
-OUTPUT(Passed_Business,,OutputFile, CSV(HEADING(single), QUOTE('"')));
+IF(Output_Master_Results, OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout.csv', CSV(HEADING(single), QUOTE('"'))));
+OUTPUT(Passed_Business,,OutputFile + '.csv', CSV(HEADING(single), QUOTE('"')));	
+
+Settings_Dataset := PublicRecords_KEL.ECL_Functions.fn_make_settings_dataset(Settings);
+		
+OUTPUT(Settings_Dataset, NAMED('Attributes_Settings'));
+
+SALT_AttributeResults := IF(Output_SALT_Profile, SALTRoutines.SALT_Profile_Run_Everything(Passed_Business, 'SALT_Results'), 0);
+
+IF(Output_SALT_Profile, OUTPUT(SALT_AttributeResults, NAMED('Total_Fields_Profiled')));

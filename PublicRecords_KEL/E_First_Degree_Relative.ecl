@@ -17,7 +17,7 @@ EXPORT E_First_Degree_Relative(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefa
     KEL.typ.nstr Relationship_Date_Last_Seen_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
-    UNSIGNED1 __Permits;
+    UNSIGNED8 __Permits;
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED __Mapping := 'lexid(Subject_:0|Relative_:0),title(Title_:0),relationshiptype(Relationship_Type_:\'\'),relationshipconfidence(Relationship_Confidence_:\'\'),relationshipscore(Relationship_Score_:0),generation(Generation_:\'\'),relationshipdatefirstseen(Relationship_Date_First_Seen_:\'\'),relationshipdatelastseen(Relationship_Date_Last_Seen_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';

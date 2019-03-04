@@ -1,0 +1,4 @@
+[submodule "KnowledgeUniverse"]
+	path = KnowledgeUniverse
+	url = https://gitlab.ins.risk.regn.net/risk-engineering/KnowledgeUniverse.git
+	branch = master

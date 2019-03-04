@@ -2176,6 +2176,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsCClue	                    (string  sr) := sr               in set_CClue 	                   ;
 	export SourceIsCorrectional_Facilities    (string  sr) := sr               in set_Correctional_Facilities    ;
 	export SourceIsCortera                    (string  sr) := sr               in set_Cortera                    ;
+	export SourceIsCortera_Tradeline          (string  sr) := sr               = src_Cortera_Tradeline           ;
 	export SourceIsFL_CH                      (string  sr) := sr               in set_FL_CH                      ;
 	export SourceIsGA_CH                      (string  sr) := sr               in set_GA_CH                      ;
 	export SourceIsPA_CH                      (string  sr) := sr               in set_PA_CH                      ;
