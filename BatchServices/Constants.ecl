@@ -342,7 +342,8 @@ EXPORT Constants := MODULE
 													
 	end;
 													
-	
-	
+	export  Didville := module
+   EXPORT unsigned8 Limit_MaxResultsPerAcct := 5; // limiting the number of DIDs to be returened for a input to 5.
+	end;
 	
 END;
