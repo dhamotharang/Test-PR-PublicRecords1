@@ -10,6 +10,7 @@ export t_SocioIndicatorsOptions := record
 	boolean IncludeReadmissionScore {xpath('IncludeReadmissionScore')};
 	boolean IncludeHealthAttributesV3 {xpath('IncludeHealthAttributesV3')};
 	boolean IncludeMedicationAdherenceScore {xpath('IncludeMedicationAdherenceScore')};
+	// boolean IncludeMotivationScore {xpath('IncludeMotivationScore')};
 end;
 		
 export t_Admission := record
@@ -38,7 +39,7 @@ export t_SocioIndicatorsMember := record
 	t_SocioIndicatorsUDF UserDefinedFields {xpath('UserDefinedFields')};
 end;
 		
-export t_SocioRiskDrivers := record
+export t_SocioCareDrivers := record
 	string8 High1 {xpath('High1')};
 	string8 High2 {xpath('High2')};
 	string8 High3 {xpath('High3')};
@@ -51,7 +52,7 @@ export t_SocioScore := record
 	string50 Name {xpath('Name')};
 	string8 Value {xpath('Value')};
 	string10 Category {xpath('Category')};
-	t_SocioRiskDrivers RiskDrivers {xpath('RiskDrivers')};
+	t_SocioCareDrivers CareDrivers {xpath('CareDrivers')};
 end;
 		
 export t_SocioAttrAccident := record
