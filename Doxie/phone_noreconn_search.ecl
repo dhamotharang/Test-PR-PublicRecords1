@@ -309,15 +309,32 @@ EXPORT phone_noreconn_search := MACRO
 														transform(out_layout,
 																			self.deceased := 'N',
 																			self := left),left only);
+																			
+out_layout_info := record
+	    recordof(out_layout);
+   		string src := '';
+end;
 
-	resultsPlusDeath := join(results_best, Doxie.key_death_masterV2_ssa_DID,
+	resultsPlusDeath_info := join(results_best, Doxie.key_death_masterV2_ssa_DID,
 														keyed((integer)left.did = right.l_did)
 														and	not DeathV2_Services.functions.Restricted(right.src, right.glb_flag, glb_ok, deathparams),
-														transform(out_layout,
+														transform(out_layout_info,
 																			self.deceased := if ( right.l_did > 0,'Y','N'),  
 																			self.dod := (integer)right.dod8, 
+																			self.src := right.src;
 																			self := left),
-														left outer,limit(ut.limits.DEATH_PER_DID),keep(1));
+														left outer,limit(ut.limits.DEATH_PER_DID, skip));
+														
+	Death_source_srt:= Sort(resultsPlusDeath_info,did,dod);													
+	Death_source_grp:= Sort(group(Death_source_srt,did,dod), if(src = MDR.sourceTools.src_Death_Restricted, 1,0));
+	Death_source_info := iterate(Death_source_grp, transform(out_layout_info, self.IsLimitedAccessDMF :=if(counter = 1 , right.dod != 0 and right.src= MDR.sourceTools.src_Death_Restricted,
+	                                   left.IsLimitedAccessDMF ) ,
+																																				self :=right));
+
+resultsPlusSSA := dedup(sort(ungroup(Death_source_info), except dod, src, IsLimitedAccessDMF), except dod, src, IsLimitedAccessDMF);
+ 
+resultsPlusDeath := Project(resultsPlusSSA, transform(out_layout,  
+																  self := left));
 
 	resultsToMask := if (IncludeDeadContacts,resultsPlusDeath,filteredResults);
 

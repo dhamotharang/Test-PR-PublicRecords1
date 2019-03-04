@@ -61,6 +61,7 @@ export PhonesPlus_Layouts := MODULE
 			string9 SSN := '';
 			string9 ssn_unmasked := '';
 			unsigned4 dod := 0;
+			boolean IsLimitedAccessDMF := false;
 		  string1 deceased;
 		end;
 
