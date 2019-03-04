@@ -1,10 +1,11 @@
-import BusinessInstantID20_Services;
+﻿import BusinessInstantID20_Services;
 
 EXPORT Layouts_TestseedsBIID2 := MODULE
 
 EXPORT ConsumerIIDrep1Layout	:= RECORD 
 		UNSIGNED4 Seq;
 		// AuthRep1
+
 		STRING20 rep1_verfirst;
 		STRING20 rep1_verlast;
 		STRING50 rep1_veraddr;
@@ -1291,7 +1292,8 @@ EXPORT ConsumerIIDrep1Layout	:= RECORD
 		BusinessInstantID20_Services.Layouts.BatchPersonRoleLayout AND NOT [Seq];
 		BusinessInstantID20_Services.Layouts.BatchParentLayout AND NOT [Seq];
 		BusinessInstantID20_Services.Layouts.SBFEVerificationLayout AND NOT [Seq];
-//BusinessInstantID20_Services.Layouts.OutputLayout_batch;
+		BusinessInstantID20_Services.Layouts.BusinessAddressRiskLayout AND NOT [Seq];
+		//BusinessInstantID20_Services.Layouts.OutputLayout_batch;
 END;
 
 //BIID20 Testseeds layout 2
