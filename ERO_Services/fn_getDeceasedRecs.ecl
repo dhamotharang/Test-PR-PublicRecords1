@@ -1,5 +1,5 @@
 
-import AutoStandardI, BatchServices, DeathV2_services, Doxie, NID, ut;
+import AutoStandardI, BatchServices, DeathV2_services, Doxie, NID;
 
 export fn_getDeceasedRecs( dataset(Layouts.LookupId) ids = dataset([],Layouts.LookupId) ) :=
 	function
@@ -34,7 +34,7 @@ export fn_getDeceasedRecs( dataset(Layouts.LookupId) ids = dataset([],Layouts.Lo
 		*/
 		// Local attributes.
 		deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
-		glb_ok := ut.glb_ok(deathparams.glbpurpose);
+		glb_ok := deathparams.isValidGlb();
 		PrefFirstMatch(string20 l, string20 r) :=
 				NID.mod_PFirstTools.SUBPFLeqPFR(l,r) or NID.mod_PFirstTools.SUBPFLeqR(l,r);
 		// Local functions.

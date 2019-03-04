@@ -8,7 +8,7 @@ EXPORT fn_getBusiness_BestInformation (BusinessCredit_Services.Iparam.reportreco
 																				STRING8 BestCode
 																			 ):= FUNCTION
 
-		topBusiness_bestrecs_bip := PROJECT(topBusinessRecs, BusinessCredit_Services.Layouts.TopBusiness_BestSection)[1].BestSection;
+    topBusiness_bestrecs_bip := PROJECT(topBusinessRecs, BusinessCredit_Services.Layouts.TopBusiness_BestSection)[1].BestSection;
     topBusiness_bestrecs_sbfe := IF(buzCreditAccess,
                                     BIPV2_Best_SBFE.Key_LinkIds().kFetch2(inmod.BusinessIds, inmod.FetchLevel, , inmod.DataPermissionMask,
                                                                           BusinessCredit_Services.Constants.KFETCH_MAX_LIMIT));
@@ -53,13 +53,15 @@ EXPORT fn_getBusiness_BestInformation (BusinessCredit_Services.Iparam.reportreco
 		ds_lnca_slimmed := PROJECT(ds_lnca_keyrecs, TRANSFORM(BusinessCredit_Services.Layouts.rec_lnca,
 																														SELF.source_docid 				:= LEFT.rawfields.enterprise_num, 
 																														SELF.annual_sales_amount	:= (INTEGER) LEFT.rawfields.sales,
-																														SELF.employee_number 			:= LEFT.rawfields.emp_num,
-																														SELF.update_date 					:= LEFT.rawfields.update_date,
+																														SELF.employee_number 			:= LEFT.rawfields.emp_num,																														
+																														SELF.update_date                             := LEFT.clean_dates.update_date,
 																														SELF 											:= LEFT));
  
-		ds_lnca_dedup 	:= DEDUP(SORT(ds_lnca_slimmed(annual_sales_amount != 0),
+		tmpds_lnca_dedup 	:= DEDUP(SORT(ds_lnca_slimmed(annual_sales_amount != 0),
 														 #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()),source_docid ,-update_date, RECORD),
 											 #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()),source_docid);
+           ds_lnca_dedup := SORT(tmpds_lnca_dedup, -update_date);
+											 
 		AnnualIncome		:= ds_lnca_dedup[1].annual_sales_amount;
 		noOfEmployees		:= ds_lnca_dedup[1].employee_number;
    
@@ -146,5 +148,6 @@ EXPORT fn_getBusiness_BestInformation (BusinessCredit_Services.Iparam.reportreco
 		Business_BestInformation := DATASET([transform_t_BusinessCreditBestSection()]);
        // output(ParentInfoCname, named('ParentInfoCname'));
 			 // output(parentCompany, named('parentCompany'));
+			
 		RETURN Business_BestInformation;
 END;

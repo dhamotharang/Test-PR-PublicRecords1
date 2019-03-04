@@ -123,7 +123,7 @@ export split_Residents (DATASET(doxie.layout_best) ds_all_records_tmp,
       Self := L; //all the other fields which unfortunately has defaults in the layout definition
     END;
 		deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
-		glb_ok := ut.glb_ok(deathparams.glbpurpose);		
+		glb_ok := deathparams.isValidGlb();
 		
     res_w_d_pre := JOIN (res_w_issuance, doxie.key_death_masterV2_ssa_DID, 
                          keyed (Left.did = Right.l_did) 

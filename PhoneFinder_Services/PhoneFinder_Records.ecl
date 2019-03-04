@@ -18,11 +18,11 @@ MODULE
   SHARED IsPhoneRiskAssessment	:= inMod.TransactionType = PhoneFinder_Services.Constants.TransType.PhoneRiskAssessment;
   SHARED IsValidTransactionType	:= inMod.TransactionType = PhoneFinder_Services.Constants.TransType.Blank;
   
-  SHARED dEmpty_dids := DATASET([],PhoneFinder_Services.Layouts.BatchInAppendDID);
+  SHARED dEmpty := DATASET([],PhoneFinder_Services.Layouts.BatchInAppendDID);
 	
 	useADL := inMod.IsPrimarySearchPII OR vPhoneBlank OR (vIsPhone10 AND (inMod.VerifyPhoneNameAddress OR inMod.VerifyPhoneName));	
 	
-	SHARED dGetDIDs := IF(IsPhoneRiskAssessment, dEmpty_dids,
+	SHARED dGetDIDs := IF(IsPhoneRiskAssessment, dEmpty,
 	                    PhoneFinder_Services.GetDIDs(dProcessInput, useADL));
 																					
 	PhoneFinder_Services.Layouts.BatchInAppendDID tDIDs(Autokey_batch.Layouts.rec_inBatchMaster le,
@@ -46,11 +46,11 @@ MODULE
 																		TRANSFORM(PhoneFinder_Services.Layouts.BatchInAppendDID,SELF.orig_did := LEFT.did,SELF := LEFT)));
 	 
 	// Split the input DATASET into two depending on the input criteria
-	SHARED dInPhone   := IF(inMod.IsPrimarySearchPII, dEmpty_dids, dAppendDIDs(homephone != ''));
-	SHARED dInNoPhone := IF(inMod.IsPrimarySearchPII, dAppendDIDs, dAppendDIDs(homephone = '' and did != 0 and ~IsPhoneRiskAssessment));
+	SHARED dInPhone   := dAppendDIDs(homephone != '');
+	SHARED dPIISearch := dAppendDIDs(homephone = '' and did != 0 and ~IsPhoneRiskAssessment);
 
 	// Best information
-	SHARED dInNoPhoneBestInfo := PhoneFinder_Services.Functions.GetBestInfo(dInNoPhone);
+	SHARED dInNoPhoneBestInfo := PhoneFinder_Services.Functions.GetBestInfo(dPIISearch);
 
 	// Primary identity		
 	Suppress.MAC_Suppress(dInNoPhoneBestInfo, SHARED dinBestInfo,
@@ -60,10 +60,10 @@ MODULE
 	dPhoneSearchResults := IF(EXISTS(dInPhone),PhoneFinder_Services.PhoneSearch(dInPhone,inMod,dGateways));
 
 	// Waterfall process when only PII is provided
-	dWaterfallResults := IF(EXISTS(dInNoPhone),PhoneFinder_Services.DIDSearch(dInNoPhone,inMod,dGateways,dInNoPhoneBestInfo));
+	dWaterfallResults := IF(EXISTS(dPIISearch),PhoneFinder_Services.DIDSearch(dPIISearch,inMod,dGateways,dInNoPhoneBestInfo));
 	
 
-	SHARED dSearchRecs_pre		     := IF(vPhoneBlank OR inMod.IsPrimarySearchPII, dWaterfallResults, dPhoneSearchResults);
+	SHARED dSearchRecs_pre		     := IF(vPhoneBlank, dWaterfallResults, dPhoneSearchResults);
 	
 	dSearchRecs_pre_a		 := dSearchRecs_pre(((did <> 0 AND fname <> ''AND lname <> '') OR typeflag = Phones.Constants.TypeFlag.DataSource_PV) OR listed_name <> '');
 	
@@ -124,7 +124,8 @@ MODULE
   verifyRequest := (INTEGER)inMod.VerifyPhoneIsActive + (INTEGER)inMod.VerifyPhoneName + (INTEGER)inMod.VerifyPhoneNameAddress;
          	
   // Fail the service if multiple DIDs are returned for the search criteria OR if the phone number is not 10 digits OR if no records are returned
-  MAP(~vPhoneBlank and ~vIsPhone10                    => FAIL(301,doxie.ErrorCodes(301)),
+  MAP(inMod.IsPrimarySearchPII and verifyRequest > 0 => FAIL(303, doxie.ErrorCodes(303)),
+     ~vPhoneBlank and ~vIsPhone10                    => FAIL(301,doxie.ErrorCodes(301)),
       vPhoneBlank and EXISTS(dGetDIDs(did_count > 1)) => FAIL(203,doxie.ErrorCodes(203)), //FAIL the service if no records exists
         // If phoneFinder were to run as a verification tool, only one type of verification should be selected.
        // If more than one type of verification is selected, fail the service.			

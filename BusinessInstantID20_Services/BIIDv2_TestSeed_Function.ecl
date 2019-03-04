@@ -54,6 +54,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 			// i.e. risk_indicators.Layout_InstantID_NuGenPlus AND NOT [acctno,seq];
       SELF.did              := fn_CreateFakeDID( key1.rep1_firstname, key1.rep1_lastname );
       SELF.rep_whichone     := IF(key1.rep1_firstname <> '' AND key1.rep1_lastname <> '','1','');
+      SELF.sequence         := IF(key1.rep1_firstname <> '' AND key1.rep1_lastname <> '','1','');
       SELF.title            := key1.rep1_titlename;
       SELF.fname            := key1.rep1_firstname;
       SELF.mname            := key1.rep1_middlename;
@@ -200,6 +201,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 			// i.e. risk_indicators.Layout_InstantID_NuGenPlus AND NOT [acctno,seq];
       SELF.did              := fn_CreateFakeDID( key1.rep2_firstname, key1.rep2_lastname );
       SELF.rep_whichone     := IF(key1.rep2_firstname <> '' AND key1.rep2_lastname <> '','2','');
+      SELF.sequence         := IF(key1.rep2_firstname <> '' AND key1.rep2_lastname <> '','2','');
       SELF.title            := key1.rep2_titlename;
       SELF.fname            := key1.rep2_firstname;
       SELF.mname            := key1.rep2_middlename;
@@ -344,6 +346,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 			// i.e. risk_indicators.Layout_InstantID_NuGenPlus AND NOT [acctno,seq];
       SELF.did              := fn_CreateFakeDID( key1.rep3_firstname, key1.rep3_lastname );
       SELF.rep_whichone     := IF(key1.rep3_firstname <> '' AND key1.rep3_lastname <> '','3','');
+      SELF.sequence         := IF(key1.rep3_firstname <> '' AND key1.rep3_lastname <> '','3','');
       SELF.title            := key1.rep3_titlename;
       SELF.fname            := key1.rep3_firstname;
       SELF.mname            := key1.rep3_middlename;
@@ -488,6 +491,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 			// i.e. risk_indicators.Layout_InstantID_NuGenPlus AND NOT [acctno,seq];
       SELF.did              := fn_CreateFakeDID( key1.rep4_firstname, key1.rep4_lastname );
       SELF.rep_whichone     := IF(key1.rep4_firstname <> '' AND key1.rep4_lastname <> '','4','');
+      SELF.sequence         := IF(key1.rep4_firstname <> '' AND key1.rep4_lastname <> '','4','');
       SELF.title            := key1.rep4_titlename;
       SELF.fname            := key1.rep4_firstname;
       SELF.mname            := key1.rep4_middlename;
@@ -633,6 +637,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 			// i.e. risk_indicators.Layout_InstantID_NuGenPlus AND NOT [acctno,seq];
       SELF.did              := fn_CreateFakeDID( key1.rep5_firstname, key1.rep5_lastname );
       SELF.rep_whichone     := IF(key1.rep5_firstname <> '' AND key1.rep5_lastname <> '','5','');
+      SELF.sequence         := IF(key1.rep5_firstname <> '' AND key1.rep5_lastname <> '','5','');
       SELF.title            := key1.rep5_titlename;
       SELF.fname            := key1.rep5_firstname;
       SELF.mname            := key1.rep5_middlename;
@@ -801,7 +806,8 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 			SELF.InputEcho.in_bus_ipaddr         	 := key1.bus_ipaddr;
 			SELF.InputEcho.in_bus_url            	 := key1.bus_url;
       SELF.InputEcho.rep1_lexid              := fn_CreateFakeDID( key1.rep1_firstname, key1.rep1_lastname );
-			SELF.InputEcho.in_rep1_title         	 := key1.rep1_titlename;
+			// SELF.InputEcho.in_rep1_sequence        := key1.rep1_sequence;
+      SELF.InputEcho.in_rep1_title         	 := key1.rep1_titlename;
 			SELF.InputEcho.in_rep1_full          	 := key1.rep1_fullname;
 			SELF.InputEcho.in_rep1_first         	 := key1.rep1_firstname;
 			SELF.InputEcho.in_rep1_middle        	 := key1.rep1_middlename;
@@ -819,6 +825,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 			SELF.InputEcho.in_rep1_dlstate       	 := key1.rep1_dlstate;
 			SELF.InputEcho.in_rep1_email         	 := key1.rep1_email;
       SELF.InputEcho.rep2_lexid              := fn_CreateFakeDID( key1.rep2_firstname, key1.rep2_lastname );
+			// SELF.InputEcho.in_rep2_sequence        := key1.rep2_sequence;
 			SELF.InputEcho.in_rep2_title         	 := key1.rep2_titlename;
 			SELF.InputEcho.in_rep2_full          	 := key1.rep2_fullname;
 			SELF.InputEcho.in_rep2_first         	 := key1.rep2_firstname;
@@ -837,6 +844,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 			SELF.InputEcho.in_rep2_dlstate       	 := key1.rep2_dlstate;
 			SELF.InputEcho.in_rep2_email         	 := key1.rep2_email;
       SELF.InputEcho.rep3_lexid              := fn_CreateFakeDID( key1.rep3_firstname, key1.rep3_lastname );
+			// SELF.InputEcho.in_rep3_sequence        := key1.rep3_sequence;
 			SELF.InputEcho.in_rep3_title         	 := key1.rep3_titlename;
 			SELF.InputEcho.in_rep3_full          	 := key1.rep3_fullname;
 			SELF.InputEcho.in_rep3_first         	 := key1.rep3_firstname;
@@ -855,6 +863,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 			SELF.InputEcho.in_rep3_dlstate       	 := key1.rep3_dlstate;
 			SELF.InputEcho.in_rep3_email         	 := key1.rep3_email;
       SELF.InputEcho.rep4_lexid              := fn_CreateFakeDID( key1.rep4_firstname, key1.rep4_lastname );
+			// SELF.InputEcho.in_rep4_sequence        := key1.rep4_sequence;
 			SELF.InputEcho.in_rep4_title         	 := key1.rep4_titlename;
 			SELF.InputEcho.in_rep4_full          	 := key1.rep4_fullname;
 			SELF.InputEcho.in_rep4_first         	 := key1.rep4_firstname;
@@ -873,6 +882,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 			SELF.InputEcho.in_rep4_dlstate       	 := key1.rep4_dlstate;
 			SELF.InputEcho.in_rep4_email         	 := key1.rep4_email;
       SELF.InputEcho.rep5_lexid              := fn_CreateFakeDID( key1.rep5_firstname, key1.rep5_lastname );
+			// SELF.InputEcho.in_rep5_sequence        := key1.rep5_sequence;
 			SELF.InputEcho.in_rep5_title         	 := key1.rep5_titlename;
 			SELF.InputEcho.in_rep5_full          	 := key1.rep5_fullname;
 			SELF.InputEcho.in_rep5_first         	 := key1.rep5_firstname;
@@ -1158,6 +1168,10 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 			SELF.OFAC.bus_ofac_entity_name_7  	 := key1.bus_watchlist_entity_name_7;
 			SELF.OFAC.bus_ofac_sequence_7     	 := key1.bus_watchlist_sequence_7;
 
+      // SELF.BusinessAddressRisk.AddressIsCMRA := key1.AddressIsCMRA;
+      // SELF.Models := key1.Models;
+      // SELF.AttributeGroup := key1.AttributeGroup;
+      
 			SELF.ConsumerInstantID               := buildConsumerInstantIDDataset;
 			SELF := [];		
 		END;

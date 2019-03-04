@@ -20,7 +20,7 @@ EXPORT Functions_Death  := MODULE
 			uiSSNExists := inputRecs[1].userinput.ssn <> '';
 			
 			deathparams := DeathV2_Services.IParam.GetDeathRestrictions(gm);
-			glb_ok := AutoStandardI.InterfaceTranslator.glb_ok.val(project(gm,AutoStandardI.InterfaceTranslator.glb_ok.params)); 
+			glb_ok := deathparams.isValidGlb();
 			
 			// Get DID match to DMF did - Keeping Match Only if the user entered an SSN (Maybe turned on in the future)
 			byDids := dedup(NORMALIZE(inputRecs,LEFT.dids,transform(Healthcare_Shared.Layouts.layout_death,self.acctno := left.acctno;self.internalid:=left.internalid;self.did:=right.did;self.group_key:=left.vendorid;

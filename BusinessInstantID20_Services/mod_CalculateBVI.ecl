@@ -3,7 +3,7 @@ Changes for CR5 (Alternate Company Name added to index calculations).
 */
 IMPORT Business_Risk_BIP, Models, STD;
 
-EXPORT mod_CalculateBVI( Business_Risk_BIP.Layouts.Shell le, BOOLEAN useSBFE = FALSE ) :=
+EXPORT mod_CalculateBVI( Business_Risk_BIP.Layouts.Shell le, BOOLEAN useSBFE = FALSE) :=
 	MODULE
 		
 		SHARED fein                          := le.input_echo.fein;

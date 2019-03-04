@@ -19,7 +19,6 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_SSN_Risk (DATASET(Su
 	
 	headerBuild := CHOOSEN(Doxie.Key_Max_Dt_Last_Seen, 1);
 	headerBuildDate := ((STRING)headerBuild[1].Max_Date_Last_Seen)[1..6];
-	deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
 	
 	sixMonths := Risk_Indicators.iid_constants.sixmonths;
 	threeMonths := ROUND(sixMonths / 2);
@@ -32,7 +31,9 @@ EXPORT Suspicious_Fraud_LN.layouts.Layout_Batch_Plus Search_SSN_Risk (DATASET(Su
   END;
   glb_ok := mod_access.isValidGLB();
   dppa_ok := mod_access.isValidDPPA();
-	
+
+	deathparams := DeathV2_Services.IParam.GetRestrictions(mod_access);
+
 	// Temporary Header Layout - Used for Calculating Header Based Risk Codes
 	TempHeader := RECORD
 		UNSIGNED8 Seq := 0;

@@ -28,6 +28,7 @@
 					mod_Name       := Address.CleanNameFields(_CleanName);
 					_FirstName     := IF( le.FirstName = '' AND validCleaned, mod_Name.FName, le.FirstName );
 					
+					SELF.Sequence           := le.Sequence;
 					SELF.Rep_WhichOne       := le.Rep_WhichOne;
 					SELF.FullName           := TRIM(UCase(le.FullName), LEFT, RIGHT);
 					SELF.NameTitle          := TRIM(UCase(IF(le.NameTitle = '' AND validCleaned, mod_Name.Title, le.NameTitle)), LEFT, RIGHT);
@@ -41,6 +42,7 @@
 					SELF.City               := TRIM(UCase(le.City));
 					SELF.State              := TRIM(UCase(le.State));
 					SELF.Zip                := le.Zip;
+					SELF.SortOrder          := le.SortOrder;
 					
 					BusinessInstantID20_Services.Macros.mac_AppendAddrData() // cleaned
 					

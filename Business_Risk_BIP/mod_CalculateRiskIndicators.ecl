@@ -42,7 +42,7 @@ EXPORT mod_CalculateRiskIndicators( Business_Risk_BIP.Layouts.Shell le, STRING2 
 			'40' => 'B', '41' => 'D', '42' => 'D', '43' => 'D', '44' => 'D', '45' => 'D', '46' => 'D', '47' => 'D', '48' => 'D', '49' => 'D', 
 			'50' => 'D', '51' => 'D', '52' => 'D', '53' => 'D',' 54' => 'D', /* default => */ 'D');
 
-	SHARED getHRIDescription(STRING4 rc) := 
+	EXPORT getHRIDescription(STRING4 rc) := 
 		CASE(TRIM(rc),	
 			'10' => 'The input business name matches OFAC file',
 			'11' => 'The input business name matches non-OFAC global watchlist(s)',

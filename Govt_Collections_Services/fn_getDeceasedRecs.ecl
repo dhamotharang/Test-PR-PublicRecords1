@@ -1,5 +1,5 @@
 
-IMPORT Autokey_batch, BatchServices,DeathV2_Services,Govt_Collections_Services;
+IMPORT Autokey_batch, BatchServices,DeathV2_Services,Govt_Collections_Services, BatchShare;
 
 EXPORT fn_getDeceasedRecs(dataset(Govt_Collections_Services.Layouts.batch_working) ds_batch_in,
                           Govt_Collections_Services.IParams.BatchParams in_mod ) := 
@@ -23,8 +23,11 @@ EXPORT fn_getDeceasedRecs(dataset(Govt_Collections_Services.Layouts.batch_workin
 
 		// 1. Transform input to rec_inBatchMaster and get Deceased records.
 		data_in := PROJECT(ds_batch_in, Govt_Collections_Services.Transforms.xfm_to_batchIn(LEFT) );
-		deathIn := PROJECT(data_in, DeathV2_Services.Layouts.BatchIn);		
-		deathInMod := MODULE(project(in_mod, DeathV2_Services.IParam.BatchParams, opt))							
+		deathIn := PROJECT(data_in, DeathV2_Services.Layouts.BatchIn);
+		mod_batch := BatchShare.IParam.GetFromLegacy(in_mod);
+		deathInMod := MODULE(project(mod_batch, DeathV2_Services.IParam.BatchParams, opt))
+			EXPORT unsigned3 DidScoreThreshold        := in_mod.DidScoreThreshold; 
+
 			EXPORT BOOLEAN AddSupplemental 						:= TRUE;
 			EXPORT BOOLEAN PartialNameMatchCodes			:= TRUE;
 			EXPORT BOOLEAN ExtraMatchCodes 						:= TRUE;

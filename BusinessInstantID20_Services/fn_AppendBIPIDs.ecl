@@ -1,5 +1,5 @@
-IMPORT Address, BIPV2, BIPV2_Best, Business_Risk, Business_Risk_BIP, BusinessCredit_Services, Census_data, 
-       Corp2, DCAV2, DID_Add, EBR, Gateway, MDR, Risk_Indicators, RiskWise, TopBusiness_Services, ut;
+﻿IMPORT Address, BIPV2, BIPV2_Best, Business_Risk, Business_Risk_BIP, BusinessCredit_Services, Census_data, 
+       Corp2, DCAV2, DID_Add, EBR, Gateway, MDR, Risk_Indicators, RiskWise, ut, BusinessInstantID20_Services;
 
 	// The following function appends the BIPIDs to the Business. Borrowed logic from 
 	// Business_Risk_BIP.Business_Shell_Function
@@ -36,6 +36,7 @@ IMPORT Address, BIPV2, BIPV2_Best, Business_Risk, Business_Risk_BIP, BusinessCre
 						SELF.Rep_LastName   := Rep.LastName,
 						SELF.Rep_SSN        := Rep.SSN,
 						SELF.Rep_LexID      := Rep.LexID,
+						SELF.Rep_Sequence   := Rep.Sequence,
 						SELF := LEFT,
 						SELF := []
 						));

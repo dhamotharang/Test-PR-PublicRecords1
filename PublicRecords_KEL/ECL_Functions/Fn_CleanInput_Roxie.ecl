@@ -32,6 +32,7 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.Layo
 		cleaned_zip       := PublicRecords_KEL.ECL_Functions.Fn_Clean_Zip(le.InputZipEcho);
 		cleaned_Addr      := PublicRecords_KEL.ECL_Functions.Fn_Clean_Address_Roxie(le.InputStreetEcho, le.InputCityEcho, le.InputStateEcho, cleaned_zip);
 		cleaned_DL        := PublicRecords_KEL.ECL_Functions.Fn_Clean_DLNumber(le.InputDLEcho);
+		cleaned_DLState   := PublicRecords_KEL.ECL_Functions.Fn_Clean_DLState(le.InputDLStateEcho);   //afa 2019026
 		cleaned_email     := PublicRecords_KEL.ECL_Functions.Fn_Clean_Email(le.InputEmailEcho);
 		cleaned_phone10   := PublicRecords_KEL.ECL_Functions.Fn_Clean_Phone(le.InputHomePhoneEcho);
 		cleaned_workphone := PublicRecords_KEL.ECL_Functions.Fn_Clean_Phone(le.InputWorkPhoneEcho);
@@ -39,8 +40,10 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.Layo
 		DOB_dates         := PublicRecords_KEL.ECL_Functions.Fn_Clean_Date(le.InputDOBEcho);
 		cleaned_DOB       := DOB_dates[1];
 		cleaned_name      := PublicRecords_KEL.ECL_Functions.Fn_Clean_Name_Roxie(le.InputFirstNameEcho, le.InputMiddleNameEcho, le.InputLastNameEcho);
-
+  
 		NameNotPopulated := IF(le.InputFirstNameEcho = '' AND le.InputMiddleNameEcho = '' AND le.InputLastNameEcho = '', '', le.InputLastNameEcho);
+	
+		                 
 		/*
 		// We need to revisit this logic below. InputCleanMiddleName may be populated after
 		// cleaning if the input firstname contains both the firstname and the middlename.
@@ -58,7 +61,7 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.Layo
 		SELF.InputPostDirectionClean := cleaned_Addr.postdir;
 		SELF.InputUnitDesigClean := cleaned_Addr.unit_desig;
 		SELF.InputSecondaryRangeClean :=cleaned_Addr.sec_range;
-		SELF.InputCityClean := cleaned_Addr.p_city_name;
+		SELF.InputCityClean := cleaned_Addr.v_city_name;
 		SELF.InputStateClean := cleaned_Addr.st;
 		SELF.InputZip5Clean := cleaned_Addr.zip;
 		SELF.InputZip4Clean := cleaned_Addr.zip4;
@@ -66,7 +69,7 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.Layo
 		SELF.InputLongitudeClean :=	cleaned_Addr.geo_long;
 		SELF.InputAddressTypeClean := cleaned_Addr.rec_type;
 		SELF.InputAddressStatusClean :=	cleaned_Addr.err_stat;
-		SELF.InputCountyClean := cleaned_Addr.county;
+		SELF.InputCountyClean := cleaned_Addr.county[3..5];
 		SELF.InputGeoblockClean := cleaned_Addr.geo_blk;
 		SELF.InputEmailClean :=cleaned_email;
 		SELF.InputHomePhoneClean := cleaned_phone10;
@@ -74,7 +77,7 @@ EXPORT Fn_CleanInput_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.Layo
 		SELF.InputSSNClean := cleaned_SSN;
 		SELF.InputDOBClean := cleaned_DOB.ValidPortion_00; 
 		SELF.InputDLClean := cleaned_DL;  
-		SELF.InputDLStateClean := le.InputDLStateEcho;  
+		SELF.InputDLStateClean := cleaned_DLState ;  
 		
 		// Cleaned DOB metadata
 		SELF.DateAsNumsOnly := cleaned_DOB.DateAsNumsOnly; 

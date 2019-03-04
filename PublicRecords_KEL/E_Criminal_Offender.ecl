@@ -26,7 +26,7 @@ EXPORT E_Criminal_Offender(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     KEL.typ.nstr Source_;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
-    UNSIGNED1 __Permits;
+    UNSIGNED8 __Permits;
   END;
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
@@ -94,7 +94,7 @@ EXPORT E_Criminal_Offender(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
   SHARED __d2 := __SourceFilter(PROJECT(KEL.FromFlat.Convert(__d2_Prefiltered,InLayout,__Mapping2),__Mapping2_Transform(LEFT)));
   SHARED __Mapping3 := 'UID(UID),offender_key(Offender_Key_:\'\'),source_file(Source_File_:\'\'),orig_state(Source_State_:\'\'),citizenship(Citizenship_:\'\'),hair_color_desc(Hair_Color_:\'\'),eye_color_desc(Eye_Color_:\'\'),skin_color_desc(Skin_Color_:\'\'),height(Height_:0),weight(Weight_:0),party_status_desc(Status_:\'\'),curr_incar_flag(Current_Incarcerated_Flag_:\'\'),curr_parole_flag(Current_Parole_Flag_:\'\'),curr_probation_flag(Current_Probation_Flag_:\'\'),data_type(Data_Type_:0),datasource(Data_Source_:\'\'),numberofoffensecounts(Number_Of_Offense_Counts_:0),src(Source_:\'\'),datefirstseen(Date_First_Seen_:EPOCH),datelastseen(Date_Last_Seen_:EPOCH)';
   SHARED InLayout __Mapping3_Transform(InLayout __r) := TRANSFORM
-    SELF.__Permits := CFG_Compile.Permit_nonFCRA;
+    SELF.__Permits := CFG_Compile.Permit_NonFCRA;
     SELF := __r;
   END;
   SHARED __d3_Norm := NORMALIZE(__in,LEFT.Dataset_Doxie_Files__Key_Offenders,TRANSFORM(RECORDOF(__in.Dataset_Doxie_Files__Key_Offenders),SELF:=RIGHT));

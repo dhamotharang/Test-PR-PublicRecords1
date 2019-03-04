@@ -12,7 +12,7 @@ export AddrHistory_Function(dataset(location_services.Layout_AddrHistory_In) inr
 function
 
 deathparams := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
-glb_ok_death := ut.glb_ok(deathparams.glbpurpose);
+glb_ok_death := deathparams.isValidGlb();
 
 MAX_RECS_PER_ADDRESS := 1000; // Big enough to get records back from doxie.did_from_address
 

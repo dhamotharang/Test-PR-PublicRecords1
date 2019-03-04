@@ -51,6 +51,7 @@ EXPORT Layouts := MODULE
 		STRING9     Yearly_Revenue := '';
 		STRING10    Fax_Number := '';
 		// Authorized Representative Information
+		STRING15		Rep_Sequence := '';
 		STRING120		Rep_FullName := '';
 		STRING5			Rep_NameTitle := '';
 		STRING20		Rep_FirstName := '';
@@ -90,6 +91,7 @@ EXPORT Layouts := MODULE
 		UNSIGNED1		Rep_LexIDScore := 0;
 		STRING50		Rep_BusinessTitle := '';
 		// Authorized Representative 2 Information
+		STRING15		Rep2_Sequence := '';
 		STRING120		Rep2_FullName := '';
 		STRING5			Rep2_NameTitle := '';
 		STRING20		Rep2_FirstName := '';
@@ -129,6 +131,7 @@ EXPORT Layouts := MODULE
 		UNSIGNED1		Rep2_LexIDScore := 0;
 		STRING50		Rep2_BusinessTitle := '';
 		// Authorized Representative 3 Information
+		STRING15		Rep3_Sequence := '';
 		STRING120		Rep3_FullName := '';
 		STRING5			Rep3_NameTitle := '';
 		STRING20		Rep3_FirstName := '';
@@ -168,6 +171,7 @@ EXPORT Layouts := MODULE
 		UNSIGNED1		Rep3_LexIDScore := 0;
 		STRING50		Rep3_BusinessTitle := '';
 		// Authorized Representative 4 Information
+		STRING15		Rep4_Sequence := '';
 		STRING120		Rep4_FullName := '';
 		STRING5			Rep4_NameTitle := '';
 		STRING20		Rep4_FirstName := '';
@@ -207,6 +211,7 @@ EXPORT Layouts := MODULE
 		UNSIGNED1		Rep4_LexIDScore := 0;
 		STRING50		Rep4_BusinessTitle := '';
 		// Authorized Representative 5 Information
+		STRING15		Rep5_Sequence := '';
 		STRING120		Rep5_FullName := '';
 		STRING5			Rep5_NameTitle := '';
 		STRING20		Rep5_FirstName := '';

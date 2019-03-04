@@ -21,6 +21,7 @@ EXPORT EmailAddressAppendSearch(DATASET($.Layouts.batch_in_rec) batch_in,
                                    TRANSFORM($.Layouts.email_final_rec, 
                                             SELF.record_err_msg  := AutoKeyI.errorcodes._msgs(AutoKeyI.errorcodes._codes.LEXID_FAIL);
                                             SELF.record_err_code := AutoKeyI.errorcodes._codes.LEXID_FAIL;
+                                            SELF.is_rejected_rec := TRUE;
                                             SELF := LEFT,
                                             SELF := [])));
 

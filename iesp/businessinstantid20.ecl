@@ -15,6 +15,7 @@ export t_BIID20Company := record
 end;
 		
 export t_BIID20AuthRep := record
+	string15 Sequence {xpath('Sequence')};	
 	iesp.share.t_Name Name {xpath('Name')};
 	string20 FormerLastName {xpath('FormerLastName')};
 	string12 UniqueId {xpath('UniqueId')};
@@ -47,7 +48,17 @@ export t_BIID20Gateway := record
 	string40 ServiceName {xpath('ServiceName')};
 	string150 URL {xpath('URL')};
 end;
+
+export t_SBAModelOption := record
+	string64 OptionName {xpath('OptionName')};
+	string64 OptionValue {xpath('OptionValue')};
+end;
 		
+export t_SBAModels := record
+	dataset(iesp.share.t_StringArrayItem) Names {xpath('Names/Name'), MAXCOUNT(iesp.constants.SBAnalytics.MaxModelCount)};
+	dataset(t_SBAModelOption) ModelOptions {xpath('ModelOptions/ModelOption'), MAXCOUNT(iesp.constants.SBAnalytics.MaxModelOptionCount)};
+end;
+
 export t_BIID20Options := record (iesp.share.t_BaseOption)
 	string IndustryClass {xpath('IndustryClass')};//hidden[internal]
 	unsigned6 HistoryDate {xpath('HistoryDate')};//hidden[internal]
@@ -102,8 +113,10 @@ export t_BIID20Options := record (iesp.share.t_BaseOption)
 	string6 SSNMask {xpath('SSNMask')};//hidden[internal]
 	string8 TimeofApplication {xpath('TimeofApplication')};//hidden[internal]
 	boolean UseDOBFilter {xpath('UseDOBFilter')};
+	dataset(iesp.share.t_StringArrayItem) AttributesVersionRequest {xpath('AttributesVersionRequest/Name'), MAXCOUNT(iesp.constants.SBAnalytics.MaxAttributeVersionCount)};
+	t_SBAModels IncludeModels {xpath('IncludeModels')};
 end;
-		
+
 export t_BIID20InputEcho := record
 	string30 Seq {xpath('Seq')};//hidden[ecldev]
 	t_BIID20Company Company {xpath('Company')};
@@ -206,6 +219,10 @@ export t_BIID20ResidentialBusiness := record
 	string1 Indicator {xpath('Indicator')};
 	string30 Description {xpath('Description')};
 end;
+
+export t_BIID20BusinessAddressRisk := record
+	boolean AddressIsCMRA {xpath('AddressIsCMRA')};
+end;
 		
 export t_BIID20CompanyResults := record
 	t_BIID20Company VerifiedInput {xpath('VerifiedInput')};
@@ -223,10 +240,11 @@ export t_BIID20CompanyResults := record
 	dataset(t_BIID20WatchList) OFACWatchLists {xpath('OFACWatchLists/OFACWatchList'), MAXCOUNT(iesp.constants.BIID.MAXWATCHLISTS)};
 	t_BIID20Compliance Compliance {xpath('Compliance')};
 	t_BIID20SBFEVerification SBFEVerification {xpath('SBFEVerification')};
+	t_BIID20BusinessAddressRisk AddressRisk {xpath('AddressRisk')};
 end;
 		
 export t_BIID20ConsumerInstantIDInputEcho := record
-	string4 Sequence {xpath('Sequence')};
+	string15 Sequence {xpath('Sequence')};
 	iesp.share.t_Name Name {xpath('Name')};
 	string20 FormerLastName {xpath('FormerLastName')};
 	iesp.share.t_Address Address {xpath('Address')};
@@ -335,6 +353,8 @@ export t_BIID20Result := record
 	t_BIID20InputEcho InputEcho {xpath('InputEcho')};
 	t_BIID20CompanyResults CompanyResults {xpath('CompanyResults')};
 	dataset(t_BIID20AuthorizedRepresentativeResults) AuthorizedRepresentativeResults {xpath('AuthorizedRepresentativeResults/AuthorizedRepresentativeResult'), MAXCOUNT(iesp.constants.BIID.MAXAUTHORIZEDREPS)};
+	dataset(iesp.smallbusinessanalytics.t_SBAModelHRI) Models {xpath('Models/Model'), MAXCOUNT(iesp.constants.SBAnalytics.MaxModelCount)};
+	dataset(iesp.smallbusinessanalytics.t_SBAAttributesGroup) Attributes {xpath('Attributes/Attribute'), MAXCOUNT(iesp.constants.SBAnalytics.MaxAttributes)};
 end;
 		
 export t_BIID20Response := record

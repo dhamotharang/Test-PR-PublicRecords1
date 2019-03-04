@@ -170,6 +170,10 @@ EXPORT compliance := MODULE
     // Customer allowed to see GLB protected data prior to June 2001 ('Pre GLB'), position 23.		
     EXPORT boolean isPreGLBRestricted(drm_type drm) := ~allowAll AND preGLBRestrict(drm);
 
+    // BriteVerify gateway for Email verification 
+    EXPORT BOOLEAN isBriteVerifyRestricted(drm_type drm) := ~allowAll AND (drm[46] NOT IN ['0','']);
+
+
 // This macro will be used to conditionally remove records for certain source(s) from an
 // input file based upon the contents of a specific field within the input file and 
 // based upon the passed-in Data Restriction Mask (DRM).
@@ -177,8 +181,7 @@ EXPORT compliance := MODULE
       RETURN infile (NOT doxie.compliance.isHeaderSourceRestricted (src_field, drm));
     ENDMACRO;  
 
-		// BriteVerify gateway for Email verification 
-		EXPORT BOOLEAN isBriteVerifyRestricted(drm_type drm) := ~allowAll AND (drm[46] NOT IN ['0','']);
-
+    restrictedSet := ['0',''];
+    EXPORT use_DM_SSA_updates(string dpm) := dpm[10] NOT IN restrictedSet;
 
 END;

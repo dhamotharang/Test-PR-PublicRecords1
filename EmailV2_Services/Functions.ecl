@@ -11,13 +11,13 @@ EXPORT Functions := MODULE
     
     // filter by source, make sure data restrictions are enforced
     // currently there is no restrictions of direct to consumer email sources
-    restrict_DataMarketing := in_mod.isUtility() OR $.Constants.IntendedPurpose.isDirectMarketing(in_mod.IntendedPurpose);
+    restrict_DataMarketing := in_mod.isDirectMarketing() OR $.Constants.RestrictedUseCase.isDirectMarketing(in_mod.RestrictedUseCase);
     
     restrict_reseller := in_mod.isConsumer() OR  // data restriction indicators for reseller still needs to be clarified
-                         $.Constants.IntendedPurpose.isReseller(in_mod.IntendedPurpose);
+                         $.Constants.RestrictedUseCase.isReseller(in_mod.RestrictedUseCase);
     fltrd_reseller_recs := IF(restrict_reseller,
                              JOIN(fltrd_historic_recs,Codes.Key_Codes_V3,KEYED(RIGHT.file_name = $.Constants.EMAIL_SOURCES) AND 
-                                                          KEYED(RIGHT.field_name = $.Constants.IntendedPurpose.Reseller) AND
+                                                          KEYED(RIGHT.field_name = $.Constants.RestrictedUseCase.Reseller) AND
                                                           RIGHT.code = LEFT.email_src,
                                                           TRANSFORM($.Layouts.email_raw_rec, SELF := LEFT),
                                  KEEP(1), LIMIT(0)), 
@@ -26,7 +26,7 @@ EXPORT Functions := MODULE
       
     with_fltrd_sources := IF(restrict_DataMarketing,  
                              JOIN(fltrd_reseller_recs, Codes.Key_Codes_V3,KEYED(RIGHT.file_name = $.Constants.EMAIL_SOURCES) AND 
-                                                          KEYED(RIGHT.field_name = $.Constants.IntendedPurpose.DirectMarketing) AND
+                                                          KEYED(RIGHT.field_name = $.Constants.RestrictedUseCase.DirectMarketing) AND
                                                           RIGHT.code = LEFT.email_src,
                                                           TRANSFORM($.Layouts.email_raw_rec, SELF := LEFT),
                                  KEEP(1), LIMIT(0)), 
@@ -103,7 +103,8 @@ EXPORT Functions := MODULE
                               );
     
     $.Layouts.email_internal_rec doRollup($.Layouts.email_internal_rec ll, DATASET($.Layouts.email_internal_rec) allRows) := TRANSFORM
-      SELF.latest_orig_login_date := MAX(allRows, original.login_date);
+      _latest_orig_login_date := MAX(allRows, original.login_date);
+      SELF.latest_orig_login_date := IF((UNSIGNED)_latest_orig_login_date>0, _latest_orig_login_date, '');
       SELF.num_sources := COUNT(DEDUP(SORT(allRows, email_src), email_src));
       SELF := ll;
     END;
@@ -148,7 +149,7 @@ EXPORT Functions := MODULE
   ) := FUNCTION
     
     perm_type := dx_BestRecords.Functions.get_perm_type_idata(PROJECT(in_mod,doxie.IDataAccess),
-                       useMarketing := $.Constants.IntendedPurpose.isDirectMarketing(in_mod.IntendedPurpose)); 
+                       useMarketing := in_mod.isDirectMarketing() OR $.Constants.RestrictedUseCase.isDirectMarketing(in_mod.RestrictedUseCase)); 
     
     email_with_best_recs := PROJECT(dx_BestRecords.append(ds_batch_in,did,perm_type), 
                                     TRANSFORM($.Layouts.email_final_rec,

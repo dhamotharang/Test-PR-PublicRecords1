@@ -222,8 +222,7 @@ EXPORT Functions := MODULE
 	EXPORT append_deceased (DATASET(HomesteadExemptionV2_Services.Layouts.workRec) ds_work_in,
 					HomesteadExemptionV2_Services.IParams.Params in_mod) := FUNCTION
 
-		mod_legacy := BatchShare.IParam.ConvertToLegacy(in_mod);
-		deceased_mod := MODULE(PROJECT(mod_legacy,DeathV2_Services.IParam.BatchParams,OPT))
+		deceased_mod := MODULE(PROJECT(in_mod,DeathV2_Services.IParam.BatchParams,OPT))
 			EXPORT UNSIGNED3 DidScoreThreshold:=HomesteadExemptionV2_Services.Constants.SCORE_THRESHOLD;
 		END;
 

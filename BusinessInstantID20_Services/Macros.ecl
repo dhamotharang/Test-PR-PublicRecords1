@@ -19,6 +19,7 @@
 		STRING10  _Phone10             := search.Company.Phone;
 		
 		// Authorized Representative 1 Information
+		STRING15  _Rep1_Sequence       := search.AuthorizedRep1.Sequence;
 		STRING5   _Rep1_NameTitle      := search.AuthorizedRep1.Name.Prefix;
 		STRING120 _Rep1_FullName       := search.AuthorizedRep1.Name.Full;
 		STRING20  _Rep1_FirstName      := search.AuthorizedRep1.Name.First;
@@ -44,6 +45,7 @@
 		UNSIGNED6 _Rep1_LexID          := (UNSIGNED6)search.AuthorizedRep1.UniqueID;
 		
 		// Authorized Representative 2 Information
+		STRING15  _Rep2_Sequence       := search.AuthorizedRep2.Sequence;
 		STRING5   _Rep2_NameTitle      := search.AuthorizedRep2.Name.Prefix;
 		STRING120 _Rep2_FullName       := search.AuthorizedRep2.Name.Full;
 		STRING20  _Rep2_FirstName      := search.AuthorizedRep2.Name.First;
@@ -69,6 +71,7 @@
 		UNSIGNED6 _Rep2_LexID          := (UNSIGNED6)search.AuthorizedRep2.UniqueID;
 		
 		// Authorized Representative 3 Information
+		STRING15  _Rep3_Sequence       := search.AuthorizedRep3.Sequence;
 		STRING5   _Rep3_NameTitle      := search.AuthorizedRep3.Name.Prefix;
 		STRING120 _Rep3_FullName       := search.AuthorizedRep3.Name.Full;
 		STRING20  _Rep3_FirstName      := search.AuthorizedRep3.Name.First;
@@ -94,6 +97,7 @@
 		UNSIGNED6 _Rep3_LexID          := (UNSIGNED6)search.AuthorizedRep3.UniqueID;
 		
 		// Authorized Representative 4 Information
+		STRING15  _Rep4_Sequence       := search.AuthorizedRep4.Sequence;
 		STRING5   _Rep4_NameTitle      := search.AuthorizedRep4.Name.Prefix;
 		STRING120 _Rep4_FullName       := search.AuthorizedRep4.Name.Full;
 		STRING20  _Rep4_FirstName      := search.AuthorizedRep4.Name.First;
@@ -119,6 +123,7 @@
 		UNSIGNED6 _Rep4_LexID          := (UNSIGNED6)search.AuthorizedRep4.UniqueID;
 		
 		// Authorized Representative 5 Information
+		STRING15  _Rep5_Sequence       := search.AuthorizedRep5.Sequence;
 		STRING5   _Rep5_NameTitle      := search.AuthorizedRep5.Name.Prefix;
 		STRING120 _Rep5_FullName       := search.AuthorizedRep5.Name.Full;
 		STRING20  _Rep5_FirstName      := search.AuthorizedRep5.Name.First;
@@ -202,7 +207,16 @@
 		BOOLEAN   _include_additional_watchlists   := if(_ExcludeWatchlists = TRUE, FALSE, _BIID20ProductType IN [BusinessInstantID20_Services.Types.productTypeEnum.COMPLIANCE, BusinessInstantID20_Services.Types.productTypeEnum.COMPLIANCE_PLUS_SBFE]);  
 		DATASET(iesp.share.t_StringArrayItem) _Watchlists_Requested := option.WatchlistsRequested;
 		DATASET(iesp.businessinstantid20.t_BIID20Gateway) _Gateways  := if(exists(Options_Gateway), Options_Gateway, gateways_root);
-    
+		DATASET(LNSmallBusiness.Layouts.AttributeGroupRec) _AttributesRequested := PROJECT(option.AttributesVersionRequest, TRANSFORM(LNSmallBusiness.Layouts.AttributeGroupRec, SELF.AttributeGroup := StringLib.StringToUpperCase(LEFT.Value)));
+		DATASET(LNSmallBusiness.Layouts.ModelNameRec) _ModelsRequested := 
+				PROJECT(option.IncludeModels.Names, 
+						TRANSFORM(LNSmallBusiness.Layouts.ModelNameRec, 
+										SELF.ModelName := StringLib.StringToUpperCase(LEFT.Value)));
+		DATASET(LNSmallBusiness.Layouts.ModelOptionsRec) _ModelOptions := 
+				PROJECT(option.IncludeModels.ModelOptions,
+						TRANSFORM(LNSmallBusiness.Layouts.ModelOptionsRec, 
+										SELF.OptionName := StringLib.StringToUpperCase(TRIM(LEFT.OptionName, LEFT, RIGHT)), 
+										SELF.OptionValue := StringLib.StringToUpperCase(TRIM(LEFT.OptionValue, LEFT, RIGHT))));
     STRING    _DataPermissionMask := BusinessInstantID20_Services.fn_setSBFEBitInDataPermissionMask(__DataPermissionMask, _BIID20ProductType); 
 				
 		// Per Product Mgmt guidance:
@@ -340,11 +354,11 @@
 			SELF.AuthReps := 
 					DATASET(
 						[
-							{ 1,_Rep1_NameTitle,_Rep1_FullName,_Rep1_FirstName,_Rep1_MiddleName,_Rep1_LastName,_Rep1_NameSuffix,_Rep1_FormerLastName,_Rep1_StreetAddress1,_Rep1_StreetAddress2,_Rep1_City,_Rep1_State,_Rep1_Zip,_Rep1_SSN,_Rep1_DateOfBirth,_Rep1_Age,_Rep1_DLNumber,_Rep1_DLState,_Rep1_Phone10,_Rep1_Email,_Rep1_LexID },
-							{ 2,_Rep2_NameTitle,_Rep2_FullName,_Rep2_FirstName,_Rep2_MiddleName,_Rep2_LastName,_Rep2_NameSuffix,_Rep2_FormerLastName,_Rep2_StreetAddress1,_Rep2_StreetAddress2,_Rep2_City,_Rep2_State,_Rep2_Zip,_Rep2_SSN,_Rep2_DateOfBirth,_Rep2_Age,_Rep2_DLNumber,_Rep2_DLState,_Rep2_Phone10,_Rep2_Email,_Rep2_LexID },
-							{ 3,_Rep3_NameTitle,_Rep3_FullName,_Rep3_FirstName,_Rep3_MiddleName,_Rep3_LastName,_Rep3_NameSuffix,_Rep3_FormerLastName,_Rep3_StreetAddress1,_Rep3_StreetAddress2,_Rep3_City,_Rep3_State,_Rep3_Zip,_Rep3_SSN,_Rep3_DateOfBirth,_Rep3_Age,_Rep3_DLNumber,_Rep3_DLState,_Rep3_Phone10,_Rep3_Email,_Rep3_LexID },
-							{ 4,_Rep4_NameTitle,_Rep4_FullName,_Rep4_FirstName,_Rep4_MiddleName,_Rep4_LastName,_Rep4_NameSuffix,_Rep4_FormerLastName,_Rep4_StreetAddress1,_Rep4_StreetAddress2,_Rep4_City,_Rep4_State,_Rep4_Zip,_Rep4_SSN,_Rep4_DateOfBirth,_Rep4_Age,_Rep4_DLNumber,_Rep4_DLState,_Rep4_Phone10,_Rep4_Email,_Rep4_LexID },
-							{ 5,_Rep5_NameTitle,_Rep5_FullName,_Rep5_FirstName,_Rep5_MiddleName,_Rep5_LastName,_Rep5_NameSuffix,_Rep5_FormerLastName,_Rep5_StreetAddress1,_Rep5_StreetAddress2,_Rep5_City,_Rep5_State,_Rep5_Zip,_Rep5_SSN,_Rep5_DateOfBirth,_Rep5_Age,_Rep5_DLNumber,_Rep5_DLState,_Rep5_Phone10,_Rep5_Email,_Rep5_LexID }
+							{ IF(_Rep1_Sequence<>'',_Rep1_Sequence,IF(_Rep1_Sequence<>'' OR _Rep2_Sequence<>'' OR _Rep3_Sequence<>'' OR _Rep4_Sequence<>'' OR _Rep5_Sequence<>'','','1')),1,_Rep1_NameTitle,_Rep1_FullName,_Rep1_FirstName,_Rep1_MiddleName,_Rep1_LastName,_Rep1_NameSuffix,_Rep1_FormerLastName,_Rep1_StreetAddress1,_Rep1_StreetAddress2,_Rep1_City,_Rep1_State,_Rep1_Zip,_Rep1_SSN,_Rep1_DateOfBirth,_Rep1_Age,_Rep1_DLNumber,_Rep1_DLState,_Rep1_Phone10,_Rep1_Email,_Rep1_LexID,1 },
+							{ IF(_Rep2_Sequence<>'',_Rep2_Sequence,IF(_Rep1_Sequence<>'' OR _Rep2_Sequence<>'' OR _Rep3_Sequence<>'' OR _Rep4_Sequence<>'' OR _Rep5_Sequence<>'','','2')),2,_Rep2_NameTitle,_Rep2_FullName,_Rep2_FirstName,_Rep2_MiddleName,_Rep2_LastName,_Rep2_NameSuffix,_Rep2_FormerLastName,_Rep2_StreetAddress1,_Rep2_StreetAddress2,_Rep2_City,_Rep2_State,_Rep2_Zip,_Rep2_SSN,_Rep2_DateOfBirth,_Rep2_Age,_Rep2_DLNumber,_Rep2_DLState,_Rep2_Phone10,_Rep2_Email,_Rep2_LexID,2 },
+							{ IF(_Rep3_Sequence<>'',_Rep3_Sequence,IF(_Rep1_Sequence<>'' OR _Rep2_Sequence<>'' OR _Rep3_Sequence<>'' OR _Rep4_Sequence<>'' OR _Rep5_Sequence<>'','','3')),3,_Rep3_NameTitle,_Rep3_FullName,_Rep3_FirstName,_Rep3_MiddleName,_Rep3_LastName,_Rep3_NameSuffix,_Rep3_FormerLastName,_Rep3_StreetAddress1,_Rep3_StreetAddress2,_Rep3_City,_Rep3_State,_Rep3_Zip,_Rep3_SSN,_Rep3_DateOfBirth,_Rep3_Age,_Rep3_DLNumber,_Rep3_DLState,_Rep3_Phone10,_Rep3_Email,_Rep3_LexID,3 },
+							{ IF(_Rep4_Sequence<>'',_Rep4_Sequence,IF(_Rep1_Sequence<>'' OR _Rep2_Sequence<>'' OR _Rep3_Sequence<>'' OR _Rep4_Sequence<>'' OR _Rep5_Sequence<>'','','4')),4,_Rep4_NameTitle,_Rep4_FullName,_Rep4_FirstName,_Rep4_MiddleName,_Rep4_LastName,_Rep4_NameSuffix,_Rep4_FormerLastName,_Rep4_StreetAddress1,_Rep4_StreetAddress2,_Rep4_City,_Rep4_State,_Rep4_Zip,_Rep4_SSN,_Rep4_DateOfBirth,_Rep4_Age,_Rep4_DLNumber,_Rep4_DLState,_Rep4_Phone10,_Rep4_Email,_Rep4_LexID,4 },
+							{ IF(_Rep5_Sequence<>'',_Rep5_Sequence,IF(_Rep1_Sequence<>'' OR _Rep2_Sequence<>'' OR _Rep3_Sequence<>'' OR _Rep4_Sequence<>'' OR _Rep5_Sequence<>'','','5')),5,_Rep5_NameTitle,_Rep5_FullName,_Rep5_FirstName,_Rep5_MiddleName,_Rep5_LastName,_Rep5_NameSuffix,_Rep5_FormerLastName,_Rep5_StreetAddress1,_Rep5_StreetAddress2,_Rep5_City,_Rep5_State,_Rep5_Zip,_Rep5_SSN,_Rep5_DateOfBirth,_Rep5_Age,_Rep5_DLNumber,_Rep5_DLState,_Rep5_Phone10,_Rep5_Email,_Rep5_LexID,5 }
 						],
 						BusinessInstantID20_Services.Layouts.InputAuthRepInfo
 					);

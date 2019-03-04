@@ -75,79 +75,83 @@ EXPORT CommonQuery := MODULE
 				RETURN bus_in;
 		ENDMACRO;
 		
-		EXPORT mac_CreateInputFromXML(requestType, requestStoredName, requestedReport, serviceRequested) := MACRO
+    EXPORT mac_CreateInputFromXML(requestType, requestStoredName, requestedReport, serviceRequested) := MACRO
 				
-				// Can't have duplicate definitions of Stored with different default values, 
-				// so add the default to #stored to eliminate the assignment of a default value.
-				#STORED('DPPAPurpose', Business_Risk_BIP.Constants.Default_DPPA);
-				#STORED('GLBPurpose',  Business_Risk_BIP.Constants.Default_GLBA);
-				
-				
-				//Get debugging indicator
-				debugIndicator := FALSE : STORED('debugMode');
-				intermediates := FALSE : STORED('intermediateVariables');
+        // Can't have duplicate definitions of Stored with different default values, 
+        // so add the default to #stored to eliminate the assignment of a default value.
+        #STORED('DPPAPurpose', Business_Risk_BIP.Constants.Default_DPPA);
+        #STORED('GLBPurpose',  Business_Risk_BIP.Constants.Default_GLBA);
 
-				// Get XML input 
-				requestIn := DATASET([], requestType) : STORED(requestStoredName, FEW);
 
-				firstRow := requestIn[1] : INDEPENDENT; // Since this is realtime AND not batch, should only have one row on input.
+        //Get debugging indicator
+        debugIndicator := FALSE : STORED('debugMode');
+        intermediates := FALSE : STORED('intermediateVariables');
 
-				optionsIn := GLOBAL(firstRow.options);
-				userIn := GLOBAL(firstRow.user);  
-				search := GLOBAL(firstRow.reportBy);
-				
-				//get outer band data - to use if customer data is not populated
-				UNSIGNED1 outerBandDPPAPurpose := Business_Risk_BIP.Constants.Default_DPPA : STORED('DPPAPurpose');
-				UNSIGNED1 outerBandGLBPurpose  := Business_Risk_BIP.Constants.Default_GLBA : STORED('GLBPurpose');
-				outerBandHistoryDate           := DueDiligence.Constants.NUMERIC_ZERO      : STORED('HistoryDateYYYYMMDD');
+        // Get XML input 
+        requestIn := DATASET([], requestType) : STORED(requestStoredName, FEW);
+
+        firstRow := requestIn[1] : INDEPENDENT; // Since this is realtime AND not batch, should only have one row on input.
+
+        optionsIn := GLOBAL(firstRow.options);
+        userIn := GLOBAL(firstRow.user);  
+        search := GLOBAL(firstRow.reportBy);
+
+        //Fields for test seeds
+        BOOLEAN executeTestSeeds := userIn.testDataEnabled;
+        STRING testSeedTableName := userIn.testDataTableName;
+
+        //get outer band data - to use if customer data is not populated
+        UNSIGNED1 outerBandDPPAPurpose := Business_Risk_BIP.Constants.Default_DPPA : STORED('DPPAPurpose');
+        UNSIGNED1 outerBandGLBPurpose  := Business_Risk_BIP.Constants.Default_GLBA : STORED('GLBPurpose');
+        outerBandHistoryDate           := DueDiligence.Constants.NUMERIC_ZERO      : STORED('HistoryDateYYYYMMDD');
         STRING6 outerBandSSNMASK       := Business_Risk_BIP.Constants.Default_SSNMask : STORED('SSNMask');  
-				
-				
+
+
         //The general rule for picking these options is to look in the inner band (ie the User section) first
         //If the inner band fields are not populated look in the outer band or the Default from the Global Module 
         drm	    := IF(TRIM(userIn.DataRestrictionMask) <> DueDiligence.Constants.EMPTY, userIn.DataRestrictionMask, AutoStandardI.GlobalModule().DataRestrictionMask);
-				dpm	    := IF(TRIM(userIn.DataPermissionMask) <> DueDiligence.Constants.EMPTY, userIn.DataPermissionMask, AutoStandardI.GlobalModule().DataPermissionMask);
-				dppa    := IF((UNSIGNED1)userIn.DLPurpose > DueDiligence.Constants.NUMERIC_ZERO, (UNSIGNED1)userIn.DLPurpose, outerBandDPPAPurpose);
-				glba    := IF((UNSIGNED1)userIn.GLBPurpose > DueDiligence.Constants.NUMERIC_ZERO, (UNSIGNED1)userIn.GLBPurpose, outerBandGLBPurpose);
+        dpm	    := IF(TRIM(userIn.DataPermissionMask) <> DueDiligence.Constants.EMPTY, userIn.DataPermissionMask, AutoStandardI.GlobalModule().DataPermissionMask);
+        dppa    := IF((UNSIGNED1)userIn.DLPurpose > DueDiligence.Constants.NUMERIC_ZERO, (UNSIGNED1)userIn.DLPurpose, outerBandDPPAPurpose);
+        glba    := IF((UNSIGNED1)userIn.GLBPurpose > DueDiligence.Constants.NUMERIC_ZERO, (UNSIGNED1)userIn.GLBPurpose, outerBandGLBPurpose);
         STRING6 DD_SSNMask := IF(userIn.SSNMask != DueDiligence.Constants.EMPTY, TRIM(userIn.SSNMask), TRIM(outerBandSSNMASK));    //*** EXPECTING ALL/LAST4/FIRST5 from MBS   
-				
+
         //since the initial version can be defaulted, default options for person and business reports only; attributes need to be requested
         defaultVersion := MAP(TRIM(STD.Str.ToUpperCase(optionsIn.DDAttributesVersionRequest)) <> DueDiligence.Constants.EMPTY => TRIM(STD.Str.ToUpperCase(optionsIn.DDAttributesVersionRequest)),
                               serviceRequested = DueDiligence.Constants.BUSINESS => DueDiligence.Constants.BUS_REQ_ATTRIBUTE_V3,
                               serviceRequested = DueDiligence.Constants.INDIVIDUAL => DueDiligence.Constants.IND_REQ_ATTRIBUTE_V3,
                               DueDiligence.Constants.EMPTY);
                               
-				requestedVersion := defaultVersion;
-				includeReport := requestedReport;
-				displayAttributeText := optionsIn.displayText;       
-        
+        requestedVersion := defaultVersion;
+        includeReport := requestedReport;
+        displayAttributeText := optionsIn.displayText;       
+
         requestedSource := MAP(STD.Str.ToUpperCase(TRIM(optionsIn.IncludeSpecialAttributes)) = 'NONE' => DueDiligence.Constants.REQUESTED_SOURCE_ENUM.NONE,
                                 STD.Str.ToUpperCase(TRIM(optionsIn.IncludeSpecialAttributes)) = 'ONLINE' => DueDiligence.Constants.REQUESTED_SOURCE_ENUM.ONLINE,
                                 STD.Str.ToUpperCase(TRIM(optionsIn.IncludeSpecialAttributes)) = 'BATCH' => DueDiligence.Constants.REQUESTED_SOURCE_ENUM.BATCH,
                                 DueDiligence.Constants.REQUESTED_SOURCE_ENUM.EMPTY);
-				
-				
-				
-				
-				wseq := PROJECT(requestIn, TRANSFORM({INTEGER4 seq, RECORDOF(requestIn)}, SELF.seq := COUNTER, SELF := LEFT));
 
-				input := PROJECT(wseq, TRANSFORM(DueDiligence.Layouts.Input,
-				
-																					version := requestedVersion;
-																					reportBy := LEFT.reportBy;
-																					
-																					populatedInd := DueDiligence.CommonQuery.PopulateIndividualFromRequest(reportBy, LEFT.user.accountNumber, serviceRequested);
-																					populatedBus := DueDiligence.CommonQuery.PopulateBusinessFromRequest(reportBy, LEFT.user.accountNumber, serviceRequested);
-																					
-																					
-																					useHistDate := (UNSIGNED4)(INTFORMAT(LEFT.options.HistoryDate.Year, 4, 1) + INTFORMAT(LEFT.options.HistoryDate.Month, 2, 1) + INTFORMAT(LEFT.options.HistoryDate.Day, 2, 1));
-																					histDate := IF(useHistDate > 0, useHistDate, (UNSIGNED4)outerBandHistoryDate);
-																																					
-																					SELF.seq := LEFT.seq;
-																					SELF.individual := populatedInd[1];
-																					SELF.business := populatedBus[1];
-																					SELF.historyDateYYYYMMDD := histDate;
-																					SELF.requestedVersion := version;
+
+
+
+        wseq := PROJECT(requestIn, TRANSFORM({INTEGER4 seq, RECORDOF(requestIn)}, SELF.seq := COUNTER, SELF := LEFT));
+
+        input := PROJECT(wseq, TRANSFORM(DueDiligence.Layouts.Input,
+
+                                          version := requestedVersion;
+                                          reportBy := LEFT.reportBy;
+                                          
+                                          populatedInd := DueDiligence.CommonQuery.PopulateIndividualFromRequest(reportBy, LEFT.user.accountNumber, serviceRequested);
+                                          populatedBus := DueDiligence.CommonQuery.PopulateBusinessFromRequest(reportBy, LEFT.user.accountNumber, serviceRequested);
+                                          
+                                          
+                                          useHistDate := (UNSIGNED4)(INTFORMAT(LEFT.options.HistoryDate.Year, 4, 1) + INTFORMAT(LEFT.options.HistoryDate.Month, 2, 1) + INTFORMAT(LEFT.options.HistoryDate.Day, 2, 1));
+                                          histDate := IF(useHistDate > 0, useHistDate, (UNSIGNED4)outerBandHistoryDate);
+                                                                          
+                                          SELF.seq := LEFT.seq;
+                                          SELF.individual := populatedInd[1];
+                                          SELF.business := populatedBus[1];
+                                          SELF.historyDateYYYYMMDD := histDate;
+                                          SELF.requestedVersion := version;
                                           
                                           //Citizenship fields
                                           #IF(serviceRequested = DueDiligence.Constants.ATTRIBUTES)
@@ -160,8 +164,8 @@ EXPORT CommonQuery := MODULE
                                             SELF.productRequested := search.ProductRequestType;
                                           #END
                                           
-																					SELF := [];));
-		ENDMACRO;
+                                          SELF := [];));
+    ENDMACRO;
 		
 		
 		EXPORT ValidateRequest(DATASET(DueDiligence.Layouts.Input) input, UNSIGNED1 glbPurpose, UNSIGNED1 dppaPurpose, STRING11 requestedService):= FUNCTION

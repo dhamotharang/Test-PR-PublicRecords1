@@ -28,24 +28,38 @@ export MAC_BestAppend(infile,
 import didville, suppress, doxie, doxie_files, DeathV2_Services, AutoStandardI, SSNBest_Services,
        did_add, header_slimsort, ut, STD, dx_BestRecords;
 
+	didville.Mac_Common_Field_Declare();
+
+  // need just a few things, so no reading from globals
+  mod_access := MODULE (doxie.IDataAccess)
+    EXPORT unsigned1 glb := glb_purpose_value;
+    EXPORT unsigned1 dppa := dppa_purpose_value;
+    EXPORT string DataRestrictionMask := fixed_DRM;
+    EXPORT string5 industry_class := IndustryClass_val;
+		EXPORT string32 application_type := appType;
+    EXPORT boolean show_minors := include_minors OR (glb_purpose_value = 2);
+		EXPORT string ssn_mask := ssn_mask_value;
+    EXPORT unsigned1 dl_mask := dl_mask_val;
+  END;
+
 os(string i) := if (i='','',trim(i)+' ');
 #uniquename(deathparams)
-%deathparams% := DeathV2_Services.IParam.GetDeathRestrictions(AutoStandardI.GlobalModule());
+%deathparams% := DeathV2_Services.IParam.GetRestrictions(mod_access);
 // Bug: 53541. For some of the services we want to use the _nonblank data (so we return the maximum 
 // number of first/last names). At the time of this change, the watchdog marketing data 
 // does not have a nonblank variant.
 
 // relevant flags for best records permissions
 #uniquename(pre_glb_flag)
-%pre_glb_flag% := doxie.DataRestriction.restrictPreGLB;
+%pre_glb_flag% := mod_access.isPreGLBRestricted();
 #uniquename(cnsmr_flag)
 %cnsmr_flag% := false;
 #uniquename(utility_flag)
-%utility_flag% := IndustryClass_val = ut.IndustryClass.UTILI_IC;
+%utility_flag% := mod_access.isUtility();
 #uniquename(filter_exp)
-%filter_exp% := doxie.DataRestriction.isECHRestricted(fixed_DRM);
+%filter_exp% := mod_access.isECHRestricted();
 #uniquename(filter_eq)
-%filter_eq% := doxie.DataRestriction.isEQCHRestricted(fixed_DRM);
+%filter_eq% := mod_access.isEQCHRestricted();
 
 // get appropriate best_records permission flag
 #uniquename(perm_flag)
@@ -280,22 +294,6 @@ typeof(infile) strip_minors(infile le, doxie_files.key_minors_hash re) := transf
 
   outfile_ := if (stringlib.stringfind(supply,'MAX_SSN',1) = 0,outfile1,mid3);
 	
-	didville.Mac_Common_Field_Declare();
-	// TODO: only ssn_mask_value is taken, and it'd be better to take it from global module, since it is called above anyway
-
-  // need just a few things, so no projecting
-  mod_access := MODULE (doxie.IDataAccess)
-    EXPORT unsigned1 glb := glb_purpose_value;
-    EXPORT unsigned1 dppa := dppa_purpose_value;
-    EXPORT string DataRestrictionMask := fixed_DRM;
-    EXPORT string5 industry_class := IndustryClass_val;
-		EXPORT string32 application_type := appType;
-    EXPORT boolean show_minors := include_minors; //TODO: or glb=2?
-		EXPORT string ssn_mask := ssn_mask_value;
-    EXPORT dl_mask := dl_mask_val;
-		// input include_minors -- is it include only or dppa as well?
-  END;
-
 	ssnBestParams := SSNBest_Services.IParams.setSSNBestParams(mod_access
 																														 ,suppress_and_mask_:=FALSE); //since suppression and masking is done below
 																										
