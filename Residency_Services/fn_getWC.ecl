@@ -3,8 +3,7 @@ IMPORT doxie, Residency_Services, WatercraftV2_Services, BatchShare;
 EXPORT fn_getWC(DATASET(doxie.layout_references_acctno) ds_in_acctnos_dids,
                 Residency_Services.IParam.BatchParams mod_params_in) := FUNCTION
 
-	mod_batch := BatchShare.IParam.ConvertToLegacy(mod_params_in);
-	mod_batch_params := MODULE(PROJECT(mod_batch, 
+	mod_batch_params := MODULE(PROJECT(mod_params_in, 
 	                                   WatercraftV2_Services.Interfaces.batch_params, OPT))
 		EXPORT BOOLEAN include_non_regulated_sources := FALSE : STORED('IncludeNonRegulatedWatercraftSources');
 	END;

@@ -2,13 +2,13 @@
 
 EXPORT IParam := MODULE
 
-	EXPORT BatchParams := INTERFACE(BatchShare.IParam.BatchParams, FCRA.iRules)
+	EXPORT BatchParams := INTERFACE(BatchShare.IParam.BatchParamsV2, FCRA.iRules)
 		export string1   BIPFetchLevel := '';
 	END;
 
 	EXPORT getBatchParams(boolean isFCRA = FALSE) := FUNCTION
 		
-		base_params := BatchShare.IParam.getBatchParams();
+		base_params := BatchShare.IParam.getBatchParamsV2();
 	
 		string1 sBIPFetchLevel := BIPV2.IDconstants.Fetch_Level_SELEID	 : STORED('BIPFetchLevel');
 		

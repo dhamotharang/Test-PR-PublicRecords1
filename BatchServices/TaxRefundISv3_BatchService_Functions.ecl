@@ -302,7 +302,7 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 		end;
 
 		crim_batch := project(in_clean_batch, xformToCrimBatch(left));
-		batch_params		:= BatchShare.IParam.getBatchParams();
+		batch_params		:= BatchShare.IParam.getBatchParamsV2();
 
 		crim_batch_params := module(project(batch_params, CriminalRecords_BatchService.IParam.batch_params, opt))	
 			unsigned2 MaxResults_val := 50 : stored('MaxResults');

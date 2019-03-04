@@ -67,7 +67,7 @@ EXPORT batch_records (FaaV2_Services.IParam.BatchParams params,
   // since aircrafts corections are fetched by 'aircraft_id', which is not shared among different DIDs
   faa_res := Doxie_Raw.AirCraft_Raw (
                faa_dids, faa_bdids,
-               0, params.DPPAPurpose, params.GLBPurpose, params.ssn_mask, params.ApplicationType, //0 == dateval
+               0, params.dppa, params.glb, params.ssn_mask, params.application_type, //0 == dateval
                IsFCRA, ds_flags,
 							 faa_linkids,params.BIPFetchLevel, slim_pc_recs, FFDOptionsMask_adj);
 
