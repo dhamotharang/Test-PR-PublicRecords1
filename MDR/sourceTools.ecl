@@ -126,6 +126,7 @@ MODULE
 	export src_WY_Corporations           := 'CZ';
 	export src_Correctional_Facilities	 := '14';  // Correctional Facilities - Internal
 	export src_Cortera                   := 'RR';
+	export src_Cortera_Tradeline         := '7K';
 	export src_CrashCarrier							 := 'KC';  // aka US DOT "Safer Census" data for BIP
 	export src_Credit_Unions             := 'CU';
 	export src_Datagence								 := 'DG';
