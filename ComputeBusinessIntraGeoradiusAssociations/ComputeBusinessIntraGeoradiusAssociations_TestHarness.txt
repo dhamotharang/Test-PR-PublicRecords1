@@ -1,0 +1,5 @@
+testcompositionrun_info
+Monitoring WU W20170321-110131-2(HIPIE_BCTLWXCARMIGJX_ComputeBusinessIntraGeoradiusAssociations_CarmigJX) to completion.
+
+testcompositionrun_err
+Plugin ComputeBusinessIntraGeoradiusAssociations passed compliance check

@@ -1,0 +1,110 @@
+﻿ID "893c0cae-47f6-42db-99a5-03e0defe88c4";
+NAME ComputeBIZIndexes;
+LABEL "Compute BIZ Indexes";
+VERSION "2.0";
+AUTHOR "CarmigJX";
+CATEGORY CUSTOM;
+DESCRIPTION "Builds custom BIZ Indexes for use in custom search query used by BIZ dashboards.";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING JobID: LABEL("Batch Job ID"),DESCRIPTION("The batch Job ID will be appended to the indexes names to avoid collision with previous runs"),DEFAULT("^GLOBAL|JOBID");
+  STRING BusinessKeyIdentifier: LABEL("Business Key Identifier"),DEFAULT("Business"),OPTIONAL,DESCRIPTION("Identifier used in the business keys' name. Default is Business");
+  STRING BusinessPersonKeyIdentifier: LABEL("Business Person Key Identifier"),DEFAULT("Officer"),OPTIONAL,DESCRIPTION("Identifier used in the business person keys' name. Default is Officer");
+	DATASET dsInputBusiness: MAPBYNAME
+    FIELD RecordId: LABEL("Record ID"),DESCRIPTION("Unique record identifier");
+    FIELD AccountNumber: LABEL("Account Number"),DESCRIPTION("Customer account number");
+    FIELD BusinessName: LABEL("Business Name"),DESCRIPTION("Legal business name");
+    FIELD DBAName: LABEL("DBA Name"),DESCRIPTION("DBA name");
+    FIELD UltBusinessName: LABEL("Ult Business Name"),DESCRIPTION("Ult business name from BIP Best");
+    FIELD SeleBusinessName: LABEL("Sele Business Name"),DESCRIPTION("Sele business name from BIP Best");
+    FIELD ProxBusinessName: LABEL("Prox Business Name"),DESCRIPTION("Prox business name from BIP Best");
+    FIELD BusinessPrimaryName: LABEL("Business Primary Name"),DESCRIPTION("Business location primary name");
+    FIELD BusinessPrimaryRange: LABEL("Business Primary Range"),DESCRIPTION("Business location primary range");
+    FIELD BusinessSecondaryRange: LABEL("Business Secondary Range"),DESCRIPTION("Business location secondary range");
+    FIELD BusinessCity: LABEL("Business City"),DESCRIPTION("Business location city");
+    FIELD BusinessState: LABEL("Business State"),DESCRIPTION("Business location state");
+    FIELD BusinessZip: LABEL("Business Zip"),DESCRIPTION("Business location zip");
+    FIELD FEIN: LABEL("FEIN"),DESCRIPTION("Business FEIN");
+  END
+  DATASET dsInputPerson: MAPBYNAME
+    FIELD FirstName: LABEL("First Name"),DESCRIPTION("Business person best first name");
+    FIELD MiddleName: LABEL("Middle Name"),DESCRIPTION("Business person best middle name");
+    FIELD LastName: LABEL("Last Name"),DESCRIPTION("Business person best last name");
+    FIELD NameSuffix: LABEL("Name Suffix"),DESCRIPTION("Business person best name suffix");
+    FIELD RawName: LABEL("Raw Name"),DESCRIPTION("Business person name raw name from customer data"), OPTIONAL, NULL("");
+    FIELD PrimaryName: LABEL("Primary Name"),DESCRIPTION("Address primary name"), OPTIONAL, NULL("");
+    FIELD PrimaryRange: LABEL("Primary Range"),DESCRIPTION("Address primary range"), OPTIONAL, NULL("");
+    FIELD SecondaryRange: LABEL("Secondary Range"),DESCRIPTION("Address secondary range"), OPTIONAL, NULL("");
+    FIELD City: LABEL("City"),DESCRIPTION("Address city"), OPTIONAL, NULL("");
+    FIELD State: LABEL("State"),DESCRIPTION("Address state"), OPTIONAL, NULL("");
+    FIELD Zip: LABEL("Zip"),DESCRIPTION("Address zip"), OPTIONAL, NULL("");
+    FIELD SSN: LABEL("SSN"),DESCRIPTION("SSN"), OPTIONAL, NULL("");
+    FIELD ContextUID: LABEL("Context UID"),DESCRIPTION("Context UID for use in graph"), OPTIONAL, NULL("");
+  END
+  DATASET dsInputContact: MAPBYNAME
+    FIELD ContactFirstName: LABEL("Contact First Name"),DESCRIPTION("Business contact first name"), OPTIONAL, NULL("");
+    FIELD ContactMiddleName: LABEL("Contact Middle Name"),DESCRIPTION("Business contact middle name"), OPTIONAL, NULL("");
+    FIELD ContactLastName: LABEL("Contact Last Name"),DESCRIPTION("Business contact last name"), OPTIONAL, NULL("");
+    FIELD ContactNameSuffix: LABEL("Contact Name Suffix"),DESCRIPTION("Business contact name suffix"), OPTIONAL, NULL("");
+    FIELD ContactContextUID: LABEL("Contact Context UID"),DESCRIPTION("Business contact context UID for use in graph"), OPTIONAL, NULL("");
+  END
+END
+
+OUTPUTS
+  ACTION dsBuildKeys;
+END
+
+GENERATES INLINE
+	IMPORT ComputeBIZIndexes;
+  kBusinessName := ComputeBIZIndexes.macComputeBusinessNameIndex(%dsInputBusiness%, %RecordId%, %BusinessName%, %DBAName%, %UltBusinessName%, %SeleBusinessName%, %ProxBusinessName%, %^qJobID%, %^qBusinessKeyIdentifier%);
+  kBusinessAddress := ComputeBIZIndexes.macComputeAddressIndex(%dsInputBusiness%, %BusinessPrimaryName%, %BusinessPrimaryRange%, %BusinessSecondaryRange%, %BusinessCity%, %BusinessState%, %BusinessZip%, %^qJobID%, %^qBusinessKeyIdentifier%);
+  kBusinessFEIN := ComputeBIZIndexes.macComputeTaxIdIndex(%dsInputBusiness%, %FEIN%, %^qJobID%, %^qBusinessKeyIdentifier%);
+  
+  kOfficerName := ComputeBIZIndexes.macComputeBusinessPersonNameIndex(%dsInputPerson%, %FirstName%, %MiddleName%, %LastName%, %NameSuffix%, %RawName%, %^qJobID%, %^qBusinessPersonKeyIdentifier%, %ContextUID%,
+    %dsInputContact%, %ContactFirstName%, %ContactMiddleName%, %ContactLastName%, %ContactNameSuffix%, %ContactContextUID%);
+  #IF(#TEXT(%PrimaryName%) != '' OR #TEXT(%PrimaryRange%) != '' OR #TEXT(%SecondaryRange%) != '' OR #TEXT(%City%) != '' OR #TEXT(%State%) != '' OR #TEXT(%Zip%) != '')
+    kOfficerAddress := ComputeBIZIndexes.macComputeAddressIndex(%dsInputPerson%, %PrimaryName%, %PrimaryRange%, %SecondaryRange%, %City%, %State%, %Zip%, %^qJobID%, %^qBusinessPersonKeyIdentifier%);
+  #END
+  #IF(#TEXT(%SSN%) != '')
+    kOfficerSSN := ComputeBIZIndexes.macComputeTaxIdIndex(%dsInputPerson%, %SSN%, %^qJobID%, %^qBusinessPersonKeyIdentifier%);
+  #END
+  
+  kAccountNumber := ComputeBIZIndexes.macComputeAccountIndex(%dsInputBusiness%,%AccountNumber%,%^qJobID%);
+  kPayload       := ComputeBIZIndexes.macComputePayloadIndex(%dsInputBusiness%,%RecordId%,%^qJobID%);
+
+  %^edsBuildKeys% := PARALLEL(
+    BUILDINDEX(kBusinessName, OVERWRITE),
+    BUILDINDEX(kBusinessAddress, OVERWRITE),
+    BUILDINDEX(kBusinessFEIN, OVERWRITE),
+    BUILDINDEX(kOfficerName, OVERWRITE),
+    #IF(#TEXT(%PrimaryName%) != '' OR #TEXT(%PrimaryRange%) != '' OR #TEXT(%SecondaryRange%) != '' OR #TEXT(%City%) != '' OR #TEXT(%State%) != '' OR #TEXT(%Zip%) != '')
+      BUILDINDEX(kOfficerAddress, OVERWRITE),
+    #END
+    #IF(#TEXT(%SSN%) != '') 
+      BUILDINDEX(kOfficerSSN, OVERWRITE), 
+    #END
+    BUILDINDEX(kAccountNumber, OVERWRITE),
+    BUILDINDEX(kPayload, OVERWRITE)
+    );
+  
+ENDGENERATES
+
+
+RESOURCES
+	FILE readme: FILENAME("ComputeBIZIndexes_2.0_ReadMe.txt"),LABEL("Plugin ReadMe File");
+	FILE ComputeBIZIndexes_2.0_testcmp: FILENAME("ComputeBIZIndexes_2.0_testcmp.txt"),LABEL("Plugin Test Composition");
+	FILE ComputeBIZIndexes_2.0_BuildTestDataset: FILENAME("ComputeBIZIndexes_2.0_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+	FILE ComputeBIZIndexesChecklist: FILENAME("ComputeBIZIndexesChecklist.xlsx"),LABEL("Checklist");
+	LOGICALFILE testbusiness: FILENAME("~qa::computebizindexes::computebizindexes::input::officers"),URL("http://10.241.100.159:8010"),DALIIP("10.241.100.159"),CLUSTER("thor100_100dev");
+	LOGICALFILE testofficer: FILENAME("~qa::computebizindexes::computebizindexes::input::businesses"),URL("http://10.241.100.159:8010"),DALIIP("10.241.100.159"),CLUSTER("thor100_100dev");
+  ECL  ComputeBIZIndexes:FILENAME("ComputeBIZIndexes"), URL("<http://10.241.100.153:8010>"); 
+  ECL  Address:FILENAME("Address"), URL("<http://10.241.100.153:8010>"); 
+  ECL  NID:FILENAME("NID"), URL("<http://10.241.100.153:8010>"); 
+  ECL  ML:FILENAME("ML"), URL("<http://10.241.100.153:8010>"); 
+  ECL  doxie:FILENAME("doxie"), URL("<http://10.241.100.153:8010>"); 
+END

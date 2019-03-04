@@ -1,0 +1,15 @@
+testcompositionrun_info
+
+Monitoring WU W20170214-133041(periassx_suspectaddressvisualization_testcmp.ins002_service_20170214_013035) to completion.
+Monitoring WU W20170214-133045(HIPIE_ALAPERIASSX-W7D_SuspectAddressVisualization_testcmp_periassx_deleteOldFiles) to completion.
+Monitoring WU W20170214-133049(HIPIE_ALAPERIASSX-W7D_SuspectAddressVisualization_testcmp_periassx) to completion.
+
+
+testcompositionrun_err
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/C:/Program%20Files%20(x86)/HPCCSystems/6.2.0/HIPIE/HIPIE.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/C:/Program%20Files%20(x86)/HPCCSystems/6.2.0/KEL/hipie.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
+Plugin SuspectAddressVisualization passed compliance check
+

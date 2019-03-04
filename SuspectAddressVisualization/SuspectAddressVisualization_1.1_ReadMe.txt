@@ -1,0 +1,29 @@
+Suspect Address Visualization Read Me
+
+===========================================================
+				Plugin Type
+===========================================================
+
+This is an Visualization Plugin
+
+===========================================================
+				Plugin Description
+===========================================================
+This plugin creates score, address and provider dataset for suspect address visualization dashboard.
+
+===========================================================
+				What to input
+===========================================================
+dsInput is the input dataset. The input comes from provider address scored plugin.
+
+===========================================================
+				Output
+===========================================================
+The plugin cretes 4 output file. Scored, ScoredWithFlagFilter (newly added in version 1.1), Provider and Address file.
+
+
+Version 1.1.0 Notes
+-------------------
+Per RAMPS-222, added an extra dataset ScoredWithFlagFilterDs. This dataset is ScoredDs JOIN ProviderDs ON ProviderKey, having an 
+extra field called FlagFilter which is the flag reason description from ProviderDs. This change enables providers for selected address being filtered by 
+flag reason description.

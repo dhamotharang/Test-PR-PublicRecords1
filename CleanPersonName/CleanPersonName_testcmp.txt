@@ -1,0 +1,30 @@
+ID "cleanpersonname_cmp";
+NAME cleanpersonname;
+LABEL CleanPersonName;
+DESCRIPTION "A template only with Data source input";
+VERSION "1.0.0";
+AUTHOR prichajx;
+PERMISSIONS
+VIEW:PRIVATE;
+EDIT:PRIVATE;
+RUN:PRIVATE;
+END
+INPUTS 
+    STRING CompareWUID : DEFAULT("W20151104-153023"); 
+END
+INSTANCE HIPIE_Plugins.OutDataset.OutDataset(Ins009): LABEL("Output Dataset"),VERSION("1.0.0")
+	dsInput="^Ins006|dsOutput"
+	name="~qa::cleanpersonname::cleanpersonname::output"
+	Method="THOR"
+END
+INSTANCE HIPIE_Plugins.CleanPersonName.CleanPersonName(Ins006): LABEL("Clean Person Name"),VERSION("1.0.0")
+	dsInput="^Ins001|dsOutput"
+	Name_childds_recnum="1"
+	Prefix="Contact"
+	Name="name"
+END
+INSTANCE HIPIE_Plugins.UseDataset.UseDataset(Ins001): LABEL("Use Dataset"),VERSION("1.1.0")
+	LogicalFilename="~qa::cleanpersonname::cleanpersonname::input"
+	Method="THOR"
+	Structure="{ string name };"
+END
