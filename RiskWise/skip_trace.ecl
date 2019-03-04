@@ -1,4 +1,4 @@
- 
+﻿ 
 import AutoStandardI, risk_indicators, didville, ut, address, doxie_files, 
 census_data, header_slimsort, did_add, suppress, Bankruptcyv2, BankruptcyV3, mdr, Death_Master;
 
@@ -223,12 +223,15 @@ bans_did := BankruptcyV3.key_bankruptcyV3_did();
 				get_more_bankrupt(LEFT,RIGHT),
 				ATMOST(RiskWise.max_atmost),keep(50));
 				
+	s_bankrupt := group(sort(full_bankrupt, seq, -date_filed, match_flag), seq);
+				
 	bans_layout roll_bankrupt(bans_layout le, bans_layout rt) := transform
-		chooser1 := le.match_flag <= rt.match_flag and le.date_filed >= rt.date_filed;
+		chooser1 := map(le.date_filed > rt.date_filed => true,
+										le.date_filed = rt.date_filed and le.match_flag <= rt.match_flag => true,
+										false);
 		self := if(chooser1, le, rt);
 	end;
 
-	s_bankrupt := group(sort(full_bankrupt, seq, -date_filed, match_flag), seq);
 	rolled_bankrupt := rollup(s_bankrupt, true, roll_bankrupt(left,right));
 		
 	Layout_SkipTrace add_bankrupt(Layout_SkipTrace le, bans_layout rt) := transform
