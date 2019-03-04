@@ -12,12 +12,12 @@ EXPORT fm_keep_best_remote_linking_matches(__ds_in) := FUNCTIONMACRO
   rec := RECORDOF(__ds_in);
 
   //Separate the highest scoring lexIDs.
-  ds_hi_score_lexIDs := DEDUP(SORT(__ds_in(best_lexid>0), acctno, best_lexid, -conf), acctno, best_lexid);
+  ds_hi_score_lexIDs := DEDUP(SORT(__ds_in, acctno, best_lexid, -conf), acctno, best_lexid);
 
   //Sort and Group by acctno to have subsequent operations run on each individual acctno.
   ds_hi_score_lexIDs_grouped := GROUP(SORT(ds_hi_score_lexIDs, acctno, -conf), acctno);
 
-  //Roll up by acctno and keep records with either a single lexID, or a single conf score.
+  //Only keep records with a single highest conf score per account.
   //This removes the ambigous matches where we have 2 of the same conf scores with differing lexID values.
   rec Roll_Remove_Ambiguous(rec L, DATASET(rec) grouped_recs) := transform
     max_score := MAX(grouped_recs, conf);
@@ -28,20 +28,12 @@ EXPORT fm_keep_best_remote_linking_matches(__ds_in) := FUNCTIONMACRO
 
   dl_hi_score_ambig_removed := ROLLUP(ds_hi_score_lexIDs_grouped, GROUP, Roll_Remove_Ambiguous(LEFT, ROWS(LEFT)));
 
-  //Now add back records with matching lexIDs to our new table that were removed due to lower conf scores.
+  //Now add back records with matching lexID which were deduped.
+  //In the case of lexID = 0, we only add other matching ones back that have the same conf score.
   dl_all_best_lexIDs := JOIN(__ds_in, dl_hi_score_ambig_removed, LEFT.acctno = RIGHT.acctno AND
-    LEFT.best_lexID = RIGHT.best_lexID, TRANSFORM(LEFT), KEEP(1), LIMIT(0));
+    LEFT.best_lexID = RIGHT.best_lexID AND (LEFT.best_lexID <> 0 OR LEFT.conf = RIGHT.conf),
+    TRANSFORM(LEFT), KEEP(1), LIMIT(0));
 
-  //Grab any matches where there were no rows which had a best_lexID value.
-  dl_no_lexID := JOIN(__ds_in(best_lexID = 0), ds_hi_score_lexIDs, LEFT.acctno = RIGHT.acctno, LEFT ONLY);
-
-  //Sort and group by acctno.
-  dl_no_lexID_grouped := GROUP(SORT(dl_no_lexID, acctno, -conf), acctno);
-
-  //Roll up to remove ambigous matches.
-  ds_no_lexID_best := ROLLUP(dl_no_lexID_grouped, GROUP, Roll_Remove_Ambiguous(LEFT, ROWS(LEFT)));
-
-  //Add the matches with lexIDs to the ones without them and return.
-  RETURN dl_all_best_lexIDs + ds_no_lexID_best;
+  RETURN dl_all_best_lexIDs;
 
 ENDMACRO;

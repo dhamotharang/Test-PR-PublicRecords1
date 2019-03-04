@@ -11,6 +11,7 @@ EXPORT fn_get_remote_linking_matches(DATASET(BatchServices.layout_BankruptcyV3_B
 
   InsuranceHeader_RemoteLinking.Layouts.ServiceInputLayout_Batch
     create_rl_request(BatchServices.layout_BankruptcyV3_Batch_out L, BatchServices.layout_BankruptcyV3_Batch_in R) := TRANSFORM
+      best_ssn := IF(L.debtor_ssnmatch <> '', L.debtor_ssnmatch, L.debtor_ssn);
       SELF.Inquiry_Lexid := R.did;
       SELF.SSN_Inq := INTFORMAT((integer)R.ssn, 9, 1);
       SELF.SNAME_Inq := toUpper(R.name_suffix);
@@ -22,9 +23,9 @@ EXPORT fn_get_remote_linking_matches(DATASET(BatchServices.layout_BankruptcyV3_B
       SELF.SEC_RANGE_Inq := toUpper(R.sec_range);
       SELF.CITY_Inq := toUpper(R.p_city_name);
       SELF.ST_Inq := toUpper(R.st);
-      SELF.ZIP_Inq := toUpper(R.z5);
+      SELF.ZIP_Inq := INTFORMAT((integer)R.z5, 5, 1);
       SELF.Results_Lexid := (unsigned6)L.debtor_did;
-      SELF.SSN_Res := INTFORMAT((integer)L.debtor_ssn, 9, 1);
+      SELF.SSN_Res := INTFORMAT((integer)best_ssn, 9, 1);
       SELF.SNAME_Res := toUpper(L.debtor_1_name_suffix);
       SELF.FNAME_Res := toUpper(L.debtor_1_fname);
       SELF.MNAME_Res := toUpper(L.debtor_1_mname);
@@ -34,7 +35,7 @@ EXPORT fn_get_remote_linking_matches(DATASET(BatchServices.layout_BankruptcyV3_B
       SELF.SEC_RANGE_Res := toUpper(L.debtor_sec_range);
       SELF.CITY_Res := toUpper(L.debtor_p_city_name);
       SELF.ST_Res := toUpper(L.debtor_st);
-      SELF.ZIP_Res := toUpper(L.debtor_zip);
+      SELF.ZIP_Res := INTFORMAT((integer)L.debtor_zip, 5, 1);
       SELF.ReferenceID := L.sequenceNumber;
       SELF := [];
   END;
@@ -71,6 +72,13 @@ EXPORT fn_get_remote_linking_matches(DATASET(BatchServices.layout_BankruptcyV3_B
     TRANSFORM(BatchServices.layout_BankruptcyV3_Batch_out,
       SELF.inquiry_Lexid := (STRING)LEFT.best_lexID,
       SELF := LEFT));
+      
+  // DEBUG-------------------------
+  // OUTPUT(ds_remote_linking_request, NAMED('ds_remote_linking_request'));
+  // OUTPUT(ds_remote_linking_results, NAMED('ds_remote_linking_results'));
+  // OUTPUT(ds_remote_linking_matches, NAMED('ds_remote_linking_matches'));
+  // OUTPUT(ds_rl_best_lexIDs, NAMED('ds_rl_best_lexIDs'));
+  // ------------------------------
 
   RETURN ds_rl_batch_out;
 
