@@ -78,7 +78,8 @@
 		 string    TotalShareValue{xpath('TotalShareValue')};																  
 		 string    TradeApplicantType{xpath('TradeApplicantType')};													  
 		 string    OwnerName{xpath('OwnerName')};																						 
-		 string    IsForeign{xpath('IsForeign')};																						  
+		 string    IsForeign{xpath('IsForeign')};		
+		 string    ActionNumber{xpath('ActionNumber')};
 	end;
 		
 	export RegisteredAgentLayoutIn	:= record

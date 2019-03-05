@@ -31,7 +31,6 @@
 															  registered or reserved name.  Again, “Corporation Entity” is the “master” table, of which there
 															  will be only one.  There will not be a Registered Agent or Corporate Officer record for these
 															  data types, however Corporate Actions (history filings) may exist.  
-															  All tables are related using by the AcctNumber field.  
  	
 	 Source Notes							:   The state sends the files in JSON format which is similar to XML tagging. 
  
@@ -49,7 +48,7 @@
 																The files need to be sprayed as 'VARIABLE' with field separator as '' and record separator as
 																'},{,]' for the Data files and '\\]' for the lookup tables.  Then the files need to be read on 
 																thor like this: CSV(SEPARATOR(['']),TERMINATOR(['},{'])).  In the Corp2_Raw_NE.Files attribute, 
-																the files are parsted into the correct layouts and the FROMJSON function is used to convert the 
+																the files are parsed into the correct layouts and the FROMJSON function is used to convert the 
 																json tagging into fixed layouts.
                                																
 */					

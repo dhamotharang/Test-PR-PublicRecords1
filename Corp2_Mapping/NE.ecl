@@ -2,7 +2,7 @@
 
 EXPORT NE  := MODULE; 
 
-	export Update(string fileDate, string version, boolean pShouldSpray = _Dataset().bShouldSpray, boolean pOverwrite = false,pUseProd = Tools._Constants.IsDataland) :=Function
+	export Update(string fileDate, string version, boolean pShouldSpray = _Dataset().bShouldSpray, boolean pOverwrite = false, pUseProd = Tools._Constants.IsDataland) :=Function
 
 		state_origin			:= 'NE';
 		state_fips	 			:= '31';
@@ -16,21 +16,12 @@ EXPORT NE  := MODULE;
 		CorpTypeTable  	  := Corp2_Raw_NE.Files(filedate,pUseProd).input.CorpTypeTable     : independent;	 	
 		ListOfStatesTable := Corp2_Raw_NE.Files(filedate,pUseProd).input.ListOfStatesTable : independent;	 
 		CountryCodesTable	:= Corp2_Raw_NE.Files(filedate,pUseProd).input.CountryCodesTable : independent;	 
-		
-		
-		domestic_type	:= ['7','10115','10134','10139','10140','10141','10142','10143',
-											'10146','10154','10156','10158','10159','10160','10197','10199',
-											'10200','10205','10206','10207','10211','10219','10226'];
-		foreign_type 	:= ['19','10129','10148','10149','10151','10162','10202',
-											'10203','10204','10208','10224','10227'];
-    contact_types	:= ['TRADEMARK','PROTECTED NAME','REGISTERED NAME','SERVICE MARK','RESERVATION OF CORPORATE NAME']; 
-		
-		
+	
 		//Corporation Recs Mappings
 		
 		//--------------------- Merge  RA_Agents ------------------------------------------
-		CorpEntityRA		:= distribute(CorpEntity,hash(RegAgentId));  // Distribute on RegAgentId for join to RegisteredAgent 
-		DsEntityWithRA 	:= join(CorpEntityRA, RegisteredAgent(corp2.t2u(AgentId) not in ['6178','175919']),	
+		CorpEntity_dist	:= distribute(CorpEntity,hash(RegAgentId));  // Distribute on RegAgentId for join to RegisteredAgent 
+		DsEntityWithRA 	:= join(CorpEntity_dist, RegisteredAgent(corp2.t2u(AgentId) not in ['6178','175919']),	
 														corp2.t2u(left.RegAgentId) = corp2.t2u(right.AgentId),
 														transform(Corp2_Raw_NE.Layouts.Temp_CorpEntityWithRA,
 																			self 	:= left;
@@ -67,8 +58,8 @@ EXPORT NE  := MODULE;
 																		 
 		corp2_mapping.LayoutsCommon.Main  corpMainTransform(Corp2_Raw_NE.Layouts.Temp_CorpEntityWithRA input,integer ctr):= transform,
 				skip((ctr = 2 and 
-							input.streetaddress1   +input.streetaddress2   +input.City   +input.state   +input.zipCode = 
-							input.DO_streetaddress1+input.DO_streetaddress2+input.DO_City+input.DO_state+input.DO_zipCode) 
+							corp2.t2u(input.streetaddress1   +input.streetaddress2   +input.City   +input.state   +input.zipCode) = 
+							corp2.t2u(input.DO_streetaddress1+input.DO_streetaddress2+input.DO_City+input.DO_state+input.DO_zipCode)) 
 						)
 			self.dt_vendor_first_reported							:=(integer)fileDate;
 			self.dt_vendor_last_reported							:=(integer)fileDate;
@@ -95,7 +86,7 @@ EXPORT NE  := MODULE;
 			self.corp_orig_org_structure_cd					  := corp2.t2u(input.CorpTypeCode);															
 			self.corp_orig_org_structure_desc				  := corp2.t2u(input.corptype);
 			self.corp_for_profit_ind        					:= if(corp2.t2u(input.CorpTypeCode)in
-																										 ['10159','10160','10207','10162','10208','10217','10218'],
+																										 ['10159','10160','10162','10207','10208','10217','10218'],
 																											'N',''); 
 			self.corp_status_cd												:= case(corp2.t2u(input.Status),
 																												'ACTIVE'   =>'A',
@@ -103,31 +94,20 @@ EXPORT NE  := MODULE;
 																												'SUSPENDED'=>'S',
 																												'');
 			self.corp_status_desc										 	:= corp2.t2u(input.Status);	//Scrubbing										
-			valid_Date                              	:= corp2_mapping.fValidateDate(input.DateIncorp[1..10],'CCYY-MM-DD').PastDate;
-			self.corp_foreign_domestic_ind						:= if(corp2.t2u(input.corptypecode) <> '10221',
-																											map(corp2.t2u(input.QualifyingState)in[ state_origin,''] and corp2.t2u(input.corptypecode)  in domestic_type     =>'D',
-																													corp2.t2u(input.QualifyingState)not in[ state_origin,''] and corp2.t2u(input.corptypecode) in foreign_type	 =>'F',
-																													corp2.t2u(input.QualifyingState)='' and corp2.t2u(input.corptypecode) in foreign_type										 		 =>'F',
-																													corp2.t2u(input.corptypecode) in foreign_type										 		 																				 =>'F',
-																													corp2.t2u(input.corptypecode) in domestic_type    																												   =>'D',
-																													''),
-																										  '');
-			self.corp_inc_date												:= if(corp2.t2u(input.corptypecode) <> '10221',
-																											map(corp2.t2u(input.QualifyingState)in[ state_origin,''] and corp2.t2u(input.corptypecode)  in domestic_type =>valid_Date,
-																													corp2.t2u(input.QualifyingState)='' and corp2.t2u(input.corptypecode) not in foreign_type								 =>valid_Date,
-																													corp2.t2u(input.corptypecode) not in foreign_type										 																		 =>valid_Date,//noticed in the data, states which are state_origin and have forein type & vice versa		
-																													''),
-																											'');
-			self.corp_forgn_date											:=if(corp2.t2u(input.corptypecode) <> '10221',
-																										map(corp2.t2u(input.QualifyingState)not in[ state_origin,''] and corp2.t2u(input.corptypecode) in foreign_type=>valid_Date,
-																												corp2.t2u(input.QualifyingState)='' and corp2.t2u(input.corptypecode) in foreign_type										  =>valid_Date,
-																												corp2.t2u(input.corptypecode) in foreign_type										 																					=>valid_Date,
-																												''),
-																										'');		
+			self.corp_foreign_domestic_ind						:= map(corp2.t2u(input.QualifyingState)in[state_origin,''] and corp2.t2u(input.corptypecode) in Corp2_Raw_NE.Functions.domestic_type =>'D',
+																											 corp2.t2u(input.QualifyingState)not in[state_origin] and corp2.t2u(input.corptypecode) in Corp2_Raw_NE.Functions.foreign_type =>'F',
+																											 corp2.t2u(input.corptypecode) in Corp2_Raw_NE.Functions.foreign_type										 		 																	 =>'F',
+																											 corp2.t2u(input.corptypecode) in Corp2_Raw_NE.Functions.domestic_type    																										 =>'D',
+																											 '');
+			valid_Date                              	:= corp2_mapping.fValidateDate(input.DateIncorp[1..10],'CCYY-MM-DD').PastDate;																								
+			self.corp_inc_date												:= if(corp2.t2u(input.corptypecode) not in ['10221',Corp2_Raw_NE.Functions.foreign_type]
+			                                                ,valid_Date ,'');
+			self.corp_forgn_date											:= if(corp2.t2u(input.corptypecode) in Corp2_Raw_NE.Functions.foreign_type
+			                                                ,valid_Date ,'');	
 			self.corp_filing_date											:= if(corp2.t2u(input.corptypecode) = '10221' ,valid_Date ,'');
 			self.corp_trademark_filing_date						:= if(corp2.t2u(input.corptypecode) = '10221' ,valid_Date ,'');
-			self.corp_forgn_state_cd									:= if(corp2.t2u(input.QualifyingState) not in ['NE',''],corp2.t2u(input.QualifyingState),'')	;												 											 
-			self.corp_forgn_state_desc								:= if(corp2.t2u(input.QualifyingState) not in ['NE',''],corp2.t2u(input.StDesc),'')	;	
+			self.corp_forgn_state_cd									:= if(corp2.t2u(input.QualifyingState) not in [state_origin,''],corp2.t2u(input.QualifyingState),'')	;												 											 
+			self.corp_forgn_state_desc								:= if(corp2.t2u(input.QualifyingState) not in [state_origin,''],corp2.t2u(input.StDesc),'')	;	
 			self.corp_country_of_formation		    		:= corp2.t2u(input.CntryDesc);
 			self.corp_inc_county                      := corp2.t2u(input.countycode);
 		  self.corp_address1_line1                  := choose(ctr	,corp2_mapping.fCleanAddress(state_origin,state_desc,input.streetaddress1,input.streetaddress2,input.City,input.state,input.zipCode,input.CntryDesc).AddressLine1
@@ -140,12 +120,12 @@ EXPORT NE  := MODULE;
 																															,corp2_mapping.fCleanAddress(state_origin,state_desc,input.DO_streetaddress1,input.DO_streetaddress2,input.DO_City,input.DO_state,input.DO_zipCode).PrepAddrLine1);		
 			self.corp_prep_addr1_last_line            := choose(ctr	,corp2_mapping.fCleanAddress(state_origin,state_desc,input.streetaddress1,input.streetaddress2,input.City,input.state,input.zipCode,input.CntryDesc).PrepAddrLastLine
 																															,corp2_mapping.fCleanAddress(state_origin,state_desc,input.DO_streetaddress1,input.DO_streetaddress2,input.DO_City,input.DO_state,input.DO_zipCode).PrepAddrLastLine);		
-		  self.corp_address1_type_cd                := choose(ctr	,if(corp2.t2u(input.corptype)not in contact_types
+		  self.corp_address1_type_cd                := choose(ctr	,if(corp2.t2u(input.corptype)not in Corp2_Raw_NE.Functions.contact_types
 																																	,if(corp2_mapping.fAddressExists(state_origin,state_desc,input.streetaddress1,input.streetaddress2,input.City,input.state,input.zipCode,input.CntryDesc).ifAddressExists,'B','')
 																																	,if(corp2_mapping.fAddressExists(state_origin,state_desc,input.streetaddress1,input.streetaddress2,input.City,input.state,input.zipCode,input.CntryDesc).ifAddressExists,'T',''))
 																															,if(corp2_mapping.fAddressExists(state_origin,state_desc,input.DO_streetaddress1,input.DO_streetaddress2,input.DO_City,input.DO_state,input.DO_zipCode).ifAddressExists,'D','')
 																											    );	
-			self.corp_address1_type_desc              := choose(ctr	,if(corp2.t2u(input.corptype)not in contact_types
+			self.corp_address1_type_desc              := choose(ctr	,if(corp2.t2u(input.corptype)not in Corp2_Raw_NE.Functions.contact_types
 																																	,if(corp2_mapping.fAddressExists(state_origin,state_desc,input.streetaddress1,input.streetaddress2,input.City,input.state,input.zipCode,input.CntryDesc).ifAddressExists,'BUSINESS','')
 																																	,if(corp2_mapping.fAddressExists(state_origin,state_desc,input.streetaddress1,input.streetaddress2,input.City,input.state,input.zipCode,input.CntryDesc).ifAddressExists,'CONTACT',''))
 																															,if(corp2_mapping.fAddressExists(state_origin,state_desc,input.DO_streetaddress1,input.DO_streetaddress2,input.DO_City,input.DO_state,input.DO_zipCode).ifAddressExists,'DESIGNATED OFFICE','')
@@ -183,8 +163,8 @@ EXPORT NE  := MODULE;
 			self.corp_ra_address_type_cd		  				:= if(corp2_mapping.fAddressExists(state_origin,state_desc,input.RAStreetAddress1,input.RAStreetAddress2,input.RACity,input.RAState,input.RAZipcode).ifAddressExists , 'R', '');
 			self.corp_ra_address_type_desc						:= if(corp2_mapping.fAddressExists(state_origin,state_desc,input.RAStreetAddress1,input.RAStreetAddress2,input.RACity,input.RAState,input.RAZipcode).ifAddressExists , 'REGISTERED OFFICE', '');									 
 			// For scrub purposes; new vendor corptype values will be captured.  Corptype values are crucial for dates & indicator fields.
-			self.internalfield1												:= if(corp2.t2u(input.CorpTypeCode)not in[domestic_type ,foreign_type]  
-																											  and corp2.t2u(input.CorpType)not in[contact_types] 
+			self.internalfield1												:= if(corp2.t2u(input.CorpTypeCode)not in[Corp2_Raw_NE.Functions.domestic_type ,Corp2_Raw_NE.Functions.foreign_type]  
+																											  and corp2.t2u(input.CorpType)not in[Corp2_Raw_NE.Functions.contact_types] 
 																											  and self.CORP_LN_NAME_TYPE_CD not in ['01','03','04','05','07','09']
 																											,'**|'+ corp2.t2u(input.CorpTypeCode)+'|'+corp2.t2u(input.CorpType) ,'');
 			self.recordOrigin													:= 'C';	
@@ -217,28 +197,19 @@ EXPORT NE  := MODULE;
 			self.corp_ln_name_type_desc 					:= 'HOME STATE NAME'; 
 			self.corp_name_comment							  := 'HOME STATE NAME';
 			valid_Date                           	:= corp2_mapping.fValidateDate(input.DateIncorp[1..10],'CCYY-MM-DD').PastDate;
-			self.corp_inc_date										:= if(corp2.t2u(input.corptypecode) <> '10221',
-																									map(corp2.t2u(input.QualifyingState)in[ state_origin,''] and corp2.t2u(input.corptypecode)  in domestic_type =>valid_Date,
-																											corp2.t2u(input.QualifyingState)='' and corp2.t2u(input.corptypecode) not in foreign_type								 =>valid_Date,
-																											corp2.t2u(input.corptypecode) not in foreign_type										 																		 =>valid_Date,//noticed in the data, states which are state_origin and have forein type & vice versa		
-																											''),
-																									'');  
-			self.corp_forgn_date									:=if(corp2.t2u(input.corptypecode) <> '10221',
-																								map(corp2.t2u(input.QualifyingState)not in[ state_origin,''] and corp2.t2u(input.corptypecode) in foreign_type=>valid_Date,
-																										corp2.t2u(input.QualifyingState)='' and corp2.t2u(input.corptypecode) in foreign_type										  =>valid_Date,
-																										corp2.t2u(input.corptypecode) in foreign_type										 																					=>valid_Date,
-																										''),
-																								'');													 			
+			self.corp_inc_date										:= if(corp2.t2u(input.corptypecode) not in ['10221',Corp2_Raw_NE.Functions.foreign_type]
+			                                            ,valid_Date ,'');
+			self.corp_forgn_date									:= if(corp2.t2u(input.corptypecode) in Corp2_Raw_NE.Functions.foreign_type
+			                                            ,valid_Date ,'');														 			
 			self.recordOrigin											:= 'C';			
 			self																	:= [];
-
 		end;
 
 		mapCorpForgn	:= project(DsEntity_Cntrydesc ,corpForgnNameTransform(left));
 		
 		//Contact Recs Mappings from CorpEntity	
 		corp2_mapping.LayoutsCommon.Main    contTransform1(Corp2_Raw_NE.Layouts.CorpEntityLayoutIn input) := transform,
-			skip (corp2.t2u(input.corptype) not in contact_types or corp2.t2u(input.AcctNumber) = '' or
+			skip (corp2.t2u(input.corptype) not in Corp2_Raw_NE.Functions.contact_types or corp2.t2u(input.AcctNumber) = '' or
 						corp2_mapping.fCleanBusinessName(state_origin,state_desc,input.name).BusinessName = '')
 			// Per Rosemary, leaving this code in place even though currently none of these records would be built, 
 			// because the vendor has the "name" field in their layout, but it is not being populated at this time.
@@ -323,7 +294,7 @@ EXPORT NE  := MODULE;
 			
 			self.cont_effective_date 						 := choose(ctr
 																										 ,corp2_mapping.fValidateDate(input.DateTakingOffice[1..10],'CCYY-MM-DD').PastDate
-																										 ,corp2_mapping.fValidateDate(input.YearOutReported[4..7]+'-'+input.YearOutReported[1..2]+'01','CCYY-MM-DD').PastDate);
+																										 ,corp2_mapping.fValidateDate(input.YearOutReported[4..7]+'-'+input.YearOutReported[1..2]+'-01','CCYY-MM-DD').PastDate);
 			self.cont_effective_cd  						 := if(self.cont_effective_date <> '' ,choose(ctr,'A','T'), '');					
 			self.cont_effective_desc 						 := if(self.cont_effective_date <> '' ,choose(ctr,'ASSIGNED','TERMINATION'), '');
 			self.recordOrigin										 := 'T';			
@@ -381,23 +352,22 @@ EXPORT NE  := MODULE;
 		       (integer)(input.DocumentNumber)= 0 and corp2.t2u(input.FilingTypeDescription) = '' and corp2_mapping.fValidateDate(input.FilingDateTime[1..10],'CCYY-MM-DD').PastDate='' and
 				   corp2_mapping.fValidateDate(input.EffectiveDate[1..10],'CCYY-MM-DD').GeneralDate=''
 				   )
-      isEvent                         := if(corp2.t2u(input.FilingTypeId) not in Corp2_Raw_NE.Functions.Set_Of_AR_Codes ,true ,false);
-			self.corp_key										:= if(isEvent, state_fips+'-' + corp2.t2u(input.AcctNumber),'');
+      self.corp_key										:= state_fips+'-' + corp2.t2u(input.AcctNumber);
 			self.corp_vendor								:= state_fips ;
 			self.corp_state_origin					:= state_origin ;
 			self.corp_process_date					:= fileDate;
-			self.corp_sos_charter_nbr 			:= if(isEvent,corp2.t2u(input.AcctNumber),'');	
-			self.event_filing_reference_nbr	:= if(isEvent and (integer)(input.DocumentNumber)<> 0,corp2.t2u(input.DocumentNumber),'');
-			cleanFilDate                    := if(isEvent,corp2_mapping.fValidateDate(input.FilingDateTime[1..10],'CCYY-MM-DD').PastDate,'');
-			cleanEffDate 								    := if(isEvent,corp2_mapping.fValidateDate(input.EffectiveDate[1..10],'CCYY-MM-DD').GeneralDate,'');
+			self.corp_sos_charter_nbr 			:= corp2.t2u(input.AcctNumber);	
+			self.event_filing_reference_nbr	:= if((integer)(input.DocumentNumber)<> 0,corp2.t2u(input.DocumentNumber),'');
+			cleanFilDate                    := corp2_mapping.fValidateDate(input.FilingDateTime[1..10],'CCYY-MM-DD').PastDate;
+			cleanEffDate 								    := corp2_mapping.fValidateDate(input.EffectiveDate[1..10],'CCYY-MM-DD').GeneralDate;
 			self.event_filing_date         	:= choose(ctr,cleanFilDate,cleanEffDate);
 			self.event_date_type_cd         := if(self.event_filing_date <> '' ,choose(ctr,'FIL','EFF') ,'');					
 			self.event_date_type_desc       := if(self.event_filing_date <> '' ,choose(ctr,'FILING','EFFECTIVE') ,'');	
 			self.event_filing_cd						:= corp2.t2u(input.FilingTypeId);
 			self.event_filing_desc					:= corp2.t2u(input.FilingTypeDescription);
 			// scrubs will catch codes that are neither AR recs or Event recs. 
-			self.InternalField1             := if(corp2.t2u(input.FilingTypeId) not in [Corp2_Raw_NE.Functions.Set_Of_AR_Codes ,Corp2_Raw_NE.Functions.Set_Of_Event_Codes],
-																						'**|'+corp2.t2u(input.FilingTypeId)+'|'+corp2.t2u(input.FilingTypeDescription),'');
+			self.InternalField1             := if(corp2.t2u(input.FilingTypeId) not in Corp2_Raw_NE.Functions.Set_Of_Event_Codes
+																						,'**|'+corp2.t2u(input.FilingTypeId)+'|'+corp2.t2u(input.FilingTypeDescription),'');
 			self          									:= [];
 
 		end;
@@ -641,7 +611,7 @@ EXPORT NE  := MODULE;
 									
 		//Validating the filedate entered is within 30 days		
 		  isFileDateValid := if((string)Std.Date.Today() between ut.date_math(filedate,-30) and ut.date_math(filedate,30),true,false);
-			result		 			:= if( isFileDateValid
+			result		 			:= if(isFileDateValid
 													 ,mapNE
 													 ,sequential (corp2_mapping.Send_Email(state_origin,filedate).InvalidFileDateParm
 																				,FAIL('corp2_mapping.'+state_origin+'failed. An invalid filedate was passed in as a parameter.')
