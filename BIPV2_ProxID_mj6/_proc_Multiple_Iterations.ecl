@@ -62,11 +62,11 @@ functionmacro
       ,pOutputSuperfile  := '~bipv2_build::qa::workunit_history' 
       ,pCompileOnly      := pCompileTest
   );
-  kickiters := Workman.mac_WorkMan(ecltextIterFix,version ,cluster,lstartiter,lnumitersmax,lnumiters   
+  kickiters := Workman.mac_WorkMan(ecltextIterFix,version ,cluster,'',lnumitersmax,lnumiters   
       ,pSetResults          := eclsetResults
       ,pStopCondition       := StopCondition
       ,pSetNameCalculations := SetNameCalculations
-      ,pBuildName           := pUniqueOut + 'Iters'
+      ,pBuildName           := 'ProxidIters'
       ,pNotifyEmails        := BIPV2_Build.mod_email.emailList
       ,pOutputFilename      := '~bipv2_build::@version@::workunit_history::proc_proxid_mj6.iterations'
       ,pOutputSuperfile     := '~bipv2_build::qa::workunit_history' 
