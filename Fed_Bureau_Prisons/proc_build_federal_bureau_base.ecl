@@ -1,5 +1,5 @@
 ﻿//
-import STD, nid;
+import STD, nid, mdr;
 
 EXPORT proc_build_federal_bureau_base (string version):= function
 
@@ -21,7 +21,7 @@ EXPORT proc_build_federal_bureau_base (string version):= function
 	middleName := STD.Str.FindReplace(l.middlename, '\\U0027', '\'' );
 	suffix := STD.Str.FindReplace(l.suffix, '\\U0027', '\'' ); 	
 	
-	src := 'XX'; // mdr.sourceTools.src_fed
+	src := mdr.sourceTools.src_fed_crim;
 		
   offender_key := (String)hash64(name + l.InmateNumber);  //Do not include DOB, gender and race in off key. 
 	                                                        //Since if in future fill rates increase in these three fields, 

@@ -1,10 +1,10 @@
 ﻿//
 import STD, PromoteSupers,scrubs_Fed_Bureau_Prisons,RoxieKeyBuild,Orbit3,_Control;
 
-EXPORT proc_build_federal_bureau_all (string version):= function
+EXPORT proc_build_federal_bureau_all (string version, string inTargetGrp, string inRemoteLoc):= function
 
 	//Spray
-	spray := Fed_Bureau_Prisons.spray_federal_bureau_files(version);
+	spray := Fed_Bureau_Prisons.spray_federal_bureau_files(version,inTargetGrp,inRemoteLoc);
 
   //Build base and superfile suffle 	
 	build_base :=  Fed_Bureau_Prisons.proc_build_federal_bureau_base(version);
