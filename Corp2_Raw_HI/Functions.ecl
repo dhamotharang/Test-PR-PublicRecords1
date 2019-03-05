@@ -1486,7 +1486,7 @@ EXPORT Functions := Module
 									uc_s = 'WB' 				=> 		'WORSHIP BOARD',
 									uc_s = 'WL' 				=> 		'WOMEN LEADER',
 									uc_s = 'WM' 				=> 		'WAYS AND MEANS',
-									uc_s = 'WMO' 				=> 		'WOMENÃ‚â€™S MISSION OFFICER',
+									uc_s = 'WMO' 				=> 		'WOMEN\'S MISSION OFFICER',
 									uc_s = 'YDO' 				=> 		'YOUTH DIRECTOR OFFICER',
 									uc_s = 'YOUTH PS' 	=> 		'YOUTH PASTOR',
 									uc_s = 'ZA' 				=> 		'ZONE ADMINISTRATOR',
