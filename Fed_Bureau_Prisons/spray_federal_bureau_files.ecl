@@ -5,7 +5,7 @@ IMPORT std;
  EXPORT spray_federal_bureau_files (String Update_filedate) := function																 
 																	 
 	srcIP := 'bctlpedata12.risk.regn.net'; 
-  targetGrp := 'thor400_sta01'; 
+  targetGrp := 'thor400_dev01'; 
   RemoteLoc := '/data/projects/fbop/'+Update_filedate+'/';																 
 							
 	def   := 'US_FEDERAL_BUREAU_OF_PRISONS_FEDERAL_INMATE_REGISTRY_DEFENDANT.txt';

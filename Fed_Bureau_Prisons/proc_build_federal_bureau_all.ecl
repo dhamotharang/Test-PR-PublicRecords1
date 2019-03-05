@@ -1,6 +1,5 @@
 ﻿//
-import STD, PromoteSupers//, scrubs_Fed_Bureau_Prisons
-                          ,RoxieKeyBuild,Orbit3,_Control;
+import STD, PromoteSupers,scrubs_Fed_Bureau_Prisons,RoxieKeyBuild,Orbit3,_Control;
 
 EXPORT proc_build_federal_bureau_all (string version):= function
 
@@ -22,7 +21,7 @@ EXPORT proc_build_federal_bureau_all (string version):= function
 	//build_Keys := proc_build_Keys(version);
 	
 	//Scrubs
-	//scrubs := scrubs_Fed_Bureau_Prisons.fnRunScrubs(version,'tarun.patel@lexisnexis.com');
+	scrubs := scrubs_Fed_Bureau_Prisons.fnRunScrubs(version,'tarun.patel@lexisnexis.com');
 		
   //DOPS Entry Creation  
 	dops_update	:=	RoxieKeyBuild.updateversion('FBOPKeys', version, _Control.MyInfo.EmailAddressNotify+';tarun.patel@lexisnexisrisk.com',,'N');														
@@ -34,7 +33,7 @@ EXPORT proc_build_federal_bureau_all (string version):= function
 	strata := Strata_Population_Stats(version);
 	
   return sequential(spray,
-	                  //scrubs, //scrubs on raw
+	                  scrubs, 
 										build_base,
 										clear_delete_sf,
 										superfile_shuffle//,
