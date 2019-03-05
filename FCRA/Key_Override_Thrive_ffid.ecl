@@ -1,4 +1,4 @@
-import fcra, ut, data_services; 
+﻿import fcra, ut, data_services; 
 export Key_Override_Thrive_ffid := MODULE
 
 shared fname_prefix := '~thor_data400::base::override::fcra::qa::';
@@ -10,6 +10,9 @@ dailyds_thrive := dataset(daily_prefix + 'thrive',FCRA.Layout_Override_thrive,cs
 kf := dedup(sort(ds_thrive,-flag_file_id),except flag_file_id,keep(1));
 FCRA.Mac_Replace_Records(kf,dailyds_thrive,persistent_record_id,replaceds);
 
-export thrive := index(replaceds,{flag_file_id}, {replaceds},
+replaceds_dep := FCRA.fDeprecate_Fields_Thrive(replaceds);  //Field deprecation 
+
+export thrive := index(replaceds_dep,{flag_file_id}, {replaceds_dep},
+// export thrive := index(replaceds,{flag_file_id}, {replaceds_dep},
 	keyname_prefix + 'Thrive::qa::ffid', OPT);
 END;
