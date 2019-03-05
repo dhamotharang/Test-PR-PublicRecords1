@@ -154,7 +154,7 @@ functionmacro
 
   // -- figure out start iteration #
   ds_output_superfile                := dataset(pOutputSuperfile,WorkMan.layouts.wks_slim,flat,opt);
-  ds_previous_builds                 := ds_output_superfile(version < pversion,pBuildName = '' or StringLib.StringToLowerCase(Build_name) = StringLib.StringToLowerCase(pBuildName));
+  ds_previous_builds                 := ds_output_superfile(version <= pversion,pBuildName = '' or StringLib.StringToLowerCase(Build_name) = StringLib.StringToLowerCase(pBuildName));
   ds_previous_build_final_iterations := sort(ds_previous_builds,-version,-(unsigned)iteration);
 
   #IF(#TEXT(pStartIteration) = '' or #TEXT(pStartIteration) = '\'\'') // it is blank
