@@ -4,7 +4,7 @@
 // Return value: Dataset with layout Doxie/layout_bk_output.
 //============================================================================
 
-import Doxie, bankrupt, bankruptcyv3, ut, Suppress, bipv2, bankruptcyv2;
+import Doxie, bankrupt, bankruptcyv3, ut, Suppress;
 
 export bk_raw(
   dataset(Doxie.layout_references) dids,
@@ -69,13 +69,6 @@ rec_main_int get_trustee_info(recordof(bankruptcyv3.key_bankruptcyv3_main_full()
 	SELF := [];
 end;
 
-rec_main_int_full_bip := RECORD
-	  rec_main_int;
-			bankruptcyv2.layout_bankruptcy_search_v3_supp;
-			bipv2.IDlayouts.l_xlink_ids;	 
-			unsigned8 source_rec_id := 0; 
-END;
-	
 f_main_byd0 := join(ds_did_bdid,bankruptcyv3.key_bankruptcyv3_casenumber(),
                        keyed(left.case_number = right.case_number),
 											 transform({recordof(bankruptcyv3.key_bankruptcyv3_casenumber()),ds_did_bdid.court_code}, 
@@ -98,7 +91,7 @@ f_main0 := if(cnum != '', f_main_byn, f_main_byd);
 //to be in Bkv2 main but are now only available in Bkv3 search
 f_main1 := join(f_main0, bankruptcyv3.key_bankruptcyv3_search_full_bip(),
                     keyed(left.tmsid = right.tmsid),
-										transform(rec_main_int_full_bip,
+										transform({rec_main_int and not [corp_flag] or recordof(bankruptcyv3.key_bankruptcyv3_search_full_bip())},
 											self.chapter 					:= right.chapter,
 											self.orig_filing_type := right.filing_type,
 											self.corp_flag 				:= right.corp_flag,
