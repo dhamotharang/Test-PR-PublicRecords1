@@ -1,4 +1,4 @@
-IMPORT corp2, scrubs;
+﻿IMPORT corp2, scrubs;
 	
 EXPORT Functions := MODULE
 
@@ -240,6 +240,7 @@ EXPORT Functions := MODULE
 																		uc_s in ['FOREIGN LLLP']															=> true,
 																		uc_s in ['TEMPORARY TRANSACTION']											=> true,
 																		uc_s in ['UNREGISTERED OWNER']												=> true,
+																		uc_s in ['COOPERATIVE']												        => true,
 																		false
 																		);
 																		
