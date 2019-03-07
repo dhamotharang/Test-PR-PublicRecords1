@@ -37,4 +37,6 @@
 		EXPORT RESIDENTIAL := 'Residential';
 		EXPORT BUSINESS := 'Business';
 	END;
+  
+  EXPORT CONSUMER_IND_CLASS := 'CNSMR';
 END;
