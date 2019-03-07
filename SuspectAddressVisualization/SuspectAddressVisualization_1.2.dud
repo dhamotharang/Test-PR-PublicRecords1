@@ -1,4 +1,4 @@
-NAME SuspectAddressVisualization;
+﻿NAME SuspectAddressVisualization;
 LABEL "SuspectAddressVisualization";
 CATEGORY VISUALIZE;
 VERSION "1.2.0";
@@ -444,7 +444,7 @@ GENERATES INLINE
 
     MaxAddressScore := MAX (%dsInput%, %AddressScore%) : INDEPENDENT;
     
-    IMPORT STD, Relavator;
+    IMPORT STD, hipie_ecl;
 
     TrimScoredOutDs := PROJECT(%dsInput%, TRANSFORM(%ScoredRec%,
                                         SELF.ProviderKey    :=  '_' + LEFT.%ProviderKey%,
@@ -520,7 +520,7 @@ GENERATES INLINE
                                          SELF.SLNPID                         := (STRING)LEFT.%LNPID%;
                                          SELF.ProviderType                   := MAP(LEFT.%ProviderLastName% <> '' AND LEFT.%ProviderFirstName% <> '' => 'P',
                                                                                     LEFT.%FacilityName% <> '' => 'F','');
-                                         SELF.ContextUID                     := IF(SELF.SLNPID <> '', Relavator.MacGraphContextUID (8,SELF.SLNPID),'');
+                                         SELF.ContextUID                     := IF(SELF.SLNPID <> '', hipie_ecl.MacGraphContextUID (8,SELF.SLNPID),'');
                                          SELF := LEFT;
                                          SELF := [];)); 
 
@@ -810,7 +810,7 @@ GENERATES INLINE
        SELF.Zip            := LEFT.Zip5;
        SELF                := LEFT;));
 
-    import Relavator;
+    import hipie_ecl;
 
     ReasonAttrDs := NORMALIZE (ProviderDataDs, COUNT(LEFT.ScoreReasons), TRANSFORM(%TopSuspectProviderReasonRecord%, 
                                 SELF.ReasonCode             := LEFT.ScoreReasons[counter].Reason [1..1]; 
@@ -833,7 +833,7 @@ GENERATES INLINE
 																SELF.ReasonValueForProvider	:= IF (SELF.ReasonType = 'P', SELF.ReasonValue, '');
                                 SELF.LNPID                  := LEFT.LNPID;
                                 SELF.SLNPID                 := (STRING)LEFT.LNPID;
-                                SELF.ContextUID             := IF(SELF.SLNPID <> '', Relavator.MacGraphContextUID (8,SELF.SLNPID),'');
+                                SELF.ContextUID             := IF(SELF.SLNPID <> '', hipie_ecl.MacGraphContextUID (8,SELF.SLNPID),'');
                                 SELF := LEFT;));
             
     %^sProviderAttrsDs% := DEDUP(SORT(DISTRIBUTE(ReasonAttrDs(Reason <> ''),HASH32(Reason,ProviderKey)),Reason,ProviderKey,LOCAL),Reason,ProviderKey,LOCAL);
@@ -986,6 +986,6 @@ RESOURCES
     FILE Checklist: FILENAME("SuspectAddressVisualizationChecklist.xlsx"),LABEL("Plugin Checklist");
     FILE SuspectAddressVisualization_TestHarness: FILENAME("SuspectAddressVisualization_TestHarness.txt"),LABEL("Test Harness");
     ECL HealthCareProvider: FILENAME("HealthCareProvider"),URL("http://10.241.100.153:8010");
-    ECL Relavator: FILENAME("Relavator"),URL("http://10.241.100.153:8010");
+    ECL hipie_ecl: FILENAME("hipie_ecl"),URL("http://10.241.100.153:8010");
     LOGICALFILE test: FILENAME("~qa::suspectaddressvisualization::suspectaddressvisualization::input"),URL("http://10.241.100.159:8010"),DALIIP("10.241.100.159"),CLUSTER("thor100_100dev");
 END
