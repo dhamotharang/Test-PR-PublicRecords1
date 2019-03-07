@@ -146,47 +146,47 @@ EXPORT mod_CalculateAuthRepAdHocRiskIndicators( BusinessInstantID20_Services.iOp
         (ri+riAuthRep1pre), rcOrder,
         LEFT.hri = RIGHT.hri,
         TRANSFORM( risk_indicators.layouts.layout_desc_plus_seq,
-          SELF.seq := RIGHT.rcOrder,
+          SELF.seq := IF(RIGHT.rcOrder>0,RIGHT.rcOrder,99),
           SELF := LEFT,
           SELF := []
         ),
-        INNER, KEEP(1), ATMOST(100), PARALLEL, FEW);
+        LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
       SHARED riAuthRep2combined := JOIN(
         (ri+riAuthRep2pre), rcOrder,
         LEFT.hri = RIGHT.hri,
         TRANSFORM( risk_indicators.layouts.layout_desc_plus_seq,
-          SELF.seq := RIGHT.rcOrder,
+          SELF.seq := IF(RIGHT.rcOrder>0,RIGHT.rcOrder,99),
           SELF := LEFT,
           SELF := []
         ),
-        INNER, KEEP(1), ATMOST(100), PARALLEL, FEW);
+        LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
       SHARED riAuthRep3combined := JOIN(
         (ri+riAuthRep3pre), rcOrder,
         LEFT.hri = RIGHT.hri,
         TRANSFORM( risk_indicators.layouts.layout_desc_plus_seq,
-          SELF.seq := RIGHT.rcOrder,
+          SELF.seq := IF(RIGHT.rcOrder>0,RIGHT.rcOrder,99),
           SELF := LEFT,
           SELF := []
         ),
-        INNER, KEEP(1), ATMOST(100), PARALLEL, FEW);
+        LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
       SHARED riAuthRep4combined := JOIN(
         (ri+riAuthRep4pre), rcOrder,
         LEFT.hri = RIGHT.hri,
         TRANSFORM( risk_indicators.layouts.layout_desc_plus_seq,
-          SELF.seq := RIGHT.rcOrder,
+          SELF.seq := IF(RIGHT.rcOrder>0,RIGHT.rcOrder,99),
           SELF := LEFT,
           SELF := []
         ),
-        INNER, KEEP(1), ATMOST(100), PARALLEL, FEW);
+        LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);
       SHARED riAuthRep5combined := JOIN(
         (ri+riAuthRep5pre), rcOrder,
         LEFT.hri = RIGHT.hri,
         TRANSFORM( risk_indicators.layouts.layout_desc_plus_seq,
-          SELF.seq := RIGHT.rcOrder,
+          SELF.seq := IF(RIGHT.rcOrder>0,RIGHT.rcOrder,99),
           SELF := LEFT,
           SELF := []
         ),
-        INNER, KEEP(1), ATMOST(100), PARALLEL, FEW);  
+        LEFT OUTER, KEEP(1), ATMOST(100), PARALLEL, FEW);  
       
       SHARED riAuthRep1sorted := PROJECT(DEDUP(SORT(riAuthRep1combined, (integer)seq),seq,hri,desc),TRANSFORM(risk_indicators.layout_desc, SELF := LEFT));
       risk_indicators.mac_add_sequence(riAuthRep1sorted, riAuthRep1seq);

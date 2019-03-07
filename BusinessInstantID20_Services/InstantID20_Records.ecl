@@ -208,19 +208,12 @@ EXPORT InstantID20_Records( DATASET(BusinessInstantID20_Services.layouts.InputCo
 				_transforms.xfm_AddAddressRisk(LEFT,RIGHT), 
 				LEFT OUTER, KEEP(1), PARALLEL, FEW );
 
-    // Add back in RiskIndicators for Company and AuthReps
-    watchlist_table_authrep1 := _transforms.fn_NormalizeAuthRepWatchlist(ds_GlobalWatchlistInfo[1],1);
-    watchlist_table_authrep2 := _transforms.fn_NormalizeAuthRepWatchlist(ds_GlobalWatchlistInfo[1],2);
-    watchlist_table_authrep3 := _transforms.fn_NormalizeAuthRepWatchlist(ds_GlobalWatchlistInfo[1],3);
-    watchlist_table_authrep4 := _transforms.fn_NormalizeAuthRepWatchlist(ds_GlobalWatchlistInfo[1],4);
-    watchlist_table_authrep5 := _transforms.fn_NormalizeAuthRepWatchlist(ds_GlobalWatchlistInfo[1],5);
-        
     // Join Watchlist info to Consumer InstantID.
     ds_ConsumerInstantIDwithWatchlist := 
     JOIN( 
 				ds_ConsumerInstantIDInfo, ds_GlobalWatchlistInfo,
 				LEFT.Seq = RIGHT.Seq, 
-				_transforms.xfm_AddConsumerInstantIDWatchlist(LEFT,RIGHT,(INTEGER)LEFT.rep_whichone,watchlist_table_authrep1,watchlist_table_authrep2,watchlist_table_authrep3,watchlist_table_authrep4,watchlist_table_authrep5,options), 
+				_transforms.xfm_AddConsumerInstantIDWatchlist(LEFT,RIGHT,(INTEGER)LEFT.rep_whichone,options), 
 				LEFT OUTER, KEEP(1), PARALLEL, FEW );
 		
     // Add Consumer InstantID records with AuthRep Watchlists.		
