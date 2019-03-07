@@ -336,7 +336,6 @@ EXPORT fn_GetGlobalWatchlistInfo( DATASET(BusinessInstantID20_Services.layouts.I
     validXG5_ptys_AuthRep4  := XG5_ptys(bdid=4);
     validXG5_ptys_AuthRep5  := XG5_ptys(bdid=5);
 
-		// XG5Parsed   := BusinessInstantID20_Services.fn_GetOFACXG5_Watchlist2_Response(validXG5_ptys);
 		XG5Parsed_Company   := OFAC_XG5.OFACXG5_Watchlist2_Response(validXG5_ptys_Company);
     XG5Parsed_AuthRep1  := OFAC_XG5.OFACXG5_Watchlist2_Response(validXG5_ptys_AuthRep1);
     XG5Parsed_AuthRep2  := OFAC_XG5.OFACXG5_Watchlist2_Response(validXG5_ptys_AuthRep2);
@@ -344,7 +343,6 @@ EXPORT fn_GetGlobalWatchlistInfo( DATASET(BusinessInstantID20_Services.layouts.I
     XG5Parsed_AuthRep4  := OFAC_XG5.OFACXG5_Watchlist2_Response(validXG5_ptys_AuthRep4);
     XG5Parsed_AuthRep5  := OFAC_XG5.OFACXG5_Watchlist2_Response(validXG5_ptys_AuthRep5);
     
-		// NonErrorRecsXG5	:= XG5Parsed(errormessage = '');
 		NonErrorRecsXG5_Company   := XG5Parsed_Company(errormessage = '');
     NonErrorRecsXG5_AuthRep1  := XG5Parsed_AuthRep1(errormessage = '');
     NonErrorRecsXG5_AuthRep2  := XG5Parsed_AuthRep2(errormessage = '');
@@ -428,8 +426,7 @@ EXPORT fn_GetGlobalWatchlistInfo( DATASET(BusinessInstantID20_Services.layouts.I
 		AddFileXG5_AuthRep4	:= fn_AddFileXG5(AddAddrXG5_AuthRep4, NonErrorRecsXG5_AuthRep4.FileRec);
 		AddFileXG5_AuthRep5	:= fn_AddFileXG5(AddAddrXG5_AuthRep5, NonErrorRecsXG5_AuthRep5.FileRec);
 
-    // dedupRespXG5  := dedup(sort(NonErrorRecsXG5,  blockid, bdid, entityseq), blockid, bdid);
-		dedupRespXG5_Company  := dedup(sort(NonErrorRecsXG5_Company,  blockid, entityseq), blockid);
+    dedupRespXG5_Company  := dedup(sort(NonErrorRecsXG5_Company,  blockid, entityseq), blockid);
     dedupRespXG5_AuthRep1 := dedup(sort(NonErrorRecsXG5_AuthRep1, blockid, entityseq), blockid);
     dedupRespXG5_AuthRep2 := dedup(sort(NonErrorRecsXG5_AuthRep2, blockid, entityseq), blockid);
     dedupRespXG5_AuthRep3 := dedup(sort(NonErrorRecsXG5_AuthRep3, blockid, entityseq), blockid);
@@ -451,7 +448,6 @@ EXPORT fn_GetGlobalWatchlistInfo( DATASET(BusinessInstantID20_Services.layouts.I
 		CurrentMatchesXG5_AuthRep4	:= fn_CurrentMatchesXG5(dedupRespXG5_AuthRep4, AddFileXG5_AuthRep4( TRIM(BestName) != '' ));
 		CurrentMatchesXG5_AuthRep5	:= fn_CurrentMatchesXG5(dedupRespXG5_AuthRep5, AddFileXG5_AuthRep5( TRIM(BestName) != '' ));  
 
-    // CurrentMatchesXG5_Company_sorted  := SORT( CurrentMatchesXG5(bdid=0), blockid, -entitymatchscore, EntityPartyKey, RECORD);
     CurrentMatchesXG5_Company_sorted  := SORT( CurrentMatchesXG5_Company, blockid, -entitymatchscore, EntityPartyKey, RECORD);
     CurrentMatchesXG5_AuthRep1_sorted := SORT( CurrentMatchesXG5_AuthRep1, blockid, -entitydate, -publisheddate, -entitymatchscore, EntityPartyKey, RECORD);
     CurrentMatchesXG5_AuthRep2_sorted := SORT( CurrentMatchesXG5_AuthRep2, blockid, -entitydate, -publisheddate, -entitymatchscore, EntityPartyKey, RECORD);
