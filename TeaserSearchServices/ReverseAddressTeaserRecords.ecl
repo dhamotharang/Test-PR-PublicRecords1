@@ -1,4 +1,4 @@
-IMPORT  Advo,AutoStandardI,iesp,doxie,suppress,ut,LN_PropertyV2,TeaserSearchServices;
+﻿IMPORT  Advo,AutoStandardI,iesp,doxie,suppress,ut,LN_PropertyV2,TeaserSearchServices;
 
 EXPORT ReverseAddressTeaserRecords := MODULE
 
@@ -94,24 +94,13 @@ EXPORT val(params in_mod,
 	 SELF := [];
   END;
 		
-  dsHeaderRolled := ROLLUP (dsHeaderGrouped(HHID <> 0 AND dt_last_seen <> 0 AND 
-													  penalt < 1),
-														GROUP, 
-	                        Rollit (LEFT, ROWS (LEFT)));
+  dsHeaderRolled := ROLLUP (dsHeaderGrouped(dt_last_seen <> 0 AND penalt < 2),
+                            GROUP, 
+                            Rollit (LEFT, ROWS (LEFT)));
 													           
-  // already sorted on hhid																	 
-	dsHeaderRolledSorted := UNGROUP(SORT(GROUP(dsHeaderRolled,HHID), -dt_last_seen));
+  dsHeaderRolledSorted := SORT(dsHeaderRolled,rawaid,-dt_last_seen); 
 	
-  dsHeaderRolledSlim :=    UNGROUP(SORT(GROUP(
-	                            ROLLUP(dsHeaderRolledSorted,
-	                              LEFT.HHID = RIGHT.HHID,																
-																TRANSFORM(RECORDOF(dsHeaderRolled),
-																  SELF := LEFT;
-																	SELF := RIGHT;
-																 )																
-																),RawAid),-dt_last_seen));
-																
-  dsHeaderRolledSlimGroupByRawAid := GROUP(dsHeaderRolledSlim, rawAid);
+  dsHeaderRolledSlimGroupByRawAid := GROUP(dsHeaderRolledSorted, rawAid);
 
   // grp by addresshash and then pick off top 5 of each address	
 	// resulting set is still sorted by dt_last_seen descending within each rawAid Grp.
@@ -169,7 +158,7 @@ EXPORT val(params in_mod,
                                         self.maskedPhone := IF (tmpPhone10 <> '', '(' + tmpphone10[1..3] + ') ' + TeaserSearchServices.Constants.PhoneMaskString,'');
 																																	
 																				dids_grpd := GROUP(SORT(tmpDID, did), did);
-																				rels := doxie.relative_names(dids_grpd,glb_ok, industry_class_value = 'CNSMR');
+																				rels := doxie.relative_names(dids_grpd,glb_ok, industry_class_value = TeaserSearchServices.Constants.CONSUMER_IND_CLASS);
 																				                                             //in_mod.industry_class_value = 'CNSMR');
 																				                                             // ^^^^ consumer flag
 																				
@@ -209,14 +198,14 @@ EXPORT val(params in_mod,
 		                         iesp.thinreverseaddressteaser.t_ThinReverseAddressTeaserRecord,														 
 											  SELF.Address := LEFT.address;																															 													 														 														 
 												// this project should only be ever just 1 row set from Iterate above
-												SELF.currentResidents := Project(ROWS(LEFT)(cur), 
+												SELF.currentResidents := Project(CHOOSEN(ROWS(LEFT),iesp.Constants.ThinReverseAddress.MaxCurrentResidents)(cur), 
 														 TRANSFORM(iesp.thinreverseaddressteaser.t_ThinReverseAddressTeaserPersonResidence,																	            
 																SELF.Address := iesp.ecl2esp.setAddress('','','','',
 																								  '','','',LEFT.address.city,
 																									left.address.state,'','','','','','','');																								  
 															  SELF := LEFT));
 																// this could be multiple rows																								
-												SELF.PreviousResidents := Project(ROWS(LEFT)(NOT(cur)),
+												SELF.PreviousResidents := Project(CHOOSEN(ROWS(LEFT),iesp.Constants.ThinReverseAddress.MaxPreviousResidents)(NOT(cur)),
 														 TRANSFORM(iesp.thinreverseaddressteaser.t_ThinReverseAddressTeaserPersonResidence,
                                 SELF.Address := iesp.ecl2esp.setAddress('','','','',
 																					         '','','',LEFT.address.city,
@@ -261,7 +250,7 @@ EXPORT val(params in_mod,
 												 SELF := LEFT
 												  )
 												 );
-												
+		
 	// output(headerRecs, named('headerRecs'));
 	// output(dsHeaderGrouped, named('dsHeaderGrouped'));
 	// output(dsHeaderRolled, named('dsHeaderRolled'));
