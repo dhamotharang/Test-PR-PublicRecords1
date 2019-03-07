@@ -215,7 +215,7 @@ cnt_proflic_did_fcra := OUTPUT(strata.macf_pops(prte2_prof_licensev2.keys.key_pr
 											 bld_auto_keys,
 											 mymove,
 											 cnt_proflic_did_fcra, 
-											 PerformUpdateOrNot
+										//	 PerformUpdateOrNot
 											 );
 	 
 END;
