@@ -150,8 +150,8 @@ EXPORT TestSeedFunction(DATASET(DueDiligence.Layouts.Input) inData, STRING testD
                                                                                                               LEFT.county, LEFT.postalCode,
                                                                                                               LEFT.streetAddress1, LEFT.streetAddress2,
                                                                                                               LEFT.stateCityZip);
-                                                                      // SELF.ssn := LEFT.ssn;
-                                                                      // SELF.dob := iesp.ECL2ESP.toDate(LEFT.dob);
+                                                                      SELF.ssn := LEFT.ssn;
+                                                                      SELF.dob := iesp.ECL2ESP.toDate(LEFT.dob);
                                                                       SELF.lexID := (STRING)LEFT.lexID;
                                                                       SELF := [];));
                                                                       
