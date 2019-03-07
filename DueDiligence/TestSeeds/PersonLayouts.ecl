@@ -106,6 +106,8 @@ EXPORT PersonLayouts := MODULE
     Input;
     DueDiligence.TestSeeds.SharedLayouts.NameLexID;
     DueDiligence.TestSeeds.SharedLayouts.Address;
+    STRING9 ssn;
+    UNSIGNED4 dob;
     DueDiligence.TestSeeds.SharedLayouts.TopLevelCriminal topLevelCriminal1;
     DueDiligence.TestSeeds.SharedLayouts.TopLevelCriminal topLevelCriminal2;
   END;
