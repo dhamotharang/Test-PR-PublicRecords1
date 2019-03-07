@@ -1828,14 +1828,15 @@ EXPORT Transforms(BusinessInstantID20_Services.iOptions Options) := MODULE
 		
 		EXPORT BusinessInstantID20_Services.Layouts.ConsumerInstantIDLayout xfm_AddConsumerInstantIDWatchlist( BusinessInstantID20_Services.Layouts.ConsumerInstantIDLayout le, 
 		BusinessInstantID20_Services.Layouts.OFACAndWatchlistLayoutFlat ri, INTEGER C,
-		DATASET(Risk_Indicators.Layouts.layout_watchlists_plus_seq) watchlist_table_authrep1,
-		DATASET(Risk_Indicators.Layouts.layout_watchlists_plus_seq) watchlist_table_authrep2,
-		DATASET(Risk_Indicators.Layouts.layout_watchlists_plus_seq) watchlist_table_authrep3,
-		DATASET(Risk_Indicators.Layouts.layout_watchlists_plus_seq) watchlist_table_authrep4,
-		DATASET(Risk_Indicators.Layouts.layout_watchlists_plus_seq) watchlist_table_authrep5,
 		BusinessInstantID20_Services.iOptions Options		
 		) :=
 		  TRANSFORM
+				watchlist_table_authrep1 := fn_NormalizeAuthRepWatchlist(ri,1);
+				watchlist_table_authrep2 := fn_NormalizeAuthRepWatchlist(ri,2);
+				watchlist_table_authrep3 := fn_NormalizeAuthRepWatchlist(ri,3);
+				watchlist_table_authrep4 := fn_NormalizeAuthRepWatchlist(ri,4);
+				watchlist_table_authrep5 := fn_NormalizeAuthRepWatchlist(ri,5);			
+			
 				SELF.watchlists := 
 				  PROJECT(CHOOSE(C,fn_NormalizeWatchlists(ri,1),fn_NormalizeWatchlists(ri,2),fn_NormalizeWatchlists(ri,3),fn_NormalizeWatchlists(ri,4),fn_NormalizeWatchlists(ri,5)),
 						  TRANSFORM(Risk_Indicators.Layouts.layout_watchlists_plus_seq, 
@@ -1855,8 +1856,8 @@ EXPORT Transforms(BusinessInstantID20_Services.iOptions Options) := MODULE
 								  SELF := []));
 				_ri := le.ri;
 				_fua := le.fua;
-				SELF.ri  := CHOOSEN(BusinessInstantID20_Services.Mod_CalculateAuthRepAdHocRiskIndicators(options,watchlist_table_authrep1,watchlist_table_authrep2,watchlist_table_authrep3,watchlist_table_authrep4,watchlist_table_authrep5,5,(string1)C,_ri,_fua).riAuthRep,5);
-				SELF.fua := CHOOSEN(BusinessInstantID20_Services.Mod_CalculateAuthRepAdHocRiskIndicators(options,watchlist_table_authrep1,watchlist_table_authrep2,watchlist_table_authrep3,watchlist_table_authrep4,watchlist_table_authrep5,5,(string1)C,_ri,_fua).fuaAuthRep,4);
+				SELF.ri  := CHOOSEN(BusinessInstantID20_Services.Mod_CalculateAuthRepAdHocRiskIndicators(options,watchlist_table_authrep1,watchlist_table_authrep2,watchlist_table_authrep3,watchlist_table_authrep4,watchlist_table_authrep5,8,(string1)C,_ri,_fua).riAuthRep,8);
+				SELF.fua := CHOOSEN(BusinessInstantID20_Services.Mod_CalculateAuthRepAdHocRiskIndicators(options,watchlist_table_authrep1,watchlist_table_authrep2,watchlist_table_authrep3,watchlist_table_authrep4,watchlist_table_authrep5,8,(string1)C,_ri,_fua).fuaAuthRep,8);
 				SELF := le;
 				SELF := [];
 		  END;  
