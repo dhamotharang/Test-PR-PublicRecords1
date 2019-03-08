@@ -4,7 +4,7 @@
   We need to do this because of BIPV2.fn_derive_pn uses bipv2_Best.Key_LinkIds.key_static before the new key is built
   so it needs to use the previous layout of the key.
   Need a better solution for this.
-*/
+*/ 
 import BIPV2;
 EXPORT Layouts := MODULE
 EXPORT In_Base_with_flags := record
