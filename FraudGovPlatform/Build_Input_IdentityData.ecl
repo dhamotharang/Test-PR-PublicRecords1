@@ -2,10 +2,10 @@
 EXPORT Build_Input_IdentityData(
 	 string pversion
 	,dataset(FraudShared.Layouts.Input.mbs) MBS_Sprayed = FraudShared.Files().Input.MBS.sprayed
-	,dataset(Layouts.OutputF.SkipModules) pSkipModules = FraudGovPlatform.Files().OutputF.SkipModules
+	,dataset(Layouts.Flags.SkipModules) pSkipModules = FraudGovPlatform.Files().Flags.SkipModules
 	,dataset(Layouts.Input.IdentityData) IdentityData_Sprayed =  files().Input.IdentityData.sprayed	
 	,dataset(Layouts.Input.IdentityData) ByPassed_IdentityData_Sprayed = files().Input.ByPassed_IdentityData.sprayed
-	,boolean PSkipValidations = true	 
+	,dataset(Layouts.Flags.SkipValidationByGCID) PSkipValidations = files().Flags.SkipValidationByGCID	 
 ) :=
 module
 
@@ -61,8 +61,22 @@ module
 
 	shared f1:=project(inIdentityDataUpdateUpper,tr(left, counter));
 	
-	f1_errors:=f1
-		((	 
+	shared EnforceValidations 
+		:= join(	  f1
+					, PSkipValidations
+					, left.Customer_Account_Number = right.gc_id
+					, TRANSFORM(Layouts.Input.IdentityData,SELF := LEFT),LEFT ONLY, LOOKUP);
+
+	shared SkipValidations 
+		:= join(	  f1
+					, PSkipValidations
+					, left.Customer_Account_Number = right.gc_id
+					, TRANSFORM(FraudGovPlatform.Layouts.Input.IdentityData,SELF := LEFT), INNER, LOOKUP);
+
+	shared valid_records := EnforceValidations + SkipValidations;
+	
+	shared f1_errors:=EnforceValidations
+		(	 
 				Customer_Account_Number = ''
 			or	Customer_County = ''
 			or 	(LexID = 0 and raw_Full_Name = '' and (raw_First_name = '' or raw_Last_Name=''))
@@ -71,9 +85,9 @@ module
 			or 	(Customer_State in FraudGovPlatform_Validation.Mod_Sets.States) = FALSE
 			or 	(Customer_Agency_Vertical_Type in FraudGovPlatform_Validation.Mod_Sets.Agency_Vertical_Type) = FALSE
 			or 	(Customer_Program in FraudGovPlatform_Validation.Mod_Sets.IES_Benefit_Type) = FALSE				
-		) and PSkipValidations = false);
-	
-	NotInMbs := join(	f1,
+		);
+
+	NotInMbs := join( valid_records,
 					MBS_Sprayed(status = 1),
 					left.Customer_Account_Number =(string)right.gc_id and
 					left.file_type = right.file_type and
@@ -99,7 +113,7 @@ module
 		pQuote := Constants().validQuotes);
 									
 	//Move only Valid Records
-	shared f1_dedup :=	join (	f1,
+	shared f1_dedup :=	join (	valid_records,
 							ByPassed_records,
 							left.Customer_Account_Number = right.Customer_Account_Number and
 							left.Unique_Id = right.Unique_Id,
