@@ -3010,13 +3010,13 @@ EXPORT Layouts := MODULE
 		BusinessByPhoneLayout AND NOT [Seq, bus_phone_match_ultid_1, bus_phone_match_orgid_1, bus_phone_match_proxid_1, bus_phone_match_powid_1, bus_phone_match_ultid_2, bus_phone_match_orgid_2, bus_phone_match_proxid_2, bus_phone_match_powid_2, bus_phone_match_ultid_3, bus_phone_match_orgid_3, bus_phone_match_proxid_3, bus_phone_match_powid_3];
 		PhonesByAddressLayout AND NOT [Seq];
 		BusinessByFEINLayout AND NOT [Seq, bus_fein_match_ultid_1, bus_fein_match_orgid_1, bus_fein_match_proxid_1, bus_fein_match_powid_1, bus_fein_match_ultid_2, bus_fein_match_orgid_2, bus_fein_match_proxid_2, bus_fein_match_powid_2, bus_fein_match_ultid_3, bus_fein_match_orgid_3, bus_fein_match_proxid_3, bus_fein_match_powid_3];
-		OFACLayoutFlat AND NOT [Seq];
-		WatchlistLayoutFlat AND NOT [Seq];		
+		OFACLayoutFlat AND NOT [Seq, bus_ofac_entitydate_1, bus_ofac_publisheddate_1, bus_ofac_entitydate_2, bus_ofac_publisheddate_2, bus_ofac_entitydate_3, bus_ofac_publisheddate_3, bus_ofac_entitydate_4, bus_ofac_publisheddate_4, bus_ofac_entitydate_5, bus_ofac_publisheddate_5, bus_ofac_entitydate_6, bus_ofac_publisheddate_6, bus_ofac_entitydate_7, bus_ofac_publisheddate_7];
+		WatchlistLayoutFlat AND NOT [Seq, bus_watchlist_entitydate_1, bus_watchlist_publisheddate_1, bus_watchlist_entitydate_2, bus_watchlist_publisheddate_2, bus_watchlist_entitydate_3, bus_watchlist_publisheddate_3, bus_watchlist_entitydate_4, bus_watchlist_publisheddate_4, bus_watchlist_entitydate_5, bus_watchlist_publisheddate_5, bus_watchlist_entitydate_6, bus_watchlist_publisheddate_6, bus_watchlist_entitydate_7, bus_watchlist_publisheddate_7];
 		BatchFirmographicLayout AND NOT [Seq];
 		BatchPersonRoleLayout AND NOT [Seq];
 		BatchParentLayout AND NOT [Seq];
 		SBFEVerificationLayout AND NOT [Seq];
-		ConsumerIIDFlatLayout AND NOT [Seq];
+		ConsumerIIDFlatLayout AND NOT [Seq, rep1_sequence, rep2_sequence, rep3_sequence, rep4_sequence, rep5_sequence];
 		// LNSmallBusiness.BIP_Layouts.Version1Attributes;
 		// LNSmallBusiness.BIP_Layouts.Version2Attributes;
 		// LNSmallBusiness.BIP_Layouts.SBFEAttributes;
