@@ -735,7 +735,7 @@ MODULE
 	];
 
 	export set_DMV_restricted             := [
-		 src_CT_DL ,src_FL_DL ,src_LA_DL ,src_MI_DL ,src_MO_DL ,src_OH_DL ,src_TX_DL ,src_WV_DL ,src_NC_DL , src_SC_Experian_DL
+		 src_CT_DL ,src_FL_DL ,src_LA_DL ,src_MI_DL ,src_MO_DL ,src_OH_DL ,src_TX_DL ,src_WV_DL ,/*src_NC_DL ,*/ src_SC_Experian_DL  //DF-24277
 		,src_FL_Veh ,src_MO_Veh ,src_OH_Veh ,src_TX_Veh ,src_SC_Experian_Veh //, src_WV_Veh
 	];
 
