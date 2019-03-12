@@ -1,13 +1,13 @@
-import ut;
+﻿import ut;
 EXPORT fn_Agency_DE := function
 
  agency_new    := dataset(ut.foreign_prod+'thor_data400::in::ecrash::agency'
 													 ,FLAccidents_Ecrash.Layout_Infiles.agency
-													 ,csv(terminator('\n'), separator('~~'),quote('"')))(Agency_ID != 'Agency_ID') ;
+													 ,csv(terminator(['|\n', '\n']), separator('|\t|'),quote('"')))(Agency_ID != 'Agency_ID') ;
 													 
 	agency_old   := dataset(ut.foreign_prod+'thor_data400::in::ecrash::agency.'+ut.getDateOffset(-2,ut.GetDate)+'.csv'
 													 ,FLAccidents_Ecrash.Layout_Infiles.agency
-													 ,csv(terminator('\n'), separator('~~'),quote('"')),opt)(Agency_ID != 'Agency_ID') ;
+													 ,csv(terminator(['|\n', '\n']), separator('|\t|'),quote('"')),opt)(Agency_ID != 'Agency_ID') ;
 													 
 		
 	rec := record
