@@ -28,7 +28,7 @@
     DATASET(rDiffValues) Differences;
   end;
   
-  LOCAL dBasediff  := JOIN(dOld, dNew, 
+  LOCAL dBasediff  := JOIN(SORT(DISTRIBUTE(dOld, HASH32(#EXPAND(strJoinFields1))),#EXPAND(strJoinFields1), LOCAL), SORT(DISTRIBUTE(dNew, HASH32(#EXPAND(strJoinFields2))),#EXPAND(strJoinFields2), LOCAL),
 		#EXPAND(strJoinStatement) AND ( #EXPAND(%'FieldDiff'%)),
 			TRANSFORM({#EXPAND(hipie_ecl.macComputeAppendFieldsRecord(strJoinFields1, '')) rDiff}, 
 			 SELF.Old := LEFT,
@@ -44,6 +44,6 @@
 			 {'fieldname', '1', '2', FALSE}
 			 ], rDiffValues)((BOOLEAN)IsDifferent),
        SELF := LEFT,
-			 ), HASH);  
+			 ), LOCAL);  
   RETURN dBasediff;
 ENDMACRO;
