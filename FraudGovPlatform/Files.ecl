@@ -46,7 +46,6 @@ module
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.AddressCache_Deltabase,Layouts.Base.AddressCache,AddressCache_Deltabase,'CSV',,'~<EOL>~','~|~',,,true);
 
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.DemoData,FraudShared.Layouts.Base.Main,DemoData);
-		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.SourcesToAnonymize,Layouts.Input.SourcesToAnonymize,SourcesToAnonymize);
 		
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ConfigRiskLevel,Layouts.Input.ConfigRiskLevel,ConfigRiskLevel,'CSV',,'\r\n',',',true);
 		
@@ -83,9 +82,12 @@ module
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.IPMetaData,Layouts.IPMetaData,IPMetaData,,,,,,true);
 	end;
 
-	export OutputF := module
-		export FraudgovInfoFile	:= dataset(Filenames().OutputF.FraudgovInfoFn,Layouts.OutputF.FraudgovInfoRec,thor,opt);
-		export SkipModules	:= dataset(Filenames().OutputF.SkipModules,Layouts.OutputF.SkipModules,thor,opt);
+	export Flags := module
+		export FraudgovInfoFile	:= dataset(Filenames().Flags.FraudgovInfoFn,Layouts.Flags.FraudgovInfoRec,thor,opt);
+		export SourcesToAnonymize	:= dataset(Filenames().Flags.SourcesToAnonymize,Layouts.Flags.SourcesToAnonymize,thor,opt);
+		export SkipModules	:= dataset(Filenames().Flags.SkipModules,Layouts.Flags.SkipModules,thor,opt); 
+		export SkipValidationByGCID	:= dataset(Filenames().Flags.SkipValidationByGCID,Layouts.Flags.SkipValidationByGCID,thor,opt);
 	end;
+
 	
 end;

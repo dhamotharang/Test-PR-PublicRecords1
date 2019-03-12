@@ -1,0 +1,39 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_Cortera_Tradeline
+FILENAME:Cortera_Tradeline
+// Uncomment up to NINES for internal or external adl
+// IDFIELD:EXISTS:<NameOfIDField>
+// RIDFIELD:<NameOfRidField>
+// RECORDS:<NumberOfRecordsInDataFile>
+RECORDS:1000000
+// POPULATION:<ExpectedNumberOfEntitiesInDataFile>
+// NINES:<Precision required 3 = 99.9%, 2 = 99% etc>
+NINES:3
+// Uncomment Process if doing external adl
+// PROCESS:<ProcessName>
+// FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields
+// BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking
+// FUZZY can be used to create new types of FUZZY linking
+// Remember to generate specificities and update the 0,0 placeholders below before running any sort of linking.
+// If the actual specificity for a field is <1, round it up to 1 rather than down to 0.  If your cluster is running
+// a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience.
+FIELDTYPE:numeric:ALLOW(0123456789)
+FIELDTYPE:number:ALLOW(0123456789-):LENGTHS(0,1..)
+FIELDTYPE:date:ALLOW(0123456789):LENGTHS(0,8)
+FIELD:link_id:LIKE(numeric):0,0
+FIELD:account_key:TYPE(STRING32):0,0
+FIELD:segment_id:TYPE(STRING2):0,0
+FIELD:ar_date:TYPE(STRING8):LIKE(date):0,0
+FIELD:total_ar:TYPE(STRING20):LIKE(number):0,0
+FIELD:current_ar:TYPE(STRING20):LIKE(number):0,0
+FIELD:aging_1to30:TYPE(STRING20):LIKE(number):0,0
+FIELD:aging_31to60:TYPE(STRING20):LIKE(number):0,0
+FIELD:aging_61to90:TYPE(STRING20):LIKE(number):0,0
+FIELD:aging_91plus:TYPE(STRING):LIKE(number):0,0
+FIELD:credit_limit:TYPE(STRING20):LIKE(number):0,0
+FIELD:first_sale_date:TYPE(STRING8):LIKE(date):0,0
+FIELD:last_sale_date:TYPE(STRING8):LIKE(date):0,0
+// CONCEPT statements should be used to group together interellated fields; such as address
+// RELATIONSHIP is used to find non-obvious relationships between the clusters
+// SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+// LINKPATH is used to define access paths for external linking

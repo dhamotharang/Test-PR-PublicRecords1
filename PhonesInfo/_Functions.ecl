@@ -1,4 +1,4 @@
-/*2017-06-26T23:02:50Z (Judy Tao)
+﻿/*2017-06-26T23:02:50Z (Judy Tao)
 DF-18913: Changes for expanded port file
 */
 import std, ut;
@@ -107,6 +107,22 @@ EXPORT _Functions := MODULE
 		carrName := stringlib.stringfilter(stringlib.stringtouppercase(trim(name, left, right)), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ3 .-:*&/_;\'"()!+,@#');
 	
 		return carrName;
+	
+	END;
+	
+	EXPORT fn_alphaText(string name):= FUNCTION
+		
+		alphaText := stringlib.stringfilter(stringlib.stringtouppercase(trim(name, left, right)), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ');
+	
+		return alphaText;
+	
+	END;
+	
+	EXPORT fn_alphaNumText(string name):= FUNCTION
+		
+		alphaNumText := stringlib.stringfilter(stringlib.stringtouppercase(trim(name, left, right)), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ');
+	
+		return alphaNumText;
 	
 	END;
 		
@@ -249,6 +265,27 @@ EXPORT _Functions := MODULE
 	//remove nulls
 	EXPORT rmNull(string fld):= FUNCTION
 		return std.str.findReplace(trim(fld, left, right), 'NULL', '');
+	END;
+	
+	/////////////////////////////////////////////////////////////////////////////////////
+	//LERG6//////////////////////////////////////////////////////////////////////////////	
+	/////////////////////////////////////////////////////////////////////////////////////
+	
+	EXPORT fn_maxLerg6FileDt(dataset(PhonesInfo.Layout_Lerg.lerg6Main) ds):= function
+
+		dtLayout := record
+			string filename;
+		end;
+
+		dtLayout rTr(ds l):= transform			
+			self.filename := l.dt_last_reported;
+		end;
+
+		findDate	:= project(ds, rTr(left));
+		findMax		:=(string)max(findDate(std.date.isValidDate((unsigned)(filename[1..8]))), (unsigned)filename); //Pull Highest Filedate
+
+		return findMax;
+
 	END;
 
 END;

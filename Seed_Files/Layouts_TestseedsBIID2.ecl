@@ -1,10 +1,11 @@
-import BusinessInstantID20_Services;
+﻿import BusinessInstantID20_Services;
 
 EXPORT Layouts_TestseedsBIID2 := MODULE
 
 EXPORT ConsumerIIDrep1Layout	:= RECORD 
 		UNSIGNED4 Seq;
 		// AuthRep1
+
 		STRING20 rep1_verfirst;
 		STRING20 rep1_verlast;
 		STRING50 rep1_veraddr;
@@ -1286,12 +1287,13 @@ EXPORT ConsumerIIDrep1Layout	:= RECORD
 		BusinessInstantID20_Services.Layouts.BusinessByPhoneLayout AND NOT [Seq, bus_phone_match_ultid_1, bus_phone_match_orgid_1, bus_phone_match_proxid_1, bus_phone_match_powid_1,bus_phone_match_seleid_1, bus_phone_match_ultid_2, bus_phone_match_orgid_2, bus_phone_match_proxid_2, bus_phone_match_powid_2,bus_phone_match_seleid_2, bus_phone_match_ultid_3, bus_phone_match_orgid_3, bus_phone_match_proxid_3, bus_phone_match_powid_3,bus_phone_match_seleid_3];
 		BusinessInstantID20_Services.Layouts.PhonesByAddressLayout AND NOT [Seq];
 		BusinessInstantID20_Services.Layouts.BusinessByFEINLayout AND NOT [Seq, bus_fein_match_ultid_1, bus_fein_match_orgid_1, bus_fein_match_proxid_1, bus_fein_match_powid_1,bus_fein_match_seleid_1, bus_fein_match_ultid_2, bus_fein_match_orgid_2, bus_fein_match_proxid_2, bus_fein_match_powid_2,bus_fein_match_seleid_2, bus_fein_match_ultid_3, bus_fein_match_orgid_3, bus_fein_match_proxid_3, bus_fein_match_powid_3,bus_fein_match_seleid_3];
-		BusinessInstantID20_Services.Layouts.WatchlistLayoutFlat;
+		BusinessInstantID20_Services.Layouts.WatchlistLayoutFlat AND NOT [bus_watchlist_entitydate_1,bus_watchlist_publisheddate_1,bus_watchlist_entitydate_2,bus_watchlist_publisheddate_2,bus_watchlist_entitydate_3,bus_watchlist_publisheddate_3,bus_watchlist_entitydate_4,bus_watchlist_publisheddate_4,bus_watchlist_entitydate_5,bus_watchlist_publisheddate_5,bus_watchlist_entitydate_6,bus_watchlist_publisheddate_6,bus_watchlist_entitydate_7,bus_watchlist_publisheddate_7];
 		BusinessInstantID20_Services.Layouts.BatchFirmographicLayout AND NOT [Seq];
 		BusinessInstantID20_Services.Layouts.BatchPersonRoleLayout AND NOT [Seq];
 		BusinessInstantID20_Services.Layouts.BatchParentLayout AND NOT [Seq];
 		BusinessInstantID20_Services.Layouts.SBFEVerificationLayout AND NOT [Seq];
-//BusinessInstantID20_Services.Layouts.OutputLayout_batch;
+		BusinessInstantID20_Services.Layouts.BusinessAddressRiskLayout AND NOT [Seq];
+		//BusinessInstantID20_Services.Layouts.OutputLayout_batch;
 END;
 
 //BIID20 Testseeds layout 2
