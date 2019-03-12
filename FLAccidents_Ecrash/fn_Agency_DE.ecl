@@ -5,7 +5,7 @@ EXPORT fn_Agency_DE := function
 													 ,FLAccidents_Ecrash.Layout_Infiles.agency
 													 ,csv(terminator(['|\n', '\n']), separator('|\t|'),quote('"')))(Agency_ID != 'Agency_ID') ;
 													 
-	agency_old   := dataset(ut.foreign_prod+'thor_data400::in::ecrash::agency.'+ut.getDateOffset(-2,ut.GetDate)+'.csv'
+	agency_old   := dataset(ut.foreign_prod+'thor_data400::in::ecrash::agency.'+ut.getDateOffset(-1,ut.GetDate)+'.csv'
 													 ,FLAccidents_Ecrash.Layout_Infiles.agency
 													 ,csv(terminator(['|\n', '\n']), separator('|\t|'),quote('"')),opt)(Agency_ID != 'Agency_ID') ;
 													 
