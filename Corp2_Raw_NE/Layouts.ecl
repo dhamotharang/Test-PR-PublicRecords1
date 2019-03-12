@@ -1,225 +1,171 @@
-EXPORT Layouts := MODULE;
-	
- 
-	export CorpActionLayoutIn	:= record 
-	
-		string ActionNumber;
-		string AcctNumber;           
-		string DateTimeFiled;           
-		string DateTimeEntered;      
-		string DateTimeEffective;     
-		string FilerClientName;
-		string ServiceTypeCode;       
-		string DocNumber;
-		string NumPages;
-		string TaxPayment;
-		string TaxReceiptDate;           
-		string TaxReportNumber;       
-		string InternalField;
-		
-	end;
-	
-	export CorpActionLayoutBase	:= Record
-		
-		string1		action_flag;
-		unsigned4	dt_first_received;
-		unsigned4	dt_last_received;	
-		CorpActionLayoutIn;
-		
+﻿EXPORT Layouts := MODULE;
+	 
+	export CorpActionsLayoutIn	:= record 
+		 string    ActionNumber{xpath('ActionNumber')};											  
+		 string    AcctNumber{xpath('AcctNumber')};													  
+		 string    FilingDateTime{xpath('FilingDateTime')}; 								
+		 string    ExecutedDate{xpath('ExecutedDate')}; 										
+		 string    EffectiveDate{xpath('EffectiveDate')};										
+		 string    FilerClientName{xpath('FilerClientName')};								
+		 string    DocumentNumber{xpath('DocumentNumber')};									
+		 string    NumberOfPages{xpath('NumberOfPages')};										
+		 string    AddedDate{xpath('AddedDate')};														
+		 string    UpdatedDate{xpath('UpdatedDate')};												
+		 string    FilingTypeId{xpath('FilingType/Id')};										
+		 string    FilingTypeDescription{xpath('FilingType/Description')};	
+		 string    BusTypeId{xpath('BusinessType/Id')};											
+		 string    BusTypeDescription{xpath('BusinessType/Description')};		
+		 string    TaxPayment{xpath('TaxPayment')};													
+		 string		 TaxReportNumber{xpath('TaxReportNumber')};									
+		 string		 TaxReceiptDate{xpath('TaxReceiptDate')};									
+		 string    Fees{xpath('Fees')};																			
 	end;
 
 	export CorpOfficersLayoutIn	:= record
-	
-		string RecID;
-		string AcctNumber;              
-		string YearInReported;        
-		string YearOutReported;
-		string PositionTitle;            
-		string FirstName;            
-		string MiddleInitial;         
-		string LastName;          
-		string LastNameSdx;			
-		string OfcrAddress1;
-		string OfcrAddress2;                   
-		string OfcrCity;          
-		string OfcrState;         
-		string cntryCode;              
-		string OfcrZipCode;          		    
-		string FilingDateTime;           
-		string Internal;
-		
+		 string    Id{xpath('Id')};																					
+		 string    AcctNumber{xpath('AcctNumber')};													
+		 string    DateTakingOffice{xpath('DateTakingOffice')};							
+		 string    PositionHeld{xpath('PositionHeld')};											
+		 string 	 FirstName{xpath('FirstName')};														
+		 string 	 MiddleName{xpath('MiddleName')};													
+		 string 	 LastName{xpath('LastName')};															
+		 string 	 SoundexName{xpath('SoundexName')};												
+		 string 	 OfcrStreetAddress1{xpath('Address/StreetAddress1')};			
+		 string 	 OfcrStreetAddress2{xpath('Address/StreetAddress2')};			
+		 string 	 OfcrCity{xpath('Address/City')};													
+		 string 	 OfcrState{xpath('Address/State')};												
+		 string 	 OfcrZipcode{xpath('Address/Zipcode')};										
+		 string 	 OfcrCountyCode{xpath('Address/CountyCode')};								
+		 string 	 OfcrCountryCode{xpath('Address/CountryCode')};						
+		 string 	 FilingDateTime{xpath('FilingDateTime')};									
+		 string 	 YearOutReported{xpath('YearOutReported')};								
 	end;
 	
-	export CorpOfficersLayoutBase	:= Record
-		
-		string1		action_flag;
-		unsigned4	dt_first_received;
-		unsigned4	dt_last_received;	
-		CorpOfficersLayoutIn;
-		
-	end;
-
 	export CorpEntityLayoutIn	:= Record
+		 string    AcctNumber{xpath('AcctNumber')};																							
+		 string    FilingDateTime{xpath('FilingDateTime')};																			
+		 string    CorpType{xpath('CorpType')};																							
+		 string    CorpStateName{xpath('CorpStateName')};																		
+		 string    ForgnCorpName{xpath('ForgnCorpName')};																		
+		 string    Status{xpath('Status')};																									
+		 string    Duration{xpath('Duration')};																							
+		 string    ExpirationDate{xpath('ExpirationDate')};																	
+		 string    StreetAddress1{xpath('Address/StreetAddress1')};													  
+		 string    StreetAddress2{xpath('Address/StreetAddress2')};													  
+		 string    City{xpath('Address/City')};																							 
+		 string    State{xpath('Address/State')};																						  
+		 string    Zipcode{xpath('Address/Zipcode')};																				  
+		 string    CountyCode{xpath('Address/CountyCode')};																	 
+		 string    CountryCode{xpath('Address/CountryCode')};																  
+		 string    QualifyingState{xpath('QualifyingState')};																
+		 string    DateIncorp{xpath('DateIncorp')};																					
+		 string 	 NonProfitMembers{xpath('NonProfitMembers')};															  
+		 string    NonProfitBenefit{xpath('NonProfitBenefit')};															  
+		 string    RegAgentID{xpath('RegAgentID')};																					
+		 string    DO_StreetAddress1{xpath('DesignatedOffice/StreetAddress1')};		               
+		 string    DO_StreetAddress2{xpath('DesignatedOffice/StreetAddress2')};		               
+		 string    DO_City{xpath('DesignatedOffice/City')};												              
+		 string    DO_State{xpath('DesignatedOffice/State')};											               
+		 string    DO_Zipcode{xpath('DesignatedOffice/Zipcode')};									               
+		 string    DO_CountyCode{xpath('DesignatedOffice/CountyCode')};						               
+		 string    DO_CountryCode{xpath('DesignatedOffice/CountryCode')};					               
+		 string    AssociatedAcctNumber{xpath('AssociatedAcctNumber')};											
+		 string    NatureOfBusiness{xpath('NatureOfBusiness')};															
+		 string    LawPractice{xpath('LawPractice')};																				  
+		 string    Name{xpath('Name')};																											
+		 string    CorpModNameFlag{xpath('CorpModNameFlag')};																  
+		 string    FarmExemptionCategory{xpath('FarmExemptionCategory')};										
+		 string    TotalShareValue{xpath('TotalShareValue')};																  
+		 string    TradeApplicantType{xpath('TradeApplicantType')};													  
+		 string    OwnerName{xpath('OwnerName')};																						 
+		 string    IsForeign{xpath('IsForeign')};		
+		 string    ActionNumber{xpath('ActionNumber')};
+	end;
+		
+	export RegisteredAgentLayoutIn	:= record
+		 string    RegAgentName{xpath('RegAgentName')};					
+		 string    FirstName{xpath('FirstName')};								  
+		 string    LastName{xpath('LastName')};									  
+		 string    IndivEntity{xpath('IndivEntity')};						  
+		 string    RAStreetAddress1{xpath('Address/StreetAddress1')};	 
+		 string    RAStreetAddress2{xpath('Address/StreetAddress2')};	 
+		 string    RACity{xpath('Address/City')};									  
+		 string    RAState{xpath('Address/State')}; 							  
+		 string    RAZipcode{xpath('Address/Zipcode')}; 					  
+		 string    RACountyCode{xpath('Address/CountyCode')};			  
+		 string    RACountryCode{xpath('Address/CountryCode')}; 	  
+		 string    AcctNumber{xpath('AcctNumber')};							
+		 string    CorporationType{xpath('CorporationType')};		  
+		 string		 AgentId{xpath('AgentId')}; 									  
+		 string    EntityNumber{xpath('EntityNumber')};					 
+		 string    BusinessName{xpath('BusinessName')};					  
+	end;
 
-		string AcctNumber;               
-		string AssociatedAcctNumber;      
-		string ForgnCorpName;
-		string ForgnModifiedName;
-		string ForgnModifiedNameSdx;
-		string CorpStateName;            
-		string CorpModifiedName;
-		string CorpModifiedNameSdx;
-		string CorpModifiedNameFlag;				 
-		string RegAgentID;
-		string RegAgentContact;
-		string CorpType;	
-		string Status;     
-		string UpdateNeeded;
-		string Classification;       
-		string FarmExemptionCategory;    
-		string DateIncorp;      
-		string QualifyingState;
-		string Duration;
-		string ExpirationDate;         
-		string Name;     
-		string Contact;    
-		string Address1;     
-		string Address2;    
-		string City;
-		string State;                    
-		string ZipCode;
-		string CountyCode;
-		string CntryCode;
-		string PhoneNumber;
-		string FaxNumber;
-		string EmailAddr;
-		string NatureOfBusiness;        
-		string Field33;
-		string UserField2;
-		string FilingDateTime;          
-		string Internal;			
 
+// Vendor Lookup Table Files
+
+	export CorpTypeLayoutIn := record
+		string  	Id{xpath('Id')};
+		string    Description{xpath('Description')};
 	end;
 	
-	export CorpEntityLayoutBase	:= Record
-		
-		string1		action_flag;
-		unsigned4	dt_first_received;
-		unsigned4	dt_last_received;	
-		CorpEntityLayoutIn;
-		
+	export CountryCodesLayoutIn := record
+		string 		Code{xpath('Code')};
+		string 		Description{xpath('Description')};
+	end;
+
+	export ListOfStatesLayoutIn := record
+		string 		Id{xpath('Id')};
+		string 		StateCodeID{xpath('StateCodeID')};
+		string    StateCode{xpath('StateCode')};
+		string    Description{xpath('Description')};
 	end;
 	
-	export RegisterAgentLayoutIn	:= record
+	// Vendor sends this file, but CorpActions already contains this info.
+	// The Corp2.NE mapper doesn't use the FilingType file, but leaving this in place in case we need it later	
+	// export FilingTypeLayoutIn := record
+		// string  	Id{xpath('Id')};
+		// string    Description{xpath('Description')};
+	// end;
+
+	// Vendor sends this file, but CorpOfficers already contains this info.
+	// The Corp2.NE mapper doesn't use the PositionHeld file, but leaving this in place in case we need it later
+	// export PositionHeldLayoutIn := record
+		// string 		Id{xpath('Id')}; 
+		// string    Description{xpath('Description')};
+		// string    EntityTypeId{xpath('EntityTypeId')};
+		// string    EntityType{xpath('EntityType')};
+	// end;
+
 	
-		string RegAgentID;
-		string AcctNumber;
-		string CorporationRepresented;
-		string PickListFlag;
-		string RegAgentName;            
-		string RegAgentNameSdx;
-		string RegAgentAddr1;     
-		string RegAgentAddr2;    
-		string RegAgentCity;
-		string RegAgentState; 
-		string RegAgentZip;
-		string RegAgentCnty;
-		string RegAgentPhone;
-		string RegAgentFax;
-		string RegAgentEmail;
-		string RegAgentContact;
-		string RegAgtLastUpdatedBy;
-		string RegAgtDateTimeStamp;
-		string RegAgtInternal;
+// Temporary Layouts
 		
-	end;
+	export	jsonInputLayout := record 	
+	  string jsonData;  
+  end;
 	
-	export RegisterAgentLayoutBase	:= Record
-		
-		string1		action_flag;
-		unsigned4	dt_first_received;
-		unsigned4	dt_last_received;	
-		RegisterAgentLayoutIn;
-		
-	end;
-		
-	export Temp_CorpActionDesc := record
-	
-		CorpActionLayoutIn;
-		string Description;
-			
-	end;
-		
-	export Temp_OfficerWithTitles	:= record
-		
-		CorpOfficersLayoutIn;
-		string Title1;
-		string Title2;
-		string Title3;
-		string Title4;
-		string Title5;
-		string Title6;
-		string Title7;
-		string Title8;
-		string Title9;
-		string Title10;
-	
-	end;
-	
-	export Temp_EntityWithOfficerTitles	:= record
-	
+	export Temp_OfficersWithEntity	:= record
+			CorpOfficersLayoutIn;
 			CorpEntityLayoutIn;
-			Temp_OfficerWithTitles;
-		
 	end;
-			
-	export Temp_CorpEntityWithRA := record 
 	
+	export Temp_CorpEntityWithRA := record 
 		CorpEntityLayoutIn;			
-		RegisterAgentLayoutIn;		
-		string CorpTypeDesc;
+		RegisteredAgentLayoutIn;		
+		string CorpTypeCode;
 		string StDesc;
 		string CntryDesc;
-			
 	end;
 	
-	export Lookup_FilingCode := record	
-		
-		string filingCode;
-		string filingDesc;						
-		string filingDesc2;	
-			
-	end;
-	
-	export Lookup_CorpCode := record
-	
-		string corpCode;
-		string corpDesc;
-		string corpDesc2;
-		string corpDesc3;
-		
-	end;
-	
-	export Lookup_TitleCode := record	
-	
-		string titleCode;  
-		string titleDesc;			
-	
-	end;	
-	
-	export StateTypeCodeLayout := record
-	
+  export StateTypeCodeLayout := record
 		string stateCode;
 		string stateDesc;	
-		
 	end;		
 		  
 	export CntryTypeCodeLayout := record	
-	
 		string cntryDesc;
 		string cntryCode1;
 		string cntryCode2;
-		
 	end;
 	
 end;

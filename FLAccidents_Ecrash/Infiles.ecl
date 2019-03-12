@@ -29,7 +29,7 @@ vProperty_Damage_ea  := if ( nothor (fileservices.FindSuperFileSubName('~thor_da
 
 export agency0     := dataset(Data_Services.foreign_prod+'thor_data400::in::ecrash::agency'
 													 ,FLAccidents_Ecrash.Layout_Infiles.agency
-															 ,csv(terminator(['\n', '\nr', '\r', '\rn']), separator('~~'),quote('"')))(Agency_ID != 'Agency_ID');
+															 ,csv(terminator(['|\n', '\n', '\nr', '\r', '\rn']), separator('|\t|'),quote('"')))(Agency_ID != 'Agency_ID');
 export agency:= project(agency0, transform({agency0}, 
                             self.agency_id := IF(trim(Left.agency_id,left,right) <>'', Left.agency_id,ERROR('agency file bad')),
 														agency_name := IF(trim(Left.agency_name,left,right) <>'', Left.agency_name,ERROR('agency file bad'));

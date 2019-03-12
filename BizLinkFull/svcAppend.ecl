@@ -14,6 +14,8 @@
 	boolean do_zip_expansion := true : stored('do_zip_expansion');
 	boolean from_thor := false : stored('from_thor');
 	boolean includeRecords := false : stored('include_records');
+	boolean isMarketing := false : stored('is_marketing');
+	boolean dnbFullRemove := false : stored('dnb_full_remove');
 
 	inputDs := dataset([], BIPV2.IdAppendLayouts.AppendInput) : stored('append_input');
 
@@ -67,11 +69,12 @@
 			self := left,
 			self := []));
 
-	postBest := BIPV2.IdAppendLocal.AppendBest(withAppend, fetchLevel := fetchLevel, allBest := allBest);
+	postBest := BIPV2.IdAppendLocal.AppendBest(withAppend, fetchLevel := fetchLevel,
+	                                           allBest := allBest, isMarketing := isMarketing);
 
 	res := if(includeBest, postBest, postAppend);
 
-	postHeader := BIPV2.IdAppendLocal.FetchRecords(withAppend, fetchLevel);
+	postHeader := BIPV2.IdAppendLocal.FetchRecords(withAppend, fetchLevel, dnbFullRemove);
 
 	emptyHeader := dataset([], BIPV2.IdAppendLayouts.svcAppendRecsOut);
 				

@@ -20,9 +20,9 @@ EXPORT fn_Skip_Modules (
 				SkipKelBuild, 
 				SkipOrbitBuild,
 				SkipDashboardsBuild}],
-			FraudGovPlatform.Layouts.OutputF.SkipModules);
+			FraudGovPlatform.Layouts.Flags.SkipModules);
 
-	fn := fraudgovplatform.filenames().OutputF.SkipModules;
+	fn := fraudgovplatform.filenames().Flags.SkipModules;
 
 	PromoteSupers.MAC_SF_BuildProcess(d,fn,WriteFile,2,,true);
 

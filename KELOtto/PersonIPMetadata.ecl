@@ -1,35 +1,11 @@
 ﻿IMPORT KELOtto, FraudGovPlatform;
 
+PersonIPMetadataPrep1 := FraudGovPlatform.files(,KELOtto.Constants.useOtherEnvironmentDali).base.IPMetaData.built;
 
-PersonIPMetadataPrep := FraudGovPlatform.files(,KELOtto.Constants.useOtherEnvironmentDali).base.IPMetaData.built;
+//Set_ip_address_:=['171.2.75.6','195.92.48.70','9.105.72.130','11.186.75.150','143.60.137.122','170.141.177.75','48.128.243.249','23.227.207.19','251.110.91.211','23.105.131.251','174.127.99.171'];
+//PersonIPMetadataPrep := PROJECT(PersonIPMetadataPrep1, TRANSFORM(RECORDOF(LEFT), SELF.edgecity := 'MIAMI', SELf.proxydescription := CHOOSE(LEFT.did % 3 + 1, 'TOR EXIT','TOR RELAY','VPN'), SELF.proxytype := 'HOSTING', SELF := LEFT));
 
-CustomerPersonIPMetadataPrep := JOIN(PersonIPMetadataPrep,
-                                   KELOtto.SharingRules, 
-                       //LEFT.classification_permissible_use_access.fdn_file_info_id=RIGHT.fdn_ind_type_gc_id_inclusion,
-                       
-                       LEFT.fdn_file_info_id = RIGHT.fdn_file_info_id,// AND LEFT.classification_Permissible_use_access.Ind_type = RIGHT.ind_type,
-//                       HASH32(TRIM(LEFT.Customer_Id) + '|' + TRIM((STRING)LEFT.classification_Permissible_use_access.Ind_type))=RIGHT.sourcecustomerhash,
-                       TRANSFORM(
-                         {
-                           RECORDOF(LEFT),
-                        	 STRING PrimaryRange, // Address fields to keep KEL USE happy...
-                           STRING Predirectional,
-                           STRING PrimaryName,
-                           STRING Suffix,
-                           STRING Postdirectional,
-                           STRING Zip,
-                           STRING SecondaryRange,
-                           
-                           UNSIGNED SourceCustomerFileInfo,
-                           UNSIGNED AssociatedCustomerFileInfo,
-                         },
-                           SELF.SourceCustomerFileInfo := RIGHT.sourcecustomerhash,
-                           SELF.AssociatedCustomerFileInfo := RIGHT.targetcustomerhash,
-//                           SELF.SourceCustomerFileInfo := LEFT.classification_permissible_use_access.fdn_file_info_id,
-//                           SELF.AssociatedCustomerFileInfo := RIGHT.fdn_file_info_id,
-                           SELF := LEFT, SELF := []), LOOKUP, MANY);
-
-EXPORT PersonIPMetadata := CustomerPersonIPMetadataPrep;
+EXPORT PersonIPMetadata := PersonIPMetadataPrep1;
 
 
  

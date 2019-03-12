@@ -1,4 +1,4 @@
-import tools, _control, corp2, std;
+﻿import tools, _control, corp2, std;
 
 export fSprayFiles(
 	 string		pCorpState									= ''																		//to spray a specific state, or set of states(delimited by pipes)
@@ -22,7 +22,7 @@ function
 	
 	lookup_filter 	:= if(pShouldIncludeLookups = true or
 												//list of states where lookups are mandatory and come in each update
-												regexfind('^.*?(ak|ga|ks|mo|ms|ne|nh|oh|pa)$',FilesToSpray.Thor_filename_template,nocase)
+												regexfind('^.*?(ak|ga|ks|mo|ms|nh|oh|pa)$',FilesToSpray.Thor_filename_template,nocase)
 													,true
 													,not regexfind('lookup',FilesToSpray.Thor_filename_template, nocase)
 											 );

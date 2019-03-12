@@ -1,12 +1,15 @@
 ﻿/* ********************************************************************************************
 PRTE2_Header_Ins.MAC_fn_Add_From_IHDR
+
+Transform records coming in from IHDR into valid BHDR records
+Probably could have been just a function ... but works so no big deal
 ******************************************************************************************** */
 EXPORT MAC_fn_Add_From_IHDR(IHDRDS) := FUNCTIONMACRO
 
-	IMPORT PRTE2_X_Ins_DataCleanse, PRTE_CSV, Address, PRTE2_Common, doxie, NID;
+	IMPORT Address, PRTE2_Common, doxie, NID;
 
 	#uniquename(BHDRLayout)
-	%BHDRLayout% := PRTE_CSV.ge_header_base.layout_payload;
+	%BHDRLayout% := PRTE2_Header_Ins.Layouts.Base_Layout;
 	#uniquename(lookups)
 	%lookups% := doxie.lookup_setter(2,			'SEX') |
 							 doxie.lookup_setter(3, 		'CRIM') |
