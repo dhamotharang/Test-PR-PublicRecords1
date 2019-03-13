@@ -1,13 +1,13 @@
-﻿import DeathV2_Services, AutoStandardI, MDR, BatchServices, ut, D2C;
+﻿import DeathV2_Services, MDR, BatchServices, ut, D2C;
 
 export Functions := module
 
 	EXPORT boolean Restricted(string2 src, string1 glb_flag, boolean glb_ok, DeathV2_Services.IParam.DeathRestrictions in_mod) := function
-		return AutoStandardI.DataRestrictionI.val(in_mod).isHeaderSourceRestricted(src, in_mod.DataRestrictionMask)
+		return in_mod.isHeaderSourceRestricted(src)
 						or (~glb_ok and glb_flag = 'Y')
-						or ((~in_mod.UseDeathMasterSSAUpdates or (in_mod.DeathMasterPurpose = DeathV2_Services.Constants.DeathMasterPurpose.NoPermissibleUse))and src = MDR.sourceTools.src_Death_Restricted)					
-						or (in_mod.IsConsumer and src in D2C.Constants.DeathRestrictedSources)										
-						or (in_mod.SuppressNonMarketingDeathSources and src in [DeathV2_Services.Constants.src_Death_NonMarketing_Sources]);			
+						or ((~in_mod.UseDeathMasterSSAUpdates or (in_mod.DeathMasterPurpose = DeathV2_Services.Constants.DeathMasterPurpose.NoPermissibleUse))and src = MDR.sourceTools.src_Death_Restricted)
+						or (in_mod.IsConsumer() and src in D2C.Constants.DeathRestrictedSources)
+						or (in_mod.SuppressNonMarketingDeathSources and src in [DeathV2_Services.Constants.src_Death_NonMarketing_Sources]);
 	END;			 		
 	
 	SHARED csvStr2ds(STRING csvStr) := FUNCTION

@@ -1011,7 +1011,7 @@ EXPORT Functions := MODULE
 	end;
 	Export doCheckDeath(dataset(layouts.layout_slim) input) := Function
 			deathparams := DeathV2_Services.IParam.GetDeathRestrictions(gm);
-			glb_ok := AutoStandardI.InterfaceTranslator.glb_ok.val(project(gm,AutoStandardI.InterfaceTranslator.glb_ok.params));  
+			glb_ok := deathparams.isValidGlb();
 			byDids := normalize(input,left.dids,transform(Layouts.layout_death_DID,self.acctno := left.acctno;self.ProviderID:=left.ProviderID;self.did:=right.did;self.ssn:=if(left.UserSSNFound,left.UserSSN,'');self.freq:=right.freq;self.dob:=if(left.UserDOBFound,left.UserDOB[1..6],'');self.UserSSNFound:=left.UserSSNFound;self:=[]));
 			byDids_BestFreq := dedup(sort(byDids,acctno,ProviderID,-freq),acctno,ProviderID);
 			deathRecs := join(byDids(SSN<>''),doxie.Key_Death_MasterV2_ssa_Did,

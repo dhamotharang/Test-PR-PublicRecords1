@@ -546,7 +546,7 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 	Export PopulateScoresDS(CoreResults, Config, isReadmissionRequested, isMedicationAdherenceRequested) := FUNCTIONMACRO
 		
 		iesp.healthcare_socio_indicators.t_SocioScore formatRS() := TRANSFORM
-			SELF.Name := IF(isReadmissionRequested, 'ReadmissionRiskScore', _blank);
+			SELF.Name := IF(isReadmissionRequested, 'ReadmissionProbability', _blank);
 			SELF.Value := IF(isReadmissionRequested, CoreResults[1].SeRs_Score, 'N/A');
 			SeRs_Score := (DECIMAL32_16)CoreResults[1].SeRs_Score;
 			SELF.Category := MAP(CoreResults[1].SeRs_Score = 'N/A' => 'N/A',
@@ -556,12 +556,12 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 	   								SeRs_Score < Config[1].ReadmissionScore_Category_5_Low AND isReadmissionRequested => '4',
 	   								SeRs_Score >= Config[1].ReadmissionScore_Category_5_Low AND isReadmissionRequested => '5',
 	   								'N/A');
-			SELF.RiskDrivers.High1 := CoreResults[1].RAR_Driver_Hi1;
-			SELF.RiskDrivers.High2 := CoreResults[1].RAR_Driver_Hi2;
-			SELF.RiskDrivers.High3 := CoreResults[1].RAR_Driver_Hi3;
-			SELF.RiskDrivers.Low1  := CoreResults[1].RAR_Driver_Lo1;
-			SELF.RiskDrivers.Low2  := CoreResults[1].RAR_Driver_Lo2;
-			SELF.RiskDrivers.Low3  := CoreResults[1].RAR_Driver_Lo3;
+			SELF.CareDrivers.High1 := CoreResults[1].RAR_Driver_Hi1;
+			SELF.CareDrivers.High2 := CoreResults[1].RAR_Driver_Hi2;
+			SELF.CareDrivers.High3 := CoreResults[1].RAR_Driver_Hi3;
+			SELF.CareDrivers.Low1  := CoreResults[1].RAR_Driver_Lo1;
+			SELF.CareDrivers.Low2  := CoreResults[1].RAR_Driver_Lo2;
+			SELF.CareDrivers.Low3  := CoreResults[1].RAR_Driver_Lo3;
 		END;
 		ReadmissionScoreDS := dataset([formatRS()]);
 
@@ -576,12 +576,12 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 	   								SeMA_Score < Config[1].MedicationAdherenceScore_category_1_Low AND isMedicationAdherenceRequested => '2',
 	   								SeMA_Score >= Config[1].MedicationAdherenceScore_category_1_Low AND isMedicationAdherenceRequested => '1',
 	   								'N/A');
-			SELF.RiskDrivers.High1 := CoreResults[1].MA_Driver_Hi1;
-			SELF.RiskDrivers.High2 := CoreResults[1].MA_Driver_Hi2;
-			SELF.RiskDrivers.High3 := CoreResults[1].MA_Driver_Hi3;
-			SELF.RiskDrivers.Low1  := CoreResults[1].MA_Driver_Lo1;
-			SELF.RiskDrivers.Low2  := CoreResults[1].MA_Driver_Lo2;
-			SELF.RiskDrivers.Low3  := CoreResults[1].MA_Driver_Lo3;
+			SELF.CareDrivers.High1 := CoreResults[1].MA_Driver_Hi1;
+			SELF.CareDrivers.High2 := CoreResults[1].MA_Driver_Hi2;
+			SELF.CareDrivers.High3 := CoreResults[1].MA_Driver_Hi3;
+			SELF.CareDrivers.Low1  := CoreResults[1].MA_Driver_Lo1;
+			SELF.CareDrivers.Low2  := CoreResults[1].MA_Driver_Lo2;
+			SELF.CareDrivers.Low3  := CoreResults[1].MA_Driver_Lo3;
 		END;
 		MedicationScoreDS := dataset([formatMA()]);
 		

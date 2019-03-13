@@ -2596,10 +2596,19 @@ EXPORT SmallBusiness_BIP_Testseed_Function (
 			RIGHT.modelname = BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL, 
 			getModelKey(LEFT, RIGHT), INNER, KEEP(1)
 		);
+    BBFM1808_1_0_results :=
+    JOIN(
+			Input, Seed_Files.key_SmallBusModels, 
+			KEYED(TestDataTableName = RIGHT.tablename AND 
+			EXISTS(ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM)) AND 
+			getHashValue_for_models(LEFT) = RIGHT.HashValue) AND
+			RIGHT.modelname = BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM, 
+			getModelKey(LEFT, RIGHT),ATMOST(1), INNER, KEEP(1)
+		);
     
 	Model_Results := 
 		SORT( 
-			(SBBM1601_0_0_results + SBOM1601_0_0_results + SLBO1702_0_2_results + SLBB1702_0_2_results + SLBO1809_0_0_results + SLBB1809_0_0_results ), // Sort to the top the "real" model names.
+			(SBBM1601_0_0_results + SBOM1601_0_0_results + SLBO1702_0_2_results + SLBB1702_0_2_results + SLBO1809_0_0_results + SLBB1809_0_0_results + BBFM1808_1_0_results ), // Sort to the top the "real" model names.
 			seq,
 			IF( StringLib.StringFind(modelname,'1601_0_0',1) > 0, 0, 1 ), 
 			ModelName 

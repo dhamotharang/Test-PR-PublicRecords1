@@ -1,0 +1,400 @@
+ID "HIPIE_Plugins.ComputeBusinessIntraGeoradiusAssociations.ComputeBusinessIntraGeoradiusAssociations_cmp";
+NAME computebusinessintrageoradiusassociations_testcmp;
+LABEL "Test composition for Compute Business Intra Georadius Associations";
+DESCRIPTION "Auto-generated test composition for plugin ComputeBusinessIntraGeoradiusAssociations";
+VERSION "1.0.0";
+AUTHOR "CarmigJX";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+	STRING CompareWUID: DEFAULT("W20171213-133753");
+END
+
+INSTANCE HIPIE_Plugins.OutDataset.OutDataset(Ins004): LABEL("Output Dataset"),VERSION("2.0")
+	dsInput="^Ins003|dsOutput"
+	name="~qa::computebusinessintrageoradiusassociations::computebusinessintrageoradiusassociations::output"
+	Method="THOR"
+END
+
+INSTANCE HIPIE_Plugins.ComputeBusinessIntraGeoradiusAssociations.ComputeBusinessIntraGeoradiusAssociations(Ins003): LABEL("Compute Business Intra Georadius Associations"),VERSION("1.0.0")
+	dsInput="^Ins002|dsOutput"
+  Prefix="test"
+  Geohash="physicaladdressgeohash"
+  RecordID="bizrecid"
+  UltID="ultid"
+  ProxID="proxid"
+  ProxEntityContextUID="proxentitycontextuid"
+  BusinessName="bestselecompanyname"
+  BuildingAddress="physicaladdressconcatenated"
+  PhysicalAddress="physicaladdresscleanedaddress"
+  BusinessPhone="bus_ph_nbr"
+  AppendFields="legal_name","physicaladdressconcatenated"
+	ThresholdDistance=0.5
+	MaxBusinessAtLocation=50
+	EditDistanceThreshold=2
+END
+
+INSTANCE HIPIE_Plugins.ComputeBusinessIntraGeoradiusAssociations.ComputeBusinessIntraGeoradiusAssociations(Ins002): LABEL("Compute Business Intra Georadius Associations"),VERSION("1.0.0")
+  dsInput="^Ins001|dsOutput"
+  Prefix="ProxAssociation"
+  Geohash="physicaladdressgeohash"
+  RecordID="bizrecid"
+  UltID="ultid" 
+  ProxID="proxid"
+  ProxEntityContextUID="proxentitycontextuid"
+  BusinessName="bestselecompanyname"
+  BuildingAddress="physicaladdressconcatenated"
+  PhysicalAddress="physicaladdresscleanedaddress"
+  BusinessPhone="bus_ph_nbr"
+  LegalName="legal_name"
+  DBAName="dba_name"
+  MailingAddress="mailingaddresscleanedaddress"
+  AppendFields="legal_name", "dba_name"
+	ThresholdDistance=0.7
+	MaxBusinessAtLocation=50
+	EditDistanceThreshold=2
+END 
+
+INSTANCE HIPIE_Plugins.UseDataset.UseDataset(Ins001): LABEL("Use Dataset"),VERSION("1.1")
+	LogicalFilename="~qa::computebusinessintrageoradiusassociations::computebusinessintrageoradiusassociations::input"
+  Method="THOR"
+	Structure="  record
+    string customer_account;
+    string fein;
+    string ssn;
+    string suffix;
+    string legal_name;
+    string dba_name;
+    string bus_contact_name;
+    string bus_addr;
+    string bus_secondary_addr;
+    string bus_city;
+    string bus_state;
+    string bus_zip;
+    string busi_mailing_addr;
+    string bus_secondary_mailing_addr;
+    string bus_mailing_city;
+    string bus_mailing_state;
+    string bus_mailing_zip;
+    string ro_name_1;
+    string ro_ssn_1;
+    string ro_name_2;
+    string ro_ssn_2;
+    string ro_name_3;
+    string ro_ssn_3;
+    string bus_ph_nbr;
+    string contact_ph_nbr;
+    string regd_agent_name;
+    string regd_agent_address;
+    string regd_agent_secondary_mail_addr;
+    string regd_agent_mail_city;
+    string regd_agent_mail_state;
+    string regd_agent_mail_zip;
+    string regd_agent_phone;
+    string naics_cd;
+    string sic;
+    string bus_type;
+    string bus_status;
+    string tax_type_code;
+    string tax_type_desc;
+    string tax_type_code_2;
+    string tax_type_desc_2;
+    string tax_type_code_3;
+    string tax_type_desc_3;
+    string tax_type_code_4;
+    string tax_type_desc_4;
+    string tax_type_code_5;
+    string tax_type_desc_5;
+    string tax_type_code_6;
+    string tax_type_desc_6;
+    string tax_type_code_7;
+    string tax_type_desc_7;
+    string fein_ssn_desc;
+    string tax_permit_num;
+    string tax_permit_status;
+    string tax_permit_start_date;
+    string tax_permit_dt_last_seen;
+    string tax_permit_exp_dt;
+    string agi;
+    string ui_claims;
+    string date_of_last_ui_claim;
+    string total_employees;
+    string total_amt_wth;
+    string lexid_ro_1;
+    string lexid_score_ro_1;
+    string verify_best_ssn_score_ro_1;
+    string verify_best_name_score_ro_1;
+    string best_ssn_ro_1;
+    string best_dob_ro_1;
+    string best_dod_ro_1;
+    string best_fname_ro_1;
+    string best_mname_ro_1;
+    string best_lname_ro_1;
+    string best_name_suffix_ro_1;
+    string best_address_ro_1;
+    string best_city_ro_1;
+    string best_state_ro_1;
+    string best_zip_ro_1;
+    string best_zip4_ro_1;
+    string best_addr_date_ro_1;
+    string lexid_ro_2;
+    string lexid_score_ro_2;
+    string verify_best_ssn_score_ro_2;
+    string verify_best_name_score_ro_2;
+    string best_ssn_ro_2;
+    string best_dob_ro_2;
+    string best_dod_ro_2;
+    string best_fname_ro_2;
+    string best_mname_ro_2;
+    string best_lname_ro_2;
+    string best_name_suffix_ro_2;
+    string best_address_ro_2;
+    string best_city_ro_2;
+    string best_state_ro_2;
+    string best_zip_ro_2;
+    string best_zip4_ro_2;
+    string best_addr_date_ro_2;
+    string lexid_ro_3;
+    string lexid_score_ro_3;
+    string verify_best_ssn_score_ro_3;
+    string verify_best_name_score_ro_3;
+    string best_ssn_ro_3;
+    string best_dob_ro_3;
+    string best_dod_ro_3;
+    string best_fname_ro_3;
+    string best_mname_ro_3;
+    string best_lname_ro_3;
+    string best_name_suffix_ro_3;
+    string best_address_ro_3;
+    string best_city_ro_3;
+    string best_state_ro_3;
+    string best_zip_ro_3;
+    string best_zip4_ro_3;
+    string best_addr_date_ro_3;
+    string10 physicaladdressprimaryrange;
+    string2 physicaladdresspredirectional;
+    string28 physicaladdressprimaryname;
+    string4 physicaladdressaddresssuffix;
+    string2 physicaladdresspostdirectional;
+    string10 physicaladdressunitdesignation;
+    string8 physicaladdresssecondaryrange;
+    string25 physicaladdresspostalcity;
+    string25 physicaladdressvanitycity;
+    string2 physicaladdressstate;
+    string5 physicaladdresszip;
+    string4 physicaladdresszip4;
+    string2 physicaladdressdbpc;
+    string1 physicaladdresscheckdigit;
+    string2 physicaladdressrecordtype;
+    string5 physicaladdresscounty;
+    string10 physicaladdresslatitude;
+    string11 physicaladdresslongitude;
+    string4 physicaladdressmsa;
+    string7 physicaladdressgeoblock;
+    string1 physicaladdressgeomatchcode;
+    string4 physicaladdresserrorstatus;
+    boolean physicaladdresscachehit;
+    boolean physicaladdresscleanerhit;
+    string physicaladdresscleanedaddress;
+    string physicaladdressinputaddress;
+    boolean physicaladdressnoaddressinput;
+    boolean physicaladdressnoaddresscleanererror;
+    string physicaladdresserrorcodedescription;
+    string10 mailingaddressprimaryrange;
+    string2 mailingaddresspredirectional;
+    string28 mailingaddressprimaryname;
+    string4 mailingaddressaddresssuffix;
+    string2 mailingaddresspostdirectional;
+    string10 mailingaddressunitdesignation;
+    string8 mailingaddresssecondaryrange;
+    string25 mailingaddresspostalcity;
+    string25 mailingaddressvanitycity;
+    string2 mailingaddressstate;
+    string5 mailingaddresszip;
+    string4 mailingaddresszip4;
+    string2 mailingaddressdbpc;
+    string1 mailingaddresscheckdigit;
+    string2 mailingaddressrecordtype;
+    string5 mailingaddresscounty;
+    string10 mailingaddresslatitude;
+    string11 mailingaddresslongitude;
+    string4 mailingaddressmsa;
+    string7 mailingaddressgeoblock;
+    string1 mailingaddressgeomatchcode;
+    string4 mailingaddresserrorstatus;
+    boolean mailingaddresscachehit;
+    boolean mailingaddresscleanerhit;
+    string mailingaddresscleanedaddress;
+    string mailingaddressinputaddress;
+    boolean mailingaddressnoaddressinput;
+    boolean mailingaddressnoaddresscleanererror;
+    string mailingaddresserrorcodedescription;
+    unsigned6 legalphysicalultid;
+    unsigned6 legalphysicalorgid;
+    unsigned6 legalphysicalseleid;
+    unsigned6 legalphysicalproxid;
+    unsigned6 legalphysicalpowid;
+    unsigned6 legalphysicaldotid;
+    unsigned6 legalphysicalempid;
+    unsigned6 legalphysicalscore;
+    unsigned6 legalphysicalweight;
+    unsigned6 dbaphysicalultid;
+    unsigned6 dbaphysicalorgid;
+    unsigned6 dbaphysicalseleid;
+    unsigned6 dbaphysicalproxid;
+    unsigned6 dbaphysicalpowid;
+    unsigned6 dbaphysicaldotid;
+    unsigned6 dbaphysicalempid;
+    unsigned6 dbaphysicalscore;
+    unsigned6 dbaphysicalweight;
+    unsigned6 legalmailingultid;
+    unsigned6 legalmailingorgid;
+    unsigned6 legalmailingseleid;
+    unsigned6 legalmailingproxid;
+    unsigned6 legalmailingpowid;
+    unsigned6 legalmailingdotid;
+    unsigned6 legalmailingempid;
+    unsigned6 legalmailingscore;
+    unsigned6 legalmailingweight;
+    unsigned6 dbamailingultid;
+    unsigned6 dbamailingorgid;
+    unsigned6 dbamailingseleid;
+    unsigned6 dbamailingproxid;
+    unsigned6 dbamailingpowid;
+    unsigned6 dbamailingdotid;
+    unsigned6 dbamailingempid;
+    unsigned6 dbamailingscore;
+    unsigned6 dbamailingweight;
+    unsigned6 ultid;
+    unsigned6 orgid;
+    unsigned6 seleid;
+    unsigned6 proxid;
+    unsigned6 powid;
+    unsigned6 empid;
+    unsigned6 dotid;
+    unsigned8 score;
+    unsigned8 weight;
+    integer1 businessisultinput;
+    integer1 businessisseleinput;
+    integer1 businessisproxinput;
+    string bestultcompanyname;
+    string9 bestultfein;
+    string10 bestultprimaryrange;
+    string2 bestultpredirectional;
+    string28 bestultprimaryname;
+    string4 bestultaddresssuffix;
+    string2 bestultpostdirectional;
+    string10 bestultunitdesignation;
+    string8 bestultsecondaryrange;
+    string25 bestultpostalcity;
+    string25 bestultvanitycity;
+    string2 bestultstate;
+    string5 bestultzip;
+    string4 bestultzip4;
+    string18 bestultcounty;
+    string10 bestultphone;
+    integer4 bestultdatefirstseen;
+    integer4 bestultdatelastseen;
+    unsigned4 bestultincorporationdate;
+    string8 bestultsic;
+    string6 bestultnaics;
+    string bestselecompanyname;
+    string9 bestselefein;
+    string10 bestseleprimaryrange;
+    string2 bestselepredirectional;
+    string28 bestseleprimaryname;
+    string4 bestseleaddresssuffix;
+    string2 bestselepostdirectional;
+    string10 bestseleunitdesignation;
+    string8 bestselesecondaryrange;
+    string25 bestselepostalcity;
+    string25 bestselevanitycity;
+    string2 bestselestate;
+    string5 bestselezip;
+    string4 bestselezip4;
+    string18 bestselecounty;
+    string10 bestselephone;
+    integer4 bestseledatefirstseen;
+    integer4 bestseledatelastseen;
+    unsigned4 bestseleincorporationdate;
+    string8 bestselesic;
+    string6 bestselenaics;
+    boolean bestseleisactive;
+    boolean bestseleisdefunct;
+    string bestproxcompanyname;
+    string9 bestproxfein;
+    string10 bestproxprimaryrange;
+    string2 bestproxpredirectional;
+    string28 bestproxprimaryname;
+    string4 bestproxaddresssuffix;
+    string2 bestproxpostdirectional;
+    string10 bestproxunitdesignation;
+    string8 bestproxsecondaryrange;
+    string25 bestproxpostalcity;
+    string25 bestproxvanitycity;
+    string2 bestproxstate;
+    string5 bestproxzip;
+    string4 bestproxzip4;
+    string18 bestproxcounty;
+    string10 bestproxphone;
+    integer4 bestproxdatefirstseen;
+    integer4 bestproxdatelastseen;
+    unsigned4 bestproxincorporationdate;
+    string8 bestproxsic;
+    string6 bestproxnaics;
+    string mappininfo;
+    boolean bipattributesisnew;
+    boolean bipattributesinactive;
+    string ultentitycontextuid;
+    string seleentitycontextuid;
+    string proxentitycontextuid;
+    string physicalcleanaddresssearchstring;
+    string physicalinputaddresssearchstring;
+    string mailingcleanaddresssearchstring;
+    string mailinginputaddresssearchstring;
+    string bestselenaicsdescription;
+    string bestselesicdescription;
+    string bestproxnaicsdescription;
+    string bestproxsicdescription;
+    unsigned6 bizrecid;
+    integer8 ispotentiallyunknownflag;
+    integer8 inactiveactivemismatchflag;
+    string physicaladdressconcatenated;
+    string1 advohitflag;
+    string1 advovacancyindicator;
+    string1 advothrowbackindicator;
+    string1 advoseasonaldeliveryindicator;
+    string5 advoseasonalsuppressionstartdate;
+    string5 advoseasonalsuppressionenddate;
+    string1 advodonotdeliverindicator;
+    string1 advocollegeindicator;
+    string10 advocollegesuppressionstartdate;
+    string10 advocollegesuppressionenddate;
+    string1 advoaddressstyle;
+    string5 advosimplifyaddresscount; 
+    string1 advodropindicator;
+    string1 advoresidentialorbusinessindicator;
+    string1 advoonlywaytogetmailindicator;
+    string1 advorecordtypecode;
+    string1 advoaddresstype;
+    string1 advoaddressusagetype;
+    string8 advofirstseendate;
+    string8 advolastseendate;
+    string8 advovendorfirstreporteddate;
+    string8 advovendorlastreporteddate;
+    string8 advovacationbegindate;
+    string8 advovacationenddate;
+    string8 advonumberofcurrentvacationmonths;
+    string8 advomaxvacationmonths;
+    string8 advovacationperiodscount; 
+    integer8 isnotvacantbusinessflag;
+    integer8 ispoboxflag;
+    string advoresidentialorbusinessindicatordescription;
+    string12 physicaladdressgeohash;
+    string mailingaddressconcatenated;
+  end;"
+END

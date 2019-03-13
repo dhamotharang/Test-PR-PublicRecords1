@@ -1,4 +1,4 @@
-﻿IMPORT PersonSlimReport_Services, BatchShare, ut, iesp;
+﻿IMPORT PersonSlimReport_Services, BatchShare, ut, iesp, doxie;
 EXPORT IParams := MODULE
 
 	EXPORT PersonSlimReportOptions := INTERFACE
@@ -11,14 +11,14 @@ EXPORT IParams := MODULE
 		EXPORT BOOLEAN   IncludeMinors           := FALSE;
 		EXPORT BOOLEAN   mask_dl                 := FALSE; //for accidents
 		EXPORT STRING    RealTimePermissibleUse  := '';
-		EXPORT BOOLEAN   IncludeNonRegulatedVehicleSources    := FALSE;
-		EXPORT BOOLEAN   IncludeNonRegulatedWatercraftSources := FALSE;
-		EXPORT BOOLEAN   IncludePriorProperties  := FALSE;
+		EXPORT BOOLEAN   IncludeNonRegulatedVehicleSources      := FALSE;
+		//underscores to match the watercraft mod
+		EXPORT BOOLEAN   include_NonRegulated_WatercraftSources := FALSE;
+		EXPORT BOOLEAN   IncludePriorProperties  := FALSE; // NOT NECESSARILY SUBJECT PROPERTY!
 		EXPORT BOOLEAN   EnableNationalAccidents := FALSE;
 		EXPORT BOOLEAN   EnableExtraAccidents    := FALSE;
 		EXPORT BOOLEAN   IncludeBlankDOD         := FALSE;
-		EXPORT STRING1 ucc_party_type            := PersonSlimReport_Services.Constants.DEBTOR;
-		EXPORT STRING14 did                      := ''; //for firearms
+		EXPORT STRING1   ucc_party_type          := PersonSlimReport_Services.Constants.DEBTOR;
 
 		EXPORT BOOLEAN IncludeAddresses            := FALSE;
 		EXPORT BOOLEAN IncludePhones               := FALSE;
@@ -49,6 +49,23 @@ EXPORT IParams := MODULE
 		EXPORT BOOLEAN IncludeDeaths               := FALSE;
 		EXPORT BOOLEAN IncludeUtility              := FALSE;
 	END;
+	
+	//convert current parameters' module into IDataAccess - 
+	//temporarily until Vlad completes the IDataAccess work and updates the whole mod
+  EXPORT convertToDataAccess (PersonSlimReportOptions mod) := FUNCTION
+    //note: using (most restrictive) defaults for fields not defined in the current module
+    mod_access := MODULE (doxie.IDataAccess)
+      EXPORT unsigned1 glb := mod.GLBPurpose;
+      EXPORT unsigned1 dppa := mod.DPPAPurpose;
+      EXPORT string DataRestrictionMask := mod.DataRestrictionMask;
+      EXPORT string5 industry_class := mod.industry_class;
+      EXPORT string32 application_type := mod.ApplicationType;
+      EXPORT boolean show_minors := mod.IncludeMinors OR (mod.GLBPurpose = 2);
+      EXPORT string ssn_mask := mod.ssn_mask;
+      EXPORT unsigned1 dl_mask := IF (mod.mask_dl, 1, 0);
+    END;
+    RETURN mod_access;
+  END;
 
 	EXPORT getOptions(iesp.personslimreport.t_PersonSlimReportRequest inIesp) := FUNCTION
 		in_mod := MODULE(PersonSlimReportOptions)
@@ -59,7 +76,6 @@ EXPORT IParams := MODULE
 			EXPORT STRING5   industry_class            := inIesp.user.industryclass;
 			EXPORT STRING6   ssn_mask                  := inIesp.user.ssnmask;
 			EXPORT BOOLEAN   mask_dl                   := inIesp.user.dlmask;
-			EXPORT STRING14  did                       := inIesp.reportby.uniqueid;
 
 			EXPORT BOOLEAN IncludeAddresses            := inIesp.Options.IncludeAddresses;
 			EXPORT BOOLEAN IncludePhones               := inIesp.Options.IncludePhones;
@@ -84,8 +100,8 @@ EXPORT IParams := MODULE
 			EXPORT BOOLEAN EnableNationalAccidents     := inIesp.Options.EnableNationalAccidents;
 			EXPORT BOOLEAN EnableExtraAccidents        := inIesp.Options.EnableExtraAccidents;
 			EXPORT BOOLEAN IncludeBlankDOD             := inIesp.Options.IncludeBlankDOD;
-			EXPORT BOOLEAN IncludeNonRegulatedWatercraftSources := inIesp.Options.IncludeNonRegulatedWatercraftSources;
-			EXPORT BOOLEAN IncludeNonRegulatedVehicleSources    := inIesp.Options.IncludeNonRegulatedVehicleSources;
+			EXPORT BOOLEAN include_NonRegulated_WatercraftSources := inIesp.Options.IncludeNonRegulatedWatercraftSources;
+			EXPORT BOOLEAN IncludeNonRegulatedVehicleSources      := inIesp.Options.IncludeNonRegulatedVehicleSources;
 			EXPORT BOOLEAN IncludeAccidents            := inIesp.Options.IncludeAccidents;
 			EXPORT BOOLEAN IncludeBankruptcies         := inIesp.Options.IncludeBankruptcies;
 			EXPORT BOOLEAN IncludeLiens                := inIesp.Options.IncludeLiens;
@@ -114,14 +130,10 @@ EXPORT IParams := MODULE
 		#STORED('IncludePriorProperties', IncludePriorProperties);
 		BOOLEAN IncludeNonRegulatedVehicleSources := global(inIesp.Options).IncludeNonRegulatedVehicleSources;
 		#STORED('IncludeNonRegulatedVehicleSources', IncludeNonRegulatedVehicleSources);
-		BOOLEAN IncludeNonRegulatedWatercraftSources := global(inIesp.Options).IncludeNonRegulatedWatercraftSources;
-		#STORED('IncludeNonRegulatedWatercraftSources', IncludeNonRegulatedWatercraftSources);
 		BOOLEAN EnableNationalAccidents := global(inIesp.Options).EnableNationalAccidents;
 		#STORED('EnableNationalAccidents', EnableNationalAccidents);
 		BOOLEAN EnableExtraAccidents := global(inIesp.Options).EnableExtraAccidents;
 		#STORED('EnableExtraAccidents', EnableExtraAccidents);
-		BOOLEAN IncludeBlankDOD := global(inIesp.Options).IncludeBlankDOD;
-		#STORED('IncludeBlankDOD', IncludeBlankDOD);
 		//return bogus output to avoid any errors - this is done in iesp.ECL2ESP
 		RETURN OUTPUT (dataset ([],{integer x}), named('__internal__'), extend);
 	END;

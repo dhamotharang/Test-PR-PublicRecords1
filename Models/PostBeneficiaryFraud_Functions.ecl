@@ -1659,8 +1659,7 @@ EXPORT PostBeneficiaryFraud_Functions := MODULE
 		deceased_codes := ['S', 'SAZC', 'ANZC', 'SN', 'ANSZC'];
 
 		// Have to translate the information into something the Death batch service can recognize.
-		deathInMod := MODULE(project(DeathV2_Services.IParam.getBatchParams(), DeathV2_Services.IParam.BatchParams, opt))							
-			EXPORT STRING32	ApplicationType 		:= '';
+		deathInMod := MODULE(DeathV2_Services.IParam.getBatchParams())
 			EXPORT BOOLEAN  IncludeBlankDOD 		:= TRUE;
 			EXPORT BOOLEAN  ExtraMatchCodes 		:= TRUE;
 			EXPORT BOOLEAN  AddSupplemental 		:= TRUE;

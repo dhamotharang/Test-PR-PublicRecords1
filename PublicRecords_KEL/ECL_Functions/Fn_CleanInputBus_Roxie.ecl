@@ -41,7 +41,7 @@ EXPORT Fn_CleanInputBus_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.L
 				SELF.BusInputPostDirClean				 := cleaned_Addr.postdir;
 				SELF.BusInputUnitDesigClean			 := cleaned_Addr.unit_desig;
 				SELF.BusInputSecRangeClean			 := cleaned_Addr.sec_range;
-				SELF.BusInputCityClean					 := cleaned_Addr.p_city_name;
+				SELF.BusInputCityClean					 := cleaned_Addr.v_city_name;
 				SELF.BusInputStateClean					 := cleaned_Addr.st;
 				SELF.BusInputZip5Clean					 := cleaned_Addr.zip;
 				SELF.BusInputZip4Clean					 := cleaned_Addr.zip4;
@@ -49,7 +49,7 @@ EXPORT Fn_CleanInputBus_Roxie( DATASET(PublicRecords_KEL.ECL_Functions.Layouts.L
 				SELF.BusInputLongitudeClean			 := cleaned_Addr.geo_long;
 				SELF.BusInputAddrTypeClean			 := cleaned_Addr.rec_type;
 				SELF.BusInputAddrStatusClean		 := cleaned_Addr.err_stat;
-				SELF.BusInputCountyClean				 := cleaned_Addr.county;
+				SELF.BusInputCountyClean				 := cleaned_Addr.county[3..5];
 				SELF.BusInputGeoblockClean			 := cleaned_Addr.geo_blk;
 						
 				// Other cleaned fields (email, phone, TIN)

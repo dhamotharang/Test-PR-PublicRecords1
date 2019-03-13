@@ -1,9 +1,22 @@
 ﻿IMPORT PublicRecords_KEL, Gateway;
 
 EXPORT Interface_Options := INTERFACE
+	EXPORT STRING AttributeSetName := '';
+	EXPORT STRING VersionName := '';
+	EXPORT BOOLEAN isFCRA := FALSE;
+	EXPORT STRING ArchiveDate := '0';
+	EXPORT STRING InputFileName := '';
+	EXPORT STRING PermissiblePurpose := '';
+	EXPORT STRING Data_Restriction_Mask := '';
+	EXPORT STRING Data_Permission_Mask := '';
+	EXPORT UNSIGNED GLBAPurpose := 0;
+	EXPORT UNSIGNED DPPAPurpose := 0;
+	EXPORT BOOLEAN Override_Experian_Restriction := FALSE;
+	EXPORT STRING Allowed_Sources := '';
 	EXPORT INTEGER ScoreThreshold := 80;
-	EXPORT BOOLEAN IsFCRA := FALSE;
 	EXPORT BOOLEAN ExcludeConsumerShell := FALSE;
+	EXPORT BOOLEAN isMarketing := FALSE; // When TRUE enables Marketing Restrictions
+	EXPORT UNSIGNED8 KEL_Permissions_Mask := 0; // Set by PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate()
 	EXPORT BOOLEAN OutputMasterResults := FALSE;
 	
 		SHARED gateways_in := Gateway.Configuration.Get();
@@ -14,6 +27,13 @@ EXPORT Interface_Options := INTERFACE
 		END;
 
 	EXPORT DATASET(Gateway.Layouts.Config) Gateways := PROJECT(gateways_in, gw_switch(LEFT));
+	
+	// BIP Append Options
+	EXPORT UNSIGNED BIPAppendScoreThreshold := 75;
+	EXPORT UNSIGNED BIPAppendWeightThreshold := 0;
+	EXPORT BOOLEAN BIPAppendPrimForce := FALSE;
+	EXPORT BOOLEAN BIPAppendReAppend := TRUE;
+	EXPORT BOOLEAN BIPAppendIncludeAuthRep := FALSE;
 	
 	// Performance options to turn ON/OFF ENTITIES in during FDC build.
 	// By default, all ENTITIES are ON.

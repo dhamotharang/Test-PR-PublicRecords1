@@ -1,8 +1,10 @@
-﻿IMPORT iesp, Doxie_Raw, UT;
-
-EXPORT Death_records (DATASET({unsigned6 did}) dids) := FUNCTION
-
-  death_raw := Doxie_Raw.death_raw(dids);
+﻿IMPORT iesp, Doxie_Raw, UT, PersonSlimReport_Services;
+// suppression and minor checks are done before calling this
+EXPORT Death_records (DATASET({unsigned6 did}) dids,
+            PersonSlimReport_Services.IParams.PersonSlimReportOptions in_mod) := FUNCTION
+ 
+  death_raw      := Doxie_Raw.death_raw(dids,,,in_mod.DPPAPurpose,in_mod.GLBPurpose,in_mod.ssn_mask);
+  death_raw_bdod := death_raw(in_mod.IncludeBlankDOD or (unsigned)dod8 != 0);
   
   iesp.death.t_DeathReportRecord toDeathIesp(doxie_raw.Layout_Death_Raw L) := TRANSFORM
     self.statedeathid     := L.state_death_id;
@@ -60,6 +62,6 @@ EXPORT Death_records (DATASET({unsigned6 did}) dids) := FUNCTION
     self.deathinfo.hospitalstatus           := L.hospital_status;
   END;
   
-  death_iesp := PROJECT(death_raw,toDeathIesp(LEFT));
+  death_iesp := PROJECT(death_raw_bdod,toDeathIesp(LEFT));
   RETURN death_iesp;
 END;

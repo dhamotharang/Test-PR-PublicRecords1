@@ -643,7 +643,7 @@ layout_watchlists_temp := record
 					), 
 					300
 				), 
-				Source );
+				Source ) + [MDR.SourceTools.src_Cortera_Tradeline];
 	
 	Risk_Indicators.Layout_Input prepForDIDAppend(Business_Risk_BIP.Layouts.Shell le) := TRANSFORM
 		SELF.Seq := le.Clean_Input.Seq;
@@ -941,7 +941,7 @@ layout_watchlists_temp := record
   Cortera := Business_Risk_BIP.PD_Cortera(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
   CorteraRecs := Cortera.CorteraRecs;
   Cortera_Attribute_recs := Cortera.Cortera_Attribute_recs;
-  
+  Cortera_Tradelines := Business_Risk_BIP.PD_Cortera_Tradelines(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
 	// Keep all of the outputs at the end so that we can keep them sorted more easily, and so that the function compiles
 	// Inputs/Options - By outputting these two here we are forcing OSS to display the fields on the form in an order that makes sense and that we control
 	OUTPUT(Input, NAMED('Raw_Input'));
@@ -966,6 +966,7 @@ layout_watchlists_temp := record
 	IF((outputs.IncludeCorpFilings OR outputs.IncludeAll), OUTPUT(CHOOSEN((CorpFilings_recs), outputs.OutputRecordCount), NAMED('Corp_Filings')));
 	IF((outputs.IncludeCortera OR outputs.IncludeAll), OUTPUT(CHOOSEN((CorteraRecs), outputs.OutputRecordCount), NAMED('Cortera_Header')));
 	IF((outputs.IncludeCortera OR outputs.IncludeAll), OUTPUT(CHOOSEN((Cortera_Attribute_recs), outputs.OutputRecordCount), NAMED('Cortera_Attributes')));
+	IF((outputs.IncludeCortera OR outputs.IncludeAll), OUTPUT(CHOOSEN((Cortera_Tradelines), outputs.OutputRecordCount), NAMED('Cortera_Tradelines')));
 	IF((outputs.IncludeDCA OR outputs.IncludeAll), OUTPUT(CHOOSEN((DCA), outputs.OutputRecordCount), NAMED('DCA')));
 	IF((outputs.IncludeDEADCO OR outputs.IncludeAll), OUTPUT(CHOOSEN((DEADCO), outputs.OutputRecordCount), NAMED('DEADCO')));
 	IF((outputs.IncludeDNBDMI OR outputs.IncludeAll), OUTPUT(CHOOSEN((DNBDMI), outputs.OutputRecordCount), NAMED('DNB_DMI')));

@@ -44,7 +44,8 @@ EXPORT IDataAccess := INTERFACE
            $.compliance.HeaderIsPreGLB (nonglb_last_seen, first_seen, src, DataRestrictionMask);
 
   EXPORT boolean isConsumer () := industry_class = 'CNSMR';
-  EXPORT boolean isUtility () := industry_class = 'UTILI';
+  EXPORT boolean isDirectMarketing () := industry_class = 'DRMKT';
+  EXPORT boolean isUtility () := industry_class = 'UTILI';  // should we look for 'DRMKT' here as well?
 
   // restrictions based on data restriction mask flags
   EXPORT boolean isPreGLBRestricted () := $.compliance.isPreGLBRestricted (DataRestrictionMask);

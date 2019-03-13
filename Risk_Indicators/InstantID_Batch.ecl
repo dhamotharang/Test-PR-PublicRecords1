@@ -1037,7 +1037,7 @@ risk_indicators.Layout_InstantID_NuGen_Denorm into_final(formed L, scores R) := 
 	self.hri_desc_12 := if (count(l.ri) >= 12, L.ri[12].desc, '');
 	self.hri_13 := if (count(l.ri) >= 13, L.ri[13].hri, '');
 	self.hri_desc_13 := if (count(l.ri) >= 13, L.ri[13].desc, '');
-	self.hri_14 := if (count(l.ri) >= 14, L.ri[4].hri, '');
+	self.hri_14 := if (count(l.ri) >= 14, L.ri[14].hri, '');
 	self.hri_desc_14 := if (count(l.ri) >= 14, L.ri[14].desc, '');
 	self.hri_15 := if (count(l.ri) >= 15, L.ri[15].hri, '');
 	self.hri_desc_15 := if (count(l.ri) >= 15, L.ri[15].desc, '');

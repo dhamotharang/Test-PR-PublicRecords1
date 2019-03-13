@@ -21,11 +21,12 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 		fraudpoint2_models := ['fp1109_0', 'fp1109_9', 'fp1307_2'];
 		fraudpoint3_models := ['fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9']; // FP3 Flagship models
 		FP3_models_requiring_GLB	:= ['fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9']; //these models require valid GLB, else fail
-		fraudpoint3_custom_models := ['fp1702_2','fp1702_1','fp1508_1'];
+		fraudpoint3_custom_models := ['fp1702_2','fp1702_1','fp1508_1','fp1705_1'];
 
 		bill_to_ship_to_models := ['fp1409_2']; // Populate with real model ids when the time comes.
   
 		bsVersion := MAP( doParo or requestedattributegroups IN ['fraudpointattrv202','fraudpointattrv203'] or model_name IN ['fp1508_1','msn1803_1','rsn804_1','msnrsn_1'] => 53, // bs 53
+                      model_name IN ['fp1705_1'] => 52,
                       model_name IN ['fp3fdn1505_0', 'fp31505_0', 'fp3fdn1505_9', 
                                      'fp31505_9','fp1702_2','fp1702_1'] => 51, //run 51 shell for both FP3 models
                       requestedattributegroups IN ['fraudpointattrv201'] => 50,
@@ -49,7 +50,7 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 		// new options for fp attributes 2.0
 		IncludeDLverification := doVersion2 OR requestedattributegroups IN ['fraudpointattrv201','fraudpointattrv202','fraudpointattrv203'] ;
 		unsigned8 BSOptions := if(doVersion2 OR requestedattributegroups IN ['fraudpointattrv201','fraudpointattrv202','fraudpointattrv203'] or model_name in ['fp1210_1','fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 
-		                                                       'fp3fdn1505_9','fp1702_2','fp1702_1','fp1508_1'], 
+		                                                       'fp3fdn1505_9','fp1702_2','fp1702_1','fp1508_1','fp1705_1'], 
 			risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary +
 			risk_indicators.iid_constants.BSOptions.IncludeDoNotMail +
 			risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity,
@@ -158,7 +159,7 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 		boolean   doRelatives := true;
 		boolean   doDL := false;
 		boolean   doVehicle := MAP(
-																model_name IN ['fp31105_1','fp1702_2','fp1702_1','fp1508_1'] or doVersion2 => TRUE,
+																model_name IN ['fp31105_1','fp1702_2','fp1702_1','fp1508_1','fp1705_1'] or doVersion2 => TRUE,
 																															 FALSE
 															 );
 		boolean   doDerogs := true;
@@ -930,6 +931,7 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 		model_fp1109_0 := Models.FP1109_0_0( clam_ip, 6, false);
 		model_fp1307_2 := Models.FP1307_2_0( clam_ip, 6, false);
 		
+		
 		model_fraudpoint2 := case( model_name,
 			'fp1109_0' => model_fp1109_0, 
 			'fp1109_9' => Models.FP1109_0_0( clam_ip, 6, true), // FP1109_9 is simply FP1109_0 with criminal risk codes returned
@@ -943,6 +945,7 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 																		self.FriendlyFraudIndex := right.FriendlyFraudIndex,
 																		self.SuspiciousActivityIndex := right.SuspiciousActivityIndex,
 																		self := left)),
+                                
 			dataset( [], Models.Layouts.layout_fp1109 )
 		);
 
@@ -953,7 +956,8 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 			'fp3fdn1505_0'	=> Models.FP3FDN1505_0_Base( clam_ip, 6, false), 
 			'fp31505_9' 		=> Models.FP31505_0_Base( clam_ip, 6, true), // '_9' indicates to use criminal data
 			'fp3fdn1505_9'	=> Models.FP3FDN1505_0_Base( clam_ip, 6, true), // '_9' indicates to use criminal data
-			'fp1508_1'	=> Models.fp1508_1_0( ungroup(clam), 6),
+			'fp1508_1'	=> Models.fp1508_1_0( ungroup(clam), 6), 
+			'fp1705_1'	=> Models.fp1705_1_0( ungroup(clam), 6), 
 												 dataset( [], Models.Layouts.layout_fp1109 )
 		);
     
@@ -995,6 +999,7 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 					model_name='msn1803_1' => Risk_Indicators.BillingIndex.MSN1803_1,
 					model_name='rsn804_1' => Risk_Indicators.BillingIndex.RSN804_1,
 					model_name='msnrsn_1' => Risk_Indicators.BillingIndex.MSNRSN_1,
+					model_name='fp1705_1' => Risk_Indicators.BillingIndex.FP1705_1,
 					''
 				),
 				
@@ -1008,6 +1013,7 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 					model_name IN ['fp1702_2'] 																													    => 'FraudPointfp1702_2',
 					model_name IN ['fp1702_1'] 																													    => 'FraudPointfp1702_1',
 					model_name IN ['fp1508_1'] 																													    => 'FraudPointfp1508_1',
+					model_name IN ['fp1705_1'] 																													    => 'FraudPointFP1705_1',
 					model_name IN ['msn1803_1', 'msnrsn_1'] 																								=> 'FraudPointMSN1803_1',
 					model_name IN ['rsn804_1'] 																													    => 'FraudPointRSN804_1',
 					''
@@ -1016,7 +1022,7 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 				self.scorename1 := map(
 					model_name IN ['fp3710_0', 'fp31105_1', 'fp1109_0', 'fp1109_9', 'fp1210_1', 'fp1307_2', 
 												 'fp1409_2', 'fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9',
-												 'fp1702_2','fp1702_1','fp1508_1', 'msn1803_1', 'msnrsn_1'] 		=> '0 to 999',
+												 'fp1702_2','fp1702_1','fp1508_1', 'msn1803_1', 'msnrsn_1','fp1705_1'] 		=> '0 to 999',
           model_name IN ['rsn804_1'] => '250 to 999',
 					''
 				),

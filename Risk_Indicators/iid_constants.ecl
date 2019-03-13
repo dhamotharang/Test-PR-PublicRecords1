@@ -164,6 +164,7 @@ export posInquiriesRestriction := 16;
 export posRestrictPreGLB := 23; //this is high level check use other code not just this if checking in future
 export posFDNvfRestriction := 25; //FDN Virtual Fraud data
 export posLiensJudgRestriction := 41; //Liens/Judgments 
+export posCortera := 42;
 
 export FDNvf_ok(string DataRestriction) := DataRestriction[posFDNvfRestriction]=sFalse;
 

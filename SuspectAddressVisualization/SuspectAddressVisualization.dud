@@ -1,0 +1,760 @@
+﻿NAME SuspectAddressVisualization;
+LABEL "SuspectAddressVisualization";
+CATEGORY VISUALIZE;
+VERSION "1.0.0";
+AUTHOR "periassx";
+DESCRIPTION "Suspect Address Visualization";
+PERMISSIONS
+ VIEW:PUBLIC;
+ EDIT:PRIVATE;
+ RUN:PUBLIC;
+END
+
+INPUTS
+
+    STRING Prefix:LABEL("Append Column Prefix"),DEFAULT("MainDashBoard");
+    STRING ScoreReasons:LABEL("Score Reason"),DEFAULT("scoringreasons");
+    STRING Reason:LABEL("Reason"),DEFAULT("reason");
+    STRING Description:LABEL("Reason"),DEFAULT("description");
+    STRING Value:LABEL("Reason"),DEFAULT("value");
+
+    DATASET dsInput:MAPBYNAME
+        FIELD LNPID:LABEL("Lexis Nexis Professional ID"),DESCRIPTION("Lexis Nexis Professional ID"),OPTIONAL,NULL("");
+        FIELD LEXID:LABEL("Lexis Nexis Consumer ID"),DESCRIPTION("Lexis Nexis Consumer ID"),OPTIONAL,NULL("");
+        FIELD ProviderKey:LABEL("Provider Identifier Key"),DESCRIPTION("Provider Identifier Key"),OPTIONAL,NULL("");
+        FIELD ProviderFirstName:LABEL("Provider First Name"),DESCRIPTION("Provider First Name"),OPTIONAL,NULL("");
+        FIELD ProviderMiddleName:LABEL("Provider Middle Name"),DESCRIPTION("Provider Middle Name"),OPTIONAL,NULL("");
+        FIELD ProviderLastName:LABEL("Provider Last Name"),DESCRIPTION("Provider Last Name"),OPTIONAL,NULL("");
+        FIELD ProviderSuffixName:LABEL("Provider Suffix Name"),DESCRIPTION("Provider Suffix Name"),OPTIONAL,NULL("");
+        FIELD FacilityName:LABEL("Facility Name"),DESCRIPTION("Facility Name"),OPTIONAL,NULL("");
+        FIELD TotalChargeAmount:LABEL("Total Charge Amount"),DESCRIPTION("Total Charge Amount"),OPTIONAL,NULL("");
+        FIELD TotalPaidAmount:LABEL("Total Paid Amount"),DESCRIPTION("Total Paid Amount"),OPTIONAL,NULL("");
+        FIELD TotalClaimCount:LABEL("Total Claim Count"),DESCRIPTION("Total Claim Count"),OPTIONAL,NULL("");
+        FIELD TotalProviderCount:LABEL("Total Provider Count"),DESCRIPTION("Total Provider Count"),OPTIONAL,NULL("");
+        FIELD ProviderSpecialtyDescription:LABEL("Provider Specialty Description"),DESCRIPTION("Provider Specialty Description"),OPTIONAL,NULL("");
+        FIELD ProviderNpi:LABEL("Provider NPI"),DESCRIPTION("Provider NPI"),OPTIONAL,NULL("");
+        FIELD PrimaryRange:LABEL("Primary Range"),DESCRIPTION("Primary Range, Street Number"),OPTIONAL,NULL("");
+        FIELD PreDirectional:LABEL("Pre-Direction"), DESCRIPTION("Pre-Directional"),OPTIONAL,NULL("");
+        FIELD PrimaryName:LABEL("Primary Name"),DESCRIPTION("Primary Name, Street Name"),OPTIONAL,NULL("");
+        FIELD AddressSuffix:LABEL("Address Suffix"),DESCRIPTION("Address Suffix"),OPTIONAL,NULL("");
+        FIELD PostDirectional:LABEL("Post-Direction"), DESCRIPTION("Post-Directional"),OPTIONAL,NULL("");
+        FIELD SecondaryRange:LABEL("Secondary Range"),DESCRIPTION("Secondary Range, Apt or Suite"),OPTIONAL,NULL("");
+        FIELD CityName_Vanity:LABEL("City"),DESCRIPTION("City"),OPTIONAL,NULL("");
+        FIELD State:LABEL("State"),DESCRIPTION("Two-letter State abbreviation"),OPTIONAL,NULL("");
+        FIELD Zip5:LABEL("Zip Code"),DESCRIPTION("5-Digit Zip Code"),OPTIONAL,NULL("");
+        FIELD FipsState:LABEL("Fips State"),DESCRIPTION("Fips State"),OPTIONAL,NULL("");
+        FIELD County:LABEL("Address County"),DESCRIPTION("Address County"),OPTIONAL,NULL("");
+        FIELD Latitude:LABEL("Address Latitude"),DESCRIPTION("Address Latitude"),OPTIONAL,NULL(""); 
+        FIELD Longitude:LABEL("Address Longitude"),DESCRIPTION("Address Longitude"),OPTIONAL,NULL("");  
+        FIELD ProfessionalScore:LABEL("Final Professional Score"),DESCRIPTION("Professional Score"),OPTIONAL,NULL("");
+        FIELD AddressScore:LABEL("Final Address Score"),DESCRIPTION("Address Score"),OPTIONAL,NULL("");
+        FIELD AddressExclusionFlag:LABEL("Address Exclusion Flag"),DESCRIPTION("Exclude Address from Scoring"),OPTIONAL,NULL("");
+        FIELD AddressClaimCount:LABEL("Address Claim Count"),DESCRIPTION("Address Claim Count"),OPTIONAL,NULL("");
+        FIELD AddressHighPaidAmount:LABEL("Address High Paid Amount"),DESCRIPTION("Address High Paid Amount"),OPTIONAL,NULL("");
+        FIELD AddressProviderCount:LABEL("Address Provider Count"),DESCRIPTION("Address Provider Count"),OPTIONAL,NULL("");
+        FIELD LNPIDClaimCount:LABEL("LNPID Claim Count"),DESCRIPTION("LNPID Claim Count"),OPTIONAL,NULL("");
+        FIELD LNPIDHighChargeAmount:LABEL("LNPID High Charge Amount"),DESCRIPTION("LNPID High Charge Amount"),OPTIONAL,NULL("");
+        FIELD LNPIDHighPaidAmount:LABEL("LNPID High Paid Amount"),DESCRIPTION("LNPID High Paid Amount"),OPTIONAL,NULL("");
+        FIELD NumberOfAddress:LABEL("Number of Address"),DESCRIPTION("Number of Address"),OPTIONAL,NULL("");
+        FIELD ProviderClaimCount:LABEL("Provider Claim Count"),DESCRIPTION("Provider Claim Count"),OPTIONAL,NULL("");
+        FIELD ProviderHighPaidAmount:LABEL("Provider High Paid Amount"),DESCRIPTION("Provider High Paid Amount"),OPTIONAL,NULL("");
+        FIELD AddressKey:LABEL("Address Key"),DESCRIPTION("Address Key"),OPTIONAL,NULL("");
+        FIELD HighPaidDollarsPerClaim:LABEL("High Paid Dollars Per Claim By Address"),DESCRIPTION("High Paid Dollars Per Claim By Address"),OPTIONAL,NULL("");
+    FIELD ClaimStartDate:LABEL("Claim Start Date"),DESCRIPTION("Claim Start Date"),OPTIONAL,NULL("");
+    FIELD ClaimEndDate:LABEL("Claim End Date"),DESCRIPTION("Claim End Date"),OPTIONAL,NULL("");
+        FIELD SuspectReason:LABEL("Suspect Flag Reason"),DESCRIPTION("Suspect Flag Reason"),OPTIONAL,NULL("");
+        FIELD SuspectDescription:LABEL("Reasons Description"),DESCRIPTION("Reasons Description"),OPTIONAL,NULL("");
+    END
+END
+
+OUTPUTS
+
+    DATASET ScoredDs : LARGE 
+        STRING50  ProviderKey;
+        STRING10  ProviderNPI;
+        STRING50  FacilityName;
+        STRING20  LastName;
+        STRING20  FirstName;
+        STRING20  MiddleName;
+        STRING5   SuffixName;
+        STRING10  PrimaryRange;
+        STRING2   PreDirectional;
+        STRING28  PrimaryName;
+        STRING4   AddressSuffix;
+        STRING2   PostDirectional;
+        STRING8   SecondaryRange;
+        STRING25  City;
+        STRING2   State;
+        STRING5   Zip5;
+        STRING5   CountyCode;
+        STRING7   StateCountyCode;
+        STRING50  AddressLine1;
+        STRING75  AddressLine;
+        STRING10  Latitude;
+        STRING10  Longitude;
+        UNSIGNED8 LNPID;
+        UNSIGNED8 LEXID;
+        STRING50  TaxonomyDescription;
+        STRING3   SpecialityCode;
+        UNSIGNED4 ProviderClaimCount;
+        UNSIGNED4 LNPIDClaimCount;
+        UNSIGNED8 ProviderHighChargeAmount;
+        UNSIGNED8 ProviderHighPaidAmount;
+        UNSIGNED8 LNPIDHighChargeAmount;
+        UNSIGNED8 LNPIDHighPaidAmount;
+        STRING1   AddressExclusionFlag;
+        UNSIGNED8 AddressProviderCount;
+        UNSIGNED8 AddressClaimCount;
+        UNSIGNED8 AddressHighPaidAmount;
+        UNSIGNED4 NumberOfAddress;
+        STRING25  AddressKey;
+        UNSIGNED4 AddressScore;
+        UNSIGNED4 ProfessionalScore;
+        STRING1   ProviderScored;
+        STRING8   AddressScoreRange;
+        INTEGER1  AddressScoreRangeGroup;
+        INTEGER8  AddressScoreRangeProviderCount;
+        INTEGER8  AddressScoreRangeAddressCount;
+        UNSIGNED2 StateCount;
+        UNSIGNED2 PaidPercent;
+        UNSIGNED2 PaidPercentByLNPID;
+        UNSIGNED2 ProviderScoreByLNPID;
+        STRING25  SLNPID;
+    END
+
+    DATASET ProviderDs  : LARGE
+        UNSIGNED8   LNPID;
+        STRING50    AddressLine1;
+        STRING20    City;
+        STRING2     State;
+        STRING5     Zip;
+        STRING20    ProviderKey;
+        STRING20    FirstName;
+        STRING20    MiddleName;
+        STRING20    LastName;
+        STRING50    FacilityName;
+        INTEGER8    TotalCharge;
+        INTEGER8    TotalPaid;
+        REAL4       PaidPercent;
+        INTEGER8    NoOfClaims;
+        STRING50    SpecialityDesc;
+        STRING10    NPI;
+        INTEGER2    ProviderScore;
+        STRING75    AddressLine;
+        STRING10  PrimaryRange;
+        STRING2   PreDirectional;
+        STRING28  PrimaryName;
+        STRING4   AddressSuffix;
+        STRING2   PostDirectional;
+        STRING8   SecondaryRange;
+        STRING5   CountyCode;
+        STRING7   StateCountyCode;
+        UNSIGNED8 LEXID;
+        STRING1     ReasonCode;
+        STRING4     Reason;
+        STRING75    ReasonCodeDescription;
+        STRING75    Description;
+        STRING100   ReasonValue;
+        STRING1     ReasonType;  
+    END
+
+    DATASET AddressDs  : LARGE
+        STRING50    AddressLine1;
+        STRING20    City;
+        STRING2     State;
+        STRING5     Zip;
+        STRING20    ProviderKey;
+        UNSIGNED8   LNPID;
+        INTEGER2    NoOfProviders;
+        INTEGER8    TotalPaid;
+        INTEGER8    TotalClaim;
+        INTEGER2    AddressScore;
+        STRING75    AddressLine;
+        INTEGER2    ProfessionalScore;
+        STRING5     CountyCode;
+        STRING7     StateCountyCode;
+        STRING10    Latitude;
+        STRING11    Longitude;
+        STRING25    AddressKey;
+        STRING1     ReasonCode;
+        STRING4     Reason;
+        STRING75    ReasonCodeDescription;
+        STRING75    Description;
+        STRING100   ReasonValue;
+        STRING1     ReasonType; 
+        STRING50    FacilityName;
+        STRING8    AddressScoreRange;
+        INTEGER1   AddressScoreRangeGroup;
+        INTEGER8   AddressScoreRangeAddressCount;
+    END
+
+    DATASET FacilityDs  : LARGE
+        STRING Provider_ID;
+        STRING Facility_Name;
+        STRING Legal_Business_Name;
+        STRING Doing_Business_As;
+        STRING Primary_Address;
+        STRING City;
+        STRING State;
+        STRING Zip;
+        STRING FacilityType;
+        INTEGER8 ChargedDollarAmount;
+        INTEGER8 PaidDollarAmount;
+        STRING ClaimsStartDate;
+        STRING ClaimsEndDate;
+        STRING NPI;
+        STRING Speciality;
+        UNSIGNED8 TotalClaims;
+    END
+END
+
+VISUALIZE MainDashBoard
+    FORM TopSuspectAddressScoresFORM: TITLE("Top Suspect Address Scores"),SELECTS(*->TopSuspectAddressScores), _flyout(true),_allowEmptyRequest(true)
+    STRING ProviderScored: LABEL("providerscored"),DEFAULT("1");
+    END
+    LINE TopSuspectAddressScores(ScoredDs{AddressLine,ProviderScored,MAX(AddressScore)}): Y(MAX(AddressScore)),X(AddressLine),FILTER(ProviderScored),SORT(-MAX(AddressScore)),FIRST(25),TITLE("Top Suspect Addresses"), _charttype("AM_BAR"), _yAxisDomainLow("0"), _yAxisDomainHigh("100"), _yAxisDomainPadding("10");
+    FORM ProviderFlagsFORM: TITLE("Provider Flags"),SELECTS(*->ProviderFlags), _flyout(true),_allowEmptyRequest(true)
+    STRING ReasonType: LABEL("reasontype"),DEFAULT("P");
+    END
+    PIE ProviderFlags(ProviderDs{Description,ReasonType,COUNT}): LABEL(Description),WEIGHT(COUNT),FILTER(ReasonType),TITLE("Provider Flags"), _charttype("AM_PIE");
+    FORM AddressFlagsFORM: TITLE("Address Flags"),SELECTS(*->AddressFlags), _flyout(true),_allowEmptyRequest(true)
+    STRING ReasonType: LABEL("reasontype"),DEFAULT("A");
+    END
+    PIE AddressFlags(AddressDs{Description,ReasonType,COUNT}): LABEL(Description),WEIGHT(COUNT),FILTER(ReasonType),TITLE("Address Flags"), _charttype("AM_PIE");
+    FORM SuspectAddressDistributionFORM: TITLE("Suspect Address Distribution"),SELECTS(*->SuspectAddressDistribution), _flyout(true),_allowEmptyRequest(true)
+    STRING ProviderScored: LABEL("providerscored"),DEFAULT("1");
+    END
+    CHORO SuspectAddressDistribution(ScoredDs{State,ProviderScored,MAX(StateCount)}): STATE(State),WEIGHT(MAX(StateCount)),COLOR("Red_Yellow_Blue"),FILTER(ProviderScored),TITLE("Suspect Address Distribution"), _charttype("CHORO");
+END
+
+VISUALIZE TopSuspectAddressDashboard
+    LINE TopSuspectAddressLocations(ScoredDs{AddressLine,MAX(AddressScore)}): Y(MAX(AddressScore)),X(AddressLine),SORT(-MAX(AddressScore)),SELECTS(AddressLine->CompleteAddress.AddressLine,TotalPaidDollars.AddressLine,TotalClaims.AddressLine,TotalProviders.AddressLine,AddressScores.AddressLine,SuspectAddressFlags.AddressLine,SuspectProvidersatSelectedAddress.AddressLine,MERGE),FIRST(25),TITLE("Top Suspect Address Locations"), _charttype("AM_BAR");
+    TABLE CompleteAddress(ScoredDs{Latitude,Longitude,AddressLine}): LABEL("latitude","longitude","AddressLine"),VALUE(Latitude,Longitude,AddressLine),FILTER(AddressLine),FIRST(1),TITLE("Complete Address"), _charttype("TABLE");
+    TABLE TotalPaidDollars(ScoredDs{MAX(AddressHighPaidAmount),AddressLine}): LABEL("MAX(AddressHighPaidAmount)","AddressLine"),VALUE(MAX(AddressHighPaidAmount),AddressLine),FILTER(AddressLine),TITLE("Total Paid Dollars"), _charttype("TABLE");
+    TABLE TotalClaims(ScoredDs{MAX(AddressClaimCount),AddressLine}): LABEL("MAX(AddressClaimCount)","AddressLine"),VALUE(MAX(AddressClaimCount),AddressLine),FILTER(AddressLine),TITLE("Total Claims"), _charttype("TABLE");
+    TABLE TotalProviders(ScoredDs{MAX(AddressProviderCount),AddressLine}): LABEL("MAX(AddressProviderCount)","AddressLine"),VALUE(MAX(AddressProviderCount),AddressLine),FILTER(AddressLine),TITLE("Total Providers"), _charttype("TABLE");
+    TABLE AddressScores(ScoredDs{MAX(AddressScore),AddressLine}): LABEL("MAX(AddressScore)","AddressLine"),VALUE(MAX(AddressScore),AddressLine),FILTER(AddressLine),TITLE("Address Score"), _charttype("TABLE");
+    TABLE SuspectAddressFlags(AddressDs{Description,ReasonValue,AddressLine}): LABEL("Description","ReasonValue"),VALUE(Description,ReasonValue),FILTER(AddressLine),TITLE("Suspect Address Flags"), _charttype("TABLE");
+    TABLE SuspectProvidersatSelectedAddress(ScoredDs{ProviderKey,FirstName,MiddleName,LastName,FacilityName,ProviderHighPaidAmount,PaidPercent,ProviderClaimCount,TaxonomyDescription,ProviderNPI,ProfessionalScore,AddressLine}): LABEL("Provider ID(s)","First Name","Middle Name","Last Name","Facility","Paid Dollars","% Paid (Relative to charged dollars)","Claims","Specialty","NPI","Provider Score"),VALUE(ProviderKey,FirstName,MiddleName,LastName,FacilityName,ProviderHighPaidAmount,PaidPercent,ProviderClaimCount,TaxonomyDescription,ProviderNPI,ProfessionalScore),SORT(-ProfessionalScore,-ProviderHighPaidAmount),SELECTS(ProviderKey->SuspectProviderFlags.ProviderKey,RelationshipGraph.ProviderKey,MERGE),FILTER(AddressLine),TITLE("Suspect Providers at Selected Address"), _charttype("TABLE");
+    FORM SuspectProviderFlagsFORM: TITLE("Suspect Provider Flags"),SELECTS(*->SuspectProviderFlags), _flyout(true),_allowEmptyRequest(true)
+    STRING ReasonType: LABEL("ReasonType"),DEFAULT("P");
+    END
+    TABLE SuspectProviderFlags(ProviderDs{Description,ReasonValue,ReasonType,ProviderKey}): LABEL("Description","ReasonValue"),VALUE(Description,ReasonValue),FILTER(ReasonType,ProviderKey),TITLE("Suspect Provider Flags"), _charttype("TABLE");
+    TABLE RelationshipGraph(ScoredDs{SLNPID,ProviderKey}): LABEL("Provider LNPID"),VALUE(SLNPID),FILTER(ProviderKey),TITLE("Relationship Graph"), _charttype("TABLE");
+END
+
+GENERATES INLINE 
+
+   %^sReasonLayout% := RECORD
+     STRING4 Reason;
+     STRING Description;
+     STRING Value;
+   END;
+
+    %^sScoredRec% := RECORD
+        STRING50  ProviderKey;
+        STRING10  ProviderNPI;
+        STRING50  FacilityName;
+        STRING20  LastName;
+        STRING20  FirstName;
+        STRING20  MiddleName;
+        STRING5   SuffixName;
+        STRING10  PrimaryRange;
+        STRING2   PreDirectional;
+        STRING28  PrimaryName;
+        STRING4   AddressSuffix;
+        STRING2   PostDirectional;
+        STRING8   SecondaryRange;
+        STRING25  City;
+        STRING2   State;
+        STRING5   Zip5;
+        STRING5   CountyCode;
+        STRING7   StateCountyCode;
+        STRING50  AddressLine1;
+        STRING75  AddressLine;
+        STRING10  Latitude;
+        STRING10  Longitude;
+        UNSIGNED8 LNPID;
+        UNSIGNED8 LEXID;
+        STRING50  TaxonomyDescription;
+        STRING3   SpecialityCode;
+        UNSIGNED4 ProviderClaimCount;
+        UNSIGNED4 LNPIDClaimCount;
+        UNSIGNED8 ProviderHighChargeAmount;
+        UNSIGNED8 ProviderHighPaidAmount;
+        UNSIGNED8 LNPIDHighChargeAmount;
+        UNSIGNED8 LNPIDHighPaidAmount;
+        STRING1   AddressExclusionFlag;
+        UNSIGNED8 AddressProviderCount;
+        UNSIGNED8 AddressClaimCount;
+        UNSIGNED8 AddressHighPaidAmount;
+        UNSIGNED4 NumberOfAddress;
+        STRING25  AddressKey;
+        UNSIGNED4 AddressScore;
+        UNSIGNED4 ProfessionalScore;
+        STRING1   ProviderScored;
+        STRING8   AddressScoreRange;
+        INTEGER1  AddressScoreRangeGroup;
+        INTEGER8  AddressScoreRangeProviderCount;
+        INTEGER8  AddressScoreRangeAddressCount;
+        UNSIGNED2 StateCount;
+        UNSIGNED2 PaidPercent;
+        UNSIGNED2 PaidPercentByLNPID;
+        UNSIGNED2 ProviderScoreByLNPID;
+        STRING25  SLNPID;
+        STRING1   ProviderType;
+        STRING25  ContextUID;
+        DATASET (%ReasonLayout%) ScoreReasons;
+    END;
+
+    %^sScoredOutRec% := RECORD
+            %ScoredRec% - ScoreReasons;
+    END;
+
+    %^sTopSuspectAddressRecord% := RECORD
+            STRING50    AddressLine1;
+            STRING20    City;
+            STRING2     State;
+            STRING5     Zip;
+            STRING75    AddressLine;
+            INTEGER2    AddressScore;
+            STRING5     CountyCode;
+    END;    
+    
+    %^sTopProviderRec% := RECORD
+        STRING10  PrimaryRange;
+        STRING2   PreDirectional;
+        STRING28  PrimaryName;
+        STRING4   AddressSuffix;
+        STRING2   PostDirectional;
+        STRING8   SecondaryRange;
+        STRING25  City;
+        STRING2   State;
+        STRING5   Zip5;
+        UNSIGNED4 ProfessionalScore;
+        DATASET (%ReasonLayout%) ScoreReasons;
+    END;
+    
+    %^sFacilityRec% := RECORD
+        STRING Provider_ID;
+        STRING Facility_Name;
+        STRING Legal_Business_Name;
+        STRING Doing_Business_As;
+        STRING Primary_Address;
+        STRING City;
+        STRING State;
+        STRING Zip;
+        STRING FacilityType;
+        INTEGER8 ChargedDollarAmount;
+        INTEGER8 PaidDollarAmount;
+        STRING ClaimsStartDate;
+        STRING ClaimsEndDate;
+        STRING NPI;
+        STRING Speciality;
+        UNSIGNED8 TotalClaims;
+    END;
+    
+    IMPORT STD, HealthCareProvider;
+
+    %^sTrimFacilityDs% := PROJECT (%dsInput% (%FacilityName% <> '' AND %AddressExclusionFlag% <> 'Y' AND %LNPID% = 0), TRANSFORM(%FacilityRec%,
+        SELF.Provider_ID        := '_' + LEFT.%ProviderKey%;
+        SELF.Facility_Name      := LEFT.%FacilityName%;
+        SELF.Legal_Business_Name    := '';
+        SELF.Doing_Business_As      := '';
+        SELF.Primary_Address        := STD.STR.CleanSpaces (TRIM(LEFT.%PrimaryRange%) + ' ' + 
+                                                                                             TRIM(LEFT.%PreDirectional%) + ' ' + 
+                                                                                             TRIM(LEFT.%PrimaryName%) + ' ' + 
+                                                                                             TRIM(LEFT.%AddressSuffix%) + ' ' + 
+                                                                                             TRIM(LEFT.%AddressSuffix%) + ' ' + 
+                                                                                             TRIM(LEFT.%SecondaryRange%)); 
+
+        SELF.City           := LEFT.%CityName_Vanity%;
+        SELF.State          := LEFT.%State%;
+        SELF.Zip            := LEFT.%Zip5%;
+        SELF.FacilityType       := '';
+        SELF.ChargedDollarAmount    := LEFT.%TotalChargeAmount%;
+        SELF.PaidDollarAmount       := LEFT.%TotalPaidAmount%;
+        SELF.ClaimsStartDate        := IF (HealthCareProvider.isValidDate (LEFT.%ClaimStartDate%),LEFT.%ClaimStartDate%,''); 
+        SELF.ClaimsEndDate      := IF (HealthCareProvider.isValidDate (LEFT.%ClaimEndDate%),LEFT.%ClaimEndDate%,'');
+        SELF.NPI            := LEFT.%ProviderNpi%;
+        SELF.Speciality         := LEFT.%ProviderSpecialtyDescription%;
+        SELF.TotalClaims        := LEFT.%ProviderClaimCount%;
+        ));
+
+    MaxAddressScore := MAX (%dsInput%, %AddressScore%) : INDEPENDENT;
+    
+    IMPORT STD, hipie_ecl;
+
+    TrimScoredOutDs := PROJECT(%dsInput%, TRANSFORM(%ScoredRec%,
+                                        SELF.ProviderKey    :=  '_' + LEFT.%ProviderKey%,
+                                        SELF.ProviderNpi    :=  LEFT.%ProviderNpi%,
+                                        SELF.FacilityName   :=  LEFT.%FacilityName%,
+                                        SELF.LastName       :=  LEFT.%ProviderLastName%,
+                                        SELF.FirstName      :=  LEFT.%ProviderFirstName%,
+                                        SELF.MiddleName     :=  LEFT.%ProviderMiddleName%,
+                                        SELF.SuffixName     :=  LEFT.%ProviderSuffixName%,
+                                        SELF.PrimaryRange   :=  LEFT.%PrimaryRange%,
+                                        SELF.PreDirectional :=  LEFT.%PreDirectional%,
+                                        SELF.PrimaryName    :=  LEFT.%PrimaryName%,
+                                        SELF.AddressSuffix  :=  LEFT.%AddressSuffix%,
+                                        SELF.PostDirectional    :=  LEFT.%PostDirectional%,
+                                        SELF.SecondaryRange     :=  LEFT.%SecondaryRange%,
+                                        SELF.City               :=  LEFT.%CityName_Vanity%,
+                                        SELF.State              :=  LEFT.%State%,
+                                        SELF.Zip5               :=  LEFT.%Zip5%,
+                                        SELF.CountyCode         :=  LEFT.%FipsState% + LEFT.%County%,
+                                        SELF.StateCountyCode    :=  LEFT.%State% + LEFT.%FipsState% + LEFT.%County%,
+                                        SELF.AddressLine1       :=  STD.STR.CleanSpaces (TRIM(LEFT.%PrimaryRange%) + ' ' + 
+                                                                                         TRIM(LEFT.%PreDirectional%) + ' ' + 
+                                                                                         TRIM(LEFT.%PrimaryName%) + ' ' + 
+                                                                                         TRIM(LEFT.%AddressSuffix%) + ' ' + 
+                                                                                         TRIM(LEFT.%PostDirectional%) + ' ' + 
+                                                                                         TRIM(LEFT.%SecondaryRange%)); 
+                                        SELF.AddressLine        :=  STD.STR.CleanSpaces (TRIM(LEFT.%PrimaryRange%) + ' ' + 
+                                                                                         TRIM(LEFT.%PreDirectional%) + ' ' + 
+                                                                                         TRIM(LEFT.%PrimaryName%) + ' ' + 
+                                                                                         TRIM(LEFT.%AddressSuffix%) + ' ' + 
+                                                                                         TRIM(LEFT.%PostDirectional%) + ' ' + 
+                                                                                         TRIM(LEFT.%SecondaryRange%) + ' ' + 
+                                                                                         TRIM(LEFT.%CityName_Vanity%) + ' ' + 
+                                                                                         TRIM(LEFT.%State%) + ' ' + 
+                                                                                         TRIM(LEFT.%Zip5%));
+                                        SELF.Latitude           :=  LEFT.%Latitude%,
+                                        SELF.Longitude          :=  LEFT.%Longitude%,
+                                        SELF.LNPID              :=  LEFT.%LNPID%,
+                                        SELF.LEXID                  :=  LEFT.%LEXID%,
+                                        SELF.TaxonomyDescription    :=  LEFT.%ProviderSpecialtyDescription%,
+                                        SELF.ProviderClaimCount     :=  LEFT.%ProviderClaimCount%,
+                                        SELF.LNPIDClaimCount        :=  LEFT.%LNPIDClaimCount%,
+                                        SELF.ProviderHighChargeAmount       :=  ROUND(LEFT.%TotalChargeAmount%),
+                                        SELF.ProviderHighPaidAmount         :=  ROUND(LEFT.%TotalPaidAmount%),
+                                        SELF.LNPIDHighChargeAmount          :=  ROUND(LEFT.%LNPIDHighChargeAmount%),
+                                        SELF.LNPIDHighPaidAmount            :=  ROUND(LEFT.%LNPIDHighPaidAmount%),
+                                        SELF.AddressExclusionFlag           :=  LEFT.%AddressExclusionFlag%,
+                                        SELF.AddressProviderCount           :=  LEFT.%AddressProviderCount%,
+                                        SELF.AddressClaimCount              :=  LEFT.%AddressClaimCount%,
+                                        SELF.AddressHighPaidAmount          :=  ROUND(LEFT.%AddressHighPaidAmount%),
+                                        SELF.NumberOfAddress                :=  LEFT.%NumberOfAddress%,
+                                        SELF.AddressKey                     :=  LEFT.%AddressKey%,
+                                        SELF.ProfessionalScore              :=  LEFT.%ProfessionalScore%,
+                                        SELF.ScoreReasons                   :=  LEFT.%ScoreReasons%,
+                                        SELF.ProviderScored                 := IF(LEFT.%ProfessionalScore% > 0, '1', '0'); 
+                                        SELF.AddressScore                   := ROUNDUP((LEFT.%AddressScore% * 100)/MaxAddressScore);
+                                        SELF.PaidPercent                    := ROUND ((LEFT.%TotalPaidAmount% / LEFT.%TotalChargeAmount%) * 100);
+                                        SELF.AddressScoreRangeGroup := MAP(SELF.AddressScore BETWEEN 1 AND 20 => 5,
+                                                                           SELF.AddressScore BETWEEN 21 AND 40 => 4,
+                                                                           SELF.AddressScore BETWEEN 41 AND 60 => 3,
+                                                                           SELF.AddressScore BETWEEN 61 AND 80 => 2,
+                                                                           SELF.AddressScore BETWEEN 81 AND 100 => 1,
+                                                                                                                    0);
+                                         SELF.AddressScoreRange := MAP(SELF.AddressScoreRangeGroup = 5 => '1  - 20 ',
+                                                                       SELF.AddressScoreRangeGroup = 4 => '21 - 40 ',
+                                                                       SELF.AddressScoreRangeGroup = 3 => '41 - 60 ',
+                                                                       SELF.AddressScoreRangeGroup = 2 => '61 - 80 ',
+                                                                       SELF.AddressScoreRangeGroup = 1 => '81 - 100',
+                                                                                                          '        ');
+                                         SELF.AddressScoreRangeProviderCount := LEFT.%TotalProviderCount%;
+                                         SELF.AddressScoreRangeAddressCount  := 0;
+                                         SELF.PaidPercentByLNPID             := ROUND((LEFT.%LNPIDHighPaidAmount% /  LEFT.%LNPIDHighChargeAmount%) * 100); 
+                                         SELF.SLNPID                         := (STRING)LEFT.%LNPID%;
+                                         SELF.ProviderType                   := MAP(LEFT.%ProviderLastName% <> '' AND LEFT.%ProviderFirstName% <> '' => 'P',
+                                                                                    LEFT.%FacilityName% <> '' => 'F','');
+                                         SELF.ContextUID                     := IF(SELF.SLNPID <> '', hipie_ecl.MacGraphContextUID (8,SELF.SLNPID),'');
+                                         SELF := LEFT;
+                                         SELF := [];)); 
+
+    AddressScoreRangeCount := TABLE (DEDUP(DISTRIBUTE(TrimScoredOutDs (AddressExclusionFlag <> 'Y' AND AddressScoreRange <> '' AND AddressKey <> '' and State <> ''),HASH32(State, AddressKey, AddressScoreRange)),State, AddressKey, AddressScoreRange, ALL, LOCAL), {State, AddressScoreRange, AddressRangeCount := COUNT(GROUP)},State, AddressScoreRange, MERGE );
+    
+    %^sScoredOutDs% := JOIN (TrimScoredOutDs,AddressScoreRangeCount, LEFT.State = RIGHT.State AND LEFT.AddressScoreRange = RIGHT.AddressScoreRange, TRANSFORM(%ScoredRec%, 
+            SELF.AddressScoreRangeAddressCount := RIGHT.AddressRangeCount;
+            SELF := LEFT;
+                ), LEFT OUTER, HASH);
+
+    TopAddrDs := DEDUP(SORT (DISTRIBUTE(%ScoredOutDs% (PrimaryName <> '' AND Zip5 <> ''),HASH32(AddressLine)),AddressLine, -AddressScore,LOCAL), AddressLine,LOCAL);      
+    TopAddrTable := TABLE(TopAddrDs (State <> ''), {State, StateCounts := COUNT(GROUP)}, State, MERGE);
+    ScoredDsWithStateCount := JOIN(%ScoredOutDs%, TopAddrTable, LEFT.State = RIGHT.State, TRANSFORM(%ScoredRec%,
+                                                                SELF.StateCount := RIGHT.StateCounts;
+                                                                SELF := LEFT;), LEFT OUTER, HASH);
+
+    SortLNPIDDs  := SORT (DISTRIBUTE(%ScoredOutDs% (LNPID > 0),HASH32(LNPID)), LNPID,LOCAL);
+    GroupLNPIDDs := GROUP(SortLNPIDDs, LNPID,LOCAL);   
+   
+    %ScoredRec% LnpidRollUp (%ScoredRec% L, DATASET (%ScoredRec%) R) := TRANSFORM
+        SELF.ProviderScoreByLnpid := MAX(r,ProfessionalScore);
+        SELF := L;
+    END;
+
+    RollupLnpidTrimDs := ROLLUP (GroupLNPIDDs, GROUP, LnpidRollUp(LEFT, ROWS(LEFT)));
+   
+    %^sJoinLNPIDDs% := JOIN(ScoredDsWithStateCount, RollupLnpidTrimDs, LEFT.LNPID = RIGHT.LNPID, TRANSFORM(%ScoredRec%,
+                                                SELF.ProviderScoreByLnpid := RIGHT.ProviderScoreByLnpid;
+                                                SELF := LEFT;), LEFT OUTER,HASH);
+
+    %^sTrimScoredDs% := PROJECT(%JoinLNPIDDs%, TRANSFORM(%ScoredOutRec%, SELF := LEFT;));
+
+    TopScoredProvider    := DEDUP(SORT(DISTRIBUTE(PROJECT (%JoinLNPIDDs% (PrimaryName <> '' AND Zip5 <> ''), %TopProviderRec%),HASH32(PrimaryRange, PreDirectional, PrimaryName, AddressSuffix, PostDirectional, SecondaryRange, City, State, Zip5)), PrimaryRange, PreDirectional, PrimaryName, AddressSuffix, PostDirectional, SecondaryRange, City, State, Zip5, -ProfessionalScore,LOCAL), PrimaryRange, PreDirectional, PrimaryName, AddressSuffix, PostDirectional, SecondaryRange, City, State, Zip5,LOCAL);
+    FilterExcludedAddress := %JoinLNPIDDs% (AddressExclusionFlag <> 'Y' AND PrimaryName <> '' AND Zip5 <> '');
+   
+    %^sSuspectAddress% := JOIN(FilterExcludedAddress, TopScoredProvider, LEFT.PrimaryRange = RIGHT.PrimaryRange AND 
+                                                                    LEFT.PreDirectional = RIGHT.PreDirectional AND 
+                                                                    LEFT.PrimaryName = RIGHT.PrimaryName AND 
+                                                                    LEFT.AddressSuffix = RIGHT.AddressSuffix AND 
+                                                                    LEFT.PostDirectional = RIGHT.PostDirectional AND 
+                                                                    LEFT.SecondaryRange = RIGHT.SecondaryRange AND 
+                                                                    LEFT.City = RIGHT.City AND 
+                                                                    LEFT.State = RIGHT.State AND 
+                                                                    LEFT.Zip5 = RIGHT.Zip5, 
+                                                                    TRANSFORM(RECORDOF(LEFT),
+                                                                        SELF.ScoreReasons := LEFT.ScoreReasons; 
+                                                                        SELF := LEFT;), HASH);
+    
+    AddressDs := PROJECT(%SuspectAddress%, TRANSFORM(%TopSuspectAddressRecord%, SELF.Zip := LEFT.Zip5; SELF := LEFT;));
+   
+    TopAddress := DEDUP(SORT(DISTRIBUTE(AddressDs,HASH32(AddressLine1, City, State, Zip)), AddressLine1, City, State, Zip, -AddressScore, LOCAL), AddressLine1, City, State, Zip, LOCAL);  
+
+    TopStateDs := TABLE(TopAddress ,{State, StateCount := COUNT(GROUP)}, State, MERGE);
+
+    %^sTopAddressDs% := SORT(TopAddress (AddressScore > 0),-AddressScore);
+
+    %^sTopSuspectAddressDataRecord% := RECORD
+            STRING50    AddressLine1;
+            STRING20    City;
+            STRING2     State;
+            STRING5     Zip;
+            STRING20    ProviderKey;
+            UNSIGNED8   LNPID;
+            DATASET (%ReasonLayout%) ScoreReasons;
+            INTEGER2    NoOfProviders;
+            INTEGER8    TotalPaid;
+            INTEGER8    TotalClaim;
+            INTEGER2    AddressScore;
+            STRING75    AddressLine;
+            INTEGER2    ProfessionalScore;
+            STRING5     CountyCode;
+            STRING7     StateCountyCode;
+            STRING10    Latitude;
+            STRING11    Longitude;
+            STRING25    AddressKey;
+            STRING50    FacilityName;
+            STRING8     AddressScoreRange;
+            INTEGER1    AddressScoreRangeGroup;
+            INTEGER8    AddressScoreRangeAddressCount;
+    END;
+
+    AddressDataDs := PROJECT(%SuspectAddress%, TRANSFORM(%TopSuspectAddressDataRecord%, 
+      SELF.NoOfProviders  := LEFT.AddressProviderCount;
+      SELF.TotalPaid      := LEFT.AddressHighPaidAmount;
+      SELF.TotalClaim     := LEFT.AddressClaimCount; SELF.Zip := LEFT.Zip5; SELF := LEFT));
+
+    TopAddressDataDs := JOIN (AddressDataDs, %TopAddressDs%, LEFT.AddressLine1 = RIGHT.AddressLine1 AND 
+                                                          LEFT.City = RIGHT.City AND 
+                                                          LEFT.State = RIGHT.State AND 
+                                                          LEFT.Zip = RIGHT.Zip,
+                                                          TRANSFORM(%TopSuspectAddressDataRecord%, 
+                                                                SELF := LEFT;),RIGHT OUTER, HASH);
+
+    SortedAddressDs := SORT(DISTRIBUTE(TopAddressDataDs, HASH32(AddressLine, City, State, Zip)), AddressLine, City, State, Zip, -AddressScore, LOCAL);
+    GroupAddressDs  := GROUP (SortedAddressDs, AddressLine, City, State, Zip, LOCAL);
+
+    %TopSuspectAddressDataRecord% NormAddrData (%TopSuspectAddressDataRecord% l, DATASET (%TopSuspectAddressDataRecord%) R) := TRANSFORM
+            Norm_Ds := NORMALIZE (R, COUNT(LEFT.ScoreReasons), TRANSFORM(%ReasonLayout%, SELF.Reason := LEFT.ScoreReasons[COUNTER].Reason; 
+                                                                                       SELF.Description := LEFT.ScoreReasons[COUNTER].Description;
+                                                                                       SELF.Value := LEFT.ScoreReasons[COUNTER].Value));
+            SDS := SORT(Norm_Ds,Reason);
+            DSDS := DEDUP (SDS (Reason <> ''),Reason);
+            SELF.ScoreReasons := PROJECT (DSDS,TRANSFORM(%ReasonLayout%, SELF := LEFT;));
+            SELF := L;
+    END;
+
+    %^sRolledAddressDs% := ROLLUP (GroupAddressDs,GROUP,NormAddrData(LEFT,ROWS(LEFT)));
+
+    %^sTopSuspectAddressReasonRecord% := RECORD
+            STRING50    AddressLine1;
+            STRING20    City;
+            STRING2     State;
+            STRING5     Zip;
+            STRING20    ProviderKey;
+            UNSIGNED8   LNPID;
+            STRING25    SLNPID;
+            INTEGER2    NoOfProviders;
+            INTEGER8    TotalPaid;
+            INTEGER8    TotalClaim;
+            INTEGER2    AddressScore;
+            STRING75    AddressLine;
+            INTEGER2    ProfessionalScore;
+            STRING5     CountyCode;
+            STRING7     StateCountyCode;
+            STRING10    Latitude;
+            STRING11    Longitude;
+            STRING25    AddressKey;
+            STRING1     ReasonCode;
+            STRING4     Reason;
+            STRING75    ReasonCodeDescription;
+            STRING75    Description;
+            STRING100   ReasonValue;
+            STRING1     ReasonType;     
+            STRING50    FacilityName;       
+            STRING8     AddressScoreRange;
+            INTEGER1    AddressScoreRangeGroup;
+            INTEGER8    AddressScoreRangeAddressCount;
+    END;
+
+    AddressReasonAttrDs := NORMALIZE (%RolledAddressDs%, COUNT(LEFT.ScoreReasons), TRANSFORM(%TopSuspectAddressReasonRecord%, 
+                                SELF.ReasonCode             := LEFT.ScoreReasons[counter].Reason [1..1]; 
+                                SELF.Reason                 := LEFT.ScoreReasons[counter].Reason; 
+                                SELF.ReasonCodeDescription  := MAP(SELF.ReasonCode = 'A' => 'Flagged Addresses', 
+                                                                   SELF.ReasonCode = 'B' => 'Federal & State Exclusion Providers', 
+                                                                   SELF.ReasonCode = 'C' => 'Flagged License Providers', 
+                                                                   SELF.ReasonCode = 'D' => 'Deceased/Deactivated NPI Providers', 
+                                                                   SELF.ReasonCode = 'E' => 'Flagged Facilities', 
+                                                                   SELF.ReasonCode = 'F' => 'High Paid Providers', 
+                                                                   SELF.ReasonCode = 'G' => 'Flagged Patient Profile Providers', 
+                                                                   SELF.ReasonCode = 'H' => 'Flagged Distances Providers', 
+                                                                   SELF.ReasonCode = 'I' => 'Flagged Relationship Providers', 
+                                                                   SELF.ReasonCode = 'J' => 'Bankruptcy/Felony Providers', 
+                                                                   '');
+                                SELF.Description            := LEFT.ScoreReasons[counter].Description;
+                                SELF.ReasonValue            := LEFT.ScoreReasons[counter].Value;
+                                SELF.ReasonType             := IF (SELF.ReasonCode IN ['A','E'],'A','P');
+                                SELF.SLNPID                 := (STRING) LEFT.LNPID;
+                                SELF.LNPID                  := LEFT.LNPID; SELF := LEFT;));
+            
+    %^sAddressAttrsDs% := DEDUP(SORT(DISTRIBUTE(AddressReasonAttrDs(Reason <> ''),HASH32(Reason,AddressLine)),Reason,AddressLine, LOCAL),Reason,AddressLine, LOCAL);
+
+    %^sTopSuspectAddressProviderRecord% := RECORD
+            UNSIGNED8   LNPID;
+            STRING50    AddressLine1;
+            STRING20    City;
+            STRING2     State;
+            STRING5     Zip;
+            STRING20    ProviderKey;
+            STRING20    FirstName;
+            STRING20    MiddleName;
+            STRING20    LastName;
+            STRING50    FacilityName;
+            INTEGER8    TotalCharge;
+            INTEGER8    TotalPaid;
+            REAL4       PaidPercent;
+            INTEGER8    NoOfClaims;
+            UNSIGNED4 NumberOfAddress;
+            STRING50    SpecialityDesc;
+            STRING10    NPI;
+            INTEGER2    ProviderScore;
+            STRING75    AddressLine;
+            DATASET (%ReasonLayout%) ScoreReasons;
+            STRING10  PrimaryRange;
+            STRING2   PreDirectional;
+            STRING28  PrimaryName;
+            STRING4   AddressSuffix;
+            STRING2   PostDirectional;
+            STRING8   SecondaryRange;
+            STRING5   CountyCode;
+            STRING7   StateCountyCode;
+            UNSIGNED8 LEXID;
+            STRING10  Latitude;
+            STRING11  Longitude;
+            STRING25  AddressKey;
+    END;
+
+    %^sTopSuspectProviderReasonRecord% := RECORD
+            UNSIGNED8   LNPID;
+            STRING50    AddressLine1;
+            STRING20    City;
+            STRING2     State;
+            STRING5     Zip;
+            STRING20    ProviderKey;
+            STRING20    FirstName;
+            STRING20    MiddleName;
+            STRING20    LastName;
+            STRING50    FacilityName;
+            INTEGER8    TotalCharge;
+            INTEGER8    TotalPaid;
+            REAL4       PaidPercent;
+            INTEGER8    NoOfClaims;
+            UNSIGNED4 NumberOfAddress;
+            STRING50    SpecialityDesc;
+            STRING10    NPI;
+            INTEGER2    ProviderScore;
+            STRING75    AddressLine;
+            STRING10  PrimaryRange;
+            STRING2   PreDirectional;
+            STRING28  PrimaryName;
+            STRING4   AddressSuffix;
+            STRING2   PostDirectional;
+            STRING8   SecondaryRange;
+            STRING5   CountyCode;
+            STRING7   StateCountyCode;
+            UNSIGNED8 LEXID;
+            STRING10  Latitude;
+            STRING11  Longitude;
+            STRING25  AddressKey;
+            STRING1     ReasonCode;
+            STRING4     Reason;
+            STRING75    ReasonCodeDescription;
+            STRING75    Description;
+            STRING100   ReasonValue;
+            STRING1     ReasonType;     
+            STRING25    SLNPID;   
+            STRING25    ContextUID;    
+    END;
+
+    ProviderDataDs := PROJECT (%ScoredOutDs% (PrimaryName <> '' AND Zip5 <> ''), TRANSFORM(%TopSuspectAddressProviderRecord%, 
+       SELF.TotalCharge    := LEFT.LNPIDHighChargeAmount;
+       SELF.TotalPaid      := LEFT.LNPIDHighPaidAmount;
+       SELF.PaidPercent    := ROUND((LEFT.ProviderHighPaidAmount / LEFT.ProviderHighChargeAmount) * 100);
+       SELF.NoOfClaims     := LEFT.LNPIDClaimCount;
+       SELF.SpecialityDesc := LEFT.TaxonomyDescription;
+       SELF.Npi            := LEFT.ProviderNPI;
+       SELF.ProviderScore  := LEFT.ProfessionalScore;
+       SELF.ScoreReasons   := LEFT.ScoreReasons;
+       SELF.Zip            := LEFT.Zip5;
+       SELF                := LEFT;));
+
+    import hipie_ecl;
+
+    ReasonAttrDs := NORMALIZE (ProviderDataDs, COUNT(LEFT.ScoreReasons), TRANSFORM(%TopSuspectProviderReasonRecord%, 
+                                SELF.ReasonCode             := LEFT.ScoreReasons[counter].Reason [1..1]; 
+                                SELF.Reason                 := LEFT.ScoreReasons[counter].Reason; 
+                                SELF.ReasonCodeDescription  := MAP(SELF.ReasonCode = 'A' => 'Flagged Addresses', 
+                                                                   SELF.ReasonCode = 'B' => 'Federal & State Exclusion Providers', 
+                                                                   SELF.ReasonCode = 'C' => 'Flagged License Providers', 
+                                                                   SELF.ReasonCode = 'D' => 'Deceased/Deactivated NPI Providers', 
+                                                                   SELF.ReasonCode = 'E' => 'Flagged Facilities', 
+                                                                   SELF.ReasonCode = 'F' => 'High Paid Providers', 
+                                                                   SELF.ReasonCode = 'G' => 'Flagged Patient Profile Providers', 
+                                                                   SELF.ReasonCode = 'H' => 'Flagged Distances Providers', 
+                                                                   SELF.ReasonCode = 'I' => 'Flagged Relationship Providers', 
+                                                                   SELF.ReasonCode = 'J' => 'Bankruptcy/Felony Providers', 
+                                                                   '');
+                                SELF.Description            := LEFT.ScoreReasons[counter].Description;
+                                SELF.ReasonValue            := LEFT.ScoreReasons[counter].Value;
+                                SELF.ReasonType             := IF (SELF.ReasonCode IN ['A','E'],'A','P');
+                                SELF.LNPID                  := LEFT.LNPID;
+                                SELF.SLNPID                 := (STRING)LEFT.LNPID;
+                                SELF.ContextUID             := IF(SELF.SLNPID <> '', hipie_ecl.MacGraphContextUID (8,SELF.SLNPID),'');
+                                SELF := LEFT;));
+            
+    %^sProviderAttrsDs% := DEDUP(SORT(DISTRIBUTE(ReasonAttrDs(Reason <> ''),HASH32(Reason,ProviderKey)),Reason,ProviderKey,LOCAL),Reason,ProviderKey,LOCAL);
+
+    AttrTable := TABLE(%ProviderAttrsDs%,{ReasonCode, Reason, ReasonCodeDescription, ReasonCount := COUNT(GROUP)}, ReasonCode, MERGE);
+
+    PieChartDs := PROJECT(AttrTable, TRANSFORM(RECORDOF(AttrTable), 
+                                            SELF.ReasonCodeDescription := LEFT.ReasonCodeDescription;
+                                            SELF := LEFT;));
+
+   %^eScoredDs%      := %TrimScoredDs% %^p%;
+   %^eProviderDs%    := %ProviderAttrsDs% %^p%;
+   %^eAddressDs%     := %AddressAttrsDs% %^p%;
+   %^eFacilityDs%    := %TrimFacilityDs% %^p%;
+ENDGENERATES
+
+RESOURCES
+    FILE ReadMe: FILENAME("SuspectAddressVisualization_ReadMe.txt"),LABEL("Plugin Readme File");
+    FILE SuspectAddressVisualization_testcmp: FILENAME("SuspectAddressVisualization_testcmp.txt"),LABEL("Plugin Test Composition");
+    FILE SuspectAddressVisualization_BuildTestDataset: FILENAME("SuspectAddressVisualization_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+    FILE Checklist: FILENAME("SuspectAddressVisualizationChecklist.xlsx"),LABEL("Plugin Checklist");
+    FILE SuspectAddressVisualization_TestHarness: FILENAME("SuspectAddressVisualization_TestHarness.txt"),LABEL("Test Harness");
+    ECL HealthCareProvider: FILENAME("HealthCareProvider"),URL("http://10.241.100.153:8010");
+    ECL hipie_ecl: FILENAME("hipie_ecl"),URL("http://10.241.100.153:8010");
+    LOGICALFILE test: FILENAME("~qa::suspectaddressvisualization::suspectaddressvisualization::input"),URL("http://10.241.100.159:8010"),DALIIP("10.241.100.159"),CLUSTER("thor100_100dev");
+END

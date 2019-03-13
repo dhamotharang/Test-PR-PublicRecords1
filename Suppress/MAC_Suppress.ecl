@@ -1,4 +1,4 @@
-/*
+﻿/*
 Suppress.Key_New_Suppression is a replacement for doxie.Key_PullSSN
 Usage: InFile = input file to be checked
 			 outFile = output file
@@ -12,13 +12,13 @@ Usage: InFile = input file to be checked
 */
 
 export MAC_Suppress (inFile, outFile, inApplicationType, inLinkType = '\'\'', inLinkID = '\'\'', 
-										 inDocType = '\'\'', inDocID = '\'\'', batch = false, demo_cust = '\'\'', use_acctno = false) := macro
+										   inDocType = '\'\'', inDocID = '\'\'', batch = false, demo_cust = '\'\'', 
+                     use_acctno = false, retainField ='\'\'') := macro
 	import suppress;
 				#uniquename(tra)
 				#uniquename(suppressFile)
 				#uniquename(validCriteria)
 				#uniquename(outfile1)
-				
 				%suppressFile% := suppress.Key_New_Suppression;
 
 
@@ -29,6 +29,13 @@ export MAC_Suppress (inFile, outFile, inApplicationType, inLinkType = '\'\'', in
 					#else
 						self.seq := l.seq;
 					#end
+/*This is being used for cases where partial suppression is required. We can easily rertain a 
+  unique field and join back outside to do partial suppression outside. 
+*/          
+         #if(#text(retainField) <> '\'\'')
+         self.retainField := l.retainField; 
+         #end
+         
 					self := if((inLinkType <> '' and r.Linking_ID = '') or
 										 (inDocType <> '' and r.Document_ID = ''),
 											l);

@@ -84,5 +84,41 @@ EXPORT Common(PublicRecords_KEL.Interface_Options Options) := MODULE
 			(Options.IncludeCriminalDetails OR
 			Options.IncludeCriminalOffense OR
 			Options.IncludeCriminalPunishment);
+
+	EXPORT DoFDCJoin_Bankruptcy_Files__Key_bankruptcy_did :=
+		(Options.IncludeBankruptcy OR
+		Options.IncludePersonBankruptcy OR
+		Options.IncludeSSNBankruptcy OR
+		Options.IncludePerson OR
+		Options.IncludePersonAddress OR
+		Options.IncludePersonSSN OR
+		Options.IncludePhoneSSN OR
+		Options.IncludeSocialSecurityNumber OR
+		Options.IncludeSSNAddress OR
+		Options.IncludeZipCodePerson); 
+	
+	EXPORT DoFDCJoin_Bankruptcy_Files__Bankruptcy__Key_Search :=
+		(Options.IncludeBankruptcy OR
+		Options.IncludePersonBankruptcy OR
+		Options.IncludeSSNBankruptcy OR
+		Options.IncludePerson OR
+		Options.IncludePersonAddress OR
+		Options.IncludePersonSSN OR
+		Options.IncludePhoneSSN OR
+		Options.IncludeSocialSecurityNumber OR
+		Options.IncludeSSNAddress OR
+		Options.IncludeZipCodePerson);
+	
+	EXPORT DoFDCJoin_Bankruptcy_Files__Bankruptcy__Key_Main :=
+		(Options.IncludeBankruptcy OR
+		Options.IncludePersonBankruptcy OR
+		Options.IncludeSSNBankruptcy OR
+		Options.IncludePerson OR
+		Options.IncludePersonAddress OR
+		Options.IncludePersonSSN OR
+		Options.IncludePhoneSSN OR
+		Options.IncludeSocialSecurityNumber OR
+		Options.IncludeSSNAddress OR
+		Options.IncludeZipCodePerson);
 	
 END;

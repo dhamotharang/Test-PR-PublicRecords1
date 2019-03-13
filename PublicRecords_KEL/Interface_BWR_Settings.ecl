@@ -1,0 +1,20 @@
+﻿EXPORT Interface_BWR_Settings := INTERFACE
+	EXPORT STRING AttributeSetName := '';
+	EXPORT STRING VersionName := '';
+	EXPORT BOOLEAN isFCRA := FALSE;
+	EXPORT STRING ArchiveDate := '0';
+	EXPORT STRING InputFileName := '';
+	EXPORT STRING PermissiblePurpose := '';
+	EXPORT STRING Data_Restriction_Mask := '';
+	EXPORT STRING Data_Permission_Mask := '';
+	EXPORT UNSIGNED GLBAPurpose := 0;
+	EXPORT UNSIGNED DPPAPurpose := 0;
+	EXPORT BOOLEAN Override_Experian_Restriction := FALSE;
+	EXPORT STRING Allowed_Sources := '';
+	EXPORT UNSIGNED LexIDThreshold := 0;
+	EXPORT UNSIGNED BusinessLexIDThreshold := 0;
+	EXPORT UNSIGNED BusinessLexIDWeightThreshold := 0;
+	EXPORT BOOLEAN BusinessLexIDPrimForce := FALSE;
+	EXPORT BOOLEAN BusinessLexIDReAppend := TRUE;
+	EXPORT BOOLEAN BusinessLexIDIncludeAuthRep := FALSE;
+END;	

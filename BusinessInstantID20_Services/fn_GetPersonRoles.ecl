@@ -1,4 +1,4 @@
-IMPORT _Validate, BIPV2, BIPV2_Build, Business_Risk_BIP, doxie_cbrs, Risk_Indicators, STD;
+﻿IMPORT _Validate, BIPV2, BIPV2_Build, Business_Risk_BIP, doxie_cbrs, Risk_Indicators, STD;
 
 // The following function finds the title for each Auth Rep at the time of the HistoryDate.
 EXPORT fn_GetPersonRoles( DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfoClean) ds_CleanedInputWithLexIDs,
@@ -110,6 +110,8 @@ EXPORT fn_GetPersonRoles( DATASET(BusinessInstantID20_Services.layouts.InputComp
 			UNSIGNED lname_score  := 0;
 			UNSIGNED executive_ind_order  := 0;
 			UNSIGNED executive_ind_order2 := 0;
+			STRING15  Sequence    := '';
+			UNSIGNED1 SortOrder   := 0;
 		END;	
 		
 		layout_temp xfm_NormAuthReps( BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfoClean le, BusinessInstantID20_Services.Layouts.InputAuthRepInfoClean ri ) := 
@@ -119,6 +121,8 @@ EXPORT fn_GetPersonRoles( DATASET(BusinessInstantID20_Services.layouts.InputComp
 				SELF.FirstName    := ri.FirstName;
 				SELF.LastName     := ri.LastName;
 				SELF.LexID        := ri.LexID;
+				SELF.Sequence     := ri.Sequence;
+				SELF.SortOrder    := ri.SortOrder;
 				SELF := [];
 			END;
 			
@@ -157,7 +161,7 @@ EXPORT fn_GetPersonRoles( DATASET(BusinessInstantID20_Services.layouts.InputComp
 			DEDUP( 
 				SORT( 
 					ds_AuthReps_with_Titles, 
-					seq, Rep_WhichOne, executive_ind_order, executive_ind_order2
+					seq, SortOrder, executive_ind_order, executive_ind_order2
 				),
 				seq, Rep_WhichOne
 			);
@@ -199,6 +203,8 @@ EXPORT fn_GetPersonRoles( DATASET(BusinessInstantID20_Services.layouts.InputComp
 		// OUTPUT( ds_AuthRepsNormed, NAMED('AuthRepsNormed') );
 		// OUTPUT( ds_AuthReps_with_Titles, NAMED('AuthReps_with_Titles') );
 		// OUTPUT( ds_AuthReps_with_Titles_ddpd, NAMED('AuthReps_with_Titles_ddpd') );
+		// OUTPUT( ds_AuthReps_with_Titles_grpd, NAMED('ds_AuthReps_with_Titles_grpd') );
+		// OUTPUT( ds_AuthReps_with_Titles_combined, NAMED('ds_AuthReps_with_Titles_combined') );
 		
 		RETURN ds_AuthReps_with_Titles_combined;
 END;

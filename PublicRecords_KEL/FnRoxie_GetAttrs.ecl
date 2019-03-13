@@ -24,7 +24,7 @@ EXPORT FnRoxie_GetAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Layout) In
 	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( withLexID, Options );
 
   // Get Attributes - cleans the attributes after KEL is done 
-  InputPIIAttributes := KEL.Clean(PublicRecords_KEL.Q_Input_Attributes_V1(withLexID, (STRING) withLexID[1].InputArchiveDateClean[1..8]).res0, TRUE, TRUE, TRUE);
+  InputPIIAttributes := KEL.Clean(PublicRecords_KEL.Q_Input_Attributes_V1(withLexID, (STRING) withLexID[1].InputArchiveDateClean[1..8], Options.KEL_Permissions_Mask).res0, TRUE, TRUE, TRUE);
 	
 	PersonAttributes := PublicRecords_KEL.FnRoxie_GetPersonAttributes(withLexID, FDCDataset, Options); 
 

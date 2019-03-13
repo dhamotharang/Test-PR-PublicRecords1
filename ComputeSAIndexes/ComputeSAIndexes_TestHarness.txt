@@ -1,0 +1,25 @@
+Info Log -
+
+Monitoring WU W20180214-115700(HIPIE_ALAPERIASSX-W7D_HIPIE_Plugins.ComputeSAInde
+xes.ComputeSAIndexes_testcmp_gaoyon01) to completion.
+Plugin ComputeSAIndexes's test composition ComputeSAIndexes_testcmp ran on clust
+er http://10.241.100.159:8010/ and created workunit W20180214-115700 with status
+ completed
+Plugin ComputeSAIndexes's test composition ComputeSAIndexes_testcmp ran and comp
+leted with state "completed"
+Control workunit W20180214-112201 and this test workunit W20180214-115700 had th
+e same number of results
+Control workunit W20180214-112201has no outputs that are missing from test worku
+nit W20180214-115700
+No results were found in test workunit W20180214-115700 that weren't in the cont
+rol workunit W20180214-112201
+All workunit results had the same number of records in the control workunit W201
+80214-112201 and this test workunit W20180214-115700
+The content of all workunit results was the same in the control workunit W201802
+14-112201 and the current test workunit W20180214-115700
+Plugin ComputeSAIndexes passed compliance check
+
+Err Log - 
+
+Plugin ComputeSAIndexes passed compliance check
+

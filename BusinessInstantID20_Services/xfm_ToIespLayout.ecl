@@ -1,4 +1,4 @@
-﻿IMPORT iesp, risk_indicators, ut;
+﻿IMPORT iesp, risk_indicators, ut, Advo;
 
 // --------------------[ Components for InputEcho section ]--------------------
 
@@ -18,6 +18,7 @@ fn_NormalizeAuthReps( BusinessInstantID20_Services.Layouts.InputEchoLayout echo 
 				SELF.DriverLicenseNumber := echo.in_rep1_dlnumber;
 				SELF.DriverLicenseState  := echo.in_rep1_dlstate;
 				SELF.Email               := echo.in_rep1_email;
+				SELF.Sequence            := echo.in_rep1_sequence;
 				SELF := [];
 			END;
 
@@ -34,6 +35,7 @@ fn_NormalizeAuthReps( BusinessInstantID20_Services.Layouts.InputEchoLayout echo 
 				SELF.DriverLicenseNumber := echo.in_rep2_dlnumber;
 				SELF.DriverLicenseState  := echo.in_rep2_dlstate;
 				SELF.Email               := echo.in_rep2_email;
+				SELF.Sequence            := echo.in_rep2_sequence;
 				SELF := [];
 			END;
 
@@ -50,6 +52,7 @@ fn_NormalizeAuthReps( BusinessInstantID20_Services.Layouts.InputEchoLayout echo 
 				SELF.DriverLicenseNumber := echo.in_rep3_dlnumber;
 				SELF.DriverLicenseState  := echo.in_rep3_dlstate;
 				SELF.Email               := echo.in_rep3_email;
+				SELF.Sequence            := echo.in_rep3_sequence;
 				SELF := [];
 			END;
 
@@ -66,6 +69,7 @@ fn_NormalizeAuthReps( BusinessInstantID20_Services.Layouts.InputEchoLayout echo 
 				SELF.DriverLicenseNumber := echo.in_rep4_dlnumber;
 				SELF.DriverLicenseState  := echo.in_rep4_dlstate;
 				SELF.Email               := echo.in_rep4_email;
+				SELF.Sequence            := echo.in_rep4_sequence;
 				SELF := [];
 			END;
 
@@ -82,6 +86,7 @@ fn_NormalizeAuthReps( BusinessInstantID20_Services.Layouts.InputEchoLayout echo 
 				SELF.DriverLicenseNumber := echo.in_rep5_dlnumber;
 				SELF.DriverLicenseState  := echo.in_rep5_dlstate;
 				SELF.Email               := echo.in_rep5_email;
+				SELF.Sequence            := echo.in_rep5_sequence;
 				SELF := [];
 			END;
 		
@@ -746,7 +751,7 @@ fn_GetRiskIndicators( BusinessInstantID20_Services.layouts.OutputLayout_intermed
 				iesp.share.t_SequencedRiskIndicator 
 			);
 		
-		RETURN RiskIndicators(RiskCode != '');		
+		RETURN RiskIndicators(RiskCode != '' AND RiskCode != '00');		
 	END;
 
 // 16. CompanyResults: Verification Summaries
@@ -830,7 +835,15 @@ fn_GetBus2ExecIndexes( BusinessInstantID20_Services.layouts.OutputLayout_interme
 		
 		RETURN Bus2ExecIndexes;		
 	END;
-	
+
+// 18. CompanyResults: Address Risk
+temp_BusinessAddressRiskLayout := {BusinessInstantID20_Services.Layouts.BusinessAddressRiskLayout AND NOT [seq]};
+
+iesp.businessinstantid20.t_BIID20BusinessAddressRisk xfm_BusinessAddressRisk(temp_BusinessAddressRiskLayout le) := 
+	TRANSFORM
+		SELF.AddressIsCMRA := le.AddressIsCMRA;
+	END;
+
 // CompanyResults
 iesp.businessinstantid20.t_BIID20CompanyResults xfm_AddCompanyResults(BusinessInstantID20_Services.Layouts.OutputLayout_intermediate le) := 
 	TRANSFORM
@@ -849,6 +862,7 @@ iesp.businessinstantid20.t_BIID20CompanyResults xfm_AddCompanyResults(BusinessIn
 		SELF.BusinessToAuthorizedRepLinkIndexes := fn_GetBus2ExecIndexes(le); 
 		SELF.Compliance                         := ROW( xfm_Compliance(le) );
 		SELF.SBFEVerification                   := ROW( xfm_SBFEVerification(le.SBFEVerification) );
+		SELF.AddressRisk                        := ROW( xfm_BusinessAddressRisk(le.BusinessAddressRisk) );
 		SELF := [];
 	END;
 
@@ -858,7 +872,7 @@ iesp.businessinstantid20.t_BIID20AuthorizedRepresentativeResults xfm_AddAuthRepR
 		SELF.UniqueId := (STRING)le.did;
 		
 		// Input Echo
-		SELF.InputEcho.Sequence                  		  := (STRING)le.Rep_WhichOne;
+		SELF.InputEcho.Sequence                  		  := le.Sequence;
 		SELF.InputEcho.Name.Full                 		  := '';
 		SELF.InputEcho.Name.First                		  := le.fname;
 		SELF.InputEcho.Name.Middle                		:= le.mname;
@@ -1166,6 +1180,8 @@ EXPORT iesp.businessinstantid20.t_BIID20Result xfm_ToIespLayout(BusinessInstantI
 		SELF.InputEcho                := ROW( xfm_AddInputEcho(le.InputEcho) );
 		SELF.CompanyResults           := PROJECT( le, xfm_AddCompanyResults(LEFT) );
 		SELF.AuthorizedRepresentativeResults := PROJECT( le.ConsumerInstantID, xfm_AddAuthRepResults(LEFT) );
+		SELF.Models                   := le.Models;
+		SELF.Attributes               := le.AttributeGroup;
 		SELF := [];
 	END;
 

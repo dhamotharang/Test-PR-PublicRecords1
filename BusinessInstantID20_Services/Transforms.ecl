@@ -1,5 +1,5 @@
-
-IMPORT Business_Risk_BIP, STD, ut;
+﻿
+IMPORT Business_Risk_BIP, STD, ut, LNSmallBusiness, BusinessInstantID20_Services, iesp, Risk_Indicators;
 
 EXPORT Transforms(BusinessInstantID20_Services.iOptions Options) := MODULE
 
@@ -35,6 +35,7 @@ EXPORT Transforms(BusinessInstantID20_Services.iOptions Options) := MODULE
 			SELF.Phone10        := CHOOSE( c, le.Rep1_Phone10, le.Rep2_Phone10, le.Rep3_Phone10, le.Rep4_Phone10, le.Rep5_Phone10, '' );
 			SELF.Email          := CHOOSE( c, le.Rep1_Email, le.Rep2_Email, le.Rep3_Email, le.Rep4_Email, le.Rep5_Email, '' );
 			SELF.LexID          := CHOOSE( c, le.Rep1_LexID, le.Rep2_LexID, le.Rep3_LexID, le.Rep4_LexID, le.Rep5_LexID, 0 );		
+			SELF.SortOrder      := c;
 		END;
 	
 	EXPORT BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo xfm_LoadInput( BusinessInstantID20_Services.layouts.BatchInput le, INTEGER c ) :=
@@ -93,6 +94,7 @@ EXPORT Transforms(BusinessInstantID20_Services.iOptions Options) := MODULE
 			// Authorized Rep 1 input information
 			rep1 := le.AuthReps(Rep_WhichOne = 1)[1];
 			SELF.InputEcho.rep1_lexid             := rep1.LexID;
+			SELF.InputEcho.in_rep1_sequence       := rep1.Sequence;
 			SELF.InputEcho.in_rep1_title          := rep1.NameTitle;
 			SELF.InputEcho.in_rep1_full           := rep1.FullName;
 			SELF.InputEcho.in_rep1_first          := rep1.FirstName;
@@ -113,6 +115,7 @@ EXPORT Transforms(BusinessInstantID20_Services.iOptions Options) := MODULE
 			// Authorized Rep 2 input information
 			rep2 := le.AuthReps(Rep_WhichOne = 2)[1];
 			SELF.InputEcho.rep2_lexid             := rep2.LexID;
+			SELF.InputEcho.in_rep2_sequence       := rep2.Sequence;
 			SELF.InputEcho.in_rep2_title          := rep2.NameTitle;
 			SELF.InputEcho.in_rep2_full           := rep2.FullName;
 			SELF.InputEcho.in_rep2_first          := rep2.FirstName;
@@ -133,6 +136,7 @@ EXPORT Transforms(BusinessInstantID20_Services.iOptions Options) := MODULE
 			// Authorized Rep 3 input information
 			rep3 := le.AuthReps(Rep_WhichOne = 3)[1];
 			SELF.InputEcho.rep3_lexid             := rep3.LexID;
+			SELF.InputEcho.in_rep3_sequence       := rep3.Sequence;
 			SELF.InputEcho.in_rep3_title          := rep3.NameTitle;
 			SELF.InputEcho.in_rep3_full           := rep3.FullName;
 			SELF.InputEcho.in_rep3_first          := rep3.FirstName;
@@ -153,6 +157,7 @@ EXPORT Transforms(BusinessInstantID20_Services.iOptions Options) := MODULE
 			// Authorized Rep 4 input information
 			rep4 := le.AuthReps(Rep_WhichOne = 4)[1];
 			SELF.InputEcho.rep4_lexid             := rep4.LexID;
+			SELF.InputEcho.in_rep4_sequence       := rep4.Sequence;
 			SELF.InputEcho.in_rep4_title          := rep4.NameTitle;
 			SELF.InputEcho.in_rep4_full           := rep4.FullName;
 			SELF.InputEcho.in_rep4_first          := rep4.FirstName;
@@ -173,6 +178,7 @@ EXPORT Transforms(BusinessInstantID20_Services.iOptions Options) := MODULE
 			// Authorized Rep 5 input information
 			rep5 := le.AuthReps(Rep_WhichOne = 5)[1];
 			SELF.InputEcho.rep5_lexid             := rep5.LexID;
+			SELF.InputEcho.in_rep5_sequence       := rep5.Sequence;
 			SELF.InputEcho.in_rep5_title          := rep5.NameTitle;
 			SELF.InputEcho.in_rep5_full           := rep5.FullName;
 			SELF.InputEcho.in_rep5_first          := rep5.FirstName;
@@ -229,6 +235,7 @@ EXPORT Transforms(BusinessInstantID20_Services.iOptions Options) := MODULE
 				// Authorized Rep 1
 				rep1 := ri.AuthReps(Rep_WhichOne = 1)[1];
 				SELF.InputEcho.rep1_lexid      := rep1.LexID;
+				SELF.CleanInput.out_rep1_sequence         := rep1.Sequence;      
 				SELF.CleanInput.out_rep1_name_title       := rep1.NameTitle;      
 				SELF.CleanInput.out_rep1_full_name        := rep1.FullName;       
 				SELF.CleanInput.out_rep1_first_name       := rep1.FirstName;      
@@ -262,6 +269,7 @@ EXPORT Transforms(BusinessInstantID20_Services.iOptions Options) := MODULE
 				// Authorized Rep 2
 				rep2 := ri.AuthReps(Rep_WhichOne = 2)[1];
 				SELF.InputEcho.rep2_lexid      := rep2.LexID;
+				SELF.CleanInput.out_rep2_sequence         := rep2.Sequence;      
 				SELF.CleanInput.out_rep2_name_title       := rep2.NameTitle;      
 				SELF.CleanInput.out_rep2_full_name        := rep2.FullName;       
 				SELF.CleanInput.out_rep2_first_name       := rep2.FirstName;      
@@ -295,6 +303,7 @@ EXPORT Transforms(BusinessInstantID20_Services.iOptions Options) := MODULE
 				// Authorized Rep 3
 				rep3 := ri.AuthReps(Rep_WhichOne = 3)[1];
 				SELF.InputEcho.rep3_lexid      := rep3.LexID;
+				SELF.CleanInput.out_rep3_sequence         := rep3.Sequence;      
 				SELF.CleanInput.out_rep3_name_title       := rep3.NameTitle;      
 				SELF.CleanInput.out_rep3_full_name        := rep3.FullName;       
 				SELF.CleanInput.out_rep3_first_name       := rep3.FirstName;      
@@ -328,6 +337,7 @@ EXPORT Transforms(BusinessInstantID20_Services.iOptions Options) := MODULE
 				// Authorized Rep 4
 				rep4 := ri.AuthReps(Rep_WhichOne = 4)[1];
 				SELF.InputEcho.rep4_lexid      := rep4.LexID;
+				SELF.CleanInput.out_rep4_sequence         := rep4.Sequence;      
 				SELF.CleanInput.out_rep4_name_title       := rep4.NameTitle;      
 				SELF.CleanInput.out_rep4_full_name        := rep4.FullName;       
 				SELF.CleanInput.out_rep4_first_name       := rep4.FirstName;      
@@ -361,6 +371,7 @@ EXPORT Transforms(BusinessInstantID20_Services.iOptions Options) := MODULE
 				// Authorized Rep 5
 				rep5 := ri.AuthReps(Rep_WhichOne = 5)[1];
 				SELF.InputEcho.rep5_lexid      := rep5.LexID;
+				SELF.CleanInput.out_rep5_sequence         := rep5.Sequence;      
 				SELF.CleanInput.out_rep5_name_title       := rep5.NameTitle;      
 				SELF.CleanInput.out_rep5_full_name        := rep5.FullName;       
 				SELF.CleanInput.out_rep5_first_name       := rep5.FirstName;      
@@ -623,6 +634,1241 @@ EXPORT Transforms(BusinessInstantID20_Services.iOptions Options) := MODULE
 				SELF := [];
 			END;
 
+		EXPORT fn_NormalizeWatchlists( BusinessInstantID20_Services.layouts.OFACAndWatchlistLayoutFlat le, INTEGER C) := 
+		  FUNCTION
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec1 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_1;
+						SELF.Program								:= le.authrep_watchlist_program_1;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_1;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_1;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_1;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_1;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_1;
+						SELF.Address.City				   := le.authrep_watchlist_city_1;
+						SELF.Address.State				  := le.authrep_watchlist_state_1;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_1;
+						SELF.Country								:= le.authrep_watchlist_country_1;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_1;
+						SELF.Sequence						   := '1';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec2 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_2;
+						SELF.Program								:= le.authrep_watchlist_program_2;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_2;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_2;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_2;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_2;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_2;
+						SELF.Address.City				   := le.authrep_watchlist_city_2;
+						SELF.Address.State				  := le.authrep_watchlist_state_2;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_2;
+						SELF.Country								:= le.authrep_watchlist_country_2;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_2;
+						SELF.Sequence						   := '2';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec3 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_3;
+						SELF.Program								:= le.authrep_watchlist_program_3;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_3;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_3;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_3;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_3;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_3;
+						SELF.Address.City				   := le.authrep_watchlist_city_3;
+						SELF.Address.State				  := le.authrep_watchlist_state_3;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_3;
+						SELF.Country								:= le.authrep_watchlist_country_3;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_3;
+						SELF.Sequence						   := '3';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec4 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_4;
+						SELF.Program								:= le.authrep_watchlist_program_4;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_4;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_4;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_4;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_4;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_4;
+						SELF.Address.City				   := le.authrep_watchlist_city_4;
+						SELF.Address.State				  := le.authrep_watchlist_state_4;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_4;
+						SELF.Country								:= le.authrep_watchlist_country_4;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_4;
+						SELF.Sequence						   := '4';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec5 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_5;
+						SELF.Program								:= le.authrep_watchlist_program_5;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_5;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_5;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_5;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_5;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_5;
+						SELF.Address.City				   := le.authrep_watchlist_city_5;
+						SELF.Address.State				  := le.authrep_watchlist_state_5;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_5;
+						SELF.Country								:= le.authrep_watchlist_country_5;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_5;
+						SELF.Sequence						   := '5';
+						SELF := [];
+				  END;			
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec6 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_6;
+						SELF.Program								:= le.authrep_watchlist_program_6;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_6;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_6;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_6;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_6;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_6;
+						SELF.Address.City				   := le.authrep_watchlist_city_6;
+						SELF.Address.State				  := le.authrep_watchlist_state_6;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_6;
+						SELF.Country								:= le.authrep_watchlist_country_6;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_6;
+						SELF.Sequence						   := '6';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec7 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_7;
+						SELF.Program								:= le.authrep_watchlist_program_7;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_7;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_7;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_7;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_7;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_7;
+						SELF.Address.City				   := le.authrep_watchlist_city_7;
+						SELF.Address.State				  := le.authrep_watchlist_state_7;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_7;
+						SELF.Country								:= le.authrep_watchlist_country_7;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_7;
+						SELF.Sequence						   := '7';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec8 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_8;
+						SELF.Program								:= le.authrep_watchlist_program_8;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_8;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_8;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_8;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_8;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_8;
+						SELF.Address.City				   := le.authrep_watchlist_city_8;
+						SELF.Address.State				  := le.authrep_watchlist_state_8;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_8;
+						SELF.Country								:= le.authrep_watchlist_country_8;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_8;
+						SELF.Sequence						   := '1';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec9 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_9;
+						SELF.Program								:= le.authrep_watchlist_program_9;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_9;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_9;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_9;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_9;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_9;
+						SELF.Address.City				   := le.authrep_watchlist_city_9;
+						SELF.Address.State				  := le.authrep_watchlist_state_9;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_9;
+						SELF.Country								:= le.authrep_watchlist_country_9;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_9;
+						SELF.Sequence						   := '2';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec10 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_10;
+						SELF.Program								:= le.authrep_watchlist_program_10;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_10;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_10;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_10;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_10;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_10;
+						SELF.Address.City				   := le.authrep_watchlist_city_10;
+						SELF.Address.State				  := le.authrep_watchlist_state_10;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_10;
+						SELF.Country								:= le.authrep_watchlist_country_10;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_10;
+						SELF.Sequence						   := '3';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec11 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_11;
+						SELF.Program								:= le.authrep_watchlist_program_11;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_11;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_11;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_11;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_11;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_11;
+						SELF.Address.City				   := le.authrep_watchlist_city_11;
+						SELF.Address.State				  := le.authrep_watchlist_state_11;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_11;
+						SELF.Country								:= le.authrep_watchlist_country_11;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_11;
+						SELF.Sequence						   := '4';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec12 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_12;
+						SELF.Program								:= le.authrep_watchlist_program_12;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_12;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_12;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_12;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_12;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_12;
+						SELF.Address.City				   := le.authrep_watchlist_city_12;
+						SELF.Address.State				  := le.authrep_watchlist_state_12;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_12;
+						SELF.Country								:= le.authrep_watchlist_country_12;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_12;
+						SELF.Sequence						   := '5';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec13 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_13;
+						SELF.Program								:= le.authrep_watchlist_program_13;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_13;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_13;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_13;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_13;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_13;
+						SELF.Address.City				   := le.authrep_watchlist_city_13;
+						SELF.Address.State				  := le.authrep_watchlist_state_13;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_13;
+						SELF.Country								:= le.authrep_watchlist_country_13;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_13;
+						SELF.Sequence						   := '6';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec14 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_14;
+						SELF.Program								:= le.authrep_watchlist_program_14;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_14;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_14;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_14;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_14;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_14;
+						SELF.Address.City				   := le.authrep_watchlist_city_14;
+						SELF.Address.State				  := le.authrep_watchlist_state_14;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_14;
+						SELF.Country								:= le.authrep_watchlist_country_14;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_14;
+						SELF.Sequence						   := '7';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec15 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_15;
+						SELF.Program								:= le.authrep_watchlist_program_15;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_15;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_15;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_15;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_15;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_15;
+						SELF.Address.City				   := le.authrep_watchlist_city_15;
+						SELF.Address.State				  := le.authrep_watchlist_state_15;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_15;
+						SELF.Country								:= le.authrep_watchlist_country_15;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_15;
+						SELF.Sequence						   := '1';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec16 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_16;
+						SELF.Program								:= le.authrep_watchlist_program_16;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_16;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_16;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_16;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_16;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_16;
+						SELF.Address.City				   := le.authrep_watchlist_city_16;
+						SELF.Address.State				  := le.authrep_watchlist_state_16;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_16;
+						SELF.Country								:= le.authrep_watchlist_country_16;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_16;
+						SELF.Sequence						   := '2';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec17 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_17;
+						SELF.Program								:= le.authrep_watchlist_program_17;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_17;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_17;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_17;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_17;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_17;
+						SELF.Address.City				   := le.authrep_watchlist_city_17;
+						SELF.Address.State				  := le.authrep_watchlist_state_17;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_17;
+						SELF.Country								:= le.authrep_watchlist_country_17;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_17;
+						SELF.Sequence						   := '3';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec18 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_18;
+						SELF.Program								:= le.authrep_watchlist_program_18;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_18;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_18;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_18;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_18;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_18;
+						SELF.Address.City				   := le.authrep_watchlist_city_18;
+						SELF.Address.State				  := le.authrep_watchlist_state_18;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_18;
+						SELF.Country								:= le.authrep_watchlist_country_18;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_18;
+						SELF.Sequence						   := '4';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec19 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_19;
+						SELF.Program								:= le.authrep_watchlist_program_19;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_19;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_19;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_19;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_19;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_19;
+						SELF.Address.City				   := le.authrep_watchlist_city_19;
+						SELF.Address.State				  := le.authrep_watchlist_state_19;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_19;
+						SELF.Country								:= le.authrep_watchlist_country_19;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_19;
+						SELF.Sequence						   := '5';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec20 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_20;
+						SELF.Program								:= le.authrep_watchlist_program_20;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_20;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_20;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_20;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_20;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_20;
+						SELF.Address.City				   := le.authrep_watchlist_city_20;
+						SELF.Address.State				  := le.authrep_watchlist_state_20;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_20;
+						SELF.Country								:= le.authrep_watchlist_country_20;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_20;
+						SELF.Sequence						   := '6';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec21 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_21;
+						SELF.Program								:= le.authrep_watchlist_program_21;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_21;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_21;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_21;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_21;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_21;
+						SELF.Address.City				   := le.authrep_watchlist_city_21;
+						SELF.Address.State				  := le.authrep_watchlist_state_21;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_21;
+						SELF.Country								:= le.authrep_watchlist_country_21;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_21;
+						SELF.Sequence						   := '7';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec22 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_22;
+						SELF.Program								:= le.authrep_watchlist_program_22;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_22;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_22;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_22;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_22;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_22;
+						SELF.Address.City				   := le.authrep_watchlist_city_22;
+						SELF.Address.State				  := le.authrep_watchlist_state_22;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_22;
+						SELF.Country								:= le.authrep_watchlist_country_22;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_22;
+						SELF.Sequence						   := '1';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec23 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_23;
+						SELF.Program								:= le.authrep_watchlist_program_23;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_23;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_23;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_23;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_23;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_23;
+						SELF.Address.City				   := le.authrep_watchlist_city_23;
+						SELF.Address.State				  := le.authrep_watchlist_state_23;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_23;
+						SELF.Country								:= le.authrep_watchlist_country_23;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_23;
+						SELF.Sequence						   := '2';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec24 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_24;
+						SELF.Program								:= le.authrep_watchlist_program_24;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_24;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_24;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_24;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_24;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_24;
+						SELF.Address.City				   := le.authrep_watchlist_city_24;
+						SELF.Address.State				  := le.authrep_watchlist_state_24;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_24;
+						SELF.Country								:= le.authrep_watchlist_country_24;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_24;
+						SELF.Sequence						   := '3';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec25 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_25;
+						SELF.Program								:= le.authrep_watchlist_program_25;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_25;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_25;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_25;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_25;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_25;
+						SELF.Address.City				   := le.authrep_watchlist_city_25;
+						SELF.Address.State				  := le.authrep_watchlist_state_25;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_25;
+						SELF.Country								:= le.authrep_watchlist_country_25;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_25;
+						SELF.Sequence						   := '4';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec26 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_26;
+						SELF.Program								:= le.authrep_watchlist_program_26;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_26;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_26;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_26;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_26;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_26;
+						SELF.Address.City				   := le.authrep_watchlist_city_26;
+						SELF.Address.State				  := le.authrep_watchlist_state_26;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_26;
+						SELF.Country								:= le.authrep_watchlist_country_26;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_26;
+						SELF.Sequence						   := '5';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec27 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_27;
+						SELF.Program								:= le.authrep_watchlist_program_27;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_27;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_27;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_27;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_27;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_27;
+						SELF.Address.City				   := le.authrep_watchlist_city_27;
+						SELF.Address.State				  := le.authrep_watchlist_state_27;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_27;
+						SELF.Country								:= le.authrep_watchlist_country_27;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_27;
+						SELF.Sequence						   := '6';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec28 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_28;
+						SELF.Program								:= le.authrep_watchlist_program_28;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_28;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_28;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_28;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_28;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_28;
+						SELF.Address.City				   := le.authrep_watchlist_city_28;
+						SELF.Address.State				  := le.authrep_watchlist_state_28;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_28;
+						SELF.Country								:= le.authrep_watchlist_country_28;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_28;
+						SELF.Sequence						   := '7';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec29 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_29;
+						SELF.Program								:= le.authrep_watchlist_program_29;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_29;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_29;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_29;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_29;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_29;
+						SELF.Address.City				   := le.authrep_watchlist_city_29;
+						SELF.Address.State				  := le.authrep_watchlist_state_29;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_29;
+						SELF.Country								:= le.authrep_watchlist_country_29;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_29;
+						SELF.Sequence						   := '1';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec30 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_30;
+						SELF.Program								:= le.authrep_watchlist_program_30;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_30;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_30;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_30;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_30;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_30;
+						SELF.Address.City				   := le.authrep_watchlist_city_30;
+						SELF.Address.State				  := le.authrep_watchlist_state_30;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_30;
+						SELF.Country								:= le.authrep_watchlist_country_30;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_30;
+						SELF.Sequence						   := '2';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec31 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_31;
+						SELF.Program								:= le.authrep_watchlist_program_31;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_31;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_31;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_31;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_31;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_31;
+						SELF.Address.City				   := le.authrep_watchlist_city_31;
+						SELF.Address.State				  := le.authrep_watchlist_state_31;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_31;
+						SELF.Country								:= le.authrep_watchlist_country_31;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_31;
+						SELF.Sequence						   := '3';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec32 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_32;
+						SELF.Program								:= le.authrep_watchlist_program_32;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_32;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_32;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_32;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_32;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_32;
+						SELF.Address.City				   := le.authrep_watchlist_city_32;
+						SELF.Address.State				  := le.authrep_watchlist_state_32;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_32;
+						SELF.Country								:= le.authrep_watchlist_country_32;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_32;
+						SELF.Sequence						   := '4';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec33 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_33;
+						SELF.Program								:= le.authrep_watchlist_program_33;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_33;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_33;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_33;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_33;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_33;
+						SELF.Address.City				   := le.authrep_watchlist_city_33;
+						SELF.Address.State				  := le.authrep_watchlist_state_33;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_33;
+						SELF.Country								:= le.authrep_watchlist_country_33;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_33;
+						SELF.Sequence						   := '5';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec34 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_34;
+						SELF.Program								:= le.authrep_watchlist_program_34;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_34;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_34;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_34;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_34;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_34;
+						SELF.Address.City				   := le.authrep_watchlist_city_34;
+						SELF.Address.State				  := le.authrep_watchlist_state_34;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_34;
+						SELF.Country								:= le.authrep_watchlist_country_34;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_34;
+						SELF.Sequence						   := '6';
+						SELF := [];
+				  END;
+				iesp.businessinstantid20.t_BIID20WatchList xfm_Rec35 :=
+				  TRANSFORM
+						SELF.Table								  := le.authrep_watchlist_table_35;
+						SELF.Program								:= le.authrep_watchlist_program_35;
+						SELF.RecordNumber				   := le.authrep_watchlist_record_number_35;
+						SELF.CompanyName						:= le.authrep_watchlist_companyname_35;
+						SELF.Name.First						 := le.authrep_watchlist_firstname_35;
+						SELF.Name.Last						  := le.authrep_watchlist_lastname_35;
+						SELF.Address.StreetAddress1 := le.authrep_watchlist_address_35;
+						SELF.Address.City				   := le.authrep_watchlist_city_35;
+						SELF.Address.State				  := le.authrep_watchlist_state_35;
+						SELF.Address.Zip5				   := le.authrep_watchlist_zip_35;
+						SELF.Country								:= le.authrep_watchlist_country_35;
+						SELF.EntityName						 := le.authrep_watchlist_entity_name_35;
+						SELF.Sequence						   := '7';
+						SELF := [];
+				  END;
+				ds_WatchlistsAuthRep1 := DATASET( [xfm_Rec1] ) + DATASET( [xfm_Rec2] ) + DATASET( [xfm_Rec3] ) + DATASET( [xfm_Rec4] ) + DATASET( [xfm_Rec5] ) + DATASET( [xfm_Rec6] ) + DATASET( [xfm_Rec7] );
+				ds_WatchlistsAuthRep2 := DATASET( [xfm_Rec8] ) + DATASET( [xfm_Rec9] ) + DATASET( [xfm_Rec10] ) + DATASET( [xfm_Rec11] ) + DATASET( [xfm_Rec12] ) + DATASET( [xfm_Rec13] ) + DATASET( [xfm_Rec14] );
+				ds_WatchlistsAuthRep3 := DATASET( [xfm_Rec15] ) + DATASET( [xfm_Rec16] ) + DATASET( [xfm_Rec17] ) + DATASET( [xfm_Rec18] ) + DATASET( [xfm_Rec19] ) + DATASET( [xfm_Rec20] ) + DATASET( [xfm_Rec21] );
+				ds_WatchlistsAuthRep4 := DATASET( [xfm_Rec22] ) + DATASET( [xfm_Rec23] ) + DATASET( [xfm_Rec24] ) + DATASET( [xfm_Rec25] ) + DATASET( [xfm_Rec26] ) + DATASET( [xfm_Rec27] ) + DATASET( [xfm_Rec28] );
+				ds_WatchlistsAuthRep5 := DATASET( [xfm_Rec29] ) + DATASET( [xfm_Rec30] ) + DATASET( [xfm_Rec31] ) + DATASET( [xfm_Rec32] ) + DATASET( [xfm_Rec33] ) + DATASET( [xfm_Rec34] ) + DATASET( [xfm_Rec35] );
+				ds_Watchlists := CASE(C,
+																1 => ds_WatchlistsAuthRep1,
+																2 => ds_WatchlistsAuthRep2,
+																3 => ds_WatchlistsAuthRep3,
+																4 => ds_WatchlistsAuthRep4,
+																5 => ds_WatchlistsAuthRep5,
+																		 DATASET([],iesp.businessinstantid20.t_BIID20WatchList)
+														  );
+				RETURN ds_Watchlists(EntityName != '' OR Name.First != '');
+		  END;  
+		
+		EXPORT fn_NormalizeAuthRepWatchlist( BusinessInstantID20_Services.Layouts.OFACAndWatchlistLayoutFlat le, INTEGER C) := 
+		  FUNCTION
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec1 :=
+				  TRANSFORM
+						SELF.seq := 1;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_1;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_1;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_1;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_1;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_1;
+						SELF.Watchlist_address := le.authrep_watchlist_address_1;
+						SELF.Watchlist_city := le.authrep_watchlist_city_1;
+						SELF.Watchlist_state := le.authrep_watchlist_state_1;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_1;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_1;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_1;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec2 :=
+				  TRANSFORM
+						SELF.seq := 2;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_2;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_2;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_2;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_2;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_2;
+						SELF.Watchlist_address := le.authrep_watchlist_address_2;
+						SELF.Watchlist_city := le.authrep_watchlist_city_2;
+						SELF.Watchlist_state := le.authrep_watchlist_state_2;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_2;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_2;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_2;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec3 :=
+				  TRANSFORM
+						SELF.seq := 3;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_3;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_3;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_3;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_3;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_3;
+						SELF.Watchlist_address := le.authrep_watchlist_address_3;
+						SELF.Watchlist_city := le.authrep_watchlist_city_3;
+						SELF.Watchlist_state := le.authrep_watchlist_state_3;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_3;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_3;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_3;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec4 :=
+				  TRANSFORM
+						SELF.seq := 4;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_4;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_4;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_4;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_4;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_4;
+						SELF.Watchlist_address := le.authrep_watchlist_address_4;
+						SELF.Watchlist_city := le.authrep_watchlist_city_4;
+						SELF.Watchlist_state := le.authrep_watchlist_state_4;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_4;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_4;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_4;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec5 :=
+				  TRANSFORM
+						SELF.seq := 5;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_5;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_5;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_5;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_5;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_5;
+						SELF.Watchlist_address := le.authrep_watchlist_address_5;
+						SELF.Watchlist_city := le.authrep_watchlist_city_5;
+						SELF.Watchlist_state := le.authrep_watchlist_state_5;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_5;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_5;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_5;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec6 :=
+				  TRANSFORM
+						SELF.seq := 6;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_6;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_6;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_6;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_6;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_6;
+						SELF.Watchlist_address := le.authrep_watchlist_address_6;
+						SELF.Watchlist_city := le.authrep_watchlist_city_6;
+						SELF.Watchlist_state := le.authrep_watchlist_state_6;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_6;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_6;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_6;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec7 :=
+				  TRANSFORM
+						SELF.seq := 7;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_7;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_7;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_7;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_7;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_7;
+						SELF.Watchlist_address := le.authrep_watchlist_address_7;
+						SELF.Watchlist_city := le.authrep_watchlist_city_7;
+						SELF.Watchlist_state := le.authrep_watchlist_state_7;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_7;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_7;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_7;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec8 :=
+				  TRANSFORM
+						SELF.seq := 1;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_8;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_8;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_8;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_8;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_8;
+						SELF.Watchlist_address := le.authrep_watchlist_address_8;
+						SELF.Watchlist_city := le.authrep_watchlist_city_8;
+						SELF.Watchlist_state := le.authrep_watchlist_state_8;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_8;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_8;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_8;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec9 :=
+				  TRANSFORM
+						SELF.seq := 2;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_9;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_9;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_9;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_9;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_9;
+						SELF.Watchlist_address := le.authrep_watchlist_address_9;
+						SELF.Watchlist_city := le.authrep_watchlist_city_9;
+						SELF.Watchlist_state := le.authrep_watchlist_state_9;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_9;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_9;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_9;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec10 :=
+				  TRANSFORM
+						SELF.seq := 3;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_10;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_10;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_10;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_10;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_10;
+						SELF.Watchlist_address := le.authrep_watchlist_address_10;
+						SELF.Watchlist_city := le.authrep_watchlist_city_10;
+						SELF.Watchlist_state := le.authrep_watchlist_state_10;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_10;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_10;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_10;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec11 :=
+				  TRANSFORM
+						SELF.seq := 4;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_11;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_11;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_11;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_11;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_11;
+						SELF.Watchlist_address := le.authrep_watchlist_address_11;
+						SELF.Watchlist_city := le.authrep_watchlist_city_11;
+						SELF.Watchlist_state := le.authrep_watchlist_state_11;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_11;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_11;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_11;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec12 :=
+				  TRANSFORM
+						SELF.seq := 5;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_12;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_12;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_12;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_12;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_12;
+						SELF.Watchlist_address := le.authrep_watchlist_address_12;
+						SELF.Watchlist_city := le.authrep_watchlist_city_12;
+						SELF.Watchlist_state := le.authrep_watchlist_state_12;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_12;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_12;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_12;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec13 :=
+				  TRANSFORM
+						SELF.seq := 6;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_13;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_13;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_13;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_13;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_13;
+						SELF.Watchlist_address := le.authrep_watchlist_address_13;
+						SELF.Watchlist_city := le.authrep_watchlist_city_13;
+						SELF.Watchlist_state := le.authrep_watchlist_state_13;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_13;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_13;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_13;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec14 :=
+				  TRANSFORM
+						SELF.seq := 7;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_14;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_14;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_14;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_14;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_14;
+						SELF.Watchlist_address := le.authrep_watchlist_address_14;
+						SELF.Watchlist_city := le.authrep_watchlist_city_14;
+						SELF.Watchlist_state := le.authrep_watchlist_state_14;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_14;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_14;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_14;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec15 :=
+				  TRANSFORM
+						SELF.seq := 1;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_15;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_15;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_15;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_15;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_15;
+						SELF.Watchlist_address := le.authrep_watchlist_address_15;
+						SELF.Watchlist_city := le.authrep_watchlist_city_15;
+						SELF.Watchlist_state := le.authrep_watchlist_state_15;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_15;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_15;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_15;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec16 :=
+				  TRANSFORM
+						SELF.seq := 2;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_16;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_16;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_16;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_16;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_16;
+						SELF.Watchlist_address := le.authrep_watchlist_address_16;
+						SELF.Watchlist_city := le.authrep_watchlist_city_16;
+						SELF.Watchlist_state := le.authrep_watchlist_state_16;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_16;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_16;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_16;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec17 :=
+				  TRANSFORM
+						SELF.seq := 3;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_17;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_17;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_17;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_17;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_17;
+						SELF.Watchlist_address := le.authrep_watchlist_address_17;
+						SELF.Watchlist_city := le.authrep_watchlist_city_17;
+						SELF.Watchlist_state := le.authrep_watchlist_state_17;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_17;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_17;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_17;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec18 :=
+				  TRANSFORM
+						SELF.seq := 4;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_18;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_18;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_18;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_18;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_18;
+						SELF.Watchlist_address := le.authrep_watchlist_address_18;
+						SELF.Watchlist_city := le.authrep_watchlist_city_18;
+						SELF.Watchlist_state := le.authrep_watchlist_state_18;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_18;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_18;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_18;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec19 :=
+				  TRANSFORM
+						SELF.seq := 5;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_19;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_19;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_19;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_19;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_19;
+						SELF.Watchlist_address := le.authrep_watchlist_address_19;
+						SELF.Watchlist_city := le.authrep_watchlist_city_19;
+						SELF.Watchlist_state := le.authrep_watchlist_state_19;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_19;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_19;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_19;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec20 :=
+				  TRANSFORM
+						SELF.seq := 6;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_20;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_20;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_20;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_20;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_20;
+						SELF.Watchlist_address := le.authrep_watchlist_address_20;
+						SELF.Watchlist_city := le.authrep_watchlist_city_20;
+						SELF.Watchlist_state := le.authrep_watchlist_state_20;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_20;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_20;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_20;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec21 :=
+				  TRANSFORM
+						SELF.seq := 7;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_21;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_21;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_21;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_21;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_21;
+						SELF.Watchlist_address := le.authrep_watchlist_address_21;
+						SELF.Watchlist_city := le.authrep_watchlist_city_21;
+						SELF.Watchlist_state := le.authrep_watchlist_state_21;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_21;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_21;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_21;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec22 :=
+				  TRANSFORM
+						SELF.seq := 1;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_22;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_22;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_22;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_22;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_22;
+						SELF.Watchlist_address := le.authrep_watchlist_address_22;
+						SELF.Watchlist_city := le.authrep_watchlist_city_22;
+						SELF.Watchlist_state := le.authrep_watchlist_state_22;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_22;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_22;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_22;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec23 :=
+				  TRANSFORM
+						SELF.seq := 2;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_23;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_23;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_23;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_23;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_23;
+						SELF.Watchlist_address := le.authrep_watchlist_address_23;
+						SELF.Watchlist_city := le.authrep_watchlist_city_23;
+						SELF.Watchlist_state := le.authrep_watchlist_state_23;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_23;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_23;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_23;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec24 :=
+				  TRANSFORM
+						SELF.seq := 3;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_24;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_24;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_24;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_24;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_24;
+						SELF.Watchlist_address := le.authrep_watchlist_address_24;
+						SELF.Watchlist_city := le.authrep_watchlist_city_24;
+						SELF.Watchlist_state := le.authrep_watchlist_state_24;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_24;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_24;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_24;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec25 :=
+				  TRANSFORM
+						SELF.seq := 4;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_25;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_25;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_25;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_25;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_25;
+						SELF.Watchlist_address := le.authrep_watchlist_address_25;
+						SELF.Watchlist_city := le.authrep_watchlist_city_25;
+						SELF.Watchlist_state := le.authrep_watchlist_state_25;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_25;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_25;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_25;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec26 :=
+				  TRANSFORM
+						SELF.seq := 5;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_26;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_26;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_26;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_26;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_26;
+						SELF.Watchlist_address := le.authrep_watchlist_address_26;
+						SELF.Watchlist_city := le.authrep_watchlist_city_26;
+						SELF.Watchlist_state := le.authrep_watchlist_state_26;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_26;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_26;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_26;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec27 :=
+				  TRANSFORM
+						SELF.seq := 6;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_27;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_27;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_27;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_27;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_27;
+						SELF.Watchlist_address := le.authrep_watchlist_address_27;
+						SELF.Watchlist_city := le.authrep_watchlist_city_27;
+						SELF.Watchlist_state := le.authrep_watchlist_state_27;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_27;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_27;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_27;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec28 :=
+				  TRANSFORM
+						SELF.seq := 7;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_28;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_28;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_28;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_28;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_28;
+						SELF.Watchlist_address := le.authrep_watchlist_address_28;
+						SELF.Watchlist_city := le.authrep_watchlist_city_28;
+						SELF.Watchlist_state := le.authrep_watchlist_state_28;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_28;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_28;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_28;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec29 :=
+				  TRANSFORM
+						SELF.seq := 1;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_29;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_29;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_29;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_29;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_29;
+						SELF.Watchlist_address := le.authrep_watchlist_address_29;
+						SELF.Watchlist_city := le.authrep_watchlist_city_29;
+						SELF.Watchlist_state := le.authrep_watchlist_state_29;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_29;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_29;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_29;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec30 :=
+				  TRANSFORM
+						SELF.seq := 2;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_30;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_30;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_30;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_30;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_30;
+						SELF.Watchlist_address := le.authrep_watchlist_address_30;
+						SELF.Watchlist_city := le.authrep_watchlist_city_30;
+						SELF.Watchlist_state := le.authrep_watchlist_state_30;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_30;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_30;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_30;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec31 :=
+				  TRANSFORM
+						SELF.seq := 3;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_31;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_31;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_31;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_31;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_31;
+						SELF.Watchlist_address := le.authrep_watchlist_address_31;
+						SELF.Watchlist_city := le.authrep_watchlist_city_31;
+						SELF.Watchlist_state := le.authrep_watchlist_state_31;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_31;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_31;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_31;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec32 :=
+				  TRANSFORM
+						SELF.seq := 4;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_32;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_32;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_32;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_32;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_32;
+						SELF.Watchlist_address := le.authrep_watchlist_address_32;
+						SELF.Watchlist_city := le.authrep_watchlist_city_32;
+						SELF.Watchlist_state := le.authrep_watchlist_state_32;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_32;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_32;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_32;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec33 :=
+				  TRANSFORM
+						SELF.seq := 5;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_33;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_33;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_33;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_33;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_33;
+						SELF.Watchlist_address := le.authrep_watchlist_address_33;
+						SELF.Watchlist_city := le.authrep_watchlist_city_33;
+						SELF.Watchlist_state := le.authrep_watchlist_state_33;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_33;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_33;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_33;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec34 :=
+				  TRANSFORM
+						SELF.seq := 6;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_34;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_34;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_34;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_34;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_34;
+						SELF.Watchlist_address := le.authrep_watchlist_address_34;
+						SELF.Watchlist_city := le.authrep_watchlist_city_34;
+						SELF.Watchlist_state := le.authrep_watchlist_state_34;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_34;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_34;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_34;
+						SELF := [];
+				  END;
+				Risk_Indicators.Layouts.layout_watchlists_plus_seq xfm_rec35 :=
+				  TRANSFORM
+						SELF.seq := 7;
+						SELF.Watchlist_Table := le.authrep_watchlist_table_35;
+						SELF.Watchlist_Program := le.authrep_watchlist_program_35;
+						SELF.Watchlist_Record_Number := le.authrep_watchlist_record_number_35;
+						SELF.Watchlist_fname := le.authrep_watchlist_firstname_35;
+						SELF.Watchlist_lname := le.authrep_watchlist_lastname_35;
+						SELF.Watchlist_address := le.authrep_watchlist_address_35;
+						SELF.Watchlist_city := le.authrep_watchlist_city_35;
+						SELF.Watchlist_state := le.authrep_watchlist_state_35;
+						SELF.Watchlist_zip := le.authrep_watchlist_zip_35;
+						SELF.Watchlist_contry := le.authrep_watchlist_country_35;
+						SELF.Watchlist_Entity_Name := le.authrep_watchlist_entity_name_35;
+						SELF := [];
+				  END;
+				  
+				ds_WatchlistsAuthRep1 := DATASET( [xfm_Rec1] )+ DATASET( [xfm_Rec2] ) + DATASET( [xfm_Rec3] ) + DATASET( [xfm_Rec4] ) + DATASET( [xfm_Rec5] ) + DATASET( [xfm_Rec6] ) + DATASET( [xfm_Rec7] );
+				ds_WatchlistsAuthRep2 := DATASET( [xfm_Rec8] ) + DATASET( [xfm_Rec9] ) + DATASET( [xfm_Rec10] ) + DATASET( [xfm_Rec11] ) + DATASET( [xfm_Rec12] ) + DATASET( [xfm_Rec13] ) + DATASET( [xfm_Rec14] );
+				ds_WatchlistsAuthRep3 := DATASET( [xfm_Rec15] ) + DATASET( [xfm_Rec16] ) + DATASET( [xfm_Rec17] ) + DATASET( [xfm_Rec18] ) + DATASET( [xfm_Rec19] ) + DATASET( [xfm_Rec20] ) + DATASET( [xfm_Rec21] );
+				ds_WatchlistsAuthRep4 := DATASET( [xfm_Rec22] ) + DATASET( [xfm_Rec23] ) + DATASET( [xfm_Rec24] ) + DATASET( [xfm_Rec25] ) + DATASET( [xfm_Rec26] ) + DATASET( [xfm_Rec27] ) + DATASET( [xfm_Rec28] );
+				ds_WatchlistsAuthRep5 := DATASET( [xfm_Rec29] ) + DATASET( [xfm_Rec30] ) + DATASET( [xfm_Rec31] ) + DATASET( [xfm_Rec32] ) + DATASET( [xfm_Rec33] ) + DATASET( [xfm_Rec34] ) + DATASET( [xfm_Rec35] );
+				ds_Watchlists := CASE(C,
+																1 => ds_WatchlistsAuthRep1,
+																2 => ds_WatchlistsAuthRep2,
+																3 => ds_WatchlistsAuthRep3,
+																4 => ds_WatchlistsAuthRep4,
+																5 => ds_WatchlistsAuthRep5,
+																		 DATASET([],Risk_Indicators.Layouts.layout_watchlists_plus_seq)
+														  );
+				RETURN ds_Watchlists(Watchlist_Entity_Name != '' OR Watchlist_fname != '');  
+		END;
+		
+		EXPORT BusinessInstantID20_Services.Layouts.ConsumerInstantIDLayout xfm_AddConsumerInstantIDWatchlist( BusinessInstantID20_Services.Layouts.ConsumerInstantIDLayout le, 
+		BusinessInstantID20_Services.Layouts.OFACAndWatchlistLayoutFlat ri, INTEGER C,
+		BusinessInstantID20_Services.iOptions Options		
+		) :=
+		  TRANSFORM
+				watchlist_table_authrep1 := fn_NormalizeAuthRepWatchlist(ri,1);
+				watchlist_table_authrep2 := fn_NormalizeAuthRepWatchlist(ri,2);
+				watchlist_table_authrep3 := fn_NormalizeAuthRepWatchlist(ri,3);
+				watchlist_table_authrep4 := fn_NormalizeAuthRepWatchlist(ri,4);
+				watchlist_table_authrep5 := fn_NormalizeAuthRepWatchlist(ri,5);			
+			
+				SELF.watchlists := 
+				  PROJECT(CHOOSE(C,fn_NormalizeWatchlists(ri,1),fn_NormalizeWatchlists(ri,2),fn_NormalizeWatchlists(ri,3),fn_NormalizeWatchlists(ri,4),fn_NormalizeWatchlists(ri,5)),
+						  TRANSFORM(Risk_Indicators.Layouts.layout_watchlists_plus_seq, 
+								  SELF.watchlist_table				  := LEFT.Table,
+								  SELF.watchlist_program				:= LEFT.Program,
+								  SELF.watchlist_record_number  := LEFT.RecordNumber,
+								  SELF.watchlist_fname				  := LEFT.Name.First,
+								  SELF.watchlist_lname				  := LEFT.Name.Last,
+								  SELF.watchlist_address				:= LEFT.Address.StreetAddress1,
+								  SELF.watchlist_city				   := LEFT.Address.City,
+								  SELF.watchlist_state				  := LEFT.Address.State,
+								  SELF.watchlist_zip						:= LEFT.Address.Zip5,
+								  SELF.watchlist_contry				 := LEFT.Country,
+								  SELF.watchlist_Entity_Name		:= LEFT.EntityName,
+								  SELF.seq										  := (INTEGER)LEFT.Sequence,
+								  SELF := LEFT,
+								  SELF := []));
+				_ri := le.ri;
+				_fua := le.fua;
+				SELF.ri  := CHOOSEN(BusinessInstantID20_Services.Mod_CalculateAuthRepAdHocRiskIndicators(options,watchlist_table_authrep1,watchlist_table_authrep2,watchlist_table_authrep3,watchlist_table_authrep4,watchlist_table_authrep5,8,(string1)C,_ri,_fua).riAuthRep,8);
+				SELF.fua := CHOOSEN(BusinessInstantID20_Services.Mod_CalculateAuthRepAdHocRiskIndicators(options,watchlist_table_authrep1,watchlist_table_authrep2,watchlist_table_authrep3,watchlist_table_authrep4,watchlist_table_authrep5,8,(string1)C,_ri,_fua).fuaAuthRep,8);
+				SELF := le;
+				SELF := [];
+		  END;  
+		
+		EXPORT BusinessInstantID20_Services.layouts.OutputLayout_intermediate xfm_AddAddressRisk( BusinessInstantID20_Services.layouts.OutputLayout_intermediate le, BusinessInstantID20_Services.Layouts.BusinessAddressRiskLayout ri ) :=
+			TRANSFORM
+				  SELF.BusinessAddressRisk  := ri;
+				  SELF := le;
+				  SELF := [];
+		  END;
+		  
 		EXPORT BusinessInstantID20_Services.layouts.OutputLayout_intermediate xfm_AddOFACGWL( BusinessInstantID20_Services.layouts.OutputLayout_intermediate le, BusinessInstantID20_Services.layouts.OFACAndWatchlistLayoutFlat ri ) :=
 			TRANSFORM
 				// OFAC (Office of Foreign Access Control)
@@ -839,10 +2085,14 @@ EXPORT Transforms(BusinessInstantID20_Services.iOptions Options) := MODULE
 				SELF := [];
 			END;
 
-		EXPORT BusinessInstantID20_Services.layouts.OutputLayout_intermediate xfm_AddScoresAndBusinessShellData( BusinessInstantID20_Services.layouts.OutputLayout_intermediate le, Business_Risk_BIP.Layouts.Shell ri ) :=
+		EXPORT BusinessInstantID20_Services.layouts.OutputLayout_intermediate xfm_AddScoresAndBusinessShellData( 
+				  BusinessInstantID20_Services.layouts.OutputLayout_intermediate le, 
+				  Business_Risk_BIP.Layouts.Shell ri, 
+				  DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo) ri2, 
+				  DATASET(BusinessInstantID20_Services.layouts.OFACAndWatchlistLayoutFlat) ri3 ) :=
 			TRANSFORM
 				bus_verification  := BusinessInstantID20_Services.mod_CalculateBVI( ri, Options.useSBFE );
-				risk_indicators   := BusinessInstantID20_Services.fn_CalculateRiskIndicators( ri, bus_verification.bvi, bus_verification.bvi_desc_key, Options.useSBFE );
+				_risk_indicators  := BusinessInstantID20_Services.Mod_CalculateBusinessAdHocRiskIndicators( ri2, ri, Options, ri3,5).riBusiness;
 				sbfe_verification := BusinessInstantID20_Services.fn_CalculateSBFEVerification( ri, Options.useSBFE );
 				bus2exec_index    := BusinessInstantID20_Services.mod_CalculateBusiness2Exec( ri, Options.useSBFE ).rw_result;
 				resid_bus_info    := BusinessInstantID20_Services.mod_CalculateResidentialBusiness( ri, Options.useSBFE ).rw_result;
@@ -863,22 +2113,22 @@ EXPORT Transforms(BusinessInstantID20_Services.iOptions Options) := MODULE
 				SELF.ResidentialBus.residential_bus_desc      := resid_bus_info.residential_bus_desc;
 				
 				// Risk Indicators
-				SELF.RiskIndicators.bus_ri_1      := risk_indicators.bus_ri_1;
-				SELF.RiskIndicators.bus_ri_desc_1 := risk_indicators.bus_ri_desc_1;
-				SELF.RiskIndicators.bus_ri_2      := risk_indicators.bus_ri_2;
-				SELF.RiskIndicators.bus_ri_desc_2 := risk_indicators.bus_ri_desc_2;
-				SELF.RiskIndicators.bus_ri_3      := risk_indicators.bus_ri_3;
-				SELF.RiskIndicators.bus_ri_desc_3 := risk_indicators.bus_ri_desc_3;
-				SELF.RiskIndicators.bus_ri_4      := risk_indicators.bus_ri_4;
-				SELF.RiskIndicators.bus_ri_desc_4 := risk_indicators.bus_ri_desc_4;
-				SELF.RiskIndicators.bus_ri_5      := risk_indicators.bus_ri_5;
-				SELF.RiskIndicators.bus_ri_desc_5 := risk_indicators.bus_ri_desc_5;
-				SELF.RiskIndicators.bus_ri_6      := risk_indicators.bus_ri_6;
-				SELF.RiskIndicators.bus_ri_desc_6 := risk_indicators.bus_ri_desc_6;
-				SELF.RiskIndicators.bus_ri_7      := risk_indicators.bus_ri_7;
-				SELF.RiskIndicators.bus_ri_desc_7 := risk_indicators.bus_ri_desc_7;
-				SELF.RiskIndicators.bus_ri_8      := risk_indicators.bus_ri_8;
-				SELF.RiskIndicators.bus_ri_desc_8 := risk_indicators.bus_ri_desc_8;	
+				SELF.RiskIndicators.bus_ri_1      := _risk_indicators.bus_ri_1;
+				SELF.RiskIndicators.bus_ri_desc_1 := _risk_indicators.bus_ri_desc_1;
+				SELF.RiskIndicators.bus_ri_2      := _risk_indicators.bus_ri_2;
+				SELF.RiskIndicators.bus_ri_desc_2 := _risk_indicators.bus_ri_desc_2;
+				SELF.RiskIndicators.bus_ri_3      := _risk_indicators.bus_ri_3;
+				SELF.RiskIndicators.bus_ri_desc_3 := _risk_indicators.bus_ri_desc_3;
+				SELF.RiskIndicators.bus_ri_4      := _risk_indicators.bus_ri_4;
+				SELF.RiskIndicators.bus_ri_desc_4 := _risk_indicators.bus_ri_desc_4;
+				SELF.RiskIndicators.bus_ri_5      := _risk_indicators.bus_ri_5;
+				SELF.RiskIndicators.bus_ri_desc_5 := _risk_indicators.bus_ri_desc_5;
+				SELF.RiskIndicators.bus_ri_6      := _risk_indicators.bus_ri_6;
+				SELF.RiskIndicators.bus_ri_desc_6 := _risk_indicators.bus_ri_desc_6;
+				SELF.RiskIndicators.bus_ri_7      := _risk_indicators.bus_ri_7;
+				SELF.RiskIndicators.bus_ri_desc_7 := _risk_indicators.bus_ri_desc_7;
+				SELF.RiskIndicators.bus_ri_8      := _risk_indicators.bus_ri_8;
+				SELF.RiskIndicators.bus_ri_desc_8 := _risk_indicators.bus_ri_desc_8;	
 				
 				// Verification Summaries
 				SELF.VerificationSummaries.ver_phone_src_index           := verif_summaries.ver_phone_src_index;

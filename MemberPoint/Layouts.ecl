@@ -1,4 +1,4 @@
-import Autokey_batch,AddrBest,BatchServices,BatchShare,DidVille,progressive_phone,DeathV2_Services,Royalty, PhoneFinder_Services;
+﻿ import Autokey_batch,AddrBest,BatchServices,BatchShare,DidVille,progressive_phone,DeathV2_Services,Royalty, PhoneFinder_Services;
 
 export Layouts := module
 
@@ -201,12 +201,17 @@ export Layouts := module
 		typeof(BatchServices.layout_Death_Batch_out.dod8) Date_of_death;
 		string31 dcd_match_code; // this will be death match code + 1 string for 'D' or DOB matches
 
-// Email
+//  Email
 		string Email1;
 		string Email2;
 		string Email3;
 		string Email4;
 		string Email5;
+		string Email6;
+		string Email7;
+		string Email8;
+		string Email9;
+		string Email10;
 end;
 	
 	

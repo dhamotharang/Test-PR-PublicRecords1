@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, iesp, Patriot;
+﻿IMPORT BIPV2, Business_Risk_BIP, iesp, Patriot, BusinessInstantID20_Services;
 
 EXPORT mod_BusinessShell(DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo) ds_input,
                            BusinessInstantID20_Services.iOptions Options) := 
@@ -128,6 +128,7 @@ EXPORT mod_BusinessShell(DATASET(BusinessInstantID20_Services.layouts.InputCompa
 				IF(includeAddlWatchlists, DATASET([{patriot.constants.wlALL}], iesp.share.t_StringArrayItem));
 
       SHARED ds_WatchlistsRequested := Options.Watchlists_Requested + ds_derived_watchlists;
+      // SHARED ds_WatchlistsRequested := DATASET([],iesp.Share.t_StringArrayItem);
 			 
 			// Grab Business Shell results. Layout is Business_Risk_BIP.Layouts.Shell .
 			SHARED Shell_Results := Business_Risk_BIP.LIB_Business_Shell_Function(Shell_Input,

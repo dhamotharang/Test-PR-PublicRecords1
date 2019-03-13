@@ -1,12 +1,11 @@
 ﻿IMPORT Address, AutoStandardI, BIPV2, Business_Credit_Scoring, BusinessCredit_Services, Business_Risk_BIP, Doxie, iesp, LNSmallBusiness, ut, std;
 
-EXPORT fn_getBusiness_CreditScore (BusinessCredit_Services.Iparam.reportrecords inmod,
-                                                                                                DATASET(BusinessCredit_Services.Layouts.TopBusinessRecord) topBusinessRecs,																		
-																		DATASET(doxie.layout_best) AuthRepBestRec																		
+EXPORT fn_getBusiness_CreditScore (BusinessCredit_Services.Iparam.reportrecords inmod,                                                                                              
+																	     DATASET(BusinessCredit_Services.Layouts.TopBusiness_BestSection) bestRecs,
+																		DATASET(doxie.layout_best) AuthRepBestRec																																		
 																		) := MODULE
 
 	SHARED BuzCreditScoringRecs := Business_Credit_Scoring.Key_ScoringIndex().kFetch2(inmod.BusinessIds,inmod.FetchLevel,,inmod.DataPermissionMask, BusinessCredit_Services.Constants.JOIN_LIMIT);
-	topBusiness_bestrecs 				:= PROJECT(topBusinessRecs, BusinessCredit_Services.Layouts.TopBusiness_BestSection);	
 
 	// Adding min input check for Business & AuthRep. we only wanted to suppliment information from best file to analytics fxn when below check is not satisfied in the search.
 	// this is done to fix Score Mismatch between CreditReport and Analytics Score service
@@ -40,21 +39,23 @@ EXPORT fn_getBusiness_CreditScore (BusinessCredit_Services.Iparam.reportrecords 
 		SELF.Seq            		:= 1;
 		SELF.AcctNo         		:= '1';
 		SELF.HistoryDate    		:= (INTEGER)Business_Risk_BIP.Constants.NinesDate;
-		SELF.HistoryDateTime		:= (INTEGER)Business_Risk_BIP.Constants.NinesDateTime;
-		SELF.CompanyName    		:= IF(MinimumInputForBizSearch, inmod.CompanyName , topBusiness_bestrecs[1].BestSection.CompanyName);
-		SELF.Prim_Range 				:= IF(MinimumInputForBizSearch, inmod.Company_StreetNumber , topBusiness_bestrecs[1].BestSection.Address.StreetNumber);
-		SELF.PreDir 						:= IF(MinimumInputForBizSearch, inmod.Company_StreetPreDirection , topBusiness_bestrecs[1].BestSection.Address.StreetPreDirection);
-		SELF.Prim_Name 					:= IF(MinimumInputForBizSearch, inmod.Company_StreetName , topBusiness_bestrecs[1].BestSection.Address.StreetName);
-		SELF.Addr_Suffix 				:= IF(MinimumInputForBizSearch, inmod.Company_StreetSuffix , topBusiness_bestrecs[1].BestSection.Address.StreetSuffix);
-		SELF.PostDir 						:= IF(MinimumInputForBizSearch, inmod.Company_StreetPostDirection , topBusiness_bestrecs[1].BestSection.Address.StreetPostDirection);
-		SELF.Unit_Desig 				:= IF(MinimumInputForBizSearch, inmod.Company_UnitDesignation , topBusiness_bestrecs[1].BestSection.Address.UnitDesignation);
-		SELF.Sec_Range 					:= IF(MinimumInputForBizSearch, inmod.Company_UnitNumber , topBusiness_bestrecs[1].BestSection.Address.UnitNumber);
-		SELF.StreetAddress1 		:= IF(MinimumInputForBizSearch, inmod.Company_StreetAddress1 , topBusiness_bestrecs[1].BestSection.Address.StreetAddress1);
-		SELF.City           		:= IF(MinimumInputForBizSearch, inmod.Company_City , topBusiness_bestrecs[1].BestSection.Address.City);
-		SELF.State         			:= IF(MinimumInputForBizSearch, inmod.Company_State , topBusiness_bestrecs[1].BestSection.Address.State);
-		SELF.Zip          			:= IF(MinimumInputForBizSearch, inmod.Company_Zip , topBusiness_bestrecs[1].BestSection.Address.Zip5);		
-		SELF.FEIN          			:= IF(MinimumInputForBizSearch, inmod.Tin , topBusiness_bestrecs[1].BestSection.Tin);		
-		SELF.Phone10    				:= IF(MinimumInputForBizSearch, inmod.Company_Phone, topBusiness_bestrecs[1].BestSection.PhoneInfo.Phone10);
+		SELF.HistoryDateTime		:= (INTEGER)Business_Risk_BIP.Constants.NinesDateTime;		
+		// new code:
+		SELF.CompanyName := IF(MinimumInputForBizSearch, inmod.CompanyName , bestrecs[1].BestSection.CompanyName);
+		SELF.Prim_Range 	:= IF(MinimumInputForBizSearch, inmod.Company_StreetNumber , bestrecs[1].BestSection.Address.StreetNumber);
+		SELF.PreDir 			:= IF(MinimumInputForBizSearch, inmod.Company_StreetPreDirection , bestrecs[1].BestSection.Address.StreetPreDirection);
+		SELF.Prim_Name 		:= IF(MinimumInputForBizSearch, inmod.Company_StreetName , bestrecs[1].BestSection.Address.StreetName);
+		SELF.Addr_Suffix 		:= IF(MinimumInputForBizSearch, inmod.Company_StreetSuffix , bestrecs[1].BestSection.Address.StreetSuffix);
+		SELF.PostDir 			:= IF(MinimumInputForBizSearch, inmod.Company_StreetPostDirection , bestrecs[1].BestSection.Address.StreetPostDirection);
+		SELF.Unit_Desig 		:= IF(MinimumInputForBizSearch, inmod.Company_UnitDesignation , bestrecs[1].BestSection.Address.UnitDesignation);
+		SELF.Sec_Range 		:= IF(MinimumInputForBizSearch, inmod.Company_UnitNumber , bestrecs[1].BestSection.Address.UnitNumber);
+		SELF.StreetAddress1	:= IF(MinimumInputForBizSearch, inmod.Company_StreetAddress1 , bestrecs[1].BestSection.Address.StreetAddress1);
+		SELF.City           		:= IF(MinimumInputForBizSearch, inmod.Company_City , bestrecs[1].BestSection.Address.City);
+		SELF.State         		:= IF(MinimumInputForBizSearch, inmod.Company_State , bestrecs[1].BestSection.Address.State);
+		SELF.Zip          			:= IF(MinimumInputForBizSearch, inmod.Company_Zip , bestrecs[1].BestSection.Address.Zip5);		
+		SELF.FEIN          		:= IF(MinimumInputForBizSearch, inmod.Tin , bestrecs[1].BestSection.Tin);		
+		SELF.Phone10    		:= IF(MinimumInputForBizSearch, inmod.Company_Phone, bestrecs[1].BestSection.PhoneInfo.Phone10);
+		//
 		SELF.SeleID  						:= inmod.BusinessIds[1].SeleID;
 		SELF.OrgID   						:= inmod.BusinessIds[1].OrgID;
 		SELF.UltID   						:= inmod.BusinessIds[1].UltID;
@@ -123,8 +124,14 @@ EXPORT fn_getBusiness_CreditScore (BusinessCredit_Services.Iparam.reportrecords 
 		SELF.Rep_DLState 				:= inmod.DLState;
 		SELF         						:= [];	
 	END;
-	
+	//                                         this UseInputDataAsIs is defaulted to false in BusinessCredit_Services.Iparam.reportRecords
+	//                                        and set to true in the call from  LNSmallBusiness.SmallBusiness_BIP_Combined_Service
+	//
+	//                                        since that service also calls this attribute LNSmallBusiness.SmallBusiness_BIP_Combined_Service =>
+	 //                                       LNSmallBusiness.SmallBusiness_BIP_Combined_Service_Records ->  BusinessCredit_Services.CreditReport_Records 
+	 //                                       -> BusinessCredit_Services.fn_getBusiness_CreditScore
 	input_rec				:= IF( inmod.UseInputDataAsIs, DATASET([prepare_input_for_Combined_service()]), DATASET([prepare_input()]) );
+	
 	SHARED results	:= LNSmallBusiness.fn_SmallBusiness_getScores(input_rec, input_options, set_model);
 
 	model_results	:= NORMALIZE(results, LEFT.modelresults, TRANSFORM(RIGHT));

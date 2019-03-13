@@ -1,0 +1,465 @@
+ID "h534f7cd-c866-4f40-2342-89cf23543678e";
+NAME ComputeSAIndexes;
+LABEL "Compute SA Indexes";
+VERSION "1.1.0";
+AUTHOR "gaoyon01";
+CATEGORY CUSTOM;
+DESCRIPTION "Builds custom SA Indexes for use in custom search query used by SA dashboards.";
+PERMISSIONS
+VIEW:PUBLIC;
+EDIT:PRIVATE;
+RUN:PUBLIC;
+END
+
+INPUTS
+    STRING JOBID: LABEL("Batch Job ID"),DESCRIPTION("The batch Job ID will be appended to the indexes names to avoid collision with previous runs"),DEFAULT("^GLOBAL|JOBID");
+    STRING GCID: LABEL("GCID"),DESCRIPTION("GCID"),DEFAULT("^GLOBAL|GCID");
+
+    DATASET dsInputProvider: MAPBYNAME
+        FIELD FirstName:LABEL("Provider First Name"),DESCRIPTION("Provider First Name"),OPTIONAL,NULL("");
+        FIELD MiddleName:LABEL("Provider Middle Name"),DESCRIPTION("Provider Middle Name"),OPTIONAL,NULL("");
+        FIELD LastName:LABEL("Provider Last Name"),DESCRIPTION("Provider Last Name"),OPTIONAL,NULL("");
+        FIELD SuffixName:LABEL("Provider Suffix Name"),DESCRIPTION("Provider Suffix Name"),OPTIONAL,NULL("");
+
+        FIELD PrimaryRange:LABEL("Primary Range"),DESCRIPTION("Primary Range, Street Number"),OPTIONAL,NULL("");
+        FIELD PreDirectional:LABEL("Pre-Direction"), DESCRIPTION("Pre-Directional"),OPTIONAL,NULL("");
+        FIELD PrimaryName:LABEL("Primary Name"),DESCRIPTION("Primary Name, Street Name"),OPTIONAL,NULL("");
+        FIELD AddressSuffix:LABEL("Address Suffix"),DESCRIPTION("Address Suffix"),OPTIONAL,NULL("");
+        FIELD PostDirectional:LABEL("Post-Direction"), DESCRIPTION("Post-Directional"),OPTIONAL,NULL("");
+        FIELD SecondaryRange:LABEL("Secondary Range"),DESCRIPTION("Secondary Range, Apt or Suite"),OPTIONAL,NULL("");
+        FIELD City:LABEL("City"),DESCRIPTION("City"),OPTIONAL,NULL("");
+        FIELD State:LABEL("State"),DESCRIPTION("Two-letter State abbreviation"),OPTIONAL,NULL("");
+        FIELD Zip5:LABEL("Zip Code"),DESCRIPTION("5-Digit Zip Code"),OPTIONAL,NULL("");
+        FIELD FipsState:LABEL("Fips State"),DESCRIPTION("Fips State"),OPTIONAL,NULL("");
+        FIELD County:LABEL("Address County"),DESCRIPTION("Address County"),OPTIONAL,NULL("");
+        FIELD Latitude:LABEL("Address Latitude"),DESCRIPTION("Address Latitude"),OPTIONAL,NULL(""); 
+        FIELD Longitude:LABEL("Address Longitude"),DESCRIPTION("Address Longitude"),OPTIONAL,NULL("");  
+        FIELD AddressKey:LABEL("Address Key"),DESCRIPTION("Address Key"),OPTIONAL,NULL("");
+
+        FIELD LNPID:LABEL("Lexis Nexis Professional ID"),DESCRIPTION("Lexis Nexis Professional ID"),OPTIONAL,NULL("");
+        FIELD LEXID:LABEL("Lexis Nexis Consumer ID"),DESCRIPTION("Lexis Nexis Consumer ID"),OPTIONAL,NULL("");
+
+        FIELD ProviderProviderKey:LABEL("Provider Identifier Key"),DESCRIPTION("Provider Identifier Key"),OPTIONAL,NULL("");
+        FIELD ProviderProviderNpi:LABEL("Provider NPI"),DESCRIPTION("Provider NPI"),OPTIONAL,NULL("");
+        FIELD ProviderFacilityName:LABEL("Facility Name"),DESCRIPTION("Facility Name"),OPTIONAL,NULL("");
+        FIELD ProviderSpecialty:LABEL("Provider Specialty Description"),DESCRIPTION("Provider Specialty Description"),OPTIONAL,NULL("");
+
+        FIELD ProviderChargedDollars:LABEL("Total Charge Amount"),DESCRIPTION("Total Charge Amount"),OPTIONAL,NULL("");
+        FIELD ProviderPaidDollars:LABEL("Total Paid Amount"),DESCRIPTION("Total Paid Amount"),OPTIONAL,NULL("");
+        FIELD ProviderClaims:LABEL("Total Claim Count"),DESCRIPTION("Total Claim Count"),OPTIONAL,NULL("");
+
+        FIELD ProviderImpactDollars:LABEL("Provider Impact Amount"),DESCRIPTION("Provider Impact Amount"),OPTIONAL,NULL("");
+        FIELD ProviderImpactClaims:LABEL("Provider Impact Claim Count"),DESCRIPTION("Provider Impact Claim Count"),OPTIONAL,NULL("");
+        FIELD AddressImpactDollars:LABEL("Address Impact Amount"),DESCRIPTION("Address Impact Amount"),OPTIONAL,NULL("");
+        FIELD AddressImpactClaims:LABEL("Address Impact Claim Count"),DESCRIPTION("Address Impact Claim Count"),OPTIONAL,NULL("");
+        FIELD LnpidImpactDollars:LABEL("Lnpid Impact Amount"),DESCRIPTION("Lnpid Impact Amount"),OPTIONAL,NULL("");
+        FIELD LnpidImpactClaims:LABEL("Lnpid Impact Claim Count"),DESCRIPTION("Lnpid Impact Claim Count"),OPTIONAL,NULL("");
+
+        FIELD ProviderScore:LABEL("Provider Score"),DESCRIPTION("Provider Score"),OPTIONAL,NULL("");
+        FIELD ClientSpecialty:LABEL("Client Specialty"),DESCRIPTION("Client Specialty"),OPTIONAL,NULL("");
+
+    END
+
+    DATASET dsInputFacility: MAPBYNAME
+        FIELD NetworkKey:LABEL("Network Identifier Key"),DESCRIPTION("Network Identifier Key"),OPTIONAL,NULL("");
+        FIELD LegalBusinessName:LABEL("Legal Business Name"),DESCRIPTION("Legal Business Name"),OPTIONAL,NULL("");
+        FIELD DoingBusinessAs:LABEL("Doing Business As"),DESCRIPTION("Doing Business As"),OPTIONAL,NULL("");
+        FIELD BusinessAddress:LABEL("Business Address"),DESCRIPTION("Business Address"),OPTIONAL,NULL("");
+        FIELD InInputFile:LABEL("In Input File"),DESCRIPTION("In Input File"),OPTIONAL,NULL("");
+        FIELD LegalEntityIsActive:LABEL("Legal Entity Is Active"),DESCRIPTION("Legal Entity Is Active"),OPTIONAL,NULL("");
+        FIELD LegalEntityIsDefunct:LABEL("Legal Entity Is Defunct"),DESCRIPTION("Legal Entity Is Defunct"),OPTIONAL,NULL("");
+        FIELD DateFirstSeen:LABEL("Date First Seen"),DESCRIPTION("Date First Seen"),OPTIONAL,NULL("");
+        FIELD IncorporationDate:LABEL("Incorporation Date"),DESCRIPTION("Incorporation Date"),OPTIONAL,NULL("");
+        FIELD ClaimStartDate:LABEL("Claim Start Date"),DESCRIPTION("Claim Start Date"),OPTIONAL,NULL("");
+        FIELD ClaimEndDate:LABEL("Claim End Date"),DESCRIPTION("Claim End Date"),OPTIONAL,NULL("");
+
+        FIELD FacilityProviderKey:LABEL("Provider Identifier Key"),DESCRIPTION("Provider Identifier Key"),OPTIONAL,NULL("");
+        FIELD FacilityProviderNpi:LABEL("Provider NPI"),DESCRIPTION("Provider NPI"),OPTIONAL,NULL("");
+        FIELD FacilityFacilityName:LABEL("Facility Name"),DESCRIPTION("Facility Name"),OPTIONAL,NULL("");
+        FIELD FacilitySpecialty:LABEL("Provider Specialty Description"),DESCRIPTION("Provider Specialty Description"),OPTIONAL,NULL("");
+
+        FIELD FacilityChargedDollars:LABEL("Total Charge Amount"),DESCRIPTION("Total Charge Amount"),OPTIONAL,NULL("");
+        FIELD FacilityPaidDollars:LABEL("Total Paid Amount"),DESCRIPTION("Total Paid Amount"),OPTIONAL,NULL("");
+        FIELD FacilityClaims:LABEL("Total Claim Count"),DESCRIPTION("Total Claim Count"),OPTIONAL,NULL("");
+    END
+END
+
+OUTPUTS
+    ACTION dsBuildKeys;
+END
+
+GENERATES INLINE
+
+    ProviderLayout := RECORD
+        STRING1   InProviderFile;
+
+        STRING50  ProviderProviderKey;
+        STRING10  ProviderProviderNpi;
+        STRING50  ProviderFacilityName;
+        STRING50  ProviderSpecialty;
+
+        INTEGER8 ProviderImpactDollars;
+        INTEGER8 ProviderImpactClaims;
+        INTEGER8 AddressImpactDollars;
+        INTEGER8 AddressImpactClaims;
+        INTEGER8 LnpidImpactDollars;
+        INTEGER8 LnpidImpactClaims;
+
+        UNSIGNED4 ProviderScore;
+        STRING100 ClientSpecialty;
+
+        UNSIGNED8 ProviderChargedDollars;
+        UNSIGNED8 ProviderPaidDollars;
+        UNSIGNED8 ProviderClaims;
+
+        STRING20  FirstName;
+        STRING20  MiddleName;
+        STRING20  LastName;
+        STRING5   SuffixName;
+
+        STRING10  PrimaryRange;
+        STRING2   PreDirectional;
+        STRING28  PrimaryName;
+        STRING4   AddressSuffix;
+        STRING2   PostDirectional;
+        STRING8   SecondaryRange;
+        STRING25  City;
+        STRING2   State;
+        STRING5   Zip5;
+        STRING5   CountyCode;
+        STRING7   StateCountyCode;
+        STRING50  AddressLine1;
+        STRING75  AddressLine;
+        STRING10  Latitude;
+        STRING10  Longitude;
+        STRING25  AddressKey;
+
+        UNSIGNED8 LNPID;
+        UNSIGNED8 LEXID;
+    END;
+
+    FacilityLayout := RECORD
+        STRING1 InFacilityFile;
+
+        STRING50 FacilityProviderKey;
+        STRING10 FacilityProviderNpi;
+        STRING50 FacilityFacilityName;
+        STRING50 FacilitySpecialty;
+
+        UNSIGNED8 FacilityChargedDollars;
+        UNSIGNED8 FacilityPaidDollars;
+        UNSIGNED8 FacilityClaims;
+
+        STRING8 DateFirstSeen;
+        STRING8 ClaimstartDate;
+        STRING8 ClaimEndDate;
+
+        STRING50 NetworkKey;
+        STRING50 LegalBusinessName;
+        STRING50 DoingBusinessAs;
+        STRING BusinessAddress;  
+        UNSIGNED1 InInputFile;
+        STRING8 IncorporationDate;
+        BOOLEAN LegalEntityIsActive;
+        BOOLEAN LegalEntityIsDefunct;
+    END;
+
+    JoinedLayout := RECORD
+        ProviderLayout;
+        FacilityLayout;
+    END;  
+
+    CombinedLayout := RECORD
+        STRING1   InProviderFile;
+        STRING1   InFacilityFile;
+
+        STRING50  ProviderKey;
+        STRING10  ProviderNpi;
+        STRING50  FacilityName;
+        STRING50  Specialty;
+
+        INTEGER8 ProviderImpactDollars;
+        INTEGER8 ProviderImpactClaims;
+        INTEGER8 AddressImpactDollars;
+        INTEGER8 AddressImpactClaims;
+        INTEGER8 LnpidImpactDollars;
+        INTEGER8 LnpidImpactClaims;
+
+        UNSIGNED4 ProviderScore;
+        STRING100 ClientSpecialty;
+
+        UNSIGNED8 ChargedDollars;
+        UNSIGNED8 PaidDollars;
+        UNSIGNED8 Claims;
+
+        STRING20  FirstName;
+        STRING20  MiddleName;
+        STRING20  LastName;
+        STRING5   SuffixName;
+
+        STRING10  PrimaryRange;
+        STRING2   PreDirectional;
+        STRING28  PrimaryName;
+        STRING4   AddressSuffix;
+        STRING2   PostDirectional;
+        STRING8   SecondaryRange;
+        STRING25  City;
+        STRING2   State;
+        STRING5   Zip5;
+        STRING5   CountyCode;
+        STRING7   StateCountyCode;
+        STRING50  AddressLine1;
+        STRING75  AddressLine;
+        STRING10  Latitude;
+        STRING10  Longitude;
+        STRING25  AddressKey;
+
+        UNSIGNED8 LNPID;
+        UNSIGNED8 LEXID;
+
+        STRING8   DateFirstSeen;
+        STRING8   ClaimStartDate;
+        STRING8   ClaimEndDate;
+
+        STRING50  NetworkKey;
+        STRING50  LegalBusinessName;
+        STRING50  DoingBusinessAs;
+        STRING    BusinessAddress;  
+        UNSIGNED1 InInputFile;
+        BOOLEAN   LegalEntityIsActive;
+        BOOLEAN   LegalEntityIsDefunct;
+        STRING8   IncorporationDate;
+    END;
+
+    IndexLayout := RECORD
+        UNSIGNED8 RecordId;
+        STRING20  PreferredFirstName;
+        STRING20  PhoneticLastName;
+
+        STRING50  ProviderKey;
+        STRING10  ProviderNpi;
+        STRING20  FirstName;
+        STRING20  MiddleName;
+        STRING20  LastName;
+        STRING5   SuffixName;
+        STRING50  FacilityName;
+        STRING10  PrimaryRange;
+        STRING2   PreDirectional;
+        STRING28  PrimaryName;
+        STRING4   AddressSuffix;
+        STRING2   PostDirectional;
+        STRING8   SecondaryRange;
+        STRING25  City;
+        STRING2   State;
+        STRING5   Zip5;
+        UNSIGNED8 LNPID;
+        UNSIGNED8 LEXID;
+    END;
+    
+    PayloadLayout := RECORD
+        IndexLayout;
+
+        INTEGER8 ProviderImpactDollars;
+        INTEGER8 ProviderImpactClaims;
+        INTEGER8 AddressImpactDollars;
+        INTEGER8 AddressImpactClaims;
+        INTEGER8 LnpidImpactDollars;
+        INTEGER8 LnpidImpactClaims;
+
+        UNSIGNED4 ProviderScore;
+
+        STRING100  Specialty;
+
+        UNSIGNED8 ChargedDollars;
+        UNSIGNED8 PaidDollars;
+        UNSIGNED8 Claims;
+
+        STRING8   DateFirstSeen;
+        STRING8   ClaimStartDate;
+        STRING8   ClaimEndDate;
+
+        STRING5   CountyCode;
+        STRING7   StateCountyCode;
+        STRING50  AddressLine1;
+        STRING10  Latitude;
+        STRING10  Longitude;
+        STRING25  AddressKey;
+
+        STRING50  NetworkKey;
+        STRING50  LegalBusinessName;
+        STRING50  DoingBusinessAs;
+        STRING 	  BusinessAddress;  
+        UNSIGNED1 InInputFile;
+        STRING8   IncorporationDate;
+        BOOLEAN   LegalEntityIsActive;
+        BOOLEAN   LegalEntityIsDefunct;
+    END;
+
+    IMPORT STD, ComputeSAIndexes, NID, lib_metaphone;
+
+    ProviderLayout providerXform(RECORDOF(%dsInputProvider%) L) := TRANSFORM
+        SELF.FirstName              := L.%FirstName%;
+        SELF.MiddleName             := L.%MiddleName%;
+        SELF.LastName               := L.%LastName%;
+        SELF.SuffixName             := L.%SuffixName%;
+
+        SELF.PrimaryRange           := L.%PrimaryRange%;
+        SELF.PreDirectional         := L.%PreDirectional%;
+        SELF.PrimaryName            := L.%PrimaryName%;
+        SELF.AddressSuffix          := L.%AddressSuffix%;
+        SELF.PostDirectional        := L.%PostDirectional%;
+        SELF.SecondaryRange         := L.%SecondaryRange%;
+        SELF.City                   := L.%City%;
+        SELF.State                  := L.%State%;
+        SELF.Zip5                   := L.%Zip5%;
+        SELF.CountyCode             := L.%FipsState% + L.%County%;
+        SELF.StateCountyCode        := L.%State% + L.%FipsState% + L.%County%,
+        SELF.AddressLine1           := STD.STR.CleanSpaces(TRIM(L.%PrimaryRange%) + ' ' + 
+                                       TRIM(L.%PreDirectional%) + ' ' + 
+                                       TRIM(L.%PrimaryName%) + ' ' + 
+                                       TRIM(L.%AddressSuffix%) + ' ' + 
+                                       TRIM(L.%PostDirectional%) + ' ' + 
+                                       TRIM(L.%SecondaryRange%)); 
+
+        SELF.AddressLine            := STD.STR.CleanSpaces(TRIM(L.%PrimaryRange%) + ' ' + 
+                                       TRIM(L.%PreDirectional%) + ' ' + 
+                                       TRIM(L.%PrimaryName%) + ' ' + 
+                                       TRIM(L.%AddressSuffix%) + ' ' + 
+                                       TRIM(L.%PostDirectional%) + ' ' + 
+                                       TRIM(L.%SecondaryRange%) + ' ' + 
+                                       TRIM(L.%City%) + ' ' + 
+                                       TRIM(L.%State%) + ' ' + 
+                                       TRIM(L.%Zip5%));
+                                    
+        SELF.Latitude               := L.%Latitude%;
+        SELF.Longitude              := L.%Longitude%;
+        SELF.AddressKey             := L.%AddressKey%;
+
+        SELF.LNPID        		    := L.%LNPID%;
+        SELF.LEXID        		    := L.%LEXID%;
+
+        SELF.InProviderFile         := 'Y';
+
+        SELF.ProviderProviderKey    := IF(TRIM(L.%ProviderProviderKey%, ALL) <> '', '_' + TRIM(L.%ProviderProviderKey%, ALL), '');
+
+        SELF.ProviderProviderNpi    := TRIM(L.%ProviderProviderNpi%, ALL);
+        SELF.ProviderSpecialty      := L.%ProviderSpecialty%;
+        SELF.ProviderFacilityName   := L.%ProviderFacilityName%;
+
+        SELF.ProviderChargedDollars := ROUND(L.%ProviderChargedDollars%);
+        SELF.ProviderPaidDollars    := ROUND(L.%ProviderPaidDollars%);
+        SELF.ProviderClaims         := L.%ProviderClaims%;
+
+        SELF.ProviderImpactDollars  := L.%ProviderImpactDollars%;
+        SELF.ProviderImpactClaims   := L.%ProviderImpactClaims%;
+        SELF.AddressImpactDollars   := L.%AddressImpactDollars%;
+        SELF.AddressImpactClaims    := L.%AddressImpactClaims%;
+        SELF.LnpidImpactDollars     := L.%LnpidImpactDollars%;
+        SELF.LnpidImpactClaims      := L.%LnpidImpactClaims%;
+
+        SELF.ProviderScore          := L.%ProviderScore%;
+        SELF.ClientSpecialty        := L.%ClientSpecialty%;
+    END; 
+    dsProvider := PROJECT(%dsInputProvider%, providerXform(LEFT));
+
+    FacilityLayout facilityXform(RECORDOF(%dsInputFacility%) L) := TRANSFORM
+        SELF.DateFirstSeen          := IF(L.%DateFirstSeen% = 0, '', (STRING8)L.%DateFirstSeen%);
+        SELF.ClaimstartDate         := L.%ClaimStartDate%;
+        SELF.ClaimEndDate           := L.%ClaimEndDate%;
+
+        SELF.NetworkKey             := TRIM(L.%NetworkKey%, ALL);
+        SELF.LegalBusinessName      := L.%LegalBusinessName%;
+        SELF.DoingBusinessAs        := L.%DoingBusinessAs%;
+        SELF.BusinessAddress        := L.%BusinessAddress%;  
+        SELF.InInputFile            := L.%InInputFile%;
+        SELF.IncorporationDate      := IF(L.%IncorporationDate% = 0, '', (STRING8)L.%IncorporationDate%);
+        SELF.LegalEntityIsActive    := L.%LegalEntityIsActive%;
+        SELF.LegalEntityIsDefunct   := L.%LegalEntityIsDefunct%;
+
+        SELF.InFacilityFile         := 'Y';
+
+        SELF.FacilityProviderKey    := TRIM(L.%FacilityProviderKey%, ALL);
+        SELF.FacilityProviderNpi    := TRIM(L.%FacilityProviderNpi%, ALL);
+        SELF.FacilityFacilityName   := L.%FacilityFacilityName%;
+        SELF.FacilitySpecialty      := L.%FacilitySpecialty%;
+
+        SELF.FacilityChargedDollars := L.%FacilityChargedDollars%;
+        SELF.FacilityPaidDollars    := L.%FacilityPaidDollars%;
+        SELF.FacilityClaims         := L.%FacilityClaims%;
+
+    END; 
+    dsFacility := PROJECT(%dsInputFacility%, facilityXform(LEFT));
+
+    JoinedLayout joinedXform(ProviderLayout L, FacilityLayout R) := TRANSFORM
+        SELF := R;
+        SELF := L;
+    END;
+    dsJoined := JOIN(dsProvider, dsFacility, LEFT.ProviderProviderKey = RIGHT.FacilityProviderKey, joinedXform(LEFT, RIGHT), LEFT OUTER, HASH);
+  
+    CombinedLayout combinedXform(JoinedLayout L) := TRANSFORM
+        SELF.ProviderKey 			:= L.ProviderProviderKey;
+        SELF.ProviderNpi 			:= L.ProviderProviderNpi;
+        SELF.FacilityName 			:= L.ProviderFacilityName;
+
+        SELF.Specialty 				:= IF(TRIM(L.ProviderSpecialty, ALL) <> '', L.ProviderSpecialty, L.FacilitySpecialty);
+
+        SELF.ChargedDollars 		:= L.ProviderChargedDollars;
+        SELF.PaidDollars 			:= L.ProviderPaidDollars;
+        SELF.Claims 				:= L.ProviderClaims;
+
+        SELF := L;
+    END;
+    dsCombined := PROJECT(dsJoined, combinedXform(LEFT));
+
+    PayloadLayout payloadXform(CombinedLayout L, INTEGER C) := TRANSFORM
+        SELF.Specialty := IF(TRIM(L.ClientSpecialty, ALL) <> '', L.ClientSpecialty, L.Specialty);
+
+        SELF := L;
+
+        SELF.RecordId := (UNSIGNED8)C;
+        SELF.PreferredFirstName := NID.PreferredFirstNew(SELF.FirstName),
+        SELF.PhoneticLastName	:= metaphonelib.DMetaPhone1(SELF.LastName)[1..6],
+    END;
+
+    dsPayload := PROJECT(dsCombined, payloadXform(LEFT, COUNTER));
+    dsIndex := PROJECT(dsPayload, TRANSFORM(IndexLayout, SELF := LEFT;));
+
+    kProviderKey := ComputeSAIndexes.macComputeProviderKeyIndex(dsIndex, providerkey, %^qJOBID%, 'providerid', %^qGCID%);
+    kProviderNpi := ComputeSAIndexes.macComputeProviderNpiIndex(dsIndex, providernpi, %^qJOBID%, 'npi', %^qGCID%);
+    kFirstName := ComputeSAIndexes.macComputeFirstNameIndex(dsIndex, firstname, %^qJOBID%, 'firstname', %^qGCID%);
+    kLastName := ComputeSAIndexes.macComputeLastNameIndex(dsIndex, lastname, %^qJOBID%, 'lastname', %^qGCID%);
+    kFacilityName := ComputeSAIndexes.macComputeFacilityNameIndex(dsIndex, recordid, facilityname, %^qJOBID%, 'facilityname', %^qGCID%);
+    kPrimaryRange := ComputeSAIndexes.macComputePrimaryRangeIndex(dsIndex, primaryrange, %^qJOBID%, 'primaryrange', %^qGCID%);
+    kPrimaryName := ComputeSAIndexes.macComputePrimaryNameIndex(dsIndex, recordid, primaryname, %^qJOBID%, 'primaryname', %^qGCID%);
+    kSecondaryRange := ComputeSAIndexes.macComputeSecondaryRangeIndex(dsIndex, secondaryrange, %^qJOBID%, 'secondaryrange', %^qGCID%);
+    kState := ComputeSAIndexes.macComputeStateIndex(dsIndex, state, %^qJOBID%, 'state', %^qGCID%);
+    kCityState := ComputeSAIndexes.macComputeCityStateIndex(dsIndex, city, state, %^qJOBID%, 'citystate', %^qGCID%);
+    kPayload := ComputeSAIndexes.macComputePayloadIndex(dsPayload, recordid, %^qJOBID%, 'payload', %^qGCID%);
+
+    %^edsBuildKeys% := PARALLEL(
+        BUILDINDEX(kProviderKey, OVERWRITE),
+        BUILDINDEX(kProviderNpi, OVERWRITE),
+        BUILDINDEX(kFirstName, OVERWRITE),
+        BUILDINDEX(kLastName, OVERWRITE),
+        BUILDINDEX(kFacilityName, OVERWRITE),
+        BUILDINDEX(kPrimaryRange, OVERWRITE),
+        BUILDINDEX(kPrimaryName, OVERWRITE),
+        BUILDINDEX(kSecondaryRange, OVERWRITE),
+        BUILDINDEX(kState, OVERWRITE),
+        BUILDINDEX(kCityState, OVERWRITE),
+        BUILDINDEX(kPayload, OVERWRITE)
+    );  
+
+ENDGENERATES
+
+
+RESOURCES
+    FILE ComputeSAIndexes_ReadMe: FILENAME("ComputeSAIndexes_1.1_ReadMe.txt"),LABEL("Plugin ReadMe File");
+    FILE ComputeSAIndexes_testcmp: FILENAME("ComputeSAIndexes_1.1_testcmp.txt"),LABEL("Plugin Test Composition");
+    FILE ComputeSAIndexes_BuildTestDataset: FILENAME("ComputeSAIndexes_1.1_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
+    FILE ComputeSAIndexes_Checklist: FILENAME("ComputeSAIndexes_1.1_Checklist.xlsx"),LABEL("Checklist");
+    LOGICALFILE testprovider: FILENAME("~qa::computesaindexes::computesaindexes::input::provider"),URL("http://10.173.10.159:8010"),DALIIP("10.173.10.159"),CLUSTER("thor100_100dev");
+    LOGICALFILE testfacility: FILENAME("~qa::computesaindexes::computesaindexes::input::facility"),URL("http://10.173.10.159:8010"),DALIIP("10.173.10.159"),CLUSTER("thor100_100dev");
+    ECL  ComputeSAIndexes:FILENAME("ComputeSAIndexes"), URL("http://10.173.10.159:8145/WsAttributes"); 
+    ECL  NID:FILENAME("NID"), URL("http://10.173.10.159:8145/WsAttributes"); 
+END

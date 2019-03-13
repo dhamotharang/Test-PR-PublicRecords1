@@ -333,7 +333,7 @@ EXPORT functions := MODULE
     f_pre_death_check := if(inMod.DedupOutputPhones, dedup(f_out_srt, acctno, subj_phone10), f_out_srt);
 
     //death check														
-    deathparams := DeathV2_Services.IParam.GetDeathRestrictions(gmod);
+    deathparams := DeathV2_Services.IParam.GetRestrictions(mod_access);
 
     f_post_death_filter := join(f_pre_death_check,doxie.key_death_masterV2_ssa_DID,
                               keyed(left.p_did = right.l_did)  and
