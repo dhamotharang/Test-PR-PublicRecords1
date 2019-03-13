@@ -16,7 +16,7 @@ b 		:= join(b_all, h,
 							(dob > 0);
 
 // rel file where number_cohabits > 20
-fr := header.File_Relatives;
+fr := header.File_Relatives_v3;
 r_all := fr +
 				 project(fr, transform({fr}, self.person1 := left.person2,
 																		 self.person2 := left.person1,

@@ -13,7 +13,6 @@ EXPORT BuildHeaderScrubsReport(DATASET(cortera.Layout_Header) F, string version)
 		//Generating a template to upload rules to Orbit
 		//Scrubs.OrbitProfileStats(,,stats).ProfileTemplate;
 
-
 		orbitStats := U.OrbitStats();
 
 		submitStats :=
@@ -24,7 +23,8 @@ EXPORT BuildHeaderScrubsReport(DATASET(cortera.Layout_Header) F, string version)
 				EyeballSomeErrors,
 				SomeErrorValues,
 				OrbitReport,
-				submitStats
+				//submitStats,
+				GenerateAlertCSVTemplate
 		);
 
 END;

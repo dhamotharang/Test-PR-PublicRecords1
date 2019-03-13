@@ -1,4 +1,4 @@
-
+﻿
 export RoxieEnv := MODULE
 
 	export QA := 'QA';
@@ -7,6 +7,8 @@ export RoxieEnv := MODULE
 	export Test := 'Test';
 	export certvip := 'http://roxiestaging.br.seisint.com:9876';
 	export prodvip := 'http://roxiebatch.br.seisint.com:9856';
+	export boca_certvip := 'roxiestaging.br.seisint.com:9876';
+	export boca_prodvip := 'roxiebatch.br.seisint.com:9856';
 	export prodbipvip := 'http://biproxievip.sc.seisint.com:9876';
 	export certbipvip := 'http://certbiproxievip.sc.seisint.com:9876';
 	export certprctvip := 'http://demoroxiecertvip.sc.seisint.com:9876';

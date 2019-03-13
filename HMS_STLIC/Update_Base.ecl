@@ -336,18 +336,22 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 												AND trim(left.language)												= trim(right.language)
 												AND trim(left.description)									= trim(right.description)
 											,t_rollup(LEFT,RIGHT),LOCAL);	
-											
-											
+																				
 				matchset := ['A','Z','P'];
-				did_add.MAC_Match_Flex
-				(stlic_base, matchset,					
-				foo,foo1,first, middle, last, suffix, 
-				street1, street2, street3, zip, address_state,phone_number, 
-				did, HMS_STLIC.layouts.statelicense_base, true, did_score,
-				75, d_did);
+				did_add.MAC_Match_Flex(
+							stlic_base, matchset,					
+							'','',first, middle, last, suffix, 
+							street1, street2, street3, zip, address_state,phone_number, 
+							did, {stlic_base}, true, did_score,
+							75, d_did);
 
-					did_add.MAC_Add_SSN_By_DID(d_did,did,best_ssn,d_ssn,false);
-					did_add.MAC_Add_DOB_By_DID(d_ssn,did,best_dob,d_dob0,false);
+				did_desc1 := project (d_did,transform (recordof(d_did), 
+                       self.xadl2_keys_desc := InsuranceHeader_xLink.Process_xIDL_Layouts(false).KeysUsedToText (left.xadl2_keys_used); 
+                       self.xadl2_matches_desc := InsuranceHeader_xLink.fn_MatchesToText(left.xadl2_matches);
+                       self := left;));
+
+				did_add.MAC_Add_SSN_By_DID(did_desc1,did,best_ssn,d_ssn,false);
+				did_add.MAC_Add_DOB_By_DID(d_ssn,did,best_dob,d_dob0,false);
 					
 				d_dob:=project(d_dob0
 											,transform({d_dob0}
@@ -462,26 +466,26 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 					 
 				
 			
-				final_base := result + with_lnpid;
+				final_base := with_lnpid + result;
 				
 				// ********************************Set clean dates and phones to blank where all 0's and all 8's***************************
 			
 				HMS_STLIC.Layouts.statelicense_base DatePhoneMapping(HMS_STLIC.Layouts.statelicense_base L) := TRANSFORM					
-											SELF.clean_phone											:= if(REGEXREPLACE('9',L.clean_phone,'') = '','',L.clean_phone);
+						SELF.clean_phone										:= if(REGEXREPLACE('9',L.clean_phone,'') = '','',L.clean_phone);
          		SELF.clean_phone1										:= if(REGEXREPLACE('9',L.clean_phone1,'') = '','',L.clean_phone1);
          		SELF.clean_phone2										:= if(REGEXREPLACE('9',L.clean_phone2,'') = '','',L.clean_phone2);
          		SELF.clean_phone3										:= if(REGEXREPLACE('9',L.clean_phone3,'') = '','',L.clean_phone3);
          		SELF.clean_fax1   									:= if(REGEXREPLACE('9',L.clean_fax1,'') = '','',L.clean_fax1);
          		SELF.clean_fax2   									:= if(REGEXREPLACE('9',L.clean_fax2,'') = '','',L.clean_fax2);
          		SELF.clean_fax3   									:= if(REGEXREPLACE('9',L.clean_fax3,'') = '','',L.clean_fax3);
-         		SELF.clean_other_phone1				:= if(REGEXREPLACE('9',L.clean_other_phone1,'') = '','',L.clean_other_phone1);
-											SELF.clean_issue_date						:= if(REGEXREPLACE('0',trim(L.clean_issue_date,all),'') = '','',L.clean_issue_date); 
-         		SELF.clean_expiration_date	:= if(REGEXREPLACE('0',trim(L.clean_expiration_date,all),'') = '','',L.clean_expiration_date);
-         		SELF.clean_offense_date				:= if(REGEXREPLACE('0',trim(L.clean_offense_date,all),'') = '','',L.clean_offense_date);
-         		SELF.clean_action_date					:= if(REGEXREPLACE('0',trim(L.clean_action_date,all),'') = '','',L.clean_action_date);
-         		SELF.clean_dateofbirth					:= if(REGEXREPLACE('0',trim(L.clean_dateofbirth,all),'') = '','',L.clean_dateofbirth);
-         		SELF.clean_dateofdeath					:= if(REGEXREPLACE('0',trim(L.clean_dateofdeath,all),'') = '','',L.clean_dateofdeath);
-         		SELF 																						:= L;
+         		SELF.clean_other_phone1							:= if(REGEXREPLACE('9',L.clean_other_phone1,'') = '','',L.clean_other_phone1);
+						SELF.clean_issue_date								:= if(REGEXREPLACE('0',trim(L.clean_issue_date,all),'') = '','',L.clean_issue_date); 
+         		SELF.clean_expiration_date					:= if(REGEXREPLACE('0',trim(L.clean_expiration_date,all),'') = '','',L.clean_expiration_date);
+         		SELF.clean_offense_date							:= if(REGEXREPLACE('0',trim(L.clean_offense_date,all),'') = '','',L.clean_offense_date);
+         		SELF.clean_action_date							:= if(REGEXREPLACE('0',trim(L.clean_action_date,all),'') = '','',L.clean_action_date);
+         		SELF.clean_dateofbirth							:= if(REGEXREPLACE('0',trim(L.clean_dateofbirth,all),'') = '','',L.clean_dateofbirth);
+         		SELF.clean_dateofdeath							:= if(REGEXREPLACE('0',trim(L.clean_dateofdeath,all),'') = '','',L.clean_dateofdeath);
+         		SELF 																:= L;
 					END;
 											
 					stlic_base_result := PROJECT(final_base, DatePhoneMapping(LEFT));
@@ -673,9 +677,9 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
    		HMS_STLIC.layouts.statelicense_base t_rollup(new_base_s L, new_base_s R) := TRANSFORM
    			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
    			SELF.dt_vendor_last_reported  := ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
-						SELF.source_rid           				:=	if(L.dt_vendor_first_reported<R.dt_vendor_first_reported,L.source_rid,R.source_rid);
-   			SELF 		 																						:= IF(L.dt_vendor_last_reported>R.dt_vendor_last_reported,L,R);
-					END;
+				SELF.source_rid           		:= if(L.dt_vendor_first_reported<R.dt_vendor_first_reported,L.source_rid,R.source_rid);
+   			SELF 		 											:= IF(L.dt_vendor_last_reported>R.dt_vendor_last_reported,L,R);
+			END;
    
    		stlic_base_s := ROLLUP(new_base_s
 											,trim(left.license_number)=trim(right.license_number)

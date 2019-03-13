@@ -34,11 +34,11 @@ delete_deletes := if(FileServices.GetSuperFileSubCount(Superfile_List.deletes) =
 
 PromoteSupers.Mac_SF_BuildProcess(TransunionCred.Build_base(ver).all,Superfile_List.Base, TransunionCred,2,,true);
 
-zDoPopulationStats := Transunion.Strata(ver);
+zDoPopulationStats := Strata(ver);
 
 built := sequential(
 					spray_it,
-		            consolidate_them,
+		      consolidate_them,
 #IF (IsFullUpdate = false)
 					spray_deletes,
 					TransunionCred

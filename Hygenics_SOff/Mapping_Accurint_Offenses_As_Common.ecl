@@ -372,7 +372,8 @@ o2 defCategory(o2 l):= transform
 						'FALSE SWEARING|'+
 						'FALSE PRETENSES \\(ATTEMPT\\)|'+
 						'RESISTING ARREST|'+
-						
+						', FALSE PRETENSES|'+
+
 						
 						'WITHIN 500\'',
 						trim(l.offense_description, left, right),
@@ -1673,6 +1674,7 @@ o2 defCategory(o2 l):= transform
 						'MLESTATIN F A MINR|'+
 						'ATTEMPTED USE F MINRS FR BSENE PURPSES|'+
 						'INDESCENT LIBERTIES WITH A MINR|'+
+						'UNDER/16 MIAMI DADE FL;|'+
 
 						'WITH A 10, 13 AND 14 Y/O FEMALE' 											
 						,
@@ -2609,6 +2611,10 @@ o2 defCategory(o2 l):= transform
 						'SAC; 12CR2998|'+
 						'SAC; 05CR480|'+
 						'SAC; 2012CR809|'+
+            'RCW 9A 44 100 ATTEMPTED INCDECENT LIBERTIES|'+
+					          
+						'PRED CRM SX ASSL|'+
+
 						
 						'SAC-ATTEMPT'
 						,				
@@ -3163,7 +3169,45 @@ o2 defCategory(o2 l):= transform
 						'DE1111110000FF\\(\\)|'+
 						'TIME.|'+
 						'D0222007CR000271|'+
-						'D0392016CR005553|'+
+						'D0392016CR005553|'+						
+					
+						'LCD_DS|'+		
+						'750.520E1|'+		
+						'18-3-405 CSA|'+		
+						'18-3-405 CSA|'+		
+						'INDECENT A&AMP;B|'+		
+						'DELETE|'+		
+						'16-6-3\\(B\\)|'+		
+						'CRG READS: 18-2-101 & 18-3-405 CRIM ATTE|'+		
+						'D0301996M 004635|'+		
+						'D0302005CR004409|'+		
+						'ART UCMJ 120B DIBRS 120BB3|'+		
+						'D0621999CR000953|'+		
+						'18-6-401\\(1\\),\\(7\\)\\(B\\)\\(I\\)|'+		
+						'D0622005CR001337|'+		
+            'T17-A 253\\(1\\) \\(B\\)|'+		
+            'TENN STING|'+		
+						
+            'NEW JERSEY;|'+
+						'ATTEMPT;|'+
+						'AGRAVETED;|'+
+						'38-12-14-A|'+
+						'NEW HAMPSHIRE|'+
+						'13A-6-64|'+
+						'22 021 A1 B\\(\\)|'+
+						'ATTEMPT;|'+
+						'632-A:2 II|'+
+						'INDICTMENT NUMBER CP870011443;|'+
+						
+						'FRAUD|'+
+						'18USC2252A\\(A\\)\\(5\\)\\(B\\);|'+
+						'130.50 SUB 01;|'+
+						'MAINE|'+
+						'LIFETIME|'+
+						'MANUF/DELIVER AMPHETAMINE \\(<=3G\\)|'+
+						'ATTEMPTED \\(ATTEMPTED\\)|'+
+						
+						
 						
 						'16-6-4-\\(B\\)'						
 						,						
@@ -3205,6 +3249,7 @@ o2 defCategory(o2 l):= transform
 					trim(l.offense_description, left, right) = 'TRANSPORT OR SHIP' 				=> 'OTH',
 					trim(l.offense_description, left, right) = 'UNKNOWN' 									=> 'OTH',
 					trim(l.offense_description, left, right) = 'WYOMING' 									=> 'OTH',
+          trim(l.offense_description, left, right) = 'A'     => 'OTH',					
 					
 					trim(l.offense_description, left, right) in ['ARRALC196360022020121115','ATTEMPT 1ST DEGREE','BARKIM196660118920131111','BARSAM196851116020120808','BEADAN197550719520130828','BLADAV196750822320130712','BLADAV196750823020130712','BONALB198460015420130101','BONALB198460016420130101',
 						'BONALP197550716020130225','BROCHR199250917020121214','BROCHR199250917220121214','BROKEN196750916320121114','BROMAR197351015020000717',
@@ -3290,9 +3335,9 @@ o2 defCategory(o2 l):= transform
 						'USE OF COMMUNICATION SYSTEMS TO FACILITATE CERTAIN OFFENSES INVOLVING CHILDREN|'+
 						'W-CHILD|'+
 						'CALIFORNIA CONVICTION INVOLVING A 5 YR OLD FEMALE|'+
+            'UNDER/16 MIAMI DADE FL;|'+				
+						
 						'CONVICTED IN THE STATE OF IOWA FOR SEXUALLY ABUSING THREE MALE VICTIMS, AGES 5, 11, AND 15. SUBJECT'
-						
-						
 						
 						,
 						trim(l.offense_description, left, right),

@@ -1,13 +1,14 @@
-﻿Import ut,tools,FraudShared; 
+﻿Import tools; 
 
 EXPORT Build_Base_AddressCache (
    string pversion
 	,dataset(Layouts.Base.AddressCache)	inAddressCache_IDDT		= Files().Input.AddressCache_IDDT.Sprayed
 	,dataset(Layouts.Base.AddressCache)	inAddressCache_KNFD		= Files().Input.AddressCache_KNFD.Sprayed
+	,dataset(Layouts.Base.AddressCache)	inAddressCache_Deltabase	= Files().Input.AddressCache_Deltabase.Sprayed
 ) := 
 module 
 
-	pDataset_sort := sort(inAddressCache_IDDT + inAddressCache_KNFD , address_id, -address_cleaned);
+	pDataset_sort := sort(inAddressCache_IDDT + inAddressCache_KNFD + inAddressCache_Deltabase, address_id, -address_cleaned);
 	pDataset_dedup := dedup(pDataset_sort, address_id);
 	
 	tools.mac_WriteFile(Filenames(pversion).Base.AddressCache.New,pDataset_dedup,Build_Base_File);
@@ -15,7 +16,9 @@ module
 // Return
 	export full_build :=
 		 sequential(
-			 Build_Base_File
+			  Build_Base_File
+			, Promote(pversion).buildfiles.New2Built
+ 
 		);
 		
 	export All :=

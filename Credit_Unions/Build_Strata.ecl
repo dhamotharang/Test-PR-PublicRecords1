@@ -1,4 +1,4 @@
-import tools,strata;
+﻿import tools,strata;
 
 export Build_Strata(
 
@@ -8,14 +8,12 @@ export Build_Strata(
 	,string															pfileversion			= 'using'
 	,boolean														pUseOtherEnviron	= _Constants().isdataland
 	,dataset(Layouts.Input.Sprayed		)	pSprayedFile			= Files(pfileversion,pUseOtherEnviron).Input.logical
-	,dataset(Layouts.Input.SprayedOLD	)	pSprayedOldFile		= Files(pfileversion,pUseOtherEnviron).InputOld.logical
-	,dataset(Layouts.Input.Sprayed		)	pPrepSprayedFile	= Prep_File(pfileversion,pUseOtherEnviron,pSprayedFile,pSprayedOldFile)	//because comes in diff layout sometimes
 	,boolean														pIsTesting				= tools._Constants.IsDataland
 
 ) :=
 function
 
-	dUpdate := Strata_stats(pBaseFile,pfileversion,pUseOtherEnviron,pSprayedFile,pSprayedOldFile,pPrepSprayedFile);
+	dUpdate := Strata_stats(pBaseFile,pfileversion,pUseOtherEnviron,pSprayedFile);
 	
 	Strata.mac_CreateXMLStats(dUpdate.dInputNoGrouping					,_Constants().Name	,'Input'	,pversion	,email_notification_lists().buildsuccess	,BuildInputNoGrouping_Strata					,'View'					,'Population'	,,pIsTesting,pOverwrite);
 	Strata.mac_CreateXMLStats(dUpdate.dUniqueInputNoGrouping		,_Constants().Name	,'Input'	,pversion	,email_notification_lists().buildsuccess	,BuildInputUniqueNoGrouping_Strata		,'View'					,'Uniques'		,,pIsTesting,pOverwrite);

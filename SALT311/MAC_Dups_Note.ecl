@@ -29,10 +29,12 @@ export MAC_Dups_Note(infile,outformat,outfile,outdups,uniqueIDField='uniqueid',m
 #EXPAND(REGEXREPLACE('[|]',REGEXREPLACE('([^|]+)',REGEXREPLACE('¶_[^¶]+_¶',
 	#FOR (AllFields)
 		#FOR (Field)
-			#IF(%'@isDataset'%='1' OR %'@isRecord'%='1')
+			#IF(%'@isRecord'%='1')
 				'¶_'+
 			#ELSIF(%'@isEnd'%='1')
 				'_¶'+
+			#ELSIF(%'@isDataset'%='1')
+				'|'+%'@name'%+'¶_'+
 			#ELSIF(StringLib.StringToLowerCase(%'@name'%)<>StringLib.StringToLowerCase(#TEXT(uniqueIDField)))
         '|'+%'@name'%+
 	    #END

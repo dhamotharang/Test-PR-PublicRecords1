@@ -93,7 +93,7 @@ END;
 lname_addr_nosec_ct := TABLE(lname_addr_ct, layout_hhid_nosec_ct, 
 	lname, prim_range, prim_name, zip, st, LOCAL);
 
-layout_household JoinSec(hhid_lname_addr l, lname_addr_ct r) := TRANSFORM
+Header_SlimSort.Layout_household JoinSec(hhid_lname_addr l, lname_addr_ct r) := TRANSFORM
 	SELF.hhid_cnt := r.hhid_ct;
 	SELF := l;
 END;
@@ -107,7 +107,7 @@ j1 := JOIN(hhid_lname_addr, lname_addr_ct,
 	LEFT.st = RIGHT.st,
 	JoinSec(LEFT, RIGHT), LOCAL);
 
-layout_household JoinNoSec(j1 l, lname_addr_nosec_ct r) := TRANSFORM
+Header_SlimSort.Layout_household JoinNoSec(j1 l, lname_addr_nosec_ct r) := TRANSFORM
 	SELF.hhid_nosec_cnt := r.hhid_nosec_ct;
 	SELF := l;
 END;

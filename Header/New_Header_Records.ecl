@@ -1,7 +1,7 @@
 ﻿import ut,ak_perm_fund,utilfile,vehiclev2,bankrupt,mdr,driversv2,emerges,
        atf,prof_license,govdata,mdr,faa,dea,watercraft,property,targus,
        LiensV2,ln_propertyv2,american_student_list,OKC_Student_List,votersv2,certegy,
-	   ExperianCred,ExperianIRSG_Build,address,eq_hist, TransunionCred, AlloyMedia_student_list,header,Std;
+	   ExperianCred,ExperianIRSG_Build,address,eq_hist, TransunionCred, AlloyMedia_student_list,header,Std,cd_seed;
 
 export New_Header_Records(boolean pFastHeader = false) := function
 //pFastHeader parameter used to determine if the run of the funtion is for Fast header or Full Header
@@ -106,6 +106,8 @@ Exprn_ph_in :=  ExperianIRSG_Build.ExperianIRSG_asHeader(,true)(use_Experian_pho
 
 AlloyMedia_in :=  AlloyMedia_student_list.alloy_as_header(,true)(use_AlloyMedia_SL); 
 
+cd_seed_in := cd_seed.cd_seed_as_header(,true);
+
 //Sources that can be added to Fast Header or Full Header depending on the pFastHeader parameter
 concat0 := if(~pFastHeader, 
 				 ids 
@@ -139,7 +141,7 @@ concat0 := if(~pFastHeader,
 		 + Experian_in
 		 + Exprn_ph_in
 		 + AlloyMedia_in
-		 + dataset('~thor_data::asheader::cd_seed_20180313',Header.Layout_New_Records,flat),
+		 + cd_seed_in,
 		 
 		 dl_in
 		 + ba_in

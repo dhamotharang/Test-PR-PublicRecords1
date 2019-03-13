@@ -1,10 +1,11 @@
-﻿OPTIONS:-gh -ga -gs2
+﻿//SALTVERSION:311
+OPTIONS:-gh -ga -gs2
+
 MODULE:BIPV2_ProxID
 FILENAME:DOT_Base
-
 IDFIELD:EXISTS:Proxid
 RIDFIELD:rcid
-RECORDS:6801149648
+RECORDS:227982173
 POPULATION:200000000
 NINES:3
 THRESHOLD:30
@@ -15,6 +16,8 @@ HACK:MAXBLOCKSIZE:20000
 FIELDTYPE:alpha:CAPS:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ)
 FIELDTYPE:number:ALLOW(0123456789)
 FIELDTYPE:upper:CAPS:ONFAIL(CLEAN)
+FIELDTYPE:multiword:CAPS:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):SPACES( <>{}[]-^=!+&,./):ONFAIL(CLEAN)
+FIELDTYPE:Noblanks:LIKE(multiword):LENGTHS(1..):ONFAIL(CLEAN,REJECT)
 // FIELDTYPE:positive:ALLOW(0123456789):CUSTOM(fn_positive):ONFAIL(REJECT)
 //FIELDTYPE:cname:CAPS:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):SPACES( <>{}[]-^=!+&,./):CUSTOM(fn_cname):ONFAIL(REJECT)
 // FUZZY can be used to create new types of FUZZY linking
@@ -25,28 +28,28 @@ FUZZY:NormSuffix:RST:CUSTOM(fn_normSuffix):TYPE(STRING5)
 //  1. Company
 // ------------------------------------
 // Active ID fields from reliable sources
-FIELD:active_duns_number:PROP:28,24
-FIELD:active_enterprise_number:FORCE(--):PROP:27,7
-FIELD:active_domestic_corp_key:FORCE(--):PROP:27,6
+FIELD:active_duns_number:PROP:18,78
+FIELD:active_enterprise_number:FORCE(--):PROP:20,15
+FIELD:active_domestic_corp_key:FORCE(--):PROP:19,1
 // Historical and non-domestic IDs from reliable sources
 // If match, add to score, if not, don't care(SWITCH0)
-FIELD:hist_enterprise_number:PROP:27,7
-FIELD:hist_duns_number:PROP:28,21
-FIELD:hist_domestic_corp_key:PROP:27,61
-FIELD:foreign_corp_key:SWITCH0:PROP:27,174
-FIELD:unk_corp_key:SWITCH0:PROP:27,49
-FIELD:ebr_file_number:PROP:28,224
-FIELD:company_fein:PROP:EDIT1:27,161
+FIELD:hist_enterprise_number:PROP:20,22
+FIELD:hist_duns_number:PROP:18,72
+FIELD:hist_domestic_corp_key:PROP:19,151
+FIELD:foreign_corp_key:SWITCH0:PROP:19,418
+FIELD:unk_corp_key:SWITCH0:PROP:19,133
+FIELD:ebr_file_number:PROP:20,427
+FIELD:company_fein:PROP:EDIT1:17,227
 FIELD:company_name:CARRY:0,0
-FIELD:cnp_name:TYPE(STRING250):BAGOFWORDS(MOST):EDIT1:FORCE(+6,OR(active_domestic_corp_key),OR(active_duns_number),OR(company_fein)):ABBR(ACRONYM,INITIAL,MAXSPC(13)):HYPHEN1:TYPE(string250):15,166
+FIELD:cnp_name:TYPE(STRING250):LIKE(Noblanks):BAGOFWORDS(MOST):EDIT1:FORCE(+6,OR(active_domestic_corp_key),OR(active_duns_number),OR(company_fein)):ABBR(ACRONYM,INITIAL,MAXSPC(13)):HYPHEN1:12,334
 // FIELD:cnp_name:BAGOFWORDS(MOST):EDIT1:FORCE(+13,OR(active_domestic_corp_key),OR(active_duns_number)):ABBR(FIRST):HYPHEN1:TYPE(string250):15,137
 //FIELD:source:CARRY:0,0
 FIELD:company_name_type_raw:CARRY:0,0
-FIELD:company_name_type_derived:WEIGHT(0.001):PROP:2,0
+FIELD:company_name_type_derived:WEIGHT(0.001):PROP:1,402
 FIELD:cnp_hasnumber:CARRY:0,0
-FIELD:cnp_number:FORCE:PROP:15,0
+FIELD:cnp_number:FORCE:PROP:13,0
 //FIELD:cnp_btype:FORCE(--):2,1  CO and inc for same name forced apart here
-FIELD:cnp_btype:3,51
+FIELD:cnp_btype:3,166
 FIELD:cnp_lowv:CARRY:0,0
 FIELD:cnp_translated:CARRY:0,0
 FIELD:cnp_classid:CARRY:0,0
@@ -56,26 +59,26 @@ FIELD:cnp_classid:CARRY:0,0
 FIELD:company_foreign_domestic:CARRY:0,0
 FIELD:company_bdid:CARRY:0,0
 // -- could add this field as SWITCH0 
-FIELD:company_phone:SWITCH0:PROP:27,298
+FIELD:company_phone:SWITCH0:PROP:18,426
 //FIELD:current:PROP:FORCE(--):3,0
 //FIELD:iscorp:SWITCH0:PROP:1,0
 // ------------------------------------
 //  2. Place
 // ------------------------------------
 FIELD:prim_name:CARRY:0,0
-FIELD:prim_name_derived:BAGOFWORDS(MOST):EDIT1:FORCE(+5):ABBR(FIRST):HYPHEN1:13,7
+FIELD:prim_name_derived:TYPE(STRING250):LIKE(Noblanks):BAGOFWORDS(MOST):EDIT1:FORCE(+5):ABBR(FIRST):HYPHEN1:11,14
 // FIELD:prim_name:BAGOFWORDS(MOST):EDIT1:FORCE(+5):ABBR(FIRST):HYPHEN1:13,4
 //FIELD:prim_name:FORCE(+):15,0
-FIELD:sec_range:HYPHEN1:PROP:12,84
-FIELD:v_city_name:CONTEXT(st):11,13
+FIELD:sec_range:HYPHEN1:PROP:11,142
+FIELD:v_city_name:CONTEXT(st):10,18
 FIELD:st:LIKE(alpha):FORCE(+):5,0
-FIELD:zip:LIKE(number):14,6
+FIELD:zip:LIKE(number):13,18
 BESTTYPE:SINGLEPRIMRANGE:BASIS(cnp_name:prim_name_derived:v_city_name:st:zip):UNIQUE:PROP
 FIELD:prim_range:CARRY:0,0
-FIELD:prim_range_derived:FORCE:SINGLEPRIMRANGE:13,3
-CONCEPT:company_csz:v_city_name:st:zip:FORCE(+-2):14,24
-CONCEPT:company_addr1:prim_range_derived:prim_name_derived:sec_range:24,99
-CONCEPT:company_address:company_addr1:company_csz:FORCE(+):25,116
+FIELD:prim_range_derived:FORCE:SINGLEPRIMRANGE:12,7
+CONCEPT:company_csz:v_city_name:st:zip:FORCE(+-2):13,52
+CONCEPT:company_addr1:prim_range_derived:prim_name_derived:sec_range:17,177
+CONCEPT:company_address:company_addr1:company_csz:FORCE(+):18,205
 // ------------------------------------
 //  3. Contact
 // ------------------------------------
@@ -96,8 +99,8 @@ CONCEPT:company_address:company_addr1:company_csz:FORCE(+):25,116
 // ------------------------------------
 //  Metadata
 // ------------------------------------
-FIELD:dt_first_seen:RECORDDATE(FIRST):0,0
-FIELD:dt_last_seen:RECORDDATE(LAST):0,0
+FIELD:dt_first_seen:RECORDDATE(FIRST):9,729
+FIELD:dt_last_seen:RECORDDATE(LAST):8,773
 SOURCEFIELD:source:PARTITION(BIPV2.Mod_Sources.src2partition)
 HACK:CUSTOMINTERNALJOIN:_mj_extra
 // ------------------------------------
@@ -109,10 +112,11 @@ CLEAVE:solo_cnp_number:BASIS(cnp_number):MINIMUM(1)
 // ------------------------------------
 //  Attribute Files
 // ------------------------------------
-ATTRIBUTEFILE:SrcRidVlid:NAMED(file_SrcRidVlid):VALUES(source:source_record_id:vl_id):IDFIELD(Proxid):SUPPORTS(cnp_name):27,647
-ATTRIBUTEFILE:ForeignCorpkey:NAMED(file_Foreign_Corpkey):VALUES(company_charter_number<company_inc_state):FORCE(--,ALL):IDFIELD(Proxid):27,39
-ATTRIBUTEFILE:RAAddresses:NAMED(file_RA_Addresses):VALUES(cname):FORCE:IDFIELD(Proxid):28,84
-ATTRIBUTEFILE:FilterPrimNames:NAMED(file_filter_Prim_names):VALUES(pname_digits):FORCE:IDFIELD(Proxid):13,3
+ATTRIBUTEFILE:SrcRidVlid:NAMED(file_SrcRidVlid):VALUES(source:source_record_id:vl_id):IDFIELD(Proxid):SUPPORTS(cnp_name):19,753
+ATTRIBUTEFILE:ForeignCorpkey:NAMED(file_Foreign_Corpkey):VALUES(company_charter_number<company_inc_state):FORCE(--,ALL):IDFIELD(Proxid):19,321
+ATTRIBUTEFILE:RAAddresses:NAMED(file_RA_Addresses):VALUES(cname):FORCE:IDFIELD(Proxid):18,196
+ATTRIBUTEFILE:FilterPrimNames:NAMED(file_filter_Prim_names):VALUES(pname_digits):FORCE:IDFIELD(Proxid):12,5
+ATTRIBUTEFILE:UnderLinks:NAMED(file_underLink):VALUES(UnderLinkId):SUPPORTS(cnp_name):IDFIELD(ProxID):20,0
 // ------------------------------------
 //  ID Parents
 // ------------------------------------

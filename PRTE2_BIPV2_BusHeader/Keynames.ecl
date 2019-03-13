@@ -44,7 +44,8 @@ module
 	export proxid_in_data                  := tools.mod_FilenamesBuild(lprefix + 'key::proxid::BIPV2_ProxID::@version@::in_data'                ,pversion );
 	export proxid_match_history            := tools.mod_FilenamesBuild(lprefix + 'key::proxid::BIPV2_ProxID::@version@::match_history'          ,pversion );
 	
-	//*** bipv2_lgid3 keynames
+	export lgid3_matches                 := tools.mod_FilenamesBuild(lprefix + 'key::BIPV2_LGID3::@version@::attribute_matches'      ,pversion );// key::BIPV2_LGID3::LGID3::Debug::attribute_matches'
+	
 	export lgid3_specificities_debug      := tools.mod_FilenamesBuild(lprefix + 'key::BIPV2_LGID3::@version@::specificities_debug'    ,pversion );// key::BIPV2_LGID3::LGID3::Debug::specificities_debug'
 	export lgid3_match_sample_debug       := tools.mod_FilenamesBuild(lprefix + 'key::BIPV2_LGID3::@version@::match_sample_debug'     ,pversion );// key::BIPV2_LGID3::LGID3::Debug::match_sample_debug';
 	export lgid3_patched_candidates       := tools.mod_FilenamesBuild(lprefix + 'key::BIPV2_LGID3::@version@::patched_candidates'     ,pversion );// key::BIPV2_LGID3::LGID3::Datafile::patched_candidates';
@@ -131,6 +132,7 @@ module
 		+ lgid3_match_candidates_debug.dall_filenames
 		+ lgid3_specificities_debug.dall_filenames
 		+ lgid3_match_sample_debug.dall_filenames
+		+ lgid3_matches.dall_filenames
 		
     //+ BizLinkFull.keynames            (pversion,pUseOtherEnvironment).dall_filenames
 		+ meow                      .dall_filenames

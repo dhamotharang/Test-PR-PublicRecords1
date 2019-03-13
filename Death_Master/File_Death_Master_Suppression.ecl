@@ -256,7 +256,29 @@ dSuppressRecs				:=
 	// LNK-1494	Non-FCRA - Alive Consumer marked as deceased
 				{/*'000000000000'*/'', 0, '20130524', ' ', ' ', /*'563392477'*/'', 'KHOURI              ', '    ', 'NABIL          ', 'ADIB           ', ' ', '20040116', '        ', '06', '     ', '     ', 'CA', '   ', '  ', 'Y', 'CAL', 'CA00000002765897', 'D0', 'N'},
 	//	LNK-1285	Ohio National Life - 1765801 Miguel Nunez Jr.
-    {'001691940595', 100, '20180619', ' ', ' ', '266712661', 'NUNEZ               ', '    ', 'MIGUEL         ', 'ANGEL          ', ' ', '20120903', '        ', '12', '33133', '     ', 'FL', '086', '  ', 'N', 'ENC', /*'001691940595NENC'*/'', '64', 'N'}
+    {'001691940595', 100, '20180619', ' ', ' ', '266712661', 'NUNEZ               ', '    ', 'MIGUEL         ', 'ANGEL          ', ' ', '20120903', '        ', '12', '33133', '     ', 'FL', '086', '  ', 'N', 'ENC', /*'001691940595NENC'*/'', '64', 'N'},
+	// LNK-1816 Consumer being reported with two DODs.
+		{/*'001856332815'*/'', 100, '20180621', ' ', ' ', '         ', 'NOTTINGHAM          ', '    ', 'RICHARD        ', 'E              ', ' ', '20180531', '19470210', '40', '     ', '     ', 'OK', '   ', '  ', 'N', 'OBD', 'OB00000040823558', 'OB', 'N'},
+	// LNK-1854	Overlinking of Death record to LexID 153361926277 Bennie
+		{/*'153361926277'*/'', 97, '20180629', 'A', 'A', '567180654', 'BENNIE              ', '    ', 'ANDREW         ', 'ADAIR          ', ' ', '19441219', '00000000', '  ', '     ', '     ', '  ', '   ', '  ', 'N', 'SSA', /*'567180654B441219'*/'', 'DE', 'N'},
+	// LNK-987 FW: Deceased data
+    {'000602512896', 100, '20180806', ' ', ' ', '         ', 'DE JORIA            ', 'II  ', 'JOHN           ', 'PAUL           ', ' ', '        ', '19650731', '41', '97132', '     ', 'OR', '071', '  ', 'N', 'TUN', /*'000602512896DTUN'*/'', 'TN', 'Y'},
+	//	LNK-579 Health Equity - Yolanda White - Showing DECEASED and is NOT
+    {'001122861464', 85, '20180806', ' ', ' ', '         ', 'YOLANDA             ', '    ', 'POPE           ', '               ', ' ', '        ', '        ', '53', '98178', '     ', 'WA', '033', '  ', 'N', 'TUN', /*'001122861464YTUN'*/'', 'TN', 'Y'},
+	//	LNK-1632	Lincoln Financial Group: Public Records Possible Overlinking (Deceased indicator)
+    {'035499717130', 93, '20181008', ' ', ' ', '         ', 'CHIN                ', 'JR  ', 'PAUL           ', 'PHILIP         ', ' ', '        ', '        ', '51', '23454', '     ', 'VA', '810', '  ', 'N', 'TUN', /*'035499717130CTUN'*/'', 'TN', 'Y'},
+	//	LNK-1733	Possible Overlink
+    {'001961115336', 100, '20181105', ' ', ' ', '393549837', 'PETERSON            ', '    ', 'JAMES          ', 'M              ', ' ', '20150611', '        ', '55', '54701', '     ', 'WI', '035', '  ', 'N', 'ENC', /*'001961115336PENC'*/'', '64', 'N'}, 
+	// LNK-1782 Copy of 180329-001784: ACCURINT - 99136 - deceased indicator [Incident: 180706-000082]
+    {'000154038387', 100, '20181008', ' ', ' ', '         ', 'BATISTE             ', '    ', 'ORANEE         ', '               ', ' ', '        ', '19440408', '06', '93635', '     ', 'CA', '047', '  ', 'N', 'TUN', /*'000154038387BTUN'*/'', 'TN', 'Y'}, 
+	// LNK-2044 Copy of 180831-000613: Copy of 180831-000560: Accurint – deceased indicator [WILLIAM P DOYLE] [ticket#106193] [Incident: 180910-001177]
+    {'000680057632', 100, '20181008', ' ', ' ', '426204079', 'DOYLE               ', '    ', 'WILLIAM        ', 'P              ', ' ', '        ', '19481227', '12', '33172', '     ', 'FL', '086', '  ', 'N', 'TUN', /*'000680057632DTUN'*/'', 'TN', 'Y'}, 
+	// LNK-2088 non-fcra decease indicator- 106883 [Incident: 180920-000580]
+    {/*'000486500382'*/'', 100, '20180906', ' ', ' ', '         ', 'COLLINS             ', '    ', 'BONNIE         ', '               ', ' ', '20180727', '19460112', '48', '77372', '     ', 'TX', '339', '  ', 'N', 'OBD', 'OB00000041401284', 'OB', 'N'}, 
+	// LNK-2103 Alive person marked as deceased
+    {'000880859745', 100, '20181105', ' ', ' ', '334549109', 'LINDENMUTH          ', '    ', 'KRYSTYNA       ', 'MARIA          ', ' ', '        ', '19480612', '08', '80002', '     ', 'CO', '059', '  ', 'N', 'ENC', /*'000880859745LENC'*/'', '64', 'N'}, 
+	// LNK-2124 FW: Deceased record comingle possibility
+    {'000566764672', 100, '20090807', 'A', 'A', '608746456', 'NGUYEN              ', '    ', 'THE            ', '               ', 'P', '20090724', '19440515', '45', '75052', '     ', 'TX', '113', '  ', 'N', 'SSA', /*'608746456N090724'*/'', 'DE', 'N'}
 	], Header.Layout_Did_Death_MasterV3);
 
 EXPORT	File_Death_Master_Suppression	:=	dSuppressRecs;

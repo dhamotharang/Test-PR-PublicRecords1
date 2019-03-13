@@ -102,7 +102,10 @@ Prof_License_Mari.layouts.base		xformToCommon(Prof_License_Mari.layout_VTS0356.c
 								           REGEXFIND('[0-9]+.[0-9]+\\-[SO]',TrimLicType)  => pInput.LICENSE_NBR[1..3] + pInput.LICENSE_NBR[13],
 													 REGEXFIND('[0-9]+.[0-9]+\\-[MA]',TrimLicType)  => pInput.LICENSE_NBR[1..3], 
 																										pInput.LICENSE_NBR[1..3]);
-		newLICTYPE   	  := IF(tmpLICTYPE = '083' AND REGEXFIND(BranchIdent,TrimNAME_Bus),pInput.LICENSE_NBR[1..3] + 'B', TRIM(tmpLICTYPE,LEFT,RIGHT));
+		newLICTYPE   	  := MAP(tmpLICTYPE = '083' AND REGEXFIND(BranchIdent,TrimNAME_Bus)=> pInput.LICENSE_NBR[1..3] + 'B', 
+		                       not regexfind('[A-Z]',tmpLICTYPE) and tmpLICTYPE[1..2] = '00' => TRIM(tmpLICTYPE[3..],LEFT,RIGHT),
+													 not regexfind('[A-Z]',tmpLICTYPE) and tmpLICTYPE[1] = '0' => TRIM(tmpLICTYPE[2..],LEFT,RIGHT),
+													 TRIM(tmpLICTYPE,LEFT,RIGHT));
 		SELF.TYPE_CD		:= IF(newLICTYPE[1..3] in ['083','077'], 'GR','MD'); 			
 	
 	// License Information

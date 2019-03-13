@@ -23,8 +23,9 @@
 		STRING9 Court_Time;
 		STRING200 Citation_Detail1;
 		STRING3 Local_Code;
-		STRING30 Violation_Code1;
-		STRING30 Violation_Code2;
+		//PRTCC update datatype
+		STRING60 Violation_Code1;
+		STRING60 Violation_Code2;
 		STRING7 Multiple_Charges_Indicator;
 		STRING7 DUI_Indicator;
 		STRING9 Court_Time_AM;
@@ -33,6 +34,9 @@
 		STRING7 Type_Hazardous;
 		STRING7 Type_Other;
 		STRING64 Citation_Status;
+		//PRtCC new fields
+		STRING60 Violation_Code3;
+		STRING60 Violation_Code4;
 	END;
 
 	EXPORT commercl := RECORD
@@ -426,9 +430,10 @@
 		STRING Report_Property_Damage;	
 		STRING Report_Collision_Type;	
 		STRING Report_First_Harmful_Event;	
-		STRING Report_Light_Condition;	
-		STRING Report_Weather_Condition;
-		STRING Report_Road_Condition;
+		STRING Report_Light_Condition;
+		//PRtcc datatype update
+		STRING200 Report_Weather_Condition;
+		STRING200 Report_Road_Condition;
 		STRING20 cru_agency_id;
 		STRING100 cru_agency_name;
 		STRING20 VENDor_Report_Id	;
@@ -445,6 +450,12 @@
 		STRING10 Date_Report_Submitted;
 		//CrashLogic Release 4
 	  STRING1 Releasable;
+		//Nucleus 
+		STRING50 Platform;
+		STRING40 Agency_Report_Number;
+		//PRtCC new fields
+		STRING20 Dispatch_Time;
+		STRING1 Additional_Keying;
 	END;
 
 	EXPORT persn := RECORD
@@ -592,7 +603,8 @@
 		STRING7 interlock_device_in_use	;
 		STRING7 drug_test_type_blood	;
 		STRING7 drug_test_type_urine;
-		STRING64 driver_distracted_by;	
+		//PRTCC datatype update
+		STRING200 driver_distracted_by;	
 		STRING64 non_motorist_type;	
 		STRING64 seating_position_row;	
 		STRING64 seating_position_seat	;
@@ -600,8 +612,12 @@
 		STRING64 transported_id_number;	
 		STRING10 witness_number	;
 		STRING20 date_of_birth_derived;
-		STRING Report_Injury_Status;
+		//PRTCC datatype update
+		STRING100 Report_Injury_Status;
 		STRING100 Address2;
+		//PRtCC new fields
+		STRING200 Dui_Suspected;
+		STRING200 Report_Contributing_Circumstances_p;
 	END;
 
 	EXPORT vehicl := RECORD
@@ -627,7 +643,8 @@
 		STRING30 Special_Function_in_Transport;
 		STRING30 Special_Function_in_Transport_Other_Unit;
 		STRING7 Emergency_Use;
-		STRING2 Posted_Satutory_Speed_Limit;
+		//PRTCC update datatype
+		STRING7 Posted_Satutory_Speed_Limit;
 		STRING15 Direction_of_Travel_Before_Crash;
 		STRING60 Trafficway_Description;
 		STRING50 Traffic_Control_Device_Type;
@@ -824,8 +841,9 @@
 		STRING20 speed_limit_posted;
 		STRING Report_Damage_Extent	;
 		STRING Report_Vehicle_Type	;
-		STRING Report_Traffic_Control_Device_Type;	
-		STRING Report_Contributing_Circumstances_v;	
+		STRING Report_Traffic_Control_Device_Type;
+		//PRTCC update datatype
+		STRING200 Report_Contributing_Circumstances_v;	
 		STRING Report_Vehicle_Maneuver_Action_Prior;	
 		STRING Report_Vehicle_Body_Type;
 	END;
@@ -843,8 +861,9 @@
 		STRING9 Court_Time;
 		STRING200 Citation_Detail1;
 		STRING3 Local_Code;
-		STRING30 Violation_Code1;
-		STRING30 Violation_Code2;
+		//PRTCC update datatype
+		STRING60 Violation_Code1;
+		STRING60 Violation_Code2;
 		STRING7 Multiple_Charges_Indicator;
 		STRING7 DUI_Indicator;
 		STRING9 Court_Time_AM;
@@ -1333,7 +1352,8 @@
 		STRING30 Special_Function_in_Transport;
 		STRING30 Special_Function_in_Transport_Other_Unit;
 		STRING7 Emergency_Use;
-		STRING2 Posted_Satutory_Speed_Limit;
+		//PRTCC update datatype
+		STRING7 Posted_Satutory_Speed_Limit;
 		STRING15 Direction_of_Travel_Before_Crash;
 		STRING60 Trafficway_Description;
 		STRING50 Traffic_Control_Device_Type;
@@ -1575,7 +1595,8 @@
 		STRING30 other_unit_type3;
 		STRING70 damaged_areas3;
 		//STRING20 speed_limit_posted;
-		STRING64 driver_distracted_by;	
+		//PRTCC datatype update
+		STRING200 driver_distracted_by;	
 		STRING64 non_motorist_type;	
 		STRING64 seating_position_row;	
 		STRING64 seating_position_seat;
@@ -1594,21 +1615,23 @@
 		STRING1 Report_Property_Damage;	
 		STRING Report_Collision_Type;	
 		STRING Report_First_Harmful_Event;	
-		STRING Report_Light_Condition;	
-		STRING Report_Weather_Condition;
-		STRING Report_Road_Condition;
-		STRING Report_Injury_Status;
+		STRING Report_Light_Condition;
+		//PRTCC update datatype
+		STRING200 Report_Weather_Condition;
+		STRING200 Report_Road_Condition;
+		STRING100 Report_Injury_Status;
 		STRING Report_Damage_Extent;
 		STRING Report_Vehicle_Type;
-		STRING Report_Traffic_Control_Device_Type;	
-		STRING Report_Contributing_Circumstances_v;	
+		STRING Report_Traffic_Control_Device_Type;
+		//PRtcc datatype update
+		STRING200 Report_Contributing_Circumstances_v;	
 		STRING Report_Vehicle_Maneuver_Action_Prior;	
 		STRING Report_Vehicle_Body_Type;
 		STRING20  cru_agency_id;
 		STRING100 cru_agency_name;
 		STRING20 VENDor_Report_Id;
 		STRING1  is_available_for_public;
-		STRING1  has_addENDum	;
+		STRING1  has_addendum	;
 		STRING10 report_agency_ori;
 		STRING20 report_status;
 		STRING20 ReportLinkID; 
@@ -1618,11 +1641,24 @@
 	  STRING3 Contrib_source; 
 		
 		//BuyCrash Release 6
-		STRING10 date_report_submitted;
+		STRING10 Date_Report_Submitted;
 		
 		//CrashLogic Release 4
 	  STRING1 Releasable;
+		
+		//Nucleus 
+		STRING50 Platform;
+		STRING40 Agency_Report_Number;
+		
+		//PRtCC new fields
+		STRING60 Violation_Code3;
+		STRING60 Violation_Code4;
+		STRING20 Dispatch_Time;
+		STRING1 Additional_Keying;
+		STRING200 Dui_Suspected;
+		STRING200 Report_Contributing_Circumstances_p;
 	END;
+	
 	EXPORT property_damage := RECORD
 		STRING11 Property_Damage_ID;
 		STRING11 Incident_ID;

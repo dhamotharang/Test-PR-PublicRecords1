@@ -1,17 +1,21 @@
-﻿/*2018-01-25T22:28:39Z ()
-Sandboxed
-*/
+﻿
 import std, header_services, vehiclev2, Watercraft;
 
 export applyRegulatory := module
-			shared IP := header_services.ProductionLZ.IP_Loc; 
-			shared thor_path := header_services.ProductionLZ.Directory_Loc;
-			shared unix_path := header_services.ProductionLZ.Directory_Loc1;
-					
+
+			export debug_ar := false : stored('debug_ar');
+			
+			export IP := header_services.ProductionLZ.IP_Loc; 	
+			export unix_path := header_services.ProductionLZ.Directory_Loc1 : stored('unix_path_override');
+			export thor_path := header_services.ProductionLZ.Directory_Loc  : stored('thor_path_override');
+
+			export enhFileName := 'file_enhanced_fnames.txt';
+			
 			export notification_email_addr := header_services.ProductionLZ.notification_email; 
 			
 			export full_file_name(string fname) := STD.File.ExternalLogicalFileName(IP, thor_path + fname);
-
+			export enhfull_file_name := STD.File.ExternalLogicalFileName(IP, thor_path + enhFileName);
+			
 			export should_fail := true : stored('fail_switch');
 
 			shared emailAddr := notification_email_addr;
@@ -37,8 +41,8 @@ export applyRegulatory := module
 			export check_size(string fname, unsigned record_length) := 
 					function
 							fsize := STD.File.RemoteDirectory(IP,unix_path,fname)[1].size;
-
-							file_size_good   := ((fsize % record_length) = 0) and (fsize <> 0);
+							file_size_good   := (((fsize % record_length) = 0) or (fsize % (record_length+8) = 0)) and (fsize <> 0);
+							// file_size_good   := ((fsize % record_length) = 0) and (fsize <> 0);
 							size_failure_msg := 'unexpected supplemental data file size/record length: ' + fsize + ', expected record length: ' +  record_length + ' for '+ full_file_name(fname);
 							size_failure     := if(should_fail
 																			, sequential(emailMsg(size_failure_msg), fail(size_failure_msg))
@@ -51,23 +55,73 @@ export applyRegulatory := module
 					end;							
 
 
-			export getfile(filename,layout) := 
+			export determine_file( fname, layout) := 
+					functionmacro
+							debug_ar := false : stored('debug_ar');
+
+							enhanced_layout := 
+										record 
+												unsigned8 record_source_id; 
+												layout;
+										end;
+
+							enh_base_file:=dataset(fname, enhanced_layout, flat);
+							base_file:=dataset(fname, layout, flat);
+					
+							unenhanced_base_ds := project(enh_base_file(record_source_id % 2 = 0) ,
+									transform(layout,
+											self := left;
+											self := []));
+					
+							final_file := if(is_enhancedFile, unenhanced_base_ds, base_file); 
+								
+							return final_file;
+					endmacro;	
+
+			export is_file_enh(string enhffName, string fname) := 
+					function
+							enhanced_fname_layout := 
+										record 
+												string32 file_name;
+												string2  crlf;
+										end;
+							enhffds := 	dataset(enhffName, enhanced_fname_layout, flat);
+													
+							enhfile	:= enhffds(file_name=stringlib.Data2String(hashmd5(fname)));
+							enhfilecnt := if(count(enhfile)>0, true, false);
+							return enhfilecnt;
+					end;
+
+
+			export getfile(filename, layout) := 
 					functionmacro
 							import _control;
-							local full_filename_path    := suppress.applyregulatory.full_file_name(filename);			
+
+							local full_filename_path    := suppress.applyregulatory.full_file_name(filename);		
 							local isFound           		:= nothor(suppress.applyregulatory.check_found(full_filename_path));
 							local record_length     		:= sizeof(Layout);
 							local isSizeGood        		:= nothor(suppress.applyregulatory.check_size(filename,record_length));
+							
+							local	enhfull_filename_path := suppress.applyregulatory.enhfull_file_name;		
+							local is_enhFound         	:= nothor(suppress.applyregulatory.check_found(enhfull_filename_path));
+							local is_enhancedFile				:= suppress.applyregulatory.is_file_enh(enhfull_filename_path,filename);
+							
+							local determine_outfile			:= suppress.applyRegulatory.determine_file(full_filename_path, layout);
 							local success_msg       		:= 'successfully read supplemental data filename ' + full_filename_path;
 							local success_email     		:= nothor(suppress.applyregulatory.emailMsg(success_msg));
 							local isProd            		:= (_control.ThisEnvironment.name = 'Prod' or _control.ThisEnvironment.Name = 'Prod_Thor'); // Alpha Prod or Boca Prod						
+
 							if(isFound
 									, if(isSizeGood
-												, success_email));
-						
-							return if(isFound and isSizeGood and isProd
-												, dataset(full_filename_path, layout, flat, opt)
-												, dataset([], layout));
+												, success_email)
+												);
+												 
+							return ( if((isFound and is_enhFound)
+												, if(isSizeGood 
+															,	if (isProd
+																		, determine_outfile 
+																		, dataset([], layout)))));
+
 					endmacro;
 
 
@@ -86,11 +140,6 @@ export applyRegulatory := module
 							return base_ds + Base_file_append;
 					endmacro; // complex_append
 
-
-			// base_ds is the thor dataset to be appended to
-			// filename is the lz file to be injected
-			// drop_layout is the layout of the lz file
-			// endrec is an indicator that the lz file contains and end of rec (newline) character
 			export simple_append(base_ds, filename, Drop_Layout, endrec=false) := 
 					functionmacro
 							Base_File_Append_In := suppress.applyregulatory.getFile(filename, Drop_Layout);
@@ -121,7 +170,7 @@ export applyRegulatory := module
 							Base_File_Append := project(Base_File_Append_In, reformat_append(left));															
 
 							return base_ds + Base_file_append;						
-					endmacro; // simple_append				
+					endmacro; // CR_simple_append				
 
 			export CR_simple_append_Punish(base_ds, filename, Drop_Layout, endrec=false) := 
 					functionmacro
@@ -139,8 +188,27 @@ export applyRegulatory := module
 							Base_File_Append := project(Base_File_Append_In, reformat_append(left));															
 
 							return base_ds + Base_file_append;						
-					endmacro; // simple_append	
+					endmacro; // CR_simple_append_Punish	
+					
+			export CCW_simple_append(base_ds, filename, Drop_Layout, endrec=false) := 
+					functionmacro
+							import std;
+							Base_File_Append_In := suppress.applyregulatory.getFile(filename, Drop_Layout);
+			
+							max_unique_id := max(base_ds, unique_id);
+							
+							recordof(base_ds) reformat_append(Base_File_Append_In L, UNSIGNED c ) := 
+									transform
+											// obviously this equation is a little weak, but will give us a unique id
+											self.unique_id :=  intformat((c*thorlib.nodes() + (integer) max_unique_id), 8, 1); 
+											self := L;
+											self := [];
+									end;
+			
+							Base_File_Append := project(Base_File_Append_In, reformat_append(left, counter));															
 
+							return base_ds + Base_file_append;						
+					endmacro; // CCW_simple_append		
 
 					
       export simple_sup(base_ds, filename, hashFunc) := 
@@ -158,8 +226,24 @@ export applyRegulatory := module
 													, left only
 													, lookup);
 					endmacro; // simple_sup
+		
+			export reverse_sup_layout := {unsigned8 rid;};
+			
+      export simple_reverse_sup(base_ds, filename, hashFunc) := 
+					functionmacro
+							import header_services;
+							local supLayout := header_services.Supplemental_Data.layout_in;		
+						
+							sup_in := suppress.applyregulatory.getFile(filename, supLayout);																			
 
-
+							local dSuppressedIn := project(sup_In, header_services.Supplemental_Data.in_to_out(left));
+						
+							return join(base_ds, dSuppressedIn
+													, hashFunc(left) = right.hval
+													, transform(suppress.applyRegulatory.reverse_sup_layout, self := left)
+													, lookup);
+					endmacro; // simple_reverse_sup
+				
 			export applyBIPV2(ds) := 
 					functionmacro
 							bdidAddrSupHash(recordof(ds) rec) := hashmd5(intformat(rec.seleID, 12, 1), rec.st, rec.zip,
@@ -410,30 +494,41 @@ export applyRegulatory := module
 			//
 			export applyMotorVehicleM(ds) := 
 					functionmacro
-							// vinSupHash(recordof(ds) L) := hashmd5(trim((string)l.Vina_Vin, left,right));
-						
-							// VehicleKeySupHash(recordof(ds) L) := hashmd5(trim((string)l.Vehicle_key, left,right));
-						
-							// ds1 := Suppress.applyRegulatory.simple_sup(ds, 		'file_mvr_main_vin_sup.txt', vinSupHash);
-							// ds2 := Suppress.applyRegulatory.simple_sup(ds1, 	 	'file_mvr_vehkey_sup.txt', VehicleKeySupHash);
-							// return suppress.applyRegulatory.simple_append(ds1, 'file_mvr_main_inj.thor', Suppress.Layout_Regulatory.MVR_Main_Lo);
 							return ds;
 					endmacro;
 
+			export complex_sup_trio(base_ds, filename, hashFunc1, hashFunc2, hashFunc3) := 
+					functionmacro
+							import header_services;
+							local supLayout := header_services.Supplemental_Data.layout_in;		
+						
+							sup_in := suppress.applyregulatory.getFile(filename, supLayout);																			
 
+							local dSuppressedIn := project(sup_In, header_services.Supplemental_Data.in_to_out(left));
+					
+							return join (base_ds, dSuppressedIn, 
+									hashFunc1(left) = right.hval or
+									hashFunc2(left) = right.hval or
+									hashFunc3(left) = right.hval
+									, transform(LEFT)
+											, LEFT ONLY
+											, ALL) ;	
+					endmacro; // complex_sup_trio
+					
 			//
 			// process hunting/fishing information
 			//
 			export applyHF(ds) := 
 					functionmacro
-							HF_SSN_Hash(recordof(ds) L) := hashmd5(trim(l.best_ssn, left, right));
-							HF_DID_Hash(recordof(ds) L) := hashmd5(trim(l.did_out, 	left, right));
-																												 
-							// this could be done better via use of a multi-sup function
-							ds1 := Suppress.applyRegulatory.simple_sup(ds, 'file_hunt_fish_sup.txt', HF_SSN_Hash);
-							ds2 := Suppress.applyRegulatory.simple_sup(ds1, 'file_hunt_fish_sup.txt', HF_DID_Hash);
+	            HF_DID_Hash(recordof(ds) L) := hashmd5(trim(l.did_out, 	left, right));				
+							HF_DID_SOURCE_STATE_Hash(recordof(ds) L) := hashmd5(trim(l.did_out, 	left, right), trim(l.source_state, 	left, right));
+							HF_PERSISTENT_ID_Hash(recordof(ds) L) := hashmd5(l.persistent_record_id);
+
+							// complex_hunt_fish_sup(base_ds, filename, hashFunc1, hashFunc2)
+							
+							ds1 := Suppress.applyRegulatory.complex_sup_trio(ds, 'file_hunt_fish_sup.txt', HF_DID_SOURCE_STATE_Hash, HF_DID_Hash, HF_PERSISTENT_ID_Hash);
 						
-							return suppress.applyRegulatory.simple_append(ds2, 'file_hunt_fish_inj.thor', emerges.layout_hunters_out); 
+							return suppress.applyRegulatory.simple_append(ds1, 'file_hunt_fish_inj.thor', emerges.layout_hunters_out); 
 					endmacro; // applyHF
 
 			//
@@ -441,14 +536,15 @@ export applyRegulatory := module
 			//
 			export applyCCW(ds) := 
 					functionmacro						
-							CCW_SSN_Hash(recordof(ds) L) := hashmd5(trim(l.best_ssn, left, right));
-							CCW_DID_Hash(recordof(ds) L) := hashmd5(trim(l.did_out,  left, right));
 
-							// this could be done better via use of a multi-sup function
-							ds1 := Suppress.applyRegulatory.simple_sup(ds, 'file_ccw_sup.txt', CCW_SSN_Hash);
-							ds2 := Suppress.applyRegulatory.simple_sup(ds1, 'file_ccw_sup.txt', CCW_DID_Hash);
+	            CCW_Hash1(recordof(ds) L) := hashmd5(trim(l.did_out, 	left, right));				
+							CCW_Hash2(recordof(ds) L) := hashmd5(trim(l.did_out, 	left, right), trim(l.source_state, 	left, right));
+							CCW_Hash3(recordof(ds) L) := hashmd5(l.persistent_record_id);
 
-							return Suppress.applyRegulatory.simple_append(ds2, 'file_ccw_inj.thor', emerges.layout_ccw_out);  
+							ds1 := Suppress.applyRegulatory.complex_sup_trio(ds, 'file_ccw_sup.txt', CCW_Hash1, CCW_Hash2, CCW_Hash3);
+
+							return Suppress.applyRegulatory.CCW_simple_append(ds1, 'file_ccw_inj.thor', emerges.layout_ccw_out);  
+							// return Suppress.applyRegulatory.simple_append(ds1, 'file_ccw_inj.thor', emerges.layout_ccw_out);  
 					endmacro; // applyCCW
 
 
@@ -541,8 +637,6 @@ export applyRegulatory := module
 			//
 			// process Criminal Records Offender information
 			//
-			// *** we went both ways on suppression based on SSN and/or DID.  Just in case we change decision back, i'm leaving 
-			//      did and ssn hash and complex sup calls in the code
 			export apply_CR_Offenders(ds) := 
 					functionmacro
 							// CR_Offn_DID_Hash(recordof(ds) L) 					:= hashmd5(trim(l.did, left, right));
@@ -596,18 +690,18 @@ export applyRegulatory := module
 			
 			//
 			// process Criminal Records Court Offenses information
-			// this is a placeholder until AOC offenses is processed														
 			//
 			export apply_CR_CourtOffenses(ds) := 
 					functionmacro
-							return (ds);
+							CR_CourtOffs_Offender_Key_Hash(recordof(ds) L) 	:= hashmd5(trim(l.offender_key, left, right));
+			
+							ds1 := Suppress.applyRegulatory.simple_sup(ds, 'file_cr_traffic_offense_sup.txt', CR_CourtOffs_Offender_Key_Hash);
+							
+							return 	Suppress.applyRegulatory.CR_simple_append(ds1, 'file_cr_traffic_offense_inj.thor', hygenics_crim.Layout_Base_CourtOffenses_with_OffenseCategory);
 					endmacro; // apply_CR_CourtOffenses
-
 														
 			//
 			// process Sex Offender information
-			// *** we went both ways on suppression based on SSN and/or DID.  Just in case we change decision back, i'm leaving 
-			//      did and ssn hash and complex sup calls in the code
 			//
 			export apply_SO_Offender_Main(ds) := 
 					functionmacro
@@ -632,18 +726,18 @@ export applyRegulatory := module
 							ds1 := Suppress.applyRegulatory.simple_sup(ds, 'file_soff_offense_sup.txt', Soff_Offs_Prim_Key_Hash);
 							
 							return 	Suppress.applyRegulatory.simple_append(ds1, 'file_soff_offense_inj.thor', sexoffender.layout_Common_Offense_new);
-					endmacro; // apply_SO_Offender_Offense 
-
-					
-			//
-			// process Sex Offender enhanced FDID information
-			// this is a placeholder as I'm not convince we can manipulate this file.  														
-			//
-			// export apply_SO_enh_fdid(ds) := 
-					// functionmacro
-							// return (ds);
-					// endmacro; // apply_SO_enh_fdid 
+					endmacro; // apply_SO_Offender_Offense 									
+			
+			export apply_SO_enh_fdid(ds) := 
+					functionmacro
+							return (ds);
+					endmacro; // apply_SO_enh_fdid 
 					
 							
-					
+			export hdr_incremental_sup(ds) := 
+				functionmacro
+					local hashFunc(recordof(ds) l) := hashmd5(l.rid);
+					local reverse_sup_result := Suppress.applyRegulatory.simple_reverse_sup(ds, 'hdr_incremental_sup.txt', hashFunc);
+					return reverse_sup_result;
+				endmacro;
 end;

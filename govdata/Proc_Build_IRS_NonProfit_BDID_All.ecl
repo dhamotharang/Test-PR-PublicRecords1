@@ -35,7 +35,7 @@ make_bdid := govdata.Make_IRS_NonProfit_BDID(filedate);
 //STRATA
 strata_counts := govdata.Strata_Population_Stats.IRS_Non_profit_pop;
 
-orbit_update := sequential(Orbit3.proc_Orbit3_CreateBuild_npf('IRS Non-profit Charitable Organizations',(filedate),'BUILD_AVAILABLE_FOR_USE',true),Orbit3.proc_Orbit3_CreateBuild_AddItem('IRS Non-profit Charitable Organizations',(filedate),'N'));
+orbit_update := Orbit3.proc_Orbit3_CreateBuild_npf('IRS Non-profit Charitable Organizations',(filedate),'BUILD_AVAILABLE_FOR_USE',true);
 
 retval := sequential(sprayfile
 					  ,superfile_transac

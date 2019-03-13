@@ -10,7 +10,8 @@ EXPORT validTerminatorsDeltabase := '|\n';
 
 EXPORT IdentityData_numberOfColumns := 58;
 EXPORT KnownFraud_numberOfColumns	:= 117;
-EXPORT Deltabase_numberOfColumns	:=50;
+EXPORT SafeList_numberOfColumns	:= 117;
+EXPORT Deltabase_numberOfColumns	:=56;
 EXPORT VelocityRules_numberOfColumns	:=15;
 
 EXPORT CriticalFieldError_IdentityData	:= [
@@ -46,12 +47,14 @@ EXPORT CriticalFieldError_KnownFraud	:= [
 EXPORT CriticalFieldError_Deltabase	:= [
 															'Customer_Account_Number'
 															,'Customer_program'								
-															,'Customer_County'
-															,'Customer_State'											
-															,'Customer_Agency_Vertical_Type'
 															,'reported_date'
-														];															
+														];			
 
+EXPORT CriticalFieldError_SafeList		:= [
+															'Customer_Account_Number'
+															,'Customer_program'								
+															,'reported_date'
+														];			
 EXPORT Agency_Vertical_Type 
 		:= 
 			[

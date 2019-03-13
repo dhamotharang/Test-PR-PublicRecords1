@@ -36,10 +36,11 @@ export proc_ingest(STRING omitDisposition='') := module
   function
   
     ds_err_summ_strata := project(pErr_Summary,transform({lay_err_summary - cnt,unsigned countgroup,unsigned count},self.countgroup := left.cnt,self.count := left.cnt,self := left));
-  
+    As_Linking_Counts := pAs_Linking_Counts : independent;
+    
     return parallel(
        // Strata.macf_CreateXMLStats(ds_err_summ_strata  ,'BIPV2','PrepIngest'	,pversion	,BIPV2_Build.mod_email.emailList	,'Remedies' ,'ErrorSummary' 	,pIsTesting,pOverwrite) //group on src_name
-       Strata.macf_CreateXMLStats(pAs_Linking_Counts  ,'BIPV2','PrepIngest'	,pversion	,BIPV2_Build.mod_email.emailList	,'stats'    ,'AsLinking'	    ,pIsTesting,pOverwrite) //group on File
+       Strata.macf_CreateXMLStats(As_Linking_Counts  ,'BIPV2','PrepIngest'	,pversion	,BIPV2_Build.mod_email.emailList	,'stats'    ,'AsLinking'	    ,pIsTesting,pOverwrite) //group on File
       
     );
   end;
@@ -102,10 +103,53 @@ export proc_ingest(STRING omitDisposition='') := module
 		END;
 	END;
 	
+	shared suppressedData := BIPV2_Files.files_suppressions().ds_suppressions;
 	shared ingest_results := PROJECT(BIPV2_Ingest.Ingest().AllRecords, TRANSFORM(BIPV2.CommonBase.Layout, SELF.ingest_status:=BIPV2_Ingest.Ingest().RTToText(LEFT.__Tpe), SELF:=LEFT));
-  SHARED ds_re_DID   := BIPV2_Files.tools_dotid().APPEND_DID(distribute(omittedSources.preserve(ingest_results)));//this can get skewed, so add distribute
-  SHARED ds_setsos   := BIPV2_Files.tools_dotid().SetSOS(project(ds_re_DID,BIPV2.CommonBase.Layout));//set sos again because the ingest status affects it.
-	SHARED ds_ingested := project(ds_setsos,recordof(BIPV2_Ingest.In_BASE));  
+	SHARED ds_re_DID      := BIPV2_Files.tools_dotid().APPEND_DID(distribute(omittedSources.preserve(ingest_results)));//this can get skewed, so add distribute
+	SHARED ds_setsos      := BIPV2_Files.tools_dotid().SetSOS(project(ds_re_DID,BIPV2.CommonBase.Layout));//set sos again because the ingest status affects it.
+
+	SHARED ds_removesuppressed := join(ds_setsos, suppressedData(suppressed), 
+															left.fname = right.fname and
+															left.mname = right.mname and
+															left.lname = right.lname and
+															left.name_suffix = right.name_suffix and
+															left.cnp_name = right.cnp_name and
+															left.cnp_number = right.cnp_number and
+															left.cnp_store_number = right.cnp_store_number and
+															left.prim_range = right.prim_range and
+															left.predir = right.predir and
+															left.prim_name = right.prim_name and
+															left.addr_suffix = right.addr_suffix and
+															left.postdir = right.postdir and
+															left.unit_desig = right.unit_desig and
+															left.sec_range = right.sec_range and
+															left.v_city_name = right.v_city_name and
+															left.st = right.st and
+															left.zip = right.zip and
+															left.active_duns_number = right.active_duns_number and
+															left.active_enterprise_number = right.active_enterprise_number and
+															left.ebr_file_number = right.ebr_file_number and
+															left.active_domestic_corp_key = right.active_domestic_corp_key and
+															left.foreign_corp_key = right.foreign_corp_key and
+															left.unk_corp_key = right.unk_corp_key and
+															left.company_fein = right.company_fein and
+															left.company_phone = right.company_phone and
+															left.company_ticker = right.company_ticker and
+															left.company_ticker_exchange = right.company_ticker_exchange and
+															left.company_foreign_domestic = right.company_foreign_domestic and
+															left.company_url = right.company_url and
+															left.company_inc_state = right.company_inc_state and
+															left.company_charter_number = right.company_charter_number and
+															left.vl_id = right.vl_id and
+															left.duns_number = right.duns_number and
+															left.contact_ssn = right.contact_ssn and
+															left.contact_dob = right.contact_dob and					
+															left.company_name = right.company_name and
+															left.contact_dob = right.contact_dob and
+															left.contact_email = right.contact_email,
+								                  transform(left), left only, lookup);
+											   
+	SHARED ds_ingested := project(ds_removesuppressed,recordof(BIPV2_Ingest.In_BASE));  
 	// SHARED ds_ingested := project(dataset('~thor_data400::bipv2_ingest::out_20161216',bipv2.CommonBase.layout,thor),recordof(BIPV2_Ingest.In_BASE));  
 
 	SHARED xt_src_status	:= TABLE(ds_ingested, {source, STRING50 src_name:=BIPV2.mod_sources.TranslateSource_aggregate(source), ingest_status, UNSIGNED cnt:=COUNT(GROUP)}, source, ingest_status, MERGE);
@@ -278,7 +322,8 @@ function
 																					source,
 																					FEW), 
 		                                -countval
-																	  );
+																	  )
+                                     : independent;
 		
     dds_rollX := project(pDS_Roll  ,transform(l_roll_strata,self.source := left.src_name,self.cnt_ancient := isneg1(left.cnt_ancient),self.cnt_old := isneg1(left.cnt_old), self.cnt_unchanged := isneg1(left.cnt_unchanged), self.cnt_updated := isneg1(left.cnt_updated) ,self.cnt_new := isneg1(left.cnt_new),
     ,self.countgroup := self.cnt_ancient + self.cnt_old + self.cnt_unchanged + self.cnt_updated + self.cnt_new,self.count := self.countgroup,self := left)) : independent;
@@ -314,7 +359,7 @@ function
 										 self.source:=left.source; self.valuename:='cnt_new';
 										 self.countval:=left.cnt_new));
 		Q_All:=	Q_orbititems + Q_type + Q_countgroup + Q_ancient + Q_old + Q_unchanged + Q_updated + Q_new;
-		Q_Final:=sort(Q_All,source, valuename, skew(1.0));
+		Q_Final:=sort(Q_All,source, valuename, skew(1.0)) : independent;
     
     // ds_alerts_for_email := join(Q_Final  ,Q_type ,left.source = right.source  ,transform(left),lookup);
     source_stats_email_string_prep := project(sort(Q_type,valuename,source)  ,transform({unsigned cnt,string valuename,string source,string emailstring},self.emailstring := trim(left.source),self := left,self.cnt := counter));
@@ -342,7 +387,7 @@ function
       ));
     
 		dds_Total_status := project(pTotal_Status,transform({lay_total_status,unsigned count},self.count := left.countgroup,self := left));
-    ds_RE_DID_Stats := BIPV2_Files.tools_dotid().RE_DID_Stats(pds_re_DID);
+    ds_RE_DID_Stats := BIPV2_Files.tools_dotid().RE_DID_Stats(pds_re_DID) : independent;
 //-------simplify the ReDID part to construct another alert:
 		ds2:=table(ds_RE_DID_Stats(source<>'source') ,{source, field,unsigned countgroup := sum(group,countgroup)  
       ,unsigned total_new   := sum(group,total_new)  
@@ -382,15 +427,16 @@ function
 										 self.source:=left.source; self.field:=left.field; self.valuename:='same';
 										 self.countval:=left.same));
 		P_ALL:=P_countgroup+P_new+P_old+P_gained+P_lost+P_changed+P_same;
-		P_Final:=sort(P_ALL, source, field, valuename, skew(1.0));
-	
+		P_Final:=sort(P_ALL, source, field, valuename, skew(1.0)) : independent;
+    lds_agg_unused := pds_agg_unused : independent;
+    Total_Counts := pTotal_Counts : independent;
     return parallel(
      //Strata.macf_CreateXMLStats(dds_roll,'BIPV2','RunIngest'	,pversion	,BIPV2_Build.mod_email.emailList	,'status'     ,'Source' 	,pIsTesting,pOverwrite) //group on src_name
        email_ingest_alerts
       ,Strata.macf_CreateXMLStats(Q_Final, 'BIPV2','RunIngest'	,pversion	,BIPV2_Build.mod_email.emailList	,'statusSmpl' ,'Source' 	,pIsTesting,pOverwrite) //group on src_name
       // ,Strata.macf_CreateXMLStats(dds_Total_status,'BIPV2','RunIngest'	,pversion	,BIPV2_Build.mod_email.emailList	,'status' ,'Total'	  ,pIsTesting,pOverwrite) //group on ingest_status
-      ,Strata.macf_CreateXMLStats(pTotal_Counts   ,'BIPV2','RunIngest'	,pversion	,BIPV2_Build.mod_email.emailList	,'counts' ,'Total' 	  ,pIsTesting,pOverwrite) //group on File
-      ,Strata.macf_CreateXMLStats(pds_agg_unused  ,'BIPV2','RunIngest'	,pversion	,BIPV2_Build.mod_email.emailList	,'Sources','Unused'   ,pIsTesting,pOverwrite) //group on src_name
+      ,Strata.macf_CreateXMLStats(Total_Counts   ,'BIPV2','RunIngest'	,pversion	,BIPV2_Build.mod_email.emailList	,'counts' ,'Total' 	  ,pIsTesting,pOverwrite) //group on File
+      ,Strata.macf_CreateXMLStats(lds_agg_unused  ,'BIPV2','RunIngest'	,pversion	,BIPV2_Build.mod_email.emailList	,'Sources','Unused'   ,pIsTesting,pOverwrite) //group on src_name
       ,Strata.macf_CreateXMLStats(ds_RE_DID_Stats ,'BIPV2','RunIngest'	,pversion	,BIPV2_Build.mod_email.emailList	,'Stats'  ,'ReDID'    ,pIsTesting,pOverwrite) //group on source,field //group on source,ingest_status,field (old)
       ,Strata.macf_CreateXMLStats(P_Final ,'BIPV2','RunIngest'	,pversion	,BIPV2_Build.mod_email.emailList	,'StatsSmpl'  ,'ReDID'    ,pIsTesting,pOverwrite) //group on source,field //group on source,ingest_status,field (old)
       ,Strata.macf_CreateXMLStats(ds_dropped_rcids_by_src,'BIPV2','RunIngest'	,pversion	,BIPV2_Build.mod_email.emailList	,'Rcids'  ,'Dropped'    ,pIsTesting,pOverwrite)
@@ -455,15 +501,15 @@ function
   export debug_email_alert := sequential(debug_alert  ,email_alert);
   
   shared uu:=sort(BIPV2_Ingest.Scrubs_Stats.SummaryStats_smpl,-totalerr);
-  shared vv:=uu(totalerr>=100);
+  shared vv:=uu(totalerr>=100) : independent;
 
   shared ww:=BIPV2_Ingest.Scrubs_Stats.BadValues;
-  shared xx:=choosen(ww,200);
+  shared xx:=choosen(ww,200) : independent;
 
   export Scrub_Strata_SummaryStats :=Strata.macf_CreateXMLStats(vv ,'BIPV2','Ingest',BIPV2.KeySuffix,BIPV2_Build.mod_email.emailList,'SummaryStatsSmpl','Scrubs',false,false);
   export Scrub_Strata_BadValues :=Strata.macf_CreateXMLStats(xx ,'BIPV2','Ingest',BIPV2.KeySuffix,BIPV2_Build.mod_email.emailList,'BadValues','Scrubs',false,false);
 
- 
+  import BIPV2_QA_Tool;
 	// Merge Base SuperFile with Ingest SuperFile - queue up the results for DOT
   // for strata: ds_roll,xtab_types and the count fields(put into 1 dataset)
 	EXPORT fn_runIngest(
@@ -478,18 +524,22 @@ function
 
     return SEQUENTIAL(
        email_alert
-      ,omittedSources.check
-      ,OUTPUT(ds_ingested,, f_ingest_out, COMPRESSED, OVERWRITE)
-      ,OUTPUT(TABLE(ds_ingested,{rcid, ingest_status}),, f_ingest_typ, COMPRESSED, OVERWRITE)
-      ,OUTPUT(dropped_rcids,, f_ingest_drcids, COMPRESSED, OVERWRITE)
-      ,doStats
-      ,do_runingest_strata()
+      ,parallel(
+         omittedSources.check
+        ,OUTPUT(ds_ingested,, f_ingest_out, COMPRESSED, OVERWRITE)
+        ,OUTPUT(TABLE(ds_ingested,{rcid, ingest_status}),, f_ingest_typ, COMPRESSED, OVERWRITE)
+        ,OUTPUT(dropped_rcids,, f_ingest_drcids, COMPRESSED, OVERWRITE)
+        ,doStats
+        ,do_runingest_strata()
+      )      
       ,BIPV2_Files.files_ingest.updateSuperFiles(f_ingest_out)
+      ,BIPV2_QA_Tool.mac_Ingest_Stats(workunit,pversion)
       ,copyempid2StorageThor_prepingestfile  
       ,copyempid2StorageThor_fathercommonbase
       // ,if(not wk_ut._constants.IsDev ,tools.Copy2_Storage_Thor(filename := f_ingest_in  ,pDeleteSourceFile  := true)) //copy prepingest file to storage thor after using it.
       // ,if(not wk_ut._constants.IsDev ,tools.Copy2_Storage_Thor(filename := '~' + nothor(std.file.superfilecontents(BIPV2.CommonBase.FILE_BASE)[1].name)  ,pDeleteSourceFile  := true))  //copy commonbase file to storage thor
-      ,Scrub_Strata_SummaryStats,Scrub_Strata_BadValues
+      ,Scrub_Strata_SummaryStats
+      ,Scrub_Strata_BadValues
     );
 	end;
   

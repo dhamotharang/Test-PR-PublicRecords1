@@ -1,4 +1,4 @@
-// NHS0856 / New Hampshire Real Estate Commission / Real Estate //
+﻿// NHS0856 / New Hampshire Real Estate Commission / Real Estate //
 
 export layout_NHS0856 := RECORD
 	string50   LICTYPE;
@@ -17,7 +17,7 @@ export layout_NHS0856 := RECORD
 	// string20	 PHONE;    //field removed 3/25/13 Cathy Tio
 	// string100	 EMAIL;
 	string150	 OFFICENAME;	//Contains DBA name
-	string50   ADDRESS1;	
+	string100   ADDRESS1;	
 	string50   ADDRESS2;
 	string30   CITY;
 	string30   STATE;

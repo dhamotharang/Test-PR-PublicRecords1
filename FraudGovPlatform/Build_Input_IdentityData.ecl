@@ -1,43 +1,35 @@
 ﻿IMPORT tools,STD, FraudGovPlatform_Validation, FraudShared, ut;
 EXPORT Build_Input_IdentityData(
-	 string			pversion
-	,boolean		PSkipIdentityData	= false 
-	,boolean		PSkipNAC			= false	 
-	,boolean		PSkipDeltabase		= false	 
-	,boolean		PSkipInquiryLogs	= false	 
-	,boolean		PSkipValidations	= false
+	 string pversion
+	,dataset(FraudShared.Layouts.Input.mbs) MBS_Sprayed = FraudShared.Files().Input.MBS.sprayed
+	,dataset(Layouts.Flags.SkipModules) pSkipModules = FraudGovPlatform.Files().Flags.SkipModules
+	,dataset(Layouts.Input.IdentityData) IdentityData_Sprayed =  files().Input.IdentityData.sprayed	
+	,dataset(Layouts.Input.IdentityData) ByPassed_IdentityData_Sprayed = files().Input.ByPassed_IdentityData.sprayed
+	,dataset(Layouts.Flags.SkipValidationByGCID) PSkipValidations = files().Flags.SkipValidationByGCID	 
 ) :=
 module
 
-	SHARED fn_dedup(inputs):=FUNCTIONMACRO
-		in_srt:=sort(inputs, RECORD, EXCEPT processdate);
-		in_ddp:=rollup(in_srt,
-								TRANSFORM(Layouts.Input.IdentityData,SELF := LEFT; SELF := []),
-								RECORD,
-								EXCEPT ProcessDate);	
-		return in_ddp;
-	ENDMACRO;	
-	
-	inIdentityDataUpdate :=	  if( nothor(STD.File.GetSuperFileSubCount('~thor_data400::in::fraudgov::passed::identitydata')) > 0 and PSkipIdentityData = false, 
-													Files(pversion).Sprayed.IdentityData, 
-													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
-											)   
-											+ if ( nothor(STD.File.GetSuperFileSubCount('~thor_data400::in::fraudgov::passed::deltabase')) > 0  and PSkipDeltabase = false,
-													Build_Prepped_Deltabase(pversion),
-													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
-											)	
-											+ if (nothor(STD.File.GetSuperFileSubCount('~thor_data400::in::fraudgov::passed::nac')) > 0 and PSkipNAC = false, 
-													Build_Prepped_NAC(pversion).NACIDDTUpdate,
-													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
-											)
-											+ if (nothor(STD.File.GetSuperFileSubCount('~thor_data400::in::fraudgov::passed::inquirylogs')) > 0 and PSkipInquiryLogs = false, 
-													Build_Prepped_InquiryLogs(pversion),
-													dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
-											);
+	shared SkipNACBuild := pSkipModules[1].SkipNACBuild;
+	shared SkipInquiryLogsBuild := pSkipModules[1].SkipInquiryLogsBuild;
+
+	inIdentityDataUpdate :=	  if( nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.IdentityData)) > 0, 
+		Files(pversion).Sprayed.IdentityData, 
+		dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
+		)   
+		+ if (nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.NAC)) > 0 and SkipNACBuild = false, 
+				Build_Prepped_NAC(pversion).NACIDDTUpdate,
+				dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
+		)
+		+ if (nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.InquiryLogs)) > 0 and SkipInquiryLogsBuild = false, 
+				Build_Prepped_InquiryLogs(pversion),
+				dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
+		);
 
 	Functions.CleanFields(inIdentityDataUpdate ,inIdentityDataUpdateUpper); 
 
-	Layouts.Input.IdentityData tr(inIdentityDataUpdateUpper l) := transform
+	max_uid := max(IdentityData_Sprayed, IdentityData_Sprayed.unique_id) :	global;
+
+	Layouts.Input.IdentityData tr(inIdentityDataUpdateUpper l, integer cnt) := transform
 		sub:=stringlib.stringfind(l.fn,'20',1);
 		sub2:=stringlib.stringfind(l.fn,'.dat',1)-6;
 		FileDate := (unsigned)l.fn[sub..sub+7];
@@ -57,189 +49,129 @@ module
 		self.mailing_address_2 := mailing_address_2;
 		self.mailing_address_id := hash64(mailing_address_1 + mailing_address_2);
 		self.raw_full_name := if(l.raw_full_name='', ut.CleanSpacesAndUpper(l.raw_first_name + ' ' + l.raw_middle_name + ' ' + l.raw_last_name), l.raw_full_name);
-
 		self.ind_type 	:= functions.ind_type_fn(l.Customer_Program);
 		self.file_type := 3 ;
-		
 		source_input := if (l.source_input = '', 'IDDT',l.source_input);
 		self.source_input := source_input;
-		SELF.unique_id := hash64(hashmd5(
-									ut.CleanSpacesAndUpper(l.Customer_Name) + ',' + 
-									ut.CleanSpacesAndUpper(l.Customer_Account_Number) + ',' + 
-									ut.CleanSpacesAndUpper(l.Customer_State) + ',' + 
-									ut.CleanSpacesAndUpper(l.Customer_County) + ',' + 
-									ut.CleanSpacesAndUpper(l.Customer_Agency) + ',' + 														
-									ut.CleanSpacesAndUpper(l.Customer_Agency_Vertical_Type) + ',' + 
-									ut.CleanSpacesAndUpper(l.Customer_Program) + ',' + 
-									ut.CleanSpacesAndUpper(l.Customer_Job_ID) + ',' + 
-									ut.CleanSpacesAndUpper(l.Batch_Record_ID) + ',' + 
-									ut.CleanSpacesAndUpper(l.Transaction_ID_Number) + ',' + 
-									ut.CleanSpacesAndUpper(l.Reason_for_Transaction_Activity) + ',' + 	
-									ut.CleanSpacesAndUpper(l.Date_of_Transaction) + ',' + 												
-									(string)l.LexID + ',' + 
-									ut.CleanSpacesAndUpper(l.raw_Full_Name) + ',' + 
-									ut.CleanSpacesAndUpper(l.raw_Title) + ',' + 
-									ut.CleanSpacesAndUpper(l.raw_First_name) + ',' + 
-									ut.CleanSpacesAndUpper(l.raw_Middle_Name) + ',' + 
-									ut.CleanSpacesAndUpper(l.raw_Last_Name) + ',' + 
-									ut.CleanSpacesAndUpper(l.raw_orig_suffix) + ',' + 
-									ut.CleanSpacesAndUpper(l.SSN) + ',' + 
-									ut.CleanSpacesAndUpper(l.SSN4) + ',' + 
-									ut.CleanSpacesAndUpper(l.Address_Type) + ',' + 
-									ut.CleanSpacesAndUpper(l.Street_1) + ',' + 
-									ut.CleanSpacesAndUpper(l.Street_2) + ',' + 
-									ut.CleanSpacesAndUpper(l.City) + ',' + 
-									ut.CleanSpacesAndUpper(l.State) + ',' + 
-									ut.CleanSpacesAndUpper(l.Zip) + ',' + 
-									ut.CleanSpacesAndUpper(l.Mailing_Street_1) + ',' + 
-									ut.CleanSpacesAndUpper(l.Mailing_Street_2) + ',' + 
-									ut.CleanSpacesAndUpper(l.Mailing_City) + ',' + 
-									ut.CleanSpacesAndUpper(l.Mailing_State) + ',' + 
-									ut.CleanSpacesAndUpper(l.Mailing_Zip) + ',' + 
-									ut.CleanSpacesAndUpper(l.County) + ',' + 
-									ut.CleanSpacesAndUpper(l.Contact_Type) + ',' + 
-									ut.CleanSpacesAndUpper(l.phone_number) + ',' + 
-									ut.CleanSpacesAndUpper(l.Cell_Phone) + ',' + 
-									ut.CleanSpacesAndUpper(l.dob) + ',' + 
-									ut.CleanSpacesAndUpper(l.Email_Address) + ',' + 
-									ut.CleanSpacesAndUpper(l.Drivers_License_State) + ',' + 
-									ut.CleanSpacesAndUpper(l.Drivers_License_Number) + ',' + 
-									ut.CleanSpacesAndUpper(l.Bank_Routing_Number_1) + ',' + 
-									ut.CleanSpacesAndUpper(l.Bank_Account_Number_1) + ',' + 
-									ut.CleanSpacesAndUpper(l.Bank_Routing_Number_2) + ',' + 
-									ut.CleanSpacesAndUpper(l.Bank_Account_Number_2) + ',' + 
-									ut.CleanSpacesAndUpper(l.Ethnicity) + ',' + 
-									ut.CleanSpacesAndUpper(l.Race) + ',' + 
-									ut.CleanSpacesAndUpper(l.Case_ID) + ',' + 
-									ut.CleanSpacesAndUpper(l.Client_ID) + ',' + 
-									ut.CleanSpacesAndUpper(l.Head_of_Household_indicator) + ',' + 
-									ut.CleanSpacesAndUpper(l.Relationship_Indicator) + ',' + 
-									ut.CleanSpacesAndUpper(l.IP_Address) + ',' + 
-									ut.CleanSpacesAndUpper(l.Device_ID) + ',' + 
-									ut.CleanSpacesAndUpper(l.Unique_number) + ',' + 
-									ut.CleanSpacesAndUpper(l.MAC_Address) + ',' + 
-									ut.CleanSpacesAndUpper(l.Serial_Number) + ',' + 
-									ut.CleanSpacesAndUpper(l.Device_Type) + ',' + 
-									ut.CleanSpacesAndUpper(l.Device_identification_Provider) + ',' +  
-									ut.CleanSpacesAndUpper(l.geo_lat) + ',' + 
-									ut.CleanSpacesAndUpper(l.geo_long))); 
-		self.Deltabase := if(l.source_input[1..9] = 'DELTABASE', 1, 0);
+		SELF.unique_id := max_uid + cnt;
+		self.Deltabase := 0;
 		self:=l;
 		self:=[];
 	end;
 
-	shared f1:=project(inIdentityDataUpdateUpper,tr(left));
+	shared f1:=project(inIdentityDataUpdateUpper,tr(left, counter));
 	
-	f1_errors:=f1
-			((	 
-					Customer_Account_Number = ''
-				or	Customer_County = ''
-				or 	(LexID = 0 and raw_Full_Name = '' and (raw_First_name = '' or raw_Last_Name=''))
-				or 	((SSN = '' or length(STD.Str.CleanSpaces(SSN))<>9 or regexfind('^[0-9]*$',STD.Str.CleanSpaces(ssn)) =false) and (Drivers_License_Number='' and Drivers_License_State='') and LexID = 0)
-				or 	(Street_1='' and City='' and State='' and Zip='')
-				or 	(Customer_State in FraudGovPlatform_Validation.Mod_Sets.States) 							= FALSE
-				or 	(Customer_Agency_Vertical_Type in FraudGovPlatform_Validation.Mod_Sets.Agency_Vertical_Type) 		= FALSE
-				or 	(Customer_Program in FraudGovPlatform_Validation.Mod_Sets.IES_Benefit_Type) 			= FALSE				
-			)and PSkipValidations = false);
+	shared EnforceValidations 
+		:= join(	  f1
+					, PSkipValidations
+					, left.Customer_Account_Number = right.gc_id
+					, TRANSFORM(Layouts.Input.IdentityData,SELF := LEFT),LEFT ONLY, LOOKUP);
 
+	shared SkipValidations 
+		:= join(	  f1
+					, PSkipValidations
+					, left.Customer_Account_Number = right.gc_id
+					, TRANSFORM(FraudGovPlatform.Layouts.Input.IdentityData,SELF := LEFT), INNER, LOOKUP);
 
-	MBS_Layout := Record
-		FraudShared.Layouts.Input.MBS;
-		unsigned1 Deltabase := 0;
-	end;
-	MBS	:= project(FraudShared.Files().Input.MBS.sprayed(status = 1), transform(MBS_Layout, self.Deltabase := If(regexfind('DELTA', left.fdn_file_code, nocase),1,0); self := left));
+	shared valid_records := EnforceValidations + SkipValidations;
 	
-	NotInMbs := join(f1,
-								MBS,
-										left.Customer_Account_Number =(string)right.gc_id and
-										left.file_type = right.file_type and
-										left.ind_type = right.ind_type and
-										left.Deltabase = Right.Deltabase and
-										( 
-											 left.Deltabase = 1
-											OR 
-											(	left.Deltabase = 0 AND
-												left.customer_State = right.Customer_State AND
-												left.Customer_County = right.Customer_County AND 	
-												left.Customer_Agency_Vertical_Type = right.Customer_Vertical
-											)
-										),
-										TRANSFORM(Layouts.Input.IdentityData,SELF := LEFT),LEFT ONLY, lookup);
+	shared f1_errors:=EnforceValidations
+		(	 
+				Customer_Account_Number = ''
+			or	Customer_County = ''
+			or 	(LexID = 0 and raw_Full_Name = '' and (raw_First_name = '' or raw_Last_Name=''))
+			or 	((SSN = '' or length(STD.Str.CleanSpaces(SSN))<>9 or regexfind('^[0-9]*$',STD.Str.CleanSpaces(ssn)) =false) and (Drivers_License_Number='' and Drivers_License_State='') and LexID = 0)
+			or 	(Street_1='' and City='' and State='' and Zip='')
+			or 	(Customer_State in FraudGovPlatform_Validation.Mod_Sets.States) = FALSE
+			or 	(Customer_Agency_Vertical_Type in FraudGovPlatform_Validation.Mod_Sets.Agency_Vertical_Type) = FALSE
+			or 	(Customer_Program in FraudGovPlatform_Validation.Mod_Sets.IES_Benefit_Type) = FALSE				
+		);
+
+	NotInMbs := join( valid_records,
+					MBS_Sprayed(status = 1),
+					left.Customer_Account_Number =(string)right.gc_id and
+					left.file_type = right.file_type and
+					left.ind_type = right.ind_type and
+					left.customer_State = right.Customer_State and
+					left.Customer_County = right.Customer_County and 	
+					left.Customer_Agency_Vertical_Type = right.Customer_Vertical,
+					TRANSFORM(Layouts.Input.IdentityData,SELF := LEFT),LEFT ONLY, lookup);
+
 	//Exclude Errors
 	shared ByPassed_records := f1_errors + NotInMbs;
-	f1_bypass_dedup := files().Input.ByPassed_IdentityData.sprayed + project(ByPassed_records,FraudGovPlatform.Layouts.Input.IdentityData);
+	f1_bypass_dedup := fn_dedup(ByPassed_IdentityData_Sprayed + project(ByPassed_records,FraudGovPlatform.Layouts.Input.IdentityData));
 	
 	tools.mac_WriteFile(Filenames().Input.ByPassed_IdentityData.New(pversion),
-									f1_bypass_dedup,
-									Build_Bypass_Records,
-									pCompress	:= true,
-									pHeading := false,
-									pCsvout := true,
-									pSeparator := '~|~',
-									pOverwrite := true,
-									pTerminator := '~<EOL>~',
-									pQuote:= '');
+		f1_bypass_dedup,
+		Build_Bypass_Records,
+		pCompress	:= true,
+		pHeading := false,
+		pCsvout := true,
+		pSeparator := Constants().validDelimiter,
+		pOverwrite := true,
+		pTerminator := Constants().validTerminators,
+		pQuote := Constants().validQuotes);
 									
 	//Move only Valid Records
-	shared f1_dedup					:=	 join (f1,
-																							ByPassed_records,
-																							left.Unique_Id = right.Unique_Id,
-																							TRANSFORM(Layouts.Input.IdentityData,SELF := LEFT),
-																							left only);
-																							
-
+	shared f1_dedup :=	join (	valid_records,
+							ByPassed_records,
+							left.Customer_Account_Number = right.Customer_Account_Number and
+							left.Unique_Id = right.Unique_Id,
+							TRANSFORM(Layouts.Input.IdentityData,SELF := LEFT),
+							left only);
+																						
 	shared new_addresses := Functions.New_Addresses(f1_dedup);
 
 	tools.mac_WriteFile(Filenames().Input.AddressCache_IDDT.New(pversion),
-									new_addresses,
-									Build_Address_Cache,
-									pCompress	:= true,
-									pHeading := false,
-									pCsvout := true,
-									pSeparator := '~|~',
-									pOverwrite := true,
-									pTerminator := '~<EOL>~',
-									pQuote:= '');
+		new_addresses,
+		Build_Address_Cache,
+		pCompress := true,
+		pHeading := false,
+		pCsvout := true,
+		pSeparator := Constants().validDelimiter,
+		pOverwrite := true,
+		pTerminator := Constants().validTerminators,
+		pQuote:= Constants().validQuotes);
 
 																							
-	dAppendAID	:= Standardize_Entity.Clean_Address(f1_dedup, new_addresses);
-	dappendName	:= Standardize_Entity.Clean_Name(dAppendAID);	
-	dAppendPhone	:= Standardize_Entity.Clean_Phone (dappendName);
-	dAppendLexid	:= Standardize_Entity.Append_Lexid (dAppendPhone);
+	dAppendAID := Standardize_Entity.Clean_Address(f1_dedup, new_addresses);
+	dappendName := Standardize_Entity.Clean_Name(dAppendAID);	
+	dAppendPhone := Standardize_Entity.Clean_Phone (dappendName);
+	dAppendLexid := Standardize_Entity.Append_Lexid (dAppendPhone);
 	dCleanInputFields := Standardize_Entity.Clean_InputFields (dAppendLexid);	
 	
-	input_file_1 := fn_dedup(files().Input.IdentityData.sprayed  + project(dCleanInputFields,Layouts.Input.IdentityData));
+	input_file_1 := fn_dedup(IdentityData_Sprayed  + project(dCleanInputFields,Layouts.Input.IdentityData)); 
 
 	// Refresh Addresses every 90 days
 	IsTimeForRefresh := AddressesInfo(pversion).IsTimeForRefresh;
 	dRefreshAID := Standardize_Entity.dRefreshAID(input_file_1);
 	input_file_2 := if(	IsTimeForRefresh,
-						dRefreshAID,
-						input_file_1); 
+					dRefreshAID,
+					input_file_1); 
 	// Refresh Lexid when new header is released
 	IsNewHeader := HeaderInfo.IsNew;
 	dRefreshLexid := Standardize_Entity.dRefreshLexid(input_file_2);
 	input_file_3 := if(	IsNewHeader,
-						dRefreshLexid,
-						input_file_2); 
+					dRefreshLexid,
+					input_file_2); 
 
 	tools.mac_WriteFile(Filenames(pversion).Input.IdentityData.New(pversion),
-									input_file_3,
-									Build_Input_File,
-									pCompress	:= true,
-									pHeading := false,
-									pCsvout := true,
-									pSeparator := '~|~',
-									pOverwrite := true,
-									pTerminator := '~<EOL>~',
-									pQuote:= '');
+		input_file_3,
+		Build_Input_File,
+		pCompress := true,
+		pHeading := false,
+		pCsvout := true,
+		pSeparator := Constants().validDelimiter,
+		pOverwrite := true,
+		pTerminator := Constants().validTerminators,
+		pQuote:= Constants().validQuotes);
 
 // Return
 	export build_prepped := 
-			 sequential(
-				 Build_Address_Cache
-				,Build_Input_File
-				,Build_Bypass_Records 
+		sequential(
+			 Build_Address_Cache
+			,Build_Input_File
+			,Build_Bypass_Records 
 		);
 		
 	export All :=

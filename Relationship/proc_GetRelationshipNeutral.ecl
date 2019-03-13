@@ -120,7 +120,8 @@ END;
 relsSkip         := join(DID_ds,relationship_key,keyed(left.did = right.did1),xform(left,right),LIMIT(MaxCount,SKIP));
 relsFail         := join(DID_ds,relationship_key,keyed(left.did = right.did1),xform(left,right),LIMIT(MaxCount));
 relsAtmost       := join(DID_ds,relationship_key,keyed(left.did = right.did1),xform(left,right),ATMOST(MaxCount));
-relsAll          := join(DID_ds,relationship_key,keyed(left.did = right.did1),xform(left,right));
+relsAll0         := join(DID_ds,relationship_key,keyed(left.did = right.did1),xform(left,right),KEEP(20000),LIMIT(0));
+relsAll          := TOPN(relsAll0, 10000, -total_score, -total_cnt);
 relsTHOR         := join(DID_ds_dist,relationship_flat,left.did = right.did1,xform(left,right),ATMOST(MaxCount),local);
 
 shared rels      := MAP(doThor                       => relsThor,

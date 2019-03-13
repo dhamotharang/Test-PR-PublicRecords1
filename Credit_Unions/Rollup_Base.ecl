@@ -1,49 +1,86 @@
-import ut;
+﻿import ut, Credit_Unions;
 export Rollup_Base(
 
-	dataset(Layouts.Base) pDataset
+	dataset(Credit_Unions.Layouts.Base) pDataset
 	
 ) :=
 function
 
-	pDataset_Dist := distribute(pDataset, hash64(rawfields.Charter));
-	pDataset_sort := sort(pDataset_Dist	,except 
-		 dt_vendor_first_reported
-		,dt_vendor_last_reported	
-		,record_type
-		,ultscore
-		,orgscore
-		,selescore
-		,proxscore
-		,powscore
-		,empscore
-		,dotscore
-		,ultweight
-		,orgweight
-		,seleweight
-		,proxweight
-		,powweight
-		,empweight
-		,dotweight
-		,local
-	);
+	pDataset_Dist := distribute(pDataset, hash(Charter));
+	 
+	Credit_Unions.Layouts.Base  trans_RecID(Credit_Unions.Layouts.Base l ):=transform
 	
-	Layouts.Base RollupUpdate(Layouts.Base l, Layouts.Base r) := 
-	transform
-		SELF.dt_vendor_last_reported 	:= ut.LatestDate	(l.dt_vendor_last_reported	,r.dt_vendor_last_reported	);
-		SELF.dt_vendor_first_reported := ut.EarliestDate(l.dt_vendor_first_reported	,r.dt_vendor_first_reported	);
-		self.record_type							:= if(l.record_type = 'C' or r.record_type = 'C', 'C', 'H');
-		self.source_rec_id				    := if (L.source_rec_id <> 0,L.source_rec_id,R.source_rec_id);				
-		self := l;
-
+	DATA temp_record_id := HASHMD5(ut.CleanSpacesAndUpper(l.Charter) + 
+																 ut.CleanSpacesAndUpper(l.join_number) + 
+																 ut.CleanSpacesAndUpper(l.SiteId) + 
+																 ut.CleanSpacesAndUpper(l.CU_Name) + 
+																 ut.CleanSpacesAndUpper(l.SiteName) + 
+																 ut.CleanSpacesAndUpper(l.SiteTypeName) + 
+																 ut.CleanSpacesAndUpper(l.MainOffice) +
+																 ut.CleanSpacesAndUpper(l.Address1) + 
+																 ut.CleanSpacesAndUpper(l.Address2) + 
+																 ut.CleanSpacesAndUpper(l.City) +
+																 ut.CleanSpacesAndUpper(l.State) + 
+																 ut.CleanSpacesAndUpper(l.StateName) + 
+																 ut.CleanSpacesAndUpper(l.Zip_Code) + 
+																 ut.CleanSpacesAndUpper(l.CountyName) + 
+																 ut.CleanSpacesAndUpper(l.Country) + 
+																 ut.CleanSpacesAndUpper(l.Phone) +
+																 ut.CleanSpacesAndUpper(l.Contact_Name) +               
+																 ut.CleanSpacesAndUpper(l.Assets) +
+																 ut.CleanSpacesAndUpper(l.Loans) +
+																 ut.CleanSpacesAndUpper(l.NetWorthRatio) +
+																 ut.CleanSpacesAndUpper(l.Perc_ShareGrowth) +
+																 ut.CleanSpacesAndUpper(l.Perc_LoanGrowth) +
+																 ut.CleanSpacesAndUpper(l.LoantoAssetsRatio) +
+																 ut.CleanSpacesAndUpper(l.InvestAssetsRatio) +
+																 ut.CleanSpacesAndUpper(l.NumMem) +
+																 ut.CleanSpacesAndUpper(l.NumFull)
+																);																	
+		self.Source_rec_id := hash64(temp_record_id); 
+		self							 := l;
+	end;
+	
+  pDataset_RecID := project(pDataset ,trans_RecID(left));
+	
+	pDataset_sort  := sort(distribute(pDataset_RecID, hash64(charter)),
+												 except 
+												 dt_vendor_first_reported
+												 ,dt_vendor_last_reported	
+												 ,record_type
+												 ,ultscore
+												 ,orgscore
+												 ,selescore
+												 ,proxscore
+												 ,powscore
+												 ,empscore
+												 ,dotscore
+												 ,ultweight
+												 ,orgweight
+												 ,seleweight
+												 ,proxweight
+												 ,powweight
+												 ,empweight
+												 ,dotweight
+												 ,local
+												 );
+											 
+	
+	Credit_Unions.Layouts.Base RollupUpdate(Credit_Unions.Layouts.Base l, Credit_Unions.Layouts.Base r) := transform
+		self.dt_vendor_first_reported := Min(l.dt_vendor_first_reported, r.dt_vendor_first_reported);
+		self.dt_vendor_last_reported 	:= Max(l.dt_vendor_last_reported, r.dt_vendor_last_reported	);
+		self.cycle_date			          := (string) Max((unsigned4)l.cycle_date	,(unsigned4) r.cycle_date);
+		self 													:= l;
 	end;
 
-	pDataset_rollup := rollup( pDataset_sort
+	pDataset_rollup := rollup(pdataset_sort
 														,RollupUpdate(left, right)
+														,record
 														,except 
-														 dt_vendor_first_reported
+														dt_vendor_first_reported
 														,dt_vendor_last_reported	
 														,record_type
+														,cycle_date
 														,source_rec_id
 														,ultscore
 														,orgscore
@@ -60,27 +97,9 @@ function
 														,empweight
 														,dotweight
 														,local
-										);
+													 );
 
-	// --for update that is not full file
-	dnotfull_sort 			:= sort	(pDataset_rollup, rawfields.Charter, local	);
-	dnotfull_group			:= group(pDataset_sort	, rawfields.Charter, local	);
-	dnotfull_sort_group	:= sort	(dnotfull_group	, -dt_vendor_last_reported	);
-
-	Layouts.Base SetRecordType(Layouts.Base L, Layouts.Base R) := 
-	transform
-		self.record_type	:= if(l.record_type = '', 'C', r.record_type);
-		self							:= r;
-	end;
-
-	dSetRecordType := group(iterate(dnotfull_sort_group, SetRecordType(left, right)));
-
-	output_dataset := if(_Flags.IsUpdateFullFile
-											,pDataset_rollup
-											,dSetRecordType
-										);
-  ut.MAC_Append_Rcid(output_dataset, source_rec_id, output_dataset_id);
 	
-	return output_dataset_id;
+	return pDataset_rollup;
 
 end;

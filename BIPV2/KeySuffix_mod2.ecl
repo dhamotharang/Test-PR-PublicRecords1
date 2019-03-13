@@ -64,8 +64,18 @@ end;
 // export constant_ThisBuild_versionDate := '20180501'; // S58
 // export constant_ThisBuild_versionDate := '20180601'; // S59
 // export constant_ThisBuild_versionDate := '20180702'; // S60
-export constant_ThisBuild_versionDate := '20180801'; // S61
-
+// export constant_ThisBuild_versionDate := '20180801'; // S61
+// export constant_ThisBuild_versionDate := '20180901'; // S62
+// export constant_ThisBuild_versionDate := '20180901a'; // S62a
+// export constant_ThisBuild_versionDate := '20181002'; // S63
+// export constant_ThisBuild_versionDate := '20181002a'; // S63a
+// export constant_ThisBuild_versionDate := '20181101'; // S64
+// export constant_ThisBuild_versionDate := '20181101a'; // S64a
+// export constant_ThisBuild_versionDate := '20181203'; // S65
+// export constant_ThisBuild_versionDate := '20190104'; // S66
+// export constant_ThisBuild_versionDate := '20190104a'; // S66a BH-429
+// export constant_ThisBuild_versionDate := '20190201'; // S67 BH-554
+export constant_ThisBuild_versionDate := '20190304'; // S68 BH-555
 
 
 export ds :=
@@ -137,6 +147,17 @@ dataset([
 ,{  59, '',   '20180601' ,  '20180601', '', '',         '',         'Ingested S58 base. BH-460 -- BIP Build 59 - June 2018'}
 ,{  60, '',   '20180702' ,  '20180702', '', '',         '',         'Ingested S59 base. BH-478 -- BIP Build 60 - July 2018'}
 ,{  61, '',   '20180801' ,  '20180801', '', '',         '',         'Ingested S60 base + BH-504 patch. BH-479 -- BIP Build 61 - August 2018'}
+,{  62, '',   '20180901' ,  '20180901', '', '',         '',         'Ingested S61 base + BH-524 patch. BH-480 -- BIP Build 62 - September 2018'}
+,{  62, 'a',  '20180901a',  '20180901', '', '',         '',         'Ingested S62 base + no ingest/same data,BH-502 phase 2 probationary sources upgrade. BH-534 -- BIP Build 62a - September 2018'}
+,{  63, '' ,  '20181002',  '20181002', '', '',         '',         'Ingested S62a base + BH-538, BH-539 & BH-529 patches. BH-430 & BH-528. BH-481 -- BIP Build 63 - October 2018'}
+,{  63, 'a',  '20181002a',  '20181002', '', '',         '',         'Ingested S63 base  + no ingest/same data, start at proxid, BH-541, BH-439. BH-544 -- BIP Build 63a - October 2018'}
+,{  64, '' ,  '20181101' ,  '20181101', '', '',         '',         'Ingested S63a base, BH-542, BH-503. BH-482 -- BIP Build 64 - November 2018'}
+,{  64, 'a',  '20181101a',  '20181101', '', '',         '',         'Ingested S64 base, BH-354. BH-580 -- BIP Build 64a - November 2018'}
+,{  65, '' ,  '20181203',  '20181203', '', '',         '',         'Ingested S64a base, BH-520, BH-578,BH-584,BH-581. BH-483 -- BIP Build 65 - December 2018'}
+,{  66, '' ,  '20190104',  '20190104', '', '',         '',         'Ingested S65 base, BH-590, BH-278,LBP-166. BH-553 -- BIP Build 66 - January 2019'}
+,{  66, 'a' , '20190104a',  '20190104', '', '',         '',        'no ingest, just adding keys and key layout change + new service. BH-591,BH-429, RR-14704 & RR-14739, BH-609 -- BIP Build 66 - January 2019a '}
+,{  67, '' ,  '20190201',  '20190201', '', '',         '',         'Ingested S66 base, BH-599,BH-586,BH-594,BH-606,BH-607,BH-597,BH-602,BH-605,BH-592. BH-554 -- BIP Build 67 - February 2019'}
+,{  68, '' ,  '20190304',  '20190304', '', '',         '',         'Ingested S67 base, BH-623,BH-615,BH-588,BH-601,BH-613,BH-618. BH-555 -- BIP Build 68 - March 2019'}
 
 
 //						version,			ingest			ToThor			ToCertRox		ToProdRox		//these are not exact field names.  they just help w read and update.

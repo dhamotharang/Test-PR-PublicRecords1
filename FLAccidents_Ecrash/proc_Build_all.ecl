@@ -22,6 +22,7 @@ verify_dops := if ( count(Sample_data.agency_data) <> 0, updatedops,Output('No_D
 orbit_date := (integer) filedate[1..8];
 
 create_build := map ( 
+
                   ut.Weekday(orbit_date)  = 'SUNDAY'   and morning = 'yes' =>  Orbit3.proc_Orbit3_CreateBuild ( 'Accident Reports - ECrashV2 National',filedate),
 									ut.Weekday(orbit_date)  = 'FRIDAY'   and morning = 'no' =>  Orbit3.proc_Orbit3_CreateBuild ( 'Accident Reports - ECrashV2 National',filedate), 
 

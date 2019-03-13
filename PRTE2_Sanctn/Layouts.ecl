@@ -2,199 +2,324 @@
 
 EXPORT Layouts := module
 
-export rKeySanctn__key__sanctn__autokey__address	:=
-record
-	PRTE_CSV.Sanctn.rthor_data400__key__sanctn__autokey__address;
+//Incoming Layouts
+export Incident_in := record
+SANCTN.layout_SANCTN_incident_clean;
+UNSIGNED8 __internal_fpos__;
+string10 cust_name;
+string10 bug_num;
+string10 req;
 end;
 
-export rKeySanctn__key__sanctn__autokey__addressb2	:=
-record
-PRTE_CSV.Sanctn.rthor_data400__key__sanctn__autokey__addressb2;
+export Party_in := record
+SANCTN.layout_SANCTN_did;
+UNSIGNED8 __internal_fpos__;
+string10 cust_name;
+string10 bug_num;
+string8 link_dob;
+string9 link_ssn;
+string9 link_fein;
+string8 link_inc_date;
+string10 req;	
 end;
 
-export rKeySanctn__key__sanctn__autokey__citystname	:=
-record
-	PRTE_CSV.Sanctn.rthor_data400__key__sanctn__autokey__citystname;
+export license_in := record                                    
+SANCTN.layout_SANCTN_license_clean;
+UNSIGNED8 __internal_fpos__;
+string10 cust_name;
+string10 bug_num;
 end;
 
-export rKeySanctn__key__sanctn__autokey__citystnameb2	:=
-record
-	PRTE_CSV.Sanctn.rthor_data400__key__sanctn__autokey__citystnameb2;
+
+export Party_AKA_DBA_in := record
+SANCTN.layout_SANCTN_aka_dba_in;
+UNSIGNED8 __internal_fpos__;
+string10 cust_name;
+string10 bug_num;
 end;
 
-export rKeySanctn__key__sanctn__autokey__name	:=
-record
-	PRTE_CSV.Sanctn.rthor_data400__key__sanctn__autokey__name;
+export Rebuttal_in := record
+SANCTN.layout_SANCTN_rebuttal_in;
+UNSIGNED8 __internal_fpos__;
+string10 cust_name;
+string10 bug_num;
 end;
 
-export rKeySanctn__key__sanctn__autokey__nameb2	:=
-record
-	PRTE_CSV.Sanctn.rthor_data400__key__sanctn__autokey__nameb2;
+export Incident_ext := record
+Incident_in and not __internal_fpos__;
 end;
 
-export rKeySanctn__key__sanctn__autokey__namewords2	:=
-record
-	PRTE_CSV.Sanctn.rthor_data400__key__sanctn__autokey__namewords2;
+export Party_ext := record
+Party_in and not __internal_fpos__;
 end;
 
-export rKeySanctn__key__sanctn__autokey__payload	:=
-record
- PRTE_CSV.Sanctn.rthor_data400__key__sanctn__autokey__payload;
-
+export License_ext := record
+license_in and not __internal_fpos__;
 end;
 
-export rKeySanctn__key__sanctn__autokey__ssn2	:=
-record
-	PRTE_CSV.Sanctn.rthor_data400__key__sanctn__autokey__ssn2;
+export Party_AKA_DBA_ext := record
+Party_AKA_DBA_in and not __internal_fpos__;
 end;
 
-export rKeySanctn__key__sanctn__autokey__stname	:=
-record
-	PRTE_CSV.Sanctn.rthor_data400__key__sanctn__autokey__stname;
+export Rebuttal_ext := record
+Rebuttal_in and not __internal_fpos__;
 end;
 
-export rKeySanctn__key__sanctn__autokey__stnameb2	:=
-record
-	PRTE_CSV.Sanctn.rthor_data400__key__sanctn__autokey__stnameb2;
+
+export INCIDENT_base := record
+// SANCTN.layout_SANCTN_incident_clean AND NOT [RECORD_TYPE, CUST_NAME, BUG_NUM];
+Incident_ext AND NOT [RECORD_TYPE, CUST_NAME, BUG_NUM, REQ];
 end;
 
-export rKeySanctn__key__sanctn__autokey__zip	:=
-record
-	PRTE_CSV.Sanctn.rthor_data400__key__sanctn__autokey__zip;
+
+export PARTY_base := record
+// SANCTN.layout_SANCTN_did AND NOT [RECORD_TYPE, SOURCE_REC_ID, enh_did_src];
+Party_ext AND NOT [RECORD_TYPE, 
+										SOURCE_REC_ID, 
+										enh_did_src, 
+										CUST_NAME, 
+										BUG_NUM, 
+										LINK_DOB,
+										LINK_SSN,
+										LINK_FEIN,
+										LINK_INC_DATE,
+										REQ];
 end;
 
-export rKeySanctn__key__sanctn__autokey__zipb2	:=
-record
-	PRTE_CSV.Sanctn.rthor_data400__key__sanctn__autokey__zipb2;
+EXPORT LICENSE_base := RECORD
+// SANCTN.layout_SANCTN_license_clean AND NOT [RECORD_TYPE, CUST_NAME, BUG_NUM];
+License_ext AND NOT [RECORD_TYPE, CUST_NAME, BUG_NUM];
 end;
 
-export rKeySanctn__key__sanctn__bdid	:=
-record
-	PRTE_CSV.Sanctn.rthor_data400__key__sanctn__bdid;
+
+EXPORT PARTY_AKA_DBA_base := RECORD
+// SANCTN.layout_SANCTN_aka_dba_in AND NOT [RECORD_TYPE,LAST_NAME,FIRST_NAME,MIDDLE_NAME,CUST_NAME, BUG_NUM];
+Party_AKA_DBA_ext AND NOT [RECORD_TYPE,LAST_NAME,FIRST_NAME,MIDDLE_NAME,CUST_NAME, BUG_NUM];
 end;
 
-export rKeySanctn__key__sanctn__did	:=
-record
-	PRTE_CSV.Sanctn.rthor_data400__key__sanctn__did;
+
+EXPORT REBUTTAL_base := RECORD
+Rebuttal_ext AND NOT [RECORD_TYPE, CUST_NAME, BUG_NUM];
 end;
 
-export rKeySanctn__key__sanctn__casenum	:=
-record
-	PRTE_CSV.Sanctn.rthor_data400__key__sanctn__casenum;
-end;
 
-// export rKeySanctn__key__sanctn__incident	:=
-// record
-	// PRTE_CSV.Sanctn.rthor_data400__key__sanctn__incident;
-// end;
+//KEY LAYOUTS
+export bdid_key := RECORD
+	UNSIGNED6 bdid;
+	STRING8 	batch_number;
+	STRING8 	incident_number;
+	STRING8 	party_number;
+end;	
 
-//Incident Key
-export Incident_Key := RECORD
-  SANCTN.layout_SANCTN_incident_clean AND NOT [PARTY_NUMBER,RECORD_TYPE,MODIFIED_DATE,LOAD_DATE,CLN_MODIFIED_DATE,CLN_LOAD_DATE];
 	
+export casenum_key := RECORD
+	STRING20 	case_number;
+	STRING8 	batch_number;
+	STRING8 	incident_number;
+	// UNSIGNED8 __internal_fpos__;
+	END;
+	
+export did_key := RECORD
+
+	UNSIGNED6 did;
+	STRING8 	batch_number;
+	STRING8 	incident_number;
+	STRING8 	party_number;
+	// UNSIGNED8 __internal_fpos__;	
+end;
+
+//Incident Key Layout
+export Incident_Key := RECORD
+  Incident_base AND NOT [PARTY_NUMBER,MODIFIED_DATE,LOAD_DATE,CLN_MODIFIED_DATE,CLN_LOAD_DATE];
+
 END;
 
-// export rKeySanctn__key__sanctn__incident_midex	:=
-// record
-	// PRTE_CSV.Sanctn.rthor_data400__key__sanctn__incident_midex;
-// end;
+// Incident Midex Key Layout
 export Incident_MIDEX_Key := RECORD
-  SANCTN.layout_SANCTN_incident_clean AND NOT [RECORD_TYPE];
+  Incident_base;
 END;
 
 
-// export rKeySanctn__key__sanctn__license_midex	:=
-// record
-	// PRTE_CSV.Sanctn.rthor_data400__key__sanctn__license_midex;
-// end;
-
-//License Midex
+//License Midex Layout
 export  License_Midex_Key := RECORD
-	SANCTN.layout_SANCTN_license_clean AND NOT [RECORD_TYPE];
+	License_base;
 	string26 midex_rpt_nbr;
 END;
 
-// export rKeySanctn__key__sanctn__license_nbr	:=
-// record
-	// PRTE_CSV.Sanctn.rthor_data400__key__sanctn__license_nbr;
-// end;
 
-//License Key
+//License Key Layout
 export License_Key := RECORD
-  SANCTN.layout_SANCTN_license_clean AND NOT [RECORD_TYPE];
-END;
-
-// export rKeySanctn__key__sanctn__midex_rpt_nbr	:=
-// record
-	// PRTE_CSV.Sanctn.rthor_data400__key__sanctn__midex_rpt_nbr_new
-// end;
-
-//MIDEX_RPT_NBR Key
-export Party_Midex_Key := RECORD
-	SANCTN.layout_SANCTN_did AND NOT [RECORD_TYPE, SOURCE_REC_ID, enh_did_src];
-	string26 midex_rpt_nbr;
+  License_base;
 END;
 
 
-// export rKeySanctn__key__sanctn__nmls_id	:=
-// record
-	// PRTE_CSV.Sanctn.rthor_data400__key__sanctn__nmls_id;
-// end;
+export NMLS_MIDEX_KEY := RECORD
+ // SANCTN.layout_SANCTN_license_clean AND NOT [RECORD_TYPE, CLN_LICENSE_NUMBER];
+ license_base and not [CLN_LICENSE_NUMBER];
+ STRING26 		midex_rpt_nbr;
+ STRING20 		NMLS_ID;
+END;
+
 
 export NMLS_ID_Key := RECORD
-  SANCTN.layout_SANCTN_license_clean AND NOT [RECORD_TYPE, CLN_LICENSE_NUMBER];
+  // SANCTN.layout_SANCTN_license_clean AND NOT [RECORD_TYPE, CLN_LICENSE_NUMBER];
+	license_base and not [CLN_LICENSE_NUMBER];
 	STRING20 		NMLS_ID;
 	STRING26 		MIDEX_RPT_NBR;
 END;
 
 
-// export rKeySanctn__key__sanctn__nmls_midex	:=
-// record
-	// PRTE_CSV.Sanctn.rthor_data400__key__sanctn__nmls_midex;
-// end;
-
-export NMLS_MIDEX_KEY := RECORD
- SANCTN.layout_SANCTN_license_clean AND NOT [RECORD_TYPE, CLN_LICENSE_NUMBER];
-	STRING26 		midex_rpt_nbr;
-	STRING20 		NMLS_ID;
+//MIDEX_RPT_NBR Key
+export MIDEX_RPT_NBR_Key := RECORD
+	Party_base;
+	string26 midex_rpt_nbr;
 END;
 
 
-export rKeySanctn__key__sanctn__party	:=
-record
-	PRTE_CSV.Sanctn.rthor_data400__key__sanctn__party;
+export Party_Key := RECORD
+Party_ext AND NOT [enh_did_src, 
+										CUST_NAME, 
+										BUG_NUM, 
+										LINK_DOB,
+										LINK_SSN,
+										LINK_FEIN,
+										LINK_INC_DATE,
+										REQ];
 end;
-
-// export rKeySanctn__key__sanctn__rebuttal	:=
-// record
-	// PRTE_CSV.Sanctn.rthor_data400__key__sanctn__rebuttal;
-// end;
 
 //Rebuttal Key
 export Rebuttal_Key := RECORD
-  SANCTN.layout_SANCTN_rebuttal_in AND NOT [RECORD_TYPE];
+  REBUTTAL_base;
 END;
 
-
-export rKeySanctn__key__sanctn__ssn4	:=
-record
-	PRTE_CSV.Sanctn.rthor_data400__key__sanctn__ssn4;
-end;
-
-// export rKeySanctn__key__sanctn__party_aka_dba	:=
-// record
-	// PRTE_CSV.Sanctn.rthor_data400__key__sanctn__party_aka_dba;
-// end;
 
 //Party AKA/DBA Key
-export AKA_DBA_Key := RECORD
-  SANCTN.layout_SANCTN_aka_dba_in AND NOT [RECORD_TYPE,LAST_NAME,FIRST_NAME,MIDDLE_NAME];
+export PARTY_AKA_DBA_Key := RECORD
+  PARTY_AKA_DBA_base;
 END;
 
 
-export rKeySanctn__key__sanctn__linkids	:=
-record
-	PRTE_CSV.Sanctn.rthor_data400__key__sanctn__linkids;
+	
+// export nmls_id_key := RECORD
+	// STRING20	nmls_id;
+	// STRING8 	batch_number;
+	// STRING8 	incident_number;
+	// STRING8 	party_number;
+	// STRING4 	order_number;
+	// STRING50 	license_number;
+	// STRING50 	license_type;
+	// STRING20 	license_state;
+	// STRING50 	std_type_desc;
+	// STRING26 	midex_rpt_nbr;
+	// UNSIGNED8 __internal_fpos__;	
+// end;	
+
+// export nmls_midex_key := RECORD
+	// STRING26 	midex_rpt_nbr;
+	// STRING8 	batch_number;
+	// STRING8 	incident_number;
+	// STRING8 	party_number;
+	// STRING4 	order_number;
+	// STRING50 	license_number;
+	// STRING50 	license_type;
+	// STRING20 	license_state;
+	// STRING50 	std_type_desc;
+	// STRING20	nmls_id;
+	// UNSIGNED8 __internal_fpos__;
+// END;
+
+export ssn4_key := RECORD
+	STRING4 ssn4;
+	STRING8 batch_number;
+	STRING8 incident_number;
+	STRING8 party_number;
+	// UNSIGNED8 __internal_fpos__;
 end;
 
+export linkids_key := RECORD
+	unsigned6 ultid;
+	unsigned6 orgid;
+	unsigned6 seleid;
+	unsigned6 proxid;
+	unsigned6 powid;
+	unsigned6 empid;
+	unsigned6 dotid;
+	unsigned2 ultscore;
+	unsigned2 orgscore;
+	unsigned2 selescore;
+	unsigned2 proxscore;
+	unsigned2 powscore;
+	unsigned2 empscore;
+	unsigned2 dotscore;
+	unsigned2 ultweight;
+	unsigned2 orgweight;
+	unsigned2 seleweight;
+	unsigned2 proxweight;
+	unsigned2 powweight;
+	unsigned2 empweight;
+	unsigned2 dotweight;
+	string8 	batch_number;
+	string8 	incident_number;
+	string8 	party_number;
+	string1 	record_type;
+	string4 	order_number;
+	string45 party_name;
+	string45 party_position;
+	string45 party_vocation;
+	string70 party_firm;
+	string45 inaddress;
+	string45 incity;
+	string20 instate;
+	string10 inzip;
+	string11 ssnumber;
+	string10 fines_levied;
+	string10 restitution;
+	string1 	ok_for_fcr;
+	string255 party_text;
+	string5 title;
+	string20 fname;
+	string20 mname;
+	string20 lname;
+	string5 name_suffix;
+	string3 name_score;
+	string45 cname;
+	string10 prim_range;
+	string2 predir;
+	string28 prim_name;
+	string4 addr_suffix;
+	string2 postdir;
+	string10 unit_desig;
+	string8 sec_range;
+	string25 p_city_name;
+	string25 v_city_name;
+	string2 st;
+	string5 zip5;
+	string4 zip4;
+	string2 fips_state;
+	string3 fips_county;
+	string2 addr_rec_type;
+	string10 geo_lat;
+	string11 geo_long;
+	string4 cbsa;
+	string7 geo_blk;
+	string1 geo_match;
+	string4 cart;
+	string1 cr_sort_sz;
+	string4 lot;
+	string1 lot_order;
+	string2 dpbc;
+	string1 chk_digit;
+	string4 err_stat;
+	unsigned8 source_rec_id;
+	unsigned6 did;
+	unsigned3 did_score;
+	unsigned6 bdid;
+	unsigned3 bdid_score;
+	string9 ssn_appended;
+	string60 dba_name;
+	string30 contact_name;
+	// integer1 fp;
+ END;
+
+	export autokeys := sanctn.layout_autokeys;
 end;

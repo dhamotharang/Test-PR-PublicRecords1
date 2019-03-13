@@ -1,6 +1,6 @@
-import header, Census_data, Gong, Watchdog, did_add, ut, doxie_build, PRTE2_Header;
+﻿import header, Census_data, Gong, Watchdog, did_add, ut, doxie_build, PRTE2_Header;
 
-head := doxie_build.file_fcra_header_building; 
+head := doxie_build.file_fcra_header_built; 
 
 /* **************** get County Name from Count Code ****************** */
 xHead_Layout :=
@@ -166,7 +166,7 @@ END;
 with_segmented := JOIN(with_appends,segmented_h,left.did=right.did,get_lookups(LEFT,RIGHT), LOCAL): PERSIST('persist::fcra_header_pre_keybuild');
 
 #IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
-export FCRA_header_pre_keybuild := project(PRTE2_Header.files.header_FCRA_pre_keybuild,{xHead_Layout});
+export FCRA_header_pre_keybuild := project(PRTE2_Header.pre_keys.header_FCRA_pre_keybuild,{xHead_Layout});
 #ELSE
 export FCRA_header_pre_keybuild := with_segmented;
 #END;

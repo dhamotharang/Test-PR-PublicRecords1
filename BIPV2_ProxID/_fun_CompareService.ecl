@@ -26,7 +26,7 @@ function
   odl   := PROJECT(CHOOSEN(KFile.Candidates(Proxid=Proxidone),100000),transform(BIPV2_ProxID.match_candidates(BFile).layout_candidates,self := left,self := []));
   odr   := PROJECT(CHOOSEN(KFile.Candidates(Proxid=ProxidTwo),100000),transform(BIPV2_ProxID.match_candidates(BFile).layout_candidates,self := left,self := []));
   k     := KFile.Specificities_Key;
-  s     := GLOBAL(PROJECT(k,transform(BIPV2_ProxID.Layout_Specificities.R,self := left,self.cnp_name_MAXIMUM := left.cnp_name_max,self := []))[1]);
+  s     := GLOBAL(PROJECT(k,BIPV2_ProxID.Layout_Specificities.R)[1]);
   odlv  := BIPV2_ProxID.Debug(BFile,s).RolledEntities(odl);
   odrv  := BIPV2_ProxID.Debug(BFile,s).RolledEntities(odr);
 
@@ -34,7 +34,7 @@ function
     SELF := le;
   END;
 
-  am    := PROJECT(KFile.Attribute_Matches(Proxid1=Proxidone,Proxid2=Proxidtwo)+KFile.Attribute_Matches(Proxid1=Proxidtwo,Proxid2=Proxidone),ainto(LEFT));
+  am    := PROJECT(choosen(KFile.Attribute_Matches(Proxid1=Proxidone,Proxid2=Proxidtwo),10000)+choosen(KFile.Attribute_Matches(Proxid1=Proxidtwo,Proxid2=Proxidone),10000),ainto(LEFT));
   mtch  := BIPV2_ProxID.Debug(BFile,s).AnnotateMatchesFromData(odl+odr,DATASET([{0,0,0,0,Proxidone,Proxidtwo,0,0}],BIPV2_ProxID.match_candidates(BFile).layout_matches),am);
 
   // get layout with the scores only for easier reading

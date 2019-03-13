@@ -1,4 +1,4 @@
-import header,ut,mdr;
+import header,ut,mdr,std;
 
 /*
 src desc		src	src has ssn cnt	pct of total
@@ -206,7 +206,7 @@ r1 t1(hdr2 le, r_min_dob ri) := transform
  self.total_sources          := 0;
  self.total_times_seen       := 1;
  self.dt_last_seen           := le.dt_last_seen;
- self.dt_last_seen_is_recent := if(self.dt_last_seen>0 and (header.ConvertYYYYMMToNumberOfMonths((unsigned3)ut.getdate[1..6]) - header.ConvertYYYYMMToNumberOfMonths(self.dt_last_seen) < 24),true,false);
+ self.dt_last_seen_is_recent := if(self.dt_last_seen>0 and (header.ConvertYYYYMMToNumberOfMonths((unsigned3)((STRING8)Std.Date.Today())[1..6]) - header.ConvertYYYYMMToNumberOfMonths(self.dt_last_seen) < 24),true,false);
  
  self := le;
  self.min_dob                :=if(ri.min_dob=9999,0,ri.min_dob);
@@ -223,7 +223,7 @@ r1 t_issued_before_dob(r1 le, header.Layout_SSN_Map ri) := transform
   self                       := le;
 end;
 
-j0 := join(p1,header.file_ssn_map(ssn5<>'' and end_date<ut.getdate),left.ssn[1..5]=right.ssn5 and left.ssn[6..9] between right.start_serial and right.end_serial,t_issued_before_dob(left,right),left outer,lookup);
+j0 := join(p1,header.file_ssn_map(ssn5<>'' and end_date<(STRING8)Std.Date.Today()),left.ssn[1..5]=right.ssn5 and left.ssn[6..9] between right.start_serial and right.end_serial,t_issued_before_dob(left,right),left outer,lookup);
 
 p1_dist := distribute(j0,hash(did,ssn));
 p1_sort := sort(p1_dist,did,ssn,local);
@@ -257,7 +257,7 @@ r1 t2(r1 le, r1 ri) := transform
 
  self.total_score          := le.total_score     +ri.total_score;
  self.total_times_seen     := le.total_times_seen+1;
- self.dt_last_seen := ut.max2(le.dt_last_seen,ri.dt_last_seen);
+ self.dt_last_seen := max(le.dt_last_seen,ri.dt_last_seen);
  self.dt_last_seen_is_recent := if(le.dt_last_seen_is_recent=true,le.dt_last_seen_is_recent,ri.dt_last_seen_is_recent);
  
  self := le;

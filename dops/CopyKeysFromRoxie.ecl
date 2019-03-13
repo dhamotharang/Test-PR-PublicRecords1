@@ -1,4 +1,4 @@
-import dops,_Control,STD;
+﻿import dops,_Control,STD;
 // datasetname = get dataset name from DOPS
 // environment = 'Q' - QA/Cert Roxie; 'P' - Prod Roxie
 // loc = 'B' - Boca; 'A' - Alpharetta
@@ -25,7 +25,7 @@ end;
 buildindex_rec buildindex_code(datasetds l,integer cnt) := transform
 	//wordtoreplace := ut.Word(regexreplace('[\r\n]',l.logicalkey,''),1,'::');
 	
-	prteindex := regexreplace(datasetname+'_DATE',l.logicalkey,versiontocopy);
+	prteindex := regexreplace(datasetname+'_DATE',l.logicalkey,versiontocopy,nocase);
 	
 	serv := 'server=http://'+thoresp+':8010 ';
 		nsplit := ' nosplit=1 ';

@@ -1,9 +1,9 @@
- 
-EXPORT MAC_PopulationStatistics(infile,Ref='',Input_pers_surrogate = '',Input_filler1 = '',Input_license_licno = '',Input_filler2 = '',Input_license_bdate_yyyymmdd = '',Input_license_edate_yyyymmdd = '',Input_license_lic_class = '',Input_license_height = '',Input_license_sex = '',Input_license_last_name = '',Input_license_first_name = '',Input_license_middle_name = '',Input_licmail_street1 = '',Input_licmail_street2 = '',Input_licmail_city = '',Input_licmail_state = '',Input_licmail_zip = '',Input_licresi_street1 = '',Input_licresi_street2 = '',Input_licresi_city = '',Input_licresi_state = '',Input_licresi_zip = '',Input_issue_date_yyyymmdd = '',Input_license_status = '',Input_crlf = '',Input_clean_status = '',Input_process_date = '',OutFile) := MACRO
-  IMPORT SALT34,Scrubs_DL_MA;
+﻿ 
+EXPORT MAC_PopulationStatistics(infile,Ref='',Input_pers_surrogate = '',Input_filler1 = '',Input_license_licno = '',Input_filler2 = '',Input_license_bdate_yyyymmdd = '',Input_license_edate_yyyymmdd = '',Input_license_lic_class = '',Input_license_height = '',Input_license_sex = '',Input_license_last_name = '',Input_license_first_name = '',Input_license_middle_name = '',Input_licmail_street1 = '',Input_licmail_street2 = '',Input_licmail_city = '',Input_licmail_state = '',Input_licmail_zip = '',Input_licresi_street1 = '',Input_licresi_street2 = '',Input_licresi_city = '',Input_licresi_state = '',Input_licresi_zip = '',Input_issue_date_yyyymmdd = '',Input_license_status = '',Input_clean_status = '',Input_process_date = '',OutFile) := MACRO
+  IMPORT SALT39,Scrubs_DL_MA;
   #uniquename(of)
   %of% := RECORD
-    SALT34.Str512Type fields;
+    SALT39.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM
@@ -150,12 +150,6 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_pers_surrogate = '',Input_fi
       '' 
     #ELSE
         IF( le.Input_license_status = (TYPEOF(le.Input_license_status))'','',':license_status')
-    #END
- 
-+    #IF( #TEXT(Input_crlf)='' )
-      '' 
-    #ELSE
-        IF( le.Input_crlf = (TYPEOF(le.Input_crlf))'','',':crlf')
     #END
  
 +    #IF( #TEXT(Input_clean_status)='' )

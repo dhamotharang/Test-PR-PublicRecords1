@@ -1,4 +1,4 @@
-import bipv2,bipv2_postprocess,strata,BIPV2_Build,tools;
+﻿import bipv2,bipv2_postprocess,strata,BIPV2_Build,tools,BIPV2_QA_Tool;
 
 EXPORT proc_build_all(
 
@@ -68,6 +68,7 @@ function
     ,BIPV2_Strata.mac_Vanity_Lexid_VS_BIP_ID(pversion)
     ,BIPV2_Strata.mac_Single_Multi_Sourced_IDS(pversion)
     ,BIPV2_Strata.mac_Unique_Ids(pversion)
+    ,BIPV2_QA_Tool.proc_PostProcess_Stats(pversion)
     ,semail.BuildSuccess
   ) : failure(semail.BuildFailure)
   ;

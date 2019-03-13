@@ -113,8 +113,8 @@ EXPORT CopyFiles(string srcesp
 		rFileList proj_recs(srclist l) := transform
 			self.name := l.name;
 			self.newlogicalname := if ( dstSubNameSuffix = ''
-											,if (srcdali = destdali,'dstname=~'+l.name+'::copyfrom'+l.ClusterName, 'dstname=~'+l.name)
-											,'dstname=~'+l.name+'_'+dstSubNameSuffix
+											,if (srcdali = destdali,l.name+'::copyfrom'+l.ClusterName, l.name)
+											,l.name+'_'+dstSubNameSuffix
 											);
 			self.cmd := 'server=http://'+ destesp + ':8010 ' 
 									+ 'overwrite=1 ' 
@@ -160,8 +160,8 @@ EXPORT CopyFiles(string srcesp
 
 		rCopyFiles get_recs(preplist l) := transform
 			self.existsondest := if (srcdali = destdali
-																	,if (STD.File.FileExists('~'+l.name), true, false)
-																	,if (STD.File.FileExists('~foreign::'+destdali+'::'+l.name),true, false)
+																	,if (STD.File.FileExists('~'+l.newlogicalname), true, false)
+																	,if (STD.File.FileExists('~foreign::'+destdali+'::'+l.newlogicalname),true, false)
 																	);
 			self := l;
 		end;

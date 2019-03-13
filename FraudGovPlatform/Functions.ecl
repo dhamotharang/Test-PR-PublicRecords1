@@ -68,7 +68,19 @@ EXPORT Functions :=  MODULE
 		JCVD := join (pBaseFile , MBS_CVD_T , trim(StringLib.StringToUppercase(left.Customer_ID),left,right) = trim(StringLib.StringToUppercase(right.Customer_ID),left,right)
 															 and  trim(StringLib.StringToUppercase(left.Source),left,right) = trim(StringLib.StringToUppercase(right.Source) ,left,right) ,
 								transform (FraudShared.Layouts.Base.Main ,
-										self.classification_source.source_type := right.classification_source.source_type; 
+										is_delta := regexfind('DELTA', left.source, nocase);
+										
+										v_deceitful_confidence := 	if( is_delta,
+																							left.classification_Activity.Confidence_that_activity_was_deceitful, 
+																							right.classification_Activity.Confidence_that_activity_was_deceitful);
+										
+										v_source_type := 	if( is_delta,
+																			left.classification_source.source_type, 
+																			right.classification_source.source_type);
+																			
+										self.classification_Activity.Confidence_that_activity_was_deceitful := v_deceitful_confidence;
+										self.classification_source.source_type := v_source_type; 
+										
 										self.classification_source.Primary_source_Entity := right.classification_source.Primary_source_Entity; 
 										self.classification_source.Expectation_of_Victim_Entities := right.classification_source.Expectation_of_Victim_Entities; 
 										self.classification_source.Industry_segment := right.classification_source.Industry_segment; 
@@ -76,7 +88,6 @@ EXPORT Functions :=  MODULE
 										self.classification_source.Customer_County := right.classification_source.Customer_County; 
 										self.classification_source.Customer_Vertical := right.classification_source.Customer_Vertical; 
 										self.classification_Activity.Suspected_Discrepancy := right.classification_Activity.Suspected_Discrepancy; 
-										self.classification_Activity.Confidence_that_activity_was_deceitful := right.classification_Activity.Confidence_that_activity_was_deceitful; 
 										self.classification_Activity.workflow_stage_committed := right.classification_Activity.workflow_stage_committed; 
 										self.classification_Activity.workflow_stage_detected := right.classification_Activity.workflow_stage_detected; 
 										self.classification_Activity.Channels := right.classification_Activity.Channels; 
@@ -99,10 +110,22 @@ EXPORT Functions :=  MODULE
 		JMbs  := join (JCVD , MBSPrimary(status = 1) , trim(StringLib.StringToUppercase(left.source),left,right) = trim(StringLib.StringToUppercase(right.fdn_file_code),left,right) , 
 
 					transform (FraudShared.Layouts.Base.Main , 								 
+
+										is_delta								:=	regexfind('DELTA', left.source, nocase);
+										v_file_type							:=	if( is_delta, left.classification_Permissible_use_access.file_type, right.file_type);
+										v_source_type						:=	if( is_delta,FraudShared.MBS_CVD(column_name = 'FILE_TYPE' and status = 1 and desc_value = (unsigned2) v_file_type )[1].description, (qstring300)right.file_type);
+										v_deceitful_confidence_id	:=	if( is_delta,left.classification_Activity.confidence_that_activity_was_deceitful_id, right.confidence_that_activity_was_deceitful);
+										v_deceitful_confidence			:=	if( is_delta,FraudShared.MBS_CVD(column_name = 'DECEITFUL_ACTIVITY' and status = 1 and desc_value = (unsigned2) v_deceitful_confidence_id )[1].description, (qstring300)right.Confidence_that_activity_was_deceitful);
+
+										self.classification_source.Source_type_id																			:= v_file_type;
+										self.classification_source.source_type																				:= v_source_type;
+										self.classification_Permissible_use_access.file_type 			  											:= v_file_type; 
+										self.classification_Activity.Confidence_that_activity_was_deceitful_id 							:= v_deceitful_confidence_id;
+										self.classification_Activity.Confidence_that_activity_was_deceitful									:= v_deceitful_confidence;
+	
 										self.classification_Permissible_use_access.fdn_file_info_id   := right.fdn_file_info_id ; 
 										self.classification_Permissible_use_access.fdn_file_code      := StringLib.StringToUppercase(right.fdn_file_code) ; 
 										self.classification_Permissible_use_access.gc_id              := right.gc_id ; 
-										self.classification_Permissible_use_access.file_type          := right.file_type ; 
 										self.classification_Permissible_use_access.description        := StringLib.StringToUppercase(right.description) ; 
 										//self.classification_Permissible_use_a ccess.primary_source_entity := right.primary_source_entity; 
 										self.classification_Permissible_use_access.Ind_type                                    := right.Ind_type; 
@@ -117,11 +140,9 @@ EXPORT Functions :=  MODULE
 										self.classification_Permissible_use_access.user_changed                                := StringLib.StringToUppercase(right.user_changed); 
 										self.classification_Permissible_use_access.p_industry_segment                          := '' ;
 										self.classification_Permissible_use_access.usage_term                                  := '';
-										self.classification_source.Source_type_id                                              := right.file_type;
 										self.classification_source.Primary_source_Entity_id                                    := right.Primary_source_Entity;
 										self.classification_source.Expectation_of_Victim_Entities_id                           := right.Expectation_of_Victim_Entities;
 										self.classification_Activity.Suspected_Discrepancy_id                                  := right.Suspected_Discrepancy;
-										self.classification_Activity.Confidence_that_activity_was_deceitful_id                 := right.Confidence_that_activity_was_deceitful;
 										self.classification_Activity.workflow_stage_committed_id                               := right.workflow_stage_committed;
 										self.classification_Activity.workflow_stage_detected_id                                := right.workflow_stage_detected;
 										self.classification_Activity.Channels_id                                               := right.Channels;
@@ -269,28 +290,21 @@ EXPORT Functions :=  MODULE
 	END;
 	EXPORT ind_type_fn(string1 customer_program) := function
 		import _Control;
-		ind_type_dev_v := map(
-											 customer_program = 'S' => 1292,
-											 customer_program = 'M' => 1302,
-											 customer_program = 'U' => 1321,
-											 customer_program = 'N' => 1312,
-											 0
-											);
 		ind_type_prod_v := map(
 											 customer_program = 'S' => 1014,
 											 customer_program = 'M' => 1024,
-											 customer_program = 'U' => 1321,
+											 customer_program = 'U' => 1029,
 											 customer_program = 'N' => 1312,
 											 0
 											);
-		RETURN if(_Control.ThisEnvironment.Name='Dataland',ind_type_dev_v,ind_type_prod_v);
+		RETURN ind_type_prod_v;
 	END;
 
 	EXPORT new_addresses(pInputFile) := 
 	FUNCTIONMACRO		
 			IMPORT address;
 
-			Address_Cache := FraudGovPlatform.Files().Base.AddressCache.Built;
+			Address_Cache := if(FraudGovPlatform._flags.update.AddressCache, FraudGovPlatform.Files().Base.AddressCache.Built, dataset([],layouts.base.AddressCache));
 			
 			prepped_Addresses := 	dedup(
 											table(pInputFile(address_1 <> '' and address_2 <> ''),{address_1, address_2, address_id})  
@@ -301,7 +315,7 @@ EXPORT Functions :=  MODULE
 		FraudGovPlatform.Layouts.Base.AddressCache CleanAddress( prepped_Addresses l,  FraudGovPlatform.Layouts.Base.AddressCache r) := TRANSFORM 
 					Clean_Address_182								:= if (l.address_id  = r.address_id, '' ,address.CleanAddress182(l.address_1, l.address_2));
 					SELF.address_id								:= if (l.address_id  = r.address_id, r.address_id ,l.address_id);
-					SELF.address_cleaned						:= if (l.address_id  = r.address_id, r.address_cleaned, (unsigned4)ut.GetDate);
+					SELF.address_cleaned						:= if (l.address_id  = r.address_id, r.address_cleaned, (unsigned4)(String8)Std.Date.Today());
 					SELF.address_1									:= if (l.address_id  = r.address_id, r.address_1, l.address_1);
 					SELF.address_2									:= if (l.address_id  = r.address_id, r.address_2, l.address_2);
 					SELF.clean_address.prim_range			:= if (l.address_id  = r.address_id, r.clean_address.prim_range, 	Clean_Address_182[1..10])		; //prim_range
@@ -335,14 +349,15 @@ EXPORT Functions :=  MODULE
 			END;
 
 			new_addresses := join(
-												prepped_Addresses,
-												Address_Cache,								
+												distribute(prepped_Addresses, hash64(address_id)),
+												distribute(Address_Cache, hash64(address_id)),								
 												left.address_id = RIGHT.address_id,
 												CleanAddress(LEFT,RIGHT),
-												LEFT OUTER
+												LEFT OUTER,
+												LOCAL
 										);							
 
-			Sort_Address_Cache := sort(FraudGovPlatform.Files().Base.AddressCache.Built + new_addresses, address_id, -address_cleaned);
+			Sort_Address_Cache := sort(Address_Cache + new_addresses, address_id, -address_cleaned);
 			New_Address_Cache :=  dedup(Sort_Address_Cache, address_id);
 
 			RETURN New_Address_Cache;
@@ -403,8 +418,10 @@ EXPORT Functions :=  MODULE
 			RETURN Refresh_Address_Cache;
 
 	ENDMACRO;
+
+	Current_Build := IF(_Flags.FileExists.Base.Main, FraudShared.Files().Base.Main.Built, DATASET([], FraudShared.Layouts.Base.Main));
 	
-	EXPORT LastRingID := MAX(FraudShared.Files().Base.Main.Built(DID >= FraudGovPlatform.Constants().FirstRingID), DID):independent;
+	EXPORT LastRinID := MAX(Current_Build(DID >= FraudGovPlatform.Constants().FirstRinID), DID):independent;
 
 END; 
 			

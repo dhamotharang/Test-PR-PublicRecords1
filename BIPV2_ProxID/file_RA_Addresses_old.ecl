@@ -1,4 +1,4 @@
-/*2014-06-24T18:23:18Z (vern_p bentley)
+﻿/*2014-06-24T18:23:18Z (vern_p bentley)
 check-in for BIP Sprint 17
 */
 import mdr,corp2,BIPV2_Company_Names;

@@ -4,8 +4,8 @@ IMPORT E_Customer,E_Person FROM KELOtto;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Person_7 := MODULE
   SHARED VIRTUAL TYPEOF(E_Person.__Result) __E_Person := E_Person.__Result;
-  SHARED __EE9814 := __E_Person;
-  EXPORT __ST9655_Layout := RECORD
+  SHARED __EE21643 := __E_Person;
+  EXPORT __ST19509_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.nint Lex_Id_;
@@ -50,7 +50,6 @@ EXPORT B_Person_7 := MODULE
     KEL.typ.nstr _additional__lname__3_;
     KEL.typ.nstr _additional__lname__date__last__3_;
     KEL.typ.nint _subjectssncount_;
-    KEL.typ.ndataset(E_Person.Hri_List_Layout) Hri_List_;
     KEL.typ.nstr _dobmatchlevel_;
     KEL.typ.nbool _ssnfoundforlexid_;
     KEL.typ.nstr _cvicustomscore_;
@@ -69,14 +68,17 @@ EXPORT B_Person_7 := MODULE
     KEL.typ.nint _v2__inputaddrageoldest_;
     KEL.typ.nstr _v2__inputaddrdwelltype_;
     KEL.typ.nstr _v2__divssnidentitycountnew_;
+    KEL.typ.nstr _curr__incar__flag_;
+    KEL.typ.nint _name__ssn__dob__match_;
+    KEL.typ.ndataset(E_Person.Offenses_Layout) Offenses_;
     KEL.typ.int Deceased_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST9655_Layout __ND10517__Project(E_Person.Layout __PP9817) := TRANSFORM
-    SELF.Deceased_ := MAP(__T(__FN1(KEL.Routines.IsValidDate,__PP9817.Deceased_Date_))=>1,0);
-    SELF := __PP9817;
+  SHARED __ST19509_Layout __ND22364__Project(E_Person.Layout __PP21646) := TRANSFORM
+    SELF.Deceased_ := MAP(__T(__FN1(KEL.Routines.IsValidDate,__PP21646.Deceased_Date_))=>1,0);
+    SELF := __PP21646;
   END;
-  EXPORT __ENH_Person_7 := PROJECT(__EE9814,__ND10517__Project(LEFT));
+  EXPORT __ENH_Person_7 := PROJECT(__EE21643,__ND22364__Project(LEFT));
 END;

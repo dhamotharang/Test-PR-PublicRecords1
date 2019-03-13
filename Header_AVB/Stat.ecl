@@ -1,10 +1,10 @@
 ﻿import header, did_add, ut, data_services;
 
-export stat(boolean incremental=FALSE, string filedate=header.version_build) := module
+export stat(boolean incremental=FALSE, string filedate=header.version_build, string operatorEmailList) := module
 
 		#stored ('buildname', 'PersonHeader'   ); 
 		#stored ('version'  , filedate); 
-		#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com'    ); 
+		#stored ('emailList', operatorEmailList  ); 
 
         NewHeaderFileN := STRINGLIB.STRINGFILTEROUT(header.File_Header_Raw_Flag[1].lfn, '~');
         NewHeaderFileI := 'thor_data400::base::header_raw_incremental';
@@ -15,53 +15,49 @@ export New_Key := dataset(loc + NewHeaderFile,header.layout_header,flat);
 
 shared NewHeader     := 'header_raw_'+filedate;
 
-
-
-
-
 shared h2 := New_Key : independent;
 
 lay_popcounts := record
    has_did := count(group, h2.did > 0);
    has_rid := count(group, h2.rid > 0);
-   has_pflag1 := count(group, h2.pflag1 > '');
-   has_pflag2 := count(group, h2.pflag2 > '');
-   has_pflag3 := count(group, h2.pflag3 > '');
-   has_src := count(group, h2.src > '');
+   has_pflag1 := count(group, h2.pflag1 <> '');
+   has_pflag2 := count(group, h2.pflag2 <> '');
+   has_pflag3 := count(group, h2.pflag3 <> '');
+   has_src := count(group, h2.src <> '');
    has_dt_first_seen := count(group, h2.dt_first_seen > 0);
    has_dt_last_seen := count(group, h2.dt_last_seen > 0);
    has_dt_vendor_last_reported := count(group, h2.dt_vendor_last_reported > 0);
    has_dt_vendor_first_reported := count(group, h2.dt_vendor_first_reported > 0);
    has_dt_nonglb_last_seen := count(group, h2.dt_nonglb_last_seen > 0);
-   has_rec_type := count(group, h2.rec_type > '');
-   has_vendor_id := count(group, h2.vendor_id > '');
-   has_phone := count(group, h2.phone > '');
-   has_ssn := count(group, h2.ssn > '');
+   has_rec_type := count(group, h2.rec_type <> '');
+   has_vendor_id := count(group, h2.vendor_id <> '');
+   has_phone := count(group, h2.phone <> '');
+   has_ssn := count(group, h2.ssn <> '');
    has_dob := count(group, h2.dob > 0);
-   has_title := count(group, h2.title > '');
-   has_fname := count(group, h2.fname > '');
-   has_mname := count(group, h2.mname > '');
-   has_lname := count(group, h2.lname > '');
-   has_name_suffix := count(group, h2.name_suffix > '');
-   has_prim_range := count(group, h2.prim_range > '');
-   has_predir := count(group, h2.predir > '');
-   has_prim_name := count(group, h2.prim_name > '');
-   has_suffix := count(group, h2.suffix > '');
-   has_postdir := count(group, h2.postdir > '');
-   has_unit_desig := count(group, h2.unit_desig > '');
-   has_sec_range := count(group, h2.sec_range > '');
-   has_city_name := count(group, h2.city_name > '');
-   has_st := count(group, h2.st > '');
-   has_zip := count(group, h2.zip > '');
-   has_zip4 := count(group, h2.zip4 > '');
-   has_county := count(group, h2.county > '');
-   has_geo_blk := count(group, h2.geo_blk > '');
-   has_cbsa := count(group, h2.cbsa > '');
-   has_tnt := count(group, h2.tnt > '');
-   has_valid_SSN := count(group, h2.valid_SSN > '');
-   has_jflag1 := count(group, h2.jflag1 > '');
-   has_jflag2 := count(group, h2.jflag2 > '');
-   has_jflag3 := count(group, h2.jflag3 > '');
+   has_title := count(group, h2.title <> '');
+   has_fname := count(group, h2.fname <> '');
+   has_mname := count(group, h2.mname <> '');
+   has_lname := count(group, h2.lname <> '');
+   has_name_suffix := count(group, h2.name_suffix <> '');
+   has_prim_range := count(group, h2.prim_range <> '');
+   has_predir := count(group, h2.predir <> '');
+   has_prim_name := count(group, h2.prim_name <> '');
+   has_suffix := count(group, h2.suffix <> '');
+   has_postdir := count(group, h2.postdir <> '');
+   has_unit_desig := count(group, h2.unit_desig <> '');
+   has_sec_range := count(group, h2.sec_range <> '');
+   has_city_name := count(group, h2.city_name <> '');
+   has_st := count(group, h2.st <> '');
+   has_zip := count(group, h2.zip <> '');
+   has_zip4 := count(group, h2.zip4 <> '');
+   has_county := count(group, h2.county <> '');
+   has_geo_blk := count(group, h2.geo_blk <> '');
+   has_cbsa := count(group, h2.cbsa <> '');
+   has_tnt := count(group, h2.tnt <> '');
+   has_valid_SSN := count(group, h2.valid_SSN <> '');
+   has_jflag1 := count(group, h2.jflag1 <> '');
+   has_jflag2 := count(group, h2.jflag2 <> '');
+   has_jflag3 := count(group, h2.jflag3 <> '');
 end;
 
 tb := table(h2, lay_popcounts , '1', few);
