@@ -111,17 +111,13 @@
 										
   // This is the list of attributes per entity type, indicatortype
   EXPORT FullIndicatorListPrep := TABLE(FullEntityStatsPrep, {customer_id_, industry_type_, entitytype, indicatordescription, Field, ElementCount := COUNT(GROUP) }, customer_id_, industry_type_, entitytype, indicatordescription, Field, MERGE);
-  EXPORT FullIndicatorList := JOIN(FullIndicatorListPrep, FraudGovPlatform.Key_WeightingChart, 
-												 KEYED(LEFT.Field=RIGHT.Field AND (INTEGER)LEFT.EntityType = RIGHT.EntityType),  
-	// EXPORT FullIndicatorList := JOIN(FullIndicatorListPrep, WeightingChart, 
-												 // LEFT.Field=RIGHT.Field AND (INTEGER)LEFT.EntityType = RIGHT.EntityType,
+	EXPORT FullIndicatorList := JOIN(FullIndicatorListPrep, WeightingChart, 
+												 LEFT.Field=RIGHT.Field AND (INTEGER)LEFT.EntityType = RIGHT.EntityType,
 												 TRANSFORM({RECORDOF(LEFT), INTEGER1 IsConfigured}, SELF.IsConfigured := MAP(RIGHT.field != '' => 1, 0), SELF := LEFT, SELF := RIGHT), LEFT OUTER, KEEP(1)); 
 	
   // This is the final result for entity stats after w
-  // EXPORT WeightedResult := JOIN(FullEntityStatsPrep(Value != ''), WeightingChart, 
-                         // LEFT.Field=RIGHT.Field AND (INTEGER)LEFT.entity_context_uid_[2..3] = RIGHT.EntityType AND
-  EXPORT WeightedResult := JOIN(FullEntityStatsPrep(Value != ''), FraudGovPlatform.Key_WeightingChart, 
-                         KEYED(LEFT.Field=RIGHT.Field AND (INTEGER)LEFT.entity_context_uid_[2..3] = RIGHT.EntityType) AND
+  EXPORT WeightedResult := JOIN(FullEntityStatsPrep(Value != ''), WeightingChart, 
+                         LEFT.Field=RIGHT.Field AND (INTEGER)LEFT.entity_context_uid_[2..3] = RIGHT.EntityType AND
                          (
                            (
                              RIGHT.Value != '' AND LEFT.Value = RIGHT.Value
