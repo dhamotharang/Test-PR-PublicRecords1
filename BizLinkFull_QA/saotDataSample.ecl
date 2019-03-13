@@ -17,30 +17,66 @@ infile4 := '~thor::bipheader::qa::SAOT::smallbusinessrisk_' + BeginDate + '-' + 
 infile5 := '~thor::bipheader::qa::SAOT::business_instantid2_' + BeginDate + '-' + EndDate;
 
 SAMPLER_LAYOUT := RECORD
-	  STRING120 company_name,
-	  STRING10 prim_range,
-	  STRING28 prim_name,
-	  STRING8 sec_range,
-	  STRING25 city,
-	  STRING2 state,
-	  STRING5 zip5,
-	  UNSIGNED3 zip_radius_miles := 0;
-	  STRING10 phone10,
-	  STRING9 fein,
-	  STRING80 url,
-	  STRING60 email,
-	  STRING20 contact_fname,
-	  STRING20 contact_mname,
-	  STRING20 contact_lname,
-	  STRING9 contact_ssn,
-	  UNSIGNED6 contact_did,
-	  STRING8 sic_code,
-	  STRING2 source,
-	  UNSIGNED8 source_record_id,
-	  UNSIGNED6 proxid,
-	  UNSIGNED6 seleid
+  unsigned6 proxid;
+  unsigned6 seleid;
+  unsigned6 orgid;
+  unsigned6 ultid;
+  unsigned6 empid;
+  unsigned6 powid;
+  unsigned6 dotid;
+  unsigned6 parent_proxid;
+  unsigned6 sele_proxid;
+  unsigned6 org_proxid;
+  unsigned6 ultimate_proxid;
+  boolean has_lgid;
+  string120 company_name;
+  string5 title;
+  string20 fname;
+  string20 mname;
+  string20 lname;
+  string5 name_suffix;
+  string1 iscontact;
+  string9 contact_ssn;
+  string60 contact_email;
+  string10 prim_range;
+  string2 predir;
+  string28 prim_name;
+  string4 addr_suffix;
+  string2 postdir;
+  string10 unit_desig;
+  string8 sec_range;
+  string25 p_city_name;
+  string25 v_city_name;
+  string2 st;
+  string5 zip;
+  string4 zip4;
+  string3 fips_county;
+  string2 source;
+  unsigned4 dt_first_seen;
+  unsigned4 dt_last_seen;
+  unsigned4 dt_vendor_last_reported;
+  unsigned6 company_bdid;
+  string9 company_fein;
+  string9 active_duns_number;
+  string10 company_phone;
+  string1 phone_type;
+  string80 company_url;
+  string8 company_sic_code1;
+  string50 company_status_derived;
+  string34 vl_id;
+  unsigned8 source_record_id;
+  string100 source_docid;
+  unsigned6 contact_did;
+  string30 contact_email_domain;
+  string50 contact_job_title_derived;
+  string4 err_stat;
+  boolean is_sele_level;
+  boolean is_org_level;
+  boolean is_ult_level;
+  unsigned6 rcid;
+  string1 address_type_derived;
  END;
-
+ 
 //SAOT Business Credit Report Layout
  SAOT_BCR_LAYOUT := RECORD
   string transactionid;
@@ -103,9 +139,14 @@ SAMPLER_LAYOUT := RECORD
  pj_bcr_s := project(ds_bcr, transform(SAMPLER_LAYOUT, 
   self.proxid := left.inproxid;
   self.seleid := left.inseleid;
+  self.orgid := left.inorgid;
+  self.ultid := left.inultid;
+  self.empid := left.inempid;
+  self.powid := left.inpowid;
+  self.dotid := left.indotid;
   self.company_name := std.str.ToUpperCase(left.incompanyname);
-  self.contact_fname := left.inrep1firstname;
-  self.contact_lname :=left.inrep1lastname;
+  self.fname := left.inrep1firstname;
+  self.lname :=left.inrep1lastname;
   self.contact_ssn := left.inrep1ssn;;
   addr1 := TRIM(left.incompanystreetaddress1);
   addr2 := LEFT.incompanycity + ', ' + LEFT.incompanystate + ' ' + left.incompanyzip5;
@@ -113,12 +154,12 @@ SAMPLER_LAYOUT := RECORD
 	SELF.prim_range:= TRIM(sAddress[..10]);
   SELF.prim_name:= TRIM(sAddress[13..40]);
   SELF.sec_range:=TRIM(sAddress[57..64]);
-  SELF.city:= TRIM(sAddress[65..89]);
-  SELF.state:= TRIM(sAddress[115..116]);
-  SELF.zip5:= TRIM(sAddress[117..121]);                                   
+  SELF.p_city_name:= TRIM(sAddress[65..89]);
+  SELF.st:= TRIM(sAddress[115..116]);
+  SELF.zip:= TRIM(sAddress[117..121]);                                   
 	self.source := 'T1';
-  self.fein := left.incompanyfein;
-  self.phone10 := left.incompanyphone;
+  self.company_fein := left.incompanyfein;
+  self.company_phone := left.incompanyphone;
   self := [];));	
 
 //Small Business Analytics			
@@ -151,8 +192,8 @@ ds_sba := dataset(infile2, SAOT_SBA_Layout, thor);
 
 pj_sba_s := project(ds_sba, transform(	SAMPLER_LAYOUT,
   self.company_name := std.str.ToUpperCase(left.incompanyname);
-  self.contact_fname := left.inrep1firstname;
-  self.contact_lname :=left.inrep1lastname;
+  self.fname := left.inrep1firstname;
+  self.lname :=left.inrep1lastname;
   self.contact_ssn := left.inrep1ssn;;
   addr1 := TRIM(left.incompanystreetaddress1);
   addr2 := LEFT.incompanycity + ', ' + LEFT.incompanystate + ' ' + left.incompanyzip5;
@@ -160,12 +201,12 @@ pj_sba_s := project(ds_sba, transform(	SAMPLER_LAYOUT,
 	SELF.prim_range:= TRIM(sAddress[..10]);
   SELF.prim_name:= TRIM(sAddress[13..40]);
   SELF.sec_range:=TRIM(sAddress[57..64]);
-  SELF.city:= TRIM(sAddress[65..89]);
-  SELF.state:= TRIM(sAddress[115..116]);
-  SELF.zip5:= TRIM(sAddress[117..121]);                                   
+  SELF.p_city_name:= TRIM(sAddress[65..89]);
+  SELF.st:= TRIM(sAddress[115..116]);
+  SELF.zip:= TRIM(sAddress[117..121]);                                   
 	self.source := 'T2';
-  self.fein := left.incompanyfein;
-  self.phone10 := left.incompanyphone;
+  self.company_fein := left.incompanyfein;
+  self.company_phone := left.incompanyphone;
   self := [];));
 
 
@@ -232,9 +273,14 @@ SAOT_SBB_Layout := RECORD
   pj_sbbc_s := project(ds_sbbc, transform(SAMPLER_LAYOUT, 
   self.proxid := left.inproxid;
   self.seleid := left.inseleid;
+  self.orgid := left.inorgid;
+  self.ultid := left.inultid;
+  self.empid := left.inempid;
+  self.powid := left.inpowid;
+  self.dotid := left.indotid;
   self.company_name := std.str.ToUpperCase(left.incompanyname);
-  self.contact_fname := left.inrep1firstname;
-  self.contact_lname :=left.inrep1lastname;
+  self.fname := left.inrep1firstname;
+  self.lname :=left.inrep1lastname;
   self.contact_ssn := left.inrep1ssn;;
   addr1 := TRIM(left.incompanystreetaddress1);
   addr2 := LEFT.incompanycity + ', ' + LEFT.incompanystate + ' ' + left.incompanyzip5;
@@ -242,13 +288,14 @@ SAOT_SBB_Layout := RECORD
 	SELF.prim_range:= TRIM(sAddress[..10]);
   SELF.prim_name:= TRIM(sAddress[13..40]);
   SELF.sec_range:=TRIM(sAddress[57..64]);
-  SELF.city:= TRIM(sAddress[65..89]);
-  SELF.state:= TRIM(sAddress[115..116]);
-  SELF.zip5:= TRIM(sAddress[117..121]);                                   
+  SELF.p_city_name:= TRIM(sAddress[65..89]);
+  SELF.st:= TRIM(sAddress[115..116]);
+  SELF.zip:= TRIM(sAddress[117..121]);                                   
 	self.source := 'T3';
-  self.fein := left.incompanyfein;
-  self.phone10 := left.incompanyphone;
+  self.company_fein := left.incompanyfein;
+  self.company_phone := left.incompanyphone;
   self := [];));	
+
 
 
 //Small Business Risk 
@@ -283,12 +330,12 @@ pj_sbr_s := project(ds_sbr, transform(SAMPLER_LAYOUT,
 	SELF.prim_range:= TRIM(sAddress[..10]);
   SELF.prim_name:= TRIM(sAddress[13..40]);
   SELF.sec_range:=TRIM(sAddress[57..64]);
-  SELF.city:= TRIM(sAddress[65..89]);
-  SELF.state:= TRIM(sAddress[115..116]);
-  SELF.zip5:= TRIM(sAddress[117..121]);                                   
+  SELF.p_city_name:= TRIM(sAddress[65..89]);
+  SELF.st:= TRIM(sAddress[115..116]);
+  SELF.zip:= TRIM(sAddress[117..121]);                                   
 	self.source := 'T4';
-  self.fein := left.incompanyfein;
-  self.phone10 := left.incompanyphone;
+  self.company_fein := left.incompanyfein;
+  self.company_phone := left.incompanyphone;
   self := [];));
 
 //BIID2
@@ -627,26 +674,31 @@ SAOT_BIID2_Layout := RECORD
  END;
  
  ds_biid2 := dataset(infile5, SAOT_BIID2_Layout, thor);
+ 
   pj_biid2_s := project(ds_biid2, transform(SAMPLER_LAYOUT, 
   self.company_name := std.str.ToUpperCase(left.incompanyname);
-  self.contact_fname := left.inrep1firstname;
-  self.contact_lname :=left.inrep1lastname;
-  self.contact_ssn := left.inrep1ssn;;
-  addr1 := TRIM(left.incompanystreetaddress);
-  addr2 := LEFT.incompanycity + ', ' + LEFT.incompanystate + ' ' + left.incompanyzip5;
-  sAddress:=Address.CleanAddress182(addr1, addr2);
-	SELF.prim_range:= TRIM(sAddress[..10]);
-  SELF.prim_name:= TRIM(sAddress[13..40]);
-  SELF.sec_range:=TRIM(sAddress[57..64]);
-  SELF.city:= TRIM(sAddress[65..89]);
-  SELF.state:= TRIM(sAddress[115..116]);
-  SELF.zip5:= TRIM(sAddress[117..121]);                                   
-	self.source := 'T5';
-  self.fein := left.incompanyfein;
-  self.phone10 := left.incompanyphone;
-  self := [];));	
+  self.fname 				:= left.inrep1firstname;
+  self.lname 				:=left.inrep1lastname;
+  self.contact_ssn 	:= left.inrep1ssn;;
+  addr1 						:= TRIM(left.incompanystreetaddress);
+  addr2 						:= LEFT.incompanycity + ', ' + LEFT.incompanystate + ' ' + left.incompanyzip5;
+  sAddress					:=Address.CleanAddress182(addr1, addr2);
+	SELF.prim_range		:= TRIM(sAddress[..10]);
+  SELF.prim_name		:= TRIM(sAddress[13..40]);
+  SELF.sec_range		:=TRIM(sAddress[57..64]);
+  SELF.p_city_name	:= TRIM(sAddress[65..89]);
+  SELF.st						:= TRIM(sAddress[115..116]);
+  SELF.zip					:= TRIM(sAddress[117..121]);                                   
+	self.source 			:= 'T5';
+  self.company_fein := left.incompanyfein;
+  self.company_phone:= left.incompanyphone;
+  self := [];));
 
-SAOT_data := ENTH(pj_bcr_s,10000) + ENTH(pj_sba_s,10000) + ENTH(pj_sbbc_s,10000) + ENTH(pj_sbr_s,10000) + ENTH(pj_biid2_s,10000);
+SAOT_data :=  ENTH(pj_bcr_s,10000) + ENTH(pj_bcr_s,10000) + ENTH(pj_bcr_s,10000)+ ENTH(pj_bcr_s,10000)+ ENTH(pj_bcr_s,10000)
+					  + ENTH(pj_bcr_s,10000) + ENTH(pj_bcr_s,10000) + ENTH(pj_bcr_s,10000)+ ENTH(pj_bcr_s,10000)+ ENTH(pj_bcr_s,10000)
+						+ ENTH(pj_bcr_s,10000) + ENTH(pj_bcr_s,10000) + ENTH(pj_bcr_s,10000)+ ENTH(pj_bcr_s,10000)+ ENTH(pj_bcr_s,10000)
+						+ ENTH(pj_bcr_s,10000) + ENTH(pj_bcr_s,10000) + ENTH(pj_bcr_s,10000)+ ENTH(pj_bcr_s,10000)+ ENTH(pj_bcr_s,10000)
+						+ ENTH(pj_bcr_s,10000) + ENTH(pj_sba_s,50000) + ENTH(pj_sbbc_s,50000) + ENTH(pj_sbr_s,50000) + ENTH(pj_biid2_s,50000);
 
 RETURN SEQUENTIAL(PARALLEL(  
 											BizLinkFull_QA.smallBusinessRisk(),

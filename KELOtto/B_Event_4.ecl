@@ -4,8 +4,8 @@ IMPORT B_Event_5,E_Address,E_Customer,E_Event,E_Person FROM KELOtto;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Event_4 := MODULE
   SHARED VIRTUAL TYPEOF(B_Event_5.__ENH_Event_5) __ENH_Event_5 := B_Event_5.__ENH_Event_5;
-  SHARED __EE43067 := __ENH_Event_5;
-  EXPORT __ST17899_Layout := RECORD
+  SHARED __EE42567 := __ENH_Event_5;
+  EXPORT __ST17919_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Event.Source_Customers_Layout) Source_Customers_;
@@ -156,9 +156,9 @@ EXPORT B_Event_4 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST17899_Layout __ND44478__Project(B_Event_5.__ST18365_Layout __PP43070) := TRANSFORM
-    SELF.Kr_Identity_Risk_ := MAP(__T(__OR(__OR(__OP2(__PP43070._name__risk__code_,<>,__CN(0)),__OP2(__PP43070._dob__risk__code_,<>,__CN(0))),__OP2(__PP43070._identity__risk__code_,<>,__CN(0))))=>1,0);
-    SELF := __PP43070;
+  SHARED __ST17919_Layout __ND43978__Project(B_Event_5.__ST18385_Layout __PP42570) := TRANSFORM
+    SELF.Kr_Identity_Risk_ := MAP(__T(__OR(__OR(__OP2(__PP42570._name__risk__code_,<>,__CN(0)),__OP2(__PP42570._dob__risk__code_,<>,__CN(0))),__OP2(__PP42570._identity__risk__code_,<>,__CN(0))))=>1,0);
+    SELF := __PP42570;
   END;
-  EXPORT __ENH_Event_4 := PROJECT(__EE43067,__ND44478__Project(LEFT));
+  EXPORT __ENH_Event_4 := PROJECT(__EE42567,__ND43978__Project(LEFT));
 END;

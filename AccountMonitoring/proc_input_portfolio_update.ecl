@@ -1,4 +1,4 @@
-// The following attribute sprays a portfolio update to disk.
+﻿// The following attribute sprays a portfolio update to disk.
 EXPORT proc_input_portfolio_update( UNSIGNED1 pseudo_environment,
                                     STRING    spray_ip_address, 
                                     STRING    spray_path,
@@ -37,7 +37,7 @@ EXPORT proc_input_portfolio_update( UNSIGNED1 pseudo_environment,
 					'|',                                  // srcCSVseparator
 					,                                     // srcCSVterminator
 					',',                                  // srcCSVquote
-					if(AccountMonitoring.constants.spray_groupname = 'thor400_dev', 'thor400_dev01', AccountMonitoring.constants.spray_groupname),            // destinationgroup
+					AccountMonitoring.constants.spray_groupname,   // destinationgroup
 					logical_file_name,                    // destination logical filename
 					,,,,,COMPRESS)));
 			END;
