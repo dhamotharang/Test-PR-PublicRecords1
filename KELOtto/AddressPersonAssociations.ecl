@@ -179,7 +179,10 @@ EXPORT AddressPersonAssociations := MODULE
   SHARED LexidAssociationsPrep := AppendLexidToLexidAssociation.MacAppendLexidToLexidAssociations(PersonAddressMatchStatsPrep4, FromPersonLexId, ToPersonLexId, 'VerifiedPR', 2, 2000000) 
          : PERSIST('~deletemefraudgov1');
          
-	EXPORT PersonAddressMatchStats := LexidAssociationsPrep;                	
+  SHARED HighFrequencyFroms := TABLE(LexidAssociationsPrep, {FromPersonLexId, recs := COUNT(GROUP)}, FromPersonLexId, MERGE);
+  // Remove high frequency matches.
+	SHARED PersonAddressMatchStatsPrep := DEDUP(SORT(DISTRIBUTE(LexidAssociationsPrep, HASH32(FromPersonLexId, ToPersonLexId)), FromPersonLexId, ToPersonLexId, LOCAL), FromPersonLexId, ToPersonLexId, LOCAL);
+	EXPORT PersonAddressMatchStats := JOIN(LexidAssociationsPrep, HighFrequencyFroms(recs > 50), LEFT.FromPersonLexId=RIGHT.FromPersonLexId, LEFT ONLY, LOOKUP);
 												 
 	//   Same Day or within 7 days?
 	//   Multiple Distinct addresses (non-high fequency, within time threshold?)

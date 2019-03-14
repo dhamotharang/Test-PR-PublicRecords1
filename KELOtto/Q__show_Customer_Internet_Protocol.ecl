@@ -4,6 +4,6 @@ IMPORT B_Internet_Protocol,E_Customer,E_Internet_Protocol FROM KELOtto;
 IMPORT * FROM KEL011.Null;
 EXPORT Q__show_Customer_Internet_Protocol := MODULE
   SHARED TYPEOF(B_Internet_Protocol.__ENH_Internet_Protocol) __ENH_Internet_Protocol := B_Internet_Protocol.__ENH_Internet_Protocol;
-  SHARED __EE595629 := __ENH_Internet_Protocol;
-  EXPORT Res0 := __UNWRAP(__EE595629);
+  SHARED __EE609133 := __ENH_Internet_Protocol;
+  EXPORT Res0 := __UNWRAP(__EE609133);
 END;
