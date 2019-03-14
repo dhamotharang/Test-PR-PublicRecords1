@@ -1733,5 +1733,7 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2019/350 Syria List','1720'},
 {'EC 2019/352 Ukraine List','1721'},
 {'EU High-Risk Third Countries List','1722'},
-{'Oregon Department of Corrections Escapees and Most Wanted','1723'}
+{'Oregon Department of Corrections Escapees and Most Wanted','1723'},
+{'EC 2019/353 ISIL (Da\'esh) and Al-Qaida List','1724'},
+{'List of Suspected Terrorists and Terrorist Organizations (DTTOT) Indonesia','1725'}
 ],r);
