@@ -74,6 +74,7 @@ EXPORT FUNCTIONs := Module
 								''        									 => '',
 								'**|' + corp2.t2u(desc));
 
+//The Country Names and the 3 character Country Codes are from ISO-3.
 		EXPORT GetStateCode(string code) 
 							:= case(corp2.t2u(code),
 										'ALASKA' 								=> 'AK',
@@ -751,7 +752,7 @@ EXPORT FUNCTIONs := Module
 										'FOREIGN' 							=> '',
 										'');
 
-
+//The Country Names and the 3 character Country Codes are from ISO-3.
 		EXPORT GetStateDesc(string code) 
 							:= case(corp2.t2u(code),
 										'AL' 										=> 'ALABAMA',
