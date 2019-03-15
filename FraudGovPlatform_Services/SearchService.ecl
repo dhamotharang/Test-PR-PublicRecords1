@@ -7,7 +7,8 @@
 IMPORT Doxie, FraudShared_Services, FraudGovPlatform_Services, iesp, WSInput;
 
 EXPORT SearchService() := MACRO
-	#constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+	#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+	#CONSTANT('FraudPlatform', 'FraudGov');
 	WSInput.MAC_FraudGovPlatform_Services_SearchService();
 
 	ds_in					:= DATASET([],iesp.fraudgovsearch.t_FraudGovSearchRequest) : STORED('FraudGovSearchRequest', FEW);
@@ -20,16 +21,13 @@ EXPORT SearchService() := MACRO
 	#STORED('GlobalCompanyId', FraudGovUser.GlobalCompanyId);
 	#STORED('IndustryTypeName', FraudGovUser.IndustryTypeName);
 	#STORED('ProductCode',FraudGovUser.ProductCode); 
-	#STORED('FraudPlatform',	Options.Platform);
 	#STORED('IsOnline', Options.IsOnline);
 
 	// *********************************Validation*******************************************
 	
-	BOOLEAN ValidAmount := MAP(searchBy.AmountMin <> '' AND  searchBy.AmountMax = '' => TRUE,
-														 searchBy.AmountMin = '' AND  searchBy.AmountMax <> '' => TRUE,
-														 searchBy.AmountMin <> '' AND  searchBy.AmountMax <> ''
-															AND searchBy.AmountMin <= searchBy.AmountMax 				 => TRUE, 
-															FALSE);
+	BOOLEAN ValidAmount := MAP(searchBy.AmountMin <> '' AND searchBy.AmountMax = '' => TRUE,
+														 searchBy.AmountMin = '' AND searchBy.AmountMax <> '' => TRUE,
+														 searchBy.AmountMin <> '' AND searchBy.AmountMax <> '' AND searchBy.AmountMin <= searchBy.AmountMax => TRUE, FALSE);
 	
 	BOOLEAN isMinimumInput := searchBy.Name.Last <> '' OR searchBy.SSN <> '' OR searchBy.Phone10 <> '' OR searchBy.UniqueId <> '' OR 
 														searchBy.EmailAddress <> '' OR (searchBy.DriversLicense.DriversLicenseNumber <> '' AND searchBy.DriversLicense.DriversLicenseState <> '') OR
@@ -139,14 +137,13 @@ EXPORT SearchService() := MACRO
 	//Per GRP-2060, we save RINID (stored in the lexid field), when the user entered full DOB, SSN and full name
 	// as search criteria and we couldn't resolve to a lexid from publicrecords
 	// but we found a SINGLE identity record in the contributory data
-	useRINID := COUNT(search_records(RecordType=FraudGovPlatform_Services.Constants.RecordType.IDENTITY)) = 1 AND 
-							isMinimumForRINID AND ~adlDIDFound;
+	useRINID := COUNT(search_records(RecordType=FraudGovPlatform_Services.Constants.RecordType.IDENTITY)) = 1 AND isMinimumForRINID AND ~adlDIDFound;
 
 	iesp.fraudgovsearch.t_FraudGovSearchResponse final_transform_t_FraudGovSearchResponse() := TRANSFORM
-			SELF._Header	:= iesp.ECL2ESP.GetHeaderRow(),
-			SELF.RecordCount := COUNT(search_records),
-			SELF.InputEcho:= SearchBy,
-			SELF.Records	:= search_records
+		SELF._Header	:= iesp.ECL2ESP.GetHeaderRow(),
+		SELF.RecordCount := COUNT(search_records),
+		SELF.InputEcho:= SearchBy,
+		SELF.Records	:= search_records
 	END;
 
 	results := DATASET([final_transform_t_FraudGovSearchResponse()]);

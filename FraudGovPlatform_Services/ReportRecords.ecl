@@ -1,4 +1,4 @@
-﻿IMPORT DidVille, FraudShared_Services, iesp, Royalty, std;
+﻿IMPORT DidVille, FraudShared_Services, iesp, Royalty;
 
 EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
                      FraudGovPlatform_Services.IParam.BatchParams batch_params,

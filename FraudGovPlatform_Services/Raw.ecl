@@ -1,10 +1,9 @@
-﻿ IMPORT Address, AutoStandardI, Business_Risk, codes, iesp, CriminalRecords_BatchService, DeathV2_Services, 
-							 doxie, FraudDefenseNetwork_Services, FraudShared_Services, Gateway, IntlIID, patriot, risk_indicators, 
-							 riskwise, ut;
+﻿IMPORT Address, codes, iesp, CriminalRecords_BatchService, DeathV2_Services, doxie, FraudDefenseNetwork_Services, FraudShared_Services, 
+				Gateway, IntlIID, patriot, risk_indicators, riskwise, ut;
 
-EXPORT Raw(FraudGovPlatform_Services.IParam.BatchParams batch_params) := MODULE
+EXPORT Raw(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in, FraudGovPlatform_Services.IParam.BatchParams batch_params) := MODULE
 
-	EXPORT GetDeath(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in) := FUNCTION
+	EXPORT GetDeath() := FUNCTION
 									
 		death_batch_params := DeathV2_Services.IParam.getBatchParams();		
 		ds_death_in := PROJECT(ds_batch_in, DeathV2_Services.Layouts.BatchIn);
@@ -15,7 +14,7 @@ EXPORT Raw(FraudGovPlatform_Services.IParam.BatchParams batch_params) := MODULE
 	
 	END;
 	
-	EXPORT GetCriminal(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in) := FUNCTION
+	EXPORT GetCriminal() := FUNCTION
 			
 		// As per GRP-247 only following offense Categories needs to be returned. 
 		crim_batch_params := MODULE(CriminalRecords_BatchService.IParam.batch_params) 
@@ -45,7 +44,7 @@ EXPORT Raw(FraudGovPlatform_Services.IParam.BatchParams batch_params) := MODULE
 	
 	END;
 	
-		SHARED getInstantIDPre(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in) := FUNCTION
+		SHARED getInstantIDPre() := FUNCTION
 		
 		ds_instantID := PROJECT(ds_batch_in, 
 												TRANSFORM(FraudGovPlatform_Services.Layouts.instantID_in, 
@@ -58,9 +57,9 @@ EXPORT Raw(FraudGovPlatform_Services.IParam.BatchParams batch_params) := MODULE
 												
 	END;
 	
-	SHARED GetInstantIDIn(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in) := FUNCTION
+	SHARED GetInstantIDIn() := FUNCTION
 
-			ds_instantID_pre := getInstantIDPre(ds_batch_in);
+			ds_instantID_pre := getInstantIDPre();
 			
 			risk_indicators.Layout_Input into(ds_instantID_pre le) := TRANSFORM
 				historydate := if(le.HistoryDateYYYYMM=0, batch_params.history_date, le.HistoryDateYYYYMM);
@@ -74,7 +73,7 @@ EXPORT Raw(FraudGovPlatform_Services.IParam.BatchParams batch_params) := MODULE
 				SELF.seq := le.seq;	
 				SELF.ssn := IF(le.ssn='000000000','',le.ssn);	// blank out social if it is all 0's
 				SELF.dob := dob_val;
-				SELF.age := IF ((integer)le.age = 0 AND (integer)dob_val != 0,(string3)ut.GetAgeI((integer)dob_val), (le.age));
+				SELF.age := IF ((integer)le.age = 0 AND (integer)dob_val != 0,(string3)ut.Age((integer)dob_val), (le.age));
 				
 				SELF.phone10 := le.Home_Phone;
 				SELF.wphone10 := le.Work_Phone;
@@ -137,10 +136,11 @@ EXPORT Raw(FraudGovPlatform_Services.IParam.BatchParams batch_params) := MODULE
 			
 	END;
 	
-	EXPORT GetInstantIDRaw(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in) := FUNCTION
+	EXPORT GetInstantIDRaw() := FUNCTION
 	
-		ds_instantID_in := getInstantIDIn(ds_batch_in);
-	
+		ds_instantID_in := getInstantIDIn();
+
+		/* ---  based on line#155 following transform is no longer seems to be in use. commenting out....
 		Gateway.Layouts.Config gw_switch(batch_params.gateways le) := TRANSFORM
 			SELF.servicename := MAP(batch_params.IncludeTargus = FALSE AND le.servicename = 'targus' => '',	// don't call TG when Targus = FALSE
 															batch_params.IncludeTargus3220 AND le.servicename = 'targus' => 'targuse3220',	// if E3220 requested, change servicename for later use
@@ -150,23 +150,20 @@ EXPORT Raw(FraudGovPlatform_Services.IParam.BatchParams batch_params) := MODULE
 											le.url); 
 			SELF := le;
 		END;
-			
-				// hardcode gateways to null for now.  Using gateways will be a later story.		
-				// gateways := PROJECT(batch_params.gateways, gw_switch(left));
-			 gateways := dataset([], Gateway.Layouts.Config);
-			
-				ds_instantID_out := Risk_Indicators.InstantID_Function(ds_instantID_in, gateways, batch_params.DPPAPurpose,  
-																															 batch_params.GLBPurpose, batch_params.IndustryClass='UTILI', 
-																															 batch_params.ln_branded_value);
-																													 																								 
+		*/
+
+		gateways := dataset([], Gateway.Layouts.Config);
+		ds_instantID_out := Risk_Indicators.InstantID_Function(ds_instantID_in, gateways, batch_params.DPPAPurpose,  
+																													 batch_params.GLBPurpose, batch_params.IndustryClass='UTILI', 
+																													 batch_params.ln_branded_value);
+																																																			 
 		RETURN ds_instantID_out;
 
 	END;
 	
-	EXPORT GetCIID(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in,
-																GROUPED DATASET(risk_indicators.layout_output) ds_instantIDRaw) := FUNCTION
+	EXPORT GetCIID(GROUPED DATASET(risk_indicators.layout_output) ds_instantIDRaw) := FUNCTION
 
-		ds_instantID_pre := getInstantIDPre(ds_batch_in);
+		ds_instantID_pre := getInstantIDPre();
 		
 		FraudGovPlatform_Services.Layouts.Layout_InstandID_NuGenExt format_out(ds_instantIDRaw le, ds_instantID_pre R) := TRANSFORM
 			SELF.acctNo		:=R.acctno;
@@ -407,8 +404,7 @@ EXPORT Raw(FraudGovPlatform_Services.IParam.BatchParams batch_params) := MODULE
 								
 	END;
 	
-	EXPORT GetRedFlags(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in,
-																				GROUPED DATASET(risk_indicators.layout_output) ds_instantIDRaw) := FUNCTION
+	EXPORT GetRedFlags(GROUPED DATASET(risk_indicators.layout_output) ds_instantIDRaw) := FUNCTION
 		
 		red_flags_ret := IF(batch_params.RedFlag_version<>0, risk_indicators.Red_Flags_Function(ds_instantIDRaw, batch_params.reasoncode_settings), 
 													DATASET([], FraudGovPlatform_Services.Layouts.combined_layouts) );
@@ -419,7 +415,7 @@ EXPORT Raw(FraudGovPlatform_Services.IParam.BatchParams batch_params) := MODULE
 								
 	END;
 	
- 	EXPORT GetGlobalWatchlist(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in) := FUNCTION						
+ 	EXPORT GetGlobalWatchlist() := FUNCTION						
 
 		patriot.Layout_batch_in xform_in(ds_batch_in le) := TRANSFORM
 			SELF.name_first := Stringlib.StringToUpperCase(le.name_first);
@@ -441,7 +437,7 @@ EXPORT Raw(FraudGovPlatform_Services.IParam.BatchParams batch_params) := MODULE
 										 
  	END;
 	
-	EXPORT getFDN(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in) := FUNCTION
+	EXPORT getFDN() := FUNCTION
 	
 		ds_fdn_in := PROJECT(ds_batch_in, 
 										TRANSFORM(FraudDefenseNetwork_Services.Layouts.batch_search_rec, 	
@@ -455,11 +451,11 @@ EXPORT Raw(FraudGovPlatform_Services.IParam.BatchParams batch_params) := MODULE
 												SELF := []));
 
 		ds_fdn_raw := FraudDefenseNetwork_Services.Search_Records(ds_fdn_in, 
-																																																												FraudGovPlatform_Services.Constants.FDN.gc_id, 
-																																																												FraudGovPlatform_Services.Constants.FDN.industry_type, 
-																																																												FraudGovPlatform_Services.Constants.FDN.product_code, 	
-																																																												DATASET([], iesp.frauddefensenetwork.t_FDNIndType),
-																																																												DATASET([],iesp.frauddefensenetwork.t_FDNFileType));
+																															FraudGovPlatform_Services.Constants.FDN.gc_id, 
+																															FraudGovPlatform_Services.Constants.FDN.industry_type, 
+																															FraudGovPlatform_Services.Constants.FDN.product_code, 	
+																															DATASET([],iesp.frauddefensenetwork.t_FDNIndType),
+																															DATASET([],iesp.frauddefensenetwork.t_FDNFileType));
 	 
 	  ds_fdn_filter := ds_fdn_raw(doxie.DataPermission.use_FDNContributoryData OR
 															  classification_Permissible_use_access.file_type <> FraudShared_Services.Constants.FileTypeCodes.CONTRIBUTORY);
