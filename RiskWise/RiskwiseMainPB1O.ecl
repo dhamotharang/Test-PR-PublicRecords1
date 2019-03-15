@@ -41,7 +41,7 @@
 */
 /*--INFO-- Migrating pb01 and pb02 to boca.  */
 
-import ut, codes, address, gateway;
+import Gateway, Risk_Indicators, Risk_Reporting, Riskwise, Royalty, Seed_Files;
 
 export RiskwiseMainPB1O := MACRO
 
@@ -208,7 +208,7 @@ RiskWise.Layout_PB1O format_seed(seed_out le) := transform
 end;
 final_seed := if(runSeed_value, project(seed_out, format_seed(left)), dataset([], riskwise.Layout_PB1O));
 
-ret_pre := RiskWise.PB1O_Function(f, gateways, GLB_Purpose, DPPA_Purpose, DataRestriction := DataRestriction, DataPermission := DataPermission);
+ret_pre := RiskWise.PB1O_Function(f, gateways, GLB_Purpose, DPPA_Purpose, DataRestriction := DataRestriction, DataPermission := DataPermission, OFACversion := OFACversion);
 
 ret := if(tribcode in ['pb01', 'pb02'], 
 		if(count(final_seed)>0 and runSeed_value, final_seed, PROJECT( ret_pre, TRANSFORM( riskwise.layout_pb1o, SELF := LEFT, SELF := [] ) )), 
