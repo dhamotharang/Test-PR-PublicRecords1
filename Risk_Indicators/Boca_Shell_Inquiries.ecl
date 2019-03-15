@@ -1,4 +1,4 @@
-﻿import inquiry_acclogs, ut, did_add, riskwise, gateway, inquiry_deltabase, Death_Master;
+﻿import Risk_indicators, inquiry_acclogs, ut, did_add, riskwise, gateway, inquiry_deltabase, Death_Master;
 
 isFCRA := false;
 
@@ -640,9 +640,9 @@ deltaBase_all_ds := project(clam_pre_Inquiries_deltabase, transform(Inquiry_Delt
 																														self.Phone10 := left.shell_input.Phone10;
 																														self.Email := left.shell_input.Email_Address));		
 deltaBase_all_results 		:= Inquiry_Deltabase.Search_All(deltaBase_all_ds, Inquiry_AccLogs.shell_constants.set_valid_nonfcra_functions_sql(bsversion), '10', DeltabaseGateway);
-did_ds := project(clam_pre_Inquiries_deltabase, transform(Inquiry_Deltabase.Layouts.Input_Deltabase_DID,
-																														self.seq := left.shell_input.seq;
-																														self.did := left.shell_input.did));
+// did_ds := project(clam_pre_Inquiries_deltabase, transform(Inquiry_Deltabase.Layouts.Input_Deltabase_DID,
+																														// self.seq := left.shell_input.seq;
+																														// self.did := left.shell_input.did));
 deltaBase_did_results := deltaBase_all_results(S_DID <> 0 AND Search_Type='2');
 //deltaBase_did_results_old := Inquiry_Deltabase.Search_DID(did_ds, Inquiry_AccLogs.shell_constants.set_valid_nonfcra_functions_sql(bsversion), '10', DeltabaseGateway);
 MAC_raw_did_transform (add_inquiry_raw, Inquiry_AccLogs.Key_Inquiry_DID);
@@ -1968,7 +1968,7 @@ ENDMACRO;
 																														// self.Zip5 := left.shell_input.z5));
 
 // deltabase_address_results := Inquiry_Deltabase.Search_Address(address_ds, Inquiry_AccLogs.shell_constants.set_valid_nonfcra_functions_sql(bsversion), '10', DeltabaseGateway);
-deltabase_address_results := deltaBase_all_results(Zip <> '' AND Prim_Name <> '' AND Search_Type='1');
+deltabase_address_results := deltaBase_all_results(Zip5 <> '' AND Prim_Name <> '' AND Search_Type='1');
 
 MAC_raw_addr_transform(add_Addr_raw, Inquiry_AccLogs.Key_Inquiry_Address);
 MAC_raw_addr_transform(add_Addr_raw_Update, Inquiry_AccLogs.Key_Inquiry_Address_update);
@@ -2002,7 +2002,7 @@ Addr_raw_updates := join(with_all_per_ssn, Inquiry_AccLogs.Key_Inquiry_Address_u
 Addr_raw_deltabase := join(with_all_per_ssn, deltabase_address_results,	//MS104 and MS-105
 								left.shell_input.prim_name<>'' and 
 								left.shell_input.z5<>'' and
-								left.shell_input.z5=right.zip and 
+								left.shell_input.z5=right.zip5 and 
 								left.shell_input.prim_name=right.prim_name and 
 								left.shell_input.prim_range=right.prim_range and 
 								left.shell_input.sec_range=right.sec_range and
@@ -2400,7 +2400,7 @@ ENDMACRO;
 																														// self.Email := left.shell_input.Email_Address));
 																														
 // deltaBase_email_results := Inquiry_Deltabase.Search_Email(email_ds, Inquiry_AccLogs.shell_constants.set_valid_nonfcra_functions_sql(bsversion), '10', DeltabaseGateway);
-deltaBase_email_results := deltaBase_all_results(Email_Address <> '' AND Search_Type='3');
+deltaBase_email_results := deltaBase_all_results(Email <> '' AND Search_Type='3');
 
 MAC_raw_email_transform(add_email_raw, Inquiry_AccLogs.Key_Inquiry_Email);
 MAC_raw_email_transform(add_email_raw_update, Inquiry_AccLogs.Key_Inquiry_Email_update);
@@ -2421,7 +2421,7 @@ Email_raw_updates := join(with_phone_velocities, Inquiry_AccLogs.Key_Inquiry_Ema
 								
 Email_raw_deltabase := join(with_phone_velocities, deltaBase_email_results,
 								left.shell_input.email_address<>'' and 
-								left.shell_input.email_address=right.email_address,
+								left.shell_input.email_address=right.Email,
 								add_Email_raw_deltabase(left, right)/*, atmost(riskwise.max_atmost)*/);				
 
 email_raw:= if(bsversion >= 50, dedup(sort(ungroup(Email_raw_base + Email_raw_updates + Email_raw_deltabase), seq, transaction_id, -(unsigned3) first_log_date, Sequence_Number), seq, transaction_id),

@@ -98,18 +98,7 @@ EXPORT Layouts := MODULE
 	EXPORT Inquiry_Transaction_ID := RECORD
 		RECORDOF(Inquiry_AccLogs.Key_Inquiry_Transaction_ID);
 	END;	
-  EXPORT Inquiry_All := RECORD
-    RECORDOF(Inquiry_AccLogs.Key_Inquiry_Address);
-    RECORDOF(Inquiry_AccLogs.Key_Inquiry_DID);
-    RECORDOF(Inquiry_AccLogs.Key_Inquiry_Email);
-    RECORDOF(Inquiry_AccLogs.Key_Inquiry_IPAddr);
-    RECORDOF(Inquiry_AccLogs.Key_Inquiry_Name);
-    RECORDOF(Inquiry_AccLogs.Key_Inquiry_Phone);
-    RECORDOF(Inquiry_AccLogs.Key_Inquiry_SSN);
-    RECORDOF(Inquiry_AccLogs.Key_Inquiry_Transaction_ID);
-    STRING1 Search_Type;
-  END;
-	// Deltabase Function Inputs
+  // Deltabase Function Inputs
 	EXPORT Input_Deltabase_Address := RECORD
 		UNSIGNED8 Seq := 0;
 		STRING10 Prim_Range := '';
@@ -162,6 +151,12 @@ EXPORT Layouts := MODULE
 		STRING10 Phone10 := '';
 		STRING9 SSN := '';
 		STRING50 Transaction_ID := '';
+
+	END;
+	EXPORT Inquiry_All := RECORD
+		STRING1 Search_Type;
+		Input_Deltabase_All;
+		RECORDOF(Inquiry_AccLogs.Key_Inquiry_DID);
 	END;
 	EXPORT Function_Descriptions := RECORD
 		STRING100 FunctionName := '';

@@ -112,20 +112,28 @@ EXPORT Inquiry_Deltabase.Layouts.Inquiry_All Search_All (DATASET(Inquiry_Deltaba
 	// Now transform the Deltabase Response into the Inquiry Key layout to make integrating the Deltabase as seemless as possible
 	Inquiry_Deltabase.Layouts.Inquiry_All intoKeyLayout(Inquiry_Deltabase.Layouts.Deltabase_Record le) := TRANSFORM
 		// Index Fields
-    SELF.Search_Type := le.Search_Type;
-		SELF.Zip := le.Clean_Zip5;
+		SELF.Search_Type := le.Search_Type;
+		// Address
+		SELF.Zip5 := le.Clean_Zip5;
 		SELF.Prim_Name := le.Clean_Prim_Name;
 		SELF.Prim_Range := le.Clean_Prim_Range;
 		SELF.Sec_Range := le.Clean_Sec_Range;
-    SELF.S_DID := (INTEGER)le.Response_LexID;
-    SELF.Email_Address := le.Email;
-    SELF.IPAddr := le.IPAddr;
-    SELF.FName := le.FName;
-		SELF.MName := le.MName;
-		SELF.LName := le.LName;
-    SELF.Phone10 := le.Phone10;
-    SELF.SSN := le.SSN;
-    SELF.Transaction_ID := le.Transaction_ID;
+		// DID
+		SELF.S_DID := (INTEGER)le.Response_LexID;
+		// EMail
+		SELF.Email := le.Email;
+		// IPAddr
+		SELF.IPAddress := le.IPAddr;
+		// Name
+		SELF.FirstName := le.FName;
+		SELF.MiddleName := le.MName;
+		SELF.LastName := le.LName;
+		// Phone
+		SELF.Phone10 := le.Phone10;
+		// SSN
+		SELF.SSN := le.SSN;
+		// Transaction_ID
+		SELF.Transaction_ID := le.Transaction_ID;
 		// Inquiry Key Payload
 		SELF.Bus_Intel.Industry := le.Industry;
 		SELF.Bus_Intel.Vertical := le.Vertical;
@@ -184,6 +192,7 @@ EXPORT Inquiry_Deltabase.Layouts.Inquiry_All Search_All (DATASET(Inquiry_Deltaba
 		SELF.Search_Info.Product_Code := le.Product_Code;
 		SELF.Search_Info.Function_Description := le.Function_Description;
 		
+		SELF.Seq := (INTEGER)le.Seq;
 		SELF := le;
 		SELF := [];
 	END;
