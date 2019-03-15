@@ -1,4 +1,4 @@
-﻿/*
+/*
   after layouts.key is updated, in the following build the layouts.key_static will need to be updated to layouts.key.
   similar to the bipv2.commonbase.layout_static and layout_dynamic.
   We need to do this because of BIPV2.fn_derive_pn uses bipv2_Best.Key_LinkIds.key_static before the new key is built

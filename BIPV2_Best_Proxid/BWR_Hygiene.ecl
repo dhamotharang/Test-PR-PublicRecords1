@@ -1,4 +1,4 @@
-﻿//This is the code to execute in a builder window
+//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
 #workunit('name','BIPV2_Best_Proxid.BWR_Hygiene - Hygiene & Stats - SALT V3.0 Gold');
 IMPORT BIPV2_Best_Proxid,SALT30;
@@ -44,7 +44,6 @@ IMPORT BIPV2_Best_Proxid,SALT30;
   //  OUTPUT(SALT30.MAC_CrossTab(infile,source_for_votes,duns_number,Examples),NAMED('duns_numberBysource_for_votes'));
   //  OUTPUT(SALT30.MAC_CrossTab(infile,source_for_votes,company_sic_code1,Examples),NAMED('company_sic_code1Bysource_for_votes'));
   //  OUTPUT(SALT30.MAC_CrossTab(infile,source_for_votes,company_naics_code1,Examples),NAMED('company_naics_code1Bysource_for_votes'));
-  //  OUTPUT(SALT30.MAC_CrossTab(infile,source_for_votes,dba_name,Examples),NAMED('dba_nameBysource_for_votes'));
   //  OUTPUT(SALT30.MAC_CrossTab(infile,source_for_votes,prim_range,Examples),NAMED('prim_rangeBysource_for_votes'));
   //  OUTPUT(SALT30.MAC_CrossTab(infile,source_for_votes,predir,Examples),NAMED('predirBysource_for_votes'));
   //  OUTPUT(SALT30.MAC_CrossTab(infile,source_for_votes,prim_name,Examples),NAMED('prim_nameBysource_for_votes'));

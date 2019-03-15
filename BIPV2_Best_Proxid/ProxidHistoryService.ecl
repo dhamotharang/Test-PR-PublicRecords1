@@ -1,4 +1,4 @@
-﻿/*--SOAP--
+/*--SOAP--
 <message name="ProxidHistoryService">
 <part name="Proxid" type="xsd:string"/>
 </message>
@@ -26,4 +26,3 @@ EXPORT ProxidHistoryService := MACRO
   tree := LOOP(seed,LEFT.Depth=COUNTER-1,ftch(ROWS(LEFT),COUNTER));
   OUTPUT( tree,NAMED('History'));
 ENDMACRO;
- 

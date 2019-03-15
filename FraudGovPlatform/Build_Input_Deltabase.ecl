@@ -4,8 +4,7 @@ EXPORT Build_Input_Deltabase(
 	,dataset(FraudShared.Layouts.Input.mbs) MBS_Sprayed = FraudShared.Files().Input.MBS.sprayed
 	,dataset(Layouts.Input.Deltabase) Deltabase_Sprayed =  files().Input.Deltabase.sprayed	
 	,dataset(Layouts.Input.Deltabase) ByPassed_Deltabase_Sprayed = files().Input.ByPassed_Deltabase.sprayed	
-
-	,boolean PSkipValidations = false
+	,dataset(Layouts.Flags.SkipValidationByGCID) PSkipValidations = files().Flags.SkipValidationByGCID
 ) :=
 module
 
@@ -49,10 +48,23 @@ module
 
 	shared f1:=project(deltabaseUpdateUpper,tr(left,counter));
 	
-	f1_errors:=f1
-		((Customer_Account_Number = '' or reported_date = '' or file_type = 0
-			or 	(Customer_Program in FraudGovPlatform_Validation.Mod_Sets.IES_Benefit_Type) = FALSE				
-		) and PSkipValidations = false);
+	shared EnforceValidations 
+	:= join(	  f1
+				, PSkipValidations
+				, left.Customer_Account_Number = right.gc_id
+				, TRANSFORM(Layouts.Input.Deltabase,SELF := LEFT),LEFT ONLY, LOOKUP);
+
+	shared SkipValidations 
+		:= join(	  f1
+					, PSkipValidations
+					, left.Customer_Account_Number = right.gc_id
+					, TRANSFORM(FraudGovPlatform.Layouts.Input.Deltabase,SELF := LEFT), INNER, LOOKUP);				
+
+	shared valid_records := EnforceValidations + SkipValidations;
+	
+	shared f1_errors:=EnforceValidations
+		(Customer_Account_Number = '' or reported_date = '' or file_type = 0
+			or 	(Customer_Program in FraudGovPlatform_Validation.Mod_Sets.IES_Benefit_Type) = FALSE	);
 
 	MBS_Layout := Record
 		FraudShared.Layouts.Input.MBS;
@@ -60,7 +72,7 @@ module
 	end;
 	MBS_Deltabase	:= project(MBS_Sprayed(status = 1), transform(MBS_Layout, self.Deltabase := If(regexfind('DELTA', left.fdn_file_code, nocase),1,0); self := left));
 
-	NotInMbs := join(	f1,
+	NotInMbs := join(	valid_records,
 					MBS_Deltabase(Deltabase = 1),
 					left.Customer_Account_Number =(string)right.gc_id and
 					left.Deltabase = right.Deltabase,
@@ -81,7 +93,7 @@ module
 		pQuote := Constants().validQuotes);
 									
 	//Move only Valid Records
-	shared f1_dedup :=	join (	f1,
+	shared f1_dedup :=	join (	valid_records,
 							ByPassed_records,
 							left.Unique_Id = right.Unique_Id,
 							TRANSFORM(Layouts.Input.Deltabase,SELF := LEFT),
@@ -108,7 +120,7 @@ module
 	dAppendLexid := Standardize_Entity.Append_Lexid (dAppendPhone);
 	dCleanInputFields := Standardize_Entity.Clean_InputFields (dAppendLexid);	
 	
-	input_file_1 := fn_dedup(files().Input.Deltabase.sprayed  + project(dCleanInputFields,Layouts.Input.Deltabase)); 
+	input_file_1 := fn_dedup(Deltabase_Sprayed  + project(dCleanInputFields,Layouts.Input.Deltabase)); 
 
 	// Refresh Addresses every 90 days
 	IsTimeForRefresh := AddressesInfo(pversion).IsTimeForRefresh;

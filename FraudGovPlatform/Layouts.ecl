@@ -366,9 +366,6 @@ EXPORT Layouts := MODULE
 			Provenance;
 			string12		cell_phone := '';
 		END;
-		EXPORT SourcesToAnonymize := RECORD
-			unsigned6			fdn_file_info_id;
-		END;
 		
 		EXPORT ConfigRiskLevel	:= RECORD
 		  STRING entitytype;
@@ -493,7 +490,7 @@ EXPORT Layouts := MODULE
 		
 	END;
 
-	export OutputF := module
+	export Flags := module
 
 		export FraudgovInfoRec := RECORD
 			string PreviousVersion;
@@ -501,6 +498,10 @@ EXPORT Layouts := MODULE
 			string Status;
 		END;
 
+		EXPORT SourcesToAnonymize := RECORD
+			unsigned6 fdn_file_info_id;
+		END;
+		
 		export SkipModules := RECORD
 			//General Processes
 			boolean SkipBaseBuild;
@@ -510,10 +511,14 @@ EXPORT Layouts := MODULE
 			boolean SkipNACBuild;
 			boolean SkipInquiryLogsBuild;
 			boolean SkipPiiBuild;		
-			boolean	SkipKelBuild;
+			boolean SkipKelBuild;
 			boolean SkipOrbitBuild;
 			boolean SkipDashboardsBuild;
-		END;		
+		END;
+
+		export SkipValidationByGCID	 := RECORD
+			string Gc_ID;
+		end;
 	end;
 
 export temp := module 
