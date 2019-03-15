@@ -133,7 +133,6 @@ RESOURCES
   INDEX Key_Person_Cluster_Degree:FILENAME("~thor_data400::key::sna::person_cluster_degree_qa"), URL("http://10.241.12.201:8010"), DALIIP("10.241.12.201"), CLUSTER("thor400_dev"); 
   ECL AppendLexidToLexidAssociation:FILENAME("AppendLexidToLexidAssociation"), URL("http://10.241.100.153:8010");
   ECL Relationship:FILENAME("Relationship"), URL("http://10.241.100.153:8010");
-  ECL Relavator:FILENAME("Relavator"), URL("http://10.241.100.153:8010");
   ECL Header:FILENAME("Header"), URL("http://10.241.100.153:8010");
   FILE AppendLexidToLexidAssociation_BuildTestDataset: FILENAME("AppendLexidToLexidAssociation_BuildTestDataset.ecl"),LABEL("BWR to create data for test composition");
   FILE appendlexidtolexidassociation_testcmp: FILENAME("appendlexidtolexidassociation_testcmp.txt"),LABEL("Plugin Test Composition");
