@@ -1,11 +1,11 @@
-﻿IMPORT FraudGovPlatform_Services, FraudShared, FraudShared_Services, Gateway, iesp, STD;
+﻿IMPORT FraudGovPlatform_Services, FraudShared, FraudShared_Services, Gateway, iesp, STD, ut;
 
 EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams batch_params) := MODULE
 		
 		SHARED Layout_LogDeltabase := FraudGovPlatform_Services.Layouts.LOG_Deltabase_Layout_Record;
 		SHARED Layout_DeltabaseSelect := FraudShared_Services.Layouts.t_DeltaBaseSelectRequest;
 		SHARED Layout_DeltabaseResponse := FraudGovPlatform_Services.Layouts.response_deltabase_layout;
-		SHARED Fraud_Platform := FraudShared_Services.Constants.Platform.FraudGov;
+		SHARED Fraud_Platform := FraudGovPlatform_Services.Constants.FRAUD_PLATFORM;
 		SHARED serviceUrl := batch_params.gateways(servicename = Gateway.Constants.ServiceName.FraudGovDeltabase)[1].Url;
 		SHARED dqString := FraudShared_Services.Utilities.dqString;
 		
@@ -102,7 +102,7 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 	
 	SHARED DeltabaseMBSFilter(DATASET(Layout_LogDeltabase) deltabase_recs) := FUNCTION
 			
-			mbs_delta_key := FraudShared.Key_MbsDeltaBase(FraudGovPlatform_Services.Constants.FRAUD_PLATFORM);
+			mbs_delta_key := FraudShared.Key_MbsDeltaBase(Fraud_Platform);
 			
 			//Transform into input format of FraudShared_Services.FilterThruMBS function
 			FraudShared_Services.Layouts.Raw_Payload_rec xform_create_mbs_in(deltabase_recs L, 
@@ -356,14 +356,36 @@ EXPORT mod_Deltabase_Functions (FraudGovPlatform_Services.IParam.BatchParams bat
 			db_records := deltadata(batch_params.GlobalCompanyId,batch_params.IndustryTypeName,last_data_build_date);
 			*/
 			
+			//Get All Included GC_ID's using the inclusion key (per mbs sharing rules)
+			ds_file_info_id := LIMIT(FraudShared.Key_MbsDeltaBase(Fraud_Platform)
+																(	KEYED(gc_id = batch_params.GlobalCompanyId AND 
+																				ind_type = batch_params.IndustryType) AND
+																	product_include = FraudShared_Services.Constants.PRODUCT_INCLUDE_CODE_ALL
+																), 
+															FraudGovPlatform_Services.Constants.MAX_RECS_ON_JOIN, SKIP);
+											
+			ds_mbsfdnmasteridindtypeinclusion := JOIN(ds_file_info_id, FraudShared.Key_mbsfdnmasteridindtypeinclusion(Fraud_Platform),
+																								KEYED(LEFT.fdn_file_info_id = RIGHT.fdn_file_info_id),
+																								TRANSFORM(RIGHT),
+																								LIMIT(FraudGovPlatform_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
+
+			StringRec := RECORD
+				 STRING inclusion_id;
+			END;													
+													
+			ds_included_gc_id := PROJECT(ds_mbsfdnmasteridindtypeinclusion , TRANSFORM(StringRec, SELF.inclusion_id := (string)LEFT.inclusion_id));
+			
+			ut.MAC_ds_to_string(ds_included_gc_id, inclusion_id, included_gc_ids);
+			
 			//Date in DB is stored as YYYYMMDDhhmmss but the environment variable only has YYYYMMDD, so addedd hhmmss
 			//Also added failsafe...if we can't get the environment variable, we default it to yesterday
 			last_data_build_date := (INTEGER)(thorlib.getenv(FraudGovPlatform_Services.Constants.FRAUDGOV_BUILD_ENV_VARIABLE,
 															(STRING)FraudGovPlatform_Services.Utilities.yesterday)[1..8] + '000000');			
 		
 			Layout_DeltabaseSelect xRead_search() := TRANSFORM
-				SELF.Select := 'SELECT * FROM delta_fraudgov.delta_identity WHERE '
-					+ ' date_added >= ' + last_data_build_date;
+				SELF.Select := 'SELECT * FROM delta_fraudgov.delta_identity WHERE'
+					+ ' date_added >= ' + last_data_build_date + ' AND gc_id in (' + included_gc_ids + ') ORDER BY date_added DESC'
+					+ ' LIMIT 10000; ';
 			END;
 			
 			readDeltabase := DATASET([xRead_search()]);
