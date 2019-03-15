@@ -77,6 +77,7 @@
   <part name="OutcomeTrackingOptOut" type="xsd:boolean"/>
   <part name="SuppressCompromisedDLs" type="xsd:boolean"/>
   <part name="IncludeQAOutputs" type="xsd:boolean"/>
+  <part name="RemoveQuickHeader" type="xsd:boolean"/>
  </message>
 */
 /*--INFO-- Contains Fraud Advisor 3, 5, 9, Version1 and Fraud Attributes */
@@ -167,7 +168,8 @@ export FraudAdvisor_Service := MACRO
 		'TimeofApplication',
 		'OutcomeTrackingOptOut',
 		'SuppressCompromisedDLs',
-  'IncludeQAOutputs'  
+  'IncludeQAOutputs',
+  'RemoveQuickHeader'
 	));
 
 Risk_indicators.MAC_unparsedfullname(title_val,first_value,middle_value,last_value,suffix_value,'FirstName','MiddleName','LastName','NameSuffix')
@@ -279,7 +281,7 @@ boolean   IncludeRiskIndices := false : stored('IncludeRiskIndices');  // to inc
 boolean SuppressCompromisedDLs := false : stored('SuppressCompromisedDLs');
 // Set to TRUE when running RiskProcessing scripts to include some intermediate boca shell outputs for modelers
 boolean IncludeQAOutputs             := FALSE : stored('IncludeQAOutputs'); 
-
+boolean   RemoveQuickHeader       := false    : stored('RemoveQuickHeader');
 
 Boolean TrackInsuranceRoyalties := Risk_Indicators.iid_constants.InsuranceDL_ok(DataPermission);
 
@@ -584,7 +586,7 @@ bsVersion := map(
 //=========================
 //=== BSoptions         ===
 //=========================
-unsigned8 BSOptions := map(model_name='fp31604_0' and input_ok   => Risk_indicators.iid_constants.BSOptions.RetainInputDID
+unsigned8 BSOptions1 := map(model_name='fp31604_0' and input_ok   => Risk_indicators.iid_constants.BSOptions.RetainInputDID
 																																	+ Risk_indicators.iid_constants.BSOptions.IncludeDoNotMail
 																																	+ Risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity
 																																	+ risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary ,
@@ -603,6 +605,10 @@ unsigned8 BSOptions := map(model_name='fp31604_0' and input_ok   => Risk_indicat
 																																	+ if(~DisallowInsurancePhoneHeaderGateway, Risk_indicators.iid_constants.BSOptions.IncludeInsNAP, 0),
 																																	
 													0);
+
+generic_options := if(RemoveQuickHeader, risk_indicators.iid_constants.BSOptions.RemoveQuickHeader, 0); 
+
+BSOptions := BSOptions1 + generic_options;
 
 iid := risk_indicators.InstantID_Function(prep, gateways, DPPA_Purpose, GLB_Purpose, isUtility, isLn, 
 																					ofac_only, suppressNearDups, require2Ele, from_biid, isFCRA, excludewatchlists, 
