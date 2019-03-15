@@ -80,8 +80,8 @@ GENERATES INLINE
   
   %^edsSkinny% := NORMALIZE(%dsOutput%, LEFT.Differences, TRANSFORM(rOut, SELF := RIGHT, SELF := LEFT));
   
-  %^eTopRecordDeltaStats% := TOPN(TABLE(%dsSkinny%((BOOLEAN)IsDifferent),{STRING JoinColumnId := %#foreach(INPUTS.JoinFields1,"+','+")%(STRING)%INPUTS.JoinFields1%%#end%, INTEGER Cnt := COUNT(GROUP)},%INPUTS.JoinFields1%), 100, -Cnt);
-  %^eTopFieldsDeltaStats% := TOPN(TABLE(%dsSkinny%((BOOLEAN)IsDifferent),{STRING FieldName := Field, INTEGER Cnt := COUNT(GROUP)},Field), 100, -Cnt);
+  %^eTopRecordDeltaStats% := TOPN(TABLE(%dsSkinny%((BOOLEAN)IsDifferent),{STRING JoinColumnId := %#foreach(INPUTS.JoinFields1,"+','+")%(STRING)%INPUTS.JoinFields1%%#end%, INTEGER Cnt := COUNT(GROUP)},%INPUTS.JoinFields1%,MERGE), 100, -Cnt);
+  %^eTopFieldsDeltaStats% := TOPN(TABLE(%dsSkinny%((BOOLEAN)IsDifferent),{STRING FieldName := Field, INTEGER Cnt := COUNT(GROUP)},Field,MERGE), 100, -Cnt);
 
 ENDGENERATES
 
