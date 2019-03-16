@@ -250,9 +250,9 @@ export WA := MODULE;
 		Main_TranslateBitMap			:= output(Main_T);
 
     //Submits Profile's stats to Orbit
-    Main_SubmitStats          := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_WA_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp_WA_Main').SubmitStats;
+    Main_SubmitStats          := Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_WA_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp_WA_Main').SubmitStats;
 
-		Main_ScrubsWithExamples		:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_WA_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp_WA_Main').CompareToProfile_with_Examples;
+		Main_ScrubsWithExamples		:= Scrubs.OrbitProfileStatsPost310('Scrubs_Corp2_Mapping_WA_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp_WA_Main').CompareToProfile_with_Examples;
 		
 		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
