@@ -1,4 +1,5 @@
 import Suppress, STD;
+
 export date_mask_math := module
 
   // returns an integer indicator for what date component is subject for masking
@@ -15,11 +16,11 @@ export date_mask_math := module
   // returns a string representation of a mask indicator
   export string6 MaskValue (unsigned1 mask_value) := 
     case (mask_value,
-          Suppress.constants.dateMask.NONE => 'NONE',
-          Suppress.constants.dateMask.DAY => 'DAY',
-          Suppress.constants.dateMask.MONTH => 'MONTH',
-          Suppress.constants.dateMask.YEAR => 'YEAR',
-          Suppress.constants.dateMask.ALL => 'ALL',
-          'ALL');
+          Suppress.constants.dateMask.NONE => Suppress.constants.date_mask_type.NONE,
+          Suppress.constants.dateMask.DAY => Suppress.constants.date_mask_type.DAY,
+          Suppress.constants.dateMask.MONTH => Suppress.constants.date_mask_type.MONTH,
+          Suppress.constants.dateMask.YEAR => Suppress.constants.date_mask_type.YEAR,
+          Suppress.constants.dateMask.ALL => Suppress.constants.date_mask_type.ALL,
+          Suppress.constants.date_mask_type.ALL);
 
 end;
