@@ -1,4 +1,4 @@
-IMPORT AccountMonitoring;
+﻿IMPORT AccountMonitoring;
 
 // The file names/locations for the products in the various systems (ie: results, history, documents, inquiry tracking, ecm, etc)
 EXPORT filenames(unsigned1 pseudo_environment) := MODULE
@@ -53,6 +53,7 @@ EXPORT filenames(unsigned1 pseudo_environment) := MODULE
 		EXPORT mvr					 	 := documents_template('mvr');
 		EXPORT aircraft			 	 := documents_template('aircraft');
 		EXPORT watercraft		 	 := documents_template('watercraft');
+		EXPORT personheader		 	 := documents_template('personheader');
 	END;
 	
 	// The file name and location of the history files.  
@@ -85,6 +86,7 @@ EXPORT filenames(unsigned1 pseudo_environment) := MODULE
 		EXPORT mvr	 					 := history_template('mvr');
 		EXPORT aircraft				 := history_template('aircraft');
 		EXPORT watercraft			 := history_template('watercraft');
+    EXPORT personheader		 	 := documents_template('personheader');
 	END;
 	
 	// The file name and location of the Inquiry tracking files are used solely for auditing purposes

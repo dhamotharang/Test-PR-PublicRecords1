@@ -293,6 +293,7 @@ EXPORT fn_portfolio_update(UNSIGNED1 pseudo_environment,
 		mac_update_documents_file(pseudo_environment,mvr,spray_ip_address,spray_ip_path,fnms.documents.mvr.remote,write_updated_mvr_documents_file);
 		mac_update_documents_file(pseudo_environment,aircraft,spray_ip_address,spray_ip_path,fnms.documents.aircraft.remote,write_updated_aircraft_documents_file);
 		mac_update_documents_file(pseudo_environment,watercraft,spray_ip_address,spray_ip_path,fnms.documents.watercraft.remote,write_updated_watercraft_documents_file);
+		mac_update_documents_file(pseudo_environment,personheader,spray_ip_address,spray_ip_path,fnms.documents.personheader.remote,write_updated_personheader_documents_file);
 
 
       main_files_to_update := PARALLEL( write_updated_portfolio_file,
@@ -321,7 +322,8 @@ EXPORT fn_portfolio_update(UNSIGNED1 pseudo_environment,
 																		 write_updated_corp_documents_file,
 																		 write_updated_mvr_documents_file,
 																		 write_updated_aircraft_documents_file,
-																		 write_updated_watercraft_documents_file
+																		 write_updated_watercraft_documents_file,
+																		 write_updated_personheader_documents_file
 										         );
 
 		write_updated_files := IF( Inq_Tracking, 

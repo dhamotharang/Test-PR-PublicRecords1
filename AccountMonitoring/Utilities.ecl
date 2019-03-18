@@ -1,4 +1,4 @@
-// A set of utility functions that can be run to effect change within the Account Monitoring system.
+﻿// A set of utility functions that can be run to effect change within the Account Monitoring system.
 
 IMPORT _control;
 
@@ -170,6 +170,9 @@ export Utilities := MODULE
 			// ***** Watercraft Update *****
 		update_history_file_watercraft := fn_purge_history( product_cfg.watercraft, timestamp, purge_pid, purge_rid );
 
+  	// ***** PersonHeader Update *****
+		update_history_file_personheader := fn_purge_history( product_cfg.personheader, timestamp, purge_pid, purge_rid );
+
 
 		update_history_files := PARALLEL( IF(product_cfg.bankruptcy.product_is_in_mask,update_history_file_bankruptcy), 
 													 IF(product_cfg.address.product_is_in_mask,update_history_file_address),
@@ -195,7 +198,8 @@ export Utilities := MODULE
 													 IF(product_cfg.corp.product_is_in_mask,update_history_file_corp),
 													 IF(product_cfg.mvr.product_is_in_mask,update_history_file_mvr),
 													 IF(product_cfg.aircraft.product_is_in_mask,update_history_file_aircraft),
-													 IF(product_cfg.watercraft.product_is_in_mask,update_history_file_watercraft)
+													 IF(product_cfg.watercraft.product_is_in_mask,update_history_file_watercraft),
+													 IF(product_cfg.personheader.product_is_in_mask,update_history_file_personheader)
 												  );
 		
 		RETURN SEQUENTIAL(
@@ -268,6 +272,7 @@ export Utilities := MODULE
 		update_history_file_mvr := fn_purge_history_multi( product_cfg.mvr, timestamp, purge_pids, purge_rids );
 		update_history_file_aircraft := fn_purge_history_multi( product_cfg.aircraft, timestamp, purge_pids, purge_rids );
 		update_history_file_watercraft := fn_purge_history_multi( product_cfg.watercraft, timestamp, purge_pids, purge_rids );
+		update_history_file_personheader := fn_purge_history_multi( product_cfg.personheader, timestamp, purge_pids, purge_rids );
 
 		update_history_files := PARALLEL(IF(product_cfg.bankruptcy.product_is_in_mask,update_history_file_bankruptcy), 
 													IF(product_cfg.address.product_is_in_mask,update_history_file_address),
@@ -294,6 +299,7 @@ export Utilities := MODULE
 													IF(product_cfg.mvr.product_is_in_mask,update_history_file_mvr),
 													IF(product_cfg.aircraft.product_is_in_mask,update_history_file_aircraft),
 													IF(product_cfg.watercraft.product_is_in_mask,update_history_file_watercraft));
+													IF(product_cfg.personheader.product_is_in_mask,update_history_file_personheader));
 		
 		RETURN SEQUENTIAL(
 			IF(pseudo_environment = AccountMonitoring.constants.pseudo.DEFAULT OR pseudo_environment NOT IN AccountMonitoring.constants.all_pseudo,
@@ -522,6 +528,7 @@ export Utilities := MODULE
 		mac_purge_doc_file(pm.mvr  				 	 , mvr						, purge_mvr)
 		mac_purge_doc_file(pm.aircraft  	 	 , aircraft				, purge_aircraft)
 		mac_purge_doc_file(pm.watercraft	 	 , watercraft			, purge_watercraft)
+		mac_purge_doc_file(pm.personheader	 	 , personheader			, purge_personheader)
 							
 		RETURN SEQUENTIAL(
 			purge_bankruptcy, 
@@ -549,6 +556,7 @@ export Utilities := MODULE
 			purge_mvr,
 			purge_aircraft,
 			purge_watercraft
+			purge_personheader
 			);
 		
 	END;
@@ -657,6 +665,7 @@ export Utilities := MODULE
 		update_history_file_mvr  						:= fn_purge_straggler_history( product_cfg.mvr						, pseudo_environment, purge_pids );
 		update_history_file_aircraft				:= fn_purge_straggler_history( product_cfg.aircraft				, pseudo_environment, purge_pids );
 		update_history_file_watercraft			:= fn_purge_straggler_history( product_cfg.watercraft			, pseudo_environment, purge_pids );
+		update_history_file_personheader			:= fn_purge_straggler_history( product_cfg.personheader			, pseudo_environment, purge_pids );
 
 		update_history_files := PARALLEL(IF(product_cfg.bankruptcy.product_is_in_mask     ,update_history_file_bankruptcy), 
 													IF(product_cfg.address.product_is_in_mask        ,update_history_file_address),
@@ -683,6 +692,7 @@ export Utilities := MODULE
 													IF(product_cfg.mvr.product_is_in_mask  				 	 ,update_history_file_mvr),
 													IF(product_cfg.aircraft.product_is_in_mask  	 	 ,update_history_file_aircraft),
 													IF(product_cfg.watercraft.product_is_in_mask  	 ,update_history_file_watercraft));
+													IF(product_cfg.personheader.product_is_in_mask  	 ,update_history_file_personheader));
 		
 		RETURN SEQUENTIAL(
 			IF(pseudo_environment = AccountMonitoring.constants.pseudo.DEFAULT OR pseudo_environment NOT IN AccountMonitoring.constants.all_pseudo,
@@ -799,7 +809,9 @@ export Utilities := MODULE
 			  // *****  Watercraft *****
 		   update_history_file_watercraft := fn_rollback_history( product_cfg.watercraft );
 	
-	
+	  // *****  PersonHeader *****
+		   update_history_file_personheader := fn_rollback_history( product_cfg.personheader );
+       
 		   update_history_files := PARALLEL( IF(product_cfg.bankruptcy.product_is_in_mask,update_history_file_bankruptcy), 
 													    IF(product_cfg.address.product_is_in_mask,update_history_file_address),
 													    IF(product_cfg.phone.product_is_in_mask,update_history_file_phone),
@@ -825,6 +837,7 @@ export Utilities := MODULE
 															IF(product_cfg.mvr.product_is_in_mask,update_history_file_mvr),
 															IF(product_cfg.aircraft.product_is_in_mask,update_history_file_aircraft),
 															IF(product_cfg.watercraft.product_is_in_mask,update_history_file_watercraft)
+															IF(product_cfg.personheader.product_is_in_mask,update_history_file_personheader)
 													  );
 		
 		   RETURN SEQUENTIAL(
