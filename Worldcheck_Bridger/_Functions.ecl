@@ -1213,6 +1213,7 @@
 				trim(kword, left, right) = 'ZANTRS' =>SubGroup_Constants.numKeywordsID.KEYWORD_ZANTRS,
 				trim(kword, left, right) = 'USDA' =>SubGroup_Constants.numKeywordsID.KEYWORD_USDA,
 				trim(kword, left, right) = 'TRL-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_TRL_WC,
+				trim(kword, left, right) = 'CAPTA-561' =>SubGroup_Constants.numKeywordsID.KEYWORD_CAPTA_561,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
