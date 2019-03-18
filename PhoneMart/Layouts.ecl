@@ -1,4 +1,4 @@
-EXPORT Layouts := MODULE
+﻿EXPORT Layouts := MODULE
 
 	EXPORT cms_raw := RECORD
 		ebcdic string9	CID_NUMBER;
@@ -60,6 +60,8 @@ EXPORT Layouts := MODULE
 		STRING5		NAME_SUFFIX;
 		UNSIGNED8	ScrubsBits1	:=	0;
 		UNSIGNED8	ScrubsBits2	:=	0;
+		UNSIGNED4 global_sid;
+		UNSIGNED8 record_sid;
 	END;
 
 	EXPORT	base_no_scrub	:=	base AND NOT [ScrubsBits1, ScrubsBits2];
