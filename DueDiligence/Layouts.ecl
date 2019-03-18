@@ -687,28 +687,29 @@ EXPORT Layouts := MODULE
 	
   
 	
-	EXPORT Indv_Internal := Record
-		UNSIGNED6 seq := 0;
-		UNSIGNED4 historyDate;													//If all 9s will be todays date, otherwise cleaned input date (actual date value)
-		UNSIGNED4 historyDateRaw;										    //cleaned date used to calc history date
-		BOOLEAN inputAddressProvided;
-		BOOLEAN fullInputAddressProvided;
+  EXPORT Indv_Internal := Record
+    UNSIGNED6 seq := 0;
+    UNSIGNED4 historyDate;													//If all 9s will be todays date, otherwise cleaned input date (actual date value)
+    UNSIGNED4 historyDateRaw;										    //cleaned date used to calc history date
+    BOOLEAN inputAddressProvided;
+    BOOLEAN fullInputAddressProvided;
     Indv_Input indvRawInput;
-		Indv_Input indvCleanInput;
+    Indv_Input indvCleanInput;
     GeographicRiskLayout; 
-		UNSIGNED6 inquiredDID;
-		RelatedParty individual;											  //populated in DueDiligence.getIndDID, DueDiligence.getIndBestData
-		UNSIGNED4 numberOfSpouses;																							
-		DATASET(SlimIndividual) spouses;																												//populated in DueDiligence.getIndRelatives
-		DATASET(SlimIndividual) parents {MAXCOUNT(DueDiligence.Constants.MAX_PARENTS)}; 			  //populated in DueDiligence.getIndRelatives
-		STRING2 indvType;                         		  //II = Inquired Individual, IS = Inquired Individual Spouse,  IP = Inquired Individual Parent, 
-		
+    UNSIGNED6 inquiredDID;
+    RelatedParty individual;											  //populated in DueDiligence.getIndDID, DueDiligence.getIndBestData
+    UNSIGNED4 numberOfSpouses;																							
+    DATASET(SlimIndividual) spouses;																												//populated in DueDiligence.getIndRelatives
+    UNSIGNED4 numberOfParents;
+    DATASET(SlimIndividual) parents {MAXCOUNT(DueDiligence.Constants.MAX_PARENTS)}; 			  //populated in DueDiligence.getIndRelatives
+    STRING2 indvType;                         		  //II = Inquired Individual, IS = Inquired Individual Spouse,  IP = Inquired Individual Parent, 
+
     DueDiligence.LayoutsAttributes.PersonAttributeValues;         //used in calc'ing attribute values in getIndKRI
 
     IndReportDetails;                               //Used to hold report data when we have access instead of multiple key calls
-		PerAttributes;
+    PerAttributes;
     iesp.duediligencepersonreport.t_DDRPersonReport personReport;
-	END;
+  END;
 
 
 	EXPORT Busn_Internal := Record
