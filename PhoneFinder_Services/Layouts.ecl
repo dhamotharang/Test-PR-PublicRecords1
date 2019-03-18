@@ -694,16 +694,6 @@ MODULE
 	END;
 
 	// Deltabase Layouts
-	EXPORT DeltabaseValue := RECORD
-		STRING100 Value {XPATH('Value')};
-	END;
-	EXPORT DeltabaseParameters := RECORD
-		DATASET(DeltabaseValue) Parameter {XPATH('Parameter')}; 
-	END;
-	EXPORT DeltabaseInput := RECORD
-		STRING Select {XPATH('Select')};
-		DATASET(DeltabaseParameters) Parameters {XPATH('Parameters')};
-	END;
 	EXPORT DeltaPortedDataRecord := RECORD
 		 UNSIGNED   transaction_id				{XPATH('id')};
 		 STRING     date_added				  	{XPATH('date_added')};	
@@ -728,6 +718,8 @@ MODULE
 	EXPORT DeltaSpoofedRec := RECORD
 		 UNSIGNED   id										{XPATH('id')};
 		 STRING     date_added				  	{XPATH('date_added')};	
+		 STRING45   reference_id					{XPATH('reference_id')};
+		 STRING20   mode_type						  {XPATH('mode_type')};
 		 STRING 		event_time						{XPATH('event_time')};
 		 STRING10   spoofed_phone_number	{XPATH('spoofed_phone_number')};
 		 STRING10   destination_number		{XPATH('destination_number')};
@@ -763,9 +755,15 @@ MODULE
 	END;
 	
 	EXPORT DeltaInquiryDataRecord := RECORD
-	    	UNSIGNED8    seq;
-				STRING10     phone;
+	    	UNSIGNED8    seq {XPATH('Seq')};
+				STRING10     phone {XPATH('Phone')};
 	END;
+	EXPORT DeltaInquiryDeltabaseResponse := RECORD                         
+		DATASET (DeltaInquiryDataRecord) Response {XPATH('Records/Rec')};
+		STRING  RecordsReturned                  	{XPATH('RecsReturned'),MAXLENGTH(5)};
+		STRING  Latency													 	{XPATH('Latency')};
+		STRING  ExceptionMessage								 	{XPATH('Exceptions/Exception/Message')};
+	END;			
 	
 	EXPORT DeltaInquiry_recout := RECORD
 	  UNSIGNED8    seq;

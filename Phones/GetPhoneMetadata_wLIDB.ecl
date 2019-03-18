@@ -22,7 +22,7 @@ EXPORT GetPhoneMetadata_wLIDB(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dB
 	LIMIT(0), KEEP(Consts.MaxRecsPerPhone));
 
 	//Get phone data from the deltabase
-	phoneRec := {STRING10 phone};
+	phoneRec := Phones.Layouts.PhoneAttributes.gatewayQuery;
 	numbersForDelta := DEDUP(SORT(PROJECT(dBatchPhonesIn, TRANSFORM(phoneRec,
 		SELF.phone := LEFT.phoneno
 	)), phone), phone);
