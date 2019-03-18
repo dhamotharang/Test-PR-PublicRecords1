@@ -176,8 +176,7 @@ MODULE
  Royalty.MAC_RoyaltyQSENT(dResultsDedupQSent,dRoyaltyQSent,TRUE,TRUE); 
  dRoyaltyTargus := Royalty.RoyaltyTargus.GetOnlineRoyalties(dResultsDedup,,,TRUE, FALSE, FALSE, FALSE);
  dRoyaltyAccOCN := Royalty.RoyaltyAccudata.GetOnlineRoyalties(dAccu_porting);
- dRoyaltyZumGetIden := Royalty.RoyaltyZumigoGetLineIdentity.GetOnlineRoyalties(dedup(sort(dZum_final,phone,-rec_source), phone), rec_source);
- dRoyalty_ATT_LIDB := Royalty.RoyaltyATT.GetOnlineRoyalties(dFilteringInHousePhoneData_typeflag, src);		
+ dRoyaltyZumGetIden := Royalty.RoyaltyZumigoGetLineIdentity.GetOnlineRoyalties(dedup(sort(dZum_final,phone,-rec_source), phone), rec_source);	
  dRoyaltiesAccudata_CNAM  := Royalty.RoyaltyAccudata_CNAM.GetOnlineRoyalties(dFilteringInHousePhoneData_typeflag,subj_phone_type_new);
             	
  EXPORT dRoyalties := if(inMod.UseLastResort, dRoyaltyLR) + 
@@ -186,7 +185,6 @@ MODULE
                		if(inMod.UseEquifax, dRoyaltyEquifax) + 
                		if(inMod.UseAccuData_ocn, dRoyaltyAccOCN)+
                		if(inMod.UseZumigoIdentity, dRoyaltyZumGetIden)+
-                if(inMod.UseInHousePhoneMetadata, dRoyalty_ATT_LIDB)+
                  if(inMod.UseAccuData_CNAM, dRoyaltiesAccudata_CNAM);
       
  Zumigo_log_records := DATASET([{dZum_gw_recs.Zumigo_Hist}], Phones.Layouts.ZumigoIdentity.zDeltabaseLog);

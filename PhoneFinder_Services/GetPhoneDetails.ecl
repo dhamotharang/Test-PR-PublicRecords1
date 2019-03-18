@@ -5,8 +5,7 @@ EXPORT GetPhoneDetails(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dInPhones
 											           := FUNCTION
 
   tempMod := MODULE(PROJECT(inMod,Phones.IParam.PhoneAttributes.BatchParams,OPT))
-		   EXPORT UNSIGNED		max_lidb_age_days					:= PhoneFinder_Services.Constants.LIBD_LastActivityThreshold; 
-		   EXPORT BOOLEAN		use_realtime_lidb				 	:= TRUE;
+		   EXPORT UNSIGNED		max_age_days					:= PhoneFinder_Services.Constants.LERG6_LastActivityThreshold; 
 	   	EXPORT DATASET (Gateway.Layouts.Config) gateways := dGateways; 
 	 END;
 	
@@ -41,8 +40,6 @@ EXPORT GetPhoneDetails(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dInPhones
   PhoneFinder_Services.Layouts.PhoneFinder.Final appendDetails(Phones.Layouts.PhoneAttributes.Raw le, DATASET(Phones.Layouts.PhoneAttributes.Raw) ri) := TRANSFORM
     SELF.acctno                                                   := le.acctno;
     SELF.phone                                                    := le.phone;
-    SELF.src                                                      := IF(EXISTS(ri(source = Phones.Constants.PhoneAttributes.ATT_LIDB_RealTime)),
-		                                                                             Phones.Constants.PhoneAttributes.ATT_LIDB_RealTime, '');
     SELF.typeflag                                                 := 'P';
     SELF.phone_source                                             := PhoneFinder_Services.Constants.PhoneSource.QSentGateway;
     SELF.dt_last_seen                                             := (STRING8)MAX(ri,ri.dt_last_reported);

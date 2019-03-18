@@ -34,14 +34,8 @@ EXPORT PhoneAttributes_BatchService(useCannedRecs = 'false') :=
 		BatchShare.MAC_RestoreAcctno(ds_batch_in, dBatchPhonesOut, dPreResults,false,false);		
 		dSortResults := SORT(dPreResults, acctno);
 
-		ut.mac_TrimFields(dSortResults, 'dSortResults', dBatchResults);	
-		
-		BOOLEAN ReturnDetailedRoyalties := false : STORED('ReturnDetailedRoyalties');
-		dRoyaltiesRealTime_ATT := Royalty.RoyaltyATT.GetBatchRoyaltiesByAcctno(dBatchResults, source, phoneno);		
-		dRoyalties := Royalty.GetBatchRoyalties(dRoyaltiesRealTime_ATT, ReturnDetailedRoyalties);		
-		RoyaltySet := if(batch_params.use_realtime_lidb, dRoyalties, DATASET([], Royalty.Layouts.RoyaltyForBatch));	
+		ut.mac_TrimFields(dSortResults, 'dSortResults', dBatchResults);		
 			
-		OUTPUT(dBatchResults,  NAMED('Results') );		
-		OUTPUT(RoyaltySet,  NAMED('RoyaltySet') );		
+		OUTPUT(dBatchResults,  NAMED('Results') );				
 				
 	ENDMACRO;	
