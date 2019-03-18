@@ -11,8 +11,6 @@ EXPORT DueDiligence_Service := MACRO
           dueDiligenceError := TRIM(validateDD[1].errorMessage);
           
           newErrorMessage := MAP(ddAttrsRequested IN DueDiligence.Constants.VALID_BUS_ATTRIBUTE_VERSIONS => DueDiligence.CitDDShared.VALIDATION_INVALID_DD_ATTRIBUTE_REQUEST_WITH_CITIZENSHIP,
-                                 citizenshipError = Citizenship.Constants.VALIDATION_INVALID_INDIVIDUAL AND 
-                                    dueDiligenceError = DueDiligence.Constants.VALIDATION_INVALID_INDIVIDUAL => DueDiligence.CitDDShared.VALIDATION_MINIMUM_INPUT_COMBO,
                                  citizenshipError <> DueDiligence.Constants.EMPTY AND 
                                     dueDiligenceError <> DueDiligence.Constants.EMPTY => citizenshipError + ' \n ' + dueDiligenceError,
                                  citizenshipError + ' ' + dueDiligenceError);
@@ -37,25 +35,25 @@ EXPORT DueDiligence_Service := MACRO
 
 
       requestName := 'DueDiligenceAttributesRequest';
-			requestLayout := iesp.duediligenceattributes.t_DueDiligenceAttributesRequest;
-			
-			requestResponseLayout := iesp.duediligenceattributes.t_DueDiligenceAttributesResponse;
-	
-			//The following macro defines the field sequence on WsECL page of query.
-			WSInput.MAC_DueDiligence_Service(requestName);
-			
-			DueDiligence.CommonQuery.mac_CreateInputFromXML(requestLayout, requestName, FALSE, DueDiligence.Constants.ATTRIBUTES);
-      
+      requestLayout := iesp.duediligenceattributes.t_DueDiligenceAttributesRequest;
+
+      requestResponseLayout := iesp.duediligenceattributes.t_DueDiligenceAttributesResponse;
+
+      //The following macro defines the field sequence on WsECL page of query.
+      WSInput.MAC_DueDiligence_Service(requestName);
+
+      DueDiligence.CommonQuery.mac_CreateInputFromXML(requestLayout, requestName, FALSE, DueDiligence.Constants.ATTRIBUTES);
+
       //determine which product(s) are being requested
       selectedProduct := STD.Str.ToLowerCase(input[1].productRequested);
       modelName := STD.Str.ToUpperCase(TRIM(input[1].modelName));
-      
+
       IF(selectedProduct = DueDiligence.Constants.EMPTY OR selectedProduct NOT IN DueDiligence.CitDDShared.VALID_REQUESTED_PRODUCTS , FAIL(DueDiligence.CitDDShared.VALIDATION_INVALID_PRODUCT_REQUEST_TYPE));
-			
-      
+
+
       reqProduct := MAP(selectedProduct = 'attributesandcitizenship' => DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.BOTH,
-                                selectedProduct = 'citizenshiponly' => DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.CITIZENSHIP_ONLY,
-                                DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.ATTRIBUTES_ONLY);
+                        selectedProduct = 'citizenshiponly' => DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.CITIZENSHIP_ONLY,
+                        DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.ATTRIBUTES_ONLY);
                                 
                                 
       validatedRequest := CASE(reqProduct,
@@ -64,12 +62,12 @@ EXPORT DueDiligence_Service := MACRO
                                 DueDiligence.CommonQuery.ValidateRequest(input, glba, dppa, DueDiligence.Constants.ATTRIBUTES));
                               
                               
-			DueDiligence.CommonQuery.mac_FailOnError(validatedRequest(validRequest = FALSE));
-      
+      DueDiligence.CommonQuery.mac_FailOnError(validatedRequest(validRequest = FALSE));
+
       validRequest := validatedRequest(validRequest);
 
 
-      
+
       citResults := IF(reqProduct IN DueDiligence.CitDDShared.CITIZENSHIP_PRODUCTS, 
                             Citizenship.CitizenshipServiceMain(wseq, validRequest, glba, dppa, drm, dpm, modelName, intermediates, debugIndicator),
                             DATASET([], requestResponseLayout));
@@ -77,9 +75,9 @@ EXPORT DueDiligence_Service := MACRO
       ddResults := IF(reqProduct IN DueDiligence.CitDDShared.DUEDILIGENCE_PRODUCTS, 
                             DueDiligence.DueDiligenceServiceMain(wseq, validRequest), 
                             DATASET([], requestResponseLayout));
-      
-      
-      
+
+
+
       //since we only process 1 record at a time via XML
       //there could be a max of 2 records (Due Diligence + Citizenship)
       //so they would be for the same request
@@ -88,8 +86,8 @@ EXPORT DueDiligence_Service := MACRO
                                                                 SELF := LEFT;));
                                                                 
       sortProducts := SORT(allProducts, Result.UniqueID, Result.BusinessID);
-      
-      
+
+
       final := ROLLUP(sortProducts,
                       LEFT.Result.inputEcho.productRequestType = RIGHT.Result.inputEcho.productRequestType,
                       TRANSFORM(requestResponseLayout,
@@ -101,16 +99,16 @@ EXPORT DueDiligence_Service := MACRO
                                 SELF.Result.CitizenshipResults.CitizenshipScore := DueDiligence.Common.firstPopulatedString(Result.CitizenshipResults.CitizenshipScore);
                                 SELF.Result.CitizenshipResults.CitizenshipAttributes := LEFT.Result.CitizenshipResults.CitizenshipAttributes + RIGHT.Result.CitizenshipResults.CitizenshipAttributes;
                                 SELF := LEFT;));
-      
-      
-      
- 
-      
+
+
+
+
+
       IF(intermediates, output(citResults, NAMED('citResults')));
       IF(intermediates, output(ddResults, NAMED('ddResults')));
-      
-      
-      
+
+
+
       OUTPUT(final, NAMED('Results')); //This is the customer facing output    
       
 ENDMACRO;

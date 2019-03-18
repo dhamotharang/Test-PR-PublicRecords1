@@ -7,13 +7,7 @@ EXPORT CitDDShared := MODULE
   EXPORT VALIDATION_INVALID_DPPA := 'Not an allowable DPPA permissible purpose';
   EXPORT VALIDATION_INVALID_DD_ATTRIBUTE_REQUEST_WITH_CITIZENSHIP := 'Business attributes are not valid with a citizenship request';
   EXPORT VALIDATION_INVALID_PRODUCT_REQUEST_TYPE := 'Product Request Type is required or invalid. Product Request Type = AttributesOnly, CitizenshipOnly or AttributesAndCitizenship';
-  EXPORT VALIDATION_MINIMUM_INPUT_COMBO := 'Minimum input information not met. Minimum input information is: \n ' +
-                                              '(1)  First Name, Last Name, SSN  OR \n ' +
-                                              '(2)  First Name, Last Name, Street Address, City and State  OR \n ' +
-                                              '(3)  First Name, Last Name, Street Address, Zip  OR \n ' +
-                                              '(4)  LexID, First Name, Last Name, SSN  OR \n ' +
-                                              '(5)  LexID First Name, Last Name, Street Address, City and State  OR \n ' +
-                                              '(6)  LexID First Name, Last Name, Street Address, Zip';
+
   
   //we want to use the standard BS Options used in the Boca Shell.  
   EXPORT INTEGER DEFAULT_BS_VERSION := 52;
@@ -30,23 +24,7 @@ EXPORT CitDDShared := MODULE
   
 
 
-  EXPORT validateIndividual(DueDiligence.Layouts.Indv_Input individual) := FUNCTION
-      BOOLEAN IndFNamePopulated := individual.name.firstName <> DueDiligence.Constants.EMPTY OR individual.name.fullName <> DueDiligence.Constants.EMPTY;
-      BOOLEAN IndLNamePopulated := individual.name.lastName <> DueDiligence.Constants.EMPTY OR individual.name.fullName <> DueDiligence.Constants.EMPTY;
-      
-      BOOLEAN IndAddrPopulated := individual.address.streetaddress1 <> DueDiligence.Constants.EMPTY OR (individual.address.prim_range <> DueDiligence.Constants.EMPTY AND individual.address.prim_name <> DueDiligence.Constants.EMPTY);
-      BOOLEAN IndCityStatePopulated := individual.address.city <> DueDiligence.Constants.EMPTY AND individual.address.state <> DueDiligence.Constants.EMPTY;
-      BOOLEAN IndZipPopulated := individual.address.zip5 <> DueDiligence.Constants.EMPTY;
-      
-      BOOLEAN IndSSNPopulated := individual.ssn <> DueDiligence.Constants.EMPTY;      
 
-      BOOLEAN ValidIndividual := (IndFNamePopulated AND IndLNamePopulated AND
-                                  (IndSSNPopulated OR 
-                                  (IndAddrPopulated AND (IndCityStatePopulated OR IndZipPopulated))));
-                                 
-                                 
-      RETURN ValidIndividual;      
-  END;
   
   EXPORT isValidGLBA(UNSIGNED1 glbPurpose) := FUNCTION
     RETURN (glbPurpose BETWEEN 0 AND 7) OR glbPurpose = 11 OR glbPurpose = 12;
