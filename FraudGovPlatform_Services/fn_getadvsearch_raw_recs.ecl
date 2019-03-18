@@ -1,4 +1,4 @@
-﻿IMPORT FraudShared_Services, iesp, STD;
+﻿IMPORT doxie, FraudShared_Services, iesp, STD;
 
 EXPORT fn_getadvsearch_raw_recs (
 	DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_batch_in,
@@ -62,7 +62,7 @@ EXPORT fn_getadvsearch_raw_recs (
 
 	//Hitting the Fraud shared keys.. which are based on BatchIn_rec record structure. 
 	ds_valid_in 	:= FraudShared_Services.ValidateInput.BuildValidityRecs(ds_batch_in_orig);
-	EntitiesIds_ 	:= FraudShared_Services.EntitiesIds(ds_valid_in, fraud_platform, filterBy_entity_type);
+	EntitiesIds_ 	:= FraudShared_Services.EntitiesIds(ds_valid_in, fraud_platform, filterBy_entity_type,FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT);
 	
 	ds_did                  := EntitiesIds_.GetLexID();
 	ds_linkId               := EntitiesIds_.GetLinkIds();
@@ -162,7 +162,7 @@ EXPORT fn_getadvsearch_raw_recs (
 	
 	ds_ids := ds_recs_sorted[1].Recid_rec;
 	
-	ds_payload_recs := FraudShared_Services.GetPayloadRecords(ds_ids, fraud_platform);
+	ds_payload_recs := FraudGovPlatform_Services.fn_GetPayloadRecords(ds_ids, fraud_platform);
 	
 	//Applying the all AND filters based on all the Search Fields.
 	ds_recs_filtered := ds_payload_recs(if(in_rec.did <> 0, did = in_rec.did, true) AND
@@ -248,9 +248,10 @@ EXPORT fn_getadvsearch_raw_recs (
   ds_recs_pulled := FraudShared_Services.Common_Suppress(ds_recs_filtered_final);
 	
   ds_FilterThruMBS := FraudShared_Services.FilterThruMBS(ds_recs_pulled, gc_id_in, ind_type_in, product_code_in, ds_industry_types_in, ds_file_types_in, fraud_platform);
-
-  ds_allPayloadRecs := ds_FilterThruMBS;
 	
+	ds_allPayloadRecs := LIMIT(ds_FilterThruMBS,FraudGovPlatform_Services.Constants.MAX_RECS_ON_JOIN, FAIL(203, doxie.ErrorCodes(203)));
+	
+	// output(allPayloadRecs_cnt,named('allPayloadRecs_cnt'));
 	// output(ds_batch_in, named('ds_batch_in'));
 	// output(ds_auto_name, named('ds_auto_name'));
 	// output(ds_auto_address, named('ds_auto_address'));
