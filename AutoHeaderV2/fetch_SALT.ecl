@@ -10,7 +10,7 @@ EXPORT fetch_SALT (dataset (AutoHeaderV2.layouts.search) ds_search, integer sear
 	// flat layout for salt		
 	inLayout := {Insuranceheader_xLink.Layout_Person_xLink, dataset(InsuranceHeader_xLink.Process_xIDL_layouts().layout_ZIP_cases) zips, 
             string rel_fname, string rel_lname, unsigned1 saltLeadThreshold};
-	inDataOne :=  project(ds_search, 
+	inDataOne(unsigned1 stInd) :=  project(ds_search,
 				transform(inLayout, 
 			self.did := 0;
 			self.new_score := 0;			
@@ -21,7 +21,10 @@ EXPORT fetch_SALT (dataset (AutoHeaderV2.layouts.search) ds_search, integer sear
 			self.lname := left.tname.lname;
 			self.name_suffix := '';
 			self.city := IF(left.taddress.city='', left.taddress.city_other, left.taddress.city);
-			self.state := IF(left.taddress.state='', LEFT.taddress.state_prev_1, left.taddress.state);
+      self.state := MAP(stInd=0 => left.taddress.state,
+                      stInd=1 => left.taddress.state_prev_1,
+                      stInd=2 => left.taddress.state_prev_2,
+                      IF(left.taddress.state='', LEFT.taddress.state_prev_1, left.taddress.state));
 			self.prim_range := left.taddress.prim_range;
 			self.prim_name := left.taddress.prim_name;
 			self.sec_range := left.taddress.sec_range; 
@@ -36,7 +39,7 @@ EXPORT fetch_SALT (dataset (AutoHeaderV2.layouts.search) ds_search, integer sear
 					  self.weight := IF(self.zip=theZip, 100, 100-((dist/zip_radius)*80))));
 					
 			self.phone := left.tphone.phone10;
-			self.UniqueID := left.seq;
+			self.UniqueID := left.seq + stInd;
 			self.rel_fname := left.tname.fname_rel_1;
 			self.rel_lname := left.tname.lname,       
 			self.saltLeadThreshold := left.options.saltLeadThreshold, self := []));
@@ -53,28 +56,34 @@ EXPORT fetch_SALT (dataset (AutoHeaderV2.layouts.search) ds_search, integer sear
 			self.UniqueID := ds_search[1].seq;
       self.saltLeadThreshold :=  ds_search[1].options.saltLeadThreshold;
 			 self := []));
-    inDataNickname := project(inDataOne, transform(inLayout, 
+    inDataNickname(unsigned1 stInd) := project(inDataOne(stInd), transform(inLayout,
         self.fname := InsuranceHeader_xlink.fn_preferredName(left.fname),         
         self := left));
 	 // Releavant options
 	boolean isStrict := ds_search[1].options.strict_match;
 	boolean isEditDistance := ~isStrict and ds_search[1].tname.check_name_variants;
 	boolean isNickName := ~isStrict and ds_search[1].tname.nicknames;
-  boolean isFullssn  := length(trim(inDataOne[1].ssn))=9 and STD.Str.FindCount(inDataOne[1].ssn, '00000')=0;
-  boolean isCompleteAddr := inDataOne[1].prim_range<>'' and inDataOne[1].prim_name<>'' and ((inDataOne[1].city<>'' and inDataOne[1].state<>'') or inDataOne[1].zip<>'');
-  boolean isNickNameLink := isNickName and inDataOne[1].dob='0' and not isFullSsn and not isCompleteAddr;
+  boolean isFullssn  := length(trim(inDataOne(0)[1].ssn))=9 and STD.Str.FindCount(inDataOne(0)[1].ssn, '00000')=0;
+  boolean isCompleteAddr := inDataOne(0)[1].prim_range<>'' and inDataOne(0)[1].prim_name<>'' and ((inDataOne(0)[1].city<>'' and inDataOne(0)[1].state<>'') or inDataOne(0)[1].zip<>'');
+  boolean isNickNameLink := isNickName and inDataOne(0)[1].dob='0' and not isFullSsn and not isCompleteAddr;
 	boolean isPhonetic := ~isStrict and ds_search[1].tname.phonetic;
 	boolean isWildcard := search_code & AutoHeaderV2.Constants.SearchCode.ALLOW_WILDCARD;
-  
-  inData := IF(ds_search[1].tssn.fuzzy_ssn and count(ds_search[1].tssn.ssn_set) >1,  inDataSSn, 
-              inDataOne + IF(isNickNameLink, inDataNickname, dataset([],inLayout)));
-  
+  boolean isOtherSt1 := ds_search[1].taddress.state_prev_1<>'';
+  boolean isOtherSt2 := ds_search[1].taddress.state_prev_2<>'';
+  inData := DEDUP(SORT(IF(ds_search[1].tssn.fuzzy_ssn and count(ds_search[1].tssn.ssn_set) >1,  inDataSSn,
+              inDataOne(0) + IF(isNickNameLink, inDataNickname(0), dataset([],inLayout)))
+              + IF(isOtherSt1, inDataOne(1) + IF(isNickNameLink, inDataNickname(1), dataset([],inLayout))) +
+             IF(isOtherSt2, inDataOne(2) + IF(isNickNameLink, inDataNickname(2), dataset([],inLayout))), RECORD), ALL);
+  UNSIGNED2 maxId := IF(isOTherSt1 or isOTherSt2, 1000, 200); // max lexIDs returned from SALT
 	IDLExternalLinking.mac_xLinking_PS(inData, UniqueID, name_suffix , fname , mname , lname ,, 
 								 ,PRIM_NAME ,PRIM_RANGE ,SEC_RANGE ,city ,
 												 state , zips ,SSN ,DOB, PHONE,  , , 
-														rel_fname, rel_lname, saltleadthreshold, outfile);
+														rel_fname, rel_lname, saltleadthreshold, maxID, outfile1);
 				
 		// build filtering condition
+    outfile2 := IF (isOtherSt1, dedup(sort(join(outfile1(stweight>0 and reference=ds_search[1].seq), outfile1(stweight>0 and reference=ds_search[1].seq+1), left.did=right.did), did, reference), did), outfile1);
+    outfile := IF (isOtherSt2, dedup(sort(join(outfile2, outfile1(stweight>0 and reference=ds_search[1].seq+2), left.did=right.did and left.reference<>right.reference), did, reference), did), outfile2);
+    
 		result1 := IF(isEditDistance, outfile, outfile(fname_match_code <> SALT37.MatchCode.EditdistanceMatch or (ssn5weight>0 and ssn4weight>0)));
 		result2 := IF(isEditDistance, result1, result1(lname_match_code <> SALT37.MatchCode.EditdistanceMatch or (ssn5weight>0 and ssn4weight>0)));
 		
