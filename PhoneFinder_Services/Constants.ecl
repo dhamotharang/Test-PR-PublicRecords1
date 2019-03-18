@@ -24,7 +24,7 @@ MODULE
 	EXPORT UNSIGNED1 gatewayTimeout			 	 := 2;  
 	EXPORT UNSIGNED1 gatewayRetries			 	 := 0;  
 	EXPORT UNSIGNED1 NoPenalty           := 0;
-	EXPORT UNSIGNED1 LIBD_LastActivityThreshold           := 60;
+	EXPORT UNSIGNED1 LERG6_LastActivityThreshold           := 30;
 
 	// Enum for TransactionType and Phone source
 	EXPORT TransType   := ENUM(Basic = 0,Premium = 1,Ultimate = 2, PhoneRiskAssessment = 3, Blank = 255);

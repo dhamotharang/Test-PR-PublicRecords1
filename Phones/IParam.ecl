@@ -18,8 +18,7 @@ EXPORT IParam := MODULE
    export boolean 		ReturnCurrentOnly	:= false;
    export boolean 		RunDeepDive			:= false;
    export BOOLEAN 		return_current		:= true;
-   export UNSIGNED		max_lidb_age_days	:= Phones.Constants.PhoneAttributes.LastActivityThreshold; 
-   export BOOLEAN		 use_realtime_lidb	:= false;
+   export UNSIGNED		max_age_days	:= Phones.Constants.PhoneAttributes.LastActivityThreshold; 
    export DATASET(Gateway.Layouts.Config) gateways := DATASET ([], Gateway.Layouts.Config);
  END;
 
@@ -27,8 +26,7 @@ EXPORT IParam := MODULE
    		FUNCTION
      in_mod := MODULE(PROJECT(globalMod, ReportParams, opt));								
        EXPORT BOOLEAN  return_current         := report_opt.ReturnCurrent;														
-       EXPORT UNSIGNED  max_lidb_age_days     := IF(report_opt.MaxAgeDays <> 0, report_opt.MaxAgeDays, Phones.Constants.PhoneAttributes.LastActivityThreshold);				
-       EXPORT BOOLEAN  use_realtime_lidb      := report_opt.UseRealTime;			
+       EXPORT UNSIGNED  max_age_days     := IF(report_opt.MaxAgeDays <> 0, report_opt.MaxAgeDays, Phones.Constants.PhoneAttributes.LastActivityThreshold);							
        EXPORT DATASET (Gateway.Layouts.Config) gateways := Gateway.Configuration.Get();
      END;
  	 RETURN in_mod;
@@ -38,7 +36,7 @@ EXPORT IParam := MODULE
     EXPORT BOOLEAN 		return_current                 := TRUE;
     EXPORT BOOLEAN		include_temp_susp_reactivate   := FALSE;
     EXPORT UNSIGNED		max_lidb_age_days              := Phones.Constants.PhoneAttributes.LastActivityThreshold; 
-    EXPORT BOOLEAN		use_realtime_lidb              := FALSE;
+	EXPORT UNSIGNED		max_age_days              := Phones.Constants.PhoneAttributes.LastActivityThreshold;
     EXPORT DATASET(Gateway.Layouts.Config) gateways    := DATASET ([], Gateway.Layouts.Config);
   END;	
 
@@ -49,9 +47,9 @@ EXPORT IParam := MODULE
 			
 			in_mod := MODULE(PROJECT(mBaseParams, BatchParams, OPT))							
 				EXPORT BOOLEAN return_current								:= TRUE 	: STORED('return_current');									
-				EXPORT BOOLEAN include_temp_susp_reactivate	:= FALSE 	: STORED('include_temp_susp_reactivate');			
-				EXPORT UNSIGNED max_lidb_age_days						:= Phones.Constants.PhoneAttributes.LastActivityThreshold	: STORED('max_lidb_age_days');			
-				EXPORT BOOLEAN use_realtime_lidb						:= FALSE 	: STORED('use_realtime_lidb');			
+				EXPORT BOOLEAN include_temp_susp_reactivate	:= FALSE 	: STORED('include_temp_susp_reactivate');				
+				EXPORT UNSIGNED max_lidb_age_days						:= Phones.Constants.PhoneAttributes.LastActivityThreshold	: STORED('max_lidb_age_days');	
+				EXPORT UNSIGNED max_age_days					:= Phones.Constants.PhoneAttributes.LastActivityThreshold : STORED('max_age_days');	
 				EXPORT DATASET (Gateway.Layouts.Config) gateways := Gateway.Configuration.Get(); 
 			END;
 			

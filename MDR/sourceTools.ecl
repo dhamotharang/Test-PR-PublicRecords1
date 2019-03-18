@@ -333,6 +333,7 @@ MODULE
 	export src_Phones_Accudata_CNAM_CNM2 := 'PZ';
 	export src_Phones_Disconnect		 		 := 'PX';
 	export src_Phones_Gong_History_Disconnect := 'PG';
+	export src_Phones_Lerg6							 := 'L6';
 	export src_Phones_LIDB				 			 := 'PB';
 	export src_PhonesPorted_TCPA				 := 'PJ';
 	export src_PhonesPorted_iConectiv		 := 'PK';
@@ -1927,6 +1928,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_Phones_Gong_History_Disconnect := [src_Phones_Gong_History_Disconnect];
 	export set_Phones_Accudata_OCN_LNP	 := [src_Phones_Accudata_OCN_LNP	 ];
 	export set_Phones_Accudata_CNAM_CNM2 := [src_Phones_Accudata_CNAM_CNM2 ];
+	export set_Phones_Lerg6							 := [src_Phones_Lerg6							 ];
 	export set_Phones_LIDB				 			 := [src_Phones_LIDB				 			 ];
 	export set_PhonesPorted						   := [src_PhonesPorted_TCPA, src_PhonesPorted_iConectiv, src_PhonesPorted_iConectiv_Rng, src_Phones_Accudata_OCN_LNP];
 	export set_POS                       := [src_POS                       ];  			
