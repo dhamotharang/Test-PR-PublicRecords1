@@ -48,7 +48,7 @@ EXPORT Batch_ServiceFCRA () := MACRO
   nss := ut.getNonSubjectSuppression (Suppress.Constants.NonSubjectSuppression.returnRestrictedDescription);
 	
   // common batch settings, including a gateway to a remote Picklist
-	batch_params := module (project (BatchShare.IParam.getBatchParams(), WatercraftV2_Services.Interfaces.batch_params, opt))
+	batch_params := module (project (BatchShare.IParam.getBatchParamsV2(), WatercraftV2_Services.Interfaces.batch_params, opt))
     export dataset (Gateway.layouts.config) gateways := gw_config;
 		export integer1 non_subject_suppression := nss;
 		export integer8 FFDOptionsMask := inFFDOptionsMask | FFD.Constants.ConsumerOptions.SHOW_CONSUMER_STATEMENTS; // we need to override 1st bit here to make sure records with statements are flagged correctly. Dempsey Hits filtering is done separately (if needed)

@@ -71,7 +71,7 @@ EXPORT JudgmentsAndLiens_BatchService(useCannedRecs = 'false') :=
 										 PROJECT(BatchServices._Sample_inBatchMaster('JUDGEMENTSLIENS'), LiensV2_Services.Batch_Layouts.batch_in)
 									  );		
 		gm := AutoStandardI.GlobalModule();								
-		batch_params		:= BatchShare.IParam.getBatchParams();
+		batch_params		:= BatchShare.IParam.getBatchParamsV2();
 		jl_batch_params := MODULE(PROJECT(batch_params, LiensV2_Services.IParam.batch_params, OPT))
 			EXPORT UNSIGNED8 MaxResults   					:= 10000  : STORED('MaxResults');
 			EXPORT UNSIGNED8 maxResultsPerAcct 			:= 1000  : STORED('Max_Results_Per_Acct');

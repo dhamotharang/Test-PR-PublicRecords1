@@ -1,4 +1,4 @@
-﻿IMPORT Autokey_batch, AutokeyB2_batch, BatchServices, Doxie, 
+﻿IMPORT Autokey_batch, AutokeyB2_batch, BatchServices, 
        FCRA, FFD, LiensV2, LiensV2_Services, ut,
        Suppress;
        
@@ -27,7 +27,7 @@ EXPORT Batch_records(DATASET(LiensV2_Services.Batch_Layouts.batch_in) ds_batch_i
 		SET OF STRING1 party_types := configData.party_types;
 		ds_batch_in_common 	:= PROJECT(ds_batch_in, Autokey_batch.Layouts.rec_inBatchMaster);	
 		
-		boolean is_cnsmr := configData.IndustryClass = ut.IndustryClass.Knowx_IC; 		
+		boolean is_cnsmr := configData.isConsumer();
 		boolean is_restricted(boolean cnsmr, string tmsid) := cnsmr AND tmsid[1..2]='CA';	// D2C restrictions			
 																									 
 		party_key := IF(isFCRA, liensV2.key_liens_party_id_FCRA, liensV2.key_liens_party_id);
@@ -74,7 +74,7 @@ EXPORT Batch_records(DATASET(LiensV2_Services.Batch_Layouts.batch_in) ds_batch_i
 
 		// 8. Get raw records
 		ds_JL_recs_raw := LiensV2_Services.liens_raw.report_view.by_tmsid_batch(acctNos_grp,,isFCRA,,,,
-																																						configData.applicationType,
+																																						configData.application_type,
 																																						false,
 																																						ds_slim_pc, configData.FFDOptionsMask);	
 		// retrieve acctno

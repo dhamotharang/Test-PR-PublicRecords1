@@ -29,7 +29,7 @@ EXPORT Interfaces := MODULE
 		export boolean   summarize 	:= false;
 	END;
 	
-	export batch_params := INTERFACE(BatchShare.IParam.BatchParams,FCRA.iRules)
+	export batch_params := INTERFACE(BatchShare.IParam.BatchParamsV2,FCRA.iRules)
 		export integer1 non_subject_suppression := Suppress.Constants.NonSubjectSuppression.doNothing;
 		export boolean    include_non_regulated_sources := false;
 		export string1 BIPFetchLevel := BIPV2.IDconstants.Fetch_Level_SELEID;

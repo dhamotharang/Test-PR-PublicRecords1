@@ -58,7 +58,7 @@ EXPORT IParam := MODULE
 		export string32 ApplicationType := '';
 	end;
 
-	export batch_params := INTERFACE (BatchShare.IParam.BatchParams,FCRA.iRules)
+	export batch_params := INTERFACE (BatchShare.IParam.BatchParamsV2,FCRA.iRules)
 	end;
 	
 END;

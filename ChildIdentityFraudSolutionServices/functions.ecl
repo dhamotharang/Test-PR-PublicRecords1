@@ -7,7 +7,8 @@ export Functions := module
 
 //These are the common batch parameters that may be used to call other batch services. 
 shared BatchParams		:= IParam.getBatchParams();				 										 
-
+// temporarily: until we move all batches to BatchShare.IParam.BatchParamsV2
+shared mod_batchV2 := BatchShare.IParam.GetFromLegacy (BatchParams);
 
  //---------------------------------------------------------------------------------------------------------// 
 	// Death
@@ -49,7 +50,7 @@ shared BatchParams		:= IParam.getBatchParams();
 				self := [];
 			end;
 			CrimBatch := project(BatchIn, xformToCrimBatch(left));
-			CrimBatchParams := module(project(BatchParams, CriminalRecords_BatchService.IParam.batch_params, opt))	
+			CrimBatchParams := module(project(mod_batchV2, CriminalRecords_BatchService.IParam.batch_params, opt))	
 			end;
 			dsCrimPreAll := CriminalRecords_BatchService.BatchRecords(CrimBatchParams, CrimBatch); 
 			dsCrimPre := dsCrimPreAll.Records;
@@ -113,10 +114,9 @@ shared BatchParams		:= IParam.getBatchParams();
 			self.ssn		:=	left.ssn,
 			self				:=  []  )); 
 
-		IndustryClass := ut.IndustryClass.Get();
 		dsBestPre := DidVille.did_service_common_function(batchBest,'BEST_ALL','BEST_ALL','',false,, ,
-                                                 , , , , , BatchParams.GlbPurpose,BatchParams.IncludeMinors , , ,'',
-																								 IndustryClass_val := IndustryClass); 
+                                                 , , , , , mod_batchV2.glb,mod_batchV2.show_minors , , ,'',
+																								 IndustryClass_val := mod_batchV2.industry_class); 
 																								 	
 		dsBest	:= dsBestPre(score >= CONSTANTS.ScoreThreshold );	
 
@@ -208,7 +208,7 @@ shared BatchParams		:= IParam.getBatchParams();
 	end;
 //---------------------------------------------------------------------------------------------------------//		
 	export getLJ(dataset(Layouts.BatchIn) BatchIn) := function
-		LJBatchParams := module(project(BatchParams, LiensV2_Services.IParam.batch_params,opt))
+		LJBatchParams := module(project(mod_batchV2, LiensV2_Services.IParam.batch_params,opt))
 			export BOOLEAN no_did_append		:= FALSE ;
 			export party_types 							:= ['A','C','D',''];
 			export BOOLEAN MatchSSN					:= true;
@@ -248,7 +248,7 @@ shared BatchParams		:= IParam.getBatchParams();
 																							self.acctno := left.acctno,
 																							self.ssn := left.ssn,
 																							self := [] ));
-		 SOF_BatchParams := module(project(BatchParams,SexOffender_Services.IParam.batch_params, opt))
+		 SOF_BatchParams := module(project(mod_batchV2,SexOffender_Services.IParam.batch_params, opt))
 		 end;
 		
 		 dsSOF := SexOffender_Services.batch_records(SOF_BatchParams,SOF_BatchIn);
@@ -358,7 +358,7 @@ export getWC(dataset(Layouts.BatchIn) BatchIn) := function
 																							  self.acctno := left.acctno,
 																								self.ssn := left.ssn,
 																								self:=[]));
-		WCBatchParams := module(project(BatchParams, WatercraftV2_Services.Interfaces.batch_params,opt))
+		WCBatchParams := module(project(mod_batchV2, WatercraftV2_Services.Interfaces.batch_params,opt))
 		export boolean 		ReturnCurrentOnly := false; 
 		end;
 		dsWCNotFlat :=	WatercraftV2_Services.BatchRecords(WCBatchParams,WCBatchIn);

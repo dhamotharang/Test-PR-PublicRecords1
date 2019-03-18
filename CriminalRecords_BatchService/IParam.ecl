@@ -2,7 +2,7 @@ IMPORT BatchShare, FCRA;
 
 EXPORT IParam := MODULE
 
-	EXPORT batch_params := interface (BatchShare.IParam.BatchParams, FCRA.iRules)
+	EXPORT batch_params := interface (BatchShare.IParam.BatchParamsV2, FCRA.iRules)
 		// PII Preferential matching:
 		EXPORT BOOLEAN MatchName     			:= FALSE;
 		EXPORT BOOLEAN MatchStrAddr  			:= FALSE;     
@@ -65,7 +65,7 @@ EXPORT IParam := MODULE
   // Function to initalize the batch params
 	EXPORT getBatchParams() :=	FUNCTION
 	
-	  BatchShareParams := BatchShare.IParam.getBatchParams();
+	  BatchShareParams := BatchShare.IParam.getBatchParamsV2();
 			
 		param_mod := MODULE(PROJECT(BatchShareParams,batch_params,OPT))
       EXPORT UNSIGNED2 MaxResults_val       := 50    : STORED('MaxResults');

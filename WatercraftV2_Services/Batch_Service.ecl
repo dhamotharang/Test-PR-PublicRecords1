@@ -22,7 +22,7 @@ EXPORT Batch_Service(useCannedRecs = false) := MACRO
 	
 	string1 sBIPFetchLevel := BIPV2.IDconstants.Fetch_Level_SELEID	 : STORED('BIPFetchLevel');
 	
-	batch_params		:= BatchShare.IParam.getBatchParams();
+	batch_params		:= BatchShare.IParam.getBatchParamsV2();
 	wk_batch_params := module(project(batch_params, WatercraftV2_Services.Interfaces.batch_params, opt))	
 			export boolean include_non_regulated_sources := false : STORED('IncludeNonRegulatedWatercraftSources');
 			export string1 BIPFetchLevel := STD.Str.touppercase(sBIPFetchLevel);

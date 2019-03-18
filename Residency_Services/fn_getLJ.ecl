@@ -3,8 +3,7 @@ IMPORT doxie, LiensV2_Services, Residency_Services, STD, ut, BatchShare;
 EXPORT fn_getLJ(DATASET(doxie.layout_references_acctno) ds_in_acctnos_dids, 
                 Residency_Services.IParam.BatchParams mod_params_in) := FUNCTION
 
-		mod_batch := BatchShare.IParam.ConvertToLegacy(mod_params_in);
-		LJBatchParams := MODULE(PROJECT(mod_batch, LiensV2_Services.IParam.batch_params,OPT))
+		LJBatchParams := MODULE(PROJECT(mod_params_in, LiensV2_Services.IParam.batch_params,OPT))
 			EXPORT BOOLEAN no_did_append := FALSE ;
 			EXPORT party_types 					 := ['D'];
 		END;	
