@@ -2,10 +2,10 @@
 EXPORT Build_Input_KnownFraud(
 	 string pversion
 	,dataset(FraudShared.Layouts.Input.mbs) MBS_Sprayed = FraudShared.Files().Input.MBS.sprayed
-	,dataset(Layouts.OutputF.SkipModules) pSkipModules = FraudGovPlatform.Files().OutputF.SkipModules
+	,dataset(Layouts.Flags.SkipModules) pSkipModules = FraudGovPlatform.Files().Flags.SkipModules
 	,dataset(Layouts.Input.KnownFraud) KnownFraud_Sprayed =  files().Input.KnownFraud.sprayed	
 	,dataset(Layouts.Input.KnownFraud) ByPassed_KnownFraud_Sprayed = files().Input.ByPassed_KnownFraud.sprayed	
-	,boolean PSkipValidations = true
+	,dataset(Layouts.Flags.SkipValidationByGCID) PSkipValidations = files().Flags.SkipValidationByGCID
 ) :=
 module
 
@@ -60,8 +60,21 @@ module
 
 	shared f1:=project(inKnownFraudUpdateUpper, tr(left, counter));
 	
+	shared EnforceValidations 
+		:= join(	  f1
+					, PSkipValidations
+					, left.Customer_Account_Number = right.gc_id
+					, TRANSFORM(Layouts.Input.KnownFraud,SELF := LEFT),LEFT ONLY, LOOKUP);
 
-	f1_errors:=f1
+	shared SkipValidations 
+		:= join(	  f1
+					, PSkipValidations
+					, left.Customer_Account_Number = right.gc_id
+					, TRANSFORM(FraudGovPlatform.Layouts.Input.KnownFraud,SELF := LEFT), INNER, LOOKUP);	
+
+	shared valid_records := EnforceValidations + SkipValidations;
+
+	shared f1_errors:=EnforceValidations
 		((	 
 				Customer_Account_Number =''
 			or	Customer_County =''
@@ -71,9 +84,9 @@ module
 			or 	(Customer_State in FraudGovPlatform_Validation.Mod_Sets.States) = FALSE
 			or 	(Customer_Agency_Vertical_Type in FraudGovPlatform_Validation.Mod_Sets.Agency_Vertical_Type) = FALSE
 			or 	(Customer_Program in FraudGovPlatform_Validation.Mod_Sets.IES_Benefit_Type) = FALSE
-		)and PSkipValidations = false and source_input = 'KNFD' );
+		) and source_input = 'KNFD' );
 			
-	NotInMbs := join(	f1,
+	NotInMbs := join(	valid_records,
 					MBS_Sprayed(status = 1),
 					left.Customer_Account_Number =(string)right.gc_id
 					AND left.file_type = right.file_type
@@ -103,7 +116,7 @@ module
 
 
 	//Move only Valid Records
-	shared f1_dedup :=	join (	f1,
+	shared f1_dedup :=	join (	valid_records,
 							ByPassed_records,
 							left.Customer_Account_Number = right.Customer_Account_Number and
 							left.Unique_Id = right.Unique_Id,

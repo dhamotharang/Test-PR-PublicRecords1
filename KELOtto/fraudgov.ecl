@@ -23,7 +23,8 @@ fraudgov_dataset_base := PROJECT(fraudgov_dataset_base_prep,
                          UNSIGNED8 OttoSSNId,
                          UNSIGNED8 OttoBankAccountId,
                          UNSIGNED8 OttoBankAccountId2,
-                         UNSIGNED8 OttoDriversLicenseId},
+                         UNSIGNED8 OttoDriversLicenseId,
+                         UNSIGNED2 Confidence_that_activity_was_deceitful_id},
                        SELF.bank_account_number_1 := TRIM(LEFT.bank_account_number_1, LEFT, RIGHT),
                        SELF.bank_account_number_2 := TRIM(LEFT.bank_account_number_2, LEFT, RIGHT),
                        SELF.SsnFormatted := LEFT.ssn[1..3] + '-' + LEFT.ssn[4..5] + '-' + LEFT.ssn[6..9], 
@@ -36,6 +37,7 @@ fraudgov_dataset_base := PROJECT(fraudgov_dataset_base_prep,
                        SELF.OttoBankAccountId := HASH32(TRIM(LEFT.bank_routing_number_1, LEFT, RIGHT) + '|' + TRIM(LEFT.bank_account_number_1, LEFT, RIGHT)),
                        SELF.OttoBankAccountId2 := HASH32(TRIM(LEFT.bank_routing_number_2, LEFT, RIGHT) + '|' + TRIM(LEFT.bank_account_number_2, LEFT, RIGHT)),
                        SELF.OttoDriversLicenseId := HASH32(LEFT.drivers_license),
+                       SELF.Confidence_that_activity_was_deceitful_id := LEFT.classification_Activity.Confidence_that_activity_was_deceitful_id,
                        // fake bank account and dl risk stuff for testing JP
                        /*
                        SELF.event_type_1 := MAP(LEFT.bank_account_number_1 != '' => CHOOSE((HASH32(LEFT.record_id) % 8)+1, '203','291','202','204','292','200','201','293'), ''),
@@ -46,10 +48,13 @@ fraudgov_dataset_base := PROJECT(fraudgov_dataset_base_prep,
 
 // trim the data down for R&D speed.
 
-Set_did:=[1488418290,8389852385,1921409109,2435345412,1834342568,1589581232];
+Set_record_id:=[59386231,59812325,78505368,82750428,13496281,64149144,74043112,36862566,27306783,16682315,24115489,64277425,54716128,39415142,74043117,46852676,64700532,16682317,30490796,6310390,12222565,79991118,61730801,18596980,1810079,8817473,73619491,24755656,24967707,3722291,69378543,55354691,83175873,31128598,37075118,67675944,29643810,68953831];
+
+Set_did:=[002629302069,001031210303,000076333661,000963314432,000802723589,002125424642,002125424642,002125424642,000961280782,000025768453,001448074974,000191818949,002178624198,000198045101,013977886612,002516994105,002516994105,001611240365,000684209386,000562804374,000562804374,002745971775];
+
 
 // filter out spurious transactions in the future.
-fraudgov_dataset := fraudgov_dataset_base((UNSIGNED)event_date <= Std.Date.Today() and (did % 100000 in [0] OR did = 899999999550 or ssn = '294287743' or event_type_1 = '10000' or bank_account_number_1 != '' or drivers_license != '' or did in set_did));
+fraudgov_dataset := fraudgov_dataset_base((UNSIGNED)event_date <= Std.Date.Today());// and  (record_id in Set_record_id OR did % 100 in [0] OR did = 899999999550 or ssn = '294287743' or event_type_1 = '10000' or bank_account_number_1 != '' or drivers_license != '' or did in set_did OR classification_Activity.Confidence_that_activity_was_deceitful_id = 3));
 
 final := DISTRIBUTE(fraudgov_dataset);
 

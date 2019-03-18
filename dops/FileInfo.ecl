@@ -1,4 +1,4 @@
-import STD;
+﻿import STD,ut;
 
 export FileInfo(string filename
 									,string esp // roxie or thor ONLY IP for example 10.242.31.11
@@ -19,6 +19,7 @@ export FileInfo(string filename
 												,rDFUInfoRequest
 												,dataset(rDFUInfoResponse)											
 												,xpath('DFUInfoResponse')
+												,HTTPHEADER('Authorization', 'Basic ' + ut.Credentials().fGetEncodedValues())
 										 );
 
 		return dDFUInfo;
@@ -72,6 +73,7 @@ export FileInfo(string filename
 												,rDFUSearchDataRequest
 												,dataset(rDFUSearchDataResponse)
 												,xpath('DFUSearchDataResponse')
+												,HTTPHEADER('Authorization', 'Basic ' + ut.Credentials().fGetEncodedValues())
 										 );
 
 		return dDFUSearchData;

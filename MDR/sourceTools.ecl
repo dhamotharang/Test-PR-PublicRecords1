@@ -56,6 +56,7 @@ MODULE
 	export src_Bankruptcy_Trustee        := 'BT';
 	export src_BBB_Member                := 'BM';  // Better Business Bureau members
 	export src_BBB_Non_Member            := 'BN';  // Better Business Bureau non-members
+	export src_BrightVerify_email				 :=	'BV';		//BrightVerify email deltabase
 	export src_Business_Credit					 := 'BC';  // SBFE Business Credit
 	export src_Business_Registration     := 'BR';
 	export src_Calbus										 := 'C#';  // California business locator/CA sales & use tax permit holders
@@ -129,6 +130,7 @@ MODULE
 	export src_Cortera_Tradeline         := '7K';
 	export src_CrashCarrier							 := 'KC';  // aka US DOT "Safer Census" data for BIP
 	export src_infutor_narc3             := 'KP';  // infutor_narc3 consumer
+	export src_fed_crim                  := 'VM';  // federal Criminal
 	export src_Credit_Unions             := 'CU';
 	export src_Datagence								 := 'DG';
 	export src_DCA                       := 'DF';  // Directory of Corporate Affiliations; aka LNCA
@@ -733,8 +735,9 @@ MODULE
 		 src_Divorce	,src_Marriage
 	];
 
+    //DF-24277 - Remove source "NC" from DMV restricted sources
 	export set_DMV_restricted             := [
-		 src_CT_DL ,src_FL_DL ,src_LA_DL ,src_MI_DL ,src_MO_DL ,src_OH_DL ,src_TX_DL ,src_WV_DL ,src_NC_DL , src_SC_Experian_DL
+		 src_CT_DL ,src_FL_DL ,src_LA_DL ,src_MI_DL ,src_MO_DL ,src_OH_DL ,src_TX_DL ,src_WV_DL ,/*src_NC_DL , */src_SC_Experian_DL   
 		,src_FL_Veh ,src_MO_Veh ,src_OH_Veh ,src_TX_Veh ,src_SC_Experian_Veh //, src_WV_Veh
 	];
 
@@ -1065,7 +1068,7 @@ MODULE
 		,src_MediaOne									 ,src_OSHAIR										,src_PBSA											 ,src_SalesChannel
 		,src_CA_Sales_Tax							 ,src_IA_Sales_Tax							,src_TXBUS										 ,src_UCCV2
 		,src_UCCV2_WA_Hist						 ,src_Vickers										,src_Workers_Compensation			 ,src_OR_Worker_Comp
-		,src_ZOOM
+		,src_ZOOM                      ,src_TUCS_Ptrack
 	]; 
 
 export set_Marketing_Restricted := [
@@ -1550,6 +1553,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_Bankruptcy_Trustee        := [src_Bankruptcy_Trustee        ];
 	export set_BBB_Member                := [src_BBB_Member                ];
 	export set_BBB_Non_Member            := [src_BBB_Non_Member            ];
+	export set_BrightVerify_email				 := [src_BrightVerify_email				 ];
 	export set_Business_Credit			     := [src_Business_Credit           ];
 	export set_Business_Registration     := [src_Business_Registration     ];
 	export set_Calbus                    := [src_Calbus	       	           ];
@@ -1622,6 +1626,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_WY_Corporations           := [src_WY_Corporations           ];
 	export set_CrashCarrier              := [src_CrashCarrier              ];	
 	export set_infutor_narc3             := [src_infutor_narc3             ];
+	export set_fed_crim                  := [src_fed_crim                  ];
 	export set_Credit_Unions             := [src_Credit_Unions             ];
 	export set_Datagence                 := [src_Datagence                 ];
 	export set_DCA                       := [src_DCA                       ];
@@ -2064,6 +2069,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsBBB                        (string  sr) := sr               in set_BBB                        ;
 	export SourceIsBBB_Member                 (string  sr) := sr               in set_BBB_Member                 ;
 	export SourceIsBBB_Non_Member             (string  sr) := sr               in set_BBB_Non_Member             ;
+	export SourceIsBrightVerify_email					(string	 sr) := sr							 in set_BrightVerify_email				 ;
 	export SourceIsBusinessHeader             (string  sr) := sr               in set_business_header            ;
 	export SourceIsBusiness_contacts          (string  sr) := sr               in set_Business_contacts          ;
 	export SourceIsBusiness_Credit            (string  sr) := sr               in set_Business_Credit            ;
@@ -2292,6 +2298,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsInfutorCID                 (string  sr) := sr               in set_InfutorCID 								 ;
 	export SourceIsInfutorNARC                (string  sr) := sr               in set_InfutorNarc								 ;
   export SourceIsInfutorNARC3               (string  sr) := sr               in set_infutor_narc3              ;
+	export SourceIsFedcrim                    (string  sr) := sr               in set_fed_crim                   ;
 	export SourceIsInfutorNARE								(string	 sr) := sr							 in set_InfutorNare                ;
 	export SourceIsIngenix_Sanctions          (string  sr) := sr               in set_Ingenix_Sanctions          ;
 	export SourceIsInquiryAcclogs             (string  sr) := sr               in set_InquiryAcclogs             ;
@@ -2604,6 +2611,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_Bankruptcy_Trustee        ,'Bankruptcy Trustees'                                       }
 		,{src_BBB_Member                ,'Better Business Bureau Member'                             }
 		,{src_BBB_Non_Member            ,'Better Business Bureau Non-Member'                         }
+		,{src_BrightVerify_email				,'BrightVerify Email Deltabase'															 }
 		,{src_Business_Credit           ,'Business Credit (SBFE)'                                    }
 		,{src_Business_Registration     ,'Business Registration'                                     }
 		,{src_Calbus	 				          ,'California Sales & Use Tax Businesses'                     }	
@@ -2816,6 +2824,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	  ,{src_InfutorTRK	 							,'Infutor TRK - Name and Address Resource'                   }		
 		,{src_InfutorNarc	 							,'Infutor Narc  - Consumer Name and Address Resource'        }
 		,{src_infutor_narc3             ,'Infutor Narc3 Consumer'                                    }
+		,{src_fed_crim                  ,'Federal Criminal'                                          }
 		,{src_InfutorNare								,'Infutor Nare	- Consumer Name and Email Resource'					 }
 		,{src_Ingenix_Sanctions         ,'Ingenix National Provider Sanctions'                       }
 		,{src_InquiryAcclogs            ,'Inquiry Tracking Account Logs'                             }
@@ -3116,7 +3125,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_Bankruptcy_Attorney       => 'Bankruptcy Attorneys'                                 
 		,src_Bankruptcy_Trustee        => 'Bankruptcy Trustees'                                  
 		,src_BBB_Member                => 'Better Business Bureau Member'                        
-		,src_BBB_Non_Member            => 'Better Business Bureau Non-Member'                    
+		,src_BBB_Non_Member            => 'Better Business Bureau Non-Member' 
+		,src_BrightVerify_email				 => 'BrightVerify Email Deltabase'
 		,src_Business_Credit           => 'Business Credit (SBFE)'
 		,src_Business_Registration     => 'Business Registration'                                
 		,src_Calbus	 				           => 'California Sales & Use Tax Businesses'                
@@ -3329,6 +3339,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_InfutorTRK	 							 => 'Infutor TRK - Name and Address Resource'              
 		,src_InfutorNarc	 						 => 'Infutor  Narc - Consumer Name and Address Resource'
 		,src_infutor_narc3             => 'Infutor Narc3 Consumer'
+		,src_fed_crim                  => 'Federal Criminal'
 		,src_InfutorNare							 => 'Infutor Nare - Consumer Name and Email Resource'
 		,src_Ingenix_Sanctions         => 'Ingenix National Provider Sanctions'                  
 		,src_InquiryAcclogs            => 'Inquiry Tracking Account Logs'                        

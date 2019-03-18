@@ -1107,6 +1107,11 @@
 		export string KEYWORD_DKFSAPEP							:= '795';
 		export string KEYWORD_RUFTS_GA							:= '796';
 		export string KEYWORD_MINEFI_TB							:= '797';
+		export string KEYWORD_LIFMA									:= '798';
+		export string KEYWORD_ZANTRS								:= '799';
+		export string KEYWORD_USDA									:= '800';
+		export string KEYWORD_TRL_WC								:= '801';
+		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
 	

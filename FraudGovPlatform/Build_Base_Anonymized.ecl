@@ -7,7 +7,7 @@ module
 
 	nodes := thorlib.nodes();	
 
-	Sources_To_Anonymize := Files().Input.SourcesToAnonymize.Sprayed;
+	Sources_To_Anonymize := Files().Flags.SourcesToAnonymize;
 
 	empty := dataset([], FraudShared.Layouts.Base.Main);
 
@@ -27,7 +27,7 @@ module
 	anonymize_Only_Anonimized_Sources 
 		:= join (	anonymize_Records_Never_Anonymized_Before,
 					Sources_To_Anonymize,
-					(unsigned2)left.classification_Permissible_use_access.fdn_file_info_id = (unsigned2)right.fdn_file_info_id,
+					(unsigned2)left.classification_Permissible_use_access.fdn_file_info_id = (unsigned2)right.fdn_file_info_id, 
 					transform(FraudShared.Layouts.Base.Main, self := left;),
 					inner,
 					LOOKUP);

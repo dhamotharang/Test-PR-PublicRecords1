@@ -1209,6 +1209,11 @@
 				trim(kword, left, right) = 'DKFSAPEP' =>SubGroup_Constants.numKeywordsID.KEYWORD_DKFSAPEP,
 				trim(kword, left, right) = 'RUFTS-GA' =>SubGroup_Constants.numKeywordsID.KEYWORD_RUFTS_GA,
 				trim(kword, left, right) = 'MINEFI-TB' =>SubGroup_Constants.numKeywordsID.KEYWORD_MINEFI_TB,
+				trim(kword, left, right) = 'LIFMA' =>SubGroup_Constants.numKeywordsID.KEYWORD_LIFMA,
+				trim(kword, left, right) = 'ZANTRS' =>SubGroup_Constants.numKeywordsID.KEYWORD_ZANTRS,
+				trim(kword, left, right) = 'USDA' =>SubGroup_Constants.numKeywordsID.KEYWORD_USDA,
+				trim(kword, left, right) = 'TRL-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_TRL_WC,
+				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);

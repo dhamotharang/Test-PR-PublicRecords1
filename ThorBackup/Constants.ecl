@@ -44,7 +44,7 @@ EXPORT Constants := module
 	
 	export deletethresholdsize := 100000000000;
 
-	export adminemailsfordeletion := 'joseph.lezcano@lexisnexis.com, valerie.minnis@lexisnexis.com, tamika.edman@lexisnexis.com, Anantha.Venkatachalam@lexisnexis.com, Charlene.Ros@lexisnexis.com';
+	export adminemailsfordeletion := 'joseph.lezcano@lexisnexis.com, valerie.minnis@lexisnexis.com, Anantha.Venkatachalam@lexisnexis.com, Charlene.Ros@lexisnexis.com';
 
 	export allowedclusters(string environment) := module
 		export clusterset := if (dops.constants.ThorEnvironment = 'prod'
