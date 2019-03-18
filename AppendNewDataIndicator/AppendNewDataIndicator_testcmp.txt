@@ -1,0 +1,88 @@
+ID "344fe624-4e07-4f95-8371-798bc6894f4a";
+NAME AppendNewDataIndicator_testcmp;
+LABEL "Append New Data Indicator";
+AUTHOR "CarmigJX";
+VERSION "1.0.0";
+DESCRIPTION "Append flag indicating whether the record was in the previous run or not.";
+PERMISSIONS
+VIEW:PRIVATE;
+EDIT:PRIVATE;
+RUN:PRIVATE;
+END
+
+INPUTS
+	STRING CompareWUID: DEFAULT("W20180906-122402");
+END
+INSTANCE HIPIE_Plugins.UseDataset.UseDataset(Ins001)
+	LogicalFilename="~qa::appendnewdataindicator::appendnewdataindicator::input"
+	Method="THOR"
+	Structure="record
+  string treeuid;
+  string entitycontextuid;
+  unsigned1 entitytype;
+  string entitylabel;
+  string entitytooltip;
+  string entitycolor;
+  string entityicon;
+  unsigned8 entityweight;
+  real8 entitylatitude;
+  real8 entitylongitude;
+  integer1 entityflag1;
+  integer1 entityflag2;
+  integer1 entityflag3;
+  integer1 entityflag4;
+  integer1 entityflag5;
+  integer1 entityflag6;
+  integer1 entityflag7;
+  integer1 entityflag8;
+  integer1 entityflag9;
+  integer1 entityflag10;
+  unsigned4 childcount;
+end;"
+END
+INSTANCE HIPIE_Plugins.UseDataset.UseDataset(Ins002)
+	LogicalFilename="~qa::appendnewdataindicator::appendnewdataindicator::inputcompare"
+	Method="THOR"
+	Structure="record
+  string treeuid;
+  string entitycontextuid;
+  unsigned1 entitytype;
+  string entitylabel;
+  string entitytooltip;
+  string entitycolor;
+  string entityicon;
+  unsigned8 entityweight;
+  real8 entitylatitude;
+  real8 entitylongitude; 
+  integer1 entityflag1;
+  integer1 entityflag2;
+  integer1 entityflag3;
+  integer1 entityflag4;
+  integer1 entityflag5;
+  integer1 entityflag6;
+  integer1 entityflag7;
+  integer1 entityflag8;
+  integer1 entityflag9;
+  integer1 entityflag10;
+  unsigned4 childcount;
+end;"
+END
+INSTANCE HIPIE_Plugins.AppendNewDataIndicator.AppendNewDataIndicator(Ins003)
+	Prefix="Graph"
+	dsOldRun="^Ins001|dsOutput"
+	JoinFields1="treeuid","entitycontextuid"
+	dsNewRun="^Ins002|dsOutput"
+	JoinFields2="treeuid","entitycontextuid"
+END
+INSTANCE HIPIE_Plugins.AppendNewDataIndicator.AppendNewDataIndicator(Ins004)
+	Prefix="Test"
+	dsOldRun="^Ins001|dsOutput"
+	JoinFields1="treeuid","entitycontextuid"
+	dsNewRun="^Ins003|dsOutput"
+	JoinFields2="treeuid","entitycontextuid"
+END
+INSTANCE HIPIE_Plugins.OutDataset.OutDataset(Ins005)
+	dsInput="^Ins004|dsOutput"
+	name="~qa::appendnewdataindicator::appendnewdataindicator::output"
+	Method="THOR"
+END
