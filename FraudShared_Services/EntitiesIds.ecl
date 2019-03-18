@@ -3,7 +3,8 @@
 EXPORT EntitiesIds(
   DATASET(FraudShared_Services.Layouts.BatchIn_Valid_rec) ds_valid_in,
   string fraud_platform,
-  boolean filterBy_entity_type
+  boolean filterBy_entity_type,
+	unsigned join_limit = FraudShared_Services.Constants.MAX_RECS_ON_JOIN
 ) := MODULE
 
   EXPORT GetLexID() := FUNCTION
@@ -17,7 +18,7 @@ EXPORT EntitiesIds(
         SELF := RIGHT,
         SELF := LEFT,
         SELF := []),
-      LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
+      LIMIT(join_limit, SKIP));
 
     // OUTPUT(results, 'EntityIds_GetLexID');
     RETURN results;
@@ -34,7 +35,7 @@ EXPORT EntitiesIds(
         SELF := RIGHT,
         SELF := LEFT,
         SELF := []),
-      LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
+      LIMIT(join_limit, SKIP));
 
     // OUTPUT(results, 'EntityIds_GetIP');
     RETURN results;
@@ -53,7 +54,7 @@ EXPORT EntitiesIds(
         SELF := RIGHT,
         SELF := LEFT,
         SELF := []),
-      LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
+      LIMIT(join_limit, SKIP));
 
     // OUTPUT(results, 'EntityIds_GetLinkIds');
     RETURN results;
@@ -70,7 +71,7 @@ EXPORT EntitiesIds(
         SELF := RIGHT,
         SELF := LEFT,
         SELF := []),
-      LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
+      LIMIT(join_limit, SKIP));
 
     // OUTPUT(results, 'EntityIds_GetDeviceID');
     RETURN results;
@@ -87,7 +88,7 @@ EXPORT EntitiesIds(
         SELF := RIGHT,
         SELF := LEFT,
         SELF := []),
-      LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
+      LIMIT(join_limit, SKIP));
 
     // OUTPUT(results, 'EntityIds_GetProfessionalID');
     RETURN results;
@@ -104,7 +105,7 @@ EXPORT EntitiesIds(
         SELF := RIGHT,
         SELF := LEFT,
         SELF := []),
-      LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
+      LIMIT(join_limit, SKIP));
 
     // OUTPUT(results, 'EntityIds_GetTIN');
     RETURN results;
@@ -121,7 +122,7 @@ EXPORT EntitiesIds(
         SELF := RIGHT,
         SELF := LEFT,
         SELF := []),
-      LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
+      LIMIT(join_limit, SKIP));
 
     // OUTPUT(results, 'EntityIds_GetAppendedProviderID');
     RETURN results;
@@ -138,7 +139,7 @@ EXPORT EntitiesIds(
         SELF := RIGHT,
         SELF := LEFT,
         SELF := []),
-      LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
+      LIMIT(join_limit, SKIP));
 
     // OUTPUT(results, 'EntityIds_GetNPI');
     RETURN results;
@@ -155,7 +156,7 @@ EXPORT EntitiesIds(
         SELF := RIGHT,
         SELF := LEFT,
         SELF := []),
-      LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
+      LIMIT(join_limit, SKIP));
 
     // OUTPUT(results, 'EntityIds_GetLNPID');
     RETURN results;
@@ -172,7 +173,7 @@ EXPORT EntitiesIds(
         SELF := RIGHT,
         SELF := LEFT,
         SELF := []),
-      LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
+      LIMIT(join_limit, SKIP));
 
     // OUTPUT(results, 'EntityIds_GetEmail');
     RETURN results;
@@ -189,7 +190,7 @@ EXPORT EntitiesIds(
         SELF := RIGHT,
         SELF := LEFT,
         SELF := []),
-      LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
+      LIMIT(join_limit, SKIP));
 
     // OUTPUT(results, 'EntityIds_BankAccountNumber');
     RETURN results;
@@ -206,7 +207,7 @@ EXPORT EntitiesIds(
 				SELF := RIGHT,
 				SELF := LEFT,
 				SELF := []), 
-			LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
+			LIMIT(join_limit, SKIP));
 		
 		// OUTPUT(results, named('results'));
 		RETURN results;

@@ -21,7 +21,7 @@ EXPORT Search_EntitiesIDs(DATASET(FraudShared_Services.Layouts.BatchInExtended_r
 																	SELF := RIGHT,
 																	SELF := LEFT,
 																	SELF := []),
-																LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP)),
+																LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP)),
 												dataset([], FraudShared_Services.Layouts.Recid_rec));
 		RETURN ds_householdid;
 	END;	
@@ -37,7 +37,7 @@ EXPORT Search_EntitiesIDs(DATASET(FraudShared_Services.Layouts.BatchInExtended_r
 																		SELF := RIGHT,
 																		SELF := LEFT,
 																		SELF := []),
-																	LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP)),
+																	LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP)),
 														dataset([], FraudShared_Services.Layouts.Recid_rec));												
 		RETURN ds_CustomerPersonId;
 	END;
@@ -52,7 +52,7 @@ EXPORT Search_EntitiesIDs(DATASET(FraudShared_Services.Layouts.BatchInExtended_r
 																		SELF := RIGHT,
 																		SELF := LEFT,
 																		SELF := []),
-																LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
+																LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
 
 		ds_Amount_maxonly := JOIN(ds_batch_in, FraudShared.Key_AmountPaid(fraud_platform),
 																	KEYED(LEFT.AmountMax >= RIGHT.Amount_Paid),
@@ -63,7 +63,7 @@ EXPORT Search_EntitiesIDs(DATASET(FraudShared_Services.Layouts.BatchInExtended_r
 																		SELF := RIGHT,
 																		SELF := LEFT,
 																		SELF := []),
-																	LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
+																	LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
 											
 		ds_Amount_both := JOIN(ds_batch_in, FraudShared.Key_AmountPaid(fraud_platform),
 															KEYED(LEFT.AmountMin <= RIGHT.Amount_Paid) AND 
@@ -75,7 +75,7 @@ EXPORT Search_EntitiesIDs(DATASET(FraudShared_Services.Layouts.BatchInExtended_r
 																SELF := RIGHT,
 																SELF := LEFT,
 																SELF := []),
-															LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
+															LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
 		
 		ds_AmountRangeIds := MAP(validInput(in_rec.AmountMin) AND NOT validInput(in_rec.AmountMax) => ds_Amount_minOnly,
 														 NOT validInput(in_rec.AmountMin) AND validInput(in_rec.AmountMax) => ds_Amount_maxonly,
@@ -95,7 +95,7 @@ EXPORT Search_EntitiesIDs(DATASET(FraudShared_Services.Layouts.BatchInExtended_r
 																SELF := RIGHT,
 																SELF := LEFT,
 																SELF := []),
-															LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP)),
+															LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP)),
 												dataset([], FraudShared_Services.Layouts.Recid_rec));
 		RETURN ds_BankName;
 	END;
@@ -111,7 +111,7 @@ EXPORT Search_EntitiesIDs(DATASET(FraudShared_Services.Layouts.BatchInExtended_r
 																		SELF := RIGHT,
 																		SELF := LEFT,
 																		SELF := []),
-																	LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP)),
+																	LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP)),
 														dataset([], FraudShared_Services.Layouts.Recid_rec));
 		RETURN ds_BankRoutingIds;
 	END;
@@ -127,7 +127,7 @@ EXPORT Search_EntitiesIDs(DATASET(FraudShared_Services.Layouts.BatchInExtended_r
 																		SELF := RIGHT,
 																		SELF := LEFT,
 																		SELF := []),
-																	LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP)),
+																	LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP)),
 														dataset([], FraudShared_Services.Layouts.Recid_rec));
 		RETURN ds_ReportedDate;
 	END;
@@ -143,7 +143,7 @@ EXPORT Search_EntitiesIDs(DATASET(FraudShared_Services.Layouts.BatchInExtended_r
 															SELF := RIGHT,
 															SELF := LEFT,
 															SELF := []),
-														LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP)),
+														LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP)),
 											dataset([], FraudShared_Services.Layouts.Recid_rec));
 		RETURN ds_ISPName;
 	END;
@@ -159,7 +159,7 @@ EXPORT Search_EntitiesIDs(DATASET(FraudShared_Services.Layouts.BatchInExtended_r
 																SELF := RIGHT,
 																SELF := LEFT,
 																SELF := []),
-															LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP)),
+															LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP)),
 												dataset([], FraudShared_Services.Layouts.Recid_rec));
 		RETURN ds_MACAddress;
 	END;
@@ -175,7 +175,7 @@ EXPORT Search_EntitiesIDs(DATASET(FraudShared_Services.Layouts.BatchInExtended_r
 																	SELF := RIGHT,
 																	SELF := LEFT,
 																	SELF := []),
-																LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP)),
+																LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP)),
 													dataset([], FraudShared_Services.Layouts.Recid_rec));
 		RETURN ds_SerialNumber;
 	END;	
@@ -191,7 +191,7 @@ EXPORT Search_EntitiesIDs(DATASET(FraudShared_Services.Layouts.BatchInExtended_r
 																	SELF := RIGHT,
 																	SELF := LEFT,
 																	SELF := []),
-																LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP)),
+																LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP)),
 													dataset([], FraudShared_Services.Layouts.Recid_rec));
 		RETURN ds_EmailUserIds;
 	END;
@@ -207,7 +207,7 @@ EXPORT Search_EntitiesIDs(DATASET(FraudShared_Services.Layouts.BatchInExtended_r
 																	SELF := RIGHT,
 																	SELF := LEFT,
 																	SELF := []),
-																LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP)),
+																LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP)),
 													dataset([], FraudShared_Services.Layouts.Recid_rec));
 		RETURN ds_EmailDomainIds;
 	END;
@@ -224,7 +224,7 @@ EXPORT Search_EntitiesIDs(DATASET(FraudShared_Services.Layouts.BatchInExtended_r
 																	SELF := RIGHT,
 																	SELF := LEFT,
 																	SELF := []),
-																LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP)),
+																LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP)),
 													dataset([], FraudShared_Services.Layouts.Recid_rec));
 		RETURN ds_CityStateIds;
 	END;
@@ -240,7 +240,7 @@ EXPORT Search_EntitiesIDs(DATASET(FraudShared_Services.Layouts.BatchInExtended_r
 																	SELF := RIGHT,
 																	SELF := LEFT,
 																	SELF := []),
-																LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP)),
+																LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP)),
 													dataset([], FraudShared_Services.Layouts.Recid_rec));
 		RETURN ds_CountyIds;
 	END;
@@ -256,7 +256,7 @@ EXPORT Search_EntitiesIDs(DATASET(FraudShared_Services.Layouts.BatchInExtended_r
 																	SELF := RIGHT,
 																	SELF := LEFT,
 																	SELF := []),
-																LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP)),
+																LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP)),
 													dataset([], FraudShared_Services.Layouts.Recid_rec));
 		RETURN ds_ZipIds;
 	END;
@@ -273,7 +273,7 @@ EXPORT Search_EntitiesIDs(DATASET(FraudShared_Services.Layouts.BatchInExtended_r
 															SELF := RIGHT,
 															SELF := LEFT,
 															SELF := []),
-														LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
+														LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
 														
 		ds_IPRangeIds12  := JOIN(ds_batch_in, FraudShared.Key_IPRange(fraud_platform),
 														KEYED(octet1 = RIGHT.octet1 AND octet2 = RIGHT.octet2),
@@ -284,7 +284,7 @@ EXPORT Search_EntitiesIDs(DATASET(FraudShared_Services.Layouts.BatchInExtended_r
 															SELF := RIGHT,
 															SELF := LEFT,
 															SELF := []),
-														LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
+														LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
 														
 		ds_IPRangeIds1   := JOIN(ds_batch_in, FraudShared.Key_IPRange(fraud_platform),
 														KEYED(octet1 = RIGHT.octet1),
@@ -295,7 +295,7 @@ EXPORT Search_EntitiesIDs(DATASET(FraudShared_Services.Layouts.BatchInExtended_r
 															SELF := RIGHT,
 															SELF := LEFT,
 															SELF := []),
-														LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
+														LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
 		
 		ds_IPRangeIds := MAP (validInput(in_rec.ip_address) AND isIPRange123 => ds_IPRangeIds123,
 													validInput(in_rec.ip_address) AND isIPRange12	=> ds_IPRangeIds12,

@@ -2,11 +2,12 @@
 EXPORT Collect_EntitiesIDs(
   DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in,
   string fraud_platform,
-  boolean filterBy_entity_type
+  boolean filterBy_entity_type,
+	unsigned join_limit = FraudShared_Services.Constants.MAX_RECS_ON_JOIN
 ) := FUNCTION
 
   ds_valid_in := FraudShared_Services.ValidateInput.BuildValidityRecs(ds_batch_in);
-	_GetEntitiesIds := FraudShared_Services.EntitiesIds(ds_valid_in, fraud_platform, filterBy_entity_type);
+	_GetEntitiesIds := FraudShared_Services.EntitiesIds(ds_valid_in, fraud_platform, filterBy_entity_type, join_limit);
 
   ds_did                  := _GetEntitiesIds.GetLexID();
   ds_ip                   := _GetEntitiesIds.GetIp();

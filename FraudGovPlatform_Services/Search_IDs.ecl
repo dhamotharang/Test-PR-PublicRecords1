@@ -8,7 +8,7 @@ EXPORT Search_IDs(
 	
 	 ds_auto := FraudGovPlatform_Services.fn_postautokey_joins(ds_batch_in, fraud_platform);
   
-  ds_entityIds := FraudShared_Services.Collect_EntitiesIDs(ds_batch_in, fraud_platform, filterBy_entity_type);
+  ds_entityIds := FraudShared_Services.Collect_EntitiesIDs(ds_batch_in, fraud_platform, filterBy_entity_type,FraudGovPlatform_services.Constants.Limits.MAX_JOIN_LIMIT);
     
 	 ds_ids := DEDUP(ds_auto + ds_entityIds, ALL);
 

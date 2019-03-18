@@ -1,4 +1,4 @@
-﻿IMPORT FraudShared_Services, iesp;
+﻿IMPORT doxie, FraudShared_Services, iesp;
 
 EXPORT Raw_Records(	DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in,
 										unsigned6 gc_id_in, 
@@ -13,14 +13,14 @@ EXPORT Raw_Records(	DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_i
 
   ds_ids := FraudGovPlatform_Services.Search_IDs(ds_batch_in, fraud_platform, filterBy_entity_type);
 	
-  ds_Raw := FraudShared_Services.GetPayloadRecords(ds_ids, fraud_platform);
+  ds_Raw := FraudGovPlatform_Services.fn_GetPayloadRecords(ds_ids, fraud_platform);
 
   // *** No filtering in FraudGov
   ds_recs_pulled := FraudShared_Services.Common_Suppress(ds_Raw);
 	
   ds_FilterThruMBS := FraudShared_Services.FilterThruMBS(ds_recs_pulled, gc_id_in, ind_type_in, product_code_in, ds_industry_types_in, ds_file_types_in, fraud_platform);
 
-  ds_allPayloadRecs := ds_FilterThruMBS;
+	ds_allPayloadRecs := LIMIT(ds_FilterThruMBS,FraudGovPlatform_Services.Constants.MAX_RECS_ON_JOIN, FAIL(203, doxie.ErrorCodes(203)));
 	
 	RETURN ds_allPayloadRecs;
 END; 
