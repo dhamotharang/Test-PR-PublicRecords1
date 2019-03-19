@@ -314,7 +314,6 @@
 'OY', // OHIO_MONTGOMERY_COUNTY                                                                              
 'PB', // OHIO_BUTLER_COUNTY                                                                                  
 'PC', // OHIO_MONTGOMERY_COUNTY_VANDALIA_MUNICIPAL_COURT                                                     
-'PD', // OHIO_DELAWARE_COUNTY                                                                                
 'PE', // OHIO_WARREN_COUNTY_COURT                                                                            
 'PF', // OHIO_SUMMIT_COUNTY_AKRON_MUNICIPAL_COURT                                                            
 'PG', // OHIO_FRANKLIN_COUNTY                                                                                
@@ -413,6 +412,7 @@
 'WH', // OKLAHOMA_DEPARTMENT_OF_CORRECTIONS_WEBSITE                                                          
 'WK', // UTAH_DEPARTMENT_OF_CORRECTIONS_WEBSITE                                                              
 'WN', // OHIO_CUYAHOGA_COUNTY_PARMA_MUNICIPAL_COURT                                                          
+'WS', // OHIO_JEFFERSON_COUNTY_TORONTO                                                                       
 'WT', // OHIO_GUERNSEY_COUNTY_CAMBRIDGE_MUNICIPAL_COURT                                                      
 'XX', // OHIO_KNOX_COUNTY_COMMON_PLEAS_COURT                                                                 
 'XY', // OHIO_KNOX_COUNTY_MOUNT_VERNON_MUNICIPAL_COURT                                                       
@@ -420,7 +420,6 @@
 'YE', // OHIO_LUCAS_COUNTY_MAUMEE_MUNICIPAL_COURT                                                            
 'YG', // SOUTH_CAROLINA_NEWBERRY_COUNTY_CIRCUIT_COURTS                                                       
 'YH', // OHIO_MARION_COUNTY                                                                                  
-'YK', // OHIO_MONTGOMERY_MIAMISBURG_MUNICIPAL_COURT                                                          
 'YN', // OHIO_PERRY_COUNTY_COURT                                                                             
 'YO', // OHIO_PREBLE_COUNTY_COMMON_PLEAS_COURT                                                               
 'YT', // OHIO_SHELBY_COUNTY_SIDNEY_MUNICIPAL_COURT                                                           
