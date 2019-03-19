@@ -1,9 +1,10 @@
-import doxie_files, ut, doxie, autokey;
+﻿import doxie_files, ut, doxie, autokey;
 
 f_qsent := _keybuild_qsent_base;//Phonesplus.file_qsent_base;
 
 xl_qsent := RECORD
-	Phonesplus.layoutCommonKeys;
+	//CCPA-5 include 2 new CCPA fields, global_sid and record_sid
+	Phonesplus.layoutCommonKeys_CCPA;
 	unsigned6 fdid;
 END;
 
