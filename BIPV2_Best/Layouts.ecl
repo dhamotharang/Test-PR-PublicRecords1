@@ -4,7 +4,7 @@
   We need to do this because of BIPV2.fn_derive_pn uses bipv2_Best.Key_LinkIds.key_static before the new key is built
   so it needs to use the previous layout of the key.
   Need a better solution for this.
-*/ 
+*/
 import BIPV2;
 EXPORT Layouts := MODULE
 EXPORT In_Base_with_flags := record
@@ -166,7 +166,9 @@ export base := RECORD
     DATASET(duns_number_case_layout) duns_number;
     DATASET(sic_code_case_layout) sic_code;
     DATASET(naics_code_case_layout) naics_code;
-		  DATASET(dba_name_case_layout) dba_name;
+    DATASET(dba_name_case_layout) dba_name;
+    unsigned4 global_sid;
+    unsigned8 record_sid;
   END;
 EXPORT key := RECORD
     BIPV2.IDlayouts.l_xlink_ids;
@@ -182,7 +184,9 @@ EXPORT key := RECORD
     DATASET(duns_number_case_layout and not score) duns_number;
     DATASET(sic_code_case_layout and not score) sic_code;
     DATASET(naics_code_case_layout and not score) naics_code;
-		  DATASET(dba_name_case_layout and not score) dba_name;
+    DATASET(dba_name_case_layout and not score) dba_name;
+    unsigned4 global_sid;
+    unsigned8 record_sid;
 END;
 EXPORT key_static := RECORD
     BIPV2.IDlayouts.l_xlink_ids;
@@ -199,5 +203,7 @@ EXPORT key_static := RECORD
     DATASET(sic_code_case_layout and not score) sic_code;
     DATASET(naics_code_case_layout and not score) naics_code;
 	  	//DATASET(dba_name_case_layout and not score) dba_name;
+    //unsigned4 global_sid;
+    //unsigned8 record_sid;
 END;
 END;
