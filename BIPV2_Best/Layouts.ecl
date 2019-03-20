@@ -167,6 +167,8 @@ export base := RECORD
     DATASET(sic_code_case_layout) sic_code;
     DATASET(naics_code_case_layout) naics_code;
     DATASET(dba_name_case_layout) dba_name;
+    unsigned4 global_sid;
+    unsigned8 record_sid;
   END;
 EXPORT key := RECORD
     BIPV2.IDlayouts.l_xlink_ids;
@@ -183,6 +185,8 @@ EXPORT key := RECORD
     DATASET(sic_code_case_layout and not score) sic_code;
     DATASET(naics_code_case_layout and not score) naics_code;
     DATASET(dba_name_case_layout and not score) dba_name;
+    unsigned4 global_sid;
+    unsigned8 record_sid;
 END;
 EXPORT key_static := RECORD
     BIPV2.IDlayouts.l_xlink_ids;
@@ -199,5 +203,7 @@ EXPORT key_static := RECORD
     DATASET(sic_code_case_layout and not score) sic_code;
     DATASET(naics_code_case_layout and not score) naics_code;
 	  	//DATASET(dba_name_case_layout and not score) dba_name;
+    //unsigned4 global_sid;
+    //unsigned8 record_sid;
 END;
 END;
