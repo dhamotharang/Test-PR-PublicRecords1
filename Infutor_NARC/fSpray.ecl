@@ -1,7 +1,7 @@
-import lib_fileservices,_control,lib_stringlib,Versioncontrol;
+﻿import lib_fileservices,_control,lib_stringlib,Versioncontrol;
 
 export fSpray(string version, boolean pUseProd = false)	:=	DATASET([
- 	{'bctlpedata11.risk.regn.net'	                    //SourceIP			 Remote Server's IP address									
+ 	{_control.IPAddress.bctlpedata11	                    //SourceIP			 Remote Server's IP address									
  	,'/data/hds_180/infutor_narc/data/'+version[..8]+'/'            //SourceDirectory	 Absolute path of directory on Remote Server where files are located                
  	,'*.txt'                                    //directory_filter   Regular expression filter for files to be sprayed, default = '*'                          
  	,0                                                  //record_size	     record length of files to be sprayed(for fixed length files only)      

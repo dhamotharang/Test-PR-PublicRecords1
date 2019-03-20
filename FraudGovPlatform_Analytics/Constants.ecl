@@ -73,7 +73,6 @@
 			EXPORT Filenames(BOOLEAN useProdData = FALSE):= MODULE
 				EXPORT InputLogicalGraph											:= fileLocation(useProdData) + fileScope + 'fullgraph';
 				EXPORT InputLogicalEntityStats								:= fileLocation(useProdData) + fileScope + 'entitystats';
-				EXPORT InputLogicalPersonEvents								:= fileLocation(useProdData) + fileScope + 'personevents';
 				EXPORT InputLogicalPersonAssociationsStats		:= fileLocation(useProdData) + fileScope + 'person_associations_stats';
 				EXPORT InputLogicalPersonAssociationsDetails	:= fileLocation(useProdData) + fileScope + 'person_associations_details';
 			END;

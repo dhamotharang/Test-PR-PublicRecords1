@@ -69,7 +69,7 @@ EXPORT	proc_build_base(STRING	pVersion	,
 					,Build_ReleaseDate_File
 					,Promote(pversion, 'out').buildfiles.New2Built
 					,Promote(pversion, 'out').buildfiles.Built2QA
-					//	Build SBFE Best Key Base Files.  Only build the base files during a Full Build.
+						// Build SBFE Best Key Base Files.  Only build the base files during a Full Build.
 					,IF(pBuildType	<>	Constants().buildType.Daily,
 						SEQUENTIAL(
 							Build_SBFEBest_File

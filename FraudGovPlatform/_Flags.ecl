@@ -21,6 +21,7 @@ module
 			export IdentityData := count(nothor(FileServices.SuperFileContents(Filenames().Base.IdentityData.Built))) > 0;
 			export KnownFraud := count(nothor(FileServices.SuperFileContents(Filenames().Base.KnownFraud.Built))) > 0;
 			export Deltabase := count(nothor(FileServices.SuperFileContents(Filenames().Base.Deltabase.Built))) > 0;
+			export AddressCache := count(nothor(FileServices.SuperFileContents(Filenames().Base.AddressCache.Built))) > 0;
 			export Main := count(nothor(FileServices.SuperFileContents(FraudShared.Filenames().Base.Main.Built))) > 0;
 			export MainFather := count(nothor(FileServices.SuperFileContents(FraudShared.Filenames().Base.Main.Father))) > 0;
 			export Pii := count(nothor(FileServices.SuperFileContents(Filenames().Base.Pii.Built))) > 0;
@@ -33,6 +34,7 @@ module
 		export IdentityData := FileExists.Base.IdentityData;
 		export KnownFraud := FileExists.Base.KnownFraud;
 		export Deltabase := FileExists.Base.Deltabase;
+		export AddressCache := FileExists.Base.AddressCache;
 		export Main := FileExists.Base.Main;
 		export Pii := FileExists.Base.Pii;
 	end;

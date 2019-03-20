@@ -1721,5 +1721,19 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC 2019/84 Proliferation and Use of Chemical Weapons List','1708'},
 {'EC 2019/85 Syria List','1709'},
 {'EC (CFSP) 2019/271 ISIL (Da\'esh) and Al-Qaeda List','1710'},
-{'EC 2019/270 ISIL (Da\'esh) and Al-Qaeda List','1711'}
+{'EC 2019/270 ISIL (Da\'esh) and Al-Qaeda List','1711'},
+{'EC (CFSP) 2019/284 Zimbabwe List','1712'},
+{'EC (CFSP) 2019/285 Afghanistan List','1713'},
+{'EC 2019/279 Afghanistan List','1714'},
+{'EC 2019/283 Zimbabwe List','1715'},
+{'HM Treasury Monetary Penalty','1716'},
+{'US Food & Drug Administration Warning Letters','1717'},
+{'EC (CFSP) 2019/351 Syria List','1718'},
+{'EC (CFSP) 2019/354 Ukraine List','1719'},
+{'EC 2019/350 Syria List','1720'},
+{'EC 2019/352 Ukraine List','1721'},
+{'EU High-Risk Third Countries List','1722'},
+{'Oregon Department of Corrections Escapees and Most Wanted','1723'},
+{'EC 2019/353 ISIL (Da\'esh) and Al-Qaida List','1724'},
+{'List of Suspected Terrorists and Terrorist Organizations (DTTOT) Indonesia','1725'}
 ],r);

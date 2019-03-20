@@ -1,5 +1,5 @@
 ﻿
-import VersionControl,_Control,ut,lib_fileservices;
+import VersionControl,_Control,ut,lib_fileservices,std;
 
 export Spray_In(
 
@@ -11,18 +11,19 @@ function
 
 	lfile(string pkeyword) := '~thor_data400::in::ecrash::' + pkeyword + '.@version@.csv';
 	sfile(string pkeyword) := '~thor_data400::in::ecrash::' + pkeyword;
+	 agency_date :=  (STRING8) Std.Date.Today();
 
 	spry_raw:=DATASET([
-             {Constants.LandingZone,'/data/super_credit/ecrash/agency/'
-									,'mbs_ecrash_v_agency_hpcc_export_'+(string)((unsigned)ut.getDateOffset(-1,ut.GetDate))+'.txt'
-																						,0 ,lfile('agency'				  ),[{sfile('agency'			  )}],Constants.DestinationCluster,'','[0-9]{8}','VARIABLE'}
+             {Constants.LandingZone,'/data/super_credit/ecrash/agency/'+agency_date+'/'
+									,'mbs_ecrash_v_agency_hpcc_export.txt'
+																						,0 ,lfile('agency'				  ),[{sfile('agency'			  )}],Constants.DestinationCluster,agency_date,'[0-9]{8}','VARIABLE'}
 		 	], VersionControl.Layout_Sprays.Info);
 	
-verify_agency := FileServices.RemoteDirectory(FLAccidents_Ecrash.Constants.LandingZone,'/data/super_credit/ecrash/agency/','*ecrash_v_agency*'+(string)((unsigned)ut.getDateOffset(-1,ut.GetDate))+'.txt');
+verify_agency := FileServices.RemoteDirectory(FLAccidents_Ecrash.Constants.LandingZone,'/data/super_credit/ecrash/agency/'+agency_date+'/','*ecrash_v_agency*.txt');
 
 Agency_sp :=  if( ( EXISTS(verify_agency) and verify_agency[1].size <> 0 )  ,                  
-                                                                                                              sequential(fileservices.clearsuperfile('~thor_data400::in::ecrash::agency'),VersionControl.fSprayInputFiles(spry_raw,pIsTesting := pIsTesting)), 
-                                                                                                              output('NO Agency Files Recieved')); 
+										sequential(fileservices.clearsuperfile('~thor_data400::in::ecrash::agency'),VersionControl.fSprayInputFiles(spry_raw,pIsTesting := pIsTesting)), 
+										output('NO Agency Files Recieved')); 
 
 //Incident Spray
 

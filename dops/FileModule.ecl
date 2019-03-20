@@ -1,4 +1,4 @@
-﻿import lib_fileservices,lib_thorlib;
+﻿import lib_fileservices,lib_thorlib,ut;
 EXPORT FileModule(string esp
 									,string port = '8010'
 									) := module
@@ -31,6 +31,7 @@ EXPORT FileModule(string esp
 													,rWUInfoRequest
 													,dataset(rWUInfoResponse)
 													,xpath('WUInfoResponse/Workunit')
+													,HTTPHEADER('Authorization', 'Basic ' + ut.Credentials().fGetEncodedValues())
 										 );
 
 		

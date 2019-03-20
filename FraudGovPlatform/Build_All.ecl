@@ -12,7 +12,7 @@ export Build_All(
 module
 
 	// Load Files Once
-	shared SkipModules := Files().OutputF.SkipModules;
+	shared SkipModules := Files().Flags.SkipModules;
 	shared MBS_File := FraudShared.Files().Input.MBS.sprayed;
 	shared Main_Built := FraudShared.Files().Base.Main.Built;
 	
@@ -68,6 +68,7 @@ module
 		,Run_Scrubs	
 		// Build Base
 		,Run_Base
+		,if( Test_Build = 'Passed' and  Test_RecordID = 'Passed' and Test_RinID = 'Passed', promote_sprayed_files)
 	);
 	
 	export keys_portion := sequential(
@@ -92,30 +93,24 @@ module
 		 	
 	export Build_FraudGov_Base := 
 	if(tools.fun_IsValidVersion(pversion),
-		if(SkipBasePortion=false, base_portion),
-		output('No Valid version parameter passed, skipping FraudGovPlatform.Build_Base')
-	);
+		if(SkipBasePortion=false, 
+			  base_portion
+			, output('Skipping FraudGovPlatform.Build_Base')),
+		output('No Valid version parameter passed, skipping FraudGovPlatform.Build_Base'));
 
 	export Build_Fraudgov_Keys :=
 	if(tools.fun_IsValidVersion(pversion),
-		if( Test_Build = 'Passed' and  Test_RecordID = 'Passed' and Test_RinID = 'Passed',
-			sequential(
-				// If Base is valid then Build Keys
-				  if(SkipKeysPortion=false, 
-					keys_portion)
-				, promote_sprayed_files
-			),
-			// else Rollback Base file
-			Run_Rollback)
-		,output('No Valid version parameter passed, skipping FraudGovPlatform.Build_Keys')
-	);
+		 if(SkipKeysPortion=false and Test_Build = 'Passed' and  Test_RecordID = 'Passed' and Test_RinID = 'Passed',  
+			  keys_portion 
+			, Run_Rollback ),
+		output('No Valid version parameter passed, skipping FraudGovPlatform.Build_Keys'));
+	
 	
 	export All :=
 	if(tools.fun_IsValidVersion(pversion),
 		 sequential(
-			if(SkipBasePortion=false, base_portion),
-		 	if(SkipKeysPortion=false, keys_portion))
-		,output('No Valid version parameter passed, skipping FraudGovPlatform.All')
-	);
+			Build_FraudGov_Base,
+		 	Build_Fraudgov_Keys )
+		,output('No Valid version parameter passed, skipping FraudGovPlatform.All'));
 		
 end;

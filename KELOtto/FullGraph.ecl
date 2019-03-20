@@ -35,33 +35,43 @@ PersonEntities := PROJECT(KELOtto.Q__show_Customer_Person_Entities.Res0,
                 TRANSFORM(RECORDOF(KELOtto.Q__show_Customer_Person_Tree_Entities.Res0), 
                   SELF.tree_uid_ := LEFT.entity_context_uid_, 
                   SELF := LEFT, SELF := []));
+
+/* NB This is to limit adding hyper connected entities (mostly addresses) Will need to be revisited later to only add the centroid */
+
+PersonToAddress := JOIN(KELOtto.Q__show_Customer_Address_Person_Tree_Entities.Res0, KELOtto.Q__show_Customer_Address.Res0(all_person_count_ > 100), 
+                         LEFT.customer_id_ = RIGHT.customer_id_ AND LEFT.industry_type_ = RIGHT.industry_type_ AND LEFT.tree_uid_ = RIGHT.entity_context_uid_, 
+                         TRANSFORM(RECORDOF(LEFT), SELF := LEFT), LEFT ONLY, LOOKUP);
                   
 FullTreePrep1 := 
-  PersonEntities + // include person entities because people without person to person rows won't show up.
+  (PersonEntities + // include person entities because people without person to person rows won't show up.
   KELOtto.Q__show_Customer_Person_Tree_Entities.Res0 + // Person to Person 
-  KELOtto.Q__show_Customer_Address_Person_Tree_Entities.Res0 +  // Address to Person
-  KELOtto.Q__show_Customer_Person_Ip_Tree_Entities.Res0 + // IP to Person
+  PersonToAddress + //KELOtto.Q__show_Customer_Address_Person_Tree_Entities.Res0 +  // Address to Person
   KELOtto.Q__show_Customer_Person_S_S_N_Tree_Entities.Res0 + // SSN to Person
   KELOtto.Q__show_Customer_Person_Phone_Tree_Entities.Res0 + // Phone to Person
   KELOtto.Q__show_Customer_Person_Phone_Tree_Entities.Res0 + // Phone to Person
   KELOtto.Q__show_Customer_Person_Email_Tree_Entities.Res0 +
   KELOtto.Q__show_Customer_Person_Bank_Account_Tree_Entities.Res0 +
-  KELOtto.Q__show_Customer_Person_Drivers_License_Tree_Entities.Res0
+  KELOtto.Q__show_Customer_Person_Drivers_License_Tree_Entities.Res0)(tree_uid_ != '_011' AND entity_context_uid_ != '_011')
   : persist('~temp::deleteme99');
 
-SelfEntities := PROJECT(DEDUP(SORT(DISTRIBUTE(FullTreePrep1, HASH32(tree_uid_)), source_customer_, tree_uid_, LOCAL), source_customer_, tree_uid_, LOCAL), TRANSFORM(RECORDOF(LEFT), SELF.entity_context_uid_ := LEFT.tree_uid_, SELF := LEFT));
+FullTreePrepExclusions := TABLE(FullTreePrep1, {source_customer_, tree_uid_, recordcount := COUNT(GROUP)}, source_customer_, tree_uid_, MERGE);
+FullTreePrep2 := JOIN(FullTreePrep1, FullTreePrepExclusions(recordcount > 300), LEFT.source_customer_=RIGHT.source_customer_ AND LEFT.tree_uid_=RIGHT.tree_uid_, TRANSFORM(RECORDOF(LEFT), SELF := LEFT), LEFT ONLY, SMART);
 
-FullTreePrep := FullTreePrep1+SelfEntities;
+SelfEntities := PROJECT(DEDUP(SORT(DISTRIBUTE(FullTreePrep2, HASH32(source_customer_, tree_uid_)), source_customer_, tree_uid_, LOCAL), source_customer_, tree_uid_, LOCAL), TRANSFORM(RECORDOF(LEFT), SELF.entity_context_uid_ := LEFT.tree_uid_, SELF := LEFT));
 
-TreeToEntity := DEDUP(SORT(DISTRIBUTE(FullTreePrep, HASH32(entity_context_uid_)), source_customer_, tree_uid_, entity_context_uid_, LOCAL), source_customer_, tree_uid_, entity_context_uid_, LOCAL);
+FullTreePrep := DEDUP(SORT(DISTRIBUTE(FullTreePrep2+SelfEntities, HASH32(source_customer_, tree_uid_, entity_context_uid_)), source_customer_, tree_uid_, entity_context_uid_, LOCAL), source_customer_, tree_uid_, entity_context_uid_, LOCAL);
+
+TreeToEntity := DISTRIBUTE(
+                FullTreePrep//DISTRIBUTE(FullTreePrep, HASH32(source_customer_, treeuid, entity_context_uid_)), source_customer_, tree_uid_, entity_context_uid_, LOCAL), source_customer_, tree_uid_, entity_context_uid_, LOCAL);
+                , HASH32(source_customer_, entity_context_uid_));  
 
 EntityToTree := DISTRIBUTE(
-                 PROJECT(FullTreePrep, TRANSFORM(RECORDOF(LEFT), 
+                 PROJECT(FullTreePrep(tree_uid_ != '_011'), TRANSFORM(RECORDOF(LEFT),  // NB, there is some underlying data issue with LEXID = 1, needs investigating.
                   // Reverse the non-person associations.
                   SELF.tree_uid_ := MAP(LEFT.tree_uid_[2..3] != '01' => LEFT.entity_context_uid_, LEFT.tree_uid_),
                   SELF.entity_context_uid_ := MAP(LEFT.tree_uid_[2..3] != '01' => LEFT.tree_uid_, LEFT.entity_context_uid_),
                   SELF := LEFT))
-                 , HASH32(tree_uid_));  
+                 , HASH32(source_customer_, tree_uid_));  
 
 FullPersonTreeEntities1 := JOIN(TreeToEntity, EntityToTree,
                             LEFT.source_customer_=RIGHT.source_customer_ AND LEFT.entity_context_uid_=RIGHT.tree_uid_,
@@ -69,7 +79,7 @@ FullPersonTreeEntities1 := JOIN(TreeToEntity, EntityToTree,
                               RECORDOF(LEFT), 
                               SELF.tree_uid_ := LEFT.tree_uid_,
                               SELF.entity_context_uid_ := RIGHT.entity_context_uid_, //RIGHT.tree_uid_,
-                              SELF := LEFT), LOCAL);
+                              SELF := LEFT), LOCAL, KEEP(200));
 
 FullTreeEntities := DEDUP(SORT(DISTRIBUTE(EntityToTree + FullPersonTreeEntities1, HASH32(entity_context_uid_)), source_customer_, tree_uid_, entity_context_uid_, LOCAL), source_customer_, tree_uid_, entity_context_uid_, LOCAL);
 
@@ -114,6 +124,9 @@ FullGraphPrep2 := JOIN(FullGraphPrep1, DISTRIBUTE(KELOtto.Q__show_Customer_Addre
                           SELF.Zip_ := RIGHT.Zip_,
 													
                           SELF.In_Customer_Population_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.In_Customer_Population_ , LEFT.In_Customer_Population_),
+                          SELF.contributor_safe_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.contributor_safe_flag_ , LEFT.contributor_safe_flag_),
+                          SELF.safe_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.safe_flag_ , LEFT.safe_flag_),
+
                           
                           SELF.cl_event_count_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_event_count_ , LEFT.cl_event_count_),
                           SELF.cl_identity_count_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_identity_count_ , LEFT.cl_identity_count_),
@@ -159,6 +172,8 @@ FullGraphPrep3 := JOIN(FullGraphPrep2, DISTRIBUTE(KELOtto.Q__show_Customer_Ssn_E
                           SELF.cl_impact_weight_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_impact_weight_ , LEFT.cl_impact_weight_),
 
                           SELF.In_Customer_Population_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.In_Customer_Population_ , LEFT.In_Customer_Population_),
+                          SELF.contributor_safe_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.contributor_safe_flag_ , LEFT.contributor_safe_flag_),
+                          SELF.safe_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.safe_flag_ , LEFT.safe_flag_),
 													
                        //   SELF.cl_high_risk_pattern1_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern1_flag_ , LEFT.cl_high_risk_pattern1_flag_),
                        //   SELF.cl_high_risk_pattern2_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern2_flag_ , LEFT.cl_high_risk_pattern2_flag_),
@@ -199,6 +214,8 @@ FullGraphPrep4 := JOIN(FullGraphPrep3, DISTRIBUTE(KELOtto.Q__show_Customer_Ip_Ad
                           SELF.cl_impact_weight_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_impact_weight_ , LEFT.cl_impact_weight_),
 
                           SELF.In_Customer_Population_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.In_Customer_Population_ , LEFT.In_Customer_Population_),
+                          SELF.contributor_safe_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.contributor_safe_flag_ , LEFT.contributor_safe_flag_),
+                          SELF.safe_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.safe_flag_ , LEFT.safe_flag_),
 													
                        //   SELF.cl_high_risk_pattern1_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern1_flag_ , LEFT.cl_high_risk_pattern1_flag_),
                        //   SELF.cl_high_risk_pattern2_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern2_flag_ , LEFT.cl_high_risk_pattern2_flag_),
@@ -239,6 +256,8 @@ FullGraphPrep5 := JOIN(FullGraphPrep4, DISTRIBUTE(KELOtto.Q__show_Customer_Phone
                           SELF.cl_impact_weight_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_impact_weight_ , LEFT.cl_impact_weight_),
 													
                           SELF.In_Customer_Population_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.In_Customer_Population_ , LEFT.In_Customer_Population_),
+                          SELF.contributor_safe_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.contributor_safe_flag_ , LEFT.contributor_safe_flag_),
+                          SELF.safe_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.safe_flag_ , LEFT.safe_flag_),
 
                        //   SELF.cl_high_risk_pattern1_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern1_flag_ , LEFT.cl_high_risk_pattern1_flag_),
                        //   SELF.cl_high_risk_pattern2_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern2_flag_ , LEFT.cl_high_risk_pattern2_flag_),
@@ -278,6 +297,8 @@ FullGraphPrep6 := JOIN(FullGraphPrep5, DISTRIBUTE(KELOtto.Q__show_Customer_Email
                           SELF.cl_impact_weight_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_impact_weight_ , LEFT.cl_impact_weight_),
 
                           SELF.In_Customer_Population_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.In_Customer_Population_ , LEFT.In_Customer_Population_),
+                          SELF.contributor_safe_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.contributor_safe_flag_ , LEFT.contributor_safe_flag_),
+                          SELF.safe_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.safe_flag_ , LEFT.safe_flag_),
 													
                        //   SELF.cl_high_risk_pattern1_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern1_flag_ , LEFT.cl_high_risk_pattern1_flag_),
                        //   SELF.cl_high_risk_pattern2_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern2_flag_ , LEFT.cl_high_risk_pattern2_flag_),
@@ -317,6 +338,8 @@ FullGraphPrep7 := JOIN(FullGraphPrep6, DISTRIBUTE(KELOtto.Q__show_Customer_Bank_
                           SELF.cl_impact_weight_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_impact_weight_ , LEFT.cl_impact_weight_),
 
                           SELF.In_Customer_Population_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.In_Customer_Population_ , LEFT.In_Customer_Population_),
+                          SELF.contributor_safe_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.contributor_safe_flag_ , LEFT.contributor_safe_flag_),
+                          SELF.safe_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.safe_flag_ , LEFT.safe_flag_),
 													
                        //   SELF.cl_high_risk_pattern1_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern1_flag_ , LEFT.cl_high_risk_pattern1_flag_),
                        //   SELF.cl_high_risk_pattern2_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern2_flag_ , LEFT.cl_high_risk_pattern2_flag_),
@@ -357,6 +380,8 @@ FullGraphPrep8_1 := JOIN(FullGraphPrep7, DISTRIBUTE(KELOtto.Q__show_Customer_Dri
                           SELF.cl_impact_weight_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_impact_weight_ , LEFT.cl_impact_weight_),
 
                           SELF.In_Customer_Population_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.In_Customer_Population_ , LEFT.In_Customer_Population_),
+                          SELF.contributor_safe_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.contributor_safe_flag_ , LEFT.contributor_safe_flag_),
+                          SELF.safe_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.safe_flag_ , LEFT.safe_flag_),
 													
                        //   SELF.cl_high_risk_pattern1_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern1_flag_ , LEFT.cl_high_risk_pattern1_flag_),
                        //   SELF.cl_high_risk_pattern2_flag_ := MAP(RIGHT.Entity_Type_ != 0 => RIGHT.cl_high_risk_pattern2_flag_ , LEFT.cl_high_risk_pattern2_flag_),
@@ -392,6 +417,6 @@ FullGraphElementCount := JOIN(FullGraphElementCount1, AdditionalAttributes, LEFT
                RECORDOF(LEFT),
                RIGHT.event_count_
              },
-              SELF.event_count_ := RIGHT.event_count_, SELF := LEFT), LEFT OUTER, HASH);
+              SELF.event_count_ := RIGHT.event_count_, SELF := LEFT), LEFT OUTER, HASH) : PERSIST('~fraudgov::deleteme101');
 
 EXPORT FullGraph := FullGraphElementCount;

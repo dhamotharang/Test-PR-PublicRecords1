@@ -1,4 +1,4 @@
-// Function - GetRoxieDependencies
+﻿// Function - GetRoxieDependencies
 // Purpose - Get the list of roxie data dependencies per environment per location
 // Parameters -
 // 		environment: "F" - FCRA, "N" - Nonfcra, "B" - Boolean
@@ -18,11 +18,11 @@ export GetRoxieDependencies(string environment,string location,string datasetnam
 	end;
 	
 	outrec := record
-		string datasetname {xpath('Dname')};
-		string whenupdated {xpath('Whenupdated')};
-		string superkey {xpath('Superkey')};
-		string logicalkey {xpath('Logicalkey')};
-		string changeflag {xpath('Changeflag')};
+		string Dname {xpath('Dname')};
+		string Whenupdated {xpath('Whenupdated')};
+		string Logicalkey {xpath('Logicalkey')};
+		string Superkey {xpath('Superkey')};
+		string Changeflag {xpath('Changeflag')};
 		
 	end;
 	

@@ -10,48 +10,51 @@
                         '_cvi_,_v2__sourcerisklevel_,_v2__assocsuspicousidentitiescount_,_v2__assoccreditbureauonlycount_,_v2__inputaddrageoldest_,_v2__inputaddrdwelltype_,_v2__divssnidentitycountnew_,' + 
                         'hri03_flag_,hri06_flag_,hri07_flag_,hri08_flag_,hri11_flag_,hri12_flag_,hri14_flag_,hri15_flag_,hri19_flag_,hri25_flag_,hri26_flag_,hri27_flag_,hri28_flag_,hri29_flag_,hri30_flag_,hri31_flag_,hri37_flag_,hri38_flag_,hri41_flag_,hri48_flag_,hri50_flag_,hri51_flag_,hri52_flag_,hri71_flag_,hri83_flag_,hri90_flag_,hri_cl_flag_,hri_co_flag_,hri_dd_flag_,hri_df_flag_,hri_iv_flag_,hri_it_flag_,hri_mi_flag_,hri_mo_flag_,hri_ms_flag_,hri_nf_flag_,hri_pa_flag_,hri_po_flag_,hri_va_flag_,' +
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
-												'kr_high_risk_routing_,cl_active30_identity_count_,cl_active7_identity_count_,currently_incarcerated_flag_,fraud_offenses_flag_,associated_with_incarcerated_flag_,associated_with_fraud_offenses_flag_');
-                        
+												'kr_high_risk_routing_,cl_active30_identity_count_,cl_active7_identity_count_,currently_incarcerated_flag_,fraud_offenses_flag_,associated_with_incarcerated_flag_,associated_with_fraud_offenses_flag_,safe_flag_,contributor_safe_flag_,' +
+                        'cl_ip_high_risk_identity_count_,cl_ip_not_us_identity_count_,cl_ip_vpn_identity_count_,cl_ip_high_risk_city_identity_count_,cl_ip_hosted_identity_count_,cl_ip_tor_identity_count_,cl_ip_not_us_event_count_,cl_ip_vpn_event_count_,cl_ip_high_risk_city_event_count_,cl_ip_hosted_event_count_,cl_ip_tor_event_count_');
+
   SHARED AddressStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Address.Res0, 'industry_type_,customer_id_,entity_context_uid_', 
                         'identity_count_,score_,event_count_,' +
                         'all_deceased_match_person_count_,all_deceased_match_person_percent_,all_deceased_person_count_,all_deceased_person_percent_,all_high_frequency_flag_,all_high_risk_death_prior_to_all_events_person_count_,all_high_risk_death_prior_to_all_events_person_percent_,all_high_risk_death_prior_to_all_events_person_percent_flag_,all_person_count_,cl_event_count_,cl_event_count_percentile_,cl_identity_count_,cl_identity_count_percentile_,cl_impact_weight_,cluster_score_,deceased_match_person_percent_,deceased_person_count_,deceased_person_percent_,high_frequency_flag_,in_customer_population_,kr_high_risk_flag_,kr_medium_risk_flag_,source_customer_count_,_addresscmra_,' + 
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
-												'cl_active30_identity_count_,cl_active7_identity_count_'
+												'cl_active30_identity_count_,cl_active7_identity_count_,safe_flag_,contributor_safe_flag_'
                         ) : PERSIST('~temp::deleteme42');
-
   
   EXPORT SocialSecurityStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Social_Security_Number.Res0, 'industry_type_,customer_id_,entity_context_uid_', 
                         'cluster_score_, event_count_, identity_count_, score_, source_customer_count_,cl_event_count_,cl_identity_count_,' + 
 	                      'hri06_flag_,hri26_flag_,hri29_flag_,hri38_flag_,hri71_flag_,hri_it_flag_,hri_mi_flag_,kr_high_risk_flag_,kr_medium_risk_flag_,' + 
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
-												'cl_active30_identity_count_,cl_active7_identity_count_'
+												'cl_active30_identity_count_,cl_active7_identity_count_,safe_flag_,contributor_safe_flag_'
 												) : PERSIST('~temp::deleteme47');
 
   EXPORT EmailStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Email.Res0, 'industry_type_,customer_id_,entity_context_uid_',
                         'cluster_score_,event_count_,identity_count_,score_,source_customer_count_,cl_event_count_,cl_identity_count_,kr_high_risk_flag_,kr_medium_risk_flag_,' + 
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
-												'cl_active30_identity_count_,cl_active7_identity_count_'
+												'cl_active30_identity_count_,cl_active7_identity_count_,safe_flag_,contributor_safe_flag_'
 												) : PERSIST('~temp::deleteme44');
   
   EXPORT PhoneStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Phone.Res0, 'industry_type_,customer_id_,entity_context_uid_', 
                         'phone_number_,_is_cell_phone_,cluster_score_,event_count_,identity_count_,score_,source_customer_count_,cl_event_count_,cl_identity_count_,' + 
                         'hri07_flag_,hri08_flag_,hri15_flag_,hri27_flag_,hri31_flag_,kr_high_risk_flag_,kr_medium_risk_flag_,'+ 
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
-												'cl_active30_identity_count_,cl_active7_identity_count_'
+												'cl_active30_identity_count_,cl_active7_identity_count_,safe_flag_,contributor_safe_flag_'
                         ) : PERSIST('~temp::deleteme45');
 
   EXPORT IPAddressStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Internet_Protocol.Res0, 'industry_type_,customer_id_,entity_context_uid_', 
                         'score_,cluster_score_,event_count_,' + 
                         'kr_high_risk_flag_,kr_medium_risk_flag_,' +
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
-												'cl_active30_identity_count_,cl_active7_identity_count_'
+												'cl_active30_identity_count_,cl_active7_identity_count_,safe_flag_,contributor_safe_flag_,' +
+                        'ip_not_us_,ip_vpn_,ip_high_risk_city_,ip_hosted_,ip_tor_,' +
+                        'cl_ip_not_us_identity_count_,cl_ip_vpn_identity_count_,cl_ip_high_risk_city_identity_count_,cl_ip_hosted_identity_count_,cl_ip_tor_identity_count_,cl_ip_not_us_event_count_,cl_ip_vpn_event_count_,cl_ip_high_risk_city_event_count_,cl_ip_hosted_event_count_,cl_ip_tor_event_count_'
 												) : PERSIST('~temp::deleteme48');
+
 
   EXPORT BankAccountStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Bank_Account.Res0, 'industry_type_,customer_id_,entity_context_uid_',
                         'cluster_score_,event_count_,identity_count_,score_,source_customer_count_,cl_event_count_,cl_identity_count_,kr_high_risk_flag_,kr_medium_risk_flag_,' + 
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
 												'cl_active30_identity_count_,cl_active7_identity_count_,' +
-                        'kr_bnk800_flag_,kr_bnk801_flag_,kr_bnk802_flag_,kr_bnk890_flag_,kr_bnk891_flag_,kr_bnk892_flag_,kr_bnk893_flag_'                        
+                        'kr_bnk800_flag_,kr_bnk801_flag_,kr_bnk802_flag_,kr_bnk890_flag_,kr_bnk891_flag_,kr_bnk892_flag_,kr_bnk893_flag_,safe_flag_,contributor_safe_flag_'                        
 												) : PERSIST('~temp::deleteme50');
 
   EXPORT DriversLicenseStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Drivers_License.Res0, 'industry_type_,customer_id_,entity_context_uid_',
@@ -59,7 +62,7 @@
 												'vl_event1_all_count_,vl_event1_count_,vl_event30_all_day_count_,vl_event30_count_,vl_event365_all_day_count_,vl_event365_count_,vl_event7_all_count_,vl_event7_count_,' + 
 												'cl_active30_identity_count_,cl_active7_identity_count_,' + 
                         'hri41_flag_,hri_df_flag_,' + 
-                        'kr_dl200_flag_,kr_dl201_flag_,kr_dl202_flag_,kr_dl203_flag_,kr_dl204_flag_,kr_dl290_flag_,kr_dl291_flag_,kr_dl292_flag_,kr_dl293_flag_'
+                        'kr_dl200_flag_,kr_dl201_flag_,kr_dl202_flag_,kr_dl203_flag_,kr_dl204_flag_,kr_dl290_flag_,kr_dl291_flag_,kr_dl292_flag_,kr_dl293_flag_,safe_flag_,contributor_safe_flag_'
 												) : PERSIST('~temp::deleteme51');
                         
   EXPORT EventStatsPrep := FraudGovPlatform_Analytics.macPivotOttoOutput(KELOtto.Q__show_Customer_Person_Event.Res0, 'industry_type_,customer_id_,entity_context_uid_', 
@@ -72,7 +75,7 @@
                         'hri_cl_flag_,hri_dd_flag_,hri_df_flag_,hri_ms_flag_,hri_nf_flag_,' + 
                         'addr_hri11_flag_,addr_hri12_flag_,addr_hri14_flag_,addr_hri25_flag_,addr_hri30_flag_,addr_hri50_flag_,addr_hri_co_flag_,addr_hri_mo_flag_,addr_hri_pa_flag_,addr_hri_po_flag_,addr_hri_va_flag_,' + 
                         'ph_hri07_flag_,ph_hri08_flag_,ph_hri15_flag_,ph_hri27_flag_,ph_hri31_flag_,' + 
-                        'ssn_hri06_flag_,ssn_hri26_flag_,ssn_hri29_flag_,ssn_hri38_flag_,ssn_hri71_flag_,ssn_hri_it_flag_,ssn_hri_mi_flag_'     
+                        'ssn_hri06_flag_,ssn_hri26_flag_,ssn_hri29_flag_,ssn_hri38_flag_,ssn_hri71_flag_,ssn_hri_it_flag_,ssn_hri_mi_flag_,safe_flag_,contributor_safe_flag_'     
                         
 												) : PERSIST('~temp::deleteme49');
                            
@@ -108,17 +111,13 @@
 										
   // This is the list of attributes per entity type, indicatortype
   EXPORT FullIndicatorListPrep := TABLE(FullEntityStatsPrep, {customer_id_, industry_type_, entitytype, indicatordescription, Field, ElementCount := COUNT(GROUP) }, customer_id_, industry_type_, entitytype, indicatordescription, Field, MERGE);
-  EXPORT FullIndicatorList := JOIN(FullIndicatorListPrep, FraudGovPlatform.Key_WeightingChart, 
-												 KEYED(LEFT.Field=RIGHT.Field AND (INTEGER)LEFT.EntityType = RIGHT.EntityType),  
-	// EXPORT FullIndicatorList := JOIN(FullIndicatorListPrep, WeightingChart, 
-												 // LEFT.Field=RIGHT.Field AND (INTEGER)LEFT.EntityType = RIGHT.EntityType,
+	EXPORT FullIndicatorList := JOIN(FullIndicatorListPrep, WeightingChart, 
+												 LEFT.Field=RIGHT.Field AND (INTEGER)LEFT.EntityType = RIGHT.EntityType,
 												 TRANSFORM({RECORDOF(LEFT), INTEGER1 IsConfigured}, SELF.IsConfigured := MAP(RIGHT.field != '' => 1, 0), SELF := LEFT, SELF := RIGHT), LEFT OUTER, KEEP(1)); 
 	
   // This is the final result for entity stats after w
-  // EXPORT WeightedResult := JOIN(FullEntityStatsPrep(Value != ''), WeightingChart, 
-                         // LEFT.Field=RIGHT.Field AND (INTEGER)LEFT.entity_context_uid_[2..3] = RIGHT.EntityType AND
-  EXPORT WeightedResult := JOIN(FullEntityStatsPrep(Value != ''), FraudGovPlatform.Key_WeightingChart, 
-                         KEYED(LEFT.Field=RIGHT.Field AND (INTEGER)LEFT.entity_context_uid_[2..3] = RIGHT.EntityType) AND
+  EXPORT WeightedResult := JOIN(FullEntityStatsPrep(Value != ''), WeightingChart, 
+                         LEFT.Field=RIGHT.Field AND (INTEGER)LEFT.entity_context_uid_[2..3] = RIGHT.EntityType AND
                          (
                            (
                              RIGHT.Value != '' AND LEFT.Value = RIGHT.Value
@@ -152,7 +151,9 @@
   EXPORT ScoreBreakdown := 
           PROJECT(
             KELOtto.Functions.CalculatePercentile(ScoreBreakdownAggregate, 'customer_id_, industry_type_, indicatortype, entity_type_, indicatordescription', ValueCurved, 'CustomerPercentile', 'CustomerQuartileRank'), 
-            TRANSFORM(RECORDOF(LEFT) AND NOT [hashid], self.RiskLevel := LEFT.CustomerPercentile, SELF := LEFT)) : PERSIST('~temp::deleteme43', EXPIRE(7));
+            TRANSFORM(RECORDOF(LEFT) AND NOT [hashid], 
+            self.RiskLevel := LEFT.CustomerPercentile, // Only set the RiskLevel 
+            SELF := LEFT)) : PERSIST('~temp::deleteme43', EXPIRE(7));
 
 
 
@@ -178,12 +179,15 @@
   // Primarily to support weighting the categories so it can be configured later at a customer level.
   
     
-  SHARED ScoresPrep := TABLE(ScoreBreakdown,
-               {customer_id_, industry_type_, entity_context_uid_, Score := SUM(GROUP, CustomerPercentile), CurveScore := (SUM(GROUP, CustomerPercentile)*1000000) + HASH32(entity_context_uid_) % 1000000}, customer_id_, industry_type_, entity_context_uid_, MERGE);
+  SHARED ScoresPrep1 := TABLE(ScoreBreakdown,
+               {customer_id_, industry_type_, entity_context_uid_, 
+                Score := SUM(GROUP, CustomerPercentile), 
+                CurveScore := (SUM(GROUP, CustomerPercentile)*1000000) + HASH32(entity_context_uid_) % 1000000,
+                TotalWeightValue := SUM(GROUP, Value) // This is the raw value, if none of the indicators have values and this is 0 then we should 0 the score.                
+               }, customer_id_, industry_type_, entity_context_uid_, MERGE);
                
+  EXPORT Scores := DISTRIBUTE(KELOtto.Functions.CalculatePercentile(ScoresPrep1, 'customer_id_, industry_type_', CurveScore, 'ScorePercentile', 'ScoreQuartileRank'), HASH32(entity_context_uid_));
   
-  EXPORT Scores := DISTRIBUTE(KELOtto.Functions.CalculatePercentile(ScoresPrep, 'customer_id_, industry_type_', CurveScore, 'ScorePercentile', 'ScoreQuartileRank'), HASH32(entity_context_uid_));
-
   // Removed risk level 0 for now. when we put it back in the Web will need to filter them out of the widget.  
   EXPORT EntityStats := JOIN(WeightedResult(RiskLevel in [1,2,3]), Scores, LEFT.customer_id_=RIGHT.customer_id_ AND LEFT.industry_type_=RIGHT.industry_type_ AND LEFT.entity_context_uid_=RIGHT.entity_context_uid_ AND LEFT.Field = 'score_',
                         TRANSFORM(RECORDOF(LEFT), SELF.Value := MAP(RIGHT.entity_context_uid_ != '' => (STRING)RIGHT.ScorePercentile, (STRING)LEFT.Value), SELF := LEFT), LEFT OUTER, HASH);
@@ -192,12 +196,12 @@
   
   EXPORT ScoredGraphPrep1 := JOIN(DISTRIBUTE(KELOtto.FullGraph, HASH32(entity_context_uid_)), Scores,
                         LEFT.customer_id_=RIGHT.customer_id_ AND LEFT.industry_type_=RIGHT.industry_type_ AND LEFT.entity_context_uid_=RIGHT.entity_context_uid_,
-                        TRANSFORM(RECORDOF(LEFT), SELF.Score_ := MAP(RIGHT.entity_context_uid_ != '' => RIGHT.ScorePercentile, 0), SELF := LEFT), LEFT OUTER, LOCAL);
+                        TRANSFORM(RECORDOF(LEFT), SELF.Score_ := MAP(RIGHT.entity_context_uid_ != '' AND RIGHT.TotalWeightValue > 0 => RIGHT.ScorePercentile, 0), SELF := LEFT), LEFT OUTER, LOCAL);
        
   EXPORT ScoredGraphPrep2 := JOIN(ScoredGraphPrep1, DISTRIBUTE(ScoreBreakdown, HASH32(entity_context_uid_)),
                         LEFT.customer_id_=RIGHT.customer_id_ AND LEFT.industry_type_=RIGHT.industry_type_ AND LEFT.entity_context_uid_=RIGHT.entity_context_uid_ AND
-                        RIGHT.indicatortype = 'CL',
-                        TRANSFORM(RECORDOF(LEFT), SELF.Cluster_Score_ := MAP(RIGHT.entity_context_uid_ != '' => RIGHT.CustomerPercentile, 0), SELF := LEFT), LEFT OUTER, LOCAL);
+                        RIGHT.indicatortype = 'CL', 
+                        TRANSFORM(RECORDOF(LEFT), SELF.Cluster_Score_ := MAP(RIGHT.entity_context_uid_ != '' AND RIGHT.Value > 0 => RIGHT.CustomerPercentile, 0), SELF := LEFT), LEFT OUTER, LOCAL);
 
   // Flag/Indicator Child dataset.
 
@@ -227,7 +231,9 @@
 																											{'license_state_', (STRING)LEFT.license_state_},
 																											{'event_count_', (STRING)LEFT.event_count_},
                                                       {'abbreviated_bankname_', (STRING)LEFT.abbreviated_bankname_},
-                                                      {'in_customer_population_', (STRING)LEFT.in_customer_population_}
+                                                      {'in_customer_population_', (STRING)LEFT.in_customer_population_},
+                                                      {'contributor_safe_flag_', (STRING)LEFT.contributor_safe_flag_},
+                                                      {'safe_flag_', (STRING)LEFT.safe_flag_}
 																											], FlagsRec)(Value <> '');
 															 SELF := LEFT));// : PERSIST('~temp::deleteme65');
 				

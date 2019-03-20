@@ -2,6 +2,8 @@
 
 EXPORT Spray_Lerg_In(string version, const varstring eclsourceip, string thor_file, string thor_name):= FUNCTION
 
+	//DF-24140: Lerg6 Layout Change
+
 	//Linux Directories
 	srcdir 	:= '/data/data_999/phones/';
 	dir1		:= 'lerg';
@@ -14,7 +16,7 @@ EXPORT Spray_Lerg_In(string version, const varstring eclsourceip, string thor_fi
 	
 	//Spray Lerg File to Thor
 	sprayFile 		:= Std.File.SprayVariable(eclsourceip,
-																					srcdir + dir1 + '/' + version + '/' + stringlib.stringtouppercase(thor_file) + '.txt',
+																					srcdir + dir1 + '/' + version[1..8] + '/' + stringlib.stringtouppercase(thor_file) + '.txt',
 																					,
 																					',',
 																					'\r\n',

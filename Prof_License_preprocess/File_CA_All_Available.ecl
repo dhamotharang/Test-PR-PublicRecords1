@@ -1,4 +1,4 @@
-EXPORT File_CA_All_Available := module
+﻿EXPORT File_CA_All_Available := module
 
 shared brz_rec := 
 record                         
@@ -25,7 +25,7 @@ record
    string lf;                  
 end;                           
 
-export brz00_raw := dataset('~thor_data400::in::prolic::ca::all_available::breeze',brz_rec,CSV( heading(1),separator(','),terminator(['\n']),Quote('"')));
+export brz00_raw := dataset('~thor_data400::in::prolic::ca::all_available::breeze',brz_rec,CSV( heading(1),separator(','),terminator(['\n']),Quote('"'))) ( trim(Address_Line_1) <> ' ' and regexfind('[0-9]',Zip) = true );
 
 shared legacy_rec := record                         
    string  Agency_Name;        
@@ -53,7 +53,7 @@ shared legacy_rec := record
    string lf;                  
 end;                            
                                
-export lgc00_raw := dataset('~thor_data400::in::prolic::ca::all_available::legacy',legacy_rec,CSV( heading(1),separator(','),terminator(['\n']),Quote('"')));
+export lgc00_raw := dataset('~thor_data400::in::prolic::ca::all_available::legacy',legacy_rec,CSV( heading(1),separator(','),terminator(['\n']),Quote('"'))) ( trim(Address_Line_1) <> ' ' and regexfind('[0-9]',Zip) = true );
 
 
 end;

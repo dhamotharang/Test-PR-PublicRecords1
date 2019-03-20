@@ -1,6 +1,19 @@
-import _Control;
+﻿import _Control,STD,wk_ut,ut;
 
 EXPORT WorkUnitModule(string lTargetESPAddress,string lTargetESPPort) := module
+	
+	export layout_filelist := record
+			integer whichbasket := 0;
+			integer cnt := 0;
+			string filename;
+			string filepattern;
+			string modified;
+			integer size;
+			string owner;
+			string cluster;
+			integer totalmatchedfiles;// := 0;
+			string daliip;
+		end;
 	
 	export	string	fSubmitNewWorkunit(string pECLText, string pCluster)	:=
 	function
@@ -31,6 +44,7 @@ EXPORT WorkUnitModule(string lTargetESPAddress,string lTargetESPPort) := module
 																						 rWUCreateAndUpdateRequest,
 																						 rWUCreateAndUpdateResponse,
 																						 xpath('WUUpdateResponse')
+																						 ,HTTPHEADER('Authorization', 'Basic ' + ut.Credentials().fGetEncodedValues())
 																						);
 
 			return	dWUCreateAndUpdateResult.WUID;
@@ -62,6 +76,7 @@ EXPORT WorkUnitModule(string lTargetESPAddress,string lTargetESPPort) := module
 																	 rWUSubmitRequest,
 																	 rWUSubmitResponse,
 																	 xpath('WUSubmitResponse/Exceptions/Exception')
+																	 ,HTTPHEADER('Authorization', 'Basic ' + ut.Credentials().fGetEncodedValues())
 																	);
 
 			return	dWUSubmitResult;
@@ -74,6 +89,74 @@ EXPORT WorkUnitModule(string lTargetESPAddress,string lTargetESPPort) := module
 																 ''
 																);
 		return	dExceptions.Code;//return	ReturnValue;
+	end;
+	
+	export fGetFilesInWorkunit(string wid) := function
+		
+		rWUInfoRequest := record
+			string Name{xpath('Wuid')} := wid;
+		end;
+
+	
+		rWUInfoFilesUsed := record
+			string100 name {XPATH('Name')} := '';
+		end;
+
+	
+		rWUInfoFilesCreated := record
+			string100 name {XPATH('FileName')} := '';
+		end;
+
+	
+		rWUInfoResponse := record,maxlength(300000)
+			string20 Wuid{xpath('Wuid')};
+			dataset(rWUInfoFilesUsed) dWUInfoFilesUsed{xpath('SourceFiles/ECLSourceFile')};
+			dataset(rWUInfoFilesCreated) dWUInfoFilesCreated{xpath('Results/ECLResult')};
+		end;
+	
+		dSOAPResult := SOAPCALL('http://'+lTargetESPAddress+':'+lTargetESPPort+'/WsWorkunits', 'WUInfo', 
+											rWUInfoRequest, dataset(rWUInfoResponse),
+											xpath('WUInfoResponse/Workunit')
+											,HTTPHEADER('Authorization', 'Basic ' + ut.Credentials().fGetEncodedValues())
+										 );
+										 
+		rWUFilesFlat := record
+			string20 wuid := wid;
+			string100 name := '';
+			dataset(wk_ut.get_DFUInfo().DFUInfoOutRecord) dfuinfo;
+		end;
+	
+		rWUFilesFlat xWUFilesUsedFlat(dSOAPResult l, rWUInfoFilesUsed r) := transform
+			self.name := trim(r.name,left,right);
+			self.dfuinfo := wk_ut.get_DFUInfo(trim(r.name,left,right)).DFUInfo();
+			self := l;
+		end;
+	
+		dWUFilesUsedFlat := sort(normalize(dSOAPResult,left.dWUInfoFilesUsed,xWUFilesUsedFlat(left,right)),name);
+	
+		return dWUFilesUsedFlat;
+	end;
+	
+	export GetWUInfo(string wid) := function
+		
+		rWUInfoRequest := record
+			string Name{xpath('Wuid')} := wid;
+		end;
+	
+		rWUInfoResponse := record,maxlength(300000)
+			string20 Wuid{xpath('Wuid')};
+			string ecltext {XPATH('Query/Text')} := '';
+			//dataset(resultnames) resultfiles{xpath('Results/ECLResult')};
+		end;
+	
+		dWUInfoResponse := SOAPCALL('http://'+lTargetESPAddress+':'+lTargetESPPort+'/WsWorkunits', 'WUInfo', 
+											rWUInfoRequest, dataset(rWUInfoResponse),
+											xpath('WUInfoResponse/Workunit')
+											,HTTPHEADER('Authorization', 'Basic ' + ut.Credentials().fGetEncodedValues())
+										 );
+
+		
+		return dWUInfoResponse;
 	end;
 	
 end;
