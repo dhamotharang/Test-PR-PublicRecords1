@@ -1,5 +1,4 @@
-﻿#workunit('name','Phonesplus v2');
-import Cellphone,Phonesplus, lib_FileServices, RoxieKeyBuild,infutorcid, phonesplus_v2, ut,buildlogger;
+﻿import Cellphone,Phonesplus, lib_FileServices, RoxieKeyBuild,infutorcid, phonesplus_v2, ut,buildlogger;
 export BWR_Phonesplus(string pversion,string emailList='', string tversion):=function
 
 e_mail_success := FileServices.sendemail

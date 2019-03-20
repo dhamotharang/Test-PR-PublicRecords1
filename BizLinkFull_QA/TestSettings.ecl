@@ -2,7 +2,7 @@
 EXPORT TestSettings() := FUNCTION
 
 dSAOTData := BizLinkFull_QA.saotDataSample();
-dData 		:= BizLinkFull_QA.modGetSamples.fGetSamples(10000);
+dData 		:= BizLinkFull_QA.modGetSamples.fGetSamples(50000);
 filename 	:= '~thor::bipheader::validation::xlink_samples_' + WORKUNIT;	
 
 RETURN SEQUENTIAL(

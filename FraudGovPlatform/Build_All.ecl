@@ -12,7 +12,7 @@ export Build_All(
 module
 
 	// Load Files Once
-	shared SkipModules := Files().OutputF.SkipModules;
+	shared SkipModules := Files().Flags.SkipModules;
 	shared MBS_File := FraudShared.Files().Input.MBS.sprayed;
 	shared Main_Built := FraudShared.Files().Base.Main.Built;
 	
