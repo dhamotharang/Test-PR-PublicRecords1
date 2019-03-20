@@ -14,7 +14,7 @@ EXPORT Key_LinkIds := MODULE
   ),hash,keep(1),left outer);
   
 	shared dkeybuild	:= project(Base, transform(layouts.key, self := left, self := []));
-	BIPV2.IDmacros.mac_IndexWithXLinkIDs(dkeybuild, k, superfile_name)
+	BIPV2.IDmacros.mac_IndexWithXLinkIDs(dkeybuild, k, /*superfile_name*/'~thor_data400::key::bipv2_best::20190304b::linkids')
 	export Key := k; // FOR DEBUG USE ONLY -- Do not reference this in production code!
 	// export KeyPlus := BIPV2.mac_AddStatus(project(Key, {Key, string50 company_status_derived := ''})); //with company_status_derived, isactive, isdefunct
 	export KeyPlus := project(Key, {Key, string50 company_status_derived := ''}); //with company_status_derived, isactive, isdefunct
@@ -104,6 +104,7 @@ FUNCTION
 		self.company_fein			:= restrict(L.company_fein, in_mod, company_fein_data_permits, sources);
 		self.company_url			:= restrict(L.company_url, in_mod, company_url_data_permits);
 		self.company_incorporation_date := restrict(L.company_incorporation_date, in_mod, company_incorporation_date_permits, sources);
+		self.dba_name      := mask(restrict(L.dba_name, in_mod, dba_name_data_permits, , true), in_mod, dba_name_data_permits);
 		self := L;
 	end;
 	ds_restricted := project(ds_fetched, apply_restrict(left));
@@ -132,6 +133,7 @@ FUNCTION
 		self.company_fein			:= filterSrcCode(L.company_fein,    company_fein_data_permits,    sources, allowCodeBmap);
 		self.company_url			 := filterSrcCode(L.company_url,     company_url_data_permits,            , allowCodeBmap);
 		self.company_incorporation_date := filterSrcCode(L.company_incorporation_date, company_incorporation_date_permits, sources, allowCodeBmap);
+		self.dba_name       := filterSrcCode(L.dba_name,        dba_name_data_permits,               , allowCodeBmap);
 		self := L;
 	end;
 	return project(ds, apply_src_filter(left));
