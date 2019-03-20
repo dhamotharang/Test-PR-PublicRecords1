@@ -89,8 +89,9 @@ Export WV 	:= Module
 			self.corp_for_profit_ind              := map(corp2.t2u(input.BusinessClass)='P' =>'Y',
 																									 corp2.t2u(input.BusinessClass)='N'	=>'N',
 																									 '');
-			self.corp_termination_date   					:= If(corp2.t2u(input.businesstype) not in ['LLC', 'LLP'] ,Corp2_Mapping.fValidateDate(input.TerminationDate,'MM/DD/CCYY').GeneralDate, '');								 
-			self.Corp_Termination_Cd	          	:= map(corp2.t2u(input.businesstype)  in ['LLC', 'LLP']=>'',
+			self.corp_termination_date   					:= If(corp2.t2u(input.businesstype) not in ['LLC', 'LLP','TMO'] ,Corp2_Mapping.fValidateDate(input.TerminationDate,'MM/DD/CCYY').GeneralDate, '');								 
+			self.corp_trademark_expiration_date 	:= If(corp2.t2u(input.businesstype) = 'TMO',Corp2_Mapping.fValidateDate(input.TerminationDate,'MM/DD/CCYY').GeneralDate, '');								 
+  		self.Corp_Termination_Cd	          	:= map(corp2.t2u(input.businesstype)  in ['LLC', 'LLP','TMO']=>'',
 																									 corp2.t2u(input.TerminationReason) in ['0','D','S','O','Y','`']=>'', //Per CI : 'No code descriptions - leave blank'
 																									 corp2.t2u(input.TerminationReason)
 																									);																				
@@ -100,12 +101,12 @@ Export WV 	:= Module
 																									 corp2.t2u(input.TerminationReason) in ['0','D','S','O','Y','`']=>'', //Per CI : 'No code descriptions - leave blank'
 																									 corp2.t2u(input.TerminationReason)
 																									 );
-			self.corp_status_Desc 								:= if(((ut.date_slashed_mmddyyyy_to_yyyymmdd(input.TerminationDate) > ut.GetDate) OR corp2.t2u(input.TerminationDate) = '') AND
+			self.corp_status_Desc 								:= if(((ut.date_slashed_mmddyyyy_to_yyyymmdd(input.TerminationDate) > ut.GetDate) OR trim(input.TerminationDate,left,right) = '') AND
 			                                              corp2.t2u(input.TerminationReason) in ['X',''], 'ACTIVE', 'NOT ACTIVE');
-			self.corp_status_Comment              := Corp2_Raw_WV.Functions.fGetStatusDesc(self.Corp_Termination_Cd);//overload
-			Self.corp_term_exist_cd 							:= If(corp2.t2u(input.businesstype)  In ['LLC', 'LLP'] and Corp2_Mapping.fValidateDate(input.EffectiveDate,'MM/DD/CCYY').GeneralDate<>'', 'D','');
-			Self.corp_term_exist_exp 							:= If(corp2.t2u(input.businesstype)  In ['LLC', 'LLP'] ,Corp2_Mapping.fValidateDate(input.EffectiveDate,'MM/DD/CCYY').GeneralDate,'');
-			Self.corp_term_exist_desc 				    := If(corp2.t2u(input.businesstype)  In ['LLC', 'LLP'] and Corp2_Mapping.fValidateDate(input.EffectiveDate,'MM/DD/CCYY').GeneralDate<>'','EXPIRATION DATE','');
+			self.corp_status_Comment              := if(corp2.t2u(input.businesstype) <> 'TMO',Corp2_Raw_WV.Functions.fGetStatusDesc(self.Corp_Termination_Cd),'');//overload
+			Self.corp_term_exist_cd 							:= If(corp2.t2u(input.businesstype)  In ['LLC', 'LLP', 'TMO'] and Corp2_Mapping.fValidateDate(input.TerminationDate,'MM/DD/CCYY').GeneralDate<>'', 'D','');
+			Self.corp_term_exist_exp 							:= If(corp2.t2u(input.businesstype)  In ['LLC', 'LLP', 'TMO'],Corp2_Mapping.fValidateDate(input.TerminationDate,'MM/DD/CCYY').GeneralDate,'');
+			Self.corp_term_exist_desc 				    := If(corp2.t2u(input.businesstype)  In ['LLC', 'LLP', 'TMO'] and Corp2_Mapping.fValidateDate(input.TerminationDate,'MM/DD/CCYY').GeneralDate<>'','EXPIRATION DATE','');
 			self.corp_address1_line1							:= if(corp2.t2u(input.ContactType)in address1_type_list,Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.street1,input.street2,input.City,input.stateProvince,input.zipCode).AddressLine1,'');
 			self.corp_address1_line2				 			:= if(corp2.t2u(input.ContactType)in address1_type_list,Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.street1,input.street2,input.City,input.stateProvince,input.zipCode).AddressLine2,'');
 			self.corp_address1_line3				  		:= if(corp2.t2u(input.ContactType)in address1_type_list,Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.street1,input.street2,input.City,input.stateProvince,input.zipCode).AddressLine3,'');
@@ -308,7 +309,7 @@ Export WV 	:= Module
 																								corp2.t2u(input.DBAType) = 'GTN'                   => 'GENERAL PARTNER TRADENAME',
 																								corp2.t2u(input.DBAType) = 'STN'                   => 'SOLE PROPRIETOR TRADENAME',
 																								corp2.t2u(input.DBAType) = 'TM'                    => 'TRADEMARK',
-																								corp2.t2u(input.DBAType) = 'FDB'                   => 'FOREIGN DBA',	
+																								corp2.t2u(input.DBAType) = 'FDB'                   => 'FICTITIOUS NAME',	
 																								corp2.t2u(input.DBAType) in ['FDA','F','FD','TMO'] => '',
 																								'');
 			self.corp_foreign_domestic_ind     := if(corp2.t2u(input.DBAType)= 'FDB','F','');
@@ -316,7 +317,7 @@ Export WV 	:= Module
 			self.Corp_Name_Status_Desc				 := map(corp2.t2u(input.DBAType)= 'FDB' and Corp2_Mapping.fValidateDate(input.TerminationDate,'MM/DD/CCYY').pastDate<>'' => 'DATE FOREIGN DBA TERMINATES: '+ Corp2_Mapping.fValidateDate(input.TerminationDate,'MM/DD/CCYY').pastDate,																							
 																							  corp2.t2u(input.DBAType) in ['TN','FTN','GTN','STN'] and Corp2_Mapping.fValidateDate(input.TerminationDate,'MM/DD/CCYY').pastDate<>'' => 'DATE TRADENAME TERMINATES: '+ Corp2_Mapping.fValidateDate(input.TerminationDate,'MM/DD/CCYY').pastDate,
 																							'');
-			self.Corp_Trademark_Expiration_Date:= if(corp2.t2u(input.DBAType)='TM',Corp2_Mapping.fValidateDate(input.TerminationDate,'MM/DD/CCYY').GeneralDate,'');
+			self.Corp_Trademark_Expiration_Date:= if(corp2.t2u(input.DBAType) in ['TM','TMO'],Corp2_Mapping.fValidateDate(input.TerminationDate,'MM/DD/CCYY').GeneralDate,'');
 			self.Corp_Trademark_Filing_Date    := if(corp2.t2u(input.DBAType)='TM',Corp2_Mapping.fValidateDate(input.EffectiveDate,'MM/DD/CCYY').GeneralDate,'');
 			self.Corp_Trademark_Logo           := if(corp2.t2u(input.DBAType)='TM',corp2.t2u(input.DBAname),'');	
 			self.corp_status_date              := Corp2_Mapping.fValidateDate(input.TerminationDate,'MM/DD/CCYY').pastDate;
