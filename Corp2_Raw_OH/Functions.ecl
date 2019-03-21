@@ -1,4 +1,4 @@
-IMPORT corp2_mapping, ut, corp2,lib_stringlib;
+﻿IMPORT corp2_mapping, ut, corp2,lib_stringlib;
 
 EXPORT Functions := Module
 
@@ -333,7 +333,7 @@ EXPORT Functions := Module
 		
 		//Below table needs to be updated when we see new AR Type codes in Raw updates!	
 		EXPORT Set_Of_Ar_FilingCodes :=['00A','00L','01A','01L','02A','02L','03L','04A','05L','06A','07L','08A','09L','10A',
-																		'11L','12A','13L','14A','16A','15L','17L','60A','61A','62A','63A','64A','65A','66A','67A',
+																		'11L','12A','13L','14A','16A','15L','17L','18A','60A','61A','62A','63A','64A','65A','66A','67A',
 																		'68A','69A','70A','71A','72A','73A','74A','75A','76A','77A','78A','79A','80A','81A',
 																		'82A','83A','84A','85A','86A','87A','88A','89A','90A','91A','92A','92L','93A','94A',
 																		'95A','95L','96A','96L','97A','97L','98A','98L','99A','99L','ANR','71L','72L','73L',
@@ -352,14 +352,14 @@ EXPORT Functions := Module
 															 '72A','73A','74A','75A','76A','77A','78A',
 															 '79A','80A','81A','82A','83A','84A','85A',
 															 '86A','87A','88A','89A','90A','91A','93A',
-															 '94A','95A','96A','97A','99A','98A','92A'] 		 =>'ANNUAL REPORT OF PROFESSIONAL CORP',
+															 '94A','95A','96A','97A','99A','98A','92A'] 		 => 'ANNUAL REPORT OF PROFESSIONAL CORP',
 											code in ['71L','72L','73L','74L','75L','76L','77L',
 															 '78L','79L','80L','81L','82L','84L','85L',
 															 '86L','87L','88L','89L','90L','91L','92L',
 															 '93L','94L','95L','96L','97L','98L','99L',
 															 '00L','01L','02L','04L','06L','08L','10L'] 		 => 'ANNUAL REPORT/LIMITED LIABILITY PARTNERSHIP',
-											code in['02A','04A','08A','10A','12A','14A' ,'06A'] 		 =>'BIENNIAL REPORT OF PROFESSIONAL CORP',
-											code in['03L','05L','07L','09L','11L','13L','15L','17L'] =>'BIENNIAL REPORT/LIMITED LIABILITY PARTNERSHIP',
+											code in['02A','04A','08A','10A','12A','14A','06A','18A'] => 'BIENNIAL REPORT OF PROFESSIONAL CORP',
+											code in['03L','05L','07L','09L','11L','13L','15L','17L'] => 'BIENNIAL REPORT/LIMITED LIABILITY PARTNERSHIP',
 											'');																
 																	
 		End;
@@ -369,9 +369,7 @@ EXPORT Functions := Module
 				LicenseType            := map(corp2.t2u(License_Type) = 'T'=>'LICENSE TYPE: TEMPORARY LICENSE',
 																			corp2.t2u(License_Type) = 'P'=>'LICENSE TYPE: PERMANENT LICENSE',
 																			''); 
-				Consent								 := map(corp2.t2u(Consent_Flag) = 'Y'=>'RECEIVED CONSENT TO USE PROTECTED NAME',
-																			corp2.t2u(Consent_Flag) = 'N'=>'DID NOT RECEIVED CONSENT TO USE PROTECTED NAME',
-																		  ''); 	
+				Consent								 := if(corp2.t2u(Consent_Flag) = 'Y' ,'RECEIVED CONSENT TO USE PROTECTED NAME' ,'');
 				BusinessLoc            := if(corp2.t2u(Business_Location_Name)<>'','PRINCIPAL LOCATION: '+corp2.t2u(Business_Location_Name),'');
 				Purpose								 := map( trim(Business_Class,left,right)='01'=>'CHEMICALS',
 																			 trim(Business_Class,left,right)='02'=>'PAINTS',
@@ -419,7 +417,7 @@ EXPORT Functions := Module
 																			 trim(Business_Class,left,right)='44'=>'MEDICAL,VETERINARY,HYGIENIC,AGRICULTURE,FORESTRY',
 																			 trim(Business_Class,left,right)='45'=>'PERSONAL, SOCIAL AND SECURITY',
 																			 '');
-				TradeMark               :=if(trim(Business_Class,left,right)<>'' ,'PURPOSE OF TRADEMARK OR SERVICE MARK: '+ Purpose,'');
+				TradeMark               :=if(trim(Purpose,left,right)<>'' ,'PURPOSE OF TRADEMARK OR SERVICE MARK: '+ Purpose,'');
 				concatFields						:= trim(trim(LicenseType,left,right) + ';' + 
 																				trim(Consent,left,right) + ';' 		 + 
 																				trim(BusinessLoc,left,right) + ';' + 
@@ -432,5 +430,5 @@ EXPORT Functions := Module
 				return addl_info;
 
 		END; 
-		
+		 
 End;
