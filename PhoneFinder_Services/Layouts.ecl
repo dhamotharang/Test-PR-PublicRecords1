@@ -144,10 +144,10 @@ MODULE
 			DATASET(OTPs) OTPHistory;
 		END;			
 		
-		EXPORT	alert := 
+		EXPORT	Alert := 
 		RECORD
 			STRING flag;
-			DATASET(iesp.share.t_StringArrayItem) messages;
+			DATASET(iesp.share.t_STRINGArrayItem) messages;
 			DATASET(iesp.phonefinder.t_PhoneFinderAlertIndicator) AlertIndicators;
 		END;
 		
@@ -236,22 +236,25 @@ MODULE
 			STRING4 PhoneRiskIndicator;
 			BOOLEAN OTPRIFailed;
 			DATASET(Alert) Alerts;
+      Alert - [flag, Messages];
 			DATASET({STRING17 InquiryDate})									InquiryDates;		
 			UNSIGNED RecordsReturned;
 			BOOLEAN PhoneOwnershipIndicator;
 			STRING rec_source;
 			STRING15 CallForwardingIndicator;
-			string imsi_seensince;
-			string8 imsi_changedate;
-			string8 imsi_ActivationDate;
-			integer imsi_changedthis_time;
-			integer iccid_changedthis_time;
-			string iccid_seensince;
-			string imei_seensince;
-			string8 imei_changedate;
-			integer imei_changedthis_time;
-			integer loststolen;
-			string8 loststolen_date;
+			STRING imsi_seensince;
+			STRING8 imsi_changedate;
+			STRING8 imsi_ActivationDate;
+			INTEGER imsi_changedthis_time;
+			INTEGER iccid_changedthis_time;
+			STRING iccid_seensince;
+			STRING imei_seensince;
+			STRING8 imei_changedate;
+			INTEGER imei_changedthis_time;
+			INTEGER loststolen;
+			STRING8 loststolen_date;
+      BOOLEAN is_verified;
+      STRING100 verification_desc;
 		END;
 		
 		EXPORT ExcludePhones :=
@@ -294,7 +297,10 @@ MODULE
 			STRING40	primary_address_type;				
 			UNSIGNED1 phone_source;
 			STRING1 	tnt;
-			BOOLEAN PhoneOwnershipIndicator;
+			BOOLEAN   PhoneOwnershipIndicator;
+      BOOLEAN   is_identity_verified;
+      BOOLEAN   is_phone_verified;
+      STRING100 verification_desc;
 		END;
 		
 		EXPORT PhoneSlim :=
@@ -333,8 +339,21 @@ MODULE
 			STRING4 PhoneRiskIndicator;
 			BOOLEAN OTPRIFailed;
 			DATASET(Alert) Alerts;
+			DATASET({STRING17 InquiryDate})	InquiryDates;
+			UNSIGNED RecordsReturned;
 			BOOLEAN PhoneOwnershipIndicator;
 			STRING15 CallForwardingIndicator;
+			STRING imsi_seensince;
+			STRING8 imsi_changedate;
+			STRING8 imsi_ActivationDate;
+			INTEGER imsi_changedthis_time;
+			INTEGER iccid_changedthis_time;
+			STRING iccid_seensince;
+			STRING imei_seensince;
+			STRING8 imei_changedate;
+			INTEGER imei_changedthis_time;
+			INTEGER loststolen;
+			STRING8 loststolen_date;
 		END;
 		
 		EXPORT IdentityIesp :=
@@ -631,7 +650,7 @@ MODULE
 			BOOLEAN OTPRIFailed;
 			%Alerts%
 			STRING15 CallForwardingIndicator;
-			string100 PhoneVerificationDescription;
+			STRING100 PhoneVerificationDescription;
 			boolean PhoneVerified;
 			STRING   CallerID;
 			STRING   CompanyNumber;
@@ -815,49 +834,49 @@ MODULE
    		STRING16 risk_indicator;
    		STRING32 phone_type;
    		STRING32 phone_status;
-   		Integer  ported_count;
+   		INTEGER  ported_count;
 		STRING32 last_ported_date; 
    		INTEGER  otp_count;
    		STRING32 last_otp_date;
-   		integer  spoof_count;
+   		INTEGER  spoof_count;
    		STRING32 last_spoof_date;
    		STRING32 phone_forwarded;
    END;
 		
 	EXPORT	delta_phones_rpt_otherphones:= record
-   		string16 transaction_id;
-   		Integer sequence_number;
-		Integer phone_id;
-   		string15 phonenumber;
-		string16 risk_indicator;
-   		string32 phone_type;
-   		string32 phone_status;
-   		string64 listing_name;
-   		string16 porting_code;
-   		string32 phone_forwarded;
-   		Integer1	verified_carrier; 
+   		STRING16 transaction_id;
+   		INTEGER sequence_number;
+		INTEGER phone_id;
+   		STRING15 phonenumber;
+		STRING16 risk_indicator;
+   		STRING32 phone_type;
+   		STRING32 phone_status;
+   		STRING64 listing_name;
+   		STRING16 porting_code;
+   		STRING32 phone_forwarded;
+   		INTEGER1	verified_carrier; 
 	END;
    	
    EXPORT	delta_phones_rpt_identities:= record
-   		string16 transaction_id;
-   		Integer  sequence_number;
-		string32 lexid;
-   		string128 full_name;
-   		string128 full_address;
-   		string64 city;
-   		string16 state;
-   		string10 zip;
-   		Integer1	 verified_carrier; 
+   		STRING16 transaction_id;
+   		INTEGER  sequence_number;
+		STRING32 lexid;
+   		STRING128 full_name;
+   		STRING128 full_address;
+   		STRING64 city;
+   		STRING16 state;
+   		STRING10 zip;
+   		INTEGER1	 verified_carrier; 
    	END;
 
 	EXPORT delta_phones_rpt_riskindicators:= record
-        string16 transaction_id;
-        integer phone_id;
-        integer sequence_number;
-	    string256 risk_indicator_text;		 	
-	    integer risk_indicator_id;
-        string16 risk_indicator_level;
-        string32 risk_indicator_category;
+        STRING16 transaction_id;
+        INTEGER phone_id;
+        INTEGER sequence_number;
+	    STRING256 risk_indicator_text;		 	
+	    INTEGER risk_indicator_id;
+        STRING16 risk_indicator_level;
+        STRING32 risk_indicator_category;
    END;
 	 
 	EXPORT delta_phones_rpt_Usage_records := RECORD

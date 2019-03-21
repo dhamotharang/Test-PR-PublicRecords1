@@ -4,7 +4,8 @@ EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)
 													 PhoneFinder_Services.iParam.ReportParams inMod, 
 													 DATASET(Gateway.Layouts.Config) dGateways, 
 													 DATASET(PhoneFinder_Services.Layouts.BatchInAppendDID) dInBestInfo,
-													 DATASET(PhoneFinder_Services.Layouts.SubjectPhone) subjectInfo) :=
+													 DATASET(PhoneFinder_Services.Layouts.SubjectPhone) subjectInfo,
+                           BOOLEAN isBatch = FALSE) :=
 	FUNCTION
 	
 	// ---------------------------------------------------------------------------------------------------------
@@ -373,7 +374,7 @@ EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)
 	primaryPhoneSource := [PhoneFinder_Services.Constants.PhoneSource.Waterfall,PhoneFinder_Services.Constants.PhoneSource.QSentGateway];				
 	 // original approach : display RI's when IncludePhoneMetadata and transaction type = premium,ultimate and phoneriskassesment
 	 //Re-design approach: display RI's info when IncludeRiskIndicators = true
-	displayPRI := inMod.IncludeRiskIndicators AND EXISTS(inMod.RiskIndicators(Active));
+	displayPRI := isBatch AND inMod.IncludeRiskIndicators AND EXISTS(inMod.RiskIndicators(Active));
 	call_fowarded := PhoneFinder_Services.Functions.CallForwardingDesc(1);	// FORWARDED
 	PhoneFinder_Services.Layouts.PhoneFinder.Final rollMetadata(PhoneFinder_Services.Layouts.PhoneFinder.Final l,
 																																PhoneFinder_Services.Layouts.PhoneFinder.Final r) := TRANSFORM
@@ -494,7 +495,8 @@ EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)
 		// OUTPUT(dedupOTPs,NAMED('dedupOTPs'));		
 		// OUTPUT(dvalidOTP,NAMED('dvalidOTP'));		
 		// OUTPUT(dvalidOTPwHistory,NAMED('dvalidOTPwHistory'));			
-		OUTPUT(dPhoneInfowOTP,NAMED('dPhoneInfowOTP'));				
+		// OUTPUT(dPhoneInfowOTP,NAMED('dPhoneInfowOTP'));				
+		OUTPUT(dPhoneInfoUpdate_OTP,NAMED('dPhoneInfoUpdate_OTP'));				
 		OUTPUT(drolledMetadataRecs,NAMED('rolledMetadataRecs'));	
 		OUTPUT(dSortedPhoneRecs,NAMED('SortedPhoneRecs'));	
 		// OUTPUT(SortedIdentity,NAMED('SortedIdentity'));	
@@ -510,6 +512,6 @@ EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)
 		OUTPUT(MetadataResults,NAMED('MetadataResults'));		
 	#END;
 
-	RETURN SORT(MetadataResults,acctno,seq);	
+	RETURN  SORT(MetadataResults, acctno, seq);
 		
 	END;

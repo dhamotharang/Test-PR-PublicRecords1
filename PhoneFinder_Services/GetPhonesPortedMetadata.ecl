@@ -105,9 +105,10 @@ EXPORT GetPhonesPortedMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.
 			SELF.spid				 			 := IF(mostCurrent,l.spid,r.spid);
 			SELF := l;
 	END;
-	dPortedRolled		:= ROLLUP(SORT(transformPort,acctno,did,phone,FirstPortedDate=0,FirstPortedDate),
+
+  // Should be rolled up on acctno, phone NOT acctno, did, phone
+	dPortedRolled		:= ROLLUP(SORT(transformPort,acctno,phone,FirstPortedDate=0,FirstPortedDate),
 															LEFT.acctno = RIGHT.acctno AND
-															LEFT.DID		= RIGHT.DID AND
 															LEFT.phone 	= RIGHT.phone,
 															rollports(LEFT, RIGHT));	
 															

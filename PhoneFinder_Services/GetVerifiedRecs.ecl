@@ -1,24 +1,77 @@
 ﻿IMPORT $, STD, NID, MDR, iesp, ut;
 
+// Function only invoked during a PHONE search
 EXPORT GetVerifiedRecs($.IParam.PhoneVerificationParams vmod) := MODULE
    
-   SHARED matchDid ($.Layouts.PhoneFinder.IdentityIesp L, $.Layouts.BatchIn R) :=
-    (R.did>0 AND (UNSIGNED) L.UniqueId = R.did);
-  
-   SHARED matchName ($.Layouts.PhoneFinder.IdentityIesp L, $.Layouts.BatchIn R) :=
-    (matchDid(L, R) OR
-    ( 
-      NID.mod_PFirstTools.PFLeqPFR(L.Name.First, STD.STR.ToUpperCase(R.name_first)) AND                            
-      (
-        (L.Name.Last = STD.STR.ToUpperCase(R.name_last)) 
-        OR
-        (vmod.phoneticMatch AND metaphonelib.DMetaPhone1(L.Name.Last) = metaphonelib.DMetaPhone1(STD.STR.ToUpperCase(R.name_last)))
-      )
-    ));      
+  SHARED matchDid ($.Layouts.PhoneFinder.IdentitySlim L, $.Layouts.BatchIn R) :=
+  (R.did > 0 AND L.did = R.did);
 
-  SHARED matchNameAddress ($.Layouts.PhoneFinder.IdentityIesp L, $.Layouts.BatchIn R)  :=
-   (matchDid(L, R) OR
+  SHARED matchName ($.Layouts.PhoneFinder.IdentitySlim L, $.Layouts.BatchIn R) :=
+  (matchDid(L, R) OR
+  ( 
+    NID.mod_PFirstTools.PFLeqPFR(L.fname, STD.STR.ToUpperCase(R.name_first)) AND                            
+    (
+      (L.lname = STD.STR.ToUpperCase(R.name_last)) 
+      OR
+      (vmod.phoneticMatch AND metaphonelib.DMetaPhone1(L.lname) = metaphonelib.DMetaPhone1(STD.STR.ToUpperCase(R.name_last)))
+    )
+  ));
+  
+  SHARED matchNameAddress ($.Layouts.PhoneFinder.IdentitySlim L, $.Layouts.BatchIn R)  :=
+    (matchDid(L, R) OR
     ((matchName(L, R) AND 
+    (
+      (L.vendor_id = MDR.sourceTools.src_Targus_Gateway AND L.prim_range = '' AND L.prim_name = '') 
+      OR      
+      (
+        (L.prim_range = R.prim_range AND L.prim_name = STD.STR.ToUpperCase(R.prim_name)) AND 
+        (
+          (L.city_name = STD.STR.ToUpperCase(R.p_city_name) AND L.st = STD.STR.ToUpperCase(R.st))
+          OR
+          (L.zip = R.z5)
+        )
+      )
+    ))));
+
+  SHARED matchPhoneActive($.Layouts.PhoneFinder.IdentitySlim L) := 
+  FUNCTION
+      
+    today := (STRING) STD.Date.Today();   
+
+    sDateFirstSeen := (STRING)L.dt_first_seen;
+    sDateLastSeen  := (STRING)L.dt_last_seen;
+      
+    timeWithPrimaryPhone := (STRING) ut.DaysApart(sDateFirstSeen, sDateLastSeen);
+    dateLastSeenFromToday := (STRING) ut.DaysApart(today, sDateLastSeen);
+    dateFirstSeenFromToday := (STRING) ut.DaysApart(today, sDateFirstSeen);
+                          
+    dateFirstSeenOk := ~vmod.useDateFirstSeenVerify OR (INTEGER) dateFirstSeenFromToday > vmod.dateFirstSeenThreshold;                      
+    dateLastSeenOk := ~vmod.useDateLastSeenVerify OR (INTEGER) dateLastSeenFromToday > vmod.dateLastSeenThreshold;        
+    lengthOfTimeOk := ~vmod.useLengthOfTimeVerify OR (INTEGER) timeWithPrimaryPhone > vmod.lengthOfTimeThreshold; 
+                          
+    isPhoneActive := dateLastSeenOk AND dateFirstSeenOk AND lengthOfTimeOk;
+
+    RETURN isPhoneActive;   
+        
+  END;
+
+  SHARED matchDidBatch ($.Layouts.PhoneFinder.IdentityIesp L, $.Layouts.BatchIn R) :=
+  (R.did>0 AND (UNSIGNED) L.UniqueId = R.did);
+
+  SHARED matchNameBatch ($.Layouts.PhoneFinder.IdentityIesp L, $.Layouts.BatchIn R) :=
+  (matchDidBatch(L, R) OR
+  ( 
+    NID.mod_PFirstTools.PFLeqPFR(L.Name.First, STD.STR.ToUpperCase(R.name_first)) AND                            
+    (
+      (L.Name.Last = STD.STR.ToUpperCase(R.name_last)) 
+      OR
+      (vmod.phoneticMatch AND metaphonelib.DMetaPhone1(L.Name.Last) = metaphonelib.DMetaPhone1(STD.STR.ToUpperCase(R.name_last)))
+    )
+  ));
+
+  SHARED matchNameAddressBatch ($.Layouts.PhoneFinder.IdentityIesp L, $.Layouts.BatchIn R)  :=
+    (matchDidBatch(L, R) OR
+    ((matchNameBatch(L, R) AND 
     (
       (L.vendor_id = MDR.sourceTools.src_Targus_Gateway AND L.RecentAddress.StreetNumber = '' AND L.RecentAddress.StreetName = '') 
       OR      
@@ -32,7 +85,7 @@ EXPORT GetVerifiedRecs($.IParam.PhoneVerificationParams vmod) := MODULE
       )
     ))));
 
-  SHARED matchPhoneActive($.Layouts.PhoneFinder.IdentityIesp L) := 
+  SHARED matchPhoneActiveBatch($.Layouts.PhoneFinder.IdentityIesp L) := 
   FUNCTION
       
     today := (STRING) STD.Date.Today();   
@@ -54,61 +107,60 @@ EXPORT GetVerifiedRecs($.IParam.PhoneVerificationParams vmod) := MODULE
         
   END;
 
-  EXPORT verify(DATASET($.Layouts.PhoneFinder.IdentityIesp) dIdentitiesInfo, iesp.phonefinder.t_PhoneFinderSearchBy pSearchBy, string best_did) := 
+  EXPORT verify(DATASET($.Layouts.PhoneFinder.IdentitySlim) dIn, DATASET($.Layouts.BatchIn) dInWithBestDIDs) := 
   FUNCTION
+    dVerifyIdentity := JOIN(dIn, dInWithBestDIDs, 
+                            LEFT.acctno = RIGHT.acctno,
+                            TRANSFORM($.Layouts.PhoneFinder.IdentitySlim,
+                                      BOOLEAN isNameAddrVerified := vmod.VerifyPhoneNameAddress AND matchNameAddress(LEFT, RIGHT);
+                                      BOOLEAN isNameVerified     := vmod.VerifyPhoneName AND matchName(LEFT, RIGHT);
 
-    $.Layouts.BatchIn input2Match() := TRANSFORM
-        self.acctno      := '';
-        self.name_first  := pSearchBy.Name.first;
-        self.name_middle := pSearchBy.Name.middle;
-        self.name_last   := pSearchBy.Name.last;
-        self.name_suffix := pSearchBy.Name.suffix;
-        self.prim_range  := pSearchBy.Address.streetNumber;
-        self.predir      := pSearchBy.Address.streetPreDirection;
-        self.prim_name   := pSearchBy.Address.streetName;
-        self.addr_suffix := pSearchBy.Address.streetSuffix;
-        self.postdir     := pSearchBy.Address.streetPostDirection;
-        self.unit_desig  := pSearchBy.Address.unitDesignation;
-        self.sec_range   := pSearchBy.Address.unitNumber;
-        self.p_city_name := pSearchBy.Address.city;
-        self.st          := pSearchBy.Address.state;
-        self.z5          := pSearchBy.Address.zip5;
-        self.z4          := pSearchBy.Address.zip4;
-        self.phone       := pSearchBy.PhoneNumber;
-        self.did         := (UNSIGNED) best_did;
-        self.ssn         := pSearchBy.ssn;
-    END;
-    R := ROW(input2Match()); // Raw input for verification with best did
-
-    // If at least one address component was supplied, it is a name/address match.
-    checkNameAddress := R.prim_range <> '' OR R.prim_name <> '' OR R.p_city_name <> '' OR R.st <> '' OR R.z5 <> '';
-    checkName:= R.name_first <> '' OR R.name_last <> '';    
+                                      SELF.acctno               := IF(isNameAddrVerified OR isNameVerified OR (~vmod.VerifyPhoneNameAddress AND ~vmod.VerifyPhoneName), LEFT.acctno, SKIP),
+                                      SELF.is_identity_verified := isNameAddrVerified OR isNameVerified,
+                                      SELF                      := LEFT),
+                            LIMIT(0), KEEP(1));
     
-    vrecs_name_match := TOPN(PROJECT(dIdentitiesInfo, TRANSFORM($.Layouts.PhoneFinder.IdentityIesp,      
-      SELF.UniqueId := IF(matchName(LEFT, R), LEFT.UniqueId, SKIP);
-      SELF := LEFT;
-      )), 1, -LastSeenWithPrimaryPhone);
+    // Non verified identities
+    dNonVerifiedIdentities := JOIN(dIn, dVerifyIdentity(is_identity_verified),
+                                    LEFT.acctno = RIGHT.acctno,
+                                    TRANSFORM(LEFT),
+                                    LEFT ONLY);
     
-    vrecs_name_addr_match := TOPN(PROJECT(dIdentitiesInfo, TRANSFORM($.Layouts.PhoneFinder.IdentityIesp,      
-      SELF.UniqueId := IF(matchNameAddress(LEFT, R), LEFT.UniqueId, SKIP);
-      SELF := LEFT;
-      )), 1, -LastSeenWithPrimaryPhone);
+    dIdentitiesAll := dVerifyIdentity(is_identity_verified) + dNonVerifiedIdentities;
+    
+    // Phone verification
+    dInPrimaryPhones := TOPN(GROUP(SORT(dIn, acctno), acctno), 1, acctno, -dt_last_seen, dt_first_seen);
 
-    vrecs_phone := MAP(
-      checkNameAddress => vrecs_name_addr_match, 
-      checkName => vrecs_name_match,
-      dIdentitiesInfo
-    );  
-    // I'm not seeing how vrecs_phone[1] below makes sense here. Keeping it to match code in production.
-    vrecs_phone_active := IF(matchPhoneActive(vrecs_phone[1]), vrecs_phone);
+    dPhoneVerify := PROJECT(dInPrimaryPhones,
+                            TRANSFORM($.Layouts.PhoneFinder.IdentitySlim,
+                                      SELF.is_phone_verified := vMod.VerifyPhoneIsActive AND matchPhoneActive(LEFT),
+                                      SELF                   := LEFT));
+    
+    // Populate identity and phone verification flags
+    dVerify := JOIN(dIdentitiesAll,
+                    dPhoneVerify,
+                    LEFT.acctno = RIGHT.acctno,
+                    TRANSFORM($.Layouts.PhoneFinder.IdentitySlim,
+                              SELF.verification_desc := MAP(RIGHT.phone = ''   => PhoneFinder_Services.Constants.VerifyMessage.PhoneNotEntered,
+                                                            vMod.VerifyPhoneNameAddress AND LEFT.is_identity_verified => PhoneFinder_Services.Constants.VerifyMessage.PhoneMatchesNameAddress,
+                                                            vMod.VerifyPhoneName AND LEFT.is_identity_verified     => PhoneFinder_Services.Constants.VerifyMessage.PhoneMatchesName,
+                                                            (vmod.VerifyPhoneNameAddress OR vmod.VerifyPhoneName) AND ~LEFT.is_identity_verified => PhoneFinder_Services.Constants.VerifyMessage.PhoneCannotBeVerified,
+                                                            vmod.VerifyPhoneIsActive AND RIGHT.is_phone_verified => PhoneFinder_Services.Constants.VerifyMessage.PhoneIsActive,
+                                                            vmod.VerifyPhoneIsActive AND ~RIGHT.is_phone_verified => PhoneFinder_Services.Constants.VerifyMessage.PhoneNotActive,
+                                                            ''),
+                              SELF.is_phone_verified := RIGHT.is_phone_verified, SELF := LEFT),
+                    LIMIT(0), KEEP(1));
+  
+    #IF($.Constants.Debug.Intermediate)
+      OUTPUT(dVerifyIdentity, NAMED('dVerifyIdentity'));
+      OUTPUT(dNonVerifiedIdentities, NAMED('dNonVerifiedIdentities'));
+      OUTPUT(dIdentitiesAll, NAMED('dIdentitiesAll'));
+      OUTPUT(dInPrimaryPhones, NAMED('dInPrimaryPhones'));
+      OUTPUT(dPhoneVerify, NAMED('dPhoneVerify'));
+      OUTPUT(dVerify, NAMED('dVerify'));
+    #END
 
-    RETURN MAP(
-      vmod.VerifyPhoneName => vrecs_name_match,
-      vmod.VerifyPhoneNameAddress => vrecs_name_addr_match,
-      vmod.VerifyPhoneIsActive => vrecs_phone_active,
-      DATASET([], $.Layouts.PhoneFinder.IdentityIesp)
-    );
-
+    RETURN dVerify;
   END;
 
   EXPORT verifyBatch(DATASET($.Layouts.PhoneFinder.IdentityIesp) dIdentitiesInfo, DATASET($.Layouts.BatchIn) dInWithBestDIDs) := 
@@ -119,8 +171,8 @@ EXPORT GetVerifiedRecs($.IParam.PhoneVerificationParams vmod) := MODULE
     vrecs := JOIN(dIdentitiesInfo, dInWithBestDIDs, 
       left.acctno = right.acctno AND
       (
-        (vmod.VerifyPhoneNameAddress AND matchNameAddress(LEFT, RIGHT)) OR 
-        (vmatchNameOnly AND matchName(LEFT, RIGHT))
+        (vmod.VerifyPhoneNameAddress AND matchNameAddressBatch(LEFT, RIGHT)) OR 
+        (vmatchNameOnly AND matchNameBatch(LEFT, RIGHT))
       ),
       TRANSFORM(LEFT), LIMIT(0), KEEP(1));
 

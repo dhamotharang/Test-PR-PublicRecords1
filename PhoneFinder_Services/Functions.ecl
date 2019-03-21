@@ -1,11 +1,11 @@
-﻿IMPORT Address,Autokey_batch,Doxie,iesp,MDR,NID,Phones,PhoneFinder_Services,std,ut;
+﻿IMPORT Address, Autokey_batch, Doxie, iesp, MDR, NID, Phones, PhoneFinder_Services, std, ut;
 
 pfLayouts     := PhoneFinder_Services.Layouts;
 lBatchInAcctno:= pfLayouts.BatchInAppendAcctno;
 lBatchInDID   := pfLayouts.BatchInAppendDID;
 lFinal        := pfLayouts.PhoneFinder.Final;
 lIdentitySlim := pfLayouts.PhoneFinder.IdentitySlim;
-lIdentityIesp := pfLayouts.PhoneFinder.IdentityIesp;
+lPhoneSlim    := pfLayouts.PhoneFinder.PhoneSlim;
 
 EXPORT Functions :=
 MODULE
@@ -653,9 +653,9 @@ MODULE
 		dPhoneIesp := PROJECT(dLimitOthers,tFormat2IespPhone(LEFT));
 
 	  #IF(PhoneFinder_Services.Constants.Debug.Intermediate)
-				OUTPUT(dPhoneSlim,NAMED('dPhoneSlim'),EXTEND);
-   	OUTPUT(dPhoneRollup,NAMED('dPhoneRollup'),EXTEND);
-				OUTPUT(dPhoneIesp,NAMED('dPhoneIesp'),EXTEND);		
+			OUTPUT(dPhoneSlim,NAMED('dPhoneSlim'),EXTEND);
+   	  OUTPUT(dPhoneRollup,NAMED('dPhoneRollup'),EXTEND);
+			OUTPUT(dPhoneIesp,NAMED('dPhoneIesp'),EXTEND);		
 		#END
 
 		RETURN UNGROUP(dPhoneIesp);
@@ -671,7 +671,8 @@ MODULE
 																																	(INTEGER)LEFT.dt_first_seen,(INTEGER)(LEFT.dt_first_seen + '00')),
 																				SELF.dt_last_seen  := IF(LENGTH(TRIM(LEFT.dt_last_seen)) = 8,
 																																	(INTEGER)LEFT.dt_last_seen,(INTEGER)(LEFT.dt_last_seen + '00')),
-																				SELF               := LEFT));
+																				SELF               := LEFT,
+                                        SELF               := []));
 		
 		// Rollup
 		lIdentitySlim tIdentityRollup(lIdentitySlim le,lIdentitySlim ri) :=
@@ -699,7 +700,7 @@ MODULE
 		dIdentityTopn := DEDUP(SORT(dIdentityCombined,acctno,did=0,penalt,IF(PhoneOwnershipIndicator,0,1),-dt_last_seen,dt_first_seen,phone_source),acctno,KEEP(vMaxCount));
 		
 		// Format to iesp
-		lIdentityIesp tFormat2IespIdentity(lIdentitySlim pInput) :=
+		iesp.phonefinder.t_PhoneIdentityInfo tFormat2IespIdentity(lIdentitySlim pInput) :=
 		TRANSFORM
 			vFullName      := IF( pInput.fname != '' or pInput.lname != '',
 														Address.NameFromComponents(pInput.fname,pInput.mname,pInput.lname,pInput.name_suffix),
@@ -753,150 +754,219 @@ MODULE
 	END;
 	
 	// Format search results to IESP layout
-	EXPORT FormatResults2IESP(pSearchBy, inMod, dInBestInfo, dSearchResultsUnfiltered, isPhoneSearch) :=
-	FUNCTIONMACRO
-		IMPORT Address,Doxie,iesp,Suppress, ut;
-	dSearchResults := dSearchResultsUnfiltered; // temp change until Product verifies impact of the filter
-	//PFP2 1.6.3 and 1.6.4 remove Nonpublished and records without names for all versions of PhoneFinder
-	// dSearchResults := dSearchResultsUnfiltered(realtimephone_ext.NonPublished<>'Y' AND (listed_name<>'' OR lname <>'' OR fname<>'')); 
+	EXPORT FormatResults2IESP(DATASET(lFinal) dIn, PhoneFinder_Services.iParam.ReportParams inMod) :=
+	FUNCTION
+	  today := STD.Date.Today();
 
-	// IF(NOT EXISTS(dSearchResults) AND NOT (inMod.VerifyPhoneIsActive OR inMod.VerifyPhoneName OR inMod.VerifyPhoneNameAddress),FAIL(10,doxie.ErrorCodes(10)));
-		#IF(isPhoneSearch)
-			dSearchResultsPrimaryPhone := dSearchResults;
-			
-			dIdentitiesInfo   := PhoneFinder_Services.Functions.GetIdentityInfo(dSearchResultsPrimaryPhone,isPhoneSearch);
-			dPrimaryPhoneInfo := PhoneFinder_Services.Functions.GetPhoneInfo(dSearchResultsUnfiltered,inMod);
-		#ELSE
-			dSearchResultsPrimaryPhoneUnfiltered := dSearchResultsUnfiltered(isPrimaryPhone);
-			dSearchResultsPrimaryPhone := dSearchResults(isPrimaryPhone);
-			dSearchResultsOtherPhones  := dSearchResults(~isPrimaryPhone);
-			
-			dPhoneHistRecs    := dSearchResultsPrimaryPhone;
-			dPrimaryPhoneRecs := dSearchResultsPrimaryPhoneUnfiltered(phone_source in [PhoneFinder_Services.Constants.PhoneSource.Waterfall,
-																																				PhoneFinder_Services.Constants.PhoneSource.QSentGateway]);
-			
-			dIdentitiesInfo   := PhoneFinder_Services.Functions.GetIdentityInfo(dPhoneHistRecs,isPhoneSearch);
-			dPrimaryPhoneInfo := PhoneFinder_Services.Functions.GetPhoneInfo(dPrimaryPhoneRecs,inMod);
-			dOtherPhoneInfo   := PhoneFinder_Services.Functions.GetOtherInfo(dSearchResultsOtherPhones,inMod);
-		#END
-		// start phone verification
-		doVerify := ~(inMod.IsPrimarySearchPII) and (inMod.VerifyPhoneIsActive OR inMod.VerifyPhoneName OR inMod.VerifyPhoneNameAddress);
-		phoneEntered := pSearchBy.PhoneNumber != ''; 
-		
-		vmod := PROJECT(inMod, $.IParam.PhoneVerificationParams, OPT);   
-		vRec := PhoneFinder_Services.GetVerifiedRecs(vmod).verify(dIdentitiesInfo, pSearchBy, (STRING)dInBestInfo[1].did);
-																
-		hasMatch := EXISTS(vRec);
-										
-		dPrimaryPhoneInfo xFormDetails() := TRANSFORM
-			SELF.ListingType := dPrimaryPhoneInfo[1].ListingType;
-			SELF._Type := dPrimaryPhoneInfo[1]._Type;
-			SELF.VerificationStatus.PhoneVerificationDescription :=
-														MAP(~phoneEntered => PhoneFinder_Services.Constants.VerifyMessage.PhoneNotEntered,
-																inMod.VerifyPhoneNameAddress AND hasMatch => PhoneFinder_Services.Constants.VerifyMessage.PhoneMatchesNameAddress,
-																inMod.VerifyPhoneName AND hasMatch => PhoneFinder_Services.Constants.VerifyMessage.PhoneMatchesName,
-																(inMod.VerifyPhoneNameAddress AND ~hasMatch) OR 
-																	(inMod.VerifyPhoneName AND ~hasMatch) => PhoneFinder_Services.Constants.VerifyMessage.PhoneCannotBeVerified,
-																inMod.VerifyPhoneIsActive AND hasMatch => PhoneFinder_Services.Constants.VerifyMessage.PhoneIsActive,
-																inMod.VerifyPhoneIsActive AND ~hasMatch => PhoneFinder_Services.Constants.VerifyMessage.PhoneNotActive,
-																'');
+    // Identities section
+    iesp.phonefinder.t_PhoneIdentityInfo tFormat2IespIdentity(lFinal pInput) :=
+    TRANSFORM
+      vFullName      := IF( pInput.fname != '' or pInput.lname != '',
+                            Address.NameFromComponents(pInput.fname, pInput.mname, pInput.lname, pInput.name_suffix),
+                            pInput.listed_name);
+      vStreetAddress := Address.Addr1FromComponents(pInput.prim_range, pInput.predir, pInput.prim_name, pInput.suffix,
+                                                    pInput.postdir, pInput.unit_desig, pInput.sec_range);
+      vCityStZip     := Address.Addr2FromComponentsWithZip4(pInput.city_name, pInput.st, pInput.zip, pInput.zip4);
 
-		  SELF.VerificationStatus.PhoneVerified := hasMatch AND (inMod.VerifyPhoneName OR inMod.VerifyPhoneNameAddress OR inMod.VerifyPhoneIsActive);
-			// SELF := []; //Release 3 req 1.11 - now returning all fields for verification searches
-			SELF:=dPrimaryPhoneInfo[1];
+      SELF.UniqueId                          := (STRING)pInput.did;
+      SELF.Deceased                          := pInput.deceased;
+      SELF.Name                              := iesp.ECL2ESP.SetName( pInput.fname,
+                                                                      pInput.mname,
+                                                                      pInput.lname,
+                                                                      pInput.name_suffix,
+                                                                      '',
+                                                                      vFullName);
+      SELF.RecentAddress                     := iesp.ECL2ESP.SetAddress(pInput.prim_name,pInput.prim_range,
+                                                                        pInput.predir,pInput.postdir,pInput.suffix,
+                                                                        pInput.unit_desig,pInput.sec_range,
+                                                                        pInput.city_name,pInput.st,pInput.zip,
+                                                                        pInput.zip4,pInput.county_name,'',
+                                                                        vStreetAddress[1..60],vStreetAddress[61..],
+                                                                        vCityStZip);
+      SELF.PrimaryAddressType								 := pInput.primary_address_type;																				
+      SELF.RecordType												 := pInput.TNT;																				
+      SELF.FirstSeenWithPrimaryPhone         := iesp.ECL2ESP.toDatestring8(pInput.dt_first_seen);
+      SELF.LastSeenWithPrimaryPhone          := iesp.ECL2ESP.toDatestring8(pInput.dt_last_seen);
+      SELF.TimeWithPrimaryPhone              := IF((INTEGER)pInput.dt_first_seen != 0 and (INTEGER)pInput.dt_last_seen != 0,
+                                                    (STRING)ROUND(ut.DaysApart(pInput.dt_last_seen[1..6]+'01',pInput.dt_first_seen[1..6]+'01')/(365/12)),
+                                                    '');
+      SELF.TimeSinceLastSeenWithPrimaryPhone := IF((INTEGER)pInput.dt_last_seen != 0,
+                                                    (STRING)ROUND(ut.DaysApart((today)[1..6]+'01',pInput.dt_last_seen[1..6]+'01')/(365/12)),
+                                                    '');
+      SELF.PhoneOwnershipIndicator           := pInput.PhoneOwnershipIndicator;
+      SELF                                   := pInput;
+    END;
+
+    dIdentitiesIesp := PROJECT(SORT(dIn(fname != '' OR lname != ''), IF(PhoneOwnershipIndicator, 0, 1), IF(did != 0, 0, 1), -(INTEGER)dt_last_seen),
+                                tFormat2IespIdentity(LEFT));
+
+    // Primary phone section
+    iesp.phonefinder.t_PhoneFinderDetailedInfo tFormat2IespPrimaryPhone(lFinal pInput) :=
+		TRANSFORM
+			SELF.Number                           := pInput.phone;
+			SELF._Type                            := pInput.coc_description;
+			SELF.Carrier                          := pInput.carrier_name;
+			SELF.CarrierCity                      := pInput.phone_region_city;
+			SELF.CarrierState                     := pInput.phone_region_st;
+      SELF.ListingName                      := pInput.listed_name;
+			SELF.PortingCode	                    := pInput.PortingCode;
+			SELF.PortingCount                     := pInput.PortingCount;
+			SELF.FirstPortedDate                  := iesp.ECL2ESP.toDate(pInput.FirstPortedDate);
+			SELF.LastPortedDate                   := iesp.ECL2ESP.toDate(pInput.LastPortedDate);	
+			Phone_Status                          := pInput.PhoneStatus;
+			SELF.ActivationDate 									:= IF(Phone_Status = PhoneFinder_Services.Constants.PhoneStatus.Active, iesp.ECL2ESP.toDate(pInput.ActivationDate));			
+			SELF.DisconnectDate 									:= IF(Phone_Status = PhoneFinder_Services.Constants.PhoneStatus.INACTIVE, iesp.ECL2ESP.toDate(pInput.DisconnectDate));
+			SELF.Prepaid		 			 								:= pInput.Prepaid;
+			SELF.NoContractCarrier 								:= pInput.NoContractCarrier;			
+			SELF.PortingStatus                    := pInput.PortingStatus;
+			SELF.PortingHistory                   := PROJECT(pInput.PortingHistory,
+                                                        TRANSFORM(iesp.phonefinder.t_PortingHistory,
+                                                                  SELF.PortStartDate := iesp.ECL2ESP.toDate(LEFT.PortStartDate),
+                                                                  SELF.PortEndDate   := iesp.ECL2ESP.toDate(LEFT.PortEndDate),
+                                                                  SELF               := LEFT));			
+			SELF.SpoofingData.Spoof               := PROJECT(pInput.Spoof,
+                                                        TRANSFORM(iesp.phonefinder.t_SpoofCommon,
+                                                                  SELF.FirstSpoofedDate := iesp.ECL2ESP.toDate(LEFT.FirstSpoofedDate),
+                                                                  SELF.LastSpoofedDate  := iesp.ECL2ESP.toDate(LEFT.LastSpoofedDate),
+                                                                  SELF                  := LEFT));
+			SELF.SpoofingData.Destination         := PROJECT(pInput.Destination,
+                                                        TRANSFORM(iesp.phonefinder.t_SpoofCommon,
+                                                                  SELF.FirstSpoofedDate := iesp.ECL2ESP.toDate(LEFT.FirstSpoofedDate),
+                                                                  SELF.LastSpoofedDate  := iesp.ECL2ESP.toDate(LEFT.LastSpoofedDate),
+                                                                  SELF                  := LEFT));
+			SELF.SpoofingData.Source			        := PROJECT(pInput.Source,TRANSFORM(iesp.phonefinder.t_SpoofCommon,
+																																				SELF.FirstSpoofedDate 	:= iesp.ECL2ESP.toDate(LEFT.FirstSpoofedDate),
+																																				SELF.LastSpoofedDate  	:= iesp.ECL2ESP.toDate(LEFT.LastSpoofedDate),
+																																				SELF:=LEFT));		
+			SELF.SpoofingData.FirstEventSpoofedDate := iesp.ECL2ESP.toDate(pInput.FirstEventSpoofedDate);																																				
+			SELF.SpoofingData.LastEventSpoofedDate  := iesp.ECL2ESP.toDate(pInput.LastEventSpoofedDate);																																				
+			SELF.SpoofingData.TotalSpoofedCount 	  := pInput.TotalSpoofedCount;
+			SELF.SpoofingData.SpoofingHistory	 		  := PROJECT(pInput.SpoofingHistory,
+                                                          TRANSFORM(iesp.phonefinder.t_SpoofHistory,
+                                                                    SELF.EventDate := iesp.ECL2ESP.toDatestring8(LEFT.EventDate),
+                                                                    SELF           := LEFT));	
+			SELF.OneTimePassword.FirstOTPDate			:= iesp.ECL2ESP.toDate(pInput.FirstOTPDate);
+			SELF.OneTimePassword.LastOTPDate			:= iesp.ECL2ESP.toDate(pInput.LastOTPDate);
+			SELF.OneTimePassword.OTP							:= pInput.OTP;
+			SELF.OneTimePassword.OTPCount					:= pInput.OTPCount;
+			SELF.OneTimePassword.LastOTPStatus		:= pInput.LastOTPStatus;
+			SELF.OneTimePassword.OTPHistory	 			:= PROJECT(pInput.OTPHistory,
+                                                        TRANSFORM(iesp.phonefinder.t_OTPHistory,
+                                                                  SELF.EventDate := iesp.ECL2ESP.toDatestring8(LEFT.EventDate),
+                                                                  SELF           := LEFT));			
+			SELF.PhoneRiskIndicator								:= pInput.PhoneRiskIndicator;
+			SELF.OTPRIFailed											:= pInput.OTPRIFailed;
+			SELF.Alerts						 								:= PROJECT(pInput.Alerts, iesp.phonefinder.t_PhoneFinderAlert);
+			SELF.PhoneStatus                      := Phone_Status;
+			SELF.MSA                              := pInput.RealTimePhone_Ext.MetroStatAreaCode;
+			SELF.CMSA                             := pInput.RealTimePhone_Ext.ConsMetroStatAreaCode;
+			SELF.FIPS                             := pInput.RealTimePhone_Ext.CountyCode;
+			SELF.CarrierRouteZoneCode             := pInput.RealTimePhone_Ext.SortZone;
+			SELF.GeoLocation                      := ROW({pInput.RealTimePhone_Ext.Latitude, pInput.RealTimePhone_Ext.Longitude}, iesp.share.t_GeoLocation);
+			SELF.AddressType                      := AddressTypeDesc(pInput.RealTimePhone_Ext.AddressType);
+			SELF.CallerID                         := pInput.RealTimePhone_Ext.GenericName;
+			SELF.OperatingCompany.CompanyNumber   := pInput.RealTimePhone_Ext.OperatingCompany.Number;
+			SELF.OperatingCompany.Name            := pInput.RealTimePhone_Ext.OperatingCompany.Name;
+			SELF.OperatingCompany.Address         := PROJECT(pInput.RealTimePhone_Ext.OperatingCompany.Address,
+																												TRANSFORM(iesp.share.t_Address, SELF := LEFT, SELF := []));
+			SELF.OperatingCompany.AffiliatedTo    := pInput.RealTimePhone_Ext.OperatingCompany.AffiliatedTo;
+			SELF.OperatingCompany.ContactName     := PROJECT(pInput.RealTimePhone_Ext.OperatingCompany.Contact.Name,
+																												TRANSFORM(iesp.share.t_Name,
+																																	SELF.Full   := LEFT.fullname,
+																																	SELF.First  := LEFT.fname,
+																																	SELF.Middle := LEFT.mname,
+																																	SELF.Last   := LEFT.lname,
+																																	SELF.Suffix := LEFT.name_suffix,
+																																	SELF.Prefix := LEFT.name_prefix));
+			SELF.OperatingCompany.ContactAddress  := PROJECT(pInput.RealTimePhone_Ext.OperatingCompany.Contact.Address,
+																												TRANSFORM(iesp.share.t_Address,SELF := LEFT,SELF := []));
+			SELF.OperatingCompany.Email           := pInput.RealTimePhone_Ext.OperatingCompany.Contact.Email;
+			SELF.OperatingCompany.ContactPhone    :=  pInput.RealTimePhone_Ext.OperatingCompany.PhoneInfo.PhoneNPA
+																							+ pInput.RealTimePhone_Ext.OperatingCompany.PhoneInfo.PhoneNXX
+																							+ pInput.RealTimePhone_Ext.OperatingCompany.PhoneInfo.PhoneLine;
+			SELF.OperatingCompany.ContactPhoneExt := pInput.RealTimePhone_Ext.OperatingCompany.PhoneInfo.PhoneExt;
+			SELF.OperatingCompany.Fax             :=  pInput.RealTimePhone_Ext.OperatingCompany.PhoneInfo.FaxNPA
+																							+ pInput.RealTimePhone_Ext.OperatingCompany.PhoneInfo.FaxNXX
+																							+ pInput.RealTimePhone_Ext.OperatingCompany.PhoneInfo.FaxLine;																		
+			SELF.CallForwardingIndicator          := pInput.CallForwardingIndicator;
+			SELF.VerificationStatus               := ROW({pInput.is_verified, pInput.verification_desc}, iesp.phonefinder.t_PhoneFinderVerificationStatus);
+			SELF.PhoneAddressState                := '';
+			SELF                                  := pInput.RealTimePhone_Ext;
+			SELF																	:= pInput;
+
+      // Below two fields are not being used currently
+			SELF.InquiryDetails                   := [];
+			SELF.ZumigoDeviceDetails              := [];
 		END;
-		
-		dPrimaryPhoneInfo2 := IF(doVerify, DATASET([xFormDetails()]), dPrimaryPhoneInfo);
 
-		dIdentitiesInfo xFormIdentity(vRec le) := TRANSFORM
-		  
-			SELF.FirstSeenWithPrimaryPhone := le.FirstSeenWithPrimaryPhone;
-			SELF.LastSeenWithPrimaryPhone := le.LastSeenWithPrimaryPhone;
-			SELF:= le;
-			SELF := [];
-			
-		END;		
-		vrec_identities := PROJECT(vRec, xFormIdentity(LEFT));
-  
-  dIdentitiesInfo2 := IF(doVerify and exists(vrec_identities), vrec_identities, dIdentitiesInfo);	
-		/* End phone verification */
- 		Suppress.MAC_Suppress(dInBestInfo, dBestInfoSuppress,
-   													inMod.ApplicationType,Suppress.Constants.LinkTypes.DID,did,'','',FALSE,'',TRUE);	
-   											
-   		iesp.phonefinder.t_PhoneIdentityInfo tPrimaryIdentity(dBestInfoSuppress le,dIdentitiesInfo ri) :=
-   		TRANSFORM
-   			vFullName      := Address.NameFromComponents(le.name_first,le.name_middle,le.name_last,le.name_suffix);
-   			vStreetAddress := Address.Addr1FromComponents(le.prim_range,le.predir,le.prim_name,le.addr_suffix,
-   																										le.postdir,le.unit_desig,le.sec_range);
-   			vCityStZip     := Address.Addr2FromComponentsWithZip4(le.p_city_name,le.st,le.z5,le.zip4);
-   			
-   			SELF.UniqueID                          := INTFORMAT(le.did,12,1);
-   			SELF.Name                              := iesp.ECL2ESP.SetName(le.name_first,le.name_middle,le.name_last,le.name_suffix,'',vFullName);
-   			SELF.RecentAddress                     := iesp.ECL2ESP.SetAddress(le.prim_name,le.prim_range,le.predir,le.postdir,
-   																																				le.addr_suffix,le.unit_desig,le.sec_range,le.p_city_name,
-   																																				le.st,le.z5,le.zip4,'','',vStreetAddress[1..60],vStreetAddress[61..],vCityStZip);
-   			SELF.PrimaryAddressType								 := ri.PrimaryAddressType;																																	
-   			SELF.RecordType												 := ri.RecordType;																																	
-   			SELF.Deceased                          := IF((Integer)le.dod != 0,'Y','N'); 
-   			SELF.FirstSeenWithPrimaryPhone         := ri.FirstSeenWithPrimaryPhone;
-   			SELF.LastSeenWithPrimaryPhone          := ri.LastSeenWithPrimaryPhone;
-   			SELF.TimeWithPrimaryPhone              := ri.TimeWithPrimaryPhone;
-   			SELF.TimeSinceLastSeenWithPrimaryPhone := ri.TimeSinceLastSeenWithPrimaryPhone;
-   			SELF.PhoneOwnershipIndicator           := ri.PhoneOwnershipIndicator;
-   		END;
-   		
-   		dPrimaryIdentity := JOIN( dBestInfoSuppress,
-   															dIdentitiesInfo2,
-   															LEFT.acctno = RIGHT.acctno and
-   															LEFT.did    = (UNSIGNED)RIGHT.UniqueId,
-   															tPrimaryIdentity(LEFT,RIGHT),
-   															LEFT OUTER,
-   															LIMIT(0),KEEP(1));				
-   
-   		iesp.phonefinder.t_PhoneFinderSearchRecord tFormat2PhoneFinderSearch() :=
-   		TRANSFORM
-   			SELF.Identities          := IF(isPhoneSearch,
-   																			SORT(PROJECT(dIdentitiesInfo2,iesp.phonefinder.t_PhoneIdentityInfo),IF(PhoneOwnershipIndicator,0,1),-iesp.ECL2ESP.DateToInteger(LastSeenWithPrimaryPhone)),
-   																			dPrimaryIdentity);
-   			SELF.PrimaryPhoneDetails := PROJECT(dPrimaryPhoneInfo2,iesp.phonefinder.t_PhoneFinderDetailedInfo)[1];	
-   			SELF.PhonesHistory       := IF(~isPhoneSearch,
-   																			SORT(PROJECT(dIdentitiesInfo2,
-   																										TRANSFORM(iesp.phonefinder.t_PhoneFinderHistory,
-   																															SELF.Address   := LEFT.RecentAddress,
-   																															SELF.FirstSeen := LEFT.FirstSeenWithPrimaryPhone,
-   																															SELF.LastSeen  := LEFT.LastSeenWithPrimaryPhone,
-   																															SELF           := LEFT)),
-   																						-iesp.ECL2ESP.DateToInteger(LastSeen)));
-   			#IF(~isPhoneSearch)
-   				SELF.OtherPhones       := PROJECT(dOtherPhoneInfo,iesp.phonefinder.t_PhoneFinderInfo);
-   			#END
-   			SELF                     := [];
-   		END;
-   		
-   		dFormat2PhoneFinderSearch := DATASET([tFormat2PhoneFinderSearch()]);
-   		Records   := IF(EXISTS(dSearchResults) OR doVerify,dFormat2PhoneFinderSearch);
+    dPrimaryPhoneIesp := PROJECT(dIn(isPrimaryPhone), tFormat2IespPrimaryPhone(LEFT));
+
+    // Other phones
+    iesp.phonefinder.t_PhoneFinderInfo tFormat2IespOtherPhones(lFinal pInput) :=
+    TRANSFORM
+      SELF.Number                  := pInput.phone;
+			SELF._Type                   := pInput.coc_description;
+			SELF.Carrier                 := pInput.carrier_name;
+			SELF.CarrierCity             := pInput.phone_region_city;
+			SELF.CarrierState            := pInput.phone_region_st;
+      SELF.ListingName             := pInput.listed_name;
+			SELF.PortingCode	           := pInput.PortingCode;
+			SELF.LastPortedDate	         := iesp.ECL2ESP.toDate(pInput.LastPortedDate);
+			SELF.PhoneRiskIndicator	     := pInput.PhoneRiskIndicator;
+			SELF.OTPRIFailed	           := pInput.OTPRIFailed;
+			SELF.PhoneStatus             := pInput.PhoneStatus, 			                                         
+			SELF.Address                 := iesp.ECL2ESP.SetAddress(pInput.prim_name,pInput.prim_range,
+                                                              pInput.predir,pInput.postdir,pInput.suffix,
+                                                              pInput.unit_desig,pInput.sec_range,
+                                                              pInput.city_name,pInput.st,pInput.zip,
+                                                              pInput.zip4,pInput.county_name);
+			SELF.DateFirstSeen           := iesp.ECL2ESP.toDatestring8(pInput.dt_first_seen);
+			SELF.DateLastSeen            := iesp.ECL2ESP.toDatestring8(pInput.dt_last_seen);
+			SELF.MonthsWithPhone         := IF((INTEGER)pInput.dt_first_seen != 0 AND (INTEGER)pInput.dt_last_seen != 0,
+                                        (STRING)ROUND(ut.DaysApart(pInput.dt_last_seen[1..6]+'01',pInput.dt_first_seen[1..6]+'01')/(365/12)),
+                                        '');
+			SELF.MonthsSinceLastSeen     := IF( (INTEGER)pInput.dt_last_seen != 0,
+															            (STRING)ROUND(ut.DaysApart((today)[1..6]+'01',pInput.dt_last_seen[1..6]+'01')/(365/12)),
+															            '');
+			SELF.PhoneOwnershipIndicator := pInput.PhoneOwnershipIndicator;												
+			SELF.CallForwardingIndicator := pInput.CallForwardingIndicator;
+			SELF                         := pInput;
+			SELF.PhoneAddressState       := '';
+
+      // Below two fieldss are not being used currently
+			SELF.InquiryDetails          := [];
+			SELF.ZumigoDeviceDetails     := [];
+    END;
+
+    dOtherPhonesIesp := PROJECT(dIn(~isPrimaryPhone AND fname = '' AND lname = ''), tFormat2IespOtherPhones(LEFT));
+
+    // Format to final iesp layout
+    iesp.phonefinder.t_PhoneFinderSearchRecord tFormat2PhoneFinderSearch() :=
+    TRANSFORM
+      // Check if the IF statement is needed
+      SELF.Identities          := IF(inMod.isPrimarySearchPII, DATASET(dIdentitiesIesp[1]), dIdentitiesIesp);
+      SELF.PrimaryPhoneDetails := dPrimaryPhoneIesp[1];
+      SELF.PhonesHistory       := IF(inMod.isPrimarySearchPII,
+                                      PROJECT(dIdentitiesIesp[2..],
+                                              TRANSFORM(iesp.phonefinder.t_PhoneFinderHistory,
+                                                        SELF.Address   := LEFT.RecentAddress,
+                                                        SELF.FirstSeen := LEFT.FirstSeenWithPrimaryPhone,
+                                                        SELF.LastSeen  := LEFT.LastSeenWithPrimaryPhone,
+                                                        SELF           := LEFT)));
+      SELF.OtherPhones         := IF(inMod.isPrimarySearchPII, dOtherPhonesIesp);
+    END;
+    
+    dFormat2PhoneFinderSearch := DATASET([tFormat2PhoneFinderSearch()]);
    
    	// Debug
-   		#IF(PhoneFinder_Services.Constants.Debug.Main)
-   			#IF(isPhoneSearch)
-   				OUTPUT(dIdentitiesInfo,NAMED('dIdentitiesInfo_PhoneSearch'));
-   				OUTPUT(dPrimaryPhoneInfo,NAMED('dPrimaryPhoneInfo_PhoneSearch'));
-   				OUTPUT(dFormat2PhoneFinderSearch,NAMED('dFormat2PhoneFinderSearch_PhoneSearch'));
-   				OUTPUT(dInNoPhoneBestInfo,NAMED('dInNoPhoneBestInfo'));
-   			#ELSE
-   				OUTPUT(dPhoneHistRecs,NAMED('dPhoneHistRecs'));
-   				OUTPUT(dPrimaryPhoneRecs,NAMED('dPrimaryPhoneRecs'));
-   				OUTPUT(dIdentitiesInfo,NAMED('dIdentitiesInfo'));
-   				OUTPUT(dBestInfoSuppress,NAMED('dBestInfoSuppress'));
-   				OUTPUT(dIdentitiesInfo2,NAMED('dIdentitiesInfo2'));
-   				OUTPUT(dPrimaryPhoneInfo,NAMED('dPrimaryPhoneInfo'));
-   				OUTPUT(dOtherPhoneInfo,NAMED('dOtherPhoneInfo'));
-   				OUTPUT(dFormat2PhoneFinderSearch,NAMED('dFormat2PhoneFinderSearch'));
-   			#END
-   		#END
+    #IF(PhoneFinder_Services.Constants.Debug.Main)
+      OUTPUT(dIdentitiesIesp, NAMED('dIdentitiesIesp'));
+      OUTPUT(dPrimaryPhoneIesp, NAMED('dPrimaryPhoneIesp'));
+      OUTPUT(dOtherPhonesIesp, NAMED('dOtherPhonesIesp'));
+    #END
 
-		RETURN Records;
-	ENDMACRO;
+		RETURN dFormat2PhoneFinderSearch;
+	END;
 	
 	// Format search results to batch layout
 	EXPORT FormatResults2Batch(dIn,inMod,dinBestInfo,dSearchResultsUnfiltered,isPhoneSearch) :=
