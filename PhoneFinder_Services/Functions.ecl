@@ -5,6 +5,7 @@ lBatchInAcctno:= pfLayouts.BatchInAppendAcctno;
 lBatchInDID   := pfLayouts.BatchInAppendDID;
 lFinal        := pfLayouts.PhoneFinder.Final;
 lIdentitySlim := pfLayouts.PhoneFinder.IdentitySlim;
+lIdentityIesp := pfLayouts.PhoneFinder.IdentityIesp;
 lPhoneSlim    := pfLayouts.PhoneFinder.PhoneSlim;
 
 EXPORT Functions :=
@@ -700,7 +701,7 @@ MODULE
 		dIdentityTopn := DEDUP(SORT(dIdentityCombined,acctno,did=0,penalt,IF(PhoneOwnershipIndicator,0,1),-dt_last_seen,dt_first_seen,phone_source),acctno,KEEP(vMaxCount));
 		
 		// Format to iesp
-		iesp.phonefinder.t_PhoneIdentityInfo tFormat2IespIdentity(lIdentitySlim pInput) :=
+		lIdentityIesp tFormat2IespIdentity(lIdentitySlim pInput) :=
 		TRANSFORM
 			vFullName      := IF( pInput.fname != '' or pInput.lname != '',
 														Address.NameFromComponents(pInput.fname,pInput.mname,pInput.lname,pInput.name_suffix),
