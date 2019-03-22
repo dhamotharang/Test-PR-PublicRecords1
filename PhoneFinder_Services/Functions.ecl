@@ -810,16 +810,11 @@ MODULE
 			SELF.CarrierCity                      := pInput.phone_region_city;
 			SELF.CarrierState                     := pInput.phone_region_st;
       SELF.ListingName                      := pInput.listed_name;
-			SELF.PortingCode	                    := pInput.PortingCode;
-			SELF.PortingCount                     := pInput.PortingCount;
 			SELF.FirstPortedDate                  := iesp.ECL2ESP.toDate(pInput.FirstPortedDate);
 			SELF.LastPortedDate                   := iesp.ECL2ESP.toDate(pInput.LastPortedDate);	
 			Phone_Status                          := pInput.PhoneStatus;
 			SELF.ActivationDate 									:= IF(Phone_Status = PhoneFinder_Services.Constants.PhoneStatus.Active, iesp.ECL2ESP.toDate(pInput.ActivationDate));			
 			SELF.DisconnectDate 									:= IF(Phone_Status = PhoneFinder_Services.Constants.PhoneStatus.INACTIVE, iesp.ECL2ESP.toDate(pInput.DisconnectDate));
-			SELF.Prepaid		 			 								:= pInput.Prepaid;
-			SELF.NoContractCarrier 								:= pInput.NoContractCarrier;			
-			SELF.PortingStatus                    := pInput.PortingStatus;
 			SELF.PortingHistory                   := PROJECT(pInput.PortingHistory,
                                                         TRANSFORM(iesp.phonefinder.t_PortingHistory,
                                                                   SELF.PortStartDate := iesp.ECL2ESP.toDate(LEFT.PortStartDate),
@@ -854,10 +849,7 @@ MODULE
 			SELF.OneTimePassword.OTPHistory	 			:= PROJECT(pInput.OTPHistory,
                                                         TRANSFORM(iesp.phonefinder.t_OTPHistory,
                                                                   SELF.EventDate := iesp.ECL2ESP.toDatestring8(LEFT.EventDate),
-                                                                  SELF           := LEFT));			
-			SELF.PhoneRiskIndicator								:= pInput.PhoneRiskIndicator;
-			SELF.OTPRIFailed											:= pInput.OTPRIFailed;
-			SELF.Alerts						 								:= PROJECT(pInput.Alerts, iesp.phonefinder.t_PhoneFinderAlert);
+                                                                  SELF           := LEFT));
 			SELF.PhoneStatus                      := Phone_Status;
 			SELF.MSA                              := pInput.RealTimePhone_Ext.MetroStatAreaCode;
 			SELF.CMSA                             := pInput.RealTimePhone_Ext.ConsMetroStatAreaCode;
@@ -888,9 +880,8 @@ MODULE
 			SELF.OperatingCompany.ContactPhoneExt := pInput.RealTimePhone_Ext.OperatingCompany.PhoneInfo.PhoneExt;
 			SELF.OperatingCompany.Fax             :=  pInput.RealTimePhone_Ext.OperatingCompany.PhoneInfo.FaxNPA
 																							+ pInput.RealTimePhone_Ext.OperatingCompany.PhoneInfo.FaxNXX
-																							+ pInput.RealTimePhone_Ext.OperatingCompany.PhoneInfo.FaxLine;																		
-			SELF.CallForwardingIndicator          := pInput.CallForwardingIndicator;
-			SELF.VerificationStatus               := ROW({pInput.is_verified, pInput.verification_desc}, iesp.phonefinder.t_PhoneFinderVerificationStatus);
+																							+ pInput.RealTimePhone_Ext.OperatingCompany.PhoneInfo.FaxLine;
+			SELF.VerificationStatus               := ROW({pInput.verification_desc, pInput.is_verified}, iesp.phonefinder.t_PhoneFinderVerificationStatus);
 			SELF.PhoneAddressState                := '';
 			SELF                                  := pInput.RealTimePhone_Ext;
 			SELF																	:= pInput;

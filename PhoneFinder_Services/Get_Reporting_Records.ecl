@@ -58,7 +58,7 @@ EXPORT Get_Reporting_Records(DATASET(iesp.phonefinder.t_PhoneFinderSearchRecord)
 	 SELF.spoof_count   		  := R.PrimaryPhoneDetails.SpoofingData.TotalSpoofedCount;
 	 SELF.last_spoof_date		  := iesp.ECL2ESP.t_DateToString8(R.PrimaryPhoneDetails.SpoofingData.LastEventSpoofedDate);
 	 SELF.phone_forwarded      	  := R.PrimaryPhoneDetails.CallForwardingIndicator;
-	 SELF.Alerts 				  := R.PrimaryPhoneDetails.Alerts.AlertIndicators;
+	 SELF.Alerts 				  := R.PrimaryPhoneDetails.AlertIndicators;
  END;	
    
   Transaction_Rec := PROJECT (pF_Records,  xfm_Transaction(LEFT, COUNTER));
@@ -80,7 +80,7 @@ EXPORT Get_Reporting_Records(DATASET(iesp.phonefinder.t_PhoneFinderSearchRecord)
       	 SELF.porting_code         := R.PortingCode;
       	 SELF.phone_forwarded      := R.CallForwardingIndicator;
       	 SELF.verified_carrier     := (INTEGER)R.PhoneOwnershipIndicator;
-		 SELF.Alerts 			   := R.Alerts.AlertIndicators;
+		 SELF.Alerts 			   := R.AlertIndicators;
    END;	
       
    OtherPhones_Rec := NORMALIZE(pF_Records, LEFT.OtherPhones, xfm_OtherPhones(RIGHT, COUNTER));

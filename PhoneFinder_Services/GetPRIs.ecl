@@ -50,9 +50,10 @@ FUNCTION
                                               SELF := LEFT, SELF := []));
 
   // Send primary and other phones for RI calculation
-  dPrepForRIs := dPrepPrimaryForRIs & dPrepOtherPhonesForRIs;
+  dPrepForRIs := dPrepPrimaryForRIs & IF(inMod.IncludeOtherPhoneRiskIndicators, dPrepOtherPhonesForRIs);
 
   dRIs := PhoneFinder_Services.CalculatePRIs(dPrepForRIs, inMod) +
+          IF(~inMod.IncludeOtherPhoneRiskIndicators, dPrepOtherPhonesForRIs) +
           PROJECT(dIdentityInfoSort[2..],
                   TRANSFORM($.Layouts.PhoneFinder.Final,
                   SELF.isPrimaryPhone := FALSE,

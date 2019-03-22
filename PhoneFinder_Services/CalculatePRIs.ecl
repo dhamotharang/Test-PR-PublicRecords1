@@ -84,6 +84,11 @@ FUNCTION
                                                 SELF.Flag     := LEFT.Category,
                                                 SELF.Messages := LEFT.RiskDescription,
                                                 SELF          := LEFT));
+    SELF.Alerts             := ROLLUP(GROUP(SORT(dIterateRIs, Category), Category),
+                                      GROUP,
+                                      TRANSFORM($.Layouts.PhoneFinder.Alert,
+                                                SELF.flag     := LEFT.Category,
+                                                SELF.Messages := PROJECT(ROWS(LEFT), TRANSFORM(iesp.share.t_StringArrayItem, SELF.value := LEFT.RiskDescription))));
     SELF.PhoneRiskIndicator := MAP( EXISTS(tblLevelCnt(cntLevels > LevelCount)) => $.Constants.RiskIndicator[$.Constants.RiskLevel.FAILED],
                                     EXISTS(dIterateRIs)                         => $.Constants.RiskIndicator[$.Constants.RiskLevel.WARN],
                                     $.Constants.RiskIndicator[$.Constants.RiskLevel.PASS]);

@@ -128,7 +128,6 @@ end;
 export t_PhoneFinderAlert := record
 	string Flag {xpath('Flag')};
 	dataset(iesp.share.t_StringArrayItem) Messages {xpath('Messages/Message'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxAlertMessages)};
-	dataset(t_PhoneFinderAlertIndicator) AlertIndicators {xpath('AlertIndicators/AlertIndicator'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxPRIRules)};//hidden[ecl_only]
 end;
 		
 export t_ZumigoDeviceInfo := record
@@ -172,6 +171,7 @@ export t_PhoneFinderInfo := record (t_BasePhoneInfo)
 	string PhoneRiskIndicator {xpath('PhoneRiskIndicator')};
 	boolean OTPRIFailed {xpath('OTPRIFailed')};
 	dataset(t_PhoneFinderAlert) Alerts {xpath('Alerts/Alert'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxAlerts)};
+	dataset(t_PhoneFinderAlertIndicator) AlertIndicators {xpath('AlertIndicators/AlertIndicator'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxPRIRules)};//hidden[ecl_only]
 	string CallForwardingIndicator {xpath('CallForwardingIndicator')};
 	boolean PhoneOwnershipIndicator {xpath('PhoneOwnershipIndicator')};
 	t_InquiryInfo InquiryDetails {xpath('InquiryDetails')};//hidden[internal]
@@ -252,6 +252,7 @@ export t_PhoneFinderDetailedInfo := record (t_BasePhoneInfo)
 	t_OneTimePassword OneTimePassword {xpath('OneTimePassword')};
 	string PhoneRiskIndicator {xpath('PhoneRiskIndicator')};
 	dataset(t_PhoneFinderAlert) Alerts {xpath('Alerts/Alert'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxAlerts)};
+	dataset(t_PhoneFinderAlertIndicator) AlertIndicators {xpath('AlertIndicators/AlertIndicator'), MAXCOUNT(iesp.Constants.Phone_Finder.MaxPRIRules)};//hidden[ecl_only]
 	boolean OTPRIFailed {xpath('OTPRIFailed')};
 	string CallForwardingIndicator {xpath('CallForwardingIndicator')};
 	t_InquiryInfo InquiryDetails {xpath('InquiryDetails')};//hidden[internal]

@@ -148,7 +148,6 @@ MODULE
 		RECORD
 			STRING flag;
 			DATASET(iesp.share.t_STRINGArrayItem) messages;
-			DATASET(iesp.phonefinder.t_PhoneFinderAlertIndicator) AlertIndicators;
 		END;
 		
 		// Phone finder common layout with carrier information	
@@ -236,7 +235,7 @@ MODULE
 			STRING4 PhoneRiskIndicator;
 			BOOLEAN OTPRIFailed;
 			DATASET(Alert) Alerts;
-      Alert - [flag, Messages];
+			DATASET(iesp.phonefinder.t_PhoneFinderAlertIndicator) AlertIndicators;
 			DATASET({STRING17 InquiryDate})									InquiryDates;		
 			UNSIGNED RecordsReturned;
 			BOOLEAN PhoneOwnershipIndicator;
