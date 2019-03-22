@@ -62,9 +62,9 @@ EXPORT IParams := MODULE
       EXPORT STRING SearchType := STD.Str.ToUpperCase(TRIM(in_optns.SearchType,ALL));
       EXPORT BOOLEAN IncludeHistoricData := in_optns.IncludeHistoricData; 
       EXPORT BOOLEAN RequireLexidMatch := ~in_optns.IncludeNoLexIdMatch; 
+      EXPORT STRING  RestrictedUseCase := STD.Str.ToUpperCase(TRIM(in_optns.RestrictedUseCase)); // for the purpose of email filtering by source 
       
-      _EmailQualityRulesString := IF(in_optns.EmailQualityRulesMask = '', '0', in_optns.EmailQualityRulesMask); 
-      EXPORT UNSIGNED EmailQualityRulesMask := GetEmailRulesMask(_EmailQualityRulesString); 
+      EXPORT UNSIGNED EmailQualityRulesMask := IF(in_optns.EmailQualityRulesMask != '', GetEmailRulesMask(in_optns.EmailQualityRulesMask), 0); 
       EXPORT STRING   BVAPIkey := in_optns.BVAPIkey;   
       EXPORT UNSIGNED MaxEmailsForDeliveryCheck := IF(in_optns.MaxEmailsForDeliveryCheck > 0, in_optns.MaxEmailsForDeliveryCheck, $.Constants.Defaults.MaxEmailsToCheckDeliverable);   
       EXPORT BOOLEAN  CheckEmailDeliverable := in_optns.CheckEmailDeliverable;  
