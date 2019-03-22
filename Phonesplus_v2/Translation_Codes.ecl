@@ -1,4 +1,4 @@
-/*2011-09-08T19:55:48Z (a herzberg)
+﻿/*2011-09-08T19:55:48Z (a herzberg)
 Bug: 79183
 */
 import lib_stringlib, ut, mdr;
@@ -8,7 +8,6 @@ export toll_free_area_codes := ['800','811','822','833','844','855','866','877',
 													
 //-----Bit map for data sources in phonesplus													
 export source_bitmap_code(string source = '')  := map(
-													//Sources other than header
 													source = mdr.sourceTools.src_InfutorCID  	  	 		  		=> ut.bit_set(0,0),
 													source = mdr.sourceTools.src_Cellphones_Kroll  	 				=> ut.bit_set(0,1),
 													source = mdr.sourceTools.src_Cellphones_Traffix					=> ut.bit_set(0,2),
@@ -17,7 +16,6 @@ export source_bitmap_code(string source = '')  := map(
 													source = mdr.sourceTools.src_Targus_White_Pages  				=> ut.bit_set(0,5),
 													source = mdr.sourceTools.src_Pcnsr		         		  		=> ut.bit_set(0,6),
 													source = mdr.sourceTools.src_Gong_History		 		  			=> ut.bit_set(0,7),
-													//Header sources
 													source = mdr.sourceTools.src_Equifax  									=> ut.bit_set(0,9),
 													source = mdr.sourceTools.src_Utilities 									=> ut.bit_set(0,10),
 													source = mdr.sourceTools.src_LnPropV2_Fares_Asrs 				=> ut.bit_set(0,11),
@@ -46,8 +44,6 @@ export source_bitmap_code(string source = '')  := map(
 													source = mdr.sourceTools.src_MO_Experian_Veh						=> ut.bit_set(0,34),
 													source = mdr.sourceTools.src_Experian_Credit_Header			=> ut.bit_set(0,35),
 													source = mdr.sourceTools.src_MO_Watercraft							=> ut.bit_set(0,36),
-
-													//Last Resort Sources
 													source =  mdr.sourceTools.src_Wired_Assets_Royalty			=> ut.bit_set(0,37),
 													source =  mdr.sourceTools.src_Wired_Assets_Owned				=> ut.bit_set(0,38),
 													source =  mdr.sourceTools.src_ZUtil_Work_Phone          => ut.bit_set(0,39),
@@ -59,6 +55,7 @@ export source_bitmap_code(string source = '')  := map(
 													source =  mdr.sourceTools.src_thrive_pd				          => ut.bit_set(0,45),
 													source =  mdr.sourceTools.src_AlloyMedia_Consumer	      => ut.bit_set(0,46),
 													source =  mdr.sourceTools.src_Link2Tek	                => ut.bit_set(0,47),
+													source =  mdr.sourceTools.src_NeustarWireless           => ut.bit_set(0,49), //Jira DF-24336
 													0); //Max 64 sources
 
 //-----Bit map translation for EQ											
@@ -129,6 +126,7 @@ export	string	fGet_other_sources_from_bitmap(unsigned bitmap_src) := function
 										+    if(fFlagIsOn(bitmap_src, source_bitmap_code(	mdr.sourceTools.src_Thrive_PD							)),' ' + 	mdr.sourceTools.src_Thrive_PD,'')		
 										+    if(fFlagIsOn(bitmap_src, source_bitmap_code(	mdr.sourceTools.src_AlloyMedia_Consumer)),' ' + 	mdr.sourceTools.src_AlloyMedia_Consumer,'')
 										+    if(fFlagIsOn(bitmap_src, source_bitmap_code(	mdr.sourceTools.src_Link2Tek              )),' ' + 	mdr.sourceTools.src_Link2Tek,'')
+										+    if(fFlagIsOn(bitmap_src, source_bitmap_code(	mdr.sourceTools.src_NeustarWireless       )),' ' + 	mdr.sourceTools.src_NeustarWireless,'') //Jira DF-24336										
 										);
 										
 										
@@ -246,6 +244,32 @@ export rules_bitmap_code(string rules = '')  := map(
 															rules = 'FileOne-Verified-Below' => ut.bit_set(0,28),
 															rules = 'TelNet' => ut.bit_set(0,29),
 															rules = 'Neustar-Verified' => ut.bit_set(0,30),			//Bug 162654
+															//JIRA DF-24336 NeustarWireless Start
+															rules = 'NeustarWireless-Verified-A' => ut.bit_set(0,32),
+															rules = 'NeustarWireless-Verified-B' => ut.bit_set(0,33),
+															rules = 'NeustarWireless-Verified-C' => ut.bit_set(0,34),
+															rules = 'NeustarWireless-Verified-D' => ut.bit_set(0,35),
+															rules = 'NeustarWireless-Verified-E' => ut.bit_set(0,36),
+															rules = 'NeustarWireless-Activity-Status-A1' => ut.bit_set(0,37),
+															rules = 'NeustarWireless-Activity-Status-A2' => ut.bit_set(0,38),
+															rules = 'NeustarWireless-Activity-Status-A3' => ut.bit_set(0,39),
+															rules = 'NeustarWireless-Activity-Status-A4' => ut.bit_set(0,40),
+															rules = 'NeustarWireless-Activity-Status-A5' => ut.bit_set(0,41),
+															rules = 'NeustarWireless-Activity-Status-A6' => ut.bit_set(0,42),
+															rules = 'NeustarWireless-Activity-Status-A7' => ut.bit_set(0,43),
+															rules = 'NeustarWireless-Activity-Status-I1' => ut.bit_set(0,44),
+															rules = 'NeustarWireless-Activity-Status-I2' => ut.bit_set(0,45),
+															rules = 'NeustarWireless-Activity-Status-I3' => ut.bit_set(0,46),
+															rules = 'NeustarWireless-Activity-Status-I4' => ut.bit_set(0,47),
+															rules = 'NeustarWireless-Activity-Status-I5' => ut.bit_set(0,48),
+															rules = 'NeustarWireless-Activity-Status-I6' => ut.bit_set(0,49),
+															rules = 'NeustarWireless-Activity-Status-I7' => ut.bit_set(0,50),
+															rules = 'NeustarWireless-Activity-Status-U' => ut.bit_set(0,51),
+															rules = 'NeustarWireless-Prepaid-Y' => ut.bit_set(0,52),
+															rules = 'NeustarWireless-Prepaid-N' => ut.bit_set(0,53),
+															rules = 'NeustarWireless-Cord-Cutter-Y' => ut.bit_set(0,54),
+															rules = 'NeustarWireless-Cord-Cutter-N' => ut.bit_set(0,55),
+															//JIRA DF-24336 NeustarWireless End
 															0b);
 															
 export	string	fGet_rules_caption_from_bitmap(unsigned bitmap_rules) := function
@@ -283,6 +307,32 @@ export	string	fGet_rules_caption_from_bitmap(unsigned bitmap_rules) := function
 										+	   if(fFlagIsOn(bitmap_rules, rules_bitmap_code('FileOne-Verified-Below')),	' FileOne-Verified-Below','')
 										+	   if(fFlagIsOn(bitmap_rules, rules_bitmap_code('TelNet')),	' TelNet','')
 										+	   if(fFlagIsOn(bitmap_rules, rules_bitmap_code('Neustar-Verified')),	' Neustar-Verified','')		//Bug 162654
+										//JIRA DF-24336 NeustarWireless Start
+										+  	 if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Verified-A')), ' NeustarWireless-Verified-A','')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Verified-B')), ' NeustarWireless-Verified-B','')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Verified-C')), ' NeustarWireless-Verified-C','')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Verified-D')), ' NeustarWireless-Verified-D','')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Verified-E')), ' NeustarWireless-Verified-E','')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-A1')), ' NeustarWireless-Activity-Status-A1','')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-A2')), ' NeustarWireless-Activity-Status-A2','')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-A3')), ' NeustarWireless-Activity-Status-A3','')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-A4')), ' NeustarWireless-Activity-Status-A4','')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-A5')), ' NeustarWireless-Activity-Status-A5','')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-A6')), ' NeustarWireless-Activity-Status-A6','')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-A7')), ' NeustarWireless-Activity-Status-A7','')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-I1')), ' NeustarWireless-Activity-Status-I1','')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-I2')), ' NeustarWireless-Activity-Status-I2','')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-I3')), ' NeustarWireless-Activity-Status-I3','')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-I4')), ' NeustarWireless-Activity-Status-I4','')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-I5')), ' NeustarWireless-Activity-Status-I5','')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-I6')), ' NeustarWireless-Activity-Status-I6','')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-I7')), ' NeustarWireless-Activity-Status-I7','')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-U')), ' NeustarWireless-Activity-Status-U','')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Prepaid-Y')), ' NeustarWireless-Prepaid-Y','')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Prepaid-N')), ' NeustarWireless-Prepaid-N','')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Cord-Cutter-Y')), ' NeustarWireless-Cord-Cutter-Y','')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Cord-Cutter-N')), ' NeustarWireless-Cord-Cutter-N','')
+										//JIRA DF-24336 NeustarWireless End
 										);
 return		lib_stringlib.stringlib.stringfindreplace(trim(lib_stringlib.stringlib.stringcleanspaces(translated_value),left,right),' ','/');
 end;
@@ -324,6 +374,32 @@ export	string	fGet_rules_caption_as_bitmap(unsigned bitmap_rules) := function
 										+	   if(fFlagIsOn(bitmap_rules, rules_bitmap_code('FileOne-Verified-Below')),	'X','0')
 										+	   if(fFlagIsOn(bitmap_rules, rules_bitmap_code('TelNet')),	'X','0')
 										+	   if(fFlagIsOn(bitmap_rules, rules_bitmap_code('Neustar-Verified')),	'X','0')
+										//JIRA DF-24336 NuestarWireless Start
+									+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Verified-A')), 'X','0')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Verified-B')), 'X','0')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Verified-C')), 'X','0')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Verified-D')), 'X','0')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Verified-E')), 'X','0')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-A1')), 'X','0')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-A2')), 'X','0')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-A3')), 'X','0')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-A4')), 'X','0')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-A5')), 'X','0')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-A6')), 'X','0')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-A7')), 'X','0')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-I1')), 'X','0')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-I2')), 'X','0')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-I3')), 'X','0')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-I4')), 'X','0')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-I5')), 'X','0')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-I6')), 'X','0')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-I7')), 'X','0')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Activity-Status-U')), 'X','0')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Prepaid-Y')), 'X','0')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Prepaid-N')), 'X','0')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Cord-Cutter-Y')), 'X','0')
+										+    if(fFlagIsOn(bitmap_rules, rules_bitmap_code('NeustarWireless-Cord-Cutter-N')), 'X','0')
+										//JIRA DF-24336 NuestarWireless End
 										);
 return		lib_stringlib.stringlib.stringfindreplace(trim(lib_stringlib.stringlib.stringcleanspaces(translated_value),left,right),' ','');
 end;
@@ -347,6 +423,7 @@ export source_file(string vendor = '')   := map(vendor = mdr.sourceTools.src_Pcn
 												vendor = mdr.sourceTools.src_Thrive_PD		=> 'Thrive PD',
 												vendor = mdr.sourceTools.src_AlloyMedia_Consumer  => 'Alloy Media Consumer',
 												vendor = mdr.sourceTools.src_Link2Tek  => 'Link2Tek',
+												vendor = mdr.sourceTools.src_NeustarWireless  => 'Neustar Wireless Phones',
 												'Header');
 
 												

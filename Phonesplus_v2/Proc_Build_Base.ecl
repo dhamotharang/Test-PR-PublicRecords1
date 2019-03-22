@@ -1,6 +1,6 @@
-﻿import didville, Gong_v2, watchdog, phonesplus, ut, mdr, Address, STD;
+﻿import didville, Gong_v2, watchdog, phonesplus, mdr, Address, STD, PromoteSupers;
 
-export Proc_build_base(string pversion,string emailList=''):=function
+export Proc_build_base(string pversion,string emailList='', boolean isTest = false):=function
 //-------Concatenate all Pplus sources in a common layout---------------------------------
 pplus_sources := 
          Map_Cellphone_as_Phonesplus +
@@ -17,7 +17,8 @@ pplus_sources :=
 				 // Map_IBehavior_as_Phonesplus +
 				 Map_Thrive_as_Phonesplus +
 				 Map_AlloyMedia_as_Phonesplus +
-				 Map_NVerified_as_Phonesplus;
+				 Map_NVerified_as_Phonesplus 
+				 ;
 
 pplus_royalty := Map_WiredAssets_as_Phonesplus(false);	
 
@@ -136,12 +137,17 @@ Rollup_royalty_base := Fn_Rollup_Base(split_Royalty, 'royalty', pversion);
 
 Transform_to_old_layout := Fn_Transform_to_Old_Layout(Rollup_base);
 
-ut.MAC_SF_BuildProcess(Rollup_base ,'~thor_data400::base::phonesplusv2',pplusv2_base,3,,true, pversion);
-ut.MAC_SF_BuildProcess(Rollup_royalty_base,'~thor_data400::base::phonesplusv2_royalty',pplus_royalty_v2_base,3,,true, pversion);
-ut.MAC_SF_BuildProcess(Transform_to_old_layout,'~thor_data400::base::phonesplus',pplus_base,3,,true, pversion);
+PromoteSupers.MAC_SF_BuildProcess(Rollup_base ,'~thor_data400::base::phonesplusv2',pplusv2_base,3,,true, pversion);
+PromoteSupers.MAC_SF_BuildProcess(Rollup_royalty_base,'~thor_data400::base::phonesplusv2_royalty',pplus_royalty_v2_base,3,,true, pversion);
+PromoteSupers.MAC_SF_BuildProcess(Transform_to_old_layout,'~thor_data400::base::phonesplus',pplus_base,3,,true, pversion);
+create_base_files_and_promote := sequential(scrubscall, pplus_base,	pplusv2_base, pplus_royalty_v2_base);
 
-return sequential(scrubscall,
-                                     pplus_base,
-																		 pplusv2_base, pplus_royalty_v2_base);
+pplus_base_test := output(Rollup_base,,'~thor_data400::base::phonesplusv2_test_' + pversion,overwrite,compressed);
+pplusv2_base_test := output(Rollup_royalty_base,,'~thor_data400::base::phonesplusv2_royalty_test_' + pversion,overwrite,compressed);
+pplus_royalty_v2_base_test:=output(Transform_to_old_layout,,'~thor_data400::base::phonesplus_test_' + pversion,overwrite,compressed);
+create_test_files := sequential(pplus_base_test, pplusv2_base_test, pplus_royalty_v2_base_test);
+									
+return if(isTest, create_test_files, create_base_files_and_promote);
+
 end;
-																		
+								
