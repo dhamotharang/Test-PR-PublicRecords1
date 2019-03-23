@@ -74,8 +74,8 @@ file_liens_dist := distribute(project(file_liens, transform({file_liens},
 															self.name_type:= ut.CleanSpacesAndUpper(left.name_type );
 															self.did := if (trim(left.did,left,right)= '', '000000000000', left.did) ; 
 															self.bdid := if (trim(left.bdid,left,right)= '', '000000000000', left.bdid);
-															self.tmsid_old := ut.CleanSpacesAndUpper(left.TMSID_old); 
-															self.rmsid_old := ut.CleanSpacesAndUpper(left.RMSID_old);
+															self.tmsid_old := left.tmsid_old; 
+															self.rmsid_old := left.rmsid_old;
 											self := left)) ,hash(tmsid));
 
 get_recs_sort  := sort(file_liens_dist,record,- Date_Last_Seen, local);
@@ -94,8 +94,8 @@ get_recs_party := rollup(get_recs_sort,rollupXform(LEFT,RIGHT),RECORD,
 
 rLayout_liens_party_temp  tformat(get_recs_party L) := transform
 
-self.persistent_record_id := hash64(trim(l.tmsid_old,left,right)+','+ //DF-24044 use the old ids to prevent the overrides from changing
-																		trim(l.rmsid_old,left,right)+','+ //DF-24044 use the old ids to prevent the overrides from changing
+self.persistent_record_id := hash64(trim(ut.CleanSpacesAndUpper(l.TMSID_old),left,right)+','+ //DF-24044 use the old ids to prevent the overrides from changing
+																		trim(ut.CleanSpacesAndUpper(l.RMSID_old),left,right)+','+ //DF-24044 use the old ids to prevent the overrides from changing
 																		trim(l.orig_full_debtorname,left,right)+','+
 																		trim(l.orig_name ,left,right)+','+
 																		trim(l.orig_lname,left,right)+','+
@@ -122,6 +122,6 @@ end;
 Add_puid := project(get_recs_party, tformat(left));
 
 
-Allrecords := project(Add_puid, LiensV2.Layout_liens_party_SSN_BIPV2_with_LinkFlags); 
+// Allrecords := project(Add_puid, LiensV2.Layout_liens_party_SSN_BIPV2_with_LinkFlags); 
 
-EXPORT File_Liens_Party_BIPV2_with_Linkflags := Allrecords :persist('persist::File_Liens_Party_BIPV2_with_Linkflags');
+EXPORT File_Liens_Party_BIPV2_with_Linkflags := Add_puid :persist('persist::File_Liens_Party_BIPV2_with_Linkflags');

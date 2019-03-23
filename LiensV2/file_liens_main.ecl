@@ -37,7 +37,7 @@ end;
 
 Other_MainwithOldids := project(Other_Main, propagate_ids(left));
 												
-pre_file_liens_main := project((HOGAN_main(tmsid not in Liensv2.Suppress_TMSID())
+pre_file_liens_main := project((HOGAN_main(tmsid not in Liensv2.Suppress_TMSID()) 
                               + Other_MainwithOldids) , 
 						transform({liensv2.Layout_liens_main_module.layout_liens_main }, 
  self.tmsid :=  ut.CleanSpacesAndUpper(left.tmsid ), 
@@ -81,8 +81,8 @@ pre_file_liens_main := project((HOGAN_main(tmsid not in Liensv2.Suppress_TMSID()
  self.legal_block:=  ut.CleanSpacesAndUpper(left.legal_block ) ,
  self.legal_borough:=  ut.CleanSpacesAndUpper(left.legal_borough ) ,
  self.certificate_number:=  ut.CleanSpacesAndUpper(left.certificate_number ), 
- self.tmsid_old :=  ut.CleanSpacesAndUpper(left.tmsid_old ), 
- self.rmsid_old :=  ut.CleanSpacesAndUpper(left.rmsid_old ), 
+ self.tmsid_old :=  left.tmsid_old, 
+ self.rmsid_old :=  left.rmsid_old, 
  self := left)); 
  
 pre_file_liens_main_dedup := dedup(sort(distribute(pre_file_liens_main,hash(tmsid)), 
@@ -134,8 +134,9 @@ pre_file_liens_main_dedup := dedup(sort(distribute(pre_file_liens_main,hash(tmsi
 //Add persistent record id 
 Main_puid := project(pre_file_liens_main_dedup , transform({liensv2.Layout_liens_main_module.layout_liens_main} ,
  
-											self.persistent_record_id := 	hash64(  trim(left.tmsid_old,left,right)+ ','+ //DF-24044 use the old ids to prevent the overrides from changing
-																									  trim(left.rmsid_old,left,right)+  ','+ //DF-24044 use the old ids to prevent the overrides from changing
+											self.persistent_record_id := 	hash64(
+											                              trim(ut.CleanSpacesAndUpper(left.tmsid_old),left,right)+ ','+ //DF-24044 use the old ids to prevent the overrides from changing
+																									  trim(ut.CleanSpacesAndUpper(left.rmsid_old),left,right)+ ','+ //DF-24044 use the old ids to prevent the overrides from changing
 																									  trim(left.record_code,left,right)+  ','+
 																									  trim(left.date_vendor_removed ,left,right)+  ','+
 																									  trim(left.filing_jurisdiction,left,right)+  ','+
@@ -183,4 +184,3 @@ export file_liens_main := project(Main_puid((integer)amount >= 0),
 						transform(liensv2.Layout_liens_main_module.layout_liens_main, 
 						self.orig_filing_date := if(left.orig_filing_date <= stringlib.GetDateYYYYMMDD(),left.orig_filing_date, ''),
 						self := left)) :persist('~persist::file_liens_main');//:INDEPENDENT;
-						
