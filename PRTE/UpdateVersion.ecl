@@ -14,62 +14,27 @@
 
 
 import ut,_Control,dops,std;
-export updateversion(string datasetname,string uversion,string email_t,string inloc = 'B',string inenvment = '',string isboolready = 'Y',string dopsenv = dops.constants.dopsenvironment) := function
-
-	
-	emailme_function(string email_t,string datasetname,string cversion, string uversion,
-					string emailmessage) := function
-		return fileservices.sendemail(
-												email_t,
-												datasetname + ' PRTE DOPS UPDATE ' + cversion,
-												'Dataset: ' + datasetname + '\n' +
-												'Version: ' + uversion + '\n\n' +
-												emailmessage
-										);
-	end;
-	
-	
-	email_success := emailme_function(email_t,datasetname,'SUCCESS:'+uversion,uversion,'Build Version updated in PRTE Dops');
-	email_failure := emailme_function(email_t,datasetname,'FAILURE:'+(string8)STD.Date.Today(),uversion,failmessage);
-	invalid_date := emailme_function(email_t,datasetname,'FAILURE:'+(string8)STD.Date.Today(),uversion,'Invalid Build Version');
-	update_failed := emailme_function(email_t,datasetname,'FAILURE:'+(string8)STD.Date.Today(),uversion,'PRTE Dops Update failed, Contact Anantha.Venkatachalam@lexisnexis.com');
-	zero_rows := emailme_function(email_t,datasetname,'ALERT:'+(string8)STD.Date.Today(),uversion,'No Updates, Invalid dataset name or Same Build version?');
-	
-	dwhenupdated := (string8)STD.Date.Today()+ut.getTime();
-	
-	
-	
-	InputRec := record
-		string dsname{xpath('dsname')} := datasetname;
-		string dversion{xpath('dversion')} := uversion;
-		string ddatetime{xpath('ddatetime')} := (string8)STD.Date.Today()+Std.Date.SecondsToString(Std.date.CurrentSeconds(true), '%H%M%S');
-		string updatedby{xpath('updatedby')} := thorlib.jobowner();
-		string pushtoprod{xpath('pushtoprod')} := 'N';
-		string loc{xpath('loc')} := inloc;
-		string envment{xpath('envment')} := inenvment;
-		string boolready{xpath('boolready')} := isboolready;
-	end;
-	
-
-	outrec := record
-		integer Code{xpath('UpdateVersionResponse/UpdateVersionResult')};
-	end;
-	
-	soapresults := SOAPCALL(
-				dops.constants.prboca.serviceurl(dopsenv,l_loc := inloc,l_testenv := 'PRTE'),
-				'UpdateVersion',
-				InputRec,
-				dataset(outrec),
-				NAMESPACE('http://lexisnexis.com/'),
-				LITERAL,
-				SOAPACTION('http://lexisnexis.com/UpdateVersion'));
-
-	codeval := if (soapresults[1].Code = -2,invalid_date,
-					if(soapresults[1].code = -1,update_failed,
-					if(soapresults[1].code = -3,zero_rows,email_success)));
-
-								
-	return if(_Control.ThisEnvironment.Name = 'Prod_Thor', if(uversion[1..8] <= (string8)STD.Date.Today(),codeval,invalid_date),output('Not a Prod environment'));							
-
-	
-end;
+export updateversion(string l_datasetname,string l_uversion,string l_email_t,
+string l_auto_pkg = 'N',string l_inenvment = '',string l_isboolready = 'Y',
+string l_isprodready = 'N',string l_inloc = dops.constants.location,string l_indaliip = '',string l_includeboolean = 'Y', 
+string l_updateflag = 'F',
+string l_tagdelta = '',
+string l_dopsenv = dops.constants.dopsenvironment,
+boolean l_overrideupdateflag = false,
+string l_esp = dops.constants.esp(dops.constants.dopsenvironment),
+string l_espport = '8010') := dops.updateversion(
+												l_datasetname
+												,l_uversion
+												,l_email_t
+												,l_auto_pkg
+												,l_inenvment
+												,l_isboolready
+												,l_isprodready
+												,l_inloc
+												,l_indaliip
+												,l_includeboolean
+												,l_updateflag
+												,l_tagdelta
+												,l_dopsenv
+												,l_overrideupdateflag
+												,l_testenv := 'PRTE');
