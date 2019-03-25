@@ -6,7 +6,6 @@ EXPORT GetPRIs( DATASET($.Layouts.PhoneFinder.Final)     dSearchResults,
 FUNCTION
   // Identities
   dIdentitiesInfo   := PhoneFinder_Services.GetIdentitiesFinal(dSearchResults, dInBestInfo, inMod, ~inMod.IsPrimarySearchPII);
-
   // Primary phone
   dSearchResultsPrimaryPhone := IF(~inMod.IsPrimarySearchPII,
                                     dSearchResults,
@@ -20,26 +19,40 @@ FUNCTION
   
   dOtherPhoneInfo := PhoneFinder_Services.GetPhonesFinal(dSearchResultsOtherPhones, inMod, FALSE);
 
-  // Prep for Risk indicator calculation
-  // Pass only the top identity record for RI calculation
-  dIdentityInfoSort := SORT(dIdentitiesInfo, acctno, IF(did != 0, 0, 1), IF(PhoneOwnershipIndicator, 0, 1), penalt, -dt_last_seen, IF(dt_first_seen != 0, dt_first_seen, 0), phone_source, RECORD);
+  // Prep for Risk indicator calculation  
+  // Format identities to Final layout
+  dIdentitiesFormat2Final := PROJECT(dIdentitiesInfo,
+                                      TRANSFORM($.Layouts.PhoneFinder.Final,
+                                                SELF.isPrimaryPhone := FALSE,
+                                                SELF.dt_first_seen  := (STRING)LEFT.dt_first_seen,
+                                                SELF.dt_last_seen   := (STRING)LEFT.dt_last_seen,
+                                                SELF.is_verified    := LEFT.is_identity_verified OR LEFT.is_phone_verified,
+                                                SELF := LEFT, SELF := []));
   
-  dPrepIdentityForRI := DATASET(dIdentityInfoSort[1]);
+  // Identify Primary identity and pass only the top identity record for RI calculation
+  dIdentityInfoGrp := SORT(GROUP(SORT(dIdentitiesFormat2Final, acctno), acctno),
+                            IF(did != 0, 0, 1), IF(PhoneOwnershipIndicator, 0, 1), penalt, -dt_last_seen, IF(dt_first_seen != '', dt_first_seen, '99999999'), phone_source, RECORD);
+  
+  dPrepIdentityForRI := ITERATE(dIdentityInfoGrp,
+                                TRANSFORM($.Layouts.PhoneFinder.Final,
+                                          SELF.isPrimaryPhone := (COUNTER = 1),
+                                          SELF                := RIGHT));
 
-  dPrepPrimaryForRIs := JOIN( dPrepIdentityForRI,
+  dPrepPrimaryForRIs := JOIN( dPrepIdentityForRI(isPrimaryPhone),
                               dPrimaryPhoneInfo,
                               LEFT.acctno = RIGHT.acctno,
                               TRANSFORM($.Layouts.PhoneFinder.Final,
-                                        SELF.isPrimaryPhone    := TRUE;
-                                        SELF.dt_first_seen     := (STRING)LEFT.dt_first_seen,
-                                        SELF.dt_last_seen      := (STRING)LEFT.dt_last_seen,
-                                        SELF.is_verified       := LEFT.is_identity_verified OR LEFT.is_phone_verified,
+                                        SELF.phone             := RIGHT.phone,
                                         SELF.listed_name       := RIGHT.ListingName,
                                         SELF.RealTimePhone_Ext := RIGHT,
                                         SELF := LEFT, SELF := RIGHT, SELF := []),
                               LEFT OUTER,
                               LIMIT(0), KEEP(1));
 
+  // Other identities
+  dOtherIdentities := dPrepIdentityForRI(~isPrimaryPhone);
+
+  // Other phones
   dPrepOtherPhonesForRIs := PROJECT(dOtherPhoneInfo,
                                     TRANSFORM($.Layouts.PhoneFinder.Final,
                                               SELF.isPrimaryPhone    := FALSE,
@@ -51,27 +64,25 @@ FUNCTION
 
   // Send primary and other phones for RI calculation
   dPrepForRIs := dPrepPrimaryForRIs & IF(inMod.IncludeOtherPhoneRiskIndicators, dPrepOtherPhonesForRIs);
-
-  dRIs := PhoneFinder_Services.CalculatePRIs(dPrepForRIs, inMod) +
-          IF(~inMod.IncludeOtherPhoneRiskIndicators, dPrepOtherPhonesForRIs) +
-          PROJECT(dIdentityInfoSort[2..],
-                  TRANSFORM($.Layouts.PhoneFinder.Final,
-                  SELF.isPrimaryPhone := FALSE,
-                  SELF.dt_first_seen  := (STRING)LEFT.dt_first_seen,
-                  SELF.dt_last_seen   := (STRING)LEFT.dt_last_seen,
-                  SELF.is_verified    := LEFT.is_identity_verified OR LEFT.is_phone_verified,
-                  SELF := LEFT, SELF := []));
+  
+  dRIs := PhoneFinder_Services.CalculatePRIs(dPrepForRIs, inMod);
+  
+  dFinal := MAP(inMod.IncludeRiskIndicators AND inMod.IncludeOtherPhoneRiskIndicators => dRIs + dOtherIdentities,
+                inMod.IncludeRiskIndicators                                           => dRIs + dPrepOtherPhonesForRIs + dOtherIdentities,
+                UNGROUP(dIdentityInfoGrp) + dPrepOtherPhonesForRIs);
 
   #IF($.Constants.Debug.Intermediate)
-    OUTPUT(dIdentitiesInfo, NAMED('dIdentitiesInfo'));
-    OUTPUT(dSearchResultsPrimaryPhone, NAMED('dSearchResultsPrimaryPhone'));
-    OUTPUT(dSearchResultsOtherPhones, NAMED('dSearchResultsOtherPhones'));
-    OUTPUT(dOtherPhoneInfo, NAMED('dOtherPhoneInfo'));
-    OUTPUT(dIdentityInfoSort, NAMED('dIdentityInfoSort'));
-    OUTPUT(dPrepPrimaryForRIs, NAMED('dPrepPrimaryForRIs'));
-    OUTPUT(dPrepOtherPhonesForRIs, NAMED('dPrepOtherPhonesForRIs'));
-    OUTPUT(dPrepForRIs, NAMED('dPrepForRIs'));
+    OUTPUT(dIdentitiesInfo, NAMED('dIdentitiesInfo_PRI'));
+    OUTPUT(dSearchResultsPrimaryPhone, NAMED('dSearchResultsPrimaryPhone_PRI'));
+    OUTPUT(dSearchResultsOtherPhones, NAMED('dSearchResultsOtherPhones_PRI'));
+    OUTPUT(dOtherPhoneInfo, NAMED('dOtherPhoneInfo_PRI'));
+    OUTPUT(dIdentitiesFormat2Final, NAMED('dIdentitiesFormat2Final_PRI'));
+    OUTPUT(dPrepIdentityForRI, NAMED('dPrepIdentityForRI_PRI'));
+    OUTPUT(dPrepPrimaryForRIs, NAMED('dPrepPrimaryForRIs_PRI'));
+    OUTPUT(dOtherIdentities, NAMED('dOtherIdentities_PRI'));
+    OUTPUT(dPrepOtherPhonesForRIs, NAMED('dPrepOtherPhonesForRIs_PRI'));
+    IF(inMod.IncludeRiskIndicators, SEQUENTIAL(OUTPUT(dPrepForRIs, NAMED('dPrepForRIs_PRI')), OUTPUT(dRIs, NAMED('dRIs_PRI'))));
   #END
 
-  RETURN dRIs;
+  RETURN dFinal;
 END;

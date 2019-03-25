@@ -78,8 +78,8 @@ FUNCTION
 		SELF.listing_type_bus  := IF(ri.phpl_phones_plus_type = 'B',ri.phpl_phones_plus_type,'');
 		SELF.listing_type_res  := IF(ri.phpl_phones_plus_type = 'R',ri.phpl_phones_plus_type,'');
 		SELF.listing_type_gov  := IF(ri.phpl_phones_plus_type = 'G',ri.phpl_phones_plus_type,'');
-		SELF.dt_first_seen     := IF(LENGTH(TRIM(ri.subj_date_first)) = 8,ri.subj_date_first,ri.subj_date_first + '00');
-		SELF.dt_last_seen      := IF(LENGTH(TRIM(ri.subj_date_last)) = 8,ri.subj_date_last,ri.subj_date_last + '00');
+		SELF.dt_first_seen     := IF(LENGTH(TRIM(ri.subj_date_first)) = 8,ri.subj_date_first,ri.subj_date_first + '01');
+		SELF.dt_last_seen      := IF(LENGTH(TRIM(ri.subj_date_last)) = 8,ri.subj_date_last,ri.subj_date_last + '01');
 		SELF.coctype           := ri.switch_type;
 		SELF.coc_description   := CASE(ri.switch_type,
 																		'C' => PhoneFinder_Services.Constants.PhoneType.Wireless,

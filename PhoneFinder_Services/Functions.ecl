@@ -930,7 +930,7 @@ MODULE
 			SELF.ZumigoDeviceDetails     := [];
     END;
 
-    dOtherPhonesIesp := PROJECT(dIn(~isPrimaryPhone AND fname = '' AND lname = ''), tFormat2IespOtherPhones(LEFT));
+    dOtherPhonesIesp := PROJECT(dIn(~isPrimaryPhone AND phone != '' AND fname = '' AND lname = ''), tFormat2IespOtherPhones(LEFT));
 
     // Format to final iesp layout
     iesp.phonefinder.t_PhoneFinderSearchRecord tFormat2PhoneFinderSearch() :=
@@ -1471,7 +1471,6 @@ MODULE
 				OUTPUT(dPhoneIdentity,NAMED('dPhoneIdentity_PhoneSearch'));
 				OUTPUT(dFormat2BatchReady,NAMED('dFormat2BatchReady_PhoneSearch'));
 				OUTPUT(verifiedRecs,NAMED('verifiedRecs_PhoneSearch'));
-				OUTPUT(verified_PrimaryPhoneInfo,NAMED('verified_PrimaryPhoneInfo'));
  			#ELSE				
    				OUTPUT(dIdentitiesInfo,NAMED('dIdentitiesInfo'));
    				OUTPUT(dPrimaryPhoneInfo,NAMED('dPrimaryPhoneInfo'));

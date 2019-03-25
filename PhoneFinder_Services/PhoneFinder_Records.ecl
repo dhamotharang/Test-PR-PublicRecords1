@@ -15,16 +15,21 @@ MODULE
 	SHARED BOOLEAN vDIDBlank   := (UNSIGNED)first_row.did = 0;
 
 	BatchShare.MAC_CapitalizeInput(dIn, SHARED dProcessInput);
-
-  SHARED IsPhoneRiskAssessment	:= inMod.TransactionType = PhoneFinder_Services.Constants.TransType.PhoneRiskAssessment;
-  SHARED IsValidTransactionType	:= inMod.TransactionType = PhoneFinder_Services.Constants.TransType.Blank;
   
+  // Modify IsPrimarySearchPII depending on input if value not provided
+  SHARED tmpMod := MODULE(PROJECT(inMod, PhoneFinder_Services.iParam.ReportParams, OPT))
+      EXPORT BOOLEAN IsPrimarySearchPII := inMod.IsPrimarySearchPII OR vPhoneBlank;
+  END;
+
+  SHARED IsPhoneRiskAssessment	:= tmpMod.TransactionType = PhoneFinder_Services.Constants.TransType.PhoneRiskAssessment;
+  SHARED IsValidTransactionType	:= tmpMod.TransactionType = PhoneFinder_Services.Constants.TransType.Blank;
+
   // Phone verification is a "phone only" search, even if the phone is blank.  If the phone is blank, the 
   // verification will fail and the appropriate status will be returned.
-  SHARED INTEGER verifyRequest := IF(inMod.VerifyPhoneIsActive, 1, 0) + IF(inMod.VerifyPhoneName, 1, 0) + IF(inMod.VerifyPhoneNameAddress, 1, 0);
-  SHARED BOOLEAN verifyInputDID := (verifyRequest > 0) OR ~inMod.IsPrimarySearchPII;
+  SHARED INTEGER verifyRequest := IF(tmpMod.VerifyPhoneIsActive, 1, 0) + IF(tmpMod.VerifyPhoneName, 1, 0) + IF(tmpMod.VerifyPhoneNameAddress, 1, 0);
+  SHARED BOOLEAN verifyInputDID := (verifyRequest > 0) OR ~tmpMod.IsPrimarySearchPII;
 	
-	useADL := inMod.IsPrimarySearchPII OR vPhoneBlank OR (vIsPhone10 AND (inMod.VerifyPhoneNameAddress OR inMod.VerifyPhoneName));	
+	useADL := tmpMod.IsPrimarySearchPII OR vPhoneBlank OR (vIsPhone10 AND (tmpMod.VerifyPhoneNameAddress OR tmpMod.VerifyPhoneName));	
 	
 	SHARED dGetDIDs := IF(~IsPhoneRiskAssessment, PhoneFinder_Services.GetDIDs(dProcessInput, useADL));
 																					
@@ -55,16 +60,16 @@ MODULE
 	// Best information
 	SHARED dInNoPhoneBestInfo := PhoneFinder_Services.Functions.GetBestInfo(dPIISearch);
 
-  dInBest := IF(verifyInputDID, dInDIDs, dInNoPhoneBestInfo);
+  SHARED dInBest := IF(verifyInputDID, dInDIDs, dInNoPhoneBestInfo);
 
 	// Primary identity		
-	Suppress.MAC_Suppress(dInBest, SHARED dInBestInfo, inMod.ApplicationType, Suppress.Constants.LinkTypes.DID,did, '', '', FALSE, '', TRUE);
+	Suppress.MAC_Suppress(dInBest, SHARED dInBestInfo, tmpMod.ApplicationType, Suppress.Constants.LinkTypes.DID,did, '', '', FALSE, '', TRUE);
 												
 	// Search inhouse phone sources and gateways when phone number is provided
-	dPhoneSearchResults := IF(EXISTS(dInPhone), PhoneFinder_Services.PhoneSearch(dInPhone,inMod,dGateways));
+	dPhoneSearchResults := IF(EXISTS(dInPhone), PhoneFinder_Services.PhoneSearch(dInPhone,tmpMod,dGateways));
 
 	// Waterfall process when only PII is provided
-	dWaterfallResults := IF(EXISTS(dPIISearch), PhoneFinder_Services.DIDSearch(dPIISearch,inMod,dGateways,dInNoPhoneBestInfo));
+	dWaterfallResults := IF(EXISTS(dPIISearch), PhoneFinder_Services.DIDSearch(dPIISearch,tmpMod,dGateways,dInNoPhoneBestInfo));
 	
 
 	SHARED dSearchRecs_pre := IF(vPhoneBlank, dWaterfallResults, dPhoneSearchResults);
@@ -93,54 +98,53 @@ MODULE
                             PROJECT(IF(EXISTS(dSearchRecs_pre), dSearchRecs_pre, dInputPhone), withInputphone(LEFT)),
                             dSearchRecs_pre_a);
  
-  SHARED dSubjectInfo := PhoneFinder_Services.Functions.GetSubjectInfo(dSearchRecs, inMod);
+  SHARED dSubjectInfo := PhoneFinder_Services.Functions.GetSubjectInfo(dSearchRecs, tmpMod);
 
   dAccuIn  := dSearchRecs(isprimaryphone OR batch_in.homephone<>'');
                    
   dDupAccuIn := PROJECT(DEDUP(SORT(dAccuIn, acctno), acctno), PhoneFinder_Services.Layouts.PhoneFinder.Accudata_in);
 									 
-  AccuDataGateway := IF(inMod.UseAccuData_ocn, dGateways(Gateway.Configuration.IsAccuDataOCN(servicename)));
+  AccuDataGateway := IF(tmpMod.UseAccuData_ocn, dGateways(Gateway.Configuration.IsAccuDataOCN(servicename)));
   SHARED dAccu_porting := PhoneFinder_Services.GetAccuDataPhones.GetAccuData_Ocn_PortingData(dDupAccuIn, AccuDataGateway[1]);		   
   dAccu_inport := PROJECT(dAccu_porting, PhoneFinder_Services.Layouts.PortedMetadata);
 	
 	// get ported info
-	SHARED dPorted_Phones := IF(inMod.IsGetPortedData, 
-                              PhoneFinder_Services.GetPhonesPortedMetadata(dSearchRecs, inMod, dGateways, dSubjectInfo, dAccu_inport(port_end_dt <> 0)),
+	SHARED dPorted_Phones := IF(tmpMod.IsGetPortedData, 
+                              PhoneFinder_Services.GetPhonesPortedMetadata(dSearchRecs, tmpMod, dGateways, dSubjectInfo, dAccu_inport(port_end_dt <> 0)),
                               dSearchRecs);
 	 
 	// zumigo call														 
-	SHARED dZum_gw_recs := PhoneFinder_Services.GetZumigoIdentity_Records(dPorted_Phones, dInBestInfo, inMod, dGateways);
+	SHARED dZum_gw_recs := PhoneFinder_Services.GetZumigoIdentity_Records(dPorted_Phones, dInBestInfo, tmpMod, dGateways);
 	SHARED dZumigo_recs:= dZum_gw_recs.Zumigo_GLI; // zumigo records
 	
-	SHARED dZum_final := IF(inMod.UseZumigoIdentity, dZumigo_recs, dPorted_Phones);
+	SHARED dZum_final := IF(tmpMod.UseZumigoIdentity, dZumigo_recs, dPorted_Phones);
 
   // get remaining phone metadata
-  SHARED dPhoneMetadataResults := IF(inMod.IsGetMetaData,
-                                      PhoneFinder_Services.GetPhonesMetadata(dZum_final, inMod, dGateways, dInBestInfo, dSubjectInfo),
+  SHARED dPhoneMetadataResults := IF(tmpMod.IsGetMetaData,
+                                      PhoneFinder_Services.GetPhonesMetadata(dZum_final, tmpMod, dGateways, dInBestInfo, dSubjectInfo),
                                       dZum_final);
 
-  // Modify IsPrimarySearchPII depending on input if value not provided
-  SHARED tmpMod := MODULE(PROJECT(inMod, PhoneFinder_Services.iParam.ReportParams, OPT))
-      EXPORT BOOLEAN IsPrimarySearchPII := inMod.IsPrimarySearchPII OR vPhoneBlank;
-  END;
-
   // Calculate PRIs
-  SHARED dFinalResults := IF(inMod.IsGetMetaData,
+  SHARED dFinalResults := IF(tmpMod.IsGetMetaData,
                               PhoneFinder_Services.GetPRIs(dPhoneMetadataResults, dInBestInfo, tmpMod),
                               dPhoneMetadataResults);
 
-  inputOptionCheck := inMod.IncludeInhousePhones OR inMod.IncludeTargus OR inMod.IncludeAccudataOCN OR 
-                      inMod.IncludeEquifax OR inMod.IncludeTransUnionIQ411 OR inMod.IncludeTransUnionPVS OR 
-                      inMod.UseInHousePhoneMetadata OR inMod.IncludeOTP OR inMod.IncludePorting OR inMod.IncludeSpoofing OR inMod.InputZumigoOptions;
+  inputOptionCheck := tmpMod.IncludeInhousePhones OR tmpMod.IncludeTargus OR tmpMod.IncludeAccudataOCN OR 
+                      tmpMod.IncludeEquifax OR tmpMod.IncludeTransUnionIQ411 OR tmpMod.IncludeTransUnionPVS OR 
+                      tmpMod.UseInHousePhoneMetadata OR tmpMod.IncludeOTP OR tmpMod.IncludePorting OR tmpMod.IncludeSpoofing OR tmpMod.InputZumigoOptions;
   
-  OUTPUT(dSearchRecs, NAMED('dSearchRecs_pre'));
-  OUTPUT(dPorted_Phones, NAMED('dPorted_Phones'));
-  OUTPUT(dZum_final, NAMED('dZum_final'));
-  OUTPUT(dPhoneMetadataResults, NAMED('dPhoneMetadataResults'));
-  OUTPUT(dFinalResults, NAMED('dFinalResults'));
-  
+  #IF(PhoneFinder_Services.Constants.Debug.Main)
+    OUTPUT(dInPhone, NAMED('dInPhone'));
+    OUTPUT(dPIISearch, NAMED('dPIISearch'));
+    OUTPUT(dInBest, NAMED('dInBest'));
+    OUTPUT(dPorted_Phones, NAMED('dPorted_Phones'));
+    OUTPUT(dZum_final, NAMED('dZum_final'));
+    OUTPUT(dPhoneMetadataResults, NAMED('dPhoneMetadataResults'));
+    OUTPUT(dFinalResults, NAMED('dFinalResults'));
+  #END
+
   // Fail the service if multiple DIDs are returned for the search criteria OR if the phone number is not 10 digits OR if no records are returned
-  MAP(inMod.IsPrimarySearchPII and verifyRequest > 0 => FAIL(303, doxie.ErrorCodes(303)),
+  MAP(tmpMod.IsPrimarySearchPII and verifyRequest > 0 => FAIL(303, doxie.ErrorCodes(303)),
      ~vPhoneBlank and ~vIsPhone10                    => FAIL(301,doxie.ErrorCodes(301)),
       vPhoneBlank and EXISTS(dGetDIDs(did_count > 1)) => FAIL(203,doxie.ErrorCodes(203)), //FAIL the service if no records exists
         // If phoneFinder were to run as a verification tool, only one type of verification should be selected.
@@ -156,11 +160,11 @@ MODULE
   // EXPORT dFormat2IESP := dataset([], iesp.phonefinder.t_PhoneFinderSearchRecord);
 
   //Deltabase Logging Dataset
-  EXPORT	ReportingDataset := 	PhoneFinder_Services.Get_Reporting_Records(dFormat2IESP, inMod, InputEcho);
+  EXPORT	ReportingDataset := 	PhoneFinder_Services.Get_Reporting_Records(dFormat2IESP, tmpMod, InputEcho);
 
   // Royalties
   // filtering out inhouse phonmetadata records 
-  dFilteringInHousePhoneData_typeflag := 	IF(inMod.UseInHousePhoneMetadata, 
+  dFilteringInHousePhoneData_typeflag := 	IF(tmpMod.UseInHousePhoneMetadata, 
                                               PROJECT(dSearchRecs_pre,
                                                       TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.Final, 
                                                                 SELF.typeflag :=  IF(LEFT.typeflag = 'P', '', LEFT.typeflag),
@@ -194,17 +198,17 @@ MODULE
   dRoyalty_ATT_LIDB := Royalty.RoyaltyATT.GetOnlineRoyalties(dFilteringInHousePhoneData_typeflag, src);		
   dRoyaltiesAccudata_CNAM  := Royalty.RoyaltyAccudata_CNAM.GetOnlineRoyalties(dFilteringInHousePhoneData_typeflag,subj_phone_type_new);
             	
-  EXPORT dRoyalties := if(inMod.UseLastResort, dRoyaltyLR) + 
-                        if(inMod.UseInHouseQSent or inMod.UseQSent, dRoyaltyQSent) + 
-                        if(inMod.UseTargus, dRoyaltyTargus) + 
-                        if(inMod.UseEquifax, dRoyaltyEquifax) + 
-                        if(inMod.UseAccuData_ocn, dRoyaltyAccOCN) +
-                        if(inMod.UseZumigoIdentity, dRoyaltyZumGetIden) +
-                        if(inMod.UseInHousePhoneMetadata, dRoyalty_ATT_LIDB) +
-                        if(inMod.UseAccuData_CNAM, dRoyaltiesAccudata_CNAM);
+  EXPORT dRoyalties := if(tmpMod.UseLastResort, dRoyaltyLR) + 
+                        if(tmpMod.UseInHouseQSent or tmpMod.UseQSent, dRoyaltyQSent) + 
+                        if(tmpMod.UseTargus, dRoyaltyTargus) + 
+                        if(tmpMod.UseEquifax, dRoyaltyEquifax) + 
+                        if(tmpMod.UseAccuData_ocn, dRoyaltyAccOCN) +
+                        if(tmpMod.UseZumigoIdentity, dRoyaltyZumGetIden) +
+                        if(tmpMod.UseInHousePhoneMetadata, dRoyalty_ATT_LIDB) +
+                        if(tmpMod.UseAccuData_CNAM, dRoyaltiesAccudata_CNAM);
   
   Zumigo_log_records := DATASET([{dZum_gw_recs.Zumigo_Hist}], Phones.Layouts.ZumigoIdentity.zDeltabaseLog);
                         
-  EXPORT Zumigo_History_Recs := IF(inMod.UseZumigoIdentity, Zumigo_log_records , DATASET([],Phones.Layouts.ZumigoIdentity.zDeltabaseLog));
+  EXPORT Zumigo_History_Recs := IF(tmpMod.UseZumigoIdentity, Zumigo_log_records , DATASET([],Phones.Layouts.ZumigoIdentity.zDeltabaseLog));
 
 END;

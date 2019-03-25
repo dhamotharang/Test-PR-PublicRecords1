@@ -123,7 +123,7 @@ dAppendDIDs_ := JOIN(dFormat2BatchCommonInput,
 
 
 	dSearchResultsUnfiltered := IF(inMod.IsGetMetaData
-																																	,PhoneFinder_Services.GetPhonesMetadata(dZum_final,inMod,dGateways,dinBestInfo,dSubjectInfo)
+																																	,PhoneFinder_Services.GetPhonesMetadata(dZum_final, inMod, dGateways, dinBestInfo, dSubjectInfo, TRUE)
 																																	,dZum_final);
 
                                                                 

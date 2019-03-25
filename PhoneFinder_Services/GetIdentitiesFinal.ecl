@@ -10,12 +10,10 @@ FUNCTION
   dIdentitySlim := PROJECT(dSearchResults((lname != '' OR listed_name != '') AND typeflag != Phones.Constants.TypeFlag.DataSource_PV),
                             TRANSFORM($.Layouts.PhoneFinder.IdentitySlim,
                                       SELF.dt_first_seen := MAP(LENGTH(TRIM(LEFT.dt_first_seen)) = 8 => (INTEGER)LEFT.dt_first_seen,
-                                                                LENGTH(TRIM(LEFT.dt_first_seen)) = 6 => (INTEGER)(LEFT.dt_first_seen + '00'),
-                                                                LENGTH(TRIM(LEFT.dt_first_seen)) = 4 => (INTEGER)(LEFT.dt_first_seen + '0000'),
+                                                                LENGTH(TRIM(LEFT.dt_first_seen)) = 6 => (INTEGER)(LEFT.dt_first_seen + '01'),
                                                                 0),
                                       SELF.dt_last_seen  := MAP(LENGTH(TRIM(LEFT.dt_last_seen)) = 8 => (INTEGER)LEFT.dt_last_seen,
-                                                                LENGTH(TRIM(LEFT.dt_last_seen)) = 6 => (INTEGER)(LEFT.dt_last_seen + '00'),
-                                                                LENGTH(TRIM(LEFT.dt_last_seen)) = 4 => (INTEGER)(LEFT.dt_last_seen + '0000'),
+                                                                LENGTH(TRIM(LEFT.dt_last_seen)) = 6 => (INTEGER)(LEFT.dt_last_seen + '01'),
                                                                 0),
                                       SELF               := LEFT,
                                       SELF               := []));
@@ -30,11 +28,14 @@ FUNCTION
     SELF                         := le;
   END;
 
-  dDIDSort   := SORT(dIdentitySlim(did != 0), acctno, did, IF(PhoneOwnershipIndicator, 0, 1), -dt_last_seen, dt_first_seen);
+  dDIDSort   := SORT(dIdentitySlim(did != 0),
+                      acctno, did, IF(PhoneOwnershipIndicator, 0, 1), IF(typeflag != Phones.Constants.TypeFlag.DataSource_PV, 0, 1),
+                      -dt_last_seen, IF(prim_name != '', 0, 1), IF(zip != '', 0, 1));
+  
   dDIDRollUp := ROLLUP(dDIDSort, tIdentityRollup(LEFT, RIGHT), acctno, did);
   
-  dNoDIDSort   := SORT(dIdentitySlim(did = 0), acctno, IF(PhoneOwnershipIndicator, 0, 1), -dt_last_seen, dt_first_seen, RECORD);
-  dNoDIDRollup := ROLLUP(dNoDIDSort, tIdentityRollup(LEFT, RIGHT), EXCEPT phone_source, penalt, dt_first_seen, dt_last_seen);
+  dNoDIDSort   := SORT(dIdentitySlim(did = 0), acctno, IF(PhoneOwnershipIndicator, 0, 1), -dt_last_seen, IF(prim_name != '', 0, 1), IF(zip != '', 0, 1), dt_first_seen, RECORD);
+  dNoDIDRollup := ROLLUP(dNoDIDSort, tIdentityRollup(LEFT, RIGHT), EXCEPT phone, phone_source, penalt, vendor_id, src, typeflag, dt_first_seen, dt_last_seen);
   
   // Combine and dedup the data
   dIdentities := dDIDRollUp & dNoDIDRollup;
@@ -64,25 +65,27 @@ FUNCTION
   // Show the best name/address/DOD for the identities - Only for PII search
   $.Layouts.PhoneFinder.IdentitySlim tBestInfo($.Layouts.PhoneFinder.IdentitySlim le, $.Layouts.BatchInAppendDID ri) :=
   TRANSFORM
+    BOOLEAN isInputDID := ri.did != 0;
+
     SELF.did         := le.did;
-    SELF.fname       := ri.name_first;
-    SELF.mname       := ri.name_middle;
-    SELF.lname       := ri.name_last;
-    SELF.name_suffix := ri.name_suffix;
-    SELF.prim_range  := ri.prim_range;
-    SELF.predir      := ri.predir;  
-    SELF.prim_name   := ri.prim_name;  
-    SELF.suffix      := ri.addr_suffix;  
-    SELF.postdir     := ri.prim_name;  
-    SELF.unit_desig  := ri.unit_desig;  
-    SELF.sec_range   := ri.sec_range;  
-    SELF.city_name   := ri.p_city_name;  
-    SELF.st          := ri.st;  
-    SELF.zip         := ri.z5;  
-    SELF.zip4        := ri.zip4;  
-    SELF.county_code := '';  
+    SELF.fname       := IF(isInputDID, ri.name_first, le.fname);
+    SELF.mname       := IF(isInputDID, ri.name_middle, le.mname);
+    SELF.lname       := IF(isInputDID, ri.name_last, le.lname);
+    SELF.name_suffix := IF(isInputDID, ri.name_suffix, le.name_suffix);
+    SELF.prim_range  := IF(isInputDID, ri.prim_range, le.prim_range);
+    SELF.predir      := IF(isInputDID, ri.predir, le.predir);
+    SELF.prim_name   := IF(isInputDID, ri.prim_name, le.prim_name);
+    SELF.suffix      := IF(isInputDID, ri.addr_suffix, le.suffix);
+    SELF.postdir     := IF(isInputDID, ri.postdir, le.postdir);
+    SELF.unit_desig  := IF(isInputDID, ri.unit_desig, le.unit_desig);
+    SELF.sec_range   := IF(isInputDID, ri.sec_range, le.sec_range);
+    SELF.city_name   := IF(isInputDID, ri.p_city_name, le.city_name);
+    SELF.st          := IF(isInputDID, ri.st, le.st);
+    SELF.zip         := IF(isInputDID, ri.z5, le.zip);
+    SELF.zip4        := IF(isInputDID, ri.zip4, le.zip4);
+    SELF.county_code := '';
     SELF.county_name := '';																																	
-    SELF.Deceased    := IF((INTEGER)ri.dod != 0, 'Y', 'N');
+    SELF.Deceased    := IF(isInputDID, IF((INTEGER)ri.dod != 0, 'Y', 'N'), le.Deceased);
     SELF             := le;
   END;
   
@@ -97,11 +100,11 @@ FUNCTION
   dIdentitiesFinal := IF(isPhoneSearch, dIdentitiesInfo, dIdentityBestInfo);
 
   #IF($.Constants.Debug.Intermediate)
-    OUTPUT(dIdentitySlim, NAMED('dIdentitySlim'), EXTEND);
-    OUTPUT(dDIDRollUp, NAMED('dIdentityDIDRollUp'), EXTEND);
-    OUTPUT(dNoDIDRollUp, NAMED('dIdentityNoDIDRollUp'), EXTEND);
-    OUTPUT(dIdentityTopn, NAMED('dIdentityTopn'), EXTEND);
-    OUTPUT(dIdentitiesInfo, NAMED('dIdentitiesInfo'), EXTEND);
+    OUTPUT(dIdentitySlim, NAMED('dIdentitySlim'));
+    OUTPUT(dDIDRollUp, NAMED('dIdentityDIDRollUp'));
+    OUTPUT(dNoDIDRollUp, NAMED('dIdentityNoDIDRollUp'));
+    OUTPUT(dIdentityTopn, NAMED('dIdentityTopn'));
+    OUTPUT(dIdentitiesInfo, NAMED('dIdentitiesInfo'));
   #END		
   
   RETURN dIdentitiesFinal;

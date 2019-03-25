@@ -135,10 +135,10 @@ FUNCTION
                           UNGROUP(TOPN(GROUP(dPhoneRollup, acctno), PhoneFinder_Services.Constants.WFConstants.MaxSectionLimit, acctno, -phone_score)));
   
   #IF(PhoneFinder_Services.Constants.Debug.Intermediate)
-      OUTPUT(dPhoneSlim, NAMED('dPhoneSlim_Primary'), EXTEND);
-      OUTPUT(dPhoneSort, NAMED('dPhoneSort_Primary'), EXTEND);
-      OUTPUT(dPhoneRollup, NAMED('dPhoneRollup_Primary'), EXTEND);
-      OUTPUT(dPrimaryPhoneDetail, NAMED('dPrimaryPhoneDetail_Primary'), EXTEND);
+      OUTPUT(dPhoneSlim, NAMED('dPhoneSlim'), EXTEND);
+      OUTPUT(dPhoneSort, NAMED('dPhoneSort'), EXTEND);
+      OUTPUT(dPhoneRollup, NAMED('dPhoneRollup'), EXTEND);
+      OUTPUT(dPrimaryPhoneDetail, NAMED('dPrimaryPhoneDetail'), EXTEND);
       OUTPUT(dPhoneDetail, NAMED('dPhoneDetail'), EXTEND);
       OUTPUT(dTUPhonesOnly, NAMED('dTUPhonesOnly'), EXTEND);
       OUTPUT(dAllPhonesDetail, NAMED('dAllPhonesDetail'), EXTEND);

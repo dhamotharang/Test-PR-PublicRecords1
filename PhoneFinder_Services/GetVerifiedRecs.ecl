@@ -152,12 +152,13 @@ EXPORT GetVerifiedRecs($.IParam.PhoneVerificationParams vmod) := MODULE
                     LIMIT(0), KEEP(1));
   
     #IF($.Constants.Debug.Intermediate)
-      OUTPUT(dVerifyIdentity, NAMED('dVerifyIdentity'));
-      OUTPUT(dNonVerifiedIdentities, NAMED('dNonVerifiedIdentities'));
-      OUTPUT(dIdentitiesAll, NAMED('dIdentitiesAll'));
-      OUTPUT(dInPrimaryPhones, NAMED('dInPrimaryPhones'));
-      OUTPUT(dPhoneVerify, NAMED('dPhoneVerify'));
-      OUTPUT(dVerify, NAMED('dVerify'));
+      IF(vmod.VerifyPhoneNameAddress OR vmod.VerifyPhoneName OR vmod.VerifyPhoneIsActive,
+        SEQUENTIAL(OUTPUT(dVerifyIdentity, NAMED('dVerifyIdentity')),
+                    OUTPUT(dNonVerifiedIdentities, NAMED('dNonVerifiedIdentities')),
+                    OUTPUT(dIdentitiesAll, NAMED('dIdentitiesAll')),
+                    OUTPUT(dInPrimaryPhones, NAMED('dInPrimaryPhones')),
+                    OUTPUT(dPhoneVerify, NAMED('dPhoneVerify')),
+                    OUTPUT(dVerify, NAMED('dVerify'))));
     #END
 
     RETURN dVerify;
