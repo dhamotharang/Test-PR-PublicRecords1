@@ -92,7 +92,7 @@ EXPORT log := MODULE
       SELF.mbs_billind_id := ''; // ??
       SELF.mbs_product_id := ''; // ??
       SELF.fcra := IF(env_flag = Data_Services.data_env.iFCRA, 1, 0);
-      SELF.hipaa := IF(env_flag = Data_Services.data_env.iHIPPA, 1, 0);
+      SELF.hipaa := IF(env_flag = Data_Services.data_env.iHIPAA, 1, 0);
       SELF.glba_use := mod_access.glb;
       SELF.dppa_use := mod_access.dppa;
     END;
