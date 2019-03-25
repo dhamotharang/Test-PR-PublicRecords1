@@ -59,5 +59,5 @@
 	string8		SexOffenderRegistryDate;
 	string8		SexOffenderRegExpirationDate;
 	string100	SexOffenderRegistryNumber;
-	string20	SourceID;
+	string100	SourceID;
 end;
