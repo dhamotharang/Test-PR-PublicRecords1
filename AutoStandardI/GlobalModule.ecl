@@ -345,4 +345,6 @@ export GlobalModule(boolean isFCRA = false) := module
 	export boolean SuppressDMVInfo := false : stored('ExcludeDMVPII');
 	export unsigned2 xadl2_weight_threshold := 0 : stored('xadl2_weight_threshold');
 	export boolean restrictPreGlb := DataRestrictionMask[23] = '1';
+	export boolean LogRecordSource := TRUE : STORED ('LogRecordSource');
+	export boolean LexIdSourceOptout := TRUE : STORED ('LexIdSourceOptout');
 end;

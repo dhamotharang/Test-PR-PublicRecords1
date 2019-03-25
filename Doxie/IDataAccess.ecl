@@ -14,6 +14,10 @@ EXPORT IDataAccess := INTERFACE
   EXPORT unsigned3 date_threshold := 0; // a.k.a. dateVal
   EXPORT boolean suppress_dmv := TRUE; // as simple as "SuppressDMVInfo := false : stored('ExcludeDMVPII');"
 
+  // this controls whether to skip logging (for instance, in Cert environment, to save the diskspace)
+  EXPORT boolean log_record_source := TRUE; //save records' source info in Roxie logs
+  EXPORT boolean lexid_source_optout := TRUE; //suppress LexId by record's source (CCPA, for instance)
+
   // a combination of "include" and dppa; I don't like it, but need to keep for backward compatibility 
   //TODO: try rid of it completely, or at least of "include" part
   EXPORT boolean show_minors := FALSE;  //a.k.a. OKtoShowMinors

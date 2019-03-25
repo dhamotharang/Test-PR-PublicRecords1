@@ -1,4 +1,4 @@
-﻿IMPORT AutoStandardI, mdr, codes;
+﻿IMPORT AutoStandardI, Data_Services, mdr, codes;
 
 EXPORT compliance := MODULE
  
@@ -19,6 +19,9 @@ EXPORT compliance := MODULE
       EXPORT boolean no_scrub := ^.no_scrub;
       EXPORT unsigned3 date_threshold := dateVal;
       EXPORT boolean suppress_dmv := suppressDMVInfo_value;
+      EXPORT boolean log_source_optout := gm.LexIdSourceOptout;
+      // "unsigned", so that we could accommodate different log levels, if needed
+      EXPORT boolean log_record_source := gm.LogRecordSource AND ((unsigned)thorlib.getenv ('LogRecordSource', '1') > 0);
       EXPORT boolean show_minors := gm.IncludeMinors OR (GLB_Purpose = 2);
       EXPORT string ssn_mask := ssn_mask_value;
       EXPORT unsigned1 dl_mask :=  dl_mask_val;
@@ -43,6 +46,9 @@ EXPORT compliance := MODULE
       EXPORT boolean no_scrub := AutoStandardI.InterfaceTranslator.no_scrub.val(project(gm,AutoStandardI.InterfaceTranslator.no_scrub.params));
       EXPORT unsigned3 date_threshold := AutoStandardI.InterfaceTranslator.dateVal.val(project(gm,AutoStandardI.InterfaceTranslator.dateVal.params));
       EXPORT boolean suppress_dmv := gm.SuppressDMVInfo;
+      EXPORT boolean lexid_src_optout := gm.LexIdSourceOptout;
+      // "unsigned", so that we could accommodate different log levels, if needed
+      EXPORT boolean log_record_source := gm.LogRecordSource AND ((unsigned)thorlib.getenv ('LogRecordSource', '1') > 0);
       EXPORT boolean show_minors := gm.IncludeMinors OR (glb_auto = 2);
       EXPORT string ssn_mask := AutoStandardI.InterfaceTranslator.ssn_mask_value.val(project(gm,AutoStandardI.InterfaceTranslator.ssn_mask_value.params));
       EXPORT unsigned1 dl_mask :=  AutoStandardI.InterfaceTranslator.dl_mask_val.val(project(gm,AutoStandardI.InterfaceTranslator.dl_mask_val.params));
@@ -183,5 +189,13 @@ EXPORT compliance := MODULE
 
     restrictedSet := ['0',''];
     EXPORT use_DM_SSA_updates(string dpm) := dpm[10] NOT IN restrictedSet;
+
+    EXPORT logSoldToSources(ds_in, mod_access, did_field='did') := MACRO
+      doxie.log.logSoldToSources(ds_in, mod_access, did_field);   
+    ENDMACRO;
+
+    EXPORT logSoldToTransaction(mod_access, env_flag = Data_Services.data_env.iNonFCRA) := FUNCTIONMACRO
+      RETURN doxie.log.logSoldToTransaction(mod_access, env_flag);
+    ENDMACRO;
 
 END;
