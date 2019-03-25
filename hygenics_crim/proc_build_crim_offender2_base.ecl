@@ -216,7 +216,7 @@ Layout_almostfinal_offender to_crim_offender(sort_slim_off l, sort_with_ssn r) :
                             '0' );
  self.nitro_flag		:= '';
  self.orig_ssn			:= r.orig_ssn;
- self.dle_num			  := r.stateidnumber;
+ self.dle_num			  := stringlib.stringfilterout(r.stateidnumber,'@ RI');
  self.fbi_num			  := r.fbinumber;
  self.doc_num			  := r.docnumber;
  self.ins_num			  := r.aliennumber;
