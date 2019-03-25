@@ -1,10 +1,11 @@
-IMPORT iesp, FCRAGateway_Services, Gateway, Royalty;
+IMPORT _Control, iesp, FCRAGateway_Services, Gateway, Royalty;
 
 EXPORT SoapCall_EquifaxEms(
   DATASET(iesp.equifax_ems.t_EquifaxEmsRequest) ds_ems_req,
   DATASET(Gateway.Layouts.Config) gateways,
   BOOLEAN makeGatewayCall=FALSE,
-  INTEGER waittime=10,
+  //Vendor QA gateway is slow. Set to 35 seconds if on QA env.
+  INTEGER waittime= IF(_Control.ThisEnvironment.Name = 'QA', 35, 10),
   INTEGER retries=Gateway.Constants.Defaults.RETRIES) := FUNCTION
 
   //Get the URL for the EMS credit gateway

@@ -1,4 +1,4 @@
-﻿IMPORT DidVille, FraudShared_Services, iesp, Royalty, std;
+﻿IMPORT DidVille, FraudShared_Services, iesp, Royalty;
 
 EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
                      FraudGovPlatform_Services.IParam.BatchParams batch_params,
@@ -93,7 +93,6 @@ EXPORT ReportRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_in,
 																																									SELF.Value := LEFT.value)),
 																				SELF := LEFT,
 																				SELF := []),
-																				LEFT OUTER,
 																				LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
 																				
 		/* Getting the related clusters */

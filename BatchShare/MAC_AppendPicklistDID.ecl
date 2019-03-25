@@ -15,7 +15,7 @@
 // IsFCRA -- so far specifies only whether Rhode Islan restrictions should be checked
 EXPORT MAC_AppendPicklistDID (inf, outf, in_params, IsFCRA = false) := MACRO
 
-import doxie, iesp;
+import doxie, iesp, suppress;
 
   #uniquename (gateway_cfg);
 	%gateway_cfg% := in_params.gateways;
@@ -33,15 +33,16 @@ import doxie, iesp;
   #uniquename (SetUser);
   #uniquename (shared_user);
   iesp.share.t_User %SetUser% () := transform
-    Self.GLBPurpose := (string) in_params.GLBPurpose;
-    Self.DLPurpose := (string) in_params.DPPAPurpose;
+    Self.GLBPurpose := (string) in_params.glb;
+    Self.DLPurpose := (string) in_params.dppa;
     // Self.User.IndustryClass := gm.industryclass;
     Self.SSNMask := in_params.ssn_mask;
-    Self.DOBMask := (string) in_params.dob_mask; //TODO:
-    Self.DLMask := in_params.mask_dl;
+    // need a reverse translation here -- from actual value to the caller's input representation
+    Self.DOBMask := Suppress.date_mask_math.MaskValue (in_params.dob_mask);
+    Self.DLMask := in_params.dl_mask = 1;
     Self.DataRestrictionMask := in_params.DataRestrictionMask;
     Self.DataPermissionMask := in_params.DataPermissionMask;
-    Self.ApplicationType := in_params.ApplicationType;
+    Self.ApplicationType := in_params.application_type;
     Self := []; // EndUser.*, TestDataEnabled, MaxWaitSeconds, etc.
   end;
   %shared_user% := row (%SetUser% ());

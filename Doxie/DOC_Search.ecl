@@ -46,7 +46,7 @@
 import Corrections,doxie,ut,codes,address,WSInput;
 
 export DOC_Search := macro
-#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 WSInput.MAC_DOC_Search()	
 
 #STORED('LookupType','CRIM');

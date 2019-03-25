@@ -1168,7 +1168,7 @@ EXPORT BIIDV2_TestSeed_Function(DATASET(BusinessInstantID20_Services.layouts.Inp
 			SELF.OFAC.bus_ofac_entity_name_7  	 := key1.bus_watchlist_entity_name_7;
 			SELF.OFAC.bus_ofac_sequence_7     	 := key1.bus_watchlist_sequence_7;
 
-      // SELF.BusinessAddressRisk.AddressIsCMRA := key1.AddressIsCMRA;
+      SELF.BusinessAddressRisk.AddressIsCMRA := key1.AddressIsCMRA;
       // SELF.Models := key1.Models;
       // SELF.AttributeGroup := key1.AttributeGroup;
       

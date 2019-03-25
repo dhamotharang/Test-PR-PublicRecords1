@@ -12,7 +12,7 @@
 </message>
 */
 
-import address, Risk_Indicators,gateway;
+import Gateway, Risk_Indicators, RiskWise;
 
 export PB1O_Batch_Service := macro
 
@@ -42,7 +42,7 @@ OFACversion := map(BridgerGateway and tribcode_value = '' => 4, // this won't hi
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := le.servicename;
 	self.url := map(tribcode='pb01' and le.servicename in ['targus'] => le.url,// use targus gateway if needed
-																	tribcode = '' and le.servicename in ['bridgerwlc'] => le.url,
+																	tribcode in ['', 'pb01', 'pb02'] and le.servicename in ['bridgerwlc'] => le.url,
 				 ''); // default to no gateway call			 
 	self := le;
 end;

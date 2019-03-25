@@ -8,7 +8,6 @@ EXPORT Property_BatchCommon (boolean isFCRA, unsigned1 nss, boolean useCannedRec
 														 STRING BIPFetchLevel = 'S'):= FUNCTION
 														 
 		#OPTION('optimizeProjects', TRUE);
-		isCNSMR := ut.IndustryClass.is_Knowx;
 		// Constants.
 		
 		TOO_MANY_MATCHES              := AutokeyB2_batch.Constants.FAILED_TOO_MANY_MATCHES;		
@@ -56,7 +55,9 @@ EXPORT Property_BatchCommon (boolean isFCRA, unsigned1 nss, boolean useCannedRec
 
 		/* ********************************** OBTAIN PROPERTY RECORDS ********************************* */
 	// common batch settings, including a gateway to a remote Picklist
-	  batch_params := module (BatchShare.IParam.getBatchParams())
+  //If this module will be passed as an input parameter, be sure to handle correctly
+  //MaxResultsPerAcct and ReturnCurrentOnly fields: currently, those values are set in this very attribute.
+	  batch_params := module (BatchShare.IParam.getBatchParamsV2())
       export dataset (Gateway.layouts.config) gateways := gw_config;
 		  export integer1 non_subject_suppression := nss;
     end;
@@ -86,6 +87,7 @@ EXPORT Property_BatchCommon (boolean isFCRA, unsigned1 nss, boolean useCannedRec
     ds_best := project(ds_batch_in, transform(doxie.layout_best, self.did := left.did, self:=[]));
     ds_flags := if(isFCRA, FFD.GetFlagFile(ds_best, pc_recs));
 
+		isCNSMR := batch_params.isConsumer();
 		p := BatchServices.Property_BatchService_Records(ds_batch_in, record_types, party_type, nSS, isFCRA, 
 																											BIPFetchLevel, slim_pc_recs, inFFDOptionsMask, ds_flags, isCNSMR);
 		 

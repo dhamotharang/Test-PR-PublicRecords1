@@ -49,8 +49,7 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 	//*******************Get Phone Metadata - ATT LIDB(Carrier data) and porting info - reuse PhoneAttributes code***************************
 	tempMod := MODULE(PROJECT(inMod,Phones.IParam.PhoneAttributes.BatchParams,OPT))
 		EXPORT BOOLEAN 		return_current								:= TRUE; // Required for initial release
-		EXPORT UNSIGNED		max_lidb_age_days						 	:= Phones.Constants.PhoneAttributes.LastActivityThreshold; 
-		EXPORT BOOLEAN		use_realtime_lidb				 			:= inMod.useRealTimeLIDB;
+		EXPORT UNSIGNED		max_age_days						 	:= Phones.Constants.PhoneAttributes.LastActivityThreshold; 
 	END;
 	dsPhoneswMetadata := Phones.PhoneAttributes_BatchRecords(PROJECT(ds_batch_in,TRANSFORM(Phones.Layouts.PhoneAttributes.BatchIn,
 																							SELF.acctno:=LEFT.acctno,
@@ -91,7 +90,7 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 		SELF.ownership_index := IF(badNumber,Constants.Ownership.enumIndex.INVALID,Constants.Ownership.enumIndex.UNDETERMINED); 
 		SELF.ownership_likelihood := IF(badNumber,Constants.Ownership.INVALID,'');
 		SELF.reason_codes := IF(badNumber,Constants.Reason_Codes.INVALID_NUMBER,'');
-		SELF.source_category := Constants.LIDB;
+		SELF.source_category := Constants.LERG6;
 		SELF.Source := r.source; // preserves PG,PJ,PK,PB,PR source labels
 		SELF.error_desc:=r.error_desc;
 		SELF:=l.batch_in;		
@@ -302,13 +301,10 @@ EXPORT BatchRecords(DATASET(PhoneOwnership.Layouts.BatchIn) ds_batch_in,
 						LEFT OUTER,LIMIT(Constants.MAX_RECORDS,SKIP));
 
 	//*****************************Compute Royalties*****************************
-	dsRoyaltiesZumigoIdentity := Royalty.RoyaltyZumigoGetLineIdentity.GetBatchRoyaltiesByAcctno(zFinal.ZumigoResults);
-	dsRealTimeATT_LIDB := dsPhoneswMetadata(source = Phones.Constants.PhoneAttributes.ATT_LIDB_RealTime);
-	dsRoyaltiesATT_LIDB_GetLine := Royalty.RoyaltyATT.GetBatchRoyaltiesByAcctno(dsRealTimeATT_LIDB, source, phoneno, acctno);	
+	dsRoyaltiesZumigoIdentity := Royalty.RoyaltyZumigoGetLineIdentity.GetBatchRoyaltiesByAcctno(zFinal.ZumigoResults);	
 	dsRoyaltiesAccudata_CNAM  := Royalty.RoyaltyAccudata_CNAM.GetBatchRoyaltiesByAcctno(dsAccuData);
 	dsRoyaltiesByAcctno := 	IF(inMod.useZumigo, dsRoyaltiesZumigoIdentity) + 
-							IF(inMod.useAccudataCNAM, dsRoyaltiesAccudata_CNAM) + 
-							IF(inMod.useRealTimeLIDB,dsRoyaltiesATT_LIDB_GetLine);
+							IF(inMod.useAccudataCNAM, dsRoyaltiesAccudata_CNAM);
 
 	//*****************************Generating final results - 3 datasets*****************************
 	PhoneOwnership.Layouts.Final ResultswRoyalties () := TRANSFORM

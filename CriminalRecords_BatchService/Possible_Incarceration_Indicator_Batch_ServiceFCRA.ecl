@@ -22,10 +22,9 @@ EXPORT Possible_Incarceration_Indicator_Batch_ServiceFCRA() := MACRO
 	ds_xml_in := DATASET([], CriminalRecords_BatchService.Layouts.batch_pii_in) : STORED('batch_in', FEW);
 		
 	gm := AutoStandardI.GlobalModule(isFCRA);
-	batch_params		:= BatchShare.IParam.getBatchParams();
+	batch_params		:= BatchShare.IParam.getBatchParamsV2();
 	pii_batch_params := module(project(batch_params, CriminalRecords_BatchService.IParam.batch_params, opt))
 		export dataset (Gateway.layouts.config) gateways := Gateway.Configuration.Get();
-		export applicationType 	:= AutoStandardI.InterfaceTranslator.application_type_val.val(project(gm,AutoStandardI.InterfaceTranslator.application_type_val.params));
 		export integer8 FFDOptionsMask := FFD.FFDMask.Get();
 		export integer FCRAPurpose := FCRA.FCRAPurpose.Get();
 	end;

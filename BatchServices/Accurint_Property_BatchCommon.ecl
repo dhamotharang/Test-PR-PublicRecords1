@@ -1,4 +1,4 @@
-﻿IMPORT AutokeyB2_batch, BatchServices, FFD, FCRA, LN_PropertyV2_Services, LN_PropertyV2, BatchShare, Gateway, Suppress, ut, STD;
+﻿IMPORT AutokeyB2_batch, BatchServices, FFD, FCRA, LN_PropertyV2_Services, LN_PropertyV2, BatchShare, Gateway, ut, STD;
 
 EXPORT Accurint_Property_BatchCommon(boolean isFCRA, unsigned1 nss, boolean useCannedRecs) := FUNCTION
     /* ******************************************* SET-UP ****************************************** */
@@ -47,7 +47,7 @@ EXPORT Accurint_Property_BatchCommon(boolean isFCRA, unsigned1 nss, boolean useC
     
     gw_config := Gateway.Configuration.Get();
     // common batch settings, including a gateway to a remote Picklist
-    batch_params := module (BatchShare.IParam.getBatchParams())
+    batch_params := module (BatchShare.IParam.getBatchParamsV2())
       export dataset (Gateway.layouts.config) gateways := gw_config;
       export integer1 non_subject_suppression := nss;
     end;

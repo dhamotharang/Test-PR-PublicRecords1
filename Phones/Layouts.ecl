@@ -60,16 +60,6 @@ MODULE
 
 	EXPORT Deltabase := MODULE
 		// Deltabase Layouts
-		EXPORT dValue := RECORD
-			STRING100 Value {XPATH('Value')};
-		END;
-		EXPORT dParameters := RECORD
-			DATASET(dValue) Parameter {XPATH('Parameter')};
-		END;
-		EXPORT dInput := RECORD
-			STRING Select {XPATH('Select')};
-			DATASET(dParameters) Parameters {XPATH('Parameters')};
-		END;
 		EXPORT ATTRecord := RECORD
 			 STRING   transaction_id				{XPATH('transaction_id')};
 			 STRING	 	batch_job_id					{XPATH('batch_job_id')};

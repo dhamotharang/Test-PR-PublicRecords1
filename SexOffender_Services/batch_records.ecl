@@ -63,7 +63,7 @@ EXPORT batch_records(SexOffender_Services.IParam.Batch_Params configData,
 		ds_offenders_raw := SexOffender_Services.Raw.batch_view.GetOffendersRecs(acctNos_final, isFCRA, ds_flags, slim_pc_recs, FFDOptionsMask_adj);
 		
 		// 4. Remove restricted records via DID & SSN pulling and suppression.
-		appType := configData.applicationType;	  
+		appType := configData.application_type;	  
     Suppress.MAC_Suppress(ds_offenders_raw,dids_pulled,appType,Suppress.Constants.LinkTypes.DID,did);
     Suppress.MAC_Suppress(dids_pulled,dids_ssns_pulled,appType,Suppress.Constants.LinkTypes.SSN,ssn);
     Suppress.MAC_Suppress(dids_ssns_pulled,dids_appended_ssns_pulled,appType,Suppress.Constants.LinkTypes.SSN,ssn_appended);

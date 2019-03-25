@@ -34,7 +34,7 @@ EXPORT Batch_ServiceFCRA () := MACRO
   nss := ut.getNonSubjectSuppression (Suppress.Constants.NonSubjectSuppression.returnRestrictedDescription);
 	  
   // common batch settings, including a gateway to a remote Picklist
-  batch_params := module (project (BatchShare.IParam.getBatchParams(), marriage_divorce_v2_Services.input.batch_params, opt))
+  batch_params := module (project (BatchShare.IParam.getBatchParamsV2(), marriage_divorce_v2_Services.input.batch_params, opt))
     export dataset (Gateway.layouts.config) gateways := Gateway.Configuration.Get();
     export integer1 non_subject_suppression := nss;
 		export integer8 FFDOptionsMask := FFD.FFDMask.Get();

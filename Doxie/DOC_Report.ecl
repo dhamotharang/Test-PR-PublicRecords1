@@ -23,7 +23,7 @@
 import Corrections,doxie,ut,WSInput;
 
 export DOC_Report := macro
-#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
+#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 #STORED('LookupType','CRIM');
 #stored('ReportReq',true);
 #stored('ReturnOffenses',true);

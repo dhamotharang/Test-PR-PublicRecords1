@@ -8,8 +8,7 @@ EXPORT IParams := MODULE
 			EXPORT UNSIGNED1 MaxIdentityCount 							:= 1;		
 			EXPORT STRING    reverse_phonescore_model 			:= '';
 			EXPORT BOOLEAN   useZumigo											:= FALSE;			
-			EXPORT BOOLEAN   useAccudataCNAM								:= FALSE;			
-			EXPORT BOOLEAN   useRealTimeLIDB								:= FALSE;		
+			EXPORT BOOLEAN   useAccudataCNAM								:= FALSE;					
 		END;	
 
 		EXPORT getBatchParams() := FUNCTION
@@ -43,8 +42,7 @@ EXPORT IParams := MODULE
 				EXPORT STRING    OptinId 						:= '1';	
 				EXPORT STRING    OptInVersionId 				:= '';	
 				EXPORT STRING15  OptInTimestamp 				:= '';	
-				EXPORT BOOLEAN   useAccudataCNAM		  		:= ~Doxie.DataRestriction.AccuData AND search_level <> PhoneOwnership.Constants.SearchLevel.BASIC;	// this includes Ultimate
-				EXPORT BOOLEAN   useRealTimeLIDB				:= ~Doxie.DataRestriction.ATT_LIDB;				
+				EXPORT BOOLEAN   useAccudataCNAM		  		:= ~Doxie.DataRestriction.AccuData AND search_level <> PhoneOwnership.Constants.SearchLevel.BASIC;	// this includes Ultimate			
 			END;
 			
 			RETURN in_mod;

@@ -17,7 +17,10 @@ export t_EmailFinderSearchBy := record
 end;
 		
 export t_EmailFinderSearchOption := record (iesp.share.t_BaseSearchOptionEx)
+	integer ReturnCount {xpath('ReturnCount')};
+	integer StartingRecord {xpath('StartingRecord')};
 	string SearchType {xpath('SearchType')}; //values['EAA','EIA','EIC','']
+	string RestrictedUseCase {xpath('RestrictedUseCase')};
 	string EmailQualityRulesMask {xpath('EmailQualityRulesMask')};
 	boolean IncludeNoLexIdMatch {xpath('IncludeNoLexIdMatch')};
 	boolean IncludeHistoricData {xpath('IncludeHistoricData')};
@@ -68,7 +71,7 @@ export t_EmailFinderSearchRecord := record
 	string2 Source {xpath('Source')};
 	unsigned NumEmailPerLexid {xpath('NumEmailPerLexid')};
 	unsigned NumLexIdPerEmail {xpath('NumLexIdPerEmail')};
-	boolean isDeepDive {xpath('isDeepDive')};
+	boolean IsDeepDive {xpath('IsDeepDive')};
 	unsigned Penalt {xpath('Penalt')};
 	unsigned PenaltyAddress {xpath('PenaltyAddress')};
 	unsigned PenaltyName {xpath('PenaltyName')};
@@ -82,7 +85,7 @@ end;
 		
 export t_EmailFinderInputSubject := record
 	t_EmailFinderSearchBy InputEcho {xpath('InputEcho')};
-	unsigned SubjectLexid {xpath('SubjectLexid')};
+	unsigned SubjectLexId {xpath('SubjectLexId')};
 end;
 		
 export t_EmailFinderSearchResponse := record

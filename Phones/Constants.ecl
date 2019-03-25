@@ -179,23 +179,24 @@ MODULE
 	EXPORT PhoneAttributes :=
 	MODULE
 		EXPORT MaxRecsPerPhone 		:= 500; //Actual limit as of 4/18/2016 is 57 - W20160418-095049
-		EXPORT LastActivityThreshold:= 90; //tolerance threshold for record age
+		EXPORT LastActivityThreshold:= 30; //tolerance threshold for record age; for Lerg6
 		EXPORT PORTED_PHONE			:= 'C';
 		EXPORT DISCONNECTED			:= 'D';
 		EXPORT PORTED_LINE			:= 'L';
 		EXPORT REACTIVATED			:= 'R';
 		EXPORT NUMBER_SWAPPED		:= 'DS'; // swap identifies both a disconnect and a number swap
-		EXPORT SUSPENDED				:= 'U';
-		EXPORT LIDB_VERFICATION	:= 'V';
-		EXPORT ATT_LIDB_RealTime:=  'PR'; // use to identify ATT gateway records for royalty
+		EXPORT SUSPENDED			:= 'U';
+		EXPORT VERFICATION	        := 'V';
 		EXPORT ATT_LIDB_Delta		:=  'PD'; // temporarily used to distinguish deltabase records
+		EXPORT LERG6		        :=  MDR.sourceTools.src_Phones_Lerg6; 
 		EXPORT ATT_LIDB_SRC			:= MDR.sourceTools.src_Phones_LIDB;
-		EXPORT set_ATT_LIDB			:= [ATT_LIDB_SRC,ATT_LIDB_RealTime];
+		export set_VERIFICATION		:= [LERG6, ATT_LIDB_SRC];
 		EXPORT ICONECTIV_SRC		:= MDR.sourceTools.src_PhonesPorted_iConectiv;
 		EXPORT DISCONNECT_SRC		:= MDR.sourceTools.src_Phones_Disconnect;
 		EXPORT GONG_DISCONNECT_SRC	:= MDR.sourceTools.src_Phones_Gong_History_Disconnect;
 		EXPORT SUSPENDED_CODE		:= 'SU';
 		EXPORT DISCONNECTED_CODE:= 'DE';
+		EXPORT DEFAULT_BLOCK_ID:= 'A';
 
 	END;
  	

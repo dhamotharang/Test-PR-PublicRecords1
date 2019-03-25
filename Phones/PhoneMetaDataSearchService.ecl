@@ -43,11 +43,7 @@ EXPORT PhoneMetaDataSearchService() := MACRO
       		
   Results := DATASET([tFormat2IespResponse()]);
 
-  // Royalties
-  ds_RoyaltiesRealTime_ATT := Royalty.RoyaltyATT.GetOnlineRoyalties(ds_out, Source);		
-  RoyaltySet := if(in_mod.use_realtime_lidb, ds_RoyaltiesRealTime_ATT);
 
   OUTPUT(Results, NAMED('Results'));
-  OUTPUT(RoyaltySet, NAMED('Royalties'));
 
 ENDMACRO;

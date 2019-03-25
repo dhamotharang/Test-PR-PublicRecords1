@@ -89,8 +89,12 @@ ids := paw_services.PAWSearchService_IDs.val(tempmod);
 
 tempresults := PAW_Services.PAWSearchService_Records.val(ids,tempmod);
 
+//Suppress by SSN and DID.
+Suppress.MAC_Suppress_Child.keyLinked(tempresults, , ssn_suppressed, tempmod.applicationType, Suppress.Constants.LinkTypes.SSN, ssn, __seq, ssns, true);
+Suppress.MAC_Suppress(ssn_suppressed, did_suppressed, tempmod.applicationType, Suppress.Constants.LinkTypes.DID, did);
+
 doxie.MAC_Header_Field_Declare();
-doxie.MAC_Marshall_Results(tempresults,tempmarshalled);
+doxie.MAC_Marshall_Results(did_suppressed,tempmarshalled);
 
 output(tempmarshalled,named('Results'));
 

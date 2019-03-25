@@ -33,6 +33,7 @@ dppa_ok := Risk_Indicators.iid_constants.dppa_ok(dppa, isFCRA);
 
 EnableEmergingID := (BSOptions & risk_indicators.iid_constants.BSOptions.EnableEmergingID) > 0;
 FilterLiens := (BSOptions & risk_indicators.iid_constants.BSOptions.FilterLiens) > 0;
+RemoveQuickHeader := (BSOptions & risk_indicators.iid_constants.BSOptions.RemoveQuickHeader) > 0;
 
 // only use this variable in realtime mode to simulate the header build date rather than todays date
 dk := choosen(if(isFCRA, doxie.Key_FCRA_max_dt_last_seen, doxie.key_max_dt_last_seen), 1);
@@ -313,9 +314,10 @@ j_quickpre_thor := join (distribute(g_inrec(did<>0), hash64(did)),
 #ELSE
 	j_quickpre := j_quickpre_roxie;
 #END
-			   
-real_header_all_roxie := group( sort( ungroup(j_pre + j_quickpre), seq ,did), seq, did);	 
-real_header_all_thor := group( sort( distribute( ungroup(j_pre + j_quickpre), hash64(seq)), seq ,did, LOCAL), seq, did, LOCAL);
+
+header_recs_combined := if(RemoveQuickHeader, j_pre, j_pre + j_quickpre);  // adding new option to be able to toggle off quick header in archive mode			   
+real_header_all_roxie := group( sort( ungroup(header_recs_combined), seq ,did), seq, did);	 
+real_header_all_thor := group( sort( distribute( ungroup(header_recs_combined), hash64(seq)), seq ,did, LOCAL), seq, did, LOCAL);
 real_header_all := if(onThor, real_header_all_thor, real_header_all_roxie);
 
 real_header := if(DataRestriction[iid_constants.posEquifaxRestriction]=iid_constants.sTrue, real_header_all (h.src NOT IN [MDR.sourceTools.src_Equifax, MDR.sourcetools.src_Equifax_Quick, MDR.sourcetools.src_Equifax_Weekly]), real_header_all);
@@ -1677,6 +1679,7 @@ j_combined_thor := GROUP (SORT( DISTRIBUTE(UNGROUP(prison + j_corrections), HASH
 
 j_header := IF (isFCRA, j_combined, prison);	
 
+// output(header_recs_combined, named('header_recs_combined'), extend);
 // output(header_corr, named('header_corr'));
 // output(corrOnly, named('corrOnly'));
 // output(unCorrOnly, named('unCorrOnly'));

@@ -1,12 +1,13 @@
-IMPORT Address, BatchShare, FraudGovPlatform_Services, FraudShared_Services, iesp, std;
+﻿IMPORT Address, BatchShare, FraudGovPlatform_Services, FraudShared_Services, iesp, std;
 
 EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) ds_batch_in,
                      FraudGovPlatform_Services.IParam.BatchParams batch_params,
 										 BOOLEAN IsTestRequest = FALSE) := MODULE
 	
 	//Defining the constants to be used later.
-	SHARED Fragment_Types_const := FraudGovPlatform_Services.Constants.Fragment_Types;
-	SHARED File_Type_Const := FraudGovPlatform_Services.Constants.PayloadFileTypeEnum;
+	SHARED _Constant := FraudGovPlatform_Services.Constants;
+	SHARED Fragment_Types_const := _Constant.Fragment_Types;
+	SHARED File_Type_Const := _Constant.PayloadFileTypeEnum;
 	
 	// **************************************************************************************
 	// Getting the payload records from FraudGov Payload key.
@@ -114,12 +115,12 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 																		SELF := LEFT,
 																		SELF := []),
 																		LEFT OUTER,
-																		LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
+																		LIMIT(_Constant.Limits.MAX_JOIN_LIMIT, SKIP));
 																		
 	ds_clusters := PROJECT(ds_cluster_recs_scores, 
 										TRANSFORM(iesp.fraudgovsearch.t_FraudGovSearchRecord,
 											SELF.AnalyticsRecordId := LEFT.tree_uid_,
-											SELF.RecordType := FraudGovPlatform_Services.Constants.RecordType.CLUSTER,																										
+											SELF.RecordType := _Constant.RecordType.CLUSTER,																										
 											SELF.ElementType := LEFT.entity_name,
 											//Cleaning out @@@ from LEFT.entity_value when //ELEMENT is of type address OR BANK ACCOUNT NUMBER,
 											// @@@ was addded to calcualte the matching HASH value for tree_uid
@@ -142,7 +143,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 																	LEFT.record_id = RIGHT.record_id,
 																	FraudGovPlatform_Services.Transforms.xform_elements_Information(LEFT, RIGHT),
 																	LEFT OUTER,
-																	LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
+																	LIMIT(_Constant.Limits.MAX_JOIN_LIMIT, SKIP));
 	
 	// getting the records from deltabase database.
 	ds_delta_recentTransactions := FraudGovPlatform_Services.mod_Deltabase_Functions(batch_params).getDeltabaseSearchRecords();
@@ -151,7 +152,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	ds_GovBest := FraudGovPlatform_Services.Functions.getGovernmentBest(ds_dids_to_use, batch_params);
 	
 	//Getting the Contributory best to fill identity Detail card.
-	ds_contributoryBest := FraudGovPlatform_Services.Functions.getContributedBest(ds_dids_to_use, FraudGovPlatform_Services.Constants.FRAUD_PLATFORM);
+	ds_contributoryBest := FraudGovPlatform_Services.Functions.getContributedBest(ds_dids_to_use, _Constant.FRAUD_PLATFORM);
 
 	//realtime record:
 	BOOLEAN isRealtimeRecord := adlDIDFound AND COUNT(ds_contributoryBest) = 0;
@@ -170,8 +171,8 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 		contri_best_rec := ds_contributoryBest(ContributedBest.UniqueId = L.fragment_value)[1];
 		
 		SELF.AnalyticsRecordId := L.AnalyticsRecordId;
-		SELF.RecordType := MAP(	L.fragment = Fragment_Types_const.PERSON_FRAGMENT => FraudGovPlatform_Services.Constants.RecordType.IDENTITY,
-														L.fragment In FraudGovPlatform_Services.Constants.RECORD_TYPE_ELEMENT_SET => FraudGovPlatform_Services.Constants.RecordType.ELEMENT,
+		SELF.RecordType := MAP(	L.fragment = Fragment_Types_const.PERSON_FRAGMENT => _Constant.RecordType.IDENTITY,
+														L.fragment In _Constant.RECORD_TYPE_ELEMENT_SET => _Constant.RecordType.ELEMENT,
 														'');
 		SELF.ElementType := L.fragment;
 		//Cleaning out @@@ from LEFT.entity_value when ELEMENT is of type address,
@@ -242,12 +243,12 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 															LEFT.fragment_value = RIGHT.fragment_value AND
 															LEFT.fragment = RIGHT.fragment,
 															ElementsNIdentities_trans(LEFT, RIGHT),
-														LIMIT(FraudGovPlatform_Services.Constants.Limits.MAX_JOIN_LIMIT, SKIP));
+														LIMIT(_Constant.Limits.MAX_JOIN_LIMIT, SKIP));
 														
 	ds_realtimerecord := 	PROJECT(ds_realtimescoring_rec, 
 													TRANSFORM(iesp.fraudgovsearch.t_FraudGovSearchRecord,
-														SELF.AnalyticsRecordId := FraudGovPlatform_Services.Constants.KelEntityIdentifier._LEXID + (string)LEFT.LexID,
-														SELF.RecordType := FraudGovPlatform_Services.Constants.RecordType.IDENTITY,
+														SELF.AnalyticsRecordId := _Constant.KelEntityIdentifier._LEXID + (string)LEFT.LexID,
+														SELF.RecordType := _Constant.RecordType.IDENTITY,
 														SELF.RecordSource := 'REALTIME',
 														SELF.ElementType := Fragment_Types_const.PERSON_FRAGMENT,
 														SELF.ElementValue := (string)LEFT.LexID,
@@ -282,7 +283,6 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	// output(ds_fragment_recs_tab, named('ds_fragment_recs_tab'));
 	// output(ds_fragment_recs_w_scores, named('ds_fragment_recs_w_scores'));	
 	// output(ds_ExternalServices_recs, named('ds_ExternalServices_recs'));	
-	// output(ds_realtimescoring_rec, named('ds_realtimescoring_rec'));	
 	
 	EXPORT ds_results := SORT(IF(~isRealtimeRecord, (ds_ElementsNIdentities + ds_clusters), ds_realtimerecord), ElementType, ElementValue);
 END; 

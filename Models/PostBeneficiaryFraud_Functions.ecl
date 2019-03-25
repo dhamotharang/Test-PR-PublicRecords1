@@ -1335,7 +1335,7 @@ EXPORT PostBeneficiaryFraud_Functions := MODULE
 
     SOFR_batch_in := PROJECT(current_result, xfm_to_batch_input(LEFT));
 		
-		SOFR_batch_params		:= MODULE(PROJECT(BatchShare.IParam.getBatchParams(), SexOffender_Services.IParam.batch_params, opt)) END;
+		SOFR_batch_params		:= MODULE(PROJECT(BatchShare.IParam.getBatchParamsV2(), SexOffender_Services.IParam.batch_params, opt)) END;
 		SOFR_module_return 	:= SexOffender_Services.batch_records(SOFR_batch_params, SOFR_batch_in);
 		
 		offenders := SOFR_module_return.offenders;		

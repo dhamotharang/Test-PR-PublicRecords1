@@ -22,7 +22,7 @@ export Batch_Service () := FUNCTION
   BatchShare.MAC_SequenceInput (ds_xml_in, ds_sequenced);
 
   // parameters common for all batch input records 
-  batch_params := module (project (BatchShare.IParam.getBatchParams(), input.batch_params, opt)) end;
+  batch_params := module (project (BatchShare.IParam.getBatchParamsV2(), input.batch_params, opt)) end;
   
   tmp := marriage_divorce_v2_Services.batch_records (batch_params, ds_sequenced);
 	ds_batch_out := tmp.Records;
