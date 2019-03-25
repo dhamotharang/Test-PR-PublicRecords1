@@ -1,9 +1,18 @@
-IMPORT Prof_LicenseV2, doxie_files, doxie, Ingenix_NatlProf, suppress, codes, ut;
+IMPORT STD, Prof_LicenseV2, doxie_files, doxie, Ingenix_NatlProf, suppress, codes, ut;
 
 doxie.MAC_Header_Field_Declare()
+mod_access := doxie.compliance.GetGlobalDataAccessModule();
 
-Search_layout:= prof_LicenseV2_Services.Assorted_Layouts.Layout_Search_w_pen;
-Search_layout_plus:= prof_LicenseV2_Services.Assorted_Layouts.Layout_Search_w_pen_and_license_number;
+search_layout := RECORD (prof_LicenseV2_Services.Assorted_Layouts.Layout_Search_w_pen)
+                   unsigned4 global_sid;
+                   unsigned8 record_sid;
+                 END;
+
+Search_layout_plus:= RECORD (prof_LicenseV2_Services.Assorted_Layouts.Layout_Search_w_pen_and_license_number)
+                       unsigned4 global_sid;
+                       unsigned8 record_sid;
+                     END;
+
 report_layout:= prof_LicenseV2_Services.Assorted_Layouts.Layout_report;	
 
 Search_layout_x := RECORD(Search_layout)
@@ -92,8 +101,13 @@ EXPORT get_ProfLic(dataset(prof_LicenseV2_Services.Layout_Search_Ids_Prolic) Pro
 		self := r;
 		self := [];
 	END;
-	pre_providers := join(Prov_Ids,provider_key,keyed(left.ProviderId = right.l_ProviderId),
+	_pre_providers := join(Prov_Ids,provider_key,keyed(left.ProviderId = right.l_ProviderId),
 		get_base_fields_prov(left,right),limit(1000,skip),keep(100));
+  // fabricate source and record ids
+  pre_providers := PROJECT (_pre_providers, TRANSFORM (Search_layout,
+                                                       SELF.global_sid := COUNTER % 4;
+                                                       SELF.record_sid := 330000 + COUNTER;
+                                                       SELF := LEFT));
 	
 
   Search_Layout get_license_info(Search_Layout L, provider_license_key R):=transform
@@ -192,8 +206,14 @@ EXPORT get_ProfLic(dataset(prof_LicenseV2_Services.Layout_Search_Ids_Prolic) Pro
 		self := r;
 		self := [];
 	END;
-	sancs0 := join(Sanc_Ids,Sanc_Key,keyed(left.sanc_id = right.l_sancid),
+	_sancs0 := join(Sanc_Ids,Sanc_Key,keyed(left.sanc_id = right.l_sancid),
 		get_base_fields_sanc(left,right),limit(1000,skip),keep(100));
+
+  // fabricate source and record ids
+  sancs0 := PROJECT (_sancs0, TRANSFORM (Search_layout_x,
+                                         SELF.global_sid := COUNTER % 4;
+                                         SELF.record_sid := 220000 + COUNTER;
+                                         SELF := LEFT));
 
 	KeyTmpRec := RECORD
 		Search_layout.npi;
@@ -241,9 +261,16 @@ EXPORT get_ProfLic(dataset(prof_LicenseV2_Services.Layout_Search_Ids_Prolic) Pro
 				+ doxie.FN_Tra_Penalty_DID(r.did) + doxie.FN_Tra_Penalty_BDID(r.bdid);
 		self := [];
 	END;
-	prolics_search_xtra_fields := join(prolic_Ids, prof_key
+	_prolics_search_xtra_fields := join(prolic_Ids, prof_key
 						,keyed(left.prolic_seq_id = right.prolic_seq_id)
 						,get_base_fields_prolic_search(left,right),limit(1000,skip),keep(100));
+
+  // fabricate source and record ids
+  prolics_search_xtra_fields := PROJECT (_prolics_search_xtra_fields, TRANSFORM (Search_layout_plus,
+                                                                                 SELF.global_sid := COUNTER % 4;
+                                                                                 SELF.record_sid := 110000 + COUNTER;
+                                                                                 SELF := LEFT));
+
 
 	with_orig_tmp := prolics_search_xtra_fields(orig_license_number <> '');
 	
@@ -268,9 +295,16 @@ EXPORT get_ProfLic(dataset(prof_LicenseV2_Services.Layout_Search_Ids_Prolic) Pro
 	Suppress.MAC_Suppress(pre_search_res,mid1,application_type_value,Suppress.Constants.LinkTypes.DID,did);
 	Suppress.MAC_Suppress(mid1,search_pulled,application_type_value,Suppress.Constants.LinkTypes.SSN,best_ssn);
 	doxie.MAC_PruneOldSSNs(search_pulled, search_prunned, best_ssn, did);
-	suppress.mac_mask(search_prunned, search_res, best_ssn, blank, true, false);
+	suppress.mac_mask(search_prunned, search_masked, best_ssn, blank, true, false);
+  search_res := suppress.MAC_SuppressSource (search_masked, mod_access);
+  doxie.compliance.logSoldToSources (search_res, mod_access);
 
+//OUTPUT (providers, NAMED ('providers'));
+//OUTPUT (sancs, NAMED ('sancs'));
+//OUTPUT (prolics_search, NAMED ('prolics_search'));
 
+//OUTPUT (search_masked, NAMED ('search_masked'));
+//OUTPUT (search_res, NAMED ('search_res'));
 	EXPORT search := search_res;
 
 
@@ -279,11 +313,12 @@ EXPORT get_ProfLic(dataset(prof_LicenseV2_Services.Layout_Search_Ids_Prolic) Pro
 		self.uniqueid := (string17) ('PL' + trim((string15)r.prolic_seq_id));
 		self.other_license_number := r.previous_license_number;
 		self.other_license_type := r.previous_license_type;
+    race := STD.Str.ToUpperCase(r.personal_race_cd)[1];
 		self.personal_race_desc := if(r.personal_race_desc <> '',r.personal_race_desc,
-		MAP(stringlib.stringtouppercase(r.personal_race_cd)[1] = 'W' => 'White',
-						 stringlib.stringtouppercase(r.personal_race_cd)[1] = 'B' => 'African American',
-						 stringlib.stringtouppercase(r.personal_race_cd)[1] = 'H' => 'Hispanic',
-						 'Unknown'));
+			MAP(race = 'W' => 'White',
+				race = 'B' => 'African American',
+				race = 'H' => 'Hispanic',
+				'Unknown'));
 		self := r;
 		self := [];
 	END;

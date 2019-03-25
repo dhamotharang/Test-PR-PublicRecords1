@@ -94,6 +94,9 @@ Export Prof_LicenseSearchService := MACRO
 	
 	doxie.MAC_Marshall_Results(recs2, recs_marshalled);
 
+	mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule());
+	IF (exists(recs), doxie.compliance.logSoldToTransaction(mod_access));
+
 	OUTPUT(recs_marshalled, NAMED('Results'));
 
 endmacro;
