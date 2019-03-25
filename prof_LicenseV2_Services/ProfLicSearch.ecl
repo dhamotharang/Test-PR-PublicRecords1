@@ -35,7 +35,7 @@ export val(params in_params) := FUNCTION
 	 ids_Sanc_blank := dataset([],prof_LicenseV2_Services.Layout_Search_Ids_Sanc);
 	 ids_Prov_blank := dataset([],prof_LicenseV2_Services.Layout_Search_Ids_Prov);
 	//Submit blanks we don't really want to submit these any more  We should just submit the full in_params criteria
-	 ids_Sanc :=  prof_LicenseV2_Services.ProfLicSearch_Ids.val_sanc(in_params);
+//	 ids_Sanc :=  prof_LicenseV2_Services.ProfLicSearch_Ids.val_sanc(in_params);
 	 ids_Prov := prof_LicenseV2_Services.ProfLicSearch_Ids.val_prov(in_params);
 							
 	Prolic_r   := prof_LicenseV2_Services.Prof_Lic_raw.search_view.
@@ -44,7 +44,6 @@ export val(params in_params) := FUNCTION
 	f_srt_proflic := Prolic_r(penalt <= tmp_penalt_threshold,
 	                 tmp_filingjurisdiction = ''
 									 or source_st = tmp_filingjurisdiction);								 
-	
 
 	//Submit full criteria to Header service
 	newlayout  := Healthcare_Header_Services.Layouts.autokeyInput;
@@ -118,7 +117,11 @@ export val(params in_params) := FUNCTION
 	end;
 	cfg:=dataset([buildConfig()]);
 	headerRawData := dedup(Healthcare_Header_Services.Records.getRecordsRawDoxieIndividual(ds_prov,cfg),all)(in_params.Include_Prov or in_params.Include_Sanc);
-	Search_layout:= prof_LicenseV2_Services.Assorted_Layouts.Layout_Search_w_pen;
+  search_layout := RECORD (prof_LicenseV2_Services.Assorted_Layouts.Layout_Search_w_pen)
+                     unsigned4 global_sid := 0; //default is defined temporarily
+                     unsigned8 record_sid := 0;
+                   END;
+
 	normProviderAddr := normalize(headerRawData,choosen(left.Addresses,5),transform(Healthcare_Header_Services.Layouts.CombinedHeaderResults,self.Addresses := right;self:=left;self:=[]));
 	normProviders := normalize(normProviderAddr,left.StateLicenses,transform(Healthcare_Header_Services.Layouts.CombinedHeaderResults,self.StateLicenses := right;self:=left;self:=[]));
 	headerFmtProvData := project(normProviders, transform(Search_layout,
@@ -174,6 +177,7 @@ export val(params in_params) := FUNCTION
 																self.geo_lat := left.Addresses[1].geo_lat;
 																self.geo_long := left.Addresses[1].geo_long;
 																self.Source_st_decoded := codes.GENERAL.state_long(left.StateLicenses[1].LicenseState);
+                                self := LEFT;
 																self :=[];)) (in_params.Include_Prov);
 	
 	headerFmtSancRaw := project(headerRawData, transform(Search_layout,
@@ -231,6 +235,7 @@ export val(params in_params) := FUNCTION
 																self.geo_lat := left.Addresses[1].geo_lat;
 																self.geo_long := left.Addresses[1].geo_long;
 																self.Source_st_decoded := codes.GENERAL.state_long(left.StateLicenses[1].LicenseState);
+                                self := LEFT;
 																self :=[];)) (in_params.Include_Sanc);
 
 	normSanctions := sort(dedup(normalize(headerRawData,left.LegacySanctions,transform(Healthcare_Header_Services.Layouts.layout_LegacySanctions,self.ProviderID := left.LNPID;self:=right;self:=[])),all),if(GroupSortOrder<>0,GroupSortOrder,99));
@@ -241,7 +246,7 @@ export val(params in_params) := FUNCTION
 																self.action_status := left.SANC_REAS;
 																self:=right;),keep(50), limit(0));
 
-	f_srt := f_srt_proflic+headerFmtProvData+headerFmtSancData;
+	f_srt := f_srt_proflic + headerFmtProvData + headerFmtSancData;
 
 	rsrt := if(tmp_comp_name_value = '', sort(f_srt,if(isDeepDive,1,0), penalt,
 			lname,fname,mname,company_name, providerid,prolic_seq_id,sanc_id, status, orig_license_number, -date_last_seen,record),
@@ -249,7 +254,6 @@ export val(params in_params) := FUNCTION
 			company_name,lname,fname,mname, providerid,prolic_seq_id,sanc_id, status, orig_license_number, -date_last_seen,record));
 
 	// output(ids_prolic, named('ids_prolic'));
-	// output(ids_Prov, named('ids_Prov'));
 	// output(ds_prov, named('ds_prov'));
 	// output(headerRawData, named('headerRawData'));
 	// output(normProviderAddr, named('normProviderAddr'));
@@ -261,7 +265,11 @@ export val(params in_params) := FUNCTION
 	// output(ids_prov, named('ids_prov'));
 	// output(in_params.ssn, named('in_params_ssn'));
 	// output(in_params.Include_Prof_Lic, named('Include_Prof_Lic'));
-	
+
+	//OUTPUT (headerRawData, NAMED('headerRawData'));
+
+
+
 	RETURN rsrt;
 
 END; // function
