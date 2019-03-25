@@ -5375,6 +5375,741 @@ EXPORT SeMA_M0_Xwalk_PreProc_Mapping(ds, outRecord) := FUNCTIONMACRO
 ENDMACRO;
 
 
+EXPORT SeMO_V1_PreProc_And_Patterns(ds, outRecord) := FUNCTIONMACRO
+
+outRecord doXform(TYPEOF(RECORDOF(ds)) L) := TRANSFORM 
+   self.seq := L.seq;
+   self.AcctNo := L.AcctNo;
+   self.DOB := L.DOB;
+   self.LexID := L.LexID;
+   self.HistorydateYYYYMM := L.HistorydateYYYYMM;
+   ageRefYYYYMMDD := if((string)L.HistorydateYYYYMM = '999999' OR (string)L.HistorydateYYYYMM='0', (string)Std.Date.Today(), 
+                              (string)L.HistorydateYYYYMM+(string2)Models.Healthcare_SocioEconomic_Functions_Core.calcDaysInMonth((string)L.HistorydateYYYYMM));
+   DECIMAL5_2 SeMO_Age_In_Years := (DECIMAL5_2) Models.Healthcare_SocioEconomic_Functions_Core.SeMAcalcAgeInYears(L.DOB,(string)ageRefYYYYMMDD);
+   self.age_in_years :=(REAL8) SeMO_Age_In_Years;
+
+   SELF.P_Time_First_Last_Purchase := IF(L.v1_LifeEvTimeFirstAssetPurchase < 0, -1, L.v1_LifeEvTimeFirstAssetPurchase-L.v1_LifeEvTimeLastAssetPurchase);
+   SELF.P_EstimatedHHIncomePerCapita := IF(L.v1_HHCnt < 0, -1, MAX(1, L.v1_HHEstimatedIncomeRange)/MAX(1, L.v1_HHCnt));
+   SELF.EstIncome0_1 := IF(((L.ESTIMATEDANNUALINCOME > 0 ) & (L.ESTIMATEDANNUALINCOME_12 > 0)), L.ESTIMATEDANNUALINCOME-L.ESTIMATEDANNUALINCOME_12, -250000);
+   SELF.EstIncome0_2 := IF(((L.ESTIMATEDANNUALINCOME > 0 ) & (L.ESTIMATEDANNUALINCOME_24 > 0)), L.ESTIMATEDANNUALINCOME-L.ESTIMATEDANNUALINCOME_24, -250000);
+   SELF.EstIncome1_2 := IF(((L.ESTIMATEDANNUALINCOME_12 > 0 ) & (L.ESTIMATEDANNUALINCOME_24 > 0)), L.ESTIMATEDANNUALINCOME_12-L.ESTIMATEDANNUALINCOME_24, -250000);
+   SELF.EstIncome0_1_Pcnt := IF(((L.ESTIMATEDANNUALINCOME > 0 ) & (L.ESTIMATEDANNUALINCOME_12 > 0)), (L.ESTIMATEDANNUALINCOME-L.ESTIMATEDANNUALINCOME_12)/L.ESTIMATEDANNUALINCOME_12, -25);
+   SELF.EstIncome0_2_Pcnt := IF(((L.ESTIMATEDANNUALINCOME > 0 ) & (L.ESTIMATEDANNUALINCOME_24 > 0)), (L.ESTIMATEDANNUALINCOME-L.ESTIMATEDANNUALINCOME_24)/L.ESTIMATEDANNUALINCOME_24, -25);
+   SELF.PropTaxPerRelative := IF(((L.RELATIVESCOUNT > 0) & (L.RELATIVESPROPOWNEDTAXTOTAL > 0)), L.RELATIVESPROPOWNEDTAXTOTAL/L.RELATIVESCOUNT, 0);
+   DS_STATEAVGCOST := DATASET([{1   ,6815}, {2  ,9128}, {3  ,6272}, {4  ,6167}, {5  ,5434}, {6  ,6238}, {7  ,5994}, {8  ,8654}, {9  ,8480}, {10 ,7156}, {11 ,5467}, {12 ,6856}, {13 ,6921}, {14 ,5658}, {15 ,6756}, {16 ,6666}, {17 ,6782}, {18 ,6596}, {19 ,6795}, {20 ,9278}, {21 ,7492}, {22 ,8521}, {23 ,6618}, {24 ,7409}, {25 ,6967}, {26 ,6571}, {27 ,6640}, {28 ,6444}, {29 ,7749}, {30 ,7048}, {31 ,7839}, {32 ,7583}, {33 ,6651}, {34 ,5735}, {35 ,8341}, {36 ,7076}, {37 ,6532}, {38 ,6580}, {39 ,7730}, {40 ,8309}, {41 ,6323}, {42 ,7056}, {43 ,6411}, {44 ,5924}, {45 ,5031}, {46 ,6286}, {47 ,7635}, {48 ,6782}, {49 ,7233}, {50 ,7667}, {51 ,7040}], {INTEGER4 ST_CD, INTEGER4 ST_AVG_COST});
+  STATEAVGCOST_DCT := DICTIONARY(DS_STATEAVGCOST, {ST_CD => ST_AVG_COST});
+   SELF.AVGSTATECOST := STATEAVGCOST_DCT[L.ST+1].ST_AVG_COST;
+   self.AG_Pred_Mot :=(REAL8) Models.Healthcare_SocioEconomic_Functions_Core.calc_AG_Pred_Mot((REAL8)SeMO_Age_In_Years, (Integer) L.FEMALE);
+   // Binary Patterns
+   BPR1_1 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.v1_VerifiedSSN > 0 AND L.v1_VerifiedSSN <= 0.1, 1.669353167, 0);
+   BPR1_2 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.SSNIssueState > -56 AND L.SSNIssueState <= 7, 1.561441289, 0);
+   BPR1_3 := IF( L.SSNLowIssueAge > 385 AND L.SSNLowIssueAge <= 533 AND L.SSNHighIssueAge > 507 AND L.SSNHighIssueAge <= 1584, 1.525651914, 0);
+   BPR1_4 := IF( L.AgeRiskIndicator > 20 AND L.AgeRiskIndicator <= 46 AND L.v1_HHSeniorMmbrCnt > 2 AND L.v1_HHSeniorMmbrCnt <= 68, 1.516771739, 0);
+   BPR1_5 := IF( L.v1_ProspectAge > 56 AND L.v1_ProspectAge <= 232 AND L.v1_CrtRecMsdmeanCnt > 4 AND L.v1_CrtRecMsdmeanCnt <= 15, 1.499131739, 0);
+   BPR1_6 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.CurrAddrMedianValue > -1005209 AND L.CurrAddrMedianValue <= 155056, 1.495362002, 0);
+   BPR1_7 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.v1_ProspectAge > 56 AND L.v1_ProspectAge <= 232, 1.493693447, 0);
+   BPR1_8 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.PrevAddrMedianValue > -1031251 AND L.PrevAddrMedianValue <= 129244, 1.487543855, 0);
+   BPR1_9 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.InputAddrMedianValue > -1002156 AND L.InputAddrMedianValue <= 178907, 1.486748229, 0);
+   BPR1_10 := IF( L.v1_ProspectAge > 56 AND L.v1_ProspectAge <= 232 AND L.v1_CrtRecMsdmeanTimeNewest > 135 AND L.v1_CrtRecMsdmeanTimeNewest <= 217, 1.478744528, 0);
+   BPR1_11 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.NonDerogCount24 > -11 AND L.NonDerogCount24 <= 3, 1.475736589, 0);
+   BPR1_12 := IF( L.SSNLowIssueAge > 385 AND L.SSNLowIssueAge <= 533 AND L.v1_ProspectAge > 56 AND L.v1_ProspectAge <= 232, 1.47147943, 0);
+   BPR1_13 := IF( L.PropAgeNewestPurchase > 215 AND L.PropAgeNewestPurchase <= 576 AND L.v1_CrtRecSeverityIndex > 1 AND L.v1_CrtRecSeverityIndex <= 3, 1.467590848, 0);
+   BPR1_14 := IF( L.PropAgeNewestPurchase > 215 AND L.PropAgeNewestPurchase <= 576 AND L.v1_CrtRecTimeNewest > 89 AND L.v1_CrtRecTimeNewest <= 167, 1.467239048, 0);
+   BPR1_15 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.v1_PPCurrOwnedCnt > 4 AND L.v1_PPCurrOwnedCnt <= 8, 1.465887479, 0);
+   BPR1_16 := IF( L.InputPhoneHighRisk > -1 AND L.InputPhoneHighRisk <= -0.9 AND L.v1_ProspectTimeLastUpdate > 171 AND L.v1_ProspectTimeLastUpdate <= 1552, 1.462034733, 0);
+   BPR1_17 := IF( L.InputPhoneMobile > -1 AND L.InputPhoneMobile <= -0.9 AND L.v1_ProspectTimeLastUpdate > 171 AND L.v1_ProspectTimeLastUpdate <= 1552, 1.462034733, 0);
+   BPR1_18 := IF( L.InputPhoneProblems > -1 AND L.InputPhoneProblems <= -0.9 AND L.v1_ProspectTimeLastUpdate > 171 AND L.v1_ProspectTimeLastUpdate <= 1552, 1.462034733, 0);
+   BPR1_19 := IF( L.InputPhoneServiceType > -1 AND L.InputPhoneServiceType <= -0.9 AND L.v1_ProspectTimeLastUpdate > 171 AND L.v1_ProspectTimeLastUpdate <= 1552, 1.462034733, 0);
+   BPR1_20 := IF( L.InputPhoneType > -1 AND L.InputPhoneType <= -0.9 AND L.v1_ProspectTimeLastUpdate > 171 AND L.v1_ProspectTimeLastUpdate <= 1552, 1.462034733, 0);
+   BPR1_21 := IF( L.SearchPhoneSearchCount > -1 AND L.SearchPhoneSearchCount <= -0.9 AND L.v1_ProspectTimeLastUpdate > 171 AND L.v1_ProspectTimeLastUpdate <= 1552, 1.462034733, 0);
+   BPR1_22 := IF( L.v1_VerifiedPhone > -1 AND L.v1_VerifiedPhone <= -0.9 AND L.v1_ProspectTimeLastUpdate > 171 AND L.v1_ProspectTimeLastUpdate <= 1552, 1.462034733, 0);
+   BPR1_23 := IF( L.VerifiedPhone > -1 AND L.VerifiedPhone <= -0.9 AND L.v1_ProspectTimeLastUpdate > 171 AND L.v1_ProspectTimeLastUpdate <= 1552, 1.462034733, 0);
+   BPR1_24 := IF( L.CurrAddrAgeOldestRecord > 303 AND L.CurrAddrAgeOldestRecord <= 1920 AND L.v1_CrtRecSeverityIndex > 1 AND L.v1_CrtRecSeverityIndex <= 3, 1.459361511, 0);
+   BPR1_25 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.PROPOWNEDTAXTOTAL0_d_2 > 1 AND L.PROPOWNEDTAXTOTAL0_d_2 <= 19, 1.459144681, 0);
+   BPR1_26 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.AVGSTATECOST > -4247 AND L.AVGSTATECOST <= 6638, 1.459131969, 0);
+   BPR1_27 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.PROPOWNEDTAXTOTAL0_d_1 > 1 AND L.PROPOWNEDTAXTOTAL0_d_1 <= 50, 1.458184669, 0);
+   BPR1_28 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.EstimatedAnnualIncome_12 > 18413 AND L.EstimatedAnnualIncome_12 <= 55085, 1.458068698, 0);
+   BPR1_29 := IF( L.CurrAddrLenOfRes > 302 AND L.CurrAddrLenOfRes <= 1918 AND L.v1_CrtRecSeverityIndex > 1 AND L.v1_CrtRecSeverityIndex <= 3, 1.457828001, 0);
+   BPR1_30 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.EstimatedAnnualIncome_24 > 18386 AND L.EstimatedAnnualIncome_24 <= 55031, 1.456135215, 0);
+   BPR1_31 := IF( L.FEMALE > 1 AND L.FEMALE <= 1.1 AND L.v1_HHSeniorMmbrCnt > 2 AND L.v1_HHSeniorMmbrCnt <= 68, 1.456092605, 0);
+   BPR1_32 := IF( L.InputAddrAgeOldestRecord > 303 AND L.InputAddrAgeOldestRecord <= 1920 AND L.v1_CrtRecSeverityIndex > 1 AND L.v1_CrtRecSeverityIndex <= 3, 1.45579435, 0);
+   BPR1_33 := IF( L.VerifiedPhone > -1 AND L.VerifiedPhone <= -0.9 AND L.PropAgeNewestPurchase > 215 AND L.PropAgeNewestPurchase <= 576, 1.455231029, 0);
+   BPR1_34 := IF( L.PropAgeNewestPurchase > 215 AND L.PropAgeNewestPurchase <= 576 AND L.InputPhoneHighRisk > -1 AND L.InputPhoneHighRisk <= -0.9, 1.455231029, 0);
+   BPR1_35 := IF( L.PropAgeNewestPurchase > 215 AND L.PropAgeNewestPurchase <= 576 AND L.InputPhoneMobile > -1 AND L.InputPhoneMobile <= -0.9, 1.455231029, 0);
+   BPR1_36 := IF( L.PropAgeNewestPurchase > 215 AND L.PropAgeNewestPurchase <= 576 AND L.InputPhoneProblems > -1 AND L.InputPhoneProblems <= -0.9, 1.455231029, 0);
+   BPR1_37 := IF( L.PropAgeNewestPurchase > 215 AND L.PropAgeNewestPurchase <= 576 AND L.InputPhoneServiceType > -1 AND L.InputPhoneServiceType <= -0.9, 1.455231029, 0);
+   BPR1_38 := IF( L.PropAgeNewestPurchase > 215 AND L.PropAgeNewestPurchase <= 576 AND L.InputPhoneType > -1 AND L.InputPhoneType <= -0.9, 1.455231029, 0);
+   BPR1_39 := IF( L.PropAgeNewestPurchase > 215 AND L.PropAgeNewestPurchase <= 576 AND L.SearchPhoneSearchCount > -1 AND L.SearchPhoneSearchCount <= -0.9, 1.455231029, 0);
+   BPR1_40 := IF( L.PropAgeNewestPurchase > 215 AND L.PropAgeNewestPurchase <= 576 AND L.v1_VerifiedPhone > -1 AND L.v1_VerifiedPhone <= -0.9, 1.455013851, 0);
+   BPR1_41 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.CurrAddrAgeLastSale > 218 AND L.CurrAddrAgeLastSale <= 521, 1.454661177, 0);
+   BPR1_42 := IF( L.LastNameChangeAge > 305 AND L.LastNameChangeAge <= 1920 AND L.v1_VerifiedSSN > 0 AND L.v1_VerifiedSSN <= 0.1, 1.454587764, 0);
+   BPR1_43 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.EstimatedAnnualIncome > -250999 AND L.EstimatedAnnualIncome <= 51811, 1.454514569, 0);
+   BPR1_44 := IF( L.InputAddrLenOfRes > 302 AND L.InputAddrLenOfRes <= 1918 AND L.v1_CrtRecSeverityIndex > 1 AND L.v1_CrtRecSeverityIndex <= 3, 1.454385935, 0);
+   BPR1_45 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.InputAddrAgeLastSale > 216 AND L.InputAddrAgeLastSale <= 516, 1.45366758, 0);
+   BPR1_46 := IF( L.v1_VerifiedSSN > 1 AND L.v1_VerifiedSSN <= 1.1 AND L.v1_ProspectTimeLastUpdate > 171 AND L.v1_ProspectTimeLastUpdate <= 1552, 1.453354918, 0);
+   BPR1_47 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.PROPOWNEDTAXTOTAL1_d_2 > 1 AND L.PROPOWNEDTAXTOTAL1_d_2 <= 21, 1.452812653, 0);
+   BPR1_48 := IF( L.v1_ProspectTimeLastUpdate > 171 AND L.v1_ProspectTimeLastUpdate <= 1552 AND L.AVGSTATECOST > -4247 AND L.AVGSTATECOST <= 6638, 1.451774546, 0);
+   BPR1_49 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.FEMALE > 0 AND L.FEMALE <= 0.1, 1.451532821, 0);
+   BPR1_50 := IF( L.PrevAddrAgeOldestRecord > 296 AND L.PrevAddrAgeOldestRecord <= 1920 AND L.v1_CrtRecMsdmeanTimeNewest > 135 AND L.v1_CrtRecMsdmeanTimeNewest <= 217, 1.451167689, 0);
+   BPR1_51 := IF( L.SSNHighIssueAge > 366 AND L.SSNHighIssueAge <= 507 AND L.v1_ProspectAge > 56 AND L.v1_ProspectAge <= 232, 1.450131366, 0);
+   BPR1_52 := IF( L.LastNameChangeAge > 305 AND L.LastNameChangeAge <= 1920 AND L.v1_CrtRecMsdmeanTimeNewest > 135 AND L.v1_CrtRecMsdmeanTimeNewest <= 217, 1.449753223, 0);
+   BPR1_53 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.SSNAddrCount > -255 AND L.SSNAddrCount <= 5, 1.447287411, 0);
+   BPR1_54 := IF( L.FEMALE > 0 AND L.FEMALE <= 0.1 AND L.PropAgeNewestPurchase > 215 AND L.PropAgeNewestPurchase <= 576, 1.446870215, 0);
+   BPR1_55 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.PropTax_EstIncome > 1 AND L.PropTax_EstIncome <= 5, 1.443654482, 0);
+   BPR1_56 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.v1_VerifiedPhone > -1 AND L.v1_VerifiedPhone <= -0.9, 1.44300537, 0);
+   BPR1_57 := IF( L.v1_ProspectAge > 56 AND L.v1_ProspectAge <= 232 AND L.v1_CrtRecSeverityIndex > 1 AND L.v1_CrtRecSeverityIndex <= 3, 1.442831662, 0);
+   BPR1_58 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.InputPhoneHighRisk > -1 AND L.InputPhoneHighRisk <= -0.9, 1.442188049, 0);
+   BPR1_59 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.InputPhoneMobile > -1 AND L.InputPhoneMobile <= -0.9, 1.442188049, 0);
+   BPR1_60 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.InputPhoneProblems > -1 AND L.InputPhoneProblems <= -0.9, 1.442188049, 0);
+   BPR1_61 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.InputPhoneServiceType > -1 AND L.InputPhoneServiceType <= -0.9, 1.442188049, 0);
+   BPR1_62 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.InputPhoneType > -1 AND L.InputPhoneType <= -0.9, 1.442188049, 0);
+   BPR1_63 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.SearchPhoneSearchCount > -1 AND L.SearchPhoneSearchCount <= -0.9, 1.442188049, 0);
+   BPR1_64 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.VerifiedPhone > -1 AND L.VerifiedPhone <= -0.9, 1.442188049, 0);
+   BPR1_65 := IF( L.VerifiedPhone > -1 AND L.VerifiedPhone <= -0.9 AND L.CurrAddrAgeOldestRecord > 303 AND L.CurrAddrAgeOldestRecord <= 1920, 1.43986365, 0);
+   BPR1_66 := IF( L.CurrAddrAgeOldestRecord > 303 AND L.CurrAddrAgeOldestRecord <= 1920 AND L.InputPhoneHighRisk > -1 AND L.InputPhoneHighRisk <= -0.9, 1.43986365, 0);
+   BPR1_67 := IF( L.CurrAddrAgeOldestRecord > 303 AND L.CurrAddrAgeOldestRecord <= 1920 AND L.InputPhoneMobile > -1 AND L.InputPhoneMobile <= -0.9, 1.43986365, 0);
+   BPR1_68 := IF( L.CurrAddrAgeOldestRecord > 303 AND L.CurrAddrAgeOldestRecord <= 1920 AND L.InputPhoneProblems > -1 AND L.InputPhoneProblems <= -0.9, 1.43986365, 0);
+   BPR1_69 := IF( L.CurrAddrAgeOldestRecord > 303 AND L.CurrAddrAgeOldestRecord <= 1920 AND L.InputPhoneServiceType > -1 AND L.InputPhoneServiceType <= -0.9, 1.43986365, 0);
+   BPR1_70 := IF( L.CurrAddrAgeOldestRecord > 303 AND L.CurrAddrAgeOldestRecord <= 1920 AND L.InputPhoneType > -1 AND L.InputPhoneType <= -0.9, 1.43986365, 0);
+   BPR1_71 := IF( L.CurrAddrAgeOldestRecord > 303 AND L.CurrAddrAgeOldestRecord <= 1920 AND L.SearchPhoneSearchCount > -1 AND L.SearchPhoneSearchCount <= -0.9, 1.43986365, 0);
+   BPR1_72 := IF( L.CurrAddrAgeOldestRecord > 303 AND L.CurrAddrAgeOldestRecord <= 1920 AND L.v1_VerifiedPhone > -1 AND L.v1_VerifiedPhone <= -0.9, 1.43986365, 0);
+   BPR1_73 := IF( L.VerifiedPhone > -1 AND L.VerifiedPhone <= -0.9 AND L.CurrAddrLenOfRes > 302 AND L.CurrAddrLenOfRes <= 1918, 1.439822666, 0);
+   BPR1_74 := IF( L.CurrAddrLenOfRes > 302 AND L.CurrAddrLenOfRes <= 1918 AND L.InputPhoneHighRisk > -1 AND L.InputPhoneHighRisk <= -0.9, 1.439822666, 0);
+   BPR1_75 := IF( L.CurrAddrLenOfRes > 302 AND L.CurrAddrLenOfRes <= 1918 AND L.InputPhoneMobile > -1 AND L.InputPhoneMobile <= -0.9, 1.439822666, 0);
+   BPR1_76 := IF( L.CurrAddrLenOfRes > 302 AND L.CurrAddrLenOfRes <= 1918 AND L.InputPhoneProblems > -1 AND L.InputPhoneProblems <= -0.9, 1.439822666, 0);
+   BPR1_77 := IF( L.CurrAddrLenOfRes > 302 AND L.CurrAddrLenOfRes <= 1918 AND L.InputPhoneServiceType > -1 AND L.InputPhoneServiceType <= -0.9, 1.439822666, 0);
+   BPR1_78 := IF( L.CurrAddrLenOfRes > 302 AND L.CurrAddrLenOfRes <= 1918 AND L.InputPhoneType > -1 AND L.InputPhoneType <= -0.9, 1.439822666, 0);
+   BPR1_79 := IF( L.CurrAddrLenOfRes > 302 AND L.CurrAddrLenOfRes <= 1918 AND L.SearchPhoneSearchCount > -1 AND L.SearchPhoneSearchCount <= -0.9, 1.439822666, 0);
+   BPR1_80 := IF( L.CurrAddrLenOfRes > 302 AND L.CurrAddrLenOfRes <= 1918 AND L.v1_VerifiedPhone > -1 AND L.v1_VerifiedPhone <= -0.9, 1.439822666, 0);
+   BPR1_81 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.CurrAddrMortgageType > 3 AND L.CurrAddrMortgageType <= 3.1, 1.439652499, 0);
+   BPR1_82 := IF( L.InputAddrMortgageType > 2 AND L.InputAddrMortgageType <= 2.1 AND L.v1_ProspectAge > 56 AND L.v1_ProspectAge <= 232, 1.437426157, 0);
+   BPR1_83 := IF( L.FEMALE > 0 AND L.FEMALE <= 0.1 AND L.AgeOldestRecord > 345 AND L.AgeOldestRecord <= 1920, 1.437056412, 0);
+   BPR1_84 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.PropAgeNewestPurchase > 215 AND L.PropAgeNewestPurchase <= 576, 1.436812666, 0);
+   BPR1_85 := IF( L.PropAgeNewestPurchase > 215 AND L.PropAgeNewestPurchase <= 576 AND L.v1_HHCrtRecMsdmeanMmbrCnt > 1 AND L.v1_HHCrtRecMsdmeanMmbrCnt <= 3, 1.436647937, 0);
+   BPR1_86 := IF( L.SSNIssueState > 32 AND L.SSNIssueState <= 112 AND L.CurrAddrAgeOldestRecord > 303 AND L.CurrAddrAgeOldestRecord <= 1920, 1.436492244, 0);
+   BPR1_87 := IF( L.v1_ProspectTimeLastUpdate > 171 AND L.v1_ProspectTimeLastUpdate <= 1552 AND L.v1_PropCurrOwnedCnt > 1 AND L.v1_PropCurrOwnedCnt <= 5, 1.436310626, 0);
+   BPR1_88 := IF( L.v1_ProspectTimeLastUpdate > 171 AND L.v1_ProspectTimeLastUpdate <= 1552 AND L.v1_PropCurrOwner > 1 AND L.v1_PropCurrOwner <= 1.1, 1.435943184, 0);
+   BPR1_89 := IF( L.SSNIssueState > 32 AND L.SSNIssueState <= 112 AND L.CurrAddrLenOfRes > 302 AND L.CurrAddrLenOfRes <= 1918, 1.435804304, 0);
+   BPR1_90 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.DivSSNAddrMSourceCount > -256 AND L.DivSSNAddrMSourceCount <= 6, 1.435342336, 0);
+   BPR1_91 := IF( L.PropAgeNewestPurchase > 215 AND L.PropAgeNewestPurchase <= 576 AND L.VoterRegistrationRecord > 0 AND L.VoterRegistrationRecord <= 0.1, 1.434409122, 0);
+   BPR1_92 := IF( L.VerifiedPhone > -1 AND L.VerifiedPhone <= -0.9 AND L.LastNameChangeAge > 305 AND L.LastNameChangeAge <= 1920, 1.434251343, 0);
+   BPR1_93 := IF( L.LastNameChangeAge > 305 AND L.LastNameChangeAge <= 1920 AND L.InputPhoneHighRisk > -1 AND L.InputPhoneHighRisk <= -0.9, 1.434251343, 0);
+   BPR1_94 := IF( L.LastNameChangeAge > 305 AND L.LastNameChangeAge <= 1920 AND L.InputPhoneMobile > -1 AND L.InputPhoneMobile <= -0.9, 1.434251343, 0);
+   BPR1_95 := IF( L.LastNameChangeAge > 305 AND L.LastNameChangeAge <= 1920 AND L.InputPhoneProblems > -1 AND L.InputPhoneProblems <= -0.9, 1.434251343, 0);
+   BPR1_96 := IF( L.LastNameChangeAge > 305 AND L.LastNameChangeAge <= 1920 AND L.InputPhoneServiceType > -1 AND L.InputPhoneServiceType <= -0.9, 1.434251343, 0);
+   BPR1_97 := IF( L.LastNameChangeAge > 305 AND L.LastNameChangeAge <= 1920 AND L.InputPhoneType > -1 AND L.InputPhoneType <= -0.9, 1.434251343, 0);
+   BPR1_98 := IF( L.LastNameChangeAge > 305 AND L.LastNameChangeAge <= 1920 AND L.SearchPhoneSearchCount > -1 AND L.SearchPhoneSearchCount <= -0.9, 1.434251343, 0);
+   BPR1_99 := IF( L.LastNameChangeAge > 305 AND L.LastNameChangeAge <= 1920 AND L.v1_VerifiedPhone > -1 AND L.v1_VerifiedPhone <= -0.9, 1.434251343, 0);
+   BPR1_100 := IF( L.PropAgeOldestPurchase > 237 AND L.PropAgeOldestPurchase <= 579 AND L.v1_CrtRecMsdmeanTimeNewest > 135 AND L.v1_CrtRecMsdmeanTimeNewest <= 217, 1.434088058, 0);
+   BPR1_101 := IF( L.v1_ProspectAge > 56 AND L.v1_ProspectAge <= 232 AND L.v1_CrtRecTimeNewest > 89 AND L.v1_CrtRecTimeNewest <= 167, 1.433334351, 0);
+   BPR1_102 := IF( L.LastNameChangeAge > 305 AND L.LastNameChangeAge <= 1920 AND L.v1_CrtRecTimeNewest > 89 AND L.v1_CrtRecTimeNewest <= 167, 1.431727926, 0);
+   BPR1_103 := IF( L.v1_ProspectTimeLastUpdate > 171 AND L.v1_ProspectTimeLastUpdate <= 1552 AND L.v1_ResInputOwnershipIndex > 3 AND L.v1_ResInputOwnershipIndex <= 8, 1.431313875, 0);
+   BPR1_104 := IF( L.CurrAddrAgeOldestRecord > 303 AND L.CurrAddrAgeOldestRecord <= 1920 AND L.v1_CrtRecTimeNewest > 89 AND L.v1_CrtRecTimeNewest <= 167, 1.431012787, 0);
+   BPR1_105 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.v1_VerifiedSSN > 1 AND L.v1_VerifiedSSN <= 1.1, 1.430574322, 0);
+   BPR1_106 := IF( L.VerifiedPhone > -1 AND L.VerifiedPhone <= -0.9 AND L.PrevAddrAgeOldestRecord > 296 AND L.PrevAddrAgeOldestRecord <= 1920, 1.4293802, 0);
+   BPR1_107 := IF( L.PrevAddrAgeOldestRecord > 296 AND L.PrevAddrAgeOldestRecord <= 1920 AND L.InputPhoneHighRisk > -1 AND L.InputPhoneHighRisk <= -0.9, 1.4293802, 0);
+   BPR1_108 := IF( L.PrevAddrAgeOldestRecord > 296 AND L.PrevAddrAgeOldestRecord <= 1920 AND L.InputPhoneMobile > -1 AND L.InputPhoneMobile <= -0.9, 1.4293802, 0);
+   BPR1_109 := IF( L.PrevAddrAgeOldestRecord > 296 AND L.PrevAddrAgeOldestRecord <= 1920 AND L.InputPhoneProblems > -1 AND L.InputPhoneProblems <= -0.9, 1.4293802, 0);
+   BPR1_110 := IF( L.PrevAddrAgeOldestRecord > 296 AND L.PrevAddrAgeOldestRecord <= 1920 AND L.InputPhoneServiceType > -1 AND L.InputPhoneServiceType <= -0.9, 1.4293802, 0);
+   BPR1_111 := IF( L.PrevAddrAgeOldestRecord > 296 AND L.PrevAddrAgeOldestRecord <= 1920 AND L.InputPhoneType > -1 AND L.InputPhoneType <= -0.9, 1.4293802, 0);
+   BPR1_112 := IF( L.PrevAddrAgeOldestRecord > 296 AND L.PrevAddrAgeOldestRecord <= 1920 AND L.SearchPhoneSearchCount > -1 AND L.SearchPhoneSearchCount <= -0.9, 1.4293802, 0);
+   BPR1_113 := IF( L.PrevAddrAgeOldestRecord > 296 AND L.PrevAddrAgeOldestRecord <= 1920 AND L.v1_VerifiedPhone > -1 AND L.v1_VerifiedPhone <= -0.9, 1.4293802, 0);
+   BPR1_114 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.v1_RaAMedIncomeRange > -1 AND L.v1_RaAMedIncomeRange <= -0.9, 1.429131327, 0);
+   BPR1_115 := IF( L.CurrAddrLenOfRes > 302 AND L.CurrAddrLenOfRes <= 1918 AND L.NonDerogCount06 > -10 AND L.NonDerogCount06 <= 4, 1.428909459, 0);
+   BPR1_116 := IF( L.CurrAddrLenOfRes > 302 AND L.CurrAddrLenOfRes <= 1918 AND L.v1_CrtRecTimeNewest > 89 AND L.v1_CrtRecTimeNewest <= 167, 1.428832907, 0);
+   BPR1_117 := IF( L.StatusMostRecent > 1 AND L.StatusMostRecent <= 1.1 AND L.v1_ProspectTimeLastUpdate > 171 AND L.v1_ProspectTimeLastUpdate <= 1552, 1.427937814, 0);
+   BPR1_118 := IF( L.AGE_IN_YEARS > 58 AND L.AGE_IN_YEARS <= 244.17 AND L.v1_CrtRecMsdmeanTimeNewest > 135 AND L.v1_CrtRecMsdmeanTimeNewest <= 217, 1.42766938, 0);
+   BPR1_119 := IF( L.SSNIssueState > -56 AND L.SSNIssueState <= 7 AND L.v1_ProspectAge > 41 AND L.v1_ProspectAge <= 56, 1.427455475, 0);
+   BPR1_120 := IF( L.LastNameChangeAge > 305 AND L.LastNameChangeAge <= 1920 AND L.v1_CrtRecMsdmeanTimeNewest > 52 AND L.v1_CrtRecMsdmeanTimeNewest <= 135, 1.42728617, 0);
+   BPR1_121 := IF( L.v1_ProspectAge > 56 AND L.v1_ProspectAge <= 232 AND L.v1_CrtRecMsdmeanTimeNewest > 52 AND L.v1_CrtRecMsdmeanTimeNewest <= 135, 1.426339128, 0);
+   BPR1_122 := IF( L.CurrAddrLenOfRes > 302 AND L.CurrAddrLenOfRes <= 1918 AND L.NonDerogCount03 > -10 AND L.NonDerogCount03 <= 4, 1.425921673, 0);
+   BPR1_123 := IF( L.CurrAddrAgeOldestRecord > 303 AND L.CurrAddrAgeOldestRecord <= 1920 AND L.NonDerogCount06 > -10 AND L.NonDerogCount06 <= 4, 1.425440741, 0);
+   BPR1_124 := IF( L.InputPhoneHighRisk > -1 AND L.InputPhoneHighRisk <= -0.9 AND L.v1_ProspectAge > 56 AND L.v1_ProspectAge <= 232, 1.425118029, 0);
+   BPR1_125 := IF( L.InputPhoneMobile > -1 AND L.InputPhoneMobile <= -0.9 AND L.v1_ProspectAge > 56 AND L.v1_ProspectAge <= 232, 1.425118029, 0);
+   BPR1_126 := IF( L.InputPhoneProblems > -1 AND L.InputPhoneProblems <= -0.9 AND L.v1_ProspectAge > 56 AND L.v1_ProspectAge <= 232, 1.425118029, 0);
+   BPR1_127 := IF( L.InputPhoneServiceType > -1 AND L.InputPhoneServiceType <= -0.9 AND L.v1_ProspectAge > 56 AND L.v1_ProspectAge <= 232, 1.425118029, 0);
+   BPR1_128 := IF( L.InputPhoneType > -1 AND L.InputPhoneType <= -0.9 AND L.v1_ProspectAge > 56 AND L.v1_ProspectAge <= 232, 1.425118029, 0);
+   BPR1_129 := IF( L.SearchPhoneSearchCount > -1 AND L.SearchPhoneSearchCount <= -0.9 AND L.v1_ProspectAge > 56 AND L.v1_ProspectAge <= 232, 1.425118029, 0);
+   BPR1_130 := IF( L.v1_VerifiedPhone > -1 AND L.v1_VerifiedPhone <= -0.9 AND L.v1_ProspectAge > 56 AND L.v1_ProspectAge <= 232, 1.425118029, 0);
+   BPR1_131 := IF( L.VerifiedPhone > -1 AND L.VerifiedPhone <= -0.9 AND L.v1_ProspectAge > 56 AND L.v1_ProspectAge <= 232, 1.425118029, 0);
+   BPR1_132 := IF( L.VerifiedPhone > -1 AND L.VerifiedPhone <= -0.9 AND L.InputAddrAgeOldestRecord > 303 AND L.InputAddrAgeOldestRecord <= 1920, 1.424239892, 0);
+   BPR1_133 := IF( L.InputAddrAgeOldestRecord > 303 AND L.InputAddrAgeOldestRecord <= 1920 AND L.InputPhoneHighRisk > -1 AND L.InputPhoneHighRisk <= -0.9, 1.424239892, 0);
+   BPR1_134 := IF( L.InputAddrAgeOldestRecord > 303 AND L.InputAddrAgeOldestRecord <= 1920 AND L.InputPhoneMobile > -1 AND L.InputPhoneMobile <= -0.9, 1.424239892, 0);
+   BPR1_135 := IF( L.InputAddrAgeOldestRecord > 303 AND L.InputAddrAgeOldestRecord <= 1920 AND L.InputPhoneProblems > -1 AND L.InputPhoneProblems <= -0.9, 1.424239892, 0);
+   BPR1_136 := IF( L.InputAddrAgeOldestRecord > 303 AND L.InputAddrAgeOldestRecord <= 1920 AND L.InputPhoneServiceType > -1 AND L.InputPhoneServiceType <= -0.9, 1.424239892, 0);
+   BPR1_137 := IF( L.InputAddrAgeOldestRecord > 303 AND L.InputAddrAgeOldestRecord <= 1920 AND L.InputPhoneType > -1 AND L.InputPhoneType <= -0.9, 1.424239892, 0);
+   BPR1_138 := IF( L.InputAddrAgeOldestRecord > 303 AND L.InputAddrAgeOldestRecord <= 1920 AND L.SearchPhoneSearchCount > -1 AND L.SearchPhoneSearchCount <= -0.9, 1.424239892, 0);
+   BPR1_139 := IF( L.InputAddrAgeOldestRecord > 303 AND L.InputAddrAgeOldestRecord <= 1920 AND L.v1_VerifiedPhone > -1 AND L.v1_VerifiedPhone <= -0.9, 1.424239892, 0);
+   BPR1_140 := IF( L.AddrMostRecentCrimeDiff > -400 AND L.AddrMostRecentCrimeDiff <= -49 AND L.PropAgeNewestPurchase > 215 AND L.PropAgeNewestPurchase <= 576, 1.42377062, 0);
+   BPR1_141 := IF( L.CurrAddrAgeOldestRecord > 303 AND L.CurrAddrAgeOldestRecord <= 1920 AND L.v1_HHCrtRecMsdmeanMmbrCnt > 1 AND L.v1_HHCrtRecMsdmeanMmbrCnt <= 3, 1.423386931, 0);
+   BPR1_142 := IF( L.SSNIssueState > 32 AND L.SSNIssueState <= 112 AND L.PropAgeNewestPurchase > 215 AND L.PropAgeNewestPurchase <= 576, 1.423155335, 0);
+   BPR1_143 := IF( L.CurrAddrLenOfRes > 302 AND L.CurrAddrLenOfRes <= 1918 AND L.v1_HHCrtRecMsdmeanMmbrCnt > 1 AND L.v1_HHCrtRecMsdmeanMmbrCnt <= 3, 1.422962103, 0);
+   BPR1_144 := IF( L.AGE_IN_YEARS > 58 AND L.AGE_IN_YEARS <= 244.17 AND L.SSNLowIssueAge > 385 AND L.SSNLowIssueAge <= 533, 1.422911602, 0);
+   BPR1_145 := IF( L.CurrAddrAgeOldestRecord > 303 AND L.CurrAddrAgeOldestRecord <= 1920 AND L.NonDerogCount03 > -10 AND L.NonDerogCount03 <= 4, 1.422740372, 0);
+   BPR1_146 := IF( L.PrevAddrAgeOldestRecord > 296 AND L.PrevAddrAgeOldestRecord <= 1920 AND L.v1_CrtRecTimeNewest > 89 AND L.v1_CrtRecTimeNewest <= 167, 1.422573786, 0);
+   BPR1_147 := IF( L.PrevAddrAgeOldestRecord > 296 AND L.PrevAddrAgeOldestRecord <= 1920 AND L.v1_CrtRecSeverityIndex > 1 AND L.v1_CrtRecSeverityIndex <= 3, 1.422549479, 0);
+   BPR1_148 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.NonDerogCount12 > -10 AND L.NonDerogCount12 <= 3, 1.422382043, 0);
+   BPR1_149 := IF( L.CurrAddrMedianValue > 155056 AND L.CurrAddrMedianValue <= 305320 AND L.PropAgeNewestPurchase > 215 AND L.PropAgeNewestPurchase <= 576, 1.421602324, 0);
+   BPR1_150 := IF( L.VerifiedPhone > -1 AND L.VerifiedPhone <= -0.9 AND L.InputAddrLenOfRes > 302 AND L.InputAddrLenOfRes <= 1918, 1.42155514, 0);
+   BPR1_151 := IF( L.InputAddrLenOfRes > 302 AND L.InputAddrLenOfRes <= 1918 AND L.InputPhoneHighRisk > -1 AND L.InputPhoneHighRisk <= -0.9, 1.42155514, 0);
+   BPR1_152 := IF( L.InputAddrLenOfRes > 302 AND L.InputAddrLenOfRes <= 1918 AND L.InputPhoneMobile > -1 AND L.InputPhoneMobile <= -0.9, 1.42155514, 0);
+   BPR1_153 := IF( L.InputAddrLenOfRes > 302 AND L.InputAddrLenOfRes <= 1918 AND L.InputPhoneProblems > -1 AND L.InputPhoneProblems <= -0.9, 1.42155514, 0);
+   BPR1_154 := IF( L.InputAddrLenOfRes > 302 AND L.InputAddrLenOfRes <= 1918 AND L.InputPhoneServiceType > -1 AND L.InputPhoneServiceType <= -0.9, 1.42155514, 0);
+   BPR1_155 := IF( L.InputAddrLenOfRes > 302 AND L.InputAddrLenOfRes <= 1918 AND L.InputPhoneType > -1 AND L.InputPhoneType <= -0.9, 1.42155514, 0);
+   BPR1_156 := IF( L.InputAddrLenOfRes > 302 AND L.InputAddrLenOfRes <= 1918 AND L.SearchPhoneSearchCount > -1 AND L.SearchPhoneSearchCount <= -0.9, 1.42155514, 0);
+   BPR1_157 := IF( L.InputAddrLenOfRes > 302 AND L.InputAddrLenOfRes <= 1918 AND L.v1_VerifiedPhone > -1 AND L.v1_VerifiedPhone <= -0.9, 1.42155514, 0);
+   BPR1_158 := IF( L.LastNameChangeAge > 305 AND L.LastNameChangeAge <= 1920 AND L.v1_CrtRecMsdmeanCnt > 4 AND L.v1_CrtRecMsdmeanCnt <= 15, 1.421501423, 0);
+   BPR1_159 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.SubjectAddrCount > -75 AND L.SubjectAddrCount <= 5, 1.421472295, 0);
+   BPR1_160 := IF( L.PropAgeNewestPurchase > 215 AND L.PropAgeNewestPurchase <= 576 AND L.v1_LifeEvTimeFirstAssetPurchase > -961 AND L.v1_LifeEvTimeFirstAssetPurchase <= 64, 1.421423735, 0);
+   BPR1_161 := IF( L.CurrAddrAgeLastSale > 218 AND L.CurrAddrAgeLastSale <= 521 AND L.PropAgeNewestPurchase > 215 AND L.PropAgeNewestPurchase <= 576, 1.420856786, 0);
+   BPR1_162 := IF( L.CurrAddrLenOfRes > 302 AND L.CurrAddrLenOfRes <= 1918 AND L.RecentActivityIndex > 2 AND L.RecentActivityIndex <= 4, 1.420550255, 0);
+   BPR1_163 := IF( L.CurrAddrAgeOldestRecord > 303 AND L.CurrAddrAgeOldestRecord <= 1920 AND L.RecentActivityIndex > 2 AND L.RecentActivityIndex <= 4, 1.420293937, 0);
+   BPR1_164 := IF( L.AgeOldestRecord > 345 AND L.AgeOldestRecord <= 1920 AND L.LienReleasedAge > 188 AND L.LienReleasedAge <= 868, 1.42009158, 0);
+   BPR1_165 := IF( L.PrevAddrLenOfRes > 283 AND L.PrevAddrLenOfRes <= 1918 AND L.v1_CrtRecSeverityIndex > 1 AND L.v1_CrtRecSeverityIndex <= 3, 1.41974862, 0);
+   BPR1_166 := IF( L.SSNIssueState > 32 AND L.SSNIssueState <= 112 AND L.InputAddrAgeOldestRecord > 303 AND L.InputAddrAgeOldestRecord <= 1920, 1.419493847, 0);
+   BPR1_167 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.PrevAddrAgeNewestRecord > 114 AND L.PrevAddrAgeNewestRecord <= 226, 1.419412331, 0);
+   BPR1_168 := IF( L.v1_ProspectTimeLastUpdate > 171 AND L.v1_ProspectTimeLastUpdate <= 1552 AND L.v1_LifeEvTimeLastAssetPurchase > -961 AND L.v1_LifeEvTimeLastAssetPurchase <= 53, 1.419344657, 0);
+   BPR1_169 := IF( L.InputPhoneHighRisk > -1 AND L.InputPhoneHighRisk <= -0.9 AND L.v1_ProspectTimeOnRecord > 305 AND L.v1_ProspectTimeOnRecord <= 1920, 1.419335809, 0);
+   BPR1_170 := IF( L.InputPhoneMobile > -1 AND L.InputPhoneMobile <= -0.9 AND L.v1_ProspectTimeOnRecord > 305 AND L.v1_ProspectTimeOnRecord <= 1920, 1.419335809, 0);
+   BPR1_171 := IF( L.InputPhoneProblems > -1 AND L.InputPhoneProblems <= -0.9 AND L.v1_ProspectTimeOnRecord > 305 AND L.v1_ProspectTimeOnRecord <= 1920, 1.419335809, 0);
+   BPR1_172 := IF( L.InputPhoneServiceType > -1 AND L.InputPhoneServiceType <= -0.9 AND L.v1_ProspectTimeOnRecord > 305 AND L.v1_ProspectTimeOnRecord <= 1920, 1.419335809, 0);
+   BPR1_173 := IF( L.InputPhoneType > -1 AND L.InputPhoneType <= -0.9 AND L.v1_ProspectTimeOnRecord > 305 AND L.v1_ProspectTimeOnRecord <= 1920, 1.419335809, 0);
+   BPR1_174 := IF( L.SearchPhoneSearchCount > -1 AND L.SearchPhoneSearchCount <= -0.9 AND L.v1_ProspectTimeOnRecord > 305 AND L.v1_ProspectTimeOnRecord <= 1920, 1.419335809, 0);
+   BPR1_175 := IF( L.v1_VerifiedPhone > -1 AND L.v1_VerifiedPhone <= -0.9 AND L.v1_ProspectTimeOnRecord > 305 AND L.v1_ProspectTimeOnRecord <= 1920, 1.419335809, 0);
+   BPR1_176 := IF( L.VerifiedPhone > -1 AND L.VerifiedPhone <= -0.9 AND L.v1_ProspectTimeOnRecord > 305 AND L.v1_ProspectTimeOnRecord <= 1920, 1.419335809, 0);
+   BPR1_177 := IF( L.InputAddrMedianValue > 178907 AND L.InputAddrMedianValue <= 324208 AND L.PropAgeNewestPurchase > 215 AND L.PropAgeNewestPurchase <= 576, 1.419334338, 0);
+   BPR1_178 := IF( L.InputAddrAgeLastSale > 216 AND L.InputAddrAgeLastSale <= 516 AND L.AddrMostRecentMoveAge > 231 AND L.AddrMostRecentMoveAge <= 577, 1.418794901, 0);
+   BPR1_179 := IF( L.LastNameChangeAge > 305 AND L.LastNameChangeAge <= 1920 AND L.v1_ProspectTimeLastUpdate > 171 AND L.v1_ProspectTimeLastUpdate <= 1552, 1.418194786, 0);
+   BPR1_180 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.AddrRecentEconTrajectoryIndex > 0 AND L.AddrRecentEconTrajectoryIndex <= 3, 1.417848726, 0);
+   BPR1_181 := IF( L.SSNIssueState > 32 AND L.SSNIssueState <= 112 AND L.InputAddrLenOfRes > 302 AND L.InputAddrLenOfRes <= 1918, 1.417478814, 0);
+   BPR1_182 := IF( L.VerifiedPhone > -1 AND L.VerifiedPhone <= -0.9 AND L.PrevAddrLenOfRes > 283 AND L.PrevAddrLenOfRes <= 1918, 1.417265401, 0);
+   BPR1_183 := IF( L.PrevAddrLenOfRes > 283 AND L.PrevAddrLenOfRes <= 1918 AND L.InputPhoneHighRisk > -1 AND L.InputPhoneHighRisk <= -0.9, 1.417265401, 0);
+   BPR1_184 := IF( L.PrevAddrLenOfRes > 283 AND L.PrevAddrLenOfRes <= 1918 AND L.InputPhoneMobile > -1 AND L.InputPhoneMobile <= -0.9, 1.417265401, 0);
+   BPR1_185 := IF( L.PrevAddrLenOfRes > 283 AND L.PrevAddrLenOfRes <= 1918 AND L.InputPhoneProblems > -1 AND L.InputPhoneProblems <= -0.9, 1.417265401, 0);
+   BPR1_186 := IF( L.PrevAddrLenOfRes > 283 AND L.PrevAddrLenOfRes <= 1918 AND L.InputPhoneServiceType > -1 AND L.InputPhoneServiceType <= -0.9, 1.417265401, 0);
+   BPR1_187 := IF( L.PrevAddrLenOfRes > 283 AND L.PrevAddrLenOfRes <= 1918 AND L.InputPhoneType > -1 AND L.InputPhoneType <= -0.9, 1.417265401, 0);
+   BPR1_188 := IF( L.PrevAddrLenOfRes > 283 AND L.PrevAddrLenOfRes <= 1918 AND L.SearchPhoneSearchCount > -1 AND L.SearchPhoneSearchCount <= -0.9, 1.417265401, 0);
+   BPR1_189 := IF( L.PrevAddrLenOfRes > 283 AND L.PrevAddrLenOfRes <= 1918 AND L.v1_VerifiedPhone > -1 AND L.v1_VerifiedPhone <= -0.9, 1.417265401, 0);
+   BPR1_190 := IF( L.v1_ProspectAge > 56 AND L.v1_ProspectAge <= 232 AND L.v1_HHCrtRecMsdmeanMmbrCnt > 1 AND L.v1_HHCrtRecMsdmeanMmbrCnt <= 3, 1.417152077, 0);
+   BPR1_191 := IF( L.PropAgeNewestPurchase > 215 AND L.PropAgeNewestPurchase <= 576 AND L.NonDerogCount01 > 2 AND L.NonDerogCount01 <= 4, 1.416733154, 0);
+   BPR1_192 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.InputAddrMortgageType > 3 AND L.InputAddrMortgageType <= 3.1, 1.416319815, 0);
+   BPR1_193 := IF( L.AgeOldestRecord > 345 AND L.AgeOldestRecord <= 1920 AND L.InputPhoneHighRisk > -1 AND L.InputPhoneHighRisk <= -0.9, 1.415313128, 0);
+   BPR1_194 := IF( L.AgeOldestRecord > 345 AND L.AgeOldestRecord <= 1920 AND L.InputPhoneMobile > -1 AND L.InputPhoneMobile <= -0.9, 1.415313128, 0);
+   BPR1_195 := IF( L.AgeOldestRecord > 345 AND L.AgeOldestRecord <= 1920 AND L.InputPhoneProblems > -1 AND L.InputPhoneProblems <= -0.9, 1.415313128, 0);
+   BPR1_196 := IF( L.AgeOldestRecord > 345 AND L.AgeOldestRecord <= 1920 AND L.InputPhoneServiceType > -1 AND L.InputPhoneServiceType <= -0.9, 1.415313128, 0);
+   BPR1_197 := IF( L.AgeOldestRecord > 345 AND L.AgeOldestRecord <= 1920 AND L.InputPhoneType > -1 AND L.InputPhoneType <= -0.9, 1.415313128, 0);
+   BPR1_198 := IF( L.AgeOldestRecord > 345 AND L.AgeOldestRecord <= 1920 AND L.SearchPhoneSearchCount > -1 AND L.SearchPhoneSearchCount <= -0.9, 1.415313128, 0);
+   BPR1_199 := IF( L.AgeOldestRecord > 345 AND L.AgeOldestRecord <= 1920 AND L.v1_VerifiedPhone > -1 AND L.v1_VerifiedPhone <= -0.9, 1.415313128, 0);
+   BPR1_200 := IF( L.AgeOldestRecord > 345 AND L.AgeOldestRecord <= 1920 AND L.VerifiedPhone > -1 AND L.VerifiedPhone <= -0.9, 1.415313128, 0);
+   BPR1_201 := IF( L.VerifiedPhone > -1 AND L.VerifiedPhone <= -0.9 AND L.PropAgeOldestPurchase > 237 AND L.PropAgeOldestPurchase <= 579, 1.414567385, 0);
+   BPR1_202 := IF( L.PropAgeOldestPurchase > 237 AND L.PropAgeOldestPurchase <= 579 AND L.InputPhoneHighRisk > -1 AND L.InputPhoneHighRisk <= -0.9, 1.414567385, 0);
+   BPR1_203 := IF( L.PropAgeOldestPurchase > 237 AND L.PropAgeOldestPurchase <= 579 AND L.InputPhoneMobile > -1 AND L.InputPhoneMobile <= -0.9, 1.414567385, 0);
+   BPR1_204 := IF( L.PropAgeOldestPurchase > 237 AND L.PropAgeOldestPurchase <= 579 AND L.InputPhoneProblems > -1 AND L.InputPhoneProblems <= -0.9, 1.414567385, 0);
+   BPR1_205 := IF( L.PropAgeOldestPurchase > 237 AND L.PropAgeOldestPurchase <= 579 AND L.InputPhoneServiceType > -1 AND L.InputPhoneServiceType <= -0.9, 1.414567385, 0);
+   BPR1_206 := IF( L.PropAgeOldestPurchase > 237 AND L.PropAgeOldestPurchase <= 579 AND L.InputPhoneType > -1 AND L.InputPhoneType <= -0.9, 1.414567385, 0);
+   BPR1_207 := IF( L.PropAgeOldestPurchase > 237 AND L.PropAgeOldestPurchase <= 579 AND L.SearchPhoneSearchCount > -1 AND L.SearchPhoneSearchCount <= -0.9, 1.414567385, 0);
+   BPR1_208 := IF( L.InputAddrAgeLastSale > 216 AND L.InputAddrAgeLastSale <= 516 AND L.PropAgeNewestPurchase > 215 AND L.PropAgeNewestPurchase <= 576, 1.4144392, 0);
+   BPR1_209 := IF( L.PropAgeOldestPurchase > 237 AND L.PropAgeOldestPurchase <= 579 AND L.v1_VerifiedPhone > -1 AND L.v1_VerifiedPhone <= -0.9, 1.41441966, 0);
+   BPR1_210 := IF( L.PrevAddrAgeOldestRecord > 296 AND L.PrevAddrAgeOldestRecord <= 1920 AND L.v1_CrtRecMsdmeanTimeNewest > 52 AND L.v1_CrtRecMsdmeanTimeNewest <= 135, 1.413943153, 0);
+   BPR1_211 := IF( L.InputAddrLenOfRes > 302 AND L.InputAddrLenOfRes <= 1918 AND L.NonDerogCount03 > -10 AND L.NonDerogCount03 <= 4, 1.4135851, 0);
+   BPR1_212 := IF( L.CurrAddrAgeLastSale > 218 AND L.CurrAddrAgeLastSale <= 521 AND L.v1_PropCurrOwnedAVMTtl > 163631 AND L.v1_PropCurrOwnedAVMTtl <= 591155, 1.413511494, 0);
+   BPR1_213 := IF( L.v1_ProspectTimeLastUpdate > 171 AND L.v1_ProspectTimeLastUpdate <= 1552 AND L.v1_LifeEvTimeFirstAssetPurchase > -961 AND L.v1_LifeEvTimeFirstAssetPurchase <= 64, 1.413325556, 0);
+   BPR1_214 := IF( L.LastNameChangeAge > 305 AND L.LastNameChangeAge <= 1920 AND L.NonDerogCount > 4 AND L.NonDerogCount <= 7, 1.412953505, 0);
+   BPR1_215 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.v1_ProspectTimeOnRecord > 305 AND L.v1_ProspectTimeOnRecord <= 1920, 1.412941784, 0);
+   BPR1_216 := IF( L.AGE_IN_YEARS > 58 AND L.AGE_IN_YEARS <= 244.17 AND L.SSNHighIssueAge > 366 AND L.SSNHighIssueAge <= 507, 1.412913946, 0);
+   BPR1_217 := IF( L.InputAddrAgeOldestRecord > 303 AND L.InputAddrAgeOldestRecord <= 1920 AND L.NonDerogCount03 > -10 AND L.NonDerogCount03 <= 4, 1.412817226, 0);
+   BPR1_218 := IF( L.CurrAddrAgeLastSale > 218 AND L.CurrAddrAgeLastSale <= 521 AND L.AddrMostRecentMoveAge > 231 AND L.AddrMostRecentMoveAge <= 577, 1.412608936, 0);
+   BPR1_219 := IF( L.PrevAddrAgeOldestRecord > 296 AND L.PrevAddrAgeOldestRecord <= 1920 AND L.v1_HHCrtRecMsdmeanMmbrCnt > 1 AND L.v1_HHCrtRecMsdmeanMmbrCnt <= 3, 1.412136753, 0);
+   BPR1_220 := IF( L.InputAddrAgeLastSale > 216 AND L.InputAddrAgeLastSale <= 516 AND L.CorrelationRiskLevel > 3 AND L.CorrelationRiskLevel <= 5, 1.411841658, 0);
+   BPR1_221 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.InputAddrTaxMarketValue > 189994 AND L.InputAddrTaxMarketValue <= 7020630, 1.411837238, 0);
+   BPR1_222 := IF( L.AgeOldestRecord > 345 AND L.AgeOldestRecord <= 1920 AND L.v1_CrtRecMsdmeanCnt > 4 AND L.v1_CrtRecMsdmeanCnt <= 15, 1.411743222, 0);
+   BPR1_223 := IF( L.CurrAddrAgeLastSale > 218 AND L.CurrAddrAgeLastSale <= 521 AND L.PropAgeOldestPurchase > 237 AND L.PropAgeOldestPurchase <= 579, 1.411617815, 0);
+   BPR1_224 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.v1_VerifiedName > 0 AND L.v1_VerifiedName <= 1, 1.411071806, 0);
+   BPR1_225 := IF( L.AgeOldestRecord > 345 AND L.AgeOldestRecord <= 1920 AND L.v1_CrtRecMsdmeanTimeNewest > 135 AND L.v1_CrtRecMsdmeanTimeNewest <= 217, 1.41081868, 0);
+   BPR1_226 := IF( L.LastNameChangeAge > 305 AND L.LastNameChangeAge <= 1920 AND L.SourceRiskLevel > 6 AND L.SourceRiskLevel <= 18, 1.410795172, 0);
+   BPR1_227 := IF( L.InputAddrLenOfRes > 302 AND L.InputAddrLenOfRes <= 1918 AND L.NonDerogCount06 > -10 AND L.NonDerogCount06 <= 4, 1.410714559, 0);
+   BPR1_228 := IF( L.VoterRegistrationRecord > 0 AND L.VoterRegistrationRecord <= 0.1 AND L.v1_ProspectAge > 56 AND L.v1_ProspectAge <= 232, 1.410035453, 0);
+   BPR1_229 := IF( L.InputAddrAgeOldestRecord > 303 AND L.InputAddrAgeOldestRecord <= 1920 AND L.NonDerogCount06 > -10 AND L.NonDerogCount06 <= 4, 1.409152607, 0);
+   BPR1_230 := IF( L.LastNameChangeAge > 305 AND L.LastNameChangeAge <= 1920 AND L.LienReleasedCount > 2 AND L.LienReleasedCount <= 8, 1.409108808, 0);
+   BPR1_231 := IF( L.NonDerogCount > 4 AND L.NonDerogCount <= 7 AND L.v1_ProspectAge > 56 AND L.v1_ProspectAge <= 232, 1.408998427, 0);
+   BPR1_232 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.PhoneEDAAgeOldestRecord > -1 AND L.PhoneEDAAgeOldestRecord <= -0.9, 1.408955303, 0);
+   BPR1_233 := IF( L.VoterRegistrationRecord > 0 AND L.VoterRegistrationRecord <= 0.1 AND L.v1_ProspectTimeOnRecord > 305 AND L.v1_ProspectTimeOnRecord <= 1920, 1.408917053, 0);
+   BPR1_234 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.PhoneEDAAgeNewestRecord > -1 AND L.PhoneEDAAgeNewestRecord <= -0.9, 1.408909857, 0);
+   BPR1_235 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.PropOwnedTaxTotal_24 > 129539 AND L.PropOwnedTaxTotal_24 <= 534519, 1.408804093, 0);
+   BPR1_236 := IF( L.AgeRiskIndicator > 20 AND L.AgeRiskIndicator <= 46 AND L.v1_ProspectAge > 56 AND L.v1_ProspectAge <= 232, 1.408765743, 0);
+   BPR1_237 := IF( L.CurrAddrAgeLastSale > 218 AND L.CurrAddrAgeLastSale <= 521 AND L.CorrelationRiskLevel > 3 AND L.CorrelationRiskLevel <= 5, 1.408706174, 0);
+   BPR1_238 := IF( L.PropAgeNewestPurchase > 215 AND L.PropAgeNewestPurchase <= 576 AND L.v1_RaACrtRecMsdmeanMmbrCnt > 3 AND L.v1_RaACrtRecMsdmeanMmbrCnt <= 9, 1.408624242, 0);
+   BPR1_239 := IF( L.PropAgeNewestPurchase > 215 AND L.PropAgeNewestPurchase <= 576 AND L.v1_VerifiedSSN > 1 AND L.v1_VerifiedSSN <= 1.1, 1.408464459, 0);
+   BPR1_240 := IF( L.InputAddrAgeOldestRecord > 303 AND L.InputAddrAgeOldestRecord <= 1920 AND L.v1_HHCrtRecMsdmeanMmbrCnt > 1 AND L.v1_HHCrtRecMsdmeanMmbrCnt <= 3, 1.408250232, 0);
+   BPR1_241 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.PropOwnedTaxTotal_12 > 130934 AND L.PropOwnedTaxTotal_12 <= 535175, 1.407908849, 0);
+   BPR1_242 := IF( L.AssetOwner > 1 AND L.AssetOwner <= 1.1 AND L.v1_ProspectTimeLastUpdate > 171 AND L.v1_ProspectTimeLastUpdate <= 1552, 1.407575303, 0);
+   BPR1_243 := IF( L.LastNameChangeAge > 305 AND L.LastNameChangeAge <= 1920 AND L.CurrAddrAgeLastSale > 218 AND L.CurrAddrAgeLastSale <= 521, 1.407502281, 0);
+   BPR1_244 := IF( L.RelativesPropOwnedTaxTotal > 606184 AND L.RelativesPropOwnedTaxTotal <= 2486912 AND L.PropAgeNewestPurchase > 215 AND L.PropAgeNewestPurchase <= 576, 1.407390731, 0);
+   BPR1_245 := IF( L.ProfLicCount06 > 1 AND L.ProfLicCount06 <= 3 AND L.v1_ProspectTimeOnRecord > 184 AND L.v1_ProspectTimeOnRecord <= 305, 1.407334928, 0);
+   BPR1_246 := IF( L.SSNHighIssueAge > 507 AND L.SSNHighIssueAge <= 1584 AND L.v1_CrtRecMsdmeanTimeNewest > 135 AND L.v1_CrtRecMsdmeanTimeNewest <= 217, 1.407272005, 0);
+   BPR1_247 := IF( L.v1_ProspectTimeLastUpdate > 171 AND L.v1_ProspectTimeLastUpdate <= 1552 AND L.v1_ResCurrOwnershipIndex > 3 AND L.v1_ResCurrOwnershipIndex <= 8, 1.407236371, 0);
+   BPR1_248 := IF( L.v1_ProspectTimeLastUpdate > 171 AND L.v1_ProspectTimeLastUpdate <= 1552 AND L.v1_HHPropCurrOwnerMmbrCnt > 1 AND L.v1_HHPropCurrOwnerMmbrCnt <= 11, 1.406896299, 0);
+   BPR1_249 := IF( L.v1_ProspectTimeLastUpdate > 171 AND L.v1_ProspectTimeLastUpdate <= 1552 AND L.v1_ProspectAge > 56 AND L.v1_ProspectAge <= 232, 1.406425207, 0);
+   BPR1_250 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.PropOwnedTaxTotal > 136672 AND L.PropOwnedTaxTotal <= 566197, 1.406116196, 0);
+   BPR1_251 := IF( L.PropertyOwner > 1 AND L.PropertyOwner <= 1.1 AND L.v1_ProspectTimeLastUpdate > 171 AND L.v1_ProspectTimeLastUpdate <= 1552, 1.40601636, 0);
+   BPR1_252 := IF( L.PrevAddrAgeOldestRecord > 296 AND L.PrevAddrAgeOldestRecord <= 1920 AND L.VoterRegistrationRecord > 0 AND L.VoterRegistrationRecord <= 0.1, 1.406003205, 0);
+   BPR1_253 := IF( L.ProfLicCount24 > 1 AND L.ProfLicCount24 <= 4 AND L.v1_ProspectTimeOnRecord > 184 AND L.v1_ProspectTimeOnRecord <= 305, 1.405925009, 0);
+   BPR1_254 := IF( L.InputAddrLenOfRes > 302 AND L.InputAddrLenOfRes <= 1918 AND L.RecentActivityIndex > 2 AND L.RecentActivityIndex <= 4, 1.405712712, 0);
+   BPR1_255 := IF( L.InputAddrLenOfRes > 302 AND L.InputAddrLenOfRes <= 1918 AND L.v1_HHCrtRecMsdmeanMmbrCnt > 1 AND L.v1_HHCrtRecMsdmeanMmbrCnt <= 3, 1.405609584, 0);
+   BPR1_256 := IF( L.v1_ProspectTimeOnRecord > 305 AND L.v1_ProspectTimeOnRecord <= 1920 AND L.v1_CrtRecSeverityIndex > 1 AND L.v1_CrtRecSeverityIndex <= 3, 1.405501627, 0);
+   BPR1_257 := IF( L.PropAgeNewestPurchase > 215 AND L.PropAgeNewestPurchase <= 576 AND L.CorrelationRiskLevel > 3 AND L.CorrelationRiskLevel <= 5, 1.405496518, 0);
+   BPR1_258 := IF( L.LastNameChangeAge > 305 AND L.LastNameChangeAge <= 1920 AND L.v1_RaACrtRecMsdmeanMmbrCnt > 9 AND L.v1_RaACrtRecMsdmeanMmbrCnt <= 18, 1.405410256, 0);
+   BPR1_259 := IF( L.PropAgeNewestPurchase > 215 AND L.PropAgeNewestPurchase <= 576 AND L.v1_ProspectTimeLastUpdate > 81 AND L.v1_ProspectTimeLastUpdate <= 171, 1.405345655, 0);
+   BPR1_260 := IF( L.InputAddrLenOfRes > 302 AND L.InputAddrLenOfRes <= 1918 AND L.v1_CrtRecTimeNewest > 89 AND L.v1_CrtRecTimeNewest <= 167, 1.405158719, 0);
+   BPR1_261 := IF( L.InputAddrAgeOldestRecord > 303 AND L.InputAddrAgeOldestRecord <= 1920 AND L.v1_CrtRecTimeNewest > 89 AND L.v1_CrtRecTimeNewest <= 167, 1.405099642, 0);
+   BPR1_262 := IF( L.PropAgeOldestPurchase > 237 AND L.PropAgeOldestPurchase <= 579 AND L.VoterRegistrationRecord > 0 AND L.VoterRegistrationRecord <= 0.1, 1.405005228, 0);
+   BPR1_263 := IF( L.VerifiedPhone > -1 AND L.VerifiedPhone <= -0.9 AND L.AddrMostRecentMoveAge > 231 AND L.AddrMostRecentMoveAge <= 577, 1.404968746, 0);
+   BPR1_264 := IF( L.AddrMostRecentMoveAge > 231 AND L.AddrMostRecentMoveAge <= 577 AND L.InputPhoneHighRisk > -1 AND L.InputPhoneHighRisk <= -0.9, 1.404968746, 0);
+   BPR1_265 := IF( L.AddrMostRecentMoveAge > 231 AND L.AddrMostRecentMoveAge <= 577 AND L.InputPhoneMobile > -1 AND L.InputPhoneMobile <= -0.9, 1.404968746, 0);
+   BPR1_266 := IF( L.AddrMostRecentMoveAge > 231 AND L.AddrMostRecentMoveAge <= 577 AND L.InputPhoneProblems > -1 AND L.InputPhoneProblems <= -0.9, 1.404968746, 0);
+   BPR1_267 := IF( L.AddrMostRecentMoveAge > 231 AND L.AddrMostRecentMoveAge <= 577 AND L.InputPhoneServiceType > -1 AND L.InputPhoneServiceType <= -0.9, 1.404968746, 0);
+   BPR1_268 := IF( L.AddrMostRecentMoveAge > 231 AND L.AddrMostRecentMoveAge <= 577 AND L.InputPhoneType > -1 AND L.InputPhoneType <= -0.9, 1.404968746, 0);
+   BPR1_269 := IF( L.AddrMostRecentMoveAge > 231 AND L.AddrMostRecentMoveAge <= 577 AND L.SearchPhoneSearchCount > -1 AND L.SearchPhoneSearchCount <= -0.9, 1.404968746, 0);
+   BPR1_270 := IF( L.AddrMostRecentMoveAge > 231 AND L.AddrMostRecentMoveAge <= 577 AND L.v1_VerifiedPhone > -1 AND L.v1_VerifiedPhone <= -0.9, 1.404968746, 0);
+   BPR1_271 := IF( L.LastNameChangeAge > 305 AND L.LastNameChangeAge <= 1920 AND L.v1_CrtRecSeverityIndex > 1 AND L.v1_CrtRecSeverityIndex <= 3, 1.404903478, 0);
+   BPR1_272 := IF( L.InputAddrAgeLastSale > 216 AND L.InputAddrAgeLastSale <= 516 AND L.v1_PropCurrOwnedAVMTtl > 163631 AND L.v1_PropCurrOwnedAVMTtl <= 591155, 1.404893634, 0);
+   BPR1_273 := IF( L.SSNIssueState > 32 AND L.SSNIssueState <= 112 AND L.PrevAddrAgeOldestRecord > 296 AND L.PrevAddrAgeOldestRecord <= 1920, 1.404863852, 0);
+   BPR1_274 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.PrevAddrBurglaryIndex > -1 AND L.PrevAddrBurglaryIndex <= -0.9, 1.40481945, 0);
+   BPR1_275 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.PrevAddrCarTheftIndex > -1 AND L.PrevAddrCarTheftIndex <= -0.9, 1.40481945, 0);
+   BPR1_276 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.PrevAddrCrimeIndex > -1 AND L.PrevAddrCrimeIndex <= -0.9, 1.40481945, 0);
+   BPR1_277 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.PrevAddrMedianIncome > -1 AND L.PrevAddrMedianIncome <= -0.9, 1.40481945, 0);
+   BPR1_278 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.PrevAddrMedianValue > -1 AND L.PrevAddrMedianValue <= -0.9, 1.40481945, 0);
+   BPR1_279 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.PrevAddrMurderIndex > -1 AND L.PrevAddrMurderIndex <= -0.9, 1.40481945, 0);
+   BPR1_280 := IF( L.InputAddrAgeOldestRecord > 303 AND L.InputAddrAgeOldestRecord <= 1920 AND L.RecentActivityIndex > 2 AND L.RecentActivityIndex <= 4, 1.404801548, 0);
+   BPR1_281 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.v1_LifeEvTimeFirstAssetPurchase > -961 AND L.v1_LifeEvTimeFirstAssetPurchase <= 64, 1.404640211, 0);
+   BPR1_282 := IF( L.RelativesPropOwnedTaxTotal > -1110000001 AND L.RelativesPropOwnedTaxTotal <= 606184 AND L.v1_ProspectTimeLastUpdate > 171 AND L.v1_ProspectTimeLastUpdate <= 1552, 1.403939735, 0);
+   BPR1_283 := IF( L.SSNHighIssueAge > 366 AND L.SSNHighIssueAge <= 507 AND L.PropAgeNewestPurchase > 215 AND L.PropAgeNewestPurchase <= 576, 1.403844083, 0);
+   BPR1_284 := IF( L.LastNameChangeAge > 305 AND L.LastNameChangeAge <= 1920 AND L.v1_HHCrtRecMsdmeanMmbrCnt > 1 AND L.v1_HHCrtRecMsdmeanMmbrCnt <= 3, 1.403729854, 0);
+   BPR1_285 := IF( L.SSNLowIssueAge > 385 AND L.SSNLowIssueAge <= 533 AND L.PropAgeNewestPurchase > 215 AND L.PropAgeNewestPurchase <= 576, 1.403593062, 0);
+   BPR1_286 := IF( L.PropAgeNewestPurchase > 215 AND L.PropAgeNewestPurchase <= 576 AND L.AVGSTATECOST > -4247 AND L.AVGSTATECOST <= 6638, 1.403276574, 0);
+   BPR1_287 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.PropAgeOldestPurchase > 237 AND L.PropAgeOldestPurchase <= 579, 1.403036633, 0);
+   BPR1_288 := IF( L.InputPhoneHighRisk > -1 AND L.InputPhoneHighRisk <= -0.9 AND L.v1_LifeEvTimeLastMove > 320 AND L.v1_LifeEvTimeLastMove <= 1920, 1.403013525, 0);
+   BPR1_289 := IF( L.InputPhoneMobile > -1 AND L.InputPhoneMobile <= -0.9 AND L.v1_LifeEvTimeLastMove > 320 AND L.v1_LifeEvTimeLastMove <= 1920, 1.403013525, 0);
+   BPR1_290 := IF( L.InputPhoneProblems > -1 AND L.InputPhoneProblems <= -0.9 AND L.v1_LifeEvTimeLastMove > 320 AND L.v1_LifeEvTimeLastMove <= 1920, 1.403013525, 0);
+   BPR1_291 := IF( L.InputPhoneServiceType > -1 AND L.InputPhoneServiceType <= -0.9 AND L.v1_LifeEvTimeLastMove > 320 AND L.v1_LifeEvTimeLastMove <= 1920, 1.403013525, 0);
+   BPR1_292 := IF( L.InputPhoneType > -1 AND L.InputPhoneType <= -0.9 AND L.v1_LifeEvTimeLastMove > 320 AND L.v1_LifeEvTimeLastMove <= 1920, 1.403013525, 0);
+   BPR1_293 := IF( L.SearchPhoneSearchCount > -1 AND L.SearchPhoneSearchCount <= -0.9 AND L.v1_LifeEvTimeLastMove > 320 AND L.v1_LifeEvTimeLastMove <= 1920, 1.403013525, 0);
+   BPR1_294 := IF( L.v1_VerifiedPhone > -1 AND L.v1_VerifiedPhone <= -0.9 AND L.v1_LifeEvTimeLastMove > 320 AND L.v1_LifeEvTimeLastMove <= 1920, 1.403013525, 0);
+   BPR1_295 := IF( L.VerifiedPhone > -1 AND L.VerifiedPhone <= -0.9 AND L.v1_LifeEvTimeLastMove > 320 AND L.v1_LifeEvTimeLastMove <= 1920, 1.403013525, 0);
+   BPR1_296 := IF( L.FEMALE > 0 AND L.FEMALE <= 0.1 AND L.LastNameChangeAge > 305 AND L.LastNameChangeAge <= 1920, 1.40296318, 0);
+   BPR1_297 := IF( L.PropAgeOldestPurchase > 237 AND L.PropAgeOldestPurchase <= 579 AND L.v1_CrtRecSeverityIndex > 1 AND L.v1_CrtRecSeverityIndex <= 3, 1.401399215, 0);
+   BPR1_298 := IF( L.CurrAddrLenOfRes > 302 AND L.CurrAddrLenOfRes <= 1918 AND L.VoterRegistrationRecord > 0 AND L.VoterRegistrationRecord <= 0.1, 1.401173567, 0);
+   BPR1_299 := IF( L.v1_ProspectAge > 56 AND L.v1_ProspectAge <= 232 AND L.v1_CrtRecCnt > 6 AND L.v1_CrtRecCnt <= 20, 1.401002085, 0);
+   BPR1_300 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.RelativesPropOwnedTaxTotal > -1110000001 AND L.RelativesPropOwnedTaxTotal <= 606184, 1.400950651, 0);
+   BPR1_301 := IF( L.AGE_IN_YEARS > 45 AND L.AGE_IN_YEARS <= 58 AND L.InputAddrBurglaryIndex > 140 AND L.InputAddrBurglaryIndex <= 400, 1.400618588, 0);
+   BPR1_302 := IF( L.LastNameChangeAge > 305 AND L.LastNameChangeAge <= 1920 AND L.SSNIssueState > 32 AND L.SSNIssueState <= 112, 1.400613026, 0);
+   BPR1_303 := IF( L.ProfLicCount12 > 1 AND L.ProfLicCount12 <= 3 AND L.v1_ProspectTimeOnRecord > 184 AND L.v1_ProspectTimeOnRecord <= 305, 1.400457783, 0);
+   BPR1_304 := IF( L.SSNLowIssueAge > 533 AND L.SSNLowIssueAge <= 1920 AND L.v1_CrtRecMsdmeanTimeNewest > 135 AND L.v1_CrtRecMsdmeanTimeNewest <= 217, 1.400131588, 0);
+   BPR2_1 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_RaACrtRecEvictionMmbrCnt12Mo > -8 AND L.v1_RaACrtRecEvictionMmbrCnt12Mo <= 1, 0.499976217, 0);
+   BPR2_2 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_PPCurrOwner > 0 AND L.v1_PPCurrOwner <= 0.1, 0.499741451, 0);
+   BPR2_3 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_PPCurrOwnedCnt > -26 AND L.v1_PPCurrOwnedCnt <= 1, 0.499741451, 0);
+   BPR2_4 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.SearchSSNSearchCount > -256 AND L.SearchSSNSearchCount <= 2, 0.499714214, 0);
+   BPR2_5 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.CurrAddrAgeOldestRecord > -961 AND L.CurrAddrAgeOldestRecord <= 71, 0.499663467, 0);
+   BPR2_6 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.SSNLastNameCount > 0 AND L.SSNLastNameCount <= 0.1, 0.499638676, 0);
+   BPR2_7 := IF( L.AgeRiskIndicator > 46 AND L.AgeRiskIndicator <= 160 AND L.SSNLowIssueAge > 533 AND L.SSNLowIssueAge <= 1920, 0.499623334, 0);
+   BPR2_8 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PRSearchOtherCount06 > -184 AND L.PRSearchOtherCount06 <= 3, 0.499607335, 0);
+   BPR2_9 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.EducationInstitutionRating > -1 AND L.EducationInstitutionRating <= -0.9, 0.499549268, 0);
+   BPR2_10 := IF( L.AgeRiskIndicator > 46 AND L.AgeRiskIndicator <= 160 AND L.SSNHighIssueAge > 507 AND L.SSNHighIssueAge <= 1584, 0.499447596, 0);
+   BPR2_11 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 32 AND L.NonDerogCount01 > -10 AND L.NonDerogCount01 <= 2, 0.499429669, 0);
+   BPR2_12 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PRSearchOtherCount01 > -39 AND L.PRSearchOtherCount01 <= 1, 0.499419988, 0);
+   BPR2_13 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_CrtRecSeverityIndex > -6 AND L.v1_CrtRecSeverityIndex <= 1, 0.499379378, 0);
+   BPR2_14 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ProspectCollegeTier > 0 AND L.v1_ProspectCollegeTier <= 2, 0.499275688, 0);
+   BPR2_15 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_CrtRecTimeNewest > -1 AND L.v1_CrtRecTimeNewest <= -0.9, 0.49924626, 0);
+   BPR2_16 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PRSearchPersonalFinanceCount > -255 AND L.PRSearchPersonalFinanceCount <= 4, 0.499224202, 0);
+   BPR2_17 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.LienFiledAge > -1 AND L.LienFiledAge <= -0.9, 0.499129273, 0);
+   BPR2_18 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.DerogAge > -1 AND L.DerogAge <= -0.9, 0.499087834, 0);
+   BPR2_19 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHCrtRecEvictionMmbrCnt > -9 AND L.v1_HHCrtRecEvictionMmbrCnt <= 1, 0.499083798, 0);
+   BPR2_20 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.EducationInstitutionPrivate > -1 AND L.EducationInstitutionPrivate <= -0.9, 0.499083141, 0);
+   BPR2_21 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.EducationProgram2Yr > -1 AND L.EducationProgram2Yr <= -0.9, 0.499083141, 0);
+   BPR2_22 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.EducationProgram4Yr > -1 AND L.EducationProgram4Yr <= -0.9, 0.499083141, 0);
+   BPR2_23 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.EducationProgramGraduate > -1 AND L.EducationProgramGraduate <= -0.9, 0.499083141, 0);
+   BPR2_24 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHCrtRecMmbrCnt > -87 AND L.v1_HHCrtRecMmbrCnt <= 1, 0.499082612, 0);
+   BPR2_25 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.NonDerogCount03 > -10 AND L.NonDerogCount03 <= 4, 0.499068954, 0);
+   BPR2_26 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_PPCurrOwnedAutoCnt > -19 AND L.v1_PPCurrOwnedAutoCnt <= 1, 0.499042222, 0);
+   BPR2_27 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.LienFiledCount24 > -28 AND L.LienFiledCount24 <= 1, 0.499032602, 0);
+   BPR2_28 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHCollegeTierMmbrHighest > 0 AND L.v1_HHCollegeTierMmbrHighest <= 2, 0.499030195, 0);
+   BPR2_29 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_RaAOccBusinessAssocMmbrCnt > -94 AND L.v1_RaAOccBusinessAssocMmbrCnt <= 2, 0.498958017, 0);
+   BPR2_30 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.LP_CollegeProgramType > -4 AND L.LP_CollegeProgramType <= 2, 0.498930411, 0);
+   BPR2_31 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.CurrAddrLenOfRes > -960 AND L.CurrAddrLenOfRes <= 70, 0.49885396, 0);
+   BPR2_32 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.DerogSeverityIndex > -5 AND L.DerogSeverityIndex <= 1, 0.498797141, 0);
+   BPR2_33 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_CrtRecCnt12Mo > -29 AND L.v1_CrtRecCnt12Mo <= 1, 0.498787994, 0);
+   BPR2_34 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ResInputDwellTypeIndex > 2 AND L.v1_ResInputDwellTypeIndex <= 6, 0.498766792, 0);
+   BPR2_35 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.InputAreaCodeChange > -1 AND L.InputAreaCodeChange <= -0.9, 0.498726923, 0);
+   BPR2_36 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.EvictionAge > -1 AND L.EvictionAge <= -0.9, 0.498674524, 0);
+   BPR2_37 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.NonDerogCount06 > -10 AND L.NonDerogCount06 <= 4, 0.498659382, 0);
+   BPR2_38 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_CrtRecEvictionTimeNewest > -1 AND L.v1_CrtRecEvictionTimeNewest <= -0.9, 0.498648967, 0);
+   BPR2_39 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.InputAddrLastSalesPrice > -1 AND L.InputAddrLastSalesPrice <= -0.9, 0.498507504, 0);
+   BPR2_40 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ProspectAge > -1 AND L.v1_ProspectAge <= -0.9, 0.498472401, 0);
+   BPR2_41 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.EvictionCount24 > -28 AND L.EvictionCount24 <= 1, 0.498452876, 0);
+   BPR2_42 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ProspectLastUpdate12Mo > 0 AND L.v1_ProspectLastUpdate12Mo <= 0.1, 0.498446003, 0);
+   BPR2_43 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ProspectCollegeProgramType > 0 AND L.v1_ProspectCollegeProgramType <= 1, 0.498323893, 0);
+   BPR2_44 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.LienFiledCount12 > -15 AND L.LienFiledCount12 <= 1, 0.498274311, 0);
+   BPR2_45 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_LifeEvNameChangeCnt12Mo > 0 AND L.v1_LifeEvNameChangeCnt12Mo <= 0.1, 0.498146929, 0);
+   BPR2_46 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.DerogRecentCount > -32 AND L.DerogRecentCount <= 2, 0.498078903, 0);
+   BPR2_47 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PRSearchOtherCount03 > -101 AND L.PRSearchOtherCount03 <= 2, 0.498069827, 0);
+   BPR2_48 := IF( L.AgeRiskIndicator > 46 AND L.AgeRiskIndicator <= 160 AND L.v1_RaACrtRecFelonyMmbrCnt > -25 AND L.v1_RaACrtRecFelonyMmbrCnt <= 1, 0.49804285, 0);
+   BPR2_49 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ProspectTimeLastUpdate > -1 AND L.v1_ProspectTimeLastUpdate <= -0.9, 0.497983161, 0);
+   BPR2_50 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ProspectTimeOnRecord > -1 AND L.v1_ProspectTimeOnRecord <= -0.9, 0.497983161, 0);
+   BPR2_51 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.EvictionCount12 > -16 AND L.EvictionCount12 <= 1, 0.497977072, 0);
+   BPR2_52 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.LienFiledCount60 > -61 AND L.LienFiledCount60 <= 2, 0.497968773, 0);
+   BPR2_53 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ResCurrDwellTypeIndex > 0 AND L.v1_ResCurrDwellTypeIndex <= 1, 0.497966235, 0);
+   BPR2_54 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_LifeEvTimeLastMove > -1 AND L.v1_LifeEvTimeLastMove <= -0.9, 0.497966235, 0);
+   BPR2_55 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND 
+      Models.Healthcare_SocioEconomic_Functions_Core.CrosswalkCurrAddrDwellType(L.v1_ResCurrDwellType) > -1 AND Models.Healthcare_SocioEconomic_Functions_Core.CrosswalkCurrAddrDwellType(L.v1_ResCurrDwellType) <= -0.9, 0.497966235, 0);
+   BPR2_56 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_CrtRecEvictionCnt12Mo > -18 AND L.v1_CrtRecEvictionCnt12Mo <= 1, 0.497951621, 0);
+   BPR2_57 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_LifeEvEverResidedCnt > -36 AND L.v1_LifeEvEverResidedCnt <= 1, 0.497931234, 0);
+   BPR2_58 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.InputAddrValidation > 3 AND L.InputAddrValidation <= 3.1, 0.497906921, 0);
+   BPR2_59 := IF( L.AgeRiskIndicator > 46 AND L.AgeRiskIndicator <= 160 AND L.v1_ResInputDwellTypeIndex > 2 AND L.v1_ResInputDwellTypeIndex <= 6, 0.497887894, 0);
+   BPR2_60 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_RaACrtRecLienJudgAmtMax > -10000000 AND L.v1_RaACrtRecLienJudgAmtMax <= 296849, 0.497773536, 0);
+   BPR2_61 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHCrtRecMsdmeanMmbrCnt > -38 AND L.v1_HHCrtRecMsdmeanMmbrCnt <= 1, 0.497761629, 0);
+   BPR2_62 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 32 AND L.AddrStability > -6 AND L.AddrStability <= 2, 0.497721368, 0);
+   BPR2_63 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.EvictionCount60 > -68 AND L.EvictionCount60 <= 2, 0.497714733, 0);
+   BPR2_64 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.SearchUnverifiedAddrCountYear > -8 AND L.SearchUnverifiedAddrCountYear <= 1, 0.497694275, 0);
+   BPR2_65 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_RaACollegePrivateMmbrCnt > -19 AND L.v1_RaACollegePrivateMmbrCnt <= 1, 0.497640998, 0);
+   BPR2_66 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.InputAddrErrorCode > 13 AND L.InputAddrErrorCode <= 28.3, 0.497594465, 0);
+   BPR2_67 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PRSearchPersonalFinanceCount03 > -22 AND L.PRSearchPersonalFinanceCount03 <= 1, 0.49752227, 0);
+   BPR2_68 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PhoneEDAAgeNewestRecord > -1 AND L.PhoneEDAAgeNewestRecord <= -0.9, 0.497487868, 0);
+   BPR2_69 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PhoneEDAAgeOldestRecord > -1 AND L.PhoneEDAAgeOldestRecord <= -0.9, 0.497487868, 0);
+   BPR2_70 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.LastNameChangeCount12 > -10 AND L.LastNameChangeCount12 <= 1, 0.497457449, 0);
+   BPR2_71 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHTeenagerMmbrCnt > 0 AND L.v1_HHTeenagerMmbrCnt <= 0.1, 0.49745072, 0);
+   BPR2_72 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.LastNameChangeAge > -960 AND L.LastNameChangeAge <= 93, 0.497407568, 0);
+   BPR2_73 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.InputAddrTaxMarketValue > -188000001 AND L.InputAddrTaxMarketValue <= 189994, 0.497404948, 0);
+   BPR2_74 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.LienFiledCount06 > -8 AND L.LienFiledCount06 <= 1, 0.497290804, 0);
+   BPR2_75 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHYoungAdultMmbrCnt > -7 AND L.v1_HHYoungAdultMmbrCnt <= 1, 0.497218303, 0);
+   BPR2_76 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 32 AND L.SSNIssueState > -56 AND L.SSNIssueState <= 7, 0.497173931, 0);
+   BPR2_77 := IF( L.AgeNewestRecord > -458 AND L.AgeNewestRecord <= 26 AND L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20, 0.497165317, 0);
+   BPR2_78 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.EvictionCount06 > -9 AND L.EvictionCount06 <= 1, 0.497011754, 0);
+   BPR2_79 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PRSearchLocateCount12 > -50 AND L.PRSearchLocateCount12 <= 2, 0.496882525, 0);
+   BPR2_80 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PRSearchSSNIdentities > -4 AND L.PRSearchSSNIdentities <= 2, 0.496878238, 0);
+   BPR2_81 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ResInputAVMBlockRatio > 0 AND L.v1_ResInputAVMBlockRatio <= 2, 0.496829562, 0);
+   BPR2_82 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.LienFiledCount > -100 AND L.LienFiledCount <= 3, 0.496802332, 0);
+   BPR2_83 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PRSearchLocateCount06 > -37 AND L.PRSearchLocateCount06 <= 2, 0.496758345, 0);
+   BPR2_84 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.DerogCount > -200 AND L.DerogCount <= 6, 0.496701161, 0);
+   BPR2_85 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_PPCurrOwnedWtrcrftCnt > -23 AND L.v1_PPCurrOwnedWtrcrftCnt <= 1, 0.496675875, 0);
+   BPR2_86 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHPPCurrOwnedWtrcrftCnt > -30 AND L.v1_HHPPCurrOwnedWtrcrftCnt <= 1, 0.496657054, 0);
+   BPR2_87 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.LienReleasedAge > -1 AND L.LienReleasedAge <= -0.9, 0.496650591, 0);
+   BPR2_88 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_CrtRecLienJudgTimeNewest > -1 AND L.v1_CrtRecLienJudgTimeNewest <= -0.9, 0.496638183, 0);
+   BPR2_89 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.SSNIdentitiesRecentCount > -255 AND L.SSNIdentitiesRecentCount <= 1, 0.496624246, 0);
+   BPR2_90 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_CrtRecMsdmeanCnt12Mo > -29 AND L.v1_CrtRecMsdmeanCnt12Mo <= 1, 0.496616924, 0);
+   BPR2_91 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHCrtRecMmbrCnt12Mo > 0 AND L.v1_HHCrtRecMmbrCnt12Mo <= 2, 0.496615873, 0);
+   BPR2_92 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PRSearchLocateCount > -154 AND L.PRSearchLocateCount <= 3, 0.496609782, 0);
+   BPR2_93 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.P_Time_First_Last_Purchase > -1 AND L.P_Time_First_Last_Purchase <= -0.9, 0.496575762, 0);
+   BPR2_94 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_LifeEvTimeFirstAssetPurchase > -1 AND L.v1_LifeEvTimeFirstAssetPurchase <= -0.9, 0.496575762, 0);
+   BPR2_95 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_LifeEvTimeLastAssetPurchase > -1 AND L.v1_LifeEvTimeLastAssetPurchase <= -0.9, 0.496575762, 0);
+   BPR2_96 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_CrtRecMsdmeanTimeNewest > -1 AND L.v1_CrtRecMsdmeanTimeNewest <= -0.9, 0.496572277, 0);
+   BPR2_97 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_PropPurchaseCnt12Mo > -8 AND L.v1_PropPurchaseCnt12Mo <= 1, 0.496565285, 0);
+   BPR2_98 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.EvictionCount > -99 AND L.EvictionCount <= 3, 0.496549481, 0);
+   BPR2_99 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.LienCount > -100 AND L.LienCount <= 4, 0.496549481, 0);
+   BPR2_100 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_CrtRecEvictionCnt > -100 AND L.v1_CrtRecEvictionCnt <= 3, 0.496549481, 0);
+   BPR2_101 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHPPCurrOwnedCnt > -214 AND L.v1_HHPPCurrOwnedCnt <= 2, 0.496485762, 0);
+   BPR2_102 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.LienReleasedCount60 > -18 AND L.LienReleasedCount60 <= 1, 0.496473676, 0);
+   BPR2_103 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PropPurchasedCount24 > -7 AND L.PropPurchasedCount24 <= 1, 0.496429299, 0);
+   BPR2_104 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHCrtRecLienJudgMmbrCnt > -36 AND L.v1_HHCrtRecLienJudgMmbrCnt <= 1, 0.496418994, 0);
+   BPR2_105 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHCrtRecEvictionMmbrCnt12Mo > 0 AND L.v1_HHCrtRecEvictionMmbrCnt12Mo <= 2, 0.496388311, 0);
+   BPR2_106 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.AssocCreditBureauOnlyCountNew > 0 AND L.AssocCreditBureauOnlyCountNew <= 0.1, 0.496383888, 0);
+   BPR2_107 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.CurrAddrMortgageType > -1 AND L.CurrAddrMortgageType <= -0.9, 0.496381293, 0);
+   BPR2_108 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.AgeOldestRecord_GT_Age > 0 AND L.AgeOldestRecord_GT_Age <= 0.1, 0.496378715, 0);
+   BPR2_109 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.LienReleasedCount24 > -7 AND L.LienReleasedCount24 <= 1, 0.496372638, 0);
+   BPR2_110 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_CrtRecLienJudgCnt12Mo > -10 AND L.v1_CrtRecLienJudgCnt12Mo <= 1, 0.496363039, 0);
+   BPR2_111 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ResCurrAVMRatioDiff60Mo > -100 AND L.v1_ResCurrAVMRatioDiff60Mo <= 1, 0.496320873, 0);
+   BPR2_112 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.ArrestCount24 > 0 AND L.ArrestCount24 <= 0.1, 0.496308847, 0);
+   BPR2_113 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_LifeEvNameChange > 0 AND L.v1_LifeEvNameChange <= 0.1, 0.496271642, 0);
+   BPR2_114 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PropAgeNewestPurchase > -1 AND L.PropAgeNewestPurchase <= -0.9, 0.496268549, 0);
+   BPR2_115 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PropAgeOldestPurchase > -1 AND L.PropAgeOldestPurchase <= -0.9, 0.496268549, 0);
+   BPR2_116 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PropPurchasedCount12 > -7 AND L.PropPurchasedCount12 <= 1, 0.496261978, 0);
+   BPR2_117 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ProspectCollegeAttending > 0 AND L.v1_ProspectCollegeAttending <= 0.1, 0.496216783, 0);
+   BPR2_118 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_RaACollegeGradAttendedMmbrCnt > 0 AND L.v1_RaACollegeGradAttendedMmbrCnt <= 0.1, 0.496195921, 0);
+   BPR2_119 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_CrtRecLienJudgCnt > -101 AND L.v1_CrtRecLienJudgCnt <= 3, 0.496195921, 0);
+   BPR2_120 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.LienFiledCount03 > -6 AND L.LienFiledCount03 <= 1, 0.496176483, 0);
+   BPR2_121 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.InputAddrTaxValue > -538000001 AND L.InputAddrTaxValue <= 6982846, 0.496176483, 0);
+   BPR2_122 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.FelonyCount24 > -10 AND L.FelonyCount24 <= 1, 0.496170686, 0);
+   BPR2_123 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.WatercraftCount24 > -7 AND L.WatercraftCount24 <= 1, 0.496160957, 0);
+   BPR2_124 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PRSearchLocateCount24 > -92 AND L.PRSearchLocateCount24 <= 4, 0.496151216, 0);
+   BPR2_125 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PropPurchasedCount03 > 0 AND L.PropPurchasedCount03 <= 0.1, 0.496145454, 0);
+   BPR2_126 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.BankruptcyAge > -1 AND L.BankruptcyAge <= -0.9, 0.496145454, 0);
+   BPR2_127 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.BankruptcyType > -1 AND L.BankruptcyType <= -0.9, 0.496145454, 0);
+   BPR2_128 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_CrtRecBkrptTimeNewest > -1 AND L.v1_CrtRecBkrptTimeNewest <= -0.9, 0.496145454, 0);
+   BPR2_129 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.BankruptcyCount > -14 AND L.BankruptcyCount <= 1, 0.496145454, 0);
+   BPR2_130 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_CrtRecBkrptCnt > -15 AND L.v1_CrtRecBkrptCnt <= 1, 0.496145454, 0);
+   BPR2_131 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.EvictionCount03 > -5 AND L.EvictionCount03 <= 1, 0.496125951, 0);
+   BPR2_132 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHOccBusinessAssocMmbrCnt > -59 AND L.v1_HHOccBusinessAssocMmbrCnt <= 1, 0.496115467, 0);
+   BPR2_133 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PropOwnedTaxTotal_24 > -13800000 AND L.PropOwnedTaxTotal_24 <= 129539, 0.496115467, 0);
+   BPR2_134 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_VerifiedCurrResMatchIndex > 0 AND L.v1_VerifiedCurrResMatchIndex <= 0.1, 0.496107253, 0);
+   BPR2_135 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.WatercraftCount60 > -16 AND L.WatercraftCount60 <= 1, 0.496100689, 0);
+   BPR2_136 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHSeniorMmbrCnt > -134 AND L.v1_HHSeniorMmbrCnt <= 1, 0.496100689, 0);
+   BPR2_137 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHCollege4yrAttendedMmbrCnt > 0 AND L.v1_HHCollege4yrAttendedMmbrCnt <= 2, 0.496094997, 0);
+   BPR2_138 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHCrtRecLienJudgMmbrCnt12Mo > 0 AND L.v1_HHCrtRecLienJudgMmbrCnt12Mo <= 2, 0.496094997, 0);
+   BPR2_139 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.ArrestCount03 > 0 AND L.ArrestCount03 <= 0.1, 0.496094997, 0);
+   BPR2_140 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.BankruptcyStatus > -1 AND L.BankruptcyStatus <= -0.9, 0.496094997, 0);
+   BPR2_141 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.SubPrimeOfferRequestCount > -14 AND L.SubPrimeOfferRequestCount <= 1, 0.496094997, 0);
+   BPR2_142 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.LienReleasedCount > -78 AND L.LienReleasedCount <= 2, 0.496094997, 0);
+   BPR2_143 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PropOwnedCount > -49 AND L.PropOwnedCount <= 2, 0.496085811, 0);
+   BPR2_144 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.InputAddrSICCode > -1 AND L.InputAddrSICCode <= -0.9, 0.49608266, 0);
+   BPR2_145 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.InputAddrMobilityIndex > 0 AND L.InputAddrMobilityIndex <= 2, 0.496069772, 0);
+   BPR2_146 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.ArrestCount01 > 0 AND L.ArrestCount01 <= 0.1, 0.496069772, 0);
+   BPR2_147 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_CrtRecCnt > -241 AND L.v1_CrtRecCnt <= 6, 0.496065625, 0);
+   BPR2_148 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHCrtRecFelonyMmbrCnt12Mo > 0 AND L.v1_HHCrtRecFelonyMmbrCnt12Mo <= 0.1, 0.49604455, 0);
+   BPR2_149 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ProspectDeceased > 0 AND L.v1_ProspectDeceased <= 0.1, 0.49604455, 0);
+   BPR2_150 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.FelonyCount12 > -8 AND L.FelonyCount12 <= 1, 0.49604455, 0);
+   BPR2_151 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_CrtRecFelonyCnt12Mo > -9 AND L.v1_CrtRecFelonyCnt12Mo <= 1, 0.49604455, 0);
+   BPR2_152 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.AddrChangeCount01 > -4 AND L.AddrChangeCount01 <= 2, 0.496024917, 0);
+   BPR2_153 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHCollege2yrAttendedMmbrCnt > 0 AND L.v1_HHCollege2yrAttendedMmbrCnt <= 2, 0.49601933, 0);
+   BPR2_154 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHCrtRecBkrptMmbrCnt24Mo > 0 AND L.v1_HHCrtRecBkrptMmbrCnt24Mo <= 2, 0.49601933, 0);
+   BPR2_155 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHCrtRecMsdmeanMmbrCnt12Mo > 0 AND L.v1_HHCrtRecMsdmeanMmbrCnt12Mo <= 2, 0.49601933, 0);
+   BPR2_156 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.BankruptcyCount03 > 0 AND L.BankruptcyCount03 <= 0.1, 0.49601933, 0);
+   BPR2_157 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.BankruptcyCount06 > 0 AND L.BankruptcyCount06 <= 0.1, 0.49601933, 0);
+   BPR2_158 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.BankruptcyCount12 > 0 AND L.BankruptcyCount12 <= 0.1, 0.49601933, 0);
+   BPR2_159 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.LienReleasedCount06 > 0 AND L.LienReleasedCount06 <= 0.1, 0.49601933, 0);
+   BPR2_160 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.WatercraftCount06 > -4 AND L.WatercraftCount06 <= 2, 0.49601933, 0);
+   BPR2_161 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.BankruptcyCount24 > -4 AND L.BankruptcyCount24 <= 1, 0.49601933, 0);
+   BPR2_162 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.BankruptcyCount60 > -8 AND L.BankruptcyCount60 <= 1, 0.49601933, 0);
+   BPR2_163 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PRSearchLocateCount01 > -10 AND L.PRSearchLocateCount01 <= 2, 0.49601933, 0);
+   BPR2_164 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHCrtRecLienJudgAmtTtl > -10000000 AND L.v1_HHCrtRecLienJudgAmtTtl <= 259376, 0.49601933, 0);
+   BPR2_165 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.WatercraftCount12 > -6 AND L.WatercraftCount12 <= 1, 0.496009504, 0);
+   BPR2_166 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_RaATeenageMmbrCnt > 0 AND L.v1_RaATeenageMmbrCnt <= 0.1, 0.495999665, 0);
+   BPR2_167 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHCollegePrivateMmbrCnt > 0 AND L.v1_HHCollegePrivateMmbrCnt <= 2, 0.495994113, 0);
+   BPR2_168 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHCrtRecBkrptMmbrCnt12Mo > 0 AND L.v1_HHCrtRecBkrptMmbrCnt12Mo <= 2, 0.495994113, 0);
+   BPR2_169 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_PPCurrOwnedAircrftCnt > 0 AND L.v1_PPCurrOwnedAircrftCnt <= 1, 0.495994113, 0);
+   BPR2_170 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.AircraftCount12 > 0 AND L.AircraftCount12 <= 0.1, 0.495994113, 0);
+   BPR2_171 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.AircraftOwner > 0 AND L.AircraftOwner <= 0.1, 0.495994113, 0);
+   BPR2_172 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.LienReleasedCount01 > 0 AND L.LienReleasedCount01 <= 0.1, 0.495994113, 0);
+   BPR2_173 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.LienReleasedCount03 > 0 AND L.LienReleasedCount03 <= 0.1, 0.495994113, 0);
+   BPR2_174 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PropSoldCount01 > 0 AND L.PropSoldCount01 <= 0.1, 0.495994113, 0);
+   BPR2_175 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ResCurrMortgageType > -1 AND L.v1_ResCurrMortgageType <= -0.9, 0.495994113, 0);
+   BPR2_176 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.WatercraftCount03 > -4 AND L.WatercraftCount03 <= 2, 0.495994113, 0);
+   BPR2_177 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.AircraftCount24 > -7 AND L.AircraftCount24 <= 1, 0.495994113, 0);
+   BPR2_178 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.SubPrimeOfferRequestCount60 > -7 AND L.SubPrimeOfferRequestCount60 <= 1, 0.495994113, 0);
+   BPR2_179 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_PPCurrOwnedMtrcycleCnt > -7 AND L.v1_PPCurrOwnedMtrcycleCnt <= 1, 0.495994113, 0);
+   BPR2_180 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.AircraftCount60 > -9 AND L.AircraftCount60 <= 1, 0.495994113, 0);
+   BPR2_181 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.AircraftCount > -11 AND L.AircraftCount <= 1, 0.495994113, 0);
+   BPR2_182 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_PropSoldRatio > -100 AND L.v1_PropSoldRatio <= 2, 0.495994113, 0);
+   BPR2_183 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.FelonyCount > -179 AND L.FelonyCount <= 4, 0.495994113, 0);
+   BPR2_184 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_CrtRecFelonyCnt > -180 AND L.v1_CrtRecFelonyCnt <= 4, 0.495994113, 0);
+   BPR2_185 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_RaAPPCurrOwnerAircrftMmbrCnt > 0 AND L.v1_RaAPPCurrOwnerAircrftMmbrCnt <= 0.1, 0.495984271, 0);
+   BPR2_186 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHCrtRecBkrptMmbrCnt > -37 AND L.v1_HHCrtRecBkrptMmbrCnt <= 1, 0.495979948, 0);
+   BPR2_187 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_VerifiedProspectFound > 1 AND L.v1_VerifiedProspectFound <= 1.1, 0.495968899, 0);
+   BPR2_188 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.P_PercentHHCollegeAttended > 0 AND L.P_PercentHHCollegeAttended <= 2, 0.495968899, 0);
+   BPR2_189 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.P_PercentHHPfofLic > 0 AND L.P_PercentHHPfofLic <= 2, 0.495968899, 0);
+   BPR2_190 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.P_PercentHHSport > 0 AND L.P_PercentHHSport <= 2, 0.495968899, 0);
+   BPR2_191 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_CrtRecBkrptCnt12Mo > 0 AND L.v1_CrtRecBkrptCnt12Mo <= 2, 0.495968899, 0);
+   BPR2_192 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHPPCurrOwnedAircrftCnt > 0 AND L.v1_HHPPCurrOwnedAircrftCnt <= 2, 0.495968899, 0);
+   BPR2_193 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_PropSoldCnt12Mo > 0 AND L.v1_PropSoldCnt12Mo <= 2, 0.495968899, 0);
+   BPR2_194 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.AircraftCount01 > 0 AND L.AircraftCount01 <= 0.1, 0.495968899, 0);
+   BPR2_195 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.AircraftCount03 > 0 AND L.AircraftCount03 <= 0.1, 0.495968899, 0);
+   BPR2_196 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.AircraftCount06 > 0 AND L.AircraftCount06 <= 0.1, 0.495968899, 0);
+   BPR2_197 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.BankruptcyCount01 > 0 AND L.BankruptcyCount01 <= 0.1, 0.495968899, 0);
+   BPR2_198 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.FelonyCount01 > 0 AND L.FelonyCount01 <= 0.1, 0.495968899, 0);
+   BPR2_199 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.FelonyCount03 > 0 AND L.FelonyCount03 <= 0.1, 0.495968899, 0);
+   BPR2_200 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.ProfileBooster_missing > 0 AND L.ProfileBooster_missing <= 0.1, 0.495968899, 0);
+   BPR2_201 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PropPurchasedCount01 > 0 AND L.PropPurchasedCount01 <= 0.1, 0.495968899, 0);
+   BPR2_202 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.SubPrimeOfferRequestCount01 > 0 AND L.SubPrimeOfferRequestCount01 <= 0.1, 0.495968899, 0);
+   BPR2_203 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.SubPrimeOfferRequestCount03 > 0 AND L.SubPrimeOfferRequestCount03 <= 0.1, 0.495968899, 0);
+   BPR2_204 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.SubPrimeOfferRequestCount06 > 0 AND L.SubPrimeOfferRequestCount06 <= 0.1, 0.495968899, 0);
+   BPR2_205 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.SubPrimeOfferRequestCount12 > 0 AND L.SubPrimeOfferRequestCount12 <= 0.1, 0.495968899, 0);
+   BPR2_206 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.SubPrimeOfferRequestCount24 > 0 AND L.SubPrimeOfferRequestCount24 <= 0.1, 0.495968899, 0);
+   BPR2_207 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHCollegeGradAttendedMmbrCnt > 0 AND L.v1_HHCollegeGradAttendedMmbrCnt <= 0.1, 0.495968899, 0);
+   BPR2_208 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.WatercraftCount01 > 0 AND L.WatercraftCount01 <= 0.1, 0.495968899, 0);
+   BPR2_209 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.LienReleasedCount12 > -4 AND L.LienReleasedCount12 <= 2, 0.495968899, 0);
+   BPR2_210 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PropSoldCount06 > -4 AND L.PropSoldCount06 <= 2, 0.495968899, 0);
+   BPR2_211 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.FelonyCount06 > -5 AND L.FelonyCount06 <= 2, 0.495968899, 0);
+   BPR2_212 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PropPurchasedCount06 > -7 AND L.PropPurchasedCount06 <= 2, 0.495968899, 0);
+   BPR2_213 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_LifeEvLastMoveTaxRatioDiff > -100 AND L.v1_LifeEvLastMoveTaxRatioDiff <= 1, 0.495968899, 0);
+   BPR2_214 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_CrtRecLienJudgAmtTtl > -10000000 AND L.v1_CrtRecLienJudgAmtTtl <= 235049, 0.495968899, 0);
+   BPR2_215 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.LienReleasedTotal > -22300000 AND L.LienReleasedTotal <= 299703, 0.495968899, 0);
+   BPR2_216 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.LienFiledTotal > -36600000 AND L.LienFiledTotal <= 284086, 0.495968899, 0);
+   BPR2_217 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_OccBusinessAssociation > 0 AND L.v1_OccBusinessAssociation <= 0.1, 0.495961324, 0);
+   BPR2_218 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_OccBusinessTitleLeadership > 0 AND L.v1_OccBusinessTitleLeadership <= 0.1, 0.495961324, 0);
+   BPR2_219 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_OccBusinessAssociationTime > -1 AND L.v1_OccBusinessAssociationTime <= -0.9, 0.495961324, 0);
+   BPR2_220 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PROPOWNEDTAXTOTAL0_d_2 > -254.8 AND L.PROPOWNEDTAXTOTAL0_d_2 <= 1, 0.495952507, 0);
+   BPR2_221 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHPPCurrOwnedAutoCnt > -178 AND L.v1_HHPPCurrOwnedAutoCnt <= 2, 0.495951387, 0);
+   BPR2_222 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_LifeEvEconTrajectory > -13 AND L.v1_LifeEvEconTrajectory <= 2, 0.495949169, 0);
+   BPR2_223 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.ArrestCount > 0 AND L.ArrestCount <= 0.1, 0.495940356, 0);
+   BPR2_224 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.EvictionCount01 > 0 AND L.EvictionCount01 <= 0.1, 0.495933812, 0);
+   BPR2_225 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.WatercraftOwner > 0 AND L.WatercraftOwner <= 0.1, 0.495914024, 0);
+   BPR2_226 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.WatercraftCount > -36 AND L.WatercraftCount <= 1, 0.495914024, 0);
+   BPR2_227 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PRSearchPersonalFinanceCount01 > -9 AND L.PRSearchPersonalFinanceCount01 <= 1, 0.495909552, 0);
+   BPR2_228 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.ArrestCount06 > 0 AND L.ArrestCount06 <= 0.1, 0.495908587, 0);
+   BPR2_229 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.LienFiledCount01 > 0 AND L.LienFiledCount01 <= 0.1, 0.495908587, 0);
+   BPR2_230 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_PropTimeLastSale > -1 AND L.v1_PropTimeLastSale <= -0.9, 0.495908587, 0);
+   BPR2_231 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_PropEverSoldCnt > -46 AND L.v1_PropEverSoldCnt <= 1, 0.495908587, 0);
+   BPR2_232 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.ValidationRiskLevel > -8 AND L.ValidationRiskLevel <= 2, 0.495906986, 0);
+   BPR2_233 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_RaACrtRecFelonyMmbrCnt12Mo > 0 AND L.v1_RaACrtRecFelonyMmbrCnt12Mo <= 0.1, 0.495898683, 0);
+   BPR2_234 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ResCurrMortgageAmount > -10000000 AND L.v1_ResCurrMortgageAmount <= 87831, 0.495898683, 0);
+   BPR2_235 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.BusinessAssociationAge > -1 AND L.BusinessAssociationAge <= -0.9, 0.49588145, 0);
+   BPR2_236 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.SubjectPhoneRecentCount > 0 AND L.SubjectPhoneRecentCount <= 0.1, 0.495870562, 0);
+   BPR2_237 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ResCurrAVMValue60Mo > -4476120 AND L.v1_ResCurrAVMValue60Mo <= 91147, 0.495859735, 0);
+   BPR2_238 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.InputAddrMortgageType > -1 AND L.InputAddrMortgageType <= -0.9, 0.495854343, 0);
+   BPR2_239 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.ArrestCount12 > 0 AND L.ArrestCount12 <= 0.1, 0.495848207, 0);
+   BPR2_240 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.ArrestAge > -1 AND L.ArrestAge <= -0.9, 0.495838984, 0);
+   BPR2_241 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.DoNotMail > 0 AND L.DoNotMail <= 0.1, 0.495832925, 0);
+   BPR2_242 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_DoNotMail > 0 AND L.v1_DoNotMail <= 0.1, 0.495832925, 0);
+   BPR2_243 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_PropEverOwnedCnt > -56 AND L.v1_PropEverOwnedCnt <= 2, 0.495832925, 0);
+   BPR2_244 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PROPOWNEDTAXTOTAL0_d_1 > -134.55 AND L.PROPOWNEDTAXTOTAL0_d_1 <= 1, 0.495830386, 0);
+   BPR2_245 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_LifeEvEconTrajectoryIndex > -7 AND L.v1_LifeEvEconTrajectoryIndex <= 1, 0.495829685, 0);
+   BPR2_246 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_InterestSportPerson > 0 AND L.v1_InterestSportPerson <= 0.1, 0.495823717, 0);
+   BPR2_247 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_AssetCurrOwner > 0 AND L.v1_AssetCurrOwner <= 0.1, 0.495813008, 0);
+   BPR2_248 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.ProfLicCount03 > -6 AND L.ProfLicCount03 <= 1, 0.495803029, 0);
+   BPR2_249 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ResCurrBusinessCnt > -256 AND L.v1_ResCurrBusinessCnt <= 4, 0.49578776, 0);
+   BPR2_250 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PropSoldCount12 > -6 AND L.PropSoldCount12 <= 1, 0.495782498, 0);
+   BPR2_251 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PropSoldCount60 > -10 AND L.PropSoldCount60 <= 1, 0.495772513, 0);
+   BPR2_252 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PROPOWNEDTAXTOTAL1_d_2 > -254.8 AND L.PROPOWNEDTAXTOTAL1_d_2 <= 1, 0.495754252, 0);
+   BPR2_253 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PropSoldCount03 > 0 AND L.PropSoldCount03 <= 0.1, 0.49573208, 0);
+   BPR2_254 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.ProfLicCount12 > -9 AND L.ProfLicCount12 <= 1, 0.495727591, 0);
+   BPR2_255 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ResCurrAVMTractRatio > 0 AND L.v1_ResCurrAVMTractRatio <= 2, 0.495722063, 0);
+   BPR2_256 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.ArrestCount60 > 0 AND L.ArrestCount60 <= 0.1, 0.495712326, 0);
+   BPR2_257 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ResCurrOwnershipIndex > 0 AND L.v1_ResCurrOwnershipIndex <= 2, 0.495702773, 0);
+   BPR2_258 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PRSearchLocateCount03 > -23 AND L.PRSearchLocateCount03 <= 4, 0.495681672, 0);
+   BPR2_259 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ResCurrAVMBlockRatio > 0 AND L.v1_ResCurrAVMBlockRatio <= 2, 0.495671623, 0);
+   BPR2_260 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.FelonyAge > -1 AND L.FelonyAge <= -0.9, 0.495671623, 0);
+   BPR2_261 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_CrtRecFelonyTimeNewest > -1 AND L.v1_CrtRecFelonyTimeNewest <= -0.9, 0.495671623, 0);
+   BPR2_262 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.AssocCreditBureauOnlyCountMonth > 0 AND L.AssocCreditBureauOnlyCountMonth <= 0.1, 0.495666662, 0);
+   BPR2_263 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHCrtRecFelonyMmbrCnt > -8 AND L.v1_HHCrtRecFelonyMmbrCnt <= 1, 0.49566156, 0);
+   BPR2_264 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.SSNAgeDeceased > -1 AND L.SSNAgeDeceased <= -0.9, 0.495646407, 0);
+   BPR2_265 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.FelonyCount60 > -36 AND L.FelonyCount60 <= 1, 0.495646407, 0);
+   BPR2_266 := IF( L.AgeRiskIndicator > 46 AND L.AgeRiskIndicator <= 160 AND L.AVGSTATECOST > -4247 AND L.AVGSTATECOST <= 6638, 0.495640449, 0);
+   BPR2_267 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.ProfLicCount01 > -6 AND L.ProfLicCount01 <= 1, 0.495626236, 0);
+   BPR2_268 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PropSoldCount24 > -7 AND L.PropSoldCount24 <= 1, 0.495595983, 0);
+   BPR2_269 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.ProfLicCount24 > -37 AND L.ProfLicCount24 <= 1, 0.495590747, 0);
+   BPR2_270 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_CrtRecMsdmeanCnt > -178 AND L.v1_CrtRecMsdmeanCnt <= 4, 0.495580733, 0);
+   BPR2_271 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PropOwnedTaxTotal_12 > -13900000 AND L.PropOwnedTaxTotal_12 <= 130934, 0.495559969, 0);
+   BPR2_272 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PropTax_EstIncome > -115.83 AND L.PropTax_EstIncome <= 1, 0.495544454, 0);
+   BPR2_273 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ResCurrAVMValue > -10000000 AND L.v1_ResCurrAVMValue <= 114650, 0.495534801, 0);
+   BPR2_274 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHOccProfLicMmbrCnt > -29 AND L.v1_HHOccProfLicMmbrCnt <= 1, 0.495509006, 0);
+   BPR2_275 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.InputAddrDelivery > -1 AND L.InputAddrDelivery <= -0.9, 0.495489379, 0);
+   BPR2_276 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.ProfLicCount06 > -7 AND L.ProfLicCount06 <= 1, 0.495454381, 0);
+   BPR2_277 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.HistoricalAddrCorrectional > 0 AND L.HistoricalAddrCorrectional <= 0.1, 0.495399116, 0);
+   BPR2_278 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PropAgeNewestSale > -1 AND L.PropAgeNewestSale <= -0.9, 0.495399116, 0);
+   BPR2_279 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ProspectMaritalStatus > 0 AND L.v1_ProspectMaritalStatus <= 0.1, 0.495394388, 0);
+   BPR2_280 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PropOwnedTaxTotal > -13900000 AND L.PropOwnedTaxTotal <= 136672, 0.495387233, 0);
+   BPR2_281 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PropNewestSalePrice > -1 AND L.PropNewestSalePrice <= -0.9, 0.495373893, 0);
+   BPR2_282 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PropNewestSalePurchaseIndex > -1 AND L.PropNewestSalePurchaseIndex <= -0.9, 0.495373893, 0);
+   BPR2_283 := IF( L.AgeRiskIndicator > 46 AND L.AgeRiskIndicator <= 160 AND L.AssocHighRiskTopologyCount > -25 AND L.AssocHighRiskTopologyCount <= 1, 0.495323732, 0);
+   BPR2_284 := IF( L.AgeRiskIndicator > 46 AND L.AgeRiskIndicator <= 160 AND L.RelativesFelonyCount > -25 AND L.RelativesFelonyCount <= 1, 0.495323732, 0);
+   BPR2_285 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.BusinessActiveAssociation > 0 AND L.BusinessActiveAssociation <= 0.1, 0.495268143, 0);
+   BPR2_286 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 32 AND L.NonDerogCount > -32 AND L.NonDerogCount <= 4, 0.495233107, 0);
+   BPR2_287 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_OccProfLicenseCategory > -6 AND L.v1_OccProfLicenseCategory <= 1, 0.495230263, 0);
+   BPR2_288 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ResCurrAVMRatioDiff12Mo > -78.42 AND L.v1_ResCurrAVMRatioDiff12Mo <= 1, 0.495200414, 0);
+   BPR2_289 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHElderlyMmbrCnt > -12 AND L.v1_HHElderlyMmbrCnt <= 1, 0.495197406, 0);
+   BPR2_290 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHPPCurrOwnedMtrcycleCnt > -7 AND L.v1_HHPPCurrOwnedMtrcycleCnt <= 1, 0.495182587, 0);
+   BPR2_291 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ProspectCollegePrivate > 0 AND L.v1_ProspectCollegePrivate <= 0.1, 0.495152562, 0);
+   BPR2_292 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ResCurrAVMValue12Mo > -10000000 AND L.v1_ResCurrAVMValue12Mo <= 103784, 0.495143714, 0);
+   BPR2_293 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.LP_PropertyOwned > -86 AND L.LP_PropertyOwned <= 2, 0.49511748, 0);
+   BPR2_294 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHMiddleAgemmbrCnt > -96 AND L.v1_HHMiddleAgemmbrCnt <= 1, 0.495112212, 0);
+   BPR2_295 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ResInputMortgageAmount > -10000000 AND L.v1_ResInputMortgageAmount <= 87980, 0.495097324, 0);
+   BPR2_296 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.ProfLicCount60 > -43 AND L.ProfLicCount60 <= 1, 0.495063313, 0);
+   BPR2_297 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHInterestSportPersonMmbrCnt > -20 AND L.v1_HHInterestSportPersonMmbrCnt <= 1, 0.495053859, 0);
+   BPR2_298 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 32 AND L.InputAddrMedianValue > -1002156 AND L.InputAddrMedianValue <= 178907, 0.495049785, 0);
+   BPR2_299 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PropOwnedHistoricalCount > -86 AND L.PropOwnedHistoricalCount <= 2, 0.495014828, 0);
+   BPR2_300 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ResCurrAVMCntyRatio > 0 AND L.v1_ResCurrAVMCntyRatio <= 1, 0.494993705, 0);
+   BPR2_301 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PropPurchasedCount60 > -14 AND L.PropPurchasedCount60 <= 1, 0.494993705, 0);
+   BPR2_302 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.BusinessInactiveAssociation > 0 AND L.BusinessInactiveAssociation <= 0.1, 0.494974827, 0);
+   BPR2_303 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.VariationIdentityCount > -24 AND L.VariationIdentityCount <= 2, 0.494943861, 0);
+   BPR2_304 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_OccProfLicense > 0 AND L.v1_OccProfLicense <= 0.1, 0.494868817, 0);
+   BPR2_305 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.InputAddrPhoneCount > -64 AND L.InputAddrPhoneCount <= 4, 0.494844534, 0);
+   BPR2_306 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.SourceWatchList > 0 AND L.SourceWatchList <= 0.1, 0.494793766, 0);
+   BPR2_307 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ResInputMortgageType > -1 AND L.v1_ResInputMortgageType <= -0.9, 0.494737311, 0);
+   BPR2_308 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.LastNameChangeCount01 > -8 AND L.LastNameChangeCount01 <= 1, 0.494689149, 0);
+   BPR2_309 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_RaACollegeTopTierMmbrCnt > -47 AND L.v1_RaACollegeTopTierMmbrCnt <= 1, 0.494470624, 0);
+   BPR2_310 := IF( L.AgeRiskIndicator > 46 AND L.AgeRiskIndicator <= 160 AND L.v1_ProspectAge > 56 AND L.v1_ProspectAge <= 232, 0.494436441, 0);
+   BPR2_311 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ResInputBusinessCnt > -256 AND L.v1_ResInputBusinessCnt <= 6, 0.494434464, 0);
+   BPR2_312 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHPropCurrOwnedCnt > -238 AND L.v1_HHPropCurrOwnedCnt <= 2, 0.494423395, 0);
+   BPR2_313 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.SearchUnverifiedDOBCountYear > -6 AND L.SearchUnverifiedDOBCountYear <= 1, 0.494346487, 0);
+   BPR2_314 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHCnt > -256 AND L.v1_HHCnt <= 3, 0.494287672, 0);
+   BPR2_315 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.CurrAddrTractIndex > 0 AND L.CurrAddrTractIndex <= 2, 0.49409488, 0);
+   BPR2_316 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.CurrAddrTaxMarketValue > -378000001 AND L.CurrAddrTaxMarketValue <= 9373763, 0.494001988, 0);
+   BPR2_317 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.CurrAddrCorrectional > 0 AND L.CurrAddrCorrectional <= 0.1, 0.493911266, 0);
+   BPR2_318 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.SubjectPhoneCount > -9 AND L.SubjectPhoneCount <= 1, 0.49370621, 0);
+   BPR2_319 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.CurrAddrTaxValue > -681000001 AND L.CurrAddrTaxValue <= 19680700, 0.493698188, 0);
+   BPR2_320 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_PropCurrOwnedAssessedTtl > -10000000 AND L.v1_PropCurrOwnedAssessedTtl <= 132185, 0.493457951, 0);
+   BPR2_321 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.CurrAddrBlockIndex > 0 AND L.CurrAddrBlockIndex <= 2, 0.493284116, 0);
+   BPR2_322 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.BusinessInputAddrCount > -256 AND L.BusinessInputAddrCount <= 14, 0.492736464, 0);
+   BPR2_323 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_PropCurrOwner > 0 AND L.v1_PropCurrOwner <= 0.1, 0.492724934, 0);
+   BPR2_324 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_PropCurrOwnedCnt > -56 AND L.v1_PropCurrOwnedCnt <= 1, 0.492724934, 0);
+   BPR2_325 := IF( L.CreditBureauRecord > 1 AND L.CreditBureauRecord <= 1.1 AND L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20, 0.492674457, 0);
+   BPR2_326 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.AssetOwner > 0 AND L.AssetOwner <= 0.1, 0.492635547, 0);
+   BPR2_327 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 32 AND L.NonDerogCount60 > -11 AND L.NonDerogCount60 <= 3, 0.49257201, 0);
+   BPR2_328 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHPropCurrOwnerMmbrCnt > -152 AND L.v1_HHPropCurrOwnerMmbrCnt <= 1, 0.492406668, 0);
+   BPR2_329 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PropertyOwner > 0 AND L.PropertyOwner <= 0.1, 0.492255525, 0);
+   BPR2_330 := IF( L.VerificationFailure > 0 AND L.VerificationFailure <= 0.1 AND L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20, 0.492173315, 0);
+   BPR2_331 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_HHPropCurrAVMHighest > -10000000 AND L.v1_HHPropCurrAVMHighest <= 125805, 0.49182719, 0);
+   BPR2_332 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_PropCurrOwnedAVMTtl > -10000000 AND L.v1_PropCurrOwnedAVMTtl <= 163631, 0.491535694, 0);
+   BPR2_333 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.ProfLicAge > -1 AND L.ProfLicAge <= -0.9, 0.491248726, 0);
+   BPR2_334 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.LastNameChangeCount06 > -8 AND L.LastNameChangeCount06 <= 1, 0.49108201, 0);
+   BPR2_335 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.ProfLicTypeCategory > -1 AND L.ProfLicTypeCategory <= -0.9, 0.491054574, 0);
+   BPR2_336 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PRSearchPhoneIdentities > -47 AND L.PRSearchPhoneIdentities <= 1, 0.490960077, 0);
+   BPR2_337 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 32 AND L.CurrAddrMedianValue > -1005209 AND L.CurrAddrMedianValue <= 155056, 0.490820856, 0);
+   BPR2_338 := IF( L.RecentUpdate > 1 AND L.RecentUpdate <= 1.1 AND L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20, 0.490592175, 0);
+   BPR2_339 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 32 AND L.FEMALE > 0 AND L.FEMALE <= 0.1, 0.490459641, 0);
+   BPR2_340 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.ProfLicExpired > -1 AND L.ProfLicExpired <= -0.9, 0.490390074, 0);
+   BPR2_341 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.ProfLicCount > -45 AND L.ProfLicCount <= 1, 0.490390074, 0);
+   BPR2_342 := IF( L.AgeRiskIndicator > 46 AND L.AgeRiskIndicator <= 160 AND L.v1_RaACrtRecEvictionMmbrCnt > -34 AND L.v1_RaACrtRecEvictionMmbrCnt <= 2, 0.490294368, 0);
+   BPR2_343 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.CurrAddrApplicantOwned > 0 AND L.CurrAddrApplicantOwned <= 0.1, 0.4898925, 0);
+   BPR2_344 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.LastNameChangeCount03 > -8 AND L.LastNameChangeCount03 <= 1, 0.489689525, 0);
+   BPR2_345 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PhoneIdentitiesRecentCount > -6 AND L.PhoneIdentitiesRecentCount <= 1, 0.489679861, 0);
+   BPR2_346 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.SourceRiskLevel > 6 AND L.SourceRiskLevel <= 18, 0.489453147, 0);
+   BPR2_347 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.InputAddrPhoneRecentCount > -18 AND L.InputAddrPhoneRecentCount <= 1, 0.489282624, 0);
+   BPR2_348 := IF( L.VerifiedName > 3 AND L.VerifiedName <= 3.1 AND L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20, 0.488642375, 0);
+   BPR2_349 := IF( L.SSNLowIssueAge > 196 AND L.SSNLowIssueAge <= 385 AND L.NonDerogCount > -32 AND L.NonDerogCount <= 4, 0.487343492, 0);
+   BPR2_350 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PropTaxPerRelative > -69400000 AND L.PropTaxPerRelative <= 54549, 0.487060552, 0);
+   BPR2_351 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.DivSSNIdentityMSourceCount > -256 AND L.DivSSNIdentityMSourceCount <= 2, 0.486842572, 0);
+   BPR2_352 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.SubjectSSNRecentCount > 0 AND L.SubjectSSNRecentCount <= 0.1, 0.486739912, 0);
+   BPR2_353 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.DivSSNAddrMSourceCount > -256 AND L.DivSSNAddrMSourceCount <= 6, 0.486648791, 0);
+   BPR2_354 := IF( L.SSNHighIssueAge > 179 AND L.SSNHighIssueAge <= 366 AND L.NonDerogCount > -32 AND L.NonDerogCount <= 4, 0.486620942, 0);
+   BPR2_355 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.IDVerSSNCreditBureauDelete > 0 AND L.IDVerSSNCreditBureauDelete <= 0.1, 0.484998202, 0);
+   BPR2_356 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.SSNAfter5 > 0 AND L.SSNAfter5 <= 0.1, 0.484181674, 0);
+   BPR2_357 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_RaAOccProfLicMmbrCnt > -120 AND L.v1_RaAOccProfLicMmbrCnt <= 2, 0.483487524, 0);
+   BPR2_358 := IF( L.SSNNotFound > 0 AND L.SSNNotFound <= 0.1 AND L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20, 0.483250824, 0);
+   BPR2_359 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.ST_EQ_SSNISSUESTATE > 1 AND L.ST_EQ_SSNISSUESTATE <= 1.1, 0.483062679, 0);
+   BPR2_360 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.DivSSNIdentityMSourceUrelCount > -89 AND L.DivSSNIdentityMSourceUrelCount <= 2, 0.482803586, 0);
+   BPR2_361 := IF( L.FEMALE > 0 AND L.FEMALE <= 0.1 AND L.v1_ProspectAge > 16 AND L.v1_ProspectAge <= 41, 0.482446706, 0);
+   BPR2_362 := IF( L.SSNFoundOther > 0 AND L.SSNFoundOther <= 0.1 AND L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20, 0.482311346, 0);
+   BPR2_363 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 32 AND L.PrevAddrMedianValue > -1031251 AND L.PrevAddrMedianValue <= 129244, 0.482105912, 0);
+   BPR2_364 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_RaAElderlyMmbrCnt > -21 AND L.v1_RaAElderlyMmbrCnt <= 1, 0.48156672, 0);
+   BPR2_365 := IF( L.SrcsConfirmIDAddrCount > -19 AND L.SrcsConfirmIDAddrCount <= 5 AND L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20, 0.480095499, 0);
+   BPR2_366 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.SSN3Years > 0 AND L.SSN3Years <= 0.1, 0.479792177, 0);
+   BPR2_367 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.SSNRecent > 0 AND L.SSNRecent <= 0.1, 0.479792177, 0);
+   BPR2_368 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.SSNNonUS > 0 AND L.SSNNonUS <= 0.1, 0.479392991, 0);
+   BPR2_369 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.SSNProblems > 0 AND L.SSNProblems <= 2, 0.479199735, 0);
+   BPR2_370 := IF( L.VerifiedSSN > 2 AND L.VerifiedSSN <= 2.1 AND L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20, 0.478396885, 0);
+   BPR2_371 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.DivSSNLNameCountNew > -256 AND L.DivSSNLNameCountNew <= 1, 0.478104182, 0);
+   BPR2_372 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.RelativesDistanceClosest > 0 AND L.RelativesDistanceClosest <= 1, 0.477291527, 0);
+   BPR2_373 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.CorrelationRiskLevel > 7 AND L.CorrelationRiskLevel <= 18, 0.475567966, 0);
+   BPR2_374 := IF( L.AGE_IN_YEARS > 32 AND L.AGE_IN_YEARS <= 45 AND L.FEMALE > 0 AND L.FEMALE <= 0.1, 0.474623506, 0);
+   BPR2_375 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.InputAddrBlockIndex > -93.24 AND L.InputAddrBlockIndex <= 1, 0.46932997, 0);
+   BPR2_376 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ResInputAVMTractRatio > -93.24 AND L.v1_ResInputAVMTractRatio <= 1, 0.46932997, 0);
+   BPR2_377 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PhoneIdentitiesCount > -18 AND L.PhoneIdentitiesCount <= 1, 0.468156988, 0);
+   BPR2_378 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 114 AND L.InputAddrMedianValue > -1002156 AND L.InputAddrMedianValue <= 178907, 0.467001858, 0);
+   BPR2_379 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.IDVerSSNCreditBureauCount > 2 AND L.IDVerSSNCreditBureauCount <= 6, 0.46627149, 0);
+   BPR2_380 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.PhoneOther > -1 AND L.PhoneOther <= -0.9, 0.465845591, 0);
+   BPR2_381 := IF( L.AGE_IN_YEARS > -104.17 AND L.AGE_IN_YEARS <= 32 AND L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20, 0.462511049, 0);
+   BPR2_382 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.InputAddrCountyIndex > -100 AND L.InputAddrCountyIndex <= 1, 0.462234684, 0);
+   BPR2_383 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.v1_ResInputAVMCntyRatio > -100 AND L.v1_ResInputAVMCntyRatio <= 1, 0.462234684, 0);
+   BPR2_384 := IF( L.VerifiedDOB > 6 AND L.VerifiedDOB <= 14 AND L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20, 0.455793754, 0);
+   BPR2_385 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.SSNHighIssueAge > 179 AND L.SSNHighIssueAge <= 366, 0.454637737, 0);
+   BPR2_386 := IF( L.AgeOldestRecord > -961 AND L.AgeOldestRecord <= 114 AND L.CurrAddrMedianValue > -1005209 AND L.CurrAddrMedianValue <= 155056, 0.453171138, 0);
+   BPR2_387 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.SSNLowIssueAge > 196 AND L.SSNLowIssueAge <= 385, 0.452633051, 0);
+   BPR2_388 := IF( L.AgeRiskIndicator > 9 AND L.AgeRiskIndicator <= 20 AND L.InputAddrActivePhoneList > 0 AND L.InputAddrActivePhoneList <= 0.1, 0.447669068, 0);
+
+   SELF.BP1 := IF(BPR1_1 >0,1,0) + IF(BPR1_2 >0,1,0) + IF(BPR1_3 >0,1,0) + IF(BPR1_4 >0,1,0) + IF(BPR1_5 >0,1,0) + IF(BPR1_6 >0,1,0) + IF(BPR1_7 >0,1,0) + IF(BPR1_8 >0,1,0) + IF(BPR1_9 >0,1,0) + IF(BPR1_10 >0,1,0) + IF(BPR1_11 >0,1,0) + IF(BPR1_12 >0,1,0) + IF(BPR1_13 >0,1,0) + IF(BPR1_14 >0,1,0) + IF(BPR1_15 >0,1,0) + IF(BPR1_16 >0,1,0) + IF(BPR1_17 >0,1,0) + IF(BPR1_18 >0,1,0) + IF(BPR1_19 >0,1,0) + IF(BPR1_20 >0,1,0) + IF(BPR1_21 >0,1,0) + IF(BPR1_22 >0,1,0) + IF(BPR1_23 >0,1,0) + IF(BPR1_24 >0,1,0) + IF(BPR1_25 >0,1,0) + IF(BPR1_26 >0,1,0) + IF(BPR1_27 >0,1,0) + IF(BPR1_28 >0,1,0) + IF(BPR1_29 >0,1,0) + IF(BPR1_30 >0,1,0) + IF(BPR1_31 >0,1,0) + IF(BPR1_32 >0,1,0) + IF(BPR1_33 >0,1,0) + IF(BPR1_34 >0,1,0) + IF(BPR1_35 >0,1,0) + IF(BPR1_36 >0,1,0) + IF(BPR1_37 >0,1,0) + IF(BPR1_38 >0,1,0) + IF(BPR1_39 >0,1,0) + IF(BPR1_40 >0,1,0) + IF(BPR1_41 >0,1,0) + IF(BPR1_42 >0,1,0) + IF(BPR1_43 >0,1,0) + IF(BPR1_44 >0,1,0) + IF(BPR1_45 >0,1,0) + IF(BPR1_46 >0,1,0) + IF(BPR1_47 >0,1,0) + IF(BPR1_48 >0,1,0) + IF(BPR1_49 >0,1,0) + IF(BPR1_50 >0,1,0) + IF(BPR1_51 >0,1,0) + IF(BPR1_52 >0,1,0) + IF(BPR1_53 >0,1,0) + IF(BPR1_54 >0,1,0) + IF(BPR1_55 >0,1,0) + IF(BPR1_56 >0,1,0) + IF(BPR1_57 >0,1,0) + IF(BPR1_58 >0,1,0) + IF(BPR1_59 >0,1,0) + IF(BPR1_60 >0,1,0) + IF(BPR1_61 >0,1,0) + IF(BPR1_62 >0,1,0) + IF(BPR1_63 >0,1,0) + IF(BPR1_64 >0,1,0) + IF(BPR1_65 >0,1,0) + IF(BPR1_66 >0,1,0) + IF(BPR1_67 >0,1,0) + IF(BPR1_68 >0,1,0) + IF(BPR1_69 >0,1,0) + IF(BPR1_70 >0,1,0) + IF(BPR1_71 >0,1,0) + IF(BPR1_72 >0,1,0) + IF(BPR1_73 >0,1,0) + IF(BPR1_74 >0,1,0) + IF(BPR1_75 >0,1,0) + IF(BPR1_76 >0,1,0) + IF(BPR1_77 >0,1,0) + IF(BPR1_78 >0,1,0) + IF(BPR1_79 >0,1,0) + IF(BPR1_80 >0,1,0) + IF(BPR1_81 >0,1,0) + IF(BPR1_82 >0,1,0) + IF(BPR1_83 >0,1,0) + IF(BPR1_84 >0,1,0) + IF(BPR1_85 >0,1,0) + IF(BPR1_86 >0,1,0) + IF(BPR1_87 >0,1,0) + IF(BPR1_88 >0,1,0) + IF(BPR1_89 >0,1,0) + IF(BPR1_90 >0,1,0) + IF(BPR1_91 >0,1,0) + IF(BPR1_92 >0,1,0) + IF(BPR1_93 >0,1,0) + IF(BPR1_94 >0,1,0) + IF(BPR1_95 >0,1,0) + IF(BPR1_96 >0,1,0) + IF(BPR1_97 >0,1,0) + IF(BPR1_98 >0,1,0) + IF(BPR1_99 >0,1,0) + IF(BPR1_100 >0,1,0) + IF(BPR1_101 >0,1,0) + IF(BPR1_102 >0,1,0) + IF(BPR1_103 >0,1,0) + IF(BPR1_104 >0,1,0) + IF(BPR1_105 >0,1,0) + IF(BPR1_106 >0,1,0) + IF(BPR1_107 >0,1,0) + IF(BPR1_108 >0,1,0) + IF(BPR1_109 >0,1,0) + IF(BPR1_110 >0,1,0) + IF(BPR1_111 >0,1,0) + IF(BPR1_112 >0,1,0) + IF(BPR1_113 >0,1,0) + IF(BPR1_114 >0,1,0) + IF(BPR1_115 >0,1,0) + IF(BPR1_116 >0,1,0) + IF(BPR1_117 >0,1,0) + IF(BPR1_118 >0,1,0) + IF(BPR1_119 >0,1,0) + IF(BPR1_120 >0,1,0) + IF(BPR1_121 >0,1,0) + IF(BPR1_122 >0,1,0) + IF(BPR1_123 >0,1,0) + IF(BPR1_124 >0,1,0) + IF(BPR1_125 >0,1,0) + IF(BPR1_126 >0,1,0) + IF(BPR1_127 >0,1,0) + IF(BPR1_128 >0,1,0) + IF(BPR1_129 >0,1,0) + IF(BPR1_130 >0,1,0) + IF(BPR1_131 >0,1,0) + IF(BPR1_132 >0,1,0) + IF(BPR1_133 >0,1,0) + IF(BPR1_134 >0,1,0) + IF(BPR1_135 >0,1,0) + IF(BPR1_136 >0,1,0) + IF(BPR1_137 >0,1,0) + IF(BPR1_138 >0,1,0) + IF(BPR1_139 >0,1,0) + IF(BPR1_140 >0,1,0) + IF(BPR1_141 >0,1,0) + IF(BPR1_142 >0,1,0) + IF(BPR1_143 >0,1,0) + IF(BPR1_144 >0,1,0) + IF(BPR1_145 >0,1,0) + IF(BPR1_146 >0,1,0) + IF(BPR1_147 >0,1,0) + IF(BPR1_148 >0,1,0) + IF(BPR1_149 >0,1,0) + IF(BPR1_150 >0,1,0) + IF(BPR1_151 >0,1,0) + IF(BPR1_152 >0,1,0) + IF(BPR1_153 >0,1,0) + IF(BPR1_154 >0,1,0) + IF(BPR1_155 >0,1,0) + IF(BPR1_156 >0,1,0) + IF(BPR1_157 >0,1,0) + IF(BPR1_158 >0,1,0) + IF(BPR1_159 >0,1,0) + IF(BPR1_160 >0,1,0) + IF(BPR1_161 >0,1,0) + IF(BPR1_162 >0,1,0) + IF(BPR1_163 >0,1,0) + IF(BPR1_164 >0,1,0) + IF(BPR1_165 >0,1,0) + IF(BPR1_166 >0,1,0) + IF(BPR1_167 >0,1,0) + IF(BPR1_168 >0,1,0) + IF(BPR1_169 >0,1,0) + IF(BPR1_170 >0,1,0) + IF(BPR1_171 >0,1,0) + IF(BPR1_172 >0,1,0) + IF(BPR1_173 >0,1,0) + IF(BPR1_174 >0,1,0) + IF(BPR1_175 >0,1,0) + IF(BPR1_176 >0,1,0) + IF(BPR1_177 >0,1,0) + IF(BPR1_178 >0,1,0) + IF(BPR1_179 >0,1,0) + IF(BPR1_180 >0,1,0) + IF(BPR1_181 >0,1,0) + IF(BPR1_182 >0,1,0) + IF(BPR1_183 >0,1,0) + IF(BPR1_184 >0,1,0) + IF(BPR1_185 >0,1,0) + IF(BPR1_186 >0,1,0) + IF(BPR1_187 >0,1,0) + IF(BPR1_188 >0,1,0) + IF(BPR1_189 >0,1,0) + IF(BPR1_190 >0,1,0) + IF(BPR1_191 >0,1,0) + IF(BPR1_192 >0,1,0) + IF(BPR1_193 >0,1,0) + IF(BPR1_194 >0,1,0) + IF(BPR1_195 >0,1,0) + IF(BPR1_196 >0,1,0) + IF(BPR1_197 >0,1,0) + IF(BPR1_198 >0,1,0) + IF(BPR1_199 >0,1,0) + IF(BPR1_200 >0,1,0) + IF(BPR1_201 >0,1,0) + IF(BPR1_202 >0,1,0) + IF(BPR1_203 >0,1,0) + IF(BPR1_204 >0,1,0) + IF(BPR1_205 >0,1,0) + IF(BPR1_206 >0,1,0) + IF(BPR1_207 >0,1,0) + IF(BPR1_208 >0,1,0) + IF(BPR1_209 >0,1,0) + IF(BPR1_210 >0,1,0) + IF(BPR1_211 >0,1,0) + IF(BPR1_212 >0,1,0) + IF(BPR1_213 >0,1,0) + IF(BPR1_214 >0,1,0) + IF(BPR1_215 >0,1,0) + IF(BPR1_216 >0,1,0) + IF(BPR1_217 >0,1,0) + IF(BPR1_218 >0,1,0) + IF(BPR1_219 >0,1,0) + IF(BPR1_220 >0,1,0) + IF(BPR1_221 >0,1,0) + IF(BPR1_222 >0,1,0) + IF(BPR1_223 >0,1,0) + IF(BPR1_224 >0,1,0) + IF(BPR1_225 >0,1,0) + IF(BPR1_226 >0,1,0) + IF(BPR1_227 >0,1,0) + IF(BPR1_228 >0,1,0) + IF(BPR1_229 >0,1,0) + IF(BPR1_230 >0,1,0) + IF(BPR1_231 >0,1,0) + IF(BPR1_232 >0,1,0) + IF(BPR1_233 >0,1,0) + IF(BPR1_234 >0,1,0) + IF(BPR1_235 >0,1,0) + IF(BPR1_236 >0,1,0) + IF(BPR1_237 >0,1,0) + IF(BPR1_238 >0,1,0) + IF(BPR1_239 >0,1,0) + IF(BPR1_240 >0,1,0) + IF(BPR1_241 >0,1,0) + IF(BPR1_242 >0,1,0) + IF(BPR1_243 >0,1,0) + IF(BPR1_244 >0,1,0) + IF(BPR1_245 >0,1,0) + IF(BPR1_246 >0,1,0) + IF(BPR1_247 >0,1,0) + IF(BPR1_248 >0,1,0) + IF(BPR1_249 >0,1,0) + IF(BPR1_250 >0,1,0) + IF(BPR1_251 >0,1,0) + IF(BPR1_252 >0,1,0) + IF(BPR1_253 >0,1,0) + IF(BPR1_254 >0,1,0) + IF(BPR1_255 >0,1,0) + IF(BPR1_256 >0,1,0) + IF(BPR1_257 >0,1,0) + IF(BPR1_258 >0,1,0) + IF(BPR1_259 >0,1,0) + IF(BPR1_260 >0,1,0) + IF(BPR1_261 >0,1,0) + IF(BPR1_262 >0,1,0) + IF(BPR1_263 >0,1,0) + IF(BPR1_264 >0,1,0) + IF(BPR1_265 >0,1,0) + IF(BPR1_266 >0,1,0) + IF(BPR1_267 >0,1,0) + IF(BPR1_268 >0,1,0) + IF(BPR1_269 >0,1,0) + IF(BPR1_270 >0,1,0) + IF(BPR1_271 >0,1,0) + IF(BPR1_272 >0,1,0) + IF(BPR1_273 >0,1,0) + IF(BPR1_274 >0,1,0) + IF(BPR1_275 >0,1,0) + IF(BPR1_276 >0,1,0) + IF(BPR1_277 >0,1,0) + IF(BPR1_278 >0,1,0) + IF(BPR1_279 >0,1,0) + IF(BPR1_280 >0,1,0) + IF(BPR1_281 >0,1,0) + IF(BPR1_282 >0,1,0) + IF(BPR1_283 >0,1,0) + IF(BPR1_284 >0,1,0) + IF(BPR1_285 >0,1,0) + IF(BPR1_286 >0,1,0) + IF(BPR1_287 >0,1,0) + IF(BPR1_288 >0,1,0) + IF(BPR1_289 >0,1,0) + IF(BPR1_290 >0,1,0) + IF(BPR1_291 >0,1,0) + IF(BPR1_292 >0,1,0) + IF(BPR1_293 >0,1,0) + IF(BPR1_294 >0,1,0) + IF(BPR1_295 >0,1,0) + IF(BPR1_296 >0,1,0) + IF(BPR1_297 >0,1,0) + IF(BPR1_298 >0,1,0) + IF(BPR1_299 >0,1,0) + IF(BPR1_300 >0,1,0) + IF(BPR1_301 >0,1,0) + IF(BPR1_302 >0,1,0) + IF(BPR1_303 >0,1,0) + IF(BPR1_304 >0,1,0);
+   SELF.BP2 := IF(BPR2_1 >0,1,0) + IF(BPR2_2 >0,1,0) + IF(BPR2_3 >0,1,0) + IF(BPR2_4 >0,1,0) + IF(BPR2_5 >0,1,0) + IF(BPR2_6 >0,1,0) + IF(BPR2_7 >0,1,0) + IF(BPR2_8 >0,1,0) + IF(BPR2_9 >0,1,0) + IF(BPR2_10 >0,1,0) + IF(BPR2_11 >0,1,0) + IF(BPR2_12 >0,1,0) + IF(BPR2_13 >0,1,0) + IF(BPR2_14 >0,1,0) + IF(BPR2_15 >0,1,0) + IF(BPR2_16 >0,1,0) + IF(BPR2_17 >0,1,0) + IF(BPR2_18 >0,1,0) + IF(BPR2_19 >0,1,0) + IF(BPR2_20 >0,1,0) + IF(BPR2_21 >0,1,0) + IF(BPR2_22 >0,1,0) + IF(BPR2_23 >0,1,0) + IF(BPR2_24 >0,1,0) + IF(BPR2_25 >0,1,0) + IF(BPR2_26 >0,1,0) + IF(BPR2_27 >0,1,0) + IF(BPR2_28 >0,1,0) + IF(BPR2_29 >0,1,0) + IF(BPR2_30 >0,1,0) + IF(BPR2_31 >0,1,0) + IF(BPR2_32 >0,1,0) + IF(BPR2_33 >0,1,0) + IF(BPR2_34 >0,1,0) + IF(BPR2_35 >0,1,0) + IF(BPR2_36 >0,1,0) + IF(BPR2_37 >0,1,0) + IF(BPR2_38 >0,1,0) + IF(BPR2_39 >0,1,0) + IF(BPR2_40 >0,1,0) + IF(BPR2_41 >0,1,0) + IF(BPR2_42 >0,1,0) + IF(BPR2_43 >0,1,0) + IF(BPR2_44 >0,1,0) + IF(BPR2_45 >0,1,0) + IF(BPR2_46 >0,1,0) + IF(BPR2_47 >0,1,0) + IF(BPR2_48 >0,1,0) + IF(BPR2_49 >0,1,0) + IF(BPR2_50 >0,1,0) + IF(BPR2_51 >0,1,0) + IF(BPR2_52 >0,1,0) + IF(BPR2_53 >0,1,0) + IF(BPR2_54 >0,1,0) + IF(BPR2_55 >0,1,0) + IF(BPR2_56 >0,1,0) + IF(BPR2_57 >0,1,0) + IF(BPR2_58 >0,1,0) + IF(BPR2_59 >0,1,0) + IF(BPR2_60 >0,1,0) + IF(BPR2_61 >0,1,0) + IF(BPR2_62 >0,1,0) + IF(BPR2_63 >0,1,0) + IF(BPR2_64 >0,1,0) + IF(BPR2_65 >0,1,0) + IF(BPR2_66 >0,1,0) + IF(BPR2_67 >0,1,0) + IF(BPR2_68 >0,1,0) + IF(BPR2_69 >0,1,0) + IF(BPR2_70 >0,1,0) + IF(BPR2_71 >0,1,0) + IF(BPR2_72 >0,1,0) + IF(BPR2_73 >0,1,0) + IF(BPR2_74 >0,1,0) + IF(BPR2_75 >0,1,0) + IF(BPR2_76 >0,1,0) + IF(BPR2_77 >0,1,0) + IF(BPR2_78 >0,1,0) + IF(BPR2_79 >0,1,0) + IF(BPR2_80 >0,1,0) + IF(BPR2_81 >0,1,0) + IF(BPR2_82 >0,1,0) + IF(BPR2_83 >0,1,0) + IF(BPR2_84 >0,1,0) + IF(BPR2_85 >0,1,0) + IF(BPR2_86 >0,1,0) + IF(BPR2_87 >0,1,0) + IF(BPR2_88 >0,1,0) + IF(BPR2_89 >0,1,0) + IF(BPR2_90 >0,1,0) + IF(BPR2_91 >0,1,0) + IF(BPR2_92 >0,1,0) + IF(BPR2_93 >0,1,0) + IF(BPR2_94 >0,1,0) + IF(BPR2_95 >0,1,0) + IF(BPR2_96 >0,1,0) + IF(BPR2_97 >0,1,0) + IF(BPR2_98 >0,1,0) + IF(BPR2_99 >0,1,0) + IF(BPR2_100 >0,1,0) + IF(BPR2_101 >0,1,0) + IF(BPR2_102 >0,1,0) + IF(BPR2_103 >0,1,0) + IF(BPR2_104 >0,1,0) + IF(BPR2_105 >0,1,0) + IF(BPR2_106 >0,1,0) + IF(BPR2_107 >0,1,0) + IF(BPR2_108 >0,1,0) + IF(BPR2_109 >0,1,0) + IF(BPR2_110 >0,1,0) + IF(BPR2_111 >0,1,0) + IF(BPR2_112 >0,1,0) + IF(BPR2_113 >0,1,0) + IF(BPR2_114 >0,1,0) + IF(BPR2_115 >0,1,0) + IF(BPR2_116 >0,1,0) + IF(BPR2_117 >0,1,0) + IF(BPR2_118 >0,1,0) + IF(BPR2_119 >0,1,0) + IF(BPR2_120 >0,1,0) + IF(BPR2_121 >0,1,0) + IF(BPR2_122 >0,1,0) + IF(BPR2_123 >0,1,0) + IF(BPR2_124 >0,1,0) + IF(BPR2_125 >0,1,0) + IF(BPR2_126 >0,1,0) + IF(BPR2_127 >0,1,0) + IF(BPR2_128 >0,1,0) + IF(BPR2_129 >0,1,0) + IF(BPR2_130 >0,1,0) + IF(BPR2_131 >0,1,0) + IF(BPR2_132 >0,1,0) + IF(BPR2_133 >0,1,0) + IF(BPR2_134 >0,1,0) + IF(BPR2_135 >0,1,0) + IF(BPR2_136 >0,1,0) + IF(BPR2_137 >0,1,0) + IF(BPR2_138 >0,1,0) + IF(BPR2_139 >0,1,0) + IF(BPR2_140 >0,1,0) + IF(BPR2_141 >0,1,0) + IF(BPR2_142 >0,1,0) + IF(BPR2_143 >0,1,0) + IF(BPR2_144 >0,1,0) + IF(BPR2_145 >0,1,0) + IF(BPR2_146 >0,1,0) + IF(BPR2_147 >0,1,0) + IF(BPR2_148 >0,1,0) + IF(BPR2_149 >0,1,0) + IF(BPR2_150 >0,1,0) + IF(BPR2_151 >0,1,0) + IF(BPR2_152 >0,1,0) + IF(BPR2_153 >0,1,0) + IF(BPR2_154 >0,1,0) + IF(BPR2_155 >0,1,0) + IF(BPR2_156 >0,1,0) + IF(BPR2_157 >0,1,0) + IF(BPR2_158 >0,1,0) + IF(BPR2_159 >0,1,0) + IF(BPR2_160 >0,1,0) + IF(BPR2_161 >0,1,0) + IF(BPR2_162 >0,1,0) + IF(BPR2_163 >0,1,0) + IF(BPR2_164 >0,1,0) + IF(BPR2_165 >0,1,0) + IF(BPR2_166 >0,1,0) + IF(BPR2_167 >0,1,0) + IF(BPR2_168 >0,1,0) + IF(BPR2_169 >0,1,0) + IF(BPR2_170 >0,1,0) + IF(BPR2_171 >0,1,0) + IF(BPR2_172 >0,1,0) + IF(BPR2_173 >0,1,0) + IF(BPR2_174 >0,1,0) + IF(BPR2_175 >0,1,0) + IF(BPR2_176 >0,1,0) + IF(BPR2_177 >0,1,0) + IF(BPR2_178 >0,1,0) + IF(BPR2_179 >0,1,0) + IF(BPR2_180 >0,1,0) + IF(BPR2_181 >0,1,0) + IF(BPR2_182 >0,1,0) + IF(BPR2_183 >0,1,0) + IF(BPR2_184 >0,1,0) + IF(BPR2_185 >0,1,0) + IF(BPR2_186 >0,1,0) + IF(BPR2_187 >0,1,0) + IF(BPR2_188 >0,1,0) + IF(BPR2_189 >0,1,0) + IF(BPR2_190 >0,1,0) + IF(BPR2_191 >0,1,0) + IF(BPR2_192 >0,1,0) + IF(BPR2_193 >0,1,0) + IF(BPR2_194 >0,1,0) + IF(BPR2_195 >0,1,0) + IF(BPR2_196 >0,1,0) + IF(BPR2_197 >0,1,0) + IF(BPR2_198 >0,1,0) + IF(BPR2_199 >0,1,0) + IF(BPR2_200 >0,1,0) + IF(BPR2_201 >0,1,0) + IF(BPR2_202 >0,1,0) + IF(BPR2_203 >0,1,0) + IF(BPR2_204 >0,1,0) + IF(BPR2_205 >0,1,0) + IF(BPR2_206 >0,1,0) + IF(BPR2_207 >0,1,0) + IF(BPR2_208 >0,1,0) + IF(BPR2_209 >0,1,0) + IF(BPR2_210 >0,1,0) + IF(BPR2_211 >0,1,0) + IF(BPR2_212 >0,1,0) + IF(BPR2_213 >0,1,0) + IF(BPR2_214 >0,1,0) + IF(BPR2_215 >0,1,0) + IF(BPR2_216 >0,1,0) + IF(BPR2_217 >0,1,0) + IF(BPR2_218 >0,1,0) + IF(BPR2_219 >0,1,0) + IF(BPR2_220 >0,1,0) + IF(BPR2_221 >0,1,0) + IF(BPR2_222 >0,1,0) + IF(BPR2_223 >0,1,0) + IF(BPR2_224 >0,1,0) + IF(BPR2_225 >0,1,0) + IF(BPR2_226 >0,1,0) + IF(BPR2_227 >0,1,0) + IF(BPR2_228 >0,1,0) + IF(BPR2_229 >0,1,0) + IF(BPR2_230 >0,1,0) + IF(BPR2_231 >0,1,0) + IF(BPR2_232 >0,1,0) + IF(BPR2_233 >0,1,0) + IF(BPR2_234 >0,1,0) + IF(BPR2_235 >0,1,0) + IF(BPR2_236 >0,1,0) + IF(BPR2_237 >0,1,0) + IF(BPR2_238 >0,1,0) + IF(BPR2_239 >0,1,0) + IF(BPR2_240 >0,1,0) + IF(BPR2_241 >0,1,0) + IF(BPR2_242 >0,1,0) + IF(BPR2_243 >0,1,0) + IF(BPR2_244 >0,1,0) + IF(BPR2_245 >0,1,0) + IF(BPR2_246 >0,1,0) + IF(BPR2_247 >0,1,0) + IF(BPR2_248 >0,1,0) + IF(BPR2_249 >0,1,0) + IF(BPR2_250 >0,1,0) + IF(BPR2_251 >0,1,0) + IF(BPR2_252 >0,1,0) + IF(BPR2_253 >0,1,0) + IF(BPR2_254 >0,1,0) + IF(BPR2_255 >0,1,0) + IF(BPR2_256 >0,1,0) + IF(BPR2_257 >0,1,0) + IF(BPR2_258 >0,1,0) + IF(BPR2_259 >0,1,0) + IF(BPR2_260 >0,1,0) + IF(BPR2_261 >0,1,0) + IF(BPR2_262 >0,1,0) + IF(BPR2_263 >0,1,0) + IF(BPR2_264 >0,1,0) + IF(BPR2_265 >0,1,0) + IF(BPR2_266 >0,1,0) + IF(BPR2_267 >0,1,0) + IF(BPR2_268 >0,1,0) + IF(BPR2_269 >0,1,0) + IF(BPR2_270 >0,1,0) + IF(BPR2_271 >0,1,0) + IF(BPR2_272 >0,1,0) + IF(BPR2_273 >0,1,0) + IF(BPR2_274 >0,1,0) + IF(BPR2_275 >0,1,0) + IF(BPR2_276 >0,1,0) + IF(BPR2_277 >0,1,0) + IF(BPR2_278 >0,1,0) + IF(BPR2_279 >0,1,0) + IF(BPR2_280 >0,1,0) + IF(BPR2_281 >0,1,0) + IF(BPR2_282 >0,1,0) + IF(BPR2_283 >0,1,0) + IF(BPR2_284 >0,1,0) + IF(BPR2_285 >0,1,0) + IF(BPR2_286 >0,1,0) + IF(BPR2_287 >0,1,0) + IF(BPR2_288 >0,1,0) + IF(BPR2_289 >0,1,0) + IF(BPR2_290 >0,1,0) + IF(BPR2_291 >0,1,0) + IF(BPR2_292 >0,1,0) + IF(BPR2_293 >0,1,0) + IF(BPR2_294 >0,1,0) + IF(BPR2_295 >0,1,0) + IF(BPR2_296 >0,1,0) + IF(BPR2_297 >0,1,0) + IF(BPR2_298 >0,1,0) + IF(BPR2_299 >0,1,0) + IF(BPR2_300 >0,1,0) + IF(BPR2_301 >0,1,0) + IF(BPR2_302 >0,1,0) + IF(BPR2_303 >0,1,0) + IF(BPR2_304 >0,1,0) + IF(BPR2_305 >0,1,0) + IF(BPR2_306 >0,1,0) + IF(BPR2_307 >0,1,0) + IF(BPR2_308 >0,1,0) + IF(BPR2_309 >0,1,0) + IF(BPR2_310 >0,1,0) + IF(BPR2_311 >0,1,0) + IF(BPR2_312 >0,1,0) + IF(BPR2_313 >0,1,0) + IF(BPR2_314 >0,1,0) + IF(BPR2_315 >0,1,0) + IF(BPR2_316 >0,1,0) + IF(BPR2_317 >0,1,0) + IF(BPR2_318 >0,1,0) + IF(BPR2_319 >0,1,0) + IF(BPR2_320 >0,1,0) + IF(BPR2_321 >0,1,0) + IF(BPR2_322 >0,1,0) + IF(BPR2_323 >0,1,0) + IF(BPR2_324 >0,1,0) + IF(BPR2_325 >0,1,0) + IF(BPR2_326 >0,1,0) + IF(BPR2_327 >0,1,0) + IF(BPR2_328 >0,1,0) + IF(BPR2_329 >0,1,0) + IF(BPR2_330 >0,1,0) + IF(BPR2_331 >0,1,0) + IF(BPR2_332 >0,1,0) + IF(BPR2_333 >0,1,0) + IF(BPR2_334 >0,1,0) + IF(BPR2_335 >0,1,0) + IF(BPR2_336 >0,1,0) + IF(BPR2_337 >0,1,0) + IF(BPR2_338 >0,1,0) + IF(BPR2_339 >0,1,0) + IF(BPR2_340 >0,1,0) + IF(BPR2_341 >0,1,0) + IF(BPR2_342 >0,1,0) + IF(BPR2_343 >0,1,0) + IF(BPR2_344 >0,1,0) + IF(BPR2_345 >0,1,0) + IF(BPR2_346 >0,1,0) + IF(BPR2_347 >0,1,0) + IF(BPR2_348 >0,1,0) + IF(BPR2_349 >0,1,0) + IF(BPR2_350 >0,1,0) + IF(BPR2_351 >0,1,0) + IF(BPR2_352 >0,1,0) + IF(BPR2_353 >0,1,0) + IF(BPR2_354 >0,1,0) + IF(BPR2_355 >0,1,0) + IF(BPR2_356 >0,1,0) + IF(BPR2_357 >0,1,0) + IF(BPR2_358 >0,1,0) + IF(BPR2_359 >0,1,0) + IF(BPR2_360 >0,1,0) + IF(BPR2_361 >0,1,0) + IF(BPR2_362 >0,1,0) + IF(BPR2_363 >0,1,0) + IF(BPR2_364 >0,1,0) + IF(BPR2_365 >0,1,0) + IF(BPR2_366 >0,1,0) + IF(BPR2_367 >0,1,0) + IF(BPR2_368 >0,1,0) + IF(BPR2_369 >0,1,0) + IF(BPR2_370 >0,1,0) + IF(BPR2_371 >0,1,0) + IF(BPR2_372 >0,1,0) + IF(BPR2_373 >0,1,0) + IF(BPR2_374 >0,1,0) + IF(BPR2_375 >0,1,0) + IF(BPR2_376 >0,1,0) + IF(BPR2_377 >0,1,0) + IF(BPR2_378 >0,1,0) + IF(BPR2_379 >0,1,0) + IF(BPR2_380 >0,1,0) + IF(BPR2_381 >0,1,0) + IF(BPR2_382 >0,1,0) + IF(BPR2_383 >0,1,0) + IF(BPR2_384 >0,1,0) + IF(BPR2_385 >0,1,0) + IF(BPR2_386 >0,1,0) + IF(BPR2_387 >0,1,0) + IF(BPR2_388 >0,1,0);
+
+   SELF.BPV1 := MAX(BPR1_1,BPR1_2,BPR1_3,BPR1_4,BPR1_5,BPR1_6,BPR1_7,BPR1_8,BPR1_9,BPR1_10,BPR1_11,BPR1_12,BPR1_13,BPR1_14,BPR1_15,BPR1_16,BPR1_17,BPR1_18,BPR1_19,BPR1_20,BPR1_21,BPR1_22,BPR1_23,BPR1_24,BPR1_25,BPR1_26,BPR1_27,BPR1_28,BPR1_29,BPR1_30,BPR1_31,BPR1_32,BPR1_33,BPR1_34,BPR1_35,BPR1_36,BPR1_37,BPR1_38,BPR1_39,BPR1_40,BPR1_41,BPR1_42,BPR1_43,BPR1_44,BPR1_45,BPR1_46,BPR1_47,BPR1_48,BPR1_49,BPR1_50,BPR1_51,BPR1_52,BPR1_53,BPR1_54,BPR1_55,BPR1_56,BPR1_57,BPR1_58,BPR1_59,BPR1_60,BPR1_61,BPR1_62,BPR1_63,BPR1_64,BPR1_65,BPR1_66,BPR1_67,BPR1_68,BPR1_69,BPR1_70,BPR1_71,BPR1_72,BPR1_73,BPR1_74,BPR1_75,BPR1_76,BPR1_77,BPR1_78,BPR1_79,BPR1_80,BPR1_81,BPR1_82,BPR1_83,BPR1_84,BPR1_85,BPR1_86,BPR1_87,BPR1_88,BPR1_89,BPR1_90,BPR1_91,BPR1_92,BPR1_93,BPR1_94,BPR1_95,BPR1_96,BPR1_97,BPR1_98,BPR1_99,BPR1_100,BPR1_101,BPR1_102,BPR1_103,BPR1_104,BPR1_105,BPR1_106,BPR1_107,BPR1_108,BPR1_109,BPR1_110,BPR1_111,BPR1_112,BPR1_113,BPR1_114,BPR1_115,BPR1_116,BPR1_117,BPR1_118,BPR1_119,BPR1_120,BPR1_121,BPR1_122,BPR1_123,BPR1_124,BPR1_125,BPR1_126,BPR1_127,BPR1_128,BPR1_129,BPR1_130,BPR1_131,BPR1_132,BPR1_133,BPR1_134,BPR1_135,BPR1_136,BPR1_137,BPR1_138,BPR1_139,BPR1_140,BPR1_141,BPR1_142,BPR1_143,BPR1_144,BPR1_145,BPR1_146,BPR1_147,BPR1_148,BPR1_149,BPR1_150,BPR1_151,BPR1_152,BPR1_153,BPR1_154,BPR1_155,BPR1_156,BPR1_157,BPR1_158,BPR1_159,BPR1_160,BPR1_161,BPR1_162,BPR1_163,BPR1_164,BPR1_165,BPR1_166,BPR1_167,BPR1_168,BPR1_169,BPR1_170,BPR1_171,BPR1_172,BPR1_173,BPR1_174,BPR1_175,BPR1_176,BPR1_177,BPR1_178,BPR1_179,BPR1_180,BPR1_181,BPR1_182,BPR1_183,BPR1_184,BPR1_185,BPR1_186,BPR1_187,BPR1_188,BPR1_189,BPR1_190,BPR1_191,BPR1_192,BPR1_193,BPR1_194,BPR1_195,BPR1_196,BPR1_197,BPR1_198,BPR1_199,BPR1_200,BPR1_201,BPR1_202,BPR1_203,BPR1_204,BPR1_205,BPR1_206,BPR1_207,BPR1_208,BPR1_209,BPR1_210,BPR1_211,BPR1_212,BPR1_213,BPR1_214,BPR1_215,BPR1_216,BPR1_217,BPR1_218,BPR1_219,BPR1_220,BPR1_221,BPR1_222,BPR1_223,BPR1_224,BPR1_225,BPR1_226,BPR1_227,BPR1_228,BPR1_229,BPR1_230,BPR1_231,BPR1_232,BPR1_233,BPR1_234,BPR1_235,BPR1_236,BPR1_237,BPR1_238,BPR1_239,BPR1_240,BPR1_241,BPR1_242,BPR1_243,BPR1_244,BPR1_245,BPR1_246,BPR1_247,BPR1_248,BPR1_249,BPR1_250,BPR1_251,BPR1_252,BPR1_253,BPR1_254,BPR1_255,BPR1_256,BPR1_257,BPR1_258,BPR1_259,BPR1_260,BPR1_261,BPR1_262,BPR1_263,BPR1_264,BPR1_265,BPR1_266,BPR1_267,BPR1_268,BPR1_269,BPR1_270,BPR1_271,BPR1_272,BPR1_273,BPR1_274,BPR1_275,BPR1_276,BPR1_277,BPR1_278,BPR1_279,BPR1_280,BPR1_281,BPR1_282,BPR1_283,BPR1_284,BPR1_285,BPR1_286,BPR1_287,BPR1_288,BPR1_289,BPR1_290,BPR1_291,BPR1_292,BPR1_293,BPR1_294,BPR1_295,BPR1_296,BPR1_297,BPR1_298,BPR1_299,BPR1_300,BPR1_301,BPR1_302,BPR1_303,BPR1_304);
+    self.isSeMO_Minor := IF(SeMO_Age_In_Years < 18 or L.AGE_IN_YEARS < 18, 1,0);
+    self.TransactionID := (string)L.seq;
+    self.do_Model1 := (BOOLEAN)TRUE;
+   SELF := L;
+   // SELF := [];
+   END;
+result := PROJECT(ds, doXform(LEFT));
+RETURN result;
+ENDMACRO;
+
+
 Export Models.Layouts_Healthcare_Core.Final_Output_Layout OPTION_1_SE_A(Models.Layouts_Healthcare_Core.layout_SocioEconomic_LI_PB_combined_flat Le) := TRANSFORM
    self.acctno                          := (string)Le.acctno;
    self.seq                             := (string)Le.seq;
@@ -7740,7 +8475,7 @@ EXPORT Add_LexID_ADLScore(DS_LEFT, DS_RIGHT, outRecord) := FUNCTIONMACRO
                   transform(outRecord,
                   self.Lexid := (string) right.did;
                   self.ADLScore := (string) right.score;
-                  self := left),left outer, keep(1000), atmost(1));
+                  self := left),left outer, keep(1), atmost(1));
    RETURN result;
 ENDMACRO;
 
@@ -7748,7 +8483,7 @@ EXPORT Add_ADLScore(DS_LEFT, DS_RIGHT, outRecord) := FUNCTIONMACRO
    result := Join(DS_LEFT, DS_RIGHT, left.seq=(string)right.seq, 
                   transform(outRecord,
                   self.ADLScore := (string) right.score;
-                  self := left),left outer, keep(1000), atmost(1));
+                  self := left),left outer, keep(1), atmost(1));
    RETURN result;
 ENDMACRO;
 
@@ -7770,7 +8505,7 @@ EXPORT Add_SERS_Score_RD(DS_LEFT, DS_RIGHT, outRecord) := FUNCTIONMACRO
                   self.RAR_Driver_Lo1 := (string) IF(right.RAR_Driver_Lo1 <>'', right.RAR_Driver_Lo1,'N/A');
                   self.RAR_Driver_Lo2 := (string) IF(right.RAR_Driver_Lo2 <>'', right.RAR_Driver_Lo2,'N/A');
                   self.RAR_Driver_Lo3 := (string) IF(right.RAR_Driver_Lo3 <>'', right.RAR_Driver_Lo3,'N/A');  
-                  self := [];),left outer, keep(1000), atmost(1));
+                  self := [];),left outer, keep(1), atmost(1));
    RETURN result;
 ENDMACRO;
 
@@ -7803,7 +8538,7 @@ EXPORT Add_SERS_Score_RD_DEBUG(DS_LEFT, DS_RIGHT, outRecord) := FUNCTIONMACRO
                   SELF.isSeRsExcludedDiag           := (String) Right.isSeRsExcludedDiag;
                   SELF.isSeRsMinor                  := (String) Right.isSeRsMinor;
                   SELF.isSeRsM1ModelUsed            := (String) Right.isSeRsM1ModelUsed;
-                  self := [];),left outer, keep(1000), atmost(1));
+                  self := [];),left outer, keep(1), atmost(1));
    RETURN result;
 ENDMACRO;
 
@@ -7816,7 +8551,7 @@ EXPORT Add_SEMA_RD(DS_LEFT, DS_RIGHT, outRecord) := FUNCTIONMACRO
                      self.MA_Driver_Lo1 := right.MA_Driver_Lo1;
                      self.MA_Driver_Lo2 := right.MA_Driver_Lo2;
                      self.MA_Driver_Lo3 := right.MA_Driver_Lo3;
-                     self := left;),left outer, keep(1000), atmost(1));
+                     self := left;),left outer, keep(1), atmost(1));
    RETURN result;
 ENDMACRO;
 
@@ -7831,10 +8566,24 @@ EXPORT Add_SEMA_Score_RD(DS_LEFT, DS_RIGHT, outRecord) := FUNCTIONMACRO
                   self.MA_Driver_Lo1 := (string) IF(right.MA_Driver_Lo1 <>'', right.MA_Driver_Lo1,'N/A');
                   self.MA_Driver_Lo2 := (string) IF(right.MA_Driver_Lo2 <>'', right.MA_Driver_Lo2,'N/A');
                   self.MA_Driver_Lo3 := (string) IF(right.MA_Driver_Lo3 <>'', right.MA_Driver_Lo3,'N/A');
-                  self := left;),left outer, keep(1000), atmost(1));
+                  self := left;),left outer, keep(1), atmost(1));
    RETURN result;
 ENDMACRO;
 
+EXPORT Add_SEMO_Score_RD(DS_LEFT, DS_RIGHT, outRecord) := FUNCTIONMACRO
+   result := Join(DS_LEFT, DS_RIGHT, left.seq=(string)right.seq, 
+                  transform(outRecord,
+                  self.SeMO_Raw_Score := (string) IF(right.SeMO_Raw_Score <>'', right.SeMO_Raw_Score,'N/A');
+                  self.SeMO_Score     := (string) IF(right.SeMO_Score <>'', right.SeMO_Score,'N/A');
+                  self.MO_Driver_Hi1 := (string) IF(right.MO_Driver_Hi1 <>'', right.MO_Driver_Hi1,'N/A');
+                  self.MO_Driver_Hi2 := (string) IF(right.MO_Driver_Hi2 <>'', right.MO_Driver_Hi2,'N/A');
+                  self.MO_Driver_Hi3 := (string) IF(right.MO_Driver_Hi3 <>'', right.MO_Driver_Hi3,'N/A');
+                  self.MO_Driver_Lo1 := (string) IF(right.MO_Driver_Lo1 <>'', right.MO_Driver_Lo1,'N/A');
+                  self.MO_Driver_Lo2 := (string) IF(right.MO_Driver_Lo2 <>'', right.MO_Driver_Lo2,'N/A');
+                  self.MO_Driver_Lo3 := (string) IF(right.MO_Driver_Lo3 <>'', right.MO_Driver_Lo3,'N/A');
+                  self := left;),left outer, keep(1), atmost(1));
+   RETURN result;
+ENDMACRO;
 
 EXPORT getSeRS_M0_M1_RiskDrivers(ds) := FUNCTIONMACRO 
    Models.Layouts_Healthcare_Core.RiskDrivers_Normalized_Attributes_Layout NormIt(TYPEOF(RECORDOF(ds)) L, INTEGER C) := TRANSFORM
@@ -8631,6 +9380,7 @@ EXPORT getSeMA_RiskDrivers(ds) := FUNCTIONMACRO
       (REAL8) L.do_Model1,
       (REAL8) L.SeMA_Raw_Score
       );
+      
       SELF.AttributeName := CHOOSE(C,
       'seq',
       'AcctNo',
@@ -8785,7 +9535,7 @@ EXPORT getSeMA_RiskDrivers(ds) := FUNCTIONMACRO
    Models.Layouts_Healthcare_Core.RiskDrivers_Attributes_Weight_Layout ComputeAttributeWeights(Normalized_SeMA_Attributes L, Models.Healthcare_SocioEconomic_RD_Coefficients_Core.SEMA_RD_COEFFICIENTS_DS R) := TRANSFORM
          SELF.seq := L.seq;
          SELF.Raw_Score := L.Raw_Score;
-         SELF.CATEGORY := R.CATEGORY; // TODO: Do I need to output this? or will the report do a lookup later. Lookup seems to be better to save space. 
+         SELF.CATEGORY := R.CATEGORY;
          SELF.RD_CATEGORY := R.RD_CATEGORY;
          SELF.AttributeWeight := If(L.Raw_Score>= R.START_GT_EQ AND L.Raw_Score< R.STOP_LT,  (REAL8)L.AttributeValue * R.COEFFICIENT,0);
          SELF := L;
@@ -8856,6 +9606,367 @@ EXPORT getSeMA_RiskDrivers(ds) := FUNCTIONMACRO
                                        Denorm_RD_LO(LEFT, RIGHT));
    RETURN Risk_Drivers_DS_HI_LO;
 ENDMACRO;
+      
+EXPORT getSeMO_RiskDrivers(ds) := FUNCTIONMACRO 
+   Models.Layouts_Healthcare_Core.RiskDrivers_Normalized_Attributes_Layout NormIt(TYPEOF(RECORDOF(ds)) L, INTEGER C) := TRANSFORM
+      SELF := L;
+      SELF.Raw_Score := L.SeMO_Raw_Score;
+      //Using the model input with raw score ds layout.
+      SELF.AttributeValue := CHOOSE(C,
+      (REAL8) L. seq,
+      (REAL8) L. AcctNo,
+      (REAL8) L. DOB,
+      (REAL8) L. HistorydateYYYYMM,
+      (REAL8) L. LexID,
+      (REAL8) L.AGE_IN_YEARS,
+      (REAL8) L.FEMALE,
+      (REAL8) L.AgeOldestRecord,
+      (REAL8) L.SubjectAddrCount,
+      (REAL8) L.SSNAddrCount,
+      (REAL8) L.InputAddrPhoneCount,
+      (REAL8) L.LastNameChangeAge,
+      (REAL8) L.SFDUAddrIdentitiesCount_24,
+      (REAL8) L.SFDUAddrSSNCount,
+      (REAL8) L.SSNLowIssueAge,
+      (REAL8) L.SSNHighIssueAge,
+      (REAL8) L.SSNIssueState,
+      (REAL8) L.RelativesCount,
+      (REAL8) L.RelativesPropOwnedTaxTotal,
+      (REAL8) L.InputAddrAgeOldestRecord,
+      (REAL8) L.InputAddrLenOfRes,
+      (REAL8) L.InputAddrAgeLastSale,
+      (REAL8) L.InputAddrTaxValue,
+      (REAL8) L.InputAddrMedianIncome,
+      (REAL8) L.InputAddrMedianValue,
+      (REAL8) L.InputAddrMurderIndex,
+      (REAL8) L.InputAddrCarTheftIndex,
+      (REAL8) L.InputAddrBurglaryIndex,
+      (REAL8) L.InputAddrCrimeIndex,
+      (REAL8) L.InputAddrVacantPropCount,
+      (REAL8) L.InputAddrBusinessCount,
+      (REAL8) L.InputAddrMultiFamilyCount,
+      (REAL8) L.CurrAddrAgeOldestRecord,
+      (REAL8) L.CurrAddrLenOfRes,
+      (REAL8) L.CurrAddrAgeLastSale,
+      (REAL8) L.CurrAddrAVMValue,
+      (REAL8) L.CurrAddrAVMValue12,
+      (REAL8) L.CurrAddrAVMValue60,
+      (REAL8) L.CurrAddrCountyIndex,
+      (REAL8) L.CurrAddrTractIndex,
+      (REAL8) L.CurrAddrMedianIncome,
+      (REAL8) L.CurrAddrMedianValue,
+      (REAL8) L.CurrAddrMurderIndex,
+      (REAL8) L.CurrAddrCarTheftIndex,
+      (REAL8) L.CurrAddrBurglaryIndex,
+      (REAL8) L.CurrAddrBurglaryIndex_12,
+      (REAL8) L.CurrAddrBurglaryIndex_24,
+      (REAL8) L.CurrAddrCrimeIndex,
+      (REAL8) L.PrevAddrAgeOldestRecord,
+      (REAL8) L.PrevAddrAgeNewestRecord,
+      (REAL8) L.PrevAddrLenOfRes,
+      (REAL8) L.PrevAddrAgeLastSale,
+      (REAL8) L.PrevAddrAVMValue,
+      (REAL8) L.PrevAddrCountyIndex,
+      (REAL8) L.PrevAddrTractIndex,
+      (REAL8) L.PrevAddrBlockIndex,
+      (REAL8) L.PrevAddrMedianIncome,
+      (REAL8) L.PrevAddrMedianValue,
+      (REAL8) L.PrevAddrMurderIndex,
+      (REAL8) L.PrevAddrCarTheftIndex,
+      (REAL8) L.PrevAddrBurglaryIndex,
+      (REAL8) L.PrevAddrCrimeIndex,
+      (REAL8) L.AddrMostRecentDistance,
+      (REAL8) L.AddrMostRecentMoveAge,
+      (REAL8) L.AddrMostRecentIncomeDiff,
+      (REAL8) L.AddrMostRecentValueDIff,
+      (REAL8) L.AddrMostRecentCrimeDiff,
+      (REAL8) L.AddrRecentEconTrajectory,
+      (REAL8) L.EstimatedAnnualIncome,
+      (REAL8) L.EstimatedAnnualIncome_12,
+      (REAL8) L.EstimatedAnnualIncome_24,
+      (REAL8) L.PropAgeOldestPurchase,
+      (REAL8) L.PropAgeNewestPurchase,
+      (REAL8) L.BusinessInputAddrCount,
+      (REAL8) L.DerogAge,
+      (REAL8) L.LienFiledAge,
+      (REAL8) L.NonDerogCount,
+      (REAL8) L.PRSearchLocateCount,
+      (REAL8) L.PRSearchOtherCount,
+      (REAL8) L.InputPhoneServiceType,
+      (REAL8) L.PhoneEDAAgeOldestRecord,
+      (REAL8) L.PhoneEDAAgeNewestRecord,
+      (REAL8) L.PhoneOtherAgeOldestRecord,
+      (REAL8) L.PhoneOtherAgeNewestRecord,
+      (REAL8) L.SourceRiskLevel,
+      (REAL8) L.CorrelationRiskLevel,
+      (REAL8) L.DivSSNAddrMSourceCount,
+      (REAL8) L.DivAddrIdentityCount,
+      (REAL8) L.DivAddrIdentityMSourceCount,
+      (REAL8) L.DivAddrSSNCount,
+      (REAL8) L.DivAddrSSNMSourceCount,
+      (REAL8) L.SearchSSNSearchCount,
+      (REAL8) L.SearchAddrSearchCount,
+      (REAL8) L.v1_ProspectTimeOnRecord,
+      (REAL8) L.v1_ProspectTimeLastUpdate,
+      (REAL8) L.v1_ProspectAge,
+      (REAL8) L.v1_PropCurrOwnedAssessedTtl,
+      (REAL8) L.v1_PropCurrOwnedAVMTtl,
+      (REAL8) L.v1_LifeEvTimeLastMove,
+      (REAL8) L.v1_LifeEvTimeFirstAssetPurchase,
+      (REAL8) L.v1_LifeEvTimeLastAssetPurchase,
+      (REAL8) L.v1_ResCurrAVMValue12Mo,
+      (REAL8) L.v1_ResCurrAVMValue60Mo,
+      (REAL8) L.v1_ResCurrAVMRatioDiff60Mo,
+      (REAL8) L.v1_ResCurrAVMCntyRatio,
+      (REAL8) L.v1_ResCurrAVMTractRatio,
+      (REAL8) L.v1_ResCurrAVMBlockRatio,
+      (REAL8) L.v1_ResInputAVMRatioDiff60Mo,
+      (REAL8) L.v1_ResInputAVMCntyRatio,
+      (REAL8) L.v1_CrtRecTimeNewest,
+      (REAL8) L.v1_CrtRecMsdmeanCnt,
+      (REAL8) L.v1_CrtRecMsdmeanTimeNewest,
+      (REAL8) L.v1_HHPropCurrAVMHighest,
+      (REAL8) L.v1_RaAMmbrCnt,
+      (REAL8) L.v1_RaAPropCurrOwnerMmbrCnt,
+      (REAL8) L.v1_RaAPropOwnerAVMHighest,
+      (REAL8) L.v1_RaAPropOwnerAVMMed,
+      (REAL8) L.v1_RaACrtRecMmbrCnt,
+      (REAL8) L.v1_RaACrtRecLienJudgMmbrCnt,
+      (REAL8) L.v1_RaACrtRecLienJudgAmtMax,
+      (REAL8) L.P_Time_First_Last_Purchase,
+      (REAL8) L.P_EstimatedHHIncomePerCapita,
+      (REAL8) L.EstIncome0_1,
+      (REAL8) L.EstIncome0_2,
+      (REAL8) L.EstIncome1_2,
+      (REAL8) L.EstIncome0_1_Pcnt,
+      (REAL8) L.EstIncome0_2_Pcnt,
+      (REAL8) L.PropTaxPerRelative,
+      (REAL8) L.AVGSTATECOST,
+      (REAL8) L.AG_Pred_Mot,
+      (REAL8) L.BP1,
+      (REAL8) L.BPV1,
+      (REAL8) L.BP2,
+      (REAL8) L.isSEMO_Minor,
+      (REAL8) L.TransactionID,
+      (REAL8) L.do_Model1,
+      (REAL8) L.SeMO_Raw_Score
+      );    
+      SELF.AttributeName := CHOOSE(C,
+      'seq',
+      'AcctNo',
+      'DOB',
+      'HistorydateYYYYMM',
+      'LexID',
+      'AGE_IN_YEARS',
+      'FEMALE',
+      'AgeOldestRecord',
+      'SubjectAddrCount',
+      'SSNAddrCount',
+      'InputAddrPhoneCount',
+      'LastNameChangeAge',
+      'SFDUAddrIdentitiesCount_24',
+      'SFDUAddrSSNCount',
+      'SSNLowIssueAge',
+      'SSNHighIssueAge',
+      'SSNIssueState',
+      'RelativesCount',
+      'RelativesPropOwnedTaxTotal',
+      'InputAddrAgeOldestRecord',
+      'InputAddrLenOfRes',
+      'InputAddrAgeLastSale',
+      'InputAddrTaxValue',
+      'InputAddrMedianIncome',
+      'InputAddrMedianValue',
+      'InputAddrMurderIndex',
+      'InputAddrCarTheftIndex',
+      'InputAddrBurglaryIndex',
+      'InputAddrCrimeIndex',
+      'InputAddrVacantPropCount',
+      'InputAddrBusinessCount',
+      'InputAddrMultiFamilyCount',
+      'CurrAddrAgeOldestRecord',
+      'CurrAddrLenOfRes',
+      'CurrAddrAgeLastSale',
+      'CurrAddrAVMValue',
+      'CurrAddrAVMValue12',
+      'CurrAddrAVMValue60',
+      'CurrAddrCountyIndex',
+      'CurrAddrTractIndex',
+      'CurrAddrMedianIncome',
+      'CurrAddrMedianValue',
+      'CurrAddrMurderIndex',
+      'CurrAddrCarTheftIndex',
+      'CurrAddrBurglaryIndex',
+      'CurrAddrBurglaryIndex_12',
+      'CurrAddrBurglaryIndex_24',
+      'CurrAddrCrimeIndex',
+      'PrevAddrAgeOldestRecord',
+      'PrevAddrAgeNewestRecord',
+      'PrevAddrLenOfRes',
+      'PrevAddrAgeLastSale',
+      'PrevAddrAVMValue',
+      'PrevAddrCountyIndex',
+      'PrevAddrTractIndex',
+      'PrevAddrBlockIndex',
+      'PrevAddrMedianIncome',
+      'PrevAddrMedianValue',
+      'PrevAddrMurderIndex',
+      'PrevAddrCarTheftIndex',
+      'PrevAddrBurglaryIndex',
+      'PrevAddrCrimeIndex',
+      'AddrMostRecentDistance',
+      'AddrMostRecentMoveAge',
+      'AddrMostRecentIncomeDiff',
+      'AddrMostRecentValueDIff',
+      'AddrMostRecentCrimeDiff',
+      'AddrRecentEconTrajectory',
+      'EstimatedAnnualIncome',
+      'EstimatedAnnualIncome_12',
+      'EstimatedAnnualIncome_24',
+      'PropAgeOldestPurchase',
+      'PropAgeNewestPurchase',
+      'BusinessInputAddrCount',
+      'DerogAge',
+      'LienFiledAge',
+      'NonDerogCount',
+      'PRSearchLocateCount',
+      'PRSearchOtherCount',
+      'InputPhoneServiceType',
+      'PhoneEDAAgeOldestRecord',
+      'PhoneEDAAgeNewestRecord',
+      'PhoneOtherAgeOldestRecord',
+      'PhoneOtherAgeNewestRecord',
+      'SourceRiskLevel',
+      'CorrelationRiskLevel',
+      'DivSSNAddrMSourceCount',
+      'DivAddrIdentityCount',
+      'DivAddrIdentityMSourceCount',
+      'DivAddrSSNCount',
+      'DivAddrSSNMSourceCount',
+      'SearchSSNSearchCount',
+      'SearchAddrSearchCount',
+      'v1_ProspectTimeOnRecord',
+      'v1_ProspectTimeLastUpdate',
+      'v1_ProspectAge',
+      'v1_PropCurrOwnedAssessedTtl',
+      'v1_PropCurrOwnedAVMTtl',
+      'v1_LifeEvTimeLastMove',
+      'v1_LifeEvTimeFirstAssetPurchase',
+      'v1_LifeEvTimeLastAssetPurchase',
+      'v1_ResCurrAVMValue12Mo',
+      'v1_ResCurrAVMValue60Mo',
+      'v1_ResCurrAVMRatioDiff60Mo',
+      'v1_ResCurrAVMCntyRatio',
+      'v1_ResCurrAVMTractRatio',
+      'v1_ResCurrAVMBlockRatio',
+      'v1_ResInputAVMRatioDiff60Mo',
+      'v1_ResInputAVMCntyRatio',
+      'v1_CrtRecTimeNewest',
+      'v1_CrtRecMsdmeanCnt',
+      'v1_CrtRecMsdmeanTimeNewest',
+      'v1_HHPropCurrAVMHighest',
+      'v1_RaAMmbrCnt',
+      'v1_RaAPropCurrOwnerMmbrCnt',
+      'v1_RaAPropOwnerAVMHighest',
+      'v1_RaAPropOwnerAVMMed',
+      'v1_RaACrtRecMmbrCnt',
+      'v1_RaACrtRecLienJudgMmbrCnt',
+      'v1_RaACrtRecLienJudgAmtMax',
+      'P_Time_First_Last_Purchase',
+      'P_EstimatedHHIncomePerCapita',
+      'EstIncome0_1',
+      'EstIncome0_2',
+      'EstIncome1_2',
+      'EstIncome0_1_Pcnt',
+      'EstIncome0_2_Pcnt',
+      'PropTaxPerRelative',
+      'AVGSTATECOST',
+      'AG_Pred_Mot',
+      'BP1',
+      'BPV1',
+      'BP2',
+      'isSEMO_Minor',
+      'TransactionID',
+      'do_Model1',
+      'SeMO_Raw_Score'
+      );
+   END;
+      Normalized_SeMO_Attributes := NORMALIZE(ds, 137,NormIt(LEFT, COUNTER));
+   // OUTPUT(Normalized_SeMO_Attributes, NAMED('Normalized_SeMO_Attributes'));
 
+   Models.Layouts_Healthcare_Core.RiskDrivers_Attributes_Weight_Layout ComputeAttributeWeights(Normalized_SeMO_Attributes L, Models.Healthcare_SocioEconomic_RD_Coefficients_Core.SEMO_RD_COEFFICIENTS_DS R) := TRANSFORM
+         SELF.seq := L.seq;
+         SELF.Raw_Score := L.Raw_Score;
+         SELF.CATEGORY := R.CATEGORY;
+         SELF.RD_CATEGORY := R.RD_CATEGORY;
+         SELF.AttributeWeight := If(L.Raw_Score>= R.START_GT_EQ AND L.Raw_Score< R.STOP_LT,  (REAL8)L.AttributeValue * R.COEFFICIENT,0);
+         SELF := L;
+         SELF := R;
+   END;
+
+   AttributeWeight_DS := JOIN(Normalized_SeMO_Attributes, Models.Healthcare_SocioEconomic_RD_Coefficients_Core.SEMO_RD_COEFFICIENTS_DS, STD.Str.ToUpperCase(LEFT.AttributeName)=RIGHT.ATTRIBUTE_NAME, ComputeAttributeWeights(LEFT, RIGHT));
+   // OUTPUT(AttributeWeight_DS, NAMED('AttributeWeight_DS'));
+
+   TABLE_DS := TABLE(AttributeWeight_DS, {seq, RD_CATEGORY, SumOfWeights := SUM(GROUP, AttributeWeight)}, seq, RD_CATEGORY);
+
+   SORTED_HI := SORT(GROUP(SORT(TABLE_DS, seq), seq), -SumOfWeights);
+
+   SORTED_LO := SORT(GROUP(SORT(TABLE_DS, seq), seq), SumOfWeights);
+
+   Sorted_Ranked_layout:= RECORD
+      TABLE_DS;
+      Integer _Rank;
+   END;
+
+   Sorted_Ranked_layout AddRank(SORTED_HI L, INTEGER C=1):= TRANSFORM
+      SELF._Rank:= C;
+      SELF:= L;
+   END;
+
+   HI_Rank_Added:= PROJECT(SORTED_HI, AddRank(LEFT, COUNTER));
+   // OUTPUT(HI_Rank_Added, NAMED('HI_Rank_Added'));
+   LO_Rank_Added:= PROJECT(SORTED_LO, AddRank(LEFT, COUNTER));
+   // OUTPUT(LO_Rank_Added, NAMED('LO_Rank_Added'));
+
+   HI_Ranked_Filtered := HI_Rank_Added(_Rank < 4);
+
+   LO_Ranked_Filtered := LO_Rank_Added(_Rank < 4);
+
+   Models.Layouts_Healthcare_Core.SeMO_Risk_Drivers_Only_Layout CreateEmpty_SeMO_Risk_Drivers(ds L):=  TRANSFORM
+      SELF.MO_Driver_Hi1 := 'N/A';
+      SELF.MO_Driver_Hi2 := 'N/A';
+      SELF.MO_Driver_Hi3 := 'N/A';
+      SELF.MO_Driver_Lo1 := 'N/A';
+      SELF.MO_Driver_Lo2 := 'N/A';
+      SELF.MO_Driver_Lo3 := 'N/A';
+      SELF.seq := L.seq;
+      SELF := L;
+   END;
+
+   Risk_Drivers_DS := PROJECT(ds, CreateEmpty_SeMO_Risk_Drivers(LEFT));
+
+   Models.Layouts_Healthcare_Core.SeMO_Risk_Drivers_Only_Layout Denorm_RD_HI(Risk_Drivers_DS L, HI_Ranked_Filtered R) := TRANSFORM
+      SELF.MO_Driver_Hi1 := IF(R._Rank = 1, R.RD_CATEGORY, L.MO_Driver_Hi1);
+      SELF.MO_Driver_Hi2 := IF(R._Rank = 2, R.RD_CATEGORY, L.MO_Driver_Hi2);
+      SELF.MO_Driver_Hi3 := IF(R._Rank = 3, R.RD_CATEGORY, L.MO_Driver_Hi3);
+      SELF := L;
+   END;
+
+   Models.Layouts_Healthcare_Core.SeMO_Risk_Drivers_Only_Layout Denorm_RD_LO(Risk_Drivers_DS L, LO_Ranked_Filtered R) := TRANSFORM
+      SELF.MO_Driver_Lo1 := IF(R._Rank = 1, R.RD_CATEGORY, L.MO_Driver_Lo1);
+      SELF.MO_Driver_Lo2 := IF(R._Rank = 2, R.RD_CATEGORY, L.MO_Driver_Lo2);
+      SELF.MO_Driver_Lo3 := IF(R._Rank = 3, R.RD_CATEGORY, L.MO_Driver_Lo3);
+      SELF := L;
+   END;
+
+   Risk_Drivers_DS_HI := DENORMALIZE(Risk_Drivers_DS, HI_Ranked_Filtered,
+                                       LEFT.seq = RIGHT.seq,
+                                       Denorm_RD_HI(LEFT, RIGHT));
+
+   Risk_Drivers_DS_HI_LO := DENORMALIZE(Risk_Drivers_DS_HI, LO_Ranked_Filtered,
+                                       LEFT.seq = RIGHT.seq,
+                                       Denorm_RD_LO(LEFT, RIGHT));
+   RETURN Risk_Drivers_DS_HI_LO;
+ENDMACRO;
 
 End;
