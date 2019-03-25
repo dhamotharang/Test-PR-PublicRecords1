@@ -1,7 +1,7 @@
-import CRIM, Crim_Expunctions, crim_common;
+import CRIM, Crim_Expunctions, crim_common,data_services;
 // datasets here... no reason for all the attributes at this point...
 
-	lNamePrefix := '~thor_data400::in::court_offenses_';
+	lNamePrefix := data_services.foreign_prod+'thor_data400::in::court_offenses_';
 
 	//Abinitio Files
 lFile_Vendor_02 := dataset(lNamePrefix + 'wa_scomis_crim_20120525',			Crim_Common.Layout_In_Court_Offenses,flat);
