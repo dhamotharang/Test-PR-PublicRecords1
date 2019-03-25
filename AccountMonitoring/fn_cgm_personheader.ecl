@@ -8,10 +8,10 @@ EXPORT DATASET(AccountMonitoring.layouts.history) fn_cgm_personheader(
 	FUNCTION
 	
 		// Linkid Key, VehicleV2.Key_Vehicle_linkids.key
-		Key_Linkids := 
+		Key_DID := 
 			DISTRIBUTED(
-				AccountMonitoring.product_files.watercraft.waterLinkid_key, 
-				HASH64(seleid)
+				AccountMonitoring.product_files.header_files.doxie_key_header_slim, 
+				HASH64(did)
 			);
 	
 		// Join Layout
@@ -20,31 +20,28 @@ EXPORT DATASET(AccountMonitoring.layouts.history) fn_cgm_personheader(
 			in_documents.rid;
 			in_documents.hid;
 			TYPEOF(in_portfolio.did) did;
-			TYPEOF(in_portfolio.bdid) bdid;
-			Key_Linkids.watercraft_key;
-			Key_Linkids.sequence_key;
-			Key_Linkids.state_origin;
+			Key_DID.SSN;
+			Key_DID.DOB;
+			
 		END;
 		
-		// Pivot on Linkids
-		temp_port_dist_sele  := DISTRIBUTE(in_portfolio(seleid != 0),HASH64(seleid));
+		// Pivot on did
+		temp_port_dist_did  := DISTRIBUTE(in_portfolio(did != 0),HASH64(did));
 		
-		// Tranform to data layout since only linkid key is needed for monitoring
-		temp_join_linkid_rcid := JOIN(Key_Linkids,temp_port_dist_sele,
-																BIPV2.IDmacros.mac_JoinTop3Linkids(),
-																TRANSFORM(temp_layout,
-																	SELF.pid  					:= RIGHT.pid,
-																	SELF.rid  					:= RIGHT.rid,
-																	SELF.hid  					:= 0,
-																	SELF.bdid 					:= 0, 
-																	SELF.did						:= 0, 
-																	SELF.watercraft_key := LEFT.watercraft_key;
-																	SELF.sequence_key 	:= LEFT.sequence_key;
-																	SELF.state_origin 	:= LEFT.state_origin;
-																	SELF      			:= RIGHT),
-																LOCAL);		
-		
-		temp_joins_dedup := DEDUP(SORT(DISTRIBUTE(temp_join_linkid_rcid,HASH64(pid,rid)),pid,rid,watercraft_key,sequence_key,state_origin,local),pid,rid,watercraft_key,sequence_key,state_origin,local);
+/* 		// Tranform to data layout since only DID key is needed for monitoring
+   		temp_join_linkid_rcid := JOIN(Key_DID,temp_port_dist_did,
+   																BIPV2.IDmacros.mac_JoinTop3Linkids(),
+   																TRANSFORM(temp_layout,
+   																	SELF.pid  					:= RIGHT.pid,
+   																	SELF.rid  					:= RIGHT.rid,
+   																	SELF.hid  					:= RIGHT.hid,
+   																	SELF.SSN          := LEFT.SSN;
+   																	SELF.DOB 	       := LEFT.DOB;
+   																	SELF      			:= RIGHT),
+   																LOCAL);		
+   		
+*/
+		temp_joins_dedup := DEDUP(SORT(DISTRIBUTE(temp_port_dist_did,HASH64(pid,rid)),pid,rid,ssn,dob,local),pid,rid,ssn,dob,local);
 	 
 	 	// Create hash value on monitored fields. 
 		temp_unrolled_hashes := 
@@ -53,12 +50,11 @@ EXPORT DATASET(AccountMonitoring.layouts.history) fn_cgm_personheader(
 								SELF.pid          := LEFT.pid,
 								SELF.rid          := LEFT.rid,
 								self.hid          := 0,
-								SELF.product_mask := AccountMonitoring.Constants.pm_watercraft,
+								SELF.product_mask := AccountMonitoring.Constants.pm_personheader,
 								SELF.timestamp    := '',
 								SELF.hash_value   := HASH64(
-											LEFT.watercraft_key,
-											LEFT.sequence_key,
-											LEFT.state_origin),
+											LEFT.ssn,
+											LEFT.dob),
 								SELF := LEFT)); 
 		
 		// Roll up the hashes for all records for a particular pid/rid; and return.

@@ -29,6 +29,8 @@ EXPORT product_files := MODULE
 			Header.Layout_Header.dt_vendor_last_reported;
 			Header.Layout_Header.did;
 			Header.Layout_Header.src;
+      Header.Layout_Header_v2.dob;
+			Header.Layout_Header_v2.ssn;
 		END;
 
 		EXPORT layout_base_file_util_daily := RECORD
@@ -83,6 +85,7 @@ EXPORT product_files := MODULE
 			Header.Layout_Header_v2.dt_vendor_last_reported;
 			Header.Layout_Header_v2.did;
 			Header.Layout_Header_v2.src;
+      
 		END;
 		
 		EXPORT Base_Header_file_slim := 

@@ -298,7 +298,7 @@ export Utilities := MODULE
 													IF(product_cfg.corp.product_is_in_mask,update_history_file_corp),
 													IF(product_cfg.mvr.product_is_in_mask,update_history_file_mvr),
 													IF(product_cfg.aircraft.product_is_in_mask,update_history_file_aircraft),
-													IF(product_cfg.watercraft.product_is_in_mask,update_history_file_watercraft));
+													IF(product_cfg.watercraft.product_is_in_mask,update_history_file_watercraft),
 													IF(product_cfg.personheader.product_is_in_mask,update_history_file_personheader));
 		
 		RETURN SEQUENTIAL(
@@ -482,6 +482,7 @@ export Utilities := MODULE
 		mac_build_purge_fn(mvr);
 		mac_build_purge_fn(aircraft);
 		mac_build_purge_fn(watercraft);
+		mac_build_purge_fn(personheader);
 		
 	END;
 
@@ -555,7 +556,7 @@ export Utilities := MODULE
 			purge_corp,
 			purge_mvr,
 			purge_aircraft,
-			purge_watercraft
+			purge_watercraft,
 			purge_personheader
 			);
 		
@@ -691,7 +692,7 @@ export Utilities := MODULE
 													IF(product_cfg.corp.product_is_in_mask  			 	 ,update_history_file_corp),
 													IF(product_cfg.mvr.product_is_in_mask  				 	 ,update_history_file_mvr),
 													IF(product_cfg.aircraft.product_is_in_mask  	 	 ,update_history_file_aircraft),
-													IF(product_cfg.watercraft.product_is_in_mask  	 ,update_history_file_watercraft));
+													IF(product_cfg.watercraft.product_is_in_mask  	 ,update_history_file_watercraft),
 													IF(product_cfg.personheader.product_is_in_mask  	 ,update_history_file_personheader));
 		
 		RETURN SEQUENTIAL(
@@ -836,7 +837,7 @@ export Utilities := MODULE
 															IF(product_cfg.corp.product_is_in_mask,update_history_file_corp),
 															IF(product_cfg.mvr.product_is_in_mask,update_history_file_mvr),
 															IF(product_cfg.aircraft.product_is_in_mask,update_history_file_aircraft),
-															IF(product_cfg.watercraft.product_is_in_mask,update_history_file_watercraft)
+															IF(product_cfg.watercraft.product_is_in_mask,update_history_file_watercraft),
 															IF(product_cfg.personheader.product_is_in_mask,update_history_file_personheader)
 													  );
 		

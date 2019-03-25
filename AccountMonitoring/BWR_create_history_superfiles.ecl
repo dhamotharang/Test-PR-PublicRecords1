@@ -83,12 +83,12 @@ EXPORT BWR_create_history_superfiles(UNSIGNED1 pseudo_environment) := FUNCTION
 	csf26 := IF( NOT FileServices.SuperfileExists(cluster+'base::Account_Monitoring::' + ext + 'history::liens_grandfather'),
 							 FileServices.CreateSuperFile (cluster+'base::Account_Monitoring::' + ext + 'history::liens_grandfather') );
   
-  csf27   := IF( NOT FileServices.SuperfileExists(cluster+'base::Account_Monitoring::history::watchdog'),
-	               FileServices.CreateSuperFile (cluster+'base::Account_Monitoring::history::watchdog') );	
-	csf28 := IF( NOT FileServices.SuperfileExists(cluster+'base::Account_Monitoring::history::watchdog_father'),
-	               FileServices.CreateSuperFile (cluster+'base::Account_Monitoring::history::watchdog_father');
-	csf29 := IF( NOT FileServices.SuperfileExists(cluster+'base::Account_Monitoring::history::watchdog_grandfather'),
-	               FileServices.CreateSuperFile (cluster+'base::Account_Monitoring::history::watchdog_grandfather');
+  csf27   := IF( NOT FileServices.SuperfileExists(cluster+'base::Account_Monitoring::history::personheader'),
+	               FileServices.CreateSuperFile (cluster+'base::Account_Monitoring::history::personheader') );	
+	csf28 := IF( NOT FileServices.SuperfileExists(cluster+'base::Account_Monitoring::history::personheader_father'),
+	               FileServices.CreateSuperFile (cluster+'base::Account_Monitoring::history::personheader_father'));
+	csf29 := IF( NOT FileServices.SuperfileExists(cluster+'base::Account_Monitoring::history::personheader_grandfather'),
+	               FileServices.CreateSuperFile (cluster+'base::Account_Monitoring::history::personheader_grandfather'));
 
 
 	RETURN SEQUENTIAL( 

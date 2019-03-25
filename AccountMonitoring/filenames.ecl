@@ -86,7 +86,7 @@ EXPORT filenames(unsigned1 pseudo_environment) := MODULE
 		EXPORT mvr	 					 := history_template('mvr');
 		EXPORT aircraft				 := history_template('aircraft');
 		EXPORT watercraft			 := history_template('watercraft');
-    EXPORT personheader		 	 := documents_template('personheader');
+    EXPORT personheader		 	 := history_template('personheader');
 	END;
 	
 	// The file name and location of the Inquiry tracking files are used solely for auditing purposes

@@ -137,7 +137,7 @@ EXPORT Run( AccountMonitoring.types.productMask product_mask = AccountMonitoring
 		candidates_watercraft      			:= AccountMonitoring.fn_monitor_for_candidates( product_config.watercraft, timestamp ) : INDEPENDENT;
 		update_history_file_watercraft	:= AccountMonitoring.fn_update_history_file( candidates_watercraft, product_config.watercraft, timestamp );
 
-		// ***** Watercraft *****
+		// ***** Personheader *****
 		candidates_personheader      			:= AccountMonitoring.fn_monitor_for_candidates( product_config.personheader, timestamp ) : INDEPENDENT;
 		update_history_file_personheader	:= AccountMonitoring.fn_update_history_file( candidates_personheader, product_config.personheader, timestamp );
 
@@ -168,7 +168,7 @@ EXPORT Run( AccountMonitoring.types.productMask product_mask = AccountMonitoring
 										& IF(product_config.corp.product_is_in_mask,candidates_corp)
 										& IF(product_config.mvr.product_is_in_mask,candidates_mvr)
 										& IF(product_config.aircraft.product_is_in_mask,candidates_aircraft)
-										& IF(product_config.watercraft.product_is_in_mask,candidates_watercraft);
+										& IF(product_config.watercraft.product_is_in_mask,candidates_watercraft)
 										& IF(product_config.personheader.product_is_in_mask,candidates_personheader);
 		
 		// We check for 0 hashvalue here because we don't want to return history records that simply reflect

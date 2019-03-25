@@ -1,4 +1,4 @@
-
+﻿
 IMPORT Didville, Doxie, Doxie_cbrs, Doxie_Files, Header, PhonesFeedback, Property, PhonesInfo, BIPV2;
 
 EXPORT layouts := MODULE
@@ -254,6 +254,13 @@ EXPORT layouts := MODULE
 			AccountMonitoring.product_files.watercraft.waterLinkid_key.sequence_key;
 			AccountMonitoring.product_files.watercraft.waterLinkid_key.state_origin;
 		END;
+   
+   SHARED personheader_documentid_record := RECORD
+			AccountMonitoring.product_files.watercraft.waterLinkid_key.watercraft_key;
+			AccountMonitoring.product_files.watercraft.waterLinkid_key.sequence_key;
+			AccountMonitoring.product_files.watercraft.waterLinkid_key.state_origin;
+		END;
+    
 		template(default,doxie.layout_references);
 		template(bankruptcy,bankruptcy_documentid_record);
 		template(deceased,deceased_documentid_record);
@@ -280,6 +287,7 @@ EXPORT layouts := MODULE
 		template(mvr,mvr_documentid_record);
 		template(aircraft,aircraft_documentid_record);
 		template(watercraft,watercraft_documentid_record);
+		template(personheader,personheader_documentid_record);
 	END;
 	
 	EXPORT results := RECORD

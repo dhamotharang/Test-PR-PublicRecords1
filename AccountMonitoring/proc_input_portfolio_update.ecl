@@ -109,7 +109,7 @@ EXPORT proc_input_portfolio_update( UNSIGNED1 pseudo_environment,
 			process_documents_corp.spray,
 			process_documents_mvr.spray,
 			process_documents_aircraft.spray,
-			process_documents_watercraft.spray
+			process_documents_watercraft.spray,
 			process_documents_personheader.spray
 		);
 		
@@ -139,7 +139,7 @@ EXPORT proc_input_portfolio_update( UNSIGNED1 pseudo_environment,
 			process_documents_corp.update,
 			process_documents_mvr.update,
 			process_documents_aircraft.update,
-			process_documents_watercraft.update
+			process_documents_watercraft.update,
 			process_documents_personheader.update
 		);
 			
