@@ -160,7 +160,9 @@ Layout_almostfinal_offender to_crim_offender(with_ssn l, slim_off r) := transfor
 
  self.data_type			:= '2';
  self.case_number		:= temp_case_number;
- self.case_court		:= r.courtname;
+ self.case_court		:= MAP(vVendor = 'I0018' and trim(stringlib.stringtouppercase(r.courtname)) ='CIRCUIT' => '',
+	                                   trim(stringlib.stringtouppercase(r.courtname))
+													 );
  self.case_name			:= r.casetitle;
  self.case_type			:= '';
  self.case_type_desc	:= Map(l.sourcename ='FLORIDA_LEON_COUNTY' =>'',
@@ -414,9 +416,22 @@ rollupCrimOut := ROLLUP(sorted_rcommon,
 												rollupCrim(LEFT,RIGHT),local);
 
 
-//REMOVE RECORDS WITH NO VENDOR CODE ASSIGNED////////////////////////////////////
-result_common := dedup(sort(rollupCrimOut, record,local), 
-                 record, except pty_typ, left,local) : persist ('~thor_data200::persist::hygenics::crim::HD::county::offender_withIndepDL');
-// output(result_common(offender_key = '5Y1001638532187460471MD-033863320130916'));
-// output(result_common(offender_key in Set_offender_key))	;
+//REMOVE alias records identical to primary 
+// result_common := dedup(sort(rollupCrimOut, record,local), 
+                 // record, except pty_typ, left,local) : persist ('~thor_data200::persist::hygenics::crim::HD::county::offender_withIndepDL');
+sorted_rollupCrimOut := sort(rollupCrimOut, 
+                        offender_key,case_number,case_court,case_name,case_type,case_type_desc,case_filing_dt,
+                        pty_nm,orig_lname,orig_fname,orig_mname,orig_name_suffix,dle_num,fbi_num,doc_num,ins_num,id_num,dl_num,
+												dl_state,dob,street_address_1,street_address_2,street_address_3,race,race_desc,sex,hair_color,hair_color_desc,eye_color,eye_color_desc,skin_color,skin_color_desc,
+                         height,weight,party_status,party_status_desc,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,p_city_name,
+ 												v_city_name,state,zip5,title,fname,mname,lname,name_suffix,Age,image_link,
+												pty_typ,local);
+												
+result_common := dedup(sorted_rollupCrimOut,
+												offender_key,case_number,case_court,case_name,case_type,case_type_desc,case_filing_dt,
+                        pty_nm,orig_lname,orig_fname,orig_mname,orig_name_suffix,dle_num,fbi_num,doc_num,ins_num,id_num,dl_num,
+												dl_state,dob,street_address_1,street_address_2,street_address_3,race,race_desc,sex,hair_color,hair_color_desc,eye_color,eye_color_desc,skin_color,skin_color_desc,
+                        height,weight,party_status,party_status_desc,prim_range,predir,prim_name,addr_suffix,postdir,unit_desig,sec_range,p_city_name,
+												v_city_name,state,zip5,title,fname,mname,lname,name_suffix,Age,image_link,left, local): persist ('~thor_data200::persist::hygenics::crim::HD::county::offender');
+
 export proc_build_county_crim_offender2_base := result_common;  //sequential(o1);
