@@ -304,7 +304,7 @@ EXPORT Functions :=  MODULE
 	FUNCTIONMACRO		
 			IMPORT address;
 
-			Address_Cache := FraudGovPlatform.Files().Base.AddressCache.Built;
+			Address_Cache := if(FraudGovPlatform._flags.update.AddressCache, FraudGovPlatform.Files().Base.AddressCache.Built, dataset([],layouts.base.AddressCache));
 			
 			prepped_Addresses := 	dedup(
 											table(pInputFile(address_1 <> '' and address_2 <> ''),{address_1, address_2, address_id})  
@@ -357,7 +357,7 @@ EXPORT Functions :=  MODULE
 												LOCAL
 										);							
 
-			Sort_Address_Cache := sort(FraudGovPlatform.Files().Base.AddressCache.Built + new_addresses, address_id, -address_cleaned);
+			Sort_Address_Cache := sort(Address_Cache + new_addresses, address_id, -address_cleaned);
 			New_Address_Cache :=  dedup(Sort_Address_Cache, address_id);
 
 			RETURN New_Address_Cache;
@@ -419,7 +419,7 @@ EXPORT Functions :=  MODULE
 
 	ENDMACRO;
 
-	Current_Build := FraudShared.Files().Base.Main.Built;
+	Current_Build := IF(_Flags.FileExists.Base.Main, FraudShared.Files().Base.Main.Built, DATASET([], FraudShared.Layouts.Base.Main));
 	
 	EXPORT LastRinID := MAX(Current_Build(DID >= FraudGovPlatform.Constants().FirstRinID), DID):independent;
 

@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Risk_Indicators, SALT28;
+﻿IMPORT BIPV2, Risk_Indicators, SALT28, LNSmallBusiness, iesp, BusinessInstantID20_Services;
 
 EXPORT Layouts := MODULE
 
@@ -25,7 +25,7 @@ EXPORT Layouts := MODULE
 	END;
 
 	EXPORT BatchInput := RECORD
-		UNSIGNED4  Seq    := 0;
+		UNSIGNED4  Seq		:= 0;
 		STRING30   AcctNo := '';
 		UNSIGNED6 HistoryDate := 0;
 		InputCompanyInfo;
@@ -164,27 +164,29 @@ EXPORT Layouts := MODULE
 	
 	EXPORT InputAuthRepInfo := RECORD
 		// Authorized Representative Information
+		STRING15  Sequence		   := '';
 		UNSIGNED1 Rep_WhichOne   := 0;
-		STRING5   NameTitle      := '';
-		STRING120 FullName       := '';
-		STRING20  FirstName      := '';
-		STRING20  MiddleName     := '';
-		STRING20  LastName       := '';
-		STRING5   NameSuffix     := '';
+		STRING5   NameTitle		  := '';
+		STRING120 FullName		   := '';
+		STRING20  FirstName		  := '';
+		STRING20  MiddleName		 := '';
+		STRING20  LastName		   := '';
+		STRING5   NameSuffix		 := '';
 		STRING20  FormerLastName := '';
 		STRING120 StreetAddress1 := '';
 		STRING120 StreetAddress2 := '';
-		STRING25  City           := '';
-		STRING2   State          := '';
-		STRING9   Zip            := '';
-		STRING9   SSN            := '';
-		STRING8   DateOfBirth    := '';
-		STRING3   Age            := '';
-		STRING25  DLNumber       := '';
-		STRING2   DLState        := '';
-		STRING10  Phone10        := '';
-		STRING100 Email          := '';
-		UNSIGNED6 LexID          := 0;	
+		STRING25  City				   := '';
+		STRING2   State				  := '';
+		STRING9   Zip						:= '';
+		STRING9   SSN						:= '';
+		STRING8   DateOfBirth		:= '';
+		STRING3   Age						:= '';
+		STRING25  DLNumber		   := '';
+		STRING2   DLState				:= '';
+		STRING10  Phone10				:= '';
+		STRING100 Email				  := '';
+		UNSIGNED6 LexID				  := 0;	
+		UNSIGNED1 SortOrder		  := 0;
 	END;
 
 	EXPORT InputAuthRepInfoClean := RECORD
@@ -238,6 +240,7 @@ EXPORT Layouts := MODULE
 		STRING120 in_bus_url;
 		// Authorized Rep 1 input information
 		UNSIGNED6 rep1_lexid;
+		STRING15 in_rep1_sequence;
 		STRING5 in_rep1_title;
 		STRING120 in_rep1_full;
 		STRING20 in_rep1_first;
@@ -257,6 +260,7 @@ EXPORT Layouts := MODULE
 		STRING100 in_rep1_email;
 		// Authorized Rep 2 input information
 		UNSIGNED6 rep2_lexid;
+		STRING15 in_rep2_sequence;
 		STRING5 in_rep2_title;
 		STRING120 in_rep2_full;
 		STRING20 in_rep2_first;
@@ -276,6 +280,7 @@ EXPORT Layouts := MODULE
 		STRING100 in_rep2_email;
 		// Authorized Rep 3 input information
 		UNSIGNED6 rep3_lexid;
+		STRING15 in_rep3_sequence;
 		STRING5 in_rep3_title;
 		STRING120 in_rep3_full;
 		STRING20 in_rep3_first;
@@ -295,6 +300,7 @@ EXPORT Layouts := MODULE
 		STRING100 in_rep3_email;
 		// Authorized Rep 4 input information
 		UNSIGNED6 rep4_lexid;
+		STRING15 in_rep4_sequence;
 		STRING5 in_rep4_title;
 		STRING120 in_rep4_full;
 		STRING20 in_rep4_first;
@@ -314,6 +320,7 @@ EXPORT Layouts := MODULE
 		STRING100 in_rep4_email;
 		// Authorized Rep 5 input information
 		UNSIGNED6 rep5_lexid;
+		STRING15 in_rep5_sequence;
 		STRING5 in_rep5_title;
 		STRING120 in_rep5_full;
 		STRING20 in_rep5_first;
@@ -371,7 +378,7 @@ EXPORT Layouts := MODULE
 		STRING25 rep1_dlnumber; // in_rep1_dlnumber
 		STRING2 rep1_dlstate; // in_rep1_dlstate
 		STRING100 rep1_email; // in_rep1_email
-    UNSIGNED6 rep1_lexID;
+		UNSIGNED6 rep1_lexID;
 		// Authorized Rep 2 input information
 		STRING5 rep2_titlename; // in_rep2_title
 		STRING120 rep2_fullname; // in_rep2_full
@@ -390,7 +397,7 @@ EXPORT Layouts := MODULE
 		STRING25 rep2_dlnumber; // in_rep2_dlnumber
 		STRING2 rep2_dlstate; // in_rep2_dlstate
 		STRING100 rep2_email; // in_rep2_email
-    UNSIGNED6 rep2_lexID;
+		UNSIGNED6 rep2_lexID;
 		// Authorized Rep 3 input information
 		STRING5 rep3_titlename; // in_rep3_title
 		STRING120 rep3_fullname; // in_rep3_full
@@ -409,7 +416,7 @@ EXPORT Layouts := MODULE
 		STRING25 rep3_dlnumber; // in_rep3_dlnumber
 		STRING2 rep3_dlstate; // in_rep3_dlstate
 		STRING100 rep3_email; // in_rep3_email
-    UNSIGNED6 rep3_lexID;
+		UNSIGNED6 rep3_lexID;
 		// Authorized Rep 4 input information
 		STRING5 rep4_titlename; // in_rep4_title
 		STRING120 rep4_fullname; // in_rep4_full
@@ -428,7 +435,7 @@ EXPORT Layouts := MODULE
 		STRING25 rep4_dlnumber; // in_rep4_dlnumber
 		STRING2 rep4_dlstate; // in_rep4_dlstate
 		STRING100 rep4_email; // in_rep4_email
-    UNSIGNED6 rep4_lexID;
+		UNSIGNED6 rep4_lexID;
 		// Authorized Rep 5 input information
 		STRING5 rep5_titlename; // in_rep5_title
 		STRING120 rep5_fullname; // in_rep5_full
@@ -447,18 +454,18 @@ EXPORT Layouts := MODULE
 		STRING25 rep5_dlnumber; // in_rep5_dlnumber
 		STRING2 rep5_dlstate; // in_rep5_dlstate
 		STRING100 rep5_email; // in_rep5_email
-    UNSIGNED6 rep5_lexID;
+		UNSIGNED6 rep5_lexID;
 	END;
 	
 	EXPORT CleanInputLayout := RECORD // CleanInput
 		// Business
-		STRING120 out_bus_company_name;    // not required
+		STRING120 out_bus_company_name;		// not required
 		STRING120 out_bus_alt_companyname; // not required
 		STRING120 out_bus_street_address1; // not required
 		STRING120 out_bus_street_address2; // not required
-		STRING25 out_bus_city;             // not required
-		STRING2 out_bus_state;             // not required
-		STRING9 out_bus_zip;               // not required
+		STRING25 out_bus_city;						 // not required
+		STRING2 out_bus_state;						 // not required
+		STRING9 out_bus_zip;						   // not required
 		STRING10 out_bus_prim_range;
 		STRING2 out_bus_predir;
 		STRING28 out_bus_prim_name;
@@ -474,9 +481,10 @@ EXPORT Layouts := MODULE
 		STRING4 out_bus_addr_status;
 		STRING30 out_bus_county;
 		STRING7 out_bus_geo_block;
-		STRING9 out_bus_fein;     // not required
+		STRING9 out_bus_fein;		 // not required
 		STRING10 out_bus_Phone10; // not required
 		// Authorized Rep 1
+		STRING15 out_rep1_sequence; // not required
 		STRING5 out_rep1_name_title; // not required
 		STRING120 out_rep1_full_name; // not required
 		STRING20 out_rep1_first_name; // not required
@@ -507,6 +515,7 @@ EXPORT Layouts := MODULE
 		STRING9 out_rep1_ssn; // not required
 		STRING10 out_rep1_phone10; // not required
 		// Authorized Rep 2
+		STRING15 out_rep2_sequence; // not required
 		STRING5 out_rep2_name_title; // not required
 		STRING120 out_rep2_full_name; // not required
 		STRING20 out_rep2_first_name; // not required
@@ -537,6 +546,7 @@ EXPORT Layouts := MODULE
 		STRING9 out_rep2_ssn; // not required
 		STRING10 out_rep2_phone10; // not required
 		// Authorized Rep 3
+		STRING15 out_rep3_sequence; // not required
 		STRING5 out_rep3_name_title; // not required
 		STRING120 out_rep3_full_name; // not required
 		STRING20 out_rep3_first_name; // not required
@@ -567,6 +577,7 @@ EXPORT Layouts := MODULE
 		STRING9 out_rep3_ssn; // not required
 		STRING10 out_rep3_phone10; // not required
 		// Authorized Rep 4
+		STRING15 out_rep4_sequence; // not required
 		STRING5 out_rep4_name_title; // not required
 		STRING120 out_rep4_full_name; // not required
 		STRING20 out_rep4_first_name; // not required
@@ -597,6 +608,7 @@ EXPORT Layouts := MODULE
 		STRING9 out_rep4_ssn; // not required
 		STRING10 out_rep4_phone10; // not required
 		// Authorized Rep 5
+		STRING15 out_rep5_sequence; // not required
 		STRING5 out_rep5_name_title; // not required
 		STRING120 out_rep5_full_name; // not required
 		STRING20 out_rep5_first_name; // not required
@@ -976,6 +988,8 @@ EXPORT Layouts := MODULE
 		STRING30 bus_ofac_country_1;
 		STRING200 bus_ofac_entity_name_1;
 		STRING4 bus_ofac_sequence_1;
+		STRING bus_ofac_entitydate_1;
+		STRING bus_ofac_publisheddate_1;
 		STRING60 bus_ofac_table_2;
 		STRING120 bus_ofac_program_2;
 		STRING10 bus_ofac_record_number_2;
@@ -989,6 +1003,8 @@ EXPORT Layouts := MODULE
 		STRING30 bus_ofac_country_2;
 		STRING200 bus_ofac_entity_name_2;
 		STRING4 bus_ofac_sequence_2;
+		STRING bus_ofac_entitydate_2;
+		STRING bus_ofac_publisheddate_2;
 		STRING60 bus_ofac_table_3;
 		STRING120 bus_ofac_program_3;
 		STRING10 bus_ofac_record_number_3;
@@ -1002,6 +1018,8 @@ EXPORT Layouts := MODULE
 		STRING30 bus_ofac_country_3;
 		STRING200 bus_ofac_entity_name_3;
 		STRING4 bus_ofac_sequence_3;
+		STRING bus_ofac_entitydate_3;
+		STRING bus_ofac_publisheddate_3;
 		STRING60 bus_ofac_table_4;
 		STRING120 bus_ofac_program_4;
 		STRING10 bus_ofac_record_number_4;
@@ -1015,6 +1033,8 @@ EXPORT Layouts := MODULE
 		STRING30 bus_ofac_country_4;
 		STRING200 bus_ofac_entity_name_4;
 		STRING4 bus_ofac_sequence_4;
+		STRING bus_ofac_entitydate_4;
+		STRING bus_ofac_publisheddate_4;
 		STRING60 bus_ofac_table_5;
 		STRING120 bus_ofac_program_5;
 		STRING10 bus_ofac_record_number_5;
@@ -1028,6 +1048,8 @@ EXPORT Layouts := MODULE
 		STRING30 bus_ofac_country_5;
 		STRING200 bus_ofac_entity_name_5;
 		STRING4 bus_ofac_sequence_5;
+		STRING bus_ofac_entitydate_5;
+		STRING bus_ofac_publisheddate_5;
 		STRING60 bus_ofac_table_6;
 		STRING120 bus_ofac_program_6;
 		STRING10 bus_ofac_record_number_6;
@@ -1041,6 +1063,8 @@ EXPORT Layouts := MODULE
 		STRING30 bus_ofac_country_6;
 		STRING200 bus_ofac_entity_name_6;
 		STRING4 bus_ofac_sequence_6;
+		STRING bus_ofac_entitydate_6;
+		STRING bus_ofac_publisheddate_6;
 		STRING60 bus_ofac_table_7;
 		STRING120 bus_ofac_program_7;
 		STRING10 bus_ofac_record_number_7;
@@ -1054,6 +1078,8 @@ EXPORT Layouts := MODULE
 		STRING30 bus_ofac_country_7;
 		STRING200 bus_ofac_entity_name_7;
 		STRING4 bus_ofac_sequence_7;	
+		STRING bus_ofac_entitydate_7;
+		STRING bus_ofac_publisheddate_7;
 	END;
 	
 	EXPORT WatchlistLayoutFlat := RECORD
@@ -1072,6 +1098,8 @@ EXPORT Layouts := MODULE
 		STRING30 bus_watchlist_country_1;
 		STRING200 bus_watchlist_entity_name_1;
 		STRING4 bus_watchlist_sequence_1;
+		STRING bus_watchlist_entitydate_1;
+		STRING bus_watchlist_publisheddate_1;
 		STRING60 bus_watchlist_table_2;
 		STRING120 bus_watchlist_program_2;
 		STRING10 bus_watchlist_record_number_2;
@@ -1085,6 +1113,8 @@ EXPORT Layouts := MODULE
 		STRING30 bus_watchlist_country_2;
 		STRING200 bus_watchlist_entity_name_2;
 		STRING4 bus_watchlist_sequence_2;
+		STRING bus_watchlist_entitydate_2;
+		STRING bus_watchlist_publisheddate_2;
 		STRING60 bus_watchlist_table_3;
 		STRING120 bus_watchlist_program_3;
 		STRING10 bus_watchlist_record_number_3;
@@ -1098,6 +1128,8 @@ EXPORT Layouts := MODULE
 		STRING30 bus_watchlist_country_3;
 		STRING200 bus_watchlist_entity_name_3;
 		STRING4 bus_watchlist_sequence_3;
+		STRING bus_watchlist_entitydate_3;
+		STRING bus_watchlist_publisheddate_3;
 		STRING60 bus_watchlist_table_4;
 		STRING120 bus_watchlist_program_4;
 		STRING10 bus_watchlist_record_number_4;
@@ -1111,6 +1143,8 @@ EXPORT Layouts := MODULE
 		STRING30 bus_watchlist_country_4;
 		STRING200 bus_watchlist_entity_name_4;
 		STRING4 bus_watchlist_sequence_4;
+		STRING bus_watchlist_entitydate_4;
+		STRING bus_watchlist_publisheddate_4;
 		STRING60 bus_watchlist_table_5;
 		STRING120 bus_watchlist_program_5;
 		STRING10 bus_watchlist_record_number_5;
@@ -1124,6 +1158,8 @@ EXPORT Layouts := MODULE
 		STRING30 bus_watchlist_country_5;
 		STRING200 bus_watchlist_entity_name_5;
 		STRING4 bus_watchlist_sequence_5;
+		STRING bus_watchlist_entitydate_5;
+		STRING bus_watchlist_publisheddate_5;
 		STRING60 bus_watchlist_table_6;
 		STRING120 bus_watchlist_program_6;
 		STRING10 bus_watchlist_record_number_6;
@@ -1137,6 +1173,8 @@ EXPORT Layouts := MODULE
 		STRING30 bus_watchlist_country_6;
 		STRING200 bus_watchlist_entity_name_6;
 		STRING4 bus_watchlist_sequence_6;
+		STRING bus_watchlist_entitydate_6;
+		STRING bus_watchlist_publisheddate_6;
 		STRING60 bus_watchlist_table_7;
 		STRING120 bus_watchlist_program_7;
 		STRING10 bus_watchlist_record_number_7;
@@ -1149,13 +1187,547 @@ EXPORT Layouts := MODULE
 		STRING9 bus_watchlist_zip_7;
 		STRING30 bus_watchlist_country_7;
 		STRING200 bus_watchlist_entity_name_7;
-		STRING4 bus_watchlist_sequence_7;	
+		STRING4 bus_watchlist_sequence_7;
+		STRING bus_watchlist_entitydate_7;
+		STRING bus_watchlist_publisheddate_7;
 	END;
 	
+	EXPORT AuthRepWatchlistLayoutFlat := RECORD
+		UNSIGNED4 Seq;
+		// other watchlists
+		STRING60 authrep_watchlist_table_1;
+		STRING120 authrep_watchlist_program_1;
+		STRING10 authrep_watchlist_record_number_1;
+		STRING120 authrep_watchlist_companyname_1;
+		STRING20 authrep_watchlist_firstname_1;
+		STRING20 authrep_watchlist_lastname_1;
+		STRING50 authrep_watchlist_address_1;
+		STRING30 authrep_watchlist_city_1;
+		STRING2 authrep_watchlist_state_1;
+		STRING9 authrep_watchlist_zip_1;
+		STRING30 authrep_watchlist_country_1;
+		STRING200 authrep_watchlist_entity_name_1;
+		STRING4 authrep_watchlist_sequence_1;
+		STRING authrep_watchlist_entitydate_1;
+		STRING authrep_watchlist_publisheddate_1;
+		STRING60 authrep_watchlist_table_2;
+		STRING120 authrep_watchlist_program_2;
+		STRING10 authrep_watchlist_record_number_2;
+		STRING120 authrep_watchlist_companyname_2;
+		STRING20 authrep_watchlist_firstname_2;
+		STRING20 authrep_watchlist_lastname_2;
+		STRING50 authrep_watchlist_address_2;
+		STRING30 authrep_watchlist_city_2;
+		STRING2 authrep_watchlist_state_2;
+		STRING9 authrep_watchlist_zip_2;
+		STRING30 authrep_watchlist_country_2;
+		STRING200 authrep_watchlist_entity_name_2;
+		STRING4 authrep_watchlist_sequence_2;
+		STRING authrep_watchlist_entitydate_2;
+		STRING authrep_watchlist_publisheddate_2;
+		STRING60 authrep_watchlist_table_3;
+		STRING120 authrep_watchlist_program_3;
+		STRING10 authrep_watchlist_record_number_3;
+		STRING120 authrep_watchlist_companyname_3;
+		STRING20 authrep_watchlist_firstname_3;
+		STRING20 authrep_watchlist_lastname_3;
+		STRING50 authrep_watchlist_address_3;
+		STRING30 authrep_watchlist_city_3;
+		STRING2 authrep_watchlist_state_3;
+		STRING9 authrep_watchlist_zip_3;
+		STRING30 authrep_watchlist_country_3;
+		STRING200 authrep_watchlist_entity_name_3;
+		STRING4 authrep_watchlist_sequence_3;
+		STRING authrep_watchlist_entitydate_3;
+		STRING authrep_watchlist_publisheddate_3;
+		STRING60 authrep_watchlist_table_4;
+		STRING120 authrep_watchlist_program_4;
+		STRING10 authrep_watchlist_record_number_4;
+		STRING120 authrep_watchlist_companyname_4;
+		STRING20 authrep_watchlist_firstname_4;
+		STRING20 authrep_watchlist_lastname_4;
+		STRING50 authrep_watchlist_address_4;
+		STRING30 authrep_watchlist_city_4;
+		STRING2 authrep_watchlist_state_4;
+		STRING9 authrep_watchlist_zip_4;
+		STRING30 authrep_watchlist_country_4;
+		STRING200 authrep_watchlist_entity_name_4;
+		STRING4 authrep_watchlist_sequence_4;
+		STRING authrep_watchlist_entitydate_4;
+		STRING authrep_watchlist_publisheddate_4;
+		STRING60 authrep_watchlist_table_5;
+		STRING120 authrep_watchlist_program_5;
+		STRING10 authrep_watchlist_record_number_5;
+		STRING120 authrep_watchlist_companyname_5;
+		STRING20 authrep_watchlist_firstname_5;
+		STRING20 authrep_watchlist_lastname_5;
+		STRING50 authrep_watchlist_address_5;
+		STRING30 authrep_watchlist_city_5;
+		STRING2 authrep_watchlist_state_5;
+		STRING9 authrep_watchlist_zip_5;
+		STRING30 authrep_watchlist_country_5;
+		STRING200 authrep_watchlist_entity_name_5;
+		STRING4 authrep_watchlist_sequence_5;
+		STRING authrep_watchlist_entitydate_5;
+		STRING authrep_watchlist_publisheddate_5;
+		STRING60 authrep_watchlist_table_6;
+		STRING120 authrep_watchlist_program_6;
+		STRING10 authrep_watchlist_record_number_6;
+		STRING120 authrep_watchlist_companyname_6;
+		STRING20 authrep_watchlist_firstname_6;
+		STRING20 authrep_watchlist_lastname_6;
+		STRING50 authrep_watchlist_address_6;
+		STRING30 authrep_watchlist_city_6;
+		STRING2 authrep_watchlist_state_6;
+		STRING9 authrep_watchlist_zip_6;
+		STRING30 authrep_watchlist_country_6;
+		STRING200 authrep_watchlist_entity_name_6;
+		STRING4 authrep_watchlist_sequence_6;
+		STRING authrep_watchlist_entitydate_6;
+		STRING authrep_watchlist_publisheddate_6;
+		STRING60 authrep_watchlist_table_7;
+		STRING120 authrep_watchlist_program_7;
+		STRING10 authrep_watchlist_record_number_7;
+		STRING120 authrep_watchlist_companyname_7;
+		STRING20 authrep_watchlist_firstname_7;
+		STRING20 authrep_watchlist_lastname_7;
+		STRING50 authrep_watchlist_address_7;
+		STRING30 authrep_watchlist_city_7;
+		STRING2 authrep_watchlist_state_7;
+		STRING9 authrep_watchlist_zip_7;
+		STRING30 authrep_watchlist_country_7;
+		STRING200 authrep_watchlist_entity_name_7;
+		STRING4 authrep_watchlist_sequence_7;
+		STRING authrep_watchlist_entitydate_7;
+		STRING authrep_watchlist_publisheddate_7;
+		STRING60 authrep_watchlist_table_8;
+		STRING120 authrep_watchlist_program_8;
+		STRING10 authrep_watchlist_record_number_8;
+		STRING120 authrep_watchlist_companyname_8;
+		STRING20 authrep_watchlist_firstname_8;
+		STRING20 authrep_watchlist_lastname_8;
+		STRING50 authrep_watchlist_address_8;
+		STRING30 authrep_watchlist_city_8;
+		STRING2 authrep_watchlist_state_8;
+		STRING9 authrep_watchlist_zip_8;
+		STRING30 authrep_watchlist_country_8;
+		STRING200 authrep_watchlist_entity_name_8;
+		STRING4 authrep_watchlist_sequence_8;
+		STRING authrep_watchlist_entitydate_8;
+		STRING authrep_watchlist_publisheddate_8;
+		STRING60 authrep_watchlist_table_9;
+		STRING120 authrep_watchlist_program_9;
+		STRING10 authrep_watchlist_record_number_9;
+		STRING120 authrep_watchlist_companyname_9;
+		STRING20 authrep_watchlist_firstname_9;
+		STRING20 authrep_watchlist_lastname_9;
+		STRING50 authrep_watchlist_address_9;
+		STRING30 authrep_watchlist_city_9;
+		STRING2 authrep_watchlist_state_9;
+		STRING9 authrep_watchlist_zip_9;
+		STRING30 authrep_watchlist_country_9;
+		STRING200 authrep_watchlist_entity_name_9;
+		STRING4 authrep_watchlist_sequence_9;
+		STRING authrep_watchlist_entitydate_9;
+		STRING authrep_watchlist_publisheddate_9;
+		STRING60 authrep_watchlist_table_10;
+		STRING120 authrep_watchlist_program_10;
+		STRING10 authrep_watchlist_record_number_10;
+		STRING120 authrep_watchlist_companyname_10;
+		STRING20 authrep_watchlist_firstname_10;
+		STRING20 authrep_watchlist_lastname_10;
+		STRING50 authrep_watchlist_address_10;
+		STRING30 authrep_watchlist_city_10;
+		STRING2 authrep_watchlist_state_10;
+		STRING9 authrep_watchlist_zip_10;
+		STRING30 authrep_watchlist_country_10;
+		STRING200 authrep_watchlist_entity_name_10;
+		STRING4 authrep_watchlist_sequence_10;
+		STRING authrep_watchlist_entitydate_10;
+		STRING authrep_watchlist_publisheddate_10;
+		STRING60 authrep_watchlist_table_11;
+		STRING120 authrep_watchlist_program_11;
+		STRING10 authrep_watchlist_record_number_11;
+		STRING120 authrep_watchlist_companyname_11;
+		STRING20 authrep_watchlist_firstname_11;
+		STRING20 authrep_watchlist_lastname_11;
+		STRING50 authrep_watchlist_address_11;
+		STRING30 authrep_watchlist_city_11;
+		STRING2 authrep_watchlist_state_11;
+		STRING9 authrep_watchlist_zip_11;
+		STRING30 authrep_watchlist_country_11;
+		STRING200 authrep_watchlist_entity_name_11;
+		STRING4 authrep_watchlist_sequence_11;
+		STRING authrep_watchlist_entitydate_11;
+		STRING authrep_watchlist_publisheddate_11;
+		STRING60 authrep_watchlist_table_12;
+		STRING120 authrep_watchlist_program_12;
+		STRING10 authrep_watchlist_record_number_12;
+		STRING120 authrep_watchlist_companyname_12;
+		STRING20 authrep_watchlist_firstname_12;
+		STRING20 authrep_watchlist_lastname_12;
+		STRING50 authrep_watchlist_address_12;
+		STRING30 authrep_watchlist_city_12;
+		STRING2 authrep_watchlist_state_12;
+		STRING9 authrep_watchlist_zip_12;
+		STRING30 authrep_watchlist_country_12;
+		STRING200 authrep_watchlist_entity_name_12;
+		STRING4 authrep_watchlist_sequence_12;
+		STRING authrep_watchlist_entitydate_12;
+		STRING authrep_watchlist_publisheddate_12;
+		STRING60 authrep_watchlist_table_13;
+		STRING120 authrep_watchlist_program_13;
+		STRING10 authrep_watchlist_record_number_13;
+		STRING120 authrep_watchlist_companyname_13;
+		STRING20 authrep_watchlist_firstname_13;
+		STRING20 authrep_watchlist_lastname_13;
+		STRING50 authrep_watchlist_address_13;
+		STRING30 authrep_watchlist_city_13;
+		STRING2 authrep_watchlist_state_13;
+		STRING9 authrep_watchlist_zip_13;
+		STRING30 authrep_watchlist_country_13;
+		STRING200 authrep_watchlist_entity_name_13;
+		STRING4 authrep_watchlist_sequence_13;
+		STRING authrep_watchlist_entitydate_13;
+		STRING authrep_watchlist_publisheddate_13;
+		STRING60 authrep_watchlist_table_14;
+		STRING120 authrep_watchlist_program_14;
+		STRING10 authrep_watchlist_record_number_14;
+		STRING120 authrep_watchlist_companyname_14;
+		STRING20 authrep_watchlist_firstname_14;
+		STRING20 authrep_watchlist_lastname_14;
+		STRING50 authrep_watchlist_address_14;
+		STRING30 authrep_watchlist_city_14;
+		STRING2 authrep_watchlist_state_14;
+		STRING9 authrep_watchlist_zip_14;
+		STRING30 authrep_watchlist_country_14;
+		STRING200 authrep_watchlist_entity_name_14;
+		STRING4 authrep_watchlist_sequence_14;
+		STRING authrep_watchlist_entitydate_14;
+		STRING authrep_watchlist_publisheddate_14;
+		STRING60 authrep_watchlist_table_15;
+		STRING120 authrep_watchlist_program_15;
+		STRING10 authrep_watchlist_record_number_15;
+		STRING120 authrep_watchlist_companyname_15;
+		STRING20 authrep_watchlist_firstname_15;
+		STRING20 authrep_watchlist_lastname_15;
+		STRING50 authrep_watchlist_address_15;
+		STRING30 authrep_watchlist_city_15;
+		STRING2 authrep_watchlist_state_15;
+		STRING9 authrep_watchlist_zip_15;
+		STRING30 authrep_watchlist_country_15;
+		STRING200 authrep_watchlist_entity_name_15;
+		STRING4 authrep_watchlist_sequence_15;
+		STRING authrep_watchlist_entitydate_15;
+		STRING authrep_watchlist_publisheddate_15;
+		STRING60 authrep_watchlist_table_16;
+		STRING120 authrep_watchlist_program_16;
+		STRING10 authrep_watchlist_record_number_16;
+		STRING120 authrep_watchlist_companyname_16;
+		STRING20 authrep_watchlist_firstname_16;
+		STRING20 authrep_watchlist_lastname_16;
+		STRING50 authrep_watchlist_address_16;
+		STRING30 authrep_watchlist_city_16;
+		STRING2 authrep_watchlist_state_16;
+		STRING9 authrep_watchlist_zip_16;
+		STRING30 authrep_watchlist_country_16;
+		STRING200 authrep_watchlist_entity_name_16;
+		STRING4 authrep_watchlist_sequence_16;
+		STRING authrep_watchlist_entitydate_16;
+		STRING authrep_watchlist_publisheddate_16;
+		STRING60 authrep_watchlist_table_17;
+		STRING120 authrep_watchlist_program_17;
+		STRING10 authrep_watchlist_record_number_17;
+		STRING120 authrep_watchlist_companyname_17;
+		STRING20 authrep_watchlist_firstname_17;
+		STRING20 authrep_watchlist_lastname_17;
+		STRING50 authrep_watchlist_address_17;
+		STRING30 authrep_watchlist_city_17;
+		STRING2 authrep_watchlist_state_17;
+		STRING9 authrep_watchlist_zip_17;
+		STRING30 authrep_watchlist_country_17;
+		STRING200 authrep_watchlist_entity_name_17;
+		STRING4 authrep_watchlist_sequence_17;
+		STRING authrep_watchlist_entitydate_17;
+		STRING authrep_watchlist_publisheddate_17;
+		STRING60 authrep_watchlist_table_18;
+		STRING120 authrep_watchlist_program_18;
+		STRING10 authrep_watchlist_record_number_18;
+		STRING120 authrep_watchlist_companyname_18;
+		STRING20 authrep_watchlist_firstname_18;
+		STRING20 authrep_watchlist_lastname_18;
+		STRING50 authrep_watchlist_address_18;
+		STRING30 authrep_watchlist_city_18;
+		STRING2 authrep_watchlist_state_18;
+		STRING9 authrep_watchlist_zip_18;
+		STRING30 authrep_watchlist_country_18;
+		STRING200 authrep_watchlist_entity_name_18;
+		STRING4 authrep_watchlist_sequence_18;
+		STRING authrep_watchlist_entitydate_18;
+		STRING authrep_watchlist_publisheddate_18;
+		STRING60 authrep_watchlist_table_19;
+		STRING120 authrep_watchlist_program_19;
+		STRING10 authrep_watchlist_record_number_19;
+		STRING120 authrep_watchlist_companyname_19;
+		STRING20 authrep_watchlist_firstname_19;
+		STRING20 authrep_watchlist_lastname_19;
+		STRING50 authrep_watchlist_address_19;
+		STRING30 authrep_watchlist_city_19;
+		STRING2 authrep_watchlist_state_19;
+		STRING9 authrep_watchlist_zip_19;
+		STRING30 authrep_watchlist_country_19;
+		STRING200 authrep_watchlist_entity_name_19;
+		STRING4 authrep_watchlist_sequence_19;
+		STRING authrep_watchlist_entitydate_19;
+		STRING authrep_watchlist_publisheddate_19;
+		STRING60 authrep_watchlist_table_20;
+		STRING120 authrep_watchlist_program_20;
+		STRING10 authrep_watchlist_record_number_20;
+		STRING120 authrep_watchlist_companyname_20;
+		STRING20 authrep_watchlist_firstname_20;
+		STRING20 authrep_watchlist_lastname_20;
+		STRING50 authrep_watchlist_address_20;
+		STRING30 authrep_watchlist_city_20;
+		STRING2 authrep_watchlist_state_20;
+		STRING9 authrep_watchlist_zip_20;
+		STRING30 authrep_watchlist_country_20;
+		STRING200 authrep_watchlist_entity_name_20;
+		STRING4 authrep_watchlist_sequence_20;
+		STRING authrep_watchlist_entitydate_20;
+		STRING authrep_watchlist_publisheddate_20;
+		STRING60 authrep_watchlist_table_21;
+		STRING120 authrep_watchlist_program_21;
+		STRING10 authrep_watchlist_record_number_21;
+		STRING120 authrep_watchlist_companyname_21;
+		STRING20 authrep_watchlist_firstname_21;
+		STRING20 authrep_watchlist_lastname_21;
+		STRING50 authrep_watchlist_address_21;
+		STRING30 authrep_watchlist_city_21;
+		STRING2 authrep_watchlist_state_21;
+		STRING9 authrep_watchlist_zip_21;
+		STRING30 authrep_watchlist_country_21;
+		STRING200 authrep_watchlist_entity_name_21;
+		STRING4 authrep_watchlist_sequence_21;
+		STRING authrep_watchlist_entitydate_21;
+		STRING authrep_watchlist_publisheddate_21;
+		STRING60 authrep_watchlist_table_22;
+		STRING120 authrep_watchlist_program_22;
+		STRING10 authrep_watchlist_record_number_22;
+		STRING120 authrep_watchlist_companyname_22;
+		STRING20 authrep_watchlist_firstname_22;
+		STRING20 authrep_watchlist_lastname_22;
+		STRING50 authrep_watchlist_address_22;
+		STRING30 authrep_watchlist_city_22;
+		STRING2 authrep_watchlist_state_22;
+		STRING9 authrep_watchlist_zip_22;
+		STRING30 authrep_watchlist_country_22;
+		STRING200 authrep_watchlist_entity_name_22;
+		STRING4 authrep_watchlist_sequence_22;
+		STRING authrep_watchlist_entitydate_22;
+		STRING authrep_watchlist_publisheddate_22;
+		STRING60 authrep_watchlist_table_23;
+		STRING120 authrep_watchlist_program_23;
+		STRING10 authrep_watchlist_record_number_23;
+		STRING120 authrep_watchlist_companyname_23;
+		STRING20 authrep_watchlist_firstname_23;
+		STRING20 authrep_watchlist_lastname_23;
+		STRING50 authrep_watchlist_address_23;
+		STRING30 authrep_watchlist_city_23;
+		STRING2 authrep_watchlist_state_23;
+		STRING9 authrep_watchlist_zip_23;
+		STRING30 authrep_watchlist_country_23;
+		STRING200 authrep_watchlist_entity_name_23;
+		STRING4 authrep_watchlist_sequence_23;
+		STRING authrep_watchlist_entitydate_23;
+		STRING authrep_watchlist_publisheddate_23;
+		STRING60 authrep_watchlist_table_24;
+		STRING120 authrep_watchlist_program_24;
+		STRING10 authrep_watchlist_record_number_24;
+		STRING120 authrep_watchlist_companyname_24;
+		STRING20 authrep_watchlist_firstname_24;
+		STRING20 authrep_watchlist_lastname_24;
+		STRING50 authrep_watchlist_address_24;
+		STRING30 authrep_watchlist_city_24;
+		STRING2 authrep_watchlist_state_24;
+		STRING9 authrep_watchlist_zip_24;
+		STRING30 authrep_watchlist_country_24;
+		STRING200 authrep_watchlist_entity_name_24;
+		STRING4 authrep_watchlist_sequence_24;
+		STRING authrep_watchlist_entitydate_24;
+		STRING authrep_watchlist_publisheddate_24;
+		STRING60 authrep_watchlist_table_25;
+		STRING120 authrep_watchlist_program_25;
+		STRING10 authrep_watchlist_record_number_25;
+		STRING120 authrep_watchlist_companyname_25;
+		STRING20 authrep_watchlist_firstname_25;
+		STRING20 authrep_watchlist_lastname_25;
+		STRING50 authrep_watchlist_address_25;
+		STRING30 authrep_watchlist_city_25;
+		STRING2 authrep_watchlist_state_25;
+		STRING9 authrep_watchlist_zip_25;
+		STRING30 authrep_watchlist_country_25;
+		STRING200 authrep_watchlist_entity_name_25;
+		STRING4 authrep_watchlist_sequence_25;
+		STRING authrep_watchlist_entitydate_25;
+		STRING authrep_watchlist_publisheddate_25;
+		STRING60 authrep_watchlist_table_26;
+		STRING120 authrep_watchlist_program_26;
+		STRING10 authrep_watchlist_record_number_26;
+		STRING120 authrep_watchlist_companyname_26;
+		STRING20 authrep_watchlist_firstname_26;
+		STRING20 authrep_watchlist_lastname_26;
+		STRING50 authrep_watchlist_address_26;
+		STRING30 authrep_watchlist_city_26;
+		STRING2 authrep_watchlist_state_26;
+		STRING9 authrep_watchlist_zip_26;
+		STRING30 authrep_watchlist_country_26;
+		STRING200 authrep_watchlist_entity_name_26;
+		STRING4 authrep_watchlist_sequence_26;
+		STRING authrep_watchlist_entitydate_26;
+		STRING authrep_watchlist_publisheddate_26;
+		STRING60 authrep_watchlist_table_27;
+		STRING120 authrep_watchlist_program_27;
+		STRING10 authrep_watchlist_record_number_27;
+		STRING120 authrep_watchlist_companyname_27;
+		STRING20 authrep_watchlist_firstname_27;
+		STRING20 authrep_watchlist_lastname_27;
+		STRING50 authrep_watchlist_address_27;
+		STRING30 authrep_watchlist_city_27;
+		STRING2 authrep_watchlist_state_27;
+		STRING9 authrep_watchlist_zip_27;
+		STRING30 authrep_watchlist_country_27;
+		STRING200 authrep_watchlist_entity_name_27;
+		STRING4 authrep_watchlist_sequence_27;
+		STRING authrep_watchlist_entitydate_27;
+		STRING authrep_watchlist_publisheddate_27;
+		STRING60 authrep_watchlist_table_28;
+		STRING120 authrep_watchlist_program_28;
+		STRING10 authrep_watchlist_record_number_28;
+		STRING120 authrep_watchlist_companyname_28;
+		STRING20 authrep_watchlist_firstname_28;
+		STRING20 authrep_watchlist_lastname_28;
+		STRING50 authrep_watchlist_address_28;
+		STRING30 authrep_watchlist_city_28;
+		STRING2 authrep_watchlist_state_28;
+		STRING9 authrep_watchlist_zip_28;
+		STRING30 authrep_watchlist_country_28;
+		STRING200 authrep_watchlist_entity_name_28;
+		STRING4 authrep_watchlist_sequence_28;
+		STRING authrep_watchlist_entitydate_28;
+		STRING authrep_watchlist_publisheddate_28;
+		STRING60 authrep_watchlist_table_29;
+		STRING120 authrep_watchlist_program_29;
+		STRING10 authrep_watchlist_record_number_29;
+		STRING120 authrep_watchlist_companyname_29;
+		STRING20 authrep_watchlist_firstname_29;
+		STRING20 authrep_watchlist_lastname_29;
+		STRING50 authrep_watchlist_address_29;
+		STRING30 authrep_watchlist_city_29;
+		STRING2 authrep_watchlist_state_29;
+		STRING9 authrep_watchlist_zip_29;
+		STRING30 authrep_watchlist_country_29;
+		STRING200 authrep_watchlist_entity_name_29;
+		STRING4 authrep_watchlist_sequence_29;
+		STRING authrep_watchlist_entitydate_29;
+		STRING authrep_watchlist_publisheddate_29;
+		STRING60 authrep_watchlist_table_30;
+		STRING120 authrep_watchlist_program_30;
+		STRING10 authrep_watchlist_record_number_30;
+		STRING120 authrep_watchlist_companyname_30;
+		STRING20 authrep_watchlist_firstname_30;
+		STRING20 authrep_watchlist_lastname_30;
+		STRING50 authrep_watchlist_address_30;
+		STRING30 authrep_watchlist_city_30;
+		STRING2 authrep_watchlist_state_30;
+		STRING9 authrep_watchlist_zip_30;
+		STRING30 authrep_watchlist_country_30;
+		STRING200 authrep_watchlist_entity_name_30;
+		STRING4 authrep_watchlist_sequence_30;
+		STRING authrep_watchlist_entitydate_30;
+		STRING authrep_watchlist_publisheddate_30;
+		STRING60 authrep_watchlist_table_31;
+		STRING120 authrep_watchlist_program_31;
+		STRING10 authrep_watchlist_record_number_31;
+		STRING120 authrep_watchlist_companyname_31;
+		STRING20 authrep_watchlist_firstname_31;
+		STRING20 authrep_watchlist_lastname_31;
+		STRING50 authrep_watchlist_address_31;
+		STRING30 authrep_watchlist_city_31;
+		STRING2 authrep_watchlist_state_31;
+		STRING9 authrep_watchlist_zip_31;
+		STRING30 authrep_watchlist_country_31;
+		STRING200 authrep_watchlist_entity_name_31;
+		STRING4 authrep_watchlist_sequence_31;
+		STRING authrep_watchlist_entitydate_31;
+		STRING authrep_watchlist_publisheddate_31;
+		STRING60 authrep_watchlist_table_32;
+		STRING120 authrep_watchlist_program_32;
+		STRING10 authrep_watchlist_record_number_32;
+		STRING120 authrep_watchlist_companyname_32;
+		STRING20 authrep_watchlist_firstname_32;
+		STRING20 authrep_watchlist_lastname_32;
+		STRING50 authrep_watchlist_address_32;
+		STRING30 authrep_watchlist_city_32;
+		STRING2 authrep_watchlist_state_32;
+		STRING9 authrep_watchlist_zip_32;
+		STRING30 authrep_watchlist_country_32;
+		STRING200 authrep_watchlist_entity_name_32;
+		STRING4 authrep_watchlist_sequence_32;
+		STRING authrep_watchlist_entitydate_32;
+		STRING authrep_watchlist_publisheddate_32;
+		STRING60 authrep_watchlist_table_33;
+		STRING120 authrep_watchlist_program_33;
+		STRING10 authrep_watchlist_record_number_33;
+		STRING120 authrep_watchlist_companyname_33;
+		STRING20 authrep_watchlist_firstname_33;
+		STRING20 authrep_watchlist_lastname_33;
+		STRING50 authrep_watchlist_address_33;
+		STRING30 authrep_watchlist_city_33;
+		STRING2 authrep_watchlist_state_33;
+		STRING9 authrep_watchlist_zip_33;
+		STRING30 authrep_watchlist_country_33;
+		STRING200 authrep_watchlist_entity_name_33;
+		STRING4 authrep_watchlist_sequence_33;
+		STRING authrep_watchlist_entitydate_33;
+		STRING authrep_watchlist_publisheddate_33;
+		STRING60 authrep_watchlist_table_34;
+		STRING120 authrep_watchlist_program_34;
+		STRING10 authrep_watchlist_record_number_34;
+		STRING120 authrep_watchlist_companyname_34;
+		STRING20 authrep_watchlist_firstname_34;
+		STRING20 authrep_watchlist_lastname_34;
+		STRING50 authrep_watchlist_address_34;
+		STRING30 authrep_watchlist_city_34;
+		STRING2 authrep_watchlist_state_34;
+		STRING9 authrep_watchlist_zip_34;
+		STRING30 authrep_watchlist_country_34;
+		STRING200 authrep_watchlist_entity_name_34;
+		STRING4 authrep_watchlist_sequence_34;
+		STRING authrep_watchlist_entitydate_34;
+		STRING authrep_watchlist_publisheddate_34;
+		STRING60 authrep_watchlist_table_35;
+		STRING120 authrep_watchlist_program_35;
+		STRING10 authrep_watchlist_record_number_35;
+		STRING120 authrep_watchlist_companyname_35;
+		STRING20 authrep_watchlist_firstname_35;
+		STRING20 authrep_watchlist_lastname_35;
+		STRING50 authrep_watchlist_address_35;
+		STRING30 authrep_watchlist_city_35;
+		STRING2 authrep_watchlist_state_35;
+		STRING9 authrep_watchlist_zip_35;
+		STRING30 authrep_watchlist_country_35;
+		STRING200 authrep_watchlist_entity_name_35;
+		STRING4 authrep_watchlist_sequence_35;
+		STRING authrep_watchlist_entitydate_35;
+		STRING authrep_watchlist_publisheddate_35;
+
+  END;
+  
 	EXPORT OFACAndWatchlistLayoutFlat := RECORD // OFAC
 		UNSIGNED4 Seq;
 		OFACLayoutFlat AND NOT [Seq];
 		WatchlistLayoutFlat AND NOT [Seq];
+		AuthRepWatchlistLayoutFlat AND NOT [Seq];
 	END;
 	
 	EXPORT Business2ExecLayout := RECORD // Bus2Exec
@@ -1404,6 +1976,7 @@ EXPORT Layouts := MODULE
 	EXPORT ConsumerIIDFlatLayout := RECORD 
 		UNSIGNED4 Seq;
 		// AuthRep1
+		STRING15 rep1_sequence;
 		STRING20 rep1_verfirst;
 		STRING20 rep1_verlast;
 		STRING50 rep1_veraddr;
@@ -1591,6 +2164,7 @@ EXPORT Layouts := MODULE
 		STRING200 rep1_watchlist_entity_name_7;
 		
 		// Authrep2
+		STRING15 rep2_sequence;
 		STRING20 rep2_verfirst;
 		STRING20 rep2_verlast;
 		STRING50 rep2_veraddr;
@@ -1778,6 +2352,7 @@ EXPORT Layouts := MODULE
 		STRING200 rep2_watchlist_entity_name_7;
 		
 		// Authrep3
+		STRING15 rep3_sequence;
 		STRING20 rep3_verfirst;
 		STRING20 rep3_verlast;
 		STRING50 rep3_veraddr;
@@ -1965,6 +2540,7 @@ EXPORT Layouts := MODULE
 		STRING200 rep3_watchlist_entity_name_7;
 		
 		// Authrep4
+		STRING15 rep4_sequence;
 		STRING20 rep4_verfirst;
 		STRING20 rep4_verlast;
 		STRING50 rep4_veraddr;
@@ -2152,6 +2728,7 @@ EXPORT Layouts := MODULE
 		STRING200 rep4_watchlist_entity_name_7;
 		
 		// Authrep5
+		STRING15 rep5_sequence;
 		STRING20 rep5_verfirst;
 		STRING20 rep5_verlast;
 		STRING50 rep5_veraddr;
@@ -2340,9 +2917,33 @@ EXPORT Layouts := MODULE
 	END;	
 	
 	EXPORT ConsumerInstantIDLayout := RECORD 
-		risk_indicators.Layout_InstantID_NuGenPlus AND NOT [acctno,seq];
+		risk_indicators.Layout_InstantID_NuGenPlus AND NOT [acctno];
+		STRING1   Rep_WhichOne;
+		STRING15  Sequence;
 	END;
-	
+
+	//AttributesLayout
+  EXPORT Layout_Parameters := RECORD
+		STRING name;
+		STRING value;
+  END;
+
+  EXPORT Layout_Attribute := RECORD, maxlength(10000)
+		DATASET(Layout_Parameters) Attribute;
+  END;
+
+  EXPORT Layout_AttributeGroup := RECORD, maxlength(70000)
+		STRING15 name;
+		// STRING3 index;
+		DATASET(Layout_Attribute) Attributes;
+  END;
+  
+  EXPORT BusinessAddressRiskLayout := record
+		UNSIGNED4 Seq;
+		// BOOLEAN AddressIsPOBox;
+		BOOLEAN AddressIsCMRA;
+  END;
+  
 	// The following layout provides the basis for transforming into either Online/XML or Batch layouts later.
 	EXPORT OutputLayout_intermediate := RECORD
 		UNSIGNED3 seq;
@@ -2364,7 +2965,10 @@ EXPORT Layouts := MODULE
 		SBFEVerificationLayout AND NOT [Seq] SBFEVerification;
 		OFACLayoutFlat AND NOT [Seq] OFAC;
 		WatchlistLayoutFlat AND NOT [Seq] Watchlists;
+		BusinessAddressRiskLayout AND NOT [Seq] BusinessAddressRisk;
 		DATASET(ConsumerInstantIDLayout) ConsumerInstantID;
+		DATASET(iesp.smallbusinessanalytics.t_SBAModelHRI) Models {/*xpath('Models/Model'), */MAXCOUNT(iesp.constants.SBAnalytics.MaxModelCount)};
+		DATASET(iesp.smallbusinessanalytics.t_SBAAttributesGroup) AttributeGroup {MAXCOUNT(iesp.Constants.SBAnalytics.MaxAttributes)};
 	END;
 	
 	EXPORT OutputLayout_flat := RECORD  // Verification layout
@@ -2385,6 +2989,11 @@ EXPORT Layouts := MODULE
 		SBFEVerificationLayout AND NOT [Seq];
 		OFACAndWatchlistLayoutFlat AND NOT [Seq];
 		ConsumerIIDFlatLayout AND NOT [Seq];
+		// LNSmallBusiness.BIP_Layouts.Version1Attributes;
+		// LNSmallBusiness.BIP_Layouts.Version2Attributes;
+		// LNSmallBusiness.BIP_Layouts.SBFEAttributes;
+		// LNSmallBusiness.BIP_Layouts.BatchScoreData;
+		// LNSmallBusiness.BIP_Layouts.Company_IDs;
 	END;	
 
 	EXPORT OutputLayout_batch := RECORD
@@ -2401,13 +3010,18 @@ EXPORT Layouts := MODULE
 		BusinessByPhoneLayout AND NOT [Seq, bus_phone_match_ultid_1, bus_phone_match_orgid_1, bus_phone_match_proxid_1, bus_phone_match_powid_1, bus_phone_match_ultid_2, bus_phone_match_orgid_2, bus_phone_match_proxid_2, bus_phone_match_powid_2, bus_phone_match_ultid_3, bus_phone_match_orgid_3, bus_phone_match_proxid_3, bus_phone_match_powid_3];
 		PhonesByAddressLayout AND NOT [Seq];
 		BusinessByFEINLayout AND NOT [Seq, bus_fein_match_ultid_1, bus_fein_match_orgid_1, bus_fein_match_proxid_1, bus_fein_match_powid_1, bus_fein_match_ultid_2, bus_fein_match_orgid_2, bus_fein_match_proxid_2, bus_fein_match_powid_2, bus_fein_match_ultid_3, bus_fein_match_orgid_3, bus_fein_match_proxid_3, bus_fein_match_powid_3];
-		OFACLayoutFlat AND NOT [Seq];
-		WatchlistLayoutFlat AND NOT [Seq];		
+		OFACLayoutFlat AND NOT [Seq, bus_ofac_entitydate_1, bus_ofac_publisheddate_1, bus_ofac_entitydate_2, bus_ofac_publisheddate_2, bus_ofac_entitydate_3, bus_ofac_publisheddate_3, bus_ofac_entitydate_4, bus_ofac_publisheddate_4, bus_ofac_entitydate_5, bus_ofac_publisheddate_5, bus_ofac_entitydate_6, bus_ofac_publisheddate_6, bus_ofac_entitydate_7, bus_ofac_publisheddate_7];
+		WatchlistLayoutFlat AND NOT [Seq, bus_watchlist_entitydate_1, bus_watchlist_publisheddate_1, bus_watchlist_entitydate_2, bus_watchlist_publisheddate_2, bus_watchlist_entitydate_3, bus_watchlist_publisheddate_3, bus_watchlist_entitydate_4, bus_watchlist_publisheddate_4, bus_watchlist_entitydate_5, bus_watchlist_publisheddate_5, bus_watchlist_entitydate_6, bus_watchlist_publisheddate_6, bus_watchlist_entitydate_7, bus_watchlist_publisheddate_7];
 		BatchFirmographicLayout AND NOT [Seq];
 		BatchPersonRoleLayout AND NOT [Seq];
 		BatchParentLayout AND NOT [Seq];
 		SBFEVerificationLayout AND NOT [Seq];
-		ConsumerIIDFlatLayout AND NOT [Seq];
+		ConsumerIIDFlatLayout AND NOT [Seq, rep1_sequence, rep2_sequence, rep3_sequence, rep4_sequence, rep5_sequence];
+		// LNSmallBusiness.BIP_Layouts.Version1Attributes;
+		// LNSmallBusiness.BIP_Layouts.Version2Attributes;
+		// LNSmallBusiness.BIP_Layouts.SBFEAttributes;
+		// LNSmallBusiness.BIP_Layouts.BatchScoreData ModelResults1;
+		// LNSmallBusiness.BIP_Layouts.Company_IDs;
 	END;
 	
 	EXPORT BusinessHeaderSlim := RECORD

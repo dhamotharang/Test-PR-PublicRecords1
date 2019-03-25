@@ -68,6 +68,7 @@
 '6R', // TEXAS_CHAMBERS_COUNTY                                                                               
 '6T', // OHIO_CLARK_COUNTY_COMMON_PLEAS_COURT                                                                
 '6Y', // OHIO_CUYAHOGA_COMMON_PLEAS_COURT                                                                    
+'7A', // SOUTH_CAROLINA_ADMINISTRATOR_OF_THE_COURTS                                                          
 '7J', // OHIO_MORROW_COUNTY_MUNICIPAL_COURT                                                                  
 '7N', // TEXAS_LAMAR_COUNTY                                                                                  
 '7O', // TEXAS_LAMAR_COUNTY_JUSTICE_OF_THE_PEACE_COURTS                                                      
@@ -78,7 +79,7 @@
 '7X', // FLORIDA_MANATEE_CIRCUIT_AND_COUNTY_COURTS                                                           
 '7Z', // ILLINOIS_PEORIA_COUNTY                                                                              
 '8A', // NEVADA_CLARK_COUNTY_DISTRICT_COURTS                                                                 
-'8F', // ILLINOIS_VIOLENT_OFFENDER_AGAINST_YOUTH                                                             
+'8D', // OHIO_SHELBY_COUNTY_COMMON_PLEAS_COURT                                                               
 '8M', // OHIO_FAYETTE_COUNTY_COMMON_PLEAS_COURT                                                              
 '8P', // OHIO_CUYAHOGA_COUNTY_CLEVELAND_MUNICIPAL_COURT                                                      
 '8Q', // OHIO_CUYAHOGA_COUNTY_CLEVELANDHEIGHTS_MUNICIPAL_COURT                                               
@@ -89,6 +90,8 @@
 '9G', // OHIO_LAWRENCE_COUNTY_COMMON_PLEAS_COURT                                                             
 '9O', // OHIO_FRANKLIN_COUNTY_COMMON_PLEAS                                                                   
 '9P', // OHIO_SCIOTO_COUNTY_PORTSMOUTH_MUNICIPAL_COURT                                                       
+'9R', // OHIO_STARK_COUNTY_MASSILLON_MUNICIPAL_COURT                                                         
+'9S', // OHIO_STARK_COUNTY_CANTON_MUNICIPAL_COURT                                                            
 '9T', // OHIO_OTTAWA_COUNTY_COMMON_PLEAS_COURT                                                               
 '9U', // OHIO_UNION_COUNTY_COMMON_PLEAS_COURT                                                                
 '9V', // OHIO_WYANDOT_COUNTY_COMMON_PLEAS_COURT                                                              
@@ -106,6 +109,7 @@
 'BK', // ARKANSAS_WASHINGTON_COUNTY_ARRESTS                                                                  
 'BL', // ARIZONA_MARICOPA_COUNTY_ARRESTS                                                                     
 'BM', // ARIZONA_PIMA_COUNTY_ARRESTS                                                                         
+'BN', // CALIFORNIA_FRESNO_COUNTY_ARRESTS                                                                    
 'BO', // CALIFORNIA_KERN_COUNTY_ARRESTS                                                                      
 'BP', // CALIFORNIA_KINGS_COUNTY_ARRESTS                                                                     
 'BQ', // CALIFORNIA_LOS_ANGELES_COUNTY_ARRESTS                                                               
@@ -132,13 +136,11 @@
 'DD', // ARIZONA_DEPARTMENT_OF_CORRECTIONS                                                                   
 'DJ', // GEORGIA_DEPARTMENT_OF_CORRECTIONS                                                                   
 'DL', // HAWAII_DEPARTMENT_OF_CORRECTIONS                                                                    
-'DO', // IOWA_DEPARTMENT_OF_CORRECTIONS                                                                      
 'DP', // IOWA_DEPARTMENT_OF_CORRECTIONS_PROBATION                                                            
 'DR', // KENTUCKY_DEPARTMENT_OF_CORRECTIONS                                                                  
 'DT', // MAINE_DEPARTMENT_OF_CORRECTIONS                                                                     
 'DV', // MICHIGAN_DEPARTMENT_OF_CORRECTIONS                                                                  
 'DW', // MICHIGAN_DEPARTMENT_OF_CORRECTIONS_ALTERNATE_FILE                                                   
-'EA', // NEW_JERSEY_DEPARTMENT_OF_CORRECTIONS                                                                
 'EB', // NEW_MEXICO_DEPARTMENT_OF_CORRECTIONS                                                                
 'EC', // NEVADA_DEPARTMENT_OF_CORRECTIONS                                                                    
 'ED', // NEW_YORK_DEPARTMENT_OF_CORRECTIONS                                                                  
@@ -178,6 +180,7 @@
 'GR', // FLORIDA_VOLUSIA_COUNTY_ARRESTS                                                                      
 'GT', // GEORGIA_CHATHAM_COUNTY_ARRESTS                                                                      
 'GU', // GEORGIA_CLARKE_COUNTY_ARRESTS                                                                       
+'GV', // GEORGIA_DAWSON_COUNTY_ARRESTS                                                                       
 'GW', // GEORGIA_FULTON_COUNTY_ARRESTS                                                                       
 'GX', // GEORGIA_GWINNETT_COUNTY_ARRESTS                                                                     
 'GY', // IOWA_BUENA_VISTA_COUNTY_ARRESTS                                                                     
@@ -206,12 +209,15 @@
 'HY', // MICHIGAN_KENT_COUNTY_ARRESTS                                                                        
 'HZ', // MICHIGAN_WAYNE_COUNTY_ARRESTS                                                                       
 'IC', // IOWA_ADMINISTRATOR_OF_THE_COURTS                                                                    
+'IE', // MINNESOTA_DAKOTA_COUNTY_ARRESTS                                                                     
+'IF', // MINNESOTA_HENNEPIN_COUNTY_ARRESTS                                                                   
 'IG', // MINNESOTA_OLMSTED_COUNTY_ARRESTS                                                                    
 'IH', // MISSOURI_CLAY_COUNTY_ARRESTS                                                                        
 'II', // MISSOURI_ST_FRANCOIS_COUNTY_ARRESTS                                                                 
 'IJ', // MISSISSIPPI_HARRISON_COUNTY_ARRESTS                                                                 
 'IO', // MONTANA_MISSOULA_COUNTY_ARRESTS                                                                     
 'IP', // MONTANA_YELLOWSTONE_COUNTY_ARRESTS                                                                  
+'IQ', // NORTH_CAROLINA_CABARRUS_COUNTY_ARRESTS                                                              
 'IS', // NORTH_CAROLINA_DURHAM_COUNTY_ARRESTS                                                                
 'IT', // NORTH_CAROLINA_GUILFORD_COUNTY_ARRESTS                                                              
 'IU', // NORTH_CAROLINA_LINCOLN_COUNTY_ARRESTS                                                               
@@ -230,6 +236,7 @@
 'KH', // NEW_YORK_ONEIDA_COUNTY_ARRESTS                                                                      
 'KI', // NEW_YORK_ONONDAGA_COUNTY_ARRESTS                                                                    
 'KJ', // OHIO_FAYETTE_COUNTY_ARRESTS                                                                         
+'KK', // OHIO_GALLIA_COUNTY_ARRESTS                                                                          
 'KL', // OHIO_HAMILTON_COUNTY_ARRESTS                                                                        
 'KM', // OHIO_HIGHLAND_COUNTY_ARRESTS                                                                        
 'KN', // OHIO_LICKING_COUNTY_ARRESTS                                                                         
@@ -293,6 +300,7 @@
 'NU', // VIRGINIA_DANVILLE_POLICE_ARRESTS                                                                    
 'NW', // VIRGINIA_FAIRFAX_COUNTY_ARRESTS                                                                     
 'NZ', // WASHINGTON_COWLITZ_COUNTY_ARRESTS                                                                   
+'OB', // OHIO_SUMMIT_COUNTY_CUYAHOGA_FALLS_MUNICIPAL_COURT                                                   
 'OE', // OHIO_FRANKLIN_COUNTY_MUNICIPAL_COURT                                                                
 'OF', // OHIO_WARREN_COUNTY                                                                                  
 'OI', // OHIO_COLUMBIANA_COUNTY                                                                              
@@ -306,7 +314,6 @@
 'OY', // OHIO_MONTGOMERY_COUNTY                                                                              
 'PB', // OHIO_BUTLER_COUNTY                                                                                  
 'PC', // OHIO_MONTGOMERY_COUNTY_VANDALIA_MUNICIPAL_COURT                                                     
-'PD', // OHIO_DELAWARE_COUNTY                                                                                
 'PE', // OHIO_WARREN_COUNTY_COURT                                                                            
 'PF', // OHIO_SUMMIT_COUNTY_AKRON_MUNICIPAL_COURT                                                            
 'PG', // OHIO_FRANKLIN_COUNTY                                                                                
@@ -330,6 +337,7 @@
 'QK', // CALIFORNIA_ALAMEDA_COUNTY                                                                           
 'QL', // CALIFORNIA_MARIN_COUNTY_ALTERNATE_FILE                                                              
 'QN', // COLORADO_DENVER_COUNTY                                                                              
+'QO', // OHIO_LAKE_COUNTY                                                                                    
 'QR', // OHIO_SANDUSKY_COUNTY                                                                                
 'QS', // OHIO_MEDINA_COUNTY                                                                                  
 'QU', // OHIO_HAMILTON_COUNTY                                                                                
@@ -346,9 +354,11 @@
 'RK', // OHIO_PICKAWAY_COUNTY_COMMON_PLEAS_COURT                                                             
 'RL', // OHIO_RICHLAND_COUNTY                                                                                
 'RM', // OHIO_RICHLAND_COUNTY_MANSFIELD_MUNICIPAL_COURT                                                      
+'RN', // OHIO_WAYNE_COUNTY                                                                                   
 'RP', // TENNESSEE_HAMILTON_COUNTY                                                                           
 'RQ', // TENNESSEE_RUTHERFORD_COUNTY                                                                         
 'RR', // SOUTH_CAROLINA_GREENVILLE_COUNTY                                                                    
+'RS', // SOUTH_CAROLINA_GREENVILLE_COUNTY_CURCUIT_COURTS                                                     
 'RT', // SOUTH_CAROLINA_GREENVILLE_COUNTY_SUMMARY_COURTS                                                     
 'RU', // SOUTH_CAROLINA_YORK_COUNTY                                                                          
 'SA', // SOUTH_CAROLINA_RICHLAND_COUNTY_CIRCUIT_COURTS                                                       
@@ -384,6 +394,7 @@
 'UZ', // MICHIGAN_OAKLAND_COUNTY                                                                             
 'VB', // VIRGINIA_ADMINISTRATOR_OF_THE_COURTS                                                                
 'VC', // MICHIGAN_SAGINAW_COUNTY                                                                             
+'VF', // NEVADA_CLARK_COUNTY_JUSTICE_COURTS                                                                  
 'VG', // NEW_MEXICO_BERNALILLO_COUNTY                                                                        
 'VI', // OHIO_ASHLAND_COUNTY                                                                                 
 'VJ', // OHIO_ASHTABULA_COUNTY                                                                               
@@ -400,6 +411,8 @@
 'WG', // NORTH_CAROLINA_DEPARTMENT_OF_CORRECTIONS_WEBSITE                                                    
 'WH', // OKLAHOMA_DEPARTMENT_OF_CORRECTIONS_WEBSITE                                                          
 'WK', // UTAH_DEPARTMENT_OF_CORRECTIONS_WEBSITE                                                              
+'WN', // OHIO_CUYAHOGA_COUNTY_PARMA_MUNICIPAL_COURT                                                          
+'WS', // OHIO_JEFFERSON_COUNTY_TORONTO                                                                       
 'WT', // OHIO_GUERNSEY_COUNTY_CAMBRIDGE_MUNICIPAL_COURT                                                      
 'XX', // OHIO_KNOX_COUNTY_COMMON_PLEAS_COURT                                                                 
 'XY', // OHIO_KNOX_COUNTY_MOUNT_VERNON_MUNICIPAL_COURT                                                       
@@ -407,7 +420,6 @@
 'YE', // OHIO_LUCAS_COUNTY_MAUMEE_MUNICIPAL_COURT                                                            
 'YG', // SOUTH_CAROLINA_NEWBERRY_COUNTY_CIRCUIT_COURTS                                                       
 'YH', // OHIO_MARION_COUNTY                                                                                  
-'YK', // OHIO_MONTGOMERY_MIAMISBURG_MUNICIPAL_COURT                                                          
 'YN', // OHIO_PERRY_COUNTY_COURT                                                                             
 'YO', // OHIO_PREBLE_COUNTY_COMMON_PLEAS_COURT                                                               
 'YT', // OHIO_SHELBY_COUNTY_SIDNEY_MUNICIPAL_COURT                                                           
@@ -477,6 +489,7 @@
 'W0066', // CALIFORNIA_NEVADA_COUNTY_SHERIFFS_OFFICE_CW                                                         
 'W0079', // FLORIDA_COLUMBIA_COUNTY_SHERIFFS_OFFICE_CW                                                          
 'W0082', // FLORIDA_JACKSON_COUNTY_SHERIFFS_OFFICE_CW                                                           
+'W0083', // MASSACHUSETTS_TAUNTON_POLICE_DEPARTMENT_CW                                                          
 'W0087', // LOUISIANA_OPELOUSAS_POLICE_CW                                                                       
 'W0088', // CALIFORNIA_SANTA_CLARA_POLICE_DEPARTMENT_CW                                                         
 'W0089', // MASSACHUSETTS_HOLYOKE_POLICE_DEPARTMENT_CW                                                          

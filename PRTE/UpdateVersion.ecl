@@ -56,7 +56,7 @@ export updateversion(string datasetname,string uversion,string email_t,string in
 	end;
 	
 	soapresults := SOAPCALL(
-				dops.constants.prboca.serviceurl(dopsenv,l_loc := inloc),
+				dops.constants.prboca.serviceurl(dopsenv,l_loc := inloc,l_testenv := 'PRTE'),
 				'UpdateVersion',
 				InputRec,
 				dataset(outrec),

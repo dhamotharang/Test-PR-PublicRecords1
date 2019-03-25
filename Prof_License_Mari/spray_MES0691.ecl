@@ -1,4 +1,4 @@
-// spray MES0691 Professional Licenses Files for MARI	   
+﻿// spray MES0691 Professional Licenses Files for MARI	   
 
 import ut
 	   ,_control
@@ -17,7 +17,7 @@ shared filepath		    :=	'/data/data_build_5_2/MARI/in/MES0691/';
 shared sourcepath		:=	'/data/data_build_5_2/MARI/';
 
 shared maxRecordSize	:=	8192;
-shared group_name	:=	'thor40_241';
+shared group_name	:=	Common_Prof_Lic_Mari.group_name;
 
 destination := Common_Prof_Lic_Mari.SourcesFolder + 'MES0691::';
 

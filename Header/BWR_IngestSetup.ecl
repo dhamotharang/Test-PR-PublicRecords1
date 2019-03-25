@@ -89,10 +89,20 @@ lgn(string sp_name) := '~'+nothor(fileservices.SuperFileContents(sp_name)[1].nam
 _wuid(string sp_name) := nothor(STD.File.GetLogicalFileAttribute(lgn(sp_name),'workunit'));
 restoreWuid(string sp_name) := output(wk_ut.Restore_Workunit(_wuid(sp_name)),named(ingest_action + 'wuids_restore'),extend);
 
+isHeaderBuildingSFEmpty(string buildingSuperfilename) := function
+
+    hdr_ingst_building_content := nothor(fileservices.SuperFileContents(buildingSuperfilename)[1].name);
+    val := if(hdr_ingst_building_content <> '', false, true);
+    return val;
+ 
+end;
+
 // Reusable call to check packages vs. base file dates
-ck(string pk, string buildingSuperfilename, string sp_name, string clstr='N') := dataset([{pk,sp_name,
-                            if(isNewerOrProdCertDeployAFTERfileWuidBuildEnd(pk,sp_name,buildingSuperfilename,clstr),true,false)}],
-                                        {string pk, string sp_name, boolean input_will_update});
+ck(string pk, string buildingSuperfilename, string sp_name, string clstr='N') := dataset([{
+                            pk,
+                            sp_name,
+                            if(isHeaderBuildingSFEmpty(buildingSuperfilename), false, if(isNewerOrProdCertDeployAFTERfileWuidBuildEnd(pk,sp_name,buildingSuperfilename,clstr),true,false))
+                            }],{string pk, string sp_name, boolean input_will_update});
 
 restore := 
 sequential(
@@ -141,7 +151,7 @@ ck('VehicleV2Keys'      ,'~thor_data400::base::vehicles_v2_party_header_building
 ck('VehicleV2Keys_F'    ,'~thor_data400::base::vehicles_v2_party_header_building','~thor_data400::base::vehiclev2::party_father')+
 // ck('VehicleV2Keys_D'    ,'~thor_data400::base::vehicles_v2_party_header_building','~thor_data400::base::vehiclev2::party_delete')+
 ck('CertegyKeys'        ,'~thor_data400::base::certegyheader_building'           ,'~thor_data400::base::certegy')+
-ck('SexOffenderKeys'    ,'~thor_data400::base::sex_offender_mainpublic_building' ,'~thor_data400::base::sex_offender_mainpublic')+
+// ck('SexOffenderKeys'    ,'~thor_data400::base::sex_offender_mainpublic_building' ,'~thor_data400::base::sex_offender_mainpublic')+
 ck('TargusKeys'         ,'~thor_data400::base::consumer_targusHeader_Building'   ,'~thor_data400::base::consumer_targus') +
 ck('TargusKeys_F'       ,'~thor_data400::base::consumer_targusHeader_Building'   ,'~thor_data400::base::consumer_targus_father') :independent;
 
@@ -162,7 +172,9 @@ report2 := project(report,transform({string pk, boolean update},SELF.pk:=LEFT.pk
                      {'tucs'          ,true}, // Always on
                      {'transunion'    ,true}, // Always on
                      {'eq_hist'       ,true}, // Stale (always on)
-                     {'alloymedia'    ,true}  // Stale (always on)
+                     {'alloymedia'    ,true},  // Stale (always on)
+                     {'cd_seed'       ,true},  // Stale (always on)
+                     {'SexOffenderKeys' ,true}  // Stale (always on)
                      
                     ],{string pk, boolean update});
 
@@ -266,7 +278,8 @@ action_setup := sequential(
                 );
 return
 sequential(
-             restore
+             // if(~skip_action, output(SFContents, named('SuperFiles Contents Before Setup Run'))
+            restore
             ,report_condition_status
             ,STD.System.Debug.Sleep (10000)
             ,output(report,named(ingest_action + 'auto_report'))

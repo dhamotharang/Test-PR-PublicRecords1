@@ -13,12 +13,33 @@ end;
 
 t_Expdates := table(dInValid_Expdate,exprec,date_last_seen,vendor,few);
 
-srt_exp := sort(t_Expdates ,-count_); 
+out_exp := output(t_Expdates,named('Invalid_Expiration_Dates'));
 
 
-out_exp := output(srt_exp,named('Invalid_Expiration_Dates'));
+srt_exp := sort(t_Expdates ,-count_,-date_last_seen); 
 
-validate_exp := if ( srt_exp[1].count_ > 1000 and ut.DaysApart ( (STRING8)STD.Date.Today() , srt_exp[1].date_last_seen ) < 30  ,fail ('Count greater than 1000'),Output('LOOKS GOOD')); 
+expfinalrec := record
+exprec;
+string alert_flag := 'N';
+end;
+
+expfinalrec  texpdt ( srt_exp l ) := transform
+self.alert_flag := if (  l.count_ > 1000 and ut.DaysApart ( (STRING8)STD.Date.Today() , l.date_last_seen ) < 30 ,'Y','N');
+self := l;
+end;
+
+srt_exp_final := project( srt_exp, texpdt(left));
+
+
+
+
+validate_exp := if ( count(srt_exp_final(alert_flag = 'Y')) > 0  ,Sequential( Output(topn(srt_exp_final(alert_flag = 'Y'), 100, -date_last_seen) , named ( 'New_Invalid_Expiration_Dates')),
+                                                                                                      fail ('Count greater than 1000')
+																		    ),
+															Output('LOOKS GOOD')
+  ); 
+
+
 
 
 //Issue_Date
@@ -33,9 +54,33 @@ end;
 
 t_Issuedates := sort(table(dInValid_Issue_Date,issuerec,date_last_seen,vendor,few),-count_);
 
+srt_issue := sort(t_Issuedates ,-count_,-date_last_seen); 
+
+issuefinalrec := record
+issuerec;
+string alert_flag := 'N';
+end;
+
+issuefinalrec  tissuedt ( srt_exp l ) := transform
+self.alert_flag := if (  l.count_ > 1000 and ut.DaysApart ( (STRING8)STD.Date.Today() , l.date_last_seen ) < 30 ,'Y','N');
+self := l;
+end;
+
+srt_issue_final := project( srt_issue, tissuedt(left));
+
+
+
+
+validate_issue := if ( count(srt_issue_final(alert_flag = 'Y')) > 0  ,Sequential( Output(topn(srt_issue_final(alert_flag = 'Y'), 100, -date_last_seen) , named ( 'New_Invalid_Issue_Dates')),
+                                                                                                      fail ('Count greater than 1000')
+																		    ),
+															Output('LOOKS GOOD')
+  ); 
+
+
+
 out_issue := output(t_Issuedates,named('Invalid_Issue_Dates'));
 
-validate_issue := if ( t_Issuedates[1].count_ > 1000 and ut.DaysApart ( (STRING8)STD.Date.Today() , t_Issuedates[1].date_last_seen ) < 30  ,fail ('Count greater than 1000'),Output('LOOKS GOOD')); 
 
 
 return sequential( out_exp,out_issue, validate_exp, validate_issue);

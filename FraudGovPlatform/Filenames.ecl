@@ -8,13 +8,13 @@ export Filenames(
 ) :=
 module
 
-	Shared FraudGov_Prefix (string pType):= FraudGovPlatform._Dataset(false).thor_cluster_Files + pType +'::' + FraudGovPlatform._Dataset(false).name + '::' ;
+	Shared FraudGov_Prefix (string pType):= FraudGovPlatform._Dataset(false).thor_cluster_Files + pType +'::';
 
 	//////////////////////////////////////////////////////////////////
 	// -- Sprayed Filename Versions
 	//////////////////////////////////////////////////////////////////
 	export Sprayed := module
-		export FileSprayed 	:= 	_Dataset().thor_cluster_Files +'in::'+_Dataset().Name;
+		export FileSprayed 	:= 	_Dataset().thor_cluster_Files +'in';
 		
 		export _IdentityDataPassed := FileSprayed+'::Passed::IdentityData';
 		export _IdentityDataRejected := FileSprayed+'::Rejected::IdentityData';
@@ -67,7 +67,6 @@ module
 		export AddressCache_Deltabase							:= tools.mod_FilenamesInput(Template('AddressCache_Deltabase'),pversion);
 		
 		export DemoData											:= tools.mod_FilenamesInput(Template('DemoData'),pversion);
-		export SourcesToAnonymize						:= tools.mod_FilenamesInput(Template('SourcesToAnonymize'),pversion);
 		export MBSInclusionDemoData					:= tools.mod_FilenamesInput(Template('MBSInclusionDemoData'),pversion);
 		export MBSDemoData									:= tools.mod_FilenamesInput(Template('MBSDemoData'),pversion);
 		
@@ -88,15 +87,24 @@ module
 	end;
 
 	//////////////////////////////////////////////////////////////////
+	// -- Config Filenames
+	//////////////////////////////////////////////////////////////////
+	export Flags := module
+		export NewHeader := FraudGov_Prefix('flags') + 'NewHeader_flag';
+		export FraudgovInfoFn := FraudGov_Prefix('flags') + 'NewFraudgov_flag';
+		export RefreshAddresses := FraudGov_Prefix('flags') + 'RefreshAddresses_flag';	
+		export SourcesToAnonymize := FraudGov_Prefix('flags') + 'SourcesToAnonymize_flag';	
+		export SkipModules := FraudGov_Prefix('flags') + 'SkipModules_flag';
+		export SkipValidationByGCID	 := FraudGov_Prefix('flags') + 'SkipValidationByGCID_flag';
+	end;
+	//////////////////////////////////////////////////////////////////
 	// -- Output Filename Versions
 	//////////////////////////////////////////////////////////////////
 	export OutputF := module
-		export NewHeader 			:= FraudGov_Prefix('out') + 'NewHeader_flag';
-		export FraudgovInfoFn		:= FraudGov_Prefix('out') + 'NewFraudgov_flag';
-		export RefreshAddresses 	:= FraudGov_Prefix('out') + 'RefreshAddresses_flag';	
-		export Scrubs_FraudGov 		:= FraudGov_Prefix('out') + 'Scrubs_FraudGov';
-		export mod_collisions_concat_srt 		:= FraudGov_Prefix('out') + 'mod_collisions::concat_srt';
-		export mod_collisions_concat_ddp 		:= FraudGov_Prefix('out') + 'mod_collisions::concat_ddp';
+		export Scrubs_MBS := FraudGov_Prefix('out') + 'Scrubs_MBS';
+		export Scrubs_FraudGov := FraudGov_Prefix('out') + 'Scrubs_FraudGov';
+		export mod_collisions_concat_srt := FraudGov_Prefix('out') + 'mod_collisions::concat_srt';
+		export mod_collisions_concat_ddp := FraudGov_Prefix('out') + 'mod_collisions::concat_ddp';
 	end;
 
 	//////////////////////////////////////////////////////////////////

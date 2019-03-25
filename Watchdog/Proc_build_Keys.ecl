@@ -1,4 +1,4 @@
-﻿import ut,lib_keylib,lib_fileservices,RoxieKeybuild,Orbit3,Suppress,_control,header;
+﻿import ut,lib_keylib,lib_fileservices,RoxieKeybuild,Orbit3,Suppress,_control,header,Watchdog_V2;
 
 leMailTarget := 'dataops@seisint.com;michael.gould@lexisnexisrisk.com';
 
@@ -159,7 +159,10 @@ create_build := Orbit3.proc_Orbit3_CreateBuild('Watchdog Best',filedate,'N|B');
 										
 export Proc_build_Keys := sequential(wchk,build_keys,move_to_built,move_keys
 			,parallel(eighth_key,eighthDotOne_key),mv8,mv8_1,move8,move8_1 // builds off seventh key and uses MOXIE out file that will be deleted
-		  ,/*k9,k10,mv9,mv10,move9,move10*/
+		  /*k9,k10,mv9,mv10,move9,move10*/
+			// build universal key after all the other keys are built
+			,Watchdog_V2.Proc_Build_Merged_Key(filedate),
+			// then update DOPS
 			update_version,
 			create_build,
 			/*,create_build,update_idops,*/

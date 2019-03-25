@@ -53,7 +53,8 @@ end;
 
 w_fed_dstcode_layout xform_fed_dstcode(w_prim_city l, Ares.files.ds_city r) := transform
 	fed_dstcode1 := r.alternativeRegions.alternativeRegions(type='Federal Reserve District')[1].value;
-	self.fed_dstcode := fed_dstcode1 + r.alternativeRegions.alternativeRegions(type='Federal Reserve Sub District')[1].value;
+	fed_dstcode2 := r.alternativeRegions.alternativeRegions(type='Federal Reserve Sub District')[1].value;
+	self.fed_dstcode := fed_dstcode1 + ' ' + regexreplace(fed_dstcode1, fed_dstcode2, '');
 	self := l;
 end;
 
@@ -65,7 +66,7 @@ w_rc_lookups_layout := record(recordof(w_fed_dstcode))
 	string rc_mask := '';
 end;
 w_rc_lookups_layout xform_rc_lookup(w_fed_dstcode l, rc_lookups r) := transform
-	self.rc_mask := regexreplace('[%@]', r.tfpformat, '#') ;
+	self.rc_mask := regexreplace('[%@]', r.format, '#') ;
 	self := l;
 end;
 
@@ -83,9 +84,10 @@ layout_gpcod2 xform_final(w_rc_lookups l, integer c) := Transform
 													 l.routingnumber_alt != '' => 	l.routingnumber_alt, 
 													 l.rc_mask != '' => Ares.str_functions.mask(l.routing_raw, l.rc_mask),
 													 l.routing_raw );
+	self.Federal_Reserve_District_Code := if(l.codeType = 'ABA', l.fed_dstcode,'');
 	self := l;
 End;
 
 final := Project(w_rc_lookups, xform_final(left, counter));
 
-EXPORT file_gpcod2 := final : persist('persist::ares::routingcodes');
+EXPORT file_gpcod2 := final : persist('persist::ares::routingcodes', SINGLE);

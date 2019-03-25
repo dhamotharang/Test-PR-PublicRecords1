@@ -2,7 +2,7 @@
 
 export proc_Build_Phase_2(
 
-   pversion               
+   pversion               = 'BIPV2.KeySuffix'       
   //booleans to control what runs in the build.  These allow for fine control over build without sandboxing.
   ,pSkipXlink             = 'false'
   ,pSkipCopyXlinkKeys     = 'false'
@@ -12,10 +12,12 @@ export proc_Build_Phase_2(
   ,pSkipBest              = 'false'
   ,pSkipIndustry          = 'false'
   ,pSkipMisckeys          = 'false'
+  ,pSkipQASamples         = 'false'
   ,pSkipSegStats          = 'false'
   ,pSkipStrata            = 'false'
   ,pSkipOverlinking       = 'false'
   ,pSkipSeleidRelative    = 'false'
+  ,pCompileTest           = 'false'
    
 ) := 
 functionmacro
@@ -38,6 +40,7 @@ functionmacro
       ,if(pSkipBest             = false ,BIPV2_Build.proc_best                 (pversion ,false      )                                                                                        ) //when lgid3 added, run this after that
       ,if(pSkipIndustry         = false ,BIPV2_Build.proc_industry_license     (pversion             )                                                                                        )
       ,if(pSkipMisckeys         = false ,BIPV2_Build.proc_misc_keys            (pversion             )                                                                                        )
+      ,if(pSkipQASamples        = false ,BIPV2_Build.proc_BIPV2_QA_Samples     (pversion,pCompileTest)                                                                                        )
       ,if(pSkipSegStats         = false ,BIPV2_Build.proc_segmentation         (pversion             )                                                                                        )
       ,if(pSkipStrata           = false ,BIPV2_Build.proc_Strata               (pversion             )                                                                                        )
       ,if(pSkipOverlinking      = false ,BIPV2_Build.proc_overlinking_samples  (pversion             )                                                                                        )

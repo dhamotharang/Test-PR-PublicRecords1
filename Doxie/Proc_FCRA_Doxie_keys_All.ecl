@@ -14,7 +14,7 @@ export Proc_FCRA_Doxie_keys_All(boolean pFastHeader=false, boolean inc = false, 
  
  fcra_fhb(boolean inc) := doxie_build.Proc_file_FCRA_header_building(filedate,inc);
 fcra_keys := doxie.proc_fcra_header_keys(filedate);
- fcra_mv2QA := header.Proc_FCRAacceptSK_toQA(filedate);
+ fcra_mv2QA := header.Proc_FCRAacceptSK_toQA(filedate,false,inc);
 
  return sequential(
 									if(~inc,Header.Proc_re_did_FCRA_EN) // only run in monthly

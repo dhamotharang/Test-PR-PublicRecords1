@@ -9,13 +9,15 @@ EXPORT _proc_Multiple_Iterations(
   ,pdoSpecs         = 'true'
   ,pUniqueOut       = '\'Proxid\''
   ,pMatchThreshold  = 'BIPV2_ProxID.Config.MatchThreshold'
+  ,pCompileTest     = 'false'
 ) :=
 functionmacro
   
-  import wk_ut,tools,bipv2,mdr,BIPV2_ProxID,SALTTOOLS22,BIPV2_Files,BIPV2_Build;
+  import workman,tools,bipv2,mdr,BIPV2_ProxID,SALTTOOLS22,BIPV2_Files,BIPV2_Build;
   
   lstartiter        := pstartiter                       ;
   lnumiters         := pnumiters                        ;
+  lnumitersmax      := pnumiters + 1                    ;
   version           := pversion                         ;
   cluster           := pcluster                         ;
   previter          := (string)(pstartiter - 1)         ;
@@ -43,37 +45,53 @@ functionmacro
                     
   ecltextIterFix  := regexreplace('@matchthreshold@',ecltextIter,#TEXT(pMatchThreshold),nocase);
 
-  eclsetResults   := [ 'PreClusterCount PreClusterCount[3].cnt'         ,'{STRING10 Count_Type, UNSIGNED Cnt}'
+/*  eclsetResults   := [ 'PreClusterCount PreClusterCount[3].cnt'         ,'{STRING10 Count_Type, UNSIGNED Cnt}'
                       ,'PostClusterCount PostClusterCount[3].cnt'       ,'{STRING10 Count_Type, UNSIGNED Cnt}'
                       ,'MatchesPerformed MatchStatistics[1].Value'      ,'{STRING label, UNSIGNED value}'
                       // ,'BasicMatchesPerformed MatchStatistics[2].Value' ,'{STRING label, UNSIGNED value}'  //can't do this yet because it references the same result output as above.  Next release of workman will allow it
                       // ,'SlicesPerformed MatchStatistics[3].Value'       ,'{STRING label, UNSIGNED value}'  //can't do this yet because it references the same result output as above.  Next release of workman will allow it
                       ,'ProxidsCreatedByCleave'
                      ];
-
-  // eclsetResults   := ['PreClusterCount PreClusterCount[3].cnt' ,'{STRING10 Count_Type, UNSIGNED Cnt}' ,'PostClusterCount PostClusterCount[3].cnt' ,'{STRING10 Count_Type, UNSIGNED Cnt}' ,'ProxidsCreatedByCleave'];
+*/
+  eclsetResults   := [ 'PreClusterCount PreClusterCount.Proxid_Cnt'        
+                      ,'PostClusterCount PostClusterCount.Proxid_Cnt'       
+                      ,'MatchesPerformed'      
+                      ,'BasicMatchesPerformed'
+                      ,'SlicesPerformed'
+                      ,'ProxidsCreatedByCleave'
+                      ,'LinkBlockSplits'
+                     ];
+  StopCondition   := '(PostClusterCount / PreClusterCount * 100.0) > (99.9)';
+  SetNameCalculations := ['Convergence_PCT','Convergence_Threshold'];
 
   ecltextPost    := '#workunit(\'name\',\'BIPV2_ProxID._PostProcess @version@\');\n\n' + '#workunit(\'priority\',\'high\');\n' 
                   + 'BIPV2_ProxID._PostProcess(\'@version@\',' + pDOTFile + ',\'' + dotbasefilename + '\');';  
 
-  kickPreprocess := wk_ut.mac_ChainWuids(ecltextPreprocess ,1         ,1        ,prevcombo,[]           ,cluster,pOutputEcl := false,pUniqueOutput := pUniqueOut + 'Patch',pNotifyEmails := BIPV2_ProxID._Constants().EmailList
+  kickPreprocess := Workman.mac_WorkMan(ecltextPreprocess ,prevcombo,cluster,1         ,1        ,pBuildName := pUniqueOut + 'Patch',pNotifyEmails := BIPV2_ProxID._Constants().EmailList
       ,pOutputFilename   := '~bipv2_build::' + version + '::workunit_history::proc_proxid.' + workman_preprocess_file
       ,pOutputSuperfile  := '~bipv2_build::qa::workunit_history' 
+      ,pCompileOnly      := pCompileTest
   );
-  kickSpecs := wk_ut.mac_ChainWuids(ecltextSpecs  ,1         ,1        ,version  ,[]           ,cluster,pOutputEcl := false,pUniqueOutput := pUniqueOut + 'Specs',pNotifyEmails := BIPV2_ProxID._Constants().EmailList
+  kickSpecs := Workman.mac_WorkMan(ecltextSpecs  ,version,cluster,1         ,1        ,pBuildName := pUniqueOut + 'Specs',pNotifyEmails := BIPV2_ProxID._Constants().EmailList
       ,pOutputFilename   := '~bipv2_build::' + version + '::workunit_history::proc_proxid.Specificities'
       ,pOutputSuperfile  := '~bipv2_build::qa::workunit_history' 
+      ,pCompileOnly      := pCompileTest
   );
-  kickiters := wk_ut.mac_ChainWuids(ecltextIterFix,lstartiter,lnumiters,version  ,eclsetResults,cluster,pOutputEcl := false,pUniqueOutput := pUniqueOut + 'Iters',pNotifyEmails := BIPV2_ProxID._Constants().EmailList
-      ,pOutputFilename   := '~bipv2_build::@version@_@iteration@::workunit_history::proc_proxid.iterations'
-      ,pOutputSuperfile  := '~bipv2_build::qa::workunit_history' 
-      ,pSummaryFilename  := '~bipv2_build::@version@_@iteration@::summary_report::proc_proxid.iterations'
-      ,pSummarySuperfile := '~bipv2_build::qa::summary_report::proc_proxid.iterations'                                                 
+  kickiters := Workman.mac_WorkMan(ecltextIterFix,version,cluster,'',lnumitersmax,lnumiters
+      ,pSetResults          := eclsetResults
+      ,pStopCondition       := StopCondition
+      ,pSetNameCalculations := SetNameCalculations
+      ,pBuildName           := 'ProxidIters'
+      ,pNotifyEmails        := BIPV2_ProxID._Constants().EmailList
+      ,pOutputFilename      := '~bipv2_build::@version@::workunit_history::proc_proxid.iterations.' + trim(pUniqueOut)
+      ,pOutputSuperfile     := '~bipv2_build::qa::workunit_history' 
+      ,pCompileOnly         := pCompileTest
   );
  
-  kickPost  := wk_ut.mac_ChainWuids(ecltextPost   ,1         ,1        ,version,[]           ,cluster,pOutputEcl := false,pUniqueOutput := pUniqueOut + 'PostProcess',pNotifyEmails := BIPV2_ProxID._Constants().EmailList
+  kickPost  := Workman.mac_WorkMan(ecltextPost,version ,cluster  ,1         ,1        ,pBuildName := pUniqueOut + 'PostProcess',pNotifyEmails := BIPV2_ProxID._Constants().EmailList
       ,pOutputFilename   := '~bipv2_build::' + version + '::workunit_history::proc_proxid.' + workman_postprocess_file
       ,pOutputSuperfile  := '~bipv2_build::qa::workunit_history' 
+      ,pCompileOnly      := pCompileTest
   );
 
   //kickiters;

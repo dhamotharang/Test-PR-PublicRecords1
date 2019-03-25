@@ -2,29 +2,12 @@
 
 export WI_as_DL(dataset(Drivers.Layout_WI_Full) pFile_WI_Input) := function
 
-//dWI := distribute(Drivers.File_WI_Full,hash(orig_dl_number)) + distribute(DriversV2.File_DL_WI_Update,hash(orig_dl_number));
 dWI := distribute(pFile_WI_Input,hash(orig_dl_number));
-
-dWIOptOut := dedup(sort(dWI(orig_opt_out_code	=	'S'),orig_DL_NUMBER,-append_PROCESS_DATE,local),orig_DL_NUMBER,local);
-
-recordof(dWI) tremoveOptOut(dWI le, dWIOptOut ri) :=
-transform
-	self := le;
-end;
-
-dWIFinal := join( dWI,
-									dWIOptOut,
-									left.orig_DL_NUMBER = right.orig_DL_NUMBER and 
-									left.append_process_date<=right.append_process_date,
-									tremoveoptout(left,right),
-									left only,
-									local
-								);
 
 bad_names  := ['UNKNOWN','UNK','UNKN','NONE','N/A','UNAVAILABLE'];
 bad_mnames := ['NMN','NMI'];
 
-DriversV2.Layout_DL_Extended lTransform_WI_To_Common(dWIFinal pInput)
+DriversV2.Layout_DL_Extended lTransform_WI_To_Common(dWI pInput)
  := transform
 	self.orig_state 		      		:= 'WI';
 	self.dt_first_seen 		      	:= (unsigned8)pInput.append_process_date div 100;
@@ -91,9 +74,11 @@ DriversV2.Layout_DL_Extended lTransform_WI_To_Common(dWIFinal pInput)
 	self.geo_match 				  			:= pInput.clean_geo_match;		                             
 	self.err_stat 				  			:= pInput.clean_err_stat;		                             
 	self.issuance 				  			:= ''; // had to include explcitly because of...
+	// added opt_out flag to carry along to the base file build logic.
+	self.opt_out									:= pInput.orig_opt_out_code;
 end;
 
-WI_as_DL_mapper := project(dWIFinal, lTransform_WI_To_Common(left));
+WI_as_DL_mapper := project(dWI, lTransform_WI_To_Common(left));
 
 return WI_as_DL_mapper;
 
