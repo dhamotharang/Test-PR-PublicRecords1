@@ -1,4 +1,4 @@
-﻿Import Models, STD, Address, risk_indicators, riskwise, ut;
+﻿﻿Import Models, STD, Address, risk_indicators, riskwise, ut;
 Import Models.Healthcare_SocioEconomic_Functions_Core;
 Import Models.Healthcare_SocioEconomic_Ref_Data;
 Import Models.Healthcare_Constants_RT_Service;
@@ -60,7 +60,7 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 	END;
 
 	//Modeled after HC Profile Search
-	EXPORT Models.Layouts_Healthcare_RT_Service.transactionLog SocioTransactionLog(iesp.healthcare_socio_indicators.t_SocioeconomicIndicatorsRequest L, Boolean isAttributesRequested, Boolean isReadmissionRequested, Boolean isMedicationAdherenceRequested) := TRANSFORM
+	EXPORT Models.Layouts_Healthcare_RT_Service.transactionLog SocioTransactionLog(iesp.healthcare_socio_indicators.t_SocioeconomicIndicatorsRequest L, Boolean isAttributesRequested, Boolean isReadmissionRequested, Boolean isMedicationAdherenceRequested, Boolean isMotivationRequested) := TRANSFORM
 		SELF.transaction_id	:= L.AccountContext.Common.TransactionID;
 		SELF.billing_code	:= L.User.BillingCode;
 		SELF.gc_id	:= (integer) L.AccountContext.Common.GlobalCompanyId;
@@ -82,8 +82,9 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 		SELF.i_person_country	:= _blank;
  		report_options_bit_1 := IF(isAttributesRequested, '1', '0');
  		report_options_bit_2 := IF(isReadmissionRequested, '1', '0');
- 		report_options_bit_3 := IF(isMedicationAdherenceRequested, '1', '0');	
-		SELF.report_options	:= report_options_bit_1 + report_options_bit_2 + report_options_bit_3;
+ 		report_options_bit_3 := IF(isMedicationAdherenceRequested, '1', '0');
+ 		report_options_bit_4 := IF(isMotivationRequested, '1', '0');		
+		SELF.report_options	:= report_options_bit_1 + report_options_bit_2 + report_options_bit_3 + report_options_bit_4;
 		SELF.login_history_id	:= (integer)L.User.LoginHistoryId;
     	SELF.ip_address	:= L.User.IP;
     	SELF.end_user_name := L.User.EndUser.CompanyName;
@@ -543,7 +544,7 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 		SELF := [];
 	END;
 
-	Export PopulateScoresDS(CoreResults, Config, isReadmissionRequested, isMedicationAdherenceRequested) := FUNCTIONMACRO
+	Export PopulateScoresDS(CoreResults, Config, isReadmissionRequested, isMedicationAdherenceRequested, isMotivationRequested) := FUNCTIONMACRO
 		
 		iesp.healthcare_socio_indicators.t_SocioScore formatRS() := TRANSFORM
 			SELF.Name := IF(isReadmissionRequested, 'ReadmissionProbability', _blank);
@@ -585,7 +586,27 @@ EXPORT Healthcare_SocioEconomic_Transforms_RT_Service := MODULE
 		END;
 		MedicationScoreDS := dataset([formatMA()]);
 		
-		ScoresDS := ReadmissionScoreDS + MedicationScoreDS;
+		iesp.healthcare_socio_indicators.t_SocioScore formatMO() := TRANSFORM
+			SELF.Name := IF(isMotivationRequested, 'MotivationLevel', _blank);
+			SELF.Value := IF(isMotivationRequested, CoreResults[1].SeMO_Score, 'N/A');
+			SeMO_Score := (DECIMAL32_16)CoreResults[1].SeMO_Score;
+			SELF.Category := MAP(CoreResults[1].SeMO_Score = 'N/A' => 'N/A',
+	   								SeMO_Score < Config[1].MotivationScore_category_4_Low AND isMotivationRequested => '5',
+	   								SeMO_Score < Config[1].MotivationScore_category_3_Low AND isMotivationRequested => '4',
+	   								SeMO_Score < Config[1].MotivationScore_category_2_Low AND isMotivationRequested => '3',
+	   								SeMO_Score < Config[1].MotivationScore_category_1_Low AND isMotivationRequested => '2',
+	   								SeMO_Score >= Config[1].MotivationScore_category_1_Low AND isMotivationRequested => '1',
+	   								'N/A');
+			SELF.CareDrivers.High1 := CoreResults[1].MA_Driver_Hi1;
+			SELF.CareDrivers.High2 := CoreResults[1].MA_Driver_Hi2;
+			SELF.CareDrivers.High3 := CoreResults[1].MA_Driver_Hi3;
+			SELF.CareDrivers.Low1  := CoreResults[1].MA_Driver_Lo1;
+			SELF.CareDrivers.Low2  := CoreResults[1].MA_Driver_Lo2;
+			SELF.CareDrivers.Low3  := CoreResults[1].MA_Driver_Lo3;
+		END;
+		MotivationScoreDS := dataset([formatMO()]);
+		
+		ScoresDS := ReadmissionScoreDS + MedicationScoreDS + MotivationScoreDS;
 		return ScoresDS(Name<>_blank);
 	ENDMACRO;
 
