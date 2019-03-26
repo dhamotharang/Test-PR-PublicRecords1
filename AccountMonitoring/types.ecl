@@ -27,7 +27,7 @@
 																				 mvr = corp << 1,			 					 					 //	 4194304
 																				 aircraft = mvr << 1,			 					 			 //	 8388608
 																				 watercraft = aircraft << 1,			 				 //	 16777216
-                                     personheader =  watercraft << 1,         //33554431
+                                     personheader =  watercraft << 1,         //33554432
                                      allProducts = (personheader << 1) - 1); 		 //  67108863
 																				 
 
