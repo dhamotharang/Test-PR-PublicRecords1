@@ -2,6 +2,7 @@
 
 	//DF-23660: Create Lerg6 Keybuild
 	//DF-24140: Lerg6 Layout Change
+	//DF-24037: Replace LIDB Use Lerg6 for Carrier Info
 
 	//Lerg6
 	EXPORT lerg6_in:= RECORD
@@ -137,4 +138,16 @@
 		unsigned8 record_sid;		//CCPA Requirement
 	end;
 	
+	EXPORT lerg6UpdHist := record						
+		string 		reference_id 	:= '';
+		string10 	phone;
+		unsigned6	did						:=0;
+		string8		file_date 		:= '';
+	end;
+	
+	EXPORT lerg6UpdHist_Prep := record
+		PhonesInfo.Layout_Common.portedMetadata_Main;
+		unsigned4   global_sid;		//CCPA Requirement
+		unsigned8   record_sid;		//CCPA Requirement
+	end;
 END;

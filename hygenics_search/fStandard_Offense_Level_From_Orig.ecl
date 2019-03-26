@@ -1,4 +1,4 @@
-export string1 fStandard_Offense_Level_From_Orig(string5 pVendor, string5 pCourtOffLevel)
+﻿export string1 fStandard_Offense_Level_From_Orig(string5 pVendor, string5 pCourtOffLevel)
  := map( 		pVendor='01' and pCourtOffLevel='0'=> 'U',
 		pVendor='01' and pCourtOffLevel='1'=> 'U',
 		pVendor='01' and pCourtOffLevel='02'=> 'U',
@@ -122,9 +122,9 @@ export string1 fStandard_Offense_Level_From_Orig(string5 pVendor, string5 pCourt
 		pVendor='05' and pCourtOffLevel='Z'=> 'U',
 		pVendor='06' and pCourtOffLevel='1'=> 'U',
 		pVendor='06' and pCourtOffLevel='13'=> 'U',
-		pVendor='06' and pCourtOffLevel='Ã¡'=> 'U',
-		pVendor='06' and pCourtOffLevel='Ã¡F'=> 'F',
-		pVendor='06' and pCourtOffLevel='Ã¡M'=> 'M',
+		pVendor='06' and pCourtOffLevel='ÃƒÂ¡'=> 'U',
+		pVendor='06' and pCourtOffLevel='ÃƒÂ¡F'=> 'F',
+		pVendor='06' and pCourtOffLevel='ÃƒÂ¡M'=> 'M',
 		pVendor='06' and pCourtOffLevel='DF'=> 'F',
 		pVendor='06' and pCourtOffLevel='FA'=> 'F',
 		pVendor='06' and pCourtOffLevel='FB'=> 'F',
@@ -711,10 +711,12 @@ export string1 fStandard_Offense_Level_From_Orig(string5 pVendor, string5 pCourt
 																
   
  
-         pvendor IN ['8T','9L','W0155','W0157','W0156']  and trim(pCourtOffLevel,all) IN ['I','IN','NIN'] =>'I',
-
+         pvendor IN ['8T','9L','W0155','W0157','W0156','I0013','I0014','I0005','I0006']  and trim(pCourtOffLevel,all) IN ['I','IN','NIN'] =>'I',
+				 pvendor IN ['I0008']  and trim(pCourtOffLevel,all) IN ['O'] =>'I',
+				 pvendor IN ['I0031','I0010']  and trim(pCourtOffLevel,all) IN ['ORD'] =>'I',
 				 trim(pCourtOffLevel,all) IN [//'I','IN','IA','IB','IC','ID','IF','IU','I1','I2','ICA',
 				                              'PM','PM3','PM4','PM5','PMT',
 				                              'MM1','MAM','MUM','MUMUN','MAMUN','ORD','MM','MO','CO','COR','MOR','MO1','MO2','OMU','MU1','MU2','CO2','OCO'] => 'I',
+																			
 				 pVendor='' and pCourtOffLevel=''=> 'U',
 'U');
