@@ -44,7 +44,7 @@
 /*--INFO-- This service pulls from the DL file.*/
 
 export dl_Helper := MACRO
-#CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+#CONSTANT ('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 doxie.MAC_Header_Field_Declare()
 x := 1;
 MAP( ~dppa_ok 			=> 	FAIL(2, doxie.ErrorCodes(2)),
