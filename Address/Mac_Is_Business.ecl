@@ -1,4 +1,4 @@
-export Mac_Is_Business(inFile, Field, outFile, nameType='nametype', dodedup=true, doclean=false,
+﻿export Mac_Is_Business(inFile, Field, outFile, nameType='nametype', dodedup=true, doclean=false,
 		title = 'cln_title',		// cleaned title field
 		fname = 'cln_fname',		// cleaned first name field
 		mname = 'cln_mname',		// cleaned middle name field
@@ -34,6 +34,7 @@ doclean		If true, clean the name, if it is determined to be a person name
 
 ******************************************************************/
 import nid;
+
 #UNIQUENAME(ind_layout)
 // layout for nameType
 	%ind_layout% := RECORD
@@ -77,7 +78,7 @@ import nid;
 
 #UNIQUENAME(dsOut1)
 	
-	%dsOut1% := PROJECT(Nid.fn_CleanFullNames(%dsx%, Field,,nameType), %new_layout%);
+	%dsOut1% := PROJECT(Nid.fn_CleanFullNames(%dsx%, Field,,nameType), %new_layout%) : DEPRECATED( 'Mac_Is_Business is deprecated. Use Nid.fn_CleanFullNames or Nid.Mac_CleanFullNames with option V2' );
 
 	
 #IF(dodedup=true)

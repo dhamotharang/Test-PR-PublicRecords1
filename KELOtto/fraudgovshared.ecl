@@ -12,9 +12,10 @@ Set_associated91 :=[3635312545, 1026679856];
 Set_associated81 :=[3005794324, 866735130];
 
 
+DemoHashes := [3977509724, 2727638882, 1139485299, 2459821998, 3635312545, 1026679856, 4401323, 3005794324, 866735130];
 
 CustomerAddressPersonPrep1 := JOIN(KELOtto.fraudgovprep(clean_address.prim_range != '' AND clean_address.prim_name != '' and clean_address.zip != '' and did > 0),
-                                   KELOtto.SharingRules, 
+                                   KELOtto.SharingRules/*(targetcustomerhash not in demohashes)*/, 
                        //LEFT.classification_permissible_use_access.fdn_file_info_id=RIGHT.fdn_ind_type_gc_id_inclusion,
                        
                        LEFT.classification_Permissible_use_access.fdn_file_info_id = RIGHT.fdn_file_info_id,// AND LEFT.classification_Permissible_use_access.Ind_type = RIGHT.ind_type,
