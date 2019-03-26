@@ -424,9 +424,10 @@ CoTrustees := '\\bCO[ -]+(TRUSTEE|TRUSTE|TRUSTEES|TRSTEE|TTEE|TRS|TRSTE|TRU|TTE|
 
 rgxTrustDated := '\\(?(DATED|DTD|UTD) +\\d{1,2}[/-] *\\d{1,2} *[/-] *\\d{2,4}\\)?';
 TrustAbbreviations := '(TRUST|TRU|TR|TRS)';
-boolean LikelyTrust(string s) := 
-	REGEXFIND('([A-Z]+) +(TRUST(S)?|TRUS|TRU|TRST|TR|T, RUST|TR, UST|TRU, ST|TRUS, T|TRU ST|(IR)?REVOCABLE LIVING)$', s, 1) in TrustWords
-	OR REGEXFIND('\\b(REVOCABLE|REVOCABL|REVOCAB|REVOCA|REVOC|REV)( (LIVING|LIVI|LIVIN|LIV|LI|L|T))?$',s);
+boolean LikelyTrust(string s) := Nid.Trusts.LikelyTrust(s);
+//	REGEXFIND('([A-Z]+) +(TRUST(S)?|TRUS|TRU|TRST|TR|T, RUST|TR, UST|TRU, ST|TRUS, T|TRU ST|(IR)?REVOCABLE LIVING)$', s, 1) in TrustWords
+//	OR REGEXFIND('\\b(REVOCABLE|REVOCABL|REVOCAB|REVOCA|REVOC|REV)( (LIVING|LIVI|LIVIN|LIV|LI|L|T))?$',s)
+//	OR Nid.Trusts.IsTrust2BeginOrEnd(s);
 
 MatchType CheckTrust(string s, DATASET(NameTester.rWord) words, DATASET(NameTester.rWord) digraphs,string name) := 
 	MAP(
@@ -451,7 +452,7 @@ MatchType CheckTrust(string s, DATASET(NameTester.rWord) words, DATASET(NameTest
 		REGEXFIND('^[A-Z] +[A-Z] +TRUST$', s) => MatchType.Trust,			// A S TRUST
 		REGEXFIND('\\b[A-Z]/+[A-Z] +TRUST$', s) => MatchType.Trust,
 		REGEXFIND('\\(TRUST\\)$', s) => MatchType.TRUST,		// (TRUST)
-
+		
 		REGEXFIND('^[A-Z] +[A-Z] +[A-Z] +TRUST$',s) => MatchType.Trust, // A B C TRUST
 		REGEXFIND('\\bTRUST +[0-9]+',s) => MatchType.TRUST,
 		REGEXFIND(' TRUST (TRUSTY|TTEE|OFFICER|BENEFICIARY|BENEFICIAR|DATED|PT|COMP|A|B|C|1|2|3|I|II|III)\\b', s) => MatchType.Trust,
@@ -825,6 +826,7 @@ MatchType MatchX(string str, string options) := FUNCTION
 		COUNT(words) = 0 => MatchType.Inv,
 		CrazyBizName(str) => MatchType.Inv,
 		SpecialNames.IsInvalidName(s) => MatchType.Inv,
+		LikelyTrust(s) => MatchType.Trust,
 		LENGTH(Std.Str.Filter(name, '"^~!:')) > 4 => MatchType.Inv,
 		// Rule 14: check for invalid or obscene patterns
 		SpecialNames.IsInvalidToken(words, digraphs) => MatchType.Inv,
@@ -856,7 +858,7 @@ MatchType MatchX(string str, string options) := FUNCTION
 		// business words
 		//REGEXFIND('\\bTRUST(S)?\\b',s) => CheckTrust(s, words, digraphs, name),
 		NOT REGEXFIND(CoTrustees, s) AND REGEXFIND('\\b(TRUST|TRUS|TRU|TRST|TST|TRUSTS)\\b',s) => CheckTrust(s, words, digraphs, name),
-		LikelyTrust(s) => MatchType.Trust,
+//		LikelyTrust(s) => MatchType.Trust,
 		REGEXFIND('\\bEXECUT(OR|RIX) +(OF|FOR)\\b', s) => MatchType.Inv,				//MatchType.Unclass,
 		NOT REGEXFIND(CoTrustees, s) AND	NOT REGEXFIND(Positions, s) AND	// avoiding interpreting CO as company
 				NameTester.MatchBusinessTokens(words, digraphs) => MatchType.Business,
