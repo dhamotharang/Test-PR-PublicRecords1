@@ -1188,13 +1188,13 @@ Event: => KrIdentityRisk := MAP(name_risk_code != 0 OR dob_risk_code != 0 OR ide
 Event: => KrHighRiskIdentityFlag := MAP(KrIdentityRisk = 1 OR COUNT(EventTypes(EventType IN ['10000','10001','10002','10004','10005','10006','10007','11000','11001','11002','11003','11004','11005','11006','11007','11008','11009','11010','11011','11012','11013','11014','11015','11016','11017','11018','11019','12000','12001','12002','12003','12004','12005','12006','12007','13000','13001','13002','13003','13004','13005','13006','13007','1400']))>0 => 1, 0); 
 Event: => KrMediumRiskIdentityFlag := MAP(COUNT(EventTypes(EventType IN ['10003','14001']))>0 => 1, 0);
 
-Event: => KrHighRiskAddressFlag := MAP(mailing_address_risk_code != 0 OR physical_address_risk_code != 0 OR COUNT(EventTypes(EventType IN ['301','302']))>0 => 1, 0);
+Event: => KrHighRiskAddressFlag := MAP(COUNT(EventTypes(EventType IN ['301','302','303']))>0 => 1, 0);
 Event: => KrMediumRiskAddressFlag := MAP(COUNT(EventTypes(EventType IN ['300']))>0 => 1, 0);
 
-Event: => KrHighRiskSsnFlag := MAP(ssn_risk_code != 0 => 1, 0);
-Event: => KrHighRiskPhoneFlag := MAP(phone_risk_code != 0 OR cell_phone_risk_code != 0 => 1, 0);
-Event: => KrHighRiskEmailFlag := MAP(email_address_risk_code != 0 => 1, 0);
-Event: => KrHighRiskIpAddressFlag := MAP(ip_address_fraud_code != 0 => 1, 0);
+Event: => KrHighRiskSsnFlag := MAP(COUNT(EventTypes(EventType IN ['202','204','292','100']))>0 => 1, 0);
+Event: => KrHighRiskPhoneFlag := MAP(COUNT(EventTypes(EventType IN ['400','402']))>0 => 1, 0);
+Event: => KrHighRiskEmailFlag := MAP(COUNT(EventTypes(EventType IN ['500','501','591']))>0 => 1, 0);
+Event: => KrHighRiskIpAddressFlag := MAP(ip_address_fraud_code != 0 OR COUNT(EventTypes(EventType IN ['601','602','605','1000']))>0 => 1, 0);
 
 Event: => KrHighRiskDlFlag := MAP(drivers_license_risk_code != 0 OR COUNT(EventTypes(EventType IN ['203','291']))>0 => 1, 0);
 Event: => KrMediumRiskDlFlag := MAP(COUNT(EventTypes(EventType IN ['202','204','292']))>0 => 1, 0);
@@ -1268,6 +1268,81 @@ Event: => KrBnk890Flag := MAP(COUNT(EventTypes(EventType IN ['890']))>0 => 1, 0)
 Event: => KrBnk891Flag := MAP(COUNT(EventTypes(EventType IN ['891']))>0 => 1, 0);
 Event: => KrBnk892Flag := MAP(COUNT(EventTypes(EventType IN ['892']))>0 => 1, 0);
 Event: => KrBnk893Flag := MAP(COUNT(EventTypes(EventType IN ['893']))>0 => 1, 0);
+
+Event: => KrEml500Flag := MAP(COUNT(EventTypes(EventType IN ['500']))>0 => 1, 0);
+Event: => KrEml501Flag := MAP(COUNT(EventTypes(EventType IN ['501']))>0 => 1, 0);
+Event: => KrEml502Flag := MAP(COUNT(EventTypes(EventType IN ['502']))>0 => 1, 0);
+Event: => KrEml590Flag := MAP(COUNT(EventTypes(EventType IN ['590']))>0 => 1, 0);
+Event: => KrEml591Flag := MAP(COUNT(EventTypes(EventType IN ['591']))>0 => 1, 0);
+Event: => KrEml592Flag := MAP(COUNT(EventTypes(EventType IN ['592']))>0 => 1, 0);
+Event: => KrEml593Flag := MAP(COUNT(EventTypes(EventType IN ['593']))>0 => 1, 0);
+
+Event: => KrSsn100Flag := MAP(COUNT(EventTypes(EventType IN ['100']))>0 => 1, 0);
+Event: => KrSsn101Flag := MAP(COUNT(EventTypes(EventType IN ['101']))>0 => 1, 0);
+
+Event: => KrPhn400Flag := MAP(COUNT(EventTypes(EventType IN ['400']))>0 => 1, 0);
+Event: => KrPhn401Flag := MAP(COUNT(EventTypes(EventType IN ['401']))>0 => 1, 0);
+Event: => KrPhn402Flag := MAP(COUNT(EventTypes(EventType IN ['402']))>0 => 1, 0);
+
+Event: => KrAddr300Flag := MAP(COUNT(EventTypes(EventType IN ['300']))>0 => 1, 0);
+Event: => KrAddr301Flag := MAP(COUNT(EventTypes(EventType IN ['301']))>0 => 1, 0);
+Event: => KrAddr302Flag := MAP(COUNT(EventTypes(EventType IN ['302']))>0 => 1, 0);
+Event: => KrAddr303Flag := MAP(COUNT(EventTypes(EventType IN ['303']))>0 => 1, 0);
+
+Event: => KrIp600Flag := MAP(COUNT(EventTypes(EventType IN ['600']))>0 => 1, 0);
+Event: => KrIp601Flag := MAP(COUNT(EventTypes(EventType IN ['601']))>0 => 1, 0);
+Event: => KrIp602Flag := MAP(COUNT(EventTypes(EventType IN ['602']))>0 => 1, 0);
+Event: => KrIp603Flag := MAP(COUNT(EventTypes(EventType IN ['603']))>0 => 1, 0);
+Event: => KrIp604Flag := MAP(COUNT(EventTypes(EventType IN ['604']))>0 => 1, 0);
+Event: => KrIp605Flag := MAP(COUNT(EventTypes(EventType IN ['605']))>0 => 1, 0);
+Event: => KrIp1000Flag := MAP(COUNT(EventTypes(EventType IN ['1000']))>0 => 1, 0);
+Event: => KrIp1001Flag := MAP(COUNT(EventTypes(EventType IN ['1001']))>0 => 1, 0);
+
+Event: => KrId10000Flag := MAP(COUNT(EventTypes(EventType IN ['10000']))>0 => 1, 0);
+Event: => KrId10001Flag := MAP(COUNT(EventTypes(EventType IN ['10001']))>0 => 1, 0);
+Event: => KrId10002Flag := MAP(COUNT(EventTypes(EventType IN ['10002']))>0 => 1, 0);
+Event: => KrId10003Flag := MAP(COUNT(EventTypes(EventType IN ['10003']))>0 => 1, 0);
+Event: => KrId10004Flag := MAP(COUNT(EventTypes(EventType IN ['10004']))>0 => 1, 0);
+Event: => KrId10005Flag := MAP(COUNT(EventTypes(EventType IN ['10005']))>0 => 1, 0);
+Event: => KrId10006Flag := MAP(COUNT(EventTypes(EventType IN ['10006']))>0 => 1, 0);
+Event: => KrId10007Flag := MAP(COUNT(EventTypes(EventType IN ['10007']))>0 => 1, 0);
+Event: => KrId11000Flag := MAP(COUNT(EventTypes(EventType IN ['11000']))>0 => 1, 0);
+Event: => KrId11001Flag := MAP(COUNT(EventTypes(EventType IN ['11001']))>0 => 1, 0);
+Event: => KrId11002Flag := MAP(COUNT(EventTypes(EventType IN ['11002']))>0 => 1, 0);
+Event: => KrId11003Flag := MAP(COUNT(EventTypes(EventType IN ['11003']))>0 => 1, 0);
+Event: => KrId11004Flag := MAP(COUNT(EventTypes(EventType IN ['11004']))>0 => 1, 0);
+Event: => KrId11005Flag := MAP(COUNT(EventTypes(EventType IN ['11005']))>0 => 1, 0);
+Event: => KrId11006Flag := MAP(COUNT(EventTypes(EventType IN ['11006']))>0 => 1, 0);
+Event: => KrId11007Flag := MAP(COUNT(EventTypes(EventType IN ['11007']))>0 => 1, 0);
+Event: => KrId11008Flag := MAP(COUNT(EventTypes(EventType IN ['11008']))>0 => 1, 0);
+Event: => KrId11009Flag := MAP(COUNT(EventTypes(EventType IN ['11009']))>0 => 1, 0);
+Event: => KrId11010Flag := MAP(COUNT(EventTypes(EventType IN ['11010']))>0 => 1, 0);
+Event: => KrId11011Flag := MAP(COUNT(EventTypes(EventType IN ['11011']))>0 => 1, 0);
+Event: => KrId11012Flag := MAP(COUNT(EventTypes(EventType IN ['11012']))>0 => 1, 0);
+Event: => KrId11013Flag := MAP(COUNT(EventTypes(EventType IN ['11013']))>0 => 1, 0);
+Event: => KrId11014Flag := MAP(COUNT(EventTypes(EventType IN ['11014']))>0 => 1, 0);
+Event: => KrId11015Flag := MAP(COUNT(EventTypes(EventType IN ['11015']))>0 => 1, 0);
+Event: => KrId11016Flag := MAP(COUNT(EventTypes(EventType IN ['11016']))>0 => 1, 0);
+Event: => KrId11017Flag := MAP(COUNT(EventTypes(EventType IN ['11017']))>0 => 1, 0);
+Event: => KrId11018Flag := MAP(COUNT(EventTypes(EventType IN ['11018']))>0 => 1, 0);
+Event: => KrId11019Flag := MAP(COUNT(EventTypes(EventType IN ['11019']))>0 => 1, 0);
+Event: => KrId12000Flag := MAP(COUNT(EventTypes(EventType IN ['12000']))>0 => 1, 0);
+Event: => KrId12001Flag := MAP(COUNT(EventTypes(EventType IN ['12001']))>0 => 1, 0);
+Event: => KrId12002Flag := MAP(COUNT(EventTypes(EventType IN ['12002']))>0 => 1, 0);
+Event: => KrId12003Flag := MAP(COUNT(EventTypes(EventType IN ['12003']))>0 => 1, 0);
+Event: => KrId12004Flag := MAP(COUNT(EventTypes(EventType IN ['12004']))>0 => 1, 0);
+Event: => KrId12006Flag := MAP(COUNT(EventTypes(EventType IN ['12006']))>0 => 1, 0);
+Event: => KrId12007Flag := MAP(COUNT(EventTypes(EventType IN ['12007']))>0 => 1, 0);
+Event: => KrId13000Flag := MAP(COUNT(EventTypes(EventType IN ['13000']))>0 => 1, 0);
+Event: => KrId13001Flag := MAP(COUNT(EventTypes(EventType IN ['13001']))>0 => 1, 0);
+Event: => KrId13002Flag := MAP(COUNT(EventTypes(EventType IN ['13002']))>0 => 1, 0);
+Event: => KrId13003Flag := MAP(COUNT(EventTypes(EventType IN ['13003']))>0 => 1, 0);
+Event: => KrId13005Flag := MAP(COUNT(EventTypes(EventType IN ['13005']))>0 => 1, 0);
+Event: => KrId13006Flag := MAP(COUNT(EventTypes(EventType IN ['13006']))>0 => 1, 0);
+Event: => KrId13007Flag := MAP(COUNT(EventTypes(EventType IN ['13007']))>0 => 1, 0);
+Event: => KrId14000Flag := MAP(COUNT(EventTypes(EventType IN ['14000']))>0 => 1, 0);
+Event: => KrId14001Flag := MAP(COUNT(EventTypes(EventType IN ['14001']))>0 => 1, 0);
+
 
 Event: => IdAge := YEARSBETWEEN(DateOfBirth, DATEFROMPARTS(2018, 4, 7));
 
@@ -1411,8 +1486,55 @@ Person: => IpTor := MAP(COUNT(PersonEvent.Transaction(IpTor=1))>0 => 1, 0);
 Person: => KrHighRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrHighRiskIdentityFlag=1)) > 0 => 1, 0);
 Person: => KrMediumRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrMediumRiskIdentityFlag=1))>0 => 1, 0);
 Person: => KrHighRiskRouting := MAP(COUNT(PersonBankAccount.Account(HighRiskRouting=1))>0 => 1, 0);
+
+Person: => KrId10000Flag := MAP(COUNT(PersonEvent.Transaction(KrId10000Flag=1))>0 => 1, 0);
+Person: => KrId10001Flag := MAP(COUNT(PersonEvent.Transaction(KrId10001Flag=1))>0 => 1, 0);
+Person: => KrId10002Flag := MAP(COUNT(PersonEvent.Transaction(KrId10002Flag=1))>0 => 1, 0);
+Person: => KrId10003Flag := MAP(COUNT(PersonEvent.Transaction(KrId10003Flag=1))>0 => 1, 0);
+Person: => KrId10004Flag := MAP(COUNT(PersonEvent.Transaction(KrId10004Flag=1))>0 => 1, 0);
+Person: => KrId10005Flag := MAP(COUNT(PersonEvent.Transaction(KrId10005Flag=1))>0 => 1, 0);
+Person: => KrId10006Flag := MAP(COUNT(PersonEvent.Transaction(KrId10006Flag=1))>0 => 1, 0);
+Person: => KrId10007Flag := MAP(COUNT(PersonEvent.Transaction(KrId10007Flag=1))>0 => 1, 0);
+Person: => KrId11000Flag := MAP(COUNT(PersonEvent.Transaction(KrId11000Flag=1))>0 => 1, 0);
+Person: => KrId11001Flag := MAP(COUNT(PersonEvent.Transaction(KrId11001Flag=1))>0 => 1, 0);
+Person: => KrId11002Flag := MAP(COUNT(PersonEvent.Transaction(KrId11002Flag=1))>0 => 1, 0);
+Person: => KrId11003Flag := MAP(COUNT(PersonEvent.Transaction(KrId11003Flag=1))>0 => 1, 0);
+Person: => KrId11004Flag := MAP(COUNT(PersonEvent.Transaction(KrId11004Flag=1))>0 => 1, 0);
+Person: => KrId11005Flag := MAP(COUNT(PersonEvent.Transaction(KrId11005Flag=1))>0 => 1, 0);
+Person: => KrId11006Flag := MAP(COUNT(PersonEvent.Transaction(KrId11006Flag=1))>0 => 1, 0);
+Person: => KrId11007Flag := MAP(COUNT(PersonEvent.Transaction(KrId11007Flag=1))>0 => 1, 0);
+Person: => KrId11008Flag := MAP(COUNT(PersonEvent.Transaction(KrId11008Flag=1))>0 => 1, 0);
+Person: => KrId11009Flag := MAP(COUNT(PersonEvent.Transaction(KrId11009Flag=1))>0 => 1, 0);
+Person: => KrId11010Flag := MAP(COUNT(PersonEvent.Transaction(KrId11010Flag=1))>0 => 1, 0);
+Person: => KrId11011Flag := MAP(COUNT(PersonEvent.Transaction(KrId11011Flag=1))>0 => 1, 0);
+Person: => KrId11012Flag := MAP(COUNT(PersonEvent.Transaction(KrId11012Flag=1))>0 => 1, 0);
+Person: => KrId11013Flag := MAP(COUNT(PersonEvent.Transaction(KrId11013Flag=1))>0 => 1, 0);
+Person: => KrId11014Flag := MAP(COUNT(PersonEvent.Transaction(KrId11014Flag=1))>0 => 1, 0);
+Person: => KrId11015Flag := MAP(COUNT(PersonEvent.Transaction(KrId11015Flag=1))>0 => 1, 0);
+Person: => KrId11016Flag := MAP(COUNT(PersonEvent.Transaction(KrId11016Flag=1))>0 => 1, 0);
+Person: => KrId11017Flag := MAP(COUNT(PersonEvent.Transaction(KrId11017Flag=1))>0 => 1, 0);
+Person: => KrId11018Flag := MAP(COUNT(PersonEvent.Transaction(KrId11018Flag=1))>0 => 1, 0);
+Person: => KrId11019Flag := MAP(COUNT(PersonEvent.Transaction(KrId11019Flag=1))>0 => 1, 0);
+Person: => KrId12000Flag := MAP(COUNT(PersonEvent.Transaction(KrId12000Flag=1))>0 => 1, 0);
+Person: => KrId12001Flag := MAP(COUNT(PersonEvent.Transaction(KrId12001Flag=1))>0 => 1, 0);
+Person: => KrId12002Flag := MAP(COUNT(PersonEvent.Transaction(KrId12002Flag=1))>0 => 1, 0);
+Person: => KrId12003Flag := MAP(COUNT(PersonEvent.Transaction(KrId12003Flag=1))>0 => 1, 0);
+Person: => KrId12004Flag := MAP(COUNT(PersonEvent.Transaction(KrId12004Flag=1))>0 => 1, 0);
+Person: => KrId12006Flag := MAP(COUNT(PersonEvent.Transaction(KrId12006Flag=1))>0 => 1, 0);
+Person: => KrId12007Flag := MAP(COUNT(PersonEvent.Transaction(KrId12007Flag=1))>0 => 1, 0);
+Person: => KrId13000Flag := MAP(COUNT(PersonEvent.Transaction(KrId13000Flag=1))>0 => 1, 0);
+Person: => KrId13001Flag := MAP(COUNT(PersonEvent.Transaction(KrId13001Flag=1))>0 => 1, 0);
+Person: => KrId13002Flag := MAP(COUNT(PersonEvent.Transaction(KrId13002Flag=1))>0 => 1, 0);
+Person: => KrId13003Flag := MAP(COUNT(PersonEvent.Transaction(KrId13003Flag=1))>0 => 1, 0);
+Person: => KrId13005Flag := MAP(COUNT(PersonEvent.Transaction(KrId13005Flag=1))>0 => 1, 0);
+Person: => KrId13006Flag := MAP(COUNT(PersonEvent.Transaction(KrId13006Flag=1))>0 => 1, 0);
+Person: => KrId13007Flag := MAP(COUNT(PersonEvent.Transaction(KrId13007Flag=1))>0 => 1, 0);
+Person: => KrId14000Flag := MAP(COUNT(PersonEvent.Transaction(KrId14000Flag=1))>0 => 1, 0);
+Person: => KrId14001Flag := MAP(COUNT(PersonEvent.Transaction(KrId14001Flag=1))>0 => 1, 0);
+
 Person: => SafeFlag := MAP(COUNT(PersonEvent.Transaction(SafeFlag=1))>0 => 1, 0);
 Person: => ContributorSafeFlag := MAP(COUNT(PersonEvent.Transaction(ContributorSafeFlag=1))>0 => 1, 0);
+
 
 
 // Velocity
@@ -1443,6 +1565,7 @@ Person: => ClHighRiskDeathPriorToAllEventsIdentityCount := SUM(PersonPerson.ToPe
 Person: => ClEventCount := COUNT(PersonPerson.ToPerson.PersonEvent{Transaction}); //  // Count within cluster of all events/transactions
 Person: => ClElementCount := 0; 
 Person: => ClIdentityCount := COUNT(PersonPerson.ToPerson.PersonPerson.ToPerson{LexId});  // Count within cluster of Identities within 1 degree (temporarily putting 2nd degree for consistency in the UI) 20180807
+Person: => ClIdentityCountDecile := ClIdentityCount$^Decile; 
 Person: => ClPRIdentityMatchCount := COUNT(PersonPerson(VerifiedPRHit=1).ToPerson.PersonPerson(VerifiedPRHit=1).ToPerson{LexId}); // Count within cluster of Lexid Associates that match PR associates.    
 Person: => ClPRIdentityMatchPercent := ClPRIdentityMatchCount / ClIdentityCount; // Percent within cluster of Lexid Associates that match PR associates.    
 Person: => ClFullIdentityCount := COUNT(PersonPerson.ToPerson.PersonPerson.ToPerson{LexId});  // Count within cluster of within 2 degrees. Person -> Person -> Person
@@ -1453,11 +1576,24 @@ Person: => ClActive7IdentityCount := COUNT(PersonPerson.ToPerson(VlEvent7ActiveF
 Person: => ClActive30IdentityCount := COUNT(PersonPerson.ToPerson(VlEvent30ActiveFlag=1));  // Count within cluster of active identities in the last 30 days.
 Person: => ClAddressCount := COUNT(PersonAddress.Subject(InCustomerPopulation=1));  // Count within cluster of distict addresses within customer population
 Person: => ClIdentityEventAvg := ClEventCount / ClIdentityCount; // Average number of events/transactions per identity within cluster.
+
 Person: => ClHighRiskPattern1Flag := MAP(ClIdentityCount > 9 => 1, 0); // High Identity Count Cluster
 Person: => ClHighRiskPattern2Flag := MAP(ClNas9IdentityCount > 10 AND ClNap3IdentityCount > 0 => 1, 0); // Pattern of Phone and Addresses not being associated with identities. 
 Person: => ClHighRiskPattern3Flag := MAP(ClHighRiskDeathPriorToAllEventsIdentityCount >  0 => 1, 0); // Pattern of associated deceased identities within the cluster.
 Person: => ClHighRiskPattern4Flag := MAP(ClIpHighRiskIdentityCount > 4 => 1, 0); // Velocity
 Person: => ClHighRiskPattern5Flag := MAP(ClHighKrIdentityCount > 4 => 1, 0); //Known Risk
+
+Person: => ClNas9IdentityPercent := ClNas9IdentityCount / ClIdentityCount;
+Person: => ClNas9Top10 := MAP(ClNas9IdentityPercent > ClNas9IdentityPercent$GROUP{ClIdentityCountDecile}:Percentile(90) => 1, 0);
+
+Person: => ClHighRiskDeathPriorToAllEventsIdentityPercent := ClHighRiskDeathPriorToAllEventsIdentityCount / ClIdentityCount;
+Person: => ClHighRiskDeathPriorToAllEventsIdentityTop10 := MAP(ClHighRiskDeathPriorToAllEventsIdentityPercent > ClHighRiskDeathPriorToAllEventsIdentityPercent$GROUP{ClIdentityCountDecile}:Percentile(90) => 1, 0);
+
+Person: => ClIpHighRiskIdentityPercent := ClIpHighRiskIdentityCount / ClIdentityCount;
+Person: => ClIpHighRiskIdentityTop10 := MAP(ClIpHighRiskIdentityPercent > ClIpHighRiskIdentityPercent$GROUP{ClIdentityCountDecile}:Percentile(90) => 1, 0);
+
+Person: => ClHighKrIdentityPercent := ClHighKrIdentityCount / ClIdentityCount;
+Person: => ClHighKrIdentityTop10 := MAP(ClHighKrIdentityPercent > ClHighKrIdentityPercent$GROUP{ClIdentityCountDecile}:Percentile(90) => 1, 0);
 
 Person: => ClIpNotUsIdentityCount := COUNT(PersonPerson.ToPerson.PersonPerson.ToPerson(IpNotUs=1){LexId});
 Person: => ClIpVpnIdentityCount := COUNT(PersonPerson.ToPerson.PersonPerson.ToPerson(IpVpn=1){LexId});
@@ -1473,6 +1609,7 @@ Person: => ClIpHostedEventCount := COUNT(PersonPerson.ToPerson.PersonEvent(Trans
 Person: => ClIpTorEventCount := COUNT(PersonPerson.ToPerson.PersonEvent(Transaction.IpTor=1){Transaction});
 
 Person: => ClIdentityCountPercentile := ClIdentityCount$^Percentile;
+
 Person: => ClEventCountPercentile := ClEventCount$^Percentile;
 Person: => ClActive30IdentityCountPercentile := ClActive30IdentityCount$^Percentile;
 Person: => ClActive7IdentityCountPercentile  := ClActive7IdentityCount$^Percentile;
@@ -1508,7 +1645,8 @@ SocialSecurityNumber: => KrMediumRiskFlag := 0;
 SocialSecurityNumber: => SafeFlag := MAP(COUNT(SsnEvent.Transaction(SafeFlag=1))>0 => 1, 0);
 SocialSecurityNumber: => ContributorSafeFlag := MAP(COUNT(SsnEvent.Transaction(ContributorSafeFlag=1))>0 => 1, 0);
 
-
+SocialSecurityNumber: => KrSsn100Flag := MAP(COUNT(SsnEvent.Transaction(KrSsn100Flag=1))>0 => 1, 0);
+SocialSecurityNumber: => KrSsn101Flag := MAP(COUNT(SsnEvent.Transaction(KrSsn101Flag=1))>0 => 1, 0);
 
 // Velocity
 
@@ -1564,9 +1702,14 @@ Phone: => Hri31Flag := MAP(COUNT(PhoneEvent.Transaction(Hri31Flag=1)) > 0 => 1, 
 
 // Known Risk 
 Phone: => KrHighRiskFlag := MAP(COUNT(PhoneEvent.Transaction(KrHighRiskPhoneFlag=1)) > 0 => 1, 0);
+
 Phone: => KrMediumRiskFlag := 0;
 Phone: => SafeFlag := MAP(COUNT(PhoneEvent.Transaction(SafeFlag=1))>0 => 1, 0);
 Phone: => ContributorSafeFlag := MAP(COUNT(PhoneEvent.Transaction(ContributorSafeFlag=1))>0 => 1, 0);
+
+Phone: => KrPhn400Flag := MAP(COUNT(PhoneEvent.Transaction(KrPhn400Flag=1))>0 => 1, 0);
+Phone: => KrPhn401Flag := MAP(COUNT(PhoneEvent.Transaction(KrPhn401Flag=1))>0 => 1, 0);
+Phone: => KrPhn402Flag := MAP(COUNT(PhoneEvent.Transaction(KrPhn402Flag=1))>0 => 1, 0);
 
 // Velocity
 
@@ -1619,6 +1762,14 @@ Email: => KrHighRiskFlag := MAP(COUNT(EmailEvent.Transaction(KrHighRiskEmailFlag
 Email: => KrMediumRiskFlag := 0;
 Email: => SafeFlag := MAP(COUNT(EmailEvent.Transaction(SafeFlag=1))>0 => 1, 0);
 Email: => ContributorSafeFlag := MAP(COUNT(EmailEvent.Transaction(ContributorSafeFlag=1))>0 => 1, 0);
+
+Email: => KrEml500Flag := MAP(COUNT(EmailEvent.Transaction(KrEml500Flag=1))>0 => 1, 0);
+Email: => KrEml501Flag := MAP(COUNT(EmailEvent.Transaction(KrEml501Flag=1))>0 => 1, 0);
+Email: => KrEml502Flag := MAP(COUNT(EmailEvent.Transaction(KrEml502Flag=1))>0 => 1, 0);
+Email: => KrEml590Flag := MAP(COUNT(EmailEvent.Transaction(KrEml590Flag=1))>0 => 1, 0);
+Email: => KrEml591Flag := MAP(COUNT(EmailEvent.Transaction(KrEml591Flag=1))>0 => 1, 0);
+Email: => KrEml592Flag := MAP(COUNT(EmailEvent.Transaction(KrEml592Flag=1))>0 => 1, 0);
+Email: => KrEml593Flag := MAP(COUNT(EmailEvent.Transaction(KrEml593Flag=1))>0 => 1, 0);
 
 // Velocity
 
@@ -1822,6 +1973,15 @@ InternetProtocol: => KrMediumRiskFlag := 0;
 InternetProtocol: => SafeFlag := MAP(COUNT(InternetProtocolEvent.Transaction(SafeFlag=1))>0 => 1, 0);
 InternetProtocol: => ContributorSafeFlag := MAP(COUNT(InternetProtocolEvent.Transaction(ContributorSafeFlag=1))>0 => 1, 0);
 
+InternetProtocol: => KrIp600Flag := MAP(COUNT(InternetProtocolEvent.Transaction(KrIp600Flag=1))>0 => 1, 0);
+InternetProtocol: => KrIp601Flag := MAP(COUNT(InternetProtocolEvent.Transaction(KrIp601Flag=1))>0 => 1, 0);
+InternetProtocol: => KrIp602Flag := MAP(COUNT(InternetProtocolEvent.Transaction(KrIp602Flag=1))>0 => 1, 0);
+InternetProtocol: => KrIp603Flag := MAP(COUNT(InternetProtocolEvent.Transaction(KrIp603Flag=1))>0 => 1, 0);
+InternetProtocol: => KrIp604Flag := MAP(COUNT(InternetProtocolEvent.Transaction(KrIp604Flag=1))>0 => 1, 0);
+InternetProtocol: => KrIp605Flag := MAP(COUNT(InternetProtocolEvent.Transaction(KrIp605Flag=1))>0 => 1, 0);
+InternetProtocol: => KrIp1000Flag := MAP(COUNT(InternetProtocolEvent.Transaction(KrIp1000Flag=1))>0 => 1, 0);
+InternetProtocol: => KrIp1001Flag := MAP(COUNT(InternetProtocolEvent.Transaction(KrIp1001Flag=1))>0 => 1, 0);
+
 // Velocity
 
 InternetProtocol: => VlEvent1AllCount := COUNT(InternetProtocolEvent.Transaction(Age<2));
@@ -1953,6 +2113,11 @@ Address: => KrHighRiskFlag := MAP(COUNT(AddressEvent.Transaction(KrHighRiskAddre
 Address: => KrMediumRiskFlag := MAP(COUNT(AddressEvent.Transaction(KrMediumRiskAddressFlag=1))>0 => 1, 0);
 Address: => SafeFlag := MAP(COUNT(AddressEvent.Transaction(SafeFlag=1))>0 => 1, 0);
 Address: => ContributorSafeFlag := MAP(COUNT(AddressEvent.Transaction(ContributorSafeFlag=1))>0 => 1, 0);
+
+Address: => KrAddr300Flag := MAP(COUNT(AddressEvent.Transaction(KrAddr300Flag=1))>0 => 1, 0);
+Address: => KrAddr301Flag := MAP(COUNT(AddressEvent.Transaction(KrAddr301Flag=1))>0 => 1, 0);
+Address: => KrAddr302Flag := MAP(COUNT(AddressEvent.Transaction(KrAddr302Flag=1))>0 => 1, 0);
+Address: => KrAddr303Flag := MAP(COUNT(AddressEvent.Transaction(KrAddr303Flag=1))>0 => 1, 0);
 
 // Cluster Attributes
 
