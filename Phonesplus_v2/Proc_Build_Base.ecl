@@ -17,7 +17,8 @@ pplus_sources :=
 				 // Map_IBehavior_as_Phonesplus +
 				 Map_Thrive_as_Phonesplus +
 				 Map_AlloyMedia_as_Phonesplus +
-				 Map_NVerified_as_Phonesplus 
+				 Map_NVerified_as_Phonesplus +
+				 Map_NeustarWireless_as_Phonesplus 
 				 ;
 
 pplus_royalty := Map_WiredAssets_as_Phonesplus(false);	
