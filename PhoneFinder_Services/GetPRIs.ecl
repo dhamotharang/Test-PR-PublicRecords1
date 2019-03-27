@@ -15,11 +15,11 @@ FUNCTION
   dPrimaryPhoneInfo := PhoneFinder_Services.GetPhonesFinal(dSearchResultsPrimaryPhone, inMod, TRUE);
   
   // Other phones
-  dSearchResultsOtherPhones := dSearchResults(~isPrimaryPhone);
+  dSearchResultsOtherPhones := IF(inMod.isPrimarySearchPII, dSearchResults(~isPrimaryPhone));
   
   dOtherPhoneInfo := PhoneFinder_Services.GetPhonesFinal(dSearchResultsOtherPhones, inMod, FALSE);
 
-  // Prep for Risk indicator calculation  
+  // Prep for Risk indicator calculation
   // Format identities to Final layout
   dIdentitiesFormat2Final := PROJECT(dIdentitiesInfo,
                                       TRANSFORM($.Layouts.PhoneFinder.Final,
@@ -33,21 +33,39 @@ FUNCTION
   dIdentityInfoGrp := SORT(GROUP(SORT(dIdentitiesFormat2Final, acctno), acctno),
                             IF(did != 0, 0, 1), IF(PhoneOwnershipIndicator, 0, 1), penalt, -dt_last_seen, IF(dt_first_seen != '', dt_first_seen, '99999999'), phone_source, RECORD);
   
-  dPrepIdentityForRI := ITERATE(dIdentityInfoGrp,
-                                TRANSFORM($.Layouts.PhoneFinder.Final,
-                                          SELF.isPrimaryPhone := (COUNTER = 1),
-                                          SELF                := RIGHT));
+  dPrepIdentityForRI := UNGROUP(ITERATE(dIdentityInfoGrp,
+                                        TRANSFORM($.Layouts.PhoneFinder.Final,
+                                                  SELF.isPrimaryPhone := (COUNTER = 1),
+                                                  SELF                := RIGHT)));
 
   dPrepPrimaryForRIs := JOIN( dPrepIdentityForRI(isPrimaryPhone),
                               dPrimaryPhoneInfo,
                               LEFT.acctno = RIGHT.acctno,
                               TRANSFORM($.Layouts.PhoneFinder.Final,
                                         SELF.phone             := RIGHT.phone,
+                                        SELF.dt_first_seen     := LEFT.dt_first_seen,
+                                        SELF.dt_last_seen      := LEFT.dt_last_seen,
                                         SELF.listed_name       := RIGHT.ListingName,
                                         SELF.RealTimePhone_Ext := RIGHT,
-                                        SELF := LEFT, SELF := RIGHT, SELF := []),
+                                        SELF := RIGHT, SELF := LEFT, SELF := []),
                               LEFT OUTER,
                               LIMIT(0), KEEP(1));
+  
+  dPrepPrimaryPhoneOnlyForRIs := JOIN(dPrepPrimaryForRIs,
+                                      dPrimaryPhoneInfo,
+                                      LEFT.acctno = RIGHT.acctno,
+                                      TRANSFORM($.Layouts.PhoneFinder.Final,
+                                                SELF.isPrimaryPhone    := TRUE;
+                                                SELF.phone             := RIGHT.phone,
+                                                SELF.dt_first_seen     := (STRING)RIGHT.dt_first_seen,
+                                                SELF.dt_last_seen      := (STRING)RIGHT.dt_last_seen,
+                                                SELF.listed_name       := RIGHT.ListingName,
+                                                SELF.RealTimePhone_Ext := RIGHT,
+                                                SELF := RIGHT, SELF := []),
+                                      RIGHT ONLY);
+  
+  // Combine primary identity and phone
+  dPrimaryForRIs := dPrepPrimaryForRIs + dPrepPrimaryPhoneOnlyForRIs;
 
   // Other identities
   dOtherIdentities := dPrepIdentityForRI(~isPrimaryPhone);
@@ -63,25 +81,28 @@ FUNCTION
                                               SELF := LEFT, SELF := []));
 
   // Send primary and other phones for RI calculation
-  dPrepForRIs := dPrepPrimaryForRIs & IF(inMod.IncludeOtherPhoneRiskIndicators, dPrepOtherPhonesForRIs);
+  dPrepForRIs := dPrimaryForRIs & IF(inMod.IncludeOtherPhoneRiskIndicators, dPrepOtherPhonesForRIs);
   
-  dRIs := PhoneFinder_Services.CalculatePRIs(dPrepForRIs, inMod);
+  dRIs := IF(inMod.IncludeRiskIndicators, PhoneFinder_Services.CalculatePRIs(dPrepForRIs, inMod));
   
   dFinal := MAP(inMod.IncludeRiskIndicators AND inMod.IncludeOtherPhoneRiskIndicators => dRIs + dOtherIdentities,
                 inMod.IncludeRiskIndicators                                           => dRIs + dPrepOtherPhonesForRIs + dOtherIdentities,
-                UNGROUP(dIdentityInfoGrp) + dPrepOtherPhonesForRIs);
+                dPrimaryForRIs + dPrepOtherPhonesForRIs);
 
-  #IF($.Constants.Debug.Intermediate)
+  #IF($.Constants.Debug.Main)
     OUTPUT(dIdentitiesInfo, NAMED('dIdentitiesInfo_PRI'));
     OUTPUT(dSearchResultsPrimaryPhone, NAMED('dSearchResultsPrimaryPhone_PRI'));
-    OUTPUT(dSearchResultsOtherPhones, NAMED('dSearchResultsOtherPhones_PRI'));
-    OUTPUT(dOtherPhoneInfo, NAMED('dOtherPhoneInfo_PRI'));
+    IF(inMod.isPrimarySearchPII, OUTPUT(dSearchResultsOtherPhones, NAMED('dSearchResultsOtherPhones_PRI')));
+    IF(inMod.isPrimarySearchPII, OUTPUT(dOtherPhoneInfo, NAMED('dOtherPhoneInfo_PRI')));
     OUTPUT(dIdentitiesFormat2Final, NAMED('dIdentitiesFormat2Final_PRI'));
     OUTPUT(dPrepIdentityForRI, NAMED('dPrepIdentityForRI_PRI'));
     OUTPUT(dPrepPrimaryForRIs, NAMED('dPrepPrimaryForRIs_PRI'));
+    OUTPUT(dPrepPrimaryPhoneOnlyForRIs, NAMED('dPrepPrimaryPhoneOnlyForRIs_PRI'));
+    OUTPUT(dPrimaryForRIs, NAMED('dPrimaryForRIs_PRI'));
     OUTPUT(dOtherIdentities, NAMED('dOtherIdentities_PRI'));
-    OUTPUT(dPrepOtherPhonesForRIs, NAMED('dPrepOtherPhonesForRIs_PRI'));
-    IF(inMod.IncludeRiskIndicators, SEQUENTIAL(OUTPUT(dPrepForRIs, NAMED('dPrepForRIs_PRI')), OUTPUT(dRIs, NAMED('dRIs_PRI'))));
+    IF(inMod.isPrimarySearchPII, OUTPUT(dPrepOtherPhonesForRIs, NAMED('dPrepOtherPhonesForRIs_PRI')));
+    IF(inMod.IncludeRiskIndicators, OUTPUT(dPrepForRIs, NAMED('dPrepForRIs_PRI')));
+    IF(inMod.IncludeRiskIndicators, OUTPUT(dRIs, NAMED('dRIs_PRI')));
   #END
 
   RETURN dFinal;

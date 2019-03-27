@@ -15,6 +15,7 @@ FUNCTION
                                   SELF.ListingName 	 := IF(LEFT.listed_name != '', LEFT.listed_name, LEFT.RealTimePhone_Ext.ListingName);
                                   SELF.dt_first_seen := (UNSIGNED4)LEFT.dt_first_seen,
                                   SELF.dt_last_seen  := (UNSIGNED4)LEFT.dt_last_seen,
+                                  SELF.PortingCode   := LEFT.PortingCode,
                                   SELF             	 := LEFT.RealTimePhone_Ext,
                                   SELF             	 := LEFT));
   
@@ -134,7 +135,7 @@ FUNCTION
                           dPhoneDetail + dTUPhonesOnly,
                           UNGROUP(TOPN(GROUP(dPhoneRollup, acctno), PhoneFinder_Services.Constants.WFConstants.MaxSectionLimit, acctno, -phone_score)));
   
-  #IF(PhoneFinder_Services.Constants.Debug.Intermediate)
+  #IF(PhoneFinder_Services.Constants.Debug.Main)
       OUTPUT(dPhoneSlim, NAMED('dPhoneSlim'), EXTEND);
       OUTPUT(dPhoneSort, NAMED('dPhoneSort'), EXTEND);
       OUTPUT(dPhoneRollup, NAMED('dPhoneRollup'), EXTEND);

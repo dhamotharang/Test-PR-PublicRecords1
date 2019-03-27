@@ -124,10 +124,8 @@ MODULE
                                       PhoneFinder_Services.GetPhonesMetadata(dZum_final, tmpMod, dGateways, dInBestInfo, dSubjectInfo),
                                       dZum_final);
 
-  // Calculate PRIs
-  SHARED dFinalResults := IF(tmpMod.IsGetMetaData,
-                              PhoneFinder_Services.GetPRIs(dPhoneMetadataResults, dInBestInfo, tmpMod),
-                              dPhoneMetadataResults);
+  // Phone verfication, calculate PRIs
+  SHARED dFinalResults := PhoneFinder_Services.GetPRIs(dPhoneMetadataResults, dInBestInfo, tmpMod);
 
   inputOptionCheck := tmpMod.IncludeInhousePhones OR tmpMod.IncludeTargus OR tmpMod.IncludeAccudataOCN OR 
                       tmpMod.IncludeEquifax OR tmpMod.IncludeTransUnionIQ411 OR tmpMod.IncludeTransUnionPVS OR 
@@ -137,6 +135,7 @@ MODULE
     OUTPUT(dInPhone, NAMED('dInPhone'));
     OUTPUT(dPIISearch, NAMED('dPIISearch'));
     OUTPUT(dInBest, NAMED('dInBest'));
+    OUTPUT(dSearchRecs, NAMED('dSearchRecs'));
     OUTPUT(dPorted_Phones, NAMED('dPorted_Phones'));
     OUTPUT(dZum_final, NAMED('dZum_final'));
     OUTPUT(dPhoneMetadataResults, NAMED('dPhoneMetadataResults'));
@@ -144,7 +143,7 @@ MODULE
   #END
 
   // Fail the service if multiple DIDs are returned for the search criteria OR if the phone number is not 10 digits OR if no records are returned
-  MAP(tmpMod.IsPrimarySearchPII and verifyRequest > 0 => FAIL(303, doxie.ErrorCodes(303)),
+  MAP(inMod.IsPrimarySearchPII and verifyRequest > 0 => FAIL(303, doxie.ErrorCodes(303)),
      ~vPhoneBlank and ~vIsPhone10                    => FAIL(301,doxie.ErrorCodes(301)),
       vPhoneBlank and EXISTS(dGetDIDs(did_count > 1)) => FAIL(203,doxie.ErrorCodes(203)), //FAIL the service if no records exists
         // If phoneFinder were to run as a verification tool, only one type of verification should be selected.

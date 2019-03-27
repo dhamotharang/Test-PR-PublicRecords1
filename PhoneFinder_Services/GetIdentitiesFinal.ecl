@@ -99,7 +99,7 @@ FUNCTION
 
   dIdentitiesFinal := IF(isPhoneSearch, dIdentitiesInfo, dIdentityBestInfo);
 
-  #IF($.Constants.Debug.Intermediate)
+  #IF($.Constants.Debug.Main)
     OUTPUT(dIdentitySlim, NAMED('dIdentitySlim'));
     OUTPUT(dDIDRollUp, NAMED('dIdentityDIDRollUp'));
     OUTPUT(dNoDIDRollUp, NAMED('dIdentityNoDIDRollUp'));

@@ -151,14 +151,13 @@ EXPORT GetVerifiedRecs($.IParam.PhoneVerificationParams vmod) := MODULE
                               SELF.is_phone_verified := RIGHT.is_phone_verified, SELF := LEFT),
                     LIMIT(0), KEEP(1));
   
-    #IF($.Constants.Debug.Intermediate)
-      IF(vmod.VerifyPhoneNameAddress OR vmod.VerifyPhoneName OR vmod.VerifyPhoneIsActive,
-        SEQUENTIAL(OUTPUT(dVerifyIdentity, NAMED('dVerifyIdentity')),
-                    OUTPUT(dNonVerifiedIdentities, NAMED('dNonVerifiedIdentities')),
-                    OUTPUT(dIdentitiesAll, NAMED('dIdentitiesAll')),
-                    OUTPUT(dInPrimaryPhones, NAMED('dInPrimaryPhones')),
-                    OUTPUT(dPhoneVerify, NAMED('dPhoneVerify')),
-                    OUTPUT(dVerify, NAMED('dVerify'))));
+    #IF($.Constants.Debug.Main)
+      IF(vmod.VerifyPhoneNameAddress OR vmod.VerifyPhoneName OR vmod.VerifyPhoneIsActive, OUTPUT(dVerifyIdentity, NAMED('dVerifyIdentity')));
+      IF(vmod.VerifyPhoneNameAddress OR vmod.VerifyPhoneName OR vmod.VerifyPhoneIsActive, OUTPUT(dNonVerifiedIdentities, NAMED('dNonVerifiedIdentities')));
+      IF(vmod.VerifyPhoneNameAddress OR vmod.VerifyPhoneName OR vmod.VerifyPhoneIsActive, OUTPUT(dIdentitiesAll, NAMED('dIdentitiesAll')));
+      IF(vmod.VerifyPhoneNameAddress OR vmod.VerifyPhoneName OR vmod.VerifyPhoneIsActive, OUTPUT(dInPrimaryPhones, NAMED('dInPrimaryPhones')));
+      IF(vmod.VerifyPhoneNameAddress OR vmod.VerifyPhoneName OR vmod.VerifyPhoneIsActive, OUTPUT(dPhoneVerify, NAMED('dPhoneVerify')));
+      IF(vmod.VerifyPhoneNameAddress OR vmod.VerifyPhoneName OR vmod.VerifyPhoneIsActive, OUTPUT(dVerify, NAMED('dVerify')));
     #END
 
     RETURN dVerify;

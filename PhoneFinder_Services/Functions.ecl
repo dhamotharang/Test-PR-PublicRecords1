@@ -777,28 +777,28 @@ MODULE
                                                                       pInput.name_suffix,
                                                                       '',
                                                                       vFullName);
-      SELF.RecentAddress                     := iesp.ECL2ESP.SetAddress(pInput.prim_name,pInput.prim_range,
-                                                                        pInput.predir,pInput.postdir,pInput.suffix,
-                                                                        pInput.unit_desig,pInput.sec_range,
-                                                                        pInput.city_name,pInput.st,pInput.zip,
-                                                                        pInput.zip4,pInput.county_name,'',
-                                                                        vStreetAddress[1..60],vStreetAddress[61..],
+      SELF.RecentAddress                     := iesp.ECL2ESP.SetAddress(pInput.prim_name, pInput.prim_range,
+                                                                        pInput.predir, pInput.postdir, pInput.suffix,
+                                                                        pInput.unit_desig, pInput.sec_range,
+                                                                        pInput.city_name, pInput.st, pInput.zip,
+                                                                        pInput.zip4, pInput.county_name,'',
+                                                                        vStreetAddress[1..60], vStreetAddress[61..],
                                                                         vCityStZip);
       SELF.PrimaryAddressType								 := pInput.primary_address_type;																				
       SELF.RecordType												 := pInput.TNT;																				
       SELF.FirstSeenWithPrimaryPhone         := iesp.ECL2ESP.toDatestring8(pInput.dt_first_seen);
       SELF.LastSeenWithPrimaryPhone          := iesp.ECL2ESP.toDatestring8(pInput.dt_last_seen);
       SELF.TimeWithPrimaryPhone              := IF((INTEGER)pInput.dt_first_seen != 0 and (INTEGER)pInput.dt_last_seen != 0,
-                                                    (STRING)ROUND(ut.DaysApart(pInput.dt_last_seen[1..6]+'01',pInput.dt_first_seen[1..6]+'01')/(365/12)),
+                                                    (STRING)ROUND(ut.DaysApart(pInput.dt_last_seen[1..6] + '01', pInput.dt_first_seen[1..6] + '01')/(365/12)),
                                                     '');
       SELF.TimeSinceLastSeenWithPrimaryPhone := IF((INTEGER)pInput.dt_last_seen != 0,
-                                                    (STRING)ROUND(ut.DaysApart((today)[1..6]+'01',pInput.dt_last_seen[1..6]+'01')/(365/12)),
+                                                    (STRING)ROUND(ut.DaysApart((today)[1..6] + '01', pInput.dt_last_seen[1..6] + '01')/(365/12)),
                                                     '');
       SELF.PhoneOwnershipIndicator           := pInput.PhoneOwnershipIndicator;
       SELF                                   := pInput;
     END;
 
-    dIdentitiesIesp := PROJECT(SORT(dIn(fname != '' OR lname != ''), IF(PhoneOwnershipIndicator, 0, 1), IF(did != 0, 0, 1), -(INTEGER)dt_last_seen),
+    dIdentitiesIesp := PROJECT(SORT(dIn(fname != '' OR lname != '' OR listed_name != ''), IF(PhoneOwnershipIndicator, 0, 1), IF(did != 0, 0, 1), -(INTEGER)dt_last_seen),
                                 tFormat2IespIdentity(LEFT));
 
     // Primary phone section
@@ -830,10 +830,11 @@ MODULE
                                                                   SELF.FirstSpoofedDate := iesp.ECL2ESP.toDate(LEFT.FirstSpoofedDate),
                                                                   SELF.LastSpoofedDate  := iesp.ECL2ESP.toDate(LEFT.LastSpoofedDate),
                                                                   SELF                  := LEFT));
-			SELF.SpoofingData.Source			        := PROJECT(pInput.Source,TRANSFORM(iesp.phonefinder.t_SpoofCommon,
-																																				SELF.FirstSpoofedDate 	:= iesp.ECL2ESP.toDate(LEFT.FirstSpoofedDate),
-																																				SELF.LastSpoofedDate  	:= iesp.ECL2ESP.toDate(LEFT.LastSpoofedDate),
-																																				SELF:=LEFT));		
+			SELF.SpoofingData.Source			        := PROJECT(pInput.Source,
+                                                        TRANSFORM(iesp.phonefinder.t_SpoofCommon,
+                                                                  SELF.FirstSpoofedDate 	:= iesp.ECL2ESP.toDate(LEFT.FirstSpoofedDate),
+                                                                  SELF.LastSpoofedDate  	:= iesp.ECL2ESP.toDate(LEFT.LastSpoofedDate),
+                                                                  SELF:=LEFT));		
 			SELF.SpoofingData.FirstEventSpoofedDate := iesp.ECL2ESP.toDate(pInput.FirstEventSpoofedDate);																																				
 			SELF.SpoofingData.LastEventSpoofedDate  := iesp.ECL2ESP.toDate(pInput.LastEventSpoofedDate);																																				
 			SELF.SpoofingData.TotalSpoofedCount 	  := pInput.TotalSpoofedCount;
