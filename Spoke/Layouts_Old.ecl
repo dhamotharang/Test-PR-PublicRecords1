@@ -1,4 +1,4 @@
-import address;
+﻿import address, bipv2;
 export Layouts_Old :=
 module
 
@@ -55,10 +55,13 @@ module
 	////////////////////////////////////////////////////////////////////////
 	export Base :=
 	record, maxlength(max_size)
+		BIPV2.IDlayouts.l_xlink_ids;
 		unsigned6												Did													:= 0;
 		unsigned1												did_score										:= 0;
 		unsigned6												Bdid												:= 0;
 		unsigned1												bdid_score									:= 0;
+		unsigned8							    			raw_aid											:= 0;
+		unsigned8							    			ace_aid											:= 0;
 		unsigned4 											dt_first_seen										;
 		unsigned4 											dt_last_seen										;
 		unsigned4 											dt_vendor_first_reported				;
