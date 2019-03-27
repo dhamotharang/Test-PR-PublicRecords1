@@ -22,8 +22,6 @@ EXPORT VALID_BUS_ATTRIBUTE_VERSIONS := [BUS_REQ_ATTRIBUTE_V3];
 
 EXPORT INVALID := 'INVALID';
 
-EXPORT VALIDATION_INVALID_INDIVIDUAL := 'Minimum input information not met. Minimum input information is: \n (1)  First Name, Last Name, Street Address, City and State or Zip  OR \n (2)  First Name, Last Name, SSN  OR \n (3)  LexID';
-EXPORT VALIDATION_INVALID_BUSINESS := 'Minimum input information not met. Minimum input information is: \n (1)  Business Name, Street Address, City and State or Zip  OR \n (2)  Business Name, Tax ID OR \n (3)  LexID';
 EXPORT VALIDATION_INVALID_VERSION := 'Please enter a valid attributes version';
 
 

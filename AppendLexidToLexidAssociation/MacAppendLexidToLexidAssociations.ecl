@@ -1,6 +1,6 @@
 ﻿EXPORT MacAppendLexidToLexidAssociations(indata, Lexid1, Lexid2='', Prefix='Association', DegreeThreshold=2, IndexThreshold=20000000) := FUNCTIONMACRO
   IMPORT Relationship;
-	IMPORT Relavator;
+	IMPORT AppendLexidToLexidAssociation;
   IMPORT Header;
   LOCAL DistinctLexids := TABLE(PROJECT(indata((INTEGER)Lexid1 > 0 
   #IF(#TEXT(Lexid2)<>'')														
@@ -88,7 +88,7 @@
   PROJECT(DistinctInputLexidAssociations, TRANSFORM(RECORDOF(InputwithoutMatchedFirstDegrees), SELF.did1 := LEFT.did, SELF := []))
     #END, 
     
-  Relavator.Key_Person_Cluster_Degree, 
+  AppendLexidToLexidAssociation.Key_Person_Cluster_Degree, 
                           LEFT.did1=RIGHT.cluster_id 
   #IF(#TEXT(Lexid2)<>'')													
                           AND LEFT.did2=RIGHT.associated_did
@@ -108,7 +108,7 @@
     #END, 
   
   
-  PULL(Relavator.Key_Person_Cluster_Degree(Degree_Key/100 <= DegreeThreshold)), 
+  PULL(AppendLexidToLexidAssociation.Key_Person_Cluster_Degree(Degree_Key/100 <= DegreeThreshold)), 
                           LEFT.did1=RIGHT.cluster_id 
   #IF(#TEXT(Lexid2)<>'')													
                           AND LEFT.did2=RIGHT.associated_did

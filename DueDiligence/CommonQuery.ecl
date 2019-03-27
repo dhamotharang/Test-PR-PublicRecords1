@@ -3,77 +3,77 @@
 
 EXPORT CommonQuery := MODULE
 		
-		EXPORT mac_AddressFromRequest(reportedBy) := MACRO
-				
-				indBusAddr := reportedBy.address;
-				address_in := DATASET([TRANSFORM(DueDiligence.Layouts.Address,
-																					SELF.prim_range := TRIM(indBusAddr.streetnumber);
-																					SELF.predir := TRIM(indBusAddr.streetPreDirection);
-																					SELF.prim_name := TRIM(indBusAddr.streetName);
-																					SELF.addr_suffix := TRIM(indBusAddr.streetSuffix);
-																					SELF.postdir := TRIM(indBusAddr.streetPostDirection);
-																					SELF.unit_desig := TRIM(indBusAddr.unitDesignation);
-																					SELF.sec_range := TRIM(indBusAddr.unitNumber);
-																					SELF.streetAddress1 := TRIM(indBusAddr.streetAddress1);
-																					SELF.streetAddress2 := TRIM(indBusAddr.streetAddress2);
-																					SELF.city := TRIM(indBusAddr.city);
-																					SELF.state := TRIM(indBusAddr.state);
-																					SELF.zip5 := TRIM(indBusAddr.zip5);
-																					SELF.zip4 := TRIM(indBusAddr.zip4);
-																					SELF.county := TRIM(indBusAddr.county);
-																					SELF := [];)]);
-		ENDMACRO;
+    EXPORT mac_AddressFromRequest(reportedBy) := MACRO
+        
+        indBusAddr := reportedBy.address;
+        address_in := DATASET([TRANSFORM(DueDiligence.Layouts.Address,
+                                          SELF.prim_range := TRIM(indBusAddr.streetnumber);
+                                          SELF.predir := TRIM(indBusAddr.streetPreDirection);
+                                          SELF.prim_name := TRIM(indBusAddr.streetName);
+                                          SELF.addr_suffix := TRIM(indBusAddr.streetSuffix);
+                                          SELF.postdir := TRIM(indBusAddr.streetPostDirection);
+                                          SELF.unit_desig := TRIM(indBusAddr.unitDesignation);
+                                          SELF.sec_range := TRIM(indBusAddr.unitNumber);
+                                          SELF.streetAddress1 := TRIM(indBusAddr.streetAddress1);
+                                          SELF.streetAddress2 := TRIM(indBusAddr.streetAddress2);
+                                          SELF.city := TRIM(indBusAddr.city);
+                                          SELF.state := TRIM(indBusAddr.state);
+                                          SELF.zip5 := TRIM(indBusAddr.zip5);
+                                          SELF.zip4 := TRIM(indBusAddr.zip4);
+                                          SELF.county := TRIM(indBusAddr.county);
+                                          SELF := [];)]);
+    ENDMACRO;
 		
-		EXPORT PopulateIndividualFromRequest(reportedBy, acctNo, indvIndicator) := FUNCTIONMACRO
-				
-				#if(indvIndicator <> DueDiligence.Constants.BUSINESS)
-						
-						personInfo := reportedBy.person;
-						DueDiligence.CommonQuery.mac_AddressFromRequest(personInfo);
-						
-						ind_in := DATASET([TRANSFORM(DueDiligence.Layouts.Indv_Input,
-																					SELF.lexID := TRIM(personInfo.lexID);
-																					SELF.name := DATASET([TRANSFORM(DueDiligence.Layouts.Name,
-																																					SELF.fullName := TRIM(personInfo.name.full);
-																																					SELF.firstName := TRIM(personInfo.name.first);
-																																					SELF.middleName := TRIM(personInfo.name.middle);
-																																					SELF.lastName := TRIM(personInfo.name.last);
-																																					SELF.suffix := TRIM(personInfo.name.suffix);
-																																					SELF := [];)])[1];
-																					SELF.address := address_in[1];
-																					SELF.phone := TRIM(personInfo.phone);
-																					SELF.ssn := TRIM(personInfo.ssn);
-																					SELF.accountNumber := TRIM(acctNo);
+    EXPORT PopulateIndividualFromRequest(reportedBy, acctNo, indvIndicator) := FUNCTIONMACRO
+        
+        #if(indvIndicator <> DueDiligence.Constants.BUSINESS)
+            
+            personInfo := reportedBy.person;
+            DueDiligence.CommonQuery.mac_AddressFromRequest(personInfo);
+            
+            ind_in := DATASET([TRANSFORM(DueDiligence.Layouts.Indv_Input,
+                                          SELF.lexID := TRIM(personInfo.lexID);
+                                          SELF.name := DATASET([TRANSFORM(DueDiligence.Layouts.Name,
+                                                                          SELF.fullName := TRIM(personInfo.name.full);
+                                                                          SELF.firstName := TRIM(personInfo.name.first);
+                                                                          SELF.middleName := TRIM(personInfo.name.middle);
+                                                                          SELF.lastName := TRIM(personInfo.name.last);
+                                                                          SELF.suffix := TRIM(personInfo.name.suffix);
+                                                                          SELF := [];)])[1];
+                                          SELF.address := address_in[1];
+                                          SELF.phone := TRIM(personInfo.phone);
+                                          SELF.ssn := TRIM(personInfo.ssn);
+                                          SELF.accountNumber := TRIM(acctNo);
                                           SELF.dob := (INTFORMAT(personInfo.dob.Year, 4, 1) + INTFORMAT(personInfo.dob.Month, 2, 1) + INTFORMAT(personInfo.dob.Day, 2, 1));
-																					SELF := [];)]);
-				#else
-						ind_in := DATASET([], DueDiligence.Layouts.Indv_Input);
-				#end
-				
-				RETURN ind_in;
-		ENDMACRO;
+                                          SELF := [];)]);
+        #else
+            ind_in := DATASET([], DueDiligence.Layouts.Indv_Input);
+        #end
+
+        RETURN ind_in;
+    ENDMACRO;
 		
-		EXPORT PopulateBusinessFromRequest(reportedBy, acctNo, busIndicator) := FUNCTIONMACRO
-				
-				#if(busIndicator <> DueDiligence.Constants.INDIVIDUAL)
-						
-						businessInfo := reportedBy.business;
-						DueDiligence.CommonQuery.mac_AddressFromRequest(businessInfo);
-						
-						bus_in := DATASET([TRANSFORM(DueDiligence.Layouts.Busn_Input,
-																			SELF.lexID := TRIM(businessInfo.lexID);
-																			SELF.accountNumber := TRIM(acctNo);
-																			SELF.companyName := TRIM(businessInfo.companyName);
-																			SELF.altCompanyName := TRIM(businessInfo.alternateCompanyName);
-																			SELF.address := address_in[1];
-																			SELF.fein := TRIM(businessInfo.fein);
-																			SELF := [];)]);
-				#else
-						bus_in := DATASET([], DueDiligence.Layouts.Busn_Input);
-				#end
-				
-				RETURN bus_in;
-		ENDMACRO;
+    EXPORT PopulateBusinessFromRequest(reportedBy, acctNo, busIndicator) := FUNCTIONMACRO
+        
+        #if(busIndicator <> DueDiligence.Constants.INDIVIDUAL)
+            
+            businessInfo := reportedBy.business;
+            DueDiligence.CommonQuery.mac_AddressFromRequest(businessInfo);
+            
+            bus_in := DATASET([TRANSFORM(DueDiligence.Layouts.Busn_Input,
+                                          SELF.lexID := TRIM(businessInfo.lexID);
+                                          SELF.accountNumber := TRIM(acctNo);
+                                          SELF.companyName := TRIM(businessInfo.companyName);
+                                          SELF.altCompanyName := TRIM(businessInfo.alternateCompanyName);
+                                          SELF.address := address_in[1];
+                                          SELF.fein := TRIM(businessInfo.fein);
+                                          SELF := [];)]);
+        #else
+            bus_in := DATASET([], DueDiligence.Layouts.Busn_Input);
+        #end
+
+        RETURN bus_in;
+    ENDMACRO;
 		
     EXPORT mac_CreateInputFromXML(requestType, requestStoredName, requestedReport, serviceRequested) := MACRO
 				
@@ -168,37 +168,17 @@ EXPORT CommonQuery := MODULE
     ENDMACRO;
 		
 		
-		EXPORT ValidateRequest(DATASET(DueDiligence.Layouts.Input) input, UNSIGNED1 glbPurpose, UNSIGNED1 dppaPurpose, STRING11 requestedService):= FUNCTION
+    EXPORT ValidateRequest(DATASET(DueDiligence.Layouts.Input) input, UNSIGNED1 glbPurpose, UNSIGNED1 dppaPurpose, STRING11 requestedService):= FUNCTION
         
         BOOLEAN ValidGLB := DueDiligence.CitDDShared.isValidGLBA(glbPurpose);
-				BOOLEAN ValidDPPA := DueDiligence.CitDDShared.isValidDPPA(dppaPurpose);
+        BOOLEAN ValidDPPA := DueDiligence.CitDDShared.isValidDPPA(dppaPurpose);
                                                       
-				validatedRequests := PROJECT(input, TRANSFORM(DueDiligence.Layouts.Input,
-																											//Validate the request
-                                                      validPerson := DueDiligence.CitDDShared.validateIndividual(LEFT.individual);
-                                                      BOOLEAN LexIDPopulated := LEFT.individual.lexID <> DueDiligence.Constants.EMPTY;
-                                                      BOOLEAN ValidIndividual := validPerson OR LexIDPopulated;
-                                                      
-                                                      BOOLEAN BusNamePopulated := LEFT.business.companyName <> DueDiligence.Constants.EMPTY OR LEFT.business.altCompanyName <> DueDiligence.Constants.EMPTY;
-                                                      
-                                                      BOOLEAN BusAddrPopulated := LEFT.business.address.streetaddress1 <> DueDiligence.Constants.EMPTY OR (LEFT.business.address.prim_range <> DueDiligence.Constants.EMPTY AND LEFT.Business.address.prim_name <> DueDiligence.Constants.EMPTY);
-                                                      BOOLEAN BusCityStatePopulated := LEFT.business.address.city <> DueDiligence.Constants.EMPTY AND LEFT.business.address.state <> DueDiligence.Constants.EMPTY;
-                                                      BOOLEAN BusZipPopulated := LEFT.business.address.zip5 <> DueDiligence.Constants.EMPTY;
-                                                      
-                                                      BOOLEAN BusTaxIDPopulated := LEFT.business.fein <> DueDiligence.Constants.EMPTY;
-                                                      BOOLEAN SeleIDPopulated := LEFT.business.lexID <> DueDiligence.Constants.EMPTY;
-                                                      
-                                                      BOOLEAN ValidBusiness := (BusNamePopulated AND
-                                                                                    (BusTaxIDPopulated OR
-                                                                                    (BusAddrPopulated AND (BusCityStatePopulated OR BusZipPopulated)))) 
-                                                                                OR SeleIDPopulated;
-                                                                                
+        validatedRequests := PROJECT(input, TRANSFORM(DueDiligence.Layouts.Input,
+                                                      //Validate the request
                                                       BOOLEAN ValidIndVersion := LEFT.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS;
                                                       BOOLEAN ValidBusVersion := LEFT.requestedVersion IN DueDiligence.Constants.VALID_BUS_ATTRIBUTE_VERSIONS;
-                                                      
+
                                                       STRING OhNoMessage := MAP(ValidIndVersion = FALSE AND ValidBusVersion = FALSE => DueDiligence.Constants.VALIDATION_INVALID_VERSION,
-                                                                                ValidIndVersion AND ValidIndividual = FALSE => DueDiligence.Constants.VALIDATION_INVALID_INDIVIDUAL,
-                                                                                ValidBusVersion AND ValidBusiness = FALSE => DueDiligence.Constants.VALIDATION_INVALID_BUSINESS,
                                                                                 ValidGLB = FALSE => DueDiligence.CitDDShared.VALIDATION_INVALID_GLB,
                                                                                 ValidDPPA = FALSE => DueDiligence.CitDDShared.VALIDATION_INVALID_DPPA,
                                                                                 DueDiligence.Constants.EMPTY);
@@ -209,16 +189,16 @@ EXPORT CommonQuery := MODULE
                                                             
                                                       versionReq := ': ' + validVersions;
                                                       updatedOhNoMessage := IF(OhNoMessage = DueDiligence.Constants.VALIDATION_INVALID_VERSION, TRIM(OhNoMessage) + versionReq, OhNoMessage);
-                                                      
-																											trimOhNo := TRIM(updatedOhNoMessage);
 
-																											
-																											SELF.validRequest := trimOhNo = DueDiligence.Constants.EMPTY;
-																											SELF.errorMessage := trimOhNo;
-																											SELF := LEFT;));
+                                                      trimOhNo := TRIM(updatedOhNoMessage);
 
-				RETURN validatedRequests;
-		END;
+
+                                                      SELF.validRequest := trimOhNo = DueDiligence.Constants.EMPTY;
+                                                      SELF.errorMessage := trimOhNo;
+                                                      SELF := LEFT;));
+
+        RETURN validatedRequests;
+    END;
 		
 		
 		EXPORT mac_FailOnError(invalidRequests) := MACRO
@@ -226,148 +206,147 @@ EXPORT CommonQuery := MODULE
 		ENDMACRO;
 			
 			
-		EXPORT GetCleanData(DATASET(DueDiligence.Layouts.Input) input) := FUNCTION
+    EXPORT GetCleanData(DATASET(DueDiligence.Layouts.Input) input) := FUNCTION
 			
-				cleanData := PROJECT(input, TRANSFORM(DueDiligence.Layouts.CleanedData,
-																							//Clean Address
-																							addressToClean := IF(LEFT.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, LEFT.individual.address, LEFT.business.address);
-																							addressClean := DueDiligence.CitDDShared.cleanAddress(addressToClean);
-																							
-																							addrProvided := addressToClean.streetAddress1 <> DueDiligence.Constants.EMPTY OR addressToClean.streetAddress2 <> DueDiligence.Constants.EMPTY OR addressToClean.prim_range <> DueDiligence.Constants.EMPTY OR addressToClean.predir <> DueDiligence.Constants.EMPTY OR 
-																															addressToClean.prim_name <> DueDiligence.Constants.EMPTY OR addressToClean.addr_suffix <> DueDiligence.Constants.EMPTY OR addressToClean.postdir <> DueDiligence.Constants.EMPTY OR addressToClean.unit_desig <> DueDiligence.Constants.EMPTY OR 
-																															addressToClean.sec_range <> DueDiligence.Constants.EMPTY OR addressToClean.city <> DueDiligence.Constants.EMPTY OR addressToClean.state <> DueDiligence.Constants.EMPTY OR addressToClean.zip5 <> DueDiligence.Constants.EMPTY;	
-																															
-																							fullAddrProvided := (addressClean.streetAddress1 <> DueDiligence.Constants.EMPTY OR addressClean.prim_name <> DueDiligence.Constants.EMPTY) AND addressClean.city <> DueDiligence.Constants.EMPTY AND addressClean.state <> DueDiligence.Constants.EMPTY AND addressClean.zip5 <> DueDiligence.Constants.EMPTY;
-																							
-																							//Clean Company Name
-																							busName := LEFT.business.companyName;
-																							altBusName := LEFT.business.altCompanyName;
-																							
+        cleanData := PROJECT(input, TRANSFORM(DueDiligence.Layouts.CleanedData,
+                                              //Clean Address
+                                              addressToClean := IF(LEFT.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, LEFT.individual.address, LEFT.business.address);
+                                              addressClean := DueDiligence.CitDDShared.cleanAddress(addressToClean);
 
-																							companyName := IF(busName = DueDiligence.Constants.EMPTY, ut.CleanCompany(altBusName), ut.CleanCompany(busName)); // If the customer didn't pass in a company but passed in an alt company name use the alt as the company name
-																							altCompanyName := IF(busName = DueDiligence.Constants.EMPTY, DueDiligence.Constants.EMPTY, ut.CleanCompany(altBusName)); // Blank out the cleaned AltCompanyName if CompanyName wasn't populated, as we copied Alt into the Main CompanyName field on the previous line
-																							
-																							//Clean Phone Number
-																							phoneNumber := IF(LEFT.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, LEFT.individual.phone, LEFT.business.phone);
-																							phoneToClean := DueDiligence.CitDDShared.stripNonNumericValues(phoneNumber);
-																							
-																							//Remove any non-numeric fiends from taxID and lexID fields
-																							taxID := IF(LEFT.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, LEFT.individual.ssn, LEFT.business.fein);
-																							taxIDToClean := DueDiligence.CitDDShared.stripNonNumericValues(taxID);
-																							validTaxID := IF(LEFT.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, 
-																																IF(Business_Header.IsValidSsn((UNSIGNED)taxIDToClean), taxIDToClean, DueDiligence.Constants.EMPTY), 
-																																IF(Business_Header.ValidFEIN((UNSIGNED)taxIDToClean), taxIDToClean, DueDiligence.Constants.EMPTY ));
-																							
-																							lexID := IF(LEFT.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, LEFT.individual.lexID, LEFT.business.lexID);
-																							validLexID := DueDiligence.CitDDShared.stripNonNumericValues(lexID);
-																							
-																							//Valid history date passed - if invalid should return 99999999 for current mode
-																							validDate := DueDiligence.Common.checkInvalidDate((STRING)LEFT.historyDateYYYYMMDD, (STRING)DueDiligence.Constants.date8Nines);
-																							
-																							//Populate appropriate cleaned data	
-																							busClean := IF(LEFT.requestedVersion IN DueDiligence.Constants.VALID_BUS_ATTRIBUTE_VERSIONS, 
-																																							DATASET([TRANSFORM(DueDiligence.Layouts.Busn_Input,
-																																																	SELF.lexID := validLexID;
-																																																	SELF.companyName := companyName;
-																																																	SELF.altCompanyName := altCompanyName;
-																																																	SELF.address := addressClean;
-																																																	SELF.phone := IF(Business_Risk_BIP.Common.validPhone(phoneToClean), phoneToClean, DueDiligence.Constants.EMPTY);
-																																																	SELF.fein := validTaxID;
+                                              addrProvided := addressToClean.streetAddress1 <> DueDiligence.Constants.EMPTY OR addressToClean.streetAddress2 <> DueDiligence.Constants.EMPTY OR addressToClean.prim_range <> DueDiligence.Constants.EMPTY OR addressToClean.predir <> DueDiligence.Constants.EMPTY OR 
+                                                              addressToClean.prim_name <> DueDiligence.Constants.EMPTY OR addressToClean.addr_suffix <> DueDiligence.Constants.EMPTY OR addressToClean.postdir <> DueDiligence.Constants.EMPTY OR addressToClean.unit_desig <> DueDiligence.Constants.EMPTY OR 
+                                                              addressToClean.sec_range <> DueDiligence.Constants.EMPTY OR addressToClean.city <> DueDiligence.Constants.EMPTY OR addressToClean.state <> DueDiligence.Constants.EMPTY OR addressToClean.zip5 <> DueDiligence.Constants.EMPTY;	
+                                                              
+                                              fullAddrProvided := (addressClean.streetAddress1 <> DueDiligence.Constants.EMPTY OR addressClean.prim_name <> DueDiligence.Constants.EMPTY) AND addressClean.city <> DueDiligence.Constants.EMPTY AND addressClean.state <> DueDiligence.Constants.EMPTY AND addressClean.zip5 <> DueDiligence.Constants.EMPTY;
+
+                                              //Clean Company Name
+                                              busName := LEFT.business.companyName;
+                                              altBusName := LEFT.business.altCompanyName;
+
+
+                                              companyName := IF(busName = DueDiligence.Constants.EMPTY, ut.CleanCompany(altBusName), ut.CleanCompany(busName)); // If the customer didn't pass in a company but passed in an alt company name use the alt as the company name
+                                              altCompanyName := IF(busName = DueDiligence.Constants.EMPTY, DueDiligence.Constants.EMPTY, ut.CleanCompany(altBusName)); // Blank out the cleaned AltCompanyName if CompanyName wasn't populated, as we copied Alt into the Main CompanyName field on the previous line
+
+                                              //Clean Phone Number
+                                              phoneNumber := IF(LEFT.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, LEFT.individual.phone, LEFT.business.phone);
+                                              phoneToClean := DueDiligence.CitDDShared.stripNonNumericValues(phoneNumber);
+
+                                              //Remove any non-numeric fiends from taxID and lexID fields
+                                              taxID := IF(LEFT.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, LEFT.individual.ssn, LEFT.business.fein);
+                                              taxIDToClean := DueDiligence.CitDDShared.stripNonNumericValues(taxID);
+                                              validTaxID := IF(LEFT.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, 
+                                                                IF(Business_Header.IsValidSsn((UNSIGNED)taxIDToClean), taxIDToClean, DueDiligence.Constants.EMPTY), 
+                                                                IF(Business_Header.ValidFEIN((UNSIGNED)taxIDToClean), taxIDToClean, DueDiligence.Constants.EMPTY ));
+
+                                              lexID := IF(LEFT.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, LEFT.individual.lexID, LEFT.business.lexID);
+                                              validLexID := DueDiligence.CitDDShared.stripNonNumericValues(lexID);
+
+                                              //Valid history date passed - if invalid should return 99999999 for current mode
+                                              validDate := DueDiligence.Common.checkInvalidDate((STRING)LEFT.historyDateYYYYMMDD, (STRING)DueDiligence.Constants.date8Nines);
+
+                                              //Populate appropriate cleaned data	
+                                              busClean := IF(LEFT.requestedVersion IN DueDiligence.Constants.VALID_BUS_ATTRIBUTE_VERSIONS, 
+                                                                              DATASET([TRANSFORM(DueDiligence.Layouts.Busn_Input,
+                                                                                                  SELF.lexID := validLexID;
+                                                                                                  SELF.companyName := companyName;
+                                                                                                  SELF.altCompanyName := altCompanyName;
+                                                                                                  SELF.address := addressClean;
+                                                                                                  SELF.phone := IF(Business_Risk_BIP.Common.validPhone(phoneToClean), phoneToClean, DueDiligence.Constants.EMPTY);
+                                                                                                  SELF.fein := validTaxID;
                                                                                                   SELF.BIP_IDs.SeleID.LinkID := (UNSIGNED6)validLexID;
-																																																	SELF := LEFT.business;
-																																																	SELF := [];)]),
-																																							DATASET([], DueDiligence.Layouts.Busn_Input));
-																						
-																							indClean := IF(LEFT.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS,
-																																							DATASET([TRANSFORM(DueDiligence.Layouts.Indv_Input,
-																																																	SELF.lexID := validLexID;
-																																																	SELF.name := DATASET([TRANSFORM(DueDiligence.Layouts.Name,
-																																																																	unparsedName := STD.Str.ToUpperCase(LEFT.individual.name.fullName);
-																																																																	fName := STD.Str.ToUpperCase(LEFT.individual.name.firstName);
-																																																																	mName := STD.Str.ToUpperCase(LEFT.individual.name.middleName);
-																																																																	lName := STD.Str.ToUpperCase(LEFT.individual.name.lastName);
-																																																																	sName := STD.Str.ToUpperCase(LEFT.individual.name.suffix);
-																																																																	
-																																																																	
-																																																																	cleanedName := MAP(STD.Str.ToUpperCase(LEFT.individual.nameInputOrder) = 'FML' => Address.CleanPersonFML73(unparsedName),
-																																																																										 STD.Str.ToUpperCase(LEFT.individual.nameInputOrder) = 'LFM' => Address.CleanPersonLFM73(unparsedName),
-																																																																										 Address.CleanPerson73(unparsedName));	
-																														
-																																																																	cleanedFirst := IF(unparsedName <> DueDiligence.Constants.EMPTY, STD.Str.ToUpperCase(cleanedName[6..25]), DueDiligence.Constants.EMPTY);
-																																																																	cleanedMiddle := IF(unparsedName <> DueDiligence.Constants.EMPTY, STD.Str.ToUpperCase(cleanedName[26..45]), DueDiligence.Constants.EMPTY);
-																																																																	cleanedLast := IF(unparsedName <> DueDiligence.Constants.EMPTY, STD.Str.ToUpperCase(cleanedName[46..65]), DueDiligence.Constants.EMPTY);
-																																																																	cleanedSuffix := IF(unparsedName <> DueDiligence.Constants.EMPTY, STD.Str.ToUpperCase(cleanedName[66..70]), DueDiligence.Constants.EMPTY);
-																																																									
-																																																																	SELF.fullName := unparsedName;
-																																																																	SELF.firstName := IF(fName = DueDiligence.Constants.EMPTY, cleanedFirst, fName);
-																																																																	SELF.middleName := IF(mName = DueDiligence.Constants.EMPTY, cleanedMiddle, mName);
-																																																																	SELF.lastName := IF(lName = DueDiligence.Constants.EMPTY, cleanedLast, lName);
-																																																																	SELF.suffix := IF(sName = DueDiligence.Constants.EMPTY, cleanedSuffix, sName);																															
-																																																																	SELF := [];)])[1];
-																																																	SELF.address := addressClean;
-																																																	SELF.phone := phoneToClean;
-																																																	SELF.ssn := validTaxID;
-																																																	SELF := LEFT.individual;
-																																																	SELF := [];)]),
-																																							DATASET([], DueDiligence.Layouts.Indv_Input));
+                                                                                                  SELF := LEFT.business;
+                                                                                                  SELF := [];)]),
+                                                                              DATASET([], DueDiligence.Layouts.Busn_Input));
 
-																							inputClean := DATASET([TRANSFORM(DueDiligence.Layouts.Input,
-																																								SELF.business := busClean[1];
-																																								SELF.individual := indClean[1];
-																																								SELF.historyDateYYYYMMDD := (UNSIGNED)validDate;
-																																								SELF.addressProvided := addrProvided;
-																																								SELF.fullAddressProvided := fullAddrProvided;
-																																								SELF := LEFT;
-																																								SELF := [];)])[1];
-																							
-																							
-																							SELF.cleanedInput := inputClean;
-																							SELF.inputEcho := LEFT;
-																							SELF := []));
+                                              indClean := IF(LEFT.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS,
+                                                                              DATASET([TRANSFORM(DueDiligence.Layouts.Indv_Input,
+                                                                                                  SELF.lexID := validLexID;
+                                                                                                  SELF.name := DATASET([TRANSFORM(DueDiligence.Layouts.Name,
+                                                                                                                                  unparsedName := STD.Str.ToUpperCase(LEFT.individual.name.fullName);
+                                                                                                                                  fName := STD.Str.ToUpperCase(LEFT.individual.name.firstName);
+                                                                                                                                  mName := STD.Str.ToUpperCase(LEFT.individual.name.middleName);
+                                                                                                                                  lName := STD.Str.ToUpperCase(LEFT.individual.name.lastName);
+                                                                                                                                  sName := STD.Str.ToUpperCase(LEFT.individual.name.suffix);
+                                                                                                                                  
+                                                                                                                                  
+                                                                                                                                  cleanedName := MAP(STD.Str.ToUpperCase(LEFT.individual.nameInputOrder) = 'FML' => Address.CleanPersonFML73(unparsedName),
+                                                                                                                                                     STD.Str.ToUpperCase(LEFT.individual.nameInputOrder) = 'LFM' => Address.CleanPersonLFM73(unparsedName),
+                                                                                                                                                     Address.CleanPerson73(unparsedName));	
+                                                            
+                                                                                                                                  cleanedFirst := IF(unparsedName <> DueDiligence.Constants.EMPTY, STD.Str.ToUpperCase(cleanedName[6..25]), DueDiligence.Constants.EMPTY);
+                                                                                                                                  cleanedMiddle := IF(unparsedName <> DueDiligence.Constants.EMPTY, STD.Str.ToUpperCase(cleanedName[26..45]), DueDiligence.Constants.EMPTY);
+                                                                                                                                  cleanedLast := IF(unparsedName <> DueDiligence.Constants.EMPTY, STD.Str.ToUpperCase(cleanedName[46..65]), DueDiligence.Constants.EMPTY);
+                                                                                                                                  cleanedSuffix := IF(unparsedName <> DueDiligence.Constants.EMPTY, STD.Str.ToUpperCase(cleanedName[66..70]), DueDiligence.Constants.EMPTY);
+                                                                                                                  
+                                                                                                                                  SELF.fullName := unparsedName;
+                                                                                                                                  SELF.firstName := IF(fName = DueDiligence.Constants.EMPTY, cleanedFirst, fName);
+                                                                                                                                  SELF.middleName := IF(mName = DueDiligence.Constants.EMPTY, cleanedMiddle, mName);
+                                                                                                                                  SELF.lastName := IF(lName = DueDiligence.Constants.EMPTY, cleanedLast, lName);
+                                                                                                                                  SELF.suffix := IF(sName = DueDiligence.Constants.EMPTY, cleanedSuffix, sName);																															
+                                                                                                                                  SELF := [];)])[1];
+                                                                                                  SELF.address := addressClean;
+                                                                                                  SELF.phone := phoneToClean;
+                                                                                                  SELF.ssn := validTaxID;
+                                                                                                  SELF := LEFT.individual;
+                                                                                                  SELF := [];)]),
+                                                                              DATASET([], DueDiligence.Layouts.Indv_Input));
+
+                                              inputClean := DATASET([TRANSFORM(DueDiligence.Layouts.Input,
+                                                                                SELF.business := busClean[1];
+                                                                                SELF.individual := indClean[1];
+                                                                                SELF.historyDateYYYYMMDD := (UNSIGNED)validDate;
+                                                                                SELF.addressProvided := addrProvided;
+                                                                                SELF.fullAddressProvided := fullAddrProvided;
+                                                                                SELF := LEFT;
+                                                                                SELF := [];)])[1];
+
+
+                                              SELF.cleanedInput := inputClean;
+                                              SELF.inputEcho := LEFT;
+                                              SELF := []));
 			
 				
-				RETURN cleanData;
-		END;
+        RETURN cleanData;
+    END;
 		
 		
-		EXPORT mac_GetBusinessOptionSettings(dppaIn, glbaIn, drmIn, dpmIn, industryIn) := MACRO
+    EXPORT mac_GetBusinessOptionSettings(dppaIn, glbaIn, drmIn, dpmIn, industryIn) := MACRO
     
         industry := IF(TRIM(industryIn) = DueDiligence.Constants.EMPTY, Business_Risk_BIP.Constants.Default_IndustryClass, industryIn);
-        
-				
-				busOptions := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
-							// Clean up the Options and make sure that defaults are enforced
-							EXPORT UNSIGNED1 DPPA_Purpose := dppaIn;
-							EXPORT UNSIGNED1 GLBA_Purpose := glbaIn;
-							EXPORT STRING50 DataRestrictionMask	:= TRIM(drmIn);
-							EXPORT STRING50 DataPermissionMask	:= TRIM(dpmIn);
-							EXPORT STRING10 IndustryClass := STD.Str.ToUpperCase(industry);
-							EXPORT UNSIGNED1 LinkSearchLevel := Business_Risk_BIP.Constants.LinkSearch.SeleID;
-							EXPORT UNSIGNED1 BusShellVersion := Business_Risk_BIP.Constants.Default_BusShellVersion;
-							EXPORT UNSIGNED1 MarketingMode := Business_Risk_BIP.Constants.Default_MarketingMode;
-							EXPORT STRING50 AllowedSources := Business_Risk_BIP.Constants.Default_AllowedSources;
-							EXPORT UNSIGNED1 BIPBestAppend := Business_Risk_BIP.Constants.BIPBestAppend.OverwriteWithBest;
-				END;
 
-				busLinkingOptions := MODULE(BIPV2.mod_sources.iParams)
-							EXPORT STRING DataRestrictionMask := busOptions.DataRestrictionMask; 
-							EXPORT BOOLEAN ignoreFares := FALSE; // From AutoStandardI.DataRestrictionI, this is a User Configurable Input Option to Ignore FARES data - default it to FALSE to always utilize whatever the DataRestrictionMask allows
-							EXPORT BOOLEAN ignoreFidelity := FALSE; // From AutoStandardI.DataRestrictionI, this is a User Configurable Input Option to Ignore Fidelity data - default it to FALSE to always utilize whatever the DataRestrictionMask allows
-							EXPORT BOOLEAN AllowAll := FALSE;
-							EXPORT BOOLEAN AllowGLB := Risk_Indicators.iid_constants.GLB_OK(busOptions.GLBA_Purpose, FALSE);
-							EXPORT BOOLEAN AllowDPPA := Risk_Indicators.iid_constants.DPPA_OK(busOptions.DPPA_Purpose, FALSE);
-							EXPORT UNSIGNED1 DPPAPurpose := busOptions.DPPA_Purpose;
-							EXPORT UNSIGNED1 GLBPurpose := busOptions.GLBA_Purpose;
-							EXPORT BOOLEAN IncludeMinors := TRUE; // Shouldn't really have an impact on business searches, set to TRUE for now
-							EXPORT BOOLEAN LNBranded := TRUE; // Not entirely certain what effect this has
-				END;		
-		ENDMACRO;
+        busOptions := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
+              // Clean up the Options and make sure that defaults are enforced
+              EXPORT UNSIGNED1 DPPA_Purpose := dppaIn;
+              EXPORT UNSIGNED1 GLBA_Purpose := glbaIn;
+              EXPORT STRING50 DataRestrictionMask	:= TRIM(drmIn);
+              EXPORT STRING50 DataPermissionMask	:= TRIM(dpmIn);
+              EXPORT STRING10 IndustryClass := STD.Str.ToUpperCase(industry);
+              EXPORT UNSIGNED1 LinkSearchLevel := Business_Risk_BIP.Constants.LinkSearch.SeleID;
+              EXPORT UNSIGNED1 BusShellVersion := Business_Risk_BIP.Constants.Default_BusShellVersion;
+              EXPORT UNSIGNED1 MarketingMode := Business_Risk_BIP.Constants.Default_MarketingMode;
+              EXPORT STRING50 AllowedSources := Business_Risk_BIP.Constants.Default_AllowedSources;
+              EXPORT UNSIGNED1 BIPBestAppend := Business_Risk_BIP.Constants.BIPBestAppend.OverwriteWithBest;
+        END;
+
+        busLinkingOptions := MODULE(BIPV2.mod_sources.iParams)
+              EXPORT STRING DataRestrictionMask := busOptions.DataRestrictionMask; 
+              EXPORT BOOLEAN ignoreFares := FALSE; // From AutoStandardI.DataRestrictionI, this is a User Configurable Input Option to Ignore FARES data - default it to FALSE to always utilize whatever the DataRestrictionMask allows
+              EXPORT BOOLEAN ignoreFidelity := FALSE; // From AutoStandardI.DataRestrictionI, this is a User Configurable Input Option to Ignore Fidelity data - default it to FALSE to always utilize whatever the DataRestrictionMask allows
+              EXPORT BOOLEAN AllowAll := FALSE;
+              EXPORT BOOLEAN AllowGLB := Risk_Indicators.iid_constants.GLB_OK(busOptions.GLBA_Purpose, FALSE);
+              EXPORT BOOLEAN AllowDPPA := Risk_Indicators.iid_constants.DPPA_OK(busOptions.DPPA_Purpose, FALSE);
+              EXPORT UNSIGNED1 DPPAPurpose := busOptions.DPPA_Purpose;
+              EXPORT UNSIGNED1 GLBPurpose := busOptions.GLBA_Purpose;
+              EXPORT BOOLEAN IncludeMinors := TRUE; // Shouldn't really have an impact on business searches, set to TRUE for now
+              EXPORT BOOLEAN LNBranded := TRUE; // Not entirely certain what effect this has
+        END;		
+    ENDMACRO;
 		
 		
-		EXPORT GetIndividualAttributes(DATASET(DueDiligence.Layouts.Indv_Internal) results) := FUNCTION
+    EXPORT GetIndividualAttributes(DATASET(DueDiligence.Layouts.Indv_Internal) results) := FUNCTION
 				
-				personAttributes := NORMALIZE(UNGROUP(results), DueDiligence.Constants.NUMBER_OF_INDIVIDUAL_ATTRIBUTES, TRANSFORM(iesp.share.t_NameValuePair,
-																																	SELF := CASE(COUNTER,
+        personAttributes := NORMALIZE(UNGROUP(results), DueDiligence.Constants.NUMBER_OF_INDIVIDUAL_ATTRIBUTES, TRANSFORM(iesp.share.t_NameValuePair,
+                                                                  SELF := CASE(COUNTER,
                                                                                 1  => DueDiligence.Common.createNVPair('PerAssetOwnProperty', LEFT.PerAssetOwnProperty),
                                                                                 2  => DueDiligence.Common.createNVPair('PerAssetOwnAircraft', LEFT.PerAssetOwnAircraft),
                                                                                 3  => DueDiligence.Common.createNVPair('PerAssetOwnWatercraft', LEFT.PerAssetOwnWatercraft),
@@ -393,111 +372,111 @@ EXPORT CommonQuery := MODULE
 
 	
 	
-				RETURN personAttributes;
-		END;
+        RETURN personAttributes;
+    END;
 		
 		
-		EXPORT GetIndividualAttributeFlags(DATASET(DueDiligence.Layouts.Indv_Internal) results) := FUNCTION
+    EXPORT GetIndividualAttributeFlags(DATASET(DueDiligence.Layouts.Indv_Internal) results) := FUNCTION
 		
-				personFlags := NORMALIZE(UNGROUP(results), DueDiligence.Constants.NUMBER_OF_INDIVIDUAL_ATTRIBUTES, TRANSFORM(iesp.share.t_NameValuePair,
-																												SELF := CASE(COUNTER,
-                                                                      1  => DueDiligence.Common.createNVPair('PerAssetOwnProperty_Flag', LEFT.PerAssetOwnProperty_Flag),
-                                                                      2  => DueDiligence.Common.createNVPair('PerAssetOwnAircraft_Flag', LEFT.PerAssetOwnAircraft_Flag),
-                                                                      3  => DueDiligence.Common.createNVPair('PerAssetOwnWatercraft_Flag', LEFT.PerAssetOwnWatercraft_Flag),
-                                                                      4  => DueDiligence.Common.createNVPair('PerAssetOwnVehicle_Flag', LEFT.PerAssetOwnVehicle_Flag),
-                                                                      5  => DueDiligence.Common.createNVPair('PerAccessToFundsIncome_Flag', LEFT.PerAccessToFundsIncome_Flag),
-                                                                      6  => DueDiligence.Common.createNVPair('PerAccessToFundsProperty_Flag', LEFT.PerAccessToFundsProperty_Flag),
-                                                                      7  => DueDiligence.Common.createNVPair('PerGeographic_Flag', LEFT.PerGeographic_Flag),
-                                                                      8  => DueDiligence.Common.createNVPair('PerMobility_Flag', LEFT.PerMobility_Flag),
-                                                                      9  => DueDiligence.Common.createNVPair('PerStateLegalEvent_Flag', LEFT.PerStateLegalEvent_Flag),
-                                                                      10 => DueDiligence.Common.createNVPair('PerFederalLegalEvent_Flag', LEFT.PerFederalLegalEvent_Flag),
-                                                                      11 => DueDiligence.Common.createNVPair('PerFederalLegalMatchLevel_Flag', LEFT.PerFederalLegalMatchLevel_Flag),
-                                                                      12 => DueDiligence.Common.createNVPair('PerCivilLegalEvent_Flag', LEFT.PerCivilLegalEvent_Flag),
-                                                                      13 => DueDiligence.Common.createNVPair('PerOffenseType_Flag', LEFT.PerOffenseType_Flag),
-                                                                      14 => DueDiligence.Common.createNVPair('PerAgeRange_Flag', LEFT.PerAgeRange_Flag),
-                                                                      15 => DueDiligence.Common.createNVPair('PerIdentityRisk_Flag', LEFT.PerIdentityRisk_Flag),
-                                                                      16 => DueDiligence.Common.createNVPair('PerUSResidency_Flag', LEFT.PerUSResidency_Flag),
-                                                                      17 => DueDiligence.Common.createNVPair('PerMatchLevel_Flag', LEFT.PerMatchLevel_Flag),
-                                                                      18 => DueDiligence.Common.createNVPair('PerAssociates_Flag', LEFT.PerAssociates_Flag),
-                                                                      19 => DueDiligence.Common.createNVPair('PerEmploymentIndustry_Flag', LEFT.PerEmploymentIndustry_Flag),
-                                                                      20 => DueDiligence.Common.createNVPair('PerProfLicense_Flag', LEFT.PerProfLicense_Flag),
-                                                                      21 => DueDiligence.Common.createNVPair('PerBusAssociations_Flag', LEFT.PerBusAssociations_Flag),
-                                                                            DueDiligence.Common.createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID));));
+        personFlags := NORMALIZE(UNGROUP(results), DueDiligence.Constants.NUMBER_OF_INDIVIDUAL_ATTRIBUTES, TRANSFORM(iesp.share.t_NameValuePair,
+                                                                  SELF := CASE(COUNTER,
+                                                                                1  => DueDiligence.Common.createNVPair('PerAssetOwnProperty_Flag', LEFT.PerAssetOwnProperty_Flag),
+                                                                                2  => DueDiligence.Common.createNVPair('PerAssetOwnAircraft_Flag', LEFT.PerAssetOwnAircraft_Flag),
+                                                                                3  => DueDiligence.Common.createNVPair('PerAssetOwnWatercraft_Flag', LEFT.PerAssetOwnWatercraft_Flag),
+                                                                                4  => DueDiligence.Common.createNVPair('PerAssetOwnVehicle_Flag', LEFT.PerAssetOwnVehicle_Flag),
+                                                                                5  => DueDiligence.Common.createNVPair('PerAccessToFundsIncome_Flag', LEFT.PerAccessToFundsIncome_Flag),
+                                                                                6  => DueDiligence.Common.createNVPair('PerAccessToFundsProperty_Flag', LEFT.PerAccessToFundsProperty_Flag),
+                                                                                7  => DueDiligence.Common.createNVPair('PerGeographic_Flag', LEFT.PerGeographic_Flag),
+                                                                                8  => DueDiligence.Common.createNVPair('PerMobility_Flag', LEFT.PerMobility_Flag),
+                                                                                9  => DueDiligence.Common.createNVPair('PerStateLegalEvent_Flag', LEFT.PerStateLegalEvent_Flag),
+                                                                                10 => DueDiligence.Common.createNVPair('PerFederalLegalEvent_Flag', LEFT.PerFederalLegalEvent_Flag),
+                                                                                11 => DueDiligence.Common.createNVPair('PerFederalLegalMatchLevel_Flag', LEFT.PerFederalLegalMatchLevel_Flag),
+                                                                                12 => DueDiligence.Common.createNVPair('PerCivilLegalEvent_Flag', LEFT.PerCivilLegalEvent_Flag),
+                                                                                13 => DueDiligence.Common.createNVPair('PerOffenseType_Flag', LEFT.PerOffenseType_Flag),
+                                                                                14 => DueDiligence.Common.createNVPair('PerAgeRange_Flag', LEFT.PerAgeRange_Flag),
+                                                                                15 => DueDiligence.Common.createNVPair('PerIdentityRisk_Flag', LEFT.PerIdentityRisk_Flag),
+                                                                                16 => DueDiligence.Common.createNVPair('PerUSResidency_Flag', LEFT.PerUSResidency_Flag),
+                                                                                17 => DueDiligence.Common.createNVPair('PerMatchLevel_Flag', LEFT.PerMatchLevel_Flag),
+                                                                                18 => DueDiligence.Common.createNVPair('PerAssociates_Flag', LEFT.PerAssociates_Flag),
+                                                                                19 => DueDiligence.Common.createNVPair('PerEmploymentIndustry_Flag', LEFT.PerEmploymentIndustry_Flag),
+                                                                                20 => DueDiligence.Common.createNVPair('PerProfLicense_Flag', LEFT.PerProfLicense_Flag),
+                                                                                21 => DueDiligence.Common.createNVPair('PerBusAssociations_Flag', LEFT.PerBusAssociations_Flag),
+                                                                                      DueDiligence.Common.createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID));));
 		
-				RETURN personFlags;
-		END;
+        RETURN personFlags;
+    END;
 		
 		
-		EXPORT GetBusinessAttributes(DATASET(DueDiligence.Layouts.Busn_Internal) results) := FUNCTION
+    EXPORT GetBusinessAttributes(DATASET(DueDiligence.Layouts.Busn_Internal) results) := FUNCTION
         
-        businessAttributes := NORMALIZE(UNGROUP(results), DueDiligence.Constants.NUMBER_OF_BUSINESS_ATTRIBUTES, TRANSFORM(iesp.share.t_NameValuePair,
-																																			SELF := CASE(COUNTER,
-                                                                                    1  => DueDiligence.Common.createNVPair('BusAssetOwnProperty', LEFT.BusAssetOwnProperty),
-                                                                                    2  => DueDiligence.Common.createNVPair('BusAssetOwnAircraft', LEFT.BusAssetOwnAircraft),
-                                                                                    3  => DueDiligence.Common.createNVPair('BusAssetOwnWatercraft', LEFT.BusAssetOwnWatercraft),
-                                                                                    4  => DueDiligence.Common.createNVPair('BusAssetOwnVehicle', LEFT.BusAssetOwnVehicle),
-                                                                                    5  => DueDiligence.Common.createNVPair('BusAccessToFundSales', LEFT.BusAccessToFundSales),
-                                                                                    6  => DueDiligence.Common.createNVPair('BusAccessToFundsProperty', LEFT.BusAccessToFundsProperty),
-                                                                                    7  => DueDiligence.Common.createNVPair('BusGeographic', LEFT.BusGeographic),
-                                                                                    8  => DueDiligence.Common.createNVPair('BusValidity', LEFT.BusValidity),
-                                                                                    9  => DueDiligence.Common.createNVPair('BusStability', LEFT.BusStability),
-                                                                                    10 => DueDiligence.Common.createNVPair('BusIndustry', LEFT.BusIndustry),
-                                                                                    11 => DueDiligence.Common.createNVPair('BusStructureType', LEFT.BusStructureType),
-                                                                                    12 => DueDiligence.Common.createNVPair('BusSOSAgeRange', LEFT.BusSOSAgeRange),
-                                                                                    13 => DueDiligence.Common.createNVPair('BusPublicRecordAgeRange', LEFT.BusPublicRecordAgeRange),
-                                                                                    14 => DueDiligence.Common.createNVPair('BusShellShelf', LEFT.BusShellShelf),
-                                                                                    15 => DueDiligence.Common.createNVPair('BusMatchLevel', LEFT.BusMatchLevel),
-                                                                                    16 => DueDiligence.Common.createNVPair('BusStateLegalEvent', LEFT.BusStateLegalEvent),
-                                                                                    17 => DueDiligence.Common.createNVPair('BusFederalLegalEvent', LEFT.BusFederalLegalEvent),
-                                                                                    18 => DueDiligence.Common.createNVPair('BusFederalLegalMatchLevel', LEFT.BusFederalLegalMatchLevel),
-                                                                                    19 => DueDiligence.Common.createNVPair('BusCivilLegalEvent', LEFT.BusCivilLegalEvent),
-                                                                                    20 => DueDiligence.Common.createNVPair('BusOffenseType', LEFT.BusOffenseType),
-                                                                                    21 => DueDiligence.Common.createNVPair('BusBEOProfLicense', LEFT.BusBEOProfLicense),
-                                                                                    22 => DueDiligence.Common.createNVPair('BusBEOUSResidency', LEFT.BusBEOUSResidency),
-                                                                                    23 => DueDiligence.Common.createNVPair('BusBEOAccessToFundsProperty', LEFT.BusBEOAccessToFundsProperty),
-                                                                                    24 => DueDiligence.Common.createNVPair('BusLinkedBusinesses', LEFT.BusLinkedBusinesses),
-                                                                                          DueDiligence.Common.createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID));));
+      businessAttributes := NORMALIZE(UNGROUP(results), DueDiligence.Constants.NUMBER_OF_BUSINESS_ATTRIBUTES, TRANSFORM(iesp.share.t_NameValuePair,
+                                                                  SELF := CASE(COUNTER,
+                                                                                1  => DueDiligence.Common.createNVPair('BusAssetOwnProperty', LEFT.BusAssetOwnProperty),
+                                                                                2  => DueDiligence.Common.createNVPair('BusAssetOwnAircraft', LEFT.BusAssetOwnAircraft),
+                                                                                3  => DueDiligence.Common.createNVPair('BusAssetOwnWatercraft', LEFT.BusAssetOwnWatercraft),
+                                                                                4  => DueDiligence.Common.createNVPair('BusAssetOwnVehicle', LEFT.BusAssetOwnVehicle),
+                                                                                5  => DueDiligence.Common.createNVPair('BusAccessToFundSales', LEFT.BusAccessToFundSales),
+                                                                                6  => DueDiligence.Common.createNVPair('BusAccessToFundsProperty', LEFT.BusAccessToFundsProperty),
+                                                                                7  => DueDiligence.Common.createNVPair('BusGeographic', LEFT.BusGeographic),
+                                                                                8  => DueDiligence.Common.createNVPair('BusValidity', LEFT.BusValidity),
+                                                                                9  => DueDiligence.Common.createNVPair('BusStability', LEFT.BusStability),
+                                                                                10 => DueDiligence.Common.createNVPair('BusIndustry', LEFT.BusIndustry),
+                                                                                11 => DueDiligence.Common.createNVPair('BusStructureType', LEFT.BusStructureType),
+                                                                                12 => DueDiligence.Common.createNVPair('BusSOSAgeRange', LEFT.BusSOSAgeRange),
+                                                                                13 => DueDiligence.Common.createNVPair('BusPublicRecordAgeRange', LEFT.BusPublicRecordAgeRange),
+                                                                                14 => DueDiligence.Common.createNVPair('BusShellShelf', LEFT.BusShellShelf),
+                                                                                15 => DueDiligence.Common.createNVPair('BusMatchLevel', LEFT.BusMatchLevel),
+                                                                                16 => DueDiligence.Common.createNVPair('BusStateLegalEvent', LEFT.BusStateLegalEvent),
+                                                                                17 => DueDiligence.Common.createNVPair('BusFederalLegalEvent', LEFT.BusFederalLegalEvent),
+                                                                                18 => DueDiligence.Common.createNVPair('BusFederalLegalMatchLevel', LEFT.BusFederalLegalMatchLevel),
+                                                                                19 => DueDiligence.Common.createNVPair('BusCivilLegalEvent', LEFT.BusCivilLegalEvent),
+                                                                                20 => DueDiligence.Common.createNVPair('BusOffenseType', LEFT.BusOffenseType),
+                                                                                21 => DueDiligence.Common.createNVPair('BusBEOProfLicense', LEFT.BusBEOProfLicense),
+                                                                                22 => DueDiligence.Common.createNVPair('BusBEOUSResidency', LEFT.BusBEOUSResidency),
+                                                                                23 => DueDiligence.Common.createNVPair('BusBEOAccessToFundsProperty', LEFT.BusBEOAccessToFundsProperty),
+                                                                                24 => DueDiligence.Common.createNVPair('BusLinkedBusinesses', LEFT.BusLinkedBusinesses),
+                                                                                      DueDiligence.Common.createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID));));
 																																																							
 				
-				RETURN businessAttributes;
-		END;
+        RETURN businessAttributes;
+    END;
 		
 		
-		EXPORT GetBusinessAttributeFlags(DATASET(DueDiligence.Layouts.Busn_Internal) results) := FUNCTION
+    EXPORT GetBusinessAttributeFlags(DATASET(DueDiligence.Layouts.Busn_Internal) results) := FUNCTION
 			
-      businessFlags := NORMALIZE(UNGROUP(results), DueDiligence.Constants.NUMBER_OF_BUSINESS_ATTRIBUTES, TRANSFORM(iesp.share.t_NameValuePair,
-																													SELF := CASE(COUNTER,
-                                                                        1  => DueDiligence.Common.createNVPair('BusAssetOwnProperty_Flag', LEFT.BusAssetOwnProperty_Flag),
-                                                                        2  => DueDiligence.Common.createNVPair('BusAssetOwnAircraft_Flag', LEFT.BusAssetOwnAircraft_Flag),
-                                                                        3  => DueDiligence.Common.createNVPair('BusAssetOwnWatercraft_Flag', LEFT.BusAssetOwnWatercraft_Flag),
-                                                                        4  => DueDiligence.Common.createNVPair('BusAssetOwnVehicle_Flag', LEFT.BusAssetOwnVehicle_Flag),
-                                                                        5  => DueDiligence.Common.createNVPair('BusAccessToFundsSales_Flag', LEFT.BusAccessToFundsSales_Flag),
-                                                                        6  => DueDiligence.Common.createNVPair('BusAccessToFundsProperty_Flag', LEFT.BusAccessToFundsProperty_Flag),
-                                                                        7  => DueDiligence.Common.createNVPair('BusGeographic_Flag', LEFT.BusGeographic_Flag),
-                                                                        8  => DueDiligence.Common.createNVPair('BusValidity_Flag', LEFT.BusValidity_Flag),
-                                                                        9  => DueDiligence.Common.createNVPair('BusStability_Flag', LEFT.BusStability_Flag),
-                                                                        10 => DueDiligence.Common.createNVPair('BusIndustry_Flag', LEFT.BusIndustry_Flag),
-                                                                        11 => DueDiligence.Common.createNVPair('BusStructureType_Flag', LEFT.BusStructureType_Flag),
-                                                                        12 => DueDiligence.Common.createNVPair('BusSOSAgeRange_Flag', LEFT.BusSOSAgeRange_Flag),
-                                                                        13 => DueDiligence.Common.createNVPair('BusPublicRecordAgeRange_Flag', LEFT.BusPublicRecordAgeRange_Flag),
-                                                                        14 => DueDiligence.Common.createNVPair('BusShellShelf_Flag', LEFT.BusShellShelf_Flag),
-                                                                        15 => DueDiligence.Common.createNVPair('BusMatchLevel_Flag', LEFT.BusMatchLevel_Flag),
-                                                                        16 => DueDiligence.Common.createNVPair('BusStateLegalEvent_Flag', LEFT.BusStateLegalEvent_Flag),
-                                                                        17 => DueDiligence.Common.createNVPair('BusFederalLegalEvent_Flag', LEFT.BusFederalLegalEvent_Flag),
-                                                                        18 => DueDiligence.Common.createNVPair('BusFederalLegalMatchLevel_Flag', LEFT.BusFederalLegalMatchLevel_Flag),
-                                                                        19 => DueDiligence.Common.createNVPair('BusCivilLegalEvent_Flag', LEFT.BusCivilLegalEvent_Flag),
-                                                                        20 => DueDiligence.Common.createNVPair('BusOffenseType_Flag', LEFT.BusOffenseType_Flag),
-                                                                        21 => DueDiligence.Common.createNVPair('BusBEOProfLicense_Flag', LEFT.BusBEOProfLicense_Flag),
-                                                                        22 => DueDiligence.Common.createNVPair('BusBEOUSResidency_Flag', LEFT.BusBEOUSResidency_Flag),
-                                                                        23 => DueDiligence.Common.createNVPair('BusBEOAccessToFundsProperty_Flag', LEFT.BusBEOAccessToFundsProperty_Flag),
-                                                                        24 => DueDiligence.Common.createNVPair('BusLinkedBusinesses_Flag', LEFT.BusLinkedBusinesses_Flag),
-                                                                              DueDiligence.Common.createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID));));
+        businessFlags := NORMALIZE(UNGROUP(results), DueDiligence.Constants.NUMBER_OF_BUSINESS_ATTRIBUTES, TRANSFORM(iesp.share.t_NameValuePair,
+                                                                  SELF := CASE(COUNTER,
+                                                                                1  => DueDiligence.Common.createNVPair('BusAssetOwnProperty_Flag', LEFT.BusAssetOwnProperty_Flag),
+                                                                                2  => DueDiligence.Common.createNVPair('BusAssetOwnAircraft_Flag', LEFT.BusAssetOwnAircraft_Flag),
+                                                                                3  => DueDiligence.Common.createNVPair('BusAssetOwnWatercraft_Flag', LEFT.BusAssetOwnWatercraft_Flag),
+                                                                                4  => DueDiligence.Common.createNVPair('BusAssetOwnVehicle_Flag', LEFT.BusAssetOwnVehicle_Flag),
+                                                                                5  => DueDiligence.Common.createNVPair('BusAccessToFundsSales_Flag', LEFT.BusAccessToFundsSales_Flag),
+                                                                                6  => DueDiligence.Common.createNVPair('BusAccessToFundsProperty_Flag', LEFT.BusAccessToFundsProperty_Flag),
+                                                                                7  => DueDiligence.Common.createNVPair('BusGeographic_Flag', LEFT.BusGeographic_Flag),
+                                                                                8  => DueDiligence.Common.createNVPair('BusValidity_Flag', LEFT.BusValidity_Flag),
+                                                                                9  => DueDiligence.Common.createNVPair('BusStability_Flag', LEFT.BusStability_Flag),
+                                                                                10 => DueDiligence.Common.createNVPair('BusIndustry_Flag', LEFT.BusIndustry_Flag),
+                                                                                11 => DueDiligence.Common.createNVPair('BusStructureType_Flag', LEFT.BusStructureType_Flag),
+                                                                                12 => DueDiligence.Common.createNVPair('BusSOSAgeRange_Flag', LEFT.BusSOSAgeRange_Flag),
+                                                                                13 => DueDiligence.Common.createNVPair('BusPublicRecordAgeRange_Flag', LEFT.BusPublicRecordAgeRange_Flag),
+                                                                                14 => DueDiligence.Common.createNVPair('BusShellShelf_Flag', LEFT.BusShellShelf_Flag),
+                                                                                15 => DueDiligence.Common.createNVPair('BusMatchLevel_Flag', LEFT.BusMatchLevel_Flag),
+                                                                                16 => DueDiligence.Common.createNVPair('BusStateLegalEvent_Flag', LEFT.BusStateLegalEvent_Flag),
+                                                                                17 => DueDiligence.Common.createNVPair('BusFederalLegalEvent_Flag', LEFT.BusFederalLegalEvent_Flag),
+                                                                                18 => DueDiligence.Common.createNVPair('BusFederalLegalMatchLevel_Flag', LEFT.BusFederalLegalMatchLevel_Flag),
+                                                                                19 => DueDiligence.Common.createNVPair('BusCivilLegalEvent_Flag', LEFT.BusCivilLegalEvent_Flag),
+                                                                                20 => DueDiligence.Common.createNVPair('BusOffenseType_Flag', LEFT.BusOffenseType_Flag),
+                                                                                21 => DueDiligence.Common.createNVPair('BusBEOProfLicense_Flag', LEFT.BusBEOProfLicense_Flag),
+                                                                                22 => DueDiligence.Common.createNVPair('BusBEOUSResidency_Flag', LEFT.BusBEOUSResidency_Flag),
+                                                                                23 => DueDiligence.Common.createNVPair('BusBEOAccessToFundsProperty_Flag', LEFT.BusBEOAccessToFundsProperty_Flag),
+                                                                                24 => DueDiligence.Common.createNVPair('BusLinkedBusinesses_Flag', LEFT.BusLinkedBusinesses_Flag),
+                                                                                      DueDiligence.Common.createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID));));
 												
-				RETURN businessFlags;
-		END;
+        RETURN businessFlags;
+    END;
 
 
-		EXPORT mac_GetESPReturnData(inputWithSeq, results, iespLayout, indvOrBus, includeReport, attrs, attrsFlags, reqVersion, customerPassThruInput) := FUNCTIONMACRO
+    EXPORT mac_GetESPReturnData(inputWithSeq, results, iespLayout, indvOrBus, includeReport, attrs, attrsFlags, reqVersion, customerPassThruInput) := FUNCTIONMACRO
 			
         returnData := JOIN(inputWithSeq, results, 
                             LEFT.seq = RIGHT.seq,
@@ -527,13 +506,10 @@ EXPORT CommonQuery := MODULE
                                       #EXPAND(IF(indvOrBus = DueDiligence.Constants.INDIVIDUAL AND includeReport = DueDiligence.Constants.STRING_TRUE,
                                                               'SELF.result.PersonReport := RIGHT.personReport;',
                                                               DueDiligence.Constants.EMPTY))
-                                                              
-                                                              
-                                                              
-                                                              
+                                                                 
                                       SELF := LEFT;
                                       SELF := [];));																																		
 				
-				RETURN returnData;
-		ENDMACRO;
+        RETURN returnData;
+    ENDMACRO;
 END;

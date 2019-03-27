@@ -40,7 +40,8 @@
 	<part name="GlobalWatchlistThreshold" type="xsd:real"/>
 	<part name="OFACversion" type="xsd:unsignedInt"/>
 	<part name="IncludeOfac" type="xsd:boolean"/>
-	<part name="IncludeAdditionalWatchLists" type="xsd:boolean"/> 
+	<part name="IncludeAdditionalWatchLists" type="xsd:boolean"/>
+	<part name="RemoveQuickHeader" type="xsd:boolean"/> 
 	<part name="gateways" type="tns:XmlDataSet" cols="110" rows="10"/>
  </message>
 */
@@ -91,6 +92,7 @@ export Boca_Shell := MACRO
 	'IncludeOfac',
 	'IncludeAdditionalWatchLists',
 	'GlobalWatchlistThreshold',
+	'RemoveQuickHeader',
 	'gateways'));
 
 string30 account_value := '' 		: stored('AccountNumber');
@@ -145,6 +147,7 @@ boolean RetainInputDID := false : stored('RetainInputDID');  // to be used by mo
 real watchlist_threshold := 0.84 			: stored('GlobalWatchlistThreshold');
 unsigned1 ofac_version      := 1        : stored('OFACVersion');
 boolean   include_ofac       := false    : stored('IncludeOfac');
+boolean   RemoveQuickHeader       := false    : stored('RemoveQuickHeader');
 boolean   include_additional_watchlists  := false    : stored('IncludeAdditionalWatchLists');
 
 rec := record
@@ -261,7 +264,8 @@ unsigned8 BSOptions :=
 										 risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity,
 											0) +
 	if(RetainInputDID, Risk_Indicators.iid_constants.BSOptions.RetainInputDID, 0 ) +
-	if(bsVersion >= 50, risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary, 0);
+	if(bsVersion >= 50, risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary, 0) +
+	if(RemoveQuickHeader, risk_indicators.iid_constants.BSOptions.RemoveQuickHeader, 0);
 
 
 prep := risk_indicators.InstantID_Function(iid_prep, 

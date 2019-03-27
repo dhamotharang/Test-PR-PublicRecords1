@@ -17,7 +17,7 @@ EXPORT BatchServiceFCRA() := MACRO
 	
 	ds_xml_in		    := DATASET([], CriminalRecords_BatchService.Layouts.batch_in) : STORED('batch_in');
 
-	batch_params		:= BatchShare.IParam.getBatchParams();
+	batch_params		:= BatchShare.IParam.getBatchParamsV2();
 	crim_batch_params := module(project(batch_params, CriminalRecords_BatchService.IParam.batch_params, opt))
 		export dataset (Gateway.layouts.config) gateways := Gateway.Configuration.Get();
 		unsigned2 MaxResults_val := 50 : stored('MaxResults');

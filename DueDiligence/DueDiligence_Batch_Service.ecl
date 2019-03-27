@@ -39,9 +39,11 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
   
   requestedProducts := MAP(callCitizenship AND callDueDiligence => DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.BOTH,
                             callCitizenship => DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.CITIZENSHIP_ONLY,
-                            DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.ATTRIBUTES_ONLY);
+                            callDueDiligence => DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.ATTRIBUTES_ONLY,
+                            DueDiligence.CitDDShared.PRODUCT_REQUESTED_ENUM.EMPTY);
                             
-
+                            
+                            
   rawWithSeq := PROJECT(batch_in, TRANSFORM({UNSIGNED6 uniqueID, RECORDOF(LEFT)},
                                             SELF.uniqueID := COUNTER;
                                             SELF := LEFT;));

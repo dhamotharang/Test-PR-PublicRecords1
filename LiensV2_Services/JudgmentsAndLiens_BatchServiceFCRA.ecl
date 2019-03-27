@@ -66,7 +66,7 @@ EXPORT JudgmentsAndLiens_BatchServiceFCRA(useCannedRecs = 'false') :=
 		//non-subject suppression
 		nss := ut.getNonSubjectSuppression (Suppress.Constants.NonSubjectSuppression.returnRestrictedDescription);
 		gm := AutoStandardI.GlobalModule(isFCRA);	
-		batch_params		:= BatchShare.IParam.getBatchParams();
+		batch_params		:= BatchShare.IParam.getBatchParamsV2();
 		
 		jl_batch_params := module(PROJECT(batch_params, LiensV2_Services.IParam.batch_params, opt))
 			EXPORT UNSIGNED8 MaxResults   										:= 10000 : STORED('MaxResults');	
@@ -75,7 +75,6 @@ EXPORT JudgmentsAndLiens_BatchServiceFCRA(useCannedRecs = 'false') :=
 			EXPORT party_types 																:= partyTypes;
 			EXPORT DATASET (Gateway.layouts.config) gateways 	:= gw_config;
 			EXPORT INTEGER1 non_subject_suppression 					:= nss;
-			EXPORT applicationType 														:= AutoStandardI.InterfaceTranslator.application_type_val.val(PROJECT(gm,AutoStandardI.InterfaceTranslator.application_type_val.params));
 			EXPORT INTEGER8 FFDOptionsMask 								    := inFFDOptionsMask | FFD.Constants.ConsumerOptions.SHOW_CONSUMER_STATEMENTS;  // we need to override 1st bit here to make sure records with statements are flagged in Batch_records. Dempsey Hits filtering is done later if needed
 			EXPORT INTEGER  FCRAPurpose    								    := inFCRAPurpose;
 		END;

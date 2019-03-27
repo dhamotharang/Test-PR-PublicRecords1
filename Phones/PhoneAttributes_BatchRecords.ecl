@@ -19,6 +19,7 @@ EXPORT PhoneAttributes_BatchRecords(
 	//A PORTED_PHONE event becomes a PORTED_PHONE+PORTED_LINE event when the most recent historic record
 	//has either serv or line populated with a value different from the current record OR
 	//if no historic record exists with line or serv
+	
 	dPortedLineSortPhones := SORT(dFilterBatchPhones, acctno, phoneno, -event_date);
 
 	Layout_BatchOut tMostRecentRecord(Layout_BatchRaw L) := TRANSFORM
@@ -53,8 +54,8 @@ EXPORT PhoneAttributes_BatchRecords(
 		boolean is_line_match := L.phone_line_type = R.phone_line_type;
 		boolean is_serv_match := L.phone_serv_type = R.phone_serv_type;
 		boolean is_line_ported := is_same_account and is_ported_event and ((~is_line_match or ~is_serv_match) or (~exists_hist_line and ~exists_hist_serv));
-		SELF.event_type := MAP( R.source IN Consts.set_ATT_LIDB and is_line_match => Consts.LIDB_VERFICATION,
-			R.source IN Consts.set_ATT_LIDB and ~is_line_match and C <> 1 => Consts.PORTED_LINE,
+		SELF.event_type := MAP( R.source IN Consts.set_VERIFICATION and is_line_match => Consts.VERFICATION,
+			R.source IN Consts.set_VERIFICATION and ~is_line_match and C <> 1 => Consts.PORTED_LINE,
 			is_line_ported => TRIM(R.event_type) + Consts.PORTED_LINE,
 			R.event_type);
 		SELF := R;
@@ -96,7 +97,7 @@ EXPORT PhoneAttributes_BatchRecords(
 		output(dPhonesWithCurrent, named('dPhonesWithCurrent'));
 		output(dRolledUpPhones, named('dRolledUpPhones'));
 	#END
-
+ 
 	RETURN dBatchPhonesOut;
 
 END;

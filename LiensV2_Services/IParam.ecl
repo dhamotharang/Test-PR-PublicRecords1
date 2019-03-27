@@ -43,7 +43,7 @@ EXPORT IParam := MODULE
 			export boolean subject_only := false;
 	END;
 
-	EXPORT batch_params := INTERFACE (BatchShare.IParam.BatchParams,FCRA.iRules)
+	EXPORT batch_params := INTERFACE (BatchShare.IParam.BatchParamsV2,FCRA.iRules)
 		EXPORT SET OF STRING1 party_types := ['A','C','D',''];
 		EXPORT BOOLEAN no_did_append			:= FALSE;
 		EXPORT BOOLEAN no_bdid_append		 	:= FALSE;

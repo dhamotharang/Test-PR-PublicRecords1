@@ -1,4 +1,4 @@
-import AutostandardI, iesp,  doxie,gateway, Gong, Risk_Indicators, PhonesInfo, Suppress, ut, bipv2,
+﻿import AutostandardI, iesp,  doxie,gateway, Gong, Risk_Indicators, PhonesInfo, Suppress, ut, bipv2,
   MDR;
 
 EXPORT ReversePhoneTeaserRecords := Module
@@ -117,8 +117,8 @@ EXPORT Records(AutoStandardI.DataRestrictionI.params tempMod,
    PortedMetadatapayloadSlim := PortedMetadatapayload(((source = mdr.sourcetools.src_PhonesPorted_iConectiv 
 	                                                      OR source = mdr.sourcetools.src_PhonesPorted_TCPA) And (is_Ported))
 	                                                        OR
-																											 (source = mdr.sourcetools.src_Phones_LIDB and (not(is_Ported)))
-																											 );
+																											 (source IN [mdr.sourcetools.src_Phones_LIDB, MDR.sourceTools.src_Phones_Lerg6] and (not(is_Ported)))
+                                                     );
 
 	// this assumes 1 phone entry and one phone rec # returned for a given input.									 
 	String1 phoneType := IF (EXISTS(portedMetadatapayloadSlim), 

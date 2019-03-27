@@ -1,4 +1,4 @@
-﻿IMPORT Autokey_batch, AutokeyB2, BatchServices, FraudShared_Services, FraudShared;
+﻿IMPORT Autokey_batch, AutokeyB2, AutokeyB2_batch, BatchServices, doxie, FraudShared_Services, FraudShared;
 
 EXPORT AutoKey_IDs(
   DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in,
@@ -50,7 +50,10 @@ EXPORT AutoKey_IDs(
 	END;
 
 	ds_fids := Autokey_batch.get_fids(ds_ak_batch_in, ak_keyname, ak_config_data);
-
+	
+	if(fraud_platform = FraudShared_Services.Constants.Platform.FraudGov AND EXISTS(ds_fids(search_status=AutokeyB2_batch.Constants.FAILED_TOO_MANY_MATCHES)),
+	FAIL(203, doxie.ErrorCodes(203)));
+	
 	// Get autokey payloads (the real DIDs/BDIDs, record ids, and other goodies).		
 	AutokeyB2.mac_get_payload(UNGROUP(ds_fids), ak_keyname, ak_dataset, outpl, did, bdid, ak_typeStr)
 

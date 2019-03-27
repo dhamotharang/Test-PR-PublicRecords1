@@ -6,16 +6,16 @@ EXPORT Functions := MODULE
 	EXPORT getExternalServicesRecs(	DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in, 
 																	FraudGovPlatform_Services.IParam.BatchParams batch_params) := FUNCTION
 
-		raw_ := FraudGovPlatform_Services.Raw(batch_params);
-		recs_Death := raw_.GetDeath(ds_batch_in);
-		recs_Criminal := raw_.GetCriminal(ds_batch_in);
-		recs_Patriot := raw_.GetGlobalWatchlist(ds_batch_in);
-		recs_FDN := raw_.GetFDN(ds_batch_in);
+		raw_ := FraudGovPlatform_Services.Raw(ds_batch_in, batch_params);
+		recs_Death := raw_.GetDeath();
+		recs_Criminal := raw_.GetCriminal();
+		recs_Patriot := raw_.GetGlobalWatchlist();
+		recs_FDN := raw_.GetFDN();
 		
-		ds_instantIDRaw := raw_.getInstantIDRaw(ds_batch_in);
+		ds_instantIDRaw := raw_.getInstantIDRaw();
 		
-		recs_RedFlag := raw_.GetRedFlags(ds_batch_in, ds_instantIDRaw); 
-		recs_CIID := raw_.GetCIID(ds_batch_in, ds_instantIDRaw);
+		recs_RedFlag := raw_.GetRedFlags(ds_instantIDRaw); 
+		recs_CIID := raw_.GetCIID(ds_instantIDRaw);
 		
 		FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw xfm_Compilation(FraudShared_Services.Layouts.BatchIn_rec L) := TRANSFORM
 			SELF.batchin_rec := L;

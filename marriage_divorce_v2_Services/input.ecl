@@ -32,7 +32,7 @@ export input := module
 		AutoHeaderI.LIBIN.FetchI_Hdr_Biz.base)
 	end;
 
-	export batch_params := INTERFACE (BatchShare.IParam.BatchParams,FCRA.iRules)
+	export batch_params := INTERFACE (BatchShare.IParam.BatchParamsV2,FCRA.iRules)
 		export integer1 non_subject_suppression := suppress.Constants.NonSubjectSuppression.doNothing;
 	end;
 

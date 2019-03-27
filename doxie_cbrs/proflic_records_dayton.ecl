@@ -1,4 +1,4 @@
-import ut, suppress, doxie, business_header,Prof_LicenseV2;
+﻿import ut, suppress, doxie, business_header,Prof_LicenseV2;
 doxie_cbrs.mac_Selection_Declare()
 
 export proflic_records_dayton(dataset(doxie_cbrs.layout_references) bdids) := FUNCTION
@@ -46,8 +46,16 @@ baf3 := join(baf2,baf,left.seq2=right.seq2,keepbaf(right),right only);
 // KEY INTO PROFESSIONAL LICENSES
 kap := Prof_LicenseV2.key_addr_proflic;
 
+
+// RR-14975 REMOVING CCPA RELATED FIELDS FROM QUERY OUTPUT
+// DEFINING LAYOUT USING ACTUAL LAYOUT INSTEAD OF THE DATASET
+kap_layout := RECORD
+  Prof_LicenseV2.Layouts_ProfLic.Layout_Base - [global_sid, record_sid];
+END;
+
+
 // TRANSFORM TO CAPTURE PROLIC RECORDS MATCHING OUR ADDR-NAME TUPLES
-kap keepk(kap r) := transform
+kap_layout keepk(kap r) := transform
 	self := r;
 end;
 

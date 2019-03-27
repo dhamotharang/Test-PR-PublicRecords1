@@ -1,4 +1,4 @@
-﻿export svcAppend := function
+﻿export svcAppend := macro
 	import BIPV2;
 	import BIPV2_Best;
 
@@ -77,13 +77,19 @@
 	postHeader := BIPV2.IdAppendLocal.FetchRecords(withAppend, fetchLevel, dnbFullRemove);
 
 	emptyHeader := dataset([], BIPV2.IdAppendLayouts.svcAppendRecsOut);
+
+	// Catch failures so roxiepipe won't fail.
+	// Return dataset with request ids in case of failure, turning an error into a no hit.
+	catchRes := catch(res, skip);
+	failResult := project(inputDs, transform(BIPV2.IDAppendLayouts.svcAppendOut,
+	                      self.request_id := left.request_id, self := []));
 				
-	return parallel(
-		output(res, named('Results'));
+	parallel(
+		output(if(not exists(catchRes), failResult, res), named('Results'));
 		output(if(includeRecords, postHeader, emptyHeader), named('Header'));
 	);
 
-	// return parallel(
+	// parallel(
 		// output(preBest, named('preBest'));
 		// output(withBest, named('withBest'));
 		// output(withAppend, named('withappend'));
@@ -91,4 +97,4 @@
 		// output(postAppend, named('postAppend'));
 		// output(res, named('Results'));
 	// );
-end;
+endmacro;

@@ -31,7 +31,7 @@ EXPORT PickListBatchService (useCannedRecs = false) := FUNCTION
   BatchShare.MAC_CapitalizeInput(ds_in_seq, ds_in_cap);
   BatchShare.MAC_CleanAddresses(ds_in_cap, ds_batch_in);
     
-  my_params := module(BatchShare.IParam.getBatchParams())
+  my_params := module(BatchShare.IParam.getBatchParamsV2())
     export dataset (Gateway.layouts.config) gateways := Gateway.Configuration.Get();
   END;
 

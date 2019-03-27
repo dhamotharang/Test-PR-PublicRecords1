@@ -19,8 +19,7 @@ EXPORT SexOffenderCPS_BatchService(useCannedRecs = false) :=
 	MACRO
   #constant('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);		
 		gm := AutoStandardI.GlobalModule();	
-		batch_params := module (project (BatchShare.IParam.getBatchParams(), SexOffender_Services.IParam.batch_params, opt))
-			export applicationType 	:= AutoStandardI.InterfaceTranslator.application_type_val.val(project(gm,AutoStandardI.InterfaceTranslator.application_type_val.params));
+		batch_params := module (project (BatchShare.IParam.getBatchParamsV2(), SexOffender_Services.IParam.batch_params, opt))
 		end;
 		
 		ds_xml_in_raw 	:= dataset([], SexOffender_Services.Layouts.batch_in) : stored('batch_in', FEW);
