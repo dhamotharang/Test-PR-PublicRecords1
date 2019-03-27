@@ -1,4 +1,4 @@
-/*
+﻿/*
   wk_ut.Rewind_Build()
     rewind a build to an earlier step.  this will use the workman files to examine all workunits in the 
     build(starting from the workunit you pass in), and compile the following files to be deleted:
@@ -16,7 +16,7 @@
     This will restore any wuids that it needs to so that it can get the information it needs from the wuids.
     
 */
-import tools,wk_ut,std,ut,WsDFU;
+import tools,wk_ut,std,ut,WsDFU,WsWorkunits,Workman,FileSpray;
 
 EXPORT Rewind_Build(
 
@@ -30,7 +30,7 @@ EXPORT Rewind_Build(
 function
              
   ds_workman                          := pWorkman_Superfile(wuid != '',pWuid = '' or wuid >= pWuid,pversion = '' or version = pversion);
-  ds_workman_files_written            := project(ds_workman  ,transform({string esp,dataset(wk_ut.get_WUInfo().WsFileWritten) files} ,self.files := wk_ut.get_FilesWritten(left.wuid,left.esp),self := left));
+  ds_workman_files_written            := project(ds_workman  ,transform({string esp,dataset(WsWorkunits.layouts.WsFileWritten) files} ,self.files := Workman.get_FilesWritten(left.wuid,left.esp),self := left));
   ds_workman_files_written_norm       := normalize(ds_workman_files_written ,left.files ,transform({string name,string esp},self.name := '~' + right.name,self := left));
   ds_workman_files_written_norm_filt  := ds_workman_files_written_norm(regexfind('[[:digit:]]{8}',name,nocase),pFilter = '' or regexfind(pFilter,name,nocase));
 
@@ -41,7 +41,7 @@ function
   ;
 
   ////////////////////////////
-  ds_workman_skipped_files            := project(ds_workman  ,transform({dataset({string name}) files,string esp} ,self.files := project(wk_ut.get_WUInfo(left.wuid).dnormresults(filename = '',regexfind('not building',value,nocase)),transform({string name},self.name := regexreplace('not building (.*?) because it already exists',left.value,'$1',nocase))),self := left));
+  ds_workman_skipped_files            := project(ds_workman  ,transform({dataset({string name}) files,string esp} ,self.files := project(WsWorkunits.get_Results(left.wuid)(filename = '',regexfind('not building',value,nocase)),transform({string name},self.name := regexreplace('not building (.*?) because it already exists',left.value,'$1',nocase))),self := left));
   ds_workman_skipped_files_norm       := normalize(ds_workman_skipped_files ,left.files ,transform({string name,string esp},self.name := right.name,self := left));
 
   ////////////////////////////
@@ -54,10 +54,10 @@ function
   END;
 
   ds_workman_timings  := project(ds_workman ,transform({string esp,dataset(WsTiming) timings},
-    self.timings := wk_ut.get_WUInfo(left.wuid,left.esp).ds_Wstiming,self := left));
+    self.timings := WorkMan.get_WsTiming(left.wuid,left.esp),self := left));
   ds_workman_timings_filter := normalize(ds_workman_timings ,left.timings,transform({string esp,WsTiming},self := right,self := left)) (regexfind('copy',name,nocase));
   ds_dfuwuids               := dedup(project(ds_workman_timings_filter  ,transform({string wuid,string esp},self.wuid := regexfind('D[[:digit:]]{8}[-][[:alnum:]-]+',left.name,0),self := left)),all);
-  ds_dfu_files              := project(ds_dfuwuids  ,transform({string name,string esp},self.name := '~' + tools.mod_dfuInfo(left.wuid,left.esp).DestLogicalName,self := left));
+  ds_dfu_files              := project(ds_dfuwuids  ,transform({string name,string esp},self.name := '~' + FileSpray.get_DestLogicalName(left.wuid,left.esp),self := left));
 
   ds_workman_extra_fnames_filtered := dedup(ds_workman_extra_fnames(pFilter = '' or regexfind(pFilter,srcname,nocase)),srcname,all);
 
