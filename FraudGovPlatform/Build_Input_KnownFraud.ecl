@@ -1,11 +1,11 @@
-﻿IMPORT tools,STD, FraudGovPlatform_Validation, FraudShared,ut;
+﻿IMPORT tools,STD, FraudGovPlatform_Validation, FraudShared,ut; 
 EXPORT Build_Input_KnownFraud(
 	 string pversion
 	,dataset(FraudShared.Layouts.Input.mbs) MBS_Sprayed = FraudShared.Files().Input.MBS.sprayed
 	,dataset(Layouts.Flags.SkipModules) pSkipModules = FraudGovPlatform.Files().Flags.SkipModules
 	,dataset(Layouts.Input.KnownFraud) KnownFraud_Sprayed =  files().Input.KnownFraud.sprayed	
 	,dataset(Layouts.Input.KnownFraud) ByPassed_KnownFraud_Sprayed = files().Input.ByPassed_KnownFraud.sprayed	
-	,dataset(Layouts.Flags.SkipValidationByGCID) PSkipValidations = files().Flags.SkipValidationByGCID
+	,dataset(Layouts.CustomerSettings) pCustomerSettings = files().CustomerSettings
 ) :=
 module
 
@@ -22,17 +22,32 @@ module
 			);
 	
 	Functions.CleanFields(inKnownFraudUpdate ,inKnownFraudUpdateUpper); 
-
-	max_uid := max(KnownFraud_Sprayed, KnownFraud_Sprayed.unique_id) :	global;
 	
 	Layouts.Input.knownfraud tr(inKnownFraudUpdateUpper l, integer cnt) := transform
-		sub:=stringlib.stringfind(l.fn,'20',1);
-		sub2:=stringlib.stringfind(l.fn,'.dat',1)-6;
-		FileDate := (unsigned)l.fn[sub..sub+7];
-		FileTime := ut.CleanSpacesAndUpper(l.fn[sub2..sub2+5]);
-		self.FileName := l.fn;
+
+		filename := ut.CleanSpacesAndUpper(l.fn);
+		
+		self.FileName := filename;	
+		
+		fn := STD.Str.SplitWords( STD.Str.FindReplace(l.fn,'.dat',''), '_' );
+		
+		Customer_Account_Number := STD.Str.FindReplace(fn[1],'FRAUDGOV::IN::','');
+		Customer_State := fn[2];
+		Customer_Agency_Vertical_Type := fn[3]; // ignore
+		Customer_Program_fn := fn[4];
+		FileType := fn[5]; // ignore 
+		FileDate := (unsigned)fn[6];
+		FileTime := fn[7];
+		MemberID := fn[8];
+		InstanceID := fn[9];
+
+		self.Customer_Account_Number := Customer_Account_Number;
+		self.Customer_State := Customer_State;
+		self.Customer_Agency_Vertical_Type := Customer_Agency_Vertical_Type;
+		self.Customer_Program_fn := Customer_Program_fn;
+		
 		self.ProcessDate := (unsigned)pversion;
-		self.FileDate := if(FileDate>20130000,FileDate,self.ProcessDate);
+		self.FileDate :=FileDate;;
 		self.FileTime :=FileTime;
 		address_1 := tools.AID_Helpers.fRawFixLine1( trim(l.Street_1) + ' ' +  trim(l.Street_2));
 		address_2 := tools.AID_Helpers.fRawFixLineLast( stringlib.stringtouppercase(trim(l.city) + if(l.state != '', ', ', '') + trim(l.state)  + ' ' + trim(l.zip)[1..5]));
@@ -45,62 +60,67 @@ module
 		self.mailing_address_2 := mailing_address_2;
 		self.mailing_address_id := hash64(mailing_address_1 + mailing_address_2);
 		self.raw_full_name := if(l.raw_full_name='', ut.CleanSpacesAndUpper(l.raw_first_name + ' ' + l.raw_middle_name + ' ' + l.raw_last_name), l.raw_full_name);
-		self.ind_type 	:= functions.ind_type_fn(l.Customer_Program);
+		self.ind_type 	:= functions.ind_type_fn(Customer_Program_fn);
 		self.file_type := 1 ;		
 		source_input := map(
-			 STD.Str.Contains( l.fn, 'KnownFraud', true) => 'KNFD'
+			 STD.Str.Contains( l.fn, 'KnownRisk', true) => 'KNFD'
 			,STD.Str.Contains( l.fn, 'SafeList', true) => 'SAFELIST'
 			,'KNFD');
 		self.source_input := source_input;
-		SELF.unique_id := max_uid + cnt;
-		self.Deltabase := 0;
+		SELF.unique_id := 0;
 		self:=l;
 		self:=[];
 	end;
 
 	shared f1:=project(inKnownFraudUpdateUpper, tr(left, counter));
+
+	max_uid := max(KnownFraud_Sprayed, KnownFraud_Sprayed.unique_id) + 1;
 	
-	shared EnforceValidations 
-		:= join(	  f1
-					, PSkipValidations
-					, left.Customer_Account_Number = right.gc_id
-					, TRANSFORM(Layouts.Input.KnownFraud,SELF := LEFT),LEFT ONLY, LOOKUP);
+	MAC_Sequence_Records( f1, unique_id, f1_unique_id, max_uid);
+	
+	shared rs_unique_id := f1_unique_id;
 
-	shared SkipValidations 
-		:= join(	  f1
-					, PSkipValidations
-					, left.Customer_Account_Number = right.gc_id
-					, TRANSFORM(FraudGovPlatform.Layouts.Input.KnownFraud,SELF := LEFT), INNER, LOOKUP);	
+	shared NotInMbs := join(	
+		rs_unique_id,
+		MBS_Sprayed(status = 1),
+		left.Customer_Account_Number =(string)right.gc_id
+		AND	left.customer_State = right.Customer_State
+		AND left.file_type = right.file_type //1=events
+		AND left.ind_type = right.ind_type //program
+		AND (( left.source_input = 'KNFD' and right.confidence_that_activity_was_deceitful != 3 )
+			OR ( left.source_input = 'SAFELIST' and right.confidence_that_activity_was_deceitful = 3 )),
+		TRANSFORM(Layouts.Input.knownfraud,SELF := LEFT),
+		LEFT ONLY,
+		LOOKUP);
 
-	shared valid_records := EnforceValidations + SkipValidations;
+	shared EnforceValidations := join(
+		  rs_unique_id
+		, pCustomerSettings
+		, left.Customer_Account_Number = right.Customer_Account_Number and 
+		  left.Customer_State = right.Customer_State and
+		  left.file_type = right.file_type and //3=transactions
+		  left.ind_type = right.ind_type and //program
+		  right.validate_data = true
+		, TRANSFORM(Layouts.Input.knownfraud,SELF := LEFT),INNER, LOOKUP);
+
 
 	shared f1_errors:=EnforceValidations
-		((	 
+		(
 				Customer_Account_Number =''
-			or	Customer_County =''
+			or 	(Customer_State in FraudGovPlatform_Validation.Mod_Sets.States) = FALSE
+			or 	(Customer_Program_fn in FraudGovPlatform_Validation.Mod_Sets.IES_Benefit_Type) = FALSE
+			or 	customer_event_id = ''
+			or 	reported_date = ''
+			or 	reported_time = ''
+			or 	reported_by = ''
 			or 	(LexID = 0 and raw_Full_Name = '' and (raw_First_name = '' or raw_Last_Name=''))
 			or 	((SSN = '' or length(STD.Str.CleanSpaces(SSN))<>9 or regexfind('^[0-9]*$',STD.Str.CleanSpaces(ssn)) =false) and (Drivers_License_Number='' and Drivers_License_State='') and LexID = 0)
 			or 	(Street_1='' and City='' and State='' and Zip='')
-			or 	(Customer_State in FraudGovPlatform_Validation.Mod_Sets.States) = FALSE
-			or 	(Customer_Agency_Vertical_Type in FraudGovPlatform_Validation.Mod_Sets.Agency_Vertical_Type) = FALSE
-			or 	(Customer_Program in FraudGovPlatform_Validation.Mod_Sets.IES_Benefit_Type) = FALSE
-		) and source_input = 'KNFD' );
+		);
 			
-	NotInMbs := join(	valid_records,
-					MBS_Sprayed(status = 1),
-					left.Customer_Account_Number =(string)right.gc_id
-					AND left.file_type = right.file_type
-					AND left.ind_type = right.ind_type
-					AND (( left.source_input = 'KNFD' and right.confidence_that_activity_was_deceitful != 3 )
-						OR ( left.source_input = 'SAFELIST' and	right.confidence_that_activity_was_deceitful = 3 ))	
-					AND	left.customer_State = right.Customer_State
-					AND	left.Customer_County = right.Customer_County
-					AND	left.Customer_Agency_Vertical_Type = right.Customer_Vertical,
-					TRANSFORM(Layouts.Input.knownfraud,SELF := LEFT),
-					LEFT ONLY,
-					LOOKUP);
+
 	//Exclude Errors
-	shared ByPassed_records := f1_errors + NotInMbs;
+	shared ByPassed_records := NotInMbs + f1_errors;
 	f1_bypass_dedup := fn_dedup(ByPassed_KnownFraud_Sprayed + project(ByPassed_records, FraudGovPlatform.Layouts.Input.knownfraud));
 
 	tools.mac_WriteFile(Filenames().Input.ByPassed_KnownFraud.New(pversion),
@@ -116,12 +136,13 @@ module
 
 
 	//Move only Valid Records
-	shared f1_dedup :=	join (	valid_records,
-							ByPassed_records,
-							left.Customer_Account_Number = right.Customer_Account_Number and
-							left.Unique_Id = right.Unique_Id,
-							TRANSFORM(Layouts.Input.knownfraud,SELF := LEFT),
-							left only);	
+	shared f1_dedup :=	join (
+		rs_unique_id,
+		ByPassed_records,
+		left.Customer_Account_Number = right.Customer_Account_Number and
+		left.Unique_Id = right.Unique_Id,
+		TRANSFORM(Layouts.Input.knownfraud,SELF := LEFT),
+		left only);	
 																							
 	shared new_addresses := Functions.New_Addresses(f1_dedup);
 

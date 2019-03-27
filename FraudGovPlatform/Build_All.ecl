@@ -37,6 +37,9 @@ module
 	export Run_MBS := FraudGovPlatform_Validation.SprayMBSFiles( pversion := pVersion[1..8] );
 	export Run_Scrubs := Build_Scrubs(pversion,SkipModules);
 	export Run_Deltabase := FraudGovPlatform_Validation.SprayAndQualifyDeltabase(pversion);
+	export Run_NAC := FraudGovPlatform_Validation.SprayAndQualifyNAC(pversion);
+	export Run_Prepped := FraudGovPlatform_Validation.SprayAndQualifyInput(pversion);
+
 	export Run_Inputs := Build_Input(pversion, MBS_File, SkipModules).All;	
 	export Run_Base := Build_Base(pversion, MBS_File).All;
 	export Run_GarbageCollector := Garbage_Collector.Run;
@@ -58,15 +61,7 @@ module
 	
 	export base_portion := sequential(
 		 Create_Supers
-		// Spray MBS
-		,Run_MBS
-		// Spray Deltabase
-		,Run_Deltabase
-		// Clean Inputs
 		,Run_Inputs
-		// RUn MBS Scrubs
-		,Run_Scrubs	
-		// Build Base
 		,Run_Base
 		,if( Test_Build = 'Passed' and  Test_RecordID = 'Passed' and Test_RinID = 'Passed', promote_sprayed_files)
 	);
