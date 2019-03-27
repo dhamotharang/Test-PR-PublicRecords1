@@ -42,7 +42,7 @@
 /*--INFO-- This service pulls from the Criminal Offenders file.*/
 
 export DOC_Search_People := macro
-#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 WSInput.MAC_DOC_Search_People()	
 
 #STORED('LookupType','CRIM');
