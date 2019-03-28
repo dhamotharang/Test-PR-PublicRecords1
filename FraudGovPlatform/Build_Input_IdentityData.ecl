@@ -83,7 +83,7 @@ module
 	
 	shared NotInMbs := join( 
 		rs_unique_id,
-		MBS_Sprayed(status = 1),
+		MBS_Sprayed(status = 1 and regexfind('DELTA', fdn_file_code, nocase) = false),
 		left.Customer_Account_Number =(string)right.gc_id and
 		left.customer_State = right.Customer_State and
 		left.file_type = right.file_type and //3=transactions
