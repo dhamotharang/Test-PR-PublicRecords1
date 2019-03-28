@@ -1,4 +1,4 @@
-IMPORT	Business_Credit,	BIPV2,	Address,	doxie,	lib_date,	STD;
+﻿IMPORT	Business_Credit,	BIPV2,	Address,	doxie,	lib_date,	STD;
 EXPORT	Key_BusinessOwnerInformation(	STRING pVersion	=	(STRING8)Std.Date.Today(),
 																			Constants().buildType	pBuildType	=	Constants().buildType.Daily)	:=	MODULE
 
@@ -50,6 +50,8 @@ EXPORT	Key_BusinessOwnerInformation(	STRING pVersion	=	(STRING8)Std.Date.Today()
 		STRING10	Phone_Number;
 		STRING9		Federal_TaxID_SSN;
 		STRING3		Federal_TaxID_SSN_Identifier;
+    UNSIGNED4 global_sid  :=  0;
+    UNSIGNED8 record_sid  :=  0;
 		STRING2		source;
 	END;
 	
