@@ -1,4 +1,4 @@
-﻿IMPORT Address, CriminalRecords_BatchService, DeathV2_Services, FraudGovPlatform_Services, FraudShared_Services, iesp, Patriot, risk_indicators;
+﻿IMPORT Address, CriminalRecords_BatchService, DeathV2_Services, FraudGovPlatform_Services, FraudShared_Services, iesp, Patriot, risk_indicators, STD;
 
 EXPORT Transforms := MODULE
 	
@@ -404,7 +404,7 @@ EXPORT Transforms := MODULE
 													L.predir,
 													L.prim_name, L.addr_suffix,
 													L.postdir,'',	''),
-											L.addr);
+											STD.Str.CleanSpaces(L.addr));
 					SELF.physical_city := L.p_city_name;
 					SELF.physical_state := L.st;
 					SELF.physical_zip := L.z5;
@@ -413,7 +413,7 @@ EXPORT Transforms := MODULE
 													L.mailing_predir,
 													L.mailing_prim_name, L.mailing_addr_suffix,
 													L.mailing_postdir,'',''),
-											L.mailing_addr);
+											STD.Str.CleanSpaces(L.mailing_addr));
 					SELF.mailing_city := L.mailing_p_city_name;
 					SELF.mailing_state := L.mailing_st;
 					SELF.mailing_zip := L.mailing_z5;
