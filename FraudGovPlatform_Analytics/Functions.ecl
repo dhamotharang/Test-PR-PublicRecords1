@@ -1,5 +1,5 @@
 ﻿EXPORT Functions := MODULE
-	IMPORT BatchShare, FraudGovPlatform_Services, FraudGovPlatform_Analytics;
+	IMPORT AppendRelativesAddressMatch, BatchShare, FraudGovPlatform_Services, FraudGovPlatform_Analytics;
 
 	//Project to the event scoring layout
 	EXPORT projectToEventScoringLayout(DATASET(FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw) ds_in, 
@@ -17,6 +17,7 @@
 			integer8 deceased_prior_to_event_;
 			integer8 _nas__summary_;
 			integer8 _nap__summary_;
+			integer8 nas9_flag_;
 			boolean _ssnfoundforlexid_;
 			integer8 _subjectssncount_;
 			/*
@@ -77,8 +78,18 @@
 			integer8 ssn_hri_it_flag_;
 			integer8 ssn_hri_mi_flag_;
 			integer8 in_customer_population_;
+			string10 prim_range;
+			// string2  predir;
+			string28 prim_name;
+			// string4  addr_suffix;
+			// string2  postdir;
+			// string10 unit_desig;
+			// string8  sec_range;
+			// string25 p_city_name;
+			// string2  st;
+			string5  z5;			
 		END;
-
+		
 		scoring_rec xform_scoring(FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw L) := TRANSFORM
 			SELF.customer_id_ :=(UNSIGNED)batch_params.GlobalCompanyId;	//always the same at runtime. To support customer specific weighting and configs
 			SELF.industry_type_ := (UNSIGNED)batch_params.IndustryType;	//always the same at runtime. To support customer specific weighting and configs        
@@ -90,9 +101,20 @@
 			SELF.deceased_:= IF((UNSIGNED)L.childrecs_death[1].dod8 <> 0, 1, 0);
 			SELF.deceased_prior_to_event_:= IF((UNSIGNED)L.childrecs_death[1].dod8 <> 0, 1, 0); //if we have never seen this person before and they are dead, then they are dead prior to all their events
 			SELF._nas__summary_:= L.childrecs_ciid[1].nas_summary;
+			SELF.nas9_flag_		 := 0; //this gets set after calling macAppendRelativesAddressMatch
 			SELF._nap__summary_:= L.childrecs_ciid[1].nap_summary;
 			SELF._ssnfoundforlexid_ := L.childRecs_ciid[1].ssnfoundforlexid;
 			SELF._subjectssncount_ := (UNSIGNED)L.childrecs_ciid[1].subjectssncount;
+			SELF.prim_range := L.childrecs_ciid[1].prim_range;
+			// SELF.predir := L.childrecs_ciid[1].predir;
+			SELF.prim_name := L.childrecs_ciid[1].prim_name;
+			// SELF.addr_suffix := L.childrecs_ciid[1].addr_suffix;
+			// SELF.postdir := L.childrecs_ciid[1].postdir;
+			// SELF.unit_desig := L.childrecs_ciid[1].unit_desig;
+			// SELF.sec_range := L.childrecs_ciid[1].sec_range;
+			// SELF.p_city_name := L.childrecs_ciid[1].p_city_name;
+			// SELF.st := L.childrecs_ciid[1].st;
+			SELF.z5 := L.childrecs_ciid[1].z5;
 			// SELF.stolen_identity_index_;
 			// SELF.synthetic_identity_index_;
 			// SELF.manipulated_identity_index_;
@@ -161,10 +183,15 @@
 			SELF.in_customer_population_ := 0; //the identity is not in the customer's population
 		END;
 		roxieInputPrep := PROJECT(ds_in, xform_scoring(LEFT));
+		
+		roxieInputPrepRelAddrMatch := PROJECT(AppendRelativesAddressMatch.macAppendRelativesAddressMatch(roxieInputPrep,lexid,prim_range,prim_name,z5 ,,'(integer)_nas__summary_ = 9'),
+			TRANSFORM(RECORDOF(LEFT),
+				SELF.nas9_flag_ := (INTEGER) (LEFT._nas__summary_ = 9 AND LEFT.RelativeAddressMatch = 0),
+				SELF := LEFT));		
 
 		//Pivot to put the dataset in the expected layout for scoring						
-		scoringInput := FraudGovPlatform_Analytics.macPivotOttoOutput(roxieInputPrep, 'acctno,customer_id_,industry_type_,entity_context_uid_,lexid',
-												 '_nas__summary_,_nap__summary_,_cvi_,_ssnfoundforlexid_,_cvicustomscore_,_subjectssncount_,' + 
+		scoringInput := FraudGovPlatform_Analytics.macPivotOttoOutput(roxieInputPrepRelAddrMatch, 'acctno,customer_id_,industry_type_,entity_context_uid_,lexid',
+												 '_nas__summary_,nas9_flag_,_nap__summary_,_cvi_,_ssnfoundforlexid_,_cvicustomscore_,_subjectssncount_,' + 
 													//  'stolen_identity_index_,synthetic_identity_index_,manipulated_identity_index_,vulnerable_victim_index_,friendlyfraud_index_,suspicious_activity_index_,' + 
 													//  '_v2__sourcerisklevel_,_v2__assocsuspicousidentitiescount_,_v2__assoccreditbureauonlycount_,_v2__validationaddrproblems_,_v2__inputaddrageoldest_,_v2__inputaddrdwelltype_,_v2__divssnidentitycountnew_,' + 
 												'kr_high_risk_address_flag_,kr_high_risk_identity_flag_,kr_medium_risk_address_flag_,kr_medium_risk_identity_flag_,' +
