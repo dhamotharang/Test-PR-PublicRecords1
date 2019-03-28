@@ -1,4 +1,4 @@
-import header, gong, Risk_Indicators,ut;
+﻿import header, gong, Risk_Indicators,ut;
 
 ppCandidate := dataset(ut.foreign_prod + 'thor_data400::in::qsent_clean',Phonesplus.layoutCommonOut,thor);
 
@@ -124,12 +124,14 @@ ppmatch := join(sort(distribute(neverseen,hash(CellPhone)),CellPhone,local),
 /* ************************************************************************************************** */
 //Mark Active Gong under different name and 
 // Mark QSENT Other	
-
-Phonesplus.layoutCommonOut t_mrkActive(ppmatch L ,f_currgong R) := transform
+//CCPA-5 Add global_sid and record_sid to Qsent base file
+Phonesplus.layoutCommonOut_CCPA t_mrkActive(ppmatch L ,f_currgong R) := transform
 self.ActiveFlag := if(R.phoneno != '','Y','');
 self.InitScore		:= if(L.InitScoreType = '',5,L.InitScore);
 self.InitScoreType	:= if(L.InitScoreType = '','QSENT OTHER',L.InitScoreType);
 self.ConfidenceScore:= L.InitScore + L.TDSMatch;
+self.global_sid := 0;
+self.record_sid := 0;
 self := L;
 end;					
 
