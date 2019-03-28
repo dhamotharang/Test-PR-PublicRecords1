@@ -9,11 +9,15 @@ e_mail_failure := FileServices.sendemail
 
 phonesplus_dops_update  := sequential(
 																			RoxieKeybuild.updateversion('PhonesPlusV2Keys',pversion,'john.freibaum@lexisneis.com',,'N'),
-																			RoxieKeybuild.updateversion('QsentKeys',pversion,'john.freibaum@lexisneis.com',,'N'));
+																			//CCPA-5 comment out for 4/9RR
+																			// RoxieKeybuild.updateversion('QsentKeys',pversion,'john.freibaum@lexisneis.com',,'N'));
+																			);
 																														
 phonesplus_idops_update := sequential(RoxieKeybuild.updateversion('PhonesPlusKeys',pversion,'john.freibaum@lexisneis.com',,'N',,,'A'),
 																			RoxieKeybuild.updateversion('PhonesPlusV2Keys',pversion,'john.freibaum@lexisneis.com',,'N',,,'A'),
-																			RoxieKeybuild.updateversion('QsentKeys',pversion,'john.freibaum@lexisneis.com',,'N',,,'A'));
+																			//CCPA-5 comment out for 4/9RR
+																			// RoxieKeybuild.updateversion('QsentKeys',pversion,'john.freibaum@lexisneis.com',,'N',,,'A'));
+																			);
 
 addHeaderKeyBuilding 		:= if(fileservices.getsuperfilesubcount('~thor_data400::Base::HeaderKey_Building')>0, 
 															output('Nothing added to thor_data400::Base::HeaderKey_Building'), 
@@ -39,8 +43,8 @@ BuildAll:= sequential
 				Phonesplus.proc_create_phonesplus_relationships(pversion),
 				Phonesplus_v2.Proc_Build_Iverification(pversion),
 				Phonesplus_v2.Proc_Build_Scoring_Keys(pversion),
-				Phonesplus.Qsent_DID(pversion),
-				Phonesplus.proc_build_qsent_keys(pversion),
+				// Phonesplus.Qsent_DID(pversion),			//CCPA-5 comment out for 4/9RR
+				// Phonesplus.proc_build_qsent_keys(pversion),		//CCPA-5 comment out for 4/9RR
 				clearHeaderKeyBuilding,
 				BuildLogger.KeyEnd(false),
 				BuildLogger.PostStart(false),
@@ -50,8 +54,8 @@ BuildAll:= sequential
 	parallel
 		   (Phonesplus.sample_PhonesplusBase,
 				Phonesplus_v2.Strata_Phonesplus(pversion),
-				Phonesplus.sample_QsentBase,
-			  Phonesplus.strata_popFileQsentBase(pversion),
+				// Phonesplus.sample_QsentBase,			//CCPA-5 comment out for 4/9RR
+			  // Phonesplus.strata_popFileQsentBase(pversion),						//CCPA-5 comment out for 4/9RR
 			  phonesplus.proc_build_stats),
 				BuildLogger.PostEnd(false),
 				BuildLogger.BuildEnd(false),
