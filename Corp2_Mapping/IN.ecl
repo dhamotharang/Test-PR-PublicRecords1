@@ -72,10 +72,11 @@ export IN := MODULE;
 		Corp2_mapping.LayoutsCommon.Main in_corp1Transform_Business(Corp2_Raw_IN.Layouts.Temp_CorpAgentMergersNamesLayoutIn l,integer ctr):= transform
 		 
 		  legal_list 						:= ['2','3','4','5','6','7','8','9','10','11','14','15','16','17','18','19',
-			                          '20','21','22','23','30','32','33','34','35','36','37','39','40','41','42'];
+			                          '20','21','22','23','30','32','33','34','35','36','37','39','40','41','42',
+																'45','46'];
 			Reserved_list 				:= ['26'];
 			foreign_list 					:= ['14','15','16','17','18','19','20','21','22','23','30','33','35','37','40','42'];
-			domestic_list					:= ['2','3','4','5','6','7','8','9','10','11','32','34','36','39','41'];
+			domestic_list					:= ['2','3','4','5','6','7','8','9','10','11','32','34','36','39','41','45','46'];
 			status_list       		:= ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16',
 			                          '17','18','19','20','21','22','23','24','25','26','27'];
 			
@@ -281,7 +282,7 @@ export IN := MODULE;
 	  MapCorp   := AllCorps(corp_legal_name <> '');
 		
 		Corp2_Mapping.LayoutsCommon.AR in_arTransform(Corp2_Raw_IN.Layouts.CorpFilingsLayoutIn  l):=transform,
-		skip(corp2.t2u(l.fili_business_id) = '' OR corp2.t2u(l.fili_filing_type) <> '21')  
+		skip(corp2.t2u(l.fili_business_id) = '' OR corp2.t2u(l.fili_filing_type) not in ['21','10006'] )  
 		
 			self.corp_key					      					:= state_fips +'-'+corp2.t2u(l.fili_business_id);
 			self.corp_vendor					  					:= state_fips;
@@ -290,7 +291,7 @@ export IN := MODULE;
 			self.corp_sos_charter_nbr		      		:= corp2.t2u(l.fili_business_id);
 			self.ar_report_nbr               			:= corp2.t2u(l.fili_filing_num);
 			self.ar_filed_dt                      := Corp2_Mapping.fValidateDate(l.fili_filing_date[1..10]).pastDate;
-			self.ar_type                          := 'BUSINESS ENTITY REPORT';
+			self.ar_type                          := if(corp2.t2u(l.fili_filing_type)='10006', 'ANNUAL BENEFIT REPORT', 'BUSINESS ENTITY REPORT');
 			self.ar_comment                       := corp2.t2u(l.fili_comment);
 			self                                  := [];
 			
@@ -309,7 +310,7 @@ export IN := MODULE;
 									         ) : INDEPENDENT;			
 													 
 		Corp2_Mapping.LayoutsCommon.Events eventTransform(Corp2_Raw_IN.Layouts.Temp_CorpFilingsLayoutIn l,integer ctr) := transform,
-		skip(corp2.t2u(l.fili_business_id)='' or corp2.t2u(l.fili_filing_type) = '21')
+		skip(corp2.t2u(l.fili_business_id)='' or corp2.t2u(l.fili_filing_type) in ['21','10006'] )
 		
 			self.corp_key					    						:= state_fips +'-'+ corp2.t2u(l.fili_business_id);
 			self.corp_vendor					  					:= state_fips;
@@ -329,8 +330,12 @@ export IN := MODULE;
 			
 		end;
 	
-		mapEvent 				:= normalize(joinCorpFilings, if(corp2.t2u(left.fili_filing_date) <> '' and  corp2.t2u(left.fili_effective_date) <> '' and corp2.t2u(left.fili_filing_date) <> corp2.t2u(left.fili_effective_date),2,1)
-																 ,eventTransform(left, counter));		
+		mapEvent 				:= normalize(joinCorpFilings, 
+		                             if(Corp2_Mapping.fValidateDate(left.fili_filing_date).pastDate <> ''  and  Corp2_Mapping.fValidateDate(left.fili_effective_date).GeneralDate <> '' and 
+																		Corp2_Mapping.fValidateDate(left.fili_filing_date).pastDate <> Corp2_Mapping.fValidateDate(left.fili_effective_date).GeneralDate,2,1
+																		),
+																 eventTransform(left, counter)
+																);		
 		dsMapEvent 			:= mapEvent(corp2.t2u(event_filing_date + event_filing_cd + event_filing_reference_nbr + event_desc) <> '');
 		dedupMapEvents 	:= dedup(sort(distribute(dsMapEvent,hash(corp_key)),record,local),record,local) : independent;
 		
