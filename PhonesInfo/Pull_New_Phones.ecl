@@ -1,6 +1,7 @@
-﻿IMPORT Gong, PhonesPlus_v2;
+﻿IMPORT dx_PhonesInfo, Gong, PhonesPlus_v2;
 
 	//DF-24037: Replace LIDB Use Lerg6 for Carrier Info
+	//DF-24397: Create Dx-Prefixed Keys
 	
 	/*portV2: N = Use PMT or 
 						Y = Use Phone Type File*/
@@ -24,13 +25,13 @@ EXPORT Pull_New_Phones(string version, string portV2) := FUNCTION
 	//Choose Between Phones Metadata or Phone Type File for the Latest Port Records 
 			
 			//Phones Metadata File Transformed to Phone Type Layout (Common Shared Layout)		
-			prtPMT 					:= project(PhonesInfo.Key_Phones.Ported_Metadata(is_ported=true and source='PK'), transform({PhonesInfo.Layout_Common.Phones_Type_Main},
+			prtPMT 					:= project(PhonesInfo.Key_Phones.Ported_Metadata(is_ported=true and source='PK'), transform({dx_PhonesInfo.Layouts.Phones_Type_Main},
 																								self.record_sid		:= 0;
 																								self.global_sid		:= 0;
 																								self							:= left));
 			
 			//Phone Type File	
-			prtPType				:= dedup(sort(distribute(PhonesInfo.Key_Phones_Type(source='PK'), hash(phone, vendor_last_reported_dt)), phone, -vendor_last_reported_dt, local), phone, local);
+			prtPType				:= dedup(sort(distribute(dx_PhonesInfo.Key_Phones_Type(source='PK'), hash(phone, vendor_last_reported_dt)), phone, -vendor_last_reported_dt, local), phone, local);
 	
 	dsIC 						:= if(portV2='N',
 												prtPMT,							//Phones Metadata Key
@@ -73,4 +74,4 @@ EXPORT Pull_New_Phones(string version, string portV2) := FUNCTION
 	
 	RETURN outFile;
 	
-END;	
+END;

@@ -1,4 +1,6 @@
-﻿import Data_Services, Mdr, PhoneFraud, Ut;
+﻿IMPORT Data_Services, dx_PhonesInfo, Mdr, PhoneFraud, Ut;
+
+//DF-24397: Create Dx-Prefixed Keys
 
 EXPORT Map_OTP := FUNCTION
 
@@ -10,7 +12,7 @@ EXPORT Map_OTP := FUNCTION
 	ds_filt			:= ds(otp_phone<>'' and otp_delivery_method in ['T','M','W','H'] and verify_passed=TRUE);
 
 	//Map to Common OTP Layout
-	PhonesInfo.Layout_Common.Phones_Transaction_Main trOTP(ds_filt l):= transform
+	dx_PhonesInfo.Layouts.Phones_Transaction_Main trOTP(ds_filt l):= transform
 	
 		//Pull DBA's Date_Added, If Populated.  Otherwise, Use Build Load Date
 		//Map to Layout Specified in PHOM-84
@@ -42,7 +44,7 @@ EXPORT Map_OTP := FUNCTION
 	//Rollup Same-Day OTP Transactions / Determine Min/Max Dates
 	compFile 		:= sort(distribute(cmnOTP, hash(phone)), phone, (((string)transaction_dt)+transaction_time), local);
 
-	PhonesInfo.Layout_Common.Phones_Transaction_Main trComp(compFile l, compFile r):= transform
+	dx_PhonesInfo.Layouts.Phones_Transaction_Main trComp(compFile l, compFile r):= transform
 	
 		combDt1		:= ((string)l.transaction_dt)+l.transaction_time;
 		combDt2		:= ((string)r.transaction_dt)+r.transaction_time;
@@ -59,9 +61,17 @@ EXPORT Map_OTP := FUNCTION
 												left.transaction_dt = right.transaction_dt, 
 												trComp(left, right), local);
 	
-	ddOTP				:= dedup(sort(distribute(combRec, hash(phone)), record, local), record, local);
+	//Add Record SID
+	dx_PhonesInfo.Layouts.Phones_Transaction_Main trID(combRec l):= transform
+		self.record_sid 						:= hash64(Mdr.SourceTools.Src_PhoneFraud_OTP + l.transaction_code + l.transaction_dt + l.transaction_time + l.vendor_first_reported_dt) + (integer)l.phone;	
+		self 												:= l;
+	end;
+	
+	addID			:= project(combRec, trID(left));
+	
+	//Dedup Results
+	ddOTP			:= dedup(sort(distribute(addID, hash(phone)), record, local), record, local);
 
 	RETURN ddOTP;
 	
-end;
-
+END;

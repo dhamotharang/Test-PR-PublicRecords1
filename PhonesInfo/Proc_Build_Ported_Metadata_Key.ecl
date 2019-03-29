@@ -1,4 +1,4 @@
-﻿import _control, Dops, Doxie, PromoteSupers, RoxieKeyBuild, std, ut, Orbit3, Scrubs_PhonesInfo,buildLogger;
+﻿IMPORT _control, Dops, Doxie, dx_PhonesInfo, PromoteSupers, RoxieKeyBuild, std, ut, Orbit3, Scrubs_PhonesInfo,buildLogger;
 
 EXPORT Proc_Build_Ported_Metadata_Key(string version):= function
 
@@ -38,7 +38,8 @@ EXPORT Proc_Build_Ported_Metadata_Key(string version):= function
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 //Build Carrier Reference Key////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(PhonesInfo.Key_Source_Reference.Ocn_Name
+	RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_PhonesInfo.Key_Source_Reference.ocn_name
+																							,PhonesInfo.File_Source_Reference.Main
 																							,'~thor_data400::key::phonesmetadata::carrier_reference'
 																							,'~thor_data400::key::'+version+'::phonesmetadata::carrier_reference'
 																							,bkPhonesMetadataCarrierName
@@ -67,15 +68,15 @@ EXPORT Proc_Build_Ported_Metadata_Key(string version):= function
 //Run Strata Stats///////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	PhonesInfo.Out_STRATA_Population_Stats(PhonesInfo.File_TCPA.Main_Current,
-																																							 PhonesInfo.File_iConectiv.Main_Current,
-																																							 PhonesInfo.File_LIDB.Response_Processed,
-																																							 PhonesInfo.File_Deact_GH.Main_Current,
-																																							 PhonesInfo.File_Deact.Main_Current2,
-																																							 PhonesInfo.File_Metadata.PortedMetadata_Main,
-																																							 PhonesInfo.File_Source_Reference.Main,
-																																							 version,
-																																							 buildStrata
-																																							 );
+																										PhonesInfo.File_iConectiv.Main_Current,
+																										PhonesInfo.File_LIDB.Response_Processed,
+																										PhonesInfo.File_Deact_GH.Main_Current,
+																										PhonesInfo.File_Deact.Main_Current2,
+																										PhonesInfo.File_Metadata.PortedMetadata_Main,
+																										PhonesInfo.File_Source_Reference.Main,
+																										version,
+																										buildStrata
+																										);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 //Run Scrub Reports//////////////////////////////////////////////////////////////////////////////////////////

@@ -1,10 +1,12 @@
-﻿IMPORT Mdr, PhonesInfo, Std, Ut;
+﻿IMPORT dx_PhonesInfo, Mdr, PhonesInfo, Std, Ut;
+
+//DF-24397: Create Dx-Prefixed Keys
 
 //Pull Existing History w/ Newly Concatenated Daily
 	dailyICInput 		:= PhonesInfo.File_iConectiv.In_Port_Daily_History(action_code in ['A','U','D']);
 		
 	tempLayout := record
-		PhonesInfo.Layout_Common.Phones_Transaction_Main;
+		dx_PhonesInfo.Layouts.Phones_Transaction_Main;
 		string temp_report_dt;
 		string temp_transaction_dt;
 		integer groupid;
@@ -90,7 +92,7 @@
 													roll(left, right), local);
 		
 //Add Transaction Date to Remaining Records & Parse Out Date/Time
-	PhonesInfo.Layout_Common.Phones_Transaction_Main trRem(aggrTrans_r l) := transform
+	dx_PhonesInfo.Layouts.Phones_Transaction_Main trRem(aggrTrans_r l) := transform
 		self.vendor_first_reported_dt 	:= if(l.vendor_first_reported_dt<>0,(integer)(((string)l.vendor_first_reported_dt)[1..8]),(integer)(((string)l.temp_report_dt)[1..8]));
 		self.vendor_first_reported_time	:= if(l.vendor_first_reported_dt<>0,((string)l.vendor_first_reported_dt)[9..], 						((string)l.temp_report_dt)[9..]);
 		self.vendor_last_reported_dt 		:= if(l.vendor_last_reported_dt<>0, (integer)(((string)l.vendor_last_reported_dt)[1..8]), (integer)(((string)l.temp_report_dt)[1..8]));
@@ -101,8 +103,16 @@
 	end;
 
 	outFile 			:= project(aggrTrans_r, trRem(left));
+	
+//Add Record SID
+	dx_PhonesInfo.Layouts.Phones_Transaction_Main trID(outFile l) := transform
+		self.record_sid									:= hash64(Mdr.sourceTools.Src_PhonesPorted_iConectiv + l.transaction_code + l.transaction_dt + l.transaction_time + l.vendor_first_reported_dt + l.vendor_first_reported_time + l.routing_code + l.spid) + (integer)l.phone;
+		self														:= l;
+	end;
+	
+	addID		:= project(outFile, trID(left));
 
-	//Dedup Results
-	ddRec					:= dedup(sort(distribute(outFile, hash(phone)), record, local), record, local);
+//Dedup Results
+	ddRec					:= dedup(sort(distribute(addID, hash(phone)), record, local), record, local);
 	
 EXPORT Remap_ICPort_File := ddRec;

@@ -1,4 +1,6 @@
-﻿IMPORT mdr, ut;
+﻿IMPORT dx_PhonesInfo, Mdr, Ut;
+
+//DF-24397: Create Dx-Prefixed Keys
 
 //Pull Records from Deact History File
 	deactHist := PhonesInfo.File_Deact.History2;
@@ -39,7 +41,7 @@
 										addOp(left, right), left outer, lookup);
 	
 	tempLayout := record
-		PhonesInfo.Layout_Common.Phones_Transaction_Main;
+		dx_PhonesInfo.Layouts.Phones_Transaction_Main;
 		string changeid;
 		string timestamp;
 		integer groupid;
@@ -134,9 +136,17 @@
 	concatSW 			:= sdRec + saRec;
 	
 //CONCAT ALL RECORDS
-	concatAll 		:= project(nonSWRec + concatSW, PhonesInfo.Layout_Common.Phones_Transaction_Main);
+	concatAll 		:= project(nonSWRec + concatSW, dx_PhonesInfo.Layouts.Phones_Transaction_Main);
+	
+//ADD RECORD SID
+	dx_PhonesInfo.Layouts.Phones_Transaction_Main trID(concatAll l):= transform
+		self.record_sid 							:= hash64(Mdr.SourceTools.src_Phones_Disconnect + l.phone_swap + l.source + l.carrier_name + l.transaction_code + l.transaction_dt + l.vendor_first_reported_dt) + (integer)l.phone;
+		self 													:= l;
+	end;
+	
+	addID 				:= project(concatAll, trID(left))(transaction_code<>'' and phone<>'');
 	
 //DEDUP RESULTS
-	ddRec					:= dedup(sort(distribute(concatAll(transaction_code<>'' and phone<>''), hash(phone)), record, local), record, local);
+	ddRec					:= dedup(sort(distribute(addID, hash(phone)), record, local), record, local);
 
 EXPORT Remap_Deact_File := ddRec;

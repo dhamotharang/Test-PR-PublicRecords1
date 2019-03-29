@@ -1,6 +1,7 @@
-﻿Import Data_Services, Gong, Mdr, Std, Ut;
+﻿IMPORT Data_Services, dx_PhonesInfo, Gong, Mdr, Std, Ut;
 
 #OPTION ('multiplePersistInstances', FALSE);
+//DF-24397: Create Dx-Prefixed Keys
 
 EXPORT Remap_Deact_Gong_History(string version) := FUNCTION
 
@@ -24,7 +25,7 @@ EXPORT Remap_Deact_Gong_History(string version) := FUNCTION
 	addAddr := project(ds, addA(left));
 	
 	//Output History File (Input)
-	ghHistoryFile := output(addAddr,,'~thor_data400::in::phones::deact_gh_history_'+version, overwrite, __compressed__);
+	//ghHistoryFile := output(addAddr,,'~thor_data400::in::phones::deact_gh_history_'+version, overwrite, __compressed__);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 //Dedup/Remap Gong History Records////////////////////////////////////////////////////////////////////////////
@@ -45,7 +46,7 @@ EXPORT Remap_Deact_Gong_History(string version) := FUNCTION
 	ddRec 		:= dedup(sort(distribute(allRec, hash(p3+phone7)), p3+phone7, address1, -current_record_flag, dt_first_seen, -dt_last_seen, local), p3+phone7, address1, current_record_flag, local);
 
 	tempLayout := record
-		PhonesInfo.Layout_Common.Phones_Transaction_Main;
+		dx_PhonesInfo.Layouts.Phones_Transaction_Main;
 		integer did;
 		integer bdid;
 		integer addID;
@@ -118,21 +119,29 @@ EXPORT Remap_Deact_Gong_History(string version) := FUNCTION
 														left.groupid = right.groupid, 
 														roll(left, right), local)(length(trim(phone, left, right))=10); //Pull Valid Phones
 														
-	fixForm					:= project(aggrTrans_r, PhonesInfo.Layout_Common.Phones_Transaction_Main);
+	fixForm					:= project(aggrTrans_r, dx_PhonesInfo.Layouts.Phones_Transaction_Main);
+	
+	//Add Record SID
+	dx_PhonesInfo.Layouts.Phones_Transaction_Main trID(fixForm l):= transform
+		self.record_sid 								:= hash64(Mdr.SourceTools.Src_Phones_Gong_History_Disconnect + l.transaction_code + l.transaction_dt + l.vendor_first_reported_dt) + (integer)l.phone;
+		self 														:= l;
+	end;
+	
+	addID							:= project(fixForm, trID(left))(length(trim(phone, left, right))=10); //Pull Complete Phones
 		
 	//DEDUP RESULTS
-	ddRecords				:= dedup(sort(distribute(fixForm, hash(phone)), record, local), record, local);
+	ddRecords				:= dedup(sort(distribute(addID, hash(phone)), record, local), record, local);
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	//Exclude Deact Records Where Deact/React Start/End_Dt = Current Date (Potential Gong History Update Record)//
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	filterDate			:= ddRecords(fDate not in [((string)transaction_dt)[1..8]]);
-	filterSameDay		:= ddRecords(fDate in [((string)transaction_dt)[1..8]]):persist('~thor_data400::persist::gong_history_deact_sameDay');
+	filterSameDay		:= ddRecords(fDate in [((string)transaction_dt)[1..8]]):persist('~thor_data400::persist::gong_history_deact_sameDay2');
 	filterSameDayOut:= choosen(filterSameDay, 500);
 
 	//Output Base File
 	ghFile 						:= output(filterDate,,'~thor_data400::base::phones::deact_gh_main_'+version, overwrite, __compressed__);
-	allFiles					:= sequential(ghHistoryFile, ghFile, output(filterSameDayOut));
+	allFiles					:= sequential(/*ghHistoryFile, */ghFile, output(filterSameDayOut));
 
 	RETURN allFiles;
 

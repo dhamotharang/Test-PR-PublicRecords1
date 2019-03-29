@@ -1,7 +1,6 @@
-﻿/*2017-06-26T23:02:50Z (Judy Tao)
-DF-18913: Changes for expanded port file
-*/
-import std, ut;
+﻿IMPORT dx_PhonesInfo, Std, Ut;
+
+	//DF-24397: Create Dx-Prefixed Keys
 
 EXPORT _Functions := MODULE
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -271,7 +270,7 @@ EXPORT _Functions := MODULE
 	//LERG6//////////////////////////////////////////////////////////////////////////////	
 	/////////////////////////////////////////////////////////////////////////////////////
 	
-	EXPORT fn_maxLerg6FileDt(dataset(PhonesInfo.Layout_Lerg.lerg6Main) ds):= function
+	EXPORT fn_maxLerg6FileDt(dataset(dx_PhonesInfo.Layouts.lerg6Main) ds):= function
 
 		dtLayout := record
 			string filename;

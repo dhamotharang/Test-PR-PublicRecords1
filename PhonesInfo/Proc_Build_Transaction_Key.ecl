@@ -1,4 +1,6 @@
-﻿import _control, Dops, Doxie, PromoteSupers, RoxieKeyBuild, Std, Ut, Orbit3;
+﻿IMPORT _control, Dops, Doxie, dx_PhonesInfo, PromoteSupers, RoxieKeyBuild, Std, Ut, Orbit3;
+
+//DF-24397: Create Dx-Prefixed Keys
 
 EXPORT Proc_Build_Transaction_Key(string version):= function
 
@@ -20,7 +22,8 @@ EXPORT Proc_Build_Transaction_Key(string version):= function
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 //Build Transaction Key//////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(PhonesInfo.Key_Phones_Transaction
+	RoxieKeyBuild.Mac_SK_BuildProcess_v3_local(dx_PhonesInfo.Key_Phones_Transaction
+																							,PhonesInfo.File_Phones_Transaction.Main	
 																							,'~thor_data400::key::phones_transaction'
 																							,'~thor_data400::key::'+version+'::phones_transaction'
 																							,bkPhonesTransaction

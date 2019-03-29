@@ -1,4 +1,6 @@
-﻿IMPORT Mdr, PhonesInfo;
+﻿IMPORT dx_PhonesInfo, Mdr, PhonesInfo;
+
+//DF-24397: Create Dx-Prefixed Keys
 
 	//Use Neustar Ported Base File
 	ds 			:= PhonesInfo.File_TCPA.Main_Current;
@@ -7,7 +9,7 @@
 	//Port Add Records
 	ds_add 	:= ds(port_start_dt<>0);
 
-	PhonesInfo.Layout_Common.Phones_Transaction_Main fixPJA(ds_add l):= transform
+	dx_PhonesInfo.Layouts.Phones_Transaction_Main fixPJA(ds_add l):= transform
 		self.source											:= if(l.phonetype='LC', Mdr.SourceTools.Src_PhonesPorted_TCPA,	   //Port: PJ - Landline-to-Cellphone
 																				if(l.phonetype='CL', Mdr.SourceTools.Src_PhonesPorted_TCPA_CL, //Port: PM - Cellphone-to-Landline
 																				''));
@@ -35,7 +37,7 @@
 	//Port Delete Records	
 	ds_del 	:= ds(port_end_dt<>0);
 
-	PhonesInfo.Layout_Common.Phones_Transaction_Main fixPJD(ds_del l):= transform
+	dx_PhonesInfo.Layouts.Phones_Transaction_Main fixPJD(ds_del l):= transform
 		self.source											:= if(l.phonetype='LC', Mdr.SourceTools.Src_PhonesPorted_TCPA,	   //Port: PJ - Landline-to-Cellphone
 																				if(l.phonetype='CL', Mdr.SourceTools.Src_PhonesPorted_TCPA_CL, //Port: PM - Cellphone-to-Landline
 																				''));
@@ -62,6 +64,15 @@
 	
 	//Concat/Dedup Neustar Port Records
 	concatNeustarPort 		:= addRec + delRec;
-	ddNPort								:= dedup(sort(distribute(concatNeustarPort, hash(phone)), record, local), record, local);
+	
+	//Add Record_id
+	dx_PhonesInfo.Layouts.Phones_Transaction_Main trID(concatNeustarPort l) := transform
+		self.record_sid									:= hash64(l.source + l.transaction_code + l.transaction_dt + l.vendor_first_reported_dt) + (integer)l.phone;
+		self														:= l;
+	end;
+	
+	addID		:= project(concatNeustarPort, trID(left));
+
+	ddNPort	:= dedup(sort(distribute(addID, hash(phone)), record, local), record, local);
 
 EXPORT Remap_TCPA_File 	:= ddNPort;

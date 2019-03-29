@@ -1,8 +1,9 @@
-﻿IMPORT _control, Gong, Mdr, PhonesPlus_v2, Ut;
+﻿IMPORT _control, dx_PhonesInfo, Gong, Mdr, PhonesPlus_v2, Ut;
 
 	//DF-24037: Replace LIDB Use Lerg6 for Carrier Info
 	//DF-24394: Add dt_first_reported/dt_last_reported to the L6 records for consistency (historical LIDB format)
-
+	//DF-24397: Create Dx-Prefixed Keys
+	
 EXPORT Map_L6_OCN_Serv_Line_Append(string version) := FUNCTION
 	
 	//Append OCNs to New Phones / Phones w/ Changed DIDs, Using the Lerg6
@@ -10,13 +11,13 @@ EXPORT Map_L6_OCN_Serv_Line_Append(string version) := FUNCTION
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Step 1: Determine New Phones / Phones with Changed DIDs//////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////	
-	dsL6							:= PhonesInfo.Key_Phones_Lerg6;					//Lerg6
+	dsL6							:= dx_PhonesInfo.Key_Phones_Lerg6;			//Lerg6
 	dsNewPhone				:= PhonesInfo.File_Lerg.Lerg6NewPhone;	//New Phones/Phones with Changed DIDs or Phone Refresh
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Step 2: Run New Phone Records Through Lerg6 by Phone[1..7]///////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	srtL6							:= sort(distribute(dsL6, hash(npa+nxx+block_id)), npa, nxx, block_id, local);	
+	srtL6							:= sort(distribute(dsL6, hash(npa+nxx+block_id)), npa+nxx+block_id, local);	
 	srtNewPhone				:= sort(distribute(dsNewPhone, hash(phone[1..7])), phone[1..7], local);
 
 	//Reformatting to PMT Layout
@@ -223,4 +224,4 @@ EXPORT Map_L6_OCN_Serv_Line_Append(string version) := FUNCTION
 	
 	RETURN applyDates;
 	
-END;	
+END;
