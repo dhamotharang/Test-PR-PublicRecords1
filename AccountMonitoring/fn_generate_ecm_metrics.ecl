@@ -31,7 +31,7 @@ SHARED get_product_name(AccountMonitoring.types.productMask nth_product) :=
 				 AccountMonitoring.types.productMask.mvr	 					 => 'MVR',
 				 AccountMonitoring.types.productMask.aircraft				 => 'AIRCRAFT',
 				 AccountMonitoring.types.productMask.watercraft			 => 'WATERCRAFT',
-				 AccountMonitoring.types.productMask.personheader			 => 'personheader',
+				 AccountMonitoring.types.productMask.personheader			 => 'PERSONHEADER',
 				'UNKNOWN'
 			);
 		RETURN product_name;

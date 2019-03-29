@@ -7,7 +7,7 @@ EXPORT DATASET(AccountMonitoring.layouts.history) fn_cgm_personheader(
 	) := 
 	FUNCTION
 	
-		// Linkid Key, VehicleV2.Key_Vehicle_linkids.key
+		// 
 		Key_DID := 
 			DISTRIBUTED(
 				AccountMonitoring.product_files.header_files.doxie_key_header_slim, 
@@ -28,24 +28,23 @@ EXPORT DATASET(AccountMonitoring.layouts.history) fn_cgm_personheader(
 		// Pivot on did
 		temp_port_dist_did  := DISTRIBUTE(in_portfolio(did != 0),HASH64(did));
 		
-/* 		// Tranform to data layout since only DID key is needed for monitoring
-   		temp_join_linkid_rcid := JOIN(Key_DID,temp_port_dist_did,
-   																BIPV2.IDmacros.mac_JoinTop3Linkids(),
+ 		// Tranform to data layout since only DID key is needed for monitoring
+   	temp_slim := project (temp_port_dist_did,
    																TRANSFORM(temp_layout,
    																	SELF.pid  					:= RIGHT.pid,
    																	SELF.rid  					:= RIGHT.rid,
    																	SELF.hid  					:= RIGHT.hid,
    																	SELF.SSN          := LEFT.SSN;
    																	SELF.DOB 	       := LEFT.DOB;
-   																	SELF      			:= RIGHT),
+   																	SELF      			    := LEFT),
    																LOCAL);		
    		
-*/
-		temp_joins_dedup := DEDUP(SORT(DISTRIBUTE(temp_port_dist_did,HASH64(pid,rid)),pid,rid,ssn,dob,local),pid,rid,ssn,dob,local);
+
+		temp_dedup := DEDUP(SORT(DISTRIBUTE(temp_slim,HASH64(pid,rid)),pid,rid,ssn,dob,local),pid,rid,ssn,dob,local);
 	 
 	 	// Create hash value on monitored fields. 
 		temp_unrolled_hashes := 
-			PROJECT(temp_joins_dedup,
+			PROJECT(temp_dedup,
 							TRANSFORM(AccountMonitoring.layouts.history,
 								SELF.pid          := LEFT.pid,
 								SELF.rid          := LEFT.rid,
