@@ -14,7 +14,7 @@ EXPORT Key_LinkIds := MODULE
   ),hash,keep(1),left outer);
   
 	shared dkeybuild	:= project(Base, transform(layouts.key, self := left, self := []));
-	BIPV2.IDmacros.mac_IndexWithXLinkIDs(dkeybuild, k, /*superfile_name*/'~thor_data400::key::bipv2_best::20190304b::linkids')
+	BIPV2.IDmacros.mac_IndexWithXLinkIDs(dkeybuild, k, superfile_name)
 	export Key := k; // FOR DEBUG USE ONLY -- Do not reference this in production code!
 	// export KeyPlus := BIPV2.mac_AddStatus(project(Key, {Key, string50 company_status_derived := ''})); //with company_status_derived, isactive, isdefunct
 	export KeyPlus := project(Key, {Key, string50 company_status_derived := ''}); //with company_status_derived, isactive, isdefunct
