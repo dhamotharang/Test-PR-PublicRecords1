@@ -9,6 +9,8 @@ C:\Users\prichajx\AppData\Roaming\HPCC Systems\eclide\jprichard\Dataland\KELOtto
 ERA reportedby BEFORE(DateFirstSeen=NULL(MIN));
 ERA reportedbetween BETWEEN(DateFirstSeen=NULL(MIN), DateLastSeen=NULL(MAX));
 
+FUNCTION: CleanSpaces(STRING s) <= ECL(STD.Str.CleanSpaces(s)) FROM Std RETURNS STRING;
+
 //GLOBAL: => HighFrequencyAddressThreshold := 20;
 
 Customer := ENTITY(FLAT(UID=TargetCustomerHash,
@@ -1298,6 +1300,9 @@ Event: => KrIp605Flag := MAP(COUNT(EventTypes(EventType IN ['605']))>0 => 1, 0);
 Event: => KrIp1000Flag := MAP(COUNT(EventTypes(EventType IN ['1000']))>0 => 1, 0);
 Event: => KrIp1001Flag := MAP(COUNT(EventTypes(EventType IN ['1001']))>0 => 1, 0);
 
+Event: => KrId1010Flag := MAP(COUNT(EventTypes(EventType IN ['1010']))>0 => 1, 0);
+Event: => KrId2025Flag := MAP(COUNT(EventTypes(EventType IN ['2025']))>0 => 1, 0);
+
 Event: => KrId10000Flag := MAP(COUNT(EventTypes(EventType IN ['10000']))>0 => 1, 0);
 Event: => KrId10001Flag := MAP(COUNT(EventTypes(EventType IN ['10001']))>0 => 1, 0);
 Event: => KrId10002Flag := MAP(COUNT(EventTypes(EventType IN ['10002']))>0 => 1, 0);
@@ -1487,6 +1492,8 @@ Person: => KrHighRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrHighRiskIdentit
 Person: => KrMediumRiskFlag := MAP(COUNT(PersonEvent.Transaction(KrMediumRiskIdentityFlag=1))>0 => 1, 0);
 Person: => KrHighRiskRouting := MAP(COUNT(PersonBankAccount.Account(HighRiskRouting=1))>0 => 1, 0);
 
+Person: => KrId1010Flag := MAP(COUNT(PersonEvent.Transaction(KrId1010Flag=1))>0 => 1, 0);
+Person: => KrId2025Flag := MAP(COUNT(PersonEvent.Transaction(KrId2025Flag=1))>0 => 1, 0);
 Person: => KrId10000Flag := MAP(COUNT(PersonEvent.Transaction(KrId10000Flag=1))>0 => 1, 0);
 Person: => KrId10001Flag := MAP(COUNT(PersonEvent.Transaction(KrId10001Flag=1))>0 => 1, 0);
 Person: => KrId10002Flag := MAP(COUNT(PersonEvent.Transaction(KrId10002Flag=1))>0 => 1, 0);
@@ -2036,8 +2043,8 @@ Address: => CustomerId := rCustomer.CustomerId;
 Address: => IndustryType := rCustomer.IndustryType;
 Address: => InCustomerPopulation := MAP(COUNT(SourceCustomers(rSourceCustomer=rCustomer))>0 => 1, 0);
 Address: => SourceCustomerCount := COUNT(SourceCustomers);
-Address: => FullAddress := TRIM(TRIM(PrimaryRange) + ' ' + TRIM(TRIM(Predirectional) + ' ' + TRIM(TRIM(PrimaryName) + ' ' + TRIM(TRIM(Suffix) + ' ' + TRIM(TRIM(Postdirectional) + ' ' + TRIM(TRIM(UnitDesignation) + ' ' + TRIM(TRIM(SecondaryRange) + ' ' + TRIM(TRIM(VanityCity) + ' ' + TRIM(State)))))))));
-Address: => StreetAddress := TRIM(TRIM(PrimaryRange) + ' ' + TRIM(TRIM(Predirectional) + ' ' + TRIM(TRIM(PrimaryName) + ' ' + TRIM(TRIM(Suffix) + ' ' + TRIM(TRIM(Postdirectional) + ' ' + TRIM(TRIM(UnitDesignation) + ' ' + TRIM(TRIM(SecondaryRange))))))));
+Address: => FullAddress := CleanSpaces(TRIM(TRIM(PrimaryRange) + ' ' + TRIM(TRIM(Predirectional) + ' ' + TRIM(TRIM(PrimaryName) + ' ' + TRIM(TRIM(Suffix) + ' ' + TRIM(TRIM(Postdirectional) + ' ' + TRIM(TRIM(UnitDesignation) + ' ' + TRIM(TRIM(SecondaryRange) + ' ' + TRIM(TRIM(VanityCity) + ' ' + TRIM(State))))))))));
+Address: => StreetAddress := CleanSpaces(TRIM(TRIM(PrimaryRange) + ' ' + TRIM(TRIM(Predirectional) + ' ' + TRIM(TRIM(PrimaryName) + ' ' + TRIM(TRIM(Suffix) + ' ' + TRIM(TRIM(Postdirectional) + ' ' + TRIM(TRIM(UnitDesignation) + ' ' + TRIM(TRIM(SecondaryRange)))))))));
 Address: => EntityContextUid := '_09' + OttoAddressId;
 Address: => EntityType := 9;
 
