@@ -1,4 +1,4 @@
-﻿import doxie_files, ut, doxie, autokey;
+﻿import doxie_files, Data_Services, doxie, autokey;
 
 f_qsent := _keybuild_qsent_base;//Phonesplus.file_qsent_base;
 
@@ -19,4 +19,4 @@ DS_qsent_xpand := project(f_qsent, xpand_qsent(left, counter));
 //ut.mac_suppress_by_phonetype(ph_out1,cellphone,state,ph_out2,true,did);
 
 export key_qsent_fdid := index(DS_qsent_xpand,{fdid},{DS_qsent_xpand},
-                               ut.foreign_prod + 'thor_data400::key::qsent_fdids_' + doxie.Version_SuperKey);
+                               Data_Services.foreign_prod + 'thor_data400::key::qsent_fdids_' + doxie.Version_SuperKey);
