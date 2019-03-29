@@ -204,6 +204,24 @@ Boolean VALIDATION := false; //True when validating model, false for production 
     //Added for Paro 9-2018
     skiptrace_Prep := project(ungroup(iid), transform(risk_indicators.Layout_input, self := left));
     skiptrace_call := riskwise.skip_trace(skiptrace_Prep, args.DPPA, args.GLB, args.DataRestriction, '', args.DataPermission);
+    
+    riskwise.Layout_SkipTrace get_confidence(riskwise.Layout_SkipTrace le, risk_indicators.layout_output rt) := transform
+      self.addr_confidence_a := map(le.addr_type_a='X' => '',
+      
+                                    le.addr_type_a in ['U','C'] and rt.chronophone<>'' and
+                                    risk_indicators.ga(Risk_Indicators.AddrScore.AddressScore(le.prim_range, le.prim_name, le.sec_range, rt.chronoprim_range, rt.chronoprim_name, rt.chronosec_range)) => 'A',
+
+                                    le.addr_type_a in ['U','C'] and rt.chronophone='' and
+                                    risk_indicators.ga(Risk_Indicators.AddrScore.AddressScore(le.prim_range, le.prim_name, le.sec_range, rt.chronoprim_range, rt.chronoprim_name, rt.chronosec_range)) => 'B',
+
+                                    risk_indicators.ga(Risk_Indicators.AddrScore.AddressScore(le.prim_range, le.prim_name, le.sec_range, rt.chronoprim_range2, rt.chronoprim_name2, rt.chronosec_range2)) => 'B',
+
+                                    risk_indicators.ga(Risk_Indicators.AddrScore.AddressScore(le.prim_range, le.prim_name, le.sec_range, rt.chronoprim_range3, rt.chronoprim_name3, rt.chronosec_range3)) => 'C',
+                                    '');							
+      self := le;		
+    end;
+
+  full_skiptrace := join(skiptrace_call, iid, LEFT.seq= RIGHT.seq, get_confidence(left,right) );
     								
     easi_census := join(ungroup(iid), Easi.Key_Easi_Census,
                         keyed(left.st+left.county+left.geo_blk=right.geolink) and model_name IN Models.FraudAdvisor_Constants.Paro_models,
@@ -918,7 +936,7 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 			model_name = 'fp1210_1' 	=> ungroup(Models.FP1210_1_0( clam )), 	// TRIS - Custom FraudPoint Model
 		  model_name = 'fp1409_2' 	=> Models.FP1409_2_0( ungroup(clam_BtSt)), //Synchrony - Custom BTST model
       model_name IN ['msn1803_1', 'msnrsn_1']  => Models.MSN1803_1_0( ungroup(clam) ),
-      model_name = 'rsn804_1'  => Models.RSN804_1_0( clam, skiptrace_call, easi_census ),
+      model_name = 'rsn804_1'  => Models.RSN804_1_0( clam, full_skiptrace, easi_census ),
 			model_name = '' or model_name in fraudpoint2_models + fraudpoint3_models => dataset( [], Models.Layout_ModelOut ),
 			fail(Models.Layout_ModelOut, 'Invalid fraud version/model input combination')
 		);
@@ -962,7 +980,7 @@ Boolean VALIDATION := false; //True when validating model, false for production 
 		);
     
     Second_model_score := CASE(model_name,
-                               'msnrsn_1' => Models.RSN804_1_0( clam, skiptrace_call, easi_census ),
+                               'msnrsn_1' => Models.RSN804_1_0( clam, full_skiptrace, easi_census ),
                                              dataset( [], Models.Layout_ModelOut )
                               );
 		

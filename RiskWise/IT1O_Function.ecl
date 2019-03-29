@@ -156,8 +156,6 @@ end;
 full_skip_trace := join(skiptrace, iid_results, LEFT.seq= RIGHT.seq, get_confidence(left,right) );
 
 
-
-
 // fill in as much as possible from iid_function results	
 dwelltype(STRING1 at) := MAP(at='F' => '', at='G' => 'S', at='H' => 'A', at='P' => 'E', at='R' => 'R', at='S' => '', '');					  		
 invalidSet := ['E101','E212','E213','E214','E216','E302','E412','E413','E420','E421','E423','E500','E501','E502','E503','E600'];
@@ -749,7 +747,7 @@ end;
 withModel := join(mapped_results, firstscore, left.seq*2=right.seq, addModel(left,right),left outer);
 
 thirdscore := map(
-	tribcode in ['it37','it61'] => Models.RSN804_1_0( clam, skiptrace, easi_census ),
+	tribcode in ['it37','it61'] => Models.RSN804_1_0( clam, full_skip_trace, easi_census ),
 	dataset([],Models.Layout_ModelOut)
 );
 
