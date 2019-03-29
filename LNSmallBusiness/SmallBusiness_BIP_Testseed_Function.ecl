@@ -2549,7 +2549,7 @@ EXPORT SmallBusiness_BIP_Testseed_Function (
 			EXISTS(ModelsRequested(ModelName = BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL)) AND 
 			getHashValue_for_models(LEFT) = RIGHT.HashValue) AND
 			RIGHT.modelname = BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL, 
-			getModelKey(LEFT, RIGHT), INNER, KEEP(1)
+			getModelKey(LEFT, RIGHT),ATMOST(100), INNER, KEEP(1)	
 		);
  SLBO1702_0_2_results := 
 		JOIN(
@@ -2558,7 +2558,7 @@ EXPORT SmallBusiness_BIP_Testseed_Function (
 			EXISTS(ModelsRequested(ModelName = BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO)) AND 
 			getHashValue_for_models(LEFT) = RIGHT.HashValue) AND
 			RIGHT.modelname = BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO, 
-			getModelKey(LEFT, RIGHT), INNER, KEEP(1)
+			getModelKey(LEFT, RIGHT),ATMOST(100), INNER, KEEP(1)		
 		);
 	SBBM1601_0_0_results := 
 		JOIN(
@@ -2567,7 +2567,7 @@ EXPORT SmallBusiness_BIP_Testseed_Function (
 			EXISTS(ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL)) AND 
 			getHashValue_for_models(LEFT) = RIGHT.HashValue) AND
 			RIGHT.modelname = BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL, 
-			getModelKey(LEFT, RIGHT), INNER, KEEP(1)
+			getModelKey(LEFT, RIGHT),ATMOST(100), INNER, KEEP(1)		
 		);
 	SLBB1702_0_2_results := 
 		JOIN(
@@ -2576,7 +2576,7 @@ EXPORT SmallBusiness_BIP_Testseed_Function (
 			EXISTS(ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB)) AND 
 			getHashValue_for_models(LEFT) = RIGHT.HashValue) AND
 			RIGHT.modelname = BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB, 
-			getModelKey(LEFT, RIGHT), INNER, KEEP(1)
+			getModelKey(LEFT, RIGHT),ATMOST(100), INNER, KEEP(1)		
 		);
     SLBB1809_0_0_results := 
 		JOIN(
@@ -2585,7 +2585,7 @@ EXPORT SmallBusiness_BIP_Testseed_Function (
 			EXISTS(ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL)) AND 
 			getHashValue_for_models(LEFT) = RIGHT.HashValue) AND
 			RIGHT.modelname = BusinessCredit_Services.Constants.BLENDED_SCORE_SLBBNFEL, 
-			getModelKey(LEFT, RIGHT), INNER, KEEP(1)
+			getModelKey(LEFT, RIGHT),ATMOST(100), INNER, KEEP(1)		
 		);
      SLBO1809_0_0_results := 
 		JOIN(
@@ -2594,7 +2594,7 @@ EXPORT SmallBusiness_BIP_Testseed_Function (
 			EXISTS(ModelsRequested(ModelName = BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL)) AND 
 			getHashValue_for_models(LEFT) = RIGHT.HashValue) AND
 			RIGHT.modelname = BusinessCredit_Services.Constants.CREDIT_SCORE_SLBONFEL, 
-			getModelKey(LEFT, RIGHT), INNER, KEEP(1)
+			getModelKey(LEFT, RIGHT),ATMOST(100), INNER, KEEP(1)		
 		);
     BBFM1808_1_0_results :=
     JOIN(
@@ -2603,7 +2603,7 @@ EXPORT SmallBusiness_BIP_Testseed_Function (
 			EXISTS(ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM)) AND 
 			getHashValue_for_models(LEFT) = RIGHT.HashValue) AND
 			RIGHT.modelname = BusinessCredit_Services.Constants.BLENDED_SCORE_BBFM, 
-			getModelKey(LEFT, RIGHT),ATMOST(1), INNER, KEEP(1)
+			getModelKey(LEFT, RIGHT),ATMOST(100), INNER, KEEP(1)		
 		);
     
 	Model_Results := 
