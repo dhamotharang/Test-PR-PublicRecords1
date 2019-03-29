@@ -1,4 +1,4 @@
-﻿
+﻿﻿
 export Healthcare_SocioEconomic_RT_Service := MACRO
 import risk_indicators, models, std, Profilebooster;
 IMPORT LUCI, ut, STD;
@@ -69,14 +69,17 @@ IMPORT iesp;
 	BOOLEAN isAttributesRequested := (BOOLEAN) RequestOptions.IncludeHealthAttributesV3;
 	BOOLEAN isReadmissionRequested := (BOOLEAN) RequestOptions.IncludeReadmissionScore;
 	BOOLEAN isMedicationAdherenceRequested := (BOOLEAN) RequestOptions.IncludeMedicationAdherenceScore;
+	BOOLEAN isMotivationRequested := (BOOLEAN) RequestOptions.IncludeMotivationScore;
 
 	BOOLEAN isAttributesSubscribed := Models.Healthcare_SocioEconomic_Functions_RT_Service.getBooleanFlagValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_SubscribedToHealthAttributesV3);
 	BOOLEAN isReadmissionSubscribed := Models.Healthcare_SocioEconomic_Functions_RT_Service.getBooleanFlagValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_SubscribedToReadmissionScore);
 	BOOLEAN isMedicationAdherenceSubscribed := Models.Healthcare_SocioEconomic_Functions_RT_Service.getBooleanFlagValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_SubscribedToMedicationAdherenceScore);
+	BOOLEAN isMotivationSubscribed := Models.Healthcare_SocioEconomic_Functions_RT_Service.getBooleanFlagValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_SubscribedToMotivationScore);
 
 	// isAttributesSubscribed;
 	// isReadmissionSubscribed;
 	// isMedicationAdherenceSubscribed;
+	// isMotivationSubscribed
 
 	EmptyExceptionDS0 := DATASET([], iesp.share.t_WsException);
 	_EmptyExceptionDSRow0 := ROW({_blank,0,_blank,_blank}, iesp.share.t_WsException);
@@ -87,14 +90,17 @@ IMPORT iesp;
 	// isReadmissionRequestValid;
 	isMedicationAdherenceRequestValid := IF(isMedicationAdherenceRequested, IF(isMedicationAdherenceRequested = isMedicationAdherenceSubscribed,TRUE,FALSE),TRUE);
 	// isMedicationAdherenceRequestValid;
+	isMotivationRequestValid := IF(isMotivationRequested, IF(isMotivationRequested = isMotivationSubscribed,TRUE,FALSE),TRUE);
+	// isMedicationAdherenceRequestValid;
 
 	AttributesFailMessage := IF(isAttributesRequestValid,_blank, Models.Healthcare_Constants_RT_Service.AttributesSubFailMessage);
 	ReadmissionFailMessage := IF(isReadmissionRequestValid,_blank, Models.Healthcare_Constants_RT_Service.ReadmissionSubFailMessage);
 	MedicationAdherenceFailMessage := IF(isMedicationAdherenceRequestValid,_blank, Models.Healthcare_Constants_RT_Service.MedicationAdherenceSubFailMessage);
-	RequestFailedMessage := Models.Healthcare_Constants_RT_Service.SubInvalidRequest + AttributesFailMessage + ReadmissionFailMessage + MedicationAdherenceFailMessage;
+	MotivationFailMessage := IF(isMotivationRequestValid,_blank, Models.Healthcare_Constants_RT_Service.MotivationSubFailMessage);
+	RequestFailedMessage := Models.Healthcare_Constants_RT_Service.SubInvalidRequest + AttributesFailMessage + ReadmissionFailMessage + MedicationAdherenceFailMessage + MotivationFailMessage;
 	
 	//Exception#1
-	SubscriptionFail_DS := EmptyExceptionDS0 + IF(isAttributesRequestValid = FALSE OR isReadmissionRequestValid = FALSE OR isMedicationAdherenceRequestValid = FALSE, ROW({_blank, Models.Healthcare_Constants_RT_Service.InvalidInput_Code, _blank, RequestFailedMessage}, iesp.share.t_WsException), _EmptyExceptionDSRow0);
+	SubscriptionFail_DS := EmptyExceptionDS0 + IF(isAttributesRequestValid = FALSE OR isReadmissionRequestValid = FALSE OR isMedicationAdherenceRequestValid = FALSE OR isMotivationRequestValid = FALSE, ROW({_blank, Models.Healthcare_Constants_RT_Service.InvalidInput_Code, _blank, RequestFailedMessage}, iesp.share.t_WsException), _EmptyExceptionDSRow0);
 
 	Models.Layouts_Healthcare_RT_Service.common_runtime_config getCfg() := transform
 			custID := if(first_row.user.CompanyId <> _blank and first_row.user.CompanyId <> first_row.AccountContext.Common.GlobalCompanyId,first_row.user.CompanyId,first_row.AccountContext.Common.GlobalCompanyId);
@@ -104,6 +110,7 @@ IMPORT iesp;
 			self.SubscribedToHealthAttributesV3 := Models.Healthcare_SocioEconomic_Functions_RT_Service.getBooleanFlagValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_SubscribedToHealthAttributesV3);
 			self.SubscribedToReadmissionScore := Models.Healthcare_SocioEconomic_Functions_RT_Service.getBooleanFlagValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_SubscribedToReadmissionScore);
 			self.SubscribedToMedicationAdherenceScore := Models.Healthcare_SocioEconomic_Functions_RT_Service.getBooleanFlagValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_SubscribedToMedicationAdherenceScore);
+			self.SubscribedToMotivationScore := Models.Healthcare_SocioEconomic_Functions_RT_Service.getBooleanFlagValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_SubscribedToMotivationScore);
 
 			self.SuppressAccident := Models.Healthcare_SocioEconomic_Functions_RT_Service.getBooleanFlagValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_SuppressAccident);
 			self.SuppressAddressStability := Models.Healthcare_SocioEconomic_Functions_RT_Service.getBooleanFlagValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_SuppressAddressStability);
@@ -174,6 +181,28 @@ IMPORT iesp;
 			self.MedicationAdherenceScore_Category_2_Low := IF(val_MedicationAdherenceScore_Category_2_Low<> 0, val_MedicationAdherenceScore_Category_2_Low ,Models.Healthcare_Constants_RT_Service.val_MedicationAdherenceScore_Category_2_Low );
 			self.MedicationAdherenceScore_Category_1_High := IF(val_MedicationAdherenceScore_Category_1_High<> 0, val_MedicationAdherenceScore_Category_1_High ,Models.Healthcare_Constants_RT_Service.val_MedicationAdherenceScore_Category_1_High );
 			self.MedicationAdherenceScore_Category_1_Low := IF(val_MedicationAdherenceScore_Category_1_Low <> 0, val_MedicationAdherenceScore_Category_1_Low ,Models.Healthcare_Constants_RT_Service.val_MedicationAdherenceScore_Category_1_Low );
+			
+			val_MotivationScore_Category_5_High := (DECIMAL7_4) Models.Healthcare_SocioEconomic_Functions_RT_Service.getCatThresholdValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_MotivationScore_Category_5_High);
+			val_MotivationScore_Category_5_Low := (DECIMAL7_4) Models.Healthcare_SocioEconomic_Functions_RT_Service.getCatThresholdValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_MotivationScore_Category_5_Low);
+			val_MotivationScore_Category_4_High := (DECIMAL7_4) Models.Healthcare_SocioEconomic_Functions_RT_Service.getCatThresholdValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_MotivationScore_Category_4_High);
+			val_MotivationScore_Category_4_Low := (DECIMAL7_4) Models.Healthcare_SocioEconomic_Functions_RT_Service.getCatThresholdValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_MotivationScore_Category_4_Low);
+			val_MotivationScore_Category_3_High := (DECIMAL7_4) Models.Healthcare_SocioEconomic_Functions_RT_Service.getCatThresholdValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_MotivationScore_Category_3_High);
+			val_MotivationScore_Category_3_Low := (DECIMAL7_4) Models.Healthcare_SocioEconomic_Functions_RT_Service.getCatThresholdValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_MotivationScore_Category_3_Low);
+			val_MotivationScore_Category_2_High := (DECIMAL7_4) Models.Healthcare_SocioEconomic_Functions_RT_Service.getCatThresholdValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_MotivationScore_Category_2_High);
+			val_MotivationScore_Category_2_Low := (DECIMAL7_4) Models.Healthcare_SocioEconomic_Functions_RT_Service.getCatThresholdValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_MotivationScore_Category_2_Low);
+			val_MotivationScore_Category_1_High := (DECIMAL7_4) Models.Healthcare_SocioEconomic_Functions_RT_Service.getCatThresholdValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_MotivationScore_Category_1_High);
+			val_MotivationScore_Category_1_Low := (DECIMAL7_4) Models.Healthcare_SocioEconomic_Functions_RT_Service.getCatThresholdValueForKeyFromIESP(cfg_DS_Sections, Models.Healthcare_Constants_RT_Service.CFG_MBS_MotivationScore_Category_1_Low);
+
+			self.MotivationScore_Category_5_High := IF(val_MotivationScore_Category_5_High <> 0,val_MotivationScore_Category_5_High ,Models.Healthcare_Constants_RT_Service.val_MotivationScore_Category_5_High );
+			self.MotivationScore_Category_5_Low := IF(val_MotivationScore_Category_5_Low <> 0, val_MotivationScore_Category_5_Low ,Models.Healthcare_Constants_RT_Service.val_MotivationScore_Category_5_Low );
+			self.MotivationScore_Category_4_High := IF(val_MotivationScore_Category_4_High<> 0, val_MotivationScore_Category_4_High ,Models.Healthcare_Constants_RT_Service.val_MotivationScore_Category_4_High );
+			self.MotivationScore_Category_4_Low := IF(val_MotivationScore_Category_4_Low<> 0, val_MotivationScore_Category_4_Low ,Models.Healthcare_Constants_RT_Service.val_MotivationScore_Category_4_Low );
+			self.MotivationScore_Category_3_High := IF(val_MotivationScore_Category_3_High<> 0, val_MotivationScore_Category_3_High ,Models.Healthcare_Constants_RT_Service.val_MotivationScore_Category_3_High );
+			self.MotivationScore_Category_3_Low := IF(val_MotivationScore_Category_3_Low<> 0, val_MotivationScore_Category_3_Low ,Models.Healthcare_Constants_RT_Service.val_MotivationScore_Category_3_Low );
+			self.MotivationScore_Category_2_High := IF(val_MotivationScore_Category_2_High<> 0, val_MotivationScore_Category_2_High ,Models.Healthcare_Constants_RT_Service.val_MotivationScore_Category_2_High );
+			self.MotivationScore_Category_2_Low := IF(val_MotivationScore_Category_2_Low<> 0, val_MotivationScore_Category_2_Low ,Models.Healthcare_Constants_RT_Service.val_MotivationScore_Category_2_Low );
+			self.MotivationScore_Category_1_High := IF(val_MotivationScore_Category_1_High<> 0, val_MotivationScore_Category_1_High ,Models.Healthcare_Constants_RT_Service.val_MotivationScore_Category_1_High );
+			self.MotivationScore_Category_1_Low := IF(val_MotivationScore_Category_1_Low <> 0, val_MotivationScore_Category_1_Low ,Models.Healthcare_Constants_RT_Service.val_MotivationScore_Category_1_Low );
 			self := [];
 	end;
 	dsCfg := dataset([getCfg()]);
@@ -191,18 +220,32 @@ IMPORT iesp;
 		dsCfg[1].MedicationAdherenceScore_Category_2_Low <= dsCfg[1].MedicationAdherenceScore_Category_3_High OR
 		dsCfg[1].MedicationAdherenceScore_Category_1_Low <= dsCfg[1].MedicationAdherenceScore_Category_2_High,
 		FAIL('Overlapping MedicationAdherenceScore_Category thresholds supplied.'));
+	// Checking the MotivationScore_Category thresholds for overlaps 
+	IF(dsCfg[1].MotivationScore_Category_4_Low <= dsCfg[1].MotivationScore_Category_5_High OR 
+		dsCfg[1].MotivationScore_Category_3_Low <= dsCfg[1].MotivationScore_Category_4_High OR
+		dsCfg[1].MotivationScore_Category_2_Low <= dsCfg[1].MotivationScore_Category_3_High OR
+		dsCfg[1].MotivationScore_Category_1_Low <= dsCfg[1].MotivationScore_Category_2_High,
+		FAIL('Overlapping MotivationScore_Category thresholds supplied.'));
 
 	// Exception#2 and Exception#3
 	Condition_1_2_Minor_Reject_DS := Models.Healthcare_SocioEconomic_Transforms_RT_Service.BuildMinInputErrorsDS(Cleaned_Input);
 
 	//Core option resolution
-	Socio_Core_Option := MAP(isAttributesRequested = TRUE AND isReadmissionRequested = TRUE AND isMedicationAdherenceRequested = TRUE => '5M',
+	Socio_Core_Option := MAP(isAttributesRequested = TRUE AND isReadmissionRequested = TRUE AND isMedicationAdherenceRequested = TRUE AND isMotivationRequested = TRUE => '5MO',
+							isAttributesRequested = TRUE AND isMedicationAdherenceRequested = TRUE AND isMotivationRequested = TRUE => '1MO',
+							isReadmissionRequested = TRUE AND isMedicationAdherenceRequested = TRUE AND isMotivationRequested = TRUE => '2MO',
+							isAttributesRequested = TRUE AND isReadmissionRequested = TRUE AND isMotivationRequested = TRUE => '5O',
+							isAttributesRequested = TRUE AND isMotivationRequested = TRUE => '1O',
+							isReadmissionRequested = TRUE AND isMotivationRequested = TRUE => '2O',
+							isMedicationAdherenceRequested = TRUE AND isMotivationRequested = TRUE => 'MO',
+							isAttributesRequested = TRUE AND isReadmissionRequested = TRUE AND isMedicationAdherenceRequested = TRUE => '5M',
 							isAttributesRequested = TRUE AND isMedicationAdherenceRequested = TRUE => '1M',
 							isReadmissionRequested = TRUE AND isMedicationAdherenceRequested = TRUE => '2M',
 							isAttributesRequested = TRUE AND isReadmissionRequested = TRUE => '5',
 							isAttributesRequested = TRUE => '1',
 							isReadmissionRequested = TRUE => '2',
 							isMedicationAdherenceRequested = TRUE => 'M',
+							isMotivationRequested = TRUE => 'O',
 							'1');
 	// OUTPUT(Socio_Core_Option, NAMED('Socio_Core_Option'));
 
@@ -234,7 +277,7 @@ IMPORT iesp;
 	PreCoreException_DS := SubscriptionFail_DS + Condition_1_2_Minor_Reject_DS + GLB_DPPA_Exceptions_DS;
 	ExceptionsInInputRequest := IF(COUNT(PreCoreException_DS(code<>0)) > 0, TRUE, FALSE);
 
-	Boolean NothingIsRequested := IF(isAttributesRequested = FALSE AND isReadmissionRequested = FALSE AND isMedicationAdherenceRequested = FALSE, TRUE, FALSE);
+	Boolean NothingIsRequested := IF(isAttributesRequested = FALSE AND isReadmissionRequested = FALSE AND isMedicationAdherenceRequested = FALSE AND isMotivationRequested = FALSE, TRUE, FALSE);
 	isCoreRequestValid := IF(NothingIsRequested = FALSE AND ExceptionsInInputRequest = FALSE, TRUE, FALSE);
 
 	DataRestrictionMask_in := (string) TRIM(first_row.user.DataRestrictionMask, LEFT, RIGHT);
@@ -242,11 +285,12 @@ IMPORT iesp;
 	IF(DataRestrictionMask_in=_blank, FAIL('A blank DataRestrictionMask value is supplied.'));
 	IF(DataPermissionMask_in=_blank, FAIL('A blank DataPermissionMask value is supplied.'));
 	// Calling Socio core
-	//TODO: Pass additional parameters to the core, set them to defaults unless otherwise directed. Set ofac_version_in, gateways_in_ds
+	//Passing additional parameters to the core, set them to defaults unless otherwise directed. Set ofac_version_in, gateways_in_ds
 	unsigned1 ofac_version_in := 1; //Set to default
 	gateways_in_ds := dataset([], Gateway.Layouts.Config); //Set to default
+	
 	Models.Healthcare_SocioEconomic_Core(isCoreRequestValid, batch_in, DPPAPurpose_in, GLBPurpose_in, DataRestrictionMask_in, DataPermissionMask_in, Socio_Core_Option, ofac_version_in, gateways_in_ds, coreResults);
-  	// Models.Healthcare_SocioEconomic_Core(isCoreRequestValid, batch_in, DPPAPurpose_in, GLBPurpose_in, DataRestrictionMask_in, DataPermissionMask_in, Socio_Core_Option, coreResults);
+	// Models.Healthcare_SocioEconomic_Core(isCoreRequestValid, batch_in, DPPAPurpose_in, GLBPurpose_in, DataRestrictionMask_in, DataPermissionMask_in, Socio_Core_Option, coreResults);
   	// OUTPUT(coreResults, NAMED('coreResults'));
 
   	EmptyCoreResults0 := dataset([], Models.Layouts_Healthcare_Core.Final_Output_Layout);
@@ -262,7 +306,7 @@ IMPORT iesp;
 
 	FinalException_DS := PreCoreException_DS + ADLScoreFail_DS;
 
-	SocioScoresDS := Models.Healthcare_SocioEconomic_Transforms_RT_Service.PopulateScoresDS(coreResults, dsCfg, isReadmissionRequested, isMedicationAdherenceRequested);
+	SocioScoresDS := Models.Healthcare_SocioEconomic_Transforms_RT_Service.PopulateScoresDS(coreResults, dsCfg, isReadmissionRequested, isMedicationAdherenceRequested, isMotivationRequested);
 	SocioScoresChildDS := choosen(SocioScoresDS,iesp.Constants.Socio.Max_Scores);
 	// OUTPUT(SocioScoresChildDS, NAMED('SocioScoresChildDS'));
 
@@ -300,7 +344,7 @@ IMPORT iesp;
 																						
 	// LOGGING
 	// Populate the input fields
-	 myloggingdata0 := PROJECT(ds_in, Models.Healthcare_SocioEconomic_Transforms_RT_Service.SocioTransactionLog(LEFT, isAttributesRequested, isReadmissionRequested, isMedicationAdherenceRequested));
+	 myloggingdata0 := PROJECT(ds_in, Models.Healthcare_SocioEconomic_Transforms_RT_Service.SocioTransactionLog(LEFT, isAttributesRequested, isReadmissionRequested, isMedicationAdherenceRequested, isMotivationRequested));
 	// Populate all non input fields
 	Models.Layouts_Healthcare_RT_Service.transactionlog setNonInput(Models.Layouts_Healthcare_RT_Service.transactionlog L):=transform
 			self.product_id := (UNSIGNED) Models.Healthcare_Constants_RT_Service.Socio_product_id; 

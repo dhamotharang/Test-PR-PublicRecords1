@@ -1,7 +1,8 @@
 Import Models;
 
-EXPORT Layouts_Healthcare_V4 := module 
-	EXPORT Output_Layout := RECORD
+EXPORT Layouts_Healthcare_V5 := module 
+
+EXPORT Core_Results_Layout := RECORD //Layout of core results after adding Motivation Score
 	string10 seq;
 	string10 acctno;
 	string12 lexid;
@@ -488,6 +489,15 @@ EXPORT Layouts_Healthcare_V4 := module
 	string10 MA_Driver_Lo1 := 'N/A';
 	string10 MA_Driver_Lo2 := 'N/A';
 	string10 MA_Driver_Lo3 := 'N/A';
+	// Motivation Score related fields
+	string8 SeMO_Score 		:= 'N/A';
+	string20 SeMO_Raw_Score := 'N/A';
+	string10 MO_Driver_Hi1 := 'N/A';
+	string10 MO_Driver_Hi2 := 'N/A';
+	string10 MO_Driver_Hi3 := 'N/A';
+	string10 MO_Driver_Lo1 := 'N/A';
+	string10 MO_Driver_Lo2 := 'N/A';
+	string10 MO_Driver_Lo3 := 'N/A';
 	//Debug fields that form as additional model inputs for Readmission.
 	string3 ADDRCHANGECOUNT24;
 	string3 ARRESTCOUNT24;
@@ -507,8 +517,13 @@ EXPORT Layouts_Healthcare_V4 := module
 	STRING3 CRTRECLIENJUDGCNT;
 	STRING3 CRTRECBKRPTTIMENEWEST;
 	STRING3 HHPPCURROWNEDAUTOCNT;
+END;
+
+EXPORT Output_Layout := RECORD
+	Core_Results_Layout;
 	string10 ReadmissionScore_Category;
 	string10 MedicationAdherenceScore_Category;
-	END;
+	string10 MotivationScore_Category;
+END;
 	
 END;
