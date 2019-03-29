@@ -1,11 +1,14 @@
 ﻿import DeltabaseGateway, MDR, PhonesPlus_V2, Ut;	
 	
-	portFile 					:= PhonesInfo.File_Phones.Ported_Current; 																//Port File
-	lidbFile					:= PhonesInfo.File_LIDB.Response_Processed;																//LIDB File
-	discFile					:= PhonesInfo.File_Deact.Main_Current2;																		//Deact File
-	discGHFile				:= PhonesInfo.File_Deact_GH.Main_Current;																	//Deact Gong History File
-	lidbDelt					:= DeltabaseGateway.File_Deltabase_Gateway.Historic_Results_Base(source in ['ATT_DQ_IRS'] and stringlib.stringfind(device_mgmt_status, 'BAD', 1)=0); //Deltabase Gateway File
-	srcRef						:= PhonesInfo.File_Source_Reference.Main(is_current=TRUE); 								//Source Reference Table
+//DF-24394: Filtering for complete L6 records (account_owner/serv/line types populated)
+	
+	portFile 					:= PhonesInfo.File_Phones.Ported_Current; 																																																						//Port File
+	lidbFile					:= PhonesInfo.File_LIDB.Response_Processed;																																																						//LIDB File
+	discFile					:= PhonesInfo.File_Deact.Main_Current2;																																																								//Deact File
+	discGHFile				:= PhonesInfo.File_Deact_GH.Main_Current;																																																							//Deact Gong History File
+	lidbDelt					:= DeltabaseGateway.File_Deltabase_Gateway.Historic_Results_Base(source in ['ATT_DQ_IRS'] and stringlib.stringfind(device_mgmt_status, 'BAD', 1)=0); 	//Deltabase Gateway File
+	l6UpdPhone				:= project(PhonesInfo.File_Lerg.Lerg6UpdPhone(account_owner<>'' and serv<>'' and line<>''), PhonesInfo.Layout_Common.portedMetadata_Main);						//Lerg6 Updated Phones	
+	srcRef						:= PhonesInfo.File_Source_Reference.Main(is_current=TRUE); 																																														//Source Reference Table
 	
 //////////////////////////////////////////////////////////////////////////////////////////
 //Map Ported Base to Common Layout - Append Serv/Line/Carrier Names from Reference Table//
@@ -245,11 +248,21 @@
 														 adddiscGHSL(left, right), left outer, local, keep(1));
 														
 	cmndiscGH 				:= dedup(sort(distribute(addLidbdiscGHFields, hash(phone)), record, local), record, local);
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//Map Lerg6 Updated Phone Base to Common Layout///////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+	
+	PhonesInfo.Layout_Common.portedMetadata_Main trL6(l6UpdPhone l):= transform
+		self 										:= l;
+	end;
+	
+	cmnL6UpdPh				:= project(l6UpdPhone, trL6(left));
 	
 //////////////////////////////////////////////////////////////////////////////////////////
 //Concat Reformatted Files////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
-	concatC 					:= cmnPort + cmnLidb + cmnDisc + cmndiscGH + cmnLidbDelt;
+	concatC 					:= cmnPort + cmnLidb + cmnDisc + cmndiscGH + cmnLidbDelt + cmnL6UpdPh;
 	
 	//Set Blank Serv/Line Types to "UNKNOWN"
 	concatC addSL(concatC l):= transform

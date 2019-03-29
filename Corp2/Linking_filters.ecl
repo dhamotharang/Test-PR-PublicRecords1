@@ -1,4 +1,4 @@
-import corp,ut;
+﻿import corp,ut;
 
 export Linking_filters :=
 module
@@ -105,7 +105,8 @@ module
 												'FOREIGN PROFIT CORPORATION',
 												'GENERAL DOMESTIC PARTNERSHIP',
 												'GENERAL FOREIGN PARTNERSHIP',
-												'UNREGISTERED OWNER'];
+												'UNREGISTERED OWNER',
+												'PROFESSIONAL LIMITED LIABILITY PARTNERSHIP'];
 
 	export CompanyStatus	:=	[	'AB INITIO',
 															'ABANDONED',
