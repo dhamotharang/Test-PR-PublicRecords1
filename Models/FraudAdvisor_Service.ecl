@@ -634,6 +634,24 @@ clam_BtSt :=
   //Added for Paro 9-2018
   skiptrace_Prep := project(ungroup(iid), transform(risk_indicators.Layout_input, self := left));
   skiptrace_call := riskwise.skip_trace(skiptrace_Prep, DPPA_Purpose, GLB_Purpose, DataRestriction, '', DataPermission);
+  
+  riskwise.Layout_SkipTrace get_confidence(riskwise.Layout_SkipTrace le, risk_indicators.layout_output rt) := transform
+    self.addr_confidence_a := map(le.addr_type_a='X' => '',
+    
+                                  le.addr_type_a in ['U','C'] and rt.chronophone<>'' and
+                                  risk_indicators.ga(Risk_Indicators.AddrScore.AddressScore(le.prim_range, le.prim_name, le.sec_range, rt.chronoprim_range, rt.chronoprim_name, rt.chronosec_range)) => 'A',
+
+                                  le.addr_type_a in ['U','C'] and rt.chronophone='' and
+                                  risk_indicators.ga(Risk_Indicators.AddrScore.AddressScore(le.prim_range, le.prim_name, le.sec_range, rt.chronoprim_range, rt.chronoprim_name, rt.chronosec_range)) => 'B',
+
+                                  risk_indicators.ga(Risk_Indicators.AddrScore.AddressScore(le.prim_range, le.prim_name, le.sec_range, rt.chronoprim_range2, rt.chronoprim_name2, rt.chronosec_range2)) => 'B',
+
+                                  risk_indicators.ga(Risk_Indicators.AddrScore.AddressScore(le.prim_range, le.prim_name, le.sec_range, rt.chronoprim_range3, rt.chronoprim_name3, rt.chronosec_range3)) => 'C',
+                                  '');							
+    self := le;		
+  end;
+
+  full_skiptrace := join(skiptrace_call, iid, LEFT.seq= RIGHT.seq, get_confidence(left,right) );
 
   easi_census := join(ungroup(iid), Easi.Key_Easi_Census,
                       keyed(left.st+left.county+left.geo_blk=right.geolink) and model_name IN Models.FraudAdvisor_Constants.Paro_models,
@@ -2221,7 +2239,7 @@ ret3 := Models.FD9510_0_0(clam, ofacSearching, nugen, addtl_watchlists);
 
 //Get the Paro models
 Paro_ret  := Models.MSN1803_1_0( ungroup(clam) );
-Paro_ret2 := Models.RSN804_1_0( clam, skiptrace_call, easi_census );
+Paro_ret2 := Models.RSN804_1_0( clam, full_skiptrace, easi_census );
 
 bs_with_ip := record
 	risk_indicators.Layout_Boca_Shell bs;
