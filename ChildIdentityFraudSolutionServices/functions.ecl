@@ -1,7 +1,7 @@
-﻿import BatchServices, BatchShare, ut, VehicleV2_Services, Autokey_batch, CriminalRecords_BatchService, 
+﻿import BatchServices, BatchShare, ut, VehicleV2_Services, Autokey_batch, 
        doxie, AddrBest, LiensV2_Services, paw_services, DidVille, prof_LicenseV2_Services, FaaV2_Services,
 			 SexOffender_Services, WatercraftV2_Services, Foreclosure_Services, LN_PropertyV2_Services, Suppress,
-			 BIPV2, Royalty, DeathV2_Services, STD;
+			 BIPV2, Royalty, STD;
 
 export Functions := module
 
@@ -9,103 +9,6 @@ export Functions := module
 shared BatchParams		:= IParam.getBatchParams();				 										 
 // temporarily: until we move all batches to BatchShare.IParam.BatchParamsV2
 shared mod_batchV2 := BatchShare.IParam.GetFromLegacy (BatchParams);
-
- //---------------------------------------------------------------------------------------------------------// 
-	// Death
-	
-	// 
-	export getDeath(dataset(Layouts.BatchIn) BatchIn, 
-									ChildIdentityFraudSolutionServices.IParam.BatchParams inMod) := function
-	    		
-		deceased_match_codes := ['ANSZC', 'ANSZ', 'ANSC', 'ANS', 'SNCZ', 'SNC', 'SNZ', 'SN'];
-		currentYear := STD.Date.Year (STD.Date.Today());
-		IsEnoughTimeSinceDeath(string4 year) := (integer)currentYear - (integer)year >= inMod.TaxYearsToIgnore;			
-		
-		BatchInCommon 	:= project(BatchIn, 
-			transform(DeathV2_Services.Layouts.BatchIn,
-				self.acctno 			:= left.acctno,
-				self.name_first 	:= left.name_first,
-				self.name_middle 	:= left.name_middle,
-				self.name_last 		:= left.name_last,
-				self.name_suffix 	:= left.name_suffix,
-				self.ssn 					:= left.ssn;
-				self 							:= [])); 
-
-		// temporarily, double projection
-		mod_batch := BatchShare.IParam.GetFromLegacy(inMod);
-		deathBatchParams := module(project(mod_batch, DeathV2_Services.IParam.BatchParams, opt)) end;
-
-		dsDeath := DeathV2_Services.BatchRecords(BatchInCommon, deathBatchParams)															
-			(( matchcode in deceased_match_codes OR  ( matchcode ='S' and 	ut.Age((unsigned4)dob8)< 18 ) )  // Matchcode should be in constants
-			 and IsEnoughTimeSinceDeath((DOD8[1..4]))
-			);
-		return dsDeath;
-	end;
-	//---------------------------------------------------------------------------------------------------------//
-	// Criminal
-	export getCriminal(dataset(Layouts.BatchIn) BatchIn) := function
-			CriminalRecords_BatchService.Layouts.batch_in xformToCrimBatch(Layouts.BatchIn L) := transform
-				self.acctno := L.acctno;
-				self.ssn := L.ssn;
-				self := [];
-			end;
-			CrimBatch := project(BatchIn, xformToCrimBatch(left));
-			CrimBatchParams := module(project(mod_batchV2, CriminalRecords_BatchService.IParam.batch_params, opt))	
-			end;
-			dsCrimPreAll := CriminalRecords_BatchService.BatchRecords(CrimBatchParams, CrimBatch); 
-			dsCrimPre := dsCrimPreAll.Records;
-			dsCrim := dsCrimPre(datasource = 'Department of Corrections') ;
-			
-		return dsCrim;  	
-	end;
-	
- 
- //---------------------------------------------------------------------------------------------------------//
-	export getDids(dataset(Layouts.BatchIn) BatchIn) := function
-		BatchInCommon 	:= project(BatchIn, Autokey_batch.Layouts.rec_inBatchMaster);	
-	  dsDids :=  BatchServices.Functions.fn_find_dids_and_append_to_acctno(BatchInCommon);
-	  return dsDids;
-	end;
-//---------------------------------------------------------------------------------------------------------//	 
-	export getHeader(dataset(Layouts.BatchIn) BatchIn) := function
-   
-	 //get dids	
-	  ds_dids	:= getDids(project(BatchIn,transform(Layouts.BatchIn, 
-																												self.acctno := left.acctno,
-																												self.ssn    := left.ssn,
-																												self := []	)));
-																												
-		dids := project(dedup(ds_dids,did),transform(doxie.layout_references_hh, self.did := left.did ,self.includedByHHID := false ));
-   
-	 //get header w/o acctno		
-		dsHeaderPre := doxie.header_records_byDID(dids,,,,,true,true,,,,,true);
-		
-	 //append acctno to header result	
-	  tmpFormat := recordof(dsHeaderPre);
-		
-		headerRecord := RECORD(tmpFormat)
-								 Layouts.BatchIn.AcctNo;							
-						     END;
-						 
-		dsHeaderPre1 := project(dsHeaderPre,transform(headerRecord,
-				self.acctno := ds_dids(did = left.did)[1].acctno,
-				self := left));
-		
-		headerRecord xFormHeader(headerRecord L , headerRecord R) := Transform
-			self.acctno 				:= L.acctno;
-			self.did    				:= R.did;
-			self.ssn					  :=  if(L.ssn = '',R.ssn,L.ssn); // try to get ssn if available
-			//We want the oldest date first seen
-			self.dt_first_seen	:=	ut.Min2(L.dt_first_seen,R.dt_first_seen);   
-			//We want the newest date last seen	 &	We want the newest record for the did												
-			self		:=	if(L.dt_last_seen > R.dt_last_seen ,L,R);
-		End;
-		// Rollup so that you have just 1 record per DID	
-		dsHeader := rollup(sort(dsHeaderPre1,acctno,did,dt_first_seen,-dt_last_seen),
-											left.acctno = right.acctno and left.did = right.did,xFormHeader(left,right));
-		
-		return dsHeader;
-	end;
 //---------------------------------------------------------------------------------------------------------//	
 	export getBest(dataset(Layouts.BatchIn) BatchIn)  := function
 	
@@ -156,46 +59,6 @@ shared mod_batchV2 := BatchShare.IParam.GetFromLegacy (BatchParams);
 		
 		return dsBestAddress;
 	endmacro;	
-
-//---------------------------------------------------------------------------------------------------------//	
-	
-	export getOUSSN(dataset(Layouts.BatchIn) BatchIn) := function
-	  BatchInCommon := project(BatchIn, Autokey_batch.Layouts.rec_inBatchMaster);
-		dsOUSSN := BatchServices.OthersUsingSSN_BatchService_Records(BatchInCommon, FALSE);
-		return dsOUSSN;
-	end;
-	
-//---------------------------------------------------------------------------------------------------------//	
-
-	export getRAN(dsHeader) := functionmacro // TODO this has to change to only DIDs & account number
-		//get dids	
-    IMPORT DidVille;
-	 			
-		inBatch := project(dsHeader,Transform(DidVille.Layout_RAN_BestInfo_BatchIn, 
-																					self.dob 					:= (string) left.dob, 
-																					self.acctno				:= Left.acctno,
-																					self.ssn					:= Left.ssn,
-																					self.name_first		:= Left.fname,
-																					self.name_middle	:= Left.mname,
-																					self.name_last		:= Left.lname,
-																					self.name_suffix	:= Left.name_suffix,			
-																					self.prim_range		:= Left.prim_range,
-																					self.predir				:= Left.predir,
-																					self.prim_name		:= Left.prim_name,
-																					self.suffix				:= Left.suffix,
-																					self.postdir			:= Left.postdir,
-																					self.unit_desig		:= Left.unit_desig,
-																					self.sec_range		:= Left.sec_range,
-																					self.p_city_name	:= Left.city_name,
-																					self.st						:= Left.st,
-																					self.z5						:= Left.zip, 
-																					self.z4						:= Left.zip4,
-																					self 							:= [] ));
-																					
-		dsRAN := DidVille.RAN_BestInfo_Batch_Service_Records(inBatch);
-		
-		return dsRAN;
-  endmacro;
 //---------------------------------------------------------------------------------------------------------//		
 	export getBankruptcy(dataset(Layouts.BatchIn) BatchIn) := function
 	 BatchInCommonSSN := project(BatchIn, transform(BatchServices.layout_BankruptcyV3_Batch_in,
