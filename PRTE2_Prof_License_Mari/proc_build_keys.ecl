@@ -5,7 +5,7 @@ export proc_build_keys(string filedate) := FUNCTION
 
 // -- Build Keys
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(keys.key_BDID,							Constants.KEY_PREFIX+'bdid',									Constants.KEY_PREFIX+filedate+'::bdid',									key1);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(keys.key_DID(),						Constants.KEY_PREFIX+'did',										Constants.KEY_PREFIX+filedate+'::did',									key2);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(keys.key_DID,				  		Constants.KEY_PREFIX+'did',										Constants.KEY_PREFIX+filedate+'::did',									key2);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(keys.key_license_nbr,			Constants.KEY_PREFIX+'license_nbr',						Constants.KEY_PREFIX+filedate+'::license_nbr',					key3);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(keys.key_ssn_taxid,				Constants.KEY_PREFIX+'ssn_taxid',							Constants.KEY_PREFIX+filedate+'::ssn_taxid',						key4);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(keys.key_mari_payload,			Constants.KEY_PREFIX+'rid',										Constants.KEY_PREFIX+filedate+'::rid',									key5);
@@ -17,7 +17,7 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(keys.key_nmls_id,					Constants.KEY_P
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(keys.key_linkIds.key,			Constants.KEY_PREFIX+'linkids',								Constants.KEY_PREFIX+filedate+'::linkids',							key11);
 
 // Build FCRA Keys
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(keys.key_DID(true),				Constants.KEY_PREFIX+'did',								 		Constants.KEY_PREFIX_FCRA+filedate+'::did',						fcra_key1);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(keys.key_did_FCRA,				Constants.KEY_PREFIX+'did',								 		Constants.KEY_PREFIX_FCRA+filedate+'::did',						fcra_key1);
 
 build_roxie_keys	:=	parallel(	key1, key2, key3, key4, key5, key6, key7, key8, key9, key10, key11, fcra_key1);
 
@@ -79,8 +79,8 @@ buildKey	:=	sequential(
 												 build_roxie_keys
 												,Move_keys
 												,to_qa
-												,build_autokeys);
-												//,PerformUpdateOrNot);
+												,build_autokeys
+												,PerformUpdateOrNot);
 												
 
 return	buildKey;
