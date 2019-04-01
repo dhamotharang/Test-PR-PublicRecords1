@@ -6,15 +6,16 @@ EXPORT _proc_Multiple_Iterations(
   ,pDOTFile         = '\'BIPV2_Files.files_dotid().DS_BASE\''
   ,pcluster         = 'BIPV2_Build._Constants().Groupname'
   ,pDotFilename     = '\'\''                                  //'BIPV2_Files.files_dotid.FILE_BASE' //by default it will start where it left off
+  ,pdoPreprocess    = 'true'
   ,pdoSpecs         = 'true'
+  ,pdoIter          = 'true'
+  ,pdoPostprocess   = 'BIPV2_ProxID._Constants().RunPostProcess'
   ,pUniqueOut       = '\'Proxid\''
   ,pMatchThreshold  = 'BIPV2_ProxID.Config.MatchThreshold'
+  ,pEmailList       = 'BIPV2_ProxID._Constants().EmailList'     // -- for testing, make sure to put in your email address to receive the emails
   ,pCompileTest     = 'false'
-  ,pdoPreprocess    = 'true'
-  ,pdoPostprocess   = 'BIPV2_ProxID._Constants().RunPostProcess'
   ,pdo1Iteration    = 'false'
   ,pIsTesting       = 'false'
-  ,pEmailList       = 'BIPV2_ProxID._Constants().EmailList'     // -- for testing, make sure to put in your email address to receive the emails
 ) :=
 functionmacro
   
@@ -85,7 +86,7 @@ functionmacro
   ecltextPost    := '#workunit(\'name\',\'BIPV2_ProxID._PostProcess @version@\');\n\n' + '#workunit(\'priority\',\'high\');\n' 
                   + 'BIPV2_ProxID._PostProcess(\'@version@\',' + pDOTFile + ',\'' + dotbasefilename + '\');';  
 
-  kickPreprocess := Workman.mac_WorkMan(ecltextPreprocess ,prevcombo,cluster,1         ,1        ,pBuildName := pUniqueOut + 'Patch',pNotifyEmails := pEmailList
+  kickPreprocess := Workman.mac_WorkMan(ecltextPreprocess ,version,cluster,1         ,1        ,pBuildName := pUniqueOut + 'Patch',pNotifyEmails := pEmailList
       ,pOutputFilename   := '~bipv2_build::' + version + '::workunit_history::BIPV2_ProxID.proc_proxid.' + workman_preprocess_file
       ,pOutputSuperfile  := '~bipv2_build::qa::workunit_history' 
       ,pCompileOnly      := pCompileTest
