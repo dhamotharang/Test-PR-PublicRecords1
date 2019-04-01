@@ -1,35 +1,35 @@
 ﻿import tools, _control,lib_thorlib;
 
 export SprayMBSFiles(
-	 string		pServerIP		                   						= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10)
-	,string		pDirectory	                   						= '/data/super_credit/fdn/in'	
-	,string		pFilenamembs                   						= '*file_info.txt'	 											
-	,string 	pFilenameMbsFdnMasterIDIndTypeInclusion		= '*ind_gc_inclusion.txt'
-	,string		pFilenameMbsNewGcIdExclusion   						= '*file_gc_exclusion.txt'
-	,string		pFilenameMbsIndTypeExclusion   						= '*ind_type_exclusion.txt'
-	,string		pFilenameMbsProductInclude     						= '*file_product_include.txt'
-	,string		pFilenameMBSSourceGcExclusion  						= '*source_gc_exclusion_comp.txt'
-	,string   pFilenameMBSmarketAppend       						= '*fdn_market*txt'
-	,string   pFilenameMBSFdnIndType         						= '*ind_type.txt'
-	,string   pFilenameMBSFdnCCID            						= 'mbsi_fdn_accounts*'
-	,string   pFilenameMBSFdnHHID            						= 'hhid_fdn_accounts*'
-	,string   pFilenameMBSTableCol           						= 'table_column.txt'
-	,string   pFilenameMBSColValDesc         						= 'column_value_desc.txt'
-	,string 	pFilenameMbsVelocityRules									= '*velocity_rules.txt'
-	,string		pversion
-	,string		pGroupName	                   = thorlib.group()																		
-	,boolean	pIsTesting	                   = false
-	,boolean	pOverwrite	                   =  true
-	,boolean	pReplicate	                   =	true
-	,string		pNameOutput	                   = 'FraudGov Spray Info'	
-	,boolean	pSprayMultipleFilesAs1	       = true
+	 string pServerIP = if(_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10)
+	,string pDirectory = '/data/super_credit/fdn/in'	
+	,string pFilenamembs = '*file_info.txt'	 											
+	,string pFilenameMbsFdnMasterIDIndTypeInclusion = '*ind_gc_inclusion.txt'
+	,string pFilenameMbsNewGcIdExclusion = '*file_gc_exclusion.txt'
+	,string pFilenameMbsIndTypeExclusion = '*ind_type_exclusion.txt'
+	,string pFilenameMbsProductInclude = '*file_product_include.txt'
+	,string pFilenameMBSSourceGcExclusion = '*source_gc_exclusion_comp.txt'
+	,string pFilenameMBSmarketAppend = '*fdn_market*txt'
+	,string pFilenameMBSFdnIndType = '*ind_type.txt'
+	,string pFilenameMBSFdnCCID = 'mbsi_fdn_accounts*'
+	,string pFilenameMBSFdnHHID = '*hhid_fdn_accounts.txt'
+	,string pFilenameMBSTableCol = '*table_column.txt'
+	,string pFilenameMBSColValDesc = '*column_value_desc.txt'
+	,string pFilenameMbsVelocityRules = '*velocity_rules.txt'
+	,string pversion
+	,string pGroupName = thorlib.group()																		
+	,boolean pIsTesting = false
+	,boolean pOverwrite = true
+	,boolean pReplicate = true
+	,string pNameOutput = 'FraudGov Spray Info'	
+	,boolean pSprayMultipleFilesAs1 = true
 
 ) :=
 function
 
 	MAC_FilesToSprayCSVPipe(pRemoteFilename,pLocalFilename,outAttr) := macro
 	
-		outAttr := DATASET([
+		outAttr := dataset([
 
 			{pServerIP
 			,pDirectory + '/' + pversion
@@ -52,7 +52,7 @@ function
 	
 	MAC_FilesToSprayCSV(pRemoteFilename,pLocalFilename,outAttr) := macro
 	
-		outAttr := DATASET([
+		outAttr := dataset([
 
 			{pServerIP
 			,pDirectory + '/' + pversion

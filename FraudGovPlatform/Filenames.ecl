@@ -8,13 +8,13 @@ export Filenames(
 ) :=
 module
 
-	Shared FraudGov_Prefix (string pType):= FraudGovPlatform._Dataset(false).thor_cluster_Files + pType +'::' + FraudGovPlatform._Dataset(false).name + '::' ;
+	Shared FraudGov_Prefix (string pType):= FraudGovPlatform._Dataset(false).thor_cluster_Files + pType +'::';
 
 	//////////////////////////////////////////////////////////////////
 	// -- Sprayed Filename Versions
 	//////////////////////////////////////////////////////////////////
 	export Sprayed := module
-		export FileSprayed 	:= 	_Dataset().thor_cluster_Files +'in::'+_Dataset().Name;
+		export FileSprayed 	:= 	_Dataset().thor_cluster_Files +'in';
 		
 		export _IdentityDataPassed := FileSprayed+'::Passed::IdentityData';
 		export _IdentityDataRejected := FileSprayed+'::Rejected::IdentityData';
@@ -26,6 +26,11 @@ module
 		export _KnownFraudDelete := FileSprayed+'::Delete::KnownFraud';
 		export KnownFraud	:= _KnownFraudPassed;
 
+		export _SafeListPassed := _KnownFraudPassed;  
+		export _SafeListRejected := _KnownFraudRejected;
+		export _SafeListDelete := _KnownFraudDelete;
+		export SafeList	:= _SafeListPassed;
+		
 		export _DeltabasePassed := FileSprayed+'::Passed::Deltabase';  
 		export _DeltabaseRejected := FileSprayed+'::Rejected::Deltabase';
 		export _DeltabaseDelete := FileSprayed+'::Delete::Deltabase';
@@ -62,7 +67,6 @@ module
 		export AddressCache_Deltabase							:= tools.mod_FilenamesInput(Template('AddressCache_Deltabase'),pversion);
 		
 		export DemoData											:= tools.mod_FilenamesInput(Template('DemoData'),pversion);
-		export SourcesToAnonymize						:= tools.mod_FilenamesInput(Template('SourcesToAnonymize'),pversion);
 		export MBSInclusionDemoData					:= tools.mod_FilenamesInput(Template('MBSInclusionDemoData'),pversion);
 		export MBSDemoData									:= tools.mod_FilenamesInput(Template('MBSDemoData'),pversion);
 		
@@ -83,15 +87,24 @@ module
 	end;
 
 	//////////////////////////////////////////////////////////////////
+	// -- Config Filenames
+	//////////////////////////////////////////////////////////////////
+	export Flags := module
+		export NewHeader := FraudGov_Prefix('flags') + 'NewHeader_flag';
+		export FraudgovInfoFn := FraudGov_Prefix('flags') + 'NewFraudgov_flag';
+		export RefreshAddresses := FraudGov_Prefix('flags') + 'RefreshAddresses_flag';	
+		export SourcesToAnonymize := FraudGov_Prefix('flags') + 'SourcesToAnonymize_flag';	
+		export SkipModules := FraudGov_Prefix('flags') + 'SkipModules_flag';
+		export SkipValidationByGCID	 := FraudGov_Prefix('flags') + 'SkipValidationByGCID_flag';
+	end;
+	//////////////////////////////////////////////////////////////////
 	// -- Output Filename Versions
 	//////////////////////////////////////////////////////////////////
 	export OutputF := module
-		export NewHeader 			:= FraudGov_Prefix('out') + 'NewHeader_flag';
-		export FraudgovInfoFn		:= FraudGov_Prefix('out') + 'NewFraudgov_flag';
-		export RefreshAddresses 	:= FraudGov_Prefix('out') + 'RefreshAddresses_flag';	
-		export Scrubs_FraudGov 		:= FraudGov_Prefix('out') + 'Scrubs_FraudGov';
-		export mod_collisions_concat_srt 		:= FraudGov_Prefix('out') + 'mod_collisions::concat_srt';
-		export mod_collisions_concat_ddp 		:= FraudGov_Prefix('out') + 'mod_collisions::concat_ddp';
+		export Scrubs_MBS := FraudGov_Prefix('out') + 'Scrubs_MBS';
+		export Scrubs_FraudGov := FraudGov_Prefix('out') + 'Scrubs_FraudGov';
+		export mod_collisions_concat_srt := FraudGov_Prefix('out') + 'mod_collisions::concat_srt';
+		export mod_collisions_concat_ddp := FraudGov_Prefix('out') + 'mod_collisions::concat_ddp';
 	end;
 
 	//////////////////////////////////////////////////////////////////
@@ -110,6 +123,7 @@ module
 		export Crim					:= tools.mod_FilenamesBuild(Template('Crim'),pversion);
 		export Death				:= tools.mod_FilenamesBuild(Template('Death'),pversion);
 		export FraudPoint		:= tools.mod_FilenamesBuild(Template('FraudPoint'),pversion);
+		export IPMetaData		:= tools.mod_FilenamesBuild(Template('IPMetaData'),pversion);
 		
 		
 		//Kel Files
@@ -122,6 +136,9 @@ module
 		export kel_person_associations_stats		:= tools.mod_FilenamesBuild(Template('kel::person_associations_stats'),pversion);
 		export kel_person_associations_details	:= tools.mod_FilenamesBuild(Template('kel::person_associations_details'),pversion);
 		export kel_entity_scorebreakdown				:= tools.mod_FilenamesBuild(Template('kel::entity_scorebreakdown'),pversion);
+		export kel_CustomerStatsPivot				:= tools.mod_FilenamesBuild(Template('kel::CustomerStatsPivot'),pversion);
+		export kel_CustomerDashTopEntityStats				:= tools.mod_FilenamesBuild(Template('kel::CustomerDashTopEntityStats'),pversion);
+		export kel_CustomerDashTopClustersAndElements				:= tools.mod_FilenamesBuild(Template('kel::CustomerDashTopClustersAndElements'),pversion);
 		
 		export Main_Orig	:= tools.mod_FilenamesBuild(Template('Main_Orig'),pversion);
 		export Main_Anon	:= tools.mod_FilenamesBuild(Template('Main_anon'),pversion);
@@ -131,25 +148,15 @@ module
 		export CIID_Orig				:= tools.mod_FilenamesBuild(Template('CIID_Orig'),pversion);
 		export Crim_Orig				:= tools.mod_FilenamesBuild(Template('Crim_Orig'),pversion);
 		export Death_Orig				:= tools.mod_FilenamesBuild(Template('Death_Orig'),pversion);
-		export FraudPoint_Orig	:= tools.mod_FilenamesBuild(Template('FraudPoint_Orig'),pversion);
-		
-		// soap appends anonymized
-		export CIID_Anon				:= tools.mod_FilenamesBuild(Template('CIID_Anon'),pversion);
-		export Crim_Anon				:= tools.mod_FilenamesBuild(Template('Crim_Anon'),pversion);
-		export Death_Anon				:= tools.mod_FilenamesBuild(Template('Death_Anon'),pversion);
-		
+			
 		// DemoData Files - SOAP Appends
 		export Pii_Demo					:= tools.mod_FilenamesBuild(Template('Pii_Demo'),pversion);
 		export CIID_Demo				:= tools.mod_FilenamesBuild(Template('CIID_Demo'),pversion);
 		export Crim_Demo				:= tools.mod_FilenamesBuild(Template('Crim_Demo'),pversion);
 		export Death_Demo				:= tools.mod_FilenamesBuild(Template('Death_Demo'),pversion);
 		export FraudPoint_Demo	:= tools.mod_FilenamesBuild(Template('FraudPoint_Demo'),pversion);
+		Export IpMetaData_Demo	:= tools.mod_FilenamesBuild(Template('IpMetaData_Demo'),pversion);
 			
-		// DemoData Anonymized Files - SOAP Appends
-		export CIID_Demo_Anon				:= tools.mod_FilenamesBuild(Template('CIID_Demo_Anon'),pversion);
-		export Crim_Demo_Anon				:= tools.mod_FilenamesBuild(Template('Crim_Demo_Anon'),pversion);
-		export Death_Demo_Anon			:= tools.mod_FilenamesBuild(Template('Death_Demo_Anon'),pversion);
-		
 		export dAll_filenames :=
 			IdentityData.dAll_filenames +
 			KnownFraud.dAll_filenames +
@@ -169,6 +176,9 @@ module
 			kel_person_associations_stats.dAll_filenames +
 			kel_person_associations_details.dAll_filenames +
 			kel_entity_scorebreakdown.dAll_filenames + 
+			kel_CustomerStatsPivot.dAll_filenames + 
+			kel_CustomerDashTopEntityStats.dAll_filenames + 
+			kel_CustomerDashTopClustersAndElements.dAll_filenames + 
  			Main_Orig.dAll_filenames + 
 			Main_Anon.dAll_filenames + 
 			Pii_Demo.dAll_filenames + 
@@ -176,13 +186,11 @@ module
 			Crim_Demo.dAll_filenames + 
 			Death_Demo.dAll_filenames + 
 			FraudPoint_Demo.dAll_filenames + 
-			CIID_Demo_Anon.dAll_filenames + 
-			Crim_Demo_Anon.dAll_filenames + 
-			Death_Demo_Anon.dAll_filenames +
+			IpMetaData_Demo.dAll_filenames + 
 			CIID_Orig.dAll_filenames +
 			Crim_Orig.dAll_filenames +
 			Death_Orig.dAll_filenames +
-			FraudPoint_Orig.dAll_filenames
+			IPMetaData.dAll_filenames;
 			; 
 	
 	end;

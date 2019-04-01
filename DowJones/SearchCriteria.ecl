@@ -1,4 +1,4 @@
-EXPORT SearchCriteria := MODULE
+﻿EXPORT SearchCriteria := MODULE
 
 export unicode Common := 
 		 '<group id="4" name="Entity Type">' +
@@ -44,6 +44,7 @@ export unicode Common :=
      '<value id="11" name="Organized Crime Japan" />\r\n' +
      '<value id="5" name="Other Official Lists" />\r\n' +
 		 '<value id="34" name="Sanctions Control and Ownership" />\r\n' + //Bug 20372
+		 $.SearchCriteria3.Sanctions[1].criterion +
      '<value id="6" name="Sanctions Lists" />\r\n' +
 		 '<value id="13" name="Tax Crime" />\r\n' + // Bug: 156981     
 		 '<value id="7" name="Terror" />\r\n' +
@@ -55,7 +56,13 @@ export unicode Common :=
      '<value id="2" name="Alive" />\r\n' +
      '<value id="1" name="Deceased" />\r\n' + 
      '</group>\r\n' +
-			BuildSourceCriteria;
+		'<group id="3" name="Active Status">\r\n' +
+     '<value id="9" name="No Value" />\r\n' +
+		 '<value id="1" name="Active" />\r\n' + 
+     '<value id="2" name="Inactive" />\r\n' +
+     '</group>\r\n' +
+		
+		BuildSourceCriteria;
 		 
 // geographical seaches
 // Middle East me
@@ -91,7 +98,7 @@ unicode CriteriaME :=
 // Africa afr
 unicode CriteriaAFR :=	
 		U'<group id="6" name="Country">' +
-		U'<value id="4" name="Algeria" /><value id="7" name="Angola" /><value id="22" name="Benin" /><value id="27" name="Botswana" /><value id="28" name="Bouvet Island" /><value id="228" name="Burkina Faso" /><value id="34" name="Burundi" /><value id="38" name="Cameroon" /><value id="53" name="Cape Verde" /><value id="37" name="Central African Republic" /><value id="41" name="Chad" /><value id="47" name="Comoros" /><value id="48" name="Congo Republic" /><value id="95" name="Cote d\'Ivoire" /><value id="241" name="Democratic Republic of the Congo" /><value id="209" name="Djibouti" /><value id="60" name="Egypt" /><value id="62" name="Equatorial Guinea" /><value id="63" name="Eritrea" /><value id="65" name="Ethiopia" /><value id="74" name="Gabon" /><value id="75" name="Gambia" /><value id="77" name="Ghana" /><value id="87" name="Guinea" /><value id="86" name="Guinea-Bissau" /><value id="108" name="Kenya" /><value id="116" name="Lesotho" /><value id="117" name="Liberia" /><value id="118" name="Libya" /><value id="124" name="Madagascar" /><value id="125" name="Malawi" /><value id="128" name="Mali" /><value id="131" name="Mauritania" /><value id="133" name="Mayotte" /><value id="141" name="Morocco" /><value id="142" name="Mozambique" /><value id="143" name="Namibia" /><value id="151" name="Niger" /><value id="150" name="Nigeria" /><value id="175" name="Reunion" /><value id="178" name="Rwanda" /><value id="197" name="Saint Helena" /><value id="172" name="Sao Tome and Principe" /><value id="181" name="Senegal" /><value id="182" name="Seychelles" /><value id="184" name="Sierra Leone" /><value id="193" name="Somalia" /><value id="180" name="South Africa" /><value id="253" name="South Sudan" /><value id="200" name="Sudan" /><value id="204" name="Swaziland" /><value id="211" name="Tanzania" /><value id="216" name="Togo" /><value id="220" name="Tunisia" /><value id="225" name="Uganda" /><value id="195" name="Western Sahara" /><value id="242" name="Zambia" /><value id="243" name="Zimbabwe" /></group>\r\n';
+		U'<value id="4" name="Algeria" /><value id="7" name="Angola" /><value id="22" name="Benin" /><value id="27" name="Botswana" /><value id="28" name="Bouvet Island" /><value id="228" name="Burkina Faso" /><value id="34" name="Burundi" /><value id="38" name="Cameroon" /><value id="53" name="Cape Verde" /><value id="37" name="Central African Republic" /><value id="41" name="Chad" /><value id="47" name="Comoros" /><value id="48" name="Congo Republic" /><value id="95" name="Cote d\'Ivoire" /><value id="241" name="Democratic Republic of the Congo" /><value id="209" name="Djibouti" /><value id="60" name="Egypt" /><value id="62" name="Equatorial Guinea" /><value id="63" name="Eritrea" /><value id="204" name="Eswatini" /><value id="65" name="Ethiopia" /><value id="74" name="Gabon" /><value id="75" name="Gambia" /><value id="77" name="Ghana" /><value id="87" name="Guinea" /><value id="86" name="Guinea-Bissau" /><value id="108" name="Kenya" /><value id="116" name="Lesotho" /><value id="117" name="Liberia" /><value id="118" name="Libya" /><value id="124" name="Madagascar" /><value id="125" name="Malawi" /><value id="128" name="Mali" /><value id="131" name="Mauritania" /><value id="133" name="Mayotte" /><value id="141" name="Morocco" /><value id="142" name="Mozambique" /><value id="143" name="Namibia" /><value id="151" name="Niger" /><value id="150" name="Nigeria" /><value id="175" name="Reunion" /><value id="178" name="Rwanda" /><value id="197" name="Saint Helena" /><value id="172" name="Sao Tome and Principe" /><value id="181" name="Senegal" /><value id="182" name="Seychelles" /><value id="184" name="Sierra Leone" /><value id="193" name="Somalia" /><value id="180" name="South Africa" /><value id="253" name="South Sudan" /><value id="200" name="Sudan" /><value id="211" name="Tanzania" /><value id="216" name="Togo" /><value id="220" name="Tunisia" /><value id="225" name="Uganda" /><value id="195" name="Western Sahara" /><value id="242" name="Zambia" /><value id="243" name="Zimbabwe" /></group>\r\n';
 // Asia asia
 unicode CriteriaASIA :=	
 		U'<group id="6" name="Country">' +
@@ -107,7 +114,7 @@ unicode CriteriaEUROPE :=
 		
 // North America na
 unicode CriteriaNA :=	
-		U'<group id="6" name="Country"><value id="8" name="Anguilla" /><value id="9" name="Antigua and Barbuda" /><value id="12" name="Aruba" /><value id="16" name="Bahamas" /><value id="19" name="Barbados" /><value id="21" name="Belize" /><value id="23" name="Bermuda" /><value id="35" name="British Virgin Islands" /><value id="40" name="Cayman Islands" /><value id="50" name="Costa Rica" /><value id="52" name="Cuba" /><value id="57" name="Dominica" /><value id="58" name="Dominican Republic" /><value id="61" name="El Salvador" /><value id="80" name="Greenland" /><value id="81" name="Grenada" /><value id="83" name="Guadeloupe" /><value id="85" name="Guatemala" /><value id="89" name="Haiti" /><value id="92" name="Honduras" /><value id="103" name="Jamaica" /><value id="130" name="Martinique" /><value id="135" name="Mexico" /><value id="140" name="Montserrat" /><value id="144" name="Netherlands Antilles - CuraÃ§ao" /><value id="149" name="Nicaragua" /><value id="164" name="Panama" /><value id="173" name="Puerto Rico" /><value id="186" name="Saint Kitts and Nevis" /><value id="188" name="Saint Lucia" /><value id="245" name="Saint Barthelemy" /><value id="249" name="Saint Maarten" /><value id="198" name="Saint Martin" /><value id="199" name="Saint Pierre and Miquelon" /><value id="203" name="Saint Vincent and the Grenadines" /><value id="219" name="Trinidad and Tobago" /><value id="212" name="Turks and Caicos Islands" /><value id="235" name="US Virgin Islands" /></group>\r\n';
+		U'<group id="6" name="Country"><value id="8" name="Anguilla" /><value id="9" name="Antigua and Barbuda" /><value id="12" name="Aruba" /><value id="16" name="Bahamas" /><value id="19" name="Barbados" /><value id="21" name="Belize" /><value id="23" name="Bermuda" /><value id="35" name="British Virgin Islands" /><value id="40" name="Cayman Islands" /><value id="50" name="Costa Rica" /><value id="52" name="Cuba" /><value id="57" name="Dominica" /><value id="58" name="Dominican Republic" /><value id="61" name="El Salvador" /><value id="80" name="Greenland" /><value id="81" name="Grenada" /><value id="83" name="Guadeloupe" /><value id="85" name="Guatemala" /><value id="89" name="Haiti" /><value id="92" name="Honduras" /><value id="103" name="Jamaica" /><value id="130" name="Martinique" /><value id="135" name="Mexico" /><value id="140" name="Montserrat" /><value id="144" name="Netherlands Antilles - Curaçao" /><value id="149" name="Nicaragua" /><value id="164" name="Panama" /><value id="173" name="Puerto Rico" /><value id="186" name="Saint Kitts and Nevis" /><value id="188" name="Saint Lucia" /><value id="245" name="Saint Barthelemy" /><value id="249" name="Saint Maarten" /><value id="198" name="Saint Martin" /><value id="199" name="Saint Pierre and Miquelon" /><value id="203" name="Saint Vincent and the Grenadines" /><value id="219" name="Trinidad and Tobago" /><value id="212" name="Turks and Caicos Islands" /><value id="235" name="US Virgin Islands" /></group>\r\n';
 		
 // South America sa
 unicode CriteriaSA :=	

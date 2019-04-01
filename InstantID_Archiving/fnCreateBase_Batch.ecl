@@ -20,7 +20,7 @@ InstantID_Key := PROJECT(InstantID_Archiving.Files_Batch.InstantID_Key,
 												SELF.orig_dob := LEFT.dob;
 												SELF.orig_ssn := LEFT.ssn;
 												SELF := LEFT;
-												SELF := []));
+												SELF := [])):persist('~thor_data400::persist::instantid_archive::batch_instantID_key');
 																								
 FlexID_Key := PROJECT(InstantID_Archiving.Files_Batch.FlexID_Key, 
 									TRANSFORM(InstantID_Archiving.Layout_Base,
@@ -35,7 +35,7 @@ FlexID_Key := PROJECT(InstantID_Archiving.Files_Batch.FlexID_Key,
 												SELF.orig_dob := LEFT.dob;
 												SELF.orig_ssn := LEFT.ssn;
 												SELF := LEFT;
-												SELF := []));
+												SELF := [])):persist('~thor_data400::persist::instantid_archive::batch_flexID_key');
 
 Key_Files_Concat := FlexID_Key + InstantID_Key;
 

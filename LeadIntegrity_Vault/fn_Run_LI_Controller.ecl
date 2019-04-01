@@ -1,38 +1,39 @@
-﻿EXPORT fn_Run_LI_Controller(build_period = '',LIProcToRun = 1) := FUNCTIONMACRO
+﻿EXPORT fn_Run_LI_Controller(build_period,LIProcToRun = 1) := FUNCTIONMACRO
 
 	Import LeadIntegrity_Vault, Std;
 				
-	LIApd01 := LeadIntegrity_Vault.fn_LeadIntegrity_Controller(build_period, '01');
-	LIApd02 := LeadIntegrity_Vault.fn_LeadIntegrity_Controller(build_period, '02');
-	LIApd03 := LeadIntegrity_Vault.fn_LeadIntegrity_Controller(build_period, '03');
-	LIApd04 := LeadIntegrity_Vault.fn_LeadIntegrity_Controller(build_period, '04');
-	LIApd05 := LeadIntegrity_Vault.fn_LeadIntegrity_Controller(build_period, '05');
-	LIApd06 := LeadIntegrity_Vault.fn_LeadIntegrity_Controller(build_period, '06');
-	LIApd07 := LeadIntegrity_Vault.fn_LeadIntegrity_Controller(build_period, '07');
-	LIApd08 := LeadIntegrity_Vault.fn_LeadIntegrity_Controller(build_period, '08');
-	LIApd09 := LeadIntegrity_Vault.fn_LeadIntegrity_Controller(build_period, '09');
-	LIApd10 := LeadIntegrity_Vault.fn_LeadIntegrity_Controller(build_period, '10');
-	LIApd11 := LeadIntegrity_Vault.fn_LeadIntegrity_Controller(build_period, '11');
-	LIApd12 := LeadIntegrity_Vault.fn_LeadIntegrity_Controller(build_period, '12');
-	LIApd13 := LeadIntegrity_Vault.fn_LeadIntegrity_Controller(build_period, '13');
-	LIApd14 := LeadIntegrity_Vault.fn_LeadIntegrity_Controller(build_period, '14');
-	LIApd15 := LeadIntegrity_Vault.fn_LeadIntegrity_Controller(build_period, '15');		
+	local LIApd01 := LeadIntegrity_Vault.fn_LeadIntegrity_Controller(build_period, '01');
+	local LIApd02 := LeadIntegrity_Vault.fn_LeadIntegrity_Controller(build_period, '02');
+	local LIApd03 := LeadIntegrity_Vault.fn_LeadIntegrity_Controller(build_period, '03');
+	local LIApd04 := LeadIntegrity_Vault.fn_LeadIntegrity_Controller(build_period, '04');
+	local LIApd05 := LeadIntegrity_Vault.fn_LeadIntegrity_Controller(build_period, '05');
+	local LIApd06 := LeadIntegrity_Vault.fn_LeadIntegrity_Controller(build_period, '06');
+	local LIApd07 := LeadIntegrity_Vault.fn_LeadIntegrity_Controller(build_period, '07');
+	local LIApd08 := LeadIntegrity_Vault.fn_LeadIntegrity_Controller(build_period, '08');
+	local LIApd09 := LeadIntegrity_Vault.fn_LeadIntegrity_Controller(build_period, '09');
+	local LIApd10 := LeadIntegrity_Vault.fn_LeadIntegrity_Controller(build_period, '10');
+	local LIApd11 := LeadIntegrity_Vault.fn_LeadIntegrity_Controller(build_period, '11');
+	local LIApd12 := LeadIntegrity_Vault.fn_LeadIntegrity_Controller(build_period, '12');
+	local LIApd13 := LeadIntegrity_Vault.fn_LeadIntegrity_Controller(build_period, '13');
+	local LIApd14 := LeadIntegrity_Vault.fn_LeadIntegrity_Controller(build_period, '14');
+	local LIApd15 := LeadIntegrity_Vault.fn_LeadIntegrity_Controller(build_period, '15');
 	
-		failuresubject   := 'The LeadIntegrity Build Failed for the Build Period: ' + build_period;
-		failurebody      := 'The LeadIntegrity Build Failed for the Build Period: ' + build_period + '\n' +
+ local failuresubject   := 'The LeadIntegrity Build Failed for the Build Period: ' + (string) build_period;
+		
+	local failurebody      := 'The LeadIntegrity Build Failed for the Build Period: ' + (string) build_period + '\n' +
 												          'The Workunit is '+WORKUNIT + '\n' +
 												          'ErrorMessage is '+FAILMESSAGE + '\n\n';
 
-		ValDatefailurebody := 'The LeadIntegrity Build did NOT kick off because invalid build date: ' + build_period + '\n' +
+	local ValDatefailurebody := 'The LeadIntegrity Build did NOT kick off because invalid build date: ' + (string) build_period + '\n' +
 														          'The Workunit is '+WORKUNIT + '\n';
 
-  ValCntfailurebody := 'The LeadIntegrity Build did NOT kick off because of missing Input files exspecting 15 files: ' + build_period + '\n' +
+ local ValCntfailurebody := 'The LeadIntegrity Build did NOT kick off because of missing Input files exspecting 15 files: ' + (string) build_period + '\n' +
 														         'The Workunit is '+WORKUNIT + '\n';														 
 
 												
-		FILE_MASK := LeadIntegrity_Vault.Constants.MMPrefixNM + TRIM(build_period) + '_*_of_15';
-		ds_files := nothor(STD.File.LogicalFileList(FILE_MASK, true, false, true)); 
-		inputFileCount := COUNT(ds_files);
+	local 	FILE_MASK := LeadIntegrity_Vault.Constants.MMPrefixNM + (string) TRIM(build_period) + '_*_of_15';
+	local 	ds_files := nothor(STD.File.LogicalFileList(FILE_MASK, true, false, true)); 
+	local 	inputFileCount := COUNT(ds_files) :Independent;
 
 		output(build_period,named('Build_Period'));
 		output(inputFileCount,named('InputfileCount'));
@@ -85,9 +86,10 @@
 	  ERROR('fn_Run_LI_Controller - Invalid Parm for LIProcToRun');
 #END	
 
-Final := map(TRIM(build_period)='' => Fileservices.Sendemail(Constants.TeamEmailList, failuresubject, ValDatefailurebody)
-		            ,inputFileCount < 15 => Fileservices.Sendemail(Constants.TeamEmailList, failuresubject, ValCntfailurebody) 
+Final := map(TRIM(build_period)='' => Fileservices.Sendemail(LeadIntegrity_Vault.Constants.TeamEmailList, failuresubject, ValDatefailurebody)
+		            ,inputFileCount < 15 => Fileservices.Sendemail(LeadIntegrity_Vault.Constants.TeamEmailList, failuresubject, ValCntfailurebody) 
 								      ,RunLI);
+										
 
 
 Return Final;

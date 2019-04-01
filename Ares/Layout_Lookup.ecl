@@ -20,6 +20,13 @@ end;
 lookup_lookupBody := record
 	string id {xpath('./@id')}:='';
 	string fid {xpath('./@fid')};
+	string databank_type {xpath('./@databank_type')};
+	
+	string intl_type {xpath('./@intl_type')};
+	string inst_type {xpath('./@inst_type')};
+	string rtn_type {xpath('./@rtn_type')};
+	string tfpSubcategory {xpath('./@tfpSubcategory')};
+	
 	string fdbDescription {xpath('./@fdbDescription')};
 	string fdbDescriptionPlural {xpath('./@fdbDescriptionPlural')};
 	string fdbFormat {xpath('./@fdbFormat')};

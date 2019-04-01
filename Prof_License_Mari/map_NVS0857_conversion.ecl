@@ -1,3 +1,6 @@
+﻿/*2018-11-26T20:15:42Z (xsheng_prod)
+C:\Users\shenxi01\AppData\Roaming\HPCC Systems\eclide\xsheng_prod\New_Dataland\Prof_License_Mari\map_NVS0857_conversion\2018-11-26T20_15_42Z.ecl
+*/
 /* Converting Nevada Real Estate Division / Real Estate Appraisers Licenses File to MARI common layout
 // Following allowable Real Estate License Type: APR, RLE, MTG, LND
 */
@@ -22,55 +25,7 @@ EXPORT map_NVS0857_conversion(STRING pVersion) := FUNCTION
 	sale                := Prof_License_Mari.file_NVS0857.sale;
 	broker              := Prof_License_Mari.file_NVS0857.broker;
 
-  Prof_License_Mari.layout_NVS0857 prep_merge(layout_NVS0857 L) := TRANSFORM
-	  TrimSLNUM             := ut.CleanSpacesAndUpper(L.SLNUM);
-	  SELF.SLNUM            := MAP(TrimSLNUM IN ['CHRISTIANSEN','LESEBERG','FOREMAN'] => '',
-		                             REGEXFIND('PAGE ',TrimSLNUM) => '',
-																 REGEXFIND('STATE OF ',TrimSLNUM) => '',
-		                             TrimSLNUM[1..2] IN ['A\\.','B\\.'] => TrimSLNUM,
-																 TrimSLNUM[1..3] = 'BS\\.' => TrimSLNUM,
-																 TrimSLNUM[1..5] = 'BUSB\\.' => TrimSLNUM,
-																 Prof_License_Mari.func_is_company(TrimSLNUM)  OR TrimSLNUM IN ['INC','LLC'] => '',
-																 TrimSLNUM IN ['^.*#.*$','STE.*$'] => '',
-																 TrimSLNUM = 'VILLAGE' => '',
-																 TrimSLNUM IN ['STATE','CITY'] => '',
-																 TrimSLNUM);
-	  SELF.ORG_NAME         := IF(TrimSLNUM IN ['CHRISTIANSEN','LESEBERG','FOREMAN'],TrimSLNUM,L.ORG_NAME);
-		SELF.OFFICENAME       := MAP(TrimSLNUM[1..2] IN ['A\\.','B\\.'] => L.OFFICENAME,
-																 TrimSLNUM[1..3] = 'BS\\.' => L.OFFICENAME,
-																 TrimSLNUM[1..5] = 'BUSB\\.' => L.OFFICENAME,
-		                             REGEXFIND('PAGE ',TrimSLNUM) => L.OFFICENAME,
-																 REGEXFIND('STATE OF ',TrimSLNUM) => L.OFFICENAME,															 
-		                             Prof_License_Mari.func_is_company(TrimSLNUM)  OR TrimSLNUM IN ['INC','LLC'] => TrimSLNUM,
-																 L.OFFICENAME);
-		SELF.ADDRESS1_1       := IF(TrimSLNUM IN ['^.*#.*$','^STE.*$'],TrimSLNUM,L.ADDRESS1_1);
-		SELF.CITY_1           := IF(TrimSLNUM = 'VILLAGE',TrimSLNUM,L.CITY_1);
-		SELF.COUNTY           := IF(TrimSLNUM IN ['STATE','CITY'],TrimSLNUM,L.COUNTY);
-   	SELF := L;
-	END;
-	
-	prep_merge1             := PROJECT(appr,prep_merge(LEFT));
-	prep_merge2             := PROJECT(b_broker,prep_merge(LEFT));
-	prep_merge3             := PROJECT(sale,prep_merge(LEFT));
-	prep_merge4             := PROJECT(broker,prep_merge(LEFT));
-
-  //The input file has many records that are broken into 2 lines.
-	Prof_License_Mari.layout_NVS0857 merge_lines(layout_NVS0857 L, layout_NVS0857 R) := TRANSFORM
-	  SELF.ORG_NAME         := IF(TRIM(R.ORG_NAME)<>'',StringLib.StringCleanSpaces(L.ORG_NAME + ' '+ R.ORG_NAME),L.ORG_NAME);
-		SELF.OFFICENAME       := IF(TRIM(R.OFFICENAME)<>'',StringLib.StringCleanSpaces(L.OFFICENAME + ' '+ R.OFFICENAME),L.OFFICENAME);
-		SELF.ADDRESS1_1       := IF(TRIM(R.ADDRESS1_1)<>'',StringLib.StringCleanSpaces(L.ADDRESS1_1 + ' '+ R.ADDRESS1_1),L.ADDRESS1_1);
-		SELF.CITY_1           := IF(TRIM(R.CITY_1)<>'',StringLib.StringCleanSpaces(L.CITY_1 + ' '+ R.CITY_1),L.CITY_1);
-		SELF.STATE_1          := IF(TRIM(R.STATE_1)<>'',StringLib.StringCleanSpaces(L.STATE_1 + ' '+ R.STATE_1),L.STATE_1);
-		SELF.ZIP              := IF(TRIM(R.ZIP)<>'',StringLib.StringCleanSpaces(L.ZIP + ' '+ R.ZIP),L.ZIP);
-		SELF.COUNTY           := IF(TRIM(R.COUNTY)<>'',StringLib.StringCleanSpaces(L.COUNTY + ' '+ R.COUNTY),L.COUNTY);
-   	SELF := L;
-   END;
-   
-   merge_line1        := ROLLUP(prep_merge1,TRIM(RIGHT.SLNUM) = '',merge_lines(LEFT,RIGHT));
-	 merge_line2        := ROLLUP(prep_merge2,TRIM(RIGHT.SLNUM) = '',merge_lines(LEFT,RIGHT));
-	 merge_line3        := ROLLUP(prep_merge3,TRIM(RIGHT.SLNUM) = '',merge_lines(LEFT,RIGHT));
-	 merge_line4        := ROLLUP(prep_merge4,TRIM(RIGHT.SLNUM) = '',merge_lines(LEFT,RIGHT));
-	 merge_line         := merge_line1 + merge_line2 + merge_line3 + merge_line4;
+	merge_line          := appr + b_broker + sale + broker;
 
 	//Reference Files for lookup joins
 	cmvTransLkp					:= Prof_License_Mari.files_References.cmvtranslation(SOURCE_UPD =src_cd);
@@ -104,7 +59,7 @@ EXPORT map_NVS0857_conversion(STRING pVersion) := FUNCTION
 					         ')';
 
 	//Filtering out BAD RECORDS
-	GoodNameRec 		:= merge_line(NOT REGEXFIND('(LICENSE NO|EXPIRATION|STATE|PAGE)',ut.CleanSpacesAndUpper(slnum))
+	GoodNameRec 		:= merge_line(NOT REGEXFIND('(LICENSE NO|EXPIRATION|DATE|STATE|PAGE)',ut.CleanSpacesAndUpper(slnum))
 	                              AND ut.CleanSpacesAndUpper(ORG_NAME + OFFICENAME + ADDRESS1_1 + CITY_1 + STATE_1 + ZIP + COUNTY) <> ''
 																AND ut.CleanSpacesAndUpper(ZIP)<>'ZIP');
   O_GoodRec := OUTPUT(GoodNameRec);
@@ -150,6 +105,8 @@ EXPORT map_NVS0857_conversion(STRING pVersion) := FUNCTION
 		                    =>REGEXFIND('A[\\.]([0-9]+)[\\.]([A-z]+)[\\-]([A-z]+$)',Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.SLNUM),3),
 											 REGEXFIND('(^[A-z]+)[\\.]([0-9]+)[\\.](.+$)',Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.SLNUM)) //BS.0032399.PC MGR, BUSB.0000114.-BKR
 		                    =>REGEXFIND('(^[A-z]+)[\\.]([0-9]+)[\\.](.+$)',Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.SLNUM),1),
+											 REGEXFIND('(^[A-z]+)[\\.]([A-z]+$)',Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.SLNUM)) //BS.0032399.PC MGR, BUSB.0000114.-BKR
+		                    =>REGEXFIND('(^[A-z]+)[\\.]([A-z]+$)',Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.SLNUM),1),
 											 Prof_License_Mari.mod_clean_name_addr.TrimUpper(pInput.SLNUM)
 		                  );
 		SELF.RAW_LICENSE_TYPE	:= tmpLIC_TYPE;
@@ -159,7 +116,7 @@ EXPORT map_NVS0857_conversion(STRING pVersion) := FUNCTION
 					
 		//Reformatting date to YYYYMMDD
 		SELF.CURR_ISSUE_DTE		:= '17530101';
-		SELF.ORIG_ISSUE_DTE		:= '17530101';
+		SELF.ORIG_ISSUE_DTE		:= IF(pInput.ISSEDT != '',Prof_License_Mari.DateCleaner.fmt_dateMMDDYYYY(pInput.ISSEDT),'17530101');
 		SELF.EXPIRE_DTE				:= IF(pInput.EXPDT != '',Prof_License_Mari.DateCleaner.fmt_dateMMDDYYYY(pInput.EXPDT),'17530101');
 		
 		//LICSTAT has been removed. Use expiration date to determine the license status

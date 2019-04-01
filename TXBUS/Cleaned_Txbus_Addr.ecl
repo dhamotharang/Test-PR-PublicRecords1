@@ -1,21 +1,35 @@
-import lib_stringlib, ut, address, idl_header, aid, NID;
+﻿import lib_stringlib, ut, address, idl_header, aid, NID;
 
-in_file := Txbus.File_Txbus_In.File_Cleaned_Super;
+in_file   := Txbus.File_Txbus_In.File_Cleaned_Super;
 
+base_file := project(Txbus.File_Txbus_Base, transform(Txbus.Layouts_txbus.Layout_Common,self:=left));
+
+update_combined		:= in_file + base_file;
+															
 Temp_Txbus_Layout_Common:=record
 		Txbus.Layouts_Txbus.Layout_Common;
 		string73 tempTaxpayerName;
 end;
 
+//** function removes the non-viewable characters from a given string. 
+//** Jira# DF-DF-23898 TXBUS -Name has special characters
+fRemoveNonviewableChars(string instr) := function
+		clean_instr := ut.CleanSpacesAndUpper(stringlib.stringfilter(instr,'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ~`!@#$%^&*()-_+={}[]|\\:;"\'<,>.?/'));
+		return clean_instr;
+end;
+
 Temp_Txbus_layout_Common trans_Name(Txbus.Layouts_Txbus.Layout_Common l) :=transform
 //If Taxpayer_Org_Type = 'IS' then Taxpayer_Name will contain an induvidual's name instead of the  
 //business name. So based on this conditions we only clean if it is an actual person name.
- 			self.tempTaxpayerName := if(trim(l.Taxpayer_Name,left,right) <> '' and stringlib.StringToUpperCase(trim(l.Taxpayer_Org_Type,left,right)) = 'IS',
-																			stringlib.StringToUpperCase(trim(l.Taxpayer_Name,left,right)),'');
+			cleaned_taxpayer_name := fRemoveNonviewableChars(l.taxpayer_name);
+			self.Taxpayer_Name		:= trim(cleaned_taxpayer_name);
+ 			self.tempTaxpayerName := if(trim(cleaned_taxpayer_name) <> '' and ut.CleanSpacesAndUpper(l.Taxpayer_Org_Type) = 'IS',
+																			trim(cleaned_taxpayer_name),'');
+			self.Outlet_Name			:= fRemoveNonviewableChars(l.outlet_name);
 			self							 		:= l;
 			
 end;
-dCleanName := project(in_file,trans_Name(left));
+dCleanName := project(update_combined,trans_Name(left));
 //*** Cleaning person names using the new NID name cleaner.
 NID.Mac_CleanFullNames(dCleanName, cleaned_name_output, tempTaxpayerName);
 
@@ -158,10 +172,10 @@ end;
 
 //** Adding back the filtered blank address records to the rest of the file.
 dAID_Cleaned_Addr := project(dwithAID, tMapAidAddr(left))
-									 + project(dWithout_address,transform(Layouts_Txbus.Layout_AID_Clean_Temp, self := left, self := []));
+									 + project(dWithout_address,transform(Txbus.Layouts_Txbus.Layout_AID_Clean_Temp, self := left, self := []));
 
 //*** Denorm AID cleaned address records to get them back to original form
-Txbus.Layouts_Txbus.Layout_AID_Temp DenormRecs(Txbus.Layouts_Txbus.Layout_AID_Temp l,  Layouts_Txbus.Layout_AID_Clean_Temp r) := transform	
+Txbus.Layouts_Txbus.Layout_AID_Temp DenormRecs(Txbus.Layouts_Txbus.Layout_AID_Temp l,  Txbus.Layouts_Txbus.Layout_AID_Clean_Temp r) := transform	
 	self.raw_aid 									:= if(r.addr_type = 'O', r.raw_aid, l.raw_aid)															;
 	self.ace_aid 									:= if(r.addr_type = 'O', r.ace_aid, l.ace_aid)															;
 	self.mail_raw_aid 						:= if(r.addr_type = 'M', r.raw_aid, l.mail_raw_aid)													;	
@@ -233,6 +247,6 @@ dDenorm_AID := denormalize(dPreAddrForAID,
 														DenormRecs(left, right)
 													 );
 
-dCommon_With_AID 					:= project(dDenorm_AID,transform(layouts_Txbus.Layout_AID_Common, self := left));
+dCommon_With_AID 					:= project(dDenorm_AID,transform(Txbus.layouts_Txbus.Layout_AID_Common, self := left));
 
 export Cleaned_Txbus_Addr := dCommon_with_AID : persist(Txbus.Constants.Cluster + 'persist::txbus::Cleaned_Addr_txbus::Addr_WithAID');

@@ -1,4 +1,4 @@
-﻿import STD,lib_workunitservices,lib_stringlib,thorbackup;
+﻿import STD,lib_workunitservices,lib_stringlib;
 EXPORT WorkunitTimingDetails(string esp
 														,string fromemail
 														,string toemaillist
@@ -10,10 +10,11 @@ EXPORT WorkunitTimingDetails(string esp
 	shared states := ['completed','aborted','failed'];
 	// no of workunits in dev is more compared to prod, hence limiting the count else
 	// it is failing with buffer overlimit error
-	shared noofdaysbehind := if (dopsenv = 'dev',5,20);
+	shared noofdaysbehind := if (dopsenv = 'dev',1,1);
 	shared startwu := 'W' + (string)STD.Date.AdjustDate(STD.Date.Today(),0,0,-noofdaysbehind) + '-' + (string)STD.Date.CurrentTime(true);
 	shared endwu := 'W' + (string)STD.Date.Today() + '-' + (string)STD.Date.CurrentTime(true);
-	shared integer baskets := 500;
+	shared integer nooffilesperbasket := 100;
+	shared integer baskets := 2000;
 	
 	export rWUTimingDetails := record, maxlength(20000)
 		string wuid;
@@ -54,7 +55,7 @@ EXPORT WorkunitTimingDetails(string esp
 	
 	export GetWUList() := sort(lib_workunitservices.WorkunitServices.workunitlist
 														(lowwuid := startwu 
-															, highwuid := endwu)(stringlib.StringToLowerCase(state) in states), wuid);
+															, highwuid := endwu)(stringlib.StringToLowerCase(state) in states and job <> ''), wuid);
 	
 	
 	
@@ -75,12 +76,12 @@ EXPORT WorkunitTimingDetails(string esp
 		
 		rWUTimingDetails xGetDFUWUIDs(dWUTimingDetails l,lib_workunitservices.WsTiming r) := transform
 			self.dfujobid := if (regexfind('SPRAY',std.str.touppercase(trim(r.name,left,right)),nocase)
-														,r.name
+														,STD.Str.SplitWords(r.name,'(')[1]
 														,'');
 			self := l;
 		end;
 		
-		dGetDFUWUIDs := dedup(sort(normalize(dWUTimingDetails,left.wutimings,xGetDFUWUIDs(left,right)),dfujobid), record);
+		dGetDFUWUIDs := dedup(sort(normalize(dWUTimingDetails,left.wutimings,xGetDFUWUIDs(left,right)),wuid), record);
 		
 		rDataVizInfo xCaptureTimings(dGetDFUWUIDs l,integer c) := transform
 			s_time := l.wutimestamp(trim(id,left,right) = 'Created')[1].time;
@@ -123,10 +124,8 @@ EXPORT WorkunitTimingDetails(string esp
 															,project(dGetDFUWUIDs,xCaptureTimings(left,counter))
 															);
 		
-		
-		
 		rDataVizInfo itr_recs(dCaptureTimings l, dCaptureTimings r) := transform
-			self.whichbasket := if (r.cnt > (baskets * l.whichbasket) and r.cnt > (l.whichbasket * thorbackup.Constants.getnooffiles().nfiles),l.whichbasket + 1,l.whichbasket);
+			self.whichbasket := if (r.cnt > (l.whichbasket * nooffilesperbasket),l.whichbasket + 1,l.whichbasket);
 			self := r;
 			
 		end;
@@ -134,7 +133,7 @@ EXPORT WorkunitTimingDetails(string esp
 		dgroupbaskets := iterate(dCaptureTimings,itr_recs(left,right));
 		
 				
-		return dgroupbaskets;
+		return dedup(dgroupbaskets,record,except dfujobid, cnt, whichbasket);
 		
 	end;
 	
@@ -240,6 +239,7 @@ EXPORT WorkunitTimingDetails(string esp
 						,if (~fileservices.fileexists('~wutimings::job::running')
 								,sequential(
 									output(dataset([{WORKUNIT}],{string wuid}),,'~wutimings::job::running',overwrite)
+									,output(dDetails,,'~dataops::wutimings::presoapcall',overwrite)
 									//output(choosen(ds,100)),
 									,output(soap_response,,'~dataops::soapcalls::wutimingstoupdatedb',overwrite),
 									if(count(soapds(rstatus[1].Code = '-1')) > 0,

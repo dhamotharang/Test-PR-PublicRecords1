@@ -1,4 +1,4 @@
-﻿EXPORT Functions := MODULE
+﻿﻿EXPORT Functions := MODULE
   IMPORT Std;
   EXPORT GenerateJoinEquality(Val) := FUNCTIONMACRO
     Layout := {STRING ColumnName};
@@ -18,7 +18,7 @@
     LOCAL Me := PROJECT(InDS, TRANSFORM({RECORDOF(LEFT), STRING HashID}, SELF.HashID := #EXPAND('LEFT.' + REGEXREPLACE(',', Grouping, ' + \'|\' + LEFT.')), SELF := LEFT));
 		LOCAL t1 := TABLE(Me, {HashID, Val, INTEGER cnt := count(group)}, HashID, Val, MERGE);
     LOCAL TotalCandidates := TABLE(Me, {HashID, INTEGER TotalCandidates := count(group)}, HashID, MERGE);
-    LOCAL t2 := JOIN(t1, TotalCandidates, LEFT.HashID=RIGHT.HashID, HASH);   
+    LOCAL t2 := JOIN(t1, TotalCandidates, LEFT.HashID=RIGHT.HashID, SMART);   
     
 		LOCAL ResType := RECORD
 			RECORDOF(t2);
@@ -34,7 +34,7 @@
 			SELF := R;
 		END;
 		
-		LOCAL i1 := UNGROUP(ITERATE(PROJECT(GROUP(SORT(t2,HashID, Val, RECORD), HashID), TRANSFORM(ResType, self := LEFT, self := [])), T(LEFT,RIGHT)));
+		LOCAL i1 := UNGROUP(ITERATE(PROJECT(GROUP(SORT(DISTRIBUTE(t2, HASH32(HashId)),HashID, Val/*, RECORD*/, LOCAL), HashID), TRANSFORM(ResType, self := LEFT, self := [])), T(LEFT,RIGHT)));
     
 		LOCAL Final := JOIN(Me, i1, LEFT.HashID=RIGHT.HashID AND LEFT.Val=RIGHT.Val, TRANSFORM({RECORDOF(LEFT), #EXPAND('RIGHT.' + PercentileRankColumnName), #EXPAND('RIGHT.' +QuartileRank)}, self := LEFT, self := RIGHT), HASH);
 		RETURN Final;

@@ -1,4 +1,4 @@
-IMPORT corp2;
+﻿IMPORT corp2;
 EXPORT Functions := Module;
 
 //********************************************************************
@@ -155,11 +155,13 @@ EXPORT Functions := Module;
 								'CA' =>'COOPERATIVE ASSOCIATION',
 								'CD' =>'CONSERVATION DISTRICTS',
 								'CSO'=>'CREDIT SERVICE ORGANIZATION',
+								'DC' =>'DEBT COLLECTOR',
 								'EC' =>'EXEMPT CORPORATION',
 								'ECS'=>'EXEMPT CSO',
 								'ELC'=>'EXEMPT LLC',
 								'ELP'=>'EXEMPT LP',
 								'EMB'=>'EMBLEM',
+								'FN' =>'FICTITIOUS NAME',
 								'GP' =>'GENERAL PARTNERSHIP',
 								'I'  =>'INSURANCE COMPANY',
 								'LLC'=>'LIMITED LIABILITY COMPANY',
@@ -170,8 +172,9 @@ EXPORT Functions := Module;
 								'PC' =>'PUBLIC CORPORATION',
 								'PFP'=>'PURCHASER OF FUTURE PAYMENTS',
 								'PLC'=>'PROFESSIONAL LIMITED LIABILITY COMPANY',
-								'TM'=>'',
-								'TMO'=>'',
+								'SP' =>'SOLE PROPRIETOR',
+								'TM' =>'',
+								'TMO'=>'TRADEMARK HOLDER',
 								'UNA'=>'UNINCORPORATED NON-PROFIT ORGANIZATION',
 								'VA' =>'VOLUNTARY ASSOCIATION',
 								'Z'	 =>'NOT PROCESSED',
@@ -191,7 +194,7 @@ EXPORT Functions := Module;
 								'L'=>'LLC CANCELLATION (FOREIGN)',
 								'M'=>'MERGER',
 								'N'=>'NAME CHANGE (RESERVED FOR OLD RECORDS)',
-								'P'=>'PENDING DISSOLUTIONWITHDRAWAL OR MERGER',
+								'P'=>'PENDING DISSOLUTION WITHDRAWAL OR MERGER',
 								'R'=>'REVOKED (FAILURE TO FILE ANNUAL REPORT)',
 								'T'=>'LLC TERMINATION (DOMESTIC)',
 								'V'=>'VOLUNTARY DISSOLUTION (DOMESTIC)',
@@ -239,7 +242,7 @@ EXPORT Functions := Module;
 								st in ['II','LLC','NA','Z','156','260','203','250','255','257','253','247','258',
 											 '264','267','262','254','252','256','074','544','752','`',
 											 '307','261','100','109','120','327','190','266','926','230',
-											 '411','912','249','530','503','112','201','457','263','662','840','240']	=> '',//Per CI:Leave blank -  no translation available
+											 '411','912','249','530','503','112','201','457','263','662','840','240','280']	=> '',//Per CI:Leave blank -  no translation available
 								st in ['PAR','SLO','TE','UDS','UIS','USS','WOR']=>'',		//Per CI:Leave blank -  no translation available	 
 								st ='ABW'=>'ARUBA',	
 								st ='AFG'=>'AFGHANISTAN',	

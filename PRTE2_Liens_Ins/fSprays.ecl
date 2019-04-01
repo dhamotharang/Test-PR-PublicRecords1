@@ -1,5 +1,7 @@
 ﻿/* *********************************************************************************************
 	PRTE2_Liens_Ins.fSprays
+
+Dec 2018, during sprays use Boca Hash to set Persistent_Record_ID field so it can be used for Dempsey
 ********************************************************************************************* */
 
 IMPORT PRTE2_Liens_Ins,LiensV2, PromoteSupers, PRTE2_Common, Address, PRTE2_Common;
@@ -32,7 +34,51 @@ EXPORT fSprays := MODULE
 			//**** Any preprocessing needed? *****************************************************************
 			//***********************************************************************************************
 			newMainData0 := Files.main_TmpFile_DS;
-			newMainData := PROJECT(newMainData0,TRANSFORM({newMainData0},SELF.bcbflag:=TRUE, SELF := LEFT));
+			newMainData := PROJECT(newMainData0,TRANSFORM({newMainData0},
+										SELF.bcbflag:=TRUE, 
+										SELF.persistent_record_id := 	HASH64(trim(LEFT.tmsid,left,right)+ ','+
+													trim(LEFT.rmsid,left,right)+  ','+
+													trim(LEFT.record_code,left,right)+  ','+
+													trim(LEFT.date_vendor_removed ,left,right)+  ','+
+													trim(LEFT.filing_jurisdiction,left,right)+  ','+
+													trim(LEFT.filing_state ,left,right)+  ','+
+													trim(LEFT.orig_filing_number ,left,right)+  ','+
+													trim(LEFT.orig_filing_type ,left,right)+  ','+
+													trim(LEFT.orig_filing_date ,left,right)+  ','+
+													trim(LEFT.orig_filing_time ,left,right)+ ','+ 
+													trim(LEFT.case_number   ,left,right)+  ','+
+													trim(LEFT.filing_number ,left,right)+  ','+
+													trim(LEFT.filing_type_desc ,left,right)+  ','+
+													trim(LEFT.filing_date ,left,right)+  ','+
+													trim(LEFT.filing_time ,left,right)+  ','+
+													trim(LEFT.vendor_entry_date ,left,right)+  ','+
+													trim(LEFT.judge ,left,right)+  ','+
+													trim(LEFT.case_title ,left,right)+  ','+
+													trim(LEFT.filing_book ,left,right)+  ','+
+													trim(LEFT.filing_page ,left,right)+  ','+
+													trim(LEFT.release_date ,left,right)+  ','+
+													trim(LEFT.amount ,left,right)+  ','+
+													trim(LEFT.eviction ,left,right)+  ','+
+													trim(LEFT.satisifaction_type ,left,right)+  ','+
+													trim(LEFT.judg_satisfied_date ,left,right)+  ','+
+													trim(LEFT.judg_vacated_date ,left,right)+  ','+
+													trim(LEFT.tax_code ,left,right)+  ','+
+													trim(LEFT.irs_serial_number ,left,right)+  ','+
+													trim(LEFT.effective_date ,left,right)+  ','+
+													trim(LEFT.lapse_date ,left,right)+  ','+
+													trim(LEFT.accident_date ,left,right)+  ','+
+													trim(LEFT.sherrif_indc ,left,right)+  ','+
+													trim(LEFT.expiration_date ,left,right)+  ','+
+													trim(LEFT.agency ,left,right)+  ','+
+													trim(LEFT.agency_city ,left,right)+  ','+
+													trim(LEFT.agency_state ,left,right)+  ','+
+													trim(LEFT.agency_county ,left,right)+  ','+
+													trim(LEFT.legal_lot ,left,right)+  ','+
+													trim(LEFT.legal_block ,left,right)+  ','+
+													trim(LEFT.legal_borough ,left,right)+  ','+
+													trim(LEFT.certificate_number ,left,right)+ ','+
+													trim(LEFT.filing_status ,left,right)+trim(LEFT.filing_status_desc,left,right)),
+										SELF := LEFT));
 			//***********************************************************************************************
 			// newMainData := PROJECT(Files.main_TmpFile_DS,tBaseStatus(LEFT));
 			//TODO - I think we need to intialize some fields in there too.
@@ -76,7 +122,7 @@ EXPORT fSprays := MODULE
 			// see proc_build_base for persistent_record_id generation - those are the primary fields to start with
 			//***********************************************************************************************
 			newpartyData := PRTE2_Common.mac_ConvertToUpperCase(Files.party_TmpFile_DS , fname, mname, lname);
-			FinalPartyData := PROJECT(newpartyData,
+			FinalPartyData1 := PROJECT(newpartyData,
 																	TRANSFORM({newpartyData},
 																			// ------------------ clean / prepare name fields ----------------------
 																				TempPname					:= Address.CleanPersonFML73(LEFT.orig_full_debtorname);
@@ -131,7 +177,34 @@ EXPORT fSprays := MODULE
 																				self.msa						:= TempAddr[167..170];
 																				self.geo_match			:= TempAddr[178];
 																				self.err_stat				:= TempAddr[179..182];
-
+																				self := LEFT;																	
+																	)
+																);
+			// Jan 2019, moved this to a final PROJECT so all fields have been initialized prior to computing the persistent_record_id
+			FinalPartyData := PROJECT(FinalPartyData1,
+																	TRANSFORM({FinalPartyData1},
+																				self.persistent_record_id := hash64(trim(LEFT.tmsid,left,right)+','+
+																								trim(LEFT.rmsid,left,right)+','+
+																								trim(LEFT.orig_full_debtorname,left,right)+','+
+																								trim(LEFT.orig_name ,left,right)+','+
+																								trim(LEFT.orig_lname,left,right)+','+
+																								trim(LEFT.orig_fname,left,right)+','+
+																								trim(LEFT.orig_mname ,left,right)+','+
+																								trim(LEFT.orig_suffix ,left,right)+','+
+																								trim(LEFT.tax_id ,left,right)+','+
+																								trim(LEFT.ssn ,left,right)+','+
+																								trim(LEFT.cname ,left,right)+','+
+																								trim(LEFT.orig_address1 ,left,right)+','+
+																								trim(LEFT.orig_address2 ,left,right)+','+
+																								trim(LEFT.orig_city ,left,right)+','+
+																								trim(LEFT.orig_state ,left,right)+','+
+																								trim(LEFT.orig_zip5 ,left,right)+','+
+																								trim(LEFT.orig_zip4 ,left,right)+','+
+																								trim(LEFT.orig_county ,left,right)+','+
+																								trim(LEFT.orig_country ,left,right)+','+
+																								trim(LEFT.phone ,left,right)+ ','+
+																								trim(LEFT.name_type ,left,right) +','+ trim(LEFT.bdid,left,right) +','+trim(LEFT.did,left,right)+','+trim(LEFT.zip,left,right)
+																								+trim(LEFT.fname,left,right)+','+trim(LEFT.lname,left,right)+','+trim(LEFT.mname,left,right)+','+trim(LEFT.name_suffix,left,right) +','+ trim(LEFT.zip4,left,right)); // orig name has multiple names 
 																				self := LEFT;																	
 																	)
 																);

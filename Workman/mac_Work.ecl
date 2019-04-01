@@ -178,7 +178,7 @@ functionmacro
 
   // -- Set and define output file
   OutputFilename                  := regexreplace('@version@' ,pOutputFilename  ,pversion);
-  outputfilename_dataset          := dataset(OutputFilename      ,WorkMan.layouts.wks_slim  ,thor ,opt);
+  outputfilename_dataset          := dataset(OutputFilename      ,WorkMan.layouts.wks_slim  ,thor ,opt)(pBuildName = '' or trim(build_name) = trim(pBuildName));
   count_outputfile                := count(outputfilename_dataset);
   outputfilename_remote_dataset   := dataset(trim(WorkMan._Config.foreign_env(pESP) + OutputFilename[2..])  ,WorkMan.layouts.wks_slim  ,thor ,opt);
 
@@ -197,6 +197,7 @@ functionmacro
   previous_stop_condition_formula := outputfilename_dataset[count_outputfile].stop_condition_formula;
   previous_advice                 := outputfilename_dataset[count_outputfile].advice                ;
   previous_last_iteration         := outputfilename_dataset[count_outputfile].iteration             ;
+  previous_build_name             := outputfilename_dataset[count_outputfile].build_name            ;
   
   // -- figure out whether to run this or not.  if it was already run, and there are no changes, skip it
   // we could run something, it almost finishes then fails and we skip it which cleans up the output file just like if it finished.
@@ -205,11 +206,13 @@ functionmacro
     Is_Already_Done := false;
   #ELSE
     Is_Already_Done := if(    count_outputfile > 0 
-                          and (     (unsigned)pStartIteration         = (unsigned)previous_start_iteration 
+                          and( (     (unsigned)pStartIteration        = (unsigned)previous_start_iteration 
                                 and (unsigned)%MAX_ITERATIONS%        = (unsigned)previous_max_iterations 
                                 and (unsigned)%'MIN_ITERATIONS'%      = (unsigned)previous_min_iterations
                                 and trim(pStopCondition)              = trim(previous_stop_condition_formula)
                               ) 
+                              or (unsigned)previous_last_iteration >= (unsigned)pStartIteration + (unsigned)%MAX_ITERATIONS% - 1
+                          )
                           ,true  
                           ,false
                        );
@@ -340,11 +343,14 @@ childrunner_ecl_code :=
   
   // -- check for failures
   check_for_failures := 
-    iff(
+    iff((
           (   get_child_wuid_state not in ['completed'] 
           and get_child_wuid_state not in ['completed']
-          ) 
+          )
        and not regexfind('(skip|move on)',get_Advice,nocase)
+       )
+       and pCompileOnly = false
+
           ,fail('Fail workunit because wuid ' + get_child_wuid + ' has/is ' + get_child_wuid_state + ' with the following error(s):\n' + get_child_wuid_errors)
     );
 

@@ -1,4 +1,4 @@
-/*
+﻿/*
   // -- example of a run
 EmpStartIteration  := 1   ;
 EmpNumIterations   := 1   ;
@@ -80,7 +80,11 @@ EXPORT _proc_empid_down(
 	/* ---------------------- Take Action -------------------------------- */
 	// export runSpecBuild := sequential(specBuild, specDebug);
 	
-	export runIter := sequential(linking, outputReviewSamples, updateBuilding()/*, updateLinkHist*/)
+	/*-----------------------QA Tool Iteration Stats -------------*/
+  import BIPV2_QA_Tool;
+  export Empid_Down_iteration_stats := BIPV2_QA_Tool.mac_Iteration_Stats(workunit  ,empid ,Build_Date  ,iter  ,BIPV2_Empid_down.Config.MatchThreshold ,'BIPV2_Empid_Down');
+
+	export runIter := sequential(linking, outputReviewSamples, updateBuilding(),Empid_Down_iteration_stats/*, updateLinkHist*/)
 		: SUCCESS(bipv2_build.mod_email.SendSuccessEmail(,'BIPv2', , 'EmpID_Down')),
 			FAILURE(bipv2_build.mod_email.SendFailureEmail(,'BIPv2', failmessage, 'EmpID_Down'));
 	
@@ -88,42 +92,80 @@ EXPORT _proc_empid_down(
 	
 	export MultIter_wuName(unsigned startIter, unsigned numIters) := 
 			'BIPV2_EmpID_Down Controller ' + Build_Date + ' ' + (string)startiter + '-' + (string)(startiter + numiters - 1);
-	export MultIter_run(startIter, numIters, doInit = 'true',dospec = 'true',doIters = 'true',doPost = 'true',pversion = 'bipv2.keysuffix',p_Init_File = 'BIPV2_Files.files_powid().DS_BASE') := functionmacro
-			import wk_ut, tools,BIPV2_build;
-			pHint     := if(_Control.ThisEnvironment.name='Dataland','dev','20');
-			cluster		:= BIPV2_build._Constants().Groupname;
-			version		:= pversion;
-			previter	:= (string)(startiter - 1);
-			lastIter	:= (string)(startiter - 1 + numIters);
-			eclInit		:= 'import BIPV2_Files,BIPV2_build;\niteration := \'@iteration@\';\npversion  := \'@version@\';\n#workunit(\'name\',\'BIPV2_EmpID_Down \' + pversion + \' Init \');\n#OPTION(\'multiplePersistInstances\',FALSE);\n#workunit(\'priority\',\'high\');\n' + 'BIPV2_EmpID_Down._proc_empid_down(,,\'' + pversion + '\').init(' + #TEXT(p_Init_File)+ ');';
-		  // eclSpec		:= 'import BIPV2_Files,BIPV2_build;iteration := \'@iteration@\';pversion  := \'@version@\';lih := BIPV2_Files.files_empid_down(\'BIPV2_EmpID_Down\').DS_BUILDING;#workunit(\'name\',\'BIPV2_EmpID_Down \' + pversion + \' Specificities \');#workunit(\'priority\',\'high\');BIPV2_EmpID_Down._proc_empid_down(lih,iteration,\'' + pversion + '\').runSpecBuild;';
-			eclIter		:= 'import BIPV2_Files,BIPV2_build;\niteration := \'@iteration@\';\npversion  := \'@version@\';\nlih := BIPV2_Files.files_empid_down(\'BIPV2_EmpID_Down\').DS_BUILDING;\n#OPTION(\'multiplePersistInstances\',FALSE);\n#workunit(\'name\',\'BIPV2_EmpID_Down \' + pversion + \' iter \' + iteration);\n#workunit(\'priority\',\'high\');\n' + 'BIPV2_EmpID_Down._proc_empid_down(lih,iteration,\'' + pversion + '\').runIter;';
-      eclPost		:= 'import BIPV2_build;\n#workunit(\'name\',\'BIPV2_EmpID_Down @version@ PostProcess\');\n' + 'BIPV2_EmpID_Down._proc_empid_down(,\'' + lastIter + '\',\'' + pversion + '\').updateSuperfiles();';
-			kickInit	:= wk_ut.mac_ChainWuids(eclInit,1,1,version,,cluster,pOutputEcl := false,pUniqueOutput := 'EmpDownInit',pNotifyEmails := BIPV2_build.mod_email.emailList
+
+	export MultIter_run(
+       startIter    = '1' //starting from scratch each build, so start at one
+      ,numIters     = '6'
+      ,doInit       = 'true'
+      ,dospec       = 'true'
+      ,doIters      = 'true'
+      ,doPost       = 'true'
+      ,pversion     = 'bipv2.keysuffix'
+      ,p_Init_File  = 'BIPV2_Files.files_powid().DS_BASE'
+      ,pcluster     = 'BIPV2_Build._Constants().Groupname'
+      ,pEmailList   = 'BIPV2_Build.mod_email.emailList'     // -- for testing, make sure to put in your email address to receive the emails
+      ,pCompileTest = 'false'                                               
+      
+   ) :=
+   functionmacro
+   
+			import Workman, tools,BIPV2_build;
+      
+			cluster		    := pcluster;
+			version		    := pversion;
+      lnumiters     := numIters         ;
+      lnumitersmax  := numIters + 1     ;
+      
+			eclInit_prep		:= 'import BIPV2_Files,BIPV2_build;\niteration := \'@iteration@\';\npversion  := \'@version@\';\n#workunit(\'name\',\'BIPV2_EmpID_Down \' + pversion + \' Init \');\n#OPTION(\'multiplePersistInstances\',FALSE);\n#workunit(\'priority\',\'high\');\n' ;
+			eclIter_prep		:= 'import BIPV2_Files,BIPV2_build;\niteration := \'@iteration@\';\npversion  := \'@version@\';\nlih := BIPV2_Files.files_empid_down(\'BIPV2_EmpID_Down\').DS_BUILDING;\n#OPTION(\'multiplePersistInstances\',FALSE);\n#workunit(\'name\',\'BIPV2_EmpID_Down \' + pversion + \' iter \' + iteration);\n#workunit(\'priority\',\'high\');\n' ;
+      eclPost_prep		:= 'import BIPV2_build;\n#workunit(\'name\',\'BIPV2_EmpID_Down @version@ PostProcess\');\n' ;
+      
+      eclInit		:= eclInit_prep + 'BIPV2_EmpID_Down._proc_empid_down(   ,           ,\'' + pversion + '\').init            (' + #TEXT(p_Init_File)+ ');';
+      eclIter		:= eclIter_prep + 'BIPV2_EmpID_Down._proc_empid_down(lih,iteration  ,\'' + pversion + '\').runIter                                    ;';
+      eclPost		:= eclPost_prep + 'BIPV2_EmpID_Down._proc_empid_down(   ,\'\'       ,\'' + pversion + '\').updateSuperfiles(                         );';
+
+      eclsetResults   := [ 'PreClusterCount PreClusterCount.empid_cnt'        
+                          ,'PostClusterCount PostClusterCount.empid_cnt'       
+                          ,'MatchesPerformed'      
+                          ,'BasicMatchesPerformed'
+                          ,'SlicesPerformed'
+                          // ,'LinkBlockSplits'
+                          ,'recordsrejected0'
+                          ,'unlinkablerecords0'
+                         ];
+      StopCondition   := '(PostClusterCount / PreClusterCount * 100.0) > (99.9)';
+      SetNameCalculations := ['Convergence_PCT','Convergence_Threshold'];
+
+      kickInit   := Workman.mac_WorkMan(eclInit   ,version,cluster ,1         ,1  ,pBuildName := 'EmpDownInit' ,pNotifyEmails := pEmailList
       ,pOutputFilename   := '~BIPV2_build::' + version + '::workunit_history::proc_empid_down.Init'
       ,pOutputSuperfile  := '~BIPV2_build::qa::workunit_history' 
+        ,pCompileOnly      := pCompileTest
       );
-			// kickSpec	:= wk_ut.mac_ChainWuids(eclSpec,1,1,version,,cluster,pOutputEcl := false,pUniqueOutput := 'EmpDownSpecs',pNotifyEmails := _control.MyInfo.EmailAddressNotify + ',todd.leonard@risk.lexisnexis.com'
-      // ,pOutputFilename   := '~BIPV2_build::' + version + '::workunit_history::proc_empid_down.Specificities'
-      // ,pOutputSuperfile  := '~BIPV2_build::qa::workunit_history' 
-      // );
-			kickIters	:= wk_ut.mac_ChainWuids(eclIter,startiter,numiters,version,['PreClusterCount[1].empid_count','{UNSIGNED rcid_Count,UNSIGNED empid_count}','PostClusterCount[1].empid_count','{UNSIGNED rcid_Count,UNSIGNED empid_count}','BasicMatchesPerformed','MatchesPerformed','SlicesPerformed'],cluster,pOutputEcl := false,pUniqueOutput := 'EmpDownIters',pNotifyEmails := BIPV2_build.mod_email.emailList
-      ,pOutputFilename   := '~BIPV2_build::@version@_@iteration@::workunit_history::proc_empid_down.iterations'
-      ,pOutputSuperfile  := '~BIPV2_build::qa::workunit_history' 
-      ,pSummaryFilename  := '~BIPV2_build::@version@_@iteration@::summary_report::proc_empid_down.iterations'
-      ,pSummarySuperfile := '~BIPV2_build::qa::summary_report::proc_empid_down.iterations'                                                 
+
+      kickiters := Workman.mac_WorkMan(eclIter,version ,cluster,startiter,lnumitersmax,lnumiters   
+        ,pSetResults          := eclsetResults
+        ,pStopCondition       := StopCondition
+        ,pSetNameCalculations := SetNameCalculations
+        ,pBuildName           := 'EmpIDIters'
+        ,pNotifyEmails        := pEmailList
+        ,pOutputFilename      := '~BIPV2_build::@version@_@iteration@::workunit_history::proc_empid_down.iterations'
+        ,pOutputSuperfile     := '~BIPV2_build::qa::workunit_history' 
+        ,pCompileOnly         := pCompileTest
      );
-      kickPost	:= wk_ut.mac_ChainWuids(eclPost,1,1,version,,cluster,pOutputEcl := false,pUniqueOutput := 'EmpDownPost',pNotifyEmails := BIPV2_build.mod_email.emailList
+     
+      kickPost   := Workman.mac_WorkMan(eclPost   ,version,cluster ,1         ,1  ,pBuildName := 'EmpDownPost' ,pNotifyEmails := pEmailList
         ,pOutputFilename   := '~BIPV2_build::' + version + '::workunit_history::proc_empid_down.Post'
         ,pOutputSuperfile  := '~BIPV2_build::qa::workunit_history' 
+        ,pCompileOnly      := pCompileTest
       );
+
 			return sequential(
-				 if(doInit, kickInit)
-				// ,if(doSpec, kickSpec)
+				 if(doInit  ,kickInit )
         ,if(doIters ,kickiters)
         ,if(doPost  ,kickPost )
 			);
 		endmacro;
+    
 	// EXAMPLE for calling MultIter...
 	//		startIter	:= 1; // REMINDER: Check these three inputs carefully!
 	//		numIters	:= 3;

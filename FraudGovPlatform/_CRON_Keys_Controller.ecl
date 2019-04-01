@@ -5,12 +5,13 @@ ThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_
 lECL1 :=
  'import ut;\n'
 +'#CONSTANT	(\'Platform\',\'FraudGov\');\n'
++'#OPTION(\'multiplePersistInstances\',FALSE);\n'
 +'wuname := \'FraudGov Build Keys\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
 +'email(string msg):=fileservices.sendemail(\n'
-+'   \'oscar.barrientos@lexisnexis.com\'\n'
++'   FraudGovPlatform_Validation.Mailing_List().Alert\n'
 +' 	 ,\'FraudGov Build Keys\'\n'
 +' 	 ,msg\n'
 +' 	 +\'Build wuid \'+workunit\n'
@@ -22,8 +23,8 @@ lECL1 :=
 +'version:=ut.GetDate : independent;\n'
 +'if(active_workunit\n'
 +'		,email(\'**** WARNING - Workunit \'+d_wu+\' in Wait, Queued, or Running *******\')\n'
-+'		,sequential(FraudGovPlatform.Build_All(version).Build_Key_Files\n'
-+'	);\n'
++'		,sequential(FraudGovPlatform.Build_All(version).Build_Fraudgov_Keys\n'
++'	));\n'
 ;
 
 #WORKUNIT('protect',true);

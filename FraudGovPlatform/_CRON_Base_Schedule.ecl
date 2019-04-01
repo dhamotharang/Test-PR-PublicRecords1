@@ -1,5 +1,5 @@
 ﻿import _Control,FraudGovPlatform_Validation;
-EVERY_DAY_AT_530PM := '30 22 * * *';
+EVERY_DAY_AT_3AM := '0 8 * * 1-5';
 
 IP			:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
 ThorName	:=		IF(_control.ThisEnvironment.Name <> 'Prod_Thor',		FraudGovPlatform_Validation.Constants.ThorName_Dev,	FraudGovPlatform_Validation.Constants.ThorName_Prod);
@@ -15,7 +15,7 @@ lECL1 :=
 +'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
 +'email(string msg):=fileservices.sendemail(\n'
-+'   \'oscar.barrientos@lexisnexis.com\'\n'
++'   FraudGovPlatform_Validation.Mailing_List().Alert\n'
 +' 	 ,\'FraudGov Build Base\'\n'
 +' 	 ,msg\n'
 +' 	 +\'Build wuid \'+workunit\n'
@@ -26,7 +26,7 @@ lECL1 :=
 +'active_workunit :=  exists(d);\n'
 +'if(active_workunit\n'
 +'		,email(\'**** WARNING - Workunit \'+d_wu+\' in Wait, Queued, or Running *******\')\n'
-+'		,FraudGovPlatform.Build_All(version).Build_Base_Files\n'
++'		,FraudGovPlatform.Build_All(version).Build_FraudGov_Base\n'
 +'	);\n'
 ;
 
@@ -34,7 +34,7 @@ lECL1 :=
 #WORKUNIT('name', 'FraudGov Build Base Schedule');
 
 _Control.fSubmitNewWorkunit(lECL1,ThorName)
-			: WHEN(CRON(EVERY_DAY_AT_530PM))
+			: WHEN(CRON(EVERY_DAY_AT_3AM))
 			,FAILURE(fileservices.sendemail(FraudGovPlatform_Validation.Mailing_List('','').Alert
 																			,'FraudGov Build Base Schedule failure'
 																			,FraudGovPlatform_Validation.Constants.NOC_MSG

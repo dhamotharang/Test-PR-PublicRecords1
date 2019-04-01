@@ -66,6 +66,7 @@ functionmacro
   #UNIQUENAME(NumMaxIterations)
   #UNIQUENAME(NumMinIterations)
   #UNIQUENAME(StartIteration  )
+  #UNIQUENAME(WATCHER_POLLING_FREQUENCY  )
 
   #IF(trim(#TEXT(pNumMaxIterations))  = '')
     #SET(NumMaxIterations ,-1)
@@ -154,7 +155,7 @@ functionmacro
 
   // -- figure out start iteration #
   ds_output_superfile                := dataset(pOutputSuperfile,WorkMan.layouts.wks_slim,flat,opt);
-  ds_previous_builds                 := ds_output_superfile(version < pversion,pBuildName = '' or StringLib.StringToLowerCase(Build_name) = StringLib.StringToLowerCase(pBuildName));
+  ds_previous_builds                 := ds_output_superfile(version <= pversion,pBuildName = '' or StringLib.StringToLowerCase(Build_name) = StringLib.StringToLowerCase(pBuildName));
   ds_previous_build_final_iterations := sort(ds_previous_builds,-version,-(unsigned)iteration);
 
   #IF(#TEXT(pStartIteration) = '' or #TEXT(pStartIteration) = '\'\'') // it is blank
@@ -172,11 +173,12 @@ functionmacro
   
   
   // -- Iteration #
-  Iteration            := map((unsigned)WorkMan.get_Scalar_Result(workunit,'Current_Iteration') !=  0 => WorkMan.get_Scalar_Result(workunit,'Current_Iteration')
-                             ,child_iteration1                                          != '' => child_iteration1
-                             ,latest_completed_iteration                                != '' => latest_completed_iteration
-                             ,                                                                   (string)StartIteration
-                          );
+  Iteration            := map(
+     (unsigned)WorkMan.get_Scalar_Result(workunit,'Current_Iteration')  !=  0                                                                       => WorkMan.get_Scalar_Result(workunit,'Current_Iteration')
+    ,child_iteration1                                                   != ''  and (unsigned)StartIteration < (unsigned)child_iteration1            => child_iteration1             //if start iteration is more than what you find in a file, use the start iteration
+    ,latest_completed_iteration                                         != ''  and (unsigned)StartIteration < (unsigned)latest_completed_iteration  => latest_completed_iteration
+  ,                                                                                                                                                    (string)StartIteration
+  );
                           
   ECL := regexreplace('@iteration@',regexreplace('@version@' ,regexreplace('\\n',pECL,'\n')  ,pversion),Iteration);
 
@@ -193,10 +195,12 @@ functionmacro
   // -- added output of wuid instead of just returning the string wuid because
   // -- platform was executing both the "then" and "else" results each time, creating a new iteration wuid even when 
   // -- it returned the old one(child_wuid).  changing this to the output stopped that.
-  iteration_wuid := iff((     DoesFileExist 
+  iteration_wuid := iff((     DoesFileExist //start file exists(a temp file, so this is a rerun)
                           or  (unsigned)latest_completed_iteration  >= ((unsigned)StartIteration + (unsigned)pNumMaxIterations - 1) 
                           or  (unsigned)Iteration                   >  ((unsigned)StartIteration + (unsigned)pNumMaxIterations - 1)
                         ) 
+                        and (unsigned)StartIteration < (unsigned)latest_completed_iteration 
+                        and (unsigned)StartIteration < (unsigned)child_iteration1
                         and trim(child_wuid1) != '' 
                         and pOnlyCompile = false
                             ,output(Child_Wuid                                     ,named('Iteration_Wuid'                                      ),overwrite)
@@ -206,9 +210,16 @@ functionmacro
                     );
 
 //use child wuid so it doesn't reevaluate it and create another workunit
+  #IF(pOnlyCompile = false)
+    #SET(WATCHER_POLLING_FREQUENCY  ,pPollingFrequency)
+  #ELSE
+    #SET(WATCHER_POLLING_FREQUENCY  ,'1') //when compiling, set it to every minute to speed testing up
+  #END
+
+    
   createwatcherworkunit := WorkMan.CreateWuid_Raw(
        '#workunit(\'name\',\'---WorkMan.mac_Watcher--- for wuid: ' + Iteration_Wuid_result + ', ' + if(pBuildName != '' , pBuildName ,'') +  ', version: ' + pversion + ' iteration: ' + Iteration + '\');\n'       
-     + 'WorkMan.mac_Watcher(\'' + Iteration_Wuid_result + '\',\'' + %'WORKMAN_CHILDRUNNER_EVENT'% + '\',\'' + %'FAILUREEMAILS'% + '\',\'' + pPollingFrequency + '\',\'' + localesp + '\');'
+     + 'WorkMan.mac_Watcher(\'' + Iteration_Wuid_result + '\',\'' + %'WORKMAN_CHILDRUNNER_EVENT'% + '\',\'' + %'FAILUREEMAILS'% + '\',\'' + %'WATCHER_POLLING_FREQUENCY'% + '\',\'' + localesp + '\');'
     ,watchercluster
     ,localesp
     ,

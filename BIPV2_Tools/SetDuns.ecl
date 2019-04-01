@@ -190,7 +190,8 @@ function
      ,(unsigned)ds_refresh_stats(trim(file) = 'Input' ,trim(field) = 'deleted_fein'       ,trim(stat) = 'Count NonBlank')[1].value               //,unsigned deleted_fein_in 
      ,(unsigned)ds_refresh_stats(trim(file) = 'Output',trim(field) = 'deleted_fein'       ,trim(stat) = 'Count NonBlank')[1].value               //,unsigned deleted_fein_out      
     }
-  ],lay_strata);
+  ],lay_strata)
+  : independent;
      
   import strata;
   Strata_explode_stats := if(pDoStrata = true ,Strata.macf_CreateXMLStats(ds_strata   ,'BIPV2','RunIngest'  ,pversion ,pEmailList ,'Proxid_Correction_Stats' ,'SetDuns'   ,pIsTesting,pOverwrite));

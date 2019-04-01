@@ -1,5 +1,5 @@
 ﻿//git test
-import  did_add, risk_indicators, autokeyb2, ut, standard, ut, doxie, autokey,AutoKeyI, RoxieKeyBuild,doxie,RoxieKeyBuild,DayBatchEda,EDA_VIA_XML,risk_indicators,doxie_cbrs,relocations;
+import  did_add, risk_indicators, autokeyb2, ut, standard, ut, doxie, autokey,AutoKeyI, RoxieKeyBuild,doxie,RoxieKeyBuild,DayBatchEda,EDA_VIA_XML,risk_indicators,doxie_cbrs,relocations, Orbit3;
 
 
 EXPORT Proc_CreateKeys(string prundate = ut.GetDate) := FUNCTION
@@ -65,13 +65,15 @@ f2 := table(Score_Logs.Files_Base.File, {string45 transaction_id := transaction_
 f3 := table(Score_Logs.Files_Base.Transaction_IDs, {string45 transaction_id := transaction_id, string8 dt := datetime[..8], string15 datetime := datetime, string3 ftype := 'TRN'});
 f := f1+f2+f3;
 
+orbit_update := if ( ut.Weekday((integer) prundate)  not in [ 'SATURDAY','SUNDAY']  , Orbit3.proc_Orbit3_CreateBuild ('Score and Attribute Outcome',prundate) , Output('No_Orbit_Entry_needed') );
+
 BuildKeys := sequential(
 									 buildindex(f,{dt, ftype},{f}, '~thor_data400::key::score_archiving::record_date_samples', overwrite, named('QA_Search_Transactions_by_Date'));
 									 parallel(bk_xmltid, bk_xmlint1, bk_xmlint2, bk_xmlint3, bk_xmlint4, bk_xmlint5, bk_xmlint6, bk_xmlint7, bk_xmlint8, bk_xmlint9, bk_FCRA_xmltid, bk_FCRA_xmlint1, bk_FCRA_xmlint2, bk_FCRA_xmlint3, bk_FCRA_xmlint4, bk_FCRA_xmlint5, bk_FCRA_xmlint6);
 									 parallel(mv_xmltid, mv_xmlint1, mv_xmlint2, mv_xmlint3, mv_xmlint4, mv_xmlint5, mv_xmlint6, mv_xmlint7, mv_xmlint8, mv_xmlint9, mv_FCRA_xmltid, mv_FCRA_xmlint1, mv_FCRA_xmlint2, mv_FCRA_xmlint3, mv_FCRA_xmlint4, mv_FCRA_xmlint5, mv_FCRA_xmlint6);
 									 parallel(mv2qa_xmltid, mv2qa_xmlint1, mv2qa_xmlint2, mv2qa_xmlint3, mv2qa_xmlint4, mv2qa_xmlint5, mv2qa_xmlint6,  mv2qa_xmlint7, mv2qa_xmlint8, mv2qa_xmlint9, mv2qa_FCRA_xmltid, mv2qa_FCRA_xmlint1, mv2qa_FCRA_xmlint2, mv2qa_FCRA_xmlint3, mv2qa_FCRA_xmlint4, mv2qa_FCRA_xmlint5, mv2qa_FCRA_xmlint6));
 
-RETURN sequential(BuildKeys;
+RETURN sequential(BuildKeys, orbit_update;
 										RoxieKeybuild.updateversion('SAOKeys',rundate,'john.freibaum@lexisnexisrisk.com, Wenhong.Ma@lexisnexisrisk.com, Sudhir.Kasavajjala@lexisnexisrisk.com, Darren.Knowles@lexisnexisrisk.com',,'N')
 										);
 END;

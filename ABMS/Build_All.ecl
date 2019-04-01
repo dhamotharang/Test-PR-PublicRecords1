@@ -63,8 +63,8 @@ EXPORT Build_All(
 		                               pIsTesting,
 		                               pOverwrite,
 		                               pReplicate);
-	
-	EXPORT dops_update := RoxieKeyBuild.updateversion('ABMSKeys', pversion, _Control.MyInfo.EmailAddressNotify + ';darren.knowles@lexisnexisrisk.com', , 'N'); 															
+	//Added ;michael.gould@lexisnexisrisk.com
+	EXPORT dops_update := RoxieKeyBuild.updateversion('ABMSKeys', pversion, _Control.MyInfo.EmailAddressNotify + ';michael.gould@lexisnexisrisk.com;darren.knowles@lexisnexisrisk.com', , 'N'); 															
 
 	EXPORT orbitUpdate := Orbit3.proc_Orbit3_CreateBuild('ABMS',pversion,'N');
 

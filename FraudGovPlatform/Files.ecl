@@ -46,7 +46,6 @@ module
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.AddressCache_Deltabase,Layouts.Base.AddressCache,AddressCache_Deltabase,'CSV',,'~<EOL>~','~|~',,,true);
 
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.DemoData,FraudShared.Layouts.Base.Main,DemoData);
-		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.SourcesToAnonymize,Layouts.Input.SourcesToAnonymize,SourcesToAnonymize);
 		
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.ConfigRiskLevel,Layouts.Input.ConfigRiskLevel,ConfigRiskLevel,'CSV',,'\r\n',',',true);
 		
@@ -77,20 +76,18 @@ module
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Crim_Demo,Layouts.Crim,Crim_Demo);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Death_Demo,Layouts.Death,Death_Demo);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.FraudPoint_Demo,Layouts.FraudPoint,FraudPoint_Demo);
-		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.CIID_Demo_Anon,Layouts.CIID,CIID_Demo_Anon);
-		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Crim_Demo_Anon,Layouts.Crim,Crim_Demo_Anon,,,,,,true);
-		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Death_Demo_Anon,Layouts.Death,Death_Demo_Anon);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.CIID_Orig,Layouts.CIID,CIID_Orig,,,,,,true);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Crim_Orig,Layouts.Crim,Crim_Orig,,,,,,true);
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Death_Orig,Layouts.Death,Death_Orig,,,,,,true);
-		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.FraudPoint_Orig,Layouts.FraudPoint,FraudPoint_Orig,,,,,,true);
-		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.CIID_Anon,Layouts.CIID,CIID_Anon,,,,,,true);
-		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Crim_Anon,Layouts.Crim,Crim_Anon,,,,,,true);
-		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Death_Anon,Layouts.Death,Death_Anon,,,,,,true);
+		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.IPMetaData,Layouts.IPMetaData,IPMetaData,,,,,,true);
 	end;
 
-	export OutputF := module
-		export FraudgovInfoFile	:= dataset(Filenames().OutputF.FraudgovInfoFn,Layouts.OutputF.FraudgovInfoRec,thor,opt);
+	export Flags := module
+		export FraudgovInfoFile	:= dataset(Filenames().Flags.FraudgovInfoFn,Layouts.Flags.FraudgovInfoRec,thor,opt);
+		export SourcesToAnonymize	:= dataset(Filenames().Flags.SourcesToAnonymize,Layouts.Flags.SourcesToAnonymize,thor,opt);
+		export SkipModules	:= dataset(Filenames().Flags.SkipModules,Layouts.Flags.SkipModules,thor,opt); 
+		export SkipValidationByGCID	:= dataset(Filenames().Flags.SkipValidationByGCID,Layouts.Flags.SkipValidationByGCID,thor,opt);
 	end;
+
 	
 end;

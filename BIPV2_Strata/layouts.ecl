@@ -1,4 +1,4 @@
-import BIPV2_PostProcess;
+﻿import BIPV2_PostProcess;
 EXPORT layouts := 
 MODULE
 	EXPORT layout_Businesses := record
@@ -45,4 +45,21 @@ MODULE
   ,unsigned ParentNoDid0      := 0
   ,unsigned ParentAboveDid0   := 0
   };
+  
+  export Gold_Seleid_Orgid_Persistence := {string version,string statname,string statvalue};
+
+  export Gold_Seleid_Orgid_Persistence_rollup := 
+  record
+    string version;
+    string Gold_Seleids_new	                 ;
+    string Gold_Seleids_old	                 ;
+    string Gold_Seleids_in_common	           ;
+    string Gold_Seleids_with_same_orgid	     ;
+    string Gold_Seleids_with_same_ultid	     ;
+    string Gold_Seleids_with_different_orgid ;
+    string Gold_Seleids_with_different_ultid ;
+    string Pct_Gold_Seleids_with_same_orgid	 ;
+    string Pct_Gold_Seleids_with_same_ultid	 ;
+  end;
+  
 END;

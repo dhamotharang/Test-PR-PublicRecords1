@@ -1,3 +1,3 @@
 ﻿import ut, STD;
 	
-export version :=  ut.GetDate : independent;
+export version := '20181010';

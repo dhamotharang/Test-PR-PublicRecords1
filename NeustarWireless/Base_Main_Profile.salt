@@ -1,0 +1,111 @@
+﻿OPTIONS:-gh
+MODULE:NeustarWireless
+FILENAME:MAIN
+// Uncomment up to NINES for internal or external adl
+// IDFIELD:EXISTS:<NameOfIDField>
+// RIDFIELD:<NameOfRidField>
+// RECORDS:<NumberOfRecordsInDataFile>
+// POPULATION:<ExpectedNumberOfEntitiesInDataFile>
+// NINES:<Precision required 3 = 99.9%, 2 = 99% etc>
+// Uncomment Process if doing external adl
+// PROCESS:<ProcessName>
+// FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields
+// BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking
+// FUZZY can be used to create new types of FUZZY linking
+// Remember to generate specificities and update the 0,0 placeholders below before running any sort of linking.
+// If the actual specificity for a field is <1, round it up to 1 rather than down to 0.  If your cluster is running
+// a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience.
+FIELD:phone:TYPE(STRING10):0,0
+FIELD:fname:TYPE(STRING15):0,0
+FIELD:mname:TYPE(STRING1):0,0
+FIELD:lname:TYPE(STRING20):0,0
+FIELD:salutation:TYPE(STRING5):0,0
+FIELD:suffix:TYPE(STRING3):0,0
+FIELD:gender:TYPE(STRING1):0,0
+FIELD:dob:TYPE(STRING8):0,0
+FIELD:house:TYPE(STRING10):0,0
+FIELD:pre_dir:TYPE(STRING2):0,0
+FIELD:street:TYPE(STRING28):0,0
+FIELD:street_type:TYPE(STRING4):0,0
+FIELD:post_dir:TYPE(STRING2):0,0
+FIELD:apt_type:TYPE(STRING4):0,0
+FIELD:apt_nbr:TYPE(STRING8):0,0
+FIELD:zip:TYPE(STRING5):0,0
+FIELD:plus4:TYPE(STRING4):0,0
+FIELD:dpc:TYPE(STRING1):0,0
+FIELD:z4_type:TYPE(STRING1):0,0
+FIELD:crte:TYPE(STRING4):0,0
+FIELD:city:TYPE(STRING28):0,0
+FIELD:state:TYPE(STRING2):0,0
+FIELD:dpvcmra:TYPE(STRING1):0,0
+FIELD:dpvconf:TYPE(STRING1):0,0
+FIELD:fips_state:TYPE(STRING2):0,0
+FIELD:fips_county:TYPE(STRING3):0,0
+FIELD:census_tract:TYPE(STRING6):0,0
+FIELD:census_block_group:TYPE(STRING1):0,0
+FIELD:cbsa:TYPE(STRING5):0,0
+FIELD:match_code:TYPE(STRING3):0,0
+FIELD:latitude:TYPE(REAL8):0,0
+FIELD:longitude:TYPE(REAL8):0,0
+FIELD:email:TYPE(STRING100):0,0
+FIELD:verified:TYPE(STRING1):0,0
+FIELD:activity_status:TYPE(STRING2):0,0
+FIELD:prepaid:TYPE(STRING1):0,0
+FIELD:cord_cutter:TYPE(STRING1):0,0
+FIELD:raw_file_name:TYPE(STRING75):0,0
+FIELD:rcid:TYPE(UNSIGNED6):0,0
+FIELD:source:TYPE(STRING2):0,0
+FIELD:persistent_record_id:TYPE(UNSIGNED8):0,0
+FIELD:did:TYPE(UNSIGNED8):0,0
+FIELD:did_score:TYPE(UNSIGNED8):0,0
+FIELD:xadl2_weight:TYPE(UNSIGNED2):0,0
+FIELD:xadl2_score:TYPE(UNSIGNED2):0,0
+FIELD:xadl2_keys_used:TYPE(UNSIGNED4):0,0
+FIELD:xadl2_distance:TYPE(UNSIGNED2):0,0
+FIELD:xadl2_matches:TYPE(STRING20):0,0
+FIELD:append_prep_address_1:TYPE(STRING):0,0
+FIELD:append_prep_address_2:TYPE(STRING):0,0
+FIELD:rawaid:TYPE(UNSIGNED8):0,0
+FIELD:aceaid:TYPE(UNSIGNED8):0,0
+FIELD:clean_address.prim_range:TYPE(STRING10):0,0
+FIELD:clean_address.predir:TYPE(STRING2):0,0
+FIELD:clean_address.prim_name:TYPE(STRING28):0,0
+FIELD:clean_address.addr_suffix:TYPE(STRING4):0,0
+FIELD:clean_address.postdir:TYPE(STRING2):0,0
+FIELD:clean_address.unit_desig:TYPE(STRING10):0,0
+FIELD:clean_address.sec_range:TYPE(STRING8):0,0
+FIELD:clean_address.p_city_name:TYPE(STRING25):0,0
+FIELD:clean_address.v_city_name:TYPE(STRING25):0,0
+FIELD:clean_address.st:TYPE(STRING2):0,0
+FIELD:clean_address.zip:TYPE(STRING5):0,0
+FIELD:clean_address.zip4:TYPE(STRING4):0,0
+FIELD:clean_address.cart:TYPE(STRING4):0,0
+FIELD:clean_address.cr_sort_sz:TYPE(STRING1):0,0
+FIELD:clean_address.lot:TYPE(STRING4):0,0
+FIELD:clean_address.lot_order:TYPE(STRING1):0,0
+FIELD:clean_address.dbpc:TYPE(STRING2):0,0
+FIELD:clean_address.chk_digit:TYPE(STRING1):0,0
+FIELD:clean_address.rec_type:TYPE(STRING2):0,0
+FIELD:clean_address.county:TYPE(STRING5):0,0
+FIELD:clean_address.geo_lat:TYPE(STRING10):0,0
+FIELD:clean_address.geo_long:TYPE(STRING11):0,0
+FIELD:clean_address.msa:TYPE(STRING4):0,0
+FIELD:clean_address.geo_blk:TYPE(STRING7):0,0
+FIELD:clean_address.geo_match:TYPE(STRING1):0,0
+FIELD:clean_address.err_stat:TYPE(STRING4):0,0
+FIELD:append_prep_name:TYPE(STRING):0,0
+FIELD:nid:TYPE(UNSIGNED8):0,0
+FIELD:name_ind:TYPE(UNSIGNED2):0,0
+FIELD:nametype:TYPE(STRING1):0,0
+FIELD:cln_title:TYPE(STRING5):0,0
+FIELD:cln_fname:TYPE(STRING20):0,0
+FIELD:cln_mname:TYPE(STRING20):0,0
+FIELD:cln_lname:TYPE(STRING20):0,0
+FIELD:cln_suffix:TYPE(STRING5):0,0
+FIELD:cln_fullname:TYPE(STRING150):0,0
+FIELD:process_date:TYPE(UNSIGNED4):0,0
+FIELD:process_time:TYPE(UNSIGNED4):0,0
+FIELD:date_vendor_first_reported:TYPE(UNSIGNED4):0,0
+FIELD:date_vendor_last_reported:TYPE(UNSIGNED4):0,0
+FIELD:current_rec:TYPE(BOOLEAN1):0,0
+FIELD:ingest_tpe:TYPE(UNSIGNED1):0,0
