@@ -1,4 +1,4 @@
-EXPORT MAC_PersonReports_SmartLinxReportService := MACRO
+﻿EXPORT MAC_PersonReports_SmartLinxReportService := MACRO
 #WEBSERVICE (FIELDS(	
 									/*---- Compliance Fields .----*/
 									'ApplicationType',
@@ -14,6 +14,8 @@ EXPORT MAC_PersonReports_SmartLinxReportService := MACRO
 									'MaxResults',
 									'MaxResultsThisTime',
 									'SkipRecords',
+									/*---- Gateways ----*/
+									'Gateways',
 									/*----  iesp form ----*/
 									'SmartLinxReportRequest'
 						));
