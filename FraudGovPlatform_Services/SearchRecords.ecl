@@ -153,7 +153,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	ds_GovBest := FraudGovPlatform_Services.Functions.getGovernmentBest(ds_dids_to_use, batch_params);
 	
 	//Getting the Contributory best to fill identity Detail card.
-	ds_contributoryBest := FraudGovPlatform_Services.Functions.getContributedBest(ds_dids_to_use, _Constant.FRAUD_PLATFORM);
+	ds_contributoryBest := FraudGovPlatform_Services.Functions.getContributedBest(ds_dids_to_use, _Constant.FRAUD_PLATFORM, batch_params);
 
 	//realtime record:
 	BOOLEAN isRealtimeRecord := adlDIDFound AND COUNT(ds_contributoryBest) = 0;

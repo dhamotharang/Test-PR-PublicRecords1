@@ -181,8 +181,10 @@ EXPORT ReportService() := MACRO
 	// Append DID for Input PII
 	// **************************************************************************************	  
 	ds_in_with_did := BatchShare.MAC_Get_Scored_DIDs(report_in, report_mod, usePhone:=TRUE);
+	
+	ds_in_final := IF(Options.IsOnline, report_in, ds_in_with_did);
 
-	ds_reportrecords := FraudGovPlatform_Services.ReportRecords(ds_in_with_did, 
+	ds_reportrecords := FraudGovPlatform_Services.ReportRecords(ds_in_final, 
 																															report_mod,
 																															Options.IsIdentityTestRequest, //This is not used as of now, left for future use.
 																															Options.IsElementTestRequest //This is not used as of now, left for future use.
