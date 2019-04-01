@@ -7,7 +7,7 @@ MODULE
 
 	Shared Sprayed_NAC := Files(pversion).Sprayed.NAC;
 
-	Shared NAC_Base := NAC.Files().base;
+	Shared NAC_Base := distribute(NAC.Files().base, hash(Case_State_Abbreviation,case_identifier,client_identifier,case_benefit_type,case_benefit_month));
 
 	Shared Level_1 := [ 'NSD', 'VSD', 'NSB', 'VSB', 'NPD' ];
 	Shared Level_2 := [ 'NPB', 'VPB','S', 'NDACZ', 'NDAC', 'NDAZ', 'VDACZ','VDAC','VDAZ','NBACZ','NBAC','NBAZ', 'VBACZ', 'VBAC', 'VBAZ' ];
@@ -16,8 +16,6 @@ MODULE
 		string75 fn { virtual(logicalfilename) };
 		Layouts.Sprayed.IdentityData;
 	END;	
-
-	
 
 	IdentityData MapIDDT(Sprayed_NAC L) := TRANSFORM 
 
@@ -79,10 +77,13 @@ MODULE
 			vDate := sw[1];
 			vTime := sw[2];
 
-			SELF.reported_date := '';
-			SELF.reported_time := '';
-			SELF.customer_event_id := '';
-			SELF.event_type_1 := '';
+			SELF.reported_date := vDate;
+			SELF.reported_time := vTime;
+			SELF.customer_event_id := L.SequenceNumber + '_' + L.activitysource ;
+
+			SELF.event_type_1 := map(	L.matchcodes in Level_1 => '14000',
+										L.matchcodes in Level_2 => '14001',
+										'');
 
 			SELF.raw_first_name		:= L.ClientFirstName;
 			SELF.raw_middle_name	:= L.ClientMiddleName;
@@ -181,7 +182,8 @@ MODULE
 													and 	trim(left.SearchClientId)		=		trim(right.client_identifier)
 													and 	trim(left.SearchBenefitType)	=		trim(right.case_benefit_type)
 													and 	trim(left.SearchBenefitMonth)	=		trim(right.case_benefit_month)
-											,JoinNACBase(left, right));
+											,JoinNACBase(left, right),
+											LOCAL);
 
 	P_NacKNFD := Project(dbucket_4(DrupalUserState='FL' and caseState = 'FL'),MapKNFD(Left));
 	
