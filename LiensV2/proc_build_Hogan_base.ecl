@@ -145,22 +145,13 @@ Liensv2.AddSuperFileContents('HOGAN'),
 
 // Removing IRS records from Party file
 fileservices.removesuperfile('~thor_data400::base::Liens::party::Hogan','~thor_data400::in::liensv2::party::dummy_irs2'),
-
 create_new_main_file,add_new_main_file,
-
-output(count(dMappingFile_outdeduped)),
-output(count(ds_fix)),
-output(count(ds_fix2)),
-
+bld_hogan_Mappingfile,
 bld_hogan_main,bld_hogan_party,
-
 // Adding back the IRS records to party file
 fileservices.addsuperfile('~thor_data400::base::Liens::party::Hogan','~thor_data400::in::liensv2::party::dummy_irs2'),
-
 //Replace full file
 hoganfull,
-
-bld_hogan_Mappingfile,
 
 Liensv2.Clear_Liensv2_Input_SuperFiles('HOGAN'),
 

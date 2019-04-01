@@ -31,15 +31,18 @@ dHoganMain     := Dedup(Sort(Distribute(dMain(TMSID<>'' AND CaseLinkID<>'' ),HAS
 									
 dHoganMainslim := Project(dHoganMain(),rHoganMainslim);
 
-//Extract the court id from TMSID and retain valid ones. Propagate caselink id where missing.
-rHoganMainwithNewIds tLiensHoganMainWithCaseLinkID(dHoganMainslim l, dMain r) :=  TRANSFORM
+//Get Court ID from TMSID, Court Lookup and OKC Backfill files
+dMainWCourt := LiensV2.Fn_GetCourtID(dMain);
 
-  STRING7 CourtId      :=  r.tmsid[length(TRIM(r.tmsid,LEFT,RIGHT))-6..];
-	STRING7 ValidCourtid :=  MAP(regexfind('[A-Z\\.]{6}[A-Z0-9]',CourtId ) and courtid[1..2] in ut.Set_State_Abbrev => CourtId,
-	                             CourtId in ['IAO\'BD1','IAO\'BC1'] => CourtId,
-															 '');
+//Extract the court id from TMSID and retain valid ones. Propagate caselink id where missing.
+rHoganMainwithNewIds tLiensHoganMainWithCaseLinkID(dHoganMainslim l, dMainWCourt r) :=  TRANSFORM
+
+  // STRING7 CourtId      :=  r.tmsid[length(TRIM(r.tmsid,LEFT,RIGHT))-6..];
+	// STRING7 ValidCourtid :=  MAP(regexfind('[A-Z\\.]{6}[A-Z0-9]',CourtId ) and courtid[1..2] in ut.Set_State_Abbrev => CourtId,
+	                             // CourtId in ['IAO\'BD1','IAO\'BC1'] => CourtId,
+															 // '');
 	  
-	self.CourtId          :=  ValidCourtid;
+	// self.CourtId          :=  ValidCourtid;
 	// self.ValidCourtid  :=  ValidCourtid;
 	self.CaseLinkID_temp  :=  l.CaseLinkID; //oldest caselinkid
 	self.CaseLinkID_temp2 :=  Map(r.CaseLinkID ='' => l.CaseLinkID, r.CaseLinkID); //populated blank caselinkids with oldest	                             
@@ -47,14 +50,10 @@ rHoganMainwithNewIds tLiensHoganMainWithCaseLinkID(dHoganMainslim l, dMain r) :=
 	self                 :=  [];
 END;
 
-dHoganMainWCaselink    :=  Join(distribute(dHoganMainslim,HASH(TMSID)),distribute(dMain,HASH(TMSID)),
+dHoganMainWCaselink    :=  Join(distribute(dHoganMainslim,HASH(TMSID)),distribute(dMainWCourt,HASH(TMSID)),
                                 left.TMSID =right.TMSID,
                                 tLiensHoganMainWithCaseLinkID(LEFT,RIGHT),Right outer, local
                                 );
-
-// output(count(dHoganMainWCaselink(CaseLinkID_temp <> '')));
-// output(count(dHoganMainWCaselink(CaseLinkID_temp2 <> '')));
-// output(count(dHoganMainWCaselink),named('bef'));
 
 //Group on oldest propagated Caselinkid and court to identify clusters that should have the same tmsid
 dCaseLinkIDClusterGrp  :=  GROUP(SORT(DISTRIBUTE(dHoganMainWCaselink(TMSID<>'' AND CaseLinkID_temp<>'' AND CourtID<>''),
@@ -140,7 +139,6 @@ dCaseLinkIDClusterGrp3 tPropagateTMSID3(dCaseLinkIDClusterGrp3 l, dCaseLinkIDClu
 
 dHoganMainwithNewTMSID3 := iterate(dCaseLinkIDClusterGrp3,tPropagateTMSID3(left,right));
 // output(count(dHoganMainwithNewTMSID3),named('step3'));
-
 /*********************************************************************************************************/
 
 //Step4 - the first two steps in some case result in partial propagation. Use the newtmsid_final that has the maximum caselinkids to unify the cluster.
@@ -162,9 +160,9 @@ rNewtemp_rec getalltherecords2(unq_Newtmsid l ,dHoganMainwithNewTMSID3 r) :=tran
 self:= r;
 self.caselinktempcnt := l.caselinktempcnt;
 end;
-recordsthatdidnotwork2  := join(unq_Newtmsid, dHoganMainwithNewTMSID3 ,
+recordsthatdidnotwork2  := join(distribute(unq_Newtmsid,HASH(Newtmsid_final)), distribute(dHoganMainwithNewTMSID3,HASH(Newtmsid_final)) ,
                               left.Newtmsid_final = right.Newtmsid_final,
-															getalltherecords2(left,right), skew(1) );
+															getalltherecords2(left,right),right outer, local );
 
 dCaseLinkIDClusterGrp4  :=  GROUP(SORT(DISTRIBUTE(recordsthatdidnotwork2(TMSID<>'' AND CaseLinkID_temp<>'' AND CourtID<>''),
                                        HASH( CaseLinkID_temp,CourtID)),
@@ -181,28 +179,65 @@ dCaseLinkIDClusterGrp4 tPropagateNewTMSID3(dCaseLinkIDClusterGrp4 l, dCaseLinkID
   self := r;
   end;
 
-dHoganMainwithNewTMSIDFinal := iterate(dCaseLinkIDClusterGrp4,tPropagateNewTMSID3(left,right));
+dHoganMainwithNewTMSIDFinalStep4 := iterate(dCaseLinkIDClusterGrp4,tPropagateNewTMSID3(left,right));
 
+/****************************************************************************************************************************************************/
+//Step5 - Propagate the most popular NewTMSID_Final to all the records using caselink
+rNewtabrecstep5 := record
+dHoganMainwithNewTMSIDFinalStep4.Newtmsid_final;
+NewTMSID_finalcnt:= count(group);
+end;
 
+unq_Newtmsidstep5:= table(dHoganMainwithNewTMSIDFinalStep4,rNewtabrecstep5,Newtmsid_final,few);
+
+rNewtemp_recStep5 := record
+dHoganMainwithNewTMSIDFinalStep4;
+rNewtabrecstep5.NewTMSID_finalcnt;
+end;
+
+rNewtemp_recStep5 getalltherecords5(unq_Newtmsidstep5 l ,dHoganMainwithNewTMSIDFinalStep4 r) :=transform
+self:= r;
+self.NewTMSID_finalcnt := l.NewTMSID_finalcnt;
+end;
+recordsthatdidnotwork3  := join(distribute(unq_Newtmsidstep5,HASH(Newtmsid_final)), distribute(dHoganMainwithNewTMSIDFinalStep4,HASH(Newtmsid_final)) ,
+                                left.Newtmsid_final = right.Newtmsid_final,
+				  											getalltherecords5(left,right),right outer, local );
+
+dCaseLinkIDClusterGrp5  :=  GROUP(SORT(DISTRIBUTE(recordsthatdidnotwork3(TMSID<>'' AND CaseLinkID_temp2<>'' AND CourtID<>''),
+                                       HASH( CaseLinkID_temp2,CourtID)),
+                                  CaseLinkID_temp2,CourtID,-NewTMSID_finalcnt,LOCAL),
+                            CaseLinkID_temp2,CourtID,LOCAL);
+													 
+
+//propagating mewtmsid_final with maximun number of caselinks to all the records in the cluster.
+dCaseLinkIDClusterGrp5 tPropagateNewTMSID5(dCaseLinkIDClusterGrp5 l, dCaseLinkIDClusterGrp5 r) := transform
+  self.NewTMSID_final 			:= MAP (l.NewTMSID_finalcnt =0 => r.NewTMSID_final,
+	                                  l.NewTMSID_finalcnt >= r.NewTMSID_finalcnt =>l.NewTMSID_final ,
+															      ''
+															     );
+  self := r;
+  end;
+
+dHoganMainwithNewTMSIDFinalStep5 := iterate(dCaseLinkIDClusterGrp5,tPropagateNewTMSID5(left,right));
 /***************************************************************************************************************************************************/
-//Step5
+//Step6
 //Populate all the records with the earliest TMSID
-dEarliestTmsidPerCluster := dedup(sort(distribute(dHoganMainwithNewTMSIDFinal,HASH(NewTMSID_final)),
+dEarliestTmsidPerCluster := dedup(sort(distribute(dHoganMainwithNewTMSIDFinalStep5,HASH(NewTMSID_final)),
                                   NewTMSID_final,orig_filing_date,process_date,tmsid,local),
 																	NewTMSID_final,local);
 																	
-dHoganMainwithNewTMSIDFinal Propagateearliesttmsid(dEarliestTmsidPerCluster l ,dHoganMainwithNewTMSIDFinal r) :=transform
+dHoganMainwithNewTMSIDFinalStep5 Propagateearliesttmsid(dEarliestTmsidPerCluster l ,dHoganMainwithNewTMSIDFinalStep5 r) :=transform
 self.BestEarliestTMSID := l.tmsid;
 self:= r;
 end;
-dHoganMainwithBestTMSID  := join(dEarliestTmsidPerCluster, distribute(dHoganMainwithNewTMSIDFinal,HASH(NewTMSID_final)) ,
+dHoganMainwithBestTMSID  := join(dEarliestTmsidPerCluster, distribute(dHoganMainwithNewTMSIDFinalStep5,HASH(NewTMSID_final)) ,
                               left.Newtmsid_final = right.Newtmsid_final,
 															Propagateearliesttmsid(left,right), local );																	
                                  
 /***************************************************************************************************************************************************/
-//Step6
+//Step7
 //Derive the NEW RMSID for the records that got a new TMSID
-dHoganMainwithNewTMSIDFinal tDeriveNewRMSID(dHoganMainwithBestTMSID l) := transform
+dHoganMainwithBestTMSID tDeriveNewRMSID(dHoganMainwithBestTMSID l) := transform
   self.NewRMSID 			:= MAP (L.BestEarliestTMSID <> L.TMSID and trim(L.RMSID)[length(trim(L.RMSID))-1..] =  L.filing_type_id => 'HGR'+trim(L.BestEarliestTMSID[3..])+L.filing_type_id,
 	                            L.BestEarliestTMSID <> L.TMSID and trim(L.RMSID)[length(trim(L.RMSID))-1..] <> L.filing_type_id => 'HGR'+trim(L.BestEarliestTMSID[3..])+trim(L.RMSID)[length(trim(L.RMSID))-1..],
 															L.RMSID);

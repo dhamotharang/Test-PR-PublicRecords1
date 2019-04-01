@@ -1,4 +1,4 @@
-﻿import RoxieKeybuild,doxie_files,ut,PromoteSupers,Orbit3,DopsGrowthCheck,dops,strata;
+﻿import RoxieKeybuild,doxie_files,ut,PromoteSupers,Orbit3,DopsGrowthCheck,dops,strata,_Control;
 
 export Proc_build_fcra_keys(string filedate) := function
 
@@ -59,7 +59,21 @@ cnt_fcra_party_id := OUTPUT(strata.macf_pops(LiensV2.key_liens_party_id_FCRA,,,,
 																													['phone','tax_id']));
 cnt_fcra_autokey_payload := OUTPUT(strata.macf_pops(LiensV2.key_fcra_liens_autokeypayload,,,,,,FALSE,
 																						['tax_id']));
-
+/***********************************************DF-24044******************************************************/
+Attachment := 	Liensv2.fn_email_attachment(choosen(Liensv2.File_TMSID_MappingFile,100));		
+mailfile	 :=	FileServices.SendEmailAttachData('vani.chikte@lexisnexis.com'
+																															 ,'Liens Mapping File' //subject
+																															 ,'Liens WU: '+WORKUNIT //body
+																															 ,(data)Attachment
+																															 ,'text/csv'
+																															 ,'TMSIDMappingFile.csv'
+																															 ,
+																															 ,
+																															 ,_Control.MyInfo.EmailAddressNotify);
+Mailfile2 := fileservices.sendemail('vani.chikte@lexisnexis.com',
+				                            'Too Many records in the Mapping File, Please email it manually',
+				                            'workunit: ' + workunit);	
+/******************************************************************************************************/																		
 build_fcra_keys := sequential(
 															parallel(
 															fcra_bshell_did_key3,fcra_did_key,
@@ -76,8 +90,12 @@ build_fcra_keys := sequential(
 						qmv_fcra_party_trid_key,qmv_fcra_rmsid_key,mv_bdid_qa,mv_case_nbr_qa,mv_cert_nbr_qa,mv_filing_nbr_qa,mv_serial_nbr_qa),bld_autokeys,
 						DeltaCommands,
 						cnt_fcra_main_id,cnt_fcra_party_id, cnt_fcra_autokey_payload,
+						Map(count(Liensv2.File_TMSID_MappingFile) >1000 => mailfile2,
+	              count(Liensv2.File_TMSID_MappingFile) >0 => mailfile ,
+	              Output('No New mapping Entries to report')),
 						RoxieKeybuild.updateversion('FCRA_LiensV2Keys',filedate,'skasavajjala@seisint.coml,michael.gould@lexisnexisrisk.com',,'F'),
-						create_build);
+						create_build
+						);
 
 return build_fcra_keys;
 
