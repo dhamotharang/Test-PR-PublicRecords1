@@ -1,4 +1,4 @@
-﻿import doxie_files, doxie, Cellphone, ut;
+﻿import doxie_files, doxie, Cellphone, Data_Services;
 
 f_qsent := _keybuild_qsent_base;//Phonesplus.file_qsent_base;
 
@@ -19,4 +19,4 @@ p_qsent := PROJECT(f_qsent,slim_phonesplus(LEFT));
 fqsent_did := p_qsent((unsigned)did<>0, (unsigned)CellPhone<>0);
 export key_qsent_did := index(fqsent_did,
                                 {unsigned6 l_did := did},{fqsent_did},
-                                ut.foreign_prod+'thor_data400::key::qsent_did_'+doxie.Version_SuperKey);
+                                Data_Services.foreign_prod+'thor_data400::key::qsent_did_'+doxie.Version_SuperKey);

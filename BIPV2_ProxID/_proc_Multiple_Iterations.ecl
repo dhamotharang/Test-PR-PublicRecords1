@@ -1,7 +1,7 @@
 ﻿import BIPV2_Files,tools,BIPV2,BIPV2_ProxID,bipv2_build;
 EXPORT _proc_Multiple_Iterations(
-   pstartiter
-  ,pnumiters 
+   pstartiter       = '\'\''    //default is to start where it left off
+  ,pnumiters        = '3'
   ,pversion         = 'BIPV2.KeySuffix'
   ,pDOTFile         = '\'BIPV2_Files.files_dotid().DS_BASE\''
   ,pcluster         = 'BIPV2_Build._Constants().Groupname'
@@ -10,6 +10,11 @@ EXPORT _proc_Multiple_Iterations(
   ,pUniqueOut       = '\'Proxid\''
   ,pMatchThreshold  = 'BIPV2_ProxID.Config.MatchThreshold'
   ,pCompileTest     = 'false'
+  ,pdoPreprocess    = 'true'
+  ,pdoPostprocess   = 'BIPV2_ProxID._Constants().RunPostProcess'
+  ,pdo1Iteration    = 'false'
+  ,pIsTesting       = 'false'
+  ,pEmailList       = 'BIPV2_ProxID._Constants().EmailList'     // -- for testing, make sure to put in your email address to receive the emails
 ) :=
 functionmacro
   
@@ -17,11 +22,9 @@ functionmacro
   
   lstartiter        := pstartiter                       ;
   lnumiters         := pnumiters                        ;
-  lnumitersmax      := pnumiters + 1                    ;
+  lnumitersmax      := #IF(pdo1Iteration = false) pnumiters + 1  #ELSE pnumiters #END                 ;
   version           := pversion                         ;
   cluster           := pcluster                         ;
-  previter          := (string)(pstartiter - 1)         ;
-  string prevcombo  := version + '_' + previter         ;
   dotbase           := BIPV2_ProxID.files().base.built  ;
   dotbasefilename   := if(trim(pDotFilename) = '' ,BIPV2_Files.files_dotid().FILE_BASE  ,pDotFilename);
   
@@ -32,13 +35,26 @@ functionmacro
   ecltextPreprocess :=  '#workunit(\'name\',\'BIPV2_ProxID._Preprocess @version@\');\n\n#workunit(\'priority\',\'high\');\n'
                       + 'BIPV2_ProxID._Preprocess('+ pDOTFile + ',\'@version@\',\'' + dotbasefilename + '\''
                       + ',\'' + pUniqueOut + '\''
+  #IF(pIsTesting = true)  //don't need to do all the other stuff when testing an iteration
+                      + ',false'
+                      + ',false'
+                      + ',false'
+                      + ',false'
+                      + ',false'
+  #END
                       + ');';
                       
   workman_preprocess_file  := '_Preprocess.'  + pUniqueOut;
   workman_postprocess_file := '_PostProcess.' + pUniqueOut;
   
-  ecltextSpecs  := '#workunit(\'name\',BIPV2_ProxID._Constants().name + \' @version@ Specificities\');\n#OPTION(\'multiplePersistInstances\',FALSE);\n#workunit(\'priority\',\'high\');\ndotbase := BIPV2_ProxID.files().base.built;\n\nSpecMod := BIPV2_ProxID.specificities(BIPV2_ProxID.files().base.built);\n'
-                  +'sequential(\n  SpecMod.Build\n  ,parallel(\n     OUTPUT(SpecMod.Specificities ,NAMED(\'Specificities\'))\n    ,OUTPUT(SpecMod.SpcShift      ,NAMED(\'SpcShift\'     ))\n    ,SALTTOOLS22.mac_Patch_SPC(SpecMod.Specificities,\'BIPV2_ProxID._SPC\',dotbase,,false)\n//     ,SALTTOOLS22.mac_Patch_SPC(SpecMod.Specificities,\'BIPV2_ProxID._SPC\',dotbase,,false,false)\n  )\n);\n';;
+  ecltextSpecs  := '#workunit(\'name\',BIPV2_ProxID._Constants().name + \' @version@ Specificities\');\n'
+                  + '#OPTION(\'multiplePersistInstances\',FALSE);\n#workunit(\'priority\',\'high\');\n'
+                  + 'dotbase := BIPV2_ProxID.files().base.built;\n\n'
+                  + 'SpecMod := BIPV2_ProxID.specificities(BIPV2_ProxID.files().base.built);\n'
+                  +'sequential(\n  SpecMod.Build\n  ,parallel(\n     OUTPUT(SpecMod.Specificities ,NAMED(\'Specificities\'))\n    ,OUTPUT(SpecMod.SpcShift      ,NAMED(\'SpcShift\'     ))\n'
+                  + '//,SALTTOOLS22.mac_Patch_SPC(SpecMod.Specificities,\'BIPV2_ProxID._SPC\',dotbase,,false)\n'
+                  + '//     ,SALTTOOLS22.mac_Patch_SPC(SpecMod.Specificities,\'BIPV2_ProxID._SPC\',dotbase,,false,false)\n'
+                  + ')\n);\n';
   
   ecltextIter     := 'import BIPV2,BIPV2_Build,BIPV2_ProxID,tools,mdr,BIPV2_Files;\n\n#OPTION(\'multiplePersistInstances\',FALSE);\niteration       := \'@iteration@\'                          ;\npversion        := \'@version@\'                            ;\npFirstIteration := false                                  ;\npInfile         := BIPV2_ProxID.In_DOT_Base               ;\npMatchThreshold := @matchthreshold@                                     ;\npDotFilename    := \'\'                                     ;/*done by BIPV2_ProxID._proc_Multiple_Iterations.  default is BIPV2_Files.files_dotid().FILE_DOTID_BASE*/\n\n#workunit(\'name\',BIPV2_ProxID._Constants().name + \' \' + pversion + \' iter \' + iteration);\n#workunit(\'priority\',\'high\');\n#workunit(\'protect\' ,true);\n\n'
                     +'BIPV2_ProxID._Proc_Iterate(iteration,pversion,pFirstIteration,pInfile,pMatchThreshold,pDotFilename);\n';
@@ -60,6 +76,8 @@ functionmacro
                       ,'SlicesPerformed'
                       ,'ProxidsCreatedByCleave'
                       ,'LinkBlockSplits'
+                      ,'recordsrejected0'
+                      ,'unlinkablerecords0'
                      ];
   StopCondition   := '(PostClusterCount / PreClusterCount * 100.0) > (99.9)';
   SetNameCalculations := ['Convergence_PCT','Convergence_Threshold'];
@@ -67,40 +85,38 @@ functionmacro
   ecltextPost    := '#workunit(\'name\',\'BIPV2_ProxID._PostProcess @version@\');\n\n' + '#workunit(\'priority\',\'high\');\n' 
                   + 'BIPV2_ProxID._PostProcess(\'@version@\',' + pDOTFile + ',\'' + dotbasefilename + '\');';  
 
-  kickPreprocess := Workman.mac_WorkMan(ecltextPreprocess ,prevcombo,cluster,1         ,1        ,pBuildName := pUniqueOut + 'Patch',pNotifyEmails := BIPV2_ProxID._Constants().EmailList
-      ,pOutputFilename   := '~bipv2_build::' + version + '::workunit_history::proc_proxid.' + workman_preprocess_file
+  kickPreprocess := Workman.mac_WorkMan(ecltextPreprocess ,prevcombo,cluster,1         ,1        ,pBuildName := pUniqueOut + 'Patch',pNotifyEmails := pEmailList
+      ,pOutputFilename   := '~bipv2_build::' + version + '::workunit_history::BIPV2_ProxID.proc_proxid.' + workman_preprocess_file
       ,pOutputSuperfile  := '~bipv2_build::qa::workunit_history' 
       ,pCompileOnly      := pCompileTest
   );
-  kickSpecs := Workman.mac_WorkMan(ecltextSpecs  ,version,cluster,1         ,1        ,pBuildName := pUniqueOut + 'Specs',pNotifyEmails := BIPV2_ProxID._Constants().EmailList
-      ,pOutputFilename   := '~bipv2_build::' + version + '::workunit_history::proc_proxid.Specificities'
+  kickSpecs := Workman.mac_WorkMan(ecltextSpecs  ,version,cluster,1         ,1        ,pBuildName := pUniqueOut + 'Specs',pNotifyEmails := pEmailList
+      ,pOutputFilename   := '~bipv2_build::' + version + '::workunit_history::BIPV2_ProxID.proc_proxid.Specificities'
       ,pOutputSuperfile  := '~bipv2_build::qa::workunit_history' 
       ,pCompileOnly      := pCompileTest
   );
-  kickiters := Workman.mac_WorkMan(ecltextIterFix,version,cluster,'',lnumitersmax,lnumiters
+  kickiters := Workman.mac_WorkMan(ecltextIterFix,version,cluster,pstartiter,lnumitersmax,lnumiters
       ,pSetResults          := eclsetResults
       ,pStopCondition       := StopCondition
       ,pSetNameCalculations := SetNameCalculations
       ,pBuildName           := 'ProxidIters'
-      ,pNotifyEmails        := BIPV2_ProxID._Constants().EmailList
-      ,pOutputFilename      := '~bipv2_build::@version@::workunit_history::proc_proxid.iterations.' + trim(pUniqueOut)
+      ,pNotifyEmails        := pEmailList
+      ,pOutputFilename      := '~bipv2_build::@version@::workunit_history::BIPV2_ProxID.proc_proxid.iterations.' + trim(pUniqueOut)
       ,pOutputSuperfile     := '~bipv2_build::qa::workunit_history' 
       ,pCompileOnly         := pCompileTest
   );
  
-  kickPost  := Workman.mac_WorkMan(ecltextPost,version ,cluster  ,1         ,1        ,pBuildName := pUniqueOut + 'PostProcess',pNotifyEmails := BIPV2_ProxID._Constants().EmailList
-      ,pOutputFilename   := '~bipv2_build::' + version + '::workunit_history::proc_proxid.' + workman_postprocess_file
+  kickPost  := Workman.mac_WorkMan(ecltextPost,version ,cluster  ,1         ,1        ,pBuildName := pUniqueOut + 'PostProcess',pNotifyEmails := pEmailList
+      ,pOutputFilename   := '~bipv2_build::' + version + '::workunit_history::BIPV2_ProxID.proc_proxid.' + workman_postprocess_file
       ,pOutputSuperfile  := '~bipv2_build::qa::workunit_history' 
       ,pCompileOnly      := pCompileTest
   );
 
   //kickiters;
   return sequential(
-     kickPreprocess
-    ,iff(pdoSpecs = true ,kickSpecs)
-    ,kickiters
-    ,if(BIPV2_ProxID._Constants().RunPostProcess  ,kickPost)
-    
-    //need to do post process here to copy to storage thor
+     #IF(pdoPreprocess = true)   kickPreprocess,  #END
+     #IF(pdoSpecs      = true)   kickSpecs,       #END
+                                 kickiters
+     #IF(pdoPostprocess = true) ,kickPost #END
   );
 endmacro;

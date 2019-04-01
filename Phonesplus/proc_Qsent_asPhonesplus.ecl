@@ -1,6 +1,6 @@
-﻿import header, gong, Risk_Indicators,ut;
+﻿import header, gong, Risk_Indicators,Data_Services;
 
-ppCandidate := dataset(ut.foreign_prod + 'thor_data400::in::qsent_clean',Phonesplus.layoutCommonOut,thor);
+ppCandidate := dataset(Data_Services.foreign_prod + 'thor_data400::in::qsent_clean',Phonesplus.layoutCommonOut,thor);
 
 layout_ppCandidate := record
 string3 npa;
