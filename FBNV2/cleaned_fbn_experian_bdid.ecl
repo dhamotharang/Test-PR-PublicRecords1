@@ -10,5 +10,5 @@ Business_Header_SS.MAC_Add_BDID_FLEX(
 	'',bdid,Layout_fbn_experian.BDID_Rec,
 	false, bdid_score, //set the flag to true for bdid_score
 	postBDID)
-export cleaned_fbn_experian_bdid:= postBDID :persist(fbnv2.cluster.cluster_out+'persist::FBNV2::CleanedFBN_Experian_Bdid');
+export cleaned_fbn_experian_bdid:= postBDID :persist(cluster.cluster_out+'persist::FBNV2::CleanedFBN_Experian_Bdid');
 

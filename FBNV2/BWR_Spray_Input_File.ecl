@@ -1,33 +1,28 @@
-﻿import FBNV2,_control, std, lib_fileservices, _control;
+﻿import FBNV2,_control, std, lib_fileservices, ut;
 
-export BWR_Spray_Input_File(string filename,string filedate,string source) 
+export BWR_Spray_Input_File(string filename,string filedate,string source, string ip) 
 		:= function
 		
 			leMailTarget      := _control.MyInfo.EmailAddressNotify;
 			
 		  fSendMail(string pSubject, string pBody)
 				:= lib_fileservices.fileservices.sendemail(leMailTarget,pSubject,pBody);
-			
-			validateSource(string pSource) :=
-				map(trim(source,left,right) = 'Orange' => fSendMail('FBN Spray Started','Valid Source Parameter Entered'),		
-								trim(source,left,right) = 'San_Diego'   => fSendMail('FBN Spray Started','Valid Source Parameter Entered'),
-								trim(source,left,right) = 'Santa_Clara'   => fSendMail('FBN Spray Started','Valid Source Parameter Entered'),		
-								trim(source,left,right) = 'Ventura'   => fSendMail('FBN Spray Started','Valid Source Parameter Entered'),
-								trim(source,left,right) = 'Event'   => fSendMail('FBN Spray Started','Valid Source Parameter Entered'),		
-								trim(source,left,right) = 'Filing'   => fSendMail('FBN Spray Started','Valid Source Parameter Entered'),		
-								trim(source,left,right) = 'Harris'   => fSendMail('FBN Spray Started','Valid Source Parameter Entered'),
-								trim(source,left,right) = 'Dallas'   => fSendMail('FBN Spray and Build Not Set Up For This Source','This Source Has Not Been Sent By Vendor In A Long Time'),
-								trim(source,left,right) = 'InfoUSA'   => fSendMail('FBN Spray and Build Not Set Up For This Source','This Source HasNot Been Sent By Vendor In A Long Time'),		
-								trim(source,left,right) = 'San_Bernardino'   => fSendMail('FBN Spray and Build Not Set Up For This Source','This Source Has Not Been Sent By Vendor In A Long Time'),		
-								trim(source,left,right) = 'NY'   => fSendMail('FBN Spray and Build Not Set Up For This Source','This Source Has Not Been Sent By Vendor In A Long Time'),		
-								trim(source,left,right) = 'Experian'   => fSendMail('FBN Spray Started','Valid Source Parameter Entered'),
-								FAIL('Source Parameter passed did not match the Sources, please check the source value passed.'));	
-
-				sourceip 					:= _control.IPAddress.bctlpedata11;
 				
-				superfilename 		:= FBNV2.Get_Input_Superfilename(source); 						
-				logicalfilename 	:= FBNV2.Get_Input_Superfilename(source)[1..length(trim(superfilename))-length('Sprayed')]+filedate;
-				reclength 				:= Get_Infile_Record_Length(source);
+				ValidSources	:=	['ORANGE','SAN_DIEGO','SANTA_CLARA','VENTURA','EVENT','FILING','HARRIS','EXPERIAN'];
+				StaticSources	:=	['DALLAS','INFOUSA','SAN_BERNARDINO','NY'];
+				
+				string psource := ut.CleanSpacesAndUpper(source);
+			
+				validateSource(string pSource) :=
+				map(	trim(psource,left,right) in ValidSources 	=> fSendMail('FBN Spray Started','Valid Source Parameter Entered'),		
+							trim(psource,left,right) in StaticSources	=> fSendMail('FBN Spray and Build Not Set Up For This Source','This Source Has Not Been Sent By Vendor In A Long Time'),
+							FAIL('Source Parameter passed did not match the Sources, please check the source value passed.'));
+
+				sourceip 					:= ip;
+				
+				superfilename 		:= FBNV2.Get_Input_Superfilename(psource); 						
+				logicalfilename 	:= FBNV2.Get_Input_Superfilename(psource)[1..length(trim(superfilename))-length('Sprayed')]+filedate;
+				reclength 				:= Get_Infile_Record_Length(psource);
         groupName := STD.System.Thorlib.Group( );
 				
         // Due to the file names changing with multiple loads, shortened them up to give the greatest
@@ -44,20 +39,20 @@ export BWR_Spray_Input_File(string filename,string filedate,string source)
 											'/data/data_build_4/fbn/sources/tx/harris/'+filedate+'/'+'ASND*.txt',
 											,'|',,'"', groupname,'~thor_data400::in::fbnv2::tx::harris::' + filedate+ '::dbas',-1,,,true,false);											
 	
-				spray_Harris := sequential( parallel(doInstr, doOwner, doDBA), 
-											              Merge_FBN_TX_Harris('~thor_data400::in::fbnv2::tx::harris::' + filedate, 
+				spray_HARRIS := sequential( parallel(doInstr, doOwner, doDBA), 
+											              Merge_FBN_TX_HARRIS('~thor_data400::in::fbnv2::tx::harris::' + filedate, 
 																			'~thor_data400::in::fbnv2::tx::harris::' + filedate+ '::instruments', 
 																			'~thor_data400::in::fbnv2::tx::harris::' + filedate+ '::owners', 
 																			'~thor_data400::in::fbnv2::tx::harris::' + filedate+ '::dbas') );
 
 				spray_Fixed				:= FileServices.SprayFixed(sourceip,filename, reclength,groupname,logicalfilename,-1,,,true,true,true);
-				spray_file				:= map(trim(source,left,right) in ['Filing','Event'] => spray_Fixed,
-				                         trim(source,left,right) = 'San_Diego'   => FileServices.SprayVariable(sourceip,filename, ,',','\\n,\\r\\n','"',groupname,logicalfilename,-1,,,true,true,true),
-																 trim(source,left,right) = 'Santa_Clara' => FileServices.SprayVariable(sourceip,filename, ,,,'"',groupname,logicalfilename,-1,,,true,true,true),
-														     trim(source,left,right) = 'Harris' => spray_Harris,
-																 trim(source,left,right) = 'Orange' => FileServices.SprayVariable(sourceip,filename, ,,,'"',groupname,logicalfilename,-1,,,true,true,true),
-																 trim(source,left,right) = 'Ventura' => FileServices.SprayVariable(sourceip,filename, ,'\\~','\\n,\\r\\n','"',groupname,logicalfilename,-1,,,true,true,true),		
-																 trim(source,left,right) = 'Experian' => fsprayFBNfiles(filename,filedate,sourceip),															 
+				spray_file				:= map(trim(psource,left,right) in ['FILING','EVENT'] => spray_Fixed,
+				                         trim(psource,left,right) = 'SAN_DIEGO'   => FileServices.SprayVariable(sourceip,filename, ,',','\\n,\\r\\n','"',groupname,logicalfilename,-1,,,true,true,true),
+																 trim(psource,left,right) = 'SANTA_CLARA' => FileServices.SprayVariable(sourceip,filename, ,,,'"',groupname,logicalfilename,-1,,,true,true,true),
+														     trim(psource,left,right) = 'HARRIS' => spray_HARRIS,
+																 trim(psource,left,right) = 'ORANGE' => FileServices.SprayVariable(sourceip,filename, ,,,'"',groupname,logicalfilename,-1,,,true,true,true),
+																 trim(psource,left,right) = 'VENTURA' => FileServices.SprayVariable(sourceip,filename, ,'\\~','\\n,\\r\\n','"',groupname,logicalfilename,-1,,,true,true,true),		
+																 trim(psource,left,right) = 'EXPERIAN' => fsprayFBNfiles(filename,filedate,sourceip),															 
 																 output('Source Parameter passed did not match the Sources, please check the source value passed.'));
 																 
 				create_super			:= FileServices.CreateSuperFile(superfilename,false);
@@ -71,38 +66,37 @@ export BWR_Spray_Input_File(string filename,string filedate,string source)
 																				FileServices.FinishSuperFileTransaction()
 																			 );
 																			 
-				preprocess_file		:= map(trim(source,left,right) = 'Orange' => FBNV2.Standardize_FBN_CA_Orange(filedate, ,FBNV2.File_CA_Orange_in.raw),
-																 trim(source,left,right) = 'San_Diego' => FBNV2.Standardize_FBN_CA_San_Diego(filedate, ,FBNV2.File_CA_San_Diego_in.raw),
-																 trim(source,left,right) = 'Santa_Clara' => FBNV2.Standardize_FBN_CA_Santa_Clara(filedate, ,FBNV2.File_CA_Santa_Clara_in.raw),
-																 trim(source,left,right) = 'Ventura' => FBNV2.Standardize_FBN_CA_Ventura(filedate, ,FBNV2.File_CA_Ventura_in.raw),
-																 trim(source,left,right) = 'Harris' => FBNV2.Standardize_FBN_TX_Harris(filedate, ,FBNV2.File_TX_Harris_in.raw),
-																 trim(source,left,right) = 'Filing' => FBNV2.Standardize_FBN_FL.fPreProcessFiling(filedate, ,FBNV2.File_FL_Filing_in.raw),
-																 trim(source,left,right) = 'Event' => FBNV2.Standardize_FBN_FL.fPreProcessEvent(filedate, ,FBNV2.File_FL_Event_in.raw)
-																 // ,output('Source Parameter passed did not match the Sources, please check the source value passed.')
+				preprocess_file		:= map(trim(psource,left,right) = 'ORANGE' => FBNV2.Standardize_FBN_CA_ORANGE(filedate, ,FBNV2.File_CA_ORANGE_in.raw),
+																 trim(psource,left,right) = 'SAN_DIEGO' => FBNV2.Standardize_FBN_CA_SAN_DIEGO(filedate, ,FBNV2.File_CA_SAN_DIEGO_in.raw),
+																 trim(psource,left,right) = 'SANTA_CLARA' => FBNV2.Standardize_FBN_CA_SANTA_CLARA(filedate, ,FBNV2.File_CA_SANTA_CLARA_in.raw),
+																 trim(psource,left,right) = 'VENTURA' => FBNV2.Standardize_FBN_CA_VENTURA(filedate, ,FBNV2.File_CA_VENTURA_in.raw),
+																 trim(psource,left,right) = 'HARRIS' => FBNV2.Standardize_FBN_TX_HARRIS(filedate, ,FBNV2.File_TX_HARRIS_in.raw),
+																 trim(psource,left,right) = 'FILING' => FBNV2.Standardize_FBN_FL.fPreProcessFILING(filedate, ,FBNV2.File_FL_FILING_in.raw),
+																 trim(psource,left,right) = 'EVENT' => FBNV2.Standardize_FBN_FL.fPreProcessEVENT(filedate, ,FBNV2.File_FL_EVENT_in.raw)
 																);
 				
 				
 				addExtractSuper		:= sequential(
-				                                FileServices.RemoveOwnedSubFiles(cluster.cluster_out + 'in::fbn_extract::sprayed::FL_Filing'),
+				                                FileServices.RemoveOwnedSubFiles(cluster.cluster_out + 'in::fbn_extract::sprayed::fl_filing'),
 																				FileServices.StartSuperFileTransaction(),
-																				FileServices.AddSuperFile(cluster.cluster_out + 'in::fbn_extract::sprayed::FL_Filing', '~thor_data400::in::fbnv2::FL::Filing::'+filedate+'::Cleaned'),
+																				FileServices.AddSuperFile(cluster.cluster_out + 'in::fbn_extract::sprayed::fl_filing', '~thor_data400::in::fbnv2::fl::filing::'+filedate+'::Cleaned'),
 																				FileServices.FinishSuperFileTransaction()
 																			  );
 																				
-				retval 						:= sequential(validateSource(source),
+				retval 						:= sequential(validateSource(psource),
 				                                spray_file,
-																				if (source!='Experian',
+																				if (psource!='EXPERIAN',
 																				     sequential( 																								
 																							if(~FileServices.FileExists(superfilename), create_super),
 																							add_super,
 																							preprocess_file
 																					   )
 																				   ),
-																				if (source='Filing',
+																				if (psource='FILING',
 																							addExtractSuper
 																						)	
 																				//uncomment when scrubs is added		
-																				,RunScrubsOnInput(source,filedate,leMailTarget)																				
+																				// ,RunScrubsOnInput(psource,filedate,leMailTarget)																				
 																				);
 		 return retval;
 		

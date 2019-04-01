@@ -1,43 +1,6 @@
 ﻿import ut,fbnv2,_validate;
 
-
-// dFiling			            := FBNV2.File_CA_San_Diego_in.Cleaned_old(type_of_record='2' and prev_file_number <> '');
 dFiling2			          := FBNV2.File_CA_San_Diego_in.Cleaned(type_of_name = 'B');
-
-
-// layout_common.Business_AID tFiling(dFiling pInput)
-   // :=TRANSFORM
-      // string filing_number          := if(pInput.FILE_NUMBER = '',pinput.prev_file_number,pInput.FILE_NUMBER);
-			
-			// self.tmsid					          := 'CAS' + trim(pinput.prev_file_number + hash(pInput.Business_name[1..25]),all);
-			// self.rmsid					          :=  if(pInput.FILE_NUMBER='',trim(pinput.prev_file_number,all),pInput.FILE_NUMBER);
-			// self.dt_first_seen      		  := if(_validate.date.fIsValid((string)pInput.prev_file_date),(integer) pInput.prev_file_date,0);
-			// self.dt_last_seen       		  := IF(pInput.FILE_DATE < pInput.prev_file_date
-																				// ,if(_validate.date.fIsValid((string)pInput.prev_file_date),(integer) pInput.prev_file_date,0)
-																				// ,if(_validate.date.fIsValid((string)pInput.file_date),(integer) pInput.file_date,0) );
-			// self.dt_vendor_first_reported	:= if(_validate.date.fIsValid((string)pInput.process_date),(integer) pInput.process_date,0);
-			// self.dt_vendor_last_reported  := if(_validate.date.fIsValid((string)pInput.process_date),(integer) pInput.process_date,0);
-			// self.Filing_Jurisdiction 		  := 'CAS';
-			// self.FILING_NUMBER 			      := FILING_NUMBER ;
-			// self.Filing_date           		:= IF(pInput.FILE_NUMBER = '' and pInput.FILE_DATE <> ''
-																				// ,if(_validate.date.fIsValid((string)pInput.file_date),(integer) pInput.file_date,0)
-																				// ,if(_validate.date.fIsValid((string)pInput.prev_file_date),(integer) pInput.prev_file_date,0) );
-			// self.ORIG_FILING_NUMBER 		  := pinput.prev_file_number ;
-			// self.ORIG_FILING_DATE     		:= (integer) if(pInput.prev_file_number <> FILING_NUMBER
-																									 // ,if(_validate.date.fIsValid((string)pInput.prev_file_date),(integer) pInput.prev_file_date,0)
-																									 // ,if(_validate.date.fIsValid((string)pInput.file_date),(integer) pInput.file_date,0) );
-			// self.bus_status             	:= IF(pInput.fBN_type = 'A','INACTIVE','ACTIVE');
-			// self.CANCELLATION_DATE        := IF(pInput.fBN_type = 'A'
-																						// ,if(_validate.date.fIsValid((string)pInput.file_date),(integer) pInput.file_date,0)
-																						// ,0);
-			// self.BUS_NAME 					      := pInput.Business_NAME;
-			// self.BUS_STATE							  := 'CA';
-			// self.BUS_COUNTY							  := 'SAN DIEGO';
-			// SELF.LONG_BUS_NAME            := pInput.BUSINESS_NAME;
-			// self.SEQ_NO 				          := 0;
-			
-			
-	 // end;
 	
 	 layout_common.Business_AID tFiling2(dFiling2 pInput) := TRANSFORM
       string filing_number          := if(pInput.FILE_NUMBER='',pinput.prev_file_number,pInput.FILE_NUMBER);
@@ -113,9 +76,7 @@ layout_common.Business_AID  rollupXform(layout_common.Business_AID pLeft, layout
 	
 
 dProj   	:= 
-             //dedup(project(dfiling,tfiling(left)),all)   + 
-             dedup(project(dfiling2,tfiling2(left)),all) 
-						 //+FBNV2.Mapping_FBN_CA_San_Diego_Business_xml
+             dedup(project(dfiling2,tfiling2(left)),all)
 						 ;
 
 

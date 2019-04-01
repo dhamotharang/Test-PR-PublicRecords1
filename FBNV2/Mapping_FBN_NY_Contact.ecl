@@ -40,28 +40,6 @@ layout_common.contact_AID tFiling(dFiling pInput)
 			self.lname					    :=	pInput.pname[46..65];
 			self.name_suffix				:=	pInput.pname[66..70];
 			self.name_score			        :=	pInput.pname[71..73];
-/*
-			self.prim_range 				:=	clean_address[1..10];			
-			self.predir 					:=	clean_address[11..12];			
-			self.prim_name 					:=	clean_address[13..40];			
-			self.addr_suffix				:=	clean_address[41..44];			
-			self.postdir 					:=	clean_address[45..46];			
-			self.unit_desig 				:=	clean_address[47..56];			
-			self.sec_range 					:=	clean_address[57..64];			
-			self.v_city_name 				:=	clean_address[90..114];			
-			self.st 						:=	clean_address[115..116];			
-			self.zip5 						:=	clean_address[117..121];			
-			self.zip4 						:=	clean_address[122..125];			
-			self.addr_rec_type				:=	clean_address[139..140];			
-			self.fips_state 				:=	clean_address[141..142];			
-			self.fips_county 				:=  clean_address[143..145];				
-			self.geo_lat 					:=	clean_address[146..155];			
-			self.geo_long 					:=	clean_address[156..166];			
-			self.cbsa						:=	clean_address[167..170];			
-			self.geo_blk 					:=	clean_address[171..177];			
-			self.geo_match 					:=	clean_address[178];			
-			self.err_stat 					:=	clean_address[179..182];
-*/
 			self.prep_addr_line1			:= address.Addr1FromComponents(
 																					stringlib.stringtouppercase(trim(o_address,left,right))
 																					,''
@@ -89,7 +67,6 @@ layout_common.contact_AID  rollupXform(layout_common.contact_AID pLeft, layout_c
 	END;
 	
 dProj   	:=dedup(project(dfiling,tfiling(left))
-                          // +Mapping_FBN_NY_Contact_Xml
 													,all);
 			
 dSort       :=SORT(Distribute(dProj, hash(tmsid)),

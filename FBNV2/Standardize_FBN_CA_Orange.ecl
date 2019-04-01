@@ -80,14 +80,7 @@ function
 																					stringlib.stringtouppercase(trim(l.OWNER_CITY ))
 																					,stringlib.stringtouppercase(trim(l.OWNER_STATE))
 																					,owner_zip[1..5]);
-/*
-			self.pname 							:= if (trim(fname) <> '' or 
-																		 trim(mname) <> '', 
-																		 address.CleanPersonFML73(fname + ' '+ mname + ' '+ lname_comp),'');
-*/
 			self.full_name					:= trim(fname) +' '+ trim(mname) +' '+ trim(lname_comp);
-			//self.cname 							:= if (trim(fname) <> '', '', lname_comp);
-
 			self 										:= l;
 			self 										:= [];
 	end;
@@ -150,7 +143,7 @@ function
 	VersionControl.macBuildNewLogicalFile(logicalfile	,Clean_Filings_Names	,filing_out		,,,pOverwrite);		
 	
 	mapped_Filing 	:= 	sequential(filing_out);
-	source					:= 'Orange';
+	source					:= 'ORANGE';
 	superfilename 	:= FBNV2.Get_Update_SupperFilename(source);
 	Create_Super		:= FileServices.CreateSuperFile(superfilename,false);
 	

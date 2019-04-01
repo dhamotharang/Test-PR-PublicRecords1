@@ -3,9 +3,9 @@
 /********************************
 Before we grab this sprayed file we have to make sure that
 if we receive updates from Experian  
-we have to run FBNV2.fsprayFBNfiles  attribute passing file date 
+we have to run FBNV2.fsprayFBNfiles attribute passing file date 
 for spray and to add new update raw files to this supper file 
-thor_data400::in::experian::sprayed::fbn .
+thor_data400::in::experian::sprayed::fbn.
 ********************************/
 
 trimUpper(string s) := function

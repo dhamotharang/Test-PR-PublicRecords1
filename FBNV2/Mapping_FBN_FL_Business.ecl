@@ -3,7 +3,6 @@
 Layout_temp :=RECORD
        STRING8 process_date;
        layout_common.Bus;
-//	   STRING182 	Clean_address;
 		 STRING100  Prep_Addr_Line1;
 		 STRING50  	Prep_Addr_Line_Last;
 	   STRING3 	 	filing_type_code ;
@@ -16,7 +15,6 @@ Layout_temp :=RECORD
        STRING5 		ACTION_OLD_ZIP5                   :='';
 	   STRING4 		ACTION_OLD_ZIP4                   :='';
 	   STRING40 	ACTION_OLD_COUNTRY                :='';
-	   //STRING182 	Clean_Old_address				  :='';
 		 STRING100	Prep_Old_Addr_Line1 := '';
 		 STRING50		Prep_Old_Addr_Line_Last :=  '';
 	END;
@@ -162,54 +160,11 @@ layout_common.Business_AID tMerge(Layout_temp pInput)
 			self.Mail_CITY					:=  pInput.Bus_CITY;
 			self.Mail_state					:=  pInput.Bus_state;
 			self.Mail_zip					:=  (string)pInput.Bus_zip+pInput.Bus_zip4;
-/*
-			SELF.prim_range 				:=	pInput.clean_address[1..10];			
-			SELF.predir 					:=	pInput.clean_address[11..12];			
-			SELF.prim_name 					:=	pInput.clean_address[13..40];			
-			SELF.addr_suffix				:=	pInput.clean_address[41..44];			
-			SELF.postdir 					:=	pInput.clean_address[45..46];			
-			SELF.unit_desig 				:=	pInput.clean_address[47..56];			
-			SELF.sec_range 					:=	pInput.clean_address[57..64];			
-			SELF.v_city_name 				:=	pInput.clean_address[90..114];			
-			SELF.st 						:=	pInput.clean_address[115..116];			
-			SELF.zip5 						:=	pInput.clean_address[117..121];			
-			SELF.zip4 						:=	pInput.clean_address[122..125];			
-			SELF.addr_rec_type				:=	pInput.clean_address[139..140];			
-			SELF.fips_state 				:=	pInput.clean_address[141..142];			
-			SELF.fips_county 				:=  pInput.clean_address[143..145];				
-			SELF.geo_lat 					:=	pInput.clean_address[146..155];			
-			SELF.geo_long 					:=	pInput.clean_address[156..166];			
-			SELF.cbsa						:=	pInput.clean_address[167..170];			
-			SELF.geo_blk 					:=	pInput.clean_address[171..177];			
-			SELF.geo_match 					:=	pInput.clean_address[178];			
-			SELF.err_stat 					:=	pInput.clean_address[179..182];	
-			SELF.mail_prim_range 			:=	pInput.clean_address[1..10];		
-			SELF.mail_predir 				:=	pInput.clean_address[11..12];		
-			SELF.mail_prim_name 			:=	pInput.clean_address[13..40];		
-			SELF.mail_addr_suffix			:=	pInput.clean_address[41..44];		
-			SELF.mail_postdir 				:=	pInput.clean_address[45..46];		
-			SELF.mail_unit_desig 			:=	pInput.clean_address[47..56];		
-			SELF.mail_sec_range 			:=	pInput.clean_address[57..64];		
-			SELF.mail_v_city_name 			:=	pInput.clean_address[90..114];		
-			SELF.mail_st 					:=	pInput.clean_address[115..116];		
-			SELF.mail_zip5 					:=	pInput.clean_address[117..121];		
-			SELF.mail_zip4 					:=	pInput.clean_address[122..125];		
-			SELF.mail_addr_rec_type			:=	pInput.clean_address[139..140];		
-			SELF.mail_fips_state 			:=	pInput.clean_address[141..142];		
-			SELF.mail_fips_county 			:=  pInput.clean_address[143..145];			
-			SELF.mail_geo_lat 				:=	pInput.clean_address[146..155];		
-			SELF.mail_geo_long 				:=	pInput.clean_address[156..166];		
-			SELF.mail_cbsa					:=	pInput.clean_address[167..170];		
-			SELF.mail_geo_blk 				:=	pInput.clean_address[171..177];		
-			SELF.mail_geo_match 			:=	pInput.clean_address[178];		
-			SELF.mail_err_stat 				:=	pInput.clean_address[179..182];
-*/
 			self.Prep_Addr_Line1					:= pinput.prep_addr_line1;
 			self.Prep_Addr_Line_last			:= pinput.prep_addr_line_Last;
 			self.Prep_Mail_Addr_Line1			:= pinput.Prep_Addr_Line1;
 			self.Prep_Mail_Addr_Line_last	:= pinput.Prep_Addr_Line_Last;			
 			SELF						    					:=  pInput;
-			//SELF													:= [];
 	END;
 
 layout_common.Business_AID tAddSeq(layout_common.Business_AID pInput ,INTEGER c)	
@@ -228,8 +183,7 @@ layout_common.Business_AID  ROLLUPXform(layout_common.Business_AID pLEFT, layout
 	    SELF := pLEFT;
 	END;
 	
-dFiling		:=GROUP(SORT(DISTRIBUTE(DEDUP(PROJECT(
-									// File_FL_Filing_in.Cleaned_Old +										
+dFiling		:=GROUP(SORT(DISTRIBUTE(DEDUP(PROJECT(									
 									File_FL_Filing_in.Cleaned,tfiling(LEFT )),ALL),
                                  HASH(orig_filing_number)),
 							orig_filing_number,EXPIRATION_DATE,LOCAL),
@@ -240,7 +194,6 @@ dFilingType :=UNGROUP(ITERATE(dFiling, tITERATEf(LEFT,RIGHT,COUNTER)));
 dPreInit    :=DEDUP(sort(dFilingType(filing_type[1]='I'),orig_filing_number,-filing_type_code,LOCAL),orig_filing_number,LOCAL);
 							 
 dGroupEven  :=GROUP(SORT(DISTRIBUTE(DEDUP(PROJECT(
-										// File_FL_Event_in.Cleaned_Old(action_code<>'REN') +
 										File_FL_Event_in.Cleaned(action_code<>'REN'), tevent(LEFT)),ALL,EXCEPT filing_date),
                                     HASH(orig_filing_number)),
 					     ORIG_FILING_NUMBER,FILING_DATE,IF(FILING_TYPE_CODE='CHF',0,1),LOCAL),

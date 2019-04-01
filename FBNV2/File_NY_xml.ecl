@@ -1,1 +1,1 @@
-﻿export File_NY_xml :=dataset(Cluster.Cluster_In +'in::FBNV2::xml2fix::NY',layout_xml.NY,flat);
+﻿export File_NY_xml :=dataset('~thor_data400::in::FBNV2::xml2fix::NY',layout_xml.NY,flat);

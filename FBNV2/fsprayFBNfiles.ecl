@@ -1,9 +1,9 @@
 ﻿import lib_fileservices,_control,lib_stringlib,std;
 /******************************** we have to make sure that
 if we receive updates from Experian  
-we have to run  this FBNV2.fsprayFBNfiles  attribute passing file date 
+we have to run this FBNV2.fsprayFBNfiles attribute passing file date 
 for spray and to add new update raw files to 
-thor_data400::in::experian::sprayed::fbn supper file and
+thor_data400::in::experian::sprayed::fbn supper file and
 This is the superfile where all updates reside.
 ********************************/
 

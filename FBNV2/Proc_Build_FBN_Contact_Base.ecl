@@ -1,15 +1,9 @@
 ﻿IMPORT Address, AID, DID_Add, NID, PromoteSupers, lib_stringLib;
 
-dContactInputs  	:= 		
-                          //commented sources have not been sent from vendor in a long time, unsure of format
-				                  ungroup(Mapping_FBN_FL_Contact)+
-																 //ungroup(Mapping_FBN_TXD_Contact)+
-				                         // ungroup(Mapping_FBN_InfoUSA_Contact)+
-				                         //ungroup(Mapping_FBN_CA_San_Bernardino_Contact)+
+dContactInputs  	:=ungroup(Mapping_FBN_FL_Contact)+
 				                         ungroup(Mapping_FBN_CA_San_Diego_Contact)+
 																 ungroup(Mapping_FBN_CA_Santa_Clara_Contact)+
 														     ungroup(Mapping_FBN_TX_Harris_Contact)+
-														     //ungroup(Mapping_FBN_NY_Contact)+
 																 ungroup(Mapping_FBN_CA_Orange_Contact)+
 																 ungroup(Mapping_FBN_CA_Ventura_Contact)+
 																 ungroup(Mapping_FBN_Experian_Contact);	

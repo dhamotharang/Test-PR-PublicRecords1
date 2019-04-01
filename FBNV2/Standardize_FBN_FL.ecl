@@ -122,7 +122,7 @@ module
 			VersionControl.macBuildNewLogicalFile(logicalfile_filing	,PrepFilings	,filing_out		,false,,pOverwrite);		
 	
 			mapped_Filing 	:= 	sequential(filing_out);
-			source					:= 'Filing';
+			source					:= 'FILING';
 			superfilename 	:= FBNV2.Get_Update_SupperFilename(source);
 			Create_Super		:= FileServices.CreateSuperFile(superfilename,false);
 			
@@ -130,10 +130,8 @@ module
 				sequential(
 					mapped_Filing
 					,if(~FileServices.FileExists(superfilename), Create_Super)
-					//,FileServices.StartSuperFileTransaction()
 					,fileservices.clearSuperFile(superfilename)
-					,fileservices.addsuperfile(superfilename,logicalfile_filing)
-			   	//,FileServices.FinishSuperFileTransaction()								  
+					,fileservices.addsuperfile(superfilename,logicalfile_filing) 
 				);	
 
 			return result;
@@ -293,12 +291,11 @@ module
 			Clean_Event_Names	:=project(dCleanName ,CleanUpName(left));
 			
 			logicalfile_event := '~thor_data400::in::fbnv2::FL::Event::'+pversion+'::Cleaned';
-			
-			//VersionControl.macBuildNewLogicalFile(logicalfile_event	,Clean_Event_Names	,Event_out		,,,pOverwrite);	
+	
 			VersionControl.macBuildNewLogicalFile(logicalfile_event	,Clean_Event_Names	,Event_out		,false,,pOverwrite);
 	
 			mapped_Event 	:= 	sequential(Event_out);
-			source				:= 'Event';
+			source				:= 'EVENT';
 			superfilename := FBNV2.Get_Update_SupperFilename(source);
 			Create_Super		:= FileServices.CreateSuperFile(superfilename,false);
 			
@@ -306,10 +303,8 @@ module
 				sequential(
 					mapped_Event
 					,if(~FileServices.FileExists(superfilename), Create_Super)
-					//,FileServices.StartSuperFileTransaction()
 					,fileservices.clearSuperFile( superfilename)
 					,fileservices.addsuperfile( superfilename,logicalfile_event)
-					//,FileServices.FinishSuperFileTransaction()
 				);	
 			
 			return result;

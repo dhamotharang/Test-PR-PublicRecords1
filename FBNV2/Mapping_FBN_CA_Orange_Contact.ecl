@@ -1,9 +1,5 @@
 ﻿import ut,fbnv2,_validate;
 
-//dFiling_Old							:= File_CA_Orange_in.Cleaned_Old;
-// dFiling			            := dedup(dFiling_Old +
-																 // File_CA_Orange_in.Cleaned,all);
-
 dFiling			            := dedup(File_CA_Orange_in.Cleaned,all);
 
 layout_common.contact_AID tFiling(dFiling pInput)
@@ -31,28 +27,6 @@ layout_common.contact_AID tFiling(dFiling pInput)
 			self.lname					    			:=	pInput.lname;
 			self.name_suffix							:=	pInput.name_suffix;
 			self.name_score			       		:=	pInput.name_score;
-/*
-			self.prim_range 				:=	pInput.clean_owner_address[1..10];			
-			self.predir 					:=	pInput.clean_owner_address[11..12];			
-			self.prim_name 					:=	pInput.clean_owner_address[13..40];			
-			self.addr_suffix				:=	pInput.clean_owner_address[41..44];			
-			self.postdir 					:=	pInput.clean_owner_address[45..46];			
-			self.unit_desig 				:=	pInput.clean_owner_address[47..56];			
-			self.sec_range 					:=	pInput.clean_owner_address[57..64];			
-			self.v_city_name 				:=	pInput.clean_owner_address[90..114];			
-			self.st 						:=	pInput.clean_owner_address[115..116];			
-			self.zip5 						:=	pInput.clean_owner_address[117..121];			
-			self.zip4 						:=	pInput.clean_owner_address[122..125];			
-			self.addr_rec_type				:=	pInput.clean_owner_address[139..140];			
-			self.fips_state 				:=	pInput.clean_owner_address[141..142];			
-			self.fips_county 				:=  pInput.clean_owner_address[143..145];				
-			self.geo_lat 					:=	pInput.clean_owner_address[146..155];			
-			self.geo_long 					:=	pInput.clean_owner_address[156..166];			
-			self.cbsa						:=	pInput.clean_owner_address[167..170];			
-			self.geo_blk 					:=	pInput.clean_owner_address[171..177];			
-			self.geo_match 					:=	pInput.clean_owner_address[178];			
-			self.err_stat 					:=	pInput.clean_owner_address[179..182];	
-*/
 			self.Prep_Addr_Line1			:= pinput.prep_owner_addr_line1;
 			self.Prep_Addr_Line_last	:= pinput.prep_owner_addr_line_last;
 			self                			:= pinput;
@@ -71,7 +45,6 @@ layout_common.contact_AID  rollupXform(layout_common.contact_AID pLeft, layout_c
 	END;
 	
 dSortFiling	:=SORT(DISTRIBUTE(dedup(project(dfiling,tfiling(left)),all)
-          // +FBNV2.Mapping_FBN_CA_Orange_contact_Xml
 					,hash(tmsid))
 					,RECORD,except dt_first_seen,dt_last_seen, dt_vendor_first_reported,dt_vendor_last_reported,local); 
 					

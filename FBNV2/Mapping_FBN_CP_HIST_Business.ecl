@@ -37,28 +37,6 @@ trimUpper(string s) := function
 			self.BUS_PHONE_NUM              :=if((integer)pInput.bus_phone <> 0,trim(pInput.bus_phone,left,right),'');
 			self.fips_state 				:= pinput.Bus_fips_state	;
 			self.fips_county 				:= pinput.Bus_fips_county	;
-/*
-			self.prim_range 				:= pinput.Bus_prim_range	;
-			self.predir 					:= pinput.Bus_predir	;
-			self.prim_name 					:= pinput.Bus_prim_name	;
-			self.addr_suffix				:= pinput.Bus_addr_suffix	;
-			self.postdir 					:= pinput.Bus_postdir	;
-			self.unit_desig 				:= pinput.Bus_unit_desig	;
-			self.sec_range 					:= pinput.Bus_sec_range	;
-			self.v_city_name 				:= pinput.Bus_v_city_name	;
-			self.st 						:= pinput.Bus_st	;
-			self.zip5 						:= pinput.Bus_zip5	;
-			self.zip4 						:= pinput.Bus_zip4	;
-			self.addr_rec_type				:= pinput.Bus_addr_rec_type	;
-			self.fips_state 				:= pinput.Bus_fips_state	;
-			self.fips_county 				:= pinput.Bus_fips_county	;
-			self.geo_lat 					:= pinput.Bus_geo_lat	;
-			self.geo_long 					:= pinput.Bus_geo_long	;
-			self.cbsa						:= pinput.Bus_cbsa	;
-			self.geo_blk 					:= pinput.Bus_geo_blk	;
-			self.geo_match 					:= pinput.Bus_geo_match	;
-			self.err_stat 					:= pinput.Bus_err_stat	;
-*/
 			self.prep_addr_line1		 := address.Addr1FromComponents(
 																					stringlib.stringtouppercase(trim(pinput.ADDR_1,left,right))
 																					,stringlib.stringtouppercase(trim(pinput.ADDR_2,left,right))

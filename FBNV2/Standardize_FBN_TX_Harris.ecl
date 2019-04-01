@@ -158,7 +158,7 @@ function
 	VersionControl.macBuildNewLogicalFile(logicalfile	,Clean_Filings_Names2	,filing_out		,,,pOverwrite);		
 	
 	mapped_Filing 	:= 	filing_out;
-	source					:= 'Harris';
+	source					:= 'HARRIS';
 	superfilename 	:= FBNV2.Get_Update_SupperFilename(source);
 	Create_Super		:= FileServices.CreateSuperFile(superfilename,false);
 	

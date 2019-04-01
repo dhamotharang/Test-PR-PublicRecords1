@@ -28,7 +28,6 @@ cleaned_common_rec xform_new_to_common(Layout_File_TX_Harris_in.Cleaned L) := TR
   SELF := L;
 END;
 
-// dOldFiling := PROJECT(File_TX_Harris_in.Cleaned_Old(FILE_NUMBER != ''), xform_old_to_common(LEFT));
 dNewFiling := PROJECT(File_TX_Harris_in.Cleaned(FILE_NUMBER != ''), xform_new_to_common(LEFT));
 dFiling_combined := 
                      // dOldFiling + 

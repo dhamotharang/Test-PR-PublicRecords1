@@ -160,7 +160,7 @@ function
 	VersionControl.macBuildNewLogicalFile(logicalfile	,Clean_Filings_Names	,filing_out		,,,pOverwrite);		
 	
 	mapped_Filing 	:= 	sequential(filing_out);
-	source					:= 'Ventura';
+	source					:= 'VENTURA';
 	superfilename 	:= FBNV2.Get_Update_SupperFilename(source); 
 	Create_Super		:= FileServices.CreateSuperFile(superfilename,false);
 	

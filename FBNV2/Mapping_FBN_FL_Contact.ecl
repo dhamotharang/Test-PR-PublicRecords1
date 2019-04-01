@@ -8,15 +8,7 @@ LAYOUT_TEMP
 		unsigned6 	FILING_DATE;
 		STRING12 	FILING_NUMBER;
 		fbnv2.layout_common.CONT_INFO;
-		STRING73   	PNAME;
-		// string5   title;
-		// string20  fname;
-		// string20  mname;
-		// string20  lname;
-		// string5   name_suffix;
-		// string3   name_score;
-		//STRING182 	CLEAN_ADDRESS;
-		
+		STRING73   	PNAME;		
 		string100		prep_addr_line1;
 		string50		prep_addr_line_last;
 		string3   	filing_type_code :='';
@@ -45,7 +37,6 @@ LAYOUT_TEMP tFiling(fbnv2.File_FL_Filing_in.Cleaned pInput)
 			self.contact_Fei_num  		    := (integer)pInput.FIC_owner_fei_num;
 			self.SEQ_NO 					:= (integer) pInput.seq;
 			self.contact_charter_num		:= pInput.FIC_OWNER_CHARTER_NUM ;
-			//SELF.CLEAN_ADDRESS              := CLEAN_ADDRESS;
 			self.prep_addr_line1				:= prep_addr_line1;
 			self.prep_addr_line_last		:= prep_addr_line_last;
 			Self.FILING_NUMBER 			    := pInput.FIC_FIL_DOC_NUM ;
@@ -59,9 +50,6 @@ LAYOUT_TEMP tFiling(fbnv2.File_FL_Filing_in.Cleaned pInput)
 
 LAYOUT_TEMP tEvent(fbnv2.File_FL_Event_in.Cleaned pInput)
    :=TRANSFORM
-   
-            // STRING182        clean_address  := if(pInput.clean_owner_address<>'',
-			                                      // pInput.clean_owner_address,pInput.clean_address);
 			
 			STRING100    Prep_addr_line1  		:= if(pInput.prep_owner_addr_line1 <> '',
 																							pInput.prep_owner_addr_line1,pInput.prep_new_addr_line1);
@@ -83,7 +71,6 @@ LAYOUT_TEMP tEvent(fbnv2.File_FL_Event_in.Cleaned pInput)
 																			,if(_validate.date.fIsValid((string) pInput.EVENT_DATE), (integer) pInput.EVENT_DATE,0) 
 																			,0);
 			self.CONTACT_STATUS             := if(pInput.action_code='DEL','INACTIVE','ACTIVE');
-			//SELF.CLEAN_ADDRESS              := CLEAN_ADDRESS;
 			self.prep_addr_line1				:= prep_addr_line1;
 			self.prep_addr_line_last		:= prep_addr_line_last;
 			Self.FILING_NUMBER 			    := pInput.EVENT_DOC_NUMBER ;
@@ -122,28 +109,6 @@ fbnv2.layout_common.contact_AID tMERGE(LAYOUT_TEMP pInput)
 			self.lname					    :=	pInput.pname[46..65];
 			self.name_suffix				:=	pInput.pname[66..70];
 			self.name_score			        :=	pInput.pname[71..73];
-/*
-			self.prim_range 				:=	pInput.clean_address[1..10];			
-			self.predir 					:=	pInput.clean_address[11..12];			
-			self.prim_name 					:=	pInput.clean_address[13..40];			
-			self.addr_suffix				:=	pInput.clean_address[41..44];			
-			self.postdir 					:=	pInput.clean_address[45..46];			
-			self.unit_desig 				:=	pInput.clean_address[47..56];			
-			self.sec_range 					:=	pInput.clean_address[57..64];			
-			self.v_city_name 				:=	pInput.clean_address[90..114];			
-			self.st 						:=	pInput.clean_address[115..116];			
-			self.zip5 						:=	pInput.clean_address[117..121];			
-			self.zip4 						:=	pInput.clean_address[122..125];			
-			self.addr_rec_type				:=	pInput.clean_address[139..140];			
-			self.fips_state 				:=	pInput.clean_address[141..142];			
-			self.fips_county 				:=  pInput.clean_address[143..145];				
-			self.geo_lat 					:=	pInput.clean_address[146..155];			
-			self.geo_long 					:=	pInput.clean_address[156..166];			
-			self.cbsa						:=	pInput.clean_address[167..170];			
-			self.geo_blk 					:=	pInput.clean_address[171..177];			
-			self.geo_match 					:=	pInput.clean_address[178];			
-			self.err_stat 					:=	pInput.clean_address[179..182];	
-*/
 			self.Prep_Addr_Line1			:= pInput.Prep_Addr_Line1;
 			self.Prep_Addr_Line_Last	:= pInput.Prep_Addr_Line_Last;
 			self                      :=  pInput;
@@ -161,15 +126,11 @@ fbnv2.layout_common.contact_AID  rollupXform(fbnv2.layout_common.contact_AID pLe
 	    self := pLeft;
 	END;
 
-// dEvent      := distribute(dedup(project(fbnv2.File_FL_Event_in.Cleaned_Old(action_code='ADD' or action_code='DEL' Or action_code='CHO') +
-																				// fbnv2.File_FL_Event_in.Cleaned(action_code='ADD' or action_code='DEL' Or action_code='CHO'),
 dEvent      := distribute(dedup(project(fbnv2.File_FL_Event_in.Cleaned(action_code='ADD' or action_code='DEL' Or action_code='CHO'),
 										tevent(left)),
 								all),
 						  hash(orig_filing_number));
-	
-//dFiling	    := DISTRIBUTE(dedup(project(fbnv2.File_FL_Filing_in.Cleaned_Old(fic_owner_name<>'') +
-																				// fbnv2.File_FL_Filing_in.Cleaned(fic_owner_name<>''),
+
 dFiling	    := DISTRIBUTE(dedup(project(fbnv2.File_FL_Filing_in.Cleaned(fic_owner_name<>''),
                                         tfiling(left)),
 								all),

@@ -1,7 +1,6 @@
 ﻿import ut,fbnv2,_validate;
 
 dFiling			            := dedup(
-                                 // File_CA_Santa_clara_in.Cleaned_Old +
 																 File_CA_Santa_clara_in.Cleaned,all);
 layout_common.contact_AID tFiling(dFiling pInput)
    :=TRANSFORM
@@ -44,28 +43,6 @@ layout_common.contact_AID tFiling(dFiling pInput)
 			self.lname					   			 	:=	pInput.Owner_lname;
 			self.name_suffix							:=	pInput.Owner_name_suffix;
 			self.name_score			    		  :=	pInput.Owner_name_score;
-/*			
-			self.prim_range 				:=	pInput.clean_address[1..10];			
-			self.predir 					:=	pInput.clean_address[11..12];			
-			self.prim_name 					:=	pInput.clean_address[13..40];			
-			self.addr_suffix				:=	pInput.clean_address[41..44];			
-			self.postdir 					:=	pInput.clean_address[45..46];			
-			self.unit_desig 				:=	pInput.clean_address[47..56];			
-			self.sec_range 					:=	pInput.clean_address[57..64];			
-			self.v_city_name 				:=	pInput.clean_address[90..114];			
-			self.st 						:=	pInput.clean_address[115..116];			
-			self.zip5 						:=	pInput.clean_address[117..121];			
-			self.zip4 						:=	pInput.clean_address[122..125];			
-			self.addr_rec_type				:=	pInput.clean_address[139..140];			
-			self.fips_state 				:=	pInput.clean_address[141..142];			
-			self.fips_county 				:=  pInput.clean_address[143..145];				
-			self.geo_lat 					:=	pInput.clean_address[146..155];			
-			self.geo_long 					:=	pInput.clean_address[156..166];			
-			self.cbsa						:=	pInput.clean_address[167..170];			
-			self.geo_blk 					:=	pInput.clean_address[171..177];			
-			self.geo_match 					:=	pInput.clean_address[178];			
-			self.err_stat 					:=	pInput.clean_address[179..182];
-*/
 			self.Prep_Addr_Line1 			:= pInput.prep_owner_addr_line1;
 			self.Prep_Addr_Line_Last  := pInput.prep_owner_addr_line_last;
 			self               				:= pinput;
@@ -83,7 +60,6 @@ layout_common.contact_AID  rollupXform(layout_common.contact_AID pLeft, layout_c
 	END;
 	
 dProj   	:=dedup(project(dfiling,tfiling(left))
-                  //+Mapping_FBN_CA_Santa_Clara_Contact_Xml
 									,all);
 			
 dSort       :=SORT(Distribute(dProj, hash(tmsid)),

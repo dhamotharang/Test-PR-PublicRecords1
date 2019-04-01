@@ -93,11 +93,6 @@ function
 																								l.name_flag = 'U' => l.owner_name_suffix, 
 																								''
 																							);
-
-		// self.CName			:= if(l.name_flag = 'B',
-													// trim(l.Owner_Name,left,right),
-													// ''
-												 // );	
 		self						:=	l;
 		self						:=	[];
 	end;		
@@ -109,7 +104,7 @@ function
 	VersionControl.macBuildNewLogicalFile(logicalfile	,Clean_Filings_Names	,filing_out		,,,pOverwrite);		
 	
 	mapped_Filing 	:= 	sequential(filing_out);
-	source					:= 'Santa_Clara';
+	source					:= 'SANTA_CLARA';
 	superfilename 	:= FBNV2.Get_Update_SupperFilename(source); 
 	Create_Super		:= FileServices.CreateSuperFile(superfilename,false);
 	
