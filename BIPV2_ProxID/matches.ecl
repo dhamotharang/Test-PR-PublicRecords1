@@ -127,7 +127,7 @@ SHARED match_candidates(ih).layout_matches match_join(match_candidates(ih).layou
   INTEGER2 cnp_name_score_supp := MIN(IF(support_cnp_name>0,MAX(cnp_name_score_temp,support_cnp_name*100),cnp_name_score_temp),s.cnp_name_MAXIMUM*100); // Add support
   INTEGER2 cnp_name_score := MAP ( le.cnp_name = ri.cnp_name 
     or (cnp_name_score_supp >= Config.cnp_name_Force * 100 and cnp_name_support0 = 0)
-    or (cnp_name_score_supp >= Config.cnp_name_Force * 100 and cnp_name_score_temp < Config.cnp_name_Force * 100 and cnp_name_support0 > 0 /*and regexfind('fbn|dba|fictitious|assumed|trade',le.company_name_type_raw + le.company_name_type_derived + ri.company_name_type_raw + ri.company_name_type_derived,nocase)*/)  
+    or (cnp_name_score_supp >= Config.cnp_name_Force * 100 /*and cnp_name_score_temp < Config.cnp_name_Force * 100*/ and cnp_name_support0 > 0 /*and regexfind('fbn|dba|fictitious|assumed|trade',le.company_name_type_raw + le.company_name_type_derived + ri.company_name_type_raw + ri.company_name_type_derived,nocase)*/)  
     => cnp_name_score_supp
     ,active_domestic_corp_key_score > Config.active_domestic_corp_key_Force*100  and ~(regexfind('legal',le.company_name_type_derived,nocase) and regexfind('legal',ri.company_name_type_derived,nocase) )
     => 0
@@ -182,12 +182,12 @@ END;
 //Allow rule numbers to be converted to readable text.
 EXPORT RuleText(UNSIGNED n) :=  MAP (
      n = 0 => ':cnp_number:st:prim_range_derived'
-  ,n = 101 => ':cnp_number:prim_range_derived:cnp_name:st:pname_digits'      /* HACKMatches01 */
-  ,n = 102 => ':cnp_number:prim_range_derived:prim_name_derived:st:cnp_name[1..4]'     /* HACKMatches01 */
-  ,n = 103 => ':prim_range_derived:prim_name_derived:st:sec_range'         /* HACKMatches01 */
-  ,n = 104 => ':cnp_number:prim_range_derived:v_city_name:st:pname_digits:cnp_name_raw[1..4]'	/* HACKMatches01 */
+  ,n = 101 => ':cnp_number:prim_range_derived:cnp_name:st:pname_digits'                      /* HACKMatches01 */
+  ,n = 102 => ':cnp_number:prim_range_derived:prim_name_derived:st:cnp_name[1..4]'                   /* HACKMatches01 */
+  ,n = 103 => ':prim_range_derived:prim_name_derived:st:sec_range'                                   /* HACKMatches01 */
+  ,n = 104 => ':cnp_number:prim_range_derived:v_city_name:st:pname_digits:cnp_name_raw[1..4]'/* HACKMatches01 */
   ,n = 105 => ':cnp_number:prim_range_derived:zip:st:pname_digits:cnp_name_raw[1..4]'        /* HACKMatches01 */
-  ,n = 106 => ':cnp_number:cnp_name:company_address'   /* HACKMatches01 */
+  ,n = 106 => ':cnp_number:cnp_name:company_address'                                 /* HACKMatches01 */
   ,'AttributeFile:'+(STRING)(n-10000)
   );
 
@@ -243,7 +243,12 @@ AND ( left.active_enterprise_number = right.active_enterprise_number OR left.act
 AND ( left.active_domestic_corp_key = right.active_domestic_corp_key OR left.active_domestic_corp_key_isnull OR right.active_domestic_corp_key_isnull )
 AND (( ~left.cnp_name_isnull AND ~right.cnp_name_isnull ) OR LEFT.support_cnp_name > 0 or (left.active_domestic_corp_key = right.active_domestic_corp_key OR left.active_domestic_corp_key_isnull OR right.active_domestic_corp_key_isnull ) OR ( ~left.active_duns_number_isnull AND ~right.active_duns_number_isnull ) OR ( ~left.company_fein_isnull AND ~right.company_fein_isnull ))
 AND ( ~left.prim_name_derived_isnull AND ~right.prim_name_derived_isnull ) AND (~left.company_address_isnull AND ~right.company_address_isnull )
-,match_join( RIGHT,PROJECT(LEFT,strim(LEFT)),LEFT.Rule, LEFT.Conf,LEFT.support_cnp_name),LOCAL); // Will be distributed by DID1
+,match_join( RIGHT,PROJECT(LEFT,strim(LEFT)),LEFT.Rule, LEFT.Conf,LEFT.support_cnp_name)
+,ATMOST(LEFT.cnp_number = RIGHT.cnp_number AND LEFT.prim_name_derived = RIGHT.prim_name_derived
+      AND LEFT.st = RIGHT.st
+      AND LEFT.prim_range_derived = RIGHT.prim_range_derived,1000)
+      ,LOCAL); 
+ // Will be distributed by DID1
 with_attr := attr_match + all_mjs;
 all_matches1 := MOD_Attr_ForeignCorpkey(ih).ForceFilter(ih,with_attr,Proxid1,Proxid2); // Restrict to those matches obeying force upon ForeignCorpkey
 all_matches2 := MOD_Attr_RAAddresses(ih).ForceFilter(ih,all_matches1,Proxid1,Proxid2); // Restrict to those matches obeying force upon RAAddresses
