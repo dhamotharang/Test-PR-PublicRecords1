@@ -1,4 +1,4 @@
-IMPORT PhoneFinder_Services, iesp, Gateway, MDR, Phones, PhonesInfo, ut;
+﻿IMPORT PhoneFinder_Services, iesp, Gateway, MDR, Phones, PhonesInfo, ut, dx_PhonesInfo;
 EXPORT GetAccuDataPhones := MODULE
 
 	 EXPORT GetAccuData_Ocn_PortingData(
@@ -27,7 +27,7 @@ EXPORT GetAccuDataPhones := MODULE
 		 recordof(PhonesInfo.Key_Phones.Ported_Metadata);	
 		end;
 	 
-		portedrec  xporting(iesp.accudata_ocn.t_AccudataOcnResponseEx l, recordof(PhonesInfo.Key_Source_Reference.ocn_name) r) :=  transform		
+		portedrec  xporting(iesp.accudata_ocn.t_AccudataOcnResponseEx l, recordof(dx_PhonesInfo.Key_Source_Reference.ocn_name) r) :=  transform		
 		 accurpt := l.response.AccudataReport;
 		 self.acctno := accurpt.RequestId;
 		 self.phone := accurpt.phone;
@@ -43,7 +43,7 @@ EXPORT GetAccuDataPhones := MODULE
 		 self := [];		
 		end;
 		
-		ocn_join  := join(gw_recs(response.AccudataReport.ErrorMessage =''), PhonesInfo.Key_Source_Reference.ocn_name,
+		ocn_join  := join(gw_recs(response.AccudataReport.ErrorMessage =''), dx_PhonesInfo.Key_Source_Reference.ocn_name,
 		  keyed(left.response.AccudataReport.OperatingCompanyNumber = right.ocn) and right.is_current,
 			xporting(left,right),
 			left outer, keep(1), limit(0));
