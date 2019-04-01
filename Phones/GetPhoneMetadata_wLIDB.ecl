@@ -1,4 +1,4 @@
-﻿IMPORT Doxie, Gateway, Iesp, Phones, PhonesInfo, STD, UT;
+﻿IMPORT Doxie, Gateway, Iesp, Phones, PhonesInfo, STD, UT, dx_PhonesInfo;
 
 EXPORT GetPhoneMetadata_wLIDB(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dBatchPhonesIn,
 	Phones.IParam.PhoneAttributes.BatchParams in_mod) := FUNCTION
@@ -28,7 +28,7 @@ Layout_BatchRaw_info := RECORD
 	string1 block_id;
 END;	
 
-Layout_BatchRaw_info transformLerg6(Phones.Layouts.PhoneAttributes.BatchIn l, recordof(PhonesInfo.Key_Phones_Lerg6) r) := TRANSFORM
+Layout_BatchRaw_info transformLerg6(Phones.Layouts.PhoneAttributes.BatchIn l, recordof(dx_PhonesInfo.Key_Phones_Lerg6) r) := TRANSFORM
 		SELF.acctno := l.acctno;
 		SELF.phone := l.phoneno;
 		SELF.source := r.source;  
@@ -40,7 +40,7 @@ Layout_BatchRaw_info transformLerg6(Phones.Layouts.PhoneAttributes.BatchIn l, re
 		SELF := [];
 	END;
 	
-dLerg6Phones := JOIN(dBatchPhonesIn, PhonesInfo.Key_Phones_Lerg6, (LEFT.phoneno[1..3] =RIGHT.npa and left.phoneno[4..6]=RIGHT.nxx 
+dLerg6Phones := JOIN(dBatchPhonesIn, dx_PhonesInfo.Key_Phones_Lerg6, (LEFT.phoneno[1..3] =RIGHT.npa and left.phoneno[4..6]=RIGHT.nxx 
 																    and (left.phoneno[7]=RIGHT.block_id or RIGHT.block_id = Consts.DEFAULT_BLOCK_ID) 
 																	   and RIGHT.is_current = TRUE),
 		                  transformLerg6(LEFT, RIGHT),LIMIT(0),KEEP(Consts.MaxRecsPerPhone));
@@ -56,7 +56,7 @@ dLerg6Phones := JOIN(dBatchPhonesIn, PhonesInfo.Key_Phones_Lerg6, (LEFT.phoneno[
 	//Add additional carrier info to Lerg6 records. They don't contain this information.
 	//However records retrieved from the metadata file should be left alone.
 	//is_current looks like it's true for all records but we are keeping the old logic for now.
-		Layout_BatchRaw tAppendCarrierRefInfo1(Layout_BatchRaw le, RECORDOF(PhonesInfo.Key_Source_Reference.ocn_name) ri) :=
+		Layout_BatchRaw tAppendCarrierRefInfo1(Layout_BatchRaw le, RECORDOF(dx_PhonesInfo.Key_Source_Reference.ocn_name) ri) :=
   TRANSFORM
       
     is_carrier_info := ri.contact_function = '' AND ri.overall_ocn <> '' AND (ri.carrier_city != '' OR ri.carrier_state != '');
@@ -93,7 +93,7 @@ dLerg6Phones := JOIN(dBatchPhonesIn, PhonesInfo.Key_Phones_Lerg6, (LEFT.phoneno[
   END;
   
 	//denormalize to join index records for contact function = '' and overall ocn <> '' -  limit to 100
-	dPortedPhonesFinal := DENORMALIZE(dPortedPhones, PhonesInfo.Key_Source_Reference.ocn_name,
+	dPortedPhonesFinal := DENORMALIZE(dPortedPhones, dx_PhonesInfo.Key_Source_Reference.ocn_name,
 									KEYED(LEFT.account_owner = RIGHT.ocn) AND
 									RIGHT.is_current, 
 									tAppendCarrierRefInfo1(LEFT, RIGHT),
