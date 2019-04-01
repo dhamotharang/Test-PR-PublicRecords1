@@ -1,4 +1,4 @@
-/*
+﻿/*
   after layouts.key is updated, in the following build the layouts.key_static will need to be updated to layouts.key.
   similar to the bipv2.commonbase.layout_static and layout_dynamic.
   We need to do this because of BIPV2.fn_derive_pn uses bipv2_Best.Key_LinkIds.key_static before the new key is built
@@ -18,6 +18,7 @@ string1 address_flag := '';
 string1 duns_number_flag := '';
 string1 company_sic_code1_flag := '';
 string1 company_naics_code1_flag := '';
+string1 dba_name_flag := '';
 end;
 EXPORT linkids := RECORD
   unsigned6 proxid;
@@ -42,6 +43,15 @@ EXPORT company_name_case_layout := RECORD
     unsigned1 score := 0 ;
     DATASET(Source) Sources;
   END;
+EXPORT dba_name := RECORD
+   string120 dba_name;
+   unsigned2 dba_name_data_permits;
+   unsigned1 dba_name_method;
+  END;	
+EXPORT dba_name_case_layout := RECORD
+    dba_name;
+    unsigned1 score := 0 ;
+  END;	
 EXPORT company_address := RECORD
    string10 address_prim_range;
    string2 address_predir;
@@ -156,6 +166,9 @@ export base := RECORD
     DATASET(duns_number_case_layout) duns_number;
     DATASET(sic_code_case_layout) sic_code;
     DATASET(naics_code_case_layout) naics_code;
+    DATASET(dba_name_case_layout) dba_name;
+    unsigned4 global_sid;
+    unsigned8 record_sid;
   END;
 EXPORT key := RECORD
     BIPV2.IDlayouts.l_xlink_ids;
@@ -171,9 +184,14 @@ EXPORT key := RECORD
     DATASET(duns_number_case_layout and not score) duns_number;
     DATASET(sic_code_case_layout and not score) sic_code;
     DATASET(naics_code_case_layout and not score) naics_code;
+    DATASET(dba_name_case_layout and not score) dba_name;
+    unsigned4 global_sid;
+    unsigned8 record_sid;
 END;
 EXPORT key_static := RECORD
     BIPV2.IDlayouts.l_xlink_ids;
+    boolean isActive ; //seleid level
+    boolean isDefunct; //seleid level   
     unsigned6 company_bdid;
     DATASET(company_name_case_layout and not score) company_name;
     DATASET(company_address_case_layout  and not [score, state_fips, county_fips]) company_address;
@@ -184,5 +202,8 @@ EXPORT key_static := RECORD
     DATASET(duns_number_case_layout and not score) duns_number;
     DATASET(sic_code_case_layout and not score) sic_code;
     DATASET(naics_code_case_layout and not score) naics_code;
+	  	//DATASET(dba_name_case_layout and not score) dba_name;
+    //unsigned4 global_sid;
+    //unsigned8 record_sid;
 END;
 END;
