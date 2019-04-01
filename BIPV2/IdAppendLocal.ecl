@@ -1,6 +1,10 @@
-﻿import BIPV2;
+﻿import AutoStandardI;
+import BIPV2;
 import BIPV2_Best;
+import BIPV2_Build;
 import BIPV2_Company_Names;
+import doxie;
+import ut;
 
 export IdAppendLocal := module
 
@@ -48,7 +52,7 @@ export IdAppendLocal := module
 					self.company_sic_code1 := right.sic_code[1].company_sic_code1,
 					self.company_naics_code1 := right.naics_code[1].company_naics_code1,
 // get new best fields for dba_name, contact_fname, contact_mname, contact_lname, contact_job_title, contact_did
-					self.dba_name := '',
+					self.dba_name := right.dba_name[1].dba_name,
 					self.company_btype := '',
 					self.contact_fname := '',
 					self.contact_mname := '',
@@ -59,16 +63,44 @@ export IdAppendLocal := module
 					self := right),
 				left outer);
 
-		BIPV2_Company_Names.functions.mac_go(postBest, outBtype, request_id, company_name);
+		postBestWithId := project(postBest, transform({recordof(left), unsigned _btype_id}, self._btype_id := counter, self := left));
+
+		BIPV2_Company_Names.functions.mac_go(postBestWithId, outBtype, _btype_id, company_name);
 		withBType :=
-			join(postBest, outBtype,
-				left.request_id = right.request_id,
-				transform(recordof(left),
+			join(postBestWithId, outBtype,
+				left._btype_id = right._btype_id,
+				transform(recordof(postBest),
 					self.company_btype := right.cnp_btype,
 					self := left),
 				keep(1), left outer);
 
-		return withBType;
+		preContact := preBest;
+		getContact := bipv2_build.key_contact_title_linkids().kfetch2(preContact, fetchlevel);
+		withContact :=
+			join(withBType, getContact,
+				left.request_id = right.uniqueid
+					and left.proxid = right.proxid,
+				transform(recordof(withBType),
+					self.contact_did := right.contact_title[1].contact_did,
+					self.contact_job_title := trim(right.contact_title[1].contact_job_title_derived),
+					self := left),
+				left outer, keep(1));
+
+		// use did to get contact names from person header
+		gm := AutoStandardI.GlobalModule();												 
+		doxie.mac_best_records(withContact, contact_did, getNames, ut.dppa_ok(gm.DPPAPurpose), ut.glb_ok(gm.GLBPurpose), , doxie.DataRestriction.fixed_DRM);
+		withNames :=
+			join(withContact(contact_did != 0), getNames,
+				left.contact_did = right.did,
+				transform(recordof(withContact),
+					self.contact_fname := right.fname,
+					self.contact_mname := right.mname,
+					self.contact_lname := right.lname,
+					self := left),
+				left outer, keep(1))
+			 + withContact(contact_did = 0);
+
+		return withNames;
 
 	end;
 
