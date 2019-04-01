@@ -1735,5 +1735,16 @@ EXPORT dsSourceCriteria := DATASET([
 {'EU High-Risk Third Countries List','1722'},
 {'Oregon Department of Corrections Escapees and Most Wanted','1723'},
 {'EC 2019/353 ISIL (Da\'esh) and Al-Qaida List','1724'},
-{'List of Suspected Terrorists and Terrorist Organizations (DTTOT) Indonesia','1725'}
+{'List of Suspected Terrorists and Terrorist Organizations (DTTOT) Indonesia','1725'},
+{'EC (CFSP) 2019/415 Ukraine List','1726'},
+{'EC (CFSP) 2019/416  Ukraine List','1727'},
+{'EC 2019/408 Ukraine List','1728'},
+{'EC 2019/409 Ukraine List','1729'},
+{'ISN (US) Sanctions - Export-Import Bank Act of 1945','1730'},
+{'ISN (US) Sanctions - Nuclear Proliferation Prevention Act','1731'},
+{'OFAC - Correspondent Account or Payable-Through Account Sanctions (CAPTA) List','1732'},
+{'EC (CFSP) 2019/468 Egypt List','1733'},
+{'EC 2019/431 ISIL (Da\'esh) and Al-Qaida List','1734'},
+{'EC 2019/459 Egypt List','1735'},
+{'Financial Sector Conduct Authority (South Africa) Media Releases','1736'}
 ],r);

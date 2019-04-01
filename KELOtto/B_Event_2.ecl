@@ -1,11 +1,11 @@
 ﻿//HPCC Systems KEL Compiler Version 0.11.0
 IMPORT KEL011 AS KEL;
-IMPORT B_Event_3,E_Address,E_Customer,E_Event,E_Person FROM KELOtto;
+IMPORT B_Event_3,B_Event_4,E_Address,E_Customer,E_Event,E_Person FROM KELOtto;
 IMPORT * FROM KEL011.Null;
 EXPORT B_Event_2 := MODULE
   SHARED VIRTUAL TYPEOF(B_Event_3.__ENH_Event_3) __ENH_Event_3 := B_Event_3.__ENH_Event_3;
-  SHARED __EE112215 := __ENH_Event_3;
-  EXPORT __ST16617_Layout := RECORD
+  SHARED __EE121653 := __ENH_Event_3;
+  EXPORT __ST20562_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Customer.Typ) _r_Customer_;
     KEL.typ.ndataset(E_Event.Source_Customers_Layout) Source_Customers_;
@@ -162,9 +162,9 @@ EXPORT B_Event_2 := MODULE
     KEL.typ.epoch Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST16617_Layout __ND113667__Project(B_Event_3.__ST17442_Layout __PP112218) := TRANSFORM
-    SELF.Ip_High_Risk_City_ := MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__PP112218._edgecity_),IN,__CN(['MIAMI'])))=>1,0);
-    SELF := __PP112218;
+  SHARED __ST20562_Layout __ND123105__Project(B_Event_4.__ST21874_Layout __PP121656) := TRANSFORM
+    SELF.Ip_High_Risk_City_ := MAP(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__PP121656._edgecity_),IN,__CN(['MIAMI'])))=>1,0);
+    SELF := __PP121656;
   END;
-  EXPORT __ENH_Event_2 := PROJECT(__EE112215,__ND113667__Project(LEFT));
+  EXPORT __ENH_Event_2 := PROJECT(__EE121653,__ND123105__Project(LEFT));
 END;
