@@ -33,6 +33,10 @@ function
     dataset(rESPExceptions)    Exceptions {xpath('Exceptions/ESPException'),maxcount (110)};
   end;
 
+  import ut,Workman;
+  #UNIQUENAME(SOAPCALLCREDENTIALS)
+  #SET(SOAPCALLCREDENTIALS  ,ut.Credentials().mac_add2Soapcall())
+
   dWUCreateAndUpdateResult  :=  
     soapcall(
         'http://' + pESP + ':' + pESPPort + '/WsWorkunits'
@@ -42,6 +46,18 @@ function
        ,xpath('WUUpdateResponse')
     );
 
-  return  dWUCreateAndUpdateResult;
+  dWUCreateAndUpdateResult_remote  :=  
+    soapcall(
+        'http://' + pESP + ':' + pESPPort + '/WsWorkunits'
+       ,'WUUpdate'
+       ,rWUCreateAndUpdateRequest
+       ,rWUCreateAndUpdateResponse
+       ,xpath('WUUpdateResponse')
+       %SOAPCALLCREDENTIALS%
+    );
+
+  returnresult := iff(trim(pesp) in Workman._Config.LocalEsps ,dWUCreateAndUpdateResult  ,dWUCreateAndUpdateResult_remote);
+
+  return  returnresult;
   
 end;

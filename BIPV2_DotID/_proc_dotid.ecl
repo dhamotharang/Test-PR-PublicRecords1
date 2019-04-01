@@ -144,38 +144,81 @@ export _proc_dotid(
 	
 	export MultIter_wuName(unsigned startIter, unsigned numIters) := 
 		'BIPV2_DOTID Controller ' + BIPV2.KeySuffix + ' ' + (string)startiter + '-' + (string)(startiter + numiters - 1);
-	export MultIter_run(startIter, numIters, doInit, doSpec, doIters='true', doPost='true',pversion = 'bipv2.keysuffix',p_Init_File = 'BIPV2_Files.files_ingest.DS_BASE',pFixDotidOverlinks = 'true') := functionmacro
-		import wk_ut, tools,BIPV2_build;
-    fbool(boolean pinput) := if(pinput = true,'true','false');
-		cluster		:= BIPV2_build._Constants().Groupname; // NOTE: See if we can parameterize this
+	export MultIter_run(
+     startIter          = '\'\''
+    ,numIters           = '3'
+    ,doInit             = 'true'
+    ,doSpec             = 'true'
+    ,doIters            = 'true'
+    ,doPost             = 'true'
+    ,pversion           = 'bipv2.keysuffix'
+    ,p_Init_File        = 'BIPV2_Files.files_ingest.DS_BASE'
+    ,pFixDotidOverlinks = 'true'
+    ,pcluster           = 'BIPV2_Build._Constants().Groupname'
+    ,pEmailList         = 'BIPV2_Build.mod_email.emailList'     // -- for testing, make sure to put in your email address to receive the emails
+    ,pCompileTest       = 'false'                                               
+    
+  ) := 
+  functionmacro
+  
+		import Workman, tools,BIPV2_build;
+    
+    fbool_dotid(boolean pinput) := if(pinput = true,'true','false');
+    lnumiters     := numIters         ;
+    lnumitersmax  := numIters + 1     ;
+		cluster		:= pcluster; // NOTE: See if we can parameterize this
 		version		:= pversion;
-		previter	:= (string)(startiter - 1);
-		lastIter	:= (string)(startiter - 1 + numIters);
-		eclInit		:= 'import BIPV2_Files,BIPV2_build;\niteration := \'@iteration@\';\npversion  := \'@version@\';\n#workunit(\'name\',\'BIPV2_DOTID \' + pversion + \' Init \');\n#workunit(\'priority\',\'high\');\n#OPTION(\'multiplePersistInstances\',FALSE);\n'                                                                                
-                  + 'BIPV2_DOTID._proc_dotid(   ,         ,\''         + pversion + '\',' + fbool(pFixDotidOverlinks) + ').init('               + #TEXT(p_Init_File)+ ');';
-		eclSpec		:= 'import BIPV2_Files,BIPV2_build;\niteration := \'@iteration@\';\npversion  := \'@version@\';\nlih := BIPV2_Files.files_dotid(\'BIPV2_DOTID\').DS_BUILDING;\n#OPTION(\'multiplePersistInstances\',FALSE);\n#workunit(\'name\',\'BIPV2_DOTID \' + pversion + \' Specificities \');\n#workunit(\'priority\',\'high\');\n'     
-                  + 'BIPV2_DOTID._proc_dotid(lih,iteration,\''         + pversion + '\',' + fbool(pFixDotidOverlinks) + ').runSpecBuild;';
-		eclIter		:= 'import BIPV2_Files,BIPV2_build;\niteration := \'@iteration@\';\npversion  := \'@version@\';\nlih := BIPV2_Files.files_dotid(\'BIPV2_DOTID\').DS_BUILDING;\n#OPTION(\'multiplePersistInstances\',FALSE);\n#workunit(\'name\',\'BIPV2_DOTID \' + pversion + \' iter \' + iteration);\n#workunit(\'priority\',\'high\');\n'  
-                  + 'BIPV2_DOTID._proc_dotid(lih,iteration,\''         + pversion + '\',' + fbool(pFixDotidOverlinks) + ').runIter;';
-		eclPost		:= 'import BIPV2_build;\n#workunit(\'name\',\'BIPV2_DOTID @version@ PostProcess\');\n'                                                                                                                                                                                                                                            
-                  + 'BIPV2_DOTID._proc_dotid(,\'' + lastIter + '\',\'' + pversion + '\',' + fbool(pFixDotidOverlinks) + ').updateSuperFiles(,'  + #TEXT(p_Init_File)+ ')';
-		kickInit	:= wk_ut.mac_ChainWuids(eclInit,1,1,version,,cluster,pOutputEcl := false,pUniqueOutput := 'DOTIDInit',pNotifyEmails := BIPV2_build.mod_email.emailList
+		// lastIter	:= (string)(startiter - 1 + numIters);
+    
+		eclInit_prep		:= 'import BIPV2_Files,BIPV2_build;\niteration := \'@iteration@\';\npversion  := \'@version@\';\n#workunit(\'name\',\'BIPV2_DOTID \' + pversion + \' Init \');\n#workunit(\'priority\',\'high\');\n#OPTION(\'multiplePersistInstances\',FALSE);\n'                                                                            ;        
+		eclSpec_prep		:= 'import BIPV2_Files,BIPV2_build;\niteration := \'@iteration@\';\npversion  := \'@version@\';\nlih := BIPV2_Files.files_dotid(\'BIPV2_DOTID\').DS_BUILDING;\n#OPTION(\'multiplePersistInstances\',FALSE);\n#workunit(\'name\',\'BIPV2_DOTID \' + pversion + \' Specificities \');\n#workunit(\'priority\',\'high\');\n'     ;
+		eclIter_prep		:= 'import BIPV2_Files,BIPV2_build;\niteration := \'@iteration@\';\npversion  := \'@version@\';\nlih := BIPV2_Files.files_dotid(\'BIPV2_DOTID\').DS_BUILDING;\n#OPTION(\'multiplePersistInstances\',FALSE);\n#workunit(\'name\',\'BIPV2_DOTID \' + pversion + \' iter \' + iteration);\n#workunit(\'priority\',\'high\');\n'  ;
+		eclPost_prep		:= 'import BIPV2_build;\n#workunit(\'name\',\'BIPV2_DOTID @version@ PostProcess\');\n'                                                                                                                                                                                                                                        ;   
+                  
+		eclInit		:= eclInit_prep + 'BIPV2_DOTID._proc_dotid(   ,         ,\''         + pversion + '\',' + fbool_dotid(pFixDotidOverlinks) + ').init('               + #TEXT(p_Init_File)+ ');';
+		eclSpec		:= eclSpec_prep + 'BIPV2_DOTID._proc_dotid(lih,iteration,\''         + pversion + '\',' + fbool_dotid(pFixDotidOverlinks) + ').runSpecBuild;';
+		eclIter		:= eclIter_prep + 'BIPV2_DOTID._proc_dotid(lih,iteration,\''         + pversion + '\',' + fbool_dotid(pFixDotidOverlinks) + ').runIter;';
+		eclPost		:= eclPost_prep + 'BIPV2_DOTID._proc_dotid(   ,\'\'     ,\''         + pversion + '\',' + fbool_dotid(pFixDotidOverlinks) + ').updateSuperFiles(,'  + #TEXT(p_Init_File)+ ');';
+
+    eclsetResults   := [ 'PreClusterCount PreClusterCount.DOTid_Cnt'        
+                        ,'PostClusterCount PostClusterCount.DOTid_Cnt'       
+                        ,'MatchesPerformed'      
+                        ,'BasicMatchesPerformed'
+                        ,'SlicesPerformed'
+                        ,'DOTidsCreatedByCleave'
+                        ,'LinkBlockSplits'
+                        ,'recordsrejected0'
+                        ,'unlinkablerecords0'
+                       ];
+    StopCondition   := '(PostClusterCount / PreClusterCount * 100.0) > (99.9)';
+    SetNameCalculations := ['Convergence_PCT','Convergence_Threshold'];
+
+    kickInit   := Workman.mac_WorkMan(eclInit   ,version,cluster ,1         ,1  ,pBuildName := 'DOTIDInit' ,pNotifyEmails := pEmailList
       ,pOutputFilename   := '~BIPV2_build::' + version + '::workunit_history::proc_dotid.Init'
       ,pOutputSuperfile  := '~BIPV2_build::qa::workunit_history' 
+      ,pCompileOnly      := pCompileTest
     );
-		kickSpec	:= wk_ut.mac_ChainWuids(eclSpec,1,1,version,,cluster,pOutputEcl := false,pUniqueOutput := 'DotSpecs',pNotifyEmails := BIPV2_build.mod_email.emailList
+    kickSpec   := Workman.mac_WorkMan(eclSpec   ,version,cluster ,1         ,1  ,pBuildName := 'DotSpecs' ,pNotifyEmails := pEmailList
       ,pOutputFilename   := '~BIPV2_build::' + version + '::workunit_history::proc_dotid.Specificities'
       ,pOutputSuperfile  := '~BIPV2_build::qa::workunit_history' 
+      ,pCompileOnly      := pCompileTest
     );
-		kickIters	:= wk_ut.mac_ChainWuids(eclIter,startiter,numiters,version,['PreClusterCount[1].Dotid_Count'   ,'{UNSIGNED rcid_Count,UNSIGNED Dotid_Count}','PostClusterCount PostClusterCount[1].Dotid_Count'  ,'{UNSIGNED rcid_Count,UNSIGNED Dotid_Count}','MatchesPerformed','BasicMatchesPerformed','SlicesPerformed','DOTidsCreatedByCleave'],cluster,pOutputEcl := false,pUniqueOutput := 'DotIters',pNotifyEmails := BIPV2_build.mod_email.emailList
-      ,pOutputFilename   := '~BIPV2_build::@version@_@iteration@::workunit_history::proc_dotid.iterations'
-      ,pOutputSuperfile  := '~BIPV2_build::qa::workunit_history'                                            
-      ,pSummaryFilename  := '~BIPV2_build::@version@_@iteration@::summary_report::proc_dotid.iterations'
-      ,pSummarySuperfile := '~BIPV2_build::qa::summary_report::proc_dotid.iterations'                                                 
+
+    kickiters := Workman.mac_WorkMan(eclIter,version ,cluster,startiter,lnumitersmax,lnumiters   
+      ,pSetResults          := eclsetResults
+      ,pStopCondition       := StopCondition
+      ,pSetNameCalculations := SetNameCalculations
+      ,pBuildName           := 'DotIters'
+      ,pNotifyEmails        := pEmailList
+      ,pOutputFilename      := '~BIPV2_build::@version@_@iteration@::workunit_history::proc_dotid.iterations'
+      ,pOutputSuperfile     := '~BIPV2_build::qa::workunit_history'                                            
+      ,pCompileOnly         := pCompileTest
     );
-		kickPost	:= wk_ut.mac_ChainWuids(eclPost,1,1,version,,cluster,pOutputEcl := false,pUniqueOutput := 'DOTIDPost',pNotifyEmails := BIPV2_build.mod_email.emailList
+    
+    kickPost   := Workman.mac_WorkMan(eclPost   ,version,cluster ,1         ,1  ,pBuildName := 'DOTIDPost' ,pNotifyEmails := pEmailList
       ,pOutputFilename   := '~BIPV2_build::' + version + '::workunit_history::proc_dotid.Post'
       ,pOutputSuperfile  := '~BIPV2_build::qa::workunit_history' 
+      ,pCompileOnly         := pCompileTest
     );
 		return sequential(
 			 if(doInit ,kickInit  )

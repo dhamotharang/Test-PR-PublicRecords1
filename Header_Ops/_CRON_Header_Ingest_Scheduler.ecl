@@ -48,6 +48,9 @@ build_version := if(status <> 0, ver, today); // 0 -> Completed
 incremental := if(isMonthly, 'false', 'true');
 ingestType := if(isMonthly, 'monthly', 'incremental');
 
+days := ut.DaysApart(today, ver);
+norun := days <= 5 and status = 0;
+
 ECL := '\n'
 +'#WORKUNIT(\'protect\',true);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'
@@ -64,7 +67,7 @@ ECL := '\n'
 +'#stored (\'versionBuild\',\''+ build_version + '\');\n'
 +'#WORKUNIT(\'name\',\'' + build_version + ' Header Ingest ' + ingestType + if(status <> 0, ' RECOVER ', '') + '\');\n\n'
 
-+'Header_Ops.hdr_bld_ingest(\'' + build_version + '\',' + incremental + ', ' + status + ');\n';
++ if(norun, 'fileservices.sendemail(Header.email_list.BocaDevelopers,\'Monitoring Header Ingest\',\'Header Ingest for this week completed - Try to run next week\');\n', 'Header_Ops.hdr_bld_ingest(\'' + build_version + '\',' + incremental + ', ' + status + ');\n');
 
 THOR := 'thor400_44_eclcc';
 

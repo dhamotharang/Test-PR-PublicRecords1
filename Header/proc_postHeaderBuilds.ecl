@@ -104,20 +104,6 @@ export proc_postHeaderBuilds := module
 		cmpltd:=step+' completed';
 		failed:=step+' failed';
 
-		sel:=[
-		118120464
-		,1067439253
-		,2550118476, 2484243127 												//Bug: 140323
-		,1733604568, 1807428055, 1733604568, 1731726281 //Bug: 197240
-		];
-				
-		holder1 := header.relatives.relatives1(~(person1 in sel and person2 in sel))
-							: success(header.msg('Relative completed',elist_owners).good)
-		;
-		rel_title := header.file_relative_title.build_file 
-						  : success(header.msg('Relative Title completed',elist_owners).good);
-		PromoteSupers.MAC_SF_BuildProcess(holder1,'~thor_data400::BASE::Relatives',bld_relatives,2,,true,pVersion:=Header.version_build);
-        PromoteSupers.MAC_SF_BuildProcess(rel_title,'~thor_data400::base::relative_title',bld_relative_title,2,,true,pVersion:=Header.version_build);
 		PromoteSupers.MAC_SF_BuildProcess(header.HHID_Table_Final,'~thor_data400::BASE::HHID',make_hhid,2,,true,pVersion:=Header.version_build);
 		PromoteSupers.MAC_SF_BuildProcess(header.FCRA_HHID_Table_Final,'~thor_data400::BASE::FCRA_HHID',make_fcra_hhid,2,,true,pVersion:=Header.version_build);
 		export relatives := sequential(
@@ -171,7 +157,7 @@ export proc_postHeaderBuilds := module
 		#stored ('version'  , header.version_build); 
 		
 		step:=Header.version_build+' Move header_raw and source keys to prod';
-		#WORKUNIT('name', step);
+		
 		cmpltd:=step+' completed';
 		failed:=step+' failed';
 		wl:=nothor(WorkunitServices.WorkunitList('',jobname:='y*quick*'))(state in ['blocked','running','wait']);
@@ -199,8 +185,8 @@ export proc_postHeaderBuilds := module
 		
 		// step:='Yogurt:'+Header.version_build+' FCRA Header and keys';
 		step:=Header.version_build+' FCRA Header and keys';
-		#WORKUNIT('name', step);
-		cmpltd:=step+' completed';
+		
+        cmpltd:=step+' completed';
 		failed:=step+' failed';
 		export FCRAheader := sequential(
                                         header.LogBuild.single('Started :'+step)
@@ -221,7 +207,7 @@ export proc_postHeaderBuilds := module
 		
 		// step:='Yogurt:'+Header.version_build+' PowerSearch Keys';
 		step:=Header.version_build+' PowerSearch Keys';
-		#WORKUNIT('name', step);
+		
 		cmpltd:=step+' completed';
 		failed:=step+' failed';
 		export booleanSrch := sequential(
