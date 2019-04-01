@@ -37,7 +37,7 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	
 	ds_contributory_in := PROJECT(ds_allPayloadRecs , 
 													TRANSFORM(DidVille.Layout_Did_OutBatch,
-														SELF.Seq := (integer) LEFT.acctno,
+														SELF.Seq := COUNTER,
 														SELF.did := LEFT.did,
 														SELF := []));
 
@@ -61,7 +61,8 @@ EXPORT SearchRecords(DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) d
 	//adding additional elements lexid's to ds_batch_in , so velocities can be calculated.
 	ds_elements_dids := PROJECT(ds_contributory_in_dedup, 
 												TRANSFORM(FraudShared_Services.Layouts.BatchInExtended_rec, 
-													SELF.acctno := (string) LEFT.Seq,
+													SELF.acctno := '1', //since search request is always batch of 1 record, acctno can safely be hardcoded to 1, as assigned in service layer attribute. 
+													SELF.Seq := LEFT.Seq,
 													SELF.did := LEFT.did,
 													SELF := []));
 	
