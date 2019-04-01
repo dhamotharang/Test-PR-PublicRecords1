@@ -3,7 +3,7 @@
  to preclean a name before cleaning it
  it removes punctuation and tokens that are not part of a name
 ******/
-import STD;
+import STD, Nid;
 rgxGen := '(JR|SR|I|II|III|IV|V|VI|2ND|3RD|4TH|5TH|6TH|1|2|3|4|5|6|7|8|9)';
 rgxSureGen := '(JR|SR|II|III|IV|2ND|3RD|4TH|5TH|6TH)';
 rgxHonor := 
@@ -52,6 +52,7 @@ string RemoveMrMrs(string s1) := FUNCTION
 	return MAP(
 	REGEXFIND(rgxMrMrs, s) => REGEXREPLACE(rgxMrMrs, s, ''),
 	REGEXFIND('^SW ', s) => TRIM(s[4..],LEFT),
+	REGEXFIND('^ML ', s) => TRIM(s[4..],LEFT),
 	REGEXFIND('^EST ', s) => TRIM(s[5..],LEFT),
 	REGEXFIND('\\b(HUSBAND|WIFE) *( AND |&) *(WIFE|HUSBAND)$',s) => REGEXREPLACE('\\b(HUSBAND|WIFE) *( AND |&) *(WIFE|HUSBAND)$',s, ''),
 	REGEXFIND('( AND |&) *(HIS|HER) +(HUSBAND|WIFE)\\b',s) => REGEXREPLACE('\\b(HIS|HER) +(HUSBAND|WIFE)\\b',s, ''),
@@ -179,6 +180,9 @@ RemoveTrustAndDegrees(string s) :=
 			CheckMispelledTrust(
 					MAP(
 						REGEXFIND(rgxSlashTrustee, s) => REGEXREPLACE(rgxSlashTrustee, s, ' '),
+						
+						Nid.Trusts.IsTrust2BeginOrEnd(s) => Nid.Trusts.StripTrust2Words(s),
+						
 						REGEXFIND('^[A-Z-]+ +(MA|DO|TE)$', TRIM(s)) => s,
 						REGEXFIND('^[A-Z-]+ +[A-Z] +(MA|DO)$', TRIM(s)) => s,
 						REGEXFIND('^[A-Z-]+ *(&| AND ) *[A-Z]+ +(MA|DO|TE)$', TRIM(s)) => s,
@@ -488,6 +492,7 @@ string FixGen(string suffix) :=
 			'JR' => 'JR',
 			'JR,' => 'JR',
 			'SR' => 'SR',
+			'JNR' => 'JR',
 			'I' => 'I',
 			'II' => 'II',
 			'II,' => 'II',
