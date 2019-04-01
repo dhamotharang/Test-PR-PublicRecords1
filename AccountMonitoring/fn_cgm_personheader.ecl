@@ -2,7 +2,7 @@
 
 EXPORT DATASET(AccountMonitoring.layouts.history) fn_cgm_personheader(
 		DATASET(AccountMonitoring.layouts.portfolio.base) in_portfolio,
-		DATASET(AccountMonitoring.layouts.documents.personheader.base) in_documents = DATASET([], AccountMonitoring.layouts.documents.watercraft.base),
+		DATASET(AccountMonitoring.layouts.documents.personheader.base) in_documents = DATASET([], AccountMonitoring.layouts.documents.personheader.base),
 		AccountMonitoring.i_Job_Config job_config
 	) := 
 	FUNCTION
@@ -18,7 +18,7 @@ EXPORT DATASET(AccountMonitoring.layouts.history) fn_cgm_personheader(
 		temp_layout := RECORD
 			in_documents.pid;
 			in_documents.rid;
-			in_documents.hid;
+			//in_documents.hid;
 			TYPEOF(in_portfolio.did) did;
 			Key_DID.SSN;
 			Key_DID.DOB;
@@ -31,11 +31,11 @@ EXPORT DATASET(AccountMonitoring.layouts.history) fn_cgm_personheader(
  		// Tranform to data layout since only DID key is needed for monitoring
    	temp_slim := project (temp_port_dist_did,
    																TRANSFORM(temp_layout,
-   																	SELF.pid  					:= RIGHT.pid,
-   																	SELF.rid  					:= RIGHT.rid,
-   																	SELF.hid  					:= RIGHT.hid,
+   																	SELF.pid  					:= LEFT.pid,
+   																	SELF.rid  					:= LEFT.rid,
+   																	//SELF.hid  					:= LEFT.hid,
    																	SELF.SSN          := LEFT.SSN;
-   																	SELF.DOB 	       := LEFT.DOB;
+   																	SELF.DOB 	       := (unsigned)LEFT.DOB;
    																	SELF      			    := LEFT),
    																LOCAL);		
    		
@@ -49,6 +49,7 @@ EXPORT DATASET(AccountMonitoring.layouts.history) fn_cgm_personheader(
 								SELF.pid          := LEFT.pid,
 								SELF.rid          := LEFT.rid,
 								self.hid          := 0,
+              self.bdid         := 0,  
 								SELF.product_mask := AccountMonitoring.Constants.pm_personheader,
 								SELF.timestamp    := '',
 								SELF.hash_value   := HASH64(

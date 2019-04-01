@@ -256,9 +256,7 @@ EXPORT layouts := MODULE
 		END;
    
    SHARED personheader_documentid_record := RECORD
-			AccountMonitoring.product_files.watercraft.waterLinkid_key.watercraft_key;
-			AccountMonitoring.product_files.watercraft.waterLinkid_key.sequence_key;
-			AccountMonitoring.product_files.watercraft.waterLinkid_key.state_origin;
+			Header.Layout_Header.did;
 		END;
     
 		template(default,doxie.layout_references);
