@@ -13,13 +13,31 @@ spraying := rootDir+'spraying/';
 
 dsFileList:=nothor(FileServices.RemoteDirectory(ip, ready, '*.dat')):independent;
 dsFileListSorted := sort(dsFileList,modified);
-fname :=dsFileListSorted[1].Name:independent;
-UpSt:=stringlib.stringtouppercase(STD.STr.SplitWords(fname,'_')[1]);
+
+fname := dsFileListSorted[1].Name:independent;
+
+// https://confluence.rsi.lexisnexis.com/display/GTG/Naming+Conventions
+fn := STD.Str.SplitWords( STD.Str.FindReplace(fname,'.dat',''), '_' );
+Customer_Account_Number := fn[1];
+Customer_State := fn[2];
+Customer_Program := fn[4];
+FileType := fn[5];
+
+CustomerSettings := 
+	FraudGovPlatform.Files().CustomerSettings( 
+			Customer_Account_Number= Customer_Account_Number and
+			Customer_State = Customer_State and
+			Customer_Program = Customer_Program and
+			FileType = FileType);
+
+UpSt:=Customer_State;
 UpType := map(
-			 STD.Str.Contains( fname, 'IdentityData'	, true	) => 'IDENTITYDATA'
-			,STD.Str.Contains( fname, 'KnownFraud'		, true	)	=> 'KNOWNFRAUD'
-			,STD.Str.Contains( fname, 'SafeList'			, true	)	=> 'SAFELIST'
+			 STD.Str.Contains( FileType, 'Identity', true )	=> 'IDENTITY'
+			,STD.Str.Contains( FileType, 'KnownRisk', true )	=> 'KNOWNRISK'
+			,STD.Str.Contains( FileType, 'SafeList', true )	=> 'SAFELIST'
 			,'UNKNOWN');
+
+Customer_Email := CustomerSettings[1].Customer_Email;
 
 MoveReadyToSpraying :=nothor(FileServices.MoveExternalFile(IP,ready+fname,spraying+fname));
 MoveReadyToError    :=nothor(FileServices.MoveExternalFile(IP,ready+fname,err+fname));
@@ -48,7 +66,7 @@ SprayIt:=sequential(
 				,spraying + fname //sourcepath 
 				,5000000000//maxrecordsize 
 				,//srcCSVseparator 
-				,'~<EOL>~,\n'//srcCSVterminator 
+				,'\n'//srcCSVterminator 
 				,//srcCSVquote 
 				,thorlib.group() //destinationgroup
 				,FileSprayed //destinationlogicalname 
@@ -80,41 +98,41 @@ MoveToPass:=sequential(
 	 output('File '+fname+' content accepted',named('Contributory_File_content_accepted'))
 	,MoveSprayingToDone
 	,map(
-		 UpType = 'IDENTITYDATA' => fileservices.AddSuperfile(IdentityData_Passed,FileSprayed)
-		,UpType = 'KNOWNFRAUD' => fileservices.AddSuperfile(KnownFraud_Passed,FileSprayed)
+		 UpType = 'IDENTITY' => fileservices.AddSuperfile(IdentityData_Passed,FileSprayed)
+		,UpType = 'KNOWNRISK' => fileservices.AddSuperfile(KnownFraud_Passed,FileSprayed)
 		,UpType = 'SAFELIST' => fileservices.AddSuperfile(Safelist_Passed,FileSprayed)
 	 )
-	,Send_Email(st:=UpSt,fn:=fname,ut:=UpType).FileValidationReport(mod_sets.validDelimiter, mod_sets.validTerminators));
+	,Send_Email(st:=UpSt,fn:=fname,ut:=UpType,ce:=Customer_Email).FileValidationReport(mod_sets.validDelimiter, mod_sets.validTerminators));
 															
 MoveToReject:=sequential(
 	 output('File '+fname+' contains fatal errors.  File will be rejected',named('Contributory_File_content_rejected'))
 	,MoveSprayingToError
 	,map(
-		 UpType = 'IDENTITYDATA' => fileservices.AddSuperfile(IdentityData_Rejected,FileSprayed) 
-		,UpType = 'KNOWNFRAUD' => fileservices.AddSuperfile(KnownFraud_Rejected,FileSprayed)
+		 UpType = 'IDENTITY' => fileservices.AddSuperfile(IdentityData_Rejected,FileSprayed) 
+		,UpType = 'KNOWNRISK' => fileservices.AddSuperfile(KnownFraud_Rejected,FileSprayed)
 		,UpType = 'SAFELIST' => fileservices.AddSuperfile(Safelist_Rejected,FileSprayed)
 	 ));
 
 ReportExcessiveInvalidRecords := 
 	sequential (
 		MoveToReject
-		,Send_Email(st:=UpSt,fn:=fname,ut:=UpType).FileValidationReport(mod_sets.validDelimiter, mod_sets.validTerminators));
+		,Send_Email(st:=UpSt,fn:=fname,ut:=UpType,ce:=Customer_Email).FileValidationReport(mod_sets.validDelimiter, mod_sets.validTerminators));
 
 ReportInvalidDelimiter := 
 	sequential (
 		 MoveToReject
-		,Send_Email(st:=UpSt,fn:=fname,ut:=UpType).InvalidDelimiterError(mod_sets.validDelimiter, mod_sets.validTerminators));
+		,Send_Email(st:=UpSt,fn:=fname,ut:=UpType,ce:=Customer_Email).InvalidDelimiterError(mod_sets.validDelimiter, mod_sets.validTerminators));
 
 ReportInvalidNumberOfColumns := 
 	sequential (				
 		 MoveToReject
-		,Send_Email(st:=UpSt,fn:=fname,ut:=UpType).InvalidNumberOfColumns(mod_sets.validDelimiter, mod_sets.validTerminators));
+		,Send_Email(st:=UpSt,fn:=fname,ut:=UpType,ce:=Customer_Email).InvalidNumberOfColumns(mod_sets.validDelimiter, mod_sets.validTerminators));
 
 ReportEmptyFile := 
 	sequential (
 		 output('File '+ip+ready+fname+' empty',named('Contributory_File_empty'))
 		,MoveReadyToError
-		,Send_Email(st:=UpSt,fn:=FileSprayed,ut:=UpType).FileEmptyErrorAlert
+		,Send_Email(st:=UpSt,fn:=FileSprayed,ut:=UpType,ce:=Customer_Email).FileEmptyErrorAlert
 		);
 		
 outputwork :=
@@ -133,8 +151,8 @@ outputwork :=
 							InvalidNumberOfColumnsFound => ReportInvalidNumberOfColumns,
 							ExcessiveInvalidRecordsFound => ReportExcessiveInvalidRecords,
 							MoveToPass)))
-						,Send_Email(st:=UpSt,fn:=fname,ut:=UpType).FileErrorAlert))
-	):failure(Send_Email(st:=UpSt,fn:=fname,ut:=UpType).FraudGov_Input_Prep_failure);
+						,Send_Email(st:=UpSt,fn:=fname,ut:=UpType,ce:=Customer_Email).FileErrorAlert))
+	):failure(Send_Email(st:=UpSt,fn:=fname,ut:=UpType,ce:=Customer_Email).FraudGov_Input_Prep_failure);
 
 	return outputwork;
 
