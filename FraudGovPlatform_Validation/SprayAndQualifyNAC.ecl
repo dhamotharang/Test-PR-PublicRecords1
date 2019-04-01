@@ -4,10 +4,14 @@ EXPORT SprayAndQualifyNAC( string pversion ) := FUNCTION
 
 	cs := dedup(table(FraudGovPlatform.Files().CustomerSettings,{MSH_Prefix}),all);
 
-	msh_files := nothor(STD.File.LogicalFileList( 'nac::for_msh::*', TRUE, FALSE));
+	msh_files := nothor(STD.File.LogicalFileList( 'nac::for_msh::fl_msh_*', TRUE, FALSE));
+	
+	vDate := (string8)( 
+            if( count(msh_files(name[1..29] = 'nac::for_msh::fl_msh_' + pversion[1..8])) > 0, 
+                (unsigned)pversion[1..8],
+                (unsigned)pversion[1..8]-1)
+            );
 
-
-	vDate := (string8)((unsigned)pversion[1..8]);
 
 	f := join(
 		cs,
