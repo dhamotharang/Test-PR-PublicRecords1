@@ -1,5 +1,5 @@
-IMPORT STD ; 
+﻿IMPORT Workman ; 
 /**
  * Returns the current time and date in string format
  **/
-EXPORT getTimeDate() := STD.Date.SecondsToString(STD.Date.CurrentSeconds(TRUE), '%F %H:%M:%S'): DEPRECATED('Use STD.Date.SecondsToString'); 
+EXPORT getTimeDate := Workman.getTimeDate; 

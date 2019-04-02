@@ -1,4 +1,4 @@
-//This is the code to execute in a builder window
+﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
 #workunit('name','BIPV2_Best_Seleid.BWR_Specificities - Specificities - SALT V3.0 Gold');
 IMPORT BIPV2_Best_Seleid,SALT30;

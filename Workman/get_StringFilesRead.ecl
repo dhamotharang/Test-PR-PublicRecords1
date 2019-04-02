@@ -7,7 +7,7 @@
 ) := 
 function
 
-  getwuids    := global(iff((unsigned)WorkMan.get_DS_Count(pWuid,'Workunits') > 0 ,WorkMan.get_DS_Result(pWuid,'Workunits',WorkMan.layouts.wks_slim)  ,dataset([{'',pWuid,'','','','','','',0}],WorkMan.layouts.wks_slim)));
+  getwuids    := global(iff((unsigned)WorkMan.get_DS_Count(pWuid,'Workunits') > 0 ,WorkMan.get_DS_Result(pWuid,'Workunits',WorkMan.layouts.wks_slim)  ,dataset([{'','',pWuid,'','','','','','','',''}],WorkMan.layouts.wks_slim)));
   countwuids  := count(getwuids);
   recindex    := if(pIndex  = 0 ,countwuids ,pIndex);
   wuid        := getwuids[recindex].wuid;

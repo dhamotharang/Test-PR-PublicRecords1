@@ -1,8 +1,9 @@
-IMPORT ut,SALT30;
+﻿IMPORT ut,SALT30;
 // This module is to the field values what the fields module is to the field itself
 // It really exists to answer the question: does a token with these characters logically belong in this field?
 // This module should be viewed as experimental
 EXPORT Classify(DATASET(layout_Base) h) := MODULE
+ 
 // Most of the data we need for the classification exists in the specificities module - collect and convert
 SHARED TotalClusters := specificities(h).TotalClusters;
   company_name_tokens := PROJECT(specificities(h).company_name_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.company_name; SELF.TokenType := 4; SELF.Spc := LEFT.field_Specificity ));
@@ -12,29 +13,36 @@ SHARED TotalClusters := specificities(h).TotalClusters;
   duns_number_tokens := PROJECT(specificities(h).duns_number_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.duns_number; SELF.TokenType := 8; SELF.Spc := LEFT.field_Specificity ));
   company_sic_code1_tokens := PROJECT(specificities(h).company_sic_code1_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.company_sic_code1; SELF.TokenType := 9; SELF.Spc := LEFT.field_Specificity ));
   company_naics_code1_tokens := PROJECT(specificities(h).company_naics_code1_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.company_naics_code1; SELF.TokenType := 10; SELF.Spc := LEFT.field_Specificity ));
-  prim_range_tokens := PROJECT(specificities(h).prim_range_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.prim_range; SELF.TokenType := 11; SELF.Spc := LEFT.field_Specificity ));
-  predir_tokens := PROJECT(specificities(h).predir_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.predir; SELF.TokenType := 12; SELF.Spc := LEFT.field_Specificity ));
-  prim_name_tokens := PROJECT(specificities(h).prim_name_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.prim_name; SELF.TokenType := 13; SELF.Spc := LEFT.field_Specificity ));
-  addr_suffix_tokens := PROJECT(specificities(h).addr_suffix_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.addr_suffix; SELF.TokenType := 14; SELF.Spc := LEFT.field_Specificity ));
-  postdir_tokens := PROJECT(specificities(h).postdir_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.postdir; SELF.TokenType := 15; SELF.Spc := LEFT.field_Specificity ));
-  unit_desig_tokens := PROJECT(specificities(h).unit_desig_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.unit_desig; SELF.TokenType := 16; SELF.Spc := LEFT.field_Specificity ));
-  sec_range_tokens := PROJECT(specificities(h).sec_range_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.sec_range; SELF.TokenType := 17; SELF.Spc := LEFT.field_Specificity ));
-  p_city_name_tokens := PROJECT(specificities(h).p_city_name_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.p_city_name; SELF.TokenType := 18; SELF.Spc := LEFT.field_Specificity ));
-  v_city_name_tokens := PROJECT(specificities(h).v_city_name_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.v_city_name; SELF.TokenType := 19; SELF.Spc := LEFT.field_Specificity ));
-  st_tokens := PROJECT(specificities(h).st_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.st; SELF.TokenType := 20; SELF.Spc := LEFT.field_Specificity ));
-  zip_tokens := PROJECT(specificities(h).zip_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.zip; SELF.TokenType := 21; SELF.Spc := LEFT.field_Specificity ));
-  zip4_tokens := PROJECT(specificities(h).zip4_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.zip4; SELF.TokenType := 22; SELF.Spc := LEFT.field_Specificity ));
-  fips_state_tokens := PROJECT(specificities(h).fips_state_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.fips_state; SELF.TokenType := 23; SELF.Spc := LEFT.field_Specificity ));
-  fips_county_tokens := PROJECT(specificities(h).fips_county_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.fips_county; SELF.TokenType := 24; SELF.Spc := LEFT.field_Specificity ));
-SHARED all_tokens0 := company_name_tokens + company_fein_tokens + company_phone_tokens + company_url_tokens + duns_number_tokens + company_sic_code1_tokens + company_naics_code1_tokens + prim_range_tokens + predir_tokens + prim_name_tokens + addr_suffix_tokens + postdir_tokens + unit_desig_tokens + sec_range_tokens + p_city_name_tokens + v_city_name_tokens + st_tokens + zip_tokens + zip4_tokens + fips_state_tokens + fips_county_tokens;
+  dba_name_tokens := PROJECT(specificities(h).dba_name_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.dba_name; SELF.TokenType := 11; SELF.Spc := LEFT.field_Specificity ));
+  prim_range_tokens := PROJECT(specificities(h).prim_range_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.prim_range; SELF.TokenType := 12; SELF.Spc := LEFT.field_Specificity ));
+  predir_tokens := PROJECT(specificities(h).predir_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.predir; SELF.TokenType := 13; SELF.Spc := LEFT.field_Specificity ));
+  prim_name_tokens := PROJECT(specificities(h).prim_name_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.prim_name; SELF.TokenType := 14; SELF.Spc := LEFT.field_Specificity ));
+  addr_suffix_tokens := PROJECT(specificities(h).addr_suffix_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.addr_suffix; SELF.TokenType := 15; SELF.Spc := LEFT.field_Specificity ));
+  postdir_tokens := PROJECT(specificities(h).postdir_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.postdir; SELF.TokenType := 16; SELF.Spc := LEFT.field_Specificity ));
+  unit_desig_tokens := PROJECT(specificities(h).unit_desig_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.unit_desig; SELF.TokenType := 17; SELF.Spc := LEFT.field_Specificity ));
+  sec_range_tokens := PROJECT(specificities(h).sec_range_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.sec_range; SELF.TokenType := 18; SELF.Spc := LEFT.field_Specificity ));
+  p_city_name_tokens := PROJECT(specificities(h).p_city_name_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.p_city_name; SELF.TokenType := 19; SELF.Spc := LEFT.field_Specificity ));
+  v_city_name_tokens := PROJECT(specificities(h).v_city_name_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.v_city_name; SELF.TokenType := 20; SELF.Spc := LEFT.field_Specificity ));
+  st_tokens := PROJECT(specificities(h).st_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.st; SELF.TokenType := 21; SELF.Spc := LEFT.field_Specificity ));
+  zip_tokens := PROJECT(specificities(h).zip_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.zip; SELF.TokenType := 22; SELF.Spc := LEFT.field_Specificity ));
+  zip4_tokens := PROJECT(specificities(h).zip4_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.zip4; SELF.TokenType := 23; SELF.Spc := LEFT.field_Specificity ));
+  fips_state_tokens := PROJECT(specificities(h).fips_state_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.fips_state; SELF.TokenType := 24; SELF.Spc := LEFT.field_Specificity ));
+  fips_county_tokens := PROJECT(specificities(h).fips_county_values_persisted,TRANSFORM(SALT30.Layout_Classify_Token,SELF.TokenValue := (SALT30.StrType)LEFT.fips_county; SELF.TokenType := 25; SELF.Spc := LEFT.field_Specificity ));
+SHARED all_tokens0 := company_name_tokens + company_fein_tokens + company_phone_tokens + company_url_tokens + duns_number_tokens + company_sic_code1_tokens + company_naics_code1_tokens + dba_name_tokens + prim_range_tokens + predir_tokens + prim_name_tokens + addr_suffix_tokens + postdir_tokens + unit_desig_tokens + sec_range_tokens + p_city_name_tokens + v_city_name_tokens + st_tokens + zip_tokens + zip4_tokens + fips_state_tokens + fips_county_tokens;
   all_tokens := SALT30.fn_process_multitokens(all_tokens0);
+ 
 EXPORT TokenKeyName := '~'+'key::BIPV2_Best_Proxid::Proxid::Token::TokenKey';
+ 
 EXPORT TokenKey := INDEX(all_tokens,{UNSIGNED4 TokenHash := HASH32(TokenValue),TokenType},{all_tokens},TokenKeyName);
+ 
 EXPORT MultiTokenKeyName := '~'+'key::BIPV2_Best_Proxid::Proxid::Token::MultiTokenKey';
+ 
 EXPORT MultiTokenKey := INDEX(all_tokens0(SALT30.WordCount(TokenValue)>1),{UNSIGNED4 TokenHash := HASH32(TokenValue),TokenType},{all_tokens0},MultiTokenKeyName);
-  address_tokens := PROJECT(specificities(h).address_values_persisted,TRANSFORM(SALT30.Layout_Classify_Concept,SELF.ConceptHash := LEFT.address; SELF.TokenType := 25; SELF.Spc := LEFT.field_Specificity ));
+  address_tokens := PROJECT(specificities(h).address_values_persisted,TRANSFORM(SALT30.Layout_Classify_Concept,SELF.ConceptHash := LEFT.address; SELF.TokenType := 26; SELF.Spc := LEFT.field_Specificity ));
 all_tokens1 := address_tokens;
+ 
 EXPORT ConceptKeyName := '~'+'key::BIPV2_Best_Proxid::Proxid::Token::ConceptKey';
+ 
 EXPORT ConceptKey := INDEX(all_tokens1,{ConceptHash,TokenType},{all_tokens1},ConceptKeyName);
 // Now compute the patterns of filled in field values for the various concept fields
 SHARED s := specificities(h).specificities;
@@ -66,7 +74,7 @@ SHARED Layout_ConceptTemplate := RECORD
   END;
   t := table(ih,address_filled_rec);
   address_filled_rec_totals := RECORD
-    UNSIGNED2 TokenType := 25;
+    UNSIGNED2 TokenType := 26;
     t.prim_range_filled;
     t.predir_filled;
     t.prim_name_filled;
@@ -82,25 +90,31 @@ SHARED Layout_ConceptTemplate := RECORD
   SALT30.MAC_Field_Specificities(t_tot,o_tot);
 shared address_combinations := o_tot;
   Layout_ConceptTemplate Into(address_combinations le) := TRANSFORM
-    SELF.FieldNumber1 := MAP ( le.prim_range_filled => 11, le.predir_filled => 12, le.prim_name_filled => 13, le.addr_suffix_filled => 14, le.postdir_filled => 15, le.unit_desig_filled => 16, le.sec_range_filled => 17, le.st_filled => 20, le.zip_filled => 21,0);
-    SELF.FieldNumber2 := MAP ( le.predir_filled AND SELF.FieldNumber1 != 12 => 12, le.prim_name_filled AND SELF.FieldNumber1 != 13 => 13, le.addr_suffix_filled AND SELF.FieldNumber1 != 14 => 14, le.postdir_filled AND SELF.FieldNumber1 != 15 => 15, le.unit_desig_filled AND SELF.FieldNumber1 != 16 => 16, le.sec_range_filled AND SELF.FieldNumber1 != 17 => 17, le.st_filled AND SELF.FieldNumber1 != 20 => 20, le.zip_filled AND SELF.FieldNumber1 != 21 => 21,0);
-    SELF.FieldNumber3 := MAP ( le.prim_name_filled AND SELF.FieldNumber1 != 13 AND SELF.FieldNumber2 != 13 => 13, le.addr_suffix_filled AND SELF.FieldNumber1 != 14 AND SELF.FieldNumber2 != 14 => 14, le.postdir_filled AND SELF.FieldNumber1 != 15 AND SELF.FieldNumber2 != 15 => 15, le.unit_desig_filled AND SELF.FieldNumber1 != 16 AND SELF.FieldNumber2 != 16 => 16, le.sec_range_filled AND SELF.FieldNumber1 != 17 AND SELF.FieldNumber2 != 17 => 17, le.st_filled AND SELF.FieldNumber1 != 20 AND SELF.FieldNumber2 != 20 => 20, le.zip_filled AND SELF.FieldNumber1 != 21 AND SELF.FieldNumber2 != 21 => 21,0);
-    SELF.FieldNumber4 := MAP ( le.addr_suffix_filled AND SELF.FieldNumber1 != 14 AND SELF.FieldNumber2 != 14 AND SELF.FieldNumber3 != 14 => 14, le.postdir_filled AND SELF.FieldNumber1 != 15 AND SELF.FieldNumber2 != 15 AND SELF.FieldNumber3 != 15 => 15, le.unit_desig_filled AND SELF.FieldNumber1 != 16 AND SELF.FieldNumber2 != 16 AND SELF.FieldNumber3 != 16 => 16, le.sec_range_filled AND SELF.FieldNumber1 != 17 AND SELF.FieldNumber2 != 17 AND SELF.FieldNumber3 != 17 => 17, le.st_filled AND SELF.FieldNumber1 != 20 AND SELF.FieldNumber2 != 20 AND SELF.FieldNumber3 != 20 => 20, le.zip_filled AND SELF.FieldNumber1 != 21 AND SELF.FieldNumber2 != 21 AND SELF.FieldNumber3 != 21 => 21,0);
-    SELF.FieldNumber5 := MAP ( le.postdir_filled AND SELF.FieldNumber1 != 15 AND SELF.FieldNumber2 != 15 AND SELF.FieldNumber3 != 15 AND SELF.FieldNumber4 != 15 => 15, le.unit_desig_filled AND SELF.FieldNumber1 != 16 AND SELF.FieldNumber2 != 16 AND SELF.FieldNumber3 != 16 AND SELF.FieldNumber4 != 16 => 16, le.sec_range_filled AND SELF.FieldNumber1 != 17 AND SELF.FieldNumber2 != 17 AND SELF.FieldNumber3 != 17 AND SELF.FieldNumber4 != 17 => 17, le.st_filled AND SELF.FieldNumber1 != 20 AND SELF.FieldNumber2 != 20 AND SELF.FieldNumber3 != 20 AND SELF.FieldNumber4 != 20 => 20, le.zip_filled AND SELF.FieldNumber1 != 21 AND SELF.FieldNumber2 != 21 AND SELF.FieldNumber3 != 21 AND SELF.FieldNumber4 != 21 => 21,0);
-    SELF.FieldNumber6 := MAP ( le.unit_desig_filled AND SELF.FieldNumber1 != 16 AND SELF.FieldNumber2 != 16 AND SELF.FieldNumber3 != 16 AND SELF.FieldNumber4 != 16 AND SELF.FieldNumber5 != 16 => 16, le.sec_range_filled AND SELF.FieldNumber1 != 17 AND SELF.FieldNumber2 != 17 AND SELF.FieldNumber3 != 17 AND SELF.FieldNumber4 != 17 AND SELF.FieldNumber5 != 17 => 17, le.st_filled AND SELF.FieldNumber1 != 20 AND SELF.FieldNumber2 != 20 AND SELF.FieldNumber3 != 20 AND SELF.FieldNumber4 != 20 AND SELF.FieldNumber5 != 20 => 20, le.zip_filled AND SELF.FieldNumber1 != 21 AND SELF.FieldNumber2 != 21 AND SELF.FieldNumber3 != 21 AND SELF.FieldNumber4 != 21 AND SELF.FieldNumber5 != 21 => 21,0);
-    SELF.FieldNumber7 := MAP ( le.sec_range_filled AND SELF.FieldNumber1 != 17 AND SELF.FieldNumber2 != 17 AND SELF.FieldNumber3 != 17 AND SELF.FieldNumber4 != 17 AND SELF.FieldNumber5 != 17 AND SELF.FieldNumber6 != 17 => 17, le.st_filled AND SELF.FieldNumber1 != 20 AND SELF.FieldNumber2 != 20 AND SELF.FieldNumber3 != 20 AND SELF.FieldNumber4 != 20 AND SELF.FieldNumber5 != 20 AND SELF.FieldNumber6 != 20 => 20, le.zip_filled AND SELF.FieldNumber1 != 21 AND SELF.FieldNumber2 != 21 AND SELF.FieldNumber3 != 21 AND SELF.FieldNumber4 != 21 AND SELF.FieldNumber5 != 21 AND SELF.FieldNumber6 != 21 => 21,0);
-    SELF.FieldNumber8 := MAP ( le.st_filled AND SELF.FieldNumber1 != 20 AND SELF.FieldNumber2 != 20 AND SELF.FieldNumber3 != 20 AND SELF.FieldNumber4 != 20 AND SELF.FieldNumber5 != 20 AND SELF.FieldNumber6 != 20 AND SELF.FieldNumber7 != 20 => 20, le.zip_filled AND SELF.FieldNumber1 != 21 AND SELF.FieldNumber2 != 21 AND SELF.FieldNumber3 != 21 AND SELF.FieldNumber4 != 21 AND SELF.FieldNumber5 != 21 AND SELF.FieldNumber6 != 21 AND SELF.FieldNumber7 != 21 => 21,0);
-    SELF.FieldNumber9 := MAP ( le.zip_filled AND SELF.FieldNumber1 != 21 AND SELF.FieldNumber2 != 21 AND SELF.FieldNumber3 != 21 AND SELF.FieldNumber4 != 21 AND SELF.FieldNumber5 != 21 AND SELF.FieldNumber6 != 21 AND SELF.FieldNumber7 != 21 AND SELF.FieldNumber8 != 21 => 21,0);
+    SELF.FieldNumber1 := MAP ( le.prim_range_filled => 12, le.predir_filled => 13, le.prim_name_filled => 14, le.addr_suffix_filled => 15, le.postdir_filled => 16, le.unit_desig_filled => 17, le.sec_range_filled => 18, le.st_filled => 21, le.zip_filled => 22,0);
+    SELF.FieldNumber2 := MAP ( le.predir_filled AND SELF.FieldNumber1 != 13 => 13, le.prim_name_filled AND SELF.FieldNumber1 != 14 => 14, le.addr_suffix_filled AND SELF.FieldNumber1 != 15 => 15, le.postdir_filled AND SELF.FieldNumber1 != 16 => 16, le.unit_desig_filled AND SELF.FieldNumber1 != 17 => 17, le.sec_range_filled AND SELF.FieldNumber1 != 18 => 18, le.st_filled AND SELF.FieldNumber1 != 21 => 21, le.zip_filled AND SELF.FieldNumber1 != 22 => 22,0);
+    SELF.FieldNumber3 := MAP ( le.prim_name_filled AND SELF.FieldNumber1 != 14 AND SELF.FieldNumber2 != 14 => 14, le.addr_suffix_filled AND SELF.FieldNumber1 != 15 AND SELF.FieldNumber2 != 15 => 15, le.postdir_filled AND SELF.FieldNumber1 != 16 AND SELF.FieldNumber2 != 16 => 16, le.unit_desig_filled AND SELF.FieldNumber1 != 17 AND SELF.FieldNumber2 != 17 => 17, le.sec_range_filled AND SELF.FieldNumber1 != 18 AND SELF.FieldNumber2 != 18 => 18, le.st_filled AND SELF.FieldNumber1 != 21 AND SELF.FieldNumber2 != 21 => 21, le.zip_filled AND SELF.FieldNumber1 != 22 AND SELF.FieldNumber2 != 22 => 22,0);
+    SELF.FieldNumber4 := MAP ( le.addr_suffix_filled AND SELF.FieldNumber1 != 15 AND SELF.FieldNumber2 != 15 AND SELF.FieldNumber3 != 15 => 15, le.postdir_filled AND SELF.FieldNumber1 != 16 AND SELF.FieldNumber2 != 16 AND SELF.FieldNumber3 != 16 => 16, le.unit_desig_filled AND SELF.FieldNumber1 != 17 AND SELF.FieldNumber2 != 17 AND SELF.FieldNumber3 != 17 => 17, le.sec_range_filled AND SELF.FieldNumber1 != 18 AND SELF.FieldNumber2 != 18 AND SELF.FieldNumber3 != 18 => 18, le.st_filled AND SELF.FieldNumber1 != 21 AND SELF.FieldNumber2 != 21 AND SELF.FieldNumber3 != 21 => 21, le.zip_filled AND SELF.FieldNumber1 != 22 AND SELF.FieldNumber2 != 22 AND SELF.FieldNumber3 != 22 => 22,0);
+    SELF.FieldNumber5 := MAP ( le.postdir_filled AND SELF.FieldNumber1 != 16 AND SELF.FieldNumber2 != 16 AND SELF.FieldNumber3 != 16 AND SELF.FieldNumber4 != 16 => 16, le.unit_desig_filled AND SELF.FieldNumber1 != 17 AND SELF.FieldNumber2 != 17 AND SELF.FieldNumber3 != 17 AND SELF.FieldNumber4 != 17 => 17, le.sec_range_filled AND SELF.FieldNumber1 != 18 AND SELF.FieldNumber2 != 18 AND SELF.FieldNumber3 != 18 AND SELF.FieldNumber4 != 18 => 18, le.st_filled AND SELF.FieldNumber1 != 21 AND SELF.FieldNumber2 != 21 AND SELF.FieldNumber3 != 21 AND SELF.FieldNumber4 != 21 => 21, le.zip_filled AND SELF.FieldNumber1 != 22 AND SELF.FieldNumber2 != 22 AND SELF.FieldNumber3 != 22 AND SELF.FieldNumber4 != 22 => 22,0);
+    SELF.FieldNumber6 := MAP ( le.unit_desig_filled AND SELF.FieldNumber1 != 17 AND SELF.FieldNumber2 != 17 AND SELF.FieldNumber3 != 17 AND SELF.FieldNumber4 != 17 AND SELF.FieldNumber5 != 17 => 17, le.sec_range_filled AND SELF.FieldNumber1 != 18 AND SELF.FieldNumber2 != 18 AND SELF.FieldNumber3 != 18 AND SELF.FieldNumber4 != 18 AND SELF.FieldNumber5 != 18 => 18, le.st_filled AND SELF.FieldNumber1 != 21 AND SELF.FieldNumber2 != 21 AND SELF.FieldNumber3 != 21 AND SELF.FieldNumber4 != 21 AND SELF.FieldNumber5 != 21 => 21, le.zip_filled AND SELF.FieldNumber1 != 22 AND SELF.FieldNumber2 != 22 AND SELF.FieldNumber3 != 22 AND SELF.FieldNumber4 != 22 AND SELF.FieldNumber5 != 22 => 22,0);
+    SELF.FieldNumber7 := MAP ( le.sec_range_filled AND SELF.FieldNumber1 != 18 AND SELF.FieldNumber2 != 18 AND SELF.FieldNumber3 != 18 AND SELF.FieldNumber4 != 18 AND SELF.FieldNumber5 != 18 AND SELF.FieldNumber6 != 18 => 18, le.st_filled AND SELF.FieldNumber1 != 21 AND SELF.FieldNumber2 != 21 AND SELF.FieldNumber3 != 21 AND SELF.FieldNumber4 != 21 AND SELF.FieldNumber5 != 21 AND SELF.FieldNumber6 != 21 => 21, le.zip_filled AND SELF.FieldNumber1 != 22 AND SELF.FieldNumber2 != 22 AND SELF.FieldNumber3 != 22 AND SELF.FieldNumber4 != 22 AND SELF.FieldNumber5 != 22 AND SELF.FieldNumber6 != 22 => 22,0);
+    SELF.FieldNumber8 := MAP ( le.st_filled AND SELF.FieldNumber1 != 21 AND SELF.FieldNumber2 != 21 AND SELF.FieldNumber3 != 21 AND SELF.FieldNumber4 != 21 AND SELF.FieldNumber5 != 21 AND SELF.FieldNumber6 != 21 AND SELF.FieldNumber7 != 21 => 21, le.zip_filled AND SELF.FieldNumber1 != 22 AND SELF.FieldNumber2 != 22 AND SELF.FieldNumber3 != 22 AND SELF.FieldNumber4 != 22 AND SELF.FieldNumber5 != 22 AND SELF.FieldNumber6 != 22 AND SELF.FieldNumber7 != 22 => 22,0);
+    SELF.FieldNumber9 := MAP ( le.zip_filled AND SELF.FieldNumber1 != 22 AND SELF.FieldNumber2 != 22 AND SELF.FieldNumber3 != 22 AND SELF.FieldNumber4 != 22 AND SELF.FieldNumber5 != 22 AND SELF.FieldNumber6 != 22 AND SELF.FieldNumber7 != 22 AND SELF.FieldNumber8 != 22 => 22,0);
     SELF := le;
   END;
 shared address_templates := project(address_combinations,Into(LEFT));
 all_templates := address_templates;
+ 
 EXPORT ConceptTemplatesKey := '~'+'key::BIPV2_Best_Proxid::Proxid::Token::ConceptKey';
+ 
 EXPORT ConceptTemplateKey := INDEX(all_templates,{FieldNumber1,TokenType},{all_templates},ConceptTemplatesKey);
+ 
 EXPORT Build := PARALLEL(BUILDINDEX(TokenKey, OVERWRITE),BUILDINDEX(MultiTokenKey, OVERWRITE),BUILDINDEX(ConceptKey, OVERWRITE),BUILDINDEX(ConceptTemplateKey, OVERWRITE));
+ 
 SHARED TokenClassify_Raw(SALT30.StrType s,SET OF UNSIGNED2 Poss=[]) := PROJECT( TokenKey(TokenHash=HASH32(s),TokenValue = s,Poss=[] OR TokenType IN Poss),TRANSFORM(SALT30.Layout_Classify_Token,SELF := LEFT) );
 SHARED MultiTokenClassify_Raw(SALT30.StrType s) := PROJECT( MultiTokenKey(TokenHash=HASH32(s),TokenValue = s),TRANSFORM(SALT30.Layout_Classify_Token,SELF := LEFT) );
+ 
 EXPORT TokenClassify(SALT30.StrType s) := SORT(TokenClassify_Raw(s),spc);
+ 
 EXPORT FieldClassify(SALT30.StrType s,SET OF UNSIGNED2 Poss=[]) := FUNCTION
   NWords := SALT30.WordCount(s);
   AsData := DATASET([{s}],{SALT30.StrType s1;});
@@ -120,6 +134,7 @@ EXPORT ParseClassify(DATASET(SALT30.Layout_Parse_Raw) p) := FUNCTION
   rl2 := JOIN(rl1,MultiTokenKey,RIGHT.TokenHash=HASH32(LEFT.TokenValue) AND RIGHT.TokenValue=LEFT.TokenValue AND LEFT.TokenType = RIGHT.TokenType,TRANSFORM(sp.r,SELF.Verified := LEFT.TokenValue=RIGHT.TokenValue,SELF := LEFT),LEFT OUTER);
   RETURN sp.JoinBack(rl0+rl2);
 END;
+ 
 EXPORT StreamVerify(SALT30.StrType s,DATASET(SALT30.Layout_Classify_Hypothesis) Classified) := FUNCTION
   // MORE - could try to get clever and combine fetches for different types of same multi-token
   SALT30.Layout_Classify_Hypothesis Confirm(Classified le) := TRANSFORM
@@ -130,6 +145,7 @@ EXPORT StreamVerify(SALT30.StrType s,DATASET(SALT30.Layout_Classify_Hypothesis) 
   R0 := SALT30.fn_classify_dedup_hypothesis(R,TRUE);
   RETURN SORT(R,SPC,-Len);
 END;
+ 
 EXPORT StreamAnnotateConcepts(SALT30.StrType s,DATASET(SALT30.Layout_Classify_Hypothesis) Classified) := FUNCTION
 // Now we need to look for concept-templates in the fields
   Layout_Template_Hypothesis := RECORD(SALT30.Layout_Classify_Hypothesis)
@@ -174,6 +190,7 @@ EXPORT StreamAnnotateConcepts(SALT30.StrType s,DATASET(SALT30.Layout_Classify_Hy
   AP := JOIN(AP0,ConceptKey,HASH32(LEFT.Txt)=RIGHT.ConceptHash AND LEFT.TokenType=RIGHT.TokenType,TRANSFORM(Layout_Template_Hypothesis, SELF.Spc := RIGHT.Spc; SELF := LEFT));
   RETURN PROJECT(AP,TRANSFORM(SALT30.Layout_Classify_Hypothesis,SELF.Len := LEFT.Cpos-LEFT.StartPos; SELF.Spc := LEFT.SPC / SELF.Len; SELF := LEFT));
 END;
+ 
 EXPORT StreamClassify(SALT30.StrType s) := FUNCTION
   NWords := SALT30.WordCount(s);
   EmptyStart := dataset([],SALT30.Layout_Classify_Hypothesis);
@@ -183,5 +200,6 @@ EXPORT StreamClassify(SALT30.StrType s) := FUNCTION
   DH := SALT30.fn_classify_dedup_hypothesis(WC,TRUE);
   RETURN SORT(DH,SPC,-Len);
 END;
+ 
 EXPORT PrettyStreamClassify(SALT30.StrType s) := SALT30.fn_pretty_hypothesis(s,StreamClassify(s),Fields.FieldName);
 END;
