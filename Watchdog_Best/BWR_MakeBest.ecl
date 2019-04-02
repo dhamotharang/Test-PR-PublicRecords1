@@ -1,4 +1,5 @@
-﻿import utilfile, header, gong_neustar;
+﻿#OPTION('multiplePersistInstances', FALSE);
+#workunit('name','Watchdog_best.BWR_Best');
 
 qlfn := '~thor400_36::persist::qh_did_into_watchdog';
 q := dataset(qlfn, header.Layout_Header, thor);
@@ -12,4 +13,8 @@ base1 := Header.File_Headers;
 												 self := left));
 h := base1 + q : Persist('~thor::watchdog_best::header_aid_reclean');
 
-EXPORT File_Input := h;
+h2 := Watchdog_Best.proc_prep_input(h) : Persist('~thor::watchdog_best::prepped');
+
+best := Watchdog_Best.proc_build_best(h2);
+
+OUTPUT(best,,'~thor::watchdog_best::best_child', compressed, overwrite, named('bestby_child')); // Uses child datasets
