@@ -4,18 +4,11 @@ EXPORT Layouts := MODULE
 
 	EXPORT Sprayed := module
 		EXPORT IdentityData := RECORD
-			string		Customer_Name;  
-			string20	Customer_Account_Number;
-			string2		Customer_State;
-			string3		Customer_County;
-			string		Customer_Agency;														
-			string		Customer_Agency_Vertical_Type;
-			string1		Customer_Program;
 			string		Customer_Job_ID;
 			string		Batch_Record_ID;
 			string		Transaction_ID_Number;
-			string		Reason_for_Transaction_Activity;	
-			string10	Date_of_Transaction;												
+			string		Reason_for_Transaction_Activity;
+			string8		Date_of_Transaction;
 			unsigned6	LexID;
 			string60	raw_Full_Name;
 			string5		raw_Title;
@@ -62,17 +55,11 @@ EXPORT Layouts := MODULE
 			string25	Device_Type;
 			string25	Device_identification_Provider; 
 			string10	geo_lat;
-			string11	geo_long; 
+			string11	geo_long;
 			string100 	source_input := 'Contributory';
 		END;
 		
 		EXPORT KnownFraud := RECORD
-			string		customer_name;
-			string20	customer_account_number;
-			string2		customer_state;
-			string3		customer_county;
-			string		customer_agency;
-			string		customer_agency_vertical_type;
 			string20	customer_event_id;
 			string8		reported_date;
 			string10	reported_time;
@@ -252,11 +239,6 @@ EXPORT Layouts := MODULE
 		END;
 	
 		EXPORT validate_record := record
-			string20	Customer_Account_Number	:= '';
-			string2 	Customer_State	:= '';
-			string3		Customer_County	:= '';
-			string 		Customer_Agency_Vertical_Type	:= '';
-			string1 	Customer_Program	:= '';
 			string8		reported_date	:= '';
 			string20	lexid	:= '';
 			string100	raw_full_name	:= '';
@@ -296,6 +278,37 @@ EXPORT Layouts := MODULE
 	EXPORT Input := module
 		EXPORT IdentityData := RECORD
 			Sprayed.IdentityData;
+			string20		Customer_Account_Number;
+			string2			Customer_State;
+			string			Customer_Agency_Vertical_Type;
+			string1			Customer_Program;
+			unsigned8		Unique_Id ;
+			Address.Layout_Clean_Name				cleaned_name;
+			unsigned8		address_id;
+			string100		address_1 := '';
+			string50		address_2 := '';
+			Address.Layout_Clean182_fips			clean_address;
+			unsigned8		mailing_address_id;
+			string100		mailing_address_1 := '';
+			string50		mailing_address_2 := '';
+			Address.Layout_Clean182_fips			additional_address;	
+			clean_phones	clean_phones;
+			string9			clean_SSN;
+			string9			clean_Zip;
+			string25		clean_IP_Address;
+			string25		clean_dob;
+			unsigned6		did ; 
+			unsigned1		did_score;
+			unsigned3		file_type;
+			unsigned6		ind_type;
+			Provenance;			
+		END;
+		EXPORT KnownFraud := RECORD
+			Sprayed.KnownFraud;
+			string20		customer_account_number;
+			string2			customer_state;
+			string			customer_agency_vertical_type;
+			string1			customer_program_fn; // use this one
 			unsigned8		Unique_Id ;
 			Address.Layout_Clean_Name				cleaned_name;
 			unsigned8		address_id;			
@@ -303,43 +316,18 @@ EXPORT Layouts := MODULE
 			string50		address_2 := '';
 			Address.Layout_Clean182_fips			clean_address;
 			unsigned8		mailing_address_id;	
-			string100		mailing_address_1 := '';   
+			string100		mailing_address_1 := '';
 			string50		mailing_address_2 := '';
-			Address.Layout_Clean182_fips			additional_address;	
-			clean_phones										clean_phones;
-			string9			clean_SSN;
-			string9			clean_Zip;
-			string25		clean_IP_Address;
-			string25		clean_dob;
-			unsigned6 	did ; 
-			unsigned1		did_score;
-			unsigned3		file_type;
-			unsigned6		ind_type;
-			unsigned1		Deltabase := 0;
-			Provenance;			
-		END;
-		EXPORT KnownFraud := RECORD
-			Sprayed.KnownFraud;
-			unsigned8		Unique_Id ;
-			Address.Layout_Clean_Name				cleaned_name;
-			unsigned8		address_id;			
-			string100		address_1 := '';   
-			string50		address_2 := '';				
-			Address.Layout_Clean182_fips			clean_address;
-			unsigned8		mailing_address_id;	
-			string100		mailing_address_1 := '';   
-			string50		mailing_address_2 := '';				
 			Address.Layout_Clean182_fips			additional_address;
-			clean_phones										clean_phones;
+			clean_phones	clean_phones;
 			string10		clean_SSN;
 			string10		clean_Zip;
 			string25		clean_IP_Address;
 			string10		clean_dob;
-			unsigned6 	did ; 
+			unsigned6 		did ; 
 			unsigned1		did_score;	
 			unsigned3		file_type;
-			unsigned6		ind_type;			
-			unsigned1		Deltabase := 0;
+			unsigned6		ind_type;
 			Provenance;
 		END;
 		EXPORT Deltabase := RECORD
@@ -347,12 +335,12 @@ EXPORT Layouts := MODULE
 			unsigned8		Unique_Id ;
 			Address.Layout_Clean_Name				cleaned_name;
 			unsigned8		address_id;			
-			string100		address_1 := '';   
-			string50		address_2 := '';				
+			string100		address_1 := '';
+			string50		address_2 := '';
 			Address.Layout_Clean182_fips			clean_address;
-			unsigned8		mailing_address_id;	
-			string100		mailing_address_1 := '';   
-			string50		mailing_address_2 := '';				
+			unsigned8		mailing_address_id;
+			string100		mailing_address_1 := '';
+			string50		mailing_address_2 := '';
 			Address.Layout_Clean182_fips			additional_address;
 			clean_phones	clean_phones;
 			string10		clean_SSN;
@@ -362,7 +350,6 @@ EXPORT Layouts := MODULE
 			unsigned6 		did; 
 			unsigned1		did_score;
 			unsigned6		ind_type;
-			unsigned1		Deltabase := 1;
 			Provenance;
 			string12		cell_phone := '';
 		END;
@@ -385,22 +372,26 @@ EXPORT Layouts := MODULE
 		EXPORT IdentityData	:= 
 			record 
 			Sprayed.IdentityData ;
+			string20		Customer_Account_Number;
+			string2			Customer_State;
+			string			Customer_Agency_Vertical_Type;
+			string1			Customer_Program;
 			unsigned8		Unique_Id ;
-			Address.Layout_Clean_Name				cleaned_name;				
-			string100		address_1 := '';   
+			Address.Layout_Clean_Name				cleaned_name;
+			string100		address_1 := '';
 			string50		address_2 := '';
 			Address.Layout_Clean182_fips			clean_address;
-			string100		mailing_address_1 := '';   
+			string100		mailing_address_1 := '';
 			string50		mailing_address_2 := '';
 			Address.Layout_Clean182_fips			additional_address;	
-			clean_phones										clean_phones;
+			clean_phones	clean_phones;
 			string9			clean_SSN;
 			string9			clean_Zip;
 			string25		clean_IP_Address;
 			string10		clean_dob;
 			unsigned6		did ; 
-			unsigned1		did_score;		
-			string			current ; 
+			unsigned1		did_score;
+			string			current ;
 			unsigned4		dt_first_seen;
 			unsigned4		dt_last_seen;
 			unsigned4		dt_vendor_first_reported;
@@ -411,53 +402,24 @@ EXPORT Layouts := MODULE
 			string100		Source; 
 			unsigned8		source_rec_id; 
 			unsigned3		file_type;
-			unsigned6		ind_type;			
-			unsigned1		Deltabase := 0;
+			unsigned6		ind_type;
 		END; 
 		
 		EXPORT KnownFraud	:= 
 			record 
 			Sprayed.KnownFraud ;
+			string20		customer_account_number;
+			string2			customer_state;
+			string			customer_agency_vertical_type;
+			string1			customer_program_fn; // use this one
 			unsigned8		Unique_Id ;
 			Address.Layout_Clean_Name			cleaned_name;
-			string100         	address_1 := '';   
-			string50          	address_2 := '';				
-			Address.Layout_Clean182_fips		clean_address;
-			string100         	mailing_address_1 := '';   
-			string50          	mailing_address_2 := '';				
-			Address.Layout_Clean182_fips		additional_address;
-			clean_phones									clean_phones;
-			string10		clean_SSN;
-			string10		clean_Zip;
-			string25		clean_IP_Address;
-			string10		clean_dob;
-			unsigned6		did ; 
-			unsigned1		did_score;			
-			string			current ; 
-			unsigned4		dt_first_seen;
-			unsigned4		dt_last_seen;
-			unsigned4		dt_vendor_first_reported;
-			unsigned4		dt_vendor_last_reported;
-			unsigned2		name_ind:=0;
-			unsigned8		NID:=0;
-			unsigned4		process_date ; 
-			string100		Source; 
-			unsigned8		source_rec_id;
-			unsigned3		file_type;
-			unsigned6		ind_type;				
-			unsigned1		Deltabase := 0;
-		END;
-		EXPORT Deltabase	:= 
-			record 
-			Sprayed.Deltabase ;
-			unsigned8		Unique_Id ;
-			Address.Layout_Clean_Name		cleaned_name;
 			string100		address_1 := '';
 			string50		address_2 := '';
-			Address.Layout_Clean182_fips	clean_address;
+			Address.Layout_Clean182_fips		clean_address;
 			string100		mailing_address_1 := '';
 			string50		mailing_address_2 := '';
-			Address.Layout_Clean182_fips	additional_address;
+			Address.Layout_Clean182_fips		additional_address;
 			clean_phones	clean_phones;
 			string10		clean_SSN;
 			string10		clean_Zip;
@@ -475,20 +437,62 @@ EXPORT Layouts := MODULE
 			unsigned4		process_date;
 			string100		Source;
 			unsigned8		source_rec_id;
+			unsigned3		file_type;
 			unsigned6		ind_type;
-			string12		cell_phone := '';	
-			unsigned1		Deltabase := 1;
+		END;
+		EXPORT Deltabase	:= 
+			record 
+			Sprayed.Deltabase ;
+			unsigned8		Unique_Id ;
+			Address.Layout_Clean_Name		cleaned_name;
+			string100		address_1 := '';
+			string50		address_2 := '';
+			Address.Layout_Clean182_fips	clean_address;
+			string100		mailing_address_1 := '';
+			string50		mailing_address_2 := '';
+			Address.Layout_Clean182_fips	additional_address;
+			clean_phones	clean_phones;
+			string10		clean_SSN;
+			string10		clean_Zip;
+			string25		clean_IP_Address;
+			string10		clean_dob;
+			unsigned6		did ;
+			unsigned1		did_score;
+			string			current;
+			unsigned4		dt_first_seen;
+			unsigned4		dt_last_seen;
+			unsigned4		dt_vendor_first_reported;
+			unsigned4		dt_vendor_last_reported;
+			unsigned2		name_ind:=0;
+			unsigned8		NID:=0;
+			unsigned4		process_date;
+			string100		Source;
+			unsigned8		source_rec_id;
+			unsigned6		ind_type;
+			string12		cell_phone := '';
 		END;
 
 		EXPORT AddressCache := record
 			unsigned8			address_id;
 			unsigned4			address_cleaned;
-			string100      address_1 := '';   
+			string100      address_1 := '';
 			string50       address_2 := '';
-			Address.Layout_Clean182_fips					clean_address;
+			Address.Layout_Clean182_fips		clean_address;
 		END;
 		
 	END;
+
+	EXPORT CustomerSettings := record 
+		string20 	Customer_Account_Number;
+		string2 	Customer_State;
+		unsigned3 	file_type;
+		unsigned6 	ind_type;
+		boolean 	Anonymize_Data;
+		boolean 	Validate_Data;
+		string30 	MSH_Prefix;
+		string 		Customer_Email; // Emails Separated by semicolon ";"
+		unsigned6 	fdn_file_info_id;
+	end;
 
 	export Flags := module
 
@@ -550,7 +554,7 @@ export temp := module
 			string28		prim_name;
 			string5			zip5;
 			string8			sec_range;
-			string25 		p_City_name;   		// City
+			string25 		p_City_name;	// City
 			string2			state;
 			string10		phone;
 			string20 		fname;

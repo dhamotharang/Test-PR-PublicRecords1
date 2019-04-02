@@ -35,7 +35,7 @@ function
 	
   DFULogicalFile:=RECORD
     STRING   Prefix             {xpath('Prefix'            )};
-    STRING   ClusterName        {xpath('ClusterName'       )};
+    STRING   ClusterName        {xpath('NodeGroup'         )};//ClusterName returns blank, so put it here
     STRING   NodeGroup          {xpath('NodeGroup'         )};
     STRING   Directory          {xpath('Directory'         )};
     STRING   Description        {xpath('Description'       )};
