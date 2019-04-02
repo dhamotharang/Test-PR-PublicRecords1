@@ -179,7 +179,7 @@
   export string RemoteSearchServiceName := 'AutoheaderV2.LexIDSearchService';
   export string SearchLibraryName := 'AutoheaderV2.LIB_header';	
   export string SearchSALTLibraryName := 'AutoheaderV2.LIB_header_SALTPlus';
-  export unsigned1 SaltLeadThreshold := 10; // default is no threshold
+  export unsigned1 SaltLeadThreshold := 15; // default is no threshold
 		
 		EXPORT LibVersion := module
 			EXPORT integer LEGACY := 0;
