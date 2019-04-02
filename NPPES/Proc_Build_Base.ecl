@@ -147,7 +147,7 @@ nppes.Layouts.base   buildBase(outfile15 L) := transform, skip (length(trim(rege
 															'5' => 'OTHER NAME',									
 															'');
 		self.mailing_country_desc					:= ut.Country_ISO2_To_Name(l.provider_business_mailing_address_country_code);
-		self.practice_location_country_desc			:= ut.Country_ISO2_To_Name(l.provider_business_practice_location_address_city_name);
+		self.practice_location_country_desc			:= ut.Country_ISO2_To_Name(l.Provider_Business_Practice_Location_Address_Country_Code);
 		self.other_pid_issuer_desc_1                := getIssuerDesc(l.other_provider_identifier_type_code_1);
 		self.other_pid_issuer_desc_2                := getIssuerDesc(l.other_provider_identifier_type_code_2);
 		self.other_pid_issuer_desc_3                := getIssuerDesc(l.other_provider_identifier_type_code_3);
