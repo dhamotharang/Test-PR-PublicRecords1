@@ -1,4 +1,4 @@
-﻿IMPORT corp2;
+﻿IMPORT corp2, std, ut;
 EXPORT Functions := Module;
 
 //********************************************************************
@@ -636,5 +636,32 @@ EXPORT Functions := Module;
 		
     END;
 	
-	 
- END;
+    //"fix_ForeignChar" function returns WV state-site matching leagal name after replacing "foreign character patterns" with match "sate site character patterns"
+		//line 645 to 658 regexfind functions are different to rest since those companies doesn't have common replacement char
+		EXPORT fix_ForeignChar(STRING s) := FUNCTION
+
+			uc_s  							 := corp2.t2u(s);				
+			temp_Lname 					 := regexreplace('Â|||', uc_s, '');  //unprintables noticed in the data & Cleaning them
+			fix_legal_name       := map(regexfind('ARETÃ HOLDINGS LTD. CO.',  temp_Lname,0)  <> ''  				=>'ARETA HOLDINGS LTD CO',
+																	regexfind('BÃRKI ENTERPRISES LLC',  temp_Lname,0)  <> ''						=>'BARKI ENTERPRISES LLC',
+																	regexfind('BRUADER MÃR',  temp_Lname,0)  <> ''										  =>'BRUADER MOR',
+																	regexfind('CAFÃ INTERNACIONAL, LLC',  temp_Lname,0)  <> ''					=>'CAFE INTERNACIONAL LLC' ,
+																	regexfind('DRAGON CAFÃ INC.',  temp_Lname,0)  <> ''									=>'DRAGON CAFE INC',
+																	regexfind('E-THERAPY CAFÃ INC.',  temp_Lname,0)  <> ''							=>'E THERAPY CAFE INC',
+																	regexfind('HUDROKHOÃS DESIGN AND BUILD, LLC',  temp_Lname,0)  <> ''	=>'HUDROKHOAS DESIGN AND BUILD LLC',
+																	regexfind('INFINITY CRAFT & DÃ¨COR, LLC',  temp_Lname,0)  <> ''			=>'INFINITY CRAFT & DECOR LLC',
+																	regexfind('MÃLODIE MUSIC STUDIO, INC',  temp_Lname,0)  <> ''				=>'MALODIE MUSIC STUDIO INC',
+																	regexfind('MCCUTÃE LLC',  temp_Lname,0)  <> ''											=>'MCCUTIE LLC',
+																	regexfind('MOJO Ã GOGO LLC',  temp_Lname,0)  <> ''									=>'MOJO A GOGO LLC',
+																	regexfind('PFÃRTNER - PREMIUM PROPERTIES',  temp_Lname,0)  <> ''		=>'PFORTNER - PREMIUM PROPERTIES',
+																	regexfind('PORTA JÃIAS',  temp_Lname,0)  <> ''											=>'PORTA JOIAS',
+																	regexfind('ILASHÃ LLC',  temp_Lname,0)  <> ''												=>'ILASHA LLC',
+																	regexfind('Â²', temp_Lname,0) 	 <> ''															=>regexreplace('Â²', temp_Lname, ''),
+																	regexfind('Â³', temp_Lname,0)   <> ''																=>regexreplace('Â³', temp_Lname, ''),
+																	regexfind('Â|Â¢|Â°|â|â¢',  temp_Lname,0)  <> ''											=>regexreplace('Â|Â¢|Â°|â|â¢',  temp_Lname, ''),
+																	temp_Lname);
+		 return ut.fn_RemoveSpecialChars((string)Std.Uni.CleanAccents(fix_legal_name));		
+				
+   	END;
+		
+END;
