@@ -430,7 +430,8 @@ EXPORT Functions := MODULE
 	END;
 	
 	EXPORT getContributedBest(DATASET(didville.Layout_Did_OutBatch) ds_best_in,
-														STRING fraud_platform) := FUNCTION
+														STRING fraud_platform,
+														FraudGovPlatform_Services.IParam.BatchParams batch_params) := FUNCTION
 
 		ds_rids:=	JOIN(ds_best_in, FraudShared.Key_Did(fraud_platform),
 										KEYED(LEFT.did = RIGHT.did),
@@ -440,9 +441,14 @@ EXPORT Functions := MODULE
 											SELF := []),
 									LIMIT(FraudShared_Services.Constants.MAX_RECS_ON_JOIN, SKIP));
 
-		ds_payload_recs := FraudShared_Services.GetPayloadRecords(ds_rids, fraud_platform);
+		ds_payload_recs := FraudGovPlatform_Services.fn_GetPayloadRecords(ds_rids, fraud_platform);
 
-		ds_payload_recs_sorted := SORT(ds_payload_recs, did, -event_date, record);
+		// *** No filtering in FraudGov
+		ds_recs_pulled := FraudShared_Services.Common_Suppress(ds_payload_recs);
+		
+		ds_FilterThruMBS := FraudShared_Services.FilterThruMBS(ds_recs_pulled, batch_params.GlobalCompanyId, batch_params.IndustryType, batch_params.ProductCode, DATASET([],iesp.frauddefensenetwork.t_FDNIndType), DATASET([],iesp.frauddefensenetwork.t_FDNFileType), fraud_platform);
+
+		ds_payload_recs_sorted := SORT(ds_FilterThruMBS, did, -event_date, record);
 
 		FraudShared_Services.Layouts.Raw_Payload_rec xformRollup(FraudShared_Services.Layouts.Raw_Payload_rec L, FraudShared_Services.Layouts.Raw_Payload_rec R) := transform
 				//We wanted to keep the record which has good address, instead of first non blank address...
