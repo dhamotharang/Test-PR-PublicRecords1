@@ -68,16 +68,16 @@ EXPORT mod_sources := MODULE
 	// it returns a string representation of the sources rather than a bitmpa
 	export string src2str(unsigned x) := FUNCTION
 					s := 
-								IF(bit_test(x, codes.glb), 'G', '')
-						+		IF(bit_test(x, codes.glb_nonen), 'R', '')
-						+		IF(bit_test(x, codes.glb_noneq), 'Q', '')
-						+		IF(bit_test(x, codes.glb_nonen_noneq), 'B', '')
-						+		IF(bit_test(x, codes.nonglb), 'N', '')
-						+		IF(bit_test(x, codes.nonglb_noneq), 'O', '')
-						+		IF(bit_test(x, codes.marketing), 'M', '')
-						+		IF(bit_test(x, codes.dppa), 'D', '')
+								IF(bit_test(x, codes.glb), 'GLB', '')
+						+		IF(bit_test(x, codes.glb_nonen), ' NONEN', '')
+						+		IF(bit_test(x, codes.glb_noneq), ' NONEQ', '')
+						+		IF(bit_test(x, codes.glb_nonen_noneq), ' NONENEQ', '')
+						+		IF(bit_test(x, codes.nonglb), ' NONGLB', '')
+						+		IF(bit_test(x, codes.nonglb_noneq), ' NONGLBEQ', '')
+						+		IF(bit_test(x, codes.marketing), ' MARKETING', '')
+						+		IF(bit_test(x, codes.dppa), ' DPPA', '')
 				;
 				
-		return sortstr(s);
+		return TRIM(s, left, right);
 	END;
 END;
