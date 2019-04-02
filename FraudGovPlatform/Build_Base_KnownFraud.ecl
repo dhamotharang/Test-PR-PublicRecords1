@@ -29,11 +29,9 @@ module
 							left.Customer_Account_Number =(string)right.gc_id
 							AND left.file_type = right.file_type
 							AND left.ind_type = right.ind_type
-							AND (( left.source_input = 'KNFD' 			and	right.confidence_that_activity_was_deceitful != 3 )
-								OR	( left.source_input = 'SAFELIST' 	and	right.confidence_that_activity_was_deceitful = 3 ))	
-							AND	left.customer_State 	= right.Customer_State
-							AND	left.Customer_County 	= right.Customer_County
-							AND	left.Customer_Agency_Vertical_Type = right.Customer_Vertical,										
+							AND (( left.source_input = 'KNFD' and right.confidence_that_activity_was_deceitful != 3 )
+								OR	( left.source_input = 'SAFELIST' and right.confidence_that_activity_was_deceitful  = 3 ))	
+							AND	left.customer_State = right.Customer_State,
 							TRANSFORM(Layouts.Base.KnownFraud,SELF.Source := RIGHT.fdn_file_code; SELF := LEFT));
 
   // Rollup Update and previous base 

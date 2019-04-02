@@ -82,11 +82,11 @@ module
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.IPMetaData,Layouts.IPMetaData,IPMetaData,,,,,,true);
 	end;
 
+	export CustomerSettings := dataset(Filenames().CustomerSettings,Layouts.CustomerSettings,thor,opt);
+
 	export Flags := module
 		export FraudgovInfoFile	:= dataset(Filenames().Flags.FraudgovInfoFn,Layouts.Flags.FraudgovInfoRec,thor,opt);
-		export SourcesToAnonymize	:= dataset(Filenames().Flags.SourcesToAnonymize,Layouts.Flags.SourcesToAnonymize,thor,opt);
 		export SkipModules	:= dataset(Filenames().Flags.SkipModules,Layouts.Flags.SkipModules,thor,opt); 
-		export SkipValidationByGCID	:= dataset(Filenames().Flags.SkipValidationByGCID,Layouts.Flags.SkipValidationByGCID,thor,opt);
 	end;
 
 	
