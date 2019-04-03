@@ -1,1163 +1,1184 @@
-﻿IMPORT SALT37;
+﻿IMPORT SALT311;
 IMPORT Scrubs_Equifax_Business_Data; // Import modules for FieldTypes attribute definitions
 EXPORT Input_Fields := MODULE
  
+EXPORT NumFields := 186;
+ 
 // Processing for each FieldType
-EXPORT SALT37.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_name','invalid_legal_name','invalid_mandatory','invalid_zero_integer','invalid_record_type','invalid_numeric','invalid_numeric_or_blank','invalid_percentage','invalid_direction','invalid_cart','invalid_cr_sort_sz','invalid_lot','invalid_lot_order','invalid_dbpc','invalid_chk_digit','invalid_rec_type','invalid_fips_state','invalid_fips_county','invalid_geo','invalid_msa','invalid_geo_blk','invalid_geo_match','invalid_err_stat','invalid_raw_aid','invalid_ace_aid','invalid_st','invalid_zip5','invalid_zip4','invalid_phone','invalid_rcid','invalid_sic','invalid_naics','invalid_url','invalid_address_type_code','invalid_norm_type','invalid_email','invalid_yes_blank','invalid_business_size','invalid_cert_or_class','invalid_current_future_date','invalid_current_past_date','invalid_future_date','invalid_general_date','invalid_past_date','invalid_year_established','invalid_date_created','invalid_date_seen','invalid_reformated_date','invalid_vendor_reported_date','invalid_process_date','invalid_busstatcd','invalid_cmsa','invalid_corpamountcd','invalid_corpamountprec','invalid_corpamounttp','invalid_corpempcd','invalid_ctryisocd','invalid_ctrynum','invalid_ctrytelcd','invalid_geoprec','invalid_merctype','invalid_mrkt_telescore','invalid_mrkt_totalind','invalid_mrkt_totalscore','invalid_public','invalid_statec','invalid_stkexc');
-EXPORT FieldTypeNum(SALT37.StrType fn) := CASE(fn,'invalid_name' => 1,'invalid_legal_name' => 2,'invalid_mandatory' => 3,'invalid_zero_integer' => 4,'invalid_record_type' => 5,'invalid_numeric' => 6,'invalid_numeric_or_blank' => 7,'invalid_percentage' => 8,'invalid_direction' => 9,'invalid_cart' => 10,'invalid_cr_sort_sz' => 11,'invalid_lot' => 12,'invalid_lot_order' => 13,'invalid_dbpc' => 14,'invalid_chk_digit' => 15,'invalid_rec_type' => 16,'invalid_fips_state' => 17,'invalid_fips_county' => 18,'invalid_geo' => 19,'invalid_msa' => 20,'invalid_geo_blk' => 21,'invalid_geo_match' => 22,'invalid_err_stat' => 23,'invalid_raw_aid' => 24,'invalid_ace_aid' => 25,'invalid_st' => 26,'invalid_zip5' => 27,'invalid_zip4' => 28,'invalid_phone' => 29,'invalid_rcid' => 30,'invalid_sic' => 31,'invalid_naics' => 32,'invalid_url' => 33,'invalid_address_type_code' => 34,'invalid_norm_type' => 35,'invalid_email' => 36,'invalid_yes_blank' => 37,'invalid_business_size' => 38,'invalid_cert_or_class' => 39,'invalid_current_future_date' => 40,'invalid_current_past_date' => 41,'invalid_future_date' => 42,'invalid_general_date' => 43,'invalid_past_date' => 44,'invalid_year_established' => 45,'invalid_date_created' => 46,'invalid_date_seen' => 47,'invalid_reformated_date' => 48,'invalid_vendor_reported_date' => 49,'invalid_process_date' => 50,'invalid_busstatcd' => 51,'invalid_cmsa' => 52,'invalid_corpamountcd' => 53,'invalid_corpamountprec' => 54,'invalid_corpamounttp' => 55,'invalid_corpempcd' => 56,'invalid_ctryisocd' => 57,'invalid_ctrynum' => 58,'invalid_ctrytelcd' => 59,'invalid_geoprec' => 60,'invalid_merctype' => 61,'invalid_mrkt_telescore' => 62,'invalid_mrkt_totalind' => 63,'invalid_mrkt_totalscore' => 64,'invalid_public' => 65,'invalid_statec' => 66,'invalid_stkexc' => 67,0);
+EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid_name','invalid_legal_name','invalid_mandatory','invalid_zero_integer','invalid_record_type','invalid_numeric','invalid_numeric_or_blank','invalid_county','invalid_percentage','invalid_direction','invalid_cart','invalid_cr_sort_sz','invalid_lot','invalid_lot_order','invalid_dbpc','invalid_chk_digit','invalid_rec_type','invalid_fips_state','invalid_fips_county','invalid_geo','invalid_msa','invalid_geo_blk','invalid_geo_match','invalid_err_stat','invalid_raw_aid','invalid_ace_aid','invalid_st','invalid_zip5','invalid_zip4','invalid_phone','invalid_rcid','invalid_sic','invalid_naics','invalid_url','invalid_address_type_code','invalid_norm_type','invalid_email','invalid_alpha','invalid_yes_blank','invalid_business_size','invalid_cert_or_class','invalid_current_future_date','invalid_current_past_date','invalid_future_date','invalid_general_date','invalid_past_date','invalid_year_established','invalid_date_created','invalid_date_seen','invalid_reformated_date','invalid_vendor_reported_date','invalid_process_date','invalid_busstatcd','invalid_cmsa','invalid_corpamountcd','invalid_corpamountprec','invalid_corpamounttp','invalid_corpempcd','invalid_ctryisocd','invalid_ctrynum','invalid_ctrytelcd','invalid_geoprec','invalid_merctype','invalid_mrkt_telescore','invalid_mrkt_totalind','invalid_mrkt_totalscore','invalid_public','invalid_statec','invalid_stkexc');
+EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'invalid_name' => 1,'invalid_legal_name' => 2,'invalid_mandatory' => 3,'invalid_zero_integer' => 4,'invalid_record_type' => 5,'invalid_numeric' => 6,'invalid_numeric_or_blank' => 7,'invalid_county' => 8,'invalid_percentage' => 9,'invalid_direction' => 10,'invalid_cart' => 11,'invalid_cr_sort_sz' => 12,'invalid_lot' => 13,'invalid_lot_order' => 14,'invalid_dbpc' => 15,'invalid_chk_digit' => 16,'invalid_rec_type' => 17,'invalid_fips_state' => 18,'invalid_fips_county' => 19,'invalid_geo' => 20,'invalid_msa' => 21,'invalid_geo_blk' => 22,'invalid_geo_match' => 23,'invalid_err_stat' => 24,'invalid_raw_aid' => 25,'invalid_ace_aid' => 26,'invalid_st' => 27,'invalid_zip5' => 28,'invalid_zip4' => 29,'invalid_phone' => 30,'invalid_rcid' => 31,'invalid_sic' => 32,'invalid_naics' => 33,'invalid_url' => 34,'invalid_address_type_code' => 35,'invalid_norm_type' => 36,'invalid_email' => 37,'invalid_alpha' => 38,'invalid_yes_blank' => 39,'invalid_business_size' => 40,'invalid_cert_or_class' => 41,'invalid_current_future_date' => 42,'invalid_current_past_date' => 43,'invalid_future_date' => 44,'invalid_general_date' => 45,'invalid_past_date' => 46,'invalid_year_established' => 47,'invalid_date_created' => 48,'invalid_date_seen' => 49,'invalid_reformated_date' => 50,'invalid_vendor_reported_date' => 51,'invalid_process_date' => 52,'invalid_busstatcd' => 53,'invalid_cmsa' => 54,'invalid_corpamountcd' => 55,'invalid_corpamountprec' => 56,'invalid_corpamounttp' => 57,'invalid_corpempcd' => 58,'invalid_ctryisocd' => 59,'invalid_ctrynum' => 60,'invalid_ctrytelcd' => 61,'invalid_geoprec' => 62,'invalid_merctype' => 63,'invalid_mrkt_telescore' => 64,'invalid_mrkt_totalind' => 65,'invalid_mrkt_totalscore' => 66,'invalid_public' => 67,'invalid_statec' => 68,'invalid_stkexc' => 69,0);
  
-EXPORT MakeFT_invalid_name(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_name(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_name(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_invalid_name(s)>0);
-EXPORT InValidMessageFT_invalid_name(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_invalid_name'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_name(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_invalid_name(s)>0);
+EXPORT InValidMessageFT_invalid_name(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_invalid_name'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_legal_name(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_legal_name(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_legal_name(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_invalid_legal_name(s)>0);
-EXPORT InValidMessageFT_invalid_legal_name(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_invalid_legal_name'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_legal_name(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_invalid_legal_name(s)>0);
+EXPORT InValidMessageFT_invalid_legal_name(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_invalid_legal_name'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_mandatory(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_mandatory(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_mandatory(SALT37.StrType s) := WHICH(~(LENGTH(TRIM(s)) >= 1));
-EXPORT InValidMessageFT_invalid_mandatory(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotLength('1..'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_mandatory(SALT311.StrType s) := WHICH(~(LENGTH(TRIM(s)) >= 1));
+EXPORT InValidMessageFT_invalid_mandatory(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotLength('1..'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_zero_integer(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_zero_integer(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_zero_integer(SALT37.StrType s) := WHICH(((SALT37.StrType) s) NOT IN ['0','']);
-EXPORT InValidMessageFT_invalid_zero_integer(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('0|'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_zero_integer(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['0','']);
+EXPORT InValidMessageFT_invalid_zero_integer(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('0|'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_record_type(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_record_type(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_record_type(SALT37.StrType s) := WHICH(((SALT37.StrType) s) NOT IN ['C','H']);
-EXPORT InValidMessageFT_invalid_record_type(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('C|H'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_record_type(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['C','H']);
+EXPORT InValidMessageFT_invalid_record_type(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('C|H'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_numeric(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_numeric(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_numeric(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_numeric(s)>0);
-EXPORT InValidMessageFT_invalid_numeric(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_numeric'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_numeric(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_numeric(s)>0);
+EXPORT InValidMessageFT_invalid_numeric(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_numeric'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_numeric_or_blank(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_numeric_or_blank(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_numeric_or_blank(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_numeric_or_blank(s)>0);
-EXPORT InValidMessageFT_invalid_numeric_or_blank(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_numeric_or_blank'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_numeric_or_blank(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_numeric_or_blank(s)>0);
+EXPORT InValidMessageFT_invalid_numeric_or_blank(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_numeric_or_blank'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_percentage(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_county(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_percentage(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_range_numeric(s,0,100)>0);
-EXPORT InValidMessageFT_invalid_percentage(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_range_numeric'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_county(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_numeric(s,3)>0);
+EXPORT InValidMessageFT_invalid_county(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_numeric'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_direction(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_percentage(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_direction(SALT37.StrType s) := WHICH(((SALT37.StrType) s) NOT IN ['E','N','S','W','NE','NW','SE','SW','']);
-EXPORT InValidMessageFT_invalid_direction(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('E|N|S|W|NE|NW|SE|SW|'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_percentage(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_range_numeric(s,0,100)>0);
+EXPORT InValidMessageFT_invalid_percentage(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_range_numeric'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_cart(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_direction(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_cart(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_alphanum(s,4)>0);
-EXPORT InValidMessageFT_invalid_cart(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_alphanum'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_direction(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['E','N','S','W','NE','NW','SE','SW','']);
+EXPORT InValidMessageFT_invalid_direction(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('E|N|S|W|NE|NW|SE|SW|'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_cr_sort_sz(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_cart(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_cr_sort_sz(SALT37.StrType s) := WHICH(((SALT37.StrType) s) NOT IN ['A','B','C','D','']);
-EXPORT InValidMessageFT_invalid_cr_sort_sz(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('A|B|C|D|'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_cart(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_alphanum(s,4)>0);
+EXPORT InValidMessageFT_invalid_cart(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_alphanum'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_lot(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_cr_sort_sz(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_lot(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_numeric(s,4)>0);
-EXPORT InValidMessageFT_invalid_lot(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_numeric'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_cr_sort_sz(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['A','B','C','D','']);
+EXPORT InValidMessageFT_invalid_cr_sort_sz(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('A|B|C|D|'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_lot_order(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_lot(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_lot_order(SALT37.StrType s) := WHICH(((SALT37.StrType) s) NOT IN ['A','D','']);
-EXPORT InValidMessageFT_invalid_lot_order(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('A|D|'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_lot(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_numeric(s,4)>0);
+EXPORT InValidMessageFT_invalid_lot(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_numeric'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_dbpc(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_lot_order(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_dbpc(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_numeric(s,2)>0);
-EXPORT InValidMessageFT_invalid_dbpc(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_numeric'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_lot_order(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['A','D','']);
+EXPORT InValidMessageFT_invalid_lot_order(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('A|D|'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_chk_digit(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_dbpc(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_chk_digit(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_numeric(s,1)>0);
-EXPORT InValidMessageFT_invalid_chk_digit(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_numeric'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_dbpc(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_numeric(s,2)>0);
+EXPORT InValidMessageFT_invalid_dbpc(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_numeric'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_rec_type(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_chk_digit(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_rec_type(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_addr_rec_type(s)>0);
-EXPORT InValidMessageFT_invalid_rec_type(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_addr_rec_type'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_chk_digit(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_numeric(s,1)>0);
+EXPORT InValidMessageFT_invalid_chk_digit(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_numeric'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_fips_state(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_rec_type(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_fips_state(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_numeric(s,2)>0);
-EXPORT InValidMessageFT_invalid_fips_state(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_numeric'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_rec_type(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_addr_rec_type(s)>0);
+EXPORT InValidMessageFT_invalid_rec_type(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_addr_rec_type'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_fips_county(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_fips_state(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_fips_county(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_numeric(s,3)>0);
-EXPORT InValidMessageFT_invalid_fips_county(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_numeric'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_fips_state(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_numeric(s,2)>0);
+EXPORT InValidMessageFT_invalid_fips_state(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_numeric'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_geo(SALT37.StrType s0) := FUNCTION
-  s1 := SALT37.stringfilter(s0,'-.0123456789'); // Only allow valid symbols
+EXPORT MakeFT_invalid_fips_county(SALT311.StrType s0) := FUNCTION
+  RETURN  s0;
+END;
+EXPORT InValidFT_invalid_fips_county(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_numeric(s,3)>0);
+EXPORT InValidMessageFT_invalid_fips_county(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_numeric'),SALT311.HygieneErrors.Good);
+ 
+EXPORT MakeFT_invalid_geo(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,'-.0123456789'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_geo(SALT37.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT37.StringFilter(s,'-.0123456789'))));
-EXPORT InValidMessageFT_invalid_geo(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInChars('-.0123456789'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_geo(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,'-.0123456789'))));
+EXPORT InValidMessageFT_invalid_geo(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars('-.0123456789'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_msa(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_msa(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_msa(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_numeric(s,4)>0);
-EXPORT InValidMessageFT_invalid_msa(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_numeric'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_msa(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_numeric(s,4)>0);
+EXPORT InValidMessageFT_invalid_msa(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_numeric'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_geo_blk(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_geo_blk(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_geo_blk(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_numeric(s,7)>0);
-EXPORT InValidMessageFT_invalid_geo_blk(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_numeric'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_geo_blk(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_numeric(s,7)>0);
+EXPORT InValidMessageFT_invalid_geo_blk(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_numeric'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_geo_match(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_geo_match(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_geo_match(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_numeric(s,1)>0);
-EXPORT InValidMessageFT_invalid_geo_match(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_numeric'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_geo_match(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_numeric(s,1)>0);
+EXPORT InValidMessageFT_invalid_geo_match(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_numeric'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_err_stat(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_err_stat(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_err_stat(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_alphanum(s,4)>0);
-EXPORT InValidMessageFT_invalid_err_stat(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_alphanum'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_err_stat(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_alphanum(s,4)>0);
+EXPORT InValidMessageFT_invalid_err_stat(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_alphanum'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_raw_aid(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_raw_aid(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_raw_aid(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_range_numeric(s,10000000000,999999999999)>0);
-EXPORT InValidMessageFT_invalid_raw_aid(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_range_numeric'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_raw_aid(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_range_numeric(s,10000000000,999999999999)>0);
+EXPORT InValidMessageFT_invalid_raw_aid(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_range_numeric'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_ace_aid(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_ace_aid(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_ace_aid(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_numeric(s,12)>0);
-EXPORT InValidMessageFT_invalid_ace_aid(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_numeric'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_ace_aid(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_numeric(s,12)>0);
+EXPORT InValidMessageFT_invalid_ace_aid(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_numeric'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_st(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_st(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_st(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_state(s)>0);
-EXPORT InValidMessageFT_invalid_st(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_state'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_st(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_state(s)>0);
+EXPORT InValidMessageFT_invalid_st(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_state'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_zip5(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_zip5(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_zip5(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_zip5(s)>0);
-EXPORT InValidMessageFT_invalid_zip5(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_zip5'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_zip5(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_zip5(s)>0);
+EXPORT InValidMessageFT_invalid_zip5(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_zip5'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_zip4(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_zip4(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_zip4(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_numeric_or_blank(s,4)>0);
-EXPORT InValidMessageFT_invalid_zip4(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_numeric_or_blank'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_zip4(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_numeric_or_blank(s,4)>0);
+EXPORT InValidMessageFT_invalid_zip4(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_numeric_or_blank'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_phone(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_phone(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_phone(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_optional_phone(s)>0);
-EXPORT InValidMessageFT_invalid_phone(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_optional_phone'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_phone(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_optional_phone(s)>0);
+EXPORT InValidMessageFT_invalid_phone(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_optional_phone'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_rcid(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_rcid(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_rcid(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_rcid(s)>0);
-EXPORT InValidMessageFT_invalid_rcid(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_rcid'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_rcid(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_rcid(s)>0);
+EXPORT InValidMessageFT_invalid_rcid(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_rcid'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_sic(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_sic(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_sic(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_sic(s)>0);
-EXPORT InValidMessageFT_invalid_sic(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_sic'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_sic(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_sic(s)>0);
+EXPORT InValidMessageFT_invalid_sic(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_sic'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_naics(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_naics(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_naics(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_naics(s)>0);
-EXPORT InValidMessageFT_invalid_naics(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_naics'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_naics(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_naics(s)>0);
+EXPORT InValidMessageFT_invalid_naics(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_naics'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_url(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_url(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_url(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_url(s)>0);
-EXPORT InValidMessageFT_invalid_url(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_url'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_url(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_url(s)>0);
+EXPORT InValidMessageFT_invalid_url(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_url'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_address_type_code(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_address_type_code(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_address_type_code(SALT37.StrType s) := WHICH(((SALT37.StrType) s) NOT IN ['P','M']);
-EXPORT InValidMessageFT_invalid_address_type_code(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('P|M'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_address_type_code(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['P','M']);
+EXPORT InValidMessageFT_invalid_address_type_code(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('P|M'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_norm_type(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_norm_type(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_norm_type(SALT37.StrType s) := WHICH(((SALT37.StrType) s) NOT IN ['D','L']);
-EXPORT InValidMessageFT_invalid_norm_type(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('D|L'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_norm_type(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['D','L']);
+EXPORT InValidMessageFT_invalid_norm_type(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('D|L'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_email(SALT37.StrType s0) := FUNCTION
-  s1 := SALT37.stringfilter(s0,' 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ\\\'-!#$%&*,./:;?@_{}~+=()^`><'); // Only allow valid symbols
+EXPORT MakeFT_invalid_email(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,' 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ\\\'-!#$%&*,./:;?@_{}~+=()^`><'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_email(SALT37.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT37.StringFilter(s,' 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ\\\'-!#$%&*,./:;?@_{}~+=()^`><'))));
-EXPORT InValidMessageFT_invalid_email(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInChars(' 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ\\\'-!#$%&*,./:;?@_{}~+=()^`><'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_email(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,' 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ\\\'-!#$%&*,./:;?@_{}~+=()^`><'))));
+EXPORT InValidMessageFT_invalid_email(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars(' 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ\\\'-!#$%&*,./:;?@_{}~+=()^`><'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_yes_blank(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_alpha(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_yes_blank(SALT37.StrType s) := WHICH(((SALT37.StrType) s) NOT IN ['Y',' ']);
-EXPORT InValidMessageFT_invalid_yes_blank(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('Y| '),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_alpha(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_alpha(s,4)>0);
+EXPORT InValidMessageFT_invalid_alpha(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_alpha'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_business_size(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_yes_blank(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_business_size(SALT37.StrType s) := WHICH(((SALT37.StrType) s) NOT IN ['L','S','X']);
-EXPORT InValidMessageFT_invalid_business_size(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('L|S|X'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_yes_blank(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['Y',' ']);
+EXPORT InValidMessageFT_invalid_yes_blank(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('Y| '),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_cert_or_class(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_business_size(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_cert_or_class(SALT37.StrType s) := WHICH(((SALT37.StrType) s) NOT IN ['CERTIFIED','CLASSIFIED','CLASSIFICATION','CERTIFICATION','SELF-CLASSIFIED/NON VERIFIED','OTHER CLASSIFICATIONS','UNKNOWN',' ']);
-EXPORT InValidMessageFT_invalid_cert_or_class(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.NotInEnum('CERTIFIED|CLASSIFIED|CLASSIFICATION|CERTIFICATION|SELF-CLASSIFIED/NON VERIFIED|OTHER CLASSIFICATIONS|UNKNOWN| '),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_business_size(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['L','S','X']);
+EXPORT InValidMessageFT_invalid_business_size(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('L|S|X'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_current_future_date(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_cert_or_class(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_current_future_date(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_current_future_date(s)>0);
-EXPORT InValidMessageFT_invalid_current_future_date(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_current_future_date'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_cert_or_class(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['CERTIFIED','CLASSIFIED','CLASSIFICATION','CERTIFICATION','SELF-CLASSIFIED/NON VERIFIED','OTHER CLASSIFICATIONS','UNKNOWN',' ']);
+EXPORT InValidMessageFT_invalid_cert_or_class(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('CERTIFIED|CLASSIFIED|CLASSIFICATION|CERTIFICATION|SELF-CLASSIFIED/NON VERIFIED|OTHER CLASSIFICATIONS|UNKNOWN| '),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_current_past_date(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_current_future_date(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_current_past_date(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_current_past_date(s)>0);
-EXPORT InValidMessageFT_invalid_current_past_date(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_current_past_date'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_current_future_date(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_current_future_date(s)>0);
+EXPORT InValidMessageFT_invalid_current_future_date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_current_future_date'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_future_date(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_current_past_date(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_future_date(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_future_date(s)>0);
-EXPORT InValidMessageFT_invalid_future_date(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_future_date'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_current_past_date(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_current_past_date(s)>0);
+EXPORT InValidMessageFT_invalid_current_past_date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_current_past_date'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_general_date(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_future_date(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_general_date(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_valid_generalDate(s)>0);
-EXPORT InValidMessageFT_invalid_general_date(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_valid_generalDate'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_future_date(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_future_date(s)>0);
+EXPORT InValidMessageFT_invalid_future_date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_future_date'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_past_date(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_general_date(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_past_date(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_valid_past_Date(s)>0);
-EXPORT InValidMessageFT_invalid_past_date(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_valid_past_Date'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_general_date(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_valid_generalDate(s)>0);
+EXPORT InValidMessageFT_invalid_general_date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_valid_generalDate'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_year_established(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_past_date(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_year_established(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_valid_year_established(s)>0);
-EXPORT InValidMessageFT_invalid_year_established(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_valid_year_established'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_past_date(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_valid_past_Date(s)>0);
+EXPORT InValidMessageFT_invalid_past_date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_valid_past_Date'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_date_created(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_year_established(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_date_created(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_valid_date_created(s)>0);
-EXPORT InValidMessageFT_invalid_date_created(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_valid_date_created'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_year_established(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_valid_year_established(s)>0);
+EXPORT InValidMessageFT_invalid_year_established(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_valid_year_established'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_date_seen(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_date_created(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_date_seen(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_current_past_date(s)>0);
-EXPORT InValidMessageFT_invalid_date_seen(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_current_past_date'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_date_created(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_valid_date_created(s)>0);
+EXPORT InValidMessageFT_invalid_date_created(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_valid_date_created'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_reformated_date(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_date_seen(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_reformated_date(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_valid_reformatedDate(s)>0);
-EXPORT InValidMessageFT_invalid_reformated_date(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_valid_reformatedDate'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_date_seen(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_current_past_date(s)>0);
+EXPORT InValidMessageFT_invalid_date_seen(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_current_past_date'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_vendor_reported_date(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_reformated_date(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_vendor_reported_date(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_current_past_date(s)>0);
-EXPORT InValidMessageFT_invalid_vendor_reported_date(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_current_past_date'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_reformated_date(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_valid_reformatedDate(s)>0);
+EXPORT InValidMessageFT_invalid_reformated_date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_valid_reformatedDate'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_process_date(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_vendor_reported_date(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_process_date(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_current_past_date(s)>0);
-EXPORT InValidMessageFT_invalid_process_date(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_current_past_date'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_vendor_reported_date(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_current_past_date(s)>0);
+EXPORT InValidMessageFT_invalid_vendor_reported_date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_current_past_date'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_busstatcd(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_process_date(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_busstatcd(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_busstatcd(s)>0);
-EXPORT InValidMessageFT_invalid_busstatcd(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_busstatcd'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_process_date(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_current_past_date(s)>0);
+EXPORT InValidMessageFT_invalid_process_date(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_current_past_date'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_cmsa(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_busstatcd(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_cmsa(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_cmsa(s)>0);
-EXPORT InValidMessageFT_invalid_cmsa(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_cmsa'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_busstatcd(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_busstatcd(s)>0);
+EXPORT InValidMessageFT_invalid_busstatcd(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_busstatcd'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_corpamountcd(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_cmsa(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_corpamountcd(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_corpamountcd(s)>0);
-EXPORT InValidMessageFT_invalid_corpamountcd(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_corpamountcd'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_cmsa(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_cmsa(s)>0);
+EXPORT InValidMessageFT_invalid_cmsa(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_cmsa'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_corpamountprec(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_corpamountcd(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_corpamountprec(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_corpamountprec(s)>0);
-EXPORT InValidMessageFT_invalid_corpamountprec(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_corpamountprec'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_corpamountcd(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_corpamountcd(s)>0);
+EXPORT InValidMessageFT_invalid_corpamountcd(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_corpamountcd'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_corpamounttp(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_corpamountprec(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_corpamounttp(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_corpamounttp(s)>0);
-EXPORT InValidMessageFT_invalid_corpamounttp(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_corpamounttp'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_corpamountprec(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_corpamountprec(s)>0);
+EXPORT InValidMessageFT_invalid_corpamountprec(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_corpamountprec'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_corpempcd(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_corpamounttp(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_corpempcd(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_corpempcd(s)>0);
-EXPORT InValidMessageFT_invalid_corpempcd(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_corpempcd'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_corpamounttp(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_corpamounttp(s)>0);
+EXPORT InValidMessageFT_invalid_corpamounttp(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_corpamounttp'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_ctryisocd(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_corpempcd(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_ctryisocd(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_ctryisocd(s)>0);
-EXPORT InValidMessageFT_invalid_ctryisocd(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_ctryisocd'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_corpempcd(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_corpempcd(s)>0);
+EXPORT InValidMessageFT_invalid_corpempcd(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_corpempcd'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_ctrynum(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_ctryisocd(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_ctrynum(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_ctrynum(s)>0);
-EXPORT InValidMessageFT_invalid_ctrynum(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_ctrynum'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_ctryisocd(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_ctryisocd(s)>0);
+EXPORT InValidMessageFT_invalid_ctryisocd(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_ctryisocd'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_ctrytelcd(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_ctrynum(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_ctrytelcd(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_ctrytelcd(s)>0);
-EXPORT InValidMessageFT_invalid_ctrytelcd(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_ctrytelcd'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_ctrynum(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_ctrynum(s)>0);
+EXPORT InValidMessageFT_invalid_ctrynum(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_ctrynum'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_geoprec(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_ctrytelcd(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_geoprec(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_geoprec(s)>0);
-EXPORT InValidMessageFT_invalid_geoprec(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_geoprec'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_ctrytelcd(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_ctrytelcd(s)>0);
+EXPORT InValidMessageFT_invalid_ctrytelcd(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_ctrytelcd'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_merctype(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_geoprec(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_merctype(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_merctype(s)>0);
-EXPORT InValidMessageFT_invalid_merctype(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_merctype'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_geoprec(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_geoprec(s)>0);
+EXPORT InValidMessageFT_invalid_geoprec(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_geoprec'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_mrkt_telescore(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_merctype(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_mrkt_telescore(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_mrkt_telescore(s)>0);
-EXPORT InValidMessageFT_invalid_mrkt_telescore(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_mrkt_telescore'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_merctype(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_merctype(s)>0);
+EXPORT InValidMessageFT_invalid_merctype(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_merctype'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_mrkt_totalind(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_mrkt_telescore(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_mrkt_totalind(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_mrkt_totalind(s)>0);
-EXPORT InValidMessageFT_invalid_mrkt_totalind(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_mrkt_totalind'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_mrkt_telescore(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_mrkt_telescore(s)>0);
+EXPORT InValidMessageFT_invalid_mrkt_telescore(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_mrkt_telescore'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_mrkt_totalscore(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_mrkt_totalind(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_mrkt_totalscore(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_mrkt_totalscore(s)>0);
-EXPORT InValidMessageFT_invalid_mrkt_totalscore(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_mrkt_totalscore'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_mrkt_totalind(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_mrkt_totalind(s)>0);
+EXPORT InValidMessageFT_invalid_mrkt_totalind(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_mrkt_totalind'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_public(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_mrkt_totalscore(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_public(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_public(s)>0);
-EXPORT InValidMessageFT_invalid_public(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_public'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_mrkt_totalscore(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_mrkt_totalscore(s)>0);
+EXPORT InValidMessageFT_invalid_mrkt_totalscore(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_mrkt_totalscore'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_statec(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_public(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_statec(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_statec(s)>0);
-EXPORT InValidMessageFT_invalid_statec(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_statec'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_public(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_public(s)>0);
+EXPORT InValidMessageFT_invalid_public(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_public'),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid_stkexc(SALT37.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid_statec(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_stkexc(SALT37.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_stkexc(s)>0);
-EXPORT InValidMessageFT_invalid_stkexc(UNSIGNED1 wh) := CHOOSE(wh,SALT37.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_stkexc'),SALT37.HygieneErrors.Good);
+EXPORT InValidFT_invalid_statec(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_statec(s)>0);
+EXPORT InValidMessageFT_invalid_statec(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_statec'),SALT311.HygieneErrors.Good);
  
-EXPORT SALT37.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'dt_first_seen','dt_last_seen','dt_vendor_first_reported','dt_vendor_last_reported','process_date','record_type','normcompany_type','normaddress_type','norm_state','norm_zip','norm_zip4','EFX_NAME','EFX_LEGAL_NAME','EFX_ADDRESS','EFX_BUSSTATCD','EFX_CMSA','EFX_CORPAMOUNTCD','EFX_CORPAMOUNTPREC','EFX_CORPAMOUNTTP','EFX_CORPEMPCD','EFX_WEB','EFX_CTRYISOCD','EFX_CTRYNUM','EFX_CTRYTELCD','EFX_GEOPREC','EFX_MERCTYPE','EFX_MRKT_TELESCORE','EFX_MRKT_TOTALIND','EFX_MRKT_TOTALSCORE','EFX_PUBLIC','EFX_STKEXC','EFX_PRIMSIC','EFX_SECSIC1','EFX_SECSIC2','EFX_SECSIC3','EFX_SECSIC4','EFX_ID','EFX_CITY','EFX_REGION','EFX_CTRYNAME','EFX_COUNTYNM','EFX_CMSADESC','EFX_SOHO','EFX_BIZ','EFX_RES','EFX_CMRA','EFX_SECADR','EFX_SECCTY','EFX_SECGEOPREC','EFX_SECREGION','EFX_SECCTRYISOCD','EFX_SECCTRYNUM','EFX_SECCTRYNAME','EFX_PHONE','EFX_FAXPHONE','EFX_BUSSTAT','EFX_YREST','EFX_CORPEMPCNT','EFX_LOCEMPCNT','EFX_LOCEMPCD','EFX_CORPAMOUNT','EFX_LOCAMOUNT','EFX_LOCAMOUNTCD','EFX_LOCAMOUNTTP','EFX_LOCAMOUNTPREC','EFX_TCKSYM','EFX_PRIMSICDESC','EFX_SECSICDESC1','EFX_SECSICDESC2','EFX_SECSICDESC3','EFX_SECSICDESC4','EFX_PRIMNAICSCODE','EFX_SECNAICS1','EFX_SECNAICS2','EFX_SECNAICS3','EFX_SECNAICS4','EFX_PRIMNAICSDESC','EFX_SECNAICSDESC1','EFX_SECNAICSDESC2','EFX_SECNAICSDESC3','EFX_SECNAICSDESC4','EFX_DEAD','EFX_DEADDT','EFX_MRKT_TELEVER','EFX_MRKT_VACANT','EFX_MRKT_SEASONAL','EFX_MBE','EFX_WBE','EFX_MWBE','EFX_SDB','EFX_HUBZONE','EFX_DBE','EFX_VET','EFX_DVET','EFX_8a','EFX_8aEXPDT','EFX_DIS','EFX_SBE','EFX_BUSSIZE','EFX_LBE','EFX_GOV','EFX_FGOV','EFX_NONPROFIT','EFX_HBCU','EFX_GAYLESBIAN','EFX_WSBE','EFX_VSBE','EFX_DVSBE','EFX_MWBESTATUS','EFX_NMSDC','EFX_WBENC','EFX_CA_PUC','EFX_TX_HUB','EFX_TX_HUBCERTNUM','EFX_GSAX','EFX_CALTRANS','EFX_EDU','EFX_MI','EFX_ANC','AT_CERT1','AT_CERT2','AT_CERT3','AT_CERT4','AT_CERT5','AT_CERT6','AT_CERT7','AT_CERT8','AT_CERT9','AT_CERT10','AT_CERTDESC1','AT_CERTDESC2','AT_CERTDESC3','AT_CERTDESC4','AT_CERTDESC5','AT_CERTDESC6','AT_CERTDESC7','AT_CERTDESC8','AT_CERTDESC9','AT_CERTDESC10','AT_CERTSRC1','AT_CERTSRC2','AT_CERTSRC3','AT_CERTSRC4','AT_CERTSRC5','AT_CERTSRC6','AT_CERTSRC7','AT_CERTSRC8','AT_CERTSRC9','AT_CERTSRC10','AT_CERTLEV1','AT_CERTLEV2','AT_CERTLEV3','AT_CERTLEV4','AT_CERTLEV5','AT_CERTLEV6','AT_CERTLEV7','AT_CERTLEV8','AT_CERTLEV9','AT_CERTLEV10','AT_CERTNUM1','AT_CERTNUM2','AT_CERTNUM3','AT_CERTNUM4','AT_CERTNUM5','AT_CERTNUM6','AT_CERTNUM7','AT_CERTNUM8','AT_CERTNUM9','AT_CERTNUM10','AT_CERTEXP1','AT_CERTEXP2','AT_CERTEXP3','AT_CERTEXP4','AT_CERTEXP5','AT_CERTEXP6','AT_CERTEXP7','AT_CERTEXP8','AT_CERTEXP9','AT_CERTEXP10','EFX_EXTRACT_DATE','EFX_MERCHANT_ID','EFX_PROJECT_ID','EFX_FOREIGN','Record_Update_Refresh_Date','EFX_DATE_CREATED');
-EXPORT FieldNum(SALT37.StrType fn) := CASE(fn,'dt_first_seen' => 0,'dt_last_seen' => 1,'dt_vendor_first_reported' => 2,'dt_vendor_last_reported' => 3,'process_date' => 4,'record_type' => 5,'normcompany_type' => 6,'normaddress_type' => 7,'norm_state' => 8,'norm_zip' => 9,'norm_zip4' => 10,'EFX_NAME' => 11,'EFX_LEGAL_NAME' => 12,'EFX_ADDRESS' => 13,'EFX_BUSSTATCD' => 14,'EFX_CMSA' => 15,'EFX_CORPAMOUNTCD' => 16,'EFX_CORPAMOUNTPREC' => 17,'EFX_CORPAMOUNTTP' => 18,'EFX_CORPEMPCD' => 19,'EFX_WEB' => 20,'EFX_CTRYISOCD' => 21,'EFX_CTRYNUM' => 22,'EFX_CTRYTELCD' => 23,'EFX_GEOPREC' => 24,'EFX_MERCTYPE' => 25,'EFX_MRKT_TELESCORE' => 26,'EFX_MRKT_TOTALIND' => 27,'EFX_MRKT_TOTALSCORE' => 28,'EFX_PUBLIC' => 29,'EFX_STKEXC' => 30,'EFX_PRIMSIC' => 31,'EFX_SECSIC1' => 32,'EFX_SECSIC2' => 33,'EFX_SECSIC3' => 34,'EFX_SECSIC4' => 35,'EFX_ID' => 36,'EFX_CITY' => 37,'EFX_REGION' => 38,'EFX_CTRYNAME' => 39,'EFX_COUNTYNM' => 40,'EFX_CMSADESC' => 41,'EFX_SOHO' => 42,'EFX_BIZ' => 43,'EFX_RES' => 44,'EFX_CMRA' => 45,'EFX_SECADR' => 46,'EFX_SECCTY' => 47,'EFX_SECGEOPREC' => 48,'EFX_SECREGION' => 49,'EFX_SECCTRYISOCD' => 50,'EFX_SECCTRYNUM' => 51,'EFX_SECCTRYNAME' => 52,'EFX_PHONE' => 53,'EFX_FAXPHONE' => 54,'EFX_BUSSTAT' => 55,'EFX_YREST' => 56,'EFX_CORPEMPCNT' => 57,'EFX_LOCEMPCNT' => 58,'EFX_LOCEMPCD' => 59,'EFX_CORPAMOUNT' => 60,'EFX_LOCAMOUNT' => 61,'EFX_LOCAMOUNTCD' => 62,'EFX_LOCAMOUNTTP' => 63,'EFX_LOCAMOUNTPREC' => 64,'EFX_TCKSYM' => 65,'EFX_PRIMSICDESC' => 66,'EFX_SECSICDESC1' => 67,'EFX_SECSICDESC2' => 68,'EFX_SECSICDESC3' => 69,'EFX_SECSICDESC4' => 70,'EFX_PRIMNAICSCODE' => 71,'EFX_SECNAICS1' => 72,'EFX_SECNAICS2' => 73,'EFX_SECNAICS3' => 74,'EFX_SECNAICS4' => 75,'EFX_PRIMNAICSDESC' => 76,'EFX_SECNAICSDESC1' => 77,'EFX_SECNAICSDESC2' => 78,'EFX_SECNAICSDESC3' => 79,'EFX_SECNAICSDESC4' => 80,'EFX_DEAD' => 81,'EFX_DEADDT' => 82,'EFX_MRKT_TELEVER' => 83,'EFX_MRKT_VACANT' => 84,'EFX_MRKT_SEASONAL' => 85,'EFX_MBE' => 86,'EFX_WBE' => 87,'EFX_MWBE' => 88,'EFX_SDB' => 89,'EFX_HUBZONE' => 90,'EFX_DBE' => 91,'EFX_VET' => 92,'EFX_DVET' => 93,'EFX_8a' => 94,'EFX_8aEXPDT' => 95,'EFX_DIS' => 96,'EFX_SBE' => 97,'EFX_BUSSIZE' => 98,'EFX_LBE' => 99,'EFX_GOV' => 100,'EFX_FGOV' => 101,'EFX_NONPROFIT' => 102,'EFX_HBCU' => 103,'EFX_GAYLESBIAN' => 104,'EFX_WSBE' => 105,'EFX_VSBE' => 106,'EFX_DVSBE' => 107,'EFX_MWBESTATUS' => 108,'EFX_NMSDC' => 109,'EFX_WBENC' => 110,'EFX_CA_PUC' => 111,'EFX_TX_HUB' => 112,'EFX_TX_HUBCERTNUM' => 113,'EFX_GSAX' => 114,'EFX_CALTRANS' => 115,'EFX_EDU' => 116,'EFX_MI' => 117,'EFX_ANC' => 118,'AT_CERT1' => 119,'AT_CERT2' => 120,'AT_CERT3' => 121,'AT_CERT4' => 122,'AT_CERT5' => 123,'AT_CERT6' => 124,'AT_CERT7' => 125,'AT_CERT8' => 126,'AT_CERT9' => 127,'AT_CERT10' => 128,'AT_CERTDESC1' => 129,'AT_CERTDESC2' => 130,'AT_CERTDESC3' => 131,'AT_CERTDESC4' => 132,'AT_CERTDESC5' => 133,'AT_CERTDESC6' => 134,'AT_CERTDESC7' => 135,'AT_CERTDESC8' => 136,'AT_CERTDESC9' => 137,'AT_CERTDESC10' => 138,'AT_CERTSRC1' => 139,'AT_CERTSRC2' => 140,'AT_CERTSRC3' => 141,'AT_CERTSRC4' => 142,'AT_CERTSRC5' => 143,'AT_CERTSRC6' => 144,'AT_CERTSRC7' => 145,'AT_CERTSRC8' => 146,'AT_CERTSRC9' => 147,'AT_CERTSRC10' => 148,'AT_CERTLEV1' => 149,'AT_CERTLEV2' => 150,'AT_CERTLEV3' => 151,'AT_CERTLEV4' => 152,'AT_CERTLEV5' => 153,'AT_CERTLEV6' => 154,'AT_CERTLEV7' => 155,'AT_CERTLEV8' => 156,'AT_CERTLEV9' => 157,'AT_CERTLEV10' => 158,'AT_CERTNUM1' => 159,'AT_CERTNUM2' => 160,'AT_CERTNUM3' => 161,'AT_CERTNUM4' => 162,'AT_CERTNUM5' => 163,'AT_CERTNUM6' => 164,'AT_CERTNUM7' => 165,'AT_CERTNUM8' => 166,'AT_CERTNUM9' => 167,'AT_CERTNUM10' => 168,'AT_CERTEXP1' => 169,'AT_CERTEXP2' => 170,'AT_CERTEXP3' => 171,'AT_CERTEXP4' => 172,'AT_CERTEXP5' => 173,'AT_CERTEXP6' => 174,'AT_CERTEXP7' => 175,'AT_CERTEXP8' => 176,'AT_CERTEXP9' => 177,'AT_CERTEXP10' => 178,'EFX_EXTRACT_DATE' => 179,'EFX_MERCHANT_ID' => 180,'EFX_PROJECT_ID' => 181,'EFX_FOREIGN' => 182,'Record_Update_Refresh_Date' => 183,'EFX_DATE_CREATED' => 184,0);
+EXPORT MakeFT_invalid_stkexc(SALT311.StrType s0) := FUNCTION
+  RETURN  s0;
+END;
+EXPORT InValidFT_invalid_stkexc(SALT311.StrType s) := WHICH(~Scrubs_Equifax_Business_Data.Functions.fn_verify_stkexc(s)>0);
+EXPORT InValidMessageFT_invalid_stkexc(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Equifax_Business_Data.Functions.fn_verify_stkexc'),SALT311.HygieneErrors.Good);
+ 
+EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'dt_first_seen','dt_last_seen','dt_vendor_first_reported','dt_vendor_last_reported','process_date','record_type','normcompany_type','normaddress_type','norm_state','norm_zip','norm_zip4','EFX_NAME','EFX_LEGAL_NAME','EFX_ADDRESS','EFX_BUSSTATCD','EFX_CMSA','EFX_CORPAMOUNTCD','EFX_CORPAMOUNTPREC','EFX_CORPAMOUNTTP','EFX_CORPEMPCD','EFX_WEB','EFX_CTRYISOCD','EFX_CTRYNUM','EFX_CTRYTELCD','EFX_GEOPREC','EFX_MERCTYPE','EFX_MRKT_TELESCORE','EFX_MRKT_TOTALIND','EFX_MRKT_TOTALSCORE','EFX_PUBLIC','EFX_STKEXC','EFX_PRIMSIC','EFX_SECSIC1','EFX_SECSIC2','EFX_SECSIC3','EFX_SECSIC4','EFX_ID','EFX_CITY','EFX_REGION','EFX_CTRYNAME','EFX_COUNTYNM','EFX_COUNTY','EFX_CMSADESC','EFX_SOHO','EFX_BIZ','EFX_RES','EFX_CMRA','EFX_SECADR','EFX_SECCTY','EFX_SECGEOPREC','EFX_SECREGION','EFX_SECCTRYISOCD','EFX_SECCTRYNUM','EFX_SECCTRYNAME','EFX_PHONE','EFX_FAXPHONE','EFX_BUSSTAT','EFX_YREST','EFX_CORPEMPCNT','EFX_LOCEMPCNT','EFX_LOCEMPCD','EFX_CORPAMOUNT','EFX_LOCAMOUNT','EFX_LOCAMOUNTCD','EFX_LOCAMOUNTTP','EFX_LOCAMOUNTPREC','EFX_TCKSYM','EFX_PRIMSICDESC','EFX_SECSICDESC1','EFX_SECSICDESC2','EFX_SECSICDESC3','EFX_SECSICDESC4','EFX_PRIMNAICSCODE','EFX_SECNAICS1','EFX_SECNAICS2','EFX_SECNAICS3','EFX_SECNAICS4','EFX_PRIMNAICSDESC','EFX_SECNAICSDESC1','EFX_SECNAICSDESC2','EFX_SECNAICSDESC3','EFX_SECNAICSDESC4','EFX_DEAD','EFX_DEADDT','EFX_MRKT_TELEVER','EFX_MRKT_VACANT','EFX_MRKT_SEASONAL','EFX_MBE','EFX_WBE','EFX_MWBE','EFX_SDB','EFX_HUBZONE','EFX_DBE','EFX_VET','EFX_DVET','EFX_8a','EFX_8aEXPDT','EFX_DIS','EFX_SBE','EFX_BUSSIZE','EFX_LBE','EFX_GOV','EFX_FGOV','EFX_NONPROFIT','EFX_HBCU','EFX_GAYLESBIAN','EFX_WSBE','EFX_VSBE','EFX_DVSBE','EFX_MWBESTATUS','EFX_NMSDC','EFX_WBENC','EFX_CA_PUC','EFX_TX_HUB','EFX_TX_HUBCERTNUM','EFX_GSAX','EFX_CALTRANS','EFX_EDU','EFX_MI','EFX_ANC','AT_CERT1','AT_CERT2','AT_CERT3','AT_CERT4','AT_CERT5','AT_CERT6','AT_CERT7','AT_CERT8','AT_CERT9','AT_CERT10','AT_CERTDESC1','AT_CERTDESC2','AT_CERTDESC3','AT_CERTDESC4','AT_CERTDESC5','AT_CERTDESC6','AT_CERTDESC7','AT_CERTDESC8','AT_CERTDESC9','AT_CERTDESC10','AT_CERTSRC1','AT_CERTSRC2','AT_CERTSRC3','AT_CERTSRC4','AT_CERTSRC5','AT_CERTSRC6','AT_CERTSRC7','AT_CERTSRC8','AT_CERTSRC9','AT_CERTSRC10','AT_CERTLEV1','AT_CERTLEV2','AT_CERTLEV3','AT_CERTLEV4','AT_CERTLEV5','AT_CERTLEV6','AT_CERTLEV7','AT_CERTLEV8','AT_CERTLEV9','AT_CERTLEV10','AT_CERTNUM1','AT_CERTNUM2','AT_CERTNUM3','AT_CERTNUM4','AT_CERTNUM5','AT_CERTNUM6','AT_CERTNUM7','AT_CERTNUM8','AT_CERTNUM9','AT_CERTNUM10','AT_CERTEXP1','AT_CERTEXP2','AT_CERTEXP3','AT_CERTEXP4','AT_CERTEXP5','AT_CERTEXP6','AT_CERTEXP7','AT_CERTEXP8','AT_CERTEXP9','AT_CERTEXP10','EFX_EXTRACT_DATE','EFX_MERCHANT_ID','EFX_PROJECT_ID','EFX_FOREIGN','Record_Update_Refresh_Date','EFX_DATE_CREATED');
+EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'dt_first_seen','dt_last_seen','dt_vendor_first_reported','dt_vendor_last_reported','process_date','record_type','normcompany_type','normaddress_type','norm_state','norm_zip','norm_zip4','EFX_NAME','EFX_LEGAL_NAME','EFX_ADDRESS','EFX_BUSSTATCD','EFX_CMSA','EFX_CORPAMOUNTCD','EFX_CORPAMOUNTPREC','EFX_CORPAMOUNTTP','EFX_CORPEMPCD','EFX_WEB','EFX_CTRYISOCD','EFX_CTRYNUM','EFX_CTRYTELCD','EFX_GEOPREC','EFX_MERCTYPE','EFX_MRKT_TELESCORE','EFX_MRKT_TOTALIND','EFX_MRKT_TOTALSCORE','EFX_PUBLIC','EFX_STKEXC','EFX_PRIMSIC','EFX_SECSIC1','EFX_SECSIC2','EFX_SECSIC3','EFX_SECSIC4','EFX_ID','EFX_CITY','EFX_REGION','EFX_CTRYNAME','EFX_COUNTYNM','EFX_COUNTY','EFX_CMSADESC','EFX_SOHO','EFX_BIZ','EFX_RES','EFX_CMRA','EFX_SECADR','EFX_SECCTY','EFX_SECGEOPREC','EFX_SECREGION','EFX_SECCTRYISOCD','EFX_SECCTRYNUM','EFX_SECCTRYNAME','EFX_PHONE','EFX_FAXPHONE','EFX_BUSSTAT','EFX_YREST','EFX_CORPEMPCNT','EFX_LOCEMPCNT','EFX_LOCEMPCD','EFX_CORPAMOUNT','EFX_LOCAMOUNT','EFX_LOCAMOUNTCD','EFX_LOCAMOUNTTP','EFX_LOCAMOUNTPREC','EFX_TCKSYM','EFX_PRIMSICDESC','EFX_SECSICDESC1','EFX_SECSICDESC2','EFX_SECSICDESC3','EFX_SECSICDESC4','EFX_PRIMNAICSCODE','EFX_SECNAICS1','EFX_SECNAICS2','EFX_SECNAICS3','EFX_SECNAICS4','EFX_PRIMNAICSDESC','EFX_SECNAICSDESC1','EFX_SECNAICSDESC2','EFX_SECNAICSDESC3','EFX_SECNAICSDESC4','EFX_DEAD','EFX_DEADDT','EFX_MRKT_TELEVER','EFX_MRKT_VACANT','EFX_MRKT_SEASONAL','EFX_MBE','EFX_WBE','EFX_MWBE','EFX_SDB','EFX_HUBZONE','EFX_DBE','EFX_VET','EFX_DVET','EFX_8a','EFX_8aEXPDT','EFX_DIS','EFX_SBE','EFX_BUSSIZE','EFX_LBE','EFX_GOV','EFX_FGOV','EFX_NONPROFIT','EFX_HBCU','EFX_GAYLESBIAN','EFX_WSBE','EFX_VSBE','EFX_DVSBE','EFX_MWBESTATUS','EFX_NMSDC','EFX_WBENC','EFX_CA_PUC','EFX_TX_HUB','EFX_TX_HUBCERTNUM','EFX_GSAX','EFX_CALTRANS','EFX_EDU','EFX_MI','EFX_ANC','AT_CERT1','AT_CERT2','AT_CERT3','AT_CERT4','AT_CERT5','AT_CERT6','AT_CERT7','AT_CERT8','AT_CERT9','AT_CERT10','AT_CERTDESC1','AT_CERTDESC2','AT_CERTDESC3','AT_CERTDESC4','AT_CERTDESC5','AT_CERTDESC6','AT_CERTDESC7','AT_CERTDESC8','AT_CERTDESC9','AT_CERTDESC10','AT_CERTSRC1','AT_CERTSRC2','AT_CERTSRC3','AT_CERTSRC4','AT_CERTSRC5','AT_CERTSRC6','AT_CERTSRC7','AT_CERTSRC8','AT_CERTSRC9','AT_CERTSRC10','AT_CERTLEV1','AT_CERTLEV2','AT_CERTLEV3','AT_CERTLEV4','AT_CERTLEV5','AT_CERTLEV6','AT_CERTLEV7','AT_CERTLEV8','AT_CERTLEV9','AT_CERTLEV10','AT_CERTNUM1','AT_CERTNUM2','AT_CERTNUM3','AT_CERTNUM4','AT_CERTNUM5','AT_CERTNUM6','AT_CERTNUM7','AT_CERTNUM8','AT_CERTNUM9','AT_CERTNUM10','AT_CERTEXP1','AT_CERTEXP2','AT_CERTEXP3','AT_CERTEXP4','AT_CERTEXP5','AT_CERTEXP6','AT_CERTEXP7','AT_CERTEXP8','AT_CERTEXP9','AT_CERTEXP10','EFX_EXTRACT_DATE','EFX_MERCHANT_ID','EFX_PROJECT_ID','EFX_FOREIGN','Record_Update_Refresh_Date','EFX_DATE_CREATED');
+EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'dt_first_seen' => 0,'dt_last_seen' => 1,'dt_vendor_first_reported' => 2,'dt_vendor_last_reported' => 3,'process_date' => 4,'record_type' => 5,'normcompany_type' => 6,'normaddress_type' => 7,'norm_state' => 8,'norm_zip' => 9,'norm_zip4' => 10,'EFX_NAME' => 11,'EFX_LEGAL_NAME' => 12,'EFX_ADDRESS' => 13,'EFX_BUSSTATCD' => 14,'EFX_CMSA' => 15,'EFX_CORPAMOUNTCD' => 16,'EFX_CORPAMOUNTPREC' => 17,'EFX_CORPAMOUNTTP' => 18,'EFX_CORPEMPCD' => 19,'EFX_WEB' => 20,'EFX_CTRYISOCD' => 21,'EFX_CTRYNUM' => 22,'EFX_CTRYTELCD' => 23,'EFX_GEOPREC' => 24,'EFX_MERCTYPE' => 25,'EFX_MRKT_TELESCORE' => 26,'EFX_MRKT_TOTALIND' => 27,'EFX_MRKT_TOTALSCORE' => 28,'EFX_PUBLIC' => 29,'EFX_STKEXC' => 30,'EFX_PRIMSIC' => 31,'EFX_SECSIC1' => 32,'EFX_SECSIC2' => 33,'EFX_SECSIC3' => 34,'EFX_SECSIC4' => 35,'EFX_ID' => 36,'EFX_CITY' => 37,'EFX_REGION' => 38,'EFX_CTRYNAME' => 39,'EFX_COUNTYNM' => 40,'EFX_COUNTY' => 41,'EFX_CMSADESC' => 42,'EFX_SOHO' => 43,'EFX_BIZ' => 44,'EFX_RES' => 45,'EFX_CMRA' => 46,'EFX_SECADR' => 47,'EFX_SECCTY' => 48,'EFX_SECGEOPREC' => 49,'EFX_SECREGION' => 50,'EFX_SECCTRYISOCD' => 51,'EFX_SECCTRYNUM' => 52,'EFX_SECCTRYNAME' => 53,'EFX_PHONE' => 54,'EFX_FAXPHONE' => 55,'EFX_BUSSTAT' => 56,'EFX_YREST' => 57,'EFX_CORPEMPCNT' => 58,'EFX_LOCEMPCNT' => 59,'EFX_LOCEMPCD' => 60,'EFX_CORPAMOUNT' => 61,'EFX_LOCAMOUNT' => 62,'EFX_LOCAMOUNTCD' => 63,'EFX_LOCAMOUNTTP' => 64,'EFX_LOCAMOUNTPREC' => 65,'EFX_TCKSYM' => 66,'EFX_PRIMSICDESC' => 67,'EFX_SECSICDESC1' => 68,'EFX_SECSICDESC2' => 69,'EFX_SECSICDESC3' => 70,'EFX_SECSICDESC4' => 71,'EFX_PRIMNAICSCODE' => 72,'EFX_SECNAICS1' => 73,'EFX_SECNAICS2' => 74,'EFX_SECNAICS3' => 75,'EFX_SECNAICS4' => 76,'EFX_PRIMNAICSDESC' => 77,'EFX_SECNAICSDESC1' => 78,'EFX_SECNAICSDESC2' => 79,'EFX_SECNAICSDESC3' => 80,'EFX_SECNAICSDESC4' => 81,'EFX_DEAD' => 82,'EFX_DEADDT' => 83,'EFX_MRKT_TELEVER' => 84,'EFX_MRKT_VACANT' => 85,'EFX_MRKT_SEASONAL' => 86,'EFX_MBE' => 87,'EFX_WBE' => 88,'EFX_MWBE' => 89,'EFX_SDB' => 90,'EFX_HUBZONE' => 91,'EFX_DBE' => 92,'EFX_VET' => 93,'EFX_DVET' => 94,'EFX_8a' => 95,'EFX_8aEXPDT' => 96,'EFX_DIS' => 97,'EFX_SBE' => 98,'EFX_BUSSIZE' => 99,'EFX_LBE' => 100,'EFX_GOV' => 101,'EFX_FGOV' => 102,'EFX_NONPROFIT' => 103,'EFX_HBCU' => 104,'EFX_GAYLESBIAN' => 105,'EFX_WSBE' => 106,'EFX_VSBE' => 107,'EFX_DVSBE' => 108,'EFX_MWBESTATUS' => 109,'EFX_NMSDC' => 110,'EFX_WBENC' => 111,'EFX_CA_PUC' => 112,'EFX_TX_HUB' => 113,'EFX_TX_HUBCERTNUM' => 114,'EFX_GSAX' => 115,'EFX_CALTRANS' => 116,'EFX_EDU' => 117,'EFX_MI' => 118,'EFX_ANC' => 119,'AT_CERT1' => 120,'AT_CERT2' => 121,'AT_CERT3' => 122,'AT_CERT4' => 123,'AT_CERT5' => 124,'AT_CERT6' => 125,'AT_CERT7' => 126,'AT_CERT8' => 127,'AT_CERT9' => 128,'AT_CERT10' => 129,'AT_CERTDESC1' => 130,'AT_CERTDESC2' => 131,'AT_CERTDESC3' => 132,'AT_CERTDESC4' => 133,'AT_CERTDESC5' => 134,'AT_CERTDESC6' => 135,'AT_CERTDESC7' => 136,'AT_CERTDESC8' => 137,'AT_CERTDESC9' => 138,'AT_CERTDESC10' => 139,'AT_CERTSRC1' => 140,'AT_CERTSRC2' => 141,'AT_CERTSRC3' => 142,'AT_CERTSRC4' => 143,'AT_CERTSRC5' => 144,'AT_CERTSRC6' => 145,'AT_CERTSRC7' => 146,'AT_CERTSRC8' => 147,'AT_CERTSRC9' => 148,'AT_CERTSRC10' => 149,'AT_CERTLEV1' => 150,'AT_CERTLEV2' => 151,'AT_CERTLEV3' => 152,'AT_CERTLEV4' => 153,'AT_CERTLEV5' => 154,'AT_CERTLEV6' => 155,'AT_CERTLEV7' => 156,'AT_CERTLEV8' => 157,'AT_CERTLEV9' => 158,'AT_CERTLEV10' => 159,'AT_CERTNUM1' => 160,'AT_CERTNUM2' => 161,'AT_CERTNUM3' => 162,'AT_CERTNUM4' => 163,'AT_CERTNUM5' => 164,'AT_CERTNUM6' => 165,'AT_CERTNUM7' => 166,'AT_CERTNUM8' => 167,'AT_CERTNUM9' => 168,'AT_CERTNUM10' => 169,'AT_CERTEXP1' => 170,'AT_CERTEXP2' => 171,'AT_CERTEXP3' => 172,'AT_CERTEXP4' => 173,'AT_CERTEXP5' => 174,'AT_CERTEXP6' => 175,'AT_CERTEXP7' => 176,'AT_CERTEXP8' => 177,'AT_CERTEXP9' => 178,'AT_CERTEXP10' => 179,'EFX_EXTRACT_DATE' => 180,'EFX_MERCHANT_ID' => 181,'EFX_PROJECT_ID' => 182,'EFX_FOREIGN' => 183,'Record_Update_Refresh_Date' => 184,'EFX_DATE_CREATED' => 185,0);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ENUM'],['ENUM'],['ENUM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['LENGTHS'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],[],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['LENGTHS'],[],['LENGTHS'],['CUSTOM'],['CUSTOM'],[],['ENUM'],['ENUM'],['ENUM'],['ENUM'],[],[],['CUSTOM'],[],['CUSTOM'],['CUSTOM'],[],['CUSTOM'],['CUSTOM'],[],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],[],[],[],[],[],[],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],[],[],[],[],[],['ENUM'],['CUSTOM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['CUSTOM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],[],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],['ENUM'],[],[],[],[],[],[],[],[],[],[],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ENUM'],['CUSTOM'],['CUSTOM'],[]);
+EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
  
-EXPORT Make_dt_first_seen(SALT37.StrType s0) := MakeFT_invalid_reformated_date(s0);
-EXPORT InValid_dt_first_seen(SALT37.StrType s) := InValidFT_invalid_reformated_date(s);
+EXPORT Make_dt_first_seen(SALT311.StrType s0) := MakeFT_invalid_reformated_date(s0);
+EXPORT InValid_dt_first_seen(SALT311.StrType s) := InValidFT_invalid_reformated_date(s);
 EXPORT InValidMessage_dt_first_seen(UNSIGNED1 wh) := InValidMessageFT_invalid_reformated_date(wh);
  
-EXPORT Make_dt_last_seen(SALT37.StrType s0) := MakeFT_invalid_reformated_date(s0);
-EXPORT InValid_dt_last_seen(SALT37.StrType s) := InValidFT_invalid_reformated_date(s);
+EXPORT Make_dt_last_seen(SALT311.StrType s0) := MakeFT_invalid_reformated_date(s0);
+EXPORT InValid_dt_last_seen(SALT311.StrType s) := InValidFT_invalid_reformated_date(s);
 EXPORT InValidMessage_dt_last_seen(UNSIGNED1 wh) := InValidMessageFT_invalid_reformated_date(wh);
  
-EXPORT Make_dt_vendor_first_reported(SALT37.StrType s0) := MakeFT_invalid_reformated_date(s0);
-EXPORT InValid_dt_vendor_first_reported(SALT37.StrType s) := InValidFT_invalid_reformated_date(s);
+EXPORT Make_dt_vendor_first_reported(SALT311.StrType s0) := MakeFT_invalid_reformated_date(s0);
+EXPORT InValid_dt_vendor_first_reported(SALT311.StrType s) := InValidFT_invalid_reformated_date(s);
 EXPORT InValidMessage_dt_vendor_first_reported(UNSIGNED1 wh) := InValidMessageFT_invalid_reformated_date(wh);
  
-EXPORT Make_dt_vendor_last_reported(SALT37.StrType s0) := MakeFT_invalid_reformated_date(s0);
-EXPORT InValid_dt_vendor_last_reported(SALT37.StrType s) := InValidFT_invalid_reformated_date(s);
+EXPORT Make_dt_vendor_last_reported(SALT311.StrType s0) := MakeFT_invalid_reformated_date(s0);
+EXPORT InValid_dt_vendor_last_reported(SALT311.StrType s) := InValidFT_invalid_reformated_date(s);
 EXPORT InValidMessage_dt_vendor_last_reported(UNSIGNED1 wh) := InValidMessageFT_invalid_reformated_date(wh);
  
-EXPORT Make_process_date(SALT37.StrType s0) := MakeFT_invalid_reformated_date(s0);
-EXPORT InValid_process_date(SALT37.StrType s) := InValidFT_invalid_reformated_date(s);
+EXPORT Make_process_date(SALT311.StrType s0) := MakeFT_invalid_reformated_date(s0);
+EXPORT InValid_process_date(SALT311.StrType s) := InValidFT_invalid_reformated_date(s);
 EXPORT InValidMessage_process_date(UNSIGNED1 wh) := InValidMessageFT_invalid_reformated_date(wh);
  
-EXPORT Make_record_type(SALT37.StrType s0) := MakeFT_invalid_record_type(s0);
-EXPORT InValid_record_type(SALT37.StrType s) := InValidFT_invalid_record_type(s);
+EXPORT Make_record_type(SALT311.StrType s0) := MakeFT_invalid_record_type(s0);
+EXPORT InValid_record_type(SALT311.StrType s) := InValidFT_invalid_record_type(s);
 EXPORT InValidMessage_record_type(UNSIGNED1 wh) := InValidMessageFT_invalid_record_type(wh);
  
-EXPORT Make_normcompany_type(SALT37.StrType s0) := MakeFT_invalid_norm_type(s0);
-EXPORT InValid_normcompany_type(SALT37.StrType s) := InValidFT_invalid_norm_type(s);
+EXPORT Make_normcompany_type(SALT311.StrType s0) := MakeFT_invalid_norm_type(s0);
+EXPORT InValid_normcompany_type(SALT311.StrType s) := InValidFT_invalid_norm_type(s);
 EXPORT InValidMessage_normcompany_type(UNSIGNED1 wh) := InValidMessageFT_invalid_norm_type(wh);
  
-EXPORT Make_normaddress_type(SALT37.StrType s0) := MakeFT_invalid_address_type_code(s0);
-EXPORT InValid_normaddress_type(SALT37.StrType s) := InValidFT_invalid_address_type_code(s);
+EXPORT Make_normaddress_type(SALT311.StrType s0) := MakeFT_invalid_address_type_code(s0);
+EXPORT InValid_normaddress_type(SALT311.StrType s) := InValidFT_invalid_address_type_code(s);
 EXPORT InValidMessage_normaddress_type(UNSIGNED1 wh) := InValidMessageFT_invalid_address_type_code(wh);
  
-EXPORT Make_norm_state(SALT37.StrType s0) := MakeFT_invalid_st(s0);
-EXPORT InValid_norm_state(SALT37.StrType s) := InValidFT_invalid_st(s);
+EXPORT Make_norm_state(SALT311.StrType s0) := MakeFT_invalid_st(s0);
+EXPORT InValid_norm_state(SALT311.StrType s) := InValidFT_invalid_st(s);
 EXPORT InValidMessage_norm_state(UNSIGNED1 wh) := InValidMessageFT_invalid_st(wh);
  
-EXPORT Make_norm_zip(SALT37.StrType s0) := MakeFT_invalid_zip5(s0);
-EXPORT InValid_norm_zip(SALT37.StrType s) := InValidFT_invalid_zip5(s);
+EXPORT Make_norm_zip(SALT311.StrType s0) := MakeFT_invalid_zip5(s0);
+EXPORT InValid_norm_zip(SALT311.StrType s) := InValidFT_invalid_zip5(s);
 EXPORT InValidMessage_norm_zip(UNSIGNED1 wh) := InValidMessageFT_invalid_zip5(wh);
  
-EXPORT Make_norm_zip4(SALT37.StrType s0) := MakeFT_invalid_zip4(s0);
-EXPORT InValid_norm_zip4(SALT37.StrType s) := InValidFT_invalid_zip4(s);
+EXPORT Make_norm_zip4(SALT311.StrType s0) := MakeFT_invalid_zip4(s0);
+EXPORT InValid_norm_zip4(SALT311.StrType s) := InValidFT_invalid_zip4(s);
 EXPORT InValidMessage_norm_zip4(UNSIGNED1 wh) := InValidMessageFT_invalid_zip4(wh);
  
-EXPORT Make_EFX_NAME(SALT37.StrType s0) := MakeFT_invalid_name(s0);
-EXPORT InValid_EFX_NAME(SALT37.StrType s) := InValidFT_invalid_name(s);
+EXPORT Make_EFX_NAME(SALT311.StrType s0) := MakeFT_invalid_name(s0);
+EXPORT InValid_EFX_NAME(SALT311.StrType s) := InValidFT_invalid_name(s);
 EXPORT InValidMessage_EFX_NAME(UNSIGNED1 wh) := InValidMessageFT_invalid_name(wh);
  
-EXPORT Make_EFX_LEGAL_NAME(SALT37.StrType s0) := MakeFT_invalid_legal_name(s0);
-EXPORT InValid_EFX_LEGAL_NAME(SALT37.StrType s) := InValidFT_invalid_legal_name(s);
+EXPORT Make_EFX_LEGAL_NAME(SALT311.StrType s0) := MakeFT_invalid_legal_name(s0);
+EXPORT InValid_EFX_LEGAL_NAME(SALT311.StrType s) := InValidFT_invalid_legal_name(s);
 EXPORT InValidMessage_EFX_LEGAL_NAME(UNSIGNED1 wh) := InValidMessageFT_invalid_legal_name(wh);
  
-EXPORT Make_EFX_ADDRESS(SALT37.StrType s0) := MakeFT_invalid_mandatory(s0);
-EXPORT InValid_EFX_ADDRESS(SALT37.StrType s) := InValidFT_invalid_mandatory(s);
+EXPORT Make_EFX_ADDRESS(SALT311.StrType s0) := MakeFT_invalid_mandatory(s0);
+EXPORT InValid_EFX_ADDRESS(SALT311.StrType s) := InValidFT_invalid_mandatory(s);
 EXPORT InValidMessage_EFX_ADDRESS(UNSIGNED1 wh) := InValidMessageFT_invalid_mandatory(wh);
  
-EXPORT Make_EFX_BUSSTATCD(SALT37.StrType s0) := MakeFT_invalid_busstatcd(s0);
-EXPORT InValid_EFX_BUSSTATCD(SALT37.StrType s) := InValidFT_invalid_busstatcd(s);
+EXPORT Make_EFX_BUSSTATCD(SALT311.StrType s0) := MakeFT_invalid_busstatcd(s0);
+EXPORT InValid_EFX_BUSSTATCD(SALT311.StrType s) := InValidFT_invalid_busstatcd(s);
 EXPORT InValidMessage_EFX_BUSSTATCD(UNSIGNED1 wh) := InValidMessageFT_invalid_busstatcd(wh);
  
-EXPORT Make_EFX_CMSA(SALT37.StrType s0) := MakeFT_invalid_cmsa(s0);
-EXPORT InValid_EFX_CMSA(SALT37.StrType s) := InValidFT_invalid_cmsa(s);
+EXPORT Make_EFX_CMSA(SALT311.StrType s0) := MakeFT_invalid_cmsa(s0);
+EXPORT InValid_EFX_CMSA(SALT311.StrType s) := InValidFT_invalid_cmsa(s);
 EXPORT InValidMessage_EFX_CMSA(UNSIGNED1 wh) := InValidMessageFT_invalid_cmsa(wh);
  
-EXPORT Make_EFX_CORPAMOUNTCD(SALT37.StrType s0) := MakeFT_invalid_corpamountcd(s0);
-EXPORT InValid_EFX_CORPAMOUNTCD(SALT37.StrType s) := InValidFT_invalid_corpamountcd(s);
+EXPORT Make_EFX_CORPAMOUNTCD(SALT311.StrType s0) := MakeFT_invalid_corpamountcd(s0);
+EXPORT InValid_EFX_CORPAMOUNTCD(SALT311.StrType s) := InValidFT_invalid_corpamountcd(s);
 EXPORT InValidMessage_EFX_CORPAMOUNTCD(UNSIGNED1 wh) := InValidMessageFT_invalid_corpamountcd(wh);
  
-EXPORT Make_EFX_CORPAMOUNTPREC(SALT37.StrType s0) := MakeFT_invalid_corpamountprec(s0);
-EXPORT InValid_EFX_CORPAMOUNTPREC(SALT37.StrType s) := InValidFT_invalid_corpamountprec(s);
+EXPORT Make_EFX_CORPAMOUNTPREC(SALT311.StrType s0) := MakeFT_invalid_corpamountprec(s0);
+EXPORT InValid_EFX_CORPAMOUNTPREC(SALT311.StrType s) := InValidFT_invalid_corpamountprec(s);
 EXPORT InValidMessage_EFX_CORPAMOUNTPREC(UNSIGNED1 wh) := InValidMessageFT_invalid_corpamountprec(wh);
  
-EXPORT Make_EFX_CORPAMOUNTTP(SALT37.StrType s0) := MakeFT_invalid_corpamounttp(s0);
-EXPORT InValid_EFX_CORPAMOUNTTP(SALT37.StrType s) := InValidFT_invalid_corpamounttp(s);
+EXPORT Make_EFX_CORPAMOUNTTP(SALT311.StrType s0) := MakeFT_invalid_corpamounttp(s0);
+EXPORT InValid_EFX_CORPAMOUNTTP(SALT311.StrType s) := InValidFT_invalid_corpamounttp(s);
 EXPORT InValidMessage_EFX_CORPAMOUNTTP(UNSIGNED1 wh) := InValidMessageFT_invalid_corpamounttp(wh);
  
-EXPORT Make_EFX_CORPEMPCD(SALT37.StrType s0) := MakeFT_invalid_corpempcd(s0);
-EXPORT InValid_EFX_CORPEMPCD(SALT37.StrType s) := InValidFT_invalid_corpempcd(s);
+EXPORT Make_EFX_CORPEMPCD(SALT311.StrType s0) := MakeFT_invalid_corpempcd(s0);
+EXPORT InValid_EFX_CORPEMPCD(SALT311.StrType s) := InValidFT_invalid_corpempcd(s);
 EXPORT InValidMessage_EFX_CORPEMPCD(UNSIGNED1 wh) := InValidMessageFT_invalid_corpempcd(wh);
  
-EXPORT Make_EFX_WEB(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_WEB(SALT37.StrType s) := 0;
+EXPORT Make_EFX_WEB(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_WEB(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_WEB(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_CTRYISOCD(SALT37.StrType s0) := MakeFT_invalid_ctryisocd(s0);
-EXPORT InValid_EFX_CTRYISOCD(SALT37.StrType s) := InValidFT_invalid_ctryisocd(s);
+EXPORT Make_EFX_CTRYISOCD(SALT311.StrType s0) := MakeFT_invalid_ctryisocd(s0);
+EXPORT InValid_EFX_CTRYISOCD(SALT311.StrType s) := InValidFT_invalid_ctryisocd(s);
 EXPORT InValidMessage_EFX_CTRYISOCD(UNSIGNED1 wh) := InValidMessageFT_invalid_ctryisocd(wh);
  
-EXPORT Make_EFX_CTRYNUM(SALT37.StrType s0) := MakeFT_invalid_ctrynum(s0);
-EXPORT InValid_EFX_CTRYNUM(SALT37.StrType s) := InValidFT_invalid_ctrynum(s);
+EXPORT Make_EFX_CTRYNUM(SALT311.StrType s0) := MakeFT_invalid_ctrynum(s0);
+EXPORT InValid_EFX_CTRYNUM(SALT311.StrType s) := InValidFT_invalid_ctrynum(s);
 EXPORT InValidMessage_EFX_CTRYNUM(UNSIGNED1 wh) := InValidMessageFT_invalid_ctrynum(wh);
  
-EXPORT Make_EFX_CTRYTELCD(SALT37.StrType s0) := MakeFT_invalid_ctrytelcd(s0);
-EXPORT InValid_EFX_CTRYTELCD(SALT37.StrType s) := InValidFT_invalid_ctrytelcd(s);
+EXPORT Make_EFX_CTRYTELCD(SALT311.StrType s0) := MakeFT_invalid_ctrytelcd(s0);
+EXPORT InValid_EFX_CTRYTELCD(SALT311.StrType s) := InValidFT_invalid_ctrytelcd(s);
 EXPORT InValidMessage_EFX_CTRYTELCD(UNSIGNED1 wh) := InValidMessageFT_invalid_ctrytelcd(wh);
  
-EXPORT Make_EFX_GEOPREC(SALT37.StrType s0) := MakeFT_invalid_geoprec(s0);
-EXPORT InValid_EFX_GEOPREC(SALT37.StrType s) := InValidFT_invalid_geoprec(s);
+EXPORT Make_EFX_GEOPREC(SALT311.StrType s0) := MakeFT_invalid_geoprec(s0);
+EXPORT InValid_EFX_GEOPREC(SALT311.StrType s) := InValidFT_invalid_geoprec(s);
 EXPORT InValidMessage_EFX_GEOPREC(UNSIGNED1 wh) := InValidMessageFT_invalid_geoprec(wh);
  
-EXPORT Make_EFX_MERCTYPE(SALT37.StrType s0) := MakeFT_invalid_merctype(s0);
-EXPORT InValid_EFX_MERCTYPE(SALT37.StrType s) := InValidFT_invalid_merctype(s);
+EXPORT Make_EFX_MERCTYPE(SALT311.StrType s0) := MakeFT_invalid_merctype(s0);
+EXPORT InValid_EFX_MERCTYPE(SALT311.StrType s) := InValidFT_invalid_merctype(s);
 EXPORT InValidMessage_EFX_MERCTYPE(UNSIGNED1 wh) := InValidMessageFT_invalid_merctype(wh);
  
-EXPORT Make_EFX_MRKT_TELESCORE(SALT37.StrType s0) := MakeFT_invalid_mrkt_telescore(s0);
-EXPORT InValid_EFX_MRKT_TELESCORE(SALT37.StrType s) := InValidFT_invalid_mrkt_telescore(s);
+EXPORT Make_EFX_MRKT_TELESCORE(SALT311.StrType s0) := MakeFT_invalid_mrkt_telescore(s0);
+EXPORT InValid_EFX_MRKT_TELESCORE(SALT311.StrType s) := InValidFT_invalid_mrkt_telescore(s);
 EXPORT InValidMessage_EFX_MRKT_TELESCORE(UNSIGNED1 wh) := InValidMessageFT_invalid_mrkt_telescore(wh);
  
-EXPORT Make_EFX_MRKT_TOTALIND(SALT37.StrType s0) := MakeFT_invalid_mrkt_totalind(s0);
-EXPORT InValid_EFX_MRKT_TOTALIND(SALT37.StrType s) := InValidFT_invalid_mrkt_totalind(s);
+EXPORT Make_EFX_MRKT_TOTALIND(SALT311.StrType s0) := MakeFT_invalid_mrkt_totalind(s0);
+EXPORT InValid_EFX_MRKT_TOTALIND(SALT311.StrType s) := InValidFT_invalid_mrkt_totalind(s);
 EXPORT InValidMessage_EFX_MRKT_TOTALIND(UNSIGNED1 wh) := InValidMessageFT_invalid_mrkt_totalind(wh);
  
-EXPORT Make_EFX_MRKT_TOTALSCORE(SALT37.StrType s0) := MakeFT_invalid_mrkt_totalscore(s0);
-EXPORT InValid_EFX_MRKT_TOTALSCORE(SALT37.StrType s) := InValidFT_invalid_mrkt_totalscore(s);
+EXPORT Make_EFX_MRKT_TOTALSCORE(SALT311.StrType s0) := MakeFT_invalid_mrkt_totalscore(s0);
+EXPORT InValid_EFX_MRKT_TOTALSCORE(SALT311.StrType s) := InValidFT_invalid_mrkt_totalscore(s);
 EXPORT InValidMessage_EFX_MRKT_TOTALSCORE(UNSIGNED1 wh) := InValidMessageFT_invalid_mrkt_totalscore(wh);
  
-EXPORT Make_EFX_PUBLIC(SALT37.StrType s0) := MakeFT_invalid_public(s0);
-EXPORT InValid_EFX_PUBLIC(SALT37.StrType s) := InValidFT_invalid_public(s);
+EXPORT Make_EFX_PUBLIC(SALT311.StrType s0) := MakeFT_invalid_public(s0);
+EXPORT InValid_EFX_PUBLIC(SALT311.StrType s) := InValidFT_invalid_public(s);
 EXPORT InValidMessage_EFX_PUBLIC(UNSIGNED1 wh) := InValidMessageFT_invalid_public(wh);
  
-EXPORT Make_EFX_STKEXC(SALT37.StrType s0) := MakeFT_invalid_stkexc(s0);
-EXPORT InValid_EFX_STKEXC(SALT37.StrType s) := InValidFT_invalid_stkexc(s);
+EXPORT Make_EFX_STKEXC(SALT311.StrType s0) := MakeFT_invalid_stkexc(s0);
+EXPORT InValid_EFX_STKEXC(SALT311.StrType s) := InValidFT_invalid_stkexc(s);
 EXPORT InValidMessage_EFX_STKEXC(UNSIGNED1 wh) := InValidMessageFT_invalid_stkexc(wh);
  
-EXPORT Make_EFX_PRIMSIC(SALT37.StrType s0) := MakeFT_invalid_sic(s0);
-EXPORT InValid_EFX_PRIMSIC(SALT37.StrType s) := InValidFT_invalid_sic(s);
+EXPORT Make_EFX_PRIMSIC(SALT311.StrType s0) := MakeFT_invalid_sic(s0);
+EXPORT InValid_EFX_PRIMSIC(SALT311.StrType s) := InValidFT_invalid_sic(s);
 EXPORT InValidMessage_EFX_PRIMSIC(UNSIGNED1 wh) := InValidMessageFT_invalid_sic(wh);
  
-EXPORT Make_EFX_SECSIC1(SALT37.StrType s0) := MakeFT_invalid_sic(s0);
-EXPORT InValid_EFX_SECSIC1(SALT37.StrType s) := InValidFT_invalid_sic(s);
+EXPORT Make_EFX_SECSIC1(SALT311.StrType s0) := MakeFT_invalid_sic(s0);
+EXPORT InValid_EFX_SECSIC1(SALT311.StrType s) := InValidFT_invalid_sic(s);
 EXPORT InValidMessage_EFX_SECSIC1(UNSIGNED1 wh) := InValidMessageFT_invalid_sic(wh);
  
-EXPORT Make_EFX_SECSIC2(SALT37.StrType s0) := MakeFT_invalid_sic(s0);
-EXPORT InValid_EFX_SECSIC2(SALT37.StrType s) := InValidFT_invalid_sic(s);
+EXPORT Make_EFX_SECSIC2(SALT311.StrType s0) := MakeFT_invalid_sic(s0);
+EXPORT InValid_EFX_SECSIC2(SALT311.StrType s) := InValidFT_invalid_sic(s);
 EXPORT InValidMessage_EFX_SECSIC2(UNSIGNED1 wh) := InValidMessageFT_invalid_sic(wh);
  
-EXPORT Make_EFX_SECSIC3(SALT37.StrType s0) := MakeFT_invalid_sic(s0);
-EXPORT InValid_EFX_SECSIC3(SALT37.StrType s) := InValidFT_invalid_sic(s);
+EXPORT Make_EFX_SECSIC3(SALT311.StrType s0) := MakeFT_invalid_sic(s0);
+EXPORT InValid_EFX_SECSIC3(SALT311.StrType s) := InValidFT_invalid_sic(s);
 EXPORT InValidMessage_EFX_SECSIC3(UNSIGNED1 wh) := InValidMessageFT_invalid_sic(wh);
  
-EXPORT Make_EFX_SECSIC4(SALT37.StrType s0) := MakeFT_invalid_sic(s0);
-EXPORT InValid_EFX_SECSIC4(SALT37.StrType s) := InValidFT_invalid_sic(s);
+EXPORT Make_EFX_SECSIC4(SALT311.StrType s0) := MakeFT_invalid_sic(s0);
+EXPORT InValid_EFX_SECSIC4(SALT311.StrType s) := InValidFT_invalid_sic(s);
 EXPORT InValidMessage_EFX_SECSIC4(UNSIGNED1 wh) := InValidMessageFT_invalid_sic(wh);
  
-EXPORT Make_EFX_ID(SALT37.StrType s0) := MakeFT_invalid_numeric(s0);
-EXPORT InValid_EFX_ID(SALT37.StrType s) := InValidFT_invalid_numeric(s);
+EXPORT Make_EFX_ID(SALT311.StrType s0) := MakeFT_invalid_numeric(s0);
+EXPORT InValid_EFX_ID(SALT311.StrType s) := InValidFT_invalid_numeric(s);
 EXPORT InValidMessage_EFX_ID(UNSIGNED1 wh) := InValidMessageFT_invalid_numeric(wh);
  
-EXPORT Make_EFX_CITY(SALT37.StrType s0) := MakeFT_invalid_mandatory(s0);
-EXPORT InValid_EFX_CITY(SALT37.StrType s) := InValidFT_invalid_mandatory(s);
+EXPORT Make_EFX_CITY(SALT311.StrType s0) := MakeFT_invalid_mandatory(s0);
+EXPORT InValid_EFX_CITY(SALT311.StrType s) := InValidFT_invalid_mandatory(s);
 EXPORT InValidMessage_EFX_CITY(UNSIGNED1 wh) := InValidMessageFT_invalid_mandatory(wh);
  
-EXPORT Make_EFX_REGION(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_REGION(SALT37.StrType s) := 0;
+EXPORT Make_EFX_REGION(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_REGION(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_REGION(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_CTRYNAME(SALT37.StrType s0) := MakeFT_invalid_mandatory(s0);
-EXPORT InValid_EFX_CTRYNAME(SALT37.StrType s) := InValidFT_invalid_mandatory(s);
+EXPORT Make_EFX_CTRYNAME(SALT311.StrType s0) := MakeFT_invalid_mandatory(s0);
+EXPORT InValid_EFX_CTRYNAME(SALT311.StrType s) := InValidFT_invalid_mandatory(s);
 EXPORT InValidMessage_EFX_CTRYNAME(UNSIGNED1 wh) := InValidMessageFT_invalid_mandatory(wh);
  
-EXPORT Make_EFX_COUNTYNM(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_COUNTYNM(SALT37.StrType s) := 0;
-EXPORT InValidMessage_EFX_COUNTYNM(UNSIGNED1 wh) := '';
+EXPORT Make_EFX_COUNTYNM(SALT311.StrType s0) := MakeFT_invalid_alpha(s0);
+EXPORT InValid_EFX_COUNTYNM(SALT311.StrType s) := InValidFT_invalid_alpha(s);
+EXPORT InValidMessage_EFX_COUNTYNM(UNSIGNED1 wh) := InValidMessageFT_invalid_alpha(wh);
  
-EXPORT Make_EFX_CMSADESC(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_CMSADESC(SALT37.StrType s) := 0;
+EXPORT Make_EFX_COUNTY(SALT311.StrType s0) := MakeFT_invalid_county(s0);
+EXPORT InValid_EFX_COUNTY(SALT311.StrType s) := InValidFT_invalid_county(s);
+EXPORT InValidMessage_EFX_COUNTY(UNSIGNED1 wh) := InValidMessageFT_invalid_county(wh);
+ 
+EXPORT Make_EFX_CMSADESC(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_CMSADESC(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_CMSADESC(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SOHO(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_SOHO(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_SOHO(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_SOHO(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_SOHO(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_BIZ(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_BIZ(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_BIZ(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_BIZ(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_BIZ(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_RES(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_RES(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_RES(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_RES(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_RES(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_CMRA(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_CMRA(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_CMRA(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_CMRA(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_CMRA(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_SECADR(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECADR(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECADR(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECADR(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECADR(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECCTY(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECCTY(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECCTY(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECCTY(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECCTY(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECGEOPREC(SALT37.StrType s0) := MakeFT_invalid_geoprec(s0);
-EXPORT InValid_EFX_SECGEOPREC(SALT37.StrType s) := InValidFT_invalid_geoprec(s);
+EXPORT Make_EFX_SECGEOPREC(SALT311.StrType s0) := MakeFT_invalid_geoprec(s0);
+EXPORT InValid_EFX_SECGEOPREC(SALT311.StrType s) := InValidFT_invalid_geoprec(s);
 EXPORT InValidMessage_EFX_SECGEOPREC(UNSIGNED1 wh) := InValidMessageFT_invalid_geoprec(wh);
  
-EXPORT Make_EFX_SECREGION(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECREGION(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECREGION(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECREGION(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECREGION(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECCTRYISOCD(SALT37.StrType s0) := MakeFT_invalid_ctryisocd(s0);
-EXPORT InValid_EFX_SECCTRYISOCD(SALT37.StrType s) := InValidFT_invalid_ctryisocd(s);
+EXPORT Make_EFX_SECCTRYISOCD(SALT311.StrType s0) := MakeFT_invalid_ctryisocd(s0);
+EXPORT InValid_EFX_SECCTRYISOCD(SALT311.StrType s) := InValidFT_invalid_ctryisocd(s);
 EXPORT InValidMessage_EFX_SECCTRYISOCD(UNSIGNED1 wh) := InValidMessageFT_invalid_ctryisocd(wh);
  
-EXPORT Make_EFX_SECCTRYNUM(SALT37.StrType s0) := MakeFT_invalid_ctrynum(s0);
-EXPORT InValid_EFX_SECCTRYNUM(SALT37.StrType s) := InValidFT_invalid_ctrynum(s);
+EXPORT Make_EFX_SECCTRYNUM(SALT311.StrType s0) := MakeFT_invalid_ctrynum(s0);
+EXPORT InValid_EFX_SECCTRYNUM(SALT311.StrType s) := InValidFT_invalid_ctrynum(s);
 EXPORT InValidMessage_EFX_SECCTRYNUM(UNSIGNED1 wh) := InValidMessageFT_invalid_ctrynum(wh);
  
-EXPORT Make_EFX_SECCTRYNAME(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECCTRYNAME(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECCTRYNAME(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECCTRYNAME(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECCTRYNAME(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_PHONE(SALT37.StrType s0) := MakeFT_invalid_phone(s0);
-EXPORT InValid_EFX_PHONE(SALT37.StrType s) := InValidFT_invalid_phone(s);
+EXPORT Make_EFX_PHONE(SALT311.StrType s0) := MakeFT_invalid_phone(s0);
+EXPORT InValid_EFX_PHONE(SALT311.StrType s) := InValidFT_invalid_phone(s);
 EXPORT InValidMessage_EFX_PHONE(UNSIGNED1 wh) := InValidMessageFT_invalid_phone(wh);
  
-EXPORT Make_EFX_FAXPHONE(SALT37.StrType s0) := MakeFT_invalid_phone(s0);
-EXPORT InValid_EFX_FAXPHONE(SALT37.StrType s) := InValidFT_invalid_phone(s);
+EXPORT Make_EFX_FAXPHONE(SALT311.StrType s0) := MakeFT_invalid_phone(s0);
+EXPORT InValid_EFX_FAXPHONE(SALT311.StrType s) := InValidFT_invalid_phone(s);
 EXPORT InValidMessage_EFX_FAXPHONE(UNSIGNED1 wh) := InValidMessageFT_invalid_phone(wh);
  
-EXPORT Make_EFX_BUSSTAT(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_BUSSTAT(SALT37.StrType s) := 0;
+EXPORT Make_EFX_BUSSTAT(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_BUSSTAT(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_BUSSTAT(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_YREST(SALT37.StrType s0) := MakeFT_invalid_year_established(s0);
-EXPORT InValid_EFX_YREST(SALT37.StrType s) := InValidFT_invalid_year_established(s);
+EXPORT Make_EFX_YREST(SALT311.StrType s0) := MakeFT_invalid_year_established(s0);
+EXPORT InValid_EFX_YREST(SALT311.StrType s) := InValidFT_invalid_year_established(s);
 EXPORT InValidMessage_EFX_YREST(UNSIGNED1 wh) := InValidMessageFT_invalid_year_established(wh);
  
-EXPORT Make_EFX_CORPEMPCNT(SALT37.StrType s0) := MakeFT_invalid_numeric_or_blank(s0);
-EXPORT InValid_EFX_CORPEMPCNT(SALT37.StrType s) := InValidFT_invalid_numeric_or_blank(s);
+EXPORT Make_EFX_CORPEMPCNT(SALT311.StrType s0) := MakeFT_invalid_numeric_or_blank(s0);
+EXPORT InValid_EFX_CORPEMPCNT(SALT311.StrType s) := InValidFT_invalid_numeric_or_blank(s);
 EXPORT InValidMessage_EFX_CORPEMPCNT(UNSIGNED1 wh) := InValidMessageFT_invalid_numeric_or_blank(wh);
  
-EXPORT Make_EFX_LOCEMPCNT(SALT37.StrType s0) := MakeFT_invalid_numeric_or_blank(s0);
-EXPORT InValid_EFX_LOCEMPCNT(SALT37.StrType s) := InValidFT_invalid_numeric_or_blank(s);
+EXPORT Make_EFX_LOCEMPCNT(SALT311.StrType s0) := MakeFT_invalid_numeric_or_blank(s0);
+EXPORT InValid_EFX_LOCEMPCNT(SALT311.StrType s) := InValidFT_invalid_numeric_or_blank(s);
 EXPORT InValidMessage_EFX_LOCEMPCNT(UNSIGNED1 wh) := InValidMessageFT_invalid_numeric_or_blank(wh);
  
-EXPORT Make_EFX_LOCEMPCD(SALT37.StrType s0) := MakeFT_invalid_corpempcd(s0);
-EXPORT InValid_EFX_LOCEMPCD(SALT37.StrType s) := InValidFT_invalid_corpempcd(s);
+EXPORT Make_EFX_LOCEMPCD(SALT311.StrType s0) := MakeFT_invalid_corpempcd(s0);
+EXPORT InValid_EFX_LOCEMPCD(SALT311.StrType s) := InValidFT_invalid_corpempcd(s);
 EXPORT InValidMessage_EFX_LOCEMPCD(UNSIGNED1 wh) := InValidMessageFT_invalid_corpempcd(wh);
  
-EXPORT Make_EFX_CORPAMOUNT(SALT37.StrType s0) := MakeFT_invalid_numeric_or_blank(s0);
-EXPORT InValid_EFX_CORPAMOUNT(SALT37.StrType s) := InValidFT_invalid_numeric_or_blank(s);
+EXPORT Make_EFX_CORPAMOUNT(SALT311.StrType s0) := MakeFT_invalid_numeric_or_blank(s0);
+EXPORT InValid_EFX_CORPAMOUNT(SALT311.StrType s) := InValidFT_invalid_numeric_or_blank(s);
 EXPORT InValidMessage_EFX_CORPAMOUNT(UNSIGNED1 wh) := InValidMessageFT_invalid_numeric_or_blank(wh);
  
-EXPORT Make_EFX_LOCAMOUNT(SALT37.StrType s0) := MakeFT_invalid_numeric_or_blank(s0);
-EXPORT InValid_EFX_LOCAMOUNT(SALT37.StrType s) := InValidFT_invalid_numeric_or_blank(s);
+EXPORT Make_EFX_LOCAMOUNT(SALT311.StrType s0) := MakeFT_invalid_numeric_or_blank(s0);
+EXPORT InValid_EFX_LOCAMOUNT(SALT311.StrType s) := InValidFT_invalid_numeric_or_blank(s);
 EXPORT InValidMessage_EFX_LOCAMOUNT(UNSIGNED1 wh) := InValidMessageFT_invalid_numeric_or_blank(wh);
  
-EXPORT Make_EFX_LOCAMOUNTCD(SALT37.StrType s0) := MakeFT_invalid_corpamountcd(s0);
-EXPORT InValid_EFX_LOCAMOUNTCD(SALT37.StrType s) := InValidFT_invalid_corpamountcd(s);
+EXPORT Make_EFX_LOCAMOUNTCD(SALT311.StrType s0) := MakeFT_invalid_corpamountcd(s0);
+EXPORT InValid_EFX_LOCAMOUNTCD(SALT311.StrType s) := InValidFT_invalid_corpamountcd(s);
 EXPORT InValidMessage_EFX_LOCAMOUNTCD(UNSIGNED1 wh) := InValidMessageFT_invalid_corpamountcd(wh);
  
-EXPORT Make_EFX_LOCAMOUNTTP(SALT37.StrType s0) := MakeFT_invalid_corpamounttp(s0);
-EXPORT InValid_EFX_LOCAMOUNTTP(SALT37.StrType s) := InValidFT_invalid_corpamounttp(s);
+EXPORT Make_EFX_LOCAMOUNTTP(SALT311.StrType s0) := MakeFT_invalid_corpamounttp(s0);
+EXPORT InValid_EFX_LOCAMOUNTTP(SALT311.StrType s) := InValidFT_invalid_corpamounttp(s);
 EXPORT InValidMessage_EFX_LOCAMOUNTTP(UNSIGNED1 wh) := InValidMessageFT_invalid_corpamounttp(wh);
  
-EXPORT Make_EFX_LOCAMOUNTPREC(SALT37.StrType s0) := MakeFT_invalid_corpamountprec(s0);
-EXPORT InValid_EFX_LOCAMOUNTPREC(SALT37.StrType s) := InValidFT_invalid_corpamountprec(s);
+EXPORT Make_EFX_LOCAMOUNTPREC(SALT311.StrType s0) := MakeFT_invalid_corpamountprec(s0);
+EXPORT InValid_EFX_LOCAMOUNTPREC(SALT311.StrType s) := InValidFT_invalid_corpamountprec(s);
 EXPORT InValidMessage_EFX_LOCAMOUNTPREC(UNSIGNED1 wh) := InValidMessageFT_invalid_corpamountprec(wh);
  
-EXPORT Make_EFX_TCKSYM(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_TCKSYM(SALT37.StrType s) := 0;
+EXPORT Make_EFX_TCKSYM(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_TCKSYM(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_TCKSYM(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_PRIMSICDESC(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_PRIMSICDESC(SALT37.StrType s) := 0;
+EXPORT Make_EFX_PRIMSICDESC(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_PRIMSICDESC(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_PRIMSICDESC(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECSICDESC1(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECSICDESC1(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECSICDESC1(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECSICDESC1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECSICDESC1(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECSICDESC2(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECSICDESC2(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECSICDESC2(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECSICDESC2(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECSICDESC2(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECSICDESC3(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECSICDESC3(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECSICDESC3(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECSICDESC3(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECSICDESC3(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECSICDESC4(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECSICDESC4(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECSICDESC4(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECSICDESC4(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECSICDESC4(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_PRIMNAICSCODE(SALT37.StrType s0) := MakeFT_invalid_naics(s0);
-EXPORT InValid_EFX_PRIMNAICSCODE(SALT37.StrType s) := InValidFT_invalid_naics(s);
+EXPORT Make_EFX_PRIMNAICSCODE(SALT311.StrType s0) := MakeFT_invalid_naics(s0);
+EXPORT InValid_EFX_PRIMNAICSCODE(SALT311.StrType s) := InValidFT_invalid_naics(s);
 EXPORT InValidMessage_EFX_PRIMNAICSCODE(UNSIGNED1 wh) := InValidMessageFT_invalid_naics(wh);
  
-EXPORT Make_EFX_SECNAICS1(SALT37.StrType s0) := MakeFT_invalid_naics(s0);
-EXPORT InValid_EFX_SECNAICS1(SALT37.StrType s) := InValidFT_invalid_naics(s);
+EXPORT Make_EFX_SECNAICS1(SALT311.StrType s0) := MakeFT_invalid_naics(s0);
+EXPORT InValid_EFX_SECNAICS1(SALT311.StrType s) := InValidFT_invalid_naics(s);
 EXPORT InValidMessage_EFX_SECNAICS1(UNSIGNED1 wh) := InValidMessageFT_invalid_naics(wh);
  
-EXPORT Make_EFX_SECNAICS2(SALT37.StrType s0) := MakeFT_invalid_naics(s0);
-EXPORT InValid_EFX_SECNAICS2(SALT37.StrType s) := InValidFT_invalid_naics(s);
+EXPORT Make_EFX_SECNAICS2(SALT311.StrType s0) := MakeFT_invalid_naics(s0);
+EXPORT InValid_EFX_SECNAICS2(SALT311.StrType s) := InValidFT_invalid_naics(s);
 EXPORT InValidMessage_EFX_SECNAICS2(UNSIGNED1 wh) := InValidMessageFT_invalid_naics(wh);
  
-EXPORT Make_EFX_SECNAICS3(SALT37.StrType s0) := MakeFT_invalid_naics(s0);
-EXPORT InValid_EFX_SECNAICS3(SALT37.StrType s) := InValidFT_invalid_naics(s);
+EXPORT Make_EFX_SECNAICS3(SALT311.StrType s0) := MakeFT_invalid_naics(s0);
+EXPORT InValid_EFX_SECNAICS3(SALT311.StrType s) := InValidFT_invalid_naics(s);
 EXPORT InValidMessage_EFX_SECNAICS3(UNSIGNED1 wh) := InValidMessageFT_invalid_naics(wh);
  
-EXPORT Make_EFX_SECNAICS4(SALT37.StrType s0) := MakeFT_invalid_naics(s0);
-EXPORT InValid_EFX_SECNAICS4(SALT37.StrType s) := InValidFT_invalid_naics(s);
+EXPORT Make_EFX_SECNAICS4(SALT311.StrType s0) := MakeFT_invalid_naics(s0);
+EXPORT InValid_EFX_SECNAICS4(SALT311.StrType s) := InValidFT_invalid_naics(s);
 EXPORT InValidMessage_EFX_SECNAICS4(UNSIGNED1 wh) := InValidMessageFT_invalid_naics(wh);
  
-EXPORT Make_EFX_PRIMNAICSDESC(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_PRIMNAICSDESC(SALT37.StrType s) := 0;
+EXPORT Make_EFX_PRIMNAICSDESC(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_PRIMNAICSDESC(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_PRIMNAICSDESC(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECNAICSDESC1(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECNAICSDESC1(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECNAICSDESC1(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECNAICSDESC1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECNAICSDESC1(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECNAICSDESC2(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECNAICSDESC2(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECNAICSDESC2(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECNAICSDESC2(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECNAICSDESC2(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECNAICSDESC3(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECNAICSDESC3(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECNAICSDESC3(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECNAICSDESC3(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECNAICSDESC3(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_SECNAICSDESC4(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_SECNAICSDESC4(SALT37.StrType s) := 0;
+EXPORT Make_EFX_SECNAICSDESC4(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_SECNAICSDESC4(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_SECNAICSDESC4(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_DEAD(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_DEAD(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_DEAD(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_DEAD(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_DEAD(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_DEADDT(SALT37.StrType s0) := MakeFT_invalid_past_date(s0);
-EXPORT InValid_EFX_DEADDT(SALT37.StrType s) := InValidFT_invalid_past_date(s);
+EXPORT Make_EFX_DEADDT(SALT311.StrType s0) := MakeFT_invalid_past_date(s0);
+EXPORT InValid_EFX_DEADDT(SALT311.StrType s) := InValidFT_invalid_past_date(s);
 EXPORT InValidMessage_EFX_DEADDT(UNSIGNED1 wh) := InValidMessageFT_invalid_past_date(wh);
  
-EXPORT Make_EFX_MRKT_TELEVER(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_MRKT_TELEVER(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_MRKT_TELEVER(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_MRKT_TELEVER(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_MRKT_TELEVER(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_MRKT_VACANT(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_MRKT_VACANT(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_MRKT_VACANT(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_MRKT_VACANT(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_MRKT_VACANT(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_MRKT_SEASONAL(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_MRKT_SEASONAL(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_MRKT_SEASONAL(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_MRKT_SEASONAL(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_MRKT_SEASONAL(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_MBE(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_MBE(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_MBE(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_MBE(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_MBE(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_WBE(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_WBE(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_WBE(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_WBE(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_WBE(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_MWBE(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_MWBE(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_MWBE(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_MWBE(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_MWBE(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_SDB(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_SDB(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_SDB(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_SDB(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_SDB(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_HUBZONE(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_HUBZONE(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_HUBZONE(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_HUBZONE(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_HUBZONE(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_DBE(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_DBE(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_DBE(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_DBE(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_DBE(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_VET(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_VET(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_VET(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_VET(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_VET(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_DVET(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_DVET(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_DVET(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_DVET(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_DVET(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_8a(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_8a(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_8a(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_8a(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_8a(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_8aEXPDT(SALT37.StrType s0) := MakeFT_invalid_general_date(s0);
-EXPORT InValid_EFX_8aEXPDT(SALT37.StrType s) := InValidFT_invalid_general_date(s);
+EXPORT Make_EFX_8aEXPDT(SALT311.StrType s0) := MakeFT_invalid_general_date(s0);
+EXPORT InValid_EFX_8aEXPDT(SALT311.StrType s) := InValidFT_invalid_general_date(s);
 EXPORT InValidMessage_EFX_8aEXPDT(UNSIGNED1 wh) := InValidMessageFT_invalid_general_date(wh);
  
-EXPORT Make_EFX_DIS(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_DIS(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_DIS(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_DIS(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_DIS(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_SBE(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_SBE(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_SBE(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_SBE(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_SBE(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_BUSSIZE(SALT37.StrType s0) := MakeFT_invalid_business_size(s0);
-EXPORT InValid_EFX_BUSSIZE(SALT37.StrType s) := InValidFT_invalid_business_size(s);
+EXPORT Make_EFX_BUSSIZE(SALT311.StrType s0) := MakeFT_invalid_business_size(s0);
+EXPORT InValid_EFX_BUSSIZE(SALT311.StrType s) := InValidFT_invalid_business_size(s);
 EXPORT InValidMessage_EFX_BUSSIZE(UNSIGNED1 wh) := InValidMessageFT_invalid_business_size(wh);
  
-EXPORT Make_EFX_LBE(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_LBE(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_LBE(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_LBE(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_LBE(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_GOV(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_GOV(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_GOV(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_GOV(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_GOV(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_FGOV(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_FGOV(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_FGOV(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_FGOV(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_FGOV(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_NONPROFIT(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_NONPROFIT(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_NONPROFIT(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_NONPROFIT(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_NONPROFIT(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_HBCU(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_HBCU(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_HBCU(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_HBCU(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_HBCU(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_GAYLESBIAN(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_GAYLESBIAN(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_GAYLESBIAN(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_GAYLESBIAN(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_GAYLESBIAN(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_WSBE(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_WSBE(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_WSBE(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_WSBE(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_WSBE(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_VSBE(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_VSBE(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_VSBE(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_VSBE(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_VSBE(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_DVSBE(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_DVSBE(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_DVSBE(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_DVSBE(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_DVSBE(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_MWBESTATUS(SALT37.StrType s0) := MakeFT_invalid_cert_or_class(s0);
-EXPORT InValid_EFX_MWBESTATUS(SALT37.StrType s) := InValidFT_invalid_cert_or_class(s);
+EXPORT Make_EFX_MWBESTATUS(SALT311.StrType s0) := MakeFT_invalid_cert_or_class(s0);
+EXPORT InValid_EFX_MWBESTATUS(SALT311.StrType s) := InValidFT_invalid_cert_or_class(s);
 EXPORT InValidMessage_EFX_MWBESTATUS(UNSIGNED1 wh) := InValidMessageFT_invalid_cert_or_class(wh);
  
-EXPORT Make_EFX_NMSDC(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_NMSDC(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_NMSDC(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_NMSDC(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_NMSDC(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_WBENC(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_WBENC(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_WBENC(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_WBENC(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_WBENC(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_CA_PUC(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_CA_PUC(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_CA_PUC(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_CA_PUC(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_CA_PUC(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_TX_HUB(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_TX_HUB(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_TX_HUB(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_TX_HUB(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_TX_HUB(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_TX_HUBCERTNUM(SALT37.StrType s0) := s0;
-EXPORT InValid_EFX_TX_HUBCERTNUM(SALT37.StrType s) := 0;
+EXPORT Make_EFX_TX_HUBCERTNUM(SALT311.StrType s0) := s0;
+EXPORT InValid_EFX_TX_HUBCERTNUM(SALT311.StrType s) := 0;
 EXPORT InValidMessage_EFX_TX_HUBCERTNUM(UNSIGNED1 wh) := '';
  
-EXPORT Make_EFX_GSAX(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_GSAX(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_GSAX(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_GSAX(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_GSAX(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_CALTRANS(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_CALTRANS(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_CALTRANS(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_CALTRANS(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_CALTRANS(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_EDU(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_EDU(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_EDU(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_EDU(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_EDU(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_MI(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_MI(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_MI(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_MI(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_MI(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_EFX_ANC(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_ANC(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_ANC(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_ANC(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_ANC(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_AT_CERT1(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERT1(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERT1(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERT1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERT1(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERT2(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERT2(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERT2(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERT2(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERT2(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERT3(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERT3(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERT3(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERT3(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERT3(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERT4(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERT4(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERT4(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERT4(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERT4(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERT5(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERT5(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERT5(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERT5(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERT5(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERT6(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERT6(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERT6(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERT6(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERT6(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERT7(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERT7(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERT7(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERT7(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERT7(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERT8(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERT8(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERT8(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERT8(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERT8(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERT9(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERT9(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERT9(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERT9(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERT9(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERT10(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERT10(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERT10(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERT10(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERT10(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTDESC1(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTDESC1(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTDESC1(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTDESC1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTDESC1(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTDESC2(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTDESC2(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTDESC2(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTDESC2(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTDESC2(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTDESC3(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTDESC3(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTDESC3(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTDESC3(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTDESC3(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTDESC4(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTDESC4(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTDESC4(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTDESC4(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTDESC4(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTDESC5(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTDESC5(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTDESC5(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTDESC5(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTDESC5(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTDESC6(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTDESC6(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTDESC6(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTDESC6(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTDESC6(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTDESC7(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTDESC7(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTDESC7(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTDESC7(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTDESC7(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTDESC8(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTDESC8(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTDESC8(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTDESC8(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTDESC8(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTDESC9(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTDESC9(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTDESC9(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTDESC9(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTDESC9(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTDESC10(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTDESC10(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTDESC10(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTDESC10(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTDESC10(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTSRC1(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTSRC1(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTSRC1(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTSRC1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTSRC1(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTSRC2(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTSRC2(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTSRC2(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTSRC2(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTSRC2(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTSRC3(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTSRC3(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTSRC3(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTSRC3(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTSRC3(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTSRC4(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTSRC4(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTSRC4(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTSRC4(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTSRC4(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTSRC5(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTSRC5(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTSRC5(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTSRC5(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTSRC5(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTSRC6(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTSRC6(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTSRC6(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTSRC6(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTSRC6(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTSRC7(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTSRC7(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTSRC7(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTSRC7(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTSRC7(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTSRC8(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTSRC8(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTSRC8(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTSRC8(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTSRC8(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTSRC9(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTSRC9(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTSRC9(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTSRC9(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTSRC9(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTSRC10(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTSRC10(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTSRC10(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTSRC10(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTSRC10(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTLEV1(SALT37.StrType s0) := MakeFT_invalid_cert_or_class(s0);
-EXPORT InValid_AT_CERTLEV1(SALT37.StrType s) := InValidFT_invalid_cert_or_class(s);
+EXPORT Make_AT_CERTLEV1(SALT311.StrType s0) := MakeFT_invalid_cert_or_class(s0);
+EXPORT InValid_AT_CERTLEV1(SALT311.StrType s) := InValidFT_invalid_cert_or_class(s);
 EXPORT InValidMessage_AT_CERTLEV1(UNSIGNED1 wh) := InValidMessageFT_invalid_cert_or_class(wh);
  
-EXPORT Make_AT_CERTLEV2(SALT37.StrType s0) := MakeFT_invalid_cert_or_class(s0);
-EXPORT InValid_AT_CERTLEV2(SALT37.StrType s) := InValidFT_invalid_cert_or_class(s);
+EXPORT Make_AT_CERTLEV2(SALT311.StrType s0) := MakeFT_invalid_cert_or_class(s0);
+EXPORT InValid_AT_CERTLEV2(SALT311.StrType s) := InValidFT_invalid_cert_or_class(s);
 EXPORT InValidMessage_AT_CERTLEV2(UNSIGNED1 wh) := InValidMessageFT_invalid_cert_or_class(wh);
  
-EXPORT Make_AT_CERTLEV3(SALT37.StrType s0) := MakeFT_invalid_cert_or_class(s0);
-EXPORT InValid_AT_CERTLEV3(SALT37.StrType s) := InValidFT_invalid_cert_or_class(s);
+EXPORT Make_AT_CERTLEV3(SALT311.StrType s0) := MakeFT_invalid_cert_or_class(s0);
+EXPORT InValid_AT_CERTLEV3(SALT311.StrType s) := InValidFT_invalid_cert_or_class(s);
 EXPORT InValidMessage_AT_CERTLEV3(UNSIGNED1 wh) := InValidMessageFT_invalid_cert_or_class(wh);
  
-EXPORT Make_AT_CERTLEV4(SALT37.StrType s0) := MakeFT_invalid_cert_or_class(s0);
-EXPORT InValid_AT_CERTLEV4(SALT37.StrType s) := InValidFT_invalid_cert_or_class(s);
+EXPORT Make_AT_CERTLEV4(SALT311.StrType s0) := MakeFT_invalid_cert_or_class(s0);
+EXPORT InValid_AT_CERTLEV4(SALT311.StrType s) := InValidFT_invalid_cert_or_class(s);
 EXPORT InValidMessage_AT_CERTLEV4(UNSIGNED1 wh) := InValidMessageFT_invalid_cert_or_class(wh);
  
-EXPORT Make_AT_CERTLEV5(SALT37.StrType s0) := MakeFT_invalid_cert_or_class(s0);
-EXPORT InValid_AT_CERTLEV5(SALT37.StrType s) := InValidFT_invalid_cert_or_class(s);
+EXPORT Make_AT_CERTLEV5(SALT311.StrType s0) := MakeFT_invalid_cert_or_class(s0);
+EXPORT InValid_AT_CERTLEV5(SALT311.StrType s) := InValidFT_invalid_cert_or_class(s);
 EXPORT InValidMessage_AT_CERTLEV5(UNSIGNED1 wh) := InValidMessageFT_invalid_cert_or_class(wh);
  
-EXPORT Make_AT_CERTLEV6(SALT37.StrType s0) := MakeFT_invalid_cert_or_class(s0);
-EXPORT InValid_AT_CERTLEV6(SALT37.StrType s) := InValidFT_invalid_cert_or_class(s);
+EXPORT Make_AT_CERTLEV6(SALT311.StrType s0) := MakeFT_invalid_cert_or_class(s0);
+EXPORT InValid_AT_CERTLEV6(SALT311.StrType s) := InValidFT_invalid_cert_or_class(s);
 EXPORT InValidMessage_AT_CERTLEV6(UNSIGNED1 wh) := InValidMessageFT_invalid_cert_or_class(wh);
  
-EXPORT Make_AT_CERTLEV7(SALT37.StrType s0) := MakeFT_invalid_cert_or_class(s0);
-EXPORT InValid_AT_CERTLEV7(SALT37.StrType s) := InValidFT_invalid_cert_or_class(s);
+EXPORT Make_AT_CERTLEV7(SALT311.StrType s0) := MakeFT_invalid_cert_or_class(s0);
+EXPORT InValid_AT_CERTLEV7(SALT311.StrType s) := InValidFT_invalid_cert_or_class(s);
 EXPORT InValidMessage_AT_CERTLEV7(UNSIGNED1 wh) := InValidMessageFT_invalid_cert_or_class(wh);
  
-EXPORT Make_AT_CERTLEV8(SALT37.StrType s0) := MakeFT_invalid_cert_or_class(s0);
-EXPORT InValid_AT_CERTLEV8(SALT37.StrType s) := InValidFT_invalid_cert_or_class(s);
+EXPORT Make_AT_CERTLEV8(SALT311.StrType s0) := MakeFT_invalid_cert_or_class(s0);
+EXPORT InValid_AT_CERTLEV8(SALT311.StrType s) := InValidFT_invalid_cert_or_class(s);
 EXPORT InValidMessage_AT_CERTLEV8(UNSIGNED1 wh) := InValidMessageFT_invalid_cert_or_class(wh);
  
-EXPORT Make_AT_CERTLEV9(SALT37.StrType s0) := MakeFT_invalid_cert_or_class(s0);
-EXPORT InValid_AT_CERTLEV9(SALT37.StrType s) := InValidFT_invalid_cert_or_class(s);
+EXPORT Make_AT_CERTLEV9(SALT311.StrType s0) := MakeFT_invalid_cert_or_class(s0);
+EXPORT InValid_AT_CERTLEV9(SALT311.StrType s) := InValidFT_invalid_cert_or_class(s);
 EXPORT InValidMessage_AT_CERTLEV9(UNSIGNED1 wh) := InValidMessageFT_invalid_cert_or_class(wh);
  
-EXPORT Make_AT_CERTLEV10(SALT37.StrType s0) := MakeFT_invalid_cert_or_class(s0);
-EXPORT InValid_AT_CERTLEV10(SALT37.StrType s) := InValidFT_invalid_cert_or_class(s);
+EXPORT Make_AT_CERTLEV10(SALT311.StrType s0) := MakeFT_invalid_cert_or_class(s0);
+EXPORT InValid_AT_CERTLEV10(SALT311.StrType s) := InValidFT_invalid_cert_or_class(s);
 EXPORT InValidMessage_AT_CERTLEV10(UNSIGNED1 wh) := InValidMessageFT_invalid_cert_or_class(wh);
  
-EXPORT Make_AT_CERTNUM1(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTNUM1(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTNUM1(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTNUM1(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTNUM1(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTNUM2(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTNUM2(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTNUM2(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTNUM2(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTNUM2(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTNUM3(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTNUM3(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTNUM3(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTNUM3(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTNUM3(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTNUM4(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTNUM4(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTNUM4(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTNUM4(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTNUM4(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTNUM5(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTNUM5(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTNUM5(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTNUM5(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTNUM5(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTNUM6(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTNUM6(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTNUM6(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTNUM6(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTNUM6(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTNUM7(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTNUM7(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTNUM7(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTNUM7(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTNUM7(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTNUM8(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTNUM8(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTNUM8(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTNUM8(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTNUM8(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTNUM9(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTNUM9(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTNUM9(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTNUM9(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTNUM9(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTNUM10(SALT37.StrType s0) := s0;
-EXPORT InValid_AT_CERTNUM10(SALT37.StrType s) := 0;
+EXPORT Make_AT_CERTNUM10(SALT311.StrType s0) := s0;
+EXPORT InValid_AT_CERTNUM10(SALT311.StrType s) := 0;
 EXPORT InValidMessage_AT_CERTNUM10(UNSIGNED1 wh) := '';
  
-EXPORT Make_AT_CERTEXP1(SALT37.StrType s0) := MakeFT_invalid_general_date(s0);
-EXPORT InValid_AT_CERTEXP1(SALT37.StrType s) := InValidFT_invalid_general_date(s);
+EXPORT Make_AT_CERTEXP1(SALT311.StrType s0) := MakeFT_invalid_general_date(s0);
+EXPORT InValid_AT_CERTEXP1(SALT311.StrType s) := InValidFT_invalid_general_date(s);
 EXPORT InValidMessage_AT_CERTEXP1(UNSIGNED1 wh) := InValidMessageFT_invalid_general_date(wh);
  
-EXPORT Make_AT_CERTEXP2(SALT37.StrType s0) := MakeFT_invalid_general_date(s0);
-EXPORT InValid_AT_CERTEXP2(SALT37.StrType s) := InValidFT_invalid_general_date(s);
+EXPORT Make_AT_CERTEXP2(SALT311.StrType s0) := MakeFT_invalid_general_date(s0);
+EXPORT InValid_AT_CERTEXP2(SALT311.StrType s) := InValidFT_invalid_general_date(s);
 EXPORT InValidMessage_AT_CERTEXP2(UNSIGNED1 wh) := InValidMessageFT_invalid_general_date(wh);
  
-EXPORT Make_AT_CERTEXP3(SALT37.StrType s0) := MakeFT_invalid_general_date(s0);
-EXPORT InValid_AT_CERTEXP3(SALT37.StrType s) := InValidFT_invalid_general_date(s);
+EXPORT Make_AT_CERTEXP3(SALT311.StrType s0) := MakeFT_invalid_general_date(s0);
+EXPORT InValid_AT_CERTEXP3(SALT311.StrType s) := InValidFT_invalid_general_date(s);
 EXPORT InValidMessage_AT_CERTEXP3(UNSIGNED1 wh) := InValidMessageFT_invalid_general_date(wh);
  
-EXPORT Make_AT_CERTEXP4(SALT37.StrType s0) := MakeFT_invalid_general_date(s0);
-EXPORT InValid_AT_CERTEXP4(SALT37.StrType s) := InValidFT_invalid_general_date(s);
+EXPORT Make_AT_CERTEXP4(SALT311.StrType s0) := MakeFT_invalid_general_date(s0);
+EXPORT InValid_AT_CERTEXP4(SALT311.StrType s) := InValidFT_invalid_general_date(s);
 EXPORT InValidMessage_AT_CERTEXP4(UNSIGNED1 wh) := InValidMessageFT_invalid_general_date(wh);
  
-EXPORT Make_AT_CERTEXP5(SALT37.StrType s0) := MakeFT_invalid_general_date(s0);
-EXPORT InValid_AT_CERTEXP5(SALT37.StrType s) := InValidFT_invalid_general_date(s);
+EXPORT Make_AT_CERTEXP5(SALT311.StrType s0) := MakeFT_invalid_general_date(s0);
+EXPORT InValid_AT_CERTEXP5(SALT311.StrType s) := InValidFT_invalid_general_date(s);
 EXPORT InValidMessage_AT_CERTEXP5(UNSIGNED1 wh) := InValidMessageFT_invalid_general_date(wh);
  
-EXPORT Make_AT_CERTEXP6(SALT37.StrType s0) := MakeFT_invalid_general_date(s0);
-EXPORT InValid_AT_CERTEXP6(SALT37.StrType s) := InValidFT_invalid_general_date(s);
+EXPORT Make_AT_CERTEXP6(SALT311.StrType s0) := MakeFT_invalid_general_date(s0);
+EXPORT InValid_AT_CERTEXP6(SALT311.StrType s) := InValidFT_invalid_general_date(s);
 EXPORT InValidMessage_AT_CERTEXP6(UNSIGNED1 wh) := InValidMessageFT_invalid_general_date(wh);
  
-EXPORT Make_AT_CERTEXP7(SALT37.StrType s0) := MakeFT_invalid_general_date(s0);
-EXPORT InValid_AT_CERTEXP7(SALT37.StrType s) := InValidFT_invalid_general_date(s);
+EXPORT Make_AT_CERTEXP7(SALT311.StrType s0) := MakeFT_invalid_general_date(s0);
+EXPORT InValid_AT_CERTEXP7(SALT311.StrType s) := InValidFT_invalid_general_date(s);
 EXPORT InValidMessage_AT_CERTEXP7(UNSIGNED1 wh) := InValidMessageFT_invalid_general_date(wh);
  
-EXPORT Make_AT_CERTEXP8(SALT37.StrType s0) := MakeFT_invalid_general_date(s0);
-EXPORT InValid_AT_CERTEXP8(SALT37.StrType s) := InValidFT_invalid_general_date(s);
+EXPORT Make_AT_CERTEXP8(SALT311.StrType s0) := MakeFT_invalid_general_date(s0);
+EXPORT InValid_AT_CERTEXP8(SALT311.StrType s) := InValidFT_invalid_general_date(s);
 EXPORT InValidMessage_AT_CERTEXP8(UNSIGNED1 wh) := InValidMessageFT_invalid_general_date(wh);
  
-EXPORT Make_AT_CERTEXP9(SALT37.StrType s0) := MakeFT_invalid_general_date(s0);
-EXPORT InValid_AT_CERTEXP9(SALT37.StrType s) := InValidFT_invalid_general_date(s);
+EXPORT Make_AT_CERTEXP9(SALT311.StrType s0) := MakeFT_invalid_general_date(s0);
+EXPORT InValid_AT_CERTEXP9(SALT311.StrType s) := InValidFT_invalid_general_date(s);
 EXPORT InValidMessage_AT_CERTEXP9(UNSIGNED1 wh) := InValidMessageFT_invalid_general_date(wh);
  
-EXPORT Make_AT_CERTEXP10(SALT37.StrType s0) := MakeFT_invalid_general_date(s0);
-EXPORT InValid_AT_CERTEXP10(SALT37.StrType s) := InValidFT_invalid_general_date(s);
+EXPORT Make_AT_CERTEXP10(SALT311.StrType s0) := MakeFT_invalid_general_date(s0);
+EXPORT InValid_AT_CERTEXP10(SALT311.StrType s) := InValidFT_invalid_general_date(s);
 EXPORT InValidMessage_AT_CERTEXP10(UNSIGNED1 wh) := InValidMessageFT_invalid_general_date(wh);
  
-EXPORT Make_EFX_EXTRACT_DATE(SALT37.StrType s0) := MakeFT_invalid_past_date(s0);
-EXPORT InValid_EFX_EXTRACT_DATE(SALT37.StrType s) := InValidFT_invalid_past_date(s);
+EXPORT Make_EFX_EXTRACT_DATE(SALT311.StrType s0) := MakeFT_invalid_past_date(s0);
+EXPORT InValid_EFX_EXTRACT_DATE(SALT311.StrType s) := InValidFT_invalid_past_date(s);
 EXPORT InValidMessage_EFX_EXTRACT_DATE(UNSIGNED1 wh) := InValidMessageFT_invalid_past_date(wh);
  
-EXPORT Make_EFX_MERCHANT_ID(SALT37.StrType s0) := MakeFT_invalid_numeric(s0);
-EXPORT InValid_EFX_MERCHANT_ID(SALT37.StrType s) := InValidFT_invalid_numeric(s);
+EXPORT Make_EFX_MERCHANT_ID(SALT311.StrType s0) := MakeFT_invalid_numeric(s0);
+EXPORT InValid_EFX_MERCHANT_ID(SALT311.StrType s) := InValidFT_invalid_numeric(s);
 EXPORT InValidMessage_EFX_MERCHANT_ID(UNSIGNED1 wh) := InValidMessageFT_invalid_numeric(wh);
  
-EXPORT Make_EFX_PROJECT_ID(SALT37.StrType s0) := MakeFT_invalid_numeric_or_blank(s0);
-EXPORT InValid_EFX_PROJECT_ID(SALT37.StrType s) := InValidFT_invalid_numeric_or_blank(s);
+EXPORT Make_EFX_PROJECT_ID(SALT311.StrType s0) := MakeFT_invalid_numeric_or_blank(s0);
+EXPORT InValid_EFX_PROJECT_ID(SALT311.StrType s) := InValidFT_invalid_numeric_or_blank(s);
 EXPORT InValidMessage_EFX_PROJECT_ID(UNSIGNED1 wh) := InValidMessageFT_invalid_numeric_or_blank(wh);
  
-EXPORT Make_EFX_FOREIGN(SALT37.StrType s0) := MakeFT_invalid_yes_blank(s0);
-EXPORT InValid_EFX_FOREIGN(SALT37.StrType s) := InValidFT_invalid_yes_blank(s);
+EXPORT Make_EFX_FOREIGN(SALT311.StrType s0) := MakeFT_invalid_yes_blank(s0);
+EXPORT InValid_EFX_FOREIGN(SALT311.StrType s) := InValidFT_invalid_yes_blank(s);
 EXPORT InValidMessage_EFX_FOREIGN(UNSIGNED1 wh) := InValidMessageFT_invalid_yes_blank(wh);
  
-EXPORT Make_Record_Update_Refresh_Date(SALT37.StrType s0) := MakeFT_invalid_past_date(s0);
-EXPORT InValid_Record_Update_Refresh_Date(SALT37.StrType s) := InValidFT_invalid_past_date(s);
+EXPORT Make_Record_Update_Refresh_Date(SALT311.StrType s0) := MakeFT_invalid_past_date(s0);
+EXPORT InValid_Record_Update_Refresh_Date(SALT311.StrType s) := InValidFT_invalid_past_date(s);
 EXPORT InValidMessage_Record_Update_Refresh_Date(UNSIGNED1 wh) := InValidMessageFT_invalid_past_date(wh);
  
-EXPORT Make_EFX_DATE_CREATED(SALT37.StrType s0) := MakeFT_invalid_date_created(s0);
-EXPORT InValid_EFX_DATE_CREATED(SALT37.StrType s) := InValidFT_invalid_date_created(s);
+EXPORT Make_EFX_DATE_CREATED(SALT311.StrType s0) := MakeFT_invalid_date_created(s0);
+EXPORT InValid_EFX_DATE_CREATED(SALT311.StrType s) := InValidFT_invalid_date_created(s);
 EXPORT InValidMessage_EFX_DATE_CREATED(UNSIGNED1 wh) := InValidMessageFT_invalid_date_created(wh);
  
 // This macro will compute and count field level differences based upon a pivot expression
 export MAC_CountDifferencesByPivot(in_left,in_right,pivot_exp,bad_pivots,out_counts) := MACRO
-  IMPORT SALT37,Scrubs_Equifax_Business_Data;
+  IMPORT SALT311,Scrubs_Equifax_Business_Data;
 //Find those highly occuring pivot values to remove them from consideration
 #uniquename(tr)
   %tr% := table(in_left+in_right,{ val := pivot_exp; });
@@ -1217,6 +1238,7 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_EFX_REGION;
     BOOLEAN Diff_EFX_CTRYNAME;
     BOOLEAN Diff_EFX_COUNTYNM;
+    BOOLEAN Diff_EFX_COUNTY;
     BOOLEAN Diff_EFX_CMSADESC;
     BOOLEAN Diff_EFX_SOHO;
     BOOLEAN Diff_EFX_BIZ;
@@ -1362,7 +1384,7 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_Record_Update_Refresh_Date;
     BOOLEAN Diff_EFX_DATE_CREATED;
     UNSIGNED Num_Diffs;
-    SALT37.StrType Val {MAXLENGTH(1024)};
+    SALT311.StrType Val {MAXLENGTH(1024)};
   END;
 #uniquename(fd)
   %dl% %fd%(in_left le,in_right ri) := TRANSFORM
@@ -1407,6 +1429,7 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_EFX_REGION := le.EFX_REGION <> ri.EFX_REGION;
     SELF.Diff_EFX_CTRYNAME := le.EFX_CTRYNAME <> ri.EFX_CTRYNAME;
     SELF.Diff_EFX_COUNTYNM := le.EFX_COUNTYNM <> ri.EFX_COUNTYNM;
+    SELF.Diff_EFX_COUNTY := le.EFX_COUNTY <> ri.EFX_COUNTY;
     SELF.Diff_EFX_CMSADESC := le.EFX_CMSADESC <> ri.EFX_CMSADESC;
     SELF.Diff_EFX_SOHO := le.EFX_SOHO <> ri.EFX_SOHO;
     SELF.Diff_EFX_BIZ := le.EFX_BIZ <> ri.EFX_BIZ;
@@ -1551,8 +1574,8 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_EFX_FOREIGN := le.EFX_FOREIGN <> ri.EFX_FOREIGN;
     SELF.Diff_Record_Update_Refresh_Date := le.Record_Update_Refresh_Date <> ri.Record_Update_Refresh_Date;
     SELF.Diff_EFX_DATE_CREATED := le.EFX_DATE_CREATED <> ri.EFX_DATE_CREATED;
-    SELF.Val := (SALT37.StrType)evaluate(le,pivot_exp);
-    SELF.Num_Diffs := 0+ IF( SELF.Diff_dt_first_seen,1,0)+ IF( SELF.Diff_dt_last_seen,1,0)+ IF( SELF.Diff_dt_vendor_first_reported,1,0)+ IF( SELF.Diff_dt_vendor_last_reported,1,0)+ IF( SELF.Diff_process_date,1,0)+ IF( SELF.Diff_record_type,1,0)+ IF( SELF.Diff_normcompany_type,1,0)+ IF( SELF.Diff_normaddress_type,1,0)+ IF( SELF.Diff_norm_state,1,0)+ IF( SELF.Diff_norm_zip,1,0)+ IF( SELF.Diff_norm_zip4,1,0)+ IF( SELF.Diff_EFX_NAME,1,0)+ IF( SELF.Diff_EFX_LEGAL_NAME,1,0)+ IF( SELF.Diff_EFX_ADDRESS,1,0)+ IF( SELF.Diff_EFX_BUSSTATCD,1,0)+ IF( SELF.Diff_EFX_CMSA,1,0)+ IF( SELF.Diff_EFX_CORPAMOUNTCD,1,0)+ IF( SELF.Diff_EFX_CORPAMOUNTPREC,1,0)+ IF( SELF.Diff_EFX_CORPAMOUNTTP,1,0)+ IF( SELF.Diff_EFX_CORPEMPCD,1,0)+ IF( SELF.Diff_EFX_WEB,1,0)+ IF( SELF.Diff_EFX_CTRYISOCD,1,0)+ IF( SELF.Diff_EFX_CTRYNUM,1,0)+ IF( SELF.Diff_EFX_CTRYTELCD,1,0)+ IF( SELF.Diff_EFX_GEOPREC,1,0)+ IF( SELF.Diff_EFX_MERCTYPE,1,0)+ IF( SELF.Diff_EFX_MRKT_TELESCORE,1,0)+ IF( SELF.Diff_EFX_MRKT_TOTALIND,1,0)+ IF( SELF.Diff_EFX_MRKT_TOTALSCORE,1,0)+ IF( SELF.Diff_EFX_PUBLIC,1,0)+ IF( SELF.Diff_EFX_STKEXC,1,0)+ IF( SELF.Diff_EFX_PRIMSIC,1,0)+ IF( SELF.Diff_EFX_SECSIC1,1,0)+ IF( SELF.Diff_EFX_SECSIC2,1,0)+ IF( SELF.Diff_EFX_SECSIC3,1,0)+ IF( SELF.Diff_EFX_SECSIC4,1,0)+ IF( SELF.Diff_EFX_ID,1,0)+ IF( SELF.Diff_EFX_CITY,1,0)+ IF( SELF.Diff_EFX_REGION,1,0)+ IF( SELF.Diff_EFX_CTRYNAME,1,0)+ IF( SELF.Diff_EFX_COUNTYNM,1,0)+ IF( SELF.Diff_EFX_CMSADESC,1,0)+ IF( SELF.Diff_EFX_SOHO,1,0)+ IF( SELF.Diff_EFX_BIZ,1,0)+ IF( SELF.Diff_EFX_RES,1,0)+ IF( SELF.Diff_EFX_CMRA,1,0)+ IF( SELF.Diff_EFX_SECADR,1,0)+ IF( SELF.Diff_EFX_SECCTY,1,0)+ IF( SELF.Diff_EFX_SECGEOPREC,1,0)+ IF( SELF.Diff_EFX_SECREGION,1,0)+ IF( SELF.Diff_EFX_SECCTRYISOCD,1,0)+ IF( SELF.Diff_EFX_SECCTRYNUM,1,0)+ IF( SELF.Diff_EFX_SECCTRYNAME,1,0)+ IF( SELF.Diff_EFX_PHONE,1,0)+ IF( SELF.Diff_EFX_FAXPHONE,1,0)+ IF( SELF.Diff_EFX_BUSSTAT,1,0)+ IF( SELF.Diff_EFX_YREST,1,0)+ IF( SELF.Diff_EFX_CORPEMPCNT,1,0)+ IF( SELF.Diff_EFX_LOCEMPCNT,1,0)+ IF( SELF.Diff_EFX_LOCEMPCD,1,0)+ IF( SELF.Diff_EFX_CORPAMOUNT,1,0)+ IF( SELF.Diff_EFX_LOCAMOUNT,1,0)+ IF( SELF.Diff_EFX_LOCAMOUNTCD,1,0)+ IF( SELF.Diff_EFX_LOCAMOUNTTP,1,0)+ IF( SELF.Diff_EFX_LOCAMOUNTPREC,1,0)+ IF( SELF.Diff_EFX_TCKSYM,1,0)+ IF( SELF.Diff_EFX_PRIMSICDESC,1,0)+ IF( SELF.Diff_EFX_SECSICDESC1,1,0)+ IF( SELF.Diff_EFX_SECSICDESC2,1,0)+ IF( SELF.Diff_EFX_SECSICDESC3,1,0)+ IF( SELF.Diff_EFX_SECSICDESC4,1,0)+ IF( SELF.Diff_EFX_PRIMNAICSCODE,1,0)+ IF( SELF.Diff_EFX_SECNAICS1,1,0)+ IF( SELF.Diff_EFX_SECNAICS2,1,0)+ IF( SELF.Diff_EFX_SECNAICS3,1,0)+ IF( SELF.Diff_EFX_SECNAICS4,1,0)+ IF( SELF.Diff_EFX_PRIMNAICSDESC,1,0)+ IF( SELF.Diff_EFX_SECNAICSDESC1,1,0)+ IF( SELF.Diff_EFX_SECNAICSDESC2,1,0)+ IF( SELF.Diff_EFX_SECNAICSDESC3,1,0)+ IF( SELF.Diff_EFX_SECNAICSDESC4,1,0)+ IF( SELF.Diff_EFX_DEAD,1,0)+ IF( SELF.Diff_EFX_DEADDT,1,0)+ IF( SELF.Diff_EFX_MRKT_TELEVER,1,0)+ IF( SELF.Diff_EFX_MRKT_VACANT,1,0)+ IF( SELF.Diff_EFX_MRKT_SEASONAL,1,0)+ IF( SELF.Diff_EFX_MBE,1,0)+ IF( SELF.Diff_EFX_WBE,1,0)+ IF( SELF.Diff_EFX_MWBE,1,0)+ IF( SELF.Diff_EFX_SDB,1,0)+ IF( SELF.Diff_EFX_HUBZONE,1,0)+ IF( SELF.Diff_EFX_DBE,1,0)+ IF( SELF.Diff_EFX_VET,1,0)+ IF( SELF.Diff_EFX_DVET,1,0)+ IF( SELF.Diff_EFX_8a,1,0)+ IF( SELF.Diff_EFX_8aEXPDT,1,0)+ IF( SELF.Diff_EFX_DIS,1,0)+ IF( SELF.Diff_EFX_SBE,1,0)+ IF( SELF.Diff_EFX_BUSSIZE,1,0)+ IF( SELF.Diff_EFX_LBE,1,0)+ IF( SELF.Diff_EFX_GOV,1,0)+ IF( SELF.Diff_EFX_FGOV,1,0)+ IF( SELF.Diff_EFX_NONPROFIT,1,0)+ IF( SELF.Diff_EFX_HBCU,1,0)+ IF( SELF.Diff_EFX_GAYLESBIAN,1,0)+ IF( SELF.Diff_EFX_WSBE,1,0)+ IF( SELF.Diff_EFX_VSBE,1,0)+ IF( SELF.Diff_EFX_DVSBE,1,0)+ IF( SELF.Diff_EFX_MWBESTATUS,1,0)+ IF( SELF.Diff_EFX_NMSDC,1,0)+ IF( SELF.Diff_EFX_WBENC,1,0)+ IF( SELF.Diff_EFX_CA_PUC,1,0)+ IF( SELF.Diff_EFX_TX_HUB,1,0)+ IF( SELF.Diff_EFX_TX_HUBCERTNUM,1,0)+ IF( SELF.Diff_EFX_GSAX,1,0)+ IF( SELF.Diff_EFX_CALTRANS,1,0)+ IF( SELF.Diff_EFX_EDU,1,0)+ IF( SELF.Diff_EFX_MI,1,0)+ IF( SELF.Diff_EFX_ANC,1,0)+ IF( SELF.Diff_AT_CERT1,1,0)+ IF( SELF.Diff_AT_CERT2,1,0)+ IF( SELF.Diff_AT_CERT3,1,0)+ IF( SELF.Diff_AT_CERT4,1,0)+ IF( SELF.Diff_AT_CERT5,1,0)+ IF( SELF.Diff_AT_CERT6,1,0)+ IF( SELF.Diff_AT_CERT7,1,0)+ IF( SELF.Diff_AT_CERT8,1,0)+ IF( SELF.Diff_AT_CERT9,1,0)+ IF( SELF.Diff_AT_CERT10,1,0)+ IF( SELF.Diff_AT_CERTDESC1,1,0)+ IF( SELF.Diff_AT_CERTDESC2,1,0)+ IF( SELF.Diff_AT_CERTDESC3,1,0)+ IF( SELF.Diff_AT_CERTDESC4,1,0)+ IF( SELF.Diff_AT_CERTDESC5,1,0)+ IF( SELF.Diff_AT_CERTDESC6,1,0)+ IF( SELF.Diff_AT_CERTDESC7,1,0)+ IF( SELF.Diff_AT_CERTDESC8,1,0)+ IF( SELF.Diff_AT_CERTDESC9,1,0)+ IF( SELF.Diff_AT_CERTDESC10,1,0)+ IF( SELF.Diff_AT_CERTSRC1,1,0)+ IF( SELF.Diff_AT_CERTSRC2,1,0)+ IF( SELF.Diff_AT_CERTSRC3,1,0)+ IF( SELF.Diff_AT_CERTSRC4,1,0)+ IF( SELF.Diff_AT_CERTSRC5,1,0)+ IF( SELF.Diff_AT_CERTSRC6,1,0)+ IF( SELF.Diff_AT_CERTSRC7,1,0)+ IF( SELF.Diff_AT_CERTSRC8,1,0)+ IF( SELF.Diff_AT_CERTSRC9,1,0)+ IF( SELF.Diff_AT_CERTSRC10,1,0)+ IF( SELF.Diff_AT_CERTLEV1,1,0)+ IF( SELF.Diff_AT_CERTLEV2,1,0)+ IF( SELF.Diff_AT_CERTLEV3,1,0)+ IF( SELF.Diff_AT_CERTLEV4,1,0)+ IF( SELF.Diff_AT_CERTLEV5,1,0)+ IF( SELF.Diff_AT_CERTLEV6,1,0)+ IF( SELF.Diff_AT_CERTLEV7,1,0)+ IF( SELF.Diff_AT_CERTLEV8,1,0)+ IF( SELF.Diff_AT_CERTLEV9,1,0)+ IF( SELF.Diff_AT_CERTLEV10,1,0)+ IF( SELF.Diff_AT_CERTNUM1,1,0)+ IF( SELF.Diff_AT_CERTNUM2,1,0)+ IF( SELF.Diff_AT_CERTNUM3,1,0)+ IF( SELF.Diff_AT_CERTNUM4,1,0)+ IF( SELF.Diff_AT_CERTNUM5,1,0)+ IF( SELF.Diff_AT_CERTNUM6,1,0)+ IF( SELF.Diff_AT_CERTNUM7,1,0)+ IF( SELF.Diff_AT_CERTNUM8,1,0)+ IF( SELF.Diff_AT_CERTNUM9,1,0)+ IF( SELF.Diff_AT_CERTNUM10,1,0)+ IF( SELF.Diff_AT_CERTEXP1,1,0)+ IF( SELF.Diff_AT_CERTEXP2,1,0)+ IF( SELF.Diff_AT_CERTEXP3,1,0)+ IF( SELF.Diff_AT_CERTEXP4,1,0)+ IF( SELF.Diff_AT_CERTEXP5,1,0)+ IF( SELF.Diff_AT_CERTEXP6,1,0)+ IF( SELF.Diff_AT_CERTEXP7,1,0)+ IF( SELF.Diff_AT_CERTEXP8,1,0)+ IF( SELF.Diff_AT_CERTEXP9,1,0)+ IF( SELF.Diff_AT_CERTEXP10,1,0)+ IF( SELF.Diff_EFX_EXTRACT_DATE,1,0)+ IF( SELF.Diff_EFX_MERCHANT_ID,1,0)+ IF( SELF.Diff_EFX_PROJECT_ID,1,0)+ IF( SELF.Diff_EFX_FOREIGN,1,0)+ IF( SELF.Diff_Record_Update_Refresh_Date,1,0)+ IF( SELF.Diff_EFX_DATE_CREATED,1,0);
+    SELF.Val := (SALT311.StrType)evaluate(le,pivot_exp);
+    SELF.Num_Diffs := 0+ IF( SELF.Diff_dt_first_seen,1,0)+ IF( SELF.Diff_dt_last_seen,1,0)+ IF( SELF.Diff_dt_vendor_first_reported,1,0)+ IF( SELF.Diff_dt_vendor_last_reported,1,0)+ IF( SELF.Diff_process_date,1,0)+ IF( SELF.Diff_record_type,1,0)+ IF( SELF.Diff_normcompany_type,1,0)+ IF( SELF.Diff_normaddress_type,1,0)+ IF( SELF.Diff_norm_state,1,0)+ IF( SELF.Diff_norm_zip,1,0)+ IF( SELF.Diff_norm_zip4,1,0)+ IF( SELF.Diff_EFX_NAME,1,0)+ IF( SELF.Diff_EFX_LEGAL_NAME,1,0)+ IF( SELF.Diff_EFX_ADDRESS,1,0)+ IF( SELF.Diff_EFX_BUSSTATCD,1,0)+ IF( SELF.Diff_EFX_CMSA,1,0)+ IF( SELF.Diff_EFX_CORPAMOUNTCD,1,0)+ IF( SELF.Diff_EFX_CORPAMOUNTPREC,1,0)+ IF( SELF.Diff_EFX_CORPAMOUNTTP,1,0)+ IF( SELF.Diff_EFX_CORPEMPCD,1,0)+ IF( SELF.Diff_EFX_WEB,1,0)+ IF( SELF.Diff_EFX_CTRYISOCD,1,0)+ IF( SELF.Diff_EFX_CTRYNUM,1,0)+ IF( SELF.Diff_EFX_CTRYTELCD,1,0)+ IF( SELF.Diff_EFX_GEOPREC,1,0)+ IF( SELF.Diff_EFX_MERCTYPE,1,0)+ IF( SELF.Diff_EFX_MRKT_TELESCORE,1,0)+ IF( SELF.Diff_EFX_MRKT_TOTALIND,1,0)+ IF( SELF.Diff_EFX_MRKT_TOTALSCORE,1,0)+ IF( SELF.Diff_EFX_PUBLIC,1,0)+ IF( SELF.Diff_EFX_STKEXC,1,0)+ IF( SELF.Diff_EFX_PRIMSIC,1,0)+ IF( SELF.Diff_EFX_SECSIC1,1,0)+ IF( SELF.Diff_EFX_SECSIC2,1,0)+ IF( SELF.Diff_EFX_SECSIC3,1,0)+ IF( SELF.Diff_EFX_SECSIC4,1,0)+ IF( SELF.Diff_EFX_ID,1,0)+ IF( SELF.Diff_EFX_CITY,1,0)+ IF( SELF.Diff_EFX_REGION,1,0)+ IF( SELF.Diff_EFX_CTRYNAME,1,0)+ IF( SELF.Diff_EFX_COUNTYNM,1,0)+ IF( SELF.Diff_EFX_COUNTY,1,0)+ IF( SELF.Diff_EFX_CMSADESC,1,0)+ IF( SELF.Diff_EFX_SOHO,1,0)+ IF( SELF.Diff_EFX_BIZ,1,0)+ IF( SELF.Diff_EFX_RES,1,0)+ IF( SELF.Diff_EFX_CMRA,1,0)+ IF( SELF.Diff_EFX_SECADR,1,0)+ IF( SELF.Diff_EFX_SECCTY,1,0)+ IF( SELF.Diff_EFX_SECGEOPREC,1,0)+ IF( SELF.Diff_EFX_SECREGION,1,0)+ IF( SELF.Diff_EFX_SECCTRYISOCD,1,0)+ IF( SELF.Diff_EFX_SECCTRYNUM,1,0)+ IF( SELF.Diff_EFX_SECCTRYNAME,1,0)+ IF( SELF.Diff_EFX_PHONE,1,0)+ IF( SELF.Diff_EFX_FAXPHONE,1,0)+ IF( SELF.Diff_EFX_BUSSTAT,1,0)+ IF( SELF.Diff_EFX_YREST,1,0)+ IF( SELF.Diff_EFX_CORPEMPCNT,1,0)+ IF( SELF.Diff_EFX_LOCEMPCNT,1,0)+ IF( SELF.Diff_EFX_LOCEMPCD,1,0)+ IF( SELF.Diff_EFX_CORPAMOUNT,1,0)+ IF( SELF.Diff_EFX_LOCAMOUNT,1,0)+ IF( SELF.Diff_EFX_LOCAMOUNTCD,1,0)+ IF( SELF.Diff_EFX_LOCAMOUNTTP,1,0)+ IF( SELF.Diff_EFX_LOCAMOUNTPREC,1,0)+ IF( SELF.Diff_EFX_TCKSYM,1,0)+ IF( SELF.Diff_EFX_PRIMSICDESC,1,0)+ IF( SELF.Diff_EFX_SECSICDESC1,1,0)+ IF( SELF.Diff_EFX_SECSICDESC2,1,0)+ IF( SELF.Diff_EFX_SECSICDESC3,1,0)+ IF( SELF.Diff_EFX_SECSICDESC4,1,0)+ IF( SELF.Diff_EFX_PRIMNAICSCODE,1,0)+ IF( SELF.Diff_EFX_SECNAICS1,1,0)+ IF( SELF.Diff_EFX_SECNAICS2,1,0)+ IF( SELF.Diff_EFX_SECNAICS3,1,0)+ IF( SELF.Diff_EFX_SECNAICS4,1,0)+ IF( SELF.Diff_EFX_PRIMNAICSDESC,1,0)+ IF( SELF.Diff_EFX_SECNAICSDESC1,1,0)+ IF( SELF.Diff_EFX_SECNAICSDESC2,1,0)+ IF( SELF.Diff_EFX_SECNAICSDESC3,1,0)+ IF( SELF.Diff_EFX_SECNAICSDESC4,1,0)+ IF( SELF.Diff_EFX_DEAD,1,0)+ IF( SELF.Diff_EFX_DEADDT,1,0)+ IF( SELF.Diff_EFX_MRKT_TELEVER,1,0)+ IF( SELF.Diff_EFX_MRKT_VACANT,1,0)+ IF( SELF.Diff_EFX_MRKT_SEASONAL,1,0)+ IF( SELF.Diff_EFX_MBE,1,0)+ IF( SELF.Diff_EFX_WBE,1,0)+ IF( SELF.Diff_EFX_MWBE,1,0)+ IF( SELF.Diff_EFX_SDB,1,0)+ IF( SELF.Diff_EFX_HUBZONE,1,0)+ IF( SELF.Diff_EFX_DBE,1,0)+ IF( SELF.Diff_EFX_VET,1,0)+ IF( SELF.Diff_EFX_DVET,1,0)+ IF( SELF.Diff_EFX_8a,1,0)+ IF( SELF.Diff_EFX_8aEXPDT,1,0)+ IF( SELF.Diff_EFX_DIS,1,0)+ IF( SELF.Diff_EFX_SBE,1,0)+ IF( SELF.Diff_EFX_BUSSIZE,1,0)+ IF( SELF.Diff_EFX_LBE,1,0)+ IF( SELF.Diff_EFX_GOV,1,0)+ IF( SELF.Diff_EFX_FGOV,1,0)+ IF( SELF.Diff_EFX_NONPROFIT,1,0)+ IF( SELF.Diff_EFX_HBCU,1,0)+ IF( SELF.Diff_EFX_GAYLESBIAN,1,0)+ IF( SELF.Diff_EFX_WSBE,1,0)+ IF( SELF.Diff_EFX_VSBE,1,0)+ IF( SELF.Diff_EFX_DVSBE,1,0)+ IF( SELF.Diff_EFX_MWBESTATUS,1,0)+ IF( SELF.Diff_EFX_NMSDC,1,0)+ IF( SELF.Diff_EFX_WBENC,1,0)+ IF( SELF.Diff_EFX_CA_PUC,1,0)+ IF( SELF.Diff_EFX_TX_HUB,1,0)+ IF( SELF.Diff_EFX_TX_HUBCERTNUM,1,0)+ IF( SELF.Diff_EFX_GSAX,1,0)+ IF( SELF.Diff_EFX_CALTRANS,1,0)+ IF( SELF.Diff_EFX_EDU,1,0)+ IF( SELF.Diff_EFX_MI,1,0)+ IF( SELF.Diff_EFX_ANC,1,0)+ IF( SELF.Diff_AT_CERT1,1,0)+ IF( SELF.Diff_AT_CERT2,1,0)+ IF( SELF.Diff_AT_CERT3,1,0)+ IF( SELF.Diff_AT_CERT4,1,0)+ IF( SELF.Diff_AT_CERT5,1,0)+ IF( SELF.Diff_AT_CERT6,1,0)+ IF( SELF.Diff_AT_CERT7,1,0)+ IF( SELF.Diff_AT_CERT8,1,0)+ IF( SELF.Diff_AT_CERT9,1,0)+ IF( SELF.Diff_AT_CERT10,1,0)+ IF( SELF.Diff_AT_CERTDESC1,1,0)+ IF( SELF.Diff_AT_CERTDESC2,1,0)+ IF( SELF.Diff_AT_CERTDESC3,1,0)+ IF( SELF.Diff_AT_CERTDESC4,1,0)+ IF( SELF.Diff_AT_CERTDESC5,1,0)+ IF( SELF.Diff_AT_CERTDESC6,1,0)+ IF( SELF.Diff_AT_CERTDESC7,1,0)+ IF( SELF.Diff_AT_CERTDESC8,1,0)+ IF( SELF.Diff_AT_CERTDESC9,1,0)+ IF( SELF.Diff_AT_CERTDESC10,1,0)+ IF( SELF.Diff_AT_CERTSRC1,1,0)+ IF( SELF.Diff_AT_CERTSRC2,1,0)+ IF( SELF.Diff_AT_CERTSRC3,1,0)+ IF( SELF.Diff_AT_CERTSRC4,1,0)+ IF( SELF.Diff_AT_CERTSRC5,1,0)+ IF( SELF.Diff_AT_CERTSRC6,1,0)+ IF( SELF.Diff_AT_CERTSRC7,1,0)+ IF( SELF.Diff_AT_CERTSRC8,1,0)+ IF( SELF.Diff_AT_CERTSRC9,1,0)+ IF( SELF.Diff_AT_CERTSRC10,1,0)+ IF( SELF.Diff_AT_CERTLEV1,1,0)+ IF( SELF.Diff_AT_CERTLEV2,1,0)+ IF( SELF.Diff_AT_CERTLEV3,1,0)+ IF( SELF.Diff_AT_CERTLEV4,1,0)+ IF( SELF.Diff_AT_CERTLEV5,1,0)+ IF( SELF.Diff_AT_CERTLEV6,1,0)+ IF( SELF.Diff_AT_CERTLEV7,1,0)+ IF( SELF.Diff_AT_CERTLEV8,1,0)+ IF( SELF.Diff_AT_CERTLEV9,1,0)+ IF( SELF.Diff_AT_CERTLEV10,1,0)+ IF( SELF.Diff_AT_CERTNUM1,1,0)+ IF( SELF.Diff_AT_CERTNUM2,1,0)+ IF( SELF.Diff_AT_CERTNUM3,1,0)+ IF( SELF.Diff_AT_CERTNUM4,1,0)+ IF( SELF.Diff_AT_CERTNUM5,1,0)+ IF( SELF.Diff_AT_CERTNUM6,1,0)+ IF( SELF.Diff_AT_CERTNUM7,1,0)+ IF( SELF.Diff_AT_CERTNUM8,1,0)+ IF( SELF.Diff_AT_CERTNUM9,1,0)+ IF( SELF.Diff_AT_CERTNUM10,1,0)+ IF( SELF.Diff_AT_CERTEXP1,1,0)+ IF( SELF.Diff_AT_CERTEXP2,1,0)+ IF( SELF.Diff_AT_CERTEXP3,1,0)+ IF( SELF.Diff_AT_CERTEXP4,1,0)+ IF( SELF.Diff_AT_CERTEXP5,1,0)+ IF( SELF.Diff_AT_CERTEXP6,1,0)+ IF( SELF.Diff_AT_CERTEXP7,1,0)+ IF( SELF.Diff_AT_CERTEXP8,1,0)+ IF( SELF.Diff_AT_CERTEXP9,1,0)+ IF( SELF.Diff_AT_CERTEXP10,1,0)+ IF( SELF.Diff_EFX_EXTRACT_DATE,1,0)+ IF( SELF.Diff_EFX_MERCHANT_ID,1,0)+ IF( SELF.Diff_EFX_PROJECT_ID,1,0)+ IF( SELF.Diff_EFX_FOREIGN,1,0)+ IF( SELF.Diff_Record_Update_Refresh_Date,1,0)+ IF( SELF.Diff_EFX_DATE_CREATED,1,0);
   END;
 // Now need to remove bad pivots from comparison
 #uniquename(L)
@@ -1606,6 +1629,7 @@ Bad_Pivots := %t2%(Cnt>100);
     Count_Diff_EFX_REGION := COUNT(GROUP,%Closest%.Diff_EFX_REGION);
     Count_Diff_EFX_CTRYNAME := COUNT(GROUP,%Closest%.Diff_EFX_CTRYNAME);
     Count_Diff_EFX_COUNTYNM := COUNT(GROUP,%Closest%.Diff_EFX_COUNTYNM);
+    Count_Diff_EFX_COUNTY := COUNT(GROUP,%Closest%.Diff_EFX_COUNTY);
     Count_Diff_EFX_CMSADESC := COUNT(GROUP,%Closest%.Diff_EFX_CMSADESC);
     Count_Diff_EFX_SOHO := COUNT(GROUP,%Closest%.Diff_EFX_SOHO);
     Count_Diff_EFX_BIZ := COUNT(GROUP,%Closest%.Diff_EFX_BIZ);

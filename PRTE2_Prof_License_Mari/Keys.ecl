@@ -9,18 +9,18 @@ export key_regulatory			:= index(files.dsRegulatory, {NMLS_ID,AFFIL_TYPE_CD}, {f
 
 export key_bdid      	:= index(dedup(files.dsSearch(bdid != 0),all),{unsigned6 bdid := (unsigned6)files.dsSearch.bdid}	,{files.dsSearch}, Data_Services.Data_location.Prefix('mari')+ constants.KEY_PREFIX + doxie.Version_SuperKey+'::bdid');
 export key_cmc_slpk	 	:= index(files.dsSearch, {CMC_SLPK,AFFIL_TYPE_CD,STD_SOURCE_UPD}, {files.dsSearch},Data_Services.Data_location.Prefix('mari')+ constants.KEY_PREFIX + doxie.Version_SuperKey+'::cmc_slpk');
-export key_did   := index(dedup(files.dsSearch_did, all),		
-																											{unsigned6 s_did := (unsigned6)files.dsSearch_did.did},{files.dsSearch_did}, 
-																											Data_services.Data_location.Prefix('mari') +
-																						constants.KEY_PREFIX + doxie.Version_SuperKey + '::did');
 
 
-ut.MAC_CLEAR_FIELDS(files.dsSearch_did, ds_search_cleared, constants.fields_to_clear);
-export key_did_FCRA   := index(dedup(ds_Search_cleared, all),		
-																											{unsigned6 s_did := (unsigned6)ds_Search_Cleared.did},{ds_search_cleared}, 
-																											Data_services.Data_location.Prefix('mari') +
-																											constants.KEY_PREFIX +'fcra::' + doxie.Version_SuperKey + '::did');
+export did_file   := dedup(files.dsSearch_did(did !=0), all);		
 
+EXPORT key_did(boolean IsFCRA = false) := function
+ut.MAC_CLEAR_FIELDS(did_file, ds_search_cleared,Constants.fields_to_clear);
+key_file := if(isFCRA, ds_search_cleared,did_file);
+
+return INDEX(key_file,{unsigned6 s_did := (unsigned6)key_file.did},{key_file}, 
+						 Data_services.Data_location.Prefix('mari') + if(isFCRA, constants.KEY_PREFIX + 'fcra::', constants.KEY_PREFIX) + doxie.Version_SuperKey + '::did');
+								
+end;
 
 export key_nmls_id		:= index(files.dsSearch(nmls_id != 0), {nmls_id}, {files.dsSearch}, Data_Services.Data_location.Prefix('mari')+ constants.KEY_PREFIX + doxie.Version_SuperKey+'::nmls_id');
 export key_mari_payload   := index(files.dsSearch, {mari_rid}, {files.dsSearch}, Data_Services.Data_location.Prefix('mari')+ constants.KEY_PREFIX + doxie.Version_SuperKey+'::rid');

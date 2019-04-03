@@ -1,4 +1,5 @@
-﻿EXPORT Build_Prepped_NAC(
+﻿import STD;
+EXPORT Build_Prepped_NAC(
 	string pversion
 ) :=
 MODULE
@@ -6,77 +7,76 @@ MODULE
 
 	Shared Sprayed_NAC := Files(pversion).Sprayed.NAC;
 
+
 	IdentityData := RECORD 
 		string75 fn { virtual(logicalfilename) };
 		Layouts.Sprayed.IdentityData;
 	END;	
 
 	IdentityData MapIDDT(Sprayed_NAC L) := TRANSFORM 
-			SELF.Customer_Name					:= '';
-			SELF.Customer_Account_Number	:= '196969851'; 
-			SELF.Customer_State					:= 'FL';
-			SELF.Customer_County				:= '001';
-			SELF.Customer_Agency				:= ''; 														
-			SELF.Customer_Agency_Vertical_Type	:= 'S';
-			SELF.Customer_Program				:= 'N';  // NAC SNAP
-			SELF.Customer_Job_ID				:= ''; 
-			SELF.Batch_Record_ID				:= ''; 
-			SELF.Transaction_ID_Number		:= ''; 
-			SELF.Reason_for_Transaction_Activity	:= ''; 	
-			SELF.Date_of_Transaction			:= '';											
-			SELF.LexID								:= 0;
-			SELF.raw_Full_Name					:= l.SearchFullName;
-			SELF.raw_Title							:= '';
-			SELF.raw_First_name					:= l.SearchFirstName;
-			SELF.raw_Middle_Name				:= l.SearchMiddleName;
-			SELF.raw_Last_Name					:= l.SearchLastName;
-			SELF.raw_Orig_Suffix				:= l.SearchSuffix;
-			SELF.SSN									:= l.SearchSSN;
-			SELF.SSN4									:= ''; 
-			SELF.Address_Type						:= ''; 
-			SELF.Street_1							:= l.SearchAddress1StreetAddress1;
-			SELF.Street_2							:= l.SearchAddress1StreetAddress2;
-			SELF.City									:= l.SearchAddress1City;
-			SELF.State								:= l.SearchAddress1State;
-			SELF.Zip									:= l.SearchAddress1Zip;
-			SELF.Mailing_Street_1				:= l.SearchAddress2StreetAddress1;
-			SELF.Mailing_Street_2				:= l.SearchAddress2StreetAddress2;
-			SELF.Mailing_City						:= l.SearchAddress2City;
-			SELF.Mailing_State					:= l.SearchAddress2State; 
-			SELF.Mailing_Zip						:= l.SearchAddress2Zip;
-			SELF.County								:= '';
-			SELF.Contact_Type						:= ''; 
-			SELF.phone_number						:= ''; 
-			SELF.Cell_Phone						:= '';
-			SELF.dob									:= l.SearchDOB;
-			SELF.Email_Address					:= '';
-			SELF.Drivers_License_State		:= '';
-			SELF.Drivers_License_Number		:= '';
-			SELF.Bank_Routing_Number_1		:= ''; 
-			SELF.Bank_Account_Number_1		:= ''; 
-			SELF.Bank_Routing_Number_2		:= ''; 
-			SELF.Bank_Account_Number_2		:= ''; 
-			SELF.Ethnicity							:= ''; 
-			SELF.Race									:= ''; 
-			SELF.Case_ID								:= l.SearchCaseId;
-			SELF.Client_ID							:= '';
-			SELF.Head_of_Household_indicator	:= ''; 
-			SELF.Relationship_Indicator		:= ''; 
-			SELF.IP_Address						:= l.enduserip;
-			SELF.Device_ID							:= ''; 
-			SELF.Unique_number					:= ''; 
-			SELF.MAC_Address						:= ''; 
-			SELF.Serial_Number					:= ''; 
-			SELF.Device_Type						:= ''; 
-			SELF.Device_identification_Provider	:= '';  
-			SELF.geo_lat								:= '';
-			SELF.geo_long							:= '';
-			SELF.source_input 					:= 'NAC';
+
+			searchpattern := '([0-9])\\w+';
+			sw := STD.Str.SplitWords( regexfind(searchpattern, l.fn,0), '_');
+			vDate := sw[1];
+			SELF.Customer_Job_ID := '';
+			SELF.Batch_Record_ID := '';
+			SELF.Transaction_ID_Number := L.ESPTransactionId;
+			SELF.Reason_for_Transaction_Activity:= '';
+			SELF.Date_of_Transaction := vDate;
+			SELF.LexID := 0;
+			SELF.raw_Full_Name := l.SearchFullName;
+			SELF.raw_Title := '';
+			SELF.raw_First_name := l.SearchFirstName;
+			SELF.raw_Middle_Name := l.SearchMiddleName;
+			SELF.raw_Last_Name := l.SearchLastName;
+			SELF.raw_Orig_Suffix := l.SearchSuffix;
+			SELF.SSN := l.SearchSSN;
+			SELF.SSN4 := '';
+			SELF.Address_Type := '';
+			SELF.Street_1 := l.SearchAddress1StreetAddress1;
+			SELF.Street_2 := l.SearchAddress1StreetAddress2;
+			SELF.City := l.SearchAddress1City;
+			SELF.State := l.SearchAddress1State;
+			SELF.Zip := l.SearchAddress1Zip;
+			SELF.Mailing_Street_1 := l.SearchAddress2StreetAddress1;
+			SELF.Mailing_Street_2 := l.SearchAddress2StreetAddress2;
+			SELF.Mailing_City := l.SearchAddress2City;
+			SELF.Mailing_State := l.SearchAddress2State;
+			SELF.Mailing_Zip := l.SearchAddress2Zip;
+			SELF.County := '';
+			SELF.Contact_Type := '';
+			SELF.phone_number := l.ClientPhone;
+			SELF.Cell_Phone := '';
+			SELF.dob := l.SearchDOB;
+			SELF.Email_Address := l.ClientEmail;
+			SELF.Drivers_License_State := '';
+			SELF.Drivers_License_Number := '';
+			SELF.Bank_Routing_Number_1 := '';
+			SELF.Bank_Account_Number_1 := '';
+			SELF.Bank_Routing_Number_2 := '';
+			SELF.Bank_Account_Number_2 := '';
+			SELF.Ethnicity := l.ClientEthnicity;
+			SELF.Race := l.ClientRace;
+			SELF.Case_ID := l.SearchCaseId;
+			SELF.Client_ID := l.SearchClientId;
+			SELF.Head_of_Household_indicator := '';
+			SELF.Relationship_Indicator := '';
+			SELF.IP_Address := l.enduserip;
+			SELF.Device_ID := '';
+			SELF.Unique_number := '';
+			SELF.MAC_Address := '';
+			SELF.Serial_Number := '';
+			SELF.Device_Type := '';
+			SELF.Device_identification_Provider	:= '';
+			SELF.geo_lat := '';
+			SELF.geo_long := '';
+			SELF.source_input := 'MSH_NAC';
 			SELF := L;
 			SELF := [];
 	END;
 
-	EXPORT NACIDDTUpdate := Project(dedup(Sprayed_NAC(ActivityType in ['1','2']),all),MapIDDT(Left));
+	bucket_1_n_2 := Sprayed_NAC(ActivityType in ['1','2']);
+	EXPORT NACIDDTUpdate := Project(dedup(bucket_1_n_2,all),MapIDDT(Left));
 	
 	KnownFraud := RECORD 
 		string75 fn { virtual(logicalfilename) };
@@ -84,15 +84,13 @@ MODULE
 	END;	
 
 	KnownFraud MapKNFD(Sprayed_NAC L) := TRANSFORM 
-			SELF.customer_name := '';
-			SELF.customer_account_number := '196969851';
-			SELF.customer_state := 'FL';
-			SELF.customer_county := '001';
-			SELF.customer_agency := '';
-			SELF.customer_agency_vertical_type := 'S';
-			SELF.customer_event_id := '';
-			SELF.reported_date := '';
-			SELF.reported_time := '';
+			searchpattern := '([0-9])\\w+';
+			sw := STD.Str.SplitWords( regexfind(searchpattern, l.fn,0), '_');
+			vDate := sw[1];
+			vTime := sw[2];
+			SELF.customer_event_id := L.SequenceNumber;
+			SELF.reported_date := vDate;
+			SELF.reported_time := vTime;
 			SELF.reported_by := '';
 			SELF.event_date := '';
 			SELF.event_end_date := '';
@@ -100,41 +98,41 @@ MODULE
 			SELF.event_type_1 := '';
 			SELF.event_type_2 := '';
 			SELF.event_type_3 := '';
-			SELF.case_id := l.CaseID;
-			SELF.client_id := '';
+			SELF.case_id := L.CaseID;
+			SELF.client_id := L.ClientID;
 			SELF.head_of_household_indicator := '';
 			SELF.relationship_indicator := '';
 			SELF.lexid := 0;
 			SELF.raw_title := '';
-			SELF.raw_first_name := l.ClientFirstName;
-			SELF.raw_middle_name := l.ClientMiddleName;
-			SELF.raw_last_name := l.ClientLastName;
+			SELF.raw_first_name := L.ClientFirstName;
+			SELF.raw_middle_name := L.ClientMiddleName;
+			SELF.raw_last_name := L.ClientLastName;
 			SELF.raw_orig_suffix := '';
 			SELF.raw_full_name := '';
 			SELF.name_risk_code := '';
-			SELF.ssn := l.ClientSSN;
+			SELF.ssn := L.ClientSSN;
 			SELF.ssn_risk_code := '';
-			SELF.dob := l.ClientDOB;
+			SELF.dob := L.ClientDOB;
 			SELF.dob_risk_code := '';
 			SELF.Drivers_License_Number := '';
 			SELF.Drivers_License_State := '';
 			SELF.drivers_license_risk_code := '';
-			SELF.Street_1 := '';
-			SELF.Street_2 := '';
-			SELF.city := '';
-			SELF.state := '';
-			SELF.zip := '';
+			SELF.Street_1 := L.CasePhysicalStreet1;
+			SELF.Street_2 := L.CasePhysicalStreet2;
+			SELF.city := L.CasePhysicalCity;
+			SELF.state := L.CasePhysicalState;
+			SELF.zip := L.CasePhysicalZip;
 			SELF.physical_address_risk_code := '';
-			SELF.mailing_Street_1 := '';
-			SELF.mailing_Street_2 := '';
-			SELF.mailing_city := '';
-			SELF.mailing_state := '';
-			SELF.mailing_zip := '';
+			SELF.mailing_Street_1 := L.CaseMailStreet1;
+			SELF.mailing_Street_2 := L.CaseMailStreet2;
+			SELF.mailing_city := L.CaseMailCity;
+			SELF.mailing_state := L.CaseMailState;
+			SELF.mailing_zip := L.CaseMailZip;
 			SELF.mailing_address_risk_code := '';
 			SELF.address_date := '';
 			SELF.address_type := '';
 			SELF.county := '';
-			SELF.phone_number := l.ClientPhone;
+			SELF.phone_number := L.ClientPhone;
 			SELF.phone_risk_code := '';
 			SELF.cell_phone := '';
 			SELF.cell_phone_risk_code := '';
@@ -147,7 +145,7 @@ MODULE
 			SELF.contact := '';
 			SELF.call_records := '';
 			SELF.in_service := '';
-			SELF.email_address := l.ClientEmail;
+			SELF.email_address := L.ClientEmail;
 			SELF.email_address_risk_code := '';
 			SELF.email_address_type := '';
 			SELF.email_date := '';
@@ -182,7 +180,7 @@ MODULE
 			SELF.business_type_1 := '';
 			SELF.business_date := '';
 			SELF.business_risk_code := '';
-			SELF.Customer_Program := 'N';
+			SELF.Customer_Program := L.CaseBenefitType;
 			SELF.start_date := '';
 			SELF.end_date := '';
 			SELF.amount_paid := '';
@@ -202,12 +200,46 @@ MODULE
 			SELF.external_referral_or_casenumber := '';
 			SELF.cleared_fraud := '';
 			SELF.reason_cleared_code := '';
-			SELF.source_input := 'NAC';
+			SELF.source_input := 'MSH_NAC';
 			SELF := L;
 			SELF := [];
 	END;
 
-	EXPORT NACKNFDUpdate := Project(dedup(Sprayed_NAC(ActivityType ='4'),all),MapKNFD(Left));
+	bucket_4 := Sprayed_NAC(ActivityType ='4');
+	intraState := bucket_4(casemailstate = SearchAddress1State and casemailstate <> '' and SearchAddress1State <> '');
+	interState := bucket_4(casemailstate <> SearchAddress1State);	
+
+	Sprayed_NAC NormIt(Sprayed_NAC L, UNSIGNED C) := TRANSFORM
+		self.casestate := CHOOSE(C,L.casestate,L.SearchAddress1State);
+		self.casebenefittype := CHOOSE(C,L.casebenefittype,L.searchbenefittype);
+		self.caseid := CHOOSE(C,L.caseid,L.searchcaseid);
+		self.caselastname := CHOOSE(C,L.caselastname,L.SearchLastName);
+		self.casefirstname := CHOOSE(C,L.casefirstname,L.SearchFirstName);
+		self.casemiddlename := CHOOSE(C,L.casemiddlename,L.SearchMiddleName);
+		self.casephysicalstreet1 := CHOOSE(C,L.casephysicalstreet1,L.SearchAddress1StreetAddress1);
+		self.casephysicalstreet2 := CHOOSE(C,L.casephysicalstreet2,L.SearchAddress1StreetAddress2);
+		self.casephysicalcity := CHOOSE(C,L.casephysicalcity,L.SearchAddress1City);
+		self.casephysicalstate := CHOOSE(C,L.casephysicalstate,L.SearchAddress1State);
+		self.casephysicalzip := CHOOSE(C,L.casephysicalzip,L.SearchAddress1Zip);
+		self.casemailstreet1 := CHOOSE(C,L.casemailstreet1,L.SearchAddress2StreetAddress1);
+		self.casemailstreet2 := CHOOSE(C,L.casemailstreet2,L.SearchAddress2StreetAddress2);
+		self.casemailcity := CHOOSE(C,L.casemailcity,L.SearchAddress2City);
+		self.casemailstate := CHOOSE(C,L.casemailstate,L.SearchAddress2State);
+		self.casemailzip := CHOOSE(C,L.casemailzip,L.SearchAddress2Zip);
+		self.clientid := CHOOSE(C,L.clientid,L.SearchClientId);
+		self.clientlastname := CHOOSE(C,L.clientlastname,L.SearchLastName);
+		self.clientfirstname := CHOOSE(C,L.clientfirstname,L.SearchFirstName);
+		self.clientmiddlename := CHOOSE(C,L.clientmiddlename,L.SearchMiddleName);
+		self.clientssn := CHOOSE(C,L.clientssn,L.SearchSSN);
+		self.clientdob := CHOOSE(C,L.clientdob,L.SearchDOB);
+		SELF := L;
+	END;
+
+	normRec := normalize(intraState, 2, NormIt(LEFT, COUNTER));
+
+	comb := normRec + interState;
+
+	EXPORT NACKNFDUpdate := Project(dedup(comb,all),MapKNFD(Left));
 	
 	
 end;
