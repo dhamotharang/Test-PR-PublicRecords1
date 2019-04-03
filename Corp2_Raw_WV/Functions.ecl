@@ -636,8 +636,8 @@ EXPORT Functions := Module;
 		
     END;
 	
-    //"fix_ForeignChar" function returns WV state-site matching leagal name after replacing "foreign character patterns" with match "sate site character patterns"
-		//line 645 to 658 regexfind functions are different to rest since those companies doesn't have common replacement char
+   //"fix_ForeignChar" function returns WV state-site matching “Legal Names” by replacing –“foreign character patterns" with “WV-Sate site character patterns"
+	 //line numbers from 645 to 658 (Regexfind- functions are different than rest them since those companies does not have common replacement char
 		EXPORT fix_ForeignChar(STRING s) := FUNCTION
 
 			uc_s  							 := corp2.t2u(s);				
