@@ -1,4 +1,4 @@
-export mac_JoinHeader_Raw(
+﻿export mac_JoinHeader_Raw(
 		infile, outfile, did_field = 'did', outerjoin = false,
     mod_access
 ) := MACRO
@@ -14,7 +14,7 @@ end;
 
 //*** call raw
 #uniquename(raw)
-%raw% := doxie_raw.Header_Raw(%myDIDs%,mod_access.date_threshold,mod_access.dppa,mod_access.glb,mod_access.ssn_mask,mod_access.ln_branded, mod_access.probation_override);
+%raw% := doxie_raw.Header_Raw(%myDIDs%,mod_access);
 
 //*** join the infile back to the raw
 #uniquename(outrec)
