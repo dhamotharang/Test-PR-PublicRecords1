@@ -5,8 +5,8 @@ EXPORT Fields := MODULE
 EXPORT NumFields := 28;
  
 // Processing for each FieldType
-EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid__date','invalid__optional_date','invalid__corp_key','invalid__corp_vendor','invalid__state_origin','invalid__charter','invalid__mandatory','invalid__name_type_cd','invalid__name_type_desc','invalid__forgn_dom_code','invalid__orig_org_structure_cd','invalid__for_profit_ind','invalid__recordorigin','invalid__alphablank','invalid__alphablankhyphen','invalid__merger_desc');
-EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'invalid__date' => 1,'invalid__optional_date' => 2,'invalid__corp_key' => 3,'invalid__corp_vendor' => 4,'invalid__state_origin' => 5,'invalid__charter' => 6,'invalid__mandatory' => 7,'invalid__name_type_cd' => 8,'invalid__name_type_desc' => 9,'invalid__forgn_dom_code' => 10,'invalid__orig_org_structure_cd' => 11,'invalid__for_profit_ind' => 12,'invalid__recordorigin' => 13,'invalid__alphablank' => 14,'invalid__alphablankhyphen' => 15,'invalid__merger_desc' => 16,0);
+EXPORT SALT311.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'invalid__date','invalid__optional_date','invalid__corp_key','invalid__corp_vendor','invalid__state_origin','invalid__charter','invalid__mandatory','invalid__name_type_cd','invalid__name_type_desc','invalid__forgn_dom_code','invalid__orig_org_structure_cd','invalid__for_profit_ind','invalid__recordOrigin','invalid__alphablank','invalid__alphablankhyphen','invalid__alphablankhyphencommaparens','invalid__merger_desc');
+EXPORT FieldTypeNum(SALT311.StrType fn) := CASE(fn,'invalid__date' => 1,'invalid__optional_date' => 2,'invalid__corp_key' => 3,'invalid__corp_vendor' => 4,'invalid__state_origin' => 5,'invalid__charter' => 6,'invalid__mandatory' => 7,'invalid__name_type_cd' => 8,'invalid__name_type_desc' => 9,'invalid__forgn_dom_code' => 10,'invalid__orig_org_structure_cd' => 11,'invalid__for_profit_ind' => 12,'invalid__recordOrigin' => 13,'invalid__alphablank' => 14,'invalid__alphablankhyphen' => 15,'invalid__alphablankhyphencommaparens' => 16,'invalid__merger_desc' => 17,0);
  
 EXPORT MakeFT_invalid__date(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,'0123456789'); // Only allow valid symbols
@@ -57,19 +57,13 @@ EXPORT InValidMessageFT_invalid__mandatory(UNSIGNED1 wh) := CHOOSE(wh,SALT311.Hy
 EXPORT MakeFT_invalid__name_type_cd(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid__name_type_cd(SALT311.StrType s+++Line:329:DEPRECATED case-insensitive label match: recordOrigin
-,SALT311.StrType recordOrigin) := WHICH(~Scrubs_Corp2_Mapping_WA_Main.Functions.invalid_name_type_code(s+++Line:329:DEPRECATED case-insensitive label match: recordOrigin
-,recordOrigin+++Line:329:DEPRECATED case-insensitive label match: recordOrigin
-)>0);
+EXPORT InValidFT_invalid__name_type_cd(SALT311.StrType s,SALT311.StrType recordOrigin) := WHICH(~Scrubs_Corp2_Mapping_WA_Main.Functions.invalid_name_type_code(s,recordOrigin)>0);
 EXPORT InValidMessageFT_invalid__name_type_cd(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Corp2_Mapping_WA_Main.Functions.invalid_name_type_code'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid__name_type_desc(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid__name_type_desc(SALT311.StrType s+++Line:329:DEPRECATED case-insensitive label match: recordOrigin
-,SALT311.StrType recordOrigin) := WHICH(~Scrubs_Corp2_Mapping_WA_Main.Functions.invalid_name_type_desc(s+++Line:329:DEPRECATED case-insensitive label match: recordOrigin
-,recordOrigin+++Line:329:DEPRECATED case-insensitive label match: recordOrigin
-)>0);
+EXPORT InValidFT_invalid__name_type_desc(SALT311.StrType s,SALT311.StrType recordOrigin) := WHICH(~Scrubs_Corp2_Mapping_WA_Main.Functions.invalid_name_type_desc(s,recordOrigin)>0);
 EXPORT InValidMessageFT_invalid__name_type_desc(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.CustomFail('Scrubs_Corp2_Mapping_WA_Main.Functions.invalid_name_type_desc'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid__forgn_dom_code(SALT311.StrType s0) := FUNCTION
@@ -90,11 +84,11 @@ END;
 EXPORT InValidFT_invalid__for_profit_ind(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['N','Y',' ']);
 EXPORT InValidMessageFT_invalid__for_profit_ind(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('N|Y| '),SALT311.HygieneErrors.Good);
  
-EXPORT MakeFT_invalid__recordorigin(SALT311.StrType s0) := FUNCTION
+EXPORT MakeFT_invalid__recordOrigin(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid__recordorigin(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['C','T']);
-EXPORT InValidMessageFT_invalid__recordorigin(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('C|T'),SALT311.HygieneErrors.Good);
+EXPORT InValidFT_invalid__recordOrigin(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['C','T']);
+EXPORT InValidMessageFT_invalid__recordOrigin(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('C|T'),SALT311.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid__alphablank(SALT311.StrType s0) := FUNCTION
   s1 := SALT311.stringfilter(s0,' ABCDEFGHIJKLMNOPQRSTUVWXYZ'); // Only allow valid symbols
@@ -110,15 +104,22 @@ END;
 EXPORT InValidFT_invalid__alphablankhyphen(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,' -ABCDEFGHIJKLMNOPQRSTUVWXYZ'))));
 EXPORT InValidMessageFT_invalid__alphablankhyphen(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars(' -ABCDEFGHIJKLMNOPQRSTUVWXYZ'),SALT311.HygieneErrors.Good);
  
+EXPORT MakeFT_invalid__alphablankhyphencommaparens(SALT311.StrType s0) := FUNCTION
+  s1 := SALT311.stringfilter(s0,' (),-ABCDEFGHIJKLMNOPQRSTUVWXYZ'); // Only allow valid symbols
+  RETURN  s1;
+END;
+EXPORT InValidFT_invalid__alphablankhyphencommaparens(SALT311.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT311.StringFilter(s,' (),-ABCDEFGHIJKLMNOPQRSTUVWXYZ'))));
+EXPORT InValidMessageFT_invalid__alphablankhyphencommaparens(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInChars(' (),-ABCDEFGHIJKLMNOPQRSTUVWXYZ'),SALT311.HygieneErrors.Good);
+ 
 EXPORT MakeFT_invalid__merger_desc(SALT311.StrType s0) := FUNCTION
   RETURN  s0;
 END;
 EXPORT InValidFT_invalid__merger_desc(SALT311.StrType s) := WHICH(((SALT311.StrType) s) NOT IN ['MERGER','MERGER NON-SURVIVOR',' ']);
 EXPORT InValidMessageFT_invalid__merger_desc(UNSIGNED1 wh) := CHOOSE(wh,SALT311.HygieneErrors.NotInEnum('MERGER|MERGER NON-SURVIVOR| '),SALT311.HygieneErrors.Good);
  
-EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'dt_vendor_first_reported','dt_vendor_last_reported','dt_first_seen','dt_last_seen','corp_ra_dt_first_seen','corp_ra_dt_last_seen','corp_process_date','corp_inc_date','corp_forgn_date','corp_dissolved_date','corp_merger_date','corp_key','corp_orig_sos_charter_nbr','corp_vendor','corp_state_origin','corp_legal_name','corp_inc_state','corp_forgn_state_desc','corp_foreign_domestic_ind','corp_for_profit_ind','corp_ln_name_type_cd','corp_ln_name_type_desc','corp_orig_org_structure_cd','corp_orig_org_structure_desc','corp_status_desc','corp_merger_desc','cont_title1_desc','recordorigin');
-EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'dt_vendor_first_reported','dt_vendor_last_reported','dt_first_seen','dt_last_seen','corp_ra_dt_first_seen','corp_ra_dt_last_seen','corp_process_date','corp_inc_date','corp_forgn_date','corp_dissolved_date','corp_merger_date','corp_key','corp_orig_sos_charter_nbr','corp_vendor','corp_state_origin','corp_legal_name','corp_inc_state','corp_forgn_state_desc','corp_foreign_domestic_ind','corp_for_profit_ind','corp_ln_name_type_cd','corp_ln_name_type_desc','corp_orig_org_structure_cd','corp_orig_org_structure_desc','corp_status_desc','corp_merger_desc','cont_title1_desc','recordorigin');
-EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'dt_vendor_first_reported' => 0,'dt_vendor_last_reported' => 1,'dt_first_seen' => 2,'dt_last_seen' => 3,'corp_ra_dt_first_seen' => 4,'corp_ra_dt_last_seen' => 5,'corp_process_date' => 6,'corp_inc_date' => 7,'corp_forgn_date' => 8,'corp_dissolved_date' => 9,'corp_merger_date' => 10,'corp_key' => 11,'corp_orig_sos_charter_nbr' => 12,'corp_vendor' => 13,'corp_state_origin' => 14,'corp_legal_name' => 15,'corp_inc_state' => 16,'corp_forgn_state_desc' => 17,'corp_foreign_domestic_ind' => 18,'corp_for_profit_ind' => 19,'corp_ln_name_type_cd' => 20,'corp_ln_name_type_desc' => 21,'corp_orig_org_structure_cd' => 22,'corp_orig_org_structure_desc' => 23,'corp_status_desc' => 24,'corp_merger_desc' => 25,'cont_title1_desc' => 26,'recordorigin' => 27,0);
+EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'dt_vendor_first_reported','dt_vendor_last_reported','dt_first_seen','dt_last_seen','corp_ra_dt_first_seen','corp_ra_dt_last_seen','corp_process_date','corp_inc_date','corp_forgn_date','corp_dissolved_date','corp_merger_date','corp_key','corp_orig_sos_charter_nbr','corp_vendor','corp_state_origin','corp_legal_name','corp_inc_state','corp_forgn_state_desc','corp_foreign_domestic_ind','corp_for_profit_ind','corp_ln_name_type_cd','corp_ln_name_type_desc','corp_orig_org_structure_cd','corp_orig_org_structure_desc','corp_status_desc','corp_merger_desc','cont_title1_desc','recordOrigin');
+EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'dt_vendor_first_reported','dt_vendor_last_reported','dt_first_seen','dt_last_seen','corp_ra_dt_first_seen','corp_ra_dt_last_seen','corp_process_date','corp_inc_date','corp_forgn_date','corp_dissolved_date','corp_merger_date','corp_key','corp_orig_sos_charter_nbr','corp_vendor','corp_state_origin','corp_legal_name','corp_inc_state','corp_forgn_state_desc','corp_foreign_domestic_ind','corp_for_profit_ind','corp_ln_name_type_cd','corp_ln_name_type_desc','corp_orig_org_structure_cd','corp_orig_org_structure_desc','corp_status_desc','corp_merger_desc','cont_title1_desc','recordOrigin');
+EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'dt_vendor_first_reported' => 0,'dt_vendor_last_reported' => 1,'dt_first_seen' => 2,'dt_last_seen' => 3,'corp_ra_dt_first_seen' => 4,'corp_ra_dt_last_seen' => 5,'corp_process_date' => 6,'corp_inc_date' => 7,'corp_forgn_date' => 8,'corp_dissolved_date' => 9,'corp_merger_date' => 10,'corp_key' => 11,'corp_orig_sos_charter_nbr' => 12,'corp_vendor' => 13,'corp_state_origin' => 14,'corp_legal_name' => 15,'corp_inc_state' => 16,'corp_forgn_state_desc' => 17,'corp_foreign_domestic_ind' => 18,'corp_for_profit_ind' => 19,'corp_ln_name_type_cd' => 20,'corp_ln_name_type_desc' => 21,'corp_orig_org_structure_cd' => 22,'corp_orig_org_structure_desc' => 23,'corp_status_desc' => 24,'corp_merger_desc' => 25,'cont_title1_desc' => 26,'recordOrigin' => 27,0);
 EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,['ALLOW','CUSTOM','LENGTHS'],['ALLOW','CUSTOM','LENGTHS'],['ALLOW','CUSTOM','LENGTHS'],['ALLOW','CUSTOM','LENGTHS'],['ALLOW','CUSTOM','LENGTHS'],['ALLOW','CUSTOM','LENGTHS'],['ALLOW','CUSTOM','LENGTHS'],['ALLOW','CUSTOM','LENGTHS'],['ALLOW','CUSTOM','LENGTHS'],['ALLOW','CUSTOM','LENGTHS'],['ALLOW','CUSTOM','LENGTHS'],['ALLOW','LENGTHS'],['ALLOW','LENGTHS'],['ENUM'],['ENUM'],['LENGTHS'],['ENUM'],['ALLOW'],['ENUM'],['ENUM'],['CUSTOM'],['CUSTOM'],['CUSTOM'],['ALLOW'],['ALLOW'],['ENUM'],['ALLOW'],['ENUM'],[]);
 EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
@@ -192,9 +193,9 @@ EXPORT Make_corp_inc_state(SALT311.StrType s0) := MakeFT_invalid__state_origin(s
 EXPORT InValid_corp_inc_state(SALT311.StrType s) := InValidFT_invalid__state_origin(s);
 EXPORT InValidMessage_corp_inc_state(UNSIGNED1 wh) := InValidMessageFT_invalid__state_origin(wh);
  
-EXPORT Make_corp_forgn_state_desc(SALT311.StrType s0) := MakeFT_invalid__alphablank(s0);
-EXPORT InValid_corp_forgn_state_desc(SALT311.StrType s) := InValidFT_invalid__alphablank(s);
-EXPORT InValidMessage_corp_forgn_state_desc(UNSIGNED1 wh) := InValidMessageFT_invalid__alphablank(wh);
+EXPORT Make_corp_forgn_state_desc(SALT311.StrType s0) := MakeFT_invalid__alphablankhyphencommaparens(s0);
+EXPORT InValid_corp_forgn_state_desc(SALT311.StrType s) := InValidFT_invalid__alphablankhyphencommaparens(s);
+EXPORT InValidMessage_corp_forgn_state_desc(UNSIGNED1 wh) := InValidMessageFT_invalid__alphablankhyphencommaparens(wh);
  
 EXPORT Make_corp_foreign_domestic_ind(SALT311.StrType s0) := MakeFT_invalid__forgn_dom_code(s0);
 EXPORT InValid_corp_foreign_domestic_ind(SALT311.StrType s) := InValidFT_invalid__forgn_dom_code(s);
@@ -205,15 +206,11 @@ EXPORT InValid_corp_for_profit_ind(SALT311.StrType s) := InValidFT_invalid__for_
 EXPORT InValidMessage_corp_for_profit_ind(UNSIGNED1 wh) := InValidMessageFT_invalid__for_profit_ind(wh);
  
 EXPORT Make_corp_ln_name_type_cd(SALT311.StrType s0) := MakeFT_invalid__name_type_cd(s0);
-EXPORT InValid_corp_ln_name_type_cd(SALT311.StrType s+++Line:329:DEPRECATED case-insensitive label match: recordOrigin
-,SALT311.StrType recordOrigin) := InValidFT_invalid__name_type_cd(s+++Line:329:DEPRECATED case-insensitive label match: recordOrigin
-,recordOrigin);
+EXPORT InValid_corp_ln_name_type_cd(SALT311.StrType s,SALT311.StrType recordOrigin) := InValidFT_invalid__name_type_cd(s,recordOrigin);
 EXPORT InValidMessage_corp_ln_name_type_cd(UNSIGNED1 wh) := InValidMessageFT_invalid__name_type_cd(wh);
  
 EXPORT Make_corp_ln_name_type_desc(SALT311.StrType s0) := MakeFT_invalid__name_type_desc(s0);
-EXPORT InValid_corp_ln_name_type_desc(SALT311.StrType s+++Line:329:DEPRECATED case-insensitive label match: recordOrigin
-,SALT311.StrType recordOrigin) := InValidFT_invalid__name_type_desc(s+++Line:329:DEPRECATED case-insensitive label match: recordOrigin
-,recordOrigin);
+EXPORT InValid_corp_ln_name_type_desc(SALT311.StrType s,SALT311.StrType recordOrigin) := InValidFT_invalid__name_type_desc(s,recordOrigin);
 EXPORT InValidMessage_corp_ln_name_type_desc(UNSIGNED1 wh) := InValidMessageFT_invalid__name_type_desc(wh);
  
 EXPORT Make_corp_orig_org_structure_cd(SALT311.StrType s0) := MakeFT_invalid__orig_org_structure_cd(s0);
@@ -236,9 +233,9 @@ EXPORT Make_cont_title1_desc(SALT311.StrType s0) := MakeFT_invalid__alphablank(s
 EXPORT InValid_cont_title1_desc(SALT311.StrType s) := InValidFT_invalid__alphablank(s);
 EXPORT InValidMessage_cont_title1_desc(UNSIGNED1 wh) := InValidMessageFT_invalid__alphablank(wh);
  
-EXPORT Make_recordorigin(SALT311.StrType s0) := MakeFT_invalid__recordorigin(s0);
-EXPORT InValid_recordorigin(SALT311.StrType s) := InValidFT_invalid__recordorigin(s);
-EXPORT InValidMessage_recordorigin(UNSIGNED1 wh) := InValidMessageFT_invalid__recordorigin(wh);
+EXPORT Make_recordOrigin(SALT311.StrType s0) := MakeFT_invalid__recordOrigin(s0);
+EXPORT InValid_recordOrigin(SALT311.StrType s) := InValidFT_invalid__recordOrigin(s);
+EXPORT InValidMessage_recordOrigin(UNSIGNED1 wh) := InValidMessageFT_invalid__recordOrigin(wh);
  
 // This macro will compute and count field level differences based upon a pivot expression
 export MAC_CountDifferencesByPivot(in_left,in_right,pivot_exp,bad_pivots,out_counts) := MACRO
@@ -288,7 +285,7 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_corp_status_desc;
     BOOLEAN Diff_corp_merger_desc;
     BOOLEAN Diff_cont_title1_desc;
-    BOOLEAN Diff_recordorigin;
+    BOOLEAN Diff_recordOrigin;
     UNSIGNED Num_Diffs;
     SALT311.StrType Val {MAXLENGTH(1024)};
   END;
@@ -321,9 +318,9 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_corp_status_desc := le.corp_status_desc <> ri.corp_status_desc;
     SELF.Diff_corp_merger_desc := le.corp_merger_desc <> ri.corp_merger_desc;
     SELF.Diff_cont_title1_desc := le.cont_title1_desc <> ri.cont_title1_desc;
-    SELF.Diff_recordorigin := le.recordorigin <> ri.recordorigin;
+    SELF.Diff_recordOrigin := le.recordOrigin <> ri.recordOrigin;
     SELF.Val := (SALT311.StrType)evaluate(le,pivot_exp);
-    SELF.Num_Diffs := 0+ IF( SELF.Diff_dt_vendor_first_reported,1,0)+ IF( SELF.Diff_dt_vendor_last_reported,1,0)+ IF( SELF.Diff_dt_first_seen,1,0)+ IF( SELF.Diff_dt_last_seen,1,0)+ IF( SELF.Diff_corp_ra_dt_first_seen,1,0)+ IF( SELF.Diff_corp_ra_dt_last_seen,1,0)+ IF( SELF.Diff_corp_process_date,1,0)+ IF( SELF.Diff_corp_inc_date,1,0)+ IF( SELF.Diff_corp_forgn_date,1,0)+ IF( SELF.Diff_corp_dissolved_date,1,0)+ IF( SELF.Diff_corp_merger_date,1,0)+ IF( SELF.Diff_corp_key,1,0)+ IF( SELF.Diff_corp_orig_sos_charter_nbr,1,0)+ IF( SELF.Diff_corp_vendor,1,0)+ IF( SELF.Diff_corp_state_origin,1,0)+ IF( SELF.Diff_corp_legal_name,1,0)+ IF( SELF.Diff_corp_inc_state,1,0)+ IF( SELF.Diff_corp_forgn_state_desc,1,0)+ IF( SELF.Diff_corp_foreign_domestic_ind,1,0)+ IF( SELF.Diff_corp_for_profit_ind,1,0)+ IF( SELF.Diff_corp_ln_name_type_cd,1,0)+ IF( SELF.Diff_corp_ln_name_type_desc,1,0)+ IF( SELF.Diff_corp_orig_org_structure_cd,1,0)+ IF( SELF.Diff_corp_orig_org_structure_desc,1,0)+ IF( SELF.Diff_corp_status_desc,1,0)+ IF( SELF.Diff_corp_merger_desc,1,0)+ IF( SELF.Diff_cont_title1_desc,1,0)+ IF( SELF.Diff_recordorigin,1,0);
+    SELF.Num_Diffs := 0+ IF( SELF.Diff_dt_vendor_first_reported,1,0)+ IF( SELF.Diff_dt_vendor_last_reported,1,0)+ IF( SELF.Diff_dt_first_seen,1,0)+ IF( SELF.Diff_dt_last_seen,1,0)+ IF( SELF.Diff_corp_ra_dt_first_seen,1,0)+ IF( SELF.Diff_corp_ra_dt_last_seen,1,0)+ IF( SELF.Diff_corp_process_date,1,0)+ IF( SELF.Diff_corp_inc_date,1,0)+ IF( SELF.Diff_corp_forgn_date,1,0)+ IF( SELF.Diff_corp_dissolved_date,1,0)+ IF( SELF.Diff_corp_merger_date,1,0)+ IF( SELF.Diff_corp_key,1,0)+ IF( SELF.Diff_corp_orig_sos_charter_nbr,1,0)+ IF( SELF.Diff_corp_vendor,1,0)+ IF( SELF.Diff_corp_state_origin,1,0)+ IF( SELF.Diff_corp_legal_name,1,0)+ IF( SELF.Diff_corp_inc_state,1,0)+ IF( SELF.Diff_corp_forgn_state_desc,1,0)+ IF( SELF.Diff_corp_foreign_domestic_ind,1,0)+ IF( SELF.Diff_corp_for_profit_ind,1,0)+ IF( SELF.Diff_corp_ln_name_type_cd,1,0)+ IF( SELF.Diff_corp_ln_name_type_desc,1,0)+ IF( SELF.Diff_corp_orig_org_structure_cd,1,0)+ IF( SELF.Diff_corp_orig_org_structure_desc,1,0)+ IF( SELF.Diff_corp_status_desc,1,0)+ IF( SELF.Diff_corp_merger_desc,1,0)+ IF( SELF.Diff_cont_title1_desc,1,0)+ IF( SELF.Diff_recordOrigin,1,0);
   END;
 // Now need to remove bad pivots from comparison
 #uniquename(L)
@@ -363,7 +360,7 @@ Bad_Pivots := %t2%(Cnt>100);
     Count_Diff_corp_status_desc := COUNT(GROUP,%Closest%.Diff_corp_status_desc);
     Count_Diff_corp_merger_desc := COUNT(GROUP,%Closest%.Diff_corp_merger_desc);
     Count_Diff_cont_title1_desc := COUNT(GROUP,%Closest%.Diff_cont_title1_desc);
-    Count_Diff_recordorigin := COUNT(GROUP,%Closest%.Diff_recordorigin);
+    Count_Diff_recordOrigin := COUNT(GROUP,%Closest%.Diff_recordOrigin);
   END;
   out_counts := table(%Closest%,%AggRec%,true);
 ENDMACRO;

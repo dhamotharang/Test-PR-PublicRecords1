@@ -328,7 +328,7 @@ end;
 	ds_linkid						:= dataset([],rKeyEquifax_Business_Data__linkid);
 		
 	linkid_IN			  		:= index(ds_linkid, 			 {ultid,orgid,seleid,proxid,powid,empid,dotid},
-													 {ds_linkid}, 		 '~prct::key::Equifax_Business_Data::'+pIndexVersion+'::linkids');
+													 {ds_linkid}, 		 '~prte::key::Equifax_Business_Data::'+pIndexVersion+'::linkids');
 	
 	return	sequential(	
 								build(linkid_IN, update),

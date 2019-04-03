@@ -26,9 +26,10 @@ FIELDTYPE:invalid__name_type_desc:CUSTOM(Scrubs_Corp2_Mapping_WA_Main.Functions.
 FIELDTYPE:invalid__forgn_dom_code:ENUM(D|F| )
 FIELDTYPE:invalid__orig_org_structure_cd:CUSTOM(Scrubs_Corp2_Mapping_WA_Main.Functions.invalid_org_structure_cd>0)
 FIELDTYPE:invalid__for_profit_ind:ENUM(N|Y| )
-FIELDTYPE:invalid__recordorigin:ENUM(C|T)
+FIELDTYPE:invalid__recordOrigin:ENUM(C|T)
 FIELDTYPE:invalid__alphablank:ALLOW( ABCDEFGHIJKLMNOPQRSTUVWXYZ)
 FIELDTYPE:invalid__alphablankhyphen:ALLOW( -ABCDEFGHIJKLMNOPQRSTUVWXYZ)
+FIELDTYPE:invalid__alphablankhyphencommaparens:ALLOW( \(\),-ABCDEFGHIJKLMNOPQRSTUVWXYZ)
 FIELDTYPE:invalid__merger_desc:ENUM(MERGER|MERGER NON-SURVIVOR| )
 
 //FIELD DEFINITIONS
@@ -49,7 +50,7 @@ FIELD:corp_vendor:TYPE(STRING2):LIKE(invalid__corp_vendor):0,0
 FIELD:corp_state_origin:TYPE(STRING2):LIKE(invalid__state_origin):0,0
 FIELD:corp_legal_name:TYPE(STRING350):LIKE(invalid__mandatory):0,0
 FIELD:corp_inc_state:TYPE(STRING2):LIKE(invalid__state_origin):0,0
-FIELD:corp_forgn_state_desc:TYPE(STRING60):LIKE(invalid__alphablank):0,0
+FIELD:corp_forgn_state_desc:TYPE(STRING60):LIKE(invalid__alphablankhyphencommaparens):0,0
 FIELD:corp_foreign_domestic_ind:TYPE(STRING1):LIKE(invalid__forgn_dom_code):0,0
 FIELD:corp_for_profit_ind:TYPE(STRING1):LIKE(invalid__for_profit_ind):0,0
 FIELD:corp_ln_name_type_cd:TYPE(STRING2):LIKE(invalid__name_type_cd):0,0
@@ -59,7 +60,7 @@ FIELD:corp_orig_org_structure_desc:TYPE(STRING60):LIKE(invalid__alphablankhyphen
 FIELD:corp_status_desc:TYPE(STRING60):LIKE(invalid__alphablank):0,0
 FIELD:corp_merger_desc:TYPE(STRING250):LIKE(invalid__merger_desc):0,0
 FIELD:cont_title1_desc:TYPE(STRING60):LIKE(invalid__alphablank):0,0
-FIELD:recordorigin:TYPE(STRING1):LIKE(invalid__recordorigin):0,0
+FIELD:recordOrigin:TYPE(STRING1):LIKE(invalid__recordOrigin):0,0
   
 //Fields not being Scrubbed
 // DATEFIELD:corp_filing_date:TYPE(STRING8):LIKE(invalid__optional_date):0,0

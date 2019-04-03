@@ -1,5 +1,5 @@
 ﻿ 
-EXPORT MAC_PopulationStatistics(infile,Ref='',Input_dt_vendor_first_reported = '',Input_dt_vendor_last_reported = '',Input_dt_first_seen = '',Input_dt_last_seen = '',Input_corp_ra_dt_first_seen = '',Input_corp_ra_dt_last_seen = '',Input_corp_process_date = '',Input_corp_inc_date = '',Input_corp_forgn_date = '',Input_corp_dissolved_date = '',Input_corp_merger_date = '',Input_corp_key = '',Input_corp_orig_sos_charter_nbr = '',Input_corp_vendor = '',Input_corp_state_origin = '',Input_corp_legal_name = '',Input_corp_inc_state = '',Input_corp_forgn_state_desc = '',Input_corp_foreign_domestic_ind = '',Input_corp_for_profit_ind = '',Input_corp_ln_name_type_cd = '',Input_corp_ln_name_type_desc = '',Input_corp_orig_org_structure_cd = '',Input_corp_orig_org_structure_desc = '',Input_corp_status_desc = '',Input_corp_merger_desc = '',Input_cont_title1_desc = '',Input_recordorigin = '',OutFile) := MACRO
+EXPORT MAC_PopulationStatistics(infile,Ref='',Input_dt_vendor_first_reported = '',Input_dt_vendor_last_reported = '',Input_dt_first_seen = '',Input_dt_last_seen = '',Input_corp_ra_dt_first_seen = '',Input_corp_ra_dt_last_seen = '',Input_corp_process_date = '',Input_corp_inc_date = '',Input_corp_forgn_date = '',Input_corp_dissolved_date = '',Input_corp_merger_date = '',Input_corp_key = '',Input_corp_orig_sos_charter_nbr = '',Input_corp_vendor = '',Input_corp_state_origin = '',Input_corp_legal_name = '',Input_corp_inc_state = '',Input_corp_forgn_state_desc = '',Input_corp_foreign_domestic_ind = '',Input_corp_for_profit_ind = '',Input_corp_ln_name_type_cd = '',Input_corp_ln_name_type_desc = '',Input_corp_orig_org_structure_cd = '',Input_corp_orig_org_structure_desc = '',Input_corp_status_desc = '',Input_corp_merger_desc = '',Input_cont_title1_desc = '',Input_recordOrigin = '',OutFile) := MACRO
   IMPORT SALT311,Scrubs_Corp2_Mapping_WA_Main;
   #uniquename(of)
   %of% := RECORD
@@ -170,10 +170,10 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_dt_vendor_first_reported = '
         IF( le.Input_cont_title1_desc = (TYPEOF(le.Input_cont_title1_desc))'','',':cont_title1_desc')
     #END
  
-+    #IF( #TEXT(Input_recordorigin)='' )
++    #IF( #TEXT(Input_recordOrigin)='' )
       '' 
     #ELSE
-        IF( le.Input_recordorigin = (TYPEOF(le.Input_recordorigin))'','',':recordorigin')
+        IF( le.Input_recordOrigin = (TYPEOF(le.Input_recordOrigin))'','',':recordOrigin')
     #END
 ;
   END;
