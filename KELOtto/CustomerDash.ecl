@@ -19,7 +19,7 @@
     PROJECT(KELOtto.Q__show_Customer_Internet_Protocol.Res0(event_count_ > 1000), TRANSFORM(ExlusionRecord, SELF := LEFT));
 
   //topclusters
-  OttoFullGraph := KELOtto.KelFiles.FullCluster(in_customer_population_ = 1 AND safe_flag_ = 0); //DATASET('~foreign::10.173.44.105::gov::otto::fullgraph', RECORDOF(KELOtto.KelFiles.FullCluster), THOR); 
+  OttoFullGraph := KELOtto.KelFiles.FullCluster(safe_flag_ = 0); //DATASET('~foreign::10.173.44.105::gov::otto::fullgraph', RECORDOF(KELOtto.KelFiles.FullCluster), THOR); 
 
 
   

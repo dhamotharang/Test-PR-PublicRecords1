@@ -51,6 +51,7 @@ FullTreePrep1 :=
   KELOtto.Q__show_Customer_Person_Phone_Tree_Entities.Res0 + // Phone to Person
   KELOtto.Q__show_Customer_Person_Email_Tree_Entities.Res0 +
   KELOtto.Q__show_Customer_Person_Bank_Account_Tree_Entities.Res0 +
+  KELOtto.Q__show_Customer_Person_Ip_Tree_Entities.Res0 +
   KELOtto.Q__show_Customer_Person_Drivers_License_Tree_Entities.Res0)(tree_uid_ != '_011' AND entity_context_uid_ != '_011')
   : persist('~temp::deleteme99');
 

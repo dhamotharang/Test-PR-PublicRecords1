@@ -202,8 +202,8 @@ EXPORT key_static := RECORD
     DATASET(duns_number_case_layout and not score) duns_number;
     DATASET(sic_code_case_layout and not score) sic_code;
     DATASET(naics_code_case_layout and not score) naics_code;
-	  	//DATASET(dba_name_case_layout and not score) dba_name;
-    //unsigned4 global_sid;
-    //unsigned8 record_sid;
+	  	DATASET(dba_name_case_layout and not score) dba_name;
+    unsigned4 global_sid;
+    unsigned8 record_sid;
 END;
 END;
