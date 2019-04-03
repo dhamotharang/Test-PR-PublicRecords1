@@ -50,12 +50,8 @@ inputi := project(inputOrig, transform(Doxie_Raw.Layout_input,
     self.section := StringLib.StringToLowerCase(left.section);
     self := left;
 ));
-/*Doxie_Raw.Layout_input caseFormat(Doxie_Raw.Layout_input fileL):= transform
-    self.idtype := StringLib.StringToUpperCase(fileL.idtype);
-    self.section := StringLib.StringToLowerCase(fileL.section);
-    self := fileL;
-end;
-inputi := project(inputOrig, caseFormat(left));*/
+
+mod_access := Doxie.compliance.GetGlobalDataAccessModule();
 
 // inclusion/exclusion
 includeOccurrences	:= false : stored('IncludeOccurrences');
@@ -65,8 +61,7 @@ includeSources			:= not excludeSources;
 
 //===========================================================
 //For did: do NOT project to Layout_references. Keep the address.
-outDid := Doxie_Raw.ViewSourceDid(inputi(idtype in ['DID', 'RID']), dateVal, 
-    dppa_purpose, glb_purpose, application_type_value,ln_branded_value, probation_override_value, industry_class_value,IsCRS,ssn_mask_value,dl_mask_value,
+outDid := Doxie_Raw.ViewSourceDid(inputi(idtype in ['DID', 'RID']), mod_access, IsCRS,
 		BankruptcyVersion,JudgmentLienVersion,UccVersion,DlVersion,VehicleVersion,VoterVersion,DeaVersion,
     CriminalRecordVersion, doxie_crs.str_typeDebtor);
 

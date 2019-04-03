@@ -1,4 +1,4 @@
-﻿IMPORT doxie, doxie_raw, iesp;//, AutoHeaderI, AutoStandardI;
+﻿IMPORT doxie, doxie_raw, iesp, PersonReports;//, AutoHeaderI, AutoStandardI;
 
 // Produces static counts (from header key)
 
@@ -16,7 +16,7 @@ out_rec := iesp.share.t_SourceSection;
 // produces source counts for (single) DID
 //TODO: rewrite doxie, making it ESDL-compliant
 EXPORT out_rec SourceCounts_records (dataset (doxie.layout_references) dids,
-  input._sources param, 
+  PersonReports.input._sources param, 
   boolean IsFCRA = false
   ) := FUNCTION
 
@@ -202,8 +202,11 @@ EXPORT out_rec SourceCounts_records (dataset (doxie.layout_references) dids,
 //  self.quickheader_cnt := count(dedup(SORT(L.quickheader_child, RECORD), record));
 
   // Take sections from header file (this is almost exact copy of the code from doxie.CRS)  
-  //TODO: add dateVal to the interface
-  header_recs := Doxie_Raw.Header_Raw (dids, , param.DPPAPurpose, param.GLBPurpose);
+  mod_access := MODULE(Doxie.compliance.GetGlobalDataAccessModuleTranslated(AutoStandardI.GlobalModule()))
+    EXPORT unsigned1 glb := param.GLBPurpose;
+    EXPORT unsigned1 dppa := param.DPPAPurpose;
+  END;
+  header_recs := Doxie_Raw.Header_Raw (dids, mod_access);
 
   header_sections := 
     if (exists (header_recs),             dataset ([{'ADDRESSES', 0, did_ref_prefix + 'ADDRESSES', 'Section'}], iesp.share.t_SourceSection)) +

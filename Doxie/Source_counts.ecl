@@ -4,7 +4,11 @@ export Source_counts (dataset (doxie.layout_references) dids) := function
 
 doxie.MAC_Header_Field_Declare();
 doxie.MAC_Selection_Declare();
-boolean is_knowx1 := ut.IndustryClass.is_knowx;
+
+mod_access := Doxie.compliance.GetGlobalDataAccessModule();
+
+boolean is_knowx1 := mod_access.isConsumer();
+
 Out_layout := record
  unsigned2 atf_cnt; 
  unsigned2 bk_cnt;
@@ -72,8 +76,7 @@ end;
 
 inputi := project(dids,intoInput(left));
 
-outDid := Doxie_Raw.ViewSourceDid(inputi, dateVal, 
-    dppa_purpose, glb_purpose, application_type_value,ln_branded_value, probation_override_value, industry_class_value,IsCRS,,,
+outDid := Doxie_Raw.ViewSourceDid(inputi, mod_access, IsCRS,
 		BankruptcyVersion,JudgmentLienVersion,UccVersion,DlVersion,VehicleVersion,VoterVersion,DeaVersion,CriminalRecordVersion,
 		doxie_crs.str_typeDebtor); //limit counts for CRS
 

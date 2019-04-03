@@ -6,16 +6,8 @@ doxie.MAC_Selection_Declare ();
 
 export ViewSourceDid(
     dataset(Doxie_Raw.Layout_input) input,
-    unsigned4 dateVal = 0,
-    unsigned1 dppa_purpose = 0,
-    unsigned1 glb_purpose = 0,
-		string32 application_type_value = '',
-		boolean ln_branded_value = false,
-		boolean probation_override_value = false,
-		string5 industry_class_value,
+		doxie.IDataAccess mod_access,
     boolean IsCRS = false,
-		string6 ssn_mask_value = 'NONE',
-		boolean dl_mask_value = false,
 		BankruptcyVersion = 0,
 		JudgmentLienVersion = 0,
 		UccVersion = 0,
@@ -26,7 +18,9 @@ export ViewSourceDid(
 		CriminalRecordVersion =0,
 		string1 in_party_type = ''
 ) := FUNCTION
+
 global_mod := AutoStandardI.GlobalModule();
+
 //================== Section Select ==========================
 boolean IncludeBlankDOD := false : stored('IncludeBlankDOD');
 boolean viewAll(string20 sect) := sect = '';
@@ -88,8 +82,6 @@ boolean viewFLCrash(string20 sect)    := IF (IsCRS, Include_Accidents_val, viewA
 boolean viewDOC  (string20 sect)      := CriminalRecordVersion in [0,1] and IF (IsCRS, Include_CriminalRecords_val, viewAll(sect) OR sect = 'doc');
 boolean viewDOCv2(string20 sect)      := CriminalRecordVersion in [0,2] and IF (IsCRS, Include_CriminalRecords_val, viewAll(sect) OR sect = 'doc');
 
-
-
 boolean viewSexOffender(string20 sect):= IF (IsCRS, Include_SexualOffenses_val, viewAll(sect) OR sect = 'sexoffender');
 //probably not needed here since they're only ever filled in for a Loc Report
 boolean viewBusHeader(string20 sect)  := viewAll(sect) OR sect = 'busheader';
@@ -107,60 +99,72 @@ bdid0 := doxie_raw.ds_EmptyBDIDs;
 tmsid0 := doxie_raw.ds_EmptyTMSIDs;
 
 //============================= rid children ========================
+/*
+mod_access := MODULE(Doxie.compliance.GetGlobalDataAccessModuleTranslated(global_mod))
+  EXPORT boolean ln_branded := ln_branded_value;
+  EXPORT boolean probation_override := probation_override_value;
+  EXPORT string ssn_mask := ssn_mask_value;
+  EXPORT unsigned1 dl_mask :=	IF (dl_mask_value, 1, 0);
+  EXPORT string5 industry_class :=	industry_class_value;
+  EXPORT string32 application_type :=	application_type_value;
+  EXPORT unsigned1 glb := glb_purpose;
+  EXPORT unsigned1 dppa := dppa_purpose;
+  EXPORT unsigned3 date_threshold := dateVal;
+END;
+*/
 //address, ssn and dob section
 ds_address := IF(EXISTS(input(idtype = 'DID',viewCompAddress(section))),
-	Doxie_Raw.CompAddress_Raw(input(idtype = 'DID',viewCompAddress(section)), dateVal, dppa_purpose, glb_purpose, 
-                            ln_branded_value,probation_override_value,ssn_mask_value,dl_mask_value,application_type_value, industry_class_value));
+	               Doxie_Raw.CompAddress_Raw(input(idtype = 'DID',viewCompAddress(section)), mod_access));
 ds_ssn := IF(EXISTS(input(idtype = 'DID', viewSSN(section))),
-	Doxie_Raw.SSN_Raw(input(idtype = 'DID',viewSSN(section)),dateVal,dppa_purpose,glb_purpose,ssn_mask_value,dl_mask_value,application_type_value));
+	           Doxie_Raw.SSN_Raw(input(idtype = 'DID',viewSSN(section)), mod_access));
 ds_dob := IF(EXISTS(input(idtype = 'DID', viewDob(section))),
-	Doxie_Raw.Dob_Raw(input(idtype = 'DID',viewDob(section)),dateVal,dppa_purpose,glb_purpose,ssn_mask_value,dl_mask_value,application_type_value));
+	           Doxie_Raw.Dob_Raw(input(idtype = 'DID',viewDob(section)), mod_access));
 
 //============================= did children ====================================
 Doxie_raw.layout_crs_raw getDidChildren(Doxie_Raw.Layout_input fileL) := transform
     unsigned6 did := (unsigned6)fileL.id;
     SELF.did := did;
 		dids := dataset([{did}],Doxie.layout_references);
-		ds_email_child := if(viewEmail(fileL.section), Doxie.email_records(dids,ssn_mask_value,application_type_value));
-    ds_death_child := if(viewDeath(fileL.section),Doxie_raw.death_raw(dids, , dateVal, dppa_purpose, glb_purpose,ssn_mask_value)(IncludeBlankDOD or (integer)DOD8 > 0 ));
-    ds_state_death_child := if(viewStateDeath(fileL.section),Doxie_raw.state_death_raw(dids, dateVal, dppa_purpose, glb_purpose,ssn_mask_value));		
-    ds_atf_child := if(viewAtf(fileL.section), Doxie_raw.atf_raw(dids, dateVal, dppa_purpose, glb_purpose,ssn_mask_value));
-    ds_bk_child := if(viewBK(fileL.section),Doxie_raw.bk_raw(dids, bdid0, , , dateVal, dppa_purpose, glb_purpose, ssn_mask_value, in_party_type));
-		ds_bk_v2_child := if(viewBKV2(fileL.section),Doxie_raw.bkV2_raw(dids, bdid0, , dateVal, ssn_mask_value, in_party_type));
-	  ds_lien_child := if(viewLien(fileL.section), Doxie_raw.Lien_Raw(dids, bdid0, dateVal, dppa_purpose, glb_purpose,,,,,,,,,ssn_mask_value,in_party_type));
-	  ds_lien_v2_child := if(viewLienV2(fileL.section), Doxie_raw.Liensv2_Raw(dids, bdid0, tmsid0, dateVal, dppa_purpose, glb_purpose,,,,,,,,ssn_mask_value,in_party_type,application_type_value));
-	  ds_dl_child := if(viewDl(fileL.section), Doxie_raw.DL_Raw(dids, dateVal, dppa_purpose, glb_purpose, ln_branded_value,,,,,,,,,,,ssn_mask_value,dl_mask_value));
-	  ds_dl2_child := if(viewDl2(fileL.section), Doxie_Raw.DLV2_Raw(dids, , ,dppa_purpose, ssn_mask_value) );
-	  ds_proflic_child := if(viewProfLic(fileL.section), Doxie_raw.PL_Raw(dids, bdid0, '', dateVal,dppa_purpose, glb_purpose,ssn_mask_value));
-		ds_sanc_child := if(viewSanc(fileL.section),Doxie_Raw.Sanc_Raw(dids,,dateVal));
+		ds_email_child := if(viewEmail(fileL.section), Doxie.email_records(dids,mod_access.ssn_mask,mod_access.application_type));
+    ds_death_child := if(viewDeath(fileL.section),Doxie_raw.death_raw(dids, , mod_access.date_threshold, mod_access.dppa, mod_access.glb,mod_access.ssn_mask)(IncludeBlankDOD or (integer)DOD8 > 0 ));
+    ds_state_death_child := if(viewStateDeath(fileL.section),Doxie_raw.state_death_raw(dids, mod_access.date_threshold, mod_access.dppa, mod_access.glb,mod_access.ssn_mask));		
+    ds_atf_child := if(viewAtf(fileL.section), Doxie_raw.atf_raw(dids, mod_access.date_threshold, mod_access.dppa, mod_access.glb,mod_access.ssn_mask));
+    ds_bk_child := if(viewBK(fileL.section),Doxie_raw.bk_raw(dids, bdid0, , , mod_access.date_threshold, mod_access.dppa, mod_access.glb, mod_access.ssn_mask, in_party_type));
+		ds_bk_v2_child := if(viewBKV2(fileL.section),Doxie_raw.bkV2_raw(dids, bdid0, , mod_access.date_threshold, mod_access.ssn_mask, in_party_type));
+	  ds_lien_child := if(viewLien(fileL.section), Doxie_raw.Lien_Raw(dids, bdid0, mod_access.date_threshold, mod_access.dppa, mod_access.glb,,,,,,,,,mod_access.ssn_mask,in_party_type));
+	  ds_lien_v2_child := if(viewLienV2(fileL.section), Doxie_raw.Liensv2_Raw(dids, bdid0, tmsid0, mod_access.date_threshold, mod_access.dppa, mod_access.glb,,,,,,,,mod_access.ssn_mask,in_party_type,mod_access.application_type));
+	  ds_dl_child := if(viewDl(fileL.section), Doxie_raw.DL_Raw(dids, mod_access.date_threshold, mod_access.dppa, mod_access.glb, mod_access.ln_branded,,,,,,,,,,,mod_access.ssn_mask,dl_mask_value));
+	  ds_dl2_child := if(viewDl2(fileL.section), Doxie_Raw.DLV2_Raw(dids, , ,mod_access.dppa, mod_access.ssn_mask) );
+	  ds_proflic_child := if(viewProfLic(fileL.section), Doxie_raw.PL_Raw(dids, bdid0, '', mod_access.date_threshold,mod_access.dppa, mod_access.glb,mod_access.ssn_mask));
+		ds_sanc_child := if(viewSanc(fileL.section),Doxie_Raw.Sanc_Raw(dids,,mod_access.date_threshold));
 		ds_prov_child := if(viewProv(fileL.section),Doxie_Raw.Prov_Raw(dids)); 	  
-		ds_veh_child := if(viewVeh(fileL.section), Doxie_raw.Veh_Raw(dids, , , , , , , dateVal, dppa_purpose, glb_purpose, ln_branded_value,ssn_mask_value,dl_mask_value,,,,application_type_value,IncludeNonRegulatedVehicleSources));
-    ds_veh_v2_child := if(viewVehV2(fileL.section), Doxie_raw.VehV2_Raw(dids,,,ssn_mask_value,dateVal));	  
-    ds_dea_child := if(viewDea(fileL.section), Doxie_raw.Dea_Raw(dids, bdid0, dateVal, dppa_purpose, glb_purpose, ssn_mask_value));
-		ds_dea_v2_child := if(viewDeaV2(fileL.section), Doxie_raw.DeaV2_Raw(dids, bdid0,, dppa_purpose, glb_purpose, ssn_mask_value,application_type_value));
-	  ds_airc_child := if(viewAircraft(fileL.section), Doxie_raw.AirCraft_Raw(dids, bdid0, dateVal, dppa_purpose, glb_purpose,ssn_mask_value,application_type_value));
-    ds_watercraft_child := if(viewWaterCraft(fileL.section), Doxie_Raw.WaterCraft_Raw(dids, dateVal, dppa_purpose, glb_purpose,'','','','',bdid0,,IncludeNonRegulatedWatercraftSources));
-    ds_ucc_child := if(viewUcc(fileL.section), Doxie_Raw.UCC_Legacy_Raw(dids, bdid0, dateVal, dppa_purpose, glb_purpose,ssn_mask_value,,in_party_type));
-    ds_ucc_v2_child := if(viewUCCv2(fileL.section), Doxie_Raw.UCCv2_Raw(dids, bdid0, dateVal, dppa_purpose, glb_purpose,,,,,,,,,ssn_mask_value,in_party_type));
-    ds_corpAffil_child := if(viewCorpAffil(fileL.section), Doxie_Raw.CorpAffil_Raw(dids, dateVal, dppa_purpose, glb_purpose));
-    ds_emerge_child := project(if(viewCcw(fileL.section), Doxie_Raw.Ccw_Raw(dids, dateVal, dppa_purpose, glb_purpose,ssn_mask_value)),  
+		ds_veh_child := if(viewVeh(fileL.section), Doxie_raw.Veh_Raw(dids, , , , , , , mod_access.date_threshold, mod_access.dppa, mod_access.glb, mod_access.ln_branded,mod_access.ssn_mask,dl_mask_value,,,,mod_access.application_type,IncludeNonRegulatedVehicleSources));
+    ds_veh_v2_child := if(viewVehV2(fileL.section), Doxie_raw.VehV2_Raw(dids,,,mod_access.ssn_mask,mod_access.date_threshold));	  
+    ds_dea_child := if(viewDea(fileL.section), Doxie_raw.Dea_Raw(dids, bdid0, mod_access.date_threshold, mod_access.dppa, mod_access.glb, mod_access.ssn_mask));
+		ds_dea_v2_child := if(viewDeaV2(fileL.section), Doxie_raw.DeaV2_Raw(dids, bdid0,, mod_access.dppa, mod_access.glb, mod_access.ssn_mask,mod_access.application_type));
+	  ds_airc_child := if(viewAircraft(fileL.section), Doxie_raw.AirCraft_Raw(dids, bdid0, mod_access.date_threshold, mod_access.dppa, mod_access.glb,mod_access.ssn_mask,mod_access.application_type));
+    ds_watercraft_child := if(viewWaterCraft(fileL.section), Doxie_Raw.WaterCraft_Raw(dids, mod_access.date_threshold, mod_access.dppa, mod_access.glb,'','','','',bdid0,,IncludeNonRegulatedWatercraftSources));
+    ds_ucc_child := if(viewUcc(fileL.section), Doxie_Raw.UCC_Legacy_Raw(dids, bdid0, mod_access.date_threshold, mod_access.dppa, mod_access.glb,mod_access.ssn_mask,,in_party_type));
+    ds_ucc_v2_child := if(viewUCCv2(fileL.section), Doxie_Raw.UCCv2_Raw(dids, bdid0, mod_access.date_threshold, mod_access.dppa, mod_access.glb,,,,,,,,,mod_access.ssn_mask,in_party_type));
+    ds_corpAffil_child := if(viewCorpAffil(fileL.section), Doxie_Raw.CorpAffil_Raw(dids, mod_access.date_threshold, mod_access.dppa, mod_access.glb));
+    ds_emerge_child := project(if(viewCcw(fileL.section), Doxie_Raw.Ccw_Raw(dids, mod_access.date_threshold, mod_access.dppa, mod_access.glb,mod_access.ssn_mask)),  
         transform(Doxie_Raw.Layout_emerge_raw, self := left, self := []))
-      + project(if(viewHunt(fileL.section), Doxie_Raw.Hunt_Raw(dids, dateVal, dppa_purpose, glb_purpose,ssn_mask_value)),  
+      + project(if(viewHunt(fileL.section), Doxie_Raw.Hunt_Raw(dids, mod_access.date_threshold, mod_access.dppa, mod_access.glb,mod_access.ssn_mask)),  
         transform(Doxie_Raw.Layout_emerge_raw, self := left, self := [])) 
-      + project(if(viewVoter(fileL.section), Doxie_Raw.Voter_Raw(dids, dateVal, dppa_purpose, glb_purpose,ssn_mask_value)),  
+      + project(if(viewVoter(fileL.section), Doxie_Raw.Voter_Raw(dids, mod_access.date_threshold, mod_access.dppa, mod_access.glb,mod_access.ssn_mask)),  
         transform(Doxie_Raw.Layout_emerge_raw, self.did := (unsigned6)left.did, self := left, self := []));	
-	  ds_voters_v2_child := if (viewVoterV2 (fileL.section), Doxie_raw.Votersv2_Raw (dids, dateVal, ssn_mask_value));
-    ds_pilot_child := if(viewPilot(fileL.section), Doxie_Raw.Pilot_Raw(dids, dateVal, dppa_purpose, glb_purpose,ssn_mask_value));
-    ds_pilotCert_child := if(viewPilotCert(fileL.section), Doxie_Raw.Pilot_Cert_Raw(dids, dateVal));
-    ds_whoIs_child := if(viewWhoIs(fileL.section), Doxie_Raw.WhoIs_Raw(dids, bdid0, '', dateVal, dppa_purpose, glb_purpose));
+	  ds_voters_v2_child := if (viewVoterV2 (fileL.section), Doxie_raw.Votersv2_Raw (dids, mod_access.date_threshold, mod_access.ssn_mask));
+    ds_pilot_child := if(viewPilot(fileL.section), Doxie_Raw.Pilot_Raw(dids, mod_access.date_threshold, mod_access.dppa, mod_access.glb,mod_access.ssn_mask));
+    ds_pilotCert_child := if(viewPilotCert(fileL.section), Doxie_Raw.Pilot_Cert_Raw(dids, mod_access.date_threshold));
+    ds_whoIs_child := if(viewWhoIs(fileL.section), Doxie_Raw.WhoIs_Raw(dids, bdid0, '', mod_access.date_threshold, mod_access.dppa, mod_access.glb));
 
     prop_ids := doxie_ln.property_ids (
-                  dids, bdid0, dateVal, dppa_purpose, glb_purpose, ln_branded_value, probation_override_value,
-                  false, doxie.stored_Use_CurrentlyOwnedProperty_value,,,,,,application_type_value);
+                  dids, bdid0, mod_access.date_threshold, mod_access.dppa, mod_access.glb, mod_access.ln_branded, mod_access.probation_override,
+                  false, doxie.stored_Use_CurrentlyOwnedProperty_value,,,,,,mod_access.application_type);
     ds_assessor_child := if(viewProperty(fileL.section) or viewAssessment(fileL.section), 
-                            sort(Doxie_LN.asses_records(prop_ids, dateVal, ln_branded_value, 200)(current), whole record));
+                            sort(Doxie_LN.asses_records(prop_ids, mod_access.date_threshold, mod_access.ln_branded, 200)(current), whole record));
     ds_deed_child := if(viewProperty(fileL.section) or viewDeed(fileL.section),
-                        sort(Doxie_LN.deed_records(prop_ids, dateVal, ln_branded_value,200)(current), whole record));
+                        sort(Doxie_LN.deed_records(prop_ids, mod_access.date_threshold, mod_access.ln_branded,200)(current), whole record));
     
     ds_assessor2_child := if(
 			viewPropertyV2(fileL.section) or viewAssessmentV2(fileL.section), 
@@ -173,22 +177,22 @@ Doxie_raw.layout_crs_raw getDidChildren(Doxie_Raw.Layout_input fileL) := transfo
 
     // moving population of phone_child outside the transform to get past codegen FAIL issue
     ds_phone_child := [];
-    ds_finder_child := if(viewFinder(fileL.section),doxie_raw.Finder_Raw(dids, dateVal, dppa_purpose, glb_purpose,ssn_mask_value,application_type_value));
-    ds_eq_child := if(viewEq(fileL.section),doxie_raw.Eq_Raw(dids, dateVal, dppa_purpose, glb_purpose,ssn_mask_value,application_type_value));
-    ds_en_child := if(viewEN(fileL.section),doxie_raw.EN_Raw(dids, dateVal, dppa_purpose, glb_purpose,ssn_mask_value,application_type_value));
-    ds_util_child := if(viewUtil(fileL.section),doxie_raw.Util_Raw(project(dids, doxie.layout_references_hh), dateVal, dppa_purpose, glb_purpose, industry_class_value,ssn_mask_value,dl_mask_value,application_type_value));
-    ds_ak_child := if(viewAK(fileL.section),doxie_raw.AK_Raw(dids, dateVal, dppa_purpose, glb_purpose,application_type_value));
-    ds_mswork_child := if(viewMSWork(fileL.section),doxie_raw.MSWork_Raw(dids, dateVal, dppa_purpose, glb_purpose,ssn_mask_value,application_type_value));
-    ds_for_child := if(viewFor(fileL.section),doxie_raw.For_Raw(dids, dateVal, dppa_purpose, glb_purpose,ssn_mask_value,application_type_value));
-    ds_nod_child := if(viewNOD(fileL.section),doxie_raw.Nod_Raw(dids, dateVal, dppa_purpose, glb_purpose,ssn_mask_value,application_type_value));
-    ds_boater_child := if(viewBoater(fileL.section),doxie_raw.Boater_Raw(dids, dateVal, dppa_purpose, glb_purpose,application_type_value));
-    ds_tu_child := if(viewTU(fileL.section),doxie_raw.TU_Raw(dids, dateVal, dppa_purpose, glb_purpose,ssn_mask_value,dl_mask_value,application_type_value));
-    ds_tn_child := if(viewTN(fileL.section),doxie_raw.TN_Raw(dids, dateVal, dppa_purpose, glb_purpose,ssn_mask_value,dl_mask_value,application_type_value));
-		ds_flcrash_child := if(viewFLCrash(fileL.section),doxie_raw.FLCrash_Raw(dids,dateVal,dppa_purpose,glb_purpose));
+    ds_finder_child := if(viewFinder(fileL.section),doxie_raw.Finder_Raw(dids, mod_access));
+    ds_eq_child := if(viewEq(fileL.section),doxie_raw.Eq_Raw(dids, mod_access));
+    ds_en_child := if(viewEN(fileL.section),doxie_raw.EN_Raw(dids, mod_access));
+    ds_util_child := if(viewUtil(fileL.section),doxie_raw.Util_Raw(project(dids, doxie.layout_references_hh), mod_access));
+    ds_ak_child := if(viewAK(fileL.section),doxie_raw.AK_Raw(dids, mod_access));
+    ds_mswork_child := if(viewMSWork(fileL.section),doxie_raw.MSWork_Raw(dids, mod_access));
+    ds_for_child := if(viewFor(fileL.section),doxie_raw.For_Raw(dids, mod_access)); 
+    ds_nod_child := if(viewNOD(fileL.section),doxie_raw.Nod_Raw(dids, mod_access));
+    ds_boater_child := if(viewBoater(fileL.section),doxie_raw.Boater_Raw(dids, mod_access));
+    ds_tu_child := if(viewTU(fileL.section),doxie_raw.TU_Raw(dids, mod_access));
+    ds_tn_child := if(viewTN(fileL.section),doxie_raw.TN_Raw(dids, mod_access)); 
+    ds_flcrash_child := if(viewFLCrash(fileL.section),doxie_raw.FLCrash_Raw(dids,mod_access.date_threshold,mod_access.dppa,mod_access.glb));
 
-		doc_persons := doxie_raw.DOC_People_Raw(dids,,,,,,, dateval, dppa_purpose, glb_purpose,ssn_mask_value,,application_type_value);
+		doc_persons := doxie_raw.DOC_People_Raw(dids,,,,,,, mod_access.date_threshold, mod_access.dppa, mod_access.glb,mod_access.ssn_mask,,mod_access.application_type);
 		ds_doc_people_child := if(viewDOC(fileL.section),doc_persons);
-		ds_doc_events_child := if(viewDOC(fileL.section),doxie_raw.DOC_Events_Raw(doc_persons,true,true,true,true,true,,,,dateVal,dppa_purpose,glb_purpose));
+		ds_doc_events_child := if(viewDOC(fileL.section),doxie_raw.DOC_Events_Raw(doc_persons,true,true,true,true,true,,,,mod_access.date_threshold,mod_access.dppa,mod_access.glb));
 		// same as in doxie@Comprehensive_Report_Service
 		tempmod := module(project(global_mod,CriminalRecords_Services.IParam.report,opt))
 			export string14 did := input[1].id;	
@@ -200,12 +204,12 @@ Doxie_raw.layout_crs_raw getDidChildren(Doxie_Raw.Layout_input fileL) := transfo
 		docr2 := project(CriminalRecords_Services.ReportService_Records.val(tempmod).CriminalRecords, iesp.criminal.t_CrimReportRecord);
 		ds_doc_v2_child := if(viewDOCv2 (fileL.section), docr2);
 
-		sexoffender_persons := doxie_raw.SexOffender_People_Raw(dids,,,,false,dateVal,dppa_purpose,glb_purpose,application_type_value, ssn_mask_value);
+		sexoffender_persons := doxie_raw.SexOffender_People_Raw(dids,,,,false,mod_access.date_threshold,mod_access.dppa,mod_access.glb,mod_access.application_type, mod_access.ssn_mask);
 		ds_sexoffender_people_child := if(viewSexOffender(fileL.section),sexoffender_persons);
-		ds_sexoffender_events_child := if(viewSexOffender(fileL.section),doxie_raw.SexOffender_Events_Raw(sexoffender_persons,,dateVal,dppa_purpose,glb_purpose,application_type_value));
-	  ds_quickHeader_child := if(viewQuickHeader(fileL.section), doxie_raw.QuickHeader_raw(PROJECT(dids, doxie.layout_references_hh),dateVal,dppa_purpose,glb_purpose,ssn_mask_value));
-	  ds_targ_child := if(viewTargus(fileL.section), Doxie_raw.Targus_Raw(dids, dateVal, dppa_purpose, glb_purpose, industry_class_value));
-		ds_pp_child := if(viewPP(fileL.section), moxie_phonesplus_server.phonesplus_did_records(dids, ut.limits.CRS_SOURCE_COUNT.default, score_threshold_value,glb_purpose,dppa_purpose,,true).wo_timezone);
+		ds_sexoffender_events_child := if(viewSexOffender(fileL.section),doxie_raw.SexOffender_Events_Raw(sexoffender_persons,,mod_access.date_threshold,mod_access.dppa,mod_access.glb,mod_access.application_type));
+	  ds_quickHeader_child := if(viewQuickHeader(fileL.section), doxie_raw.QuickHeader_raw(PROJECT(dids, doxie.layout_references_hh),mod_access.date_threshold,mod_access.dppa,mod_access.glb,mod_access.ssn_mask));
+	  ds_targ_child := if(viewTargus(fileL.section), Doxie_raw.Targus_Raw(dids, mod_access.date_threshold, mod_access.dppa, mod_access.glb, mod_access.industry_class));
+		ds_pp_child := if(viewPP(fileL.section), moxie_phonesplus_server.phonesplus_did_records(dids, ut.limits.CRS_SOURCE_COUNT.default, score_threshold_value,mod_access.glb,mod_access.dppa,,true).wo_timezone);
 	  ds_fbn_v2_child := if(viewFBNv2(fileL.section), iesp.transform_FBN(Doxie_Raw.FBNV2_Raw(dids)));
     studentMod:= MODULE(PROJECT(global_mod, American_Student_Services.IParam.searchParams,opt))		
 	  	EXPORT unsigned2 penalty_threshold := AutoStandardI.InterfaceTranslator.penalt_threshold_value.val(project(global_mod,AutoStandardI.InterfaceTranslator.penalt_threshold_value.params)); ;
@@ -358,9 +362,9 @@ Doxie.layout_ref_rid toRid(Doxie_Raw.Layout_input fileL) := Transform
 End;
 rids := project(input(idtype = 'RID' and ~is_Gong(id) and ~is_utility(id) ), toRid(left));
 
-outRid := Doxie_Raw.ViewSourceRid(rids, dateVal, dppa_purpose, glb_purpose, ssn_mask_value, dl_mask_value,,
+outRid := Doxie_Raw.ViewSourceRid(rids, mod_access,,
 																	BankruptcyVersion,JudgmentLienVersion,DlVersion,VehicleVersion,
-																	VoterVersion,DeaVersion,application_type_value,
+																	VoterVersion,DeaVersion,
 																	IncludeNonRegulatedVehicleSources,IncludeNonRegulatedWatercraftSources);
 
 //===================== addresses, ssn, dob are from Rid too. =====================
