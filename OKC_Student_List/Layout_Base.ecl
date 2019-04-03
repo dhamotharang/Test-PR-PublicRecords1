@@ -100,6 +100,9 @@ EXPORT base := RECORD
 	string25				COLLEGE_TYPE_EXPLODED:='';
 	string1         FILE_TYPE:='';
 	STRING4					CollegeUpdate := '';
+	//CCPA-7 Add 2 new fields for CCPA
+	unsigned4 global_sid;
+	unsigned8 record_sid
 	
 end;
 
