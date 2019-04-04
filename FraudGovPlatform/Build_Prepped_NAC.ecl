@@ -1,4 +1,4 @@
-﻿import STD,NAC;
+﻿import STD,NAC,ut;
 EXPORT Build_Prepped_NAC(
 	string pversion
 ) :=
@@ -19,14 +19,16 @@ MODULE
 
 	IdentityData MapIDDT(Sprayed_NAC L) := TRANSFORM 
 
-			searchpattern := '([0-9])\\w+';
-			sw := STD.Str.SplitWords( regexfind(searchpattern, l.fn,0), '_');
-			vDate := sw[1];
+			filename := ut.CleanSpacesAndUpper(l.fn);
+			fn := StringLib.SplitWords( StringLib.StringFindReplace(filename, '.dat',''), '_', true );
+			FileDate := fn[6];
 
+			SELF.Customer_Job_ID := '0';
+			SELF.Batch_Record_ID := '0';
 			SELF.Transaction_ID_Number := L.ESPTransactionId;
 			SELF.Reason_for_Transaction_Activity:= 'Search in National Accuracy Clearinghouse';
 
-			SELF.Date_of_Transaction := vDate;
+			SELF.Date_of_Transaction := FileDate;
 
 			SELF.raw_Full_Name := l.SearchFullName;
 			SELF.raw_First_name := l.SearchFirstName;
@@ -62,7 +64,7 @@ MODULE
 			SELF := [];
 	END;
 
-	bucket_1_n_2 := Sprayed_NAC(ActivityType in ['1','2']);
+	bucket_1_n_2 := Sprayed_NAC(ActivityType in ['1','2'] and DrupalUserState='FL');
 	EXPORT NACIDDTUpdate := Project(dedup(bucket_1_n_2,all),MapIDDT(Left));
 	
 	KnownFraud := RECORD 
@@ -72,13 +74,14 @@ MODULE
 
 	KnownFraud MapKNFD(Sprayed_NAC L) := TRANSFORM 
 
-			searchpattern := '([0-9])\\w+';
-			sw := STD.Str.SplitWords( regexfind(searchpattern, l.fn,0), '_');
-			vDate := sw[1];
-			vTime := sw[2];
+			filename := ut.CleanSpacesAndUpper(l.fn);
+			fn := StringLib.SplitWords( StringLib.StringFindReplace(filename, '.dat',''), '_', true );
+			FileDate := fn[6];
+			FileTime := fn[7];
 
-			SELF.reported_date := vDate;
-			SELF.reported_time := vTime;
+			SELF.reported_date := FileDate;
+			SELF.reported_time := FileTime;
+			SELF.reported_by   := 'NAC-MSH';
 			SELF.customer_event_id := L.SequenceNumber + '_' + L.activitysource ;
 
 			SELF.event_type_1 := map(	L.matchcodes in Level_1 => '14000',
@@ -173,7 +176,7 @@ MODULE
 			SELF := [];
 	END;
 
-	bucket_4 := Sprayed_NAC(ActivityType ='4');
+	bucket_4 := distribute(Sprayed_NAC(ActivityType ='4'), hash(drupaluserstate, SearchCaseId, SearchClientId, SearchBenefitType, SearchBenefitMonth));
 	dbucket_4 := dedup(bucket_4,all);
 
 	J_NACBase := Join(bucket_4(DrupalUserState='FL') , NAC_Base(Case_State_Abbreviation='FL')

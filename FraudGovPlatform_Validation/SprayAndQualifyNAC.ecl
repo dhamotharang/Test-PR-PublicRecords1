@@ -1,31 +1,45 @@
-﻿IMPORT _Control,tools,STD,NAC,FraudGovPlatform;
+﻿IMPORT _Control,tools,STD,NAC,FraudGovPlatform, ut, lib_fileservices;
 
 EXPORT SprayAndQualifyNAC( string pversion ) := FUNCTION	
 
-	cs := dedup(table(FraudGovPlatform.Files().CustomerSettings,{MSH_Prefix}),all);
+	cs := FraudGovPlatform.Files().CustomerSettings(MSH_Prefix!= '');
 
-	msh_files := nothor(STD.File.LogicalFileList( 'nac::for_msh::fl_msh_*', TRUE, FALSE));
-	
-	vDate := (string8)( 
-            if( count(msh_files(name[1..29] = 'nac::for_msh::fl_msh_' + pversion[1..8])) > 0, 
-                (unsigned)pversion[1..8],
-                (unsigned)pversion[1..8]-1)
-            );
+	msh_files := FileServices.LogicalFileList( 'nac::for_msh::*', TRUE, FALSE);
 
+	vDate := ut.date_math(pVersion[1..8], -1);
 
-	f := join(
+	filename := record 
+		cs;
+		string name;
+		string copy_name;
+	end;
+
+	fname := join(	
 		cs,
 		msh_files,
-		left.msh_prefix[1..21]+vDate = right.name[1..29] );
+		trim(left.msh_prefix[1..21])+vDate = right.name[1..29],
+		transform(filename,
+		self.name := right.name;
+		self.copy_name := FraudGovPlatform._Dataset().thor_cluster_Files +'in::'+trim(left.customer_account_number)+'_'+left.customer_state+'_'+left.Customer_Agency_Vertical_Type+'_'+left.Customer_Program+'_NAC_'+vDate+'_000000.dat';
+		self := left;
+		self := [])); 
 	
-	copyMSH := STD.File.Copy('~'+f[1].name,'thor400_44','~fraudgov::in::'+f[1].name , allowoverwrite := true);
+
+	Copy_File (string filename, string copy_filename) := FUNCTION 
+		RETURN SEQUENTIAL(FileServices.Copy('~'+filename,'thor400_44',copy_filename, allowoverwrite := true));
+	END;
+	ExecCopyStmt := APPLY( fname, Copy_File(fname.name, fname.copy_name));	
 
 	supername := FraudGovPlatform.Filenames().Sprayed.NAC;
-	subname := 'fraudgov::in::'+f[1].name;
 
+	Add_Super (string copy_filename) := FUNCTION   
+		RETURN SEQUENTIAL(FileServices.AddSuperFile(supername, copy_filename));
+	END;
+	// ExecAddSupperStmt := APPLY( fname, Add_Super(fname.copy_name));	
+	
 	outputwork := sequential(
-		copyMSH,
-		STD.File.AddSuperFile(supername, '~' + subname),
+		ExecCopyStmt,
+		// ExecAddSupperStmt
 	);
 
 	RETURN outputwork;

@@ -2,7 +2,7 @@
 EXPORT Mac_TestRinID(   
 	string pversion
 	,dataset(FraudShared.Layouts.Base.Main)	pBaseMainFile	=	FraudShared.Files().Base.Main.Built
-	,dataset(FraudShared.Layouts.Base.Main) pPreviousMain = if(_Flags.FileExists.Base.MainFather,FraudShared.Files().Base.Main.Father,DATASET([], FraudShared.Layouts.Base.Main))
+	,dataset(FraudShared.Layouts.Base.Main) pPreviousMain = if(_Flags.FileExists.Base.MainQA,FraudShared.Files().Base.Main.QA,DATASET([], FraudShared.Layouts.Base.Main))
 ) := 
 FUNCTION
 	// Find Duplicate RinIDs on 2 or more different People

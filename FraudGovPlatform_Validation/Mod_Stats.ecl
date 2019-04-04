@@ -297,7 +297,7 @@ END;
 					);		
 
 				err_Deltabase:=choose(c
-					,if(length(trim(l.reported_date,left,right))=8,'','E002')
+					,if(length(trim(l.reported_date,left,right))>=8,'','E002')
 					,''	//lexid
 					,''	//fullname
 					,''	//raw_First_name	
@@ -360,12 +360,8 @@ END;
 				Validate_SafeList := ValidateInputs(	fname, 
 					project(DS_SafeList, TRANSFORM(FraudGovPlatform.Layouts.Sprayed.validate_record,self.lexid := (string20)Left.lexid;SELF := LEFT;SELF := []))).ValidationResults;	
 
-				//delta_identity_20190319.txt
-				fn := STD.Str.SplitWords( STD.Str.FindReplace(fname,'.txt',''), '_' ):independent;
-				FileDate := fn[3];
-
 				Validate_Deltabase 	:= 	ValidateInputs(	fname, 
-					project(DS_DeltaBase, TRANSFORM(FraudGovPlatform.Layouts.Sprayed.validate_record,self.reported_date := FileDate; self.lexid := (string20)Left.lexid;SELF := LEFT;SELF := []))).ValidationResults;	
+					project(DS_DeltaBase, TRANSFORM(FraudGovPlatform.Layouts.Sprayed.validate_record,self.lexid := (string20)Left.lexid;SELF := LEFT;SELF := []))).ValidationResults;	
 
 				SHARED ErrorsFound	
 					:=	MAP (
