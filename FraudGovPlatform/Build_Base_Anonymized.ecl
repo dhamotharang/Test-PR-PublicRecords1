@@ -11,14 +11,14 @@ module
 
 	empty := dataset([], FraudShared.Layouts.Base.Main);
 
-	Father_Data := if(nothor(STD.File.GetSuperFileSubCount( FraudShared.Filenames().Base.Main.Father )) > 0, FraudShared.Files().Base.Main.Father,empty);
+	QA_Data := if(nothor(STD.File.GetSuperFileSubCount( FraudShared.Filenames().Base.Main.QA )) > 0, FraudShared.Files().Base.Main.QA,empty);
 	Demo_Data	:= if(nothor(STD.File.GetSuperFileSubCount( Filenames().Input.DemoData.Sprayed )) > 0, Files().Input.DemoData.Sprayed,empty);
 
-	FatherBaseAndDemo := if(_Flags.UseDemoData, Father_Data + Demo_Data, Father_Data);
+	QABaseAndDemo := if(_Flags.UseDemoData, QA_Data + Demo_Data, QA_Data);
 	
 	anonymize_Records_Never_Anonymized_Before 
 		:= join (	distribute(pBaseFile,hash32(record_id)),
-					distribute(FatherBaseAndDemo,hash32(record_id)),
+					distribute(QABaseAndDemo,hash32(record_id)),
 					left.record_id = right.record_id,
 					transform(FraudShared.Layouts.Base.Main, self := left;),
 					left only,
@@ -95,15 +95,15 @@ module
 					left only,
 					local);
 										
-	Original_Father 
-		:= join(	distribute(Father_Data,hash32(record_id)), // Discard Demo Data here, since it will append later and can cause duplicates
+	Original_QA 
+		:= join(	distribute(QA_Data,hash32(record_id)), // Discard Demo Data here, since it will append later and can cause duplicates
 					distribute(pBaseFile,hash32(record_id)),
 					left.record_id = right.record_id,
 					transform(FraudShared.Layouts.Base.Main, self := left;),
 					left only,
 					local);	
 										
-	Shared new_base := Original_Father + New_Records_Anonymized + New_Records_Not_Anonimized;
+	Shared new_base := Original_QA + New_Records_Anonymized + New_Records_Not_Anonimized;
 
 	tools.mac_WriteFile(Filenames(pversion).Base.Main_Anon.New,new_base,Build_Base_File_Anonymized);
 
