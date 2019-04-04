@@ -75,7 +75,9 @@ end;
 // export constant_ThisBuild_versionDate := '20190104'; // S66
 // export constant_ThisBuild_versionDate := '20190104a'; // S66a BH-429
 // export constant_ThisBuild_versionDate := '20190201'; // S67 BH-554
-export constant_ThisBuild_versionDate := '20190304'; // S68 BH-555
+// export constant_ThisBuild_versionDate := '20190304'; // S68 BH-555
+// export constant_ThisBuild_versionDate := '20190304a'; // S68a BH-625
+export constant_ThisBuild_versionDate := '20190401'; // S69 BH-555
 
 
 export ds :=
@@ -158,6 +160,8 @@ dataset([
 ,{  66, 'a' , '20190104a',  '20190104', '', '',         '',        'no ingest, just adding keys and key layout change + new service. BH-591,BH-429, RR-14704 & RR-14739, BH-609 -- BIP Build 66 - January 2019a '}
 ,{  67, '' ,  '20190201',  '20190201', '', '',         '',         'Ingested S66 base, BH-599,BH-586,BH-594,BH-606,BH-607,BH-597,BH-602,BH-605,BH-592. BH-554 -- BIP Build 67 - February 2019'}
 ,{  68, '' ,  '20190304',  '20190304', '', '',         '',         'Ingested S67 base, BH-623,BH-615,BH-588,BH-601,BH-613,BH-618. BH-555 -- BIP Build 68 - March 2019'}
+,{  68, 'a',  '20190304a', '20190304', '', '',         '',         'BH-625 & RR-14883. BH-632 -- BIP Build 68a - March 2019'}
+,{  69, '' ,  '20190401',  '20190401', '', '',         '',         'Ingested S68 base, applied BH-600 & LNK-1832 patches, BH-629,BH627,BH610,BH-614,LNK-845,LNK-2567. BH-556 -- BIP Build 69 - April 2019'}
 
 
 //						version,			ingest			ToThor			ToCertRox		ToProdRox		//these are not exact field names.  they just help w read and update.

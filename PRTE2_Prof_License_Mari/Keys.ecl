@@ -1,4 +1,4 @@
-﻿import doxie_files, doxie, ut, Data_Services, fcra,PRTE2_Prof_License_Mari, BIPV2,autokey,AutoKeyB2,AutoKeyI;
+﻿import doxie_files, doxie, ut, Data_Services, fcra,PRTE2_Prof_License_Mari, BIPV2,autokey,AutoKeyB2,AutoKeyI,fcra;
 
 EXPORT Keys := module
 
@@ -9,9 +9,18 @@ export key_regulatory			:= index(files.dsRegulatory, {NMLS_ID,AFFIL_TYPE_CD}, {f
 
 export key_bdid      	:= index(dedup(files.dsSearch(bdid != 0),all),{unsigned6 bdid := (unsigned6)files.dsSearch.bdid}	,{files.dsSearch}, Data_Services.Data_location.Prefix('mari')+ constants.KEY_PREFIX + doxie.Version_SuperKey+'::bdid');
 export key_cmc_slpk	 	:= index(files.dsSearch, {CMC_SLPK,AFFIL_TYPE_CD,STD_SOURCE_UPD}, {files.dsSearch},Data_Services.Data_location.Prefix('mari')+ constants.KEY_PREFIX + doxie.Version_SuperKey+'::cmc_slpk');
-export key_did(boolean IsFCRA = false) := index(dedup(files.dsSearch(did != 0), all),		
-																											{unsigned6 s_did := (unsigned6)files.dsSearch.did},{files.dsSearch}, 
-																											Data_services.Data_location.Prefix('mari') + if(isFCRA, constants.KEY_PREFIX + 'fcra::', constants.KEY_PREFIX) + doxie.Version_SuperKey + '::did');
+
+
+export did_file   := dedup(files.dsSearch_did(did !=0), all);		
+
+EXPORT key_did(boolean IsFCRA = false) := function
+ut.MAC_CLEAR_FIELDS(did_file, ds_search_cleared,Constants.fields_to_clear);
+key_file := if(isFCRA, ds_search_cleared,did_file);
+
+return INDEX(key_file,{unsigned6 s_did := (unsigned6)key_file.did},{key_file}, 
+						 Data_services.Data_location.Prefix('mari') + if(isFCRA, constants.KEY_PREFIX + 'fcra::', constants.KEY_PREFIX) + doxie.Version_SuperKey + '::did');
+								
+end;
 
 export key_nmls_id		:= index(files.dsSearch(nmls_id != 0), {nmls_id}, {files.dsSearch}, Data_Services.Data_location.Prefix('mari')+ constants.KEY_PREFIX + doxie.Version_SuperKey+'::nmls_id');
 export key_mari_payload   := index(files.dsSearch, {mari_rid}, {files.dsSearch}, Data_Services.Data_location.Prefix('mari')+ constants.KEY_PREFIX + doxie.Version_SuperKey+'::rid');
