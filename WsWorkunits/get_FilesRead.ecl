@@ -15,7 +15,7 @@ function
     ,self.isSuper := if(counter = 1 ,left.IsSuperFile   ,false                            )
     ,self.usage   := left.Count 
   ));
-  FilesRead  := project(global(FilesRead1,few),WsFileRead);
+  FilesRead  := project(FilesRead1,WsFileRead);
 
   return FilesRead;
   
