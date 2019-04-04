@@ -1,4 +1,4 @@
-
+﻿
 import data_services, ut,LIB_Date;
  Parsename :=  module
 export Fixname (string pname,string plastname,string pfirstname,string pmiddlename) := function
@@ -137,6 +137,13 @@ file_in_defendant_CW  := dataset(data_services.foreign_prod+'thor_200::in::crim:
 														(stringlib.StringToUpperCase(recordid[1..8])<>'RECORDID' and nametype<>'B' and name not in ['UNKNOWN', 'RESTRICTED', 'EXPUNGED', 'EXPUNGED EXPUNGED', 'NONAME'] and regexfind('[0-9][0-9]+', name[1..2], 0)='') ;
 
 proj_def_cw           := Project(file_in_defendant_CW,transform(hygenics_crim.layout_in_defendant,self.sourcename := trim(left.sourcename)+'_CW'; self := left;));
+
+file_in_defendant_IE  := dataset(data_services.foreign_prod+'thor_200::in::crim::hd::aoc_defendant_IE', hygenics_crim.layout_in_defendant,
+														CSV(SEPARATOR('|'), TERMINATOR(['\n', '\r\n']), QUOTE('"'), MAXLENGTH(4096)))
+														(stringlib.StringToUpperCase(recordid[1..8])<>'RECORDID' and nametype<>'B' and name not in ['UNKNOWN', 'RESTRICTED', 'EXPUNGED', 'EXPUNGED EXPUNGED', 'NONAME'] and regexfind('[0-9][0-9]+', name[1..2], 0)='') ;
+
+proj_def_IE           := Project(file_in_defendant_IE,transform(hygenics_crim.layout_in_defendant,self.sourcename := trim(left.sourcename)+'_IE'; self := left;));
+
 //Pull Only OR Defendants Where There is a Corresponding Offense////////////////////////////////////////////////
 
 	Filtered_Offense_Sources := ['OR','FL','AZ','MN','MD'];
@@ -147,18 +154,18 @@ proj_def_cw           := Project(file_in_defendant_CW,transform(hygenics_crim.la
 	or_def_only					:= file_in_defendant_all(statecode IN Filtered_Offense_Sources);
 	not_or_def					:= file_in_defendant_all(statecode NOT IN Filtered_Offense_Sources);
 
-	hygenics_crim.layout_in_defendant noCivil(or_off_only l, or_def_only r):= transform	
-		self := r;
+	hygenics_crim.layout_in_defendant noCivil(or_def_only l,or_off_only r):= transform	
+		self := l;
 	end;
 
-  or_def_off_mat 			:= join(or_off_only, or_def_only,
+  or_def_off_mat 			:= join(or_def_only,or_off_only,
 													left.recordid = right.recordid and
 													left.statecode = right.statecode,
-													noCivil(left, right));
+													noCivil(left, right),skew(1));
 													
 	or_def_off_match 		:= dedup(sort(or_def_off_mat, statecode, recordid), record);
 	
-	all_def := not_or_def + or_def_off_match+proj_def_cw;//:persist('~thor_200::persist::crim::hd::aoc_def_filtered');
+	all_def := not_or_def + or_def_off_match+proj_def_cw+proj_def_IE;//:persist('~thor_200::persist::crim::hd::aoc_def_filtered');
 	
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

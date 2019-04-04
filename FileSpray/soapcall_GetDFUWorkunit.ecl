@@ -4,12 +4,12 @@
 ) :=
 function
 
-	export GetDFUWorkunitInRecord :=
+	GetDFUWorkunitInRecord :=
 	record, maxlength(100)
 		string  wuid             {xpath('wuid'                   )} := pWorkunitID;
 	end;
 	
-	export GetDFUWorkunitOutRecord :=
+	GetDFUWorkunitOutRecord :=
 	record, maxlength(100000)
 	
 		string exception_code     {xpath('Exceptions/Exception/Code'    )};
@@ -25,7 +25,12 @@ function
                   // ,'prod:8010'
                 // );
   myurl := 'http://' + pESp + ':8010/FileSpray';
+
+  import ut,Workman;
   
+  #UNIQUENAME(SOAPCALLCREDENTIALS)
+  #SET(SOAPCALLCREDENTIALS  ,ut.Credentials().mac_add2Soapcall())
+
   results := SOAPCALL(
      myurl
     ,'GetDFUWorkunit'
@@ -36,6 +41,19 @@ function
     ,literal
   );
 
-  return results;
+  results_remote := SOAPCALL(
+     myurl
+    ,'GetDFUWorkunit'
+    ,GetDFUWorkunitInRecord
+    ,dataset(GetDFUWorkunitOutRecord)
+    // ,heading('<WUInfoRequest>','</WUInfoRequest>')
+    ,xpath('GetDFUWorkunitResponse')
+    ,literal
+   %SOAPCALLCREDENTIALS%
+  );
+
+  returnresult := iff(trim(pesp) in Workman._Config.LocalEsps ,results  ,results_remote);
+
+  return returnresult;
   
 end;

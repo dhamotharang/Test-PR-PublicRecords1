@@ -1,7 +1,7 @@
-export layout_in_charge := record
+﻿export layout_in_charge := record
 	string40	RecordID;
 	string2		StateCode;
-	string40	CaseID;
+	string100	CaseID;
 	string20	WarrantNumber;
 	string8		WarrantDate;
 	string200	WarrantDesc;
@@ -28,5 +28,5 @@ export layout_in_charge := record
 	string10	BondAmount;
 	string50	BondType;
 	string100	SourceName;
-	string		SourceID;
+	string100	SourceID;
 end;

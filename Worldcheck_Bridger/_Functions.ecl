@@ -304,12 +304,14 @@
 				trim(catname, left, right) in ['Crime - Narcotics','CRIME - NARCOTICS'] =>SubGroup_Constants.numCategoryID.CRIME_NARCOTICS,
 				trim(catname, left, right) in ['Crime - Financial','CRIME - FINANCIAL'] =>SubGroup_Constants.numCategoryID.CRIME_FINANCIAL,
 				trim(catname, left, right) in ['Crime - Associated','CRIME - ASSOCIATED'] => SubGroup_Constants.numCategoryID.CRIME_ASSOCIATED,
+				trim(catname, left, right) in ['Crime - Terror','CRIME - TERROR'] => SubGroup_Constants.numCategoryID.CRIME_TERROR,
 				trim(catname, left, right) in ['Diplomat','DIPLOMAT'] =>SubGroup_Constants.numCategoryID.DIPLOMAT,
 				trim(catname, left, right) in ['Embargo','EMBARGO'] =>SubGroup_Constants.numCategoryID.EMBARGO,
 				trim(catname, left, right) in ['Embargo Vessel','EMBARGO VESSEL'] =>  SubGroup_Constants.numCategoryID.EMBARGO_VESSEL,
 				trim(catname, left, right) in ['Individual','INDIVIDUAL'] =>SubGroup_Constants.numCategoryID.INDIVIDUAL,
 				trim(catname, left, right) in ['Legal','LEGAL'] => SubGroup_Constants.numCategoryID.LEGAL,
 				trim(catname, left, right) in ['Military','MILITARY'] => SubGroup_Constants.numCategoryID.MILITARY,
+				trim(catname, left, right) in ['Nonconviction Terror','NONCONVICTION TERROR'] => SubGroup_Constants.numCategoryID.NONCONVICTION_TERROR,
 				trim(catname, left, right) in ['Organization','ORGANIZATION','Organisation','ORGANISATION'] => SubGroup_Constants.numCategoryID.ORGANIZATION,
 				trim(catname, left, right) in ['Political Individual','POLITICAL INDIVIDUAL'] =>SubGroup_Constants.numCategoryID.POLITICAL_INDIVIDUAL,
 				trim(catname, left, right) in ['Political Party','POLITICAL PARTY'] => SubGroup_Constants.numCategoryID.POLITICAL_PARTY,
@@ -1213,6 +1215,9 @@
 				trim(kword, left, right) = 'ZANTRS' =>SubGroup_Constants.numKeywordsID.KEYWORD_ZANTRS,
 				trim(kword, left, right) = 'USDA' =>SubGroup_Constants.numKeywordsID.KEYWORD_USDA,
 				trim(kword, left, right) = 'TRL-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_TRL_WC,
+				trim(kword, left, right) = 'CAPTA-561' =>SubGroup_Constants.numKeywordsID.KEYWORD_CAPTA_561,
+				trim(kword, left, right) = 'PSPMA-LFL' =>SubGroup_Constants.numKeywordsID.KEYWORD_PSPMA_LFL,
+				trim(kword, left, right) = 'NLPOL' =>SubGroup_Constants.numKeywordsID.KEYWORD_NLPOL,
 				
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
