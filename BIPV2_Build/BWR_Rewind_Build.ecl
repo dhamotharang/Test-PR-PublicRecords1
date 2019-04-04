@@ -13,7 +13,7 @@ workman.Rewind_Build(
    pversion            := '20190401'                                // version of the build you are rolling back
   ,PWuid               := 'W20190402-103652'                        // all files created in this workunit and subsequent workunits(more recent) in this build will be deleted.
   ,pWorkman_Superfile  := BIPV2_Build.files().workunit_history_.qa
-  ,pDeleteFiles        := true                                     // true = output the files to the workunit + delete them.  false = output the files to the workunit
+  ,pDeleteFiles        := false                                     // true = output the files to the workunit + delete them.  false = output the files to the workunit
   ,pFilter             := ''                                        // optional additional regex filter for the files to delete.
   ,pRestoreWuids       := false
 );
