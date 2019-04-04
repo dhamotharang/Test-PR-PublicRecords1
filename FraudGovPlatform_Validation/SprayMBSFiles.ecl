@@ -12,7 +12,7 @@ function
 	pFilenameMBSmarketAppend := '*fdn_market*txt';
 	yesterday_date := (unsigned)pVersion[1..8] - 1;
 	pFilenameMBSFdnCCID := 'mbsi_fdn_accounts_' + (string)yesterday_date + '*';
-	pFilenameMBSFdnHHID := '*hhid_fdn_accounts.csv';
+	pFilenameMBSFdnHHID := '*hhid_fdn_accounts.txt';
 	pGroupName := thorlib.group();
 	pIsTesting := false;
 	pOverwrite :=  true;
