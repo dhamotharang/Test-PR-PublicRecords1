@@ -215,7 +215,8 @@ export FileInfo(string filename
 		end;
 		
 		rLayoutDetails xLayoutDetails(dLayout l) := transform
-			self.fulllayout := l.fullxml;
+			self.fulllayout := regexreplace('[;,]',regexreplace('(=>\n[ ]+|=>[ ]+)',l.fullxml,''),'');
+			// self.fulllayout := l.fullxml;
 			self.keyedfields := if (STD.Str.ToUpperCase(l.contenttype) = 'KEY'
 																,dNorm[1].keycol
 																,'');
