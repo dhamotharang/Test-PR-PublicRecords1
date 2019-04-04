@@ -1,4 +1,4 @@
-IMPORT Address;
+﻿IMPORT Address;
 
 EXPORT Layouts := MODULE
 
@@ -76,7 +76,10 @@ EXPORT Layouts := MODULE
 		UNSIGNED6 did;
 		UNSIGNED6 bdid;
 		Address.Layout_Clean182_fips clean_address;
-    Address.Layout_Clean_Name    clean_name;
+   Address.Layout_Clean_Name    clean_name;
+		//DF-24493 Add 2 new fields for CCPA
+		unsigned4 global_sid;
+		unsigned8 record_sid;
   END;
 
 END;
