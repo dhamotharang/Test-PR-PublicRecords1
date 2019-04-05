@@ -13,7 +13,7 @@ function
   
   FilesWritten1   := project(ds_normresults,transform({unsigned rid,layouts.WsFileWritten} ,self.rid := counter,self.name := left.filename,self.graph := '',self.cluster := '',self.kind := 0));
   FilesWritten2   := sort(join(FilesWritten1(name != ''),ds_filesread,left.name = right.name,transform(recordof(left),self.cluster := right.cluster,self := left),left outer),rid); 
-  FilesWritten    := project(global(FilesWritten2,few),layouts.WsFileWritten); 
+  FilesWritten    := project(FilesWritten2,layouts.WsFileWritten); 
   
   // return FilesWritten;
   return if(pesp in WsWorkunits._Config.LocalEsps  and WsWorkunits.Is_Valid_Wuid(pWorkunitID)   ,STD.System.Workunit.WorkunitFilesWritten(pWorkunitID)
