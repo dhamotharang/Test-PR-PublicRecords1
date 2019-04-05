@@ -31,7 +31,7 @@ EXPORT Rewind_Build(
 function
              
   ds_workman                          := pWorkman_Superfile(wuid != '',pWuid = '' or wuid >= pWuid,pversion = '' or version = pversion);
-  ds_workman_files_written            := project(ds_workman  ,transform({string esp,dataset(WsWorkunits.layouts.WsFileWritten) files} ,self.files := Workman.get_FilesWritten(left.wuid,left.esp),self := left));
+  ds_workman_files_written            := project(ds_workman  ,transform({string esp,dataset(WsWorkunits.layouts.WsFileWritten) files} ,self.files := Workman.get_FilesWritten(left.wuid,left.esp,false),self := left));
   ds_workman_files_written_norm       := normalize(ds_workman_files_written ,left.files ,transform({string name,string esp},self.name := '~' + right.name,self := left));
   ds_workman_files_written_norm_filt  := ds_workman_files_written_norm(regexfind('[[:digit:]]{8}',name,nocase),pFilter = '' or regexfind(pFilter,name,nocase));
 
