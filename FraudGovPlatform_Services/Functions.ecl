@@ -1,5 +1,5 @@
 ﻿IMPORT Address, AutoStandardI, BatchShare, CriminalRecords_BatchService, didville, FraudGovPlatform, FraudGovPlatform_Services, 
-				FraudShared_Services, FraudShared, iesp, Patriot, Risk_Indicators, STD, Suppress, ut;
+				FraudShared_Services, FraudShared, iesp, Patriot, Risk_Indicators, STD, ut;
 
 EXPORT Functions := MODULE
 	
@@ -374,29 +374,21 @@ EXPORT Functions := MODULE
 	EXPORT getGovernmentBest(	DATASET(didville.Layout_Did_OutBatch) ds_best_in,
 														FraudGovPlatform_Services.IParam.BatchParams batch_params) := FUNCTION
 
-		p := module(AutoStandardI.PermissionI_Tools.params)
-			export unsigned1 GLBPurpose := batch_params.GLBPurpose;
-		END;
 		
-		GLB := AutoStandardI.PermissionI_Tools.val(p).glb.ok(batch_params.GLBPurpose);
-		
-		//Mask DOB when requested.
-		unsigned1 dob_mask_value := Suppress.date_mask_math.MaskIndicator(batch_params.DOBMask);		
-
 		ds_best := DidVille.did_service_common_function(ds_best_in,
 																										appends_value			:= FraudGovPlatform_Services.Constants.append_l,
 																										verify_value			:= FraudGovPlatform_Services.Constants.verify_l,
-																										glb_flag					:= GLB,
-																										glb_purpose_value	:= batch_params.GLBPurpose,
-																										appType						:= batch_params.ApplicationType,
+																										glb_flag					:= batch_params.isValidGLB(),
+																										glb_purpose_value	:= batch_params.glb,
+																										appType						:= batch_params.application_type,
 																										include_minors		:= TRUE,
-																										IndustryClass_val	:= batch_params.IndustryClass,
+																										IndustryClass_val	:= batch_params.industry_class,
 																										DRM_val						:= batch_params.DataRestrictionMask,
 																										GetSSNBest				:= TRUE);
 		
 		iesp.fraudgovplatform.t_FraudGovBestInfo best_trans(RECORDOF(ds_best) L) := TRANSFORM	
 			dob_ := iesp.ECL2ESP.toDate((integer) L.best_dob);
-			masked_dob := iesp.ECL2ESP.ApplyDateMask(dob_, dob_mask_value);
+			masked_dob := iesp.ECL2ESP.ApplyDateMask(dob_, batch_params.dob_mask);
 			
 			SELF.UniqueId := (string) L.did;  
 			SELF.Name.Prefix := L.best_title; 

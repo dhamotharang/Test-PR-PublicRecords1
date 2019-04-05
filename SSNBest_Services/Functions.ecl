@@ -1,4 +1,4 @@
-IMPORT SSNBest_Services,doxie,Risk_Indicators,doxie_crs;
+﻿IMPORT SSNBest_Services,doxie,Risk_Indicators,doxie_crs;
 EXPORT Functions := MODULE
 
 	//returns the 'best ssn' with input layout - currently called from ADL_Best - DidVille.MAC_BestAppend & doxie.best_records
@@ -30,8 +30,7 @@ EXPORT Functions := MODULE
 	EXPORT fetchSSNs(in_ds, in_mod, pSSN = 'ssn',pDID = 'did') := FUNCTIONMACRO
 	IMPORT SSNBest_Services,MDR,AutoKeyI;
 
-    mod_ssn := SSNBest_Services.IParams.setFromBatch (in_mod);
-		Subj_SSNs := SSNBest_Services.Raw.Get_Subj_Best(in_ds,mod_ssn,pSSN,pDID);
+		Subj_SSNs := SSNBest_Services.Raw.Get_Subj_Best(in_ds,in_mod,pSSN,pDID);
 
 		rollupRec := RECORD(SSNBest_Services.Layouts.KEY_subjSrcNorm)
      string1 bureau_only_ssn := '';

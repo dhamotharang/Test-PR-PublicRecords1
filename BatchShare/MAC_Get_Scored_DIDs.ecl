@@ -1,4 +1,4 @@
-//This Function Macro accepts a batch with PII and fetches a scored DID for ALL the input
+﻿//This Function Macro accepts a batch with PII and fetches a scored DID for ALL the input
 //records that don't already have one. It then returns the DID's that scored >= Threshold (from in_mod).
 //You also need to pass in a standard restriction interface including the score threshold.
 //This Macro expects the input acctno to be an integer, so run MAC_SequenceInput before this macro
@@ -23,15 +23,13 @@ EXPORT MAC_Get_Scored_DIDs(ds_in_batch,in_mod,usePhone=false,phone_Field='phonen
 	ds_didless := ds_in_batch(did=0);//only get DIDs for records that don't already have one
 	ds_with_ADL_Layout := PROJECT(ds_didless,prepare_layout(LEFT));
 	
-	// NO_GM - no global mod hits
-  NO_GM := AutoStandardI.PermissionI_Tools.val(ut.PopulateDRI_Mod(in_mod));//prevents global mod hits
-	glb   := NO_GM.glb.ok(in_mod.GLBPurpose);
+
 	//we call ADL_BEST just to get the scored dids....not to get the best data
 	recsWithScoredDIDs := didville.did_service_common_function(ds_with_ADL_Layout
-	                                                          ,glb_flag:=glb
-	                                                          ,glb_purpose_value:=in_mod.GLBPurpose
-																														,appType:=in_mod.ApplicationType
-																														,IndustryClass_val := in_mod.industryclass);
+	                                                          ,glb_flag:=in_mod.isValidGLB()
+	                                                          ,glb_purpose_value:=in_mod.glb
+																														,appType:=in_mod.application_type
+																														,IndustryClass_val := in_mod.industry_class);
 	 //we only keep the did's that were found via PII if the did score > 80
 	recsWithScoredDIDs_filtered := recsWithScoredDIDs(score >= in_mod.DIDScoreThreshold);
 
