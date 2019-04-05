@@ -189,26 +189,7 @@ EXPORT product_files := MODULE
 				HASH64(did)
 			);
       
-/*   Header.Layout_Header.fname;
-			Header.Layout_Header.mname;
-			Header.Layout_Header.lname;
-			Header.Layout_Header.prim_range;
-			Header.Layout_Header.prim_name;
-			Header.Layout_Header.sec_range;
-			Header.Layout_Header.city_name;
-			Header.Layout_Header.st;
-			Header.Layout_Header.zip;
-			Header.Layout_Header.phone;
-			Header.Layout_Header.dt_last_seen;
-			Header.Layout_Header.dt_vendor_last_reported;
-			Header.Layout_Header.did;
-			Header.Layout_Header.src;
-      Header.Layout_Header_v2.dob;
-			Header.Layout_Header_v2.ssn;   */
-      
-		//fake_testing_header := dataset([{'Rama','N','Bindiganavale','','','','','','','','','',2,'','19751114','733532910'}],layout_base_header);
-		fake_testing_header := dataset([{'Rama','N','Bindiganavale','','','','','','','','','',2,'','19851114','733532911'}],layout_base_header);
-		EXPORT doxie_key_header_slim := DEDUP(SORT(doxie_key_header + fake_testing_header, 
+		EXPORT doxie_key_header_slim := DEDUP(SORT(doxie_key_header, 
 																							 did, fname, lname, prim_range, prim_name, sec_range, st, zip, phone, -dt_last_seen, -dt_vendor_last_reported, LOCAL),
 																				  did, fname, lname, prim_range, prim_name, sec_range, st, zip, phone, LOCAL) 
 																		: INDEPENDENT; //PERSIST('acctmon::header::doxie_key_header_slim');

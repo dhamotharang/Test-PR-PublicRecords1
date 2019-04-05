@@ -28,28 +28,31 @@ EXPORT DATASET(AccountMonitoring.layouts.history) fn_cgm_personheader(
 		// Pivot on did
 		temp_port_dist_did  := DISTRIBUTE(in_portfolio(did != 0),HASH64(did));
 		
- 		// Tranform to data layout since only DID key is needed for monitoring
-   	temp_slim := project (temp_port_dist_did,
+ 		// Tranform to data layout since only DID key is needed for monitoring	
+                                
+   	temp_join_did := JOIN (Key_DID,temp_port_dist_did,
+                           left.did = right.did, 
    																TRANSFORM(temp_layout,
-   																	SELF.pid  		  := LEFT.pid,
-   																	SELF.rid  		  := LEFT.rid,
-   																	SELF.hid  		  := 0,
-   																	SELF.SSN          := LEFT.SSN;
-   																	SELF.DOB 	      := (unsigned)LEFT.DOB;
-   																	SELF      		  := LEFT),
+   																	SELF.pid  		 := RIGHT.pid,
+   																	SELF.rid  		 := RIGHT.rid,
+   																	SELF.hid  		 := 0,
+                                SELF.did			 := LEFT.did,    
+   																	SELF.SSN      := LEFT.SSN;   //if(left.did = (integer)55300 ,(qstring9)23323421,LEFT.SSN) ;
+   																	SELF.DOB 	   := LEFT.DOB;   //if((integer)left.did = (integer)55300 ,(integer)197511, (integer)LEFT.DOB);
+   																	SELF      		 := RIGHT),
    																LOCAL);		
    		
 
-		temp_dedup := DEDUP(SORT(DISTRIBUTE(temp_slim,HASH64(pid,rid)),pid,rid,ssn,dob,local),pid,rid,ssn,dob,local);
+		temp_joins_dedup := DEDUP(SORT(DISTRIBUTE(temp_join_did,HASH64(pid,rid)),pid,rid,ssn,dob,local),pid,rid,ssn,dob,local);
 	 
 	 	// Create hash value on monitored fields. 
 		temp_unrolled_hashes := 
-			PROJECT(temp_dedup,
+			PROJECT(temp_joins_dedup,
 							TRANSFORM(AccountMonitoring.layouts.history,
 								SELF.pid          := LEFT.pid,
 								SELF.rid          := LEFT.rid,
 								self.hid          := 0,
-                                self.bdid         := 0,  
+              self.bdid         := 0,  
 								SELF.product_mask := AccountMonitoring.Constants.pm_personheader,
 								SELF.timestamp    := '',
 								SELF.hash_value   := HASH64(
