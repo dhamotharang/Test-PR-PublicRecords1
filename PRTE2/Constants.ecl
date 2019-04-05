@@ -12,5 +12,7 @@ EXPORT Constants := MODULE
 	EXPORT lnpr_IN := '~prte::in::lnpr::relate';
 	
 	EXPORT Linkids := '~prte::base::lnpr::relate';
+	
+	EXPORT Prefix:='~prte::';
 															 	
 END;
