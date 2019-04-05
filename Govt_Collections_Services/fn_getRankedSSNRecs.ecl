@@ -1,4 +1,4 @@
-IMPORT SSNBest_Services, Govt_Collections_Services;
+﻿IMPORT SSNBest_Services, Govt_Collections_Services,BatchShare;
 
 EXPORT fn_getRankedSSNRecs(dataset(Govt_Collections_Services.Layouts.batch_working) ds_batch_in,
                            Govt_Collections_Services.IParams.BatchParams in_mod ) := FUNCTION
@@ -12,8 +12,9 @@ EXPORT fn_getRankedSSNRecs(dataset(Govt_Collections_Services.Layouts.batch_worki
 		ds_ssn_in := PROJECT(ds_batch_in, TRANSFORM(working_rec, 
 																				SELF.did := (INTEGER)LEFT.lex_id,
 																				SELF := LEFT));
+		mod_from_legacy := BatchShare.IParam.GetFromLegacy(in_mod);
 
-		mod_ssn_batch := MODULE (PROJECT (in_mod, SSNBest_Services.IParams.BatchParams, OPT)) END;
+		mod_ssn_batch := MODULE (PROJECT (mod_from_legacy, SSNBest_Services.IParams.BatchParams, OPT)) END;
 		ds_ranked_ssn_recs := SSNBest_Services.Functions.fetchSSNs(ds_ssn_in(did <> 0), mod_ssn_batch);
 		
 		// 4. Join back to batch_in and assign best ssn and the correct code to poss_shared_ssn--that's 
