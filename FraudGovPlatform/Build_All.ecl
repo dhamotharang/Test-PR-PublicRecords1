@@ -28,21 +28,30 @@ module
 	shared SkipBasePortion := SkipModules[1].SkipBaseBuild;
 	shared SkipBaseRollback := SkipModules[1].SkipBaseRollback;
 	shared SkipKeysPortion := SkipModules[1].SkipKeysBuild;
+	shared SkipNACBuild := SkipModules[1].SkipNACBuild;
+	shared SkipInquiryLogsBuild := SkipModules[1].SkipInquiryLogsBuild;
 	shared SkipPiiBuild := SkipModules[1].SkipPiiBuild;
 	shared SkipKelBuild := SkipModules[1].SkipKelBuild;
 	shared SkipOrbitBuild := SkipModules[1].SkipOrbitBuild;
 	shared SkipDashboardsBuild := SkipModules[1].SkipDashboardsBuild;
+	shared SkipMBS := SkipModules[1].SkipMBS;
+	shared SkipDeltabase := SkipModules[1].SkipDeltabase;
+	shared SkipContributory := SkipModules[1].SkipContributory;
+	shared SkipScrubs := SkipModules[1].SkipScrubs;
+	shared SkipRefreshHeader := SkipModules[1].SkipRefreshHeader;
+	shared SkipRefreshAddresses := SkipModules[1].SkipRefreshAddresses;
+	shared SkipGarbageCollector := SkipModules[1].SkipGarbageCollector;
 
 	// Modules
-	export Run_MBS := FraudGovPlatform_Validation.SprayMBSFiles( pversion := pVersion[1..8] );
-	export Run_Scrubs := Build_Scrubs(pversion,SkipModules);
-	export Run_Deltabase := FraudGovPlatform_Validation.SprayAndQualifyDeltabase(pversion);
-	export Run_NAC := FraudGovPlatform_Validation.SprayAndQualifyNAC(pversion);
-	export Run_Prepped := FraudGovPlatform_Validation.SprayAndQualifyInput(pversion);
+	export Run_MBS			:= if(SkipMBS = false,FraudGovPlatform_Validation.SprayMBSFiles( pversion := pVersion[1..8] ));
+	export Run_Scrubs		:= if(SkipScrubs = false,Build_Scrubs(pversion,SkipModules));
+	export Run_Deltabase 	:= if(SkipDeltabase = false, FraudGovPlatform_Validation.SprayAndQualifyDeltabase(pversion));
+	export Run_NAC 			:= if(SkipNACBuild = false, FraudGovPlatform_Validation.SprayAndQualifyNAC(pversion));
+	export Run_Prepped		:= if(SkipContributory = false, FraudGovPlatform_Validation.SprayAndQualifyInput(pversion));
 
-	export Run_Inputs := Build_Input(pversion, MBS_File, SkipModules).All;	
-	export Run_Base := Build_Base(pversion, MBS_File).All;
-	export Run_GarbageCollector := Garbage_Collector.Run;
+	export Run_Inputs 	:= Build_Input(pversion, MBS_File).All;	
+	export Run_Base 	:= Build_Base(pversion, MBS_File).All;
+	export Run_GarbageCollector := if(SkipGarbageCollector = false,Garbage_Collector.Run);
 	// --
 	export Run_Rollback := if(SkipBaseRollback=false,Rollback('',Test_Build,Test_RecordID,Test_RinID).All);
 	// --
