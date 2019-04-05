@@ -1,4 +1,4 @@
-export layout_in_addresshistory := record
+﻿export layout_in_addresshistory := record
 	string40	RecordID;
 	string2		StateCode;
 	string150	Street;
@@ -8,5 +8,5 @@ export layout_in_addresshistory := record
 	string9		orig_Zip;
 	string20	AddressType;
 	string100	SourceName;
-	string		SourceID;
+	string100	SourceID;
 end;

@@ -1,4 +1,4 @@
-import BIPV2;
+﻿import BIPV2;
 EXPORT fn_Prep_Base_for_Key 
 			(string pversion
 			 ,dataset(BIPV2_Best.Layouts.Base) pBestBase         = BIPV2_Best.Files(pversion).base.built
@@ -15,6 +15,7 @@ url_size := sizeof(BIPV2_Best.Layouts.company_url);
 incorp_date_size := sizeof(BIPV2_Best.Layouts.company_incorporation_date);
 source_size := sizeof(BIPV2_Best.Layouts.Source);	
 duns_size := sizeof(BIPV2_Best.Layouts.duns_number);
+dba_size := sizeof(BIPV2_Best.Layouts.dba_name);
 	
 Size_layout := record
 BIPV2_Best.Layouts.Base;
@@ -49,6 +50,7 @@ Size_layout t_sizeit(pBestBase le) := transform
 																			SELF.childcnt := count(le.company_incorporation_date[counter].sources);
 																			SELF := LEFT))), childcnt);
 		duns_children:= count(le.duns_number);
+		dba_children:= count(le.dba_name);
 		self.fixed_size := key_size + 
 																	id_size +  
 																	(name_size         * if(name_children = 0, 1, name_children)) +
@@ -57,7 +59,8 @@ Size_layout t_sizeit(pBestBase le) := transform
 																	(fein_size         * if(fein_children = 0, 1, fein_children)) +
 																	(url_size          * if(url_children = 0, 1, url_children )) +
 																	(incorp_date_size  * if(incorp_date_children = 0, 1, incorp_date_children)) +
-																	(duns_size          * if(duns_children = 0, 1, duns_children )) ;
+																	(duns_size         * if(duns_children = 0, 1, duns_children )) +
+																	(dba_size          * if(dba_children = 0, 1, dba_children )) ;
 		self.total_size :=self.fixed_size +  
 																	(source_size       * if(name_grandchildren = 0, 1, name_grandchildren)) +
 																	(source_size       * if(fein_grandchildren = 0, 1, fein_grandchildren)) +

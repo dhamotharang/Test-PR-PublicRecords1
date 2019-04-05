@@ -172,10 +172,23 @@ EXPORT NE  := MODULE;
 
 		end;
 
-		mapCorp     := Normalize(DsEntity_Cntrydesc, 
+		mapCorp1   := Normalize(DsEntity_Cntrydesc, 
 														if(corp2.t2u(left.DO_streetaddress1+left.DO_streetaddress2+left.DO_City+left.DO_state+left.DO_zipCode)<>''
 														,2,1) ,corpMainTransform(left, counter));
+	
+		// Deduping after the normalize because sometimes there is a "D" address but not a "B" or "T" address, so we only
+		// want to keep the record with the "D" address, but not the corresponding record with a blank address. DF-24298
+		mapCorp_DandBlank := mapCorp1(corp_address1_type_cd in ['','D']);
+		mapCorp_theRest   := mapCorp1(corp_address1_type_cd not in ['','D']);
 
+		mapCorpDistSort   := sort(distribute(mapCorp_DandBlank, hash(corp_key)), corp_key,corp_legal_name,-corp_address1_type_cd, local);
+ 		mapCorpDedup      := dedup(mapCorpDistSort, record, 
+												  except corp_address1_type_cd, corp_address1_type_desc, 
+															   corp_address1_line1, corp_address1_line2, corp_address1_line3, 
+															   corp_prep_addr1_line1, corp_prep_addr1_last_line ,local) : independent;
+ 		mapCorp           := mapCorpDedup + mapCorp_theRest;
+	
+	
 		//FOREIGN NAME Recs Mappings & Overloaded Transform
 		corp2_mapping.LayoutsCommon.Main corpForgnNameTransform(Corp2_Raw_NE.Layouts.Temp_CorpEntityWithRA input):= transform,
 				skip(corp2.t2u(input.forgnCorpName) = '')

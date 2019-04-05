@@ -1,5 +1,5 @@
 ﻿#OPTION('multiplePersistInstances',FALSE);
-import ut, business_header, mdr, lib_stringlib, email_data;
+import ut, business_header, mdr, lib_stringlib, email_data, _validate;
 
 EXPORT As_Business_Linking (
 	 boolean pUseOtherEnviron = _Constants().IsDataland
@@ -64,14 +64,15 @@ EXPORT As_Business_Linking (
 				self.dppa						             := false;
         self.company_foreign_domestic := if(l.EFX_FOREIGN = '', 'D', 'F'); 
         self.company_charter_number := '';
-        self.company_filing_date := 0;  
-        self.company_status_date := 0; 
+        self.company_filing_date := 0; 				
+			  unsigned4 temp_clean_dead_date := IF(_validate.date.fIsValid(ut.date_slashed_MMDDYYYY_to_YYYYMMDD(L.EFX_DEADDT)),
+			                                            (UNSIGNED4)ut.date_slashed_MMDDYYYY_to_YYYYMMDD(L.EFX_DEADDT),
+																		              0);
+        self.company_status_date := if(l.EFX_DEAD = 'Y', temp_clean_dead_date, 0);
         self.company_foreign_date := 0;  
         self.event_filing_date := 0;  
         self.company_name_status_raw := '';
-        self.company_status_raw := '';  
-				//possible future change
-        // self.company_status_raw := if(l.EFX_DEAD = 'Y', 'DEFUNCT', '');  
+        self.company_status_raw := if(l.EFX_DEAD = 'Y', 'DEFUNCT', '');  
 				self.dt_first_seen_company_name := 0;
         self.dt_last_seen_company_name := 0;
         self.dt_first_seen_company_address := 0;
