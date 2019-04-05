@@ -45,7 +45,7 @@
 /*--INFO-- This service pulls from the Criminal Offenses and Events files.*/
 
 export DOC_Search_Events := macro
-#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
+#CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.LEGACY);
 #STORED('LookupType','CRIM');
 #stored('SelectIndividually',true);
 #stored('IncludeCriminalRecords',true);
