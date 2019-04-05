@@ -239,8 +239,9 @@ END;
 					,''	//fullname
 					,if(regexreplace('0',l.lexid,'') <>'' or (l.raw_First_name <>'' or l.raw_full_name <>''),'','E001')	
 					,if(regexreplace('0',l.lexid,'') <>'' or (l.raw_Last_Name <>'' or l.raw_full_name <>''),'','E001')
-					,if(l.SSN <>''	OR	regexreplace('0',l.lexid,'')	<>'' OR	
-								(l.Drivers_License_Number<>'' AND	l.Drivers_License_State	<>''),'','E006')
+					,if( (l.raw_full_name <> '' or (l.raw_First_name <>'' and l.raw_Last_Name <> '')) and 
+								(l.SSN <>''	OR	regexreplace('0',l.lexid,'')	<>'' OR	
+								(l.Drivers_License_Number<>'' AND	l.Drivers_License_State	<>'')),'','E006')
 					,''	//full_address (Deltabase)
 					,''	//physical_address (Deltabase)
 					,''	//street_1
@@ -262,8 +263,9 @@ END;
 					,''	//fullname
 					,if(regexreplace('0',l.lexid,'') <>'' or (l.raw_First_name <>'' or l.raw_full_name <>''),'','E001')	
 					,if(regexreplace('0',l.lexid,'') <>'' or (l.raw_Last_Name <>'' or l.raw_full_name <>''),'','E001')
-					,if(l.SSN <>''	OR	regexreplace('0',l.lexid,'')	<>'' OR	
-								(l.Drivers_License_Number<>'' AND	l.Drivers_License_State	<>''),'','E006')
+					,if( (l.raw_full_name <> '' or (l.raw_First_name <>'' and l.raw_Last_Name <> '')) and 
+								(l.SSN <>''	OR	regexreplace('0',l.lexid,'')	<>'' OR	
+								(l.Drivers_License_Number<>'' AND	l.Drivers_License_State	<>'')),'','E006')
 					,''	//full_address (Deltabase)
 					,''	//physical_address (Deltabase)
 					,''	//street_1

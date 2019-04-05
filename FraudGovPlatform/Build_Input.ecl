@@ -7,7 +7,6 @@ EXPORT Build_Input (
 module
 
 	// Modules
-	export Run_Spray := FraudGovPlatform_Validation.SprayAndQualifyInput(pversion);
 	export Run_IdentityData := Build_Input_IdentityData(pversion, MBS_Sprayed, pCustomerSettings := pCustomerSettings).All;
 	export Run_KnownFraud :=  Build_Input_KnownFraud(pversion, MBS_Sprayed, pCustomerSettings := pCustomerSettings).All;
 	export Run_Deltabase := Build_Input_Deltabase(pversion, MBS_Sprayed, pCustomerSettings := pCustomerSettings ).All;
