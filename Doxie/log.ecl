@@ -13,19 +13,24 @@ EXPORT log := MODULE
   END;
 
   EXPORT layout_log_sold_to_transactions := RECORD
-    string transaction_id;
-    string query_name;
+    string20 transaction_id;
+    string32 local_id;
+    string1 domain;
+    string80 query_name;
     integer mbs_gcid;
-    string mbs_billind_id;
-    string mbs_product_id;
+    string25 mbs_billind_id;
+    integer mbs_product_id;
     unsigned1 fcra;
     unsigned1 glba_use;
     unsigned1 dppa_use;
     unsigned1 hipaa;
+    unsigned1 deathmaster;
+    // probably have a single bitmap field with all these last 5 permissions
   END;
 
   EXPORT layout_log_sold_to_sources := RECORD
-    string transaction_id;
+    string20 transaction_id;
+    string32 local_id;
     unsigned6 LexID;
     utf8 source_list; /* JSON format: [{“S”:1234}, {“S”:1235,”R”:666},{“S”:1237}] */
   END;
@@ -45,9 +50,12 @@ EXPORT log := MODULE
     #uniquename(ds_slim)
     #uniquename(toLogFormat)
     #uniquename(l_lexid)
+    #uniquename(t_id)
     %rec_log% %toLogFormat% (RECORDOF (ds_in) L) := TRANSFORM
       %l_lexid% :=  (unsigned6) L.did_field;
-      SELF.transaction_id := doxie.log.transaction_id; // from where? read from stored('_TransactionId') in gateway.Configuration
+      %t_id% := doxie.log.transaction_id; // from where? read from stored('_TransactionId') in gateway.Configuration
+      SELF.transaction_id := %t_id%;
+      SELF.local_id := %t_id%; // temporarily assigning local id
       SELF.LexID :=  %l_lexid%;
       SELF.global_sid:= L.global_sid; //orbitID of the dataset being searched
       SELF.record_sid := IF ( %l_lexid% = 0, L.record_sid, 0); //  // if we have a lexid, we only need to log source ids
@@ -84,15 +92,20 @@ EXPORT log := MODULE
   
     IMPORT Data_Services, STD;
 
+    t_id := doxie.log.transaction_id;
+
     // no uniquenames as this macro must always be called just once 
     doxie.log.layout_log_sold_to_transactions toLogFormat() := TRANSFORM
-      SELF.transaction_id := doxie.log.transaction_id;
+      SELF.transaction_id := t_id;
+      SELF.local_id := t_id; // temporarily assigning local id
+      SELF.domain := 'P'; // TODO: define enum [P, I, H] somewhere
       SELF.query_name := STD.System.Job.Name();
       SELF.mbs_gcid := 0; // ??
       SELF.mbs_billind_id := ''; // ??
-      SELF.mbs_product_id := ''; // ??
+      SELF.mbs_product_id := 0; // ??
       SELF.fcra := IF(env_flag = Data_Services.data_env.iFCRA, 1, 0);
       SELF.hipaa := IF(env_flag = Data_Services.data_env.iHIPAA, 1, 0);
+      SELF.deathmaster := 0; // ??
       SELF.glba_use := mod_access.glb;
       SELF.dppa_use := mod_access.dppa;
     END;
