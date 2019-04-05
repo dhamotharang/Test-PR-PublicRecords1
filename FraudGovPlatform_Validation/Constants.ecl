@@ -1,11 +1,11 @@
 ﻿import _control;
 export	Constants	:=
 module
-	export	string		LandingZoneServer_prod		:=	_control.IPAddress.bair_batchlz01;
-	export	string		LandingZonePathBase_prod	:=	'/data/otto/';
+	export	string		LandingZoneServer_prod		:=	_control.IPAddress.bctlpedata10;
+	export	string		LandingZonePathBase_prod	:=	'/data/super_credit/fraudgov/in/contributions/';
 
-	export	string		LandingZoneServer_dev		:=	_control.IPAddress.bair_batchlz01;
-	export	string		LandingZonePathBase_dev		:=	'/data/otto/';
+	export	string		LandingZoneServer_dev		:=	_control.IPAddress.bctlpedata12;
+	export	string		LandingZonePathBase_dev		:=	'/data/super_credit/fraudgov/in/contributions/';
 
 	export	string		LandingZoneFilePathRgx			:=	'^[0-9]+/ready';
 	

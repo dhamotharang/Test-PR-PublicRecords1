@@ -1,4 +1,4 @@
-IMPORT prte2_ebr;
+﻿IMPORT prte2_ebr, ebr;
 
 
 EXPORT Files := MODULE
@@ -7,8 +7,13 @@ EXPORT Files := MODULE
 	EXPORT IN_5610_Demographic_Data		:= dataset(Constants.in_prefix_name + '5610_demographic_data', Layouts.In_5610_Demographic, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
 
 	EXPORT BASE_0010_Header						:= dataset(Constants.base_prefix_name + '0010_header', Layouts.File_0010_Header, thor); 
+	EXPORT BASE_0010_Header_linkids:=project(BASE_0010_Header,EBR.Layout_0010_Header_Base_AID); 
+	
 	EXPORT BASE_5600_Demographic			:= dataset(Constants.base_prefix_name + '5600_demographic_data', Layouts.File_5600_Demographic, thor);
+	Export Base_5600_Demographic_LinkIds:=Project(BASE_5600_Demographic,EBR.Layout_5600_Demographic_Data_Base);
+	
 	EXPORT BASE_5610_Demographic			:= dataset(Constants.base_prefix_name + '5610_demographic_data', Layouts.File_5610_Demographic, thor);
+	Export BASE_5610_Demographic_linkIds:=project(BASE_5610_Demographic,EBR.Layout_5610_demographic_data_Base);
 	
 	EXPORT BASE_1000_Executive_Summary				:= dataset([], Layouts.File_1000_Executive_Summary);
 	EXPORT BASE_2000_Trade										:= dataset([], Layouts.File_2000_Trade);

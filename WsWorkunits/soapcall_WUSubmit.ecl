@@ -27,6 +27,10 @@ function
     string                    Message   {xpath('Message'  ),maxlength(200 )};
   end;
 
+  import ut,Workman;
+  #UNIQUENAME(SOAPCALLCREDENTIALS)
+  #SET(SOAPCALLCREDENTIALS  ,ut.Credentials().mac_add2Soapcall())
+
   dWUSubmitResult  :=  
     soapcall(
        'http://' + pESP + ':' + pESPPort + '/WsWorkunits'
@@ -36,6 +40,18 @@ function
       ,xpath('WUSubmitResponse/Exceptions/Exception')
     );
 
-  return  dWUSubmitResult;
+  dWUSubmitResult_remote  :=  
+    soapcall(
+       'http://' + pESP + ':' + pESPPort + '/WsWorkunits'
+      ,'WUSubmit'
+      ,rWUSubmitRequest
+      ,rWUSubmitResponse
+      ,xpath('WUSubmitResponse/Exceptions/Exception')
+      %SOAPCALLCREDENTIALS%
+    );
+
+  returnresult := iff(trim(pesp) in Workman._Config.LocalEsps ,dWUSubmitResult  ,dWUSubmitResult_remote);
+
+  return  returnresult;
 
 end;

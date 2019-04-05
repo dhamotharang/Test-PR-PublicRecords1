@@ -3,7 +3,7 @@ EXPORT Anonymize  := Module
 
 	Shared nodes				:= thorlib.nodes();	
 
-	Shared Sources_To_Anonymize := FraudGovPlatform.Files().Flags.SourcesToAnonymize;
+	Shared Sources_To_Anonymize := FraudGovPlatform.Files().CustomerSettings;
 	
 	Export Ciid(dataset(Layouts.ciid) pCiidFile)		:= Module
 		

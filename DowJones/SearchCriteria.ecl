@@ -44,6 +44,7 @@ export unicode Common :=
      '<value id="11" name="Organized Crime Japan" />\r\n' +
      '<value id="5" name="Other Official Lists" />\r\n' +
 		 '<value id="34" name="Sanctions Control and Ownership" />\r\n' + //Bug 20372
+		 $.SearchCriteria3.Sanctions[1].criterion +
      '<value id="6" name="Sanctions Lists" />\r\n' +
 		 '<value id="13" name="Tax Crime" />\r\n' + // Bug: 156981     
 		 '<value id="7" name="Terror" />\r\n' +
@@ -55,7 +56,13 @@ export unicode Common :=
      '<value id="2" name="Alive" />\r\n' +
      '<value id="1" name="Deceased" />\r\n' + 
      '</group>\r\n' +
-			BuildSourceCriteria;
+		'<group id="3" name="Active Status">\r\n' +
+     '<value id="9" name="No Value" />\r\n' +
+		 '<value id="1" name="Active" />\r\n' + 
+     '<value id="2" name="Inactive" />\r\n' +
+     '</group>\r\n' +
+		
+		BuildSourceCriteria;
 		 
 // geographical seaches
 // Middle East me
