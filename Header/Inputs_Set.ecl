@@ -40,7 +40,7 @@ liensv2_file := if(fileservices.getsuperfilesubcount('~thor_data400::base::Liens
 output('Nothing added to base::LiensV2Header_Building'),
 sequential(
 output(liensv2.file_liens_main,,'~thor_data400::base::liens::main', CLUSTER( 'thor400_44' ), overwrite,compressed), //combines all liensv2 base files main
-output(liensv2.file_liens_party,,'~thor_data400::base::liens::party', CLUSTER( 'thor400_44' ), overwrite,compressed), //combines all liensv2 base files party
+output(liensv2.File_liens_party_headerIngest,,'~thor_data400::base::liens::party', CLUSTER( 'thor400_44' ), overwrite,compressed), //combines all liensv2 base files party
 fileservices.addsuperfile('~thor_data400::base::LiensV2_mainHeader_Building','~thor_data400::base::liens::main'),
 fileservices.addsuperfile('~thor_data400::base::LiensV2_partyHeader_Building','~thor_data400::base::liens::party')
 ));
