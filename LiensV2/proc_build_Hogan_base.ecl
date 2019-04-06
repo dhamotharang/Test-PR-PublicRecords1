@@ -103,6 +103,8 @@ end;
 dMappingfile_out := Project(dHoganMainwithNewIds(BestEarliestTMSID <> tmsid and BestEarliestTMSID <> ''),tGenerateMapping(left));
 dMappingFile_outdeduped := dedup(sort(dMappingfile_out,record),record);
 
+dMappingfile_tosend := Project(dHoganMainwithNewIds(BestEarliestTMSID <> tmsid and BestEarliestTMSID <> '' and process_date < (STRING8)Std.Date.Today()),tGenerateMapping(left));
+dMappingFile_tosenddeduped := dedup(sort(dMappingfile_tosend,record),record);
 /**************************************************Party*************************************************************************/
 //Propagate the new IDS to Party file
 dHoganPartywithnewids       := LiensV2.Fn_Propagate_TMSIDRMSID_Party(dMappingFile_outdeduped,ds_fix);
@@ -131,7 +133,7 @@ dNewHoganPartyFullBasewithNewIds := Project(dHoganPartyfullwithnewids,tAdobt_new
 /**********************************************************************************************************/
 PromoteSupers.MAC_SF_BuildProcess(dNewHoganMainBasewithNewIds,
                        '~thor_data400::base::Liens::Main::Hogan',bld_hogan_main, 2,,true);
-PromoteSupers.MAC_SF_BuildProcess(dMappingFile_outdeduped,
+PromoteSupers.MAC_SF_BuildProcess(dMappingFile_tosenddeduped,
                        '~thor_data400::base::Liens::Mappingfile::Hogan',bld_hogan_Mappingfile, 2,,true);											 
 											 
 PromoteSupers.MAC_SF_BuildProcess(dNewHoganPartyBasewithNewIds,'~thor_data400::base::Liens::party::Hogan', bld_hogan_party, 2,,true);

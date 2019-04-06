@@ -1,4 +1,4 @@
-IMPORT Business_Header, ut, mdr, _validate;
+﻿IMPORT Business_Header, ut, mdr, _validate;
 
 EXPORT fLiensV2_As_Business_Linking(DATASET(LiensV2.layout_liens_party_ssn_BIPV2) pFile_Liens) :=
 FUNCTION
@@ -59,7 +59,7 @@ FUNCTION
     // SELF.vl_id                         := IF(l.tax_id <> '',
 																						 // TRIM(l.tmsid[1..2]) + ut.fnTrim2Upper(l.cname) + l.st + l.tax_id,
 																						 // TRIM(l.tmsid[1..2]) + ut.fnTrim2Upper(l.cname) + l.st + l.prim_name + l.p_city_name);   
-    SELF.vl_id                         := TRIM(l.tmsid[1..2]) + (STRING)HASH(l.tmsid + l.rmsid);   
+    SELF.vl_id                         := TRIM(l.tmsid_old[1..2]) + (STRING)HASH(l.tmsid_old + l.rmsid_old);   //DF_24044 keep tmsid consistent as some have changed.
 		SELF.current                       := TRUE;
 		SELF.source_record_id              := l.persistent_record_id;
     SELF.phone_score                   := IF((INTEGER)SELF.company_phone=0,0,1);

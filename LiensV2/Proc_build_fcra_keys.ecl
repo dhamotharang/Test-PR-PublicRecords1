@@ -71,7 +71,7 @@ mailfile	 :=	FileServices.SendEmailAttachData('vani.chikte@lexisnexis.com'
 																															 ,
 																															 ,_Control.MyInfo.EmailAddressNotify);
 Mailfile2 := fileservices.sendemail('vani.chikte@lexisnexis.com',
-				                            'Too Many records in the Mapping File, Please email it manually',
+				                            'Too Many records in the Mapping File, It has been desprayed',
 				                            'workunit: ' + workunit);	
 /******************************************************************************************************/																		
 build_fcra_keys := sequential(
@@ -90,6 +90,8 @@ build_fcra_keys := sequential(
 						qmv_fcra_party_trid_key,qmv_fcra_rmsid_key,mv_bdid_qa,mv_case_nbr_qa,mv_cert_nbr_qa,mv_filing_nbr_qa,mv_serial_nbr_qa),bld_autokeys,
 						DeltaCommands,
 						cnt_fcra_main_id,cnt_fcra_party_id, cnt_fcra_autokey_payload,
+						liensV2._Functions.fn_despray_file(liensv2.File_TMSID_MappingFile,'Thor_data400::LiensV2::MappingTMSIDRMSID_file');
+	
 						Map(count(Liensv2.File_TMSID_MappingFile) >1000 => mailfile2,
 	              count(Liensv2.File_TMSID_MappingFile) >0 => mailfile ,
 	              Output('No New mapping Entries to report')),

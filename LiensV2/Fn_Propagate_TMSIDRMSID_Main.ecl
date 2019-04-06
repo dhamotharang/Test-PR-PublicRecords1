@@ -142,14 +142,14 @@ dHoganMainwithNewTMSID3 := iterate(dCaseLinkIDClusterGrp3,tPropagateTMSID3(left,
 /*********************************************************************************************************/
 
 //Step4 - the first two steps in some case result in partial propagation. Use the newtmsid_final that has the maximum caselinkids to unify the cluster.
-unq_Newids:= table(dHoganMainwithNewTMSID3,{Newtmsid_final,caselinkid_temp},Newtmsid_final,caselinkid_temp,few);
+// unq_Newids:= table(dHoganMainwithNewTMSID3,{Newtmsid_final,caselinkid_temp},Newtmsid_final,caselinkid_temp,few);
 
 rNewtabrec := record
-unq_Newids.Newtmsid_final;
+dHoganMainwithNewTMSID3.Newtmsid_final;
 caselinktempcnt:= count(group);
 end;
 
-unq_Newtmsid:= table(unq_Newids,rNewtabrec,Newtmsid_final,few);
+unq_Newtmsid:= table(dHoganMainwithNewTMSID3,rNewtabrec,Newtmsid_final,few);
 
 rNewtemp_rec := record
 dHoganMainwithNewTMSID3;
@@ -222,16 +222,16 @@ dHoganMainwithNewTMSIDFinalStep5 := iterate(dCaseLinkIDClusterGrp5,tPropagateNew
 /***************************************************************************************************************************************************/
 //Step6
 //Populate all the records with the earliest TMSID
-dEarliestTmsidPerCluster := dedup(sort(distribute(dHoganMainwithNewTMSIDFinalStep5,HASH(NewTMSID_final)),
-                                  NewTMSID_final,orig_filing_date,process_date,tmsid,local),
-																	NewTMSID_final,local);
+dEarliestTmsidPerCluster := dedup(sort(distribute(dHoganMainwithNewTMSIDFinalStep5,HASH(NewTMSID_final,courtID)),
+                                  NewTMSID_final,courtid, orig_filing_date,process_date,tmsid,local),
+																	NewTMSID_final,courtid, local);
 																	
 dHoganMainwithNewTMSIDFinalStep5 Propagateearliesttmsid(dEarliestTmsidPerCluster l ,dHoganMainwithNewTMSIDFinalStep5 r) :=transform
 self.BestEarliestTMSID := l.tmsid;
 self:= r;
 end;
-dHoganMainwithBestTMSID  := join(dEarliestTmsidPerCluster, distribute(dHoganMainwithNewTMSIDFinalStep5,HASH(NewTMSID_final)) ,
-                              left.Newtmsid_final = right.Newtmsid_final,
+dHoganMainwithBestTMSID  := join(dEarliestTmsidPerCluster, distribute(dHoganMainwithNewTMSIDFinalStep5,HASH(NewTMSID_final,courtID)) ,
+                              left.Newtmsid_final = right.Newtmsid_final and left.courtID = right.courtID,
 															Propagateearliesttmsid(left,right), local );																	
                                  
 /***************************************************************************************************************************************************/
@@ -239,7 +239,8 @@ dHoganMainwithBestTMSID  := join(dEarliestTmsidPerCluster, distribute(dHoganMain
 //Derive the NEW RMSID for the records that got a new TMSID
 dHoganMainwithBestTMSID tDeriveNewRMSID(dHoganMainwithBestTMSID l) := transform
   self.NewRMSID 			:= MAP (L.BestEarliestTMSID <> L.TMSID and trim(L.RMSID)[length(trim(L.RMSID))-1..] =  L.filing_type_id => 'HGR'+trim(L.BestEarliestTMSID[3..])+L.filing_type_id,
-	                            L.BestEarliestTMSID <> L.TMSID and trim(L.RMSID)[length(trim(L.RMSID))-1..] <> L.filing_type_id => 'HGR'+trim(L.BestEarliestTMSID[3..])+trim(L.RMSID)[length(trim(L.RMSID))-1..],
+	                            L.BestEarliestTMSID <> L.TMSID and ~regexfind('[A-Z]+',trim(L.RMSID)[length(trim(L.RMSID))-1..])    => 'HGR'+trim(L.BestEarliestTMSID[3..])+L.filing_type_id,
+															L.BestEarliestTMSID <> L.TMSID and trim(L.RMSID)[length(trim(L.RMSID))-1..] <> L.filing_type_id => 'HGR'+trim(L.BestEarliestTMSID[3..])+trim(L.RMSID)[length(trim(L.RMSID))-1..],
 															L.RMSID);
   self := L;
   end;

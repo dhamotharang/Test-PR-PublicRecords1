@@ -34,7 +34,7 @@ rMainWCourtIDs t_court_id1(dMainWCourtidBF l) := transform
   HG_Court(string desc) := HG_CourtDict[desc].court_id;
 
 
- STRING7 CourtId      :=  l.tmsid[length(TRIM(l.tmsid,LEFT,RIGHT))-6..];
+ STRING7 CourtId      :=  l.tmsid_old[length(TRIM(l.tmsid_old,LEFT,RIGHT))-6..];
  STRING7 ValidCourtid :=  MAP(regexfind('[A-Z\\.]{6}[A-Z0-9]',CourtId ) and courtid[1..2] in ut.Set_State_Abbrev => CourtId,
                                              CourtId in ['IAO\'BD1','IAO\'BC1'] => CourtId,
                                                                                                                                                                                                                                                 '');

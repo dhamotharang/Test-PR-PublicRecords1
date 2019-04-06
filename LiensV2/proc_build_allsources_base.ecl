@@ -15,7 +15,7 @@ END;
 
 HOGAN_main := project(LiensV2.file_Hogan_main, forkey(left));
 
-pre_file_liens_main := HOGAN_main(tmsid not in Liensv2.Suppress_TMSID())
+pre_file_liens_main := HOGAN_main(tmsid_old not in Liensv2.Suppress_TMSID())
                         + LiensV2.file_ILFDLN_main(tmsid not in Liensv2.Suppress_TMSID())
 						+ LiensV2.file_NYC_main(tmsid not in Liensv2.Suppress_TMSID())
 						+ LiensV2.file_NYFDLN_main(tmsid not in Liensv2.Suppress_TMSID())
@@ -68,7 +68,7 @@ END;
 Hogan_party := project(LiensV2.file_Hogan_party, refHGPTY(left));
 
 
-pre_file_liens_party := Hogan_party((cname <> ''or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID() and NOT regexfind('CAALAC1',tmsid))
+pre_file_liens_party := Hogan_party((cname <> ''or lname <> '' or fname <> '' or mname <> '') and tmsid_old not in Liensv2.Suppress_TMSID() and NOT regexfind('CAALAC1',tmsid))
                         + LiensV2.file_ILFDLN_party((cname <> '' or lname <> '' or fname <> '' or mname <> '')and tmsid not in Liensv2.Suppress_TMSID() and NOT regexfind('CAALAC1',tmsid))
 						+ LiensV2.file_NYC_party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID() and NOT regexfind('CAALAC1',tmsid))
 						+ LiensV2.file_NYFDLN_party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID() and NOT regexfind('CAALAC1',tmsid))
