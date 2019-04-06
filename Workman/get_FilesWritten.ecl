@@ -1,10 +1,21 @@
 ﻿import std,WsWorkunits;
 EXPORT get_FilesWritten(
-   string   pWorkunitID = ''
-  ,string   pesp        = _Config.LocalEsp
-  ,boolean  pUseGlobal  = true
+   pWorkunitID = '\'\''
+  ,pesp        = '_Config.LocalEsp'
+  ,pUseGlobal  = 'true'
 ) :=
-  map(pesp in _Config.LocalEsps  and WorkMan.Is_Valid_Wuid(pWorkunitID) and pUseGlobal = true  => global(nothor(STD.System.Workunit.WorkunitFilesWritten (pWorkunitID        )),few)
-     ,pesp in _Config.LocalEsps  and WorkMan.Is_Valid_Wuid(pWorkunitID) and pUseGlobal = false =>               STD.System.Workunit.WorkunitFilesWritten (pWorkunitID        )
-     ,                                                                                                          WsWorkunits.get_FilesWritten             (pWorkunitID  ,pesp ,pUseGlobal) //done use global in rewind, but use it other places
-  );
+functionmacro
+
+  import std;
+  
+  #IF(pUseGlobal = true and pesp in _Config.LocalEsps)
+    returnresult := global(nothor(STD.System.Workunit.WorkunitFilesWritten(pWorkunitID)),few);
+  #ELSIF(pUseGlobal = false and pesp in _Config.LocalEsps)
+    returnresult := STD.System.Workunit.WorkunitFilesWritten(pWorkunitID);
+  #ELSE
+    returnresult := WsWorkunits.get_FilesWritten            (pWorkunitID,pesp,pUseGlobal);
+  #END
+
+  return returnresult;
+  
+endmacro;
