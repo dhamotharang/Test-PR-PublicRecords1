@@ -4,6 +4,7 @@ EXPORT get_FilesRead(
   ,string   pesp        = _Config.LocalEsp
   ,boolean  pUseGlobal  = true
 ) :=
-  if(pesp in _Config.LocalEsps and WorkMan.Is_Valid_Wuid(pWorkunitID)   ,global(STD.System.Workunit.WorkunitFilesRead(pWorkunitID),few)//can't trust this to flag superfiles
-                                                                        ,WsWorkunits.get_FilesRead            (pWorkunitID,pesp,pUseGlobal)
+  map(pesp in _Config.LocalEsps and WorkMan.Is_Valid_Wuid(pWorkunitID) and pUseGlobal = true  => global(nothor(STD.System.Workunit.WorkunitFilesRead(pWorkunitID)),few)
+     ,pesp in _Config.LocalEsps and WorkMan.Is_Valid_Wuid(pWorkunitID) and pUseGlobal = false =>               STD.System.Workunit.WorkunitFilesRead(pWorkunitID)
+     ,                                                                                                         WsWorkunits.get_FilesRead            (pWorkunitID,pesp,pUseGlobal)
   );

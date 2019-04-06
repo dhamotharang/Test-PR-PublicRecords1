@@ -4,6 +4,7 @@ EXPORT get_FilesWritten(
   ,string   pesp        = _Config.LocalEsp
   ,boolean  pUseGlobal  = true
 ) :=
-  if(pesp in _Config.LocalEsps  and WorkMan.Is_Valid_Wuid(pWorkunitID) ,STD.System.Workunit.WorkunitFilesWritten (pWorkunitID        )
-                                                                       ,WsWorkunits.get_FilesWritten             (pWorkunitID  ,pesp ,pUseGlobal) //done use global in rewind, but use it other places
+  map(pesp in _Config.LocalEsps  and WorkMan.Is_Valid_Wuid(pWorkunitID) and pUseGlobal = true  => global(nothor(STD.System.Workunit.WorkunitFilesWritten (pWorkunitID        )),few)
+     ,pesp in _Config.LocalEsps  and WorkMan.Is_Valid_Wuid(pWorkunitID) and pUseGlobal = false =>               STD.System.Workunit.WorkunitFilesWritten (pWorkunitID        )
+     ,                                                                                                          WsWorkunits.get_FilesWritten             (pWorkunitID  ,pesp ,pUseGlobal) //done use global in rewind, but use it other places
   );
