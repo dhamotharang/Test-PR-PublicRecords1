@@ -1,6 +1,6 @@
 ﻿//modify BIPV2.KeySuffix to new build version before running
 
-import bipv2,Workman,_control,bipv2_build;
+import bipv2,Workman,_control,bipv2_build,std,tools,WsWorkunits;
 
 pversion      := BIPV2.KeySuffix                                     ;
 cluster       := Workman._Config.localhthor                          ;

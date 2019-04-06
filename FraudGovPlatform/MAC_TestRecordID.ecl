@@ -2,7 +2,7 @@
 EXPORT Mac_TestRecordID(   
 	string pversion
 	,dataset(FraudShared.Layouts.Base.Main)	pBaseMainFile =	FraudShared.Files().Base.Main.Built
-	,dataset(FraudShared.Layouts.Base.Main) pPreviousMain = if(_Flags.FileExists.Base.MainFather,FraudShared.Files().Base.Main.Father,DATASET([], FraudShared.Layouts.Base.Main))
+	,dataset(FraudShared.Layouts.Base.Main) pPreviousMain = if(_Flags.FileExists.Base.MainQA,FraudShared.Files().Base.Main.QA,DATASET([], FraudShared.Layouts.Base.Main)) 
 ) := 
 FUNCTION
 	main := table(pBaseMainFile, {record_id; cnt := count(group)}, record_id );

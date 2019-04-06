@@ -1,6 +1,7 @@
 ﻿EXPORT get_FilesRead(
-   string pWorkunitID = ''
-  ,string pesp        = WsWorkunits._Config.localEsp
+   string   pWorkunitID = ''
+  ,string   pesp        = WsWorkunits._Config.localEsp
+  ,boolean  pUseGlobal  = true
 ) :=
 function
 
@@ -15,8 +16,10 @@ function
     ,self.isSuper := if(counter = 1 ,left.IsSuperFile   ,false                            )
     ,self.usage   := left.Count 
   ));
-  FilesRead  := project(global(FilesRead1,few),WsFileRead);
-
+  FilesRead  := if(pUseGlobal = true
+                  ,project(global(FilesRead1,few),WsFileRead)
+                  ,project(FilesRead1,WsFileRead)
+                );
   return FilesRead;
   
 end;

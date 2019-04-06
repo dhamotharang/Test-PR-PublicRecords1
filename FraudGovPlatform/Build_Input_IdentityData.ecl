@@ -2,25 +2,21 @@
 EXPORT Build_Input_IdentityData(
 	 string pversion
 	,dataset(FraudShared.Layouts.Input.mbs) MBS_Sprayed = FraudShared.Files().Input.MBS.sprayed
-	,dataset(Layouts.Flags.SkipModules) pSkipModules = FraudGovPlatform.Files().Flags.SkipModules
 	,dataset(Layouts.Input.IdentityData) IdentityData_Sprayed =  files().Input.IdentityData.sprayed	
 	,dataset(Layouts.Input.IdentityData) ByPassed_IdentityData_Sprayed = files().Input.ByPassed_IdentityData.sprayed
 	,dataset(Layouts.CustomerSettings) pCustomerSettings = files().CustomerSettings
 ) :=
 module
 
-	shared SkipNACBuild := pSkipModules[1].SkipNACBuild;
-	shared SkipInquiryLogsBuild := pSkipModules[1].SkipInquiryLogsBuild;
-
 	inIdentityDataUpdate :=	  if( nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.IdentityData)) > 0, 
 		Files(pversion).Sprayed.IdentityData, 
 		dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
 		)   
-		+ if (nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.NAC)) > 0 and SkipNACBuild = false, 
+		+ if (nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.NAC)) > 0, 
 				Build_Prepped_NAC(pversion).NACIDDTUpdate,
 				dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
 		)
-		+ if (nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.InquiryLogs)) > 0 and SkipInquiryLogsBuild = false, 
+		+ if (nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.InquiryLogs)) > 0, 
 				Build_Prepped_InquiryLogs(pversion),
 				dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
 		);
@@ -111,9 +107,24 @@ module
 			or Transaction_ID_Number = ''
 			or Reason_for_Transaction_Activity = ''
 			or Date_of_Transaction = ''
-			or (LexID = 0 and raw_Full_Name = '' and (raw_First_name = '' or raw_Last_Name=''))
-			or ((SSN = '' or length(STD.Str.CleanSpaces(SSN))<>9 or regexfind('^[0-9]*$',STD.Str.CleanSpaces(ssn)) =false) and (Drivers_License_Number='' and Drivers_License_State='') and LexID = 0)
-			or (Street_1='' and City='' and State='' and Zip='')
+			// https://jira.rsi.lexisnexis.com/browse/GRP-203
+			// 26/Oct/17 Sundeep Commented:
+			// lets say we have name and address only but no ssn, dl, lexid, the entire record will be in the payload keys but not in the ssn key, dl key, or the lexid key.
+			// The only records that we can truly discard are the ones that dont have a name, address, and any identifying information. 
+			// If we get an inquiry with only an IP address and nothing else, we will still keep that inquiry.			
+			//
+			or (
+					(	raw_Full_Name = '' and 
+						(raw_First_name = '' or raw_Last_Name='') and 
+						(Street_1='' and City='' and State='' and Zip='')
+					) and (
+							(SSN = '' or length(STD.Str.CleanSpaces(SSN))<>9 or regexfind('^[0-9]*$',STD.Str.CleanSpaces(ssn)) =false) and 
+						(Drivers_License_Number='' and Drivers_License_State='') and
+						LexID = 0
+					) and 
+					//DOB = '' and ??
+					IP_Address = ''
+			)					
 		);
 
 	//Exclude Errors
