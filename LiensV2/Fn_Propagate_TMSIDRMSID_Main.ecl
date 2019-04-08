@@ -223,7 +223,7 @@ dHoganMainwithNewTMSIDFinalStep5 := iterate(dCaseLinkIDClusterGrp5,tPropagateNew
 //Step6
 //Populate all the records with the earliest TMSID
 dEarliestTmsidPerCluster := dedup(sort(distribute(dHoganMainwithNewTMSIDFinalStep5,HASH(NewTMSID_final,courtID)),
-                                  NewTMSID_final,courtid, orig_filing_date,process_date,tmsid,local),
+                                  NewTMSID_final,courtid,process_date, orig_filing_date,tmsid,local),
 																	NewTMSID_final,courtid, local);
 																	
 dHoganMainwithNewTMSIDFinalStep5 Propagateearliesttmsid(dEarliestTmsidPerCluster l ,dHoganMainwithNewTMSIDFinalStep5 r) :=transform
