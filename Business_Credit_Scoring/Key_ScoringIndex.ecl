@@ -6,8 +6,21 @@ EXPORT Key_ScoringIndex(	STRING	pVersion	=	(STRING8)Std.Date.Today(),
 
 	SHARED	dKeyResult			:=	Business_Credit_Scoring.Files().ScoringIndex;
 
-	SHARED	superfile_name	:=	Business_Credit_Scoring.keynames(pUseOtherEnvironment:=pUseProd).ScoringIndex.QA;	
-	SHARED	Base						:=	dKeyResult;
+	SHARED	superfile_name	:=	Business_Credit_Scoring.keynames(pUseOtherEnvironment:=pUseProd).ScoringIndex.QA;
+  SHARED  dKeyResultCCA   :=  PROJECT(dKeyResult,
+                                TRANSFORM(
+                                  {
+                                    //  This allows source to be the last field in the layout for consistency
+                                    RECORDOF(LEFT) AND NOT [source],
+                                    UNSIGNED4 global_sid  :=  0;
+                                    UNSIGNED8 record_sid  :=  0;
+                                    STRING2		source      :=  Business_Credit_Scoring.Constants().source;
+                                  },
+                                  SELF  :=  LEFT;
+                                  SELF  :=  [];
+                                )                                
+                              );
+	SHARED	Base						:=	dKeyResultCCA;
 	
 	BIPV2.IDmacros.mac_IndexWithXLinkIDs(Base, k, superfile_name)
 	EXPORT Key := k;
