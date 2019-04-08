@@ -12,7 +12,7 @@ export Input := DATASET([
                 ,'1701'                                                             
                 ,'~thor_dell400::in::experiancred::cpchf' + ver + '_' + ver    
                 ,[{'~thor_data400::in::experiancred'}]    
-                ,'thor400_44'
+                ,std.system.job.target()
                 ,ver
               ,'S[0-9]{3}'            //this regex pulls the S003 from the unix filename and replaces the @ver@ in the thor filename with it
                       
@@ -28,7 +28,7 @@ export Delete := DATASET([
 								,'101'                                                             
 								,'~thor_dell400::in::experiancred_delete::cpchf' + ver    
 								,[{'~thor_data400::in::experiancred_delete'}]    
-								,'thor400_44'
+								,std.system.job.target()
 								,ver
 								}
 							], versionControl.Layout_Sprays.Info);
@@ -42,7 +42,7 @@ export Deceased := DATASET([
 									,'101'                                                             
 									,'~thor_dell400::in::experiancred_deceased::cpchf' + ver
 									,[{'~thor_data400::in::experiancred_deceased'}]    
-									,'thor400_44'
+									,std.system.job.target()
 									,ver
 									}
 								], versionControl.Layout_Sprays.Info);
