@@ -1,4 +1,5 @@
-﻿import address, aid, risk_indicators, models, riskwise, ut, fcra_opt_out, gateway, FFD;
+﻿import _Control, address, aid, risk_indicators, models, riskwise, ut, fcra_opt_out, gateway, FFD;
+onThor := _Control.Environment.OnThor;
 
 // This code is adapted from Models.RiskView_Batch_Service for use of scripts running RiskView v4 on thor.
 EXPORT RiskView_Thor_Records(DATASET(risk_indicators.Layout_Batch_In_Plus_Custom) BatchIn, DATASET(Gateway.Layouts.Config) Gateways,
@@ -6,7 +7,7 @@ boolean	IncludeAllScores, boolean IncludeAllAttributes, boolean IncludeScoresAtt
 boolean IncludeRetail, boolean IncludeTelecom, boolean IncludeMoney_temp, boolean IncludePreScreenTemp, boolean IncludeLifestyle, 
 boolean IncludeDemographic, boolean IncludeFinancial, boolean IncludeProperty, boolean IncludeDerogatory, boolean IncludeVersion2,
 boolean IncludeVersion3, boolean IncludeVersion4, string5 industry_class_val, string AlternateModel_in, boolean IsPreScreenTemp,
-integer FlagshipVersion, string DataRestriction, string50 DataPermission, STRING strFFDOptionsMask_in, BOOLEAN onThor) := FUNCTION
+integer FlagshipVersion, string DataRestriction, string50 DataPermission, STRING strFFDOptionsMask_in) := FUNCTION
 
 boolean OutputConsumerStatements := strFFDOptionsMask_in[1] = '1';	
 
@@ -172,24 +173,43 @@ Risk_Indicators.Layout_Input into_in(batchinseq le) := TRANSFORM
 	SELF.in_city := le.p_City_name;
 	SELF.in_state := le.St;
 	SELF.in_zipCode := le.Z5;
-	self.prim_range := IF(onThor, '', clean_a2[1..10]);
-	self.predir := IF(onThor, '', clean_a2[11..12]);
-	self.prim_name := IF(onThor, '', clean_a2[13..40]);
-	self.addr_suffix := IF(onThor, '', clean_a2[41..44]);
-	self.postdir := IF(onThor, '', clean_a2[45..46]);
-	self.unit_desig := IF(onThor, '', clean_a2[47..56]);
-	self.sec_range := IF(onThor, '', clean_a2[57..65]);
-	self.p_city_name := IF(onThor, '', clean_a2[90..114]);
-	self.st := IF(onThor, '', clean_a2[115..116]);
-	self.z5 := IF(onThor, '', clean_a2[117..121]);
-	self.zip4 := IF(onThor, '', clean_a2[122..125]);
-	self.lat := IF(onThor, '', clean_a2[146..155]);
-	self.long := IF(onThor, '', clean_a2[156..166]);
-	self.addr_type := IF(onThor, '', clean_a2[139]);
-	self.addr_status := IF(onThor, '', clean_a2[179..182]);
-	self.county := IF(onThor, '', clean_a2[143..145]);
-	self.geo_blk := IF(onThor, '', clean_a2[171..177]);
-	
+  #IF(onThor)
+    self.prim_range := '';
+    self.predir := '';
+    self.prim_name := '';
+    self.addr_suffix := '';
+    self.postdir := '';
+    self.unit_desig := '';
+    self.sec_range := '';
+    self.p_city_name := '';
+    self.st := '';
+    self.z5 := '';
+    self.zip4 := '';
+    self.lat := '';
+    self.long := '';
+    self.addr_type := '';
+    self.addr_status := '';
+    self.county := '';
+    self.geo_blk := '';
+	#ELSE
+  	self.prim_range := clean_a2[1..10];
+    self.predir := clean_a2[11..12];
+    self.prim_name := clean_a2[13..40];
+    self.addr_suffix := clean_a2[41..44];
+    self.postdir := clean_a2[45..46];
+    self.unit_desig := clean_a2[47..56];
+    self.sec_range := clean_a2[57..65];
+    self.p_city_name := clean_a2[90..114];
+    self.st := clean_a2[115..116];
+    self.z5 := clean_a2[117..121];
+    self.zip4 := clean_a2[122..125];
+    self.lat := clean_a2[146..155];
+    self.long := clean_a2[156..166];
+    self.addr_type := clean_a2[139];
+    self.addr_status := clean_a2[179..182];
+    self.county := clean_a2[143..145];
+    self.geo_blk := clean_a2[171..177];
+  #END
 	self.dl_number := stringlib.stringtouppercase(dl_num_clean);
 	self.dl_state := stringlib.stringtouppercase(le.dl_state);
 	
@@ -249,7 +269,11 @@ END;
 
 cleanIn_thor := PROJECT(my_dataset_with_address_cache, getCleanAddr_thor(LEFT));
 
-cleanIn := IF(onThor, cleanIn_thor, cleanIn_roxie);
+#IF(onThor)
+  cleanIn := cleanIn_thor;
+#ELSE
+  cleanIn := cleanIn_roxie;
+#END
 
 // set variables for passing to bocashell function fcra
 boolean   isUtility := StringLib.StringToUpperCase(industry_class_val) = 'UTILI';
@@ -285,14 +309,14 @@ clam := Risk_Indicators.Boca_Shell_Function_FCRA(cleanIn, gateways, dppa, glba, 
 																								 suppressNearDups, fromBIID, excludeWatchlists, fromIT1O,
 																								 ofacVersion, includeOfac, includeAddWatchlists, watchlistThreshold,
 																								 bsVersion, isPreScreen, doScore, nugen, ADL_Based_Shell:=false,datarestriction:=DataRestriction,
-																								 BSOptions:=BSOptions, datapermission:=DataPermission, onThor := onThor);
+																								 BSOptions:=BSOptions, datapermission:=DataPermission);
 
 adl_clam := Risk_Indicators.Boca_Shell_Function_FCRA(cleanIn, gateways, dppa, glba, isUtility, isLN, 
 																								 require2ele, doRelatives, doDL, doVehicle, doDerogs, ofacOnly,
 																								 suppressNearDups, fromBIID, excludeWatchlists, fromIT1O,
 																								 ofacVersion, includeOfac, includeAddWatchlists, watchlistThreshold,
 																								 bsVersion, isPreScreen, doScore, nugen, ADL_Based_Shell:=true,datarestriction:=DataRestriction,
-																								 BSOptions:=BSOptions, datapermission:=DataPermission, onThor := onThor);
+																								 BSOptions:=BSOptions, datapermission:=DataPermission);
 
 adl_clam_model := AlternateModel in ['rvp1012_1','rvp1208_1','rvp1401_1','rvp1401_2','rvp1503_1','rvc1112_0','rvc1208_1',
                                      'rvc1301_1','rvc1307_1','rvc1405_3','rvc1405_4','rvc1412_1','rvc1703_1','rvc1801_1'];
