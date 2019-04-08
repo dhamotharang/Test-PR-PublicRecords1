@@ -1,4 +1,4 @@
-//*************Funtions to flag records that match gong history by name, address and phone7 
+﻿//*************Funtions to flag records that match gong history by name, address and phone7 
 //             or by did and phone7
 export Fn_Flag_EDA_History(dataset(recordof(Layout_In_Phonesplus.layout_in_common)) phplus_in) := function
 
@@ -10,7 +10,7 @@ recordof(phplus_in) t_edah_score(phplus_in le) := transform
 						
 	self.rules  		:= if ( Translation_Codes.fFlagIsOn(le.eda_hist_match, 10b) or
 							    Translation_Codes.fFlagIsOn(le.eda_hist_match, 1000b),
-								Translation_Codes.rules_bitmap_code('Disconnected-EDA'),
+								le.rules | Translation_Codes.rules_bitmap_code('Disconnected-EDA'), //DF-24336 Don't overwrite NeustarWireless rules
 								le.rules); 
 	self := le;
 end;
@@ -23,7 +23,7 @@ edah_score_flagged := edah_score(Translation_Codes.fFlagIsOn(rules, Translation_
 
 recordof(phplus_in) t_prop_eda(edah_score le,edah_score_flagged  ri) := transform
 	self.in_flag 	   := if(ri.rules <> 0b, ri.in_flag, le.in_flag);
-	self.rules 	       := if(ri.rules <> 0b, ri.rules, le.rules);
+	self.rules 	       := if(ri.rules <> 0b, le.rules | ri.rules, le.rules);
 	self := le;
 end;
 

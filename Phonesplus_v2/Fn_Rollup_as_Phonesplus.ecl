@@ -1,4 +1,4 @@
-//****************Function to rollup records with the same CellPhoneIDKey********************
+﻿//****************Function to rollup records with the same CellPhoneIDKey********************
 import ut, mdr;
 export Fn_Rollup_as_Phonesplus(dataset(recordof(Layout_In_Phonesplus.layout_in_common)) phplus_in) := function
 
@@ -7,7 +7,7 @@ no_royalty_phones := phplus_in(~(Translation_codes.fGet_other_sources_from_bitma
 
 Remove_overlaping_royalty:= Fn_Remove_Overlap_Royalty(no_royalty_phones, royalty_phones);
 
-phplus_in_s := sort(distribute(Remove_overlaping_royalty, hash(CellPhoneIDKey)),CellPhoneIDKey, append_npa_effective_dt, append_npa_last_change_dt, local);
+phplus_in_s := sort(distribute(Remove_overlaping_royalty, hash(CellPhoneIDKey)),CellPhoneIDKey, append_npa_effective_dt, append_npa_last_change_dt, -rules, local); //DF-24336 added rules
 
 recordof(phplus_in) t_rollup(phplus_in_s le, phplus_in ri) := transform
 	glb_priority(string1 flag)			:= map(flag = 'U' => 1,
@@ -56,6 +56,7 @@ recordof(phplus_in) t_rollup(phplus_in_s le, phplus_in ri) := transform
 	self.cur_orig_conf_score			:= ut.Max2(le.cur_orig_conf_score, ri.cur_orig_conf_score);
 	self.append_min_source_conf			:= ut.Min2(le.append_min_source_conf, ri.append_min_source_conf);
 	self.append_max_source_conf 		:= ut.Max2(le.append_max_source_conf , ri.append_max_source_conf );
+	self.rules										:= le.rules | ri.rules;  //DF-24336
 	self := le;
 end;
 
