@@ -78,8 +78,9 @@ export _proc_powid(
 	
 	/*-----------------------For Persistence stats of the powid cluster and records -------------*/
   import BIPV2_QA_Tool;
-  shared the_base:=	dataset(f_out(iter),l_base,thor);
-	shared the_father:=BIPV2.CommonBase.DS_BASE;
+  shared last_powid_iter  := '~' + nothor(std.file.superfilecontents(_files_powid.FILE_BUILDING)[1].name);
+  shared the_base         := dataset(last_powid_iter,l_base,thor);
+	shared the_father       := BIPV2.CommonBase.DS_BASE;
 	shared ds_powid_persistence_stats   :=  BIPV2_Strata.PersistenceStats(the_base      ,the_father ,rcid,powid ) : independent;
 	shared ds_seleid_persistence_stats  :=  BIPV2_Strata.PersistenceStats(ds_powid_down ,the_father ,rcid,seleid) : independent;   
 
@@ -90,8 +91,7 @@ export _proc_powid(
   shared QA_Tool_seleid_persistence_cluster_stats    := BIPV2_QA_Tool.mac_persistence_cluster_stats(ds_seleid_persistence_stats ,'seleid' ,Build_Date);
   
 	/* ---------------------- SALT Output -------------------------------- */
-	shared updateBuilding(string fname=f_out(iter)) := _files_powid.updateBuilding(fname);
-	export updateSuperfiles(string fname=f_out(iter), DATASET(l_common) ds_common=ds_powid_down) := 
+	export updateSuperfiles(string fname=last_powid_iter, DATASET(l_common) ds_common=ds_powid_down) := 
   function
   
     kick_copy2_storage_thor_post  := BIPV2_Tools.Copy2_Storage_Thor(fname ,Build_Date ,'powid_postprocess');
@@ -106,8 +106,7 @@ export _proc_powid(
        ,QA_Tool_seleid_persistence_record_stats 
        ,QA_Tool_seleid_persistence_cluster_stats
        ,_files_powid.updateSuperfiles(fname+'_post')
-      ,copy2StorageThor_post
-      // ,if(not wk_ut._constants.IsDev ,tools.Copy2_Storage_Thor(filename := fname  ,pDeleteSourceFile  := true))  //copy orig file to storage thor
+       ,copy2StorageThor_post
     );
 	end;
 	
@@ -132,6 +131,7 @@ export _proc_powid(
 	/* ---------------------- Take Action -------------------------------- */
 	export runSpecBuild := sequential(specBuild, specDebug);
 	
+	shared updateBuilding(string fname=f_out(iter)) := _files_powid.updateBuilding(fname);
 	export runIter := sequential(linking, outputReviewSamples, updateBuilding(),POWID_iteration_stats/*, updateLinkHist*/)
 		: SUCCESS(bipv2_build.mod_email.SendSuccessEmail(,'BIPv2', , 'POWID')),
 			FAILURE(bipv2_build.mod_email.SendFailureEmail(,'BIPv2', failmessage, 'POWID'));
