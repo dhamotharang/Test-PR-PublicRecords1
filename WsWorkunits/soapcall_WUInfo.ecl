@@ -66,7 +66,7 @@ SuppressResultSchemas      =1
   end;
   
 	ECLSourceFileLayout :=
-	record, maxlength(5000)
+	record, maxlength(500)
 	
 	// string FileName{xpath('FileName')};
   // <xsd:element minOccurs="0" name="FileCluster" type="xsd:string" /> 
