@@ -64,6 +64,10 @@ STRING45	CaseLinkID	:=	'';
 STRING50 TMSID_old	:=	'';
 STRING50 RMSID_old	:=	'';
 BOOLEAN	CaseLinkID_Prop_Flag	:=	FALSE;
-
+//DF-24061	
+string7   AgencyID;
+unsigned4 global_sid;
+unsigned8 record_sid;
+String    Agency_id_src;
 end;
 end;

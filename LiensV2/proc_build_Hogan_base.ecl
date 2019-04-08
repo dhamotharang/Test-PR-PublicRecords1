@@ -1,4 +1,4 @@
-/*2007-10-02T12:19:46Z (Cecelie_p Guyton)
+﻿/*2007-10-02T12:19:46Z (Cecelie_p Guyton)
 changed output to be sequential
 */
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -65,6 +65,7 @@ Liensv2.layout_liens_main_module_for_hogan.layout_liens_main change_dummy_ver(ma
 	self.filing_date := (string)STD.Date.Today();
 	self.orig_filing_date := (string)STD.Date.Today();
 	self.orig_rmsid := '';
+	self.agency_id_src := '';
 	self := d;
 end;
 

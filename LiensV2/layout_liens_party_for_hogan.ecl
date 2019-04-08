@@ -36,4 +36,6 @@ string8  date_last_seen := '';
 string8  date_vendor_first_reported := '';
 string8  date_vendor_last_reported := '';
 unsigned8 persistent_record_id := 0 ; 
+unsigned4 global_sid;
+unsigned8 record_sid;
 end;

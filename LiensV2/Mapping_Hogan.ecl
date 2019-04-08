@@ -180,6 +180,10 @@ SELF.CaseLinkID	:=	L.CaseLinkID;
 SELF.TMSID_old	:=	L.TMSID_old;
 SELF.RMSID_old	:=	L.RMSID_old;
 SELF.CaseLinkID_Prop_Flag	:=	FALSE;
+self.AgencyID   := L.CourtID;
+self.Global_sid := 0;
+self.Record_sid := 0;
+self.agency_id_src := 'R';
 end;
 
 export Mapping_Hogan := project(filein_join, main_mapping_format(left));
