@@ -510,6 +510,7 @@ EXPORT Layouts := MODULE
 		
 		export SkipModules := RECORD
 			//General Processes
+			boolean SkipInputBuild;
 			boolean SkipBaseBuild;
 			boolean SkipBaseRollback;
 			boolean SkipKeysBuild;

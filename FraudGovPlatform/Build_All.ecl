@@ -25,6 +25,7 @@ module
 	shared pUseProdData := True; // Default to prod data. The data used to refresh the RIN Analytics Dashboard
 
 	// Skip Modules if they are no enabled	
+	shared SkipInputPortion := SkipModules[1].SkipInputBuild;
 	shared SkipBasePortion := SkipModules[1].SkipBaseBuild;
 	shared SkipBaseRollback := SkipModules[1].SkipBaseRollback;
 	shared SkipKeysPortion := SkipModules[1].SkipKeysBuild;
@@ -49,8 +50,8 @@ module
 	export Run_NAC 			:= if(SkipNACBuild = false, FraudGovPlatform_Validation.SprayAndQualifyNAC(pversion));
 	export Run_Prepped		:= if(SkipContributory = false, FraudGovPlatform_Validation.SprayAndQualifyInput(pversion));
 
-	export Run_Inputs 	:= Build_Input(pversion, MBS_File).All;	
-	export Run_Base 	:= Build_Base(pversion, MBS_File).All;
+	export Run_Inputs 	:= if(SkipInputPortion=false,Build_Input(pversion, MBS_File).All);	
+	export Run_Base 	:= if(SkipBasePortion=false,Build_Base(pversion, MBS_File).All);
 	export Run_GarbageCollector := if(SkipGarbageCollector = false,Garbage_Collector.Run);
 	// --
 	export Run_Rollback := if(SkipBaseRollback=false,Rollback('',Test_Build,Test_RecordID,Test_RinID).All);
@@ -97,9 +98,7 @@ module
 		 	
 	export Build_FraudGov_Base := 
 	if(tools.fun_IsValidVersion(pversion),
-		if(SkipBasePortion=false, 
-			  base_portion
-			, output('Skipping FraudGovPlatform.Build_Base')),
+		base_portion,
 		output('No Valid version parameter passed, skipping FraudGovPlatform.Build_Base'));
 
 	export Build_Fraudgov_Keys :=
