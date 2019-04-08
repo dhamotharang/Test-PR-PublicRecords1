@@ -505,6 +505,7 @@ dedupedOffender:= dedup(sortedOffender,
                            curr_incar_flag ,   curr_parole_flag ,   curr_probation_flag ,	 fcra_conviction_flag ,	 fcra_traffic_flag ,	 fcra_date ,	 fcra_date_type ,
 	                         conviction_override_date ,	 conviction_override_date_type ,	 offense_score ,local): persist('Persist::Crim_offender_persistentID1');
 
-uniquePID := dedup(sort(dedupedOffender,offender_persistent_id,-score,did,ssn_appended,image_link),offender_persistent_id) :persist('Persist::Crim_offender_persistentID1_unique');
+uniquePID := dedup(sort(dedupedOffender,offender_persistent_id,-score,-did,-ssn_appended,name_type,-image_link), offender_persistent_id) :persist('Persist::Crim_offender_persistentID1_unique');
+
 
 export MainFile := uniquePID;
