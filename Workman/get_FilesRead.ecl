@@ -7,9 +7,9 @@ EXPORT get_FilesRead(
 ) :=
 functionmacro
 
-  import std;
+  import std,Workman;
   
-  #IF(pUseGlobal = true and pesp in _Config.LocalEsps)
+  #IF(pUseGlobal = true and pesp in Workman._Config.LocalEsps)
     returnresult := global(nothor(STD.System.Workunit.WorkunitFilesRead(pWorkunitID)),few);
   #ELSIF(pUseGlobal = false and pesp in _Config.LocalEsps)
     returnresult := STD.System.Workunit.WorkunitFilesRead(pWorkunitID);

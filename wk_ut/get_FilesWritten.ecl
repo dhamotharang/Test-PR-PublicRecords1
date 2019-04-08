@@ -1,2 +1,14 @@
-﻿import Workman;
-EXPORT get_FilesWritten := Workman.get_FilesWritten;
+﻿import Workman,wk_ut;
+
+EXPORT get_FilesWritten(
+   pWorkunitID = '\'\''
+  ,pesp        = 'wk_ut._Constants.LocalEsp'
+  ,pUseGlobal  = 'true'
+) :=
+functionmacro
+
+  import Workman;
+  
+  return Workman.get_FilesWritten(pWorkunitID ,pesp ,pUseGlobal);
+
+endmacro;
