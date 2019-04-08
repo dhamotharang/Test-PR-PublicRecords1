@@ -3,6 +3,6 @@ IMPORT KEL011 AS KEL;
 IMPORT B_Customer,E_Customer FROM KELOtto;
 IMPORT * FROM KEL011.Null;
 EXPORT RQ__show_Customer := MODULE
-  SHARED __EE825322 := B_Customer.IDX_Customer_UID_Wrapped;
-  EXPORT Res0 := __UNWRAP(__EE825322);
+  SHARED __EE827635 := B_Customer.IDX_Customer_UID_Wrapped;
+  EXPORT Res0 := __UNWRAP(__EE827635);
 END;

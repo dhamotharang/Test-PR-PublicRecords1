@@ -3,6 +3,12 @@
 
 import PRTE_CSV;
 export	Layouts	:= module
+
+EXPORT DEFLT_CPA := RECORD
+ unsigned4 global_sid;
+ unsigned8 record_sid;
+ end;
+
 //*  Layout for Foreclosures on LZ:    
 		
   EXPORT ERC_Record := RECORD

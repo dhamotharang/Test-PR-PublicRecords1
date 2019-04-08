@@ -1746,5 +1746,7 @@ EXPORT dsSourceCriteria := DATASET([
 {'EC (CFSP) 2019/468 Egypt List','1733'},
 {'EC 2019/431 ISIL (Da\'esh) and Al-Qaida List','1734'},
 {'EC 2019/459 Egypt List','1735'},
-{'Financial Sector Conduct Authority (South Africa) Media Releases','1736'}
+{'Financial Sector Conduct Authority (South Africa) Media Releases','1736'},
+{'EC 2019/507 ISIL (Da\'esh) and Al-Qaida List','1737'},
+{'FBI Featured Fugitives - Law Enforcement Assistance','1738'}
 ],r);

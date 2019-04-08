@@ -89,13 +89,13 @@ module
 	//////////////////////////////////////////////////////////////////
 	// -- Config Filenames
 	//////////////////////////////////////////////////////////////////
+	export CustomerSettings := FraudGov_Prefix('config') + 'CustomerSettings';
+
 	export Flags := module
 		export NewHeader := FraudGov_Prefix('flags') + 'NewHeader_flag';
 		export FraudgovInfoFn := FraudGov_Prefix('flags') + 'NewFraudgov_flag';
 		export RefreshAddresses := FraudGov_Prefix('flags') + 'RefreshAddresses_flag';	
-		export SourcesToAnonymize := FraudGov_Prefix('flags') + 'SourcesToAnonymize_flag';	
 		export SkipModules := FraudGov_Prefix('flags') + 'SkipModules_flag';
-		export SkipValidationByGCID	 := FraudGov_Prefix('flags') + 'SkipValidationByGCID_flag';
 	end;
 	//////////////////////////////////////////////////////////////////
 	// -- Output Filename Versions
