@@ -66,7 +66,7 @@ SuppressResultSchemas      =1
   end;
   
 	ECLSourceFileLayout :=
-	record, maxlength(500)
+	record, maxlength(5000)
 	
 	// string FileName{xpath('FileName')};
   // <xsd:element minOccurs="0" name="FileCluster" type="xsd:string" /> 
@@ -78,7 +78,7 @@ SuppressResultSchemas      =1
 
 		string FileCluster {xpath('FileCluster')};
 		string Name{xpath('Name')};
-		boolean IsSuperFile{xpath('IsSuperFile')};
+	  boolean IsSuperFile{xpath('IsSuperFile')};
 		integer Subs {xpath('Subs')};
 		integer Count{xpath('Count')};
 		dataset(SubfileLayout       ) Subfiles {xpath('ECLSourceFiles/ECLSourceFile')};
@@ -224,7 +224,7 @@ SuppressResultSchemas      =1
     import ut,Workman;
     
 		results := SOAPCALL(
-			'http://' + esp + '/WsWorkunits'//?ver_=1.48'
+			'http://' + esp + '/WsWorkunits?ver_=1.69'
 			,'WUInfo'
 			,wuinfoInRecord
 			,dataset(wuinfoOutRecord)

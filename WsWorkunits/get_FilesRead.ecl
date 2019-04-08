@@ -2,6 +2,7 @@
    string   pWorkunitID = ''
   ,string   pesp        = WsWorkunits._Config.localEsp
   ,boolean  pUseGlobal  = true
+  ,boolean  pDebug      = false
 ) :=
 function
 
@@ -20,6 +21,15 @@ function
                   ,project(global(FilesRead1,few),WsFileRead)
                   ,project(FilesRead1,WsFileRead)
                 );
-  return FilesRead;
+
+  output_debug := parallel(
+     output(wuinfo            ,named('wuinfo'           ),all)
+    ,output(dnormSourceFiles  ,named('dnormSourceFiles' ),all)
+    ,output(FilesRead1        ,named('FilesRead1'       ),all)
+    ,output(FilesRead         ,named('FilesRead'        ),all)
+  
+  );
+
+  return when(FilesRead ,if(pDebug = true ,output_debug));
   
 end;
