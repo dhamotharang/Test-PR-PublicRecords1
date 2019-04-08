@@ -79,16 +79,16 @@ export _proc_dotid(
 	
 	/*-----------------------For Persistence stats of the dot cluster and records -------------*/
   import BIPV2_QA_Tool;
-  shared the_base:=	dataset(f_out(iter),l_base,thor);
-	shared the_father:=BIPV2.CommonBase.DS_BASE;
+  shared the_base   := _files_dotid.DS_BUILDING;
+	shared the_father := BIPV2.CommonBase.DS_BASE;
 	shared ds_dotid_persistence_stats                := BIPV2_Strata.PersistenceStats(the_base,the_father,rcid,dotid) : independent;
 	shared QA_Tool_Dotid_persistence_record_stats    := BIPV2_QA_Tool.mac_persistence_records_stats(ds_dotid_persistence_stats ,'dotid' ,Build_Date);
   shared QA_Tool_Dotid_persistence_cluster_stats   := BIPV2_QA_Tool.mac_persistence_cluster_stats(ds_dotid_persistence_stats ,'dotid' ,Build_Date);
 
 	/* ---------------------- SALT Output -------------------------------- */
+  last_dotid_iter := '~' + nothor(std.file.superfilecontents(_files_dotid.FILE_BUILDING)[1].name);
 
-	export updateBuilding(string fname=f_out(iter)) := _files_dotid.updateDotIDBuilding(fname);
-	export updateSuperfiles(string fname=f_out(iter),DATASET(l_common) ds=ds_ingest) :=
+	export updateSuperfiles(string fname=last_dotid_iter,DATASET(l_common) ds=ds_ingest) :=
   function
   
     kick_copy2_storage_thor_post  := BIPV2_Tools.Copy2_Storage_Thor(fname ,Build_Date ,'dotid_postprocess');
@@ -121,6 +121,7 @@ export _proc_dotid(
 	/* ---------------------- Take Action -------------------------------- */
 	export runSpecBuild := sequential(specBuild, specDebug);
   import BIPV2_build;
+	export updateBuilding(string fname=f_out(iter)) := _files_dotid.updateDotIDBuilding(fname);
   export runSpecs(pversion = 'BIPV2.KeySuffix',pInputfile = 'BIPV2.CommonBase.DS_BUILT',pDoSpecs = 'true') := 
   functionmacro
 		eclSpec		:= 'import BIPV2_Files,BIPV2_build;\npversion  := \'@version@\';\nlih := project(' + #TEXT(pInputfile) + ',BIPV2_Files.files_dotid(\'BIPV2_DOTID\').l_DOTID);\n#OPTION(\'multiplePersistInstances\',FALSE);\n#workunit(\'name\',\'BIPV2 DotID \' + pversion + \' Specificities \');\n#workunit(\'priority\',\'high\');\nBIPV2_DOTID._proc_dotid(lih).runSpecBuild;';
