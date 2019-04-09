@@ -153,15 +153,15 @@ export _proc_empid(
 	
 	/*-----------------------For Persistence stats of the emp cluster and records -------------*/
   import BIPV2_QA_Tool;
-  shared the_base:=	dataset(f_out(iter),l_base,thor);
-	shared the_father:=BIPV2.CommonBase.DS_BASE;
+  shared last_empid_iter  := '~' + nothor(std.file.superfilecontents(_files_empid.FILE_BUILDING)[1].name);
+  shared the_base         := dataset(last_empid_iter,l_base,thor);
+	shared the_father       := BIPV2.CommonBase.DS_BASE;
 	shared ds_empid_persistence_stats                := BIPV2_Strata.PersistenceStats(the_base,the_father,rcid,empid) : independent;
 	shared QA_Tool_Empid_persistence_record_stats    := BIPV2_QA_Tool.mac_persistence_records_stats(ds_empid_persistence_stats ,'empid' ,Build_Date);
   shared QA_Tool_Empid_persistence_cluster_stats   := BIPV2_QA_Tool.mac_persistence_cluster_stats(ds_empid_persistence_stats ,'empid' ,Build_Date);
 	
 	/* ---------------------- SALT Output -------------------------------- */
-	shared updateBuilding(string fname=f_out(iter)) := _files_empid.updateBuilding(fname);
-	export updateSuperfiles(string fname=f_out(iter), DATASET(l_common) ds_common=ds_empid_down) := 
+	export updateSuperfiles(string fname=last_empid_iter, DATASET(l_common) ds_common=ds_empid_down) := 
   function
   
     kick_copy2_storage_thor  := BIPV2_Tools.Copy2_Storage_Thor(fname ,Build_Date ,'empid_postprocess');
@@ -194,6 +194,7 @@ export _proc_empid(
   import BIPV2_QA_Tool;
   export Empid_iteration_stats := BIPV2_QA_Tool.mac_Iteration_Stats(workunit  ,empid ,Build_Date  ,iter  ,BIPV2_Empid.Config.MatchThreshold ,'BIPV2_Empid');
 
+	shared updateBuilding(string fname=f_out(iter)) := _files_empid.updateBuilding(fname);
 	export runIter := sequential(linking, outputReviewSamples, updateBuilding(),Empid_iteration_stats/*, updateLinkHist*/)
 		: SUCCESS(bipv2_build.mod_email.SendSuccessEmail(,'BIPv2', , 'EmpID')),
 			FAILURE(bipv2_build.mod_email.SendFailureEmail(,'BIPv2', failmessage, 'EmpID'));

@@ -1,9 +1,114 @@
-﻿EXPORT Layout_Lerg := MODULE
+﻿IMPORT dx_PhonesInfo;
 
-	//DF-23660: Create Lerg6 Keybuild
-	//DF-24140: Lerg6 Layout Change
-	//DF-24037: Replace LIDB Use Lerg6 for Carrier Info
+	//DF-24397: Create Dx-Prefixed Keys
 
+EXPORT Layout_Lerg := MODULE
+
+	//Lerg1
+	EXPORT lerg1_in := RECORD
+		string4 ocn;
+		string50 ocn_name;
+		string20 ocn_abbr_name;
+		string2	ocn_state;
+		string10 category;
+		string4	overall_ocn;
+		string5	filler1;
+		string1	filler2;
+		string20 last_name;
+		string10 first_name;
+		string1 middle_initial;
+		string50 company_name;
+		string30 title;
+		string address1;
+		string address2;
+		string10 floor;
+		string20 room;
+		string20 city;
+		string2	state;
+		string9 postal_code;
+		string12 phone;
+		string4 target_ocn;
+		string4 overall_target_ocn;
+		string1	rural_lec_indicator;
+		string1	small_ilec_indicator;	
+	END;
+	
+	EXPORT lerg1 := RECORD
+		lerg1_in;
+		string255 filename{virtual (logicalfilename)};
+	END;
+	
+	EXPORT lerg1Hist := RECORD
+		lerg1_in;	
+		string255 filename;
+	END;
+	
+	//Lerg1Con
+	EXPORT lerg1Con_in := RECORD
+		string4	ocn;
+		string50 ocn_name;
+		string2	ocn_state;
+		string20 contact_function;
+		string10 contact_phone;
+		string70 contact_information;
+		string16 filler;
+	END;
+	
+	EXPORT lerg1Con := RECORD
+		lerg1Con_in;	
+		string255 filename{virtual (logicalfilename)};
+	END;
+	
+	EXPORT lerg1ConHist := RECORD
+		lerg1Con_in;	
+		string255 filename;
+	END;
+	
+	//Lerg1ConOver
+	EXPORT lerg1ConOver_in := RECORD
+		string ocn;	
+		string ocn_name;
+		string empty;
+		string category;	
+		string overall_ocn;	
+		string contact_function;	
+		string overall_company;
+		string first_name;	
+		string mi;	
+		string last_name;	
+		string title;	
+		string address;	
+		string floor;	
+		string room;	
+		string city;	
+		string state;	
+		string zip;	
+		string contact_phone;	
+		string email;	
+		string fax;
+	END;
+	
+	EXPORT lerg1ConOver := RECORD
+		lerg1ConOver_in;	
+		string255 filename{virtual (logicalfilename)};
+	END;
+	
+	EXPORT lerg1ConOverHist := RECORD
+		lerg1ConOver_in;	
+		string255 filename;
+	END;
+	
+	//Lerg Prep	
+	EXPORT lergPrep := RECORD
+		dx_PhonesInfo.Layouts.sourceRefBase;
+		string address1;
+		string address2;
+		string opname;
+		string country;
+		string1 is_new;
+		string1 rec_update;
+	END;
+	
 	//Lerg6
 	EXPORT lerg6_in:= RECORD
 		string lata;
@@ -51,103 +156,88 @@
 		lerg6_in;
 		string255 filename{virtual (logicalfilename)};
 	END;
-	
+		
 	EXPORT lerg6Hist := RECORD
 		lerg6_in;	
 		string255 filename;
 	END;
 	
-	EXPORT lerg6Main := record
-		string8 dt_first_reported;
-		string8 dt_last_reported;
-		string8 dt_start;						//Date/Time Entered in Table
-		string8 dt_end;
-		string2 source;
-		string10 lata;
-		string30 lata_name;
-		string2 status;
-		string8 eff_date;
-		string6 eff_time;
-		string3 npa;
-		string3 nxx;
-		string1 block_id;
-		string1 filler1;
-		string5 coc_type;
-		string5 ssc;
-		string1 dind;
-		string5 td_eo;
-		string5 td_at;
-		string1 portable;
-		string5 aocn;
-		string1 filler2;
-		string5 ocn;
-		string20 loc_name;
-		string5 loc;
-		string2 loc_state;
-		string20 rc_abbre;
-		string5 rc_ty;
-		string5 line_fr;
-		string5 line_to;
-		string15 switch;
-		string5 sha_indicator;
-		string1 filler3;
-		string5 test_line_num;
-		string2 test_line_response;
-		string8 test_line_exp_date;
-		string6 test_line_exp_time;
-		string2 blk_1000_pool;
-		string10 rc_lata;
-		string1 filler4;
-		string8 creation_date;
-		string6 creation_time;
-		string1 filler5;
-		string8 e_status_date;
-		string6 e_status_time;
-		string1 filler6;
-		string8 last_modified_date;
-		string6 last_modified_time;
-		string1 filler7;
-		boolean is_current;
-		string5 os1;
-		string5 os2;
-		string5 os3;
-		string5 os4;
-		string5 os5;
-		string5 os6;
-		string5 os7;
-		string5 os8;
-		string5 os9;
-		string5 os10;
-		string5 os11;
-		string5 os12;
-		string5 os13;
-		string5 os14;
-		string5 os15;
-		string5 os16;
-		string5 os17;
-		string5 os18;
-		string5 os19;
-		string5 os20;
-		string5 os21;
-		string5 os22;
-		string5 os23;
-		string5 os24;
-		string5 os25;
-		string80 notes;
-		unsigned4 global_sid;		//CCPA Requirement
-		unsigned8 record_sid;		//CCPA Requirement
-	end;
+	EXPORT lerg6Atc_in := RECORD
+		lerg6_in;
+		string os1;
+		string os2;
+		string os3;
+		string os4;
+		string os5;
+		string os6;
+		string os7;
+		string os8;
+		string os9;
+		string os10;
+		string os11;
+		string os12;
+		string os13;
+		string os14;
+		string os15;
+		string os16;
+		string os17;
+		string os18;
+		string os19;
+		string os20;
+		string os21;
+		string os22;
+		string os23;
+		string os24;
+		string os25;
+	END;
+	
+	EXPORT lerg6Atc := RECORD
+		lerg6Atc_in;
+		string255 filename{virtual (logicalfilename)};
+	END;
+	
+	EXPORT lerg6AtcHist := RECORD
+		lerg6Atc_in;	
+		string255 filename;
+	END;
+	
+	EXPORT lerg6Odd_in := RECORD
+		lerg6_in;
+		string notes;
+	END;
+	
+	EXPORT lerg6Odd := RECORD
+		lerg6Odd_in;
+		string255 filename{virtual (logicalfilename)};
+	END;
+	
+	EXPORT lerg6OddHist := RECORD
+		lerg6Odd_in;	
+		string255 filename;
+	END;
+	
+	//Lerg6 Base
+	//dx_PhonesInfo.Layouts.lerg6Main
+	
+	EXPORT lerg6Prep := RECORD
+		string3 lerg6_type;
+		lerg6Atc_in;	
+		string notes;
+		string8 filedate;
+		string255 filename;
+	END;
 	
 	EXPORT lerg6UpdHist := record						
-		string 		reference_id 	:= '';
-		string10 	phone;
-		unsigned6	did						:=0;
-		string8		file_date 		:= '';
+		string 			reference_id := '';
+		string10 		phone;
+		unsigned6		did:=0;
+		string8			file_date := '';
 	end;
 	
 	EXPORT lerg6UpdHist_Prep := record
-		PhonesInfo.Layout_Common.portedMetadata_Main;
+		PhonesInfo.Layout_common.portedMetadata_Main;
 		unsigned4   global_sid;		//CCPA Requirement
 		unsigned8   record_sid;		//CCPA Requirement
 	end;
+	
 END;
