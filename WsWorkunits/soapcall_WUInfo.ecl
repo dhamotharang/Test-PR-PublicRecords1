@@ -78,7 +78,7 @@ SuppressResultSchemas      =1
 
 		string FileCluster {xpath('FileCluster')};
 		string Name{xpath('Name')};
-		boolean IsSuperFile{xpath('IsSuperFile')};
+	  boolean IsSuperFile{xpath('IsSuperFile')};
 		integer Subs {xpath('Subs')};
 		integer Count{xpath('Count')};
 		dataset(SubfileLayout       ) Subfiles {xpath('ECLSourceFiles/ECLSourceFile')};
@@ -224,7 +224,7 @@ SuppressResultSchemas      =1
     import ut,Workman;
     
 		results := SOAPCALL(
-			'http://' + esp + '/WsWorkunits'//?ver_=1.48'
+			'http://' + esp + '/WsWorkunits?ver_=1.69'
 			,'WUInfo'
 			,wuinfoInRecord
 			,dataset(wuinfoOutRecord)
